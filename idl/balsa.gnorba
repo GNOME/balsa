@@ -1,5 +1,11 @@
-[balsa]
+[mail_send]
 type=exe
 repo_id=IDL:balsa/mail_send:1.0
-description=BALSA E-mail reader
+description=Balsa send message
+location-info=balsa
+
+[mailbox_info]
+type=exe
+repo_id=IDL:balsa/mailbox_info:1.0
+description=Balsa mailbox info
 location-info=balsa

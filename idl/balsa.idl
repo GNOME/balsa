@@ -1,6 +1,10 @@
 module balsa {
   interface mail_send {
-    long open(in string to);
-    long attachment(in string to, in string filename);
+    boolean to(in string to);
+    boolean attachment(in string to, in string filename);
+  };
+  interface mailbox_info {
+    boolean newmail(in string path);
+    long num_msgs (in string path);
   };
 };

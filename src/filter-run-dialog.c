@@ -48,8 +48,8 @@ enum {
     LAST_SIGNAL,
 };
 
+static GObjectClass *parent_class = NULL;
 static gint balsa_filter_run_dialog_signals[LAST_SIGNAL];
-static GtkDialogClass *parent_class = NULL;
 
 GList * fr_dialogs_opened=NULL;
 
@@ -58,6 +58,7 @@ GList * fr_dialogs_opened=NULL;
 static void balsa_filter_run_dialog_class_init(BalsaFilterRunDialogClass *
                                                klass);
 static void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p);
+static void balsa_filter_run_dispose(GObject * object);
 
 static void fr_refresh(BalsaFilterRunDialog * dialog,
                        GSList * names_changing, gpointer throwaway);
@@ -123,10 +124,10 @@ populate_selected_filters_list(GtkTreeView * filter_list,
     }
 }
 
-GtkType
+GType
 balsa_filter_run_dialog_get_type(void)
 {
-    static GtkType balsa_filter_run_dialog_type = 0;
+    static GType balsa_filter_run_dialog_type = 0;
 
     if (!balsa_filter_run_dialog_type) {
 	GTypeInfo balsa_filter_run_dialog_info = {
@@ -154,9 +155,8 @@ balsa_filter_run_dialog_get_type(void)
 static void
 balsa_filter_run_dialog_class_init(BalsaFilterRunDialogClass * klass)
 {
-    GtkObjectClass *object_class;
-
-    object_class = GTK_OBJECT_CLASS(klass);
+    GObjectClass *object_class = G_OBJECT_CLASS(klass);
+    parent_class = g_type_class_peek_parent(klass);
 
     balsa_filter_run_dialog_signals[REFRESH] =
 	g_signal_new("refresh",
@@ -167,7 +167,7 @@ balsa_filter_run_dialog_class_init(BalsaFilterRunDialogClass * klass)
 		     g_cclosure_marshal_VOID__OBJECT,
                      G_TYPE_NONE, 1, G_TYPE_OBJECT);
 
-    parent_class = gtk_type_class(gtk_dialog_get_type());
+    object_class->dispose = balsa_filter_run_dispose;
 
     klass->refresh = fr_refresh;
 }
@@ -178,19 +178,18 @@ balsa_filter_run_dialog_new(LibBalsaMailbox * mbox)
     BalsaFilterRunDialog *p;
     gchar * dialog_title;
 
+    g_return_val_if_fail(mbox, NULL);
     p = g_object_new(BALSA_TYPE_FILTER_RUN_DIALOG, NULL);
-    g_return_val_if_fail(p,NULL);
 
     /* We set the dialog title */
     p->mbox=mbox;
-    dialog_title=g_strconcat(_("Balsa Filters of mailbox : "),p->mbox->name,NULL);
+    libbalsa_mailbox_open(p->mbox); 
+    dialog_title=g_strconcat(_("Balsa Filters of mailbox : "),
+                             p->mbox->name,NULL);
     gtk_window_set_title(GTK_WINDOW(p),dialog_title);
     gtk_window_set_wmclass(GTK_WINDOW(p), "filter-run", "Balsa");
     g_free(dialog_title);
 
-    /* Open the mailbox if needed */
-    if (mbox->open_ref==0)
-	libbalsa_mailbox_open(p->mbox);
     /* Load associated filters if needed */
     if (!p->mbox->filters)
 	config_mailbox_filters_load(p->mbox);
@@ -360,7 +359,21 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     p->filters_modified=FALSE;
 }
 
-static void fr_refresh(BalsaFilterRunDialog * fr_dialog,GSList * names_changing,gpointer throwaway)
+/* balsa_filter_run_dispose:
+   FIXME: why is it called twice? Is it a problem?
+*/
+static void
+balsa_filter_run_dispose(GObject * object)
+{
+    BalsaFilterRunDialog* bfrd = BALSA_FILTER_RUN_DIALOG(object);
+    if(bfrd->mbox) libbalsa_mailbox_close(bfrd->mbox); 
+    bfrd->mbox = NULL;
+    G_OBJECT_CLASS(parent_class)->dispose(object);
+}
+
+static void
+fr_refresh(BalsaFilterRunDialog * fr_dialog,GSList * names_changing,
+           gpointer throwaway)
 {
     /* FIXME : this is the future implementation of a signal that will be able to tell each filter-run dialog box
      * that filters have changed and that they have to refresh their content

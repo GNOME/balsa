@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -44,18 +44,22 @@ extern "C" {
 #endif				/* __cplusplus */
 
 
-#define BALSA_TYPE_FILTER_RUN_DIALOG          balsa_filter_run_dialog_get_type()
-#define BALSA_FILTER_RUN_DIALOG(obj)          GTK_CHECK_CAST(obj, BALSA_TYPE_FILTER_RUN_DIALOG, BalsaFilterRunDialog)
-#define BALSA_FILTER_RUN_DIALOG_CLASS(klass)  GTK_CHECK_CLASS_CAST(klass, BALSA_TYPE_FILTER_RUN_DIALOG, BalsaFilterRunDialogClass)
-#define BALSA_IS_FILTER_RUN_DIALOG(obj)       GTK_CHECK_TYPE(obj, BALSA_TYPE_FILTER_RUN_DIALOG)
+#define BALSA_TYPE_FILTER_RUN_DIALOG     \
+     (balsa_filter_run_dialog_get_type())
+#define BALSA_FILTER_RUN_DIALOG(obj)     \
+     G_TYPE_CHECK_INSTANCE_CAST((obj), BALSA_TYPE_FILTER_RUN_DIALOG, BalsaFilterRunDialog)
+#define BALSA_FILTER_RUN_DIALOG_CLASS(klass) \
+     G_TYPE_CHECK_CLASS_CAST((klass), BALSA_TYPE_FILTER_RUN_DIALOG, BalsaFilterRunDialogClass)
+#define BALSA_IS_FILTER_RUN_DIALOG(obj)      \
+     G_TYPE_CHECK_INSTANCE_TYPE((obj), BALSA_TYPE_FILTER_RUN_DIALOG)
 
-    enum {
-        NAME_COLUMN,
-        DATA_COLUMN,
-        INCOMING_COLUMN,
-        CLOSING_COLUMN,
-        N_COLUMNS
-    };
+enum {
+    NAME_COLUMN,
+    DATA_COLUMN,
+    INCOMING_COLUMN,
+    CLOSING_COLUMN,
+    N_COLUMNS
+};
 
 #define BALSA_FILTER_KEY "balsa-filter-key"
 
@@ -76,10 +80,11 @@ struct _BalsaFilterRunDialog {
 struct _BalsaFilterRunDialogClass {
 	GtkDialogClass parent_class;
 
-	void (*refresh) (BalsaFilterRunDialog * fr,GSList * filters_changing,gpointer throwaway);
+	void (*refresh) (BalsaFilterRunDialog * fr,
+                         GSList * filters_changing, gpointer throwaway);
 };
 
-GtkType balsa_filter_run_dialog_get_type(void);
+GType balsa_filter_run_dialog_get_type(void) G_GNUC_CONST;
 
 GtkWidget *balsa_filter_run_dialog_new(LibBalsaMailbox * mbox);
 

@@ -345,7 +345,7 @@ static GnomeUIInfo edit_menu[] = {
 /* #define MENU_EDIT_PREFERENCES_POS 7 */
 /*     GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL), */
     GNOMEUIINFO_SEPARATOR,
-    GNOMEUIINFO_ITEM_STOCK(N_("_Filters..."), N_("Manage filters"),
+    GNOMEUIINFO_ITEM_STOCK(N_("F_ilters..."), N_("Manage filters"),
                            filter_dlg_cb, GTK_STOCK_PROPERTIES),
     GNOMEUIINFO_ITEM_STOCK(N_("_Export filters"), N_("Export filters as Sieve scripts"),
 			   filter_export_cb, GTK_STOCK_PROPERTIES),
@@ -797,8 +797,6 @@ static const gchar* main_toolbar[] = {
     BALSA_PIXMAP_REPLY_ALL,
     BALSA_PIXMAP_FORWARD,
     "",
-    BALSA_PIXMAP_PREVIOUS,
-    BALSA_PIXMAP_NEXT,
     BALSA_PIXMAP_NEXT_UNREAD,
     "",
     BALSA_PIXMAP_PRINT

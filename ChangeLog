@@ -1,3 +1,9 @@
+2002-12-08  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/filter-run.h, src/filter-run-dialog.c: GNOME2-ify
+	dialog. Keep properly open count.
+	* src/main-window.c: remove next/prev from default set of tools.
+
 2002-12-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/Makefile.am: remove threads.h

@@ -253,8 +253,6 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       message = (Message *) gtk_clist_get_row_data (clist, row);
 
       msg->window = gnome_app_new ("balsa", "Reply to ");
-
-      message_answer(message);
       break;
     case 2:
       clist = GTK_CLIST (GTK_BIN (bindex)->child);
@@ -507,7 +505,8 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   message->body_list = g_list_append (message->body_list, body);
 
-  send_message (message, balsa_app.smtp_server, balsa_app.debug);
+  if (send_message (message, balsa_app.smtp_server, balsa_app.debug))
+      message_answer(message);
 
   body_free (body);
   message->body_list->data = NULL;

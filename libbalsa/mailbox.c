@@ -121,6 +121,7 @@ static Mailbox *client_mailbox = NULL;
 static void load_messages (Mailbox * mailbox, gint emit);
 static void free_messages (Mailbox * mailbox);
 
+static void send_watcher_mark_clear_message (Mailbox * mailbox, Message * message);
 static void send_watcher_mark_answer_message (Mailbox * mailbox, Message * message);
 static void send_watcher_mark_read_message (Mailbox * mailbox, Message * message);
 static void send_watcher_mark_delete_message (Mailbox * mailbox, Message * message);
@@ -548,6 +549,31 @@ free_messages (Mailbox * mailbox)
  * sending messages to watchers
  */
 static void
+send_watcher_mark_clear_message (Mailbox * mailbox, Message * message)
+{
+  GList *list;
+  MailboxWatcherMessage mw_message;
+  MailboxWatcher *watcher;
+
+  mw_message.type = MESSAGE_MARK_DELETE;
+  mw_message.mailbox = mailbox;
+  mw_message.message = message;
+
+  list = WATCHER_LIST (mailbox);
+  while (list)
+    {
+      watcher = list->data;
+      list = list->next;
+
+      if (watcher->mask & MESSAGE_MARK_CLEAR_MASK)
+	{
+	  mw_message.data = watcher->data;
+	  (*watcher->func) (&mw_message);
+	}
+    }
+}
+
+static void
 send_watcher_mark_answer_message (Mailbox * mailbox, Message * message)
 {
   GList *list;
@@ -895,6 +921,24 @@ message_answer (Message * message)
 
   message->flags |= MESSAGE_FLAG_ANSWERED;
   send_watcher_mark_delete_message (message->mailbox, message);
+
+  UNLOCK_MAILBOX ();
+}
+
+void
+message_clear_flags (Message * message)
+{
+  char tmp[BUFFER_SIZE];
+
+  LOCK_MAILBOX (message->mailbox);
+  RETURN_IF_CLIENT_STRAM_CLOSED (message->mailbox);
+
+  sprintf (tmp, "%ld", message->msgno);
+  mail_clearflag (CLIENT_STREAM (message->mailbox), tmp, "\\DELETED");
+  mail_clearflag (CLIENT_STREAM (message->mailbox), tmp, "\\ANSWERED");
+
+  message->flags = 0;
+  send_watcher_mark_clear_message (message->mailbox, message);
 
   UNLOCK_MAILBOX ();
 }

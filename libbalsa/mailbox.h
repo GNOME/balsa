@@ -51,6 +51,7 @@ typedef enum
 
 typedef enum
 {
+  MESSAGE_MARK_CLEAR,       /* clear all flags */
   MESSAGE_MARK_ANSWER,      /* message has been answered */
   MESSAGE_MARK_READ,        /* message has changed from new to read */
   MESSAGE_MARK_DELETE,      /* message has been marked deleted */
@@ -64,6 +65,7 @@ typedef enum
 
 typedef enum
 {
+  MESSAGE_MARK_CLEAR_MASK     = 1,
   MESSAGE_MARK_ANSWER_MASK    = 1 << 1,
   MESSAGE_MARK_READ_MASK      = 1 << 2,
   MESSAGE_MARK_DELETE_MASK    = 1 << 3,

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-07-11 12:47-0400\n"
+"POT-Creation-Date: 1998-07-12 11:02-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,7 +26,7 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: src/main-window.c:300 src/sendmsg-window.c:166
+#: src/main-window.c:291 src/sendmsg-window.c:166
 msgid "Message"
 msgstr ""
 
@@ -50,11 +50,11 @@ msgstr ""
 msgid "Contents"
 msgstr ""
 
-#: src/addrbook-manager.c:200 src/main-window.c:382 src/sendmsg-window.c:207
+#: src/addrbook-manager.c:200 src/main-window.c:373 src/sendmsg-window.c:207
 msgid "Help"
 msgstr ""
 
-#: src/addrbook-manager.c:188 src/main-window.c:213
+#: src/addrbook-manager.c:188 src/main-window.c:212
 msgid "File"
 msgstr ""
 
@@ -66,54 +66,54 @@ msgstr ""
 msgid "Get New Mail"
 msgstr ""
 
-#: src/main-window.c:201
+#: src/main-window.c:200
 msgid "Exit"
 msgstr ""
 
-#: src/main-window.c:223
+#: src/main-window.c:222
 msgid "New"
 msgstr ""
 
-#: src/main-window.c:236
+#: src/main-window.c:235
 msgid "Reply"
 msgstr ""
 
-#: src/main-window.c:251
+#: src/main-window.c:248
 msgid "Forward"
 msgstr ""
 
-#: src/main-window.c:269
+#: src/main-window.c:264
 msgid "Delete"
 msgstr ""
 
-#: src/main-window.c:285
+#: src/main-window.c:278
 msgid "Undelete"
 msgstr ""
 
-#: src/main-window.c:305
+#: src/main-window.c:296
 msgid "MDI"
 msgstr ""
 
-#: src/main-window.c:312
+#: src/main-window.c:303
 msgid "Mailbox List"
 msgstr ""
 
-#: src/main-window.c:329
+#: src/main-window.c:320
 msgid "Mailboxes"
 msgstr ""
 
-#: src/main-window.c:338
+#: src/main-window.c:329
 msgid "Preferences..."
 msgstr ""
 
-#: src/main-window.c:349
+#: src/main-window.c:340
 msgid "Mailbox Manager..."
 msgstr ""
 
-#: src/main-window.c:361
+#: src/main-window.c:352
 msgid "Settings"
 msgstr ""
 
-#: src/main-window.c:369
+#: src/main-window.c:360
 msgid "About"
 msgstr ""

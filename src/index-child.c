@@ -269,19 +269,19 @@ create_menu (BalsaIndex * bindex, Message * message)
 
   submenu = gtk_menu_new ();
   smenuitem = gtk_menu_item_new_with_label ("Unread");
-  gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+  gtk_signal_connect (GTK_OBJECT (smenuitem), "activate",
 		      (GtkSignalFunc) message_status_set_new_cb, message);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
 
   smenuitem = gtk_menu_item_new_with_label ("Read");
-  gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+  gtk_signal_connect (GTK_OBJECT (smenuitem), "activate",
 		      (GtkSignalFunc) message_status_set_read_cb, message);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
 
   smenuitem = gtk_menu_item_new_with_label ("Replied");
-  gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+  gtk_signal_connect (GTK_OBJECT (smenuitem), "activate",
 		   (GtkSignalFunc) message_status_set_answered_cb, message);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
@@ -340,10 +340,8 @@ static void
 message_status_set_answered_cb (GtkWidget * widget, Message * message)
 {
   g_return_if_fail (widget != NULL);
-#if 0
+
   message_answer (message);
-#endif
-  /* balsa_index_select_next (BALSA_INDEX (mainwindow->index)); */
 }
 
 

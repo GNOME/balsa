@@ -91,5 +91,6 @@ send_message (Message * message, gchar *smtp_server, glong debug)
     fprintf (stderr, "[Can't open connection to any server]\n");
   mail_free_envelope (&envelope);
   mail_free_body (&body);
+  return TRUE;
 }
 

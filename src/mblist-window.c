@@ -90,9 +90,17 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_clist_freeze (GTK_CLIST (mblw->ctree));
 
   if (balsa_app.mailbox_nodes)
-    if (balsa_app.mailbox_nodes->children)
-      gtk_ctree_insert_gnode (mblw->ctree, mblw->parent, NULL,
-	   balsa_app.mailbox_nodes->children, mailbox_nodes_to_ctree, &i);
+    {
+      GNode *walk;
+
+      walk = g_node_last_child (balsa_app.mailbox_nodes);
+      while (walk)
+	{
+	  gtk_ctree_insert_gnode (mblw->ctree, mblw->parent, NULL,
+				  walk, mailbox_nodes_to_ctree, &i);
+	  walk = walk->prev;
+	}
+    }
 
   gtk_clist_thaw (GTK_CLIST (mblw->ctree));
 
@@ -136,12 +144,12 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
   if (!gnode || (!(mbnode = gnode->data)))
     return FALSE;
 
-  if (mbnode->mailbox->type == MAILBOX_IMAP ||
-      mbnode->mailbox->type == MAILBOX_POP3)
-    return FALSE;
-
   if (mbnode->mailbox)
     {
+      if (mbnode->mailbox->type == MAILBOX_IMAP ||
+	  mbnode->mailbox->type == MAILBOX_POP3)
+	return FALSE;
+      
       if (mbnode->mailbox && mbnode->name)
 	{
 	  if (!strcmp (MAILBOX_LOCAL (mbnode->mailbox)->path, mbnode->name))
@@ -150,7 +158,6 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2, NULL,
 				       NULL, NULL, NULL,
 				       G_NODE_IS_LEAF (gnode), TRUE);
-	      gtk_ctree_set_text (ctree, cnode, 1, mbnode->mailbox->name);
 	      gtk_ctree_set_row_data(ctree,cnode,mbnode->mailbox);
 	    }
 	  else
@@ -159,7 +166,6 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2, NULL,
 				       NULL, NULL, NULL,
 				       FALSE, TRUE);
-	      gtk_ctree_set_text (ctree, cnode, 1, mbnode->mailbox->name);
 	      gtk_ctree_set_row_data(ctree,cnode,mbnode->mailbox);
 	    }
 	}
@@ -170,7 +176,6 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
       gtk_ctree_set_node_info (ctree, cnode, g_basename (mbnode->name), 2, NULL,
 			       NULL, NULL, NULL,
 			       G_NODE_IS_LEAF (gnode), TRUE);
-      gtk_ctree_set_text (ctree, cnode, 1, mbnode->mailbox->name);
     }
   return TRUE;
 }

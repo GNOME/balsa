@@ -398,14 +398,15 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi)
   gtk_widget_realize(window);
 
   gtk_widget_show (toolbar);
-#if 0
+
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
 			     "Check",
 			     "Check Email",
 			     NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RCV),
-			     (GtkSignalFunc) check_new_messages_cb,
+	/*		     (GtkSignalFunc) check_new_messages_cb, */
+			     (GtkSignalFunc) NULL,
 			     "Check Email");
   gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), mw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
@@ -413,7 +414,6 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi)
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
-#endif
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),

@@ -246,7 +246,7 @@ restore_global_settings ()
   balsa_app.debug = get_int_set_default ("debug", (gint) balsa_app.debug);
 
   /* mdi style */
-  balsa_app.toolbar_style = get_int_set_default ("mdi style", (gint) balsa_app.mdi_style);
+  balsa_app.mdi_style = get_int_set_default ("mdi style", (gint) balsa_app.mdi_style);
 
 
   /* save changes */

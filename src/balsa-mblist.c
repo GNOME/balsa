@@ -77,6 +77,7 @@ static void bmbl_get_property(GObject * object, guint prop_id,
 static gboolean bmbl_drag_motion(GtkWidget * mblist,
                                  GdkDragContext * context, gint x, gint y,
                                  guint time);
+static gboolean bmbl_popup_menu(GtkWidget * widget);
 static void bmbl_select_mailbox(GtkTreeSelection * selection,
                                 gpointer data);
 static void bmbl_init(BalsaMBList * mblist);
@@ -147,6 +148,7 @@ static gboolean bmbl_find_data_func(GtkTreeModel * model,
 static void bmbl_mbnode_tab_style(BalsaMailboxNode * mbnode, gint unread);
 static void bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter);
 static gint bmbl_core_mailbox(LibBalsaMailbox * mailbox);
+static void bmbl_do_popup(GtkWidget * widget, GdkEventButton * event);
 /* end of prototypes */
 
 /* class methods */
@@ -201,6 +203,7 @@ bmbl_class_init(BalsaMBListClass * klass)
 
     /* GtkWidget signals */
     widget_class->drag_motion = bmbl_drag_motion;
+    widget_class->popup_menu = bmbl_popup_menu;
 
     /* Properties */
     g_object_class_install_property(o_class, PROP_SHOW_CONTENT_INFO,
@@ -612,31 +615,59 @@ bmbl_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
     GtkTreePath *path;
-    BalsaMailboxNode *mbnode;
 
     if (event->type != GDK_BUTTON_PRESS || event->button != 3
         || event->window != gtk_tree_view_get_bin_window(tree_view))
         return FALSE;
 
-    mbnode = NULL;
     if (gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y,
                                       &path, NULL, NULL, NULL)) {
-        GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-        GtkTreeIter iter;
         GtkTreeSelection *selection =
             gtk_tree_view_get_selection(tree_view);
-
-        gtk_tree_model_get_iter(model, &iter, path);
-        gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);
 
         gtk_tree_selection_select_path(selection, path);
         gtk_tree_path_free(path);
     }
 
-    gtk_menu_popup(GTK_MENU(balsa_mailbox_node_get_context_menu(mbnode)),
-                   NULL, NULL, NULL, NULL, event->button, event->time);
+    bmbl_do_popup(widget, event);
 
     return TRUE;
+}
+
+/* bmbl_popup_menu:
+ * default handler for the "popup-menu" signal, which is issued when the
+ * user hits shift-F10
+ */
+static gboolean
+bmbl_popup_menu(GtkWidget * widget)
+{
+    bmbl_do_popup(widget, NULL);
+    return TRUE;
+}
+
+static void
+bmbl_do_popup(GtkWidget * widget, GdkEventButton * event)
+{
+    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    BalsaMailboxNode *mbnode = NULL;
+    gint event_button;
+    guint event_time;
+
+    if (gtk_tree_selection_get_selected(selection, &model, &iter))
+        gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);
+
+    if (event) {
+        event_button = event->button;
+        event_time = event->time;
+    } else {
+        event_button = 0;
+        event_time = gtk_get_current_event_time();
+    }
+    gtk_menu_popup(GTK_MENU(balsa_mailbox_node_get_context_menu(mbnode)),
+                   NULL, NULL, NULL, NULL, event_button, event_time);
 }
 
 /* bmbl_column_resize [MBG]
@@ -1745,7 +1776,7 @@ bmbl_mru_menu(GtkWindow * window, GList ** url_list,
     mru->window = window;
     mru->setup_cb = setup_cb;
     mru_list = g_slist_prepend(mru_list, mru);
-    item = gtk_menu_item_new_with_label(_("Other..."));
+    item = gtk_menu_item_new_with_mnemonic(_("_Other..."));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
     g_signal_connect(item, "activate",
                      G_CALLBACK(bmbl_mru_show_tree), mru);

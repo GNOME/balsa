@@ -714,6 +714,8 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
 void
 balsa_index_del(BalsaIndex * bindex, LibBalsaMessage * message)
 {
+    gint row;
+    gpointer row_data;
     GtkCTreeNode *node;
 
     g_return_if_fail(bindex != NULL);
@@ -768,7 +770,11 @@ balsa_index_del(BalsaIndex * bindex, LibBalsaMessage * message)
 					     NULL, (gpointer) message);
 	}
     }
-    
+
+
+    row_data = gtk_ctree_node_get_row_data (bindex->ctree, node);
+    row = gtk_clist_find_row_from_data (GTK_CLIST (bindex->ctree), row_data);
+    gtk_clist_unselect_row (GTK_CLIST (bindex->ctree), row, -1);
     gtk_ctree_remove_node(GTK_CTREE(bindex->ctree), node);
 }
 
@@ -809,6 +815,7 @@ balsa_index_select_row(BalsaIndex * bindex, gint row)
     gtk_clist_moveto(clist, row, -1, 0.5, 0.0);
 }
 
+
 /* balsa_index_select_next:
    selects next message or last message when no messages are selected.
 */
@@ -822,11 +829,13 @@ balsa_index_select_next(BalsaIndex * bindex)
 
     clist = GTK_CLIST(bindex->ctree);
 
+    /* check this part, it might need to be h - 2 instead */
     if ((h = bi_get_largest_selected(clist)) < 0 || h + 1 >= clist->rows)
 	h = clist->rows - 1;
 
     balsa_index_select_row(bindex, h + 1);
 }
+
 
 /* balsa_index_select_next_unread:
    search for the next unread in the current mailbox.
@@ -1485,7 +1494,9 @@ balsa_message_delete(GtkWidget * widget, gpointer user_data)
     BalsaIndex *trash = NULL;
     LibBalsaMessage *message;
     gboolean to_trash;
+    gboolean select_next = TRUE;
     GList *messages=NULL;
+
 
     g_return_if_fail(widget != NULL);
     g_return_if_fail(user_data != NULL);
@@ -1497,6 +1508,11 @@ balsa_message_delete(GtkWidget * widget, gpointer user_data)
 	to_trash = FALSE;
     else
 	to_trash = TRUE;
+
+    /* select the previous message if we're at the bottom of the index */
+    if (GTK_CLIST (index->ctree)->rows - 1 == 
+        bi_get_largest_selected (GTK_CLIST (index->ctree)))
+        select_next = FALSE;
 
     while (list) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
@@ -1510,8 +1526,13 @@ balsa_message_delete(GtkWidget * widget, gpointer user_data)
 	    libbalsa_messages_delete(messages);
 	g_list_free(messages);
     }
-    balsa_index_select_next(index);
-
+    
+    /* select another message depending on where we are in the list */
+    if (select_next)
+        balsa_index_select_next (index);
+    else
+        balsa_index_select_previous (index);
+    
     libbalsa_mailbox_commit_changes(index->mailbox_node->mailbox);
 
     /*

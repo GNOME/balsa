@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include <sys/utsname.h>
+#include <sys/stat.h>
 #include <string.h>
 #include <time.h>
 #include <gnome.h>
@@ -341,6 +342,7 @@ gint
 mailbox_open_ref (Mailbox * mailbox)
 {
   GString *tmp;
+  struct stat st;
   LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
 
 
@@ -353,6 +355,14 @@ mailbox_open_ref (Mailbox * mailbox)
       return TRUE;
     }
 
+  if (mailbox->type != MAILBOX_IMAP && mailbox->type != MAILBOX_POP3)
+    {
+      if (stat (MAILBOX_LOCAL (mailbox)->path, &st) == -1)
+	{
+	  UNLOCK_MAILBOX ();
+	  return FALSE;
+	}
+    }
 
   switch (mailbox->type)
     {

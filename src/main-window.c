@@ -276,10 +276,6 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
-  w = gtk_menu_item_new_with_label (_ ("MDI"));
-  gtk_widget_show (w);
-  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
-
 /* Mailbox list */
   menu = gtk_menu_new ();
 

@@ -48,8 +48,6 @@
 #include "sendmsg-window.h"
 #include "store-address.h"
 
-#include "filter.h"
-
 #include "libbalsa/misc.h"
 
 /* gtk widget */
@@ -77,9 +75,11 @@ static gboolean bndx_set_style_recursive(BalsaIndex * index,
 static void bndx_set_parent_style(BalsaIndex * index, GtkTreePath * path);
 static void bndx_check_visibility(BalsaIndex * index);
 static void bndx_scroll_to_row(BalsaIndex * index, GtkTreePath * path);
-static void bndx_find_row(BalsaIndex * index, GtkTreeIter * prev,
-                          GtkTreeIter * next, LibBalsaMessageFlag flag,
-                          gint op, GSList * conditions, GList * exclude);
+static void bndx_find_row(BalsaIndex * index,
+                          GtkTreeIter * prev, GtkTreeIter * next,
+                          LibBalsaMessageFlag flag,
+                          FilterOpType op, GSList * conditions,
+                          GList * exclude);
 static void bndx_expand_to_row_and_select(BalsaIndex * index,
                                           GtkTreeIter * iter);
 static void bndx_changed_find_row(BalsaIndex * index);
@@ -918,12 +918,8 @@ bndx_select_row(BalsaIndex * index, GtkTreePath * path)
 static void
 bndx_scroll_to_row(BalsaIndex * index, GtkTreePath * path)
 {
-    /* We'd like to scroll just far enough to make the row visible,
-     * (use_align = FALSE), but that raises CRITICAL messages when the
-     * widget is exposed, because it's not yet implemented in parts of
-     * GtkTreeView. */
     gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
-                                 TRUE, 0.5, 0);
+                                 FALSE, 0, 0);
 }
 
 static void
@@ -1063,8 +1059,8 @@ bndx_expand_to_row_and_select(BalsaIndex * index, GtkTreeIter * iter)
  */
 static void
 bndx_find_row(BalsaIndex * index, GtkTreeIter * prev,
-              GtkTreeIter * next, LibBalsaMessageFlag flag, gint op,
-              GSList * conditions, GList * exclude)
+              GtkTreeIter * next, LibBalsaMessageFlag flag,
+              FilterOpType op, GSList * conditions, GList * exclude)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
@@ -1103,66 +1099,57 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * prev,
     }
 }
 
+/*
+ * Helper for the public message selection methods.
+ */
 static void
-bndx_activate_cursor_key(BalsaIndex * index, guint keyval)
+bndx_find_row_and_select(BalsaIndex * index,
+                         LibBalsaMessageFlag flag,
+                         FilterOpType op,
+                         GSList * conditions,
+                         gboolean previous)
 {
-    gboolean index_has_focus = GTK_WIDGET_HAS_FOCUS(GTK_WIDGET(index));
-    
-    gtk_widget_grab_focus(GTK_WIDGET(index));
-    gtk_bindings_activate(GTK_OBJECT(index), keyval, 0);
-    if (!index_has_focus) {
-        GtkWidget *preview = BALSA_WINDOW(index->window)->preview;
-        gtk_widget_grab_focus(BALSA_MESSAGE(preview)->header_text);
-    }
+    GtkTreeIter prev;
+    GtkTreeIter next;
+
+    bndx_find_row(index, &prev, &next, flag, op, conditions, NULL);
+    bndx_expand_to_row_and_select(index, previous ? &prev : &next);
 }
 
 void
 balsa_index_select_next(BalsaIndex * index)
 {
-    bndx_activate_cursor_key(index, GDK_Down);
+    bndx_find_row_and_select(index, (LibBalsaMessageFlag) 0,
+                             FILTER_NOOP, NULL, FALSE);
 }
 
 void
 balsa_index_select_previous(BalsaIndex * index)
 {
-    bndx_activate_cursor_key(index, GDK_Up);
-}
-
-static void
-bndx_select_next_with_flag(BalsaIndex * index, LibBalsaMessageFlag flag)
-{
-    GtkTreeIter iter;
-    gboolean index_has_focus = GTK_WIDGET_HAS_FOCUS(GTK_WIDGET(index));
-    
-    bndx_find_row(index, NULL, &iter, flag, FILTER_NOOP, NULL, NULL);
-    bndx_expand_to_row_and_select(index, &iter);
-    if (!index_has_focus) {
-        GtkWidget *preview = BALSA_WINDOW(index->window)->preview;
-        gtk_widget_grab_focus(BALSA_MESSAGE(preview)->header_text);
-    }
+    bndx_find_row_and_select(index, (LibBalsaMessageFlag) 0,
+                             FILTER_NOOP, NULL, TRUE);
 }
 
 void
 balsa_index_select_next_unread(BalsaIndex * index)
 {
-    bndx_select_next_with_flag(index, LIBBALSA_MESSAGE_FLAG_NEW);
+    bndx_find_row_and_select(index, LIBBALSA_MESSAGE_FLAG_NEW,
+                             FILTER_NOOP, NULL, FALSE);
 }
 
 void
 balsa_index_select_next_flagged(BalsaIndex * index)
 {
-    bndx_select_next_with_flag(index, LIBBALSA_MESSAGE_FLAG_FLAGGED);
+    bndx_find_row_and_select(index, LIBBALSA_MESSAGE_FLAG_FLAGGED,
+                             FILTER_NOOP, NULL, FALSE);
 }
 
 void
-balsa_index_find(BalsaIndex * index, gint op, GSList * conditions,
+balsa_index_find(BalsaIndex * index, FilterOpType op, GSList * conditions,
                  gboolean previous)
 {
-    GtkTreeIter prev;
-    GtkTreeIter next;
-
-    bndx_find_row(index, &prev, &next, 0, op, conditions, NULL);
-    bndx_expand_to_row_and_select(index, previous ? &prev : &next);
+    bndx_find_row_and_select(index, (LibBalsaMessageFlag) 0,
+                             op, conditions, previous);
 }
 
 static void

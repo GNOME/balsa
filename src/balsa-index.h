@@ -24,6 +24,7 @@
 
 #include <gnome.h>
 #include "libbalsa.h"
+#include "filter.h"
 #include "mailbox-node.h"
 
 #ifdef __cplusplus
@@ -119,7 +120,8 @@ extern "C" {
     void balsa_index_select_next_flagged(BalsaIndex * bindex);
     void balsa_index_select_previous(BalsaIndex *);
 
-    void balsa_index_find(BalsaIndex * bindex,gint op,GSList * conditions,gboolean previous);
+    void balsa_index_find(BalsaIndex * bindex, FilterOpType op,
+                          GSList * conditions, gboolean previous);
 
 /* balsa index page stuff */
     void balsa_message_reply(GtkWidget * widget, gpointer user_data);

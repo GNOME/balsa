@@ -1,3 +1,7 @@
+2000-07-03  Pawel Salek <pawsa@theochem.kth.se>
+
+	* main.html.in,download.html.in: 0.9.1 announcement.
+	
 2000-07-31  Peter Williams  <peter@wgwill.ne.mediaone.net>
 
 	* download.html.in: Change from newton.cx FTP to newton.cx

@@ -53,7 +53,6 @@ struct _MailboxConfWindow
     Mailbox *mailbox;
     Mailbox *current;
 
-    GtkWidget *bbox;
     GtkWidget *ok;
     GtkWidget *cancel;
 
@@ -67,12 +66,12 @@ struct _MailboxConfWindow
     GtkWidget *local_mailbox_path;
 
     /* for imap mailboxes */
-
     GtkWidget *imap_server;
     GtkWidget *imap_port;
     GtkWidget *imap_username;
     GtkWidget *imap_password;
 
+    /* for pop3 mailboxes */
     GtkWidget *pop_mailbox_name;
     GtkWidget *pop_server;
     GtkWidget *pop_port;
@@ -221,7 +220,7 @@ mailbox_conf_delete (Mailbox * mailbox)
 void
 mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
 {
-  GtkWidget *label;
+  GtkWidget *bbox;
 
   if (mcw)
     return;
@@ -234,9 +233,7 @@ mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
   else
     mcw->mailbox = mailbox;
 
-  mcw->window = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (mcw->window), _ ("Mailbox Configurator"));
-  gtk_container_border_width (GTK_CONTAINER (mcw->window), 0);
+  mcw->window = gnome_dialog_new (_ ("Mailbox Configurator"), NULL);
 
   gtk_signal_connect (GTK_OBJECT (mcw->window),
 		      "delete_event",
@@ -247,44 +244,39 @@ mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
   /* notbook for action area of dialog */
   mcw->notebook = gtk_notebook_new ();
   gtk_container_border_width (GTK_CONTAINER (mcw->notebook), 5);
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mcw->window)->vbox), mcw->notebook, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (mcw->window)->vbox), mcw->notebook, TRUE, TRUE, 0);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (mcw->notebook), FALSE);
   gtk_notebook_set_show_border (GTK_NOTEBOOK (mcw->notebook), FALSE);
 
 
   /* notebook pages */
-  label = gtk_label_new ("np");
   gtk_notebook_append_page (GTK_NOTEBOOK (mcw->notebook),
 			    create_new_page (),
-			    label);
+			    NULL);
 
-  label = gtk_label_new ("lp");
   gtk_notebook_append_page (GTK_NOTEBOOK (mcw->notebook),
 			    create_local_mailbox_page (),
-			    label);
+			    NULL);
 
-  label = gtk_label_new ("pp");
   gtk_notebook_append_page (GTK_NOTEBOOK (mcw->notebook),
 			    create_pop_mailbox_page (),
-			    label);
+			    NULL);
 
-  label = gtk_label_new ("ip");
   gtk_notebook_append_page (GTK_NOTEBOOK (mcw->notebook),
 			    create_imap_mailbox_page (),
-			    label);
+			    NULL);
 
   /* close button (bottom dialog) */
-  mcw->bbox = gtk_hbutton_box_new ();
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mcw->window)->action_area), mcw->bbox, TRUE, TRUE, 0);
-  gtk_button_box_set_layout (GTK_BUTTON_BOX (mcw->bbox), GTK_BUTTONBOX_SPREAD);
-  gtk_button_box_set_spacing (GTK_BUTTON_BOX (mcw->bbox), 5);
-  gtk_button_box_set_child_size (GTK_BUTTON_BOX (mcw->bbox), BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
-  gtk_widget_show (mcw->bbox);
+  bbox = GNOME_DIALOG (mcw->window)->action_area;
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
+  gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 5);
+  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
+			   BALSA_BUTTON_WIDTH / 2, BALSA_BUTTON_HEIGHT / 2);
 
   if (mcw->mailbox)
     {
       mcw->ok = gtk_button_new_with_label ("Update");
-      gtk_container_add (GTK_CONTAINER (mcw->bbox), mcw->ok);
+      gtk_container_add (GTK_CONTAINER (bbox), mcw->ok);
       gtk_signal_connect (GTK_OBJECT (mcw->ok), "clicked",
 			  (GtkSignalFunc) mailbox_conf_close, (void *) TRUE);
     }
@@ -293,7 +285,7 @@ mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
     /* for new mailbox */
     {
       mcw->ok = gnome_stock_button (GNOME_STOCK_BUTTON_NEXT);
-      gtk_container_add (GTK_CONTAINER (mcw->bbox), mcw->ok);
+      gtk_container_add (GTK_CONTAINER (bbox), mcw->ok);
       gtk_signal_connect (GTK_OBJECT (mcw->ok), "clicked",
 			  GTK_SIGNAL_FUNC (next_cb), NULL);
     }
@@ -301,7 +293,7 @@ mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
 
   /* cancel button */
   mcw->cancel = gnome_stock_button (GNOME_STOCK_BUTTON_CANCEL);
-  gtk_container_add (GTK_CONTAINER (mcw->bbox), mcw->cancel);
+  gtk_container_add (GTK_CONTAINER (bbox), mcw->cancel);
   gtk_signal_connect (GTK_OBJECT (mcw->cancel), "clicked",
 		      (GtkSignalFunc) mailbox_conf_close, FALSE);
 
@@ -564,7 +556,6 @@ static GtkWidget *
 create_new_page (void)
 {
   GtkWidget *vbox;
-  GtkWidget *bbox;
   GtkWidget *radio_button;
 
   vbox = gtk_vbox_new (FALSE, 0);
@@ -578,29 +569,12 @@ create_new_page (void)
   gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (radio_button), TRUE);
   gtk_widget_show (radio_button);
 
-  /* pop3 mailbox */
-  radio_button = gtk_radio_button_new_with_label
-    (gtk_radio_button_group (GTK_RADIO_BUTTON (radio_button)), "POP3");
-  gtk_box_pack_start (GTK_BOX (vbox), radio_button, FALSE, FALSE, 0);
-  gtk_signal_connect (GTK_OBJECT (radio_button), "clicked", GTK_SIGNAL_FUNC (set_next_page), (void *) MC_PAGE_POP3);
-  gtk_widget_show (radio_button);
-
-
   /* imap mailbox */
   radio_button = gtk_radio_button_new_with_label
     (gtk_radio_button_group (GTK_RADIO_BUTTON (radio_button)), "IMAP");
   gtk_box_pack_start (GTK_BOX (vbox), radio_button, FALSE, FALSE, 0);
   gtk_signal_connect (GTK_OBJECT (radio_button), "clicked", GTK_SIGNAL_FUNC (set_next_page), (void *) MC_PAGE_IMAP);
   gtk_widget_show (radio_button);
-
-  /* close button (bottom dialog) */
-  bbox = gtk_hbutton_box_new ();
-  gtk_box_pack_start (GTK_BOX (vbox), bbox, TRUE, TRUE, 0);
-  gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
-  gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 5);
-  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox), BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
-  gtk_widget_show (bbox);
-
 
   return vbox;
 }
@@ -818,28 +792,21 @@ create_imap_mailbox_page (void)
 static void
 next_cb (GtkWidget * widget)
 {
-  gtk_widget_destroy (mcw->bbox);
-  mcw->bbox = gtk_hbutton_box_new ();
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mcw->window)->action_area), mcw->bbox, TRUE, TRUE, 0);
-  gtk_button_box_set_layout (GTK_BUTTON_BOX (mcw->bbox), GTK_BUTTONBOX_SPREAD);
-  gtk_button_box_set_spacing (GTK_BUTTON_BOX (mcw->bbox), 5);
-  gtk_button_box_set_child_size (GTK_BUTTON_BOX (mcw->bbox), BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
-  gtk_widget_show (mcw->bbox);
+  GtkWidget *bbox;
+
+  bbox = GNOME_DIALOG (mcw->window)->action_area;
+  gtk_container_remove (GTK_CONTAINER (bbox), mcw->ok);
+
+  gtk_widget_destroy (mcw->ok);
 
   if (mcw->mailbox)
     mcw->ok = gtk_button_new_with_label ("Update");
   else
     mcw->ok = gnome_stock_button (GNOME_STOCK_BUTTON_OK);
-  gtk_container_add (GTK_CONTAINER (mcw->bbox), mcw->ok);
-  gtk_signal_connect (GTK_OBJECT (mcw->ok), "clicked",
-		      (GtkSignalFunc) mailbox_conf_close, (void *) TRUE);
+  gtk_widget_show (mcw->ok);
 
-  mcw->cancel = gnome_stock_button (GNOME_STOCK_BUTTON_CANCEL);
-  gtk_container_add (GTK_CONTAINER (mcw->bbox), mcw->cancel);
-  gtk_signal_connect (GTK_OBJECT (mcw->cancel), "clicked",
-		      (GtkSignalFunc) mailbox_conf_close, FALSE);
-
-  gtk_widget_show_all (mcw->bbox);
+  gtk_container_add (GTK_CONTAINER (bbox), mcw->ok);
+  gtk_box_reorder_child (GTK_BOX (bbox), mcw->ok, 0);
 
   switch (mcw->next_page)
     {

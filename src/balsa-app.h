@@ -120,6 +120,7 @@ extern struct BalsaApplication
   gboolean wordwrap;
   gint wraplength;
   
+  gboolean empty_trash_on_exit;
   gboolean previewpane;
   gboolean debug;
   gboolean smtp;
@@ -143,6 +144,7 @@ extern struct BalsaApplication
   /* appbar */
   GnomeAppBar* appbar;
   GtkWidget* notebook;
+
   
 }
 balsa_app;

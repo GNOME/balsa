@@ -45,7 +45,6 @@
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
 
-
 /* Globals for Thread creation, messaging, pipe I/O */
 pthread_t			get_mail_thread;
 pthread_t                       send_mail;
@@ -67,6 +66,7 @@ static void threads_init( gboolean init );
 static void balsa_init (int argc, char **argv);
 static void config_init (void);
 static void mailboxes_init (void);
+static void empty_trash (void);
 
 void Exception (CORBA_Environment *);
 
@@ -328,6 +328,10 @@ balsa_exit (void)
 		   close_all_mailboxes,
 		   NULL);
 
+  if (balsa_app.empty_trash_on_exit)
+	  empty_trash( );
+
+
   mailbox = balsa_app.inbox;
   if (mailbox)
     {
@@ -381,6 +385,30 @@ balsa_exit (void)
   gtk_main_quit();
 }
 
+
+static void
+empty_trash( void )
+{
+	BalsaIndexPage *page;
+	GList *message;
+
+	balsa_mailbox_open(balsa_app.trash);
+
+	message = balsa_app.trash->message_list;
+
+	while(message) {
+		message_delete(message->data);
+		message = message->next;
+	}
+	mailbox_commit_flagged_changes(balsa_app.trash);
+
+	balsa_mailbox_close(balsa_app.trash);
+
+	if ( (page=balsa_find_notebook_page(balsa_app.trash)))
+		balsa_index_page_reset( page );
+}
+
+
 /* Eeew. But I'm tired of ifdefs. -- PGKW */
 /* Don't EVER EVER EVER call this even for a joke -- it recurses. */
 static void __lame_hack_to_avoid_unused_warnings( void );
@@ -393,3 +421,5 @@ static void __lame_hack_to_avoid_unused_warnings( void )
 	i_b_m_i__c();
 	self();
 }
+
+

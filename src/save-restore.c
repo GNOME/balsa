@@ -824,6 +824,16 @@ config_global_load (void)
   else
       balsa_app.PrintCommand.breakline = atoi(field);
 
+  if (( field = pl_dict_get_str (globals, "CheckMailUponStartup")) == NULL )
+	  balsa_app.check_mail_upon_startup = FALSE;
+  else
+	  balsa_app.check_mail_upon_startup = atoi(field);
+
+  if (( field = pl_dict_get_str (globals, "EmptyTrash")) == NULL )
+	  balsa_app.empty_trash_on_exit = FALSE;
+  else
+	  balsa_app.empty_trash_on_exit = atoi(field);
+
  return TRUE;
 }				/* config_global_load */
 
@@ -951,13 +961,17 @@ config_global_save (void)
   else
       pl_dict_add_str_str(globals, "PrintCommand", "a2ps -d -q %s");
 
-  {
-      char tmp[MAX_PROPLIST_KEY_LEN];
-      snprintf (tmp, sizeof (tmp), "%d", balsa_app.PrintCommand.linesize);
-      pl_dict_add_str_str (globals, "PrintLinesize", tmp);
-      snprintf (tmp, sizeof (tmp), "%d", balsa_app.PrintCommand.breakline);
-      pl_dict_add_str_str (globals, "PrintBreakline", tmp);
-  }
+  
+  snprintf (tmp, sizeof (tmp), "%d", balsa_app.PrintCommand.linesize);
+  pl_dict_add_str_str (globals, "PrintLinesize", tmp);
+  snprintf (tmp, sizeof (tmp), "%d", balsa_app.PrintCommand.breakline);
+  pl_dict_add_str_str (globals, "PrintBreakline", tmp);
+  
+  snprintf (tmp, sizeof (tmp), "%d", balsa_app.check_mail_upon_startup);
+  pl_dict_add_str_str (globals, "CheckMailUponStartup", tmp);
+
+  snprintf ( tmp, sizeof(tmp), "%d", balsa_app.empty_trash_on_exit);
+  pl_dict_add_str_str (globals, "EmptyTrash", tmp);
 
   /* Add it to configuration file */
   temp_str = PLMakeString ("Globals");

@@ -234,20 +234,21 @@ static void
 bndx_destroy(GtkObject * obj)
 {
     BalsaIndex *index;
-    LibBalsaMailbox* mailbox;
 
     g_return_if_fail(obj != NULL);
     index = BALSA_INDEX(obj);
 
-    /*page->window references our owner */
-    if (index->mailbox_node && (mailbox = index->mailbox_node->mailbox) ) {
-        g_signal_handlers_disconnect_matched(G_OBJECT(mailbox),
-                                             G_SIGNAL_MATCH_DATA,
-                                             0, 0, NULL, NULL,
-                                             index);
-	gtk_tree_view_set_model(GTK_TREE_VIEW(index), NULL);
-	libbalsa_mailbox_close(mailbox);
-        g_object_unref(G_OBJECT(index->mailbox_node));
+    if (index->mailbox_node) {
+	LibBalsaMailbox* mailbox;
+	
+	if ((mailbox = index->mailbox_node->mailbox)) {
+	    g_signal_handlers_disconnect_matched(mailbox,
+						 G_SIGNAL_MATCH_DATA,
+						 0, 0, NULL, NULL, index);
+	    gtk_tree_view_set_model(GTK_TREE_VIEW(index), NULL);
+	    libbalsa_mailbox_close(mailbox);
+	}
+        g_object_unref(index->mailbox_node);
 	index->mailbox_node = NULL;
     }
 

@@ -697,7 +697,7 @@ conf_add_mailbox(LibBalsaMailbox ** mbox)
 		g_node_append(balsa_app.mailbox_nodes, dir->file_tree);
 		dir->file_tree = NULL;
 		imapdir_destroy(dir);
-		return TRUE;
+		return MC_RET_OK;
 	    } else
 		imapdir_destroy(dir);
 	    /* and assume it was ordinary IMAP mailbox */
@@ -719,7 +719,7 @@ conf_add_mailbox(LibBalsaMailbox ** mbox)
 
     config_mailbox_add(mailbox, NULL);
     *mbox = mailbox;
-    return TRUE;
+    return MC_RET_OK;
 }
 
 

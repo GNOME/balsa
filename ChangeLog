@@ -1,5 +1,13 @@
 2000-11-08  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* src/mailbox-conf.c: fix #30890: Adding POP mail box doesn't
+	appear until after refresh.
+	* libbalsa/send.c: save fcc (NOTE: append mode of
+	libbalsa_mailbox_open() does not work sensibly, redesign this
+	part).
+	
+2000-11-08  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* src/balsa-mblist.c: forgotten patch for changing IMAP mailbox's icon.
 
 2000-11-07  Gediminas Paulauskas  <menesis@delfi.lt>

@@ -166,14 +166,49 @@ static void dump_queue(const char*msg)
     }
 }
 #endif
+
+/* libbalsa_message_queue:
+   places given message in the outbox. If fcc message field is set, saves
+   it to fcc mailbox as well.
+*/
+
+static void
+libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
+		      gint encoding)
+{
+    MessageQueueItem *mqi;
+    LibBalsaMailbox*fccbox;
+
+    g_return_if_fail(message);
+
+    mqi = msg_queue_item_new(message);
+    set_option(OPTWRITEBCC);
+    if (libbalsa_create_msg(message, mqi->message,
+			    mqi->tempfile, encoding, 0)) {
+	libbalsa_lock_mutt();
+	mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(outbox)->path,
+		       mqi->message, NULL, 0, NULL);
+	libbalsa_unlock_mutt();
+	fccbox = balsa_find_mbox_by_name(mqi->fcc);
+	
+	if (fccbox && LIBBALSA_IS_MAILBOX_LOCAL(fccbox)) {
+	    libbalsa_lock_mutt();
+	    mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(fccbox)->path,
+			   mqi->message, NULL, 0, NULL);
+	    libbalsa_unlock_mutt();
+	    libbalsa_mailbox_check(fccbox);
+	}
+	libbalsa_mailbox_check(outbox);
+    } 
+    unset_option(OPTWRITEBCC);
+    msg_queue_item_destroy(mqi);
+}
+
 /* libbalsa_message_send:
    send the given messsage (if any, it can be NULL) and all the messages
    in given outbox.
    NOTE that we do not close outbox after reading. send_real/thread message 
    handler does that.
-   FIXME: split this into two funtions: one saves the message to outbox,
-   other one processes the queue. This make it easy to implement function
-   like "send message later".
 */
 gboolean
 libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
@@ -184,24 +219,15 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
     LibBalsaMessage *queu;
 #ifdef BALSA_USE_THREADS
     GtkWidget *send_dialog_source = NULL;
-    pthread_mutex_lock(&send_messages_lock);
 #endif
 
-    if (message != NULL) {
-	mqi = msg_queue_item_new(message);
-	if (libbalsa_create_msg(message, mqi->message,
-				 mqi->tempfile, encoding, 0)) {
-	    /* save message so it is not lost if we quit before sending it */
-	    mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(outbox)->path,
-			   mqi->message, NULL, 0, NULL);
-	    libbalsa_mailbox_check(outbox);
-	} 
-	msg_queue_item_destroy(mqi);
-    }
-    
+    if (message != NULL)
+	libbalsa_message_queue(message, outbox, encoding);
+
  /* We do messages in queue now only if where are not sending them already */
 
 #ifdef BALSA_USE_THREADS
+    pthread_mutex_lock(&send_messages_lock);
     if (sending_mail == FALSE) {
 	/* We create here the progress bar */
 	send_dialog = gnome_dialog_new("Sending Mail...", "Hide", NULL);
@@ -272,22 +298,8 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 static void
 handle_successful_send(MessageQueueItem *mqi)
 {
-    LibBalsaMailbox *save_box;
-    gdk_threads_enter();
-    save_box = balsa_find_mbox_by_name(mqi->fcc);
-    gdk_threads_leave();
-    
-    if (save_box && LIBBALSA_IS_MAILBOX_LOCAL(save_box)) {
-	libbalsa_lock_mutt();
-	mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(save_box)->path,
-		       mqi->message, NULL, 0, NULL);
-	libbalsa_unlock_mutt();
-	if (save_box->open_ref > 0)
-	    libbalsa_mailbox_check(save_box);
-    }
-    if (mqi->orig->mailbox) {
+    if (mqi->orig->mailbox)
 	libbalsa_message_delete(mqi->orig);
-    }
     mqi->status = MQI_SENT;
 }
 
@@ -977,7 +989,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	if ((tempfp = safe_fopen(tmpfile, "w")) == NULL)
 	    return (-1);
 
-	mutt_write_rfc822_header(tempfp, msg->env, msg->content, 0);
+	mutt_write_rfc822_header(tempfp, msg->env, msg->content, -1);
 	fputc('\n', tempfp);	/* tie off the header. */
 
 	if ((mutt_write_mime_body(msg->content, tempfp) == -1)) {

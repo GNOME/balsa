@@ -26,5 +26,7 @@
 #include "smtp.h"
 
 extern char *get_header_from (MAILSTREAM *, unsigned long);
+extern char *get_header_replyto (MAILSTREAM *, unsigned long);
+extern char *get_header_subject (MAILSTREAM *, unsigned long);
 
 #endif /* __c_client_h__ */

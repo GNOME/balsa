@@ -224,7 +224,7 @@ addressbook_window_new (GtkWidget * widget, gpointer data)
   GtkWidget *hpane;
   static char *titles[1];
 
-  window = gnome_app_new ("balsa_addressbook_window", "Address book");
+  window = gnome_app_new ("balsa", "Address book");
   gtk_widget_set_usize (window, 680, 435);
   gtk_window_set_wmclass (GTK_WINDOW (window), "balsa_app",
 			  "Balsa");

@@ -1266,9 +1266,5 @@ nb_main_delete_yesno (void)
   gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
   gtk_widget_show (button);
 
-  button = gtk_button_new_with_label ("Unsure, ask me later");
-  gtk_box_pack_end (GTK_BOX (hbox), button, TRUE, TRUE, 0);
-  gtk_widget_show (button);
-
   return vbox;
 }

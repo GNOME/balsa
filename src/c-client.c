@@ -25,11 +25,19 @@
 #include "mailbox.h"
 
 
+/* memmove needs to be 2 more than the length in the STRINGLIST 
+ * so that it removes the header, the : and the space
+ *
+ * FIXME (mabey)
+ * We are cutting off the last two characters beacuse they appear
+ * to always be two spaces.  This may be bad.
+ */
 
 char *
 get_header_from (MAILSTREAM * stream, unsigned long mesgno)
 {
   char *t;
+  int len;
   static STRINGLIST mailrnfromline =
   {
     {(unsigned char *) ">from", 5}, NIL};
@@ -37,13 +45,49 @@ get_header_from (MAILSTREAM * stream, unsigned long mesgno)
   {
     {(unsigned char *) "from", 4,}, &mailrnfromline};
   t = mail_fetch_header (stream, mesgno, NIL, &mailfromline, NIL, FT_INTERNAL | FT_PEEK);
+  len = strlen (t);
+  if (len < 3)
+    return "";
   memmove (t, t + 6, strlen (t) - 5);
+  t[strlen (t) - 2] = '\0';
   return t;
 }
 
 
+char *
+get_header_replyto (MAILSTREAM * stream, unsigned long mesgno)
+{
+  char *t;
+  int len;
+  static STRINGLIST mailreplytoline =
+  {
+    {(unsigned char *) "reply-to", 8}, NIL};
+  t = mail_fetch_header (stream, mesgno, NIL, &mailreplytoline, NIL, FT_INTERNAL | FT_PEEK);
+  len = strlen (t);
+  if (len < 3)
+    return get_header_from (stream, mesgno);
+  memmove (t, t + 10, len - 9);
+  t[strlen (t) - 2] = '\0';
+  return t;
+}
 
 
+char *
+get_header_subject (MAILSTREAM * stream, unsigned long mesgno)
+{
+  char *t;
+  int len;
+  static STRINGLIST mailreplytoline =
+  {
+    {(unsigned char *) "subject", 7}, NIL};
+  t = mail_fetch_header (stream, mesgno, NIL, &mailreplytoline, NIL, FT_INTERNAL | FT_PEEK);
+  len = strlen (t);
+  if (len < 3)
+    return "";
+  memmove (t, t + 9, len - 8);
+  t[strlen (t) - 2] = '\0';
+  return t;
+}
 
 /* 
  * Callbacks from the C-CLIENT Library

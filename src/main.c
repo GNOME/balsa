@@ -53,9 +53,11 @@
 
 #include "libinit_balsa/init_balsa.h"
 
+#if 0
 #include "Balsa.h"
 #include "balsa-bonobo.h"
 #include <bonobo-activation/bonobo-activation.h>
+#endif
 
 #ifdef HAVE_GPGME
 #include <gpgme.h>

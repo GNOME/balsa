@@ -1,3 +1,7 @@
+2003-11-24  Carlos Morgado  <chbm gnome.org>
+
+	* src/main.c: remove Balsa.h dep for now
+
 2003-11-24 14:42  PeterB
 
 	* libbalsa/: mailbox.c, mailbox_imap.c, mailbox_local.c: Remove

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-03-30 21:11-0500\n"
-"PO-Revision-Date: 2005-03-30 16:41-0500\n"
+"POT-Creation-Date: 2005-03-31 09:16-0500\n"
+"PO-Revision-Date: 2005-03-31 16:41-0500\n"
 "Last-Translator: Adam Weinberger <adamw@gnome.org>\n"
 "Language-Team: Canadian English <adamw@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -445,6 +445,10 @@ msgstr "Cannot connect to the server"
 #, c-format
 msgid "Exceeded the number of connections per server %s"
 msgstr "Exceeded the number of connections per server %s"
+
+#: ../libbalsa/libbalsa-conf.c:189
+msgid "Your Balsa configuration is now stored in \"~/.balsa/config\"."
+msgstr "Your Balsa configuration is now stored in \"~/.balsa/config\"."
 
 #: ../libbalsa/libbalsa.c:285
 #, c-format

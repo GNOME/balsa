@@ -95,4 +95,7 @@ void libbalsa_server_save_config(LibBalsaServer * server);
 
 
 void libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...);
+
+void libbalsa_server_connect_signals(LibBalsaServer * server, GCallback cb,
+                                     gpointer cb_data);
 #endif				/* __LIBBALSA_SERVER_H__ */

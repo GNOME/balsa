@@ -417,3 +417,13 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
     }
     va_end(alist);
 }
+
+void
+libbalsa_server_connect_signals(LibBalsaServer * server, GCallback cb,
+                                gpointer cb_data)
+{
+    if (!g_signal_has_handler_pending(server,
+                                      libbalsa_server_signals
+                                      [GET_PASSWORD], 0, TRUE))
+        g_signal_connect(server, "get-password", cb, cb_data);
+}

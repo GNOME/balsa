@@ -506,9 +506,9 @@ config_mailbox_init(const gchar * prefix)
     if (mailbox == NULL)
 	return FALSE;
     if (LIBBALSA_IS_MAILBOX_REMOTE(mailbox))
-        g_signal_connect(G_OBJECT(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)),
-                         "get-password", G_CALLBACK(ask_password),
-                         mailbox);
+        libbalsa_server_connect_signals(LIBBALSA_MAILBOX_REMOTE_SERVER
+                                        (mailbox),
+                                        G_CALLBACK(ask_password), mailbox);
 
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
         g_signal_connect(G_OBJECT(mailbox),

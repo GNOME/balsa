@@ -525,8 +525,6 @@ BalsaMailboxNode*
 balsa_mailbox_node_new_from_config(const gchar* prefix)
 {
     BalsaMailboxNode * folder = balsa_mailbox_node_new();
-    static guint get_password_signal = 0;
-
     gnome_config_push_prefix(prefix);
 
     folder->server = LIBBALSA_SERVER(libbalsa_imap_server_new_from_config());
@@ -538,15 +536,8 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
 		     G_CALLBACK(folder_conf_imap_node), NULL);
     g_signal_connect(G_OBJECT(folder), "append-subtree", 
 		     G_CALLBACK(imap_dir_cb), NULL);
-
-    if (!get_password_signal)
-        get_password_signal =
-            g_signal_lookup("get-password", LIBBALSA_TYPE_SERVER);
-    if (!g_signal_has_handler_pending(G_OBJECT(folder->server),
-                                      get_password_signal, 0, TRUE))
-        g_signal_connect(G_OBJECT(folder->server), "get-password",
-                         G_CALLBACK(ask_password), NULL);
-
+    libbalsa_server_connect_signals(folder->server,
+                                    G_CALLBACK(ask_password), NULL);
     balsa_mailbox_node_load_config(folder, prefix);
 
     folder->dir = gnome_config_get_string("Directory");

@@ -75,6 +75,7 @@ static gboolean construct(GNode * node, struct ThreadingInfo * ti);
 static void subject_gather(GNode * node, GHashTable * subject_table);
 static void subject_merge(GNode * node, GHashTable * subject_table);
 static const gchar* chop_re(const gchar* str);
+static GNode *bndt_unlink(GNode * node);
 
 static void threading_simple(BalsaIndex * index,
                              LibBalsaMailboxThreadingType th_type);
@@ -132,6 +133,7 @@ gen_container(GtkTreeModel * model, GtkTreePath * path,
     GHashTable *ref_table;
     LibBalsaMessage *message;
     GNode *container;
+    GNode *parent;
 
     /* Make sure the index's ref table has an entry for this message. */
     ref_table = ti->index->ref_table;
@@ -141,7 +143,8 @@ gen_container(GtkTreeModel * model, GtkTreePath * path,
                             gtk_tree_row_reference_new(model, path));
 
     container = get_container(message, ti->id_table);
-    if (container) {
+    if (!container)
+        return FALSE;
     /*
      * Set the parent of this message to be the last element in References.
      * Note that this message may have a parent already: this can happen
@@ -159,13 +162,33 @@ gen_container(GtkTreeModel * model, GtkTreePath * path,
      * Note that at all times, the various ``parent'' and ``child''
      * fields must be kept inter-consistent.
      */
-        /* In this implementation, check_references always returns a
-         * parent; if the message has no parent, it's the root of the
-         * whole mailbox tree. */
-        GNode* parent = check_references(message, ti);
+    /* In this implementation, check_references always returns a
+     * parent; if the message has no parent, it's the root of the
+     * whole mailbox tree. */
+
+    parent = check_references(message, ti);
+
+    if (!G_NODE_IS_ROOT(container)) {
+        GNode *child;
+
+        if (container == parent)
+            /* This message listed itself as its parent! Oh well... */
+            return FALSE;
+
+        for (child = container->children; child; child = child->next)
+            if (child == parent || g_node_is_ancestor(child, parent)) {
+                /* Prepending container to parent would create a
+                 * loop; in check_references, we just omit making
+                 * the link, but here we really want to link the
+                 * message's container to its parent, so we'll fix
+                 * the tree: unlink the offending child and prepend it
+                 * to the container's parent. */
+                g_node_append(container->parent, bndt_unlink(child));
+                break;
+            }
         g_node_unlink(container);
-        g_node_prepend(parent, container);
     }
+    g_node_prepend(parent, container);
 
     return FALSE;
 }

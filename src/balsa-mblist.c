@@ -1021,6 +1021,8 @@ balsa_mblist_open_mailbox(LibBalsaMailbox * mailbox)
     } else { /* page with mailbox not found, open it */
 	balsa_window_open_mbnode(balsa_app.main_window, mbnode);
 
+	balsa_window_set_filter_label(balsa_app.main_window,
+				  libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_TO);
 	if (balsa_app.mblist->display_info)
 	    balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
                                         mailbox);

@@ -1372,15 +1372,15 @@ bw_filter_entry_changed(GtkWidget *entry, GtkWidget *button)
 static GtkWidget*
 bw_create_index_widget(BalsaWindow *bw)
 {
-    GtkWidget *vbox, *label, *button;
+    GtkWidget *vbox, *button;
     GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX(hbox),
-                       label = gtk_label_new_with_mnemonic
+                       bw->filter_label = gtk_label_new_with_mnemonic
                        (_("Subject or Sender _Contains:")),
                        FALSE, FALSE, 0);
-    gtk_widget_show(label);
+    gtk_widget_show(bw->filter_label);
     bw->sos_entry = gtk_entry_new();
-    gtk_label_set_mnemonic_widget(GTK_LABEL(label), bw->sos_entry);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(bw->filter_label), bw->sos_entry);
     g_signal_connect(G_OBJECT(bw->sos_entry), "focus_in_event",
                      G_CALLBACK(bw_enable_filter), bw);
     g_signal_connect(G_OBJECT(bw->sos_entry), "focus_out_event",
@@ -4336,6 +4336,9 @@ notebook_switch_page_cb(GtkWidget * notebook,
 
     balsa_index_refresh_date(index);
     balsa_index_refresh_size(index);
+
+    balsa_window_set_filter_label(balsa_app.main_window,
+				  libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_TO);
 }
 
 static void
@@ -4862,4 +4865,14 @@ balsa_window_update_tab(BalsaMailboxNode * mbnode)
 	gtk_notebook_set_tab_label(GTK_NOTEBOOK(balsa_app.notebook), page,
 				   balsa_notebook_label_new(mbnode));
     }
+}
+
+void
+balsa_window_set_filter_label(BalsaWindow * window,
+			      gboolean to_field)
+{
+    gtk_label_set_text_with_mnemonic(GTK_LABEL(window->filter_label),
+				     to_field ? 
+				     _("Subject or Receiver _Contains:") :
+				     _("Subject or Sender _Contains:"));
 }

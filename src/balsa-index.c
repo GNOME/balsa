@@ -1977,13 +1977,15 @@ balsa_index_set_sos_filter(BalsaIndex *bindex, const gchar *sos_filter,
     bindex->sos_filter = g_strdup(sos_filter);
 
     if(sos_filter && sos_filter[0] != '\0') {
+	/* Check the To: field for sentbox and From for others */
         LibBalsaCondition *name = 
             libbalsa_condition_new_bool_ptr
             (FALSE, CONDITION_OR,
              libbalsa_condition_new_string
              (FALSE, CONDITION_MATCH_SUBJECT, g_strdup(sos_filter), NULL),
              libbalsa_condition_new_string
-             (FALSE, CONDITION_MATCH_FROM, g_strdup(sos_filter), NULL));
+             (FALSE, (libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_TO) ? CONDITION_MATCH_TO : CONDITION_MATCH_FROM,
+	      g_strdup(sos_filter), NULL));
         
         if(flag_filter)
             flag_filter = libbalsa_condition_new_bool_ptr

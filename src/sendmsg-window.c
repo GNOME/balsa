@@ -2665,7 +2665,9 @@ static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
         libbalsa_insert_with_url(buffer, signature, NULL, NULL, NULL);
 	
 	g_free(signature);
-    }
+    } else
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("No signature found!"));
     
     return TRUE;
 }
@@ -3459,7 +3461,8 @@ read_signature(BalsaSendmsg *bsmsg)
     size_t len = 0;
     gchar *ret = NULL, *path;
 
-    if (bsmsg->ident->signature_path == NULL)
+    if (bsmsg->ident->signature_path == NULL||
+        *bsmsg->ident->signature_path == '\0')
 	return NULL;
 
     path = libbalsa_expand_path(bsmsg->ident->signature_path);
@@ -3467,20 +3470,38 @@ read_signature(BalsaSendmsg *bsmsg)
         /* signature is executable */
 	fp = popen(path,"r");
 	g_free(path);
-        if (!fp)
+        if (!fp) {
+            balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              _("Error executing signature generator %s"),
+                              bsmsg->ident->signature_path);
             return NULL;
-         len = libbalsa_readfile_nostat(fp, &ret);
-         pclose(fp);    
-	}
-     else{
-         /* sign is normal file */
-	 fp = fopen(path, "r");
-	 g_free(path);
-         if (!fp)
-             return NULL;
-         len = libbalsa_readfile_nostat(fp, &ret);
-         fclose(fp);
-	}
+        }
+        len = libbalsa_readfile_nostat(fp, &ret);
+        pclose(fp);    
+    } else {
+        /* sign is normal file */
+        fp = fopen(path, "r");
+        g_free(path);
+        if (!fp) {
+            balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              _("Cannot open signature file '%s' "
+                                "for reading"),
+                              bsmsg->ident->signature_path);
+            return NULL;
+        }
+        len = libbalsa_readfile_nostat(fp, &ret);
+        fclose(fp);
+    }
+    if(!ret)
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("Error reading signature from %s"), path);
+    else {
+        if(!libbalsa_utf8_sanitize(&ret, FALSE, NULL))
+            balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              _("Signature in %s is not a UTF-8 text."),
+                              bsmsg->ident->signature_path);
+    }
+
     return ret;
 }
 

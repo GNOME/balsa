@@ -50,6 +50,7 @@ struct _BalsaWindow {
     GtkWidget *hpaned;
     GtkWidget *vpaned;
     GtkWidget *current_index;
+    GtkWidget *filter_label;
     LibBalsaMessage *current_message;
 };
 
@@ -82,6 +83,7 @@ void balsa_window_open_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
 void balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
 void balsa_identities_changed(BalsaWindow *bw);
 
+void balsa_window_set_filter_label(BalsaWindow * window, gboolean to_field);
 void balsa_window_update_tab(BalsaMailboxNode * mbnode);
 void enable_empty_trash(BalsaWindow * window, TrashState status);
 void balsa_window_enable_continue(BalsaWindow * window);

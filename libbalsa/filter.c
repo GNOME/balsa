@@ -152,7 +152,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 	    if(is_new) libbalsa_message_read(message, FALSE);
 	    libbalsa_message_body_unref(message);
 	    if (mbox_locked)
-		LOCK_MAILBOX(message->mailbox);
+		LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
 	    if (body) {
 		if (body->str) match=in_string(body->str,cond->match.string);
 		g_string_free(body,TRUE);
@@ -217,7 +217,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 		    UNLOCK_MAILBOX(message->mailbox);
 		bool = libbalsa_message_body_ref(message);
 		if (mbox_locked)
-		    LOCK_MAILBOX(message->mailbox);
+		    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
 		if (!bool) {
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                          _("Unable to load message body "
@@ -230,7 +230,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 		    UNLOCK_MAILBOX(message->mailbox);
 		libbalsa_message_body_unref(message);
 		if (mbox_locked)
-		    LOCK_MAILBOX(message->mailbox);
+		    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
 		if (body && body->str) 
                     match = REGEXEC(*(regex->compiled),body->str)==0;
 		g_string_free(body,TRUE);

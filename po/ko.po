@@ -1,0 +1,380 @@
+# balsa ko.po
+# Copyright (C) 1998 Free Software Foundation, Inc.
+# Sung-Hyun Nam <namsh@lgic.co.kr>
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: balsa 0.4.0\n"
+"POT-Creation-Date: 1998-08-06 15:32+0900\n"
+"PO-Revision-Date: 1998-08-06 07:39:44+0900\n"
+"Last-Translator: Sung-Hyun Nam <namsh@lgic.co.kr>\n"
+"Language-Team: Korean <ko@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=euc-kr\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/balsa-index.c:175
+msgid "From"
+msgstr ""
+
+#: src/balsa-index.c:176
+msgid "Subject"
+msgstr "제목"
+
+#: src/balsa-index.c:177
+msgid "Date"
+msgstr "날짜"
+
+#: src/balsa-init.c:97
+msgid "Welcome To Balsa!"
+msgstr "Balsa 사용을 환영합니다!"
+
+#: src/balsa-init.c:151
+msgid "Previous..."
+msgstr "이전..."
+
+#: src/balsa-init.c:162
+msgid "Next..."
+msgstr "다음..."
+
+#: src/balsa-init.c:183
+msgid ""
+"Welcome to Balsa!  The following steps will help you get setup to use Balsa."
+msgstr ""
+"Balsa 사용을 환영합니다. 다음 단계에서 balsa 사용을 위해 설정을 도와줄 겁니다."
+
+#. your name
+#: src/balsa-init.c:209 src/pref-manager.c:396
+msgid "Your name:"
+msgstr "성명:"
+
+#. email address
+#: src/balsa-init.c:223 src/pref-manager.c:413
+msgid "E-Mail address:"
+msgstr "전자우편 주소:"
+
+#. smtp server
+#: src/balsa-init.c:238 src/pref-manager.c:445
+msgid "SMTP server:"
+msgstr "SMTP 서버:"
+
+#: src/balsa-init.c:285
+msgid "Balsa is now ready to run.  Click finish to save your settings"
+msgstr "Balsa가 실행될 준비가 끝났읍니다. 설정 저장을 위해 끝 버튼을 누르세요"
+
+#: src/balsa-init.c:289
+msgid "Finish"
+msgstr "끝"
+
+#: src/balsa-init.c:306
+msgid "we are deleting the window, not saving, lets quit now\n"
+msgstr "저장하지 않은 상태에서 창을 닫는 중입니다. 이제 종료합니다\n"
+
+#: src/index-child.c:156
+msgid "Unable to Open Mailbox!"
+msgstr "메일박스를 열수 없습니다!"
+
+#: src/index-child.c:229
+msgid "Transfer"
+msgstr ""
+
+#: src/index-child.c:247
+msgid "Change Status"
+msgstr ""
+
+#: src/index-child.c:250
+msgid "Unread"
+msgstr ""
+
+#: src/index-child.c:256
+msgid "Read"
+msgstr ""
+
+#: src/index-child.c:262
+msgid "Replied"
+msgstr ""
+
+#: src/index-child.c:268
+msgid "Forwarded"
+msgstr ""
+
+#: src/index-child.c:278 src/main-window.c:261
+msgid "Undelete"
+msgstr ""
+
+#: src/index-child.c:286 src/main-window.c:247 src/main-window.c:415
+msgid "Delete"
+msgstr ""
+
+#: src/local-mailbox.c:117
+#, c-format
+msgid "Local Mailbox Loaded as: %s\n"
+msgstr ""
+
+#: src/mailbox-manager.c:69
+msgid "Account"
+msgstr ""
+
+#: src/mailbox-manager.c:70
+msgid "Type"
+msgstr ""
+
+#: src/mailbox-manager.c:71
+msgid "Server"
+msgstr "서버"
+
+#: src/mailbox-manager.c:86
+msgid "Mailbox Manager"
+msgstr "메일박스 관리자"
+
+#. edit account button
+#: src/mailbox-manager.c:140
+msgid "Edit..."
+msgstr "편집..."
+
+#. edit account button
+#: src/mailbox-manager.c:153
+msgid "New..."
+msgstr "새 메일박스..."
+
+#. delete account button
+#: src/mailbox-manager.c:166
+msgid "Delete..."
+msgstr "삭제..."
+
+#: src/main-window.c:90
+msgid "Mailboxes/<Separator>"
+msgstr "메일박스/<Separator>"
+
+#: src/main-window.c:151
+msgid "Get New Mail"
+msgstr ""
+
+#: src/main-window.c:168
+msgid "Check POP3"
+msgstr ""
+
+#: src/main-window.c:183
+msgid "Exit"
+msgstr "끝내기"
+
+#: src/main-window.c:195
+msgid "File"
+msgstr "파일"
+
+#: src/main-window.c:205
+msgid "New"
+msgstr "새 메시지"
+
+#: src/main-window.c:218 src/main-window.c:440 src/main-window.c:441
+msgid "Reply"
+msgstr ""
+
+#: src/main-window.c:231 src/main-window.c:451 src/main-window.c:452
+msgid "Forward"
+msgstr ""
+
+#: src/main-window.c:274 src/sendmsg-window.c:165
+msgid "Message"
+msgstr "메시지"
+
+#. MDI page
+#: src/main-window.c:279 src/pref-manager.c:161 src/pref-manager.c:668
+msgid "MDI"
+msgstr "MDI"
+
+#: src/main-window.c:286
+msgid "Mailbox List"
+msgstr "메일박스 목록"
+
+#: src/main-window.c:297 src/sendmsg-window.c:157
+msgid "Close"
+msgstr "닫기"
+
+#. mailboxes page
+#: src/main-window.c:312 src/pref-manager.c:149
+msgid "Mailboxes"
+msgstr "메일박스"
+
+#: src/main-window.c:321
+msgid "Preferences..."
+msgstr "속성..."
+
+#: src/main-window.c:332
+msgid "Mailbox Manager..."
+msgstr "메일박스 관리자..."
+
+#: src/main-window.c:344
+msgid "Settings"
+msgstr "설정"
+
+#: src/main-window.c:352
+msgid "About"
+msgstr "이 프로그램은"
+
+#: src/main-window.c:365 src/sendmsg-window.c:206
+msgid "Help"
+msgstr "도움말"
+
+#: src/main-window.c:400
+msgid "Check"
+msgstr ""
+
+#: src/main-window.c:416
+msgid "Delete Message"
+msgstr ""
+
+#: src/main-window.c:429
+msgid "Compose"
+msgstr ""
+
+#: src/main-window.c:430
+msgid "Compose Message"
+msgstr ""
+
+#: src/main-window.c:465
+msgid "Previous"
+msgstr "이전"
+
+#: src/main-window.c:466
+msgid "Open Previous Message"
+msgstr "이전 메시지 열기"
+
+#: src/main-window.c:476
+msgid "Next"
+msgstr "다음"
+
+#: src/main-window.c:477
+msgid "Open Next Message"
+msgstr "다음 메시지 열기"
+
+#: src/main-window.c:514
+msgid "Balsa is a E-Mail Client"
+msgstr "Balsa는 전자우편 클라이언트입니다"
+
+#: src/pref-manager.c:110
+msgid "Preferences"
+msgstr "속성"
+
+#. identity page
+#: src/pref-manager.c:143
+msgid "Identity"
+msgstr ""
+
+#. view page
+#: src/pref-manager.c:155
+msgid "View"
+msgstr ""
+
+#. organization
+#: src/pref-manager.c:429
+msgid "Organization:"
+msgstr ""
+
+#: src/pref-manager.c:483
+msgid "Local mail directory:"
+msgstr ""
+
+#. inbox path
+#: src/pref-manager.c:499
+msgid "Inbox Path:"
+msgstr ""
+
+#. outbox path
+#: src/pref-manager.c:516
+msgid "Outbox Path:"
+msgstr ""
+
+#. trash path
+#: src/pref-manager.c:532
+msgid "Trash Path:"
+msgstr ""
+
+#. Toolbars
+#: src/pref-manager.c:567
+msgid "Toolbars"
+msgstr "툴바"
+
+#: src/pref-manager.c:578
+msgid "Show as Text"
+msgstr "텍스트로 표시"
+
+#: src/pref-manager.c:594
+msgid "Show as Images"
+msgstr "그림으로 표시"
+
+#: src/pref-manager.c:610
+msgid "Show as Text and Images"
+msgstr "텍스트와 그림으로 표시"
+
+#: src/pref-manager.c:637
+msgid "Debug"
+msgstr ""
+
+#: src/pref-manager.c:679
+msgid "Notebook"
+msgstr ""
+
+#: src/pref-manager.c:695
+msgid "Toplevel"
+msgstr ""
+
+#: src/pref-manager.c:711
+msgid "Modal"
+msgstr ""
+
+#: src/sendmsg-window.c:70 src/sendmsg-window.c:135
+msgid "Send"
+msgstr ""
+
+#: src/sendmsg-window.c:146
+msgid "Attach File"
+msgstr ""
+
+#: src/sendmsg-window.c:172
+msgid "Cut"
+msgstr "자르기"
+
+#: src/sendmsg-window.c:179
+msgid "Copy"
+msgstr "복사"
+
+#: src/sendmsg-window.c:186
+msgid "Paste"
+msgstr "붙이기"
+
+#: src/sendmsg-window.c:193
+msgid "Edit"
+msgstr "편집"
+
+#: src/sendmsg-window.c:201
+msgid "Contents"
+msgstr ""
+
+#: src/sendmsg-window.c:244
+msgid "New message"
+msgstr "새 메시지"
+
+#: src/sendmsg-window.c:256
+msgid "Reply to "
+msgstr ""
+
+#: src/sendmsg-window.c:268
+msgid "Forward message"
+msgstr ""
+
+#: libbalsa/mailbox.c:368
+#, c-format
+msgid "Mailbox: Opening %s Refcount: %d\n"
+msgstr ""
+
+#: libbalsa/mailbox.c:393
+#, c-format
+msgid "Mailbox: Closing %s Refcount: %d\n"
+msgstr ""
+
+#: libbalsa/mailbox.c:1103
+#, c-format
+msgid "Loading message: %s/%s\n"
+msgstr ""

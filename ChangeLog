@@ -1,3 +1,8 @@
+2003-08-31  Carlos Morgado  <chbm chbm.net>
+
+	* src/main-window.c (balsa_notebook_label_new): add tooltips 
+	to mailbox tabs, no more 'INBOX' madness
+
 2003-08-31  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/address-book-ldif.c: parse more reliably address groups.

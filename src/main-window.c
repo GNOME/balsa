@@ -921,7 +921,7 @@ balsa_window_new()
                      G_CALLBACK (notebook_drag_received_cb), NULL);
     g_signal_connect(G_OBJECT (window->notebook), "drag-motion",
                      G_CALLBACK (notebook_drag_motion_cb), NULL);
-   balsa_app.notebook = window->notebook;
+    balsa_app.notebook = window->notebook;
 
     window->preview = balsa_message_new();
 
@@ -1337,7 +1337,7 @@ balsa_notebook_label_new (BalsaMailboxNode* mbnode)
        GtkWidget *box = gtk_hbox_new(FALSE, 4);
        GtkWidget *lab = gtk_label_new(mbnode->mailbox->name);
        GtkWidget *but = gtk_button_new();
-
+       GtkWidget *ev = gtk_event_box_new();
 #if BALSA_MAJOR < 2
        close_pix = gnome_stock_pixmap_widget(GTK_WIDGET(balsa_app.main_window),
                BALSA_PIXMAP_OTHER_CLOSE);
@@ -1354,11 +1354,16 @@ balsa_notebook_label_new (BalsaMailboxNode* mbnode)
        gtk_box_pack_start(GTK_BOX (box), lab, TRUE, TRUE, 0);
        gtk_box_pack_start(GTK_BOX (box), but, FALSE, FALSE, 0);
        gtk_widget_show_all(box);
+       gtk_container_add(GTK_CONTAINER(ev), box);
 
        g_signal_connect(G_OBJECT (but), "clicked", 
                         G_CALLBACK(mailbox_tab_close_cb), mbnode);
-                                                                                                                   
-       return box;
+
+       gtk_tooltips_set_tip(balsa_app.tooltips, 
+			    ev,
+			    mbnode->mailbox->url,
+			    mbnode->mailbox->url);       
+       return ev;
 }
 
 #define BALSA_WINDOW_KEY "balsa-window"

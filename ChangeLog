@@ -1,3 +1,11 @@
+2004-03-25 11:47  PeterB
+
+	* src/filter-run-callbacks.c, libbalsa/filter.c, libbalsa/filter.h,
+	libbalsa/mailbox.c, libbalsa/mailbox.h, libbalsa/mailbox_imap.c,
+	libbalsa/message.c: use a GArray to pass a list of message numbers;
+	implement and use libbalsa_mailbox_register_msgnos, to update
+	message numbers in a GArray when a message is expunged.
+
 2004-03-22 21:02  PeterB
 
 	* src/sendmsg-window.c: body_ref the message before getting

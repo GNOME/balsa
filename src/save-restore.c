@@ -230,6 +230,10 @@ config_mailbox_init (const gchar * prefix)
   if ( mailbox == NULL )
     return FALSE;
 
+  if ( LIBBALSA_IS_MAILBOX_REMOTE(mailbox) )
+    gtk_signal_connect(GTK_OBJECT(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)), 
+		       "get-password", GTK_SIGNAL_FUNC(ask_password), mailbox);
+
   if ( LIBBALSA_IS_MAILBOX_POP3(mailbox) ) {
     balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
   } else if (strcmp ("Inbox/", key) == 0)
@@ -244,10 +248,8 @@ config_mailbox_init (const gchar * prefix)
       balsa_app.trash = mailbox;
   else
     {
-      if ( LIBBALSA_IS_MAILBOX_LOCAL(mailbox) && LIBBALSA_MAILBOX_LOCAL(mailbox)->type == LIBBALSA_MAILBOX_LOCAL_MH )
-	is_mh = TRUE;
-      else
-	is_mh = FALSE;
+      is_mh = LIBBALSA_IS_MAILBOX_LOCAL(mailbox) 
+	&& LIBBALSA_MAILBOX_LOCAL(mailbox)->type == LIBBALSA_MAILBOX_LOCAL_MH;
 
       node = g_node_new (mailbox_node_new (g_strdup (mailbox->name),
 					   mailbox, is_mh));
@@ -439,8 +441,10 @@ config_global_load (void)
   gnome_config_get_vector("OpenMailboxes", &open_mailbox_count, &open_mailbox_vector);
   if ( balsa_app.remember_open_mboxes && open_mailbox_count > 0 ) {
     /* FIXME: Open the mailboxes.... */
-  }
-  g_strfreev(open_mailbox_vector);
+    gtk_idle_add((GtkFunction)open_mailboxes_idle_cb, 
+		 open_mailbox_vector);
+  } 
+  else g_strfreev(open_mailbox_vector);
 
   balsa_app.empty_trash_on_exit = gnome_config_get_bool("EmptyTrash=false");
   balsa_app.ab_dist_list_mode = gnome_config_get_bool("AddressBookDistMode=false");
@@ -605,7 +609,6 @@ config_get_unused_section (const gchar *prefix)
   gchar *name, *key, *val;
   int pref_len =   strlen(prefix);
 
-  g_print("config_mailbox_get_free_pkey\n");
   iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
 
   max = 0;

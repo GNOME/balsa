@@ -1049,7 +1049,7 @@ balsa_widget_get_bold_font (GtkWidget* widget)
   GdkFont* font;
   GtkStyle* style;
   GSList* list;
-  gint i;
+  gint i = 0;
   
   style = gtk_widget_get_style (widget);
   font = style->font;

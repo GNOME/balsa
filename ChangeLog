@@ -3,7 +3,9 @@
 	* libbalsa/mailbox_imap.c (mailbox_open): fix memory leak.
 	* libbalsa/server.c: set sensible default for user field.
 	* src/balsa-app.[hc],src/main.c: fix --open-mailbox option.
-
+	* src/balsa-mblist.c: fix_get_bold_font(), hopefully right this time.
+	* src/save-restore.c: connect get-password signal on mailbox creation.
+	
 2000-10-03  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libinit_balsa/Makefile.am: Fix GOB related rules. The generated

@@ -125,7 +125,7 @@ WHERE gid_t MailGid;
 WHERE gid_t UserGid;
 #endif /* USE_SETGID */
 
-#ifdef MAIN_C
+#ifdef GLOBALS_C
 const char *Weekdays[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 const char *Months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "ERR" };
 
@@ -136,10 +136,10 @@ extern const char *Weekdays[];
 extern const char *Months[];
 #endif
 
-#ifdef MAIN_C
+#ifdef GLOBALS_C
 /* so that global vars get included */ 
 #include "mx.h"
 #include "mutt_regex.h"
 #include "buffy.h"
 #include "sort.h"
-#endif /* MAIN_C */
+#endif /* MAIN_H */

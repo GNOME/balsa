@@ -22,4 +22,3 @@
 #include "keymap.h"
 #include "mailbox.h"
 #include "reldate.h"
-#include "sort.h"

@@ -746,6 +746,8 @@ static GnomeUIInfo mailbox_menu[] = {
                            filter_run_cb, GTK_STOCK_PROPERTIES),
     GNOMEUIINFO_END
 };
+#define NEXT_MSG_WIDGET mailbox_menu[MENU_MAILBOX_NEXT_POS].widget
+#define PREV_MSG_WIDGET mailbox_menu[MENU_MAILBOX_PREV_POS].widget
 #define NEXT_UNREAD_WIDGET mailbox_menu[MENU_MAILBOX_NEXT_UNREAD_POS].widget
 #define EXPUNGE_WIDGET     mailbox_menu[MENU_MAILBOX_COMMIT_POS].widget
 #define EMPTY_TRASH_WIDGET mailbox_menu[MENU_MAILBOX_EMPTY_TRASH_POS].widget
@@ -782,15 +784,15 @@ static GnomeUIInfo main_menu[] = {
  * =================================================================== */
 
 static GnomeUIInfo tu_mailbox_menu[] = {
-    GNOMEUIINFO_ITEM_STOCK(N_("Local mbox mailbox..."), 
+    GNOMEUIINFO_ITEM_STOCK(N_("Local mailbox..."), 
                            N_("Add a new mbox style mailbox"),
                            mailbox_conf_add_mbox_cb, 
                            GTK_STOCK_ADD),
-    GNOMEUIINFO_ITEM_STOCK(N_("Local Maildir mailbox..."), 
+    GNOMEUIINFO_ITEM_STOCK(N_("Local \"Maildir\" mailbox..."), 
                            N_("Add a new Maildir style mailbox"),
                            mailbox_conf_add_maildir_cb, 
                            GTK_STOCK_ADD),
-    GNOMEUIINFO_ITEM_STOCK(N_("Local MH mailbox..."), 
+    GNOMEUIINFO_ITEM_STOCK(N_("Local \"MH\" mailbox..."), 
                            N_("Add a new MH style mailbox"),
                            mailbox_conf_add_mh_cb, 
                            GTK_STOCK_ADD),
@@ -820,7 +822,7 @@ static GnomeUIInfo tu_mailbox_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_EXPUNGE_POS 5
     GNOMEUIINFO_ITEM_STOCK(
-        N_("E_xpunge Deleted Messages"),
+        N_("_Compress Mailbox"),
         N_("Expunge messages marked as deleted "
 	   "in the currently opened mailbox"),
         mailbox_expunge_cb,
@@ -908,13 +910,7 @@ static GnomeUIInfo tu_shown_hdrs_menu[] = {
 };
 
 static GnomeUIInfo tu_view_more_menu[] = {
-#define MENU_VIEW_NEXT_UNREAD_POS 0
-    { GNOME_APP_UI_ITEM, N_("Next Unread Message"),
-      N_("Next Unread Message"),
-      next_unread_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_MENU_NEXT_UNREAD, 'N', GDK_CONTROL_MASK, NULL
-    },
-#define MENU_VIEW_NEXT_FLAGGED_POS (MENU_VIEW_NEXT_UNREAD_POS+1)
+#define MENU_VIEW_NEXT_FLAGGED_POS 0
     { GNOME_APP_UI_ITEM, N_("Next Flagged Message"),
       N_("Next Flagged Message"),
       next_flagged_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
@@ -945,24 +941,34 @@ static GnomeUIInfo tu_view_more_menu[] = {
                            enable_view_filter_cb, NULL),
     GNOMEUIINFO_END
 };
-#define NEXT_UNREAD_WIDGET tu_view_more_menu[MENU_VIEW_NEXT_UNREAD_POS].widget
 
 static GnomeUIInfo tu_view_menu[] = {
+#define MENU_VIEW_NEXT_UNREAD_POS 0
+    { GNOME_APP_UI_ITEM, N_("Next Unread Message"),
+      N_("Next Unread Message"),
+      next_unread_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+      BALSA_PIXMAP_MENU_NEXT_UNREAD, 'N', GDK_CONTROL_MASK, NULL
+    },
+#define MENU_VIEW_NEXT_POS 1
     { GNOME_APP_UI_ITEM, N_("Next Message"), N_("Next Message"),
       next_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       BALSA_PIXMAP_MENU_NEXT, 'N', 0, NULL },
+#define MENU_VIEW_PREV_POS 2
     { GNOME_APP_UI_ITEM, N_("Previous Message"), N_("Previous Message"),
       previous_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       BALSA_PIXMAP_MENU_PREVIOUS, 'P', 0, NULL },
     GNOMEUIINFO_SEPARATOR,
+#define MENU_VIEW_ZOOM_IN_POS 4
     { GNOME_APP_UI_ITEM, N_("Zoom _In"), N_("Increase magnification"),
       zoom_cb, GINT_TO_POINTER(1), NULL, GNOME_APP_PIXMAP_STOCK,
       GTK_STOCK_ZOOM_IN, '+', GDK_CONTROL_MASK, NULL},
+#define MENU_VIEW_ZOOM_OUT_POS (MENU_VIEW_ZOOM_IN_POS+1)
     { GNOME_APP_UI_ITEM, N_("Zoom _Out"), N_("Decrease magnification"),
       zoom_cb, GINT_TO_POINTER(-1), NULL, GNOME_APP_PIXMAP_STOCK,
       GTK_STOCK_ZOOM_OUT, '-', GDK_CONTROL_MASK, NULL},
       /* To warn msgfmt that the % sign isn't a format specifier: */
       /* xgettext:no-c-format */
+#define MENU_VIEW_ZOOM_100_POS (MENU_VIEW_ZOOM_OUT_POS+1)
     { GNOME_APP_UI_ITEM, N_("Zoom _100%"), N_("No magnification"),
       zoom_cb, GINT_TO_POINTER(0), NULL, GNOME_APP_PIXMAP_STOCK,
       GTK_STOCK_ZOOM_100, 0, 0, NULL},
@@ -970,9 +976,12 @@ static GnomeUIInfo tu_view_menu[] = {
     GNOMEUIINFO_SUBTREE(N_("_More"), tu_view_more_menu),
     GNOMEUIINFO_END
 };
-#define MENU_VIEW_ZOOM_IN_WIDGET  tu_view_menu[3].widget
-#define MENU_VIEW_ZOOM_OUT_WIDGET tu_view_menu[4].widget
-#define MENU_VIEW_ZOOM_100_WIDGET tu_view_menu[5].widget
+#define NEXT_MSG_WIDGET tu_view_menu[MENU_VIEW_NEXT_POS].widget
+#define PREV_MSG_WIDGET tu_view_menu[MENU_VIEW_PREV_POS].widget
+#define NEXT_UNREAD_WIDGET tu_view_more_menu[MENU_VIEW_NEXT_UNREAD_POS].widget
+#define MENU_VIEW_ZOOM_IN_WIDGET  tu_view_menu[MENU_VIEW_ZOOM_IN_POS].widget
+#define MENU_VIEW_ZOOM_OUT_WIDGET tu_view_menu[MENU_VIEW_ZOOM_OUT_POS].widget
+#define MENU_VIEW_ZOOM_100_WIDGET tu_view_menu[MENU_VIEW_ZOOM_100_POS].widget
 
 
 static GnomeUIInfo tu_message_more_menu[] = {
@@ -1687,11 +1696,9 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
 #if !defined(ENABLE_TOUCH_UI)
     gtk_widget_set_sensitive(edit_menu[MENU_EDIT_SELECT_ALL_POS].widget,
                              enable);
-    gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_NEXT_POS].widget,
-                             index && index->next_message);
-    gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_PREV_POS].widget,
-                             index && index->prev_message);
 #endif /* ENABLE_TOUCH_UI */
+    gtk_widget_set_sensitive(NEXT_MSG_WIDGET, index && index->next_message);
+    gtk_widget_set_sensitive(PREV_MSG_WIDGET, index && index->prev_message);
     gtk_widget_set_sensitive(NEXT_UNREAD_WIDGET, 
                              mailbox  && mailbox->unread_messages > 0);
 

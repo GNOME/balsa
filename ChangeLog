@@ -1,3 +1,8 @@
+2004-08-07  21:30 Pawel Salek
+
+	* libbalsa/message.c: canonize headers.
+	* src/main-window.c: touchscreen fixes.
+
 2004-08-07  Albrecht Dreß
 
 	* libbalsa/address.h: remove duplicate function prototype.

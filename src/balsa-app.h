@@ -25,7 +25,7 @@
 #include <gnome.h>
 #include "libbalsa.h"
 #include "balsa-mblist.h"
-#include "balsa-index-page.h"
+#include "main-window.h"
 #include "information-dialog.h"
 
 /* Work around nonprivileged installs so we can find icons */

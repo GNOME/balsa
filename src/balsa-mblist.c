@@ -28,6 +28,7 @@
 
 #include "balsa-app.h"
 #include "balsa-icons.h"
+#include "balsa-index.h"
 #include "balsa-mblist.h"
 #include "libbalsa.h"
 #include "mailbox-node.h"
@@ -328,16 +329,14 @@ mblist_open_mailbox(LibBalsaMailbox * mailbox)
     /* If we currently have a page open, update the time last visited */
     if (c != -1) {
 	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), c);
-	page = gtk_object_get_data(GTK_OBJECT(page), "indexpage");
-	g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use);
+	g_get_current_time(&BALSA_INDEX(page)->last_use);
     }
     
     i = balsa_find_notebook_page_num(mailbox);
     if (i != -1) {
 	gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook), i);
 	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i);
-	page = gtk_object_get_data(GTK_OBJECT(page), "indexpage");
-	g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use);
+	g_get_current_time(&BALSA_INDEX(page)->last_use);
 	
 /* This nasty looking piece of code is for the column resizing patch, it needs
    to change the size of the columns before they get displayed.  To do this we
@@ -345,23 +344,23 @@ mblist_open_mailbox(LibBalsaMailbox * mailbox)
    the index, which gives us the clist, which we then reference.  Looks ugly
    but works well. */
 	gtk_clist_set_column_width(GTK_CLIST
-				   ((BALSA_INDEX_PAGE(page)->index)),
+				   ((BALSA_INDEX(page)->ctree)),
 				   0, balsa_app.index_num_width);
 	gtk_clist_set_column_width(GTK_CLIST
-				   ((BALSA_INDEX_PAGE(page)->index)),
+				   ((BALSA_INDEX(page)->ctree)),
 				   1, balsa_app.index_status_width);
 	gtk_clist_set_column_width(GTK_CLIST
-				   ((BALSA_INDEX_PAGE(page)->index)),
+				   ((BALSA_INDEX(page)->ctree)),
 				   2,
 				   balsa_app.index_attachment_width);
 	gtk_clist_set_column_width(GTK_CLIST
-				   ((BALSA_INDEX_PAGE(page)->index)),
+				   ((BALSA_INDEX(page)->ctree)),
 				   3, balsa_app.index_from_width);
 	gtk_clist_set_column_width(GTK_CLIST
-				   ((BALSA_INDEX_PAGE(page)->index)),
+				   ((BALSA_INDEX(page)->ctree)),
 				   4, balsa_app.index_subject_width);
 	gtk_clist_set_column_width(GTK_CLIST
-				   ((BALSA_INDEX_PAGE(page)->index)),
+				   ((BALSA_INDEX(page)->ctree)),
 				   5, balsa_app.index_date_width);
     } else { /* page with mailbox not found, open it */
 	balsa_window_open_mbnode(balsa_app.main_window, 
@@ -1348,7 +1347,7 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
                 guint info, guint32 time, gpointer data)
 {
     BalsaMBList* bmbl;
-    BalsaIndexPage* page;
+    BalsaIndex* bindex;
     GtkCTree* ctree;
     GtkCTreeNode* node;
     LibBalsaMailbox* mailbox;
@@ -1375,7 +1374,7 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
     /* find the node and mailbox */
     if (gtk_clist_get_selection_info (GTK_CLIST (ctree), x, y, 
                                       &row, &column)) {
-        node = gtk_ctree_node_nth (ctree, row - 1);
+        node = gtk_ctree_node_nth (ctree, row);
         mbnode = gtk_ctree_node_get_row_data (ctree, node);
 
 
@@ -1404,8 +1403,8 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
             
             libbalsa_mailbox_commit_changes (orig_mailbox);
 
-            if ((page = balsa_find_notebook_page (mailbox)))
-                balsa_index_page_reset (page);
+            if ((bindex = balsa_find_index (mailbox)))
+                balsa_index_reset (bindex);
         }
     }
 
@@ -1427,7 +1426,7 @@ mblist_drag_motion_cb (GtkWidget* mblist, GdkDragContext* context,
 		gtk_signal_handler_block_by_func (GTK_OBJECT (mblist),
 		GTK_SIGNAL_FUNC (select_mailbox), (gpointer) NULL);
 		
-		gtk_clist_select_row (GTK_CLIST (mblist), row - 1, col);
+		gtk_clist_select_row (GTK_CLIST (mblist), row, col);
 		
 		gtk_signal_handler_unblock_by_func (GTK_OBJECT (mblist), GTK_SIGNAL_FUNC (select_mailbox), (gpointer) NULL);
 	}

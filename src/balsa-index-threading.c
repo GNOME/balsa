@@ -95,7 +95,7 @@ threading_jwz(BalsaIndex* bindex, int type)
     GSList *root_set=NULL;
     GSList *save_node=NULL;
     GSList *foo=NULL;
-    GtkCTree* ctree=GTK_CTREE(bindex);
+    GtkCTree* ctree=GTK_CTREE(bindex->ctree);
 
     id_table=g_hash_table_new(g_str_hash, g_str_equal);
     gtk_ctree_pre_recursive(ctree, 
@@ -859,7 +859,7 @@ threading_simple(BalsaIndex* bindex)
     GtkCTreeNode* parent;
     GList *root_children=NULL;
     GList *p=NULL;
-    GtkCTree* ctree=GTK_CTREE(bindex);
+    GtkCTree* ctree=GTK_CTREE(bindex->ctree);
     GHashTable *msg_table;
 
     msg_table=g_hash_table_new(g_str_hash, g_str_equal);

@@ -1,3 +1,20 @@
+2001-01-28  Matthew Guenther  <guentherm@asme.org>
+
+	* src/Makefile.am: remove balsa-index-page.c from compilation.
+	* src/address-book.c: add sendmsg-window.h include.
+	* src/balsa-app.h: remove balsa-index-page.h include, main-window.h.
+	* src/balsa-index-threading.[ch]: changed references to
+	BalsaIndexPage to use BalsaIndex, use new class members.
+	* src/balsa-index.[ch]: merged BalsaIndexPage and BalsaIndex.  Now
+	a subclass of GtkScrolledWindow.
+	* src/balsa-mblist.c: changed references to BalsaIndexPage to use
+	BalsaIndex, use new class members.
+	* src/mailbox-node.h: formatting changes.
+	* src/main-window.c: changed references to BalsaIndexPage to use
+	BalsaIndex, use new class members.
+	* src/main.c: changed references to BalsaIndexPage to use
+	BalsaIndex, use new class members.
+	
 2001-01-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/address-book.c: fix the infamous address book crash.

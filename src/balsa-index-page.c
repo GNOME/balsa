@@ -199,7 +199,7 @@ balsa_index_page_reset(BalsaIndexPage * page)
 	gtk_object_get_data(GTK_OBJECT(current_page), "indexpage");
 
     balsa_window_close_mbnode(BALSA_WINDOW(window), mbnode);
-    balsa_window_open_mbnode(BALSA_WINDOW(window),  mbnode);
+    balsa_window_open_mbnode(BALSA_WINDOW(window), mbnode);
 
     gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook),
 			  balsa_find_notebook_page_num(mbnode->mailbox));

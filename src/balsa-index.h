@@ -24,60 +24,72 @@
 
 #include <gnome.h>
 #include "libbalsa.h"
+#include "mailbox-node.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif				/* __cplusplus */
 
-#define BALSA_INDEX(obj)          GTK_CHECK_CAST (obj, balsa_index_get_type (), BalsaIndex)
-#define BALSA_INDEX_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, balsa_index_get_type (), BalsaIndexClass)
-#define BALSA_IS_INDEX(obj)       GTK_CHECK_TYPE (obj, balsa_index_get_type ())
+    GtkType balsa_index_get_type(void);
+
+#define BALSA_TYPE_INDEX          (balsa_index_get_type ())
+#define BALSA_INDEX(obj)          (GTK_CHECK_CAST (obj, balsa_index_get_type (), BalsaIndex))
+#define BALSA_INDEX_CLASS(klass)  (GTK_CHECK_CLASS_CAST (klass, balsa_index_get_type (), BalsaIndexClass))
+#define BALSA_IS_INDEX(obj)       (GTK_CHECK_TYPE (obj, balsa_index_get_type ()))
+#define BALSA_IS_INDEX_CLASS(klass) (GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_INDEX))
 
 
     typedef struct _BalsaIndex BalsaIndex;
     typedef struct _BalsaIndexClass BalsaIndexClass;
 
     struct _BalsaIndex {
-	GtkCTree ctree;
+        GtkScrolledWindow sw;    
+        
+	GtkCTree* ctree;
+        GtkWidget* window;       
 
-	LibBalsaMailbox *mailbox;
-	LibBalsaMessage *first_new_message;
-	int threading_type;
+        BalsaMailboxNode* mailbox_node;
+	LibBalsaMessage* first_new_message;
+
+        int threading_type;
+        GTimeVal last_use;
     };
 
     struct _BalsaIndexClass {
-	GtkCTreeClass parent_class;
+	GtkScrolledWindowClass parent_class;
 
 	void (*select_message) (BalsaIndex * bindex,
 				LibBalsaMessage * message);
 	void (*unselect_message) (BalsaIndex * bindex,
 				  LibBalsaMessage * message);
+        void (*unselect_all_messages) (BalsaIndex* bindex);
     };
 
-    guint balsa_index_get_type(void);
+
+/* function prototypes */
+    
     GtkWidget *balsa_index_new(void);
 
 
 /* sets the mail stream; if it's a new stream, then it's 
  * contents is loaded into the index */
-    void balsa_index_set_mailbox(BalsaIndex * bindex,
-				 LibBalsaMailbox * mailbox);
+    gboolean balsa_index_load_mailbox_node(BalsaIndex * bindex,
+                                           BalsaMailboxNode * mbnode);
     void balsa_index_refresh(BalsaIndex * bindex);
     void balsa_index_set_threading_type(BalsaIndex * bindex, int thtype);
 
 /* adds a new message */
     void balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message);
-/* del a message */
-    void balsa_index_del(BalsaIndex * bindex, LibBalsaMessage * message);
+
     void balsa_index_update_flag(BalsaIndex * bindex,
 				 LibBalsaMessage * message);
 
+    void balsa_index_redraw_current(BalsaIndex *);
 
 /* select up/down the index */
     void balsa_index_select_next(BalsaIndex *);
     void balsa_index_select_next_unread(BalsaIndex * bindex);
     void balsa_index_select_previous(BalsaIndex *);
-    void balsa_index_redraw_current(BalsaIndex *);
     void balsa_index_select_row(BalsaIndex * bindex, gint row);
 
 /* retrieve the selection */
@@ -85,6 +97,28 @@ extern "C" {
 					      GtkCTreeNode *** rows,
 					      guint * nb_rows);
 
+
+/* balsa index page stuff */
+    void balsa_message_reply(GtkWidget * widget, gpointer user_data);
+    void balsa_message_replytoall(GtkWidget * widget, gpointer user_data);
+    void balsa_message_replytogroup(GtkWidget * widget, gpointer user_data);
+
+    void balsa_message_forward(GtkWidget * widget, gpointer user_data);
+    void balsa_message_continue(GtkWidget * widget, gpointer user_data);
+
+    void balsa_message_delete(GtkWidget * widget, gpointer user_data);
+    void balsa_message_undelete(GtkWidget * widget, gpointer user_data);
+
+    void balsa_message_toggle_flagged(GtkWidget * widget, gpointer user_data);
+    void balsa_message_toggle_new(GtkWidget * widget, gpointer user_data);
+
+    void balsa_index_reset(BalsaIndex * index);
+    gint balsa_find_notebook_page_num(LibBalsaMailbox * mailbox);
+    BalsaIndex* balsa_find_index(LibBalsaMailbox* mailbox);
+    void balsa_index_update_message(BalsaIndex * index);
+
+    /* Threading Stuff */
+    void balsa_index_threading(BalsaIndex* bindex); 
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

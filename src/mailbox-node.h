@@ -56,7 +56,7 @@ typedef enum {
 struct _BalsaMailboxNode {
     GtkObject object;
     BalsaMailboxNode *parent; /* NULL for root-level folders & mailboxes */
-    LibBalsaMailbox * mailbox; /* != NULL for leaves only */
+    LibBalsaMailbox *mailbox; /* != NULL for leaves only */
     gchar *name;       /* used for folders, i.e. when mailbox == NULL */
     BalsaIndexThreadingType threading_type;
     BalsaMailboxNodeStyle style;
@@ -64,7 +64,7 @@ struct _BalsaMailboxNode {
     int remote:1;   /* is dirname or server field used in data union.
 		     * If there is a need for more types, make a subclass. */
     gchar* dir;
-    LibBalsaServer * server; /* Used only by remote; is referenced */
+    LibBalsaServer *server; /* Used only by remote; is referenced */
 };
 
 struct _BalsaMailboxNodeClass {

@@ -23,7 +23,7 @@
 
 #include <gnome.h>
 #include "balsa-app.h"
-
+#include "sendmsg-window.h"
 #include "address-book.h"
 
 #define LIST_COLUMN_NAME        0

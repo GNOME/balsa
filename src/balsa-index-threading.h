@@ -21,8 +21,6 @@
 #ifndef __BALSA_INDEX_THREADING_H__
 #define __BALSA_INDEX_THREADING_H__
 
-#include "balsa-index.h"
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -34,8 +32,6 @@ extern "C"
 	BALSA_INDEX_THREADING_SIMPLE,
 	BALSA_INDEX_THREADING_JWZ
     } BalsaIndexThreadingType;
-
-    void balsa_index_threading(BalsaIndex * bindex); 
 
 #ifdef __cplusplus
 }

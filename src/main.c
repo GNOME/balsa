@@ -41,10 +41,12 @@
 
 #include "balsa-app.h"
 #include "balsa-icons.h"
+#include "balsa-index.h"
 #include "main-window.h"
 #include "libbalsa.h"
 #include "mailbox-node.h"
 #include "save-restore.h"
+#include "sendmsg-window.h"
 #include "main.h"
 #include "information.h"
 
@@ -483,7 +485,7 @@ balsa_exit(void)
 static void
 empty_trash(void)
 {
-    BalsaIndexPage *page;
+    BalsaIndex *index;
     GList *message;
 
     libbalsa_mailbox_open(balsa_app.trash, FALSE);
@@ -499,8 +501,8 @@ empty_trash(void)
     libbalsa_mailbox_close(balsa_app.trash);
 
     if (balsa_app.notebook &&
-	(page = balsa_find_notebook_page(balsa_app.trash)))
-	    balsa_index_page_reset(page);
+	(index = balsa_find_index(balsa_app.trash)))
+	    balsa_index_reset(index);
 }
 
 

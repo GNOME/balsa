@@ -94,8 +94,10 @@ balsa_init_window_new ()
   prefs = g_malloc0 (sizeof (Prefs));
 
   iw->window = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (iw->window), _("Welcome To Balsa!"));
-  
+  gtk_window_set_title (GTK_WINDOW (iw->window), _ ("Welcome To Balsa!"));
+
+  gtk_widget_realize (iw->window);
+
   gtk_signal_connect (GTK_OBJECT (iw->window),
 		      "delete_event",
 		      (GtkSignalFunc) delete_init_window,
@@ -140,16 +142,16 @@ balsa_init_window_new ()
 
   bbox = gtk_hbutton_box_new ();
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (iw->window)->action_area), bbox, TRUE, TRUE, 0);
-  gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
+  gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 5);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
   gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
-                                 BALSA_BUTTON_WIDTH,
-                                 BALSA_BUTTON_HEIGHT);
+				 BALSA_BUTTON_WIDTH,
+				 BALSA_BUTTON_HEIGHT);
   gtk_widget_show (bbox);
 
 
-  iw->prev = gtk_button_new_with_label (_("Previous..."));
-  gtk_container_add(GTK_CONTAINER(bbox), iw->prev);
+  iw->prev = gtk_button_new_with_label (_ ("Previous..."));
+  gtk_container_add (GTK_CONTAINER (bbox), iw->prev);
   gtk_widget_show (iw->prev);
 
   gtk_widget_set_sensitive (iw->prev, FALSE);
@@ -159,8 +161,8 @@ balsa_init_window_new ()
 		      (GtkSignalFunc) prev_cb,
 		      NULL);
 
-  iw->next = gtk_button_new_with_label (_("Next..."));
-  gtk_container_add(GTK_CONTAINER(bbox), iw->next);
+  iw->next = gtk_button_new_with_label (_ ("Next..."));
+  gtk_container_add (GTK_CONTAINER (bbox), iw->next);
   gtk_widget_show (iw->next);
 
   gtk_signal_connect (GTK_OBJECT (iw->next),
@@ -175,12 +177,37 @@ static GtkWidget *
 create_welcome_page ()
 {
   GtkWidget *vbox;
+  GtkWidget *text;
   GtkWidget *label;
+
+#if 0
+  gchar *buf;
+
+  buf = g_new (gchar, 2048);
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
 
-  label = gtk_label_new (_("Welcome to Balsa!  The following steps will help you get setup to use Balsa."));
+  snprintf (buf, 2048, _ ("Welcome to Balsa!\n\n"),
+	    _ ("You seem to be running Balsa for the first time.\n"),
+	    _ ("The following steps will setup Balsa by asking a few simple questions."), "  ",
+	    _ ("Once you have completed these steps, you can always change them at a later time through Balsa's preferences."),
+	    "  ",
+	    _ ("Please check the about box in Balsa's main window for more information on contacting the authors or reporting bugs."));
+  gtk_text_freeze (GTK_TEXT (text));
+  text = gtk_text_new (NULL, NULL);
+  gtk_box_pack_start (GTK_BOX (vbox), text, FALSE, FALSE, 5);
+  gtk_widget_show (text);
+  gtk_text_set_editable (GTK_TEXT (text), TRUE);
+  gtk_text_set_word_wrap (GTK_TEXT (text), TRUE);
+  gtk_text_insert (GTK_TEXT (text), NULL, NULL, NULL, buf, 2048);
+  g_free (buf);
+  gtk_text_thaw (text);
+#endif
+  vbox = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox);
+
+  label = gtk_label_new (_ ("Welcome to Balsa!  The following steps will help you get setup to use Balsa."));
   gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 5);
   gtk_widget_show (label);
 
@@ -206,7 +233,7 @@ create_general_page ()
   gtk_widget_show (table);
 
   /* your name */
-  label = gtk_label_new (_("Your name:"));
+  label = gtk_label_new (_ ("Your name:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL,
@@ -220,7 +247,7 @@ create_general_page ()
   gtk_widget_show (prefs->real_name);
 
   /* email address */
-  label = gtk_label_new (_("E-Mail address:"));
+  label = gtk_label_new (_ ("E-Mail address:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
 		    GTK_FILL, GTK_FILL,
@@ -235,7 +262,7 @@ create_general_page ()
   gtk_widget_show (prefs->email);
 
   /* smtp server */
-  label = gtk_label_new (_("SMTP server:"));
+  label = gtk_label_new (_ ("SMTP server:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
 		    GTK_FILL, GTK_FILL,
@@ -282,11 +309,11 @@ create_finished_page ()
   vbox = gtk_vbox_new (TRUE, 0);
   gtk_widget_show (vbox);
 
-  label = gtk_label_new (_("Balsa is now ready to run.  Click finish to save your settings"));
+  label = gtk_label_new (_ ("Balsa is now ready to run.  Click finish to save your settings"));
   gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 5);
   gtk_widget_show (label);
 
-  button = gtk_button_new_with_label (_("Finish"));
+  button = gtk_button_new_with_label (_ ("Finish"));
   gtk_widget_set_usize (button, BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
   gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 5);
   gtk_widget_show (button);
@@ -303,7 +330,7 @@ create_finished_page ()
 static gint
 delete_init_window (GtkWidget * widget)
 {
-  printf (_("we are deleting the window, not saving, lets quit now\n"));
+  printf ("we are deleting the window, not saving, lets quit now\n");
   balsa_exit ();
   return FALSE;
 }

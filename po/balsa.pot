@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-16 08:46-0400\n"
+"POT-Creation-Date: 1998-08-16 13:05-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,79 +30,101 @@ msgstr ""
 msgid "Welcome To Balsa!"
 msgstr ""
 
-#: src/balsa-init.c:151
+#: src/balsa-init.c:153
 msgid "Previous..."
 msgstr ""
 
-#: src/balsa-init.c:162
+#: src/balsa-init.c:164
 msgid "Next..."
 msgstr ""
 
-#: src/balsa-init.c:183
+#: src/balsa-init.c:189
+msgid ""
+"Welcome to Balsa!\n"
+"\n"
+msgstr ""
+
+#: src/balsa-init.c:190
+msgid "You seem to be running Balsa for the first time.\n"
+msgstr ""
+
+#: src/balsa-init.c:191
+msgid "The following steps will setup Balsa by asking a few simple questions."
+msgstr ""
+
+#: src/balsa-init.c:192
+msgid ""
+"Once you have completed these steps, you can always change them at a later "
+"time through Balsa's preferences."
+msgstr ""
+
+#: src/balsa-init.c:194
+msgid ""
+"Please check the about box in Balsa's main window for more information on "
+"contacting the authors or reporting bugs."
+msgstr ""
+
+#: src/balsa-init.c:208
 msgid ""
 "Welcome to Balsa!  The following steps will help you get setup to use Balsa."
 msgstr ""
 
 #. your name
-#: src/balsa-init.c:209 src/pref-manager.c:349
+#: src/balsa-init.c:234 src/pref-manager.c:318
 msgid "Your name:"
 msgstr ""
 
 #. email address
-#: src/balsa-init.c:223 src/pref-manager.c:366
+#: src/balsa-init.c:248 src/pref-manager.c:328
 msgid "E-Mail address:"
 msgstr ""
 
 #. smtp server
-#: src/balsa-init.c:238 src/pref-manager.c:398
+#: src/balsa-init.c:263 src/pref-manager.c:338
 msgid "SMTP server:"
 msgstr ""
 
-#: src/balsa-init.c:285
+#: src/balsa-init.c:310
 msgid "Balsa is now ready to run.  Click finish to save your settings"
 msgstr ""
 
-#: src/balsa-init.c:289
+#: src/balsa-init.c:314
 msgid "Finish"
-msgstr ""
-
-#: src/balsa-init.c:306
-msgid "we are deleting the window, not saving, lets quit now\n"
 msgstr ""
 
 #: src/index-child.c:96
 msgid "Unable to Open Mailbox!"
 msgstr ""
 
-#: src/index-child.c:199
+#: src/index-child.c:198
 msgid "Transfer"
 msgstr ""
 
-#: src/index-child.c:217
+#: src/index-child.c:216
 msgid "Change Status"
 msgstr ""
 
-#: src/index-child.c:220
+#: src/index-child.c:219
 msgid "Unread"
 msgstr ""
 
-#: src/index-child.c:226
+#: src/index-child.c:225
 msgid "Read"
 msgstr ""
 
-#: src/index-child.c:232
+#: src/index-child.c:231
 msgid "Replied"
 msgstr ""
 
-#: src/index-child.c:238
+#: src/index-child.c:237
 msgid "Forwarded"
 msgstr ""
 
-#: src/index-child.c:248 src/main-window.c:262
+#: src/index-child.c:247 src/main-window.c:262
 msgid "Undelete"
 msgstr ""
 
-#: src/index-child.c:256 src/main-window.c:248 src/main-window.c:411
+#: src/index-child.c:255 src/main-window.c:248 src/main-window.c:411
 msgid "Delete"
 msgstr ""
 
@@ -191,7 +213,7 @@ msgid "Close"
 msgstr ""
 
 #. mailboxes page
-#: src/main-window.c:309 src/pref-manager.c:129
+#: src/main-window.c:309 src/pref-manager.c:131
 msgid "Mailboxes"
 msgstr ""
 
@@ -260,7 +282,12 @@ msgid "Open Next Message"
 msgstr ""
 
 #: src/main-window.c:510
-msgid "Balsa is a E-Mail Client"
+msgid ""
+"The Balsa email client is part of the GNOME desktop environment.  "
+"Information on Balsa can be found at http://www.balsa.net/\n"
+"\n"
+"If you need to report bugs, please do so at: "
+"http://www.gnome.org/cgi-bin/bugs"
 msgstr ""
 
 #: src/mblist-window.c:406
@@ -272,75 +299,31 @@ msgid "Edit Mailbox"
 msgstr ""
 
 #. identity page
-#: src/pref-manager.c:123
+#: src/pref-manager.c:124
 msgid "Identity"
 msgstr ""
 
 #. view page
-#: src/pref-manager.c:135
+#: src/pref-manager.c:138
 msgid "View"
 msgstr ""
 
 #. MDI page
-#: src/pref-manager.c:141 src/pref-manager.c:621
+#: src/pref-manager.c:145 src/pref-manager.c:438
 msgid "MDI"
 msgstr ""
 
-#. organization
-#: src/pref-manager.c:382
-msgid "Organization:"
-msgstr ""
-
-#: src/pref-manager.c:436
+#: src/pref-manager.c:367
 msgid "Local mail directory:"
 msgstr ""
 
-#. inbox path
-#: src/pref-manager.c:452
-msgid "Inbox Path:"
-msgstr ""
-
-#. outbox path
-#: src/pref-manager.c:469
-msgid "Outbox Path:"
-msgstr ""
-
-#. trash path
-#: src/pref-manager.c:485
-msgid "Trash Path:"
-msgstr ""
-
 #. Toolbars
-#: src/pref-manager.c:520
+#: src/pref-manager.c:397
 msgid "Toolbars"
 msgstr ""
 
-#: src/pref-manager.c:531
-msgid "Show as Text"
-msgstr ""
-
-#: src/pref-manager.c:547
-msgid "Show as Images"
-msgstr ""
-
-#: src/pref-manager.c:563
-msgid "Show as Text and Images"
-msgstr ""
-
-#: src/pref-manager.c:590
+#: src/pref-manager.c:417
 msgid "Debug"
-msgstr ""
-
-#: src/pref-manager.c:632
-msgid "Notebook"
-msgstr ""
-
-#: src/pref-manager.c:648
-msgid "Toplevel"
-msgstr ""
-
-#: src/pref-manager.c:664
-msgid "Modal"
 msgstr ""
 
 #: src/sendmsg-window.c:68 src/sendmsg-window.c:133

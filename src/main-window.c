@@ -507,7 +507,7 @@ show_about_box ()
 			   BALSA_VERSION,
 			   "Copyright (C) 1997-98",
 			   authors,
-			   _ ("Balsa is a E-Mail Client"),
+			   _ ("The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n\nIf you need to report bugs, please do so at: http://www.gnome.org/cgi-bin/bugs"),
 			   NULL);
 
   gtk_signal_connect (GTK_OBJECT (about),

@@ -173,7 +173,7 @@ struct _Message
   {
     /* the mailbox this message belongs to */
     Mailbox *mailbox;
-    
+
     /* flags */
     MessageFlags flags;
 
@@ -221,9 +221,9 @@ struct _Address
 
 struct _Body
   {
-    gchar   *buffer;		/* holds raw data of the MIME part, or NULL */
-    gchar   *htmlized;		/* holds htmlrep of buffer, or NULL */
-    BODY    *mutt_body;		/* pointer to BODY struct of mutt message */
+    gchar *buffer;		/* holds raw data of the MIME part, or NULL */
+    gchar *htmlized;		/* holds htmlrep of buffer, or NULL */
+    BODY *mutt_body;		/* pointer to BODY struct of mutt message */
   };
 
 
@@ -240,9 +240,9 @@ void mailbox_init (gchar * inbox);
 
 gint set_imap_username (Mailbox * mb);
 void check_all_pop3_hosts (Mailbox *);
-void add_mailboxes_for_checking(Mailbox *);
+void add_mailboxes_for_checking (Mailbox *);
 gint mailbox_have_new_messages (gchar * path);
-GList *make_list_from_string(gchar *);
+GList *make_list_from_string (gchar *);
 
 /* 
  * open and close a mailbox 

@@ -80,7 +80,7 @@ create_toolbar (GtkWidget * window, BalsaSendmsg * bsmw)
 
   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
 		  _ ("Attach"), _ ("Add attachments to this message"), NULL,
-		gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_OPEN),
+		gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_ATTACH),
 					   GTK_SIGNAL_FUNC (attach_clicked),
 					   bsmw->attachments);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
@@ -189,7 +189,7 @@ create_menu (GtkWidget * window, BalsaSendmsg * bmsg)
 		      bmsg);
 
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_OPEN, _ ("Attach File"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_ATTACH, _ ("Attach File"));
   gtk_widget_show (w);
   gtk_widget_add_accelerator (w, "activate", accel,
 			      'H', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);

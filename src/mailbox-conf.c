@@ -77,6 +77,7 @@ struct _MailboxConfWindow
     GtkWidget *pop_port;
     GtkWidget *pop_username;
     GtkWidget *pop_password;
+    GtkWidget *pop_check;
 
   };
 
@@ -355,6 +356,7 @@ mailbox_conf_set_values (Mailbox * mailbox)
 	  gtk_entry_set_text (GTK_ENTRY (mcw->pop_server), MAILBOX_POP3 (mailbox)->server);
 	  gtk_entry_set_text (GTK_ENTRY (mcw->pop_username), MAILBOX_POP3 (mailbox)->user);
 	  gtk_entry_set_text (GTK_ENTRY (mcw->pop_password), MAILBOX_POP3 (mailbox)->passwd);
+	  gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (mcw->pop_check), MAILBOX_POP3 (mailbox)->check);
 	}
       gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_POP3);
       break;
@@ -412,6 +414,7 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
       MAILBOX_POP3 (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)));
       MAILBOX_POP3 (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)));
       MAILBOX_POP3 (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)));
+      MAILBOX_POP3 (mailbox)->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
 
       config_mailbox_update (mailbox, old_mbox_name);
       break;
@@ -502,6 +505,7 @@ conf_add_mailbox ()
       MAILBOX_POP3 (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)));
       MAILBOX_POP3 (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)));
       MAILBOX_POP3 (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)));
+      MAILBOX_POP3 (mailbox)->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
       balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
       config_mailbox_add (mailbox, NULL);
       add_mailboxes_for_checking (mailbox);
@@ -678,7 +682,7 @@ create_pop_mailbox_page (void)
   GtkWidget *table;
   GtkWidget *label;
 
-  return_widget = table = gtk_table_new (4, 2, FALSE);
+  return_widget = table = gtk_table_new (5, 2, FALSE);
   gtk_widget_show (table);
 
   /* mailbox name */
@@ -721,12 +725,12 @@ create_pop_mailbox_page (void)
 
   label = gtk_label_new ("Username:");
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
 		    GTK_FILL, GTK_FILL,
 		    10, 10);
   gtk_widget_show (label);
   mcw->pop_username = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->pop_username, 1, 2, 3, 4,
+  gtk_table_attach (GTK_TABLE (table), mcw->pop_username, 1, 2, 2, 3,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
 
@@ -738,17 +742,23 @@ create_pop_mailbox_page (void)
 
   label = gtk_label_new ("Password:");
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 4, 5,
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
 		    GTK_FILL, GTK_FILL,
 		    10, 10);
   gtk_widget_show (label);
   mcw->pop_password = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->pop_password, 1, 2, 4, 5,
+  gtk_table_attach (GTK_TABLE (table), mcw->pop_password, 1, 2, 3, 4,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
   gtk_entry_set_visibility (GTK_ENTRY (mcw->pop_password), FALSE);
-
   gtk_widget_show (mcw->pop_password);
+
+  mcw->pop_check = gtk_check_button_new_with_label("Check");
+  gtk_table_attach (GTK_TABLE (table), mcw->pop_check, 0, 2, 4, 5,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (mcw->pop_check);
+
   return return_widget;
 }
 

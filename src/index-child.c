@@ -215,36 +215,43 @@ index_child_create_view (GnomeMDIChild * child)
 
   ic = INDEX_CHILD (child);
 
-  vpane = gtk_vpaned_new ();
+  if (balsa_app.previewpane)
+    {
 
-  ic->index = balsa_index_new ();
-  gtk_paned_add1 (GTK_PANED (vpane), ic->index);
+      vpane = gtk_vpaned_new ();
 
-  table = gtk_table_new (2, 2, FALSE);
+      ic->index = balsa_index_new ();
+      gtk_paned_add1 (GTK_PANED (vpane), ic->index);
 
-  ic->message = balsa_message_new ();
+      table = gtk_table_new (2, 2, FALSE);
 
-  gtk_table_attach_defaults (GTK_TABLE (table), ic->message, 0, 1, 0, 1);
+      ic->message = balsa_message_new ();
 
-  hscrollbar = gtk_hscrollbar_new (GTK_LAYOUT (ic->message)->hadjustment);
-  GTK_WIDGET_UNSET_FLAGS (hscrollbar, GTK_CAN_FOCUS);
-  gtk_table_attach (GTK_TABLE (table), hscrollbar, 0, 1, 1, 2,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+      gtk_table_attach_defaults (GTK_TABLE (table), ic->message, 0, 1, 0, 1);
 
-  vscrollbar = gtk_vscrollbar_new (GTK_LAYOUT (ic->message)->vadjustment);
-  GTK_WIDGET_UNSET_FLAGS (vscrollbar, GTK_CAN_FOCUS);
-  gtk_table_attach (GTK_TABLE (table), vscrollbar, 1, 2, 0, 1,
-		    GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
+      hscrollbar = gtk_hscrollbar_new (GTK_LAYOUT (ic->message)->hadjustment);
+      GTK_WIDGET_UNSET_FLAGS (hscrollbar, GTK_CAN_FOCUS);
+      gtk_table_attach (GTK_TABLE (table), hscrollbar, 0, 1, 1, 2,
+			GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 
-  gtk_paned_add2 (GTK_PANED (vpane), table);
-  gtk_widget_set_usize (vpane, 1, 250);
+      vscrollbar = gtk_vscrollbar_new (GTK_LAYOUT (ic->message)->vadjustment);
+      GTK_WIDGET_UNSET_FLAGS (vscrollbar, GTK_CAN_FOCUS);
+      gtk_table_attach (GTK_TABLE (table), vscrollbar, 1, 2, 0, 1,
+			GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
 
-  gtk_widget_show_all (vpane);
+      gtk_paned_add2 (GTK_PANED (vpane), table);
+      gtk_widget_set_usize (vpane, 1, 250);
+
+      gtk_widget_show_all (vpane);
+    }
+  else
+    {
+      ic->index = balsa_index_new ();
+      gtk_widget_show(ic->index);
+    }
 
   balsa_index_set_mailbox (BALSA_INDEX (ic->index), ic->mailbox);
-/*
-   gtk_idle_add ((GtkFunction) check_for_new_mail, ic->index);
- */
+
   gtk_signal_connect (GTK_OBJECT (ic->index), "select_message",
 		      (GtkSignalFunc) index_select_cb, ic);
   return (vpane);
@@ -269,7 +276,11 @@ idle_handler_cb (GtkWidget * widget)
     gtk_menu_popup (GTK_MENU (create_menu (BALSA_INDEX (widget))), NULL, NULL, NULL, NULL, bevent->button, bevent->time);
 
   else
-    balsa_message_set (BALSA_MESSAGE (((IndexChild *) data)->message), message);
+    {
+      if (BALSA_MESSAGE (((IndexChild *) data)->message))
+	balsa_message_set (BALSA_MESSAGE (((IndexChild *) data)->message), message);
+    }
+
   handler = 0;
 
   gtk_object_remove_data (GTK_OBJECT (widget), "bevent");

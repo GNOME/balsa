@@ -211,8 +211,8 @@ struct _LibBalsaMailboxClass {
     void (*fetch_message_structure)(LibBalsaMailbox *mailbox,
                                     LibBalsaMessage * message,
                                     LibBalsaFetchFlag flags);
-    GMimeStream *(*get_message_part) (LibBalsaMessage     *message,
-				      LibBalsaMessageBody *part);
+    const gchar *(*get_message_part) (LibBalsaMessage     *message,
+                                      LibBalsaMessageBody *part, ssize_t*);
     GMimeStream *(*get_message_stream) (LibBalsaMailbox * mailbox,
 					LibBalsaMessage * message);
 
@@ -285,11 +285,12 @@ void libbalsa_mailbox_fetch_message_structure(LibBalsaMailbox *mailbox,
 					      LibBalsaMessage *message,
 					      LibBalsaFetchFlag flags);
 
-/** libbalsa_mailbox_get_message_stream() returns a stream associated
-    with selected, single part of the message.
+/** libbalsa_mailbox_get_message_stream() returns an allocated block containing
+    selected, single part of the message.
 */
-GMimeStream *libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
-					       LibBalsaMessageBody *part);
+const gchar *libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
+                                               LibBalsaMessageBody *part, 
+                                               ssize_t *sz);
 
 /** libbalsa_mailbox_get_message_stream() returns a message stream associated
     with full RFC822 text of the message.

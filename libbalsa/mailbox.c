@@ -884,13 +884,16 @@ libbalsa_mailbox_fetch_message_structure(LibBalsaMailbox *mailbox,
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
     g_return_if_fail(message != NULL);
 
+    if(message->body_list) /* already fetched no need to refetch it */
+        return;
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)
         ->fetch_message_structure(mailbox, message, flags);
 }
 
-GMimeStream*
+const gchar*
 libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
-				  LibBalsaMessageBody *part)
+				  LibBalsaMessageBody *part,
+                                  ssize_t *sz)
 {
     g_return_val_if_fail(message != NULL, NULL);
     g_return_val_if_fail(message->mailbox != NULL, NULL);
@@ -898,7 +901,7 @@ libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
     g_return_val_if_fail(part != NULL, NULL);
 
     return LIBBALSA_MAILBOX_GET_CLASS(message->mailbox)
-        ->get_message_part(message, part);
+        ->get_message_part(message, part, sz);
 }
 
 GMimeStream *

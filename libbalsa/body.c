@@ -122,12 +122,35 @@ void
 libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
 				    GMimeObject * mime_part)
 {
+    const GMimeContentType *type;
+    g_return_if_fail(mime_part);
     g_return_if_fail(body->mime_part == NULL);
 
+    type = g_mime_object_get_content_type(mime_part);
     g_object_ref(G_OBJECT(mime_part));	
     if (body->mime_part)
 	g_object_unref(G_OBJECT(body->mime_part));	
     body->mime_part = mime_part;
+
+    if      (g_mime_content_type_is_type(type, "audio", "*"))
+	body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_AUDIO;
+    else if (g_mime_content_type_is_type(type, "application", "*"))
+	body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION;
+    else if (g_mime_content_type_is_type(type, "image", "*"))
+	body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_IMAGE;
+    else if (g_mime_content_type_is_type(type, "message", "*"))
+	body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE;
+    else if (g_mime_content_type_is_type(type, "model", "*"))
+	body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_MODEL;
+    else if (g_mime_content_type_is_type(type, "multipart", "*"))
+	body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART;
+    else if (g_mime_content_type_is_type(type, "text", "*"))
+	body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_TEXT;
+    else if (g_mime_content_type_is_type(type, "video", "*"))
+	body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_VIDEO;
+    else body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_OTHER;
+    body->mime_type = g_mime_content_type_to_string(type);
+
     if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE &&
 	GMIME_IS_MESSAGE_PART(body->mime_part)) {
 	GMimeMessagePart* message_part = GMIME_MESSAGE_PART(body->mime_part);
@@ -159,28 +182,8 @@ libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
 LibBalsaMessageBodyType
 libbalsa_message_body_type(LibBalsaMessageBody * body)
 {
-    const GMimeContentType *type=g_mime_object_get_content_type(body->mime_part);
-
-    if      (g_mime_content_type_is_type(type, "audio", "*"))
-	return LIBBALSA_MESSAGE_BODY_TYPE_AUDIO;
-    else if (g_mime_content_type_is_type(type, "application", "*"))
-	return LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION;
-    else if (g_mime_content_type_is_type(type, "image", "*"))
-	return LIBBALSA_MESSAGE_BODY_TYPE_IMAGE;
-    else if (g_mime_content_type_is_type(type, "message", "*"))
-	return LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE;
-    else if (g_mime_content_type_is_type(type, "model", "*"))
-	return LIBBALSA_MESSAGE_BODY_TYPE_MODEL;
-    else if (g_mime_content_type_is_type(type, "multipart", "*"))
-	return LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART;
-    else if (g_mime_content_type_is_type(type, "text", "*"))
-	return LIBBALSA_MESSAGE_BODY_TYPE_TEXT;
-    else if (g_mime_content_type_is_type(type, "video", "*"))
-	return LIBBALSA_MESSAGE_BODY_TYPE_VIDEO;
-    else return LIBBALSA_MESSAGE_BODY_TYPE_OTHER;
-
-    g_assert_not_reached();
-    return LIBBALSA_MESSAGE_BODY_TYPE_OTHER;
+    /* FIXME: this could be a virtual function... OR not? */
+    return body->body_type;
 }
 
 gchar *
@@ -272,7 +275,6 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
     const char *charset;
     GMimeFilter *filter;
 
-    g_return_val_if_fail(GMIME_IS_PART(body->mime_part), FALSE);
     stream = g_mime_stream_fs_new(fd);
     filter_stream = g_mime_stream_filter_new_with_stream(stream);
     g_mime_stream_unref(stream);
@@ -289,7 +291,7 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
     }
     g_free(mime_type);
 
-    buf = g_mime_part_get_content(GMIME_PART(body->mime_part), &len);
+    buf = libbalsa_mailbox_get_message_part(body->message, body, &len);
     if (len && g_mime_stream_write(filter_stream, (char*)buf, len) == -1) {
 	g_mime_stream_unref(filter_stream);
 	/* FIXME: unlink??? */
@@ -310,11 +312,16 @@ gchar *
 libbalsa_message_body_get_content_type(LibBalsaMessageBody * body)
 {
     gchar *res;
-
+#ifdef OLD_CODE
+    gchar *tmp;
     const GMimeContentType *type=g_mime_object_get_content_type(body->mime_part);
-    res=g_mime_content_type_to_string(type);
+    tmp=g_mime_content_type_to_string(type);
 
-    g_ascii_strdown(res, strlen(res));
+    res = g_ascii_strdown(tmp, -1);
+    g_free(tmp);
+#else
+    res = g_ascii_strdown(body->mime_type, -1);
+#endif
     return res;
 }
 

@@ -1,3 +1,4 @@
+#define _XOPEN_SOURCE 500
 #include <stdio.h>
 #include <string.h>
 #include "imap-handle.h"
@@ -499,13 +500,13 @@ imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle, unsigned uid,
 
 ImapResponse
 imap_mbox_handle_fetch_body(ImapMboxHandle* handle, 
-                            unsigned seqno, unsigned partno,
+                            unsigned seqno, const char *section,
                             ImapFetchBodyCb body_cb, void *arg)
 {
   char cmd[40];
   handle->body_cb  = body_cb;
   handle->body_arg = arg;
-  sprintf(cmd, "FETCH %d BODY[%d]", seqno, partno);
+  snprintf(cmd, sizeof(cmd), "FETCH %d BODY[%s]", seqno, section);
   return imap_cmd_exec(handle, cmd);
 }
 

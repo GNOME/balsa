@@ -120,13 +120,6 @@ ImapResponse imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
                                           unsigned lo, unsigned hi,
                                           ImapFetchType ift);
 
-typedef void (*ImapFetchBodyCb)(const char *buf, int buflen, void* arg);
-ImapResponse imap_mbox_handle_fetch_body(ImapMboxHandle* handle, 
-                                         unsigned seqno, 
-                                         unsigned partno,
-                                         ImapFetchBodyCb body_handler,
-                                         void *arg);
-
 ImapResponse imap_mbox_handle_fetch_structure(ImapMboxHandle* handle,
                                               const gchar *seq);
 
@@ -146,6 +139,14 @@ unsigned imap_mbox_set_sort(ImapMboxHandle *h, ImapSortOrder isr);
 const char *imap_mbox_get_filter(ImapMboxHandle *h);
 /* get_thread_root is deprecated */
 GNode *imap_mbox_handle_get_thread_root(ImapMboxHandle* handle); 
+
+/* ================ BEGIN OF BODY STRUCTURE FUNCTIONS ================== */
+const gchar *imap_body_get_param(ImapBody *body, const gchar *param);
+gchar *imap_body_get_mime_type(ImapBody *body);
+ImapBody *imap_message_get_body_from_section(ImapMessage *msg,
+                                             const char *section);
+
+/* ================ END OF BODY STRUCTURE FUNCTIONS ==================== */
 
 /* ================ BEGIN OF MBOX_VIEW FUNCTIONS ======================= */
 typedef struct _MboxView MboxView;

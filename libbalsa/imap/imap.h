@@ -97,7 +97,8 @@ typedef struct ImapEnvelope_ {
 typedef struct ImapBody_ ImapBody;
 
 typedef enum { IMBMEDIA_MULTIPART,
-               IMBMEDIA_APPLICATION, IMBMEDIA_AUDIO,
+               IMBMEDIA_APPLICATION,
+               IMBMEDIA_AUDIO,
                IMBMEDIA_IMAGE, 
                IMBMEDIA_MESSAGE_RFC822,
                IMBMEDIA_MESSAGE_OTHER,
@@ -112,8 +113,9 @@ struct ImapBody_ {
   ImapMediaBasic media_basic;
   gchar *media_basic_other;
   gchar* media_subtype;
-  int octets;
-  int lines;
+  GHashTable *params;
+  unsigned octets;
+  unsigned lines;
   char *desc;
   ImapEnvelope *envelope;/* used only if media/basic == MESSAGE */
   ImapBody *child; /* not null for eg. message/rfc822 */

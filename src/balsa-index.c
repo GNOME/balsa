@@ -583,7 +583,6 @@ bndx_selection_changed_func(GtkTreeModel * model, GtkTreePath * path,
                        -1);
     if (sci->message == sci->current_message)
         sci->current_message_selected = TRUE;
-    printf("selection changed.\n");
 }
 
 static gboolean
@@ -2286,7 +2285,7 @@ bndx_select_row(BalsaIndex * index, GtkTreePath * path)
 static void
 bndx_load_and_thread(BalsaIndex * index, int thtype)
 {
-#if 1
+
     gtk_tree_view_set_model(GTK_TREE_VIEW(index), NULL);
     libbalsa_mailbox_set_threading(index->mailbox_node->mailbox, thtype);
 #ifndef GTK2_FETCHES_ONLY_VISIBLE_CELLS
@@ -2295,18 +2294,6 @@ bndx_load_and_thread(BalsaIndex * index, int thtype)
 #endif
     gtk_tree_view_set_model(GTK_TREE_VIEW(index),
                             GTK_TREE_MODEL(index->mailbox_node->mailbox));
-#else
-    LibBalsaMailbox *mailbox;
-    GList *list;
-
-    g_hash_table_foreach_remove(index->ref_table, (GHRFunc) gtk_true, NULL);
-    mailbox = index->mailbox_node->mailbox;
-    for (list = mailbox->message_list; list; list = list->next)
-        bndx_add_message(index, list->data);
-    bndx_set_threading_type(index, thtype);
-    bndx_set_sort_order(index, mailbox->view->sort_field,
-                        mailbox->view->sort_type);
-#endif
 }
 
 

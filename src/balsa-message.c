@@ -3110,7 +3110,7 @@ static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
 /* This function handles multiparts as specified by RFC2046 5.1 */
 {
     const GMimeContentType *type;
-    type=g_mime_object_get_content_type(parent->mime_part);
+    type=g_mime_content_type_new_from_string(parent->mime_type);
     if (g_mime_content_type_is_type(type, "multipart", "*")) {
         if (g_mime_content_type_is_type(type, "*", "related")) {
             /* FIXME: more processing required see RFC1872 */

@@ -1,3 +1,15 @@
+2003-10-05  Pawel Salek
+
+	* libbalsa/body.[hc]: do not require gmime for content-type.
+	* src/balsa-message.c: ditto.
+	* libbalsa/mailbox.[hc]: change _get_message_part API.
+	* libbalsa/mailbox_{local,imap}.c: implement _get_message_part().
+	* libbalsa/message.c: add forgotten UNLOCK.
+	* libbalsa/imap/imap-commands.[hc]: backend support for get_part().
+	* libbalsa/imap/imap-handle.[ch]: actually remember part parameters.
+	* libbalsa/imap/imap.h: add params field.
+	* src/balsa-index.c: cleanup.
+
 2003-10-04  Pawel Salek
 
 	* libbalsa/mailbox.[ch]: add prepare_threading,

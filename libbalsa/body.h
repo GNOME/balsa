@@ -50,8 +50,11 @@ enum _LibBalsaMessageBodyType {
 
 struct _LibBalsaMessageBody {
     LibBalsaMessage *message;	/* The message of which this is a part */
+    /* FIXME: remove buffer and buf_len to decrease memory usage. */
     gchar *buffer;		/* holds raw data of the MIME part, or NULL */
+    ssize_t buflen;             /* size of the block */
     LibBalsaMessageHeaders *embhdrs;  /* headers of a message/rfc822 part */
+    LibBalsaMessageBodyType body_type;
     gchar *mime_type;           /* the mime type/subtype of buffer, or NULL, if plain */
     gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
     gboolean attach_as_extbody; /* if an attachment shall be appended as external-body (sending) */

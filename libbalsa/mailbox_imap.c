@@ -98,8 +98,9 @@ static void libbalsa_mailbox_imap_prepare_threading(LibBalsaMailbox *mailbox,
 static void libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
                                                   LibBalsaMessage *message,
                                                   LibBalsaFetchFlag flags);
-static GMimeStream* libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
-                                                       LibBalsaMessageBody *);
+static const gchar* libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
+                                                       LibBalsaMessageBody *,
+                                                       ssize_t *);
 
 static int libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
 					     LibBalsaMessage * message );
@@ -1299,19 +1300,145 @@ libbalsa_mailbox_imap_prepare_threading(LibBalsaMailbox *mailbox,
 }
 
 static void
+lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
+{
+    g_return_if_fail(lbbody);
+    g_return_if_fail(imap_body);
+
+    switch(imap_body->media_basic) {
+    case IMBMEDIA_MULTIPART:
+        lbbody->body_type = LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART; break;
+    case IMBMEDIA_APPLICATION:
+        lbbody->body_type = LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION; break;
+    case IMBMEDIA_AUDIO:
+        lbbody->body_type = LIBBALSA_MESSAGE_BODY_TYPE_AUDIO; break;
+    case IMBMEDIA_IMAGE:
+        lbbody->body_type = LIBBALSA_MESSAGE_BODY_TYPE_IMAGE; break;
+    case IMBMEDIA_MESSAGE_RFC822:
+    case IMBMEDIA_MESSAGE_OTHER:
+        lbbody->body_type = LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE; break;
+    case IMBMEDIA_TEXT:
+        lbbody->body_type = LIBBALSA_MESSAGE_BODY_TYPE_TEXT; break;
+    default:
+    case IMBMEDIA_OTHER:
+        lbbody->body_type = LIBBALSA_MESSAGE_BODY_TYPE_OTHER; break;
+    }
+    lbbody->mime_type = g_ascii_strdown(imap_body_get_mime_type(imap_body),-1);
+    lbbody->filename  = g_strdup(imap_body->desc);
+    lbbody->filename  = g_strdup(imap_body_get_param(imap_body, "name"));
+    lbbody->charset   = g_strdup(imap_body_get_param(imap_body, "charset"));
+    if(imap_body->envelope)
+            g_warning("%s: implement envelope\n", __func__);
+    if(imap_body->child) {
+        LibBalsaMessageBody *body = libbalsa_message_body_new(lbbody->message);
+        lbm_imap_construct_body(body, imap_body->child);
+        lbbody->parts = body;
+    }
+    if(imap_body->next) {
+        LibBalsaMessageBody *body = libbalsa_message_body_new(lbbody->message);
+        lbm_imap_construct_body(body, imap_body->next);
+        lbbody->next = body;
+    }
+}
+
+static void
 libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
                                       LibBalsaMessage *message,
                                       LibBalsaFetchFlag flags)
 {
-    g_warning("%s not implemented yet.\n", __func__);
+    ImapResponse rc;
+    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    ImapMboxHandle *handle;
+    char seq[15];
+
+    handle = libbalsa_mailbox_imap_get_selected_handle(mimap);
+    g_return_if_fail(handle);
+    snprintf(seq, sizeof(seq), "%u", (unsigned)message->msgno);
+    rc = imap_mbox_handle_fetch_structure(handle, seq);
+    if(rc == IMR_OK) { /* translate ImapData to LibBalsaMessage */
+        ImapMessage *im = imap_mbox_handle_get_msg(handle, message->msgno);
+        LibBalsaMessageBody *body = libbalsa_message_body_new(message);
+	lbm_imap_construct_body(body, im->body);
+        libbalsa_message_append_part(message, body);
+    }
+    RELEASE_HANDLE(mailbox, handle);
 }
 
-static GMimeStream*
-libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
-                                   LibBalsaMessageBody *part)
+static gboolean
+is_child_of(LibBalsaMessageBody *body, LibBalsaMessageBody *child,
+            GString *s)
 {
-    g_warning("%s not implemented yet.\n", __func__);
-    return NULL;
+    int i = 1;
+    for(i=1; body;  body = body->next) {
+        if(body->body_type == LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART)
+            continue;
+        if(body==child) {
+            g_string_printf(s, "%u", i);
+            return TRUE;
+        }
+        if(is_child_of(body->parts, child, s)) {
+            char buf[12];
+            snprintf(buf, sizeof(buf), "%u.", i);
+            g_string_prepend(s, buf);
+            return TRUE;
+        }
+        i++;
+    }
+    return FALSE;
+}
+static gchar*
+get_section_for(LibBalsaMessage *msg, LibBalsaMessageBody *part)
+{
+    GString *section = g_string_new("");
+
+    if(!is_child_of(msg->body_list, part, section)) {
+        g_warning("Internal error, part not found.\n");
+        g_string_free(section, TRUE);
+        return g_strdup("1");
+    }
+    return g_string_free(section, FALSE);
+}
+struct part_data { char *block; unsigned pos; ImapBody *body; };
+static void
+append_str(const char *buf, int buflen, void *arg)
+{
+    struct part_data *dt = (struct part_data*)arg;
+
+    if(dt->pos + buflen > dt->body->octets) {
+        g_error("IMAP server sends too much data?\n");
+        buflen = dt->body->octets-dt->pos;
+    }
+    memcpy(dt->block + dt->pos, buf, buflen);
+    dt->pos += buflen;
+}
+
+static const gchar*
+libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
+                                   LibBalsaMessageBody *part,
+                                   ssize_t *sz)
+{
+    if(!part->buffer) {
+        struct part_data dt;
+        LibBalsaMailboxImap* mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
+        gchar *section = get_section_for(msg, part);
+        ImapMboxHandle *handle = 
+            libbalsa_mailbox_imap_get_selected_handle(mimap);
+        ImapMessage *im = imap_mbox_handle_get_msg(handle, msg->msgno);
+        ImapResponse rc;
+        dt.body  = imap_message_get_body_from_section(im, section);
+        dt.block = g_malloc(dt.body->octets+1);
+        dt.pos   = 0;
+        rc = imap_mbox_handle_fetch_body(handle, msg->msgno, section,
+                                         append_str, &dt);
+        if(rc != IMR_OK)
+            g_error("FIXME: error handling here!\n");
+        part->buffer = dt.block;
+        part->buflen = dt.body->octets;
+        g_free(section);
+        RELEASE_HANDLE(mimap, handle);
+    }
+    *sz = part->buflen;
+    return part->buffer;
 }
 
 int

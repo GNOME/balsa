@@ -67,8 +67,9 @@ static void libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
                                                    LibBalsaMessage *message,
                                                    LibBalsaFetchFlag flags);
 
-static GMimeStream* libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
-                                                        LibBalsaMessageBody *);
+static const gchar* libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
+                                                        LibBalsaMessageBody *,
+                                                        ssize_t *sz);
 
 GType
 libbalsa_mailbox_local_get_type(void)
@@ -628,15 +629,22 @@ libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
                                       LibBalsaMessage *message,
                                       LibBalsaFetchFlag flags)
 {
-    g_warning("%s not implemented yet.\n", __func__);
+    LibBalsaMessageBody *body;
+    GMimeMessage *mime = message->mime_msg;
+    g_return_if_fail(mime);
+
+    body = libbalsa_message_body_new(message);
+    libbalsa_message_body_set_mime_body(body,
+                                        mime->mime_part);
+    libbalsa_message_append_part(message, body);
 }
 
-static GMimeStream*
+static const gchar*
 libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
-                                   LibBalsaMessageBody *part)
+                                    LibBalsaMessageBody *part, ssize_t *len)
 {
-    g_warning("%s not implemented yet.\n", __func__);
-    return NULL;
+    g_return_val_if_fail(part->mime_part, NULL);
+    return g_mime_part_get_content(GMIME_PART(part->mime_part), len);
 }
 
 static gboolean

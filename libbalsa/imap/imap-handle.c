@@ -694,10 +694,21 @@ imap_envelope_free(ImapEnvelope *env)
   imap_envelope_free_data(env);
   g_free(env);
 }
+
+/* ================ BEGIN OF BODY STRUCTURE FUNCTIONS ================== */
+static gboolean
+imap_str_case_equal(gconstpointer v, gconstpointer v2)
+{
+  return strcasecmp(v, v2) == 0;
+}
+
 ImapBody*
 imap_body_new(void)
 {
-  return g_malloc0(sizeof(ImapBody));
+  ImapBody *body = g_malloc0(sizeof(ImapBody));
+  body->params = g_hash_table_new_full(g_str_hash, imap_str_case_equal, 
+                                       g_free, g_free);
+  return body;
 }
 
 void
@@ -706,11 +717,13 @@ imap_body_free(ImapBody* body)
   g_free(body->media_basic_other);
   g_free(body->media_subtype);
   g_free(body->desc);
+  g_hash_table_destroy(body->params);
   if(body->envelope) imap_envelope_free(body->envelope);
   if(body->child) imap_body_free(body->child);
   if(body->next) imap_body_free(body->next);
   g_free(body);
 }
+
 void
 imap_body_set_desc(ImapBody* body, char* str)
 {
@@ -721,9 +734,57 @@ imap_body_set_desc(ImapBody* body, char* str)
 void
 imap_body_add_param(ImapBody *body, char *key, char *val)
 {
-  /* printf("adding %s=%s\n", key, val); */
-  g_free(key); g_free(val);
+  g_hash_table_insert(body->params, key, val);
 }
+
+const gchar*
+imap_body_get_param(ImapBody *body, const gchar *param)
+{
+  return g_hash_table_lookup(body->params, param);
+}
+
+gchar*
+imap_body_get_mime_type(ImapBody *body)
+{
+  const gchar* type = NULL;
+  switch(body->media_basic) {
+  case IMBMEDIA_MULTIPART:      type = "multipart"; break;
+  case IMBMEDIA_APPLICATION:    type = "application"; break;
+  case IMBMEDIA_AUDIO:          type = "audio"; break;
+  case IMBMEDIA_IMAGE:          type = "image"; break;
+  case IMBMEDIA_MESSAGE_RFC822: return g_strdup("message/rfc822"); break;
+  case IMBMEDIA_MESSAGE_OTHER:  type = "message_other"; break;
+  case IMBMEDIA_TEXT:           type = "text"; break;
+  case IMBMEDIA_OTHER:          return g_strdup(body->media_basic_other);break;
+  }
+  return g_strconcat(type, "/", body->media_subtype, NULL);
+}
+
+static ImapBody*
+get_body_from_section(ImapBody *body, const char *section)
+{
+  char * dot;
+  int no = atoi(section);
+  if(body && body->media_basic == IMBMEDIA_MULTIPART)
+    body = body->next;
+  while(--no && body)
+    body = body->next;
+
+  if(!body) return NULL; /* non-existing section */
+  dot = strchr(section, '.');
+  if(dot) return get_body_from_section(body->child, dot+1);
+  else return body;
+}
+
+ImapBody*
+imap_message_get_body_from_section(ImapMessage *msg,
+                                   const char *section)
+{
+  /* FIXME: check call arguments! */
+  g_return_val_if_fail(section, NULL);
+  return get_body_from_section(msg->body, section);
+}
+
 
 void
 imap_body_append_part(ImapBody* body, ImapBody* sibling)
@@ -747,6 +808,7 @@ imap_body_set_id(ImapBody *body, char *id)
   if(id) printf("part ID='%s'\n", id);
   g_free(id);
 }
+/* ================ END OF BODY STRUCTURE FUNCTIONS ==================== */
 
 
 /* =================================================================== */
@@ -2017,6 +2079,7 @@ imap_mbox_handle_get_thread_root(ImapMboxHandle* handle)
   g_return_val_if_fail(handle, NULL);
   return handle->thread_root;
 }
+
 
 /* =================================================================== */
 /*               MboxView routines                                     */

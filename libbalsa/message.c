@@ -816,6 +816,8 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
     libbalsa_mailbox_fetch_message_structure(message->mailbox, message,
 					     LB_FETCH_RFC822_HEADERS
 					     |LB_FETCH_STRUCTURE);
+    message->body_ref++;
+    UNLOCK_MAILBOX(message->mailbox);
 #else /* OLD_CODE */
     /*
      * load message body

@@ -42,6 +42,12 @@ ImapResponse imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
                                            unsigned seqno, FILE *fl);
 ImapResponse imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle,
                                                unsigned uid, FILE *fl);
+typedef void (*ImapFetchBodyCb)(const char *buf, int buflen, void* arg);
+ImapResponse imap_mbox_handle_fetch_body(ImapMboxHandle* handle, 
+                                         unsigned seqno, 
+                                         const char *section,
+                                         ImapFetchBodyCb body_handler,
+                                         void *arg);
 
 /* Experimental/Expansion */
 ImapResult imap_mbox_scan(ImapMboxHandle *r, const char*what, const char*str);

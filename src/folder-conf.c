@@ -269,6 +269,8 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                     mn ? _("_Update") : _("_Create"), GTK_RESPONSE_OK,
                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                     GTK_STOCK_HELP, GTK_RESPONSE_HELP, NULL));
+    g_object_add_weak_pointer(G_OBJECT(fcw->dialog),
+                              (gpointer) &fcw->dialog);
     gtk_window_set_wmclass(GTK_WINDOW(fcw->dialog), 
 			   "folder_config_dialog", "Balsa");
     if (mn) {
@@ -693,6 +695,8 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, 
                     GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
                     NULL));
+    g_object_add_weak_pointer(G_OBJECT(sdd->dialog),
+                              (gpointer) &sdd->dialog);
     /* `Enter' key => Create: */
     gtk_dialog_set_default_response(GTK_DIALOG(sdd->dialog), GTK_RESPONSE_OK);
     gtk_window_set_wmclass(GTK_WINDOW(sdd->dialog), 

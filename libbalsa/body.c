@@ -180,18 +180,9 @@ libbalsa_message_body_set_message_part(LibBalsaMessageBody * body,
 	*next_part = libbalsa_message_body_new(body->message);
     libbalsa_message_body_set_mime_body(*next_part,
 					embedded_message->mime_part);
-    next_part = &(*next_part)->next;
-
-    if (GMIME_IS_PART(embedded_message->mime_part))
-	/* This part may not have a Content-Disposition header, but
-	 * we must treat it as inline. */
-	g_mime_part_set_content_disposition(GMIME_PART
-					    (embedded_message->mime_part),
-					    GMIME_DISPOSITION_INLINE);
-
     g_object_unref(embedded_message);
 
-    return next_part;
+    return &(*next_part)->next;
 }
 
 static LibBalsaMessageBody **
@@ -563,6 +554,8 @@ libbalsa_message_body_is_inline(LibBalsaMessageBody * body)
 	 * message/rfc822; in either case, we want to in-line the part.
 	 */
         return (body->content_type == NULL
+                || g_ascii_strcasecmp(body->content_type,
+                                      "message/rfc822") == 0
                 || g_ascii_strcasecmp(body->content_type,
                                       "text/plain") == 0);
 

@@ -1,3 +1,10 @@
+2004-07-31 15:05  PeterB
+
+	* libbalsa/mailbox.c: remove a scheduled idle callback if
+	libbalsa_mailbox_check is called explicitly.
+	* libbalsa/send.c: restore checking the outbox--we can't wait for
+	the idle callback.
+
 2004-07-31  Pawel Salek
 
 	* libbalsa/imap-server.c: get the TLS mode right from the config.

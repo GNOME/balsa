@@ -432,6 +432,8 @@ bm_header_widget_new(BalsaMessage * bm, gboolean is_toplevel)
 	GtkWidget *button;
 
 	/* the event box is needed to set the background correctly */
+	GtkTooltips *tooltips = gtk_tooltips_new();
+
 	ebox = gtk_event_box_new();
 	gtk_box_pack_start(GTK_BOX(hbox), ebox, FALSE, FALSE, 0);
 	g_object_set_data(G_OBJECT(widget), BALSA_MESSAGE_HEADER_BTNBOX,
@@ -446,6 +448,8 @@ bm_header_widget_new(BalsaMessage * bm, gboolean is_toplevel)
 	gtk_box_pack_start(GTK_BOX(hbox2), vbox, FALSE, FALSE, 0);
 
 	button = gtk_button_new();
+        gtk_tooltips_set_tip(tooltips, button,
+                             _("Check cryptographic signature"), NULL);
         g_signal_connect(G_OBJECT(button), "focus_in_event",
                          G_CALLBACK(balsa_message_limit_focus),
                            (gpointer) bm);
@@ -465,6 +469,8 @@ bm_header_widget_new(BalsaMessage * bm, gboolean is_toplevel)
 	gtk_box_pack_start(GTK_BOX(hbox2), vbox, FALSE, FALSE, 0);
 
 	button = gtk_button_new();
+        gtk_tooltips_set_tip(tooltips, button,
+                             _("Select message part to display"), NULL);
         g_signal_connect(G_OBJECT(button), "focus_in_event",
                          G_CALLBACK(balsa_message_limit_focus),
                            (gpointer) bm);

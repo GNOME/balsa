@@ -2373,7 +2373,6 @@ part_info_init(BalsaMessage * bm, BalsaPartInfo * info)
 	if (balsa_app.debug)
 	    fprintf(stderr, "part: message\n");
 	part_info_init_message(bm, info);
-	fprintf(stderr, "part end: multipart\n");
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
 	break;
@@ -3108,12 +3107,26 @@ static void add_body(BalsaMessage *bm,
 	BalsaPartInfo *info = part_info_from_body(bm, body);
 	
 	if (info)
-	    add_part(bm, part_info_from_body(bm, body));
+	    add_part(bm, info);
 	else
 	    add_multipart(bm, body);
     }
 }
 
+static void
+add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body)
+{
+    /* Add first (main) part + anything else with 
+       Content-Disposition: inline */
+    if (body) {
+	add_body(bm, body);
+	for (body = body->next; body; body = body->next) {
+	    if (libbalsa_message_body_is_inline(body)
+		|| libbalsa_message_body_is_multipart(body))
+		add_body(bm, body);
+	}
+    }
+}
 
 static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
 /* This function handles multiparts as specified by RFC2046 5.1 */
@@ -3129,17 +3142,7 @@ static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
 	    /* Add the most suitable part. */
 	    add_body(bm, preferred_part(parent->parts));
         } else { /* default to multipart/mixed */
-	    /* Add first (main) part + anything else with 
-	       Content-Disposition: inline */
-	    LibBalsaMessageBody *body=parent->parts;
-	    
-	    if(body) {
-		add_body(bm, body);
-		for(body=body->next; body; body=body->next) {
-                    if(libbalsa_message_body_is_inline(body))
-			add_body(bm, body);
-		}
-	    }
+	    add_multipart_mixed(bm, parent->parts);
 	}
     }
     g_mime_content_type_destroy(type);

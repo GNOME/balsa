@@ -1,3 +1,8 @@
+2003-04-14 19:13  PeterB
+
+	* src/main-window.c: Rearrange Help menu (Darko Obradovic
+	<dobradovic@gmx.de>).
+
 2003-04-13 08:52  PeterB
 
 	* src/sendmsg-window.c: Use a GString instead of a stack buffer and

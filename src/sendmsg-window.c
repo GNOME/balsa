@@ -33,6 +33,8 @@
 #include "pixmaps/p15.xpm"
 #include "pixmaps/p16.xpm"
 
+#define BUFFER_SIZE 1024
+
 gint delete_event (GtkWidget *, gpointer);
 
 extern GtkWidget *new_icon (gchar **, GtkWidget *);
@@ -242,22 +244,39 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   GtkWidget *table;
   GtkWidget *hscrollbar;
   GtkWidget *vscrollbar;
+  GtkCList *clist;
+
   BalsaSendmsg *msg = NULL;
+  gchar *tmpbuf = g_malloc (1024);
   gchar *from;
+  gint row;
 
   msg = g_malloc (sizeof (BalsaSendmsg));
-  switch(type)
-  {
-	  case 0:
-		  msg->window = gnome_app_new ("balsa", "New message");
-		  break;
-	  case 1:
-		  msg->window = gnome_app_new ("balsa", "Reply to ");
-		  break;
-	  case 2:
-		  msg->window = gnome_app_new ("balsa", "Forward message");
-		  break;
-  }
+  switch (type)
+    {
+    case 0:
+      msg->window = gnome_app_new ("balsa", "New message");
+      break;
+    case 1:
+      clist = GTK_CLIST (GTK_BIN (bindex)->child);
+
+      if (!clist->selection)
+	return;
+
+      row = (gint) clist->selection->data + 1;
+
+      msg->window = gnome_app_new ("balsa", "Reply to ");
+      break;
+    case 2:
+      clist = GTK_CLIST (GTK_BIN (bindex)->child);
+
+      if (!clist->selection)
+	return;
+
+      row = (gint) clist->selection->data + 1;
+      msg->window = gnome_app_new ("balsa", "Forward message");
+      break;
+    }
   gtk_signal_connect (GTK_OBJECT (msg->window), "destroy",
 		      GTK_SIGNAL_FUNC (delete_event), NULL);
   gtk_signal_connect (GTK_OBJECT (msg->window), "delete_event",
@@ -274,6 +293,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   gtk_widget_show (table);
 
+
   label = gtk_label_new ("To:");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
@@ -281,7 +301,13 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_widget_show (label);
   msg->to = gtk_entry_new ();
   gtk_table_attach_defaults (GTK_TABLE (table), msg->to, 1, 2, 0, 1);
+  if (type == 1)
+    {
+      mail_fetchfrom (tmpbuf, bindex->stream, row, (long) BUFFER_SIZE);
+      gtk_entry_set_text (GTK_ENTRY (msg->to), tmpbuf);
+    }
   gtk_widget_show (msg->to);
+
 
   label = gtk_label_new ("From:");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
@@ -309,6 +335,14 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 		    GTK_FILL, GTK_FILL, 0, 0);
   gtk_widget_show (label);
   msg->subject = gtk_entry_new ();
+  if (type != 0)
+    {
+      mail_fetchsubject (tmpbuf, bindex->stream, row, (long) BUFFER_SIZE);
+      gtk_entry_set_text (GTK_ENTRY (msg->subject), tmpbuf);
+      if (type==1) gtk_entry_prepend_text(GTK_ENTRY(msg->subject),"Re: ");
+      else if (type==2) gtk_entry_prepend_text(GTK_ENTRY(msg->subject),"Fw: ");
+    }
+
   gtk_table_attach_defaults (GTK_TABLE (table), msg->subject, 1, 2, 2, 3);
   gtk_widget_show (msg->subject);
 
@@ -361,6 +395,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 			 GTK_TOOLBAR (create_toolbar (msg)));
 
   gtk_widget_show (msg->window);
+  g_free(tmpbuf);
 }
 
 

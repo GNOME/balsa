@@ -128,6 +128,17 @@ enum {
     TARGET_MESSAGES
 };
 
+/* Column numbers (used for sort_column_id): */
+typedef enum {
+    BNDX_TREE_COLUMN_NO = 1,
+    BNDX_TREE_COLUMN_STATUS,    /* not used */
+    BNDX_TREE_COLUMN_ATTACH,    /* not used */
+    BNDX_TREE_COLUMN_SENDER,
+    BNDX_TREE_COLUMN_SUBJECT,
+    BNDX_TREE_COLUMN_DATE,
+    BNDX_TREE_COLUMN_SIZE
+} BndxTreeColumnId;
+
 static GtkTargetEntry index_drag_types[] = {
     {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
 };
@@ -270,13 +281,15 @@ balsa_index_init(BalsaIndex * index)
     gtk_tree_view_column_set_attributes(column, renderer,
                                         "text", BNDX_INDEX_COLUMN,
                                         NULL);
-    gtk_tree_view_column_set_clickable(column, TRUE);
+    gtk_tree_view_column_set_sort_column_id(column,
+                                            BNDX_TREE_COLUMN_NO);
     g_signal_connect(G_OBJECT(column), "clicked",
-                     G_CALLBACK(bndx_column_click),
-                     index);
+                     G_CALLBACK(bndx_column_click), index);
     gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(tree_store),
-                                    0, bndx_row_compare,
-                                    GINT_TO_POINTER(0), NULL);
+                                    BNDX_TREE_COLUMN_NO,
+                                    bndx_row_compare,
+                                    GINT_TO_POINTER(BNDX_TREE_COLUMN_NO),
+                                    NULL);
     gtk_tree_view_append_column(tree_view, column);
 
     /* Status icon column */
@@ -309,6 +322,10 @@ balsa_index_init(BalsaIndex * index)
     gtk_tree_view_column_set_alignment(column, 0.5);
     gtk_tree_view_column_set_resizable(column, TRUE);
     gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
+    gtk_tree_view_column_set_sort_column_id(column,
+                                            BNDX_TREE_COLUMN_SENDER);
+    g_signal_connect(G_OBJECT(column), "clicked",
+                     G_CALLBACK(bndx_column_click), index);
     gtk_tree_view_append_column(tree_view, column);
 
     /* Subject column--contains tree expanders */
@@ -326,6 +343,10 @@ balsa_index_init(BalsaIndex * index)
     gtk_tree_view_column_set_alignment(column, 0.5);
     gtk_tree_view_column_set_resizable(column, TRUE);
     gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
+    gtk_tree_view_column_set_sort_column_id(column,
+                                            BNDX_TREE_COLUMN_SUBJECT);
+    g_signal_connect(G_OBJECT(column), "clicked",
+                     G_CALLBACK(bndx_column_click), index);
     gtk_tree_view_append_column(tree_view, column);
     gtk_tree_view_set_expander_column(tree_view, column);
 
@@ -338,13 +359,15 @@ balsa_index_init(BalsaIndex * index)
                                                  NULL);
     gtk_tree_view_column_set_alignment(column, 0.5);
     gtk_tree_view_column_set_resizable(column, TRUE);
-    gtk_tree_view_column_set_clickable(column, TRUE);
+    gtk_tree_view_column_set_sort_column_id(column,
+                                            BNDX_TREE_COLUMN_DATE);
     g_signal_connect(G_OBJECT(column), "clicked",
-                     G_CALLBACK(bndx_column_click),
-                     index);
+                     G_CALLBACK(bndx_column_click), index);
     gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(tree_store),
-                                    5, bndx_row_compare,
-                                    GINT_TO_POINTER(5), NULL);
+                                    BNDX_TREE_COLUMN_DATE,
+                                    bndx_row_compare,
+                                    GINT_TO_POINTER(BNDX_TREE_COLUMN_DATE),
+                                    NULL);
     gtk_tree_view_append_column(tree_view, column);
 
     /* Size column */
@@ -357,13 +380,15 @@ balsa_index_init(BalsaIndex * index)
     gtk_tree_view_column_set_attributes(column, renderer,
                                         "text", BNDX_SIZE_COLUMN,
                                         NULL);
-    gtk_tree_view_column_set_clickable(column, TRUE);
+    gtk_tree_view_column_set_sort_column_id(column,
+                                            BNDX_TREE_COLUMN_SIZE);
     g_signal_connect(G_OBJECT(column), "clicked",
-                     G_CALLBACK(bndx_column_click),
-                     index);
+                     G_CALLBACK(bndx_column_click), index);
     gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(tree_store),
-                                    6, bndx_row_compare,
-                                    GINT_TO_POINTER(6), NULL);
+                                    BNDX_TREE_COLUMN_SIZE,
+                                    bndx_row_compare,
+                                    GINT_TO_POINTER(BNDX_TREE_COLUMN_SIZE),
+                                    NULL);
     gtk_tree_view_append_column(tree_view, column);
 
     /* Initialize some other members */
@@ -463,38 +488,41 @@ size_compare(LibBalsaMessage * m1, LibBalsaMessage * m2)
 static void
 bndx_column_click(GtkTreeViewColumn * column, gpointer data)
 {
-    GtkSortType gtk_sort = GTK_SORT_ASCENDING;
+    LibBalsaMailbox *mailbox;
     GtkTreeView *tree_view = GTK_TREE_VIEW(data);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-    GtkTreeSortable *sortable = GTK_TREE_SORTABLE(model);
-    GList *columns = gtk_tree_view_get_columns(tree_view);
-    gint col_id = g_list_index(columns, column);
-    gint current_col_id;
-    LibBalsaMailboxSortFields field;
-    LibBalsaMailboxSortType   order;
+    BndxTreeColumnId col_id;
+    GtkSortType gtk_sort;
 
-    g_list_free(columns);
-    if (gtk_tree_sortable_get_sort_column_id(sortable,
-                                             &current_col_id, &gtk_sort)) {
-        GtkTreeViewColumn *current_column =
-            gtk_tree_view_get_column(tree_view, current_col_id);
+    mailbox = BALSA_INDEX(tree_view)->mailbox_node->mailbox;
+    gtk_tree_sortable_get_sort_column_id(GTK_TREE_SORTABLE(model),
+                                         (gint *) &col_id, &gtk_sort);
 
-        gtk_tree_view_column_set_sort_indicator(current_column, FALSE);
-        if (current_col_id == col_id)
-            gtk_sort = (gtk_sort == GTK_SORT_DESCENDING ?
-			GTK_SORT_ASCENDING : GTK_SORT_DESCENDING);
+    switch (col_id) {
+    case BNDX_TREE_COLUMN_NO:
+        mailbox->sort_field = LB_MAILBOX_SORT_NO;
+        break;
+    case BNDX_TREE_COLUMN_SENDER:
+        mailbox->sort_field = LB_MAILBOX_SORT_SENDER;
+        break;
+    case BNDX_TREE_COLUMN_SUBJECT:
+        mailbox->sort_field = LB_MAILBOX_SORT_SUBJECT;
+        break;
+    case BNDX_TREE_COLUMN_DATE:
+        mailbox->sort_field = LB_MAILBOX_SORT_DATE;
+        break;
+    case BNDX_TREE_COLUMN_SIZE:
+        mailbox->sort_field = LB_MAILBOX_SORT_SIZE;
+        break;
+    default:
+        mailbox->sort_field = LB_MAILBOX_SORT_NATURAL;
+        break;
     }
 
-    switch(col_id) {
-    case 0: field = LB_MAILBOX_SORT_NO;       break;
-    case 5: field = LB_MAILBOX_SORT_DATE;     break;
-    case 6: field = LB_MAILBOX_SORT_SIZE;     break;
-    default: field = LB_MAILBOX_SORT_NATURAL; break;
-    }
-    order = (gtk_sort == GTK_SORT_DESCENDING)
-	? LB_MAILBOX_SORT_TYPE_DESC : LB_MAILBOX_SORT_TYPE_ASC;
+    mailbox->sort_type =
+        (gtk_sort == GTK_SORT_DESCENDING) ? LB_MAILBOX_SORT_TYPE_DESC
+                                          : LB_MAILBOX_SORT_TYPE_ASC;
 
-    bndx_set_sort_order(BALSA_INDEX(tree_view), field, order);
     bndx_changed_find_row(BALSA_INDEX(tree_view));
     bndx_check_visibility(BALSA_INDEX(tree_view));
 }
@@ -2290,11 +2318,10 @@ static void
 bndx_set_sort_order(BalsaIndex * index, LibBalsaMailboxSortFields field, 
 		    LibBalsaMailboxSortType order)
 {
-    int col_id;
+    BndxTreeColumnId col_id;
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     GtkTreeSortable *sortable =
         GTK_TREE_SORTABLE(gtk_tree_view_get_model(tree_view));
-    GtkTreeViewColumn *column;
     GtkSortType gtk_sort;
 
     g_return_if_fail(index->mailbox_node);
@@ -2306,18 +2333,17 @@ bndx_set_sort_order(BalsaIndex * index, LibBalsaMailboxSortFields field,
     index->mailbox_node->mailbox->sort_type  = order;
     
     switch(field) {
-    case LB_MAILBOX_SORT_NO:   col_id = 0;     break;
-    case LB_MAILBOX_SORT_SIZE: col_id = 6;     break;
-    default: 
-    case LB_MAILBOX_SORT_DATE: col_id = 5;     break;
+    case LB_MAILBOX_SORT_NO:      col_id = BNDX_TREE_COLUMN_NO;      break;
+    case LB_MAILBOX_SORT_SENDER:  col_id = BNDX_TREE_COLUMN_SENDER;  break;
+    case LB_MAILBOX_SORT_SUBJECT: col_id = BNDX_TREE_COLUMN_SUBJECT; break;
+    case LB_MAILBOX_SORT_SIZE:    col_id = BNDX_TREE_COLUMN_SIZE;    break;
+    default:
+    case LB_MAILBOX_SORT_DATE:    col_id = BNDX_TREE_COLUMN_DATE;    break;
     }
     gtk_sort = (order == LB_MAILBOX_SORT_TYPE_ASC) 
 	? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
 
-    column = gtk_tree_view_get_column(tree_view, col_id);
     gtk_tree_sortable_set_sort_column_id(sortable, col_id, gtk_sort);
-    gtk_tree_view_column_set_sort_indicator(column, TRUE);
-    gtk_tree_view_column_set_sort_order(column, gtk_sort);
 }
 
 static gboolean
@@ -2479,11 +2505,11 @@ bndx_row_compare(GtkTreeModel * model, GtkTreeIter * iter1,
     gtk_tree_model_get(model, iter2, BNDX_MESSAGE_COLUMN, &m2, -1);
 
     switch (sort_column) {
-        case 0:
+        case BNDX_TREE_COLUMN_NO:
             return numeric_compare(m1, m2);
-        case 5:
+        case BNDX_TREE_COLUMN_DATE:
             return date_compare(m1, m2);
-        case 6:
+        case BNDX_TREE_COLUMN_SIZE:
             return size_compare(m1, m2);
         default:
             return 0;

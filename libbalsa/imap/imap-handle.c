@@ -699,7 +699,7 @@ imap_envelope_free(ImapEnvelope *env)
 static gboolean
 imap_str_case_equal(gconstpointer v, gconstpointer v2)
 {
-  return strcasecmp(v, v2) == 0;
+  return g_ascii_strcasecmp(v, v2) == 0;
 }
 
 ImapBody*
@@ -1104,7 +1104,7 @@ ir_capability_data(ImapMboxHandle *handle)
   do {
     c = imap_get_atom(handle->sio, atom, sizeof(atom));
     for (x=0; x<ELEMENTS(capabilities); x++)
-      if (strcasecmp(atom, capabilities[x]) == 0) {
+      if (g_ascii_strcasecmp(atom, capabilities[x]) == 0) {
 	handle->capabilities[x] = 1;
 	break;
       }
@@ -1127,7 +1127,7 @@ ir_resp_text_code(ImapMboxHandle *h)
   ImapResponse rc = IMR_OK;
 
   for(o=0; o<ELEMENTS(resp_text_code); o++)
-    if(strcasecmp(buf, resp_text_code[o]) == 0) break;
+    if(g_ascii_strcasecmp(buf, resp_text_code[o]) == 0) break;
 
   switch(o) {
   case 0: if(h->alert_cb) h->alert_cb("ALERT", h->alert_arg);/* FIXME*/break;
@@ -1230,13 +1230,26 @@ ir_bye(ImapMboxHandle *h)
   return IMR_BYE;
 }
 
+static ImapResponse
+ir_check_crlf(ImapMboxHandle *h, int c)
+{
+  if( c != 0x0d) {
+    printf("CR:%d\n",c);
+    return IMR_PROTOCOL;
+  }
+  if( (c=sio_getc(h->sio)) != 0x0a) {
+    printf("LF:%d\n",c);
+    return IMR_PROTOCOL;
+  }
+  return IMR_OK;
+}
 
 static ImapResponse
 ir_capability(ImapMboxHandle *handle)
 {
   int c = ir_capability_data(handle);
   printf("ir_capability, c='%c'[%d]\n", c, c);
-  return (c == 0x0d && sio_getc(handle->sio) == 0x0a) ? IMR_OK : IMR_PROTOCOL;
+  return ir_check_crlf(handle, c);
 }
 /* follow mailbox-list syntax (See rfc) */
 static ImapResponse
@@ -1259,7 +1272,7 @@ ir_list_lsub(ImapMboxHandle *h, ImapHandleSignal signal)
     if(c!= '\\') return IMR_PROTOCOL;
     c = imap_get_atom(h->sio, buf, sizeof(buf));
     for(i=0; i< ELEMENTS(mbx_flags); i++) {
-      if(strcasecmp(buf, mbx_flags[i]) ==0) {
+      if(g_ascii_strcasecmp(buf, mbx_flags[i]) ==0) {
         IMAP_MBOX_SET_FLAG(flags, i);
         break;
       }
@@ -1281,9 +1294,7 @@ ir_list_lsub(ImapMboxHandle *h, ImapHandleSignal signal)
   g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[signal],
                 0, delim, &flags, s);
   g_free(s);
-  if( c != 0x0d) {printf("CR:%d\n",c); return IMR_PROTOCOL;}
-  if( (c=sio_getc(h->sio)) != 0x0a) {printf("LF:%d\n",c); return IMR_PROTOCOL;}
-  return IMR_OK;
+  return ir_check_crlf(h, c);
 }
 
 static ImapResponse
@@ -1312,14 +1323,10 @@ ir_search(ImapMboxHandle *h)
   int c;
   char seq[12];
 
-  do {
-    c=imap_get_atom(h->sio, seq, sizeof(seq));
-    if(!seq[0]) break;
+  while ((c=imap_get_atom(h->sio, seq, sizeof(seq))), seq[0])
     if(h->search_cb)
       h->search_cb(h, atoi(seq), h->search_arg);
-  } while(1);
-  if(c==0x0d) sio_getc(h->sio);
-  return IMR_OK;
+  return ir_check_crlf(h, c);
 }
 
 /* ir_sort: sort response handler. clears current view and creates a
@@ -1335,8 +1342,7 @@ ir_sort(ImapMboxHandle *h)
     if(!seq[0]) break;
     mbox_view_append_no(&h->mbox_view, atoi(seq));
   } while(1);
-  if(c==0x0d) sio_getc(h->sio);
-  return IMR_OK;
+  return ir_check_crlf(h, c);
 }
 
 static ImapResponse
@@ -1403,7 +1409,7 @@ ir_msg_att_flags(ImapMboxHandle *h, int c, unsigned seqno)
     char buf[LONG_STRING];
     c = imap_get_flag(h->sio, buf, sizeof(buf));
     for(i=0; i<ELEMENTS(msg_flags); i++)
-      if(buf[0] == '\\' && strcasecmp(msg_flags[i], buf+1) == 0) {
+      if(buf[0] == '\\' && g_ascii_strcasecmp(msg_flags[i], buf+1) == 0) {
         msg->flags |= 1<<i;
         break;
       }
@@ -1592,16 +1598,16 @@ ir_media(struct siobuf* sio, ImapMediaBasic *imb, ImapBody *body)
   if(sio_getc(sio) != ' ') { g_free(type); return IMR_PROTOCOL; }
   subtype = imap_get_string(sio);
   /* printf("media: %s/%s\n", type, subtype); */
-  if     (strcasecmp(type, "APPLICATION") ==0) *imb = IMBMEDIA_APPLICATION;
-  else if(strcasecmp(type, "AUDIO") ==0)       *imb = IMBMEDIA_AUDIO;
-  else if(strcasecmp(type, "IMAGE") ==0)       *imb = IMBMEDIA_IMAGE;
-  else if(strcasecmp(type, "MESSAGE") ==0) {
-    if(strcasecmp(subtype, "RFC822") == 0)
+  if     (g_ascii_strcasecmp(type, "APPLICATION") ==0) *imb = IMBMEDIA_APPLICATION;
+  else if(g_ascii_strcasecmp(type, "AUDIO") ==0)       *imb = IMBMEDIA_AUDIO;
+  else if(g_ascii_strcasecmp(type, "IMAGE") ==0)       *imb = IMBMEDIA_IMAGE;
+  else if(g_ascii_strcasecmp(type, "MESSAGE") ==0) {
+    if(g_ascii_strcasecmp(subtype, "RFC822") == 0)
       *imb = IMBMEDIA_MESSAGE_RFC822;
     else
       *imb = IMBMEDIA_MESSAGE_OTHER;
   }
-  else if(strcasecmp(type, "TEXT") ==0)        *imb = IMBMEDIA_TEXT;
+  else if(g_ascii_strcasecmp(type, "TEXT") ==0)        *imb = IMBMEDIA_TEXT;
   else *imb = IMBMEDIA_OTHER;
   g_free(type);
   if(body) {
@@ -1663,11 +1669,11 @@ ir_body_fld_enc(struct siobuf* sio, ImapBody *body)
 
   if(!str) return IMR_PROTOCOL;
 
-  if     (strcasecmp(str, "7BIT")==0)             enc = IMBENC_7BIT;
-  else if(strcasecmp(str, "8BIT")==0)             enc = IMBENC_8BIT;
-  else if(strcasecmp(str, "BINARY")==0)           enc = IMBENC_BINARY;
-  else if(strcasecmp(str, "BASE64")==0)           enc = IMBENC_BASE64;
-  else if(strcasecmp(str, "QUOTED-PRINTABLE")==0) enc = IMBENC_QUOTED;
+  if     (g_ascii_strcasecmp(str, "7BIT")==0)             enc = IMBENC_7BIT;
+  else if(g_ascii_strcasecmp(str, "8BIT")==0)             enc = IMBENC_8BIT;
+  else if(g_ascii_strcasecmp(str, "BINARY")==0)           enc = IMBENC_BINARY;
+  else if(g_ascii_strcasecmp(str, "BASE64")==0)           enc = IMBENC_BASE64;
+  else if(g_ascii_strcasecmp(str, "QUOTED-PRINTABLE")==0) enc = IMBENC_QUOTED;
   else enc = IMBENC_OTHER;
   if(body)
     body->encoding = enc;
@@ -1912,9 +1918,7 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
     c=sio_getc(h->sio);
   } while( c!= EOF && c == ' ');
   if(c!=')') return IMR_PROTOCOL;
-  if( (c=sio_getc(h->sio)) != 0x0d) return IMR_PROTOCOL;
-  if( (c=sio_getc(h->sio)) != 0x0a) return IMR_PROTOCOL;
-  return IMR_OK;
+  return ir_check_crlf(h, (c=sio_getc(h->sio)));
 }
 
 static ImapResponse
@@ -2003,8 +2007,7 @@ ir_thread(ImapMboxHandle *h)
       }
       c=sio_getc(h->sio);
   }
-  if( c != 0x0d) {printf("CR:%d\n",c); rc = IMR_PROTOCOL;}
-  if( (c=sio_getc(h->sio)) != 0x0a) {printf("LF:%d\n",c); rc = IMR_PROTOCOL;}
+  rc = ir_check_crlf(h, c);
 
   if (rc != IMR_OK)
       g_node_destroy(root);
@@ -2019,22 +2022,23 @@ ir_thread(ImapMboxHandle *h)
 static const struct {
   const gchar *response;
   int keyword_len;
+  int always_has_data;
   ImapResponse (*handler)(ImapMboxHandle *h);
 } ResponseHandlers[] = {
-  { "OK",         2, ir_ok },
-  { "NO",         2, ir_no },
-  { "BAD",        3, ir_bad },
-  { "PREAUTH",    7, ir_preauth },
-  { "BYE",        3, ir_bye },
-  { "CAPABILITY",10, ir_capability },
-  { "LIST",       4, ir_list },
-  { "LSUB",       4, ir_lsub },
-  { "STATUS",     6, ir_status },
-  { "SEARCH",     6, ir_search },
-  { "SORT",       4, ir_sort   },
-  { "THREAD",     6, ir_thread },
-  { "FLAGS",      5, ir_flags  },
-  { "FETCH",      5, ir_fetch  }
+  { "OK",         2, 1, ir_ok },
+  { "NO",         2, 1, ir_no },
+  { "BAD",        3, 1, ir_bad },
+  { "PREAUTH",    7, 1, ir_preauth },
+  { "BYE",        3, 1, ir_bye },
+  { "CAPABILITY",10, 1, ir_capability },
+  { "LIST",       4, 1, ir_list },
+  { "LSUB",       4, 1, ir_lsub },
+  { "STATUS",     6, 1, ir_status },
+  { "SEARCH",     6, 0, ir_search },
+  { "SORT",       4, 0, ir_sort   },
+  { "THREAD",     6, 0, ir_thread },
+  { "FLAGS",      5, 1, ir_flags  },
+  { "FETCH",      5, 1, ir_fetch  }
 };
 static const struct {
   const gchar *response;
@@ -2051,26 +2055,31 @@ static const struct {
 static ImapResponse
 ir_handle_response(ImapMboxHandle *h)
 {
+  int c;
   char atom[LONG_STRING];
   unsigned i, seqno;
 
-  imap_get_atom(h->sio, atom, sizeof(atom));
+  c = imap_get_atom(h->sio, atom, sizeof(atom));
   if( isdigit(atom[0]) ) {
     seqno = atoi(atom);
     imap_get_atom(h->sio, atom, sizeof(atom));
     for(i=0; i<ELEMENTS(NumHandlers); i++) {
-      if(strncasecmp(atom, NumHandlers[i].response, 
-                     NumHandlers[i].keyword_len) == 0) {
+      if(g_ascii_strncasecmp(atom, NumHandlers[i].response, 
+                             NumHandlers[i].keyword_len) == 0) {
         return
           NumHandlers[i].handler(h, seqno);
       }
     }
   } else {
     for(i=0; i<ELEMENTS(ResponseHandlers); i++) {
-      if(strncasecmp(atom, ResponseHandlers[i].response, 
-                     ResponseHandlers[i].keyword_len) == 0)
-        return
-          ResponseHandlers[i].handler(h);
+      if(g_ascii_strncasecmp(atom, ResponseHandlers[i].response, 
+                             ResponseHandlers[i].keyword_len) == 0) {
+	if (ResponseHandlers[i].always_has_data || c == ' ') {
+	  return
+	    ResponseHandlers[i].handler(h);
+	}
+	return ir_check_crlf(h, c);
+      }
     }
   }
   return IMR_OK; /* FIXME: unknown response is really a failure */

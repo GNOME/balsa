@@ -48,6 +48,7 @@
 #endif
 
 #include <sys/stat.h>		/* for check_if_regular_file() */
+#include <sys/wait.h>
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -74,6 +75,12 @@
 #include "toolbar-factory.h"
 
 #define GNOME_MIME_BUG_WORKAROUND 1
+typedef struct {
+    pid_t pid_editor;
+    gchar *filename;
+    BalsaSendmsg *msg;
+} balsa_edit_with_gnome_data;
+
 
 static gchar *read_signature(BalsaSendmsg *msg);
 static gint include_file_cb(GtkWidget *, BalsaSendmsg *);
@@ -117,6 +124,7 @@ static void address_book_cb(GtkWidget *widget, BalsaSendmsg *smd_msg_wind);
 
 static gint set_locale(GtkWidget *, BalsaSendmsg *, gint);
 
+static void edit_with_gnome(GtkWidget* widget, BalsaSendmsg* msg);
 static void change_identity_dialog_cb(GtkWidget*, BalsaSendmsg*);
 static void update_msg_identity(BalsaSendmsg*, LibBalsaIdentity*);
 
@@ -246,6 +254,13 @@ static GnomeUIInfo edit_menu[] = {
                            N_("Select the Identity to use for the message"),
                            change_identity_dialog_cb,
                            BALSA_PIXMAP_MENU_IDENTITY),
+    GNOMEUIINFO_SEPARATOR,
+#define EDIT_MENU_EDIT_GNOME 17
+    GNOMEUIINFO_ITEM_STOCK(N_("_Edit with Gnome-Editor"),
+                           N_("Edit the current message with "
+                              "the default Gnome editor"),
+                           edit_with_gnome,
+                           BALSA_PIXMAP_MENU_IDENTITY), /*FIXME: Other icon */
     GNOMEUIINFO_END
 };
 
@@ -649,6 +664,137 @@ fill_language_menu()
     lang_menu[LANG_CURRENT_POS].label = (char *) locales[idxsys].lang_name;
 }
 
+static gboolean
+edit_with_gnome_check(gpointer data) {
+    FILE *tmp;
+    balsa_edit_with_gnome_data *data_real = (balsa_edit_with_gnome_data *)data;
+    pid_t pid;
+    gint curposition;
+    gchar line[81]; /* FIXME:All lines should wrap at this line */
+    /* Editor not ready */
+    pid = waitpid (data_real->pid_editor, NULL, WNOHANG);
+    if(pid == -1) {
+        perror("waitpid");
+        return TRUE;
+    } else if(pid == 0) return TRUE;
+    
+    tmp = fopen(data_real->filename, "r");
+    if(tmp == NULL){
+        perror("fopen");
+        return TRUE;
+    }
+    if(balsa_app.edit_headers) {
+	while(!feof(tmp)) {
+            fgets(line, 80, tmp);
+            if(line[strlen(line)-1] == '\n')line[strlen(line)-1] = '\0';
+            if(!strncmp(line, "To: ", 4))
+                gtk_entry_set_text(GTK_ENTRY(data_real->msg->to[1]), line+4);
+            else if(!strncmp(line, "From: ", 6))
+                gtk_entry_set_text(GTK_ENTRY(data_real->msg->from[1]), line+6);
+            else if(!strncmp(line, "Reply-To: ", 10))
+                gtk_entry_set_text(GTK_ENTRY(data_real->msg->reply_to[1]), 
+                                   line+10);
+            else if(!strncmp(line, "Bcc: ", 5))
+                gtk_entry_set_text(GTK_ENTRY(data_real->msg->bcc[1]), line+5);
+            else if(!strncmp(line, "Cc: ", 4))
+                gtk_entry_set_text(GTK_ENTRY(data_real->msg->cc[1]), line+4);
+            else if(!strncmp(line, "Comments: ", 10))
+                gtk_entry_set_text(GTK_ENTRY(data_real->msg->comments[1]), 
+                                   line+10);
+            else if(!strncmp(line, "Subject: ", 9))
+                gtk_entry_set_text(GTK_ENTRY(data_real->msg->subject[1]), 
+                                   line+9);
+            else break;
+	}
+    }
+    gtk_editable_delete_text(GTK_EDITABLE(data_real->msg->text),0,-1);
+    curposition = 0;
+    while(!feof(tmp)) {
+        fgets(line, 80, tmp);
+        gtk_editable_insert_text(GTK_EDITABLE(data_real->msg->text),line, 
+                                 strlen(line), &curposition);
+    }
+    g_free(data_real->filename);
+    fclose(tmp);
+    unlink(data_real->filename);
+    gtk_widget_set_sensitive(data_real->msg->text, TRUE);
+    g_free(data);
+    return FALSE;
+}
+
+/* Edit the current file with an external editor.
+ *
+ * We fork twice current process, so we get:
+ *
+ * - Old (parent) process (this needs to continue because we don't want 
+ *   balsa to 'hang' until the editor exits
+ * - New (child) process (forks and waits for child to finish)
+ * - New (grandchild) process (executes editor)
+ */
+static void
+edit_with_gnome(GtkWidget* widget, BalsaSendmsg* msg)
+{
+    static const char TMP_PATTERN[] = "/tmp/balsa-edit-XXXXXX";
+    gchar filename[sizeof(TMP_PATTERN)];
+    gchar *command;
+    gchar **cmdline;
+    balsa_edit_with_gnome_data *data = 
+        g_malloc(sizeof(balsa_edit_with_gnome_data));
+    pid_t pid, pid_ext;
+    FILE *tmp;
+    int tmpfd;
+
+    strcpy(filename, TMP_PATTERN);
+    tmpfd = mkstemp(filename);
+    tmp   = fdopen(tmpfd, "w+");
+    
+    if(balsa_app.edit_headers) {
+	gchar *from = gtk_entry_get_text(GTK_ENTRY(msg->from[1])),
+            *to = gtk_entry_get_text(GTK_ENTRY(msg->to[1])),
+            *reply_to =
+            gtk_entry_get_text(GTK_ENTRY(msg->reply_to[1])), *cc =
+            gtk_entry_get_text(GTK_ENTRY(msg->cc[1])),
+            *bcc = gtk_entry_get_text(GTK_ENTRY(msg->bcc[1])),
+            *subject = gtk_entry_get_text(GTK_ENTRY(msg->subject[1])),
+            *comments = gtk_entry_get_text(GTK_ENTRY(msg->comments[1]));
+	
+	/* Write all the headers */
+	fprintf(tmp, 
+                "From: %s\n"
+                "To: %s\n"
+                "Cc: %s\n"
+                "Bcc: %s\n"
+                "Subject: %s\n"
+                "Reply-To: %s\n"
+                "Comments: %s\n\n\n",
+                from, to, cc, bcc, subject, reply_to, comments);
+    }
+    gtk_widget_set_sensitive(msg->text, FALSE);
+    fputs(gtk_editable_get_chars(GTK_EDITABLE(msg->text), 0,
+                                 gtk_text_get_length(GTK_TEXT
+                                                     (msg->text))), tmp);
+    fclose(tmp);
+    if ((pid = fork()) < 0) {
+        perror ("fork");
+        return; 
+    } 
+    if (pid == 0) {
+        setpgrp();
+        
+        command = g_strdup_printf(balsa_app.extern_editor_command, filename); 
+        cmdline = g_strsplit(command, " ", 1024); 
+        execvp (cmdline[0], cmdline); 
+        perror ("execvp"); 
+        g_strfreev (cmdline); 
+        g_free(command);
+        exit(127);
+    }
+    /* Return immediately. We don't want balsa to 'hang' */
+    data->pid_editor = pid;
+    data->filename = g_strdup(filename);
+    data->msg = msg;
+    gtk_idle_add((GtkFunction) edit_with_gnome_check, data);
+}
 
 static void 
 change_identity_dialog_cb(GtkWidget* widget, BalsaSendmsg* msg)
@@ -663,11 +809,6 @@ change_identity_dialog_cb(GtkWidget* widget, BalsaSendmsg* msg)
 	update_msg_identity(msg, ident);
 }
 
-/*
-	Drop down list identity update
-*/
-
-
 
 static void
 update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
@@ -675,11 +816,10 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
     gchar* tmpstr=libbalsa_address_to_gchar(ident->address, 0);
     
     /* change entries to reflect new identity */
-        gtk_entry_set_text(GTK_ENTRY(msg->from[1]), tmpstr);
-        g_free(tmpstr);
+    gtk_entry_set_text(GTK_ENTRY(msg->from[1]), tmpstr);
+    g_free(tmpstr);
 
     gtk_entry_set_text(GTK_ENTRY(msg->reply_to[1]), ident->replyto);
-    
     gtk_entry_set_text(GTK_ENTRY(msg->bcc[1]), ident->bcc);
     
     /* change the subject to use the reply/forward strings */
@@ -688,7 +828,7 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
      * the signature if path changed */
 
     /* update the current messages identity */
-	msg->ident=ident;
+    msg->ident=ident;
 }
 
 

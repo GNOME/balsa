@@ -1,4 +1,13 @@
-2002-01-05  Pawel Salek  <pawsa@theochem.kth.se>
+2002-01-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Jelmer Vernooij <jelmer@lintux.cx> patch (balsa-list, 2001.12.25
+	17:13) with minor changes (tmpnam->mkstemp, etc).
+	* src/balsa-app.h: add extern_editor_command and edit_headers
+	* src/pref-manager.c: edit config.
+	* src/save-restore.c: save&restore config.
+	* src/sendmsg-window.c: edit message text using external editor.
+
+2002-01-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox.c: set context to NULL only when really closed.
 	* libbalsa/mailbox_imap.c: clean cache properly, not only first

@@ -272,6 +272,10 @@ extern struct BalsaApplication {
     gboolean previewpane;
     gboolean debug;
 
+    /* external editor */
+    gchar *extern_editor_command;
+    gboolean edit_headers;
+
     /* arp --- string to prefix "replied to" messages. */
     gchar *quote_str;
 

@@ -103,6 +103,10 @@ typedef struct _PropertyUI {
     GtkWidget *debug_message_menu;
     GtkWidget *fatal_message_menu;
 
+    /* External editor preferences */
+    GtkWidget *extern_editor_command;
+    GtkWidget *edit_headers;
+
     /* arp */
     GtkWidget *quote_str;
 
@@ -408,6 +412,14 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(pui->forward_attached), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
 
+    /* external editor */
+    gtk_signal_connect(GTK_OBJECT(pui->extern_editor_command), "changed",
+                       GTK_SIGNAL_FUNC(properties_modified_cb),
+    		       property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->edit_headers), "toggled",
+    		       GTK_SIGNAL_FUNC(properties_modified_cb),
+    		       property_box);
+		
     /* arp */
     gtk_signal_connect(GTK_OBJECT(pui->quote_str), "changed",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
@@ -648,6 +660,13 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.close_mailbox_timeout =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
 					 (pui->close_mailbox_minutes));
+
+    /* external editor */
+    g_free(balsa_app.extern_editor_command);
+    balsa_app.extern_editor_command = 
+    	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->extern_editor_command)));
+    	
+    balsa_app.edit_headers = GTK_TOGGLE_BUTTON(pui->edit_headers)->active;
 
     /* arp */
     g_free(balsa_app.quote_str);
@@ -900,6 +919,12 @@ set_prefs(void)
 			     GTK_TOGGLE_BUTTON(pui->wordwrap)->active);
     gtk_widget_set_sensitive(pui->send_rfc2646_format_flowed,
 			     GTK_TOGGLE_BUTTON(pui->wordwrap)->active);
+
+    /* external editor */
+    gtk_entry_set_text(GTK_ENTRY(pui->extern_editor_command), 
+                       balsa_app.extern_editor_command);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->edit_headers),
+                                 balsa_app.edit_headers);
 
     /* arp */
     gtk_entry_set_text(GTK_ENTRY(pui->quote_str), balsa_app.quote_str);
@@ -1627,10 +1652,15 @@ outgoing_page(gpointer data)
 
 	vbox2 = vbox_in_container(frame2);
 
-    table2 = GTK_TABLE(gtk_table_new(3, 2, FALSE));
+    table2 = GTK_TABLE(gtk_table_new(5, 2, FALSE));
     gtk_container_add(GTK_CONTAINER(vbox2), GTK_WIDGET(table2));
     gtk_container_set_border_width(GTK_CONTAINER(table2), 2);
-    pui->quote_str = attach_entry(_("Reply prefix:"), 4, table2);
+    pui->extern_editor_command = 
+        attach_entry(_("External editor command:"), 4, table2);
+    pui->edit_headers = 
+    	gtk_check_button_new_with_label(_("Edit headers in external editor"));
+    gtk_box_pack_start(GTK_BOX(vbox2), pui->edit_headers, FALSE, TRUE, 0);
+    pui->quote_str = attach_entry(_("Reply Prefix:"), 5, table2);
 
     pui->autoquote =
         gtk_check_button_new_with_label(_("Automatically quote original "
@@ -1638,12 +1668,14 @@ outgoing_page(gpointer data)
     gtk_box_pack_start(GTK_BOX(vbox2), pui->autoquote, FALSE, TRUE, 0);
 
     pui->reply_strip_html_parts =
-	gtk_check_button_new_with_label(_("Don't include HTML parts as text when replying or forwarding mail"));
+	gtk_check_button_new_with_label(_("Don't include HTML parts as text "
+                                          "when replying or forwarding mail"));
     gtk_box_pack_start(GTK_BOX(vbox2), pui->reply_strip_html_parts,
 		       FALSE, TRUE, 0);
 
     pui->forward_attached =
-	gtk_check_button_new_with_label(_("Forward a mail as attachment instead of quoting it"));
+	gtk_check_button_new_with_label(_("Forward a mail as attachment "
+                                          "instead of quoting it"));
     gtk_box_pack_start(GTK_BOX(vbox2), pui->forward_attached,
 		       FALSE, TRUE, 0);
 

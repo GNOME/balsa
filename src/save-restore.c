@@ -733,6 +733,12 @@ config_global_load(void)
     /* Compose window ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Compose/");
 
+    g_free(balsa_app.extern_editor_command);
+    balsa_app.extern_editor_command = 
+        gnome_config_get_string("ExternEditorCommand=gnome-edit %s");
+    balsa_app.edit_headers = 
+        gnome_config_get_bool("ExternEditorEditHeaders=false");
+
     g_free(balsa_app.quote_str);
     balsa_app.quote_str = gnome_config_get_string("QuoteString=> ");
     g_free(balsa_app.compose_headers);
@@ -975,7 +981,11 @@ gint config_save(void)
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Compose/");
 
     gnome_config_set_string("ComposeHeaders", balsa_app.compose_headers);
-    gnome_config_set_bool("RequestDispositionNotification", balsa_app.req_dispnotify);
+    gnome_config_set_bool("RequestDispositionNotification", 
+                          balsa_app.req_dispnotify);
+    gnome_config_set_string("ExternEditorCommand", 
+                            balsa_app.extern_editor_command);
+    gnome_config_set_bool("ExternEditorEditHeaders", balsa_app.edit_headers);
     gnome_config_set_string("QuoteString", balsa_app.quote_str);
 
     gnome_config_pop_prefix();

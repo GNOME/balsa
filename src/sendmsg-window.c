@@ -3550,6 +3550,7 @@ print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 #ifndef HAVE_GNOME_PRINT
     balsa_information(
 	LIBBALSA_INFORMATION_ERROR,
+        GTK_WINDOW(bsmsg->window),
 	_("Balsa has been compiled without gnome-print support.\n"
 	  "Printing is not possible."));
 #else

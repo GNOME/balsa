@@ -1804,7 +1804,8 @@ check_call_url(GtkWidget * widget, GdkEventButton * event,
 
     x = event->x;
     y = event->y;
-    if (x == stored_x && y == stored_y
+    /* 2-pixel motion tolerance */
+    if (abs(x - stored_x) <= 2 && abs(y - stored_y) <= 2
         && (event->state & STORED_MASK_BITS) == stored_mask) {
         url = find_url(widget, x, y, url_list);
         if (url)

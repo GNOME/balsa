@@ -478,6 +478,15 @@ body2canvas (BalsaMessage * bmessage, Message * message)
 					       "x", (double) 10.0,
 					       "y", (double) (y2 - y1) + 20,
 					       NULL));
+
+  gnome_canvas_item_new (bmessage->body, GNOME_TYPE_CANVAS_TEXT,
+			 "x", (double) 0,
+			 "y", (double) 0,
+			 "anchor", GTK_ANCHOR_NW,
+			 "font", "fixed",
+			 "text", 
+			 "                                                                                                   ", NULL);
+
   message_body_ref (message);
   content2canvas (message, bmessage->body);
   message_body_unref (message);

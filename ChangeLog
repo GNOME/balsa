@@ -1,6 +1,19 @@
+2004-01-18  Carlos Morgado  <chbm gnome.org>
+
+	* src/main.c (Message): 
+	* src/balsa-message.c (Message): 
+	* src/balsa-bonobo.h (Message): 
+	* src/balsa-bonobo.c (Message): 
+	* src/Makefile.am (Message): 
+	* src/Balsa.idl (Message): 
+	* Makefile.am (Message): 
+	* GNOME_Balsa.server.in (Message): 
+	backport of bonoboization from HEAD
+	
 2004-01-13  Laurent Dhima  <laurenti@alblinux.net>
 
 	* configure.in: Added "sq" to ALL_LINGUAS.
+	(Message): 
 
 2004-01-11 12:18  PeterB
 

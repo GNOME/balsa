@@ -52,6 +52,10 @@
 
 #include "libinit_balsa/init_balsa.h"
 
+#include "Balsa.h"
+#include "balsa-bonobo.h"
+#include <bonobo-activation/bonobo-activation.h>
+
 #ifdef HAVE_GPGME
 #include <gpgme.h>
 #endif
@@ -87,6 +91,9 @@ static gint balsa_save_session(GnomeClient * client, gint phase,
 			       GnomeSaveStyle save_style, gint is_shutdown,
 			       GnomeInteractStyle interact_style,
 			       gint is_fast, gpointer client_data);
+gboolean initial_open_unread_mailboxes(void); 
+/* yes void is there cause gcc is tha suck */
+gboolean initial_open_inbox(void);
 
 /* We need separate variable for storing command line requests to check the 
    mail because such selection cannot be stored in balsa_app and later 
@@ -101,6 +108,84 @@ static GSList* opt_attach_list = NULL;
 /* opt_compose_email: To: field for the compose window */
 static gchar *opt_compose_email = NULL;
 
+
+static void
+balsa_handle_automation_options() {
+   CORBA_Object factory;
+   CORBA_Environment ev;
+   BonoboObject *balsacomposer;
+   BonoboObject *balsaapp;
+ 
+   CORBA_exception_init (&ev);
+
+   factory = bonobo_activation_activate_from_id 
+       ("OAFIID:GNOME_Balsa_Application_Factory",
+	Bonobo_ACTIVATION_FLAG_EXISTING_ONLY,
+	NULL, &ev);
+
+   if (factory) {
+       /* there already is a server. good */
+       CORBA_Object app;
+       app =  
+	   bonobo_activation_activate_from_id ("OAFIID:GNOME_Balsa_Application",
+						   0, NULL, &ev);
+
+       if (cmd_check_mail_on_startup) 
+	   GNOME_Balsa_Application_checkmail (app, &ev);
+
+       if (cmd_open_unread_mailbox)
+	   GNOME_Balsa_Application_openUnread (app, &ev);
+
+       if (cmd_open_inbox)
+	   GNOME_Balsa_Application_openInbox (app, &ev);
+
+       if (cmd_line_open_mailboxes)
+	   GNOME_Balsa_Application_openMailbox (app,
+					       cmd_line_open_mailboxes,
+					       &ev);
+
+       if (opt_compose_email || opt_attach_list) {
+	   GNOME_Balsa_Composer_attachs *attachs;
+	   CORBA_Object server;
+	   
+	   attachs = CORBA_sequence_CORBA_string__alloc();
+	   server =  
+	       bonobo_activation_activate_from_id ("OAFIID:GNOME_Balsa_Composer",
+						   0, NULL, &ev);
+	   if(opt_attach_list) {
+	       gint i,l;
+	       l = g_slist_length(opt_attach_list);
+	       attachs->_buffer = 
+		   CORBA_sequence_CORBA_string_allocbuf(l);
+	       attachs->_length = l;
+	       
+	       
+	       for( i = 0 ; i < l; i++) {
+		   attachs->_buffer[i] = 
+		       g_slist_nth_data( opt_attach_list, i );
+	       }
+	   } else 
+	       attachs->_length = 0;
+	   CORBA_sequence_set_release( attachs, TRUE);
+
+	   GNOME_Balsa_Composer_sendMessage(server,
+					    "",
+					    opt_compose_email,
+					    "",
+					    "",
+					    attachs,
+					    0, 
+					    &ev );
+       }
+
+       exit(0);
+   } else {
+       balsacomposer = balsa_composer_new ();
+       balsaapp = balsa_application_new ();
+   }
+   
+}
+
 /* balsa_init:
    FIXME - check for memory leaks.
 */
@@ -114,7 +199,7 @@ balsa_init(int argc, char **argv)
 
 	{"checkmail", 'c', POPT_ARG_NONE,
 	 &(cmd_check_mail_on_startup), 0,
-	 N_("Get new mail on startup"), NULL},
+	 N_("Get new mail on staartup"), NULL},
 	{"compose", 'm', POPT_ARG_STRING, &(opt_compose_email),
 	 0, N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
 	{"attach", 'a', POPT_ARG_STRING, &(attachment),
@@ -132,11 +217,9 @@ balsa_init(int argc, char **argv)
 	{NULL, '\0', 0, NULL, 0}	/* end the list */
     };
 
-#if BALSA_MAJOR < 2
-    context = poptGetContext(PACKAGE, argc, argv, options, 0);
-#else
+
     context = poptGetContext(PACKAGE, argc, (const char **)argv, options, 0);
-#endif                          /* BALSA_MAJOR < 2 */
+
     while((opt = poptGetNextOpt(context)) > 0) {
         switch (opt) {
 	    case 'a':
@@ -151,7 +234,11 @@ balsa_init(int argc, char **argv)
                        GNOME_PARAM_POPT_TABLE, options,
                        GNOME_PARAM_APP_PREFIX, BALSA_STD_PREFIX,
                        GNOME_PARAM_APP_DATADIR, BALSA_STD_PREFIX "/share",
+		       GNOME_PARAM_HUMAN_READABLE_NAME, _("The Balsa E-Mail Client"),
                        NULL);
+
+    balsa_handle_automation_options();  
+    
 }
 
 /* check_special_mailboxes: 
@@ -257,7 +344,7 @@ threads_destroy(void)
    open mailboxes on startup if requested so.
    This is an idle handler. Be sure to use gdk_threads_{enter/leave}
  */
-static gboolean
+gboolean
 initial_open_unread_mailboxes()
 {
     GList *i, *gl;
@@ -277,7 +364,7 @@ initial_open_unread_mailboxes()
 }
 
 
-static gboolean
+gboolean
 initial_open_inbox()
 {
     if (!balsa_app.inbox)
@@ -353,6 +440,7 @@ main(int argc, char *argv[])
               (const char *) gnome_i18n_get_language_list("LC_CTYPE")->data);
 #endif
 
+
 #ifdef HAVE_GPGME
     /* initialise the gpgme library */
     g_message("init gpgme version %s", gpgme_check_version(NULL));
@@ -424,9 +512,11 @@ main(int argc, char *argv[])
 	for(lst = opt_attach_list; lst; lst = g_slist_next(lst))
 	    add_attachment(GNOME_ICON_LIST(snd->attachments[1]), 
 			   lst->data, FALSE, NULL);
-	SENDMSG_WINDOW_QUIT_ON_CLOSE(snd);
-    } else
-	gtk_widget_show(window);
+	snd->quit_on_close = FALSE;
+ 
+    };
+
+    gtk_widget_show(window);
 
     if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)
 	check_new_messages_cb(NULL, NULL);

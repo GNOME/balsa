@@ -371,7 +371,7 @@ balsa_message_init(BalsaMessage * bm)
     gtk_box_pack_start(GTK_BOX(bm->vbox), bm->header_container, FALSE, FALSE, 0);
 
     bm->header_text = gtk_text_view_new();
-    gdk_color_parse ("grey85", &color);
+    gdk_color_parse ("grey90", &color);
     gtk_text_view_set_editable(GTK_TEXT_VIEW(bm->header_text), FALSE);
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(bm->header_text), 2);
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(bm->header_text), 15);

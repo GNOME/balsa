@@ -60,10 +60,26 @@ balsa_BASE_SRCLIST =	\
 	toolbar-prefs.c		\
 	toolbar-prefs.h
 
+balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h balsa-bonobo.c balsa-bonobo.h
 
-balsa_IDL_SRCLIST = # balsa-common.c balsa-skels.c balsa-stubs.c		
 
 balsa_SOURCES = $(balsa_BASE_SRCLIST) $(balsa_IDL_SRCLIST)
+
+EXTRA_DIST = Balsa.idl
+
+
+idldir = $(datadir)/idl
+idl_DATA = Balsa.idl
+
+$(balsa_IDL_SRCLIST): $(idl_DATA)
+	$(ORBIT_IDL) -I $(LIBBONOBO_IDL) -I $(BONOBO_ACTIVATION_IDL) $(idl_DATA)
+
+INCLUDES = \
+        -DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
+        -I$(top_builddir) -I$(top_srcdir) \
+        -I$(top_srcdir)/libbalsa \
+        $(BALSA_CFLAGS)
+
 
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
@@ -92,18 +108,6 @@ dist-hook:
 	mkdir $(distdir)/pixmaps
 	cp $(srcdir)/pixmaps/*.{xpm,png} $(distdir)/pixmaps
 
-idldir = $(datadir)/idl
-
-idl_DATA = #../idl/balsa.idl
-
-CORBA_SRCLIST = balsa-common.c balsa-skels.c balsa-stubs.c \
-                balsa.h
-
-BALSA_ORB_SRCLIST = orbit-glue.c 
-
-
-$(CORBA_SRCLIST): $(idl_DATA)
-		$(ORBIT_IDL) $(idl_DATA)
 
 DEFS = -DG_DISABLE_DEPRECATED   \
        -DGTK_DISABLE_DEPRECATED \

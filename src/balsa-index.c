@@ -84,6 +84,8 @@ static void bndx_selection_changed(GtkTreeSelection * selection,
 
 struct BndxSelectionChangedInfo {
     guint msgno;
+    guint current_msgno;
+    gboolean current_selected;
     GArray *selected;
     GArray *new_selected;
 };
@@ -475,6 +477,7 @@ static gboolean
 bndx_deselected_idle(BalsaIndex * index)
 {
     GArray *deselected;
+    LibBalsaMessage *current_message;
 
     gdk_threads_enter();
 
@@ -491,9 +494,23 @@ bndx_deselected_idle(BalsaIndex * index)
         return FALSE;
     }
 
+    if ((current_message = index->current_message))
+	/* Do not allow current message to be finalized. */
+	g_object_ref(current_message);
+
     libbalsa_mailbox_messages_change_flags(index->mailbox_node->mailbox,
                                            deselected, 0,
                                            LIBBALSA_MESSAGE_FLAG_SELECTED);
+
+    if (current_message) {
+	/* We had a message... */
+	if (!index->current_message)
+	    /* ...but we don't any more; restore it. */
+	    index->current_message = current_message;
+	else
+	    /* Discard. */
+	    g_object_unref(current_message);
+    }
 
     if (index->current_message) {
         GtkTreePath *path;
@@ -505,7 +522,11 @@ bndx_deselected_idle(BalsaIndex * index)
                 bndx_select_row(index, path);
             }
             gtk_tree_path_free(path);
-        }                       /* else ??? */
+        } else {
+	    /* Can this happen? */
+	    g_object_unref(index->current_message);
+	    index->current_message = NULL;
+	}
     }
 
     g_object_set_data(G_OBJECT(index), BALSA_INDEX_DESELECTED_ARRAY, NULL);
@@ -513,6 +534,12 @@ bndx_deselected_idle(BalsaIndex * index)
 
     gdk_threads_leave();
     return FALSE;
+}
+
+static int
+bndx_compare_guint(gconstpointer a, gconstpointer b)
+{
+    return *(guint *)a - *(guint *)b;
 }
 
 static void
@@ -526,8 +553,6 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     GArray *deselected;
     gint i;
     gint current_depth = 0;
-    guint current_msgno = 0;
-    gboolean current_selected = FALSE;
 
     if (mailbox->state == LB_MAILBOX_STATE_TREECLEANING)
         return;
@@ -545,8 +570,8 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     /* Check previously selected messages. */
     deselected =
 	g_object_get_data(G_OBJECT(index), BALSA_INDEX_DESELECTED_ARRAY);
-    if (index->current_message)
-	current_msgno = index->current_message->msgno;
+    sci.current_msgno =
+        index->current_message ? index->current_message->msgno : 0;
     for (i = index->selected->len; --i >= 0; ) {
 	GtkTreePath *path;
 	guint msgno = g_array_index(index->selected, guint, i);
@@ -575,17 +600,18 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 	    }
 	    g_array_append_val(deselected, msgno);
 	    g_array_remove_index(index->selected, i);
-	    if (msgno == current_msgno)
+	    if (msgno == sci.current_msgno)
 		current_depth = gtk_tree_path_get_depth(path);
-	} else if (msgno == current_msgno)
-	    ++current_selected;
+	}
 	gtk_tree_path_free(path);
     }
 
     /* Check currently selected messages. */
+    g_array_sort(index->selected, bndx_compare_guint);
     sci.selected = index->selected;
     sci.new_selected = g_array_new(FALSE, FALSE, sizeof(guint));
     sci.msgno = 0;
+    sci.current_selected = FALSE;
     gtk_tree_selection_selected_foreach(selection,
                                         (GtkTreeSelectionForeachFunc)  
 					bndx_selection_changed_func,
@@ -597,8 +623,7 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 	                sci.new_selected->len);
     g_array_free(sci.new_selected, TRUE);
 
-    /* If current message is still selected, return. */
-    if (current_selected)
+    if (sci.current_selected)
 	return;
 
     /* sci.msgno is the msgno of the new current message;
@@ -624,17 +649,33 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     }
 }
 
+/* Binary search for msgno in array. */
+static gboolean
+bndx_msgno_is_in_array(guint msgno, GArray * array)
+{
+    gint high = array->len, low = -1;
+
+    while (high - low > 1) {
+        gint middle = (high + low) / 2;
+        if (g_array_index(array, guint, middle) > msgno)
+            high = middle;
+        else
+            low = middle;
+    }
+
+    return low >= 0 && g_array_index(array, guint, low) == msgno;
+}
+
 static void
 bndx_selection_changed_func(GtkTreeModel * model, GtkTreePath * path,
                             GtkTreeIter * iter,
 			    struct BndxSelectionChangedInfo *sci)
 {
-    gint i;
-
     gtk_tree_model_get(model, iter, LB_MBOX_MSGNO_COL, &sci->msgno, -1);
-    for (i = sci->selected->len; --i >= 0; )
-        if (g_array_index(sci->selected, guint, i) == sci->msgno)
-            return;
+    if (sci->msgno == sci->current_msgno)
+	sci->current_selected = TRUE;
+    if (bndx_msgno_is_in_array(sci->msgno, sci->selected))
+	return;
     g_array_append_val(sci->new_selected, sci->msgno);
 }
 

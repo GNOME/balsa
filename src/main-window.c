@@ -478,6 +478,6 @@ show_about_box (GtkWidget * widget, gpointer data)
 			   "Copyright (C) 1997-98",
 			   authors,
 			   "Balsa is a E-Mail Client",
-			   NULL);
+			   "pixmaps/balsa.xpm");
   gtk_widget_show (about);
 }

@@ -80,18 +80,19 @@ create_menu (GtkWidget * window)
 void addressbook_window_new(GtkWidget *widget, gpointer data)
 {
   GtkWidget *window;
-  GtkWidget *vbox;
-  GtkWidget *hbox;
   GtkWidget *vbox1;
   GtkWidget *hbox1;
   GtkWidget *label;
+  GtkWidget *button;
+  GtkWidget *vpane;
+  GtkWidget *hpane;
+  GtkWidget *addyb_list;
   GtkWidget *email_list;
-  static char *titles[] =
-  {
-    "Email address"
-  };
+  GtkWidget *comments;
+  static char *titles[1];
 
-  window = gnome_app_new ("balsa_addressbook_window","Addressbook");
+  window = gnome_app_new ("balsa_addressbook_window","Address book");
+  gtk_widget_set_usize (window, 560, 270);
   gtk_window_set_wmclass (GTK_WINDOW (window), "balsa_app",
 			  "Balsa");
 
@@ -101,24 +102,59 @@ void addressbook_window_new(GtkWidget *widget, gpointer data)
   gtk_signal_connect (GTK_OBJECT (window), "delete_event",
 		      GTK_SIGNAL_FUNC (delete_event), NULL);
 
-  vbox = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (vbox);
+  hpane=gtk_hpaned_new();
+  gtk_widget_show(hpane);
 
-  hbox = gtk_hbox_new (FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 2);
-  gtk_widget_show (hbox);
+/* address book list (show nicknames in this list) */
+  titles[0] =  "Names";
 
   vbox1 = gtk_vbox_new (FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (hbox), vbox1, TRUE, TRUE, 2);
   gtk_widget_show (vbox1);
 
+  addyb_list = gtk_clist_new_with_titles (1, titles);
+  gtk_clist_column_titles_passive (GTK_CLIST (addyb_list));
+  gtk_clist_set_selection_mode (GTK_CLIST (addyb_list), GTK_SELECTION_BROWSE);
+  
+  gtk_clist_set_column_width (GTK_CLIST (addyb_list), 0, 200);
+  
+  gtk_clist_set_policy (GTK_CLIST (addyb_list),
+                        GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_box_pack_start (GTK_BOX (vbox1), addyb_list, TRUE, TRUE, 3);
+  gtk_widget_show (addyb_list);
+
   hbox1 = gtk_hbox_new (FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox1), hbox1, TRUE, TRUE, 2);
+  gtk_box_pack_start (GTK_BOX (vbox1), hbox1, FALSE, FALSE, 0);
   gtk_widget_show (hbox1);
 
-  label=gtk_label_new("Name:");
-  gtk_box_pack_start (GTK_BOX (hbox1), label, TRUE, TRUE, 10);
-  gtk_widget_show(label);
+  button=gtk_button_new_with_label("Add");
+  gtk_widget_set_usize (button, 60, 25);
+  gtk_box_pack_start(GTK_BOX(hbox1), button, FALSE, FALSE, 0 );
+  gtk_widget_show(button);
+
+  button=gtk_button_new_with_label("Modify");
+  gtk_widget_set_usize (button, 60, 25);
+  gtk_box_pack_start(GTK_BOX(hbox1), button, FALSE, FALSE, 0 );
+  gtk_widget_show(button);
+
+  button=gtk_button_new_with_label("Remove");
+  gtk_widget_set_usize (button, 60, 25);
+  gtk_box_pack_start(GTK_BOX(hbox1), button, FALSE, FALSE, 0 );
+  gtk_widget_show(button);
+
+  gtk_paned_add1 (GTK_PANED (hpane), vbox1);
+
+
+
+
+
+  vpane = gtk_vpaned_new ();
+  gtk_widget_show (vpane);
+
+/* email address list for the currently selected nick in the list above */
+  vbox1 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox1);
+
+  titles[0] =  "Email address";
 
   email_list = gtk_clist_new_with_titles (1, titles);
   gtk_clist_column_titles_passive (GTK_CLIST (email_list));
@@ -128,13 +164,51 @@ void addressbook_window_new(GtkWidget *widget, gpointer data)
   
   gtk_clist_set_policy (GTK_CLIST (email_list),
                         GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-  gtk_box_pack_start (GTK_BOX (vbox1), email_list, TRUE, TRUE, 10);
+  gtk_box_pack_start (GTK_BOX (vbox1), email_list, TRUE, TRUE, 3);
   gtk_widget_show (email_list);
-  
+
+  hbox1 = gtk_hbox_new (FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox1), hbox1, FALSE, FALSE, 0);
+  gtk_widget_show (hbox1);
+
+  button=gtk_button_new_with_label("Add");
+  gtk_widget_set_usize (button, 60, 25);
+  gtk_box_pack_start(GTK_BOX(hbox1), button, FALSE, FALSE, 0 );
+  gtk_widget_show(button);
+
+  button=gtk_button_new_with_label("Modify");
+  gtk_widget_set_usize (button, 60, 25);
+  gtk_box_pack_start(GTK_BOX(hbox1), button, FALSE, FALSE, 0 );
+  gtk_widget_show(button);
+
+  button=gtk_button_new_with_label("Remove");
+  gtk_widget_set_usize (button, 60, 25);
+  gtk_box_pack_start(GTK_BOX(hbox1), button, FALSE, FALSE, 0 );
+  gtk_widget_show(button);
+
+  gtk_paned_add1 (GTK_PANED (vpane), vbox1);
 
 
+/* comments box */
+  vbox1 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox1);
 
-  gnome_app_set_contents (GNOME_APP (window), vbox);
+  label=gtk_label_new("Comments:");
+  gtk_box_pack_start(GTK_BOX(vbox1), label,FALSE, FALSE, 0);
+  gtk_widget_show(label);
+
+  comments = gtk_text_new(NULL,NULL);
+  gtk_box_pack_start (GTK_BOX (vbox1), comments, TRUE, TRUE, 3);
+  gtk_widget_show (comments);
+
+  gtk_paned_add2 (GTK_PANED (vpane), vbox1);
+
+  gtk_paned_add2 (GTK_PANED (hpane), vpane);
+
+
+/* other stuff... */
+
+  gnome_app_set_contents (GNOME_APP (window), vpane);
 
   gnome_app_set_menus (GNOME_APP (window),
 		       GTK_MENU_BAR (create_menu (window)));

@@ -1,3 +1,12 @@
+2004-04-20 01:22  PeterB
+
+	* src/balsa-message.c: check GMIME_IS_PART(info->body->mime_part).
+	* libbalsa/gmime-part-rfc2440.c: check for empty content.
+	* libbalsa/filter.c, libbalsa/mailbox.c, libbalsa/mailbox.h,
+	libbalsa/mailbox_local.c, src/balsa-index.c, src/main-window.c:
+	check messages against view-filter after filtering; allow NULL
+	condition and search-iter.
+
 2004-04-20 00:30  PeterB
 
 	* libbalsa/message.c: clear message->has_all_headers when extra

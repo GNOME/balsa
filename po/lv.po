@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-02-02 11:02+0100\n"
-"PO-Revision-Date: 2003-02-02 21:38--300\n"
+"POT-Creation-Date: 2003-02-09 11:09+0100\n"
+"PO-Revision-Date: 2003-02-09 22:08--300\n"
 "Last-Translator: Artis Trops <hornet@navigator.lv>\n"
 "Language-Team: Latvian <ll10nt@os.lv>\n"
 "MIME-Version: 1.0\n"
@@ -143,8 +143,8 @@ msgstr "Klūda pārvietojot vēstules"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:87
-#: src/balsa-index-threading.c:804
-#: src/balsa-index-threading.c:806
+#: src/balsa-index-threading.c:524
+#: src/balsa-index-threading.c:526
 #: src/sendmsg-window.c:2312
 #: src/sendmsg-window.c:2313
 msgid "Re:"
@@ -396,31 +396,31 @@ msgstr "Nevarēju izveidot MH direktoriju iekš %s (%s)"
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Nevarēju izveidot MH struktūru %s (%s)"
 
-#: libbalsa/mailbox_pop3.c:211
+#: libbalsa/mailbox_pop3.c:213
 #, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: Atveru %s Refcount: %d\n"
 
-#: libbalsa/mailbox_pop3.c:266
+#: libbalsa/mailbox_pop3.c:268
 #, c-format
 msgid "POP3 mailbox %s temp file error:\n"
 "%s"
 msgstr "POP3 pastkastītes %s pagaidu faila kļūda:\n"
 "%s"
 
-#: libbalsa/mailbox_pop3.c:282
+#: libbalsa/mailbox_pop3.c:285
 #, c-format
 msgid "POP3 mailbox %s accessing error:\n"
 "%s"
 msgstr "POP3 pastkastītes %s piekļuves kļūda:\n"
 "%s"
 
-#: libbalsa/mailbox_pop3.c:304
+#: libbalsa/mailbox_pop3.c:307
 #, c-format
 msgid "POP3 mailbox %s temp mailbox error:\n"
 msgstr "POP3 pastkastītes %s pagaidu pastkastītes kļūda:\n"
 
-#: libbalsa/mailbox_pop3.c:329
+#: libbalsa/mailbox_pop3.c:332
 #, c-format
 msgid "Error placing messages from %s on %s\n"
 "Messages are left in %s\n"
@@ -1556,7 +1556,7 @@ msgid "Error displaying %s: %s\n"
 msgstr "Kļūda parādot %s: %s\n"
 
 #: src/address-book-config.c:571
-#: src/mailbox-conf.c:469
+#: src/mailbox-conf.c:478
 #: src/pref-manager.c:1523
 #: src/pref-manager.c:2614
 msgid "_Add"
@@ -1661,68 +1661,68 @@ msgstr "Pastkastītes parole priekš %s@%s:"
 msgid "Password needed"
 msgstr "Nepieciešama parole"
 
-#: src/balsa-app.c:801
+#: src/balsa-app.c:837
 #, c-format
 msgid "Multiple mailboxes named \"%s\""
 msgstr "Vairākas pastkastītes ar nosaukumu \"%s\""
 
-#: src/balsa-index.c:325
+#: src/balsa-index.c:368
 msgid "From"
 msgstr "No"
 
-#: src/balsa-index.c:340
+#: src/balsa-index.c:383
 msgid "Subject"
 msgstr "Temats"
 
-#: src/balsa-index.c:361
+#: src/balsa-index.c:404
 msgid "Date"
 msgstr "Datums"
 
-#: src/balsa-index.c:374
+#: src/balsa-index.c:417
 msgid "Size"
 msgstr "Izmērs"
 
-#: src/balsa-index.c:589
+#: src/balsa-index.c:810
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Atveru pastkastīti %s. Lūdzu uzgaidiet..."
 
-#: src/balsa-index.c:626
+#: src/balsa-index.c:849
 msgid "To"
 msgstr "Kam"
 
-#: src/balsa-index.c:2103
+#: src/balsa-index.c:1842
 msgid "_View Source"
 msgstr "_Skatīt Avotu"
 
-#: src/balsa-index.c:2105
+#: src/balsa-index.c:1844
 #: src/main-window.c:444
 #: src/message-window.c:126
 msgid "_Reply..."
 msgstr "_Atbildēt..."
 
-#: src/balsa-index.c:2107
+#: src/balsa-index.c:1846
 msgid "Reply To _All..."
 msgstr "Atbildēt _Visiem..."
 
-#: src/balsa-index.c:2109
+#: src/balsa-index.c:1848
 msgid "Reply To _Group..."
 msgstr "Atbildēt _Grupai..."
 
-#: src/balsa-index.c:2111
+#: src/balsa-index.c:1850
 msgid "_Forward Attached..."
 msgstr "_Pārsūtīt Piesaistītu..."
 
-#: src/balsa-index.c:2113
+#: src/balsa-index.c:1852
 msgid "Forward _Inline..."
 msgstr "Pārsūtīt _Iekļaujot..."
 
-#: src/balsa-index.c:2115
+#: src/balsa-index.c:1854
 #: src/main-window.c:546
 msgid "_Store Address..."
 msgstr "_Noglabāt Adresi..."
 
-#: src/balsa-index.c:2128
+#: src/balsa-index.c:1867
 #: src/filter-edit-dialog.c:216
 #: src/mailbox-node.c:866
 #: src/main-window.c:528
@@ -1731,58 +1731,58 @@ msgstr "_Noglabāt Adresi..."
 msgid "_Delete"
 msgstr "_Dzēst"
 
-#: src/balsa-index.c:2133
+#: src/balsa-index.c:1872
 #: src/main-window.c:535
 msgid "_Undelete"
 msgstr "_Atdzēst"
 
-#: src/balsa-index.c:2138
+#: src/balsa-index.c:1877
 msgid "Move To _Trash"
 msgstr "Pārvietot Uz _Atkritumkasti"
 
-#: src/balsa-index.c:2142
+#: src/balsa-index.c:1881
 msgid "T_oggle"
 msgstr "_Slēgt"
 
-#: src/balsa-index.c:2145
+#: src/balsa-index.c:1884
 msgid "_Flagged"
 msgstr "_Karogotā"
 
-#: src/balsa-index.c:2148
+#: src/balsa-index.c:1887
 msgid "_Unread"
 msgstr "_Nelasītas"
 
-#: src/balsa-index.c:2156
+#: src/balsa-index.c:1895
 msgid "_Move to"
 msgstr "_Pārvietot uz"
 
-#: src/balsa-mblist.c:326
+#: src/balsa-mblist.c:332
 msgid "Mailbox"
 msgstr "Pastkastīte"
 
-#: src/balsa-mblist.c:349
+#: src/balsa-mblist.c:358
 #: src/filter-edit-callbacks.c:783
 msgid "Unread"
 msgstr "Nelasītas"
 
-#: src/balsa-mblist.c:369
+#: src/balsa-mblist.c:381
 msgid "Total"
 msgstr "Kopā"
 
-#: src/balsa-mblist.c:983
-#: src/balsa-mblist.c:1028
+#: src/balsa-mblist.c:948
+#: src/balsa-mblist.c:993
 msgid "Failed to find mailbox"
 msgstr "Neizdevās atrast pastkastīti"
 
-#: src/balsa-mblist.c:1765
+#: src/balsa-mblist.c:1713
 msgid "_Other..."
 msgstr "_Cits..."
 
-#: src/balsa-mblist.c:1826
+#: src/balsa-mblist.c:1774
 msgid "Choose destination folder"
 msgstr "Izvēlaties mērķa mapi"
 
-#: src/balsa-mblist.c:2138
+#: src/balsa-mblist.c:2086
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Parādītā pastkastīte: %s ar %ld vēstulēm, %ld jaunas"
@@ -1912,75 +1912,75 @@ msgstr "Temats: %s\n"
 msgid "Send message to obtain this part"
 msgstr "Sūtīt vēstuli, lai iegūtu šo daļu"
 
-#: src/balsa-message.c:1095
-msgid "No open or view action defined in GNOME MIME for this content type"
-msgstr "Neviena atvēršanas vai skata darbība nav definēta iekš GNOME MIME šim satura tipam"
+#: src/balsa-message.c:1086
+#, c-format
+msgid "Filename: %s"
+msgstr "Faila nosaukums: %s"
 
-#: src/balsa-message.c:1100
+#: src/balsa-message.c:1094
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Tips: %s (%s)"
 
-#: src/balsa-message.c:1102
+#: src/balsa-message.c:1097
 #, c-format
 msgid "Content Type: %s"
 msgstr "Satura Tips: %s"
 
 #: src/balsa-message.c:1108
-#, c-format
-msgid "Filename: %s"
-msgstr "Faila nosaukums: %s"
+msgid "No open or view action defined in GNOME MIME for this content type"
+msgstr "Neviena atvēršanas vai skata darbība nav definēta iekš GNOME MIME šim satura tipam"
 
-#: src/balsa-message.c:1116
+#: src/balsa-message.c:1114
 msgid "Save part"
 msgstr "Saglabāt daļu"
 
-#: src/balsa-message.c:1139
-#: src/balsa-message.c:1162
+#: src/balsa-message.c:1138
+#: src/balsa-message.c:1163
 #, c-format
 msgid "View part with %s"
 msgstr "Skatīt daļu ar %s"
 
-#: src/balsa-message.c:1550
+#: src/balsa-message.c:1551
 #, c-format
 msgid "Calling URL %s..."
 msgstr "Izsaucu URL %s..."
 
-#: src/balsa-message.c:1559
-#: src/balsa-message.c:2071
-#: src/balsa-message.c:2610
+#: src/balsa-message.c:1560
+#: src/balsa-message.c:2072
+#: src/balsa-message.c:2611
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Kļūda parādot %s: %s\n"
 
-#: src/balsa-message.c:1590
+#: src/balsa-message.c:1591
 #, c-format
 msgid "Error writing to temporary file %s.\n"
 "Check the directory permissions."
 msgstr "Kļūda rakstot pagaidu failu %s.\n"
 "Pārbaudiet direktorijas atļaujas."
 
-#: src/balsa-message.c:1598
+#: src/balsa-message.c:1599
 #, c-format
 msgid "Cannot open temporary file %s."
 msgstr "Nevareju atvērt pagaidu failu %s."
 
-#: src/balsa-message.c:1874
+#: src/balsa-message.c:1875
 #, c-format
 msgid "Open with %s"
 msgstr "Atvērt ar %s"
 
-#: src/balsa-message.c:2012
+#: src/balsa-message.c:2013
 msgid "Save..."
 msgstr "Saglabāt..."
 
-#: src/balsa-message.c:2152
-#: src/balsa-message.c:2197
+#: src/balsa-message.c:2153
+#: src/balsa-message.c:2198
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "nevarēju izveidot pagaidu failu %s"
 
-#: src/balsa-message.c:2895
+#: src/balsa-message.c:2896
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -1991,7 +1991,7 @@ msgstr ""
 "lai tiktu atgriezts Vēstules Rīcības Paziņojumu(MDN) uz `%s'.\n"
 "Vai vēlāties sūtīt šo paziņojumu?"
 
-#: src/balsa-message.c:2902
+#: src/balsa-message.c:2903
 msgid "reply to MDN?"
 msgstr "atbildēt uz MDN?"
 
@@ -2124,19 +2124,19 @@ msgid "C_lear"
 msgstr "A_ttīrīt"
 
 #: src/filter-edit-callbacks.c:992
-#: src/main-window.c:2701
+#: src/main-window.c:2692
 msgid "_Body"
 msgstr "_Rumpis"
 
 #. To:
 #: src/filter-edit-callbacks.c:999
-#: src/main-window.c:2702
+#: src/main-window.c:2693
 #: src/sendmsg-window.c:1820
 msgid "_To:"
 msgstr "_Kam:"
 
 #: src/filter-edit-callbacks.c:1006
-#: src/main-window.c:2703
+#: src/main-window.c:2694
 msgid "_From:"
 msgstr "_No:"
 
@@ -2146,7 +2146,7 @@ msgid "_Subject"
 msgstr "_Temats"
 
 #: src/filter-edit-callbacks.c:1021
-#: src/main-window.c:2705
+#: src/main-window.c:2696
 msgid "_Cc:"
 msgstr "_Cc:"
 
@@ -2361,7 +2361,7 @@ msgstr "Attālināta IMAP mape"
 
 #: src/folder-conf.c:266
 #: src/folder-conf.c:705
-#: src/mailbox-conf.c:480
+#: src/mailbox-conf.c:489
 msgid "_Update"
 msgstr "_Atjaunināt"
 
@@ -2381,14 +2381,14 @@ msgstr "Aprakstošais _Nosaukums:"
 
 #. pop server
 #: src/folder-conf.c:294
-#: src/mailbox-conf.c:939
-#: src/mailbox-conf.c:1027
+#: src/mailbox-conf.c:956
+#: src/mailbox-conf.c:1051
 msgid "_Server:"
 msgstr "_Serveris:"
 
 #. username
 #: src/folder-conf.c:300
-#: src/mailbox-conf.c:946
+#: src/mailbox-conf.c:963
 msgid "Use_r name:"
 msgstr "Lietotāj_a vārds:"
 
@@ -2421,7 +2421,7 @@ msgid "Select parent folder"
 msgstr "Izvēlieties senča mapi"
 
 #: src/folder-conf.c:530
-#: src/mailbox-conf.c:403
+#: src/mailbox-conf.c:412
 #: src/sendmsg-window.c:849
 msgid "Select Identity"
 msgstr "Izvēlieties Identitāti"
@@ -2486,13 +2486,13 @@ msgid "_Browse..."
 msgstr "_Lūkoties..."
 
 #: src/folder-conf.c:751
-#: src/mailbox-conf.c:907
+#: src/mailbox-conf.c:924
 msgid "Identity:"
 msgstr "Iden_titāte:"
 
 #: src/folder-conf.c:757
-#: src/mailbox-conf.c:912
-#: src/mailbox-conf.c:1086
+#: src/mailbox-conf.c:929
+#: src/mailbox-conf.c:1110
 msgid "C_hange..."
 msgstr "_Mainīt..."
 
@@ -2527,11 +2527,11 @@ msgstr "KĻŪDA: "
 msgid "FATAL: "
 msgstr "FATĀLS:"
 
-#: src/mailbox-conf.c:205
+#: src/mailbox-conf.c:214
 msgid "No mailbox selected."
 msgstr "Neviena pastkastīte nav izvēlēta."
 
-#: src/mailbox-conf.c:233
+#: src/mailbox-conf.c:242
 #, c-format
 msgid ""
 "Mailbox \"%s\" is used by balsa and I cannot remove it.\n"
@@ -2542,7 +2542,7 @@ msgstr ""
 "Ja patiesi vēlaties to izņemt, piešķiriet tās funkcijas\n"
 "kādai citai pastkastītei."
 
-#: src/mailbox-conf.c:243
+#: src/mailbox-conf.c:252
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.  You may also delete the disk file or files associated with this mailbox.\n"
@@ -2553,15 +2553,15 @@ msgstr ""
 "Ja jūs neizņemsiet failu no diska, jūs varēsiet \"Pievienot Pastkastīti\", lai no jauna piekļūtu pastkastītei.\n"
 "Ko jūs vēlētos darīt?"
 
-#: src/mailbox-conf.c:255
+#: src/mailbox-conf.c:264
 msgid "Remove from _list"
 msgstr "Izņemt no _saraksta"
 
-#: src/mailbox-conf.c:256
+#: src/mailbox-conf.c:265
 msgid "Remove from list and _disk"
 msgstr "Izņemt no saraksta un _diska"
 
-#: src/mailbox-conf.c:264
+#: src/mailbox-conf.c:273
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" and all its messages from your IMAP server.  If %s has subfolders, it will still appear as a node in the folder tree.\n"
@@ -2572,11 +2572,11 @@ msgstr ""
 "Jūs varat vēlāk lietot \"Jauna IMAP apakšmape\", lai pievienotu pastkastīt ar šādu vārdu.\n"
 "Ko jūs vēlētos darīt?"
 
-#: src/mailbox-conf.c:277
+#: src/mailbox-conf.c:286
 msgid "_Remove from server"
 msgstr "_Izņemt no servera"
 
-#: src/mailbox-conf.c:284
+#: src/mailbox-conf.c:293
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
@@ -2587,24 +2587,24 @@ msgstr ""
 "Jūs vēlāk variet lietot \"Pievienot Pastkastīti\", lai pievienotu šo mapi atkal.\n"
 "Ko jūs vēlētos darīt?"
 
-#: src/mailbox-conf.c:293
+#: src/mailbox-conf.c:302
 msgid "_Remove from list"
 msgstr "_Izņemt no saraksta"
 
-#: src/mailbox-conf.c:344
+#: src/mailbox-conf.c:353
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Aaaaa! pastkastīte nav atrasta  balsa_app.mailbox mezglos?\n"
 
-#: src/mailbox-conf.c:431
+#: src/mailbox-conf.c:440
 msgid "Mailbox Configurator"
 msgstr "Pastkastītes Konfigurātors"
 
-#: src/mailbox-conf.c:632
+#: src/mailbox-conf.c:645
 #, c-format
 msgid "%s on %s"
 msgstr "%s uz %s"
 
-#: src/mailbox-conf.c:744
+#: src/mailbox-conf.c:761
 #, c-format
 msgid "Rename of %s to %s failed:\n"
 "%s"
@@ -2612,65 +2612,69 @@ msgstr "Pārsaukšana %s par %s neizdevās:\n"
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:876
-#: src/mailbox-conf.c:932
-#: src/mailbox-conf.c:1021
+#: src/mailbox-conf.c:893
+#: src/mailbox-conf.c:949
+#: src/mailbox-conf.c:1045
 msgid "Mailbox _Name:"
 msgstr "Pastkastītes _Nosaukums:"
 
 #. path to file
-#: src/mailbox-conf.c:884
+#: src/mailbox-conf.c:901
 msgid "Mailbox _Path:"
 msgstr "Pastkastītes _Ceļš:"
 
-#: src/mailbox-conf.c:886
+#: src/mailbox-conf.c:903
 msgid "Mailbox Path"
 msgstr "Pastkastītes Ceļš"
 
 #. password field
-#: src/mailbox-conf.c:952
-#: src/mailbox-conf.c:1048
+#: src/mailbox-conf.c:969
+#: src/mailbox-conf.c:1072
 msgid "Pass_word:"
 msgstr "Pa_role"
 
-#: src/mailbox-conf.c:959
+#: src/mailbox-conf.c:976
 msgid "Use _APOP Authentication"
 msgstr "Lietot _APOP Autentifikāciju"
 
-#: src/mailbox-conf.c:965
+#: src/mailbox-conf.c:982
 msgid "_Delete messages from server after download"
 msgstr "_Dzēst vēstules no servera pēc lejuplādes"
 
-#: src/mailbox-conf.c:970
+#: src/mailbox-conf.c:987
 msgid "_Filter messages through procmail"
 msgstr "_Filtrēt vēstules caur procmail"
 
-#: src/mailbox-conf.c:975
+#: src/mailbox-conf.c:991
+msgid "Fi_lter Command:"
+msgstr "Fi_ltra Komanda:"
+
+#: src/mailbox-conf.c:999
 msgid "_Enable check for new mail"
 msgstr "_Aktivizēt jauna pasta pārbaudi"
 
-#: src/mailbox-conf.c:985
+#: src/mailbox-conf.c:1009
 msgid "Use SS_L (pop3s)"
 msgstr "Lietot SS_L (pop3)"
 
 #. username
-#: src/mailbox-conf.c:1034
+#: src/mailbox-conf.c:1058
 msgid "_Username:"
 msgstr "_Lietotājvārds:"
 
-#: src/mailbox-conf.c:1042
+#: src/mailbox-conf.c:1066
 msgid "_Remember Password"
 msgstr "_Atcerēties Paroli"
 
-#: src/mailbox-conf.c:1053
+#: src/mailbox-conf.c:1077
 msgid "F_older Path:"
 msgstr "_Mapes Ceļš:"
 
-#: src/mailbox-conf.c:1076
+#: src/mailbox-conf.c:1100
 msgid "Use SS_L (imaps)"
 msgstr "Lietot SS_L (imaps)"
 
-#: src/mailbox-conf.c:1081
+#: src/mailbox-conf.c:1105
 msgid "_Identity:"
 msgstr "_Identitāte:"
 
@@ -3231,69 +3235,69 @@ msgstr ""
 msgid "Checking Mail..."
 msgstr "Pārbaudu Pastu..."
 
-#: src/main-window.c:2095
+#: src/main-window.c:2086
 msgid "Finished Checking."
 msgstr "Pārbaude Pabeigta."
 
-#: src/main-window.c:2165
+#: src/main-window.c:2156
 #, c-format
 msgid "Sending error: %s"
 msgstr "Sūtīšanas kļūda: %s"
 
-#: src/main-window.c:2260
+#: src/main-window.c:2251
 msgid "Balsa: New mail"
 msgstr "Balsa: Jauns pasts"
 
-#: src/main-window.c:2270
+#: src/main-window.c:2261
 #, c-format
 msgid "You have received %d new messages."
 msgstr "Jūs esat saņēmis %d jaunas vēstules."
 
-#: src/main-window.c:2271
+#: src/main-window.c:2262
 msgid "You have received 1 new message."
 msgstr "Jūs esat saņēmis 1 jaunu vēstuli."
 
-#: src/main-window.c:2661
+#: src/main-window.c:2652
 msgid "Search mailbox"
 msgstr "Meklēt pastkastīti"
 
-#: src/main-window.c:2674
+#: src/main-window.c:2665
 msgid "_Reverse search"
 msgstr "_Apgriezt meklēšanu"
 
-#: src/main-window.c:2677
+#: src/main-window.c:2668
 msgid "_Search for:"
 msgstr "_Meklēt:"
 
-#: src/main-window.c:2690
+#: src/main-window.c:2681
 msgid "In:"
 msgstr "Iekš:"
 
-#: src/main-window.c:2704
+#: src/main-window.c:2695
 msgid "S_ubject"
 msgstr "T_emats"
 
-#: src/main-window.c:2819
+#: src/main-window.c:2810
 msgid "You can apply filters only on mailbox\n"
 msgstr "Jūs varat pielietot filtrus tikai pastkastītēm\n"
 
-#: src/main-window.c:2854
-#: src/main-window.c:2873
+#: src/main-window.c:2845
+#: src/main-window.c:2864
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Izdarīšana pastkastītē %s neizdevās."
 
-#: src/main-window.c:3066
+#: src/main-window.c:3057
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (tikai lasīt)"
 
-#: src/main-window.c:3068
+#: src/main-window.c:3059
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3159
+#: src/main-window.c:3150
 msgid "Cannot access the message's body\n"
 msgstr "Nevaru piekļūt vēstules rumpim\n"
 
@@ -4549,22 +4553,22 @@ msgid "The message cannot be encoded in charset %s.\n"
 msgstr "Vēstule nevar tikt kodēta rakstzīmjkopā %s.\n"
 "Lūdzu izvēlaties valodu šai vēstulei."
 
-#: src/sendmsg-window.c:3924
+#: src/sendmsg-window.c:3925
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Atbildēt uz %s: %s"
 
-#: src/sendmsg-window.c:3929
+#: src/sendmsg-window.c:3930
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Pārsūtīt vēstuli uz %s: %s"
 
-#: src/sendmsg-window.c:3933
+#: src/sendmsg-window.c:3934
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Turpināt vēstuli uz  %s %s"
 
-#: src/sendmsg-window.c:3937
+#: src/sendmsg-window.c:3938
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Jauna vēstule uz %s: %s"

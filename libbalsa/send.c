@@ -29,32 +29,37 @@
 #include "mailbackend.h"
 #include "send.h"
 
+BODY *
+add_mutt_body_plain (void)
+{
+  BODY *body;
+  gchar buffer[PATH_MAX];
+
+  body = mutt_new_body ();
+
+  body->type = TYPETEXT;
+  body->subtype = g_strdup ("plain");
+  body->unlink = 1;
+  body->use_disp = 0;
+
+  mutt_mktemp (buffer);
+  body->filename = g_strdup (buffer);
+
+  return body;
+}
+
 gboolean
 balsa_send_message (Message * message, gchar * smtp_server, glong debug)
 {
-  FILE *tempfp = NULL;
   HEADER *msg;
-  gchar *text;
-  gchar buffer[PATH_MAX];
+  BODY **cbody;
   gchar *tmp;
   GList *list;
-  Body *body;
 
   msg = mutt_new_header ();
 
   if (!msg->env)
     msg->env = mutt_new_envelope ();
-
-  msg->content = mutt_new_body ();
-
-  msg->content->type = TYPETEXT;
-  msg->content->subtype = safe_strdup ("plain");
-  msg->content->unlink = 1;
-  msg->content->use_disp = 0;
-
-  mutt_mktemp (buffer);
-  msg->content->filename = g_strdup (buffer);
-  tempfp = safe_fopen (buffer, "w+");
 
   msg->env->userhdrs = mutt_new_list ();
   {
@@ -87,18 +92,31 @@ balsa_send_message (Message * message, gchar * smtp_server, glong debug)
   msg->env->cc = rfc822_parse_adrlist (msg->env->cc, make_string_from_list (message->cc_list));
   msg->env->bcc = rfc822_parse_adrlist (msg->env->bcc, make_string_from_list (message->bcc_list));
 
-  text = ((Body *) (g_list_first (message->body_list)->data))->buffer;
-  fputs (text, tempfp);
-  fclose (tempfp);
-  tempfp = NULL;
-
   list = message->body_list;
+  cbody = &msg->content;
+
   while (list)
     {
+      FILE *tempfp = NULL;
+      Body *body;
+
       body = list->data;
+
       if (body->filename)
-	msg->content->next = mutt_make_file_attach (body->filename);
+	*cbody = mutt_make_file_attach (body->filename);
+
+      else if (body->buffer)
+	{
+	  *cbody = add_mutt_body_plain ();
+	  tempfp = safe_fopen ((*cbody)->filename, "w+");
+	  fputs (body->buffer, tempfp);
+	  fclose (tempfp);
+	  tempfp = NULL;
+	}
+
       list = list->next;
+      if (*cbody)
+	*cbody = (*cbody)->next;
     }
 
   mutt_update_encoding (msg->content);
@@ -119,8 +137,6 @@ balsa_send_message (Message * message, gchar * smtp_server, glong debug)
     default:
       break;
     }
-
-  unlink (msg->content->filename);
 
   mutt_free_header (&msg);
 

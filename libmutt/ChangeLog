@@ -1,3 +1,8 @@
+2001-10-22  Carlos Morgado  <chbm@chbm.nu>
+
+	* imap/imap_private.h: remove sleep define (unused, causing
+	problems)
+
 2001-10-16  Carlos Morgado  <chbm@chbm.nu>
 
 	* mutt_ssl.c: patch from Jeremy Katz <katzj@redhat.com> 

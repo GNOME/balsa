@@ -59,7 +59,7 @@ static void libbalsa_address_entry_draw(GtkWidget * widget,
  * Other function prototypes.
  */
 static void libbalsa_inputData_free(LibBalsaAddressEntry * address_entry);
-static emailData *libbalsa_emailData_new(gchar *str);
+static emailData *libbalsa_emailData_new(const gchar *str, gint n);
 static void libbalsa_emailData_set_user(emailData * addy, gchar * str);
 static void libbalsa_emailData_free(emailData * addy);
 static gint libbalsa_address_entry_button_press(GtkWidget *,
@@ -339,12 +339,12 @@ libbalsa_force_no_match(emailData *addy) {
  *     A new emailData structure.
  *************************************************************/
 static emailData *
-libbalsa_emailData_new(gchar * str)
+libbalsa_emailData_new(const gchar * str, gint n)
 {
     emailData *tmp;
 
     tmp = g_malloc(sizeof(emailData));
-    tmp->user = g_strdup(str);
+    tmp->user = g_strndup(str, n);
     tmp->match = NULL;
     tmp->cursor = -1;
     tmp->tabs = 0;
@@ -408,7 +408,7 @@ libbalsa_inputData_free(LibBalsaAddressEntry * address_entry)
 {
     GList *list;
 
-    if (address_entry == NULL)
+    if (!address_entry)
         return;
 
     list = g_list_first(address_entry->active);
@@ -456,7 +456,8 @@ libbalsa_is_an_email(gchar * str)
  *     Modifies the structure.
  *************************************************************/
 static void
-libbalsa_alias_accept_match(emailData *addy) {
+libbalsa_alias_accept_match(emailData *addy)
+{
     g_assert(addy->match != NULL);
     libbalsa_emailData_set_user(addy, addy->match);
     addy->match = NULL;
@@ -482,32 +483,25 @@ static GList *
 libbalsa_strsplit(const gchar *str, gchar delimiter)
 {
     GList *glist;
-    gchar *data;
     const gchar *old, *current;
-    gint i, previous;
     gboolean quoted;
 
-    g_return_val_if_fail(str != NULL, NULL);
+    if (!str) return NULL;
 
     quoted = FALSE;
     glist = NULL;
-    previous = 0;
-    old = current = str;
-    for (i = 0; str[i]; i++) {
-	if (str[i] == '"') quoted = !quoted;
-	if ( (!quoted) && (str[i] == delimiter) ) {
-	    data = g_strndup(old, i - previous);
-	    glist = g_list_append(glist, data);
-	    previous = i + 1;
-	    old = current;
-	    old++;
+    old = str;
+    for (current=str;*current;current++) {
+	if (*current == '"') quoted = !quoted;
+	else if ( (!quoted) && (*current == delimiter) ) {
+            glist =
+                g_list_append(glist,
+                              libbalsa_emailData_new(old, current - old));
+	    old=current+1;
 	}
-	current++;
     }
-    if (str) {
-	data = g_strndup(old, i - previous);
-	glist = g_list_append(glist, data);
-    }
+    glist =
+        g_list_append(glist, libbalsa_emailData_new(old, current - old));
     return glist;
 }
 
@@ -598,9 +592,8 @@ libbalsa_move_backward_word(LibBalsaAddressEntry *address_entry)
 static void
 libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
 {
-    gint cursor = 0, size = 0, prev = 0;
+    gint cursor, size = 0, prev;
     gchar *typed = NULL;
-    GList *el, *current;
     GList *list = NULL;
     emailData *addy;
     size_t tmp;
@@ -618,61 +611,36 @@ libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
      */
     cursor = (gint) gtk_editable_get_position(GTK_EDITABLE(address_entry));
     typed = gtk_editable_get_chars(GTK_EDITABLE(address_entry), 0, -1);
-    if (typed == NULL)
+    if (!typed)
 	typed = g_strdup("");
 
     /*
-     * Split the input string by comma, and store the result in
-     * address_entry->list.
+     * Split the input string by comma.
      * str contains a list of e-mail addresses seperated by ','.
      *
-     * FIXME: Breaks for '"Doe, John" <john@doe.com>'
-     */
-    el = libbalsa_strsplit(typed, ',');
-    g_free(typed);
-    /*
-     * Store it all in a glist.
-     */
-    if (el != NULL) {
-	for (current = el;
-	     current != NULL;
-	     current = g_list_next(current)) {
-	    addy = libbalsa_emailData_new((gchar *)current->data);
-            address_entry->active =
-                g_list_append(address_entry->active, addy);
-	}
-	g_list_foreach(el, (GFunc)g_free, NULL);
-        g_list_free(el);
-    } else {
-       addy = libbalsa_emailData_new("");
-       address_entry->active = g_list_append(address_entry->active, addy);
-    }
-
-    /*
      * Search for the currently active list member.
      * We have to match the cursor in GtkEntry to the list.
      */
-    g_assert(address_entry->active != NULL);
-    size = prev = 0;
-    for (list = g_list_first(address_entry->active);
-	 list != NULL;
-	 list = g_list_next(list)) {
-	if (cursor >= size) {
-	    prev = size;
-	    address_entry->active = list;
-	}
-	addy = (emailData *)list->data;
-	size = size + strlen(addy->user) + 1;
+    for (list = libbalsa_strsplit(typed, ','); list;
+         list = g_list_next(list)) {
+	prev = size;
+	addy = list->data;
+	size += strlen(addy->user) + 1;
 	addy->user = g_strchug(addy->user);
-    }
 
-    addy = (emailData *)address_entry->active->data;
-    addy->cursor = cursor - prev;
-    if (g_list_previous(address_entry->active))
-	addy->cursor = addy->cursor - 1; /* Compensate for the ',' */
-    if (addy->cursor < 0) addy->cursor = 0;
-    if (addy->cursor > (tmp = strlen(addy->user)))
-        addy->cursor = tmp;
+        if (!address_entry->active && (cursor < size || !g_list_next(list))) {
+            /* found the cursor, or hit the last addy */
+            address_entry->active = list;
+            addy->cursor = cursor - prev;
+            if (g_list_previous(address_entry->active))
+                /* Compensate for the ',' */
+                addy->cursor--;
+            if (addy->cursor < 0)
+                addy->cursor = 0;
+            if (addy->cursor > (tmp = strlen(addy->user)))
+                addy->cursor = tmp;
+        }
+    }
 }
 
 /*************************************************************
@@ -725,7 +693,7 @@ libbalsa_delete_forward_word(LibBalsaAddressEntry *address_entry)
      */
     if (addy->user[addy->cursor] == '\0') {
 	list = g_list_next(address_entry->active);
-	if (list != NULL) {
+	if (list) {
 	    libbalsa_emailData_free(list->data);
 	    libbalsa_delete_link(list, list);
 	}
@@ -742,7 +710,7 @@ libbalsa_delete_forward_word(LibBalsaAddressEntry *address_entry)
 	libbalsa_emailData_free(list->data);
         address_entry->active =
             libbalsa_delete_link(address_entry->active, list);
-	if (address_entry->active != NULL) {
+	if (address_entry->active) {
 	    addy = address_entry->active->data;
 	    g_assert(addy != NULL);
 	    addy->cursor = 0;
@@ -776,7 +744,7 @@ libbalsa_delete_backward_word(LibBalsaAddressEntry *address_entry)
     g_return_if_fail(address_entry != NULL);
     g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
 
-    if (address_entry->active == NULL)
+    if (!address_entry->active)
 	return;
 
     addy = address_entry->active->data;
@@ -784,9 +752,9 @@ libbalsa_delete_backward_word(LibBalsaAddressEntry *address_entry)
     /*
      * Lets see if the user is at the beginning of an e-mail entry.
      */
-    if (addy->cursor == 0) {
+    if (!addy->cursor) {
 	list = g_list_previous(address_entry->active);
-	if (list != NULL) {
+	if (list) {
 	    libbalsa_emailData_free(list->data);
 	    libbalsa_delete_link(list, list);
 	}
@@ -796,12 +764,12 @@ libbalsa_delete_backward_word(LibBalsaAddressEntry *address_entry)
      */
     } else {
 	list = address_entry->active;
-	if (g_list_next(list) == NULL)
+	if (!g_list_next(list))
 	    address_entry->active = g_list_previous(list);
 	libbalsa_emailData_free(list->data);
         address_entry->active =
             libbalsa_delete_link(address_entry->active, list);
-	if (address_entry->active != NULL) {
+	if (address_entry->active) {
 	    addy = address_entry->active->data;
 	    g_assert(addy != NULL);
 	    addy->cursor = strlen(addy->user);
@@ -846,7 +814,7 @@ libbalsa_delete_to_line_end(LibBalsaAddressEntry *address_entry)
      * Free all the following data.
      */
     for (list = g_list_next(address_entry->active);
-	 list != NULL;
+	 list;
 	 list = g_list_next(address_entry->active)) {
 	 /*
 	  * Concatenate the two e-mails.
@@ -1014,18 +982,18 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
     /*
      * Lets see if the user is at the beginning of an e-mail entry.
      */
-    if (addy->cursor == 0) {
+    if (!addy->cursor) {
        list = g_list_previous(address_entry->active);
-       if (list != NULL) {
+       if (list) {
 	   /*
 	    * Concatenate the two e-mails.
 	    */
 	   extra = list->data;
 	   extra->cursor = strlen(extra->user);
-            libbalsa_emailData_set_user(addy,
-                                        g_strconcat(extra->user,
-                                                    addy->user,
-                                                    NULL));
+	   libbalsa_emailData_set_user(addy,
+				       g_strconcat(extra->user,
+						   addy->user,
+						   NULL));
 	   
 	   /*
 	    * Free a whole bunch of RAM.
@@ -1042,11 +1010,11 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
         gchar *p;
         for (p = addy->user + addy->cursor - 1; *p; ++p)
             *p = *(p + 1);
-       addy->cursor--;
-       if (*addy->user == '\0')
-	   libbalsa_force_no_match(addy);
-       else if (address_entry->find_match)
-	   (*address_entry->find_match) (addy, TRUE);
+	addy->cursor--;
+	if (*addy->user == '\0')
+	    libbalsa_force_no_match(addy);
+	else if (address_entry->find_match)
+	    (*address_entry->find_match) (addy, TRUE);
     }
 }
 
@@ -1096,7 +1064,7 @@ libbalsa_delete_forward_character(LibBalsaAddressEntry *address_entry)
         }
     
 	list = g_list_next(address_entry->active);
-	if (list != NULL) {
+	if (list) {
 	    /*
 	     * Concatenate the two e-mails.
 	     */
@@ -1140,13 +1108,13 @@ libbalsa_accept_match(LibBalsaAddressEntry *address_entry)
     g_return_val_if_fail(address_entry != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry), FALSE);
 	    
-    if (address_entry->active == NULL)
+    if (!address_entry->active)
 	return TRUE;
 
     g_assert(address_entry->active->data != NULL);
 
     addy = address_entry->active->data;
-    if (addy->match != NULL) {
+    if (addy->match) {
 	libbalsa_alias_accept_match(addy);
 	return TRUE;
     }
@@ -1184,7 +1152,7 @@ libbalsa_keystroke_enter(LibBalsaAddressEntry *address_entry)
      * Else no match was found.  Check if there was a default
      * domain to add to e-mail addresses.
      */
-    if (address_entry->domain == NULL || *address_entry->domain == '\0')
+    if (!address_entry->domain || *address_entry->domain == '\0')
 	return;
 
     /*
@@ -1246,7 +1214,7 @@ libbalsa_keystroke_home(LibBalsaAddressEntry *address_entry)
     g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
 
     addy = address_entry->active->data;
-    if (addy->match != NULL)
+    if (addy->match)
 	libbalsa_alias_accept_match(addy);
     address_entry->active = g_list_first(address_entry->active);
     addy = address_entry->active->data;
@@ -1330,7 +1298,7 @@ libbalsa_keystroke_end(LibBalsaAddressEntry *address_entry) {
     g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
 	    
     addy = address_entry->active->data;
-    if (addy->match != NULL)
+    if (addy->match)
 	libbalsa_alias_accept_match(addy);
     address_entry->active = g_list_last(address_entry->active);
     addy = address_entry->active->data;
@@ -1378,7 +1346,7 @@ libbalsa_keystroke_comma(LibBalsaAddressEntry *address_entry)
     addy = address_entry->active->data;
     left = addy->user;
     right = NULL;
-    if (addy->match != NULL) {
+    if (addy->match) {
 	libbalsa_alias_accept_match(addy);
     } else {
 	if ((addy->cursor > 0) && (addy->user[addy->cursor] != '\0')) {
@@ -1394,11 +1362,11 @@ libbalsa_keystroke_comma(LibBalsaAddressEntry *address_entry)
     /*
      * Now we add a new entry.
      */
-    if (right != NULL) {
-        extra = libbalsa_emailData_new(right);
+    if (right) {
+        extra = libbalsa_emailData_new(right, strlen(right));
         libbalsa_emailData_set_user(addy, g_strndup(left, addy->cursor));
     } else
-        extra = libbalsa_emailData_new("");
+        extra = libbalsa_emailData_new("", 0);
     g_list_insert(address_entry->active, extra, 1);
 
     /*
@@ -1410,7 +1378,7 @@ libbalsa_keystroke_comma(LibBalsaAddressEntry *address_entry)
     /*
      * And we add the default domain to the original entry.
      */
-    if (address_entry->domain == NULL ||
+    if (!address_entry->domain ||
 	*address_entry->domain == '\0' ||
 	libbalsa_is_an_email(addy->user)) return;
 
@@ -1619,6 +1587,7 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
     GtkEditable *editable;
     GtkEntry *entry;
     LibBalsaAddressEntry *address_entry;
+    GList * lst;
 
     gboolean return_val;
     guint initial_pos;
@@ -1637,7 +1606,7 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
     /*
      * Skip it if its not editable...
      */
-    if (editable->editable == FALSE) return FALSE;
+    if (!editable->editable) return FALSE;
 
     /*
      * Setup variables, and see if we need to select text.
@@ -1878,7 +1847,7 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
 	 */
 	addy = (emailData *)list->data;
 	g_assert(addy != NULL);
-	if (addy->match != NULL) {
+	if (addy->match) {
 	    out = g_strconcat(addy->user, " (", addy->match, ")", NULL);
 	} else {
 	    out = g_strdup(addy->user);
@@ -1887,7 +1856,7 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
 	 * Copy the string, adding a delimiter if need be.
 	 */
 	show = g_string_append(show, out);
-	if (g_list_next(list) != NULL)
+	if (g_list_next(list))
 	    show = g_string_append(show, ", ");
 
 	/*
@@ -1896,7 +1865,7 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
 	if (!found) {
 	    if (list != address_entry->active) {
 		cursor += strlen(out);
-	    	if (g_list_next(list) != NULL) cursor += 2;
+	    	if (g_list_next(list)) cursor += 2;
 	    } else {
 		found = TRUE;
 		cursor += addy->cursor;

@@ -1,3 +1,7 @@
+2002-02-15  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/address-entry.c: cleaning up the remaining corners.
+
 2002-02-11  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/address-entry.[hc]: next major cleanup.

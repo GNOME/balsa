@@ -360,16 +360,66 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
     return libbalsa_message_body_save_fd(body, fd);
 }
 
-gboolean
-libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
+static GMimeStream *
+libbalsa_message_body_assure_stream_filter(GMimeStream * stream)
 {
-    GMimeStream *stream, *filter_stream;
-    gchar *mime_type = NULL;
-    const char *charset;
-    GMimeFilter *filter;
-    gboolean retval = TRUE;
+    GMimeStream *filtered_stream;
 
-    stream = g_mime_stream_fs_new(fd);
+    if (GMIME_IS_STREAM_FILTER(stream))
+        return stream;
+
+    filtered_stream = g_mime_stream_filter_new_with_stream(stream);
+    g_object_unref(stream);
+
+    return filtered_stream;
+}
+
+GMimeStream *
+libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
+{
+    GMimeStream *stream;
+    GMimeFilter *filter;
+    gchar *mime_type = NULL;
+    const gchar *charset;
+
+    if (libbalsa_mailbox_get_message_part(body->message, body)) {
+        GMimeDataWrapper *wrapper;
+
+        wrapper =
+            g_mime_part_get_content_object(GMIME_PART(body->mime_part));
+        stream = g_mime_data_wrapper_get_stream(wrapper);
+
+        filter = NULL;
+        switch (g_mime_data_wrapper_get_encoding(wrapper)) {
+        case GMIME_PART_ENCODING_BASE64:
+            filter =
+                g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_BASE64_DEC);
+            break;
+        case GMIME_PART_ENCODING_QUOTEDPRINTABLE:
+            filter =
+                g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_QP_DEC);
+            break;
+        case GMIME_PART_ENCODING_UUENCODE:
+            filter =
+                g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_UU_DEC);
+            break;
+        default:
+            break;
+        }
+        g_object_unref(wrapper);
+
+        if (filter) {
+	    stream = libbalsa_message_body_assure_stream_filter(stream);
+            g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream), filter);
+            g_object_unref(filter);
+        }
+    } else if (body->mime_part) {
+        /* Not a GMimePart... */
+        stream = g_mime_stream_mem_new();
+        g_mime_object_write_to_stream(body->mime_part, stream);
+    } else
+        return NULL;
+
     /* convert text bodies but HTML - gtkhtml does conversion on its own. */
     if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_TEXT
 	&& strcmp(mime_type = libbalsa_message_body_get_mime_type(body),
@@ -377,30 +427,95 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
 	&& (charset = libbalsa_message_body_charset(body))
 	&& g_ascii_strcasecmp(charset, "unknown-8bit") != 0
 	&& (filter = g_mime_filter_charset_new(charset, "UTF-8")) != NULL) {
-	filter_stream = g_mime_stream_filter_new_with_stream(stream);
-	g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
+	stream = libbalsa_message_body_assure_stream_filter(stream);
+	g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream), filter);
 	g_object_unref(filter);
-	g_object_unref(stream);
-	stream = filter_stream;
     }
     g_free(mime_type);
 
-    if (libbalsa_mailbox_get_message_part(body->message, body)) {
-	GMimeDataWrapper *wrapper;
+    g_mime_stream_reset(stream);
+    return stream;
+}
 
-	wrapper = g_mime_part_get_content_object(GMIME_PART(body->mime_part));
-	if (g_mime_data_wrapper_write_to_stream(wrapper, stream) == -1)
-            retval = FALSE;
-	g_object_unref(wrapper);
-    } else {
-	/* Not a GMimePart... */
-	if (body->mime_part != NULL
-	    && g_mime_object_write_to_stream(body->mime_part, stream) == -1)
-	    retval = FALSE;
+gssize
+libbalsa_message_body_get_content(LibBalsaMessageBody * body, gchar ** buf)
+{
+    GMimeStream *stream, *stream_mem;
+    GByteArray *array;
+    gssize len;
+
+    *buf = NULL;
+    stream = libbalsa_message_body_get_stream(body);
+    if (!stream)
+        return -1;
+
+    array = g_byte_array_new();
+    stream_mem = g_mime_stream_mem_new_with_byte_array(array);
+    g_mime_stream_mem_set_owner(GMIME_STREAM_MEM(stream_mem), FALSE);
+    len = g_mime_stream_write_to_stream(stream, stream_mem);
+    g_object_unref(stream_mem);
+    g_object_unref(stream);
+
+    if (len >= 0) {
+        len = array->len;
+	/* NULL-terminate, in case it is used as a string. */
+	g_byte_array_append(array, "", 1);
+        *buf = array->data;
+        g_byte_array_free(array, FALSE);
+    } else
+        g_byte_array_free(array, TRUE);
+
+    return len;
+}
+
+GdkPixbuf *
+libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
+{
+    GdkPixbufLoader *loader;
+    GMimeStream *stream;
+    gssize count;
+    gboolean ok = TRUE;
+    gchar buf[4096];
+    GdkPixbuf *pixbuf = NULL;
+
+    stream = libbalsa_message_body_get_stream(body);
+    if (!stream)
+        return pixbuf;
+
+    loader = gdk_pixbuf_loader_new();
+    while ((count = g_mime_stream_read(stream, buf, sizeof(buf))) > 0) {
+        if (!gdk_pixbuf_loader_write(loader, buf, count, err)) {
+            ok = FALSE;
+            break;
+        }
     }
-    if (retval && g_mime_stream_flush(stream) == -1)
+    g_object_unref(stream);
+
+    if (ok && !gdk_pixbuf_loader_close(loader, err))
+	ok = FALSE;
+
+    if (ok) {
+        pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
+	g_object_ref(pixbuf);
+    }
+    g_object_unref(loader);
+
+    return pixbuf;
+}
+
+gboolean
+libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
+{
+    GMimeStream *stream, *stream_fs;
+    gboolean retval = TRUE;
+
+    stream = libbalsa_message_body_get_stream(body);
+    stream_fs = g_mime_stream_fs_new(fd);
+
+    if (g_mime_stream_write_to_stream(stream, stream_fs) < 0)
 	retval = FALSE;
     g_object_unref(stream);
+    g_object_unref(stream_fs);
 
     return retval;
 }

@@ -1740,8 +1740,7 @@ mru_menu_cb(gchar * url, BalsaIndex * index)
 
     g_return_if_fail(mailbox != NULL);
 
-    if (index->selected->len > 0
-        && index->mailbox_node->mailbox != mailbox)
+    if (index->mailbox_node->mailbox != mailbox)
         balsa_index_transfer(index, index->selected, mailbox, FALSE);
 }
 
@@ -2081,7 +2080,7 @@ balsa_index_transfer(BalsaIndex *index, GArray * msgnos,
     LibBalsaMailbox *from_mailbox;
     GError *e = NULL;
 
-    if (index->selected->len == 0)
+    if (msgnos->len == 0)
         return;
 
     from_mailbox = index->mailbox_node->mailbox;
@@ -2091,7 +2090,7 @@ balsa_index_transfer(BalsaIndex *index, GArray * msgnos,
 
     if (!success) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  index->selected->len > 1 
+			  msgnos->len > 1 
 			  ? _("Failed to copy messages to mailbox \"%s\": %s")
 			  : _("Failed to copy message to mailbox \"%s\": %s"),
 			  to_mailbox->name, e ? e->message : "?");

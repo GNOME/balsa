@@ -65,6 +65,18 @@ static void libbalsa_address_book_ldap_finalize(GObject * object);
 static LibBalsaABErr libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab, 
                                                      LibBalsaAddressBookLoadFunc callback, 
                                                      gpointer closure);
+
+static LibBalsaABErr
+libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
+                                       LibBalsaAddress *address);
+static LibBalsaABErr
+libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
+                                          LibBalsaAddress *address);
+static LibBalsaABErr
+libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
+                                          LibBalsaAddress *address,
+                                          LibBalsaAddress *newval);
+
 static gboolean
 libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab);
 static void
@@ -125,6 +137,11 @@ libbalsa_address_book_ldap_class_init(LibBalsaAddressBookLdapClass * klass)
     object_class->finalize = libbalsa_address_book_ldap_finalize;
 
     address_book_class->load = libbalsa_address_book_ldap_load;
+    address_book_class->add_address = libbalsa_address_book_ldap_add_address;
+    address_book_class->remove_address = 
+        libbalsa_address_book_ldap_remove_address;
+    address_book_class->modify_address =
+        libbalsa_address_book_ldap_modify_address;
 
     address_book_class->save_config =
 	libbalsa_address_book_ldap_save_config;
@@ -409,6 +426,31 @@ create_name(gchar * first, gchar * last)
 	return g_strdup(first);
     else
 	return g_strdup_printf("%s %s", first, last);
+}
+
+static LibBalsaABErr
+libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
+                                       LibBalsaAddress *address)
+{
+    /* FIXME: implement */
+    return LBABERR_CANNOT_WRITE;
+}
+
+static LibBalsaABErr
+libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
+                                          LibBalsaAddress *address)
+{
+    /* FIXME: implement */
+    return LBABERR_CANNOT_WRITE;
+}
+
+static LibBalsaABErr
+libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
+                                           LibBalsaAddress *address,
+                                           LibBalsaAddress *newval)
+{
+    /* FIXME: implement */
+    return LBABERR_CANNOT_WRITE;
 }
 
 static void

@@ -50,8 +50,9 @@ static void store_address_weak_notify(StoreAddressInfo * info,
 static void store_address_response(GtkWidget * dialog, gint response,
                                    StoreAddressInfo *info);
 static void store_address_free(StoreAddressInfo * info);
-static void store_address_from_entries(StoreAddressInfo * info,
-                                       GtkWidget ** entries);
+static gboolean store_address_from_entries(GtkWindow *window,
+                                           StoreAddressInfo * info,
+                                           GtkWidget ** entries);
 static GtkWidget *store_address_book_frame(StoreAddressInfo * info);
 static GtkWidget *store_address_note_frame(StoreAddressInfo * info);
 static void store_address_book_menu_cb(GtkWidget * widget, 
@@ -141,8 +142,9 @@ store_address_response(GtkWidget * dialog, gint response,
         /* Save the current address. */
         gint page = gtk_notebook_get_current_page(notebook);
         GList *list = g_list_nth(info->entries_list, page);
-        store_address_from_entries(info, list->data);
-        if (response == SA_RESPONSE_SAVE)
+        gboolean successful = 
+            store_address_from_entries(GTK_WINDOW(dialog), info, list->data);
+        if (response == SA_RESPONSE_SAVE || !successful)
             /* Keep the dialog open. */
             return;
     }
@@ -197,17 +199,19 @@ store_address_dialog(StoreAddressInfo * info)
 
 /* store_address_from_entries:
  * make the actual address book entry */
-static void
-store_address_from_entries(StoreAddressInfo * info,
+static gboolean
+store_address_from_entries(GtkWindow *window, StoreAddressInfo * info,
                            GtkWidget ** entries)
 {
     LibBalsaAddress *address;
+    LibBalsaABErr rc;
     gint cnt;
+    gchar *msg;
 
     if (info->current_address_book == NULL) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
     		      _("No address book selected...."));
-        return;
+        return FALSE;
     }
 
     /* FIXME: This problem should be solved in the VCard
@@ -226,7 +230,7 @@ store_address_from_entries(StoreAddressInfo * info,
 
             gtk_widget_grab_focus(GTK_WIDGET(entries[cnt]));
 
-            return;
+            return FALSE;
         }
     }
 
@@ -255,10 +259,23 @@ store_address_from_entries(StoreAddressInfo * info,
     			     (GTK_EDITABLE(entries[EMAIL_ADDRESS]),
     			      0, -1)));
 
-    libbalsa_address_book_store_address(info->current_address_book,
-                                        address);
-
+    rc = libbalsa_address_book_add_address(info->current_address_book,
+                                           address);
+    switch(rc) {
+    case LBABERR_OK: msg = NULL; break; 
+    case LBABERR_CANNOT_WRITE: 
+        msg = _("Address could not be written to this address book."); break;
+    case LBABERR_CANNOT_CONNECT:
+        msg = _("Address book could not be accessed."); break;
+    case LBABERR_DUPLICATE:
+        msg = _("This mail address is already in this address book."); break;
+    default:
+        msg = _("Unexpected address book error. Report it."); break;
+    }
+    if(msg)
+        balsa_information_parented(window, LIBBALSA_INFORMATION_ERROR, msg);
     g_object_unref(address);
+    return msg == NULL;
 }
 
 /* store_address_book_frame:

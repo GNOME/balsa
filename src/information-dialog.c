@@ -32,12 +32,14 @@
 #include "balsa-app.h"
 #include "information-dialog.h"
 
-static void balsa_information_list(LibBalsaInformationType type,
-				   char *msg);
-static void balsa_information_dialog(LibBalsaInformationType type,
-				     char *msg);
+static void balsa_information_list(GtkWindow *parent,
+                                   LibBalsaInformationType type,
+				   const char *msg);
+static void balsa_information_dialog(GtkWindow *parent,
+                                     LibBalsaInformationType type,
+				     const char *msg);
 static void balsa_information_stderr(LibBalsaInformationType type,
-				     char *msg);
+				     const char *msg);
 
 /* Handle button clicks in the warning window */
 static void
@@ -54,17 +56,11 @@ balsa_information_list_response_cb(GtkWidget * dialog, gint response,
     }
 }
 
-void
-balsa_information(LibBalsaInformationType type, const char *fmt, ...)
+static void
+balsa_information_real(GtkWindow *parent, LibBalsaInformationType type,
+                       const char *msg)
 {
     BalsaInformationShow show;
-    gchar *msg;
-    va_list ap;
-
-    va_start(ap, fmt);
-    msg = g_strdup_vprintf(fmt, ap);
-    va_end(ap);
-
     switch (type) {
     case LIBBALSA_INFORMATION_MESSAGE:
 	show = balsa_app.information_message;
@@ -88,29 +84,55 @@ balsa_information(LibBalsaInformationType type, const char *fmt, ...)
     case BALSA_INFORMATION_SHOW_NONE:
 	break;
     case BALSA_INFORMATION_SHOW_DIALOG:
-	balsa_information_dialog(type, msg);
+	balsa_information_dialog(parent, type, msg);
 	break;
     case BALSA_INFORMATION_SHOW_LIST:
-	balsa_information_list(type, msg);
+	balsa_information_list(parent, type, msg);
 	break;
     case BALSA_INFORMATION_SHOW_STDERR:
 	balsa_information_stderr(type, msg);
 	break;
     }
 
-    g_free(msg);
-
     if (type == LIBBALSA_INFORMATION_FATAL)
 	gtk_main_quit();
+}
 
+void
+balsa_information(LibBalsaInformationType type, const char *fmt, ...)
+{
+    gchar *msg;
+    va_list ap;
 
+    va_start(ap, fmt);
+    msg = g_strdup_vprintf(fmt, ap);
+    va_end(ap);
+    balsa_information_real(GTK_WINDOW(balsa_app.main_window), type, msg);
+    g_free(msg);
+}
+
+void
+balsa_information_parented(GtkWindow *parent, LibBalsaInformationType type,
+                           const char *fmt, ...)
+{
+    gchar *msg;
+    va_list ap;
+
+    if(!parent)
+        parent = GTK_WINDOW(balsa_app.main_window);
+    va_start(ap, fmt);
+    msg = g_strdup_vprintf(fmt, ap);
+    va_end(ap);
+    balsa_information_real(parent, type, msg);
+    g_free(msg);
 }
 
 /*
  * Pops up an error dialog
  */
 static void
-balsa_information_dialog(LibBalsaInformationType type, char *msg)
+balsa_information_dialog(GtkWindow *parent, LibBalsaInformationType type,
+                         const char *msg)
 {
     GtkMessageType message_type;
     GtkWidget *messagebox;
@@ -137,7 +159,7 @@ balsa_information_dialog(LibBalsaInformationType type, char *msg)
     }
 
     messagebox =
-        gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+        gtk_message_dialog_new(GTK_WINDOW(parent),
                                GTK_DIALOG_DESTROY_WITH_PARENT,
                                message_type, GTK_BUTTONS_CLOSE, msg);
 
@@ -170,7 +192,8 @@ balsa_information_list_new(void)
  * hundreds of windows is ugly.
  */
 static void
-balsa_information_list(LibBalsaInformationType type, char *msg)
+balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
+                       const char *msg)
 {
     static GtkWidget *information_list = NULL;
     GtkTextBuffer *buffer;
@@ -182,7 +205,7 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
 
 	information_dialog =
 	    gtk_dialog_new_with_buttons(_("Information - Balsa"), 
-                                        GTK_WINDOW(balsa_app.main_window),
+                                        parent,
                                         GTK_DIALOG_DESTROY_WITH_PARENT,
                                         GTK_STOCK_CLEAR, GTK_RESPONSE_APPLY,
                                         GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
@@ -237,7 +260,7 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
 }
 
 static void 
-balsa_information_stderr(LibBalsaInformationType type, char *msg)
+balsa_information_stderr(LibBalsaInformationType type, const char *msg)
 {
     switch (type) {
     case LIBBALSA_INFORMATION_WARNING:

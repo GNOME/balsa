@@ -66,7 +66,8 @@ mutt_message(const char *fmt, ...)
     va_list va_args;
 
     va_start(va_args, fmt);
-    libbalsa_information_varg(LIBBALSA_INFORMATION_MESSAGE, fmt, va_args);
+    libbalsa_information_varg(NULL, LIBBALSA_INFORMATION_MESSAGE,
+                              fmt, va_args);
     va_end(va_args);
 }
 
@@ -465,7 +466,8 @@ libbalsa_mutt_error(const char *fmt, ...)
 
     va_start(va_args, fmt);
     if(*fmt) 
-	libbalsa_information_varg(LIBBALSA_INFORMATION_WARNING, fmt, va_args);
+	libbalsa_information_varg(NULL, LIBBALSA_INFORMATION_WARNING,
+                                  fmt, va_args);
     va_end(va_args);
 }
 /* wraper function */

@@ -26,48 +26,54 @@
 
 #include "information.h"
 
-static gboolean libbalsa_message_idle_handler(gchar * msg);
-static gboolean libbalsa_warning_idle_handler(gchar * msg);
-static gboolean libbalsa_error_idle_handler(gchar * msg);
-static gboolean libbalsa_debug_idle_handler(gchar * msg);
+struct information_data {
+    GtkWindow *parent;
+    gchar *msg;
+};
+static gboolean libbalsa_message_idle_handler(struct information_data*);
+static gboolean libbalsa_warning_idle_handler(struct information_data*);
+static gboolean libbalsa_error_idle_handler(struct information_data*);
+static gboolean libbalsa_debug_idle_handler(struct information_data*);
 
 LibBalsaInformationFunc libbalsa_real_information_func;
 
 /*
- * We are adding an idle handler - we do not need to hold the gdk lock for this.
+ * We are adding an idle handler - we do not need to hold the gdk lock
+ * for this.
  *
- * We can't just grab the GDK lock and call the real_error function since this
- * runs a dialog, which has a nested g_main loop - glib doesn't like haveing main 
- * loops active in two threads at one time. When the idle handler gets run it is 
- * from the main thread.
+ * We can't just grab the GDK lock and call the real_error function
+ * since this runs a dialog, which has a nested g_main loop - glib
+ * doesn't like haveing main loops active in two threads at one
+ * time. When the idle handler gets run it is from the main thread.
  *
  */
 void
-libbalsa_information_varg(LibBalsaInformationType type, const char *fmt,
-			  va_list ap)
+libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
+                          const char *fmt, va_list ap)
 {
-    gchar *msg;
-
+    struct information_data *data = g_new(struct information_data, 1);
     g_assert(libbalsa_real_information_func != NULL);
 
     /* We format the string here. It must be free()d in the idle
      * handler We parse the args here because by the time the idle
      * function runs we will no longer be in this stack frame. 
      */
-    msg = g_strdup_vprintf(fmt, ap);
-
+    data->parent = parent;
+    data->msg = g_strdup_vprintf(fmt, ap);
+    if(parent)
+        g_object_add_weak_pointer(G_OBJECT(parent), (gpointer) &data->parent);
     switch (type) {
     case LIBBALSA_INFORMATION_MESSAGE:
-	g_idle_add((GSourceFunc) libbalsa_message_idle_handler, msg);
+	g_idle_add((GSourceFunc) libbalsa_message_idle_handler, data);
 	break;
     case LIBBALSA_INFORMATION_WARNING:
-	g_idle_add((GSourceFunc) libbalsa_warning_idle_handler, msg);
+	g_idle_add((GSourceFunc) libbalsa_warning_idle_handler, data);
 	break;
     case LIBBALSA_INFORMATION_ERROR:
-	g_idle_add((GSourceFunc) libbalsa_error_idle_handler, msg);
+	g_idle_add((GSourceFunc) libbalsa_error_idle_handler, data);
 	break;
     case LIBBALSA_INFORMATION_DEBUG:
-	g_idle_add((GSourceFunc) libbalsa_debug_idle_handler, msg);
+	g_idle_add((GSourceFunc) libbalsa_debug_idle_handler, data);
 	break;
     default:
 	g_assert_not_reached();
@@ -75,12 +81,24 @@ libbalsa_information_varg(LibBalsaInformationType type, const char *fmt,
 }
 
 void
-libbalsa_information(LibBalsaInformationType type, const char *fmt, ...)
+libbalsa_information(LibBalsaInformationType type,
+                     const char *fmt, ...)
 {
     va_list va_args;
 
     va_start(va_args, fmt);
-    libbalsa_information_varg(type, fmt, va_args);
+    libbalsa_information_varg(NULL, type, fmt, va_args);
+    va_end(va_args);
+}
+
+void
+libbalsa_information_parented(GtkWindow *parent, LibBalsaInformationType type,
+                              const char *fmt, ...)
+{
+    va_list va_args;
+
+    va_start(va_args, fmt);
+    libbalsa_information_varg(parent, type, fmt, va_args);
     va_end(va_args);
 }
 
@@ -88,45 +106,69 @@ libbalsa_information(LibBalsaInformationType type, const char *fmt, ...)
  * These are all idle handlers, so we need to grab the GDK lock 
  */
 static gboolean
-libbalsa_message_idle_handler(gchar * msg)
+libbalsa_message_idle_handler(struct information_data *data)
 {
     gdk_threads_enter();
-    libbalsa_real_information_func(LIBBALSA_INFORMATION_MESSAGE, msg);
+    libbalsa_real_information_func(data->parent,
+                                   LIBBALSA_INFORMATION_MESSAGE,
+                                   data->msg);
     gdk_threads_leave();
 
-    g_free(msg);
+    if(data->parent)
+        g_object_remove_weak_pointer(G_OBJECT(data->parent), 
+                                     (gpointer) &data->parent);
+    g_free(data->msg);
+    g_free(data);
     return FALSE;
 }
 
 static gboolean
-libbalsa_warning_idle_handler(gchar * msg)
+libbalsa_warning_idle_handler(struct information_data *data)
 {
     gdk_threads_enter();
-    libbalsa_real_information_func(LIBBALSA_INFORMATION_WARNING, msg);
+    libbalsa_real_information_func(data->parent,
+                                   LIBBALSA_INFORMATION_WARNING,
+                                   data->msg);
     gdk_threads_leave();
 
-    g_free(msg);
+    if(data->parent)
+        g_object_remove_weak_pointer(G_OBJECT(data->parent), 
+                                     (gpointer) &data->parent);
+    g_free(data->msg);
+    g_free(data);
     return FALSE;
 }
 
 static gboolean
-libbalsa_error_idle_handler(gchar * msg)
+libbalsa_error_idle_handler(struct information_data *data)
 {
     gdk_threads_enter();
-    libbalsa_real_information_func(LIBBALSA_INFORMATION_ERROR, msg);
+    libbalsa_real_information_func(data->parent,
+                                   LIBBALSA_INFORMATION_ERROR, 
+                                   data->msg);
     gdk_threads_leave();
 
-    g_free(msg);
+    if(data->parent)
+        g_object_remove_weak_pointer(G_OBJECT(data->parent), 
+                                     (gpointer) &data->parent);
+    g_free(data->msg);
+    g_free(data);
     return FALSE;
 }
 
 static gboolean
-libbalsa_debug_idle_handler(gchar * msg)
+libbalsa_debug_idle_handler(struct information_data *data)
 {
     gdk_threads_enter();
-    libbalsa_real_information_func(LIBBALSA_INFORMATION_DEBUG, msg);
+    libbalsa_real_information_func(data->parent,
+                                   LIBBALSA_INFORMATION_DEBUG,
+                                   data->msg);
     gdk_threads_leave();
 
-    g_free(msg);
+    if(data->parent)
+        g_object_remove_weak_pointer(G_OBJECT(data->parent), 
+                                     (gpointer) &data->parent);
+    g_free(data->msg);
+    g_free(data);
     return FALSE;
 }

@@ -44,7 +44,9 @@ static void libbalsa_address_book_real_load_config(LibBalsaAddressBook *
 
 enum {
     LOAD,
-    STORE_ADDRESS,
+    ADD_ADDRESS,
+    REMOVE_ADDRESS,
+    MODIFY_ADDRESS,
     SAVE_CONFIG,
     LOAD_CONFIG,
     ALIAS_COMPLETE,
@@ -97,16 +99,36 @@ libbalsa_address_book_class_init(LibBalsaAddressBookClass * klass)
 		       libbalsa_INT__POINTER_POINTER,
                        G_TYPE_INT, 2,
 		       G_TYPE_POINTER, G_TYPE_POINTER);
-    libbalsa_address_book_signals[STORE_ADDRESS] =
-	g_signal_new("store-address",
+    libbalsa_address_book_signals[ADD_ADDRESS] =
+	g_signal_new("add-address",
 		       G_TYPE_FROM_CLASS(object_class),
 		       G_SIGNAL_RUN_LAST,
 		       G_STRUCT_OFFSET(LibBalsaAddressBookClass,
-					 store_address),
+                                       add_address),
                        NULL, NULL,
 		       libbalsa_INT__OBJECT,
                        G_TYPE_INT, 1,
 		       G_TYPE_OBJECT);
+    libbalsa_address_book_signals[REMOVE_ADDRESS] =
+	g_signal_new("remove-address",
+		       G_TYPE_FROM_CLASS(object_class),
+		       G_SIGNAL_RUN_LAST,
+		       G_STRUCT_OFFSET(LibBalsaAddressBookClass,
+                                       remove_address),
+                       NULL, NULL,
+		       libbalsa_INT__OBJECT,
+                       G_TYPE_INT, 1,
+		       G_TYPE_OBJECT);
+    libbalsa_address_book_signals[MODIFY_ADDRESS] =
+	g_signal_new("modify-address",
+		       G_TYPE_FROM_CLASS(object_class),
+		       G_SIGNAL_RUN_LAST,
+		       G_STRUCT_OFFSET(LibBalsaAddressBookClass,
+                                       modify_address),
+                       NULL, NULL,
+		       libbalsa_INT__OBJECT_OBJECT,
+                       G_TYPE_INT, 2,
+		       G_TYPE_OBJECT, G_TYPE_OBJECT);
     libbalsa_address_book_signals[SAVE_CONFIG] =
 	g_signal_new("save-config",
                        G_TYPE_FROM_CLASS(object_class),
@@ -139,7 +161,9 @@ libbalsa_address_book_class_init(LibBalsaAddressBookClass * klass)
 		       G_TYPE_POINTER, G_TYPE_POINTER);
 
     klass->load = NULL;
-    klass->store_address = NULL;
+    klass->add_address = NULL;
+    klass->remove_address = NULL;
+    klass->modify_address = NULL;
     klass->save_config = libbalsa_address_book_real_save_config;
     klass->load_config = libbalsa_address_book_real_load_config;
     klass->alias_complete = NULL;
@@ -224,19 +248,47 @@ libbalsa_address_book_load(LibBalsaAddressBook * ab,
 }
 
 LibBalsaABErr
-libbalsa_address_book_store_address(LibBalsaAddressBook * ab,
-                                    LibBalsaAddress * address)
+libbalsa_address_book_add_address(LibBalsaAddressBook *ab,
+                                  LibBalsaAddress *address)
 {
     LibBalsaABErr res;
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), LBABERR_OK);
 
     g_signal_emit(G_OBJECT(ab),
-                  libbalsa_address_book_signals[STORE_ADDRESS], 0,
+                  libbalsa_address_book_signals[ADD_ADDRESS], 0,
                   address, &res);
     return res;
 }
 
+LibBalsaABErr
+libbalsa_address_book_remove_address(LibBalsaAddressBook *ab,
+                                     LibBalsaAddress *address)
+{
+    LibBalsaABErr res;
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), LBABERR_OK);
+
+    g_signal_emit(G_OBJECT(ab),
+                  libbalsa_address_book_signals[REMOVE_ADDRESS], 0,
+                  address, &res);
+    return res;
+}
+
+LibBalsaABErr
+libbalsa_address_book_modify_address(LibBalsaAddressBook *ab,
+                                     LibBalsaAddress *address,
+                                     LibBalsaAddress *newval)
+{
+    LibBalsaABErr res;
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), LBABERR_OK);
+
+    g_signal_emit(G_OBJECT(ab),
+                  libbalsa_address_book_signals[MODIFY_ADDRESS], 0,
+                  address, newval, &res);
+    return res;
+}
 
 void
 libbalsa_address_book_save_config(LibBalsaAddressBook * ab,

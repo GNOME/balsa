@@ -67,8 +67,21 @@ struct _LibBalsaAddressBookClass {
                            LibBalsaAddressBookLoadFunc callback,
                            gpointer closure);
 
-    LibBalsaABErr (*store_address) (LibBalsaAddressBook * ab,
-                                    LibBalsaAddress * address);
+    /* adds given address to the address book, updating the permanent
+     * storage. */
+    LibBalsaABErr (*add_address) (LibBalsaAddressBook * ab,
+                                  LibBalsaAddress * address);
+
+    /* remove given address to the address book, updating the permanent
+     * storage. */
+    LibBalsaABErr (*remove_address) (LibBalsaAddressBook * ab,
+                                     LibBalsaAddress * address);
+
+    /* Sets new entries for given address, copying fields from newval.
+     * Updates the permanent storage. */
+    LibBalsaABErr (*modify_address) (LibBalsaAddressBook * ab,
+                                     LibBalsaAddress * address,
+                                     LibBalsaAddress * newval);
 
     void (*save_config) (LibBalsaAddressBook * ab, const gchar * prefix);
     void (*load_config) (LibBalsaAddressBook * ab, const gchar * prefix);
@@ -95,8 +108,13 @@ LibBalsaABErr libbalsa_address_book_load(LibBalsaAddressBook * ab,
                                          LibBalsaAddressBookLoadFunc callback,
                                          gpointer closure);
 
-LibBalsaABErr libbalsa_address_book_store_address(LibBalsaAddressBook * ab,
-                                                  LibBalsaAddress * address);
+LibBalsaABErr libbalsa_address_book_add_address(LibBalsaAddressBook *ab,
+                                                LibBalsaAddress *address);
+LibBalsaABErr libbalsa_address_book_remove_address(LibBalsaAddressBook *ab,
+                                                   LibBalsaAddress *address);
+LibBalsaABErr libbalsa_address_book_modify_address(LibBalsaAddressBook *ab,
+                                                   LibBalsaAddress *address,
+                                                   LibBalsaAddress *newval);
 
 void libbalsa_address_book_save_config(LibBalsaAddressBook * ab,
 				       const gchar * prefix);

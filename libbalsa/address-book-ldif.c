@@ -51,8 +51,16 @@ static LibBalsaABErr libbalsa_address_book_ldif_load(LibBalsaAddressBook * ab,
                                                      LibBalsaAddressBookLoadFunc 
                                                      callback,
                                                      gpointer closure);
-static LibBalsaABErr libbalsa_address_book_ldif_store_address(LibBalsaAddressBook *ab,
-                                                              LibBalsaAddress *new_address);
+static LibBalsaABErr
+libbalsa_address_book_ldif_add_address(LibBalsaAddressBook *ab,
+                                       LibBalsaAddress *address);
+static LibBalsaABErr
+libbalsa_address_book_ldif_remove_address(LibBalsaAddressBook *ab,
+                                          LibBalsaAddress *address);
+static LibBalsaABErr
+libbalsa_address_book_ldif_modify_address(LibBalsaAddressBook *ab,
+                                          LibBalsaAddress *address,
+                                          LibBalsaAddress *newval);
 
 static void libbalsa_address_book_ldif_save_config(LibBalsaAddressBook *ab,
 						    const gchar * prefix);
@@ -117,8 +125,12 @@ libbalsa_address_book_ldif_class_init(LibBalsaAddressBookLdifClass *
     object_class->finalize = libbalsa_address_book_ldif_finalize;
 
     address_book_class->load = libbalsa_address_book_ldif_load;
-    address_book_class->store_address =
-	libbalsa_address_book_ldif_store_address;
+    address_book_class->add_address =
+	libbalsa_address_book_ldif_add_address;
+    address_book_class->remove_address =
+	libbalsa_address_book_ldif_remove_address;
+    address_book_class->modify_address =
+	libbalsa_address_book_ldif_modify_address;
 
     address_book_class->save_config =
 	libbalsa_address_book_ldif_save_config;
@@ -642,8 +654,8 @@ build_name(gchar *cn, gchar *givenname, gchar *surname)
 }
 
 static LibBalsaABErr
-libbalsa_address_book_ldif_store_address(LibBalsaAddressBook * ab,
-                                         LibBalsaAddress * new_address)
+libbalsa_address_book_ldif_add_address(LibBalsaAddressBook * ab,
+                                       LibBalsaAddress * new_address)
 {
     GList *list;
     gchar *cn = NULL;
@@ -728,6 +740,23 @@ libbalsa_address_book_ldif_store_address(LibBalsaAddressBook * ab,
     }
     fclose(fp);
     return LBABERR_OK;
+}
+
+static LibBalsaABErr
+libbalsa_address_book_ldif_remove_address(LibBalsaAddressBook *ab,
+                                          LibBalsaAddress *address)
+{
+    /* FIXME: implement */
+    return LBABERR_CANNOT_WRITE;
+}
+
+static LibBalsaABErr
+libbalsa_address_book_ldif_modify_address(LibBalsaAddressBook *ab,
+                                          LibBalsaAddress *address,
+                                          LibBalsaAddress *newval)
+{
+    /* FIXME: implement */
+    return LBABERR_CANNOT_WRITE;
 }
 
 static void

@@ -31,5 +31,8 @@ enum _BalsaInformationShow {
 };
 
 void balsa_information(LibBalsaInformationType type, const char *fmt, ...);
+void balsa_information_parented(GtkWindow *widget,
+                                LibBalsaInformationType type, 
+                                const char *fmt, ...);
 
 #endif

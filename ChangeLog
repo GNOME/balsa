@@ -1,3 +1,14 @@
+2003-08-07  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/address-book.[hc]: add remove-address and modify-address signals.
+	* libbalsa/address-book-{extern,ldap,ldif,vcard}.c: add remove/modify support.
+	* libbalsa/information.[hc]: add ability to choose parent for the msg window.
+	* libbalsa/libbalsa-marshal.list: add INT:OBJECT,OBJECT marshaller.
+	* libbalsa/libbalsa.c: pass parent window.
+	* src/information-dialog.[hc]: use passed parent window.
+	* src/main.c: balsa_information_parented is now the main info callback.
+	* src/store-address.c: check for errors when adding addresses.
+
 2003-08-05  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/address.[hc]: move common address edition code here.

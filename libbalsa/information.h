@@ -23,7 +23,7 @@
 #ifndef __LIBBALSA_INFORMATION_H__
 #define __LIBBALSA_INFORMATION_H__
 
-#include <glib.h>
+#include <gtk/gtk.h>
 #include <stdarg.h>
 
 enum _LibBalsaInformationType {
@@ -36,16 +36,20 @@ enum _LibBalsaInformationType {
 
 typedef enum _LibBalsaInformationType LibBalsaInformationType;
 
-typedef void (*LibBalsaInformationFunc) (LibBalsaInformationType
-					 message_type, const gchar * fmt);
+typedef void (*LibBalsaInformationFunc) (GtkWindow *parent, 
+                                         LibBalsaInformationType message_type,
+                                         const gchar * fmt);
 
 
 extern LibBalsaInformationFunc libbalsa_real_information_func;
 
-void libbalsa_information(LibBalsaInformationType type, const char *fmt,
-			  ...);
-void libbalsa_information_varg(LibBalsaInformationType type,
-			       const char *fmt, va_list ap);
-
+void libbalsa_information(LibBalsaInformationType type,
+                          const char *fmt, ...);
+void libbalsa_information_parented(GtkWindow *parent,
+                                   LibBalsaInformationType type,
+                                   const char *fmt, ...);
+void libbalsa_information_varg(GtkWindow *parent,
+                               LibBalsaInformationType type,
+                               const char *fmt, va_list ap);
 
 #endif

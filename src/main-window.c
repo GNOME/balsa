@@ -676,15 +676,28 @@ balsa_window_refresh(BalsaWindow *window)
 {
   GnomeDockItem *item;
   GtkWidget *toolbar;
+  static BalsaWindow *balsa_window = NULL;
 
+  if (window == NULL)
+    {
+      if (balsa_window == NULL)
+        return;
+    }
+  else
+    balsa_window = window;
+  
   /*
    * set the toolbar style
    */
-  item = gnome_app_get_dock_item_by_name(GNOME_APP(window),
+  item = gnome_app_get_dock_item_by_name(GNOME_APP(balsa_window),
 					 GNOME_APP_TOOLBAR_NAME);
   toolbar = gnome_dock_item_get_child(item);
 
   gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), balsa_app.toolbar_style);
+
+  /* I don't know if this is a bug of gtk or not but if this is not here
+     it doesn't properly resize after a toolbar style change */
+  gtk_widget_queue_resize (GNOME_APP(balsa_window));
 }
 
 /*

@@ -1509,6 +1509,7 @@ bndx_popup_menu_create(BalsaIndex * index)
                                (balsa_message_move_to_trash), index);
 
     menuitem = gtk_menu_item_new_with_mnemonic(_("T_oggle"));
+    index->toggle_item = menuitem;
     submenu = gtk_menu_new();
     create_stock_menu_item(submenu, BALSA_PIXMAP_MENU_FLAGGED,
                            _("_Flagged"),
@@ -1581,6 +1582,8 @@ bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
     gtk_widget_set_sensitive(index->move_to_trash_item,
                              any && mailbox != balsa_app.trash
                              && !mailbox->readonly);
+    gtk_widget_set_sensitive(index->toggle_item,
+                             any && !mailbox->readonly);
     gtk_widget_set_sensitive(index->move_to_item,
                              any && !mailbox->readonly);
 

@@ -53,6 +53,7 @@ extern "C" {
         GtkWidget *delete_item;
         GtkWidget *undelete_item;
         GtkWidget *move_to_trash_item;
+        GtkWidget *toggle_item;
         GtkWidget *move_to_item;
 
         BalsaMailboxNode* mailbox_node;

@@ -872,4 +872,8 @@ int  state_printf(STATE *, const char *, ...);
 #include "lib.h"
 #include "globals.h"
 
+#ifdef LIBMUTT
+void mutt_set_charset (char *charset);
+#endif /* i sometimes sicken myself */
+
 #endif /* MUTT_H */

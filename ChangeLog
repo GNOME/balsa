@@ -1,3 +1,9 @@
+2000-08-03  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in: tested against gtkHTML 0.5 and enabled it.
+	* src/main-window.c(send_outbox_messages_cb): menu entry and callback
+	for sending messages queued in outbox.
+	
 2000-08-01  Peter Williams  <peterw@helixcode.com>
 
 	* libbalsa/mailbox.c (check_all_pop3_hosts): Compile fix for

@@ -241,6 +241,7 @@ if test x"$check_gtkhtml" = xyes ; then
 	        case $vers
         	in
             		gtkhtml-0.4) have_gtkhtml=yes ;;
+                        gtkhtml-0.5) have_gtkhtml=yes ;;
 			*) have_gtkhtml=no ;;
         	esac
 	else

@@ -116,6 +116,7 @@ static void show_about_box (void);
 
 /* callbacks */
 static void check_new_messages_cb (GtkWidget *, gpointer data);
+static void send_outbox_messages_cb (GtkWidget *, gpointer data);
 
 
 static void new_message_cb (GtkWidget * widget, gpointer data);
@@ -170,6 +171,12 @@ static GnomeUIInfo file_menu[] =
  GNOME_APP_UI_ITEM, N_ ("_Get new mail"), N_("Fetch new incoming mail"),
  check_new_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
  GNOME_STOCK_MENU_MAIL_RCV, 'M', GDK_CONTROL_MASK, NULL
+  },
+    /* Ctrl-S */
+  {
+ GNOME_APP_UI_ITEM, N_ ("_Send queued mail"), N_("Send mail from the outbox"),
+ send_outbox_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+ GNOME_STOCK_MENU_MAIL_SND, 'A', GDK_CONTROL_MASK, NULL
   },
   GNOMEUIINFO_SEPARATOR,
   {
@@ -1025,6 +1032,15 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
 
   balsa_mblist_have_new (balsa_app.mblist);
 #endif
+}
+
+/* send_outbox_messages_cb:
+   tries again to send the messages queued in outbox.
+*/
+static void
+send_outbox_messages_cb (GtkWidget * widget, gpointer data)
+{
+  libbalsa_message_send(NULL);
 }
 
 

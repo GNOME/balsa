@@ -1,5 +1,7 @@
-2004-10-25 08:37  PeterB
+2004-10-25 12:59  PeterB
 
+	* src/: filter-edit-callbacks.c, filter-edit-dialog.c: populate
+	list of user headers.
 	* src/mailbox-conf.c: migrate mailbox-conf dialogs from deprecated
 	GtkOptionMenu to GtkComboBox; replace last HAVE_GTK24 with
 	GTK_CHECK_VERSION.

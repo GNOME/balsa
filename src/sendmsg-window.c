@@ -2124,7 +2124,7 @@ attach_clicked(GtkWidget * widget, gpointer data)
 
     fsw =
         gtk_file_chooser_dialog_new(_("Attach file"),
-                                    GTK_WINDOW(balsa_app.main_window),
+                                    GTK_WINDOW(bsmsg->window),
                                     GTK_FILE_CHOOSER_ACTION_OPEN,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
@@ -4118,7 +4118,7 @@ include_file_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
     file_selector =
 	gtk_file_chooser_dialog_new(_("Include file"),
-                                    GTK_WINDOW(balsa_app.main_window),
+                                    GTK_WINDOW(bsmsg->window),
                                     GTK_FILE_CHOOSER_ACTION_OPEN,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);

@@ -384,31 +384,7 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
             g_mime_part_get_content_object(GMIME_PART(body->mime_part));
 	stream = g_mime_stream_mem_new();
 	g_mime_data_wrapper_write_to_stream(wrapper, stream);
-
-        filter = NULL;
-        switch (g_mime_data_wrapper_get_encoding(wrapper)) {
-        case GMIME_PART_ENCODING_BASE64:
-            filter =
-                g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_BASE64_DEC);
-            break;
-        case GMIME_PART_ENCODING_QUOTEDPRINTABLE:
-            filter =
-                g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_QP_DEC);
-            break;
-        case GMIME_PART_ENCODING_UUENCODE:
-            filter =
-                g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_UU_DEC);
-            break;
-        default:
-            break;
-        }
         g_object_unref(wrapper);
-
-        if (filter) {
-	    stream = libbalsa_message_body_assure_stream_filter(stream);
-            g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream), filter);
-            g_object_unref(filter);
-        }
     } else if (body->mime_part) {
         /* Not a GMimePart... */
 	GMimeObject *object = body->mime_part;

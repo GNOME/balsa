@@ -181,8 +181,8 @@ static GnomeUIInfo main_menu[] = {
     GNOMEUIINFO_MENU_EDIT_TREE(edit_menu),
     GNOMEUIINFO_MENU_VIEW_TREE(view_menu),
 #define MAIN_MENU_MOVE_POS 3
-    GNOMEUIINFO_SUBTREE("M_ove", move_menu),
-    GNOMEUIINFO_SUBTREE("_Message", message_menu),
+    GNOMEUIINFO_SUBTREE(N_("M_ove"), move_menu),
+    GNOMEUIINFO_SUBTREE(N_("_Message"), message_menu),
     GNOMEUIINFO_END
 };
 

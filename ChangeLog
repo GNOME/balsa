@@ -3,6 +3,9 @@
 	* src/main.c: Use gtk_window_set_default_icon_from_file instead of
 	gnome_window_icon_set_default_from_file to set default icon.
 	Requires GTK-2.2.
+	* src/main-window.c: Don't mark Copyright string for translation,
+	UTF-8-escape it.
+	* src/message-window.c: Marked missing menu labels for translation.
 	* src/information-dialog.c: HIGified.
 	* configure.in: Require at least GTK-2.2.
 

@@ -1653,7 +1653,7 @@ show_about_box(void)
 
     about = gnome_about_new("Balsa",
                             BALSA_VERSION,
-                            _("Copyright (C) 1997-2002"),
+                            "Copyright \xc2\xa9 1997-2003",
 #if BALSA_MAJOR < 2
                             authors,
 #endif                          /* BALSA_MAJOR < 2 */

@@ -69,6 +69,11 @@ AC_CHECK_LIB(esd, esd_open_sound,
 
 AC_CHECK_LIB(crypt, crypt)
 
+AC_CHECK_LIB(des, des_encrypt)
+AC_CHECK_LIB(krb, krb_sendauth)
+AC_CHECK_LIB(acap, acap_OpenConnection)
+
+
 AM_FUNC_OBSTACK
 AM_HDR_SIGACTION
 AM_HDR_SIGSET

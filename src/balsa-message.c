@@ -2564,11 +2564,9 @@ balsa_gtk_html_size_request(GtkWidget * widget,
     g_return_if_fail(widget != NULL);
     g_return_if_fail(HTML_IS_VIEW(widget));
     g_return_if_fail(requisition != NULL);
-
-    requisition->width = GTK_LAYOUT(widget)->hadjustment->upper +
-        widget->style->xthickness * 2;
-    requisition->height = GTK_LAYOUT(widget)->vadjustment->upper +
-        widget->style->ythickness * 2;
+    
+    requisition->width  = GTK_LAYOUT(widget)->hadjustment->upper;
+    requisition->height = GTK_LAYOUT(widget)->vadjustment->upper;
 }
 
 static gboolean

@@ -1,3 +1,7 @@
+2003-01-11  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-message.c: fix gtkhtml2 space requisition (bug 103156).
+
 2003-01-12  PeterB
 
 	* src/: main-window.c, main-window.h: Don't export

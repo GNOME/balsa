@@ -303,6 +303,11 @@ text2html (char *buff)
 	  gs = g_string_append (gs, "<br>\n");
 	  i++;
 	}
+      else if (buff[i] == '\n' && buff[i+1] == '\n')
+	{
+	  gs = g_string_append (gs, "</tt></p><p><tt>\n");
+	  i++;
+	}
       else if (buff[i] == '\n')
 	{
 	  gs = g_string_append (gs, "<br>\n");
@@ -310,6 +315,11 @@ text2html (char *buff)
       else if (buff[i] == '\r')
 	{
 	  gs = g_string_append (gs, "<br>\n");
+	}
+      else if (buff[i] == ' ' && buff[i + 1] == ' ' && buff[i + 2] == ' ' && buff[i+3] == ' ')
+	{
+	  gs = g_string_append (gs, "&nbsp; &nbsp; ");
+	  i += 2;
 	}
       else if (buff[i] == ' ' && buff[i + 1] == ' ' && buff[i + 2] == ' ')
 	{

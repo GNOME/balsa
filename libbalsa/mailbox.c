@@ -635,10 +635,16 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 gboolean
 libbalsa_mailbox_message_match(LibBalsaMailbox * mailbox,
                                guint msgno,
-                               LibBalsaMailboxSearchIter *search_iter)
+                               LibBalsaMailboxSearchIter * search_iter)
 {
+    gboolean match;
+
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+
+    if (libbalsa_condition_is_flag_only(search_iter->condition,
+                                        mailbox, msgno, &match))
+        return match;
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->message_match(mailbox,
                                                               msgno,
@@ -3434,28 +3440,30 @@ libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
                                   gboolean forward,
                                   guint stop_msgno)
 {
-    GNode *node = iter->user_data;
-    GNode *(*step_func)(GNode *) = forward ?  lbm_next : lbm_prev;
-    gboolean (*match_func)(LibBalsaMailbox *, guint, 
-                           LibBalsaMailboxSearchIter *) =
-        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->message_match;
+    GNode *node;
     gboolean retval = FALSE;
+    gint total;
 
     libbalsa_lock_mailbox(mailbox);
 
+    node = iter->user_data;
     if (!node)
         node = mailbox->msg_tree;
 
+    total = libbalsa_mailbox_total_messages(mailbox);
     for (;;) {
         guint msgno;
 
-        node = step_func(node);
+        node = forward ? lbm_next(node) : lbm_prev(node);
         msgno = GPOINTER_TO_UINT(node->data);
-        if (msgno == stop_msgno) {
+        if (msgno == stop_msgno
+	    || --total < 0 /* Runaway? */ ) {
             retval = FALSE;
             break;
         }
-        if (msgno > 0 && match_func(mailbox, msgno, search_iter)) {
+        if (msgno > 0
+            && libbalsa_mailbox_message_match(mailbox, msgno,
+                                              search_iter)) {
             iter->user_data = node;
             retval = TRUE;
             break;

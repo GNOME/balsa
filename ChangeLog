@@ -1,3 +1,8 @@
+2000-1-1    Héctor García Álvarez  <hector@scouts-es.org>
+        * libbalsa/send.c: Added deletion on sended queued messages. 
+	SMTP support should now work properly. No known bugs in STMP 
+	support yet.
+
 1999-12-31  Ragnar Henriksen <ragnar@juniks.org>
         * src/pref-manager.c: The help button are now working.
 

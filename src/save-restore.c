@@ -183,11 +183,13 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
 	g_free((*special)->config_prefix); 
 	(*special)->config_prefix = NULL;
 	config_mailbox_add(*special, NULL);
+	gtk_object_unref(GTK_OBJECT(*special));
     }
     config_mailbox_delete(mailbox);
     config_mailbox_add(mailbox, specialNames[which]);
 
     *special = mailbox;
+    gtk_object_ref(GTK_OBJECT(mailbox));
 }
 
 void
@@ -369,6 +371,8 @@ config_mailbox_init(const gchar * prefix)
 	    g_list_append(balsa_app.inbox_input, 
 			  balsa_mailbox_node_new_from_mailbox(mailbox));
     } else {
+        gboolean special = TRUE;
+
 	node = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));
 	g_node_append(balsa_app.mailbox_nodes, node);
 
@@ -382,6 +386,11 @@ config_mailbox_init(const gchar * prefix)
 	    balsa_app.draftbox = mailbox;
 	else if (strcmp("Trash/", key) == 0)
 	    balsa_app.trash = mailbox;
+	else
+            special = FALSE;
+
+	if (special)
+            gtk_object_ref(GTK_OBJECT(mailbox));
     }
     return TRUE;
 }				/* config_mailbox_init */

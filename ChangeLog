@@ -1,3 +1,14 @@
+2001-09-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/pref-manager.c: it is legal to call update_mail_servers() 
+	when pref window is closed.
+	
+	Proper mailbox referencing by Peter Bloomfield 
+	<PeterBloomfield@MindSpring.com>:
+	* src/mailbox-node.c: ref and sink mailbox on create.
+	* src/main.c: unref specials on exit.
+	* src/save-restore.c: referencing special mailboxes.
+
 2001-09-10  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/mailbox_pop3.c (libbalsa_mailbox_pop3_check): WorksForMe(tm)

@@ -432,10 +432,15 @@ balsa_cleanup(void)
 	empty_trash();
 
     force_close_mailbox(balsa_app.inbox);
+    gtk_object_unref(GTK_OBJECT(balsa_app.inbox));
     force_close_mailbox(balsa_app.outbox);
+    gtk_object_unref(GTK_OBJECT(balsa_app.outbox));
     force_close_mailbox(balsa_app.sentbox);
+    gtk_object_unref(GTK_OBJECT(balsa_app.sentbox));
     force_close_mailbox(balsa_app.draftbox);
+    gtk_object_unref(GTK_OBJECT(balsa_app.draftbox));
     force_close_mailbox(balsa_app.trash);
+    gtk_object_unref(GTK_OBJECT(balsa_app.trash));
 
     config_save();
 

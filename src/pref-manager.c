@@ -990,6 +990,11 @@ add_other_server(GNode * node, gpointer data)
     }
 }
 
+/* update_mail_servers:
+   update mail server list in the preferences window.
+   NOTE: it can be called even when the preferences window is closed (via
+   mailbox context menu) - and it should check for it.
+*/
 void
 update_mail_servers(void)
 {
@@ -1000,12 +1005,11 @@ update_mail_servers(void)
 
     BalsaMailboxNode *mbnode;
 
-    g_return_if_fail(pui);
+    if(pui == NULL) return;
 
     clist = GTK_CLIST(pui->mail_servers);
 
     gtk_clist_clear(clist);
-
     gtk_clist_freeze(clist);
     while (list) {
 	mbnode = list->data;

@@ -244,6 +244,8 @@ balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox * mb)
     BalsaMailboxNode *mbn;
     mbn = BALSA_MAILBOX_NODE(balsa_mailbox_node_new());
     mbn->mailbox = mb;
+    gtk_object_ref(GTK_OBJECT(mb));
+    gtk_object_sink(GTK_OBJECT(mb));
     gtk_signal_connect(GTK_OBJECT(mbn), "show-prop-dialog", 
 		       mailbox_conf_edit, NULL);
     return mbn;
@@ -324,6 +326,7 @@ balsa_mailbox_node_new_imap_node(LibBalsaServer* s, const char*p)
 
     folder->server = s;
     gtk_object_ref(GTK_OBJECT(s));
+    gtk_object_sink(GTK_OBJECT(s));
     folder->dir = g_strdup(p);
     gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 
 		       imap_dir_cb, NULL);
@@ -338,6 +341,7 @@ balsa_mailbox_node_new_imap(LibBalsaServer* s, const char*p)
     g_assert(s);
 
     folder->mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
+    gtk_object_ref(GTK_OBJECT(folder->mailbox));
     libbalsa_mailbox_remote_set_server(
 	LIBBALSA_MAILBOX_REMOTE(folder->mailbox), s);
     libbalsa_mailbox_imap_set_path(LIBBALSA_MAILBOX_IMAP(folder->mailbox), p);
@@ -692,8 +696,10 @@ remove_mailbox_from_nodes(LibBalsaMailbox* mailbox)
 {
     GNode* gnode = find_by_url(balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
 			       G_TRAVERSE_ALL, mailbox->url);
-    g_return_val_if_fail(gnode, NULL);
-    g_node_unlink(gnode);
+    if (gnode)
+	g_node_unlink(gnode);
+    else
+	gnode = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));
     return gnode;
 }
     
@@ -926,7 +932,9 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
     LIBBALSA_MAILBOX(m)->name = mbnode->name;
     mbnode->name = NULL;
     mbnode->mailbox = LIBBALSA_MAILBOX(m);
-    
+    gtk_object_ref(GTK_OBJECT(m));
+    gtk_object_sink(GTK_OBJECT(m));
+
     return node;
 }
 

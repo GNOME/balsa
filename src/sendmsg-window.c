@@ -32,6 +32,7 @@
 #include <libgnomevfs/gnome-vfs-uri.h>
 #include <libgnomevfs/gnome-vfs-mime-handlers.h>
 #include <ctype.h>
+#include <glib.h>
 
 #ifdef HAVE_LOCALE_H
 #include <locale.h>
@@ -194,6 +195,8 @@ static void wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static gint insert_signature_cb(GtkWidget *, BalsaSendmsg *);
 static gint quote_messages_cb(GtkWidget *, BalsaSendmsg *);
+static void set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
+			SendType type, LibBalsaIdentity* ident);
 
 
 static GnomeUIInfo file_menu[] = {
@@ -904,9 +907,15 @@ prep_signature(LibBalsaIdentity* ident, gchar* sig)
 
     /* empty signature is a legal signature */
     if(sig == NULL) return NULL;
-    
-    if (ident->sig_separator) {
-        sig_tmp = g_strconcat("-- \n", sig, NULL);
+
+    if (ident->sig_separator
+        && strncmp(sig, "--\n", 3)
+        && strncmp(sig, "-- \n", 4)) {
+        sig_tmp = g_strconcat("\n-- \n", sig, NULL);
+        g_free(sig);
+        sig = sig_tmp;
+    } else {
+        sig_tmp = g_strconcat("\n", sig, NULL);
         g_free(sig);
         sig = sig_tmp;
     }
@@ -932,12 +941,15 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     gint siglen;
     gint i = 0;
     
+    gboolean found_sig = FALSE;
     gchar* old_sig;
     gchar* new_sig;
     gchar* message_text;
     gchar* compare_str;
     gchar** message_split;
     gchar* tmpstr=libbalsa_address_to_gchar(ident->address, 0);
+    const gchar* subject;
+    gint replen, fwdlen;
     
     LibBalsaIdentity* old_ident;
 
@@ -953,13 +965,45 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     gtk_entry_set_text(GTK_ENTRY(bsmsg->bcc[1]), ident->bcc);
     
     /* change the subject to use the reply/forward strings */
+    subject = gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1]));
+
+    /*
+     * If the subject begins with the old reply string
+     *    Then replace it with the new reply string.
+     * Else, if the subject begins with the old forward string
+     *    Then replace it with the new forward string.
+     * Else, if the old reply string was empty, and the message
+     *    is a reply, OR the old forward string was empty, and the
+     *    message is a forward
+     *    Then call set_entry_to_subject()
+     * Else assume the user hand edited the subject and does
+     *    not want it altered
+     */
+    old_ident = bsmsg->ident;
+    if (((replen = strlen(old_ident->reply_string)) > 0) &&
+	(strncmp(subject, old_ident->reply_string, replen) == 0)) {
+	tmpstr = g_strconcat(ident->reply_string, &(subject[replen]), NULL);
+	gtk_entry_set_text(GTK_ENTRY(bsmsg->subject[1]), tmpstr);
+	g_free(tmpstr);
+    } else if (((fwdlen = strlen(old_ident->forward_string)) > 0) &&
+	       (strncmp(subject, old_ident->forward_string, fwdlen) == 0)) {
+	tmpstr = g_strconcat(ident->forward_string, &(subject[fwdlen]), NULL);
+	gtk_entry_set_text(GTK_ENTRY(bsmsg->subject[1]), tmpstr);
+	g_free(tmpstr);
+    } else if (((replen == 0) && (bsmsg->type == SEND_REPLY ||
+				  bsmsg->type == SEND_REPLY_ALL ||
+				  bsmsg->type == SEND_REPLY_GROUP)) ||
+	       ((fwdlen == 0) && (bsmsg->type == SEND_FORWARD_ATTACH ||
+				  bsmsg->type == SEND_FORWARD_INLINE))) {
+	set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]), bsmsg->orig_message,
+			     bsmsg->type, ident);
+    }
 
     /* -----------------------------------------------------------
      * remove/add the signature depending on the new settings, change
      * the signature if path changed */
 
     /* reconstruct the old signature to search with */
-    old_ident = bsmsg->ident;
     old_sig = read_signature(bsmsg);
     old_sig = prep_signature(old_ident, old_sig);
 
@@ -979,36 +1023,61 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
                                 0, new_sig);
     } else {
         /* split on sig separator */
-        message_split = g_strsplit(message_text, "-- \n", 0);
+        message_split = g_strsplit(message_text, "\n-- \n", 0);
         siglen = g_utf8_strlen(old_sig, -1);
-        while (message_split[i]) {
-            /* put sig separator back to search */
-            compare_str = g_strconcat("-- \n", message_split[i], NULL);
-            
-            /* try to find occurance of old signature */
-            if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
-                repl_identity_signature(bsmsg, ident, old_ident,
-                                        &replace_offset, siglen, new_sig);
-            }
-            
-            replace_offset += 
-                g_utf8_strlen(i ? compare_str : message_split[i], -1);
-            g_free(compare_str);
-            i++;
+
+	/* check the special case of starting a message with a sig */
+	compare_str = g_strconcat("\n", message_split[0], NULL);
+
+	if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
+	    g_free(compare_str);
+	    repl_identity_signature(bsmsg, ident, old_ident,
+				    &replace_offset, siglen - 1, new_sig);
+	    found_sig = TRUE;
+	} else {
+	    g_free(compare_str);
+	while (message_split[i]) {
+		/* put sig separator back to search */
+		compare_str = g_strconcat("\n-- \n", message_split[i], NULL);
+
+		/* try to find occurance of old signature */
+		if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
+		    repl_identity_signature(bsmsg, ident, old_ident,
+					    &replace_offset, siglen, new_sig);
+		    found_sig = TRUE;
+		}
+
+		replace_offset +=
+		    g_utf8_strlen(i ? compare_str : message_split[i], -1);
+		g_free(compare_str);
+		i++;
+	    }
         }
         /* if no sig seperators found, do a slower brute force approach */
-        if (!message_split[0] || !message_split[1]) {
+        if (!found_sig) {
             compare_str = message_text;
             replace_offset = 0;
-            
-            while (*compare_str) {
-                if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
-                    repl_identity_signature(bsmsg, ident, old_ident,
-                                            &replace_offset, siglen, new_sig);
-                }
-                replace_offset++;
-                compare_str = g_utf8_next_char(compare_str);
-            }
+
+	    /* check the special case of starting a message with a sig */
+	    tmpstr = g_strconcat("\n", message_text, NULL);
+
+	    if (g_ascii_strncasecmp(old_sig, tmpstr, siglen) == 0) {
+		g_free(tmpstr);
+		repl_identity_signature(bsmsg, ident, old_ident,
+					&replace_offset, siglen - 1, new_sig);
+	    } else {
+		g_free(tmpstr);
+		replace_offset++;
+		compare_str = g_utf8_next_char(compare_str);
+		while (*compare_str) {
+		    if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
+			repl_identity_signature(bsmsg, ident, old_ident,
+						&replace_offset, siglen, new_sig);
+		    }
+		    replace_offset++;
+		    compare_str = g_utf8_next_char(compare_str);
+		}
+	    }
         }
         g_strfreev(message_split);
     }
@@ -2222,19 +2291,12 @@ fillBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
        || (forwd_any && bsmsg->ident->sig_whenforward)
        || (type == SEND_NORMAL && bsmsg->ident->sig_sending)) {
 
-	    if (bsmsg->ident->sig_separator
-		&& strncmp(signature, "--\n", 3)
-		&& strncmp(signature, "-- \n", 4)) {
-		gchar * tmp = g_strconcat("-- \n", signature, NULL);
-		g_free(signature);
-		signature = tmp;
-	    }
+	    signature = prep_signature(bsmsg->ident, signature);
 
 	    if (bsmsg->ident->sig_prepend && type != SEND_NORMAL) {
 	    	g_string_prepend(body, "\n\n");
 	    	g_string_prepend(body, signature);
 	    } else {
-                g_string_append_c(body, '\n');
 	    	g_string_append(body, signature);
 	    }
 	    g_string_prepend_c(body, '\n');
@@ -2497,38 +2559,72 @@ set_identity_from_mailbox(BalsaSendmsg* bsmsg)
 static gboolean
 guess_identity(BalsaSendmsg* bsmsg)
 {
-    GList *alist;
     LibBalsaMessage *message = bsmsg->orig_message;
+    const gchar *address_string;
+    GList *ilist;
+    LibBalsaIdentity *ident;
+    gchar *tmp;
+
+
     if( !message  || !message->headers || !message->headers->to_list ||
 	!balsa_app.identities)
         return FALSE; /* use default */
 
-    /*
-     * Loop through all the addresses in the message's To:
-     * field, and look for an identity that matches one of them.
-     */
-    for (alist = message->headers->to_list; alist; alist = g_list_next(alist)) {
-        LibBalsaAddress *addy;
-        gchar *address_string;
-        GList *ilist;
-        
-        addy = alist->data;
-	if (!addy->address_list	/* empty To: field */
-	    || !addy->address_list->data)	/* empty <> in address */
-	    continue;
-        address_string = addy->address_list->data;
-        for (ilist = balsa_app.identities; ilist;
-             ilist = g_list_next(ilist)) {
-            LibBalsaIdentity* ident;
-            gchar *tmp;
-            
-            ident = LIBBALSA_IDENTITY(ilist->data);
-            if ((tmp = ident->address->address_list->data)
-                && !g_ascii_strcasecmp(address_string, tmp)) {
-                bsmsg->ident = ident;
-                return TRUE;
+    if (bsmsg->type == SEND_CONTINUE) {
+ 	if (message->headers->from) {
+ 	    /*
+ 	    * Look for an identity that matches the From: address.
+ 	    */
+ 	    address_string = message->headers->from->address_list->data;
+ 	    for (ilist = balsa_app.identities; ilist;
+ 		 ilist = g_list_next(ilist)) {
+ 		ident = LIBBALSA_IDENTITY(ilist->data);
+ 		if ((tmp = ident->address->address_list->data)
+ 		    && !g_ascii_strcasecmp(address_string, tmp)) {
+ 		    bsmsg->ident = ident;
+ 		    return( TRUE );
+ 		}
 	    }
-        }
+ 	}
+    } else if (bsmsg->type != SEND_NORMAL) {
+ 	/* bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
+ 	*  bsmsg->type == SEND_REPLY_GROUP || bsmsg->type == SEND_FORWARD_ATTACH ||
+ 	*  bsmsg->type == SEND_FORWARD_INLINE */
+ 	LibBalsaAddress *addy;
+ 	GList *alist;
+ 
+ 	/*
+ 	* Loop through all the addresses in the message's To:
+ 	* field, and look for an identity that matches one of them.
+ 	*/
+ 	for (alist = message->headers->to_list; alist; alist = g_list_next(alist)) {
+ 	    addy = alist->data;
+ 	    address_string = addy->address_list->data;
+ 	    for (ilist = balsa_app.identities; ilist;
+ 		 ilist = g_list_next(ilist)) {
+ 		ident = LIBBALSA_IDENTITY(ilist->data);
+ 		if ((tmp = ident->address->address_list->data)
+ 		    && !g_ascii_strcasecmp(address_string, tmp)) {
+ 		    bsmsg->ident = ident;
+ 		    return TRUE;
+ 		}
+ 	    }
+ 	}
+ 
+ 	/* No match in the to_list, try the cc_list */
+ 	for (alist = message->headers->cc_list; alist; alist = g_list_next(alist)) {
+ 	    addy = alist->data;
+ 	    address_string = addy->address_list->data;
+ 	    for (ilist = balsa_app.identities; ilist;
+ 		 ilist = g_list_next(ilist)) {
+ 		ident = LIBBALSA_IDENTITY(ilist->data);
+ 		if ((tmp = ident->address->address_list->data)
+ 		    && !g_ascii_strcasecmp(address_string, tmp)) {
+ 		    bsmsg->ident = ident;
+ 		    return TRUE;
+ 		}
+ 	    }
+ 	}
     }
     return FALSE;
 }
@@ -2827,8 +2923,18 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     /* Subject: */
     set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]), message, type, bsmsg->ident);
 
-    if (type == SEND_CONTINUE)
+    if (type == SEND_CONTINUE) {
 	setup_headers_from_message(bsmsg, message);
+
+	/* Replace "From" and "Reply-To" with values from the
+	 * continued messages - they may have been hand edited. */
+	if (message->headers->from != NULL)
+	    gtk_entry_set_text(GTK_ENTRY(bsmsg->from[1]),
+			       libbalsa_address_to_gchar(message->headers->from, 0));
+	if (message->headers->reply_to != NULL)
+	    gtk_entry_set_text(GTK_ENTRY(bsmsg->reply_to[1]),
+			       libbalsa_address_to_gchar(message->headers->reply_to, 0));
+    }
 
     if (type == SEND_REPLY_ALL) {
 	tmp = libbalsa_make_string_from_list(message->headers->to_list);
@@ -3511,18 +3617,14 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 
     g_object_unref(G_OBJECT(message));
 
-#ifdef HAVE_GPGME
-    switch (result)
-	{
-	case LIBBALSA_MESSAGE_SIGN_ERROR:
-	case LIBBALSA_MESSAGE_ENCRYPT_ERROR:
-	    return FALSE;
-	default:
-	    gtk_widget_destroy(bsmsg->window);
-	}
-#else
+    if (result != LIBBALSA_MESSAGE_CREATE_OK) {
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_WARNING,
+				   _("Send failed"));
+	return FALSE;
+    }
+
     gtk_widget_destroy(bsmsg->window);
-#endif
 
     return TRUE;
 }

@@ -261,7 +261,7 @@ is_user_cb(ImapMboxHandle *h, ImapUserEventType ue, void *arg, ...)
 
     va_start(alist, arg);
     switch(ue) {
-    case IM_UE_GET_USER_PASS: {
+    case IME_GET_USER_PASS: {
         gchar *method = va_arg(alist, gchar*);
         gchar **user = va_arg(alist, gchar**);
         gchar **pass = va_arg(alist, gchar**);
@@ -272,7 +272,7 @@ is_user_cb(ImapMboxHandle *h, ImapUserEventType ue, void *arg, ...)
         libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, method);
         break;
     }
-    case IM_UE_GET_USER:  { /* for eg kerberos */
+    case IME_GET_USER:  { /* for eg kerberos */
         gchar **user = va_arg(alist, gchar**);
         ok = va_arg(alist, int*);
         *ok = 1; /* consider popping up a dialog window here */

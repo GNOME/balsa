@@ -60,7 +60,7 @@ imap_auth_login(ImapMboxHandle* handle)
   
   ok = 0;
   if(!ok && handle->user_cb)
-    handle->user_cb(handle, IM_UE_GET_USER_PASS, handle->user_arg,
+    handle->user_cb(handle, IME_GET_USER_PASS, handle->user_arg,
                     "LOGIN", &user, &pass, &ok);
   if(!ok || user == NULL || pass == NULL)
     return IMAP_AUTH_FAILURE;

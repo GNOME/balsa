@@ -10,6 +10,17 @@ typedef enum {
   IM_EVENT_EXPUNGE
 } ImapMboxEventType;
 
+/* user events below usually require application's or user's
+ *  intervention */
+typedef enum {
+  IME_GET_USER_PASS,
+  IME_GET_USER,
+  IME_TLS_VERIFY_ERROR,
+  IME_TLS_NO_PEER_CERT,
+  IME_TLS_WEAK_CIPHER
+} ImapUserEventType;
+
+
 /* connection states, as defined in rfc-2060, 3 */
 typedef enum {
   IMHS_DISCONNECTED,
@@ -34,6 +45,7 @@ typedef enum {
   IMR_OK,
   IMR_NO,
   IMR_BAD,
+  IMR_ALERT,
   IMR_PARSE     /* inofficial: server had problems parsing one of    */
                 /* the messages. Ignore is probably the only action. */
 } ImapResponse;
@@ -85,7 +97,10 @@ typedef struct {
 typedef void (*ImapMboxNotifyCb)(ImapMboxHandle*handle, ImapMboxEventType ev, 
                                  int seqno, void* data);
 
-typedef void (*ImapInfoCb)(const char *buffer, void *arg);
+typedef void (*ImapInfoCb)(ImapMboxHandle *h, ImapResponse rc,
+                           const char *buffer, void *arg);
+typedef void (*ImapUserCb)(ImapMboxHandle *h, ImapUserEventType ue, void *arg,
+                           ...);
 typedef void (*ImapMonitorCb)(const char *buffer, int length, int direction,
                               void *arg);
 
@@ -98,11 +113,10 @@ typedef void(*ImapListCb)(ImapMboxHandle*handle, int delim,
 ImapMboxHandle *imap_mbox_handle_new(void);
 void imap_handle_set_monitorcb(ImapMboxHandle* h, ImapMonitorCb cb, void*);
 void imap_handle_set_infocb(ImapMboxHandle* h, ImapInfoCb cb, void*);
-void imap_handle_set_alertcb(ImapMboxHandle* h, ImapInfoCb cb, void*);
+void imap_handle_set_usercb(ImapMboxHandle* h, ImapUserCb cb, void*);
 void imap_handle_set_flagscb(ImapMboxHandle* h, ImapFlagsCb cb, void*);
 
-ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst,
-                                    const char* user, const char* passwd);
+ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst);
 ImapResponse imap_mbox_handle_reconnect(ImapMboxHandle* r,
                                         gboolean *readonly);
 

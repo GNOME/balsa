@@ -1,3 +1,7 @@
+2004-02-02 08:34  PeterB
+
+	* libbalsa/mailbox_pop3.c: use rmdir to remove temp mailbox.
+
 2004-02-01  Pawel Salek
 
 	(correcting myself)

@@ -413,16 +413,38 @@ bm_message_widget(GtkWidget * headers, gboolean embedded)
 }
 
 static void
+on_set_style(GtkWidget * widget, GtkStyle * previous_style, GtkWidget * target)
+{
+  GtkStyle * new_style, * text_view_style;
+  int n;
+
+  new_style = gtk_style_new();
+  text_view_style = 
+    gtk_rc_get_style_by_paths(gtk_widget_get_settings (target),
+			      NULL, NULL, gtk_text_view_get_type());
+  if (text_view_style)
+    for (n = GTK_STATE_NORMAL; n <= GTK_STATE_INSENSITIVE; n++)
+      new_style->bg[n] = text_view_style->base[n];
+  else {
+    GdkColor color;
+
+    gdk_color_parse("White", &color);
+    for (n = GTK_STATE_NORMAL; n <= GTK_STATE_INSENSITIVE; n++)
+      new_style->bg[n] = color;
+  }
+  gtk_widget_set_style(target, new_style);
+  g_object_unref(G_OBJECT(new_style));
+}
+
+static void
 balsa_message_init(BalsaMessage * bm)
 {
     GtkWidget *scroll;
     GtkWidget *label;
     GtkWidget *message_widget;
-    GtkWidget *text_view;
     GtkTreeStore *model;
     GtkCellRenderer *renderer;
     GtkTreeSelection *selection;
-    GtkStyle * border_style;
 
     /* Notebook to hold content + structure */
     bm->notebook = gtk_notebook_new();
@@ -442,18 +464,11 @@ balsa_message_init(BalsaMessage * bm)
     bm->cont_viewport = gtk_viewport_new(NULL, NULL);
     gtk_widget_show(bm->cont_viewport);
     gtk_container_add(GTK_CONTAINER(scroll), bm->cont_viewport);
+    g_signal_connect_after(G_OBJECT(bm->notebook), "style-set",
+			   G_CALLBACK(on_set_style), bm->cont_viewport);
 
     /* Widget to hold headers */
     bm->header_container = bm_header_widget(bm);
-
-    /* Make background of the view-port the same as the base color of the
-     * text. */
-    text_view = g_object_get_data(G_OBJECT(bm->header_container),
-				  BALSA_MESSAGE_TEXT_VIEW);
-    border_style = gtk_style_copy(gtk_widget_get_style(text_view));
-    border_style->bg[GTK_STATE_NORMAL] = border_style->base[GTK_STATE_NORMAL];
-    gtk_widget_set_style(bm->cont_viewport, border_style);
-    g_object_unref(border_style);
 
     /* Widget to hold message */
     message_widget = bm_message_widget(bm->header_container, FALSE);

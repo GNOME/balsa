@@ -122,7 +122,6 @@ struct _Mailbox
 {
   GtkObject object;
 
-  gboolean ismbnode; /* is also in MailboxNode... used to tell them apart */
   MailboxType type;
   gchar *name;
   void *private;

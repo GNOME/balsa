@@ -237,18 +237,26 @@ mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
 
   gint row, column;
   gint on_mailbox;
-  Mailbox *mailbox;
+  GtkObject *data;
+  Mailbox *mailbox = NULL;
   GtkCTreeNode *node;
 
   bmbl = BALSA_MBLIST (widget);
   clist = GTK_CLIST (widget);
   ctree = GTK_CTREE (widget);
   
-  on_mailbox=gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
+  on_mailbox = gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
   
   if (on_mailbox)
     {
-      mailbox = gtk_clist_get_row_data (clist, row);
+      data = gtk_clist_get_row_data(clist, row);
+
+      if (BALSA_IS_MAILBOX(data)) {
+        mailbox = BALSA_MAILBOX(data);
+      } else {
+        return FALSE;
+      }
+
       node = gtk_ctree_node_nth( ctree, row );
       
       

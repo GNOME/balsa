@@ -381,7 +381,6 @@ balsa_mailbox_class_init (MailboxClass *klass)
 static void
 balsa_mailbox_init(Mailbox *mailbox)
 {
-  mailbox->ismbnode = FALSE;
   mailbox->lock = FALSE;
   mailbox->name = NULL;
   mailbox->private = (void *) g_malloc (sizeof (MailboxPrivate));

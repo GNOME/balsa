@@ -29,13 +29,13 @@ size_t readfile (FILE * fp, char **buf);
 
 typedef struct _MailboxNode MailboxNode;
 struct _MailboxNode
-  {
-    gboolean ismbnode;
-    gchar *name;
-    Mailbox *mailbox;
-    gint IsDir;
-    gint expanded;
-  };
+{
+  GtkObject object;
+  gchar *name;
+  Mailbox *mailbox;
+  gint IsDir;
+  gint expanded;
+};
 
 MailboxNode *mailbox_node_new (const gchar * name, Mailbox * mb, gint i);
 gchar *g_get_host_name (void);

@@ -2509,8 +2509,7 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
 
     /* If there is no current message, don't select one; if there is,
      * and it's not being removed, keep it. */
-    if (!index->current_message ||
-        !g_list_find(messages, index->current_message))
+    if (!g_list_find(messages, index->current_message))
         next_message = index->current_message;
 
     /* check the list of messages to be removed */

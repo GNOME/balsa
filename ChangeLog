@@ -1,3 +1,8 @@
+2002-08-15  Steve Wall  <hitched97@myrealbox.com>
+
+	* configure.in: pass also -I when libestmp location specified.
+	* libinit_balsa/balsa-druid-page-user.c: remove redundant line.
+
 2002-08-13  Willem Riede  <wriede@riede.org>
 
 	* src/balsa-icons.[hc], src/pixmaps/balsa_flagged.xpm: add icon.

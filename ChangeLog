@@ -1,3 +1,10 @@
+2000-09-14  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/address-book.c: Fix crash if there is no default address
+	book (also fixed potential problem if there are no address books).
+	* src/pref-manager.c: Connect the properties_modified_cb to the
+	set as default address book button.
+
 2000-09-13  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/address.[ch]: Make into a proper Gtk object.

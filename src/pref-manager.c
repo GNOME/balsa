@@ -1973,6 +1973,8 @@ static GtkWidget *create_address_book_page ( void )
 	button = gtk_button_new_with_label(_("Set as default"));
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			   GTK_SIGNAL_FUNC(set_default_address_book_cb), NULL);
+	gtk_signal_connect(GTK_OBJECT(button), "clicked",
+			   GTK_SIGNAL_FUNC(properties_modified_cb), NULL);
 	gtk_widget_show(button);
 	gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
 

@@ -244,6 +244,9 @@ ab_load(GtkWidget * widget, gpointer data)
 	if (composing) 
 		ab_clear_clist(GTK_CLIST(add_clist)); 
 
+	if (current_address_book == NULL)
+		return;
+
 	libbalsa_address_book_load(current_address_book);
 	list =  current_address_book->address_list;
 
@@ -348,7 +351,7 @@ address_book_cb(GtkWidget * widget, gpointer data)
 
         /* If we have something in the data, then the addressbook was opened
          * from a message window */
-	/* FIXE: (widget->parent->parent->parent->parent->parent) could be more elegant ;-) */
+	/* FIXME: (widget->parent->parent->parent->parent->parent) could be more elegant ;-) */
         if (GTK_IS_BUTTON (widget))
                 gnome_dialog_set_parent (GNOME_DIALOG (dialog), 
                                          GTK_WINDOW (widget->parent->parent->parent->parent->parent));
@@ -375,6 +378,9 @@ address_book_cb(GtkWidget * widget, gpointer data)
 		ab_list = balsa_app.address_book_list;
 		while (ab_list) {
 			address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
+			if ( current_address_book == NULL )
+				current_address_book = address_book;
+
 			menu_item = gtk_menu_item_new_with_label ( address_book->name );
 			gtk_widget_show ( menu_item );
 			gtk_menu_append(GTK_MENU(ab_menu), menu_item);

@@ -337,7 +337,9 @@ imap_search_exec(ImapMboxHandle *h, ImapSearchKey *s,
   void *oarg;
   unsigned cmdno;
 
-  if(!IMAP_MBOX_IS_SELECTED(h) || !s)
+  IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
+
+  if(!s)
     return IMR_BAD;
 
   ocb  = h->search_cb;  h->search_cb  = (ImapSearchCb)cb;

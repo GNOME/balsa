@@ -56,6 +56,7 @@ imap_authenticate(ImapMboxHandle* handle)
       return r;
     }
   }
+  imap_mbox_handle_set_msg(handle, "No way to authenticate is known");
   return r;
 }
 

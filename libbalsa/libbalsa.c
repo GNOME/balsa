@@ -431,7 +431,6 @@ libbalsa_certs_destroy(void)
 gboolean
 libbalsa_is_cert_known(X509* cert, long vfy_result)
 {
-    char buf[256];
     X509 *tmpcert = NULL;
     FILE *fp;
     gchar *cert_name;
@@ -452,10 +451,11 @@ libbalsa_is_cert_known(X509* cert, long vfy_result)
     fp = fopen(cert_name, "rt");
     g_free(cert_name);
     if(fp) {
+        /* 
         printf("Looking for cert: %s\n", 
                X509_NAME_oneline(X509_get_subject_name (cert),
                                  buf, sizeof (buf)));
-        
+        */
         res = FALSE;
         while ((tmpcert = PEM_read_X509(fp, NULL, NULL, NULL)) != NULL) {
             res = X509_cmp(cert, tmpcert)==0;

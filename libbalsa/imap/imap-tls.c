@@ -356,6 +356,7 @@ imap_handle_starttls(ImapMboxHandle *handle)
   ImapResponse rc;
   SSL *ssl;
 
+  IMAP_REQUIRED_STATE1(handle, IMHS_CONNECTED, IMR_BAD);
   if(!imap_mbox_handle_can_do(handle, IMCAP_STARTTLS)) 
     return IMR_NO;
 

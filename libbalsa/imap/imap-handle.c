@@ -630,9 +630,11 @@ imap_mbox_handle_fetch(ImapMboxHandle* handle, const gchar *seq,
 {
   char* cmd;
   int i;
-  GString* hdr = g_string_new(headers[0]);
+  GString* hdr;
   ImapResponse rc;
   
+  IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
+  hdr = g_string_new(headers[0]);
   for(i=1; headers[i]; i++) {
     if (hdr->str[hdr->len - 1] != '(' && headers[i][0] != ')')
       g_string_append_c(hdr, ' ');
@@ -651,6 +653,7 @@ imap_mbox_handle_fetch_env(ImapMboxHandle* handle, const gchar *seq)
   char* cmd;
   ImapResponse rc;
   
+  IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   cmd = g_strdup_printf("FETCH %s (ENVELOPE FLAGS UID)", seq);
   rc = imap_cmd_exec(handle, cmd);
   g_free(cmd);

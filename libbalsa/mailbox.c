@@ -349,7 +349,7 @@ mailbox_open_ref (Mailbox * mailbox)
       g_string_append_c (tmp, '}');
       g_string_append (tmp, MAILBOX_IMAP (mailbox)->path);
       set_imap_username (mailbox);
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp->str, 0, NULL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp->str, M_NOSORT, NULL);
       g_string_free (tmp, TRUE);
       break;
 

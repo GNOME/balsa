@@ -1093,8 +1093,8 @@ static gboolean thread_has_unread(GtkCTree *ctree, GtkCTreeNode *node)
 	LibBalsaMessage *message=
 	    LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(ctree, child));
 
-	if(message && message->flags & LIBBALSA_MESSAGE_FLAG_NEW ||
-	   thread_has_unread(ctree, child))
+	if(message && (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) ||
+	   thread_has_unread(ctree, child)) 
 	    return TRUE;
     }
     return FALSE;
@@ -1116,7 +1116,7 @@ static void balsa_index_set_style(BalsaIndex * bindex,
 	        style can't be use as it isn't initialised yet the first time
 		we call this. */
     
-    if(!GTK_CTREE_ROW(node)->expanded && thread_has_unread(ctree, node)) {
+    if(thread_has_unread(ctree, node)) { /* chbm */
 	style = balsa_app.mblist->unread_mailbox_style;
     } else
 	style = gtk_widget_get_style(GTK_WIDGET(balsa_app.mblist));
@@ -2237,6 +2237,7 @@ balsa_index_update_tree(BalsaIndex *bindex, gboolean expand)
 
     gtk_clist_freeze(clist);
     for(node=gtk_ctree_node_nth(tree, 0); node; node=GTK_CTREE_NODE_NEXT(node)) {
+	balsa_index_set_style_recursive( bindex, node); /*`chbm */
 	if(expand)
 	    gtk_ctree_expand_recursive(tree, node);
 	else

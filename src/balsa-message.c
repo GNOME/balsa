@@ -722,8 +722,8 @@ part_info_init_image(BalsaMessage * bm, BalsaPartInfo * info)
     GdkPixbuf *pb;
 #endif
 
-    GdkPixmap *pixmap;
-    GdkBitmap *mask;
+    GdkPixmap *pixmap = NULL;
+    GdkBitmap *mask = NULL;
 
     GtkWidget *image;
 
@@ -735,19 +735,21 @@ part_info_init_image(BalsaMessage * bm, BalsaPartInfo * info)
 	return;
     }
 
-    if (!gdk_imlib_render(im, im->rgb_width, im->rgb_height)) {
+    if (!gdk_imlib_render(im, im->rgb_width, im->rgb_height))
 	g_print(_("Couldn't render image\n"));
-    }
 
     pixmap = gdk_imlib_copy_image(im);
     mask = gdk_imlib_copy_mask(im);
-
     gdk_imlib_destroy_image(im);
-
 #else
-    pb = gdk_pixbuf_new_from_file(info->body->temp_filename);
-    gdk_pixbuf_render_pixmap_and_mask(pb, &pixmap, &mask, 0);
-    gdk_pixbuf_unref(pb);
+    if( (pb = gdk_pixbuf_new_from_file(info->body->temp_filename)) ) {
+	gdk_pixbuf_render_pixmap_and_mask(pb, &pixmap, &mask, 0);
+	gdk_pixbuf_unref(pb);
+    } else {
+	g_print
+	    (_("balsa/pixbuf: Could not load image. It is likely corrupted."));
+	return;
+    }
 #endif
 
     if (pixmap) {
@@ -1501,7 +1503,7 @@ part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info)
 	    cps[fpos - cmd + 1] = 's';
 	    exe_str = g_strdup_printf(cps, info->body->temp_filename);
 	    gnome_execute_shell(NULL, exe_str);
-	    fprintf(stderr, "Executed\n");
+	    fprintf(stderr, "Executed: %s\n", exe_str);
             g_free (cps);
             g_free (exe_str);
 	}

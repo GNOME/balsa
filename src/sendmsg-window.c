@@ -507,8 +507,14 @@ balsa_sendmsg_destroy(BalsaSendmsg * bsm)
     g_free(bsm);
 
 #ifdef BALSA_USE_THREADS
-    if (balsa_app.compose_email && !sending_mail)
+    if (balsa_app.compose_email) {
+	while(sending_mail) {
+	    while(gtk_events_pending())
+		gtk_main_iteration_do(FALSE);
+	    usleep(500);
+	}
 	balsa_exit();
+    }
 #else
     if (balsa_app.compose_email)
 	balsa_exit();

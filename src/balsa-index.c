@@ -37,10 +37,6 @@
 #include <gnome.h>
 #include <glib.h>
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
-
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-index.h"
@@ -523,18 +519,6 @@ moveto_handler(BalsaIndex * bindex)
    functional (and that's MOST important; think long before modyfying it)
    but perhaps we could write it nicer?
 */
-#if BALSA_USE_THREADS
-static gboolean is_opening =FALSE;
-static void *open_in_thread(void* mailbox)
-{
-    
-    gdk_threads_enter();
-    libbalsa_mailbox_open(LIBBALSA_MAILBOX(mailbox), FALSE);
-    gdk_threads_leave();
-    is_opening = FALSE;
-    return NULL;
-}
-#endif 
 
 gboolean
 balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
@@ -542,13 +526,6 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
     LibBalsaMailbox* mailbox;
     gchar *msg;
 
-#ifdef BALSA_USE_THREADS
-    void*data;
-    static pthread_mutex_t open_lock = PTHREAD_MUTEX_INITIALIZER;
-    pthread_t open_thread;
-    if(pthread_mutex_trylock(&open_lock) != 0)  /* already opening */
-	return TRUE;
-#endif
     g_return_val_if_fail (bindex != NULL, TRUE);
     g_return_val_if_fail (mbnode != NULL, TRUE);
     g_return_val_if_fail (mbnode->mailbox != NULL, TRUE);
@@ -558,29 +535,11 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
 			  mbnode->mailbox->name);
     gnome_appbar_push(balsa_app.appbar, msg);
     g_free(msg);
-#ifdef BALSA_USE_THREADS
-    is_opening = TRUE;
-    balsa_window_increase_activity(BALSA_WINDOW(bindex->window));
-    pthread_create(&open_thread, NULL, open_in_thread, mailbox);
-    while(is_opening) {
-        while(is_opening && gtk_events_pending())
-	    gtk_main_iteration_do(FALSE);
-	usleep(500);
-    }
-    pthread_join(open_thread, &data);
-    pthread_mutex_unlock(&open_lock);
-    balsa_window_decrease_activity(BALSA_WINDOW(bindex->window));
-#else
     libbalsa_mailbox_open(mailbox, FALSE);
-#endif
     gnome_appbar_pop(balsa_app.appbar);
 
-    if (mailbox->open_ref == 0) {
-	libbalsa_information(
-	    LIBBALSA_INFORMATION_ERROR,
-	    _("Unable to Open Mailbox!\nPlease check the mailbox settings."));
+    if (mailbox->open_ref == 0)
 	return TRUE;
-    }
 
     /*
      * release the old mailbox
@@ -687,7 +646,6 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
     node = gtk_ctree_insert_node(GTK_CTREE(bindex->ctree), NULL, NULL, 
                                  text, 2, NULL, NULL, NULL, NULL, 
                                  FALSE, TRUE);
-
     g_free(text[5]);
 
     gtk_ctree_node_set_row_data (GTK_CTREE (bindex->ctree), node, 

@@ -442,7 +442,6 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
     sending_mail = FALSE;
     pthread_mutex_unlock(&send_messages_lock);
     MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
-    pthread_exit(0);
 #endif
     send_message_info_destroy(info);	
     return TRUE;

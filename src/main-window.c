@@ -134,6 +134,8 @@ static void mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node,
 static void enable_mailbox_menus(BalsaMailboxNode * mbnode);
 static void enable_message_menus(LibBalsaMessage * message);
 static void enable_edit_menus(BalsaMessage * bm);
+static void register_open_mailbox(LibBalsaMailbox *m);
+static void unregister_open_mailbox(LibBalsaMailbox *m);
 
 static gint about_box_visible = FALSE;
 
@@ -685,6 +687,8 @@ balsa_window_new()
 			       balsa_app.show_notebook_tabs);
     gtk_notebook_set_show_border (GTK_NOTEBOOK(window->notebook), FALSE);
     gtk_notebook_set_scrollable (GTK_NOTEBOOK (window->notebook), TRUE);
+    gtk_signal_connect(GTK_OBJECT(window), "delete_event",
+		       GTK_SIGNAL_FUNC(balsa_exit), NULL);
     gtk_signal_connect(GTK_OBJECT(window->notebook), "size_allocate",
 		       GTK_SIGNAL_FUNC(notebook_size_alloc_cb), NULL);
     gtk_signal_connect(GTK_OBJECT(window->notebook), "switch_page",
@@ -694,7 +698,7 @@ balsa_window_new()
                        GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
     gtk_signal_connect (GTK_OBJECT (window->notebook), "drag-data-received",
                         GTK_SIGNAL_FUNC (notebook_drag_received_cb), NULL);
-    balsa_app.notebook = window->notebook;
+   balsa_app.notebook = window->notebook;
 
     scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
@@ -998,51 +1002,79 @@ balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
 }
 
 static void
-balsa_window_real_open_mbnode(BalsaWindow * window,
-                              BalsaMailboxNode * mbnode)
+real_open_mbnode(BalsaMailboxNode* mbnode)
 {
-    GtkWidget *index;
+    BalsaIndex * index;
     GtkWidget *label;
     gint page_num;
-
-
-    index = balsa_index_new();
-
-    /* [MBG] FIXME */
-    BALSA_INDEX (index)->window = GTK_WIDGET (window);
+    gboolean failurep;
     
-/*     index = BALSA_INDEX(BALSA_INDEX_PAGE(page)->index); */
-    gtk_signal_connect(GTK_OBJECT (index), "select_message",
-                       GTK_SIGNAL_FUNC (balsa_window_select_message_cb),
-                       window);
-    gtk_signal_connect(GTK_OBJECT (index), "unselect_message",
-                       GTK_SIGNAL_FUNC (balsa_window_unselect_message_cb),
-                       window);
-    gtk_signal_connect(GTK_OBJECT (index), "unselect_all_messages",
-                       GTK_SIGNAL_FUNC(balsa_window_unselect_all_messages_cb),
-                       window);
+#ifdef BALSA_USE_THREADS
+    static pthread_mutex_t open_lock = PTHREAD_MUTEX_INITIALIZER;
+    if(pthread_mutex_trylock(&open_lock) != 0){
+	printf("already opening another mailbox.\n");
+	return;
+    }
+#endif
+    index = BALSA_INDEX(balsa_index_new());
+    index->window = GTK_WIDGET(balsa_app.main_window);
 
-    if (balsa_index_load_mailbox_node(BALSA_INDEX (index), mbnode)) {
-	/* The function will display a dialog on error */
+    gdk_threads_enter();
+    balsa_window_increase_activity(balsa_app.main_window);
+    failurep = balsa_index_load_mailbox_node(BALSA_INDEX (index), mbnode);
+    balsa_window_decrease_activity(balsa_app.main_window);
+
+    if(failurep) {
+	libbalsa_information(
+	    LIBBALSA_INFORMATION_ERROR,
+	    _("Unable to Open Mailbox!\nPlease check the mailbox settings."));
 	gtk_object_destroy(GTK_OBJECT(index));
 	return;
     }
 
+    gtk_signal_connect(GTK_OBJECT (index), "select_message",
+                       GTK_SIGNAL_FUNC (balsa_window_select_message_cb),
+                       balsa_app.main_window);
+    gtk_signal_connect(GTK_OBJECT (index), "unselect_message",
+                       GTK_SIGNAL_FUNC (balsa_window_unselect_message_cb),
+                       balsa_app.main_window);
+    gtk_signal_connect(GTK_OBJECT (index), "unselect_all_messages",
+                       GTK_SIGNAL_FUNC(balsa_window_unselect_all_messages_cb),
+                       balsa_app.main_window);
+
     label = gtk_label_new(mbnode->mailbox->name);
 
     /* store for easy access */
-    gtk_notebook_append_page(GTK_NOTEBOOK(window->notebook),
+    gtk_notebook_append_page(GTK_NOTEBOOK(balsa_app.main_window->notebook),
 			     GTK_WIDGET(index), label);
 
     /* change the page to the newly selected notebook item */
-    page_num = gtk_notebook_page_num(GTK_NOTEBOOK (window->notebook),
-                                     GTK_WIDGET (index));
-    gtk_notebook_set_page(GTK_NOTEBOOK(window->notebook), page_num);
-    balsa_app.open_mailbox_list =
-	g_list_prepend(balsa_app.open_mailbox_list, mbnode->mailbox);
+    page_num = gtk_notebook_page_num
+	(GTK_NOTEBOOK (balsa_app.main_window->notebook),
+	 GTK_WIDGET (index));
+    gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.main_window->notebook),
+			  page_num);
+    register_open_mailbox(mbnode->mailbox);
 
     /* Enable relavent menu items... */
     enable_mailbox_menus(mbnode);
+    gdk_threads_leave();
+#ifdef BALSA_USE_THREADS
+    pthread_mutex_unlock(&open_lock);
+#endif
+}
+
+static void
+balsa_window_real_open_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
+{
+#ifdef BALSA_USE_THREADS
+    pthread_t open_thread;
+    pthread_create(&open_thread, NULL, (void*(*)(void*))real_open_mbnode, 
+		   mbnode);
+    pthread_detach(open_thread);
+#else
+    real_open_mbnode(mbnode);
+#endif
 }
 
 /* balsa_window_real_close_mbnode:
@@ -1084,9 +1116,7 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
 	    enable_message_menus(NULL);
 	    enable_edit_menus(NULL);
 	}
-
-	balsa_app.open_mailbox_list =
-	    g_list_remove(balsa_app.open_mailbox_list, mbnode->mailbox);
+	unregister_open_mailbox(mbnode->mailbox);
     }
 
     /* we use (BalsaIndex*) instead of BALSA_INDEX because we don't want
@@ -1209,6 +1239,38 @@ balsa_window_refresh(BalsaWindow * window)
     gtk_widget_queue_resize(GTK_WIDGET(window));
 }
 
+/* monitored functions for MT-safe manipulation of the open mailbox list
+   QUESTION: could they migrate to balsa-app.c?
+*/
+#ifdef BALSA_USE_THREADS
+static pthread_mutex_t open_list_lock = PTHREAD_MUTEX_INITIALIZER;
+
+static void register_open_mailbox(LibBalsaMailbox *m)
+{
+    pthread_mutex_lock(&open_list_lock);
+    balsa_app.open_mailbox_list =
+	g_list_prepend(balsa_app.open_mailbox_list, m);
+    pthread_mutex_unlock(&open_list_lock);
+}
+static void unregister_open_mailbox(LibBalsaMailbox *m)
+{
+    pthread_mutex_lock(&open_list_lock);
+	balsa_app.open_mailbox_list =
+	    g_list_remove(balsa_app.open_mailbox_list, m);
+    pthread_mutex_unlock(&open_list_lock);
+}
+#else
+static void register_open_mailbox(LibBalsaMailbox *m)
+{
+    balsa_app.open_mailbox_list =
+	g_list_prepend(balsa_app.open_mailbox_list, m);
+}
+static void unregister_open_mailbox(LibBalsaMailbox *m)
+{
+    balsa_app.open_mailbox_list =
+	g_list_remove(balsa_app.open_mailbox_list, m);
+}
+#endif
 /*
  * show the about box for Balsa
  */

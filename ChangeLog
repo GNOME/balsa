@@ -1,3 +1,12 @@
+2004-05-25 10:44  PeterB
+
+	* src/: main-window.c, main-window.h: pass BalsaWindow as an
+	argument to balsa_window_enable_mailbox_menus, instead of using
+	balsa_app.main_window.
+	* src/balsa-index.c: supply new argument to
+	balsa_window_enable_mailbox_menus; check BALSA_IS_INDEX(index) in
+	exported select methods.
+
 2004-05-24 18:59  PeterB
 
 	* src/: mailbox-conf.c, main-window.c, main-window.h: update the

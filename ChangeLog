@@ -1,5 +1,8 @@
-2004-03-20 06:52  PeterB
+2004-03-20 08:13  PeterB
 
+	* libbalsa/mailbox_imap.c: (libbalsa_mailbox_imap_messages_copy)
+	allow NULL search_iter.
+	* libbalsa/: mailbox.c, message.c: use bulk copy and move methods.
 	* src/balsa-index.c: use a LibBalsaMailboxSearchIter, to allow
 	caching of search results.
 	* libbalsa/: mailbox.c, mailbox.h: implement

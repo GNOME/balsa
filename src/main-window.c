@@ -173,6 +173,7 @@ static void reset_show_all_headers(void);
 static void show_preview_pane_cb(GtkWidget * widget, gpointer data);
 
 static void threading_change_cb(GtkWidget * widget, gpointer data);
+static void balsa_window_set_threading_menu(int option);
 static void expand_all_cb(GtkWidget * widget, gpointer data);
 static void collapse_all_cb(GtkWidget * widget, gpointer data);
 
@@ -1239,7 +1240,7 @@ balsa_window_enable_continue(void)
     }
 }
 
-void
+static void
 balsa_window_set_threading_menu(int option)
 {
     int pos;
@@ -2594,6 +2595,7 @@ threading_change_cb(GtkWidget * widget, gpointer data)
     type = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
                                              GNOMEUIINFO_KEY_UIDATA));
     balsa_index_set_threading_type(BALSA_INDEX(index), type);
+    balsa_window_set_threading_menu(type);
 }
 
 static void

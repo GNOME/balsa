@@ -1,3 +1,8 @@
+2004-01-19 00:02  PeterB
+
+	* src/sendmsg-window.c: show window before setting `From:' address,
+	so its text doesn't get selected.
+
 2004-01-18  Pawel Salek
 
 	* libbalsa/html.c: compile against libgtkhtml2.

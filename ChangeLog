@@ -1,3 +1,15 @@
+2002-11-02  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/main-window.c: use (locked) balsa_app.mailbox_nodes for
+	message counting, instead of (unlocked)
+	balsa_app.mblist_tree_store; use a weak_pointer instead of global
+	new_mail_dialog_visible; replace deprecated items.
+	* src/sendmsg-window.c: replace deprecated items.
+	* src/spell-check.[ch]: replace deprecated items; move structure 
+	declarations from spell-check.h to spell-check.c.
+	* src/message-window.c, print.c, quote-color.c, save-restore.c:
+	* src/store-address.c, toolbar-factory.c: replace deprecated items.
+
 2002-10-30  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/main.c: do not hang when called with -m (#97168).

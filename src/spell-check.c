@@ -29,6 +29,7 @@
 #define USE_ORIGINAL_MANAGER_FUNCS
 #include <pspell/pspell.h>
 #include <stdio.h>
+#include <string.h>
 
 #ifdef HAVE_PCRE
 #  include <pcre.h>
@@ -42,6 +43,42 @@
 #include "quote-color.h"
 #include "spell-check.h"
 
+/* the basic structures */
+struct _BalsaSpellCheck {
+    GtkDialog dialog;
+
+    GtkTextView *view;
+    GtkTreeView *list;
+    GtkEntry *entry;
+
+    /* actual spell checking variables */
+    PspellConfig *spell_config;
+    PspellManager *spell_manager;
+    const PspellWordList *word_list;
+    PspellStringEmulation *suggestions;
+
+    /* restoration information */
+    gchar *original_text;
+    GtkTextMark *original_mark;
+    gint original_offset;
+
+    /* word selection */
+    GtkTextIter start_iter;
+    GtkTextIter end_iter;
+
+    /* config stuff */
+    gchar *module;
+    gchar *suggest_mode;
+    guint ignore_length;
+    gchar *language_tag;
+    gchar *character_set;
+};
+
+struct _BalsaSpellCheckClass {
+    GtkDialogClass parent_class;
+
+    void (*done_spell_check) (BalsaSpellCheck * spell_check);
+};
 
 /* enumerations */
 typedef enum _LearnType LearnType;
@@ -56,20 +93,22 @@ enum {
 };
 
 enum {
-    ARG_0,
-    ARG_MODULE,
-    ARG_SUGGEST,
-    ARG_IGNORE,
-    ARG_LANGUAGE,
-    ARG_CHARSET
+    PROP_0,
+    PROP_MODULE,
+    PROP_SUGGEST,
+    PROP_IGNORE,
+    PROP_LANGUAGE,
+    PROP_CHARSET
 };
 
 
 /* initialization stuff */
 static void balsa_spell_check_class_init(BalsaSpellCheckClass *);
 static void balsa_spell_check_init(BalsaSpellCheck *);
-static void balsa_spell_check_set_arg(GtkObject *, GtkArg *, guint);
-static void balsa_spell_check_get_arg(GtkObject *, GtkArg *, guint);
+static void spch_set_property(GObject * object, guint prop_id,
+                              const GValue * value, GParamSpec * pspec);
+static void spch_get_property(GObject * object, guint prop_id,
+                              GValue * value, GParamSpec * pspec);
 static void balsa_spell_check_destroy(GtkObject * object);
 
 
@@ -81,8 +120,7 @@ static void ignore_cb(GtkButton *, gpointer);
 static void ignore_all_cb(GtkButton *, gpointer);
 static void learn_cb(GtkButton * button, gpointer);
 static void cancel_cb(GtkButton * button, gpointer);
-static void select_word_cb(GtkCList *, gint, gint,
-			   GdkEventButton *, gpointer);
+static void select_word_cb(GtkTreeSelection * selection, gpointer data);
 
 
 /* function prototypes */
@@ -112,19 +150,21 @@ balsa_spell_check_get_type()
     static GtkType balsa_spell_check_type = 0;
 
     if (!balsa_spell_check_type) {
-	GtkTypeInfo balsa_spell_check_info = {
-	    "BalsaSpellCheck",
-	    sizeof(BalsaSpellCheck),
+	static const GTypeInfo balsa_spell_check_info = {
 	    sizeof(BalsaSpellCheckClass),
-	    (GtkClassInitFunc) balsa_spell_check_class_init,
-	    (GtkObjectInitFunc) balsa_spell_check_init,
-	    (gpointer) NULL,
-	    (gpointer) NULL,
-	    (GtkClassInitFunc) NULL
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) balsa_spell_check_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(BalsaSpellCheck),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) balsa_spell_check_init
 	};
 
 	balsa_spell_check_type =
-	    gtk_type_unique(gtk_dialog_get_type(), &balsa_spell_check_info);
+	    g_type_register_static(GTK_TYPE_DIALOG, "BalsaSpellCheck",
+                                   &balsa_spell_check_info, 0);
     }
 
     return balsa_spell_check_type;
@@ -135,67 +175,83 @@ static void
 balsa_spell_check_class_init(BalsaSpellCheckClass * klass)
 {
     GtkObjectClass *object_class;
+    GObjectClass *o_class;
     GtkWidgetClass *widget_class;
     GtkContainerClass *container_class;
 
     object_class = (GtkObjectClass *) klass;
+    o_class = (GObjectClass *) klass;
     widget_class = (GtkWidgetClass *) klass;
     container_class = (GtkContainerClass *) klass;
 
     parent_class = gtk_type_class(GTK_TYPE_FRAME);
 
-    gtk_object_add_arg_type("BalsaSpellCheck::spell-module",
-			    GTK_TYPE_STRING,
-			    GTK_ARG_READWRITE, ARG_MODULE);
-    gtk_object_add_arg_type("BalsaSpellCheck::suggest-mode",
-			    GTK_TYPE_STRING,
-			    GTK_ARG_READWRITE, ARG_SUGGEST);
-    gtk_object_add_arg_type("BalsaSpellCheck::ignore-length",
-			    GTK_TYPE_UINT, GTK_ARG_READWRITE, ARG_IGNORE);
-    gtk_object_add_arg_type("BalsaSpellCheck::language-tag",
-			    GTK_TYPE_STRING,
-			    GTK_ARG_READWRITE, ARG_LANGUAGE);
-    gtk_object_add_arg_type("BalsaSpellCheck::character-set",
-			    GTK_TYPE_STRING,
-			    GTK_ARG_READWRITE, ARG_CHARSET);
+    /* GObject signals */
+    o_class->set_property = spch_set_property;
+    o_class->get_property = spch_get_property;
+
+    g_object_class_install_property(o_class, PROP_MODULE,
+                                    g_param_spec_string("spell-module",
+                                                        NULL, NULL,
+                                                        NULL,
+                                                        G_PARAM_READWRITE));
+    g_object_class_install_property(o_class, PROP_SUGGEST,
+                                    g_param_spec_string("suggest-mode",
+                                                        NULL, NULL,
+                                                        NULL,
+                                                        G_PARAM_READWRITE));
+    g_object_class_install_property(o_class, PROP_IGNORE,
+                                    g_param_spec_uint("ignore-length",
+                                                      NULL, NULL,
+                                                      0, -1, 0,
+                                                      G_PARAM_READWRITE));
+    g_object_class_install_property(o_class, PROP_LANGUAGE,
+                                    g_param_spec_string("language-tag",
+                                                        NULL, NULL,
+                                                        NULL,
+                                                        G_PARAM_READWRITE));
+    g_object_class_install_property(o_class, PROP_CHARSET,
+                                    g_param_spec_string("character-set",
+                                                        NULL, NULL,
+                                                        NULL,
+                                                        G_PARAM_READWRITE));
 
     object_class->destroy = balsa_spell_check_destroy;
-    object_class->set_arg = balsa_spell_check_set_arg;
-    object_class->get_arg = balsa_spell_check_get_arg;
 
     klass->done_spell_check = NULL;
 }
 
 
 static void
-balsa_spell_check_set_arg(GtkObject * object, GtkArg * arg, guint arg_id)
+spch_set_property(GObject * object, guint prop_id, const GValue * value,
+                  GParamSpec * pspec)
 {
-    BalsaSpellCheck *spell_check;
+    BalsaSpellCheck *spell_check = BALSA_SPELL_CHECK(object);
 
-    spell_check = BALSA_SPELL_CHECK(object);
-    switch (arg_id) {
-    case ARG_MODULE:
-	balsa_spell_check_set_module(spell_check, GTK_VALUE_STRING(*arg));
+    switch (prop_id) {
+    case PROP_MODULE:
+	balsa_spell_check_set_module(spell_check,
+                                     g_value_get_string(value));
 	break;
 
-    case ARG_SUGGEST:
+    case PROP_SUGGEST:
 	balsa_spell_check_set_suggest_mode(spell_check,
-					   GTK_VALUE_STRING(*arg));
+					   g_value_get_string(value));
 	break;
 
-    case ARG_IGNORE:
+    case PROP_IGNORE:
 	balsa_spell_check_set_ignore_length(spell_check,
-					    GTK_VALUE_UINT(*arg));
+					    g_value_get_uint(value));
 	break;
 
-    case ARG_LANGUAGE:
+    case PROP_LANGUAGE:
 	balsa_spell_check_set_language(spell_check,
-				       GTK_VALUE_STRING(*arg));
+				       g_value_get_string(value));
 	break;
 
-    case ARG_CHARSET:
+    case PROP_CHARSET:
 	balsa_spell_check_set_character_set(spell_check,
-					    GTK_VALUE_STRING(*arg));
+					    g_value_get_string(value));
 	break;
 
     default:
@@ -205,34 +261,33 @@ balsa_spell_check_set_arg(GtkObject * object, GtkArg * arg, guint arg_id)
 
 
 static void
-balsa_spell_check_get_arg(GtkObject * object, GtkArg * arg, guint arg_id)
+spch_get_property(GObject * object, guint prop_id, GValue * value,
+                  GParamSpec * pspec)
 {
-    BalsaSpellCheck *spell_check;
+    BalsaSpellCheck *spell_check = BALSA_SPELL_CHECK(object);
 
-    spell_check = BALSA_SPELL_CHECK(object);
-    switch (arg_id) {
-    case ARG_MODULE:
-	GTK_VALUE_STRING(*arg) = g_strdup(spell_check->module);
+    switch (prop_id) {
+    case PROP_MODULE:
+        g_value_set_string(value, spell_check->module);
 	break;
 
-    case ARG_SUGGEST:
-	GTK_VALUE_STRING(*arg) = g_strdup(spell_check->suggest_mode);
+    case PROP_SUGGEST:
+        g_value_set_string(value, spell_check->suggest_mode);
 	break;
 
-    case ARG_IGNORE:
-	GTK_VALUE_UINT(*arg) = spell_check->ignore_length;
+    case PROP_IGNORE:
+        g_value_set_uint(value, spell_check->ignore_length);
 	break;
 
-    case ARG_LANGUAGE:
-	GTK_VALUE_STRING(*arg) = g_strdup(spell_check->language_tag);
+    case PROP_LANGUAGE:
+        g_value_set_string(value, spell_check->language_tag);
 	break;
 
-    case ARG_CHARSET:
-	GTK_VALUE_STRING(*arg) = g_strdup(spell_check->character_set);
+    case PROP_CHARSET:
+        g_value_set_string(value, spell_check->character_set);
 	break;
 
     default:
-	arg->type = GTK_TYPE_INVALID;
 	break;
     }
 }
@@ -247,8 +302,7 @@ balsa_spell_check_new(void)
 {
     BalsaSpellCheck *spell_check;
 
-    spell_check =
-	BALSA_SPELL_CHECK(gtk_type_new(balsa_spell_check_get_type()));
+    spell_check = g_object_new(balsa_spell_check_get_type(), NULL);
 
     return GTK_WIDGET(spell_check);
 }
@@ -263,8 +317,7 @@ balsa_spell_check_new_with_text(GtkTextView * check_text)
 {
     BalsaSpellCheck *spell_check;
 
-    spell_check =
-	BALSA_SPELL_CHECK(gtk_type_new(balsa_spell_check_get_type()));
+    spell_check = BALSA_SPELL_CHECK(balsa_spell_check_new());
     spell_check->view = check_text;
 
     return GTK_WIDGET(spell_check);
@@ -381,6 +434,10 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     GtkWidget *new_word_text;
     GtkWidget *sw;
     GtkWidget *suggestion_list;
+    GtkListStore *store;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    GtkTreeSelection *selection;
     GtkWidget *change;
     GtkWidget *change_all;
     GtkWidget *ignore;
@@ -417,50 +474,59 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
                        sw, TRUE, TRUE, 0);
 
     /* setup suggestion list */
-    suggestion_list = gtk_clist_new(1);
-    gtk_clist_set_selection_mode(GTK_CLIST(suggestion_list),
-				 GTK_SELECTION_BROWSE);
-    gtk_clist_set_column_auto_resize(GTK_CLIST(suggestion_list), 0, TRUE);
-    gtk_clist_column_titles_hide(GTK_CLIST(suggestion_list));
+    store = gtk_list_store_new(1, G_TYPE_STRING);
+    suggestion_list = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    g_object_unref(store);
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
+                                                      "text", 0, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(suggestion_list), column);
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(suggestion_list));
+    gtk_tree_selection_set_mode(selection, GTK_SELECTION_BROWSE);
+    gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(suggestion_list), FALSE);
     gtk_container_add(GTK_CONTAINER(sw), suggestion_list);
-    spell_check->list = GTK_CLIST(suggestion_list);
+    spell_check->list = GTK_TREE_VIEW(suggestion_list);
 
     /* setup buttons to perform actions */
     vbox = gtk_vbox_new(FALSE, padding);
-    change = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_REDO,
+    change = balsa_stock_button_with_label(GTK_STOCK_REDO,
 					   "Change");
     gtk_tooltips_set_tip(balsa_app.tooltips, change,
-			 _
-			 ("Replace the current word with the selected suggestion"),
+			 _("Replace the current word "
+                           "with the selected suggestion"),
 			 NULL);
     gtk_box_pack_start(GTK_BOX(vbox), change, FALSE, FALSE, 0);
 
-    change_all = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_REFRESH,
+    change_all = balsa_stock_button_with_label(GTK_STOCK_REFRESH,
 					       "Change All");
     gtk_tooltips_set_tip(balsa_app.tooltips, change_all,
-			 _("Replace all occurences of the current word with the selected suggestion"),
+			 _("Replace all occurences of the current word "
+                           "with the selected suggestion"),
 			 NULL);
     gtk_box_pack_start(GTK_BOX(vbox), change_all, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(spell_check)->action_area),
                        vbox, FALSE, FALSE, 0);
 
     vbox = gtk_vbox_new(FALSE, padding);
-    ignore = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_FORWARD, "Ignore");
+    ignore = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD,
+                                           "Ignore");
 
     gtk_tooltips_set_tip(balsa_app.tooltips, ignore,
 			 _("Skip the current word"), NULL);
     gtk_box_pack_start(GTK_BOX(vbox), ignore, FALSE, FALSE, 0);
 
-    ignore_all = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_LAST, "Ignore All");
+    ignore_all = balsa_stock_button_with_label(GTK_STOCK_GOTO_LAST,
+                                               "Ignore All");
     gtk_tooltips_set_tip(balsa_app.tooltips, ignore_all,
-			 _("Skip all occurances of the current word"),
+			 _("Skip all occurrences of the current word"),
 			 NULL);
     gtk_box_pack_start(GTK_BOX(vbox), ignore_all, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(spell_check)->action_area),
                        vbox, FALSE, FALSE, 0);
 
     vbox = gtk_vbox_new(FALSE, padding);
-    learn = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_BOOK_OPEN, "Learn");
+    learn = balsa_stock_button_with_label(GNOME_STOCK_BOOK_OPEN,
+                                          "Learn");
     gtk_tooltips_set_tip(balsa_app.tooltips, learn,
 			 _("Add the current word to your personal dictionary"),
 			 NULL);
@@ -469,12 +535,12 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
                        vbox, FALSE, FALSE, 0);
 
     vbox = gtk_vbox_new(FALSE, padding);
-    done = balsa_stock_button_with_label(GNOME_STOCK_BUTTON_OK, "Done");
+    done = balsa_stock_button_with_label(GTK_STOCK_OK, "Done");
     gtk_tooltips_set_tip(balsa_app.tooltips, done,
 			 _("Finish spell checking"), NULL);
     gtk_box_pack_start(GTK_BOX(vbox), done, FALSE, FALSE, 0);
 
-    cancel = gtk_button_new_from_stock(GNOME_STOCK_BUTTON_CANCEL);
+    cancel = gtk_button_new_from_stock(GTK_STOCK_CANCEL);
     gtk_tooltips_set_tip(balsa_app.tooltips, cancel,
 			 _("Revert all changes and finish spell checking"),
 			 NULL);
@@ -483,29 +549,29 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
                      vbox, FALSE, FALSE, 0);
 
     /* connect signal handlers */
-    gtk_signal_connect(GTK_OBJECT(suggestion_list), "select-row",
-		       GTK_SIGNAL_FUNC(select_word_cb), spell_check);
+    g_signal_connect(G_OBJECT(selection), "changed",
+		     G_CALLBACK(select_word_cb), spell_check);
 
-    gtk_signal_connect(GTK_OBJECT(change), "clicked",
-		       GTK_SIGNAL_FUNC(change_cb), spell_check);
+    g_signal_connect(G_OBJECT(change), "clicked",
+		     G_CALLBACK(change_cb), spell_check);
 
-    gtk_signal_connect(GTK_OBJECT(change_all), "clicked",
-		       GTK_SIGNAL_FUNC(change_all_cb), spell_check);
+    g_signal_connect(G_OBJECT(change_all), "clicked",
+		     G_CALLBACK(change_all_cb), spell_check);
 
-    gtk_signal_connect(GTK_OBJECT(ignore), "clicked",
-		       GTK_SIGNAL_FUNC(ignore_cb), spell_check);
+    g_signal_connect(G_OBJECT(ignore), "clicked",
+		     G_CALLBACK(ignore_cb), spell_check);
 
-    gtk_signal_connect(GTK_OBJECT(ignore_all), "clicked",
-		       GTK_SIGNAL_FUNC(ignore_all_cb), spell_check);
+    g_signal_connect(G_OBJECT(ignore_all), "clicked",
+		     G_CALLBACK(ignore_all_cb), spell_check);
 
-    gtk_signal_connect(GTK_OBJECT(learn), "clicked",
-		       GTK_SIGNAL_FUNC(learn_cb), spell_check);
+    g_signal_connect(G_OBJECT(learn), "clicked",
+		     G_CALLBACK(learn_cb), spell_check);
 
-    gtk_signal_connect(GTK_OBJECT(cancel), "clicked",
-		       GTK_SIGNAL_FUNC(cancel_cb), spell_check);
+    g_signal_connect(G_OBJECT(cancel), "clicked",
+		     G_CALLBACK(cancel_cb), spell_check);
 
-    gtk_signal_connect(GTK_OBJECT(done), "clicked",
-		       GTK_SIGNAL_FUNC(done_cb), spell_check);
+    g_signal_connect(G_OBJECT(done), "clicked",
+		     G_CALLBACK(done_cb), spell_check);
 
     gtk_window_set_title(GTK_WINDOW(spell_check), _("Spell check"));
     gtk_window_set_wmclass(GTK_WINDOW(spell_check), "spell", "Balsa");
@@ -519,18 +585,18 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
  * from the clist selection.
  * */
 static void
-select_word_cb(GtkCList * clist, gint row, gint column,
-	       GdkEventButton * button, gpointer data)
+select_word_cb(GtkTreeSelection * selection, gpointer data)
 {
-    BalsaSpellCheck *spell_check;
-    gchar *selection[1];
-    gint result;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
 
+    if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+        gchar *str;
+        BalsaSpellCheck *spell_check = BALSA_SPELL_CHECK(data);
 
-    spell_check = BALSA_SPELL_CHECK(data);
-    result = gtk_clist_get_text(clist, row, column, selection);
-    if (result) {
-	gtk_entry_set_text(spell_check->entry, selection[0]);
+        gtk_tree_model_get(model, &iter, 0, &str, -1);
+        gtk_entry_set_text(spell_check->entry, str);
+        g_free(str);
     }
 }
 
@@ -696,8 +762,7 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check)
     pspell_config_replace(spell_check->spell_config,
 			  "sug-mode", spell_check->suggest_mode);
 
-    string = g_strdup(spell_check->character_set);
-    g_strdown(string);
+    string = g_ascii_strdown(spell_check->character_set, -1);
     if (!strncmp(string, "iso-", 4)) {
 	    /* pspell .map files are iso8859-* */
 	    memmove(&string[3], &string[4], strlen(string) - 3);
@@ -780,6 +845,10 @@ static gboolean
 balsa_spell_check_next(BalsaSpellCheck * spell_check)
 {
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
+    GtkTreeView *tree_view = spell_check->list;
+    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
+    GtkTreeIter iter;
 
     if (!next_word(spell_check)) {
 	balsa_spell_check_finish(spell_check, TRUE);
@@ -794,10 +863,12 @@ balsa_spell_check_next(BalsaSpellCheck * spell_check)
     }
 
     /* found an incorrect spelling */
-    gtk_clist_select_row(spell_check->list, 0, 0);
-    if (gtk_clist_row_is_visible(spell_check->list, 1) !=
-        GTK_VISIBILITY_FULL)
-        gtk_clist_moveto(spell_check->list, 1, -1, 0.0, 0.0);
+    if (gtk_tree_model_get_iter_first(model, &iter)) {
+        GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
+        gtk_tree_selection_select_path(selection, path);
+        gtk_tree_view_scroll_to_cell(tree_view, path, NULL, TRUE, 0.5, 0);
+        gtk_tree_path_free(path);
+    }
 
     /* highlight current word by selecting it */
     gtk_text_buffer_place_cursor(buffer, &spell_check->start_iter);
@@ -922,7 +993,7 @@ balsa_spell_check_fix(BalsaSpellCheck * spell_check, gboolean fix_all)
             wrong_word =
                 gtk_text_buffer_get_text(buffer, &spell_check->start_iter,
                                          &spell_check->end_iter, FALSE);
-	    if (g_strcasecmp(old_word, wrong_word) == 0) {
+	    if (g_ascii_strcasecmp(old_word, wrong_word) == 0) {
 		switch_word(spell_check, wrong_word, new_word);
 	    }
 	    g_free(wrong_word);
@@ -1036,28 +1107,25 @@ balsa_spell_check_finish(BalsaSpellCheck * spell_check,
 static void
 setup_suggestions(BalsaSpellCheck * spell_check)
 {
+    GtkTreeModel *model = gtk_tree_view_get_model(spell_check->list);
     const PspellWordList *wl;
     const gchar *new_word;
-    gchar *row_text[1];
-
 
     wl = spell_check->word_list;
-    gtk_clist_freeze(spell_check->list);
     spell_check->suggestions = pspell_word_list_elements(wl);
 
-    while (
-	   (new_word =
-	    pspell_string_emulation_next(spell_check->suggestions)) !=
-	   NULL) {
-	if (balsa_app.debug)
-	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			      "BalsaSpellCheck: Suggest %s\n", new_word);
+    while ((new_word =
+            pspell_string_emulation_next(spell_check->suggestions)) !=
+           NULL) {
+        GtkTreeIter iter;
 
-	row_text[0] = g_strdup(new_word);
-	gtk_clist_append(spell_check->list, row_text);
-	g_free(row_text[0]);
+        if (balsa_app.debug)
+            balsa_information(LIBBALSA_INFORMATION_DEBUG,
+                              "BalsaSpellCheck: Suggest %s\n", new_word);
+
+        gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+        gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, new_word, -1);
     }
-    gtk_clist_thaw(spell_check->list);
 }
 
 
@@ -1118,8 +1186,10 @@ check_word(BalsaSpellCheck * spell_check)
 static void
 finish_check(BalsaSpellCheck * spell_check)
 {
+    GtkTreeModel *model = gtk_tree_view_get_model(spell_check->list);
+
     /* get rid of the suggestions */
-    gtk_clist_clear(spell_check->list);
+    gtk_list_store_clear(GTK_LIST_STORE(model));
 
     gtk_entry_set_text(spell_check->entry, "");
 

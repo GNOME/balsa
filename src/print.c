@@ -22,7 +22,7 @@
 #include "config.h"
 
 #include <gnome.h>
-#include <balsa-app.h>
+#include "balsa-app.h"
 
 #include "print.h"
 #include "misc.h"
@@ -43,6 +43,8 @@
 #endif
 #include "balsa-index.h"
 #include "quote-color.h"
+
+#include <string.h>
 
 #define BALSA_PRINT_TYPE_HEADER     1
 #define BALSA_PRINT_TYPE_SEPARATOR  2
@@ -808,7 +810,7 @@ print_default(PrintInfo * pi, gpointer data)
     gnome_print_concat(pi->pc, matrix);
     print_image_from_pixbuf(pi->pc, pdata->pixbuf);
     gnome_print_grestore (pi->pc);
-    gdk_pixbuf_unref(pdata->pixbuf);
+    g_object_unref(pdata->pixbuf);
     
     /* print the description */
     gnome_print_setfont(pi->pc, pi->header_font);
@@ -900,7 +902,7 @@ print_image(PrintInfo * pi, gpointer * data)
     print_image_from_pixbuf(pi->pc, pdata->pixbuf);
     gnome_print_grestore (pi->pc);
     pi->ypos -= pdata->print_height;
-    gdk_pixbuf_unref(pdata->pixbuf);
+    g_object_unref(pdata->pixbuf);
 }
 
 /*
@@ -931,8 +933,8 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
 	
 	for (action = mime_actions; 
 	     action->mime_type && 
-		 g_strncasecmp(action->mime_type, conttype, 
-			       strlen(action->mime_type));
+		 g_ascii_strncasecmp(action->mime_type, conttype, 
+			             strlen(action->mime_type));
 	     action++);
 	g_free(conttype);
 
@@ -1196,9 +1198,9 @@ print_dialog(GnomePrintMaster * master, CommonInfo * ci)
     gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 3);    
     chkbut = 
 	gtk_check_button_new_with_label ("enable highlighting of cited text");
-    gtk_signal_connect(GTK_OBJECT(chkbut), "toggled",
-		       GTK_SIGNAL_FUNC(togglebut_changed), 
-		       &balsa_app.print_highlight_cited);    
+    g_signal_connect(G_OBJECT(chkbut), "toggled",
+		     G_CALLBACK(togglebut_changed), 
+		     &balsa_app.print_highlight_cited);    
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(chkbut),
 				  balsa_app.print_highlight_cited);
     gtk_container_add (GTK_CONTAINER (frame), chkbut);

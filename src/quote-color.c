@@ -91,14 +91,18 @@ is_a_quote(const gchar * str, regex_t * rex)
  */
 void
 allocate_quote_colors(GtkWidget * widget, GdkColor color[],
-		      gint first, gint last)
+                      gint first, gint last)
 {
     gint i;
 
     for (i = first; i <= last; i++) {
-	if (!gdk_colormap_alloc_color
-	    (balsa_app.colormap, &color[i], FALSE,
-	     TRUE)) gdk_color_black(balsa_app.colormap, &color[i]);
+        if (!gdk_colormap_alloc_color(balsa_app.colormap,
+                                      &color[i], FALSE, TRUE)) {
+            /* gdk_color_black(balsa_app.colormap, &color[i]); */
+            color[i].red = color[i].green = color[i].blue = 0;
+            gdk_colormap_alloc_color(balsa_app.colormap, &color[i], FALSE,
+                                     TRUE);
+        }
     }
 }
 

@@ -22,6 +22,7 @@
 #include "config.h"
 
 #include <gnome.h>
+#include <string.h>
 
 #include "balsa-app.h"
 #include "balsa-index.h"
@@ -229,12 +230,11 @@ store_address_book_frame(struct store_address_info * info)
 
 	    menu_item = gtk_menu_item_new_with_label(address_book->name);
 	    gtk_widget_show(menu_item);
-	    gtk_menu_append(GTK_MENU(ab_menu), menu_item);
+	    gtk_menu_shell_append(GTK_MENU_SHELL(ab_menu), menu_item);
 
             info->address_book = address_book;
-	    gtk_signal_connect(GTK_OBJECT(menu_item), "activate",
-			       GTK_SIGNAL_FUNC(store_address_book_menu_cb),
-                               info);
+	    g_signal_connect(G_OBJECT(menu_item), "activate",
+			     G_CALLBACK(store_address_book_menu_cb), info);
 
 	    if (address_book == balsa_app.default_address_book)
 		gtk_menu_set_active(GTK_MENU(ab_menu), default_ab_offset);

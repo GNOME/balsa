@@ -552,9 +552,12 @@ config_global_load(void)
     balsa_app.shown_headers = d_get_gint("ShownHeaders", HEADERS_SELECTED);
 
     g_free(balsa_app.selected_headers);
-    balsa_app.selected_headers =
-	gnome_config_get_string("SelectedHeaders=" DEFAULT_SELECTED_HDRS);
-    g_strdown(balsa_app.selected_headers);
+    {                           /* scope */
+        gchar *tmp = gnome_config_get_string("SelectedHeaders="
+                                             DEFAULT_SELECTED_HDRS);
+        balsa_app.selected_headers = g_ascii_strdown(tmp, -1);
+        g_free(tmp);
+    }
 
     /* ... Message window title format */
     g_free(balsa_app.message_title_format);
@@ -1251,7 +1254,7 @@ config_identities_load()
 	    ident = libbalsa_identity_new_config(tmp, key+pref_len);
 	    balsa_app.identities = g_list_prepend(balsa_app.identities, ident);
 	    g_free(tmp);
-	    if(g_strcasecmp(default_ident, ident->identity_name) == 0)
+	    if(g_ascii_strcasecmp(default_ident, ident->identity_name) == 0)
 		balsa_app.current_ident = ident;
 	}
 	g_free(key);

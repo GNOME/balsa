@@ -34,52 +34,22 @@
 extern "C" {
 #endif				/* __cplusplus */
 
-#define BALSA_TYPE_SPELL_CHECK         (balsa_spell_check_get_type ())
-#define BALSA_SPELL_CHECK(obj)         GTK_CHECK_CAST (obj, BALSA_TYPE_SPELL_CHECK, BalsaSpellCheck)
-#define BALSA_SPELL_CHECK_CLASS(klass) GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_SPELL_CHECK, BalsaSpellCheckClass)
-#define BALSA_IS_SPELL_CHECK(obj)      GTK_CHECK_TYPE (obj, BALSA_TYPE_SPELL_CHECK)
+#define BALSA_TYPE_SPELL_CHECK \
+        (balsa_spell_check_get_type ())
+#define BALSA_SPELL_CHECK(obj) \
+        GTK_CHECK_CAST (obj, BALSA_TYPE_SPELL_CHECK, BalsaSpellCheck)
+#define BALSA_SPELL_CHECK_CLASS(klass) \
+        GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_SPELL_CHECK, \
+                BalsaSpellCheckClass)
+#define BALSA_IS_SPELL_CHECK(obj) \
+        GTK_CHECK_TYPE (obj, BALSA_TYPE_SPELL_CHECK)
+#define BALSA_IS_SPELL_CHECK_CLASS(klass) \
+        (GTK_CHECK_CLASS_TYPE ((klass), BALSA_TYPE_SPELL_CHECK))
 
 
+/* opaque structures, declared in spell-check.c */
     typedef struct _BalsaSpellCheck BalsaSpellCheck;
     typedef struct _BalsaSpellCheckClass BalsaSpellCheckClass;
-
-
-    struct _BalsaSpellCheck {
-	GtkDialog dialog;
-
-	GtkTextView *view;
-	GtkCList *list;
-	GtkEntry *entry;
-
-	/* actual spell checking variables */
-	PspellConfig *spell_config;
-	PspellManager *spell_manager;
-	const PspellWordList *word_list;
-	PspellStringEmulation *suggestions;
-
-	/* restoration information */
-	gchar *original_text;
-	GtkTextMark *original_mark;
-        gint original_offset;
-
-	/* word selection */
-	GtkTextIter start_iter;
-	GtkTextIter end_iter;
-
-	/* config stuff */
-	gchar *module;
-	gchar *suggest_mode;
-	guint ignore_length;
-	gchar *language_tag;
-	gchar *character_set;
-    };
-
-
-    struct _BalsaSpellCheckClass {
-	GtkDialogClass parent_class;
-
-	void (*done_spell_check) (BalsaSpellCheck * spell_check);
-    };
 
     GtkType balsa_spell_check_get_type(void);
 

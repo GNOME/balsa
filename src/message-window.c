@@ -326,7 +326,7 @@ message_window_new(LibBalsaMessage * message)
 				BALSA_TOOLBAR_FUNC(print_cb), mw);
     set_toolbar_button_callback(2, BALSA_PIXMAP_SAVE,
 				BALSA_TOOLBAR_FUNC(save_current_part_cb), mw);
-    set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_CLOSE,
+    set_toolbar_button_callback(2, GTK_STOCK_CLOSE,
 				BALSA_TOOLBAR_FUNC(close_message_window), mw);
     set_toolbar_button_callback(2, BALSA_PIXMAP_SHOW_HEADERS,
 				BALSA_TOOLBAR_FUNC(show_all_headers_tool_cb), mw);
@@ -342,9 +342,8 @@ message_window_new(LibBalsaMessage * message)
 
     gtk_window_set_wmclass(GTK_WINDOW(mw->window), "message", "Balsa");
 
-    gtk_signal_connect(GTK_OBJECT(mw->window),
-		       "destroy",
-		       GTK_SIGNAL_FUNC(destroy_message_window), mw);
+    g_signal_connect(G_OBJECT(mw->window), "destroy",
+		     G_CALLBACK(destroy_message_window), mw);
     
     gnome_app_create_menus_with_data(GNOME_APP(mw->window), main_menu, mw);
 

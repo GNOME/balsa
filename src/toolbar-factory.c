@@ -97,8 +97,8 @@ static char *toolbar1_legal[]={
     BALSA_PIXMAP_PRINT,
     BALSA_PIXMAP_SAVE,
     BALSA_PIXMAP_SEND,
-    GNOME_STOCK_PIXMAP_CLOSE,
-    GNOME_STOCK_PIXMAP_SPELLCHECK,
+    GTK_STOCK_CLOSE,
+    GTK_STOCK_SPELL_CHECK,
     NULL
 };
 
@@ -117,7 +117,7 @@ static char *toolbar2_legal[]={
     BALSA_PIXMAP_SHOW_HEADERS,
     BALSA_PIXMAP_TRASH,
     BALSA_PIXMAP_TRASH_EMPTY,
-    GNOME_STOCK_PIXMAP_CLOSE,
+    GTK_STOCK_CLOSE,
     NULL
 };
 
@@ -164,9 +164,9 @@ button_data toolbar_buttons[]={
      N_("Save the current item"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_IDENTITY, N_("Identity"),
      N_("Set identity to use for this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_SPELLCHECK, N_("Spelling"),
+    {GTK_STOCK_SPELL_CHECK, N_("Spelling"),
      N_("Run a spell check"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {GNOME_STOCK_PIXMAP_CLOSE, N_("Cancel"), 
+    {GTK_STOCK_CLOSE, N_("Cancel"), 
      N_("Cancel this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_MARKED_NEW, N_("Toggle\nnew"),
      N_("Toggle new message flag"), TOOLBAR_BUTTON_TYPE_BUTTON},
@@ -265,7 +265,7 @@ get_tool_widget(GtkWidget *window, BalsaToolbarType toolbar, const char *id)
     if (position < 0)
 	return NULL;
     
-    children = gtk_container_children(GTK_CONTAINER(bar));
+    children = gtk_container_get_children(GTK_CONTAINER(bar));
     child = GTK_WIDGET(g_list_nth_data(children, position));
     g_list_free(children);
 
@@ -326,11 +326,11 @@ static const gchar* compose_toolbar[] = {
     "",
     BALSA_PIXMAP_IDENTITY,
     "",
-    GNOME_STOCK_PIXMAP_SPELLCHECK,
+    GTK_STOCK_SPELL_CHECK,
     "",
     BALSA_PIXMAP_PRINT,
     "",
-    GNOME_STOCK_PIXMAP_CLOSE,
+    GTK_STOCK_CLOSE,
     NULL
 };
 
@@ -496,7 +496,6 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
 #else
         bar = GTK_TOOLBAR(gtk_toolbar_new());
         gtk_toolbar_set_orientation(bar, GTK_ORIENTATION_HORIZONTAL);
-        gtk_toolbar_set_style(bar, GTK_TOOLBAR_BOTH);
 #endif                          /* BALSA_MAJOR < 2 */
     } else {
 	bar=GTK_TOOLBAR(toolbar_map[i].toolbar);
@@ -518,8 +517,6 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
     index=get_toolbar_index(toolbar);
     if(index == -1)
 	return NULL;
-
-    gtk_toolbar_set_style(bar, GTK_TOOLBAR_BOTH);
 
     position=0;
     for(j=0; balsa_app.toolbars[index][j]; j++) {

@@ -642,7 +642,7 @@ imap_mbox_get_filter(ImapMboxHandle *h)
 /* imap_mbox_set_sort:
  */
 unsigned
-imap_mbox_set_sort(ImapMboxHandle *h, ImapSortOrder isr)
+imap_mbox_set_sort(ImapMboxHandle *h, ImapSortKey isr, int ascending)
 {
   gchar *cmd;
   const char *field;
@@ -653,7 +653,8 @@ imap_mbox_set_sort(ImapMboxHandle *h, ImapSortOrder isr)
   case IMSO_DATE   : field = "DATE";    break;
   case IMSO_FROM   : field = "FROM";    break;
   }
-  cmd= g_strdup_printf("SORT (%s) UTF-8 %s", field,
+  cmd= g_strdup_printf("SORT (%s%s) UTF-8 %s", field,
+                       ascending ? "" : " REVERSE",
                        imap_mbox_get_filter(h));
   h->mbox_view.entries = 0; /* FIXME: I do not like this! 
                              * we should not be doing such 
@@ -1363,8 +1364,10 @@ ir_sort(ImapMboxHandle *h)
 {
   int c;
   char seq[12];
-  while ((c=imap_get_atom(h->sio, seq, sizeof(seq))), seq[0])
+  while ((c=imap_get_atom(h->sio, seq, sizeof(seq))), seq[0]) {
     mbox_view_append_no(&h->mbox_view, atoi(seq));
+    if(c == '\r') break;
+  }
   return ir_check_crlf(h, c);
 }
 
@@ -2533,7 +2536,11 @@ imap_mbox_handle_get_thread_root(ImapMboxHandle* handle)
 /* =================================================================== */
 /*               MboxView routines                                     */
 /* =================================================================== */
+#ifdef DEEP_MBOX_VIEW_IMPLEMENTATION_OUT_OF_BALSA
 #define MBOX_VIEW_IS_ACTIVE(mv) ((mv)->arr != NULL)
+#else
+#define MBOX_VIEW_IS_ACTIVE(mv) 0
+#endif
 void
 mbox_view_init(MboxView *mv)
 {

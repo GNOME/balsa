@@ -1,3 +1,11 @@
+2003-11-01  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/mailbox.[hc]: move SortTuple to header file.
+	* libbalsa/mailbox_imap.c: enable server side sorting.
+	* libbalsa/imap/imap-commands.[ch]: some support in the library.
+	* libbalsa/imap/imap-handle.h: add asc/desc flag.
+	* libbalsa/imap/imap.h: add more sorting keys.
+
 2003-10-31  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/server.c: make sure LibBalsaServer::host field is set.

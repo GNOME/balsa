@@ -68,25 +68,6 @@ do {\
 } while (0)
 
 
-/*
- * enums
- */
-typedef enum {
-    MAILBOX_SORT_DATE = 1,
-    MAILBOX_SORT_SIZE = 2,
-    MAILBOX_SORT_SUBJECT = 3,
-    MAILBOX_SORT_FROM = 4,
-    MAILBOX_SORT_ORDER = 5,
-    MAILBOX_SORT_THREADS = 6,
-    MAILBOX_SORT_RECEIVED = 7,
-    MAILBOX_SORT_TO = 8,
-    MAILBOX_SORT_SCORE = 9,
-    MAILBOX_SORT_ALIAS = 10,
-    MAILBOX_SORT_ADDRESS = 11,
-    MAILBOX_SORT_MASK = 0xf,
-    MAILBOX_SORT_REVERSE = (1 << 4),
-    MAILBOX_SORT_LAST = (1 << 5)
-} LibBalsaMailboxSort;
 
 typedef enum {
     LB_MAILBOX_SORT_NATURAL,
@@ -97,6 +78,13 @@ typedef enum {
     LB_MAILBOX_SORT_SIZE,
     LB_MAILBOX_SORT_SENDER
 } LibBalsaMailboxSortFields;
+
+typedef struct _SortTuple SortTuple;
+/* Sorting */
+struct _SortTuple {
+    gint offset;
+    GNode *node;
+};
 
 typedef enum {
     LB_MAILBOX_SORT_TYPE_ASC,

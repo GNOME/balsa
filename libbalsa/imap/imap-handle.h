@@ -133,7 +133,8 @@ ImapResponse imap_mbox_find_all(ImapMboxHandle *h, const char *search_str,
                                 unsigned *msgcnt, unsigned**msgs);
 
 unsigned imap_mbox_set_view(ImapMboxHandle *h, ImapMsgFlag f, gboolean state);
-unsigned imap_mbox_set_sort(ImapMboxHandle *h, ImapSortOrder isr);
+unsigned imap_mbox_set_sort(ImapMboxHandle *h, ImapSortKey isr, 
+                            int ascending);
 const char *imap_mbox_get_filter(ImapMboxHandle *h);
 /* get_thread_root is deprecated */
 GNode *imap_mbox_handle_get_thread_root(ImapMboxHandle* handle); 

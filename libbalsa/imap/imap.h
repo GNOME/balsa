@@ -53,10 +53,13 @@ typedef unsigned ImapMsgFlags;
 
 typedef enum {
   IMSO_ARRIVAL,
-  IMSO_SUBJECT,
+  IMSO_CC,
   IMSO_DATE,
-  IMSO_FROM   
-} ImapSortOrder;
+  IMSO_FROM,
+  IMSO_SIZE,
+  IMSO_SUBJECT,
+  IMSO_TO
+} ImapSortKey;
 
 /* ImapMessage: Structure used to pass around and cache IMAP message data.
  */

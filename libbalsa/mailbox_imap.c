@@ -1351,6 +1351,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 
     imsg = imap_mbox_handle_get_msg(mimap->handle, message->msgno);
 
+    g_return_val_if_fail(imsg, FALSE);
     lbimap_update_flags(message, imsg);
 
     lb_set_headers(message->headers, imsg->envelope, FALSE);
@@ -1728,6 +1729,23 @@ libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
 #endif
 }
 
+static ImapSortKey
+lbmi_get_imap_sort_key(LibBalsaMailbox *mbox)
+{
+    ImapSortKey key = LB_MBOX_FROM_COL;
+
+    switch (mbox->sort_column_id) {
+    default:
+    case LB_MBOX_MSGNO_COL:   /* FIXME */ break;
+    case LB_MBOX_FROM_COL:    
+        key = mbox->view->show == LB_MAILBOX_SHOW_TO
+            ? IMSO_TO : IMSO_FROM;                break;
+    case LB_MBOX_SUBJECT_COL: key = IMSO_SUBJECT; break;
+    case LB_MBOX_DATE_COL:    key = IMSO_DATE;    break;
+    case LB_MBOX_SIZE_COL:    key = IMSO_SIZE;    break;
+    }
+    return key;
+}
 static void
 libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 				    LibBalsaMailboxThreadingType thread_type)
@@ -1741,7 +1759,7 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 	new_tree = g_node_new(NULL);
 	for(msgno = 1; msgno <= mailbox->total_messages; msgno++)
 	    g_node_append_data(new_tree, GUINT_TO_POINTER(msgno));
-	break;
+        break;
     case  LB_MAILBOX_THREADING_SIMPLE:
     case LB_MAILBOX_THREADING_JWZ:
 	imap_mbox_thread(mimap->handle, "REFERENCES");
@@ -1761,8 +1779,66 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
     mailbox->stamp++;
 }
 
-static void
-libbalsa_mailbox_imap_sort(LibBalsaMailbox *mailbox, GArray *array)
+static gint
+lbmi_compare_func(const SortTuple * a,
+		  const SortTuple * b,
+		  gboolean ascending)
 {
-    g_warning("FIXME: %s needs to be implemented\n", __func__);
+    if(ascending)
+        return GPOINTER_TO_INT(a->node->data) - GPOINTER_TO_INT(b->node->data);
+    else
+        return GPOINTER_TO_INT(b->node->data) - GPOINTER_TO_INT(a->node->data);
+}
+
+static int
+cmp_msgno(const void* a, const void *b)
+{
+    return (*(unsigned*)a) - (*(unsigned*)b);
+}
+
+static void
+libbalsa_mailbox_imap_sort(LibBalsaMailbox *mbox, GArray *array)
+{
+    unsigned *msgno_arr, *msgno_map, len, i, no_max;
+    GArray *tmp;
+    len = array->len;
+
+    if(mbox->view->threading_type != LB_MAILBOX_THREADING_FLAT)
+        return; /* FIXME: implement threading with sorting */
+    if(mbox->sort_column_id == LB_MBOX_MSGNO_COL) {
+        g_array_sort_with_data(array, (GCompareDataFunc)lbmi_compare_func,
+                               GINT_TO_POINTER(mbox->order ==
+                                               GTK_SORT_ASCENDING));
+        return;
+    }
+
+    msgno_arr = g_malloc(len*sizeof(unsigned));
+    no_max = 0;
+    for(i=0; i<len; i++) {
+        msgno_arr[i] = 
+            GPOINTER_TO_UINT(g_array_index(array, SortTuple, i).node->data);
+        if(msgno_arr[i]> no_max)
+            no_max = msgno_arr[i];
+    }
+    msgno_map  = g_malloc(no_max*sizeof(unsigned));
+    for(i=0; i<len; i++)
+        msgno_map[msgno_arr[i]-1] = i;
+
+    qsort(msgno_arr, len, sizeof(msgno_arr[0]), cmp_msgno);
+    imap_sort_msgno(LIBBALSA_MAILBOX_IMAP(mbox)->handle,
+                    lbmi_get_imap_sort_key(mbox),
+                    mbox->order == GTK_SORT_ASCENDING,
+                    msgno_arr, len); /* ignore errors */
+    
+    tmp = g_array_new(FALSE,FALSE, sizeof(SortTuple));
+    g_array_append_vals(tmp, array->data, array->len);
+    g_array_set_size(array, 0);    /* truncate */
+
+    for(i=0; i<len; i++)
+        g_array_append_val(array, 
+                           g_array_index(tmp,SortTuple, 
+                                         msgno_map[msgno_arr[i]-1]));
+    g_array_free(tmp, TRUE);
+    g_free(msgno_arr);
+    g_free(msgno_map);
 }

@@ -631,7 +631,6 @@ libbalsa_mailbox_real_release_message(LibBalsaMailbox * mailbox,
     /* Default is noop. */
 }
 
-typedef struct _SortTuple SortTuple;
 static gint mbox_compare_func(const SortTuple * a,
                               const SortTuple * b,
                               LibBalsaMailbox * mbox);
@@ -1606,11 +1605,6 @@ mbox_sortable_init(GtkTreeSortableIface * iface)
     iface->has_default_sort_func = mbox_has_default_sort_func;
 }
 
-/* Sorting */
-struct _SortTuple {
-    gint offset;
-    GNode *node;
-};
 
 static gint
 mbox_compare_msgno(LibBalsaMessage * message_a,

@@ -629,3 +629,47 @@ ImapResponse imap_mbox_uid_search(ImapMboxHandle *handle, const char *query,
   /* FIXME: Implement me! */
   return IMR_BAD;
 }
+
+static unsigned
+sort_coealesce_func(int i, unsigned msgno[])
+{
+  return msgno[i];
+}
+
+ImapResponse
+imap_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
+                int ascending, int *msgno, unsigned cnt)
+{
+  ImapResponse rc;
+  const char *keystr;
+  char *seq, *cmd;
+  unsigned i;
+
+  printf("xxx: %s\n", __func__);
+  switch(key) {
+  case IMSO_ARRIVAL: keystr = "ARRIVAL"; break;
+  case IMSO_CC:      keystr = "CC";      break;
+  case IMSO_DATE:    keystr = "DATE";    break;
+  case IMSO_FROM:    keystr = "FROM";    break;
+  case IMSO_SIZE:    keystr = "SIZE";    break;
+  case IMSO_SUBJECT: keystr = "SUBJECT"; break;
+  default:
+  case IMSO_TO:      keystr = "TO";      break;
+  }
+  seq = coalesce_seq_range(0,cnt-1, (CoalesceFunc)sort_coealesce_func, msgno);
+  cmd= g_strdup_printf("SORT (%s%s) UTF-8 %s", 
+                       ascending ? "" : "REVERSE ",
+                       keystr, seq);
+  g_free(seq);
+
+  handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
+                                  * we should not be doing such 
+                                  * low level manipulations here */
+  rc = imap_cmd_exec(handle, cmd);
+  g_free(cmd);
+
+  for(i=0; i<cnt; i++)
+    msgno[i] = handle->mbox_view.arr[i];
+
+  return rc;
+}

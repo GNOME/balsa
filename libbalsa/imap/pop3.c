@@ -36,6 +36,7 @@
 #include "pop3.h"
 #include "siobuf.h"
 #include "imap_private.h"
+#include "md5-utils.h"
 
 #define ELEMENTS(x) (sizeof (x) / sizeof(x[0]))
 

@@ -26,10 +26,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>
-#include <gmime/md5-utils.h> 
 
 #include "imap-auth.h"
+#include "md5-utils.h"
 #include "util.h"
+
 #include "imap_private.h"
 
 #define LONG_STRING 1024

@@ -77,14 +77,14 @@ void libbalsa_mailbox_local_msgno_removed(LibBalsaMailbox * mailbox,
 void libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox);
 
 /* Helpers for maildir and mh. */
-GMimeMessage *_libbalsa_mailbox_local_get_mime_message(LibBalsaMailbox *
+GMimeMessage *libbalsa_mailbox_local_get_mime_message(LibBalsaMailbox *
+						      mailbox,
+						      const gchar * name1,
+						      const gchar * name2);
+GMimeStream *libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox *
 						       mailbox,
 						       const gchar * name1,
 						       const gchar * name2);
-GMimeStream *_libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox *
-							mailbox,
-							const gchar * name1,
-							const gchar * name2);
 
 /* Queued sync. */
 void libbalsa_mailbox_local_queue_sync(LibBalsaMailboxLocal * local);

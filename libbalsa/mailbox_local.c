@@ -69,9 +69,12 @@ static void lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *mailbox, 
                                                      guint lo, guint hi);
 
-static void libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
-                                                   LibBalsaMessage *message,
-                                                   LibBalsaFetchFlag flags);
+static gboolean libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *
+                                                       mailbox,
+                                                       LibBalsaMessage *
+                                                       message,
+                                                       LibBalsaFetchFlag
+                                                       flags);
 static void libbalsa_mailbox_local_fetch_headers(LibBalsaMailbox *mailbox,
                                                  LibBalsaMessage *message);
 
@@ -541,14 +544,15 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *mailbox,
  * to this one.
  */
 
-static void
+static gboolean
 libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
                                        LibBalsaMessage *message,
                                        LibBalsaFetchFlag flags)
 {
     GMimeMessage *mime_message = message->mime_msg;
-    g_assert(mime_message != NULL);
-    g_assert(mime_message->mime_part != NULL);
+
+    if (!mime_message || !mime_message->mime_part)
+	return FALSE;
 
     if(flags & LB_FETCH_STRUCTURE) {
         LibBalsaMessageBody *body = libbalsa_message_body_new(message);
@@ -562,6 +566,8 @@ libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
             libbalsa_message_user_hdrs_from_gmime(mime_message);
         message->has_all_headers = 1;
     }
+
+    return TRUE;
 }
 
 static void
@@ -1210,7 +1216,7 @@ lbml_thread_message(GNode * node, ThreadingInfo * ti)
 
 /* Helper for maildir and mh. */
 GMimeMessage *
-_libbalsa_mailbox_local_get_mime_message(LibBalsaMailbox * mailbox,
+libbalsa_mailbox_local_get_mime_message(LibBalsaMailbox * mailbox,
 					 const gchar * name1,
 					 const gchar * name2)
 {
@@ -1219,19 +1225,22 @@ _libbalsa_mailbox_local_get_mime_message(LibBalsaMailbox * mailbox,
     GMimeMessage *mime_message;
 
     mime_stream =
-	_libbalsa_mailbox_local_get_message_stream(mailbox, name1, name2);
+	libbalsa_mailbox_local_get_message_stream(mailbox, name1, name2);
+    if (!mime_stream)
+	return NULL;
+
     mime_parser = g_mime_parser_new_with_stream(mime_stream);
     g_mime_parser_set_scan_from(mime_parser, FALSE);
     mime_message = g_mime_parser_construct_message(mime_parser);
 
     g_object_unref(mime_parser);
-    g_mime_stream_unref(mime_stream);
+    g_object_unref(mime_stream);
 
     return mime_message;
 }
 
 GMimeStream *
-_libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox * mailbox,
+libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox * mailbox,
 					   const gchar * name1,
 					   const gchar * name2)
 {

@@ -1127,16 +1127,16 @@ reflow_string(gchar * str, gint mode, gint * cur_pos, int width)
 }
 
 typedef struct _message_url_t {
-    gint start, end;     /* positions within the text widget */
-    gchar *url;          /* the link */
+    gint xul, yul, xlr, ylr;     /* positions within the text widget */
+    gchar *url;                  /* the link */
 } message_url_t;
 
 static void
 gtk_text_insert_with_url(GtkText *text, GdkFont *font, GdkColor *dflt, 
 			 const char *chars, regex_t *url_reg,
-			 GList **url_list, gint *index)
+			 GList **url_list, gint *linepos)
 {
-    gint match;
+    gint match, xpos = 0;
     regmatch_t url_match;
     gchar *p = (gchar *)chars;
 
@@ -1144,34 +1144,88 @@ gtk_text_insert_with_url(GtkText *text, GdkFont *font, GdkColor *dflt,
     while (!match) {
 	gchar *buf;
 	message_url_t *url_found;
+	gint lbearing, rbearing, width, ascent, descent;
 
 	if (url_match.rm_so) {
 	    buf = g_strndup(p, url_match.rm_so);
 	    gtk_text_insert(text, font, dflt, NULL, buf, -1);
+	    gdk_string_extents(font, buf, &lbearing, &rbearing, &width,
+			       &ascent, &descent);
+	    xpos += width;
 	    g_free(buf);
 	}
       
 	buf = g_strndup(p + url_match.rm_so, 
 			url_match.rm_eo - url_match.rm_so);
-	if(balsa_app.debug) printf("Found URL: '%s'\n", buf);
 	gtk_text_insert(text, font, &balsa_app.url_color, NULL, buf, -1);
+	gdk_string_extents(font, buf, &lbearing, &rbearing, &width,
+			   &ascent, &descent);
 
 	/* remember the URL and its position within the text */
 	url_found = g_malloc(sizeof(message_url_t));
-	url_found->start = *index + url_match.rm_so;
-	url_found->end = *index + url_match.rm_eo;
+	url_found->xul = xpos;
+	url_found->yul = *linepos;
+	url_found->xlr = xpos + width;
+	url_found->ylr = *linepos + font->ascent + font->descent;
 	url_found->url = buf;  /* gets freed later... */
 	*url_list = g_list_append(*url_list, url_found);
 
 	p += url_match.rm_eo;
-	*index += url_match.rm_eo;
+	xpos += width;
 	match = regexec(url_reg, p, 1, &url_match, 0);
     }
 
-    if (*p) {
+    if (*p)
 	gtk_text_insert(text, font, dflt, NULL, p, -1);
-	*index += strlen (p);
+    
+    *linepos += font->ascent + font->descent;
+}
+
+static gboolean
+fix_event_mask(GtkWidget *widget, gpointer data)
+{
+    GdkWindow *w = GTK_TEXT(widget)->text_area;
+    
+    gdk_window_set_events(w, gdk_window_get_events(w) | GDK_POINTER_MOTION_MASK);
+    return FALSE;
+}
+
+static gboolean
+check_over_url(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+    GList *url_list = (GList *)data;
+    gint x, y;
+    GdkModifierType mask;
+    static GdkCursor *normal = NULL, *over_url = NULL;
+    static gboolean was_over_url = FALSE;
+
+    g_return_val_if_fail(url_list, FALSE); /* this should not happen... */
+
+    gdk_window_get_pointer(GTK_TEXT(widget)->text_area, &x, &y, &mask);
+    while (url_list) {
+	message_url_t *url_data = (message_url_t *)url_list->data;
+
+	if (url_data->xul <= x && x <= url_data->xlr &&
+	    url_data->yul <= y && y <= url_data->ylr) {
+	    if (!normal || !over_url) {
+		normal = gdk_cursor_new(GDK_LEFT_PTR);
+		over_url = gdk_cursor_new(GDK_HAND2);
+	    }
+	    if (!was_over_url) {
+		gdk_window_set_cursor(GTK_TEXT(widget)->text_area, over_url);
+		was_over_url = TRUE;
+	    }
+	    return FALSE;
+	}
+	url_list = g_list_next(url_list);
     }
+
+    if (was_over_url) {
+	gdk_window_set_cursor(GTK_TEXT(widget)->text_area, normal);
+	was_over_url = FALSE;
+    }
+
+    return FALSE;
 }
 
 static gboolean 
@@ -1180,13 +1234,17 @@ check_call_url(GtkWidget *widget, GdkEventButton *event, gpointer data)
     g_return_val_if_fail(data, FALSE); /* this should not happen... */
 
     if (event->type == GDK_BUTTON_RELEASE && event->button == 1) {
-	gint cursor = gtk_editable_get_position(GTK_EDITABLE(widget));
 	GList *url_list = (GList *)data;
+	gint x;
+	gint y;
+	GdkModifierType mask;
 	
+	gdk_window_get_pointer(GTK_TEXT(widget)->text_area, &x, &y, &mask);
 	while (url_list) {
 	    message_url_t *url_data = (message_url_t *)url_list->data;
 
-	    if (cursor >= url_data->start && cursor <= url_data->end) {
+	    if (url_data->xul <= x && x <= url_data->xlr &&
+		url_data->yul <= y && y <= url_data->ylr) {
 		gchar *notice =
 		    g_strdup_printf(_("Calling URL %s..."), url_data->url);
 		gnome_appbar_set_status(balsa_app.appbar, notice);
@@ -1249,14 +1307,15 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 #endif
     } else {
 	regex_t rex, url_reg;
-	const char *url_str = "((ht|f)tps?://[^[:blank:]\r\n]+)";
-	
+	const char *url_str = "\\<((ht|f)tp[s]?://[^[:blank:]]+)\\>";
+
 	GtkWidget *item = NULL;
 	GdkFont *fnt = NULL;
 
 	GList *url_list = NULL;
 	
 	fnt = find_body_font(info->body);
+
 	if (bm->wrap_text)
 	    libbalsa_wrap_string(ptr, balsa_app.wraplength);
 	
@@ -1292,7 +1351,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 		("part_info_init_mimetext: quote regex compilation failed.");
 	    gtk_text_insert(GTK_TEXT(item), fnt, NULL, NULL, ptr, -1);
 	} else {
-	    gint index = 0;
+	    gint ypos = 0;
 
 	    lines = l = g_strsplit(ptr, "\n", -1);
 	    for (line = *lines; line != NULL; line = *(++lines)) {
@@ -1307,10 +1366,10 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 		    quote_level = (quote_level-1)%MAX_QUOTED_COLOR;
 		    gtk_text_insert_with_url(GTK_TEXT(item), fnt,
 					     &balsa_app.quoted_color[quote_level],
-					     line, &url_reg, &url_list, &index);
+					     line, &url_reg, &url_list, &ypos);
 		} else
 		    gtk_text_insert_with_url(GTK_TEXT(item), fnt, NULL, 
-					     line, &url_reg, &url_list, &index);
+					     line, &url_reg, &url_list, &ypos);
 		g_free(line);
 	    }
 	    g_strfreev(l);
@@ -1323,6 +1382,12 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	    gtk_signal_connect_after(GTK_OBJECT(item), "button_release_event",
 				     (GtkSignalFunc)check_call_url, 
 				     (gpointer) url_list);
+	    gtk_signal_connect(GTK_OBJECT(item), "motion-notify-event",
+			       (GtkSignalFunc)check_over_url, 
+			       (gpointer) url_list);
+	    gtk_signal_connect_after(GTK_OBJECT(item), "realize",
+				     (GtkSignalFunc)fix_event_mask,
+				     NULL);
 	}
 
 	gtk_text_set_editable(GTK_TEXT(item), FALSE);

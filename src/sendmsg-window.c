@@ -444,8 +444,7 @@ static GnomeUIInfo opts_menu[] = {
 
 
 headerMenuDesc headerDescs[] =  {
-    {"from", 3}, {"to", 3}, {"subject", 2},
-    {"cc", 3}, {"bcc", 3}, {"fcc", 2}, {"replyto", 3}
+    {"from", 3}, {"cc", 3}, {"bcc", 3}, {"fcc", 2}, {"replyto", 3}
 };
 
 #define MAIN_MENUS_COUNT 5

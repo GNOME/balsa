@@ -1700,8 +1700,6 @@ static BalsaMBListMRUEntry *bmbl_mru_new(GList ** url_list,
                                          gpointer user_data,
                                          gchar * url);
 static void bmbl_mru_activate_cb(GtkWidget * widget, gpointer data);
-static gboolean bmbl_mru_destroy_cb(GtkWidget * widget, GdkEvent * event,
-                                    gpointer data);
 static void bmbl_mru_show_tree(GtkWidget * widget, gpointer data);
 static void bmbl_mru_selected_cb(GtkTreeSelection * selection,
                                  gpointer data);
@@ -1757,7 +1755,6 @@ bmbl_mru_menu(GtkWindow * window, GList ** url_list,
     GtkWidget *item;
     GList *list;
     BalsaMBListMRUEntry *mru;
-    GSList *mru_list = NULL;
 
     for (list = *url_list; list; list = g_list_next(list)) {
         gchar *url = list->data;
@@ -1765,12 +1762,13 @@ bmbl_mru_menu(GtkWindow * window, GList ** url_list,
 
         if (mailbox || (allow_empty && !*url)) {
             mru = bmbl_mru_new(url_list, user_func, user_data, url);
-            mru_list = g_slist_prepend(mru_list, mru);
             item =
                 gtk_menu_item_new_with_label(mailbox ? mailbox->name : "");
             gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-            g_signal_connect(item, "activate",
-                             G_CALLBACK(bmbl_mru_activate_cb), mru);
+            g_signal_connect_data(item, "activate",
+                                  G_CALLBACK(bmbl_mru_activate_cb), mru,
+                                  (GClosureNotify) g_free,
+                                  (GConnectFlags) 0);
         }
     }
 
@@ -1780,14 +1778,12 @@ bmbl_mru_menu(GtkWindow * window, GList ** url_list,
     mru = bmbl_mru_new(url_list, user_func, user_data, NULL);
     mru->window = window;
     mru->setup_cb = setup_cb;
-    mru_list = g_slist_prepend(mru_list, mru);
     item = gtk_menu_item_new_with_mnemonic(_("_Other..."));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-    g_signal_connect(item, "activate",
-                     G_CALLBACK(bmbl_mru_show_tree), mru);
+    g_signal_connect_data(item, "activate",
+                          G_CALLBACK(bmbl_mru_show_tree), mru,
+                          (GClosureNotify) g_free, (GConnectFlags) 0);
 
-    g_signal_connect(menu, "destroy-event",
-                     G_CALLBACK(bmbl_mru_destroy_cb), mru_list);
     gtk_widget_show_all(menu);
 
     return menu;
@@ -1830,23 +1826,6 @@ bmbl_mru_activate_cb(GtkWidget * item, gpointer data)
     balsa_mblist_mru_add(mru->url_list, mru->url);
     if (mru->user_func)
         ((MRUCallback) mru->user_func) (mru->url, mru->user_data);
-}
-
-/*
- * bmbl_mru_destroy_cb:
- *
- * Callback for the "destroy-event" signal of the menu.
- * Frees the allocated BalsaMBListMRUEntry structures.
- */
-static gboolean
-bmbl_mru_destroy_cb(GtkWidget * widget, GdkEvent * event, gpointer data)
-{
-    GSList *slist = data;
-
-    g_slist_foreach(slist, (GFunc) g_free, NULL);
-    g_slist_free(slist);
-
-    return FALSE;
 }
 
 /*
@@ -2022,9 +2001,7 @@ typedef struct _BalsaMBListMRUOption BalsaMBListMRUOption;
 /* Forward references */
 static void bmbl_mru_option_menu_setup(BalsaMBListMRUOption * mro);
 static void bmbl_mru_option_menu_cb(const gchar * url, gpointer data);
-static gboolean bmbl_mru_option_menu_destroy_cb(GtkWidget * widget,
-                                                GdkEvent * event,
-                                                gpointer data);
+static void bmbl_mru_option_menu_destroy_cb(BalsaMBListMRUOption * mro);
 
 /*
  * balsa_mblist_mru_option_menu:
@@ -2055,13 +2032,11 @@ balsa_mblist_mru_option_menu(GtkWindow * window, GList ** url_list)
     mro->window = window;
     mro->url_list = url_list;
     mro->option_menu = GTK_OPTION_MENU(option_menu);
+    mro->url = NULL;
     bmbl_mru_option_menu_setup(mro);
-    g_signal_connect(option_menu, "destroy-event",
-                     G_CALLBACK(bmbl_mru_option_menu_destroy_cb), mro);
-    g_object_set_data(G_OBJECT(option_menu), "mro", mro);
-
-    /* initial setting */
-    mro->url = *url_list ? g_strdup((const gchar *) (*url_list)->data) : NULL;
+    gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), 0);
+    g_object_set_data_full(G_OBJECT(option_menu), "mro", mro, 
+                           (GDestroyNotify) bmbl_mru_option_menu_destroy_cb);
 
     return option_menu;
 }
@@ -2146,18 +2121,13 @@ bmbl_mru_option_menu_cb(const gchar * url, gpointer data)
 /*
  * bmbl_mru_option_menu_destroy_cb:
  *
- * Callback for the "destroy-event" signal of the option menu. Frees the
- * allocated BalsaMBListMRUOption structure.
+ * Free the allocated BalsaMBListMRUOption structure.
  */
-static gboolean
-bmbl_mru_option_menu_destroy_cb(GtkWidget * widget, GdkEvent * event,
-                                gpointer data)
+static void
+bmbl_mru_option_menu_destroy_cb(BalsaMBListMRUOption * mro)
 {
-    BalsaMBListMRUOption *mro = (BalsaMBListMRUOption *) data;
-
     g_free(mro->url);
     g_free(mro);
-    return FALSE;
 }
 
 void

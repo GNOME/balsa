@@ -1,3 +1,8 @@
+2004-11-07 11:27  PeterB
+
+	* src/sendmsg-window.c: fix bug 156460--replace EUC-JP with
+	ISO-2022-JP for Japanese language option.
+
 2004-11-07 10:54  manu <eallaud@yahoo.fr>
 
 	* libbalsa/mailbox_imap.c, src/ab-window.c, src/pref-manager.c:

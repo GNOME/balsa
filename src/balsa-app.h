@@ -75,6 +75,7 @@ extern struct BalsaApplication
   GtkToolbarStyle toolbar_style;
   GnomeMDIMode mdi_style;
 
+  gboolean previewpane;
   gboolean debug;
 }
 balsa_app;

@@ -40,7 +40,7 @@ static gchar *pl_dict_get_str (proplist_t dict, gchar * str);
 static proplist_t config_mailbox_get_by_name (gchar * name);
 static proplist_t config_mailbox_get_key (proplist_t mailbox);
 static gint config_mailbox_init (proplist_t mbox, gchar * key);
-static gint config_mailbox_get_highest_number(proplist_t accounts);
+static gint config_mailbox_get_highest_number (proplist_t accounts);
 
 /* Load the configuration from the specified file. The filename is
    taken to be relative to the user's home directory, as if "~/" had
@@ -138,13 +138,13 @@ config_save (gchar * user_filename)
  * failure.
  */
 gint
-config_mailbox_add (Mailbox * mailbox, char * key_arg)
+config_mailbox_add (Mailbox * mailbox, char *key_arg)
 {
   proplist_t mbox_dict, accounts, temp_str;
   char key[32];
 
   /* Initialize the key in case it is accidentally used uninitialized */
-  strcpy(key, "AnErrorOccurred");
+  strcpy (key, "AnErrorOccurred");
 
   /* Each mailbox is stored as a Proplist dictionary of mailbox settings.
      First create the dictionary, then add it to the "accounts" section
@@ -178,7 +178,7 @@ config_mailbox_add (Mailbox * mailbox, char * key_arg)
       pl_dict_add_str_str (mbox_dict, "Username",
 			   MAILBOX_POP3 (mailbox)->user);
       /* Do not save the password if the field is NULL.  This is here
-	 so that asving the password to the balsarc file can be optional */
+         so that asving the password to the balsarc file can be optional */
       if (MAILBOX_POP3 (mailbox)->passwd != NULL)
 	pl_dict_add_str_str (mbox_dict, "Password",
 			     MAILBOX_POP3 (mailbox)->passwd);
@@ -240,9 +240,9 @@ config_mailbox_add (Mailbox * mailbox, char * key_arg)
   if (accounts == NULL)
     {
       if (key_arg == NULL)
-	strcpy(key, "m1");
+	strcpy (key, "m1");
       else
-	snprintf(key, sizeof(key), "%s", key_arg);
+	snprintf (key, sizeof (key), "%s", key_arg);
 
       /* If there is no Accounts list in the global proplist, create
          one and add it to the global configuration dictionary. */
@@ -257,18 +257,18 @@ config_mailbox_add (Mailbox * mailbox, char * key_arg)
   else
     {
       /* Before we can add the mailbox to the configuration, we need
-	 to pick a unique key for it.  "Inbox", "Outbox" and "Trash"
-	 all have unique keys, but for all other mailboxes, we are
-	 simply passed NULL, meaning that we must supply the key ourselves. */
+         to pick a unique key for it.  "Inbox", "Outbox" and "Trash"
+         all have unique keys, but for all other mailboxes, we are
+         simply passed NULL, meaning that we must supply the key ourselves. */
       if (key_arg == NULL)
 	{
 	  int mbox_max;
 
-	  mbox_max = config_mailbox_get_highest_number(accounts);
-	  snprintf(key, sizeof(key), "m%d", mbox_max + 1);
+	  mbox_max = config_mailbox_get_highest_number (accounts);
+	  snprintf (key, sizeof (key), "m%d", mbox_max + 1);
 	}
       else
-	snprintf(key, sizeof(key), "%s", key_arg);
+	snprintf (key, sizeof (key), "%s", key_arg);
 
       /* If there is already an Accounts list, just add this new mailbox */
       temp_str = PLMakeString (key);
@@ -307,7 +307,7 @@ config_mailbox_delete (gchar * name)
     return FALSE;
 
   /* Now grab the associated key */
-  mbox_key = config_mailbox_get_key(mbox);
+  mbox_key = config_mailbox_get_key (mbox);
   if (mbox_key == NULL)
     return FALSE;
 
@@ -549,16 +549,28 @@ config_global_load (void)
   balsa_app.smtp_server = g_strdup (field);
 
   /* toolbar style */
-  if ((field = pl_dict_get_str(globals, "ToolbarStyle")) == NULL)
-	  balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
+  if ((field = pl_dict_get_str (globals, "ToolbarStyle")) == NULL)
+    balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
   else
-	  balsa_app.toolbar_style = atoi(field);
+    balsa_app.toolbar_style = atoi (field);
 
   /* mdi style */
-  if ((field = pl_dict_get_str(globals, "MDIStyle")) == NULL)
-	  balsa_app.mdi_style = GNOME_MDI_DEFAULT_MODE;
+  if ((field = pl_dict_get_str (globals, "MDIStyle")) == NULL)
+    balsa_app.mdi_style = GNOME_MDI_DEFAULT_MODE;
   else
-	  balsa_app.mdi_style = atoi(field);
+    balsa_app.mdi_style = atoi (field);
+
+  /* use the preview pane */
+  if ((field = pl_dict_get_str (globals, "UsePreviewPane")) == NULL)
+    balsa_app.previewpane = TRUE;
+  else
+    balsa_app.previewpane = atoi (field);
+
+  /* debugging enabled */
+  if ((field = pl_dict_get_str (globals, "Debug")) == NULL)
+    balsa_app.debug = FALSE;
+  else
+    balsa_app.debug = atoi (field);
 
   return TRUE;
 }				/* config_global_load */
@@ -593,12 +605,19 @@ config_global_save (void)
     pl_dict_add_str_str (globals, "SMTPServer", balsa_app.smtp_server);
 
   {
-          char tmp[32];
-            snprintf (tmp, sizeof (tmp), "%d", balsa_app.toolbar_style);
-             pl_dict_add_str_str (globals, "ToolbarStyle", tmp);
-            snprintf (tmp, sizeof (tmp), "%d", balsa_app.mdi_style);
-             pl_dict_add_str_str (globals, "MDIStyle", tmp);
-         }
+    char tmp[32];
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.toolbar_style);
+    pl_dict_add_str_str (globals, "ToolbarStyle", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mdi_style);
+    pl_dict_add_str_str (globals, "MDIStyle", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.debug);
+    pl_dict_add_str_str (globals, "Debug", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.previewpane);
+    pl_dict_add_str_str (globals, "UsePreviewPane", tmp);
+  }
 
   /* Add it to configuration file */
   temp_str = PLMakeString ("Globals");
@@ -739,35 +758,34 @@ config_mailbox_get_key (proplist_t mailbox)
 }				/* config_mailbox_get_key */
 
 static gint
-config_mailbox_get_highest_number(proplist_t accounts)
+config_mailbox_get_highest_number (proplist_t accounts)
 {
-  int num_elements, i , max = 0, curr;
+  int num_elements, i, max = 0, curr;
   proplist_t mbox_name;
-  char * name;
+  char *name;
 
-  num_elements = PLGetNumberOfElements(accounts);
-  for ( i = 0 ; i < num_elements ; i ++)
+  num_elements = PLGetNumberOfElements (accounts);
+  for (i = 0; i < num_elements; i++)
     {
-      mbox_name = PLGetArrayElement(accounts, i);
+      mbox_name = PLGetArrayElement (accounts, i);
 
       if (mbox_name == NULL)
 	{
 	  fprintf (stderr, "config_mailbox_get_highest_number: "
 		   "error getting mailbox key!\n");
-	  abort();
+	  abort ();
 	}
-	
-      name = PLGetString(mbox_name);
+
+      name = PLGetString (mbox_name);
 
       curr = 0;
 
-      if (strlen(name) > 1)
-	curr = atoi(name + 1);
+      if (strlen (name) > 1)
+	curr = atoi (name + 1);
 
       if (curr > max)
 	max = curr;
     }
 
   return max;
-} /* config_mailbox_get_highest_number */
-
+}				/* config_mailbox_get_highest_number */

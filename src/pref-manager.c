@@ -36,6 +36,7 @@ typedef struct _PropertyUI
 
     GtkWidget *real_name, *email, *smtp_server, *mail_directory;
     
+    GtkWidget *previewpane;
     GtkWidget *debug;		/* enable/disable debugging */
   }
 PropertyUI;
@@ -78,6 +79,7 @@ static GtkWidget *create_identity_page (void);
 static GtkWidget *create_mailboxes_page (void);
 static GtkWidget *create_view_page (void);
 static GtkWidget *create_mdi_page (void);
+static GtkWidget *create_misc_page (void);
 
 
 /* save the settings */
@@ -147,6 +149,13 @@ open_preferences_manager (void)
 			     create_mdi_page (),
 			     label);
 
+  /* Misc page */
+  label = gtk_label_new (_ ("Misc"));
+  gtk_notebook_append_page (
+		    GTK_NOTEBOOK (GNOME_PROPERTY_BOX (pui->pbox)->notebook),
+			     create_misc_page (),
+			     label);
+
   set_prefs ();
 
   for (i = 0; i < NUM_MDI_MODES; i++)
@@ -160,6 +169,8 @@ open_preferences_manager (void)
 			  properties_modified_cb, pui->pbox);
     }
 
+  gtk_signal_connect (GTK_OBJECT (pui->previewpane), "toggled",
+		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
   gtk_signal_connect (GTK_OBJECT (pui->debug), "toggled",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
 
@@ -246,6 +257,9 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
 	break;
       }
 
+  balsa_app.debug = GTK_TOGGLE_BUTTON(pui->debug)->active;
+  balsa_app.previewpane = GTK_TOGGLE_BUTTON(pui->previewpane)->active;
+
   refresh_main_window ();
 
   /*
@@ -290,6 +304,7 @@ set_prefs (void)
  
   gtk_entry_set_text (GTK_ENTRY (pui->mail_directory), balsa_app.local_mail_directory);
 
+  gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->previewpane), balsa_app.previewpane);
   gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->debug), balsa_app.debug);
 }
 
@@ -406,12 +421,12 @@ create_view_page ()
       group = gtk_radio_button_group (pui->toolbar_type[i]);
     }
 
-/* Misc */
-  frame = gtk_frame_new ("Misc");
+/* Main window */
+  frame = gtk_frame_new ("Main window");
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
 
-  pui->debug = gtk_check_button_new_with_label (_ ("Debug"));
-  gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (pui->debug));
+  pui->previewpane = gtk_check_button_new_with_label (_ ("Use preview pane"));
+  gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (pui->previewpane));
 
   return vbox;
 }
@@ -450,6 +465,24 @@ create_mdi_page ()
   return vbox;
 }
 
+static GtkWidget *
+create_misc_page()
+{
+  GtkWidget *vbox;
+  GtkWidget *frame;
+
+  vbox = gtk_vbox_new (FALSE, 0);
+  gtk_container_border_width (GTK_CONTAINER (vbox), 10);
+
+/* Misc */
+  frame = gtk_frame_new ("Misc");
+  gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
+
+  pui->debug = gtk_check_button_new_with_label (_ ("Debug"));
+  gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (pui->debug));
+
+  return vbox;
+}
 
 /*
  * callbacks

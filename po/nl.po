@@ -1,9 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD.nl\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-07-16 11:16+0200\n"
-"PO-Revision-Date: 2003-07-07 15:05+0100\n"
+"POT-Creation-Date: 2003-07-18 11:14+0200\n"
+"PO-Revision-Date: 2003-07-18 21:02+0100\n"
 "Last-Translator: Vincent van Adrighem <V.vanAdrighem@dirck.mine.nu>\n"
 "Language-Team: Dutch <vertaling@nl.linux.org>\n"
 "MIME-Version: 1.0\n"
@@ -969,7 +968,7 @@ msgid "From"
 msgstr "Van"
 
 #: libbalsa/send.c:897 src/balsa-message.c:1239 src/print.c:353
-#: src/sendmsg-window.c:665 src/sendmsg-window.c:2110 src/store-address.c:324
+#: src/sendmsg-window.c:664 src/sendmsg-window.c:2109 src/store-address.c:324
 msgid "To:"
 msgstr "Aan:"
 
@@ -2093,18 +2092,18 @@ msgstr ""
 "%s"
 
 #: src/balsa-app.c:73
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Opening remote mailbox %s.\n"
 "The _password for %s@%s:"
 msgstr ""
 "Postbus %s op afstand wordt geopend.\n"
-"Het wachtwoord voor %s@%s:"
+"Het _wachtwoord voor %s@%s:"
 
 #: src/balsa-app.c:78
-#, fuzzy, c-format
+#, c-format
 msgid "Mailbox _password for %s@%s:"
-msgstr "Postbus-wachtwoord voor %s@%s:"
+msgstr "Postbus-_wachtwoord voor %s@%s:"
 
 #: src/balsa-app.c:81
 msgid "Password needed"
@@ -2136,60 +2135,60 @@ msgstr "Grootte"
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Postbus %s wordt geopend. Even geduld a.u.b..."
 
-#: src/balsa-index.c:1883
+#: src/balsa-index.c:1889
 msgid "_View Source"
 msgstr "Brontekst _weergeven"
 
-#: src/balsa-index.c:1885 src/main-window.c:462 src/message-window.c:116
+#: src/balsa-index.c:1891 src/main-window.c:462 src/message-window.c:116
 msgid "_Reply..."
 msgstr "_Beantwoorden..."
 
-#: src/balsa-index.c:1887
+#: src/balsa-index.c:1893
 msgid "Reply To _All..."
 msgstr "_Iedereen beantwoorden..."
 
-#: src/balsa-index.c:1889
+#: src/balsa-index.c:1895
 msgid "Reply To _Group..."
 msgstr "_Groep beantwoorden..."
 
-#: src/balsa-index.c:1891
+#: src/balsa-index.c:1897
 msgid "_Forward Attached..."
 msgstr "_Doorsturen als bijvoeging..."
 
-#: src/balsa-index.c:1893
+#: src/balsa-index.c:1899
 msgid "Forward _Inline..."
 msgstr "_Ingevoegd doorsturen..."
 
-#: src/balsa-index.c:1895 src/main-window.c:564
+#: src/balsa-index.c:1901 src/main-window.c:564
 msgid "_Store Address..."
 msgstr "Bewaar _adres..."
 
-#: src/balsa-index.c:1908 src/filter-edit-dialog.c:216 src/mailbox-node.c:952
+#: src/balsa-index.c:1914 src/filter-edit-dialog.c:216 src/mailbox-node.c:952
 #: src/main-window.c:546 src/pref-manager.c:1572 src/pref-manager.c:2714
 msgid "_Delete"
 msgstr "_Verwijderen"
 
-#: src/balsa-index.c:1913 src/main-window.c:553
+#: src/balsa-index.c:1919 src/main-window.c:553
 msgid "_Undelete"
 msgstr "_Terughalen"
 
-#: src/balsa-index.c:1918
+#: src/balsa-index.c:1924
 msgid "Move To _Trash"
 msgstr "Naar _prullenbak verplaatsen"
 
-#: src/balsa-index.c:1922
+#: src/balsa-index.c:1928
 msgid "T_oggle"
 msgstr "_Omschakelen"
 
-#: src/balsa-index.c:1925
+#: src/balsa-index.c:1931
 msgid "_Flagged"
 msgstr "Ge_vlagd"
 
-#: src/balsa-index.c:1928
+#: src/balsa-index.c:1934
 msgid "_Unread"
 msgstr "_Ongelezen"
 
-#: src/balsa-index.c:1936
+#: src/balsa-index.c:1942
 msgid "_Move to"
 msgstr "_Verplaatsen naar"
 
@@ -2828,13 +2827,13 @@ msgid "Error when applying filters"
 msgstr "Fout bij toepassen van filters"
 
 #: src/filter-run-callbacks.c:193
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The destination mailbox of the filter \"%s\" is \"%s\".\n"
 "You can't associate it with the same mailbox (that causes recursion)."
 msgstr ""
 "De doelpostbus van filter \"%s\" is \"%s\".\n"
-"U kunt het niet hetzelfde maken (dat veroorzaakt recursiviteit)."
+"U kunt deze niet hetzelfde maken (dat veroorzaakt recursiviteit)."
 
 #: src/filter-run-callbacks.c:201
 #, c-format
@@ -4178,7 +4177,7 @@ msgstr ""
 msgid "Quoted and Flowed Text"
 msgstr "Aangehaalde tekst"
 
-#: src/pref-manager.c:1744 src/sendmsg-window.c:3736
+#: src/pref-manager.c:1744 src/sendmsg-window.c:3731
 msgid "Quoted Text Regular Expression"
 msgstr "Reguliere expressie van geciteerde text"
 
@@ -4748,7 +4747,7 @@ msgstr "_Afbreken tekst"
 
 #: src/sendmsg-window.c:265
 msgid "_Reflow Selected Text"
-msgstr ""
+msgstr "Geselecteerde tekst _hervloeien"
 
 #: src/sendmsg-window.c:270
 msgid "Insert Si_gnature"
@@ -5059,7 +5058,7 @@ msgid "Attach file"
 msgstr "Bestand als bijlage"
 
 #: src/sendmsg-window.c:1542 src/sendmsg-window.c:1604
-#: src/sendmsg-window.c:2845
+#: src/sendmsg-window.c:2840
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5077,7 +5076,7 @@ msgstr "Af_zender:"
 msgid "S_ubject:"
 msgstr "Onder_werp:"
 
-#. fcc:
+#. fcc: mailbox folder where the message copy will be written to
 #: src/sendmsg-window.c:1826
 msgid "F_cc:"
 msgstr "F_cc:"
@@ -5125,11 +5124,11 @@ msgstr "Op %s schreef %s:\n"
 msgid "%s wrote:\n"
 msgstr "%s schreef:\n"
 
-#: src/sendmsg-window.c:3007
+#: src/sendmsg-window.c:3002
 msgid "Choose charset"
 msgstr "Kies tekenset"
 
-#: src/sendmsg-window.c:3014
+#: src/sendmsg-window.c:3009
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
@@ -5137,16 +5136,16 @@ msgstr ""
 "Dit bestand is niet in US-ASCII of UTF-8 formaat.\n"
 "Kies de te gebruiken tekenset voor het bericht."
 
-#: src/sendmsg-window.c:3080
+#: src/sendmsg-window.c:3075
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Kan bestand '%s' niet openen.\n"
 
-#: src/sendmsg-window.c:3102
+#: src/sendmsg-window.c:3097
 msgid "Include file"
 msgstr "Bestand invoegen"
 
-#: src/sendmsg-window.c:3360
+#: src/sendmsg-window.c:3355
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5155,7 +5154,7 @@ msgstr ""
 "Het bericht kan niet gecodeerd worden met de tekenset %s.\n"
 "Kies alstublieft een andere taal voor dit bericht."
 
-#: src/sendmsg-window.c:3379
+#: src/sendmsg-window.c:3374
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5166,32 +5165,32 @@ msgstr ""
 "methode moeten gebruiken om het hele bericht te beschermen. Wilt u doorgaan "
 "met de OpenPGP methode?"
 
-#: src/sendmsg-window.c:3392
+#: src/sendmsg-window.c:3387
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "bericht wordt verzonden met gpg-stand %d"
 
-#: src/sendmsg-window.c:3735
+#: src/sendmsg-window.c:3730
 #, c-format
 msgid "Could not compile %s"
 msgstr "Kan %s niet compileren"
 
-#: src/sendmsg-window.c:4253
+#: src/sendmsg-window.c:4250
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Antwoord naar %s: %s"
 
-#: src/sendmsg-window.c:4258
+#: src/sendmsg-window.c:4255
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Bericht doorsturen naar %s: %s"
 
-#: src/sendmsg-window.c:4262
+#: src/sendmsg-window.c:4259
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Verder gaan aan bericht naar %s: %s"
 
-#: src/sendmsg-window.c:4266
+#: src/sendmsg-window.c:4263
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nieuw bericht naar %s: %s"

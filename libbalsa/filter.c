@@ -510,7 +510,7 @@ libbalsa_filter_match(GSList * filter_list, GList * messages,
 		match_conditions(filt->conditions_op, filt->conditions,
 				 LIBBALSA_MESSAGE(messages->data), mbox_locked);
 	}
-	if (match) {
+	if (match && !g_list_find(filt->matching_messages, messages->data)) {
 	    /* We hold a reference on the matching messages, to be sure they 
 	       are still there when we do actions of filter */
 	    g_object_ref(messages->data);

@@ -35,10 +35,21 @@ for dir in $PATH ; do
 done
 IFS="$ifs_save"
 
-if test -z "$gnome_autogen" ; then
-  echo "You need to install the gnome-common module and make"
-  echo "sure the gnome-autogen.sh script is in your \$PATH."
-  exit 1
+if test -n "$gnome_autogen" ; then
+  GNOME_DATADIR="$gnome_datadir" USE_GNOME2_MACROS=1 . $gnome_autogen
+  exit 0
 fi
 
-GNOME_DATADIR="$gnome_datadir" USE_GNOME2_MACROS=1 . $gnome_autogen
+echo "gnome-autogen.sh not found."
+echo "Assuming you have a 'native' install of GNOME2."
+sleep 3
+
+# GNOME2 is properly installed on the system.
+# Do the things the usual way.
+
+# GNOME's autogen.sh does not pass --intl option to gettextize,
+# let's call gettextize ourselves
+gettextize --force --copy --intl
+
+# call GNOME's autogen.sh.
+. $srcdir/macros/autogen.sh

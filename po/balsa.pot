@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-15 12:17-0400\n"
+"POT-Creation-Date: 1998-08-16 08:46-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,39 +70,39 @@ msgstr ""
 msgid "we are deleting the window, not saving, lets quit now\n"
 msgstr ""
 
-#: src/index-child.c:97
+#: src/index-child.c:96
 msgid "Unable to Open Mailbox!"
 msgstr ""
 
-#: src/index-child.c:224
+#: src/index-child.c:199
 msgid "Transfer"
 msgstr ""
 
-#: src/index-child.c:242
+#: src/index-child.c:217
 msgid "Change Status"
 msgstr ""
 
-#: src/index-child.c:245
+#: src/index-child.c:220
 msgid "Unread"
 msgstr ""
 
-#: src/index-child.c:251
+#: src/index-child.c:226
 msgid "Read"
 msgstr ""
 
-#: src/index-child.c:257
+#: src/index-child.c:232
 msgid "Replied"
 msgstr ""
 
-#: src/index-child.c:263
+#: src/index-child.c:238
 msgid "Forwarded"
 msgstr ""
 
-#: src/index-child.c:273 src/main-window.c:262
+#: src/index-child.c:248 src/main-window.c:262
 msgid "Undelete"
 msgstr ""
 
-#: src/index-child.c:281 src/main-window.c:248 src/main-window.c:411
+#: src/index-child.c:256 src/main-window.c:248 src/main-window.c:411
 msgid "Delete"
 msgstr ""
 
@@ -263,11 +263,11 @@ msgstr ""
 msgid "Balsa is a E-Mail Client"
 msgstr ""
 
-#: src/mblist-window.c:405
+#: src/mblist-window.c:406
 msgid "Add Mailbox"
 msgstr ""
 
-#: src/mblist-window.c:410
+#: src/mblist-window.c:411
 msgid "Edit Mailbox"
 msgstr ""
 
@@ -383,17 +383,17 @@ msgstr ""
 msgid "Forward message"
 msgstr ""
 
-#: libbalsa/mailbox.c:404
+#: libbalsa/mailbox.c:469
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:429
+#: libbalsa/mailbox.c:494
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:1292
+#: libbalsa/mailbox.c:1357
 #, c-format
 msgid "Loading message: %s/%s\n"
 msgstr ""

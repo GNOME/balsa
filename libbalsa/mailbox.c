@@ -236,6 +236,57 @@ check_all_pop3_hosts (Mailbox * to)
     }
 }
 
+#ifdef BUFFY_SIZE
+/*
+ * Incoming is a global var in mutt, needs to be set for
+ * mailbox_have_new_messages() to work correctly.
+ */
+extern int test_new_folder (const char *);
+void
+add_mailboxes_for_checking (Mailbox * mailbox)
+{
+  BUFFY **tmp;
+  struct stat sb;
+  
+  if (!mailbox)
+    return;
+
+  if (mailbox->type == MAILBOX_IMAP ||
+      mailbox->type == MAILBOX_POP3)
+    return;
+
+  for (tmp = &Incoming; *tmp; tmp = &((*tmp)->next))
+    {
+      if (strcmp (MAILBOX_LOCAL(mailbox)->path, (*tmp)->path) == 0)
+	break;
+    }
+
+  if (!*tmp)
+    {
+      *tmp = (BUFFY *) g_malloc (sizeof (BUFFY));
+      (*tmp)->path = g_strdup (MAILBOX_LOCAL(mailbox)->path);
+      (*tmp)->next = NULL;
+    }
+  (*tmp)->new = 0;
+  (*tmp)->notified = 1;
+  (*tmp)->newly_created = 0;
+
+  /* for buffy_size, it is important that if the folder is new (tested
+   * by reading it), the size is set to 0 so that later when we check we see
+   * that it increased .  without buffy_size we probably don't care.
+   */
+  if (stat ((*tmp)->path, &sb) == 0 && !test_new_folder ((*tmp)->path))
+    {
+      /* some systems out there don't have an off_t type */
+      (*tmp)->size = (long) sb.st_size;
+    }
+  else
+    (*tmp)->size = 0;
+
+  return;
+
+}
+
 gint
 mailbox_have_new_messages (gchar * path)
 {
@@ -246,6 +297,20 @@ mailbox_have_new_messages (gchar * path)
   else
     return FALSE;
 }
+#else
+void
+add_mailboxes_for_checking (Mailbox * mailbox)
+{
+  return;
+}
+
+gint
+mailbox_have_new_messages (gchar * path)
+{
+  return FALSE;
+}
+#endif /* BUFFY_SIZE */
+
 
 /*
  * allocate a new mailbox

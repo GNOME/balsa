@@ -15,7 +15,8 @@ For 0.4.5 release:
    add support for IMAP, mh or maildir ones.  (mh and/or maildir might work)
 
  * fix it under solaris.  test under aix, hpux, and osf (digital unix i fink?)
- 
+     solaris seems to be ok now.  need to test other platforms.
+
  * fix checking for new mail inside mailboxes.
      we have a full mail tray and an empty one.  full should be used to show
      messages with new mail.  the mailbox name should also be in bold.

@@ -19,5 +19,5 @@ libbalsasrv_a_SOURCES = \
 	balsa-impl.c \
 	balsa.h
 
-$(BUILT_SOURCES): balsa.idl
-	orbit-idl balsa.idl
+$(BUILT_SOURCES): $(srcdir)/balsa.idl
+	orbit-idl $(srcdir)/balsa.idl

@@ -39,7 +39,7 @@ balsa_SOURCES =	\
 
 
 INCLUDES=-I. -I${top_srcdir}/libbalsa -I${top_srcdir} -I$(top_srcdir)/idl \
-	    -I${top_builddir}/libmutt $(GNOME_INCLUDEDIR)
+	    -I$(top_builddir)/idl -I${top_builddir}/libmutt $(GNOME_INCLUDEDIR)
 
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a \

@@ -17,11 +17,6 @@ Nat's ideas:
  * In the message composition window, hitting TAB will bring the cursor to
    the next text entry box.  Make it so that hitting ENTER does the same thing.
 
- * When you reply to a message, the message is quoted with the '>'
-   character.  Make automatic message quoting optional and make it
-   flexible enough to allow the user to select their quote
-   character(s).
-
  * The message display/composition font should be selectable,
    including color.
 

@@ -132,13 +132,14 @@ libbalsa_mailbox_maildir_class_init(LibBalsaMailboxMaildirClass * klass)
     libbalsa_mailbox_class->sync = libbalsa_mailbox_maildir_sync;
     libbalsa_mailbox_class->close_backend = libbalsa_mailbox_maildir_close_backend;
     libbalsa_mailbox_class->get_message = libbalsa_mailbox_maildir_get_message;
-    libbalsa_mailbox_class->load_message = libbalsa_mailbox_maildir_load_message;
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_maildir_add_message;
     libbalsa_mailbox_class->change_message_flags =
 	libbalsa_mailbox_maildir_change_message_flags;
 
     libbalsa_mailbox_local_class->remove_files = 
 	libbalsa_mailbox_maildir_remove_files;
+    libbalsa_mailbox_local_class->load_message =
+        libbalsa_mailbox_maildir_load_message;
 
 }
 

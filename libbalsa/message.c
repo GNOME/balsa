@@ -790,15 +790,16 @@ mime_content_type2str(int contenttype)
 #endif
 
 /* libbalsa_message_body_ref:
-   references the body of given message.
-   NO OP for 'loose' messages (i.e not associated with any mailbox).
-   returns TRUE for success, FALSE for failure (broken IMAP connection etc).
+   references the structure of given message.
+   message parts can be fetched later on.
 */
 gboolean
 libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 {
+#ifdef OLD_CODE
     LibBalsaMessageBody *body;
     GMimeMessage *msg;
+#endif
 
     g_return_val_if_fail(message, FALSE);
     if (!message->mailbox) return FALSE;
@@ -811,6 +812,11 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 	return TRUE;
     }
 
+#ifndef OLD_CODE
+    libbalsa_mailbox_fetch_message_structure(message->mailbox, message,
+					     LB_FETCH_RFC822_HEADERS
+					     |LB_FETCH_STRUCTURE);
+#else /* OLD_CODE */
     /*
      * load message body
      */
@@ -847,7 +853,8 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 
     if (msg != NULL) {
 	body = libbalsa_message_body_new(message);
-	libbalsa_message_body_set_mime_body(body, message->mime_msg->mime_part);
+	libbalsa_message_body_set_mime_body(body,
+					    message->mime_msg->mime_part);
 	libbalsa_message_append_part(message, body);
 
 	message->body_ref++;
@@ -863,6 +870,7 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 	libbalsa_messages_read(messages, TRUE);
 	g_list_free(messages);
     }
+#endif /* OLD_CODE */
     return TRUE;
 }
 

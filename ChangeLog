@@ -1,3 +1,17 @@
+2003-10-04  Pawel Salek
+
+	* libbalsa/mailbox.[ch]: add prepare_threading,
+	fetch_message_structure and get_message_part virtual functions.
+	* libbalsa/mailbox_imap.c: prepare to implement above.
+	* libbalsa/mailbox_local.[hc]: same. Change 
+	LibBalsaMailbox::load_message to LibBalsaMailboxLocal.
+	* libbalsa/mailbox_{maildir,mh}.c: adapt to above.
+	* libbalsa/mailbox_mbox.c: ditto. Fix off-by-one bug.
+	* libbalsa/message.c: use fetch_message_structure.
+	* src/balsa-index.c: restore bndx_selection_changed_func().
+	* src/save-restore.c: change default threading type to flat - it
+	is faster.
+
 2003-10-04 10:03  PeterB
 
 	* libbalsa/: libbalsa.c, libbalsa.h, mailbox_local.h,

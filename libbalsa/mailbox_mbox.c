@@ -126,13 +126,15 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
     libbalsa_mailbox_class->sync = libbalsa_mailbox_mbox_sync;
     libbalsa_mailbox_class->close_backend = libbalsa_mailbox_mbox_close_backend;
     libbalsa_mailbox_class->get_message = libbalsa_mailbox_mbox_get_message;
-    libbalsa_mailbox_class->load_message = libbalsa_mailbox_mbox_load_message;
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_mbox_add_message;
     libbalsa_mailbox_class->change_message_flags =
 	libbalsa_mailbox_mbox_change_message_flags;
 
     libbalsa_mailbox_local_class->remove_files = 
 	libbalsa_mailbox_mbox_remove_files;
+
+    libbalsa_mailbox_local_class->load_message =
+        libbalsa_mailbox_mbox_load_message;
 }
 
 
@@ -753,9 +755,10 @@ libbalsa_mailbox_mbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox), NULL);
     g_return_val_if_fail (msgno > 0, NULL);
+    g_return_val_if_fail (msgno <= (unsigned)mailbox->total_messages, NULL);
 
     msg_info = &g_array_index(LIBBALSA_MAILBOX_MBOX(mailbox)->messages_info,
-			      struct message_info, msgno);
+			      struct message_info, msgno-1);
 
     if (!msg_info)
 	return NULL;

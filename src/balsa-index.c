@@ -577,6 +577,13 @@ static void
 bndx_selection_changed_func(GtkTreeModel * model, GtkTreePath * path,
                             GtkTreeIter * iter, gpointer data)
 {
+    struct BndxSelectionChangedInfo *sci = data;
+
+    gtk_tree_model_get(model, iter, LB_MBOX_MESSAGE_COL, &sci->message,
+                       -1);
+    if (sci->message == sci->current_message)
+        sci->current_message_selected = TRUE;
+    printf("selection changed.\n");
 }
 
 static gboolean
@@ -622,7 +629,7 @@ bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
 
     gtk_tree_model_get_iter(model, &iter, path);
     gtk_tree_model_get(model, &iter, LB_MBOX_MESSAGE_COL, &message, -1);
-
+    g_return_if_fail(message);
     /* activate a message means open a message window,
      * unless we're in the draftbox, in which case it means open
      * a sendmsg window */

@@ -89,6 +89,21 @@ typedef enum {
 } LibBalsaMailboxSort;
 
 typedef enum {
+    LB_MAILBOX_SORT_NATURAL,
+    LB_MAILBOX_SORT_NO,
+    LB_MAILBOX_SORT_FROM,
+    LB_MAILBOX_SORT_SUBJECT,
+    LB_MAILBOX_SORT_DATE,
+    LB_MAILBOX_SORT_SIZE,
+    LB_MAILBOX_SORT_SENDER
+} LibBalsaMailboxSortFields;
+
+typedef enum {
+    LB_MAILBOX_SORT_TYPE_ASC,
+    LB_MAILBOX_SORT_TYPE_DESC
+} LibBalsaMailboxSortType;
+
+typedef enum {
     LIBBALSA_NTFY_SOURCE,
     LIBBALSA_NTFY_FINISHED,
     LIBBALSA_NTFY_MSGINFO,
@@ -106,26 +121,18 @@ typedef enum {
     LB_MAILBOX_THREADING_JWZ
 } LibBalsaMailboxThreadingType;
 
-typedef enum {
-    LB_MAILBOX_SORT_TYPE_ASC,
-    LB_MAILBOX_SORT_TYPE_DESC
-} LibBalsaMailboxSortType;
-
-typedef enum {
-    LB_MAILBOX_SORT_NATURAL,
-    LB_MAILBOX_SORT_NO,
-    LB_MAILBOX_SORT_FROM,
-    LB_MAILBOX_SORT_SUBJECT,
-    LB_MAILBOX_SORT_DATE,
-    LB_MAILBOX_SORT_SIZE,
-    LB_MAILBOX_SORT_SENDER
-} LibBalsaMailboxSortFields;
 
 typedef enum {
     LB_MAILBOX_SHOW_UNSET = 0,
     LB_MAILBOX_SHOW_FROM,
     LB_MAILBOX_SHOW_TO
 } LibBalsaMailboxShow;
+
+typedef enum {
+    LB_FETCH_RFC822_HEADERS = 1<<0, /* prepare all rfc822 headers */
+    LB_FETCH_STRUCTURE      = 1<<1  /* prepare message structure */
+} LibBalsaFetchFlag;
+
 
 /*
  * structures
@@ -199,8 +206,16 @@ struct _LibBalsaMailboxClass {
 				      gboolean flag);
 
     /* Virtual Functions */
+    LibBalsaMessage *(*get_message) (LibBalsaMailbox * mailbox, guint msgno);
+    void (*prepare_threading)(LibBalsaMailbox *mailbox, guint lo, guint hi);
+    void (*fetch_message_structure)(LibBalsaMailbox *mailbox,
+                                    LibBalsaMessage * message,
+                                    LibBalsaFetchFlag flags);
+    GMimeStream *(*get_message_part) (LibBalsaMessage     *message,
+				      LibBalsaMessageBody *part);
     GMimeStream *(*get_message_stream) (LibBalsaMailbox * mailbox,
-				 LibBalsaMessage * message);
+					LibBalsaMessage * message);
+
     void (*check) (LibBalsaMailbox * mailbox);
     gboolean (*message_match) (LibBalsaMailbox * mailbox,
 			       LibBalsaMessage * message,
@@ -212,8 +227,6 @@ struct _LibBalsaMailboxClass {
     void (*save_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     void (*load_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     gboolean (*sync) (LibBalsaMailbox * mailbox);
-    LibBalsaMessage *(*get_message) (LibBalsaMailbox * mailbox, guint msgno);
-    LibBalsaMessage *(*load_message) (LibBalsaMailbox * mailbox, guint msgno);
     int (*add_message) (LibBalsaMailbox * mailbox, LibBalsaMessage * message );
     void (*change_message_flags) (LibBalsaMailbox * mailbox, guint msgno,
                                   LibBalsaMessageFlag set,
@@ -245,8 +258,45 @@ void libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
                                       int type, int prog, int tot,
                                       const gchar* msg);
 
+/** Message access functions.
+ */
+
+/** libbalsa_mailbox_get_message() returns structure containing
+    changed, UTF-8 converted data of the message.  LibBalsaMessage
+    will contain only basic information about the message sufficient to
+    produce message index unless more information was requested to be
+    prefetched.
+ */
+LibBalsaMessage *libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox,
+					      guint msgno);
+
+/** libbalsa_mailbox_prepare_threading() requests prefetching of information
+    needed for client-size message threading.
+    lo and hi are related to currently set view.
+*/
+void libbalsa_mailbox_prepare_threading(LibBalsaMailbox *mailbox,
+					guint lo, guint hi);
+
+/** libbalsa_mailbox_fetch_message_structure() fetches detailed
+    message structure for given message. It can also fetch all RFC822
+    headers of the message.
+*/
+void libbalsa_mailbox_fetch_message_structure(LibBalsaMailbox *mailbox,
+					      LibBalsaMessage *message,
+					      LibBalsaFetchFlag flags);
+
+/** libbalsa_mailbox_get_message_stream() returns a stream associated
+    with selected, single part of the message.
+*/
+GMimeStream *libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
+					       LibBalsaMessageBody *part);
+
+/** libbalsa_mailbox_get_message_stream() returns a message stream associated
+    with full RFC822 text of the message.
+*/
 GMimeStream *libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
-					  LibBalsaMessage * message);
+						 LibBalsaMessage * message);
+
 gint libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete);
 
 /* This function returns TRUE if the mailbox can be matched
@@ -277,12 +327,13 @@ void libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
 void libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);
 
-int libbalsa_mailbox_copy_message(LibBalsaMessage *message, LibBalsaMailbox *dest);
+int libbalsa_mailbox_copy_message(LibBalsaMessage *message,
+				  LibBalsaMailbox *dest);
 gboolean libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox);
-LibBalsaMessage *libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno);
-LibBalsaMessage *libbalsa_mailbox_load_message(LibBalsaMailbox * mailbox, guint msgno);
-void libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox, guint msgno,
+
+void libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox,
+					   guint msgno,
 					   LibBalsaMessageFlag set,
 					   LibBalsaMessageFlag clear);
 
@@ -306,6 +357,10 @@ void libbalsa_mailbox_set_view(LibBalsaMailbox *mailbox,
                                LibBalsaMessageFlag set,
                                LibBalsaMessageFlag clear);
 
+/** libbalsa_mailbox_set_threading() uses backend-optimized threading mode
+    to produce a tree of messages. The tree is put in msg_tree and used
+    later by GtkTreeModel interface.
+*/
 void libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
 				    LibBalsaMailboxThreadingType thread_type);
 

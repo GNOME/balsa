@@ -661,7 +661,7 @@ config_global_load(void)
 
     balsa_app.expand_tree = gnome_config_get_bool("ExpandTree=false");
     balsa_app.threading_type = d_get_gint("ThreadingType", 
-					  LB_MAILBOX_THREADING_JWZ);
+					  LB_MAILBOX_THREADING_FLAT);
 
     /* ... Quote colouring */
     g_free(balsa_app.quote_regex);

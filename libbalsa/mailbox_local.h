@@ -35,6 +35,9 @@
     (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_LOCAL))
 #define LIBBALSA_IS_MAILBOX_LOCAL_CLASS(klass) \
     (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_LOCAL))
+#define LIBBALSA_MAILBOX_LOCAL_GET_CLASS(mailbox) \
+    (G_TYPE_INSTANCE_GET_CLASS ((mailbox), LIBBALSA_TYPE_MAILBOX_LOCAL, \
+				LibBalsaMailboxLocalClass))
 
 GType libbalsa_mailbox_local_get_type(void);
 
@@ -50,6 +53,7 @@ struct _LibBalsaMailboxLocal {
 struct _LibBalsaMailboxLocalClass {
     LibBalsaMailboxClass klass;
 
+    LibBalsaMessage *(*load_message)(LibBalsaMailbox *mb, guint msgno);
     void (*remove_files)(LibBalsaMailboxLocal *mb);
 };
 
@@ -61,6 +65,8 @@ gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 	((const gchar *) (LIBBALSA_MAILBOX(mbox))->url+7)
 
 void libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox);
+LibBalsaMessage *libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox,
+                                                     guint msgno);
 void libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox);
 
 #endif				/* __LIBBALSA_MAILBOX_LOCAL_H__ */

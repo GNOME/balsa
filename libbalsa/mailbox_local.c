@@ -60,6 +60,16 @@ static void libbalsa_mailbox_local_set_threading(LibBalsaMailbox *mailbox,
 						 thread_type);
 static void libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox);
 
+static void libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *mailbox, 
+                                                     guint lo, guint hi);
+
+static void libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
+                                                   LibBalsaMessage *message,
+                                                   LibBalsaFetchFlag flags);
+
+static GMimeStream* libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
+                                                        LibBalsaMessageBody *);
+
 GType
 libbalsa_mailbox_local_get_type(void)
 {
@@ -120,6 +130,13 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 	libbalsa_mailbox_local_set_threading;
     libbalsa_mailbox_class->close_mailbox =
 	libbalsa_mailbox_local_close_mailbox;
+    libbalsa_mailbox_class->prepare_threading =
+        libbalsa_mailbox_local_prepare_threading;
+    libbalsa_mailbox_class->fetch_message_structure = 
+        libbalsa_mailbox_local_fetch_structure;
+    libbalsa_mailbox_class->get_message_part = 
+        libbalsa_mailbox_local_get_msg_part;
+    klass->load_message = NULL;
     klass->remove_files = NULL;
 }
 
@@ -200,6 +217,18 @@ libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox)
     g_signal_emit(G_OBJECT(mailbox),
 		  libbalsa_mailbox_local_signals[REMOVE_FILES], 0);
 
+}
+
+
+LibBalsaMessage*
+libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox, guint msgno)
+{
+    g_return_val_if_fail(mailbox != NULL, NULL);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox), NULL);
+    g_return_val_if_fail(msgno > 0, NULL);
+
+    return LIBBALSA_MAILBOX_LOCAL_GET_CLASS(mailbox)
+        ->load_message(mailbox, msgno);
 }
 
 static void
@@ -397,7 +426,7 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox)
 
     LOCK_MAILBOX(mailbox);
     for (msgno = mailbox->messages + 1; mailbox->new_messages > 0; msgno++) {
-	message = libbalsa_mailbox_load_message(mailbox, msgno);
+	message = libbalsa_mailbox_local_load_message(mailbox, msgno);
 	if (!message)
 		continue;
 	libbalsa_message_headers_update(message);
@@ -585,6 +614,29 @@ lbml_get_message(GNode * node, ThreadingInfo * ti)
     g_return_val_if_fail(msgno <= ti->msg_array_len, NULL);
 
     return msgno <= 0 ? NULL : ti->msg_array[msgno - 1];
+}
+
+static void
+libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *mailbox, 
+                                        guint lo, guint hi)
+{
+    g_warning("%s not implemented yet.\n", __func__);
+}
+
+static void
+libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
+                                      LibBalsaMessage *message,
+                                      LibBalsaFetchFlag flags)
+{
+    g_warning("%s not implemented yet.\n", __func__);
+}
+
+static GMimeStream*
+libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
+                                   LibBalsaMessageBody *part)
+{
+    g_warning("%s not implemented yet.\n", __func__);
+    return NULL;
 }
 
 static gboolean

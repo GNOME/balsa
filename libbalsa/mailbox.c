@@ -206,9 +206,11 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->messages_removed = NULL;
     klass->messages_status_changed = messages_status_changed_cb;
 
-    klass->get_message_stream = NULL;
     klass->get_message = NULL;
-    klass->load_message = NULL;
+    klass->prepare_threading = NULL;
+    klass->fetch_message_structure = NULL;
+    klass->get_message_part = NULL;
+    klass->get_message_stream = NULL;
     klass->change_message_flags = NULL;
     klass->set_threading = NULL;
     klass->check = NULL;
@@ -563,18 +565,6 @@ libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
     gnome_config_pop_prefix();
 }
 
-GMimeStream *
-libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
-				    LibBalsaMessage * message)
-{
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
-    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
-    g_return_val_if_fail(message->mailbox == mailbox, NULL);
-
-    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message_stream(mailbox,
-								   message);
-}
-
 static void
 libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 {
@@ -872,15 +862,55 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message(mailbox, msgno);
 }
 
-LibBalsaMessage *
-libbalsa_mailbox_load_message(LibBalsaMailbox * mailbox, guint msgno)
+void
+libbalsa_mailbox_prepare_threading(LibBalsaMailbox *mailbox, 
+				   guint lo, guint hi)
 {
-    g_return_val_if_fail(mailbox != NULL, NULL);
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
-    g_return_val_if_fail(msgno > 0, NULL);
+    g_return_if_fail(mailbox != NULL);
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_return_if_fail(lo > 0);
+    g_return_if_fail(hi > 0);
 
-    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->load_message(mailbox,
-							     msgno);
+    LIBBALSA_MAILBOX_GET_CLASS(mailbox)
+        ->prepare_threading(mailbox, lo, hi);
+}
+
+void
+libbalsa_mailbox_fetch_message_structure(LibBalsaMailbox *mailbox,
+					 LibBalsaMessage *message,
+					 LibBalsaFetchFlag flags)
+{
+    g_return_if_fail(mailbox != NULL);
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_return_if_fail(message != NULL);
+
+    LIBBALSA_MAILBOX_GET_CLASS(mailbox)
+        ->fetch_message_structure(mailbox, message, flags);
+}
+
+GMimeStream*
+libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
+				  LibBalsaMessageBody *part)
+{
+    g_return_val_if_fail(message != NULL, NULL);
+    g_return_val_if_fail(message->mailbox != NULL, NULL);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(message->mailbox), NULL);
+    g_return_val_if_fail(part != NULL, NULL);
+
+    return LIBBALSA_MAILBOX_GET_CLASS(message->mailbox)
+        ->get_message_part(message, part);
+}
+
+GMimeStream *
+libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
+				    LibBalsaMessage * message)
+{
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
+    g_return_val_if_fail(message->mailbox == mailbox, NULL);
+
+    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message_stream(mailbox,
+								   message);
 }
 
 void
@@ -932,7 +962,7 @@ libbalsa_mailbox_view_new(void)
 
     view->mailing_list_address = NULL;
     view->identity_name=NULL;
-    view->threading_type = LB_MAILBOX_THREADING_JWZ;
+    view->threading_type = LB_MAILBOX_THREADING_FLAT;
     view->sort_type =  LB_MAILBOX_SORT_TYPE_ASC;
     view->sort_field = LB_MAILBOX_SORT_DATE;
     view->show = LB_MAILBOX_SHOW_UNSET;
@@ -1186,7 +1216,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
     gtk_tree_view_widget_to_tree_coords(tree, b.x+b.width, b.y+b.height, 
 					&c.width, &c.height);
     c.width -= c.x; c.height -= c.y;
-    if(gdk_rectangle_intersect(&a, &c, &d)) 
+    if(gdk_rectangle_intersect(&a, &c, &d) || column == LB_MBOX_MESSAGE_COL) 
 	msg = libbalsa_mailbox_get_message(lmm, msgno);
     else { 
 	msg = NULL; 

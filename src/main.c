@@ -99,6 +99,9 @@ balsa_init (int argc, char **argv)
   PortableServer_POAManager pm;
   static struct poptOption options[] = {
          {"checkmail", 'c', POPT_ARG_NONE, &(balsa_app.check_mail_upon_startup), 0, N_("Get new mail on startup"), NULL},
+         {"compose", 'm', POPT_ARG_STRING, &(balsa_app.compose_email), 0, N_("Compose a new email to EMAIL@ADRESS"), "EMAIL@ADRESS"},
+         {"open-mailbox", 'o', POPT_ARG_STRING, &(balsa_app.open_mailbox), 0, N_("Opens MAILBOXNAME"),N_("MAILBOXNAME")},
+         {"open-unread-mailbox", 'u', POPT_ARG_NONE, &(balsa_app.open_unread_mailbox), 0, N_("Opens first unread mailbox"), NULL},
          {NULL, '\0', 0, NULL, 0} /* end the list */
   };
 
@@ -252,7 +255,16 @@ main (int argc, char *argv[])
   window = balsa_window_new();
   gtk_widget_show(window);
 
+
   gdk_rgb_init();
+
+  if(balsa_app.compose_email)  {
+    BalsaSendmsg *snd;
+    snd=sendmsg_window_new(window,NULL,SEND_NORMAL);
+    gtk_entry_set_text(GTK_ENTRY(snd->to[1]),balsa_app.compose_email);
+    gtk_widget_grab_focus(snd->subject[1]);
+  }
+
 #ifdef USE_PIXBUF
   gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
   gtk_widget_set_default_visual(gdk_rgb_get_visual());

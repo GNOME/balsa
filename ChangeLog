@@ -1,3 +1,7 @@
+2000-2-26   Birger Langkjer <birger.langkjer@image.dk>
+
+	* Integrated a patch from Mikael Hermansson <mikeh@bahnhof.se>
+	
 2000-2-14   Birger Langkjer <birger.langkjer@image.dk>
 
 	* src/sendmsg-window.c: fixed spelling error: Cyrylic->Cyrillic

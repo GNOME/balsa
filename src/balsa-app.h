@@ -145,7 +145,12 @@ extern struct BalsaApplication
   /* arp --- string to prefix "replied to" messages. */
   gchar *quote_str;
 
+  /* command line options */
+
   gint check_mail_upon_startup;
+  gint open_unread_mailbox;
+  gchar *open_mailbox;
+  gchar* compose_email;
 
   /* font used to display messages */
   gchar *message_font;

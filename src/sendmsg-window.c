@@ -740,7 +740,7 @@ fillBody(Message * message, BalsaSendmsg *msg, SendType type)
   gtk_editable_set_position( GTK_EDITABLE(msg->text), 0);
 }
 
-void
+BalsaSendmsg *
 sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 {
   GtkWidget *window;
@@ -961,6 +961,14 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   */
   set_menus(msg); 
   gtk_widget_show (window);
+
+
+  if( type==SEND_NORMAL || type==SEND_FORWARD)  
+    gtk_widget_grab_focus(msg->to[1]);
+  else
+    gtk_widget_grab_focus(msg->text);
+
+   return msg;
 }
 
 static gchar *

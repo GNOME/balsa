@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
-"POT-Creation-Date: 2000-02-16 22:06+0100\n"
-"PO-Revision-Date: 2000-02-14 14:05+01:00\n"
+"POT-Creation-Date: 2000-02-26 21:14+0100\n"
+"PO-Revision-Date: 2000-02-26 21:43+01:00\n"
 "Last-Translator: Birger Langkjer <birger.langkjer@image.dk>\n"
 "Language-Team: Danish <sslug-locale@sslug.dk>\n"
 "MIME-Version: 1.0\n"
@@ -132,8 +132,8 @@ msgid "Save"
 msgstr "Gem"
 
 #: src/balsa-message.c:164 src/mailbox-conf.c:632 src/sendmsg-window.c:113
-#: src/sendmsg-window.c:327 src/sendmsg-window.c:1004
-#: src/sendmsg-window.c:1323 src/sendmsg-window.c:1346
+#: src/sendmsg-window.c:327 src/sendmsg-window.c:1012
+#: src/sendmsg-window.c:1331 src/sendmsg-window.c:1354
 msgid "Cancel"
 msgstr "Annullér"
 
@@ -668,6 +668,22 @@ msgstr ""
 msgid "Get new mail on startup"
 msgstr "Hent ny post ved opstart"
 
+#: src/main.c:102
+msgid "Compose a new email to EMAIL@ADRESS"
+msgstr "Skrev et ebrev til EMAIL@ADRESS"
+
+#: src/main.c:103
+msgid "Opens MAILBOXNAME"
+msgstr "Åbner MAILBOXNAME"
+
+#: src/main.c:103
+msgid "MAILBOXNAME"
+msgstr "MAILBOXNAME"
+
+#: src/main.c:104
+msgid "Opens first unread mailbox"
+msgstr "Åbner første ulæste postkasse"
+
 #: src/mblist-window.c:352
 msgid "Open Mailbox"
 msgstr "Åbn postkasse"
@@ -1188,23 +1204,23 @@ msgstr "Fortsæt brev"
 msgid "New message"
 msgstr "Nyt brev"
 
-#: src/sendmsg-window.c:1003
+#: src/sendmsg-window.c:1011
 msgid "Could not open the file.\n"
 msgstr "Kunne ikke åbne filen.\n"
 
-#: src/sendmsg-window.c:1009
+#: src/sendmsg-window.c:1017
 msgid "Loading..."
 msgstr "Indlæser..."
 
-#: src/sendmsg-window.c:1034
+#: src/sendmsg-window.c:1042
 msgid "Include file"
 msgstr "Inkludér fil"
 
-#: src/sendmsg-window.c:1321
+#: src/sendmsg-window.c:1329
 msgid "Cannot execute print command."
 msgstr "Kan ikke udføre printerkommando."
 
-#: src/sendmsg-window.c:1345
+#: src/sendmsg-window.c:1353
 msgid "Error executing lpr"
 msgstr "Fejl under køring af lpr"
 

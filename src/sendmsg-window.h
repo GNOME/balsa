@@ -50,7 +50,7 @@ extern "C"
 	 guint charset_idx;
    };
 
-  void sendmsg_window_new (GtkWidget *, Message *, SendType);
+  BalsaSendmsg * sendmsg_window_new (GtkWidget *, Message *, SendType);
    
 #ifdef __cplusplus
 }

@@ -327,7 +327,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 			GtkCTreeNode * cnode,
 			gpointer data)
 {
-  MailboxNode *mbnode;
+  MailboxNode *mbnode=NULL;
 
   if (!gnode || (!(mbnode = gnode->data)))
     return FALSE;
@@ -347,6 +347,11 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
     }
     else if (mbnode->mailbox && mbnode->name)
     {
+      if(balsa_app.open_mailbox && strcmp(balsa_app.open_mailbox,mbnode->mailbox->name) == 0)  {
+        mblist_open_mailbox(mbnode->mailbox); 
+        gtk_ctree_select(ctree,cnode);
+      }
+
       if (mbnode->mailbox->type == MAILBOX_MH ||
 	  mbnode->mailbox->type == MAILBOX_MAILDIR)
       {
@@ -365,6 +370,11 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	  GdkFont *font;
 	  GtkStyle *style;
 	  
+      if(balsa_app.open_unread_mailbox)  {
+        balsa_app.open_unread_mailbox=FALSE;
+        mblist_open_mailbox(mbnode->mailbox); 
+      }
+
 	  style = gtk_style_copy (gtk_widget_get_style (GTK_WIDGET (ctree)));
 	  gdk_font_unref(style->font);
 	  font = gdk_font_load

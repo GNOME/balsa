@@ -1,3 +1,9 @@
+2003-11-26 12:15  PeterB
+
+	* src/balsa-message.c: Handle nested multipart messages.
+	* libbalsa/body.c: Ignore trailing characters in
+	Content-Disposition.
+
 2003-11-24 23:55  PeterB
 
 	* libbalsa/body.c: Get a file descriptor for body->temp_filename,

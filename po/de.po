@@ -1569,7 +1569,7 @@ msgstr "Normal"
 
 #: src/pref-manager.c:202
 msgid "Bad Spellers"
-msgstr ""
+msgstr "Falsche Angabe"
 
 #: src/pref-manager.c:227
 msgid "Balsa Preferences"

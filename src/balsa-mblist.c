@@ -870,15 +870,36 @@ bmbl_messages_status_changed_cb(LibBalsaMailbox * mailbox,
 	balsa_mblist_update_mailbox(store, mailbox);
 }
 
+struct update_mbox_data {
+    LibBalsaMailbox *mailbox;
+    GtkTreeStore *store;
+};
+static gboolean
+update_mailbox_idle(struct update_mbox_data*umd)
+{
+    gdk_threads_enter();
+    if (umd->store) {
+        g_object_remove_weak_pointer(G_OBJECT(umd->store),
+                                     (gpointer) &umd->store);
+        balsa_mblist_update_mailbox(umd->store, umd->mailbox);
+    }
+    gdk_threads_leave();
+    g_free(umd);
+}
+
 static void
 bmbl_unread_messages_changed_cb(LibBalsaMailbox * mailbox,
 				gboolean flag,
 				GtkTreeStore * store)
 {
+    struct update_mbox_data *umd;
     g_return_if_fail(mailbox);
     g_return_if_fail(store);
 
-    balsa_mblist_update_mailbox(store, mailbox);
+    umd = g_new(struct update_mbox_data,1);
+    umd->mailbox = mailbox; umd->store = store;
+    g_object_add_weak_pointer(G_OBJECT(store), (gpointer) &umd->store);
+    g_idle_add((GSourceFunc)update_mailbox_idle, umd);
 }
 
 /* public methods */
@@ -1506,11 +1527,6 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
                                TOTAL_COLUMN, "0", -1);
             mbnode->style &= ~MBNODE_STYLE_TOTAL_MESSAGES;
         }
-    }
-    { /* FIXME: view update needed. Shouldn't store_set enforce this? */
-	GtkTreePath * path =  gtk_tree_model_get_path(model, iter);
-	gtk_tree_model_row_changed(model, path, iter);
-	gtk_tree_path_free(path);
     }
 }
 

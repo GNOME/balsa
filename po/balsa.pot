@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-01 17:34-0400\n"
+"POT-Creation-Date: 1998-08-02 17:55-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,11 +22,11 @@ msgstr ""
 msgid "Attach File"
 msgstr ""
 
-#: src/addrbook-manager.c:180 src/main-window.c:296 src/sendmsg-window.c:158
+#: src/addrbook-manager.c:180 src/main-window.c:298 src/sendmsg-window.c:158
 msgid "Close"
 msgstr ""
 
-#: src/main-window.c:273 src/sendmsg-window.c:166
+#: src/main-window.c:275 src/sendmsg-window.c:166
 msgid "Message"
 msgstr ""
 
@@ -50,11 +50,11 @@ msgstr ""
 msgid "Contents"
 msgstr ""
 
-#: src/addrbook-manager.c:200 src/main-window.c:364 src/sendmsg-window.c:207
+#: src/addrbook-manager.c:200 src/main-window.c:366 src/sendmsg-window.c:207
 msgid "Help"
 msgstr ""
 
-#: src/addrbook-manager.c:188 src/main-window.c:194
+#: src/addrbook-manager.c:188 src/main-window.c:196
 msgid "File"
 msgstr ""
 
@@ -62,62 +62,62 @@ msgstr ""
 msgid "Mailboxes/<Separator>"
 msgstr ""
 
-#: src/main-window.c:150
+#: src/main-window.c:152
 msgid "Get New Mail"
 msgstr ""
 
-#: src/main-window.c:167
+#: src/main-window.c:169
 msgid "Check POP3"
 msgstr ""
 
-#: src/main-window.c:182
+#: src/main-window.c:184
 msgid "Exit"
 msgstr ""
 
-#: src/main-window.c:204
+#: src/main-window.c:206
 msgid "New"
 msgstr ""
 
-#: src/main-window.c:217
+#: src/main-window.c:219
 msgid "Reply"
 msgstr ""
 
-#: src/main-window.c:230
+#: src/main-window.c:232
 msgid "Forward"
 msgstr ""
 
-#: src/main-window.c:246
+#: src/main-window.c:248
 msgid "Delete"
 msgstr ""
 
-#: src/main-window.c:260
+#: src/main-window.c:262
 msgid "Undelete"
 msgstr ""
 
-#: src/main-window.c:278
+#: src/main-window.c:280
 msgid "MDI"
 msgstr ""
 
-#: src/main-window.c:285
+#: src/main-window.c:287
 msgid "Mailbox List"
 msgstr ""
 
-#: src/main-window.c:311
+#: src/main-window.c:313
 msgid "Mailboxes"
 msgstr ""
 
-#: src/main-window.c:320
+#: src/main-window.c:322
 msgid "Preferences..."
 msgstr ""
 
-#: src/main-window.c:331
+#: src/main-window.c:333
 msgid "Mailbox Manager..."
 msgstr ""
 
-#: src/main-window.c:343
+#: src/main-window.c:345
 msgid "Settings"
 msgstr ""
 
-#: src/main-window.c:351
+#: src/main-window.c:353
 msgid "About"
 msgstr ""

@@ -310,7 +310,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 			 MESSAGE_DELETE_MASK |
 			 MESSAGE_NEW_MASK |
 			 MESSAGE_FLAGGED_MASK |
-			 MESSAGE_ANSWERED_MASK,
+			 MESSAGE_REPLIED_MASK,
 			 (gpointer) bindex);
 
 
@@ -463,8 +463,8 @@ flag_str (MessageFlags flags)
   if (flags & MESSAGE_FLAG_FLAGGED)
     return "F";
 
-  if (flags & MESSAGE_FLAG_ANSWERED)
-    return "A";
+  if (flags & MESSAGE_FLAG_REPLIED)
+    return "R";
 
   if (flags & MESSAGE_FLAG_NEW)
     return "N";
@@ -529,7 +529,7 @@ mailbox_listener (MailboxWatcherMessage * mw_message)
     case MESSAGE_MARK_DELETE:
     case MESSAGE_MARK_UNDELETE:
     case MESSAGE_FLAGGED:
-    case MESSAGE_ANSWERED:
+    case MESSAGE_REPLIED:
       balsa_index_update_flag (bindex, mw_message->message);
       break;
 

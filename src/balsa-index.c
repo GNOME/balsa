@@ -352,7 +352,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   gtk_clist_set_selection_mode (GTK_CLIST (bindex),
 				GTK_SELECTION_EXTENDED);
 
-  /* FIXME MAJOR HACK */
+  /* FIXME this might could be cleaned up some */
   if (bindex->first_new_message == 0)
     bindex->first_new_message = i;
 

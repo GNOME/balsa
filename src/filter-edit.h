@@ -58,27 +58,15 @@ static option_list fe_actions[] =
     { "Send to Trash", FILTER_TRASH, NULL}
 };
 
-/* Dialog window */
-GtkWidget *fe_dialog;
-/* and buttons */
-GtkWidget *fe_dialog_ok;
-GtkWidget *fe_dialog_cancel;
-GtkWidget *fe_dialog_help;
 /* and button callbacs */
 void fe_dialog_button_clicked (GtkWidget * widget,
                                gpointer data);
 
-/* main table */
-GtkWidget *fe_table;
 
 
-/*
- * Left side of hbox
- */
+/*---------------- Left side of hbox ----------------*/
 
-/* clist */
-GtkWidget *fe_clist;
-/* its callbacks */
+/* clist callbacks */
 void fe_clist_select_row (GtkWidget * widget,
                           gint row, gint column,
                           GdkEventButton * bevent,
@@ -87,15 +75,6 @@ void fe_clist_button_event_press (GtkWidget * widget,
                                   GdkEventButton * bevent,
                                   gpointer data);
 
-/* boxes for clist control buttons */
-GtkWidget *fe_box_newdelete;
-GtkWidget *fe_box_updown;
-
-/* clist control buttons */
-GtkWidget *fe_new;
-GtkWidget *fe_delete;
-GtkWidget *fe_up;
-GtkWidget *fe_down;
 /* their callbacks */
 void fe_new_pressed (GtkWidget * widget,
                      gpointer data);
@@ -106,24 +85,11 @@ void fe_up_pressed (GtkWidget * widget,
 void fe_down_pressed (GtkWidget * widget,
                       gpointer data);
 
-/*
- * Separator
- */
-GtkWidget *fe_vseparator;
 
-/*
- * Right side of hbox
- */
-
-/* main notebook */
-GtkWidget *fe_notebook;
+/*---------------- Right side of hbox ----------------*/
 
 /* its pages */
 GtkWidget *fe_notebook_match_page;
-GtkWidget *fe_notebook_action_page;
-/* their labels */
-GtkWidget *fe_match_label;
-GtkWidget *fe_action_label;
 
 /* type notebook */
 GtkWidget *fe_type_notebook;

@@ -26,17 +26,20 @@
  * Returns:
  *    gchar* - the unique name
  */
-static gint unique_filter_name(gchar *name)
+static gint unique_filter_name(GtkWidget *clist, gchar *name)
 {
     gchar *row_text;
     gint len, row = 0;
    
-    if ((!name) || (name[0] == '\0'))
+  g_return_val_if_fail(clist != NULL, 0);
+  g_return_val_if_fail(GTK_IS_CLIST(clist), 0);
+
+  if ((!name) || (name[0] == '\0'))
         return(0);
 
     len = strlen(name);
 
-    while (gtk_clist_get_text(GTK_CLIST(fe_clist),
+    while (gtk_clist_get_text(GTK_CLIST(clist),
                               row,
                               1,
                               &row_text))
@@ -49,6 +52,8 @@ static gint unique_filter_name(gchar *name)
     return(1);
 } /* end unique_filter_name() */
 
+#if 0
+/* FIXME FIXME FIXME */
 
 /*
  * fe_dialog_button_clicked()
@@ -80,7 +85,7 @@ fe_dialog_button_clicked (GtkWidget * widget,
   gtk_widget_destroy (fe_dialog);
   /* more destruction is needed.  But that is for later */
 }                                /* end fe_dialog_button_clicked */
-
+#endif
 
 /*
  * fe_checkbutton_toggled()
@@ -322,8 +327,9 @@ fe_sound_browse_clicked (GtkWidget * widget,
  */
 void
 fe_new_pressed (GtkWidget * widget,
-                gpointer throwaway)
+                gpointer data)
 {
+  GtkWidget *clist;
   gint new_row;
   GdkImlibImage *im;
   GdkPixmap *pixmap;
@@ -333,7 +339,11 @@ fe_new_pressed (GtkWidget * widget,
     "", "New filter"
   };
 
-  new_row = gtk_clist_append (GTK_CLIST (fe_clist),
+  g_return_if_fail(data != NULL);
+  g_return_if_fail(GTK_IS_CLIST(data));
+  clist = GTK_WIDGET(data);
+
+  new_row = gtk_clist_append (GTK_CLIST (clist),
                               new_item);
 
   /* now for the pixmap from gdk */
@@ -343,7 +353,7 @@ fe_new_pressed (GtkWidget * widget,
   mask = gdk_imlib_copy_mask (im);
   gdk_imlib_destroy_image (im);
 
-  gtk_clist_set_pixmap (GTK_CLIST (fe_clist),
+  gtk_clist_set_pixmap (GTK_CLIST (clist),
                         new_row,
                         0,
                         pixmap,
@@ -352,7 +362,7 @@ fe_new_pressed (GtkWidget * widget,
   gdk_pixmap_unref (pixmap);
   gdk_bitmap_unref (mask);
 
-  gtk_clist_select_row (GTK_CLIST (fe_clist),
+  gtk_clist_select_row (GTK_CLIST (clist),
                         new_row, 1);
 }                                /* end fe_new_pressed() */
 
@@ -364,23 +374,28 @@ fe_new_pressed (GtkWidget * widget,
  */
 void 
 fe_delete_pressed (GtkWidget * widget,
-                   gpointer throwaway)
+                   gpointer data)
 {
+  GtkWidget *clist;
   gint row;
   filter *fil;
 
-  if (!(GTK_CLIST (fe_clist)->selection))
+  g_return_if_fail(data != NULL);
+  g_return_if_fail(GTK_IS_CLIST(data));
+  clist = GTK_WIDGET(data);
+
+  if (!(GTK_CLIST (clist)->selection))
     return;
 
-  row = GPOINTER_TO_INT ((GTK_CLIST (fe_clist)->selection)->data);
+  row = GPOINTER_TO_INT ((GTK_CLIST (clist)->selection)->data);
 
-  fil = (filter *) gtk_clist_get_row_data (GTK_CLIST (fe_clist),
+  fil = (filter *) gtk_clist_get_row_data (GTK_CLIST (clist),
                                            row);
 
   if (fil)
     filter_free (fil, NULL);
 
-  gtk_clist_remove (GTK_CLIST (fe_clist),
+  gtk_clist_remove (GTK_CLIST (clist),
                     row);
 }                                /* end fe_delete_pressed() */
 
@@ -392,15 +407,20 @@ fe_delete_pressed (GtkWidget * widget,
  */
 void 
 fe_down_pressed (GtkWidget * widget,
-                 gpointer throwaway)
+                 gpointer data)
 {
+  GtkWidget *clist;
   gint row;
 
-  if (!(GTK_CLIST (fe_clist)->selection))
+  g_return_if_fail(data != NULL);
+  g_return_if_fail(GTK_IS_CLIST(data));
+  clist = GTK_WIDGET(data);
+
+  if (!(GTK_CLIST (clist)->selection))
     return;
 
-  row = GPOINTER_TO_INT ((GTK_CLIST (fe_clist)->selection)->data);
-  gtk_clist_swap_rows (GTK_CLIST (fe_clist), row, row + 1);
+  row = GPOINTER_TO_INT ((GTK_CLIST (clist)->selection)->data);
+  gtk_clist_swap_rows (GTK_CLIST (clist), row, row + 1);
 }                                /* end fe_down_pressed */
 
 
@@ -411,25 +431,30 @@ fe_down_pressed (GtkWidget * widget,
  */
 void 
 fe_up_pressed (GtkWidget * widget,
-               gpointer throwaway)
+               gpointer data)
 {
+  GtkWidget *clist;
   gint row;
 
-  if (!(GTK_CLIST (fe_clist)->selection))
+  g_return_if_fail(data != NULL);
+  g_return_if_fail(GTK_IS_CLIST(data));
+  clist = GTK_WIDGET(data);
+
+  if (!(GTK_CLIST (clist)->selection))
     return;
 
-  row = GPOINTER_TO_INT ((GTK_CLIST (fe_clist)->selection)->data);
-  gtk_clist_swap_rows (GTK_CLIST (fe_clist), row - 1, row);
+  row = GPOINTER_TO_INT ((GTK_CLIST (clist)->selection)->data);
+  gtk_clist_swap_rows (GTK_CLIST (clist), row - 1, row);
 }                                /* end fe_up_pressed */
 
 
 /*
- * fe_clist_button_event_press()
+ * clist_button_event_press()
  *
  * Callback for when button is pressed.
  */
 void
-fe_clist_button_event_press (GtkWidget * widget,
+clist_button_event_press (GtkWidget * clist,
                              GdkEventButton * bevent,
                              gpointer data)
 {
@@ -439,8 +464,7 @@ fe_clist_button_event_press (GtkWidget * widget,
   GdkBitmap *mask;
   GtkCellType type;
 
-
-  res = gtk_clist_get_selection_info (GTK_CLIST (fe_clist),
+  res = gtk_clist_get_selection_info (GTK_CLIST (clist),
                                       bevent->x,
                                       bevent->y,
                                       &row,
@@ -449,18 +473,18 @@ fe_clist_button_event_press (GtkWidget * widget,
   if ((bevent->button != 1) || (column != 0))
     return;
 
-  type = gtk_clist_get_cell_type (GTK_CLIST (fe_clist),
+  type = gtk_clist_get_cell_type (GTK_CLIST (clist),
                                   row,
                                   column);
 
   if (type == GTK_CELL_PIXMAP)
     {
-      gtk_clist_set_text (GTK_CLIST (fe_clist),
+      gtk_clist_set_text (GTK_CLIST (clist),
                           row,
                           column,
                           NULL);
 
-      gtk_clist_select_row (GTK_CLIST (fe_clist), row, -1);
+      gtk_clist_select_row (GTK_CLIST (clist), row, -1);
     }
   else
     {
@@ -471,23 +495,23 @@ fe_clist_button_event_press (GtkWidget * widget,
       mask = gdk_imlib_copy_mask (im);
       gdk_imlib_destroy_image (im);
 
-      gtk_clist_set_pixmap (GTK_CLIST (fe_clist),
+      gtk_clist_set_pixmap (GTK_CLIST (clist),
                             row,
                             0,
                             pixmap,
                             mask);
 
-      gtk_clist_select_row (GTK_CLIST (fe_clist), row, -1);
+      gtk_clist_select_row (GTK_CLIST (clist), row, -1);
 
       gdk_pixmap_unref (pixmap);
       gdk_bitmap_unref (mask);
     }
 
-  gtk_signal_emit_stop_by_name (GTK_OBJECT (fe_clist),
+  gtk_signal_emit_stop_by_name (GTK_OBJECT (clist),
                                 "button_press_event");
 
 
-} /* end fe_clist_button_event_press() */
+} /* end clist_button_event_press() */
 
 
 /*
@@ -504,7 +528,7 @@ void fe_apply_pressed(GtkWidget *widget,
 
     /* quick check before we malloc */
     temp = gtk_entry_get_text(GTK_ENTRY(fe_name_entry));
-    if ((!temp) || (temp[0] == '\0') || (!unique_filter_name(temp)))
+    if ((!temp) || (temp[0] == '\0') || (!unique_filter_name(data, temp)))
     {
         /* error_popup("Invalid filter name"); */
         return;
@@ -553,8 +577,14 @@ void fe_apply_pressed(GtkWidget *widget,
 void fe_revert_pressed(GtkWidget *widget,
                        gpointer data)
 {
-    gtk_clist_select_row(GTK_CLIST(fe_clist),
+  GtkWidget *clist;
+
+  g_return_if_fail(data != NULL);
+  g_return_if_fail(GTK_IS_CLIST(data));
+  clist = GTK_WIDGET(data);
+
+    gtk_clist_select_row(GTK_CLIST(clist),
                          GPOINTER_TO_INT(
-                             ((GList *)(GTK_CLIST(fe_clist)->selection))->data),
+                             ((GList *)(GTK_CLIST(clist)->selection))->data),
                          -1);
 } /* end fe_revert_pressed() */

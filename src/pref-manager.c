@@ -110,7 +110,7 @@ open_preferences_manager (void)
   pui = g_malloc (sizeof (PropertyUI));
 
   pui->pbox = GNOME_PROPERTY_BOX (gnome_property_box_new ());
-
+  gtk_window_set_title(GTK_WINDOW(pui->pbox), _("Balsa Preferences"));
   active_win = GNOME_APP(gnome_mdi_get_active_window(mdi));
   gnome_dialog_set_parent(GNOME_DIALOG(pui->pbox), GTK_WINDOW(active_win));
 

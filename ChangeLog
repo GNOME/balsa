@@ -1,3 +1,12 @@
+2002-12-30 PeterB
+
+	* libbalsa/identity.c (general rewrite),
+        * libbalsa/identity.h,
+	* src/main-window.c (ident_manage_dialog_cb),
+        * src/sendmsg-window.c (change_identity_dialog_cb,
+                                update_msg_identity):
+          Make identity dialogs non-modal.
+
 2002-12-30  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/sendmsg-window.c: include correctly non-UTF-8 files.

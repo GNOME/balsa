@@ -5,13 +5,38 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 2000-08-30 12:38+0400\n"
-"PO-Revision-Date: 2000-08-30 12:38+04:00\n"
+"POT-Creation-Date: 2000-08-31 10:35+0400\n"
+"PO-Revision-Date: 2000-08-31 10:43+04:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=koi8-r\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: libbalsa/mailbox_imap.c:233
+#, c-format
+msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxImap: Открыто %s Число ссылок: %d\n"
+
+#: libbalsa/mailbox_local.c:227
+#, c-format
+msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxLocal: Открыто %s Число ссылок: %d\n"
+
+#: libbalsa/mailbox_pop3.c:177
+#, c-format
+msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxPop3: Открыто %s Число ссылок: %d\n"
+
+#: libbalsa/send.c:787
+#, c-format
+msgid "Could not find address for host %s."
+msgstr "Не удалось найти адрес для хоста %s."
+
+#: libbalsa/send.c:790
+#, c-format
+msgid "Error: Could not find address for host %s."
+msgstr "Ошибка: Не удалось найти адрес для хоста %s."
 
 #.
 #. ISPRIME(9)
@@ -156,6 +181,290 @@ msgstr "Файл с названием \"%s\" не является каталогом."
 #: libinit_balsa/init_balsa.c:36
 msgid "Configure Balsa"
 msgstr "Конфигурирование Balsa"
+
+#: libmutt/mbox.c:134 libmutt/mbox.c:292
+msgid "Reading %s... %d (%d%%)"
+msgstr "Чтение %s... %d (%d%%)"
+
+#: libmutt/mbox.c:158 libmutt/mbox.c:217
+msgid "Mailbox is corrupt!"
+msgstr "Почтовый ящик поврежден!"
+
+#: libmutt/mbox.c:666
+msgid "Mailbox was corrupted!"
+msgstr "Почтовый ящик был поврежден!"
+
+#: libmutt/mbox.c:703 libmutt/mbox.c:978
+msgid "Fatal error!  Could not reopen mailbox!"
+msgstr "Фатальная ошибка! Невозможно открыть почтовый ящик!"
+
+#: libmutt/mbox.c:712
+msgid "Unable to lock mailbox!"
+msgstr "Невозможно заблокировать почтовый ящик!"
+
+#: libmutt/mbox.c:741
+msgid "Could not create temporary file!"
+msgstr "Невозможно создать временный файл!"
+
+#. this means ctx->changed or ctx->deleted was set, but no
+#. * messages were found to be changed or deleted.  This should
+#. * never happen, is we presume it is a bug in mutt.
+#.
+#: libmutt/mbox.c:758
+msgid "sync: mbox modified, but no modified messages! (report this bug)"
+msgstr ""
+"sync: mbox изменен, но нет измененных сообщений! (сообщите об этой ошибке)"
+
+#: libmutt/mbox.c:788
+msgid "Writing messages... %d (%d%%)"
+msgstr "Запись сообщений... %d (%d%%)"
+
+#: libmutt/mbox.c:962
+#, c-format
+msgid "Write failed!  Saved partial mailbox to %s"
+msgstr "Сбой при записи! Сохранена часть почтового ящика в %s"
+
+#: libmutt/mbox.c:1028
+msgid "Could not reopen mailbox!"
+msgstr "Не удалось открыть почтовый ящик!"
+
+#: libmutt/mbox.c:1066
+msgid "Reopening mailbox..."
+msgstr "Открытие почтового ящика..."
+
+#: libmutt/mx.c:119
+#, c-format
+msgid "Lock count exceeded, remove lock for %s?"
+msgstr "Превышено число блокировок, удалить блокировку с %s?"
+
+#: libmutt/mx.c:131
+#, c-format
+msgid "Can't dotlock %s.\n"
+msgstr "Невозможно выполнить dotlock %s.\n"
+
+#: libmutt/mx.c:189
+msgid "Timeout exceeded while attempting fcntl lock!"
+msgstr "Исчерпано время ожидания при попытке выполнить fcntl lock!"
+
+#: libmutt/mx.c:195
+#, c-format
+msgid "Waiting for fcntl lock... %d"
+msgstr "Ожидание fcntl lock... %d"
+
+#: libmutt/mx.c:223
+msgid "Timeout exceeded while attempting flock lock!"
+msgstr "Исчерпано время ожидания при попытке выполнить flock lock!"
+
+#: libmutt/mx.c:230
+#, c-format
+msgid "Waiting for flock attempt... %d"
+msgstr "Ожидание завершения попытки выполнить flock ... %d"
+
+#: libmutt/mx.c:459 libmutt/mx.c:605
+#, c-format
+msgid "%s is not a mailbox."
+msgstr "%s не является почтовым ящиком."
+
+#: libmutt/mx.c:542
+#, c-format
+msgid "Couldn't lock %s\n"
+msgstr "Невозможно заблокировать %s\n"
+
+#: libmutt/mx.c:630
+#, c-format
+msgid "Reading %s..."
+msgstr "Чтение %s..."
+
+#: libmutt/mx.c:719
+#, c-format
+msgid "Writing %s..."
+msgstr "Запись %s..."
+
+#: libmutt/mx.c:746
+#, c-format
+msgid "Could not synchronize mailbox %s!"
+msgstr "Невозможно синхронизировать почтовый ящик %s!"
+
+#: libmutt/mx.c:848
+#, c-format
+msgid "Moving read messages to %s..."
+msgstr "Перемещение прочитанных сообщений в %s..."
+
+#: libmutt/mx.c:899 libmutt/mx.c:1056
+msgid "Mailbox is unchanged."
+msgstr "Почтовый ящик не изменился."
+
+#: libmutt/mx.c:929
+#, c-format
+msgid "%d kept, %d moved, %d deleted."
+msgstr "%d сохранено, %d перемещено, %d удалено."
+
+#: libmutt/mx.c:932 libmutt/mx.c:1098
+#, c-format
+msgid "%d kept, %d deleted."
+msgstr "%d сохранено, %d удалено."
+
+#: libmutt/mx.c:1040
+#, c-format
+msgid " Press '%s' to toggle write"
+msgstr " Нажмите \"%s\", чтобы переключить запись"
+
+#: libmutt/mx.c:1043
+msgid "Use 'toggle-write' to re-enable write!"
+msgstr "Используйте \"toggle-write\", чтобы повторно разрешить запись!"
+
+#: libmutt/mx.c:1045
+#, c-format
+msgid "Mailbox is marked unwritable. %s"
+msgstr "Почтовый ящик отмечен как непредназначенный для записи. %s"
+
+#: libmutt/mx.c:1050
+msgid "Mailbox is read-only."
+msgstr "Почтовый ящик только для чтения."
+
+#: libmutt/mx.c:1065
+#, c-format
+msgid "Purge %d deleted message?"
+msgstr "Выкинуть %d удаленное сообщение?"
+
+#: libmutt/mx.c:1065
+#, c-format
+msgid "Purge %d deleted messages?"
+msgstr "Выкинуть %d удаленных сообщений?"
+
+#: libmutt/mx.c:1095
+#, c-format
+msgid "%d kept."
+msgstr "%d сохранено."
+
+#: libmutt/mx.c:1375
+msgid "Can't write message"
+msgstr "Невозможно записать письмо"
+
+#: libmutt/pop.c:140
+msgid "Unable to get APOP seed from server"
+msgstr "Не удаллось получить зерно APOP с сервера"
+
+#. now begin login
+#: libmutt/imap/auth_gss.c:83
+msgid "Authenticating (GSSAPI)..."
+msgstr "Идентификация (GSSAPI)..."
+
+#: libmutt/imap/browse.c:93
+msgid "Getting namespaces..."
+msgstr "Получение пространства имен..."
+
+#: libmutt/imap/browse.c:120
+msgid "Getting folder list..."
+msgstr "Получение списка папок..."
+
+#: libmutt/imap/imap_ssl.c:86
+msgid "Filling entropy pool"
+msgstr "Заполнение пула энтропии"
+
+#: libmutt/imap/imap_ssl.c:118
+msgid "Failed to find enough entropy on your system"
+msgstr "Не удалось обнаружить достаточной энтропии в вашей системе"
+
+#: libmutt/imap/imap_ssl.c:133
+msgid "SSL disabled due the lack of entropy"
+msgstr "SSL отключено из-за недостатка энтропии"
+
+#: libmutt/imap/imap_ssl.c:213
+msgid "Unable to get certificate from peer"
+msgstr "Не удалось получить сертификат от узла"
+
+#: libmutt/imap/imap_ssl.c:224
+#, c-format
+msgid "SSL connection using %s"
+msgstr "SSL соединение с использованием %s"
+
+#: libmutt/imap/imap_ssl.c:249
+msgid "Unknown"
+msgstr "Неизвестно"
+
+#: libmutt/imap/imap_ssl.c:274
+msgid "[unable to calculate]"
+msgstr "[Невозможно вычислить]"
+
+#: libmutt/imap/imap_ssl.c:292
+msgid "[invalid date]"
+msgstr "[неверная дата]"
+
+#: libmutt/imap/imap_ssl.c:367
+msgid "Server certificate is not yet valid"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:374
+msgid "Server certificate has expired"
+msgstr "Сертификат сервера устарел"
+
+#: libmutt/imap/imap_ssl.c:447
+msgid "This certificate belongs to:"
+msgstr "Этот сертификат принадлежит:"
+
+#: libmutt/imap/imap_ssl.c:457
+msgid "This certificate was issued by:"
+msgstr "Этот сертификат был выдан:"
+
+#: libmutt/imap/imap_ssl.c:467
+msgid "This certificate is valid"
+msgstr "Этот сертификат действителен"
+
+#: libmutt/imap/imap_ssl.c:468
+#, c-format
+msgid "   from %s"
+msgstr "   из %s"
+
+#: libmutt/imap/imap_ssl.c:470
+#, c-format
+msgid "     to %s"
+msgstr "    в %s"
+
+#: libmutt/imap/imap_ssl.c:476
+#, c-format
+msgid "Fingerprint: %s"
+msgstr "Отпечатки пальцев: %s"
+
+#: libmutt/imap/imap_ssl.c:478
+msgid "SSL Certificate check"
+msgstr "Проверка SSL сертификата"
+
+#: libmutt/imap/imap_ssl.c:481
+msgid "(r)eject, accept (o)nce, (a)ccept always"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:482
+msgid "roa"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:486
+msgid "(r)eject, accept (o)nce"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:487
+msgid "ro"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:491
+msgid "Exit  "
+msgstr "Выход  "
+
+#: libmutt/imap/imap_ssl.c:493
+msgid "Help"
+msgstr "Справка"
+
+#: libmutt/imap/imap_ssl.c:516
+msgid "Warning: Couldn't save certificate"
+msgstr "Внимание: Невозможно сохранить сертификат"
+
+#: libmutt/imap/imap_ssl.c:518
+msgid "Certificate saved"
+msgstr "Сертификат сохранен"
+
+#: libmutt/imap/util.c:43
+msgid "Continue?"
+msgstr "Продолжить?"
 
 #: src/address-book.c:194
 msgid "Add New Address"
@@ -1782,189 +2091,3 @@ msgstr "Не удалось выполнить команду печати."
 #: src/sendmsg-window.c:1519
 msgid "Error executing lpr"
 msgstr "Ошибка выполнения lpr"
-
-#: libbalsa/mailbox_imap.c:233
-#, c-format
-msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxImap: Открыто %s Число ссылок: %d\n"
-
-#: libbalsa/mailbox_local.c:227
-#, c-format
-msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxLocal: Открыто %s Число ссылок: %d\n"
-
-#: libbalsa/mailbox_pop3.c:177
-#, c-format
-msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxPop3: Открыто %s Число ссылок: %d\n"
-
-#: libmutt/mbox.c:134 libmutt/mbox.c:292
-msgid "Reading %s... %d (%d%%)"
-msgstr "Чтение %s... %d (%d%%)"
-
-#: libmutt/mbox.c:158 libmutt/mbox.c:217
-msgid "Mailbox is corrupt!"
-msgstr "Почтовый ящик поврежден!"
-
-#: libmutt/mbox.c:666
-msgid "Mailbox was corrupted!"
-msgstr "Почтовый ящик был поврежден!"
-
-#: libmutt/mbox.c:703 libmutt/mbox.c:978
-msgid "Fatal error!  Could not reopen mailbox!"
-msgstr "Фатальная ошибка! Невозможно открыть почтовый ящик!"
-
-#: libmutt/mbox.c:712
-msgid "Unable to lock mailbox!"
-msgstr "Невозможно заблокировать почтовый ящик!"
-
-#: libmutt/mbox.c:741
-msgid "Could not create temporary file!"
-msgstr "Невозможно создать временный файл!"
-
-#. this means ctx->changed or ctx->deleted was set, but no
-#. * messages were found to be changed or deleted.  This should
-#. * never happen, is we presume it is a bug in mutt.
-#.
-#: libmutt/mbox.c:758
-msgid "sync: mbox modified, but no modified messages! (report this bug)"
-msgstr ""
-"sync: mbox изменен, но нет измененных сообщений! (сообщите об этой ошибке)"
-
-#: libmutt/mbox.c:788
-msgid "Writing messages... %d (%d%%)"
-msgstr "Запись сообщений... %d (%d%%)"
-
-#: libmutt/mbox.c:962
-#, c-format
-msgid "Write failed!  Saved partial mailbox to %s"
-msgstr "Сбой при записи! Сохранена часть почтового ящика в %s"
-
-#: libmutt/mbox.c:1028
-msgid "Could not reopen mailbox!"
-msgstr "Не удалось открыть почтовый ящик!"
-
-#: libmutt/mbox.c:1066
-msgid "Reopening mailbox..."
-msgstr "Открытие почтового ящика..."
-
-#: libmutt/mx.c:119
-#, c-format
-msgid "Lock count exceeded, remove lock for %s?"
-msgstr "Превышено число блокировок, удалить блокировку с %s?"
-
-#: libmutt/mx.c:131
-#, c-format
-msgid "Can't dotlock %s.\n"
-msgstr "Невозможно выполнить dotlock %s.\n"
-
-#: libmutt/mx.c:189
-msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr "Исчерпано время ожидания при попытке выполнить fcntl lock!"
-
-#: libmutt/mx.c:195
-#, c-format
-msgid "Waiting for fcntl lock... %d"
-msgstr "Ожидание fcntl lock... %d"
-
-#: libmutt/mx.c:223
-msgid "Timeout exceeded while attempting flock lock!"
-msgstr "Исчерпано время ожидания при попытке выполнить flock lock!"
-
-#: libmutt/mx.c:230
-#, c-format
-msgid "Waiting for flock attempt... %d"
-msgstr "Ожидание завершения попытки выполнить flock ... %d"
-
-#: libmutt/mx.c:459 libmutt/mx.c:605
-#, c-format
-msgid "%s is not a mailbox."
-msgstr "%s не является почтовым ящиком."
-
-#: libmutt/mx.c:542
-#, c-format
-msgid "Couldn't lock %s\n"
-msgstr "Невозможно заблокировать %s\n"
-
-#: libmutt/mx.c:630
-#, c-format
-msgid "Reading %s..."
-msgstr "Чтение %s..."
-
-#: libmutt/mx.c:719
-#, c-format
-msgid "Writing %s..."
-msgstr "Запись %s..."
-
-#: libmutt/mx.c:746
-#, c-format
-msgid "Could not synchronize mailbox %s!"
-msgstr "Невозможно синхронизировать почтовый ящик %s!"
-
-#: libmutt/mx.c:848
-#, c-format
-msgid "Moving read messages to %s..."
-msgstr "Перемещение прочитанных сообщений в %s..."
-
-#: libmutt/mx.c:899 libmutt/mx.c:1056
-msgid "Mailbox is unchanged."
-msgstr "Почтовый ящик не изменился."
-
-#: libmutt/mx.c:929
-#, c-format
-msgid "%d kept, %d moved, %d deleted."
-msgstr "%d сохранено, %d перемещено, %d удалено."
-
-#: libmutt/mx.c:932 libmutt/mx.c:1098
-#, c-format
-msgid "%d kept, %d deleted."
-msgstr "%d сохранено, %d удалено."
-
-#: libmutt/mx.c:1040
-#, c-format
-msgid " Press '%s' to toggle write"
-msgstr " Нажмите \"%s\", чтобы переключить запись"
-
-#: libmutt/mx.c:1043
-msgid "Use 'toggle-write' to re-enable write!"
-msgstr "Используйте \"toggle-write\", чтобы повторно разрешить запись!"
-
-#: libmutt/mx.c:1045
-#, c-format
-msgid "Mailbox is marked unwritable. %s"
-msgstr "Почтовый ящик отмечен как непредназначенный для записи. %s"
-
-#: libmutt/mx.c:1050
-msgid "Mailbox is read-only."
-msgstr "Почтовый ящик только для чтения."
-
-#: libmutt/mx.c:1065
-#, c-format
-msgid "Purge %d deleted message?"
-msgstr "Выкинуть %d удаленное сообщение?"
-
-#: libmutt/mx.c:1065
-#, c-format
-msgid "Purge %d deleted messages?"
-msgstr "Выкинуть %d удаленных сообщений?"
-
-#: libmutt/mx.c:1095
-#, c-format
-msgid "%d kept."
-msgstr "%d сохранено."
-
-#: libmutt/mx.c:1375
-msgid "Can't write message"
-msgstr "Невозможно записать письмо"
-
-#~ msgid "Error: "
-#~ msgstr "Ошибка: "
-
-#~ msgid "List"
-#~ msgstr "Список"
-
-#~ msgid "Mailbox %s has %d new messages"
-#~ msgstr "В почтовом ящике %s есть %d новых сообщений"
-
-#~ msgid "you"
-#~ msgstr "вы"

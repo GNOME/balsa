@@ -1,0 +1,4 @@
+1998-02-19  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* src/main.c (main): Added app_id "balsa".
+

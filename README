@@ -1,0 +1,32 @@
+Balsa E-Mail Client 0.0.4
+Copyright (C) 1997-1998 Jay Painter and Stuart Parmenter
+See 'COPYING' for licence information.
+
+Jay Painter      -- jpaint@serv.net   -- jpaint@gimp.org
+Stuart Parmenter -- pavlov@innerx.net -- pavlov@gimp.org
+http://www.serv.net/~jpaint
+
+This uses Mark Crispin's c-client library, which needs to be in or linked from the
+toplevel of this directory.  I have left my link in this tar file to show how 
+it's done.
+ 
+It must be compiled first in order to compile Balsa.  More information on the
+c-client liberary is avaible at http://www.imap.org.
+
+
+BUILD INSTRUCTIONS:
+
+First compile the c-client library
+
+Then to build balsa:
+# cd imap
+# make lnx
+# cd ..
+# ./autogen.sh
+# make
+
+FEATURES (not):
+  * I can't think of any :-)
+
+That's all for now,
+Jay

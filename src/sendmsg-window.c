@@ -595,8 +595,6 @@ add_attachment(GnomeIconList * iconlist, char *filename)
 	gint pos;
 	gchar *label;
 
-	g_print ("POO\n");
-
 	label = g_strdup_printf ("%s (%s)", g_basename(filename), content_type);
 
 	pos = gnome_icon_list_append(iconlist, pix, label);

@@ -166,8 +166,11 @@ libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab)
 
     gc = fopen(addr_vcard->path, "r");
 
-    if (gc == NULL)
+    if (gc == NULL) {
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("Could not open vCard address book %s."), 
+			     ab->name);
 	return;
+    }
 
     while (fgets(string, sizeof(string), gc)) {
 	/*
@@ -322,7 +325,7 @@ libbalsa_address_book_vcard_store_address(LibBalsaAddressBook * ab,
     fp = fopen(LIBBALSA_ADDRESS_BOOK_VCARD(ab)->path, "a");
     if (fp == NULL) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Cannot open vCard address book %s\n"),
+			     _("Cannot open vCard address book %s for saving\n"),
 			     ab->name);
 	return;
     }

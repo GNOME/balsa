@@ -1,3 +1,13 @@
+2000-10-31  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/sendmsg-window.c (add_attachment): Remove
+	g_print("POO\n"). Don't ask, I don't know.
+	* libinit_balsa/balsa-initdruid.gob: If there is a GnomeCard
+	address book in ~/.gnome/ then add it to the list of address
+	books.
+	* libbalsa/address-book-vcard.c: Report a warning if we can't
+	open the mailbox.
+
 2000-10-31  Pawel Salek <pawsa@theochem.kth.se>
 
 	* INSTALL, README: update install requirements and version numbers.

@@ -26,6 +26,7 @@
 
 %{
 #include "save-restore.h" 
+#include "balsa-app.h"
 
 #include "balsa-druid-page.h"
 #include "balsa-druid-page-welcome.h"
@@ -101,6 +102,7 @@ class Balsa:InitDruid from Gnome:Druid {
 
 	public void finished( self ) {
 		GtkObject *win;
+		gchar *address_book;
 
 		win = GTK_OBJECT( self->_priv->window );
 
@@ -112,6 +114,16 @@ class Balsa:InitDruid from Gnome:Druid {
 		/*gtk_object_unref( win );*/
 		gtk_object_destroy( win );
 
+		address_book = gnome_util_home_file("GnomeCard.gcrd");
+		if ( g_file_exists(address_book) ) {
+		  LibBalsaAddressBook *ab = libbalsa_address_book_vcard_new(_("GnomeCard Address Book"),
+									    address_book);
+
+		  balsa_app.address_book_list = g_list_prepend(balsa_app.address_book_list, ab);
+		  balsa_app.default_address_book = ab;
+		}
+		g_free(address_book);
+		
 		gtk_main_quit();
 	}
 }

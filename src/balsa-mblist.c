@@ -92,6 +92,7 @@ static gint numeric_compare (GtkCList * clist, gconstpointer ptr1, gconstpointer
 #endif
 static gint mblist_mbnode_compare (gconstpointer a, gconstpointer b);
 
+
 guint
 balsa_mblist_get_type(void)
 {
@@ -349,7 +350,7 @@ balsa_mblist_insert_mailbox (BalsaMBList * mblist,
 
 /* balsa_mblist_redraw 
  *
- * bmbl:  the BalsaMBList that needs redrawing (PS: recreating!)
+ * bmbl:  the BalsaMBList that needs recreating.
  *
  * Description: Called whenever a new mailbox is added to the mailbox
  * list, it clears the ctree, and draws all the entire tree from
@@ -364,7 +365,7 @@ void balsa_mblist_redraw (BalsaMBList * bmbl)
 
   ctree = GTK_CTREE (bmbl);
 
-  mutt_buffy_notify();
+  /* mutt_buffy_notify(); balsa_mblist_have_new calls m_b_n(). */
 
   gtk_clist_freeze (GTK_CLIST (ctree));
   gtk_clist_clear (GTK_CLIST (ctree));
@@ -409,7 +410,7 @@ void balsa_mblist_redraw (BalsaMBList * bmbl)
     }
   }
   gtk_ctree_sort_recursive (ctree, NULL);
-  balsa_mblist_have_new (bmbl);
+  balsa_mblist_have_new(bmbl);
   gtk_clist_thaw (GTK_CLIST (ctree));
 }
 
@@ -666,6 +667,7 @@ static void
 balsa_mblist_set_style (BalsaMBList* mblist)
 {
   GdkColor color;
+  GdkColormap * colormap;
   GdkFont* font;
   GtkStyle* style;
   
@@ -679,10 +681,10 @@ balsa_mblist_set_style (BalsaMBList* mblist)
 
   /* Get and attempt to allocate the colour */
   color = balsa_app.mblist_unread_color;
-  if (!gdk_colormap_alloc_color (gdk_colormap_get_system (), 
-                                 &color, FALSE, TRUE)) {
+  colormap = gdk_window_get_colormap (GTK_WIDGET(mblist)->window);
+  if (!gdk_colormap_alloc_color (colormap, &color, FALSE, TRUE)) {
     fprintf (stderr, "Couldn't allocate colour for unread mailboxes!\n");
-    gdk_color_black (gdk_colormap_get_system(), &color);
+    gdk_color_black (colormap, &color);
   }
   
   /* Just put it in the normal state for now */
@@ -702,20 +704,36 @@ balsa_mblist_set_style (BalsaMBList* mblist)
  * 
  * Description: This function is a wrapper for the recursive call
  * neccessary to check which mailboxes have unread messages, and
- * change the style of them in the mailbox list
+ * change the style of them in the mailbox list.
+ * Since the mailbox checking can take some time, we implement it as an 
+ * idle function.
  * */
+
+static gboolean 
+do_have_new(BalsaMBList * bmbl)
+{
+  if(bmbl->needs_update) {
+    mutt_buffy_notify();
+    
+    balsa_mblist_set_style (bmbl);
+    gtk_clist_freeze (GTK_CLIST (&(bmbl->ctree)));
+    gtk_ctree_post_recursive (GTK_CTREE (&(bmbl->ctree)), NULL, 
+			      balsa_mblist_check_new, NULL);
+    gtk_ctree_post_recursive (GTK_CTREE (&(bmbl->ctree)), NULL, 
+			      balsa_mblist_folder_style, NULL);
+    gtk_clist_thaw (GTK_CLIST (&(bmbl->ctree)));
+    
+    bmbl->needs_update = FALSE;
+  }
+
+  return FALSE;
+}
+
 void
 balsa_mblist_have_new (BalsaMBList * bmbl)
 {
-  mutt_buffy_notify();
-
-  balsa_mblist_set_style (bmbl);
-  gtk_clist_freeze (GTK_CLIST (&(bmbl->ctree)));
-  gtk_ctree_post_recursive (GTK_CTREE (&(bmbl->ctree)), NULL, 
-			    balsa_mblist_check_new, NULL);
-  gtk_ctree_post_recursive (GTK_CTREE (&(bmbl->ctree)), NULL, 
-			    balsa_mblist_folder_style, NULL);
-  gtk_clist_thaw (GTK_CLIST (&(bmbl->ctree)));
+  bmbl->needs_update  = TRUE;
+  gtk_idle_add(do_have_new, bmbl);
 }
 
 /* balsa_mblist_check_new [MBG]

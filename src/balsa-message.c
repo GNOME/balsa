@@ -101,6 +101,7 @@ static void balsa_gtk_html_size_request (GtkWidget *widget, GtkRequisition *requ
 #endif
 static void balsa_icon_list_size_request (GtkWidget *widget, GtkRequisition *requisition, gpointer data);
 
+static gboolean is_a_quote (gchar *);
 static void part_info_init_image (BalsaMessage *bm, BalsaPartInfo *info);
 static void part_info_init_other (BalsaMessage *bm, BalsaPartInfo *info);
 static void part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info);
@@ -902,6 +903,19 @@ reflow_string(gchar* str, gint mode, gint *cur_pos, int width)
       ;
 }
 
+
+static gboolean
+is_a_quote (gchar *str)
+{
+   gchar *s;
+
+   s = str;
+   if (s[0] != '>') return FALSE;
+   while (s[0] == '>') s++;
+   if (s[0] == ' ') return TRUE;
+   	else return FALSE;
+}
+
 /* END OF HELPER FUNCTIONS ----------------------------------------------- */
 
 static void
@@ -912,10 +926,18 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
   
   gchar *ptr = 0; 
   size_t alloced;
+  gchar ** l = NULL;
+  gchar ** lines = NULL;
+  gchar * line = NULL;
+  GdkColor color;
+  GdkColormap* colormap;
+
 
   libbalsa_message_body_save_temporary ( info->body, NULL );
   
-  fp = fopen( info->body->temp_filename, "r" );
+  if( (fp = fopen( info->body->temp_filename, "r")) == NULL) 
+    balsa_warning("Cannot create temporary file.");
+
   alloced = readfile( fp, &ptr );
  
   if( ptr ) {
@@ -972,7 +994,23 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
       gtk_signal_connect(GTK_OBJECT(item), "size_request",
 			 (GtkSignalFunc)balsa_gtk_text_size_request, (gpointer)bm);
 
-      gtk_text_insert(GTK_TEXT(item), fnt, NULL, NULL, ptr, -1);
+      gdk_color_parse ("#005050", &color); /* FIXME: take it from prefs */
+      colormap = gdk_window_get_colormap (GTK_WIDGET(bm)->window);
+      if (!gdk_colormap_alloc_color (colormap, &color, FALSE, TRUE))
+	gdk_color_black (colormap, &color);
+
+      lines = l = g_strsplit (ptr, "\n", -1);
+      for (line = *lines; line != NULL; line = *(++lines))
+      {
+	 line = g_strconcat (line, "\n", NULL);
+	 if (is_a_quote (line))
+	    gtk_text_insert(GTK_TEXT(item), fnt, &color, NULL, line, -1);
+	 else
+	    gtk_text_insert(GTK_TEXT(item), fnt, NULL, NULL, line, -1);
+	 g_free (line);
+      }
+      g_strfreev (l);
+      
       gtk_text_set_editable(GTK_TEXT(item), FALSE);
 
       gtk_widget_show(item);

@@ -36,6 +36,7 @@ struct _BalsaMBList
 #ifdef BALSA_SHOW_INFO
     gboolean display_content_info; /* shall the number of messages be displayed ? */
 #endif
+    gboolean needs_update;
   };
 
 struct _BalsaMBListClass

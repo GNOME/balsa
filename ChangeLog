@@ -7,6 +7,10 @@
 	* src/balsa-message.c: set_wmclass(save_dialog, "save")
 	* src/pref-manager.c,src/save-restore.c: configuration code.
 	* src/sendmsg-window.c: alias expansion hooked.
+	* src/balsa-message.c: quoted text marking, part1.
+	* src/balsa-mblist.[hc]: check mailboxes only when idle.
+	* src/pref-manager.c: use gdk_window_get_colormap() instead of
+	gdk_colormap_get_system() which is not apriopriate in this context.
 	
 2000-08-03  Ian Campbell  <ijc25@cam.ac.uk>
 

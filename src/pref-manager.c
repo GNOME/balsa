@@ -488,7 +488,9 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	g_strdown(balsa_app.selected_headers);
 
         /* unread mailbox color */
-        gdk_colormap_free_colors (gdk_colormap_get_system (), &balsa_app.mblist_unread_color, 1);
+        gdk_colormap_free_colors (
+	  gdk_window_get_colormap (GTK_WIDGET(pbox)->window),
+	  &balsa_app.mblist_unread_color, 1);
         gnome_color_picker_get_i16 (GNOME_COLOR_PICKER(pui->unread_color), &(balsa_app.mblist_unread_color.red), &(balsa_app.mblist_unread_color.green), &(balsa_app.mblist_unread_color.blue), 0);
 
 	/* address book */

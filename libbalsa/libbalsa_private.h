@@ -43,6 +43,8 @@ void libbalsa_unlock_mailbox(LibBalsaMailbox * mailbox);
 #define LOCK_MAILBOX_RETURN_VAL(mailbox, val) libbalsa_lock_mailbox(mailbox)
 #define UNLOCK_MAILBOX(mailbox) libbalsa_unlock_mailbox(mailbox)
 
+#define HAVE_MAILBOX_LOCKED(mailbox) ((mailbox)->lock > 0 && (mailbox)->thread_id == pthread_self())
+
 #else
 
 /* Non-threaded locking mechanism */
@@ -70,6 +72,8 @@ do {\
 } while (0)
 
 #define UNLOCK_MAILBOX(mailbox)          ((mailbox)->lock--)
+
+#define MAILBOX_IS_LOCKED(mailbox) ((mailbox)->lock > 0)
 
 #endif
 

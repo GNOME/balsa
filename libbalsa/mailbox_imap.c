@@ -566,14 +566,12 @@ imap_flags_cb(unsigned seqno, LibBalsaMailboxImap *mimap)
 	if ((old_flags ^ msg_info->message->flags) &
 	    LIBBALSA_MESSAGE_FLAG_NEW) {
 	    GList *list = g_list_prepend(NULL, msg_info->message);
-	    LOCK_MAILBOX(LIBBALSA_MAILBOX(mimap));
+	    g_assert(HAVE_MAILBOX_LOCKED(LIBBALSA_MAILBOX(mimap)));
 	    libbalsa_mailbox_messages_status_changed(LIBBALSA_MAILBOX
 						     (mimap), list,
 						     LIBBALSA_MESSAGE_FLAG_NEW);
-	    UNLOCK_MAILBOX(LIBBALSA_MAILBOX(mimap));
 	    g_list_free_1(list);
 	}
-	/* invalidate iters; */
 	LIBBALSA_MAILBOX(mimap)->stamp++;
     }
 }

@@ -67,6 +67,8 @@ struct _Personality
 typedef struct _personality_box_options personality_box_options;
 struct _personality_box_options
   {
+    GtkWidget *accountname;
+
     GtkWidget *realname;
     GtkWidget *replyto;
 

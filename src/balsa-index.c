@@ -93,8 +93,6 @@ static gint balsa_index_signals[LAST_SIGNAL] =
 {0};
 static GtkBinClass *parent_class = NULL;
 
-static guint first_new_message;
-
 guint
 balsa_index_get_type ()
 {
@@ -300,6 +298,15 @@ balsa_index_new ()
   return GTK_WIDGET (bindex);
 }
 
+static gboolean
+moveto_timer_hack (BalsaIndex * bindex)
+{
+  if (!GTK_WIDGET_VISIBLE (GTK_WIDGET (bindex)))
+    return TRUE;
+  g_print ("balsa-index.c: moving to row %i\n", bindex->first_new_message);
+  gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), bindex->first_new_message - 1, -1, 1.0, 0.0);
+  return FALSE;
+}
 
 void
 balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
@@ -365,19 +372,12 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child),
 				GTK_SELECTION_EXTENDED);
 
-  if (first_new_message != 0)
-    {
-      g_print ("balsa-index.c: moving to row %i\n", first_new_message);
-      gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), first_new_message, -1, 0.0, 0.0);
-    }
-  else
-    {
-      g_print ("balsa-index.c: moving to row %i\n", i);
-      gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), i - 1, -1, 1.0, 0.0);
-    }
-  first_new_message = 0;
-}
+  /* FIXME MAJOR HACK */
+  if (bindex->first_new_message == 0)
+    bindex->first_new_message = i;
 
+  gtk_timeout_add (5, moveto_timer_hack, bindex);
+}
 
 void
 balsa_index_add (BalsaIndex * bindex,
@@ -421,9 +421,9 @@ balsa_index_add (BalsaIndex * bindex,
 
   clist_set_col_img_from_flag (bindex, row, message);
 
-  if (first_new_message == 0)
+  if (bindex->first_new_message == 0)
     if (message->flags & MESSAGE_FLAG_NEW)
-      first_new_message = row;
+      bindex->first_new_message = row;
 }
 
 

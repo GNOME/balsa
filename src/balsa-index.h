@@ -43,6 +43,7 @@ struct _BalsaIndex
 
   Mailbox *mailbox;
   guint watcher_id;
+  guint first_new_message;
 };
 
 struct _BalsaIndexClass

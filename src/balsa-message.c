@@ -1952,7 +1952,8 @@ check_call_url(GtkWidget * widget, GdkEventButton * event,
 
     x = event->x;
     y = event->y;
-    if (x == stored_x && y == stored_y
+    /* 2-pixel motion tolerance */
+    if (abs(x - stored_x) <= 2 && abs(y - stored_y) <= 2
         && (event->state & STORED_MASK_BITS) == stored_mask) {
         url = find_url(widget, x, y, url_list);
         if (url)
@@ -2255,6 +2256,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
                              G_CALLBACK(check_over_url), url_list);
             g_signal_connect(G_OBJECT(item), "leave-notify-event",
                              G_CALLBACK(check_over_url), url_list);
+	    g_object_set_data(G_OBJECT(item), "url-list", url_list);
         }
 
         g_free(ptr);

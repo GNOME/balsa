@@ -2411,7 +2411,7 @@ bndx_copy_tree(BalsaIndex * index, GNode * node, GtkTreeIter * parent_iter)
     if (balsa_app.expand_tree && parent_iter) {
 	GtkTreePath *parent_path =
 	    gtk_tree_model_get_path(model, parent_iter);
-	gtk_tree_view_expand_row(GTK_TREE_VIEW(index), parent_path, FALSE);
+	gtk_tree_view_expand_row(GTK_TREE_VIEW(index), parent_path, TRUE);
 	gtk_tree_path_free(parent_path);
     }
 }

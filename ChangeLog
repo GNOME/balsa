@@ -1,3 +1,7 @@
+2004-04-23 08:23  PeterB
+
+	* src/balsa-mblist.c: split message (bug #116604).
+
 2004-04-21 12:38  PeterB
 
 	* libbalsa/pop3.c, src/balsa-mblist.c, src/main-window.c: use

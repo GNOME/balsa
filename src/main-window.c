@@ -595,7 +595,9 @@ set_icon (void)
   GdkImlibImage *im;
   GdkPixmap *pixmap;
   GdkBitmap *mask;
-  
+
+  GdkWindow *gdkwin;
+
   XIconSize *xis = NULL;
   gint count;
   gint i, maxw = 0, maxh = 0;
@@ -607,8 +609,12 @@ set_icon (void)
   if (!xis)
     return;
 
-  g_print("XIconSize's found: %i\n",count);
-  
+  gdkwin = GDK_ROOT_PARENT ();
+  if (!gdkwin)
+    return;
+
+  g_print ("XIconSize's found: %i\n", count);
+
   for (i = 0; i < count; i++)
     {
       g_print ("min: %ih x %iw\nmax: %ih x %iw\n",
@@ -624,7 +630,7 @@ set_icon (void)
 	}
     }
 
-  g_print("icon height: %i\nicon width:  %i\n", maxh, maxw);
+  g_print ("icon height: %i\nicon width:  %i\n", maxh, maxw);
 
   im = gdk_imlib_load_image (gnome_unconditional_pixmap_file ("balsa_icon.png"));
 
@@ -633,10 +639,9 @@ set_icon (void)
   pixmap = gdk_imlib_copy_image (im);
   mask = gdk_imlib_copy_mask (im);
   gdk_imlib_destroy_image (im);
+  gdk_window_set_icon (gdkwin, NULL, pixmap, mask);
+  gdk_window_set_icon_name (gdkwin, "Balsa");
 
-  gdk_window_set_icon (GDK_ROOT_PARENT (), NULL, pixmap, mask);
-  gdk_window_set_icon_name (GDK_ROOT_PARENT(), "Balsa");
-
-  gdk_pixmap_unref(pixmap);
-  gdk_bitmap_unref(mask);
+  gdk_pixmap_unref (pixmap);
+  gdk_bitmap_unref (mask);
 }

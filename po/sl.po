@@ -198,7 +198,7 @@ msgstr "Povezava zavrnjena"
 
 #: libbalsa/pop3.c:56
 msgid "Authentication failed"
-msgstr "Avtentifikacija ni uspela"
+msgstr "Avtentifikacija je bila neuspe¹na"
 
 #: libbalsa/pop3.c:323
 #, c-format
@@ -677,7 +677,7 @@ msgstr "E-po¹tni Naslov"
 
 #: src/address-book.c:164
 msgid "Address Book"
-msgstr "Imenik"
+msgstr "Adresar"
 
 #. Entry widget for finding an address
 #: src/address-book.c:243
@@ -1023,7 +1023,7 @@ msgstr "Zunanji Ukaz"
 
 #: src/filter-edit-dialog.c:50
 msgid "Copy to folder:"
-msgstr "Prepi¹i v mapo:"
+msgstr "Kopiraj v mapo:"
 
 #: src/filter-edit-dialog.c:51
 msgid "Move to folder:"
@@ -2141,7 +2141,7 @@ msgstr "Prika¾i dialog z napredkom"
 
 #: src/pref-manager.c:1543
 msgid "Display Formats"
-msgstr "Naèini Izpisa"
+msgstr "Naèini izpisa"
 
 #: src/pref-manager.c:1551
 msgid "Date encoding (for strftime):"
@@ -2880,19 +2880,19 @@ msgstr "Oprostite, dvopièja v imenu niso dovoljena!\n"
 #~ "Ne pozabite na '%s'"
 
 #~ msgid "Print Command:"
-#~ msgstr "Ukaz Za Tiskanje:"
+#~ msgstr "Ukaz za tiskanje:"
 
 #~ msgid "Local Mbox Mailbox..."
-#~ msgstr "Krajevni 'Mbox' po¹tni predal..."
+#~ msgstr "Krajevni po¹tni predal 'Mbox'..."
 
 #~ msgid "Local Maildir Mailbox..."
-#~ msgstr "Krajevni 'Maildir' po¹tni predal..."
+#~ msgstr "Krajevni po¹tni predal 'Maildir'..."
 
 #~ msgid "Local MH Mailbox..."
-#~ msgstr "Krajevni 'MH' po¹tni predal..."
+#~ msgstr "Krajevni po¹tni predal 'MH'..."
 
 #~ msgid "Remote IMAP Mailbox..."
-#~ msgstr "Oddaljen IMAP po¹tni predal..."
+#~ msgstr "Oddaljen po¹tni predal IMAP..."
 
 #~ msgid "_Toggle Flagged"
 #~ msgstr "_Preklopi oznaèbo"
@@ -2931,10 +2931,10 @@ msgstr "Oprostite, dvopièja v imenu niso dovoljena!\n"
 #~ msgstr "Nisem mogel najti naslova za stre¾nik %s."
 
 #~ msgid "Add New Address"
-#~ msgstr "Dodaj Nov Naslov"
+#~ msgstr "Dodaj nov naslov"
 
 #~ msgid "E-Mail Address:"
-#~ msgstr "E-po¹tni Naslov:"
+#~ msgstr "E-po¹tni naslov:"
 
 #~ msgid "Import first address only"
 #~ msgstr "Uvozi le prvi naslov"
@@ -2952,16 +2952,16 @@ msgstr "Oprostite, dvopièja v imenu niso dovoljena!\n"
 #~ "Ste preprièani, da ¾elite odstraniti ta predal?"
 
 #~ msgid "You need to fill in the Mailbox Name field."
-#~ msgstr "Vpisati morate Ime predala."
+#~ msgstr "Vpisati morate ime predala."
 
 #~ msgid "You need to fill in the Mailbox Path field."
 #~ msgstr "Vpisati morate pot do predala."
 
 #~ msgid "You need to fill in the folderpath field."
-#~ msgstr "Vpisati morate Imenik mape."
+#~ msgstr "Vpisati morate imenik mape."
 
 #~ msgid "You need to fill in the IMAP Server field"
-#~ msgstr "Vpisati morate IMAP Stre¾nik"
+#~ msgstr "Vpisati morate stre¾nik IMAP
 
 #~ msgid "You need to fill in the username field"
 #~ msgstr "Vpisati morate uporabni¹ko ime"

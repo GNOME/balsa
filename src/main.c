@@ -294,5 +294,5 @@ balsa_exit (void)
 
   gnome_sound_shutdown ();
 
-  gtk_exit (0);
+  gtk_main_quit();
 }

@@ -546,14 +546,11 @@ static void balsa_window_destroy (GtkObject     *object)
 
   window = BALSA_WINDOW(object);
 
-  geometry = gnome_geometry_string(GTK_WIDGET(window->mblist)->window);
-  gnome_parse_geometry(geometry,
-		       &x, &y,
-		       &balsa_app.mblist_width, 
-		       &balsa_app.mblist_height);
-  
-  balsa_app.mw_width = 640;
-  balsa_app.mw_height = 400;
+  balsa_app.mw_width = GTK_WIDGET(object)->allocation.width;
+  balsa_app.mw_height = GTK_WIDGET(object)->allocation.height;
+
+  if (GTK_OBJECT_CLASS(parent_class)->destroy)
+    (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
 
   balsa_exit();
 }

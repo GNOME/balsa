@@ -425,8 +425,7 @@ bndx_instance_init(BalsaIndex * index)
 
 struct BndxSelectionChangedInfo {
     LibBalsaMessage *message;
-    LibBalsaMessage *current_message;
-    gboolean current_message_selected;
+    GSList **selected;
 };
 
 static void
@@ -436,14 +435,40 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
     struct BndxSelectionChangedInfo sci;
     GtkTreeIter iter;
+    GSList *list;
+    GSList *next;
 
+    /* Check currently selected messages. */
+    for (list = index->selected; list; list = next) {
+	GtkTreePath *path;
+	LibBalsaMessage *message = list->data;
+
+	next = list->next;
+	if (!bndx_find_message(index, &path, NULL, message)) {
+	    /* The message is no longer in the view--it must have been
+	     * either expunged or filtered out--in either case, we just
+	     * drop it from the list. */
+	    index->selected = g_slist_delete_link(index->selected, list);
+	    continue;
+	}
+	if (!gtk_tree_selection_path_is_selected(selection, path)
+	    && bndx_row_is_viewable(index, path)) {
+	    /* The message has been deselected, and not by collapsing a
+	     * thread; we'll notify the mailbox, so it can check whether
+	     * the message still matches the view filter. */
+	    index->selected = g_slist_delete_link(index->selected, list);
+	    libbalsa_mailbox_msgno_deselected(message->mailbox, 
+					      message->msgno);
+	}
+	gtk_tree_path_free(path);
+    }
+
+    sci.selected = &index->selected;
     sci.message = NULL;
-    sci.current_message = index->current_message;
-    sci.current_message_selected = FALSE;
     gtk_tree_selection_selected_foreach(selection,
                                         bndx_selection_changed_func,
                                         &sci);
-    if (sci.current_message_selected)
+    if (g_slist_find(index->selected, index->current_message))
         return;
 
     /* we don't clear the current message if the tree contains any
@@ -468,8 +493,8 @@ bndx_selection_changed_func(GtkTreeModel * model, GtkTreePath * path,
 
     gtk_tree_model_get(model, iter, LB_MBOX_MESSAGE_COL, &sci->message,
                        -1);
-    if (sci->message == sci->current_message)
-        sci->current_message_selected = TRUE;
+    if (!g_slist_find(*sci->selected, sci->message))
+	*sci->selected = g_slist_prepend(*sci->selected, sci->message);
 }
 
 static gboolean
@@ -543,23 +568,32 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
                     GtkTreePath * path, gpointer user_data)
 {
     BalsaIndex *index = BALSA_INDEX(tree_view);
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreePath *current_path;
+    GSList *list;
 
-    /* if current message has become viewable, reselect it */
-    if (bndx_find_message(index, &current_path, NULL,
-                          index->current_message)) {
-	GtkTreeSelection *selection =
-	    gtk_tree_view_get_selection(tree_view);
+    g_signal_handler_block(selection, index->selection_changed_id);
+    /* If a message in the selected list has become viewable, reselect
+     * it. */
+    for (list = index->selected; list; list = list->next) {
+	LibBalsaMessage *message = list->data;
 
-        if (!gtk_tree_selection_path_is_selected(selection, current_path)
-            && bndx_row_is_viewable(index, current_path)) {
-            gtk_tree_view_set_cursor(GTK_TREE_VIEW(index), current_path,
-                                     NULL, FALSE);
-	    gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), current_path,
-					 NULL, FALSE, 0, 0);
-        }
-        gtk_tree_path_free(current_path);
+	if (bndx_find_message(index, &current_path, NULL, message)) {
+
+	    if (!gtk_tree_selection_path_is_selected
+		(selection, current_path)
+		&& bndx_row_is_viewable(index, current_path)) {
+		gtk_tree_selection_select_path(selection, current_path);
+		if (message == index->current_message) {
+		    gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index),
+						 current_path, NULL, FALSE,
+						 0, 0);
+		}
+	    }
+	    gtk_tree_path_free(current_path);
+	}
     }
+    g_signal_handler_unblock(selection, index->selection_changed_id);
 }
 
 /* When a column is resized, store the new size for later use */
@@ -1074,7 +1108,6 @@ bndx_mailbox_changed_func(BalsaIndex * bindex)
 	bndx_expand_to_row(bindex, path);
 	gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(bindex), path, NULL,
 				     FALSE, 0, 0);
-        bndx_select_row(bindex, path);
         gtk_tree_path_free(path);
     }
 
@@ -1151,6 +1184,8 @@ balsa_index_selected_list_func(GtkTreeModel * model, GtkTreePath * path,
 
 /*
  * balsa_index_selected_list: create a GList of selected messages
+ *
+ * Free with g_list_free.
  */
 GList *
 balsa_index_selected_list(BalsaIndex * index)
@@ -1345,6 +1380,8 @@ balsa_index_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag)
     }
 
     libbalsa_messages_change_flag(l, flag, !is_all_flagged);
+
+    g_list_free(l);
 }
 
 static void
@@ -1766,23 +1803,13 @@ bndx_find_message(BalsaIndex * index, GtkTreePath ** path,
 				       message->msgno, path, iter);
 }
 
-/* Make the actual selection, unselecting other messages and
+/* Make the actual selection,
  * making sure the selected row is within bounds and made visible.
  */
 static void
 bndx_select_row(BalsaIndex * index, GtkTreePath * path)
 {
-    GtkTreeSelection *selection;
-
-    g_return_if_fail(index != NULL);
-    g_return_if_fail(BALSA_IS_INDEX(index));
-
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
-    gtk_tree_selection_unselect_all(selection);
-    /* select path, and make sure this path gets the keyboard focus */
-    gtk_tree_selection_select_path(selection, path);
     gtk_tree_view_set_cursor(GTK_TREE_VIEW(index), path, NULL, FALSE);
-
     gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
                                  FALSE, 0, 0);
 }

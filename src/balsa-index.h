@@ -60,6 +60,7 @@ extern "C" {
         LibBalsaMessage* current_message;
         gboolean prev_message;
         gboolean next_message;
+	GSList *selected;
 
         GTimeVal last_use;
 

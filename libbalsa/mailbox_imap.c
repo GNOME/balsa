@@ -701,21 +701,28 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap)
 static void
 lbm_imap_get_unseen(LibBalsaMailboxImap * mimap)
 {
+    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     guint count;
     guint *msgs;
 
     if (imap_mbox_find_unseen(mimap->handle, &count, &msgs) != IMR_OK) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("IMAP SEARCH UNSEEN request failed"
-			       " for mailbox %s"),
-			     LIBBALSA_MAILBOX(mimap)->url);
+			       " for mailbox %s"), mailbox->url);
 	return;
     }
-    g_free(msgs);
 
-    LIBBALSA_MAILBOX(mimap)->unread_messages = count;
-    libbalsa_mailbox_set_unread_messages_flag(LIBBALSA_MAILBOX(mimap),
-					      count > 0);
+    mailbox->unread_messages = count;
+    if (mailbox->first_unread == 0 && count > 0) {
+	guint i;
+	mailbox->first_unread = msgs[0];
+	for (i = 1; i < count; i++)
+	    if (mailbox->first_unread > msgs[i])
+		mailbox->first_unread = msgs[i];
+    }
+    libbalsa_mailbox_set_unread_messages_flag(mailbox, count > 0);
+
+    g_free(msgs);
 }
 
 /* libbalsa_mailbox_imap_open:

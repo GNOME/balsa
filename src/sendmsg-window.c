@@ -606,8 +606,9 @@ create_text_area (BalsaSendmsg * msg)
   GtkStyle *style;
 
   style = gtk_style_new ();
-  font = gdk_font_load ("-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-1");
+  font = gdk_font_load ( balsa_app.message_font );
   colormap = gtk_widget_get_colormap (GTK_WIDGET (msg->attachments[1]));
+
   style->font = font;
 
   table = gtk_table_new (2, 2, FALSE);

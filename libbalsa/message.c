@@ -101,6 +101,9 @@ libbalsa_message_init(LibBalsaMessage * message)
     message->body_ref = 0;
     message->body_list = NULL;
     message->has_all_headers = 0;
+#ifdef HAVE_GPGME
+    message->prot_state = LIBBALSA_MSG_PROTECT_NONE;
+#endif
 }
 
 
@@ -580,26 +583,30 @@ libbalsa_message_set_status_icons(LibBalsaMessage * message)
 static void
 libbalsa_message_set_attach_icons(LibBalsaMessage * message)
 {
-    if (libbalsa_message_has_attachment(message))
-	message->attach_icon = LIBBALSA_MESSAGE_ATTACH_ATTACH;
 #ifdef HAVE_GPGME
-    else if (libbalsa_message_is_pgp_signed(message)) {
-	switch (message->sig_state) {
-	case LIBBALSA_MESSAGE_SIGNATURE_GOOD:
+    if (message->prot_state != LIBBALSA_MSG_PROTECT_NONE ||
+	libbalsa_message_is_pgp_signed(message) ||
+	libbalsa_message_is_pgp_encrypted(message)) {
+	switch (message->prot_state) {
+	case LIBBALSA_MSG_PROTECT_SIGN_GOOD:
 	    message->attach_icon = LIBBALSA_MESSAGE_ATTACH_GOOD;
 	    break;
-	case LIBBALSA_MESSAGE_SIGNATURE_NOTRUST:
+	case LIBBALSA_MSG_PROTECT_SIGN_NOTRUST:
 	    message->attach_icon = LIBBALSA_MESSAGE_ATTACH_NOTRUST;
 	    break;
-	case LIBBALSA_MESSAGE_SIGNATURE_BAD:
+	case LIBBALSA_MSG_PROTECT_SIGN_BAD:
 	    message->attach_icon = LIBBALSA_MESSAGE_ATTACH_BAD;
+	    break;
+	case LIBBALSA_MSG_PROTECT_CRYPT:
+	    message->attach_icon = LIBBALSA_MESSAGE_ATTACH_ENCR;
 	    break;
 	default:
 	    message->attach_icon = LIBBALSA_MESSAGE_ATTACH_SIGN;
 	}
-    } else if (libbalsa_message_is_pgp_encrypted(message))
-	message->attach_icon = LIBBALSA_MESSAGE_ATTACH_ENCR;
+    } else
 #endif
+    if (libbalsa_message_has_attachment(message))
+	message->attach_icon = LIBBALSA_MESSAGE_ATTACH_ATTACH;
     else
 	message->attach_icon = LIBBALSA_MESSAGE_ATTACH_ICONS_NUM;
 }
@@ -669,7 +676,7 @@ libbalsa_messages_change_flag(GList * messages,
                               gboolean set)
 {
     GArray *msgnos;
-    LibBalsaMessage * message;
+    LibBalsaMessage * message = NULL;
     LibBalsaMailbox *mbox;
     
     if (!messages)

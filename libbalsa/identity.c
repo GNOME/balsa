@@ -22,6 +22,9 @@
 #include "config.h"
 
 #include <gnome.h>
+#ifdef HAVE_GPGME
+#  include "rfc3156.h"
+#endif
 #include "identity.h"
 #include "information.h"
 
@@ -97,6 +100,7 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
 #ifdef HAVE_GPGME
     ident->gpg_sign = FALSE;
     ident->gpg_encrypt = FALSE;
+    ident->crypt_protocol = LIBBALSA_PROTECT_OPENPGP;
 #endif
 }
 
@@ -278,23 +282,6 @@ libbalsa_identity_set_sig_prepend(LibBalsaIdentity* ident, gboolean prepend)
     ident->sig_prepend = prepend;
 }
 
-
-#ifdef HAVE_GPGME
-void
-libbalsa_identity_set_gpg_sign(LibBalsaIdentity* ident, gboolean sign)
-{
-    g_return_if_fail(ident != NULL);
-    ident->gpg_sign = sign;
-}
-
-
-void
-libbalsa_identity_set_gpg_encrypt(LibBalsaIdentity* ident, gboolean encrypt)
-{
-    g_return_if_fail(ident != NULL);
-    ident->gpg_encrypt = encrypt;
-}
-#endif
 
 /* Used by both dialogs: */
 
@@ -510,6 +497,18 @@ static void md_response_cb(GtkWidget * dialog, gint response,
                            GtkTreeView * tree);
 static void md_name_changed(GtkEntry * name, GtkTreeView * tree);
 static void md_sig_path_changed(GtkEntry * sig_path, GObject * dialog);
+
+#ifdef HAVE_GPGME
+static void add_show_menu(const char* label, gint value, GtkWidget* menu);
+static void ident_dialog_add_option_menu(GtkWidget * table, gint row,
+                                         GtkDialog * dialog,
+                                         const gchar * label_name,
+                                         const gchar * menu_key);
+static gint ident_dialog_get_menu(GtkDialog * dialog, const gchar * key);
+static void display_frame_set_menu(GtkDialog * dialog, const gchar* key,
+                                   gint * value);
+#endif /* HAVE_GPGME */
+
 
 /* Callback for the "toggled" signal of the "Default" column. */
 static void
@@ -759,7 +758,11 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
 {
      
     GtkWidget* frame = gtk_frame_new(NULL);
+#ifdef HAVE_GPGME
+    GtkWidget *table = gtk_table_new(18, 2, FALSE);
+#else
     GtkWidget *table = gtk_table_new(15, 2, FALSE);
+#endif
     gint row = 0;
     GObject *name;
     GObject *sig_path;
@@ -811,16 +814,22 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
 
 #ifdef HAVE_GPGME
     ident_dialog_add_checkbutton(table, row++, dialog, 
-                                 _("GPG sign by default"),
+                                 _("sign messages by default"),
                                  "identity-gpgsign");
     gtk_widget_set_sensitive(GTK_WIDGET(g_object_get_data(G_OBJECT(dialog),
 							  "identity-gpgsign")),
 			     TRUE);
     ident_dialog_add_checkbutton(table, row++, dialog,
-                                 _("GPG encrypt by default"),
+                                 _("encrypt messages by default"),
                                  "identity-gpgencrypt");
     gtk_widget_set_sensitive(GTK_WIDGET(g_object_get_data(G_OBJECT(dialog),
 							  "identity-gpgencrypt")),
+			     TRUE);
+    ident_dialog_add_option_menu(table, row++, dialog,
+				 _("default crypto protocol"),
+				 "identity-crypt-protocol");
+    gtk_widget_set_sensitive(GTK_WIDGET(g_object_get_data(G_OBJECT(dialog),
+							  "identity-crypt-protocol")),
 			     TRUE);
 #endif
 
@@ -1015,6 +1024,7 @@ ident_dialog_update(GtkDialog* dlg)
 #ifdef HAVE_GPGME
     id->gpg_sign        = ident_dialog_get_bool(dlg, "identity-gpgsign");
     id->gpg_encrypt     = ident_dialog_get_bool(dlg, "identity-gpgencrypt");
+    id->crypt_protocol  = ident_dialog_get_menu(dlg, "identity-crypt-protocol");
 #endif
    
     return TRUE;
@@ -1312,6 +1322,8 @@ display_frame_update(GtkDialog * dialog, LibBalsaIdentity* ident)
                               ident->gpg_sign);    
     display_frame_set_boolean(dialog, "identity-gpgencrypt", 
                               ident->gpg_encrypt);    
+    display_frame_set_menu(dialog, "identity-crypt-protocol",
+			   &ident->crypt_protocol);
 #endif
 }
 
@@ -1386,6 +1398,7 @@ libbalsa_identity_new_config(const gchar* prefix, const gchar* name)
 #ifdef HAVE_GPGME
     ident->gpg_sign = gnome_config_get_bool("GpgSign");
     ident->gpg_encrypt = gnome_config_get_bool("GpgEncrypt");
+    ident->crypt_protocol = gnome_config_get_int("CryptProtocol=16");
 #endif
 
     gnome_config_pop_prefix();
@@ -1421,8 +1434,120 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* prefix)
 #ifdef HAVE_GPGME
     gnome_config_set_bool("GpgSign", ident->gpg_sign);
     gnome_config_set_bool("GpgEncrypt", ident->gpg_encrypt);
+    gnome_config_set_int("CryptProtocol", ident->crypt_protocol);
 #endif
 
     gnome_config_pop_prefix();
 }
 
+
+#ifdef HAVE_GPGME
+/* collected helper stuff for GPGME support */
+
+void
+libbalsa_identity_set_gpg_sign(LibBalsaIdentity* ident, gboolean sign)
+{
+    g_return_if_fail(ident != NULL);
+    ident->gpg_sign = sign;
+}
+
+
+void
+libbalsa_identity_set_gpg_encrypt(LibBalsaIdentity* ident, gboolean encrypt)
+{
+    g_return_if_fail(ident != NULL);
+    ident->gpg_encrypt = encrypt;
+}
+
+
+void
+libbalsa_identity_set_crypt_protocol(LibBalsaIdentity* ident, gint protocol)
+{
+    g_return_if_fail(ident != NULL);
+    ident->crypt_protocol = protocol;
+}
+
+
+static void
+add_show_menu(const char* label, gint value, GtkWidget* menu)
+{
+    GtkWidget *menu_item = gtk_menu_item_new_with_label(label);
+
+    gtk_widget_show(menu_item);
+    g_object_set_data(G_OBJECT(menu_item), "identity-value",
+                      GINT_TO_POINTER(value));
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+}
+
+
+/*
+ * Add an option menu to the given dialog with a label next to it
+ * explaining the contents.  A reference to the entry is stored as
+ * object data attached to the dialog with the given key.
+ */
+static void
+ident_dialog_add_option_menu(GtkWidget * table, gint row, GtkDialog * dialog,
+                             const gchar * label_name, const gchar * menu_key)
+{
+    GtkWidget *label;
+    GtkWidget *opt_menu;
+    GtkWidget *menu;
+
+    label = gtk_label_new_with_mnemonic(label_name);
+    gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
+
+    opt_menu = gtk_option_menu_new ();
+    gtk_table_attach_defaults(GTK_TABLE(table), opt_menu, 1, 2, row, row + 1);
+    g_object_set_data(G_OBJECT(dialog), menu_key, opt_menu);
+
+    menu = gtk_menu_new();
+    add_show_menu(_("GnuPG using MIME mode"), LIBBALSA_PROTECT_RFC3156, menu);
+    add_show_menu(_("GnuPG using OpenPGP mode"), LIBBALSA_PROTECT_OPENPGP, menu);
+#ifdef HAVE_SMIME
+    add_show_menu(_("S/MIME mode"), LIBBALSA_PROTECT_SMIMEV3, menu);
+#endif
+    gtk_option_menu_set_menu(GTK_OPTION_MENU(opt_menu), menu);
+}
+
+
+/*
+ * Get the value of the active option menu item
+ */
+static gint
+ident_dialog_get_menu(GtkDialog * dialog, const gchar * key)
+{
+    GtkWidget * menu;
+    gint value;
+    
+    menu = gtk_option_menu_get_menu (GTK_OPTION_MENU(g_object_get_data(G_OBJECT(dialog), key)));
+    value = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(gtk_menu_get_active (GTK_MENU(menu))), "identity-value"));
+    
+    return value;
+}
+
+
+static void
+display_frame_set_menu(GtkDialog * dialog, const gchar* key, gint * value)
+{
+    GtkOptionMenu * opt_menu =
+        GTK_OPTION_MENU(g_object_get_data(G_OBJECT(dialog), key));
+ 
+    switch (*value)
+        {
+        case LIBBALSA_PROTECT_OPENPGP:
+            gtk_option_menu_set_history(opt_menu, 1);
+            break;
+#ifdef HAVE_SMIME
+        case LIBBALSA_PROTECT_SMIMEV3:
+            gtk_option_menu_set_history(opt_menu, 2);
+            break;
+#endif
+        case LIBBALSA_PROTECT_RFC3156:
+        default:
+            gtk_option_menu_set_history(opt_menu, 0);
+            *value = LIBBALSA_PROTECT_RFC3156;
+        }
+}
+
+#endif  /* HAVE_GPGME */

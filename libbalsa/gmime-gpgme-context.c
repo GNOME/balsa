@@ -1,707 +1,1052 @@
-/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
- *  Authors: Jeffrey Stedfast <fejj@ximian.com>
+ * gmime/gpgme glue layer library
+ * Copyright (C) 2004 Albrecht Dreﬂ <albrecht.dress@arcor.de>
  *
- *  Copyright 2002 Ximian, Inc. (www.ximian.com)
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
- *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option) 
+ * any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * GNU General Public License for more details.
+ *  
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * 02111-1307, USA.
  */
+#include "config.h"
 
-
-#include <config.h>
-
-#if defined(HAVE_GPGME)
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <termios.h>
-#include <signal.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <ctype.h>
-
+#include <glib.h>
+#include <gmime/gmime.h>
+#include <gpgme.h>
 #include "gmime-gpgme-context.h"
-#include "gmime/gmime-filter-charset.h"
-#include "gmime/gmime-stream-filter.h"
-#include "gmime/gmime-stream-mem.h"
-#include "gmime/gmime-stream-fs.h"
-#include "gmime/gmime-charset.h"
-#include "gmime/gmime-error.h"
 
-#define d(x) x
-#define _(x) x
-
-#define GMIME_ERROR_QUARK (g_quark_from_static_string ("gmime"))
-
-static void g_mime_gpgme_context_class_init (GMimeGpgMEContextClass *klass);
-static void g_mime_gpgme_context_init (GMimeGpgMEContext *ctx, GMimeGpgMEContextClass *klass);
-static void g_mime_gpgme_context_finalize (GObject *object);
-
-static GMimeCipherHash gpgme_hash_id (GMimeCipherContext *ctx, const char *hash);
-
-static const char *gpgme_hash_name (GMimeCipherContext *ctx, GMimeCipherHash hash);
-
-static int gpgme_sign (GMimeCipherContext *ctx, const char *userid,
-		     GMimeCipherHash hash, GMimeStream *istream,
-		     GMimeStream *ostream, GError **err);
-
-static GMimeCipherValidity *gpgme_verify (GMimeCipherContext *ctx, GMimeCipherHash hash,
-					GMimeStream *istream, GMimeStream *sigstream,
-					GError **err);
-
-static int gpgme_encrypt (GMimeCipherContext *ctx, gboolean sign,
-			const char *userid, GPtrArray *recipients,
-			GMimeStream *istream, GMimeStream *ostream,
-			GError **err);
-
-static int gpgme_decrypt (GMimeCipherContext *ctx, GMimeStream *istream,
-			GMimeStream *ostream, GError **err);
-
-#if NOT_USED
-static int gpgme_import_keys (GMimeCipherContext *ctx, GMimeStream *istream,
-			    GError **err);
-
-static int gpgme_export_keys (GMimeCipherContext *ctx, GPtrArray *keys,
-			    GMimeStream *ostream, GError **err);
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
 #endif
+#else
+#define _(x)  (x)
+#endif
+
+
+#define GPGME_ERROR_QUARK (g_quark_from_static_string ("gmime-gpgme"))
+
+static void g_mime_gpgme_context_class_init(GMimeGpgmeContextClass *
+					    klass);
+static void g_mime_gpgme_context_init(GMimeGpgmeContext * ctx,
+				      GMimeGpgmeContextClass * klass);
+static void g_mime_gpgme_context_finalize(GObject * object);
+static gboolean g_mime_gpgme_context_check_protocol(GMimeGpgmeContextClass
+						    * klass,
+						    gpgme_protocol_t
+						    protocol,
+						    GError ** error);
+
+static GMimeCipherHash g_mime_gpgme_hash_id(GMimeCipherContext * ctx,
+					    const char *hash);
+
+static const char *g_mime_gpgme_hash_name(GMimeCipherContext * ctx,
+					  GMimeCipherHash hash);
+
+static int g_mime_gpgme_sign(GMimeCipherContext * ctx, const char *userid,
+			     GMimeCipherHash hash, GMimeStream * istream,
+			     GMimeStream * ostream, GError ** err);
+
+static GMimeCipherValidity *g_mime_gpgme_verify(GMimeCipherContext * ctx,
+						GMimeCipherHash hash,
+						GMimeStream * istream,
+						GMimeStream * sigstream,
+						GError ** err);
+
+static int g_mime_gpgme_encrypt(GMimeCipherContext * ctx, gboolean sign,
+				const char *userid, GPtrArray * recipients,
+				GMimeStream * istream,
+				GMimeStream * ostream, GError ** err);
+
+static int g_mime_gpgme_decrypt(GMimeCipherContext * ctx,
+				GMimeStream * istream,
+				GMimeStream * ostream, GError ** err);
+
+
+/* internal passphrase callback */
+static gpgme_error_t g_mime_session_passphrase(void *HOOK,
+					       const char *UID_HINT,
+					       const char *PASSPHRASE_INFO,
+					       int PREV_WAS_BAD, int FD);
+
+
+/* callbacks for gpgme file handling */
+static ssize_t g_mime_gpgme_stream_rd(GMimeStream * stream, void *buffer,
+				      size_t size);
+static void cb_data_release(void *handle);
+
+
+/* some helper functions */
+static gboolean gpgme_add_signer(GMimeGpgmeContext * ctx,
+				 const gchar * signer, GError ** error);
+static gpgme_key_t get_key_from_name(GMimeGpgmeContext * ctx,
+				     const gchar * name,
+				     gboolean secret_only,
+				     GError ** error);
+static gpgme_key_t *gpgme_build_recipients(GMimeGpgmeContext * ctx,
+					   GPtrArray * rcpt_list,
+					   GError ** error);
+static void release_keylist(gpgme_key_t * keylist);
 
 
 static GMimeCipherContextClass *parent_class = NULL;
 
 
 GType
-g_mime_gpgme_context_get_type (void)
+g_mime_gpgme_context_get_type(void)
 {
-	static GType type = 0;
+    static GType type = 0;
 
-	if (!type) {
-		static const GTypeInfo info = {
-			sizeof (GMimeGpgMEContextClass),
-			NULL, /* base_class_init */
-			NULL, /* base_class_finalize */
-			(GClassInitFunc) g_mime_gpgme_context_class_init,
-			NULL, /* class_finalize */
-			NULL, /* class_data */
-			sizeof (GMimeGpgMEContext),
-			0,    /* n_preallocs */
-			(GInstanceInitFunc) g_mime_gpgme_context_init,
-		};
+    if (!type) {
+	static const GTypeInfo info = {
+	    sizeof(GMimeGpgmeContextClass),
+	    NULL,		/* base_class_init */
+	    NULL,		/* base_class_finalize */
+	    (GClassInitFunc) g_mime_gpgme_context_class_init,
+	    NULL,		/* class_finalize */
+	    NULL,		/* class_data */
+	    sizeof(GMimeGpgmeContext),
+	    0,			/* n_preallocs */
+	    (GInstanceInitFunc) g_mime_gpgme_context_init,
+	};
 
-		type = g_type_register_static (GMIME_TYPE_CIPHER_CONTEXT, "GMimeGpgMEContext", &info, 0);
-	}
+	type =
+	    g_type_register_static(GMIME_TYPE_CIPHER_CONTEXT,
+				   "GMimeGpgmeContext", &info, 0);
+    }
 
-	return type;
+    return type;
 }
 
 
 static void
-g_mime_gpgme_context_class_init (GMimeGpgMEContextClass *klass)
+g_mime_gpgme_context_class_init(GMimeGpgmeContextClass * klass)
 {
-	GObjectClass *object_class = G_OBJECT_CLASS (klass);
-	GMimeCipherContextClass *cipher_class = GMIME_CIPHER_CONTEXT_CLASS (klass);
+    GObjectClass *object_class = G_OBJECT_CLASS(klass);
+    GMimeCipherContextClass *cipher_class =
+	GMIME_CIPHER_CONTEXT_CLASS(klass);
 
-	parent_class = g_type_class_ref (G_TYPE_OBJECT);
+    parent_class = g_type_class_ref(G_TYPE_OBJECT);
 
-	object_class->finalize = g_mime_gpgme_context_finalize;
+    object_class->finalize = g_mime_gpgme_context_finalize;
 
-	cipher_class->hash_id = gpgme_hash_id;
-	cipher_class->hash_name = gpgme_hash_name;
-	cipher_class->sign = gpgme_sign;
-	cipher_class->verify = gpgme_verify;
-	cipher_class->encrypt = gpgme_encrypt;
-	cipher_class->decrypt = gpgme_decrypt;
-//	cipher_class->import_keys = gpgme_import_keys;
-//	cipher_class->export_keys = gpgme_export_keys;
+    cipher_class->hash_id = g_mime_gpgme_hash_id;
+    cipher_class->hash_name = g_mime_gpgme_hash_name;
+    cipher_class->sign = g_mime_gpgme_sign;
+    cipher_class->verify = g_mime_gpgme_verify;
+    cipher_class->encrypt = g_mime_gpgme_encrypt;
+    cipher_class->decrypt = g_mime_gpgme_decrypt;
+
+    if (gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP) ==
+	GPG_ERR_NO_ERROR)
+	klass->has_proto_openpgp = TRUE;
+    else
+	klass->has_proto_openpgp = FALSE;
+    if (gpgme_engine_check_version(GPGME_PROTOCOL_CMS) == GPG_ERR_NO_ERROR)
+	klass->has_proto_cms = TRUE;
+    else
+	klass->has_proto_cms = FALSE;
 }
 
-static void
-g_mime_gpgme_context_init (GMimeGpgMEContext *ctx, GMimeGpgMEContextClass *klass)
-{
-	GMimeCipherContext *cipher = (GMimeCipherContext *) ctx;
-	GpgmeError error;
 
-	ctx->sig_status = GPGME_SIG_STAT_NONE;
-	ctx->key = 0;
-	ctx->fingerprint = NULL;
-	ctx->sign_time = 0;
+static void
+g_mime_gpgme_context_init(GMimeGpgmeContext * ctx,
+			  GMimeGpgmeContextClass * klass)
+{
+    ctx->rfc2440_mode = FALSE;
+    ctx->micalg = NULL;
+    ctx->sig_state = NULL;
+    ctx->key_select_cb = NULL;
+    ctx->passphrase_cb = NULL;
+}
+
+
+static void
+g_mime_gpgme_context_finalize(GObject * object)
+{
+    GMimeGpgmeContext *ctx = (GMimeGpgmeContext *) object;
+
+    gpgme_release(ctx->gpgme_ctx);
+    if (ctx->micalg) {
+	g_free(ctx->micalg);
 	ctx->micalg = NULL;
+    }
+    if (ctx->sig_state) {
+	g_object_unref(G_OBJECT(ctx->sig_state));
+	ctx->sig_state = NULL;
+    }
 
-	cipher->sign_protocol = "application/pgp-signature";
-	cipher->encrypt_protocol = "application/pgp-encrypted";
-	cipher->key_protocol = "application/pgp-keys";
-
-	/* try to create a gpgme context */
-	if ((error = gpgme_new(&ctx->gpgme_ctx)) != GPGME_No_Error) {
-#if 0
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot sign message: "
-			       "could not create gpgme context: %s"),
-			     gpgme_strerror(error));
-		return -1;
-#endif
-		ctx->gpgme_ctx = NULL;
-	}
-
+    G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
-static void
-g_mime_gpgme_context_finalize (GObject *object)
-{
-	GMimeGpgMEContext *ctx = (GMimeGpgMEContext *) object;
-
-	gpgme_release(ctx->gpgme_ctx);
-	g_free (ctx->fingerprint);
-	g_free (ctx->micalg);
-	G_OBJECT_CLASS (parent_class)->finalize (object);
-}
-
-static GMimeCipherHash
-gpgme_hash_id (GMimeCipherContext *ctx, const char *hash)
-{
-	if (hash == NULL)
-		return GMIME_CIPHER_HASH_DEFAULT;
-
-	if (!strcasecmp (hash, "pgp-"))
-		hash += 4;
-
-	if (!strcasecmp (hash, "md2"))
-		return GMIME_CIPHER_HASH_MD2;
-	else if (!strcasecmp (hash, "md5"))
-		return GMIME_CIPHER_HASH_MD5;
-	else if (!strcasecmp (hash, "sha1"))
-		return GMIME_CIPHER_HASH_SHA1;
-	else if (!strcasecmp (hash, "ripemd160"))
-		return GMIME_CIPHER_HASH_RIPEMD160;
-	else if (!strcasecmp (hash, "tiger192"))
-		return GMIME_CIPHER_HASH_TIGER192;
-	else if (!strcasecmp (hash, "haval-5-160"))
-		return GMIME_CIPHER_HASH_HAVAL5160;
-
-	return GMIME_CIPHER_HASH_DEFAULT;
-}
-
-static const char *
-gpgme_hash_name (GMimeCipherContext *ctx, GMimeCipherHash hash)
-{
-	switch (hash) {
-	case GMIME_CIPHER_HASH_MD2:
-		return "pgp-md2";
-	case GMIME_CIPHER_HASH_MD5:
-		return "pgp-md5";
-	case GMIME_CIPHER_HASH_SHA1:
-		return "pgp-sha1";
-	case GMIME_CIPHER_HASH_RIPEMD160:
-		return "pgp-ripemd160";
-	case GMIME_CIPHER_HASH_TIGER192:
-		return "pgp-tiger192";
-	case GMIME_CIPHER_HASH_HAVAL5160:
-		return "pgp-haval-5-160";
-	default:
-		return NULL;
-	}
-}
-
-
-
-static const char *gpgme_passphrase_cb(void *hook, const char *desc,
-				       void **R_HD)
-{
-	GMimeCipherContext *ctx = GMIME_CIPHER_CONTEXT(hook);
-	GMimeSession *session = ctx->session;
-	GError *err;
-
-	if (desc) {
-		return g_mime_session_request_passwd(session, desc, TRUE,
-						     desc, &err);
-	}
-	g_mime_session_forget_passwd(session, desc, &err);
-	return NULL;
-}
-
-static int gpgme_read_from_stream(void *hook, char *buffer, size_t count,
-				  size_t *nread)
-{
-	GMimeStream *stream = GMIME_STREAM(hook);
-	ssize_t read;
-
-	if (buffer == NULL && nread == NULL && count == 0) {
-		g_mime_stream_reset(stream);
-		return 0;
-	}
-	g_return_val_if_fail(buffer, -1);
-	g_return_val_if_fail(nread, -1);
-
-	read = *nread = g_mime_stream_read(stream, buffer, count);
-	if (read == -1) {
-		if (g_mime_stream_eos(stream)) {
-			*nread = 0;
-		}
-	} else {
-		read = 0;
-	}
-	return read;
-}
 
 /*
- * Parse the XML output gpgme_op_info generated by gpgme_get_op_info for
- * element in GnupgOperationInfo->signature and return it. If the result
- * is not NULL, it has to be freed.
+ * Convert a hash algorithm name to a number
  */
-static gchar *
-get_gpgme_parameter(const gchar *gpgme_op_info, const gchar *element)
+static GMimeCipherHash
+g_mime_gpgme_hash_id(GMimeCipherContext * ctx, const char *hash)
 {
-    gchar *p, *q;
+    if (hash == NULL)
+	return GMIME_CIPHER_HASH_DEFAULT;
 
-    if (!(p = strstr(gpgme_op_info, element)))
+    if (!g_ascii_strcasecmp(hash, "pgp-"))
+	hash += 4;
+
+    if (!g_ascii_strcasecmp(hash, "md2"))
+	return GMIME_CIPHER_HASH_MD2;
+    else if (!g_ascii_strcasecmp(hash, "md5"))
+	return GMIME_CIPHER_HASH_MD5;
+    else if (!g_ascii_strcasecmp(hash, "sha1"))
+	return GMIME_CIPHER_HASH_SHA1;
+    else if (!g_ascii_strcasecmp(hash, "ripemd160"))
+	return GMIME_CIPHER_HASH_RIPEMD160;
+    else if (!g_ascii_strcasecmp(hash, "tiger192"))
+	return GMIME_CIPHER_HASH_TIGER192;
+    else if (!g_ascii_strcasecmp(hash, "haval-5-160"))
+	return GMIME_CIPHER_HASH_HAVAL5160;
+
+    return GMIME_CIPHER_HASH_DEFAULT;
+}
+
+
+/*
+ * Convert a hash algorithm number to a string
+ */
+static const char *
+g_mime_gpgme_hash_name(GMimeCipherContext * context, GMimeCipherHash hash)
+{
+    GMimeGpgmeContext *ctx = GMIME_GPGME_CONTEXT(context);
+    char *p;
+
+    g_return_val_if_fail(ctx, NULL);
+    g_return_val_if_fail(ctx->gpgme_ctx, NULL);
+
+    /* note: this is only a subset of the hash algorithms gpg(me) supports */
+    switch (hash) {
+    case GMIME_CIPHER_HASH_MD2:
+	p = "pgp-md2";
+	break;
+    case GMIME_CIPHER_HASH_MD5:
+	p = "pgp-md5";
+	break;
+    case GMIME_CIPHER_HASH_SHA1:
+	p = "pgp-sha1";
+	break;
+    case GMIME_CIPHER_HASH_RIPEMD160:
+	p = "pgp-ripemd160";
+	break;
+    case GMIME_CIPHER_HASH_TIGER192:
+	p = "pgp-tiger192";
+	break;
+    case GMIME_CIPHER_HASH_HAVAL5160:
+	p = "pgp-haval-5-160";
+	break;
+    default:
 	return NULL;
-    p += strlen(element) + 1;
-    q = p + 1;
+    }
 
-    while (*q && *q != '<')
-	q++;
-    *q = '\0';
-    return g_strdup(p);
+    /* S/MIME (RFC2633) doesn't like the leading "pgp-" */
+    if (gpgme_get_protocol(ctx->gpgme_ctx) == GPGME_PROTOCOL_CMS)
+	p += 4;
+
+    return p;
 }
 
 
-static int
-gpgme_sign (GMimeCipherContext *context, const char *userid, GMimeCipherHash hash,
-	  GMimeStream *istream, GMimeStream *ostream, GError **err)
+/*
+ * Wrapper to convert the passphrase returned from the gmime session to gpgme.
+ */
+static gpgme_error_t
+g_mime_session_passphrase(void *HOOK, const char *UID_HINT,
+			  const char *PASSPHRASE_INFO, int PREV_WAS_BAD,
+			  int FD)
 {
-	GMimeGpgMEContext *ctx = (GMimeGpgMEContext *) context;
+    GMimeCipherContext *ctx = GMIME_CIPHER_CONTEXT(HOOK);
+    GMimeSession *session = ctx->session;
+    gchar *msg, *passphrase;
 
-	GpgmeCtx gpgme_ctx = ctx->gpgme_ctx;
-	GpgmeError error;
-	GpgmeData in, out;
-	size_t datasize;
-	gchar *signature_buffer, *signature_info;
-
-	ctx->micalg = NULL;
-
-	/* let gpgme create the signature */
-	gpgme_set_armor(gpgme_ctx, 1);
-	gpgme_set_passphrase_cb(gpgme_ctx, gpgme_passphrase_cb, ctx);
-
-	if ((error = gpgme_data_new_with_read_cb(&in, gpgme_read_from_stream,
-					       istream)) != GPGME_No_Error) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot sign message: "
-			       "could not get gpgme data from istream: %s"),
-			     gpgme_strerror(error));
-		return -1;
-	}
-
-	if ((error = gpgme_data_new(&out)) != GPGME_No_Error) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot sign message: "
-			       "gpgme could not create new data: %s"),
-			     gpgme_strerror(error));
-		gpgme_data_release(in);
-		return -1;
-	}
-
-	if ((error = gpgme_op_sign(gpgme_ctx, in, out, GPGME_SIG_MODE_DETACH))
-	    != GPGME_No_Error) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot sign message: "
-			       "gpgme signing failed: %s"),
-			     gpgme_strerror(error));
-		gpgme_data_release(out);
-		gpgme_data_release(in);
-		return -1;
-	}
-
-	/* get the info about the used hash algorithm */
-	signature_info = gpgme_get_op_info(gpgme_ctx, 0);
-	if (signature_info) {
-		g_free(ctx->micalg);
-		ctx->micalg = get_gpgme_parameter(signature_info, "micalg");
-		g_free(signature_info);
-	}
-
-	gpgme_data_release(in);
-	if (!(signature_buffer = gpgme_data_release_and_get_mem(out, &datasize))) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot sign message: "
-			       "could not get gpgme data: %s"),
-			     gpgme_strerror(error));
-		return -1;
-	}
-
-	g_mime_stream_write(ostream, signature_buffer, datasize);
-	g_free(signature_buffer);
-
-	return 0;
+    if (PREV_WAS_BAD)
+	msg =
+	    g_strdup_printf(_
+			    ("The passphrase for this key was bad, please try again!\n\nKey: %s"),
+			    UID_HINT);
+    else
+	msg =
+	    g_strdup_printf(_
+			    ("Please enter the passphrase for the secret key!\n\nKey: %s"),
+			    UID_HINT);
+    passphrase =
+	g_mime_session_request_passwd(session, PASSPHRASE_INFO, TRUE, msg,
+				      NULL);
+    if (passphrase) {
+	write(FD, passphrase, strlen(passphrase));
+	write(FD, "\n", 1);
+	g_mime_session_forget_passwd(session, msg, NULL);
+	return GPG_ERR_NO_ERROR;
+    } else {
+	write(FD, "\n", 1);
+	return GPG_ERR_CANCELED;
+    }
 }
 
 
+/*
+ * callback to get data from a stream
+ */
+static ssize_t
+g_mime_gpgme_stream_rd(GMimeStream * stream, void *buffer, size_t size)
+{
+    ssize_t result;
+
+    result = g_mime_stream_read(stream, buffer, size);
+    if (result == -1 && g_mime_stream_eos(stream))
+	result = 0;
+
+    return result;
+}
+
+
+/*
+ * dummy function for callback based gpgme data objects
+ */
+static void
+cb_data_release(void *handle)
+{
+    /* must just be present... bug or feature?!? */
+}
+
+
+/*
+ * Sign istream with the key userid and write the detached signature (standard
+ * mode) or the cleartext signed input (RFC 2440 mode) to ostream. Return 0 on
+ * success and -1 on error. In the latter case, set error to the reason. Note
+ * that gpgme selects the hash algorithm automatically, so we don't use the
+ * arg, but set the value in the context.
+ */
+static int
+g_mime_gpgme_sign(GMimeCipherContext * context, const char *userid,
+		  GMimeCipherHash hash, GMimeStream * istream,
+		  GMimeStream * ostream, GError ** error)
+{
+    GMimeGpgmeContext *ctx = (GMimeGpgmeContext *) context;
+    gpgme_sig_mode_t sig_mode;
+    gpgme_ctx_t gpgme_ctx;
+    gpgme_protocol_t protocol;
+    gpgme_error_t err;
+    gpgme_data_t in, out;
+    size_t datasize;
+    gchar *signature_buffer;
+    gpgme_sign_result_t sign_result;
+    struct gpgme_data_cbs cbs = {
+	(gpgme_data_read_cb_t) g_mime_gpgme_stream_rd,	/* read method */
+	NULL,			/* write method */
+	NULL,			/* seek method */
+	cb_data_release		/* release method */
+    };
+
+    /* some paranoia checks */
+    g_return_val_if_fail(ctx, -1);
+    g_return_val_if_fail(ctx->gpgme_ctx, -1);
+    gpgme_ctx = ctx->gpgme_ctx;
+    protocol = gpgme_get_protocol(gpgme_ctx);
+
+    /* set the signature mode */
+    if (ctx->rfc2440_mode) {
+	if (protocol == GPGME_PROTOCOL_OpenPGP)
+	    sig_mode = GPGME_SIG_MODE_CLEAR;
+	else {
+	    if (error)
+		g_set_error(error, GPGME_ERROR_QUARK,
+			    GPG_ERR_INV_ENGINE,
+			    _("invalid crypto engine for RFC2440"));
+	    return -1;
+	}
+    } else
+	sig_mode = GPGME_SIG_MODE_DETACH;
+
+    /* find the secret key for the "sign_for" address */
+    if (!gpgme_add_signer(ctx, userid, error))
+	return -1;
+
+    /* let gpgme create the signature */
+    gpgme_set_armor(gpgme_ctx, 1);
+
+    /* set passphrase callback */
+    /* FIXME: don't set passphrase cb when a gpg-agent is running */
+    if (protocol == GPGME_PROTOCOL_OpenPGP) {
+	if (ctx->passphrase_cb == GPGME_USE_GMIME_SESSION_CB)
+	    gpgme_set_passphrase_cb(gpgme_ctx, g_mime_session_passphrase,
+				    context);
+	else
+	    gpgme_set_passphrase_cb(gpgme_ctx, ctx->passphrase_cb,
+				    context);
+    } else
+	gpgme_set_passphrase_cb(gpgme_ctx, NULL, context);
+
+    /* create gpgme data objects */
+    if ((err =
+	 gpgme_data_new_from_cbs(&in, &cbs,
+				 istream)) != GPG_ERR_NO_ERROR) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: could not get data from stream: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	return -1;
+    }
+    if ((err = gpgme_data_new(&out)) != GPG_ERR_NO_ERROR) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: could not create new data object: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	gpgme_data_release(in);
+	return -1;
+    }
+    if ((err =
+	 gpgme_op_sign(gpgme_ctx, in, out,
+		       sig_mode)) != GPG_ERR_NO_ERROR) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: signing failed: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	gpgme_data_release(out);
+	gpgme_data_release(in);
+	return -1;
+    }
+
+    /* get the info about the used hash algorithm */
+    sign_result = gpgme_op_sign_result(gpgme_ctx);
+    g_free(ctx->micalg);
+    if (protocol == GPGME_PROTOCOL_OpenPGP)
+	ctx->micalg =
+	    g_strdup_printf("PGP-%s",
+			    gpgme_hash_algo_name(sign_result->signatures->
+						 hash_algo));
+    else
+	ctx->micalg =
+	    g_strdup(gpgme_hash_algo_name
+		     (sign_result->signatures->hash_algo));
+
+    gpgme_data_release(in);
+    if (!
+	(signature_buffer =
+	 gpgme_data_release_and_get_mem(out, &datasize))) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: could not get data: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	return -1;
+    }
+
+    /* success: write the signature */
+    g_mime_stream_write(ostream, signature_buffer, datasize);
+    g_free(signature_buffer);
+
+    return 0;
+}
+
+
+/*
+ * In standard mode, verify that sigstream contains a detached signature for
+ * istream. In RFC 2440 mode, istream contains clearsigned data, and sigstream
+ * will be filled with the verified plaintext. The routine returns a validity
+ * object. More information is saved in the context's signature object. On
+ * error error ist set accordingly.
+ */
 static GMimeCipherValidity *
-gpgme_verify (GMimeCipherContext *context, GMimeCipherHash hash,
-	    GMimeStream *istream, GMimeStream *sigstream,
-	    GError **err)
+g_mime_gpgme_verify(GMimeCipherContext * context, GMimeCipherHash hash,
+		    GMimeStream * istream, GMimeStream * sigstream,
+		    GError ** error)
 {
-	GMimeGpgMEContext *ctx = (GMimeGpgMEContext *) context;
-	GMimeCipherValidity *validity;
-	const char *diagnostics;
-	GpgmeCtx gpgme_ctx = ctx->gpgme_ctx;
-	gboolean valid;
-	GpgmeSigStat stat;
-	GpgmeError error;
-	GpgmeData sig, plain;
+    GMimeGpgmeContext *ctx = (GMimeGpgmeContext *) context;
+    gpgme_ctx_t gpgme_ctx;
+    gpgme_protocol_t protocol;
+    gpgme_error_t err;
+    gpgme_data_t msg, sig;
+    GMimeCipherValidity *validity;
+    struct gpgme_data_cbs cbs = {
+	(gpgme_data_read_cb_t) g_mime_gpgme_stream_rd,	/* read method */
+	NULL,			/* write method */
+	NULL,			/* seek method */
+	cb_data_release		/* release method */
+    };
 
-	if ((error = gpgme_data_new_with_read_cb(&plain, gpgme_read_from_stream,
-					       istream)) != GPGME_No_Error) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot verify message signature: "
-			       "could not get gpgme data from istream: %s"),
-			     gpgme_strerror(error));
-		goto exception;
-	}
+    g_return_val_if_fail(ctx, NULL);
+    g_return_val_if_fail(ctx->gpgme_ctx, NULL);
+    gpgme_ctx = ctx->gpgme_ctx;
 
-	if ((error = gpgme_data_new_with_read_cb(&sig, gpgme_read_from_stream,
-					       sigstream)) != GPGME_No_Error) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot verify message signature: "
-			       "could not get gpgme data from sigstream: %s"),
-			     gpgme_strerror(error));
-		gpgme_data_release(plain);
-		goto exception;
-	}
+    /* some paranoia checks */
+    g_return_val_if_fail(ctx, NULL);
+    g_return_val_if_fail(ctx->gpgme_ctx, NULL);
+    gpgme_ctx = ctx->gpgme_ctx;
+    protocol = gpgme_get_protocol(gpgme_ctx);
 
-	if ((error = gpgme_op_verify(gpgme_ctx, sig, plain, &ctx->sig_status))
-	    != GPGME_No_Error) {
-		g_message( _("gpgme signature verification failed: %s"),
-			   gpgme_strerror(error));
-		ctx->sig_status = GPGME_SIG_STAT_ERROR;
-	}
-
-	valid = ctx->sig_status == GPGME_SIG_STAT_GOOD;
-	validity = g_mime_cipher_validity_new ();
-	diagnostics = "";
-	g_mime_cipher_validity_set_valid (validity, valid);
-	g_mime_cipher_validity_set_description (validity, diagnostics);
-
-	if (ctx->key)
-		gpgme_key_unref(ctx->key);
-	gpgme_get_sig_key(gpgme_ctx, 0, &ctx->key);
-	ctx->fingerprint = g_strdup(gpgme_get_sig_status(gpgme_ctx, 0, &stat,
-							 &ctx->sign_time));
-
-	gpgme_data_release(sig);
-	gpgme_data_release(plain);
-
-	return validity;
-
- exception:
-
+    /* check for protocol collision */
+    if (ctx->rfc2440_mode && protocol != GPGME_PROTOCOL_OpenPGP) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_INV_ENGINE,
+			_("invalid crypto engine for RFC2440"));
 	return NULL;
-}
+    }
 
+    /* create the message stream */
+    if ((err = gpgme_data_new_from_cbs(&msg, &cbs, istream)) !=
+	GPG_ERR_NO_ERROR) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: could not get data from stream: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	return NULL;
+    }
 
-static int
-gpgme_encrypt (GMimeCipherContext *context, gboolean sign, const char *userid,
-	     GPtrArray *recipients, GMimeStream *istream, GMimeStream *ostream,
-	     GError **err)
-{
-	GMimeGpgMEContext *ctx = (GMimeGpgMEContext *) context;
-	GpgmeCtx gpgme_ctx = ctx->gpgme_ctx;
-	GpgmeError error;
-	GpgmeRecipients rcpt;
-	GpgmeData in, out;
-	gchar *databuf;
-	size_t datasize;
-	guint i;
-
-	if (sign) {
-		return -1;
+    if (ctx->rfc2440_mode) {
+	/* create data object for plaintext */
+	if ((err = gpgme_data_new(&sig)) != GPG_ERR_NO_ERROR) {
+	    if (error)
+		g_set_error(error, GPGME_ERROR_QUARK, err,
+			    _("%s: could not create new data object: %s"),
+			    gpgme_strsource(err), gpgme_strerror(err));
+	    gpgme_data_release(msg);
+	    return NULL;
 	}
-
-	/* build the list of recipients */
-	if ((error = gpgme_recipients_new(&rcpt)) != GPGME_No_Error) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot encrypt message: "
-			       "could not create gpgme recipients set: %s"),
-			     gpgme_strerror(error));
-		return -1;
+    } else {
+	/* create the detached signature stream */
+	/* FIXME: what about S/MIME base64 encoded sigs?!? */
+	if ((err = gpgme_data_new_from_cbs(&sig, &cbs, sigstream)) !=
+	    GPG_ERR_NO_ERROR) {
+	    if (error)
+		g_set_error(error, GPGME_ERROR_QUARK, err,
+			    _("%s: could not get data from stream: %s"),
+			    gpgme_strsource(err), gpgme_strerror(err));
+	    gpgme_data_release(msg);
+	    return NULL;
 	}
-#if 0
-	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-			     "encrypting for %d recipient(s)",
-			     gpgme_recipients_count(*rcpt));
-#endif
+    }
 
-	for (i = 0; i < recipients->len; i++) {
-		/* set the recipient */
-		if ((error = gpgme_recipients_add_name_with_validity(rcpt,
-			       recipients->pdata[i], 
-			       GPGME_VALIDITY_FULL)) != GPGME_No_Error) {
-			gpgme_recipients_release(rcpt);
-			return -1;
-		}
-	}
+    /* verify the signature */
+    if (ctx->rfc2440_mode)
+	err = gpgme_op_verify(gpgme_ctx, msg, NULL, sig);
+    else
+	err = gpgme_op_verify(gpgme_ctx, sig, msg, NULL);
+    if (err != GPG_ERR_NO_ERROR) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: signature verification failed: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	ctx->sig_state = g_mime_gpgme_sigstat_new();
+	ctx->sig_state->status = err;
+	ctx->sig_state->protocol = protocol;
+    } else
+	ctx->sig_state =
+	    g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx);
 
-	/* let gpgme encrypt the data */
-	gpgme_set_armor(gpgme_ctx, 1);
-	if ((error = gpgme_data_new_with_read_cb(&in, gpgme_read_from_stream,
-					       istream)) != GPGME_No_Error) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot encrypt message: "
-			       "could not get gpgme data from istream: %s"),
-			     gpgme_strerror(error));
-		gpgme_recipients_release(rcpt);
-		return -1;
-	}
+    validity = g_mime_cipher_validity_new();
+    g_mime_cipher_validity_set_valid(validity,
+				     ctx->sig_state &&
+				     ctx->sig_state->status ==
+				     GPG_ERR_NO_ERROR ? TRUE : FALSE);
+    g_mime_cipher_validity_set_description(validity, NULL);
 
-	if ((error = gpgme_data_new(&out)) != GPGME_No_Error) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot encrypt message: "
-			       "gpgme could not create new data: %s"),
-			     gpgme_strerror(error));
-		gpgme_data_release(in);
-		gpgme_recipients_release(rcpt);
-		return -1;
-	}
-
-	if ((error = gpgme_op_encrypt(gpgme_ctx, rcpt, in, out))
-	    != GPGME_No_Error) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot encrypt message: "
-			       "gpgme encryption failed: %s"),
-			     gpgme_strerror(error));
-		gpgme_data_release(out);
-		gpgme_data_release(in);
-		gpgme_recipients_release(rcpt);
-		return -1;
-	}
-
-	/* save the result to a file and return its name */
-	gpgme_data_release(in);
-	gpgme_recipients_release(rcpt);
-
-	if (!(databuf = gpgme_data_release_and_get_mem(out, &datasize))) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot encrypt message: "
-			       "could not get gpgme data: %s"),
-			     gpgme_strerror(error));
-		return -1;
-	}
-
-	g_mime_stream_write(ostream, databuf, datasize);
-	g_free(databuf);
-
-	return 0;
-}
-
-
-static int
-gpgme_decrypt (GMimeCipherContext *context, GMimeStream *istream,
-	     GMimeStream *ostream, GError **err)
-{
-	GMimeGpgMEContext *ctx = (GMimeGpgMEContext *) context;
-
-	GpgmeCtx gpgme_ctx = ctx->gpgme_ctx;
-	GpgmeError error;
-	GpgmeData cipher, plain;
-	size_t datasize;
+    gpgme_data_release(msg);
+    if (ctx->rfc2440_mode) {
 	gchar *plain_buffer;
+	size_t data_size;
 
-	/* let gpgme create the signature */
-	gpgme_set_passphrase_cb(gpgme_ctx, gpgme_passphrase_cb, ctx);
-
-	if ((error = gpgme_data_new_with_read_cb(&cipher, gpgme_read_from_stream,
-					       istream)) != GPGME_No_Error) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot decrypt message: "
-			       "could not get gpgme data from istream: %s"),
-			     gpgme_strerror(error));
-		return -1;
+	if (!
+	    (plain_buffer =
+	     gpgme_data_release_and_get_mem(sig, &data_size))) {
+	    if (error)
+		g_set_error(error, GPGME_ERROR_QUARK, err,
+			    _("%s: could not get data: %s"),
+			    gpgme_strsource(err), gpgme_strerror(err));
+	    g_mime_cipher_validity_free(validity);
+	    return NULL;
 	}
 
-	if ((error = gpgme_data_new(&plain)) != GPGME_No_Error) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot decrypt message: "
-			       "gpgme could not create new data: %s"),
-			     gpgme_strerror(error));
-		gpgme_data_release(cipher);
-		return -1;
-	}
-
-	if ((error = gpgme_op_decrypt(gpgme_ctx, cipher, plain))
-	    != GPGME_No_Error) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot decrypt message: "
-			       "gpgme decrypting failed: %s"),
-			     gpgme_strerror(error));
-		gpgme_data_release(plain);
-		gpgme_data_release(cipher);
-		return -1;
-	}
-
-	gpgme_data_release(cipher);
-	if (!(plain_buffer = gpgme_data_release_and_get_mem(plain, &datasize))) {
-		g_set_error (err, GMIME_ERROR_QUARK, error,
-			     _("Cannot decrypt message: "
-			       "could not get gpgme data: %s"),
-			     gpgme_strerror(error));
-		return -1;
-	}
-
-	g_mime_stream_write(ostream, plain_buffer, datasize);
+	/* success: write the plaintext */
+	g_mime_stream_write(sigstream, plain_buffer, data_size);
 	g_free(plain_buffer);
-	/* BUGFIX for g_mime_multipart_encrypted_decrypt */
-	g_mime_stream_flush(ostream);
-	g_mime_stream_reset(ostream);
+    } else
+	gpgme_data_release(sig);
 
-	return 0;
+    return validity;
 }
 
-#if NOT_USED
+
+/*
+ * Encrypt istream to ostream for recipients. If sign is set, sign by userid.
+ */
 static int
-gpgme_import_keys (GMimeCipherContext *context, GMimeStream *istream, GError **err)
+g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
+		     const char *userid, GPtrArray * recipients,
+		     GMimeStream * istream, GMimeStream * ostream,
+		     GError ** error)
 {
-	GMimeGpgMEContext *ctx = (GMimeGpgMEContext *) context;
-	struct _GpgMECtx *gpgme;
+    GMimeGpgmeContext *ctx = (GMimeGpgmeContext *) context;
+    gpgme_ctx_t gpgme_ctx;
+    gpgme_key_t *rcpt;
+    gpgme_protocol_t protocol;
+    gpgme_error_t err;
+    gpgme_data_t plain, crypt;
+    size_t datasize;
+    gchar *crypt_buffer;
+    struct gpgme_data_cbs cbs = {
+	(gpgme_data_read_cb_t) g_mime_gpgme_stream_rd,	/* read method */
+	NULL,			/* write method */
+	NULL,			/* seek method */
+	cb_data_release		/* release method */
+    };
 
-	gpgme = gpgme_ctx_new (context->session, ctx->path);
-	gpgme_ctx_set_mode (gpgme, GPGME_CTX_MODE_IMPORT);
-	gpgme_ctx_set_istream (gpgme, istream);
+    /* some paranoia checks */
+    g_return_val_if_fail(ctx, -1);
+    g_return_val_if_fail(ctx->gpgme_ctx, -1);
+    gpgme_ctx = ctx->gpgme_ctx;
+    protocol = gpgme_get_protocol(gpgme_ctx);
 
-	if (gpgme_ctx_op_start (gpgme) == -1) {
-		g_set_error (err, GMIME_ERROR_QUARK, errno,
-			     _("Failed to execute gpgme: %s"),
-			     errno ? g_strerror (errno) : _("Unknown"));
-		gpgme_ctx_free (gpgme);
+    /* check for protocol collision */
+    if ((ctx->rfc2440_mode || sign) && protocol != GPGME_PROTOCOL_OpenPGP) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_INV_ENGINE,
+			_("invalid crypto engine for RFC2440"));
+	return -1;
+    }
 
-		return -1;
+    /* if requested, find the secret key for "userid" */
+    if (sign) {
+	if (!gpgme_add_signer(ctx, userid, error))
+	    return -1;
+
+	/* set passphrase callback */
+	/* FIXME: don't set the callback when a gpg-agent is running */
+	if (protocol == GPGME_PROTOCOL_OpenPGP) {
+	    if (ctx->passphrase_cb == GPGME_USE_GMIME_SESSION_CB)
+		gpgme_set_passphrase_cb(gpgme_ctx,
+					g_mime_session_passphrase,
+					context);
+	    else
+		gpgme_set_passphrase_cb(gpgme_ctx, ctx->passphrase_cb,
+					context);
+	} else
+	    gpgme_set_passphrase_cb(gpgme_ctx, NULL, context);
+    }
+
+    /* build the list of recipients */
+    if (!(rcpt = gpgme_build_recipients(ctx, recipients, error)))
+	return -1;
+
+    /* create the data objects */
+    gpgme_set_armor(gpgme_ctx, 1);
+    gpgme_set_textmode(gpgme_ctx, ctx->rfc2440_mode);
+    if ((err =
+	 gpgme_data_new_from_cbs(&plain, &cbs,
+				 istream)) != GPG_ERR_NO_ERROR) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: could not get data from stream: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	release_keylist(rcpt);
+	return -1;
+    }
+    if ((err = gpgme_data_new(&crypt)) != GPG_ERR_NO_ERROR) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: could not create new data object: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	gpgme_data_release(plain);
+	release_keylist(rcpt);
+	return -1;
+    }
+
+    /* do the encrypt or sign and encrypt operation */
+    if (sign)
+	err =
+	    gpgme_op_encrypt_sign(gpgme_ctx, rcpt,
+				  GPGME_ENCRYPT_ALWAYS_TRUST, plain,
+				  crypt);
+    else
+	err =
+	    gpgme_op_encrypt(gpgme_ctx, rcpt, GPGME_ENCRYPT_ALWAYS_TRUST,
+			     plain, crypt);
+
+    gpgme_data_release(plain);
+    release_keylist(rcpt);
+    if (err != GPG_ERR_NO_ERROR) {
+	if (error) {
+	    if (sign)
+		g_set_error(error, GPGME_ERROR_QUARK, err,
+			    _("%s: signing and encryption failed: %s"),
+			    gpgme_strsource(err), gpgme_strerror(err));
+	    else
+		g_set_error(error, GPGME_ERROR_QUARK, err,
+			    _("%s: encryption failed: %s"),
+			    gpgme_strsource(err), gpgme_strerror(err));
 	}
+	gpgme_data_release(crypt);
+	return -1;
+    }
 
-	while (!gpgme_ctx_op_complete (gpgme)) {
-		if (gpgme_ctx_op_step (gpgme, err) == -1) {
-			gpgme_ctx_op_cancel (gpgme);
-			gpgme_ctx_free (gpgme);
+    /* save the result to a file and return its name */
+    if (!(crypt_buffer = gpgme_data_release_and_get_mem(crypt, &datasize))) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: could not get data: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	return -1;
+    }
 
-			return -1;
-		}
-	}
+    g_mime_stream_write(ostream, crypt_buffer, datasize);
+    g_free(crypt_buffer);
 
-	if (gpgme_ctx_op_wait (gpgme) != 0) {
-		const char *diagnostics;
-		int save;
-
-		save = errno;
-		diagnostics = gpgme_ctx_get_diagnostics (gpgme);
-		errno = save;
-
-		g_set_error (err, GMIME_ERROR_QUARK, errno, diagnostics);
-		gpgme_ctx_free (gpgme);
-
-		return -1;
-	}
-
-	gpgme_ctx_free (gpgme);
-
-	return 0;
+    return 0;
 }
-#endif
 
-#if NOT_USED
+
+/*
+ * Decrypt istream to ostream. In RFC 2440 mode, also try to check an included
+ * signature (if any).
+ */
 static int
-gpgme_export_keys (GMimeCipherContext *context, GPtrArray *keys, GMimeStream *ostream, GError **err)
+g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
+		     GMimeStream * ostream, GError ** error)
 {
-	GMimeGpgMEContext *ctx = (GMimeGpgMEContext *) context;
-	struct _GpgMECtx *gpgme;
-	int i;
+    GMimeGpgmeContext *ctx = (GMimeGpgmeContext *) context;
+    gpgme_ctx_t gpgme_ctx;
+    gpgme_error_t err;
+    gpgme_protocol_t protocol;
+    gpgme_data_t plain, crypt;
+    size_t plainSize;
+    gchar *plainData;
+    struct gpgme_data_cbs cbs = {
+	(gpgme_data_read_cb_t) g_mime_gpgme_stream_rd,	/* read method */
+	NULL,			/* write method */
+	NULL,			/* seek method */
+	cb_data_release		/* release method */
+    };
 
-	gpgme = gpgme_ctx_new (context->session, ctx->path);
-	gpgme_ctx_set_mode (gpgme, GPGME_CTX_MODE_EXPORT);
-	gpgme_ctx_set_armor (gpgme, TRUE);
-	gpgme_ctx_set_ostream (gpgme, ostream);
+    /* some paranoia checks */
+    g_return_val_if_fail(ctx, -1);
+    g_return_val_if_fail(ctx->gpgme_ctx, -1);
+    gpgme_ctx = ctx->gpgme_ctx;
+    protocol = gpgme_get_protocol(gpgme_ctx);
 
-	for (i = 0; i < keys->len; i++) {
-		gpgme_ctx_add_recipient (gpgme, keys->pdata[i]);
-	}
+    /* check for protocol collision */
+    if (ctx->rfc2440_mode && protocol != GPGME_PROTOCOL_OpenPGP) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_INV_ENGINE,
+			_("invalid crypto engine for RFC2440"));
+	return -1;
+    }
 
-	if (gpgme_ctx_op_start (gpgme) == -1) {
-		g_set_error (err, GMIME_ERROR_QUARK, errno,
-			     _("Failed to execute gpgme: %s"),
-			     errno ? g_strerror (errno) : _("Unknown"));
-		gpgme_ctx_free (gpgme);
+    /* set passphrase callback (only OpenPGP) */
+    /* FIXME: don't set the callback then gpg-agent is running */
+    if (protocol == GPGME_PROTOCOL_OpenPGP) {
+	if (ctx->passphrase_cb == GPGME_USE_GMIME_SESSION_CB)
+	    gpgme_set_passphrase_cb(gpgme_ctx, g_mime_session_passphrase,
+				    context);
+	else
+	    gpgme_set_passphrase_cb(gpgme_ctx, ctx->passphrase_cb,
+				    context);
+    } else
+	gpgme_set_passphrase_cb(gpgme_ctx, NULL, context);
 
-		return -1;
-	}
+    /* create the data streams */
+    if ((err =
+	 gpgme_data_new_from_cbs(&crypt, &cbs,
+				 istream)) != GPG_ERR_NO_ERROR) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: could not get data from stream: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	return -1;
+    }
+    if ((err = gpgme_data_new(&plain)) != GPG_ERR_NO_ERROR) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: could not create new data object: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	gpgme_data_release(crypt);
+	return -1;
+    }
 
-	while (!gpgme_ctx_op_complete (gpgme)) {
-		if (gpgme_ctx_op_step (gpgme, err) == -1) {
-			gpgme_ctx_op_cancel (gpgme);
-			gpgme_ctx_free (gpgme);
+    /* try to decrypt */
+    if ((err =
+	 gpgme_op_decrypt_verify(gpgme_ctx, crypt,
+				 plain)) != GPG_ERR_NO_ERROR) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: decryption failed: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	gpgme_data_release(plain);
+	gpgme_data_release(crypt);
+	return -1;
+    }
+    gpgme_data_release(crypt);
 
-			return -1;
-		}
-	}
+    /* try to get information about the signature (if any) */
+    ctx->sig_state = g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx);
 
-	if (gpgme_ctx_op_wait (gpgme) != 0) {
-		const char *diagnostics;
-		int save;
+    /* save the decrypted data to a file */
+    if (!(plainData = gpgme_data_release_and_get_mem(plain, &plainSize))) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: could not get data: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	return -1;
+    }
+    g_mime_stream_write(ostream, plainData, plainSize);
+    g_free(plainData);
 
-		save = errno;
-		diagnostics = gpgme_ctx_get_diagnostics (gpgme);
-		errno = save;
-
-		g_set_error (err, GMIME_ERROR_QUARK, errno, diagnostics);
-		gpgme_ctx_free (gpgme);
-
-		return -1;
-	}
-
-	gpgme_ctx_free (gpgme);
-
-	return 0;
+    return 0;
 }
-#endif
 
 
-/**
- * g_mime_gpgme_context_new:
- * @session: session
- *
- * Creates a new gpgme cipher context object.
- *
- * Returns a new gpgme cipher context object.
- **/
+/*
+ * Create a new gpgme cipher context with protocol. If anything fails, return
+ * NULL and set error.
+ */
 GMimeCipherContext *
-g_mime_gpgme_context_new (GMimeSession *session)
+g_mime_gpgme_context_new(GMimeSession * session,
+			 gpgme_protocol_t protocol, GError ** error)
 {
-	GMimeCipherContext *cipher;
-	GMimeGpgMEContext *ctx;
+    GMimeCipherContext *cipher;
+    GMimeGpgmeContext *ctx;
+    gpgme_error_t err;
+    gpgme_ctx_t gpgme_ctx;
 
-	g_return_val_if_fail (GMIME_IS_SESSION (session), NULL);
+    g_return_val_if_fail(GMIME_IS_SESSION(session), NULL);
 
-	ctx = g_object_new (GMIME_TYPE_GPGME_CONTEXT, NULL, NULL);
+    /* creating the gpgme context may fail, so do this first to get the info */
+    if ((err = gpgme_new(&gpgme_ctx)) != GPG_ERR_NO_ERROR) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: could not create context: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	return NULL;
+    }
 
-	cipher = (GMimeCipherContext *) ctx;
-	cipher->session = session;
-	g_object_ref (session);
+    /* create the cipher context */
+    ctx = g_object_new(GMIME_TYPE_GPGME_CONTEXT, NULL, NULL);
+    if (!ctx) {
+	gpgme_release(gpgme_ctx);
+	return NULL;
+    } else
+	ctx->gpgme_ctx = gpgme_ctx;
+    cipher = (GMimeCipherContext *) ctx;
 
-	return cipher;
+    /* check if the requested protocol is available */
+    if (!g_mime_gpgme_context_check_protocol
+	(GMIME_GPGME_CONTEXT_GET_CLASS(ctx), protocol, error)) {
+	g_object_unref(G_OBJECT(ctx));
+	return NULL;
+    }
+
+    /* setup according to requested protocol */
+    cipher->session = session;
+    g_object_ref(session);
+    gpgme_set_protocol(gpgme_ctx, protocol);
+    if (protocol == GPGME_PROTOCOL_OpenPGP) {
+	cipher->sign_protocol = "application/pgp-signature";
+	cipher->encrypt_protocol = "application/pgp-encrypted";
+	cipher->key_protocol = NULL;	/* FIXME */
+    } else {
+	cipher->sign_protocol = "application/pkcs7-mime";
+	cipher->encrypt_protocol = "application/pkcs7-mime";
+	cipher->key_protocol = NULL;	/* FIXME */
+    }
+
+    return cipher;
 }
 
-#endif /* HAVE_GPGME */
+
+/*
+ * Verify that protocol is valid and available in klass. Return TRUE on success
+ * and FALSE on fail and set error (if not NULL) in the latter case.
+ */
+static gboolean
+g_mime_gpgme_context_check_protocol(GMimeGpgmeContextClass * klass,
+				    gpgme_protocol_t protocol,
+				    GError ** error)
+{
+    switch (protocol) {
+    case GPGME_PROTOCOL_OpenPGP:
+	if (!klass->has_proto_openpgp) {
+	    if (error)
+		g_set_error(error, GPGME_ERROR_QUARK,
+			    GPG_ERR_INV_ENGINE,
+			    _
+			    ("the crypto engine for protocol OpenPGP is not available"));
+	    return FALSE;
+	}
+	break;
+    case GPGME_PROTOCOL_CMS:
+	if (!klass->has_proto_cms) {
+	    if (error)
+		g_set_error(error, GPGME_ERROR_QUARK,
+			    GPG_ERR_INV_ENGINE,
+			    _
+			    ("the crypto engine for protocol CMS is not available"));
+	    return FALSE;
+	}
+	break;
+    default:
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_INV_ENGINE,
+			_("invalid crypto engine %d"), protocol);
+	return FALSE;
+    }
+
+    return TRUE;
+}
+
+
+/*
+ * Get a key for name. If secret_only is set, choose only secret (private)
+ * keys. If multiple keys would match, call the key selection CB (if present).
+ * If no matching key could be found or if any error occurs, return NULL and
+ * set error.
+ */
+#define KEY_IS_OK(k)   (!((k)->expired || (k)->revoked || \
+                          (k)->disabled || (k)->invalid))
+static gpgme_key_t
+get_key_from_name(GMimeGpgmeContext * ctx, const gchar * name,
+		  gboolean secret_only, GError ** error)
+{
+    GList *keys = NULL;
+    gpgme_ctx_t gpgme_ctx = ctx->gpgme_ctx;
+    gpgme_key_t key;
+    gpgme_error_t err;
+
+    if ((err = gpgme_op_keylist_start(gpgme_ctx, NULL /* name */ ,/* FIXME!!*/
+				      secret_only)) != GPG_ERR_NO_ERROR) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: could not list keys for %s: %s"),
+			gpgme_strsource(err), name, gpgme_strerror(err));
+	return NULL;
+    }
+    while ((err =
+	    gpgme_op_keylist_next(gpgme_ctx, &key)) == GPG_ERR_NO_ERROR)
+	if (KEY_IS_OK(key) && key->subkeys && KEY_IS_OK(key->subkeys))
+	    keys = g_list_append(keys, key);
+    if (gpg_err_code(err) != GPG_ERR_EOF) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: could not list keys for %s: %s"),
+			gpgme_strsource(err), name, gpgme_strerror(err));
+	gpgme_op_keylist_end(gpgme_ctx);
+	g_list_foreach(keys, (GFunc) gpgme_key_unref, NULL);
+	g_list_free(keys);
+	return NULL;
+    }
+    gpgme_op_keylist_end(gpgme_ctx);
+
+    if (!keys) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_KEY_SELECTION,
+			_("%s: could not find a key for %s"),
+			"gmime-gpgme", name);
+	return NULL;
+    }
+
+    if (g_list_length(keys) > 1) {
+	if (ctx->key_select_cb)
+	    key = ctx->key_select_cb(name, secret_only, ctx, keys);
+	else {
+	    if (error)
+		g_set_error(error, GPGME_ERROR_QUARK,
+			    GPG_ERR_KEY_SELECTION,
+			    _("%s: multiple keys for %s"), "gmime-gpgme",
+			    name);
+	    key = NULL;
+	}
+	if (key)
+	    gpgme_key_ref(key);
+	g_list_foreach(keys, (GFunc) gpgme_key_unref, NULL);
+    } else
+	key = (gpgme_key_t) keys->data;
+
+    g_list_free(keys);
+    return key;
+}
+
+
+/*
+ * Add signer to ctx's list of signers and return TRUE on success or FALSE
+ * on error.
+ */
+static gboolean
+gpgme_add_signer(GMimeGpgmeContext * ctx, const gchar * signer,
+		 GError ** error)
+{
+    gpgme_key_t key = NULL;
+
+    if (!(key = get_key_from_name(ctx, signer, TRUE, error)))
+	return FALSE;
+
+    /* set the key (the previous operation guaranteed that it exists, no need
+     * 2 check return values...) */
+    gpgme_signers_add(ctx->gpgme_ctx, key);
+    gpgme_key_unref(key);
+
+    return TRUE;
+}
+
+
+/*
+ * Build a NULL-terminated array of keys for all recipients in rcpt_list and
+ * return it. The caller has to take care that it's released. If something
+ * goes wrong, NULL is returned.
+ */
+static gpgme_key_t *
+gpgme_build_recipients(GMimeGpgmeContext * ctx, GPtrArray * rcpt_list,
+		       GError ** error)
+{
+    gpgme_key_t *rcpt = g_new0(gpgme_key_t, rcpt_list->len + 1);
+    guint num_rcpts;
+
+    /* try to find the public key for every recipient */
+    for (num_rcpts = 0; num_rcpts < rcpt_list->len; num_rcpts++) {
+	gchar *name = (gchar *) g_ptr_array_index(rcpt_list, num_rcpts);
+	gpgme_key_t key;
+
+	if (!(key = get_key_from_name(ctx, name, FALSE, error))) {
+	    release_keylist(rcpt);
+	    return NULL;
+	}
+
+	/* set the recipient */
+	rcpt[num_rcpts] = key;
+	g_message("encrypt for %s with fpr %s", name, key->subkeys->fpr);
+    }
+    g_message("encrypting for %d recipient(s)", num_rcpts);
+
+    return rcpt;
+}
+
+
+/*
+ * helper function: unref all keys in the NULL-terminated array keylist
+ * and finally release the array itself
+ */
+static void
+release_keylist(gpgme_key_t * keylist)
+{
+    gpgme_key_t *key = keylist;
+
+    while (*key) {
+	gpgme_key_unref(*key);
+	key++;
+    }
+    g_free(keylist);
+}

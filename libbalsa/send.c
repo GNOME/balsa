@@ -183,6 +183,8 @@ send_message_info_destroy(SendMessageInfo *smi)
 #if HAVE_GPGME
 static gint
 libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part);
+static LibBalsaMsgCreateResult
+do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root);
 #endif
 
 static guint balsa_send_message_real(SendMessageInfo* info);
@@ -1342,11 +1344,6 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
     LibBalsaMessageBody *body;
     gchar *tmp;
     GList *list;
-#ifdef HAVE_GPGME
-    gboolean can_create_rfc3156 = message->body_list != NULL;
-    if (postponing)
-	can_create_rfc3156 = FALSE;
-#endif
 
     body = message->body_list;
     if (body && body->next)
@@ -1440,16 +1437,15 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 	} else if (body->buffer) {
 #ifdef HAVE_GPGME
 	    /* force quoted printable encoding if only signing is requested */
-	    mime_part = add_mime_body_plain(body,
-		((message->gpg_mode &
-		  (LIBBALSA_GPG_SIGN | LIBBALSA_GPG_ENCRYPT)
-		  ) == LIBBALSA_GPG_SIGN) ? GMIME_PART_ENCODING_QUOTEDPRINTABLE :
-					    encoding, flow);
-#ifdef HAVE_GPGME
+	    mime_part =
+		add_mime_body_plain(body,
+				    (message->gpg_mode & LIBBALSA_PROTECT_MODE) == LIBBALSA_PROTECT_SIGN ?
+				    GMIME_PART_ENCODING_QUOTEDPRINTABLE :
+				    encoding, flow);
 	    /* in '2440 mode, touch *only* the first body! */
 	    if (!postponing && body == body->message->body_list &&
 		message->gpg_mode > 0 &&
-		(message->gpg_mode & LIBBALSA_GPG_RFC2440) != 0) {
+		(message->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0) {
 		gint result = 
 		    libbalsa_create_rfc2440_buffer(body, mime_part);
 
@@ -1459,10 +1455,9 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		    return LIBBALSA_MESSAGE_CREATE_ERROR;
 		}
 	    }
-#endif
 #else
 	    mime_part = add_mime_body_plain(body, encoding, flow);
-#endif
+#endif /* HAVE_GPGME */
 	}
 
 	if (mime_root) {
@@ -1477,62 +1472,10 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
     }
 
 #ifdef HAVE_GPGME
-    if (can_create_rfc3156 && message->gpg_mode > 0 &&
-	(message->gpg_mode & LIBBALSA_GPG_RFC2440) == 0) {
-	switch (message->gpg_mode)
-	    {
-	    case LIBBALSA_GPG_SIGN:   /* sign message */
-		{
-		    if (libbalsa_sign_mime_object(&mime_root,
-					   message->headers->from->address_list->data,
-					   NULL)) {
-		    } else {
-			/* FIXME: do we have to free any resources here??? */
-			return LIBBALSA_MESSAGE_SIGN_ERROR;
-		    }
-		    break;
-		}
-	    case LIBBALSA_GPG_ENCRYPT:
-	    case LIBBALSA_GPG_ENCRYPT | LIBBALSA_GPG_SIGN:
-		{
-		    GList *encrypt_for = NULL;
-		    gboolean success;
-
-		    /* build a list containing the addresses of all to:, cc:
-		       and the from: address. Note: don't add bcc: addresses
-		       as they would be visible in the encrypted block. */
-		    encrypt_for = get_mailbox_names(encrypt_for,
-						    message->headers->to_list);
-		    encrypt_for = get_mailbox_names(encrypt_for,
-						    message->headers->cc_list);
-		    encrypt_for = g_list_append(encrypt_for,
-					message->headers->from->address_list->data);
-		    if (message->headers->bcc_list)
-			libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-					     _("This message will not be encrpyted for the BCC: recipient(s)."));
-
-		    if (message->gpg_mode & LIBBALSA_GPG_SIGN)
-			success = 
-			    libbalsa_sign_encrypt_mime_object(&mime_root,
-					   message->headers->from->address_list->data,
-					   encrypt_for,
-					   NULL);
-		    else
-			success = 
-			    libbalsa_encrypt_mime_object(&mime_root,
-							 encrypt_for);
-		    g_list_free(encrypt_for);
-			
-		    if (!success) {
-			/* FIXME: do we have to free any resources here??? */
-			return LIBBALSA_MESSAGE_ENCRYPT_ERROR;
-		    }
-		    break;
-		}
-	    default:
-		g_error("illegal gpg_mode %d (" __FILE__ " line %d)",
-		    message->gpg_mode, __LINE__);
-	    }
+    if (message->body_list != NULL && !postponing) {
+	LibBalsaMsgCreateResult crypt_res = do_multipart_crypto(message, &mime_root);
+	if (crypt_res != LIBBALSA_MESSAGE_CREATE_OK)
+	    return crypt_res;
     }
 #endif
     
@@ -1647,75 +1590,6 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 }
 
 
-#ifdef HAVE_GPGME
-static gint
-libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part)
-{
-    const gchar *content;
-    gchar *cbuf, *rbuf = NULL;
-    LibBalsaMessage *message = body->message;
-    gint mode = message->gpg_mode;
-    guint len;
-
-    content = g_mime_part_get_content(mime_part, &len);
-    cbuf = g_strndup(content, len);
-
-    g_return_val_if_fail(cbuf != NULL, LIBBALSA_MESSAGE_SIGN_ERROR);
-    
-    switch (mode & ~LIBBALSA_GPG_RFC2440)
-	{
-	case LIBBALSA_GPG_SIGN:   /* sign only */
-	    rbuf =
-		libbalsa_rfc2440_sign_buffer(cbuf, 
-					     message->headers->from->address_list->data,
-					     NULL);
-	    g_free(cbuf);
-	    if (!rbuf)
-		return LIBBALSA_MESSAGE_SIGN_ERROR;
-	    break;
-	case LIBBALSA_GPG_ENCRYPT:
-	case LIBBALSA_GPG_ENCRYPT | LIBBALSA_GPG_SIGN:
-	    {
-		GList *encrypt_for = NULL;
-			    
-		/* build a list containing the addresses of all to:, cc:
-		   and the from: address. Note: don't add bcc: addresses
-		   as they would be visible in the encrypted block. */
-		encrypt_for = get_mailbox_names(encrypt_for, message->headers->to_list);
-		encrypt_for = get_mailbox_names(encrypt_for, message->headers->cc_list);
-		encrypt_for = g_list_append(encrypt_for,
-					    message->headers->from->address_list->data);
-		if (message->headers->bcc_list)
-		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-					 _("This message will not be encrpyted for the BCC: recipient(s)."));
-
-		if (mode & LIBBALSA_GPG_SIGN)
-		    rbuf = libbalsa_rfc2440_encrypt_buffer(cbuf, 
-					     message->headers->from->address_list->data,
-					     encrypt_for,
-					     NULL);
-		else
-		    rbuf = libbalsa_rfc2440_encrypt_buffer(cbuf, 
-							   NULL,
-							   encrypt_for,
-							   NULL);
-		g_list_free(encrypt_for);
-	    }
-	    g_free(cbuf);
-	    if (!rbuf)
-		return LIBBALSA_MESSAGE_ENCRYPT_ERROR;
-	    break;
-	default:
-	    g_free(cbuf);
-	    g_error("illegal gpg_mode %d (" __FILE__ " line %d)",
-		    mode, __LINE__);
-	}
-
-    g_mime_part_set_content(mime_part, rbuf, strlen(rbuf));
-    return LIBBALSA_MESSAGE_CREATE_OK;
-}
-#endif
-
 /* Create a message-id and set it on the mime message.
  */
 static void
@@ -1781,3 +1655,137 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
   
     return LIBBALSA_MESSAGE_CREATE_OK;
 }
+
+
+#ifdef HAVE_GPGME
+static gint
+libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part)
+{
+    LibBalsaMessage *message = body->message;
+    gint mode = message->gpg_mode;
+
+    switch (mode & LIBBALSA_PROTECT_MODE)
+	{
+	case LIBBALSA_PROTECT_SIGN:   /* sign only */
+	    if (!libbalsa_rfc2440_sign_encrypt(mime_part, 
+					       message->headers->from->address_list->data,
+					       NULL, NULL))
+		return LIBBALSA_MESSAGE_SIGN_ERROR;
+	    break;
+	case LIBBALSA_PROTECT_ENCRYPT:
+	case LIBBALSA_PROTECT_SIGN | LIBBALSA_PROTECT_ENCRYPT:
+	    {
+		GList *encrypt_for = NULL;
+		gboolean result;
+			    
+		/* build a list containing the addresses of all to:, cc:
+		   and the from: address. Note: don't add bcc: addresses
+		   as they would be visible in the encrypted block. */
+		encrypt_for = get_mailbox_names(encrypt_for, message->headers->to_list);
+		encrypt_for = get_mailbox_names(encrypt_for, message->headers->cc_list);
+		encrypt_for = g_list_append(encrypt_for,
+					    message->headers->from->address_list->data);
+		if (message->headers->bcc_list)
+		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+					 _("This message will not be encrpyted for the BCC: recipient(s)."));
+
+		if (mode & LIBBALSA_PROTECT_SIGN)
+		    result = 
+			libbalsa_rfc2440_sign_encrypt(mime_part, 
+						      message->headers->from->address_list->data,
+						      encrypt_for,
+						      NULL);
+		else
+		    result = 
+			libbalsa_rfc2440_sign_encrypt(mime_part, 
+						      NULL,
+						      encrypt_for,
+						      NULL);
+		g_list_free(encrypt_for);
+		if (!result)
+		    return LIBBALSA_MESSAGE_ENCRYPT_ERROR;
+	    }
+	    break;
+	default:
+	    g_error("illegal gpg_mode %d (" __FILE__ " line %d)",
+		    mode, __LINE__);
+	}
+
+    return LIBBALSA_MESSAGE_CREATE_OK;
+}
+  
+  
+/* handle rfc2633 and rfc3156 signing and/or encryption of a message */
+static LibBalsaMsgCreateResult
+do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root)
+{
+    gpgme_protocol_t protocol;
+
+    /* check if we shall do any protection */
+    if (!(message->gpg_mode & LIBBALSA_PROTECT_MODE))
+	return LIBBALSA_MESSAGE_CREATE_OK;
+
+    /* check which protocol should be used */
+    if (message->gpg_mode & LIBBALSA_PROTECT_RFC3156)
+	protocol = GPGME_PROTOCOL_OpenPGP;
+#ifdef HAVE_SMIME
+    else if (message->gpg_mode & LIBBALSA_PROTECT_SMIMEV3)
+	protocol = GPGME_PROTOCOL_CMS;
+#endif
+    else if (message->gpg_mode & LIBBALSA_PROTECT_OPENPGP)
+	return LIBBALSA_MESSAGE_CREATE_OK;  /* already done... */
+    else
+	return LIBBALSA_MESSAGE_ENCRYPT_ERROR;  /* hmmm.... */
+
+    /* sign and/or encrypt */
+    switch (message->gpg_mode & LIBBALSA_PROTECT_MODE)
+	{
+	case LIBBALSA_PROTECT_SIGN:   /* sign message */
+	    if (!libbalsa_sign_mime_object(mime_root,
+					   message->headers->from->address_list->data,
+					   protocol, NULL))
+		return LIBBALSA_MESSAGE_SIGN_ERROR;
+	    break;
+	case LIBBALSA_PROTECT_ENCRYPT:
+	case LIBBALSA_PROTECT_ENCRYPT | LIBBALSA_PROTECT_SIGN:
+	    {
+		GList *encrypt_for = NULL;
+		gboolean success;
+		
+		/* build a list containing the addresses of all to:, cc:
+		   and the from: address. Note: don't add bcc: addresses
+		   as they would be visible in the encrypted block. */
+		encrypt_for = get_mailbox_names(encrypt_for,
+						message->headers->to_list);
+		encrypt_for = get_mailbox_names(encrypt_for,
+						message->headers->cc_list);
+		encrypt_for = g_list_append(encrypt_for,
+					    message->headers->from->address_list->data);
+		if (message->headers->bcc_list)
+		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+					 _("This message will not be encrpyted for the BCC: recipient(s)."));
+
+		if (message->gpg_mode & LIBBALSA_PROTECT_SIGN)
+		    success = 
+			libbalsa_sign_encrypt_mime_object(mime_root,
+							  message->headers->from->address_list->data,
+							  encrypt_for, protocol,
+							  NULL);
+		else
+		    success = 
+			libbalsa_encrypt_mime_object(mime_root, encrypt_for,
+						     protocol, NULL);
+		g_list_free(encrypt_for);
+		
+		if (!success)
+		    return LIBBALSA_MESSAGE_ENCRYPT_ERROR;
+		break;
+	    }
+	default:
+	    g_error("illegal gpg_mode %d (" __FILE__ " line %d)",
+		    message->gpg_mode, __LINE__);
+	}
+
+    return LIBBALSA_MESSAGE_CREATE_OK;
+}
+#endif

@@ -29,6 +29,7 @@
 
 #include <gmime/gmime.h>
 
+#include "config.h"
 #ifdef HAVE_GPGME
 #include "rfc3156.h"
 #endif
@@ -81,6 +82,20 @@ enum _LibBalsaMessageStatus {
     LIBBALSA_MESSAGE_STATUS_ICONS_NUM
 };
 
+
+#ifdef HAVE_GPGME
+typedef enum _LibBalsaMsgProtectState LibBalsaMsgProtectState;
+
+enum _LibBalsaMsgProtectState {
+    LIBBALSA_MSG_PROTECT_NONE,
+    LIBBALSA_MSG_PROTECT_SIGN_UNKNOWN,
+    LIBBALSA_MSG_PROTECT_SIGN_GOOD,
+    LIBBALSA_MSG_PROTECT_SIGN_NOTRUST,
+    LIBBALSA_MSG_PROTECT_SIGN_BAD,
+    LIBBALSA_MSG_PROTECT_CRYPT
+};
+#endif
+
 typedef enum _LibBalsaMessageAttach LibBalsaMessageAttach;
 enum _LibBalsaMessageAttach {
     LIBBALSA_MESSAGE_ATTACH_ATTACH,
@@ -94,12 +109,6 @@ enum _LibBalsaMessageAttach {
     LIBBALSA_MESSAGE_ATTACH_ICONS_NUM
 };
 
-#ifdef HAVE_GPGME
-#define  LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN     0
-#define  LIBBALSA_MESSAGE_SIGNATURE_GOOD        1
-#define  LIBBALSA_MESSAGE_SIGNATURE_NOTRUST     2
-#define  LIBBALSA_MESSAGE_SIGNATURE_BAD         3
-#endif
 
 /*
  * Message info used by mailbox;
@@ -201,8 +210,8 @@ struct _LibBalsaMessage {
     /* GPG sign and/or encrypt message (sending) */
     guint gpg_mode;
 
-    /* signature status (received message) */
-    gint sig_state;
+    /* protection (i.e. sign/encrypt) status (received message) */
+    LibBalsaMsgProtectState prot_state;
 #endif
 
     /* a forced multipart subtype or NULL for mixed; used only for

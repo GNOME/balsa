@@ -1502,6 +1502,10 @@ balsa_notebook_label_new (BalsaMailboxNode* mbnode)
        GtkWidget *but = gtk_button_new();
        GtkWidget *ev = gtk_event_box_new();
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+       gtk_event_box_set_visible_window(GTK_EVENT_BOX(ev), FALSE);
+#endif
+
     bw_notebook_label_style(GTK_LABEL(lab),
 			    mbnode->mailbox->has_unread_messages);
     g_signal_connect(mbnode->mailbox, "changed",

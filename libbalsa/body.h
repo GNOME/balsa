@@ -31,7 +31,7 @@
 #include "config.h"
 
 #ifdef HAVE_GPGME
-#include "rfc3156.h"
+#include "gmime-gpgme-signature.h"
 #endif
 
 typedef enum _LibBalsaMessageBodyType LibBalsaMessageBodyType;
@@ -65,7 +65,7 @@ struct _LibBalsaMessageBody {
 
 #ifdef HAVE_GPGME
     gchar *decrypt_file;        /* temp file for a decrypted body */
-    LibBalsaSignatureInfo* sig_info;  /* info about a pgp signature body */
+    GMimeGpgmeSigstat* sig_info;  /* info about a pgp signature body */
 #endif
 
     LibBalsaMessageBody *next;	/* Next part in the message */

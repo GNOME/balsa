@@ -440,6 +440,12 @@ balsa_app_init(void)
     balsa_app.check_imap_inbox = 0;
     balsa_app.imap_scan_depth = 1;
 
+#ifdef HAVE_GPGME
+    /* gpgme stuff */
+    balsa_app.has_openpgp = FALSE;
+    balsa_app.has_smime = FALSE;
+#endif
+
     /* Message filing */
     balsa_app.folder_mru=NULL;
     balsa_app.fcc_mru=NULL;

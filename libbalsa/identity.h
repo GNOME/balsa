@@ -76,6 +76,7 @@ extern "C"
 #ifdef HAVE_GPGME
 	gboolean gpg_sign;
 	gboolean gpg_encrypt;
+	gint crypt_protocol;
 #endif
     };
 
@@ -107,6 +108,7 @@ extern "C"
 #ifdef HAVE_GPGME
     void libbalsa_identity_set_gpg_sign(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_gpg_encrypt(LibBalsaIdentity*, gboolean);
+    void libbalsa_identity_set_crypt_protocol(LibBalsaIdentity* ident, gint);
 #endif
 
     void libbalsa_identity_config_dialog(GtkWindow * parent,

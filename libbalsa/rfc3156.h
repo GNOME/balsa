@@ -30,81 +30,74 @@
 #include <gpgme.h>
 #include "libbalsa.h"
 #include "misc.h"
-
-#define LIBBALSA_GPG_SIGN      (1 << 0)
-#define LIBBALSA_GPG_ENCRYPT   (1 << 1)
-#define LIBBALSA_GPG_RFC2440   (1 << 2)
-
-typedef struct _LibBalsaSignatureInfo LibBalsaSignatureInfo;
-typedef enum _LibBalsaMessageBodyRFC2440Mode LibBalsaMessageBodyRFC2440Mode;
-
-struct _LibBalsaSignatureInfo {
-    GpgmeSigStat status;
-    GpgmeValidity validity;
-    GpgmeValidity trust;
-    gchar *sign_name;
-    gchar *sign_email;
-    gchar *fingerprint;
-    time_t key_created;
-    time_t sign_time;
-};
-
-enum _LibBalsaMessageBodyRFC2440Mode {
-    LIBBALSA_BODY_RFC2440_NONE = 0,
-    LIBBALSA_BODY_RFC2440_SIGNED,
-    LIBBALSA_BODY_RFC2440_ENCRYPTED
-};
+#include "gmime-gpgme-context.h"
 
 
-gint libbalsa_is_pgp_signed(LibBalsaMessageBody *body);
-gint libbalsa_is_pgp_encrypted(LibBalsaMessageBody *body);
+/* bits to define the protection mode: signed or encrypted */
+#define LIBBALSA_PROTECT_SIGN      (1 << 0)
+#define LIBBALSA_PROTECT_ENCRYPT   (1 << 1)
+#define LIBBALSA_PROTECT_MODE      (3 << 0)
 
-gboolean libbalsa_sign_mime_object(GMimeObject **content,
-				   const gchar *rfc822_for,
-				   GtkWindow *parent);
-gboolean libbalsa_encrypt_mime_object(GMimeObject **content, GList *rfc822_for);
-gboolean libbalsa_sign_encrypt_mime_object(GMimeObject **content,
-					   const gchar *rfc822_signer,
-					   GList *rfc822_for,
-					   GtkWindow *parent);
+/* bits to define the protection method */
+#define LIBBALSA_PROTECT_OPENPGP   (1 << 2)	/* RFC 2440 (OpenPGP) */
+#define LIBBALSA_PROTECT_SMIMEV3   (1 << 3)	/* RFC 2633 (S/MIME v3) */
+#define LIBBALSA_PROTECT_RFC3156   (1 << 4)	/* RFC 3156 (PGP/MIME) */
+#define LIBBALSA_PROTECT_PROTOCOL  (7 << 2)
 
-gboolean libbalsa_body_check_signature(LibBalsaMessageBody *body);
-LibBalsaMessageBody *libbalsa_body_decrypt(LibBalsaMessageBody *body,
-					   GtkWindow *parent);
+/* indicate broken structure */
+#define LIBBALSA_PROTECT_ERROR     (1 << 5)
 
-LibBalsaMessageBodyRFC2440Mode libbalsa_rfc2440_check_buffer(const gchar *buffer);
-gchar *libbalsa_rfc2440_sign_buffer(const gchar *buffer,
-				    const gchar *sign_for,
-				    GtkWindow *parent);
-GpgmeSigStat libbalsa_rfc2440_check_signature(gchar **buffer,
-					      const gchar *charset,
-					      gboolean append_info,
-					      LibBalsaSignatureInfo **sig_info,
-					      const gchar * date_string);
-gchar *libbalsa_rfc2440_encrypt_buffer(const gchar *buffer,
-				       const gchar *sign_for,
-				       GList *encrypt_for,
-				       GtkWindow *parent);
-GpgmeSigStat libbalsa_rfc2440_decrypt_buffer(gchar **buffer,
-					     const gchar *charset,
-					     gboolean fallback,
-					     LibBalsaCodeset codeset,
-					     gboolean append_info,
-					     LibBalsaSignatureInfo **sig_info,
-					     const gchar *date_string,
-					     GtkWindow *parent);
 
-LibBalsaSignatureInfo *libbalsa_signature_info_destroy(LibBalsaSignatureInfo* info);
-const gchar *libbalsa_gpgme_sig_stat_to_gchar(GpgmeSigStat stat);
-const gchar *libbalsa_gpgme_validity_to_gchar(GpgmeValidity validity);
-gchar *libbalsa_signature_info_to_gchar(LibBalsaSignatureInfo * info, 
+/* some custom error messages */
+#define GPG_ERR_TRY_AGAIN          GPG_ERR_USER_15
+#define GPG_ERR_NOT_SIGNED         GPG_ERR_USER_16
+
+
+gboolean libbalsa_check_crypto_engine(gpgme_protocol_t protocol);
+
+gint libbalsa_message_body_protection(LibBalsaMessageBody * body);
+
+/* routines dealing with RFC 2633 and RFC 3156 stuff */
+gboolean libbalsa_sign_mime_object(GMimeObject ** content,
+				   const gchar * rfc822_for,
+				   gpgme_protocol_t protocol,
+				   GtkWindow * parent);
+gboolean libbalsa_encrypt_mime_object(GMimeObject ** content,
+				      GList * rfc822_for,
+				      gpgme_protocol_t protocol,
+				      GtkWindow * parent);
+gboolean libbalsa_sign_encrypt_mime_object(GMimeObject ** content,
+					   const gchar * rfc822_signer,
+					   GList * rfc822_for,
+					   gpgme_protocol_t protocol,
+					   GtkWindow * parent);
+gboolean libbalsa_body_check_signature(LibBalsaMessageBody * body,
+				       gpgme_protocol_t protocol);
+LibBalsaMessageBody *libbalsa_body_decrypt(LibBalsaMessageBody * body,
+					   gpgme_protocol_t protocol,
+					   GtkWindow * parent);
+
+/* routines dealing with RFC 2440 stuff */
+gboolean libbalsa_rfc2440_sign_encrypt(GMimePart * part,
+				       const gchar * sign_for,
+				       GList * encrypt_for,
+				       GtkWindow * parent);
+gpgme_error_t libbalsa_rfc2440_verify(GMimePart * part,
+				      GMimeGpgmeSigstat ** sig_info);
+gpgme_error_t libbalsa_rfc2440_decrypt(GMimePart * part,
+				       GMimeGpgmeSigstat ** sig_info,
+				       GtkWindow * parent);
+
+/* helper functions to convert states to human-readable form */
+const gchar *libbalsa_gpgme_sig_protocol_name(gpgme_protocol_t protocol);
+const gchar *libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat);
+const gchar *libbalsa_gpgme_validity_to_gchar(gpgme_validity_t validity);
+gchar *libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
 					const gchar * date_string);
 
 #ifdef HAVE_GPG
-gboolean gpg_ask_import_key(const gchar *message, GtkWindow *parent,
-			    const gchar *fingerprint);
+gboolean gpg_run_import_key(const gchar * fingerprint, GtkWindow * parent);
+
 #endif
-
-#endif /* HAVE_GPGME */
-
-#endif /* __RFC3156_GPG_H__ */
+#endif				/* HAVE_GPGME */
+#endif				/* __RFC3156_GPG_H__ */

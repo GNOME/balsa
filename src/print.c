@@ -80,7 +80,7 @@
 #define BALSA_PRINT_TYPE_IMAGE      4
 #define BALSA_PRINT_TYPE_DEFAULT    5
 #ifdef HAVE_GPGME
-#define BALSA_PRINT_TYPE_GPG_SIGN   6
+#define BALSA_PRINT_TYPE_CRYPT_SIGN   6
 #endif
 #ifdef HAVE_GTKHTML
 # define BALSA_PRINT_TYPE_HTML      7
@@ -418,15 +418,25 @@ prepare_header_real(PrintInfo * pi, LibBalsaMessageBody * sig_body,
     }
 
 #ifdef HAVE_GPGME
-    /* add the signature status info if available */
     if (balsa_app.shown_headers != HEADERS_NONE && sig_body &&
-	libbalsa_is_pgp_signed(sig_body) > 0 && sig_body->parts->next->sig_info) {
-	pdata->sig_status =
-	    g_strdup(libbalsa_gpgme_sig_stat_to_gchar(sig_body->parts->next->sig_info->status));
-	lines += print_wrap_string(&pdata->sig_status, pi->header_font,
-				   pi->printable_width, pi->tab_width);
+        sig_body->parts && sig_body->parts->next &&
+        sig_body->parts->next->sig_info) {
+        gint prot = libbalsa_message_body_protection(sig_body);
+
+        if ((prot & LIBBALSA_PROTECT_SIGN) &&
+            (prot & (LIBBALSA_PROTECT_RFC3156 | LIBBALSA_PROTECT_SMIMEV3))) {
+            GMimeGpgmeSigstat *siginfo = sig_body->parts->next->sig_info;
+
+            pdata->sig_status =
+                g_strconcat
+                (libbalsa_gpgme_sig_protocol_name(siginfo->protocol),
+                 libbalsa_gpgme_sig_stat_to_gchar(siginfo->status),
+                 NULL);
+            lines += print_wrap_string(&pdata->sig_status, pi->header_font,
+                                       pi->printable_width, pi->tab_width);
+        }
     } else {
-	pdata->sig_status = NULL;
+        pdata->sig_status = NULL;
     }
 #endif
 
@@ -1178,7 +1188,7 @@ print_image(PrintInfo * pi, gpointer * data)
  * ~~~ print a gpg signature info (like plain text, but with header font) ~~~
  */
 static void
-prepare_gpg_signature(PrintInfo * pi, LibBalsaMessageBody * body)
+prepare_crypto_signature(PrintInfo * pi, LibBalsaMessageBody * body)
 {
     PlainTextInfo *pdata;
     gdouble font_size;
@@ -1192,7 +1202,7 @@ prepare_gpg_signature(PrintInfo * pi, LibBalsaMessageBody * body)
     }
 
     pdata = g_malloc(sizeof(PlainTextInfo));
-    pdata->id_tag = BALSA_PRINT_TYPE_GPG_SIGN;
+    pdata->id_tag = BALSA_PRINT_TYPE_CRYPT_SIGN;
 
     /* create a buffer with the signature info */
     textbuf =
@@ -1225,12 +1235,12 @@ prepare_gpg_signature(PrintInfo * pi, LibBalsaMessageBody * body)
 }
 
 static void
-print_gpg_signature(PrintInfo * pi, gpointer * data)
+print_crypto_signature(PrintInfo * pi, gpointer * data)
 {
     PlainTextInfo *pdata = (PlainTextInfo *)data;
     GList *l;
 
-    g_return_if_fail(pdata->id_tag == BALSA_PRINT_TYPE_GPG_SIGN);
+    g_return_if_fail(pdata->id_tag == BALSA_PRINT_TYPE_CRYPT_SIGN);
 
     gnome_print_setfont(pi->pc, pi->header_font);
     l = pdata->textlines;
@@ -1272,7 +1282,10 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
 	{"image", prepare_image},
 	{"message/rfc822", prepare_embedded_header},
 #ifdef HAVE_GPGME
-	{"application/pgp-signature", prepare_gpg_signature},
+        {"application/pgp-signature", prepare_crypto_signature},
+#ifdef HAVE_SMIME
+        {"application/pkcs7-signature", prepare_crypto_signature},
+#endif
 #endif
 	{NULL, prepare_default}           /* anything else... */
     };
@@ -1445,7 +1458,7 @@ print_message(PrintInfo * pi)
 	    break;
 #ifdef HAVE_GPGME
 	case BALSA_PRINT_TYPE_GPG_SIGN:
-	    print_gpg_signature(pi, print_task->data);
+	    print_crypto_signature(pi, print_task->data);
 #endif
 	default:
 	    break;
@@ -1486,8 +1499,8 @@ print_message(PrintInfo * pi)
 		print_image(pi, print_task->data);
 		break;
 #ifdef HAVE_GPGME
-	    case BALSA_PRINT_TYPE_GPG_SIGN:
-		print_gpg_signature(pi, print_task->data);
+	    case BALSA_PRINT_TYPE_CRYPT_SIGN:
+		print_crypto_signature(pi, print_task->data);
 		break;
 #endif
 	    default:

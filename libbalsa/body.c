@@ -82,7 +82,8 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
 
 #ifdef HAVE_GPGME
     g_free(body->decrypt_file);
-    body->sig_info = libbalsa_signature_info_destroy(body->sig_info);
+    if (body->sig_info)
+	g_object_unref(G_OBJECT(body->sig_info));
 #endif
 
     libbalsa_message_body_free(body->next);

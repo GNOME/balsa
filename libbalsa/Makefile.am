@@ -2,6 +2,28 @@ SUBDIRS = imap
 
 noinst_LIBRARIES = libbalsa.a
 
+
+if BUILD_WITH_GPGME
+libbalsa_gpgme_extra = 		\
+	gmime-gpgme-context.h	\
+	gmime-gpgme-context.c	\
+	gmime-part-rfc2440.h	\
+	gmime-part-rfc2440.c	\
+	gmime-gpgme-signature.h	\
+	gmime-gpgme-signature.c
+
+# the gpgme extension needs gtk_menu for the identity :-/
+xDEFS = -DG_DISABLE_DEPRECATED   \
+       -DGNOME_DISABLE_DEPRECATED
+else
+libbalsa_gpgme_extra=
+
+xDEFS = -DG_DISABLE_DEPRECATED   \
+       -DGTK_DISABLE_DEPRECATED \
+       -DGNOME_DISABLE_DEPRECATED
+endif
+
+
 libbalsa_a_SOURCES = 		\
 	abook-completion.c	\
 	abook-completion.h	\
@@ -33,8 +55,6 @@ libbalsa_a_SOURCES = 		\
 	filter.h		\
 	folder-scanners.c	\
 	folder-scanners.h	\
-	gmime-gpgme-context.c   \
-	gmime-gpgme-context.h   \
 	html.c                  \
 	html.h                  \
 	identity.c		\
@@ -83,17 +103,20 @@ libbalsa_a_SOURCES = 		\
 	imap-server.h		\
 	source-viewer.c		\
 	url.c			\
-	url.h
+	url.h			\
+	${libbalsa_gpgme_extra}
 
 
 EXTRA_DIST = \
-	libbalsa-marshal.list
+	libbalsa-marshal.list	\
+	padlock-keyhole.xpm
 
 INCLUDES= -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	-I${top_srcdir}/libbalsa/imap \
 	$(BALSA_CFLAGS)
 
-DEFS = 
+DEFS=${xDEFS}
+
 
 #Signal marshallers
 marshal_prefix = libbalsa

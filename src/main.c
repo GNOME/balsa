@@ -457,6 +457,10 @@ main(int argc, char *argv[])
 #ifdef HAVE_GPGME
     /* initialise the gpgme library */
     g_message("init gpgme version %s", gpgme_check_version(NULL));
+#ifdef ENABLE_NLS
+    gpgme_set_locale(NULL, LC_CTYPE, setlocale(LC_CTYPE, NULL));
+    gpgme_set_locale(NULL, LC_MESSAGES, setlocale(LC_MESSAGES, NULL));
+#endif /* ENABLE_NLS */
 #endif
 
 #ifdef BALSA_USE_THREADS
@@ -506,6 +510,17 @@ main(int argc, char *argv[])
 		     G_CALLBACK(balsa_save_session), argv[0]);
     g_signal_connect(G_OBJECT(client), "die",
 		     G_CALLBACK(balsa_kill_session), NULL);
+
+#ifdef HAVE_GPGME
+    balsa_app.has_openpgp = 
+        libbalsa_check_crypto_engine(GPGME_PROTOCOL_OpenPGP);
+#ifdef HAVE_SMIME
+    balsa_app.has_smime =
+       libbalsa_check_crypto_engine(GPGME_PROTOCOL_CMS);
+#else
+    balsa_app.has_smime = FALSE;
+#endif /* HAVE_SMIME */
+#endif /* HAVE_GPGME */
     
     if (opt_compose_email || opt_attach_list) {
         BalsaSendmsg *snd;

@@ -84,6 +84,9 @@ enum {
     CHANGED,
     MESSAGE_EXPUNGED,
     PROGRESS_NOTIFY,
+#ifdef HAVE_GPGME
+    CRYPT_STATUS_CHANGED,
+#endif
     LAST_SIGNAL
 };
 

@@ -291,7 +291,13 @@ struct LibBalsaMailboxIndexEntry_ {
     unsigned short attach_icon;
     unsigned long size;
     unsigned unseen:1;
+#define CACHE_UNSEEN_CHILD FALSE
+#if CACHE_UNSEEN_CHILD
+    /* Code for managing this cached bit is incomplete; if calculating
+     * has-unseen-child status on the fly is a performance hit, we'll
+     * have to finish it. */
     unsigned has_unseen_child:1;
+#endif /* CACHE_UNSEEN_CHILD */
 } ;
 
 static gchar*
@@ -335,7 +341,9 @@ libbalsa_mailbox_index_entry_new_from_msg(LibBalsaMessage *msg)
     entry->attach_icon   = msg->attach_icon;
     entry->size          = msg->length;
     entry->unseen        = LIBBALSA_MESSAGE_IS_UNREAD(msg);
+#if CACHE_UNSEEN_CHILD
     entry->has_unseen_child = 0; /* Find out after threading. */
+#endif /* CACHE_UNSEEN_CHILD */
     return entry;
 }
 
@@ -957,6 +965,7 @@ lbm_threads_leave(gboolean unlock)
 #define lbm_threads_leave(unlock)
 #endif
 
+#if CACHE_UNSEEN_CHILD
 /* Does the node have an unseen child? */
 static gboolean
 lbm_node_has_unseen_child(LibBalsaMailbox * mailbox, GNode * node)
@@ -967,8 +976,7 @@ lbm_node_has_unseen_child(LibBalsaMailbox * mailbox, GNode * node)
 	guint msgno = GPOINTER_TO_UINT(node->data);
 	LibBalsaMailboxIndexEntry *entry =
 	    g_ptr_array_index(mailbox->mindex, msgno - 1);
-	if (entry->has_unseen_child
-	    || entry->status_icon == LIBBALSA_MESSAGE_STATUS_UNREAD)
+	if (entry && (entry->unseen || entry->has_unseen_child))
 	    return TRUE;
     }
     return FALSE;
@@ -1002,6 +1010,24 @@ lbm_entry_check(LibBalsaMailbox * mailbox, guint msgno)
                 unread ? 1 : lbm_node_has_unseen_child(mailbox, node);
     }
 }
+#else  /* CACHE_UNSEEN_CHILD */
+static LibBalsaMailboxIndexEntry *lbm_get_index_entry(LibBalsaMailbox *
+						      lmm, unsigned msgno);
+/* Does the node (non-NULL) have unseen children? */
+static gboolean
+lbm_node_has_unseen_child(LibBalsaMailbox * lmm, GNode * node)
+{
+    for (node = node->children; node; node = node->next) {
+	guint msgno = GPOINTER_TO_UINT(node->data);
+	LibBalsaMailboxIndexEntry *entry =
+	    /* g_ptr_array_index(lmm->mindex, msgno - 1); ?? */
+	    lbm_get_index_entry(lmm, msgno);
+	if ((entry && entry->unseen) || lbm_node_has_unseen_child(lmm, node))
+	    return TRUE;
+    }
+    return FALSE;
+}
+#endif /* CACHE_UNSEEN_CHILD */
 
 void
 libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
@@ -1028,7 +1054,9 @@ libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
                   path, &iter);
     gtk_tree_path_free(path);
 
+#if CACHE_UNSEEN_CHILD
     lbm_entry_check(mailbox, seqno);
+#endif /* CACHE_UNSEEN_CHILD */
 
     lbm_threads_leave(unlock);
 }
@@ -1724,6 +1752,7 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
     libbalsa_unlock_mailbox(mailbox);
 }
 
+#if CACHE_UNSEEN_CHILD
 /* GNode traverse func, called top-down: clear the current node's
  * has_unseen_child flag, and if current node is unseen, set ancestors'
  * flags; break when we find an ancestor with the flag already set,
@@ -1752,6 +1781,7 @@ lbm_check_unseen_child(GNode * node, LibBalsaMailbox * mailbox)
     }
     return FALSE;
 }
+#endif /* CACHE_UNSEEN_CHILD */
 
 static void mbox_sort_helper(LibBalsaMailbox * mbox, GNode * parent);
 static void
@@ -1770,8 +1800,10 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
     if (mailbox->msg_tree->children)
         mbox_sort_helper(mailbox, mailbox->msg_tree);
 
+#if CACHE_UNSEEN_CHILD
     g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
 		    (GNodeTraverseFunc) lbm_check_unseen_child, mailbox);
+#endif /* CACHE_UNSEEN_CHILD */
 
     g_signal_emit(G_OBJECT(mailbox), libbalsa_mailbox_signals[CHANGED], 0);
 
@@ -2149,8 +2181,15 @@ mbox_model_get_value(GtkTreeModel *tree_model,
                          ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
         break;
     case LB_MBOX_STYLE_COL:
+#if CACHE_UNSEEN_CHILD
         g_value_set_uint(value, msg && msg->has_unseen_child
                          ? PANGO_STYLE_OBLIQUE : PANGO_STYLE_NORMAL);
+#else  /* CACHE_UNSEEN_CHILD */
+        g_value_set_uint(value, msg &&
+			 lbm_node_has_unseen_child(lmm,
+						   (GNode *) iter->user_data)
+                         ? PANGO_STYLE_OBLIQUE : PANGO_STYLE_NORMAL);
+#endif /* CACHE_UNSEEN_CHILD */
         break;
     }
 }

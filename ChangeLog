@@ -1,3 +1,9 @@
+2001-03-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/main-window.c: do mailbox notify_check() in the checking thread.
+	* libbalsa/body.c: security fix: use safe_fopen.
+	* libbalsa/folder-scanners.c: make scanning work for Cyrus IMAPD.
+	
 2001-03-03  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/folder-scanners.[hc]: repsect libbalsa_ namespace.

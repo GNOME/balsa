@@ -1,14 +1,10 @@
-1998-12-26  root  <root@la-rochelle4-70.club-internet.fr>
-
-	
-
 1998-12-26  bertrand <bertrand.guiheneuf@inria.fr>
 
 	* src/balsa-message.c (balsa_message_new): corrected the bug
 	that made some widget background white instead of their
 	normal background.
 	
-	* src/sendmsg-window.c (create_info_pane): idem as above.
+	* src/sendmsg-window.c (create_info_pane): idem as above. 
 	
 
 1998-12-19  Joel Becker  <jlbec@ocala.cs.miami.edu>

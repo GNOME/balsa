@@ -76,6 +76,7 @@ libbalsa_a_SOURCES = 		\
 	information.h		\
 	libbalsa.c		\
 	libbalsa.h		\
+	libbalsa-conf.h		\
 	libbalsa-marshal.c	\
 	libbalsa-marshal.h	\
 	libbalsa_private.h	\

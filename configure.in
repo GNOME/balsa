@@ -22,7 +22,7 @@ AC_SUBST(BALSA_VERSION)
 AC_INIT(src/balsa-app.h)
 AM_INIT_AUTOMAKE(balsa, "$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}")
 AC_CONFIG_SRCDIR([src/main.c])
-AC_CONFIG_HEADER([config.h])
+AM_CONFIG_HEADER([config.h])
 
 AC_DEFINE_UNQUOTED(BALSA_MAJOR, $BALSA_MAJOR,
                    [Define to the Balsa major version])
@@ -197,7 +197,7 @@ AM_GLIB_GNU_GETTEXT
 
 # sendmail
 #
-if test x"$with_esmtp" != xno; then
+if test x"$with_esmtp" = xno; then
 AC_PATH_PROG(SENDMAIL, sendmail, no, $PATH:/usr/sbin:/usr/lib)
 AC_DEFINE_UNQUOTED(SENDMAIL, "$ac_cv_path_SENDMAIL",
 		   [Path to sendmail program.])

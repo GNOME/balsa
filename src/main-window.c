@@ -925,7 +925,7 @@ static GnomeUIInfo tu_view_more_menu[] = {
     GNOMEUIINFO_SUBTREE(N_("_Sort Mailbox"), tu_view_sort_menu),
     GNOMEUIINFO_SUBTREE(N_("_Hide messages"), mailbox_hide_menu),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_VIEW_EXPAND_ALL_POS (MENU_VIEW_NEXT_FLAGGED_POS+6)
+#define MENU_VIEW_EXPAND_ALL_POS (MENU_VIEW_NEXT_FLAGGED_POS+7)
     { GNOME_APP_UI_ITEM, N_("E_xpand All"),
      N_("Expand all threads"),
      expand_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
@@ -936,6 +936,7 @@ static GnomeUIInfo tu_view_more_menu[] = {
      collapse_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
      NULL, 'L', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
+#define MENU_VIEW_VIEW_FILTER_POS (MENU_VIEW_COLLAPSE_ALL_POS+2)
     GNOMEUIINFO_TOGGLEITEM(N_("_View filter"),
                            N_("Enable quick message index filter"),
                            enable_view_filter_cb, NULL),
@@ -1366,10 +1367,10 @@ bw_create_index_widget(BalsaWindow *bw)
                              bw->sos_entry);
     gtk_widget_show_all(button);
     vbox = gtk_vbox_new(FALSE, 0);
-#if defined(ENABLE_VIEW_FILTER)
+#if defined(ENABLE_TOUCH_UI)
     /* Usually we want to show the widget unless we operate in
      * space-constrained conditions. */
-    if(balsa_app.enable_view_filter) 
+    if(balsa_app.enable_view_filter)
 #endif
         gtk_widget_show(hbox);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
@@ -1554,6 +1555,11 @@ balsa_window_new()
                                        (view_menu[MENU_VIEW_MAILBOX_TABS_POS].widget),
                                        TRUE);
 #else
+    if (balsa_app.enable_view_filter)
+        gtk_check_menu_item_set_active
+            (GTK_CHECK_MENU_ITEM
+             (tu_view_more_menu[MENU_VIEW_VIEW_FILTER_POS].widget),
+             TRUE);
     g_signal_connect_after(G_OBJECT(window), "key_press_event",
                      G_CALLBACK(open_mailbox_cb), NULL);
 #endif

@@ -177,7 +177,6 @@ balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
     balsa_app.smtp_server =
         gtk_editable_get_chars(GTK_EDITABLE(user->smtp), 0, -1);
 #endif
-    if (balsa_app.local_mail_directory);
     g_free(balsa_app.local_mail_directory);
     balsa_app.local_mail_directory =
         gtk_editable_get_chars(GTK_EDITABLE(user->localmaildir), 0, -1);

@@ -682,11 +682,20 @@ mailbox_conf_update(MailboxConfWindow *mcw)
         if(mcw->mailbox_name) {
  	    name = gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name));
             g_free(mailbox->name);
-            mailbox->name = g_strdup(name);
-        } else { /* shortcut: this will destroy mailbox */
-            balsa_mailbox_local_rescan_parent(mailbox); 
-            balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
-            return;
+            mcw->mailbox->name = g_strdup(name);
+        } else { 
+	    /* The mailbox may be located in local mail directory.
+	       If so, just repopulate the tree. If not, must set name.
+	    */
+	    if(strncmp(balsa_app.local_mail_directory, filename,
+		       strlen(balsa_app.local_mail_directory))==0) {
+		balsa_mailbox_local_rescan_parent(mailbox); 
+		balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
+		return;
+	    } else {
+		g_free(mailbox->name);
+		mailbox->name = g_strdup(g_basename(filename));
+	    }
         }
     } else if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	update_pop_mailbox(mcw);
@@ -733,9 +742,10 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 		       strlen(balsa_app.local_mail_directory)) != 0;
 
 	if(save_to_config) {
+	    mcw->mailbox->name = g_strdup(g_basename(path));
 	    node =g_node_new(mbnode);
 	    g_node_append(balsa_app.mailbox_nodes, node);
-	}
+	} 
     } else if ( LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox) ) {
 	/* POP3 Mailboxes */
 	update_pop_mailbox(mcw);
@@ -788,7 +798,10 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
     table = gtk_table_new(2, 2, FALSE);
 
     /* mailbox name */
-    if(mcw->mailbox && BALSA_IS_MAILBOX_SPECIAL(mcw->mailbox)) {
+    if(mcw->mailbox && 
+       (BALSA_IS_MAILBOX_SPECIAL(mcw->mailbox) ||
+	strncmp(mcw->mailbox->name, balsa_app.local_mail_directory,
+		strlen(balsa_app.local_mail_directory)!=0)) ) {
         create_label(_("Mailbox _Name:"), table, 0, &keyval);
         mcw->mailbox_name = 
             create_entry(mcw->window, table,

@@ -447,8 +447,54 @@ align="center"></graphic>
 	</para>
       </listitem>
 
-    </itemizedlist>
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>F6</keysym></shortcut>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Search</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Search a message by a substring or regular expression match.
+	</para>
+      </listitem>
 
+      <listitem>
+	<para>
+	  <menuchoice>
+            <shortcut>
+              <keycombo><keysym>Shift</keysym><keysym>F6</keysym></keycombo>
+            </shortcut>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Search again</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Search the next matching message.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Filters</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Opens a dialog box to edit the filters.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Export filters</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Opens a dialog box to export the filters as Sieve scripts
+          (they can be used by all Sieve-enabled applications). It
+          display the list of all filters among which you select the
+          filters you want to export. Each filter is exported as a
+          file named : filter name.siv.
+	</para>
+      </listitem>
+    </itemizedlist>
   </listitem>
 </varlistentry>
 
@@ -3107,6 +3153,237 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 </varlistentry>
 </variablelist>
 
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SECTION: FILTERS WINDOW                           -->
+<!-- ################################################################# -->
+<sect1 id="win-filters">
+  <title>The Filters Window</title>
+  <para>
+    This window is divided in two parts : the left part is the list of all
+    filters. When you select one of them, the right part displays its
+    properties. The right part is a two pages notebook
+    (<link linkend="wf-match-page">
+       <guilabel>the match page</guilabel>
+     </link>, and 
+     <link linkend="wf-action-page">
+       <guilabel>the action page</guilabel>
+     </link>),
+     their descriptions follow.
+  </para>
+  <para>
+    There are two buttons under the filters list :
+    <itemizedlist>
+      <listitem>  
+        <para>
+          The New button : you click on it to create a new filter, it is
+          named "New Filter", and contains no condition. Then you fill in
+          the different fields in the notebook pages (in particular remember
+          to change the name of the filter), add the conditions that will
+          describe how this filters matches a message, and to confirm
+          the modifications push the Apply button on the right hand side
+          of the Filters window.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The Remove button : removes the currently selected filter.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+  <sect2 id="wf-match-page">
+    <title>The match page</title>
+
+    <para>
+      Each filter is made of one or several conditions, each one represents
+      a test to be applied to the messages. The results of these tests is
+      then combined following the type of operation specified :
+      <itemizedlist>
+	<listitem>  
+          <para>
+            AND : all condition tests must be true to make the match.
+          </para>
+        </listitem>
+	<listitem>  
+          <para>
+            OR : one condition test must be true to make the match.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </para>
+    <para>
+      Then the page displays the name of the filter and the conditions that 
+      describes how the filters matches a message. The list displays the
+      type of the conditions (the conditions will be described later) :
+      <itemizedlist>
+        <listitem>
+	  <para>
+            Simple : the match is done by a simple substring test.
+	  </para>
+        </listitem>
+        <listitem>
+        <para>
+          Regular expression : the match uses regular expressions on the
+          message headers.
+        </para>
+        </listitem>
+        <listitem>
+          <para>
+            Date interval : the match is done by checking if the date of the
+            message is within certain bounds.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Flag condition : the match is done by checking the flags of the
+            message : unread, replied, deleted, flagged.
+          </para>
+        </listitem>
+      </itemizedlist>
+      The three buttons under the list allows you to edit the selected
+      condition, add a new one, or remove one. Edition or creation of a 
+      condition is done in the
+      <link linkend="win-condition">
+        <guilabel>condition window</guilabel>
+      </link>,
+      that pops up when you click on the Edit or the New button.
+    </para>
+    <para>
+      The two buttons under the notebook at the right hand side of the window
+      lets you manipulate the currently selected filter. The Apply button
+      is used to confirm the modifications you have made on any field. If you
+      make changes and select another filter without first clicking on the
+      Apply button, all your changes will be lost.
+    </para>
+    <para>
+      The Revert button cancels all previous changes : the current filter
+      is reverted to its state just before the last click on the Apply button.
+    </para>
+  </sect2>
+  <sect2 id="wf-action-page">
+    <title>The action page</title>
+
+    <para>
+      This page describes the actions to take in case the filter matches. First
+      you specify the notification to inform you that the one or several messages
+      has matched the filter in the Notification frame. Then in the Action frame
+      you tell what to do with the matching messages. You can ask &Balsa; to copy
+      or move them to any mailbox, or to send them to the trash can. The other
+      actions are not yet implemented.
+    </para>
+  </sect2>
+  <sect2 id="win-condition">
+    <title>The condition window</title>
+    <para>
+      This window is used to edit an existing condition or to create a new
+      one. It displays all the information needed to describe the condition,
+      it is launched when you click on the Edit or New buttons under the
+      conditions list in the match page of the notebook in the right part
+      of the
+      <link linkend="win-filters">
+        <guilabel>filters window</guilabel>
+      </link>.
+    </para>
+    <para>
+      This window is made of three frames :
+      <itemizedlist>
+        <listitem>
+	  <para>
+            The "Match in" frame : it's a set of check boxes, one per match
+            field. For example if you want to match all messages that was
+            sent by hotmail users, you just have to check the From box, or
+            if you want to match all messages about balsa, check the Subject
+            box.
+	  </para>
+	  <warning>
+	    <para>
+	      Be careful with Body match, this can take time for large messages.
+            </para>
+	  </warning>
+	  <para>
+            For advanced use you can also specify directly the name of the header
+            to match on. A standard example the "X-Mailer" is a header added
+            to your message by the MUAs with their name and versions.
+          </para>
+	  <para>
+            The All button will check all boxes, whereas the Clear button will
+            uncheck all boxes as you might have guessed.
+          </para>
+	  <para>
+            If you specify several headers, a message will match this condition
+            if one of the header matches. For example if you want to filter all
+            messages talking about Balsa, you should check the Body and the Subject
+            boxes, so that all mails with the word "Balsa" in its subject or its
+            body will match. You can also, if you're fed up with Balsa ;-), match
+            all mails that does NOT contain the word Balsa in their subject and in
+            their body neither. See the description of the search types to see
+            how to do this.
+          </para>
+        </listitem>
+        <listitem>
+        <para>
+          The "Search Type" frame : it's a list of the different condition types.
+          You choose Simple, Regular expression, Date interval, flag condition.
+          Your choice will change the third frame so that it displays the fields
+          needed by the type of match chosen.
+        </para>
+        </listitem>
+        <listitem>
+          <para>
+            This part depends on the search type you've chosen :
+            <itemizedlist>
+              <listitem>
+	        <para>
+                  Simple type : a text entry lets you input the string to look
+                  for (case does not matter, the search is case-insensitive).
+                  The button lets you specify if a message matches when the string
+                  is or is NOT a substring of the specified headers, the sentence
+                  above the text entry will be updated accordingly.
+                </para>
+	      </listitem>
+
+              <listitem>
+	        <para>
+                  Regular expression : you can input a list of regular expressions.
+                  You type your regular expression in the text entry, then you click
+                  on the Add button to put it into the list. Of course the Remove
+                  button destroys the selected regular expression in the list. The
+                  Last button "One matches/None matches" let you specify when a message
+                  matches the condition : when one of the regular expression matches
+                  or when none matches. The sentence above te list will be updated
+                  accordingly.
+                </para>
+	      </listitem>
+
+              <listitem>
+	        <para>
+                  Date interval : you can input the interval by the mean of the two
+                  text entries. A blank entry means no bound. The button tells to
+                  match when the message date is within the bounds or not. The 
+                  sentence above the text entries will be updated accordingly.
+                </para>
+	      </listitem>
+
+              <listitem>
+	        <para>
+                  Flag condition: the four check boxes let you select which messages
+                  will match this condition. If you want to match all replied OR
+                  unread messages, check the corresponding boxes. The button let you
+                  specify that the match will be done when none of the specified flags
+                  are set, the sentence above the check boxes will be updated accordingly.
+                  For example if you want to filter all read and replied messages, check
+                  the "unread" and "replied" boxes, and click on the button.
+                </para>
+	      </listitem>
+
+            </itemizedlist>
+          </para>
+        </listitem>
+      </itemizedlist>
+    </para>
+  </sect2>
 </sect1>
 
 <!-- ################################################################# -->

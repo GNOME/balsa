@@ -314,14 +314,14 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
        pixmaps, hope this one is correct*/
     /* Right/Add button */
     pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_FORWARD);
-    button = gnome_pixmap_button(pixmap,"");
+    button = gnome_pixmap_button(pixmap,_("Add"));
     gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
                               GTK_SIGNAL_FUNC(fr_add_pressed), 
                               GTK_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* Left/Remove button */
     pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_BACK);
-    button = gnome_pixmap_button(pixmap,"");
+    button = gnome_pixmap_button(pixmap,_("Remove"));
     gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
                               GTK_SIGNAL_FUNC(fr_remove_pressed), 
                               GTK_OBJECT(p));

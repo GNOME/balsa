@@ -1,3 +1,11 @@
+2002-08-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* help/C/balsa.sgml: Filters documentation (Emmanuel).
+	* libinit_balsa/balsa-druid-page-user.c: redudant line removed (Steve)
+	* src/filter-run-dialog.c: add names for conditions buttons.
+	* src/mailbox-conf.c: fix adding mailboxes out of local mail dir
+	hierarchy.
+
 2002-08-15  Steve Wall  <hitched97@myrealbox.com>
 
 	* configure.in: pass also -I when libestmp location specified.

@@ -2,6 +2,7 @@
 
 	* src/sendmsg-window.c: Celtic language support fixed.
 	* libbalsa/send.c: code cleanup on the way to fix the safe_free bug.
+	* src/balsa-message.c: safe handling of broken images.
 	
 2000-05-15  Pawel Salek <pawsa@theochem.kth.se>
 

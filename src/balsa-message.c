@@ -802,26 +802,38 @@ image2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
   filename = save_mime_part (message, bdy);
 #ifndef USE_PIXBUF
   im = gdk_imlib_load_image (filename);
-  item = gnome_canvas_item_new (group,
-				gnome_canvas_image_get_type (),
-				"image", im,
-				"x", 0.0,
-				"y", next_part_height (group),
-				"width", (double) im->rgb_width,
-				"height", (double) im->rgb_height,
-				"anchor", GTK_ANCHOR_NW,
-				NULL);
+  if(im) 
+      item = gnome_canvas_item_new (group,
+				    gnome_canvas_image_get_type (),
+				    "image", im,
+				    "x", 0.0,
+				    "y", next_part_height (group),
+				    "width", (double) im->rgb_width,
+				    "height", (double) im->rgb_height,
+				    "anchor", GTK_ANCHOR_NW,
+				    NULL);
+  else {
+      item = balsa_message_text_item ("--IMAGE--", group, 0.0,
+				      next_part_height (group), NULL);
+      balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
+  }
 #else
   pb = gdk_pixbuf_new_from_file(filename);
-  item = gnome_canvas_item_new (group,
-				gnome_canvas_pixbuf_get_type(),
-				"pixbuf", pb,
-				"x", 0.0,
-				"y", next_part_height(group),
-				"width", (double) gdk_pixbuf_get_width(pb),
-				"height", (double) gdk_pixbuf_get_height(pb),
-				"anchor", GTK_ANCHOR_NW,
-				NULL);
+  if(pb)
+      item = gnome_canvas_item_new (group,
+				    gnome_canvas_pixbuf_get_type(),
+				    "pixbuf", pb,
+				    "x", 0.0,
+				    "y", next_part_height(group),
+				    "width", (double) gdk_pixbuf_get_width(pb),
+				    "height", (double) gdk_pixbuf_get_height(pb),
+				    "anchor", GTK_ANCHOR_NW,
+				    NULL);
+  else {
+      item = balsa_message_text_item ("--IMAGE--", group, 0.0,
+				      next_part_height (group), NULL);
+      balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
+  }
 #endif
   info = balsa_save_file_info_new (NULL, message, bdy);
   gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), info);

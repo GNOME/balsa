@@ -1,3 +1,8 @@
+2001-05-28  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/send.c: display a clear message on message sending failure:
+	Fix #55065.
+
 2001-05-27  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Phase out imlib and replace it with gdk-pixbuf. The only

@@ -557,9 +557,10 @@ handle_successful_send (smtp_message_t message, void *arg)
 	libbalsa_message_delete(msg);
     } else {
 	/* XXX - Show the poor user the status codes and message. */
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("SMTP message transfer error.\n"
-			       "Your message is left in Outbox."));
+	libbalsa_information(
+	    LIBBALSA_INFORMATION_WARNING, 
+	    _("Message delivery problem, placing it into your outbox.\n" 
+	      "System will attempt to redeliver the message until you delete it."));
     }
 }
 

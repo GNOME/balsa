@@ -5,7 +5,6 @@ src/balsa-message.c
 src/index-child.c
 src/local-mailbox.c
 src/mailbox-conf.c
-src/mailbox-manager.c
 src/main-window.c
 src/main.c
 src/mblist-window.c
@@ -16,5 +15,6 @@ src/sendmsg-window.c
 
 libbalsa/libbalsa.c
 libbalsa/mailbox.c
+libbalsa/mime.c
 libbalsa/misc.c
 libbalsa/send.c

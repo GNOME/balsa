@@ -43,7 +43,7 @@ msgstr "\264\331\300\275..."
 msgid ""
 "Welcome to Balsa!\n"
 "\n"
-msgstr "Balsa \273\347\277\353\300\273 \310\257\277\265\307\325\264\317\264\331!"
+msgstr "Balsa \273\347\277\353\300\273 \310\257\277\265\307\325\264\317\264\331!\n"
 
 #: src/balsa-init.c:181
 msgid "You seem to be running Balsa for the first time.\n"

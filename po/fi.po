@@ -43,7 +43,7 @@ msgstr "Seuraava..."
 msgid ""
 "Welcome to Balsa!\n"
 "\n"
-msgstr "Tervetuloa Balsaan!"
+msgstr "Tervetuloa Balsaan!\n"
 
 #: src/balsa-init.c:181
 msgid "You seem to be running Balsa for the first time.\n"

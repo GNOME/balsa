@@ -1,3 +1,13 @@
+2000-06-16  Peter Williams  <peter@beta.newton.cx>
+
+	* src/filter-edit-dialog.c (fe_run_on): Change the confusing
+	string "Pre-Send" to "Before Sending" for the translators.
+
+2000-06-15  Peter Williams  <peter@beta.newton.cx>
+
+	* src/balsa-message.c (part_info_init_unknown): Increase
+	the padding for the "save part" button, aesthetic reasons.
+
 2000-06-15  Matthew Guenther <mguenthe@attcanada.ca>
 
 	* libbalsa/send.c: Changed balsa_lookup_mime_type to use

@@ -72,6 +72,8 @@ typedef enum
   IMCAP_THREAD_REFERENCES,
   IMCAP_UNSELECT,               /* FIXME: RFC? */
   IMCAP_SCAN,                   /* FIXME: RFC? */
+  IMCAP_CHILDREN,               /* RFC 3348 */
+  IMCAP_LITERAL,                /* RFC 2088 */
   IMCAP_MAX
 } ImapCapability;
 
@@ -168,6 +170,25 @@ ImapBody *imap_message_get_body_from_section(ImapMessage *msg,
                                              const char *section);
 
 /* ================ END OF BODY STRUCTURE FUNCTIONS ==================== */
+/* ================ BEGIN OF SEARCH FUNCTIONS ========================== */
+typedef enum { IMSE_S_BCC, IMSE_S_BODY, IMSE_S_CC, IMSE_S_FROM, 
+               IMSE_S_SUBJECT, IMSE_S_TEXT, IMSE_S_TO } ImapSearchHeader;
+
+typedef struct ImapSearchKey_ ImapSearchKey;
+
+ImapSearchKey *imap_search_key_new_or(unsigned negated,
+                                      ImapSearchKey *a, ImapSearchKey *b,
+                                       ImapSearchKey *next);
+ImapSearchKey *imap_search_key_new_flag(unsigned negated, ImapMsgFlag flg,
+                                        ImapSearchKey *next);
+ImapSearchKey *imap_search_key_new_string(unsigned negated,
+                                          ImapSearchHeader hdr,
+                                          const char *string,
+                                          ImapSearchKey *next);
+void imap_search_key_free(ImapSearchKey *s);
+ImapResponse imap_search_exec(ImapMboxHandle *h, ImapSearchKey *s,
+                              ImapSearchCb cb, void *cb_arg);
+/* ================ END OF SEARCH FUNCTIONS ============================ */
 
 /* ================ BEGIN OF MBOX_VIEW FUNCTIONS ======================= */
 typedef struct _MboxView MboxView;

@@ -110,6 +110,10 @@ gchar*             libbalsa_condition_to_string(LibBalsaCondition *cond);
 LibBalsaCondition* libbalsa_condition_new_flag_enum(gboolean negated,
                                                     LibBalsaMessageFlag flgs);
 
+LibBalsaCondition* libbalsa_condition_new_string(gboolean negated,
+                                                 unsigned headers,
+                                                 gchar *str,
+                                                 gchar *user_header);
 LibBalsaCondition* libbalsa_condition_new_bool_ptr(gboolean negated,
                                                    ConditionMatchType cmt,
                                                    LibBalsaCondition *left,
@@ -221,9 +225,6 @@ void libbalsa_condition_prepend_regex(LibBalsaCondition* cond,
 gboolean libbalsa_condition_matches(LibBalsaCondition* cond,
                                     LibBalsaMessage* message,
                                     gboolean mbox_locked);
-
-
-gchar* libbalsa_condition_build_imap_query(LibBalsaCondition *condition);
 
 /* Filtering functions */
 /* FIXME : perhaps I should try to use multithreading -> but we must

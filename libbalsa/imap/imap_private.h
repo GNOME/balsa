@@ -63,12 +63,20 @@ struct _ImapMboxHandle {
   unsigned require_tls:1;
 };
 
+#define IMAP_MBOX_IS_DISCONNECTED(h)  ((h)->state == IMHS_DISCONNECTED)
+#define IMAP_MBOX_IS_CONNECTED(h)     ((h)->state == IMHS_CONNECTED)
+#define IMAP_MBOX_IS_AUTHENTICATED(h) ((h)->state == IMHS_AUTHENTICATED)
+#define IMAP_MBOX_IS_SELECTED(h)      ((h)->state == IMHS_SELECTED)
+
 extern const char* msg_flags[6];
 
 void imap_mbox_resize_cache(ImapMboxHandle *h, unsigned new_size);
 
 ImapResponse imap_cmd_exec(ImapMboxHandle* handle, const char* cmd);
 char* imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz);
+
+ImapResponse imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s,
+                            int use_literal);
 
 #ifdef USE_TLS
 #include <openssl/ssl.h>
@@ -79,8 +87,9 @@ ImapResponse imap_handle_setup_ssl(ImapMboxHandle *handle, SSL *ssl);
 /* even more private functions */
 int imap_cmd_start(ImapMboxHandle* handle, const char* cmd, unsigned* cmdno);
 ImapResponse imap_cmd_step(ImapMboxHandle* handle, unsigned cmdno);
-int imap_handle_write(ImapMboxHandle *conn, const char *buf, size_t len);
-void imap_handle_flush(ImapMboxHandle *handle);
+int      imap_handle_write(ImapMboxHandle *conn, const char *buf, size_t len);
+void     imap_handle_flush(ImapMboxHandle *handle);
+unsigned imap_make_tag(ImapCmdTag tag);
 void mbox_view_append_no(MboxView *mv, unsigned seqno);
 
 #endif /* __IMAP_PRIVATE_H__ */

@@ -73,15 +73,15 @@ ImapResponse imap_handle_starttls(ImapMboxHandle *handle);
 ImapResult imap_mbox_scan(ImapMboxHandle *r, const char*what, const char*str);
 ImapResponse imap_mbox_unselect(ImapMboxHandle *h);
 ImapResult imap_mbox_thread(ImapMboxHandle *h, const char *how,
-                            const char *filter);
+                            ImapSearchKey *filter);
 
-ImapResponse imap_mbox_uid_search(ImapMboxHandle *handle, const char *query, 
+ImapResponse imap_mbox_uid_search(ImapMboxHandle *handle, ImapSearchKey *key,
                                   void (*cb)(unsigned uid, void *),
                                   void *cb_data);
 
 ImapResponse imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
                                   int ascending, int *msgno, unsigned cnt);
 ImapResponse imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key,
-                                   int ascending, char *filter);
+                                   int ascending, ImapSearchKey *filter);
 
 #endif /* __IMAP_COMMANDS_H__ */

@@ -63,11 +63,6 @@ struct _ImapMboxHandleClass {
   void (*exists_notify)(ImapMboxHandle* handle);
 };
 
-#define IMAP_MBOX_IS_DISCONNECTED(h)  ((h)->state == IMHS_DISCONNECTED)
-#define IMAP_MBOX_IS_CONNECTED(h)     ((h)->state == IMHS_CONNECTED)
-#define IMAP_MBOX_IS_AUTHENTICATED(h) ((h)->state == IMHS_AUTHENTICATED)
-#define IMAP_MBOX_IS_SELECTED(h)      ((h)->state == IMHS_SELECTED)
-
 enum _ImapHandleSignal {
   FETCH_RESPONSE,
   LIST_RESPONSE,
@@ -424,7 +419,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
   return IMAP_SUCCESS;
 }
 
-static unsigned
+unsigned
 imap_make_tag(ImapCmdTag tag)
 {
   static unsigned no = 0; /* MT-locking here */
@@ -1085,8 +1080,8 @@ imap_cmd_exec(ImapMboxHandle* handle, const char* cmd)
     rc = imap_cmd_step (handle, cmdno);
   } while (rc == IMR_UNTAGGED);
 
-  if (rc != IMR_OK)
-    g_warning("cmd '%s' failed, rc=%d.\n", cmd, rc);
+  if (rc != IMR_OK) /* we should be silent here */
+    printf("cmd '%s' failed, rc=%d.\n", cmd, rc);
 
   return rc;
 }
@@ -1256,7 +1251,8 @@ ir_capability_data(ImapMboxHandle *handle)
   static const char* capabilities[] = {
     "IMAP4", "IMAP4rev1", "STATUS", "ACL", "NAMESPACE", "AUTH=CRAM-MD5", 
     "AUTH=GSSAPI", "AUTH=ANONYMOUS", "STARTTLS", "LOGINDISABLED", "SORT",
-    "THREAD=ORDEREDSUBJECT", "THREAD=REFERENCES", "UNSELECT", "SCAN"
+    "THREAD=ORDEREDSUBJECT", "THREAD=REFERENCES", "UNSELECT", "SCAN",
+    "CHILDREN", "LITERAL+"
   };
   unsigned x;
   int c;

@@ -203,6 +203,7 @@ static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
 
 static void hide_changed_cb(GtkWidget * widget, gpointer data);
+static void show_name_cb(GtkWidget * widget, gpointer data);
 static void mailbox_commit_changes(GtkWidget * widget, gpointer data);
 static void mailbox_commit_all(GtkWidget * widget, gpointer data);
 
@@ -648,6 +649,9 @@ static GnomeUIInfo mailbox_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_HIDE_POS (MENU_MAILBOX_NEXT_FLAGGED_POS+2)
     GNOMEUIINFO_SUBTREE(N_("_Hide messages"), mailbox_hide_menu),
+    /* the next one is for testing only */
+    GNOMEUIINFO_TOGGLEITEM_DATA(N_("Show from _name"),  "",
+     show_name_cb, GINT_TO_POINTER(0), NULL),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_MARK_ALL_POS (MENU_MAILBOX_HIDE_POS+2)
     {
@@ -3128,6 +3132,23 @@ hide_changed_cb(GtkWidget * widget, gpointer data)
     libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
     /* make it persistent */
     mailbox->view->filter = balsa_window_filter_to_int();
+}
+
+static void
+show_name_cb(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *index = balsa_window_find_current_index(balsa_app.main_window);
+    LibBalsaMailbox *mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
+    LibBalsaCondition *filter, *name;
+    filter = balsa_window_get_view_filter(balsa_app.main_window);
+    name = libbalsa_condition_new_string(FALSE,CONDITION_MATCH_FROM,
+                                         "balsa",NULL);
+    if(filter)
+        filter = libbalsa_condition_new_bool_ptr
+            (FALSE, CONDITION_AND, name, filter);
+    else 
+        filter = name;
+    libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
 }
 
 static void

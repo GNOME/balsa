@@ -81,9 +81,8 @@ libbalsa_condition_new(void)
 #endif
 
 static LibBalsaCondition*
-libbalsa_condition_new_string(gboolean negated, gchar **string)
+libbalsa_condition_new_string_parse(gboolean negated, gchar **string)
 {
-    LibBalsaCondition *cond;
     char *str, *user_header = NULL;
     int i, headers = atoi(*string);
     for(i=0; (*string)[i] && isdigit((int)(*string)[i]); i++)
@@ -104,6 +103,14 @@ libbalsa_condition_new_string(gboolean negated, gchar **string)
         g_free(user_header);
         return NULL;
     }
+    return libbalsa_condition_new_string(negated, headers, str, user_header);
+}
+
+LibBalsaCondition*
+libbalsa_condition_new_string(gboolean negated, unsigned headers,
+                              gchar *str, gchar *user_header)
+{
+    LibBalsaCondition *cond;
     cond = g_new(LibBalsaCondition,1);
     cond->negate = negated;
     cond->type = CONDITION_STRING;
@@ -237,7 +244,7 @@ libbalsa_condition_new_from_string(gchar **string)
         unsigned keylen;
         LibBalsaCondition *(*parser)(gboolean negate, gchar **str);
     } cond_types[] = {
-        { "STRING ", 7, libbalsa_condition_new_string },
+        { "STRING ", 7, libbalsa_condition_new_string_parse },
         { "DATE ",   5, libbalsa_condition_new_date   },
         { "FLAG ",   5, libbalsa_condition_new_flag   },
         { "AND ",    4, libbalsa_condition_new_and    },

@@ -864,6 +864,107 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
     run_filters_on_reception(LIBBALSA_MAILBOX_IMAP(mailbox));
 }
 
+static ImapSearchKey*
+lbmi_build_imap_query(LibBalsaCondition* cond, ImapSearchKey *last)
+{
+    ImapSearchKey *query = NULL;
+
+    if(!cond) return NULL;
+
+    switch (cond->type) {
+    case CONDITION_STRING:
+        if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO))
+            query = imap_search_key_new_string
+                (cond->negate, IMSE_S_TO, cond->match.string.string, last);
+        if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM))
+            query = imap_search_key_new_string
+                (cond->negate, IMSE_S_FROM, cond->match.string.string, last);
+        if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT))
+            query = imap_search_key_new_string
+                (cond->negate, IMSE_S_SUBJECT,cond->match.string.string,last);
+        if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC))
+            query = imap_search_key_new_string
+                (cond->negate, IMSE_S_CC, cond->match.string.string, last);
+        if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY))
+            query = imap_search_key_new_string
+                (cond->negate, IMSE_S_BODY, cond->match.string.string, last);
+#if 0
+        if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
+            gchar * tmp = g_strdup_printf("HEADER %s", cond->user_header);
+            extend_query(buffer, tmp, cond->match.string.string, last);
+            g_free(tmp);
+        }
+#endif
+        break;
+    case CONDITION_DATE:
+#if 0
+        str = NULL;
+        if (cond->match.date.date_low) {
+            date = localtime(&cond->match.date.date_low);
+            strftime(str_date, sizeof(str_date), "%Y-%m-%d", date);
+            str = g_strdup_printf("SENTSINCE %s",str_date);
+        }
+        if (cond->match.date.date_high) {
+            if (str) {
+                g_string_append_c(buffer, '(');
+                g_string_append(buffer, str);
+                g_string_append_c(buffer, ' ');
+                g_free(str);
+            }
+            date = localtime(&cond->match.date.date_high);
+            strftime(str_date, sizeof(str_date), "%Y-%m-%d", date);
+            str = g_strdup_printf("SENTBEFORE %s", str_date);
+        }
+        /* If no date has been put continue (this is not allowed normally
+           but who knows */
+        if (str) {
+            if(cond->negate)
+                extend_query(buffer, "NOT");
+            g_string_append(buffer, str);
+            g_free(str);
+            if (buffer->str[0]=='(')
+                g_string_append_c(buffer, ')');
+            g_string_prepend(buffer, "NOT ");
+        }
+#endif
+        break;
+    case CONDITION_FLAG:
+        if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
+            query = imap_search_key_new_flag
+                (cond->negate, IMSGF_ANSWERED, last);
+        if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_NEW)
+            query = imap_search_key_new_flag
+                (!cond->negate, IMSGF_SEEN, last);
+        if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+            query = imap_search_key_new_flag
+                (cond->negate, IMSGF_DELETED, last);
+        if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
+            query = imap_search_key_new_flag
+                (cond->negate, IMSGF_FLAGGED, last);
+        break;
+    case CONDITION_AND:
+        query = 
+            lbmi_build_imap_query
+            (cond->match.andor.left,
+             lbmi_build_imap_query
+             (cond->match.andor.right, last));
+        break;
+    case CONDITION_OR: 
+        query = 
+            imap_search_key_new_or
+            (cond->negate,
+             lbmi_build_imap_query(cond->match.andor.left, NULL),
+             lbmi_build_imap_query(cond->match.andor.right, NULL),
+             last);
+        break;
+    case CONDITION_NONE:
+    case CONDITION_REGEX:
+    default:
+        break;
+    }
+    return query;
+}
+
 typedef struct {
     GHashTable * uids;
     GHashTable * res;
@@ -889,7 +990,7 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 						 gboolean only_recent,
 						 gboolean * err)
 {
-    gchar* query;
+    ImapSearchKey* query;
     ImapResult rc = IMR_NO;
     ImapSearchData * cbdata;
 
@@ -898,7 +999,7 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
     cbdata = g_new( ImapSearchData, 1 );
     cbdata->uids = g_hash_table_new(NULL, NULL); 
     cbdata->res  = g_hash_table_new(NULL, NULL);
-    query = libbalsa_condition_build_imap_query(ct /* FIXME: ONLY RECENT! */);
+    query = lbmi_build_imap_query(ct /* FIXME: ONLY RECENT! */, NULL);
     if (query) {
 #ifdef UID_SEARCH_IMPLEMENTED
 	for(msgs= LIBBALSA_MAILBOX(mbox)->message_list; msgs;
@@ -910,10 +1011,10 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 #else	
         g_warning("Search results ignored. Fixme!");
 #endif
-        rc = imap_mbox_uid_search(mbox->handle, query, 
+        rc = imap_mbox_uid_search(mbox->handle, query,
                                   (void(*)(unsigned,void*))imap_matched,
                                   cbdata);
-        g_free(query);
+        imap_search_key_free(query);
     }
     g_hash_table_destroy(cbdata->uids);
     /* Clean up on error */
@@ -1919,8 +2020,8 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     GNode * new_tree;
     guint msgno;
-    gchar *filter = libbalsa_condition_build_imap_query(mailbox->view_filter);
-
+    ImapSearchKey *filter = lbmi_build_imap_query(mailbox->view_filter, NULL);
+    
     mailbox->view->threading_type = thread_type;
     switch(thread_type) {
     case LB_MAILBOX_THREADING_FLAT:
@@ -1940,7 +2041,7 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
         break;
     case LB_MAILBOX_THREADING_SIMPLE:
     case LB_MAILBOX_THREADING_JWZ:
-	imap_mbox_thread(mimap->handle, "REFERENCES", filter ? filter : "ALL");
+	imap_mbox_thread(mimap->handle, "REFERENCES", filter);
 	new_tree =
             g_node_copy(imap_mbox_handle_get_thread_root(mimap->handle));
 	break;
@@ -1948,6 +2049,7 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 	g_assert_not_reached();
 	new_tree = NULL;
     }
+    imap_search_key_free(filter);
 
     if(!mailbox->msg_tree) /* first reference */
         mailbox->msg_tree = g_node_new(NULL);

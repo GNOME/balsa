@@ -770,12 +770,27 @@ imap_mbox_unselect(ImapMboxHandle *h)
  * see draft-ietf-imapext-thread-12.txt
  */
 ImapResponse
-imap_mbox_thread(ImapMboxHandle *h, const char *how, const char *filter)
+imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
 {
   if(imap_mbox_handle_can_do(h, IMCAP_THREAD_REFERENCES)) {
-    gchar * cmd = g_strdup_printf("THREAD %s UTF-8 %s", how, filter);
-    ImapResponse rc = imap_cmd_exec(h, cmd);  
-    g_free(cmd);
+    int can_do_literals = imap_mbox_handle_can_do(h, IMCAP_LITERAL);
+    unsigned cmdno;
+    ImapResponse rc;
+    ImapCmdTag tag;
+
+    cmdno = imap_make_tag(tag);
+    
+    sio_printf(h->sio, "THREAD %s UTF-8", how);
+    if(!filter)
+      sio_write(h->sio, " ALL", 4);
+    else
+      imap_write_key(h, filter, can_do_literals);
+
+    sio_write(h->sio, "\r\n", 2);
+    imap_handle_flush(h);
+    do
+      rc = imap_cmd_step(h, cmdno);
+    while(rc == IMR_UNTAGGED);
     return rc;
   } else
     return IMR_NO;
@@ -783,7 +798,7 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, const char *filter)
 
 
 ImapResponse
-imap_mbox_uid_search(ImapMboxHandle *handle, const char *query, 
+imap_mbox_uid_search(ImapMboxHandle *handle, ImapSearchKey *key,
                      void (*cb)(unsigned uid, void *),
                      void *cb_data)
 {
@@ -854,24 +869,18 @@ append_no(ImapMboxHandle *handle, unsigned seqno, void *arg)
 
 ImapResponse
 imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
-                      char *filter)
+                      ImapSearchKey *filter)
 {
   ImapResponse rc;
   const char *keystr;
-  char *cmd;
   unsigned i;
 
   if(key == IMSO_MSGNO) {
     if(filter) {
-      ImapSearchCb cb;
-      cmd= g_strdup_printf("SEARCH %s", filter);
       handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
                                       * we should not be doing such 
                                       * low level manipulations here */
-      cb  = handle->search_cb;  handle->search_cb  = (ImapSearchCb)append_no;
-      rc = imap_cmd_exec(handle, cmd);
-      handle->search_cb = cb;
-      g_free(cmd);
+      rc = imap_search_exec(handle, filter, append_no, NULL);
     } else {
       if(handle->thread_root)
         g_node_destroy(handle->thread_root);
@@ -888,19 +897,31 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
       return IMR_OK;
     }
   } else { /* Nontrivial (ie. not over msgno) sort requires an extension */
+    unsigned cmdno;
+    int can_do_literals =
+      imap_mbox_handle_can_do(handle, IMCAP_LITERAL);
+    ImapCmdTag tag;
+
     if(!imap_mbox_handle_can_do(handle, IMCAP_SORT)) 
       return IMR_NO;
     
+    cmdno =  imap_make_tag(tag);
     keystr = sort_code_to_string(key);
-    cmd= g_strdup_printf("SORT (%s%s) UTF-8 %s", 
-                       ascending ? "" : "REVERSE ",
-                         keystr, filter);
+    sio_printf(handle->sio, "%s SORT (%s%s) UTF-8", tag,
+               ascending ? "" : "REVERSE ", keystr);
     
     handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
                                     * we should not be doing such 
                                     * low level manipulations here */
-    rc = imap_cmd_exec(handle, cmd);
-    g_free(cmd);
+    if(!filter)
+      sio_write(handle->sio, " ALL", 4);
+    else
+      imap_write_key(handle, filter, can_do_literals);
+    sio_write(handle->sio, "\r\n", 2);
+    imap_handle_flush(handle);
+    do
+      rc = imap_cmd_step(handle, cmdno);
+    while(rc == IMR_UNTAGGED);
   }
   if(rc == IMR_OK) {
     if(handle->thread_root)

@@ -1,3 +1,19 @@
+2004-02-25  Pawel Salek
+
+	* libbalsa/filter-funcs.c: add libbalsa_condition_new_string().
+	* libbalsa/filter.[hc]: remove IMAP stuff which does not belong there.
+	* libbalsa/mailbox_imap.c: build imap queries here - adapt to
+	new 8-bit safe style.
+	* libbalsa/imap/Makefile.am: add imap-search.c
+
+	* libbalsa/imap/imap-commands.[ch]: adapt to new 8-bit safe searching
+	style.
+	* libbalsa/imap/imap-handle.c: move state macros to imap_private.h
+	* libbalsa/imap/imap_private.h: 
+	* libbalsa/imap/imap-handle.h: recognize more extensions.
+
+	* src/main-window.c: add a demo for new matching code.
+
 2004-02-22  Pawel Salek
 
 	* libbalsa/imap-server.c: support SSL/imaps.

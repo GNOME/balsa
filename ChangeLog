@@ -1,3 +1,10 @@
+2002-05-07  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/message.c: libmutt fastcloses mailbox when it should not.
+	(copy few thousands msgs between IMAP mboxes to trigger).
+	* src/filter-edit-{callbacks,dialog}.c: make filters UI sensitive.
+	* src/filter-edit.h: fe_enable_right_page() header added.
+
 2002-05-07  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-index.c: implement an `Other...' dialog in place of the

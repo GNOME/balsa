@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -69,6 +69,8 @@ GtkWidget *fe_action_option_menu;
 /* Mailboxes option menu */
 GtkWidget * fe_mailboxes;
 
+GtkWidget* fe_right_page;
+
 /* Different buttons that need to be greyed or ungreyed */
 GtkWidget * fe_delete_button,* fe_apply_button,* fe_revert_button;
 GtkWidget * fe_condition_delete_button,* fe_condition_edit_button;
@@ -96,6 +98,11 @@ option_list fe_op_codes[] = {
 };
 
 /* ******************************** */
+void
+fe_enable_right_page(gboolean enabled)
+{
+    gtk_widget_set_sensitive(fe_right_page, enabled);
+}
 
 GtkWidget *
 build_option_menu(option_list options[], gint num, GtkSignalFunc func);
@@ -170,6 +177,17 @@ fe_free_associated_conditions(void)
 	libbalsa_condition_free((LibBalsaCondition *)
                                 gtk_clist_get_row_data(fe_conditions_list,row));
 }
+
+static void
+fe_clist_unselect_row(GtkWidget * widget, gint row, gint column, 
+                      GdkEventButton *event, gpointer data)
+{
+    /* unselecting the only row means it is about to be deleted */
+    printf("unselect_row\n"); 
+    if(fe_filters_list->rows<=1) 
+        fe_enable_right_page(FALSE);
+}
+
 /*
  * build_left_side()
  *
@@ -222,6 +240,8 @@ build_left_side(void)
     gtk_clist_set_auto_sort(fe_filters_list,TRUE);
     gtk_signal_connect(GTK_OBJECT(fe_filters_list), "select_row",
 		       GTK_SIGNAL_FUNC(fe_clist_select_row), NULL);
+    gtk_signal_connect(GTK_OBJECT(fe_filters_list), "unselect_row",
+		       GTK_SIGNAL_FUNC(fe_clist_unselect_row), NULL);
 
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(fe_filters_list));
 
@@ -262,12 +282,9 @@ add_mailbox_to_option_menu(GtkCTree * ctree,GtkCTreeNode *node,gpointer menu)
     GtkWidget * item;
     BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, node);
 
-    g_print("Nouveau noeud\n");
     if (mbnode->mailbox) {
 	/* OK this node is a mailbox */
-	g_print("Mailbox\n");
-	item =
-	    gtk_menu_item_new_with_label(mbnode->mailbox->name);
+	item = gtk_menu_item_new_with_label(mbnode->mailbox->name);
 	gtk_object_set_data(GTK_OBJECT(item), "mailbox",
 			    mbnode->mailbox);
 	
@@ -353,6 +370,7 @@ build_match_page()
 		     0, 5, 8, 9,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
     fe_condition_edit_button = gtk_button_new_with_label(_("Edit"));
+    gtk_widget_set_sensitive(fe_condition_edit_button,FALSE);
     gtk_box_pack_start(GTK_BOX(box), fe_condition_edit_button, TRUE, TRUE, 0);
     gtk_signal_connect(GTK_OBJECT(fe_condition_edit_button),
 		       "clicked", GTK_SIGNAL_FUNC(fe_edit_condition), 
@@ -363,7 +381,9 @@ build_match_page()
 		       "clicked", GTK_SIGNAL_FUNC(fe_edit_condition), 
                        GINT_TO_POINTER(1));
     fe_condition_delete_button = gtk_button_new_with_label(_("Remove"));
-    gtk_box_pack_start(GTK_BOX(box), fe_condition_delete_button, TRUE, TRUE, 0);
+    gtk_widget_set_sensitive(fe_condition_delete_button,FALSE);
+    gtk_box_pack_start(GTK_BOX(box), fe_condition_delete_button, TRUE, 
+                       TRUE, 0);
     gtk_signal_connect(GTK_OBJECT(fe_condition_delete_button),
 		       "clicked",
 		       GTK_SIGNAL_FUNC(fe_condition_remove_pressed), NULL);
@@ -561,7 +581,8 @@ filters_edit_dialog(void)
     sep = gtk_vseparator_new();
     gtk_box_pack_start(GTK_BOX(hbox), sep, FALSE, FALSE, 2);
 
-    piece = build_right_side();
+    fe_right_page = piece = build_right_side();
+    gtk_widget_set_sensitive(fe_right_page, FALSE);
     gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE, 2);
 
     /* Populate the clist of filters */
@@ -580,13 +601,15 @@ filters_edit_dialog(void)
 	cpfil->conditions_op=fil->conditions_op;
 	cpfil->flags=fil->flags;
 
-	/* We have to unset the "compiled" flag, because we don't copy the regex_t struc with copy condition 
-	 * (because I have no idea how to copy that mess)
-	 * so that if user doesn't modify a filter with regex conditions they would be marked as compiled
-	 * with regex_t struct being unallocated
-	 * Drawback : even if user doesn't modify any regex, but press OK button, we'll recalculate all regex
-	 * I guess we could be a bit smarter without too much gymnastic
-	 */
+	/* We have to unset the "compiled" flag, because we don't copy
+	 * the regex_t struc with copy condition (because I have no
+	 * idea how to copy that mess) so that if user doesn't modify
+	 * a filter with regex conditions they would be marked as
+	 * compiled with regex_t struct being unallocated Drawback :
+	 * even if user doesn't modify any regex, but press OK button,
+	 * we'll recalculate all regex I guess we could be a bit
+	 * smarter without too much gymnastic. */
+
 	FILTER_CLRFLAG(cpfil,FILTER_COMPILED);
 	/* Copy conditions */
       	for (cnds=fil->conditions; cnds; cnds=g_slist_next(cnds)) {

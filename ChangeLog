@@ -1,5 +1,9 @@
-2004-10-25 06:28  PeterB
+2004-10-25 08:37  PeterB
 
+	* src/mailbox-conf.c: migrate mailbox-conf dialogs from deprecated
+	GtkOptionMenu to GtkComboBox; replace last HAVE_GTK24 with
+	GTK_CHECK_VERSION.
+	* src/information-dialog.c: use g_strdup.
 	* src/: filter-edit-callbacks.c, filter-edit-dialog.c,
 	filter-edit.h: migrate filter edit dialogs from
 	deprecated GtkCombo to GtkComboBoxEntry, and from deprecated

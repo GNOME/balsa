@@ -3773,11 +3773,12 @@ static void
 postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     if (is_ready_to_send(bsmsg)) {
-        if(message_postpone(bsmsg))
+        if(message_postpone(bsmsg)) {
+            balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                       LIBBALSA_INFORMATION_MESSAGE,
+                                       _("Message postponed."));
             gtk_widget_destroy(bsmsg->window);
-        balsa_information_parented(GTK_WINDOW(bsmsg->window),
-                                   LIBBALSA_INFORMATION_MESSAGE,
-                                   _("Message postponed."));
+        }
     }
 }
 

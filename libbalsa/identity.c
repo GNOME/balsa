@@ -1214,7 +1214,7 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
 
     dialog =
         gtk_dialog_new_with_buttons(_("Manage Identities"),
-                                    parent,
+                                    parent, /* must NOT be modal */
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                     GTK_STOCK_HELP, IDENTITY_RESPONSE_HELP,
                                     GTK_STOCK_NEW, IDENTITY_RESPONSE_NEW,

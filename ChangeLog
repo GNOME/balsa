@@ -1,3 +1,16 @@
+2004-08-02  Pawel Salek
+
+	* configure.in: get the GSS bit right hopefully this time.
+	* libbalsa/identity.c: comment on dialog modality.
+	* src/address-book-config.c, src/folder-conf.c: ditto.
+	* src/pref-manager.c: same.
+	* libbalsa/mailbox.c: load_messages() survives without view.
+	* libinit_balsa/balsa-druid-page-directory.c: alternative mailbox names.
+	* src/save-restore.c: ditto.
+	* src/balsa-app.c: open_inbox_upon startup was never initialized.
+	* src/balsa-message.c: add message part button shortcuts.
+	* src/sendmsg-window.c: show message before destroying the window.
+
 2004-08-02 15:16  PeterB
 
 	* libbalsa/message.c: ignore content-disposition of first part.

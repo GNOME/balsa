@@ -679,7 +679,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
         GTK_DIALOG(gtk_dialog_new_with_buttons
                    (_("Remote IMAP subfolder"), 
                     GTK_WINDOW(balsa_app.main_window),
-                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                    GTK_DIALOG_DESTROY_WITH_PARENT, /* must NOT be modal */
                     mn ? _("_Update") : _("_Create"), GTK_RESPONSE_OK,
                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, 
                     GTK_STOCK_HELP,   GTK_RESPONSE_HELP,

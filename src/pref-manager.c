@@ -379,7 +379,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     pui = g_malloc(sizeof(PropertyUI));
 
-    property_box =
+    property_box = /* must NOT be modal */
         gtk_dialog_new_with_buttons(_("Balsa Preferences"),
                                     GTK_WINDOW(active_win),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,

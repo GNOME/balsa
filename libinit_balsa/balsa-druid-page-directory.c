@@ -35,9 +35,13 @@
 #include <unistd.h>
 #include <errno.h>
 
-static gchar *init_mbnames[NUM_EDs] =
-    { N_("_Inbox:"), N_("_Outbox:"), N_("_Sentbox:"), N_("_Draftbox:"),
+static gchar *init_mbnames[NUM_EDs] = {
+#if defined(ENABLE_TOUCH_UI)
+    "_In:", "_Out:", "_Sent:", "_Drafts:", "_Trash:"
+#else
+    N_("_Inbox:"), N_("_Outbox:"), N_("_Sentbox:"), N_("_Draftbox:"),
     N_("_Trash:")
+#endif
 };
 
 static void unconditional_mailbox(const gchar * path,
@@ -298,7 +302,7 @@ balsa_druid_page_directory_prepare(GnomeDruidPage * page,
 #define INBOX_NAME    "In"
 #define OUTBOX_NAME   "Out"
 #define SENTBOX_NAME  "Sent"
-#define DRAFTBOX_NAME "Draft"
+#define DRAFTBOX_NAME "Drafts"
 #endif /* defined(ENABLE_TOUCH_UI) */
 #define TRASH_NAME    "Trash"
 

@@ -306,7 +306,8 @@ get_from_field(LibBalsaMessage *message)
     LibBalsaAddress *addy = NULL;
 
     g_return_val_if_fail(message->mailbox, NULL);
-    if (message->mailbox->view->show == LB_MAILBOX_SHOW_TO) {
+    if (message->mailbox->view &&
+        message->mailbox->view->show == LB_MAILBOX_SHOW_TO) {
         if (message->headers && message->headers->to_list) {
             GList *list = g_list_first(message->headers->to_list);
             addy = list->data;

@@ -531,9 +531,13 @@ AC_ARG_WITH(gss,
     [with_gss=$withval],[with_gss=no])
 if test "x$with_gss" != xno  ; then
    AC_PATH_PROG(KRB5_CONFIG, krb5-config,no)
-   AC_DEFINE(HAVE_GSSAPI,1,[Defined when GSSAPI support is to be compiled.])
-   BALSA_CFLAGS="$BALSA_CFLAGS `$KRB5_CONFIG --cflags gssapi`"
-   BALSA_LIBS="$BALSA_LIBS `$KRB5_CONFIG --libs gssapi`"
+   if test "x$KRB5_CONFIG" != xno ; then 
+      AC_DEFINE(HAVE_GSSAPI,1,[Defined when GSSAPI support is to be compiled.])
+      BALSA_CFLAGS="$BALSA_CFLAGS `$KRB5_CONFIG --cflags gssapi`"
+      BALSA_LIBS="$BALSA_LIBS `$KRB5_CONFIG --libs gssapi`"
+   else
+      AC_MSG_ERROR([GSS requested but krb5-config not found. Install krb5-devel])
+   fi
 fi
 
 dnl ##########################################################################

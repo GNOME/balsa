@@ -121,7 +121,7 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book,
     abc->address_book = address_book;
 
     abc->window =
-        gtk_dialog_new_with_buttons("", parent,
+        gtk_dialog_new_with_buttons("", parent, /* must NOT be modal */
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
@@ -664,7 +664,9 @@ bad_path(GnomeFileEntry * entry, GtkWindow * window, gint type)
     }
     question = _("Do you want to correct the path?");
     name = gtk_entry_get_text(GTK_ENTRY(gnome_file_entry_gtk_entry(entry)));
-    ask = gtk_message_dialog_new(window, GTK_DIALOG_DESTROY_WITH_PARENT,
+    ask = gtk_message_dialog_new(window,
+				 GTK_DIALOG_MODAL|
+				 GTK_DIALOG_DESTROY_WITH_PARENT,
                                  GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
                                  message, name, question);
     gtk_dialog_set_default_response(GTK_DIALOG(ask), GTK_RESPONSE_YES);

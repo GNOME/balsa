@@ -1774,7 +1774,8 @@ part_info_init_message_extbody_mail(BalsaMessage * bm, BalsaPartInfo * info)
     gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(msg->str), FALSE, FALSE, 1);
     g_string_free(msg, TRUE);
 
-    button = gtk_button_new_with_label(_("Send message to obtain this part"));
+    button =
+	gtk_button_new_with_mnemonic(_("Se_nd message to obtain this part"));
     gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 5);
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(part_context_menu_mail),
@@ -1899,7 +1900,7 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
                            FALSE, FALSE, 0);
     g_free(content_type);
 
-    button = gtk_button_new_with_label(_("Save part"));
+    button = gtk_button_new_with_mnemonic(_("S_ave part"));
     gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(part_context_menu_save), (gpointer) info);
@@ -1923,8 +1924,8 @@ part_info_mime_button(BalsaPartInfo * info, const gchar * content_type,
         gnome_vfs_mime_get_value(content_type, (char *) key);
 
     if (cmd) {
-        msg = g_strdup_printf(_("View part with %s"), cmd);
-        button = gtk_button_new_with_label(msg);
+        msg = g_strdup_printf(_("View _part with %s"), cmd);
+        button = gtk_button_new_with_mnemonic(msg);
         g_object_set_data(G_OBJECT(button), "mime_action", (gpointer) key);
         g_free(msg);
 
@@ -1948,8 +1949,8 @@ part_info_mime_button_vfs (BalsaPartInfo* info, const gchar* content_type)
 
     if(app) {
         cmd = app->command;
-        msg = g_strdup_printf(_("View part with %s"), app->name);
-        button = gtk_button_new_with_label(msg);
+        msg = g_strdup_printf(_("View _part with %s"), app->name);
+        button = gtk_button_new_with_mnemonic(msg);
         g_object_set_data_full(G_OBJECT (button), "mime_action", 
                              (gpointer) g_strdup(app->id), g_free); /* *** */
         g_free(msg);
@@ -4487,7 +4488,7 @@ part_info_init_crypto_signature(BalsaMessage * bm, BalsaPartInfo * info)
     if (info->body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP &&
         info->body->sig_info->status == GPG_ERR_NO_PUBKEY) {
         GtkWidget *button =
-            gtk_button_new_with_label(_("run gpg to import this key"));
+            gtk_button_new_with_mnemonic(_("_Run gpg to import this key"));
 
         gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
         g_signal_connect(G_OBJECT(button), "clicked",
@@ -4705,7 +4706,7 @@ create_import_pubkey_button(GtkWidget * mime_part, const gchar * fingerprint)
     gtk_widget_show(vbox);
     gtk_box_pack_start(GTK_BOX(vbox), mime_part, FALSE, FALSE, 0);
 
-    button = gtk_button_new_with_label(_("run gpg to import this key"));
+    button = gtk_button_new_with_mnemonic(_("_Run gpg to import this key"));
     gtk_widget_show(button);
     gtk_container_set_border_width(GTK_CONTAINER(button), 10);
     gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);

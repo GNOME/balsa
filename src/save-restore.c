@@ -216,8 +216,21 @@ load_toolbars(void)
 
    WARNING: may destroy mailbox.
 */
+#if defined(ENABLE_TOUCH_UI)
+#define INBOX_NAME   "In"
+#define SENTBOX_NAME "Sent"
+#define DRAFTS_NAME  "Drafts"
+#define OUTBOX_NAME  "Out"
+#else
+#define INBOX_NAME   "Inbox"
+#define SENTBOX_NAME "Sentbox"
+#define DRAFTS_NAME  "Draftbox"
+#define OUTBOX_NAME  "Outbox"
+#endif /* ENABLE_TOUCH_UI */
+#define TRASH_NAME "Trash"
+
 static gchar *specialNames[] = {
-    "Inbox", "Sentbox", "Trash", "Draftbox", "Outbox"
+    INBOX_NAME, SENTBOX_NAME, TRASH_NAME, DRAFTS_NAME, OUTBOX_NAME
 };
 void
 config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
@@ -512,15 +525,15 @@ config_mailbox_init(const gchar * prefix)
 	BalsaMailboxNode *mbnode;
 
 	mbnode = balsa_mailbox_node_new_from_mailbox(mailbox);
-	if (strcmp("Inbox/", key) == 0)
+	if (strcmp(INBOX_NAME "/", key) == 0)
 	    special = &balsa_app.inbox;
-	else if (strcmp("Outbox/", key) == 0)
+	else if (strcmp(OUTBOX_NAME "/", key) == 0)
 	    special = &balsa_app.outbox;
-	else if (strcmp("Sentbox/", key) == 0)
+	else if (strcmp(SENTBOX_NAME "/", key) == 0)
 	    special = &balsa_app.sentbox;
-	else if (strcmp("Draftbox/", key) == 0)
+	else if (strcmp(DRAFTS_NAME "/", key) == 0)
 	    special = &balsa_app.draftbox;
-	else if (strcmp("Trash/", key) == 0) {
+	else if (strcmp(TRASH_NAME "/", key) == 0) {
 	    special = &balsa_app.trash;
             libbalsa_filters_set_trash(balsa_app.trash);
 	}

@@ -1741,6 +1741,7 @@ balsa_message_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag,
     GList *list;
     LibBalsaMessage *message;
     int is_all_flagged = TRUE;
+    gboolean new_flag;
 
     /* First see if we should set given flag or unset */
     for(list=GTK_CLIST(index->ctree)->selection; list; list=list->next) {
@@ -1753,11 +1754,17 @@ balsa_message_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag,
 
     /* If they all have the flag set, then unset them. Otherwise, set
      * them all.
+     * Note: the callback for `toggle unread' changes the `read' flag,
+     * but the callback for `toggle flagged' changes `flagged'
      */
+
+    new_flag =
+        (flag ==
+         LIBBALSA_MESSAGE_FLAG_NEW ? is_all_flagged : !is_all_flagged);
 
     for (list=GTK_CLIST(index->ctree)->selection; list; list=list->next) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-        (*cb)(message, !is_all_flagged);
+        (*cb) (message, new_flag);
     }
     libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
 }

@@ -1,3 +1,11 @@
+* Balsa-1.2.3 release. Release date 2001-11-05
+
+- improved address extraction from messages.
+- new tools for the toolbar.
+- improved handling of mail threading.
+- other UI fixes.
+- make building from the tarball easier.
+
 * Balsa-1.2.2 release. Release date 2001-10-31
 
 - few crash opportunities removed.

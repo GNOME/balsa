@@ -1,6 +1,12 @@
-2001-11-05    Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+2001-11-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* NEWS, libinit_balsa/Makefile.am, configure.in: release 1.2.3
+	
+2001-11-05  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/store-address.c: make notebook scrolleable.
+	* src/balsa-index.c: fix message unreading 
+	(bug occured due to missing "flag"<->"new" flag symmetry).
 
 2001-11-04  Pawel Salek  <pawsa@theochem.kth.se>
 

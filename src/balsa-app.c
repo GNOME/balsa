@@ -351,7 +351,7 @@ do_load_mailboxes(void)
        thread to construct folders that are expensive to build (IMAP over
        dialup).
     */
-    g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_ALL, -1,
+    g_node_traverse(balsa_app.mailbox_nodes, G_POST_ORDER, G_TRAVERSE_ALL, -1,
                     append_subtree_f, NULL);
     
     return TRUE;

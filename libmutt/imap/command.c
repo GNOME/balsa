@@ -515,8 +515,25 @@ static void cmd_parse_myrights (IMAP_DATA* idata, char* s)
   dprint (2, (debugfile, "Handling MYRIGHTS\n"));
 
   s = imap_next_word (s);
-  s = imap_next_word (s);
-
+  /*
+   * Now pointing at folder name. imap_next_word() will skip over it, if
+   * there are no embedded spaces.
+   */
+  if (*s != '\"')
+    s = imap_next_word (s);
+  else {
+    /* skip over '\"': */	  
+    s++;
+    /* find closing '\"': */
+    while (*s && *s != '\"')
+      if (*s++ == '\\')
+	/* skip over escaped char--it might be a '\"': */     
+	s++;      
+    if (*s)
+      /* skip over closing '\"': */	    
+      s++;
+    SKIPWS(s);
+  }
   /* zero out current rights set */
   memset (idata->rights, 0, sizeof (idata->rights));
 

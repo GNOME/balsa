@@ -39,8 +39,6 @@ static GtkWidget *create_menu (BalsaSendmsg *);
 
 static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 
-static gchar *gt_replys (gchar *);
-
 static GtkWidget *menu_items[7];
 GtkTooltips *tooltips;
 
@@ -533,40 +531,4 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   g_list_free (message->body_list);
   message_free (message);
   balsa_sendmsg_destroy (bsmsg);
-}
-
-static gchar *
-gt_replys (char *buff)
-{
-  int i = 0, len = strlen (buff);
-  GString *gs = g_string_new (NULL);
-
-  for (i = 0; i < len; i++)
-    {
-      if (buff[i] == '\r' && buff[i + 1] == '\n')
-	{
-	  gs = g_string_append (gs, "\n> ");
-	  i++;
-	}
-      else if (buff[i] == '\n' && buff[i + 1] == '\r')
-	{
-	  gs = g_string_append (gs, "\n> ");
-	  i++;
-	}
-      else if (buff[i] == '\n')
-	{
-	  gs = g_string_append (gs, "\n> ");
-	}
-      else if (buff[i] == '\r')
-	{
-	  gs = g_string_append (gs, "\n> ");
-	}
-      else
-	{
-	  gs = g_string_append_c (gs, buff[i]);
-	}
-    }
-
-  gs = g_string_prepend (gs, "> ");
-  return gs->str;
 }

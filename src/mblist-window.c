@@ -433,8 +433,10 @@ close_mblist_window (GtkWidget * widget)
   if (!mblw)
     return;
 
+  gtk_widget_realize(mblw->window);
   gdk_window_get_size (mblw->window->window,
 		       &balsa_app.mblist_width, &balsa_app.mblist_height);
+  gtk_widget_unrealize(mblw->window);
   gtk_widget_destroy (mblw->window);
   gtk_widget_destroy (GTK_WIDGET (mblw->ctree));
 }

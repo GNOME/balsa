@@ -649,13 +649,12 @@ config_global_save (void)
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mw_height);
     pl_dict_add_str_str (globals, "MainWindowHeight", tmp);
-#if 0
+
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_width);
     pl_dict_add_str_str (globals, "MailboxListWidth", tmp);
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_height);
     pl_dict_add_str_str (globals, "MailboxListHeight", tmp);
-#endif
   }
 
   /* Add it to configuration file */

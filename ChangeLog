@@ -1,3 +1,8 @@
+2003-12-09 05:36  PeterB
+
+	* src/: balsa-index.c, message-window.c: Always mark current
+	message as read when user selects "next" anything.
+
 2003-12-08 22:36  PeterB
 
 	* src/message-window.c: Set a new message in the same

@@ -1,10 +1,19 @@
 2001-08-23  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-index.c: do not crash when there is an index without 
-	associated mailbox_node.
+	associated mailbox_node (Peter Bloomfield).
 	* src/main.c, src/threads.h: remove not used appbar_lock mutex.
 	* libbalsa/mailbox_imap.c: fix crash on multiple deletion of 
 	IMAP mailboxes.
+	* libbalsa/address-entry.c: don't free useful values on Ctrl-K.
+
+	Albrecht Dreﬂ - protocol handlers improvements:
+	* libbalsa/message.[hc]: remove libbalsa_message_get_text_content().
+	* libbalsa/mime.[hc]: improve process_mime_part() instead.
+	* src/balsa-app.h: add support for stripping HTML.
+	* src/pref-manager.c: modification in preferencess...
+	* src/save-restore.c: ... and saving and restoring.
+	* src/sendmsg-window.c: strip HTML if requested.
 
 2001-08-22  Carlos Morgado  <chbm@chbm.nu>
 

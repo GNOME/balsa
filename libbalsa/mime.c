@@ -31,14 +31,15 @@
 static GString *process_mime_multipart(LibBalsaMessage * message,
 				       LibBalsaMessageBody * body,
 				       gchar * reply_prefix_str,
-				       gint llen);
+				       gint llen, gboolean ignore_html);
 static GString *process_mime_part(LibBalsaMessage * message,
 				  LibBalsaMessageBody * body,
-				  gchar * reply_prefix_str, gint llen);
+				  gchar * reply_prefix_str, gint llen,
+				  gboolean ignore_html);
 
 static GString *
 process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
-		  gchar * reply_prefix_str, gint llen)
+		  gchar * reply_prefix_str, gint llen, gboolean ignore_html)
 {
     FILE *part;
     size_t alloced;
@@ -55,10 +56,15 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
     case LIBBALSA_MESSAGE_BODY_TYPE_VIDEO:
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
-	reply = process_mime_multipart(message, body,
-				       reply_prefix_str, llen);
+	reply = process_mime_multipart(message, body, reply_prefix_str, 
+				       llen, ignore_html);
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
+	/* don't return text/html stuff... */
+	if (ignore_html && body->mutt_body->subtype &&
+	    !strcmp("html", body->mutt_body->subtype))
+	    break;
+
 	libbalsa_message_body_save_temporary(body, NULL);
 
 	part = fopen(body->temp_filename, "r");
@@ -99,13 +105,15 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 static GString *
 process_mime_multipart(LibBalsaMessage * message,
 		       LibBalsaMessageBody * body,
-		       gchar * reply_prefix_str, gint llen)
+		       gchar * reply_prefix_str, gint llen,
+		       gboolean ignore_html)
 {
     LibBalsaMessageBody *part;
     GString *res = NULL, *s;
 
     for (part = body->parts; part; part = part->next) {
-	s = process_mime_part(message, part, reply_prefix_str, llen);
+	s = process_mime_part(message, part, reply_prefix_str, llen,
+			      ignore_html);
 	if (!s)
 	    continue;
 	if (res) {
@@ -119,14 +127,15 @@ process_mime_multipart(LibBalsaMessage * message,
 
 GString *
 content2reply(LibBalsaMessage * message, gchar * reply_prefix_str,
-	      gint llen)
+	      gint llen, gboolean ignore_html)
 {
     LibBalsaMessageBody *body;
     GString *reply = NULL, *res;
 
     body = message->body_list;
     for (body = message->body_list; body; body = body->next) {
-	res = process_mime_part(message, body, reply_prefix_str, llen);
+	res = process_mime_part(message, body, reply_prefix_str, llen,
+				ignore_html);
 	if (!res)
 	    continue;
 	if (reply) {

@@ -994,44 +994,6 @@ libbalsa_message_append_part(LibBalsaMessage * message,
     }
 }
 
-/* libbalsa_message_get_text_content:
-   returns the message content as single string. 
-   When modifying make sure it works properly for both messages in mailboxes
-   as well as messages created on the fly.
-
-   FIXME: This is a simple-minded version of this function, just to get 
-   the stable release out. The full blown code should mention attachments.
-   Or we could create separate function for it, so printing would be 
-   even nicer.
-   content2reply() is also kind of specialized function that should be
-   implemented in a more general fashion.  
-*/
-gchar *
-libbalsa_message_get_text_content(LibBalsaMessage * msg, gint line_len)
-{
-    gchar *res;
-    GString *str;
-    g_return_val_if_fail(msg, NULL);
-
-    if (msg->mailbox) {
-	libbalsa_message_body_ref(msg);
-	str = content2reply(msg, NULL, line_len);
-	libbalsa_message_body_unref(msg);
-    } else {
-	LibBalsaMessageBody *body = msg->body_list;
-	str = g_string_new("");
-	while (body) {
-	    if (body->buffer)
-		str = g_string_append(str, body->buffer);
-	    body = body->next;
-	}
-	libbalsa_wrap_string(str->str, line_len);
-    }
-    res = str->str;
-    g_string_free(str, FALSE);
-    return res;
-}
-
 /* libbalsa_message_set_dispnotify:
    sets a disposition notify to a given address
    address can be NULL.

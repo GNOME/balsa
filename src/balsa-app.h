@@ -266,6 +266,9 @@ extern struct BalsaApplication {
     /* arp --- string to prefix "replied to" messages. */
     gchar *quote_str;
 
+    /* reply/forward: don't include text/html parts */
+    gboolean reply_strip_html;
+
     /* command line options */
     gint check_mail_upon_startup;
     gint remember_open_mboxes;

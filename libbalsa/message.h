@@ -212,8 +212,6 @@ const gchar *libbalsa_message_charset(LibBalsaMessage * message);
 gboolean libbalsa_message_has_attachment(LibBalsaMessage * message);
 
 GList *libbalsa_message_user_hdrs(LibBalsaMessage * message);
-gchar *libbalsa_message_get_text_content(LibBalsaMessage * msg,
-					 gint line_len);
 
 void libbalsa_message_set_dispnotify(LibBalsaMessage *message, 
 				     LibBalsaAddress *address);

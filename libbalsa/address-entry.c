@@ -1035,8 +1035,9 @@ libbalsa_delete_to_line_end(LibBalsaAddressEntry *address_entry)
 	 list->next = NULL;
 	 g_list_free(list);
     }
-    libbalsa_inputData_free(address_entry->input);
-    address_entry->input = input;
+    /* libbalsa_inputData_free(address_entry->input); 
+     * look above: the line below is not necessary */
+    /* address_entry->input = input; */
     libbalsa_address_entry_show(address_entry);
 }
 

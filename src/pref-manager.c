@@ -81,6 +81,7 @@ typedef struct _PropertyUI {
     GtkWidget *remember_open_mboxes;
     GtkWidget *mblist_show_mb_content_info;
     GtkWidget *always_queue_sent_mail;
+    GtkWidget *reply_strip_html_parts;
 
     /* Information messages */
     GtkWidget *information_message_menu;
@@ -358,6 +359,8 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		       GTK_SIGNAL_FUNC(wrap_modified_cb), property_box);
     gtk_signal_connect(GTK_OBJECT(pui->always_queue_sent_mail), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->reply_strip_html_parts), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
 
     /* arp */
     gtk_signal_connect(GTK_OBJECT(pui->quote_str), "changed",
@@ -561,6 +564,8 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.wordwrap = GTK_TOGGLE_BUTTON(pui->wordwrap)->active;
     balsa_app.wraplength =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->wraplength));
+    balsa_app.reply_strip_html =
+	GTK_TOGGLE_BUTTON(pui->reply_strip_html_parts)->active;
     balsa_app.always_queue_sent_mail =
 	GTK_TOGGLE_BUTTON(pui->always_queue_sent_mail)->active;
 
@@ -783,6 +788,8 @@ set_prefs(void)
 			      (float) balsa_app.wraplength);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->always_queue_sent_mail),
 				 balsa_app.always_queue_sent_mail);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->reply_strip_html_parts),
+				 balsa_app.reply_strip_html);
 
     gtk_widget_set_sensitive(pui->wraplength,
 			     GTK_TOGGLE_BUTTON(pui->wordwrap)->active);
@@ -1413,6 +1420,11 @@ outgoing_page(gpointer data)
     gtk_container_add(GTK_CONTAINER(vbox2), GTK_WIDGET(table2));
     gtk_container_set_border_width(GTK_CONTAINER(table2), 2);
     pui->quote_str = attach_entry(_("Reply prefix:"), 4, table2);
+
+    pui->reply_strip_html_parts =
+	gtk_check_button_new_with_label(_("don't include HTML parts as text when replying or forwarding mail"));
+    gtk_box_pack_start(GTK_BOX(vbox2), pui->reply_strip_html_parts,
+		       FALSE, TRUE, 0);
 
 	pui->always_queue_sent_mail =
 	gtk_check_button_new_with_label(_("Send button always queues outgoing mail in outbox"));

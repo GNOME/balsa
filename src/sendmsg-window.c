@@ -1187,7 +1187,7 @@ continueBody(BalsaSendmsg * msg, LibBalsaMessage * message)
     GString *rbdy;
 
     libbalsa_message_body_ref(message);
-    rbdy = content2reply(message, NULL, -1);
+    rbdy = content2reply(message, NULL, -1, balsa_app.reply_strip_html);
     if (rbdy) {
 	gtk_text_insert(GTK_TEXT(msg->text), NULL, NULL, NULL, rbdy->str,
 			strlen(rbdy->str));
@@ -1228,7 +1228,8 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 			 (type == SEND_REPLY || type == SEND_REPLY_ALL || 
 			  type == SEND_REPLY_GROUP) ?
 			 balsa_app.quote_str : NULL,
-			 balsa_app.wordwrap ? balsa_app.wraplength : -1);
+			 balsa_app.wordwrap ? balsa_app.wraplength : -1,
+			 balsa_app.reply_strip_html);
 
     if (body)
 	body = g_string_prepend(body, str);

@@ -62,7 +62,9 @@ libmutt_a_SOURCES = \
 	rfc1524.h	\
 	rfc2047.h	\
 	rfc822.h	\
-	sort.h
+	sort.h		\
+	thread_msgs.h
 
-CPPFLAGS=-DSHAREDIR=\"$(sharedir)\" -DLIBMUTT -DVERSION=\"$(VERSION)\"
+#CPPFLAGS=-DSHAREDIR=\"$(sharedir)\" -DLIBMUTT -DVERSION=\"$(VERSION)\"
+CPPFLAGS=-DSHAREDIR=\"$(sharedir)\" -DLIBMUTT
 INCLUDES=-I.

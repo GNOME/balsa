@@ -2860,7 +2860,7 @@ msgstr "Reenviar"
 
 # 51
 msgid "Mailboxes/Opened/"
-msgstr "Caixas de entrada abertas"
+msgstr "Caixas de entrada/abertas/"
 
 # 52
 msgid "Include signature when sending mail"
@@ -2876,4 +2876,4 @@ msgstr "Incluir assinatura quando responder mensagem"
 
 # 55
 msgid "Linesize:"
-msgstr "Tamanho da linha"
+msgstr "Tamanho da linha:"

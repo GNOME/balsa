@@ -157,6 +157,7 @@ fprintf(stderr,"Comienzo la funcion\n");
       balsa_create_msg (message,first_message->message,
 		            first_message->tempfile,0);
       first_message->fcc = message->fcc_mailbox;
+      
       message_number++;
   }
   else
@@ -280,10 +281,10 @@ guint
 balsa_send_message_real(MessageQueueItem *first_message)
 {
 #ifdef BALSA_USE_THREADS
-  SendThreadMessage *threadmsg, *delete_message;
+  SendThreadMessage *threadmsg, *delete_message ;
 #endif
   MessageQueueItem *current_message, *next_message;
-  int i, open;
+  int i;
 
   if( !first_message )
     return TRUE;
@@ -309,13 +310,22 @@ balsa_send_message_real(MessageQueueItem *first_message)
   
   }
   else
-  {	  
+  {	 
+
+#ifdef BALSA_USE_THREADS
+
+        pthread_mutex_lock( &send_messages_lock );
+        sending_mail = FALSE;
+        total_messages_left = 0;
+        pthread_mutex_unlock( &send_messages_lock );
+#endif
+		
      i = mutt_invoke_sendmail (first_message->message->env->to, 
 		   first_message->message->env->cc, 
 		   first_message->message->env->bcc, first_message->tempfile,
                    (first_message->message->content->encoding == ENC8BIT));
-  
-     if (i != 1 )
+ 
+     if (i != 0 )
      {
             mutt_write_fcc (MAILBOX_LOCAL (balsa_app.outbox)->path, 
 			    first_message->message, NULL, 1, NULL);
@@ -330,15 +340,14 @@ balsa_send_message_real(MessageQueueItem *first_message)
 #endif
              }
 
- /* Since we didn't send the mail we don't save it at send_mailbox */
-            return TRUE;
      }
-  
-     if ((balsa_app.sentbox->type == MAILBOX_MAILDIR ||
-             balsa_app.sentbox->type == MAILBOX_MH ||
-             balsa_app.sentbox->type == MAILBOX_MBOX) &&
-             first_message->fcc != NULL) 
-     {
+     else
+     {	     
+     	if ((balsa_app.sentbox->type == MAILBOX_MAILDIR ||
+                balsa_app.sentbox->type == MAILBOX_MH ||
+             	balsa_app.sentbox->type == MAILBOX_MBOX) &&
+                first_message->fcc != NULL) 
+     	{
             mutt_write_fcc (MAILBOX_LOCAL (first_message->fcc)->path, 
 			    first_message->message, NULL, 0, NULL);
 
@@ -351,25 +360,30 @@ balsa_send_message_real(MessageQueueItem *first_message)
 #endif
 	    }
 
-      }
+         }
+
+     }
+     
+     unlink (first_message->tempfile);
+     mutt_free_header (&first_message->message);
+     free( &first_message );
+
+#ifdef BALSA_USE_THREADS
+
+       MSGSENDTHREAD (threadmsg, MSGSENDTHREADFINISHED,"",NULL,NULL,0);
+
+       pthread_exit(0);
+#endif
+     
+     return TRUE;
 
   }
 
-  /* We give a message to the user depending on i=-1 or i=-2 */
-  if (i==-1)
-  {
-
-#ifdef BALSA_USE_THREADS
-             // pthread_mutex_lock( &send_messages_lock );
-  //            sending_mail = FALSE;
-             // pthread_mutex_unlock( &send_messages_lock );
-#endif
-				    
-	       fprintf(stderr,"Ha pasado -1\n");
+  /* We give a message to the user because an error has ocurred in the protocol
+   * A mistyped address? A server not allowing relay? We can pop a window to ask */
        
-   }
    if (i==-2)
-        fprintf(stderr,"Ha pasado -2\n");
+        fprintf(stderr,"Something has happened in the SMTP protocol\n");
        
 //   return TRUE;
 
@@ -377,21 +391,12 @@ balsa_send_message_real(MessageQueueItem *first_message)
             
     current_message = first_message;
     
-    if (balsa_app.outbox->open_ref == 0)
-    {
-	  //  balsa_mailbox_open (balsa_app.outbox);
-	    open = 0;
-    }
-    else
-	    open = 1;
-    
     while (current_message != NULL)
     {
 	   
-  //       unlink (current_message->tempfile);
          if (current_message->delete == 1)
          {
-/*	         if ((balsa_app.sentbox->type == MAILBOX_MAILDIR ||
+	         if ((balsa_app.sentbox->type == MAILBOX_MAILDIR ||
 	                 balsa_app.sentbox->type == MAILBOX_MH ||
 	                 balsa_app.sentbox->type == MAILBOX_MBOX) )
 			 
@@ -400,11 +405,12 @@ balsa_send_message_real(MessageQueueItem *first_message)
 				MAILBOX_LOCAL (balsa_app.sentbox)->path,
 				current_message->message, NULL, 0, NULL);
 	       
-*/
+
 #ifdef BALSA_USE_THREADS
-		 MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE, "Hola",
+		 MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE," ",
 		                         current_message->orig, NULL, 0);
 #endif
+		 
 	 }
 	 else
          {
@@ -413,22 +419,18 @@ balsa_send_message_real(MessageQueueItem *first_message)
 			       MAILBOX_LOCAL (balsa_app.outbox)->path,
 			       current_message->message, NULL, 0, NULL);
 	 }
-	 
+	
+	unlink (current_message->tempfile); 
         next_message = current_message->next_message;
-  //      mutt_free_header (&current_message->message);
-  //      free( current_message );
-        current_message = next_message;
+        mutt_free_header (&current_message->message);
+        
+	current_message = next_message;
     }
+    
 #ifdef BALSA_USE_THREADS
     MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE, "LAST",
                              NULL, NULL, 0);
-#endif
-    //if (open == 0)
-	//    balsa_mailbox_close (balsa_app.outbox);
-
-
-#if BALSA_USE_THREADS
-
+    
     pthread_exit(0); 
   
 #endif

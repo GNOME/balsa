@@ -1158,6 +1158,7 @@ send_progress_notify_cb( )
                 {
 			message = node->data;
                 	message_delete (message);
+			free( &message );
 			node = node->next;
                 }
                 balsa_mailbox_close (balsa_app.outbox);

@@ -1831,12 +1831,37 @@ align="center"></graphic>
   notebook. The tabs and options are explained below.
 </para>
 
+<!--
 <figure>
   <title>Preferences Window</title>
   <screenshot>
     <graphic fileref="images/preferences-window" format="png" srccredit="Matthew Guenther" align="center"></graphic>
   </screenshot>
 </figure>
+-->
+  <itemizedlist>
+    <listitem>
+      <para><link linkend="preferences-0">Mail Servers</link></para>
+    </listitem>
+    <listitem>
+      <para><link linkend="preferences-1">Address Books</link></para>
+    </listitem>
+    <listitem>
+      <para><link linkend="preferences-2">Mail Options</link></para>
+    </listitem>
+    <listitem>
+      <para><link linkend="preferences-3">Display</link></para>
+    </listitem>
+    <listitem>
+      <para><link linkend="preferences-4">Spelling</link></para>
+    </listitem>
+    <listitem>
+      <para><link linkend="preferences-5">Miscellaneous</link></para>
+    </listitem>
+    <listitem>
+      <para><link linkend="preferences-6">Startup</link></para>
+    </listitem>
+  </itemizedlist>
 </sect1>
 
 <!-- ################################################################# -->

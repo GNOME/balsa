@@ -2093,6 +2093,9 @@ create_menu(BalsaIndex * bindex)
     mailbox = bindex->mailbox_node->mailbox;
 
     menu = gtk_menu_new();
+    /* it's a single-use menu, so we must destroy it when we're done */
+    gtk_signal_connect(GTK_OBJECT(menu), "selection-done",
+                       gtk_object_destroy, NULL);
 
     for(i=0; i<ELEMENTS(entries); i++)
         create_stock_menu_item(menu, entries[i].icon, _(entries[i].label),
@@ -2177,11 +2180,6 @@ create_menu(BalsaIndex * bindex)
     gtk_signal_connect(GTK_OBJECT(bmbl), "tree_select_row",
 		       (GtkSignalFunc) transfer_messages_cb,
 		       (gpointer) bindex);
-
-    /* We would rather connect to "destroy" signal but it is apparently
-     * not emmited. Gtk bug? memory leak? */
-    gtk_signal_connect_object(GTK_OBJECT(menu), "selection-done",
-                              gtk_object_destroy, GTK_OBJECT(bmbl));
 
     /* Force the mailbox list to be a reasonable size. */
     gtk_widget_size_request(bmbl, &req);

@@ -1,3 +1,9 @@
+2002-01-31  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-index.c: 
+	* src/mailbox-node.c: destroy single-use context menus. Properly.
+	* help/C/balsa.sgml, help/C/topic.dat: doc updates.
+
 2002-01-30  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/balsa-index.c: BalsaMBList is not properly destroyed when

@@ -104,12 +104,12 @@ DEFS = -DG_DISABLE_DEPRECATED   \
 #Signal marshallers
 marshal_prefix = libbalsa
 libbalsa-marshal.h: libbalsa-marshal.list
-	( @GLIB_GENMARSHAL@ --prefix=$(marshal_prefix) libbalsa-marshal.list --header > libbalsa-marshal.tmp \
+	( @GLIB_GENMARSHAL@ --prefix=$(marshal_prefix) $(srcdir)/libbalsa-marshal.list --header > libbalsa-marshal.tmp \
 	&& mv libbalsa-marshal.tmp libbalsa-marshal.h ) \
 	|| ( rm -f libbalsa-marshal.tmp && exit 1 )
 libbalsa-marshal.c: libbalsa-marshal.h
 	( echo "#include \"libbalsa-marshal.h\"" > libbalsa-marshal.tmp \
-	&& @GLIB_GENMARSHAL@ --prefix=$(marshal_prefix) libbalsa-marshal.list --body >> libbalsa-marshal.tmp \
+	&& @GLIB_GENMARSHAL@ --prefix=$(marshal_prefix) $(srcdir)/libbalsa-marshal.list --body >> libbalsa-marshal.tmp \
 	&& mv libbalsa-marshal.tmp libbalsa-marshal.c ) \
 	|| ( rm -f libbalsa-marshal.tmp && exit 1 )
 

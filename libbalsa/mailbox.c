@@ -443,7 +443,7 @@ static gboolean
 lbm_rethread(LibBalsaMailbox*m)
 {
     gdk_threads_enter();
-    LOCK_MAILBOX(m);
+    LOCK_MAILBOX_RETURN_VAL(m, FALSE);
     lbm_set_threading(m, m->view->threading_type);
     UNLOCK_MAILBOX(m);
     g_object_unref(G_OBJECT(m));

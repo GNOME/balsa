@@ -561,7 +561,7 @@ update_counters_and_filter(void *data)
     LibBalsaMailbox *mailbox= (LibBalsaMailbox*)data;
 
     gdk_threads_enter();
-    LOCK_MAILBOX(mailbox);
+    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE); /* or retry? */
     libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
     lbm_imap_get_unseen(LIBBALSA_MAILBOX_IMAP(mailbox));
     UNLOCK_MAILBOX(mailbox);

@@ -1,5 +1,6 @@
-2004-05-25 13:05  PeterB
+2004-05-25 13:28  PeterB
 
+	* libbalsa/mailbox.c: Manu: make get-path-helper nonrecursive.
 	* libbalsa/mailbox.c: run filters on recent undeleted messages, not
 	all recent.
 	* src/: main-window.c, main-window.h: pass BalsaWindow as an

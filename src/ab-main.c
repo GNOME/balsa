@@ -43,6 +43,7 @@
 #endif
 #include "address-book-vcard.h"
 #include "address-book-gpe.h"
+#include "libbalsa-conf.c"
 #include "i18n.h"
 
 struct ABMainWindow {
@@ -67,33 +68,19 @@ static gint bab_kill_session(GnomeClient * client, gpointer client_data);
 
 static void ab_set_edit_widget(GtkWidget *w, gboolean can_remove);
 
-#define BALSA_CONFIG_PREFIX "balsa/"
 #define ADDRESS_BOOK_SECTION_PREFIX "address-book-"
-static void
-bab_config_init(void)
+static gboolean
+bab_config_init(const gchar * group, const gchar * value, gpointer data)
 {
     LibBalsaAddressBook *address_book;
-    void *iterator;
-    gchar *key, *val, *tmp;
-    int pref_len = strlen(ADDRESS_BOOK_SECTION_PREFIX);
+    GList **address_book_list = data;
 
-    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
-    while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
+    address_book = libbalsa_address_book_new_from_config(group);
+    if (address_book)
+        *address_book_list =
+            g_list_append(*address_book_list, address_book);
 
-	if (strncmp(key, ADDRESS_BOOK_SECTION_PREFIX, pref_len) == 0) {
-	    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
-
-	    address_book = libbalsa_address_book_new_from_config(tmp);
-	    if (address_book)
-		contacts_app.address_book_list =
-		    g_list_append(contacts_app.address_book_list,
-				  address_book);
-	    g_free(tmp);
-	}
-	g_free(key);
-	g_free(val);
-    }
-
+    return FALSE;
 }
 
 static void ab_warning(const char *fmt, ...);
@@ -472,7 +459,6 @@ cancel_button_cb(GtkWidget *w, gpointer data)
     } else ab_set_edit_widget(NULL, FALSE);
 }
 
-#define ELEMENTS(x) (sizeof(x)/sizeof((x)[0])) 
 static GtkWidget*
 bab_get_edit_button_box(struct ABMainWindow *abmw)
 {
@@ -669,7 +655,9 @@ main(int argc, char *argv[])
     bab_init();
 
     /* load address book data */
-    bab_config_init();
+    libbalsa_conf_foreach_group(ADDRESS_BOOK_SECTION_PREFIX,
+                                bab_config_init,
+                                &contacts_app.address_book_list);
 
     ab_window = bab_window_new();
     g_signal_connect(G_OBJECT(ab_window), "destroy",

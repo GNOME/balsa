@@ -1578,13 +1578,16 @@ pop3_edit_cb (GtkWidget * widget, gpointer data)
 	if (!mailbox)
 		return;
 
-	mailbox_conf_new (mailbox, FALSE, MAILBOX_UNKNOWN);
+	mailbox_conf_new (mailbox, FALSE);
 }
 
 static void
 pop3_add_cb (GtkWidget * widget, gpointer data)
 {
-	mailbox_conf_new (NULL, FALSE, MAILBOX_POP3);
+  LibBalsaMailbox *mb = LIBBALSA_MAILBOX(libbalsa_mailbox_pop3_new());
+
+  /* If the user cancels this will be destroyed */
+  mailbox_conf_new (mb, TRUE);
 }
 
 static void

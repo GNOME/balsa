@@ -128,6 +128,9 @@ GtkObject* libbalsa_mailbox_local_new(const gchar *path, gboolean create)
   case M_MAILDIR:
     type = LIBBALSA_MAILBOX_LOCAL_MAILDIR;
     break;
+  case M_IMAP:
+    g_warning ("Got IMAP as type for local mailbox\n");
+    return NULL;
   default:
     type = MAILBOX_MBOX;
   }

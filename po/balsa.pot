@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2000-07-11 17:51-0700\n"
+"POT-Creation-Date: 2000-07-12 19:37-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -352,7 +352,7 @@ msgstr ""
 msgid "To"
 msgstr ""
 
-#: src/balsa-mblist.c:225 src/mailbox-conf.c:1165
+#: src/balsa-mblist.c:225 src/mailbox-conf.c:1185
 msgid "Mailbox"
 msgstr ""
 
@@ -539,7 +539,7 @@ msgstr ""
 msgid "Match string:"
 msgstr ""
 
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:300 src/mailbox-conf.c:1130
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1150
 #: src/pref-manager.c:890
 msgid "Add"
 msgstr ""
@@ -629,7 +629,7 @@ msgid "Balsa Filters"
 msgstr ""
 
 #. FIXME: Should prompt to remove file aswell
-#: src/mailbox-conf.c:180
+#: src/mailbox-conf.c:181
 #, c-format
 msgid ""
 "This will remove the mailbox %s and it's files permanently from your "
@@ -637,7 +637,7 @@ msgid ""
 "Are you sure you want to remove this mailbox?"
 msgstr ""
 
-#: src/mailbox-conf.c:185
+#: src/mailbox-conf.c:186
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
@@ -645,126 +645,118 @@ msgid ""
 "Are you sure you want to remove this mailbox?"
 msgstr ""
 
-#: src/mailbox-conf.c:213
+#: src/mailbox-conf.c:214
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr ""
 
-#: src/mailbox-conf.c:255
+#: src/mailbox-conf.c:268
 msgid "Mailbox Configurator"
 msgstr ""
 
-#: src/mailbox-conf.c:310 src/mailbox-conf.c:1124
+#: src/mailbox-conf.c:330 src/mailbox-conf.c:1144
 msgid "Update"
 msgstr ""
 
-#: src/mailbox-conf.c:442 src/mailbox-conf.c:448 src/mailbox-conf.c:472
+#: src/mailbox-conf.c:458 src/mailbox-conf.c:464 src/mailbox-conf.c:488
 msgid "You need to fill in the Mailbox Name field."
 msgstr ""
 
-#: src/mailbox-conf.c:451
+#: src/mailbox-conf.c:467
 msgid "You need to fill in the folderpath field."
 msgstr ""
 
-#: src/mailbox-conf.c:453
+#: src/mailbox-conf.c:469
 msgid "You need to fill in the IMAP Server field"
 msgstr ""
 
-#: src/mailbox-conf.c:455
+#: src/mailbox-conf.c:471
 msgid "You need to fill in the username field"
 msgstr ""
 
-#: src/mailbox-conf.c:457
-msgid "You need to fill in the password field"
-msgstr ""
-
-#: src/mailbox-conf.c:459
+#: src/mailbox-conf.c:475
 msgid "You need to fill in the port field"
 msgstr ""
 
-#: src/mailbox-conf.c:476
+#: src/mailbox-conf.c:492
 msgid "You need to fill in the user field."
 msgstr ""
 
-#: src/mailbox-conf.c:480
-msgid "You need to fill in the password field."
-msgstr ""
-
-#: src/mailbox-conf.c:484
+#: src/mailbox-conf.c:500
 msgid "You need to fill in the server field."
 msgstr ""
 
-#: src/mailbox-conf.c:488
+#: src/mailbox-conf.c:504
 msgid "You need to fill in the port field."
 msgstr ""
 
-#: src/mailbox-conf.c:492
+#: src/mailbox-conf.c:508
 msgid "Some of the fields are blank."
 msgstr ""
 
-#: src/mailbox-conf.c:626
+#: src/mailbox-conf.c:642
 #, c-format
 msgid "%s on %s"
 msgstr ""
 
-#: src/mailbox-conf.c:815
+#: src/mailbox-conf.c:835
 msgid "New mailbox type:"
 msgstr ""
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:821
+#: src/mailbox-conf.c:841
 msgid "Local mailbox"
 msgstr ""
 
-#: src/mailbox-conf.c:831
+#: src/mailbox-conf.c:851
 msgid "Single IMAP folder"
 msgstr ""
 
-#: src/mailbox-conf.c:840
+#: src/mailbox-conf.c:860
 msgid "IMAP folder set"
 msgstr ""
 
 #. mailbox name
-#: src/mailbox-conf.c:865 src/mailbox-conf.c:900 src/mailbox-conf.c:1017
+#: src/mailbox-conf.c:885 src/mailbox-conf.c:920 src/mailbox-conf.c:1037
 msgid "Mailbox Name:"
 msgstr ""
 
 #. path to file
-#: src/mailbox-conf.c:875
+#: src/mailbox-conf.c:895
 msgid "Mailbox path:"
 msgstr ""
 
 #. pop server
-#: src/mailbox-conf.c:917 src/mailbox-conf.c:1027
+#: src/mailbox-conf.c:937 src/mailbox-conf.c:1047
 msgid "Server:"
 msgstr ""
 
 #. pop port
-#: src/mailbox-conf.c:936 src/mailbox-conf.c:1041
+#: src/mailbox-conf.c:956 src/mailbox-conf.c:1061
 msgid "Port:"
 msgstr ""
 
 #. username
-#: src/mailbox-conf.c:955 src/mailbox-conf.c:1056
+#: src/mailbox-conf.c:975 src/mailbox-conf.c:1076
 msgid "Username:"
 msgstr ""
 
 #. password field
-#: src/mailbox-conf.c:972 src/mailbox-conf.c:1071
+#: src/mailbox-conf.c:992 src/mailbox-conf.c:1091
 msgid "Password:"
 msgstr ""
 
 #. toggle for check
-#: src/mailbox-conf.c:987 src/main-window.c:399
+#: src/mailbox-conf.c:1007 src/main-window.c:399
 msgid "Check"
 msgstr ""
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:995
+#: src/mailbox-conf.c:1015
 msgid "Delete from server"
 msgstr ""
 
-#: src/mailbox-conf.c:1084
+#: src/mailbox-conf.c:1104
 msgid "Folder path:"
 msgstr ""
 
@@ -1106,8 +1098,8 @@ msgstr ""
 msgid "Mark as Draftbox"
 msgstr ""
 
-#: src/mblist-window.c:449 src/mblist-window.c:465 src/mblist-window.c:484
-#: src/mblist-window.c:499
+#: src/mblist-window.c:446 src/mblist-window.c:462 src/mblist-window.c:481
+#: src/mblist-window.c:496
 msgid "No mailbox selected."
 msgstr ""
 

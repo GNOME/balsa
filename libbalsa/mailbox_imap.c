@@ -100,6 +100,7 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap *mailbox)
   mailbox->path = NULL;
   mailbox->tmp_file_path = NULL;
 
+  mailbox->port = 143;
   mailbox->host = NULL;
   mailbox->user = NULL;
   mailbox->passwd = NULL;

@@ -1,8 +1,6 @@
-<!doctype article PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.0//EN" [<!-- if not using PNG graphic, replace reference above with 
-             .....PUBLIC "-//OASIS//DTD DocBook V3.1//EN"[
-         --> 
-<!ENTITY version "0.8.0"> 
-        <!-- replace with actual application  version number-->]>
+<!doctype article PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.0//EN" [
+<!ENTITY version "0.9.0"> 
+<!-- replace with actual application  version number-->]>
 
 <article id="index">
 
@@ -93,7 +91,7 @@
   <sect1 id="introduction">
     <title>Introduction</title>
     
-    <graphic fileref="images/balsa_logo" format="png" srccredit="tigert" align="center"></graphic>
+    <graphic fileref="images/balsa_logo" format="png" srccredit="tigert"></graphic>
 
     <para><application>Balsa</application> is a graphical mail client
       similar to Eudora on Windows. It supports the standard features of

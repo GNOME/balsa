@@ -96,6 +96,12 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 *mailbox)
 {
   mailbox->check = FALSE;
   mailbox->delete_from_server = FALSE;
+
+  mailbox->host = NULL;
+  mailbox->port = 110;
+  mailbox->user = NULL;
+  mailbox->passwd = NULL;
+
 }
 
 static void

@@ -2,6 +2,24 @@
 
 	* configure.in: added en_GB.po to ALL_LINGUAS
 
+2000-07-12  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/libbalsa.h:
+	* libbalsa/mailbox_imap.c:
+	* libbalsa/mailbox_local.c:
+	* libbalsa/mailbox_pop3.c:
+	* src/mailbox-conf.c:
+	* src/mailbox-conf.h:
+	* src/mblist-window.c:
+	* src/pref-manager.c:
+
+	Fix bug where mailbox configuration warns that certain fields have
+	not been filled in when they have. Also allow password to be
+	blank, since there is code to check for this and prompt at
+	runtime.
+
+	Initialize fields of some mailbox types.
+	
 2000-07-11  Ian Campbell  <ijc25@cam.ac.uk>
 	* libbalsa/body.c:
 	* libbalsa/body.h:

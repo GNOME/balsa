@@ -46,6 +46,10 @@ typedef struct body MuttBody;
 #include "mailbox_pop3.h"
 #include "mailbox_imap.h"
 
+#ifdef BALSA_SHOW_ALL
+#include "filter.h"
+#endif
+
 /*
  * Initialize the library
  */

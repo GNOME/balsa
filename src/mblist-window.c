@@ -316,13 +316,13 @@ mb_close_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 static void
 mb_conf_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
-  mailbox_conf_new (mailbox, FALSE, MAILBOX_UNKNOWN);
+  mailbox_conf_new (mailbox, FALSE);
 }
 
 static void
 mb_add_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
-  mailbox_conf_new (mailbox, TRUE, MAILBOX_UNKNOWN);
+  mailbox_conf_new (NULL, TRUE);
 }
 
 static void
@@ -429,13 +429,10 @@ mblist_create_context_menu (GtkCTree * ctree, LibBalsaMailbox * mailbox)
   return menu;
 }
 
-
 void
 mblist_menu_add_cb (GtkWidget * widget, gpointer data)
 {
-  LibBalsaMailbox *mailbox = mblist_get_selected_mailbox ();
-  
-  mailbox_conf_new (mailbox, TRUE, MAILBOX_UNKNOWN);
+  mailbox_conf_new (NULL, TRUE);
 }
 
 
@@ -451,7 +448,7 @@ mblist_menu_edit_cb (GtkWidget * widget, gpointer data)
       return;
     }
 
-  mailbox_conf_new (mailbox, FALSE, MAILBOX_UNKNOWN);
+  mailbox_conf_new (mailbox, FALSE);
 }
 
 

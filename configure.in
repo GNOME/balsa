@@ -90,7 +90,7 @@ dnl ############################################################################
 dnl All the linguas, all the time.
 dnl ######################################################################################
 
-ALL_LINGUAS="ca da de el es es_ES et fi fr ga hu it ja ko lt nl no pl pt pt_BR ru sl sv tr uk zh_CN"
+ALL_LINGUAS="ca da de en_GB el es es_ES et fi fr ga hu it ja ko lt nl no pl pt pt_BR ru sl sv tr uk zh_CN"
 LINGUAS="$ALL_LINGUAS"
 AM_GNU_GETTEXT
 

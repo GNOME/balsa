@@ -1,6 +1,8 @@
 2000-05-30  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/address-book.c: bug #12535 fix.
+	* src/balsa-message.c: bug #11949 fix
+	* src/balsa-index-page.c: bug #12606 fix.
 	
 2000-05-28  Matthew Guenther <mguenthe@netcom.ca>
 

@@ -547,7 +547,10 @@ message_status_set_read_cb (GtkWidget * widget, BalsaIndex *bindex)
     {
       message = gtk_clist_get_row_data (GTK_CLIST (bindex), 
       					GPOINTER_TO_INT (list->data));
-      message_read (message);
+      
+      if(message) /* FIXME: some crashes were reported with gnome-libs 1.2.0
+		   * if this wasn't checked. How come? */
+	  message_read (message);
       list = list->next;
     }
 }

@@ -1363,20 +1363,23 @@ lbm_mbox_armor_part(GMimeObject ** part)
 
     if (GMIME_IS_MULTIPART(*part)) {
 	const gchar *face;
-	gchar *new_face;
 	const GMimeContentType *content_type =
 	    g_mime_object_get_content_type(*part);
 	GList *subpart;
 
 	face = g_mime_multipart_get_preface(GMIME_MULTIPART(*part));
-	new_face = lbm_mbox_armor_face(face);
-	g_mime_multipart_set_preface(GMIME_MULTIPART(*part), new_face);
-	g_free(new_face);
+	if (face) {
+	    gchar *new_face = lbm_mbox_armor_face(face);
+	    g_mime_multipart_set_preface(GMIME_MULTIPART(*part), new_face);
+	    g_free(new_face);
+	}
 
 	face = g_mime_multipart_get_postface(GMIME_MULTIPART(*part));
-	new_face = lbm_mbox_armor_face(face);
-	g_mime_multipart_set_postface(GMIME_MULTIPART(*part), new_face);
-	g_free(new_face);
+	if (face) {
+	    gchar *new_face = lbm_mbox_armor_face(face);
+	    g_mime_multipart_set_postface(GMIME_MULTIPART(*part), new_face);
+	    g_free(new_face);
+	}
 
 	if (g_mime_content_type_is_type(content_type, "multipart", "signed"))
 	    /* Don't change the coding of its parts. */

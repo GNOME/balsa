@@ -259,8 +259,6 @@ libbalsa_mailbox_maildir_new(const gchar * path, gboolean create)
     mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
     lbm_maildir_set_subdirs(mdir, path);
 
-    libbalsa_notify_register_mailbox(mailbox);
-
     return G_OBJECT(mailbox);
 }
 

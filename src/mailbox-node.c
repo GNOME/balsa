@@ -35,7 +35,6 @@
 #include "mailbox-conf.h"
 #include "mailbox-node.h"
 #include "save-restore.h"
-#include "notify.h"
 #include "filter.h"
 #include "imap-server.h"
 

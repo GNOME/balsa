@@ -149,11 +149,6 @@ static gboolean libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox *
 						    LibBalsaMailbox *
 						    dest);
 
-static void server_settings_changed(LibBalsaServer * server,
-				    LibBalsaMailbox * mailbox);
-static void server_user_settings_changed_cb(LibBalsaServer * server,
-					    gchar * string,
-					    LibBalsaMailbox * mailbox);
 static void server_host_settings_changed_cb(LibBalsaServer * server,
 					    gchar * host,
 #ifdef USE_SSL
@@ -286,8 +281,6 @@ libbalsa_mailbox_imap_finalize(GObject * object)
 
     g_assert(LIBBALSA_MAILBOX(mailbox)->open_ref == 0);
 
-    libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
-
     remote = LIBBALSA_MAILBOX_REMOTE(object);
     g_free(mailbox->path); mailbox->path = NULL;
 
@@ -322,16 +315,6 @@ libbalsa_mailbox_imap_update_url(LibBalsaMailboxImap* mailbox)
     LIBBALSA_MAILBOX(mailbox)->url = libbalsa_imap_url(s, mailbox->path);
 }
 
-/* Unregister an old notification and add a current one */
-static void
-server_settings_changed(LibBalsaServer * server, LibBalsaMailbox * mailbox)
-{
-    libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
-
-    if (server->user && server->passwd && server->host)
-	libbalsa_notify_register_mailbox(mailbox);
-}
-
 void
 libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap* mailbox, const gchar* path)
 {
@@ -339,23 +322,12 @@ libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap* mailbox, const gchar* path)
     g_free(mailbox->path);
     mailbox->path = g_strdup(path);
     libbalsa_mailbox_imap_update_url(mailbox);
-
-    g_return_if_fail(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
-    server_settings_changed(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
-			    LIBBALSA_MAILBOX(mailbox));
 }
 
 const gchar*
 libbalsa_mailbox_imap_get_path(LibBalsaMailboxImap * mailbox)
 {
     return mailbox->path;
-}
-
-static void
-server_user_settings_changed_cb(LibBalsaServer * server, gchar * string,
-				LibBalsaMailbox * mailbox)
-{
-    server_settings_changed(server, mailbox);
 }
 
 static void
@@ -366,7 +338,6 @@ server_host_settings_changed_cb(LibBalsaServer * server, gchar * host,
 				LibBalsaMailbox * mailbox)
 {
     libbalsa_mailbox_imap_update_url(LIBBALSA_MAILBOX_IMAP(mailbox));
-    server_settings_changed(server, mailbox);
 }
 
 static gchar*
@@ -1287,12 +1258,6 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server = LIBBALSA_SERVER(libbalsa_imap_server_new_from_config());
 
-    g_signal_connect(G_OBJECT(remote->server), "set-username",
-		     G_CALLBACK(server_user_settings_changed_cb),
-		     (gpointer) mailbox);
-    g_signal_connect(G_OBJECT(remote->server), "set-password",
-		     G_CALLBACK(server_user_settings_changed_cb),
-		     (gpointer) mailbox);
     g_signal_connect(G_OBJECT(remote->server), "set-host",
 		     G_CALLBACK(server_host_settings_changed_cb),
 		     (gpointer) mailbox);
@@ -1300,8 +1265,6 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->load_config)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);
 
-    server_settings_changed(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
-			    mailbox);
     libbalsa_mailbox_imap_update_url(mimap);
 }
 

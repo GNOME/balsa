@@ -211,8 +211,6 @@ libbalsa_mailbox_mbox_new(const gchar * path, gboolean create)
 	return NULL;
     }
     
-    libbalsa_notify_register_mailbox(mailbox);
-    
     return G_OBJECT(mailbox);
 }
 

@@ -79,7 +79,6 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 
     libbalsa_real_information_func = information_callback;
 
-    libbalsa_notify_init();
     g_mime_init(0);
 
     /* Register our types */

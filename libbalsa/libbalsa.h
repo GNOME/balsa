@@ -38,7 +38,6 @@ typedef struct _LibBalsaCondition LibBalsaCondition;
 #include "body.h"
 #include "files.h"
 #include "mime.h"
-#include "notify.h"
 
 #include "information.h"
 

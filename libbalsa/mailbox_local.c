@@ -222,10 +222,8 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 
     /* update mailbox data */
     if(!i) {
-	libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
 	g_free(LIBBALSA_MAILBOX(mailbox)->url);
 	LIBBALSA_MAILBOX(mailbox)->url = g_strconcat("file://", path, NULL);
-	libbalsa_notify_register_mailbox(LIBBALSA_MAILBOX(mailbox));
 	return 0;
     } else
 	return errno ? errno : -1;
@@ -290,7 +288,6 @@ libbalsa_mailbox_local_finalize(GObject * object)
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(object));
 
     ml = LIBBALSA_MAILBOX_LOCAL(object);
-    libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(object));
     if(ml->sync_id) {
         g_source_remove(ml->sync_id);
         ml->sync_id = 0;
@@ -341,8 +338,6 @@ libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->load_config)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);
-
-    libbalsa_notify_register_mailbox(mailbox);
 }
 
 static void

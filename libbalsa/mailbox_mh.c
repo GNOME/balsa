@@ -219,8 +219,6 @@ libbalsa_mailbox_mh_new(const gchar * path, gboolean create)
     mh = LIBBALSA_MAILBOX_MH(mailbox);
     mh->sequences_filename = g_strdup_printf("%s/.mh_sequences", path);
 
-    libbalsa_notify_register_mailbox(mailbox);
-    
     return G_OBJECT(mailbox);
 }
 

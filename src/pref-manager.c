@@ -569,7 +569,7 @@ create_identity_page (void)
 {
 
   GtkWidget *vbox;
-  /*GtkWidget *hbox;*/x
+  /*GtkWidget *hbox;*/
   GtkWidget *frame;
   GtkWidget *table;
   GtkWidget *label;

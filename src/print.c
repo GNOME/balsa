@@ -1016,6 +1016,18 @@ find_font(const gchar * name, GHashTable * font_table)
     return font;
 }
 
+static gdouble
+get_length_from_config(GnomePrintConfig * config, const gchar * key)
+{
+    const GnomePrintUnit *unit;
+    gdouble length = 0.0;
+
+    if (gnome_print_config_get_length(config, key, &length, &unit))
+        gnome_print_convert_distance(&length, unit, GNOME_PRINT_PS_UNIT);
+
+    return length;
+}
+
 static PrintInfo *
 print_info_new(CommonInfo * ci)
 {
@@ -1026,15 +1038,19 @@ print_info_new(CommonInfo * ci)
     BALSA_GNOME_PRINT_UI_GET_PAGE_SIZE_FROM_CONFIG(config,
                                                    &pi->page_width,
                                                    &pi->page_height);
+    pi->margin_top =
+        get_length_from_config(config, GNOME_PRINT_KEY_PAGE_MARGIN_TOP);
+    pi->margin_bottom =
+        get_length_from_config(config, GNOME_PRINT_KEY_PAGE_MARGIN_BOTTOM);
+    pi->margin_left =
+        get_length_from_config(config, GNOME_PRINT_KEY_PAGE_MARGIN_LEFT);
+    pi->margin_right =
+        get_length_from_config(config, GNOME_PRINT_KEY_PAGE_MARGIN_RIGHT);
     gnome_print_config_unref(config);
 
     pi->pc = BALSA_GNOME_PRINT_UI_GET_CONTEXT(ci->master);
     pi->current_page = 0;
-    pi->margin_top = 0.75 * 72;
-    pi->margin_bottom = 0.75 * 72;
-    pi->margin_left = 0.75 * 72;
-    pi->margin_right = 0.75 * 72;
-    pi->pgnum_from_top = 0.5 * 72;
+    pi->pgnum_from_top = pi->margin_top - 0.25 * 72;
     pi->printable_width =
 	pi->page_width - pi->margin_left - pi->margin_right;
     pi->printable_height =

@@ -1,8 +1,9 @@
 2003-01-06 PeterB
 
-        * src/main-window.c: move message_print_cb from src/print.c.
-        * src/print.[hc]: move message_print_cb to src/main-window.c;
-        make print dialog non-modal and one-per-message.
+        * src/main-window.c: Move message_print_cb from src/print.c.
+        * src/print.[hc]: Move message_print_cb to src/main-window.c;
+        Make print dialog non-modal and one-per-message;
+        Get page margins from GnomePrintConfig.
         * src/sendmsg-window.c (print_message_cb): LibBalsaMessage no
         longer subclasses GtkObject. 
 

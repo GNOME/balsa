@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1998-2002 Stuart Parmenter and others, see AUTHORS file.
+ * Copyright (C) 1998-2003 Stuart Parmenter and others, see AUTHORS file.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -333,51 +333,53 @@ struct {
 #define LOC_ENGLISH_POS     8
     /* English -> American English, argh... */
     {"en_US", "ISO-8859-1", N_("English")}, 
-#define LOC_ESTONIAN_POS    9
+#define LOC_ESPERANTO_POS   9
+    {"eo_XX", "UTF-8",      N_("Esperanto")},
+#define LOC_ESTONIAN_POS    10
     {"et_EE", "ISO-8859-15", N_("Estonian")},
-#define LOC_FINNISH_POS     10
+#define LOC_FINNISH_POS     11
     {"fi_FI", "ISO-8859-15", N_("Finnish")},
-#define LOC_FRENCH_POS      11
+#define LOC_FRENCH_POS      12
     {"fr_FR", "ISO-8859-15", N_("French")},
-#define LOC_GREEK_POS       12 
+#define LOC_GREEK_POS       13 
     {"el_GR", "ISO-8859-7", N_("Greek")},
-#define LOC_HEBREW_POS      13
+#define LOC_HEBREW_POS      14
     {"he_IL", "UTF-8", N_("Hebrew")},
-#define LOC_HUNGARIAN_POS   14
+#define LOC_HUNGARIAN_POS   15
     {"hu_HU", "ISO-8859-2", N_("Hungarian")},
-#define LOC_ITALIAN_POS     15
+#define LOC_ITALIAN_POS     16
     {"it_IT", "ISO-8859-15", N_("Italian")},
-#define LOC_JAPANESE_POS    16
+#define LOC_JAPANESE_POS    17
     {"ja_JP", "euc-jp", N_("Japanese")},
-#define LOC_KOREAN_POS      17
+#define LOC_KOREAN_POS      18
     {"ko_KR", "euc-kr", N_("Korean")},
-#define LOC_LATVIAN_POS     18
+#define LOC_LATVIAN_POS     19
     {"lv_LV", "ISO-8859-13", N_("Latvian")},
-#define LOC_LITHUANIAN_POS  19
+#define LOC_LITHUANIAN_POS  20
     {"lt_LT", "ISO-8859-13", N_("Lithuanian")},
-#define LOC_NORWEGIAN_POS   20
+#define LOC_NORWEGIAN_POS   21
     {"no_NO", "ISO-8859-1", N_("Norwegian")},
-#define LOC_POLISH_POS      21
+#define LOC_POLISH_POS      22
     {"pl_PL", "ISO-8859-2", N_("Polish")},
-#define LOC_PORTUGESE_POS   22
+#define LOC_PORTUGESE_POS   23
     {"pt_PT", "ISO-8859-15", N_("Portugese")},
-#define LOC_ROMANIAN_POS    23
+#define LOC_ROMANIAN_POS    24
     {"ro_RO", "ISO-8859-2", N_("Romanian")},
-#define LOC_RUSSIAN_ISO_POS 24
+#define LOC_RUSSIAN_ISO_POS 25
     {"ru_SU", "ISO-8859-5", N_("Russian (ISO)")},
-#define LOC_RUSSIAN_KOI_POS 25
+#define LOC_RUSSIAN_KOI_POS 26
     {"ru_RU", "KOI8-R", N_("Russian (KOI)")},
-#define LOC_SLOVAK_POS      26
+#define LOC_SLOVAK_POS      27
     {"sk_SK", "ISO-8859-2", N_("Slovak")},
-#define LOC_SPANISH_POS     27
+#define LOC_SPANISH_POS     28
     {"es_ES", "ISO-8859-15", N_("Spanish")},
-#define LOC_SWEDISH_POS     28
+#define LOC_SWEDISH_POS     29
     {"sv_SE", "ISO-8859-1", N_("Swedish")},
-#define LOC_TURKISH_POS     29
+#define LOC_TURKISH_POS     30
     {"tr_TR", "ISO-8859-9", N_("Turkish")},
-#define LOC_UKRAINIAN_POS   30
+#define LOC_UKRAINIAN_POS   31
     {"uk_UK", "KOI8-U", N_("Ukrainian")},
-#define LOC_UTF8_POS        31
+#define LOC_UTF8_POS        33
     {"", "UTF-8", N_("Generic UTF-8")}
 };
 
@@ -400,8 +402,8 @@ static GnomeUIInfo locale_aj_menu[] = {
                           GINT_TO_POINTER(LOC_DUTCH_POS), NULL),
     GNOMEUIINFO_ITEM_DATA(N_("English"), NULL, lang_set_cb,
                           GINT_TO_POINTER(LOC_ENGLISH_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Estonian"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_ESTONIAN_POS), NULL),
+    GNOMEUIINFO_ITEM_DATA(N_("Esperanto"), NULL, lang_set_cb,
+                          GINT_TO_POINTER(LOC_ESPERANTO_POS), NULL),
     GNOMEUIINFO_ITEM_DATA(N_("Finnish"), NULL, lang_set_cb,
                           GINT_TO_POINTER(LOC_FINNISH_POS), NULL),
     GNOMEUIINFO_ITEM_DATA(N_("French"), NULL, lang_set_cb,
@@ -853,6 +855,7 @@ change_identity_dialog_cb(GtkWidget* widget, BalsaSendmsg* msg)
 }
 
 
+/* NOTE: replace_offset and siglen are  utf-8 character offsets. */
 static void
 repl_identity_signature(BalsaSendmsg* msg, LibBalsaIdentity* new_ident,
                         LibBalsaIdentity* old_ident, gint* replace_offset, 
@@ -909,11 +912,7 @@ prep_signature(LibBalsaIdentity* ident, gchar* sig)
     if(sig == NULL) return NULL;
     
     if (ident->sig_separator) {
-        sig_tmp = g_strconcat("\n-- \n", sig, NULL);
-        g_free(sig);
-        sig = sig_tmp;
-    } else {
-        sig_tmp = g_strconcat("\n", sig, NULL);
+        sig_tmp = g_strconcat("-- \n", sig, NULL);
         g_free(sig);
         sig = sig_tmp;
     }
@@ -980,16 +979,17 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
     gtk_text_buffer_get_bounds(buffer, &start, &end);
     message_text = gtk_text_iter_get_text(&start, &end);
     if (!old_sig) {
-        replace_offset = msg->ident->sig_prepend ? 0 : strlen(message_text);
+        replace_offset = msg->ident->sig_prepend 
+            ? 0 : g_utf8_strlen(message_text, -1);
         repl_identity_signature(msg, ident, old_ident, &replace_offset,
                                 0, new_sig);
     } else {
         /* split on sig separator */
-        message_split = g_strsplit(message_text, "\n-- \n", 0);
-        siglen = strlen(old_sig);
+        message_split = g_strsplit(message_text, "-- \n", 0);
+        siglen = g_utf8_strlen(old_sig, -1);
         while (message_split[i]) {
             /* put sig separator back to search */
-            compare_str = g_strconcat("\n-- \n", message_split[i], NULL);
+            compare_str = g_strconcat("-- \n", message_split[i], NULL);
             
             /* try to find occurance of old signature */
             if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
@@ -997,7 +997,8 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
                                         &replace_offset, siglen, new_sig);
             }
             
-            replace_offset += strlen(i ? compare_str : message_split[i]);
+            replace_offset += 
+                g_utf8_strlen(i ? compare_str : message_split[i], -1);
             g_free(compare_str);
             i++;
         }
@@ -1012,7 +1013,7 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
                                             &replace_offset, siglen, new_sig);
                 }
                 replace_offset++;
-                compare_str++;
+                compare_str = g_utf8_next_char(compare_str);
             }
         }
         g_strfreev(message_split);
@@ -2237,6 +2238,7 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	    	g_string_prepend(body, "\n\n");
 	    	g_string_prepend(body, signature);
 	    } else {
+                g_string_append_c(body, '\n');
 	    	g_string_append(body, signature);
 	    }
 	    g_string_prepend_c(body, '\n');

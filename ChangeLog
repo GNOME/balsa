@@ -1,3 +1,7 @@
+2003-01-20  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: make sig switching utf-8 safe. Add Esperanto.
+
 2003-01-18  PeterB
 
 	* src/folder-conf.c: Non-modal IMAP folder dialog.

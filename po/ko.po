@@ -3,14 +3,182 @@
 # Sung-Hyun Nam <namsh@lgic.co.kr>, 1998 - 2000
 msgid ""
 msgstr ""
-"Project-Id-Version: balsa 0.9.2\n"
-"POT-Creation-Date: 2000-08-16 19:02+0900\n"
-"PO-Revision-Date: 2000-09-05 12:40+0900\n"
+"Project-Id-Version: balsa 1.0.0\n"
+"POT-Creation-Date: 2000-11-28 18:40+0900\n"
+"PO-Revision-Date: 2000-11-28 12:10+0900\n"
 "Last-Translator: Sung-Hyun Nam <namsh@kldp.org>\n"
 "Language-Team: Korean <ko@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=euc-kr\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: libbalsa/address-book-ldap.c:188
+msgid ""
+"Failed to initialise LDAP server.\n"
+"Check that the servername is valid."
+msgstr ""
+"LDAP 서버 초기화가 실패했습니다.\n"
+"서버 이름이 맞는 지 확인하세요."
+
+#: libbalsa/address-book-ldap.c:198
+#, c-format
+msgid ""
+"Failed to bind to server: %s\n"
+"Check that the servername is valid."
+msgstr ""
+"서버를 바인드 할 수 없습니다: %s\n"
+"서버 이름이 맞는 지 확인하세요."
+
+#: libbalsa/address-book-ldap.c:246
+#, c-format
+msgid "Failed to do a search: %sCheck that the base name is valid."
+msgstr "찾기 실패: %s 이름이 맞는 지 확인하세요."
+
+#: libbalsa/address-book-ldap.c:322 libbalsa/address-book-vcard.c:192
+msgid "No-Id"
+msgstr "ID 없음"
+
+#: libbalsa/address-book-ldap.c:329 libbalsa/address-book-vcard.c:201
+msgid "No-Name"
+msgstr "이름없음"
+
+#: libbalsa/address-book-vcard.c:170
+#, c-format
+msgid "Could not open vCard address book %s."
+msgstr "%s vCard 주소록을 열 수 없습니다."
+
+#: libbalsa/address-book-vcard.c:318
+#, c-format
+msgid "%s is already in address book."
+msgstr "%s가 주소록에 이미 있습니다."
+
+#: libbalsa/address-book-vcard.c:328
+#, c-format
+msgid "Cannot open vCard address book %s for saving\n"
+msgstr "저장할 vCard 주소록 %s를 열 수 없습니다.\n"
+
+#: libbalsa/address-book.c:170
+#, c-format
+msgid "Cannot load address book %s"
+msgstr "주소록 %s를 읽어올 수 없습니다"
+
+#: libbalsa/address-book.c:177
+#, c-format
+msgid "No such address book type: %s"
+msgstr "이런 주소록 형식은 없음: %s"
+
+#: libbalsa/address-book.c:186
+#, c-format
+msgid "Could not create a address book of type %s"
+msgstr "%s 형식의 주소록을 생성할 수 없습니다"
+
+#: libbalsa/mailbox.c:297
+#, c-format
+msgid "Cannot load mailbox %s"
+msgstr "우편함 %s를 읽어들일 수 없습니다"
+
+#: libbalsa/mailbox.c:304
+#, c-format
+msgid "No such mailbox type: %s"
+msgstr "이런 우편함 형식은 없습니다: %s"
+
+#: libbalsa/mailbox.c:312
+#, c-format
+msgid "Could not create a mailbox of type %s"
+msgstr "%s 형식의 우편함을 생성할 수 없습니다"
+
+#: libbalsa/mailbox_imap.c:284
+#, c-format
+msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
+msgstr ""
+
+#: libbalsa/mailbox_local.c:257
+#, c-format
+msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
+msgstr ""
+
+#: libbalsa/mailbox_pop3.c:199
+#, c-format
+msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
+msgstr ""
+
+#: libbalsa/mailbox_pop3.c:249
+#, c-format
+msgid ""
+"POP3 mailbox %s accessing error:\n"
+"%s"
+msgstr ""
+"POP3 우편함 %s 접근 에러:\n"
+"%s"
+
+#: libbalsa/pop3.c:48
+msgid "connection error"
+msgstr "연결 에러"
+
+#: libbalsa/pop3.c:49
+msgid "POP command exection failed"
+msgstr "POP 명령 실행 실패"
+
+#: libbalsa/pop3.c:50
+msgid "Could not write the message"
+msgstr "메시지를 쓸 수 없습니다"
+
+#: libbalsa/pop3.c:51
+msgid "Could not run the delivery program (procmail)"
+msgstr "배달 프로그램(procmail)을 실행할 수 없습니다"
+
+#: libbalsa/pop3.c:52
+msgid "Could not open mailbox for spooling"
+msgstr "스풀링할 우편함을 열 수 없습니다"
+
+#: libbalsa/pop3.c:53
+msgid "Could not append message"
+msgstr "메시지를 추가할 수 없습니다"
+
+#: libbalsa/pop3.c:54
+msgid "Host not found"
+msgstr "호스트를 찾을 수 없습니다"
+
+#: libbalsa/pop3.c:55
+msgid "Connection refused"
+msgstr "연결이 거부되었습니다"
+
+#: libbalsa/pop3.c:56
+msgid "Authentication failed"
+msgstr "인증이 실패했습니다"
+
+#: libbalsa/pop3.c:323
+#, c-format
+msgid "Retrieving Message %d of %d"
+msgstr "메시지 %d / %d 받는 중입니다"
+
+#: libbalsa/pop3.c:336
+#, c-format
+msgid "Received %d bytes of %d"
+msgstr ""
+
+#: libbalsa/send.c:376
+msgid ""
+"SMTP protocol error. Cannot relay.\n"
+"Your message is left in Outbox."
+msgstr ""
+"SMTP 프로토콜 에러. 중계할 수 없습니다.\n"
+"메시지가 보낼우편함에 남아있습니다."
+
+#: libbalsa/send.c:764
+#, c-format
+msgid "Error: Could not find address for host %s."
+msgstr "에러: %s 호스트의 주소를 찾을 수 없습니다."
+
+#: libbalsa/send.c:774
+#, c-format
+msgid "Connecting to %s"
+msgstr "%s에 연결중입니다"
+
+#: libbalsa/send.c:780
+#, c-format
+msgid "Error connecting to %s."
+msgstr "%s로 연결 도중 에러가 발생했습니다."
 
 #.
 #. ISPRIME(9)
@@ -35,15 +203,15 @@ msgstr ""
 msgid "Trash:"
 msgstr "휴지통:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:77
+#: libinit_balsa/balsa-druid-page-directory.gob:78
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
-msgstr "경로명 \"%s\"는 정확하게 주어져야 합니다 -- 반드시 '/'로 "
-"시작해야 합니다."
+msgstr ""
+"경로명 \"%s\"는 정확하게 주어져야 합니다 -- 반드시 '/'로 시작해야 합니다."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:100
+#: libinit_balsa/balsa-druid-page-directory.gob:101
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "우편함 \"%s\"는 비정상적입니다."
@@ -80,8 +248,8 @@ msgstr "모두 완료!"
 msgid "Please enter information about yourself."
 msgstr "당신의 정보를 입력하시기 바랍니다."
 
-#: libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:206
-#: src/address-book.c:571
+#: libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:252
+#: src/address-book.c:470
 msgid "Name:"
 msgstr "이름:"
 
@@ -101,7 +269,7 @@ msgstr "지역 메일 디렉토리:"
 msgid "User Settings"
 msgstr "사용자 설정"
 
-#: libinit_balsa/balsa-druid-page-user.gob:152
+#: libinit_balsa/balsa-druid-page-user.gob:156
 msgid "Local Mail Problem"
 msgstr "로컬 편지 문제 발생"
 
@@ -127,13 +295,17 @@ msgstr ""
 "대하여 박스를 확인해 보시기 바랍니다. 거기에서 저자에게\n"
 "연락하는 방법이나 버그를 레포팅하는 방법등을 알 수 있습니다"
 
-#: libinit_balsa/balsa-initdruid.gob:95
+#: libinit_balsa/balsa-initdruid.gob:97
 msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"
 msgstr ""
 "발사를 종료합니다.\n"
 "정말로 원하세요?"
+
+#: libinit_balsa/balsa-initdruid.gob:119
+msgid "GnomeCard Address Book"
+msgstr "그놈카드 주소록"
 
 #: libinit_balsa/helper.c:142
 #, c-format
@@ -143,7 +315,8 @@ msgstr "경로 %s는 루트 파일시스템 (/로 시작)에 대해 상대적이어야 합니다."
 #: libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
-msgstr "디렉토리를 생성할 수 없습니다: mkdir()이 경로명 \"%s\"에 대해 실패했습니다."
+msgstr ""
+"디렉토리를 생성할 수 없습니다: mkdir()이 경로명 \"%s\"에 대해 실패했습니다."
 
 #: libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
 #, c-format
@@ -154,1645 +327,17 @@ msgstr "경로명 \"%s\"를 가진 파일이 디렉토리가 아닙니다."
 msgid "Configure Balsa"
 msgstr "발사 환경설정"
 
-#: src/address-book.c:194
-msgid "Add New Address"
-msgstr "새 주소 추가"
-
-#: src/address-book.c:213
-msgid "E-Mail Address:"
-msgstr "전자우편 주소:"
-
-#: src/address-book.c:292
-#, c-format
-msgid ""
-"Unable to open address book %s for reading.\n"
-" - %s\n"
-msgstr ""
-"주소록 %s를 읽을 수 없습니다.\n"
-" - %s\n"
-
-#: src/address-book.c:295 src/sendmsg-window.c:425
-msgid "OK"
-msgstr "확인"
-
-#: src/address-book.c:315 src/address-book.c:418
-msgid "No-Id"
-msgstr "ID 없음"
-
-#: src/address-book.c:323 src/address-book.c:426
-msgid "No-Name"
-msgstr "이름없음"
-
-#: src/address-book.c:536 src/filter-edit-dialog.c:135
-msgid "Name"
-msgstr "이름"
-
-#: src/address-book.c:536
-msgid "E-Mail Address"
-msgstr "전자우편 주소"
-
-#. address book
-#: src/address-book.c:543 src/main-window.c:178 src/pref-manager.c:1581
-msgid "Address Book"
-msgstr "주소록"
-
-#: src/address-book.c:611
-msgid "Send-To"
-msgstr "...로 보냄"
-
-#: src/address-book.c:625
-msgid "Run GnomeCard"
-msgstr "그놈카드 실행"
-
-#: src/address-book.c:631
-msgid "Re-Import"
-msgstr ""
-
-#: src/address-book.c:639
-msgid "Import first address only"
-msgstr ""
-
-#: src/address-book.c:641
-msgid "Import all adresses"
-msgstr ""
-
-#: src/balsa-app.c:236 src/balsa-app.c:241 src/balsa-app.c:246
-#: src/balsa-app.c:251 src/balsa-app.c:256
-#, c-format
-msgid "Balsa cannot open your \"%s\" mailbox."
-msgstr "\"%s\" 우편함을 열 수 없습니다."
-
-#: src/balsa-app.c:236
-msgid "Inbox"
-msgstr "받은우편함"
-
-#: src/balsa-app.c:241
-msgid "Outbox"
-msgstr "보낼우편함"
-
-#: src/balsa-app.c:246
-msgid "Sentbox"
-msgstr "보낸보관함"
-
-#: src/balsa-app.c:251
-msgid "Draftbox"
-msgstr ""
-
-#: src/balsa-app.c:256
-msgid "Trash"
-msgstr "휴지통"
-
-#: src/balsa-index-page.c:275
-msgid "Mailbox password:"
-msgstr "우편함 비밀번호:"
-
-#: src/balsa-index-page.c:298
-msgid ""
-"Unable to Open Mailbox!\n"
-"Please check the mailbox settings."
-msgstr "우편함을 열수없음!\n"
-"우편함 설정을 확인하세요."
-
-#: src/balsa-index-page.c:600 src/filter-edit-dialog.c:222
-msgid "New"
-msgstr "새 메일"
-
-#: src/balsa-index-page.c:603 src/main-window.c:411
-msgid "Reply"
-msgstr "회신"
-
-#: src/balsa-index-page.c:606 src/main-window.c:414
-msgid "Reply to all"
-msgstr "전체 회신"
-
-#: src/balsa-index-page.c:609 src/main-window.c:417
-msgid "Forward"
-msgstr "전달"
-
-#: src/balsa-index-page.c:612 src/filter-edit-dialog.c:228
-#: src/main-window.c:404 src/pref-manager.c:951
-msgid "Delete"
-msgstr "삭제"
-
-#: src/balsa-index-page.c:615
-msgid "Undelete"
-msgstr "삭제취소"
-
-#: src/balsa-index-page.c:619 src/balsa-index-page.c:1228
-msgid "Store Address"
-msgstr "주소 저장"
-
-#: src/balsa-index-page.c:622 src/main-window.c:314
-msgid "Toggle flagged"
-msgstr ""
-
-#: src/balsa-index-page.c:630
-msgid "Transfer"
-msgstr "송신"
-
-#: src/balsa-index-page.c:833
-msgid "Sorry, no semicolons are allowed in the name!\n"
-msgstr "미안하지만 이름에 세미콜론을 사용할 수 없습니다!\n"
-
-#: src/balsa-index-page.c:865
-#, c-format
-msgid ""
-"Unable to open %s for read.\n"
-" - %s\n"
-msgstr ""
-"%s를 읽을 수 없습니다.\n"
-" - %s\n"
-
-#: src/balsa-index-page.c:870
-msgid "The Card Name field must be non-empty.\n"
-msgstr "카드 이름 항목은 비어있으면 않됩니다.\n"
-
-#: src/balsa-index-page.c:876
-#, c-format
-msgid ""
-"There is already an address book entry for %s.\n"
-"Run GnomeCard if you would like to edit your address book entries.\n"
-msgstr ""
-"%s에 대한 주소록 항목이 이미 있습니다.\n"
-"이 항목을 편집하고 싶으시면 그놈 카드를 실행하십시오.\n"
-
-#: src/balsa-index-page.c:1140
-msgid "Card Name:"
-msgstr "카드 이름:"
-
-#: src/balsa-index-page.c:1140
-msgid "First Name:"
-msgstr "첫번째 이름:"
-
-#: src/balsa-index-page.c:1141
-msgid "Last Name:"
-msgstr "마지막 이름:"
-
-#: src/balsa-index-page.c:1141
-msgid "Organization:"
-msgstr "직장:"
-
-#: src/balsa-index-page.c:1142
-msgid "Email Address:"
-msgstr "전자우편 주소:"
-
-#: src/balsa-index-page.c:1157
-msgid "In order to store an address, you must select a message.\n"
-msgstr "주소를 저장하려면 메시지를 선택하셔야 합니다.\n"
-
-#: src/balsa-index-page.c:1167
-msgid "You may only store one address at a time.\n"
-msgstr "한번에 하나의 주소만 저장할 수 있습니다.\n"
-
-#: src/balsa-index-page.c:1180
-msgid "This message doesn't contain an e-mail address.\n"
-msgstr "이 메시지는 전자우편 주소를 가지고 있지 않습니다.\n"
-
-#: src/balsa-index-page.c:1231
-msgid "Contact Information"
-msgstr ""
-
-#: src/balsa-index.c:256
-msgid "From"
-msgstr "보낸이"
-
-#: src/balsa-index.c:257 src/filter-edit-dialog.c:349
-msgid "Subject"
-msgstr "제목"
-
-#: src/balsa-index.c:258
-msgid "Date"
-msgstr "날짜"
-
-#: src/balsa-index.c:374
-msgid "To"
-msgstr "받는이"
-
-#: src/balsa-mblist.c:225 src/mailbox-conf.c:1196
-msgid "Mailbox"
-msgstr "우편함"
-
-#: src/balsa-mblist.c:225
-msgid "Unread"
-msgstr "안읽음"
-
-#: src/balsa-mblist.c:225
-msgid "Total"
-msgstr "총"
-
-#: src/balsa-mblist.c:782
-#, c-format
-msgid "Shown mailbox: %s with %ld messages, %ld new"
-msgstr ""
-
-#: src/balsa-message.c:240 src/balsa-message.c:243
-msgid "Save MIME Part"
-msgstr "MIME 부분 저장"
-
-#: src/balsa-message.c:241 src/balsa-message.c:1180
-msgid "Save"
-msgstr "저장"
-
-#: src/balsa-message.c:241 src/sendmsg-window.c:132 src/sendmsg-window.c:451
-#: src/sendmsg-window.c:1212 src/sendmsg-window.c:1490
-#: src/sendmsg-window.c:1513
-msgid "Cancel"
-msgstr "취소"
-
-#: src/balsa-message.c:250
-msgid "Please choose a filename to save this part of the message as:"
-msgstr "이 메시지 부분을 저장할 파일명을 선택:"
-
-#: src/balsa-message.c:276
-#, c-format
-msgid " Could not save %s:%s "
-msgstr " %s를 저장할 수 없습니다:%s "
-
-#: src/balsa-message.c:541
-msgid "Date:"
-msgstr "날짜:"
-
-#. From:
-#: src/balsa-message.c:546 src/filter-edit-dialog.c:337
-#: src/sendmsg-window.c:687
-msgid "From:"
-msgstr "보낸이:"
-
-#. To:
-#: src/balsa-message.c:550 src/filter-edit-dialog.c:325
-#: src/sendmsg-window.c:689
-msgid "To:"
-msgstr "받는이:"
-
-#: src/balsa-message.c:551
-msgid "Cc:"
-msgstr "참조:"
-
-#: src/balsa-message.c:552
-msgid "Bcc:"
-msgstr "다음참조:"
-
-#: src/balsa-message.c:555
-msgid "Fcc:"
-msgstr "Fcc:"
-
-#. Subject:
-#: src/balsa-message.c:557 src/sendmsg-window.c:694
-msgid "Subject:"
-msgstr "제목:"
-
-#: src/balsa-message.c:625
-msgid "Couldn't render image\n"
-msgstr "이미지를 묘사할 수 없습니다\n"
-
-#: src/balsa-message.c:675
-#, c-format
-msgid "View part with %s"
-msgstr ""
-
-#: src/balsa-message.c:683
-msgid "No view action defined in gnome MIME for this content type"
-msgstr "이런 형식의 MIME에 대해 취할 동작이 정의되지 않았습니다"
-
-#: src/balsa-message.c:687
-#, c-format
-msgid "Content Type: %s"
-msgstr ""
-
-#: src/balsa-message.c:692
-#, c-format
-msgid "Filename: %s"
-msgstr "파일명: %s"
-
-#: src/balsa-message.c:699
-msgid "Save part"
-msgstr ""
-
-#: src/balsa-message.c:1253
-#, c-format
-msgid "could not create temporary file %s"
-msgstr "임시파일 %s를 생성할 수 없습니다"
-
-#: src/filter-edit-dialog.c:30
-msgid "Inbound"
-msgstr ""
-
-#: src/filter-edit-dialog.c:31
-msgid "Outbound"
-msgstr ""
-
-#: src/filter-edit-dialog.c:32
-msgid "Before Sending"
-msgstr ""
-
-#: src/filter-edit-dialog.c:33
-msgid "Demand"
-msgstr ""
-
-#: src/filter-edit-dialog.c:38
-msgid "Matches"
-msgstr ""
-
-#: src/filter-edit-dialog.c:39
-msgid "Doesn't Match"
-msgstr ""
-
-#: src/filter-edit-dialog.c:40
-msgid "Always"
-msgstr "항상"
-
-#: src/filter-edit-dialog.c:45
-msgid "Simple"
-msgstr ""
-
-#: src/filter-edit-dialog.c:46
-msgid "Regular Expression"
-msgstr "정규 표현식"
-
-#: src/filter-edit-dialog.c:47
-msgid "External Command"
-msgstr "외부 명령"
-
-#: src/filter-edit-dialog.c:52
-msgid "Copy to folder:"
-msgstr "폴더에 복사:"
-
-#: src/filter-edit-dialog.c:53
-msgid "Move to folder:"
-msgstr "폴더로 이동:"
-
-#: src/filter-edit-dialog.c:54
-msgid "Print on printer:"
-msgstr "프린터로 인쇄:"
-
-#: src/filter-edit-dialog.c:55
-msgid "Run program:"
-msgstr "프로그램 실행:"
-
-#: src/filter-edit-dialog.c:56
-msgid "Send to Trash"
-msgstr "휴지통으로 보냄"
-
-#: src/filter-edit-dialog.c:134
-msgid "On"
-msgstr ""
-
-#: src/filter-edit-dialog.c:199
-msgid "Up"
-msgstr "위"
-
-#: src/filter-edit-dialog.c:205
-msgid "Down"
-msgstr "아래"
-
-#: src/filter-edit-dialog.c:271
-msgid "Match in:"
-msgstr ""
-
-#: src/filter-edit-dialog.c:289
-msgid "All"
-msgstr "모두"
-
-#: src/filter-edit-dialog.c:301
-msgid "Header"
-msgstr "머리글"
-
-#: src/filter-edit-dialog.c:313
-msgid "Body"
-msgstr "본문"
-
-#: src/filter-edit-dialog.c:362
-msgid "Match string:"
-msgstr ""
-
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1161
-#: src/pref-manager.c:938
-msgid "Add"
-msgstr "추가"
-
-#: src/filter-edit-dialog.c:425 src/sendmsg-window.c:366
-msgid "Remove"
-msgstr "삭제"
-
-#: src/filter-edit-dialog.c:454
-msgid "Command:"
-msgstr "명령:"
-
-#. The name entry
-#: src/filter-edit-dialog.c:490
-msgid "Filter name:"
-msgstr "필터 이름:"
-
-#. The "Process when:" option menu
-#: src/filter-edit-dialog.c:509
-msgid "Process when:"
-msgstr ""
-
-#. The "Run on:" option menu
-#: src/filter-edit-dialog.c:540
-msgid "Run on:"
-msgstr ""
-
-#. the type notebook's option menu
-#: src/filter-edit-dialog.c:570
-msgid "Search type:"
-msgstr ""
-
-#. The notification area
-#: src/filter-edit-dialog.c:626
-msgid "Notification:"
-msgstr ""
-
-#. Notification buttons
-#: src/filter-edit-dialog.c:635
-msgid "Play sound:"
-msgstr "음악 연주:"
-
-#: src/filter-edit-dialog.c:643
-msgid "Use Sound..."
-msgstr "음악 사용..."
-
-#: src/filter-edit-dialog.c:652
-msgid "Popup text:"
-msgstr ""
-
-#. The action area
-#: src/filter-edit-dialog.c:671
-msgid "Action to perform:"
-msgstr "수행할 동작:"
-
-#. The disposition area
-#: src/filter-edit-dialog.c:692
-msgid "Disposition:"
-msgstr ""
-
-#: src/filter-edit-dialog.c:700
-msgid "Place/leave in default folder"
-msgstr ""
-
-#: src/filter-edit-dialog.c:705
-msgid "Do not place/leave in default folder"
-msgstr ""
-
-#: src/filter-edit-dialog.c:710
-msgid "Stop filtering here"
-msgstr "여기에서 필터링 중단"
-
-#: src/filter-edit-dialog.c:738
-msgid "Match"
-msgstr ""
-
-#: src/filter-edit-dialog.c:741
-msgid "Action"
-msgstr "동작"
-
-#: src/filter-edit-dialog.c:755
-msgid "Revert"
-msgstr "복구"
-
-#: src/filter-edit-dialog.c:783
-msgid "Balsa Filters"
-msgstr "발사 필터"
-
-#. FIXME: Should prompt to remove file aswell
-#: src/mailbox-conf.c:181
-#, c-format
-msgid ""
-"This will remove the mailbox %s and it's files permanently from your "
-"system.\n"
-"Are you sure you want to remove this mailbox?"
-msgstr ""
-"우편함 %s가 시스템에서 영원히 삭제될"
-" 것입니다.\n"
-"이 우편함을 지우시겠습니까?"
-
-#: src/mailbox-conf.c:186
-#, c-format
-msgid ""
-"This will remove the mailbox %s from the list of mailboxes\n"
-"You may use \"Add Mailbox\" later to access this mailbox again\n"
-"Are you sure you want to remove this mailbox?"
-msgstr ""
-"우편함 목록에서 우편함 %s가 삭제될 것입니다\n"
-"나중에 \"우편함 추가\"를 이용해서 이 우편함을 다시 사용할 수 있습니다\n"
-"이 우편함을 지우시겠습니까?"
-
-#: src/mailbox-conf.c:214
-msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-msgstr "으윽! 우편함을 balsa_app.mailbox 노드에서 찾을 수 없네요?\n"
-
-#: src/mailbox-conf.c:268
-msgid "Mailbox Configurator"
-msgstr "우편함 설정"
-
-#: src/mailbox-conf.c:330 src/mailbox-conf.c:1155
-msgid "Update"
-msgstr "갱신"
-
-#: src/mailbox-conf.c:462 src/mailbox-conf.c:468 src/mailbox-conf.c:492
-msgid "You need to fill in the Mailbox Name field."
-msgstr "우편함 이름 항목을 채우셔야 합니다."
-
-#: src/mailbox-conf.c:471
-msgid "You need to fill in the folderpath field."
-msgstr "폴더 경로 항목을 채우셔야 합니다."
-
-#: src/mailbox-conf.c:473
-msgid "You need to fill in the IMAP Server field"
-msgstr "IMAP 서버 항목을 채우셔야 합니다"
-
-#: src/mailbox-conf.c:475
-msgid "You need to fill in the username field"
-msgstr "사용자명 항목을 채우셔야 합니다"
-
-#: src/mailbox-conf.c:479
-msgid "You need to fill in the port field"
-msgstr "포트 항목을 채우셔야 합니다"
-
-#: src/mailbox-conf.c:496
-msgid "You need to fill in the user field."
-msgstr "사용자 항목을 채우셔야 합니다."
-
-#: src/mailbox-conf.c:504
-msgid "You need to fill in the server field."
-msgstr "서버 항목을 채우셔야 합니다."
-
-#: src/mailbox-conf.c:508
-msgid "You need to fill in the port field."
-msgstr "포트 항목을 채우셔야 합니다."
-
-#: src/mailbox-conf.c:512
-msgid "Some of the fields are blank."
-msgstr "몇몇 항목이 비었습니다."
-
-#: src/mailbox-conf.c:647
-#, c-format
-msgid "%s on %s"
-msgstr ""
-
-#: src/mailbox-conf.c:846
-msgid "New mailbox type:"
-msgstr "새 우편함 형식:"
-
-#. radio buttons
-#. local mailbox
-#: src/mailbox-conf.c:852
-msgid "Local mailbox"
-msgstr "로컬 우편함"
-
-#: src/mailbox-conf.c:862
-msgid "Single IMAP folder"
-msgstr ""
-
-#: src/mailbox-conf.c:871
-msgid "IMAP folder set"
-msgstr ""
-
-#. mailbox name
-#: src/mailbox-conf.c:896 src/mailbox-conf.c:931 src/mailbox-conf.c:1048
-msgid "Mailbox Name:"
-msgstr "우편함 이름:"
-
-#. path to file
-#: src/mailbox-conf.c:906
-msgid "Mailbox path:"
-msgstr "우편함 경로:"
-
-#. pop server
-#: src/mailbox-conf.c:948 src/mailbox-conf.c:1058
-msgid "Server:"
-msgstr "서버:"
-
-#. pop port
-#: src/mailbox-conf.c:967 src/mailbox-conf.c:1072
-msgid "Port:"
-msgstr "포트:"
-
-#. username
-#: src/mailbox-conf.c:986 src/mailbox-conf.c:1087
-msgid "Username:"
-msgstr "사용자명:"
-
-#. password field
-#: src/mailbox-conf.c:1003 src/mailbox-conf.c:1102
-msgid "Password:"
-msgstr "비밀번호:"
-
-#. toggle for check
-#: src/mailbox-conf.c:1018 src/main-window.c:400
-msgid "Check"
-msgstr "확인"
-
-#. toggle for deletion from server
-#: src/mailbox-conf.c:1026
-msgid "Delete from server"
-msgstr "서버에서 삭제"
-
-#: src/mailbox-conf.c:1115
-msgid "Folder path:"
-msgstr "폴더 경로:"
-
-#: src/main-window.c:166
-msgid "_Get new mail"
-msgstr "새 편지 받기(_G)"
-
-#: src/main-window.c:166
-msgid "Fetch new incoming mail"
-msgstr "새로 도착한 편지 가져오기"
-
-#: src/main-window.c:172
-msgid "_Send queued mail"
-msgstr "큐에 있는 편지 보내기(_S)"
-
-#: src/main-window.c:172
-msgid "Send mail from the outbox"
-msgstr "보낼우편함에서 편지 보내기"
-
-#: src/main-window.c:178
-msgid "Opens the address book"
-msgstr "주소록 열기"
-
-#: src/main-window.c:185
-msgid "Pr_int"
-msgstr "인쇄(_i)"
-
-#: src/main-window.c:185
-msgid "Print current mail"
-msgstr "현재 편지 인쇄"
-
-#: src/main-window.c:209 src/message-window.c:56
-msgid "N_o headers"
-msgstr "헤더 없음(_o)"
-
-#: src/main-window.c:211 src/message-window.c:58
-msgid "_Selected headers"
-msgstr "선택된 헤더(_S)"
-
-#: src/main-window.c:213 src/message-window.c:60
-msgid "All _headers"
-msgstr "모든 헤더(_h)"
-
-#: src/main-window.c:222 src/main-window.c:430
-msgid "Next"
-msgstr "다음"
-
-#: src/main-window.c:222
-msgid "Next Message"
-msgstr "다음 메시지"
-
-#: src/main-window.c:228 src/main-window.c:425
-msgid "Previous"
-msgstr "이전"
-
-#: src/main-window.c:228
-msgid "Previous Message"
-msgstr "이전 메시지"
-
-#: src/main-window.c:234 src/main-window.c:435
-msgid "Next Unread"
-msgstr "다음 안읽은 메시지"
-
-#: src/main-window.c:234
-msgid "Next Unread Message"
-msgstr "다음 안읽은 메시지"
-
-#: src/main-window.c:241 src/message-window.c:95
-msgid "Next Part"
-msgstr "다음 부분"
-
-#: src/main-window.c:241 src/message-window.c:95
-msgid "Next Part in Message"
-msgstr "메시지의 다음 부분"
-
-#: src/main-window.c:247 src/message-window.c:100
-msgid "Previous Part"
-msgstr "이전 부분"
-
-#: src/main-window.c:247 src/message-window.c:100
-msgid "Previous Part in Message"
-msgstr "메시지의 이전 부분"
-
-#: src/main-window.c:253 src/message-window.c:105
-msgid "Save Current Part"
-msgstr "현재 부분 저장"
-
-#: src/main-window.c:254 src/message-window.c:106
-msgid "Save Current Part in Message"
-msgstr "메시지의 현재 부분 저장"
-
-#: src/main-window.c:262
-msgid "_New"
-msgstr "새 편지(_N)"
-
-#: src/main-window.c:262
-msgid "Compose a new message"
-msgstr "새 메시지 작성"
-
-#: src/main-window.c:269 src/message-window.c:76
-msgid "_Reply"
-msgstr "회신(_R)"
-
-#: src/main-window.c:269
-msgid "Reply to the current message"
-msgstr "현재 메시지에 대해 회신"
-
-#: src/main-window.c:276 src/message-window.c:82
-msgid "Reply to _all"
-msgstr "전체 회신(_a)"
-
-#: src/main-window.c:277
-msgid "Reply to all recipients of the current message"
-msgstr "현재 메시지의 모든 수신자에게 회신"
-
-#: src/main-window.c:284 src/message-window.c:89
-msgid "_Forward"
-msgstr "전달(_F)"
-
-#: src/main-window.c:284
-msgid "Forward the current message"
-msgstr "현재 메시지 전달"
-
-#: src/main-window.c:291
-msgid "_Continue"
-msgstr "계속(_C)"
-
-#: src/main-window.c:292
-msgid "Continue editing current message"
-msgstr "현재 메시지 편집 계속"
-
-#: src/main-window.c:300 src/main-window.c:353
-msgid "_Delete"
-msgstr "삭제(_D)"
-
-#: src/main-window.c:300
-msgid "Delete the current message"
-msgstr "현재 메시지 삭제"
-
-#: src/main-window.c:307
-msgid "_Undelete"
-msgstr "복구(_U)"
-
-#: src/main-window.c:307
-msgid "Undelete the message"
-msgstr "메시지 복구"
-
-#: src/main-window.c:314
-msgid "_Toggle flagged"
-msgstr ""
-
-#: src/main-window.c:322
-msgid "_Store Address"
-msgstr "주소 저장(_S)"
-
-#: src/main-window.c:322
-msgid "Store address of sender in addressbook"
-msgstr "보낸이의 주소를 주소록에 저장"
-
-#: src/main-window.c:328 src/message-window.c:112
-msgid "_Wrap"
-msgstr ""
-
-#: src/main-window.c:345
-msgid "List"
-msgstr "목록"
-
-#: src/main-window.c:349
-msgid "_Add"
-msgstr "추가(_A)"
-
-#: src/main-window.c:349
-msgid "Add a new mailbox"
-msgstr "새 우편함 추가"
-
-#: src/main-window.c:351
-msgid "_Edit"
-msgstr "편집(_E)"
-
-#: src/main-window.c:351
-msgid "Edit the selected mailbox"
-msgstr "선택된 우편함 편집"
-
-#: src/main-window.c:353
-msgid "Delete the selected mailbox"
-msgstr "선택된 우편함 삭제"
-
-#: src/main-window.c:356
-msgid "Co_mmit current"
-msgstr "현재 상태 저장(_m)"
-
-#: src/main-window.c:356
-msgid "Commit the changes in the currently opened mailbox"
-msgstr "열려진 우편함의 현재 수정된 사항 저장"
-
-#: src/main-window.c:358
-msgid "_Close"
-msgstr "닫기(_C)"
-
-#: src/main-window.c:358
-msgid "Close mailbox"
-msgstr "우편함 닫기"
-
-#: src/main-window.c:361
-msgid "Empty _Trash"
-msgstr "휴지통 비우기(_T)"
-
-#: src/main-window.c:361
-msgid "Delete Messages from the trash mailbox"
-msgstr "휴지통에서 메시지 삭제"
-
-#: src/main-window.c:367
-msgid "_Filters..."
-msgstr "필터(_F)..."
-
-#: src/main-window.c:367
-msgid "Manage filters"
-msgstr "필터 관리"
-
-#: src/main-window.c:376
-msgid "_Show mailbox tree"
-msgstr "우편함 트리 보이기(_S)"
-
-#: src/main-window.c:378
-msgid "Show mailbox _tabs"
-msgstr "우편함 탭 보이기(_t)"
-
-#: src/main-window.c:391
-msgid "_Message"
-msgstr "메시지(_M)"
-
-#: src/main-window.c:392
-msgid "Mail_box"
-msgstr "우편함(_b)"
-
-#: src/main-window.c:400
-msgid "Check Email"
-msgstr "편지 확인"
-
-#: src/main-window.c:404
-msgid "Delete Message"
-msgstr "메시지 삭제"
-
-#: src/main-window.c:408
-msgid "Compose"
-msgstr "작성"
-
-#: src/main-window.c:408
-msgid "Compose Message"
-msgstr "메시지 작성"
-
-#: src/main-window.c:420
-msgid "Continue"
-msgstr "계속"
-
-#: src/main-window.c:425
-msgid "Open Previous message"
-msgstr "이전 메시지 열기"
-
-#: src/main-window.c:430
-msgid "Open Next message"
-msgstr "다음 메시지 열기"
-
-#: src/main-window.c:435
-msgid "Open Next Unread Message"
-msgstr "다음 안읽은 메시지 열기"
-
-#: src/main-window.c:440 src/print.c:83 src/sendmsg-window.c:129
-#: src/sendmsg-window.c:157
-msgid "Print"
-msgstr "인쇄"
-
-#: src/main-window.c:440
-msgid "Print current message"
-msgstr "현재 메시지 인쇄"
-
-#: src/main-window.c:934
-msgid "Copyright (C) 1997-2000"
-msgstr "Copyright (C) 1997-2000"
-
-#: src/main-window.c:936
-msgid ""
-"The Balsa email client is part of the GNOME desktop environment.  "
-"Information on Balsa can be found at http://www.balsa.net/\n"
-"\n"
-"If you need to report bugs, please do so at: http://bugs.gnome.org/"
-msgstr ""
-
-#: src/main-window.c:1288
-#, c-format
-msgid "Sending error: %s"
-msgstr "보내기 에러: %s"
-
-#: src/main-window.c:1522
-msgid ""
-"In order to store an address, you must open a mailbox and select a message.\n"
-msgstr ""
-
-#: src/main.c:96
-msgid "Get new mail on startup"
-msgstr "시작할 때 새 메시지 가져오기"
-
-#: src/main.c:98
-msgid "Compose a new email to EMAIL@ADDRESS"
-msgstr "EMAIL@ADDRESS로 새 편지 작성"
-
-#: src/main.c:100
-msgid "Opens MAILBOXNAME"
-msgstr ""
-
-#: src/main.c:100
-msgid "MAILBOXNAME"
-msgstr ""
-
-#: src/main.c:101
-msgid "Opens first unread mailbox"
-msgstr "안읽은 첫번째 우편함 열기"
-
-#: src/mblist-window.c:412
-msgid "Open Mailbox"
-msgstr "우편함 열기"
-
-#: src/mblist-window.c:413
-msgid "Close Mailbox"
-msgstr "우편함 닫기"
-
-#: src/mblist-window.c:416
-msgid "Add New Mailbox"
-msgstr "새 우편함 추가"
-
-#: src/mblist-window.c:420
-msgid "Edit Mailbox Properties"
-msgstr "우편함 속성 편집"
-
-#: src/mblist-window.c:421
-msgid "Delete Mailbox"
-msgstr "우편함 삭제"
-
-#: src/mblist-window.c:422
-msgid "Mark as Inbox"
-msgstr "받은편지함으로 표시"
-
-#: src/mblist-window.c:423
-msgid "Mark as Sentbox"
-msgstr "보낸편지함으로 표시"
-
-#: src/mblist-window.c:424
-msgid "Mark as Trash"
-msgstr "휴지통으로 표시"
-
-#: src/mblist-window.c:425
-msgid "Mark as Draftbox"
-msgstr ""
-
-#: src/mblist-window.c:445 src/mblist-window.c:461 src/mblist-window.c:480
-#: src/mblist-window.c:495
-msgid "No mailbox selected."
-msgstr "선택된 우편함 없음."
-
-#: src/message-window.c:76
-msgid "Reply to this message"
-msgstr "이 메시지에 대해 회신"
-
-#: src/message-window.c:83
-msgid "Reply to all recipients of this message"
-msgstr "이 메시지의 모든 수신자에게 회신"
-
-#: src/message-window.c:89
-msgid "Forward this message"
-msgstr "이 메시지 전달"
-
-#: src/pref-manager.c:131
-msgid "Text"
-msgstr "텍스트"
-
-#: src/pref-manager.c:132
-msgid "Icons"
-msgstr "아이콘"
-
-#: src/pref-manager.c:133
-msgid "Both"
-msgstr ""
-
-#: src/pref-manager.c:145
-msgid "7bits"
-msgstr "7비트"
-
-#: src/pref-manager.c:146
-msgid "8bits"
-msgstr "8비트"
-
-#: src/pref-manager.c:147
-msgid "quoted"
-msgstr ""
-
-#: src/pref-manager.c:159
-msgid "While Retrieving Messages"
-msgstr ""
-
-#: src/pref-manager.c:160
-msgid "Until Closed"
-msgstr ""
-
-#: src/pref-manager.c:161
-msgid "Never"
-msgstr ""
-
-#: src/pref-manager.c:186
-msgid "Balsa Preferences"
-msgstr "발사 속성"
-
-#: src/pref-manager.c:194 src/pref-manager.c:706
-msgid "Identity"
-msgstr ""
-
-#: src/pref-manager.c:197 src/pref-manager.c:788 src/pref-manager.c:866
-msgid "Signature"
-msgstr "서명"
-
-#: src/pref-manager.c:200
-msgid "Mail Servers"
-msgstr "메일 서버"
-
-#: src/pref-manager.c:203
-msgid "Mail Options"
-msgstr ""
-
-#: src/pref-manager.c:206 src/pref-manager.c:1276
-msgid "Display"
-msgstr ""
-
-#: src/pref-manager.c:209 src/pref-manager.c:1301 src/pref-manager.c:1346
-msgid "Printing"
-msgstr ""
-
-#: src/pref-manager.c:212 src/pref-manager.c:1387 src/pref-manager.c:1405
-msgid "Encoding"
-msgstr ""
-
-#: src/pref-manager.c:215 src/pref-manager.c:1439
-msgid "Misc"
-msgstr ""
-
-#: src/pref-manager.c:218
-msgid "Startup"
-msgstr ""
-
-#: src/pref-manager.c:730
-msgid "Your name:"
-msgstr "이름:"
-
-#: src/pref-manager.c:737
-msgid "E-mail address:"
-msgstr "전자우편 주소:"
-
-#: src/pref-manager.c:743
-msgid "Reply-to address:"
-msgstr "Reply-to 주소:"
-
-#: src/pref-manager.c:755
-msgid "Default domain:"
-msgstr "기본 도메인:"
-
-#: src/pref-manager.c:800
-msgid "Select your signature file"
-msgstr "서명 파일 선택"
-
-#: src/pref-manager.c:810
-msgid "sending mail"
-msgstr ""
-
-#: src/pref-manager.c:816
-msgid "replying to mail"
-msgstr ""
-
-#: src/pref-manager.c:822
-msgid "forwarding mail"
-msgstr ""
-
-#: src/pref-manager.c:837
-msgid ">"
-msgstr ">"
-
-#: src/pref-manager.c:839
-msgid "Signature file:"
-msgstr "서명 파일:"
-
-#: src/pref-manager.c:846
-msgid "Reply prefix:"
-msgstr ""
-
-#: src/pref-manager.c:853
-msgid "Use signature file when:"
-msgstr "서명 파일 사용할 때:"
-
-#: src/pref-manager.c:860
-msgid "enable signature separator"
-msgstr ""
-
-#: src/pref-manager.c:897
-msgid "Remote Mailbox Servers"
-msgstr ""
-
-#: src/pref-manager.c:922
-msgid "Type"
-msgstr ""
-
-#: src/pref-manager.c:926
-msgid "Mailbox name"
-msgstr "우편함 이름"
-
-#: src/pref-manager.c:945
-msgid "Modify"
-msgstr ""
-
-#: src/pref-manager.c:957
-msgid "Local mail"
-msgstr ""
-
-#: src/pref-manager.c:972
-msgid "Select your local mail directory"
-msgstr ""
-
-#: src/pref-manager.c:982
-msgid "Outgoing mail"
-msgstr ""
-
-#: src/pref-manager.c:1001
-msgid "Remote SMTP Server"
-msgstr ""
-
-#: src/pref-manager.c:1008
-msgid "Local mail user agent"
-msgstr ""
-
-#: src/pref-manager.c:1037
-msgid "Incoming"
-msgstr ""
-
-#: src/pref-manager.c:1041
-msgid "Outgoing"
-msgstr ""
-
-#: src/pref-manager.c:1060
-msgid "Checking"
-msgstr ""
-
-#: src/pref-manager.c:1070
-msgid "Minutes"
-msgstr ""
-
-#: src/pref-manager.c:1084
-msgid "Check mail automatically every:"
-msgstr ""
-
-#: src/pref-manager.c:1107
-msgid "Word Wrap"
-msgstr ""
-
-#: src/pref-manager.c:1118
-msgid "Wrap Outgoing Text at:"
-msgstr ""
-
-#: src/pref-manager.c:1133
-msgid "Characters"
-msgstr ""
-
-#: src/pref-manager.c:1139
-msgid "Other options"
-msgstr ""
-
-#: src/pref-manager.c:1150
-msgid "Default Bcc to:"
-msgstr ""
-
-#: src/pref-manager.c:1188
-msgid "Main window"
-msgstr ""
-
-#: src/pref-manager.c:1196
-msgid "use preview pane"
-msgstr ""
-
-#: src/pref-manager.c:1202
-msgid "Show mailbox statistics in left pane"
-msgstr ""
-
-#: src/pref-manager.c:1209
-msgid "Toolbars"
-msgstr ""
-
-#: src/pref-manager.c:1226
-msgid "Display progress dialog"
-msgstr ""
-
-#: src/pref-manager.c:1234
-msgid "Display Formats"
-msgstr ""
-
-#: src/pref-manager.c:1241
-msgid "Date encoding (for strftime):"
-msgstr ""
-
-#: src/pref-manager.c:1253
-msgid "Selected headers:"
-msgstr "선택된 헤더:"
-
-#: src/pref-manager.c:1329
-msgid "characters"
-msgstr ""
-
-#: src/pref-manager.c:1333
-msgid "Print command:"
-msgstr "인쇄 명령:"
-
-#: src/pref-manager.c:1339
-msgid "Break line at:"
-msgstr ""
-
-#: src/pref-manager.c:1373
-msgid "Charset"
-msgstr "문자셋"
-
-#: src/pref-manager.c:1449
-msgid "Debug"
-msgstr "디버그"
-
-#: src/pref-manager.c:1453
-msgid "Empty trash on exit"
-msgstr "종료시 휴지통 비우기"
-
-#. font
-#: src/pref-manager.c:1459
-msgid "Font"
-msgstr "글꼴"
-
-#: src/pref-manager.c:1487
-msgid "Select a font to use"
-msgstr "사용할 글꼴 선택"
-
-#: src/pref-manager.c:1491
-msgid "Browse..."
-msgstr ""
-
-#: src/pref-manager.c:1496
-msgid "Preview pane"
-msgstr ""
-
-#. mblist unread colour
-#: src/pref-manager.c:1504
-msgid "Colours"
-msgstr "색상"
-
-#: src/pref-manager.c:1519 src/pref-manager.c:1526
-msgid "Mailbox with unread messages colour"
-msgstr ""
-
-#: src/pref-manager.c:1542 src/pref-manager.c:1564
-msgid "Colour of quoted text"
-msgstr ""
-
-#: src/pref-manager.c:1551 src/pref-manager.c:1573
-msgid "Quoted text colour"
-msgstr ""
-
-#: src/pref-manager.c:1594
-msgid "Address book location"
-msgstr ""
-
-#: src/pref-manager.c:1599
-msgid "Select your address book file"
-msgstr ""
-
-#: src/pref-manager.c:1609
-msgid "Expand aliases as you type"
-msgstr ""
-
-#: src/pref-manager.c:1627
-msgid "Options"
-msgstr "옵션"
-
-#: src/pref-manager.c:1638
-msgid "Check mail upon startup"
-msgstr "시작시 메일 확인"
-
-#: src/pref-manager.c:1643
-msgid "Remember open mailboxes between sessions"
-msgstr ""
-
-#: src/print.c:96
-#, c-format
-msgid ""
-"Enter print command below\n"
-"Remember to include '%s'"
-msgstr ""
-
-#: src/print.c:104
-msgid "Print Command:"
-msgstr "인쇄 명령:"
-
-#: src/sendmsg-window.c:113
-msgid "Send"
-msgstr "보내기"
-
-#: src/sendmsg-window.c:113
-msgid "Send this mail"
-msgstr "이 편지 보내기"
-
-#: src/sendmsg-window.c:117
-msgid "Attach"
-msgstr "첨부"
-
-#: src/sendmsg-window.c:117
-msgid "Add attachments to this message"
-msgstr "이 메시지에 첨부파일 추가"
-
-#: src/sendmsg-window.c:121
-msgid "Postpone"
-msgstr "연기"
-
-#: src/sendmsg-window.c:121
-msgid "Continue this message later"
-msgstr "이 메시지를 나중에 보내기"
-
-#: src/sendmsg-window.c:125
-msgid "Spelling"
-msgstr "철자"
-
-#: src/sendmsg-window.c:125
-msgid "Check Spelling"
-msgstr "철자 확인"
-
-#: src/sendmsg-window.c:140
-msgid "_Include File..."
-msgstr "파일 포함(_I)..."
-
-#: src/sendmsg-window.c:144
-msgid "_Attach file..."
-msgstr "파일 첨부(_A)..."
-
-#: src/sendmsg-window.c:149
-msgid "_Send"
-msgstr "보내기(_S)"
-
-#: src/sendmsg-window.c:149
-msgid "Send the currently edited message"
-msgstr "현재 편집된 메시지 보내기"
-
-#: src/sendmsg-window.c:153
-msgid "_Postpone"
-msgstr "연기(_P)"
-
-#: src/sendmsg-window.c:157
-msgid "Print the edited message"
-msgstr "편집된 메시지 인쇄"
-
-#: src/sendmsg-window.c:175
-msgid "_Wrap body"
-msgstr ""
-
-#: src/sendmsg-window.c:175
-msgid "Wrap message lines"
-msgstr ""
-
-#: src/sendmsg-window.c:179
-msgid "_Reflow paragraph"
-msgstr ""
-
-#: src/sendmsg-window.c:182
-msgid "R_eflow message"
-msgstr ""
-
-#: src/sendmsg-window.c:191
-msgid "Fr_om"
-msgstr "보낸이(_o)"
-
-#: src/sendmsg-window.c:193
-msgid "_To"
-msgstr "받는이(_T)"
-
-#: src/sendmsg-window.c:195
-msgid "_Subject"
-msgstr "제목(_S)"
-
-#: src/sendmsg-window.c:197
-msgid "_Cc"
-msgstr "참조(_C)"
-
-#: src/sendmsg-window.c:199
-msgid "_Bcc"
-msgstr "다음참조(_B)"
-
-#: src/sendmsg-window.c:201
-msgid "_Fcc"
-msgstr "_Fcc"
-
-#: src/sendmsg-window.c:203
-msgid "_Reply To"
-msgstr ""
-
-#: src/sendmsg-window.c:205
-msgid "_Attachments"
-msgstr "첨부(_A)"
-
-#: src/sendmsg-window.c:207
-msgid "_Comments"
-msgstr ""
-
-#: src/sendmsg-window.c:209
-msgid "_Keywords"
-msgstr ""
-
-#: src/sendmsg-window.c:220
-msgid "_Western (ISO-8859-1)"
-msgstr "_Western (ISO-8859-1)"
-
-#: src/sendmsg-window.c:222
-msgid "W_estern (ISO-8859-15)"
-msgstr "W_estern (ISO-8859-15)"
-
-#: src/sendmsg-window.c:224
-msgid "_Central European (ISO-8859-2)"
-msgstr "_Central European (ISO-8859-2)"
-
-#: src/sendmsg-window.c:226
-msgid "_South European (ISO-8859-3)"
-msgstr "_South European (ISO-8859-3)"
-
-#: src/sendmsg-window.c:228
-msgid "_Baltic (ISO-8859-13)"
-msgstr "_Baltic (ISO-8859-13)"
-
-#: src/sendmsg-window.c:230
-msgid "Cy_rillic (ISO-8859-5)"
-msgstr "Cy_rillic (ISO-8859-5)"
-
-#: src/sendmsg-window.c:232
-msgid "_Hebrew (ISO-8859-8)"
-msgstr "헤브루 (ISO-8859-8)"
-
-#: src/sendmsg-window.c:234
-msgid "_Turkish (ISO-8859-9)"
-msgstr "터키 (ISO-8859-9)"
-
-#: src/sendmsg-window.c:236
-msgid "Ce_ltic (ISO-8859-14)"
-msgstr "Ce_ltic (ISO-8859-14)"
-
-#: src/sendmsg-window.c:238
-msgid "Ru_ssian (KOI8-R)"
-msgstr "러시아 (KOI8-R)"
-
-#: src/sendmsg-window.c:240
-msgid "_Ukrainian (KOI8-U)"
-msgstr ""
-
-#: src/sendmsg-window.c:286
-msgid "_Show"
-msgstr ""
-
-#: src/sendmsg-window.c:287
-msgid "_ISO Charset"
-msgstr "ISO 문자셋(_I)"
-
-#: src/sendmsg-window.c:423
-msgid ""
-"The attachment pixmap (balsa/attachment.png) cannot be found.\n"
-"This means you cannot attach any files.\n"
-msgstr ""
-
-#: src/sendmsg-window.c:441
-#, c-format
-msgid "Cannot get info on file '%s': %s\n"
-msgstr ""
-
-#: src/sendmsg-window.c:445
-#, c-format
-msgid "Attachment is not a regular file: '%s'\n"
-msgstr "첨부 파일이 일반 파일이 아닙니다: '%s'\n"
-
-#: src/sendmsg-window.c:507
-msgid "Attach file"
-msgstr "파일 첨부"
-
-#. cc:
-#: src/sendmsg-window.c:698
-msgid "cc:"
-msgstr "참조:"
-
-#. bcc:
-#: src/sendmsg-window.c:703
-msgid "bcc:"
-msgstr "다음참조:"
-
-#. fcc:
-#: src/sendmsg-window.c:707
-msgid "fcc:"
-msgstr "fcc:"
-
-#. Reply To:
-#: src/sendmsg-window.c:737
-msgid "Reply To:"
-msgstr "Reply To:"
-
-#. Attachment list
-#: src/sendmsg-window.c:743
-msgid "Attachments:"
-msgstr "첨부:"
-
-#. Comments:
-#: src/sendmsg-window.c:786
-msgid "Comments:"
-msgstr ""
-
-#. Keywords:
-#: src/sendmsg-window.c:789
-msgid "Keywords:"
-msgstr ""
-
-#: src/sendmsg-window.c:881
-#, c-format
-msgid "On %s %s wrote:\n"
-msgstr ""
-
-#: src/sendmsg-window.c:883
-#, c-format
-msgid "On %s you wrote:\n"
-msgstr ""
-
-#: src/sendmsg-window.c:887
-#, c-format
-msgid "%s wrote:\n"
-msgstr ""
-
-#: src/sendmsg-window.c:889
-msgid "You wrote:\n"
-msgstr ""
-
-#: src/sendmsg-window.c:963
-msgid "Reply to "
-msgstr ""
-
-#: src/sendmsg-window.c:968
-msgid "Forward message"
-msgstr "메시지 전달"
-
-#: src/sendmsg-window.c:973
-msgid "Continue message"
-msgstr "메시지 계속"
-
-#: src/sendmsg-window.c:978
-msgid "New message"
-msgstr "새 메시지"
-
-#: src/sendmsg-window.c:1211
-msgid "Could not open the file.\n"
-msgstr "파일을 열 수 없습니다.\n"
-
-#: src/sendmsg-window.c:1217
-msgid "Loading..."
-msgstr ""
-
-#: src/sendmsg-window.c:1242
-msgid "Include file"
-msgstr "파일 포함"
-
-#: src/sendmsg-window.c:1488
-msgid "Cannot execute print command."
-msgstr "인쇄 명령을 실행할 수 없습니다."
-
-#: src/sendmsg-window.c:1512
-msgid "Error executing lpr"
-msgstr "lpr 실행 에러"
-
-#: libbalsa/mailbox_imap.c:230
-#, c-format
-msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-msgstr ""
-
-#: libbalsa/mailbox_local.c:225
-#, c-format
-msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-msgstr ""
-
-#: libbalsa/mailbox_pop3.c:177
-#, c-format
-msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
-msgstr ""
-
-#: libbalsa/mailbox_pop3.c:281
-msgid "Error: "
-msgstr "에러: "
-
 #: libmutt/mbox.c:134 libmutt/mbox.c:292
 msgid "Reading %s... %d (%d%%)"
-msgstr ""
+msgstr "%s 읽는 중... %d (%d%%)"
 
 #: libmutt/mbox.c:158 libmutt/mbox.c:217
 msgid "Mailbox is corrupt!"
-msgstr ""
+msgstr "우편함이 깨졌습니다!"
 
 #: libmutt/mbox.c:666
 msgid "Mailbox was corrupted!"
-msgstr ""
+msgstr "우편함이 깨져있었습니다!"
 
 #: libmutt/mbox.c:703 libmutt/mbox.c:978
 msgid "Fatal error!  Could not reopen mailbox!"
@@ -1812,62 +357,62 @@ msgstr "임시 파일을 생성할 수 없습니다!"
 #.
 #: libmutt/mbox.c:758
 msgid "sync: mbox modified, but no modified messages! (report this bug)"
-msgstr ""
+msgstr "sync: 우편함이 수정되었는 데 바뀐 메시지는 없네요! (버그로 보고)"
 
 #: libmutt/mbox.c:788
 msgid "Writing messages... %d (%d%%)"
-msgstr ""
+msgstr "메시지 쓰는 중... %d (%d%%)"
 
 #: libmutt/mbox.c:962
 #, c-format
 msgid "Write failed!  Saved partial mailbox to %s"
-msgstr ""
+msgstr "쓰기가 실패했습니다!  부분 편지함이 %s에 저장되었습니다"
 
 #: libmutt/mbox.c:1028
 msgid "Could not reopen mailbox!"
-msgstr ""
+msgstr "우편함을 다시 열 수 없습니다"
 
 #: libmutt/mbox.c:1066
 msgid "Reopening mailbox..."
-msgstr ""
+msgstr "우편함을 다시 여는 중입니다..."
 
 #: libmutt/mx.c:119
 #, c-format
 msgid "Lock count exceeded, remove lock for %s?"
-msgstr ""
+msgstr "잠금 횟수 초과, %s에 대한 잠금을 없앨까요?"
 
 #: libmutt/mx.c:131
 #, c-format
 msgid "Can't dotlock %s.\n"
-msgstr ""
+msgstr "%s를 잠글 수 없습니다.\n"
 
 #: libmutt/mx.c:189
 msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr ""
+msgstr "fcntl 잠금을 시도하던 중 시간이 초과되었습니다!"
 
 #: libmutt/mx.c:195
 #, c-format
 msgid "Waiting for fcntl lock... %d"
-msgstr ""
+msgstr "fcntl 잠금을 기다리는 중입니다... %d"
 
 #: libmutt/mx.c:223
 msgid "Timeout exceeded while attempting flock lock!"
-msgstr ""
+msgstr "flock 잠금을 시도하던 중 시간이 초과되었습니다!"
 
 #: libmutt/mx.c:230
 #, c-format
 msgid "Waiting for flock attempt... %d"
-msgstr ""
+msgstr "flock 잠금을 기다리는 중입니다... %d"
 
 #: libmutt/mx.c:459 libmutt/mx.c:605
 #, c-format
 msgid "%s is not a mailbox."
-msgstr ""
+msgstr "%s는 우편함이 아닙니다."
 
 #: libmutt/mx.c:542
 #, c-format
 msgid "Couldn't lock %s\n"
-msgstr ""
+msgstr "%s를 잠글 수 없습니다\n"
 
 #: libmutt/mx.c:630
 #, c-format
@@ -1882,26 +427,26 @@ msgstr "%s에 쓰는 중..."
 #: libmutt/mx.c:746
 #, c-format
 msgid "Could not synchronize mailbox %s!"
-msgstr ""
+msgstr "%s 우편함에 동기를 맞출 수 없습니다!"
 
 #: libmutt/mx.c:848
 #, c-format
 msgid "Moving read messages to %s..."
-msgstr ""
+msgstr "읽은 메시지를 %s로 옮기는 중입니다..."
 
 #: libmutt/mx.c:899 libmutt/mx.c:1056
 msgid "Mailbox is unchanged."
-msgstr ""
+msgstr "우편함이 바뀌지 않았습니다."
 
 #: libmutt/mx.c:929
 #, c-format
 msgid "%d kept, %d moved, %d deleted."
-msgstr ""
+msgstr "%d 보존, %d 이동, %d 삭제."
 
 #: libmutt/mx.c:932 libmutt/mx.c:1098
 #, c-format
 msgid "%d kept, %d deleted."
-msgstr ""
+msgstr "%d 보존, %d 삭제."
 
 #: libmutt/mx.c:1040
 #, c-format
@@ -1910,32 +455,2184 @@ msgstr ""
 
 #: libmutt/mx.c:1043
 msgid "Use 'toggle-write' to re-enable write!"
-msgstr ""
+msgstr "쓰기를 가능하게 하려면 'toggle-write'를 사용하세요!"
 
 #: libmutt/mx.c:1045
 #, c-format
 msgid "Mailbox is marked unwritable. %s"
-msgstr ""
+msgstr "우편함이 쓰기 금지되어 있습니다. %s"
 
 #: libmutt/mx.c:1050
 msgid "Mailbox is read-only."
-msgstr ""
+msgstr "우편함이 읽기전용입니다."
 
 #: libmutt/mx.c:1065
 #, c-format
 msgid "Purge %d deleted message?"
-msgstr ""
+msgstr "%d 개의 삭제된 메시지를 제거할까요?"
 
 #: libmutt/mx.c:1065
 #, c-format
 msgid "Purge %d deleted messages?"
-msgstr ""
+msgstr "%d 개의 삭제된 메시지를 제거할까요?"
 
 #: libmutt/mx.c:1095
 #, c-format
 msgid "%d kept."
-msgstr ""
+msgstr "%d 보존."
 
 #: libmutt/mx.c:1375
 msgid "Can't write message"
 msgstr "메시지를 쓸 수 없습니다"
+
+#: libmutt/imap/auth.c:110
+msgid "Authenticating (CRAM-MD5)..."
+msgstr "인증중입니다 (CRAM-MD5)..."
+
+#: libmutt/imap/auth.c:202
+msgid "Authenticating (anonymous)..."
+msgstr "인증중입니다 (anonymous)..."
+
+#: libmutt/imap/auth.c:288
+msgid "Anonymous authentication not supported."
+msgstr "Anonymous 인증은 지원되지 않습니다."
+
+#: libmutt/imap/auth.c:301
+msgid "GSSAPI authentication failed."
+msgstr "GSSAPI 인증이 실패했습니다."
+
+#: libmutt/imap/auth.c:329
+msgid "CRAM-MD5 authentication failed."
+msgstr "CRAM-MD5 인증이 실패했습니다."
+
+#: libmutt/imap/auth.c:344
+msgid "Skipping CRAM-MD5 authentication."
+msgstr "CRAM-MD5 인증을 생략합니다."
+
+#: libmutt/imap/auth.c:366
+msgid "Logging in..."
+msgstr "로그인합니다..."
+
+#. Login failed, try again
+#: libmutt/imap/auth.c:378
+msgid "Login failed."
+msgstr "로그인이 실패했습니다."
+
+#. now begin login
+#: libmutt/imap/auth_gss.c:88
+msgid "Authenticating (GSSAPI)..."
+msgstr "인증중입니다 (GSSAPI)..."
+
+#: libmutt/imap/browse.c:93
+msgid "Getting namespaces..."
+msgstr "이름들을 얻고 있습니다..."
+
+#: libmutt/imap/browse.c:120
+msgid "Getting folder list..."
+msgstr "폴더 목록을 얻고 있습니다..."
+
+#: libmutt/imap/imap_ssl.c:92
+msgid "Filling entropy pool"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:124
+msgid "Failed to find enough entropy on your system"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:139
+msgid "SSL disabled due the lack of entropy"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:219
+msgid "Unable to get certificate from peer"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:230
+#, c-format
+msgid "SSL connection using %s"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:255
+msgid "Unknown"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:280
+msgid "[unable to calculate]"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:298
+msgid "[invalid date]"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:373
+msgid "Server certificate is not yet valid"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:380
+msgid "Server certificate has expired"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:454
+msgid "This certificate belongs to:"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:464
+msgid "This certificate was issued by:"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:474
+msgid "This certificate is valid"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:475
+#, c-format
+msgid "   from %s"
+msgstr "   from %s"
+
+#: libmutt/imap/imap_ssl.c:477
+#, c-format
+msgid "     to %s"
+msgstr "     to %s"
+
+#: libmutt/imap/imap_ssl.c:483
+#, c-format
+msgid "Fingerprint: %s"
+msgstr ""
+
+#: libmutt/imap/imap_ssl.c:485
+msgid "SSL Certificate check"
+msgstr "SSL 증명 확인"
+
+#: libmutt/imap/imap_ssl.c:488
+msgid "(r)eject, accept (o)nce, (a)ccept always"
+msgstr "거부(r), 한번만 허용(o), 항상 허용(a)"
+
+#: libmutt/imap/imap_ssl.c:489
+msgid "roa"
+msgstr "roa"
+
+#: libmutt/imap/imap_ssl.c:493
+msgid "(r)eject, accept (o)nce"
+msgstr "거부(r), 한번만 허용(o)"
+
+#: libmutt/imap/imap_ssl.c:494
+msgid "ro"
+msgstr "ro"
+
+#: libmutt/imap/imap_ssl.c:498
+msgid "Exit  "
+msgstr "종료  "
+
+#: libmutt/imap/imap_ssl.c:500
+msgid "Help"
+msgstr "도움말"
+
+#: libmutt/imap/imap_ssl.c:523
+msgid "Warning: Couldn't save certificate"
+msgstr "경고: 증명서를 저장할 수 없습니다."
+
+#: libmutt/imap/imap_ssl.c:525
+msgid "Certificate saved"
+msgstr "증명서를 저장했습니다"
+
+#: libmutt/imap/util.c:43
+msgid "Continue?"
+msgstr "계속할까요?"
+
+#: src/address-book.c:240
+msgid "Add New Address"
+msgstr "새 주소 추가"
+
+#: src/address-book.c:259
+msgid "E-Mail Address:"
+msgstr "전자우편 주소:"
+
+#: src/address-book.c:387 src/filter-edit-dialog.c:130
+msgid "Name"
+msgstr "이름"
+
+#: src/address-book.c:387
+msgid "E-Mail Address"
+msgstr "전자우편 주소"
+
+#: src/address-book.c:394
+msgid "Address Book"
+msgstr "주소록"
+
+#: src/address-book.c:523
+msgid "Send-To"
+msgstr "...로 보냄"
+
+#: src/address-book.c:549
+msgid "Run GnomeCard"
+msgstr "그놈카드 실행"
+
+#: src/address-book.c:558
+msgid "Re-Import"
+msgstr ""
+
+#. mode switching stuff
+#: src/address-book.c:566
+msgid "Import first address only"
+msgstr ""
+
+#: src/address-book.c:569
+msgid "Import all adresses"
+msgstr ""
+
+#: src/address-book-config.c:100
+msgid "Address Book Configuration"
+msgstr "주소록 설정"
+
+#: src/address-book-config.c:134 src/mailbox-conf.c:288
+#: src/mailbox-conf.c:1006
+msgid "Update"
+msgstr "갱신"
+
+#: src/address-book-config.c:255
+msgid "New Address Book type:"
+msgstr "새 주소록 형식:"
+
+#: src/address-book-config.c:265
+msgid "VCard Address Book (GnomeCard)"
+msgstr "VCard 주소록 (그놈카드)"
+
+#: src/address-book-config.c:283
+msgid "LDAP Address Book"
+msgstr "LDAP 주소록"
+
+#: src/address-book-config.c:292
+msgid "Balsa is not compiled with LDAP support"
+msgstr "발사가 LDAP를 지원하도록 컴파일되지 않았습니다"
+
+#. mailbox name
+#: src/address-book-config.c:312 src/address-book-config.c:370
+msgid "Address Book Name:"
+msgstr "주소록 이름:"
+
+#: src/address-book-config.c:321
+msgid "File name"
+msgstr "파일 이름"
+
+#: src/address-book-config.c:333 src/address-book-config.c:404
+msgid "Expand aliases as you type"
+msgstr ""
+
+#: src/address-book-config.c:381
+msgid "Host name"
+msgstr "호스트 이름"
+
+#: src/address-book-config.c:392
+msgid "Base Domain Name"
+msgstr "기본 도메인 이름"
+
+#: src/address-book-config.c:459 src/filter-edit-dialog.c:379
+#: src/mailbox-conf.c:280 src/mailbox-conf.c:1010 src/pref-manager.c:1182
+#: src/pref-manager.c:1922
+msgid "Add"
+msgstr "추가"
+
+#: src/address-book-config.c:506
+#, c-format
+msgid ""
+"The address book file path '%s' is not correct.\n"
+"Do you want to correct the file name?"
+msgstr ""
+"주소록 파일 경로 '%s'가 맞지 않습니다.\n"
+"파일 이름을 바꿀까요?"
+
+#: src/balsa-app.c:71
+#, c-format
+msgid ""
+"Opening remote mailbox %s.\n"
+"The password for %s@%s:"
+msgstr ""
+"원격 %s 우편함을 여는 중입니다.\n"
+"%s@%s의 비밀번호:"
+
+#: src/balsa-app.c:75
+#, c-format
+msgid "Mailbox password for %s@%s:"
+msgstr "%s@%s의 우편함 비밀번호:"
+
+#: src/balsa-index-page.c:257
+msgid ""
+"Unable to Open Mailbox!\n"
+"Please check the mailbox settings."
+msgstr ""
+"우편함을 열수없음!\n"
+"우편함 설정을 확인하세요."
+
+#: src/balsa-index-page.c:525
+msgid "Reply..."
+msgstr "회신..."
+
+#: src/balsa-index-page.c:529
+msgid "Reply To All..."
+msgstr "전체 회신..."
+
+#: src/balsa-index-page.c:533
+msgid "Forward..."
+msgstr "전달..."
+
+#: src/balsa-index-page.c:538
+msgid "Undelete"
+msgstr "삭제취소"
+
+#: src/balsa-index-page.c:541 src/balsa-mblist.c:371
+#: src/filter-edit-dialog.c:224 src/main-window.c:429 src/mblist-window.c:475
+#: src/pref-manager.c:1184 src/pref-manager.c:1924
+msgid "Delete"
+msgstr "삭제"
+
+#: src/balsa-index-page.c:545
+msgid "Move To Trash"
+msgstr "휴지통으로 보냄"
+
+#: src/balsa-index-page.c:550
+msgid "Store Address..."
+msgstr "주소 저장..."
+
+#: src/balsa-index-page.c:553
+msgid "Toggle Flagged"
+msgstr ""
+
+#: src/balsa-index-page.c:556
+msgid "Transfer"
+msgstr "송신"
+
+#. FIXME:
+#: src/balsa-index.c:304
+msgid "From"
+msgstr "보낸이"
+
+#: src/balsa-index.c:305 src/filter-edit-dialog.c:326
+msgid "Subject"
+msgstr "제목"
+
+#: src/balsa-index.c:306
+msgid "Date"
+msgstr "날짜"
+
+#: src/balsa-index.c:429
+msgid "To"
+msgstr "받는이"
+
+#: src/balsa-mblist.c:356 src/mblist-window.c:460
+msgid "Add New Mailbox..."
+msgstr "새 우편함 추가..."
+
+#: src/balsa-mblist.c:365 src/mblist-window.c:469
+msgid "Open"
+msgstr "열기"
+
+#: src/balsa-mblist.c:367 src/mblist-window.c:471
+msgid "Close"
+msgstr "닫기"
+
+#: src/balsa-mblist.c:369 src/mblist-window.c:473
+msgid "Properties..."
+msgstr "속성..."
+
+#: src/balsa-mblist.c:375 src/mblist-window.c:479
+msgid "Mark as Inbox"
+msgstr "받은편지함으로 표시"
+
+#: src/balsa-mblist.c:376 src/mblist-window.c:480
+msgid "Mark as Sentbox"
+msgstr "보낸편지함으로 표시"
+
+#: src/balsa-mblist.c:377 src/mblist-window.c:481
+msgid "Mark as Trash"
+msgstr "휴지통으로 표시"
+
+#: src/balsa-mblist.c:378 src/mblist-window.c:482
+msgid "Mark as Draftbox"
+msgstr ""
+
+#: src/balsa-mblist.c:458 src/balsa-mblist.c:474 src/mblist-window.c:501
+#: src/mblist-window.c:517 src/mblist-window.c:536 src/mblist-window.c:551
+msgid "No mailbox selected."
+msgstr "선택된 우편함 없음."
+
+#: src/balsa-mblist.c:577 src/mailbox-conf.c:1029
+msgid "Mailbox"
+msgstr "우편함"
+
+#: src/balsa-mblist.c:577
+msgid "Unread"
+msgstr "안읽음"
+
+#: src/balsa-mblist.c:577
+msgid "Total"
+msgstr "총"
+
+#: src/balsa-mblist.c:1087
+#, c-format
+msgid "Shown mailbox: %s with %ld messages, %ld new"
+msgstr ""
+
+#: src/balsa-message.c:287 src/balsa-message.c:290
+msgid "Save MIME Part"
+msgstr "MIME 부분 저장"
+
+#: src/balsa-message.c:288
+msgid "Save"
+msgstr "저장"
+
+#: src/balsa-message.c:288 src/sendmsg-window.c:156 src/sendmsg-window.c:628
+#: src/sendmsg-window.c:1763 src/sendmsg-window.c:1786
+msgid "Cancel"
+msgstr "취소"
+
+#: src/balsa-message.c:300
+msgid "Please choose a filename to save this part of the message as:"
+msgstr "이 메시지 부분을 저장할 파일명을 선택:"
+
+#: src/balsa-message.c:331
+#, c-format
+msgid " Could not save %s:%s "
+msgstr " %s를 저장할 수 없습니다:%s "
+
+#. Subject:
+#: src/balsa-message.c:625 src/print.c:358 src/sendmsg-window.c:883
+msgid "Subject:"
+msgstr "제목:"
+
+#: src/balsa-message.c:628 src/print.c:361
+msgid "Date:"
+msgstr "날짜:"
+
+#. From:
+#: src/balsa-message.c:633 src/filter-edit-dialog.c:316 src/print.c:348
+#: src/sendmsg-window.c:874
+msgid "From:"
+msgstr "보낸이:"
+
+#. To:
+#: src/balsa-message.c:637 src/filter-edit-dialog.c:306 src/print.c:353
+#: src/sendmsg-window.c:877
+msgid "To:"
+msgstr "받는이:"
+
+#: src/balsa-message.c:638
+msgid "Cc:"
+msgstr "참조:"
+
+#: src/balsa-message.c:639
+msgid "Bcc:"
+msgstr "다음참조:"
+
+#: src/balsa-message.c:642
+msgid "Fcc:"
+msgstr "Fcc:"
+
+#: src/balsa-message.c:708
+msgid "Could not load image. It is most likely corrupted."
+msgstr "이미지를 읽어들일 수 없습니다. 아마도 깨진 게 확실합니다."
+
+#: src/balsa-message.c:713
+msgid "Couldn't render image\n"
+msgstr "이미지를 묘사할 수 없습니다\n"
+
+#: src/balsa-message.c:771
+msgid "No open or view action defined in GNOME MIME for this content type"
+msgstr "이런 형식의 MIME에 대해 열거나 보기 동작이 정의되지 않았습니다"
+
+#: src/balsa-message.c:775
+#, c-format
+msgid "Content Type: %s"
+msgstr "내용 형식: %s"
+
+#: src/balsa-message.c:780
+#, c-format
+msgid "Filename: %s"
+msgstr "파일명: %s"
+
+#: src/balsa-message.c:788
+msgid "Save part"
+msgstr "부분 저장"
+
+#: src/balsa-message.c:812
+#, c-format
+msgid "View part with %s"
+msgstr ""
+
+#: src/balsa-message.c:1417
+msgid "Save..."
+msgstr "저장..."
+
+#: src/balsa-message.c:1474
+#, c-format
+msgid "could not create temporary file %s"
+msgstr "임시파일 %s를 생성할 수 없습니다"
+
+#: src/filter-edit-dialog.c:31
+msgid "Inbound"
+msgstr ""
+
+#: src/filter-edit-dialog.c:32
+msgid "Outbound"
+msgstr ""
+
+#: src/filter-edit-dialog.c:33
+msgid "Before Sending"
+msgstr ""
+
+#: src/filter-edit-dialog.c:34
+msgid "Demand"
+msgstr ""
+
+#: src/filter-edit-dialog.c:38
+msgid "Matches"
+msgstr ""
+
+#: src/filter-edit-dialog.c:39
+msgid "Doesn't Match"
+msgstr ""
+
+#: src/filter-edit-dialog.c:40
+msgid "Always"
+msgstr "항상"
+
+#: src/filter-edit-dialog.c:44
+msgid "Simple"
+msgstr "단순"
+
+#: src/filter-edit-dialog.c:45
+msgid "Regular Expression"
+msgstr "정규 표현식"
+
+#: src/filter-edit-dialog.c:46
+msgid "External Command"
+msgstr "외부 명령"
+
+#: src/filter-edit-dialog.c:50
+msgid "Copy to folder:"
+msgstr "폴더에 복사:"
+
+#: src/filter-edit-dialog.c:51
+msgid "Move to folder:"
+msgstr "폴더로 이동:"
+
+#: src/filter-edit-dialog.c:52
+msgid "Print on printer:"
+msgstr "프린터로 인쇄:"
+
+#: src/filter-edit-dialog.c:53
+msgid "Run program:"
+msgstr "프로그램 실행:"
+
+#: src/filter-edit-dialog.c:54
+msgid "Send to Trash"
+msgstr "휴지통으로 보냄"
+
+#: src/filter-edit-dialog.c:129
+msgid "On"
+msgstr ""
+
+#: src/filter-edit-dialog.c:194
+msgid "Up"
+msgstr "위"
+
+#: src/filter-edit-dialog.c:200
+msgid "Down"
+msgstr "아래"
+
+#: src/filter-edit-dialog.c:218
+msgid "New"
+msgstr "새 메일"
+
+#: src/filter-edit-dialog.c:263
+msgid "Match in:"
+msgstr ""
+
+#: src/filter-edit-dialog.c:276
+msgid "All"
+msgstr "모두"
+
+#: src/filter-edit-dialog.c:286
+msgid "Header"
+msgstr "머리글"
+
+#: src/filter-edit-dialog.c:296
+msgid "Body"
+msgstr "본문"
+
+#: src/filter-edit-dialog.c:337
+msgid "Match string:"
+msgstr ""
+
+#: src/filter-edit-dialog.c:384 src/sendmsg-window.c:537
+msgid "Remove"
+msgstr "삭제"
+
+#: src/filter-edit-dialog.c:404
+msgid "Command:"
+msgstr "명령:"
+
+#. The name entry
+#: src/filter-edit-dialog.c:436
+msgid "Filter name:"
+msgstr "필터 이름:"
+
+#. The "Process when:" option menu
+#: src/filter-edit-dialog.c:451
+msgid "Process when:"
+msgstr "수행할 때:"
+
+#. The "Run on:" option menu
+#: src/filter-edit-dialog.c:472
+msgid "Run on:"
+msgstr ""
+
+#. the type notebook's option menu
+#: src/filter-edit-dialog.c:491
+msgid "Search type:"
+msgstr "찾기 형식:"
+
+#. The notification area
+#: src/filter-edit-dialog.c:538
+msgid "Notification:"
+msgstr ""
+
+#. Notification buttons
+#: src/filter-edit-dialog.c:547
+msgid "Play sound:"
+msgstr "음악 연주:"
+
+#: src/filter-edit-dialog.c:554
+msgid "Use Sound..."
+msgstr "음악 사용..."
+
+#: src/filter-edit-dialog.c:559
+msgid "Popup text:"
+msgstr ""
+
+#. The action area
+#: src/filter-edit-dialog.c:574
+msgid "Action to perform:"
+msgstr "수행할 동작:"
+
+#. The disposition area
+#: src/filter-edit-dialog.c:597
+msgid "Disposition:"
+msgstr ""
+
+#: src/filter-edit-dialog.c:608
+msgid "Place/leave in default folder"
+msgstr ""
+
+#: src/filter-edit-dialog.c:615
+msgid "Do not place/leave in default folder"
+msgstr ""
+
+#: src/filter-edit-dialog.c:622
+msgid "Stop filtering here"
+msgstr "여기에서 필터링 중단"
+
+#: src/filter-edit-dialog.c:650
+msgid "Match"
+msgstr ""
+
+#: src/filter-edit-dialog.c:653
+msgid "Action"
+msgstr "동작"
+
+#: src/filter-edit-dialog.c:666
+msgid "Revert"
+msgstr "복구"
+
+#: src/filter-edit-dialog.c:693
+msgid "Balsa Filters"
+msgstr "발사 필터"
+
+#: src/information-dialog.c:145
+msgid "Balsa Information"
+msgstr "발사 정보"
+
+#: src/local-mailbox.c:196
+#, c-format
+msgid "Local Mailbox Loaded as: %s\n"
+msgstr ""
+
+#: src/mailbox-conf.c:152
+#, c-format
+msgid ""
+"This will remove the mailbox %s and it's files permanently from your "
+"system.\n"
+"Are you sure you want to remove this mailbox?"
+msgstr ""
+"우편함 %s가 시스템에서 영원히 삭제될 것입니다.\n"
+"이 우편함을 지우시겠습니까?"
+
+#: src/mailbox-conf.c:158
+#, c-format
+msgid ""
+"This will remove the mailbox %s from the list of mailboxes\n"
+"You may use \"Add Mailbox\" later to access this mailbox again\n"
+"Are you sure you want to remove this mailbox?"
+msgstr ""
+"우편함 목록에서 우편함 %s가 삭제될 것입니다\n"
+"나중에 \"우편함 추가\"를 이용해서 이 우편함을 다시 사용할 수 있습니다\n"
+"이 우편함을 지우시겠습니까?"
+
+#: src/mailbox-conf.c:185
+msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
+msgstr "으윽! 우편함을 balsa_app.mailbox 노드에서 찾을 수 없네요?\n"
+
+#: src/mailbox-conf.c:234
+msgid "Mailbox Configurator"
+msgstr "우편함 설정"
+
+#: src/mailbox-conf.c:410 src/mailbox-conf.c:419 src/mailbox-conf.c:443
+msgid "You need to fill in the Mailbox Name field."
+msgstr "우편함 이름 항목을 채우셔야 합니다."
+
+#: src/mailbox-conf.c:412
+msgid "You need to fill in the Mailbox Path field."
+msgstr "우편함 경로 항목을 채우셔야 합니다."
+
+#: src/mailbox-conf.c:424
+msgid "You need to fill in the folderpath field."
+msgstr "폴더 경로 항목을 채우셔야 합니다."
+
+#: src/mailbox-conf.c:426
+msgid "You need to fill in the IMAP Server field"
+msgstr "IMAP 서버 항목을 채우셔야 합니다"
+
+#: src/mailbox-conf.c:428
+msgid "You need to fill in the username field"
+msgstr "사용자명 항목을 채우셔야 합니다"
+
+#: src/mailbox-conf.c:430
+msgid "You need to fill in the port field"
+msgstr "포트 항목을 채우셔야 합니다"
+
+#: src/mailbox-conf.c:447
+msgid "You need to fill in the user field."
+msgstr "사용자 항목을 채우셔야 합니다."
+
+#: src/mailbox-conf.c:451
+msgid "You need to fill in the server field."
+msgstr "서버 항목을 채우셔야 합니다."
+
+#: src/mailbox-conf.c:455
+msgid "You need to fill in the port field."
+msgstr "포트 항목을 채우셔야 합니다."
+
+#: src/mailbox-conf.c:457
+msgid "Some of the fields are blank."
+msgstr "몇몇 항목이 비었습니다."
+
+#: src/mailbox-conf.c:493
+#, c-format
+msgid "%s on %s"
+msgstr ""
+
+#: src/mailbox-conf.c:588
+#, c-format
+msgid ""
+"Rename of %s to %s failed:\n"
+"%s"
+msgstr ""
+"%s를 %s로 이름바꾸기 실패:\n"
+"%s"
+
+#: src/mailbox-conf.c:606
+msgid ""
+"This is a mailbox in your local directory.\n"
+"Change the path instead."
+msgstr ""
+"지역 디렉토리에 있는 우편함입니다.\n"
+"대신에 경로를 바꾸세요."
+
+#: src/mailbox-conf.c:660
+#, c-format
+msgid "Could not access mailbox '%s'"
+msgstr "우편함 '%s'에 접근할 수 없습니다"
+
+#: src/mailbox-conf.c:793
+msgid "New mailbox type:"
+msgstr "새 우편함 형식:"
+
+#: src/mailbox-conf.c:800
+msgid "Local mailbox"
+msgstr "로컬 우편함"
+
+#: src/mailbox-conf.c:811
+msgid "Single IMAP folder"
+msgstr ""
+
+#: src/mailbox-conf.c:822
+msgid "IMAP folder set"
+msgstr ""
+
+#. mailbox name
+#: src/mailbox-conf.c:869 src/mailbox-conf.c:893 src/mailbox-conf.c:951
+msgid "Mailbox Name:"
+msgstr "우편함 이름:"
+
+#. path to file
+#: src/mailbox-conf.c:873
+msgid "Mailbox path:"
+msgstr "우편함 경로:"
+
+#. pop server
+#: src/mailbox-conf.c:897 src/mailbox-conf.c:955
+msgid "Server:"
+msgstr "서버:"
+
+#. pop port
+#: src/mailbox-conf.c:901 src/mailbox-conf.c:959
+msgid "Port:"
+msgstr "포트:"
+
+#. username
+#: src/mailbox-conf.c:905 src/mailbox-conf.c:963
+msgid "Username:"
+msgstr "사용자명:"
+
+#. password field
+#: src/mailbox-conf.c:910 src/mailbox-conf.c:967
+msgid "Password:"
+msgstr "비밀번호:"
+
+#. toggle for apop
+#: src/mailbox-conf.c:915
+msgid "APOP"
+msgstr "APOP"
+
+#. toggle for check
+#: src/mailbox-conf.c:920 src/main-window.c:424
+msgid "Check"
+msgstr "확인"
+
+#: src/mailbox-conf.c:926
+msgid "Delete from server"
+msgstr "서버에서 삭제"
+
+#: src/mailbox-conf.c:931
+msgid "Filter through procmail"
+msgstr ""
+
+#: src/mailbox-conf.c:971
+msgid "Folder path:"
+msgstr "폴더 경로:"
+
+#: src/main-window.c:182
+msgid "_Message..."
+msgstr "메시지(_M)..."
+
+#: src/main-window.c:182
+msgid "Compose a new message"
+msgstr "새 메시지 작성"
+
+#: src/main-window.c:187
+msgid "_Mailbox..."
+msgstr "우편함(_M)..."
+
+#: src/main-window.c:187
+msgid "Add a new mailbox"
+msgstr "새 우편함 추가"
+
+#: src/main-window.c:194
+msgid "_New"
+msgstr "새 편지(_N)"
+
+#: src/main-window.c:198
+msgid "_Continue"
+msgstr "계속(_C)"
+
+#: src/main-window.c:199
+msgid "Continue editing current message"
+msgstr "현재 메시지 편집 계속"
+
+#: src/main-window.c:206
+msgid "_Get New Mail"
+msgstr "새 편지 받기(_G)"
+
+#: src/main-window.c:206
+msgid "Fetch new incoming mail"
+msgstr "새로 도착한 편지 가져오기"
+
+#: src/main-window.c:212
+msgid "_Send Queued Mail"
+msgstr "큐에 있는 편지 보내기(_S)"
+
+#: src/main-window.c:213
+msgid "Send mail from the outbox"
+msgstr "보낼우편함에서 편지 보내기"
+
+#: src/main-window.c:221
+msgid "_Address Book..."
+msgstr "주소록(_A)..."
+
+#: src/main-window.c:222
+msgid "Opens the address book"
+msgstr "주소록 열기"
+
+#: src/main-window.c:249
+msgid "_Filters..."
+msgstr "필터(_F)..."
+
+#: src/main-window.c:249
+msgid "Manage filters"
+msgstr "필터 관리"
+
+#: src/main-window.c:256
+msgid "N_o Headers"
+msgstr "헤더 없음(_o)"
+
+#: src/main-window.c:256
+msgid "Display no headers"
+msgstr "헤더 표시 않함"
+
+#: src/main-window.c:258
+msgid "S_elected Headers"
+msgstr "선택된 헤더(_e)"
+
+#: src/main-window.c:259
+msgid "Display selected headers"
+msgstr "선택된 헤더 표시"
+
+#: src/main-window.c:261
+msgid "All _Headers"
+msgstr "모든 헤더(_H)"
+
+#: src/main-window.c:261
+msgid "Display all headers"
+msgstr "모든 헤더 표시"
+
+#: src/main-window.c:268
+msgid "_Show Mailbox Tree"
+msgstr "우편함 트리 보이기(_S)"
+
+#: src/main-window.c:269
+msgid "Toggle display of mailbox and folder tree"
+msgstr "우편함과 폴더 트리 표시 토글"
+
+#: src/main-window.c:272
+msgid "Show Mailbox _Tabs"
+msgstr "우편함 탭 보이기(_T)"
+
+#: src/main-window.c:273
+msgid "Toggle display of mailbox notebook tabs"
+msgstr "우편함 노트북 탭 표시 토글"
+
+#: src/main-window.c:277 src/message-window.c:94
+msgid "_Wrap"
+msgstr ""
+
+#: src/main-window.c:277 src/sendmsg-window.c:209
+msgid "Wrap message lines"
+msgstr ""
+
+#: src/main-window.c:288 src/message-window.c:103
+msgid "_Reply..."
+msgstr "회신(_R)..."
+
+#: src/main-window.c:289
+msgid "Reply to the current message"
+msgstr "현재 메시지에 대해 회신"
+
+#: src/main-window.c:295
+msgid "Reply To _All..."
+msgstr "전체 회신(_A)..."
+
+#: src/main-window.c:296
+msgid "Reply to all recipients of the current message"
+msgstr "현재 메시지의 모든 수신자에게 회신"
+
+#: src/main-window.c:302 src/message-window.c:114
+msgid "_Forward..."
+msgstr "전달(_F)..."
+
+#: src/main-window.c:303
+msgid "Forward the current message"
+msgstr "현재 메시지 전달"
+
+#: src/main-window.c:309 src/message-window.c:119
+msgid "Next Part"
+msgstr "다음 부분"
+
+#: src/main-window.c:309 src/message-window.c:119
+msgid "Next Part in Message"
+msgstr "메시지의 다음 부분"
+
+#: src/main-window.c:314 src/message-window.c:123
+msgid "Previous Part"
+msgstr "이전 부분"
+
+#: src/main-window.c:315 src/message-window.c:124
+msgid "Previous Part in Message"
+msgstr "메시지의 이전 부분"
+
+#: src/main-window.c:320 src/message-window.c:128
+msgid "Save Current Part..."
+msgstr "현재 부분 저장..."
+
+#: src/main-window.c:321 src/message-window.c:129
+msgid "Save Current Part in Message"
+msgstr "메시지의 현재 부분 저장"
+
+#: src/main-window.c:328
+msgid "_Delete"
+msgstr "삭제(_D)"
+
+#: src/main-window.c:328
+msgid "Delete the current message"
+msgstr "현재 메시지 삭제"
+
+#: src/main-window.c:334
+msgid "_Undelete"
+msgstr "복구(_U)"
+
+#: src/main-window.c:334
+msgid "Undelete the message"
+msgstr "메시지 복구"
+
+#: src/main-window.c:340
+msgid "_Toggle Flagged"
+msgstr ""
+
+#: src/main-window.c:340
+msgid "Toggle flagged"
+msgstr ""
+
+#: src/main-window.c:347
+msgid "_Store Address..."
+msgstr "주소 저장(_S)..."
+
+#: src/main-window.c:348
+msgid "Store address of sender in addressbook"
+msgstr "보낸이의 주소를 주소록에 저장"
+
+#: src/main-window.c:357
+msgid "Next Message"
+msgstr "다음 메시지"
+
+#: src/main-window.c:362
+msgid "Previous Message"
+msgstr "이전 메시지"
+
+#: src/main-window.c:367 src/main-window.c:368
+msgid "Next Unread Message"
+msgstr "다음 안읽은 메시지"
+
+#: src/main-window.c:373
+msgid "_Edit..."
+msgstr "편집(_E)..."
+
+#: src/main-window.c:373
+msgid "Edit the selected mailbox"
+msgstr "선택된 우편함 편집"
+
+#: src/main-window.c:376
+msgid "_Delete..."
+msgstr "삭제(_D)..."
+
+#: src/main-window.c:377
+msgid "Delete the selected mailbox"
+msgstr "선택된 우편함 삭제"
+
+#: src/main-window.c:383
+msgid "Co_mmit Current"
+msgstr "현재 상태 저장(_m)"
+
+#: src/main-window.c:384
+msgid "Commit the changes in the currently opened mailbox"
+msgstr "열려진 우편함의 현재 수정된 사항 저장"
+
+#: src/main-window.c:388
+msgid "_Close"
+msgstr "닫기(_C)"
+
+#: src/main-window.c:388
+msgid "Close mailbox"
+msgstr "우편함 닫기"
+
+#: src/main-window.c:392
+msgid "Empty _Trash"
+msgstr "휴지통 비우기(_T)"
+
+#: src/main-window.c:393
+msgid "Delete Messages from the trash mailbox"
+msgstr "휴지통에서 메시지 삭제"
+
+#: src/main-window.c:415
+msgid "_Message"
+msgstr "메시지(_M)"
+
+#: src/main-window.c:416
+msgid "Mail_box"
+msgstr "우편함(_b)"
+
+#: src/main-window.c:424
+msgid "Check Email"
+msgstr "편지 확인"
+
+#: src/main-window.c:429
+msgid "Delete Message"
+msgstr "메시지 삭제"
+
+#: src/main-window.c:434
+msgid "Compose"
+msgstr "작성"
+
+#: src/main-window.c:434
+msgid "Compose Message"
+msgstr "메시지 작성"
+
+#: src/main-window.c:438
+msgid "Continue"
+msgstr "계속"
+
+#: src/main-window.c:442
+msgid "Reply"
+msgstr "회신"
+
+#: src/main-window.c:446
+msgid ""
+"Reply\n"
+"To All"
+msgstr "전체회신"
+
+#: src/main-window.c:446
+msgid "Reply to all"
+msgstr "전체 회신"
+
+#: src/main-window.c:450
+msgid "Forward"
+msgstr "전달"
+
+#: src/main-window.c:456
+msgid "Previous"
+msgstr "이전"
+
+#: src/main-window.c:456
+msgid "Open Previous message"
+msgstr "이전 메시지 열기"
+
+#: src/main-window.c:461
+msgid "Next"
+msgstr "다음"
+
+#: src/main-window.c:461
+msgid "Open Next message"
+msgstr "다음 메시지 열기"
+
+#: src/main-window.c:465
+msgid ""
+"Next\n"
+"Unread"
+msgstr "다음UnRd"
+
+#: src/main-window.c:465
+msgid "Open Next Unread Message"
+msgstr "다음 안읽은 메시지 열기"
+
+#: src/main-window.c:469 src/print.c:60 src/sendmsg-window.c:153
+msgid "Print"
+msgstr "인쇄"
+
+#: src/main-window.c:469
+msgid "Print current message"
+msgstr "현재 메시지 인쇄"
+
+#: src/main-window.c:1069
+msgid "Copyright (C) 1997-2000"
+msgstr "Copyright (C) 1997-2000"
+
+#: src/main-window.c:1072
+msgid ""
+"The Balsa email client is part of the GNOME desktop environment.  "
+"Information on Balsa can be found at http://www.balsa.net/\n"
+"\n"
+"If you need to report bugs, please do so at: http://bugs.gnome.org/"
+msgstr ""
+"발사 편지 프로그램은 그놈 데스크탑 환경의 한 부분입니다.  "
+"발사에 대한 정보는 http://www.balsa.net/에서 찾을 수 있습니다.\n"
+"버그 레포트가 필요하시면 http://bugs.gnome.org/에서 해주세요"
+
+#: src/main-window.c:1464
+#, c-format
+msgid "Sending error: %s"
+msgstr "보내기 에러: %s"
+
+#: src/main-window.c:1810
+#, c-format
+msgid "Commiting mailbox %s failed."
+msgstr "우편함 %s의 현재 상태 저장이 실패했습니다."
+
+#: src/main-window.c:1994
+#, c-format
+msgid "Balsa: %s (readonly)"
+msgstr "발사: %s (읽기전용)"
+
+#: src/main-window.c:1996
+#, c-format
+msgid "Balsa: %s"
+msgstr "발사: %s"
+
+#: src/main.c:107
+msgid "Get new mail on startup"
+msgstr "시작할 때 새 메시지 가져오기"
+
+#: src/main.c:109
+msgid "Compose a new email to EMAIL@ADDRESS"
+msgstr "EMAIL@ADDRESS로 새 편지 작성"
+
+#: src/main.c:111
+msgid "Opens MAILBOXNAME"
+msgstr ""
+
+#: src/main.c:111
+msgid "MAILBOXNAME"
+msgstr ""
+
+#: src/main.c:114
+msgid "Opens first unread mailbox"
+msgstr "안읽은 첫번째 우편함 열기"
+
+#: src/main.c:132 src/main.c:137 src/main.c:143 src/main.c:149 src/main.c:155
+#, c-format
+msgid "Balsa cannot open your \"%s\" mailbox."
+msgstr "\"%s\" 우편함을 열 수 없습니다."
+
+#: src/main.c:132
+msgid "Inbox"
+msgstr "받은우편함"
+
+#: src/main.c:138
+msgid "Outbox"
+msgstr "보낼우편함"
+
+#: src/main.c:144
+msgid "Sentbox"
+msgstr "보낸보관함"
+
+#: src/main.c:150
+msgid "Draftbox"
+msgstr ""
+
+#: src/main.c:155
+msgid "Trash"
+msgstr "휴지통"
+
+#: src/message-window.c:61
+msgid "N_o headers"
+msgstr "헤더 없음(_o)"
+
+#: src/message-window.c:63
+msgid "_Selected headers"
+msgstr "선택된 헤더(_S)"
+
+#: src/message-window.c:65
+msgid "All _headers"
+msgstr "모든 헤더(_h)"
+
+#: src/message-window.c:103
+msgid "Reply to this message"
+msgstr "이 메시지에 대해 회신"
+
+#: src/message-window.c:108
+msgid "Reply to _all..."
+msgstr "전체 회신(_a)..."
+
+#: src/message-window.c:109
+msgid "Reply to all recipients of this message"
+msgstr "이 메시지의 모든 수신자에게 회신"
+
+#: src/message-window.c:114
+msgid "Forward this message"
+msgstr "이 메시지 전달"
+
+#: src/pref-manager.c:169
+msgid "Text"
+msgstr "텍스트"
+
+#: src/pref-manager.c:170
+msgid "Icons"
+msgstr "아이콘"
+
+#: src/pref-manager.c:171
+msgid "Both"
+msgstr "모두"
+
+#: src/pref-manager.c:181
+msgid "7bits"
+msgstr "7비트"
+
+#: src/pref-manager.c:182
+msgid "8bits"
+msgstr "8비트"
+
+#: src/pref-manager.c:183
+msgid "quoted"
+msgstr ""
+
+#: src/pref-manager.c:193
+msgid "While Retrieving Messages"
+msgstr "메시지 받는 동안"
+
+#: src/pref-manager.c:194
+msgid "Until Closed"
+msgstr "닫힐 때 까지"
+
+#: src/pref-manager.c:195
+msgid "Never"
+msgstr "결코"
+
+#: src/pref-manager.c:199
+msgid "Fast"
+msgstr "빠르게"
+
+#: src/pref-manager.c:200
+msgid "Normal"
+msgstr "보통"
+
+#: src/pref-manager.c:201
+msgid "Bad Spellers"
+msgstr "나쁜 철자검색기"
+
+#: src/pref-manager.c:225
+msgid "Balsa Preferences"
+msgstr "발사 속성"
+
+#: src/pref-manager.c:236 src/pref-manager.c:1074
+msgid "Identity"
+msgstr "신원"
+
+#: src/pref-manager.c:240 src/pref-manager.c:1097
+msgid "Signature"
+msgstr "서명"
+
+#: src/pref-manager.c:244
+msgid "Mail Servers"
+msgstr "메일 서버"
+
+#: src/pref-manager.c:248 src/pref-manager.c:1889
+msgid "Address Books"
+msgstr "주소록"
+
+#: src/pref-manager.c:252
+msgid "Mail Options"
+msgstr "편지 옵션"
+
+#: src/pref-manager.c:256
+msgid "Display"
+msgstr "표시"
+
+#: src/pref-manager.c:261 src/pref-manager.c:1553 src/pref-manager.c:1593
+msgid "Printing"
+msgstr "인쇄"
+
+#: src/pref-manager.c:265
+msgid "Spelling"
+msgstr "철자"
+
+#: src/pref-manager.c:269 src/pref-manager.c:1714
+msgid "Misc"
+msgstr "기타"
+
+#: src/pref-manager.c:273
+msgid "Startup"
+msgstr "시작"
+
+#: src/pref-manager.c:924
+msgid "Yes"
+msgstr "예"
+
+#: src/pref-manager.c:1078
+msgid "Your name:"
+msgstr "이름:"
+
+#: src/pref-manager.c:1079
+msgid "E-mail address:"
+msgstr "전자우편 주소:"
+
+#: src/pref-manager.c:1080
+msgid "Reply-to address:"
+msgstr "Reply-to 주소:"
+
+#: src/pref-manager.c:1081
+msgid "Default domain:"
+msgstr "기본 도메인:"
+
+#: src/pref-manager.c:1102
+msgid "Use signature file when:"
+msgstr "서명 파일 사용할 때:"
+
+#: src/pref-manager.c:1106
+msgid "sending mail"
+msgstr "편지 보냄"
+
+#: src/pref-manager.c:1107
+msgid "replying to mail"
+msgstr "편지 회신"
+
+#: src/pref-manager.c:1108
+msgid "forwarding mail"
+msgstr "편지 전달"
+
+#: src/pref-manager.c:1110
+msgid "Signature file:"
+msgstr "서명 파일:"
+
+#: src/pref-manager.c:1117
+msgid "Select your signature file"
+msgstr "서명 파일 선택"
+
+#: src/pref-manager.c:1125
+msgid "Reply prefix:"
+msgstr ""
+
+#: src/pref-manager.c:1128
+msgid "enable signature separator"
+msgstr "서명 구분자 사용"
+
+#: src/pref-manager.c:1152
+msgid "Remote Mailbox Servers"
+msgstr "원격 우편함 서버"
+
+#: src/pref-manager.c:1174 src/pref-manager.c:1911
+msgid "Type"
+msgstr "형식"
+
+#: src/pref-manager.c:1177
+msgid "Mailbox Name"
+msgstr "우편함 이름"
+
+#: src/pref-manager.c:1183 src/pref-manager.c:1923
+msgid "Modify"
+msgstr "수정"
+
+#: src/pref-manager.c:1186
+msgid "Local mail"
+msgstr "지역 편지"
+
+#: src/pref-manager.c:1196
+msgid "Select your local mail directory"
+msgstr "지역 편지 디렉토리 선택"
+
+#: src/pref-manager.c:1205
+msgid "Outgoing mail"
+msgstr ""
+
+#: src/pref-manager.c:1223
+msgid "Remote SMTP Server"
+msgstr "원격 SMTP 서버"
+
+#: src/pref-manager.c:1232
+msgid "Local mail user agent"
+msgstr ""
+
+#: src/pref-manager.c:1254
+msgid "Incoming"
+msgstr ""
+
+#: src/pref-manager.c:1256
+msgid "Outgoing"
+msgstr ""
+
+#: src/pref-manager.c:1275
+msgid "Checking"
+msgstr ""
+
+#: src/pref-manager.c:1283 src/pref-manager.c:1743
+msgid "Minutes"
+msgstr ""
+
+#: src/pref-manager.c:1295
+msgid "Check mail automatically every:"
+msgstr ""
+
+#. Quoted text regular expression
+#: src/pref-manager.c:1301
+msgid "Quoted Text"
+msgstr ""
+
+#: src/pref-manager.c:1309
+msgid "Quoted Text Regular Expression"
+msgstr ""
+
+#: src/pref-manager.c:1333
+msgid "Word Wrap"
+msgstr ""
+
+#: src/pref-manager.c:1343
+msgid "Wrap Outgoing Text at:"
+msgstr ""
+
+#: src/pref-manager.c:1356
+msgid "Characters"
+msgstr ""
+
+#: src/pref-manager.c:1360
+msgid "Other options"
+msgstr "다른 옵션"
+
+#: src/pref-manager.c:1367
+msgid "Default Bcc to:"
+msgstr ""
+
+#: src/pref-manager.c:1369
+msgid "Encoding"
+msgstr ""
+
+#: src/pref-manager.c:1414
+msgid "Main window"
+msgstr ""
+
+#: src/pref-manager.c:1420
+msgid "use preview pane"
+msgstr ""
+
+#: src/pref-manager.c:1422
+msgid "Show mailbox statistics in left pane"
+msgstr ""
+
+#: src/pref-manager.c:1427
+msgid "Toolbars"
+msgstr "툴바"
+
+#: src/pref-manager.c:1444
+msgid "Display progress dialog"
+msgstr "진행 대화상자 표시"
+
+#: src/pref-manager.c:1450
+msgid "Display Formats"
+msgstr ""
+
+#: src/pref-manager.c:1456
+msgid "Date encoding (for strftime):"
+msgstr ""
+
+#: src/pref-manager.c:1457
+msgid "Selected headers:"
+msgstr "선택된 헤더:"
+
+#. Information messages frame...
+#: src/pref-manager.c:1471
+msgid "Information Messages"
+msgstr "정보 메시지"
+
+#. gtk_table_set_row_spacings(GTK_TABLE(information_table), 1);
+#. gtk_table_set_col_spacings(GTK_TABLE(information_table), 5);
+#: src/pref-manager.c:1479
+msgid "Informational Messages"
+msgstr "정보 메시지"
+
+#: src/pref-manager.c:1492
+msgid "Warning Messages"
+msgstr "경고 메시지"
+
+#: src/pref-manager.c:1505
+msgid "Error Messages"
+msgstr "에러 메시지"
+
+#: src/pref-manager.c:1518
+msgid "Debug Messages"
+msgstr "디버그 메시지"
+
+#: src/pref-manager.c:1578
+msgid "characters"
+msgstr ""
+
+#: src/pref-manager.c:1581
+msgid "Print command:"
+msgstr "인쇄 명령:"
+
+#: src/pref-manager.c:1587
+msgid "Break line at:"
+msgstr ""
+
+#. pspell frame
+#: src/pref-manager.c:1643
+msgid "Pspell Settings"
+msgstr "Pspell 설정"
+
+#. do the module menu
+#: src/pref-manager.c:1649
+msgid "Spell Check Module"
+msgstr "철자 검사 모듈"
+
+#: src/pref-manager.c:1655
+msgid "Suggestion Level"
+msgstr ""
+
+#: src/pref-manager.c:1663
+msgid "Ignore words shorter than"
+msgstr ""
+
+#. ignore signature check box
+#: src/pref-manager.c:1670
+msgid "Misc Spelling Settings"
+msgstr "기타 철자검사 설정"
+
+#: src/pref-manager.c:1676
+msgid "Check signature"
+msgstr "서명 확인"
+
+#: src/pref-manager.c:1680
+msgid "Check quoted"
+msgstr ""
+
+#: src/pref-manager.c:1720
+msgid "Debug"
+msgstr "디버그"
+
+#: src/pref-manager.c:1724
+msgid "Empty trash on exit"
+msgstr "종료시 휴지통 비우기"
+
+#: src/pref-manager.c:1732
+msgid "Automatically close mailbox if unused more than"
+msgstr ""
+
+#. font
+#: src/pref-manager.c:1748
+msgid "Font"
+msgstr "글꼴"
+
+#: src/pref-manager.c:1770 src/pref-manager.c:1813
+msgid "Select a font to use"
+msgstr "사용할 글꼴 선택"
+
+#: src/pref-manager.c:1774 src/pref-manager.c:1817
+msgid "Browse..."
+msgstr ""
+
+#: src/pref-manager.c:1782 src/pref-manager.c:1825
+msgid "Preview pane"
+msgstr ""
+
+#. Subject Font
+#: src/pref-manager.c:1790
+msgid "Subject Header Font"
+msgstr "제목 헤더 글꼴"
+
+#. mblist unread colour
+#: src/pref-manager.c:1832
+msgid "Colours"
+msgstr "색상"
+
+#: src/pref-manager.c:1839
+msgid "Mailbox with unread messages colour"
+msgstr "읽지 않은 메시지를 가진 우편함 색"
+
+#: src/pref-manager.c:1841
+msgid "Quoted text primary colour"
+msgstr ""
+
+#: src/pref-manager.c:1843
+msgid "Quoted text secondary color"
+msgstr ""
+
+#: src/pref-manager.c:1857
+msgid "Options"
+msgstr "옵션"
+
+#: src/pref-manager.c:1864
+msgid "Check mail upon startup"
+msgstr "시작시 메일 확인"
+
+#: src/pref-manager.c:1869
+msgid "Remember open mailboxes between sessions"
+msgstr "세션간에 열려진 우편함 기억"
+
+#: src/pref-manager.c:1914
+msgid "Address Book Name"
+msgstr "주소록 이름"
+
+#: src/pref-manager.c:1918
+msgid "Expand aliases"
+msgstr ""
+
+#: src/pref-manager.c:1925
+msgid "Set as default"
+msgstr "기본값으로 설정"
+
+#: src/pref-manager.c:2183
+msgid "Show Nothing"
+msgstr "아무것도 않보기"
+
+#: src/pref-manager.c:2184
+msgid "Show Dialog"
+msgstr "대화상자로 보기"
+
+#: src/pref-manager.c:2185
+msgid "Show In List"
+msgstr "목록에서 보기"
+
+#: src/print.c:73
+#, c-format
+msgid ""
+"Enter print command below\n"
+"Remember to include '%s'"
+msgstr ""
+"밑에 인쇄 명령을 입력하세요\n"
+"'%s' 포함하는 것 잊지마세요"
+
+#: src/print.c:82
+msgid "Print Command:"
+msgstr "인쇄 명령:"
+
+#: src/print.c:462
+#, c-format
+msgid ""
+"Balsa could not find font %s\n"
+"Printing is not possible"
+msgstr ""
+"발사가 %s 글꼴을 찾을 수 없습니다\n"
+"인쇄를 할 수 없습니다"
+
+#: src/print.c:503
+msgid "Print message"
+msgstr "메시지 인쇄"
+
+#: src/print.c:529
+msgid "Balsa: message print preview"
+msgstr "발사: 메시지 인쇄 미리보기"
+
+#: src/print.c:643
+#, c-format
+msgid "Page: %i/%i"
+msgstr "페이지: %i/%i"
+
+#: src/sendmsg-window.c:132
+msgid "Send"
+msgstr "보내기"
+
+#: src/sendmsg-window.c:132
+msgid "Send this mail"
+msgstr "이 편지 보내기"
+
+#: src/sendmsg-window.c:137
+msgid "Attach"
+msgstr "첨부"
+
+#: src/sendmsg-window.c:138
+msgid "Add attachments to this message"
+msgstr "이 메시지에 첨부파일 추가"
+
+#: src/sendmsg-window.c:142
+msgid "Postpone"
+msgstr "연기"
+
+#: src/sendmsg-window.c:143
+msgid "Continue this message later"
+msgstr "이 메시지를 나중에 보내기"
+
+#: src/sendmsg-window.c:147 src/sendmsg-window.c:223
+msgid "Check Spelling"
+msgstr "철자 확인"
+
+#: src/sendmsg-window.c:149
+msgid "Run a spelling check on the current message"
+msgstr "현재 메시지에 대해 철자검사 실행"
+
+#: src/sendmsg-window.c:163
+msgid "_Include File..."
+msgstr "파일 포함(_I)..."
+
+#: src/sendmsg-window.c:167
+msgid "_Attach File..."
+msgstr "파일 첨부(_A)..."
+
+#: src/sendmsg-window.c:173
+msgid "_Send"
+msgstr "보내기(_S)"
+
+#: src/sendmsg-window.c:174
+msgid "Send the currently edited message"
+msgstr "현재 편집된 메시지 보내기"
+
+#: src/sendmsg-window.c:178
+msgid "_Queue"
+msgstr "큐(_Q)"
+
+#: src/sendmsg-window.c:179
+msgid "Queue this message in outbox for sending"
+msgstr ""
+
+#: src/sendmsg-window.c:183
+msgid "_Postpone"
+msgstr "연기(_P)"
+
+#: src/sendmsg-window.c:187
+msgid "Print..."
+msgstr "인쇄..."
+
+#: src/sendmsg-window.c:187
+msgid "Print the edited message"
+msgstr "편집된 메시지 인쇄"
+
+#: src/sendmsg-window.c:204
+msgid "Select All"
+msgstr "모두 선택"
+
+#: src/sendmsg-window.c:209
+msgid "_Wrap Body"
+msgstr ""
+
+#: src/sendmsg-window.c:214
+msgid "_Reflow Paragraph"
+msgstr ""
+
+#: src/sendmsg-window.c:218
+msgid "R_eflow Message"
+msgstr ""
+
+#: src/sendmsg-window.c:232
+msgid "Fr_om"
+msgstr "보낸이(_o)"
+
+#: src/sendmsg-window.c:234
+msgid "_To"
+msgstr "받는이(_T)"
+
+#: src/sendmsg-window.c:236
+msgid "_Subject"
+msgstr "제목(_S)"
+
+#: src/sendmsg-window.c:238
+msgid "_Cc"
+msgstr "참조(_C)"
+
+#: src/sendmsg-window.c:240
+msgid "_Bcc"
+msgstr "다음참조(_B)"
+
+#: src/sendmsg-window.c:242
+msgid "_Fcc"
+msgstr "_Fcc"
+
+#: src/sendmsg-window.c:244
+msgid "_Reply To"
+msgstr ""
+
+#: src/sendmsg-window.c:246
+msgid "_Attachments"
+msgstr "첨부(_A)"
+
+#: src/sendmsg-window.c:249
+msgid "_Comments"
+msgstr "설명(_C)"
+
+#: src/sendmsg-window.c:252
+msgid "_Keywords"
+msgstr "키워드(_K)"
+
+#: src/sendmsg-window.c:289 src/sendmsg-window.c:370
+msgid "Brazilian"
+msgstr "브라질"
+
+#: src/sendmsg-window.c:290 src/sendmsg-window.c:372
+msgid "Catalan"
+msgstr "카탈로니아"
+
+#: src/sendmsg-window.c:291 src/sendmsg-window.c:374
+msgid "Danish"
+msgstr "덴마크"
+
+#: src/sendmsg-window.c:292 src/sendmsg-window.c:378
+msgid "Dutch"
+msgstr "네덜란드"
+
+#: src/sendmsg-window.c:293 src/sendmsg-window.c:380
+msgid "English"
+msgstr "영국"
+
+#: src/sendmsg-window.c:294 src/sendmsg-window.c:382
+msgid "Estonian"
+msgstr "에스토니아"
+
+#: src/sendmsg-window.c:295 src/sendmsg-window.c:384
+msgid "Finnish"
+msgstr "핀란드"
+
+#: src/sendmsg-window.c:296 src/sendmsg-window.c:386
+msgid "French"
+msgstr "프랑스"
+
+#: src/sendmsg-window.c:297 src/sendmsg-window.c:376
+msgid "German"
+msgstr "독일"
+
+#: src/sendmsg-window.c:298 src/sendmsg-window.c:388
+msgid "Greek"
+msgstr "그리스"
+
+#: src/sendmsg-window.c:299 src/sendmsg-window.c:390
+msgid "Hungarian"
+msgstr "헝가리"
+
+#: src/sendmsg-window.c:300 src/sendmsg-window.c:392
+msgid "Italian"
+msgstr "이태리"
+
+#: src/sendmsg-window.c:301 src/sendmsg-window.c:394
+msgid "Japanese"
+msgstr "일본"
+
+#: src/sendmsg-window.c:306 src/sendmsg-window.c:396
+msgid "Korean"
+msgstr "한국"
+
+#: src/sendmsg-window.c:307 src/sendmsg-window.c:398
+msgid "Latvian"
+msgstr "라트비아"
+
+#: src/sendmsg-window.c:308 src/sendmsg-window.c:400
+msgid "Lithuanian"
+msgstr "리투아니아"
+
+#: src/sendmsg-window.c:309 src/sendmsg-window.c:402
+msgid "Norwegian"
+msgstr "노르웨이"
+
+#: src/sendmsg-window.c:310 src/sendmsg-window.c:404
+msgid "Polish"
+msgstr "폴란드"
+
+#: src/sendmsg-window.c:311 src/sendmsg-window.c:406
+msgid "Portugese"
+msgstr "포르투갈"
+
+#: src/sendmsg-window.c:312 src/sendmsg-window.c:408
+msgid "Russian (ISO)"
+msgstr "러시아 (ISO)"
+
+#: src/sendmsg-window.c:313 src/sendmsg-window.c:410
+msgid "Russian (KOI)"
+msgstr "러시아 (KOI)"
+
+#: src/sendmsg-window.c:314 src/sendmsg-window.c:412
+msgid "Slovak"
+msgstr "슬로바키아"
+
+#: src/sendmsg-window.c:315 src/sendmsg-window.c:414
+msgid "Spanish"
+msgstr "스페인"
+
+#: src/sendmsg-window.c:316 src/sendmsg-window.c:416
+msgid "Swedish"
+msgstr "스웨덴"
+
+#: src/sendmsg-window.c:317 src/sendmsg-window.c:418
+msgid "Turkish"
+msgstr "터키"
+
+#: src/sendmsg-window.c:318 src/sendmsg-window.c:420
+msgid "Ukrainian"
+msgstr "우크라이나"
+
+#: src/sendmsg-window.c:325
+msgid "_A-J"
+msgstr "_A-J"
+
+#: src/sendmsg-window.c:326
+msgid "_K-Z"
+msgstr "_K-Z"
+
+#: src/sendmsg-window.c:357
+msgid "_Show"
+msgstr "보이기(_S)"
+
+#: src/sendmsg-window.c:359
+msgid "_Language"
+msgstr "언어(_L)"
+
+#: src/sendmsg-window.c:601
+msgid ""
+"The attachment pixmap (balsa/attachment.png) cannot be found.\n"
+"This means you cannot attach any files.\n"
+msgstr ""
+"첨부 픽스맵 (balsa/attachment.png)을 찾을 수 없습니다.\n"
+"이것은 어떤 파일도 첨부할 수 없다는 뜻입니다.\n"
+
+#: src/sendmsg-window.c:616
+#, c-format
+msgid "Cannot get info on file '%s': %s\n"
+msgstr "파일 '%s'의 정보를 얻을 수 없습니다: %s\n"
+
+#: src/sendmsg-window.c:622
+#, c-format
+msgid "Attachment is not a regular file or cannot be read: '%s'\n"
+msgstr "첨부 파일이 일반 파일이 아니거나 읽을 수 없습니다: '%s'\n"
+
+#: src/sendmsg-window.c:698
+msgid "Attach file"
+msgstr "파일 첨부"
+
+#. cc:
+#: src/sendmsg-window.c:888
+msgid "cc:"
+msgstr "참조:"
+
+#. bcc:
+#: src/sendmsg-window.c:894
+msgid "bcc:"
+msgstr "다음참조:"
+
+#. fcc:
+#: src/sendmsg-window.c:900
+msgid "fcc:"
+msgstr "fcc:"
+
+#. Reply To:
+#: src/sendmsg-window.c:935
+msgid "Reply To:"
+msgstr "Reply To:"
+
+#. Attachment list
+#: src/sendmsg-window.c:941
+msgid "Attachments:"
+msgstr "첨부:"
+
+#. Comments:
+#: src/sendmsg-window.c:986
+msgid "Comments:"
+msgstr "설명:"
+
+#. Keywords:
+#: src/sendmsg-window.c:989
+msgid "Keywords:"
+msgstr "키워드:"
+
+#: src/sendmsg-window.c:1086
+msgid "you"
+msgstr "you"
+
+#: src/sendmsg-window.c:1091
+#, c-format
+msgid ""
+"\n"
+"On %s %s wrote:\n"
+msgstr ""
+"\n"
+"On %s %s wrote:\n"
+
+#: src/sendmsg-window.c:1094
+#, c-format
+msgid ""
+"\n"
+"%s wrote:\n"
+msgstr ""
+"\n"
+"%s wrote:\n"
+
+#: src/sendmsg-window.c:1174
+msgid "Reply to "
+msgstr "Reply to "
+
+#: src/sendmsg-window.c:1179
+msgid "Forward message"
+msgstr "메시지 전달"
+
+#: src/sendmsg-window.c:1184
+msgid "Continue message"
+msgstr "메시지 계속"
+
+#: src/sendmsg-window.c:1189
+msgid "New message"
+msgstr "새 메시지"
+
+#: src/sendmsg-window.c:1463
+#, c-format
+msgid "Could not open the file %s.\n"
+msgstr "%s 파일을 열 수 없습니다.\n"
+
+#: src/sendmsg-window.c:1465
+msgid "Loading..."
+msgstr "읽는 중..."
+
+#: src/sendmsg-window.c:1492
+msgid "Include file"
+msgstr "파일 포함"
+
+#: src/sendmsg-window.c:1761
+msgid "Cannot execute print command."
+msgstr "인쇄 명령을 실행할 수 없습니다."
+
+#: src/sendmsg-window.c:1784
+msgid "Error executing lpr"
+msgstr "lpr 실행 에러"
+
+#: src/spell-check.c:480
+msgid "Replace the current word with the selected suggestion"
+msgstr "현재 단어를 선택된 단어로 치환"
+
+#: src/spell-check.c:487
+msgid "Replace all occurences of the current word with the selected suggestion"
+msgstr "현재 단어를 선택된 단어로 모두 치환"
+
+#: src/spell-check.c:494
+msgid "Skip the current word"
+msgstr "현재 단어 생략"
+
+#: src/spell-check.c:499
+msgid "Skip all occurances of the current word"
+msgstr "이후 현재 단어에 대해 검사를 생략"
+
+#: src/spell-check.c:505
+msgid "Add the current word to your personal dictionary"
+msgstr "현재 단어를 개인 사전에 추가"
+
+#: src/spell-check.c:511
+msgid "Finish spell checking"
+msgstr "철자 검색이 끝냅니다"
+
+#: src/spell-check.c:516
+msgid "Revert all changes and finish spell checking"
+msgstr "모든 수정을 취소하고 철자검색을 끝냅니다"
+
+#: src/store-address.c:52
+msgid "Card Name:"
+msgstr "카드 이름:"
+
+#: src/store-address.c:52
+msgid "First Name:"
+msgstr "첫번째 이름:"
+
+#: src/store-address.c:53
+msgid "Last Name:"
+msgstr "마지막 이름:"
+
+#: src/store-address.c:53
+msgid "Organization:"
+msgstr "직장:"
+
+#: src/store-address.c:54
+msgid "Email Address:"
+msgstr "전자우편 주소:"
+
+#: src/store-address.c:75
+msgid "In order to store an address, you must select a message.\n"
+msgstr "주소를 저장하려면 메시지를 선택하셔야 합니다.\n"
+
+#: src/store-address.c:86
+msgid "You may only store one address at a time.\n"
+msgstr "한번에 하나의 주소만 저장할 수 있습니다.\n"
+
+#: src/store-address.c:100
+msgid "This message doesn't contain an e-mail address.\n"
+msgstr "이 메시지는 전자우편 주소를 가지고 있지 않습니다.\n"
+
+#: src/store-address.c:148
+msgid "Store Address"
+msgstr "주소 저장"
+
+#: src/store-address.c:151
+msgid "Contact Information"
+msgstr "연락 정보"
+
+#: src/store-address.c:242
+msgid "No address book selected...."
+msgstr "선택된 주소록 없음...."
+
+#: src/store-address.c:254
+msgid "Sorry, no semicolons are allowed in the name!\n"
+msgstr "미안하지만 이름에 세미콜론을 사용할 수 없습니다!\n"

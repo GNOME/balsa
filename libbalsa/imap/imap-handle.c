@@ -132,6 +132,7 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->recent = 0;
   handle->last_msg = NULL;
   handle->msg_cache = NULL;
+  handle->flag_cache=  g_array_new(FALSE, TRUE, sizeof(ImapFlagCache));
   handle->doing_logout = FALSE;
 #ifdef USE_TLS
   handle->using_tls = 0;
@@ -282,6 +283,7 @@ imap_mbox_resize_cache(ImapMboxHandle *h, unsigned new_size)
     }
   }
   h->msg_cache = g_realloc(h->msg_cache, new_size*sizeof(ImapMessage*));
+  g_array_set_size(h->flag_cache, new_size);
   for(i=h->exists; i<new_size; i++) 
     h->msg_cache[i] = NULL;
   h->exists = new_size;
@@ -608,6 +610,8 @@ imap_mbox_handle_finalize(GObject* gobject)
 
   mbox_view_dispose(&handle->mbox_view);
   imap_mbox_resize_cache(handle, 0);
+  g_free(handle->msg_cache); handle->msg_cache = NULL;
+  g_array_free(handle->flag_cache, TRUE);
 
   G_OBJECT_CLASS(parent_class)->finalize(gobject);  
 }
@@ -1649,6 +1653,7 @@ ir_expunge(ImapMboxHandle *h, unsigned seqno)
     h->msg_cache[seqno-1] = h->msg_cache[seqno];
     seqno++;
   }
+  g_array_remove_index(h->flag_cache, seqno-1);
   h->exists--;
   mbox_view_expunge(&h->mbox_view, seqno);
   return rc;
@@ -1667,6 +1672,7 @@ ir_msg_att_flags(ImapMboxHandle *h, int c, unsigned seqno)
 {
   unsigned i;
   ImapMessage *msg = h->msg_cache[seqno-1];
+  ImapFlagCache *flags;
 
   if(sio_getc(h->sio) != '(') return IMR_PROTOCOL;
   msg->flags = 0;
@@ -1680,6 +1686,10 @@ ir_msg_att_flags(ImapMboxHandle *h, int c, unsigned seqno)
         break;
       }
   } while(c!=-1 && c != ')');
+
+  flags = &g_array_index(h->flag_cache, ImapFlagCache, seqno-1);
+  flags->flag_values = msg->flags;
+  flags->known_flags = ~0; /* all of them are known */
 
   if(h->flags_cb)
     imap_handle_add_task(h, flags_tasklet, GUINT_TO_POINTER(seqno));

@@ -65,6 +65,12 @@ ImapResponse imap_mbox_store_flag(ImapMboxHandle *r, unsigned cnt,
 ImapResponse imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned cnt,
                                    unsigned *seqno, const gchar *dest);
 
+ImapResponse imap_mbox_find_unseen(ImapMboxHandle * h, unsigned *msgcnt,
+				   unsigned **msgs);
+gboolean imap_mbox_handle_msgno_has_flags(ImapMboxHandle *h, unsigned msgno,
+                                          ImapMsgFlag flag_set,
+                                          ImapMsgFlag flag_unset);
+
 ImapResponse imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
                                           unsigned lo, unsigned hi,
                                           ImapFetchType ift);

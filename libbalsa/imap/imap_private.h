@@ -31,6 +31,11 @@ struct _MboxView {
   char * filter_str;
 };
 
+typedef struct {
+  ImapMsgFlag flag_values;
+  ImapMsgFlag known_flags;
+} ImapFlagCache;
+
 struct _ImapMboxHandle {
   GObject object;
 
@@ -51,6 +56,7 @@ struct _ImapMboxHandle {
   gchar *last_msg; /* last server message; for error reporting purposes */
 
   ImapMessage **msg_cache;
+  GArray       *flag_cache;
   MboxView mbox_view;
   GHashTable *cmd_queue; /* A hash of commands we received return codes for.
                           * We use the command number as the key. */
@@ -114,6 +120,8 @@ char* imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz);
 
 ImapResponse imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s,
                             unsigned cmdno, int use_literal);
+ImapResponse imap_assure_needed_flags(ImapMboxHandle *h,
+                                      ImapMsgFlag needed_flags);
 
 #ifdef USE_TLS
 #include <openssl/ssl.h>

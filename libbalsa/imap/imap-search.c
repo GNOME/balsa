@@ -328,6 +328,11 @@ imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s, unsigned cmdno,
   return IMR_OK;
 }
 
+static gboolean
+execute_flag_only_search(ImapMboxHandle *h, ImapSearchKey *s,
+                         ImapSearchCb cb, void *cb_arg,
+                         ImapResponse *rc);
+
 ImapResponse
 imap_search_exec(ImapMboxHandle *h, ImapSearchKey *s,
                  ImapSearchCb cb, void *cb_arg)
@@ -345,6 +350,9 @@ imap_search_exec(ImapMboxHandle *h, ImapSearchKey *s,
   if(!s)
     return IMR_BAD;
 
+  if(execute_flag_only_search(h, s, cb, cb_arg, &ir))
+    return ir;
+
   ocb  = h->search_cb;  h->search_cb  = (ImapSearchCb)cb;
   oarg = h->search_arg; h->search_arg = cb_arg;
   
@@ -361,4 +369,76 @@ imap_search_exec(ImapMboxHandle *h, ImapSearchKey *s,
   h->search_arg = oarg;
   /* Set disconnected state here if necessary? */
   return ir;
+}
+
+/* == optimized branch for flag-only searches..  Since we know most of
+   the flags most of the time, there is no point in repeating some
+   flag-only searches over and over. We just run a search optimized
+   for exactly this kind of searches */
+static gboolean
+collect_needed_flags(ImapSearchKey *s, ImapMsgFlag *flag)
+{
+  switch(s->type) {
+  case IMSE_NOT: 
+    return collect_needed_flags(s->d.not, flag) && 
+      collect_needed_flags(s->next, flag);
+  case IMSE_OR:
+    return collect_needed_flags(s->d.or.l, flag) && 
+      collect_needed_flags(s->d.or.r, flag) && 
+      collect_needed_flags(s->next, flag);
+  case IMSE_FLAG:
+    *flag |= s->d.flag.sys_flag; break;
+  case IMSE_STRING:
+  case IMSE_DATE:
+  case IMSE_SIZE:
+    return FALSE;
+  }
+  return TRUE;
+}
+
+static gboolean
+search_key_matches(ImapSearchKey *s, ImapMsgFlag flag)
+{
+  gboolean res;
+  switch(s->type) {
+  case IMSE_NOT: 
+    res =
+      !search_key_matches(s->d.not, flag) && 
+      search_key_matches(s->next, flag);
+    break;
+  case IMSE_OR:
+    res = (search_key_matches(s->d.or.l, flag) ||
+      search_key_matches(s->d.or.r, flag)) && 
+      search_key_matches(s->next, flag);
+    break;
+  case IMSE_FLAG:
+    res = (flag & s->d.flag.sys_flag);
+    break;
+  default: 
+    return FALSE;
+  }
+  return s->negated ? !res : res;
+}
+
+static gboolean
+execute_flag_only_search(ImapMboxHandle *h, ImapSearchKey *s,
+                         ImapSearchCb cb, void *cb_arg,
+                         ImapResponse *rc)
+{
+  ImapMsgFlag needed_flags = 0;
+  unsigned i;
+  
+  if(!collect_needed_flags(s, &needed_flags))
+    return FALSE;
+  
+  if( (*rc = imap_assure_needed_flags(h, needed_flags)) != IMR_OK)
+    return FALSE;
+  
+  for(i=0; i<h->exists; i++) {
+    ImapFlagCache *f =
+      &g_array_index(h->flag_cache, ImapFlagCache, i);
+    if(search_key_matches(s, f->flag_values))
+      cb(h, i+1, cb_arg);
+  }
+  return TRUE;
 }

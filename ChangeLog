@@ -1,3 +1,12 @@
+2004-10-03  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: use cached flags.
+	* libbalsa/imap/imap-commands.[hc]: implement 
+	imap_mbox_handle_msgno_has_flags().
+	* libbalsa/imap/imap-handle.[hc], imap_private.h: cache flags.
+	* libbalsa/imap/imap-search.c: optimize flag-only searches
+	to use cached flags.
+
 2004-10-02  Pawel Salek
 
 	* NEWS, configure.in: release 2.2.5

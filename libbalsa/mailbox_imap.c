@@ -864,27 +864,20 @@ static void
 lbm_imap_get_unseen(LibBalsaMailboxImap * mimap)
 {
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
-    guint count;
-    guint *msgs;
-
-    if (imap_mbox_find_unseen(mimap->handle, &count, &msgs) != IMR_OK) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("IMAP SEARCH UNSEEN request failed"
-			       " for mailbox %s"), mailbox->url);
-	return;
+    guint i, count, total = imap_mbox_handle_get_exists(mimap->handle);
+    mailbox->first_unread = total;
+    for(i=count=0; i<total; i++) {
+        if(imap_mbox_handle_msgno_has_flags(mimap->handle,
+                                            i+1,
+                                            0, IMSGF_SEEN|IMSGF_DELETED)) {
+            count++;
+            if(mailbox->first_unread>i)
+                mailbox->first_unread = i+1;
+        }
     }
-
     mailbox->unread_messages = count;
-    if (mailbox->first_unread == 0 && count > 0) {
-	guint i;
-	mailbox->first_unread = msgs[0];
-	for (i = 1; i < count; i++)
-	    if (mailbox->first_unread > msgs[i])
-		mailbox->first_unread = msgs[i];
-    }
-    libbalsa_mailbox_set_unread_messages_flag(mailbox, count > 0);
 
-    g_free(msgs);
+    libbalsa_mailbox_set_unread_messages_flag(mailbox, count > 0);
 }
 
 /* libbalsa_mailbox_imap_open:
@@ -2297,6 +2290,24 @@ lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox, GArray * seqno,
 	return TRUE;
     } else
 	return FALSE;
+}
+
+gboolean
+libbalsa_mailbox_msgno_has_flags(LibBalsaMailbox *m, unsigned msgno,
+                                 LibBalsaMessageFlag set,
+                                 LibBalsaMessageFlag unset);
+gboolean
+libbalsa_mailbox_msgno_has_flags(LibBalsaMailbox *m, unsigned msgno,
+                                 LibBalsaMessageFlag set,
+                                 LibBalsaMessageFlag unset)
+{
+    ImapMsgFlag flag_set, flag_unset;
+    ImapMboxHandle *handle = LIBBALSA_MAILBOX_IMAP(m)->handle;
+
+    g_return_val_if_fail(handle, FALSE);
+    transform_flags(set, unset, &flag_set, &flag_unset);
+    return imap_mbox_handle_msgno_has_flags(handle, msgno,
+                                            flag_set, flag_unset);
 }
 
 static gboolean

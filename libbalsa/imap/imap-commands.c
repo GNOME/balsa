@@ -622,6 +622,134 @@ imap_mbox_find_unseen(ImapMboxHandle * h,
   return imap_mbox_find_helper(h, "SEARCH UNSEEN UNDELETED", msgcnt, msgs);
 }
 
+/* imap_mbox_handle_msgno_has_flags() this is optimized under
+   assumtion that we need only few flags. The code should probably
+   recognize if too many different flags are needed and in such a case
+   issue a full blown fetch with necessary then renumbering to take
+   care of possible EXPUNGE - which cannot be sent in response to
+   SEARCH.  Additionally, we invert the searching condition for SEEN
+   flag which is most commonly set.
+ */
+
+static void
+set_flag_cache_cb(ImapMboxHandle* h, unsigned seqno, void*arg)
+{
+  ImapFlagCache *flags;
+  ImapMsgFlag *searched_flag = (ImapMsgFlag*)arg;
+  flags = &g_array_index(h->flag_cache, ImapFlagCache, seqno-1);
+  if(*searched_flag & IMSGF_SEEN)
+    flags->flag_values &= ~*searched_flag;
+  else
+    flags->flag_values |= *searched_flag;
+}
+
+struct flag_needed_data {
+  ImapMboxHandle *handle;
+  ImapMsgFlag     flag;
+};
+static unsigned
+flag_unknown(int i, struct flag_needed_data* d)
+{
+  ImapFlagCache *f =
+    &g_array_index(d->handle->flag_cache, ImapFlagCache, i-1);
+  return (f->known_flags & d->flag) == d->flag ? 0 : i;
+}
+  
+/* imap_assure_needed_flags issues several SEARCH queries in one shot
+   and hopes the output is not intermixed */
+ImapResponse
+imap_assure_needed_flags(ImapMboxHandle *h, ImapMsgFlag needed_flags)
+{
+  ImapSearchCb cb;
+  void *arg;
+  struct flag_needed_data fnd;
+  unsigned i, shift, issued_cmd = 0;
+  unsigned cmdno[32]; /* FIXME: assume no more than 32 different flags */
+  ImapMsgFlag flag[32]; /* ditto */
+  int ics;
+  gchar *cmd = NULL, *seqno;
+  ImapResponse rc = IMR_OK;
+
+  if (h->state == IMHS_DISCONNECTED)
+    return IMR_SEVERED;
+
+  cb  = h->search_cb;  h->search_cb  = (ImapSearchCb)set_flag_cache_cb;
+  arg = h->search_arg; 
+
+  fnd.handle = h;
+  for(shift=0; needed_flags>>shift; shift++) {
+    const char *flg;
+    if((needed_flags>>shift) & 1) {
+      fnd.flag = 1<<shift;
+      if(fnd.flag & IMSGF_SEEN)
+        for(i=0; i<h->flag_cache->len; i++) {
+          ImapFlagCache *f =
+            &g_array_index(h->flag_cache, ImapFlagCache, i);
+          if( (f->known_flags & fnd.flag) ==0)
+            f->flag_values |= fnd.flag;
+        }
+      seqno = coalesce_seq_range(1, h->exists,
+                                 (CoalesceFunc)flag_unknown, &fnd);
+      if(!seqno) /* oops, why were we called in the first place!? */
+        continue;
+      switch(fnd.flag) {
+      case IMSGF_SEEN:     flg = "UNSEEN"; break;
+      case IMSGF_ANSWERED: flg = "ANSWERED"; break;
+      case IMSGF_FLAGGED:  flg = "FLAGGED"; break;
+      case IMSGF_DELETED:  flg = "DELETED"; break;
+      case IMSGF_DRAFT:    flg = "DRAFT"; break;
+      case IMSGF_RECENT:   flg = "RECENT"; break;
+      default: continue;
+      }
+      cmd = g_strdup_printf("SEARCH %s %s", seqno, flg);
+      flag[issued_cmd] = fnd.flag;
+      ics = imap_cmd_start(h, cmd, &cmdno[issued_cmd++]);
+      g_free(cmd);
+      if(ics<0)
+        return IMR_SEVERED;  /* irrecoverable connection error. */
+    }
+  }
+  if(cmd) { /* was ever altered */
+    sio_flush(h->sio);
+    for(i=0; i<issued_cmd; i++) {
+      h->search_arg = &flag[i];
+      do {
+        rc = imap_cmd_step(h, cmdno[i]);
+      } while (rc == IMR_UNTAGGED);
+    }
+  }
+  h->search_cb = cb; h->search_arg = arg;
+  if(rc == IMR_OK) {
+    for(i=0; i<h->flag_cache->len; i++) {
+      ImapFlagCache *f =
+        &g_array_index(h->flag_cache, ImapFlagCache, i);
+      f->known_flags |= needed_flags;
+    }
+  }
+  return rc;
+}
+
+gboolean
+imap_mbox_handle_msgno_has_flags(ImapMboxHandle *h, unsigned msgno,
+                                 ImapMsgFlag flag_set,
+                                 ImapMsgFlag flag_unset)
+{
+  ImapFlagCache *flags;
+  ImapMsgFlag needed_flags;
+
+  IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
+  flags = &g_array_index(h->flag_cache, ImapFlagCache, msgno-1);
+  
+  needed_flags = ~flags->known_flags & (flag_set | flag_unset);
+  
+  return 
+    (!needed_flags||imap_assure_needed_flags(h, needed_flags) == IMR_OK) &&
+    (flags->flag_values & flag_set) == flag_set &&
+    (flags->flag_values & flag_unset) == 0;
+}
+
+
+
 /* 6.4.5 FETCH Command */
 static void
 ic_construct_header_list(const char **hdr, ImapFetchType ift)
@@ -834,6 +962,12 @@ imap_mbox_store_flag(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
   str = enum_flag_to_str(flg);
   for(i=0; i<msgcnt; i++) {
     ImapMessage *msg = imap_mbox_handle_get_msg(h, seqno[i]);
+    ImapFlagCache *f = &g_array_index(h->flag_cache, ImapFlagCache, i);
+    f->known_flags |= flg;
+    if(state)
+      f->flag_values |= flg;
+    else
+      f->flag_values &= ~flg;
     if(msg) {
       if(state)
         msg->flags |= flg;

@@ -45,10 +45,10 @@ balsa_SOURCES =	\
 
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
-	-I${top_srcdir} \
-	-I${top_srcdir}/libbalsa \
+	-I$(top_srcdir) \
+	-I$(top_srcdir)/libbalsa \
 	-I$(top_srcdir)/idl \
-	-I${top_srcdir}/libmutt \
+	-I$(top_srcdir)/libmutt \
 	 $(GNOME_INCLUDEDIR)
 
 #libbalsa appearing twice is not a bug -- it is mutually dependent with libmutt

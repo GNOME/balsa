@@ -44,6 +44,24 @@ typedef enum
   }
 MailboxType;
 
+typedef enum
+  {
+    MAILBOX_SORT_DATE = 1,
+    MAILBOX_SORT_SIZE = 2,
+    MAILBOX_SORT_SUBJECT = 3,
+    MAILBOX_SORT_FROM = 4,
+    MAILBOX_SORT_ORDER = 5,
+    MAILBOX_SORT_THREADS = 6,
+    MAILBOX_SORT_RECEIVED = 7,
+    MAILBOX_SORT_TO = 8,
+    MAILBOX_SORT_SCORE = 9,
+    MAILBOX_SORT_ALIAS = 10,
+    MAILBOX_SORT_ADDRESS = 11,
+    MAILBOX_SORT_MASK = 0xf,
+    MAILBOX_SORT_REVERSE = (1<<4),
+    MAILBOX_SORT_LAST = (1<<5)
+  }
+MailboxSort;
 
 typedef enum
   {
@@ -233,7 +251,7 @@ typedef void (*MailboxWatcherFunc) (MailboxWatcherMessage * arg1);
 /*
  * call before using any mailbox functions
  */
-void mailbox_init (gchar * inbox, void (*error_func)(const char* fmt, ...));
+void mailbox_init (gchar * inbox, void (*error_func) (const char *fmt,...));
 
 gint set_imap_username (Mailbox * mb);
 void check_all_pop3_hosts (Mailbox *);
@@ -247,6 +265,10 @@ GList *make_list_from_string (gchar *);
 int mailbox_open_ref (Mailbox * mailbox);
 void mailbox_open_unref (Mailbox * mailbox);
 
+/*
+ * sorting mailbox
+ */
+void mailbox_sort(Mailbox *mailbox, MailboxSort sort);
 
 /*
  * create and destroy a mailbox structure
@@ -306,8 +328,8 @@ void body_free (Body * body);
 MailboxType mailbox_type_from_description (gchar * description);
 gchar *mailbox_type_description (MailboxType type);
 MailboxType mailbox_valid (gchar * filename);
-gchar *message_pathname(Message *message);
+gchar *message_pathname (Message * message);
 
-char * mime_content_type2str (int contenttype);
+char *mime_content_type2str (int contenttype);
 
 #endif /* __MAILBOX_H__ */

@@ -1,3 +1,14 @@
+2003-10-18 09:04  PeterB
+
+	* libbalsa/mailbox_imap.c: Populate
+	LibBalsaMessageBody::content_dsp; fix get_section_for().
+	* libbalsa/: body.c, body.h, message.c, rfc3156.c: Don't require
+	body->mime_part != NULL.
+	* libbalsa/imap/: imap-handle.c, imap.h: Handle extension info in
+	BODYSTRUCTURE response.
+	* libbalsa/imap/imap-commands.c: Fetch BODYSTRUCTURE to get
+	structure.
+
 2003-10-18  Carlos Morgado  <chbm gnome.org>
 
 	* libbalsa/imap/imap.h: make ImapBodyEncoding match 

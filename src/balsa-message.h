@@ -46,9 +46,9 @@ typedef struct _BalsaPartInfo BalsaPartInfo;
 struct _BalsaMessage {
 	GtkViewport parent;
 
-	/* The table widget */
-	GtkWidget *table;
-
+       /* The vbox widget */
+       GtkWidget *vbox;
+ 
 	/* Widget to hold headers */
 	GtkWidget *header_text;
 	ShownHeaders shown_headers;

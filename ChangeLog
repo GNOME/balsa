@@ -1,3 +1,7 @@
+2002-04-11  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/print.c: compile with new 2.0 API.
+
 2002-04-10 Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-mblist.c: squash reason of a warning message.
@@ -10,7 +14,6 @@
 	* src/sendmsg-window.c: extbody_dialog_delete should return a
 	gboolean value. Fix GtkTextIter error when quoting by dragging,
 	and simplify quoting messages.
-
 	* src/toolbar-prefs.c: page_active_cb should return a gboolean value;
 	use replace_nl_with_space() uniformly.
 	

@@ -207,8 +207,8 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox)
 	mailbox->open_ref++;
 
 #ifdef DEBUG
-	g_print(_("LibBalsaMailboxPop3: Opening %s Refcount: %d\n"),
-		mailbox->name, mailbox->open_ref);
+	g_print(_("%s: Opening %s Refcount: %d\n"),
+		"LibBalsaMailboxPop3", mailbox->name, mailbox->open_ref);
 #endif
 
     }

@@ -697,8 +697,8 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 	run_filters_on_reception(imap);
 
 #ifdef DEBUG
-	g_print(_("LibBalsaMailboxImap: Opening %s Refcount: %d\n"),
-		mailbox->name, mailbox->open_ref);
+	g_print(_("%s: Opening %s Refcount: %d\n"),
+		"LibBalsaMailboxImap", mailbox->name, mailbox->open_ref);
 #endif
     } else {
 	UNLOCK_MAILBOX(mailbox);

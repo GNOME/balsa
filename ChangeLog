@@ -1,5 +1,6 @@
-2004-08-02 12:35  PeterB
+2004-08-02 15:16  PeterB
 
+	* libbalsa/message.c: ignore content-disposition of first part.
 	* libbalsa/mailbox_imap.c: use LIST command and \Marked flag in
 	LIST response to test for new mail in a closed mailbox--not
 	guaranteed to work, as some servers seem never to use \Marked.

@@ -2599,8 +2599,8 @@ balsa_gtk_text_size_request(GtkWidget * widget,
 
     text = GTK_TEXT(widget);
 
-    requisition->width = (widget->style->klass->xthickness + 1) * 2;
-    requisition->height = (widget->style->klass->ythickness + 1) * 2;
+    requisition->width = -(widget->style->klass->xthickness + 1) * 2;
+    requisition->height = -(widget->style->klass->ythickness + 1) * 2;
 
     requisition->width += text->hadj->upper;
     requisition->height += text->vadj->upper;
@@ -2608,6 +2608,14 @@ balsa_gtk_text_size_request(GtkWidget * widget,
 }
 
 #ifdef HAVE_GTKHTML
+/* balsa_gtk_html_size_request:
+   report the requested size of the HTML widget.
+
+   FIXME: this is not 100% right. The code includes an empirical
+   (hehe) term -1 (marked with EMP) which is NOT the right way to
+   go. The right solution requires some study of size_request signal
+   handling code.  
+*/
 static void
 balsa_gtk_html_size_request(GtkWidget * widget,
 			    GtkRequisition * requisition, gpointer data)
@@ -2616,11 +2624,11 @@ balsa_gtk_html_size_request(GtkWidget * widget,
     g_return_if_fail(GTK_IS_HTML(widget));
     g_return_if_fail(requisition != NULL);
 
-    requisition->width = (widget->style->klass->xthickness + 1) * 2;
-    requisition->height = (widget->style->klass->ythickness + 1) * 2;
+    requisition->width  = -(widget->style->klass->xthickness + 1) * 2;
+    requisition->height = -(widget->style->klass->ythickness + 1) * 2;
 
-    requisition->width += GTK_LAYOUT(widget)->hadjustment->upper;
-    requisition->height += GTK_LAYOUT(widget)->vadjustment->upper;
+    requisition->width  += GTK_LAYOUT(widget)->hadjustment->upper -1 /*EMP*/;
+    requisition->height += GTK_LAYOUT(widget)->vadjustment->upper -1 /*EMP*/;
 
 }
 

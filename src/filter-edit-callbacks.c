@@ -182,7 +182,7 @@ fe_add_pressed(GtkWidget * widget, gpointer throwaway) {
     
     text = gtk_entry_get_text(GTK_ENTRY(fe_type_regex_entry));
     
-    if ((text == NULL) || (strlen(text) == 0))
+    if (text == NULL || *text == '\0')
 	return;
     
     list_item = gtk_list_item_new_with_label(text);

@@ -76,7 +76,7 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
     g_free(addy->match);
     addy->match = NULL;
 
-    if(strlen(input) == 0) {
+    if(*input == '\0') {
 	addy->match = g_strdup("");
 	return;
     }

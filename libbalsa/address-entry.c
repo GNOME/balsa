@@ -1613,7 +1613,7 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
        g_free(left);
        addy->user = str;
        addy->cursor--;
-       if (strlen(str) == 0)
+       if (*str == '\0')
 	   libbalsa_force_no_match(addy);
        else if (address_entry->find_match)
 	   (*address_entry->find_match) (addy, TRUE);
@@ -1769,15 +1769,15 @@ libbalsa_keystroke_enter(LibBalsaAddressEntry *address_entry)
      * Else no match was found.  Check if there was a default
      * domain to add to e-mail addresses.
      */
-    if (address_entry->domain == NULL) return;
-    if (strlen(address_entry->domain) == 0) return;
+    if (address_entry->domain == NULL || *address_entry->domain == '\0')
+	return;
 
     /*
      * There is a default domain to add.  Do we need to add it?
      */
     addy = address_entry->input->active->data;
-    if (libbalsa_is_an_email(addy->user)) return;
-    if (strlen(addy->user) == 0) return;
+    if (libbalsa_is_an_email(addy->user) || *addy->user == '\0')
+	return;
 
     /*
      * Okay, add it.
@@ -2012,9 +2012,10 @@ libbalsa_keystroke_comma(LibBalsaAddressEntry *address_entry)
     /*
      * And we add the default domain to the original entry.
      */
-    if (address_entry->domain == NULL) return;
-    if (strlen(address_entry->domain) == 0) return;
-    if (libbalsa_is_an_email(addy->user)) return;
+    if (address_entry->domain == NULL ||
+	*address_entry->domain == '\0' ||
+	libbalsa_is_an_email(addy->user)) return;
+
     str = g_strconcat(addy->user, "@", address_entry->domain, NULL);
     g_free(addy->user);
     addy->user = str;
@@ -2942,7 +2943,7 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
     tmp_pos = 0;
     libbalsa_address_entry_delete_text(editable, 0,
 	    GTK_ENTRY(address_entry)->text_length);
-    gtk_editable_insert_text(editable, show->str, strlen(show->str), &tmp_pos);
+    gtk_editable_insert_text(editable, show->str, show->len, &tmp_pos);
     gtk_editable_set_position(GTK_EDITABLE(address_entry), cursor);
     editable->selection_start_pos = start;
     editable->selection_end_pos = end;
@@ -2952,7 +2953,7 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
 
 
 /*************************************************************
- * libbalsa_address_entry_show:
+ * libbalsa_address_clear_match:
  *     Clears the input cache of any data.
  *
  *   arguments:

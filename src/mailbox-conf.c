@@ -525,7 +525,7 @@ fill_in_imap_data(MailboxConfWindow *mcw, gchar ** name, gchar ** path)
 
     if (!(*name =
 	  g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name))))
-	|| strlen(g_strstrip(*name)) == 0) {
+	|| *(g_strstrip(*name)) == '\0') {
 	if (*name)
 	    g_free(*name);
 

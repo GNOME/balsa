@@ -653,7 +653,7 @@ balsa_address_book_find(GtkWidget * group_entry, BalsaAddressBook *ab)
 
     entry_text = gtk_entry_get_text(GTK_ENTRY(group_entry));
 
-    if (strlen(entry_text) == 0)
+    if (*entry_text == '\0')
 	return;
 
     gtk_clist_unselect_all(GTK_CLIST(ab->address_clist));

@@ -748,29 +748,28 @@ libbalsa_delete_directory_contents(const gchar *path)
     g_return_val_if_fail(d, FALSE);
 
     for (de = readdir(d); de; de = readdir(d)) {
-	if ( g_strcasecmp(de->d_name, ".") == 0 ||
-	     g_strcasecmp(de->d_name, "..") == 0 )
+	if (g_strcasecmp(de->d_name, ".") == 0 ||
+	    g_strcasecmp(de->d_name, "..") == 0)
 	    continue;
 	new_path = g_strdup_printf("%s/%s", path, de->d_name);
 
 	stat(new_path, &sb);
-	if ( S_ISDIR(sb.st_mode) ) {
-	    if ( !libbalsa_delete_directory_contents(new_path) )
-		goto error;
-	    if ( rmdir(new_path) == -1 )
-		goto error;
+	if (S_ISDIR(sb.st_mode)) {
+	    if (!libbalsa_delete_directory_contents(new_path) ||
+		rmdir(new_path) == -1)
+		g_free(new_path);
+		closedir(d);
+		return FALSE;
 	} else {
-	    if ( unlink( new_path ) == -1 )
-		goto error;
+	    if (unlink( new_path ) == -1)
+		g_free(new_path);
+		closedir(d);
+		return FALSE;
 	}
-	g_free(new_path); new_path = 0;
+	g_free(new_path);
+	new_path = 0;
     }
 
     closedir(d);
     return TRUE;
-    
- error:
-    g_free(new_path);
-    closedir(d);
-    return FALSE;
 }

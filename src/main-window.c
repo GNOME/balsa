@@ -739,7 +739,7 @@ static GnomeUIInfo mailbox_menu[] = {
         GTK_STOCK_REMOVE),
 #define MENU_MAILBOX_CLOSE_POS (MENU_MAILBOX_COMMIT_POS+1)
     GNOMEUIINFO_ITEM_STOCK(N_("_Close"), N_("Close mailbox"),
-                           mailbox_close_cb, GTK_STOCK_CLOSE),
+                           mailbox_close_cb, BALSA_PIXMAP_CLOSE_MBOX),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_EMPTY_TRASH_POS (MENU_MAILBOX_CLOSE_POS+2)
     GNOMEUIINFO_ITEM_STOCK(N_("Empty _Trash"),
@@ -2130,7 +2130,7 @@ balsa_notebook_label_new (BalsaMailboxNode* mbnode)
 		      mbnode->mailbox);
 
        close_pix = gtk_image_new_from_stock(GTK_STOCK_CLOSE,
-                                            GTK_ICON_SIZE_MENU);
+                                            GTK_ICON_SIZE_BUTTON);
        g_signal_connect(G_OBJECT(but), "size-request",
                         G_CALLBACK(mailbox_tab_size_request), NULL);
 

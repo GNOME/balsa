@@ -482,6 +482,8 @@ balsa_app_destroy(void)
     g_list_foreach(balsa_app.address_book_list, (GFunc)g_object_unref, NULL);
     g_slist_foreach(balsa_app.filters,          (GFunc)libbalsa_filter_free, 
 		    GINT_TO_POINTER(TRUE));
+    g_slist_free(balsa_app.filters);
+    balsa_app.filters = NULL;
 
     /* close all mailboxes */
     gtk_widget_destroy(balsa_app.notebook);

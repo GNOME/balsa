@@ -769,6 +769,8 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     gdk_threads_leave();
     successp = libbalsa_mailbox_open(mailbox, err);
     gdk_threads_enter();
+    if (!balsa_app.main_window)
+	return FALSE;
     gnome_appbar_pop(balsa_app.appbar);
 
     if (!successp)

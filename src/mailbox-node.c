@@ -196,7 +196,8 @@ balsa_mailbox_node_dispose(GObject * object)
 
     if(mn->mailbox) {
 	mn->mailbox->view = NULL;
-	balsa_window_close_mbnode(balsa_app.main_window, mn);
+	if (balsa_app.main_window)
+	    balsa_window_close_mbnode(balsa_app.main_window, mn);
 	g_object_unref(mn->mailbox);
 	mn->mailbox = NULL;
     }

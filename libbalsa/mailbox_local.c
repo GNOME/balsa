@@ -513,12 +513,11 @@ struct _ThreadingInfo {
     gint msg_array_len;
     GHashTable *id_table;
     GHashTable *subject_table;
-    GSList *message_list;
 };
 typedef struct _ThreadingInfo ThreadingInfo;
 
 static void lbml_make_msg_array(ThreadingInfo * ti);
-static void lbml_set_parent(GNode * node, ThreadingInfo * ti);
+static gboolean lbml_set_parent(GNode * node, ThreadingInfo * ti);
 static void lbml_insert_node(GNode * node, LibBalsaMessage * message,
 			     ThreadingInfo * ti);
 static GNode *lbml_find_parent(LibBalsaMessage * message,
@@ -536,22 +535,13 @@ static void
 lbml_threading_jwz(LibBalsaMailbox * mailbox)
 {
     ThreadingInfo ti;
-    gint i;
 
     ti.mailbox = mailbox;
     ti.id_table = g_hash_table_new(g_str_hash, g_str_equal);
     lbml_make_msg_array(&ti);
 
-    for (i = 1; i <= ti.msg_array_len; i++) {
-	GNode *node =
-	    g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
-			GINT_TO_POINTER(i));
-	if (node)
-	    lbml_set_parent(node, &ti);
-	else
-	    g_warning("Did not find message %d\n", i);
-    }
-
+    g_node_traverse(mailbox->msg_tree, G_POST_ORDER, G_TRAVERSE_ALL, -1,
+		    (GNodeTraverseFunc) lbml_set_parent, &ti);
     g_node_traverse(mailbox->msg_tree, G_POST_ORDER, G_TRAVERSE_ALL, -1,
 		    (GNodeTraverseFunc) lbml_prune, mailbox->msg_tree);
 
@@ -597,18 +587,20 @@ lbml_get_message(GNode * node, ThreadingInfo * ti)
     return msgno <= 0 ? NULL : ti->msg_array[msgno - 1];
 }
 
-static void
+static gboolean
 lbml_set_parent(GNode * node, ThreadingInfo * ti)
 {
     LibBalsaMessage *message;
     GNode *parent;
     GNode *child;
 
-    message = lbml_get_message(node, ti);
-    if (!message || !message->message_id)
-	return;
+    if (!node->parent)
+	return FALSE;
 
-    lbml_insert_node(node, message, ti);
+    message = lbml_get_message(node, ti);
+
+    if (message->message_id)
+	lbml_insert_node(node, message, ti);
 
     /*
      * Set the parent of this message to be the last element in References.
@@ -637,7 +629,7 @@ lbml_set_parent(GNode * node, ThreadingInfo * ti)
 	/* Nothing to do... */
 	|| node == parent)
 	/* This message listed itself as its parent! Oh well... */
-	return;
+	return FALSE;
 
     for (child = node->children; child; child = child->next)
 	if (child == parent || g_node_is_ancestor(child, parent)) {
@@ -647,11 +639,13 @@ lbml_set_parent(GNode * node, ThreadingInfo * ti)
 	     * message's node to its parent, so we'll fix
 	     * the tree: unlink the offending child and prepend it
 	     * to the node's parent. */
-	    g_node_append(node->parent, lbml_unlink(child));
+	    g_node_prepend(node->parent, lbml_unlink(child));
 	    break;
 	}
 
     g_node_prepend(parent, lbml_unlink(node));
+
+    return FALSE;
 }
 
 static GNode *
@@ -690,7 +684,7 @@ lbml_find_parent(LibBalsaMessage * message, ThreadingInfo * ti)
 		/* foo has the default parent; we'll unlink it, so that
 		 * it can be linked to its rightful parent. */
 		g_node_unlink(foo);
-	    if (G_NODE_IS_ROOT(foo))
+	    if (!foo->parent)
 		g_node_prepend(parent, foo);
 	}
 
@@ -728,7 +722,7 @@ lbml_insert_node(GNode * node, LibBalsaMessage * message,
 	    || LIBBALSA_MESSAGE_IS_REPLIED(message)) {
 	    /* ...or we want to thread off this instance */
 	    while (old_node->children)
-		g_node_append(node, lbml_unlink(old_node->children));
+		g_node_prepend(node, lbml_unlink(old_node->children));
 	}
     }
 
@@ -825,7 +819,7 @@ lbml_subject_gather(GNode * node, ThreadingInfo * ti)
      *   If it is null, or if it is this container, continue. 
      *   Otherwise, we want to group together this Container and the one 
      *   in the table. There are a few possibilities: 
-     *     + If both are dummies, append one's children to the other, and 
+     *     + If both are dummies, prepend one's children to the other, and 
      *       remove the now-empty container. 
      * 
      *     + If one container is a empty and the other is not, make the 
@@ -861,7 +855,7 @@ lbml_subject_gather(GNode * node, ThreadingInfo * ti)
     if (!message)
 	message = lbml_get_message(node->children, ti);
 #endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
-    g_return_if_fail(message != NULL);
+    g_assert(message != NULL);
 
     subject = LIBBALSA_MESSAGE_GET_SUBJECT(message);
     if (subject == NULL)
@@ -887,7 +881,7 @@ lbml_subject_gather(GNode * node, ThreadingInfo * ti)
     if (!old_message)
 	old_message = lbml_get_message(old->children, ti);
 #endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
-    g_return_if_fail(old_message != NULL);
+    g_assert(old_message != NULL);
 
     old_subject = LIBBALSA_MESSAGE_GET_SUBJECT(old_message);
 
@@ -930,7 +924,7 @@ lbml_subject_merge(GNode * node, ThreadingInfo * ti)
     if (!message)
 	message = lbml_get_message(node->children, ti);
 #endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
-    g_return_if_fail(message != NULL);
+    g_assert(message != NULL);
 
     subject = LIBBALSA_MESSAGE_GET_SUBJECT(message);
     if (subject == NULL)
@@ -1034,54 +1028,40 @@ lbml_clear_empty(LibBalsaMailbox * mailbox)
 
 /* yet another message threading function */
 
-static gboolean lbml_add_message(GNode * msg_tree_node, gpointer data);
+static gboolean lbml_insert_message(GNode * node, ThreadingInfo * ti);
+static gboolean lbml_thread_message(GNode * node, ThreadingInfo * ti);
 
 static void
 lbml_threading_simple(LibBalsaMailbox * mailbox,
 		      LibBalsaMailboxThreadingType type)
 {
-    GSList *p;
     ThreadingInfo ti;
 
     ti.id_table = g_hash_table_new(g_str_hash, g_str_equal);
-    ti.message_list = NULL;
     ti.mailbox = mailbox;
     lbml_make_msg_array(&ti);
 
-    g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
-		    lbml_add_message, &ti);
+    if (type == LB_MAILBOX_THREADING_SIMPLE)
+	g_node_traverse(mailbox->msg_tree, G_POST_ORDER, G_TRAVERSE_ALL,
+			-1, (GNodeTraverseFunc) lbml_insert_message, &ti);
 
-    for (p = ti.message_list; p; p = g_slist_next(p)) {
-	GNode *child = p->data;
-	LibBalsaMessage *child_message = lbml_get_message(child, &ti);
-	GList *child_refs = child_message->references_for_threading;
-	GNode *parent = NULL;
-
-	if (type == LB_MAILBOX_THREADING_SIMPLE && child_refs != NULL)
-	    parent = g_hash_table_lookup(ti.id_table,
-					 g_list_last(child_refs)->data);
-	if (!parent)
-	    parent = mailbox->msg_tree;
-	if (parent != child->parent)
-	    g_node_prepend(parent, lbml_unlink(child));
-    }
+    g_node_traverse(mailbox->msg_tree, G_POST_ORDER, G_TRAVERSE_ALL, -1,
+		    (GNodeTraverseFunc) lbml_thread_message, &ti);
 
 #ifdef MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT
     lbml_clear_empty(mailbox);
 #endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
 
-    g_slist_free(ti.message_list);
     g_hash_table_destroy(ti.id_table);
     g_free(ti.msg_array);
 }
 
 static gboolean
-lbml_add_message(GNode * node, gpointer data)
+lbml_insert_message(GNode * node, ThreadingInfo * ti)
 {
     LibBalsaMessage *message;
-    ThreadingInfo *ti = data;
 
-    if (G_NODE_IS_ROOT(node))
+    if (node == ti->mailbox->msg_tree)
 	return FALSE;
 
     message = lbml_get_message(node, ti);
@@ -1089,13 +1069,41 @@ lbml_add_message(GNode * node, gpointer data)
     if (!message)
 	return FALSE;
 #else				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
-    g_return_val_if_fail(message != NULL, FALSE);
+    g_assert(message != NULL);
 #endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
-
-    ti->message_list = g_slist_prepend(ti->message_list, node);
 
     if (message->message_id)
 	g_hash_table_insert(ti->id_table, message->message_id, node);
+
+    return FALSE;
+}
+
+static gboolean
+lbml_thread_message(GNode * node, ThreadingInfo * ti)
+{
+    LibBalsaMessage *message;
+    GList *refs;
+    GNode *parent = NULL;
+
+    if (node == ti->mailbox->msg_tree)
+	return FALSE;
+
+    message = lbml_get_message(node, ti);
+#ifdef MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT
+    if (!message)
+	return FALSE;
+#else				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
+    g_assert(message != NULL);
+#endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
+
+    refs = message->references_for_threading;
+    if (refs)
+	parent = g_hash_table_lookup(ti->id_table,
+				     g_list_last(refs)->data);
+    if (!parent)
+	parent = ti->mailbox->msg_tree;
+    if (parent != node->parent)
+	g_node_prepend(parent, lbml_unlink(node));
 
     return FALSE;
 }

@@ -1,3 +1,8 @@
+2003-04-12 13:14  PeterB
+
+	* src/: sendmsg-window.c, sendmsg-window.h: Put the headers in a
+	scrolled window.
+
 2003-04-11 16:43  PeterB
 
 	* libbalsa/address.c: Check argument in libbalsa_address_get_name.

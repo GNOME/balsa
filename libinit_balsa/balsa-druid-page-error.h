@@ -48,6 +48,7 @@ typedef struct _BalsaDruidPageError BalsaDruidPageError;
 struct _BalsaDruidPageError {
 	BalsaDruidPage __parent__;
 	/* private */ GnomeDruidPage *real_next;
+	/* private */ gchar *text;
 };
 
 typedef struct _BalsaDruidPageErrorClass BalsaDruidPageErrorClass;
@@ -56,7 +57,7 @@ struct _BalsaDruidPageErrorClass {
 };
 
 guint	balsa_druid_page_error_get_type	(void);
-GtkObject *	balsa_druid_page_error_new_after	(BalsaDruidPage *prev, gchar *title);
+GtkObject *	balsa_druid_page_error_new_after	(BalsaDruidPage *prev, gchar *title, gchar *text);
 void 	balsa_druid_page_error_goto_me	(BalsaDruidPageError *self);
 
 #ifdef __cplusplus

@@ -16,12 +16,14 @@ BUILT_SOURCES =				\
 	balsa-druid-page-error.c	\
 	balsa-druid-page-welcome.c	\
 	balsa-druid-page-user.c		\
+	balsa-druid-page-directory.c	\
 	balsa-druid-page-finish.c	\
 	balsa-initdruid.h		\
 	balsa-druid-page.h		\
 	balsa-druid-page-error.h	\
 	balsa-druid-page-welcome.h	\
 	balsa-druid-page-user.h		\
+	balsa-druid-page-directory.h	\
 	balsa-druid-page-finish.h	
 endif
 
@@ -31,6 +33,7 @@ GOBFILES =				\
 	balsa-druid-page-error.gob	\
 	balsa-druid-page-welcome.gob	\
 	balsa-druid-page-user.gob	\
+	balsa-druid-page-directory.gob	\
 	balsa-druid-page-finish.gob
 
 %.c: %.gob
@@ -42,5 +45,5 @@ endif
 
 EXTRA_DIST = $(GOBFILES)
 
-INCLUDES=-I. -I${top_srcdir} \
+INCLUDES=-I. -I${top_srcdir} -I${top_srcdir}/libmutt -I${top_srcdir}/libbalsa -I${top_srcdir}/src\
 	$(GNOME_INCLUDEDIR)

@@ -18,7 +18,41 @@
  * 02111-1307, USA.
  */
 
+#ifndef LIBINIT_BALSA_HELPER_H
+#define LIBINIT_BALSA_HELPER_H
+
 #include "config.h"
 #include <gnome.h>
 
-extern GdkImlibImage *balsa_init_get_png( gchar *fname );
+typedef struct EntryData_s EntryData;
+typedef struct EntryMaster_s EntryMaster;
+
+struct EntryData_s {
+	GtkWidget *page;
+	guint num;
+	EntryMaster *master;
+};
+
+#define ENTRY_DATA_INIT { NULL, 0 }
+
+struct EntryMaster_s {
+	guint32 setbits;
+	guint32 numentries;
+	guint32 donemask;
+};
+
+#define ENTRY_MASTER_INIT { 0, 0, 0 }
+#define ENTRY_MASTER_P_DONE( ep ) ( ((ep)->setbits & (ep)->donemask) == (ep)->donemask )
+#define ENTRY_MASTER_DONE( e ) ( ((e).setbits & (e).donemask) == (e).donemask )
+
+extern GdkImlibImage *balsa_init_get_png( const gchar *fname );
+extern void           balsa_init_add_table_entry( GtkTable *table, 
+						  guint num, 
+						  gchar *ltext, 
+						  gchar *etext, 
+						  EntryData *ed, 
+						  GtkWidget *page, 
+						  GtkWidget **dest );
+extern gboolean       balsa_init_create_to_directory( const gchar *dir, gchar **complaint );
+
+#endif

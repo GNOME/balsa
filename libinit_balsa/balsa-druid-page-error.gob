@@ -26,13 +26,19 @@
 #include "balsa-druid-page.h"
 %}
 
+%{
+#include <errno.h>
+%}
+
 class Balsa:Druid:Page:Error from Balsa:Druid:Page {
 	private GnomeDruidPage *real_next;
-
-	public GtkObject *new_after( Balsa:Druid:Page *prev (check null type), gchar *title ) {
+	private gchar *text;
+	
+	public GtkObject *new_after( Balsa:Druid:Page *prev (check null type), gchar *title (check null), gchar *text (check null) ) {
 		BalsaDruidPageError *self = BALSA_DRUID_PAGE_ERROR( GET_NEW );
 
 		self->real_next = prev->next;
+		self->text = g_strdup( text );
 		prev->next = GNOME_DRUID_PAGE( self );
 		(BALSA_DRUID_PAGE( self ))->prev = GNOME_DRUID_PAGE( prev );
 		(BALSA_DRUID_PAGE( self ))->next = NULL;
@@ -63,7 +69,20 @@ class Balsa:Druid:Page:Error from Balsa:Druid:Page {
 
 	override (Balsa:Druid:Page) void
 	construct( Balsa:Druid:Page *self ) {
+		GtkWidget *label;
+		gchar *errtext;
+
 		PARENT_HANDLER( self );
+
+		label = gtk_label_new( (BALSA_DRUID_PAGE_ERROR( self ))->text );
+		gtk_box_pack_start( GTK_BOX( (GNOME_DRUID_PAGE_STANDARD( self ))->vbox ), label, TRUE, TRUE, 8 );
+
+		errtext = g_strdup_printf( "Technical Information:\n"
+			"errno = %d (%s)", errno, g_strerror( errno ) );
+		label = gtk_label_new( errtext );
+		g_free( errtext );
+		gtk_box_pack_start( GTK_BOX( (GNOME_DRUID_PAGE_STANDARD( self ))->vbox ), label, TRUE, TRUE, 8 );
+
 		gtk_widget_show_all( GTK_WIDGET( self ) );
 	}
 

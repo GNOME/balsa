@@ -25,86 +25,22 @@
 #include "balsa-initdruid.h"
 #include "balsa-druid-page.h"
 
-typedef struct EntryData_s EntryData;
-struct EntryData_s {
-	GtkWidget *page;
-	guint num;
-};
 %}
 
 %{
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "balsa-druid-page-error.h"
-
-#define ENTRIES 4
-	
-/* Warning: these functions are all very interdependent. Make sure to keep assumptions
- * consistent when modifying.
- */
-static void entrylabel( GtkTable *table, guint num, gchar *ltext, gchar *etext, EntryData *ed, GtkWidget *page );
-static void entry_changed_cb( GtkEntry *entry );
-
-static void entrylabel( GtkTable *table, guint num, gchar *ltext, gchar *etext, EntryData *ed, GtkWidget *page )
-{
-	GtkWidget *w;
-
-	ed->num = num;
-	ed->page = page;
-
-	w = gtk_label_new( ltext );
-	gtk_label_set_justify( GTK_LABEL( w ), GTK_JUSTIFY_RIGHT );
-	gtk_table_attach( table, GTK_WIDGET( w ), 0, 1, num + 1, num + 2,
-		GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL,
-		8, 4 );
-
-	w = gtk_entry_new();
-	gtk_object_set_user_data( GTK_OBJECT( w ), ed );
-	gtk_entry_set_text( GTK_ENTRY( w ), etext );
-	gtk_signal_connect( GTK_OBJECT( w ), "changed", entry_changed_cb, NULL );
-	gtk_table_attach( table, GTK_WIDGET( w ), 1, 2, num + 1, num + 2,
-		GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL,
-		8, 4 );
-}
-
-static void entry_changed_cb( GtkEntry *entry )
-{
-	EntryData *ed = gtk_object_get_user_data( GTK_OBJECT( entry ) );
-	BalsaDruidPageUser *up;
-	guint32 donemask;
-
-	g_assert( ed != NULL );
-
-	up = BALSA_DRUID_PAGE_USER( ed->page );
-	if( entry->text_length ) {
-		up->setbits |= (1 << ed->num);
-	} else {
-		up->setbits &= ~(1 << ed->num);
-	}
-
-	/* The stuff below is only when we are displayed... which is not
-	 * always the case.
-	 */
-	if( !GTK_WIDGET_VISIBLE( GTK_WIDGET( entry ) ) )
-		return;
-
-	/* numentries = say, 3;
-	 * 1 << 3 = 01000b
-	 * 01000b - 1 = 0111b
-	 */
-	donemask = ( (1 << up->numentries) - 1 );
-
-	/* Don't let them continue unless all entries have something. */
-	if( (up->setbits & donemask) == donemask ) {
-		gnome_druid_set_buttons_sensitive( GNOME_DRUID( (BALSA_DRUID_PAGE( up ))->druid ), TRUE, TRUE, TRUE );
-	} else {
-		gnome_druid_set_buttons_sensitive( GNOME_DRUID( (BALSA_DRUID_PAGE( up ))->druid ), TRUE, FALSE, TRUE );
-	}
-}
-
+#include "balsa-app.h"
 %}
 
 class Balsa:Druid:Page:User from Balsa:Druid:Page {
-	private guint32 setbits;
-	private guint32 numentries;
+	private GtkWidget *name;
+	private GtkWidget *email;
+	private GtkWidget *smtp;
+	private GtkWidget *localmaildir;
+	private EntryMaster emaster;
 	/* Gob can't handle arrays. Sigh. */
 	private EntryData ed0;
 	private EntryData ed1;
@@ -125,8 +61,13 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 		gchar *preset;
 		char hostbuf[512];
 
-		self->numentries = ENTRIES;
-		self->setbits = 0xFF;
+		self->emaster.setbits = 0;
+		self->emaster.numentries = 0;
+		self->emaster.donemask = 0;
+		self->ed0.master = &( self->emaster );
+		self->ed1.master = &( self->emaster );
+		self->ed2.master = &( self->emaster );
+		self->ed3.master = &( self->emaster );
 
 		table = GTK_TABLE( gtk_table_new( 5, 2, FALSE ) );
 
@@ -138,18 +79,18 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 			8, 4 );
 
 		preset = g_get_real_name();
-		entrylabel( table, 0, _("Name:"), preset, &( self->ed0 ), GTK_WIDGET( self ) );
+		balsa_init_add_table_entry( table, 0, _("Name:"), preset, &( self->ed0 ), GTK_WIDGET( self ), &( self->name ) );
 		
 		gethostname( hostbuf, 511 );
 		preset = g_strconcat( g_get_user_name(), "@", hostbuf, NULL );
-		entrylabel( table, 1, _("Email address:"), preset, &( self->ed1 ), GTK_WIDGET( self ) );
+		balsa_init_add_table_entry( table, 1, _("Email address:"), preset, &( self->ed1 ), GTK_WIDGET( self ), &( self->email ) );
 		g_free( preset );
 
 		preset = "localhost";
-		entrylabel( table, 2, _("SMTP Server:"), preset, &( self->ed2 ), GTK_WIDGET( self ) );
+		balsa_init_add_table_entry( table, 2, _("SMTP Server:"), preset, &( self->ed2 ), GTK_WIDGET( self ), &( self->smtp ) );
 
 		preset = g_strconcat( g_get_home_dir(), "/balsa", NULL );
-		entrylabel( table, 3, _("Local Mail Directory:"), preset, &( self->ed3 ), GTK_WIDGET( self ) );
+		balsa_init_add_table_entry( table, 3, _("Local Mail Directory:"), preset, &( self->ed3 ), GTK_WIDGET( self ), &( self->localmaildir ) );
 		g_free( preset );
 
 		gtk_box_pack_start( GTK_BOX( (GNOME_DRUID_PAGE_STANDARD( self ))->vbox ),
@@ -169,14 +110,12 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 
 	override (Gnome:Druid:Page) void
 	prepare( Gnome:Druid:Page *_self, Gtk:Widget *druid (check type null) ) {
-		guint32 donemask;
 		BalsaDruidPageUser *self = BALSA_DRUID_PAGE_USER( _self );
 
 		/* Don't let them continue unless all entries have something. */
 		/* FIXME: unify this with code above */
-		donemask = ( (1 << self->numentries) - 1 );
 
-		if( (self->setbits & donemask) == donemask ) {
+		if( ENTRY_MASTER_DONE( self->emaster ) ) {
 			gnome_druid_set_buttons_sensitive( GNOME_DRUID( druid ), TRUE, TRUE, TRUE );
 		} else {
 			gnome_druid_set_buttons_sensitive( GNOME_DRUID( druid ), TRUE, FALSE, TRUE );
@@ -187,17 +126,31 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 
 	override (Gnome:Druid:Page) gboolean
 	next( Gnome:Druid:Page *_self, Gtk:Widget *druid (check type null) ) {
-		static gboolean tested_it = FALSE;
+		gchar *uhoh;
+		BalsaDruidPageUser *self = BALSA_DRUID_PAGE_USER( _self );
 
-		if( !tested_it ) {
-			GtkObject *next;
+		if( balsa_app.address->personal )
+			g_free( balsa_app.address->personal );
+		balsa_app.address->personal = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->name ) ) );
 
-			next = balsa_druid_page_error_new_after( BALSA_DRUID_PAGE( _self ), "Aieee!!!" );
-			gtk_box_pack_start( GTK_BOX( (GNOME_DRUID_PAGE_STANDARD( next ))->vbox ),
-				GTK_WIDGET( gtk_label_new( "Test" ) ), TRUE, TRUE, 8 );
-			gtk_widget_show_all( GTK_WIDGET( (GNOME_DRUID_PAGE_STANDARD( next ))->vbox ) );
-			balsa_druid_page_error_goto_me( next );
-			tested_it = TRUE;
+		if( balsa_app.address->mailbox )
+			g_free( balsa_app.address->mailbox );
+		balsa_app.address->mailbox = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->email ) ) );
+
+		if( balsa_app.smtp_server );
+			g_free( balsa_app.smtp_server );
+		balsa_app.smtp_server = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->smtp ) ) );
+
+		if( balsa_app.local_mail_directory );
+			g_free( balsa_app.local_mail_directory );
+		balsa_app.local_mail_directory = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->localmaildir ) ) );
+
+		if( balsa_init_create_to_directory( balsa_app.local_mail_directory, &uhoh ) ) {
+			GtkObject *page;
+
+			page = balsa_druid_page_error_new_after( BALSA_DRUID_PAGE( self ), _("Local Mail Problem"), uhoh );
+			g_free( uhoh );
+			balsa_druid_page_error_goto_me( BALSA_DRUID_PAGE_ERROR( page ) );
 		} else {
 			PARENT_HANDLER( _self, druid );
 		}

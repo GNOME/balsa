@@ -1,5 +1,10 @@
-2004-09-09 05:04  PeterB
+2004-09-09 08:36  PeterB
 
+	* src/: balsa-index.c, main-window.c: update the mailbox's last_use
+	time stamp only on expose/conceal and changing a deleted flag, not
+	on other mailbox changes.
+	* src/balsa-message.c: hide widget while empty and while changing
+	it.
 	* libbalsa/mailbox_imap.c: do not fetch expunged message.
 	* src/balsa-index.c, src/main-window.c, libbalsa/send.c: use
 	gdk_display_flush if available, instead of gdk_flush.

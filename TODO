@@ -13,6 +13,7 @@ Stuart
  * add choice for POP3/IMAP/MBOX to new account box.
  * fix deleting accounts
  * remove attach and spell check from main-window toolbar
+ * free EVERYTHING the account manager window when closed.
 
 sendmsg-window TODO:
  * free EVERYTHING in the sendmsg-window when it is closed.

@@ -1,3 +1,8 @@
+2003-11-18 08:28  PeterB
+
+	* src/balsa-index.c: Clear index->current_message when destroying
+	the index, as the destroy method seems to be called more than once.
+
 2003-11-17 20:02  PeterB
 
 	* libbalsa/mailbox.c, libbalsa/mailbox_local.c, libbalsa/message.c,

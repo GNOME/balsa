@@ -2336,9 +2336,6 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
                                        GTK_POLICY_AUTOMATIC,
                                        GTK_POLICY_ALWAYS);
         part_info_init_html(bm, info, ptr, alloced);
-        gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(bm->scroll),
-                                       GTK_POLICY_AUTOMATIC,
-                                       GTK_POLICY_AUTOMATIC);
 #else
         part_info_init_unknown(bm, info);
 #endif
@@ -2605,6 +2602,10 @@ part_info_init(BalsaMessage * bm, BalsaPartInfo * info)
     g_return_if_fail(bm != NULL);
     g_return_if_fail(info != NULL);
     g_return_if_fail(info->body != NULL);
+
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(bm->scroll),
+                                   GTK_POLICY_AUTOMATIC,
+                                   GTK_POLICY_AUTOMATIC);
 
     type = libbalsa_message_body_type(info->body);
 

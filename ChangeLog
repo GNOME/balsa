@@ -1,5 +1,6 @@
-2004-07-16 20:46  PeterB
+2004-07-16 23:03  PeterB
 
+	* src/balsa-message.c: plug leaks.
 	* src/: mailbox-node.c, mailbox-node.h: check more carefully for
 	pre-existing imap folder; use BALSA_MAILBOX_NODE_NEW_MAILBOX
 	GObject data to mark an mbnode with a newly attached mailbox.

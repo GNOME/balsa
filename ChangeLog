@@ -1,3 +1,7 @@
+2002-09-14  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* NEWS, configure.in: release 1.4.1
+
 2002-09-09  Emmanuel <e.allaud@wanadoo.fr>
 
 	* src/main-window.c, libbalsa/send.c: build without libesmtp.

@@ -546,7 +546,7 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
         sqlite_exec_printf
             (gc->db,
              "select tag,value from contacts where urn=%d"
-             " and (upper(tag)='FAMILY_NAME' or upper(tag)='FIRST_NAME' or "
+             " and (upper(tag)='FAMILY_NAME' or upper(tag)='GIVEN_NAME' or "
              "upper(tag)='NAME' or "
              "(upper(tag)='%q' and value LIKE '%q%%'))",
              gpe_read_attr, a, NULL, uid, tag, gc->prefix);
@@ -577,7 +577,7 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
 {
     static const char *query = 
         "select distinct urn,tag from contacts where "
-        "(upper(tag)='FAMILY_NAME' or upper(tag)='FIRST_NAME' or "
+        "(upper(tag)='FAMILY_NAME' or upper(tag)='GIVEN_NAME' or "
         "upper(tag)='NAME' or "
         "upper(tag)='WORK.EMAIL' or upper(tag)='HOME.EMAIL') "
         "and upper(value) LIKE '%q%%'";

@@ -2,8 +2,9 @@
 
 	* src/main-window.c: remove unneeded GDK locks.
 
-2003-02-13 06:02  PeterB
+2003-02-13 21:44  PeterB
 
+	* src/main-window.c: Check that a message is in a mailbox.
 	* src/balsa-index.c: Check that we have a current message before
 	testing its flags.
 

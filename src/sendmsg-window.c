@@ -992,7 +992,8 @@ static struct {
     glong struct_offset;
 } headers[] = {
     { N_("To:"),       G_STRUCT_OFFSET(BalsaSendmsg, to[1])},
-    { N_("From:"),     G_STRUCT_OFFSET(BalsaSendmsg, from[1])},
+    /* Cannot edit the new "From:" header. 
+    { N_("From:"),     G_STRUCT_OFFSET(BalsaSendmsg, from[1])}, */
     { N_("Reply-To:"), G_STRUCT_OFFSET(BalsaSendmsg, reply_to[1])},
     { N_("Bcc:"),      G_STRUCT_OFFSET(BalsaSendmsg, bcc[1])},
     { N_("Cc:"),       G_STRUCT_OFFSET(BalsaSendmsg, cc[1])},
@@ -1094,6 +1095,7 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg)
     if (app) {
 #if HAVE_GNOME_VFS29
         gboolean adduri = gnome_vfs_mime_application_supports_uris(app);
+	const gchar *exec, *pct;
 #else /* HAVE_GNOME_VFS29 */
 	gboolean adduri = (app->expects_uris ==
                            GNOME_VFS_MIME_APPLICATION_ARGUMENT_TYPE_URIS);
@@ -1101,7 +1103,9 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg)
         argc = 2;
         argv = g_new0 (char *, argc+1);
 #if HAVE_GNOME_VFS29
-	argv[0] = g_strdup(gnome_vfs_mime_application_get_exec(app));
+	exec = gnome_vfs_mime_application_get_exec(app);
+	pct = strstr(exec, " %");
+	argv[0] = pct ? g_strndup(exec, pct - exec) : g_strdup(exec);
 #else /* HAVE_GNOME_VFS29 */
         argv[0] = g_strdup(app->command);
 #endif /* HAVE_GNOME_VFS29 */
@@ -4505,6 +4509,10 @@ bsmsg2message(BalsaSendmsg * bsmsg)
         message->gpg_mode = 0;
 #endif
 
+    /* remember the parent window */
+    g_object_set_data(G_OBJECT(message), "parent-window",
+		      GTK_WINDOW(bsmsg->window));
+
     return message;
 }
 
@@ -5516,6 +5524,8 @@ bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg, GtkWidget *toolbar)
 #endif
     /* preset sign/encrypt according to current identity */
     if (balsa_app.has_openpgp || balsa_app.has_smime) {
+	if (bsmsg->ident->always_trust)
+	    bsmsg->gpg_mode |= LIBBALSA_PROTECT_ALWAYS_TRUST;
         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
                                        bsmsg->ident->gpg_sign);
         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),

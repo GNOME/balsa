@@ -1935,7 +1935,6 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
     const gchar *content_desc;
     gchar *content_type;
 
-
     vbox = gtk_vbox_new(FALSE, 2);
     gtk_container_set_border_width(GTK_CONTAINER(vbox), 10);
 
@@ -1947,6 +1946,30 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
     }
 
     content_type = libbalsa_message_body_get_mime_type(info->body);
+
+    /* guess content_type if not specified or if generic app/octet-stream */
+    /* on local mailboxes only, to avoid possibly long downloads */
+    if ((content_type == NULL ||
+         g_ascii_strcasecmp(content_type, "application/octet-stream") == 0)
+        && LIBBALSA_IS_MAILBOX_LOCAL(bm->message->mailbox)) {
+        GMimeStream *stream = libbalsa_message_body_get_stream(info->body);
+        ssize_t length = 1024 /* g_mime_stream_length(stream) */ ;
+        gpointer buffer = g_malloc(length);
+        ssize_t size = g_mime_stream_read(stream, buffer, length);
+        g_object_unref(stream);
+	g_free(content_type);
+        content_type =
+	    g_strdup(gnome_vfs_get_mime_type_for_data(buffer, size));
+        if (g_ascii_strncasecmp(content_type, "text", 4) == 0
+            && libbalsa_text_attr_string(buffer) & LIBBALSA_TEXT_HI_BIT) {
+	    /* Hmmm...better stick with application/octet-stream. */
+            g_free(content_type);
+            content_type = g_strdup("application/octet-stream");
+        }
+
+        g_free(buffer);
+    }
+
     if ((content_desc = gnome_vfs_mime_get_description(content_type)))
         msg = g_strdup_printf(_("Type: %s (%s)"), content_desc,
                               content_type);
@@ -3804,7 +3827,7 @@ balsa_message_grab_focus(BalsaMessage * bmessage)
    compares two addresses according to rfc2298: local-part@domain is equal,
    if the local-parts are case sensitive equal, but the domain case-insensitive
 */
-static gchar *
+static const gchar *
 bm_get_mailbox(const InternetAddressList * list)
 {
     InternetAddress *ia;
@@ -3821,14 +3844,14 @@ bm_get_mailbox(const InternetAddressList * list)
     if (!ia || ia->type == INTERNET_ADDRESS_NONE)
 	return NULL;
 
-    return g_strdup(ia->value.addr);
+    return ia->value.addr;
 }
 
 static gboolean 
 rfc2298_address_equal(const InternetAddressList *a,
 	              const InternetAddressList *b)
 {
-    gchar *a_string, *b_string, *a_atptr, *b_atptr;
+    const gchar *a_string, *b_string, *a_atptr, *b_atptr;
     gint a_atpos, b_atpos;
 
     if (!a || !b)
@@ -3837,35 +3860,24 @@ rfc2298_address_equal(const InternetAddressList *a,
     a_string = bm_get_mailbox (a);
     b_string = bm_get_mailbox (b);
 
-    if (!a_string || !b_string) {
-        g_free (a_string);
-        g_free (b_string);
+    if (!a_string || !b_string)
         return FALSE;
-    }
     
     /* first find the "@" in the two addresses */
     a_atptr = strchr (a_string, '@');
     b_atptr = strchr (b_string, '@');
-    if (!a_atptr || !b_atptr) {
-        g_free (a_string);
-        g_free (b_string);
+    if (!a_atptr || !b_atptr)
         return FALSE;
-    }
     a_atpos = a_atptr - a_string;
     b_atpos = b_atptr - b_string;
 
     /* now compare the strings */
     if (!a_atpos || !b_atpos || a_atpos != b_atpos || 
         strncmp (a_string, b_string, a_atpos) ||
-        g_ascii_strcasecmp (a_atptr, b_atptr)) {
-        g_free (a_string);
-        g_free (b_string);
+        g_ascii_strcasecmp (a_atptr, b_atptr))
         return FALSE;
-    } else {
-        g_free (a_string);
-        g_free (b_string);
+    else
         return TRUE;
-    }
 }
 
 static void

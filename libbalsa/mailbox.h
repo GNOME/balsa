@@ -62,6 +62,31 @@ typedef enum {
     LIBBALSA_NTFY_UPDATECONFIG,
     LIBBALSA_NTFY_ERROR
 } LibBalsaMailboxNotify;
+
+
+/* MBG: If this enum is changed (even just the order) make sure to
+ * update pref-manager.c so the preferences work correctly */
+typedef enum {
+    LB_MAILBOX_THREADING_FLAT,
+    LB_MAILBOX_THREADING_SIMPLE,
+    LB_MAILBOX_THREADING_JWZ
+} LibBalsaMailboxThreadingType;
+
+typedef enum {
+    LB_MAILBOX_SORT_TYPE_ASC,
+    LB_MAILBOX_SORT_TYPE_DESC
+} LibBalsaMailboxSortType;
+
+typedef enum {
+    LB_MAILBOX_SORT_NATURAL,
+    LB_MAILBOX_SORT_NO,
+    LB_MAILBOX_SORT_FROM,
+    LB_MAILBOX_SORT_SUBJECT,
+    LB_MAILBOX_SORT_DATE,
+    LB_MAILBOX_SORT_SIZE
+} LibBalsaMailboxSortFields;
+
+
 /*
  * structures
  */
@@ -111,6 +136,9 @@ struct _LibBalsaMailbox {
 
     /* Default identity associated with the mailbox */
     gchar *identity_name;
+    LibBalsaMailboxThreadingType threading_type;
+    LibBalsaMailboxSortType      sort_type;
+    LibBalsaMailboxSortFields    sort_field;
 };
 
 struct _LibBalsaMailboxClass {
@@ -182,6 +210,9 @@ void libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);
 void libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);
+
+void libbalsa_mailbox_load_view(LibBalsaMailbox * mailbox);
+void libbalsa_mailbox_save_view(LibBalsaMailbox * mailbox);
 /*
  * misc mailbox releated functions
  */

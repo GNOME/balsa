@@ -44,6 +44,7 @@
 #define MAILBOX_SECTION_PREFIX "mailbox-"
 #define ADDRESS_BOOK_SECTION_PREFIX "address-book-"
 #define IDENTITY_SECTION_PREFIX "identity-"
+#define VIEW_SECTION_PREFIX "view-"
 
 static gint config_section_init(const char* section_prefix, 
 				gint (*cb)(const char*));
@@ -630,7 +631,7 @@ config_global_load(void)
 
     balsa_app.expand_tree = gnome_config_get_bool("ExpandTree=false");
     balsa_app.threading_type = d_get_gint("ThreadingType", 
-					  BALSA_INDEX_THREADING_JWZ);
+					  LB_MAILBOX_THREADING_JWZ);
 
     /* ... Quote colouring */
     g_free(balsa_app.quote_regex);
@@ -945,7 +946,8 @@ config_global_load(void)
     return TRUE;
 }				/* config_global_load */
 
-gint config_save(void)
+gint
+config_save(void)
 {
     gchar **open_mailboxes_vector, *tmp;
     gint i, j;
@@ -1251,6 +1253,30 @@ config_get_unused_section(const gchar * prefix)
 }
 
 static void
+config_clean_sections(const gchar* section_prefix)
+{
+    void *iterator;
+    gchar *key, *val, *prefix;
+    int pref_len = strlen(section_prefix);
+    GList* old_sections = NULL, *list;
+
+    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
+	if (strncmp(key, section_prefix, pref_len) == 0) {
+	    prefix = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
+	    old_sections = g_list_prepend(old_sections, prefix);
+	}
+	g_free(key);
+	g_free(val);
+    }
+    for(list=old_sections; list; list = g_list_next(list)) {
+	gnome_config_clean_section(list->data);
+	g_free(list->data);
+    }
+    g_list_free(old_sections);
+}
+
+static void
 config_address_books_load(void)
 {
     LibBalsaAddressBook *address_book;
@@ -1352,46 +1378,84 @@ config_identities_save(void)
 {
     LibBalsaIdentity* ident;
     GList* list;
-    gchar** conf_vec, *prefix, *key, *val;
-    GList* old_identities = NULL;
-    gint i = 0;
-    void* iterator;
-    int pref_len = strlen(IDENTITY_SECTION_PREFIX);
+    gchar* prefix;
 
-    conf_vec = g_malloc(sizeof(gchar*) * g_list_length(balsa_app.identities));
-
-    g_assert(conf_vec != NULL);
-    
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "identity/");
     gnome_config_set_string("CurrentIdentity", 
                             balsa_app.current_ident->identity_name);
     gnome_config_pop_prefix();
-    g_free(conf_vec);
 
-    /* clean removed sections */
-    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
-    while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
-	if (strncmp(key, IDENTITY_SECTION_PREFIX, pref_len) == 0) {
-	    prefix = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
-	    old_identities = g_list_prepend(old_identities, prefix);
-	}
-	g_free(key);
-	g_free(val);
-    }
-    for(list=old_identities; list; list = g_list_next(list)) {
-	gnome_config_clean_section(list->data);
-	g_free(list->data);
-    }
-    g_list_free(old_identities);
+    config_clean_sections(IDENTITY_SECTION_PREFIX);
 
     /* save current */
     for (list = balsa_app.identities; list; list = g_list_next(list)) {
 	ident = LIBBALSA_IDENTITY(list->data);
-	prefix = g_strconcat(BALSA_CONFIG_PREFIX "identity-", 
+	prefix = g_strconcat(BALSA_CONFIG_PREFIX IDENTITY_SECTION_PREFIX, 
 			     ident->identity_name, "/", NULL);
         libbalsa_identity_save(ident, prefix);
 	g_free(prefix);
     }
+}
+
+void
+config_views_load(void)
+{
+    void *iterator;
+    gchar *key, *val, *tmp;
+    int pref_len = strlen(VIEW_SECTION_PREFIX);
+    int def;
+
+    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
+	if (strncmp(key, VIEW_SECTION_PREFIX, pref_len) == 0) {
+	    gchar* url;
+	    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
+	    gnome_config_push_prefix(tmp);
+	    g_free(tmp);
+	    url = gnome_config_get_string_with_default("URL", &def);
+	    if(!def) {
+		LibBalsaMailbox* mbx = balsa_find_mailbox_by_url(url);
+		if(mbx) libbalsa_mailbox_load_view(mbx);
+	    }
+	    gnome_config_pop_prefix();
+	    g_free(url);
+	}
+	g_free(key);
+	g_free(val);
+    }
+}
+
+/* config_views_save:
+   iterates over all mailboxes and save the views.
+*/
+static gboolean
+save_view(GNode * node, int *cnt)
+{
+    gchar *prefix;
+    BalsaMailboxNode* mn = BALSA_MAILBOX_NODE(node->data);
+    g_return_val_if_fail(mn, FALSE);
+    
+    if(!mn->mailbox) return FALSE;
+    prefix = g_strdup_printf("%s%d/",
+			     BALSA_CONFIG_PREFIX VIEW_SECTION_PREFIX, 
+			     ++(*cnt));
+    gnome_config_push_prefix(prefix);
+    g_free(prefix);
+    gnome_config_set_string("URL", mn->mailbox->url);
+    libbalsa_mailbox_save_view(mn->mailbox);
+    gnome_config_pop_prefix();
+    return FALSE;
+}
+
+void
+config_views_save(void)
+{
+    int cnt = 0;
+
+    config_clean_sections(VIEW_SECTION_PREFIX);
+    /* save current */
+    g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_ALL, -1,
+		   (GNodeTraverseFunc) save_view, &cnt);
 }
 
 static gchar **

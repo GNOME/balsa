@@ -62,6 +62,7 @@ struct _MailboxConfWindow {
 
     void (*ok_handler)(MailboxConfWindow*);
     GtkWidget *mailbox_name;
+    GtkWidget* identity;
     GtkType mailbox_type;
 
     union {
@@ -433,6 +434,9 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	gtk_entry_set_text(GTK_ENTRY(mcw->mailbox_name),
 			   mailbox->name);
 
+    if(mcw->identity)
+	gtk_entry_set_text(GTK_ENTRY(mcw->identity), mailbox->identity_name);
+
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
 	LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
 
@@ -703,6 +707,12 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 	update_imap_mailbox(mcw);
     }
 
+    if(mcw->identity) {
+	const gchar *name = gtk_entry_get_text(GTK_ENTRY(mcw->identity));
+	g_free(mailbox->identity_name);
+	mailbox->identity_name = g_strdup(name);
+    }
+
     if (mailbox->config_prefix)
 	config_mailbox_update(mailbox);
 
@@ -796,7 +806,7 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
     GtkWidget *file;
     guint keyval;
     LibBalsaMailboxLocal* mloc = (LibBalsaMailboxLocal*)mcw->mailbox;
-    table = gtk_table_new(2, 2, FALSE);
+    table = gtk_table_new(3, 2, FALSE);
 
     /* mailbox name */
     if(mcw->mailbox && 
@@ -836,6 +846,10 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
     gtk_table_attach(GTK_TABLE(table), file, 1, 2, 1, 2,
 		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
+    create_label(_("Identity:"), table, 2, &keyval);
+    mcw->identity = create_entry(mcw->window, table,
+				 NULL, mcw, 2, NULL, keyval);
+
     gtk_widget_grab_focus(mcw->mailbox_name ? 
                           mcw->mailbox_name : mcw->mb_data.local.path);
     return table;
@@ -854,6 +868,7 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
     mcw->mailbox_name = create_entry(mcw->window, table,
                                      GTK_SIGNAL_FUNC(check_for_blank_fields),
                                      mcw, 0, NULL, keyval);
+    mcw->identity = NULL;
 
     /* pop server */
     create_label(_("_Server:"), table, 1, &keyval);
@@ -927,7 +942,7 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
     GtkWidget *entry;
     /*  GtkWidget *label; */
 
-    table = gtk_table_new(7, 2, FALSE);
+    table = gtk_table_new(8, 2, FALSE);
 
     /* mailbox name */
     create_label(_("Mailbox _Name:"), table, 0, &keyval);
@@ -994,6 +1009,10 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
     gtk_signal_connect(GTK_OBJECT(mcw->mb_data.imap.use_ssl), "toggled", 
                        imap_use_ssl_cb, mcw);
 #endif
+
+    create_label(_("_Identity:"), table, 0, &keyval);
+    mcw->identity = create_entry(mcw->window, table,
+				 NULL, mcw, 8, NULL, keyval);
 
     gtk_widget_grab_focus(mcw->mailbox_name? 
                           mcw->mailbox_name : mcw->mb_data.imap.server);

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,6 @@
 
 #include <gtk/gtk.h>
 #include "libbalsa.h"
-#include "balsa-index-threading.h"
 
 #define BALSA_TYPE_MAILBOX_NODE          (balsa_mailbox_node_get_type ())
 #define BALSA_MAILBOX_NODE(obj)          GTK_CHECK_CAST (obj, BALSA_TYPE_MAILBOX_NODE, BalsaMailboxNode)
@@ -58,7 +57,6 @@ struct _BalsaMailboxNode {
     BalsaMailboxNode *parent; /* NULL for root-level folders & mailboxes */
     LibBalsaMailbox *mailbox; /* != NULL for leaves only */
     gchar *name;       /* used for folders, i.e. when mailbox == NULL */
-    BalsaIndexThreadingType threading_type;
     BalsaMailboxNodeStyle style;
     int remote:1;   /* is dirname or server field used in data union.
 		     * If there is a need for more types, make a subclass. */
@@ -67,9 +65,6 @@ struct _BalsaMailboxNode {
     gchar* dir;      
     int expanded:1; 
     /* mailbox data */
-    enum { BALSA_SORT_NO=0,     BALSA_SORT_FROM=3,
-	   BALSA_SORT_SUBJECT=4,BALSA_SORT_DATE=5 } sort_field;
-    GtkSortType sort_type;
     LibBalsaServer * server; /* Used only by remote; is referenced */
     gboolean subscribed;     /* Used only by remote */
     gboolean list_inbox;     /* Used only by remote */

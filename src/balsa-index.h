@@ -156,7 +156,8 @@ extern "C" {
     void balsa_index_sync_backend(LibBalsaMailbox * mailbox);
 
     /* Threading Stuff, implementation is in balsa-index-threading.c */
-    void balsa_index_threading(BalsaIndex* bindex);
+    void balsa_index_threading(BalsaIndex* bindex,
+			       LibBalsaMailboxThreadingType th_type);
 
 #ifdef __cplusplus
 }

@@ -40,7 +40,6 @@
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-index.h"
-#include "balsa-index-threading.h"
 #include "balsa-mblist.h"
 #include "balsa-message.h"
 #include "main-window.h"
@@ -74,8 +73,9 @@ static void clist_click_column(GtkCList * clist, gint column,
 
 /* statics */
 static void bndx_match_struct_destroy(BalsaIndex * index);
-static void balsa_index_set_sort_order(BalsaIndex * bindex, int column, 
-				    GtkSortType order);
+static void balsa_index_set_sort_order(BalsaIndex * bindex,
+				       LibBalsaMailboxSortFields field,
+				       LibBalsaMailboxSortType order);
 static void balsa_index_set_first_new_message(BalsaIndex * bindex);
 /* adds a new message */
 static void balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message);
@@ -423,8 +423,7 @@ date_compare(GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2)
     m1 = row1->data;
     m2 = row2->data;
     g_return_val_if_fail(m1 && m2, 0);
-
-    return m2->date - m1->date;
+    return m1->date - m2->date;
 }
 
 
@@ -445,7 +444,7 @@ numeric_compare(GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2)
     t1 = LIBBALSA_MESSAGE_GET_NO(m1);
     t2 = LIBBALSA_MESSAGE_GET_NO(m2);
 
-    return t2-t1;
+    return t1-t2;
 }
 
 static gint
@@ -495,13 +494,24 @@ balsa_index_most_recent_message(GtkCList * clist)
 static void
 clist_click_column(GtkCList * clist, gint column, gpointer data)
 {
-    GtkSortType sort_type = clist->sort_type;
+    GtkSortType gtk_sort = clist->sort_type;
+    LibBalsaMailboxSortFields field;
+    LibBalsaMailboxSortType   order;
 
     if (column == clist->sort_column)
-	sort_type = (sort_type == GTK_SORT_ASCENDING) ?
+	gtk_sort = (gtk_sort == GTK_SORT_ASCENDING) ?
 	    GTK_SORT_DESCENDING : GTK_SORT_ASCENDING;
 	
-    balsa_index_set_sort_order(BALSA_INDEX(data), column, sort_type);
+    switch(column) {
+    case 0: field = LB_MAILBOX_SORT_NO;       break;
+    case 5: field = LB_MAILBOX_SORT_DATE;     break;
+    case 6: field = LB_MAILBOX_SORT_SIZE;     break;
+    default: field = LB_MAILBOX_SORT_NATURAL; break;
+    }
+    order = (gtk_sort == GTK_SORT_DESCENDING)
+	? LB_MAILBOX_SORT_TYPE_DESC : LB_MAILBOX_SORT_TYPE_ASC;
+
+    balsa_index_set_sort_order(BALSA_INDEX(data), field, order);
     gtk_clist_sort(clist);
     DO_CLIST_WORKAROUND(clist);
 
@@ -662,14 +672,8 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
 		       (gpointer) bindex);
 
     /* do threading */
-    balsa_index_set_sort_order(bindex, mbnode->sort_field, 
-			       mbnode->sort_type);
-    /* FIXME: this is an ugly way of doing it:
-       override default mbost threading type with the global balsa
-       default setting
-    */
-    mbnode->threading_type = balsa_app.threading_type;
-    balsa_index_set_threading_type(bindex, mbnode->threading_type);
+    balsa_index_set_sort_order(bindex,mailbox->sort_field,mailbox->sort_type);
+    balsa_index_set_threading_type(bindex, mailbox->threading_type);
     balsa_index_set_first_new_message(bindex);
 
     gtk_idle_add((GtkFunction) moveto_handler, bindex);
@@ -1752,7 +1756,8 @@ mailbox_messages_added(BalsaIndex * bindex, GList *messages)
 	balsa_index_add(bindex, message);
 	messages = g_list_next(messages);
     }
-    balsa_index_threading(bindex);
+    balsa_index_threading(bindex,
+			  bindex->mailbox_node->mailbox->threading_type);
     gtk_clist_sort(GTK_CLIST (bindex->ctree));
     DO_CLIST_WORKAROUND(GTK_CLIST (bindex->ctree));
     gtk_clist_thaw(GTK_CLIST (bindex->ctree));
@@ -2485,7 +2490,7 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
     
     gtk_ctree_set_line_style (
             bindex->ctree,
-            (thtype == BALSA_INDEX_THREADING_FLAT)?
+            (thtype == LB_MAILBOX_THREADING_FLAT)?
                 GTK_CTREE_LINES_NONE: GTK_CTREE_LINES_SOLID);
     
     mailbox = bindex->mailbox_node->mailbox;
@@ -2496,7 +2501,7 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
     for (list = mailbox->message_list; list; list = list->next)
 	balsa_index_add(bindex, LIBBALSA_MESSAGE(list->data));
     /* do threading */
-    balsa_index_threading(bindex);
+    balsa_index_threading(bindex, mailbox->threading_type);
     gtk_clist_sort(clist);
     DO_CLIST_WORKAROUND(clist);
     gtk_clist_thaw(clist);
@@ -2510,29 +2515,37 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
 }
 
 static void
-balsa_index_set_sort_order(BalsaIndex * bindex, int column, GtkSortType order)
+balsa_index_set_sort_order(BalsaIndex * bindex, 
+			   LibBalsaMailboxSortFields field, 
+			   LibBalsaMailboxSortType order)
 {
+    GtkSortType gtk_sort;
     GtkCList * clist;
+    int column;
+
     g_return_if_fail(bindex->mailbox_node);
-    g_return_if_fail(column>=0 && column <=6);
-    g_return_if_fail(order == GTK_SORT_DESCENDING || 
-		     order == GTK_SORT_ASCENDING);
+    g_return_if_fail(order == LB_MAILBOX_SORT_TYPE_DESC || 
+		     order == LB_MAILBOX_SORT_TYPE_ASC);
 
     clist = GTK_CLIST(bindex->ctree);
-    bindex->mailbox_node->sort_field = column;
-    bindex->mailbox_node->sort_type  = order;
-    clist->sort_type = order;
-    gtk_clist_set_sort_column(clist, column);
+    bindex->mailbox_node->mailbox->sort_field = field;
+    bindex->mailbox_node->mailbox->sort_type  = order;
+    gtk_sort = (order == LB_MAILBOX_SORT_TYPE_ASC) 
+	? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
+    clist->sort_type = gtk_sort;
 
-    switch (column) {
-    case 0:
+    switch (field) {
+    case LB_MAILBOX_SORT_NO:
 	gtk_clist_set_compare_func(clist, numeric_compare);
+	gtk_clist_set_sort_column(clist, 0);
 	break;
-    case 5:
+    case LB_MAILBOX_SORT_DATE:
 	gtk_clist_set_compare_func(clist, date_compare);
+	gtk_clist_set_sort_column(clist, 5);
 	break;
-    case 6:
+    case LB_MAILBOX_SORT_SIZE:
         gtk_clist_set_compare_func(clist, size_compare);
+	gtk_clist_set_sort_column(clist, 6);
         break;
     default:
 	gtk_clist_set_compare_func(clist, NULL);

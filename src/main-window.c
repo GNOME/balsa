@@ -384,19 +384,19 @@ static GnomeUIInfo threading_menu[] = {
     GNOMEUIINFO_RADIOITEM_DATA(N_("_Flat index"),
                                N_("No threading at all"),
                                threading_change_cb, 
-                               GINT_TO_POINTER(BALSA_INDEX_THREADING_FLAT),
+                               GINT_TO_POINTER(LB_MAILBOX_THREADING_FLAT),
                                NULL),
 #define MENU_THREADING_SIMPLE_POS 1
     GNOMEUIINFO_RADIOITEM_DATA(N_("S_imple threading"),
                                N_("Simple threading algorithm"),
                                threading_change_cb,
-                               GINT_TO_POINTER(BALSA_INDEX_THREADING_SIMPLE),
+                               GINT_TO_POINTER(LB_MAILBOX_THREADING_SIMPLE),
                                NULL),
 #define MENU_THREADING_JWZ_POS 2
     GNOMEUIINFO_RADIOITEM_DATA(N_("_JWZ threading"), 
                                N_("Elaborate JWZ threading"),
                                threading_change_cb,
-                               GINT_TO_POINTER(BALSA_INDEX_THREADING_JWZ),
+                               GINT_TO_POINTER(LB_MAILBOX_THREADING_JWZ),
                                NULL),
     GNOMEUIINFO_END
 };
@@ -1027,7 +1027,7 @@ enable_mailbox_menus(BalsaMailboxNode * mbnode)
         gtk_widget_set_sensitive(view_menu[view_menu_entries[i]].widget, enable);
 
     if(mbnode)
-        balsa_window_set_threading_menu(mbnode->threading_type);
+        balsa_window_set_threading_menu(mbnode->mailbox->threading_type);
 }
 
 /*
@@ -1189,11 +1189,11 @@ balsa_window_set_threading_menu(int option)
 {
     int pos;
     switch(option) {
-    case BALSA_INDEX_THREADING_FLAT:
+    case LB_MAILBOX_THREADING_FLAT:
     pos = MENU_THREADING_FLAT_POS; break;
-    case BALSA_INDEX_THREADING_SIMPLE:
+    case LB_MAILBOX_THREADING_SIMPLE:
     pos = MENU_THREADING_SIMPLE_POS; break;
-    case BALSA_INDEX_THREADING_JWZ:
+    case LB_MAILBOX_THREADING_JWZ:
     pos = MENU_THREADING_JWZ_POS; break;
     default: return;
     }
@@ -2453,7 +2453,7 @@ show_all_headers_cb(GtkWidget * widget, gpointer data)
 static void
 threading_change_cb(GtkWidget * widget, gpointer data)
 {
-    BalsaIndexThreadingType type;
+    LibBalsaMailboxThreadingType type;
     GtkWidget *index;
     GNode *gnode;
     
@@ -2468,7 +2468,7 @@ threading_change_cb(GtkWidget * widget, gpointer data)
 
     type = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(widget),
                            GNOMEUIINFO_KEY_UIDATA));
-    BALSA_MAILBOX_NODE(gnode->data)->threading_type = type;
+    BALSA_MAILBOX_NODE(gnode->data)->mailbox->threading_type = type;
     balsa_index_set_threading_type(BALSA_INDEX(index), type);
 }
 

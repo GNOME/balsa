@@ -271,7 +271,7 @@ extern struct BalsaApplication {
     ShownHeaders shown_headers;
     gchar *selected_headers;
     gchar *message_title_format;
-    BalsaIndexThreadingType threading_type;
+    LibBalsaMailboxThreadingType threading_type;
     gboolean expand_tree;
     gboolean show_mblist;
     gboolean show_notebook_tabs;

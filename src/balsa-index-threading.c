@@ -26,7 +26,7 @@
  * trivial one. If you confirm that your mailbox includes every threaded 
  * messages, the later will be enough. Those functions are selectable on
  * each mailbox by setting the 'type' member in BalsaIndex. If you don't need
- * message threading functionality, just specify 'BALSA_INDEX_THREADING_FLAT'. 
+ * message threading functionality, just specify 'LB_MAILBOX_THREADING_FLAT'. 
  *
  * ymnk@jcraft.com
  */
@@ -40,7 +40,6 @@
 #include <ctype.h>
 #include "balsa-app.h"
 #include "balsa-index.h"
-#include "balsa-index-threading.h"
 #include "main-window.h"
 
 #define MESSAGE(node) ((LibBalsaMessage *)(GTK_CTREE_ROW(node)->row.data))
@@ -72,16 +71,17 @@ static void add_message(GtkCTree *ctree,
 			GHashTable* msg_table);
 
 void
-balsa_index_threading(BalsaIndex* bindex)
+balsa_index_threading(BalsaIndex* bindex,
+		      LibBalsaMailboxThreadingType th_type)
 {
-    switch (bindex->threading_type){
-    case BALSA_INDEX_THREADING_SIMPLE:
+    switch (th_type){
+    case LB_MAILBOX_THREADING_SIMPLE:
 	threading_simple(bindex);
 	break;
-    case BALSA_INDEX_THREADING_JWZ:
+    case LB_MAILBOX_THREADING_JWZ:
 	threading_jwz(bindex);
 	break;
-    case BALSA_INDEX_THREADING_FLAT:
+    case LB_MAILBOX_THREADING_FLAT:
 	break;
     default:
 	break;

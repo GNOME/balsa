@@ -507,7 +507,9 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
     {
 	msg_info = &g_array_index(mbox->messages_info,
 		       struct message_info, i);
-	if (msg_info->flags != msg_info->orig_flags)
+	if (msg_info->flags != msg_info->orig_flags
+	    || (expunge
+		&& (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED)))
 	    break;
     }
     if (i == messages) {

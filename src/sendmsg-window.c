@@ -863,16 +863,31 @@ repl_identity_signature(BalsaSendmsg* msg, LibBalsaIdentity* new_ident,
 {
     gint ins_pos;
     gint length_delta = 0;
-    gint newsiglen = strlen(new_sig);
-
+    gint newsiglen;
+    gboolean reply_type = (msg->type == SEND_REPLY || 
+                           msg->type == SEND_REPLY_ALL ||
+                           msg->type == SEND_REPLY_GROUP);
+    gboolean forward_type = (msg->type == SEND_FORWARD_ATTACH || 
+                             msg->type == SEND_FORWARD_INLINE);
     
     gtk_text_freeze(GTK_TEXT(msg->text));
     gtk_editable_delete_text(GTK_EDITABLE(msg->text), *replace_offset,
                              *replace_offset + siglen);
-            
-    /* FIXME [MBG]: maybe also check below to see if this is a reply
-     * or forward and compare identity settings to determine
-     * whether to add signature */
+
+    if (!new_sig) {
+        gtk_text_thaw(GTK_TEXT(msg->text));
+        return;
+    } else {
+        newsiglen = strlen(new_sig);
+    }
+    
+    /* check to see if this is a reply or forward and compare identity
+     * settings to determine whether to add signature */
+    if ((reply_type && !new_ident->sig_whenreply) ||
+        (forward_type && !new_ident->sig_whenforward)) {
+        gtk_text_thaw(GTK_TEXT(msg->text));
+        return;
+    } 
 
     /* see if sig location is probably going to be the same */
     if (new_ident->sig_prepend == old_ident->sig_prepend) {
@@ -905,7 +920,8 @@ prep_signature(LibBalsaIdentity* ident, gchar* sig)
 {
     gchar* sig_tmp;
 
-
+    g_return_val_if_fail(sig != NULL, NULL);
+    
     if (ident->sig_separator) {
         sig_tmp = g_strconcat("\n-- \n", sig, NULL);
         g_free(sig);
@@ -968,7 +984,11 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
     old_ident = msg->ident;
     old_sig = read_signature(msg);
     old_sig = prep_signature(old_ident, old_sig);
-    siglen = strlen(old_sig);
+
+    if (old_sig)
+        siglen = strlen(old_sig);
+    else 
+        siglen = 0;
 
     /* switch identities in msg here so we can use read_signature
      * again */
@@ -1002,7 +1022,7 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
 
 
     /* if no sig seperators found, do a slower brute force approach */
-    if (!message_split[1]) {
+    if (!message_split[0] || !message_split[1]) {
         compare_str = message_text;
         replace_offset = 0;
         

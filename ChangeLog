@@ -1,3 +1,21 @@
+2004-02-11 21:48  PeterB
+
+	* src/balsa-message.c: possible fix for bug #109252.
+	* libbalsa/send.c: msg_queue_item_new() doesn't need to set
+	LibBalsaMessage; use libbalsa_mailbox_get_message() instead of
+	LIBBALSA_MAILBOX_LOCAL(outbox)->msg_list; lock/unlock only if
+	BALSA_USE_THREADS.
+	* libbalsa/mailbox_pop3.c: use libbalsa_mailbox_get_message()
+	instead of LIBBALSA_MAILBOX_LOCAL()->msg_list.
+	* libbalsa/mailbox_mbox.c: rewrite message status headers in place,
+	if possible; use new GMime g_mime_parser_set_respect_content_length
+	API to avoid bar From_ lines in libmutt mboxes; use only one
+	GMimeStream to access mbox when syncing; fix interpretation of 'O'
+	status flag ('O' => not recent).
+	* libbalsa/mailbox_local.c: fix comment.
+	* libbalsa/mailbox.c: check whether mailbox->msg_tree has been
+	created.
+
 2004-02-09  Pawel Salek
 
 	* libbalsa/mailbox.c: be more careful when destroying msg_tree.

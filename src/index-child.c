@@ -124,7 +124,7 @@ index_child_destroy (GtkObject * obj)
   IndexChild *ic;
 
   ic = INDEX_CHILD (obj);
-  
+
   mailbox_open_unref (ic->mailbox);
   if (GTK_OBJECT_CLASS (parent_class)->destroy)
     (*GTK_OBJECT_CLASS (parent_class)->destroy) (GTK_OBJECT (ic));
@@ -169,8 +169,11 @@ idle_handler_cb (GtkWidget * widget)
 
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     message_window_new (message);
-  else if (bevent && bevent->button == 3)
-    gtk_menu_popup (GTK_MENU (create_menu (BALSA_INDEX (widget), message)), NULL, NULL, NULL, NULL, bevent->button, bevent->time);
+
+/*  FIXME  this is commented out because it doesn't really work right (below)
+   else if (bevent && bevent->button == 3)
+   gtk_menu_popup (GTK_MENU (create_menu (BALSA_INDEX (widget), message)), NULL, NULL, NULL, NULL, bevent->button, bevent->time);
+ */
   else
     balsa_message_set (BALSA_MESSAGE (((IndexChild *) data)->message), message);
   handler = 0;
@@ -199,7 +202,7 @@ index_select_cb (GtkWidget * widget,
 
   /* this way we only display one message, not lots and lots */
   if (!handler)
-    handler = gtk_idle_add ((GtkFunction)idle_handler_cb, widget);
+    handler = gtk_idle_add ((GtkFunction) idle_handler_cb, widget);
 
 }
 

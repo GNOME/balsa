@@ -1,3 +1,8 @@
+2000-06-08  Peter Williams  <peter@beta.newton.cx>
+
+	* src/balsa-message.c: Much safer fileops now that we
+	make sure that they don't bomb completely :-)
+	
 2000-05-20  Peter Williams  <peter@beta.newton.cx>
 
 	* idl/balsa.idl: No underscores in identifiers as ORBit

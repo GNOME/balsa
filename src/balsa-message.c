@@ -307,18 +307,19 @@ save_MIME_part (GtkObject * o, BalsaSaveFileInfo * info)
   filename = gtk_entry_get_text (GTK_ENTRY (gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (file_entry))));
   s.prefix = 0;
   s.fpout = fopen (filename, "w");
-  fseek (s.fpin, info->body->offset, 0);
   if (!s.fpout)
     {
       char msg[1024];
       GtkWidget *msgbox;
 
-      snprintf (msg, 1023, _ (" Open of %s failed:%s "), filename, strerror (errno));
+      snprintf (msg, 1023, _ (" Open of %s failed:%s "), filename, 
+		strerror (errno));
       msgbox = gnome_message_box_new (msg, "Error", _ ("Ok"), NULL);
       gtk_window_set_modal (GTK_WINDOW (msgbox), TRUE);
       gnome_dialog_run (GNOME_DIALOG (msgbox));
       return;
     }
+  fseek (s.fpin, info->body->offset, 0);
   mutt_decode_attachment (info->body, &s);
   fclose (s.fpin);
   fclose (s.fpout);
@@ -702,6 +703,20 @@ body2canvas (BalsaMessage * bmessage, Message * message)
   message_body_unref (message);
 }
 
+/* error_part:
+   called when processing a part failed
+*/
+static void
+error_part(GnomeCanvasGroup * group, gchar * msg)
+{
+    GnomeCanvasItem *link;
+		   
+    link = balsa_message_text_item(msg, group, 0.0, next_part_height(group),
+				   NULL);
+    balsa_message_text_item_set_bg( link, group, BGLINKCOLOR );
+    g_free(msg);
+}
+
 static void
 other2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
@@ -713,7 +728,14 @@ other2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
   s.fpin = fp;
   mutt_mktemp (tmp_file_name);
 
-  s.fpout = fopen (tmp_file_name, "r+");
+  if( (s.fpout = fopen (tmp_file_name, "r+")) == NULL) {
+      error_part(group, 
+		 g_strdup_printf(
+		     _("other part: error writing to temporary file %s: %s"),
+		     tmp_file_name, strerror(errno)));
+      return;
+  }
+  
   s.prefix = '\0';
   mutt_decode_attachment (bdy, &s);
   fflush (s.fpout);
@@ -799,29 +821,47 @@ image2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
 #endif
   gchar *filename;
 
-  filename = save_mime_part (message, bdy);
+  if( (filename = save_mime_part (message, bdy)) == NULL) {
+      error_part(group, 
+		 g_strdup_printf(
+		     _("image: error writing to temporary file: %s"),
+		     tmp_file_name, strerror(errno)));
+      return;
+  }
 #ifndef USE_PIXBUF
   im = gdk_imlib_load_image (filename);
-  item = gnome_canvas_item_new (group,
-				gnome_canvas_image_get_type (),
-				"image", im,
-				"x", 0.0,
-				"y", next_part_height (group),
-				"width", (double) im->rgb_width,
-				"height", (double) im->rgb_height,
-				"anchor", GTK_ANCHOR_NW,
-				NULL);
+  if(im) 
+      item = gnome_canvas_item_new (group,
+				    gnome_canvas_image_get_type (),
+				    "image", im,
+				    "x", 0.0,
+				    "y", next_part_height (group),
+				    "width", (double) im->rgb_width,
+				    "height", (double) im->rgb_height,
+				    "anchor", GTK_ANCHOR_NW,
+				    NULL);
+  else {
+      item = balsa_message_text_item ("--IMAGE--", group, 0.0,
+				      next_part_height (group), NULL);
+      balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
+  }
 #else
   pb = gdk_pixbuf_new_from_file(filename);
-  item = gnome_canvas_item_new (group,
-				gnome_canvas_pixbuf_get_type(),
-				"pixbuf", pb,
-				"x", 0.0,
-				"y", next_part_height(group),
-				"width", (double) gdk_pixbuf_get_width(pb),
-				"height", (double) gdk_pixbuf_get_height(pb),
-				"anchor", GTK_ANCHOR_NW,
-				NULL);
+  if(pb)
+      item = gnome_canvas_item_new (group,
+				    gnome_canvas_pixbuf_get_type(),
+				    "pixbuf", pb,
+				    "x", 0.0,
+				    "y", next_part_height(group),
+				    "width", (double) gdk_pixbuf_get_width(pb),
+				    "height", (double) gdk_pixbuf_get_height(pb),
+				    "anchor", GTK_ANCHOR_NW,
+				    NULL);
+  else {
+      item = balsa_message_text_item ("--IMAGE--", group, 0.0,
+				      next_part_height (group), NULL);
+      balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
+  }
 #endif
   info = balsa_save_file_info_new (NULL, message, bdy);
   gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), info);
@@ -1021,8 +1061,15 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gr
 	s.flags = 0;
 
 	mutt_mktemp( tmp_file_name );
-	s.fpout = fopen( tmp_file_name, "w+" );
-
+	if( (s.fpout = fopen( tmp_file_name, "w+")) == NULL ) {
+	    error_part(
+		group, 
+		g_strdup_printf(
+		    _("text part: error writing to temporary file %s: %s"),
+		    tmp_file_name, strerror(errno)));
+	    return;
+	}
+	    
 
 	mutt_decode_attachment( bdy, &s );
 	fflush( s.fpout );
@@ -1119,7 +1166,8 @@ part2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
       if (balsa_app.debug)
 	fprintf (stderr, "part: message\n");
       message2canvas (message, bdy, fp, group);
-      fprintf (stderr, "part end: multipart\n");
+      if (balsa_app.debug)
+	      fprintf (stderr, "part end: multipart\n");
       break;
     case TYPEMULTIPART:
       if (balsa_app.debug)
@@ -1217,12 +1265,10 @@ save_mime_part (Message * message, BODY * body)
   mutt_mktemp (msg_filename);
 
   s.prefix = 0;
-  s.fpout = fopen (msg_filename, "w");
+  if( (s.fpout = fopen (msg_filename, "w")) == NULL) {
+      return NULL;
+  }
   fseek (s.fpin, body->offset, 0);
-  if (!s.fpout)
-    {
-      /* error */
-    }
   mutt_decode_attachment (body, &s);
   fclose (s.fpin);
   fclose (s.fpout);

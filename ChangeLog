@@ -30,11 +30,11 @@
 
 2000-08-27  Carlos Morgado  <chbm@chbm.nu>
 
-	* save-restore.c, mailbox-conf.c: apop support (lacking GUI)
-	* pop.c: apop support merged from mutt 1.2
-	* init.h, mutt.h: APOP option 
-	* md5c.c, md5.h: added from mutt for apop
-	* mailbox_pop3.[ch]: support for use_apop 
+	* src/save-restore.c, src/mailbox-conf.c: apop support (lacking GUI)
+	* libmutt/pop.c: apop support merged from mutt 1.2
+	* libmutt/init.h, libmutt/mutt.h: APOP option 
+	* libmutt/md5c.c, libmutt/md5.h: added from mutt for apop
+	* libbalsa/mailbox_pop3.[ch]: support for use_apop 
 
 2000-08-26  Ian Campbell  <ijc25@cam.ac.uk>
 

@@ -1,3 +1,7 @@
+2000-04-08  Matthew Guenther <mguenther@netcom.ca>
+	* src/balsa-mblist.c (balsa_mblist_insert_mailbox): Fixed bug with 
+	mailbox info.
+
 2000-04-08  Fatih Demir	<kabalak@gmx.net>
 
 	* balsa.desktop : Added the Turkish translation .

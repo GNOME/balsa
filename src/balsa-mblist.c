@@ -305,11 +305,19 @@ balsa_mblist_insert_mailbox (BalsaMBList * mblist,
 {
   GtkCTreeNode *ctnode;
   MailboxNode *mbnode;
-  gchar *text[1];
+#ifdef BALSA_SHOW_INFO
+  gchar* text[3];
+#else
+  gchar* text[1];
+#endif /* BALSA_SHOW_INFO */
   
   g_assert(mailbox!=NULL);
   text[0] = mailbox->name;
-
+#ifdef BALSA_SHOW_INFO
+  text[1] = "";
+  text[2] = "";
+#endif
+      
 #ifdef BALSA_SHOW_INFO
   if (mblist->display_content_info)
   {
@@ -327,12 +335,6 @@ balsa_mblist_insert_mailbox (BalsaMBList * mblist,
   gtk_ctree_node_set_row_data_full (GTK_CTREE (mblist), ctnode, mbnode,
 				    (GtkDestroyNotify)mailbox_node_destroy);
 
-#ifdef BALSA_SHOW_INFO
-  if (mblist->display_content_info){
-    gtk_ctree_node_set_text (GTK_CTREE (mblist), ctnode, 1, "");
-    gtk_ctree_node_set_text (GTK_CTREE (mblist), ctnode, 2, "");
-  }
-#endif
 }
 
 /* balsa_mblist_redraw 
@@ -739,12 +741,13 @@ balsa_mblist_check_new (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
   /* If it's not local the mail-check function won't work, and if it's
    * already open we can get conflicting results since we're checking
    * the file on disk as opposed to the mailbox in memory */
-  if (BALSA_IS_MAILBOX_LOCAL (mailbox) && mailbox->open_ref == 0)
+  if (BALSA_IS_MAILBOX_LOCAL (mailbox) && mailbox->open_ref == 0) {
   /* Call the actual function to determine the presence of new unread
    * messages */
      mailbox->has_unread_messages = 
-	mailbox_have_new_messages (MAILBOX_LOCAL (mailbox)->path);
-
+             mailbox_have_new_messages (MAILBOX_LOCAL (mailbox)->path);
+  } 
+  
   balsa_mblist_mailbox_style (ctree, node, cnode_data
 #ifdef BALSA_SHOW_INFO
                               ,BALSA_MBLIST (ctree)->display_content_info

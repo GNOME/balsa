@@ -1,3 +1,16 @@
+2004-07-08  Albrecht Dreß
+
+	* configure.in: require gmime-2.1.7.
+	* libbalsa/rfc3156.c:
+	* libbalsa/gmime-part-rfc2440.[hc]: 
+	* libbalsa/gmime-gpgme-{context,signature}.[ch]: GPGME fixes. See eg.
+	 http://mail.gnome.org/archives/balsa-list/2004-May/msg00067.html
+
+2004-07-07  Pawel Salek
+
+	* libbalsa/send.c: fix sendmail build.
+	* libbalsa/address-book-{vcard,ldif}.c: correct error checking.
+
 2004-07-06  Pawel Salek
 
 	* NEWS, configure.in: release 2.1.91.

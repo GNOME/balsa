@@ -22,19 +22,25 @@
 #ifndef __GMIME_PART_RFC2440_H__
 #define __GMIME_PART_RFC2440_H__
 
+
 #include <gmime/gmime.h>
 #include "gmime-gpgme-context.h"
+
 
 #ifdef __cplusplus
 extern "C" {
 
-#ifdef MAKE_EMACS_HAPPY
+#  ifdef MAKE_EMACS_HAPPY
 }
-#endif				/*  */
+#  endif
 #endif				/* __cplusplus */
+
+
 typedef enum _GMimePartRfc2440Mode GMimePartRfc2440Mode;
-enum _GMimePartRfc2440Mode { GMIME_PART_RFC2440_NONE,
-    GMIME_PART_RFC2440_SIGNED, GMIME_PART_RFC2440_ENCRYPTED
+enum _GMimePartRfc2440Mode { 
+    GMIME_PART_RFC2440_NONE,
+    GMIME_PART_RFC2440_SIGNED,
+    GMIME_PART_RFC2440_ENCRYPTED
 };
 GType g_mime_part_rfc2440_get_type(void);
 
@@ -50,9 +56,9 @@ int g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
 				     GPtrArray * recipients,
 				     const char *sign_userid,
 				     GError ** err);
-GMimeCipherValidity *g_mime_part_rfc2440_verify(GMimePart * part,
-						GMimeGpgmeContext * ctx,
-						GError ** err);
+GMimeSignatureValidity *g_mime_part_rfc2440_verify(GMimePart * part,
+						   GMimeGpgmeContext * ctx,
+						   GError ** err);
 gint g_mime_part_rfc2440_decrypt(GMimePart * part,
 				 GMimeGpgmeContext * ctx, GError ** err);
 

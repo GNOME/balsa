@@ -3,6 +3,7 @@ SUBDIRS = imap
 noinst_LIBRARIES = libbalsa.a
 
 
+if BUILD_WITH_GPGME
 libbalsa_gpgme_extra = 		\
 	gmime-gpgme-context.h	\
 	gmime-gpgme-context.c	\
@@ -10,7 +11,17 @@ libbalsa_gpgme_extra = 		\
 	gmime-part-rfc2440.c	\
 	gmime-gpgme-signature.h	\
 	gmime-gpgme-signature.c
-
+libbalsa_gpgme_extra_dist =
+else
+libbalsa_gpgme_extra =
+libbalsa_gpgme_extra_dist =	\
+	gmime-gpgme-context.h	\
+	gmime-gpgme-context.c	\
+	gmime-part-rfc2440.h	\
+	gmime-part-rfc2440.c	\
+	gmime-gpgme-signature.h	\
+	gmime-gpgme-signature.c
+endif
 
 
 libbalsa_a_SOURCES = 		\
@@ -97,13 +108,15 @@ libbalsa_a_SOURCES = 		\
 
 EXTRA_DIST = \
 	libbalsa-marshal.list	\
-	padlock-keyhole.xpm
+	padlock-keyhole.xpm	\
+	${libbalsa_gpgme_extra_dist}
 
 INCLUDES= -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	-I${top_srcdir}/libbalsa/imap \
 	$(BALSA_CFLAGS)
 
-DEFS= 
+# DEFS = -DG_DISABLE_DEPRECATED -DGMIME_DISABLE_DEPRECATED
+DEFS = -DG_DISABLE_DEPRECATED
 
 
 #Signal marshallers

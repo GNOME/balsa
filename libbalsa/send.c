@@ -32,7 +32,7 @@
 #include <pthread.h>
 #endif
 
-#include <gnome.h>
+#include <libgnome/gnome-i18n.h>
 #include <string.h>
 
 #include "libbalsa.h"
@@ -47,8 +47,8 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/utsname.h>
 #endif
+#include <sys/utsname.h>
 
 typedef struct _MessageQueueItem MessageQueueItem;
 
@@ -953,10 +953,10 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 gboolean 
 libbalsa_process_queue(LibBalsaMailbox* outbox, gboolean debug)
 {
-    MessageQueueItem *mqi, *new_message;
+    MessageQueueItem *mqi = NULL, *new_message;
     SendMessageInfo *send_message_info;
-    GList *lista;
-    LibBalsaMessage *queu;
+    LibBalsaMessage *msg;
+    guint msgno;
 
     /* We do messages in queue now only if where are not sending them already */
 
@@ -976,41 +976,37 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gboolean debug)
 	send_unlock();
 	return FALSE;
     }
-    lista = outbox->message_list; /* FIXME: breaks a non-libESMTP build? */
-    if (!lista) {
-	libbalsa_mailbox_close(outbox);
-	sending_threads--;
-	send_unlock();
-	return TRUE;
-    }
-	
-    mqi = message_queue;
-    while (lista != NULL) {
+    for (msgno = libbalsa_mailbox_total_messages(outbox);
+	 msgno > 0; msgno--) {
         LibBalsaMsgCreateResult created;
+	msg = libbalsa_mailbox_get_message(outbox, msgno);
 
-	queu = LIBBALSA_MESSAGE(lista->data);
-        if (LIBBALSA_MESSAGE_HAS_FLAG(queu,
+        if (LIBBALSA_MESSAGE_HAS_FLAG(msg,
                                       (LIBBALSA_MESSAGE_FLAG_FLAGGED |
                                        LIBBALSA_MESSAGE_FLAG_DELETED)))
             continue;
 
-        libbalsa_message_body_ref(queu, TRUE, TRUE); /* FIXME: do we need
+        libbalsa_message_body_ref(msg, TRUE, TRUE); /* FIXME: do we need
                                                       * all headers? */
 	new_message = msg_queue_item_new();
-        created = libbalsa_fill_msg_queue_item_from_queu(queu, new_message);
-        libbalsa_message_body_unref(queu);
+        created = libbalsa_fill_msg_queue_item_from_queu(msg, new_message);
+        libbalsa_message_body_unref(msg);
 	
 	if (created != LIBBALSA_MESSAGE_CREATE_OK) {
 	    msg_queue_item_destroy(new_message);
 	} else {
+	    GList * messages = g_list_prepend(NULL, msg);
+
+            libbalsa_messages_change_flag(messages,
+                                          LIBBALSA_MESSAGE_FLAG_FLAGGED,
+                                          TRUE);
+	    g_list_free(messages);
 	    if (mqi)
 		mqi->next_message = new_message;
 	    else
 		message_queue = new_message;
-	    
 	    mqi = new_message;
 	}
-	lista = lista->next;
     }
 
     send_message_info=send_message_info_new(outbox, debug);

@@ -22,25 +22,31 @@
 #ifndef __GMIME_GPGME_CONTEXT_H__
 #define __GMIME_GPGME_CONTEXT_H__
 
-#ifdef __cplusplus
-extern "C" {
-#ifdef MAKE_EMACS_HAPPY
-}
-#endif
-#endif				/* __cplusplus */
 #include <gmime/gmime.h>
 #include <gpgme.h>
 #include "gmime-gpgme-signature.h"
+
+
+#ifdef __cplusplus
+extern "C" {
+#  ifdef MAKE_EMACS_HAPPY
+}
+#  endif
+#endif				/* __cplusplus */
+
+
 #define GMIME_TYPE_GPGME_CONTEXT            (g_mime_gpgme_context_get_type ())
 #define GMIME_GPGME_CONTEXT(obj)            (GMIME_CHECK_CAST ((obj), GMIME_TYPE_GPGME_CONTEXT, GMimeGpgmeContext))
 #define GMIME_GPGME_CONTEXT_CLASS(klass)    (GMIME_CHECK_CLASS_CAST ((klass), GMIME_TYPE_GPGME_CONTEXT, GMimeGpgmeContextClass))
 #define GMIME_IS_GPGME_CONTEXT(obj)         (GMIME_CHECK_TYPE ((obj), GMIME_TYPE_GPGME_CONTEXT))
 #define GMIME_IS_GPGME_CONTEXT_CLASS(klass) (GMIME_CHECK_CLASS_TYPE ((klass), GMIME_TYPE_GPGME_CONTEXT))
 #define GMIME_GPGME_CONTEXT_GET_CLASS(obj)  (GMIME_CHECK_GET_CLASS ((obj), GMIME_TYPE_GPGME_CONTEXT, GMimeGpgmeContextClass))
+
 #define GPG_ERR_KEY_SELECTION          GPG_ERR_USER_14
 #define GPG_ERR_TRY_AGAIN              GPG_ERR_USER_15
 #define GPG_ERR_NOT_SIGNED             GPG_ERR_USER_16
 #define GPGME_USE_GMIME_SESSION_CB     (gpgme_passphrase_cb_t)(-1)
+
 typedef struct _GMimeGpgmeContext GMimeGpgmeContext;
 typedef struct _GMimeGpgmeContextClass GMimeGpgmeContextClass;
 
@@ -55,7 +61,7 @@ struct _GMimeGpgmeContext {
     GMimeCipherContext parent_object;
 
     gpgme_ctx_t gpgme_ctx;	/* gpgme context */
-    gboolean rfc2440_mode;	/* set context to RFC 2440 mode */
+    gboolean singlepart_mode;	/* set context to single-part mode (RFC 2440, 2633) */
     gchar *micalg;		/* hash algorithm (signing only) */
     GMimeGpgmeSigstat *sig_state;	/* signature status */
     GMimeGpgmeKeySelectCB key_select_cb;	/* key selection callback */

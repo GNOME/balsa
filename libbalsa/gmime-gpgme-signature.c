@@ -19,10 +19,6 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
-
-#ifdef HAVE_GPGME
-
 #include <gpgme.h>
 #include <string.h>
 #include <glib.h>
@@ -127,8 +123,13 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
 	    sig_stat->sign_uid = fix_EMail_info(g_strdup(uid->uid));
 	uid = uid->next;
     }
-    if (key->subkeys)
+    if (key->subkeys) {
 	sig_stat->key_created = key->subkeys->timestamp;
+	sig_stat->key_revoked = key->subkeys->revoked;
+	sig_stat->key_expired = key->subkeys->expired;
+	sig_stat->key_disabled = key->subkeys->disabled;
+	sig_stat->key_invalid = key->subkeys->invalid;
+    }
     gpgme_key_unref(key);
 
     return sig_stat;
@@ -226,5 +227,3 @@ fix_EMail_info(gchar * str)
     g_string_free(result, FALSE);
     return p;
 }
-
-#endif /* HAVE_GPGME */

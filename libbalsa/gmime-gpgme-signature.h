@@ -24,12 +24,15 @@
 #include <gpgme.h>
 #include <glib-object.h>
 
+
 #ifdef __cplusplus
 extern "C" {
-#ifdef MAKE_EMACS_HAPPY
+#  ifdef MAKE_EMACS_HAPPY
 }
-#endif
+#  endif
 #endif				/* __cplusplus */
+
+
 /* the signature status as returned by gpgme as a GObject */
 #define GMIME_TYPE_GPGME_SIGSTAT	    (g_mime_gpgme_sigstat_get_type())
 #define GMIME_GPGME_SIGSTAT(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GMIME_TYPE_GPGME_SIGSTAT, GMimeGpgmeSigstat))
@@ -37,6 +40,7 @@ extern "C" {
 #define GMIME_IS_GPGME_SIGSTAT(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GMIME_TYPE_GPGME_SIGSTAT))
 #define GMIME_IS_GPGME_SIGSTAT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), GMIME_TYPE_GPGME_SIGSTAT))
 #define GMIME_GPGME_SIGSTAT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), GMIME_TYPE_GPGME_SIGSTAT, GMimeGpgmeSigstatClass))
+
 typedef struct _GMimeGpgmeSigstat GMimeGpgmeSigstat;
 typedef struct _GMimeGpgmeSigstatClass GMimeGpgmeSigstatClass;
 
@@ -57,6 +61,10 @@ struct _GMimeGpgmeSigstat {
     gchar *issuer_name;
     gchar *chain_id;
     time_t key_created;
+    gboolean key_revoked;
+    gboolean key_expired;
+    gboolean key_disabled;
+    gboolean key_invalid;
     time_t sign_time;
 };
 

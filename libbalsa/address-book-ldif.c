@@ -695,7 +695,7 @@ libbalsa_address_book_ldif_add_address(LibBalsaAddressBook * ab,
     for(list = new_address->address_list; list; list = g_list_next(list)) {
 	if (list->data && *(gchar*)(list->data)) {
 	    value_spec = string_to_value_spec((gchar *) list->data);
-	    if(fprintf(fp, "mail:%s\n", value_spec) != 1)
+	    if(fprintf(fp, "mail:%s\n", value_spec) < 0)
                 res = LBABERR_CANNOT_WRITE;
 	    g_free(value_spec);
 	}

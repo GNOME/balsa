@@ -19,34 +19,71 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
-
-#ifdef HAVE_GPGME
 #include <string.h>
 
 #include <gmime/gmime.h>
 #include "gmime-part-rfc2440.h"
 
 
+#define RFC2440_BUF_LEN    4096
+
 GMimePartRfc2440Mode
 g_mime_part_check_rfc2440(GMimePart * part)
 {
-    size_t content_len;
-    const gchar *content;
+    GMimeDataWrapper * wrapper;
+    GMimeStream * stream;
+    ssize_t slen;
+    gchar buf[RFC2440_BUF_LEN];
+    GMimePartRfc2440Mode retval = GMIME_PART_RFC2440_NONE;
 
-    content = g_mime_part_get_content(part, &content_len);
-    if (content_len <= 0)
-	return GMIME_PART_RFC2440_NONE;
+    /* try to get the content stream */
+    wrapper = g_mime_part_get_content_object(part);
+    g_return_val_if_fail(wrapper, GMIME_PART_RFC2440_NONE);
+    stream = g_mime_data_wrapper_get_stream(wrapper);
+    g_object_unref(wrapper);
+    if (!stream || (slen = g_mime_stream_length(stream)) == -1)
+	return retval;
+    g_mime_stream_reset(stream);
 
-    if (!strncmp(content, "-----BEGIN PGP MESSAGE-----", 27) &&
-	strstr(content, "-----END PGP MESSAGE-----"))
-	return GMIME_PART_RFC2440_ENCRYPTED;
-    else if (!strncmp(content, "-----BEGIN PGP SIGNED MESSAGE-----", 34) &&
-	     strstr(content, "-----BEGIN PGP SIGNATURE-----") &&
-	     strstr(content, "-----END PGP SIGNATURE-----"))
-	return GMIME_PART_RFC2440_SIGNED;
-    else
-	return GMIME_PART_RFC2440_NONE;
+    /* check if the complete stream fits in the buffer */
+    if (slen < RFC2440_BUF_LEN - 1) {
+	g_mime_stream_read(stream, buf, slen);
+	buf[slen] = '\0';
+
+	if (!strncmp(buf, "-----BEGIN PGP MESSAGE-----", 27) &&
+	    strstr(buf, "-----END PGP MESSAGE-----"))
+	    retval = GMIME_PART_RFC2440_ENCRYPTED;
+	else if (!strncmp(buf, "-----BEGIN PGP SIGNED MESSAGE-----", 34)) {
+	    gchar * p1, * p2;
+
+	    p1 = strstr(buf, "-----BEGIN PGP SIGNATURE-----");
+	    p2 = strstr(buf, "-----END PGP SIGNATURE-----");
+	    if (p1 && p2 && p2 > p1)
+		retval = GMIME_PART_RFC2440_SIGNED;
+	}
+    } else {
+	/* check if the beginning of the stream matches */
+	g_mime_stream_read(stream, buf, 34);
+	g_mime_stream_seek(stream, 1 - RFC2440_BUF_LEN,  GMIME_STREAM_SEEK_END);
+	if (!strncmp(buf, "-----BEGIN PGP MESSAGE-----", 27)) {
+	    g_mime_stream_read(stream, buf, RFC2440_BUF_LEN - 1);
+	    buf[RFC2440_BUF_LEN - 1] = '\0';
+	    if (strstr(buf, "-----END PGP MESSAGE-----"))
+		retval = GMIME_PART_RFC2440_ENCRYPTED;
+	} else if (!strncmp(buf, "-----BEGIN PGP SIGNED MESSAGE-----", 34)) {
+	    gchar * p1, * p2;
+
+	    g_mime_stream_read(stream, buf, RFC2440_BUF_LEN - 1);
+	    buf[RFC2440_BUF_LEN - 1] = '\0';
+	    p1 = strstr(buf, "-----BEGIN PGP SIGNATURE-----");
+	    p2 = strstr(buf, "-----END PGP SIGNATURE-----");
+	    if (p1 && p2 && p2 > p1)
+		retval = GMIME_PART_RFC2440_SIGNED;
+	}
+    }
+
+    g_object_unref(stream);
+    return retval;
 }
 
 
@@ -65,8 +102,6 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
 				 GPtrArray * recipients,
 				 const char *sign_userid, GError ** err)
 {
-    const gchar *raw_content;
-    size_t raw_length;
     GMimeDataWrapper *wrapper;
     GMimeStream *stream, *cipherstream;
     gint result;
@@ -78,14 +113,16 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
     g_return_val_if_fail(recipients != NULL || sign_userid != NULL, -1);
 
     /* get the raw content */
-    raw_content = g_mime_part_get_content(part, &raw_length);
-    stream = g_mime_stream_mem_new_with_buffer(raw_content, raw_length);
+    wrapper = g_mime_part_get_content_object(part);
+    stream = g_mime_data_wrapper_get_stream(wrapper);
+    g_object_unref(wrapper);
+    g_mime_stream_reset(stream);
 
     /* construct the stream for the crypto output */
     cipherstream = g_mime_stream_mem_new();
 
     /* do the crypto operation */
-    ctx->rfc2440_mode = TRUE;
+    ctx->singlepart_mode = TRUE;
     if (recipients == NULL)
 	result =
 	    g_mime_cipher_sign(GMIME_CIPHER_CONTEXT(ctx), sign_userid,
@@ -139,14 +176,13 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
  * set on err to provide more information. Upon success, the content
  * of part is replaced by the verified output of the crypto engine.
  */
-GMimeCipherValidity *
+GMimeSignatureValidity *
 g_mime_part_rfc2440_verify(GMimePart * part,
 			   GMimeGpgmeContext * ctx, GError ** err)
 {
-    const gchar *raw_content;
-    size_t raw_length;
     GMimeStream *stream, *plainstream;
-    GMimeCipherValidity *valid;
+    GMimeDataWrapper * wrapper;
+    GMimeSignatureValidity *valid;
 
     g_return_val_if_fail(GMIME_IS_PART(part), NULL);
     g_return_val_if_fail(GMIME_IS_GPGME_CONTEXT(ctx), NULL);
@@ -154,18 +190,22 @@ g_mime_part_rfc2440_verify(GMimePart * part,
 			 NULL);
 
     /* get the raw content */
-    raw_content = g_mime_part_get_content(GMIME_PART(part), &raw_length);
-    stream = g_mime_stream_mem_new_with_buffer(raw_content, raw_length);
+    wrapper = g_mime_part_get_content_object(GMIME_PART(part));
+    stream = g_mime_stream_mem_new();
+    g_mime_data_wrapper_write_to_stream(wrapper, stream);
+    g_mime_stream_reset(stream);
+    g_object_unref(wrapper);
 
     /* construct the stream for the checked output */
     plainstream = g_mime_stream_mem_new();
 
     /* verify the signature */
-    ctx->rfc2440_mode = TRUE;
+    ctx->singlepart_mode = TRUE;
     valid =
 	g_mime_cipher_verify(GMIME_CIPHER_CONTEXT(ctx),
 			     GMIME_CIPHER_HASH_DEFAULT, stream,
 			     plainstream, err);
+    g_object_unref(stream);
 
     /* upon success, replace the signed content by the checked one */
     if (valid) {
@@ -176,7 +216,6 @@ g_mime_part_rfc2440_verify(GMimePart * part,
 	g_object_unref(wrapper);
     }
     g_object_unref(plainstream);
-    g_object_unref(stream);
 
     return valid;
 }
@@ -195,9 +234,8 @@ int
 g_mime_part_rfc2440_decrypt(GMimePart * part,
 			    GMimeGpgmeContext * ctx, GError ** err)
 {
-    const gchar *raw_content;
-    size_t raw_length;
     GMimeStream *stream, *plainstream;
+    GMimeDataWrapper * wrapper;
     gint result;
 
     g_return_val_if_fail(GMIME_IS_PART(part), -1);
@@ -206,8 +244,11 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
 			 NULL, -1);
 
     /* get the raw content */
-    raw_content = g_mime_part_get_content(GMIME_PART(part), &raw_length);
-    stream = g_mime_stream_mem_new_with_buffer(raw_content, raw_length);
+    wrapper = g_mime_part_get_content_object(GMIME_PART(part));
+    stream = g_mime_stream_mem_new();
+    g_mime_data_wrapper_write_to_stream(wrapper, stream);
+    g_mime_stream_reset(stream);
+    g_object_unref(wrapper);
 
     /* construct the stream for the decrypted output */
     plainstream = g_mime_stream_mem_new();
@@ -258,5 +299,3 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
 
     return result;
 }
-
-#endif /* HAVE_GPGME */

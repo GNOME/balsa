@@ -20,7 +20,6 @@
  */
 #include "config.h"
 
-#ifdef HAVE_GPGME
 #include <string.h>
 #include <glib.h>
 #include <gmime/gmime.h>
@@ -60,11 +59,11 @@ static int g_mime_gpgme_sign(GMimeCipherContext * ctx, const char *userid,
 			     GMimeCipherHash hash, GMimeStream * istream,
 			     GMimeStream * ostream, GError ** err);
 
-static GMimeCipherValidity *g_mime_gpgme_verify(GMimeCipherContext * ctx,
-						GMimeCipherHash hash,
-						GMimeStream * istream,
-						GMimeStream * sigstream,
-						GError ** err);
+static GMimeSignatureValidity *g_mime_gpgme_verify(GMimeCipherContext * ctx,
+						   GMimeCipherHash hash,
+						   GMimeStream * istream,
+						   GMimeStream * sigstream,
+						   GError ** err);
 
 static int g_mime_gpgme_encrypt(GMimeCipherContext * ctx, gboolean sign,
 				const char *userid, GPtrArray * recipients,
@@ -85,6 +84,8 @@ static gpgme_error_t g_mime_session_passphrase(void *HOOK,
 
 /* callbacks for gpgme file handling */
 static ssize_t g_mime_gpgme_stream_rd(GMimeStream * stream, void *buffer,
+				      size_t size);
+static ssize_t g_mime_gpgme_stream_wr(GMimeStream * stream, void *buffer,
 				      size_t size);
 static void cb_data_release(void *handle);
 
@@ -166,7 +167,7 @@ static void
 g_mime_gpgme_context_init(GMimeGpgmeContext * ctx,
 			  GMimeGpgmeContextClass * klass)
 {
-    ctx->rfc2440_mode = FALSE;
+    ctx->singlepart_mode = FALSE;
     ctx->micalg = NULL;
     ctx->sig_state = NULL;
     ctx->key_select_cb = NULL;
@@ -320,6 +321,16 @@ g_mime_gpgme_stream_rd(GMimeStream * stream, void *buffer, size_t size)
 
 
 /*
+ * callback to write data to a stream
+ */
+static ssize_t
+g_mime_gpgme_stream_wr(GMimeStream * stream, void *buffer, size_t size)
+{
+    return g_mime_stream_write(stream, buffer, size);
+}
+
+
+/*
  * dummy function for callback based gpgme data objects
  */
 static void
@@ -347,12 +358,10 @@ g_mime_gpgme_sign(GMimeCipherContext * context, const char *userid,
     gpgme_protocol_t protocol;
     gpgme_error_t err;
     gpgme_data_t in, out;
-    size_t datasize;
-    gchar *signature_buffer;
     gpgme_sign_result_t sign_result;
     struct gpgme_data_cbs cbs = {
 	(gpgme_data_read_cb_t) g_mime_gpgme_stream_rd,	/* read method */
-	NULL,			/* write method */
+	(gpgme_data_write_cb_t) g_mime_gpgme_stream_wr,	/* write method */
 	NULL,			/* seek method */
 	cb_data_release		/* release method */
     };
@@ -364,16 +373,11 @@ g_mime_gpgme_sign(GMimeCipherContext * context, const char *userid,
     protocol = gpgme_get_protocol(gpgme_ctx);
 
     /* set the signature mode */
-    if (ctx->rfc2440_mode) {
+    if (ctx->singlepart_mode) {
 	if (protocol == GPGME_PROTOCOL_OpenPGP)
 	    sig_mode = GPGME_SIG_MODE_CLEAR;
-	else {
-	    if (error)
-		g_set_error(error, GPGME_ERROR_QUARK,
-			    GPG_ERR_INV_ENGINE,
-			    _("invalid crypto engine for RFC2440"));
-	    return -1;
-	}
+	else
+	    sig_mode = GPGME_SIG_MODE_NORMAL;
     } else
 	sig_mode = GPGME_SIG_MODE_DETACH;
 
@@ -381,11 +385,10 @@ g_mime_gpgme_sign(GMimeCipherContext * context, const char *userid,
     if (!gpgme_add_signer(ctx, userid, error))
 	return -1;
 
-    /* let gpgme create the signature */
-    gpgme_set_armor(gpgme_ctx, 1);
+    /* OpenPGP signatures are ASCII armored */
+    gpgme_set_armor(gpgme_ctx, protocol == GPGME_PROTOCOL_OpenPGP);
 
     /* set passphrase callback */
-    /* FIXME: don't set passphrase cb when a gpg-agent is running */
     if (protocol == GPGME_PROTOCOL_OpenPGP) {
 	if (ctx->passphrase_cb == GPGME_USE_GMIME_SESSION_CB)
 	    gpgme_set_passphrase_cb(gpgme_ctx, g_mime_session_passphrase,
@@ -406,7 +409,8 @@ g_mime_gpgme_sign(GMimeCipherContext * context, const char *userid,
 			gpgme_strsource(err), gpgme_strerror(err));
 	return -1;
     }
-    if ((err = gpgme_data_new(&out)) != GPG_ERR_NO_ERROR) {
+    if ((err = gpgme_data_new_from_cbs(&out, &cbs,
+				       ostream)) != GPG_ERR_NO_ERROR) {
 	if (error)
 	    g_set_error(error, GPGME_ERROR_QUARK, err,
 			_("%s: could not create new data object: %s"),
@@ -439,20 +443,9 @@ g_mime_gpgme_sign(GMimeCipherContext * context, const char *userid,
 	    g_strdup(gpgme_hash_algo_name
 		     (sign_result->signatures->hash_algo));
 
+    /* release gpgme data buffers */
     gpgme_data_release(in);
-    if (!
-	(signature_buffer =
-	 gpgme_data_release_and_get_mem(out, &datasize))) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: could not get data: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
-	return -1;
-    }
-
-    /* success: write the signature */
-    g_mime_stream_write(ostream, signature_buffer, datasize);
-    g_free(signature_buffer);
+    gpgme_data_release(out);
 
     return 0;
 }
@@ -460,12 +453,12 @@ g_mime_gpgme_sign(GMimeCipherContext * context, const char *userid,
 
 /*
  * In standard mode, verify that sigstream contains a detached signature for
- * istream. In RFC 2440 mode, istream contains clearsigned data, and sigstream
- * will be filled with the verified plaintext. The routine returns a validity
- * object. More information is saved in the context's signature object. On
- * error error ist set accordingly.
+ * istream. In single-part mode (RFC 2440, RFC 2633 application/pkcs7-mime),
+ * istream contains clearsigned data, and sigstream will be filled with the
+ * verified plaintext. The routine returns a validity object. More information
+ * is saved in the context's signature object. On error error ist set accordingly.
  */
-static GMimeCipherValidity *
+static GMimeSignatureValidity *
 g_mime_gpgme_verify(GMimeCipherContext * context, GMimeCipherHash hash,
 		    GMimeStream * istream, GMimeStream * sigstream,
 		    GError ** error)
@@ -475,31 +468,19 @@ g_mime_gpgme_verify(GMimeCipherContext * context, GMimeCipherHash hash,
     gpgme_protocol_t protocol;
     gpgme_error_t err;
     gpgme_data_t msg, sig;
-    GMimeCipherValidity *validity;
+    GMimeSignatureValidity *validity;
     struct gpgme_data_cbs cbs = {
 	(gpgme_data_read_cb_t) g_mime_gpgme_stream_rd,	/* read method */
-	NULL,			/* write method */
+	(gpgme_data_write_cb_t) g_mime_gpgme_stream_wr,	/* write method */
 	NULL,			/* seek method */
 	cb_data_release		/* release method */
     };
-
-    g_return_val_if_fail(ctx, NULL);
-    g_return_val_if_fail(ctx->gpgme_ctx, NULL);
-    gpgme_ctx = ctx->gpgme_ctx;
 
     /* some paranoia checks */
     g_return_val_if_fail(ctx, NULL);
     g_return_val_if_fail(ctx->gpgme_ctx, NULL);
     gpgme_ctx = ctx->gpgme_ctx;
     protocol = gpgme_get_protocol(gpgme_ctx);
-
-    /* check for protocol collision */
-    if (ctx->rfc2440_mode && protocol != GPGME_PROTOCOL_OpenPGP) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_INV_ENGINE,
-			_("invalid crypto engine for RFC2440"));
-	return NULL;
-    }
 
     /* create the message stream */
     if ((err = gpgme_data_new_from_cbs(&msg, &cbs, istream)) !=
@@ -511,32 +492,20 @@ g_mime_gpgme_verify(GMimeCipherContext * context, GMimeCipherHash hash,
 	return NULL;
     }
 
-    if (ctx->rfc2440_mode) {
-	/* create data object for plaintext */
-	if ((err = gpgme_data_new(&sig)) != GPG_ERR_NO_ERROR) {
-	    if (error)
-		g_set_error(error, GPGME_ERROR_QUARK, err,
-			    _("%s: could not create new data object: %s"),
-			    gpgme_strsource(err), gpgme_strerror(err));
-	    gpgme_data_release(msg);
-	    return NULL;
-	}
-    } else {
-	/* create the detached signature stream */
-	/* FIXME: what about S/MIME base64 encoded sigs?!? */
-	if ((err = gpgme_data_new_from_cbs(&sig, &cbs, sigstream)) !=
-	    GPG_ERR_NO_ERROR) {
-	    if (error)
-		g_set_error(error, GPGME_ERROR_QUARK, err,
-			    _("%s: could not get data from stream: %s"),
-			    gpgme_strsource(err), gpgme_strerror(err));
-	    gpgme_data_release(msg);
-	    return NULL;
-	}
+    /* create data object for the detached signature stream or the "decrypted"
+     * plaintext */
+    if ((err = gpgme_data_new_from_cbs(&sig, &cbs, sigstream)) !=
+	GPG_ERR_NO_ERROR) {
+	if (error)
+	    g_set_error(error, GPGME_ERROR_QUARK, err,
+			_("%s: could not get data from stream: %s"),
+			gpgme_strsource(err), gpgme_strerror(err));
+	gpgme_data_release(msg);
+	return NULL;
     }
 
     /* verify the signature */
-    if (ctx->rfc2440_mode)
+    if (ctx->singlepart_mode)
 	err = gpgme_op_verify(gpgme_ctx, msg, NULL, sig);
     else
 	err = gpgme_op_verify(gpgme_ctx, sig, msg, NULL);
@@ -552,34 +521,25 @@ g_mime_gpgme_verify(GMimeCipherContext * context, GMimeCipherHash hash,
 	ctx->sig_state =
 	    g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx);
 
-    validity = g_mime_cipher_validity_new();
-    g_mime_cipher_validity_set_valid(validity,
-				     ctx->sig_state &&
-				     ctx->sig_state->status ==
-				     GPG_ERR_NO_ERROR ? TRUE : FALSE);
-    g_mime_cipher_validity_set_description(validity, NULL);
-
-    gpgme_data_release(msg);
-    if (ctx->rfc2440_mode) {
-	gchar *plain_buffer;
-	size_t data_size;
-
-	if (!
-	    (plain_buffer =
-	     gpgme_data_release_and_get_mem(sig, &data_size))) {
-	    if (error)
-		g_set_error(error, GPGME_ERROR_QUARK, err,
-			    _("%s: could not get data: %s"),
-			    gpgme_strsource(err), gpgme_strerror(err));
-	    g_mime_cipher_validity_free(validity);
-	    return NULL;
-	}
-
-	/* success: write the plaintext */
-	g_mime_stream_write(sigstream, plain_buffer, data_size);
-	g_free(plain_buffer);
+    validity = g_mime_signature_validity_new();
+    if (ctx->sig_state) {
+	switch (ctx->sig_state->status)
+	    {
+	    case GPG_ERR_NO_ERROR:
+		g_mime_signature_validity_set_status(validity, GMIME_SIGNATURE_STATUS_GOOD);
+		break;
+	    case GPG_ERR_NOT_SIGNED:
+		g_mime_signature_validity_set_status(validity, GMIME_SIGNATURE_STATUS_NONE);
+		break;
+	    default:
+		g_mime_signature_validity_set_status(validity, GMIME_SIGNATURE_STATUS_BAD);
+	    }
     } else
-	gpgme_data_release(sig);
+	g_mime_signature_validity_set_status(validity, GMIME_SIGNATURE_STATUS_UNKNOWN);
+
+    /* release gmgme data buffers */
+    gpgme_data_release(msg);
+    gpgme_data_release(sig);
 
     return validity;
 }
@@ -600,11 +560,9 @@ g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
     gpgme_protocol_t protocol;
     gpgme_error_t err;
     gpgme_data_t plain, crypt;
-    size_t datasize;
-    gchar *crypt_buffer;
     struct gpgme_data_cbs cbs = {
 	(gpgme_data_read_cb_t) g_mime_gpgme_stream_rd,	/* read method */
-	NULL,			/* write method */
+	(gpgme_data_write_cb_t) g_mime_gpgme_stream_wr,	/* write method */
 	NULL,			/* seek method */
 	cb_data_release		/* release method */
     };
@@ -615,11 +573,11 @@ g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
     gpgme_ctx = ctx->gpgme_ctx;
     protocol = gpgme_get_protocol(gpgme_ctx);
 
-    /* check for protocol collision */
-    if ((ctx->rfc2440_mode || sign) && protocol != GPGME_PROTOCOL_OpenPGP) {
+    /* sign & encrypt is valid only for single-part OpenPGP */
+    if (sign && (!ctx->singlepart_mode || protocol != GPGME_PROTOCOL_OpenPGP)) {
 	if (error)
 	    g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_INV_ENGINE,
-			_("invalid crypto engine for RFC2440"));
+			_("combined signing and encryption is only defined for RFC 2440"));
 	return -1;
     }
 
@@ -629,7 +587,6 @@ g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
 	    return -1;
 
 	/* set passphrase callback */
-	/* FIXME: don't set the callback when a gpg-agent is running */
 	if (protocol == GPGME_PROTOCOL_OpenPGP) {
 	    if (ctx->passphrase_cb == GPGME_USE_GMIME_SESSION_CB)
 		gpgme_set_passphrase_cb(gpgme_ctx,
@@ -647,8 +604,10 @@ g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
 	return -1;
 
     /* create the data objects */
-    gpgme_set_armor(gpgme_ctx, 1);
-    gpgme_set_textmode(gpgme_ctx, ctx->rfc2440_mode);
+    if (protocol == GPGME_PROTOCOL_OpenPGP) {
+	gpgme_set_armor(gpgme_ctx, 1);
+	gpgme_set_textmode(gpgme_ctx, ctx->singlepart_mode);
+    }
     if ((err =
 	 gpgme_data_new_from_cbs(&plain, &cbs,
 				 istream)) != GPG_ERR_NO_ERROR) {
@@ -659,7 +618,8 @@ g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
 	release_keylist(rcpt);
 	return -1;
     }
-    if ((err = gpgme_data_new(&crypt)) != GPG_ERR_NO_ERROR) {
+    if ((err = gpgme_data_new_from_cbs(&crypt, &cbs, ostream)) !=
+	GPG_ERR_NO_ERROR) {
 	if (error)
 	    g_set_error(error, GPGME_ERROR_QUARK, err,
 			_("%s: could not create new data object: %s"),
@@ -681,6 +641,7 @@ g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
 			     plain, crypt);
 
     gpgme_data_release(plain);
+    gpgme_data_release(crypt);
     release_keylist(rcpt);
     if (err != GPG_ERR_NO_ERROR) {
 	if (error) {
@@ -693,23 +654,9 @@ g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
 			    _("%s: encryption failed: %s"),
 			    gpgme_strsource(err), gpgme_strerror(err));
 	}
-	gpgme_data_release(crypt);
 	return -1;
-    }
-
-    /* save the result to a file and return its name */
-    if (!(crypt_buffer = gpgme_data_release_and_get_mem(crypt, &datasize))) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: could not get data: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
-	return -1;
-    }
-
-    g_mime_stream_write(ostream, crypt_buffer, datasize);
-    g_free(crypt_buffer);
-
-    return 0;
+    } else
+	return 0;
 }
 
 
@@ -726,11 +673,9 @@ g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
     gpgme_error_t err;
     gpgme_protocol_t protocol;
     gpgme_data_t plain, crypt;
-    size_t plainSize;
-    gchar *plainData;
     struct gpgme_data_cbs cbs = {
 	(gpgme_data_read_cb_t) g_mime_gpgme_stream_rd,	/* read method */
-	NULL,			/* write method */
+	(gpgme_data_write_cb_t) g_mime_gpgme_stream_wr,	/* write method */
 	NULL,			/* seek method */
 	cb_data_release		/* release method */
     };
@@ -741,16 +686,7 @@ g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
     gpgme_ctx = ctx->gpgme_ctx;
     protocol = gpgme_get_protocol(gpgme_ctx);
 
-    /* check for protocol collision */
-    if (ctx->rfc2440_mode && protocol != GPGME_PROTOCOL_OpenPGP) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_INV_ENGINE,
-			_("invalid crypto engine for RFC2440"));
-	return -1;
-    }
-
     /* set passphrase callback (only OpenPGP) */
-    /* FIXME: don't set the callback then gpg-agent is running */
     if (protocol == GPGME_PROTOCOL_OpenPGP) {
 	if (ctx->passphrase_cb == GPGME_USE_GMIME_SESSION_CB)
 	    gpgme_set_passphrase_cb(gpgme_ctx, g_mime_session_passphrase,
@@ -771,7 +707,8 @@ g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
 			gpgme_strsource(err), gpgme_strerror(err));
 	return -1;
     }
-    if ((err = gpgme_data_new(&plain)) != GPG_ERR_NO_ERROR) {
+    if ((err = gpgme_data_new_from_cbs(&plain, &cbs, ostream)) !=
+	GPG_ERR_NO_ERROR) {
 	if (error)
 	    g_set_error(error, GPGME_ERROR_QUARK, err,
 			_("%s: could not create new data object: %s"),
@@ -792,21 +729,11 @@ g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
 	gpgme_data_release(crypt);
 	return -1;
     }
+    gpgme_data_release(plain);
     gpgme_data_release(crypt);
 
     /* try to get information about the signature (if any) */
     ctx->sig_state = g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx);
-
-    /* save the decrypted data to a file */
-    if (!(plainData = gpgme_data_release_and_get_mem(plain, &plainSize))) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: could not get data: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
-	return -1;
-    }
-    g_mime_stream_write(ostream, plainData, plainSize);
-    g_free(plainData);
 
     return 0;
 }
@@ -861,7 +788,7 @@ g_mime_gpgme_context_new(GMimeSession * session,
 	cipher->encrypt_protocol = "application/pgp-encrypted";
 	cipher->key_protocol = NULL;	/* FIXME */
     } else {
-	cipher->sign_protocol = "application/pkcs7-mime";
+	cipher->sign_protocol = "application/pkcs7-signature";
 	cipher->encrypt_protocol = "application/pkcs7-mime";
 	cipher->key_protocol = NULL;	/* FIXME */
     }
@@ -1051,4 +978,3 @@ release_keylist(gpgme_key_t * keylist)
     }
     g_free(keylist);
 }
-#endif /* HAVE_GPGME */

@@ -49,7 +49,7 @@ gtk+-2.0 >= 2.0
 gnome-vfs-2.0
 gnome-vfs-module-2.0
 $gnome_extras
-gmime-2.0 >= 2.1.2
+gmime-2.0 >= 2.1.7
 libbonobo-2.0
 ])
 AC_SUBST(BALSA_CFLAGS)
@@ -234,9 +234,7 @@ if test x"$gpgmecfg" != xno ; then
         gpgme_ma=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
         gpgme_mi=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
 	if test $gpgme_ve -eq 0 ; then
-		if test $gpgme_ma -lt 4 ; then
-			gpgmecfg=no
-		elif test $gpgme_ma -eq 4 -a $gpgme_mi -le 2 ; then
+		if test $gpgme_ma -lt 9 ; then
 			gpgmecfg=no
 		fi
 	fi
@@ -263,17 +261,18 @@ dnl				AC_MSG_WARN(you should upgrade to gpgme 0.4.4 or newer)
 dnl			fi
 dnl			AC_MSG_RESULT([yes])
 dnl			AC_DEFINE(HAVE_SMIME,1,[Defined when supporting S/MIME])
-			AC_MSG_WARN(S/MIME supportis not yet available with gmime)
+			AC_MSG_WARN(S/MIME support is not yet available with gmime)
 		else
 			AC_MSG_RESULT([no])
 		fi
 	else
-		AC_MSG_WARN([sorry, you need at least gpgme version 0.4.3])
+		AC_MSG_WARN([sorry, you need at least gpgme version 0.9.0])
 	fi
 else
 	AC_MSG_RESULT(no)
 fi
-AM_CONDITIONAL(BUILD_WITH_GPGME, test $gpgmecfg = "yes")
+echo "GPG $gpgmecfg"
+AM_CONDITIONAL([BUILD_WITH_GPGME], [test $gpgmecfg = "yes"])
 
 
 dnl ###########################################################################

@@ -1707,24 +1707,22 @@ static void
 bndx_changed_find_row(BalsaIndex * index)
 {
     GtkTreeIter iter;
-    gpointer tmp;
 
-    if (!bndx_find_message(index, NULL, &iter, index->current_message)) {
+    if (bndx_find_message(index, NULL, &iter, index->current_message)) {
+	gpointer tmp = iter.user_data;
+	index->next_message =
+	    bndx_search_iter(index, index->search_iter, &iter,
+			     BNDX_SEARCH_DIRECTION_NEXT,
+			     BNDX_SEARCH_VIEWABLE_ONLY, 0);
+	iter.user_data = tmp;
+	index->prev_message =
+	    bndx_search_iter(index, index->search_iter, &iter,
+			     BNDX_SEARCH_DIRECTION_PREV,
+			     BNDX_SEARCH_VIEWABLE_ONLY, 0);
+    } else {
 	index->next_message = FALSE;
 	index->prev_message = FALSE;
-	return;
     }
-
-    tmp = iter.user_data;
-    index->next_message =
-	bndx_search_iter(index, index->search_iter, &iter,
-			 BNDX_SEARCH_DIRECTION_NEXT,
-			 BNDX_SEARCH_VIEWABLE_ONLY, 0);
-    iter.user_data = tmp;
-    index->prev_message =
-	bndx_search_iter(index, index->search_iter, &iter,
-			 BNDX_SEARCH_DIRECTION_PREV,
-			 BNDX_SEARCH_VIEWABLE_ONLY, 0);
 
     g_signal_emit(G_OBJECT(index), balsa_index_signals[INDEX_CHANGED], 0);
 }

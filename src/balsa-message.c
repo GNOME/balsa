@@ -1159,7 +1159,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     /*
      * emit read message
      */
-    if (is_new) {
+    if (is_new && message->mailbox && !message->mailbox->readonly) {
 	GList * messages = g_list_prepend(NULL, message);
 	
 	libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_NEW,

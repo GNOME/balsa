@@ -3699,7 +3699,8 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 				       bsmsg->flow, balsa_app.debug); 
 #endif
     if (result == LIBBALSA_MESSAGE_CREATE_OK && bsmsg->orig_message
-        && bsmsg->orig_message->mailbox) {
+        && bsmsg->orig_message->mailbox
+	&& !bsmsg->orig_message->mailbox->readonly) {
 	if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
 	    bsmsg->type == SEND_REPLY_GROUP) {
 	    libbalsa_message_reply(bsmsg->orig_message);
@@ -3789,7 +3790,9 @@ message_postpone(BalsaSendmsg * bsmsg)
                                              balsa_app.encoding_style,
                                              bsmsg->flow);
     if(successp) {
-	if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message) {
+	if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message
+	    && bsmsg->orig_message->mailbox
+	    && !bsmsg->orig_message->mailbox->readonly) {
 	    GList * messages = g_list_prepend(NULL, bsmsg->orig_message);
 
 	    libbalsa_messages_change_flag(messages,

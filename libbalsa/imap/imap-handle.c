@@ -568,7 +568,8 @@ imap_mbox_handle_fetch(ImapMboxHandle* handle, const gchar *seq,
   ImapResponse rc;
   
   for(i=0; headers[i]; i++) {
-    g_string_append_c(hdr, ' ');
+    if (hdr->str[hdr->len - 1] != '(' && headers[i][0] != ')')
+      g_string_append_c(hdr, ' ');
     g_string_append(hdr, headers[i]);
   }
   cmd = g_strdup_printf("FETCH %s (%s)", seq, hdr->str);
@@ -912,6 +913,7 @@ imap_message_free(ImapMessage *msg)
   g_return_if_fail(msg);
   if(msg->envelope) imap_envelope_free(msg->envelope);
   if(msg->body)     imap_body_free    (msg->body);
+  g_free(msg->fetched_header_fields);
   g_free(msg);
 }
 
@@ -1744,13 +1746,14 @@ ir_media(struct siobuf* sio, ImapMediaBasic *imb, ImapBody *body)
   else 
     *imb = IMBMEDIA_OTHER;
 
-  body->media_basic_name = g_strdup (type);
-
-  g_free(type);
   if(body) {
+    body->media_basic_name = type;
     body->media_basic = *imb;
     body->media_subtype = subtype;
-  } else g_free(subtype);
+  } else {
+    g_free(type);
+    g_free(subtype);
+  }
   return IMR_OK;
 }
 
@@ -1822,6 +1825,7 @@ ir_body_fld_enc(struct siobuf* sio, ImapBody *body)
   else enc = IMBENC_OTHER;
   if(body)
     body->encoding = enc;
+  g_free(str);
   return IMR_OK;
 }
 
@@ -2342,14 +2346,47 @@ ir_body_section(struct siobuf *sio, ImapFetchBodyCb body_cb, void *arg)
 }
 
 static ImapResponse
+ir_body_header_fields(struct siobuf* sio, ImapMessage *msg)
+{
+  char *tmp;
+  int c;
+
+  if(sio_getc(sio) != '(') return IMR_PROTOCOL;
+
+  while ((tmp = imap_get_astring(sio, &c))) {
+      /* nothing (yet?) */;
+    g_free(tmp);
+    if (c == ')')
+      break;
+  }
+  if(c != ')') return IMR_PROTOCOL;
+  if(sio_getc(sio) != ']') return IMR_PROTOCOL;
+  if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
+  g_free(msg->fetched_header_fields);
+  msg->fetched_header_fields = imap_get_nstring(sio);
+  return IMR_OK;
+}
+
+static ImapResponse
 ir_msg_att_body(ImapMboxHandle *h, int c, unsigned seqno)
 {
   ImapMessage *msg = h->msg_cache[seqno-1];
   ImapResponse rc;
+  char buf[15];	/* Just large enough to hold "HEADER.FIELDS". */
 
   switch(c) {
   case '[': 
-    rc = ir_body_section(h->sio, h->body_cb, h->body_arg);
+    c = sio_getc (h->sio);
+    sio_ungetc (h->sio);
+    if(isdigit (c)) {
+      rc = ir_body_section(h->sio, h->body_cb, h->body_arg);
+      break;
+    }
+    c = imap_get_atom(h->sio, buf, sizeof buf);
+    if (c == ' ' && g_ascii_strcasecmp(buf, "HEADER.FIELDS") == 0)
+      rc = ir_body_header_fields(h->sio, msg);
+    else
+      rc = IMR_PROTOCOL;
     break;
   case ' ':
     rc = ir_body(h->sio, sio_getc(h->sio),
@@ -2379,23 +2416,6 @@ ir_msg_att_bodystructure(ImapMboxHandle *h, int c, unsigned seqno)
 }
 
 static ImapResponse
-ir_msg_att_body_header_fields(ImapMboxHandle *h, int c, unsigned seqno)
-{
-  ImapMessage *msg = h->msg_cache[seqno-1];
-
-  if(sio_getc(h->sio) != '(') return IMR_PROTOCOL;
-
-  while (imap_get_astring(h->sio, &c) && c != ')')
-      /* nothing (yet?) */;
-  if(c != ')') return IMR_PROTOCOL;
-  if(sio_getc(h->sio) != ']') return IMR_PROTOCOL;
-  if(sio_getc(h->sio) != ' ') return IMR_PROTOCOL;
-  g_free(msg->fetched_header_fields);
-  msg->fetched_header_fields = imap_get_nstring(h->sio);
-  return IMR_OK;
-}
-
-static ImapResponse
 ir_msg_att_uid(ImapMboxHandle *h, int c, unsigned seqno)
 {
   char buf[12];
@@ -2422,8 +2442,6 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
     { "RFC822.TEXT",   ir_msg_att_rfc822_text }, 
     { "RFC822.SIZE",   ir_msg_att_rfc822_size }, 
     { "BODY",          ir_msg_att_body }, 
-    { "BODY[",         ir_msg_att_body }, 
-    { "BODY[HEADER.FIELDS", ir_msg_att_body_header_fields }, 
     { "BODYSTRUCTURE", ir_msg_att_bodystructure }, 
     { "UID",           ir_msg_att_uid }
   };
@@ -2437,7 +2455,6 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
   if(h->msg_cache[seqno-1] == NULL)
     h->msg_cache[seqno-1] = imap_message_new();
   do {
-    /* FIXME Can we ever match "BODY[" or "BODY[HEADER.FIELDS"? */
     for(i=0; (c = sio_getc(h->sio)) != -1; i++) {
       c = toupper(c);
       if( !( (c >='A' && c<='Z') || (c >='0' && c<='9') || c == '.') ) break;

@@ -66,7 +66,9 @@ typedef enum
 typedef enum {
   IMFETCH_ENV        = 1<<0,
   IMFETCH_BODYSTRUCT = 1<<1,
-  IMFETCH_RFC822SIZE = 1<<2
+  IMFETCH_RFC822SIZE = 1<<2,
+  IMFETCH_CONTENT_TYPE = 1<<3,
+  IMFETCH_HEADER_MASK  = IMFETCH_CONTENT_TYPE
 } ImapFetchType;
 
 typedef struct _ImapMboxHandleClass ImapMboxHandleClass;

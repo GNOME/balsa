@@ -635,7 +635,6 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap)
 	/* FIXME: update/remove msg uids */
     }
 
-    /* FIXME: these handlers should be disconnected when mailbox is closed. */
     imap_handle_set_flagscb(mimap->handle, (ImapFlagsCb)imap_flags_cb, mimap);
     g_signal_connect(G_OBJECT(mimap->handle),
                      "exists-notify", G_CALLBACK(imap_exists_cb),
@@ -1357,6 +1356,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     ImapEnvelope *envelope;
     struct collect_seq_data csd;
     ImapMessage* imsg;
+    gchar *hdr;
     
     g_return_val_if_fail(mimap->opened, FALSE);
     if( (imsg = imap_mbox_handle_get_msg(mimap->handle, message->msgno)) 
@@ -1370,7 +1370,9 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
         qsort(csd.msgno_arr, csd.cnt, sizeof(csd.msgno_arr[0]), cmp_msgno);
         rc = imap_mbox_handle_fetch_set(mimap->handle, csd.msgno_arr,
                                         csd.cnt,
-                                        IMFETCH_ENV|IMFETCH_RFC822SIZE);
+                                        IMFETCH_ENV |
+					IMFETCH_RFC822SIZE |
+					IMFETCH_CONTENT_TYPE);
         g_free(csd.msgno_arr);
         if (rc != IMR_OK)
             return FALSE;
@@ -1381,6 +1383,8 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     lbimap_update_flags(message, imsg);
 
     lb_set_headers(message->headers, imsg->envelope, FALSE);
+    if ((hdr = imsg->fetched_header_fields) && *hdr && *hdr != '\r')
+	libbalsa_message_set_header_from_string(message, hdr);
     envelope        = imsg->envelope;
     message->length = imsg->rfc822size;
     message->subj   = g_mime_utils_header_decode_text(envelope->subject);
@@ -1392,6 +1396,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 	message->message_id =
 	    g_mime_utils_decode_message_id(envelope->message_id);
     }
+
     return TRUE;
 }
 
@@ -1414,8 +1419,13 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
         msg->msgno   = msgno;
         msg->mailbox = mailbox;
         if (libbalsa_mailbox_imap_load_envelope(mimap, msg)) {
+	    gchar *id;
 	    libbalsa_message_set_icons(msg);
             msg_info->message  = msg;
+	    if (libbalsa_message_is_partial(msg, &id)) {
+		libbalsa_mailbox_try_reassemble(mailbox, id);
+		g_free(id);
+	    }
 	} else 
             g_object_unref(G_OBJECT(msg));
     }

@@ -2532,3 +2532,74 @@ libbalsa_mailbox_set_msg_tree(LibBalsaMailbox * mailbox, GNode * new_tree)
 	lbm_set_msg_tree(mailbox);
     }
 }
+
+static GMimeMessage *
+lbm_get_mime_msg(LibBalsaMailbox * mailbox, LibBalsaMessage * msg)
+{
+    GMimeMessage *mime_msg;
+
+    libbalsa_mailbox_fetch_message_structure(mailbox, msg,
+					     LB_FETCH_RFC822_HEADERS);
+    mime_msg = msg->mime_msg;
+    if (mime_msg)
+	g_mime_object_ref(GMIME_OBJECT(mime_msg));
+    else {
+	GMimeStream *stream;
+	GMimeParser *parser;
+
+	stream = libbalsa_mailbox_get_message_stream(mailbox, msg);
+	parser = g_mime_parser_new_with_stream(stream);
+	g_mime_stream_unref(stream);
+	mime_msg = g_mime_parser_construct_message(parser);
+	g_object_unref(parser);
+    }
+    libbalsa_mailbox_release_message(mailbox, msg);
+
+    return mime_msg;
+}
+
+void
+libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
+				const gchar * id)
+{
+    guint msgno;
+    LibBalsaMessage *message;
+    GMimeMessage *mime_message;
+    GPtrArray *partials = g_ptr_array_new();
+    guint total = (guint) - 1;
+
+    for (msgno = 1; msgno <= libbalsa_mailbox_total_messages(mailbox);
+	 msgno++) {
+	message = libbalsa_mailbox_get_message(mailbox, msgno);
+	gchar *tmp_id;
+
+	if (!libbalsa_message_is_partial(message, &tmp_id))
+	    continue;
+
+	if (strcmp(tmp_id, id) == 0) {
+	    GMimeMessagePartial *partial;
+
+	    mime_message = lbm_get_mime_msg(mailbox, message);
+	    partial = GMIME_MESSAGE_PARTIAL(mime_message->mime_part);
+	    g_ptr_array_add(partials, partial);
+	    if (g_mime_message_partial_get_total(partial) > 0)
+		total = g_mime_message_partial_get_total(partial);
+	    g_mime_object_unref(GMIME_OBJECT(mime_message));
+	}
+
+	g_free(tmp_id);
+    }
+
+    if (partials->len == total) {
+	mime_message =
+	    g_mime_message_partial_reconstruct_message((GMimeMessagePartial
+							**) partials->
+						       pdata, total);
+	message = libbalsa_message_new();
+	message->mime_msg = mime_message;
+	libbalsa_mailbox_copy_message(message, mailbox);
+	g_object_unref(message);
+    }
+
+    g_ptr_array_free(partials, TRUE);
+}

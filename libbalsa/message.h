@@ -123,6 +123,9 @@ struct _LibBalsaMessageHeaders {
     GList *cc_list;
     GList *bcc_list;
 
+    /* Mime type */
+    GMimeContentType *content_type;
+
     /* File Carbon Copy Mailbox URL */
     gchar *fcc_url;
 
@@ -185,11 +188,7 @@ struct _LibBalsaMessage {
 
     /* signature status (received message) */
     gint sig_state;
-    gboolean is_pgp_signed;
-    gboolean is_pgp_encrypted;
 #endif
-    gboolean has_attachment;
-    gboolean is_multipart;
 
     /* a forced multipart subtype or NULL for mixed */
     gchar *subtype;
@@ -322,6 +321,8 @@ const gchar *libbalsa_message_pathname(LibBalsaMessage * message);
 gchar *libbalsa_message_charset(LibBalsaMessage * message);
 const gchar *libbalsa_message_body_charset(LibBalsaMessageBody * body);
 gboolean libbalsa_message_is_multipart(LibBalsaMessage * message);
+gboolean libbalsa_message_is_partial(LibBalsaMessage * message,
+				     gchar ** id);
 gboolean libbalsa_message_has_attachment(LibBalsaMessage * message);
 #ifdef HAVE_GPGME
 gboolean libbalsa_message_is_pgp_signed(LibBalsaMessage * message);
@@ -349,7 +350,7 @@ void libbalsa_message_headers_update(LibBalsaMessage * message);
 gboolean libbalsa_message_load_envelope_from_file(LibBalsaMessage *message,
 						  const char *filename);
 gboolean libbalsa_message_set_header_from_string(LibBalsaMessage *message,
-						 gchar *line);
+						 const gchar *str);
 void libbalsa_message_set_references_from_string(LibBalsaMessage * message,
 						 const gchar *str);
 void libbalsa_message_set_in_reply_to_from_string(LibBalsaMessage * message,

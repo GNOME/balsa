@@ -429,6 +429,10 @@ void libbalsa_mailbox_set_sign_icon(GdkPixbuf * pixbuf);
 void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf);
 #endif /* HAVE_GPGME */
 
+/* Partial messages */
+void libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
+				     const gchar * id);
+
 /* columns ids */
 typedef enum {
     LB_MBOX_MSGNO_COL,

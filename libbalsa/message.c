@@ -230,6 +230,9 @@ libbalsa_message_headers_destroy(LibBalsaMessageHeaders * headers)
     g_list_foreach(headers->bcc_list, (GFunc) g_object_unref, NULL);
     g_list_free(headers->bcc_list);
     headers->bcc_list = NULL;
+    
+    if (headers->content_type)
+	g_mime_content_type_destroy(headers->content_type);
 
     g_free(headers->fcc_url);
     headers->fcc_url = NULL;
@@ -911,73 +914,67 @@ libbalsa_message_body_unref(LibBalsaMessage * message)
 gboolean
 libbalsa_message_is_multipart(LibBalsaMessage * message)
 {
-    const GMimeContentType *content_type;
-
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
 
-    if (message->mime_msg == NULL)
-	return message->is_multipart;
-
-    content_type =
-	g_mime_object_get_content_type(GMIME_OBJECT
-				       (message->mime_msg->mime_part));
-    return g_mime_content_type_is_type(content_type, "multipart", "*");
+    return message->headers->content_type ?
+	g_mime_content_type_is_type(message->headers->content_type,
+				    "multipart", "*") : FALSE;
 }
 
 gboolean
-libbalsa_message_has_attachment(LibBalsaMessage * message)
+libbalsa_message_is_partial(LibBalsaMessage * message, gchar ** id)
 {
     const GMimeContentType *content_type;
 
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
 
-    if (message->mime_msg == NULL)
-	return message->has_attachment;
+    content_type = message->headers->content_type;
+    if (!content_type
+	|| !g_mime_content_type_is_type(content_type,
+					"message", "partial"))
+	return FALSE;
+
+    if (id)
+	*id = g_strdup(g_mime_content_type_get_parameter(content_type,
+							 "id"));
+
+    return TRUE;
+}
+
+gboolean
+libbalsa_message_has_attachment(LibBalsaMessage * message)
+{
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
 
     /* FIXME: This is wrong, but less so than earlier versions; a message
        has attachments if main message or one of the parts has 
        Content-type: multipart/mixed AND members with
        Content-disposition: attachment. Unfortunately, part list may
        not be available at this stage. */
-    content_type =
-	g_mime_object_get_content_type(GMIME_OBJECT
-				       (message->mime_msg->mime_part));
-    return g_mime_content_type_is_type(content_type, "multipart", "mixed");
-}
+    return message->headers->content_type ?
+	g_mime_content_type_is_type(message->headers->content_type,
+				    "multipart", "mixed") : FALSE;
+ }
 
 #ifdef HAVE_GPGME
 gboolean
 libbalsa_message_is_pgp_signed(LibBalsaMessage * message)
 {
-    const GMimeContentType *content_type;
-
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
 
-    if (message->mime_msg == NULL)
-	return message->is_pgp_signed;
-
-    content_type =
-	g_mime_object_get_content_type(GMIME_OBJECT
-				       (message->mime_msg->mime_part));
-    return g_mime_content_type_is_type(content_type, "multipart",
-				       "signed");
+    return message->headers->content_type ?
+	g_mime_content_type_is_type(message->headers->content_type,
+				    "multipart", "signed") : FALSE;
 }
 
 gboolean
 libbalsa_message_is_pgp_encrypted(LibBalsaMessage * message)
 {
-    const GMimeContentType *content_type;
-
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
 
-    if (message->mime_msg == NULL)
-	return message->is_pgp_encrypted;
-
-    content_type =
-	g_mime_object_get_content_type(GMIME_OBJECT
-				       (message->mime_msg->mime_part));
-    return g_mime_content_type_is_type(content_type, "multipart",
-				       "encrypted");
+    return message->headers->content_type ?
+	g_mime_content_type_is_type(message->headers->content_type,
+				    "multipart", "encrypted") : FALSE;
 }
 #endif
 
@@ -1196,6 +1193,16 @@ libbalsa_message_headers_from_gmime(LibBalsaMessageHeaders *headers,
 	headers->bcc_list = g_list_reverse(headers->bcc_list);
     }
 
+    if (!headers->content_type) {
+	const GMimeContentType *content_type;
+	gchar *str;
+
+	content_type = g_mime_object_get_content_type(mime_msg->mime_part);
+	str = g_mime_content_type_to_string(content_type);
+	headers->content_type = g_mime_content_type_new_from_string(str);
+	g_free(str);
+    }
+
     if (!headers->user_hdrs)
 	headers->user_hdrs = libbalsa_message_user_hdrs_from_gmime(mime_msg);
 
@@ -1286,19 +1293,6 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
         }
 
         message->references_for_threading = g_list_reverse(tmp);
-    }
-
-    if (message->mailbox) {
-	message->has_attachment =
-	    libbalsa_message_has_attachment(message);
-	message->is_multipart =
-	    libbalsa_message_is_multipart(message);
-#ifdef HAVE_GPGME
-	message->is_pgp_encrypted =
-	    libbalsa_message_is_pgp_encrypted(message);
-	message->is_pgp_signed =
-	    libbalsa_message_is_pgp_signed(message);
-#endif
     }
 }
 
@@ -1430,19 +1424,20 @@ libbalsa_message_title(LibBalsaMessage * message, const gchar * format)
 }
 
 gboolean
-libbalsa_message_set_header_from_string(LibBalsaMessage *message, gchar *line)
+libbalsa_message_set_header_from_string(LibBalsaMessage *message,
+					const gchar *line)
 {
-    gchar *name, *value;
+    gchar *name, *value, **pair;
 
-    value = strchr(line, ':');
-    if (!value) {
-	g_warning("Bad header line: %s", line);
+    pair = g_strsplit(line, ":", 2);
+    if (!(pair[0] && pair[1])) {
+	g_warning("Bad header line: \"%s\"", line);
+	g_strfreev(pair);
 	return FALSE;
     }
 
-    *value++ = '\0';
-    name = g_strstrip(line);
-    value = g_strstrip(value);
+    name = g_strstrip(pair[0]);
+    value = g_strstrip(pair[1]);
     if (g_ascii_strcasecmp(name, "Subject") == 0) {
 	if (!strcmp(value, "DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA"))
 	    return FALSE;
@@ -1482,21 +1477,8 @@ libbalsa_message_set_header_from_string(LibBalsaMessage *message, gchar *line)
 	libbalsa_message_set_references_from_string(message, value);
     } else
     if (g_ascii_strcasecmp(name, "Content-Type") == 0) {
-	/* check sign/encrypt/attachment */
-	GMimeContentType* content_type =
+	message->headers->content_type =
 	    g_mime_content_type_new_from_string(value);
-
-	message->is_multipart =
-	    g_mime_content_type_is_type(content_type, "multipart", "*");
-	message->has_attachment =
-	    g_mime_content_type_is_type(content_type, "multipart", "mixed");
-#ifdef HAVE_GPGME
-	message->is_pgp_encrypted =
-	    g_mime_content_type_is_type(content_type, "multipart", "encrypted");
-	message->is_pgp_signed =
-	    g_mime_content_type_is_type(content_type, "multipart", "signed");
-#endif
-	g_mime_content_type_destroy(content_type);
     } else
 
 
@@ -1510,6 +1492,8 @@ libbalsa_message_set_header_from_string(LibBalsaMessage *message, gchar *line)
     } else
 #endif
     /* do nothing */;
+
+    g_strfreev(pair);
     return TRUE;
 }
 

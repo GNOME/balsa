@@ -323,6 +323,8 @@ libbalsa_mailbox_link_message(LibBalsaMailboxLocal *mailbox,
                               LibBalsaMessage*msg)
 {
     LibBalsaMailbox *mbx = LIBBALSA_MAILBOX(mailbox);
+    gchar *id;
+
     msg->mailbox = mbx;
     mailbox->msg_list = g_list_prepend(mailbox->msg_list, msg);
 
@@ -332,6 +334,10 @@ libbalsa_mailbox_link_message(LibBalsaMailboxLocal *mailbox,
     if(!mbx->view_filter ||
        match_condition(mbx->view_filter, msg, TRUE))
         libbalsa_mailbox_msgno_inserted(mbx, msg->msgno);
+    if (libbalsa_message_is_partial(msg, &id)) {
+	libbalsa_mailbox_try_reassemble(mbx, id);
+	g_free(id);
+    }
 }
 
 /*

@@ -1,3 +1,13 @@
+2000-05-14  Peter Williams  <peter@beta.newton.cx>
+
+	* src/cfg-memory-widgets.c (generic_*): New generic functions
+	to organize memory code. We /should/ have a little extensible
+	system that supports memory based on the widget's GtkType, but
+	we'll leave that until a time when the need becomes apparent.
+
+	(other functions) Code collated into generic functions, these
+	are much simpler now.
+
 2000-05-12  Peter Williams  <peter@beta.newton.cx>
 
 	* src/cfg-memory-widgets.[ch]: Add memory for GtkPaneds, to store

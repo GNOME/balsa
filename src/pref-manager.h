@@ -30,8 +30,8 @@ void open_preferences_manager(GtkWidget * widget, gpointer data);
  * window in case it has changed */
 void refresh_preferences_manager(void);
 
-/* update the pop3 server clist */
-void update_pop3_servers(void);
+/* update the mail (POP3, IMAP) server clist */
+void update_mail_servers(void);
 
 #endif
 /* __PREF_MANAGER_H__ */

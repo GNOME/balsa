@@ -124,10 +124,15 @@ typedef struct _PropertyUI {
     /* arp */
     GtkWidget *quote_str;
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    GtkWidget *message_font_button;	/* font used to display messages */
+    GtkWidget *subject_font_button;	/* font used to display messages */
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     GtkWidget *message_font;	/* font used to display messages */
     GtkWidget *subject_font;	/* font used to display messages */
     GtkWidget *font_picker;
     GtkWidget *font_picker2;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 
     GtkWidget *date_format;
@@ -248,6 +253,7 @@ static GtkWidget *create_table(gint rows, gint cols, GtkWidget * page);
 static GtkWidget* add_pref_menu(const gchar* label, const gchar* names[], 
                                 gint size, gint* index, GtkBox* parent, 
                                 gint padding, GtkWidget * page);
+static void add_show_menu(const char* label, gint level, GtkWidget* menu);
 static GtkWidget *attach_pref_menu(const gchar * label, gint row,
                                    GtkTable * table, const gchar * names[],
                                    gint size, gint * index);
@@ -270,6 +276,18 @@ static GtkWidget *pm_group_get_vbox(GtkWidget * group);
 static GtkWidget *pm_group_add_check(GtkWidget * group,
                                      const gchar * text);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+/* combo boxes */
+struct pm_combo_box_info {
+    GSList *levels;
+};
+#define PM_COMBO_BOX_INFO "balsa-pref-manager-combo-box-info"
+
+static GtkWidget * pm_combo_box_new(void);
+static void pm_combo_box_set_level(GtkWidget * combo_box, gint level);
+static gint pm_combo_box_get_level(GtkWidget * combo_box);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
+
 /* special helpers */
 static GtkWidget *create_information_message_menu(void);
 static GtkWidget *create_encoding_menu(void);
@@ -290,7 +308,9 @@ static void response_cb(GtkDialog * dialog, gint response, gpointer data);
 static void destroy_pref_window_cb(void);
 static void update_address_books(void);
 static void properties_modified_cb(GtkWidget * widget, GtkWidget * pbox);
+#if !GTK_CHECK_VERSION(2, 4, 0)
 static void font_changed_cb(GtkWidget * widget, GtkWidget * pbox);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 static void mail_servers_cb(GtkTreeView * tree_view, GtkTreePath * path,
                             GtkTreeViewColumn * column,
                             gpointer user_data);
@@ -408,10 +428,12 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                     GTK_STOCK_HELP,  GTK_RESPONSE_HELP,
                                     NULL);
+#if !GTK_CHECK_VERSION(2, 4, 0)
     gtk_dialog_set_response_sensitive(GTK_DIALOG(property_box),
                                       GTK_RESPONSE_OK, FALSE);
     gtk_dialog_set_response_sensitive(GTK_DIALOG(property_box),
                                       GTK_RESPONSE_APPLY, FALSE);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     notebook = gtk_notebook_new();
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(property_box)->vbox),
                       notebook);
@@ -453,6 +475,14 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 			     gtk_label_new(_("Startup")));
 
     set_prefs();
+#if GTK_CHECK_VERSION(2, 4, 0)
+    /* Now that all the prefs have been set, we must desensitize the
+     * buttons. */
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(property_box),
+                                      GTK_RESPONSE_OK, FALSE);
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(property_box),
+                                      GTK_RESPONSE_APPLY, FALSE);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     for (i = 0; i < NUM_PWINDOW_MODES; i++) {
 	g_signal_connect(G_OBJECT(pui->pwindow_type[i]), "clicked",
@@ -560,17 +590,28 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     /* arp */
     g_signal_connect(G_OBJECT(pui->quote_str), "changed",
 		     G_CALLBACK(properties_modified_cb), property_box);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    g_signal_connect(G_OBJECT(pui->quote_pattern), "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     g_signal_connect(G_OBJECT
                      (gnome_entry_gtk_entry
                       (GNOME_ENTRY(pui->quote_pattern))), "changed",
                      G_CALLBACK(properties_modified_cb),
                      property_box);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     /* multipart/alternative */
     g_signal_connect(G_OBJECT(pui->display_alt_plain), "toggled",
 		     G_CALLBACK(properties_modified_cb), property_box);
 
     /* message font */
+#if GTK_CHECK_VERSION(2, 4, 0)
+    g_signal_connect(G_OBJECT(pui->message_font_button), "font-set",
+		     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->subject_font_button), "font-set",
+		     G_CALLBACK(properties_modified_cb), property_box);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     g_signal_connect(G_OBJECT(pui->message_font), "changed",
 		     G_CALLBACK(font_changed_cb), property_box);
     g_signal_connect(G_OBJECT(pui->font_picker), "font_set",
@@ -579,6 +620,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		     G_CALLBACK(font_changed_cb), property_box);
     g_signal_connect(G_OBJECT(pui->font_picker2), "font_set",
 		     G_CALLBACK(font_changed_cb), property_box);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 
     g_signal_connect(G_OBJECT(pui->open_inbox_upon_startup), "toggled",
@@ -599,6 +641,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     /* threading */
     g_signal_connect(G_OBJECT(pui->tree_expand_check), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
+#if !GTK_CHECK_VERSION(2, 4, 0)
     g_signal_connect(G_OBJECT(pui->default_sort_field), "clicked",
                      G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->default_threading_type), "clicked",
@@ -610,6 +653,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     g_signal_connect(G_OBJECT(pui->suggestion_mode), "clicked",
 		     G_CALLBACK(properties_modified_cb), property_box);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     g_signal_connect(G_OBJECT(pui->ignore_length), "changed",
 		     G_CALLBACK(properties_modified_cb), property_box);
@@ -701,7 +745,9 @@ apply_prefs(GtkDialog * pbox)
     gint i;
     GtkWidget *balsa_window;
     GtkWidget *entry_widget;
+#if !GTK_CHECK_VERSION(2, 4, 0)
     GtkWidget *menu_item;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     const gchar* tmp;
 
     /*
@@ -727,9 +773,14 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.smtp_passphrase =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->smtp_passphrase)));
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    balsa_app.smtp_tls_mode =
+	pm_combo_box_get_level(pui->smtp_tls_mode_menu);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     menu_item = gtk_menu_get_active(GTK_MENU(pui->smtp_tls_mode_menu));
     balsa_app.smtp_tls_mode =
 	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item), "balsa-data"));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     g_free(balsa_app.smtp_certificate_passphrase);
@@ -762,9 +813,13 @@ apply_prefs(GtkDialog * pbox)
     /* if (balsa_app.alt_layout_is_active != balsa_app.alternative_layout)  */
 	balsa_change_window_layout(balsa_app.main_window);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    balsa_app.encoding_style = pm_combo_box_get_level(pui->encoding_menu);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     menu_item = gtk_menu_get_active(GTK_MENU(pui->encoding_menu));
     balsa_app.encoding_style =
 	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item), "balsa-data"));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     if (balsa_app.mblist_show_mb_content_info !=
 	GTK_TOGGLE_BUTTON(pui->mblist_show_mb_content_info)->active) {
@@ -781,21 +836,34 @@ apply_prefs(GtkDialog * pbox)
 					 (pui->check_mail_minutes));
     balsa_app.quiet_background_check =
 	GTK_TOGGLE_BUTTON(pui->quiet_background_check)->active;
+#if GTK_CHECK_VERSION(2, 4, 0)
+    balsa_app.msg_size_limit =
+        gtk_spin_button_get_value(GTK_SPIN_BUTTON(pui->msg_size_limit)) *
+        1024;
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     balsa_app.msg_size_limit =
 	gtk_spin_button_get_value_as_float(GTK_SPIN_BUTTON
                                            (pui->msg_size_limit))*1024;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     balsa_app.check_imap =
 	GTK_TOGGLE_BUTTON(pui->check_imap)->active;
     balsa_app.check_imap_inbox =
 	GTK_TOGGLE_BUTTON(pui->check_imap_inbox)->active;
     balsa_app.notify_new_mail_dialog =
 	GTK_TOGGLE_BUTTON(pui->notify_new_mail_dialog)->active;
+#if GTK_CHECK_VERSION(2, 4, 0)
+    balsa_app.mdn_reply_clean =
+	pm_combo_box_get_level(pui->mdn_reply_clean_menu);
+    balsa_app.mdn_reply_notclean =
+	pm_combo_box_get_level(pui->mdn_reply_notclean_menu);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     menu_item = gtk_menu_get_active(GTK_MENU(pui->mdn_reply_clean_menu));
     balsa_app.mdn_reply_clean =
 	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item), "balsa-data"));
     menu_item = gtk_menu_get_active(GTK_MENU(pui->mdn_reply_notclean_menu));
     balsa_app.mdn_reply_notclean =
 	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item), "balsa-data"));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     if (balsa_app.check_mail_auto)
 	update_timer(TRUE, balsa_app.check_mail_timer);
@@ -841,14 +909,30 @@ apply_prefs(GtkDialog * pbox)
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->quote_str)));
 
     g_free(balsa_app.message_font);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    balsa_app.message_font =
+        g_strdup(gtk_font_button_get_font_name
+                 (GTK_FONT_BUTTON(pui->message_font_button)));
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     balsa_app.message_font =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->message_font)));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     g_free(balsa_app.subject_font);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    balsa_app.subject_font =
+        g_strdup(gtk_font_button_get_font_name
+                 (GTK_FONT_BUTTON(pui->subject_font_button)));
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     balsa_app.subject_font =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->subject_font)));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     g_free(balsa_app.quote_regex);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    entry_widget = pui->quote_pattern;
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     entry_widget = gnome_entry_gtk_entry(GNOME_ENTRY(pui->quote_pattern));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     tmp = gtk_entry_get_text(GTK_ENTRY(entry_widget));
     balsa_app.quote_regex = g_strcompress(tmp);
 
@@ -903,30 +987,45 @@ apply_prefs(GtkDialog * pbox)
 	gdk_colormap_free_colors(gdk_drawable_get_colormap
 				 (GTK_WIDGET(pbox)->window),
 				 &balsa_app.quoted_color[i], 1);
+#if GTK_CHECK_VERSION(2, 4, 0)
+	gtk_color_button_get_color(GTK_COLOR_BUTTON(pui->quoted_color[i]),
+                                   &balsa_app.quoted_color[i]);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
 	gnome_color_picker_get_i16(GNOME_COLOR_PICKER(pui->quoted_color[i]),
 				   &(balsa_app.quoted_color[i].red),
 				   &(balsa_app.quoted_color[i].green),
 				   &(balsa_app.quoted_color[i].blue),
 				   0);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     }
 
     /* url color */
     gdk_colormap_free_colors(gdk_drawable_get_colormap(GTK_WIDGET(pbox)->window),
 			     &balsa_app.url_color, 1);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    gtk_color_button_get_color(GTK_COLOR_BUTTON(pui->url_color),
+                               &balsa_app.url_color);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     gnome_color_picker_get_i16(GNOME_COLOR_PICKER(pui->url_color),
 			       &(balsa_app.url_color.red),
 			       &(balsa_app.url_color.green),
 			       &(balsa_app.url_color.blue),
 			       0);			       
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     /* bad address color */
     gdk_colormap_free_colors(gdk_drawable_get_colormap(GTK_WIDGET(pbox)->window),
 			     &balsa_app.bad_address_color, 1);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    gtk_color_button_get_color(GTK_COLOR_BUTTON(pui->bad_address_color),
+                               &balsa_app.bad_address_color);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     gnome_color_picker_get_i16(GNOME_COLOR_PICKER(pui->bad_address_color),
 			       &(balsa_app.bad_address_color.red),
 			       &(balsa_app.bad_address_color.green),
 			       &(balsa_app.bad_address_color.blue),
 			       0);			       
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     /* sorting and threading */
     libbalsa_mailbox_set_sort_field(NULL, pui->sort_field_index);
@@ -934,6 +1033,16 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.expand_tree = GTK_TOGGLE_BUTTON(pui->tree_expand_check)->active;
 
     /* Information dialogs */
+#if GTK_CHECK_VERSION(2, 4, 0)
+    balsa_app.information_message =
+	pm_combo_box_get_level(pui->information_message_menu);
+    balsa_app.warning_message =
+	pm_combo_box_get_level(pui->warning_message_menu);
+    balsa_app.error_message =
+	pm_combo_box_get_level(pui->error_message_menu);
+    balsa_app.debug_message =
+	pm_combo_box_get_level(pui->debug_message_menu);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     menu_item =
 	gtk_menu_get_active(GTK_MENU(pui->information_message_menu));
     balsa_app.information_message =
@@ -947,14 +1056,20 @@ apply_prefs(GtkDialog * pbox)
     menu_item = gtk_menu_get_active(GTK_MENU(pui->debug_message_menu));
     balsa_app.debug_message =
 	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item), "balsa-data"));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     /* handling of 8-bit message parts without codeset header */
     balsa_app.convert_unknown_8bit =
 	GTK_TOGGLE_BUTTON(pui->convert_unknown_8bit[1])->active;
+#if GTK_CHECK_VERSION(2, 4, 0)
+    balsa_app.convert_unknown_8bit_codeset =
+        pm_combo_box_get_level(pui->convert_unknown_8bit_codeset);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     menu_item =
 	gtk_menu_get_active(GTK_MENU(gtk_option_menu_get_menu(GTK_OPTION_MENU(pui->convert_unknown_8bit_codeset))));
     balsa_app.convert_unknown_8bit_codeset = 
 	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item), "balsa-data"));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     libbalsa_set_fallback_codeset(balsa_app.convert_unknown_8bit_codeset);
 
     /*
@@ -997,8 +1112,12 @@ set_prefs(void)
 	gtk_entry_set_text(GTK_ENTRY(pui->smtp_passphrase),
 			   balsa_app.smtp_passphrase);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pm_combo_box_set_level(pui->smtp_tls_mode_menu, balsa_app.smtp_tls_mode);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_menu_set_active(GTK_MENU(pui->smtp_tls_mode_menu),
 			balsa_app.smtp_tls_mode);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     if (balsa_app.smtp_certificate_passphrase)
 	gtk_entry_set_text(GTK_ENTRY(pui->smtp_certificate_passphrase),
@@ -1024,11 +1143,15 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->debug),
 				 balsa_app.debug);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pm_combo_box_set_level(pui->encoding_menu, balsa_app.encoding_style);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     for (i = 0; i < NUM_ENCODING_MODES; i++)
 	if (balsa_app.encoding_style == encoding_type[i]) {
 	    gtk_menu_set_active(GTK_MENU(pui->encoding_menu), i);
 	    break;
 	}
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
 				 (pui->mblist_show_mb_content_info),
@@ -1055,10 +1178,17 @@ set_prefs(void)
     if(!balsa_app.check_imap)
 	gtk_widget_set_sensitive(GTK_WIDGET(pui->check_imap_inbox), FALSE);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pm_combo_box_set_level(pui->mdn_reply_clean_menu,
+                           balsa_app.mdn_reply_clean);
+    pm_combo_box_set_level(pui->mdn_reply_notclean_menu,
+                           balsa_app.mdn_reply_notclean);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_menu_set_active(GTK_MENU(pui->mdn_reply_clean_menu),
 			balsa_app.mdn_reply_clean);
     gtk_menu_set_active(GTK_MENU(pui->mdn_reply_notclean_menu),
 			balsa_app.mdn_reply_notclean);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->close_mailbox_auto),
 				 balsa_app.close_mailbox_auto);
@@ -1109,7 +1239,11 @@ set_prefs(void)
 
     /* arp */
     gtk_entry_set_text(GTK_ENTRY(pui->quote_str), balsa_app.quote_str);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    entry_widget = pui->quote_pattern;
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     entry_widget = gnome_entry_gtk_entry(GNOME_ENTRY(pui->quote_pattern));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     tmp = g_strescape(balsa_app.quote_regex, NULL);
     gtk_entry_set_text(GTK_ENTRY(entry_widget), tmp);
     g_free(tmp);
@@ -1127,6 +1261,7 @@ set_prefs(void)
 				 (pui->display_alt_plain),
 				  balsa_app.display_alt_plain);
     
+#if !GTK_CHECK_VERSION(2, 4, 0)
     /* message font */
     gtk_entry_set_text(GTK_ENTRY(pui->message_font),
 		       balsa_app.message_font);
@@ -1135,6 +1270,7 @@ set_prefs(void)
 		       balsa_app.subject_font);
     gtk_editable_set_position(GTK_EDITABLE(pui->subject_font), 0);
 
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
 				 (pui->open_inbox_upon_startup),
 				 balsa_app.open_inbox_upon_startup);
@@ -1155,19 +1291,36 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->tree_expand_check), 
                                  balsa_app.expand_tree);
     pui->sort_field_index = libbalsa_mailbox_get_sort_field(NULL);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pm_combo_box_set_level(pui->default_sort_field, pui->sort_field_index);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_option_menu_set_history(GTK_OPTION_MENU(pui->default_sort_field),
                                 pui->sort_field_index);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     pui->threading_type_index = libbalsa_mailbox_get_threading_type(NULL);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pm_combo_box_set_level(pui->default_threading_type,
+                           pui->threading_type_index);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_option_menu_set_history(GTK_OPTION_MENU(pui->default_threading_type),
                                 pui->threading_type_index);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     /* spelling */
     pui->module_index = balsa_app.module;
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pm_combo_box_set_level(pui->module, balsa_app.module);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_option_menu_set_history(GTK_OPTION_MENU(pui->module),
 				balsa_app.module);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     pui->suggestion_mode_index = balsa_app.suggestion_mode;
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pm_combo_box_set_level(pui->suggestion_mode, balsa_app.suggestion_mode);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_option_menu_set_history(GTK_OPTION_MENU(pui->suggestion_mode),
 				balsa_app.suggestion_mode);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->ignore_length),
 			      balsa_app.ignore_size);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->spell_check_sig),
@@ -1187,6 +1340,26 @@ set_prefs(void)
 	gtk_entry_set_text(GTK_ENTRY(pui->selected_headers),
 			   balsa_app.selected_headers);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    /* Colour */
+    for(i=0;i<MAX_QUOTED_COLOR;i++)
+	gtk_color_button_set_color(GTK_COLOR_BUTTON(pui->quoted_color[i]),
+                                   &balsa_app.quoted_color[i]);
+    gtk_color_button_set_color(GTK_COLOR_BUTTON(pui->url_color),
+                               &balsa_app.url_color);
+    gtk_color_button_set_color(GTK_COLOR_BUTTON(pui->bad_address_color),
+                               &balsa_app.bad_address_color);
+
+    /* Information Message */
+    pm_combo_box_set_level(pui->information_message_menu,
+                           balsa_app.information_message);
+    pm_combo_box_set_level(pui->warning_message_menu,
+                           balsa_app.warning_message);
+    pm_combo_box_set_level(pui->error_message_menu,
+                           balsa_app.error_message);
+    pm_combo_box_set_level(pui->debug_message_menu,
+                           balsa_app.debug_message);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     /* Colour */
     for(i=0;i<MAX_QUOTED_COLOR;i++)
 	gnome_color_picker_set_i16(GNOME_COLOR_PICKER(pui->quoted_color[i]),
@@ -1213,6 +1386,7 @@ set_prefs(void)
 			balsa_app.error_message);
     gtk_menu_set_active(GTK_MENU(pui->debug_message_menu),
 			balsa_app.debug_message);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     /* handling of 8-bit message parts without codeset header */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->convert_unknown_8bit[1]),
@@ -1423,12 +1597,23 @@ static GtkWidget*
 attach_information_menu(const gchar* label,gint row, GtkTable *table,
 			gint defval)
 {
+#if GTK_CHECK_VERSION(2, 4, 0)
+    GtkWidget* w, *combo_box;
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     GtkWidget* w, *option_menu, *menu;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     w = gtk_label_new(label);
     gtk_misc_set_alignment(GTK_MISC(w), 0, 0.5);
     gtk_table_attach(GTK_TABLE(table), w, 0, 1, row, row+1,
 		     GTK_FILL, 0, 0, 0);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    combo_box = create_information_message_menu();
+    pm_combo_box_set_level(combo_box, defval);
+    gtk_table_attach(GTK_TABLE(table), combo_box, 1, 2, row, row+1,
+		     GTK_EXPAND | GTK_FILL, 0, 0, 0);
+    return combo_box;
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     menu = create_information_message_menu();
     option_menu = gtk_option_menu_new();
     gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu), menu);
@@ -1436,6 +1621,7 @@ attach_information_menu(const gchar* label,gint row, GtkTable *table,
     gtk_table_attach(GTK_TABLE(table), option_menu, 1, 2, row, row+1,
 		     GTK_EXPAND | GTK_FILL, 0, 0, 0);
     return menu;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 static GtkWidget*
@@ -1469,9 +1655,14 @@ color_box(GtkBox* parent, const gchar* title)
     box = gtk_hbox_new(FALSE, COL_SPACING);
     gtk_box_pack_start(parent, box, FALSE, FALSE, 0);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    picker = gtk_color_button_new();
+    gtk_color_button_set_title(GTK_COLOR_BUTTON(picker), title);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     picker = gnome_color_picker_new();
     gnome_color_picker_set_title(GNOME_COLOR_PICKER(picker), (gchar*)title);
     gnome_color_picker_set_dither(GNOME_COLOR_PICKER(picker),TRUE);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_box_pack_start(GTK_BOX(box), picker,  FALSE, FALSE, 0);
 
     gtk_box_pack_start(GTK_BOX(box), gtk_label_new(title), FALSE, FALSE, 0);
@@ -1588,7 +1779,9 @@ outgoing_mail_group(GtkWidget * page)
 {
     GtkWidget *group;
     GtkWidget *table, *label;
+#if !GTK_CHECK_VERSION(2, 4, 0)
     GtkWidget *optionmenu;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     group = pm_group_new(_("Outgoing Mail"));
     table = create_table(5, 2, page);
@@ -1610,6 +1803,14 @@ outgoing_mail_group(GtkWidget * page)
 		     (GtkAttachOptions) (GTK_FILL),
 		     (GtkAttachOptions) (0), 0, 0);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pui->smtp_tls_mode_menu = create_tls_mode_menu();
+    pm_combo_box_set_level(pui->smtp_tls_mode_menu,
+                           balsa_app.smtp_tls_mode);
+    gtk_table_attach(GTK_TABLE(table), pui->smtp_tls_mode_menu, 1, 2, 3, 4,
+                     (GtkAttachOptions) (GTK_FILL),
+		     (GtkAttachOptions) (0), 0, 0);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     optionmenu = gtk_option_menu_new ();
     pui->smtp_tls_mode_menu = create_tls_mode_menu();
     gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu),
@@ -1619,6 +1820,7 @@ outgoing_mail_group(GtkWidget * page)
     gtk_table_attach(GTK_TABLE(table), optionmenu, 1, 2, 3, 4,
 		     (GtkAttachOptions) (GTK_FILL),
 		     (GtkAttachOptions) (0), 0, 0);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     pui->smtp_certificate_passphrase =
@@ -1744,7 +1946,11 @@ quoted_group(GtkWidget * page)
                      0, 1, 0, 1, GTK_FILL, 0, 0, 0);
     pm_page_add_to_size_group(page, label);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pui->quote_pattern = gtk_entry_new();
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     pui->quote_pattern = gnome_entry_new("quote-regex-history");
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_table_attach(GTK_TABLE(table), pui->quote_pattern,
                      1, 3, 0, 1, GTK_FILL, 0, 0, 0);
 
@@ -1791,7 +1997,9 @@ broken_8bit_codeset_group(GtkWidget * page)
     GtkWidget *group;
     GtkWidget *table;
     GSList *radio_group = NULL;
+#if !GTK_CHECK_VERSION(2, 4, 0)
     GtkWidget *menu;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     
     /* treatment of messages with 8-bit chars, but without proper MIME encoding */
 
@@ -1815,6 +2023,16 @@ broken_8bit_codeset_group(GtkWidget * page)
 		     0, 1, 1, 2,
 		     (GtkAttachOptions) (GTK_FILL), (GtkAttachOptions) (0), 0, 0);
     
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pui->convert_unknown_8bit_codeset = create_codeset_menu();
+    gtk_combo_box_set_active(GTK_COMBO_BOX
+                             (pui->convert_unknown_8bit_codeset),
+                             balsa_app.convert_unknown_8bit_codeset);
+    gtk_table_attach(GTK_TABLE(table), pui->convert_unknown_8bit_codeset,
+                     1, 2, 1, 2,
+                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                     (GtkAttachOptions) (0), 0, 0);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     pui->convert_unknown_8bit_codeset = gtk_option_menu_new ();
     gtk_table_attach(GTK_TABLE(table), pui->convert_unknown_8bit_codeset,
 		     1, 2, 1, 2,
@@ -1825,6 +2043,7 @@ broken_8bit_codeset_group(GtkWidget * page)
 			     menu);
     gtk_option_menu_set_history(GTK_OPTION_MENU(pui->convert_unknown_8bit_codeset),
 				balsa_app.convert_unknown_8bit_codeset);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     pm_page_add_to_size_group(page,
                               GTK_WIDGET(pui->convert_unknown_8bit[0]));
@@ -1841,7 +2060,9 @@ mdn_group(GtkWidget * page)
     GtkWidget *group;
     GtkWidget *label;
     GtkWidget *table;
+#if !GTK_CHECK_VERSION(2, 4, 0)
     GtkWidget *optionmenu;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     /* How to handle received MDN requests */
 
@@ -1867,6 +2088,13 @@ mdn_group(GtkWidget * page)
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1,
                      GTK_FILL, 0, 0, 0);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pui->mdn_reply_clean_menu = create_mdn_reply_menu();
+    pm_combo_box_set_level(pui->mdn_reply_clean_menu,
+                           balsa_app.mdn_reply_clean);
+    gtk_table_attach(GTK_TABLE(table), pui->mdn_reply_clean_menu,
+                     1, 2, 0, 1, GTK_FILL | GTK_EXPAND, 0, 0, 0);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     optionmenu = gtk_option_menu_new();
     pui->mdn_reply_clean_menu = create_mdn_reply_menu();
     gtk_option_menu_set_menu(GTK_OPTION_MENU(optionmenu),
@@ -1875,6 +2103,7 @@ mdn_group(GtkWidget * page)
                                 balsa_app.mdn_reply_clean);
     gtk_table_attach(GTK_TABLE(table), optionmenu, 1, 2, 0, 1,
                      GTK_FILL | GTK_EXPAND, 0, 0, 0);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     label = gtk_label_new(_("The message header looks suspicious."));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
@@ -1883,6 +2112,13 @@ mdn_group(GtkWidget * page)
                      GTK_FILL, (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pui->mdn_reply_notclean_menu = create_mdn_reply_menu();
+    pm_combo_box_set_level(pui->mdn_reply_notclean_menu,
+                           balsa_app.mdn_reply_notclean);
+    gtk_table_attach(GTK_TABLE(table), pui->mdn_reply_notclean_menu,
+                     1, 2, 1, 2, GTK_FILL | GTK_EXPAND, 0, 0, 0);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     optionmenu = gtk_option_menu_new();
     pui->mdn_reply_notclean_menu = create_mdn_reply_menu();
     gtk_option_menu_set_menu(GTK_OPTION_MENU(optionmenu),
@@ -1891,6 +2127,7 @@ mdn_group(GtkWidget * page)
                                 balsa_app.mdn_reply_notclean);
     gtk_table_attach(GTK_TABLE(table), optionmenu, 1, 2, 1, 2,
                      GTK_FILL | GTK_EXPAND, 0, 0, 0);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     return group;
 }
@@ -1980,13 +2217,20 @@ encoding_group(GtkWidget * page)
 {
     GtkWidget *group;
     GtkWidget *hbox;
+#if !GTK_CHECK_VERSION(2, 4, 0)
     GtkWidget *optionmenu;
     gint i;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     group = pm_group_new(_("Encoding"));
     hbox = gtk_hbox_new(FALSE, 0);
     pm_group_add(group, hbox);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    pui->encoding_menu = create_encoding_menu();
+    gtk_box_pack_start(GTK_BOX(hbox), pui->encoding_menu, FALSE, FALSE, 0);
+    pm_combo_box_set_level(pui->encoding_menu, balsa_app.encoding_style);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     optionmenu = gtk_option_menu_new ();
     gtk_box_pack_start(GTK_BOX(hbox), optionmenu, FALSE, FALSE, 0);
 
@@ -1997,6 +2241,7 @@ encoding_group(GtkWidget * page)
 	    gtk_option_menu_set_history (GTK_OPTION_MENU (optionmenu), i);
 	    break;
 	}
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     return group;
 }
@@ -2241,9 +2486,38 @@ preview_font_group(GtkWidget * page)
     GtkWidget *label;
 
     group = pm_group_new(_("Fonts"));
+#if GTK_CHECK_VERSION(2, 4, 0)
+    table = create_table(2, 2, page);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     table = create_table(4, 2, page);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     pm_group_add(group, table);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    label = gtk_label_new(_("Message Font"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    pm_page_add_to_size_group(page, label);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1,
+		     (GtkAttachOptions) (GTK_FILL), 0, 0, 0);
+    pui->message_font_button =
+	gtk_font_button_new_with_font(balsa_app.message_font);
+    gtk_table_attach(GTK_TABLE(table), pui->message_font_button, 
+                     1, 2, 0, 1,
+		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+		     (GtkAttachOptions) (GTK_FILL), 0, 0);
+
+    label = gtk_label_new(_("Message Subject Font"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    pm_page_add_to_size_group(page, label);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
+		     (GtkAttachOptions) (GTK_FILL), 0, 0, 0);
+    pui->subject_font_button =
+	gtk_font_button_new_with_font(balsa_app.subject_font);
+    gtk_table_attach(GTK_TABLE(table), pui->subject_font_button, 
+                     1, 2, 1, 2,
+		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+		     (GtkAttachOptions) (GTK_FILL), 0, 0);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     pui->message_font = gtk_entry_new();
     gtk_table_attach(GTK_TABLE(table), pui->message_font, 0, 1, 1, 2,
 		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -2294,6 +2568,7 @@ preview_font_group(GtkWidget * page)
     label = gtk_label_new(_("Message Subject Font"));
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 2, 3,
 		     (GtkAttachOptions) (GTK_FILL), 0, 0, 0);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     return group;
 }
@@ -2724,6 +2999,7 @@ properties_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 }
 
 
+#if !GTK_CHECK_VERSION(2, 4, 0)
 static void
 font_changed_cb(GtkWidget * widget, GtkWidget * pbox)
 {
@@ -2744,6 +3020,7 @@ font_changed_cb(GtkWidget * widget, GtkWidget * pbox)
 	properties_modified_cb(widget, pbox);
     }
 }
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 static void
 server_edit_cb(GtkWidget * widget, gpointer data)
@@ -2942,17 +3219,34 @@ pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 }
 
 static void
-option_menu_cb(GtkItem * menuitem, gpointer data)
+option_menu_cb(GtkItem * widget, gpointer data)
 {
     /* update the index number */
     gint *index = (gint *) data;
-    *index = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menuitem),
+#if GTK_CHECK_VERSION(2, 4, 0)
+    *index = gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
+    *index = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
                                                "menu_index"));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 static GtkWidget *
 create_pref_option_menu(const gchar * names[], gint size, gint * index)
 {
+#if GTK_CHECK_VERSION(2, 4, 0)
+    GtkWidget *combo_box;
+    gint i;
+
+    combo_box = pm_combo_box_new();
+    g_signal_connect(G_OBJECT(combo_box), "changed",
+                     G_CALLBACK(option_menu_cb), index);
+
+    for (i = 0; i < size; i++)
+	add_show_menu(names[i], i, combo_box);
+
+    return combo_box;
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     GtkWidget *omenu;
     GtkWidget *gmenu;
     GtkWidget *menuitem;
@@ -2976,12 +3270,20 @@ create_pref_option_menu(const gchar * names[], gint size, gint * index)
     gtk_option_menu_set_menu(GTK_OPTION_MENU(omenu), gmenu);
 
     return omenu;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 
 static void
 add_show_menu(const char* label, gint level, GtkWidget* menu)
 {
+#if GTK_CHECK_VERSION(2, 4, 0)
+    struct pm_combo_box_info *info =
+        g_object_get_data(G_OBJECT(menu), PM_COMBO_BOX_INFO);
+
+    gtk_combo_box_append_text(GTK_COMBO_BOX(menu), label);
+    info->levels = g_slist_append(info->levels, GINT_TO_POINTER(level));
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     GtkWidget *menu_item = gtk_menu_item_new_with_label(label);
     gtk_widget_show(menu_item);
     g_object_set_data(G_OBJECT(menu_item), "balsa-data",
@@ -2989,11 +3291,28 @@ add_show_menu(const char* label, gint level, GtkWidget* menu)
     g_signal_connect(G_OBJECT(menu_item), "activate",
 		     G_CALLBACK(properties_modified_cb), property_box);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 static GtkWidget *
 create_information_message_menu(void)
 {
+#if GTK_CHECK_VERSION(2, 4, 0)
+    GtkWidget *combo_box = pm_combo_box_new();
+
+    add_show_menu(_("Show nothing"),       BALSA_INFORMATION_SHOW_NONE,
+                  combo_box);
+    add_show_menu(_("Show dialog"),        BALSA_INFORMATION_SHOW_DIALOG,
+                  combo_box);
+    add_show_menu(_("Show in list"),       BALSA_INFORMATION_SHOW_LIST,
+                  combo_box);
+    add_show_menu(_("Show in status bar"), BALSA_INFORMATION_SHOW_BAR,
+                  combo_box);
+    add_show_menu(_("Print to console"),   BALSA_INFORMATION_SHOW_STDERR,
+                  combo_box);
+
+    return combo_box;
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     GtkWidget *menu = gtk_menu_new();
     add_show_menu(_("Show nothing"),     BALSA_INFORMATION_SHOW_NONE,   menu);
     add_show_menu(_("Show dialog"),      BALSA_INFORMATION_SHOW_DIALOG, menu);
@@ -3001,6 +3320,7 @@ create_information_message_menu(void)
     add_show_menu(_("Show in status bar"), BALSA_INFORMATION_SHOW_BAR,  menu);
     add_show_menu(_("Print to console"), BALSA_INFORMATION_SHOW_STDERR, menu);
     return menu;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 static GtkWidget *
@@ -3008,31 +3328,55 @@ create_encoding_menu(void)
 {
     gint i;
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    GtkWidget *combo_box = pm_combo_box_new();
+    for (i = 0; i < NUM_ENCODING_MODES; i++)
+        add_show_menu(_(encoding_type_label[i]), encoding_type[i],
+                      combo_box);
+    return combo_box;
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     GtkWidget *menu = gtk_menu_new();
     for (i = 0; i < NUM_ENCODING_MODES; i++)
 	add_show_menu(_(encoding_type_label[i]), encoding_type[i], menu );
     return menu;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 static GtkWidget *
 create_mdn_reply_menu(void)
 {
+#if GTK_CHECK_VERSION(2, 4, 0)
+    GtkWidget *combo_box = pm_combo_box_new();
+    add_show_menu(_("Never"),  BALSA_MDN_REPLY_NEVER,  combo_box);
+    add_show_menu(_("Ask me"), BALSA_MDN_REPLY_ASKME,  combo_box);
+    add_show_menu(_("Always"), BALSA_MDN_REPLY_ALWAYS, combo_box);
+    return combo_box;
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     GtkWidget *menu = gtk_menu_new();
     add_show_menu(_("Never"),  BALSA_MDN_REPLY_NEVER,  menu);
     add_show_menu(_("Ask me"), BALSA_MDN_REPLY_ASKME,  menu);
     add_show_menu(_("Always"), BALSA_MDN_REPLY_ALWAYS, menu);
     return menu;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 static GtkWidget *
 create_codeset_menu(void)
 {
     LibBalsaCodeset n;
+#if GTK_CHECK_VERSION(2, 4, 0)
+    GtkWidget *combo_box = pm_combo_box_new();
+    
+    for (n = WEST_EUROPE; n <= KOREA; n++)
+	add_show_menu(_(codeset_label[n]), n, combo_box);
+    return combo_box;
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     GtkWidget *menu = gtk_menu_new();
     
     for (n = WEST_EUROPE; n <= KOREA; n++)
 	add_show_menu(_(codeset_label[n]), n, menu);
     return menu;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 void
@@ -3107,11 +3451,19 @@ convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox)
 static GtkWidget *
 create_tls_mode_menu(void)
 {
+#if GTK_CHECK_VERSION(2, 4, 0)
+    GtkWidget *combo_box = pm_combo_box_new();
+    add_show_menu(_("Never"),       Starttls_DISABLED, combo_box);
+    add_show_menu(_("If Possible"), Starttls_ENABLED,  combo_box);
+    add_show_menu(_("Required"),    Starttls_REQUIRED, combo_box);
+    return combo_box;
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     GtkWidget *menu = gtk_menu_new();
     add_show_menu(_("Never"),       Starttls_DISABLED, menu);
     add_show_menu(_("If Possible"), Starttls_ENABLED,  menu);
     add_show_menu(_("Required"),    Starttls_REQUIRED, menu);
     return menu;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 #endif
 
@@ -3258,3 +3610,53 @@ pm_group_add_check(GtkWidget * group, const gchar * text)
 {
     return box_start_check(text, pm_group_get_vbox(group));
 }
+#if GTK_CHECK_VERSION(2, 4, 0)
+
+/* combo boxes */
+
+static void
+pm_combo_box_info_free(struct pm_combo_box_info * info)
+{
+    g_slist_free(info->levels);
+    g_free(info);
+}
+
+static GtkWidget *
+pm_combo_box_new(void)
+{
+    GtkWidget *combo_box = gtk_combo_box_new_text();
+    struct pm_combo_box_info *info = g_new0(struct pm_combo_box_info, 1);
+
+    g_object_set_data_full(G_OBJECT(combo_box), PM_COMBO_BOX_INFO, info,
+                           (GDestroyNotify) pm_combo_box_info_free);
+    g_signal_connect(G_OBJECT(combo_box), "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    return combo_box;
+}
+
+static void
+pm_combo_box_set_level(GtkWidget * combo_box, gint level)
+{
+    struct pm_combo_box_info *info =
+        g_object_get_data(G_OBJECT(combo_box), PM_COMBO_BOX_INFO);
+    GSList *list;
+    guint i;
+
+    for (list = info->levels, i = 0; list; list = list->next, ++i)
+	if (GPOINTER_TO_INT(list->data) == level) {
+	    gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), i);
+	    break;
+	}
+}
+
+static gint
+pm_combo_box_get_level(GtkWidget * combo_box)
+{
+    struct pm_combo_box_info *info =
+        g_object_get_data(G_OBJECT(combo_box), PM_COMBO_BOX_INFO);
+    gint active = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_box));
+
+    return GPOINTER_TO_INT(g_slist_nth_data(info->levels, active));
+}
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */

@@ -22,7 +22,7 @@
 #include <gtk/gtk.h>
 #include <gnome.h>
 #include "balsa-app.h"
-#include "addrbook-window.h"
+#include "addrbook-manager.h"
 
 gint delete_event (GtkWidget *, gpointer);
 
@@ -60,7 +60,7 @@ static addyb_item *addyb_item_new (gchar * name, gchar * comments)
 		      "select_row",
 		      GTK_SIGNAL_FUNC (update_addyb_window),
 		      NULL);
-  g_list_append (balsa_app.addressbook_list, new_item);
+  balsa_app.addressbook_list = g_list_append (balsa_app.addressbook_list, new_item);
 
   return (addyb_item *)gtk_clist_get_row_data(GTK_CLIST(addyb_list), row);
 }
@@ -82,7 +82,7 @@ addyb_compose_update (addyb_item * ai)
   gtk_text_freeze (GTK_TEXT (commentstext));
   gtk_editable_delete_text (GTK_EDITABLE (commentstext), 0, gtk_text_get_length (GTK_TEXT (commentstext)));
 
-  gtk_text_insert (GTK_TEXT (commentstext), NULL, NULL, NULL, ai->comments, strlen (ai->comments) + 1);
+  gtk_text_insert (GTK_TEXT (commentstext), NULL, NULL, NULL, ai->comments, strlen (ai->comments));
   gtk_text_thaw (GTK_TEXT (commentstext));
 }
 
@@ -280,6 +280,7 @@ addressbook_window_new (GtkWidget * widget, gpointer data)
   commentstext = gtk_text_new (NULL, NULL);
   gtk_box_pack_start (GTK_BOX (vbox1), commentstext, TRUE, TRUE, 3);
   gtk_widget_show (commentstext);
+  gtk_text_set_editable(GTK_TEXT(commentstext),1);
 
   gtk_paned_add2 (GTK_PANED (vpane), vbox1);
 
@@ -291,6 +292,7 @@ addressbook_window_new (GtkWidget * widget, gpointer data)
   addybitem = addyb_item_new ("Pavlov", "tests are fun");
   addyb_email_item_new(addybitem,"pavlov@innerx.net");
   addyb_email_item_new(addybitem,"pavlov@pavlov.net");
+  addyb_email_item_new(addybitem,"pavlov@alldolls.net");
   addyb_item_new ("test1", "tests suck!");
   addyb_item_new ("test2", "i like tests damnit!");
   addyb_item_new ("test3", "weeee");

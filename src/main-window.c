@@ -25,7 +25,7 @@
 #include "index.h"
 #include "mailbox.h"
 #include "mailbox-manager.h"
-#include "addrbook-window.h"
+#include "addrbook-manager.h"
 #include "../config.h"
 
 
@@ -425,7 +425,7 @@ create_menu (GtkWidget * window)
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Settings"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Settings"));
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;

@@ -29,7 +29,7 @@
 
 
 static void load_global_settings ();
-static void options_init ();
+static int options_init ();
 static void setup_local_mailboxes ();
 static void my_special_mailbox ();
 
@@ -53,15 +53,15 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.addressbook_list = NULL;
 
   load_global_settings ();
-  setup_local_mailboxes ();
-  options_init ();
+  if (options_init () == -1)
+    setup_local_mailboxes ();
   my_special_mailbox ();
 
   /* create main window */
   balsa_app.main_window = create_main_window ();
 }
 
-static void
+static gint
 options_init (void)
 {
   MailboxMBX *mbx;
@@ -76,7 +76,7 @@ options_init (void)
   MailboxIMAP *imap;
   MailboxNNTP *nntp;
 
-  int i = 0;
+  gint i = 0;
   gint type;
   gchar *name;
 
@@ -198,19 +198,21 @@ options_init (void)
 	      mbx->name = "Default";
 	      mbx->path = getenv ("MAIL");
 	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
+
+	      gnome_config_pop_prefix ();
+	      gnome_config_sync ();
+	      g_string_free (gstring, 1);
+	      g_string_free (buffer, 1);
+	      return -1;
 	    }
-	  gnome_config_pop_prefix ();
-	  gnome_config_sync ();
-	  g_string_free (gstring, 1);
-	  g_string_free (buffer, 1);
-	  return;
+	  break;
 	}
     }
   gnome_config_pop_prefix ();
   gnome_config_sync ();
   g_string_free (gstring, 1);
   g_string_free (buffer, 1);
-  return;
+  return i;
 }
 
 static void
@@ -226,15 +228,17 @@ setup_local_mailboxes ()
   MailboxUNIX *unixmb;
 
   /* check the MAIL environment variable for a spool directory */
-  if (getenv ("MAIL"))
-    {
-      mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
-      mbox->name = g_strdup ("INBOX");
-      mbox->path = g_strdup (getenv ("MAIL"));
+/* We'll make this the default if no other mailboxes are loaded... */
+/*
+   if (getenv ("MAIL"))
+   {
+   mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
+   mbox->name = g_strdup ("INBOX");
+   mbox->path = g_strdup (getenv ("MAIL"));
 
-      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
-    }
-
+   balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
+   }
+ */
   if (dp = opendir (balsa_app.local_mail_directory))
     {
       while ((d = readdir (dp)) != NULL)

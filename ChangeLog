@@ -1,3 +1,10 @@
+2004-05-26 14:06  PeterB
+
+	* doc/C/balsa.xml, libbalsa/folder-scanners.c,
+	libbalsa/folder-scanners.h, src/balsa-app.c, src/balsa-app.h,
+	src/mailbox-node.c, src/pref-manager.c, src/save-restore.c:
+	deferred folder scanning for local folder trees.
+
 2004-05-26 11:04  PeterB
 
 	* src/balsa-index.c: build with gtk+-2.0 < 2.2.0.

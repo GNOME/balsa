@@ -1,3 +1,11 @@
+2001-06-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalse/send.c: fix -m option when using with libESMTP:
+	the sending_mail flag was not set.
+	* src/pref-manager.c: capitalize strings to be capitalized.
+	* configure.in: link against libiconv library properly (contributed
+	by Brian Stafford).
+	
 2001-06-14  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/sendmsg-window.c: work around gnome-mime bug.

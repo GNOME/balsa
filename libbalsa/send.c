@@ -530,6 +530,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 
     send_message_info=send_message_info_new(outbox, session);
 #ifdef BALSA_USE_THREADS
+    sending_mail = TRUE;
     pthread_create(&send_mail, NULL,
 		   (void *) &balsa_send_message_real, send_message_info);
     /* Detach so we don't need to pthread_join
@@ -620,6 +621,9 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS,
 		      _("Disconnected"),
 		      NULL, NULL, 0);
+#ifdef BALSA_USE_THREADS
+	sending_mail = FALSE;
+#endif
         break;
     }
     va_end (ap);

@@ -1130,10 +1130,10 @@ create_identity_page(gpointer data)
     gtk_box_pack_start(GTK_BOX(vbox1), frame1, FALSE, FALSE, 0);
 
     table = GTK_TABLE(create_table(4, 2, GTK_CONTAINER(frame1)));
-    pui->real_name = attach_entry(_("Your name:"),       0,table);
-    pui->email     = attach_entry(_("E-mail address:"),  1,table);
-    pui->replyto   = attach_entry(_("Reply-to address:"),2,table);
-    pui->domain    = attach_entry(_("Default domain:"),  3,table);
+    pui->real_name = attach_entry(_("Your Name:"),       0,table);
+    pui->email     = attach_entry(_("E-mail Address:"),  1,table);
+    pui->replyto   = attach_entry(_("Reply-to Address:"),2,table);
+    pui->domain    = attach_entry(_("Default Domain:"),  3,table);
 
     return vbox1;
 }
@@ -1488,9 +1488,9 @@ outgoing_page(gpointer data)
     table2 = GTK_TABLE(gtk_table_new(3, 2, FALSE));
     gtk_container_add(GTK_CONTAINER(frame2), GTK_WIDGET(table2));
     gtk_container_set_border_width(GTK_CONTAINER(table2), 5);
-    pui->bcc = attach_entry(_("Default Bcc to:"), 0, table2);
-    pui->reply_string = attach_entry(_("Default Reply string:"), 1, table2);
-    pui->forward_string = attach_entry(_("Default Forward string:"), 2, table2);
+    pui->bcc = attach_entry(_("Default Bcc To:"), 0, table2);
+    pui->reply_string = attach_entry(_("Default Reply String:"), 1, table2);
+    pui->forward_string = attach_entry(_("Default Forward String:"), 2, table2);
 
     frame2 = gtk_frame_new(_("Encoding"));
     gtk_box_pack_start(GTK_BOX(vbox1), frame2, FALSE, FALSE, 0);

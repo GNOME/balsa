@@ -1,3 +1,7 @@
+2005-01-04  Pawel Salek
+
+	* libbalsa/mailbox_local.c: remove bogus test from msg matching (PB).
+
 2005-01-03 19:09  PeterB/manu <eallaud@yahoo.fr>
 
 	* libbalsa/mailbox_local.c: check for NULL msg-id.

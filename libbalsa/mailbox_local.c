@@ -440,7 +440,6 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
 	    if (match) break;
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
-            g_return_val_if_fail(is_refed, FALSE);
 	    if (cond->match.string.user_header) {
 		GList * header =
 		    libbalsa_message_find_user_hdr(message,

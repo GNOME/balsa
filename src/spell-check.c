@@ -279,6 +279,7 @@ balsa_spell_check_new_with_text(GtkTextView * check_text)
     spell_check =
 	BALSA_SPELL_CHECK(gtk_type_new(balsa_spell_check_get_type()));
     spell_check->view = check_text;
+    balsa_spell_check_set_highlight(spell_check);
 
     return GTK_WIDGET(spell_check);
 }
@@ -296,6 +297,7 @@ balsa_spell_check_set_text(BalsaSpellCheck * spell_check,
     g_return_if_fail(GTK_IS_TEXT_VIEW(check_text));
 
     spell_check->view = check_text;
+    balsa_spell_check_set_highlight(spell_check);
 }
 
 
@@ -426,7 +428,6 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     const guint padding = 4;
 
     /* Set spell checker */
-    balsa_spell_check_set_highlight(spell_check);
 
     spell_check->original_text = NULL;
     spell_check->word_list = NULL;

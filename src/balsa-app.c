@@ -494,7 +494,7 @@ open_mailboxes_idle_cb(gchar * names[])
 }
 
 GtkWidget *
-balsa_stock_button_with_label(const char *icon, const char *label)
+balsa_stock_button_with_label(const char *icon, const char *text)
 {
     GtkWidget *button;
     GtkWidget *pixmap;
@@ -502,10 +502,20 @@ balsa_stock_button_with_label(const char *icon, const char *label)
     pixmap = gnome_stock_new_with_icon(icon);
     button = gnome_pixmap_button(pixmap, label);
 #else
-    button = label
-        && *label ? gtk_button_new_with_label(label) : gtk_button_new();
+    GtkWidget *label, *hbox, *w;
+
     pixmap = gtk_image_new_from_stock(icon, GTK_ICON_SIZE_BUTTON);
-    gtk_container_add(GTK_CONTAINER(button), pixmap);
+    button = gtk_button_new();
+    w = gtk_hbox_new(FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(button), w);
+    hbox = gtk_hbox_new(FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(w), hbox, TRUE, FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(hbox), pixmap, FALSE, FALSE, 0);
+    if (text && *text) {
+        label = gtk_label_new(text);
+        gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 2);
+    }
+    gtk_widget_show_all(button);
 #endif                          /* BALSA_MAJOR < 2 */
     return button;
 }

@@ -2,6 +2,7 @@
 
 	* src/*,libinit_balsa/*, libbalsa/identity.c, libbalsa/misc.[hc]:
 	make entire balsa compile within GNOME2.
+	src/balsa-app.c, src/spell-check.c: hush critical errors.
 
 2002-03-10  Pawel Salek <pawsa@theochem.kth.se>
 

@@ -459,7 +459,8 @@ lbm_rethread(LibBalsaMailbox*m)
 {
     gdk_threads_enter();
     LOCK_MAILBOX_RETURN_VAL(m, FALSE);
-    lbm_set_threading(m, m->view->threading_type);
+    if (MAILBOX_OPEN(m))
+	lbm_set_threading(m, m->view->threading_type);
     UNLOCK_MAILBOX(m);
     g_object_unref(G_OBJECT(m));
     gdk_threads_leave();
@@ -1469,6 +1470,7 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
 				       LibBalsaMessageFlag clear)
 {
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_return_val_if_fail(!mailbox->readonly, FALSE);
     g_return_val_if_fail(HAVE_MAILBOX_LOCKED(mailbox), FALSE);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->

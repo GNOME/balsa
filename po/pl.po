@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-03-19 09:16+0100\n"
-"PO-Revision-Date: 2003-03-20 18:57+0100\n"
+"POT-Creation-Date: 2003-04-05 23:25+0200\n"
+"PO-Revision-Date: 2003-04-06 01:44+0200\n"
 "Last-Translator: GNOME PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -324,10 +324,31 @@ msgstr "Nie ma takiego typu skrzynki: %s"
 msgid "Could not create a mailbox of type %s"
 msgstr "Nie można utworzyć skrzynki typu %s"
 
+#: libbalsa/mailbox_imap.c:1 libbalsa/mailbox_imap.c:1
+#, c-format
+msgid ""
+"IMAP SEARCH command failed for mailbox %s\n"
+"or query was incompatible with IMAP (perhaps you use regular expressions)\n"
+"falling back to default searching method"
+msgstr ""
+"Polecenie IMAP SEARCH dla skrzynki %s nie powiodło się\n"
+"lub zapytanie nie było zgodne z protokołem IMAP (być może użyto wyrażeń "
+"regularnych).\n"
+"Nastąpił powrót do domyślnej metody wyszukiwania"
+
 #: libbalsa/mailbox_imap.c:1
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: Otwieranie %s Referencji: %d\n"
+
+#: libbalsa/mailbox_imap.c:1
+#, c-format
+msgid ""
+"IMAP SEARCH command failed for mailbox %s\n"
+"falling back to default searching method"
+msgstr ""
+"Polecenie IMAP SEARCH dla skrzynki %s nie powiodło się.\n"
+"Nastąpił powrót do domyślnej metody wyszukiwania"
 
 #: libbalsa/mailbox_local.c:1
 #, c-format
@@ -493,6 +514,295 @@ msgstr "Pobieranie listu %d z %d"
 msgid "Received %d bytes of %d"
 msgstr "Pobrano %d bajtów z %d"
 
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid ""
+"\n"
+"Signed by: %s"
+msgstr ""
+"\n"
+"Podpisane przez: %s"
+
+# Musze jeszcze sprawdzić czy napewno idzie o adres e-mail
+# a nie pocztowy (tradycyjny)
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid "Mail address: %s"
+msgstr "Adres e-mail: %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid ""
+"\n"
+"Validity: %s"
+msgstr ""
+"\n"
+"Ważność: %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid ""
+"\n"
+"Key fingerprint: %s"
+msgstr ""
+"\n"
+"Odcisk klucza: %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid ""
+"\n"
+"Key created on: %s"
+msgstr ""
+"\n"
+"Data utworzenia klucza: %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid ""
+"\n"
+"Signed on: %s"
+msgstr ""
+"\n"
+"Data podpisu: %s"
+
+#: libbalsa/rfc3156.c:1 libbalsa/rfc3156.c:1 libbalsa/rfc3156.c:1
+#, c-format
+msgid "gpgme could not get data from mailbox file: %s"
+msgstr "gpgme nie może pobrać danych z pliku skrzynki: %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid "gpgme signature verification failed: %s"
+msgstr "błąd przy weryfikacji podpisu przez gpgme: %s"
+
+#: libbalsa/rfc3156.c:1 libbalsa/rfc3156.c:1 libbalsa/rfc3156.c:1
+#, c-format
+msgid "could not create gpgme context: %s"
+msgstr "nie można utworzyć kontekstu gpgme: %s"
+
+#: libbalsa/rfc3156.c:1
+msgid "Enter passphrase to decrypt message"
+msgstr "Wprowadź hasło deszyfrujące list"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid "gpgme could not create new data object: %s"
+msgstr "gpgme nie może utworzyć nowego obiektu danych: %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid "gpgme decryption failed: %s"
+msgstr "zdeszyfrowanie przy użyciu gpgme nie powiodło się: %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid "could not get gpgme decrypted data: %s"
+msgstr "nie można pobrać danych zdeszyfrowanych przez gpgme: %s"
+
+# valid to w sumie ważny, ale to jakoś mi nie pasuje
+#: libbalsa/rfc3156.c:1
+msgid "The signature is valid."
+msgstr "Podpis jest poprawny."
+
+#: libbalsa/rfc3156.c:1
+msgid "The signature is valid but expired."
+msgstr "Podpis jest poprawny lecz stracił ważność."
+
+#: libbalsa/rfc3156.c:1
+msgid ""
+"The signature is valid but the key used to verify the signature has expired."
+msgstr ""
+"Podpis jest poprawny, ale klucz użyty do jego weryfikacji stracił ważność."
+
+#: libbalsa/rfc3156.c:1
+msgid "The signature is invalid."
+msgstr "Podpis jest niepoprawny."
+
+#: libbalsa/rfc3156.c:1
+msgid "The signature could not be verified due to a missing key."
+msgstr "Nie można zweryfikować podpisu z powodu braku klucza."
+
+#: libbalsa/rfc3156.c:1
+msgid "This part is not a real PGP signature."
+msgstr "Ten element nie jest prawdziwym podpisem PGP."
+
+#: libbalsa/rfc3156.c:1
+msgid "An error prevented the signature verification."
+msgstr "Nie można zweryfikować podpisu z powodu błędu."
+
+#: libbalsa/rfc3156.c:1
+msgid "This part contains at least two signatures with different status."
+msgstr "Ten element zawiera przynajmniej dwa podpisy z różnymi stanami."
+
+#: libbalsa/rfc3156.c:1
+msgid "bad status"
+msgstr "niepoprawny stan"
+
+#: libbalsa/rfc3156.c:1
+msgid "The user ID is of unknown validity."
+msgstr "Niepotwierdzona ważność identyfikatora użytkownika."
+
+#: libbalsa/rfc3156.c:1
+msgid "The validity of the user ID is undefined."
+msgstr "Ważność identyfikatora użytkownika nie jest określona."
+
+#: libbalsa/rfc3156.c:1
+msgid "The user ID is never valid."
+msgstr "Identyfikator użytkownika jest nieważny."
+
+#: libbalsa/rfc3156.c:1
+msgid "The user ID is marginally valid."
+msgstr "Identyfikator użytkownika jest częściowo potwierdzony."
+
+#: libbalsa/rfc3156.c:1
+msgid "The user ID is fully valid."
+msgstr "Identyfikator użytkownika jest ważny."
+
+# co za bezssens z tymi podpisami
+#: libbalsa/rfc3156.c:1
+msgid "The user ID is ultimately valid."
+msgstr "Identyfikator użytkownika jest ostatecznie ważny."
+
+# to jest naprawdę pokręcone
+# terminologia kryptologiczna rodem z prokomu :/
+#: libbalsa/rfc3156.c:1 libbalsa/rfc3156.c:1
+msgid "bad validity"
+msgstr "błąd stwierdzenia ważności"
+
+#: libbalsa/rfc3156.c:1
+msgid "unknown"
+msgstr "nieznany"
+
+#: libbalsa/rfc3156.c:1
+msgid "undefined"
+msgstr "niezdefiniowany"
+
+#: libbalsa/rfc3156.c:1
+msgid "never"
+msgstr "nigdy"
+
+#: libbalsa/rfc3156.c:1
+msgid "marginal"
+msgstr "marginalny"
+
+#: libbalsa/rfc3156.c:1
+msgid "full"
+msgstr "pełny"
+
+#: libbalsa/rfc3156.c:1
+msgid "ultimate"
+msgstr "ostateczny"
+
+#: libbalsa/rfc3156.c:1
+msgid "Fingerprint"
+msgstr "Odcisk palca"
+
+#: libbalsa/rfc3156.c:1
+msgid "Key ID"
+msgstr "ID Klucza"
+
+#: libbalsa/rfc3156.c:1
+msgid "Trust"
+msgstr "Zaufanie"
+
+#Albo czas trwania, bo może to o certyfikat idzie
+#: libbalsa/rfc3156.c:1
+msgid "Length"
+msgstr "Długość"
+
+#. FIXME: create dialog according to the Gnome HIG
+#: libbalsa/rfc3156.c:1
+msgid "Select key"
+msgstr "Wybór klucza"
+
+#: libbalsa/rfc3156.c:1
+msgid "Select the private key for the signer %s"
+msgstr "Wybierz klucz prywatny dla podpisującego %s"
+
+#: libbalsa/rfc3156.c:1
+msgid "Select the public key for the recipient %s"
+msgstr "Wybierz klucz publiczny dla odbiorcy %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid "could not list keys for %s: %s"
+msgstr "nie można uzyskać listy kluczy dla: %s: %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid "could not retrieve key for %s: %s"
+msgstr "nie można pobrać klucza dla %s: %s"
+
+#: libbalsa/rfc3156.c:1
+msgid "could not get a private key for %s"
+msgstr "nie można pobrać prywatnego klucza dla %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid "could not create gpgme recipients set: %s"
+msgstr "nie można utworzyć listy odbiorców gpgme: %s"
+
+#: libbalsa/rfc3156.c:1
+msgid "could not get a key for %s"
+msgstr "nie można pobrać klucza dla %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid "could not add recipient %s: %s"
+msgstr "nie można dodać odbiorcy %s: %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid ""
+"The passphrase for this key was bad, please try again!\n"
+"\n"
+"Key: %s"
+msgstr ""
+"Niepoprawne hasło klucza, spróbuj ponownie!\n"
+"\n"
+"Klucz: %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid ""
+"Please enter the passphrase for the secret key!\n"
+"\n"
+"Key: %s"
+msgstr ""
+"Wprowadź hasło dla tajnego klucza!\n"
+"\n"
+"Klucz: %s"
+
+#: libbalsa/rfc3156.c:1
+msgid "Enter passsphrase to sign message"
+msgstr "Wprowadź hasło w celu podpisania listu"
+
+#: libbalsa/rfc3156.c:1 libbalsa/rfc3156.c:1
+#, c-format
+msgid "gpgme could not get data from file: %s"
+msgstr "gpgme nie może pobrać danych z pliku: %s"
+
+#: libbalsa/rfc3156.c:1 libbalsa/rfc3156.c:1
+#, c-format
+msgid "gpgme could not create new data: %s"
+msgstr "gpgme nie może utworzyć nowych danych: %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid "gpgme signing failed: %s"
+msgstr "podpisanie przy użyciu gpgme nie powiodło się: %s"
+
+#: libbalsa/rfc3156.c:1 libbalsa/rfc3156.c:1
+#, c-format
+msgid "could not get gpgme data: %s"
+msgstr "nie można pobrać danych gpgme %s"
+
+#: libbalsa/rfc3156.c:1
+#, c-format
+msgid "gpgme encryption failed: %s"
+msgstr "zaszyfrowanie przy użyciu gpgme nie powiodło się: %s"
+
 #: libbalsa/send.c:1 libbalsa/send.c:1
 msgid "Sending Mail..."
 msgstr "Wysyłanie listu..."
@@ -564,6 +874,10 @@ msgid ""
 msgstr ""
 "Wystąpił problem przy komunikacji z serwerem SMTP (%d): %s\n"
 "List pozostał w skrzynce poczty wychodzącej."
+
+#: libbalsa/send.c:1
+msgid "This message will not be encrpyted for the BCC: recipient(s)."
+msgstr "List nie zostanie zaszyfrowany dla odbiorców z pola BCC:."
 
 #: libbalsa/source-viewer.c:1 src/main-window.c:1
 msgid "_Select Text"
@@ -1785,9 +2099,8 @@ msgid "Save MIME Part"
 msgstr "Zapis załącznika MIME"
 
 #: src/balsa-message.c:1
-#, c-format
-msgid "The signature of the message sent by %s with subject \"%s\" is good."
-msgstr "Podpis listu wysłanego przez %s z tematem \"%s\" jest poprawny."
+msgid "detected a good signature"
+msgstr "wykryto dobry podpis"
 
 #: src/balsa-message.c:1
 #, c-format
@@ -1803,10 +2116,10 @@ msgstr ""
 #: src/balsa-message.c:1
 #, c-format
 msgid ""
-"ckecking the signature of the message sent by %s with subject \"%s\" failed "
+"Checking the signature of the message sent by %s with subject \"%s\" failed "
 "with an error!"
 msgstr ""
-"sprawdzenie podpisu listu wysłanego przez %s z tematem \"%s\" zakończyło się "
+"Sprawdzenie podpisu listu wysłanego przez %s z tematem \"%s\" zakończyło się "
 "błędem!"
 
 #: src/balsa-message.c:1 src/print.c:1 src/sendmsg-window.c:1
@@ -1841,57 +2154,6 @@ msgstr "Fcc:"
 #: src/balsa-message.c:1 src/print.c:1
 msgid "Disposition-Notification-To:"
 msgstr "Powiadomienie-o-otrzymaniu:"
-
-#: src/balsa-message.c:1
-msgid ""
-"\n"
-"\n"
-"Signature details:"
-msgstr ""
-"\n"
-"\n"
-"Szczegóły podpisu:"
-
-#: src/balsa-message.c:1
-#, c-format
-msgid ""
-"\n"
-"Signed by: %s"
-msgstr ""
-"\n"
-"Podpisane przez: %s"
-
-# Musze jeszcze sprawdzić czy napewno idzie o adres e-mail
-# a nie pocztowy (tradycyjny)
-#: src/balsa-message.c:1
-msgid "Mail address: %s"
-msgstr "Adres e-mail: %s"
-
-#: src/balsa-message.c:1
-msgid ""
-"\n"
-"Key fingerprint: %s"
-msgstr ""
-"\n"
-"Odcisk klucza: %s"
-
-#: src/balsa-message.c:1
-#, c-format
-msgid ""
-"\n"
-"Key created on: %s"
-msgstr ""
-"\n"
-"Data utworzenia klucza: %s"
-
-#: src/balsa-message.c:1
-#, c-format
-msgid ""
-"\n"
-"Signed on: %s"
-msgstr ""
-"\n"
-"Data podpisu: %s"
 
 #: src/balsa-message.c:1 src/balsa-message.c:1 src/balsa-message.c:1
 #: src/balsa-message.c:1
@@ -1996,6 +2258,15 @@ msgstr ""
 #, c-format
 msgid "Cannot open temporary file %s."
 msgstr "Nie można otworzyć pliku tymczasowego %s."
+
+#: src/balsa-message.c:1
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
+"header describing the used codeset (converted to %s)"
+msgstr ""
+"List wysłany przez %s o temacie \"%s\" zawiera ośmiobitowe znaki, ale brak "
+"nagłówka opisującego użyty zestaw znaków (zmieniono na %s)"
 
 #: src/balsa-message.c:1
 #, c-format
@@ -2347,13 +2618,26 @@ msgid "Error when applying filters"
 msgstr "Błąd przy uruchamianiu filtrów"
 
 #: src/filter-run-callbacks.c:1
-#, c-format
 msgid ""
 "The destination mailbox of the filter \"%s\" is \"%s\"\n"
-"You can't associate it with the same mailbox (that causes recursion)."
+".You can't associate it with the same mailbox (that causes recursion)."
 msgstr ""
 "Skrzynką docelową filtru \"%s\" jest \"%s\".\n"
 "Nie można powiązać go z tą samą skrzynką (spowodowałoby to rekurencję)."
+
+# podciąg nie jest chyba najtrafniejszy
+#: src/filter-run-callbacks.c:1
+#, c-format
+msgid ""
+"The filter \"%s\" is not compatible with the mailbox type of \"%s\".\n"
+"This happens for example when you use regular expressions match with IMAP "
+"mailboxes, it is done by a very slow method; if possible, use substring "
+"match instead."
+msgstr ""
+"Filtr \"%s\" nie jest zgodny ze skrzynką typu \"%s\".\n"
+"Może się to zdarzyć w przypadku zestawienia wyrażeń regularnych ze "
+"skrzynkami IMAP co jest realizowane przy użyciu bardzo powolnej metody. "
+"Jeśli jest to możliwe, użyj porównań fragmentów napisów."
 
 #: src/filter-run-dialog.c:1
 msgid "Balsa Filters of Mailbox: "
@@ -2542,8 +2826,8 @@ msgid "Confirm"
 msgstr "Potwierdzenie"
 
 #: src/information-dialog.c:1
-msgid "Balsa Information"
-msgstr "Komunikat Balsy"
+msgid "Information - Balsa"
+msgstr "Balsa - Informacja"
 
 #: src/information-dialog.c:1
 msgid "WARNING: "
@@ -3221,7 +3505,7 @@ msgstr "_Tożsamości..."
 msgid "Create and set current identities"
 msgstr "Pozwala na utworzenie nowych tożsamości i modyfikację istniejących"
 
-#: src/main-window.c:1
+#: src/main-window.c:1 src/message-window.c:1
 msgid "_Message"
 msgstr "_List"
 
@@ -3244,10 +3528,6 @@ msgid ""
 msgstr ""
 "Nie można otworzyć skrzynki!\n"
 "Sprawdź ustawienia skrzynki."
-
-#: src/main-window.c:1
-msgid "Copyright (C) 1997-2002"
-msgstr "Copyright (C) 1997-2002"
 
 #: src/main-window.c:1
 msgid ""
@@ -3413,6 +3693,10 @@ msgstr "Prześlij w treści listu..."
 msgid "Forward this message inline"
 msgstr "Przesyła list dalej w treści nowego listu"
 
+#: src/message-window.c:1
+msgid "M_ove"
+msgstr "P_rzenieś"
+
 #: src/pref-manager.c:1
 msgid "7 Bits"
 msgstr "7 bitów"
@@ -3456,6 +3740,78 @@ msgstr "Płaskie"
 #: src/pref-manager.c:1
 msgid "JWZ"
 msgstr "JWZ"
+
+#: src/pref-manager.c:1
+msgid "west european (traditional)"
+msgstr "zachodnio-europejski (tradycyjny)"
+
+#: src/pref-manager.c:1
+msgid "east european"
+msgstr "wschodnioeuropejski"
+
+#: src/pref-manager.c:1
+msgid "south european"
+msgstr "południowoeuropejski"
+
+#: src/pref-manager.c:1
+msgid "north european"
+msgstr "północnoeuropejski"
+
+#: src/pref-manager.c:1
+msgid "cyrillic (iso/windows)"
+msgstr "cyrlica (iso/windows)"
+
+#: src/pref-manager.c:1
+msgid "arabic"
+msgstr "arabski"
+
+#: src/pref-manager.c:1
+msgid "greek"
+msgstr "grecki"
+
+#: src/pref-manager.c:1
+msgid "hebrew"
+msgstr "hebrajski"
+
+#: src/pref-manager.c:1
+msgid "turkish"
+msgstr "turecki"
+
+#: src/pref-manager.c:1
+msgid "nordic"
+msgstr "nordycki"
+
+#: src/pref-manager.c:1
+msgid "thai"
+msgstr "tajski"
+
+#: src/pref-manager.c:1
+msgid "baltic"
+msgstr "bałtycki"
+
+#: src/pref-manager.c:1
+msgid "celtic"
+msgstr "celtycki"
+
+#: src/pref-manager.c:1
+msgid "west european (euro)"
+msgstr "zachodnioeuropejski (euro)"
+
+#: src/pref-manager.c:1
+msgid "russian (koi)"
+msgstr "rosyjski (KOI)"
+
+#: src/pref-manager.c:1
+msgid "ukranian (koi)"
+msgstr "ukraiński (koi)"
+
+#: src/pref-manager.c:1
+msgid "japanese"
+msgstr "japoński"
+
+#: src/pref-manager.c:1
+msgid "korean"
+msgstr "koreański"
 
 #: src/pref-manager.c:1
 msgid "Balsa Preferences"
@@ -3607,6 +3963,21 @@ msgstr "Wyświetlanie listów wieloczęściowych"
 #: src/pref-manager.c:1
 msgid "prefer text/plain over html"
 msgstr "wybór czystego tekstu przed formatem HTML"
+
+#. treatment of messages with 8-bit chars, but without proper MIME encoding
+#: src/pref-manager.c:1
+msgid "National (8-bit) characters in broken messages without codeset header"
+msgstr ""
+"Znaki narodowe (8-bit) w uszkodzonym liście bez nagłówka zestawu znaków"
+
+#: src/pref-manager.c:1
+msgid "display as \"?\""
+msgstr "wyświetlanie jako \"?\""
+
+# sprawdzić czy nie za długi tekst
+#: src/pref-manager.c:1
+msgid "display using codeset"
+msgstr "wyświetlanie przy użyciu zestawu znaków"
 
 #. How to handle received MDN requests
 #: src/pref-manager.c:1
@@ -4557,17 +4928,11 @@ msgstr ""
 "Nie można zapisać listu przy użyciu zestawu znaków %s.\n"
 "Wybierz język tego listu."
 
+# nie jestem pewien poprawności
 #: src/sendmsg-window.c:1
-msgid "%s the message failed."
-msgstr "%s listu nie powiodło się."
-
-#: src/sendmsg-window.c:1
-msgid "Signing"
-msgstr "Podpisanie"
-
-#: src/sendmsg-window.c:1
-msgid "Encrypting"
-msgstr "Zaszyfrowanie"
+#, c-format
+msgid "sending message with gpg mode %d"
+msgstr "wysyłanie listu z użyciem trybu gpg %d"
 
 #: src/sendmsg-window.c:1
 #, c-format
@@ -4887,8 +5252,8 @@ msgid "Unknown toolbar icon \"%s\""
 msgstr "Nieznana ikona paska narzędziowego \"%s\""
 
 #: src/toolbar-prefs.c:1
-msgid "Customize"
-msgstr "Dopasowanie"
+msgid "Customize Toolbars"
+msgstr "Dopasowanie wyglądu pasków narzędziowych"
 
 #: src/toolbar-prefs.c:1
 msgid "Main window"
@@ -4939,6 +5304,52 @@ msgstr "Góra"
 #: src/toolbar-prefs.c:1
 msgid "Down"
 msgstr "Dół"
+
+#~ msgid "could not find a public key for %s"
+#~ msgstr "nie można odnaleźć klucza publicznego dla %s"
+
+#~ msgid "could not retrieve key fingerprint for %s: %s"
+#~ msgstr "nie można pobrać odcisku klucza dla %s: %s"
+
+#~ msgid "Signing the message failed"
+#~ msgstr "Podpisanie listu nie powiodło się."
+
+#~ msgid "Encrypting the message failed."
+#~ msgstr "Szyfrowanie listu nie powiodło się."
+
+#~ msgid "The signature of the message sent by %s with subject \"%s\" is good."
+#~ msgstr "Podpis listu wysłanego przez %s z tematem \"%s\" jest poprawny."
+
+#~ msgid ""
+#~ "Checking the signature of the message sent by %s with subject \"%s\" "
+#~ "failed."
+#~ msgstr ""
+#~ "Sprawdzenie podpisu listu wysłanego przez %s z tematem \"%s\" nie "
+#~ "powiodło się."
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "Signature details:"
+#~ msgstr ""
+#~ "\n"
+#~ "\n"
+#~ "Szczegóły podpisu:"
+
+#~ msgid "Signing"
+#~ msgstr "Podpisanie"
+
+#~ msgid "Encrypting"
+#~ msgstr "Zaszyfrowanie"
+
+#~ msgid "Balsa Information"
+#~ msgstr "Komunikat Balsy"
+
+#~ msgid "Copyright (C) 1997-2002"
+#~ msgstr "Copyright (C) 1997-2002"
+
+#~ msgid "Customize"
+#~ msgstr "Dopasowanie"
 
 #~ msgid "Reflow messages of type `text/plain; format=flowed'"
 #~ msgstr "Przeformatowywanie listów typu \"text/plain; format=flowed\""
@@ -5089,9 +5500,6 @@ msgstr "Dół"
 
 #~ msgid "Yes"
 #~ msgstr "Tak"
-
-#~ msgid "Display Formats"
-#~ msgstr "Formaty wyświetlania"
 
 #~ msgid "Preview Font"
 #~ msgstr "Czcionka podglądu"

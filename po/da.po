@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
-"POT-Creation-Date: 2000-02-09 07:03+0100\n"
-"PO-Revision-Date: 2000-02-07 03:25+01:00\n"
+"POT-Creation-Date: 2000-02-14 13:53+0100\n"
+"PO-Revision-Date: 2000-02-14 14:05+01:00\n"
 "Last-Translator: Birger Langkjer <birger.langkjer@image.dk>\n"
 "Language-Team: Danish <sslug-locale@sslug.dk>\n"
 "MIME-Version: 1.0\n"
@@ -131,8 +131,9 @@ msgstr "Gem MIME-del"
 msgid "Save"
 msgstr "Gem"
 
-#: src/balsa-message.c:164 src/mailbox-conf.c:632 src/sendmsg-window.c:101
-#: src/sendmsg-window.c:296
+#: src/balsa-message.c:164 src/mailbox-conf.c:632 src/sendmsg-window.c:113
+#: src/sendmsg-window.c:325 src/sendmsg-window.c:1002
+#: src/sendmsg-window.c:1321 src/sendmsg-window.c:1344
 msgid "Cancel"
 msgstr "Annullér"
 
@@ -152,13 +153,13 @@ msgstr "Dato:"
 
 #. From:
 #: src/balsa-message.c:530 src/filter-edit-dialog.c:339
-#: src/sendmsg-window.c:442
+#: src/sendmsg-window.c:461
 msgid "From:"
 msgstr "Fra:"
 
 #. To:
 #: src/balsa-message.c:544 src/filter-edit-dialog.c:327
-#: src/sendmsg-window.c:416
+#: src/sendmsg-window.c:435
 msgid "To:"
 msgstr "Til:"
 
@@ -175,7 +176,7 @@ msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:576 src/sendmsg-window.c:462
+#: src/balsa-message.c:576 src/sendmsg-window.c:481
 msgid "Subject:"
 msgstr "Emne:"
 
@@ -236,7 +237,7 @@ msgstr "Find tekst:"
 msgid "Add"
 msgstr "Tilføj"
 
-#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:221
+#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:246
 msgid "Remove"
 msgstr "Fjern"
 
@@ -638,7 +639,8 @@ msgstr "Næste"
 msgid "Open Next message"
 msgstr "Åbn det næste brev"
 
-#: src/main-window.c:331 src/print.c:82 src/sendmsg-window.c:97
+#: src/main-window.c:331 src/print.c:82 src/sendmsg-window.c:110
+#: src/sendmsg-window.c:129
 msgid "Print"
 msgstr "Udskriv"
 
@@ -990,84 +992,127 @@ msgstr ""
 msgid "Print Command:"
 msgstr "Printerkommando:"
 
-#: src/sendmsg-window.c:84
+#: src/sendmsg-window.c:96
 msgid "Send"
 msgstr "Send"
 
-#: src/sendmsg-window.c:84
+#: src/sendmsg-window.c:96
 msgid "Send this mail"
 msgstr "Send dette brev"
 
-#: src/sendmsg-window.c:87
+#: src/sendmsg-window.c:99
 msgid "Attach"
 msgstr "Vedhæft"
 
-#: src/sendmsg-window.c:87
+#: src/sendmsg-window.c:99
 msgid "Add attachments to this message"
 msgstr "Vedhæft bilag til dette brev"
 
-#: src/sendmsg-window.c:90
+#: src/sendmsg-window.c:102
 msgid "Postpone"
 msgstr "Udsæt"
 
-#: src/sendmsg-window.c:90
+#: src/sendmsg-window.c:102
 msgid "Continue this message later"
 msgstr "Fortsæt dette brev senere"
 
-#: src/sendmsg-window.c:94
+#: src/sendmsg-window.c:106
 msgid "Spelling"
 msgstr "Stavning"
 
-#: src/sendmsg-window.c:94
+#: src/sendmsg-window.c:106
 msgid "Check Spelling"
 msgstr "Stavekontrol"
 
-#: src/sendmsg-window.c:109
-msgid "_Send"
-msgstr "_Send"
+#: src/sendmsg-window.c:120
+msgid "_Include File..."
+msgstr "_Inkludér fil..."
 
-#: src/sendmsg-window.c:113
+#: src/sendmsg-window.c:122
 msgid "_Attach file..."
 msgstr "_Vedhæft bilag..."
 
-#: src/sendmsg-window.c:117
+#: src/sendmsg-window.c:125
+msgid "_Send"
+msgstr "_Send"
+
+#: src/sendmsg-window.c:125
+msgid "Send the currently edited message"
+msgstr "Send det nuværende redigerede brev"
+
+#: src/sendmsg-window.c:127
 msgid "_Postpone"
 msgstr "_Udsæt"
 
-#: src/sendmsg-window.c:131
+#: src/sendmsg-window.c:129
+msgid "Print the edited message"
+msgstr "Udskriv det redigerede brev"
+
+#: src/sendmsg-window.c:142
 msgid "_From"
 msgstr "F_ra"
 
-#: src/sendmsg-window.c:137
+#: src/sendmsg-window.c:144
 msgid "_To"
 msgstr "_Til"
 
-#: src/sendmsg-window.c:143
+#: src/sendmsg-window.c:146
 msgid "_Subject"
 msgstr "_Emne"
 
-#: src/sendmsg-window.c:149
+#: src/sendmsg-window.c:148
 msgid "_Cc"
 msgstr "_Cc"
 
-#: src/sendmsg-window.c:155
+#: src/sendmsg-window.c:150
 msgid "_Bcc"
 msgstr "_Bcc"
 
-#: src/sendmsg-window.c:161
+#: src/sendmsg-window.c:152
 msgid "_Fcc"
 msgstr "_Fcc"
 
-#: src/sendmsg-window.c:167
+#: src/sendmsg-window.c:154
 msgid "_Attachments"
 msgstr "B_ilag"
 
-#: src/sendmsg-window.c:178
+#: src/sendmsg-window.c:162
+msgid "_Western (ISO-8859-1)"
+msgstr "_Vesteuropa (ISO-8859-1)"
+
+#: src/sendmsg-window.c:164
+msgid "W_estern (ISO-8859-15)"
+msgstr "V_esteuropa (m. euro) (ISO-8859-15)"
+
+#: src/sendmsg-window.c:166
+msgid "_Central European (ISO-8859-2)"
+msgstr "_Centraleuropa (ISO-8859-2)"
+
+#: src/sendmsg-window.c:168
+msgid "_South European (ISO-8859-3)"
+msgstr "_Sydeuropa (ISO-8859-3)"
+
+#: src/sendmsg-window.c:170
+msgid "_Cyrillic (ISO-8859-5)"
+msgstr "_Kyrillisk (ISO-8859-5)"
+
+#: src/sendmsg-window.c:172
+msgid "_Hebrew (ISO-8859-8)"
+msgstr "_Hebraisk (ISO-8859-8)"
+
+#: src/sendmsg-window.c:174
+msgid "_Turkish (ISO-8859-9)"
+msgstr "_Tyrkisk (ISO-8859-9)"
+
+#: src/sendmsg-window.c:199
 msgid "_Show"
 msgstr "_Vis"
 
-#. PKGW
-#: src/sendmsg-window.c:272
+#: src/sendmsg-window.c:200
+msgid "_ISO Charset"
+msgstr "_ISO tegnsæt"
+
+#: src/sendmsg-window.c:297
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -1075,78 +1120,93 @@ msgstr ""
 "Vedhæftningsikonen (balsa/attachment.png) kunne ikke findes.\n"
 "Det betyder desværre at du ikke kan vedhæfte filer.\n"
 
-#: src/sendmsg-window.c:274
+#: src/sendmsg-window.c:299
 msgid "OK"
 msgstr "OK"
 
-#: src/sendmsg-window.c:289
+#: src/sendmsg-window.c:315
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Kan ikke skaffe information om filen '%s': %s\n"
 
-#: src/sendmsg-window.c:292
+#: src/sendmsg-window.c:319
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Bilaget er ikke en almindelig fil: '%s'\n"
 
-#: src/sendmsg-window.c:342
+#: src/sendmsg-window.c:363
 msgid "Attach file"
 msgstr "Vedhæft bilag"
 
 #. cc:
-#: src/sendmsg-window.c:472
+#: src/sendmsg-window.c:491
 msgid "cc:"
 msgstr "cc:"
 
 #. bcc:
-#: src/sendmsg-window.c:498
+#: src/sendmsg-window.c:517
 msgid "bcc:"
 msgstr "bcc:"
 
 #. fcc:
-#: src/sendmsg-window.c:524
+#: src/sendmsg-window.c:543
 msgid "fcc:"
 msgstr "fcc:"
 
 #. Attachment list
-#: src/sendmsg-window.c:552
+#: src/sendmsg-window.c:571
 msgid "Attachments:"
 msgstr "Bilag:"
 
-#: src/sendmsg-window.c:654
-msgid "Reply to "
-msgstr "Svar til "
-
-#: src/sendmsg-window.c:659
-msgid "Forward message"
-msgstr "Videresend brev"
-
-#: src/sendmsg-window.c:664
-msgid "Continue message"
-msgstr "Fortsæt brev"
-
-#: src/sendmsg-window.c:669
-msgid "New message"
-msgstr "Nyt brev"
-
-#. Should use instead something like:
-#. * 	strftime( buf, sizeof(buf), _("On %A %B %d %Y etc"),
-#. * 	                somedateparser(message-date)));
-#. * 	tmp = g_strdup_printf (buf);
-#. * so the date attribution can fully (and properly) translated.
-#.
-#: src/sendmsg-window.c:856
-#, c-format
-msgid "On %s "
-msgstr "Den %s "
-
-#: src/sendmsg-window.c:866 src/sendmsg-window.c:869
+#: src/sendmsg-window.c:683
 msgid "you"
 msgstr "du"
 
-#: src/sendmsg-window.c:871
-msgid " wrote:\n"
-msgstr " skrev:\n"
+#: src/sendmsg-window.c:692
+#, c-format
+msgid "On %s %s wrote:\n"
+msgstr "Den %s skrev %s:\n"
+
+#: src/sendmsg-window.c:694
+#, c-format
+msgid "%s wrote:\n"
+msgstr "%s skrev:\n"
+
+#: src/sendmsg-window.c:756
+msgid "Reply to "
+msgstr "Svar til "
+
+#: src/sendmsg-window.c:761
+msgid "Forward message"
+msgstr "Videresend brev"
+
+#: src/sendmsg-window.c:766
+msgid "Continue message"
+msgstr "Fortsæt brev"
+
+#: src/sendmsg-window.c:771
+msgid "New message"
+msgstr "Nyt brev"
+
+#: src/sendmsg-window.c:1001
+msgid "Could not open the file.\n"
+msgstr "Kunne ikke åbne filen.\n"
+
+#: src/sendmsg-window.c:1007
+msgid "Loading..."
+msgstr "Indlæser..."
+
+#: src/sendmsg-window.c:1032
+msgid "Include file"
+msgstr "Inkludér fil"
+
+#: src/sendmsg-window.c:1319
+msgid "Cannot execute print command."
+msgstr "Kan ikke udføre printerkommando."
+
+#: src/sendmsg-window.c:1343
+msgid "Error executing lpr"
+msgstr "Fejl under køring af lpr"
 
 #: src/spell-check.c:136
 msgid "Spell Check"
@@ -1304,174 +1364,3 @@ msgid ""
 msgstr ""
 "Dette vil afslutte Balsa.\n"
 "Vil du virkelig gerne det?"
-
-#~ msgid "Inbox"
-#~ msgstr "Indbakke"
-
-#~ msgid "Outbox"
-#~ msgstr "Udbakke"
-
-#~ msgid "Sentbox"
-#~ msgstr "Sendt_post"
-
-#~ msgid "Draftbox"
-#~ msgstr "Kladder"
-
-#~ msgid "Trash"
-#~ msgstr "Affald"
-
-#~ msgid "_Open"
-#~ msgstr "Å_bn"
-
-#~ msgid "Open the selected mailbox"
-#~ msgstr "Åbn valgte postkasse"
-
-#~ msgid "_Close"
-#~ msgstr "_Luk"
-
-#~ msgid "Close the selected mailbox"
-#~ msgstr "Luk den valgte postkasse"
-
-#~ msgid "C_lose current"
-#~ msgstr "L_uk nuværende"
-
-#~ msgid "Close the currently opened mailbox"
-#~ msgstr "Luk nuværende åbnede postkasse"
-
-#~ msgid "O_pened"
-#~ msgstr "Åb_nede"
-
-#~ msgid "Include signature when sending mail"
-#~ msgstr "Inkludér signatur når du sender post"
-
-#~ msgid "Include signature when forwarding mail"
-#~ msgstr "Inkludér signatur når du videresender post"
-
-#~ msgid "Include signature when replying to mail"
-#~ msgstr "Inkludér signatur når du svarer på post"
-
-#~ msgid "Linesize:"
-#~ msgstr "Linielængde:"
-
-#, fuzzy
-#~ msgid "Local"
-#~ msgstr "Lokal post"
-
-#, fuzzy
-#~ msgid "New Local Mailbox"
-#~ msgstr "Lokal postkasse"
-
-#, fuzzy
-#~ msgid "Mailbox name:"
-#~ msgstr "Navn på postkasse"
-
-#, fuzzy
-#~ msgid "Path to mailbox:"
-#~ msgstr "Lokal postkasse"
-
-#~ msgid ""
-#~ "Please enter information about yourself. If you don't\n"
-#~ "use an SMTP server, enter \"localhost\" into the box."
-#~ msgstr ""
-#~ "Indtast venligst lidt information om dig selv. Hvis du ikke\n"
-#~ "bruger en SMTP server, skriv bare \"localhost\" i feltet."
-
-#~ msgid "Mail Directory Settings"
-#~ msgstr "Postmappeindstillinger"
-
-#~ msgid "Create Mail Directory?"
-#~ msgstr "Opret postmappe?"
-
-#~ msgid ""
-#~ "The mailbox directory you specified either does not exist or is not properly "
-#~ "accessible. If you click the \"Next\" button, I will attempt to create it. "
-#~ "If you click \"Back\", you can change the directory. If you think the "
-#~ "directory should work, check the error message below, fix the problem, click "
-#~ "\"Back\", then try \"Next\" again."
-#~ msgstr ""
-#~ "Postkassemappen du angav eksisterer enten ikke eller er ikke ordentlig "
-#~ "tilgængelig. Hvis du klikker på knappen \"Næste\" vil jeg prøve at oprette "
-#~ "den. Hvis du klikker på \"Tilbage\" kan du vælge en anden mappe. Hvis du "
-#~ "mener at mappen burde virke, tjek fejlmeddelelsen herunder, løs problemet, "
-#~ "klik \"Tilbage\" og prøv \"Næste\" igen."
-
-#~ msgid "There is a serious internal error.\n"
-#~ msgstr "Der opstod en alvorlig intern fejl.\n"
-
-#~ msgid "Error Creating Directory"
-#~ msgstr "Fejl under oprettelse af mappe"
-
-#~ msgid ""
-#~ "There was an error creating the folder, detailed below. You cannot continue "
-#~ "unless your mail folder exists. Either go back and choose a new folder or "
-#~ "cancel this setup and fix the problem."
-#~ msgstr ""
-#~ "Der opstod en fejl under oprettelse af mappen, se detaljer herunder. Du kan "
-#~ "ikke fortsætte med mindre din postmappe eksisterer. Gå enten tilbage og vælg "
-#~ "en ny mappe eller afslut opsætning og løs problemet."
-
-#~ msgid "Configure %s"
-#~ msgstr "Indstil %s"
-
-#~ msgid ""
-#~ "Please specify a filename for mail folder \"%s\". (It will be created if it "
-#~ "does not exist.)"
-#~ msgstr ""
-#~ "Angiv venligst et filnavn for postmappen \"%s\". (Den vil blive oprettet "
-#~ "hvis den ikke eksisterer.)"
-
-#~ msgid "OOPS BUG"
-#~ msgstr "HOVSA EN FEJL"
-
-#~ msgid ""
-#~ "The directory or file \"%s\" does not appear to exist, or it is not a "
-#~ "mailbox. Should I try to create it as a mailbox? Click the \"Next\" button "
-#~ "to try and create it. Click \"Back\" to choose another filename."
-#~ msgstr ""
-#~ "Mappen eller filen \"%s\" ser ikke ud til at eksistere eller er ikke en "
-#~ "postkasse (mbox-type). Skal jeg prøve at oprette den som postkasse? Klik på "
-#~ "knappen \"Næste\" for at forsøge at oprette den. Klik \"Tilbage\" for at "
-#~ "vælge et andet filnavn."
-
-#~ msgid "Mailbox Creation Failed"
-#~ msgstr "Oprettelse af postkasse fejlede"
-
-#~ msgid ""
-#~ "A mailbox could not be created at the filename \"%s\". A more exact error is "
-#~ "below. Please determine the error and fix the problem, either by going "
-#~ "backwards and choosing a filename that will work, or exiting this setup and "
-#~ "fixing the problem elsewhere.\n"
-#~ "\n"
-#~ "Errno: %d (%s)"
-#~ msgstr ""
-#~ "En postkasse med filnavnet \"%s\" kunne ikke oprettes. Se flere detaljer "
-#~ "herunder. Find venligst ud af hvad fejlen var og løs problemet enten ved at "
-#~ "gå tilbage og vælge et filnavn der virker eller afslutte opsætning og rette "
-#~ "fejlen et andet sted.\n"
-#~ "\n"
-#~ "Fejlnr: %d (%s)"
-
-#~ msgid ""
-#~ "I would now like you to tell me where your mail directories are. The "
-#~ "directory below will be contain your Balsa mailboxes, and be searched for "
-#~ "new mailboxes. storing your Balsa mail. It does not necessarily have to "
-#~ "exist (yet).\n"
-#~ "\n"
-#~ "There are five folders that you will be asked to set up; if they do not "
-#~ "exist, they will be created. However, you must have all five of them by the "
-#~ "time setup is finished.\n"
-#~ msgstr ""
-#~ "Jeg vil nu fortælle dig om hvor dine postkasser er. Mappen herunder vil "
-#~ "indeholde dine Balsa postkasser og vil blive undersøgt for nye postkasser "
-#~ "til at gemme din e-post i. Den behøver ikke nødvendigvis at eksistere "
-#~ "endnu.\n"
-#~ "\n"
-#~ "Du vil blive bedt om at opsætte fem postkasser; hvis de ikke eksisterer vil "
-#~ "de blive oprettet. Du er dog nødt til at lave dem alle fem før du afslutter "
-#~ "opsætningsprogrammet.\n"
-
-#~ msgid "Your mailbox directory:"
-#~ msgstr "Din postkassemappe:"
-
-#~ msgid "Checked."
-#~ msgstr "Checket."

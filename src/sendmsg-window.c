@@ -167,7 +167,7 @@ static GnomeUIInfo iso_charset_menu[] = {
 #define ISO_CHARSET_3_POS 3
   GNOMEUIINFO_ITEM_NONE( N_ ("_South European (ISO-8859-3)"), NULL, iso_3_cb),
 #define ISO_CHARSET_5_POS 4
-  GNOMEUIINFO_ITEM_NONE( N_ ("_Cyrylic (ISO-8859-5)"), NULL, iso_5_cb),
+  GNOMEUIINFO_ITEM_NONE( N_ ("_Cyrillic (ISO-8859-5)"), NULL, iso_5_cb),
 #define ISO_CHARSET_8_POS 5
   GNOMEUIINFO_ITEM_NONE( N_ ("_Hebrew (ISO-8859-8)"), NULL, iso_8_cb),
 #define ISO_CHARSET_9_POS 6

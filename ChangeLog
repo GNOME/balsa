@@ -1,3 +1,18 @@
+2002-08-18  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* autogen.sh: build both with vicious-scripts and on RH beta (PS).
+	* libbalsa/body.c: convert all texts by html (PB+PS).
+	* libbalsa/folder-scanners.c: allow for NULL path in
+	libbalsa_scanner_imap_dir.
+	* libbalsa/source-viewer.c: convert to us-ascii.
+	* libinit_balsa/balsa-druid-page-user.c: remove another dead line
+	and other silliness.
+	* src/address-book-config.c, src/balsa-app.c,
+	src/balsa-index-threading.c: remove deprecated code.
+	* src/address-book.[ch]: port BalsaAddressBook lists to GtkTreeView.
+	* src/sendmsg-window.c: append addresses from book to current
+	 addresses.
+
 2002-08-15 Steve Wall  <hitched97@myrealbox.com>
 
 	* configure.in: libestmp -I flag.

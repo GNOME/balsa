@@ -528,11 +528,26 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
 
     response = gtk_dialog_run(GTK_DIALOG(ab));
     if ( response == GTK_RESPONSE_OK ) {
-	gchar *t;
-	t = balsa_address_book_get_recipients(BALSA_ADDRESS_BOOK(ab));
-	if ( t ) /* FIXME: append */
-	    gtk_entry_set_text(GTK_ENTRY(address_entry), t);
-	g_free(t);
+	gchar *t =
+            balsa_address_book_get_recipients(BALSA_ADDRESS_BOOK(ab));
+
+        if (t) {
+            gint position = -1;
+
+            /* append */
+            gtk_editable_set_position(GTK_EDITABLE(address_entry),
+                                      position);
+            position =
+                gtk_editable_get_position(GTK_EDITABLE(address_entry));
+            if (position > 0)
+                gtk_editable_insert_text(GTK_EDITABLE(address_entry), ", ",
+                                         2, &position);
+            gtk_editable_insert_text(GTK_EDITABLE(address_entry), t,
+                                     -1, &position);
+            gtk_editable_set_position(GTK_EDITABLE(address_entry),
+                                      position);
+            g_free(t);
+        }
     }
     gtk_widget_destroy(ab);
 }

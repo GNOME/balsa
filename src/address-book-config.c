@@ -114,8 +114,8 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book,
     gtk_window_set_wmclass(GTK_WINDOW(abc->window), 
 			   "address_book_config_dialog", "Balsa");
 
-    gtk_signal_connect(GTK_OBJECT(abc->window), "response", 
-                       GTK_SIGNAL_FUNC(abc_response_cb), abc);
+    g_signal_connect(G_OBJECT(abc->window), "response", 
+                     G_CALLBACK(abc_response_cb), abc);
 
     abc->notebook = gtk_notebook_new();
     gtk_container_set_border_width(GTK_CONTAINER(abc->window), 5);
@@ -127,10 +127,7 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book,
 
     bbox = GTK_DIALOG(abc->window)->action_area;
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
-    gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
-    gtk_button_box_set_child_size(GTK_BUTTON_BOX(bbox),
-				  BALSA_BUTTON_WIDTH / 2,
-				  BALSA_BUTTON_HEIGHT / 2);
+    gtk_box_set_spacing(GTK_BOX(bbox), 5);
 
     if (address_book == NULL) {
 	abc->continue_button = 
@@ -161,7 +158,7 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book,
     gtk_notebook_append_page(GTK_NOTEBOOK(abc->notebook), page, NULL);
 
     num = gtk_notebook_page_num(GTK_NOTEBOOK(abc->notebook), page);
-    gtk_notebook_set_page(GTK_NOTEBOOK(abc->notebook), num);
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(abc->notebook), num);
 
     gtk_dialog_add_buttons(GTK_DIALOG(abc->window),
                            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -325,38 +322,35 @@ create_choice_page(AddressBookConfig * abc)
 	gtk_radio_button_new_with_label(NULL,
 					_("VCard Address Book (GnomeCard)"));
     gtk_box_pack_start(GTK_BOX(vbox), radio_button, FALSE, FALSE, 0);
-    gtk_signal_connect(GTK_OBJECT(radio_button), "clicked",
-		       GTK_SIGNAL_FUNC(set_the_page), (gpointer) abc);
-    gtk_object_set_user_data(GTK_OBJECT(radio_button),
-			     GINT_TO_POINTER
-			     (LIBBALSA_TYPE_ADDRESS_BOOK_VCARD));
+    g_signal_connect(G_OBJECT(radio_button), "clicked",
+		     G_CALLBACK(set_the_page), (gpointer) abc);
+    g_object_set_data(G_OBJECT(radio_button), "user_data",
+                      GINT_TO_POINTER(LIBBALSA_TYPE_ADDRESS_BOOK_VCARD));
     gtk_widget_show(radio_button);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_button), TRUE);
     abc->create_type = LIBBALSA_TYPE_ADDRESS_BOOK_VCARD;
 
 	/* ... External query Address Book */
     radio_button = gtk_radio_button_new_with_label
-	(gtk_radio_button_group(GTK_RADIO_BUTTON(radio_button)),
+	(gtk_radio_button_get_group(GTK_RADIO_BUTTON(radio_button)),
 	 _("External query (a program)"));
     gtk_box_pack_start(GTK_BOX(vbox), radio_button, FALSE, FALSE, 0);
-    gtk_signal_connect(GTK_OBJECT(radio_button), "clicked",
-		       GTK_SIGNAL_FUNC(set_the_page), (gpointer) abc);
-    gtk_object_set_user_data(GTK_OBJECT(radio_button),
-			     GINT_TO_POINTER
-			     (LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN));
+    g_signal_connect(G_OBJECT(radio_button), "clicked",
+		     G_CALLBACK(set_the_page), (gpointer) abc);
+    g_object_set_data(G_OBJECT(radio_button), "user_data",
+                      GINT_TO_POINTER(LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN));
     gtk_widget_show(radio_button);
 
 
     /* ... LDIF Address Book */
     radio_button = gtk_radio_button_new_with_label
-	(gtk_radio_button_group(GTK_RADIO_BUTTON(radio_button)),
+	(gtk_radio_button_get_group(GTK_RADIO_BUTTON(radio_button)),
 	 _("LDIF Address Book"));
     gtk_box_pack_start(GTK_BOX(vbox), radio_button, FALSE, FALSE, 0);
-    gtk_signal_connect(GTK_OBJECT(radio_button), "clicked",
-		       GTK_SIGNAL_FUNC(set_the_page), (gpointer) abc);
-    gtk_object_set_user_data(GTK_OBJECT(radio_button),
-			     GINT_TO_POINTER
-			     (LIBBALSA_TYPE_ADDRESS_BOOK_LDIF));
+    g_signal_connect(G_OBJECT(radio_button), "clicked",
+		     G_CALLBACK(set_the_page), (gpointer) abc);
+    g_object_set_data(G_OBJECT(radio_button), "user_data",
+                      GINT_TO_POINTER(LIBBALSA_TYPE_ADDRESS_BOOK_LDIF));
     gtk_widget_show(radio_button);
 
     /* ... LDAP. */
@@ -368,11 +362,10 @@ create_choice_page(AddressBookConfig * abc)
 	(gtk_radio_button_group(GTK_RADIO_BUTTON(radio_button)),
 	 _("LDAP Address Book"));
     gtk_box_pack_start(GTK_BOX(vbox), radio_button, FALSE, FALSE, 0);
-    gtk_signal_connect(GTK_OBJECT(radio_button), "clicked",
-		       GTK_SIGNAL_FUNC(set_the_page), (gpointer) abc);
-    gtk_object_set_user_data(GTK_OBJECT(radio_button),
-			     GINT_TO_POINTER
-			     (LIBBALSA_TYPE_ADDRESS_BOOK_LDAP));
+    g_signal_connect(G_OBJECT(radio_button), "clicked",
+		     G_CALLBACK(set_the_page), (gpointer) abc);
+    g_object_set_data(GTK_OBJECT(radio_button), "user_data",
+                      GINT_TO_POINTER(LIBBALSA_TYPE_ADDRESS_BOOK_LDAP));
     gtk_widget_show(radio_button);
 #else
     label = gtk_label_new(_("Balsa is not compiled with LDAP support"));
@@ -603,7 +596,8 @@ set_the_page(GtkWidget * button, AddressBookConfig * abc)
      */
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button))) {
 	GtkType type =
-	    GPOINTER_TO_INT(gtk_object_get_user_data(GTK_OBJECT(button)));
+            GPOINTER_TO_INT(g_object_get_data(G_OBJECT(button),
+                                              "user_data"));
 	abc->create_type = type;
     }
 }
@@ -662,7 +656,7 @@ next_button_cb(AddressBookConfig * abc)
     gtk_notebook_append_page(GTK_NOTEBOOK(abc->notebook), page, NULL);
 
     num = gtk_notebook_page_num(GTK_NOTEBOOK(abc->notebook), page);
-    gtk_notebook_set_page(GTK_NOTEBOOK(abc->notebook), num);
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(abc->notebook), num);
     gtk_widget_grab_focus(abc->name_entry);
 }
 

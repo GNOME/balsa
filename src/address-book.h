@@ -43,10 +43,10 @@ struct _BalsaAddressBook
     LibBalsaAddressBook *current_address_book;
 
     /* The address list */
-    GtkWidget *address_clist;
+    GtkWidget *address_list;
 
     /* The send to list */
-    GtkWidget *recipient_clist;
+    GtkWidget *recipient_list;
 
     /* Radio buttons for dist list mode */
     GtkWidget *single_address_mode_radio;
@@ -65,12 +65,3 @@ gchar *balsa_address_book_get_recipients(BalsaAddressBook *ab);
 
 
 #endif				/* __ADDRESS_BOOK_H__ */
-
-
-
-
-
-
-
-
-

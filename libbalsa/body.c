@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -192,11 +192,15 @@ libbalsa_message_body_save(LibBalsaMessageBody * body, gchar * prefix,
     fseek(stream, body->mutt_body->offset, 0);
 
     s.fpin = stream;
-
-    s.prefix = prefix;
     s.fpout = safe_fopen(filename, "w");
     if (!s.fpout)
 	return FALSE;
+    s.prefix = prefix;
+    /* convert everything but HTML - gtkhtml does conversion on its own. */
+    s.flags = 
+	(body->mutt_body->subtype && 
+	 strcmp(body->mutt_body->subtype, "html")==0) 
+     ? 0 : M_CHARCONV;
 
     libbalsa_lock_mutt();
     mutt_decode_attachment(body->mutt_body, &s);

@@ -35,6 +35,17 @@ for dir in $PATH ; do
 done
 IFS="$ifs_save"
 
+# GNOME's autogen.sh does not pass --intl option to gettextize, and
+# gnome-autogen.sh does not need that.
+# this definition is an ugly hack until autobuild tools stabilize.
+function gettextize {
+  if test -d libmutt; then
+     `which gettextize` --intl $*;
+  else
+     `which gettextize` $*;
+  fi
+}
+
 if test -n "$gnome_autogen" ; then
   GNOME_DATADIR="$gnome_datadir" USE_GNOME2_MACROS=1 . $gnome_autogen
   exit 0
@@ -46,10 +57,6 @@ sleep 3
 
 # GNOME2 is properly installed on the system.
 # Do the things the usual way.
-
-# GNOME's autogen.sh does not pass --intl option to gettextize,
-function gettextize { `which gettextize` --intl $*; }
-
 
 # call GNOME's autogen.sh.
 . $srcdir/macros/autogen.sh

@@ -95,7 +95,6 @@ libbalsa_show_file(FILE* f, long length)
     GtkWidget* text;
     GtkTextBuffer* buffer;
     char buf[1024];
-    int linelen;
 
     window = gnome_app_new("balsa", _("Message Source"));
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
@@ -116,9 +115,22 @@ libbalsa_show_file(FILE* f, long length)
     if(length<0) length = 5*1024*1024; /* random limit for the file size
 					* not likely to be used */
     while(length>0 && fgets(buf, sizeof(buf), f)) {
-	linelen = strlen(buf);
-	gtk_text_buffer_insert_at_cursor(buffer, buf,
-                                         length>linelen ? linelen : length);
+	gint linelen = strlen(buf);
+        GError * error = NULL;
+        gchar *tmp =
+            g_convert_with_fallback(buf,
+                                    length > linelen ? linelen : length,
+                                    "US-ASCII", "ISO-8859-1", NULL, NULL,
+                                    NULL, &error);
+
+        if (error) {
+            g_print(_("Conversion error: %s\n"), error->message);
+            g_error_free(error);
+        }
+        if (tmp) {
+	    gtk_text_buffer_insert_at_cursor(buffer, tmp, -1);
+            g_free(tmp);
+        }
 	length -= linelen;
     }
 

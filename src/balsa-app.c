@@ -20,6 +20,7 @@
  */
 
 #include "config.h"
+#include <string.h>
 #ifdef BALSA_USE_THREADS
 /* _XOPEN_SOURCE is needed for rwlocks */
 #define _XOPEN_SOURCE 500
@@ -481,7 +482,8 @@ open_mailboxes_idle_cb(gchar ** urls)
     g_strfreev(urls);
 
     if (gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook)) >=
-	0) gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook), 0);
+        0)
+        gtk_notebook_set_current_page(GTK_NOTEBOOK(balsa_app.notebook), 0);
     gdk_threads_leave();
 
     return FALSE;
@@ -870,8 +872,11 @@ create_entry(GtkDialog *mcw, GtkWidget * table,
     GtkWidget *entry = gtk_entry_new();
     gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
 		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
-    if (initval)
-	gtk_entry_append_text(GTK_ENTRY(entry), initval);
+    if (initval) {
+        gint zero = 0;
+        
+        gtk_editable_insert_text(GTK_EDITABLE(entry), initval, -1, &zero);
+    }
 
     gtk_label_set_mnemonic_widget(GTK_LABEL(hotlabel), entry);
 #if TO_BE_PORTED
@@ -879,8 +884,8 @@ create_entry(GtkDialog *mcw, GtkWidget * table,
 #endif
     /* Watch for changes... */
     if(changed_func)
-	gtk_signal_connect(GTK_OBJECT(entry), "changed", 
-			   changed_func, data);
+	g_signal_connect(G_OBJECT(entry), "changed", 
+			 G_CALLBACK(changed_func), data);
 
     gtk_widget_show(entry);
     return entry;

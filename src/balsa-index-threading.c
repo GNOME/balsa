@@ -796,26 +796,31 @@ reparent(GNode* node, GNode* children)
 
 /* The more heuristics should be added. */
 static const gchar *
-chop_re(const gchar* str)
+chop_re(const gchar * str)
 {
-    const gchar *p=str;
-    while(*p) {
-	while(*p && isspace((int)*p)) p++;
-	if(!*p) break;
-	
-	if(g_strncasecmp(p, "re:", 3)==0 || g_strncasecmp(p, "aw:", 3)==0) {
-	    p+=3;
-	    continue;
-	} else if(g_strncasecmp(p, _("Re:"), strlen(_("Re:")))==0) {
-	    /* should "re" be localized ? */
-	    p+=strlen(_("Re:"));
-	    continue;
-	} else if(g_strncasecmp(p, balsa_app.current_ident->reply_string,
-				strlen(balsa_app.current_ident->reply_string))==0) {
-	    p+=strlen(balsa_app.current_ident->reply_string);
-	    continue;
-	};
-	break;
+    const gchar *p = str;
+    while (*p) {
+        while (*p && isspace((int) *p))
+            p++;
+        if (!*p)
+            break;
+
+        if (g_ascii_strncasecmp(p, "re:", 3) == 0
+            || g_ascii_strncasecmp(p, "aw:", 3) == 0) {
+            p += 3;
+            continue;
+        } else if (g_ascii_strncasecmp(p, _("Re:"), strlen(_("Re:"))) == 0) {
+            /* should "re" be localized ? */
+            p += strlen(_("Re:"));
+            continue;
+        } else
+            if (g_ascii_strncasecmp
+                (p, balsa_app.current_ident->reply_string,
+                 strlen(balsa_app.current_ident->reply_string)) == 0) {
+            p += strlen(balsa_app.current_ident->reply_string);
+            continue;
+        };
+        break;
     }
     return p;
 }

@@ -202,8 +202,8 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 	state.scanned = (i < depth - 1);
 	list = state.subfolders;
 	state.subfolders = NULL;
-	for(el= g_list_first(list); el; el = g_list_next(el)) {
-	    if(*(char*)el->data)
+	for(el = list; el; el = g_list_next(el)) {
+	    if(el->data && *((char *) el->data))
 		imap_path = g_strdup_printf("imap%s://%s/%s/", 
 #ifdef USE_SSL
 					    server->use_ssl ? "s" : "",

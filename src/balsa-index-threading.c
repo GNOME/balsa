@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -58,29 +58,22 @@
 
 struct ThreadingInfo {
     BalsaIndex *index;
-    GHashTable *subject_table;
     GHashTable *id_table;
     GSList *message_list;
 };
 
 static void threading_jwz(BalsaIndex* index);
-static gboolean is_cyclic_tree(GNode* root, GNode* child);
 static gboolean gen_container(GtkTreeModel * model, GtkTreePath * path,
                               GtkTreeIter * iter, gpointer data);
 static GNode *get_container(LibBalsaMessage * message,
                             GHashTable * id_table);
 static GNode* check_references(LibBalsaMessage* message,
 			       GHashTable *id_table);
-static void adopt_child(GNode* parent, GNode* container);
-static void find_root_set(gpointer key, GNode* value, GSList ** root_set);
-static gboolean prune(GNode *node, GSList *root_set);
-static gboolean node_equal(GNode *node1, GNode **node2);
+static void find_root_set(gpointer key, GNode* value, GNode * root);
+static gboolean prune(GNode * node, GNode * root);
 static gboolean construct(GNode * node, struct ThreadingInfo * ti);
-static void subject_gather(GNode * node, struct ThreadingInfo * ti);
-static void subject_merge(GNode * node, GSList * root_set,
-                          GSList ** save_node, GHashTable * subject_table);
-static void reparent(GNode* node, GNode* children);
-static void free_node(GNode* value);
+static void subject_gather(GNode * node, GHashTable * subject_table);
+static void subject_merge(GNode * node, GHashTable * subject_table);
 static const gchar* chop_re(const gchar* str);
 
 static void threading_simple(BalsaIndex * index,
@@ -98,73 +91,39 @@ balsa_index_threading(BalsaIndex* index, LibBalsaMailboxThreadingType th_type)
 }
 
 static void
-threading_jwz(BalsaIndex* index)
+threading_jwz(BalsaIndex * index)
 {
-    GtkTreeModel *model;
-    GSList *root_set=NULL;
-    GSList *save_node=NULL;
-    GSList *foo=NULL;
+    GNode *root;
     struct ThreadingInfo ti;
+    GHashTable *subject_table;
 
     ti.index = index;
-    ti.id_table = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
-                                        (GDestroyNotify) free_node);
+    ti.id_table = g_hash_table_new(g_str_hash, g_str_equal);
+    gtk_tree_model_foreach(gtk_tree_view_get_model(GTK_TREE_VIEW(index)),
+                           gen_container, &ti);
 
-    model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
-    gtk_tree_model_foreach(model, gen_container, &ti);
+    root = g_node_new(NULL);
+    g_hash_table_foreach(ti.id_table, (GHFunc) find_root_set, root);
+    g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_ALL, -1,
+                    (GNodeTraverseFunc) prune, root);
 
-    g_hash_table_foreach(ti.id_table, 
-			 (GHFunc)find_root_set,
-			 &root_set);
+    subject_table = g_hash_table_new(g_str_hash, g_str_equal);
+    g_node_children_foreach(root, G_TRAVERSE_ALL,
+                            (GNodeForeachFunc) subject_gather,
+                            subject_table);
+    g_node_children_foreach(root, G_TRAVERSE_ALL,
+                            (GNodeForeachFunc) subject_merge,
+                            subject_table);
 
-    balsa_window_setup_progress(BALSA_WINDOW(index->window), 
-                                g_slist_length(root_set));
-    
-    for(foo=root_set; foo; foo=g_slist_next(foo)) {
-	g_node_traverse(foo->data,
-			/*G_PRE_ORDER,*/
-			G_POST_ORDER,
-			G_TRAVERSE_ALL,
-			-1,
-			(GNodeTraverseFunc)prune,
-			root_set);
-    }
-
-    ti.subject_table = g_hash_table_new(g_str_hash, g_str_equal);
-    g_slist_foreach(root_set, (GFunc)subject_gather, &ti);
-
-    for (foo = root_set; foo; foo = g_slist_next(foo)) {
-        if (foo->data != NULL)
-            subject_merge(foo->data, root_set, &save_node,
-                          ti.subject_table);
-    }
-
-    for(foo = root_set; foo; foo=g_slist_next(foo)) {
-	if(foo->data!=NULL)
-	    g_node_traverse(foo->data,
-			    G_PRE_ORDER,   
-			    G_TRAVERSE_ALL,
-			    -1,
-			    (GNodeTraverseFunc)construct,
-			    &ti);
-        balsa_window_increment_progress(BALSA_WINDOW(index->window));
-    }
-
-    for(foo=save_node; foo; foo=g_slist_next(foo)) {
-	if(foo->data!=NULL) {
-	    ((GNode*)(foo->data))->children=NULL;
-	    g_node_destroy((GNode*)(foo->data));
-	}
-    }
-    if(save_node!=NULL)
-	g_slist_free(save_node);
-
+    balsa_window_setup_progress(BALSA_WINDOW(index->window),
+                                g_node_n_children(root));
+    g_node_traverse(root, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
+                    (GNodeTraverseFunc) construct, &ti);
     balsa_window_clear_progress(BALSA_WINDOW(index->window));
-    g_hash_table_destroy(ti.subject_table);
-    g_hash_table_destroy(ti.id_table);
 
-    if(root_set!=NULL)
-	g_slist_free(root_set);
+    g_hash_table_destroy(subject_table);
+    g_hash_table_destroy(ti.id_table);
+    g_node_destroy(root);
 }
 
 static gboolean
@@ -176,6 +135,7 @@ gen_container(GtkTreeModel * model, GtkTreePath * path,
     LibBalsaMessage *message;
     GNode *container;
 
+    /* Make sure the index's ref table has an entry for this message. */
     ref_table = ti->index->ref_table;
     gtk_tree_model_get(model, iter, BNDX_MESSAGE_COLUMN, &message, -1);
     if (!g_hash_table_lookup(ref_table, message))
@@ -183,137 +143,7 @@ gen_container(GtkTreeModel * model, GtkTreePath * path,
                             gtk_tree_row_reference_new(model, path));
 
     container = get_container(message, ti->id_table);
-    if(container) {
-        GNode* parent = check_references(message, ti->id_table);
-        if(parent)
-            adopt_child(parent, container);
-    }
-
-    return FALSE;
-}
-
-static GNode*
-check_references(LibBalsaMessage* message, GHashTable *id_table)
-{
-    /*
-     * For each element in the message's References field:
-     *   + Find a Container object for the given Message-ID:
-     *     + If there's one in id_table use that;
-     *     + Otherwise, make (and index) one with a null Message.
-     *   + Link the References field's Containers together in the order
-     *     implied by the References header.
-     *     + If they are already linked, don't change the existing links.
-     *     + Do not add a link if adding that link would introduce a loop:
-     *       that is, before asserting A->B, search down the children of B
-     *       to see if A is reachable.
-     */
-
-    GNode* parent=NULL;
-    GList *reference=message->references_for_threading;
-
-    while(reference) {
-	char *id=(char *)(reference->data);
-	GNode* foo=g_hash_table_lookup(id_table, id);
-	if(foo==NULL) {
-	    foo=g_node_new(NULL);
-	    g_hash_table_insert(id_table, id, foo);
-	}
-
-	if(foo==parent) {
-	    /* printf("duplicate!!\n"); */
-	    reference=g_list_next(reference);
-	    continue;
-	}
-
-	if(parent==NULL) {
-	    parent=foo;
-	    reference=g_list_next(reference);
-	    continue;
-	}
-
-	if(is_cyclic_tree(foo, parent)) {
-	    /* hmm.... */
-	    /*printf("cyclic_tree 1#\n");*/
-	    return NULL;
-	}
-
-	/*
-	  printf("parent->children=%x, foo->parent=%x\n",
-	  (int)(parent->children), (int)(foo->parent));
-	*/
-
-	if(parent->children==NULL && foo->parent==NULL) {
-	    parent->children=foo;
-	    foo->parent=parent;
-	}
-	else {
-	    if(foo->parent!=NULL) {
-		if(parent->children!=NULL) {
-		    if(foo->parent==parent) {
-			parent=foo;
-			reference=g_list_next(reference);
-			continue;
-		    }
-
-#if 1
-		    /* This part is not defined in jwz's algorithm. */
-		    parent=foo;
-		    reference=g_list_next(reference);
-		    continue;
-#else
-		    return NULL;
-#endif
-		}
-
-		if(foo->children!=NULL) {  
-		    if(g_list_next(reference)!=NULL &&
-		       g_list_next(reference)->data!=NULL) {
-			GNode *bar=g_hash_table_lookup(id_table,
-						       g_list_next(reference)->data);
-			if(bar==foo->children) {
-			    parent=foo;
-			    reference=g_list_next(reference);
-			    continue;
-			}
-		    }
-		}
-		return NULL;
-	    }
-
-	    if(parent->children!=NULL) {
-#if 1                                     
-		/* This part is not defined in jwz's algorithm. */
-		GNode* p; 
-		for(p=parent->children; p->next; p=p->next) {
-		    if(p==foo) break;
-		}
-		if(p!=foo) {            /* foo is not a children of parent. */
-		    p->next=foo;
-		    foo->prev=p;
-		}
-		           /* foo has siblings. */
-		for(p=foo; p; p=p->next) {
-		    p->parent=parent;
-		}
-		parent=foo;
-		reference=g_list_next(reference);
-		continue;
-	    }
-#else
-	    /* printf("return 2#\n"); */
-	    return;
-#endif
-	}
-	parent=foo;
-	reference=g_list_next(reference);
-    }
-    return parent;
-}
-
-static void
-adopt_child(GNode* parent, GNode* container)
-{
-
+    if (container) {
     /*
      * Set the parent of this message to be the last element in References.
      * Note that this message may have a parent already: this can happen
@@ -331,109 +161,108 @@ adopt_child(GNode* parent, GNode* container)
      * Note that at all times, the various ``parent'' and ``child''
      * fields must be kept inter-consistent.
      */
-
-    if(container->parent==parent) return;
-
-    if(is_cyclic_tree(container, parent)) {
-	/*printf("cyclic 2#\n");*/
-	return;
+        GNode* parent = check_references(message, ti->id_table);
+        g_node_unlink(container);
+        if (parent)
+            g_node_prepend(parent, container);
     }
 
-    if(container->parent!=NULL) {
-	GNode* foo=container->parent->children;
-	if(foo==container) {
-	    container->parent->children=container->next;
-	    if(container->next!=NULL) {
-		container->next->prev=NULL;
-	    }
-	}
-	else{
-	    container->prev->next=container->next;
-	    if(container->next!=NULL) container->next->prev=container->prev;
-	}
-    }
-
-    /* If parent had children already, told the first one that now it is
-       the second one by linking it to container that is now the first one */
-    if(parent->children!=NULL)
-	parent->children->prev=container;
-
-    /* Now container is the first child so container->prev must be NULL
-       and we link it to the existing children of parent by setting
-       container->next to parent->children */
-    container->prev=NULL;
-    container->next=parent->children;
-
-    /* Actually set container as the first child, and parent as its parent */
-    parent->children=container;
-    container->parent=parent;
+    return FALSE;
 }
 
-static gboolean
-is_cyclic_tree(GNode* root, GNode* child)
+static GNode *
+check_references(LibBalsaMessage * message, GHashTable * id_table)
 {
-    gboolean find=FALSE;
-    GNode* foo=NULL;
-#if 0
-    /* This case will be enough for jwz's rule */
-    
-    for(foo=root; foo; foo=foo->children) {
-	if(foo->children==child) {find=TRUE; break;}
+    /*
+     * For each element in the message's References field:
+     *   + Find a Container object for the given Message-ID:
+     *     + If there's one in id_table use that;
+     *     + Otherwise, make (and index) one with a null Message.
+     *   + Link the References field's Containers together in the order
+     *     implied by the References header.
+     *     + If they are already linked, don't change the existing links.
+     *     + Do not add a link if adding that link would introduce a loop:
+     *       that is, before asserting A->B, search down the children of B
+     *       to see if A is reachable.
+     */
+
+    GNode *parent = NULL;
+    GList *reference;
+
+    for (reference = message->references_for_threading; reference;
+         reference = g_list_next(reference)) {
+        gchar *id = reference->data;
+        GNode *foo = g_hash_table_lookup(id_table, id);
+
+        if (foo == NULL) {
+            foo = g_node_new(NULL);
+            g_hash_table_insert(id_table, id, foo);
+        }
+
+        if (foo == parent) {
+            /* printf("duplicate!!\n"); */
+            continue;
+        }
+
+        if (parent && !g_node_is_ancestor(foo, parent)
+            && G_NODE_IS_ROOT(foo))
+            g_node_prepend(parent, foo);
+
+        parent = foo;
     }
-#else
-    foo=child;
-    g_node_traverse(root,
-		    G_PRE_ORDER,   
-		    G_TRAVERSE_ALL,
-		    -1,
-		    (GNodeTraverseFunc)node_equal,
-		    &foo);
-    if(foo==NULL) find=TRUE;
-#endif
-    return find;
+    return parent;
 }
 
-static GNode*
-get_container(LibBalsaMessage * message, GHashTable* id_table)
+static GNode *
+get_container(LibBalsaMessage * message, GHashTable * id_table)
 {
-    GNode* container=NULL;
-
     /*
      * If id_table contains a Container for this ID:
      *   + Store this message in the Container's message slot.
      * else
      *   + Create a new Container object holding this message;
+     *     this message;
      *   + Index the Container by Message-ID in id_table.
      */
-    
-    if(!message->message_id) {
-	return NULL;
+
+    GNode *container;
+
+    if (!message->message_id)
+        return NULL;
+
+    container = g_hash_table_lookup(id_table, message->message_id);
+    if (container && !container->data)
+        container->data = message;
+    else {
+        container = g_node_new(message);
+        g_hash_table_insert(id_table, message->message_id, container);
     }
 
-    container=g_hash_table_lookup(id_table, message->message_id);
-    if(container!=NULL) {
-	container->data = message;
-    }
-    else{
-	container=g_node_new(message);
-	g_hash_table_insert(id_table, message->message_id, container);
-    }
     return container;
 }
 
 static void
-find_root_set(gpointer key, GNode* value, GSList ** root_set)
+find_root_set(gpointer key, GNode * value, GNode * root)
 {
     /*
      * Walk over the elements of id_table, and gather a list of the 
      * Container objects that have no parents. 
      */
-    if(value->parent==NULL)
-        *root_set=g_slist_append(*root_set, value);
+
+    if (value->parent == NULL)
+        g_node_prepend(root, value);
 }
 
-static gboolean 
-prune(GNode *node, GSList *root_set)
+/* helper (why doesn't g_node_unlink return the node?!) */
+static GNode *
+bndt_unlink(GNode * node)
+{
+    g_node_unlink(node);
+    return node;
+}
+
+static gboolean
+prune(GNode * node, GNode * root)
 {
     /*
      * Recursively walk all containers under the root set. For each container: 
@@ -447,84 +276,17 @@ prune(GNode *node, GSList *root_set)
      * the root set -- unless there is only one child, in which case, do. 
      */
 
-    if(node->data==NULL && node->children==NULL) {
-	/*
-	  printf("node! %x, %x\n", (int)node, (int)(node->parent));
-	*/
-	if(node->parent!=NULL) {
-	    if(node->prev==NULL) {
-		node->parent->children=node->next;
-		if(node->next!=NULL)
-		    node->next->prev=NULL;
-	    }
-	    else {
-		node->prev->next=node->next;
-		if(node->next!=NULL)
-		    node->next->prev=node->prev;
-	    }
-	}
-	else {
-	    while(root_set) {
-		if(root_set->data==node) {
-		    root_set->data=NULL;
-		    break;
-		}
-		root_set=g_slist_next(root_set);
-	    }
-	}
-	return FALSE;
-    }
+    if (node->data != NULL || node == root)
+        return FALSE;
 
-    if(node->children!=NULL && node->data==NULL &&
-       (node->parent!=NULL || node->children->next==NULL)) {
-	if(node->parent==NULL) {
-	    while(root_set) {
-		if(root_set->data==node) {
-                    root_set->data=node->children; 
-                    break;
-                }
-		root_set=g_slist_next(root_set);
-	    }
-	    node->children->parent=NULL;
-	}
-	else {
-	    GNode* foo; 
-	    if(node->prev==NULL) {
-		node->parent->children=node->children;
-	    }
-	    else {
-		node->prev->next=node->children;
-		node->children->prev=node->prev;
-	    }
+    if (node->children != NULL
+        && (node->parent != root || node->children->next == NULL))
+        while (node->children)
+            g_node_prepend(node->parent, bndt_unlink(node->children));
 
-	    for(foo=node->children; foo->next!=NULL; foo=foo->next) {
-		foo->parent=node->parent;
-	    }
+    if (node->children == NULL)
+        g_node_destroy(node);
 
-	    /* Reparent the last one also */
-	    foo->parent=node->parent;
-
-	    foo->next=node->next;
-	    if(node->next!=NULL) 
-		node->next->prev=foo;
-	    {
-		GNode* bar;
-		for(bar=node->parent->children; bar; bar=bar->next) {
-		    if(bar==node) {printf("find!!!");break;}
-		}
-	    }
-	}
-    }
-    return FALSE;
-}
-
-static gboolean 
-node_equal(GNode *node, GNode** parent)
-{
-    if(node==*parent) {
-	*parent=NULL;
-	return TRUE;
-    }
     return FALSE;
 }
 
@@ -544,9 +306,6 @@ check_parent(struct ThreadingInfo *ti, LibBalsaMessage * parent,
     GtkTreePath *child_path;
     GtkTreePath *test;
 
-    if (!child)
-        return;
-
     ref_table = ti->index->ref_table;
     child_ref = g_hash_table_lookup(ref_table, child);
     child_path = gtk_tree_row_reference_get_path(child_ref);
@@ -565,6 +324,7 @@ check_parent(struct ThreadingInfo *ti, LibBalsaMessage * parent,
                             || gtk_tree_path_get_depth(test) <= 0
                             || gtk_tree_path_compare(test, parent_path))))
         balsa_index_move_subtree(ti->index, child_path, parent_path);
+
     gtk_tree_path_free(test);
     gtk_tree_path_free(child_path);
     if (parent_path)
@@ -574,13 +334,16 @@ check_parent(struct ThreadingInfo *ti, LibBalsaMessage * parent,
 static gboolean
 construct(GNode * node, struct ThreadingInfo *ti)
 {
-    check_parent(ti, node->parent ? node->parent->data : NULL, node->data);
+    if (node->data)
+        check_parent(ti, node->parent ? node->parent->data : NULL,
+                     node->data);
 
+    balsa_window_increment_progress(BALSA_WINDOW(ti->index->window));
     return FALSE;
 }
 
 static void
-subject_gather(GNode * node, struct ThreadingInfo * ti)
+subject_gather(GNode * node, GHashTable * subject_table)
 {
     LibBalsaMessage *message, *old_message;
     const gchar *subject=NULL, *old_subject;
@@ -655,10 +418,8 @@ subject_gather(GNode * node, struct ThreadingInfo * ti)
      *     but that's not altogether straightforward either.) 
      */
 
-    if(node==NULL) return;
-
     message = node->data ? node->data : node->children->data;
-    
+
     g_return_if_fail(message!=NULL);
 
     subject=LIBBALSA_MESSAGE_GET_SUBJECT(message);
@@ -672,10 +433,10 @@ subject_gather(GNode * node, struct ThreadingInfo * ti)
       printf("subject_gather: subject %s, %s\n", subject, chopped_subject);
     */
 
-    old=g_hash_table_lookup(ti->subject_table, chopped_subject);
+    old=g_hash_table_lookup(subject_table, chopped_subject);
     if(old==NULL ||
        (node->data==NULL&&old->data!=NULL)) {
-	g_hash_table_insert(ti->subject_table, (char*)chopped_subject, node);
+	g_hash_table_insert(subject_table, (char*)chopped_subject, node);
 	return;
     }
 
@@ -684,106 +445,61 @@ subject_gather(GNode * node, struct ThreadingInfo * ti)
     old_subject = LIBBALSA_MESSAGE_GET_SUBJECT(old_message);
 
     if( old_subject != chop_re(old_subject) && subject==chopped_subject)
-        g_hash_table_insert(ti->subject_table, (gchar*)chopped_subject, node);
+        g_hash_table_insert(subject_table, (gchar*)chopped_subject, node);
 }
 
 static void
-subject_merge(GNode *node, GSList * root_set, GSList ** save_node,
-              GHashTable * subject_table)
+subject_merge(GNode * node, GHashTable * subject_table)
 {
     LibBalsaMessage *message, *message2;
     const gchar *subject, *subject2;
     const gchar *chopped_subject, *chopped_subject2;
-    GNode* node2;
+    GNode *node2;
 
-    if(node==NULL) return;
-
-    
     message = node->data ? node->data : node->children->data;
 
-    g_return_if_fail(message!=NULL);
+    g_return_if_fail(message != NULL);
 
-    subject=LIBBALSA_MESSAGE_GET_SUBJECT(message);
-    if(subject==NULL)return;
-    chopped_subject=chop_re(subject);
-    if(chopped_subject==NULL) {
-	return;
+    subject = LIBBALSA_MESSAGE_GET_SUBJECT(message);
+    if (subject == NULL)
+        return;
+    chopped_subject = chop_re(subject);
+    if (chopped_subject == NULL)
+        return;
+
+    node2 = g_hash_table_lookup(subject_table, chopped_subject);
+    if (node2 == NULL || node2 == node)
+        return;
+
+    if (node2->data == NULL) {
+        while (node->children)
+            g_node_prepend(node2, bndt_unlink(node->children));
+        return;
     }
 
-    node2=g_hash_table_lookup(subject_table, chopped_subject);
-    if(node2==NULL || node2==node) {
-	return;
-    }
-
-    if(node2->data==NULL) {
-	reparent(node2, node->children);
-	node->children=NULL;
-	return;
-    }
-
-    if(node->data==NULL) {
-	reparent(node, node2->children);
-	node2->children=NULL;
-	return;
+    if (node->data == NULL) {
+        while (node2->children)
+            g_node_prepend(node, bndt_unlink(node2->children));
+        return;
     }
 
     message2 = node2->data;
     subject2 = LIBBALSA_MESSAGE_GET_SUBJECT(message2);
-    chopped_subject2= chop_re(subject2);
+    chopped_subject2 = chop_re(subject2);
 
-    if((subject2==chopped_subject2) && subject!=chopped_subject) {
-        GSList* foo;
-        reparent(node2, node);
-        
-        for(foo=root_set; foo; foo=g_slist_next(foo)) {
-            if(foo->data==node)
-                foo->data=NULL;
-        }
-        return;
-    }
-    if((subject2!=chopped_subject2) && subject==chopped_subject) {
-        GSList* foo;
-        reparent(node, node2);
-        g_hash_table_insert(subject_table, (char*)chopped_subject, node);
-        for(foo=root_set; foo; foo=g_slist_next(foo)) {
-            if(foo->data==node2)
-                foo->data=NULL;
-        }
-        return;
-    }
+    if ((subject2 == chopped_subject2) && subject != chopped_subject)
+        g_node_prepend(node2, bndt_unlink(node));
+    else if ((subject2 != chopped_subject2)
+               && subject == chopped_subject) {
+        g_node_prepend(node, bndt_unlink(node2));
+        g_hash_table_insert(subject_table, (char *) chopped_subject, node);
+    } else {
+        GNode *new_node = g_node_new(NULL);
 
-    {
-	GNode *new_node=g_node_new(NULL);
-	GSList* foo;
-	for(foo=root_set; foo; foo=g_slist_next(foo)) {
-	    if(foo->data==node)
-		foo->data=new_node;
-	    else if(foo->data==node2)
-		foo->data=NULL;
-	}
-	reparent(new_node, node);
-	reparent(new_node, node2);
-      
-	*save_node=g_slist_append(*save_node, new_node);
+        g_node_prepend(node->parent, new_node);
+        g_node_prepend(new_node, bndt_unlink(node));
+        g_node_prepend(new_node, bndt_unlink(node2));
     }
-    return;
-}
-
-static void
-reparent(GNode* node, GNode* children)
-{
-    GNode* p;
-    for(p=children; p; p=p->next)
-	p->parent=node;
-
-    p=node->children;
-    if(p!=NULL) {
-	while(p->next)p=p->next;
-	p->next=children;
-	if(children!=NULL)children->prev=p;
-    }
-    else
-	node->children=children;
 }
 
 /* The more heuristics should be added. */
@@ -811,18 +527,10 @@ chop_re(const gchar * str)
                  strlen(balsa_app.current_ident->reply_string)) == 0) {
             p += strlen(balsa_app.current_ident->reply_string);
             continue;
-        };
+        }
         break;
     }
     return p;
-}
-
-static void
-free_node(GNode* node)
-{
-    node->data=NULL;
-    node->children=NULL;
-    g_node_destroy(node);
 }
 
 /* yet another message threading function */

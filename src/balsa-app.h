@@ -204,7 +204,10 @@ extern struct BalsaApplication {
 
     /* automatically close mailboxes after XX minutes */
     gboolean close_mailbox_auto;
-    gint close_mailbox_timeout;
+    gint close_mailbox_timeout; /* seconds */
+    /* automatically commit mailboxes after XX minutes */
+    gboolean commit_mailbox_auto;
+    gint commit_mailbox_timeout; /* seconds */
     gint check_imap;
     gint check_imap_inbox;
     gint quiet_background_check;

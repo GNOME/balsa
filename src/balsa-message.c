@@ -670,7 +670,7 @@ part_info_init_unknown (BalsaMessage *bm, BalsaPartInfo *info)
   }
 
   button = gtk_button_new_with_label (_("Save part"));
-  gtk_box_pack_start ( GTK_BOX(vbox), button, FALSE, FALSE, 1 );
+  gtk_box_pack_start ( GTK_BOX(vbox), button, FALSE, FALSE, 20 );
   gtk_signal_connect(GTK_OBJECT(button), "clicked", 
 		     (GtkSignalFunc)part_context_menu_save, (gpointer)info);
   gtk_widget_show (button);

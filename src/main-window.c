@@ -160,7 +160,9 @@ static GnomeUIInfo settings_menu[] =
 static GnomeUIInfo help_menu[] =
 {
   GNOMEUIINFO_ITEM_STOCK ("_About...", NULL, show_about_box, GNOME_STOCK_MENU_ABOUT),
+#if 0
   GNOMEUIINFO_HELP ("balsa"),
+#endif
   GNOMEUIINFO_END
 };
 static GnomeUIInfo main_menu[] =

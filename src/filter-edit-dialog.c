@@ -42,14 +42,9 @@ build_option_menu (option_list options[],
 
   for (i = 0; i < num; i++)
     {
-      options[i].widget = gtk_radio_menu_item_new_with_label (
-							       group,
-							   options[i].text);
-      gtk_object_set_data (GTK_OBJECT (options[i].widget),
-			   "value",
-			   GINT_TO_POINTER (options[1].value));
-      group = gtk_radio_menu_item_group (
-				   GTK_RADIO_MENU_ITEM (options[i].widget));
+      options[i].widget = gtk_radio_menu_item_new_with_label (group, options[i].text);
+
+      group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (options[0].widget));
       gtk_menu_append (GTK_MENU (menu), options[i].widget);
       if (func)
 	gtk_signal_connect (GTK_OBJECT (options[i].widget),
@@ -124,7 +119,7 @@ build_left_side ()
 
   gtk_container_add (GTK_CONTAINER (sw), GTK_WIDGET (clist));
 
-  gtk_box_pack_start (GTK_BOX (vbox), sw, FALSE, FALSE, 2);
+  gtk_box_pack_start (GTK_BOX (vbox), sw, TRUE, TRUE, 2);
 
 
 
@@ -139,12 +134,12 @@ build_left_side ()
   /* up button */
   button = gnome_stock_button (GNOME_STOCK_BUTTON_UP);
   gtk_signal_connect (GTK_OBJECT (button), "clicked",
-		      GTK_SIGNAL_FUNC (fe_up_pressed), NULL);
+		      GTK_SIGNAL_FUNC (fe_up_pressed), clist);
   gtk_container_add (GTK_CONTAINER (bbox), button);
   /* down button */
   button = gnome_stock_button (GNOME_STOCK_BUTTON_DOWN);
   gtk_signal_connect (GTK_OBJECT (button), "clicked",
-		      GTK_SIGNAL_FUNC (fe_down_pressed), NULL);
+		      GTK_SIGNAL_FUNC (fe_down_pressed), clist);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
 
@@ -160,13 +155,13 @@ build_left_side ()
   pixmap = gnome_stock_new_with_icon (GNOME_STOCK_PIXMAP_NEW);
   button = gnome_pixmap_button (pixmap, "New");
   gtk_signal_connect (GTK_OBJECT (button), "clicked",
-		      GTK_SIGNAL_FUNC (fe_new_pressed), NULL);
+		      GTK_SIGNAL_FUNC (fe_new_pressed), clist);
   gtk_container_add (GTK_CONTAINER (bbox), button);
   /* delete button */
   pixmap = gnome_stock_new_with_icon (GNOME_STOCK_PIXMAP_TRASH);
   button = gnome_pixmap_button (pixmap, "Delete");
   gtk_signal_connect (GTK_OBJECT (button), "clicked",
-		      GTK_SIGNAL_FUNC (fe_delete_pressed), NULL);
+		      GTK_SIGNAL_FUNC (fe_delete_pressed), clist);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
   gtk_widget_show_all (vbox);
@@ -567,7 +562,7 @@ build_action_page ()
 		    5, 5);
 
   fe_sound_entry = gtk_entry_new_with_max_length (255);
-  gtk_table_attach (GTK_TABLE (fe_notification_table),
+  gtk_table_attach (GTK_TABLE (table),
 		    fe_sound_entry,
 		    2, 8, 0, 1,
 		    GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -575,7 +570,7 @@ build_action_page ()
 		    5, 5);
   gtk_widget_show (fe_sound_entry);
   fe_sound_browse = gtk_button_new_with_label ("Browse...");
-  gtk_table_attach (GTK_TABLE (fe_notification_table),
+  gtk_table_attach (GTK_TABLE (table),
 		    fe_sound_browse,
 		    8, 10, 0, 1,
 		    GTK_FILL | GTK_SHRINK | GTK_EXPAND,
@@ -723,12 +718,15 @@ filter_edit_dialog (GList * filter_list)
   GtkWidget *piece;
   GtkWidget *sep;
 
-  window = gnome_dialog_new (_ ("Balsa Filters"));
+  window = gnome_dialog_new (_ ("Balsa Filters"),
+		  GNOME_STOCK_BUTTON_OK,
+		  GNOME_STOCK_BUTTON_CANCEL,
+		  GNOME_STOCK_BUTTON_HELP, NULL);
 
   /* main hbox */
   hbox = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (window)->vbox),
-		      hbox, TRUE, TRUE, 0);
+		      hbox, FALSE, FALSE, 0);
 
   piece = build_left_side ();
   gtk_box_pack_start (GTK_BOX (hbox), piece, FALSE, FALSE, 2);

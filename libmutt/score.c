@@ -52,9 +52,9 @@ void mutt_check_rescore (CONTEXT *ctx)
 
     for (i = 0; i < ctx->msgcount; i++)
       mutt_score_message (ctx->hdrs[i]);
-
+#ifndef LIBMUTT
     mutt_cache_index_colors (ctx);
-
+#endif
     unset_option (OPTNEEDRESCORE);
   }
 }

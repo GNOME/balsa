@@ -51,7 +51,6 @@ static LibBalsaMailboxLocalClass *parent_class = NULL;
 
 static void libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass *klass);
 static void libbalsa_mailbox_mbox_init(LibBalsaMailboxMbox * mailbox);
-static void libbalsa_mailbox_mbox_finalize(GObject * object);
 
 static GMimeStream *libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox *
 							     mailbox,
@@ -115,8 +114,6 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
     libbalsa_mailbox_local_class = LIBBALSA_MAILBOX_LOCAL_CLASS(klass);
 
     parent_class = g_type_class_peek_parent(klass);
-
-    object_class->finalize = libbalsa_mailbox_mbox_finalize;
 
     libbalsa_mailbox_class->get_message_stream =
 	libbalsa_mailbox_mbox_get_message_stream;
@@ -198,13 +195,6 @@ libbalsa_mailbox_mbox_new(const gchar * path, gboolean create)
     libbalsa_notify_register_mailbox(mailbox);
     
     return G_OBJECT(mailbox);
-}
-
-static void
-libbalsa_mailbox_mbox_finalize(GObject * object)
-{
-    if (G_OBJECT_CLASS(parent_class)->finalize)
-	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
 static GMimeStream *

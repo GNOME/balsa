@@ -1195,6 +1195,9 @@ libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
     gboolean (*match_func)(LibBalsaMailbox *, guint, 
 			   LibBalsaMailboxSearchIter *) =
 	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->message_match;
+    gboolean retval = FALSE;
+
+    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
 
     if (!node)
 	node = mailbox->msg_tree;
@@ -1204,13 +1207,20 @@ libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
 
 	node = step_func(node);
 	msgno = GPOINTER_TO_UINT(node->data);
-	if (msgno == stop_msgno)
-	    return FALSE;
+	if (msgno == stop_msgno) {
+	    retval = FALSE;
+	    break;
+	}
 	if (msgno > 0 && match_func(mailbox, msgno, search_iter)) {
 	    iter->user_data = node;
-	    return TRUE;
+	    retval = TRUE;
+	    break;
 	}
     }
+
+    UNLOCK_MAILBOX(mailbox);
+
+    return retval;
 }
 
 /* Find a message in the tree-model, by its message number. */

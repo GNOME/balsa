@@ -1,3 +1,9 @@
+2003-03-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-message.c: fix misspelling (bug 109074)
+	* src/sendmsg-window.c: fix split sentence (bug 109073).
+	* src/main.c, configure.in: revert C. Neumair's changes.
+
 2003-03-21  Christian Neumair  <chris@gnome-de.org>
 
 	* src/main.c: Use gtk_window_set_default_icon_from_file instead of
@@ -13,7 +19,7 @@
 
 	* configure.in: Added Mayalalam (ml) in ALL_LINGUAS
 
-2003-03-18  Albrecht Dre√ü  <albrecht.dress@arcor.de>
+2003-03-18  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
 
 	* libbalsa/body.[ch]: add, initialize destroy GPG-related fields.
 	* libbalsa/message.[ch]: implement is_pgp_{signed,encrypted}()

@@ -1,3 +1,7 @@
+2003-03-24  Pawel Salek <pawsa@theochem.kth.se>
+
+	* POTFILES.in: add libbalsa/rfc3156.c
+
 2003-03-24  Christian Rose  <menthos@menthos.com>
 
 	* sv.po: Updated Swedish translation.

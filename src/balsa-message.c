@@ -584,7 +584,8 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 				     libbalsa_gpgme_sig_stat_to_gchar(checkResult->gpgme_status));
 	} else
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("ckecking the signature of the message sent by %s with subject \"%s\" failed with an error!"),
+				 _("Checking the signature of the message "
+                                   "sent by %s with subject \"%s\" failed."),
 				 sender, LIBBALSA_MESSAGE_GET_SUBJECT(message));
 	g_free(sender);
     }

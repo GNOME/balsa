@@ -104,7 +104,7 @@ PKG_CHECK_MODULES(BALSA, [
 glib-2.0
 libgnome-2.0
 libgnomeui-2.0
-gtk+-2.0 >= 2.2
+gtk+-2.0 >= 2.0
 gnome-vfs-2.0
 gnome-vfs-module-2.0
 $gnome_extras
@@ -153,11 +153,6 @@ AC_CHECK_LIB(aspell, new_aspell_speller,,[
         AC_MSG_ERROR([*** Neither aspell >=0.50 (recommended) nor pspell (deprecated) library was found. Please check http://balsa.gnome.org for information on the required files. Alternatively, check config.log for clues.])
      ], -lstdc++ -lpspell-modules)
   ], -lstdc++)
-
-
-dnl Reset
-# LDFLAGS="$balsa_save_LDFLAGS"
-# LIBS="$balsa_save_LIBS"
 
 
 dnl ###########################################################################
@@ -286,7 +281,6 @@ if test "x$with_esmtp" != xno  ; then
 else
     AC_MSG_RESULT([no])
 fi
-echo "here LIBS=$LIBS"
 
 dnl ##########################################################################
 dnl Enable SASL?

@@ -160,9 +160,6 @@ struct _LibBalsaMailbox {
     gboolean readonly;
     gboolean disconnected;
 
-    glong messages; /* NOTE: this is used for internal msg counting;
-		     * it is often different from g_list_count(messages) */  
-    glong new_messages;
     GNode *msg_tree; /* the possibly filtered tree of messages */
     LibBalsaCondition *view_filter; /* to choose a subset of messages
                                      * to be displayed, e.g., only
@@ -177,10 +174,6 @@ struct _LibBalsaMailbox {
     GSList * filters;
 
     LibBalsaMailboxView *view;
-
-    /* GtkTreeSortable stuff */
-    gint sort_column_id;
-    GtkSortType order;
 };
 
 struct _LibBalsaMailboxClass {

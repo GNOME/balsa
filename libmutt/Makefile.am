@@ -3,6 +3,7 @@ EXTRA_DIST = configure muttconfig.h.in
 noinst_LIBRARIES = libmutt.a
 
 libmutt_a_SOURCES = \
+	account.c	\
 	attach.c 	\
 	base64.c	\
 	browser.h	\
@@ -24,6 +25,7 @@ libmutt_a_SOURCES = \
 	md5c.c		\
 	mh.c 		\
 	mx.c 		\
+	mutt_socket.c	\
 	parse.c 	\
 	pattern.c 	\
 	rfc1524.c 	\
@@ -35,7 +37,9 @@ libmutt_a_SOURCES = \
 	sort.c 		\
 	system.c 	\
 	thread.c	\
+	url.c		\
 	acconfig.h	\
+	account.h	\
 	attach.h	\
 	buffy.h		\
 	charset.h 	\
@@ -47,6 +51,7 @@ libmutt_a_SOURCES = \
 	history.h	\
 	init.h		\
 	keymap.h	\
+	lib.h		\
 	mailbox.h	\
 	mapping.h	\
 	md5.h		\
@@ -55,6 +60,8 @@ libmutt_a_SOURCES = \
 	mutt_curses.h	\
 	mutt_menu.h	\
 	mutt_regex.h	\
+	mutt_sasl.h	\
+	mutt_ssl.h	\
 	mutt_socket.h	\
 	mx.h		\
 	pager.h		\
@@ -63,7 +70,8 @@ libmutt_a_SOURCES = \
 	rfc1524.h	\
 	rfc2047.h	\
 	rfc822.h	\
-	sort.h
+	sort.h		\
+	url.h
 
 SUBDIRS = imap
 

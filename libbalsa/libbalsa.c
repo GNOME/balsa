@@ -125,7 +125,12 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     set_option(OPTSAVEEMPTY);
     set_option(OPTCHECKNEW);
     set_option(OPTMHPURGE);
- 
+
+    FileMask.rx = (regex_t *) safe_malloc (sizeof (regex_t));
+    REGCOMP(FileMask.rx,"!^\\.[^.]",0);
+    ReplyRegexp.rx = (regex_t *) safe_malloc (sizeof (regex_t));
+    REGCOMP(ReplyRegexp.rx,"^(re([\\[0-9\\]+])*|aw):[ \t]*",0);
+
     libbalsa_notify_init();
 
     /* Register our types */

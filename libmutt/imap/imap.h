@@ -19,33 +19,25 @@
 #ifndef _IMAP_H
 #define _IMAP_H 1
 
+#include "account.h"
 #include "browser.h"
 #include "../mailbox.h"
 
+/* -- data structures -- */
 typedef struct
 {
-  char user[64];
-  char pass[32];
-  char host[128];
-  int port;
-  char type[16];
-  int socktype;
-  char *mbox;
-  int flags;
+  ACCOUNT account;
+  char* mbox;
 } IMAP_MBOX;
-
 
 /* imap.c */
 int imap_check_mailbox (CONTEXT *ctx, int *index_hint);
-int imap_create_mailbox (CONTEXT* idata, char* mailbox);
 int imap_close_connection (CONTEXT *ctx);
 int imap_delete_mailbox (CONTEXT* idata, char* mailbox);
 int imap_open_mailbox (CONTEXT *ctx);
 int imap_open_mailbox_append (CONTEXT *ctx);
-int imap_select_mailbox (CONTEXT *ctx, const char* path);
-void imap_set_logout (CONTEXT *ctx);
 int imap_sync_mailbox (CONTEXT *ctx, int expunge, int *index_hint);
-void imap_fastclose_mailbox (CONTEXT *ctx);
+void imap_close_mailbox (CONTEXT *ctx);
 int imap_buffy_check (char *path);
 int imap_mailbox_check (char *path, int new);
 int imap_subscribe (char *path, int subscribe);
@@ -55,17 +47,19 @@ void imap_allow_reopen (CONTEXT *ctx);
 void imap_disallow_reopen (CONTEXT *ctx);
 
 /* browse.c */
-int imap_init_browse (char *path, struct browser_state *state);
+int imap_browse (char* path, struct browser_state* state);
+int imap_mailbox_create (const char* folder);
 
 /* message.c */
 int imap_append_message (CONTEXT* ctx, MESSAGE* msg);
 int imap_copy_messages (CONTEXT* ctx, HEADER* h, char* dest, int delete);
 int imap_fetch_message (MESSAGE* msg, CONTEXT* ctx, int msgno);
 
+/* socket.c */
+void imap_logout_all (void);
+
 /* util.c */
-int imap_parse_path (const char* path, IMAP_MBOX *mx);
-void imap_qualify_path (char* dest, size_t len, const IMAP_MBOX *mx,
-  const char* path, const char* name);
+int imap_parse_path (const char* path, IMAP_MBOX* mx);
 
 int imap_wait_keepalive (pid_t pid);
 void imap_keepalive (void);

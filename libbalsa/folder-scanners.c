@@ -155,6 +155,16 @@ scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     state.rnode = rnode;
     state.mailbox_handler = (void(*)())mailbox_handler;
     state.folder_handler = (void(*)())folder_handler;
+    if(!FileMask.rx) {
+       FileMask.rx = (regex_t *) safe_malloc (sizeof (regex_t));
+       if( (i=REGCOMP(FileMask.rx,"!^\\.[^.]",0)) != 0) {
+	   g_warning("FileMask regexp compilation failed with code%i.",
+		     i);
+	   safe_free((void**)&FileMask.rx);
+	   return;
+       }
+    }
+	
     unset_option(OPTIMAPLSUB);
     libbalsa_lock_mutt();
     safe_free((void **)&ImapUser);   ImapUser = safe_strdup(server->user);
@@ -169,7 +179,7 @@ scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 	for(el= g_list_first(list); el; el = g_list_next(el)) {
 	    imap_path = g_strdup_printf("{%s:%i}%s", server->host, 
 					server->port, (char*)el->data);
-	    imap_init_browse ((char*)imap_path,  &state);
+	    imap_browse ((char*)imap_path,  &state);
 	    g_free(imap_path);
 	}
 	g_list_foreach(list, (GFunc)g_free, NULL);
@@ -177,15 +187,17 @@ scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     }
     g_list_foreach((GList*)state.subfolders, (GFunc)g_free, NULL);
     g_list_free((GList*)state.subfolders);
+    regfree(FileMask.rx);
     libbalsa_unlock_mutt();
+    
 }
 
 void imap_add_folder (char delim, char *folder, int noselect,
   int noinferiors, struct browser_state *state, short isparent)
 {
-    /* printf("imap_add_folder. delim: '%c', folder: '%s', noselect: %d\n"
+    printf("imap_add_folder. delim: '%c', folder: '%s', noselect: %d\n"
 	   "noinferiors: %d, isparent: %d\n", delim, folder, noselect,
-	   noinferiors, isparent); */
+	   noinferiors, isparent);
     if(isparent) return;
     if(noinferiors)
 	state->mailbox_handler(state->rnode, folder, delim);

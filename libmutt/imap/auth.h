@@ -1,37 +1,45 @@
 /*
- * Copyright (C) 1999-2000 Thomas Roessler <roessler@guug.de>
- *
+ * Copyright (C) 2000 Brendan Cully <brendan@kublai.com>
+ * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation; either version 2 of the License, or
  *     (at your option) any later version.
- *
+ * 
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- *
+ * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
- */
+ */ 
 
-#ifndef _CHARSET_H
-#define _CHARSET_H
+/* common defs for authenticators. A good place to set up a generic callback
+ * system */
 
-#include <iconv.h>
+#ifndef _IMAP_AUTH_H
+#define _IMAP_AUTH_H 1
 
-int mutt_convert_string (char **, const char *, const char *);
+typedef enum
+{
+  IMAP_AUTH_SUCCESS = 0,
+  IMAP_AUTH_FAILURE,
+  IMAP_AUTH_UNAVAIL
+} imap_auth_res_t;
 
-iconv_t mutt_iconv_open (const char *, const char *);
-size_t mutt_iconv (iconv_t, const char **, size_t *, char **, size_t *, const char **, const char *);
+typedef imap_auth_res_t (*imap_auth_t)(IMAP_DATA* idata);
 
-typedef void * FGETCONV;
+/* external authenticator prototypes */
+imap_auth_res_t imap_auth_anon (IMAP_DATA* idata);
+imap_auth_res_t imap_auth_cram_md5 (IMAP_DATA* idata);
+imap_auth_res_t imap_auth_login (IMAP_DATA* idata);
+#ifdef USE_GSS
+imap_auth_res_t imap_auth_gss (IMAP_DATA* idata);
+#endif
+#ifdef USE_SASL
+imap_auth_res_t imap_auth_sasl (IMAP_DATA* idata);
+#endif
 
-FGETCONV *fgetconv_open (FILE *, const char *, const char *);
-int fgetconv (FGETCONV *);
-void fgetconv_close (FGETCONV **);
-
-void mutt_set_langinfo_charset (void);
-
-#endif /* _CHARSET_H */
+#endif /* _IMAP_AUTH_H */

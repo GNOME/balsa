@@ -33,7 +33,7 @@
 #endif
 
 #include "imap/imap.h"
-#include "imap/imap_socket.h"
+#include "mutt_socket.h"
 
 static LibBalsaMailboxClass *parent_class = NULL;
 
@@ -317,6 +317,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
+    g_return_val_if_fail(CLIENT_CONTEXT(mailbox), NULL);
 
     msg = safe_calloc(1, sizeof(MESSAGE));
     msg->magic = CLIENT_CONTEXT(mailbox)->magic;
@@ -342,9 +343,9 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	gint i = 0;
 	long newmsg;
 	gint index_hint;
+	g_return_if_fail(CLIENT_CONTEXT(mailbox));
 	
 	LOCK_MAILBOX(mailbox);
-	
 	newmsg = CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
 	index_hint = CLIENT_CONTEXT(mailbox)->vcount;
 	libbalsa_lock_mutt();
@@ -414,5 +415,5 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
 void
 libbalsa_imap_close_all_connections(void)
 {
-    mutt_socket_close_all_connections();
+    imap_logout_all();
 }

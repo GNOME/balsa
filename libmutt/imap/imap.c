@@ -26,7 +26,8 @@
 #include "mailbox.h"
 #include "globals.h"
 #include "sort.h"
-/* BALSA: we don browse in a terminal #include "browser.h" */
+#include "browser.h"
+#include "message.h"
 #include "imap_private.h"
 
 #include <unistd.h>
@@ -37,23 +38,23 @@
 #include <sys/stat.h>
 
 /* imap forward declarations */
-static int imap_get_delim (IMAP_DATA *idata, CONNECTION *conn);
+static int imap_get_delim (IMAP_DATA *idata);
 static char* imap_get_flags (LIST** hflags, char* s);
 static int imap_check_acl (IMAP_DATA *idata);
-static int imap_check_capabilities (IMAP_DATA *idata);
+static int imap_check_capabilities (IMAP_DATA* idata);
+static void imap_set_flag (IMAP_DATA* idata, int aclbit, int flag,
+			   const char* str, char* flags, size_t flsize);
 
-int imap_create_mailbox (CONTEXT* ctx, char* mailbox)
+int imap_create_mailbox (IMAP_DATA* idata, char* mailbox)
 {
   char buf[LONG_STRING], mbox[LONG_STRING];
 
-  imap_quote_string (mbox, sizeof (mbox), mailbox);
+  imap_munge_mbox_name (mbox, sizeof (mbox), mailbox);
   snprintf (buf, sizeof (buf), "CREATE %s", mbox);
       
-  if (imap_exec (buf, sizeof (buf), CTX_DATA, buf, 0) != 0)
-  {
-    imap_error ("imap_create_mailbox()", buf);
+  if (imap_exec (idata, buf, 0) != 0)
     return -1;
-  }
+
   return 0;
 }
 
@@ -61,19 +62,39 @@ int imap_delete_mailbox (CONTEXT* ctx, char* mailbox)
 {
   char buf[LONG_STRING], mbox[LONG_STRING];
   
-  imap_quote_string (mbox, sizeof (mbox), mailbox);
+  imap_munge_mbox_name (mbox, sizeof (mbox), mailbox);
   snprintf (buf, sizeof (buf), "DELETE %s", mbox);
 
-  if (imap_exec (buf, sizeof (buf), CTX_DATA, buf, 0) != 0)
+  if (imap_exec ((IMAP_DATA*) ctx->data, buf, 0) != 0)
     return -1;
 
   return 0;
 }
 
-void imap_set_logout (CONTEXT *ctx)
+/* imap_logout_all: close all open connections. Quick and dirty until we can
+ *   make sure we've got all the context we need. */
+void imap_logout_all (void) 
 {
-  if (CTX_DATA)
-    CTX_DATA->status = IMAP_LOGOUT;
+  CONNECTION* conn;
+  CONNECTION* tmp;
+
+  conn = mutt_socket_head ();
+
+  while (conn)
+  {
+    tmp = conn->next;
+
+    if (conn->account.type == M_ACCT_TYPE_IMAP && conn->fd >= 0)
+    {
+      mutt_message (_("Closing connection to %s..."), conn->account.host);
+      imap_logout ((IMAP_DATA*) conn->data);
+      mutt_clear_error ();
+      mutt_socket_close (conn);
+      mutt_socket_free (conn);
+    }
+
+    conn = tmp;
+  }
 }
 
 /* imap_parse_date: date is of the form: DD-MMM-YYYY HH:MM:SS +ZZzz */
@@ -127,7 +148,7 @@ time_t imap_parse_date (char *s)
 /* imap_read_literal: read bytes bytes from server into file. Not explicitly
  *   buffered, relies on FILE buffering. NOTE: strips \r from \r\n.
  *   Apparently even literals use \r\n-terminated strings ?! */
-int imap_read_literal (IMAP_DATA* idata, FILE* fp, long bytes)
+int imap_read_literal (FILE* fp, IMAP_DATA* idata, long bytes)
 {
   long pos;
   char c;
@@ -144,6 +165,7 @@ int imap_read_literal (IMAP_DATA* idata, FILE* fp, long bytes)
       return -1;
     }
 
+#if 1
     if (r == 1 && c != '\n')
       fputc ('\r', fp);
 
@@ -154,10 +176,10 @@ int imap_read_literal (IMAP_DATA* idata, FILE* fp, long bytes)
     }
     else
       r = 0;
-    
+#endif
     fputc (c, fp);
 #ifdef DEBUG
-    if (debuglevel >= 4)
+    if (debuglevel >= IMAP_LOG_LTRL)
       fputc (c, debugfile);
 #endif
   }
@@ -165,249 +187,81 @@ int imap_read_literal (IMAP_DATA* idata, FILE* fp, long bytes)
   return 0;
 }
 
-/* imap_reopen_mailbox: Reopen an imap mailbox.  This is used when the
- * server sends an EXPUNGE message, indicating that some messages may have
- * been deleted. This is a heavy handed approach, as it reparses all of the
- * headers, but it should guarantee correctness.  Later, we might implement
- * something to actually only remove the messages that are marked
- * EXPUNGE.
- */
-int imap_reopen_mailbox (CONTEXT *ctx, int *index_hint)
+/* imap_expunge_mailbox: Purge IMAP portion of expunged messages from the
+ *   context. Must not be done while something has a handle on any headers
+ *   (eg inside pager or editor). That is, check IMAP_REOPEN_ALLOW. */
+void imap_expunge_mailbox (IMAP_DATA* idata)
 {
-  HEADER **old_hdrs;
-  int old_msgcount;
-  char buf[LONG_STRING];
-  char bufout[LONG_STRING];
-  char seq[8];
-  char *pc = NULL;
-  int count = 0;
-  int msg_mod = 0;
-  int n;
-  int i, j;
-  int index_hint_set;
+  HEADER* h;
+  int i, cacheno;
 
-  ctx->quiet = 1;
-
-  if (Sort != SORT_ORDER)
+  for (i = 0; i < idata->ctx->msgcount; i++)
   {
-    short old_sort;
+    h = idata->ctx->hdrs[i];
 
-    old_sort = Sort;
-    Sort = SORT_ORDER;
-    mutt_sort_headers (ctx, 1);
-    Sort = old_sort;
-  }
-
-  old_hdrs = NULL;
-  old_msgcount = 0;
-
-  /* simulate a close */
-  hash_destroy (&ctx->id_hash, NULL);
-  hash_destroy (&ctx->subj_hash, NULL);
-  safe_free ((void **) &ctx->v2r);
-  if (ctx->readonly)
-  {
-    for (i = 0; i < ctx->msgcount; i++)
-      mutt_free_header (&(ctx->hdrs[i])); /* nothing to do! */
-    safe_free ((void **) &ctx->hdrs);
-  }
-  else
-  {
-    /* save the old headers */
-    old_msgcount = ctx->msgcount;
-    old_hdrs = ctx->hdrs;
-    ctx->hdrs = NULL;
-  }
-
-  ctx->hdrmax = 0;      /* force allocation of new headers */
-  ctx->msgcount = 0;
-  ctx->vcount = 0;
-  ctx->tagged = 0;
-  ctx->deleted = 0;
-  ctx->new = 0;
-  ctx->unread = 0;
-  ctx->flagged = 0;
-  ctx->changed = 0;
-  ctx->id_hash = hash_create (1031);
-  ctx->subj_hash = hash_create (1031);
-
-  /*BALSA:
-    mutt_message (_("Reopening mailbox... %s"), CTX_DATA->selected_mailbox);*/
-  imap_quote_string (buf, sizeof (buf), CTX_DATA->selected_mailbox);
-  imap_make_sequence (seq, sizeof (seq));
-  snprintf (bufout, sizeof (bufout), "%s STATUS %s (MESSAGES)\r\n", seq, buf);
-  mutt_socket_write (CTX_DATA->conn, bufout);
-
-  do
-  {
-    if (mutt_socket_read_line_d (buf, sizeof (buf), CTX_DATA->conn) < 0)
-      break;
-
-    if (buf[0] == '*')
+    if (h->index == -1)
     {
-      pc = buf + 2;
+      dprint (2, (debugfile, "Expunging message UID %d.\n", HEADER_DATA (h)->uid));
 
-      if (!mutt_strncasecmp ("STATUS", pc, 6) &&
-	  (pc = mutt_stristr (pc, "MESSAGES")))
+      h->active = 0;
+
+      /* free cached body from disk, if neccessary */
+      cacheno = HEADER_DATA(h)->uid % IMAP_CACHE_LEN;
+      if (idata->cache[cacheno].uid == HEADER_DATA(h)->uid &&
+	  idata->cache[cacheno].path)
       {
-	char* pn;
-	
-	/* skip "MESSAGES" */
-	pc += 8;
-	SKIPWS (pc);
-	pn = pc;
-
-	while (*pc && isdigit (*pc))
-	  pc++;
-	*pc++ = 0;
-	n = atoi (pn);
-	count = n;
+	unlink (idata->cache[cacheno].path);
+	FREE (&idata->cache[cacheno].path);
       }
-      else if (imap_handle_untagged (CTX_DATA, buf) != 0)
-	return -1;
+
+      imap_free_header_data (&h->data);
     }
   }
-  while (mutt_strncmp (seq, buf, mutt_strlen (seq)) != 0);
 
-  if (!imap_code (buf))
-  {
-    char *s;
-    s = imap_next_word (buf); /* skip seq */
-    s = imap_next_word (s); /* Skip response */
-    mutt_error ("%s", s);
-    sleep (1);
-    return -1;
-  }
-
-  ctx->hdrmax = count;
-  ctx->hdrs = safe_malloc (count * sizeof (HEADER *));
-  ctx->v2r = safe_malloc (count * sizeof (int));
-  ctx->msgcount = 0;
-  count = imap_read_headers (ctx, 0, count - 1) + 1;
-
-  index_hint_set = (index_hint == NULL);
-
-  if (!ctx->readonly)
-  {
-    for (i = 0; i < ctx->msgcount; i++)
-    {
-      int found = 0;
-
-      /* some messages have been deleted, and new  messages have been
-       * appended at the end; the heuristic is that old messages have then
-       * "advanced" towards the beginning of the folder, so we begin the
-       * search at index "i"
-       */
-      for (j = i; j < old_msgcount; j++)
-      {
-	if (old_hdrs[j] == NULL)
-	  continue;
-	if (mbox_strict_cmp_headers (ctx->hdrs[i], old_hdrs[j]))
-	{
-	  found = 1;
-	  break;
-	}
-      }
-      if (!found)
-      {
-	for (j = 0; j < i && j < old_msgcount; j++)
-	{
-	  if (old_hdrs[j] == NULL)
-	    continue;
-	  if (mbox_strict_cmp_headers (ctx->hdrs[i], old_hdrs[j]))
-	  {
-	    found = 1;
-	    break;
-	  }
-	}
-      }
-      if (found)
-      {
-	/* this is best done here */
-	if (!index_hint_set && *index_hint == j)
-	  *index_hint = i;
-
-	if (old_hdrs[j]->changed)
-	{
-	  /* Only update the flags if the old header was changed;
-	   * otherwise, the header may have been modified
-	   * externally, and we don't want to lose _those_ changes 
-	   */
-	  
-	  mutt_set_flag (ctx, ctx->hdrs[i], M_FLAG, old_hdrs[j]->flagged);
-	  mutt_set_flag (ctx, ctx->hdrs[i], M_REPLIED, old_hdrs[j]->replied);
-	  mutt_set_flag (ctx, ctx->hdrs[i], M_OLD, old_hdrs[j]->old);
-	  mutt_set_flag (ctx, ctx->hdrs[i], M_READ, old_hdrs[j]->read);
-	}
-	mutt_set_flag (ctx, ctx->hdrs[i], M_DELETE, old_hdrs[j]->deleted);
-	mutt_set_flag (ctx, ctx->hdrs[i], M_TAG, old_hdrs[j]->tagged);
-
-	/* we don't need this header any more */
-	mutt_free_header (&(old_hdrs[j]));
-      }
-    }
-
-    /* free the remaining old headers */
-    for (j = 0; j < old_msgcount; j++)
-    {
-      if (old_hdrs[j])
-      {
-	mutt_free_header (&(old_hdrs[j]));
-	msg_mod = 1;
-      }
-    }
-    safe_free ((void **) &old_hdrs);
-  }
-
-  ctx->quiet = 0;
-
-  return 0;
+  /* We may be called on to expunge at any time. We can't rely on the caller
+   * to always know to rethread */
+  mx_update_tables (idata->ctx, 0);
+  mutt_sort_headers (idata->ctx, 1);
 }
 
-static int imap_get_delim (IMAP_DATA *idata, CONNECTION *conn)
+static int imap_get_delim (IMAP_DATA *idata)
 {
-  char buf[LONG_STRING];
-  char seq[8];
   char *s;
+  int rc;
 
   /* assume that the delim is /.  If this fails, we're in bigger trouble
    * than getting the delim wrong */
   idata->delim = '/';
 
-  imap_make_sequence (seq, sizeof (seq));
-  snprintf (buf, sizeof (buf), "%s LIST \"\" \"\"\r\n", seq);
-
-  mutt_socket_write (conn, buf);
+  imap_cmd_start (idata, "LIST \"\" \"\"");
 
   do 
   {
-    if (mutt_socket_read_line_d (buf, sizeof (buf), conn) < 0)
-    {
-      return (-1);
-    }
+    if ((rc = imap_cmd_step (idata)) != IMAP_CMD_CONTINUE)
+      break;
 
-    if (buf[0] == '*') 
+    s = imap_next_word (idata->buf);
+    if (mutt_strncasecmp ("LIST", s, 4) == 0)
     {
-      s = imap_next_word (buf);
-      if (mutt_strncasecmp ("LIST", s, 4) == 0)
-      {
-	s = imap_next_word (s);
-	s = imap_next_word (s);
-	if (s && s[0] == '\"' && s[1] && s[2] == '\"')
-	  idata->delim = s[1];
-	else if (s && s[0] == '\"' && s[1] && s[1] == '\\' && s[2] && s[3] == '\"')
-	  idata->delim = s[2];
-      }
-      else
-      {
-	if (conn->data && 
-	    imap_handle_untagged (idata, buf) != 0)
-	  return (-1);
-      }
+      s = imap_next_word (s);
+      s = imap_next_word (s);
+      if (s && s[0] == '\"' && s[1] && s[2] == '\"')
+	idata->delim = s[1];
+      else if (s && s[0] == '\"' && s[1] && s[1] == '\\' && s[2] && s[3] == '\"')
+	idata->delim = s[2];
     }
   }
-  while ((mutt_strncmp (buf, seq, SEQLEN) != 0));
-  return 0;
+  while (rc == IMAP_CMD_CONTINUE);
+
+  if (rc != IMAP_CMD_DONE)
+  {
+    dprint (1, (debugfile, "imap_get_delim: failed.\n"));
+    return -1;
+  }
+
+  dprint (2, (debugfile, "Delimiter: %c\n", idata->delim));
+
+  return -1;
 }
 
 /* get rights for folder, let imap_handle_untagged do the rest */
@@ -416,9 +270,9 @@ static int imap_check_acl (IMAP_DATA *idata)
   char buf[LONG_STRING];
   char mbox[LONG_STRING];
 
-  imap_quote_string (mbox, sizeof(mbox), idata->selected_mailbox);
+  imap_munge_mbox_name (mbox, sizeof(mbox), idata->mailbox);
   snprintf (buf, sizeof (buf), "MYRIGHTS %s", mbox);
-  if (imap_exec (buf, sizeof (buf), idata, buf, 0) != 0)
+  if (imap_exec (idata, buf, 0) != 0)
   {
     imap_error ("imap_check_acl", buf);
     return -1;
@@ -426,72 +280,119 @@ static int imap_check_acl (IMAP_DATA *idata)
   return 0;
 }
 
-static int imap_check_capabilities (IMAP_DATA *idata)
+/* imap_check_capabilities: make sure we can log in to this server. */
+static int imap_check_capabilities (IMAP_DATA* idata)
 {
-  char buf[LONG_STRING];
-
-  if (imap_exec (buf, sizeof (buf), idata, "CAPABILITY", 0) != 0)
+  if (imap_exec (idata, "CAPABILITY", 0) != 0)
   {
-    imap_error ("imap_check_capabilities", buf);
+    imap_error ("imap_check_capabilities", idata->buf);
     return -1;
   }
+
   if (!(mutt_bit_isset(idata->capabilities,IMAP4)
       ||mutt_bit_isset(idata->capabilities,IMAP4REV1)))
   {
-    mutt_error ("This IMAP server is ancient. Mutt does not work with it.");
+    mutt_error _("This IMAP server is ancient. Mutt does not work with it.");
     sleep (5);	/* pause a moment to let the user see the error */
+
     return -1;
   }
+
   return 0;
 }
 
-int imap_open_connection (IMAP_DATA *idata, CONNECTION *conn)
+/* imap_conn_find: Find an open IMAP connection matching account, or open
+ *   a new one if none can be found. */
+IMAP_DATA* imap_conn_find (const ACCOUNT* account, int flags)
+{
+  CONNECTION* conn;
+  IMAP_DATA* idata;
+  ACCOUNT* creds;
+
+  if (!(conn = mutt_conn_find (NULL, account)))
+    return NULL;
+
+  /* if opening a new UNSELECTED connection, preserve existing creds */
+  creds = &(conn->account);
+
+  /* make sure this connection is not in SELECTED state, if neccessary */
+  if (flags & M_IMAP_CONN_NOSELECT)
+    while (conn->data && ((IMAP_DATA*) conn->data)->state == IMAP_SELECTED)
+    {
+      if (!(conn = mutt_conn_find (conn, account)))
+	return NULL;
+      memcpy (&(conn->account), creds, sizeof (ACCOUNT));
+    }
+  
+  idata = (IMAP_DATA*) conn->data;
+
+  /* don't open a new connection if one isn't wanted */
+  if (flags & M_IMAP_CONN_NONEW)
+    if (!idata || idata->state == IMAP_DISCONNECTED)
+    {
+      mutt_socket_free (conn);
+
+      return NULL;
+    }
+  
+  if (!idata)
+  {
+    /* The current connection is a new connection */
+    idata = safe_calloc (1, sizeof (IMAP_DATA));
+    conn->data = idata;
+    idata->conn = conn;
+  }
+  if (idata->state == IMAP_DISCONNECTED)
+    if (imap_open_connection (idata) != 0)
+    {
+      FREE (&idata);
+      mutt_socket_free (conn);
+
+      return NULL;
+    }
+  
+  return idata;
+}
+
+int imap_open_connection (IMAP_DATA* idata)
 {
   char buf[LONG_STRING];
 
-  if (mutt_socket_open_connection (conn) < 0)
+  if (mutt_socket_open (idata->conn) < 0)
     return -1;
 
   idata->state = IMAP_CONNECTED;
 
-  if (mutt_socket_read_line_d (buf, sizeof (buf), conn) < 0)
-  {
-    mutt_socket_close_connection (conn);
-    idata->state = IMAP_DISCONNECTED;
-    return -1;
-  }
+  if (imap_cmd_step (idata) != IMAP_CMD_CONTINUE)
+    goto bail;
 
-  if (mutt_strncmp ("* OK", buf, 4) == 0)
+  if (mutt_strncmp ("* OK", idata->buf, 4) == 0)
   {
-    if (imap_check_capabilities(idata) != 0 
-	|| imap_authenticate (idata, conn) != 0)
-    {
-      mutt_socket_close_connection (conn);
-      idata->state = IMAP_DISCONNECTED;
-      return -1;
-    }
+    if (imap_check_capabilities (idata) || imap_authenticate (idata))
+      goto bail;
   }
-  else if (mutt_strncmp ("* PREAUTH", buf, 9) == 0)
+  else if (mutt_strncmp ("* PREAUTH", idata->buf, 9) == 0)
   {
-    if (imap_check_capabilities(idata) != 0)
-    {
-      mutt_socket_close_connection (conn);
-      idata->state = IMAP_DISCONNECTED;
-      return -1;
-    }
+    if (imap_check_capabilities (idata) != 0)
+      goto bail;
   } 
   else
   {
     imap_error ("imap_open_connection()", buf);
-    mutt_socket_close_connection (conn);
-    idata->state = IMAP_DISCONNECTED;
-    return -1;
+    goto bail;
   }
 
+  FREE (&idata->capstr);
   idata->state = IMAP_AUTHENTICATED;
 
-  imap_get_delim (idata, conn);
+  imap_get_delim (idata);
   return 0;
+
+ bail:
+  FREE (&idata->capstr);
+  mutt_socket_close (idata->conn);
+  idata->state = IMAP_DISCONNECTED;
+  return -1;
 }
 
 /* imap_get_flags: Make a simple list out of a FLAGS response.
@@ -551,16 +452,15 @@ static char* imap_get_flags (LIST** hflags, char* s)
   return s;
 }
 
-int imap_open_mailbox (CONTEXT *ctx)
+int imap_open_mailbox (CONTEXT* ctx)
 {
   CONNECTION *conn;
   IMAP_DATA *idata;
   char buf[LONG_STRING];
   char bufout[LONG_STRING];
-  char seq[16];
   int count = 0;
-  int n;
   IMAP_MBOX mx;
+  int rc;
   
   if (imap_parse_path (ctx->path, &mx))
   {
@@ -568,110 +468,102 @@ int imap_open_mailbox (CONTEXT *ctx)
     return -1;
   }
 
-  conn = mutt_socket_select_connection (&mx, 0);
-  idata = CONN_DATA;
+  /* we require a connection which isn't currently in IMAP_SELECTED state */
+  if (!(idata = imap_conn_find (&(mx.account), M_IMAP_CONN_NOSELECT)))
+    goto fail_noidata;
+  conn = idata->conn;
 
-  if (!idata || (idata->state != IMAP_AUTHENTICATED))
-  {
-    if (!idata || (idata->state == IMAP_SELECTED) ||
-        (idata->state == IMAP_CONNECTED))
-    {
-      /* We need to create a new connection, the current one isn't useful */
-      idata = safe_calloc (1, sizeof (IMAP_DATA));
+  /* once again the context is new */
+  ctx->data = idata;
 
-      conn = mutt_socket_select_connection (&mx, 1);
-      conn->data = idata;
-      idata->conn = conn;
-    }
-    if (imap_open_connection (idata, conn))
-      return (-1);
-  }
-  ctx->data = (void *) idata;
+  if (idata->status == IMAP_FATAL)
+    goto fail;
 
   /* Clean up path and replace the one in the ctx */
   imap_fix_path (idata, mx.mbox, buf, sizeof (buf));
-  FREE(&(idata->selected_mailbox));
-  idata->selected_mailbox = safe_strdup (buf);
-  imap_qualify_path (buf, sizeof (buf), &mx, idata->selected_mailbox,
-    NULL);
+  FREE(&(idata->mailbox));
+  idata->mailbox = safe_strdup (buf);
+  imap_qualify_path (buf, sizeof (buf), &mx, idata->mailbox);
 
   FREE (&(ctx->path));
   ctx->path = safe_strdup (buf);
 
-  idata->selected_ctx = ctx;
+  idata->ctx = ctx;
 
   /* clear status, ACL */
   idata->status = 0;
   memset (idata->rights, 0, (RIGHTSMAX+7)/8);
 
-  /* BALSA: mutt_message (_("Selecting %s..."), idata->selected_mailbox); */
-  imap_quote_string (buf, sizeof(buf), idata->selected_mailbox);
-  imap_make_sequence (seq, sizeof (seq));
-  snprintf (bufout, sizeof (bufout), "%s %s %s\r\n", seq,
+  mutt_message (_("Selecting %s..."), idata->mailbox);
+  imap_munge_mbox_name (buf, sizeof(buf), idata->mailbox);
+  snprintf (bufout, sizeof (bufout), "%s %s",
     ctx->readonly ? "EXAMINE" : "SELECT", buf);
-  /* BALSA: handle broken cached connections: check the return code */
-  if(mutt_socket_write (conn, bufout) == -1) { 
-      mutt_socket_close_connection (conn);
-      idata->state = IMAP_DISCONNECTED;
-      return -1;
-  }
-  /* BALSA: end of patch */
+
   idata->state = IMAP_SELECTED;
+
+  imap_cmd_start (idata, bufout);
 
   do
   {
     char *pc;
     
-    if (mutt_socket_read_line_d (buf, sizeof (buf), conn) < 0)
+    if ((rc = imap_cmd_step (idata)) != IMAP_CMD_CONTINUE)
       break;
 
-    if (buf[0] == '*')
+    pc = idata->buf + 2;
+    pc = imap_next_word (pc);
+    if (!mutt_strncasecmp ("EXISTS", pc, 6))
     {
-      pc = buf + 2;
+      /* imap_handle_untagged will have picked up the EXISTS message and
+       * set the NEW_MAIL flag. We clear it here. */
+      idata->reopen &= ~IMAP_NEWMAIL_PENDING;
+      count = idata->newMailCount;
+      idata->newMailCount = 0;
+    }
 
-      if (isdigit (*pc))
-      {
-	char *pn = pc;
+    pc = idata->buf + 2;
 
-	while (*pc && isdigit (*pc))
-	  pc++;
-	*pc++ = '\0';
-	n = atoi (pn);
-	SKIPWS (pc);
-	if (mutt_strncasecmp ("EXISTS", pc, 6) == 0)
-	  count = n;
-      }
-      /* Obtain list of available flags here, may be overridden by a
-       * PERMANENTFLAGS tag in the OK response */
-      else if (mutt_strncasecmp ("FLAGS", pc, 5) == 0)
+    /* Obtain list of available flags here, may be overridden by a
+     * PERMANENTFLAGS tag in the OK response */
+    if (mutt_strncasecmp ("FLAGS", pc, 5) == 0)
+    {
+      /* don't override PERMANENTFLAGS */
+      if (!idata->flags)
       {
-        /* don't override PERMANENTFLAGS */
-        if (!idata->flags)
-        {
-          dprint (2, (debugfile, "Getting mailbox FLAGS\n"));
-          if ((pc = imap_get_flags (&(idata->flags), pc)) == NULL)
-            return -1;
-        }
+	dprint (2, (debugfile, "Getting mailbox FLAGS\n"));
+	if ((pc = imap_get_flags (&(idata->flags), pc)) == NULL)
+	  goto fail;
       }
-      /* PERMANENTFLAGS are massaged to look like FLAGS, then override FLAGS */
-      else if (mutt_strncasecmp ("OK [PERMANENTFLAGS", pc, 18) == 0)
-      {
-        dprint (2, (debugfile,
-          "Getting mailbox PERMANENTFLAGS\n"));
-        /* safe to call on NULL */
-        mutt_free_list (&(idata->flags));
-	/* skip "OK [PERMANENT" so syntax is the same as FLAGS */
-        pc += 13;
-        if ((pc = imap_get_flags (&(idata->flags), pc)) == NULL)
-          return -1;
-      }
-      else if (imap_handle_untagged (idata, buf) != 0)
-	return (-1);
+    }
+    /* PERMANENTFLAGS are massaged to look like FLAGS, then override FLAGS */
+    else if (mutt_strncasecmp ("OK [PERMANENTFLAGS", pc, 18) == 0)
+    {
+      dprint (2, (debugfile, "Getting mailbox PERMANENTFLAGS\n"));
+      /* safe to call on NULL */
+      mutt_free_list (&(idata->flags));
+      /* skip "OK [PERMANENT" so syntax is the same as FLAGS */
+      pc += 13;
+      if ((pc = imap_get_flags (&(idata->flags), pc)) == NULL)
+	goto fail;
     }
   }
-  while (mutt_strncmp (seq, buf, mutt_strlen (seq)) != 0);
+  while (rc == IMAP_CMD_CONTINUE);
+
+  if (rc == IMAP_CMD_NO)
+  {
+    char *s;
+    s = imap_next_word (idata->buf); /* skip seq */
+    s = imap_next_word (s); /* Skip response */
+    mutt_error ("%s", s);
+    sleep (2);
+    goto fail;
+  }
+
+  if (rc != IMAP_CMD_DONE)
+    goto fail;
+
   /* check for READ-ONLY notification */
-  if (!strncmp (imap_get_qualifier (buf), "[READ-ONLY]", 11))
+  if (!strncmp (imap_get_qualifier (idata->buf), "[READ-ONLY]", 11))
   {
     dprint (2, (debugfile, "Mailbox is read-only.\n"));
     ctx->readonly = 1;
@@ -700,21 +592,10 @@ int imap_open_mailbox (CONTEXT *ctx)
   }
 #endif
 
-  if (!imap_code (buf))
-  {
-    char *s;
-    s = imap_next_word (buf); /* skip seq */
-    s = imap_next_word (s); /* Skip response */
-    mutt_error ("%s", s);
-    idata->state = IMAP_AUTHENTICATED;
-    sleep (1);
-    return -1;
-  }
-
   if (mutt_bit_isset (idata->capabilities, ACL))
   {
     if (imap_check_acl (idata))
-      return -1;
+      goto fail;
   }
   /* assume we have all rights if ACL is unavailable */
   else
@@ -733,45 +614,17 @@ int imap_open_mailbox (CONTEXT *ctx)
   ctx->hdrs = safe_malloc (count * sizeof (HEADER *));
   ctx->v2r = safe_malloc (count * sizeof (int));
   ctx->msgcount = 0;
-  count = imap_read_headers (ctx, 0, count - 1) + 1;
+  count = imap_read_headers (idata, 0, count - 1) + 1;
 
   dprint (1, (debugfile, "imap_open_mailbox(): msgcount is %d\n", ctx->msgcount));
+  FREE (&mx.mbox);
   return 0;
-}
 
-/* fast switch mailboxes on the same connection - sync without expunge and
- * SELECT */
-int imap_select_mailbox (CONTEXT* ctx, const char* path)
-{
-  IMAP_DATA* idata;
-  CONNECTION* conn;
-  char curpath[LONG_STRING];
-  IMAP_MBOX mx;
-
-  strfcpy (curpath, path, sizeof (curpath));
-  /* check that the target folder makes sense */
-  if (imap_parse_path (curpath, &mx))
-    return -1;
-
-  /* and that it's on the same server as the current folder */
-  conn = mutt_socket_select_connection (&mx, 0);
-  if (!CTX_DATA || !CONN_DATA || (CTX_DATA->conn != CONN_DATA->conn))
-  {
-    dprint(2, (debugfile,
-      "imap_select_mailbox: source server is not target server\n"));
-    return -1;
-  }
-
-  if (imap_sync_mailbox (ctx, 0, NULL) < 0)
-    return -1;
-
-  idata = CTX_DATA;
-  /* now trick imap_open_mailbox into thinking it can just select */
-  FREE (&(ctx->path));
-  ctx->path = safe_strdup(path);
+ fail:
   idata->state = IMAP_AUTHENTICATED;
-  
-  return imap_open_mailbox (ctx);
+ fail_noidata:
+  FREE (&mx.mbox);
+  return -1;
 }
 
 int imap_open_mailbox_append (CONTEXT *ctx)
@@ -784,118 +637,107 @@ int imap_open_mailbox_append (CONTEXT *ctx)
   IMAP_MBOX mx;
 
   if (imap_parse_path (ctx->path, &mx))
-    return (-1);
+    return -1;
+
+  /* in APPEND mode, we appear to hijack an existing IMAP connection -
+   * ctx is brand new and mostly empty */
+
+  if (!(idata = imap_conn_find (&(mx.account), 0)))
+    goto fail;
+  conn = idata->conn;
 
   ctx->magic = M_IMAP;
-
-  conn = mutt_socket_select_connection (&mx, 0);
-  idata = CONN_DATA;
-
-  if (!idata || (idata->state == IMAP_DISCONNECTED))
-  {
-    if (!idata)
-    {
-      /* The current connection is a new connection */
-      idata = safe_calloc (1, sizeof (IMAP_DATA));
-      conn->data = idata;
-      idata->conn = conn;
-    }
-    if (imap_open_connection (idata, conn))
-      return (-1);
-  }
   ctx->data = (void *) idata;
 
   /* check mailbox existance */
 
   imap_fix_path (idata, mx.mbox, mailbox, sizeof (mailbox));
 
-  imap_quote_string (mbox, sizeof (mbox), mailbox);
+  imap_munge_mbox_name (mbox, sizeof (mbox), mailbox);
 				
   if (mutt_bit_isset(idata->capabilities,IMAP4REV1))
-  {
     snprintf (buf, sizeof (buf), "STATUS %s (UIDVALIDITY)", mbox);
-  }
   else if (mutt_bit_isset(idata->capabilities,STATUS))
-  { 
     /* We have no idea what the other guy wants. UW imapd 8.3 wants this
      * (but it does not work if another mailbox is selected) */
     snprintf (buf, sizeof (buf), "STATUS %s (UID-VALIDITY)", mbox);
-  }
   else
   {
-    /* STATUS not supported
-     * The thing to do seems to be:
-     *  - Open a *new* IMAP session, select, and then close it. Report the
-     * error if the mailbox did not exist. */
-      /* mutt_message _("Unable to append to IMAP mailboxes at this server");*/
-    return -1;
+    /* STATUS not supported */
+    mutt_message _("Unable to append to IMAP mailboxes at this server");
+
+    goto fail;
   }
 
-  r = imap_exec (buf, sizeof (buf), idata, buf, IMAP_OK_FAIL);
+  r = imap_exec (idata, buf, IMAP_CMD_FAIL_OK);
   if (r == -2)
   {
     /* command failed cause folder doesn't exist */
-      /* BALSA: no interactivity, quit with error.
-	 snprintf (buf, sizeof (buf), _("Create %s?"), mailbox);
-	 if (option (OPTCONFIRMCREATE) && mutt_yesorno (buf, 1) < 1) */
-      return (-1);
+    snprintf (buf, sizeof (buf), _("Create %s?"), mailbox);
+    if (option (OPTCONFIRMCREATE) && mutt_yesorno (buf, 1) < 1)
+      goto fail;
 
-    if (imap_create_mailbox (ctx, mailbox) < 0)
-      return (-1);
+    if (imap_create_mailbox (idata, mailbox) < 0)
+      goto fail;
   }
   else if (r == -1)
-  {
     /* Hmm, some other failure */
-    return -1;
-  }
+    goto fail;
+
+  FREE (&mx.mbox);
   return 0;
+
+ fail:
+  FREE (&mx.mbox);
+  return -1;
+}
+
+/* imap_logout: Gracefully log out of server. */
+void imap_logout (IMAP_DATA* idata)
+{
+  /* we set status here to let imap_handle_untagged know we _expect_ to
+   * receive a bye response (so it doesn't freak out and close the conn) */
+  idata->status = IMAP_BYE;
+  imap_cmd_start (idata, "LOGOUT");
+  while (imap_cmd_step (idata) == IMAP_CMD_CONTINUE)
+    ;
 }
 
 int imap_close_connection (CONTEXT *ctx)
 {
-  char buf[LONG_STRING];
-  char seq[8];
-
   dprint (1, (debugfile, "imap_close_connection(): closing connection\n"));
   /* if the server didn't shut down on us, close the connection gracefully */
   if (CTX_DATA->status != IMAP_BYE)
   {
-      /* BALSA: mutt_message _("Closing connection to IMAP server..."); */
-    imap_make_sequence (seq, sizeof (seq));
-    snprintf (buf, sizeof (buf), "%s LOGOUT\r\n", seq);
-    mutt_socket_write (CTX_DATA->conn, buf);
-    do
-    {
-      if (mutt_socket_read_line_d (buf, sizeof (buf), CTX_DATA->conn) < 0)
-	break;
-    }
-    while (mutt_strncmp (seq, buf, SEQLEN) != 0);
+    mutt_message _("Closing connection to IMAP server...");
+    imap_logout (CTX_DATA);
     mutt_clear_error ();
   }
-  mutt_socket_close_connection (CTX_DATA->conn);
+  mutt_socket_close (CTX_DATA->conn);
   CTX_DATA->state = IMAP_DISCONNECTED;
-  CTX_DATA->conn->uses = 0;
   CTX_DATA->conn->data = NULL;
   return 0;
 }
 
-static void imap_set_flag (CONTEXT *ctx, int aclbit, int flag, const char *str, 
-  char *flags)
+/* imap_set_flag: append str to flags if we currently have permission
+ *   according to aclbit */
+static void imap_set_flag (IMAP_DATA* idata, int aclbit, int flag,
+  const char *str, char *flags, size_t flsize)
 {
-  if (mutt_bit_isset (CTX_DATA->rights, aclbit))
+  if (mutt_bit_isset (idata->rights, aclbit))
     if (flag)
-      strcat (flags, str);
+      strncat (flags, str, flsize);
 }
 
-/* imap_make_msg_set: make an IMAP4rev1 message set out of a set of headers,
- *   given a flag enum to filter on.
- * Params: buf: to write message set into
+/* imap_make_msg_set: make an IMAP4rev1 UID message set out of a set of
+ *   headers, given a flag enum to filter on.
+ * Params: idata: IMAP_DATA containing context containing header set
+ *         buf: to write message set into
  *         buflen: length of buffer
- *         ctx: CONTEXT containing header set
  *         flag: enum of flag type on which to filter
  *         changed: include only changed messages in message set
  * Returns: number of messages in message set (0 if no matches) */
-int imap_make_msg_set (char* buf, size_t buflen, CONTEXT* ctx, int flag,
+int imap_make_msg_set (IMAP_DATA* idata, char* buf, size_t buflen, int flag,
   int changed)
 {
   HEADER** hdrs;	/* sorted local copy */
@@ -913,59 +755,65 @@ int imap_make_msg_set (char* buf, size_t buflen, CONTEXT* ctx, int flag,
   *buf = '\0';
 
   /* make copy of header pointers to sort in natural order */
-  hdrs = safe_calloc (ctx->msgcount, sizeof (HEADER*));
-  memcpy (hdrs, ctx->hdrs, ctx->msgcount * sizeof (HEADER*));
+  hdrs = safe_calloc (idata->ctx->msgcount, sizeof (HEADER*));
+  memcpy (hdrs, idata->ctx->hdrs, idata->ctx->msgcount * sizeof (HEADER*));
 
-  oldsort = Sort;
-  Sort = SORT_ORDER;
-  qsort ((void*) hdrs, ctx->msgcount, sizeof (HEADER*),
-    mutt_get_sort_func (SORT_ORDER));
-  Sort = oldsort;
-
+  if (Sort != SORT_ORDER)
+  {
+    oldsort = Sort;
+    Sort = SORT_ORDER;
+    qsort ((void*) hdrs, idata->ctx->msgcount, sizeof (HEADER*),
+      mutt_get_sort_func (SORT_ORDER));
+    Sort = oldsort;
+  }
+  
   tmp = safe_malloc (buflen);
 
-  for (n = 0; n < ctx->msgcount; n++)
+  for (n = 0; n < idata->ctx->msgcount; n++)
   {
     match = 0;
-    switch (flag)
-    {
-      case M_DELETE:
-        if (hdrs[n]->deleted)
-          match = 1;
-        break;
-      case M_TAG:
-        if (hdrs[n]->tagged)
-          match = 1;
-        break;
-    }
+    /* don't include pending expunged messages */
+    if (hdrs[n]->active)
+      switch (flag)
+      {
+        case M_DELETE:
+	  if (hdrs[n]->deleted)
+	    match = 1;
+	  break;
+        case M_TAG:
+	  if (hdrs[n]->tagged)
+	    match = 1;
+	  break;
+      }
 
     if (match && (!changed || hdrs[n]->changed))
     {
       count++;
       if (setstart == 0)
       {
-        setstart = n+1;
+        setstart = HEADER_DATA (hdrs[n])->uid;
         if (!buf[0])
-          snprintf (buf, buflen, "%u", n+1);
+          snprintf (buf, buflen, "%u", HEADER_DATA (hdrs[n])->uid);
         else
         {
           strncpy (tmp, buf, buflen);
-          snprintf (buf, buflen, "%s,%u", tmp, n+1);
+          snprintf (buf, buflen, "%s,%u", tmp, HEADER_DATA (hdrs[n])->uid);
         }
       }
       /* tie up if the last message also matches */
-      else if (n == ctx->msgcount-1)
+      else if (n == idata->ctx->msgcount-1)
       {
         strncpy (tmp, buf, buflen);
-        snprintf (buf, buflen, "%s:%u", tmp, n+1);
+        snprintf (buf, buflen, "%s:%u", tmp, HEADER_DATA (hdrs[n])->uid);
       }
     }
-    else if (setstart)
+    /* this message is not expunged and doesn't match. End current set. */
+    else if (setstart && hdrs[n]->active)
     {
-      if (n > setstart)
+      if (HEADER_DATA (hdrs[n-1])->uid > setstart)
       {
         strncpy (tmp, buf, buflen);
-        snprintf (buf, buflen, "%s:%u", tmp, n);
+        snprintf (buf, buflen, "%s:%u", tmp, HEADER_DATA (hdrs[n-1])->uid);
       }
       setstart = 0;
     }
@@ -983,8 +831,9 @@ int imap_make_msg_set (char* buf, size_t buflen, CONTEXT* ctx, int flag,
  *   expunge: 0 or 1 - do expunge? 
  */
 
-int imap_sync_mailbox (CONTEXT* ctx, int expunge, int *index_hint)
+int imap_sync_mailbox (CONTEXT* ctx, int expunge, int* index_hint)
 {
+  IMAP_DATA* idata;
   char buf[HUGE_STRING];
   char flags[LONG_STRING];
   char tmp[LONG_STRING];
@@ -993,31 +842,40 @@ int imap_sync_mailbox (CONTEXT* ctx, int expunge, int *index_hint)
   int err_continue = M_NO;	/* continue on error? */
   int rc;
 
-  if (CTX_DATA->state != IMAP_SELECTED)
+  idata = (IMAP_DATA*) ctx->data;
+
+  if (idata->state != IMAP_SELECTED)
   {
     dprint (2, (debugfile, "imap_sync_mailbox: no mailbox selected\n"));
     return -1;
   }
 
-  imap_allow_reopen (ctx);	/* This function is only called when the calling code
-				 * expects the context to be changed.
-				 */
+  /* CLOSE purges deleted messages. If we don't want to purge them, we must
+   * tell imap_close_mailbox not to issue the CLOSE command */
+  if (expunge)
+    idata->noclose = 0;
+  else
+    idata->noclose = 1;
+
+  /* This function is only called when the calling code	expects the context
+   * to be changed. */
+  imap_allow_reopen (ctx);	
 
   if ((rc = imap_check_mailbox (ctx, index_hint)) != 0)
     return rc;
 
   /* if we are expunging anyway, we can do deleted messages very quickly... */
-  if (expunge && mutt_bit_isset (CTX_DATA->rights, IMAP_ACL_DELETE))
+  if (expunge && mutt_bit_isset (idata->rights, IMAP_ACL_DELETE))
   {
-    deleted = imap_make_msg_set (buf, sizeof (buf), ctx, M_DELETE, 1);
+    deleted = imap_make_msg_set (idata, buf, sizeof (buf), M_DELETE, 1);
 
     /* if we have a message set, then let's delete */
     if (deleted)
     {
-	/* BALSA: 
-	   mutt_message (_("Marking %d messages deleted..."), deleted);*/
-      snprintf (tmp, sizeof (tmp), "STORE %s +FLAGS.SILENT (\\Deleted)", buf);
-      if (imap_exec (buf, sizeof (buf), CTX_DATA, tmp, 0) != 0)
+      mutt_message (_("Marking %d messages deleted..."), deleted);
+      snprintf (tmp, sizeof (tmp), "UID STORE %s +FLAGS.SILENT (\\Deleted)",
+        buf);
+      if (imap_exec (idata, tmp, 0) != 0)
         /* continue, let regular store try before giving up */
         dprint(2, (debugfile, "imap_sync_mailbox: fast delete failed\n"));
       else
@@ -1033,23 +891,22 @@ int imap_sync_mailbox (CONTEXT* ctx, int expunge, int *index_hint)
   {
     if (ctx->hdrs[n]->changed)
     {
-	/* BALSA: 
-	   mutt_message (_("Saving message status flags... [%d/%d]"), n+1, ctx->msgcount); */
+      mutt_message (_("Saving message status flags... [%d/%d]"), n+1, ctx->msgcount);
       
       flags[0] = '\0';
       
-      imap_set_flag (ctx, IMAP_ACL_SEEN, ctx->hdrs[n]->read, "\\Seen ",
-        flags);
-      imap_set_flag (ctx, IMAP_ACL_WRITE, ctx->hdrs[n]->flagged, "\\Flagged ",
-        flags);
-      imap_set_flag (ctx, IMAP_ACL_WRITE, ctx->hdrs[n]->replied,
-        "\\Answered ", flags);
-      imap_set_flag (ctx, IMAP_ACL_DELETE, ctx->hdrs[n]->deleted, "\\Deleted ",
-        flags);
+      imap_set_flag (idata, IMAP_ACL_SEEN, ctx->hdrs[n]->read, "\\Seen ",
+        flags, sizeof (flags));
+      imap_set_flag (idata, IMAP_ACL_WRITE, ctx->hdrs[n]->flagged,
+        "\\Flagged ", flags, sizeof (flags));
+      imap_set_flag (idata, IMAP_ACL_WRITE, ctx->hdrs[n]->replied,
+        "\\Answered ", flags, sizeof (flags));
+      imap_set_flag (idata, IMAP_ACL_DELETE, ctx->hdrs[n]->deleted,
+        "\\Deleted ", flags, sizeof (flags));
 
       /* now make sure we don't lose custom tags */
-      if (mutt_bit_isset (CTX_DATA->rights, IMAP_ACL_WRITE))
-        imap_add_keywords (flags, ctx->hdrs[n], CTX_DATA->flags);
+      if (mutt_bit_isset (idata->rights, IMAP_ACL_WRITE))
+        imap_add_keywords (flags, ctx->hdrs[n], idata->flags, sizeof (flags));
       
       mutt_remove_trailing_ws (flags);
       
@@ -1057,28 +914,28 @@ int imap_sync_mailbox (CONTEXT* ctx, int expunge, int *index_hint)
        * explicitly revoke all system flags (if we have permission) */
       if (!*flags)
       {
-        imap_set_flag (ctx, IMAP_ACL_SEEN, 1, "\\Seen ", flags);
-        imap_set_flag (ctx, IMAP_ACL_WRITE, 1, "\\Flagged ", flags);
-        imap_set_flag (ctx, IMAP_ACL_WRITE, 1, "\\Answered ", flags);
-        imap_set_flag (ctx, IMAP_ACL_DELETE, 1, "\\Deleted ", flags);
+        imap_set_flag (idata, IMAP_ACL_SEEN, 1, "\\Seen ", flags, sizeof (flags));
+        imap_set_flag (idata, IMAP_ACL_WRITE, 1, "\\Flagged ", flags, sizeof (flags));
+        imap_set_flag (idata, IMAP_ACL_WRITE, 1, "\\Answered ", flags, sizeof (flags));
+        imap_set_flag (idata, IMAP_ACL_DELETE, 1, "\\Deleted ", flags, sizeof (flags));
 
         mutt_remove_trailing_ws (flags);
 
-        snprintf (buf, sizeof (buf), "STORE %d -FLAGS.SILENT (%s)",
-          ctx->hdrs[n]->index + 1, flags);
+        snprintf (buf, sizeof (buf), "UID STORE %d -FLAGS.SILENT (%s)",
+          HEADER_DATA (ctx->hdrs[n])->uid, flags);
       }
       else
-        snprintf (buf, sizeof (buf), "STORE %d FLAGS.SILENT (%s)",
-          ctx->hdrs[n]->index + 1, flags);
+        snprintf (buf, sizeof (buf), "UID STORE %d FLAGS.SILENT (%s)",
+          HEADER_DATA (ctx->hdrs[n])->uid, flags);
 
       /* after all this it's still possible to have no flags, if you
        * have no ACL rights */
-      if (*flags && (imap_exec (buf, sizeof (buf), CTX_DATA, buf, 0) != 0) &&
+      if (*flags && (imap_exec (idata, buf, 0) != 0) &&
         (err_continue != M_YES))
       {
-	  /* BALSA: quit with error message.
-	     err_continue = imap_continue ("imap_sync_mailbox: STORE failed", buf);
-	     if (err_continue != M_YES) */
+        err_continue = imap_continue ("imap_sync_mailbox: STORE failed",
+          idata->buf);
+        if (err_continue != M_YES)
           return -1;
       }
 
@@ -1087,56 +944,43 @@ int imap_sync_mailbox (CONTEXT* ctx, int expunge, int *index_hint)
   }
   ctx->changed = 0;
 
-  if (expunge == 1)
+  /* We must send an EXPUNGE command if we're not closing. */
+  if (expunge && !(ctx->closing) &&
+      mutt_bit_isset(idata->rights, IMAP_ACL_DELETE))
   {
-    /* expunge is implicit if closing */
-    if (ctx->closing)
+    mutt_message _("Expunging messages from server...");
+    if (imap_exec (idata, "EXPUNGE", 0) != 0)
     {
-	/* BALSA: mutt_message _("Closing mailbox..."); */
-      if (imap_exec (buf, sizeof (buf), CTX_DATA, "CLOSE", 0) != 0)
-      {
-        imap_error ("imap_sync_mailbox: CLOSE failed", buf);
-        return -1;
-      }
-      CTX_DATA->state = IMAP_AUTHENTICATED;
-    }
-    else if (mutt_bit_isset(CTX_DATA->rights, IMAP_ACL_DELETE))
-    {
-	/* BALSA: mutt_message _("Expunging messages from server..."); */
-      CTX_DATA->status = IMAP_EXPUNGE;
-      if (imap_exec (buf, sizeof (buf), CTX_DATA, "EXPUNGE", 0) != 0)
-      {
-        imap_error ("imap_sync_mailbox: EXPUNGE failed", buf);
-        return -1;
-      }
-      CTX_DATA->status = 0;
-    }
-  }
-
-  for (n = 0; n < IMAP_CACHE_LEN; n++)
-  {
-    if (CTX_DATA->cache[n].path)
-    {
-      unlink (CTX_DATA->cache[n].path);
-      safe_free ((void **) &CTX_DATA->cache[n].path);
+      imap_error ("imap_sync_mailbox: EXPUNGE failed", idata->buf);
+      return -1;
     }
   }
 
   return 0;
 }
 
-void imap_fastclose_mailbox (CONTEXT *ctx)
+/* imap_close_mailbox: issue close command if neccessary, reset IMAP_DATA */
+void imap_close_mailbox (CONTEXT* ctx)
 {
+  IMAP_DATA* idata;
   int i;
 
+  idata = (IMAP_DATA*) ctx->data;
   /* Check to see if the mailbox is actually open */
-  if (!ctx->data)
+  if (!idata)
     return;
 
-  CTX_DATA->reopen &= IMAP_REOPEN_ALLOW;
+  if ((idata->status != IMAP_FATAL) &&
+      (idata->state == IMAP_SELECTED) &&
+      (ctx == idata->ctx))
+  {
+    if (!(idata->noclose) && imap_exec (idata, "CLOSE", 0))
+      imap_error ("CLOSE failed", idata->buf);
 
-  if ((CTX_DATA->state == IMAP_SELECTED) && (ctx == CTX_DATA->selected_ctx))
-    CTX_DATA->state = IMAP_AUTHENTICATED;
+    idata->reopen &= IMAP_REOPEN_ALLOW;
+    idata->state = IMAP_AUTHENTICATED;
+    FREE (&(idata->mailbox));
+  }
 
   /* free IMAP part of headers */
   for (i = 0; i < ctx->msgcount; i++)
@@ -1144,263 +988,222 @@ void imap_fastclose_mailbox (CONTEXT *ctx)
 
   for (i = 0; i < IMAP_CACHE_LEN; i++)
   {
-    if (CTX_DATA->cache[i].path)
+    if (idata->cache[i].path)
     {
-      unlink (CTX_DATA->cache[i].path);
-      safe_free ((void **) &CTX_DATA->cache[i].path);
+      unlink (idata->cache[i].path);
+      safe_free ((void **) &idata->cache[i].path);
     }
   }
-
-#if 0
-  /* This is not the right place to logout, actually. There are two dangers:
-   * 1. status is set to IMAP_LOGOUT as soon as the user says q, even if she
-   *    cancels a bit later.
-   * 2. We may get here when closing the $received folder, but before we sync
-   *    the spool. So the sync will currently cause an abort. */
-  if (CTX_DATA->status == IMAP_BYE || CTX_DATA->status == IMAP_FATAL ||
-    CTX_DATA->status == IMAP_LOGOUT)
-  {
-    imap_close_connection (ctx);
-    CTX_DATA->conn->data = NULL;
-    safe_free ((void **) &ctx->data);
-  }
-#endif
 }
 
 /* use the NOOP command to poll for new mail
  *
  * return values:
- *	M_REOPENED	mailbox has been reopened
+ *	M_REOPENED	mailbox has been externally modified
  *	M_NEW_MAIL	new mail has arrived!
  *	0		no change
  *	-1		error
  */
 int imap_check_mailbox (CONTEXT *ctx, int *index_hint)
 {
-  char buf[LONG_STRING];
-  static time_t checktime=0;
-  time_t t;
+  /* overload keyboard timeout to avoid many mailbox checks in a row.
+   * Most users don't like having to wait exactly when they press a key. */
 
-  /* 
-   * gcc thinks it has to warn about uninitialized use
-   * of t.  This is wrong.
-   */
-  
-  if (ImapCheckTimeout)
-  { 
-    t = time(NULL);
-    t -= checktime;
-  }
+  IMAP_DATA* idata;
+  time_t now;
 
-  if ((ImapCheckTimeout && t >= ImapCheckTimeout)
-      || ((CTX_DATA->reopen & IMAP_REOPEN_ALLOW) && (CTX_DATA->reopen & ~IMAP_REOPEN_ALLOW)))
-  {
-    if (ImapCheckTimeout) checktime += t;
+  idata = (IMAP_DATA*) ctx->data;
 
-    CTX_DATA->check_status = 0;
-    if (imap_exec (buf, sizeof (buf), CTX_DATA, "NOOP", 0) != 0)
+  now = time(NULL);
+  if (now > ImapLastCheck + Timeout) {
+    ImapLastCheck = now;
+
+    if (imap_exec (idata, "NOOP", 0) != 0)
     {
-      imap_error ("imap_check_mailbox()", buf);
+      imap_error ("imap_check_mailbox", idata->buf);
       return -1;
     }
-    
-    if (CTX_DATA->check_status == IMAP_NEW_MAIL)
-      return M_NEW_MAIL;
-    if (CTX_DATA->check_status == IMAP_REOPENED)
-      return M_REOPENED;
   }
+    
+  if (idata->check_status & IMAP_NEWMAIL_PENDING)
+  {
+    idata->check_status &= ~IMAP_NEWMAIL_PENDING;
+    return M_NEW_MAIL;
+  }
+  /* TODO: we should be able to detect external changes and return
+   *   M_REOPENED here. */
   
   return 0;
 }
 
 /* returns count of recent messages if new = 1, else count of total messages.
  * (useful for at least postponed function)
- * Question of taste: use RECENT or UNSEEN for new? */
-int imap_mailbox_check (char *path, int new)
+ * Question of taste: use RECENT or UNSEEN for new?
+ *   0+   number of messages in mailbox
+ *  -1    error while polling mailboxes
+ */
+int imap_mailbox_check (char* path, int new)
 {
   CONNECTION *conn;
   IMAP_DATA *idata;
   char buf[LONG_STRING];
   char mbox[LONG_STRING];
   char mbox_unquoted[LONG_STRING];
-  char seq[8];
   char *s;
   int msgcount = 0;
+  int connflags = 0;
   IMAP_MBOX mx;
+  int rc;
   
   if (imap_parse_path (path, &mx))
     return -1;
 
-  conn = mutt_socket_select_connection (&mx, 0);
-  idata = CONN_DATA;
+  /* If imap_passive is set, don't open a connection to check for new mail */
+  if (option (OPTIMAPPASSIVE))
+    connflags = M_IMAP_CONN_NONEW;
 
-  if (!idata || (idata->state == IMAP_DISCONNECTED))
+  if (!(idata = imap_conn_find (&(mx.account), connflags)))
   {
-    /* If passive is selected, then we don't open connections to check
-     * for new mail */
-    if (option (OPTIMAPPASSIVE))
-      return -1;
-    if (!idata)
-    {
-      /* The current connection is a new connection */
-      idata = safe_calloc (1, sizeof (IMAP_DATA));
-      conn->data = idata;
-      idata->conn = conn;
-    }
-    if (imap_open_connection (idata, conn))
-      return -1;
+    FREE (&mx.mbox);
+    return -1;
   }
+  conn = idata->conn;
 
   imap_fix_path (idata, mx.mbox, buf, sizeof (buf));
-  /* Update the path, if it fits */
-  if (strlen (buf) < strlen (mx.mbox))
-      strcpy (mx.mbox, buf);
+  FREE (&mx.mbox);
 
-  imap_make_sequence (seq, sizeof (seq));		
-  imap_quote_string (mbox, sizeof(mbox), buf);
+  imap_munge_mbox_name (mbox, sizeof(mbox), buf);
   strfcpy (mbox_unquoted, buf, sizeof (mbox_unquoted));
 
   /* The draft IMAP implementor's guide warns againts using the STATUS
    * command on a mailbox that you have selected 
    */
 
-  if (mutt_strcmp (mbox_unquoted, idata->selected_mailbox) == 0
+  if (mutt_strcmp (mbox_unquoted, idata->mailbox) == 0
       || (mutt_strcasecmp (mbox_unquoted, "INBOX") == 0
-	  && mutt_strcasecmp (mbox_unquoted, idata->selected_mailbox) == 0))
+	  && mutt_strcasecmp (mbox_unquoted, idata->mailbox) == 0))
   {
-    snprintf (buf, sizeof (buf), "%s NOOP\r\n", seq);
+    strfcpy (buf, "NOOP", sizeof (buf));
   }
   else if (mutt_bit_isset(idata->capabilities,IMAP4REV1) ||
 	   mutt_bit_isset(idata->capabilities,STATUS))
   {				
-    snprintf (buf, sizeof (buf), "%s STATUS %s (%s)\r\n", seq, mbox,
+    snprintf (buf, sizeof (buf), "STATUS %s (%s)", mbox,
       new ? "RECENT" : "MESSAGES");
   }
   else
-  {
     /* Server does not support STATUS, and this is not the current mailbox.
      * There is no lightweight way to check recent arrivals */
-      return -1;
-  }
+    return -1;
 
-  mutt_socket_write (conn, buf);
+  imap_cmd_start (idata, buf);
 
   do 
   {
-    if (mutt_socket_read_line_d (buf, sizeof (buf), conn) < 0)
-      return -1;
+    if ((rc = imap_cmd_step (idata)) != IMAP_CMD_CONTINUE)
+      break;
 
-    if (buf[0] == '*') 
+    s = imap_next_word (idata->buf);
+    if (mutt_strncasecmp ("STATUS", s, 6) == 0)
     {
-      s = imap_next_word (buf);
-      if (mutt_strncasecmp ("STATUS", s, 6) == 0)
+      s = imap_next_word (s);
+      /* The mailbox name may or may not be quoted here. We could try to 
+       * munge the server response and compare with quoted (or vise versa)
+       * but it is probably more efficient to just strncmp against both. */
+      if (mutt_strncmp (mbox_unquoted, s, mutt_strlen (mbox_unquoted)) == 0
+	  || mutt_strncmp (mbox, s, mutt_strlen (mbox)) == 0)
       {
 	s = imap_next_word (s);
-	if (mutt_strncmp (mbox_unquoted, s, mutt_strlen (mbox_unquoted)) == 0)
+	s = imap_next_word (s);
+	if (isdigit (*s))
 	{
-	  s = imap_next_word (s);
-	  s = imap_next_word (s);
-	  if (isdigit (*s))
+	  if (*s != '0')
 	  {
-	    if (*s != '0')
-	    {
-	      dprint (1, (debugfile, "Mail in %s\n", path));
-	      msgcount = atoi(s);
-	    }
+	    msgcount = atoi(s);
+	    dprint (2, (debugfile, "%d new messages in %s\n", msgcount, path));
 	  }
 	}
       }
       else
-      {
-	if (conn->data && 
-	    imap_handle_untagged (idata, buf) != 0)
-	  return -1;
-      }
+	dprint (1, (debugfile, "imap_mailbox_check: STATUS response doesn't match requested mailbox.\n"));
     }
   }
-  while ((mutt_strncmp (buf, seq, SEQLEN) != 0));
-
-  imap_cmd_finish (seq, idata);
-
-  /* what does this do? */
-  conn->uses--;
+  while (rc == IMAP_CMD_CONTINUE);
 
   return msgcount;
 }
 
-int imap_parse_list_response(CONNECTION *conn, char *buf, int buflen,
-  char **name, int *noselect, int *noinferiors, char *delim)
+/* all this listing/browsing is a mess. I don't like that name is a pointer
+ *   into idata->buf (used to be a pointer into the passed in buffer, just
+ *   as bad), nor do I like the fact that the fetch is done here. This
+ *   code can't possibly handle non-LIST untagged responses properly.
+ *   FIXME. ?! */
+int imap_parse_list_response(IMAP_DATA* idata, char **name, int *noselect,
+  int *noinferiors, char *delim)
 {
-  IMAP_DATA *idata = CONN_DATA;
   char *s;
   long bytes;
+  int rc;
 
   *name = NULL;
-  if (mutt_socket_read_line_d (buf, buflen, conn) < 0)
-  {
-    return (-1);
-  }
 
-  if (buf[0] == '*')
+  rc = imap_cmd_step (idata);
+  if (rc == IMAP_CMD_DONE)
+    return 0;
+  if (rc != IMAP_CMD_CONTINUE)
+    return -1;
+
+  s = imap_next_word (idata->buf);
+  if ((mutt_strncasecmp ("LIST", s, 4) == 0) ||
+      (mutt_strncasecmp ("LSUB", s, 4) == 0))
   {
-    s = imap_next_word (buf);
-    if ((mutt_strncasecmp ("LIST", s, 4) == 0) ||
-	(mutt_strncasecmp ("LSUB", s, 4) == 0))
-    {
-      *noselect = 0;
-      *noinferiors = 0;
+    *noselect = 0;
+    *noinferiors = 0;
       
-      s = imap_next_word (s); /* flags */
-      if (*s == '(')
+    s = imap_next_word (s); /* flags */
+    if (*s == '(')
+    {
+      char *ep;
+
+      s++;
+      ep = s;
+      while (*ep && *ep != ')') ep++;
+      do
       {
-	char *ep;
-	
-	s++;
-	ep = s;
-	while (*ep && *ep != ')') ep++;
-	do {
-	  if (!strncasecmp (s, "\\NoSelect", 9))
-	    *noselect = 1;
-	  if (!strncasecmp (s, "\\NoInferiors", 12))
-	    *noinferiors = 1;
-	  if (*s != ')')
-	    s++;
-	  while (*s && *s != '\\' && *s != ')') s++;
-	} while (s != ep);
-      }
-      else
-	return (0);
-      s = imap_next_word (s); /* delim */
-      /* Reset the delimiter, this can change */
-      if (strncmp (s, "NIL", 3))
-      {
-	if (s && s[0] == '\"' && s[1] && s[2] == '\"')
-	  *delim = s[1];
-	else if (s && s[0] == '\"' && s[1] && s[1] == '\\' && s[2] && s[3] == '\"')
-	  *delim = s[2];
-      }
-      s = imap_next_word (s); /* name */
-      if (s && *s == '{')	/* Literal */
-      { 
-	int len;
-	
-	if (imap_get_literal_count(buf, &bytes) < 0)
-	  return (-1);
-	len = mutt_socket_read_line (buf, buflen, conn);
-	if (len < 0)
-	  return (-1);
-	*name = buf;
-      }
-      else
-	*name = s;
+	if (!strncasecmp (s, "\\NoSelect", 9))
+	  *noselect = 1;
+	if (!strncasecmp (s, "\\NoInferiors", 12))
+	  *noinferiors = 1;
+	if (*s != ')')
+	  s++;
+	while (*s && *s != '\\' && *s != ')') s++;
+      } while (s != ep);
     }
     else
+      return 0;
+    s = imap_next_word (s); /* delim */
+    /* Reset the delimiter, this can change */
+    if (strncmp (s, "NIL", 3))
     {
-      if (imap_handle_untagged (idata, buf) != 0)
-	return (-1);
+      if (s && s[0] == '\"' && s[1] && s[2] == '\"')
+	*delim = s[1];
+      else if (s && s[0] == '\"' && s[1] && s[1] == '\\' && s[2] && s[3] == '\"')
+	*delim = s[2];
     }
+    s = imap_next_word (s); /* name */
+    if (s && *s == '{')	/* Literal */
+    { 
+      if (imap_get_literal_count(idata->buf, &bytes) < 0)
+	return -1;
+      if (imap_cmd_step (idata) != IMAP_CMD_CONTINUE)
+	return -1;
+      *name = idata->buf;
+    }
+    else
+      *name = s;
   }
-  return (0);
+
+  return 0;
 }
 
 int imap_subscribe (char *path, int subscribe)
@@ -1412,40 +1215,32 @@ int imap_subscribe (char *path, int subscribe)
   IMAP_MBOX mx;
 
   if (imap_parse_path (path, &mx))
-    return (-1);
+    return -1;
 
-  conn = mutt_socket_select_connection (&mx, 0);
-  idata = CONN_DATA;
-
-  if (!idata || (idata->state == IMAP_DISCONNECTED))
-  {
-    if (!idata)
-    {
-      /* The current connection is a new connection */
-      idata = safe_calloc (1, sizeof (IMAP_DATA));
-      conn->data = idata;
-      idata->conn = conn;
-    }
-    if (imap_open_connection (idata, conn))
-      return -1;
-  }
+  if (!(idata = imap_conn_find (&(mx.account), 0)))
+    goto fail;
+  
+  conn = idata->conn;
 
   imap_fix_path (idata, mx.mbox, buf, sizeof (buf));
-  /* BALSA:
   if (subscribe)
-      mutt_message (_("Subscribing to %s..."), buf); 
+    mutt_message (_("Subscribing to %s..."), buf);
   else
-    mutt_message (_("Unsubscribing to %s..."), buf); 
-  */
-  imap_quote_string (mbox, sizeof(mbox), buf);
+    mutt_message (_("Unsubscribing to %s..."), buf);
+  imap_munge_mbox_name (mbox, sizeof(mbox), buf);
 
   snprintf (buf, sizeof (buf), "%s %s", subscribe ? "SUBSCRIBE" :
     "UNSUBSCRIBE", mbox);
 
-  if (imap_exec (buf, sizeof (buf), idata, buf, 0) < 0)
-    return -1;
+  if (imap_exec (idata, buf, 0) < 0)
+    goto fail;
 
+  FREE (&mx.mbox);
   return 0;
+
+ fail:
+  FREE (&mx.mbox);
+  return -1;
 }
 
 /* imap_complete: given a partial IMAP folder path, return a string which
@@ -1455,7 +1250,6 @@ int imap_complete(char* dest, size_t dlen, char* path) {
   IMAP_DATA* idata;
   char list[LONG_STRING];
   char buf[LONG_STRING];
-  char seq[16];
   char* list_word = NULL;
   int noselect, noinferiors;
   char delim;
@@ -1472,42 +1266,36 @@ int imap_complete(char* dest, size_t dlen, char* path) {
     return -1;
   }
 
-  conn = mutt_socket_select_connection (&mx, 0);
-  idata = CONN_DATA;
-
   /* don't open a new socket just for completion */
-  if (!idata)
-  {
-    dprint (2, (debugfile,
-      "imap_complete: refusing to open new connection for %s", path));
-    return -1;
-  }
+  if (!(idata = imap_conn_find (&(mx.account), M_IMAP_CONN_NONEW)))
+    goto fail;
+  conn = idata->conn;
 
   /* reformat path for IMAP list, and append wildcard */
   /* don't use INBOX in place of "" */
-  if (mx.mbox[0])
+  if (mx.mbox && mx.mbox[0])
     imap_fix_path (idata, mx.mbox, list, sizeof(list));
   else
     list[0] = '\0';
 
   /* fire off command */
-  imap_make_sequence (seq, sizeof(seq));
-  snprintf (buf, sizeof(buf), "%s %s \"\" \"%s%%\"\r\n", seq, 
+  snprintf (buf, sizeof(buf), "%s \"\" \"%s%%\"",
     option (OPTIMAPLSUB) ? "LSUB" : "LIST", list);
-  mutt_socket_write (conn, buf);
+
+  imap_cmd_start (idata, buf);
 
   /* and see what the results are */
-  strfcpy (completion, mx.mbox, sizeof(completion));
+  strfcpy (completion, NONULL(mx.mbox), sizeof(completion));
   do
   {
-    if (imap_parse_list_response(conn, buf, sizeof(buf), &list_word,
-        &noselect, &noinferiors, &delim))
+    if (imap_parse_list_response(idata, &list_word, &noselect, &noinferiors,
+        &delim))
       break;
 
     if (list_word)
     {
       /* store unquoted */
-      imap_unquote_string (list_word);
+      imap_unmunge_mbox_name (list_word);
 
       /* if the folder isn't selectable, append delimiter to force browse
        * to enter it on second tab. */
@@ -1536,16 +1324,19 @@ int imap_complete(char* dest, size_t dlen, char* path) {
       completions++;
     }
   }
-  while (mutt_strncmp(seq, buf, strlen(seq)));
+  while (mutt_strncmp(idata->seq, idata->buf, SEQLEN));
 
   if (completions)
   {
     /* reformat output */
-    imap_qualify_path (dest, dlen, &mx, completion, NULL);
+    imap_qualify_path (dest, dlen, &mx, completion);
     mutt_pretty_mailbox (dest);
 
+    FREE (&mx.mbox);
     return 0;
   }
 
+ fail:
+  FREE (&mx.mbox);
   return -1;
 }

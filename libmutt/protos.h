@@ -122,7 +122,6 @@ char *mutt_get_parameter (const char *, PARAMETER *);
 char *mutt_pgp_hook (ADDRESS *);
 #endif /* _PGPPATH */
 char *mutt_make_date (char *, size_t);
-char *mutt_quote_filename(const char *);
 char *mutt_read_line (char *, size_t *, FILE *, int *);
 char *mutt_strlower (char *);
 char *mutt_skip_whitespace (char *);
@@ -230,6 +229,8 @@ int mutt_copy_stream (FILE *, FILE *);
 int mutt_decode_save_attachment (FILE *, BODY *, char *, int, int);
 int mutt_display_message (HEADER *h);
 int mutt_edit_attachment(BODY *);
+#define mutt_is_utf8(a) mutt_chscmp (a, "utf-8")
+#define mutt_is_us_ascii(a) mutt_chscmp (a, "us-ascii")
 int mutt_prepare_edit_message(CONTEXT *, HEADER *, HEADER *);
 int mutt_enter_fname (const char *, char *, size_t, int *, int);
 int mutt_enter_string (unsigned char *, size_t, int, int, int);
@@ -323,7 +324,7 @@ ADDRESS *alias_reverse_lookup (ADDRESS *);
 #define SKIPWS(c) while (*(c) && isspace ((unsigned char) *(c))) c++;
 
 /* base64.c */
-void mutt_to_base64 (unsigned char*, const unsigned char*, int);
+void mutt_to_base64 (unsigned char*, const unsigned char*, size_t, size_t);
 int mutt_from_base64 (char*, const char*);
 
 #ifdef LOCALES_HACK

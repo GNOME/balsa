@@ -55,6 +55,10 @@ WHERE char *Locale;
 WHERE char *MailcapPath;
 WHERE char *Maildir;
 WHERE char *MsgFmt;
+#ifdef USE_SOCKET
+WHERE char *Preconnect INITVAL (NULL);
+#endif /* USE_SOCKET */
+
 WHERE char *Muttrc INITVAL (NULL);
 WHERE char *Outbox;
 WHERE char *Pager;
@@ -93,6 +97,10 @@ WHERE LIST *Ignore INITVAL(0);
 WHERE LIST *UnIgnore INITVAL(0);
 WHERE LIST *MailLists INITVAL(0);
 
+#ifdef USE_IMAP
+WHERE time_t ImapLastCheck INITVAL(0);
+#endif
+
 /* bit vector for boolean variables */
 #ifdef GLOBALS_C
 unsigned char Options[(OPTMAX + 7)/8];
@@ -105,6 +113,7 @@ WHERE unsigned long QuadOptions INITVAL (0);
 
 WHERE unsigned short Counter INITVAL (0);
 
+WHERE short ConnectTimeout;
 WHERE short HistSize;
 WHERE short PagerContext;
 WHERE short PagerIndexLines;

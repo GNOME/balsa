@@ -47,7 +47,7 @@ typedef struct
 } REGEXP;
 
 WHERE REGEXP Alternates;
-/*WHERE REGEXP Mask; */
+WHERE REGEXP FileMask;
 WHERE REGEXP QuoteRegexp;
 WHERE REGEXP ReplyRegexp;
 WHERE REGEXP Smileys;

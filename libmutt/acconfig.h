@@ -24,11 +24,19 @@
  */
 #undef NFS_ATTRIBUTE_HACK
 
+/* Include code for socket support. Set automatically if you enable pop or
+ * IMAP */
+#undef USE_SOCKET
+
 /* Do you want support for the POP3 protocol? (--enable-pop) */
 #undef USE_POP
 
 /* Do you want support for the IMAP protocol? (--enable-imap) */
 #undef USE_IMAP
+
+/* Do you want to use the Cyrus SASL library for POP/IMAP authentication?
+ * (--with-sasl) */
+#undef USE_SASL
 
 /* Do you want support for IMAP GSSAPI authentication? (--with-gss) */
 #undef USE_GSS

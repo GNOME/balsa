@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
  * Copyright (C) 1996-9 Brandon Long <blong@fiction.net>
- * Copyright (C) 1999 Brendan Cully <brendan@kublai.com>
+ * Copyright (C) 1999-2000 Brendan Cully <brendan@kublai.com>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -22,8 +22,9 @@
 
 #include "mutt.h"
 #include "mx.h"	/* for M_IMAP */
+#include "url.h"
 #include "imap_private.h"
-#include "imap_ssl.h"
+#include "mutt_ssl.h"
 
 #include <stdlib.h>
 #include <ctype.h>
@@ -36,18 +37,16 @@
 
 /* imap_continue: display a message and ask the user if she wants to
  *   go on. */
-#if 0
 int imap_continue (const char* msg, const char* resp)
 {
-    imap_error (msg, resp);
-    return mutt_yesorno (_("Continue?"), 0);
+  imap_error (msg, resp);
+  return mutt_yesorno (_("Continue?"), 0);
 }
-#endif
 
 /* imap_error: show an error and abort */
 void imap_error (const char *where, const char *msg)
 {
-  mutt_error ("%s [%s]\n", where, msg);
+  mutt_error (_("%s [%s]\n"), where, msg);
   sleep (2);
 }
 
@@ -129,99 +128,104 @@ char *imap_next_word (char *s)
 }
 
 /* imap_parse_path: given an IMAP mailbox name, return host, port
- *   and a path IMAP servers will recognise. */
-int imap_parse_path (const char *path, IMAP_MBOX *mx)
+ *   and a path IMAP servers will recognise.
+ * mx.mbox is malloc'd, caller must free it */
+int imap_parse_path (const char* path, IMAP_MBOX* mx)
 {
   char tmp[128];
+  ciss_url_t url;
   char *c;
   int n;
-  
-  mx->type[0] = '\0';
-  if (sscanf (path, "{%128[^}]}", tmp) != 1) 
-  {
-    return -1;
-  }
-  c = strchr (path, '}');
-  if (!c)
-    return -1;
-  else
-    /* walk past closing '}' */
-    mx->mbox = strdup (c+1);
-  
-  /* Defaults */
-  mx->flags = 0;
-  mx->port = IMAP_PORT;
-  mx->socktype = M_NEW_SOCKET;
 
-  if ((c = strrchr (tmp, '@')))
+  /* Defaults */
+  mx->account.flags = 0;
+  mx->account.port = IMAP_PORT;
+  mx->account.type = M_ACCT_TYPE_IMAP;
+
+  c = safe_strdup (path);
+  url_parse_ciss (&url, c);
+  if (url.scheme == U_IMAP || url.scheme == U_IMAPS)
   {
-    *c = '\0';
-    strfcpy (mx->user, tmp, sizeof (mx->user));
-    strfcpy (tmp, c+1, sizeof (tmp));
-    mx->flags |= M_IMAP_USER;
-  }
-  
-  if ((n = sscanf (tmp, "%128[^:/]%128s", mx->host, tmp)) < 1)
-  {
-    dprint (1, (debugfile, "imap_parse_path: NULL host in %s\n", path));
-    return -1;
-  }
-  
-  if (n > 1) {
-    if (sscanf (tmp, ":%d%128s", &mx->port, tmp) >= 1)
-      mx->flags |= M_IMAP_PORT;
-    if (sscanf (tmp, "/%s", mx->type) == 1)
+    if (mutt_account_fromurl (&mx->account, &url) < 0)
     {
-#ifdef USE_SSL
-      if (!strcmp (mx->type, "ssl"))
-	imap_set_ssl (mx);
-      else
-#endif
+      FREE (&c);
+      return -1;
+    }
+
+    mx->mbox = safe_strdup (url.path);
+
+    if (url.scheme == U_IMAPS)
+      mx->account.flags |= M_ACCT_SSL;
+
+    FREE (&c);
+  }
+  /* old PINE-compatibility code */
+  else
+  {
+    FREE (&c);
+    if (sscanf (path, "{%128[^}]}", tmp) != 1) 
+      return -1;
+
+    c = strchr (path, '}');
+    if (!c)
+      return -1;
+    else
+      /* walk past closing '}' */
+      mx->mbox = safe_strdup (c+1);
+  
+    if ((c = strrchr (tmp, '@')))
+    {
+      *c = '\0';
+      strfcpy (mx->account.user, tmp, sizeof (mx->account.user));
+      strfcpy (tmp, c+1, sizeof (tmp));
+      mx->account.flags |= M_ACCT_USER;
+    }
+  
+    if ((n = sscanf (tmp, "%128[^:/]%128s", mx->account.host, tmp)) < 1)
+    {
+      dprint (1, (debugfile, "imap_parse_path: NULL host in %s\n", path));
+      FREE (&mx->mbox);
+      return -1;
+    }
+  
+    if (n > 1) {
+      if (sscanf (tmp, ":%hd%128s", &(mx->account.port), tmp) >= 1)
+	mx->account.flags |= M_ACCT_PORT;
+      if (sscanf (tmp, "/%s", tmp) == 1)
       {
-	dprint (1, (debugfile, "imap_parse_path: Unknown connection type in %s\n", path));
-	return (-1);
+	if (!strncmp (tmp, "ssl", 3))
+	  mx->account.flags |= M_ACCT_SSL;
+	else
+	{
+	  dprint (1, (debugfile, "imap_parse_path: Unknown connection type in %s\n", path));
+	  FREE (&mx->mbox);
+	  return -1;
+	}
       }
     }
   }
-
+  
 #ifdef USE_SSL
   if (option (OPTIMAPFORCESSL))
-    imap_set_ssl (mx);
+    mx->account.flags |= M_ACCT_SSL;
 #endif
+
+  if ((mx->account.flags & M_ACCT_SSL) && !(mx->account.flags & M_ACCT_PORT))
+    mx->account.port = IMAP_SSL_PORT;
 
   return 0;
 }
 
-
-/* imap_qualify_path: make an absolute IMAP folder target, given host, port
- *   and relative path. Use this and maybe it will be easy to convert to
- *   IMAP URLs */
-void imap_qualify_path (char *dest, size_t len, const IMAP_MBOX *mx,
-  const char* path, const char* name)
+/* imap_qualify_path: make an absolute IMAP folder target, given IMAP_MBOX
+ *   and relative path. */
+void imap_qualify_path (char *dest, size_t len, IMAP_MBOX *mx, char* path)
 {
-  char tmp[128];
-  
-  strcpy (dest, "{");
-  if ((mx->flags & M_IMAP_USER) && (!ImapUser || strcmp (mx->user, ImapUser)))
-  {
-    snprintf (tmp, sizeof (tmp), "%s@", mx->user);
-    strncat (dest, tmp, len);
-  }
-  strncat (dest, mx->host, len);
-  if (mx->flags & M_IMAP_PORT)
-  {
-    snprintf (tmp, sizeof (tmp), ":%d", mx->port);
-    strncat (dest, tmp, len);
-  }
-#ifdef USE_SSL
-  if (mx->flags & M_IMAP_TYPE)
-  {
-    snprintf (tmp, sizeof (tmp), "/%s", mx->type);
-    strncat (dest, tmp, len);
-  }
-#endif
-  snprintf (tmp, sizeof (tmp), "}%s%s", NONULL (path), NONULL (name));
-  strncat (dest, tmp, len);
+  ciss_url_t url;
+
+  mutt_account_tourl (&mx->account, &url);
+  url.path = path;
+
+  url_ciss_tostring (&url, dest, len);
 }
 
 
@@ -291,6 +295,38 @@ void imap_unquote_string (char *s)
   *d = '\0';
 }
 
+/*
+ * Quoting and UTF-7 conversion
+ */
+
+void imap_munge_mbox_name (char *dest, size_t dlen, const char *src)
+{
+  char *buf;
+
+  buf = safe_strdup (src);
+  imap_utf7_encode (&buf);
+
+  imap_quote_string (dest, dlen, buf);
+
+  safe_free ((void **) &buf);
+}
+
+void imap_unmunge_mbox_name (char *s)
+{
+  char *buf;
+
+  imap_unquote_string(s);
+
+  buf = safe_strdup (s);
+  if (buf)
+  {
+    imap_utf7_decode (&buf);
+    strncpy (s, buf, strlen (s));
+  }
+  
+  safe_free ((void **) &buf);
+}
+
 /* imap_wordcasecmp: find word a in word list b */
 int imap_wordcasecmp(const char *a, const char *b)
 {
@@ -328,8 +364,7 @@ void imap_keepalive (void)
 {
   CONTEXT *ctx = Context;
   
-  if (ctx == NULL || ctx->magic != M_IMAP ||
-      CTX_DATA->selected_ctx != ctx)
+  if (ctx == NULL || ctx->magic != M_IMAP || CTX_DATA->ctx != ctx)
     return;
 
   imap_check_mailbox (ctx, NULL);
@@ -345,7 +380,7 @@ int imap_wait_keepalive (pid_t pid)
   short imap_passive = option (OPTIMAPPASSIVE);
   
   set_option (OPTIMAPPASSIVE);
-  /* set_option (OPTKEEPQUIET); */
+  set_option (OPTKEEPQUIET);
 
   sigprocmask (SIG_SETMASK, NULL, &oldmask);
 
@@ -359,12 +394,14 @@ int imap_wait_keepalive (pid_t pid)
 
   sigaction (SIGALRM, &act, &oldalrm);
 
-  alarm (ImapCheckTimeout > 0 ? ImapCheckTimeout : 60);
+  /* RFC 2060 specifies a minimum of 30 minutes before disconnect when in
+   * the AUTHENTICATED state. We'll poll at half that. */
+  alarm (900);
   while (waitpid (pid, &rc, 0) < 0 && errno == EINTR)
   {
     alarm (0); /* cancel a possibly pending alarm */
     imap_keepalive ();
-    alarm (ImapCheckTimeout > 0 ? ImapCheckTimeout : 60);
+    alarm (900);
   }
 
   alarm (0);	/* cancel a possibly pending alarm */
@@ -372,7 +409,7 @@ int imap_wait_keepalive (pid_t pid)
   sigaction (SIGALRM, &oldalrm, NULL);
   sigprocmask (SIG_SETMASK, &oldmask, NULL);
 
-  /* unset_option (OPTKEEPQUIET); */
+  unset_option (OPTKEEPQUIET);
   if (!imap_passive)
     unset_option (OPTIMAPPASSIVE);
 
@@ -383,12 +420,12 @@ int imap_wait_keepalive (pid_t pid)
 
 void imap_allow_reopen (CONTEXT *ctx)
 {
-  if (ctx && ctx->magic == M_IMAP && CTX_DATA->selected_ctx == ctx)
+  if (ctx && ctx->magic == M_IMAP && CTX_DATA->ctx == ctx)
     CTX_DATA->reopen |= IMAP_REOPEN_ALLOW;
 }
 
 void imap_disallow_reopen (CONTEXT *ctx)
 {
-  if (ctx && ctx->magic == M_IMAP && CTX_DATA->selected_ctx == ctx)
+  if (ctx && ctx->magic == M_IMAP && CTX_DATA->ctx == ctx)
     CTX_DATA->reopen &= ~IMAP_REOPEN_ALLOW;
 }

@@ -307,6 +307,7 @@ enum
 #ifdef USE_IMAP
   OPTIMAPLSUB,
   OPTIMAPPASSIVE,
+  OPTIMAPPEEK,
   OPTIMAPSERVERNOISE,
 # ifdef USE_SSL
   OPTIMAPFORCESSL,
@@ -402,7 +403,10 @@ enum
   OPTNEEDRESCORE,	/* (pseudo) set when the `score' command is used */
   OPTUSEHEADERDATE,	/* (pseudo) used by edit-message */
   OPTATTACHMSG,		/* (pseudo) used by attach-message */
-  
+  OPTKEEPQUIET,         /* (pseudo) shut up the message and refresh
+                         *          functions while we are executing an
+                         *          external program.
+                         */  
 #ifdef _PGPPATH
   OPTPGPCHECKTRUST,	/* (pseudo) used by pgp_select_key () */
   OPTDONTHANDLEPGPKEYS,	/* (pseudo) used to extract PGP keys */
@@ -470,6 +474,7 @@ typedef struct envelope
   char *message_id;
   char *supersedes;
   char *date;
+  char *x_label;
   LIST *references;		/* message references (in reverse order) */
   LIST *userhdrs;		/* user defined headers */
 } ENVELOPE;

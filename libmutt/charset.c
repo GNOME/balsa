@@ -1,413 +1,528 @@
 /*
- * Copyright (C) 1998 Ruslan Ermilov <ru@ucb.crimea.ua>,
- *                    Thomas Roessler <roessler@guug.de>
+ * Copyright (C) 1999-2000 Thomas Roessler <roessler@guug.de>
  *
- *     This program is free software; you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation; either version 2 of the License, or
- *     (at your option) any later version.
+ *     This program is free software; you can redistribute it
+ *     and/or modify it under the terms of the GNU General Public
+ *     License as published by the Free Software Foundation; either
+ *     version 2 of the License, or (at your option) any later
+ *     version.
  *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE.  See the GNU General Public License for more
+ *     details.
  *
- *     You should have received a copy of the GNU General Public License
- *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place - Suite 330,
+ *     Boston, MA  02111, USA.
  */
+
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <sys/types.h>
+#include <dirent.h>
+#include <unistd.h>
+#include <errno.h>
+
+#include <iconv.h>
 
 #include "mutt.h"
 #include "charset.h"
 
-#include <string.h>
-#include <ctype.h>
+#ifndef EILSEQ
+# define EILSEQ EINVAL
+#endif
 
-static HASH *Translations = NULL;
-static HASH *Charsets = NULL;
-static HASH *CharsetAliases = NULL;
+/* 
+ * The following list has been created manually from the data under:
+ * http://www.isi.edu/in-notes/iana/assignments/character-sets
+ * Last update: 2000-09-07
+ *
+ * Note that it includes only the subset of character sets for which
+ * a preferred MIME name is given.
+ */
 
-static CHARSET *mutt_new_charset(void)
+static struct 
 {
-  CHARSET *chs;
+  char *key;
+  char *pref;
+}
+PreferredMIMENames[] = 
+{
+  { "ansi_x3.4-1968", 	"us-ascii"     	},
+  { "iso-ir-6",		"us-ascii" 	},
+  { "iso_646.irv:1991",	"us-ascii" 	},
+  { "ascii",		"us-ascii" 	},
+  { "iso646-us",	"us-ascii" 	},
+  { "us",		"us-ascii" 	},
+  { "ibm367",		"us-ascii" 	},
+  { "cp367",		"us-ascii" 	},
+  { "csASCII",		"us-ascii" 	},
   
-  chs          = safe_malloc(sizeof(CHARSET));
-  chs->map     = NULL;
+  { "csISO2022KR",	"iso-2022-kr" 	},
+  { "csEUCKR",		"euc-kr"      	},
+  { "csISO2022JP",	"iso-2022-jp"	},
+  { "csISO2022JP2",	"iso-2022-jp-2" },
+
+  { "ISO_8859-1:1987",	"iso-8859-1"	},
+  { "iso-ir-100",	"iso-8859-1"	},
+  { "iso_8859-1",	"iso-8859-1"	},
+  { "latin1",		"iso-8859-1"	},
+  { "l1",		"iso-8859-1"	},
+  { "IBM819",		"iso-8859-1"	},
+  { "CP819",		"iso-8859-1"	},
+  { "csISOLatin1",	"iso-8859-1"	},
   
-  return chs;
+  { "ISO_8859-2:1987",	"iso-8859-2"	},
+  { "iso-ir-101",	"iso-8859-2"	},
+  { "iso_8859-2",	"iso-8859-2"	},
+  { "latin2",		"iso-8859-2"	},
+  { "l2",		"iso-8859-2"	},
+  { "csISOLatin2",	"iso-8859-2"	},
+  
+  { "ISO_8859-3:1988",	"iso-8859-3"	},
+  { "iso-ir-109",	"iso-8859-3"	},
+  { "ISO_8859-3",	"iso-8859-3"	},
+  { "latin3",		"iso-8859-3"	},
+  { "l3",		"iso-8859-3"	},
+  { "csISOLatin3",	"iso-8859-3"	},
+
+  { "ISO_8859-4:1988",	"iso-8859-4"	},
+  { "iso-ir-110",	"iso-8859-4"	},
+  { "ISO_8859-4",	"iso-8859-4"	},
+  { "latin4",		"iso-8859-4"	},
+  { "l4",		"iso-8859-4"	},
+  { "csISOLatin4",	"iso-8859-4"	},
+
+  { "ISO_8859-6:1987",	"iso-8859-6"	},
+  { "iso-ir-127",	"iso-8859-6"	},
+  { "iso_8859-6",	"iso-8859-6"	},
+  { "ECMA-114",		"iso-8859-6"	},
+  { "ASMO-708",		"iso-8859-6"	},
+  { "arabic",		"iso-8859-6"	},
+  { "csISOLatinArabic",	"iso-8859-6"	},
+  
+  { "ISO_8859-7:1987",	"iso-8859-7"	},
+  { "iso-ir-126",	"iso-8859-7"	},
+  { "ISO_8859-7",	"iso-8859-7"	},
+  { "ELOT_928",		"iso-8859-7"	},
+  { "ECMA-118",		"iso-8859-7"	},
+  { "greek",		"iso-8859-7"	},
+  { "greek8",		"iso-8859-7"	},
+  { "csISOLatinGreek",	"iso-8859-7"	},
+  
+  { "ISO_8859-8:1988",	"iso-8859-8"	},
+  { "iso-ir-138",	"iso-8859-8"	},
+  { "ISO_8859-8",	"iso-8859-8"	},
+  { "hebrew",		"iso-8859-8"	},
+  { "csISOLatinHebrew",	"iso-8859-8"	},
+
+  { "ISO_8859-5:1988",	"iso-8859-5"	},
+  { "iso-ir-144",	"iso-8859-5"	},
+  { "ISO_8859-5",	"iso-8859-5"	},
+  { "cyrillic",		"iso-8859-5"	},
+  { "csISOLatinCyrillic", "iso8859-5"	},
+
+  { "ISO_8859-9:1989",	"iso-8859-9"	},
+  { "iso-ir-148",	"iso-8859-9"	},
+  { "ISO_8859-9",	"iso-8859-9"	},
+  { "latin5",		"iso-8859-9"	}, /* this is not a bug */
+  { "l5",		"iso-8859-9"	},
+  { "csISOLatin5",	"iso-8859-9"	},
+  
+  { "ISO_8859-10:1992",	"iso-8859-10"	},
+  { "iso-ir-157",	"iso-8859-10"	},
+  { "latin6",		"iso-8859-10"	}, /* this is not a bug */
+  { "l6",		"iso-8859-10"	},
+  { "csISOLatin6"	"iso-8859-10"	}, 
+  
+  { "csKOI8r",		"koi8-r"	},
+  
+  { "MS_Kanji",		"Shift_JIS"	}, /* Note the underscore! */
+  { "csShiftJis",	"Shift_JIS"	},
+  
+  { "Extended_UNIX_Code_Packed_Format_for_Japanese",
+      			"EUC-JP"	},
+  { "csEUCPkdFmtJapanese", "EUC-JP"	},
+  
+  { "csGB2312",		"gb2312"	},
+  { "csbig5",		"big5"		},
+
+  /* 
+   * End of official brain damage.  What follows has been taken
+   * from glibc's localedata files. 
+   */
+
+  { "iso_8859-13",	"iso-8859-13"	},
+  { "iso-ir-179",	"iso-8859-13"	},
+  { "latin7",		"iso-8859-13"	}, /* this is not a bug */
+  { "l7",		"iso-8859-13"	},
+  
+  { "iso_8859-14",	"iso-8859-14"	},
+  { "latin8",		"iso-8859-14"	}, /* this is not a bug */
+  { "l8",		"iso-8859-14"	},
+
+  { "iso_8859-15",	"iso-8859-15"	},
+
+  /*
+   * If you happen to encounter system-specific brain-damage with
+   * respect to character set naming, please add it here, and
+   * submit a patch to <mutt-dev@mutt.org>. 
+   */
+
+  /* 
+   * David Champion <dgc@uchicago.edu> has observed this with
+   * nl_langinfo under SunOS 5.8. 
+   */
+
+  { "646",		"us-ascii"	},
+  
+  /* End of aliases.  Please keep this line last. */
+  
+  { NULL, 		NULL		}
+};
+
+#ifdef HAVE_LANGINFO_CODESET
+# include <langinfo.h>
+
+
+void mutt_set_langinfo_charset (void)
+{
+  char buff[LONG_STRING];
+  char buff2[LONG_STRING];
+  
+  strfcpy (buff, nl_langinfo (CODESET), sizeof (buff));
+  mutt_canonical_charset (buff2, sizeof (buff2), buff);
+  
+  /* finally, set $charset */
+  if (!(Charset = safe_strdup (buff2)))
+    Charset = safe_strdup ("iso-8859-1");
 }
 
-#if 0
+#else
 
-static void mutt_free_charset(CHARSET **chsp)
+void mutt_set_langinfo_charset (void)
 {
-  CHARSET *chs = *chsp;
-  
-  safe_free((void **) &chs->map);
-  safe_free((void **) chsp);
+  Charset = safe_strdup ("iso-8859-1");
 }
 
 #endif
 
-static void canonical_charset(char *dest, size_t dlen, const char *name)
+void mutt_canonical_charset (char *dest, size_t dlen, const char *name)
 {
-  int i;
-  
-  if(!mutt_strncasecmp(name, "x-", 2))
-    name = name + 2;
-  
-  for(i = 0; name[i] && i < dlen - 1; i++)
-  {
-    if(strchr("_/. ", name[i]))
-      dest[i] = '-';
-    else
-      dest[i] = tolower(name[i]);
-  }
-  
-  dest[i] = '\0';
-}
+  size_t i;
+  char *p;
+  char scratch[LONG_STRING];
 
-static CHARSET *load_charset(const char *name)
-{
-  char path[_POSIX_PATH_MAX];
-  char buffer[SHORT_STRING];
-  CHARSET *chs;
-  FILE *fp = NULL;
-  int i;
+  /* catch some common iso-8859-something misspellings */
+  if (!mutt_strncasecmp (name, "iso8859", 7) && name[7] != '-')
+    snprintf (scratch, sizeof (scratch), "iso_8859-%s", name + 7);
+  else if (!mutt_strncasecmp (name, "iso8859-", 8))
+    snprintf (scratch, sizeof (scratch), "iso_8859-%s", name + 8);
+  else
+    strfcpy (scratch, NONULL(name), sizeof (scratch));
 
-  chs = mutt_new_charset();
-
-  snprintf(path, sizeof(path), "%s/charsets/%s", SHAREDIR, name);
-  if((fp = fopen(path, "r")) == NULL)
-    goto bail;
-  
-  if(fgets(buffer, sizeof(buffer), fp) == NULL)
-    goto bail;
-  
-  if(mutt_strcmp(buffer, CHARSET_MAGIC) != 0)
-    goto bail;
-
-  chs->map  = safe_malloc(sizeof(CHARSET_MAP));
-  
-  for(i = 0; i < 256; i++)
-  {
-    if(fscanf(fp, "%i", &(*chs->map)[i]) != 1)
+  for (i = 0; PreferredMIMENames[i].key; i++)
+    if (!mutt_strcasecmp (scratch, PreferredMIMENames[i].key))
     {
-      safe_free((void **) &chs->map);
-      break;
+      strfcpy (dest, PreferredMIMENames[i].pref, dlen);
+      return;
     }
-  }
 
-  bail:
-  
-  if(fp) fclose(fp);
-  return chs;
+  strfcpy (dest, scratch, dlen);
+
+  /* for cosmetics' sake, transform to lowercase. */
+  for (p = dest; *p; p++)
+    if ('A' <= *p && *p <= 'Z')
+      *p += 'a' - 'A';
 }
 
-static HASH *load_charset_aliases(void)
+int mutt_chscmp (const char *s, const char *chs)
 {
-  FILE *fp;
-  char buffer[LONG_STRING];
-  char *t;
-  HASH *charset_aliases;
-  
-  sprintf(buffer, "%s/charsets/charsets.alias", SHAREDIR);
-  if(!(fp = fopen(buffer, "r")))
-     return NULL;
+  char buffer[STRING];
 
-  charset_aliases = hash_create(127);
-  
-  while(fgets(buffer, sizeof(buffer), fp))
-  {
-    if((t = strchr(buffer, '\n')))
-      *t = '\0';
+  if (!s) return 0;
 
-    if(!(t = strchr(buffer, ' ')))
-      continue;
-    
-    *t++ = '\0';
-    hash_insert(charset_aliases, safe_strdup(buffer), safe_strdup(t), 1);
-  }
-  fclose(fp);
-  return charset_aliases;
+  mutt_canonical_charset (buffer, sizeof (buffer), s);
+  return !mutt_strcasecmp (buffer, chs);
 }
 
-static void init_charsets()
-{
-  if(Charsets) return;
 
-  Charsets       = hash_create(127);
-  Translations   = hash_create(127);
-  CharsetAliases = load_charset_aliases();
+#if 0
+
+iconv_t iconv_open (const char *tocode, const char *fromcode)
+{
+  return (iconv_t)(-1);
 }
 
-CHARSET *mutt_get_charset(const char *name)
+size_t iconv (iconv_t cd, const char **inbuf, size_t *inbytesleft,
+	      char **outbuf, size_t *outbytesleft)
 {
-  CHARSET *charset;
-  char buffer[SHORT_STRING];
-  char *real_charset;
-  
-  if (!name || !*name)
-    return (NULL);
-
-  init_charsets();
-  canonical_charset(buffer, sizeof(buffer), name);
-
-  if(!CharsetAliases || !(real_charset = hash_find(CharsetAliases, buffer)))
-    real_charset = buffer;
-
-  if(!(charset = hash_find(Charsets, real_charset)))
-  {
-    charset = load_charset(real_charset);
-    hash_insert(Charsets, safe_strdup(real_charset), charset, 1);
-  }
-  return charset;
-}
-
-static int translate_char(CHARSET_MAP *to, int ch)
-{
-  int i;
-
-  if (ch == -1) return '?';
-  for (i = 0; i < 256; i++)
-  {
-    if ((*to)[i] == ch) 
-      return i;
-  }
-  return '?';
-}
-
-CHARSET_MAP *build_translation(CHARSET_MAP *from, CHARSET_MAP *to)
-{
-  int i;
-  CHARSET_MAP *map = safe_malloc(sizeof(CHARSET_MAP));
-
-  for(i = 0; i < 256; i++)
-    (*map)[i] = translate_char(to, (*from)[i]);
-
-  return map;
-}
-
-CHARSET_MAP *mutt_get_translation(const char *_from, const char *_to)
-{
-  char from_canon[SHORT_STRING];
-  char to_canon[SHORT_STRING];
-  char key[SHORT_STRING];
-  char *from, *to;
-  CHARSET *from_cs, *to_cs;
-  CHARSET_MAP *map;
-
-  if(!_from || !_to)
-    return NULL;
-  
-  init_charsets();
-
-  canonical_charset(from_canon, sizeof(from_canon), _from);
-  canonical_charset(to_canon, sizeof(to_canon), _to);
-
-  if(!CharsetAliases || !(from = hash_find(CharsetAliases, from_canon)))
-    from = from_canon;
-  if(!CharsetAliases || !(to = hash_find(CharsetAliases, to_canon)))
-    to = to_canon;
-  
-  /* quick check for the identity mapping */
-  if((from == to) || ((*from == *to) && !mutt_strcmp(from, to)))
-    return NULL;
-  
-  snprintf(key, sizeof(key), "%s %s", from, to);
-  if((map = hash_find(Translations, key)) == NULL)
-  {
-    from_cs = mutt_get_charset(from);
-    to_cs   = mutt_get_charset(to);
-
-    if(!from_cs->map || !to_cs->map)
-      return NULL;
-    
-    if((map = build_translation(from_cs->map, to_cs->map)))
-       hash_insert(Translations, safe_strdup(key), map, 1);
-  }
-  return map;
-}
-
-unsigned char mutt_display_char(unsigned char ch, CHARSET_MAP *map)
-{
-  if (!map || !ch)
-    return ch;
-  
-  return (unsigned char) (*map)[ch];
-}
-
-int mutt_display_string(char *str, CHARSET_MAP *map)
-{
-  if(!map)
-    return -1;
-
-  while ((*str = mutt_display_char((unsigned char)*str, map)))
-    str++;
-  
   return 0;
 }
 
-/*************************************************************/
-/* UTF-8 support                                             */
-
-int mutt_is_utf8(const char *s)
+int iconv_close (iconv_t cd)
 {
-  char buffer[SHORT_STRING];
-
-  if(!s) 
-    return 0;
-
-  canonical_charset(buffer, sizeof(buffer), s);
-  return !mutt_strcmp(buffer, "utf-8");
-}
-  
-/* macros for the various bit maps we need */
-
-#define IOOOOOOO 0x80
-#define IIOOOOOO 0xc0
-#define IIIOOOOO 0xe0
-#define IIIIOOOO 0xf0
-#define IIIIIOOO 0xf8
-#define IIIIIIOO 0xfc
-#define IIIIIIIO 0xfe
-#define IIIIIIII 0xff
-
-static struct unicode_mask
-{
-  int mask;
-  int value;
-  short len;
-}
-unicode_masks[] = 
-{
-  { IOOOOOOO,	    0,   1 },
-  { IIIOOOOO, IIOOOOOO,  2 },
-  { IIIIOOOO, IIIOOOOO,  3 },
-  { IIIIIOOO, IIIIOOOO,  4 },
-  { IIIIIIOO, IIIIIOOO,  5 },
-  { IIIIIIIO, IIIIIIOO,  6 },
-  {        0,	     0,  0 }
-};
-
-
-static char *utf_to_unicode(int *out, char *in)
-{
-  struct unicode_mask *um = NULL;
-  short i;
-  
-  for(i = 0; unicode_masks[i].mask; i++)
-  {
-    if((*in & unicode_masks[i].mask) == unicode_masks[i].value)
-    {
-      um = &unicode_masks[i];
-      break;
-    }
-  }
-  
-  if(!um)
-  {
-    *out = (int) '?';
-    return in + 1;
-  }
-
-  for(i = 1; i < um->len; i++)
-  {
-    if((in[i] & IIOOOOOO) != IOOOOOOO)
-    {
-      *out = (int) '?';
-      return in + i;
-    }
-  }
-  
-  *out = ((int)in[0]) & ~um->mask & 0xff;
-  for(i = 1; i < um->len; i++)
-    *out = (*out << 6) | (((int)in[i]) & ~IIOOOOOO & 0xff);
-
-  if(!*out) 
-    *out = '?';
-  
-  return in + um->len;
+  return 0;
 }
 
-void mutt_decode_utf8_string(char *str, CHARSET *chs)
-{
-  char *s, *t;
-  int ch, i;
-  CHARSET_MAP *map = NULL;
-  
-  if(chs)
-    map = chs->map;
-  
-  for( s = t = str; *t; s++)
-  {
-    t = utf_to_unicode(&ch, t);
+#endif /* !HAVE_ICONV */
 
-    if(!map)
+
+/*
+ * Like iconv_open, but canonicalises the charsets
+ */
+
+iconv_t mutt_iconv_open (const char *tocode, const char *fromcode)
+{
+  char tocode1[SHORT_STRING];
+  char fromcode1[SHORT_STRING];
+  char *tmp;
+
+  mutt_canonical_charset (tocode1, sizeof (tocode1), tocode);
+  /* BALSA: hooks not supported 
+  if ((tmp = mutt_charset_hook (tocode1)))
+  mutt_canonical_charset (tocode1, sizeof (tocode1), tmp); */
+
+  mutt_canonical_charset (fromcode1, sizeof (fromcode1), fromcode);
+  /* BALSA: hooks not supported 
+     if ((tmp = mutt_charset_hook (fromcode1)))
+     mutt_canonical_charset (fromcode1, sizeof (fromcode1), tmp);*/
+
+  return iconv_open (tocode1, fromcode1);
+}
+
+
+/*
+ * Like iconv, but keeps going even when the input is invalid
+ * If you're supplying inrepls, the source charset should be stateless;
+ * if you're supplying an outrepl, the target charset should be.
+ */
+
+size_t mutt_iconv (iconv_t cd, const char **inbuf, size_t *inbytesleft,
+		   char **outbuf, size_t *outbytesleft,
+		   const char **inrepls, const char *outrepl)
+{
+  size_t ret = 0, ret1;
+  const char *ib = *inbuf;
+  size_t ibl = *inbytesleft;
+  char *ob = *outbuf;
+  size_t obl = *outbytesleft;
+
+  for (;;)
+  {
+    ret1 = iconv (cd, &ib, &ibl, &ob, &obl);
+    if (ret1 != (size_t)-1)
+      ret += ret1;
+    if (ibl && obl && errno == EILSEQ)
     {
-      *s = (char) ch;
-    }
-    else
-    {
-      for(i = 0, *s = '\0'; i < 256; i++)
+      if (inrepls)
       {
-	if((*map)[i] == ch)
+	/* Try replacing the input */
+	const char **t;
+	for (t = inrepls; *t; t++)
 	{
-	  *s = i;
-	  break;
+	  const char *ib1 = *t;
+	  size_t ibl1 = strlen (*t);
+	  char *ob1 = ob;
+	  size_t obl1 = obl;
+	  iconv (cd, &ib1, &ibl1, &ob1, &obl1);
+	  if (!ibl1)
+	  {
+	    ++ib, --ibl;
+	    ob = ob1, obl = obl1;
+	    ++ret;
+	    break;
+	  }
+	}
+	if (*t)
+	  continue;
+      }
+      if (outrepl)
+      {
+	/* Try replacing the output */
+	int n = strlen (outrepl);
+	if (n <= obl)
+	{
+	  memcpy (ob, outrepl, n);
+	  ++ib, --ibl;
+	  ob += n, obl -= n;
+	  ++ret;
+	  continue;
 	}
       }
     }
+    *inbuf = ib, *inbytesleft = ibl;
+    *outbuf = ob, *outbytesleft = obl;
+    return ret;
+  }
+}
+
+
+/*
+ * Convert a string
+ * Used in rfc2047.c and rfc2231.c
+ */
+
+int mutt_convert_string (char **ps, const char *from, const char *to)
+{
+  iconv_t cd;
+  const char *repls[] = { "\357\277\275", "?", 0 };
+  char *s = *ps;
+
+  if (!s || !*s)
+    return 0;
+
+  if (to && from && (cd = mutt_iconv_open (to, from)) != (iconv_t)-1) 
+  {
+    int len;
+    const char *ib;
+    char *buf, *ob;
+    size_t ibl, obl;
+    const char **inrepls = 0;
+    char *outrepl = 0;
+
+    if (mutt_is_utf8 (to))
+      outrepl = "\357\277\275";
+    else if (mutt_is_utf8 (from))
+      inrepls = repls;
+    else
+      outrepl = "?";
       
-    if(!*s) *s = '?';
-  }
-  
-  *s = '\0';
-}
-
-static char *sfu_buffer = NULL;
-static size_t sfu_blen = 0;
-static size_t sfu_bp = 0;
-
-static void _state_utf8_flush(STATE *s, CHARSET *chs)
-{
-  char *t;
-  if(!sfu_buffer || !sfu_bp)
-    return;
-  
-  sfu_buffer[sfu_bp] = '\0';
-  
-  mutt_decode_utf8_string(sfu_buffer, chs);
-  for(t = sfu_buffer; *t; t++)
-  {
-    /* This may lead to funny-looking output if 
-     * there are embedded CRs, NLs or similar things
-     * - but these would constitute illegal 
-     * UTF8 encoding anyways, so we don't care.
-     */
-
-    state_prefix_putc(*t, s);
-  }
-  sfu_bp = 0;
-}
+    len = strlen (s);
+    ib = s, ibl = len + 1;
+    obl = MB_LEN_MAX * ibl;
+    ob = buf = safe_malloc (obl + 1);
     
-void state_fput_utf8(STATE *st, char u, CHARSET *chs)
-{
-  if((u & 0x80) == 0 || (sfu_bp && (u & IIOOOOOO) != IOOOOOOO))
-    _state_utf8_flush(st, chs);
-     
-  if((u & 0x80) == 0)
-  {
-    if(u) state_prefix_putc(u, st);
+    mutt_iconv (cd, &ib, &ibl, &ob, &obl, inrepls, outrepl);
+    iconv_close (cd);
+
+    *ob = '\0';
+
+    safe_free ((void **) ps);
+    *ps = buf;
+    
+    mutt_str_adjust (ps);
+    return 0;
   }
   else
-  {
-    if(sfu_bp + 1 >= sfu_blen)
-    {
-      sfu_blen = (sfu_blen + 80) * 2;
-      safe_realloc((void **) &sfu_buffer, sfu_blen);
-    }
-    sfu_buffer[sfu_bp++] = u;
-  }
+    return -1;
 }
 
+
+/*
+ * FGETCONV stuff for converting a file while reading it
+ * Used in sendlib.c for converting from mutt's Charset
+ */
+
+struct fgetconv_s
+{
+  FILE *file;
+  iconv_t cd;
+  char bufi[512];
+  char bufo[512];
+  char *p;
+  char *ob;
+  char *ib;
+  size_t ibl;
+  const char **inrepls;
+};
+
+struct fgetconv_not
+{
+  FILE *file;
+  iconv_t cd;
+};
+
+#if 0
+FGETCONV *fgetconv_open (FILE *file, const char *from, const char *to)
+{
+  struct fgetconv_s *fc;
+  iconv_t cd = (iconv_t)-1;
+  static const char *repls[] = { "\357\277\275", "?", 0 };
+
+  if (from && to)
+    cd = mutt_iconv_open (to, from);
+
+  if (cd != (iconv_t)-1)
+  {
+    fc = safe_malloc (sizeof (struct fgetconv_s));
+    fc->p = fc->ob = fc->bufo;
+    fc->ib = fc->bufi;
+    fc->ibl = 0;
+    fc->inrepls = mutt_is_utf8 (to) ? repls : repls + 1;
+  }
+  else
+    fc = safe_malloc (sizeof (struct fgetconv_not));
+  fc->file = file;
+  fc->cd = cd;
+  return (FGETCONV *)fc;
+}
+
+int fgetconv (FGETCONV *_fc)
+{
+  struct fgetconv_s *fc = (struct fgetconv_s *)_fc;
+
+  if (!fc)
+    return EOF;
+  if (fc->cd == (iconv_t)-1)
+    return fgetc (fc->file);
+  if (!fc->p)
+    return EOF;
+  if (fc->p < fc->ob)
+    return (unsigned char)*(fc->p)++;
+
+  /* Try to convert some more */
+  fc->p = fc->ob = fc->bufo;
+  if (fc->ibl)
+  {
+    size_t obl = sizeof (fc->bufo);
+    iconv (fc->cd, (const char **)&fc->ib, &fc->ibl, &fc->ob, &obl);
+    if (fc->p < fc->ob)
+      return (unsigned char)*(fc->p)++;
+  }
+
+  /* If we trusted iconv a bit more, we would at this point
+   * ask why it had stopped converting ... */
+
+  /* Try to read some more */
+  if (fc->ibl == sizeof (fc->bufi) ||
+      (fc->ibl && fc->ib + fc->ibl < fc->bufi + sizeof (fc->bufi)))
+  {
+    fc->p = 0;
+    return EOF;
+  }
+  if (fc->ibl)
+    memcpy (fc->bufi, fc->ib, fc->ibl);
+  fc->ib = fc->bufi;
+  fc->ibl += fread (fc->ib + fc->ibl, 1, sizeof (fc->bufi) - fc->ibl, fc->file);
+
+  /* Try harder this time to convert some */
+  if (fc->ibl)
+  {
+    size_t obl = sizeof (fc->bufo);
+    mutt_iconv (fc->cd, (const char **)&fc->ib, &fc->ibl, &fc->ob, &obl,
+		fc->inrepls, 0);
+    if (fc->p < fc->ob)
+      return (unsigned char)*(fc->p)++;
+  }
+
+  /* Either the file has finished or one of the buffers is too small */
+  fc->p = 0;
+  return EOF;
+}
+
+void fgetconv_close (FGETCONV **_fc)
+{
+  struct fgetconv_s *fc = (struct fgetconv_s *) *_fc;
+
+  if (fc->cd != (iconv_t)-1)
+    iconv_close (fc->cd);
+  safe_free (_fc);
+}
+#endif

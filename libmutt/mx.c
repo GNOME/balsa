@@ -689,7 +689,7 @@ void mx_fastclose_mailbox (CONTEXT *ctx)
   
 #ifdef USE_IMAP
   if (ctx->magic == M_IMAP)
-    imap_fastclose_mailbox (ctx);
+    imap_close_mailbox (ctx);
 #endif /* USE_IMAP */
   if (ctx->subj_hash)
     hash_destroy (&ctx->subj_hash, NULL);
@@ -830,6 +830,8 @@ int mx_close_mailbox (CONTEXT *ctx, int *index_hint)
   }
 #endif
 
+  printf("mx_close, checkpoint 1, ctx=%x path=%s\n", ctx,
+	 (ctx ? ctx->path : "(nil)"));
 #ifdef USE_IMAP
   /* IMAP servers managed the OLD flag themselves */
   if (ctx->magic != M_IMAP)
@@ -843,6 +845,8 @@ int mx_close_mailbox (CONTEXT *ctx, int *index_hint)
     }
   }
 
+  printf("mx_close, checkpoint 2, ctx=%x path=%s\n", ctx,
+	 (ctx ? ctx->path : "(nil)"));
   if (move_messages)
   {
     mutt_message (_("Moving read messages to %s..."), mbox);
@@ -901,6 +905,7 @@ int mx_close_mailbox (CONTEXT *ctx, int *index_hint)
     return 0;
   }
   
+  printf("mx_close, checkpoint 3, ctx=%x\n", ctx);
 #ifdef USE_IMAP
   /* allow IMAP to preserve the deleted flag across sessions */
   if (ctx->magic == M_IMAP)

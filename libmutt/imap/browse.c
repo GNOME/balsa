@@ -25,7 +25,7 @@
 #include "mutt.h"
 #include "imap_private.h"
 
-#ifdef LIBMUTT
+/* #ifdef LIBMUTT */
 #include "browser.h"
 #define _(a) (a)
 
@@ -33,33 +33,33 @@ void init_state (struct browser_state *state)
 {
   state->entrylen = 0;
   state->entrymax = 256;
-  state->entry = (struct folder_file *) safe_malloc (sizeof (struct folder_file) * state->entrymax);
+  state->entry = (struct folder_file *) 
+    safe_malloc (sizeof (struct folder_file) * state->entrymax);
 }
-#endif
+/* #endif */
 
 /* -- forward declarations -- */
-static int add_list_result (CONNECTION *conn, const char *seq, const char *cmd,
-  struct browser_state *state, short isparent);
-
-/* BALSA: we have our own imap_add_folder() function: static  */
-
-void imap_add_folder (char delim, char *folder, int noselect,
+static int browse_add_list_result (IMAP_DATA* idata, const char* cmd,
+  struct browser_state* state, short isparent);
+#ifndef LIBMUTT
+static void imap_add_folder (char delim, char *folder, int noselect,
   int noinferiors, struct browser_state *state, short isparent);
+#endif
 static int compare_names(struct folder_file *a, struct folder_file *b);
-static int get_namespace (IMAP_DATA *idata, char *nsbuf, int nsblen, 
+static int browse_get_namespace (IMAP_DATA *idata, char *nsbuf, int nsblen, 
   IMAP_NAMESPACE_INFO *nsi, int nsilen, int *nns);
-static int verify_namespace (CONNECTION *conn, IMAP_NAMESPACE_INFO *nsi, 
-  int nns);
+static int browse_verify_namespace (IMAP_DATA* idata,
+  IMAP_NAMESPACE_INFO* nsi, int nns);
 
-int imap_init_browse (char *path, struct browser_state *state)
+/* imap_browse: IMAP hook into the folder browser, fills out browser_state,
+ *   given a current folder to browse */
+int imap_browse (char* path, struct browser_state* state)
 {
-  CONNECTION *conn;
-  IMAP_DATA *idata;
+  IMAP_DATA* idata;
   char buf[LONG_STRING];
   char nsbuf[LONG_STRING];
   char mbox[LONG_STRING];
   char list_cmd[5];
-  char seq[16];
   IMAP_NAMESPACE_INFO nsi[16];
   int home_namespace = 0;
   int n;
@@ -81,55 +81,24 @@ int imap_init_browse (char *path, struct browser_state *state)
 
   strfcpy (list_cmd, option (OPTIMAPLSUB) ? "LSUB" : "LIST", sizeof (list_cmd));
 
-  conn = mutt_socket_select_connection (&mx, 0);
-  idata = CONN_DATA;
+  if (!(idata = imap_conn_find (&(mx.account), 0)))
+    goto fail;
 
-  if (!idata || (idata->state == IMAP_DISCONNECTED))
-  {
-    if (!idata)
-    {
-      /* The current connection is a new connection */
-      idata = safe_calloc (1, sizeof (IMAP_DATA));
-      conn->data = idata;
-      idata->conn = conn;
-    }
-    if (imap_open_connection (idata, conn))
-      return -1;
-  }
-
-  if (mx.mbox[0] == '\0')
+  if (!mx.mbox)
   {
     home_namespace = 1;
     mbox[0] = '\0';		/* Do not replace "" with "INBOX" here */
-    mx.mbox = ImapHomeNamespace;
+    mx.mbox = safe_strdup(ImapHomeNamespace);
     nns = 0;
     if (mutt_bit_isset(idata->capabilities,NAMESPACE))
     {
       mutt_message _("Getting namespaces...");
-      if (get_namespace (idata, nsbuf, sizeof (nsbuf), 
+      if (browse_get_namespace (idata, nsbuf, sizeof (nsbuf), 
 			 nsi, sizeof (nsi),  &nns) != 0)
-	return -1;
-      if (verify_namespace (conn, nsi, nns) != 0)
-	return -1;
+	goto fail;
+      if (browse_verify_namespace (idata, nsi, nns) != 0)
+	goto fail;
     }
-    /* What if you have a shared namespace of ""? You'll never be
-     * able to browse it. This isn't conjecture: connect to the Cyrus
-     * reference server (cyrus.andrew.cmu.edu) as anonymous. argh! */
-#if 0
-    if (!mx.mbox)   /* Any explicitly set imap_home_namespace wins */
-    { 
-      for (i = 0; i < nns; i++)
-	if (nsi[i].listable &&
-	    (nsi[i].type == IMAP_NS_PERSONAL || nsi[i].type == IMAP_NS_SHARED))
-	{
-	  mx.mbox = nsi->prefix;
-	  nsi->home_namespace = 1;
-	  break;
-	}
-    }
-    else
-      dprint (4, (debugfile, "Home namespace: %s\n", mx.mbox));
-#endif
   }
 
   mutt_message _("Getting folder list...");
@@ -138,27 +107,29 @@ int imap_init_browse (char *path, struct browser_state *state)
   if (mx.mbox && mx.mbox[0] != '\0')
   {
     imap_fix_path (idata, mx.mbox, mbox, sizeof (mbox));
+    imap_munge_mbox_name (buf, sizeof (buf), mbox);
+    imap_unquote_string(buf); /* As kludgy as it gets */
+    mbox[sizeof (mbox) - 1] = '\0';
+    strncpy (mbox, buf, sizeof (mbox) - 1);
     n = mutt_strlen (mbox);
 
-    dprint (3, (debugfile, "imap_init_browse: mbox: %s\n", mbox));
+    dprint (3, (debugfile, "imap_browse: mbox: %s\n", mbox));
 
     /* if our target exists and has inferiors, enter it if we
      * aren't already going to */
     if (mbox[n-1] != idata->delim)
     {
-      imap_make_sequence (seq, sizeof (seq));
-      snprintf (buf, sizeof (buf), "%s %s \"\" \"%s\"\r\n", seq, list_cmd,
-        mbox);
-      mutt_socket_write (conn, buf);
+      snprintf (buf, sizeof (buf), "%s \"\" \"%s\"", list_cmd, mbox);
+      imap_cmd_start (idata, buf);
       do 
       {
-        if (imap_parse_list_response(conn, buf, sizeof(buf), &cur_folder,
-    	    &noselect, &noinferiors, &(idata->delim)) != 0)
-          return -1;
+        if (imap_parse_list_response (idata, &cur_folder, &noselect,
+            &noinferiors, &idata->delim) != 0)
+	  goto fail;
 
         if (cur_folder)
         {
-          imap_unquote_string (cur_folder);
+          imap_unmunge_mbox_name (cur_folder);
 
           if (!noinferiors && cur_folder[0] &&
             (n = strlen (mbox)) < LONG_STRING-1)
@@ -168,7 +139,7 @@ int imap_init_browse (char *path, struct browser_state *state)
           }
         }
       }
-      while ((mutt_strncmp (buf, seq, SEQLEN) != 0));
+      while (mutt_strncmp (idata->buf, idata->seq, SEQLEN));
     }
 
     /* if we're descending a folder, mark it as current in browser_state */
@@ -177,7 +148,7 @@ int imap_init_browse (char *path, struct browser_state *state)
       /* don't show parents in the home namespace */
       if (!home_namespace)
 	showparents = 1;
-      imap_qualify_path (buf, sizeof (buf), &mx, mbox, NULL);
+      imap_qualify_path (buf, sizeof (buf), &mx, mbox);
       state->folder = safe_strdup (buf);
       n--;
     }
@@ -195,22 +166,13 @@ int imap_init_browse (char *path, struct browser_state *state)
        * had the parent not exist? */
       ctmp = mbox[n];
       mbox[n] = '\0';
-#if 0
-      /* List it to see if it can be selected */
-      dprint (2, (debugfile, "imap_init_browse: listing possible parent %s\n", mbox));
-      imap_make_sequence (seq, sizeof (seq));
-      snprintf (buf, sizeof (buf), "%s %s \"\" \"%s\"\r\n", seq, 
-        list_cmd, mbox);
-      /* add this entry as a superior, if we aren't tab-completing */
-      if (showparents && add_list_result (conn, seq, buf, state, 1))
-          return -1;
-#else
+
       if (showparents)
       {
 	dprint (2, (debugfile, "imap_init_browse: adding parent %s\n", mbox));
 	imap_add_folder (idata->delim, mbox, 1, 0, state, 1);
       }
-#endif
+
       /* if our target isn't a folder, we are in our superior */
       if (!state->folder)
       {
@@ -218,7 +180,7 @@ int imap_init_browse (char *path, struct browser_state *state)
         mbox[n++] = ctmp;
         ctmp = mbox[n];
         mbox[n] = '\0';
-        imap_qualify_path (buf, sizeof (buf), &mx, mbox, NULL);
+        imap_qualify_path (buf, sizeof (buf), &mx, mbox);
         state->folder = safe_strdup (buf);
       }
       mbox[n] = ctmp;
@@ -233,7 +195,7 @@ int imap_init_browse (char *path, struct browser_state *state)
         imap_add_folder (idata->delim, relpath, 1, 0, state, 1); 
       if (!state->folder)
       {
-        imap_qualify_path (buf, sizeof (buf), &mx, relpath, NULL);
+        imap_qualify_path (buf, sizeof (buf), &mx, relpath);
         state->folder = safe_strdup (buf);
       }
     }
@@ -242,7 +204,7 @@ int imap_init_browse (char *path, struct browser_state *state)
   /* no namespace, no folder: set folder to host only */
   if (!state->folder)
   {
-    imap_qualify_path (buf, sizeof (buf), &mx, NULL, NULL);
+    imap_qualify_path (buf, sizeof (buf), &mx, NULL);
     state->folder = safe_strdup (buf);
   }
 
@@ -252,19 +214,15 @@ int imap_init_browse (char *path, struct browser_state *state)
      * namespace is not "", so we have to list it explicitly. We ask the 
      * server to see if it has descendants. */
     dprint (4, (debugfile, "imap_init_browse: adding INBOX\n"));
-    imap_make_sequence (seq, sizeof (seq));
-    snprintf (buf, sizeof (buf), "%s LIST \"\" \"INBOX\"\r\n", seq);
-    if (add_list_result (conn, seq, buf, state, 0))
-      return -1;
+    if (browse_add_list_result (idata, "LIST \"\" \"INBOX\"", state, 0))
+      goto fail;
   }
 
   nsup = state->entrylen;
 
-  imap_make_sequence (seq, sizeof (seq));
-  snprintf (buf, sizeof (buf), "%s %s \"\" \"%s%%\"\r\n", seq, 
-    list_cmd, mbox);
-  if (add_list_result (conn, seq, buf, state, 0))
-    return -1;
+  snprintf (buf, sizeof (buf), "%s \"\" \"%s%%\"", list_cmd, mbox);
+  if (browse_add_list_result (idata, buf, state, 0))
+    goto fail;
 
   qsort(&(state->entry[nsup]),state->entrylen-nsup,sizeof(state->entry[0]),
 	(int (*)(const void*,const void*)) compare_names);
@@ -280,14 +238,67 @@ int imap_init_browse (char *path, struct browser_state *state)
   }
 
   mutt_clear_error ();
+  FREE (&mx.mbox);
   return 0;
+
+ fail:
+  FREE (&mx.mbox);
+  return -1;
 }
 
-static int add_list_result (CONNECTION *conn, const char *seq, const char *cmd,
-			    struct browser_state *state, short isparent)
+#if 0
+/* imap_mailbox_create: Prompt for a new mailbox name, and try to create it */
+int imap_mailbox_create (const char* folder)
 {
-  IMAP_DATA *idata = CONN_DATA;
+  IMAP_DATA* idata;
+  IMAP_MBOX mx;
   char buf[LONG_STRING];
+  short n;
+
+  if (imap_parse_path (folder, &mx) < 0)
+  {
+    dprint (1, (debugfile, "imap_mailbox_create: Bad starting path %s\n",
+      folder));
+    return -1;
+  }
+
+  if (!(idata = imap_conn_find (&mx.account, M_IMAP_CONN_NONEW)))
+  {
+    dprint (1, (debugfile, "imap_mailbox_create: Couldn't find open connection to %s", mx.account.host));
+    goto fail;
+  }
+  
+  strfcpy (buf, NONULL (mx.mbox), sizeof (buf));
+
+  /* append a delimiter if necessary */
+  n = mutt_strlen (buf);
+  if (n && (n < sizeof (buf) - 1) && (buf[n-1] != idata->delim))
+  {
+    buf[n++] = idata->delim;
+    buf[n] = '\0';
+  }
+  
+  if (mutt_get_field (_("Create mailbox: "), buf, sizeof (buf), M_FILE) < 0)
+    goto fail;
+
+  if (imap_create_mailbox (idata, buf) < 0)
+    goto fail;
+
+  mutt_message _("Mailbox created.");
+  sleep (1);
+
+  FREE (&mx.mbox);
+  return 0;
+
+ fail:
+  FREE (&mx.mbox);
+  return -1;
+}
+#endif
+
+static int browse_add_list_result (IMAP_DATA* idata, const char* cmd,
+  struct browser_state* state, short isparent)
+{
   char *name;
   int noselect;
   int noinferiors;
@@ -296,32 +307,36 @@ static int add_list_result (CONNECTION *conn, const char *seq, const char *cmd,
   if (imap_parse_path (state->folder, &mx))
   {
     dprint (2, (debugfile,
-      "add_list_result: current folder %s makes no sense\n", state->folder));
+      "browse_add_list_result: current folder %s makes no sense\n", state->folder));
     return -1;
   }
 
-  mutt_socket_write (conn, cmd);
+  imap_cmd_start (idata, cmd);
 
   do 
   {
-    if (imap_parse_list_response(conn, buf, sizeof(buf), &name,
-        &noselect, &noinferiors, &(idata->delim)) != 0)
+    if (imap_parse_list_response(idata, &name, &noselect, &noinferiors,
+        &idata->delim) != 0)
+    {
+      FREE (&mx.mbox);
       return -1;
+    }
 
     if (name)
     {
-      imap_unquote_string (name);
       /* Let a parent folder never be selectable for navigation */
       if (isparent)
         noselect = 1;
       /* prune current folder from output */
-      if (isparent || strncmp (name, mx.mbox, strlen (name)))
+      if (isparent || mutt_strncmp (name, mx.mbox, strlen (name)))
         imap_add_folder (idata->delim, name, noselect, noinferiors, state,
           isparent);
     }
   }
-  while ((mutt_strncmp (buf, seq, SEQLEN) != 0));
-  return (0);
+  while ((mutt_strncmp (idata->buf, idata->seq, SEQLEN) != 0));
+
+  FREE (&mx.mbox);
+  return 0;
 }
 
 #ifndef LIBMUTT
@@ -337,7 +352,7 @@ static void imap_add_folder (char delim, char *folder, int noselect,
   if (imap_parse_path (state->folder, &mx))
     return;
 
-  imap_unquote_string (folder);
+  imap_unmunge_mbox_name (folder);
 
   if (state->entrylen + 1 == state->entrymax)
   {
@@ -351,18 +366,21 @@ static void imap_add_folder (char delim, char *folder, int noselect,
   if (isparent)
     strfcpy (relpath, "../", sizeof (relpath));
   /* strip current folder from target, to render a relative path */
-  else if (!strncmp (mx.mbox, folder, strlen (mx.mbox)))
-    strfcpy (relpath, folder + strlen (mx.mbox), sizeof (relpath));
+  else if (!mutt_strncmp (mx.mbox, folder, mutt_strlen (mx.mbox)))
+    strfcpy (relpath, folder + mutt_strlen (mx.mbox), sizeof (relpath));
   else
     strfcpy (relpath, folder, sizeof (relpath));
 
   /* apply filemask filter. This should really be done at menu setup rather
    * than at scan, since it's so expensive to scan. But that's big changes
    * to browser.c */
-  if (!((regexec (Mask.rx, relpath, 0, NULL, 0) == 0) ^ Mask.not))
+  if (!((regexec (FileMask.rx, relpath, 0, NULL, 0) == 0) ^ FileMask.not))
+  {
+    FREE (&mx.mbox);
     return;
+  }
 
-  imap_qualify_path (tmp, sizeof (tmp), &mx, folder, NULL);
+  imap_qualify_path (tmp, sizeof (tmp), &mx, folder);
   (state->entry)[state->entrylen].name = safe_strdup (tmp);
 
   /* mark desc with delim in browser if it can have subfolders */
@@ -382,6 +400,8 @@ static void imap_add_folder (char delim, char *folder, int noselect,
   (state->entry)[state->entrylen].selectable = !noselect;
   (state->entry)[state->entrylen].inferiors = !noinferiors;
   (state->entrylen)++;
+
+  FREE (&mx.mbox);
 }
 #endif
 
@@ -390,150 +410,142 @@ static int compare_names(struct folder_file *a, struct folder_file *b)
   return mutt_strcmp(a->name, b->name);
 }
 
-static int get_namespace (IMAP_DATA *idata, char *nsbuf, int nsblen, 
-			  IMAP_NAMESPACE_INFO *nsi, int nsilen, int *nns)
+static int browse_get_namespace (IMAP_DATA* idata, char* nsbuf, int nsblen,
+  IMAP_NAMESPACE_INFO* nsi, int nsilen, int* nns)
 {
-  char buf[LONG_STRING];
-  char seq[16];
   char *s;
   int n;
   char ns[LONG_STRING];
   char delim = '/';
   int type;
   int nsbused = 0;
+  int rc;
 
   *nns = 0;
   nsbuf[nsblen-1] = '\0';
 
-  imap_make_sequence (seq, sizeof (seq));
-  snprintf (buf, sizeof (buf), "%s NAMESPACE\r\n", seq);
-
-  mutt_socket_write (idata->conn, buf);
+  imap_cmd_start (idata, "NAMESPACE");
+  
   do 
   {
-    if (mutt_socket_read_line_d (buf, sizeof (buf), idata->conn) < 0)
-      return -1;
+    if ((rc = imap_cmd_step (idata)) != IMAP_CMD_CONTINUE)
+      break;
 
-    if (buf[0] == '*') 
+    s = imap_next_word (idata->buf);
+    if (mutt_strncasecmp ("NAMESPACE", s, 9) == 0)
     {
-      s = imap_next_word (buf);
-      if (mutt_strncasecmp ("NAMESPACE", s, 9) == 0)
+      /* There are three sections to the response, User, Other, Shared,
+       * and maybe more by extension */
+      for (type = IMAP_NS_PERSONAL; *s; type++)
       {
-	/* There are three sections to the response, User, Other, Shared,
-	 * and maybe more by extension */
-	for (type = IMAP_NS_PERSONAL; *s; type++)
+	s = imap_next_word (s);
+	if (*s && strncmp (s, "NIL", 3))
 	{
-	  s = imap_next_word (s);
-	  if (*s && strncmp (s, "NIL", 3))
+	  s++;
+	  while (*s && *s != ')')
 	  {
-	    s++;
-	    while (*s && *s != ')')
-	    {
-	      s++; /* skip ( */
-	      /* copy namespace */
-	      n = 0;
-	      delim = '\0';
+	    s++; /* skip ( */
+	    /* copy namespace */
+	    n = 0;
+	    delim = '\0';
 
-	      if (*s == '\"')
-	      {
-		s++;
-		while (*s && *s != '\"') 
-		{
-		  if (*s == '\\')
-		    s++;
-		  ns[n++] = *s;
-		  s++;
-		}
-	      }
-	      else
-		while (*s && !ISSPACE (*s)) 
-		{
-		  ns[n++] = *s;
-		  s++;
-		}
-	      ns[n] = '\0';
-	      /* delim? */
-	      s = imap_next_word (s);
-	      /* delimiter is meaningless if namespace is "". Why does
-	       * Cyrus provide one?! */
-	      if (n && *s && *s == '\"')
-              {
-		if (s[1] && s[2] == '\"')
-		  delim = s[1];
-		else if (s[1] && s[1] == '\\' && s[2] && s[3] == '\"')
-		  delim = s[2];
-              }
-	      /* skip "" namespaces, they are already listed at the root */
-	      if ((ns[0] != '\0') && (nsbused < nsblen) && (*nns < nsilen))
-	      {
-		dprint (4, (debugfile, "get_namespace: adding %s\n", ns));
-		nsi->type = type;
-		/* Cyrus doesn't append the delimiter to the namespace,
-		 * but UW-IMAP does. We'll strip it here and add it back
-		 * as if it were a normal directory, from the browser */
-		if (n && (ns[n-1] == delim))
-		  ns[--n] = '\0';
-		strncpy(nsbuf+nsbused,ns,nsblen-nsbused-1);
-		nsi->prefix = nsbuf+nsbused;
-		nsbused += n+1;
-		nsi->delim = delim;
-		nsi++;
-		(*nns)++;
-	      }
-	      while (*s && *s != ')') s++;
+	    if (*s == '\"')
+	    {
 	      s++;
+	      while (*s && *s != '\"') 
+	      {
+		if (*s == '\\')
+		  s++;
+		ns[n++] = *s;
+		s++;
+	      }
 	    }
+	    else
+	      while (*s && !ISSPACE (*s)) 
+	      {
+		ns[n++] = *s;
+		s++;
+	      }
+	    ns[n] = '\0';
+	    /* delim? */
+	    s = imap_next_word (s);
+	    /* delimiter is meaningless if namespace is "". Why does
+	     * Cyrus provide one?! */
+	    if (n && *s && *s == '\"')
+	    {
+	      if (s[1] && s[2] == '\"')
+		delim = s[1];
+	      else if (s[1] && s[1] == '\\' && s[2] && s[3] == '\"')
+		delim = s[2];
+	    }
+	    /* skip "" namespaces, they are already listed at the root */
+	    if ((ns[0] != '\0') && (nsbused < nsblen) && (*nns < nsilen))
+	    {
+	      dprint (3, (debugfile, "browse_get_namespace: adding %s\n", ns));
+	      nsi->type = type;
+	      /* Cyrus doesn't append the delimiter to the namespace,
+	       * but UW-IMAP does. We'll strip it here and add it back
+	       * as if it were a normal directory, from the browser */
+	      if (n && (ns[n-1] == delim))
+		ns[--n] = '\0';
+	      strncpy (nsbuf+nsbused,ns,nsblen-nsbused-1);
+	      nsi->prefix = nsbuf+nsbused;
+	      nsbused += n+1;
+	      nsi->delim = delim;
+	      nsi++;
+	      (*nns)++;
+	    }
+	    while (*s && *s != ')') s++;
+	    s++;
 	  }
 	}
       }
-      else
-      {
-	if (imap_handle_untagged (idata, buf) != 0)
-	  return (-1);
-      }
     }
   }
-  while ((mutt_strncmp (buf, seq, SEQLEN) != 0));
+  while (rc == IMAP_CMD_CONTINUE);
+
+  if (rc != IMAP_CMD_DONE)
+    return -1;
+
   return 0;
 }
 
 /* Check which namespaces have contents */
-static int verify_namespace (CONNECTION *conn, IMAP_NAMESPACE_INFO *nsi, 
-  int nns)
+static int browse_verify_namespace (IMAP_DATA* idata,
+  IMAP_NAMESPACE_INFO *nsi, int nns)
 {
   char buf[LONG_STRING];
-  char seq[16];
   int i = 0;
   char *name;
   char delim;
 
   for (i = 0; i < nns; i++, nsi++)
   {
-    imap_make_sequence (seq, sizeof (seq));
     /* Cyrus gives back nothing if the % isn't added. This may return lots
      * of data in some cases, I guess, but I currently feel that's better
      * than invisible namespaces */
     if (nsi->delim)
-      snprintf (buf, sizeof (buf), "%s %s \"\" \"%s%c%%\"\r\n", seq,
+      snprintf (buf, sizeof (buf), "%s \"\" \"%s%c%%\"",
 		option (OPTIMAPLSUB) ? "LSUB" : "LIST", nsi->prefix,
 		nsi->delim);
     else
-      snprintf (buf, sizeof (buf), "%s %s \"\" \"%s%%\"\r\n", seq,
+      snprintf (buf, sizeof (buf), "%s \"\" \"%s%%\"",
 		option (OPTIMAPLSUB) ? "LSUB" : "LIST", nsi->prefix);
-    
-    mutt_socket_write (conn, buf);
+
+    imap_cmd_start (idata, buf);
 
     nsi->listable = 0;
     nsi->home_namespace = 0;
     do 
     {
-      if (imap_parse_list_response(conn, buf, sizeof(buf), &name,
-          &(nsi->noselect), &(nsi->noinferiors), &delim) != 0)
+      if (imap_parse_list_response(idata, &name, &nsi->noselect,
+          &nsi->noinferiors, &delim) != 0)
 	return -1;
       nsi->listable |= (name != NULL);
     }
-    while ((mutt_strncmp (buf, seq, SEQLEN) != 0));
+    while ((mutt_strncmp (idata->buf, idata->seq, SEQLEN) != 0));
   }
-  return (0);
+
+  return 0;
 }
 

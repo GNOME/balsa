@@ -1,3 +1,10 @@
+2001-02-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/body.c:
+	* libbalsa/folder-scanners.c:
+	* libbalsa/libbalsa.c:
+	* libbalsa/mailbox_imap.c: update for mutt-unstable-20010210
+
 2001-02-11  Matthew Guenther  <guentherm@asme.org>
 
 	* src/balsa-index.c: Don't try and select a message if the last

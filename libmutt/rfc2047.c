@@ -260,23 +260,27 @@ void rfc2047_encode_adrlist (ADDRESS *addr)
 
 static int rfc2047_decode_word (char *d, const char *s, size_t len)
 {
-  char *p = safe_strdup (s);
-  char *pp = p;
-  char *pd = d;
-  int enc = 0, filter = 0, count = 0, c1, c2, c3, c4;
+  const char *pp = s, *pp1;
+  char *pd, *d0;
+  const char *t, *t1;
+  int enc = 0, count = 0, c1, c2, c3, c4;
   char *charset = NULL;
-  
-  while ((pp = strtok (pp, "?")) != NULL)
+
+  pd = d0 = safe_malloc (strlen (s));
+
+  for (pp = s; (pp1 = strchr (pp, '?')); pp = pp1 + 1)
   {
     count++;
     switch (count)
     {
       case 2:
-	if (mutt_strcasecmp (pp, Charset) != 0)
-        {
-	  filter = 1;
-	  charset = pp;
-	}
+	/* ignore language specification a la RFC 2231 */        
+	t = pp1;
+        if ((t1 = memchr (pp, '*', t - pp)))
+	  t = t1;
+	charset = safe_malloc (t - pp + 1);
+	memcpy (charset, pp, t - pp);
+	charset[t-pp] = '\0';
 	break;
       case 3:
 	if (toupper (*pp) == 'Q')
@@ -284,12 +288,16 @@ static int rfc2047_decode_word (char *d, const char *s, size_t len)
 	else if (toupper (*pp) == 'B')
 	  enc = ENCBASE64;
 	else
+	{
+	  safe_free ((void **) &charset);
+	  safe_free ((void **) &d0);
 	  return (-1);
+	}
 	break;
       case 4:
 	if (enc == ENCQUOTEDPRINTABLE)
 	{
-	  while (*pp && len > 0)
+	  while (pp < pp1 && len > 0)
 	  {
 	    if (*pp == '_')
 	    {
@@ -315,7 +323,7 @@ static int rfc2047_decode_word (char *d, const char *s, size_t len)
 	}
 	else if (enc == ENCBASE64)
 	{
-	  while (*pp && len > 0)
+	  while (pp < pp1 && len > 0)
 	  {
 	    if (pp[0] == '=' || pp[1] == 0 || pp[1] == '=')
 	      break;  /* something wrong */
@@ -345,51 +353,76 @@ static int rfc2047_decode_word (char *d, const char *s, size_t len)
 	}
 	break;
     }
-    pp = 0;
   }
   
-  if (filter)
-  {
-    if(mutt_is_utf8(charset))
-    {
-      CHARSET *chs = mutt_get_charset(Charset);
-      mutt_decode_utf8_string(d, chs);
-    }
-    else if (mutt_display_string(d, mutt_get_translation(charset, Charset)) == -1)
-    {
-      for(pd = d; *pd; pd++)
-      {
-        if (!IsPrint (*pd))
-	  *pd = '?';
-      }
-    }
-  }
-  safe_free ((void **) &p);
+  if (charset)
+    mutt_convert_string (&d0, charset, Charset);
+  strfcpy (d, d0, len);
+  safe_free ((void **) &charset);
+  safe_free ((void **) &d0);
   return (0);
+}
+
+/*
+ * Find the start and end of the first encoded word in the string.
+ * We use the grammar in section 2 of RFC 2047, but the "encoding"
+ * must be B or Q. Also, we don't require the encoded word to be
+ * separated by linear-white-space (section 5(1)).
+ */
+static const char *find_encoded_word (const char *s, const char **x)
+{
+  const char *p, *q;
+
+  q = s;
+  while ((p = strstr (q, "=?")))
+  {
+    for (q = p + 2;
+	 0x20 < *q && *q < 0x7f && !strchr ("()<>@,;:\"/[]?.=", *q);
+	 q++)
+      ;
+    if (q[0] != '?' || !strchr ("BbQq", q[1]) || q[2] != '?')
+      continue;
+    for (q = q + 3; 0x20 < *q && *q < 0x7f && *q != '?'; q++)
+      ;
+    if (q[0] != '?' || q[1] != '=')
+    {
+      --q;
+      continue;
+    }
+
+    *x = q + 2;
+    return p;
+  }
+
+  return 0;
 }
 
 /* try to decode anything that looks like a valid RFC2047 encoded
  * header field, ignoring RFC822 parsing rules
  */
-void rfc2047_decode (char *d, const char *s, size_t dlen)
+void rfc2047_decode (char **pd)
 {
   const char *p, *q;
   size_t n;
   int found_encoded = 0;
+  char *d0, *d;
+  const char *s = *pd;
+  size_t dlen;
 
-  dlen--; /* save room for the terminal nul */
+  if (!*s || !s)
+    return;
+
+  dlen = 4 * strlen (s); /* should be enough */
+  d = d0 = safe_malloc (dlen + 1);
 
   while (*s && dlen > 0)
   {
-    if ((p = strstr (s, "=?")) == NULL ||
-	(q = strchr (p + 2, '?')) == NULL ||
-	(q = strchr (q + 1, '?')) == NULL ||
-	(q = strstr (q + 1, "?=")) == NULL)
+    if (!(p = find_encoded_word (s, &q)))
     {
       /* no encoded words */
-      if (d != s)
-	strfcpy (d, s, dlen + 1);
-      return;
+      strncpy (d, s, dlen);
+      d += dlen;
+      break;
     }
 
     if (p != s)
@@ -400,8 +433,7 @@ void rfc2047_decode (char *d, const char *s, size_t dlen)
       {
 	if (n > dlen)
 	  n = dlen;
-	if (d != s)
-	  memcpy (d, s, n);
+	memcpy (d, s, n);
 	d += n;
 	dlen -= n;
       }
@@ -409,12 +441,16 @@ void rfc2047_decode (char *d, const char *s, size_t dlen)
 
     rfc2047_decode_word (d, p, dlen);
     found_encoded = 1;
-    s = q + 2;
+    s = q;
     n = mutt_strlen (d);
     dlen -= n;
     d += n;
   }
   *d = 0;
+
+  safe_free ((void **) pd);
+  *pd = d0;
+  mutt_str_adjust (pd);
 }
 
 void rfc2047_decode_adrlist (ADDRESS *a)
@@ -422,10 +458,10 @@ void rfc2047_decode_adrlist (ADDRESS *a)
   while (a)
   {
     if (a->personal && strstr (a->personal, "=?") != NULL)
-      rfc2047_decode (a->personal, a->personal, mutt_strlen (a->personal) + 1);
+      rfc2047_decode (&a->personal);
 #ifdef EXACT_ADDRESS
     if (a->val && strstr (a->val, "=?") != NULL)
-      rfc2047_decode (a->val, a->val, mutt_strlen (a->val) + 1);
+      rfc2047_decode (&a->val);
 #endif
     a = a->next;
   }

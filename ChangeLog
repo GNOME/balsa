@@ -1,3 +1,13 @@
+2003-10-30 Pawel Salek
+
+	* libbalsa/{folder-scanner,misc,pop3,send}.c: 
+	* libbalsa/mailbox_{maildir,mh}.c: compile with stricter standard
+	compatibility.
+	* libbalsa/mailbox.[hc]: initial interface for server-side sorting.
+	* libbalsa/mailbox_imap.c: same.
+	* libbalsa/imap/imap-handle.c: improve handling of embedded msgs.
+	* src/main-window.c: use ssize_t when apriopriate.
+
 2003-10-27 17:06  PeterB
 
 	* libbalsa/filter.c: Avoid casting a (const gchar *) to (gchar *).

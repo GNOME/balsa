@@ -21,6 +21,7 @@
 
 #include "config.h"
 
+#define _POSIX_SOURCE 1
 #include <ctype.h>
 #include <string.h>
 #include <sys/types.h>
@@ -55,6 +56,8 @@ static void libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox
 							   gboolean flag);
 static void libbalsa_mailbox_real_release_message (LibBalsaMailbox * mailbox,
 						   LibBalsaMessage * message);
+static void libbalsa_mailbox_real_sort(LibBalsaMailbox* mbox,
+                                       GArray *sort_array);
 static gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox* mailbox,
 						GSList * conditions);
 static void libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
@@ -232,6 +235,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->get_message_stream = NULL;
     klass->change_message_flags = NULL;
     klass->set_threading = NULL;
+    klass->sort = libbalsa_mailbox_real_sort;
     klass->check = NULL;
     klass->message_match = NULL;
     klass->mailbox_match = NULL;
@@ -624,6 +628,19 @@ libbalsa_mailbox_real_release_message(LibBalsaMailbox * mailbox,
 				      LibBalsaMessage * message)
 {
     /* Default is noop. */
+}
+
+typedef struct _SortTuple SortTuple;
+static gint mbox_compare_func(const SortTuple * a,
+                              const SortTuple * b,
+                              LibBalsaMailbox * mbox);
+
+static void
+libbalsa_mailbox_real_sort(LibBalsaMailbox* mbox, GArray *sort_array)
+{
+    /* Sort the array */
+    g_array_sort_with_data(sort_array,
+			   (GCompareDataFunc) mbox_compare_func, mbox);
 }
 
 #if 0
@@ -1589,10 +1606,10 @@ mbox_sortable_init(GtkTreeSortableIface * iface)
 }
 
 /* Sorting */
-typedef struct _SortTuple {
+struct _SortTuple {
     gint offset;
     GNode *node;
-} SortTuple;
+};
 
 static gint
 mbox_compare_msgno(LibBalsaMessage * message_a,
@@ -1747,9 +1764,7 @@ mbox_sort_helper(LibBalsaMailbox * mbox,
 	i++;
     }
 
-    /* Sort the array */
-    g_array_sort_with_data(sort_array,
-			   (GCompareDataFunc) mbox_compare_func, mbox);
+    LIBBALSA_MAILBOX_GET_CLASS(mbox)->sort(mbox, sort_array);
 
     for (i = 0; i < list_length - 1; i++) {
 	g_array_index(sort_array, SortTuple, i).node->next =
@@ -1761,7 +1776,6 @@ mbox_sort_helper(LibBalsaMailbox * mbox,
 	NULL;
     g_array_index(sort_array, SortTuple, 0).node->prev = NULL;
     parent->children = g_array_index(sort_array, SortTuple, 0).node;
-
     /* Let the world know about our new order */
     new_order = g_new(gint, list_length);
     for (i = 0; i < list_length; i++)

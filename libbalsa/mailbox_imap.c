@@ -136,6 +136,8 @@ void libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 						LibBalsaMailboxThreadingType
 						thread_type);
+static void libbalsa_mailbox_imap_sort(LibBalsaMailbox *mailbox,
+                                       GArray *array);
 
 static void server_settings_changed(LibBalsaServer * server,
 				    LibBalsaMailbox * mailbox);
@@ -237,6 +239,7 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
 	libbalsa_mailbox_imap_change_message_flags;
     libbalsa_mailbox_class->set_threading =
 	libbalsa_mailbox_imap_set_threading;
+    libbalsa_mailbox_class->sort = libbalsa_mailbox_imap_sort;
 }
 
 static void
@@ -1305,6 +1308,27 @@ libbalsa_address_new_list_from_imap_address_list(ImapAddress *list)
     return g_list_reverse(res);
 }
 
+static void
+lb_set_headers(LibBalsaMessageHeaders *headers, ImapEnvelope *  envelope,
+               gboolean is_embedded)
+{
+    headers->date = envelope->date;
+    headers->from = libbalsa_address_new_from_imap_address(envelope->from);
+    headers->reply_to =
+        libbalsa_address_new_from_imap_address(envelope->replyto);
+    headers->to_list =
+	libbalsa_address_new_list_from_imap_address_list(envelope->to);
+    headers->cc_list =
+	libbalsa_address_new_list_from_imap_address_list(envelope->cc);
+    headers->bcc_list =
+	libbalsa_address_new_list_from_imap_address_list(envelope->bcc);
+
+    if(is_embedded) {
+        headers->subject = 
+            g_mime_utils_header_decode_text(envelope->subject);
+    }
+}
+
 static gboolean
 libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 				    LibBalsaMessage *message)
@@ -1329,29 +1353,18 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 
     lbimap_update_flags(message, imsg);
 
-    envelope = imsg->envelope;
-    message->subj = g_mime_utils_header_decode_text(envelope->subject);
-    message->headers->date = envelope->date;
-    message->length        = imsg->rfc822size;
-    message->headers->from =
-	libbalsa_address_new_from_imap_address(envelope->from);
+    lb_set_headers(message->headers, imsg->envelope, FALSE);
+    envelope        = imsg->envelope;
+    message->length = imsg->rfc822size;
+    message->subj   = g_mime_utils_header_decode_text(envelope->subject);
     message->sender =
 	libbalsa_address_new_from_imap_address(envelope->sender);
-    message->headers->reply_to =
-	libbalsa_address_new_from_imap_address(envelope->replyto);
-    message->headers->to_list =
-	libbalsa_address_new_list_from_imap_address_list(envelope->to);
-    message->headers->cc_list =
-	libbalsa_address_new_list_from_imap_address_list(envelope->cc);
-    message->headers->bcc_list =
-	libbalsa_address_new_list_from_imap_address_list(envelope->bcc);
     libbalsa_message_set_in_reply_to_from_string(message,
 						 envelope->in_reply_to);
     if (envelope->message_id) {
 	message->message_id =
 	    g_mime_utils_decode_message_id(envelope->message_id);
     }
-
     return TRUE;
 }
 
@@ -1432,8 +1445,10 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     lbbody->filename  = g_strdup(imap_body->desc);
     lbbody->filename  = g_strdup(imap_body_get_param(imap_body, "name"));
     lbbody->charset   = g_strdup(imap_body_get_param(imap_body, "charset"));
-    if(imap_body->envelope)
-            g_warning("%s: implement envelope\n", __func__);
+    if(imap_body->envelope) {
+        lbbody->embhdrs = g_new0(LibBalsaMessageHeaders, 1);
+        lb_set_headers(lbbody->embhdrs, imap_body->envelope, TRUE);
+    }
     if(imap_body->child) {
         LibBalsaMessageBody *body = libbalsa_message_body_new(lbbody->message);
         lbm_imap_construct_body(body, imap_body->child);
@@ -1744,4 +1759,10 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 
     /* FIXME: do not only just invalidate iterators, force update as well */
     mailbox->stamp++;
+}
+
+static void
+libbalsa_mailbox_imap_sort(LibBalsaMailbox *mailbox, GArray *array)
+{
+    g_warning("FIXME: %s needs to be implemented\n", __func__);
 }

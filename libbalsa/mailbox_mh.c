@@ -22,6 +22,7 @@
 
 #include "config.h"
 
+#define _POSIX_SOURCE 1
 #include <gnome.h>
 
 #include <unistd.h>

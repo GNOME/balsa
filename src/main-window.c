@@ -2015,7 +2015,7 @@ mail_progress_notify_cb()
     MailThreadMessage *threadmessage;
     MailThreadMessage **currentpos;
     void *msgbuffer;
-    uint count;
+    ssize_t count;
     gfloat fraction;
 
     msgbuffer = g_malloc(MSG_BUFFER_SIZE);
@@ -2144,7 +2144,7 @@ send_progress_notify_cb()
     SendThreadMessage *threadmessage;
     SendThreadMessage **currentpos;
     void *msgbuffer;
-    uint count;
+    ssize_t count;
     float fraction;
 
     msgbuffer = malloc(2049);

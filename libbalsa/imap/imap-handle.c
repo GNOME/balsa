@@ -32,7 +32,6 @@
 FILE *debug_stream = NULL;
 
 #define LONG_STRING 512
-static const int IMAP_CMD_DELTA = 128;
 #define ELEMENTS(x) (sizeof (x) / sizeof(x[0]))
 
 #define LIT_TYPE_HANDLE \
@@ -2163,7 +2162,7 @@ ir_body_type_1part (struct siobuf *sio, ImapBody * body,
       if (body)
 	{
 	  b = imap_body_new ();
-	  b->envelope = env;
+	  body->envelope = env;
 	}
       else
 	b = NULL;

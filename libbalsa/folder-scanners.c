@@ -21,6 +21,7 @@
 
 #include "config.h"
 
+#define _POSIX_SOURCE 1
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>

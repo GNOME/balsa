@@ -22,6 +22,8 @@
 
 #include "config.h"
 
+#define _POSIX_SOURCE 1
+
 #include <fcntl.h>
 #include <errno.h>
 

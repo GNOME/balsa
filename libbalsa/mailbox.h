@@ -239,6 +239,7 @@ struct _LibBalsaMailboxClass {
                                   LibBalsaMessageFlag clear);
     void (*set_threading) (LibBalsaMailbox * mailbox,
 			   LibBalsaMailboxThreadingType thread_type);
+    void (*sort) (LibBalsaMailbox * mailbox, GArray *sort_array);
     gboolean (*close_backend)(LibBalsaMailbox * mailbox);
 };
 

@@ -25,6 +25,8 @@
 
 #include "config.h"
 
+#define _POSIX_SOURCE 1
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-04-29 18:34-0400\n"
+"POT-Creation-Date: 1998-05-02 16:07-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,15 +18,11 @@ msgstr ""
 msgid "Send"
 msgstr ""
 
-#: src/sendmsg-window.c:134
-msgid "Attach File"
-msgstr ""
-
 #: src/addrbook-manager.c:179 src/sendmsg-window.c:143
 msgid "Close"
 msgstr ""
 
-#: src/main-window.c:453 src/sendmsg-window.c:151
+#: src/main-window.c:454 src/sendmsg-window.c:151
 msgid "Message"
 msgstr ""
 
@@ -50,99 +46,74 @@ msgstr ""
 msgid "Contents"
 msgstr ""
 
-#: src/addrbook-manager.c:199 src/main-window.c:546 src/sendmsg-window.c:192
+#: src/addrbook-manager.c:199 src/main-window.c:511 src/sendmsg-window.c:192
 msgid "Help"
 msgstr ""
 
-#: src/addrbook-manager.c:187 src/main-window.c:377
+#: src/addrbook-manager.c:187 src/main-window.c:343
 msgid "File"
 msgstr ""
 
-#: src/main-window.c:334
+#: src/main-window.c:292
 msgid "Get New Mail"
 msgstr ""
 
-#.
-#. w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Save mailbox..."));
-#. gtk_widget_show (w);
-#. gtk_menu_append (GTK_MENU (menu), w);
-#. menu_items[i++] = w;
-#.
-#. w = gtk_menu_item_new ();
-#. gtk_widget_show (w);
-#. gtk_menu_append (GTK_MENU (menu), w);
-#.
-#. w = gnome_stock_menu_item (GNOME_STOCK_MENU_PRINT, _ ("Print..."));
-#. gtk_widget_show (w);
-#. gtk_menu_append (GTK_MENU (menu), w);
-#. menu_items[i++] = w;
-#.
-#. w = gtk_menu_item_new ();
-#. gtk_widget_show (w);
-#. gtk_menu_append (GTK_MENU (menu), w);
-#.
-#: src/main-window.c:367
+#: src/main-window.c:311
+msgid "Save mailbox..."
+msgstr ""
+
+#: src/main-window.c:320
+msgid "Print..."
+msgstr ""
+
+#: src/main-window.c:331
 msgid "Exit"
 msgstr ""
 
-#: src/main-window.c:385
+#: src/main-window.c:353
 msgid "New"
 msgstr ""
 
-#: src/main-window.c:395
+#: src/main-window.c:366
 msgid "Reply"
 msgstr ""
 
-#.
-#. w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Reply to All"));
-#. gtk_widget_show (w);
-#. gtk_menu_append (GTK_MENU (menu), w);
-#. menu_items[i++] = w;
-#.
-#: src/main-window.c:410
+#: src/main-window.c:382
+msgid "Reply to All"
+msgstr ""
+
+#: src/main-window.c:391
 msgid "Foward"
 msgstr ""
 
-#: src/main-window.c:433
+#: src/main-window.c:406
+msgid "Redirect"
+msgstr ""
+
+#: src/main-window.c:411
+msgid "Send again"
+msgstr ""
+
+#: src/main-window.c:423
 msgid "Delete"
 msgstr ""
 
-#: src/main-window.c:443
+#: src/main-window.c:439
 msgid "Undelete"
 msgstr ""
 
-#: src/main-window.c:463
+#: src/main-window.c:464
 msgid "Preferences..."
 msgstr ""
 
-#: src/main-window.c:473
+#: src/main-window.c:476
 msgid "Mailbox Manager..."
 msgstr ""
 
-#: src/main-window.c:483
+#: src/main-window.c:488
 msgid "Settings"
 msgstr ""
 
-#: src/main-window.c:494
-msgid "Toolbar"
-msgstr ""
-
-#: src/main-window.c:500
-msgid "Icons"
-msgstr ""
-
-#: src/main-window.c:509
-msgid "Text"
-msgstr ""
-
-#: src/main-window.c:518
-msgid "Both"
-msgstr ""
-
-#: src/main-window.c:527
-msgid "View"
-msgstr ""
-
-#: src/main-window.c:537
+#: src/main-window.c:498
 msgid "About"
 msgstr ""

@@ -358,11 +358,17 @@ void
 libbalsa_wrap_string(gchar * str, int width)
 {
     const int minl = width / 2;
-    gchar *lnbeg, *sppos, *ptr;
+
+    gchar *space_pos, *ptr;
     gint te = 0;
 
+    gint ptr_offset, line_begin_offset, space_pos_offset;
+
     g_return_if_fail(str != NULL);
-    lnbeg = sppos = ptr = str;
+
+
+    line_begin_offset = ptr_offset = space_pos_offset = 0;
+    space_pos = ptr = str;
 
     while (*ptr) {
 	switch (*ptr) {
@@ -370,19 +376,22 @@ libbalsa_wrap_string(gchar * str, int width)
 	    te += 7;
 	    break;
 	case '\n':
-	    lnbeg = ptr + 1;
+	    line_begin_offset = ptr_offset + 1;
 	    te = 0;
 	    break;
 	case ' ':
-	    sppos = ptr;
+	    space_pos = ptr;
+	    space_pos_offset = ptr_offset;
 	    break;
 	}
-	if (ptr - lnbeg >= width - te && sppos >= lnbeg + minl) {
-	    *sppos = '\n';
-	    lnbeg = sppos + 1;
+	if (ptr_offset - line_begin_offset >= width - te 
+	     && space_pos_offset >= line_begin_offset + minl) {
+	    *space_pos = '\n';
+	    line_begin_offset = space_pos_offset + 1;
 	    te = 0;
 	}
-	ptr++;
+	ptr=g_utf8_next_char(ptr);
+	ptr_offset++;
     }
 }
 
@@ -495,7 +504,7 @@ static void
 dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
                gboolean quote, GString * result)
 {
-    const gint max_width = to_screen ? G_MAXINT : MAX_WIDTH;
+    const gint max_width = to_screen ? G_MAXINT : MAX_WIDTH - 4;
 
     /* outer loop over paragraphs */
     while (list) {
@@ -543,16 +552,17 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
              * one word per inner loop
              * */
             while (*str) {
-                while (*str && !isspace((int)*str) && len < max_width) {
+                while (*str && !isspace((int)*str)
+                       && (str - start) < max_width) {
                     len++;
-                    str++;
+                    str = g_utf8_next_char(str);
                 }
-                while (len < max_width && isspace((int)*str)) {
+                while ((str - start) < max_width && isspace((int)*str)) {
                     if (*str == '\t')
                         len += 8 - len % 8;
                     else
                         len++;
-                    str++;
+                    str = g_utf8_next_char(str);;
                 }
                 /*
                  * to avoid some unnecessary space-stuffing,
@@ -560,12 +570,12 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
                  * (we already passed any spaces, so just check for '>'
                  * and "From ")
                  * */
-                if (len < max_width && *str
+                if ((str - start) < max_width && *str
                     && (*str == QUOTE_STRING[0]
                         || !strncmp(str, "From ", 5)))
                     continue;
 
-                if (!*str || len > width || len >= max_width) {
+                if (!*str || len > width || (str - start) >= max_width) {
                     /* allow an overlong first word, otherwise back up
                      * str */
                     if (len > width && !first_word)

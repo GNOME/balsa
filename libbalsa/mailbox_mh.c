@@ -64,6 +64,14 @@ static struct message_info *message_info_from_msgno(
 						  guint msgno);
 static LibBalsaMessage *libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox,
 						     guint msgno);
+static void libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox *
+							mailbox,
+							LibBalsaMessage *
+							message,
+							LibBalsaFetchFlag
+							flags);
+static void libbalsa_mailbox_mh_release_message(LibBalsaMailbox * mailbox,
+						LibBalsaMessage * message);
 static LibBalsaMessage *libbalsa_mailbox_mh_load_message(
 				    LibBalsaMailbox * mailbox, guint msgno);
 static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
@@ -126,6 +134,10 @@ libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass * klass)
     libbalsa_mailbox_class->sync = libbalsa_mailbox_mh_sync;
     libbalsa_mailbox_class->close_backend = libbalsa_mailbox_mh_close_backend;
     libbalsa_mailbox_class->get_message = libbalsa_mailbox_mh_get_message;
+    libbalsa_mailbox_class->fetch_message_structure =
+	libbalsa_mailbox_mh_fetch_message_structure;
+    libbalsa_mailbox_class->release_message =
+	libbalsa_mailbox_mh_release_message;
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_mh_add_message;
     libbalsa_mailbox_class->change_message_flags =
 	libbalsa_mailbox_mh_change_message_flags;
@@ -553,7 +565,8 @@ static void free_messages_info(GArray *messages_info)
 	msg_info = &g_array_index(messages_info, struct message_info, i);
 	g_free(msg_info->filename);
 	if (msg_info->mime_message)
-	    g_mime_object_unref(GMIME_OBJECT(msg_info->mime_message));
+	    g_object_remove_weak_pointer(G_OBJECT(msg_info->mime_message),
+					 (gpointer) &msg_info->mime_message);
     }
     messages_info->len=0;
 }
@@ -642,7 +655,9 @@ static gboolean libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox,
 	    /* free old information */
 	    g_free(msg_info->filename);
 	    if (msg_info->mime_message)
-		g_mime_object_unref(GMIME_OBJECT(msg_info->mime_message));
+		g_object_remove_weak_pointer(G_OBJECT(msg_info->mime_message),
+					     (gpointer) 
+					     &msg_info->mime_message);
 	    msg_info->filename = NULL;
 	    msg_info->mime_message = NULL;
 	    libbalsa_mailbox_msgno_removed(msg_info->message->mailbox,
@@ -905,41 +920,56 @@ static struct message_info *message_info_from_msgno( LibBalsaMailboxMh * mailbox
     return msg_info;
 }
 
-static LibBalsaMessage*
+static LibBalsaMessage *
 libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     struct message_info *msg_info;
 
-    g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox), NULL);
-    g_return_val_if_fail (MAILBOX_OPEN(mailbox), NULL);
+    msg_info =
+	message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox), msgno);
 
-    msg_info = message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox), msgno);
+    if (!msg_info->message)
+	msg_info->message =
+	    libbalsa_mailbox_mh_load_message(mailbox, msgno);
 
-    if (!msg_info)
-	return NULL;
-
-    if (!msg_info->mime_message)  {
-	const gchar *path = libbalsa_mailbox_local_get_path(mailbox);
-	gchar *filename = g_build_filename(path, msg_info->filename, NULL);
-
-	int fd = open(filename, O_RDONLY);
-	if (fd == -1)
-	    return NULL;
-
-	GMimeStream *gmime_stream = g_mime_stream_fs_new(fd);
-	GMimeParser *gmime_parser = g_mime_parser_new_with_stream(gmime_stream);
-	g_mime_parser_set_scan_from(gmime_parser, FALSE);
-
-	msg_info->mime_message = g_mime_parser_construct_message(gmime_parser);
-
-	g_object_unref(G_OBJECT(gmime_parser));
-	g_mime_stream_unref(gmime_stream);
-	g_free(filename);
-    }
-    if(!msg_info->message)
-	msg_info->message = libbalsa_mailbox_mh_load_message(mailbox, msgno);
-    msg_info->message->mime_msg = msg_info->mime_message;
     return msg_info->message;
+}
+
+static void
+libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox * mailbox,
+					    LibBalsaMessage * message,
+					    LibBalsaFetchFlag flags)
+{
+    if (!message->mime_msg) {
+	struct message_info *msg_info;
+
+	msg_info = message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox),
+					   message->msgno);
+
+	if (!msg_info->mime_message) {
+	    msg_info->mime_message =
+		_libbalsa_mailbox_local_get_mime_message(mailbox,
+							 msg_info->
+							 filename, NULL);
+	    g_object_add_weak_pointer(G_OBJECT(msg_info->mime_message),
+				      (gpointer) & msg_info->mime_message);
+	}
+	message->mime_msg = msg_info->mime_message;
+    }
+
+    LIBBALSA_MAILBOX_CLASS(parent_class)->fetch_message_structure(mailbox,
+								  message,
+								  flags);
+}
+
+static void
+libbalsa_mailbox_mh_release_message(LibBalsaMailbox * mailbox,
+				    LibBalsaMessage * message)
+{
+    if (message->mime_msg) {
+	g_object_unref(message->mime_msg);
+	message->mime_msg = NULL;
+    }
 }
 
 static LibBalsaMessage*

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8\n"
-"POT-Creation-Date: 2000-11-03 10:37+0200\n"
+"POT-Creation-Date: 2000-11-10 15:55+0200\n"
 "PO-Revision-Date: 1999-12-27 11:14+0200\n"
 "Last-Translator: Yuri Syrota <rasta@renome.rovno.ua>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -766,7 +766,7 @@ msgstr "До:"
 #. FIXME: Intl wierdness
 #: src/balsa-mblist.c:218 src/mailbox-conf.c:1023
 msgid "Mailbox"
-msgstr "Поштова скринька"
+msgstr "Скринька"
 
 #: src/balsa-mblist.c:218
 msgid "Unread"

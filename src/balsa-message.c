@@ -250,7 +250,7 @@ balsa_message_init(BalsaMessage * bm)
     bm->header_text = gtk_text_view_new();
     gtk_text_view_set_editable(GTK_TEXT_VIEW(bm->header_text), FALSE);
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(bm->header_text), 2);
-    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(bm->header_text), 2);
+    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(bm->header_text), 15);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(bm->header_text), GTK_WRAP_WORD);
     g_signal_connect(G_OBJECT(bm->header_text), "key_press_event",
 		     G_CALLBACK(balsa_message_key_press_event),
@@ -1629,7 +1629,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         item = gtk_text_view_new();
         gtk_text_view_set_editable(GTK_TEXT_VIEW(item), FALSE);
         gtk_text_view_set_left_margin(GTK_TEXT_VIEW(item), 2);
-        gtk_text_view_set_right_margin(GTK_TEXT_VIEW(item), 2);
+        gtk_text_view_set_right_margin(GTK_TEXT_VIEW(item), 15);
         gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(item), GTK_WRAP_WORD);
 
         /* set the message font */

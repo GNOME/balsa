@@ -68,6 +68,8 @@ extern "C" {
 	guint delete_sig_id;
 	gboolean modified;
 	gboolean flow;          /* send format=flowed */ 
+	gboolean quit_on_close; /* quit balsa after the compose window */
+				/* is closed.                          */
     };
 
     BalsaSendmsg *sendmsg_window_new(GtkWidget *, LibBalsaMessage *,
@@ -75,14 +77,15 @@ extern "C" {
     void sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
 				  const gchar* val);
 
-    void add_attachment(GnomeIconList * iconlist, char *filename, gboolean is_a_temp_file,
-			gchar *forced_mime_type);
+    void add_attachment(GnomeIconList * iconlist, char *filename, 
+			gboolean is_a_temp_file, gchar *forced_mime_type);
 
     typedef void (*field_setter)(BalsaSendmsg *d, const gchar*, const gchar*);
 
     void sendmsg_window_process_url(const char *url, field_setter func,
 				    void *data);
 
+#define SENDMSG_WINDOW_QUIT_ON_CLOSE(bsmsg) ((bsmsg)->quit_on_close=TRUE)
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

@@ -643,10 +643,9 @@ mw_set_next_unread(MessageWindow * mw)
     GtkWidget *toolbar =
 	balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
     LibBalsaMailbox *mailbox = mw->message->mailbox;
-    gint other_unread =
-	mailbox->unread_messages - LIBBALSA_MESSAGE_IS_UNREAD(mw->message);
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_UNREAD,
-				       other_unread > 0);
+				       mailbox
+				       && mailbox->unread_messages > 0);
 }
 
 static void

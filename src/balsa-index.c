@@ -905,14 +905,25 @@ bndx_find_row_and_select(BalsaIndex * index,
 			 gboolean threaded)
 {
     GtkTreeIter pos;
+    gboolean retval = FALSE;
 
     if (bndx_find_row(index, &pos, previous, flag, op, conditions, NULL,
 		      threaded)) {
 	bndx_expand_to_row_and_select(index, &pos, TRUE);
-	return TRUE;
+	retval = TRUE;
     }
 
-    return FALSE;
+    /* Mark as read; usually this will have been taken care of by
+     * libbalsa_message_body_ref, but we should make sure here. */
+    if ((LIBBALSA_MESSAGE_IS_UNREAD(index->current_message))) {
+	GList *messages = g_list_prepend(NULL, index->current_message);
+
+	libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_NEW,
+				      FALSE);
+	g_list_free(messages);
+    }
+
+    return retval;
 }
 
 /* bndx_find_row:
@@ -1235,6 +1246,7 @@ bndx_row_changed_cb(GtkTreeModel *model, GtkTreePath *path,
 	    bndx_select_next_threaded(bindex);
     }
     g_get_current_time (&bindex->last_use);
+    bndx_changed_find_row(bindex);
 }
 
 /* mailbox_messages_added_cb : callback for sync with backend; the signal

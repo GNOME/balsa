@@ -30,6 +30,14 @@
 #include "mblist-window.h"
 #include "misc.h"
 
+#include "pixmaps/mini_dir_closed.xpm"
+#include "pixmaps/mini_dir_open.xpm"
+
+GdkPixmap *open_folder;
+GdkPixmap *closed_folder;
+GdkBitmap *open_mask;
+GdkBitmap *closed_mask;
+
 typedef struct _MBListWindow MBListWindow;
 struct _MBListWindow
   {
@@ -57,6 +65,7 @@ mblist_open_window (GnomeMDI * mdi)
 {
   GtkWidget *bbox;
   GtkWidget *button;
+  GdkColor *transparent = NULL;
   gchar *text[] =
   {"Balsa"};
 
@@ -67,6 +76,13 @@ mblist_open_window (GnomeMDI * mdi)
 
   mblw->window = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (mblw->window), "Mailboxes");
+
+  gtk_widget_realize (mblw->window);
+  open_folder = gdk_pixmap_create_from_xpm_d (mblw->window->window,
+			       &open_mask, &transparent, mini_dir_open_xpm);
+
+  closed_folder = gdk_pixmap_create_from_xpm_d (mblw->window->window,
+			   &closed_mask, &transparent, mini_dir_closed_xpm);
 
   mblw->mdi = mdi;
   gtk_signal_connect (GTK_OBJECT (mblw->window),
@@ -160,16 +176,18 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	  if (!strcmp (MAILBOX_LOCAL (mbnode->mailbox)->path, mbnode->name))
 	    {
 	      /* probibly mh or maildir */
-	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2, NULL,
-				       NULL, NULL, NULL,
+	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2,
+				       NULL, NULL,
+				       NULL, NULL,
 				       G_NODE_IS_LEAF (gnode), TRUE);
 	      gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
 	    }
 	  else
 	    {
 	      /* normal mailbox */
-	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2, NULL,
-				       NULL, NULL, NULL,
+	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2,
+				       NULL, NULL,
+				       NULL, NULL,
 				       FALSE, TRUE);
 	      gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
 	    }
@@ -178,8 +196,9 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
   if (mbnode->name && !mbnode->mailbox)
     {
       /* new directory, but not a mailbox */
-      gtk_ctree_set_node_info (ctree, cnode, g_basename (mbnode->name), 2, NULL,
-			       NULL, NULL, NULL,
+      gtk_ctree_set_node_info (ctree, cnode, g_basename (mbnode->name), 2,
+			       closed_folder, closed_mask,
+			       open_folder, open_mask,
 			       G_NODE_IS_LEAF (gnode), TRUE);
     }
   return TRUE;
@@ -232,9 +251,10 @@ void
 mblist_add_mailbox (Mailbox * mailbox)
 {
   GtkCTreeNode *sibling;
-  gchar *text[] = {NULL};
-  
-  text[0]=mailbox->name;
+  gchar *text[] =
+  {NULL};
+
+  text[0] = mailbox->name;
 
   if (mailbox)
     {

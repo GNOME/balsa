@@ -40,6 +40,7 @@ UI:
      - open mailboxes on startup
      - load mail from local mail directory
  * spell checking in the send window
+ * menu and toolbar for message-window
 
 
 ----------------------------------

@@ -21,15 +21,14 @@
 
 #include "config.h"
 
-#include <glib.h>
 #include <ctype.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
 #endif
 
+
 #include "libbalsa.h"
-#include "libbalsa_private.h"
 #include "mailbackend.h"
 #include "misc.h"
 
@@ -37,9 +36,14 @@
 #include "threads.h"
 #endif
 
+#include <libgnome/gnome-defs.h> 
+#include <libgnome/gnome-config.h> 
+#include <libgnome/gnome-i18n.h> 
+
 #ifdef BALSA_SHOW_ALL
 #include "mailbox-filter.h"
 #endif
+#include "libbalsa_private.h"
 
 /* GTK_CLASS_TYPE for 1.2<->1.3/2.0 GTK+ compatibility */
 #ifndef GTK_CLASS_TYPE

@@ -198,7 +198,7 @@ static GnomeUIInfo file_menu[] = {
     { GNOME_APP_UI_ITEM, N_("_Send"),
       N_("Send this message"),
       send_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_MENU_SEND, 'S', GDK_CONTROL_MASK, NULL },
+      BALSA_PIXMAP_MENU_SEND, 'S', GDK_CONTROL_MASK|GDK_MOD1_MASK, NULL },
 #define MENU_FILE_QUEUE_POS 6
     { GNOME_APP_UI_ITEM, N_("_Queue"),
       N_("Queue this message in Outbox for sending"),
@@ -930,7 +930,8 @@ prep_signature(LibBalsaIdentity* ident, gchar* sig)
 {
     gchar* sig_tmp;
 
-    g_return_val_if_fail(sig != NULL, NULL);
+    /* empty signature is a legal signature */
+    if(sig == NULL) return NULL;
     
     if (ident->sig_separator && g_strncasecmp(sig, "-- \n", 5)) {
         sig_tmp = g_strconcat("\n-- \n", sig, NULL);

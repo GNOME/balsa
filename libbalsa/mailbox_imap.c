@@ -33,6 +33,8 @@
 #include <pthread.h>
 #endif
 
+#include <gnome.h> /* for gnome-i18n.h, gnome-config and gnome-util */
+
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "mx.h"
@@ -46,7 +48,6 @@
 
 #include "imap/imap.h"
 #include "mutt_socket.h"
-
 
 #define IMAP_MESSAGE_UID(msg) (((IMAP_HEADER_DATA*)(msg)->header->data)->uid)
 

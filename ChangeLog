@@ -1,5 +1,7 @@
-2004-06-04 11:56  PeterB
+2004-06-04 16:00  PeterB
 
+	* libbalsa/filter-funcs.c: eat space between left and right
+	conditions.
 	* src/main-window.c: document, and fix typo.
 	* src/: balsa-app.c, balsa-index.c, filter-run-callbacks.c,
 	main-window.c, main-window.h, pref-manager.c: don't refer to

@@ -792,7 +792,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 {
   GtkWidget *window;
   GtkWidget *paned = gtk_vpaned_new ();
-  gchar *newsubject = NULL;
+  gchar *newsubject = NULL, *tmp;
   BalsaSendmsg *msg = NULL;
 
   msg = g_malloc (sizeof (BalsaSendmsg));
@@ -848,7 +848,6 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   if (type == SEND_REPLY || type == SEND_REPLY_ALL)
     {
       Address *addr = NULL;
-      gchar *tmp;
 
       if (message->reply_to)
 	addr = message->reply_to;
@@ -888,56 +887,46 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
   /* Subject: */
   switch (type)
-    {
-    case SEND_REPLY:
-    case SEND_REPLY_ALL:
-      {
-	gchar *tmp;
-
+  {
+     case SEND_REPLY:
+     case SEND_REPLY_ALL:
 	if (!message->subject)
-	  {
-	    newsubject = g_strdup ("Re: ");
-	    break;
-	  }
-
+	{
+	   newsubject = g_strdup ("Re: ");
+	   break;
+	}
+	
 	tmp = message->subject;
 	if ((strlen (tmp) < 2) ||
 	    (toupper (tmp[0]) != 'R' &&
 	     toupper (tmp[1]) != 'E' &&
 	     tmp[2] != ':'))
-	  {
-	    newsubject = g_strdup_printf ("Re: %s", message->subject);
-	    break;
-	  }
+	{
+	   newsubject = g_strdup_printf ("Re: %s", message->subject);
+	   break;
+	}
 	newsubject = g_strdup(message->subject);
-      }
-      break;
-
-    case SEND_FORWARD:
-      {
-	gchar *tmp;
-
-	if (!message->subject)
-	  {
-	    newsubject = g_strdup ("Fw: ");
-	    break;
-	  }
-
-
-	tmp = message->subject;
-	if ((strlen (tmp) < 2) ||
-	    (toupper (tmp[0]) != 'F' &&
-	     toupper (tmp[1]) != 'W' &&
-	     tmp[2] != ':'))
-	  {
-	    newsubject = g_strdup_printf ("Fw: %s", message->subject);
-	    break;
-	  }
-      }
-      break;
-    default:
-      break;
-    }
+	break;
+	
+     case SEND_FORWARD:
+	if (!message->subject) {
+	   if (message->from && message->from->mailbox)
+	      newsubject = g_strdup_printf ("Forwarded message from %s", 
+					    message->from->mailbox);
+	   else
+	      newsubject = g_strdup ("Forwarded message");	  
+	} else {
+	   if (message->from && message->from->mailbox)
+	      newsubject = g_strdup_printf ("[%s: %s]", 
+					    message->from->mailbox, 
+					    message->subject);
+	   else
+	      newsubject = g_strdup_printf ("Fwd: %s", message->subject);
+	}
+	break;
+     default:
+	break;
+  }
 
   if (type == SEND_REPLY ||
       type == SEND_REPLY_ALL ||
@@ -949,8 +938,6 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
     }
 
   if (type == SEND_CONTINUE) {
-    gchar *tmp;
-
     if (message->to_list) {
       tmp = make_string_from_list (message->to_list);
       gtk_entry_set_text (GTK_ENTRY (msg->to[1]), tmp);
@@ -972,8 +959,6 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
   if (type == SEND_REPLY_ALL)
     {
-      gchar *tmp;
-
       tmp = make_string_from_list (message->to_list);
       gtk_entry_set_text (GTK_ENTRY (msg->cc[1]), tmp);
       g_free (tmp);

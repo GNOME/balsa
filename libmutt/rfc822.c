@@ -38,7 +38,8 @@ const char RFC822Specials[] = "@.,:;<>[]\\\"()";
 
 int RFC822Error = 0;
 
-/* these must defined in the same order as the numerated errors given in rfc822.h */
+/* these must defined in the same order as the numerated errors given in 
+   rfc822.h */
 const char *RFC822Errors[] = {
   "out of memory",
   "mismatched parenthesis",
@@ -426,8 +427,11 @@ ADDRESS *rfc822_parse_adrlist (ADDRESS *top, const char *s)
       {
 	if (cur->personal)
 	  FREE (&cur->personal);
-	/* if we get something like "Michael R. Elkins" remove the quotes */
-	rfc822_dequote_comment (phrase);
+	/* if we get something like "Michael R. Elkins" remove the quotes -
+	 - but only in the case it would not introduce ambiguities.
+	The forbidden character set might be too narrow...*/
+	if(strpbrk(phrase, ",;") == NULL)
+	  rfc822_dequote_comment (phrase);
 	cur->personal = safe_strdup (phrase);
       }
       if ((ps = parse_route_addr (s + 1, comment, &commentlen, sizeof (comment) - 1, cur)) == NULL)

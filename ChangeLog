@@ -1,3 +1,9 @@
+2000-03-20 Pawel Salek <pawsa@theochem.kth.se>
+	
+	* libbalsa/libbalsa_private.h: less verbose threaded mbox locking
+	* libmutt/rfc822.c: de-quotation handles commas in comments
+	* src/sendmsg-window.c: forward subject clarified.
+	
 2000-03-17 Matthew Guenther <mguenther@netcom.ca>
 	* src/sendmsg-window.c (bsmsg2message): enable In-Reply-To and 
 	References headers

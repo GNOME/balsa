@@ -2,19 +2,27 @@
 
 #ifdef BALSA_USE_THREADS
 
+#ifdef DEBUG
+#define DMSG1(s) fprintf(stderr,s)
+#define DMSG2(a,b) fprintf(stderr,a,b)
+#else
+#define DMSG1(s)
+#define DMSG2(a,b)
+#endif
+
 #define LOCK_MAILBOX(mailbox)\
 do {\
   pthread_mutex_lock( &mailbox_lock );\
     if ( !mailbox->lock )\
     {\
-	  fprintf( stderr, "Locking mailbox %s\n", mailbox->name );\
+	  DMSG2("Locking mailbox %s\n", mailbox->name );\
       mailbox->lock = TRUE;\
       pthread_mutex_unlock( &mailbox_lock );\
       break;\
     }\
   else\
     {\
-      fprintf( stderr, "... Mailbox lock collision ..." );\
+      DMSG1("... Mailbox lock collision ..." );\
       pthread_mutex_unlock( &mailbox_lock );\
       usleep( 250 );\
     }\
@@ -25,14 +33,14 @@ do {\
   pthread_mutex_lock( &mailbox_lock );\
     if ( !mailbox->lock )\
     {\
-	  fprintf( stderr, "Locking mailbox \n" );\
+	  DMSG1( "Locking mailbox \n" );\
       mailbox->lock = TRUE;\
       pthread_mutex_unlock( &mailbox_lock );\
       break;\
     }\
   else\
     {\
-      fprintf( stderr, "Mailbox lock collision \n" );\
+      DMSG1( "Mailbox lock collision \n" );\
       pthread_mutex_unlock( &mailbox_lock );\
       usleep( 250 );\
     }\
@@ -40,7 +48,7 @@ do {\
 
 #define UNLOCK_MAILBOX(mailbox)\
 do {\
-  fprintf(stderr, "Unlocking mailbox \n" );\
+  DMSG1( "Unlocking mailbox \n" );\
   pthread_mutex_lock( &mailbox_lock );\
   mailbox->lock = FALSE;\
   pthread_mutex_unlock( &mailbox_lock );\

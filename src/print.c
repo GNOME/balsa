@@ -987,7 +987,26 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
 static GnomeFont *
 find_font(const gchar * name)
 {
+#ifdef GNOME_FONT_FIND_HANDLES_BAD_NAME_SANELY
     return gnome_font_find_from_full_name(name);
+#else
+    gchar *copy;
+    gchar *space;
+    GnomeFontFace *face;
+    GnomeFont *font = NULL;
+
+    copy = g_strdup(name);
+    space = strrchr(copy, ' ');
+    if (space)
+        *space = 0;
+    face = gnome_font_face_find(copy);
+    g_free(copy);
+    if (face) {
+        gnome_font_face_unref(face);
+        font = gnome_font_find_from_full_name(name);
+    }
+    return font;
+#endif          /*  GNOME_FONT_FIND_HANDLES_BAD_NAME_SANELY */
 }
 
 static gdouble
@@ -1266,7 +1285,7 @@ font_info_setup(FontInfo * fi, gchar ** font_name, CommonInfo * ci)
     fi->common_info = ci;
     fi->font = find_font(*font_name);
     if (!fi->font)
-	balsa_information(LIBBALSA_INFORMATION_ERROR,
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Balsa could not find font \"%s\".\n"
 			    "Use the \"Fonts\" page on the "
                             "\"Print message\" dialog to change it."),
@@ -1276,7 +1295,10 @@ font_info_setup(FontInfo * fi, gchar ** font_name, CommonInfo * ci)
 static void
 font_info_cleanup(FontInfo * fi)
 {
-    g_object_unref(fi->font);
+    if (fi->font) {
+        g_object_unref(fi->font);
+        fi->font = NULL;
+    }
 }
 
 /*

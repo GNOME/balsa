@@ -407,12 +407,7 @@ libbalsa_mailbox_link_message(LibBalsaMailboxLocal *mailbox,
  * private 
  * PS: called by mail_progress_notify_cb:
  * loads incrementally new messages, if any.
- *  Mailbox lock MUST NOT BE HELD before calling this function.
- *  gdk_lock MUST BE HELD before calling this function because it is called
- *  from both threading and not threading code and we want to be on the safe
- *  side.
- * 
- *    FIXME: create the msg-tree in a correct way
+ *  Mailbox lock MUST BE HELD before calling this function.
  */
 void
 libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox)
@@ -421,10 +416,10 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox)
     LibBalsaMessage *message;
     GList *messages=NULL;
 
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
     if (MAILBOX_CLOSED(mailbox))
 	return;
 
-    LOCK_MAILBOX(mailbox);
     for (msgno = mailbox->messages + 1; mailbox->new_messages > 0; msgno++) {
 	message = libbalsa_mailbox_local_load_message(mailbox, msgno);
 	if (!message)
@@ -434,7 +429,6 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox)
                                       message);
 	messages=g_list_prepend(messages, message);
     }
-    UNLOCK_MAILBOX(mailbox);
 
     if(messages!=NULL){
 	messages = g_list_reverse(messages);
@@ -444,8 +438,6 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox)
 
     libbalsa_mailbox_set_unread_messages_flag(mailbox,
 					      mailbox->unread_messages > 0);
-
-    
 }
 
 static void
@@ -605,12 +597,13 @@ libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
                                       LibBalsaFetchFlag flags)
 {
     LibBalsaMessageBody *body;
-    GMimeMessage *mime = message->mime_msg;
-    g_return_if_fail(mime);
+    GMimeMessage *mime_message = message->mime_msg;
+    g_assert(mime_message != NULL);
+    g_assert(mime_message->mime_part != NULL);
 
     body = libbalsa_message_body_new(message);
     libbalsa_message_body_set_mime_body(body,
-                                        mime->mime_part);
+                                        mime_message->mime_part);
     libbalsa_message_append_part(message, body);
 }
 
@@ -1152,21 +1145,12 @@ _libbalsa_mailbox_local_get_mime_message(LibBalsaMailbox * mailbox,
 					 const gchar * name1,
 					 const gchar * name2)
 {
-    const gchar *path;
-    gchar *filename;
     GMimeStream *mime_stream;
     GMimeParser *mime_parser;
     GMimeMessage *mime_message;
-    gint fd;
 
-    path = libbalsa_mailbox_local_get_path(mailbox);
-    filename = g_build_filename(path, name1, name2, NULL);
-    fd = open(filename, O_RDONLY);
-    g_free(filename);
-    if (fd == -1)
-	return NULL; /* FIXME with a warning? */
-
-    mime_stream = g_mime_stream_fs_new(fd);
+    mime_stream =
+	_libbalsa_mailbox_local_get_message_stream(mailbox, name1, name2);
     mime_parser = g_mime_parser_new_with_stream(mime_stream);
     g_mime_parser_set_scan_from(mime_parser, FALSE);
     mime_message = g_mime_parser_construct_message(mime_parser);
@@ -1175,4 +1159,33 @@ _libbalsa_mailbox_local_get_mime_message(LibBalsaMailbox * mailbox,
     g_mime_stream_unref(mime_stream);
 
     return mime_message;
+}
+
+GMimeStream *
+_libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox * mailbox,
+					   const gchar * name1,
+					   const gchar * name2)
+{
+    const gchar *path;
+    gchar *filename;
+    int fd;
+    GMimeStream *stream = NULL;
+
+    path = libbalsa_mailbox_local_get_path(mailbox);
+    filename = g_build_filename(path, name1, name2, NULL);
+
+    fd = open(filename, O_RDONLY);
+    if (fd != -1) {
+	stream = g_mime_stream_fs_new(fd);
+	if (stream)
+	    g_mime_stream_set_bounds(stream, 0,
+				     g_mime_stream_length(stream));
+	else
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("Open of %s failed. Errno = %d, "),
+				 filename, errno);
+    }
+    g_free(filename);
+
+    return stream;
 }

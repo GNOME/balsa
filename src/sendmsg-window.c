@@ -417,17 +417,32 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
 {
   GtkFileSelection *fs;
   GnomeIconList *iconlist;
-  gchar *filename;
+  gchar *filename, *dir, *p;
+  GList * node;
 
   fs = GTK_FILE_SELECTION (data);
   iconlist = GNOME_ICON_LIST (gtk_object_get_user_data (GTK_OBJECT (fs)));
 
-  filename = g_strdup (gtk_file_selection_get_filename (fs));
-  add_attachment (iconlist, filename);
+  dir = g_strdup(gtk_file_selection_get_filename(fs));
+  p = strrchr(dir, '/');
+  if (p)
+      *(p + 1) = '\0';
+
+  for(node = GTK_CLIST(fs->file_list)->selection; node; 
+      node = g_list_next(node) ) {
+      gtk_clist_get_text(GTK_CLIST(fs->file_list), 
+			 GPOINTER_TO_INT(node->data), 0, &p);
+      filename = g_strconcat(dir, p, NULL);
+      printf("open file %s\n", filename);
+      add_attachment (iconlist, filename);
+  }
+  /* filename = g_strdup (gtk_file_selection_get_filename (fs));
+     add_attachment (iconlist, filename); */
 
   /* do not g_free(filename) - the add_attachment arg is not const */
 
   gtk_widget_destroy (GTK_WIDGET (fs));
+  g_free(dir);
 }
 
 /* attach_clicked - menu and toolbar callback */
@@ -447,13 +462,15 @@ attach_clicked (GtkWidget * widget, gpointer data)
   gtk_object_set_user_data (GTK_OBJECT (fsw), iconlist);
 
   fs = GTK_FILE_SELECTION (fsw);
+  gtk_clist_set_selection_mode(GTK_CLIST(fs->file_list), 
+			       GTK_SELECTION_EXTENDED);
 
   gtk_signal_connect (GTK_OBJECT (fs->ok_button), "clicked",
 		      (GtkSignalFunc) attach_dialog_ok,
 		      fs);
-  gtk_signal_connect (GTK_OBJECT (fs->cancel_button), "clicked",
+  gtk_signal_connect_object (GTK_OBJECT (fs->cancel_button), "clicked",
 		      (GtkSignalFunc) GTK_SIGNAL_FUNC(gtk_widget_destroy),
-		      fs);
+		      GTK_OBJECT(fsw) );
 
   gtk_widget_show (fsw);
 

@@ -1,5 +1,9 @@
 2000-04-07 Pawel Salek <pawsa@theochem.kth.se>
 
+	* src/sendmsg-window.c: multiple attachment selection.
+
+2000-04-07 Pawel Salek <pawsa@theochem.kth.se>
+
 	* libbalsa/message.c,libbalsa/misc.[hc],src/balsa-message.c:
 	showing all and selected headers completed.
 	

@@ -68,6 +68,8 @@ libmutt_a_SOURCES = \
 	sort.h		\
 	thread_msgs.h
 
+SUBDIRS = imap
+
 #CPPFLAGS=-DSHAREDIR=\"$(sharedir)\" -DLIBMUTT -DVERSION=\"$(VERSION)\"
 CPPFLAGS=-DSHAREDIR=\"$(sharedir)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DLIBMUTT
 INCLUDES=-I.

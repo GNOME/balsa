@@ -270,10 +270,10 @@ int mutt_buffy_check (int force)
   static time_t last_imap_check = 0;
   int do_imap_check = 1;
 
-  if (ImapCheckTime)
+  if (ImapCheckTimeout)
   {
     time_t now = time (NULL);
-    if (!force && (now - last_imap_check < ImapCheckTime))
+    if (!force && (now - last_imap_check < ImapCheckTimeout))
       do_imap_check = 0;
     else
       last_imap_check = now;

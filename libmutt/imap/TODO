@@ -1,0 +1,83 @@
+IMAP enhancements, by priority:
+
+[ -- socket -- ]
+* Smarter connection code. Mutt should handle dropped connections/routing
+  problems gracefully. It should be able to transparently reconnect. This
+  is facilitated by the next item.
+
+  PRIORITY: [***]
+
+* General connection code rewrite. All commands should be queued via
+  a single interface for communicating with the server. Nothing should
+  have to read or write directly to the socket.
+
+  PRIORITY: [***]
+
+[ -- browsing -- ]
+* Investigate a new way of displaying folders with subfolders and messages.
+  Possibly we could use a tree-view in the browser, w/ expand, collapse.
+  For low-bandwidth lines we could defer getting subfolder lists until the
+  folder is expanded.
+  Current thought is that <ENTER> will select a mailbox if it doesn't have
+  subfolders or enter the folder if it does. If it has messages and subfolders,
+  we'll use a new key to select it as a mailbox.
+  We should maybe add a new imap_format string for IMAP browsing, without all
+  the stat variables but with tags like how many messages are in the folders,
+  how many subfolders, that weird \Marked tag, etc.
+ 
+  PRIORITY: [** ]
+
+* See if we can't add more info to the IMAP browser than just name (without
+  incurring too much overhead). eg which folders contain new mail, size,
+  number of messages.
+
+  PRIORITY: [** ]
+
+[ -- speed -- ]
+* Persistent caching of data. I think the nicest way to do this is to store
+  local copies like IMAP does, with an invisible control message at the top,
+  and extra invisible headers in the message (for UID/dirty bits). This does
+  some nice things:
+  o We can use the existing mbox driver.
+  o Mutt can read mail stored in IMAP spools transparently and
+    nondestructively.
+  o An IMAP server could function off of a local cache - maybe we can begin
+    to develop some sort of IMAP clustering system.
+  Disadvantage:
+  o IMAP can't discriminate between its own store and a fake Mutt cache. If
+    the server changes its file format, bad things might happen. Could be
+    worked around with a specific Mutt header in all messages, probably.
+
+  PRIORITY: [*  ]
+
+* Instead of testing for the existence of a mailbox for APPEND, just append
+  and create/retry on failure. This is only a small bandwidth savings, but
+  it should be easy.
+
+  PRIORITY: [*  ]
+
+[ -- new features -- ]
+* Implement the received folder on IMAP, now that COPY is done
+
+  PRIORITY: [** ]
+
+* Commands for creating/deleting folders on the server, since users may not
+  otherwise be able to do this on IMAP servers.
+  Delete done, still must implement create.
+
+  PRIORITY: [** ]
+
+* Implement READ-ONLY support, and the x (quit without saving changes)
+  command.
+
+  PRIORITY: [** ]
+
+* Create a logout command, so users can reconnect with different account
+  information without quitting mutt. Note: Tommi Komulainen's
+  multiple-account code makes this unnecessary - just use an account of
+  the form {username@host}
+
+  PRIORITY: [*  ]
+
+Brendan Cully <brendan@kublai.com>
+Updated: 19991227

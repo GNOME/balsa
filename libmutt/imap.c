@@ -2007,10 +2007,10 @@ int imap_check_mailbox (CONTEXT *ctx, int *index_hint)
   char buf[LONG_STRING];
   static time_t checktime=0;
 
-  if (ImapCheckTime)
+  if (ImapCheckTimeout)
   {
     time_t k=time(NULL);
-    if (checktime && (k-checktime < ImapCheckTime)) return 0;
+    if (checktime && (k-checktime < ImapCheckTimeout)) return 0;
     checktime=k;
   }
 

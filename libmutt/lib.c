@@ -406,6 +406,26 @@ char *safe_strdup (const char *s)
   return (p);
 }
 
+const char *mutt_stristr (const char *haystack, const char *needle)
+{
+  const char *p, *q;
+
+  if (!haystack)
+    return NULL;
+  if (!needle)
+    return (haystack);
+
+  while (*(p = haystack))
+  {
+    for (q = needle; *p && *q && tolower (*p) == tolower (*q); p++, q++)
+      ;
+    if (!*q)
+      return (haystack);
+    haystack++;
+  }
+  return NULL;
+}
+
 char *mutt_skip_whitespace (char *p)
 {
   SKIPWS (p);

@@ -42,8 +42,11 @@ WHERE char *Homedir;
 WHERE char *Hostname;
 #ifdef USE_IMAP
 WHERE char *ImapUser INITVAL (NULL);
+WHERE char *ImapCRAMKey INITVAL (NULL);
 WHERE char *ImapPass INITVAL (NULL);
-WHERE short ImapCheckTime;
+WHERE short ImapCheckTimeout;
+WHERE char *ImapHomeNamespace INITVAL (NULL);
+WHERE char *ImapPreconnect INITVAL (NULL);
 #endif
 WHERE char *InReplyTo;
 WHERE char *Inbox;

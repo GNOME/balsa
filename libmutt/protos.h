@@ -299,6 +299,8 @@ void *safe_malloc (size_t);
 void safe_realloc (void **, size_t);
 void safe_free (void **);
 
+const char *mutt_stristr (const char *, const char *);
+
 int safe_open (const char *, int);
 int safe_symlink (const char *, const char *);
 FILE *safe_fopen (const char *, const char *);

@@ -600,6 +600,9 @@ typedef struct header
   struct header *last_sort; /* last message in subthread, for secondary SORT_LAST */
   char *tree;            /* character string to print thread tree */
 
+#ifdef USE_IMAP
+  void *data;            /* driver-specific data (only used by IMAP */
+#endif
 } HEADER;
 
 #include "mutt_regex.h"

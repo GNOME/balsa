@@ -212,6 +212,106 @@ AC_ARG_WITH(domain, [  --with-domain=DOMAIN       Specify your DNS domain name ]
 
 AC_DEFINE(USE_POP)
 AC_DEFINE(USE_IMAP)
+AC_CHECK_FUNC(setsockopt, , AC_CHECK_LIB(socket, setsockopt))
+AC_CHECK_FUNC(gethostent, , AC_CHECK_LIB(nsl, gethostent))
+LIBIMAP="-Limap -limap"
+LIBIMAPDEPS="\$(top_srcdir)/imap/imap.h imap/libimap.a"
+AM_CONDITIONAL(BUILD_IMAP, test x$need_imap = xyes)
+
+AC_ARG_WITH(gss,    [    --with-gss[=DIR]         Compile in GSSAPI authentication for IMAP],
+	[
+	if test "$need_imap" != "yes"
+        then
+          AC_MSG_ERROR([GSS support is only for IMAP, but IMAP is not enabled])
+        fi
+
+	if test "$with_gss" != "no"
+	then
+	  if test "$with_gss" != "yes"
+	  then
+	    CPPFLAGS="$CPPFLAGS -I$with_gss/include"
+	    LDFLAGS="$LDFLAGS -L$with_gss/lib"
+	  fi
+
+  	  saved_LIBS="$LIBS"
+          gss_type="none"
+
+          dnl New MIT kerberos V support
+          AC_CHECK_LIB(gssapi_krb5, gss_init_sec_context, [
+            gss_type="MIT",
+            MUTTLIBS="$MUTTLIBS -lgssapi_krb5 -lkrb5 -lk5crypto -lcom_err"
+            ],, -lkrb5 -lk5crypto -lcom_err)
+
+          dnl Heimdal kerberos V support
+          if test x$gss_type = xnone
+          then
+            AC_CHECK_LIB(gssapi, gss_init_sec_context, [
+              gss_type="Heimdal",
+              MUTTLIBS="$MUTTLIBS -lgssapi -lkrb5 -ldes -lasn1 -lroken"
+              MUTTLIBS="$MUTTLIBS -lcrypt -lcom_err"
+              AC_DEFINE(HAVE_HEIMDAL)
+              ],, -lkrb5 -ldes -lasn1 -lroken -lcrypt -lcom_err)
+          fi
+
+	  dnl Old MIT Kerberos V
+	  dnl Note: older krb5 distributions use -lcrypto instead of
+	  dnl -lk5crypto, which collides with OpenSSL.  One way of dealing
+	  dnl with that is to extract all objects from krb5's libcrypto
+	  dnl and from openssl's libcrypto into the same directory, then
+	  dnl to create a new libcrypto from these.
+          if test x$gss_type = xnone
+          then
+            AC_CHECK_LIB(gssapi_krb5, g_order_init, [
+              gss_type="OldMIT",
+              MUTTLIBS="$MUTTLIBS -lgssapi_krb5 -lkrb5 -lcrypto -lcom_err"
+              ],, -lkrb5 -lcrypto -lcom_err)
+          fi
+
+          if test x$gss_type = xnone
+          then
+            AC_CACHE_SAVE
+            AC_MSG_ERROR([GSSAPI support not found])
+          fi
+
+  	  LIBS="$saved_LIBS"
+  	  AC_DEFINE(USE_GSS)
+            need_gss="yes"
+  	fi
+
+])
+AM_CONDITIONAL(USE_GSS, test x$need_gss = xyes)
+
+AC_ARG_WITH(ssl, [    --with-ssl[=PFX]         Compile in SSL socket support for IMAP],
+[	if test "$with_ssl" != "no"
+	then
+	  if test "$need_imap" != "yes"; then
+	   AC_MSG_ERROR([SSL support is only for IMAP, but IMAP is not enabled])
+	  fi
+
+	  if test "$with_ssl" != "yes"
+	  then
+	   LDFLAGS="$LDFLAGS -L$withval/lib"
+	   CPPFLAGS="$CPPFLAGS -I$withval/include"
+	  fi	
+	  saved_LIBS="$LIBS"
+
+	  AC_CHECK_LIB(crypto, X509_new,, AC_MSG_ERROR([Unable to find SSL library]))
+	  AC_CHECK_LIB(ssl, SSL_new,, AC_MSG_ERROR([Unable to find SSL library]), -lcrypto)
+
+	  AC_CHECK_FUNCS(RAND_status RAND_egd)
+
+	  AC_DEFINE(USE_SSL)
+	  LIBS="$saved_LIBS"
+	  MUTTLIBS="$MUTTLIBS -lssl -lcrypto"
+	  need_ssl=yes
+
+          dnl Some systems avoid certain patent-encumbered SSL routines
+          AC_CHECK_HEADER(openssl/rc5.h,,AC_DEFINE(NO_RC5))
+          AC_CHECK_HEADER(openssl/idea.h,,AC_DEFINE(NO_IDEA))
+          AC_CHECK_HEADER(openssl/rsa.h,,AC_DEFINE(NO_RSA))
+	fi
+])
+AM_CONDITIONAL(USE_SSL, test x$need_ssl = xyes)
 
 mutt_cv_flock=yes
 AC_ARG_ENABLE(flock, [  --disable-fcntl            Do NOT use flock() to lock files ],
@@ -255,5 +355,7 @@ AC_SUBST(MUTT_MAJOR)
 AC_SUBST(MUTT_REVISION)
 AC_SUBST(MUTT_PATCHLEVEL)
 AC_SUBST(MUTT_VERSION)
+AC_SUBST(LIBIMAP)
+AC_SUBST(LIBIMAPDEPS)
 
-AC_OUTPUT(Makefile)
+AC_OUTPUT(Makefile imap/Makefile)

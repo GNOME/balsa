@@ -485,6 +485,10 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
 	    fclose(part);
 	    }
     }
+
+    /* fake an empty buffer if textbuf is NULL */
+    if (!pdata->textbuf)
+	pdata->textbuf = g_strdup("");
     
     /* wrap lines (if necessary) */
     font = gnome_font_new(BALSA_PRINT_BODY_FONT, BALSA_PRINT_BODY_SIZE);

@@ -1307,7 +1307,9 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 #endif
     } else {
 	regex_t rex, url_reg;
-	const char *url_str = "\\<((ht|f)tp[s]?://[^[:blank:]]+)\\>";
+	const char *url_str = 
+	    "(http|ftp)s?://(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,[:alnum:]])+";
+
 
 	GtkWidget *item = NULL;
 	GdkFont *fnt = NULL;
@@ -1343,7 +1345,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	   style = gtk_widget_get_style (GTK_WIDGET (bm));
 	   color = (GdkColor) style->text[GTK_STATE_PRELIGHT];
 	*/
-	if (regcomp(&url_reg, url_str, REG_EXTENDED) != 0)
+	if (regcomp(&url_reg, url_str, REG_EXTENDED|REG_ICASE) != 0)
 	    g_warning
 		("part_info_init_mimetext: url regex compilation failed.");
 	if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0) {

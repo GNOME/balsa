@@ -1,3 +1,7 @@
+2005-03-18 16:29  PeterB
+
+	* src/main.c: get mbnode before checking it.
+
 2005-03-17 Pawel Salek
 
 	* libbalsa/imap/imap-handle.c: make the IDLE code behave better

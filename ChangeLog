@@ -1,3 +1,9 @@
+2002-01-21  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/save-restore.c: limit items by MAXTOOLBARITEMS
+	* src/toolbar-prefs.c: clean up, make tool move arrow sensitive
+	properly (Peter B).
+
 2002-01-20  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* balsa.spec.in: "requires: pspell" was missing.

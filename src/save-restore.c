@@ -157,9 +157,8 @@ load_toolbars(void)
 	
 	sprintf(tmpkey, "Toolbar%dItemCount", i);
 	items=d_get_gint(tmpkey, 0);
-        if(items>=MAXTOOLBARS)        /* most likely, this means   */
-            items=MAXTOOLBARS-1;      /* configure file corruption */
-
+        if(items>=MAXTOOLBARITEMS)        /* most likely, this means   */
+            items=MAXTOOLBARITEMS-1;      /* configure file corruption */
 	
 	for(j=0; j<items; j++) {
 	    sprintf(tmpkey, "Toolbar%dItem%d", i, j);

@@ -246,25 +246,26 @@ get_toolbar_data(BalsaToolbarType toolbar)
     }
 }
 
+/* remove_all_buttons:
+ * does what it says
+ * lifted from gtk_toolbar_destroy, just doesn't unref the tooltips, or
+ * destroy the toolbar itself
+ */
 static void
-remove_all_buttons(GtkToolbar *bar)
+remove_all_buttons(GtkToolbar *toolbar)
 {
-    GList *lp;
-    GtkToolbarChild *child;
-    
-    while((lp=g_list_first(bar->children)) != NULL) {
-	bar->children=g_list_remove_link(bar->children, lp);
-	
-	child=(GtkToolbarChild *)lp->data;
-	if(child->label)
-	    gtk_widget_destroy(GTK_WIDGET(child->label));
-	if(child->icon)
-	    gtk_widget_destroy(GTK_WIDGET(child->icon));
-	if(child->widget)
-	    gtk_widget_destroy(GTK_WIDGET(child->widget));
-	g_free(child);
-	g_list_free(lp);
+    GList *children;
+
+    for (children = toolbar->children; children; children = children->next) {
+        GtkToolbarChild *child = children->data;
+
+        if (child->type != GTK_TOOLBAR_CHILD_SPACE)
+            gtk_widget_unparent(child->widget); /* this will unref, too */
+        g_free(child);
     }
+
+    g_list_free(toolbar->children);
+    toolbar->children = NULL;
 }
 
 static void
@@ -388,6 +389,10 @@ back_button_cb(GtkWidget *widget, gpointer data)
     gtk_clist_moveto(GTK_CLIST(toolbar_pages[toolbar].destination),
 		     row-1, 0, 0, 0);
     gnome_property_box_changed(GNOME_PROPERTY_BOX(customize_widget));
+    gtk_widget_set_sensitive(toolbar_pages[toolbar].back_button, 
+			     toolbar_pages[toolbar].selected_destination > 0);
+    gtk_widget_set_sensitive(toolbar_pages[toolbar].forward_button, 
+			     TRUE);
 }
 
 static void
@@ -419,6 +424,11 @@ forward_button_cb(GtkWidget *widget, gpointer data)
     gtk_clist_moveto(GTK_CLIST(toolbar_pages[toolbar].destination),
 		     row-1, 0, 0, 0);
     gnome_property_box_changed(GNOME_PROPERTY_BOX(customize_widget));
+    gtk_widget_set_sensitive(toolbar_pages[toolbar].back_button, 
+			     TRUE);
+    gtk_widget_set_sensitive(toolbar_pages[toolbar].forward_button, 
+			     toolbar_pages[toolbar].selected_destination <
+			     toolbar_item_count[toolbar]-1);
 }
 
 static void

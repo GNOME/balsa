@@ -715,6 +715,23 @@ conf_add_mailbox (Mailbox **mbox)
 
 
 /* IMAP Mailboxes */
+    case MC_PAGE_IMAP_DIR: 
+    {
+	ImapDir *dir = imapdir_new();
+	g_print("Creating MC_PAGE_IMAP_DIR\n");
+	fill_in_imap_data(&dir->name, &dir->path, &dir->user, &dir->passwd,
+			  &dir->host, &dir->port);
+	imapdir_scan(dir);
+	if(!G_NODE_IS_LEAF(dir->file_tree)) {
+	    config_imapdir_add(dir);
+	    g_node_append (balsa_app.mailbox_nodes, dir->file_tree);
+	    dir->file_tree = NULL;
+	    imapdir_destroy(dir);
+	    return TRUE;
+	} else
+	    imapdir_destroy(dir);
+	/* and assume it was ordinary IMAP mailbox */
+    }
     case MC_PAGE_IMAP:
     {
 	MailboxIMAP * m;
@@ -737,19 +754,7 @@ conf_add_mailbox (Mailbox **mbox)
 
 	break;
     }
-    case MC_PAGE_IMAP_DIR: 
-    {
-	ImapDir *dir = imapdir_new();
-	g_print("Creating MC_PAGE_IMAP_DIR\n");
-	fill_in_imap_data(&dir->name, &dir->path, &dir->user, &dir->passwd,
-			  &dir->host, &dir->port);
-	config_imapdir_add(dir);
-	imapdir_scan(dir);
-	g_node_append (balsa_app.mailbox_nodes, dir->file_tree);
-	dir->file_tree = NULL;
-	imapdir_destroy(dir);
-	return TRUE;
-    }
+
     case MC_PAGE_NEW:
 	    g_warning( "An unimportant can\'t-happen has occurred. mailbox-conf.c:712" );
 	    break;

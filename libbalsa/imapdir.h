@@ -29,11 +29,12 @@ struct _ImapDir
     gchar *passwd;
     gchar *host;
     gint port;
-    GNode* file_tree; /* GNode strucuture representing the IMAP directory */
+    GNode* file_tree; /* GNode structure representing the IMAP directory */
+    int ignore_hidden:1;
 };
 
 ImapDir *imapdir_new(void);
 void imapdir_destroy(ImapDir *imap_dir);
-void imapdir_scan(ImapDir * id);
+const gchar* imapdir_scan(ImapDir * id);
 
 #endif /* __IMAPDIR_H__ */

@@ -269,10 +269,14 @@ force_close_mailbox(Mailbox *mailbox) {
 	mailbox_open_unref (mailbox);
 }
 
+/* Word of comment: previous definition of this function used access()
+function before attempting creat/unlink operation. In PS opinion, the
+speed gain is negligible or negative: the number of called system
+functions in present case is constant and equal to 1; the previous
+version called system function either once or twice per directory. */
 static gboolean
 close_all_mailboxes (GNode * node, gpointer data)
 {
-    Mailbox *mailbox;
     MailboxNode *mbnode = (MailboxNode *) node->data;
     
     if (mbnode)
@@ -280,12 +284,10 @@ close_all_mailboxes (GNode * node, gpointer data)
 	if (mbnode->IsDir)
 	{
 	    gchar *tmpfile = g_strdup_printf ("%s/.expanded", mbnode->name);
-	    if (access (tmpfile, F_OK) != -1) {
-		if (mbnode->expanded)
-		    creat (tmpfile, S_IRUSR | S_IWUSR);
-		else
-		    unlink (tmpfile);
-	    }
+	    if (mbnode->expanded)
+		creat (tmpfile, S_IRUSR | S_IWUSR);
+	    else
+		unlink (tmpfile);
 	    g_free (tmpfile);
 	}
 	

@@ -24,8 +24,16 @@
 	* src/main.c: code clean up, use force_close_mailbox(), empty trash()
 	doesn't try to refer to nonexisting objects.
 	* src/save-restore.c: use pre-created open mailboxes string.
+	* src/mailbox-conf.c: guess if the path points to dir or single folder.
 	
-	2000-06-20  Pawel Salek  <pawsa@theochem.kth.se>
+	IMAPDir II: old mbox-conf single IMAP folder deprecated.
+	only GUI for update is missing and IMAP speparator handling
+	* libbalsa/imapdir.h: ignore_hidden field
+	* libbalsa/misc.c: handle deep depth trees right.
+	* libmutt/buffy.c: don't fail if the only watched mbox is wrong IMAP.
+	* libmutt/imap.c: list directories only (SEPARATOR!)
+		
+2000-06-20  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* README: local mailbox locking configure switches explained.
 	

@@ -415,6 +415,8 @@ int mutt_buffy_check (int force)
     else if (Context && Context->path)
       tmp->size = (long) sb.st_size;	/* update the size */
 #endif
+    /* tmp could be set to NULL by buffy_mailbox_remove */
+    if(!tmp) break;
 
     if (!tmp->new)
       tmp->notified = 0;

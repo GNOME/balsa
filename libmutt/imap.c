@@ -2193,7 +2193,7 @@ process_list_output(CONTEXT *ctx, const char* dir, ImapBrowseCb cb, void *data)
      * Send LIST
      */
     imap_make_sequence(seq, sizeof(seq));
-    snprintf(buf, sizeof(buf), "%s LIST \"%s\" \"*\"\r\n", seq, dir);
+    snprintf(buf, sizeof(buf), "%s LIST \"%s/\" \"*\"\r\n", seq, dir);
     mutt_socket_write (CTX_DATA->conn, buf);
     
     /* process the LIST output */
@@ -2239,12 +2239,12 @@ process_list_output(CONTEXT *ctx, const char* dir, ImapBrowseCb cb, void *data)
         while (*p == ' ')
 	    p++;
 	
-        if (*p == '\"') {
+        if (*p == '"') {
             p++;
         }
         
-        fname = p + strlen(dir);
-        while (*p != '\"' && *p) {
+        fname = p /* + strlen(dir)*/;
+        while (*p != '"' && *p) {
             p++;
         }
         *p = '\0';

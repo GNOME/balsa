@@ -102,7 +102,7 @@ static void balsa_window_destroy(GtkObject * object);
 GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
 void       balsa_window_open_mailbox( BalsaWindow *window, Mailbox *mailbox );
 void       balsa_window_close_mailbox( BalsaWindow *window, Mailbox *mailbox );
-
+static gchar * get_open_mailboxes_string(void);
 /*FIXME unused
 static guint pbar_timeout;
 */

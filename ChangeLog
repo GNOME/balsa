@@ -1,3 +1,8 @@
+2001-03-18  Matthew Guenther  <guentherm@asme.org>
+
+	* libbalsa/mailbox_maildir.c (libbalsa_mailbox_maildir_create):
+	don't issue an error if the mailbox is parsed as Maildir.
+
 2001-03-16  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/mailbox-node.c: added code to save and restore sorting and

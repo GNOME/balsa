@@ -108,7 +108,8 @@ libbalsa_mailbox_maildir_create(const gchar * path, gboolean create)
 	magic_type = mx_get_magic(path);
 	libbalsa_unlock_mutt();
 	
-	if ( magic_type == M_MAILDIR ) {
+        /* [MBG] This needs to be != or Maildir mailboxes don't get parsed */
+	if ( magic_type != M_MAILDIR ) {
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
 				 _("Mailbox %s does not appear to be a Maildir mailbox."), path);
 	    return(-1);

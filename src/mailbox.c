@@ -34,6 +34,10 @@ mailbox_type_description (MailboxType type)
       return "mbox";
       break;
 
+    case MAILBOX_MH:
+      return "MH";
+      break;
+
     case MAILBOX_POP3:
       return "POP3";
       break;
@@ -57,6 +61,7 @@ mailbox_new (MailboxType type)
 {
   Mailbox *mailbox;
   MailboxMBox *mbox;
+  MailboxMH *mh;
   MailboxPOP3 *pop3;
   MailboxIMAP *imap;
   MailboxNNTP *nntp;
@@ -71,6 +76,14 @@ mailbox_new (MailboxType type)
       mbox->name = NULL;
       mbox->stream = NIL;
       mbox->path = NULL;
+      break;
+      
+    case MAILBOX_MH:
+      mh = (MailboxMH *) mailbox;
+      mh->type = MAILBOX_MH;
+      mh->name = NULL;
+      mh->stream = NIL;
+      mh->path = NULL;
       break;
       
     case MAILBOX_POP3:
@@ -114,6 +127,7 @@ void
 mailbox_free (Mailbox * mailbox)
 {
   MailboxMBox *mbox;
+  MailboxMH *mh;
   MailboxPOP3 *pop3;
   MailboxIMAP *imap;
   MailboxNNTP *nntp;
@@ -133,6 +147,12 @@ mailbox_free (Mailbox * mailbox)
       mbox = (MailboxMBox *) mailbox;
       if (mbox->path)
 	g_free(mbox->path);
+      break;
+      
+    case MAILBOX_MH:
+      mh = (MailboxMH *) mailbox;
+      if (mh->path)
+	g_free(mh->path);
       break;
       
     case MAILBOX_POP3:
@@ -182,6 +202,7 @@ mailbox_open (Mailbox * mailbox)
   gchar buffer[MAILTMPLEN];
   Mailbox *old_mailbox;
   MailboxMBox *mbox;
+  MailboxMH *mh;
   MailboxPOP3 *pop3;
   MailboxIMAP *imap;
   MailboxNNTP *nntp;
@@ -211,6 +232,18 @@ mailbox_open (Mailbox * mailbox)
 	}
       break;
 
+    case MAILBOX_MH:
+      mh = (MailboxMH *) mailbox;
+
+      sprintf (buffer, "{%s/mh}INBOX", mh->path);
+
+      mh->stream = mail_open (NIL, buffer, NIL);
+      if (mh->stream == NIL)
+	{
+	  balsa_app.current_mailbox = old_mailbox;
+	  return FALSE;
+	}
+      break;
 
     case MAILBOX_POP3:
       pop3 = (MailboxPOP3 *) mailbox;

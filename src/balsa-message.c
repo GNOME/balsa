@@ -176,11 +176,16 @@ balsa_message_set (BalsaMessage * bmessage,
 
   /* message body */
   c = mail_fetchtext (stream, mesgno);
+/*
   gs = text2html (c);
   buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
+*/
+  buff = g_realloc (buff, strlen (buff) + strlen (c) + 1);
+  strcat (buff, c);
+/*
   strcat (buff, gs->str);
   g_string_free (gs, 1);
-
+*/
   /* HTML footer */
   buff = g_realloc (buff, strlen (buff) + strlen (HTML_FOOT) + 1);
   strcat (buff, HTML_FOOT);

@@ -1,3 +1,33 @@
+2004-08-31 20:07  PeterB
+
+	* src/message-window.c: check message->mailbox.
+	* src/main-window.c: notify user about failure in balsa_message_set
+	instead of here.
+	* src/balsa-message.c: check mailbox when body-ref fails and before
+	selecting a new part, and notify user.
+	* src/balsa-index.c: check whether message has lost its mailbox.
+
+2004-08-31 20:07  PeterB
+
+	* libbalsa/mailbox.h: change fetch_message_structure api to return
+	a gboolean success indicator.
+	* libbalsa/: message.c, message.h: ditto; new name and api for
+	libbalsa_message_load_envelope.
+	* libbalsa/mailbox_mh.c: ditto; check for removed files; use new
+	* api for libbalsa_message_load_envelope and ignore
+	load_envelope errors.
+	* libbalsa/mailbox_mbox.c: ditto; less draconian resync when
+	mailbox is changed behind our back.
+	* libbalsa/mailbox_maildir.c: ditto; drop msg_info->msgno; check
+	for removed files; reorganize sync; use new api for
+	libbalsa_message_load_envelope.
+	* libbalsa/: mailbox_local.c, mailbox_local.h: ditto; rename
+	_libbalsa_mailbox_local_get_{mime_message,message_stream}.
+	* libbalsa/mailbox_imap.c: ditto; implement sorting with threaded
+	views.
+	* libbalsa/mailbox.c: ditto; change default sort-field to
+	LB_MAILBOX_SORT_NO.
+
 2004-08-31  Pawel Salek
 
 	* libbalsa/message.h, send.h: order sending related declarations.

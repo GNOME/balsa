@@ -309,10 +309,12 @@ libbalsa_html_new(const gchar * text, size_t len,
     return html;
 }
 
-gchar *
-libbalsa_html_to_string(const gchar * text, size_t len)
+void
+libbalsa_html_to_string(gchar ** text, size_t len)
 {
-    return NULL;
+    return; /* this widget does not support conversion to a string. The
+             * string won't be altered. Other alternative would be to set
+             * it to an empty string. */
 }
 
 /*

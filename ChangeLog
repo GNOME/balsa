@@ -1,3 +1,7 @@
+2004-01-18  Pawel Salek
+
+	* libbalsa/html.c: compile against libgtkhtml2.
+
 2004-01-17 16:40  PeterB
 
 	* src/balsa-message.c: implement and use bm_message_widget to
@@ -47,6 +51,18 @@
 	Detect when GMime can filter text/enriched and text/richtext.
 	* libbalsa/message.c, src/sendmsg-window.c: Keep references in the
 	correct order.
+
+2004-01-11  Pawel Salek
+
+	* Makefile.am: add intltool-*.in to EXTRA_DIST
+	* NEWS: release 2.1.0
+	* balsa.spec.in: wrap gmime in.
+	* libbalsa/libbalsa.c: clear some libmutt remainings.
+
+	* libbalsa/mailbox_imap.c: set address to null if strings are null
+	for consistency with the rest of balsa.
+	* src/Makefile.am: add Balsa.idl to EXTRA_DIST.
+	* src/main-window.c: update author list.
 
 2004-01-11 15:54  PeterB
 

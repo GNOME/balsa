@@ -166,7 +166,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 		UNLOCK_MAILBOX(message->mailbox);
 	    is_refed = libbalsa_message_body_ref(message, FALSE);
  	    if (mbox_locked)
- 		LOCK_MAILBOX(message->mailbox);	    
+ 		LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
 	    if (!is_refed) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _("Unable to load message body to "

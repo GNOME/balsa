@@ -1,3 +1,12 @@
+* Balsa-2.1.1 release. Release date 2004-02-29
+
+oNumerous fixes, most prominent are:
+- reduce memory usage of mbox driver.
+- major cleanup of local and remote drivers.
+- searching re-enabled again.
+- SSL/TLS re-enabled again.
+- Use bonobo to bring up already running instances.
+
 * Balsa-2.1.0 release. Release date 2004-01-11
 
 - entirely new backend and message index.

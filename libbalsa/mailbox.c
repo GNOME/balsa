@@ -819,7 +819,10 @@ libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 
     iter.user_data = g_node_find(mailbox->msg_tree, G_PRE_ORDER,
 				 G_TRAVERSE_ALL, GUINT_TO_POINTER(seqno));
-    g_assert(iter.user_data != NULL);
+    /* trying to modify seqno that is not in the tree?  Possible for
+     * filtered views... Perhaps there is nothing to worry about.
+     */
+    g_return_if_fail(iter.user_data != NULL);
 
     iter.stamp = mailbox->stamp;
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);

@@ -205,6 +205,7 @@ static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
 static void hide_changed_cb(GtkWidget * widget, gpointer data);
 static void show_name_cb(GtkWidget * widget, gpointer data);
 static void show_patch_cb(GtkWidget * widget, gpointer data);
+static void reset_filter_cb(GtkWidget * widget, gpointer data);
 static void mailbox_commit_changes(GtkWidget * widget, gpointer data);
 static void mailbox_commit_all(GtkWidget * widget, gpointer data);
 
@@ -655,6 +656,8 @@ static GnomeUIInfo mailbox_menu[] = {
                            show_name_cb, GTK_STOCK_FIND),
     GNOMEUIINFO_ITEM_STOCK(N_("Show _Patches"),  "",
                            show_patch_cb, GTK_STOCK_FIND),
+    GNOMEUIINFO_ITEM_STOCK(N_("Reset _Filter"),  "",
+                           reset_filter_cb, GTK_STOCK_FIND),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_MARK_ALL_POS (MENU_MAILBOX_HIDE_POS+2)
     {
@@ -2806,6 +2809,7 @@ find_real(BalsaIndex * bindex, gboolean again)
     static LibBalsaCondition * cnd = NULL;
     static gboolean reverse = FALSE;
     static LibBalsaMailboxSearchIter *search_iter = NULL;
+    enum { FIND_RESPONSE_FILTER };
 
     if (!cnd) {
 	cnd = libbalsa_condition_new();
@@ -2821,6 +2825,7 @@ find_real(BalsaIndex * bindex, gboolean again)
                                         GTK_WINDOW(balsa_app.main_window),
                                         GTK_DIALOG_DESTROY_WITH_PARENT,
                                         GTK_STOCK_OK, GTK_RESPONSE_OK,
+                                        _("Fi_lter"),  FIND_RESPONSE_FILTER,
                                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                         NULL);
 	GtkWidget *reverse_button, *search_entry, *w, *page, *table;
@@ -2894,13 +2899,15 @@ find_real(BalsaIndex * bindex, gboolean again)
         gtk_dialog_set_default_response(GTK_DIALOG(dia), GTK_RESPONSE_OK);
 	do {
 	    ok=gtk_dialog_run(GTK_DIALOG(dia));
-	    if (ok==GTK_RESPONSE_OK) {
+            switch(ok) {
+            case GTK_RESPONSE_OK:
+            case FIND_RESPONSE_FILTER:
 		reverse = GTK_TOGGLE_BUTTON(reverse_button)->active;
 		g_free(cnd->match.string.string);
 		cnd->match.string.string =
                     g_strdup(gtk_entry_get_text(GTK_ENTRY(search_entry)));
 		cnd->match.string.fields=CONDITION_EMPTY;
-
+                
 		if (gtk_toggle_button_get_active(matching_body))
 		    CONDITION_SETMATCH(cnd,CONDITION_MATCH_BODY);
 		if (gtk_toggle_button_get_active(matching_to))
@@ -2911,30 +2918,44 @@ find_real(BalsaIndex * bindex, gboolean again)
 		    CONDITION_SETMATCH(cnd,CONDITION_MATCH_FROM);
 		if (gtk_toggle_button_get_active(matching_cc))
 		    CONDITION_SETMATCH(cnd,CONDITION_MATCH_CC);
-		if (cnd->match.string.fields!=CONDITION_EMPTY &&
-                    cnd->match.string.string[0])
-
+		if (!(cnd->match.string.fields!=CONDITION_EMPTY &&
+                    cnd->match.string.string[0]))
+                    
 		    /* FIXME : We should print error messages, but for
 		     * that we should first make find dialog non-modal
 		     * balsa_information(LIBBALSA_INFORMATION_ERROR,_("You
 		     * must specify at least one field to look in"));
 		     * *balsa_information(LIBBALSA_INFORMATION_ERROR,_("You
 		     * must provide a non-empty string")); */
-
-		    ok = GTK_RESPONSE_OK;
-		else ok = GTK_RESPONSE_CANCEL; 
-	    }
-            else ok = GTK_RESPONSE_CANCEL;
-	}
-	while (ok==GTK_RESPONSE_HELP);
+                    ok = GTK_RESPONSE_CANCEL; 
+                break;
+            default: /* cancel or just close */
+                return;
+            } /* end of switch */
+	} while (ok==GTK_RESPONSE_HELP);
 	gtk_widget_destroy(dia);
-	if (ok!=GTK_RESPONSE_OK) return;
+
 	cnd->type = CONDITION_STRING;
 
 	if (search_iter) {
 	    libbalsa_mailbox_search_iter_free(search_iter);
 	    search_iter = NULL;
 	}
+        if(ok == FIND_RESPONSE_FILTER) {
+            LibBalsaMailbox *mailbox = 
+                BALSA_INDEX(bindex)->mailbox_node->mailbox;
+            LibBalsaCondition *filter;
+            filter = balsa_window_get_view_filter(balsa_app.main_window);
+            /* steal cnd */
+            if(filter)
+                filter = libbalsa_condition_new_bool_ptr
+                    (FALSE, CONDITION_AND, cnd, filter);
+            else 
+                filter = cnd;
+            libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
+            cnd = NULL;
+            return;
+        }
     }
 
     if (!search_iter)
@@ -3206,6 +3227,16 @@ show_patch_cb(GtkWidget * widget, gpointer data)
             (FALSE, CONDITION_AND, name, filter);
     else 
         filter = name;
+    libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
+}
+
+static void
+reset_filter_cb(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *index = balsa_window_find_current_index(balsa_app.main_window);
+    LibBalsaMailbox *mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
+    LibBalsaCondition *filter;
+    filter = balsa_window_get_view_filter(balsa_app.main_window);
     libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
 }
 

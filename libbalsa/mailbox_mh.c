@@ -982,6 +982,7 @@ static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
     char *new_filename;
     int retries;
     struct message_info *msg_info;
+    GMimeStream *in_stream;
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox), -1);
     g_return_val_if_fail (LIBBALSA_IS_MESSAGE(message), -1);
@@ -1002,8 +1003,17 @@ static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 	return -1;
     }
     out_stream = g_mime_stream_fs_new(fd);
-    if (g_mime_stream_write_to_stream( libbalsa_mailbox_get_message_stream( message->mailbox, message )
-				       , out_stream) == -1)
+    {
+	GMimeStream *tmp = libbalsa_mailbox_get_message_stream( message->mailbox, message );
+	GMimeFilter *crlffilter = 
+	    g_mime_filter_crlf_new (  GMIME_FILTER_CRLF_DECODE,
+				      GMIME_FILTER_CRLF_MODE_CRLF_ONLY );
+	in_stream = g_mime_stream_filter_new_with_stream (tmp);
+	g_mime_stream_filter_add ( GMIME_STREAM_FILTER (in_stream), crlffilter );
+	g_object_unref (crlffilter);
+	g_mime_stream_unref (tmp);
+    }    
+    if (g_mime_stream_write_to_stream( in_stream, out_stream) == -1)
     {
 	g_mime_stream_unref(out_stream);
 	unlink (tmp);

@@ -1,5 +1,11 @@
 2003-09-28  Carlos Morgado  <chbm gnome.org>
 
+	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_add_message): 
+	* libbalsa/mailbox_maildir.c (libbalsa_mailbox_maildir_add_message): 
+	add CRLF filters
+	
+2003-09-28  Carlos Morgado  <chbm gnome.org>
+
 	* libbalsa/pop3.c: 
 	* libbalsa/mailbox_pop3.c: 
 	* libbalsa/mailbox_imap.c: 

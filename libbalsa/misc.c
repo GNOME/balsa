@@ -799,12 +799,20 @@ is_in_url(GtkTextIter * iter, gint offset, GtkTextTag * url_tag)
 /* Remove soft newlines and associated quote strings from num_paras
  * paragraphs in the buffer, starting at the line before iter; if
  * num_paras < 0, process the whole buffer. */
+
+/* Forward references: */
+static gboolean prescanner(const gchar * p);
+static void mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter,
+                      GtkTextTag * tag, gchar * p);
+static regex_t *get_url_reg(void);
+
 void
 libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
                        gint num_paras)
 {
     GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
     GtkTextTag *soft_tag = gtk_text_tag_table_lookup(table, "soft");
+    GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
     gboolean soft;
 
     /* Check whether the previous line flowed into this one. */
@@ -831,12 +839,13 @@ libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
 
     for (; num_paras; num_paras--) {
         gint quote_depth;
+        GtkTextIter start;
+        gchar *line;
 
         gtk_text_iter_set_line_offset(iter, 0);
         quote_depth = get_quote_depth(iter, NULL);
 
         for (;;) {
-            GtkTextIter start;
             gint qd;
             gchar *quote_string;
 
@@ -861,6 +870,35 @@ libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
             }
             gtk_text_buffer_delete(buffer, &start, iter);
         }
+
+        line = get_line(buffer, &start);
+        if (prescanner(line))
+            mark_urls(buffer, &start, url_tag, line);
+        g_free(line);
+    }
+}
+
+/* Mark URLs in one line of the buffer */
+static void
+mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
+          gchar * line)
+{
+    gchar *p = line;
+    regex_t *url_reg = get_url_reg();
+    regmatch_t url_match;
+    GtkTextIter start = *iter;
+    GtkTextIter end = *iter;
+
+    while (!regexec(url_reg, p, 1, &url_match, 0)) {
+        glong offset = g_utf8_pointer_to_offset(line, p + url_match.rm_so);
+        gtk_text_iter_set_line_offset(&start, offset);
+        offset = g_utf8_pointer_to_offset(line, p + url_match.rm_eo);
+        gtk_text_iter_set_line_offset(&end, offset);
+        gtk_text_buffer_apply_tag(buffer, tag, &start, &end);
+
+        p += url_match.rm_eo;
+        if (!prescanner(p))
+            break;
     }
 }
 
@@ -1110,23 +1148,10 @@ prescanner(const gchar * s)
     return FALSE;
 }
 
-void
-libbalsa_insert_with_url(GtkTextBuffer * buffer,
-                         const char *chars,
-                         GtkTextTag * tag,
-                         void (*callback) (GtkTextBuffer *,
-                                           GtkTextIter *,
-                                           const gchar *,
-                                           gpointer),
-                         gpointer callback_data)
+static regex_t *
+get_url_reg(void)
 {
     static regex_t *url_reg = NULL;
-    GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
-    GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
-    gint match, offset = 0;
-    regmatch_t url_match;
-    gchar *p, *buf;
-    GtkTextIter iter;
 
     if (!url_reg) {
         /* one-time compilation of a constant url_str expression */
@@ -1145,12 +1170,34 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
                       "url regex compilation failed.");
     }
 
+    return url_reg;
+}
+
+void
+libbalsa_insert_with_url(GtkTextBuffer * buffer,
+                         const char *chars,
+                         GtkTextTag * tag,
+                         void (*callback) (GtkTextBuffer *,
+                                           GtkTextIter *,
+                                           const gchar *,
+                                           gpointer),
+                         gpointer callback_data)
+{
+    gchar *p, *buf;
+    GtkTextIter iter;
+
     buf = p = g_strdup(chars);
     gtk_text_buffer_get_iter_at_mark(buffer, &iter,
                                      gtk_text_buffer_get_insert(buffer));
 
     if (prescanner(p)) {
-        match = regexec(url_reg, p, 1, &url_match, 0);
+        GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
+        GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
+        gint offset = 0;
+        regex_t *url_reg = get_url_reg();
+        regmatch_t url_match;
+        gint match = regexec(url_reg, p, 1, &url_match, 0);
+
         while (!match) {
             gchar *buf;
 

@@ -38,7 +38,6 @@
 #include "libbalsa_private.h"
 
 struct message_info {
-    GMimeMessage *mime_message;
     LibBalsaMessageFlag flags;
     LibBalsaMessageFlag orig_flags;
     LibBalsaMessage *message;
@@ -441,9 +440,6 @@ lbm_mh_free_message_info(struct message_info *msg_info)
 {
     if (!msg_info)
 	return;
-    if (msg_info->mime_message)
-	g_object_remove_weak_pointer(G_OBJECT(msg_info->mime_message),
-				     (gpointer) & msg_info->mime_message);
     if (msg_info->message) {
 	msg_info->message->mailbox = NULL;
 	g_object_unref(msg_info->message);
@@ -564,6 +560,8 @@ libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox)
 	g_ptr_array_free(mh->msgno_2_msg_info, TRUE);
 	mh->msgno_2_msg_info = NULL;
     }
+    if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
+	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
 }
 
 static int
@@ -682,16 +680,13 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    unlink(orig);
 	    g_free(orig);
 	    /* free old information */
-	    if (msg_info->mime_message) {
-		g_object_remove_weak_pointer(G_OBJECT(msg_info->mime_message),
-					     (gpointer) 
-					     &msg_info->mime_message);
-		msg_info->mime_message = NULL;
-	    }
 	    g_ptr_array_remove(mh->msgno_2_msg_info, msg_info);
 	    g_hash_table_remove(mh->messages_info, 
 		    		GINT_TO_POINTER(msg_info->fileno));
 	    libbalsa_mailbox_msgno_removed(mailbox, msgno);
+	    LIBBALSA_MAILBOX_LOCAL(mh)->msg_list = /* Ugh!! */
+		g_list_remove(LIBBALSA_MAILBOX_LOCAL(mh)->msg_list,
+			msg_info->message);
 	    mailbox->messages--;
 	} else {
 	    lbm_mh_flag_line(msg_info, LIBBALSA_MESSAGE_FLAG_NEW, &unseen);
@@ -835,28 +830,21 @@ libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox * mailbox,
 {
     if (!message->mime_msg) {
 	struct message_info *msg_info;
+	gchar *tmp;
 
 	msg_info =
 	    lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox),
 					   message->msgno);
 
-	if (!msg_info->mime_message) {
-	    gchar *tmp;
+	tmp = MH_BASENAME(msg_info);
+	message->mime_msg =
+	    _libbalsa_mailbox_local_get_mime_message(mailbox, tmp, NULL);
+	g_free(tmp);
 
-	    tmp = MH_BASENAME(msg_info);
-	    msg_info->mime_message =
-		_libbalsa_mailbox_local_get_mime_message(mailbox, tmp,
-							 NULL);
-	    g_free(tmp);
-	    g_object_add_weak_pointer(G_OBJECT(msg_info->mime_message),
-				      (gpointer) & msg_info->mime_message);
-
-	    g_mime_object_remove_header(GMIME_OBJECT(msg_info->mime_message),
-		    "Status");
-	    g_mime_object_remove_header(GMIME_OBJECT(msg_info->mime_message),
-		    "X-Status");
-	}
-	message->mime_msg = msg_info->mime_message;
+	g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
+				    "Status");
+	g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
+				    "X-Status");
     }
 
     LIBBALSA_MAILBOX_CLASS(parent_class)->fetch_message_structure(mailbox,

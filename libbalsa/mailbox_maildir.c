@@ -36,7 +36,6 @@
 #include "libbalsa_private.h"
 
 struct message_info {
-    GMimeMessage *mime_message;
     char *key;
     const char *subdir;
     char *filename;
@@ -513,9 +512,6 @@ free_message_info(struct message_info *msg_info)
 	return;
     g_free(msg_info->key);
     g_free(msg_info->filename);
-    if (msg_info->mime_message)
-	g_object_remove_weak_pointer(G_OBJECT(msg_info->mime_message),
-				     (gpointer) & msg_info->mime_message);
     if (msg_info->message) {
 	msg_info->message->mailbox = NULL;
 	g_object_unref(msg_info->message);
@@ -546,6 +542,8 @@ libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox)
 	g_ptr_array_free(mdir->msgno_2_msg_info, TRUE);
 	mdir->msgno_2_msg_info = NULL;
     }
+    if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
+	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
 }
 
 static int libbalsa_mailbox_maildir_open_temp (const gchar *dest_path,
@@ -681,6 +679,9 @@ lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir,
 	g_ptr_array_remove(mdir->msgno_2_msg_info, removed);
 	libbalsa_mailbox_msgno_removed(LIBBALSA_MAILBOX(mdir),
 				       removed->message->msgno);
+	LIBBALSA_MAILBOX_LOCAL(mdir)->msg_list = /* Ugh!! */
+	    g_list_remove(LIBBALSA_MAILBOX_LOCAL(mdir)->msg_list,
+		    removed->message);
 	/* This will free removed: */
 	g_hash_table_remove(mdir->messages_info, removed->key);
     }
@@ -731,20 +732,12 @@ libbalsa_mailbox_maildir_fetch_message_structure(LibBalsaMailbox * mailbox,
 						 LibBalsaFetchFlag flags)
 {
     if (!message->mime_msg) {
-	struct message_info *msg_info;
-
-	msg_info = message_info_from_msgno(mailbox, message->msgno);
-
-	if (!msg_info->mime_message) {
-	    msg_info->mime_message =
-		_libbalsa_mailbox_local_get_mime_message(mailbox,
-							 msg_info->subdir,
-							 msg_info->
-							 filename);
-	    g_object_add_weak_pointer(G_OBJECT(msg_info->mime_message),
-				      (gpointer) & msg_info->mime_message);
-	}
-	message->mime_msg = msg_info->mime_message;
+	struct message_info *msg_info =
+	    message_info_from_msgno(mailbox, message->msgno);
+	message->mime_msg =
+	    _libbalsa_mailbox_local_get_mime_message(mailbox,
+						     msg_info->subdir,
+						     msg_info->filename);
     }
 
     LIBBALSA_MAILBOX_CLASS(parent_class)->fetch_message_structure(mailbox,

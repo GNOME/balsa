@@ -39,6 +39,6 @@ gint g_list_index (GList * list, gpointer data);
 gchar *make_string_from_list (GList *);
 GList *make_list_from_string (gchar *);
 
-int readfile(char *name,char **buf);
+int readfile(FILE *fp,char **buf);
 
 #endif /* __MISC_H__ */

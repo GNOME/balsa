@@ -139,12 +139,12 @@ make_list_from_string (gchar * the_str)
 }
 
 int
-readfile (char *filename, char **buf)
+readfile (FILE * fp, char **buf)
 {
   size_t size;
   off_t offset;
   int r;
-  int fd = open (filename, O_RDONLY);
+  int fd = fileno (fp);
   struct stat statbuf;
 
   if (fstat (fd, &statbuf) == -1)
@@ -157,6 +157,8 @@ readfile (char *filename, char **buf)
       *buf = NULL;
       return size;
     }
+
+  lseek (fd, 0, SEEK_SET);
 
   *buf = (char *) malloc (size);
   if ((int) *buf == -1)
@@ -178,6 +180,7 @@ readfile (char *filename, char **buf)
 	}
       else if ((errno != EAGAIN) && (errno != EINTR))
 	{
+	  perror ("bleh:");
 	  return -1;
 	}
     }

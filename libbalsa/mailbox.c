@@ -1027,14 +1027,16 @@ message_body_ref (Message * message)
       mutt_mktemp (tmpfile);
 
       fp = fopen (MAILBOX_LOCAL (message->mailbox)->path, "r");
-      s.fpout = fopen (tmpfile, "w");
+      s.fpout = fopen (tmpfile, "w+");
       fseek ((s.fpin = fp), b->offset, 0);
       mutt_decode_attachment (b, &s);
 
       fclose (fp);
-      fclose (s.fpout);
 
-      readfile (tmpfile, &buf);
+      fflush (s.fpout);
+      readfile (s.fpout, &buf);
+
+      fclose (s.fpout);
 
       body = body_new ();
       body->buffer = g_strdup (buf);
@@ -1043,7 +1045,7 @@ message_body_ref (Message * message)
       g_free (buf);
 
       mx_close_message (&msg);
-      unlink(tmpfile);
+      unlink (tmpfile);
     }
 
   /*

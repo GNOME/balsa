@@ -339,7 +339,8 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 			 MESSAGE_DELETE_MASK |
 			 MESSAGE_NEW_MASK |
 			 MESSAGE_FLAGGED_MASK |
-			 MESSAGE_REPLIED_MASK,
+			 MESSAGE_REPLIED_MASK |
+			 MESSAGE_APPEND_MASK,
 			 (gpointer) bindex);
 
   /* here we play a little trick on clist; in GTK_SELECTION_BROWSE mode
@@ -618,6 +619,9 @@ mailbox_listener (MailboxWatcherMessage * mw_message)
       break;
     case MESSAGE_DELETE:
       break;
+    case MESSAGE_APPEND:
+      balsa_index_add (bindex, mw_message->message);
+      break;     
     default:
       break;
     }

@@ -132,6 +132,7 @@ static void send_watcher_mark_delete_message (Mailbox * mailbox, Message * messa
 static void send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message);
 static void send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining);
 static void send_watcher_delete_message (Mailbox * mailbox, Message * message);
+static void send_watcher_append_message (Mailbox * mailbox, Message * message);
 
 static Message *translate_message (HEADER * cur);
 static Address *translate_address (ADDRESS * caddr);
@@ -396,14 +397,19 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
     {
       if (flag == M_APPEND)
 	{
+	  
+	  /* we need the mailbox to be opened fresh i think */
+	  mx_close_mailbox( CLIENT_CONTEXT(mailbox)  );
+	  
+	} 
+      else 
+	{
+	  /* incriment the reference count */
+	  mailbox->open_ref++;
+	  
 	  UNLOCK_MAILBOX (mailbox);
-	  return FALSE;		/* we need the mailbox to be opened fresh i think */
+	  return TRUE;
 	}
-      /* incriment the reference count */
-      mailbox->open_ref++;
-
-      UNLOCK_MAILBOX (mailbox);
-      return TRUE;
     }
 
   if (mailbox->type != MAILBOX_IMAP && mailbox->type != MAILBOX_POP3)
@@ -902,6 +908,32 @@ send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining)
     }
 }
 
+static void
+send_watcher_append_message (Mailbox * mailbox, Message * message)
+{
+  GList *list;
+  MailboxWatcherMessage  mw_message;
+  MailboxWatcher *watcher;
+
+  mw_message.type = MESSAGE_APPEND;
+  mw_message.mailbox = mailbox;
+  mw_message.message = message;
+
+
+  list = WATCHER_LIST (mailbox);
+  while (list)
+    {
+      watcher = list->data;
+      list = list->next;
+
+      if (watcher->mask & MESSAGE_APPEND_MASK)
+	{
+	  mw_message.data = watcher->data;
+	  (*watcher->func) ((MailboxWatcherMessage *) & mw_message);
+	}
+    }
+}
+
 
 static void
 send_watcher_delete_message (Mailbox * mailbox, Message * message)
@@ -1083,18 +1115,21 @@ void
 message_copy (Message * message, Mailbox * dest)
 {
   HEADER *cur;
+  gint new_opened;
 
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
   cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
-  mailbox_open_ref (dest);
+  /* if the mailbox is not already opened, open it */
+  new_opened = mailbox_open_ref (dest);
 
   mutt_append_message (CLIENT_CONTEXT (dest),
 		       CLIENT_CONTEXT (message->mailbox),
 		       cur, 0, 0);
-
-  mailbox_open_unref (dest);
+  send_watcher_append_message (dest, message);
+  /* if we opened the mail box, close it */
+  if (new_opened) mailbox_open_unref (dest);
 }
 
 void
@@ -1115,7 +1150,8 @@ message_move (Message * message, Mailbox * dest)
   mutt_append_message (CLIENT_CONTEXT (dest),
 		       CLIENT_CONTEXT (message->mailbox),
 		       cur, 0, CH_UPDATE_LEN);
-  
+  send_watcher_append_message (dest, message);
+ 
   /* if we opened the mail box, close it */
   if (new_opened) mailbox_open_unref (dest);
   

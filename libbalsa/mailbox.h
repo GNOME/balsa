@@ -74,7 +74,8 @@ typedef enum
     MESSAGE_DELETE,		/* message has been deleted */
     MESSAGE_NEW,		/* message is new to the mailbox */
     MESSAGE_FLAGGED,		/* the message was flagged */
-    MESSAGE_REPLIED		/* the message was answered */
+    MESSAGE_REPLIED,		/* the message was answered */
+    MESSAGE_APPEND              /* message has been appended */
   }
 MailboxWatcherMessageType;
 
@@ -90,7 +91,8 @@ typedef enum
     MESSAGE_DELETE_MASK = 1 << 6,
     MESSAGE_NEW_MASK = 1 << 7,
     MESSAGE_FLAGGED_MASK = 1 << 8,
-    MESSAGE_REPLIED_MASK = 1 << 9
+    MESSAGE_REPLIED_MASK = 1 << 9,
+    MESSAGE_APPEND_MASK = 1 << 10
   }
 MailboxWatcherMessageMask;
 

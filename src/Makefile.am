@@ -67,11 +67,9 @@ balsa_SOURCES = $(balsa_BASE_SOURCES) $(balsa_IDL_SOURCES)
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
 	-I$(top_srcdir) \
-	-I$(top_srcdir)/libbalsa \
-	-I$(top_srcdir)/libmutt \
-	 $(GNOME_INCLUDEDIR)
+	-I$(top_srcdir)/libbalsa
 
-CFLAGS += $(GTKHTML_CFLAGS) $(PCRE_CFLAGS) $(PIXBUF_FLAGS)
+CFLAGS += $(PCRE_CFLAGS) 
 
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\
@@ -80,15 +78,9 @@ balsa_LDADD = \
 	$(top_builddir)/libinit_balsa/libinit_balsa.a \
 	-lpspell \
 	-lltdl \
-	@LIBESD_LIB@ \
-	$(GNOME_LIBDIR) \
-	$(GNOMEUI_LIBS) \
 	$(INTLLIBS) \
-	$(PTHREAD_LIB) \
-	$(GNOME_PRINT_LIBS) \
-	$(GTKHTML_LIBS)	\
 	$(PCRE_LIBS) \
-	$(PIXBUF_LIBS)
+	$(PTHREAD_LIB)
 
 balsa_DEPENDENCIES = \
 	$(top_builddir)/libbalsa/libbalsa.a	\
@@ -107,7 +99,6 @@ idl_DATA = #../idl/balsa.idl
 
 CORBA_SRCLIST = balsa-common.c balsa-skels.c balsa-stubs.c \
                 balsa.h
-
 
 BALSA_ORB_SRCLIST = orbit-glue.c 
 

@@ -69,4 +69,6 @@ libbalsa_a_SOURCES = 		\
 libbalsa_a_LIBADD = @LIBOBJS@
 
 INCLUDES=-I. -I${top_srcdir} -I${top_builddir}/libmutt \
-	$(GNOME_INCLUDEDIR) $(PCRE_CFLAGS)
+	$(PCRE_CFLAGS)
+
+

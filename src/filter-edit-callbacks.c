@@ -72,7 +72,7 @@ static gint
 unique_filter_name(GtkWidget * clist, gchar * name)
 {
     gchar *row_text;
-    gint len, row = 0;
+    guint len, row = 0;
 
     g_return_val_if_fail(clist != NULL, 0);
     g_return_val_if_fail(GTK_IS_CLIST(clist), 0);

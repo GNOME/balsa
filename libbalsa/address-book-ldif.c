@@ -234,7 +234,6 @@ libbalsa_address_book_ldif_load(LibBalsaAddressBook * ab,
 
     load_ldif_file(ab);
 
-    lst = LIBBALSA_ADDRESS_BOOK_LDIF(ab)->address_list;
     for (lst = LIBBALSA_ADDRESS_BOOK_LDIF(ab)->address_list; 
 	 lst; lst = g_list_next(lst)) {
 	if ( callback )

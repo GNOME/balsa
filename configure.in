@@ -7,118 +7,111 @@ AM_CONFIG_HEADER(config.h)
 
 dnl ###########################################################################
 dnl Versioning
-dnl   BALSA_VERSION is what we use, except when we want...
-dnl   BALSA_SHORT_VERSION, which doesn't have the release appended. 
-dnl   For RPM, which keeps the release as a separate field
+dnl   BALSA_VERSION is what we use.
 dnl ###########################################################################
 
 BALSA_MAJOR=1
 BALSA_REVISION=2
 BALSA_PATCHLEVEL=pre2
-BALSA_RELEASE=1
-use_release=no
 
-dnl BALSA_RELEASE must be specified (1 if nothing else), but
-dnl change use_release depending on whether we want it to be
-dnl appended to our official version. (no usually, yes for
-dnl something like 'pre1' or 'beta4')
-
-if test x"$use_release" = xno ; then
-	brsffx=
-else
-	brsffx="-${BALSA_RELEASE}"
-fi
-
-BALSA_SHORT_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
-BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}${brsffx}"
+BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
 VERSION="$BALSA_VERSION"
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl Configure libmutt, later
-dnl ######################################################################################
+dnl ###########################################################################
 
 AC_CONFIG_SUBDIRS(libmutt)
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl Now that we have versioning, checks and stuff
-dnl ######################################################################################
+dnl ###########################################################################
+
 
 AM_INIT_AUTOMAKE(balsa, [$VERSION])
 
+
 AM_MAINTAINER_MODE
 AM_ACLOCAL_INCLUDE(macros)
-AC_ISC_POSIX
-
-AM_PATH_GLIB([1.2.0],[],[
-	AC_MSG_ERROR([You need GLib installed -- GNOME requires this as well.])
-],gthread)
 
 GNOME_INIT
 
 AC_PROG_CC
+AC_ISC_POSIX
 AC_STDC_HEADERS
 AC_ARG_PROGRAM
 AM_PROG_LEX
 AC_PROG_YACC
 AM_PROG_LIBTOOL
 
+
+AM_PATH_GLIB([1.2.0],[],[
+	AC_MSG_ERROR([You need GLib installed -- GNOME requires this as well.])
+],gthread)
+
 dnl this should come after `AC_PROG_CC'
 GNOME_X_CHECKS
+
+AC_CHECK_LIB(ltdl,lt_dlopen,, [
+	AC_MSG_ERROR([*** libtool not found.  Please check http://www.balsa.net for information on the required files.])
+])
 
 AC_CHECK_LIB(pspell, new_pspell_manager,,[
 	AC_MSG_ERROR([*** libpspell not found.  Please check http://www.balsa.net for information on the required files.])
 ])
 
 dnl Reset
-LDFLAGS="$balsa_save_LDFLAGS"
-LIBS="$balsa_save_LIBS"
+# LDFLAGS="$balsa_save_LDFLAGS"
+# LIBS="$balsa_save_LIBS"
 
-dnl ######################################################################################
+
+dnl ###########################################################################
 dnl Check for a recent enough version of gnome-libs.
-dnl ######################################################################################
+dnl ###########################################################################
 
 AC_MSG_CHECKING([for gnome-libs version >= 1.2.1])
 vers=`gnome-config --version gnome-libs | sed 's/^gnome-libs //'`
-case $vers
-	in
-		1.0.*|1.2.0)
-			AC_MSG_RESULT([no])
-			AC_MSG_ERROR([Balsa requires a version of gnome-libs newer than 1.2.1] )
-			;;
-		*) 
-			AC_MSG_RESULT([yes])
-			;;
+case $vers in
+	1.0.*|1.2.0)
+		AC_MSG_RESULT([no])
+		AC_MSG_ERROR([Balsa requires a version of gnome-libs newer than 1.2.1] )
+		;;
+	*) 
+		AC_MSG_RESULT([yes])
+		;;
 esac
+gnome_libs="glib gtk gnome gnomeui"
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl Check for gnome-window-icon stuff.
-dnl ######################################################################################
+dnl ###########################################################################
 AC_CHECK_HEADERS(libgnomeui/gnome-window-icon.h)
 AC_SUBST(HAVE_LIBGNOMEUI_GNOME_WINDOW_ICON_H)
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl Check for gnome-print
-dnl ######################################################################################
+dnl ###########################################################################
 
 AM_PATH_GNOME_PRINT([0.25.0], [
 	AC_DEFINE(HAVE_GNOME_PRINT)
 	printing_support=yes
+	gnome_libs="$gnome_libs print"
 ], [ 
    printing_support="no (gnome-print >= 0.25 required)"
 ])
 
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl All the linguas, all the time.
-dnl ######################################################################################
+dnl ###########################################################################
 
 ALL_LINGUAS="az ca cs da de en_GB el es et fi fr ga hu it ja ko lt nl no nn pl pt pt_BR ro ru sk sl sv tr uk wa zh_CN.GB2312"
 LINGUAS="$ALL_LINGUAS"
 AM_GNOME_GETTEXT
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl Substitutions, defines, part I
-dnl ######################################################################################
+dnl ###########################################################################
 
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
@@ -132,9 +125,9 @@ AC_DEFINE_UNQUOTED(BALSA_REVISION, $BALSA_REVISION)
 AC_DEFINE_UNQUOTED(BALSA_PATCHLEVEL, $BALSA_PATCHLEVEL)
 AC_DEFINE_UNQUOTED(BALSA_VERSION, "$BALSA_VERSION")
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl More checks
-dnl ######################################################################################
+dnl ###########################################################################
 
 AC_CHECK_LIB(crypt, crypt)
 
@@ -146,34 +139,33 @@ dnl AC_CHECK_LIB(acap, acap_OpenConnection)
 AM_HDR_SIGACTION
 AM_HDR_SIGSET
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl ORBit support
-dnl Use 'failure' instead of 'dontfail' to make us bomb if no orbit. Probably should
-dnl   use 'failure'.
-dnl ######################################################################################
+dnl Use 'failure' instead of 'dontfail' to make us bomb if no orbit. 
+dnl Probably should use 'failure'.
+dnl ###########################################################################
 dnl
 dnl # No more IDL
 dnl
 dnl GNOME_ORBIT_HOOK([],dontfail)
 dnl AM_CONDITIONAL(ORBIT_INSTALLED, test -n "$ORBIT_LIBS")
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl More substitutions
-dnl ######################################################################################
+dnl ###########################################################################
 
 AC_SUBST(BALSA_MAJOR)
 AC_SUBST(BALSA_REVISION)
 AC_SUBST(BALSA_PATCHLEVEL)
 AC_SUBST(BALSA_RELEASE)
-AC_SUBST(BALSA_SHORT_VERSION)
 AC_SUBST(BALSA_VERSION)
 
 AC_SUBST(LIBOBJS)
 AC_SUBST(LIBESD_LIB)
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl Check for CVS nature, for warnings + extra program checks
-dnl ######################################################################################
+dnl ###########################################################################
 
 if test -d "${srcdir}/CVS" ; then
 	BALSA_FROM_CVS=yes
@@ -184,9 +176,9 @@ fi
 AC_MSG_CHECKING([for CVS information])
 AC_MSG_RESULT($BALSA_FROM_CVS)
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl Enable all? (=broken stuff)
-dnl ######################################################################################
+dnl ###########################################################################
 
 AC_ARG_ENABLE(all, [  --enable-all            Enable incomplete features [default=no]],[
 	use_all=$enableval
@@ -202,9 +194,9 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl Enable reply to MDN request?
-dnl ######################################################################################
+dnl ###########################################################################
 
 AC_ARG_ENABLE(all, [  --enable-mdn-reply      Enable reply to Message Disposition Notification requests [default=yes]],[
 	mdn_reply=$enableval
@@ -220,9 +212,9 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl Use threading?
-dnl ######################################################################################
+dnl ###########################################################################
 
 AC_ARG_ENABLE(threads, [  --enable-threads        Use threading for mail retrieval [default=yes]],[
 	use_threads=$enableval
@@ -270,19 +262,18 @@ dnl ##########################################################################
 dnl Check for GtkHTML if available
 dnl ##########################################################################
 
-AC_ARG_ENABLE([gtkhtml], [  --enable-gtkhtml Use GtkHTML if available (experimental) [default=no]],[
+AC_ARG_ENABLE([gtkhtml], [  --enable-gtkhtml Use GtkHTML if available (experimental) [default=yes]],[
 	check_gtkhtml=$enableval
 ],[
-	check_gtkhtml=no
+	check_gtkhtml=yes
 ])
 
 AC_MSG_CHECKING(whether to use GtkHTML)
 if test x"$check_gtkhtml" = xyes ; then
 	if gnome-config --libs gtkhtml > /dev/null 2>&1; then
         	vers=`gnome-config --modversion gtkhtml | sed 's/^gtkhtml-//'`
-	        case $vers
-        	in
-                       0.[[0123]])
+	        case $vers  in
+                       0.[0123])
                                have_gtkhtml=no ;;
                        *) 
                                have_gtkhtml=yes ;;
@@ -290,11 +281,9 @@ if test x"$check_gtkhtml" = xyes ; then
 	else
         	have_gtkhtml=no
 	fi
-
 	if test x"$have_gtkhtml" = xyes ; then
 	       	AC_MSG_RESULT(yes)
-		GTKHTML_CFLAGS="`gnome-config --cflags gtkhtml`"
-		GTKHTML_LIBS="`gnome-config --libs gtkhtml`"
+		gnome_libs="$gnome_libs gtkhtml"
 		AC_DEFINE(HAVE_GTKHTML)
 	else
 	        AC_MSG_RESULT(not found)
@@ -304,25 +293,18 @@ else
 	AC_MSG_RESULT(no)
 fi
 
-AC_SUBST(GTKHTML_CFLAGS)
-AC_SUBST(GTKHTML_LIBS)
-
 dnl ##########################################################################
 dnl Check for GdkPixbuf if available
 dnl I guess we could safely assome everybody has got this one, couldn't we?
 dnl ##########################################################################
 AC_MSG_CHECKING(whether to use GdkPixbuf)
 if gnome-config --libs gdk_pixbuf > /dev/null 2>&1; then
-	PIXBUF_CFLAGS="`gnome-config --cflags gdk_pixbuf`"
-	PIXBUF_LIBS="`gnome-config --libs gdk_pixbuf`"
+	gnome_libs="$gnome_libs gdk_pixbuf"
 	AC_DEFINE(USE_PIXBUF)
        	AC_MSG_RESULT(yes)
 else
         AC_MSG_RESULT(not found)
 fi
-AC_SUBST(PIXBUF_CFLAGS)
-AC_SUBST(PIXBUF_LIBS)
-
 
 dnl ##########################################################################
 dnl Install into gnome locations? (may require priveliges that we don't have)
@@ -352,10 +334,10 @@ fi
 AC_SUBST(gnomedatadir)
 AC_SUBST(gnomeconfdir)
 
-dnl ######################################################################################
+dnl ###########################################################################
 dnl Remember our prefixes
 dnl   The way prefix et al are defined makes us jump through some hoops.
-dnl ######################################################################################
+dnl ###########################################################################
 
 dnl datadir='${prefix}/share', so we must eval it or something. This works
 BALSA_STD_PREFIX=`eval "echo ${prefix}"`
@@ -381,7 +363,8 @@ AC_DEFINE_UNQUOTED( BALSA_DATA_PREFIX, "$BALSA_DATA_PREFIX" )
 AC_DEFINE_UNQUOTED( GNOME_STD_PREFIX, "$GNOME_STD_PREFIX" )
 AC_DEFINE_UNQUOTED( GNOME_LIB_PREFIX, "$GNOME_LIB_PREFIX" )
 AC_DEFINE_UNQUOTED( GNOME_DATA_PREFIX, "$GNOME_DATA_PREFIX" )
-AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES` ) dnl bleah
+AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES` ) 
+dnl bleah
 
 dnl ##########################################################################
 dnl Things needed by CVS user
@@ -547,13 +530,19 @@ fi
 AC_SUBST(PCRE_CFLAGS)
 AC_SUBST(PCRE_LIBS)
 
-dnl #############################################################
+dnl ###########################################################################
 dnl turn warnings into errors to enforce clean code
-dnl #############################################################
+dnl ###########################################################################
 
 AC_ARG_ENABLE(more-warnings,
 [  --enable-more-warnings  Enable maximum compiler warnings [default=yes]],
 set_more_warnings="$enableval", set_more_warnings=yes)
+
+CFLAGS="$CFLAGS `gnome-config --cflags $gnome_libs`"
+if test "$gnome_libs" != "" ; then 
+	LIBS="$LIBS `gnome-config --libs $gnome_libs`"
+	echo "GNOME libs to link against: $gnome_libs"
+fi
 
 if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
 	for option in -Wsign-promo -Wsign-compare -Wpointer-arith -Wnested-externs -Wchar-subscripts -Wuninitialized; do

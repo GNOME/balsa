@@ -11,6 +11,9 @@ AM_INIT_AUTOMAKE(libmutt, $VERSION, no-define)
 
 AM_CONFIG_HEADER(muttconfig.h)
 
+AC_PROG_CC
+AC_PROG_MAKE_SET
+AC_PROG_INSTALL
 AM_PROG_LIBTOOL
 
 AM_MAINTAINER_MODE
@@ -24,10 +27,6 @@ else
 	mutt_cv_prefix=$prefix
 fi
 AC_MSG_RESULT($mutt_cv_prefix)
-
-AC_PROG_CC
-AC_PROG_MAKE_SET
-AC_PROG_INSTALL
 
 case "$host" in
 *-*-hpux*)
@@ -154,7 +153,8 @@ int main (int argc, char **argv)
 	stat ("$mutt_cv_mailpath", &s);
 	if (s.st_mode & S_IWOTH) exit (0);
 	exit (1);
-}], [mutt_cv_worldwrite=yes], [mutt_cv_worldwrite=no]))
+}], [mutt_cv_worldwrite=yes], [mutt_cv_worldwrite=no], 
+	[ AC_MSG_ERROR("Cannot cross compile libmutt. Yet")] ))
 
 	mutt_cv_setgid=no
 	if test $mutt_cv_worldwrite = yes; then
@@ -171,7 +171,8 @@ int main (int argc, char **argv)
 	stat ("$mutt_cv_mailpath", &s);
 	if (s.st_mode & S_IWGRP) exit (0);
 	exit (1);
-}], [mutt_cv_groupwrite=yes], [mutt_cv_groupwrite=no]))
+}], [mutt_cv_groupwrite=yes], [mutt_cv_groupwrite=no],
+	[ AC_MSG_ERROR("Cannot cross compile libmutt. Yet")] ))
 
 dnl		if test $mutt_cv_groupwrite = yes; then
 dnl			AC_DEFINE(USE_DOTLOCK)
@@ -456,7 +457,8 @@ changequote([, ])dnl
                 mutt_cv_iconv_good=yes,
                 mutt_cv_iconv_good=no,
                 mutt_cv_iconv_good=yes)
-        LIBS="$mutt_save_LIBS")
+        LIBS="$mutt_save_LIBS",
+	[ AC_MSG_ERROR("Cannot cross compile libmutt. Yet")] )
 if test "$mutt_cv_iconv_good" = no; then
   AC_MSG_ERROR(Try using libiconv instead)
 fi
@@ -488,7 +490,8 @@ changequote([, ])dnl
                 mutt_cv_iconv_nontrans=no,
                 mutt_cv_iconv_nontrans=yes,
                 mutt_cv_iconv_nontrans=no)
-        LIBS="$mutt_save_LIBS")
+        LIBS="$mutt_save_LIBS",
+	[ AC_MSG_ERROR("Cannot cross compile libmutt. Yet")] )
 if test "$mutt_cv_iconv_nontrans" = yes; then
   AC_DEFINE(ICONV_NONTRANS, 1)
 else

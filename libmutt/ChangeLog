@@ -1,3 +1,7 @@
+2001-08-25  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: order stuff to supress warnings.
+
 2001-08-23  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Peter Bloomfield's fix for IMAP mailbox deletion problems.

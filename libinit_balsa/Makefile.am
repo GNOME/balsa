@@ -34,11 +34,9 @@ GOB_SOURCES =				\
 	balsa-druid-page-finish.gob
 
 INCLUDES=-I. -I$(top_srcdir) \
-	-I$(top_builddir)/libmutt \
 	-I$(top_srcdir)/libmutt \
 	-I$(top_srcdir)/libbalsa \
-	-I$(top_srcdir)/src \
-	$(GNOME_INCLUDEDIR)
+	-I$(top_srcdir)/src
 
 %.c %.h: %.gob
 	(cd $(srcdir) && gob --no-private-header $<)

@@ -55,12 +55,8 @@ index_child_get_type ()
 }
 
 /* callbacks */
-static void refresh_index_window (IndexChild * iw);
 static void mailbox_listener (MailboxWatcherMessage * iw_message);
 static void index_select_cb (GtkWidget * widget, Message * message, GdkEventButton *);
-
-static void set_index_window_data (GtkObject * object, IndexChild * iw);
-static IndexChild *get_index_window_data (GtkObject * object);
 
 static GtkWidget *create_menu (BalsaIndex * bindex, Message * message);
 
@@ -91,7 +87,8 @@ index_child_new (GnomeMDI *mdi, Mailbox * mailbox)
 {
   IndexChild *child;
 
-  if (child = gtk_type_new (index_child_get_type ()))
+  child = gtk_type_new (index_child_get_type ());
+  if (child)
     {
       child->mailbox = mailbox;
       child->mdi = mdi;
@@ -109,8 +106,8 @@ index_child_destroy(GtkObject *obj)
 
   ic = INDEX_CHILD(obj);
 
-  mailbox_open_unref (ic->mailbox);
   mailbox_watcher_remove(ic->mailbox,ic->watcher_id);
+  mailbox_open_unref (ic->mailbox);
 
   gnome_mdi_remove_child(ic->mdi, GNOME_MDI_CHILD(ic), TRUE);
 /*
@@ -124,7 +121,6 @@ index_child_destroy(GtkObject *obj)
 static GtkWidget *
 index_child_create_view (GnomeMDIChild * child)
 {
-  GList *list;
   GtkWidget *messagebox;
   GtkWidget *vbox;
   IndexChild *iw;
@@ -170,24 +166,6 @@ index_child_create_view (GnomeMDIChild * child)
   mailbox_open_unref(iw->mailbox);
 
   return (vbox);
-}
-
-/*
- * set/get data convience functions used for attaching the
- * IndexChild structure to GTK objects so it can be retrieved
- * in callbacks
- */
-static void
-set_index_window_data (GtkObject * object, IndexChild * iw)
-{
-  gtk_object_set_data (object, "index_window_data", (gpointer) iw);
-}
-
-
-static IndexChild *
-get_index_window_data (GtkObject * object)
-{
-  return gtk_object_get_data (object, "index_window_data");
 }
 
 

@@ -4,33 +4,15 @@ See 'COPYING' for licence information.
 
 Jay Painter      -- jpaint@serv.net   -- jpaint@gimp.org
 Stuart Parmenter -- pavlov@innerx.net -- pavlov@gimp.org
-http://www.serv.net/~jpaint
-
-This uses Mark Crispin's c-client library, which needs to be in or linked from the
-toplevel of this directory.  I have left my link in this tar file to show how 
-it's done.
- 
-It must be compiled first in order to compile Balsa.  More information on the
-c-client liberary is avaible at http://www.imap.org.
-
+http://www.pavlov.net/balsa/
 
 BUILD INSTRUCTIONS:
-
-First compile the c-client library
-
-Then to build balsa:
 
 ******************************
 ****** STEPS TO COMPILE ******
 ******************************
 
 STEP 1:
-
-# cd imap
-# make lnx           (look below for your OS type)
-# cd ..
-
-STEP 2:
 
 # ./autogen.sh
 # make
@@ -39,74 +21,8 @@ STEP 2:
 ******************************
 ******************************
 
-FEATURES (not):
-  * I can't think of any :-)
+FEATURES:
+  * Lots and lots! :)
 
 That's all for now,
-Jay
-
-*** IMPORTANT ***
-Please use one of these with make when you are compiling the imap directory:
-
-# a32   AIX 3.2 for RS/6000
-# a41   AIX 4.1 for RS/6000
-# aix   AIX/370
-# ami   AmigaDOS
-# am2   AmigaDOS with a 68020+
-# ama   AmigaDOS using AS225R2
-# amn   AmigaDOS with a 680x0 using "new" socket library
-# aos   AOS for RT
-# art   AIX 2.2.1 for RT
-# asv   Altos SVR4
-# aux   A/UX
-# bs3   BSD/i386 3.0 and higher
-# bsd   generic BSD
-# bsf   FreeBSD
-# bsi   BSD/i386
-# cvx   Convex
-# d-g   Data General DG/UX
-# d41   Data General DG/UX 4.11
-# d54   Data General DG/UX 5.4
-# dpx   Bull DPX/2 B.O.S.
-# drs   ICL DRS/NX
-# dyn   Dynix
-# epx   EP/IX
-# gas   GCC Altos SVR4
-# gh9   GCC HP-UX 9.x
-# ghp   GCC HP-UX 10.x
-# gso   GCC Solaris
-# gsu   GCC SUN-OS
-# gul   GCC RISC Ultrix (DEC-5000)
-# hpp   HP-UX 9.x
-# hpx   HP-UX 10.x
-# hxd   HP-UX 10.x with DCE security
-# isc   Interactive Systems
-# lnx   Linux
-# lyn   LynxOS
-# mct   MachTen
-# mnt   Atari ST Mint (not MacMint)
-# neb   NetBSD/FreeBSD
-# nxt   NEXTSTEP
-# osf   OSF/1
-# os4   OSF/1 (Digital UNIX) 4
-# ptx   PTX
-# pyr   Pyramid
-# qnx   QNX 4
-# s40   SUN-OS 4.0
-# sc5   SCO Open Server 5.0.x
-# sco   Santa Cruz Operation
-# shp   HP-UX with Trusted Computer Base
-# sgi   Silicon Graphics IRIX
-# sl5   Linux with shadow password security (libc5 version)
-# slx   Linux with shadow password security (glibc version)
-# snx   Siemens Nixdorf SININX or Reliant UNIX
-# sol   Solaris (won't work unless "ucbcc" works -- use gso instead)
-# sos   OSF/1 with SecureWare
-# ssn   SUN-OS with shadow password security
-# sun   SUN-OS 4.1 or better
-# sv2   SVR2 on AT&T PC-7300 (incomplete port)
-# sv4   generic SVR4
-# ult   RISC Ultrix (DEC-5000)
-# uw2   UnixWare SVR4.2
-# vul   VAX Ultrix
-# vu2   VAX Ultrix 2.3 (e.g. for VAXstation-2000 or similar old version)
+Stuart

@@ -288,6 +288,8 @@ void message_move (Message * message, Mailbox * mailbox);
 void message_delete (Message * message);
 void message_undelete (Message * message);
 
+void message_answer (Message * message);
+
 void message_body_ref (Message * message);
 void message_body_unref (Message * message);
 

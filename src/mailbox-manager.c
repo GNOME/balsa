@@ -50,12 +50,10 @@ static void delete_cb ();
 void
 open_mailbox_manager ()
 {
-  GtkWidget *label;
   GtkWidget *vbox;
   GtkWidget *hbox;
   GtkWidget *bbox;
   GtkWidget *button;
-  GtkWidget *frame;
 
   static gchar *titles[] =
   {

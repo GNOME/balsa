@@ -21,7 +21,7 @@
 #include "new-mailbox.h"
 #include "main-window.h"
 #include "misc.h"
-
+#include "save-restore.h"
 
 /* we'll create the notebook pages in the
  * order of these enumerated types so they 
@@ -77,14 +77,11 @@ static void destroy_new_mailbox (GtkWidget * widget);
 static void close_new_mailbox (GtkWidget * widget);
 static void ok_new_mailbox (GtkWidget * widget);
 static void refresh_new_mailbox (NewMailboxWindow * nmw);
-static void refresh_local_page (NewMailboxWindow * nmw);
 static void refresh_button_state (NewMailboxWindow * nmw);
 
 /* callbacks for new page */
 static void local_mailbox_type_cb (GtkWidget * widget);
 static void next_cb (GtkWidget * widget);
-static void menu_item_cb (GtkWidget * widget);
-
 
 /* callbacks for local page */
 static void local_mailbox_name_changed_cb (GtkWidget * widget);
@@ -104,7 +101,6 @@ open_new_mailbox (Mailbox * mailbox)
 {
   NewMailboxWindow *nmw;
   GList *list;
-  GtkWidget *button;
   GtkWidget *bbox;
 
 
@@ -262,6 +258,7 @@ ok_new_mailbox (GtkWidget * widget)
       mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_name)));
       MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_path)));
       balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
+
       add_mailbox_config (mailbox->name, MAILBOX_LOCAL (mailbox)->path, 0);
       break;
       
@@ -287,10 +284,6 @@ static void
 refresh_new_mailbox (NewMailboxWindow * nmw)
 {
   GString *str = g_string_new (NULL);
-  GList *children;
-  GtkWidget *menu;
-  GtkWidget *menuitem;
-  
 
   if (nmw->mailbox == NULL)
     {
@@ -310,21 +303,6 @@ refresh_new_mailbox (NewMailboxWindow * nmw)
   /* cleanup */
   g_string_free (str, TRUE);
 }
-
-
-
-static void
-refresh_local_page (NewMailboxWindow * nmw)
-{
-
-  if (nmw->mailbox == NULL)
-    {
-      gtk_entry_set_text (GTK_ENTRY (nmw->local_mailbox_name), nmw->mailbox->name);
-      gtk_widget_set_sensitive (nmw->local_mailbox_path, FALSE);
-      gtk_entry_set_text (GTK_ENTRY (nmw->local_mailbox_path), balsa_app.local_mail_directory);
-    }
-}
-
 
 
 
@@ -352,7 +330,6 @@ create_new_page (NewMailboxWindow * nmw)
 {
   GtkWidget *hbox;
   GtkWidget *vbox;
-  GtkWidget *bbox;
   GtkWidget *frame;
   GtkWidget *table;
   GtkWidget *button;
@@ -474,10 +451,7 @@ static GtkWidget *
 create_local_mailbox_page (NewMailboxWindow * nmw)
 {
   GtkWidget *return_widget;
-  GtkWidget *vbox;
-  GtkWidget *hbox;
   GtkWidget *table;
-  GtkWidget *entry;
   GtkWidget *label;
   GtkWidget *menu;
   GtkWidget *menuitem;

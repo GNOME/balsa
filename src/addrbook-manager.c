@@ -385,4 +385,5 @@ addressbook_window_new (GtkWidget * widget, gpointer data)
 gint
 delete_event (GtkWidget * widget, gpointer data)
 {
+ return FALSE;
 }

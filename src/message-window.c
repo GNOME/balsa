@@ -32,20 +32,14 @@ struct _MessageWindow
     GtkWidget *bmessage;
   };
 
-static GList *message_window_list = NULL;
-
-
 void message_window_new (Message *message);
 
 /* callbacks */
 static void destroy_message_window (GtkWidget * widget);
 static void close_message_window (GtkWidget * widget);
-static void refresh_message_window (MessageWindow * mw);
 
 static void set_message_window_data (GtkObject * object, MessageWindow * mw);
 static MessageWindow *get_index_window_data (GtkObject * object);
-
-static void mailbox_listener (MailboxWatcherMessage * iw_message);
 
 void
 message_window_new(Message *message)

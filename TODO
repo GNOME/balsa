@@ -1,20 +1,19 @@
 TODO LIST:
 
----------------------------------------------------------
-Note: This list is not complete, but here for the authors
-      to remember what they are supposed to be doing.
----------------------------------------------------------
-
-
-
-Stuart
----------------------------------------------------------
- * #mh/ requires a .mh_profile in ~ which looks something
-   like:  "Path: Mail", telling it to get mh folders from
-   ~/Mail
-
  * Look into recursing directories upon local mail reading.
-   This this should create submenus under the mailbox menu.
-   Not sure how to do this right now without chaning lots
-   of code, so we will address this later.
+   This this should create submenus under the mailbox ctree.
 
+ * Make an inbox which all external mail sources route mail
+   through, which filters then move around as needed.  It
+   needs to be possible to set a default folder for external
+   sources to be delivered into as well.
+
+Balsa Library (libbalsa):
+
+ * Start with a mbox parser that puts everything into the
+   correct structures, etc.  Messages need to store the
+   starting and ending offsets for their messages, as well
+   as mime parts need to store their offsets in the body_list
+   inside the message structure.
+
+ * mh folders, maildir, etc etc etc... same as above.

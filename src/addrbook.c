@@ -13,7 +13,7 @@ addressbook_read_pine (gchar * file)
 {
   int fd, ret, i, j = 0;
 
-  int ine = 0, ein = 0, tabnum = 0;
+  int ine = 0, tabnum = 0;
 
   char buff[4096];
   char tmp[4096];
@@ -109,4 +109,5 @@ addressbook_read_pine (gchar * file)
     }
 
   close (fd);
+  return NULL;
 }

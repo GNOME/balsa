@@ -21,6 +21,7 @@
 #include <gnome.h>
 
 #include "balsa-app.h"
+#include "main-window.h"
 #include "mailbox.h"
 #include "save-restore.h"
 

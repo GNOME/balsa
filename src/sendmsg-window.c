@@ -27,8 +27,9 @@
 #include "balsa-index.h"
 #include "mailbox.h"
 #include "misc.h"
-#include "sendmsg-window.h"
 #include "mailbox.h"
+#include "send.h"
+#include "sendmsg-window.h"
 
 gint delete_event (GtkWidget *, gpointer);
 
@@ -36,7 +37,6 @@ extern GtkWidget *new_icon (gchar **, GtkWidget *);
 
 static void send_message_cb (GtkWidget *, BalsaSendmsg *);
 static void close_window (GtkWidget *, gpointer);
-static void balsa_sendmsg_free (BalsaSendmsg *);
 static GtkWidget *create_menu (BalsaSendmsg *);
 
 static gchar *gt_replys (gchar *);
@@ -326,7 +326,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_entry_set_editable (GTK_ENTRY (msg->from), FALSE);
 
   from = g_malloc (strlen (balsa_app.real_name) + 2 + strlen (balsa_app.username) + 1 + strlen (balsa_app.hostname) + 2);
-  sprintf (from, "%s <%s@%s>\0",
+  sprintf (from, "%s <%s@%s>",
 	   balsa_app.real_name,
 	   balsa_app.username,
 	   balsa_app.hostname);
@@ -513,30 +513,6 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   g_list_free (message->body_list);
   message_free (message);
   balsa_sendmsg_destroy (bsmsg);
-}
-
-static gchar *
-gtk_text_to_email (char *buff)
-{
-  int i = 0, len = strlen (buff);
-  GString *gs = g_string_new (NULL);
-  gchar *str;
-
-  for (i = 0; i < len; i++)
-    {
-      switch (buff[i])
-	{
-	case '\n':
-	  gs = g_string_append (gs, "\015\012");
-	  break;
-	default:
-	  gs = g_string_append_c (gs, buff[i]);
-	  break;
-	}
-    }
-  str = g_strdup (gs->str);
-  g_string_free (gs, 1);
-  return str;
 }
 
 static gchar *

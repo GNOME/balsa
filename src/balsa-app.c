@@ -37,14 +37,12 @@ struct BalsaApplication balsa_app;
 
 
 /* prototypes */
-static void load_global_settings ();
 static int mailboxes_init ();
-static void setup_local_mailboxes ();
 static void my_special_mailbox ();
 static gint read_signature ();
-
-
+#if 0
 static gint check_for_new_messages ();
+#endif
 
 void
 init_balsa_app (int argc, char *argv[])

@@ -52,8 +52,6 @@ mblist_open_window (GnomeMDI * mdi)
   gchar *text[] =
   {"Balsa"};
 
-  guint handler;
-
   if (mblw)
     return;
 

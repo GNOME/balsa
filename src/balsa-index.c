@@ -351,7 +351,6 @@ balsa_index_add (BalsaIndex * bindex,
 {
   gchar buff1[1024], buff2[1024];
   gchar *text[6];
-  gchar *tmp;
   gint row;
 
   g_return_if_fail (bindex != NULL);

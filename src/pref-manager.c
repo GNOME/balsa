@@ -80,7 +80,6 @@ void
 open_preferences_manager ()
 {
   GtkWidget *label;
-  GtkWidget *vbox;
   GtkWidget *hbox;
   GtkWidget *bbox;
   GtkWidget *button;
@@ -356,7 +355,6 @@ create_identity_page ()
   GtkWidget *vbox;
   GtkWidget *table;
   GtkWidget *label;
-  GtkWidget *button;
 
 
   vbox = gtk_vbox_new (FALSE, 0);
@@ -462,8 +460,6 @@ create_view_page ()
 {
   GtkWidget *vbox;
   GtkWidget *table;
-  GtkWidget *label;
-  GtkWidget *button;
   GtkWidget *frame;
 
 
@@ -565,8 +561,6 @@ create_mdi_page ()
 {
   GtkWidget *vbox;
   GtkWidget *table;
-  GtkWidget *label;
-  GtkWidget *button;
   GtkWidget *frame;
 
 

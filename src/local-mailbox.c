@@ -32,7 +32,6 @@
 void
 load_local_mailboxes ()
 {
-  GList *list;
   DIR *dp;
   struct dirent *d;
   struct stat st;

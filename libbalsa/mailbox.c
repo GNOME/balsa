@@ -260,7 +260,6 @@ gint
 mailbox_open_ref (Mailbox * mailbox)
 {
   gchar buffer[MAILTMPLEN];
-  Mailbox *old_mailbox;
 
   LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
 
@@ -920,7 +919,7 @@ message_answer (Message * message)
   mail_setflag (CLIENT_STREAM (message->mailbox), tmp, "\\ANSWERED");
 
   message->flags |= MESSAGE_FLAG_ANSWERED;
-  send_watcher_mark_delete_message (message->mailbox, message);
+  send_watcher_mark_answer_message (message->mailbox, message);
 
   UNLOCK_MAILBOX ();
 }
@@ -1189,8 +1188,8 @@ mm_exists (MAILSTREAM * stream, unsigned long number)
     {
       g_print ("mm_exists: %s %d messages %d new_messages\n",
 	       client_mailbox->name,
-	       client_mailbox->messages,
-	       client_mailbox->new_messages);
+	       (gint)client_mailbox->messages,
+	       (gint)client_mailbox->new_messages);
     }
 }
 
@@ -1210,7 +1209,7 @@ mm_flags (MAILSTREAM * stream, unsigned long number)
     return;
 
   if (balsa_app.debug)
-    g_print ("Message %d in mailbox %s changed.\n", number, stream->mailbox);
+    g_print ("Message %d in mailbox %s changed.\n", (gint)number, stream->mailbox);
 }
 
 

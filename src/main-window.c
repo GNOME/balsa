@@ -74,13 +74,6 @@ static void about_box_destroy_cb ();
 void
 open_main_window ()
 {
-  GtkWidget *vbox;
-  GtkWidget *hbox;
-  GtkWidget *label;
-  GtkWidget *vpane;
-  GtkWidget *progress_bar;
-
-
   /* main window */
   mdi = GNOME_MDI (gnome_mdi_new ("balsa", "Balsa"));
 
@@ -138,7 +131,6 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi, GtkWidget *app)
   GtkWidget *menubar;
   GtkWidget *w;
   GtkWidget *menu;
-  GtkWidget *menu1;
   GtkWidget *menu_items[14];
   GtkAccelGroup *accel;
 
@@ -377,7 +369,6 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi, GtkWidget *app)
   GtkWidget *window;
   GtkWidget *toolbar;
   GtkWidget *toolbarbutton;
-  GtkWidget *label;
 
   toolbar = gtk_toolbar_new (GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_ICONS);
 

@@ -20,6 +20,7 @@
 #include <pwd.h>
 
 #include "balsa-app.h"
+#include "mailbox.h"
 #include "misc.h"
 #include "save-restore.h"
 
@@ -125,7 +126,6 @@ load_mailboxes (gchar * name)
 {
   MailboxType mailbox_type;
   Mailbox *mailbox;
-  gint i = 0;
   gint type;
   GString *gstring;
   gstring = g_string_new (NULL);
@@ -197,6 +197,7 @@ load_mailboxes (gchar * name)
   gnome_config_pop_prefix ();
   gnome_config_sync ();
   g_string_free (gstring, 1);
+  return TRUE;
 }
 
 

@@ -117,10 +117,16 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
         content_type = g_strdup(mime_type);
     else if(filename)
         content_type = libbalsa_lookup_mime_type(filename);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    else
+	content_type = g_strdup("application/octet-stream");
+
+#else                           /* GTK_CHECK_VERSION(2, 4, 0) */
     else {
         if(used_type) *used_type = g_strdup("application/octet-stream");
         return balsa_pixmap_finder ("attachment.png");
     }
+#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
     /* FIXME:
        or icon_file = gnome_desktop_item_find_icon(GVMGI(content_Type)?) */
     icon_file = gnome_vfs_mime_get_icon(content_type);

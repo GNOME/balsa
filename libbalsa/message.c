@@ -305,6 +305,8 @@ libbalsa_message_body_charset(LibBalsaMessageBody * body)
     return charset;
 }
 
+/* Note: libbalsa_message_charset returns a pointer to the charset field or
+ * NULL, but does NOT make a copy of an existing string! */
 const gchar *
 libbalsa_message_charset(LibBalsaMessage * message)
 {
@@ -314,11 +316,10 @@ libbalsa_message_charset(LibBalsaMessage * message)
     body = message->body_list;
     g_return_val_if_fail(body != NULL, NULL);
 
-    if (body->charset) {
-	return g_strdup(body->charset);
-    } else {
+    if (body->charset)
+	return body->charset;
+    else
 	return libbalsa_message_body_charset(body);
-    }
 }
 
 /* message_user_hdrs:

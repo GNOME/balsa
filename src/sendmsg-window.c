@@ -163,7 +163,7 @@ static GnomeUIInfo file_menu[] =
 			 include_file_cb, GNOME_STOCK_MENU_OPEN),
 
 #define MENU_FILE_ATTACH_POS 1
-  GNOMEUIINFO_ITEM_STOCK(N_("_Attach file..."), NULL, 
+  GNOMEUIINFO_ITEM_STOCK(N_("_Attach File..."), NULL, 
 			 attach_clicked, GNOME_STOCK_MENU_ATTACH),
   GNOMEUIINFO_SEPARATOR,
 
@@ -193,21 +193,21 @@ static GnomeUIInfo edit_menu[] =
    GNOMEUIINFO_MENU_CUT_ITEM(cut_cb, NULL),
    GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
    GNOMEUIINFO_MENU_PASTE_ITEM(paste_cb, NULL),
-   { GNOME_APP_UI_ITEM, N_("Select all"), NULL,
+   { GNOME_APP_UI_ITEM, N_("Select All"), NULL,
      (gpointer) select_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
      NULL, 'A', GDK_CONTROL_MASK, NULL },
    GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_WRAP_BODY 5
-   { GNOME_APP_UI_ITEM, N_("_Wrap body") ,N_("Wrap message lines"),
+   { GNOME_APP_UI_ITEM, N_("_Wrap Body") ,N_("Wrap message lines"),
      (gpointer)wrap_body_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
      GDK_z, GDK_CONTROL_MASK, NULL },
    GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_REFLOW_PARA 7
-   { GNOME_APP_UI_ITEM, N_("_Reflow paragraph") , NULL,
+   { GNOME_APP_UI_ITEM, N_("_Reflow Paragraph") , NULL,
      (gpointer)reflow_par_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
      GDK_r, GDK_CONTROL_MASK, NULL },
 #define EDIT_MENU_REFLOW_MESSAGE 8
-   { GNOME_APP_UI_ITEM, N_("R_eflow message") , NULL,
+   { GNOME_APP_UI_ITEM, N_("R_eflow Message") , NULL,
      (gpointer)reflow_body_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
      GDK_r, GDK_CONTROL_MASK | GDK_SHIFT_MASK, NULL },
    GNOMEUIINFO_SEPARATOR,
@@ -1765,8 +1765,8 @@ do_reflow (GtkText * txt, gint mode) {
    dummy = 0;
    gtk_editable_insert_text( GTK_EDITABLE(txt),the_text, 
 			     strlen(the_text), &dummy);
-   gtk_editable_set_position( GTK_EDITABLE(txt), pos);
    gtk_text_thaw(txt);
+   gtk_editable_set_position( GTK_EDITABLE(txt), pos);
    g_free(the_text);
 }
 

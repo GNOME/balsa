@@ -201,14 +201,14 @@ static GnomeUIInfo file_menu[] =
 #define MENU_FILE_GET_NEW_MAIL_POS 3
   /* Ctrl-M */
   {
-    GNOME_APP_UI_ITEM, N_("_Get new mail"), N_("Fetch new incoming mail"),
+    GNOME_APP_UI_ITEM, N_("_Get New Mail"), N_("Fetch new incoming mail"),
     check_new_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_RCV, 'M', GDK_CONTROL_MASK, NULL
   },
 #define MENU_FILE_SEND_QUEUED_POS 4
   /* Ctrl-S */
   {
-    GNOME_APP_UI_ITEM, N_("_Send queued mail"), N_("Send mail from the outbox"),
+    GNOME_APP_UI_ITEM, N_("_Send Queued Mail"), N_("Send mail from the outbox"),
     send_outbox_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_SND, 'A', GDK_CONTROL_MASK, NULL
   },
@@ -224,15 +224,15 @@ static GnomeUIInfo file_menu[] =
 
   GNOMEUIINFO_SEPARATOR,
 
-  #if 0
+#if 0
   {
       GNOME_APP_UI_ITEM, "Test new init", "Test the new initialization druid",
       balsa_init_begin, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       GNOME_STOCK_MENU_MAIL_RCV, '\0', GDK_CONTROL_MASK, NULL
   },  
   GNOMEUIINFO_SEPARATOR,
-  #endif
-
+#endif
+  
   GNOMEUIINFO_MENU_EXIT_ITEM(balsa_exit, NULL),
 
   GNOMEUIINFO_END
@@ -264,11 +264,11 @@ static GnomeUIInfo edit_menu[] =
 
 static GnomeUIInfo shown_hdrs_menu[] =
 {
-   GNOMEUIINFO_RADIOITEM( N_("N_o headers"), N_("Display no headers"), 
+   GNOMEUIINFO_RADIOITEM( N_("N_o Headers"), N_("Display no headers"), 
 			  show_no_headers_cb, NULL),
-   GNOMEUIINFO_RADIOITEM( N_("S_elected headers"), N_("Display selected headers"),
+   GNOMEUIINFO_RADIOITEM( N_("S_elected Headers"), N_("Display selected headers"),
 			  show_selected_cb, NULL),
-   GNOMEUIINFO_RADIOITEM( N_("All _headers"), N_("Display all headers"), 
+   GNOMEUIINFO_RADIOITEM( N_("All _Headers"), N_("Display all headers"), 
 			  show_all_headers_cb, NULL),
    GNOMEUIINFO_END
 };
@@ -276,9 +276,9 @@ static GnomeUIInfo shown_hdrs_menu[] =
 static GnomeUIInfo view_menu[] =
 {
 #define MENU_VIEW_MAILBOX_LIST_POS 0
-  GNOMEUIINFO_TOGGLEITEM( N_("_Show mailbox tree"), "Toggle display of mailbox and folder tree", show_mbtree_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_("_Show Mailbox Tree"), "Toggle display of mailbox and folder tree", show_mbtree_cb, NULL),
 #define MENU_VIEW_MAILBOX_TABS_POS 1
-  GNOMEUIINFO_TOGGLEITEM( N_("Show mailbox _tabs"), "Toggle display of mailbox notebook tabs", show_mbtabs_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_("Show Mailbox _Tabs"), "Toggle display of mailbox notebook tabs", show_mbtabs_cb, NULL),
   GNOMEUIINFO_SEPARATOR,
 #define MENU_VIEW_WRAP_POS 3
   GNOMEUIINFO_TOGGLEITEM( N_("_Wrap"), "Wrap message lines", wrap_message_cb, NULL),
@@ -299,7 +299,7 @@ static GnomeUIInfo message_menu[] =
 #define MENU_MESSAGE_REPLY_ALL_POS 1
     /* A */
   {
-    GNOME_APP_UI_ITEM, N_("Reply to _all..."),
+    GNOME_APP_UI_ITEM, N_("Reply To _All..."),
     N_("Reply to all recipients of the current message"),
     replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_DATA,
     reply_to_all_menu_xpm, 'A', 0, NULL
@@ -349,7 +349,7 @@ static GnomeUIInfo message_menu[] =
 #define MENU_MESSAGE_TOGGLE_FLAGGED_POS 10
   /* ! */
   {
-      GNOME_APP_UI_ITEM, N_("_Toggle flagged"), N_("Toggle flagged"),
+      GNOME_APP_UI_ITEM, N_("_Toggle Flagged"), N_("Toggle flagged"),
       toggle_flagged_message_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
       NULL, 'X', 0, NULL
   },
@@ -393,7 +393,7 @@ static GnomeUIInfo mailbox_menu[] =
 			  mblist_menu_delete_cb, GNOME_STOCK_PIXMAP_REMOVE),
   GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_COMMIT_POS 7
-  GNOMEUIINFO_ITEM_STOCK (N_("Co_mmit current"), N_("Commit the changes in the currently opened mailbox"),
+  GNOMEUIINFO_ITEM_STOCK (N_("Co_mmit Current"), N_("Commit the changes in the currently opened mailbox"),
 			  mailbox_commit_changes, GNOME_STOCK_MENU_REFRESH),
 #define MENU_MAILBOX_CLOSE_POS 8
   GNOMEUIINFO_ITEM_STOCK (N_("_Close"), N_("Close mailbox"),
@@ -449,7 +449,7 @@ static GnomeUIInfo main_toolbar[] =
                           replyto_message_cb,
                           GNOME_STOCK_PIXMAP_MAIL_RPL),
 #define TOOLBAR_REPLY_ALL_POS 7
-  GNOMEUIINFO_ITEM (N_("Reply to all"), N_("Reply to all"),
+  GNOMEUIINFO_ITEM (N_("Reply To All"), N_("Reply to all"),
                     replytoall_message_cb,
                     reply_to_all_xpm),
 #define TOOLBAR_FORWARD_POS 8
@@ -1277,27 +1277,27 @@ mail_progress_notify_cb( )
 	    if( progress_dialog && GTK_IS_WIDGET( progress_dialog ) )
 	      {
 		gtk_label_set_text( GTK_LABEL(progress_dialog_source), 
-				  threadmessage->message_string );
+                                    threadmessage->message_string );
 		gtk_label_set_text( GTK_LABEL(progress_dialog_message), "" );
 	        gtk_widget_show_all( progress_dialog );
 	      }
 	    else 
               {
 		gnome_appbar_set_status(balsa_app.appbar,
-				threadmessage->message_string);
+                                        threadmessage->message_string);
 	      }
 	    break;
 	  case MSGMAILTHREAD_MSGINFO:
 	    if( progress_dialog && GTK_IS_WIDGET( progress_dialog ) )
 	      {
 		gtk_label_set_text( GTK_LABEL(progress_dialog_message), 
-				  threadmessage->message_string );
+                                    threadmessage->message_string );
 		gtk_widget_show_all( progress_dialog );
 	      }
 	    else 
 	      {
 		gnome_appbar_set_status(balsa_app.appbar,
-				threadmessage->message_string);
+                                        threadmessage->message_string);
 	      }
 	    break;
 	  case MSGMAILTHREAD_UPDATECONFIG:
@@ -1366,6 +1366,7 @@ mail_progress_notify_cb( )
     return TRUE;
 }
 
+
 void
 progress_dialog_destroy_cb( GtkWidget *widget, gpointer data )
 {
@@ -1375,6 +1376,7 @@ progress_dialog_destroy_cb( GtkWidget *widget, gpointer data )
   progress_dialog_message = NULL;
   progress_dialog_bar = NULL;
 }
+
 
 gboolean
 send_progress_notify_cb( )

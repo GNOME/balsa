@@ -381,7 +381,7 @@ moveto_handler (BalsaIndex * bindex)
     return TRUE;
 
   gdk_threads_enter();
-  gtk_clist_moveto (GTK_CLIST (bindex), bindex->first_new_message - 1, -1, 0.0, 0.0);
+  gtk_clist_moveto (GTK_CLIST (bindex), bindex->first_new_message - 1, -1, 0.5, 0.0);
   gdk_threads_leave();
 
   return FALSE;
@@ -578,8 +578,8 @@ balsa_index_select_row (BalsaIndex* bindex, gint row)
   gtk_clist_unselect_all (clist);
   gtk_clist_select_row (clist, row, -1);
   
-  if (gtk_clist_row_is_visible (clist, row) != GTK_VISIBILITY_FULL)
-    gtk_clist_moveto (clist, row, -1, 1.0, 0.0);
+  /* if (gtk_clist_row_is_visible (clist, row) != GTK_VISIBILITY_FULL) */
+    gtk_clist_moveto (clist, row, -1, 0.5, 0.0);
 }
 
 /* balsa_index_select_next:

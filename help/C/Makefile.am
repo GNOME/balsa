@@ -11,7 +11,7 @@ balsa_help_DATA = \
 	topic.dat \
 	index.html
 
-NUM_PREF_PAGES = 9
+NUM_PREF_PAGES = 11
 
 # Only build html by default
 all: index.html

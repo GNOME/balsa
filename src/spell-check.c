@@ -786,6 +786,7 @@ balsa_spell_check_next (BalsaSpellCheck* spell_check)
                                        spell_check->start_pos, 
                                        spell_check->end_pos);
         gtk_text_set_point (spell_check->text, spell_check->start_pos);
+        
         gtk_text_forward_delete(spell_check->text, 
                                 spell_check->end_pos - spell_check->start_pos);
         gtk_text_insert (spell_check->text, spell_check->font, 
@@ -794,10 +795,9 @@ balsa_spell_check_next (BalsaSpellCheck* spell_check)
         g_free (word);
 
         /* scroll text window to show current word */
+        gtk_text_thaw (spell_check->text);
         gtk_editable_set_position (GTK_EDITABLE (spell_check->text), 
                                    spell_check->start_pos);
-        
-        gtk_text_thaw (spell_check->text);
 }
 
 
@@ -1200,9 +1200,12 @@ next_word (BalsaSpellCheck* spell_check)
         }
                 
         
-        if (!in_line && line && !balsa_app.check_sig)
-                if (g_strncasecmp (line, "-- \n", 4) == 0)
+        if (!in_line && line && !balsa_app.check_sig) {
+                if (g_strncasecmp (line, "-- \n", 4) == 0) {
                         at_end = TRUE;
+                        g_free (line);
+                }
+        }
 
         /* match the next word */      
         if (!at_end && line) {

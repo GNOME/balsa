@@ -1,3 +1,20 @@
+2000-10-01  Matthew Guenther  <guentherm@asme.org>
+
+	* help/C/Makefile.am: Change number of win-config redirects
+	created.
+	* help/C/win-config-gen: Small counter fix.
+	* help/C/balsa.sgml: Major changes to bring up to date, new
+	address book stuff, new menus, preferences dialog.  More glossary
+	terms and extensive interlinking.
+	* help/C/images/*:  New images for updated program.
+	* src/balsa-index.c: Selected message scrolls to center of index.
+	* src/main-window.c, src/sendmsg-window.c, src/balsa-index-page.c:
+	Menu items properly capitalized.
+	* src/spell-check.c, src/sendmsg-window.c: Moved calls to
+	gtk_editable_set_position outside gtk_text_freeze/thaw.  Causes
+	random crashes on my machine, possibly a gtk+ bug.  Memory leak
+	fix.
+	
 2000-10-01  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/message.c: libbalsa_message_move,

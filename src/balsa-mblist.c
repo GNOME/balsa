@@ -744,7 +744,8 @@ balsa_mblist_update_mailbox (BalsaMBList * mblist, LibBalsaMailbox * mailbox)
   gtk_clist_freeze (GTK_CLIST (mblist));
   balsa_mblist_mailbox_style (GTK_CTREE (mblist), 
                               node, 
-                              gtk_ctree_node_get_row_data (GTK_CTREE(mblist), node));
+                              gtk_ctree_node_get_row_data (GTK_CTREE(mblist), 
+                                                           node));
 
   /* Do the folder styles as well */
   gtk_ctree_post_recursive (GTK_CTREE (mblist), NULL, 

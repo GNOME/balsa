@@ -6,7 +6,7 @@ file_prefix="win-config-"
 suffix="html"
 counter=0;
 
-while let "counter <= $num_files"; do
+while let "counter < $num_files"; do
 	current_url=$help_file\#WIN-CONFIG-$counter
 	current_file=$file_prefix$counter.$suffix
 	

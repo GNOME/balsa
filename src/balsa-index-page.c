@@ -338,6 +338,7 @@ idle_handler_cb(GtkWidget * widget)
   gtk_object_remove_data (GTK_OBJECT (widget), "data");
 
   gdk_threads_leave();
+
   return FALSE;
 }
 
@@ -480,7 +481,7 @@ create_menu (BalsaIndex * bindex)
   create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_RPL, _("Reply..."),
 			 balsa_message_reply, bindex, TRUE);
 
-  create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_RPL, _("Reply to all..."),
+  create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_RPL, _("Reply To All..."),
 			 balsa_message_replytoall, bindex, TRUE);
 
   create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_FWD, _("Forward..."),
@@ -492,7 +493,7 @@ create_menu (BalsaIndex * bindex)
     create_stock_menu_item(menu, GNOME_STOCK_MENU_UNDELETE, _("Delete"),
 			   balsa_message_undelete, bindex, !bindex->mailbox->readonly);
   } else {
-    create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH, _("Move to Trash"),
+    create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH, _("Move To Trash"),
 			   balsa_message_delete, bindex, !bindex->mailbox->readonly);
   }
 
@@ -500,7 +501,7 @@ create_menu (BalsaIndex * bindex)
 			 _("Store Address..."),
 			 balsa_store_address, bindex, TRUE);
 
-  menuitem = gtk_menu_item_new_with_label(_("Toggle flagged"));
+  menuitem = gtk_menu_item_new_with_label(_("Toggle Flagged"));
   gtk_widget_set_sensitive(menuitem, !bindex->mailbox->readonly);
   gtk_signal_connect(GTK_OBJECT(menuitem),
 		     "activate",

@@ -11,6 +11,8 @@
 
 	* idl/balsa.idl: added new idl
 
+	* src/orbit-glue.c: preliminary orbit glue functions
+	
 2000-09-06  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libinit_balsa/libinit.c: Add gdk_threads_{enter,leave} calls

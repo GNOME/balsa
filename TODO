@@ -1,5 +1,6 @@
 TODO LIST:
 
+ * spell checking in the send window
 
  * inbox/outbox/trash should be able to be IMAP
     this can be done by editing ~/.balsarc

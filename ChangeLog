@@ -1,3 +1,10 @@
+2001-05-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* help/C/balsa.sgml: signature doc updates from 
+	Julian M Catchen <julian@catchen.org>.
+	* help/C/README: some updates relevant to RH 7.1.
+	* help/C/Makefile.am: do not force particular stylesheet location.
+
 2001-05-15  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/pref-manager.c (open_preferences_manager): fix typo in ifdef

@@ -1,3 +1,7 @@
+2003-09-23  Pawel Salek  <pawsa theochem.kth.se>
+
+	* src/expand-alias.c: reference used address before unrefing all.
+
 2003-09-21 07:59  PeterB
 
 	* configure.in: Look for libgnomeprint-2.2 before 2.0 (see

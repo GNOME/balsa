@@ -346,33 +346,38 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 
   if (type != 0)
     {
-      tmp = g_strdup (message->subject);
-      gtk_entry_set_text (GTK_ENTRY (msg->subject), tmp);
-      if (type == 1)
+      if (message->subject)
 	{
-	  if (strlen (tmp) < 2)
-	    gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
-	  else
+	  tmp = g_strdup (message->subject);
+	  gtk_entry_set_text (GTK_ENTRY (msg->subject), tmp);
+	  if (type == 1)
 	    {
-	      if (!((tmp[0] == 'R' || tmp[0] == 'r') &&
-		    (tmp[1] == 'E' || tmp[1] == 'e') &&
-		    (tmp[2] == ':')))
+	      if (strlen (tmp) < 2)
 		gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
+	      else
+		{
+		  if (!((tmp[0] == 'R' || tmp[0] == 'r') &&
+			(tmp[1] == 'E' || tmp[1] == 'e') &&
+			(tmp[2] == ':')))
+		    gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
+		}
 	    }
-	}
-      else if (type == 2)
-	{
-	  if (strlen (tmp) < 2)
-	    gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Fw: ");
-	  else
+	  else if (type == 2)
 	    {
-	      if (!((tmp[0] == 'F' || tmp[0] == 'f') &&
-		    (tmp[1] == 'W' || tmp[1] == 'w') &&
-		    (tmp[2] == ':')))
+	      if (strlen (tmp) < 2)
 		gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Fw: ");
+	      else
+		{
+		  if (!((tmp[0] == 'F' || tmp[0] == 'f') &&
+			(tmp[1] == 'W' || tmp[1] == 'w') &&
+			(tmp[2] == ':')))
+		    gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Fw: ");
+		}
 	    }
+	  g_free (tmp);
 	}
-      g_free (tmp);
+      else
+	gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
     }
 
   gtk_table_attach (GTK_TABLE (table), msg->subject, 1, 2, 2, 3,

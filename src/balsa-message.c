@@ -229,12 +229,15 @@ message2html (Message * message)
       g_free (buff);
     }
 
-  g_string_append (mbuff, "<br><b>Subject: </b>");
+  if (message->subject)
+    {
+      g_string_append (mbuff, "<br><b>Subject: </b>");
 
-  /* subject */
-  buff = text2html (message->subject);
-  g_string_append (mbuff, buff);
-  g_free (buff);
+      /* subject */
+      buff = text2html (message->subject);
+      g_string_append (mbuff, buff);
+      g_free (buff);
+    }
 
   g_string_append (mbuff, "<br></p><p><tt>");
 

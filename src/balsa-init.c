@@ -321,7 +321,7 @@ create_mailboxes_page (void)
 
   gs = g_string_truncate (gs, 0);
   gs = g_string_append (gs, g_get_home_dir ());
-  gs = g_string_append (gs, "/Mail/outbox");
+  gs = g_string_append (gs, "/Mail/trash");
   label = gtk_label_new (_ ("Trash Path:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,

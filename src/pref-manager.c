@@ -175,23 +175,23 @@ ok_preferences_manager ()
   gnome_config_push_prefix ("/balsa/Global/");
 
   gnome_config_set_string ("real name", gtk_entry_get_text (GTK_ENTRY (pmw->real_name)));
-  balsa_app.real_name = gtk_entry_get_text (GTK_ENTRY (pmw->real_name));
+  balsa_app.real_name = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->real_name)));
 
   /* we're gonna display this as  USERNAME @ HOSTNAME 
    * for the From: header */
   gnome_config_set_string ("user name", gtk_entry_get_text (GTK_ENTRY (pmw->username)));
-  balsa_app.username = gtk_entry_get_text (GTK_ENTRY (pmw->username));
+  balsa_app.username = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->username)));
   gnome_config_set_string ("host name", gtk_entry_get_text (GTK_ENTRY (pmw->hostname)));
-  balsa_app.hostname = gtk_entry_get_text (GTK_ENTRY (pmw->hostname));
+  balsa_app.hostname = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->hostname)));
 
   gnome_config_set_string ("organization", gtk_entry_get_text (GTK_ENTRY (pmw->organization)));
-  balsa_app.organization = gtk_entry_get_text (GTK_ENTRY (pmw->organization));
+  balsa_app.organization = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->organization)));
 
   gnome_config_set_string ("smtp server", gtk_entry_get_text (GTK_ENTRY (pmw->smtp_server)));
-  balsa_app.smtp_server = gtk_entry_get_text (GTK_ENTRY (pmw->smtp_server));
+  balsa_app.smtp_server = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->smtp_server)));
 
   gnome_config_set_string ("local mail directory", gtk_entry_get_text (GTK_ENTRY (pmw->mail_directory)));
-  balsa_app.local_mail_directory = gtk_entry_get_text (GTK_ENTRY (pmw->mail_directory));
+  balsa_app.local_mail_directory = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->mail_directory)));
 
   gtk_widget_destroy (pmw->window);
   g_free (pmw);
@@ -248,7 +248,7 @@ create_identity_page ()
 
 
   /* your name */
-  label = gtk_label_new ("Your Name:");
+  label = gtk_label_new ("Your name:");
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL,
@@ -265,7 +265,7 @@ create_identity_page ()
 
 
   /* email address */
-  label = gtk_label_new ("E-Mail Address:");
+  label = gtk_label_new ("E-Mail address:");
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
 		    GTK_FILL, GTK_FILL,

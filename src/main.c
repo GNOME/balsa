@@ -33,6 +33,7 @@
 
 #include "balsa-app.h"
 #include "balsa-icons.h"
+#include "mblist-window.h"
 #include "main-window.h"
 #include "libbalsa.h"
 #include "misc.h"
@@ -272,6 +273,33 @@ main (int argc, char *argv[])
   gtk_widget_set_default_colormap(gdk_imlib_get_colormap());
   gtk_widget_set_default_visual(gdk_imlib_get_visual());
 #endif
+
+  /* open mailboxes if requested so */
+  if (balsa_app.open_unread_mailbox) {
+     GList * i, *gl = mblist_find_all_unread_mboxes();
+     for( i=g_list_first(gl); i; i=g_list_next(i) ) {
+	printf("opening %s..\n", ((Mailbox*)(i->data))->name);
+	mblist_open_mailbox( (Mailbox*) (i->data) );
+     }
+     g_list_free(gl);
+  }
+  if (balsa_app.open_mailbox) {
+     gint i =0;
+     gchar** names= g_strsplit(balsa_app.open_mailbox,";",20);
+     while(names[i]) {
+	Mailbox *mbox = mblist_find_mbox_by_name(names[i]);
+	if(mbox) {
+	   printf("opening %s..\n", mbox->name);
+	   mblist_open_mailbox(mbox);
+	}
+	i++;
+     }
+     g_strfreev(names);
+  }
+
+  /* TODO: select the first one, if any is open */ 
+  if(gtk_notebook_get_current_page( GTK_NOTEBOOK(balsa_app.notebook) ) >=0 ) 
+     gtk_notebook_set_page( GTK_NOTEBOOK(balsa_app.notebook), 0);
   gtk_main();
 
 #ifdef BALSA_USE_THREADS

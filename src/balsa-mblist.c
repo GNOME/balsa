@@ -336,7 +336,7 @@ balsa_mblist_insert_mailbox (BalsaMBList * mblist,
 
 /* balsa_mblist_redraw 
  *
- * bmbl:  the BalsaMBList that needs redrawing
+ * bmbl:  the BalsaMBList that needs redrawing (PS: recreating!)
  *
  * Description: Called whenever a new mailbox is added to the mailbox
  * list, it clears the ctree, and draws all the entire tree from
@@ -430,11 +430,6 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 
     } else if (mbnode->mailbox && mbnode->name) {
 
-      if (balsa_app.open_mailbox && strcmp(balsa_app.open_mailbox,mbnode->mailbox->name) == 0) {
-        mblist_open_mailbox(mbnode->mailbox); 
-        gtk_ctree_select(ctree,cnode);
-      }
-
       if (mbnode->mailbox->type == MAILBOX_MH ||
 	  mbnode->mailbox->type == MAILBOX_MAILDIR)
       {
@@ -451,11 +446,6 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	{
           mbnode->mailbox->has_unread_messages = TRUE;
 
-          if(balsa_app.open_unread_mailbox)  {
-            balsa_app.open_unread_mailbox=FALSE;
-            mblist_open_mailbox(mbnode->mailbox); 
-          }
-          
 	  gtk_ctree_set_node_info (ctree, cnode,
 				   mbnode->mailbox->name, 5,
 				   balsa_icon_get_pixmap(BALSA_ICON_TRAY_FULL),

@@ -501,10 +501,68 @@ mblist_get_selected_mailbox (void)
   return mbnode->mailbox;
 }
 
+static gboolean
+mbox_by_name (gconstpointer a, gconstpointer b)
+{
+  MailboxNode *mbnode = (MailboxNode *) a;
+  const gchar *name = (const gchar *) b;
+  g_assert(mbnode != NULL);
+  g_assert(mbnode->mailbox != NULL);
 
+  return strcmp(mbnode->mailbox->name, name) != 0;
+}
+
+Mailbox *
+mblist_find_mbox_by_name (const gchar *name) {
+  GtkCTreeNode *node;
+
+  g_assert (mblw != NULL);
+  g_assert (mblw->ctree != NULL);
+  
+  node = gtk_ctree_find_by_row_data_custom (GTK_CTREE (mblw->ctree), NULL,
+                                          (gchar*)name, mbox_by_name);
+  if(node) {
+     MailboxNode * mbnode = 
+      gtk_ctree_node_get_row_data(GTK_CTREE (mblw->ctree),node);
+     return mbnode->mailbox;
+  } else return NULL;
+}
+
+
+/* mbox_is_unread: 
+   NOTE mbnode->mailbox == NULL for directories */
+static gboolean
+mbox_is_unread (gconstpointer a, gconstpointer b)
+{
+  MailboxNode *mbnode = (MailboxNode *) a;
+  g_assert(mbnode != NULL);
+  return !(mbnode->mailbox && mbnode->mailbox->has_unread_messages);
+}
+
+/* mblist_find_all_unread_mboxes:
+   find all nodes and translate them to mailbox list 
+*/
+GList *
+mblist_find_all_unread_mboxes (void)
+{
+   GList * res = NULL, *r, *i;
+   g_assert (mblw != NULL);
+   g_assert (mblw->ctree != NULL);
+   
+   r = gtk_ctree_find_all_by_row_data_custom (GTK_CTREE (mblw->ctree), NULL,
+					      NULL, mbox_is_unread);
+   
+   for(i=g_list_first(r); i; i=g_list_next(i) ) {
+      MailboxNode * mbnode = 
+	 gtk_ctree_node_get_row_data(GTK_CTREE (mblw->ctree),i->data);
+
+      res = g_list_append(res,  mbnode->mailbox);
+   }
+   g_list_free(r);
+   return res;
+}
 
 /* DND stuff */
-
 
 
 /* receive the data from the source */

@@ -586,6 +586,8 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
       mailbox->messages = 0;
       mailbox->total_messages = 0;
       mailbox->unread_messages = 0;
+      mailbox->has_unread_messages = FALSE; /* has_unread_messages will be reset
+					       by load_messages anyway */
       mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
       load_messages (mailbox, 0);
 
@@ -628,7 +630,8 @@ mailbox_open_unref (Mailbox * mailbox)
       mailbox->messages = 0;
       mailbox->total_messages = 0;
       mailbox->unread_messages = 0;
-
+      mailbox->has_unread_messages = FALSE;
+  
       /* now close the mail stream and expunge deleted
        * messages -- the expunge may not have to be done */
       if (CLIENT_CONTEXT_OPEN (mailbox))

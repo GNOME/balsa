@@ -86,6 +86,7 @@ extern void load_messages (Mailbox * mailbox, gint emit);
 extern void config_mailbox_update(Mailbox * mailbox, char * name);
 
 void progress_dialog_destroy_cb ( GtkWidget *, gpointer data);
+static void check_messages_thread( Mailbox *mbox );
 #endif
 
 static void balsa_window_class_init(BalsaWindowClass *klass);
@@ -94,7 +95,6 @@ static void balsa_window_real_set_cursor(BalsaWindow *window, GdkCursor *cursor)
 static void balsa_window_real_open_mailbox(BalsaWindow *window, Mailbox *mailbox);
 static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbox);
 static void balsa_window_destroy(GtkObject * object);
-static void check_messages_thread( Mailbox *mbox );
 
 static GtkWidget *balsa_window_create_preview_pane(BalsaWindow *window);
 GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
@@ -1106,7 +1106,8 @@ mail_progress_notify_cb( )
     return TRUE;
 }
 
-void progress_dialog_destroy_cb( GtkWidget *widget, gpointer data )
+void
+progress_dialog_destroy_cb( GtkWidget *widget, gpointer data )
 {
   gtk_widget_destroy( widget );
   widget = NULL;

@@ -1,3 +1,17 @@
+2000-03-26 Pawel Salek <pawsa@theochem.kth.se>
+
+	* main.c: reorganized the initial mailbox opening code.
+	* configure.in:  mailbox info switch on by default.
+	
+2000-03-25  Matthew Guenther <mguenther@netcom.ca>
+
+	* src/main-window.c: fixed opening of mailboxes on startup.
+	* src/balsa-mblist.[hc]: added balsa_mblist_open_inital() and 
+	startup_mailbox_open_list.
+	(mailbox_nodes_to_ctree): fixed opening of mailboxes on startup.
+	(balsa_mblist_insert_mailbox): allow for mailboxes to be opened
+	at startup.
+	
 2000-03-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox.c, src/balsa-mblist.c, src/balsa-message.c:

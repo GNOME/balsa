@@ -221,7 +221,7 @@ setup_local_mailboxes ()
   struct dirent *d;
   struct stat st;
   char filename[PATH_MAX + 1];
-  MAILSTREAM *s = NIL;
+  DRIVER *drv = NIL;
   MailboxMBox *mbox;
   MailboxUNIX *unixmb;
 
@@ -239,35 +239,27 @@ setup_local_mailboxes ()
     {
       while ((d = readdir (dp)) != NULL)
 	{
-	  if (s != NIL)
-	    {
-	      mail_close (s);
-	      s = NIL;
-	    }
 	  sprintf (filename, "%s/%s", balsa_app.local_mail_directory, d->d_name);
+	  drv = NIL;
 
 	  if (lstat (filename, &st) < 0)
 	    continue;
 
 	  if (S_ISREG (st.st_mode))
 	    {
-	      if (s = mail_open (s, g_strdup (filename), OP_READONLY))
+	      if (drv = mail_valid (NIL, g_strdup (filename), "error, cannot load. darn"))
 		{
 
-		if (!strcmp (s->dtb->name, "mbox"))
+		  if (!strcmp (drv->name, "mbox"))
 		    {
-		      mail_close (s);
-		      s = NIL;
 		      mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
 		      mbox->name = g_strdup (d->d_name);
 		      mbox->path = g_strdup (filename);
 
 		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
 		    }
-		if (!strcmp (s->dtb->name, "unix"))
+		  if (!strcmp (drv->name, "unix"))
 		    {
-		      mail_close (s);
-		      s = NIL;
 		      unixmb = (MailboxUNIX *) mailbox_new (MAILBOX_UNIX);
 		      unixmb->name = g_strdup (d->d_name);
 		      unixmb->path = g_strdup (filename);

@@ -177,14 +177,6 @@ char *curhst = NIL;		/* currently connected host */
 char *curusr = NIL;		/* current login user */
 char personalname[MAILTMPLEN];	/* user's personal name */
 
-void 
-prompt (char *msg, char *txt)
-{
-  printf ("%s", msg);
-  gets (txt);
-}
-
-
 static GString *
 gtk_text_to_email (char *buff)
 {
@@ -206,14 +198,13 @@ gtk_text_to_email (char *buff)
   return gs;
 }
 
-void 
+void
 send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
   long debug = 0;
   SENDSTREAM *stream = NIL;
   char line[MAILTMPLEN];
-/*  char *text = (char *) fs_get (8 * MAILTMPLEN);
-*/  ENVELOPE *msg = mail_newenvelope ();
+  ENVELOPE *msg = mail_newenvelope ();
   BODY *body = mail_newbody ();
   GString *text;
   gchar *textbuf;
@@ -235,26 +226,11 @@ send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
       rfc822_parse_adrlist (&msg->cc, gtk_entry_get_text (GTK_ENTRY (bsmsg->cc)), curhst);
     }
   msg->subject = cpystr (gtk_entry_get_text (GTK_ENTRY (bsmsg->subject)));
-  puts (" Msg (end with a line with only a '.'):");
   body->type = TYPETEXT;
-/*
-  *text = '\0';
-  while (gets (line))
-    {
-      if (line[0] == '.')
-	{
-	  if (line[1] == '\0')
-	    break;
-	  else
-	    strcat (text, ".");
-	}
-      strcat (text, line);
-      strcat (text, "\015\012");
-    }
-*/
-textbuf=gtk_editable_get_chars(GTK_EDITABLE(bsmsg->text),0,gtk_text_get_length(GTK_TEXT(bsmsg->text)));
-text=gtk_text_to_email(textbuf);
-text = g_string_append (text, "\015\012");
+
+  textbuf = gtk_editable_get_chars (GTK_EDITABLE (bsmsg->text), 0, gtk_text_get_length (GTK_TEXT (bsmsg->text)));
+  text = gtk_text_to_email (textbuf);
+  text = g_string_append (text, "\015\012");
 
   body->contents.text.data = (unsigned char *) text->str;
   body->contents.text.size = strlen (text->str);
@@ -263,20 +239,20 @@ text = g_string_append (text, "\015\012");
   strcpy (msg->date, line);
   if (msg->to)
     {
-      puts ("Sending...");
+      fprintf(stderr,"Sending...\n");
       if (stream = smtp_open (hostlist, debug))
 	{
 	  if (smtp_mail (stream, "MAIL", msg, body))
-	    puts ("[Ok]");
+	    fprintf (stderr,"[Ok]\n");
 	  else
-	    printf ("[Failed - %s]\n", stream->reply);
+	    fprintf (stderr,"[Failed - %s]\n", stream->reply);
 	}
     }
   if (stream)
     smtp_close (stream);
   else
-    puts ("[Can't open connection to any server]");
+    fprintf (stderr, "[Can't open connection to any server]\n");
   mail_free_envelope (&msg);
   mail_free_body (&body);
-
+  g_string_free (text, 1);
 }

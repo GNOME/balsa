@@ -672,6 +672,8 @@ config_global_load(void)
 	balsa_app.wraplength = 40;
     balsa_app.send_rfc2646_format_flowed =
 	gnome_config_get_bool("SendRFC2646FormatFlowed=true");
+    balsa_app.autoquote = 
+	gnome_config_get_bool("AutoQuote=true");
     balsa_app.reply_strip_html = 
 	gnome_config_get_bool("StripHtmlInReply=true");
     balsa_app.forward_attached = 
@@ -910,6 +912,7 @@ gint config_save(void)
     gnome_config_set_int("WrapLength", balsa_app.wraplength);
     gnome_config_set_bool("SendRFC2646FormatFlowed",
 			   balsa_app.send_rfc2646_format_flowed);
+    gnome_config_set_bool("AutoQuote", balsa_app.autoquote);
     gnome_config_set_bool("StripHtmlInReply", balsa_app.reply_strip_html);
     gnome_config_set_bool("ForwardAttached", balsa_app.forward_attached);
 

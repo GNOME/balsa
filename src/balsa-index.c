@@ -854,8 +854,8 @@ balsa_index_select_row(BalsaIndex * bindex, gint row)
     gtk_clist_unselect_all(clist);
     gtk_clist_select_row(clist, row, -1);
 
-    /* if (gtk_clist_row_is_visible (clist, row) != GTK_VISIBILITY_FULL) */
-    gtk_clist_moveto(clist, row, -1, 0.5, 0.0);
+    if (gtk_clist_row_is_visible (clist, row) != GTK_VISIBILITY_FULL) 
+	gtk_clist_moveto(clist, row, -1, 0.5, 0.0);
 }
 
 
@@ -2292,7 +2292,8 @@ balsa_index_update_tree(BalsaIndex *bindex, gboolean expand)
     GtkCTreeNode *node, *msg_node=NULL;
 
     gtk_clist_freeze(clist);
-    for(node=gtk_ctree_node_nth(tree, 0); node; node=GTK_CTREE_NODE_NEXT(node)) {
+    for(node=gtk_ctree_node_nth(tree, 0); node; 
+	node=GTK_CTREE_NODE_NEXT(node)) {
 	if(expand)
 	    gtk_ctree_expand_recursive(tree, node);
 	else
@@ -2303,7 +2304,7 @@ balsa_index_update_tree(BalsaIndex *bindex, gboolean expand)
 	balsa_index_set_style_recursive( bindex, node); /* chbm */
     }
     
-    if ( msg_node ) {
+    if (msg_node) {
 	guint i;
 	
 	if(!expand) {		/* Re-expand msg_node's thread; cf. Remarks */
@@ -2316,11 +2317,12 @@ balsa_index_update_tree(BalsaIndex *bindex, gboolean expand)
 	
 	if( (i=gtk_clist_find_row_from_data(clist, msg->message))>=0 &&
 	    gtk_clist_row_is_visible(clist, i) != GTK_VISIBILITY_FULL) {
-	    gtk_clist_moveto(clist, i, 0, 1.0, 0.0);
+	    gtk_clist_moveto(clist, i, -1, 0.5, 0.0);
 	    gtk_clist_select_row(clist, i, 0);
 	}
     } else
 	gtk_clist_thaw(clist);
+
 }
 
 /* balsa_index_set_threading_type:

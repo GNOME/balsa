@@ -92,6 +92,7 @@ typedef struct _PropertyUI {
     GtkWidget *remember_open_mboxes;
     GtkWidget *mblist_show_mb_content_info;
     GtkWidget *always_queue_sent_mail;
+    GtkWidget *autoquote;
     GtkWidget *reply_strip_html_parts;
     GtkWidget *forward_attached;
 
@@ -397,6 +398,8 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
     gtk_signal_connect(GTK_OBJECT(pui->always_queue_sent_mail), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->autoquote), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
     gtk_signal_connect(GTK_OBJECT(pui->reply_strip_html_parts), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
     gtk_signal_connect(GTK_OBJECT(pui->forward_attached), "toggled",
@@ -619,6 +622,8 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->wraplength));
     balsa_app.send_rfc2646_format_flowed =
 	GTK_TOGGLE_BUTTON(pui->send_rfc2646_format_flowed)->active;
+    balsa_app.autoquote =
+	GTK_TOGGLE_BUTTON(pui->autoquote)->active;
     balsa_app.reply_strip_html =
 	GTK_TOGGLE_BUTTON(pui->reply_strip_html_parts)->active;
     balsa_app.forward_attached =
@@ -869,6 +874,8 @@ set_prefs(void)
 				 balsa_app.send_rfc2646_format_flowed);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->always_queue_sent_mail),
 				 balsa_app.always_queue_sent_mail);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->autoquote),
+				 balsa_app.autoquote);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->reply_strip_html_parts),
 				 balsa_app.reply_strip_html);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->forward_attached),
@@ -1609,13 +1616,18 @@ outgoing_page(gpointer data)
     gtk_container_set_border_width(GTK_CONTAINER(table2), 2);
     pui->quote_str = attach_entry(_("Reply prefix:"), 4, table2);
 
+    pui->autoquote =
+        gtk_check_button_new_with_label(_("Automatically quote original "
+                                          "when replying"));
+    gtk_box_pack_start(GTK_BOX(vbox2), pui->autoquote, FALSE, TRUE, 0);
+
     pui->reply_strip_html_parts =
-	gtk_check_button_new_with_label(_("don't include HTML parts as text when replying or forwarding mail"));
+	gtk_check_button_new_with_label(_("Don't include HTML parts as text when replying or forwarding mail"));
     gtk_box_pack_start(GTK_BOX(vbox2), pui->reply_strip_html_parts,
 		       FALSE, TRUE, 0);
 
     pui->forward_attached =
-	gtk_check_button_new_with_label(_("forward a mail as attachment instead of quoting it"));
+	gtk_check_button_new_with_label(_("Forward a mail as attachment instead of quoting it"));
     gtk_box_pack_start(GTK_BOX(vbox2), pui->forward_attached,
 		       FALSE, TRUE, 0);
 

@@ -47,6 +47,7 @@ struct _LibBalsaMessageBody {
     gchar *mime_type;           /* the mime type/subtype of buffer, or NULL, if plain */
     MuttBody *mutt_body;	/* pointer to BODY struct of mutt message */
     gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
+    gboolean attach_as_extbody; /* if an attachment shall be appended as external-body (sending) */
     gchar *temp_filename;	/* Holds the filename of a the temporary file where this part is saved */
     gchar *charset;		/* the charset, used for sending, replying. */
 

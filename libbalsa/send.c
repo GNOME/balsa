@@ -261,6 +261,37 @@ add_mutt_body_plain(const gchar * charset, gint encoding_style,
     return body;
 }
 
+static BODY *
+add_mutt_body_as_extbody(const gchar *filename, const gchar *mime_type)
+{
+    BODY *body;
+    gchar buffer[PATH_MAX];
+    FILE *tempfp;
+
+    libbalsa_lock_mutt();
+    body = mutt_new_body();
+
+    body->type = TYPEMESSAGE;
+    body->subtype = g_strdup("external-body");
+    body->unlink = 1;
+    body->use_disp = 0;
+
+    body->encoding = ENC7BIT;
+
+    mutt_set_parameter("access-type", "local-file", &body->parameter);
+    mutt_set_parameter("name", filename, &body->parameter);
+    mutt_mktemp(buffer);
+    body->filename = g_strdup(buffer);
+    tempfp = safe_fopen(body->filename, "w+");
+    fprintf(tempfp, "Content-type: %s\n\nNote: this is _not_ the real body!\n",
+	    mime_type);
+    fclose(tempfp);
+
+    libbalsa_unlock_mutt();
+
+    return body;
+}
+
 #if 0
 /* you never know when you will need this one... */
 static void dump_queue(const char*msg)
@@ -1365,35 +1396,44 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	newbdy = NULL;
 
 	if (body->filename) {
-	    if ((newbdy = mutt_make_file_attach(body->filename)) ==
-		NULL) {
-		g_warning
-		    ("Cannot attach file: %s.\nSending without it.",
-		     body->filename);
+	    if (body->attach_as_extbody) {
+		newbdy = 
+		    add_mutt_body_as_extbody(body->filename, 
+					     body->mime_type ? body->mime_type :
+					     libbalsa_lookup_mime_type(body->filename));
 	    } else {
-
-		/* Do this here because we don't want
-		 * to use libmutt's mime types */
-		if (!body->mime_type)
-		    mime_type =
-			g_strsplit(libbalsa_lookup_mime_type(body->filename),
-				   "/", 2);
-		else
-		    mime_type = g_strsplit(body->mime_type, "/", 2);
-		/* use BASE64 encoding for non-text mime types 
-		   use 8BIT for message */
 		libbalsa_lock_mutt();
-		if(!strcasecmp(mime_type[0],"message") && 
-		   !strcasecmp(mime_type[1],"rfc822")) {
-		    newbdy->encoding = ENC8BIT;
-		    newbdy->disposition = DISPINLINE;
-		} else if(strcasecmp(mime_type[0],"text") != 0)
-		    newbdy->encoding = ENCBASE64;
-		newbdy->type = mutt_check_mime_type(mime_type[0]);
-		g_free(newbdy->subtype);
-		newbdy->subtype = g_strdup(mime_type[1]);
+		newbdy = mutt_make_file_attach(body->filename);
 		libbalsa_unlock_mutt();
-		g_strfreev(mime_type);
+		if (!newbdy) {
+		    g_warning
+			("Cannot attach file: %s.\nSending without it.",
+			 body->filename);
+		} else {
+		    
+		    /* Do this here because we don't want
+		     * to use libmutt's mime types */
+		    if (!body->mime_type)
+			mime_type =
+			    g_strsplit(libbalsa_lookup_mime_type(body->filename),
+				       "/", 2);
+		    else
+			mime_type = g_strsplit(body->mime_type, "/", 2);
+		    /* use BASE64 encoding for non-text mime types 
+		       use 8BIT for message */
+		    libbalsa_lock_mutt();
+		    if(!strcasecmp(mime_type[0],"message") && 
+		       !strcasecmp(mime_type[1],"rfc822")) {
+			newbdy->encoding = ENC8BIT;
+			newbdy->disposition = DISPINLINE;
+		    } else if(strcasecmp(mime_type[0],"text") != 0)
+			newbdy->encoding = ENCBASE64;
+		    newbdy->type = mutt_check_mime_type(mime_type[0]);
+		    g_free(newbdy->subtype);
+		    newbdy->subtype = g_strdup(mime_type[1]);
+		    libbalsa_unlock_mutt();
+		    g_strfreev(mime_type);
+		}
 	    }
 	} else if (body->buffer) {
 	    newbdy = add_mutt_body_plain(body->charset, encoding, flow);

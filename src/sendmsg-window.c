@@ -86,6 +86,7 @@ static gint postpone_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint save_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint print_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint attach_clicked(GtkWidget *, gpointer);
+static void destroy_attachment (gpointer data);
 static gboolean attach_message(BalsaSendmsg *msg, LibBalsaMessage *message);
 static gint insert_selected_messages(BalsaSendmsg *msg, SendType type);
 static gint attach_message_cb(GtkWidget *, BalsaSendmsg *);
@@ -384,6 +385,7 @@ typedef struct {
     gchar *filename;
     gchar *force_mime_type;
     gboolean delete_on_destroy;
+    gboolean as_extbody;
 } attachment_t;
 
 #define MAIN_MENUS_COUNT 5
@@ -696,11 +698,191 @@ remove_attachment(GtkWidget * widget, GnomeIconList * ilist)
     gtk_object_remove_data(GTK_OBJECT(ilist), "selectednumbertoremove");
 }
 
+/* ask if an attachment shall be message/external-body */
+static void
+extbody_dialog_delete(GtkWidget *dialog, GdkEvent *event, 
+		      gpointer user_data)
+{
+    GnomeIconList *ilist = 
+	GNOME_ICON_LIST(gtk_object_get_user_data (GTK_OBJECT (dialog)));
+    gtk_object_remove_data(GTK_OBJECT(ilist), "selectednumbertoextbody");
+    gtk_widget_hide (dialog);
+    gtk_object_destroy(GTK_OBJECT(dialog));
+}
+
+static void
+no_change_to_extbody(GtkWidget *widget, gpointer user_data)
+{
+    GtkWidget *dialog = GTK_WIDGET(user_data);
+    GnomeIconList *ilist;
+
+    ilist = 
+	GNOME_ICON_LIST(gtk_object_get_user_data (GTK_OBJECT (dialog)));
+    gtk_object_remove_data(GTK_OBJECT(ilist), "selectednumbertoextbody");
+    gtk_widget_hide (dialog);
+    gtk_object_destroy(GTK_OBJECT(dialog));
+}
+
+
+/* send attachment as external body - right mouse button callback */
+static void
+extbody_attachment(GtkWidget * widget, gpointer user_data)
+{
+    GtkWidget *dialog = GTK_WIDGET(user_data);
+    GnomeIconList *ilist;
+    gint num;
+    attachment_t *attach, *oldattach;
+    gchar *pix, *label;
+
+    ilist = 
+	GNOME_ICON_LIST(gtk_object_get_user_data (GTK_OBJECT (dialog)));
+    num = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(ilist),
+					      "selectednumbertoextbody"));
+    oldattach = 
+	(attachment_t *)gnome_icon_list_get_icon_data(ilist, num);
+    g_return_if_fail(oldattach);
+    gtk_object_remove_data(GTK_OBJECT(ilist), "selectednumbertoextbody");
+    gtk_widget_hide (dialog);
+    gtk_object_destroy(GTK_OBJECT(dialog));
+
+    /* remove the selected element and replace it */
+    gnome_icon_list_freeze(ilist);
+    attach = g_malloc(sizeof(attachment_t));
+    attach->filename = oldattach->filename ? 
+	g_strdup(oldattach->filename) : NULL;
+    attach->force_mime_type = oldattach->force_mime_type ? 
+	g_strdup(attach->force_mime_type) : NULL;
+    attach->delete_on_destroy = oldattach->delete_on_destroy;
+    attach->as_extbody = TRUE;
+    gnome_icon_list_remove(ilist, num);
+    
+    /* as this worked before, don't do too much (== any) error checking... */
+    pix = libbalsa_icon_finder("message/external-body", attach->filename);
+    label = g_strdup_printf ("%s (%s)", g_basename(attach->filename), 
+			     "message/external-body");
+    gnome_icon_list_insert(ilist, num, pix, label);
+    gnome_icon_list_set_icon_data_full(ilist, num, attach, destroy_attachment);
+    g_free(label);
+    g_free(pix);
+    gnome_icon_list_thaw(ilist);
+}
+
+static void
+show_extbody_dialog(GtkWidget *widget, GnomeIconList *ilist)
+{
+    GtkWidget *extbody_dialog;
+    GtkWidget *dialog_vbox;
+    GtkWidget *hbox;
+    GtkWidget *pixmap;
+    GtkWidget *label;
+    GtkWidget *dialog_action_area;
+    GtkWidget *button_no;
+    GtkWidget *button_yes;
+    gchar *l_text;
+    gint num;
+    attachment_t *attach;
+    
+    extbody_dialog = gnome_dialog_new (_("attach as reference?"), NULL);
+    gtk_object_set_user_data (GTK_OBJECT (extbody_dialog), ilist);
+    
+    dialog_vbox = GNOME_DIALOG (extbody_dialog)->vbox;
+    
+    hbox = gtk_hbox_new (FALSE, 10);
+    gtk_box_pack_start (GTK_BOX (dialog_vbox), hbox, TRUE, TRUE, 0);
+    
+    pixmap = gnome_pixmap_new_from_file (GNOME_DATA_PREFIX "/pixmaps/gnome-question.png");
+    gtk_box_pack_start (GTK_BOX (hbox), pixmap, TRUE, TRUE, 0);
+
+    num = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(ilist),
+					      "selectednumbertoextbody"));
+    attach = (attachment_t *)gnome_icon_list_get_icon_data(ilist, num);
+    l_text = g_strdup_printf(
+        _("Saying yes will not send the file `%s' itself, but just a MIME "
+	  "message/external-body reference.  Note that the recipient must "
+	  "have proper permissions to see the `real' file.\n\n"
+	  "Do you really want to attach this file as reference?"),
+	attach->filename);
+    label = gtk_label_new (l_text);
+    g_free (l_text);
+    gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+    gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_LEFT);
+    gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+    gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+    
+    dialog_action_area = GNOME_DIALOG (extbody_dialog)->action_area;
+    gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area), 
+			       GTK_BUTTONBOX_END);
+    gtk_button_box_set_spacing (GTK_BUTTON_BOX (dialog_action_area), 8);
+    
+    gnome_dialog_append_button (GNOME_DIALOG (extbody_dialog), 
+				GNOME_STOCK_BUTTON_NO);
+    button_no = g_list_last (GNOME_DIALOG (extbody_dialog)->buttons)->data;
+    GTK_WIDGET_SET_FLAGS (button_no, GTK_CAN_DEFAULT);
+    
+    gnome_dialog_append_button (GNOME_DIALOG (extbody_dialog), 
+				GNOME_STOCK_BUTTON_YES);
+    button_yes = g_list_last (GNOME_DIALOG (extbody_dialog)->buttons)->data;
+    GTK_WIDGET_SET_FLAGS (button_yes, GTK_CAN_DEFAULT);
+    
+    gtk_signal_connect (GTK_OBJECT (extbody_dialog), "delete_event",
+			GTK_SIGNAL_FUNC (extbody_dialog_delete), NULL);
+    gtk_signal_connect (GTK_OBJECT (button_no), "clicked",
+			GTK_SIGNAL_FUNC (no_change_to_extbody), extbody_dialog);
+    gtk_signal_connect (GTK_OBJECT (button_yes), "clicked",
+			GTK_SIGNAL_FUNC (extbody_attachment), extbody_dialog);
+    
+    gtk_widget_grab_focus (button_no);
+    gtk_widget_grab_default (button_no);
+    gtk_widget_show_all(extbody_dialog);
+}
+
+/* send attachment as "real" file - right mouse button callback */
+static void
+file_attachment(GtkWidget * widget, GnomeIconList * ilist)
+{
+    gint num = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(ilist),
+						   "selectednumbertofile"));
+    attachment_t *attach, *oldattach;
+    gchar *pix, *label;
+    const gchar *content_type;
+
+    oldattach = 
+	(attachment_t *)gnome_icon_list_get_icon_data(ilist, num);
+    g_return_if_fail(oldattach);
+    gtk_object_remove_data(GTK_OBJECT(ilist), "selectednumbertofile");
+
+    /* remove the selected element and replace it */
+    gnome_icon_list_freeze(ilist);
+    attach = g_malloc(sizeof(attachment_t));
+    attach->filename = oldattach->filename ? 
+	g_strdup(oldattach->filename) : NULL;
+    attach->force_mime_type = oldattach->force_mime_type ? 
+	g_strdup(attach->force_mime_type) : NULL;
+    attach->delete_on_destroy = oldattach->delete_on_destroy;
+    attach->as_extbody = FALSE;
+    gnome_icon_list_remove(ilist, num);
+    
+    /* as this worked before, don't do too much (==any) error checking... */
+    content_type = attach->force_mime_type ? attach->force_mime_type 
+	: libbalsa_lookup_mime_type(attach->filename);
+    pix = libbalsa_icon_finder(content_type, attach->filename);
+    label = g_strdup_printf ("%s (%s)", g_basename(attach->filename), 
+			     content_type);
+    gnome_icon_list_insert(ilist, num, pix, label);
+    gnome_icon_list_set_icon_data_full(ilist, num, attach, destroy_attachment);
+    g_free(label);
+    g_free(pix);
+    gnome_icon_list_thaw(ilist);
+}
+
 /* the menu is created on right-button click on an attachement */
 static GtkWidget *
 create_popup_menu(GnomeIconList * ilist, gint num)
 {
     GtkWidget *menu, *menuitem;
+    attachment_t *attach = 
+	(attachment_t *)gnome_icon_list_get_icon_data(ilist, num);
+
     menu = gtk_menu_new();
     menuitem = gtk_menu_item_new_with_label(_("Remove"));
     gtk_object_set_data(GTK_OBJECT(ilist), "selectednumbertoremove",
@@ -709,6 +891,25 @@ create_popup_menu(GnomeIconList * ilist, gint num)
 		       GTK_SIGNAL_FUNC(remove_attachment), ilist);
     gtk_menu_append(GTK_MENU(menu), menuitem);
     gtk_widget_show(menuitem);
+
+    /* a "real" (not temporary) file can be attached as external body */
+    if (!attach->delete_on_destroy) {
+	if (!attach->as_extbody) {
+	    menuitem = gtk_menu_item_new_with_label(_("attach as reference"));
+	    gtk_object_set_data(GTK_OBJECT(ilist), "selectednumbertoextbody",
+	    			GINT_TO_POINTER(num));
+	    gtk_signal_connect(GTK_OBJECT(menuitem), "activate",
+	    		       GTK_SIGNAL_FUNC(show_extbody_dialog), ilist);
+	} else {
+	    menuitem = gtk_menu_item_new_with_label(_("attach as file"));
+	    gtk_object_set_data(GTK_OBJECT(ilist), "selectednumbertofile",
+	    			GINT_TO_POINTER(num));
+	    gtk_signal_connect(GTK_OBJECT(menuitem), "activate",
+	    		       GTK_SIGNAL_FUNC(file_attachment), ilist);
+	}
+	gtk_menu_append(GTK_MENU(menu), menuitem);
+	gtk_widget_show(menuitem);
+    }
 
     return menu;
 }
@@ -797,6 +998,7 @@ add_attachment(GnomeIconList * iconlist, char *filename,
 	    ? g_strdup(forced_mime_type): NULL;
 
 	attach_data->delete_on_destroy = is_a_temp_file;
+	attach_data->as_extbody = FALSE;
 	gnome_icon_list_set_icon_data_full(iconlist, pos, attach_data, destroy_attachment);
 
 	g_free(label);
@@ -1601,7 +1803,8 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 
 /* fillBody --------------------------------------------------------------
    fills the body of the message to be composed based on the given message.
-   First quotes the original one and then adds the signature.
+   First quotes the original one, if autoquote is set,
+   and then adds the signature.
    Optionally prepends the signature to quoted text.
 */
 static void
@@ -1611,7 +1814,7 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
     gchar *signature;
     gint pos = 0;
 
-    if (type != SEND_NORMAL && message)
+    if (type != SEND_NORMAL && message && balsa_app.autoquote)
 	body = quoteBody(msg, message, type);
     else
 	body = g_string_new("");
@@ -2429,6 +2632,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	    body->filename = g_strdup(attach->filename);
 	    if (attach->force_mime_type)
 		body->mime_type = g_strdup(attach->force_mime_type);
+	    body->attach_as_extbody = attach->as_extbody;
 	    libbalsa_message_append_part(message, body);
 	}
     }

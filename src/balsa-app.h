@@ -270,6 +270,9 @@ extern struct BalsaApplication {
     /* arp --- string to prefix "replied to" messages. */
     gchar *quote_str;
 
+    /* reply/forward: automatically quote original when replying */
+    gboolean autoquote;
+
     /* reply/forward: don't include text/html parts */
     gboolean reply_strip_html;
 

@@ -864,7 +864,7 @@ part_info_init_message_extbody_url(BalsaMessage * bm, BalsaPartInfo * info,
 	}
 
 	url = g_strdup_printf("file:%s", local_name);
-	g_string_new(_("Content Type: external-body\n"));
+	msg = g_string_new(_("Content Type: external-body\n"));
 	g_string_sprintfa(msg, _("Access type: local-file\n"));
 	g_string_sprintfa(msg, _("File name: %s"), local_name);
 	g_free(local_name);

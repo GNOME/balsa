@@ -1,3 +1,19 @@
+2001-10-14  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-index.c: improve index center on expand/collapse.
+	
+	Albrecht Dreﬂ's patch for attaching files as external-body: #61156
+	* libbalsa/body.h: add attach_as_extbody field.
+	* libbalsa/send.c: implement add_mutt_body_as_extbody().
+	* src/balsa-message.c: do not drop g_string_new() result on floor.
+	* src/sendmsg-window.c: attaching files as external-body.
+
+	Peter Bloomfield's auto-quote (balsa-list).
+	* src/balsa-app.h: add autoquote field.
+	* src/pref-manager.c: configure autoquote.
+	* src/save-restore.c: save ad restore autoquote.
+	* src/sendmsg-window.c: autoquote.
+
 2001-10-13  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Peter Bloomfield code cleanup patches:

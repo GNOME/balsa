@@ -1804,7 +1804,7 @@ msgstr "Telesu sporoèila"
 
 #: src/filter-edit-dialog.c:345
 msgid "Match string:"
-msgstr "Najdi niz:"
+msgstr "Poi¹i niz:"
 
 #: src/filter-edit-dialog.c:392 src/sendmsg-window.c:917
 msgid "Remove"

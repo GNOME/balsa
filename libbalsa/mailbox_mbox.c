@@ -46,6 +46,7 @@ struct message_info {
     off_t start;
     off_t status;		/* Offset of the "Status:" header. */
     off_t x_status;		/* Offset of the "X-Status:" header. */
+    off_t content;		/* Offset of the first "Content-*:" header. */
     off_t end;
     char *from;
     LibBalsaMessage *message; /* registers only referenced messages
@@ -292,13 +293,14 @@ static void mbox_unlock(LibBalsaMailbox * mailbox, GMimeStream *stream)
 }
 
 /* GMimeParserHeaderRegexFunc callback; save the header's offset if it's
- * either "Status" or "X-Status".
+ * "Status", "X-Status", or "Content-*.
  * 
- * We'll save only the first of each that we see, to try to avoid
- * headers on embedded messages.  This isn't guaranteed, as the real
- * message may be missing one of the headers, if it was delivered by
- * someone else--we make sure every message has both, with blank flags
- * if necessary, when delivering our own mail.
+ * If a message has no status headers but an encapsulated message does,
+ * we must be careful not to save the offset of the encapsulated header.
+ * The outer message must have at least one "Content-* header, so we
+ * save its offset, and use that as an indication that any later headers
+ * are encapsulated.  We also use its offset as the location to insert
+ * status headers, if necessary.
  */
 static void
 lbm_mbox_header_cb(GMimeParser * parser, const char *header,
@@ -306,11 +308,17 @@ lbm_mbox_header_cb(GMimeParser * parser, const char *header,
 		   struct message_info ** msg_info_p)
 {
     struct message_info *msg_info = *msg_info_p;
-    if (g_ascii_strcasecmp(header, "status") == 0 && msg_info->status < 0)
+
+    if (msg_info->content >= 0)
+	/* We already passed the real headers. */
+	return;
+
+    if (g_ascii_strcasecmp(header, "status") == 0)
 	msg_info->status = offset;
-    else if (g_ascii_strcasecmp(header, "x-status") == 0
-	     && msg_info->x_status < 0)
+    else if (g_ascii_strcasecmp(header, "x-status") == 0)
 	msg_info->x_status = offset;
+    else if (g_ascii_strncasecmp(header, "content-", 8) == 0)
+	msg_info->content = offset;
 }
 
 static LibBalsaMessage *lbm_mbox_message_new(GMimeMessage * mime_message,
@@ -329,7 +337,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
     g_mime_parser_set_scan_from(gmime_parser, TRUE);
     g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
     g_mime_parser_set_header_regex(gmime_parser,
-				   "^(X-)?Status",
+				   "^(X-)?Status|^Content-",
 				   (GMimeParserHeaderRegexFunc)
 				   lbm_mbox_header_cb, &msg_info_p);
 
@@ -338,7 +346,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 	GMimeMessage *mime_message;
         LibBalsaMessage *msg;
 
-        msg_info.status = msg_info.x_status = -1;
+        msg_info.status = msg_info.x_status = msg_info.content = -1;
         mime_message   = g_mime_parser_construct_message(gmime_parser);
         msg_info.start = g_mime_parser_get_from_offset(gmime_parser);
         msg_info.end   = g_mime_parser_tell(gmime_parser);
@@ -1015,8 +1023,9 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    if (status_len < 0)
 		break;
 	} else {
-	    msg_info->status =
-		msg_info->start + strlen(msg_info->from) + 1;
+            msg_info->status = msg_info->content >= 0 ? msg_info->content :
+                (off_t) (msg_info->start + strlen(msg_info->from) + 1);
+	    
 	    status_len = 0;
 	}
 
@@ -1152,7 +1161,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     g_mime_parser_set_scan_from(gmime_parser, TRUE);
     g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
     g_mime_parser_set_header_regex(gmime_parser,
-				   "^(X-)?Status",
+				   "^(X-)?Status|^Content-",
 				   (GMimeParserHeaderRegexFunc)
 				   lbm_mbox_header_cb, &msg_info);
     for (j = first; j < mbox->messages_info->len; ) {
@@ -1171,7 +1180,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	j++;
 
 	msg_info->start = g_mime_parser_tell(gmime_parser);
-	msg_info->status = msg_info->x_status = -1;
+	msg_info->status = msg_info->x_status = msg_info->content = -1;
 	mime_msg = g_mime_parser_construct_message(gmime_parser);
 	g_free(msg_info->from);
 	msg_info->from = g_mime_parser_get_from(gmime_parser);

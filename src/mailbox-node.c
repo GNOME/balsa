@@ -575,6 +575,30 @@ balsa_mailbox_local_rescan_parent(LibBalsaMailbox* mbx)
 void
 balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
 {
+#if defined(BALSA_USE_THREADS) && defined(THREADED_IMAP_SCAN_FIXED)
+    GNode *gnode;
+
+    balsa_mailbox_nodes_lock(TRUE);
+    gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mn);
+
+    if(gnode) {
+	/* the expanded state needs to be preserved; it would 
+	   be reset when all the children are removed */
+	gboolean expanded = mn->expanded;
+	balsa_remove_children_mailbox_nodes(gnode);
+	balsa_mailbox_node_append_subtree(mn, gnode);
+	mn->expanded = expanded;
+	balsa_mblist_repopulate(balsa_app.mblist);
+        balsa_mailbox_nodes_unlock(TRUE);
+        if (expanded)
+            /* if this is an IMAP node, we must scan the children */
+	    mblist_scan_mailbox_node(balsa_app.mblist, mn);
+    } else {
+        balsa_mailbox_nodes_unlock(TRUE);
+        g_warning("folder node %s (%p) not found in hierarchy.\n",
+		     mn->name, mn);
+    }
+#else
     GNode *gnode;
     GNode *tmp_node;
 
@@ -606,6 +630,7 @@ balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
     }
 
     g_node_destroy(tmp_node);
+#endif                          /* defined(BALSA_USE_THREADS) && defined(THREADED_IMAP_SCAN_FIXED) */
 }
 
 /* balsa_mailbox_node_scan_children:

@@ -347,6 +347,6 @@ GtkWidget *create_entry(GnomeDialog *mcw, GtkWidget * table,
 			GtkSignalFunc func, gpointer data, gint row, 
 			const gchar * initval, const guint keyval);
 GtkWidget *create_check(GnomeDialog *mcw, const gchar * label, 
-			GtkWidget * table, gint row);
+			GtkWidget * table, gint row, gboolean initval);
 
 #endif				/* __BALSA_APP_H__ */

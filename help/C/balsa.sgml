@@ -1989,10 +1989,11 @@
                 the program and read its output, appending that text
                 to the message.  List the path to the program with a
                 "|" prepended to it.  For example:</para>
-                <para>|/home/user/dynsig.pl</para></listitem>
+                <para><quote>|/home/user/dynsig.pl</quote></para></listitem>
                 </itemizedlist>
             </para>
-            <para>You also get to control when the signature is appended.</para>
+            <para>You also get to control when the signature is
+            appended.</para>
 	  </listitem>
 	</varlistentry>
 
@@ -2065,13 +2066,15 @@
 	      mail folders.</para></listitem></varlistentry>
 
 	<varlistentry><term><guilabel>Remote SMTP
-	      Server</guilabel></term><listitem><para>Specify the domain
-	      name and optionally the port for of the SMTP server you
-	      use for submitting mail.  Please note that the default
-	      port number is 587.  The syntax is hostname[:port].  Port
-	      can be a decimal number or the name of the service as
-	      specified in /etc/services.  Typically you can just set
-	      this to localhost:25.</para></listitem></varlistentry>
+	      Server</guilabel></term><listitem><para>Specify the
+	      domain name and optionally the port for of the SMTP
+	      server you use for submitting mail.  Please note that
+	      the default port number is 587.  The syntax is
+	      hostname[:port].  Port can be a decimal number or the
+	      name of the service as specified in
+	      <filename>/etc/services</filename>.  Typically you can
+	      just set this to
+	      <quote>localhost:smtp</quote>.</para></listitem></varlistentry>
 
 	<varlistentry><term><guilabel>User</guilabel></term>
 	      <listitem><para>If the remote SMTP server requires
@@ -2155,14 +2158,19 @@
 	      </screenshot>
 	    </figure>
 
-	    <para>To locate the LDAP address book, Balsa needs to know
-	    the host name and the base domain name of the LDAP server.
-	    For example, if your directory server was located at
-	    address.domainname.org, you would enter &quot;address&quot; as the
-	    host name, and &quot;domainname.org&quot; as the base domain name.
-	    The address book name can be whatever you want, but it's a
-	    good idea to give it an informative name.</para>
-	  </listitem>
+	    <para>In order to use a <acronym>LDAP</acronym> address
+	book, you need to know the host name of the
+	<acronym>LDAP</acronym> server. Depending on the server
+	configuration, you may need also so called Base Domain Name
+	which identifies your particular department. You can always
+	try leaving Base Domain Name field empty and a default value
+	will be used (OpenLDAP stores the default Base Domain Name in
+	<filename>/etc/openldap/ldap.conf</filename>). If this does
+	not work, you may need to ask your administrator for the value
+	of this. The usual values are usually similar to:
+	<quote>dc=theochem,dc=KTH,dc=se</quote> or
+	<quote>o=Theoretical Chemistry, c=SE</quote>.</para>
+	</listitem>
 	</varlistentry>
 
 	<varlistentry>
@@ -2297,11 +2305,10 @@
 	<varlistentry>
 	  <term><guilabel>Show Mailbox Info</guilabel></term>
 	  <listitem>
-	    <para>If <application>Balsa</application> was compiled
-	      with <command>--enable-info</command>, this will allow the
-	      number of total and unread messages for each mailbox to be
-	      shown in the left pane of the
-	      <application>Balsa</application> main window.</para>
+	    <para>This will allow the number of total and unread
+	      messages for each mailbox to be shown in the left pane
+	      of the <application>Balsa</application> main
+	      window.</para>
 	  </listitem>
 	</varlistentry>
 
@@ -2678,6 +2685,8 @@
       <listitem><para><link linkend="ct-alias-expansion">Expanding
 	    e-mail addresses automatically</link> </para></listitem>
 
+      <listitem><para><link linkend="ct-ldap">Setting up LDAP address
+      books</link></para></listitem>
     </itemizedlist>
 
     <sect2 id="ct-create-new-mb">
@@ -2789,6 +2798,44 @@
         you wish to be searched for aliases to expand.  This can be
         done in the <link linkend="win-config-3">Preferences</link>
         window, under the <guilabel>Address Books</guilabel> tab.
+      </para>
+    </sect2>
+    <sect2 id="ct-ldap">
+      <title>Setting up LDAP address books</title>
+      <para>Only steps crucial for <application>balsa</application>
+	are described here. Some of the steps may be specific to
+	OpenLDAP server. Whenever in doubt, consult the documentation
+	provided with your LDAP server.</para>
+      <itemizedlist>
+	<listitem>
+	  <para>Install the LDAP server software.</para>
+	</listitem>
+	<listitem>
+	  <para>Configure. In the case of OpenLDAP, edit
+	    <filename>/etc/openldap/ldap.conf</filename> and
+	    <filename>/etc/openldap/slapd.conf</filename>. Consult
+	    your LDAP configuration and other sources to choose the
+	    right Domain Name for your institution  and authentication
+	    level apriopriate to your environment.</para>
+	</listitem>
+	<listitem>
+	  <para>Import data to your LDAP server. OpenLDAP comes with
+	    a set of migration tools but they do not create directly
+	    objects of standard <classname>inetOrgPerson</classname> class
+	    which is an apropriate type for address book entry. You
+	    may need to tune them.</para>
+	</listitem>
+      </itemizedlist>
+      
+      <para><application>Balsa</application> searches for objects
+	having <property>mail</property> attribute. The search is done
+	on the <property>cn</property> attribute and the search filter
+	has a form <quote>(&(mail=*)(cn=John D))</quote>.
+	<application>Balsa</application> uses <property>cn</property>
+	(common name), <property>givenName</property> (given name),
+	<property>sn</property> (surname) and
+	<property>mail</property> (e-mail address) attributes of the
+	found objects.
       </para>
     </sect2>
   </sect1>
@@ -2985,7 +3032,6 @@
            Hector Garcia Alvarez (<email>hector@scouts-es.org</email>)
         </para></listitem>	
 
-
 	<listitem>
 	  <para>Bruno Pires Marinho
 	    (<email>bapm@camoes.rnl.ist.utl.pt</email>)</para>
@@ -3003,7 +3049,6 @@
 	  <para>David Pickens (<email>dpickens@iaesthetic.com</email>)</para>
 	</listitem>	
 	
-
 	<listitem>
 	  <para>Peter Williams (<email>peter@newton.cx</email>)</para>
 	</listitem>	
@@ -3023,20 +3068,22 @@
     </para>
 
     <para>
-      This manual was written by:
+      Following people contributed to this manual:
       <itemizedlist>
 	<listitem>
+	  <para>Peter Bloomfield (<email>@MindSpring.com</email>)</para>
+	</listitem>
+	<listitem>
+	  <para>Matthew Guenther (<email>guentherm@asme.org</email>)</para>
+	</listitem>
+	<listitem>
+	  <para>Berend De Schouwer (<email>bds@jhb.ucs.co.za</email>)</para>
+	</listitem>
+	<listitem>
+	  <para>Pawel Salek (<email>pawsa@theochem.kth.se</email>)</para>
+	</listitem>
+	<listitem>
 	  <para>Peter Williams (<email>peter@newton.cx</email>)</para>
-	</listitem>
-	
-	<listitem>
-	  <para>Matthew Guenther
-	  (<email>guentherm@asme.org</email>)</para>
-	</listitem>
-
-	<listitem>
-	  <para>Berend De Schouwer
-	  (<email>bds@jhb.ucs.co.za</email>)</para>
 	</listitem>
       </itemizedlist>
 
@@ -3051,9 +3098,6 @@
     </para>
   </sect1>
 
-
-
-  <!-- EOPAWSA -->
   <glossary id="glossary">
 
     <glossentry id="glossary-pop">

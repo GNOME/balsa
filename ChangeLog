@@ -1,3 +1,13 @@
+2001-08-11  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* help/C/balsa.sgml: update LDAP-related tips.
+	* libbalsa/address-book-ldap.c: add timeout, clean up code.
+	* src/address-book-config.c: add keyboard shortcuts.
+	* src/balsa-app.[hc]: add a default value to create_check().
+	* src/mailbox-conf.c:
+	* src/folder-conf.c: use new create_check() API.
+	
+	
 2001-08-11  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/expand-alias.h: expand_alias_find_match() proto fixup

@@ -114,8 +114,8 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 				keyval);
     gtk_entry_set_visibility(GTK_ENTRY(fcw.password), FALSE);
 
-    fcw.subscribed = 
-	create_check(fcw.dialog, _("_Subscribed folders only"), table, 5);
+    fcw.subscribed = create_check(fcw.dialog, _("_Subscribed folders only"), 
+				  table, 5, FALSE);
     create_label(_("_Prefix"), table, 6, &keyval);
     fcw.prefix = create_entry(fcw.dialog, table, NULL, NULL, 6, 
 			      mn ? mn->dir : NULL, keyval);

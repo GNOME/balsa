@@ -217,7 +217,7 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
 	ldap_unbind_s(ab->directory);
 	return FALSE;
     }
-    ldap_enable_cache(ab->directory, LDAP_CACHE_TIMEOUT, 0);
+    // ldap_enable_cache(ab->directory, LDAP_CACHE_TIMEOUT, 0);
     return TRUE;
 }
 
@@ -255,11 +255,12 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab, LibBalsaAddressBookLoa
      * Attempt to search for e-mail addresses. It returns success 
      * or failure, but not all the matches. 
      */ 
+    /* g_print("Performing full lookup...\n"); */
     rc = ldap_search_s(ldap_ab->directory, ldap_ab->base_dn,
 		       LDAP_SCOPE_SUBTREE, "(mail=*)", NULL, 0, &result);
     if (rc != LDAP_SUCCESS) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Failed to do a search: %s"
+			     _("Failed to do a search: %s."
 			       "Check that the base name is valid."),
 			     ldap_err2string(rc));
 	return;
@@ -268,18 +269,16 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab, LibBalsaAddressBookLoa
     /* 
      * Now loop over all the results, and spit out the output.
      */
-    e = ldap_first_entry(ldap_ab->directory, result);
-    while (e != NULL) {
+    for(e = ldap_first_entry(ldap_ab->directory, result); e != NULL;
+	e = ldap_next_entry(ldap_ab->directory, e)) {
 	address = libbalsa_address_book_ldap_get_address(ab, e);
 	callback(ab, address, closure);
 	gtk_object_unref(GTK_OBJECT(address));
-	e = ldap_next_entry(ldap_ab->directory, e);
     }
     
     callback(ab, NULL, closure);
-    
+    /* printf("ldap_load:: result=%p\n", result); */
     ldap_msgfree(result);
-    
 }
 
 /* libbalsa_address_book_ldap_get_address:
@@ -475,12 +474,13 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 					  const gchar * prefix, 
 					  gchar ** new_prefix)
 {
+    static struct timeval timeout = { 15, 0 }; /* 15 sec timeout */
     LibBalsaAddressBookLdap *ldap_ab;
     LibBalsaAddress *addr;
     GList *res = NULL;
     gchar* filter;
     gchar* escaped;
-    int rc, num_entries;
+    int rc;
     LDAPMessage * e, *result;
 
     g_return_val_if_fail ( LIBBALSA_ADDRESS_BOOK_LDAP(ab), NULL);
@@ -499,46 +499,42 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
     escaped = rfc_2254_escape(prefix);
     filter = g_strdup_printf("(&(mail=*)(cn=%s*))", escaped);
     g_free(escaped);
-    rc = ldap_search_s(ldap_ab->directory, ldap_ab->base_dn,
-	   LDAP_SCOPE_SUBTREE, filter, attrs, 0, &result);
+    rc = ldap_search_st(ldap_ab->directory, ldap_ab->base_dn,
+	   LDAP_SCOPE_SUBTREE, filter, attrs, 0, &timeout, &result);
+    g_print("Sent LDAP request: %s (basedn=%s)\n", filter, ldap_ab->base_dn);
     g_free(filter);
-    if (rc != LDAP_SUCCESS) {
-        switch (rc) {
-	case LDAP_SIZELIMIT_EXCEEDED:
-	case LDAP_TIMELIMIT_EXCEEDED:
-	    /*
-	     * These are administrative limits, so don't warn about them.
-	     * Particularly SIZELIMIT can be nasty on big directories.
-	     */
-	    return NULL;
-	    
-	default:
-	    /*
-	     * Until we know for sure, complain about all other errors.
-	     */
-	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Failed to do a search: %s"
+    switch (rc) {
+    case LDAP_SUCCESS:
+	for(e = ldap_first_entry(ldap_ab->directory, result);
+	    e != NULL; e = ldap_next_entry(ldap_ab->directory, e)) {
+	    addr = libbalsa_address_book_ldap_get_address(ab, e);
+	    if(!*new_prefix) 
+		*new_prefix = libbalsa_address_to_gchar(addr, 0);
+	    res = g_list_prepend(res, addr);
+	}
+    case LDAP_SIZELIMIT_EXCEEDED:
+    case LDAP_TIMELIMIT_EXCEEDED:
+	/*
+	 * These are administrative limits, so don't warn about them.
+	 * Particularly SIZELIMIT can be nasty on big directories.
+	 */
+	break;
+	
+    default:
+	/*
+	 * Until we know for sure, complain about all other errors.
+	 */
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("Failed to do a search: %s."
 			       "Check that the base name is valid."),
 			     ldap_err2string(rc));
-	    return NULL;
-	}
+	break;
     }
 
-    /*
-     * Now loop over all the results, and spit out the output.
-     */
-    num_entries = 0;
-    e = ldap_first_entry(ldap_ab->directory, result);
-    while (e != NULL) {
-	addr = libbalsa_address_book_ldap_get_address(ab, e);
-	if(!*new_prefix) *new_prefix = libbalsa_address_to_gchar(addr, 0);
-	res = g_list_prepend(res, addr);
-
-	e = ldap_next_entry(ldap_ab->directory, e);
-    }
+    /* printf("ldap_alias_complete:: result=%p\n", result); */
     ldap_msgfree(result);
 
-    res = g_list_reverse(res);
+    if(res) res = g_list_reverse(res);
     return res;
 }
 #endif				/*LDAP_ENABLED */

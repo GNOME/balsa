@@ -555,7 +555,8 @@ create_label(const gchar * label, GtkWidget * table, gint row, guint *keyval)
    creates a checkbox with a given label and places them in given array.
 */
 GtkWidget *
-create_check(GnomeDialog *mcw, const gchar *label, GtkWidget *table, gint row)
+create_check(GnomeDialog *mcw, const gchar *label, GtkWidget *table, gint row,
+	     gboolean initval)
 {
     guint kv;
     GtkWidget *cb, *l;
@@ -575,6 +576,9 @@ create_check(GnomeDialog *mcw, const gchar *label, GtkWidget *table, gint row)
 
     gtk_table_attach(GTK_TABLE(table), cb, 1, 2, row, row+1,
 		     GTK_FILL, GTK_FILL, 5, 5);
+
+    if(initval) 	
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(cb), TRUE);
 
     return cb;
 }

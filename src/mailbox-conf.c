@@ -782,23 +782,25 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
     gtk_entry_set_visibility(GTK_ENTRY(mcw->mb_data.pop3.password), FALSE);
 
     /* toggle for apop */
-    mcw->mb_data.pop3.use_apop = create_check(mcw->window, _("Use _APOP Authentication"), table, 5);
+    mcw->mb_data.pop3.use_apop = 
+	create_check(mcw->window, _("Use _APOP Authentication"), table, 5,
+		     FALSE);
 
     /* toggle for deletion from server */
     mcw->mb_data.pop3.delete_from_server = 
 	create_check(mcw->window, 
 		     _("_Delete messages from server after download"),
-		     table, 6);
+		     table, 6, TRUE);
 
     /* Procmail */
     mcw->mb_data.pop3.filter = 
 	create_check(mcw->window, _("_Filter messages through procmail"),
-		     table, 7);
+		     table, 7, FALSE);
 
     /* toggle for check */
     mcw->mb_data.pop3.check = 
 	create_check(mcw->window, _("_Check this mailbox for new mail"), 
-		     table, 8);
+		     table, 8, TRUE);
 
     return table;
 }

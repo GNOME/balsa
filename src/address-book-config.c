@@ -306,20 +306,20 @@ static GtkWidget *
 create_vcard_page(AddressBookConfig * abc)
 {
     GtkWidget *table;
+    GnomeDialog* mcw = GNOME_DIALOG(abc->window);
     GtkWidget *label;
+    guint keyval;
+    LibBalsaAddressBookVcard* ab;
+    ab = (LibBalsaAddressBookVcard*)abc->address_book; /* may be NULL */
 
     table = gtk_table_new(2, 3, FALSE);
 
     /* mailbox name */
 
-    label = gtk_label_new(_("Address Book Name:"));
-    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1,
-		     GTK_FILL, GTK_FILL, 10, 10);
-
-    abc->name_entry = gtk_entry_new();
-    gtk_table_attach(GTK_TABLE(table), abc->name_entry, 1, 2, 0, 1,
-		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+    create_label(_("_Address Book Name"), table, 0, &keyval);
+    abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
+				   ab ? abc->address_book->name : NULL, 
+				   keyval);
 
     label = gtk_label_new(_("File name"));
     gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
@@ -333,27 +333,15 @@ create_vcard_page(AddressBookConfig * abc)
 		     1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
     abc->expand_aliases_button =
-	gtk_check_button_new_with_label(_("Expand aliases as you type"));
-    gtk_table_attach(GTK_TABLE(table), abc->expand_aliases_button, 1, 2, 2,
-		     3, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+	create_check(mcw, _("_Expand aliases as you type"), table, 3,
+		     ab ? abc->address_book->expand_aliases : TRUE);
 
-    if (abc->address_book) {
-	LibBalsaAddressBookVcard *vcard;
+    if (ab) {
 	GtkWidget *entry;
-
-	vcard = LIBBALSA_ADDRESS_BOOK_VCARD(abc->address_book);
-	entry =
-	    GTK_WIDGET(gnome_file_entry_gtk_entry
-		       (GNOME_FILE_ENTRY(abc->ab_specific.vcard.path)));
-
-	gtk_entry_set_text(GTK_ENTRY(abc->name_entry),
-			   abc->address_book->name);
-	gtk_entry_set_text(GTK_ENTRY(entry), vcard->path);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-				     (abc->expand_aliases_button),
-				     abc->address_book->expand_aliases);
+	entry = GTK_WIDGET(gnome_file_entry_gtk_entry
+			   (GNOME_FILE_ENTRY(abc->ab_specific.vcard.path)));
+	gtk_entry_set_text(GTK_ENTRY(entry), ab->path);
     }
-
     gtk_widget_show_all(table);
     return table;
 
@@ -363,65 +351,34 @@ create_vcard_page(AddressBookConfig * abc)
 static GtkWidget *
 create_ldap_page(AddressBookConfig * abc)
 {
-    GtkWidget *table;
-    GtkWidget *label;
+    GtkWidget *table = gtk_table_new(2, 3, FALSE);
 
-    table = gtk_table_new(2, 3, FALSE);
+    LibBalsaAddressBookLdap* ab;
+    GnomeDialog* mcw = GNOME_DIALOG(abc->window);
+    guint keyval;
+
+    ab = (LibBalsaAddressBookLdap*)abc->address_book; /* may be NULL */
 
     /* mailbox name */
 
-    label = gtk_label_new(_("Address Book Name:"));
-    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1,
-		     GTK_FILL, GTK_FILL, 10, 10);
-    gtk_widget_show(label);
+    create_label(_("_Address Book Name"), table, 0, &keyval);
+    abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
+				   ab ? abc->address_book->name : NULL, 
+				   keyval);
 
-    abc->name_entry = gtk_entry_new();
-    gtk_table_attach(GTK_TABLE(table), abc->name_entry, 1, 2, 0, 1,
-		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
-    gtk_widget_show(abc->name_entry);
+    create_label(_("_Host Name"), table, 1, &keyval);
+    abc->ab_specific.ldap.host_name = 
+	create_entry(mcw, table, NULL, NULL, 1, 
+		     ab ? ab->host : NULL, keyval);
 
-    label = gtk_label_new(_("Host name"));
-    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
-		     GTK_FILL, GTK_FILL, 10, 10);
-    gtk_widget_show(label);
-
-    abc->ab_specific.ldap.host_name = gtk_entry_new();
-    gtk_table_attach(GTK_TABLE(table), abc->ab_specific.ldap.host_name, 1,
-		     2, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
-    gtk_widget_show(abc->ab_specific.ldap.host_name);
-
-    label = gtk_label_new(_("Base Domain Name"));
-    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 2, 3,
-		     GTK_FILL, GTK_FILL, 10, 10);
-    gtk_widget_show(label);
-
-    abc->ab_specific.ldap.base_dn = gtk_entry_new();
-    gtk_table_attach(GTK_TABLE(table), abc->ab_specific.ldap.base_dn, 1, 2,
-		     2, 3, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
-    gtk_widget_show(abc->ab_specific.ldap.base_dn);
+    create_label(_("_Base Domain Name"), table, 2, &keyval);
+    abc->ab_specific.ldap.base_dn = 
+	create_entry(mcw, table, NULL, NULL, 2, 
+		     ab ? ab->base_dn : NULL, keyval);
 
     abc->expand_aliases_button =
-	gtk_check_button_new_with_label(_("Expand aliases as you type"));
-    gtk_table_attach(GTK_TABLE(table), abc->expand_aliases_button, 1, 2, 3,
-		     4, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
-
-    if (abc->address_book) {
-	LibBalsaAddressBookLdap *ldap;
-	ldap = LIBBALSA_ADDRESS_BOOK_LDAP(abc->address_book);
-
-	gtk_entry_set_text(GTK_ENTRY(abc->name_entry),
-			   abc->address_book->name);
-	gtk_entry_set_text(GTK_ENTRY(abc->ab_specific.ldap.host_name),
-			   ldap->host);
-	gtk_entry_set_text(GTK_ENTRY(abc->ab_specific.ldap.base_dn),
-			   ldap->base_dn);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-				     (abc->expand_aliases_button),
-				     abc->address_book->expand_aliases);
-    }
+	create_check(mcw, _("_Expand aliases as you type"), table, 3,
+		     ab ? abc->address_book->expand_aliases : TRUE);
 
     gtk_widget_show(table);
     return table;

@@ -1,7 +1,8 @@
-2002-10-23  Emmanuel <e.allaud@wanadoo.fr>
+2002-10-23  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/address-book-ldap.c: do not crash on severed LDAP
 	connection.
+	* src/folder-conf.c: do not crash on subfolder creation (#96720, EA).
 
 2002-10-20  Emmanuel <e.allaud@wanadoo.fr>
 

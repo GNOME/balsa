@@ -388,13 +388,14 @@ subfolder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
             gtk_editable_get_chars(GTK_EDITABLE(fcw->parent_folder), 0, -1);
 	folder = 
             gtk_editable_get_chars(GTK_EDITABLE(fcw->folder_name), 0, -1);
-        
+        g_print("fcw->old_parent=%s\n",fcw->old_parent);
+        g_print("fcw->old_folder=%s\n",fcw->old_folder);
 	if (fcw->mbnode) {
 	    /* rename */
-	    if (strcmp(parent, fcw->old_parent) || 
-                strcmp(folder, fcw->old_folder)) {
+	    if ((fcw->old_parent && strcmp(parent, fcw->old_parent)) || 
+                 (fcw->old_folder &&strcmp(folder, fcw->old_folder))) {
 		gint button = 0;
-		if (!strcmp(fcw->old_folder, "INBOX") &&
+		if (fcw->old_folder && !strcmp(fcw->old_folder, "INBOX") &&
 		    (!fcw->old_parent || !*fcw->old_parent)) {
 		    gchar *msg = g_strdup_printf(
 			_("Renaming INBOX is special!\n"
@@ -426,7 +427,7 @@ subfolder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
                     fcw->mbnode->dir = g_strdup(parent);
 
 		    /*	Rescan as little of the tree as possible. */
-		    if (!strncmp(parent, fcw->old_parent, strlen(parent))){
+		    if (fcw->old_parent && !strncmp(parent, fcw->old_parent, strlen(parent))){
 			/* moved it up the tree */
                         GNode* n = balsa_find_dir(balsa_app.mailbox_nodes,
                                                   parent);
@@ -434,7 +435,7 @@ subfolder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
                             balsa_mailbox_node_rescan
                                 (BALSA_MAILBOX_NODE(n->data));
                         else printf("Parent not found!?\n");
-                    } else if (!strncmp(parent, fcw->old_parent, 
+                    } else if (fcw->old_parent && !strncmp(parent, fcw->old_parent, 
                                         strlen(fcw->old_parent))) {
 			/* moved it down the tree */
                         GNode* n = balsa_find_dir(balsa_app.mailbox_nodes,

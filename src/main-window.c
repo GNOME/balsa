@@ -229,6 +229,7 @@ create_menu (GnomeMDI * mdi)
     /* Ctrl-M */
     {GNOME_APP_UI_ITEM, N_("_Get new mail"), NULL, check_new_messages_cb, NULL,
      NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_MAIL_RCV, 'M', GDK_CONTROL_MASK, NULL},
+    GNOMEUIINFO_SEPARATOR,
     {GNOME_APP_UI_ITEM, N_("E_xit"), NULL, close_main_window, NULL,
      NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_EXIT, 'Q', 0, NULL},
     GNOMEUIINFO_END

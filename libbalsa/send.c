@@ -189,8 +189,7 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part);
 static guint balsa_send_message_real(SendMessageInfo* info);
 static LibBalsaMsgCreateResult
 libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
-				     gboolean flow, gboolean postponing,
-				     GMimeMessage** return_mime_message);
+				     gboolean flow, gboolean postponing);
 static LibBalsaMsgCreateResult libbalsa_create_msg(LibBalsaMessage * message,
 				    gint encoding, gboolean flow);
 static LibBalsaMsgCreateResult
@@ -1306,8 +1305,7 @@ get_mailbox_names(GList *list, GList *address_list)
 
 static LibBalsaMsgCreateResult
 libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
-				     gboolean flow, gboolean postponing,
-				     GMimeMessage** return_mime_message)
+				     gboolean flow, gboolean postponing)
 {
     gchar **mime_type;
     GMimeObject *mime_root = NULL;
@@ -1546,40 +1544,36 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
     g_mime_message_add_header(mime_message, "X-Mailer",
 			      g_strdup_printf("Balsa %s", VERSION));
 
-    if (return_mime_message)
-	*return_mime_message = mime_message;
+    message->mime_msg = mime_message;
 
     return LIBBALSA_MESSAGE_CREATE_OK;
 }
 
-
+/* When we postpone a message in the compose window, we lose track of
+ * the message we were replying to.  We *could* save some identifying
+ * information in a dummy header, but it could still be hard to track it
+ * down: it might have been filed in another mailbox, for instance.  For
+ * now, we'll just let it go...
+ */
 gboolean
 libbalsa_message_postpone(LibBalsaMessage * message,
 			  LibBalsaMailbox * draftbox,
 			  LibBalsaMessage * reply_message,
 			  gchar * fcc, gint encoding,
-			  gboolean flow) {
-    gchar *tmp;
+			  gboolean flow)
+{
     int thereturn; 
 
- 
-    if ((reply_message != NULL) && (reply_message->mailbox != NULL))
-	/* Just saves the message ID, mailbox type and mailbox name. We could
-	 * search all mailboxes for the ID but that would not be too fast. We
-	 * could also add more stuff ID like path, server, ... without this
-	 * if you change the name of the mailbox the flag will not be set. 
-	 CHBM: unbreak this in 1.3 - use URL */
-	tmp = g_strdup_printf("%s\r%s",
-			      reply_message->message_id,
-			      reply_message->mailbox->name);
-    else
-	tmp = NULL;
+    if (!message->mime_msg
+	&& libbalsa_message_create_mime_message(message, encoding, flow,
+						TRUE) !=
+	LIBBALSA_MESSAGE_CREATE_OK)
+	return FALSE;
 
-    /* Do something with tmp and mime_message */
+    if (fcc)
+	g_mime_message_set_header(message->mime_msg, "X-Balsa-Fcc", fcc);
 
     thereturn = libbalsa_mailbox_copy_message( message, draftbox );
-
-    g_free(tmp);
 
     if (MAILBOX_OPEN(draftbox))
 	libbalsa_mailbox_check(draftbox);
@@ -1700,8 +1694,7 @@ libbalsa_create_msg(LibBalsaMessage * message,
     if (!message->mime_msg) {
 	LibBalsaMsgCreateResult res =
 	    libbalsa_message_create_mime_message(message, encoding, flow,
-						 FALSE,
-						 &message->mime_msg);
+						 FALSE);
 	if (res != LIBBALSA_MESSAGE_CREATE_OK)
 	    return res;
     }

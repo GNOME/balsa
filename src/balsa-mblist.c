@@ -118,13 +118,8 @@ static void bmbl_row_activated_cb(GtkTreeView * tree_view,
                                   GtkTreePath * path,
                                   GtkTreeViewColumn * column,
                                   gpointer data);
-static void bmbl_unread_messages_changed_cb(LibBalsaMailbox *
-                                            mailbox, gboolean flag,
-                                            GtkTreeStore * store);
-static void bmbl_messages_status_changed_cb(LibBalsaMailbox * mailbox,
-					    GList * messages,
-					    gint flag,
-					    GtkTreeStore * store);
+static void bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox,
+				    GtkTreeStore * store);
 /* helpers */
 static gboolean bmbl_find_all_unread_mboxes_func(GtkTreeModel * model,
                                                  GtkTreePath * path,
@@ -932,22 +927,7 @@ bmbl_update_mailbox_idle_add(LibBalsaMailbox * mailbox,
 }
 
 static void
-bmbl_messages_status_changed_cb(LibBalsaMailbox * mailbox,
-				GList * messages,
-				gint flag, GtkTreeStore * store)
-{
-    /* We update the mailbox infos only if the flag changed was the DELETED flag
-       or the NEW flag, because they are the only ones that change the numbers
-       displayed
-     */
-    if ((flag == LIBBALSA_MESSAGE_FLAG_DELETED) ||
-	(flag == LIBBALSA_MESSAGE_FLAG_NEW))
-	bmbl_update_mailbox_idle_add(mailbox, store);
-}
-
-static void
-bmbl_unread_messages_changed_cb(LibBalsaMailbox * mailbox,
-				gboolean flag, GtkTreeStore * store)
+bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, GtkTreeStore * store)
 {
     bmbl_update_mailbox_idle_add(mailbox, store);
 }
@@ -1108,18 +1088,14 @@ balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
  * Remove the signals we attached to the mailboxes.
  */
 static void
-bmbl_real_disconnect_mbnode_signals(BalsaMailboxNode * mbnode, GtkTreeModel * model)
+bmbl_real_disconnect_mbnode_signals(BalsaMailboxNode * mbnode,
+				    GtkTreeModel * model)
 {
-    if (mbnode->mailbox) {
+    if (mbnode->mailbox)
         g_signal_handlers_disconnect_by_func(G_OBJECT(mbnode->mailbox),
                                              G_CALLBACK
-                                             (bmbl_unread_messages_changed_cb),
+                                             (bmbl_mailbox_changed_cb),
                                              model);
-        g_signal_handlers_disconnect_by_func(G_OBJECT(mbnode->mailbox),
-                                             G_CALLBACK
-                                             (bmbl_messages_status_changed_cb),
-                                             model);
-    }
 }
 
 static gboolean
@@ -1232,14 +1208,8 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
                                        ? LB_MAILBOX_SHOW_TO
                                        : LB_MAILBOX_SHOW_FROM);
 	}
-	g_signal_connect(G_OBJECT(mailbox),
-			 "set-unread-messages-flag",
-			 G_CALLBACK(bmbl_unread_messages_changed_cb),
-			 store);
-	g_signal_connect(G_OBJECT(mailbox),
-			 "messages-status-changed",
-			 G_CALLBACK(bmbl_messages_status_changed_cb),
-			 store);
+	g_signal_connect(G_OBJECT(mailbox), "changed",
+			 G_CALLBACK(bmbl_mailbox_changed_cb), store);
     } else {
 	/* new directory, but not a mailbox */
         in = mbnode->expanded ? BALSA_PIXMAP_MBOX_DIR_OPEN :

@@ -47,6 +47,15 @@ static option_list fe_search_type[] =
     { "External Command", NULL}
 };
 
+static option_list fe_actions[] =
+{
+    { "Copy to folder:", NULL },
+    { "Move to folder:", NULL },
+    { "Print on printer:", NULL },
+    { "Run program:", NULL },
+    { "Send to Trash", NULL}
+};
+
 /* Dialog window */
 GtkWidget *fe_dialog;
 /* and buttons */
@@ -140,11 +149,7 @@ void fe_revert_pressed(GtkWidget *widget,
 GtkWidget *fe_type_frame;
 GtkWidget *fe_type_box;
 GtkWidget *fe_search_option_menu;
-/* type notebook radiobuttons */
-GtkWidget *fe_simple;
-GtkWidget *fe_regex;
-GtkWidget *fe_exec;
-/* their callback */
+/* search type callback */
 void fe_checkbutton_toggled(GtkWidget *widget,
 			    gpointer data);
 
@@ -210,7 +215,13 @@ void fe_sound_browse_clicked(GtkWidget *widget,
 /* action field */
 GtkWidget *fe_action_frame;
 GtkWidget *fe_action_table;
-GtkWidget *fe_copy_button;
+GtkWidget *fe_action_option_menu;
+GtkWidget *fe_action_entry;
+/* callback */
+void fe_action_selected(GtkWidget *widget,
+			gpointer data);
+
+/*GtkWidget *fe_copy_button;
 GtkWidget *fe_copy_entry;
 GtkWidget *fe_move_button;
 GtkWidget *fe_move_entry;
@@ -220,7 +231,7 @@ GtkWidget *fe_print_entry;
 GtkWidget *fe_run_button;
 GtkWidget *fe_run_entry;
 GtkWidget *fe_delete_button;
-GtkWidget *fe_delete_label;
+GtkWidget *fe_delete_label; */
 
 /* disposition field */
 GtkWidget *fe_disp_frame;

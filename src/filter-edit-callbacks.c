@@ -65,6 +65,43 @@ fe_checkbutton_toggled (GtkWidget * widget,
 
 
 /*
+ * fe_action_selected()
+ *
+ * Callback for the "Action" option menu
+ */
+void fe_action_selected(GtkWidget *widget,
+			gpointer data)
+{
+    gtk_widget_set_sensitive(GTK_WIDGET(fe_action_entry),
+			     TRUE);
+    switch(GPOINTER_TO_INT(data))
+    {
+    case 0: /* copy to folder */
+    case 2: /* print on printer */
+    case 3: /* run program */
+	gtk_widget_set_sensitive(GTK_WIDGET(fe_disp_place),
+				 TRUE);
+	break;
+
+    case 4: /* send to trash */
+	gtk_widget_set_sensitive(GTK_WIDGET(fe_action_entry),
+				 FALSE);
+	/* fall through */
+    case 1: /* move to folder */
+	if (GTK_TOGGLE_BUTTON(fe_disp_place)->active)
+	    gtk_toggle_button_set_state(GTK_TOGGLE_BUTTON(fe_disp_continue),
+					TRUE);
+	gtk_widget_set_sensitive(GTK_WIDGET(fe_disp_place),
+				 FALSE);
+	break;
+
+    default:
+	break;
+    }
+} /* end fe_action_selected() */
+
+
+/*
  * fe_add_pressed()
  *
  * Callback for the "Add" button for the regex type
@@ -314,25 +351,38 @@ void fe_delete_pressed(GtkWidget *widget,
 
 
 /*
- * fe_up_pressed()
+ * fe_down_pressed()
  *
- * Callback for the "Up" button
+ * Callback for the "Down" button
  */
 void fe_down_pressed(GtkWidget *widget,
 		     gpointer throwaway)
 {
     gint row;
 
-    g_print("down\n");
     if (!(GTK_CLIST(fe_clist)->selection))
 	return;
 
     row = GPOINTER_TO_INT((GTK_CLIST(fe_clist)->selection)->data);
-    g_print("row %d of %d selected\n", row, GTK_CLIST(fe_clist)->rows - 1);
-/*    if (row == (GTK_CLIST(fe_clist)->rows - 1)) 
-      return; */
-
     gtk_clist_swap_rows(GTK_CLIST(fe_clist), row, row + 1);
+} /* end fe_down_pressed */
+
+
+/*
+ * fe_up_pressed()
+ *
+ * Callback for the "Up" button
+ */
+void fe_up_pressed(GtkWidget *widget,
+		     gpointer throwaway)
+{
+    gint row;
+
+    if (!(GTK_CLIST(fe_clist)->selection))
+	return;
+
+    row = GPOINTER_TO_INT((GTK_CLIST(fe_clist)->selection)->data);
+    gtk_clist_swap_rows(GTK_CLIST(fe_clist), row - 1, row);
 } /* end fe_up_pressed */
 
 

@@ -169,6 +169,10 @@ void build_left_side()
 		       TRUE,
 		       TRUE,
 		       0);
+    gtk_signal_connect(GTK_OBJECT(fe_up),
+		       "clicked",
+		       GTK_SIGNAL_FUNC(fe_up_pressed),
+		       NULL);
     gtk_widget_show(fe_up);
     fe_down = gtk_button_new_with_label("Down");
     gtk_box_pack_start(GTK_BOX(fe_box_updown),
@@ -685,11 +689,29 @@ void build_action_page()
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     5, 5);
     gtk_widget_show(fe_action_frame);
-    fe_action_table = gtk_table_new(5, 6, FALSE);
+    fe_action_table = gtk_table_new(5, 2, FALSE);
     gtk_container_add(GTK_CONTAINER(fe_action_frame),
 		      fe_action_table);
     gtk_widget_show(fe_action_table);
 
+    fe_action_option_menu = build_option_menu(fe_actions,
+					      5,
+					      GTK_SIGNAL_FUNC(fe_action_selected));
+    gtk_table_attach(GTK_TABLE(fe_action_table),
+		     fe_action_option_menu,
+		     0, 2, 0, 1,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_action_option_menu);
+    fe_action_entry = gtk_entry_new_with_max_length(1023);
+    gtk_table_attach(GTK_TABLE(fe_action_table),
+		     fe_action_entry,
+		     0, 5, 1, 2,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_action_entry);
 
 /*** cut for testing **
     fe_copy_button = gtk_radio_button_new_with_label(NULL,

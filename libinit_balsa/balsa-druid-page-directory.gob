@@ -143,7 +143,7 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 		table = GTK_TABLE( gtk_table_new( 6, 2, FALSE ) );
 	
 		label = GTK_LABEL( gtk_label_new( _(
-			"Please confirm the locations of your default mail files.\n"
+			"Please verify the locations of your default mail files.\n"
 			"These will be created if necessary." ) ) );
 		gtk_label_set_justify( label, GTK_JUSTIFY_RIGHT );
 		gtk_label_set_line_wrap( label, TRUE );
@@ -154,6 +154,12 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 		preset = getenv( "MAIL" );
 		if( preset )
 			preset = g_strdup( preset );
+		else {
+		    preset = getenv( "USER" );
+		    preset = preset ? 
+			g_strconcat( "/var/spool/mail/", preset, NULL ) :
+			g_strdup(""); /* no clue what is the inbox location  */
+		}
 		balsa_init_add_table_entry( table, 0, _("Inbox:"), preset, 
 			&( self->_priv->ed0 ), GTK_WIDGET( self ), &( self->_priv->inbox ) );
 		if( preset )

@@ -1,3 +1,7 @@
+2000-05-02 Pawel Salek <pawsa@theochem.kth.se>:
+	* libinit_balsa/balsa-druid-page-directory.gob:
+	handle lack of MAIL environment variable properly.
+
 2000-05-02  Pawel Salek <pawsa@theochem.kth.se>
 	* src/balsa-message.c, src/sendmsg-window.c:
 	Martynas Kunigëlis <mkunigelis@alna.lt> patch for Baltic language

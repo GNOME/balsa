@@ -43,6 +43,7 @@ typedef struct _PropertyUI
 
     GtkWidget *previewpane;
     GtkWidget *debug;		/* enable/disable debugging */
+    GtkWidget *checkbox;
 
 #ifdef BALSA_SHOW_INFO
     GtkWidget *mblist_show_mb_content_info;
@@ -57,6 +58,10 @@ typedef struct _PropertyUI
     GtkRadioButton *encoding_type[NUM_ENCODING_MODES];
     GtkWidget *charset;
 
+      /* printing */
+    GtkWidget *PrintCommand;
+    GtkWidget *PrintBreakline;
+    GtkWidget *PrintLinesize;
 
   }
 PropertyUI;
@@ -100,7 +105,7 @@ static GtkWidget *create_mailservers_page (void);
 static GtkWidget *create_display_page (void);
 static GtkWidget *create_misc_page (void);
 static GtkWidget *create_encoding_page (void);
-
+static GtkWidget *create_printing_page (void);
 
 /* save the settings */
 static void apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui);
@@ -189,12 +194,18 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 			     create_misc_page (),
 			     label);
 
-  /* Misc page */
+  /* Encoding page */
   label = gtk_label_new (_ ("Encoding"));
   gtk_notebook_append_page (
 		    GTK_NOTEBOOK (GNOME_PROPERTY_BOX (pui->pbox)->notebook),
 			     create_encoding_page (),
 			     label);
+  /* Printing page */
+  label = gtk_label_new (_ ("Printing"));
+  gtk_notebook_append_page(
+		    GTK_NOTEBOOK (GNOME_PROPERTY_BOX (pui->pbox)->notebook),
+		             create_printing_page (),
+		             label);
   set_prefs ();
   for (i = 0; i < NUM_TOOLBAR_MODES; i++)
     {
@@ -251,6 +262,16 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 			  properties_modified_cb, pui->pbox);
     }
 
+  /* printing */
+  gtk_signal_connect (GTK_OBJECT (pui->PrintCommand), "changed",
+		      GTK_SIGNAL_FUNC (properties_modified_cb),
+		      pui->pbox);
+  gtk_signal_connect (GTK_OBJECT (pui->PrintBreakline), "toggled",
+		      GTK_SIGNAL_FUNC (properties_modified_cb),
+		      pui->pbox);
+  gtk_signal_connect (GTK_OBJECT (pui->PrintLinesize), "changed",
+  		      GTK_SIGNAL_FUNC (properties_modified_cb),
+  		      pui->pbox);
 
   /* set data and show the whole thing */
   gtk_widget_show_all (GTK_WIDGET (pui->pbox));
@@ -336,6 +357,14 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
 	break;
       }
 
+  /* printing */
+  g_free (balsa_app.PrintCommand.PrintCommand);
+  balsa_app.PrintCommand.PrintCommand =
+      g_strdup( gtk_entry_get_text(GTK_ENTRY (pui->PrintCommand)));
+
+  balsa_app.PrintCommand.linesize = atoi(gtk_entry_get_text(GTK_ENTRY( pui->PrintLinesize)));
+  balsa_app.PrintCommand.breakline =  GTK_TOGGLE_BUTTON(pui->PrintBreakline)->active;
+
   // XXX
   //  refresh_main_window ();
 
@@ -352,6 +381,7 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
 void
 set_prefs (void)
 {
+  gchar tmp[10];
   gint i;
 
   for (i = 0; i < NUM_TOOLBAR_MODES; i++)
@@ -392,6 +422,11 @@ set_prefs (void)
 	break;
       }
 
+  /*printing */
+  gtk_entry_set_text(GTK_ENTRY(pui->PrintCommand), balsa_app.PrintCommand.PrintCommand);
+  sprintf(tmp, "%d", balsa_app.PrintCommand.linesize);
+  gtk_entry_set_text(GTK_ENTRY(pui->PrintLinesize), tmp);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->PrintBreakline), balsa_app.PrintCommand.breakline);
 
 }
 
@@ -690,6 +725,8 @@ create_misc_page ()
   pui->debug = gtk_check_button_new_with_label (_("Debug"));
   gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (pui->debug), TRUE, TRUE, 2);
 
+  pui->checkbox = gtk_check_button_new_with_label(_("Show check box"));
+  gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (pui->checkbox), TRUE, TRUE, 2);
 
   /* arp --- table containing leadin label and string. */
   table = gtk_table_new (1, 2, FALSE);
@@ -790,6 +827,66 @@ create_encoding_page ()
       group = gtk_radio_button_group (pui->encoding_type[i]);
     }
 
+
+  return vbox;
+
+}
+
+/*
+ * printing notepad
+ */
+static GtkWidget *
+create_printing_page ()
+{
+   
+  GtkWidget *vbox;
+  GtkWidget *frame;
+
+  /* arp */
+  GtkWidget *vbox1;
+  GtkWidget *table;
+  GtkWidget *label;
+
+  vbox = gtk_vbox_new (FALSE, 5);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
+
+  frame = gtk_frame_new (_("Printing"));
+  gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
+
+  vbox1 = gtk_vbox_new (FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox1), 5);
+  gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (vbox1));
+
+  
+  table = gtk_table_new (1, 2, FALSE);
+
+  label = gtk_label_new (_("Print command:"));
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
+		    GTK_FILL, GTK_FILL, 10, 10);
+
+   pui->PrintCommand = gtk_entry_new ();
+   gtk_table_attach (GTK_TABLE (table), pui->PrintCommand, 1, 2, 0, 1,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+   //gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (table), TRUE, TRUE, 2);
+
+  label = gtk_label_new (_ ("Linesize:"));
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
+		    GTK_FILL, GTK_FILL, 10, 10);
+
+  pui->PrintLinesize = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pui->PrintLinesize, 1, 2, 1, 2,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+
+   gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (table), TRUE, TRUE, 2);
+
+   pui->PrintBreakline = gtk_check_button_new_with_label(_("Break line"));
+   gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (pui->PrintBreakline), TRUE, TRUE, 2);
+ 
+   gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (table), TRUE, TRUE, 2);
 
   return vbox;
 

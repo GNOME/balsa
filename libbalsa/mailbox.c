@@ -979,10 +979,13 @@ lbm_node_has_unseen_child(LibBalsaMailbox * mailbox, GNode * node)
 static void
 lbm_entry_check(LibBalsaMailbox * mailbox, guint msgno)
 {
-    GNode *node;
     LibBalsaMailboxIndexEntry *entry;
+    GNode *node;
     gboolean unread;
 
+    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
+    if (!entry)
+	return;
     if (!mailbox->msg_tree)
 	return;
     node = g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
@@ -990,7 +993,6 @@ lbm_entry_check(LibBalsaMailbox * mailbox, guint msgno)
     if (!node)
 	return;
 
-    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
     unread = (entry->status_icon == LIBBALSA_MESSAGE_STATUS_UNREAD);
     while ((node = node->parent) && (msgno = GPOINTER_TO_UINT(node->data))) {
 	entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
@@ -1741,6 +1743,8 @@ lbm_check_unseen_child(GNode * node, LibBalsaMailbox * mailbox)
 	while ((node = node->parent)
 	       && (msgno = GPOINTER_TO_UINT(node->data))) {
 	    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
+	    if (!entry)
+		continue;
 	    if (entry->has_unseen_child)
 		break;
 	    entry->has_unseen_child = 1;

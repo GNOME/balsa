@@ -230,7 +230,7 @@ void print_message(GtkWidget *widget, gpointer data)
 	tmp = address_to_gchar (addr);
 	fprintf(fp, "\n\n");
 	fprintf(fp, "From:    \t%s\n", tmp);
-	fprintf(fp, "Sendt:   \t%s\n", message->date);
+	fprintf(fp, "Sent:    \t%s\n", message->date);
 	tmp = make_string_from_list (message->to_list);
 	fprintf(fp, "To:      \t%s\n", tmp);
 	tmp = make_string_from_list (message->cc_list);

@@ -106,6 +106,8 @@ static gint toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static gint toggle_queue_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 
 static void spell_check_cb(GtkWidget * widget, BalsaSendmsg *);
+static void sw_spell_check_response(BalsaSpellCheck * spell_check,
+                                    gint response, BalsaSendmsg * msg);
 
 static void address_book_cb(GtkWidget *widget, BalsaSendmsg *smd_msg_wind);
 static void address_book_response(GtkWidget * ab, gint response,
@@ -675,6 +677,9 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
     quit_on_close = bsm->quit_on_close;
     g_free(bsm->fcc_url);
     g_free(bsm->charset);
+
+    if (bsm->spell_checker)
+        gtk_widget_destroy(bsm->spell_checker);
 
     g_free(bsm);
 
@@ -1831,7 +1836,6 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     GtkWidget *sw;
     GtkWidget *table;
     GtkWidget *frame;
-    GtkWidget *sc;
     GtkWidget *align;
 
     table = gtk_table_new(11, 3, FALSE);
@@ -1956,11 +1960,7 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     /* Keywords: */
     create_string_entry(table, _("Keywords:"), 9, msg->keywords);
 
-    sc = balsa_spell_check_new();
-    msg->spell_checker = sc;
-
     gtk_widget_show_all(table);
-    gtk_widget_hide(sc);
     return table;
 }
 
@@ -2035,8 +2035,6 @@ create_text_area(BalsaSendmsg * msg)
     }
     gtk_text_view_set_editable(GTK_TEXT_VIEW(msg->text), TRUE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(msg->text), GTK_WRAP_WORD);
-    balsa_spell_check_set_text(BALSA_SPELL_CHECK(msg->spell_checker),
-			       GTK_TEXT_VIEW(msg->text));
 
     table = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(table),
@@ -2202,7 +2200,7 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	}
     } else {
 	if (date)
-	    str = g_strdup_printf(_("On %s %s wrote:\n"), date, personStr);
+	    str = g_strdup_printf(_("On %s, %s wrote:\n"), date, personStr);
 	else
 	    str = g_strdup_printf(_("%s wrote:\n"), personStr);
 	body = content2reply(message,
@@ -2607,6 +2605,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->orig_message = message;
     msg->window = window = gnome_app_new("balsa", NULL);
     msg->type = type;
+    msg->spell_checker = NULL;
 
     if (message) {
         /* ref message so we don't lose it even if it is deleted */
@@ -3747,9 +3746,22 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
 {
     BalsaSpellCheck *sc;
 
+    if (msg->spell_checker) {
+        if (msg->spell_checker->window) {
+            gdk_window_raise(msg->spell_checker->window);
+            return;
+        } else
+            /* A spell checker was created, but not shown because of
+             * errors; we'll destroy it, and create a new one. */
+            gtk_widget_destroy(msg->spell_checker);
+    }
+
+    msg->spell_checker = balsa_spell_check_new(GTK_WINDOW(msg->window));
     sc = BALSA_SPELL_CHECK(msg->spell_checker);
+    g_object_add_weak_pointer(G_OBJECT(sc), (gpointer) &msg->spell_checker);
 
     /* configure the spell checker */
+    balsa_spell_check_set_text(sc, GTK_TEXT_VIEW(msg->text));
     balsa_spell_check_set_language(sc, msg->locale);
 
     balsa_spell_check_set_character_set(sc, msg->charset);
@@ -3760,11 +3772,20 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
 				       spell_check_suggest_mode_name
 				       [balsa_app.suggestion_mode]);
     balsa_spell_check_set_ignore_length(sc, balsa_app.ignore_size);
+    g_signal_connect(G_OBJECT(sc), "response",
+                     G_CALLBACK(sw_spell_check_response), msg);
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(msg->text), FALSE);
 
-    /* this will block until the dialog is closed */
     balsa_spell_check_start(sc);
+}
 
-    check_readiness(msg);
+static void
+sw_spell_check_response(BalsaSpellCheck * spell_check, gint response, 
+                        BalsaSendmsg * msg)
+{
+    gtk_widget_destroy(GTK_WIDGET(spell_check));
+    msg->spell_checker = NULL;
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(msg->text), TRUE);
 }
 
 static void

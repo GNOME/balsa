@@ -63,8 +63,9 @@ extern "C" {
 					     const gchar *);
 
 /* function prototypes */
-    GtkWidget *balsa_spell_check_new(void);
-    GtkWidget *balsa_spell_check_new_with_text(GtkTextView * view);
+    GtkWidget *balsa_spell_check_new(GtkWindow * parent);
+    GtkWidget *balsa_spell_check_new_with_text(GtkWindow * parent,
+                                               GtkTextView * view);
     void balsa_spell_check_set_text(BalsaSpellCheck * spell_check,
 				    GtkTextView * view);
     void balsa_spell_check_start(BalsaSpellCheck * spell_check);

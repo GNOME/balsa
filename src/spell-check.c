@@ -74,6 +74,9 @@ struct _BalsaSpellCheck {
     guint ignore_length;
     gchar *language_tag;
     gchar *character_set;
+
+    /* idle handler id */
+    guint highlight_idle_id;
 };
 
 struct _BalsaSpellCheckClass {
@@ -135,6 +138,7 @@ static gboolean check_pspell_errors(PspellManager * manager);
 
 static void setup_suggestions(BalsaSpellCheck * spell_check);
 static gboolean balsa_spell_check_next(BalsaSpellCheck * spell_check);
+static gboolean highlight_idle(BalsaSpellCheck * spell_check);
 static void balsa_spell_check_fix(BalsaSpellCheck * spell_check,
 				  gboolean fix_al);
 static void balsa_spell_check_learn(BalsaSpellCheck * spell_check,
@@ -300,11 +304,12 @@ spch_get_property(GObject * object, guint prop_id, GValue * value,
  * Create a new spell check widget.
  * */
 GtkWidget *
-balsa_spell_check_new(void)
+balsa_spell_check_new(GtkWindow * parent)
 {
     BalsaSpellCheck *spell_check;
 
     spell_check = g_object_new(balsa_spell_check_get_type(), NULL);
+    gtk_window_set_transient_for(GTK_WINDOW(spell_check), parent);
 
     return GTK_WIDGET(spell_check);
 }
@@ -315,11 +320,12 @@ balsa_spell_check_new(void)
  * Create a new spell check widget, assigning the GtkText to check.
  * */
 GtkWidget *
-balsa_spell_check_new_with_text(GtkTextView * check_text)
+balsa_spell_check_new_with_text(GtkWindow * parent, 
+                                GtkTextView * check_text)
 {
     BalsaSpellCheck *spell_check;
 
-    spell_check = BALSA_SPELL_CHECK(balsa_spell_check_new());
+    spell_check = BALSA_SPELL_CHECK(balsa_spell_check_new(parent));
     spell_check->view = check_text;
 
     return GTK_WIDGET(spell_check);
@@ -825,14 +831,9 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check)
     spell_check->end_iter = start;
 
     /* start the check */
-    if (!balsa_spell_check_next(spell_check)) {
-        /* run the dialog, blocking until it's closed */
+    if (!balsa_spell_check_next(spell_check))
         gtk_widget_show_all(GTK_WIDGET(spell_check));
-        gtk_dialog_run(GTK_DIALOG(spell_check));
-        gtk_widget_hide(GTK_WIDGET(spell_check));
-    }
 }
-
 
 /* balsa_spell_check_next ()
  * 
@@ -872,16 +873,37 @@ balsa_spell_check_next(BalsaSpellCheck * spell_check)
         gtk_tree_path_free(path);
     }
 
-    /* highlight current word by selecting it */
+    /* Highlight current word by selecting it; first we'll move the
+     * cursor to start of this word; we'll highlight it by moving
+     * the selection-bound to its end, but we must do that in an idle
+     * callback, otherwise the first word is never highlighted. */
     gtk_text_buffer_place_cursor(buffer, &spell_check->start_iter);
-    gtk_text_buffer_move_mark_by_name(buffer, "selection_bound",
-                                      &spell_check->end_iter);
+    spell_check->highlight_idle_id =
+        g_idle_add((GSourceFunc) highlight_idle, spell_check);
 
     /* scroll text window to show current word */
-    gtk_text_view_scroll_to_iter(spell_check->view,
-                                 &spell_check->start_iter,
-                                 0.1, FALSE, 0, 0);
+    gtk_text_view_scroll_to_mark(spell_check->view,
+                                 gtk_text_buffer_get_insert(buffer),
+                                 0, FALSE, 0, 0);
 
+    return FALSE;
+}
+
+/* Move the selection bound to the end of the current word, to highlight
+ * it. */
+static gboolean
+highlight_idle(BalsaSpellCheck * spell_check)
+{
+    GtkTextBuffer *buffer;
+
+    gdk_threads_enter();
+    if (spell_check->highlight_idle_id) {
+        buffer = gtk_text_view_get_buffer(spell_check->view);
+        gtk_text_buffer_move_mark_by_name(buffer, "selection_bound",
+                                          &spell_check->end_iter);
+        spell_check->highlight_idle_id = 0;
+    }
+    gdk_threads_leave();
     return FALSE;
 }
 
@@ -1046,6 +1068,11 @@ balsa_spell_check_destroy(GtkObject * object)
     g_free(spell_check->character_set);
     spell_check->character_set = NULL;
 
+    if (spell_check->highlight_idle_id) {
+        g_source_remove(spell_check->highlight_idle_id);
+        spell_check->highlight_idle_id = 0;
+    }
+
     if (quoted_rex_compiled) {
         regfree(&quoted_rex);
         quoted_rex_compiled = FALSE;
@@ -1096,7 +1123,7 @@ balsa_spell_check_finish(BalsaSpellCheck * spell_check,
 	balsa_information(LIBBALSA_INFORMATION_DEBUG,
 			  "BalsaSpellCheck: Finished\n");
 
-    /* unblock gtk_dialog_run */
+    /* Generate a response signal. */
     gtk_dialog_response(GTK_DIALOG(spell_check), 0);
 }
 

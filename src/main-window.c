@@ -92,11 +92,6 @@ GtkWidget *progress_dialog = NULL;
 GtkWidget *progress_dialog_source = NULL;
 GtkWidget *progress_dialog_message = NULL;
 GtkWidget *progress_dialog_bar = NULL;
-GtkWidget *send_progress = NULL;
-GtkWidget *send_progress_message = NULL;
-GtkWidget *send_dialog = NULL;
-GtkWidget *send_dialog_bar = NULL;
-/*  int total_messages_left;*/
 GSList *list = NULL;
 static gint new_mail_dialog_visible = FALSE;
 static int quiet_check=0;
@@ -1846,26 +1841,20 @@ send_progress_notify_cb()
 	    break;
 
 	case MSGSENDTHREADPOSTPONE:
-
 	    fprintf(stderr, "Send Postpone %s\n",
 		    threadmessage->message_string);
 	    break;
 
 	case MSGSENDTHREADPROGRESS:
-
 	    percent = threadmessage->of_total;
 
-	    if (percent == 0) {
+	    if (percent == 0 && send_dialog) {
 		gtk_label_set_text(GTK_LABEL(send_progress_message),
 				   threadmessage->message_string);
 		gtk_widget_show_all(send_dialog);
 	    }
 
-	    if (percent > 1.0 || percent < 0.0)
-		percent = 1.0; /* PS: never executed to my knowledge */
-
-
-	    if (GTK_IS_WIDGET(send_dialog))
+	    if (send_dialog)
 		gtk_progress_bar_update(GTK_PROGRESS_BAR(send_dialog_bar),
 					percent);
 	    else
@@ -1876,14 +1865,13 @@ send_progress_notify_cb()
 
 	case MSGSENDTHREADFINISHED:
 	    /* closes progress dialog */
-
-	    if (GTK_IS_WIDGET(send_dialog)) {
+	    g_print("MSGSENDTHREADFINISHED start\n");
+	    if (send_dialog)
 		gtk_widget_destroy(send_dialog);
-		send_dialog = NULL;
-	    }
 	    if (balsa_app.compose_email)
 		balsa_exit();
 
+	    g_print("MSGSENDTHREADFINISHED end\n");
 	    break;
 
 	default:

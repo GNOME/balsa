@@ -164,6 +164,51 @@ gchar **libbalsa_lookup_mime_type(const gchar * path);
 
 #ifdef BALSA_USE_THREADS
 void balsa_send_thread(MessageQueueItem * first_message);
+
+// GtkWidget *send_progress = NULL;
+GtkWidget *send_progress_message = NULL;
+GtkWidget *send_dialog = NULL;
+GtkWidget *send_dialog_bar = NULL;
+
+static void
+send_dialog_destroy_cb(GtkWidget* w)
+{
+    send_dialog = NULL;
+    send_progress_message = NULL;
+    send_dialog_bar = NULL;
+}
+/* ensure_send_progress_dialog:
+   ensures that there is send_dialog available.
+*/
+static void
+ensure_send_progress_dialog()
+{
+    GtkWidget* label;
+    if(send_dialog) return;
+
+    send_dialog = gnome_dialog_new(_("Sending Mail..."), _("Hide"), NULL);
+    gtk_window_set_wmclass(GTK_WINDOW(send_dialog), "send_dialog", "Balsa");
+    gnome_dialog_set_close(GNOME_DIALOG(send_dialog), TRUE);
+    label = gtk_label_new(_("Sending Mail..."));
+    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+		       label, FALSE, FALSE, 0);
+
+    send_progress_message = gtk_label_new("");
+    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+		       send_progress_message, FALSE, FALSE, 0);
+
+    /* [BCS] - I've left the progress bar in the dialogue box for now,
+       but the code to advance it hasn't been done yet. */
+    send_dialog_bar = gtk_progress_bar_new();
+    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+		       send_dialog_bar, FALSE, FALSE, 0);
+
+    gtk_widget_show_all(send_dialog);
+    gtk_signal_connect(GTK_OBJECT(send_dialog), "destroy", 
+		       send_dialog_destroy_cb, NULL);
+    /* Progress bar done */
+}
+
 #endif
 
 
@@ -406,30 +451,9 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     struct stat st;
     long estimate;
 #ifdef BALSA_USE_THREADS
-    GtkWidget *send_dialog_source = NULL;
-
     pthread_mutex_lock(&send_messages_lock);
-
     /* We create here the progress bar */
-    send_dialog = gnome_dialog_new(_("Sending Mail..."), _("Hide"), NULL);
-    gtk_window_set_wmclass(GTK_WINDOW(send_dialog), "send_dialog", "Balsa");
-    gnome_dialog_set_close(GNOME_DIALOG(send_dialog), TRUE);
-    send_dialog_source = gtk_label_new(_("Sending Mail..."));
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
-		       send_dialog_source, FALSE, FALSE, 0);
-
-    send_progress_message = gtk_label_new("");
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
-		       send_progress_message, FALSE, FALSE, 0);
-
-    /* [BCS] - I've left the progress bar in the dialogue box for now,
-       but the code to advance it hasn't been done yet. */
-    send_dialog_bar = gtk_progress_bar_new();
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
-		       send_dialog_bar, FALSE, FALSE, 0);
-
-    gtk_widget_show_all(send_dialog);
-    /* Progress bar done */
+    ensure_send_progress_dialog();
 #endif
 
     /* We do messages in queue now only if where are not sending them already */
@@ -737,6 +761,7 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 		mqi->acc = 0;
 
 		percent = (float) mqi->sent / (float) mqi->message_size;
+		if(percent>1) percent = 1;
 		MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, "", NULL, NULL,
 			      percent);
 	    }
@@ -787,28 +812,9 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding)
 
 #ifdef BALSA_USE_THREADS
     gboolean start_thread;
-    GtkWidget *send_dialog_source = NULL;
-
     pthread_mutex_lock(&send_messages_lock);
     if (sending_mail == FALSE) {
-	/* We create here the progress bar */
-	send_dialog = gnome_dialog_new(_("Sending Mail..."), _("Hide"), NULL);
-	gtk_window_set_wmclass(GTK_WINDOW(send_dialog), "send_dialog", "Balsa");
-	gnome_dialog_set_close(GNOME_DIALOG(send_dialog), TRUE);
-	send_dialog_source = gtk_label_new(_("Sending Mail..."));
-	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
-			   send_dialog_source, FALSE, FALSE, 0);
-
-	send_progress_message = gtk_label_new("");
-	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
-			   send_progress_message, FALSE, FALSE, 0);
-
-	send_dialog_bar = gtk_progress_bar_new();
-	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
-			   send_dialog_bar, FALSE, FALSE, 0);
-
-	gtk_widget_show_all(send_dialog);
-	/* Progress bar done */
+	ensure_send_progress_dialog();
 #endif
 	libbalsa_mailbox_open(outbox);
 	lista = outbox->message_list;

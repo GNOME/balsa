@@ -1,3 +1,8 @@
+2001-08-09  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/main-window.c:
+	* libbalsa/send.c: clean up the sending progress dialog.
+	
 2001-08-08  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* README: clarify the print page size syntax.

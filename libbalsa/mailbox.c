@@ -189,8 +189,8 @@ mailbox_init (gchar * inbox_path)
   if (UserHeader)
     UserHeader = UserHeader->next;
   UserHeader = mutt_new_list ();
-  tmp = g_malloc (18 + strlen (VERSION));
-  snprintf (tmp, 18 + strlen (VERSION), "X-Mailer: Balsa v%s", VERSION);
+  tmp = g_malloc (17 + strlen (VERSION));
+  snprintf (tmp, 17 + strlen (VERSION), "X-Mailer: Balsa %s", VERSION);
   UserHeader->data = g_strdup (tmp);
   g_free (tmp);
 

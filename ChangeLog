@@ -1,3 +1,8 @@
+2000-09-11  Carlos Morgado <chbm@chbm.nu>
+
+	* src/Makefile.am: balsa_SOURCE -> balsa_BASE_SOURCE, make way for 
+	balsa_IDL_SOURCE (inactive ATM)
+
 2000-09-11  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/body.c: Close the file after saving. Fixes bug #24055.

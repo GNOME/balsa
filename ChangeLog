@@ -1,5 +1,6 @@
-2004-01-25 20:21  PeterB
+2004-01-25 20:25  PeterB
 
+	* libbalsa/imap/imap-tls.c: compile with threads disabled.
 	* libbalsa/source-viewer.c: plug memory leak.
 	* libbalsa/address-entry.c, libbalsa/send.c, src/balsa-mblist.c,
 	src/main.c, src/sendmsg-window.c: plug memory leaks.

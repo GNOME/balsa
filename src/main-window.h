@@ -37,6 +37,8 @@ struct _MainWindow
     GtkWidget *index;
 
     GtkWidget *message_area;
+
+    GtkWidget *status_bar;
   };
 
 MainWindow *create_main_window ();

@@ -45,7 +45,6 @@ GtkWidget *bottom_pbar;
 void show_about_box (GtkWidget * widget, gpointer data);
 GtkWidget * new_icon (gchar ** xpm, GtkWidget * window);
 static GtkWidget * create_toolbar (MainWindow *mw);
-static GtkWidget * create_statusbar (MainWindow *mw);
 static GtkWidget * create_menu (GtkWidget * window);
 
 extern void balsa_exit ();
@@ -60,6 +59,8 @@ create_main_window ()
   GtkWidget *hbox;
   GtkWidget *label;
   GtkWidget *vpane;
+  GtkWidget *progress_bar;
+
 
   mw = g_malloc (sizeof (MainWindow));
 
@@ -122,13 +123,28 @@ create_main_window ()
   gtk_paned_add2 (GTK_PANED (vpane), hbox);
   gtk_widget_show (hbox);
 
-  gtk_box_pack_end(GTK_BOX (vbox), create_statusbar(mw), FALSE, FALSE, 3);
+
+  /* status bar */
+  mw->status_bar = gtk_statusbar_new ();
+  gtk_box_pack_start (GTK_BOX (vbox), mw->status_bar, FALSE, FALSE, 3);
+  gtk_widget_show (mw->status_bar);
+
+  progress_bar = gtk_progress_bar_new ();
+  balsa_index_set_progress_bar (BALSA_INDEX (mw->index),
+				GTK_PROGRESS_BAR (progress_bar));
+  gtk_box_pack_start (GTK_BOX (mw->status_bar), progress_bar, 
+		      FALSE, FALSE, 0);
+  gtk_widget_show (progress_bar);
+
 
   /* set the various parts of the GNOME APP up */
   gnome_app_set_contents (GNOME_APP (mw->window), vbox);
-  gnome_app_set_menus (GNOME_APP (mw->window), GTK_MENU_BAR (create_menu (mw->window)));
+  gnome_app_set_menus (GNOME_APP (mw->window), 
+		       GTK_MENU_BAR (create_menu (mw->window)));
   mw->toolbar = create_toolbar (mw);
   gnome_app_set_toolbar (GNOME_APP (mw->window), GTK_TOOLBAR (mw->toolbar));
+
+
 
   gtk_widget_show (mw->window);
   return mw;
@@ -149,17 +165,6 @@ new_icon (gchar ** xpm, GtkWidget * window)
   return pixmapwid;
 }
 
-
-static GtkWidget *
-create_statusbar (MainWindow *mw)
-{
-  GtkWidget *statusbar = gtk_statusbar_new();
-  bottom_pbar = gtk_progress_bar_new();
-  gtk_box_pack_start (GTK_BOX (statusbar), bottom_pbar, FALSE, FALSE, 0);
-  gtk_widget_show (statusbar);
-  gtk_widget_show (bottom_pbar);
-  return statusbar;
-}
 
 static GtkWidget *
 create_toolbar (MainWindow *mw)

@@ -21,13 +21,14 @@
 #include <string.h>
 #include "balsa-index.h"
 
+
 /* pixmaps */
 #include "pixmaps/gball.xpm"
 
+
+/* constants */
 #define BUFFER_SIZE 1024
 
-static gfloat currentmsgno;
-extern GtkWidget *bottom_pbar;
 
 /* gtk widget */
 static void balsa_index_class_init (BalsaIndexClass * klass);
@@ -170,15 +171,19 @@ balsa_index_init (BalsaIndex * bindex)
     "Date"
   };
 
+
   GTK_WIDGET_SET_FLAGS (bindex, GTK_NO_WINDOW);
   bindex->stream = NIL;
   bindex->last_message = 0;
   bindex->new_xpm = NULL;
   bindex->new_xpm_mask = NULL;
+  bindex->progress_bar = NULL;
 
 
   /* create the clist */
-  GTK_BIN (bindex)->child = (GtkWidget *) clist = gtk_clist_new_with_titles (5, titles);
+  GTK_BIN (bindex)->child = 
+    (GtkWidget *) clist = gtk_clist_new_with_titles (5, titles);
+ 
   gtk_widget_set_parent (GTK_WIDGET (clist), GTK_WIDGET (bindex));
   gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_BROWSE);
@@ -210,6 +215,7 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_widget_ref (GTK_WIDGET (clist));
 }
 
+
 GtkWidget *
 balsa_index_new ()
 {
@@ -217,6 +223,7 @@ balsa_index_new ()
   bindex = gtk_type_new (balsa_index_get_type ());
   return GTK_WIDGET (bindex);
 }
+
 
 void
 balsa_index_set_stream (BalsaIndex * bindex,
@@ -241,14 +248,19 @@ balsa_index_set_stream (BalsaIndex * bindex,
    * makes it appear as if the message is displayed before the index; so we set
    * the clist selection mode to a mode that doesn't automagicly select, select
    * manually, then switch back */
-  gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child), GTK_SELECTION_SINGLE);
+
+  gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child), 
+				GTK_SELECTION_SINGLE);
+
   append_messages (bindex, 1, bindex->last_message);
   
   if (GTK_CLIST (GTK_BIN (bindex)->child)->rows > 0)
     gtk_clist_select_row (GTK_CLIST (GTK_BIN (bindex)->child), 0, -1);
 
-  gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child), GTK_SELECTION_BROWSE);
+  gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child), 
+				GTK_SELECTION_BROWSE);
 }
+
 
 void
 balsa_index_append_new_messages (BalsaIndex * bindex)
@@ -275,8 +287,13 @@ balsa_index_select_next (BalsaIndex * bindex)
   gint row;
   GtkCList *clist;
 
+  g_return_if_fail (bindex != NULL);
+
   clist = GTK_CLIST (GTK_BIN (bindex)->child);
-  if (!clist->selection) return;
+
+  if (!clist->selection)
+    return;
+
   row = (gint) clist->selection->data + 1;
   
   gtk_clist_select_row (clist, row, -1);
@@ -285,14 +302,20 @@ balsa_index_select_next (BalsaIndex * bindex)
     gtk_clist_moveto (clist, row, 0, 1.0, 0.0);
 }
 
+
 void
 balsa_index_select_previous (BalsaIndex * bindex)
 {
   gint row;
   GtkCList *clist;
 
+  g_return_if_fail (bindex != NULL);
+
   clist = GTK_CLIST (GTK_BIN (bindex)->child);
-  if (!clist->selection) return;
+
+  if (!clist->selection)
+    return;
+
   row = (gint) clist->selection->data - 1;
   
   gtk_clist_select_row (clist, row, -1);
@@ -300,6 +323,31 @@ balsa_index_select_previous (BalsaIndex * bindex)
   if (gtk_clist_row_is_visible (clist, row) != GTK_VISIBILITY_FULL)
     gtk_clist_moveto (clist, row, 0, 0.0, 0.0);
 }
+
+
+void 
+balsa_index_set_progress_bar (BalsaIndex * bindex,
+			      GtkProgressBar * progress_bar)
+{
+  g_return_if_fail (bindex != NULL);
+  g_return_if_fail (progress_bar != NULL);
+
+  if (bindex->progress_bar)
+    gtk_widget_unref (GTK_WIDGET (bindex->progress_bar));
+
+  gtk_widget_ref (GTK_WIDGET (progress_bar));
+  bindex->progress_bar = progress_bar;
+}
+
+
+GtkProgressBar * 
+balsa_index_get_progress_bar (BalsaIndex * bindex)
+{
+  g_return_if_fail (bindex != NULL);
+
+  return bindex->progress_bar;
+}
+
 
 
 static void
@@ -376,11 +424,8 @@ append_messages (BalsaIndex *bindex,
   text[3] = g_malloc (BUFFER_SIZE);
   text[4] = g_malloc (BUFFER_SIZE);
 
-  gtk_clist_freeze (GTK_CLIST (GTK_BIN (bindex)->child));
 
-/*  gtk_widget_show(bottom_pbar);
-  gtk_signal_emit_by_name(GTK_OBJECT(bottom_pbar),"expose_event");
- gtk_statusbar_push(GTK_STATUSBAR(statusbar),1,"Something...");*/
+  gtk_clist_freeze (GTK_CLIST (GTK_BIN (bindex)->child));
 
   for (i = first; i <= last; i++)
     {
@@ -388,8 +433,11 @@ append_messages (BalsaIndex *bindex,
       mail_fetchfrom (text[2], bindex->stream, i, (long) BUFFER_SIZE);
       mail_fetchsubject (text[3], bindex->stream, i, (long) BUFFER_SIZE);
 
-      gtk_progress_bar_update (GTK_PROGRESS_BAR (bottom_pbar), (gfloat)i/last);
-      gtk_widget_draw(bottom_pbar,NULL);
+      if (bindex->progress_bar)
+	{
+	  gtk_progress_bar_update (bindex->progress_bar, (gfloat)i/last);
+	  gtk_widget_draw (GTK_WIDGET (bindex->progress_bar), NULL);
+	}
 
       mail_fetchstructure (bindex->stream, i, NIL);
       cache = mail_elt (bindex->stream, i);
@@ -400,7 +448,12 @@ append_messages (BalsaIndex *bindex,
     }
 
   gtk_clist_thaw (GTK_CLIST (GTK_BIN (bindex)->child));
-/*  gtk_widget_hide(bottom_pbar);*/
+
+  /* re-set the progress bar to 0.0 */
+  if (bindex->progress_bar)
+    gtk_progress_bar_update (bindex->progress_bar, 0.0);
+
+
   g_free (text[1]);
   g_free (text[2]);
   g_free (text[3]);

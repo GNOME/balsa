@@ -1,3 +1,7 @@
+2004-12-22 13:25  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	* libbalsa/: body.c, mime.c: two minor gpg related fixes.
+
 2004-12-20 12:33  PeterB
 
 	* src/: balsa-index.c, balsa-index.h: re-implement

@@ -22,6 +22,7 @@
 #include <gnome.h>
 #include <proplist.h>
 #include "mailbox.h"
+#include "balsa-mblist.h"
 #include "index-child.h"
 
 /* global definitions */
@@ -54,6 +55,7 @@ extern struct BalsaApplication
   gchar *signature_path;
   gchar *signature;
 
+  BalsaMBList *mblist;
   IndexChild *current_index_child;
 
   Mailbox *inbox;

@@ -213,7 +213,7 @@ mailbox_conf_delete (Mailbox * mailbox)
   if (mailbox->type == MAILBOX_POP3)
     update_pop3_servers ();
   else
-    mblist_redraw ();
+    balsa_mblist_redraw (BALSA_MBLIST(balsa_app.mblist));
 }
 
 
@@ -554,7 +554,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	update_pop3_servers ();
 
       else
-	mblist_redraw ();	/* redraw the main mailbox list */
+	balsa_mblist_redraw (BALSA_MBLIST(balsa_app.mblist));	/* redraw the main mailbox list */
 
       /* TODO cleanup */
 
@@ -575,7 +575,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
       if (mailbox->type == MAILBOX_POP3)
 	update_pop3_servers ();
       else
-	mblist_redraw ();
+	balsa_mblist_redraw (BALSA_MBLIST(balsa_app.mblist));
     }
 
   /* close the new mailbox window */

@@ -66,7 +66,6 @@ create_toolbar (GtkWidget * window, BalsaSendmsg * bsmw)
   tooltips = gtk_tooltips_new ();
 
   toolbar = gtk_toolbar_new (0, 0);
-  gtk_toolbar_set_style (GTK_TOOLBAR (toolbar), balsa_app.toolbar_style);
 
   gtk_widget_realize (window);
 
@@ -113,6 +112,7 @@ create_toolbar (GtkWidget * window, BalsaSendmsg * bsmw)
 					   GTK_OBJECT (window));
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
+  gtk_toolbar_set_style (GTK_TOOLBAR (toolbar), balsa_app.toolbar_style);
   gtk_widget_show (toolbar);
   return toolbar;
 }

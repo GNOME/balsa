@@ -1,3 +1,8 @@
+2002-09-16  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/mailbox_imap.c (get_cache_name):  add username to 
+	cache dirname (#92442)
+
 2002-09-15  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/balsa-message.c: show reply-to header if requested (EA).

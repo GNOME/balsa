@@ -53,9 +53,6 @@ static void libbalsa_message_init(LibBalsaMessage * message);
 
 static void libbalsa_message_finalize(GObject * object);
 
-#ifdef DEBUG
-static char *mime_content_type2str(int contenttype);
-#endif
 
 static GObjectClass *parent_class = NULL;
 
@@ -698,30 +695,6 @@ libbalsa_messages_change_flag(GList * messages,
     g_array_free(msgnos, TRUE);
 }
 
-#ifdef DEBUG
-static char *
-mime_content_type2str(int contenttype)
-{
-    switch (contenttype) {
-    case TYPEOTHER:
-	return "other";
-    case TYPEAUDIO:
-	return "audio";
-    case TYPEAPPLICATION:
-	return "application";
-    case TYPEIMAGE:
-	return "image";
-    case TYPEMULTIPART:
-	return "multipart";
-    case TYPETEXT:
-	return "text";
-    case TYPEVIDEO:
-	return "video";
-    default:
-	return "";
-    }
-}
-#endif
 
 /* libbalsa_message_body_ref:
    references the structure of given message possibly fetching also all

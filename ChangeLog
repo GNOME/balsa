@@ -1,3 +1,7 @@
+2004-06-13  Carlos Morgado  <chbm gnome.org>
+
+	* libbalsa/message.c: make build with DEBUG
+
 2004-06-10  Pawel Salek
 
 	* src/balsa-message.c: proper msg popup menus (Albrecht Dreß).

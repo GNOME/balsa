@@ -23,8 +23,8 @@
 #include <string.h>
 #include <gnome.h>
 
-#include "misc.h"
 #include "mailbox.h"
+#include "misc.h"
 
 #include "mailbackend.h"
 

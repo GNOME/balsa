@@ -23,9 +23,8 @@
 #include "balsa-app.h"
 #include "main-window.h"
 #include "mailbox.h"
+#include "misc.h"
 #include "save-restore.h"
-
-
 
 int
 main (int argc, char *argv[])
@@ -37,21 +36,22 @@ main (int argc, char *argv[])
   return 0;
 }
 
-static gboolean 
+static gboolean
 close_all_mailboxes (GNode * node, gpointer data)
 {
   Mailbox *mailbox;
 
   if (node->data)
-    {
-      mailbox = node->data;
+    if (((MailboxNode *) node->data)->mailbox)
+      {
+	mailbox = ((MailboxNode *) node->data)->mailbox;
 
-      if (balsa_app.debug)
-	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
+	if (balsa_app.debug)
+	  g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
 
-      while (mailbox->open_ref > 0)
-	mailbox_open_unref (mailbox);
-    }
+	while (mailbox->open_ref > 0)
+	  mailbox_open_unref (mailbox);
+      }
   return FALSE;
 }
 

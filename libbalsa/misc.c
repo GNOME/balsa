@@ -55,6 +55,16 @@ append_menuitem_connect (GtkMenu * menu,
   return menuitem;
 }
 
+MailboxNode *
+mailbox_node_new (gchar * name, Mailbox * mb, gint i)
+{
+  MailboxNode *mbn;
+  mbn = g_malloc (sizeof (MailboxNode));
+  mbn->name = g_strdup(name);
+  mbn->mailbox = mb;
+  mbn->IsDir = i;
+  return mbn;
+}
 
 gchar *
 get_string_set_default (const char *path,

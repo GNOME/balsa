@@ -19,6 +19,7 @@
 #include <gnome.h>
 #include "balsa-app.h"
 #include "mailbox.h"
+#include "misc.h"
 #include "mailbox-manager.h"
 #include "new-mailbox.h"
 
@@ -216,35 +217,38 @@ close_mailbox_manager ()
   gtk_widget_destroy (mmw->window);
 }
 
-static gboolean 
+static gboolean
 mmw_add_mb_to_clist_traverse_nodes (GNode * node, gpointer data)
 {
   Mailbox *mailbox;
   gchar *list_items[3];
 
   if (node->data)
-    mailbox = node->data;
-  list_items[0] = mailbox->name;
-  list_items[1] = mailbox_type_description (mailbox->type);
+    if (((MailboxNode *) node->data)->mailbox)
+      {
+	mailbox = ((MailboxNode *) node->data)->mailbox;
+	list_items[0] = mailbox->name;
+	list_items[1] = mailbox_type_description (mailbox->type);
 
-  switch (mailbox->type)
-    {
-    case MAILBOX_POP3:
-      list_items[2] = ((MailboxPOP3 *) mailbox)->server;
-      break;
+	switch (mailbox->type)
+	  {
+	  case MAILBOX_POP3:
+	    list_items[2] = ((MailboxPOP3 *) mailbox)->server;
+	    break;
 
-    case MAILBOX_IMAP:
-      list_items[2] = ((MailboxIMAP *) mailbox)->server;
-      break;
+	  case MAILBOX_IMAP:
+	    list_items[2] = ((MailboxIMAP *) mailbox)->server;
+	    break;
 
-    default:
-      list_items[2] = NULL;
-      break;
-    }
+	  default:
+	    list_items[2] = NULL;
+	    break;
+	  }
 
-  gtk_clist_set_row_data (GTK_CLIST (mmw->list),
+	gtk_clist_set_row_data (GTK_CLIST (mmw->list),
 		       gtk_clist_append (GTK_CLIST (mmw->list), list_items),
-			  mailbox);
+				mailbox);
+      }
   return FALSE;
 }
 

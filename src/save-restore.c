@@ -151,7 +151,10 @@ load_mailboxes (gchar * name)
 	  mailbox = mailbox_new (mailbox_type);
 	  mailbox->name = g_strdup (name);
 	  MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
-	  node = g_node_new (mailbox);
+	  if (mailbox_type == MAILBOX_MH)
+	    node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, TRUE));
+	  else
+	    node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
 	  g_node_append (balsa_app.mailbox_nodes, node);
 	}
       break;
@@ -163,7 +166,7 @@ load_mailboxes (gchar * name)
       MAILBOX_POP3 (mailbox)->user = gnome_config_get_string ("username");
       MAILBOX_POP3 (mailbox)->passwd = gnome_config_get_string ("password");
       MAILBOX_POP3 (mailbox)->server = gnome_config_get_string ("server");
-      node = g_node_new (mailbox);
+      node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
       g_node_append (balsa_app.mailbox_nodes, node);
       break;
 
@@ -175,7 +178,7 @@ load_mailboxes (gchar * name)
       MAILBOX_IMAP (mailbox)->passwd = gnome_config_get_string ("password");
       MAILBOX_IMAP (mailbox)->server = gnome_config_get_string ("server");
       MAILBOX_IMAP (mailbox)->path = gnome_config_get_string ("Path");
-      node = g_node_new (mailbox);
+      node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
       g_node_append (balsa_app.mailbox_nodes, node);
       break;
     }

@@ -21,14 +21,14 @@
 #define __MISC_H__
 
 
-GtkWidget * append_menuitem_connect (GtkMenu * menu,
-				     gchar * text,
-				     GtkSignalFunc func,
-				     gpointer data,
-				     gpointer user_data);
+GtkWidget *append_menuitem_connect (GtkMenu * menu,
+				    gchar * text,
+				    GtkSignalFunc func,
+				    gpointer data,
+				    gpointer user_data);
 
-gchar * get_string_set_default (const char * path,
-				const char * value);
+gchar *get_string_set_default (const char *path,
+			       const char *value);
 
 gint get_int_set_default (const char *path,
 			  const gint value);
@@ -39,6 +39,16 @@ gint g_list_index (GList * list, gpointer data);
 gchar *make_string_from_list (GList *);
 GList *make_list_from_string (gchar *);
 
-int readfile(FILE *fp,char **buf);
+int readfile (FILE * fp, char **buf);
 
+typedef struct _MailboxNode MailboxNode;
+struct _MailboxNode
+  {
+    gchar *name;
+    Mailbox *mailbox;
+    gint IsDir;
+  };
+
+MailboxNode *mailbox_node_new(gchar *name, Mailbox *mb, gint i);
+  
 #endif /* __MISC_H__ */

@@ -27,9 +27,10 @@
 #include "balsa-app.h"
 #include "local-mailbox.h"
 #include "mailbox.h"
+#include "misc.h"
 
 static void
-add_mailbox (gchar * name, gchar * path, MailboxType type)
+add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
 {
   Mailbox *mailbox;
   GNode *node;
@@ -40,15 +41,29 @@ add_mailbox (gchar * name, gchar * path, MailboxType type)
     return;
   if (!strcmp (path, balsa_app.trash_path))
     return;
-  mailbox = mailbox_new (type);
-  mailbox->name = g_strdup (name);
-  MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
 
-  node = g_node_new (mailbox);
-  g_node_append (balsa_app.mailbox_nodes, node);
+  if (isdir && type != MAILBOX_MH)
+    node = g_node_new (mailbox_node_new (g_basename (path), NULL, TRUE));
+  else
+    {
+      mailbox = mailbox_new (type);
+      mailbox->name = g_strdup (name);
+      MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
 
-  if (balsa_app.debug)
-    g_print ("Local Mailbox Loaded as: %s\n", mailbox_type_description (mailbox->type));
+      if (isdir && type == MAILBOX_MH)
+	{
+	  /*      g_strdup (g_basename (g_dirname (myfile))) */
+	  node = g_node_new (mailbox_node_new (g_strdup (name), mailbox, TRUE));
+	  g_node_append (balsa_app.mailbox_nodes, node);
+	}
+      else
+	{
+	  node = g_node_new (mailbox_node_new (g_strdup (name), mailbox, FALSE));
+	  g_node_append (balsa_app.mailbox_nodes, node);
+	}
+      if (balsa_app.debug)
+	g_print ("Local Mailbox Loaded as: %s\n", mailbox_type_description (mailbox->type));
+    }
 }
 
 static int
@@ -86,7 +101,7 @@ read_dir (gchar * prefix, struct dirent *d)
     {
       mailbox_type = mailbox_valid (filename);
       if (mailbox_type == MAILBOX_MH)
-	add_mailbox (d->d_name, filename, mailbox_type);
+	add_mailbox (d->d_name, filename, mailbox_type, 1);
       dpc = opendir (filename);
       if (!dpc)
 	return;
@@ -107,7 +122,7 @@ read_dir (gchar * prefix, struct dirent *d)
 
 	  mailbox_type = mailbox_valid (filename);
 	  if (mailbox_type != MAILBOX_UNKNOWN)
-	    add_mailbox (d->d_name, filename, mailbox_type);
+	    add_mailbox (d->d_name, filename, mailbox_type, 0);
 	}
     }
 }

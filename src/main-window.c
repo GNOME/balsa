@@ -598,15 +598,16 @@ undelete_message_cb (GtkWidget * widget)
   balsa_index_select_next (BALSA_INDEX (balsa_app.current_index_child->index));
 }
 
-static gboolean 
+static gboolean
 mblist_add_mailbox_traverse_nodes (GNode * node, gpointer data)
 {
   Mailbox *mailbox;
   if (node->data)
-    {
-      mailbox = node->data;
-      mblist_add_mailbox (mailbox);
-    }
+    if (((MailboxNode *) node->data)->mailbox)
+      {
+	mailbox = ((MailboxNode *) node->data)->mailbox;
+	mblist_add_mailbox (mailbox);
+      }
   return FALSE;
 }
 

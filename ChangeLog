@@ -1,3 +1,7 @@
+2002-09-05  Emmanuel <e.allaud@wanadoo.fr>
+
+	* src/balsa-message.c: display reply-to header when requested.
+
 2002-09-14  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* NEWS, configure.in: release 1.4.1

@@ -9,17 +9,24 @@
 		<td width="80"></td>
 		<td>
 			<dd align="left"><img src="@website_root@/images/balsa.jpg" alt="balsa" align="middle" width="476" height="122"><big><big><b>Features</b></big></big><br></dd>
-			<p>Balsa has many features including:</p>
-			<p>Balsa is a e-mail client. It is part of the GNOME desktop environment.</p>
+			<p>Balsa is an e-mail client. It is part of the GNOME desktop environment. Balsa's interface
+			is similar to that of Eudora on Windows, with many of its features.
+			</p>
 			<p><font face="lucida, helvetica, arial">It supports:</font>
 			<ul>
 				<li>Local mailboxes (mbox, maildir, mh)</li>
+				<li>Nested mailboxes (see <a href="@website_root@/screens/mainwindow.jpg">this</a>)</li>
 				<li>POP3</li>
 				<li>IMAP</li>
 				<li>Printing</li>
 				<li>Multi-threaded mail retrevial (optional)</li>
-				<li>MIME support</li>
+				<li>MIME support (view images inline, save parts)</li>
 				<li>Supports both SMTP and the use of a local MTA</li>
+				<li>Address Book that integrates with GnomeCard</li>
+				<li>Great configurability</li>
+				<li>Active, open development (list at <a href="mailto:balsa-list-request@gnome.org">balsa-list-request@gnome.org</a>)</li>
+				<li>Multiple character sets for composing and reading messages</li>
+				<li>Attach files</li>
 			</ul>
 		</td>
 	</tr>

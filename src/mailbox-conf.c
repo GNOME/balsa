@@ -833,7 +833,7 @@ create_imap_mailbox_page (void)
 
   gtk_entry_set_visibility (GTK_ENTRY (mcw->imap_password), FALSE);
 
-  button = gtk_button_new_with_label ("mailboxes");
+  button = gtk_button_new_with_label ("Mailboxes");
   gtk_box_pack_start (GTK_BOX (return_widget), button, FALSE, FALSE, 0);
   gtk_signal_connect (GTK_OBJECT (button), "clicked",
 		      (GtkSignalFunc) mailbox_conf_edit_imap_server, NULL);

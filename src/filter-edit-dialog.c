@@ -79,7 +79,7 @@ void build_base_dialog()
     /*
      * The buttons at the bottom
      */
-    fe_dialog_ok = gtk_button_new_with_label("OK");
+    fe_dialog_ok = gnome_stock_button(GNOME_STOCK_BUTTON_OK);
     gtk_signal_connect(GTK_OBJECT(fe_dialog_ok),
 		       "clicked",
 		       GTK_SIGNAL_FUNC(fe_dialog_button_clicked),
@@ -88,7 +88,7 @@ void build_base_dialog()
 		       fe_dialog_ok,
 		       FALSE, TRUE, 0);
     gtk_widget_show(fe_dialog_ok);
-    fe_dialog_cancel = gtk_button_new_with_label("Cancel");
+    fe_dialog_cancel = gnome_stock_button(GNOME_STOCK_BUTTON_CANCEL);
     gtk_signal_connect(GTK_OBJECT(fe_dialog_cancel),
 		       "clicked",
 		       GTK_SIGNAL_FUNC(fe_dialog_button_clicked),
@@ -97,7 +97,7 @@ void build_base_dialog()
 		       fe_dialog_cancel,
 		       FALSE, TRUE, 0);
     gtk_widget_show(fe_dialog_cancel);
-    fe_dialog_help = gtk_button_new_with_label("Help");
+    fe_dialog_help = gnome_stock_button(GNOME_STOCK_BUTTON_HELP);
     gtk_signal_connect(GTK_OBJECT(fe_dialog_help),
 		       "clicked",
 		       GTK_SIGNAL_FUNC(fe_dialog_button_clicked),
@@ -164,7 +164,7 @@ void build_left_side()
     gtk_widget_show(fe_box_newdelete);
 
     fe_box_updown = gtk_hbox_new(TRUE, 2);
-    fe_up = gtk_button_new_with_label("Up");
+    fe_up = gnome_stock_button(GNOME_STOCK_BUTTON_UP);
     gtk_box_pack_start(GTK_BOX(fe_box_updown),
 		       fe_up,
 		       TRUE,
@@ -175,7 +175,7 @@ void build_left_side()
 		       GTK_SIGNAL_FUNC(fe_up_pressed),
 		       NULL);
     gtk_widget_show(fe_up);
-    fe_down = gtk_button_new_with_label("Down");
+    fe_down = gnome_stock_button(GNOME_STOCK_BUTTON_DOWN);
     gtk_box_pack_start(GTK_BOX(fe_box_updown),
 		       fe_down,
 		       TRUE,

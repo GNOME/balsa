@@ -1,5 +1,6 @@
 module balsa {
-  interface simple_send {
-    long send_file_as_message(in string from, in string to, in string filename);
+  interface mail_send {
+    long open(in string to);
+    long attachment(in string to, in string filename);
   };
 };

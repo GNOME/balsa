@@ -1,3 +1,17 @@
+2003-01-10  PeterB
+
+	* src/balsa-index.c (mailbox_messages_changed_status_cb):
+	If deleted messages are shown, move on when current message
+	is deleted; signal the main window when message status
+	changes;
+        * (bndx_find_row_func): don't select deleted messages;
+	* (bndx_selection_changed_func): when the selection changes,
+	keep the current message if it's still selected.
+	* src/save-restore.c (config_global_load): Hide deleted messages
+	by default.
+	* src/pref-manager.c (update_address_books): Don't select an
+	invalid GtkTreeIter, when mail server list is empty.
+
 2003-01-09  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/Makefile.am: remove removed balsa-index-threading.h

@@ -817,7 +817,13 @@ balsa_index_del(BalsaIndex * bindex, LibBalsaMessage * message)
     gtk_clist_unselect_row (GTK_CLIST (bindex->ctree), row, -1);
     gtk_ctree_remove_node(GTK_CTREE(bindex->ctree), node);
 
-
+    /* if last message is removed, clear the preview */
+    if (GTK_CLIST (bindex->ctree)->rows <= 0) {
+        replace_attached_data(GTK_OBJECT(bindex), "message", NULL);
+        if(handler)
+            gtk_idle_remove(handler);
+        handler = gtk_idle_add((GtkFunction) idle_handler_cb, bindex);
+    }
 }
 
 

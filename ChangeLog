@@ -1,3 +1,7 @@
+2001-10-31  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-index.c: fix #63303 (Peter Bloomfield).
+
 2001-10-30  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: use jw for help. bump the version number

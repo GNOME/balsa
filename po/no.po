@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 1.0.0\n"
-"POT-Creation-Date: 2001-03-24 21:27-0500\n"
-"PO-Revision-Date: 2001-03-24 21:35-05:00\n"
+"POT-Creation-Date: 2001-03-28 00:22-0500\n"
+"PO-Revision-Date: 2001-03-28 00:22-05:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian <no@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1005,7 +1005,7 @@ msgid "Base Domain Name"
 msgstr "Basis domenenavn"
 
 #: src/address-book-config.c:460 src/filter-edit-dialog.c:379
-#: src/mailbox-conf.c:287 src/pref-manager.c:1273 src/pref-manager.c:2077
+#: src/mailbox-conf.c:287 src/pref-manager.c:1221 src/pref-manager.c:1960
 msgid "Add"
 msgstr "Legg til"
 
@@ -1121,7 +1121,7 @@ msgid "Undelete"
 msgstr "Angre slett"
 
 #: src/balsa-index.c:1828 src/filter-edit-dialog.c:224 src/mailbox-node.c:560
-#: src/main-window.c:551 src/pref-manager.c:1275 src/pref-manager.c:2079
+#: src/main-window.c:551 src/pref-manager.c:1223 src/pref-manager.c:1962
 msgid "Delete"
 msgstr "Slett"
 
@@ -1325,7 +1325,7 @@ msgstr "Passer"
 msgid "Doesn't Match"
 msgstr "Passer ikke"
 
-#: src/filter-edit-dialog.c:40 src/pref-manager.c:2341
+#: src/filter-edit-dialog.c:40 src/pref-manager.c:2212
 msgid "Always"
 msgstr "Alltid"
 
@@ -2229,479 +2229,463 @@ msgstr "Neste del av meldingen"
 msgid "Previous part in Message"
 msgstr "Forrige del i meldingen"
 
-#: src/pref-manager.c:178
+#: src/pref-manager.c:167
 msgid "Text"
 msgstr "Tekst"
 
-#: src/pref-manager.c:179
+#: src/pref-manager.c:168
 msgid "Icons"
 msgstr "Ikoner"
 
-#: src/pref-manager.c:180
+#: src/pref-manager.c:169
 msgid "Both"
 msgstr "Begge"
 
-#: src/pref-manager.c:190
+#: src/pref-manager.c:179
 msgid "7bits"
 msgstr "7bits"
 
-#: src/pref-manager.c:191
+#: src/pref-manager.c:180
 msgid "8bits"
 msgstr "8bits"
 
-#: src/pref-manager.c:192
+#: src/pref-manager.c:181
 msgid "quoted"
 msgstr "sitert"
 
-#: src/pref-manager.c:202
+#: src/pref-manager.c:191
 msgid "While Retrieving Messages"
 msgstr "Under henting av meldinger"
 
-#: src/pref-manager.c:203
+#: src/pref-manager.c:192
 msgid "Until Closed"
 msgstr "Til programmet lukkes"
 
-#: src/pref-manager.c:204 src/pref-manager.c:2339
+#: src/pref-manager.c:193 src/pref-manager.c:2210
 msgid "Never"
 msgstr "Aldri"
 
-#: src/pref-manager.c:208
+#: src/pref-manager.c:197
 msgid "Fast"
 msgstr "Rask"
 
-#: src/pref-manager.c:209
+#: src/pref-manager.c:198
 msgid "Normal"
 msgstr "Normal"
 
-#: src/pref-manager.c:210
+#: src/pref-manager.c:199
 msgid "Bad Spellers"
 msgstr "Dårlige stavere"
 
-#: src/pref-manager.c:234
+#: src/pref-manager.c:223
 msgid "Balsa Preferences"
 msgstr "Balsa innstillinger"
 
-#: src/pref-manager.c:245 src/pref-manager.c:1163
+#: src/pref-manager.c:234 src/pref-manager.c:1111
 msgid "Identity"
 msgstr "Identitet"
 
-#: src/pref-manager.c:249 src/pref-manager.c:1186
+#: src/pref-manager.c:238 src/pref-manager.c:1134
 msgid "Signature"
 msgstr "Signatur"
 
-#: src/pref-manager.c:253
+#: src/pref-manager.c:242
 msgid "Mail Servers"
 msgstr "Posttjenere"
 
-#: src/pref-manager.c:257 src/pref-manager.c:2044
+#: src/pref-manager.c:246 src/pref-manager.c:1927
 msgid "Address Books"
 msgstr "Adressebøker"
 
-#: src/pref-manager.c:261
+#: src/pref-manager.c:250
 msgid "Mail Options"
 msgstr "Alternativer for post"
 
-#: src/pref-manager.c:265 src/pref-manager.c:1601
+#: src/pref-manager.c:254 src/pref-manager.c:1549
 msgid "Display"
 msgstr "Vis"
 
-#: src/pref-manager.c:270 src/pref-manager.c:1816 src/pref-manager.c:1856
-msgid "Printing"
-msgstr "Skriver ut"
-
-#: src/pref-manager.c:274 src/sendmsg-window.c:151
+#: src/pref-manager.c:258 src/sendmsg-window.c:151
 msgid "Spelling"
 msgstr "Staving"
 
-#: src/pref-manager.c:278 src/pref-manager.c:1967
+#: src/pref-manager.c:262 src/pref-manager.c:1850
 msgid "Misc"
 msgstr "Forskjellig"
 
-#: src/pref-manager.c:282
+#: src/pref-manager.c:266
 msgid "Startup"
 msgstr "Oppstart"
 
-#: src/pref-manager.c:995
+#: src/pref-manager.c:943
 msgid "Yes"
 msgstr "Ja"
 
-#: src/pref-manager.c:1167
+#: src/pref-manager.c:1115
 msgid "Your name:"
 msgstr "Ditt navn:"
 
-#: src/pref-manager.c:1168
+#: src/pref-manager.c:1116
 msgid "E-mail address:"
 msgstr "E-post adresse:"
 
-#: src/pref-manager.c:1169
+#: src/pref-manager.c:1117
 msgid "Reply-to address:"
 msgstr "Svar-til adresse:"
 
-#: src/pref-manager.c:1170
+#: src/pref-manager.c:1118
 msgid "Default domain:"
 msgstr "Forvalgt domene:"
 
-#: src/pref-manager.c:1191
+#: src/pref-manager.c:1139
 msgid "Use signature file when:"
 msgstr "Bruk signaturfil når:"
 
-#: src/pref-manager.c:1195
+#: src/pref-manager.c:1143
 msgid "sending mail"
 msgstr "sender e-post"
 
-#: src/pref-manager.c:1196
+#: src/pref-manager.c:1144
 msgid "replying to mail"
 msgstr "svarer på e-post"
 
-#: src/pref-manager.c:1197
+#: src/pref-manager.c:1145
 msgid "forwarding mail"
 msgstr "videresender e-post"
 
-#: src/pref-manager.c:1199
+#: src/pref-manager.c:1147
 msgid "Signature file:"
 msgstr "Signaturfil:"
 
-#: src/pref-manager.c:1206
+#: src/pref-manager.c:1154
 msgid "Select your signature file"
 msgstr "Velg din signaturfil:"
 
-#: src/pref-manager.c:1214
+#: src/pref-manager.c:1162
 msgid "Reply prefix:"
 msgstr "Svarprefiks:"
 
-#: src/pref-manager.c:1217
+#: src/pref-manager.c:1165
 msgid "Enable signature separator"
 msgstr "Bruk signatur-separator"
 
-#: src/pref-manager.c:1218
+#: src/pref-manager.c:1166
 msgid "Insert signature before quoted messages"
 msgstr "Sett inn signatur før sitert melding"
 
-#: src/pref-manager.c:1243
+#: src/pref-manager.c:1191
 msgid "Remote Mailbox Servers"
 msgstr "Eksterne postbokstjenere"
 
-#: src/pref-manager.c:1265 src/pref-manager.c:2066
+#: src/pref-manager.c:1213 src/pref-manager.c:1949
 msgid "Type"
 msgstr "Type"
 
-#: src/pref-manager.c:1268
+#: src/pref-manager.c:1216
 msgid "Mailbox Name"
 msgstr "Navn på postboks"
 
-#: src/pref-manager.c:1274 src/pref-manager.c:2078
+#: src/pref-manager.c:1222 src/pref-manager.c:1961
 msgid "Modify"
 msgstr "Modifiser"
 
-#: src/pref-manager.c:1277
+#: src/pref-manager.c:1225
 msgid "Local mail"
 msgstr "Lokal e-post"
 
-#: src/pref-manager.c:1287
+#: src/pref-manager.c:1235
 msgid "Select your local mail directory"
 msgstr "Velg din lokale e-postmappe:"
 
-#: src/pref-manager.c:1296
+#: src/pref-manager.c:1244
 msgid "Outgoing mail"
 msgstr "Utgående e-post"
 
-#: src/pref-manager.c:1318
+#: src/pref-manager.c:1266
 msgid "Port"
 msgstr "Port"
 
-#: src/pref-manager.c:1325
+#: src/pref-manager.c:1273
 msgid "Remote SMTP server"
 msgstr "Ekstern SMTP-tjener"
 
-#: src/pref-manager.c:1334
+#: src/pref-manager.c:1282
 msgid "Local mail transport agent"
 msgstr "Lokal transportagent for post"
 
-#: src/pref-manager.c:1360
+#: src/pref-manager.c:1308
 msgid "Incoming"
 msgstr "Innkommende"
 
-#: src/pref-manager.c:1362
+#: src/pref-manager.c:1310
 msgid "Outgoing"
 msgstr "Utgående"
 
-#: src/pref-manager.c:1388
+#: src/pref-manager.c:1336
 msgid "Checking"
 msgstr "Sjekker"
 
-#: src/pref-manager.c:1396 src/pref-manager.c:1996
+#: src/pref-manager.c:1344 src/pref-manager.c:1879
 msgid "minutes"
 msgstr "minutter"
 
-#: src/pref-manager.c:1408
+#: src/pref-manager.c:1356
 msgid "Check mail automatically every:"
 msgstr "Sjekk etter e-post automatisk hvert:"
 
 #. Quoted text regular expression
-#: src/pref-manager.c:1414
+#: src/pref-manager.c:1362
 msgid "Quoted Text"
 msgstr "Sitert tekst"
 
-#: src/pref-manager.c:1422
+#: src/pref-manager.c:1370
 msgid "Quoted Text Regular Expression"
 msgstr "Sitert tekst vanlig uttrykk"
 
 #. How to handle received MDN requests
-#: src/pref-manager.c:1430
+#: src/pref-manager.c:1378
 #, fuzzy
 msgid "Message Disposition Notification requests"
 msgstr "Fo_respør melding om disposisjon"
 
-#: src/pref-manager.c:1438
+#: src/pref-manager.c:1386
 msgid ""
 "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
 msgstr ""
 
-#: src/pref-manager.c:1449
+#: src/pref-manager.c:1397
 msgid ""
 "the message header looks clean\n"
 "(the notify-to address is equal to the return path, I am in the to or cc "
 "list)"
 msgstr ""
 
-#: src/pref-manager.c:1464
+#: src/pref-manager.c:1412
 msgid "the message header looks suspicious"
 msgstr "meldings-headeren ser mistenkelig ut"
 
-#: src/pref-manager.c:1499
+#: src/pref-manager.c:1447
 msgid "Word Wrap"
 msgstr "Ordbryting"
 
-#: src/pref-manager.c:1509
+#: src/pref-manager.c:1457
 msgid "Wrap Outgoing Text at:"
 msgstr "Bryt utgående tekst ved:"
 
-#: src/pref-manager.c:1522
+#: src/pref-manager.c:1470
 msgid "Characters"
 msgstr "Tegn"
 
-#: src/pref-manager.c:1526
+#: src/pref-manager.c:1474
 msgid "Other options"
 msgstr "Andre alternativer"
 
-#: src/pref-manager.c:1533
+#: src/pref-manager.c:1481
 msgid "Default Bcc to:"
 msgstr "Forvalgt Bcc til:"
 
-#: src/pref-manager.c:1535
+#: src/pref-manager.c:1483
 msgid "Encoding"
 msgstr "Koding"
 
-#: src/pref-manager.c:1602
+#: src/pref-manager.c:1550
 msgid "Main window"
 msgstr "Hovedvindu"
 
-#: src/pref-manager.c:1608
+#: src/pref-manager.c:1556
 msgid "Use preview pane"
 msgstr "Bruk forhåndsvisningsområde"
 
-#: src/pref-manager.c:1610
+#: src/pref-manager.c:1558
 msgid "Show mailbox statistics in left pane"
 msgstr "Vis statistikk for innboks i venstre felt"
 
-#: src/pref-manager.c:1612
+#: src/pref-manager.c:1560
 msgid "Use alternative main window layout"
 msgstr "Bruk alternativ plassering for hovedvindu"
 
-#: src/pref-manager.c:1614
+#: src/pref-manager.c:1562
 msgid "Automatically view message when mailbox opened"
 msgstr "Vis melding automatisk når postboksen åpnes"
 
-#: src/pref-manager.c:1619
+#: src/pref-manager.c:1567
 msgid "Toolbars"
 msgstr "Verktøylinjer"
 
-#: src/pref-manager.c:1636
+#: src/pref-manager.c:1584
 msgid "Display progress dialog"
 msgstr "Vis progresjonssdialog"
 
-#: src/pref-manager.c:1642
+#: src/pref-manager.c:1590
 msgid "Display Formats"
 msgstr "Vis formater"
 
-#: src/pref-manager.c:1650
+#: src/pref-manager.c:1598
 msgid "Date encoding (for strftime):"
 msgstr "Datokoding (for strftime):"
 
-#: src/pref-manager.c:1651
+#: src/pref-manager.c:1599
 msgid "Selected headers:"
 msgstr "Valgte headere:"
 
-#: src/pref-manager.c:1667
+#: src/pref-manager.c:1615
 msgid "Status Messages"
 msgstr "Statusmeldinger"
 
-#: src/pref-manager.c:1668 src/pref-manager.c:1678
+#: src/pref-manager.c:1616 src/pref-manager.c:1626
 msgid "Information Messages"
 msgstr "Informasjonsmeldinger"
 
-#: src/pref-manager.c:1682
+#: src/pref-manager.c:1630
 msgid "Warning Messages"
 msgstr "Advarsler"
 
-#: src/pref-manager.c:1686
+#: src/pref-manager.c:1634
 msgid "Error Messages"
 msgstr "Feilmeldinger"
 
-#: src/pref-manager.c:1690
+#: src/pref-manager.c:1638
 msgid "Fatal Error Messages"
 msgstr "Fatale feilmeldinger"
 
-#: src/pref-manager.c:1694
+#: src/pref-manager.c:1642
 msgid "Debug Messages"
 msgstr "Feilsøkinsmeldinger"
 
-#: src/pref-manager.c:1701
+#: src/pref-manager.c:1649
 msgid "Colors"
 msgstr "Farger"
 
-#: src/pref-manager.c:1703
+#: src/pref-manager.c:1651
 msgid "Mailbox Colors"
 msgstr "Farger på postboks"
 
-#: src/pref-manager.c:1709
+#: src/pref-manager.c:1657
 msgid "Mailbox with unread messages color"
 msgstr "Farge for postboks med uleste meldinger"
 
-#: src/pref-manager.c:1711
+#: src/pref-manager.c:1659
 msgid "Message Colors"
 msgstr "Meldingsfarger"
 
-#: src/pref-manager.c:1717
+#: src/pref-manager.c:1665
 msgid "Quoted text primary color"
 msgstr "Primær farge for sitert tekst"
 
-#: src/pref-manager.c:1719
+#: src/pref-manager.c:1667
 msgid "Quoted text secondary color"
 msgstr "Sekundær farge for sitert tekst"
 
-#: src/pref-manager.c:1724
+#: src/pref-manager.c:1672
 msgid "Fonts"
 msgstr "Skrifttyper"
 
-#: src/pref-manager.c:1726
+#: src/pref-manager.c:1674
 msgid "Preview Font"
 msgstr "Skrifttype for forhåndsvisning"
 
-#: src/pref-manager.c:1743 src/pref-manager.c:1777
+#: src/pref-manager.c:1691 src/pref-manager.c:1725
 msgid "Select a font to use"
 msgstr "Velg skrifttype som skal brukes"
 
-#: src/pref-manager.c:1746 src/pref-manager.c:1780
+#: src/pref-manager.c:1694 src/pref-manager.c:1728
 msgid "Select..."
 msgstr "Velg..."
 
-#: src/pref-manager.c:1753 src/pref-manager.c:1788
+#: src/pref-manager.c:1701 src/pref-manager.c:1736
 msgid "Preview pane"
 msgstr "Forhåndsvisningsområde"
 
 #. Subject Font
-#: src/pref-manager.c:1761
+#: src/pref-manager.c:1709
 msgid "Subject Header Font"
 msgstr "Skrifttype for emneoverskrift"
 
-#: src/pref-manager.c:1841
-msgid "characters"
-msgstr "tegn"
-
-#: src/pref-manager.c:1844
-msgid "Print command:"
-msgstr "Utskriftskommando:"
-
-#: src/pref-manager.c:1850
-msgid "Break line at:"
-msgstr "Bryt linjer ved:"
-
 #. pspell frame
-#: src/pref-manager.c:1906
+#: src/pref-manager.c:1789
 msgid "Pspell Settings"
 msgstr "Innstillinger for pspell"
 
 #. do the module menu
-#: src/pref-manager.c:1912
+#: src/pref-manager.c:1795
 msgid "Spell Check Module"
 msgstr "Stavekontrollmodul"
 
-#: src/pref-manager.c:1918
+#: src/pref-manager.c:1801
 msgid "Suggestion Level"
 msgstr "Nivå for forslag"
 
-#: src/pref-manager.c:1926
+#: src/pref-manager.c:1809
 msgid "Ignore words shorter than"
 msgstr "Ingorer ord som er kortere enn"
 
 #. ignore signature check box
-#: src/pref-manager.c:1933
+#: src/pref-manager.c:1816
 msgid "Misc Spelling Settings"
 msgstr "Innstillinger for stavekontroll"
 
-#: src/pref-manager.c:1939
+#: src/pref-manager.c:1822
 msgid "Check signature"
 msgstr "Sjekk signatur"
 
-#: src/pref-manager.c:1943
+#: src/pref-manager.c:1826
 msgid "Check quoted"
 msgstr "Sjekk sitert"
 
-#: src/pref-manager.c:1973
+#: src/pref-manager.c:1856
 msgid "Debug"
 msgstr "Avlusing"
 
-#: src/pref-manager.c:1977
+#: src/pref-manager.c:1860
 msgid "Empty Trash on exit"
 msgstr "Tøm søppel når programmet avsluttes"
 
-#: src/pref-manager.c:1985
+#: src/pref-manager.c:1868
 msgid "Automatically close mailbox if unused more than"
 msgstr "Lukk postboks automatisk hvis den står ubrukt lenger enn"
 
-#: src/pref-manager.c:2012
+#: src/pref-manager.c:1895
 msgid "Options"
 msgstr "Alternativer"
 
-#: src/pref-manager.c:2019
+#: src/pref-manager.c:1902
 msgid "Check mail upon startup"
 msgstr "Hent ny post ved oppstart"
 
-#: src/pref-manager.c:2024
+#: src/pref-manager.c:1907
 msgid "Remember open mailboxes between sessions"
 msgstr "Husk åpne postbokser mellom sesjoner"
 
-#: src/pref-manager.c:2069
+#: src/pref-manager.c:1952
 msgid "Address Book Name"
 msgstr "Navn på adressebok"
 
-#: src/pref-manager.c:2073
+#: src/pref-manager.c:1956
 msgid "Expand aliases"
 msgstr "Utvid aliaser"
 
-#: src/pref-manager.c:2080
+#: src/pref-manager.c:1963
 msgid "Set as default"
 msgstr "Sett som standard"
 
-#: src/pref-manager.c:2327
+#: src/pref-manager.c:2198
 msgid "Show nothing"
 msgstr "Ikke vis noe"
 
-#: src/pref-manager.c:2328
+#: src/pref-manager.c:2199
 msgid "Show dialog"
 msgstr "Vis dialog"
 
-#: src/pref-manager.c:2329
+#: src/pref-manager.c:2200
 msgid "Show in list"
 msgstr "Vis i liste"
 
-#: src/pref-manager.c:2330
+#: src/pref-manager.c:2201
 msgid "Print to console"
 msgstr "Skriv ut på konsollet"
 
-#: src/pref-manager.c:2340
+#: src/pref-manager.c:2211
 msgid "Ask me"
 msgstr "Spør meg"
 
@@ -3090,13 +3074,13 @@ msgstr "Laster..."
 msgid "Include file"
 msgstr "Inkluder fil"
 
-#: src/sendmsg-window.c:1879
-msgid "Cannot execute print command."
-msgstr "Kan ikke utføre utskriftskommando."
-
-#: src/sendmsg-window.c:1902
-msgid "Error executing lpr"
-msgstr "Feil under kjøring av lpr"
+#: src/sendmsg-window.c:1869
+msgid ""
+"Balsa has been compiled without gnome-print support.\n"
+"Printing is not possible."
+msgstr ""
+"Balsa er kompilert uten støtte for gnome-print.\n"
+"Utskrift er ikke mulig"
 
 #: src/spell-check.c:482
 msgid "Replace the current word with the selected suggestion"

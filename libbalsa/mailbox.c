@@ -461,6 +461,9 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[CHECK]);
+#ifdef BALSA_USE_THREADS
+    pthread_testcancel();
+#endif
 }
 
 /* libbalsa_mailbox_get_matching:

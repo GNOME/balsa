@@ -189,7 +189,8 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
     }
     if (!password)
 #ifdef BALSA_USE_THREADS
-	return ask_password_mt(server, mbox);
+	return (pthread_self() == libbalsa_get_main_thread()) ?
+            ask_password_real(server, mbox) : ask_password_mt(server, mbox);
 #else
 	return ask_password_real(server, mbox);
 #endif

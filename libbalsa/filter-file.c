@@ -41,8 +41,6 @@
 #include "filter-funcs.h"
 #include "mailbox-filter.h"
 #include <gnome.h>
-#include "misc.h"
-
 
 #define CONDITION_SECTION_PREFIX "condition-"
 

@@ -1258,6 +1258,7 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
 #ifdef BALSA_USE_THREADS
     static pthread_mutex_t open_lock = PTHREAD_MUTEX_INITIALIZER;
     pthread_mutex_lock(&open_lock);
+    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 #endif
     /* FIXME: the check is not needed in non-MT-mode */
     if(is_open_mailbox(mbnode->mailbox)) {
@@ -1800,6 +1801,8 @@ check_messages_thread(gpointer data)
     /* and nothing else */
     
     int new_msgs_before=0, new_msgs_after=0;
+
+    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
     gtk_ctree_post_recursive(GTK_CTREE(balsa_app.mblist), NULL, 
                              count_unread_msgs_func, 
                              (gpointer)&new_msgs_before);

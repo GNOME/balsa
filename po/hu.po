@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Balsa VERSION\n"
 "POT-Creation-Date: 2001-01-22 19:13+0200\n"
-"PO-Revision-Date: 2001-01-19 13:39+01:00\n"
+"PO-Revision-Date: 2001-01-24 15:15+0100\n"
 "Last-Translator: Andras TIMAR <timar@gnome.hu>\n"
 "Language-Team: Hungarian <hu@gnome.hu>\n"
 "MIME-Version: 1.0\n"
@@ -1848,15 +1848,15 @@ msgstr "Mindkettõ"
 
 #: src/pref-manager.c:184
 msgid "7bits"
-msgstr "7bit"
+msgstr "7 bites"
 
 #: src/pref-manager.c:185
 msgid "8bits"
-msgstr "8bit"
+msgstr "8 bites"
 
 #: src/pref-manager.c:186
 msgid "quoted"
-msgstr "Idézni"
+msgstr "quoted printable (pl. á -> =E1)"
 
 #: src/pref-manager.c:196
 msgid "While Retrieving Messages"
@@ -2065,7 +2065,7 @@ msgstr "karakter"
 
 #: src/pref-manager.c:1417
 msgid "Other options"
-msgstr "Egyéb opciók"
+msgstr "Egyéb beállítások"
 
 #: src/pref-manager.c:1424
 msgid "Default Bcc to:"
@@ -2731,7 +2731,7 @@ msgstr "Sajnálom, de postosvesszõ nem lehet a névben!\n"
 
 #, fuzzy
 #~ msgid "Unable to get APOP seed from server"
-#~ msgstr "Töröl a szerverrõl"
+#~ msgstr "Töröl a kiszolgálóról"
 
 #~ msgid "Add New Address"
 #~ msgstr "Cím hozzáadása"
@@ -2761,10 +2761,10 @@ msgstr "Sajnálom, de postosvesszõ nem lehet a névben!\n"
 
 #, fuzzy
 #~ msgid "IMAP folder set"
-#~ msgstr "IMAP szerver"
+#~ msgstr "IMAP kiszolgáló"
 
 #~ msgid "Delete from server"
-#~ msgstr "Töröl a szerverrõl"
+#~ msgstr "Töröl a kiszolgálóról"
 
 #~ msgid "Charset"
 #~ msgstr "Karakterkészlet"

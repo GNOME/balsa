@@ -4064,9 +4064,11 @@ sw_spell_check_response(BalsaSpellCheck * spell_check, gint response,
 static void
 lang_set_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
 {
-    gint i = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w),
-                                               GNOMEUIINFO_KEY_UIDATA));
-    set_locale(bsmsg, i);
+    if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w))) {
+	gint i = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w),
+						   GNOMEUIINFO_KEY_UIDATA));
+	set_locale(bsmsg, i);
+    }
 }
 
 /* sendmsg_window_new_from_list:

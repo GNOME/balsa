@@ -1,3 +1,9 @@
+2003-11-15 07:41  PeterB
+
+	* src/main-window.c: Add a weak pointer to window->current_message.
+	* libbalsa/mailbox.c: Grab the gdk lock before invalidating mailbox
+	iters.
+
 2003-11-14 22:11  PeterB
 
 	* src/sendmsg-window.c: Test for empty <> in address.

@@ -1,16 +1,16 @@
-# Slovenian translation file for Balsa.
+# -------------------------------------------------------
 # Copyright (C) 2000 Free Software Foundation, Inc.
-# Andraz Tori <andraz.tori1@guest.arnes.si> 2000
+# Vasif Ismailoglu MD <azerb_linuxqhotmail.com>, 2000.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-01-07 10:29+0100\n"
-"PO-Revision-Date: 2000-07-07 12:30+0200\n"
-"Last-Translator: Andraz Tori <andraz.tori1@guest.arnes.si>\n"
-"Language-Team: Slovenian <sl@li.org>\n"
+"Project-Id-Version: balsa 1.0.1\n"
+"POT-Creation-Date: 2001-01-07 10:24+0100\n"
+"PO-Revision-Date: 2000-12-26 13:18+0100\n"
+"Last-Translator: Vasif Ismailoglu MD <azerb_linux@hotmail.com>\n"
+"Language-Team: Azerbaijani Turkish \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-2\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: libbalsa/address-book-ldap.c:203
@@ -18,8 +18,8 @@ msgid ""
 "Failed to initialise LDAP server.\n"
 "Check that the servername is valid."
 msgstr ""
-"Nisem mogel inicializirati stre�nika LDAP.\n"
-"Preverite ali je ime stre�nika veljavno."
+"LDAP vericisini başlada bilmədim.\n"
+"Lütfən keçerli bir verici adını verib vermədiyini yoxla."
 
 #: libbalsa/address-book-ldap.c:213
 #, c-format
@@ -27,86 +27,86 @@ msgid ""
 "Failed to bind to server: %s\n"
 "Check that the servername is valid."
 msgstr ""
-"Nisem se mogel povezati s stre�nikom: %s\n"
-"Preverite ali je ime stre�nika veljavno."
+"Verici %s'yə bağlana bilmədim\n"
+"Lütfən verici adının keçerli olduğunu yoxla."
 
 #: libbalsa/address-book-ldap.c:261 libbalsa/address-book-ldap.c:449
 #, c-format
 msgid "Failed to do a search: %sCheck that the base name is valid."
-msgstr "Nisem mogel izvesti iskanja: %s Preverite, da je ime baze pravilno."
+msgstr "Axtarma iflas etdi: %s. Lütfən ana adın doğru olduğunu yoxla."
 
 #: libbalsa/address-book-ldap.c:328 libbalsa/address-book-vcard.c:274
 msgid "No-Id"
-msgstr "Brez-IDja"
+msgstr "Id'siz"
 
 #: libbalsa/address-book-ldap.c:332 libbalsa/address-book-vcard.c:283
 msgid "No-Name"
-msgstr "Brez imena"
+msgstr "Adsız"
 
 #: libbalsa/address-book-vcard.c:193
 #, fuzzy, c-format
 msgid "Could not stat vcard address book: %s"
-msgstr "Nise mogel odpreti adresarja vVizitk %s."
+msgstr "vCard ünvan dəftəri %s'yi aça bilmədim."
 
 #: libbalsa/address-book-vcard.c:252
 #, c-format
 msgid "Could not open vCard address book %s."
-msgstr "Nise mogel odpreti adresarja vVizitk %s."
+msgstr "vCard ünvan dəftəri %s'yi aça bilmədim."
 
 #: libbalsa/address-book-vcard.c:422
 #, c-format
 msgid "%s is already in address book."
-msgstr "%s je �e v adresarju"
+msgstr "%s onsuz da ünvan dəftərindədir."
 
 #: libbalsa/address-book-vcard.c:432
 #, c-format
 msgid "Cannot open vCard address book %s for saving\n"
-msgstr "Nise mogel odpreti adresarja vVizitk %s za shranjevanje\n"
+msgstr "vCard ünvan dəftəri %s'yi qeyd etmək üçün aça bilmədim\n"
 
 #: libbalsa/address-book.c:176
 #, c-format
 msgid "Cannot load address book %s"
-msgstr "Ne morem nalo�iti adresarja %s"
+msgstr "Ünvan dəftəri %s'yi yükləyə bilmədim"
 
 #: libbalsa/address-book.c:183
 #, c-format
 msgid "No such address book type: %s"
-msgstr "Ni tak�nega tipa adresarja: %s"
+msgstr "Belə ünvan dəftəri növü yoxdur: %s."
 
 #: libbalsa/address-book.c:192
 #, c-format
 msgid "Could not create a address book of type %s"
-msgstr "Nisem mogel ustvariti adresarja tipa %s"
+msgstr "%s növündən bir ünvan dəftəri yarada bilmədim"
 
 #: libbalsa/mailbox.c:302
 #, c-format
 msgid "Cannot load mailbox %s"
-msgstr "Ne morem nalo�iti po�tnega predala %s"
+msgstr "ePoçt qutusu %s'yi yükləyə bilmədim"
 
 #: libbalsa/mailbox.c:309
 #, c-format
 msgid "No such mailbox type: %s"
-msgstr "Ni tak�nega tipa po�tnega predala: %s"
+msgstr "Belə bir ePoçt qutusu növü yoxdur: %s"
 
 #: libbalsa/mailbox.c:345
 #, c-format
 msgid "Could not create a mailbox of type %s"
-msgstr "Nisem mogel ustvariti po�tni predal tipa %s"
+msgstr "%s növünden bir ePoçt qutusu yarada bilmədim"
 
 #: libbalsa/mailbox_imap.c:284
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxImap: Odpiram %s, �tevec referenc: %d\n"
+msgstr "LibBalsaMailboxImap : %s'yi açıram , %d referans\n"
 
 #: libbalsa/mailbox_local.c:265
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxLocal: Odpiram %s, �tevec referenc: %d\n"
+msgstr "LibBalsaMailboxLocal : %s'yi açıram , %d referans\n"
 
 #: libbalsa/mailbox_maildir.c:120
 #, fuzzy, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
-msgstr "Po�tni predal \"%s\" ne izgleda veljaven."
+msgstr "\"%s\" ePoçt qutusu keçerli bir ePoçt qutusuna oxşamır."
 
 #: libbalsa/mailbox_maildir.c:129
 msgid "Sorry. Balsa doesn't (yet) know how to create a maildir mailbox"
@@ -122,7 +122,7 @@ msgstr ""
 msgid ""
 "Could not remove contents of %s:\n"
 "%s"
-msgstr "Nisem mogel odpreti datoteke %s.\n"
+msgstr "Dosye %s'yi aça bilmədim.\n"
 
 #: libbalsa/mailbox_maildir.c:185 libbalsa/mailbox_mbox.c:169
 #: libbalsa/mailbox_mh.c:183
@@ -130,17 +130,17 @@ msgstr "Nisem mogel odpreti datoteke %s.\n"
 msgid ""
 "Could not remove %s:\n"
 "%s"
-msgstr " Nisem mogel shraniti %s:%s "
+msgstr "%s:%s'yi qeyd edə bilmədim"
 
 #: libbalsa/mailbox_mbox.c:120
 #, fuzzy, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
-msgstr "Po�tni predal \"%s\" ne izgleda veljaven."
+msgstr "\"%s\" ePoçt qutusu keçerli bir ePoçt qutusuna oxşamır."
 
 #: libbalsa/mailbox_mh.c:119
 #, fuzzy, c-format
 msgid "Mailbox %s does not appear to be a Mh mailbox."
-msgstr "Po�tni predal \"%s\" ne izgleda veljaven."
+msgstr "\"%s\" ePoçt qutusu keçerli bir ePoçt qutusuna oxşamır."
 
 #: libbalsa/mailbox_mh.c:128
 msgid "Sorry. Balsa doesn't (yet) know how to create a mh mailbox"
@@ -149,7 +149,7 @@ msgstr ""
 #: libbalsa/mailbox_pop3.c:200
 #, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxPop3: Odpiram %s, �tevec referenc: %d\n"
+msgstr "LibBalsaMailboxPop3 : %s'yi açıram , %d referans\n"
 
 #: libbalsa/mailbox_pop3.c:250
 #, c-format
@@ -169,7 +169,7 @@ msgstr ""
 #: libbalsa/pop3.c:50
 #, fuzzy
 msgid "Could not write the message"
-msgstr "Ne mroem pisati sporo�ila"
+msgstr "Xəbəri yaza bilmədim"
 
 #: libbalsa/pop3.c:51
 msgid "Could not run the delivery program (procmail)"
@@ -178,12 +178,12 @@ msgstr ""
 #: libbalsa/pop3.c:52
 #, fuzzy
 msgid "Could not open mailbox for spooling"
-msgstr "Nisem mogel znova odpreti predala!"
+msgstr "ePoçt qutusunu təzəden aça bilmədim !"
 
 #: libbalsa/pop3.c:53
 #, fuzzy
 msgid "Could not append message"
-msgstr "Nisem mogel izrisati slike\n"
+msgstr "Rəsmi şəkilləndirə bilmədim\n"
 
 #: libbalsa/pop3.c:54
 msgid "Host not found"
@@ -192,17 +192,17 @@ msgstr ""
 #: libbalsa/pop3.c:55
 #, fuzzy
 msgid "Connection refused"
-msgstr "Nadaljuj"
+msgstr "Davam et"
 
 #: libbalsa/pop3.c:56
 #, fuzzy
 msgid "Authentication failed"
-msgstr "GSSAPI avtentifikacija ni uspela."
+msgstr "GSSAPI doğrulaması iflas etdi."
 
 #: libbalsa/pop3.c:323
 #, fuzzy, c-format
 msgid "Retrieving Message %d of %d"
-msgstr "Med prena�anjem sporo�il"
+msgstr "Xəbərləri Alarkən"
 
 #: libbalsa/pop3.c:336
 #, c-format
@@ -218,112 +218,114 @@ msgstr ""
 #: libbalsa/send.c:809
 #, c-format
 msgid "Error: Could not find address for host %s."
-msgstr "Napaka: Nisem mogel najti naslova za stre�nik %s."
+msgstr "Xəta: Verici %s üçün ünvani ala bilmədim."
 
 #: libbalsa/send.c:819
 #, fuzzy, c-format
 msgid "Connecting to %s"
-msgstr "SSL povezava z uporabo %s"
+msgstr "SSL bağlantısı %s ilə quruldu"
 
 #: libbalsa/send.c:825
 #, fuzzy, c-format
 msgid "Error connecting to %s."
-msgstr "Napaka ob izvajanju lpr (programa za tiskanje)"
+msgstr "lpr'i işə salarkən xəta oldu"
 
 #.
 #. ISPRIME(9)
 #.
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Inbox:"
-msgstr "Vhodni predal:"
+msgstr "Gələn:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Outbox:"
-msgstr "Odhodni predal:"
+msgstr "Gedən:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Sentbox:"
-msgstr "Poslana po�ta:"
+msgstr "Göndərilən:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Draftbox:"
-msgstr "Osnutki:"
+msgstr "Lahiyələr:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Trash:"
-msgstr "Smeti:"
+msgstr "Zibil:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:78
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
-msgstr "Pot \"%s\" mora biti dolo�ena absolutno -- za�eti se mora z '/'."
+msgstr ""
+"\"%s\" qovluğu tamamilə göstərilməlidir-- yə'ni bir '/''lə "
+"başlamalıdır."
 
 #: libinit_balsa/balsa-druid-page-directory.gob:101
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
-msgstr "Po�tni predal \"%s\" ne izgleda veljaven."
+msgstr "\"%s\" ePoçt qutusu keçerli bir ePoçt qutusuna oxşamır."
 
 #: libinit_balsa/balsa-druid-page-directory.gob:151
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
-"Prosim preverite lokacije privzetih datotek s po�to.\n"
-"Po potrebi bodo ustvarjene."
+"Lütfən ePoçt dosyelərinin məkanlarını göstər/doğrula .\n"
+"Bunlar yoxsa yaradılacaqdır ."
 
 #: libinit_balsa/balsa-druid-page-directory.gob:194
 msgid "Mail Files"
-msgstr "Datoteke s Po�to"
+msgstr "ePoçt Dosyeləri"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:267
 msgid "Problem Creating Mailboxes"
-msgstr "Problem pri Ustvarjanju Po�tnih Predalov"
+msgstr "ePoçt Qutularını Yaradırkən Xəta Oldu ."
 
 #: libinit_balsa/balsa-druid-page-finish.gob:45
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
 msgstr ""
-"Uspe�no ste nastavili Balso. Zabavajte se!\n"
-"   -- Razvojna skupina Balse"
+"Balsa'yı qurmayı bacardın . Müvəffəqiyyətlər!\n"
+"   -- Balsa dəstəsi"
 
 #: libinit_balsa/balsa-druid-page-finish.gob:57
 msgid "All Done!"
-msgstr "Vse Opravljeno!"
+msgstr "Hamısı Oldu !"
 
 #: libinit_balsa/balsa-druid-page-user.gob:75
 msgid "Please enter information about yourself."
-msgstr "Prosim vpi�ite podatke o sebi."
+msgstr "Lütfən özünlə əlaqədər bilgiləri ver."
 
 #: libinit_balsa/balsa-druid-page-user.gob:83
 msgid "Name:"
-msgstr "Ime:"
+msgstr "Ad:"
 
 #: libinit_balsa/balsa-druid-page-user.gob:87
 msgid "Email address:"
-msgstr "E-po�tni naslov:"
+msgstr "ePoçt ünvani :"
 
 #: libinit_balsa/balsa-druid-page-user.gob:91
 msgid "SMTP Server:"
-msgstr "Stre�nik SMTP:"
+msgstr "SMTP vericisi:"
 
 #: libinit_balsa/balsa-druid-page-user.gob:94
 msgid "Local Mail Directory:"
-msgstr "Krajevni Po�tni Imenik:"
+msgstr "Yerli ePoçt qovluğu :"
 
 #: libinit_balsa/balsa-druid-page-user.gob:104
 msgid "User Settings"
-msgstr "Nastavitve Uporabnika"
+msgstr "İstifadəci qurğuları"
 
 #: libinit_balsa/balsa-druid-page-user.gob:156
 msgid "Local Mail Problem"
-msgstr "Lokalni Problem s Po�to"
+msgstr "Yerli ePoçt qutusu problemi"
 
 #: libinit_balsa/balsa-druid-page-welcome.gob:47
 msgid "Welcome to Balsa!"
-msgstr "Dobrodo�li v Balsi!"
+msgstr "Balsa'ya Xoşgəlmişsən!"
 
 #: libinit_balsa/balsa-druid-page-welcome.gob:50
 msgid ""
@@ -335,69 +337,73 @@ msgid ""
 "main window for more information about contacting the authors or\n"
 "reporting bugs."
 msgstr ""
-"Izgleda da poganjate Baslo prvi�. Slede�i koraki bodo nastavili\n"
-"Balso s spra�evanjem enostavnih vpra�anj. Ko boste kon�ali te\n"
-"korake, jih lahko vedno spremenite kasneje v nastavitvah Balse\n"
-"�e je potrebno ustvariti kakr�nekoli imenike ali datoteke,\n"
-"bo to storjeno samodejno. Prosim poglejte v \"O Balsi\" v glavnem\n"
-"oknu za podatke o tem kako stopiti v stik z avtorji in kako\n"
-"poro�ati o hro��ih."
+"Balsa'yı dəyəsən birinci dəfədir ki işə salırsan.\n"
+"Bir-iki addımda Balsa sənə bə'zi asand suallar soruşacaq və "
+"cavablarınla\n"
+"özünü quracaqdır . Bu qurğuları sonradan \"Qurğular\" menyusündə "
+"də\n"
+"dəyişdirə bilərsən. Bə'zi dosyelər ya da qovluqlar yoxsa , onlar "
+"yaradılacaqdır .\n"
+"Lütfən Balsa'nın \"Bilgi\" qutusuna göz atın, Balsa'nın yazıçıları "
+"ilə\n"
+"xəbərləşməyə keçin və xəta raportlarını göndərin."
 
 #: libinit_balsa/balsa-initdruid.gob:97
 msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"
 msgstr ""
-"To pomeni izhod iz Balse. Si to zares \n"
-"�elite storiti?"
+"Beləce Balsa'dan çıxacaqsan.\n"
+"Bundan əminsən mi?"
 
 #: libinit_balsa/balsa-initdruid.gob:119
 msgid "GnomeCard Address Book"
-msgstr "GnomeVizitka adresar"
+msgstr "GnomeCard ünvan dəftəri"
 
 #: libinit_balsa/helper.c:142
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr ""
-"Pot %s mora biti relativna na korenski datote�ni sistem (za�eti se mora z /)."
+"%s qovluqlaşdırması dosye idarə sistemi kökünə görə "
+"yazılmalıdır( '/''ylə başlar )."
 
 #: libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
-msgstr "Nisem mogel ustvariti imenika: mkdir() na poti \"%s\" ni uspel."
+msgstr "Bu qovluğu yarada bilmədim : \"%s\" ; mkdir() iflas etdi."
 
 #: libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
-msgstr "Datoteka s potjo \"%s\" ni imenik."
+msgstr "\"%s\" yolundakı dosye bir qovluq deyildir ."
 
 #: libinit_balsa/init_balsa.c:36
 msgid "Configure Balsa"
-msgstr "Nastavi Balso"
+msgstr "Balsa'yı Qur"
 
 #: libmutt/mbox.c:134 libmutt/mbox.c:292
 msgid "Reading %s... %d (%d%%)"
-msgstr "Berem %s... %d (%d%%)"
+msgstr "%s'yi oxuyuram ... %d ( %%%d )"
 
 #: libmutt/mbox.c:158 libmutt/mbox.c:217
 msgid "Mailbox is corrupt!"
-msgstr "Predal je pokvarjen!"
+msgstr "ePoçt qutusu xəsərlidir!"
 
 #: libmutt/mbox.c:666
 msgid "Mailbox was corrupted!"
-msgstr "Predal je bil pokvarjen!"
+msgstr "ePoçt qutusu xəsər gördü!"
 
 #: libmutt/mbox.c:703 libmutt/mbox.c:978
 msgid "Fatal error!  Could not reopen mailbox!"
-msgstr "Usodna napaka! Ne morem znova odpreti predala!"
+msgstr "Ağır xəta ! ePoçt qutusunu təzəden aça bilmədim !"
 
 #: libmutt/mbox.c:712
 msgid "Unable to lock mailbox!"
-msgstr "Ne mroem zakleniti predala!"
+msgstr "ePoçt qutusunu qıfıllıya bilmədim!"
 
 #: libmutt/mbox.c:741
 msgid "Could not create temporary file!"
-msgstr "Nisem mogel ustvariti za�asne datoteke!"
+msgstr "Keçici dosyeyi yarada bilmədim !"
 
 #. this means ctx->changed or ctx->deleted was set, but no
 #. * messages were found to be changed or deleted.  This should
@@ -406,317 +412,322 @@ msgstr "Nisem mogel ustvariti za�asne datoteke!"
 #: libmutt/mbox.c:758
 msgid "sync: mbox modified, but no modified messages! (report this bug)"
 msgstr ""
-"sync: mbox spremenjen, a ni spremenjenih sporo�il! (sporo�ite tega hro��a)"
+"eşitleme : mbox dəyişdirilmişdir, fəqət heç bir xəbər "
+"dəyişdirilməmişdir ! ( bu xətayı raport et )"
 
 #: libmutt/mbox.c:788
 msgid "Writing messages... %d (%d%%)"
-msgstr "Zapisujem sporo�ila... %d (%d%%)"
+msgstr "Xəbərləri yazıram ... %d ( %%%d )"
 
 #: libmutt/mbox.c:962
 #, c-format
 msgid "Write failed!  Saved partial mailbox to %s"
-msgstr "Pisanje neuspe�no! Delni predal shranjen v %s"
+msgstr ""
+"Yazma əməliyyatı iflas etdi! Bir bölmə ePoçt qutusu %s'yə yazıldı"
 
 #: libmutt/mbox.c:1028
 msgid "Could not reopen mailbox!"
-msgstr "Nisem mogel znova odpreti predala!"
+msgstr "ePoçt qutusunu təzəden aça bilmədim !"
 
 #: libmutt/mbox.c:1066
 msgid "Reopening mailbox..."
-msgstr "Znova odpiram predal..."
+msgstr "ePoçt qutusunu təzəden açıram ..."
 
 #: libmutt/mx.c:119
 #, c-format
 msgid "Lock count exceeded, remove lock for %s?"
-msgstr "�tevilo zaklepanj prekora�eno, odstrani zaklepanje iz %s"
+msgstr ""
+"Qıfıl sayısı ən üst sərhədi aşdı, %s üçün qıfılı açım mı?"
 
 #: libmutt/mx.c:131
 #, c-format
 msgid "Can't dotlock %s.\n"
-msgstr "Nisem mogel zakleniti %s.\n"
+msgstr "%s'yi qıfıllıya bilmədim.\n"
 
 #: libmutt/mx.c:189
 msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr "Prekora�itev �asovne omejitve med poizkusom fcntl zaklepanja!"
+msgstr "fcntl ilə qıfıllamaq istədiyimdə vaxtım çatmadı!"
 
 #: libmutt/mx.c:195
 #, c-format
 msgid "Waiting for fcntl lock... %d"
-msgstr "�akam na fcntl zaklep... %d"
+msgstr "fcntl qıfılı üçün gözləyirəm... %d"
 
 #: libmutt/mx.c:223
 msgid "Timeout exceeded while attempting flock lock!"
-msgstr "Prekora�itev �asovne omejitve med poizkusom flock zaklepanja!"
+msgstr "flock ilə qıfıllamaq istədiyimdə vaxtım çatmadı!"
 
 #: libmutt/mx.c:230
 #, c-format
 msgid "Waiting for flock attempt... %d"
-msgstr "�akam na poskus flock zaklepa... %d"
+msgstr "flock qıfıllama cəhdini gözləyirəm... %d"
 
 #: libmutt/mx.c:459 libmutt/mx.c:605
 #, c-format
 msgid "%s is not a mailbox."
-msgstr "%s ni po�tni predal."
+msgstr "%s bir ePoçt qutusu deyildir ."
 
 #: libmutt/mx.c:542
 #, c-format
 msgid "Couldn't lock %s\n"
-msgstr "Ne morem zakleniti %s\n"
+msgstr "%s'yi qıfıllaya bilmədim\n"
 
 #: libmutt/mx.c:630
 #, c-format
 msgid "Reading %s..."
-msgstr "Berem %s..."
+msgstr "%s oxunur ... "
 
 #: libmutt/mx.c:719
 #, c-format
 msgid "Writing %s..."
-msgstr "Pi�em %s..."
+msgstr "%s yazılır ..."
 
 #: libmutt/mx.c:746
 #, c-format
 msgid "Could not synchronize mailbox %s!"
-msgstr "Ne morem uskladiti predala %s!"
+msgstr "ePoçt qutusu %s'yi eyniləşdirə bilmədim!"
 
 #: libmutt/mx.c:848
 #, c-format
 msgid "Moving read messages to %s..."
-msgstr "Prestavljam prebrana sporo�ila v %s..."
+msgstr "Oxunan xəbərləri %s'yə daşıyıram..."
 
 #: libmutt/mx.c:899 libmutt/mx.c:1056
 msgid "Mailbox is unchanged."
-msgstr "Predal ni bil spremenjen."
+msgstr "ePoçt qutusu dəyişməmiş ."
 
 #: libmutt/mx.c:929
 #, c-format
 msgid "%d kept, %d moved, %d deleted."
-msgstr "%d ohranjenih, %d prestavljenih, %d zbrisanih."
+msgstr "%d dənə var, %d dənə daşındı, %d dənə silindi ."
 
 #: libmutt/mx.c:932 libmutt/mx.c:1098
 #, c-format
 msgid "%d kept, %d deleted."
-msgstr "%d ohranjenih, %d zbrisanih."
+msgstr "%d dənə daha var, %d dənə silindi ."
 
 #: libmutt/mx.c:1040
 #, c-format
 msgid " Press '%s' to toggle write"
-msgstr " Pritisni '%s' za preklop mo�nosti pisanja"
+msgstr " Yazılma xüsusiyyətini açmaq üçün '%s''yə bas"
 
 #: libmutt/mx.c:1043
 msgid "Use 'toggle-write' to re-enable write!"
-msgstr "Uporabite 'toggle-write' za vnovi�no omogo�itev pisanja!"
+msgstr ""
+"Yazılma xüsusiyyətini təzəden açmaq üçün 'toggle-write' "
+"əməliyyatını istifadə et!"
 
 #: libmutt/mx.c:1045
 #, c-format
 msgid "Mailbox is marked unwritable. %s"
-msgstr "Predal je ozna�en kot nepisljiv. %s"
+msgstr "ePoçt qutusunun yazılma xüsusiyyəti bağlanmışdır. %s"
 
 #: libmutt/mx.c:1050
 msgid "Mailbox is read-only."
-msgstr "Predal je le berljiv."
+msgstr "ePoçt qutusu sırf-oxunandır ."
 
 #: libmutt/mx.c:1065
 #, c-format
 msgid "Purge %d deleted message?"
-msgstr "Odplakni %d zbrisano sporo�ilo?"
+msgstr "Silinən %d xəbəri həqiqətən də silinsin mi ?"
 
 #: libmutt/mx.c:1065
 #, c-format
 msgid "Purge %d deleted messages?"
-msgstr "Odplakni %d zbrisanih sporo�il? "
+msgstr "Silinen %d xəbərlərini həqiqətən də silim mi?"
 
 #: libmutt/mx.c:1095
 #, c-format
 msgid "%d kept."
-msgstr "%d ohranjenih."
+msgstr "%d dənə yenə var ."
 
 #: libmutt/mx.c:1375
 msgid "Can't write message"
-msgstr "Ne mroem pisati sporo�ila"
+msgstr "Xəbəri yaza bilmədim"
 
 #: libmutt/imap/auth.c:110
 msgid "Authenticating (CRAM-MD5)..."
-msgstr "Avtentificiram (CRAM-MD5)..."
+msgstr "Doğrulayıram (CRAM-MD5)..."
 
 #: libmutt/imap/auth.c:202
 msgid "Authenticating (anonymous)..."
-msgstr "Avtentificiram (anonimno)..."
+msgstr "Doğrulayıram (adsız)..."
 
 #: libmutt/imap/auth.c:288
 msgid "Anonymous authentication not supported."
-msgstr "Anonimna avtentifikacija ni podprta."
+msgstr "Adsız doğrulama dəstəklənmir."
 
 #: libmutt/imap/auth.c:301
 msgid "GSSAPI authentication failed."
-msgstr "GSSAPI avtentifikacija ni uspela."
+msgstr "GSSAPI doğrulaması iflas etdi."
 
 #: libmutt/imap/auth.c:329
 msgid "CRAM-MD5 authentication failed."
-msgstr "CRAM-MD5 avtentifikacija ni uspela."
+msgstr "CRAM-MD5 doğrulaması iflas etdi."
 
 #: libmutt/imap/auth.c:344
 msgid "Skipping CRAM-MD5 authentication."
-msgstr "Preskakujem CRAM-MD5 avtentifikacijo."
+msgstr "CRAM-MD5 doğrulamasını keçirəm"
 
 #: libmutt/imap/auth.c:366
 msgid "Logging in..."
-msgstr "Prijavljam se..."
+msgstr "Girilir..."
 
 #. Login failed, try again
 #: libmutt/imap/auth.c:378
 msgid "Login failed."
-msgstr "Prijava ni uspela."
+msgstr "Giriş iflas etdi."
 
 #. now begin login
 #: libmutt/imap/auth_gss.c:88
 msgid "Authenticating (GSSAPI)..."
-msgstr "Avtentificiram (GSSAPI)..."
+msgstr "Doğrulayıram (GSSAPI)..."
 
 #: libmutt/imap/browse.c:93
 msgid "Getting namespaces..."
-msgstr "Dobivam prostore imen..."
+msgstr "Ad sahələrini alıram..."
 
 #: libmutt/imap/browse.c:120
 msgid "Getting folder list..."
-msgstr "Dobivam seznam map..."
+msgstr "Qovluqlar siyahısını alıram..."
 
 #: libmutt/imap/imap_ssl.c:92
 msgid "Filling entropy pool"
-msgstr "Polnim entropijski bazen"
+msgstr "Entropi hovuzunu doldururam"
 
 #: libmutt/imap/imap_ssl.c:124
 msgid "Failed to find enough entropy on your system"
-msgstr "Nisem na�el dovolj entropije na va�em sistemu"
+msgstr "Sistemdə lazımi miqdarda entropi tapılmadı"
 
 #: libmutt/imap/imap_ssl.c:139
 msgid "SSL disabled due the lack of entropy"
-msgstr "SSL izklju�en zaradi pomanjkanja entropije"
+msgstr "SSL entropi əksikliyindən ötrü qapalıdır"
 
 #: libmutt/imap/imap_ssl.c:219
 msgid "Unable to get certificate from peer"
-msgstr "Od sogovornmika ne morem dobiti certifikata"
+msgstr "Vəsiqəyi ala bilmirəm"
 
 #: libmutt/imap/imap_ssl.c:230
 #, c-format
 msgid "SSL connection using %s"
-msgstr "SSL povezava z uporabo %s"
+msgstr "SSL bağlantısı %s ilə quruldu"
 
 #: libmutt/imap/imap_ssl.c:255
 msgid "Unknown"
-msgstr "Neznan"
+msgstr "Bilinmir"
 
 #: libmutt/imap/imap_ssl.c:280
 msgid "[unable to calculate]"
-msgstr "[nisem mogel izra�unati]"
+msgstr "[hesaplaya bilmədim]"
 
 #: libmutt/imap/imap_ssl.c:298
 msgid "[invalid date]"
-msgstr "[napa�en datum]"
+msgstr "[keçərsiz tarix]"
 
 #: libmutt/imap/imap_ssl.c:373
 msgid "Server certificate is not yet valid"
-msgstr "Certifikat stre�nika �e ni veljaven"
+msgstr "Verici vəsiqəsi hələ keçerli deyildir"
 
 #: libmutt/imap/imap_ssl.c:380
 msgid "Server certificate has expired"
-msgstr "Certifikat stre�nika je potekel"
+msgstr "Verici vəsiqəsinin müddəti bitmişdir"
 
 #: libmutt/imap/imap_ssl.c:454
 msgid "This certificate belongs to:"
-msgstr "Ta certifikat pripada:"
+msgstr "Bu vəsiqənin yiyəsi:"
 
 #: libmutt/imap/imap_ssl.c:464
 msgid "This certificate was issued by:"
-msgstr "Ta certifikat je izdal:"
+msgstr "Bu vəsiqəyi verən:"
 
 #: libmutt/imap/imap_ssl.c:474
 msgid "This certificate is valid"
-msgstr "Ta certifikat je veljaven"
+msgstr "Bu vəsiqə keçərlidir"
 
 #: libmutt/imap/imap_ssl.c:475
 #, c-format
 msgid "   from %s"
-msgstr "   od %s"
+msgstr "   %s'dən"
 
 #: libmutt/imap/imap_ssl.c:477
 #, c-format
 msgid "     to %s"
-msgstr "     do %s"
+msgstr "     %s'yə"
 
 #: libmutt/imap/imap_ssl.c:483
 #, c-format
 msgid "Fingerprint: %s"
-msgstr "Prstni odtis: %s"
+msgstr "Barmaq izi: %s"
 
 #: libmutt/imap/imap_ssl.c:485
 msgid "SSL Certificate check"
-msgstr "Preverjanje SSL certifikata"
+msgstr "SSL Vəsiqə_yoxlaması"
 
 #: libmutt/imap/imap_ssl.c:488
 msgid "(r)eject, accept (o)nce, (a)ccept always"
-msgstr "zav(r)ni, sprejmi (e)nkrat, (v)edno sprejmi"
+msgstr "(r)ədd'et, sadəcə bu dəf'ə (q)əbul et, (h)əmişə qəbul et"
 
 #: libmutt/imap/imap_ssl.c:489
 msgid "roa"
-msgstr "rev"
+msgstr "rkh"
 
 #: libmutt/imap/imap_ssl.c:493
 msgid "(r)eject, accept (o)nce"
-msgstr "zav(r)ni, sprejmi (e)nkrat"
+msgstr "(r)ədd'et yoxsa sadəcə (b)u dəfə qəbul et"
 
 #: libmutt/imap/imap_ssl.c:494
 msgid "ro"
-msgstr "re"
+msgstr "rb"
 
 #: libmutt/imap/imap_ssl.c:498
 msgid "Exit  "
-msgstr "Izhod"
+msgstr "Çıx   "
 
 #: libmutt/imap/imap_ssl.c:500
 msgid "Help"
-msgstr "Pomo�"
+msgstr "Kömək"
 
 #: libmutt/imap/imap_ssl.c:523
 msgid "Warning: Couldn't save certificate"
-msgstr "Opozorilo: Nisem mogel shraniti certifikata"
+msgstr "Diqqət: Vəsiqəni qeyd edə bilmədim"
 
 #: libmutt/imap/imap_ssl.c:525
 msgid "Certificate saved"
-msgstr "Certifikat shranjen"
+msgstr "Vəsiqə qeyd edildi"
 
 #: libmutt/imap/util.c:43
 msgid "Continue?"
-msgstr "Nadaljuj?"
+msgstr "Davam edilsin mi?"
 
 #: src/address-book.c:160 src/filter-edit-dialog.c:130
 msgid "Name"
-msgstr "Ime"
+msgstr "Ad"
 
 #: src/address-book.c:160
 msgid "E-Mail Address"
-msgstr "E-po�tni Naslov"
+msgstr "EPoçt ünvani"
 
 #: src/address-book.c:163
 msgid "Address Book"
-msgstr "Imenik"
+msgstr "Ünvan rəhbəri"
 
 #. Entry widget for finding an address
 #: src/address-book.c:242
 #, fuzzy
 msgid "Search for Name:"
-msgstr "Na�in iskanja:"
+msgstr "Axtarma növü:"
 
 #: src/address-book.c:310
 msgid "Send-To"
-msgstr "Po�lji"
+msgstr "Cavabla"
 
 #: src/address-book.c:329
 msgid "Run GnomeCard"
-msgstr "Po�eni GnomeCard"
+msgstr "GnomeCard'ı işə sal"
 
 #: src/address-book.c:337
 msgid "Re-Import"
-msgstr "Znova-Uvozi"
+msgstr "Təzədən itxal et"
 
 #. mode switching stuff
 #: src/address-book.c:346
@@ -733,62 +744,62 @@ msgstr ""
 
 #: src/address-book-config.c:100
 msgid "Address Book Configuration"
-msgstr "Nastavitve adesarja"
+msgstr "Ünvan rəhbəri Quraşdırması"
 
 #: src/address-book-config.c:135 src/mailbox-conf.c:312
 msgid "Update"
-msgstr "Posodobi"
+msgstr "Güncəllə"
 
 #: src/address-book-config.c:256
 msgid "New Address Book type:"
-msgstr "Nov tip adresarja:"
+msgstr "Təzə ünvan rəhbər növü:"
 
 #: src/address-book-config.c:266
 msgid "VCard Address Book (GnomeCard)"
-msgstr "Ime adresarja vVizitk (GnomeVizitk)"
+msgstr "VCard ünvan dəftəri (GnomeCard)"
 
 #: src/address-book-config.c:284
 msgid "LDAP Address Book"
-msgstr "LDAP adresar"
+msgstr "LDAP ünvan dəftəri"
 
 #: src/address-book-config.c:293
 msgid "Balsa is not compiled with LDAP support"
-msgstr "Balsa ni prevedena s podporo za LDAP"
+msgstr "Balsa LDAP dəstəyindən yoxsun yoxlanmışdır"
 
 #. mailbox name
 #: src/address-book-config.c:313 src/address-book-config.c:371
 msgid "Address Book Name:"
-msgstr "Ime adresarja:"
+msgstr "Ünvan dəftəri adı:"
 
 #: src/address-book-config.c:322
 msgid "File name"
-msgstr "Ime datoteke"
+msgstr "Dosye adı"
 
 #: src/address-book-config.c:334 src/address-book-config.c:405
 msgid "Expand aliases as you type"
-msgstr "Raz�iri soimena med tipkanjem"
+msgstr "Yazarkən ləqəbləri tamamla"
 
 #: src/address-book-config.c:382
 msgid "Host name"
-msgstr "Ime ra�unalnika"
+msgstr "Verici adı"
 
 #: src/address-book-config.c:393
 msgid "Base Domain Name"
-msgstr "Osnovno ime domene"
+msgstr "Ana Verici Adı"
 
 #: src/address-book-config.c:460 src/filter-edit-dialog.c:379
 #: src/mailbox-conf.c:257 src/pref-manager.c:1217 src/pref-manager.c:1987
 msgid "Add"
-msgstr "Dodaj"
+msgstr "Əlavə Et"
 
 #: src/address-book-config.c:507
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "The address book file path '%s' is not correct.\n"
 "Do you want to correct the file name?"
 msgstr ""
-"Datoteka adresarja '%s' ni pravilna.\n"
-"�elite popraviti ime datoteke?"
+"Ünvan dəftərin yolu '%s'·səhvdir.\n"
+"Qovluqlaşdırmayı düzəltmək istəyirsiniz mi?"
 
 #: src/balsa-app.c:71
 #, c-format
@@ -796,115 +807,115 @@ msgid ""
 "Opening remote mailbox %s.\n"
 "The password for %s@%s:"
 msgstr ""
-"Odpiram oddaljen po�tni predal %s.\n"
-"Geslo za %s@%s:"
+"Uzaqdakı ePoçt qutusu %s açılır.\n"
+"%s@%s üçün parol:"
 
 #: src/balsa-app.c:75
 #, c-format
 msgid "Mailbox password for %s@%s:"
-msgstr "Geslo po�tnega predala za %s@%s:"
+msgstr "%s@%s üçün ePoçt qutu parolu:"
 
 #: src/balsa-index-page.c:259
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
 msgstr ""
-"Ne morem odpreti po�tnega predala!\n"
-"Prosim preverite nastavitve predala."
+"ePoçt qutusunu aça bilmədim !\n"
+"Lütfən ePoçt qutusu qurğularını bir də gözdən keçir ."
 
 #: src/balsa-index-page.c:527
 msgid "Reply..."
-msgstr "Odgovori..."
+msgstr "Cavabla..."
 
 #: src/balsa-index-page.c:531
 msgid "Reply To All..."
-msgstr "Odgovori vsem..."
+msgstr "Hamısını Cavabla..."
 
 #: src/balsa-index-page.c:535
 #, fuzzy
 msgid "Reply To Group..."
-msgstr "Odgovori vsem..."
+msgstr "Hamısını Cavabla..."
 
 #: src/balsa-index-page.c:539
 msgid "Forward..."
-msgstr "Posreduj naprej..."
+msgstr "Davam Etdir..."
 
 #: src/balsa-index-page.c:544
 msgid "Undelete"
-msgstr "Odbri�i"
+msgstr "Qurtar"
 
 #: src/balsa-index-page.c:547 src/filter-edit-dialog.c:224
 #: src/main-window.c:490 src/pref-manager.c:1219 src/pref-manager.c:1989
 msgid "Delete"
-msgstr "Zbri�i"
+msgstr "Sil"
 
 #: src/balsa-index-page.c:551
 msgid "Move To Trash"
-msgstr "Po�lji v smeti"
+msgstr "Zibil Qutusuna at"
 
 #: src/balsa-index-page.c:556
 msgid "Store Address..."
-msgstr "Shrani naslov..."
+msgstr "Ünvanı qeyd et..."
 
 #: src/balsa-index-page.c:559
 msgid "Toggle Flagged"
-msgstr "Preklopi ozna�bo"
+msgstr "Işarətlə"
 
 #: src/balsa-index-page.c:562
 msgid "Transfer"
-msgstr "Prenesi"
+msgstr "Daşı"
 
 #. FIXME:
 #: src/balsa-index.c:304
 msgid "From"
-msgstr "Od"
+msgstr "Yazan"
 
 #: src/balsa-index.c:305 src/filter-edit-dialog.c:326
 msgid "Subject"
-msgstr "Zadeva"
+msgstr "Mövzu"
 
 #: src/balsa-index.c:306
 msgid "Date"
-msgstr "Datum"
+msgstr "Tarix"
 
 #: src/balsa-index.c:429
 msgid "To"
-msgstr "Za"
+msgstr "Göndərilən"
 
 #: src/balsa-mblist.c:461 src/mailbox-conf.c:950
 msgid "Mailbox"
-msgstr "Po�tni predal"
+msgstr "ePoçt qutusu"
 
 #: src/balsa-mblist.c:461
 msgid "Unread"
-msgstr "Neprebrano"
+msgstr "Oxunmamış"
 
 #: src/balsa-mblist.c:461
 msgid "Total"
-msgstr "Skupaj"
+msgstr "Toplam"
 
 #: src/balsa-mblist.c:967
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
-msgstr "Prikazan po�tni predal: %s z %ld sporo�ili, %ld novimi"
+msgstr "Göstərilən ePoçt qutusu : %s , %ld xəbər , %ld təzə xəbər"
 
 #: src/balsa-message.c:290 src/balsa-message.c:293
 msgid "Save MIME Part"
-msgstr "Shrani MIME Del"
+msgstr "MIME bölməsini qeyd et"
 
 #: src/balsa-message.c:291
 msgid "Save"
-msgstr "Shrani"
+msgstr "Qeyd Et"
 
 #: src/balsa-message.c:291 src/mailbox-conf.c:171 src/mailbox-conf.c:181
 #: src/sendmsg-window.c:159 src/sendmsg-window.c:657 src/sendmsg-window.c:1824
 #: src/sendmsg-window.c:1847
 msgid "Cancel"
-msgstr "Prekli�i"
+msgstr "Ləğv Et"
 
 #: src/balsa-message.c:303
 msgid "Please choose a filename to save this part of the message as:"
-msgstr "Prosim izberite ime datoteke v katero naj se shrani ta del sporo�ila:"
+msgstr "Xəbərin bu bölməsinin qeyd ediləcəyi dosye adını göstər:"
 
 #: src/balsa-message.c:333
 msgid "File already exists. Overwrite?"
@@ -913,266 +924,267 @@ msgstr ""
 #: src/balsa-message.c:350
 #, c-format
 msgid " Could not save %s:%s "
-msgstr " Nisem mogel shraniti %s:%s "
+msgstr "%s:%s'yi qeyd edə bilmədim"
 
 #. Subject:
 #: src/balsa-message.c:643 src/print.c:358 src/sendmsg-window.c:941
 msgid "Subject:"
-msgstr "Zadeva:"
+msgstr "Mövzu:"
 
 #: src/balsa-message.c:646 src/print.c:361
 msgid "Date:"
-msgstr "Datum:"
+msgstr "Tarix:"
 
 #. From:
 #: src/balsa-message.c:651 src/filter-edit-dialog.c:316 src/print.c:348
 #: src/sendmsg-window.c:932
 msgid "From:"
-msgstr "Od:"
+msgstr "Yazan:"
 
 #. To:
 #: src/balsa-message.c:655 src/filter-edit-dialog.c:306 src/print.c:353
 #: src/sendmsg-window.c:935
 msgid "To:"
-msgstr "Za:"
+msgstr "Göndərilən:"
 
 #: src/balsa-message.c:656
 msgid "Cc:"
-msgstr "Cc:"
+msgstr "Köçürt:"
 
 #: src/balsa-message.c:657
 msgid "Bcc:"
-msgstr "Bcc:"
+msgstr "Gizli Köçürt:"
 
 #: src/balsa-message.c:660
 msgid "Fcc:"
-msgstr "Fcc:"
+msgstr "Davammiyyəti Köçürt:"
 
 #: src/balsa-message.c:726
 msgid "Could not load image. It is most likely corrupted."
-msgstr "Ni mo� nalo�iti slike. Verjetno je pokvarjena."
+msgstr ""
+"Rəsmi yükləyə bilmədim. Büyük bir ehtimalla rəsm \"xəsər gördü\"."
 
 #: src/balsa-message.c:731
 msgid "Couldn't render image\n"
-msgstr "Nisem mogel izrisati slike\n"
+msgstr "Rəsmi şəkilləndirə bilmədim\n"
 
 #: src/balsa-message.c:789
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
-"Za ta tip vsebine dejanje odpiranja ali pogleda ni dolo�eno (med gnome MIME "
-"tipi)"
+"GNOME MIME növlərində bu möhtəviyyat növü üçün heç bir açma ya "
+"da göstərme əməliyyatı seçilməyib"
 
 #: src/balsa-message.c:793
 #, c-format
 msgid "Content Type: %s"
-msgstr "Tip vsebine: %s"
+msgstr "Mövtəviyyat Növü: %s"
 
 #: src/balsa-message.c:798
 #, c-format
 msgid "Filename: %s"
-msgstr "Ime datoteke: %s"
+msgstr "Dosye adı : %s"
 
 #: src/balsa-message.c:806
 msgid "Save part"
-msgstr "Shrani del"
+msgstr "Bölməyi qeyd et"
 
 #: src/balsa-message.c:830
 #, c-format
 msgid "View part with %s"
-msgstr "Poglej del z %s"
+msgstr "Bölməyi %s ilə göstər"
 
 #: src/balsa-message.c:1438
 msgid "Save..."
-msgstr "Shrani..."
+msgstr "Qeyd Et..."
 
 #: src/balsa-message.c:1495
 #, c-format
 msgid "could not create temporary file %s"
-msgstr "nisem mogel ustvariti za�asne datoteke %s"
+msgstr "keçici dosye %s'yi yarada bilmədim"
 
 #: src/filter-edit-dialog.c:31
 msgid "Inbound"
-msgstr "Prihajajo�a"
+msgstr "Gələnlər"
 
 #: src/filter-edit-dialog.c:32
 msgid "Outbound"
-msgstr "Odhajajo�a"
+msgstr "Gedənlər"
 
 #: src/filter-edit-dialog.c:33
 msgid "Before Sending"
-msgstr "Pred Po�iljanjem"
+msgstr "Göndərmədən Əvvəl"
 
 #: src/filter-edit-dialog.c:34
 msgid "Demand"
-msgstr "Zahtevaj"
+msgstr "Isdə"
 
 #: src/filter-edit-dialog.c:38
 msgid "Matches"
-msgstr "Ustreza"
+msgstr "Uyuşanlar"
 
 #: src/filter-edit-dialog.c:39
 msgid "Doesn't Match"
-msgstr "Ne ustreza"
+msgstr "Uyuşmayanlar"
 
 #: src/filter-edit-dialog.c:40
 msgid "Always"
-msgstr "Vedno"
+msgstr "Həmişə"
 
 #: src/filter-edit-dialog.c:44
 msgid "Simple"
-msgstr "Enostavno"
+msgstr "Sadə"
 
 #: src/filter-edit-dialog.c:45
 msgid "Regular Expression"
-msgstr "Regularni Izraz"
+msgstr "Uzantılar"
 
 #: src/filter-edit-dialog.c:46
 msgid "External Command"
-msgstr "Zunanji Ukaz"
+msgstr "Xarici Əmr"
 
 #: src/filter-edit-dialog.c:50
 msgid "Copy to folder:"
-msgstr "Prepi�i v mapo:"
+msgstr "Qovluğa köçürt: "
 
 #: src/filter-edit-dialog.c:51
 msgid "Move to folder:"
-msgstr "Prestavi v mapo:"
+msgstr "Qovluğa daşı: "
 
 #: src/filter-edit-dialog.c:52
 msgid "Print on printer:"
-msgstr "Tiskaj na tiskalnik:"
+msgstr "Yazııda çap et: "
 
 #: src/filter-edit-dialog.c:53
 msgid "Run program:"
-msgstr "Po�eni program:"
+msgstr "İşə sal: "
 
 #: src/filter-edit-dialog.c:54
 msgid "Send to Trash"
-msgstr "Po�lji v Smeti"
+msgstr "Zibil qutusuna göndər"
 
 #: src/filter-edit-dialog.c:129
 msgid "On"
-msgstr "Vklopljeno"
+msgstr "Aç"
 
 #: src/filter-edit-dialog.c:194
 msgid "Up"
-msgstr "Gor"
+msgstr "Yuxarı"
 
 #: src/filter-edit-dialog.c:200
 msgid "Down"
-msgstr "Dol"
+msgstr "Aşağı"
 
 #: src/filter-edit-dialog.c:218
 msgid "New"
-msgstr "Nov"
+msgstr "Təzə"
 
 #: src/filter-edit-dialog.c:263
 msgid "Match in:"
-msgstr "I��i v:"
+msgstr "Burada tap:"
 
 #: src/filter-edit-dialog.c:276
 msgid "All"
-msgstr "Vsem"
+msgstr "Hamısı"
 
 #: src/filter-edit-dialog.c:286
 msgid "Header"
-msgstr "Glavi"
+msgstr "Baş"
 
 #: src/filter-edit-dialog.c:296
 msgid "Body"
-msgstr "Telesu sporo�ila"
+msgstr "Vücut"
 
 #: src/filter-edit-dialog.c:337
 msgid "Match string:"
-msgstr "Najdi niz:"
+msgstr "Axtarılacaq mətn:"
 
 #: src/filter-edit-dialog.c:384 src/sendmsg-window.c:566
 msgid "Remove"
-msgstr "Odstrani"
+msgstr "Sil"
 
 #: src/filter-edit-dialog.c:404
 msgid "Command:"
-msgstr "Ukaz:"
+msgstr "Əmr:"
 
 #. The name entry
 #: src/filter-edit-dialog.c:436
 msgid "Filter name:"
-msgstr "Ime filtra:"
+msgstr "Süzgəc adı:"
 
 #. The "Process when:" option menu
 #: src/filter-edit-dialog.c:451
 msgid "Process when:"
-msgstr "Obdelaj ko:"
+msgstr "Əmaliyyat şərti:"
 
 #. The "Run on:" option menu
 #: src/filter-edit-dialog.c:472
 msgid "Run on:"
-msgstr "Po�eni ob:"
+msgstr "İşə Sal:"
 
 #. the type notebook's option menu
 #: src/filter-edit-dialog.c:491
 msgid "Search type:"
-msgstr "Na�in iskanja:"
+msgstr "Axtarma növü:"
 
 #. The notification area
 #: src/filter-edit-dialog.c:538
 msgid "Notification:"
-msgstr "Obvestilo:"
+msgstr "Xəbər vermə yolu:"
 
 #. Notification buttons
 #: src/filter-edit-dialog.c:547
 msgid "Play sound:"
-msgstr "Predvajaj zvok:"
+msgstr "Səs çal:"
 
 #: src/filter-edit-dialog.c:554
 msgid "Use Sound..."
-msgstr "Uporabi Zvok..."
+msgstr "Səs istifadə et ..."
 
 #: src/filter-edit-dialog.c:559
 msgid "Popup text:"
-msgstr "Vzkli�no besedilo:"
+msgstr "Hoppanan mətn :"
 
 #. The action area
 #: src/filter-edit-dialog.c:574
 msgid "Action to perform:"
-msgstr "Dejanje, ki naj se izvr�i:"
+msgstr "Ediləcək əməliyyat:"
 
 #. The disposition area
 #: src/filter-edit-dialog.c:597
 msgid "Disposition:"
-msgstr "Odlo�i��e:"
+msgstr "Rədd Et : "
 
 #: src/filter-edit-dialog.c:608
 msgid "Place/leave in default folder"
-msgstr "Postavi/pusti v privzeti mapi"
+msgstr "Ana qovluqda burax"
 
 #: src/filter-edit-dialog.c:615
 msgid "Do not place/leave in default folder"
-msgstr "Ne postavi/pusti v privzeti mapi"
+msgstr "Ana qovluqda buraxma"
 
 #: src/filter-edit-dialog.c:622
 msgid "Stop filtering here"
-msgstr "Tu ustavi filtriranje"
+msgstr "Burada süzməyi dayandır"
 
 #: src/filter-edit-dialog.c:650
 msgid "Match"
-msgstr "Ujemajo�"
+msgstr "Tap"
 
 #: src/filter-edit-dialog.c:653
 msgid "Action"
-msgstr "Dejanje"
+msgstr "Əməliyyat"
 
 #: src/filter-edit-dialog.c:666
 msgid "Revert"
-msgstr "Razveljavi"
+msgstr "Çevir"
 
 #: src/filter-edit-dialog.c:693
 msgid "Balsa Filters"
-msgstr "Balsini Filtri"
+msgstr "Balsa Süzgəcləri"
 
 #: src/information-dialog.c:153
 msgid "Balsa Information"
-msgstr "Podatki o balsi"
+msgstr "Balsa bilgiləri"
 
 #: src/information-dialog.c:210
 msgid "WARNING: "
@@ -1189,11 +1201,11 @@ msgstr ""
 #: src/local-mailbox.c:164
 #, c-format
 msgid "Local Mailbox Loaded as: %s\n"
-msgstr "Krajevni po�tni predal nalo�en kot: %s\n"
+msgstr "Yerli ePoçt qutusu %s olaraq yükləndi\n"
 
 #: src/mailbox-conf.c:140
 msgid "No mailbox selected."
-msgstr "Noben po�tni predal ni izbran."
+msgstr "Heç bir ePoçt qutusu seçili deyil ."
 
 #. FIXME: Should prompt to remove file aswell
 #: src/mailbox-conf.c:163
@@ -1205,9 +1217,11 @@ msgid ""
 "mailbox again.\n"
 "What would you like to do?"
 msgstr ""
-"To bo odstranilo predal %s iz seznama po�tnih predalov\n"
-"Kasneje lahko uporabite \"Dodaj predal\" za dostop do tega predala\n"
-"Ste prepri�ani, da �elite odstraniti ta predal?"
+"Bu %s ePoçt qutusunu ePoçt qutuları siyahısından silmək "
+"üzərəsiniz.\n"
+"\"ePoçt qutusu əlavə et\" yoluyla o ePoçt qutusunu təzəden əlavə "
+"etdirə bilərsiniz\n"
+"Bu ePoçt qutusunu buradan silmek istədiyinizdən əminsiniz mi?"
 
 #: src/mailbox-conf.c:169 src/mailbox-conf.c:180
 msgid "Remove from list"
@@ -1224,22 +1238,24 @@ msgid ""
 "You may use \"Add Mailbox\" later to access this mailbox again\n"
 "What would you like to do?"
 msgstr ""
-"To bo odstranilo predal %s iz seznama po�tnih predalov\n"
-"Kasneje lahko uporabite \"Dodaj predal\" za dostop do tega predala\n"
-"Ste prepri�ani, da �elite odstraniti ta predal?"
+"Bu %s ePoçt qutusunu ePoçt qutuları siyahısından silmək "
+"üzərəsiniz.\n"
+"\"ePoçt qutusu əlavə et\" yoluyla o ePoçt qutusunu təzəden əlavə "
+"etdirə bilərsiniz\n"
+"Bu ePoçt qutusunu buradan silmek istədiyinizdən əminsiniz mi?"
 
 #: src/mailbox-conf.c:223
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-msgstr "Oopa! po�tni predal ni bil najden v balsa_app.mailbox vozli��ih?\n"
+msgstr "Eh ! balsa_app.mailbox nöqtələrində ePoçt qutusu tapılmadı?!?\n"
 
 #: src/mailbox-conf.c:250 src/mailbox-conf.c:305
 msgid "Mailbox Configurator"
-msgstr "Nastavitev Po�tnega Predala"
+msgstr "ePoçt qutusu Quraşdırıcısı"
 
 #: src/mailbox-conf.c:487
 #, c-format
 msgid "%s on %s"
-msgstr "%s na %s"
+msgstr "%s : %s'də "
 
 #: src/mailbox-conf.c:591
 #, c-format
@@ -1247,8 +1263,8 @@ msgid ""
 "Rename of %s to %s failed:\n"
 "%s"
 msgstr ""
-" Preimenovanje %s v %s ni uspelo: \n"
-" %s"
+"%s'nin %s'yə adlandırılması iflas etdi:\n"
+"%s"
 
 #: src/mailbox-conf.c:609
 #, fuzzy
@@ -1257,56 +1273,56 @@ msgid ""
 "Change the path instead.\n"
 "Mailbox not Updated.\n"
 msgstr ""
-"To je po�tni predal v va�em krajevnem imeniku.\n"
-"Namesto tega spremenite pot."
+"Bu yerli qovluqda olan bir ePoçt qutusudur.\n"
+"Lütfən yolu dəyişdir."
 
 #. mailbox name
 #: src/mailbox-conf.c:807 src/mailbox-conf.c:843 src/mailbox-conf.c:892
 #, fuzzy
 msgid "Mailbox _Name:"
-msgstr "Ime Predala:"
+msgstr "ePoçt qutusu adı:"
 
 #. path to file
 #: src/mailbox-conf.c:811
 #, fuzzy
 msgid "Mailbox _Path:"
-msgstr "Pot predala:"
+msgstr "ePoçt qutusu qovluqlaşdırılması:"
 
 #. pop server
 #: src/mailbox-conf.c:847 src/mailbox-conf.c:896
 #, fuzzy
 msgid "_Server:"
-msgstr "Stre�nik:"
+msgstr "Verici:"
 
 #. pop port
 #: src/mailbox-conf.c:851 src/mailbox-conf.c:900
 #, fuzzy
 msgid "_Port:"
-msgstr "Vrata:"
+msgstr "Qapı:"
 
 #. username
 #: src/mailbox-conf.c:855 src/mailbox-conf.c:904
 #, fuzzy
 msgid "_Username:"
-msgstr "Uporabni�ko ime:"
+msgstr "İstifadəci Adı:"
 
 #. password field
 #: src/mailbox-conf.c:859 src/mailbox-conf.c:908
 #, fuzzy
 msgid "Pass_word:"
-msgstr "Geslo:"
+msgstr "Parol:"
 
 #. toggle for apop
 #: src/mailbox-conf.c:864
 #, fuzzy
 msgid "Use _APOP Authentication"
-msgstr "GSSAPI avtentifikacija ni uspela."
+msgstr "GSSAPI doğrulaması iflas etdi."
 
 #. toggle for deletion from server
 #: src/mailbox-conf.c:867
 #, fuzzy
 msgid "_Delete messages from server after download"
-msgstr "Zbri�i Sporo�ila iz predala za smeti"
+msgstr "Zibil qutusundakı xəbərləri sil"
 
 #. Procmail
 #: src/mailbox-conf.c:871
@@ -1321,127 +1337,127 @@ msgstr ""
 #: src/mailbox-conf.c:912
 #, fuzzy
 msgid "F_older Path:"
-msgstr "Pot mape:"
+msgstr "Qovluq yolu:"
 
 #: src/main-window.c:203
 msgid "_Message..."
-msgstr "_Sporo�ilo..."
+msgstr "_Xəbər..."
 
 #: src/main-window.c:203
 msgid "Compose a new message"
-msgstr "Sestavi novo sporo�ilo"
+msgstr "Təzə bir xəbər yaz"
 
 #: src/main-window.c:209
 #, fuzzy
 msgid "Local Mbox mailbox..."
-msgstr "Lokalni po�tni predal"
+msgstr "Yerli ePoçt qutusu"
 
 #: src/main-window.c:210
 #, fuzzy
 msgid "Add a new mbox style mailbox"
-msgstr "Dodaj nov po�tni predal"
+msgstr "Təzə bir ePoçt qutusu əlavə et"
 
 #: src/main-window.c:214
 #, fuzzy
 msgid "Local Maildir mailbox..."
-msgstr "Lokalni po�tni predal"
+msgstr "Yerli ePoçt qutusu"
 
 #: src/main-window.c:215
 #, fuzzy
 msgid "Add a new maildir style mailbox"
-msgstr "Dodaj nov po�tni predal"
+msgstr "Təzə bir ePoçt qutusu əlavə et"
 
 #: src/main-window.c:219
 #, fuzzy
 msgid "Local MH mailbox..."
-msgstr "Lokalni po�tni predal"
+msgstr "Yerli ePoçt qutusu"
 
 #: src/main-window.c:220
 #, fuzzy
 msgid "Add a new MH style mailbox"
-msgstr "Dodaj nov po�tni predal"
+msgstr "Təzə bir ePoçt qutusu əlavə et"
 
 #: src/main-window.c:224
 #, fuzzy
 msgid "Remote IMAP mailbox..."
-msgstr "Znova odpiram predal..."
+msgstr "ePoçt qutusunu təzəden açıram ..."
 
 #: src/main-window.c:225
 #, fuzzy
 msgid "Add a new IMAP mailbox"
-msgstr "Dodaj nov po�tni predal"
+msgstr "Təzə bir ePoçt qutusu əlavə et"
 
 #: src/main-window.c:233
 msgid "_New"
-msgstr "_Novo"
+msgstr "Tə_zə"
 
 #: src/main-window.c:237
 msgid "_Continue"
-msgstr "N_adaljuj"
+msgstr "_davam et"
 
 #: src/main-window.c:238
 msgid "Continue editing current message"
-msgstr "Nadaljuj z urejanjem trenutnega sporo�ila"
+msgstr "Hazırkı xəbəri təzədan dəyişdir"
 
 #: src/main-window.c:245
 msgid "_Get New Mail"
-msgstr "_Dobi novo po�to"
+msgstr "_ePoçtya bax"
 
 #: src/main-window.c:245
 msgid "Fetch new incoming mail"
-msgstr "Prinesi novo prispelo po�to"
+msgstr "Təzə gələn ePoçtları dara"
 
 #: src/main-window.c:251
 msgid "_Send Queued Mail"
-msgstr "_Po�lji �akajo�o po�to"
+msgstr "_Növbədəki xəbərləri göndər"
 
 #: src/main-window.c:252
 msgid "Send mail from the outbox"
-msgstr "Po�lji izhodno po�to"
+msgstr "Göndərmə qutususundakı xəbəri göndər"
 
 #: src/main-window.c:260
 msgid "_Address Book..."
-msgstr "_Adresar..."
+msgstr "_Ünvan dəftəri..."
 
 #: src/main-window.c:261
 msgid "Opens the address book"
-msgstr "Odpre zibrko naslovov"
+msgstr "Ünvan dəftərini açar"
 
 #: src/main-window.c:288
 msgid "_Filters..."
-msgstr "_Filtri..."
+msgstr "_Süzgəclər..."
 
 #: src/main-window.c:288
 msgid "Manage filters"
-msgstr "Uredi filtre"
+msgstr "Süzgəcləri idarə et"
 
 #: src/main-window.c:295
 msgid "N_o Headers"
-msgstr "_Brez glav"
+msgstr "Başlıqsı_z"
 
 #: src/main-window.c:295
 msgid "Display no headers"
-msgstr "Ne prika�i glav"
+msgstr "Heç bir başlığı göstərme"
 
 #: src/main-window.c:297
 msgid "S_elected Headers"
-msgstr "_Izbrane glave"
+msgstr "_Seçili başlıqlar"
 
 #: src/main-window.c:298
 msgid "Display selected headers"
-msgstr "_Poka�i izbrane glave"
+msgstr "Seçili başlıqları göstər"
 
 #: src/main-window.c:300
 msgid "All _Headers"
-msgstr "_Vse glave"
+msgstr "Bü_tün başlıqlar"
 
 #: src/main-window.c:300
 msgid "Display all headers"
-msgstr "Poka�i vse glave"
+msgstr "Bütün başlıqları göstər"
 
 #: src/main-window.c:307
 msgid "_Show Mailbox Tree"
-msgstr "_Ka�i drevo predalov"
+msgstr "ePoçt qutusu _ağacını göstər"
 
 #: src/main-window.c:308
 msgid "Toggle display of mailbox and folder tree"
@@ -1449,7 +1465,7 @@ msgstr ""
 
 #: src/main-window.c:311
 msgid "Show Mailbox _Tabs"
-msgstr "Ka�i _tabulatorje predalov"
+msgstr "ePoçt qutusu _tablarını göstər"
 
 #: src/main-window.c:312
 msgid "Toggle display of mailbox notebook tabs"
@@ -1457,245 +1473,247 @@ msgstr ""
 
 #: src/main-window.c:316 src/message-window.c:94
 msgid "_Wrap"
-msgstr "_Prevoj"
+msgstr "_Qır"
 
 #: src/main-window.c:316 src/sendmsg-window.c:212
 msgid "Wrap message lines"
-msgstr "Lomi vrstice sporo�ila"
+msgstr "Xəbər sətirlərini qır"
 
 #: src/main-window.c:327 src/message-window.c:103
 msgid "_Reply..."
-msgstr "_Odgovori..."
+msgstr "_Cavabla..."
 
 #: src/main-window.c:328
 msgid "Reply to the current message"
-msgstr "Odgovori na trenutno sporo�ilo"
+msgstr "Hazırkı xəbərə cavab ver"
 
 #: src/main-window.c:335
 msgid "Reply To _All..."
-msgstr "Odgovori _vsem..."
+msgstr "Hamısını cav_abla..."
 
 #: src/main-window.c:336
 msgid "Reply to all recipients of the current message"
-msgstr "Odgovori vsem prejetnikom trenutnega sporo�ila"
+msgstr "Seçili xəbərin alıcılarına cavabla"
 
 #: src/main-window.c:343
 #, fuzzy
 msgid "Reply To _Group..."
-msgstr "Odgovori _vsem..."
+msgstr "Hamısını cav_abla..."
 
 #: src/main-window.c:344
 #, fuzzy
 msgid "Reply to mailing list"
-msgstr "Odgovori vsem"
+msgstr "Hamısına cavab ver"
 
 #: src/main-window.c:351 src/message-window.c:114
 msgid "_Forward..."
-msgstr "_Posreduj naprej..."
+msgstr "_Davam Etdir..."
 
 #: src/main-window.c:352
 msgid "Forward the current message"
-msgstr "Trenutno sporo�ilo posreduj naprej"
+msgstr "Hazırkı xəbəri başqasına davam etdir"
 
 #: src/main-window.c:359 src/message-window.c:119
 msgid "Next Part"
-msgstr "Naslednji del"
+msgstr "Bir bölmə irəli"
 
 #: src/main-window.c:359 src/message-window.c:119
 msgid "Next Part in Message"
-msgstr "Naslednji del sporo�ila"
+msgstr "Xəbərdə bir vahid irəli get"
 
 #: src/main-window.c:365 src/message-window.c:123
 msgid "Previous Part"
-msgstr "Prej�nji del"
+msgstr "Bir bölmə arxaya"
 
 #: src/main-window.c:366 src/message-window.c:124
 msgid "Previous Part in Message"
-msgstr "Prej�nji del sporo�ila"
+msgstr "Xəbədə bir vahid arxaya get"
 
 #: src/main-window.c:372 src/message-window.c:128
 msgid "Save Current Part..."
-msgstr "Shrani trenutni del..."
+msgstr "Hazırkı bölməyi qeyd et..."
 
 #: src/main-window.c:373 src/message-window.c:129
 msgid "Save Current Part in Message"
-msgstr "Shrani Trenutni Del Sporo�ila"
+msgstr "Xəbərdəki hazırkı bölməyi qeyd et"
 
 #: src/main-window.c:381
 msgid "_Delete"
-msgstr "_Zbri�i"
+msgstr "_Sil"
 
 #: src/main-window.c:381
 msgid "Delete the current message"
-msgstr "Zbri�i trenutno sporo�ilo"
+msgstr "Hazırkı xəbəri sil"
 
 #: src/main-window.c:388
 msgid "_Undelete"
-msgstr "_Odbri�i"
+msgstr "_Qurtar"
 
 #: src/main-window.c:388
 msgid "Undelete the message"
-msgstr "Odbri�i sporo�ilo"
+msgstr "Xəbəri qurtar"
 
 #: src/main-window.c:395
 msgid "_Toggle Flagged"
-msgstr "_Preklopi ozna�bo"
+msgstr "_Işarətlə"
 
 #: src/main-window.c:395
 msgid "Toggle flagged"
-msgstr "Preklopi ozna�bo"
+msgstr "Işarətlə"
 
 #: src/main-window.c:403
 msgid "_Store Address..."
-msgstr "_Shrani Naslov..."
+msgstr "Ünvanı _qeyd et..."
 
 #: src/main-window.c:404
 msgid "Store address of sender in addressbook"
-msgstr "Shrani naslov po�iljatelja v knjigo naslovov"
+msgstr "Göndərənin ePoçt ünvanını ünvan dəftərinə əlavə et"
 
 #: src/main-window.c:414
 msgid "Next Message"
-msgstr "Naslednje Sporo�ilo"
+msgstr "Sonrakı Xəbər"
 
 #: src/main-window.c:420
 msgid "Previous Message"
-msgstr "Prej�nje Sporo�ilo"
+msgstr "Əvvəlki Xəbər"
 
 #: src/main-window.c:426 src/main-window.c:427
 msgid "Next Unread Message"
-msgstr "Naslednje neprebrano sporo�ilo"
+msgstr "Sonrakı Oxunmamış Xəbər"
 
 #: src/main-window.c:433
 msgid "_Edit..."
-msgstr "_Uredi..."
+msgstr "_Dəyişdir..."
 
 #: src/main-window.c:433
 msgid "Edit the selected mailbox"
-msgstr "Uredi izbran predal"
+msgstr "Seçili ePoçt qutusunu dəyişdir"
 
 #: src/main-window.c:437
 msgid "_Delete..."
-msgstr "_Zbri�i..."
+msgstr "_Sil..."
 
 #: src/main-window.c:438
 msgid "Delete the selected mailbox"
-msgstr "Zbri�i izbran predal"
+msgstr "Seçili ePoçt qutusunu sil"
 
 #: src/main-window.c:444
 msgid "Co_mmit Current"
-msgstr "_Udejani trenutno"
+msgstr "Hazırkını _uyğula"
 
 #: src/main-window.c:445
 msgid "Commit the changes in the currently opened mailbox"
-msgstr "Udejani spremembe na trenutno odprtem po�tenem predalu"
+msgstr ""
+"Hazırda açıq olan ePoçt qutusundakı dəyişlikləri "
+"bərabərlaşdir/uyğula"
 
 #: src/main-window.c:449
 msgid "_Close"
-msgstr "_Zapri"
+msgstr "_Qapat"
 
 #: src/main-window.c:449
 msgid "Close mailbox"
-msgstr "Zapri predal"
+msgstr "ePoçt qutusunu qapat"
 
 #: src/main-window.c:453
 msgid "Empty _Trash"
-msgstr "Sprazni _Smeti"
+msgstr "Zibil qutusunu _boşalt"
 
 #: src/main-window.c:454
 msgid "Delete Messages from the trash mailbox"
-msgstr "Zbri�i Sporo�ila iz predala za smeti"
+msgstr "Zibil qutusundakı xəbərləri sil"
 
 #: src/main-window.c:476
 msgid "_Message"
-msgstr "_Sporo�ilo"
+msgstr "_Xəbər"
 
 #: src/main-window.c:477
 msgid "Mail_box"
-msgstr "_Po�tni predal"
+msgstr "_ePoçt qutusu"
 
 #: src/main-window.c:485
 msgid "Check"
-msgstr "Preveri"
+msgstr "Bax"
 
 #: src/main-window.c:485
 msgid "Check Email"
-msgstr "Preveri E-po�to"
+msgstr "ePoçta bax"
 
 #: src/main-window.c:490
 msgid "Delete Message"
-msgstr "Zbri�i Sporo�ilo"
+msgstr "Xəbəri sil"
 
 #: src/main-window.c:495
 msgid "Compose"
-msgstr "Sestavi"
+msgstr "Yaz"
 
 #: src/main-window.c:495
 msgid "Compose Message"
-msgstr "Sestavi Sporo�ilo"
+msgstr "Xəbər yaz"
 
 #: src/main-window.c:499
 msgid "Continue"
-msgstr "Nadaljuj"
+msgstr "Davam et"
 
 #: src/main-window.c:503
 msgid "Reply"
-msgstr "Odgovori"
+msgstr "Cavab"
 
 #: src/main-window.c:507
 msgid ""
 "Reply\n"
 "To All"
 msgstr ""
-"Odgovori\n"
-"vsem"
+"Hamısına\n"
+"cavab ver"
 
 #: src/main-window.c:507
 msgid "Reply to all"
-msgstr "Odgovori vsem"
+msgstr "Hamısına cavab ver"
 
 #: src/main-window.c:511
 msgid "Forward"
-msgstr "Posreduj naprej"
+msgstr "Davam Etdir"
 
 #: src/main-window.c:517
 msgid "Previous"
-msgstr "Nazaj"
+msgstr "Əvvəlki"
 
 #: src/main-window.c:517
 msgid "Open Previous message"
-msgstr "Odpri Prej�nje sporo�ilo"
+msgstr "Bir xəbər arxaya"
 
 #: src/main-window.c:522
 msgid "Next"
-msgstr "Naprej"
+msgstr "Sonrakı"
 
 #: src/main-window.c:522
 msgid "Open Next message"
-msgstr "Odpri Naslednje sporo�ilo"
+msgstr "Bir xəbər irəli"
 
 #: src/main-window.c:526
 msgid ""
 "Next\n"
 "Unread"
 msgstr ""
-"Naslednje\n"
-"neprebrano"
+"Sonrakı\n"
+"Oxunmamış"
 
 #: src/main-window.c:526
 msgid "Open Next Unread Message"
-msgstr "Odpri naslednje neprebrano sporo�ilo"
+msgstr "Sonrakı Oxunmamış Xəbəri Aç"
 
 #: src/main-window.c:530 src/print.c:60 src/sendmsg-window.c:156
 msgid "Print"
-msgstr "Natisni"
+msgstr "Çap Et"
 
 #: src/main-window.c:530
 msgid "Print current message"
-msgstr "Natisni trenutno sporo�ilo"
+msgstr "Hazırkı xəbəri çap et"
 
 #: src/main-window.c:1148
 msgid "Copyright (C) 1997-2000"
-msgstr "Avtorske pravice pridr�ane (C) 1997-2000"
+msgstr "Təlif haqqı (C) 1997-2000"
 
 #: src/main-window.c:1151
 msgid ""
@@ -1704,25 +1722,27 @@ msgid ""
 "\n"
 "If you need to report bugs, please do so at: http://bugs.gnome.org/"
 msgstr ""
-"Odjemalec elektronske po�te Balsa je del GNOME namizja.  Podatke o Balsi "
-"lahko najdete na  http://www.balsa.net/\n"
+"Balsa ePoçt uyğulaması GNOME masaüstü çevrəsinin bir parçasıdır "
+".Balsa'yla əlaqəli bilgilərə \"http://www.balsa.net/\"'dən çata "
+"bilərsiniz.\n"
 "\n"
-"�e �elite poro�ati o hro��ih, to storite na: http://bugs.gnome.org/"
+"Xəta raportları göndermək məcburiyyatində qalarsanız , lütfən "
+"\"http://bugs.gnome.org/\"'a gedin."
 
 #: src/main-window.c:1522
 #, c-format
 msgid "Sending error: %s"
-msgstr "Po�iljam napako: %s"
+msgstr "Göndərmə xətası: %s"
 
 #: src/main-window.c:1887
 #, c-format
 msgid "Commiting mailbox %s failed."
-msgstr "Uveljavljanje po�tnega predala %s ni uspelo."
+msgstr "ePoçt qutusu %s'nin bərəbərləşdirilməsi iflas etdi."
 
 #: src/main-window.c:2108
 #, c-format
 msgid "Balsa: %s (readonly)"
-msgstr "Balsa: %s (le berljiv)."
+msgstr "Balsa: %s (sırf oxunan)"
 
 #: src/main-window.c:2110
 #, c-format
@@ -1731,326 +1751,326 @@ msgstr "Balsa: %s"
 
 #: src/main.c:107
 msgid "Get new mail on startup"
-msgstr "Poberi novo po�to ob zagonu"
+msgstr "Başlarkən təzə ePoçtu al"
 
 #: src/main.c:109
 msgid "Compose a new email to EMAIL@ADDRESS"
-msgstr "Sestavi novo sporo�ilo za EPO�TNI@NASLOV"
+msgstr ""
 
 #: src/main.c:111
 msgid "Opens MAILBOXNAME"
-msgstr "Odpre IMEPREDALA"
+msgstr "MAILBOXNAME'i aç"
 
 #: src/main.c:111
 msgid "MAILBOXNAME"
-msgstr "IMEPREDALA"
+msgstr "MAILBOXNAME"
 
 #: src/main.c:114
 msgid "Opens first unread mailbox"
-msgstr "Odpre prvi neprebran predal"
+msgstr "Ilk oxunmamış məktubları olan ePoçt qutusunu açar"
 
 #: src/main.c:132 src/main.c:137 src/main.c:143 src/main.c:149 src/main.c:155
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
-msgstr "Balsa ne more odpreti po�tnega predala \"%s\"."
+msgstr "Balsa \"%s\" ePoçt qutusunu aça bilmədi ."
 
 #: src/main.c:132
 msgid "Inbox"
-msgstr "Vhodni predal"
+msgstr "Gələnlər qutusu"
 
 #: src/main.c:138
 msgid "Outbox"
-msgstr "Odhodni predal"
+msgstr "Gedənlər qutusu"
 
 #: src/main.c:144
 msgid "Sentbox"
-msgstr "Poslana po�ta"
+msgstr "Göndərilənlər qutusu"
 
 #: src/main.c:150
 msgid "Draftbox"
-msgstr "Osnutki"
+msgstr "Lahiyələr qutusu"
 
 #: src/main.c:155
 msgid "Trash"
-msgstr "Smeti"
+msgstr "Zibil qutusu"
 
 #: src/message-window.c:61
 msgid "N_o headers"
-msgstr "_Brez glav"
+msgstr "_Heç bir başlığı göstərme"
 
 #: src/message-window.c:63
 msgid "_Selected headers"
-msgstr "_Izbrane glave"
+msgstr "_Seçili başlıqları  göstər"
 
 #: src/message-window.c:65
 msgid "All _headers"
-msgstr "_Vse glave"
+msgstr "Bü_tün başlıqları göstər"
 
 #: src/message-window.c:103
 msgid "Reply to this message"
-msgstr "Odgovori na to sporo�ilo"
+msgstr "Bu xəbərə cavab ver"
 
 #: src/message-window.c:108
 msgid "Reply to _all..."
-msgstr "Odgovori _vsem..."
+msgstr "Hamısını cav_abla..."
 
 #: src/message-window.c:109
 msgid "Reply to all recipients of this message"
-msgstr "Odgovori vsem prejemnikom tega sporo�ila"
+msgstr "Bu xəbərin bütün alıcılarına cavab ver"
 
 #: src/message-window.c:114
 msgid "Forward this message"
-msgstr "Posreduj to sporo�ilo"
+msgstr "Bu xəbəryi davam etdir"
 
 #: src/pref-manager.c:171
 msgid "Text"
-msgstr "Besedilo"
+msgstr "Mətn"
 
 #: src/pref-manager.c:172
 msgid "Icons"
-msgstr "Ikone"
+msgstr "Timsallar"
 
 #: src/pref-manager.c:173
 msgid "Both"
-msgstr "Oboje"
+msgstr "Ikisi də"
 
 #: src/pref-manager.c:183
 msgid "7bits"
-msgstr "7 bitno"
+msgstr "7 bit"
 
 #: src/pref-manager.c:184
 msgid "8bits"
-msgstr "8 bitno"
+msgstr "8 bit"
 
 #: src/pref-manager.c:185
 msgid "quoted"
-msgstr "citirano"
+msgstr "məhdudlaşdırılmış"
 
 #: src/pref-manager.c:195
 msgid "While Retrieving Messages"
-msgstr "Med prena�anjem sporo�il"
+msgstr "Xəbərləri Alarkən"
 
 #: src/pref-manager.c:196
 msgid "Until Closed"
-msgstr "Dokler se ne zapre"
+msgstr "Bağlanıncaya Qədər"
 
 #: src/pref-manager.c:197
 msgid "Never"
-msgstr "Nikoli"
+msgstr "Heç bir vaxt"
 
 #: src/pref-manager.c:201
 msgid "Fast"
-msgstr "Hitro"
+msgstr "Sür'ətli"
 
 #: src/pref-manager.c:202
 msgid "Normal"
-msgstr "Obi�ajno"
+msgstr "Normal"
 
 #: src/pref-manager.c:203
 msgid "Bad Spellers"
-msgstr "Slabi �rkovalniki"
+msgstr "Ağır imla xətaları"
 
 #: src/pref-manager.c:227
 msgid "Balsa Preferences"
-msgstr "Nastavitve Balse"
+msgstr "Balsa qurğuları"
 
 #: src/pref-manager.c:238 src/pref-manager.c:1108
 msgid "Identity"
-msgstr "Identiteta"
+msgstr "Şəxsiyyət"
 
 #: src/pref-manager.c:242 src/pref-manager.c:1131
 msgid "Signature"
-msgstr "Podpis"
+msgstr "Imza"
 
 #: src/pref-manager.c:246
 msgid "Mail Servers"
-msgstr "Po�tni stre�niki"
+msgstr "ePoçt vericiləri"
 
 #: src/pref-manager.c:250 src/pref-manager.c:1954
 msgid "Address Books"
-msgstr "Adresarji"
+msgstr "Ünvan dəftərləri"
 
 #: src/pref-manager.c:254
 msgid "Mail Options"
-msgstr "Mo�nmosti po�te"
+msgstr "ePoçt qurğuları"
 
 #: src/pref-manager.c:258
 msgid "Display"
-msgstr "Prikaz"
+msgstr "Göstər"
 
 #: src/pref-manager.c:263 src/pref-manager.c:1618 src/pref-manager.c:1658
 msgid "Printing"
-msgstr "Tiskanje"
+msgstr "Çap Edilir"
 
 #: src/pref-manager.c:267
 msgid "Spelling"
-msgstr "�rkovanje"
+msgstr "Hecalama"
 
 #: src/pref-manager.c:271 src/pref-manager.c:1779
 msgid "Misc"
-msgstr "Razno"
+msgstr "Qarışıq"
 
 #: src/pref-manager.c:275
 msgid "Startup"
-msgstr "Zagon"
+msgstr "Başlanğıc"
 
 #: src/pref-manager.c:956
 msgid "Yes"
-msgstr "Da"
+msgstr "Bəli"
 
 #: src/pref-manager.c:1112
 msgid "Your name:"
-msgstr "Va�e ime:"
+msgstr "Adınız:"
 
 #: src/pref-manager.c:1113
 msgid "E-mail address:"
-msgstr "E-po�tni naslov:"
+msgstr "ePoçt ünvanınız:"
 
 #: src/pref-manager.c:1114
 msgid "Reply-to address:"
-msgstr "Naslov za odgovor:"
+msgstr "Cavab-veriləcək ünvan:"
 
 #: src/pref-manager.c:1115
 msgid "Default domain:"
-msgstr "Privzeta domena:"
+msgstr "Əsas verici :"
 
 #: src/pref-manager.c:1136
 msgid "Use signature file when:"
-msgstr "Uporabi datoteko s podpisom kadar:"
+msgstr "Imza dosyesini bu şərt altında istifadə et :"
 
 #: src/pref-manager.c:1140
 msgid "sending mail"
-msgstr "po�iljam po�to"
+msgstr "xəbəri göndərirəm"
 
 #: src/pref-manager.c:1141
 msgid "replying to mail"
-msgstr "odgovarjam na po�to"
+msgstr "xəbərə cavab verirəm"
 
 #: src/pref-manager.c:1142
 msgid "forwarding mail"
-msgstr "posredujem po�to"
+msgstr "xəbəri davam etdirirəm"
 
 #: src/pref-manager.c:1144
 msgid "Signature file:"
-msgstr "Datoteka s podpisom:"
+msgstr "Imza dosyesi:"
 
 #: src/pref-manager.c:1151
 msgid "Select your signature file"
-msgstr "Izberite datoteko z va�im podpisom"
+msgstr "Imza dosyeni seç"
 
 #: src/pref-manager.c:1159
 msgid "Reply prefix:"
-msgstr "Predpona odgovora:"
+msgstr "Cavablama başlığı:"
 
 #: src/pref-manager.c:1162
 msgid "enable signature separator"
-msgstr "vklju�i lo�itev podpisa"
+msgstr "imza ayırıcısı istifadə et"
 
 #: src/pref-manager.c:1187
 msgid "Remote Mailbox Servers"
-msgstr "Oddaljeni sre�niki po�tnih predalov"
+msgstr "Uzaqdakı ePoçt qutusu vericilərini sil"
 
 #: src/pref-manager.c:1209 src/pref-manager.c:1976
 msgid "Type"
-msgstr "Tip"
+msgstr "Növ"
 
 #: src/pref-manager.c:1212
 msgid "Mailbox Name"
-msgstr "Ime predala"
+msgstr "ePoçt qutu adı:"
 
 #: src/pref-manager.c:1218 src/pref-manager.c:1988
 msgid "Modify"
-msgstr "Spremeni"
+msgstr "Dəyişdir"
 
 #: src/pref-manager.c:1221
 msgid "Local mail"
-msgstr "Krajevna po�ta"
+msgstr "Yerli ePoçt"
 
 #: src/pref-manager.c:1231
 msgid "Select your local mail directory"
-msgstr "Izberite va� krajevni po�tni imenik"
+msgstr "Yerli ePoçt qovluğu"
 
 #: src/pref-manager.c:1240
 msgid "Outgoing mail"
-msgstr "Odhodna po�ta"
+msgstr "Gedən ePoçt"
 
 #: src/pref-manager.c:1262
 #, fuzzy
 msgid "Port"
-msgstr "Vrata:"
+msgstr "Qapı:"
 
 #: src/pref-manager.c:1269
 msgid "Remote SMTP Server"
-msgstr "Oddaljen stre�nik SMTP"
+msgstr "Uzaqdakı bir SMTP vericisi"
 
 #: src/pref-manager.c:1278
 msgid "Local mail user agent"
-msgstr "Krajevni po�tni agent"
+msgstr "Yerli ePoçt agenti"
 
 #: src/pref-manager.c:1304
 msgid "Incoming"
-msgstr "Prihodna"
+msgstr "Gələn"
 
 #: src/pref-manager.c:1306
 msgid "Outgoing"
-msgstr "Odhodna"
+msgstr "Gedən"
 
 #: src/pref-manager.c:1325
 msgid "Checking"
-msgstr "Preverjam"
+msgstr "Yoxlama"
 
 #: src/pref-manager.c:1333 src/pref-manager.c:1808
 msgid "Minutes"
-msgstr "Minut"
+msgstr "Dəqiqə"
 
 #: src/pref-manager.c:1345
 msgid "Check mail automatically every:"
-msgstr "Samodejno preveri po�to vsakih:"
+msgstr "ePoçta avtomatik bax:"
 
 #. Quoted text regular expression
 #: src/pref-manager.c:1351
 msgid "Quoted Text"
-msgstr "Citirano besedilo"
+msgstr "Məhdudlaşdırılmış mətn"
 
 #: src/pref-manager.c:1359
 msgid "Quoted Text Regular Expression"
-msgstr "Regularni izraz kot citirano besedilo"
+msgstr "Mahdudlaşdırma Uzantıları"
 
 #: src/pref-manager.c:1383
 msgid "Word Wrap"
-msgstr "Lomi vrstice ob besedah"
+msgstr "Kəlimə Qırması"
 
 #: src/pref-manager.c:1393
 msgid "Wrap Outgoing Text at:"
-msgstr "Lomi odhodno besedilo pri:"
+msgstr "Gedən xəbərlərin metnini qır :"
 
 #: src/pref-manager.c:1406
 msgid "Characters"
-msgstr "Znakih"
+msgstr "Hərf"
 
 #: src/pref-manager.c:1410
 msgid "Other options"
-msgstr "Ostale nastavitve"
+msgstr "O biri seçənəklər"
 
 #: src/pref-manager.c:1417
 msgid "Default Bcc to:"
-msgstr "Privzet Bcc na:"
+msgstr "Əsas Bcc:"
 
 #: src/pref-manager.c:1419
 msgid "Encoding"
-msgstr "Zapis"
+msgstr "Şəkilləndirmə"
 
 #: src/pref-manager.c:1464
 msgid "Main window"
-msgstr "Glavno okno"
+msgstr "Ana pəncərə"
 
 #: src/pref-manager.c:1470
 msgid "use preview pane"
-msgstr "uporabi polje predogleda"
+msgstr "Ön izləmə görüşünü istifadə et"
 
 #: src/pref-manager.c:1472
 msgid "Show mailbox statistics in left pane"
-msgstr "Ka�i statistiko po�tnega predala v levem polju"
+msgstr "Sol paneldə ePoçt statistikalarını göstər"
 
 #: src/pref-manager.c:1474
 msgid "Use alternative main window layout"
@@ -2058,102 +2078,102 @@ msgstr ""
 
 #: src/pref-manager.c:1479
 msgid "Toolbars"
-msgstr "Orodjarne"
+msgstr "Ləvazimat çubuqları"
 
 #: src/pref-manager.c:1496
 msgid "Display progress dialog"
-msgstr "Prika�i dialog z napredkom"
+msgstr "İrəliləmə dialoqunu göstər"
 
 #: src/pref-manager.c:1502
 msgid "Display Formats"
-msgstr "Na�ini Izpisa"
+msgstr "Şəkilləndirmələri Göstər"
 
 #: src/pref-manager.c:1508
 msgid "Date encoding (for strftime):"
-msgstr "Na�in izpisa datuma (za strftime):"
+msgstr "Tarix şəkilləndirməsi ( strftime üçün ):"
 
 #: src/pref-manager.c:1509
 msgid "Selected headers:"
-msgstr "Izbrane glave:"
+msgstr "Seçili başlıqlar :"
 
 #. Information messages frame...
 #: src/pref-manager.c:1523
 msgid "Information Messages"
-msgstr "Informativna sporo�ila"
+msgstr "Bilgiləndirme Xəbərləri"
 
 #. gtk_table_set_row_spacings(GTK_TABLE(information_table), 1);
 #. gtk_table_set_col_spacings(GTK_TABLE(information_table), 5);
 #: src/pref-manager.c:1531
 msgid "Informational Messages"
-msgstr "Informativna sporo�ila "
+msgstr "Bilgiləndirmə Xəbərləri"
 
 #: src/pref-manager.c:1544
 msgid "Warning Messages"
-msgstr "Opozorilna sporo�ila"
+msgstr "Xəbərdarlıqlar"
 
 #: src/pref-manager.c:1557
 msgid "Error Messages"
-msgstr "Sporo�ila o napakah"
+msgstr "Xəta Xəbərləri"
 
 #: src/pref-manager.c:1570
 #, fuzzy
 msgid "Fatal Error Messages"
-msgstr "Sporo�ila o napakah"
+msgstr "Xəta Xəbərləri"
 
 #: src/pref-manager.c:1583
 msgid "Debug Messages"
-msgstr "Razhro��evalna sporo�ila"
+msgstr "Xəta Həlli Xəbərləri"
 
 #: src/pref-manager.c:1643
 msgid "characters"
-msgstr "znaki"
+msgstr "hərflərdən sonra"
 
 #: src/pref-manager.c:1646
 msgid "Print command:"
-msgstr "Ukaz za tiskanje:"
+msgstr "Çap Etmə əmri :"
 
 #: src/pref-manager.c:1652
 msgid "Break line at:"
-msgstr "Prelomi vrstico pri:"
+msgstr "Sətri qır :"
 
 #. pspell frame
 #: src/pref-manager.c:1708
 msgid "Pspell Settings"
-msgstr "Nastavitve programa pspell"
+msgstr "Pspell Qurğuları"
 
 #. do the module menu
 #: src/pref-manager.c:1714
 msgid "Spell Check Module"
-msgstr "Modul za preverjanje �rkovanje"
+msgstr "Imla Yoxlama Modulu"
 
 #: src/pref-manager.c:1720
 msgid "Suggestion Level"
-msgstr "Stopnja predlogov"
+msgstr "Tövsiyyə Səviyyəsi"
 
 #: src/pref-manager.c:1728
 msgid "Ignore words shorter than"
-msgstr "Prezri besede kraj�e od"
+msgstr "Bəlli bir qiymətdən qısa kəlimələri yoxlama"
 
 #. ignore signature check box
 #: src/pref-manager.c:1735
 msgid "Misc Spelling Settings"
-msgstr "Razli�ne nastavitve �rkovanja"
+msgstr "Qarışıq imla qurğular_ı"
 
 #: src/pref-manager.c:1741
 msgid "Check signature"
-msgstr "Preveri podpis"
+msgstr "Imzayı yoxla"
 
 #: src/pref-manager.c:1745
 msgid "Check quoted"
-msgstr "Preveri citirano"
+msgstr "Məhdudlaşdırmayı yoxla"
 
 #: src/pref-manager.c:1785
 msgid "Debug"
-msgstr "Razhro��evanje"
+msgstr "Həll Et"
 
 #: src/pref-manager.c:1789
 msgid "Empty trash on exit"
-msgstr "Sprazni smeti ob izhodu"
+msgstr "Çıxışda zibil qutusunu boşalt"
 
 #: src/pref-manager.c:1797
 msgid "Automatically close mailbox if unused more than"
@@ -2162,84 +2182,84 @@ msgstr ""
 #. font
 #: src/pref-manager.c:1813
 msgid "Font"
-msgstr "Pisava"
+msgstr "Yazıtipi"
 
 #: src/pref-manager.c:1835 src/pref-manager.c:1878
 msgid "Select a font to use"
-msgstr "Izberite pisavo, ki naj se uprabi"
+msgstr "İstifadə ediləcak yazıtipini seç"
 
 #: src/pref-manager.c:1839 src/pref-manager.c:1882
 msgid "Browse..."
-msgstr "Brskaj..."
+msgstr "Gəz ..."
 
 #: src/pref-manager.c:1847 src/pref-manager.c:1890
 msgid "Preview pane"
-msgstr "Polje predogleda"
+msgstr "Ön izləmə bucağı"
 
 #. Subject Font
 #: src/pref-manager.c:1855
 msgid "Subject Header Font"
-msgstr "Izberi pisavo glave"
+msgstr "Mövzu başlığı yazıtipi"
 
 #. mblist unread colour
 #: src/pref-manager.c:1897
 msgid "Colours"
-msgstr "Barve"
+msgstr "Rənglər"
 
 #: src/pref-manager.c:1904
 msgid "Mailbox with unread messages colour"
-msgstr "Barva predala z neprebranimi sporo�ili"
+msgstr "Oxunmamış xəbərləri daxil edən ePoçt qutusunun rəngi"
 
 #: src/pref-manager.c:1906
 #, fuzzy
 msgid "Quoted text primary colour"
-msgstr "Osnovna barva"
+msgstr "Ilk rəng"
 
 #: src/pref-manager.c:1908
 #, fuzzy
 msgid "Quoted text secondary color"
-msgstr "Drugotna barva"
+msgstr "Ikinci rəng"
 
 #: src/pref-manager.c:1922
 msgid "Options"
-msgstr "Mo�nosti"
+msgstr "Qurğular"
 
 #: src/pref-manager.c:1929
 msgid "Check mail upon startup"
-msgstr "Preveri po�to ob zagonu"
+msgstr "Başlanğıcda təzə ePoçt üçün bak"
 
 #: src/pref-manager.c:1934
 msgid "Remember open mailboxes between sessions"
-msgstr "Zapomni si odprte predale med sejami"
+msgstr "Oturumlar arasında açıq ePoçt qutularını ağlında tut"
 
 #: src/pref-manager.c:1979
 msgid "Address Book Name"
-msgstr "Ime adresarja"
+msgstr "Ünvan dəftəri adı"
 
 #: src/pref-manager.c:1983
 msgid "Expand aliases"
-msgstr "Raz�iri soimena"
+msgstr "Ləqəblari tamamla"
 
 #: src/pref-manager.c:1990
 msgid "Set as default"
-msgstr "Postavi za privzeto"
+msgstr "Əsas olaraq seç"
 
 #: src/pref-manager.c:2237
 msgid "Show Nothing"
-msgstr "Ne ka�i ni�esar"
+msgstr "Heç bir şey göstərme"
 
 #: src/pref-manager.c:2238
 msgid "Show Dialog"
-msgstr "Ka�i dialog"
+msgstr "Dialoq Göstər"
 
 #: src/pref-manager.c:2239
 msgid "Show In List"
-msgstr "Ka�i v seznamu"
+msgstr "Siyahıda Göstər"
 
 #: src/pref-manager.c:2240
 #, fuzzy
 msgid "Print to console"
-msgstr "Tiskaj na tiskalnik:"
+msgstr "Yazııda çap et: "
 
 #: src/print.c:73
 #, c-format
@@ -2247,12 +2267,12 @@ msgid ""
 "Enter print command below\n"
 "Remember to include '%s'"
 msgstr ""
-"Vnesite ukaz za tiskanje\n"
-"Ne pozabite na '%s'"
+"Çap əmrinı altda göstər\n"
+"'%s''yi istifadə etməyi unutma !"
 
 #: src/print.c:82
 msgid "Print Command:"
-msgstr "Ukaz Za Tiskanje:"
+msgstr "Çap Əmri :"
 
 #: src/print.c:462
 #, c-format
@@ -2260,70 +2280,70 @@ msgid ""
 "Balsa could not find font %s\n"
 "Printing is not possible"
 msgstr ""
-"Balsa ni mogla najti pisave %s\n"
-"Tisk ni mo�en"
+"Balsa yazıtipi %s'yi tapamadı.\n"
+"Çap etmək bu şərtlər altında mümkün deyildir"
 
 #: src/print.c:503
 #, fuzzy
 msgid "Print message"
-msgstr "Natisni sporo�ilo"
+msgstr "Xəbəri çap et"
 
 #: src/print.c:529
 msgid "Balsa: message print preview"
-msgstr "Balsa: predogled tiskanja sporo�ila"
+msgstr "Balsa: xəbər çap etmə ön izləməsi"
 
 #: src/print.c:643
 #, c-format
 msgid "Page: %i/%i"
-msgstr "Stran: %i/%i"
+msgstr "Səhifə: %i/%i"
 
 #: src/sendmsg-window.c:135
 msgid "Send"
-msgstr "Po�lji"
+msgstr "Gönder"
 
 #: src/sendmsg-window.c:135
 msgid "Send this mail"
-msgstr "Po�lji to sporo�ilo"
+msgstr "Bu xəbəri gönder"
 
 #: src/sendmsg-window.c:140
 msgid "Attach"
-msgstr "Prilo�i"
+msgstr "Əlavə Et"
 
 #: src/sendmsg-window.c:141
 msgid "Add attachments to this message"
-msgstr "Dodaj prilogo temu sporo�ilu"
+msgstr "Bu xəbərə əlavələr et"
 
 #: src/sendmsg-window.c:145
 msgid "Postpone"
-msgstr "Odlo�i"
+msgstr "Sonraya burax"
 
 #: src/sendmsg-window.c:146
 msgid "Continue this message later"
-msgstr "Nadaljuj s tem sporo�ilom kasneje"
+msgstr "Bu xəbərə sonra davam et"
 
 #: src/sendmsg-window.c:150 src/sendmsg-window.c:226
 msgid "Check Spelling"
-msgstr "Preveri �rkovanje"
+msgstr "Hecala"
 
 #: src/sendmsg-window.c:152
 msgid "Run a spelling check on the current message"
-msgstr "Po�eni preverjanje �rkovanja na trenutnem sporo�ilu"
+msgstr "Hazırkı xəbərə imla yoxlaması et"
 
 #: src/sendmsg-window.c:166
 msgid "_Include File..."
-msgstr "_Vklju�i Datoteko..."
+msgstr "Dosye _daxil..."
 
 #: src/sendmsg-window.c:170
 msgid "_Attach File..."
-msgstr "_Prilo�i datoteko..."
+msgstr "Dosye _əlavə et..."
 
 #: src/sendmsg-window.c:176
 msgid "_Send"
-msgstr "_Po�lji"
+msgstr "Gö_ndər"
 
 #: src/sendmsg-window.c:177
 msgid "Send the currently edited message"
-msgstr "Po�lji trenutno urejeno sporo�ilo"
+msgstr "Hazırda dəyişdirilen xəbəri göndər"
 
 #: src/sendmsg-window.c:181
 msgid "_Queue"
@@ -2335,43 +2355,43 @@ msgstr ""
 
 #: src/sendmsg-window.c:186
 msgid "_Postpone"
-msgstr "_Odlo�i"
+msgstr "_Sonraya burax"
 
 #: src/sendmsg-window.c:190
 msgid "Print..."
-msgstr "Natisni..."
+msgstr "Çap Et..."
 
 #: src/sendmsg-window.c:190
 msgid "Print the edited message"
-msgstr "Natisni urejeno sporo�ilo"
+msgstr "Hazırda dəyişdirilən xəbəri çap et"
 
 #: src/sendmsg-window.c:207
 msgid "Select All"
-msgstr "Izberi vse"
+msgstr "Hamısıni seç"
 
 #: src/sendmsg-window.c:212
 msgid "_Wrap Body"
-msgstr "_Lomi telo"
+msgstr "Xəbəri qı_r"
 
 #: src/sendmsg-window.c:217
 msgid "_Reflow Paragraph"
-msgstr "_Znova postavi odstavek"
+msgstr "Pa_raqrafı təzəden qır"
 
 #: src/sendmsg-window.c:221
 msgid "R_eflow Message"
-msgstr "Z_nova postavi sporo�ilo"
+msgstr "Xəbəri t_əzədən qır"
 
 #: src/sendmsg-window.c:235
 msgid "Fr_om"
-msgstr "_Od"
+msgstr "_Yazan"
 
 #: src/sendmsg-window.c:237
 msgid "_To"
-msgstr "_Za"
+msgstr "_Göndərilən"
 
 #: src/sendmsg-window.c:239
 msgid "_Subject"
-msgstr "Z_adeva"
+msgstr "_Mövzu"
 
 #: src/sendmsg-window.c:241
 msgid "_Cc"
@@ -2387,132 +2407,132 @@ msgstr "_Fcc"
 
 #: src/sendmsg-window.c:247
 msgid "_Reply To"
-msgstr "_Odgovor na"
+msgstr "_Cavabla"
 
 #: src/sendmsg-window.c:249
 msgid "_Attachments"
-msgstr "_Priloge"
+msgstr "_Əlavələr"
 
 #: src/sendmsg-window.c:252
 msgid "_Comments"
-msgstr "_Komentarji"
+msgstr "_Şərhlər"
 
 #: src/sendmsg-window.c:255
 msgid "_Keywords"
-msgstr "K_lju�ne besede"
+msgstr "A_çar sözcüklər"
 
 #: src/sendmsg-window.c:293 src/sendmsg-window.c:375
 msgid "Brazilian"
-msgstr "Brazil��ina"
+msgstr "Braziliya"
 
 #: src/sendmsg-window.c:294 src/sendmsg-window.c:377
 msgid "Catalan"
-msgstr "Katalon��ina"
+msgstr "Katalan"
 
 #: src/sendmsg-window.c:295 src/sendmsg-window.c:379
 msgid "Danish"
-msgstr "Dan��ina"
+msgstr "Danimarkaca"
 
 #: src/sendmsg-window.c:296 src/sendmsg-window.c:383
 msgid "Dutch"
-msgstr "Nizozem��ina"
+msgstr "Flemenkcə"
 
 #: src/sendmsg-window.c:297 src/sendmsg-window.c:385
 msgid "English"
-msgstr "Angle��ina"
+msgstr "Ingilizcə"
 
 #: src/sendmsg-window.c:298 src/sendmsg-window.c:387
 msgid "Estonian"
-msgstr "Eston��ina"
+msgstr "Estonca"
 
 #: src/sendmsg-window.c:299 src/sendmsg-window.c:389
 msgid "Finnish"
-msgstr "Fin��ina"
+msgstr "Fincə"
 
 #: src/sendmsg-window.c:300 src/sendmsg-window.c:391
 msgid "French"
-msgstr "Franco��ina"
+msgstr "Fransızca"
 
 #: src/sendmsg-window.c:301 src/sendmsg-window.c:381
 msgid "German"
-msgstr "Nem��ina"
+msgstr "Almanca"
 
 #: src/sendmsg-window.c:302 src/sendmsg-window.c:393
 msgid "Greek"
-msgstr "Gr��ina"
+msgstr "Yunanca"
 
 #: src/sendmsg-window.c:303 src/sendmsg-window.c:395
 msgid "Hungarian"
-msgstr "Mad�ar��ina"
+msgstr "Macarca"
 
 #: src/sendmsg-window.c:304 src/sendmsg-window.c:397
 msgid "Italian"
-msgstr "Italjan��ina"
+msgstr "Italyanca"
 
 #: src/sendmsg-window.c:305 src/sendmsg-window.c:399
 msgid "Japanese"
-msgstr "Japon��ina"
+msgstr "Yaponca "
 
 #: src/sendmsg-window.c:310 src/sendmsg-window.c:401
 msgid "Korean"
-msgstr "Korej��ina"
+msgstr "Koreyaca"
 
 #: src/sendmsg-window.c:311 src/sendmsg-window.c:403
 msgid "Latvian"
-msgstr "Latvij��ina"
+msgstr "Latışca"
 
 #: src/sendmsg-window.c:312 src/sendmsg-window.c:405
 msgid "Lithuanian"
-msgstr "Litvan��ina"
+msgstr "Litvanca"
 
 #: src/sendmsg-window.c:313 src/sendmsg-window.c:407
 msgid "Norwegian"
-msgstr "Norve��ina"
+msgstr "Norveçcə"
 
 #: src/sendmsg-window.c:314 src/sendmsg-window.c:409
 msgid "Polish"
-msgstr "Polj��ina"
+msgstr "Polyakca"
 
 #: src/sendmsg-window.c:315 src/sendmsg-window.c:411
 msgid "Portugese"
-msgstr "Portugal��ina"
+msgstr "Portuqalca"
 
 #: src/sendmsg-window.c:316 src/sendmsg-window.c:413
 #, fuzzy
 msgid "Romanian"
-msgstr "Eston��ina"
+msgstr "Estonca"
 
 #: src/sendmsg-window.c:317 src/sendmsg-window.c:415
 msgid "Russian (ISO)"
-msgstr "Rusko (ISO)"
+msgstr "Rusca (ISO)"
 
 #: src/sendmsg-window.c:318 src/sendmsg-window.c:417
 msgid "Russian (KOI)"
-msgstr "Rusko (KOI)"
+msgstr "Rusca (KOI)"
 
 #: src/sendmsg-window.c:319 src/sendmsg-window.c:419
 msgid "Slovak"
-msgstr "Slova��ina"
+msgstr "Slovakca"
 
 #: src/sendmsg-window.c:320 src/sendmsg-window.c:421
 msgid "Spanish"
-msgstr "�pan��ina"
+msgstr "İspanca"
 
 #: src/sendmsg-window.c:321 src/sendmsg-window.c:423
 msgid "Swedish"
-msgstr "�ved��ina"
+msgstr "Isveçcə"
 
 #: src/sendmsg-window.c:322 src/sendmsg-window.c:425
 msgid "Turkish"
-msgstr "Tur��ina"
+msgstr "Türkcə"
 
 #: src/sendmsg-window.c:323 src/sendmsg-window.c:427
 msgid "Ukrainian"
-msgstr "Ukrain��ina"
+msgstr "Ukraynaca"
 
 #: src/sendmsg-window.c:330
 msgid "_A-J"
-msgstr "_A-H"
+msgstr "_A-J"
 
 #: src/sendmsg-window.c:331
 msgid "_K-Z"
@@ -2520,33 +2540,33 @@ msgstr "_K-Z"
 
 #: src/sendmsg-window.c:362
 msgid "_Show"
-msgstr "_Prika�i"
+msgstr "_Göstər"
 
 #: src/sendmsg-window.c:364
 msgid "_Language"
-msgstr "_Jezik"
+msgstr "_Dil"
 
 #: src/sendmsg-window.c:630
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
 msgstr ""
-"Slika za prilogo (balsa/attachment.png) ni bila najdena.\n"
-"To pomeni, da ne morete prilagati datotek.\n"
+"Əlavələr rəsmi ( balsa/attachment.png ) tapılmadı.\n"
+"Heç bir dosye əlavə etməyəcəyim.\n"
 
 #: src/sendmsg-window.c:645
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
-msgstr "Ne morem dobiti podatkov o datoteki '%s': %s\n"
+msgstr "`%s' dosyenın bilgilərini ala bilmədim: %s\n"
 
 #: src/sendmsg-window.c:651
 #, c-format
 msgid "Attachment is not a regular file or cannot be read: '%s'\n"
-msgstr "Priloga ni obi�ajna datoteka ali pa ne more biti prebrana: '%s'\n"
+msgstr "Əlavə normal bir dosye deyil ya da oxuna bilmədi: '%s'\n"
 
 #: src/sendmsg-window.c:727
 msgid "Attach file"
-msgstr "Prilo�i datoteko"
+msgstr "Dosye əlavə et"
 
 #. cc:
 #: src/sendmsg-window.c:943
@@ -2566,26 +2586,26 @@ msgstr "fcc:"
 #. Reply To:
 #: src/sendmsg-window.c:974
 msgid "Reply To:"
-msgstr "Odgovor Na:"
+msgstr "Cavabla :"
 
 #. Attachment list
 #: src/sendmsg-window.c:978
 msgid "Attachments:"
-msgstr "Priloge:"
+msgstr "Əlavələr:"
 
 #. Comments:
 #: src/sendmsg-window.c:1023
 msgid "Comments:"
-msgstr "Komentarji:"
+msgstr "Şərhlər:"
 
 #. Keywords:
 #: src/sendmsg-window.c:1026
 msgid "Keywords:"
-msgstr "Klju�ne besede:"
+msgstr "Açar sözcüklər :"
 
 #: src/sendmsg-window.c:1120
 msgid "you"
-msgstr "vi"
+msgstr "sən"
 
 #: src/sendmsg-window.c:1125
 #, c-format
@@ -2594,7 +2614,7 @@ msgid ""
 "On %s %s wrote:\n"
 msgstr ""
 "\n"
-"Na %s %s pi�e:\n"
+"%s'də %s bunu yazmış:\n"
 
 #: src/sendmsg-window.c:1128
 #, c-format
@@ -2603,395 +2623,232 @@ msgid ""
 "%s wrote:\n"
 msgstr ""
 "\n"
-"%s je napisal:\n"
+"%s bunu yazmış:\n"
 
 #: src/sendmsg-window.c:1206
 msgid "Reply to "
-msgstr "Odgovor na "
+msgstr "Cavabla"
 
 #: src/sendmsg-window.c:1211
 msgid "Forward message"
-msgstr "Po�lji sporo�ilo naprej"
+msgstr "Xəbəri davam etdir"
 
 #: src/sendmsg-window.c:1216
 msgid "Continue message"
-msgstr "Nadaljuj s sporo�ilom"
+msgstr "Xəbərə davam et"
 
 #: src/sendmsg-window.c:1221
 msgid "New message"
-msgstr "Novo sporo�ilo"
+msgstr "Təzə xəbər"
 
 #: src/sendmsg-window.c:1515
 #, c-format
 msgid "Could not open the file %s.\n"
-msgstr "Nisem mogel odpreti datoteke %s.\n"
+msgstr "Dosye %s'yi aça bilmədim.\n"
 
 #: src/sendmsg-window.c:1517
 msgid "Loading..."
-msgstr "Nalagam..."
+msgstr "Yüklənir ..."
 
 #: src/sendmsg-window.c:1544
 msgid "Include file"
-msgstr "Vklju�i datoteko"
+msgstr "Dosyeyi daxil et"
 
 #: src/sendmsg-window.c:1822
 msgid "Cannot execute print command."
-msgstr "Ne morem izvr�iti ukaza za tiskanje."
+msgstr "Çap etmə əmrinı işə sala bilmədim."
 
 #: src/sendmsg-window.c:1845
 msgid "Error executing lpr"
-msgstr "Napaka ob izvajanju lpr (programa za tiskanje)"
+msgstr "lpr'i işə salarkən xəta oldu"
 
 #: src/spell-check.c:482
 msgid "Replace the current word with the selected suggestion"
-msgstr "Zamenjaj trenutno besedo z izbranim predlogom"
+msgstr "Hazırkı tövsiyyəyi qəbul et və uyğula"
 
 #: src/spell-check.c:489
 #, fuzzy
 msgid "Replace all occurences of the current word with the selected suggestion"
-msgstr "Zamenjaj vse pojavitve trenutne besede z izbranim predlogom"
+msgstr "Hazırkı tövsiyyəyi hər dəfə qəbul et və uyğula"
 
 #: src/spell-check.c:496
 msgid "Skip the current word"
-msgstr "Presko�i trenutno besedo"
+msgstr "Hazırkı kəliməyi keç"
 
 #: src/spell-check.c:501
 msgid "Skip all occurances of the current word"
-msgstr "Presko�i vse pojavitve trenutne besede"
+msgstr "Hazırkı kəlimənin bütün təkrarlarını keç"
 
 #: src/spell-check.c:507
 #, fuzzy
 msgid "Add the current word to your personal dictionary"
-msgstr "Dodaj trenutno besedo v osebni slovar�ek"
+msgstr "Hazırkı kəliməyi şəxsi sözlüyə əlavə et"
 
 #: src/spell-check.c:513
 msgid "Finish spell checking"
-msgstr "Kon�aj preverjanje �rkovanja"
+msgstr "Imla yoxlamasını qurtar"
 
 #: src/spell-check.c:518
 msgid "Revert all changes and finish spell checking"
-msgstr "Zanemari vse spremembe in ko�aj preverjanje �rkovanja"
+msgstr "Bütün dəyişiklikləri geri al və imla yoxlamasını bitir"
 
 #: src/store-address.c:52
 msgid "Card Name:"
-msgstr "Ime Kartice:"
+msgstr "Kart Adı:"
 
 #: src/store-address.c:52
 msgid "First Name:"
-msgstr "Ime:"
+msgstr "Ad :"
 
 #: src/store-address.c:53
 msgid "Last Name:"
-msgstr "Priimek:"
+msgstr "Soyad :"
 
 #: src/store-address.c:53
 msgid "Organization:"
-msgstr "Organizacija:"
+msgstr "Quruluş:"
 
 #: src/store-address.c:54
 msgid "Email Address:"
-msgstr "E-po�tni naslov:"
+msgstr "ePoçt ünvani :"
 
 #: src/store-address.c:75
 msgid "In order to store an address, you must select a message.\n"
-msgstr "�e ho�ete shraniti naslov, morate izbrati sporo�ilo.\n"
+msgstr "Bir ünvani qeyd etmək üçün bir xəbəri seçməlisən.\n"
 
 #: src/store-address.c:86
 msgid "You may only store one address at a time.\n"
-msgstr "Shranite lahko le en naslov hkrati.\n"
+msgstr "Bir dəfədə sadəcə olaraq bir ünvan qeyd edə bilərsən.\n"
 
 #: src/store-address.c:100
 msgid "This message doesn't contain an e-mail address.\n"
-msgstr "To sporo�ilo ne vsebuje e-po�tnega naslova.\n"
+msgstr "Bu xəbərdə bir ePoçt ünvani yoxdur.\n"
 
 #: src/store-address.c:148
 msgid "Store Address"
-msgstr "Shrani Naslov"
+msgstr "Ünvani qeyd et"
 
 #: src/store-address.c:151
 msgid "Contact Information"
-msgstr "Kontaktne informacije"
+msgstr "Təmas bilgiləri"
 
 #: src/store-address.c:242
 msgid "No address book selected...."
-msgstr "Noben adresar ni izbran...."
+msgstr "Heç bir ünvan dəftəri seçili deyildir..."
 
 #: src/store-address.c:254
 msgid "Sorry, no semicolons are allowed in the name!\n"
-msgstr "Oprostite, dvopi�ja v imenu niso dovoljena!\n"
+msgstr "Təəsüf ki adda vergül-nöqtalər istifadə edə bilməzsiiz!\n"
 
 #~ msgid "Could not find address for host %s."
-#~ msgstr "Nisem mogel najti naslova za stre�nik %s."
+#~ msgstr "Verici %s üçün ünvani ala bilmədim."
 
 #~ msgid "Unable to get APOP seed from server"
-#~ msgstr "S stre�nika ne morem dobiti APOP semena"
+#~ msgstr "Vericidən APOP verisini ala bilmədim"
 
 #~ msgid "Add New Address"
-#~ msgstr "Dodaj Nov Naslov"
+#~ msgstr "Təzə bir ünvan əlavə et"
 
 #~ msgid "E-Mail Address:"
-#~ msgstr "E-po�tni Naslov:"
+#~ msgstr "EPoçt ünvani:"
 
 #~ msgid "Import first address only"
-#~ msgstr "Uvozi le prvi naslov"
+#~ msgstr "Sadəcə ilk ePoçt ünvanı"
 
-#~ msgid "Import all adresses"
-#~ msgstr "Uvozi vse naslove"
+#~ msgid "Import all ünvanses"
+#~ msgstr "Bütün ePoçt ünvanlarını itxal et"
 
 #~ msgid ""
 #~ "This will remove the mailbox %s and it's files permanently from your "
 #~ "system.\n"
 #~ "Are you sure you want to remove this mailbox?"
 #~ msgstr ""
-#~ "To bo permanentno odstranilo po�tni predal %s in njegove datoteke iz "
-#~ "sistema.\n"
-#~ "Ste prepri�ani, da �elite odstraniti ta predal?"
+#~ "Bu %s ePoçt qutusunu və dosyelərini sistemdən həmişə siləcəkdir .\n"
+#~ "Bu ePoçt qutusunu həqiqətən də silmək istəyirsiniz mi?"
 
 #~ msgid "You need to fill in the Mailbox Name field."
-#~ msgstr "Vpisati morate Ime predala."
+#~ msgstr "ePoçt qutusunun adını göstərməlisiniz."
 
 #~ msgid "You need to fill in the Mailbox Path field."
-#~ msgstr "Vpisati morate pot do predala."
+#~ msgstr "ePoçt qutusunun yolunu göstərməlisiniz."
 
 #~ msgid "You need to fill in the folderpath field."
-#~ msgstr "Vpisati morate Imenik mape."
+#~ msgstr "Yol girişini boş buraxa bilməzsiniz."
 
 #~ msgid "You need to fill in the IMAP Server field"
-#~ msgstr "Vpisati morate IMAP Stre�nik"
+#~ msgstr "IMAP vericisi vahidini boş buraxa bilməzsiniz"
 
 #~ msgid "You need to fill in the username field"
-#~ msgstr "Vpisati morate uporabni�ko ime"
+#~ msgstr "İstifadəci adını göstərməlisiniz"
 
 #~ msgid "You need to fill in the port field"
-#~ msgstr "Vpisati morate vrata"
+#~ msgstr "Qapı nömrəsini göstərməlisiniz"
 
 #~ msgid "You need to fill in the user field."
-#~ msgstr "Vpisati morate polje uporabnik."
+#~ msgstr "İstifadəci vahidini doldurmalısınız."
 
 #~ msgid "You need to fill in the server field."
-#~ msgstr "Vpisati morate stre�nik."
+#~ msgstr "Verici vahidini doldurmalısınız."
 
 #~ msgid "You need to fill in the port field."
-#~ msgstr "Vpisati morate vrata."
+#~ msgstr "Qapı nömrəsi vahidini doldurmalısınız."
 
 #~ msgid "Some of the fields are blank."
-#~ msgstr "Nekatera polja so prazna."
+#~ msgstr "Bə'zi vahidlər boş buraxılmışdır."
 
 #~ msgid "Could not access mailbox '%s'"
-#~ msgstr "Ne morem dostopati do po�tnega predala '%s'"
+#~ msgstr "ePoçt qutusu %s'yə çata bilmədim"
 
 #~ msgid "New mailbox type:"
-#~ msgstr "Tip novega predala:"
+#~ msgstr "Təzə ePoçt qutusu növü:"
 
 #~ msgid "Single IMAP folder"
-#~ msgstr "Ena sama mapa IMAP"
+#~ msgstr "Tək IMAP qovluğu"
 
 #~ msgid "IMAP folder set"
-#~ msgstr "Mno�ica map IMAP"
+#~ msgstr "IMAP qovluq kütləsi"
 
 #~ msgid "Use APOP"
-#~ msgstr "UporabI APOP"
+#~ msgstr "APOP istifadə et"
 
 #~ msgid "Delete from server"
-#~ msgstr "Zbri�i s sre�nika"
+#~ msgstr "Vericidən sil"
 
 #~ msgid "_Mailbox..."
-#~ msgstr "_Po�tni predal..."
+#~ msgstr "_ePoçt qutusu..."
+
+#~ msgid "Compose a new email to azerb_linux@hotmail.com"
+#~ msgstr "azerb_linux@hotmail.com a təzə bir ePoçt yaz"
 
 #~ msgid "Add New Mailbox..."
-#~ msgstr "Dodaj nov predal..."
+#~ msgstr "Təzə ePoçt qutusu əlavə et..."
 
 #~ msgid "Open"
-#~ msgstr "Odpri"
+#~ msgstr "Aç"
 
 #~ msgid "Close"
-#~ msgstr "Zapri"
+#~ msgstr "Qapat"
 
 #~ msgid "Properties..."
-#~ msgstr "Lastnosti..."
+#~ msgstr "Xüsusiyyətlər..."
 
 #~ msgid "Mark as Inbox"
-#~ msgstr "Ozna�i kot dohodno po�to"
+#~ msgstr "Gələnlər qutusu olaraq işarətlə"
 
 #~ msgid "Mark as Sentbox"
-#~ msgstr "Ozna�i kot poslano po�to"
+#~ msgstr "Göndərilənlər qutusu olaraq işarətlə"
 
 #~ msgid "Mark as Trash"
-#~ msgstr "Ozna�i kot smeti"
+#~ msgstr "Zibil qutusu olaraq işarətlə"
 
 #~ msgid "Mark as Draftbox"
-#~ msgstr "Ozna�i kot osnutek"
+#~ msgstr "Lahiyələr qutusu olaraq işarətlə"
 
 #~ msgid ">"
 #~ msgstr ">"
 
 #~ msgid "Charset"
-#~ msgstr "Nabor znakov"
+#~ msgstr "Yazıtipi şəkilləndirilməsi"
 
 #~ msgid "Colour of quoted text"
-#~ msgstr "Barva citiranega besedila"
-
-#~ msgid "Couldn't open destination mailbox (%s) for copying"
-#~ msgstr "Nisem mogel odpreti ciljenga predala (%s) za kopiranje"
-
-#~ msgid "Couldn't open destination mailbox (%s) for writing"
-#~ msgstr "Nisem mogel odpreti ciljnega predala (%s) za pisanje"
-
-#~ msgid "Source mailbox (%s) is readonly. Cannot move message"
-#~ msgstr "Izvorni predal (%s) je le berljiv. Ne morem premakniti sporo�ila"
-
-#~ msgid "Path"
-#~ msgstr "Pot"
-
-#~ msgid ""
-#~ "Failed to do a search: %s\n"
-#~ "Check that the base name is valid."
-#~ msgstr ""
-#~ "Nisem uspel izvesti iskanja: %s\n"
-#~ "Preverite ali je ime baze veljavno."
-
-#~ msgid ""
-#~ "Connection to server established.\n"
-#~ "No e-mail addresses were found.\n"
-#~ "Check the base domain name."
-#~ msgstr ""
-#~ "Povezava s stre�nikom vzpostavljena.\n"
-#~ "E-po�tnih naslovov ni bilo najdenih.\n"
-#~ "Preverite ime baze."
-
-#~ msgid "LDAP tested OK."
-#~ msgstr "LDAP preizku�en v redu."
-
-#~ msgid "Baltic"
-#~ msgstr "Balt��ina"
-
-#~ msgid "Russian"
-#~ msgstr "Ru��ina"
-
-#~ msgid "Pr_int"
-#~ msgstr "_Natisni"
-
-#~ msgid "Print current mail"
-#~ msgstr "Natisni trenutno sporo�ilo"
-
-#~ msgid "_Add"
-#~ msgstr "_Dodaj"
-
-#~ msgid ""
-#~ "In order to store an address, you must open a mailbox and select a message.\n"
-#~ msgstr ""
-#~ "�e �elite shraniti naslov, morate odpreti predal in izbrati sporo�ilo.\n"
-
-#~ msgid "Open Mailbox"
-#~ msgstr "Odpri predal"
-
-#~ msgid "Close Mailbox"
-#~ msgstr "Zapri predal"
-
-#~ msgid "Edit Mailbox Properties"
-#~ msgstr "Uredi lastnosti predala"
-
-#~ msgid "Delete Mailbox"
-#~ msgstr "Zbri�i predal"
-
-#~ msgid "_Western (ISO-8859-1)"
-#~ msgstr "_Zahodno (ISO-8859-1)"
-
-#~ msgid "W_estern (ISO-8859-15)"
-#~ msgstr "Z_ahodno (ISO-8859-15)"
-
-#~ msgid "_Central European (ISO-8859-2)"
-#~ msgstr "_Centralno evropsko (ISO-8859-2)"
-
-#~ msgid "_South European (ISO-8859-3)"
-#~ msgstr "_Ju�no evropsko (ISO-8859-3)"
-
-#~ msgid "_Baltic (ISO-8859-13)"
-#~ msgstr "_Balti�ko (ISO-8859-13)"
-
-#~ msgid "Cy_rillic (ISO-8859-5)"
-#~ msgstr "_Cirilica (ISO-8859-5)"
-
-#~ msgid "_Hebrew (ISO-8859-8)"
-#~ msgstr "_Hebrej��ina (ISO-8859-8)"
-
-#~ msgid "_Turkish (ISO-8859-9)"
-#~ msgstr "_Tur��ina (ISO-8859-9)"
-
-#~ msgid "Ce_ltic (ISO-8859-14)"
-#~ msgstr "_Keltsko (ISO-8859-14)"
-
-#~ msgid "_ISO Charset"
-#~ msgstr "_ISO nabor znakov"
-
-#~ msgid "OK"
-#~ msgstr "V redu"
-
-#~ msgid ""
-#~ "Unable to open address book %s for reading.\n"
-#~ " - %s\n"
-#~ msgstr ""
-#~ "Ne morem odpreti adresarja %s za branje.\n"
-#~ " - %s\n"
-
-#~ msgid "Balsa Warning"
-#~ msgstr "Balsa opozorilo"
-
-#~ msgid ""
-#~ "Unable to open %s for read.\n"
-#~ " - %s\n"
-#~ msgstr ""
-#~ "Ne morem odpreti %s za branje.\n"
-#~ " - %s\n"
-
-#~ msgid "The Card Name field must be non-empty.\n"
-#~ msgstr "Ime Kartice mora biti vpisano.\n"
-
-#~ msgid ""
-#~ "There is already an address book entry for %s.\n"
-#~ "Run GnomeCard if you would like to edit your address book entries.\n"
-#~ msgstr ""
-#~ "Vnos v adresar za %s �e obstaja.\n"
-#~ "Po�enite GnomeCard �e �elite urediti va�e naslove.\n"
-
-#~ msgid "Mailbox name"
-#~ msgstr "Ime predala"
-
-#~ msgid "Select your address book file"
-#~ msgstr "Izberite va�o datoteko adresarja"
-
-#~ msgid "On %s you wrote:\n"
-#~ msgstr "%s ste napisali:\n"
-
-#~ msgid "You wrote:\n"
-#~ msgstr "Ste napisali:\n"
-
-#~ msgid "List"
-#~ msgstr "Seznam"
-
-#~ msgid "Error: "
-#~ msgstr "Napaka: "
-
-#~ msgid "Balsa does not know how to display this message part"
-#~ msgstr "Balsa ne zna predstaviti tega dela sporo�ila"
-
-#~ msgid "You need to fill in the password field"
-#~ msgstr "Vpisati morate geslo"
-
-#~ msgid "You need to fill in the password field."
-#~ msgstr "Vpisati morate geslo."
-
-#~ msgid "An error occurred when attempting to creat(2) the file \"%s\"."
-#~ msgstr "Zgodila se je napaka ob poskusu ukaza creat(2) na datoteki \"%s\"."
-
-#~ msgid "Error"
-#~ msgstr "Napaka"
-
-#~ msgid "Ok"
-#~ msgstr "V redu"
-
-#~ msgid "Content Type: %s/%s"
-#~ msgstr "Tip Vsebine: %s/%s"
-
-#~ msgid "Mailbox: Opening %s Refcount: %d\n"
-#~ msgstr "Malbox: Odpiram %s �tevec referenc: %d\n"
+#~ msgstr "Məhjdudlaşdırılmış mətn rəngi"

@@ -1,5 +1,6 @@
 [__section_info__]
 description=Balsa E-mail reader
+description[az]=Balsa ePoΓ§t oxuyucusu
 description[ca]=Lector de correu Balsa
 description[da]=E-postprogrammet Balsa
 description[el]=Πρόγραμμα Ηλεκτρονικής Αλληλογραφίας Balsa
@@ -19,6 +20,7 @@ description[wa]=Manaedjeu d' emilaedjes Balsa
 [startup]
 file=balsa/startup.wav
 description=Program startup
+description[az]=Proqram baΕlanΔΔ±cΔ±
 description[ca]=Inici del programa
 description[da]=Opstart af program
 description[el]=Έναρξη του προγράμματος

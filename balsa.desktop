@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=Balsa
+Name[az]=Balsa
 Name[ca]=Balsa
 Name[cs]=Balsa
 Name[da]=Balsa
@@ -33,6 +34,7 @@ Name[wa]=Balsa
 Name[zh_CN.GB2312]=Balsa
 Name[zh_TW.Big5]=Balsa
 Comment=E-Mail utility
+Comment[az]=ePoçt Proqramı
 Comment[ca]=Programa gestor de correu
 Comment[cs]=Program pro elektronickou po�tu
 Comment[da]=Epostklient

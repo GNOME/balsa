@@ -1,3 +1,7 @@
+2001-01-06  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* *.desktop,sounds/*.soundlist: added Azeri strings
+
 2001-01-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-app.c: move local dir back to the top.

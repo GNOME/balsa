@@ -73,7 +73,7 @@ do {\
 
 #define UNLOCK_MAILBOX(mailbox)          ((mailbox)->lock--)
 
-#define MAILBOX_IS_LOCKED(mailbox) ((mailbox)->lock > 0)
+#define HAVE_MAILBOX_LOCKED(mailbox) ((mailbox)->lock > 0)
 
 #endif
 

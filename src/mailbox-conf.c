@@ -282,6 +282,7 @@ mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
       gtk_container_add (GTK_CONTAINER (bbox), mcw->ok);
       gtk_signal_connect (GTK_OBJECT (mcw->ok), "clicked",
 			  (GtkSignalFunc) mailbox_conf_close, (void *) TRUE);
+
     }
   else if (mcw->mailbox)
     {

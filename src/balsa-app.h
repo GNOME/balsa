@@ -101,6 +101,7 @@ extern struct BalsaApplication
   
   gboolean previewpane;
   gboolean debug;
+  gboolean smtp;
   
   /* arp --- string to prefix "replied to" messages. */
   gchar *quote_str;

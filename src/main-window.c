@@ -688,7 +688,6 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
   gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(dialog)->vbox), w, FALSE, FALSE, 0);
 
   gtk_widget_show_all(dialog);
-
   check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input);
   check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
 

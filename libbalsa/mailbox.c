@@ -146,7 +146,7 @@ check_all_imap_hosts (Mailbox * to, GList *mailboxes)
 
 
 void
-check_all_pop3_hosts (Mailbox * to, GList *mailboxes)
+check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
 {
   GList *list;
   Mailbox *mailbox;
@@ -154,9 +154,10 @@ check_all_pop3_hosts (Mailbox * to, GList *mailboxes)
 
   list = g_list_first (mailboxes);
 
-  if (to->type != MAILBOX_MBOX)
+ /* if (to->type != MAILBOX_MBOX)
     return;
-
+  */
+  
   Spoolfile = MAILBOX_LOCAL (to)->path;
 
   while (list)
@@ -191,14 +192,13 @@ check_all_pop3_hosts (Mailbox * to, GList *mailboxes)
       g_free (PopPass);
       g_free (PopUser);
 
-      if(MAILBOX_POP3(mailbox)->last_popped_uid != NULL &&
+      if(MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
          strcmp(MAILBOX_POP3(mailbox)->last_popped_uid, uid) != 0)
       {
         g_free ( MAILBOX_POP3 (mailbox)->last_popped_uid );
         MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
         config_mailbox_update( mailbox, MAILBOX_POP3 (mailbox)->mailbox.name );
       }
-
     }
     list = list->next;
   }

@@ -63,6 +63,11 @@ rot (gchar * pass)
      fails we're screwed anyway to let the upcoming coredump
      occur. */
 
+  assert (pass != NULL);
+  assert (buff != NULL);	/* TODO: using assert for this case is wrong!
+				 * The error should be handled gracefully.
+				 */
+
   for (i = 0; i < len; i++)
     {
       if ((buff[i] <= 'M' && buff[i] >= 'A')
@@ -227,7 +232,8 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
 	pl_dict_add_str_str (mbox_dict, "Delete", tmp);
       }
 
-	  pl_dict_add_str_str (mbox_dict, "LastUID", MAILBOX_POP3 (mailbox)->last_popped_uid);
+        if ((MAILBOX_POP3 (mailbox)->last_popped_uid) != NULL)
+		pl_dict_add_str_str (mbox_dict, "LastUID", MAILBOX_POP3 (mailbox)->last_popped_uid);
 	  
       break;
 
@@ -311,7 +317,7 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
       if (key_arg == NULL)
 	{
 	  int mbox_max;
-
+	
 	  mbox_max = config_mailbox_get_highest_number (accounts);
 	  snprintf (key, sizeof (key), "m%d", mbox_max + 1);
 	}
@@ -489,7 +495,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 
       if ((field = pl_dict_get_str (mbox, "Password")) != NULL)
 	{
-	  gchar *buff;
+	  gchar *buff ;
 	  buff = rot (field);
 	  MAILBOX_POP3 (mailbox)->server->passwd = g_strdup (buff);
 	  g_free (buff);
@@ -653,7 +659,14 @@ config_global_load (void)
     ;				/* an optional field for now */
   g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup (field);
-
+ 
+  if ((field = pl_dict_get_str (globals, "SMTP")) == NULL)
+	      balsa_app.smtp = FALSE;
+   else {
+       balsa_app.smtp = atoi (field);
+       if (balsa_app.smtp_server==NULL)
+	       balsa_app.smtp = FALSE;
+   }
   /* toolbar style */
   if ((field = pl_dict_get_str (globals, "ToolbarStyle")) == NULL)
     balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
@@ -799,6 +812,10 @@ config_global_save (void)
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.previewpane);
     pl_dict_add_str_str (globals, "UsePreviewPane", tmp);
+
+    if (balsa_app.smtp) 
+   // snprintf (tmp, sizeof (tmp), "%d", balsa_app.smtp);
+        pl_dict_add_str_str (globals, "SMTP", 1);
 #ifdef BALSA_SHOW_INFO
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_show_mb_content_info);
     pl_dict_add_str_str (globals, "ShowMailboxContentInfo", tmp);

@@ -71,6 +71,8 @@ PropertyUI;
 
 static PropertyUI *pui;
 
+static void smtp_changed (void);
+
 guint toolbar_type[NUM_TOOLBAR_MODES] =
 {
   GTK_TOOLBAR_TEXT,
@@ -229,6 +231,10 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
   gtk_signal_connect (GTK_OBJECT (pui->replyto), "changed",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
 
+  gtk_signal_connect (GTK_OBJECT (pui->rb_smtp_server), "toggled",
+		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+  gtk_signal_connect (GTK_OBJECT (pui->rb_smtp_server), "toggled",
+		      GTK_SIGNAL_FUNC (smtp_changed), NULL);
   gtk_signal_connect (GTK_OBJECT (pui->smtp_server), "changed",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
   gtk_signal_connect (GTK_OBJECT (pui->mail_directory), "changed",
@@ -286,6 +292,12 @@ cancel_prefs (void)
   pui = NULL;
 }
 
+static void
+smtp_changed (void)
+{
+	  balsa_app.smtp=!balsa_app.smtp;
+	    gtk_widget_set_sensitive (pui->smtp_server, balsa_app.smtp);
+} 
 
 /*
  * update data from the preferences window
@@ -327,6 +339,7 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
       }
   balsa_app.debug = GTK_TOGGLE_BUTTON (pui->debug)->active;
   balsa_app.previewpane = GTK_TOGGLE_BUTTON (pui->previewpane)->active;
+  balsa_app.smtp = GTK_TOGGLE_BUTTON (pui->rb_smtp_server)->active;
 #ifdef BALSA_SHOW_INFO
   if (balsa_app.mblist_show_mb_content_info != GTK_TOGGLE_BUTTON (pui->mblist_show_mb_content_info)->active)
    {
@@ -397,12 +410,16 @@ set_prefs (void)
   gtk_entry_set_text (GTK_ENTRY (pui->replyto), balsa_app.replyto);
 
   gtk_entry_set_text (GTK_ENTRY (pui->signature), balsa_app.signature_path);
-  if (balsa_app.smtp_server)
-    gtk_entry_set_text (GTK_ENTRY (pui->smtp_server), balsa_app.smtp_server);
+
+  if (balsa_app.smtp_server) 
+      gtk_entry_set_text (GTK_ENTRY (pui->smtp_server), balsa_app.smtp_server);
+   
+  
   gtk_entry_set_text (GTK_ENTRY (pui->mail_directory), balsa_app.local_mail_directory);
 
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->previewpane), balsa_app.previewpane);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->debug), balsa_app.debug);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->rb_smtp_server), balsa_app.smtp);
 #ifdef BALSA_SHOW_INFO
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->mblist_show_mb_content_info), balsa_app.mblist_show_mb_content_info);
 #endif
@@ -630,8 +647,10 @@ create_mailservers_page ()
   gtk_table_attach (GTK_TABLE (table1), pui->rb_smtp_server, 0, 1, 0, 1,
                     (GtkAttachOptions) GTK_EXPAND | GTK_FILL,
 		    (GtkAttachOptions) GTK_EXPAND | GTK_FILL, 0, 0);
-  gtk_widget_set_sensitive (pui->rb_smtp_server, FALSE);
-
+  /* This line is to be deleted whenever smtp works */
+//  gtk_widget_set_sensitive (pui->rb_smtp_server, FALSE); 
+// Hola 
+  
   pui->rb_local_mua = gtk_radio_button_new_with_label (rbgroup,
   	_("Local mail user agent"));
   gtk_widget_show (pui->rb_local_mua);
@@ -645,8 +664,8 @@ create_mailservers_page ()
   gtk_table_attach (GTK_TABLE (table1), pui->smtp_server, 1, 2, 0, 1,
                     (GtkAttachOptions) GTK_EXPAND | GTK_FILL,
 		    (GtkAttachOptions) GTK_EXPAND | GTK_FILL, 0, 0);
-  gtk_widget_set_sensitive (pui->smtp_server, FALSE);
-
+  gtk_widget_set_sensitive (pui->smtp_server, balsa_app.smtp);
+  
   return vbox;
 }
 

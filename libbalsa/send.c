@@ -52,7 +52,7 @@ gboolean
 balsa_send_message (Message * message, gchar * smtp_server, glong debug)
 {
   HEADER *msg;
-  BODY **cbody;
+  BODY *last, *newbdy;
   gchar *tmp;
   GList *list;
 
@@ -93,30 +93,40 @@ balsa_send_message (Message * message, gchar * smtp_server, glong debug)
   msg->env->bcc = rfc822_parse_adrlist (msg->env->bcc, make_string_from_list (message->bcc_list));
 
   list = message->body_list;
-  cbody = &msg->content;
+
+  last = msg->content;
+  while (last && last->next)
+    last = last->next;
 
   while (list)
     {
       FILE *tempfp = NULL;
       Body *body;
+      newbdy = NULL;
 
       body = list->data;
 
       if (body->filename)
-	*cbody = mutt_make_file_attach (body->filename);
+	newbdy = mutt_make_file_attach (body->filename);
 
       else if (body->buffer)
 	{
-	  *cbody = add_mutt_body_plain ();
-	  tempfp = safe_fopen ((*cbody)->filename, "w+");
+	  newbdy = add_mutt_body_plain ();
+	  tempfp = safe_fopen (newbdy->filename, "w+");
 	  fputs (body->buffer, tempfp);
 	  fclose (tempfp);
 	  tempfp = NULL;
 	}
 
+      if (newbdy)
+	{
+	  if (last)
+	    last->next = newbdy;
+	  else
+	    msg->content = newbdy;
+	}
+
       list = list->next;
-      if (*cbody)
-	*cbody = (*cbody)->next;
     }
 
   mutt_update_encoding (msg->content);

@@ -50,6 +50,7 @@ enum __ed_types {
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 /*
 ISPRIME(9)
@@ -91,7 +92,12 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 
 	index[-1] = '/';
 
-	if( stat( dup, &sb ) < 0 ) {
+	/* I'm having cases where stat returns nonzero but
+	 * the file exists. Fortunately, errno is still zero,
+	 * so this is our acid test.
+	 */
+
+	if( stat( dup, &sb ) != 0 && errno != 0 ) {
 		if( (fd = creat( dup, S_IRUSR | S_IWUSR )) < 0 ) {
 			(*error) = g_strdup_printf( _("An error occurred when attempting "
 				"to creat(2) the file \"%s\"."), dup );
@@ -100,14 +106,17 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 		}
 
 		close( fd );
-	} else if( mailbox_valid( dup ) == MAILBOX_UNKNOWN ) {
+	}
+
+	mt = mailbox_valid( dup );
+
+	if( mt == MAILBOX_UNKNOWN ) {
 		(*error) = g_strdup_printf( _("The mailbox \"%s\" does not appear to be valid."),
 			dup );
 		g_free( dup );
 		return;
 	}
 
-	mt = mailbox_valid( dup );
 	box = BALSA_MAILBOX( mailbox_new( mt ) );
 	box->name = g_strdup( gettext( prettyname ) );
 	(MAILBOX_LOCAL( box ))->path = dup;
@@ -134,8 +143,8 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 	{ 
 		GtkObject *self = GTK_OBJECT( GET_NEW );
 		(BALSA_DRUID_PAGE( self ))->druid = GNOME_DRUID( druid );
-		if( BALSA_DRUID_PAGE_CLASS(parent_class)->construct )
-			BALSA_DRUID_PAGE_CLASS(parent_class)->construct( BALSA_DRUID_PAGE( self ) );
+		if( BALSA_DRUID_PAGE_CLASS( (GTK_OBJECT( self ))->klass )->construct )
+			BALSA_DRUID_PAGE_CLASS( (GTK_OBJECT( self ))->klass )->construct( BALSA_DRUID_PAGE( self ) );
 		return self;
 	}
 

@@ -1,4 +1,19 @@
-2000-06-1   Pawel Salek  <pawsa@theochem.kth.se>
+2000-06-21  Peter Williams  <peterw@curious-george.helixcode.com>
+
+	* libinit_balsa/balsa-druid-page-*.gob: Whoops, don't just
+	construct for the parent class, consturct for our class as
+	well!
+
+	* libmutt/mx.c (mx_get_magic): Make this a little more forgiving
+	of mailboxes with newlines at the beginning
+
+	* Makefile.am: put our pixmaps in gnomepixmapdir so that we
+	can find it in the pixmap browser -- if --disable-system-install,
+	no loss.
+
+	* help/C/Makefile.am: Put our help in gnomedatadir as well.
+	
+2000-06-21  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Safe quitting and general clean up.
 	* libbalsa/mailbox.c,src/sendmsg-window.c: use

@@ -82,6 +82,10 @@ class Balsa:InitDruid from Gnome:Druid {
 		(BALSA_DRUID_PAGE_WELCOME( self->_priv->welcome ))->next = GNOME_DRUID_PAGE( self->_priv->user );
 		(BALSA_DRUID_PAGE( self->_priv->user ))->next = GNOME_DRUID_PAGE( self->_priv->std_boxes );
 		(BALSA_DRUID_PAGE( self->_priv->std_boxes ))->next = GNOME_DRUID_PAGE( self->_priv->finish );
+
+		(BALSA_DRUID_PAGE( self->_priv->finish ))->prev = GNOME_DRUID_PAGE( self->_priv->std_boxes );
+		(BALSA_DRUID_PAGE( self->_priv->std_boxes ))->prev = GNOME_DRUID_PAGE( self->_priv->user );
+		(BALSA_DRUID_PAGE( self->_priv->user ))->prev = GNOME_DRUID_PAGE( self->_priv->welcome );
 	}
 
 	override (Gnome:Druid) void 

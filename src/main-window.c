@@ -254,7 +254,7 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
      NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_TRASH, 'D', 0, NULL},
     /* U */
     {GNOME_APP_UI_ITEM, N_("_Undelete"), NULL, undelete_message_cb, NULL,
-     NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_UNDELETE, 'D', 0, NULL},
+     NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL},
     GNOMEUIINFO_END
   };
   static GnomeUIInfo mailbox_menu[] = {

@@ -1,3 +1,8 @@
+2003-05-01 21:44  PeterB
+
+	* libbalsa/filter.c: Message list for filter action must not have
+	duplicates.
+
 2003-05-01  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
 
 	* libbalsa/libbalsa.c: show ceritificate expire date

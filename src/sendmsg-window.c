@@ -922,7 +922,7 @@ prep_signature(LibBalsaIdentity* ident, gchar* sig)
 
     g_return_val_if_fail(sig != NULL, NULL);
     
-    if (ident->sig_separator) {
+    if (ident->sig_separator && g_strncasecmp(sig, "-- \n", 5)) {
         sig_tmp = g_strconcat("\n-- \n", sig, NULL);
         g_free(sig);
         sig = sig_tmp;
@@ -2282,13 +2282,7 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
        || (forwd_any && msg->ident->sig_whenforward)
        || (type == SEND_NORMAL && msg->ident->sig_sending)) {
 
-	    if (msg->ident->sig_separator
-		&& g_strncasecmp(signature, "--\n", 3)
-		&& g_strncasecmp(signature, "-- \n", 4)) {
-		gchar * tmp = g_strconcat("-- \n", signature, NULL);
-		g_free(signature);
-		signature = tmp;
-	    }
+            signature = prep_signature(msg->ident, signature);
 
 	    if (msg->ident->sig_prepend && type != SEND_NORMAL) {
 	    	g_string_prepend(body, "\n\n");

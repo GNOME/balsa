@@ -1,3 +1,8 @@
+2002-02-22  Matthew Guenther  <guentherm@asme.org>
+
+	* src/sendmsg-window.c (fillBody): use prep_signature function
+	from sig switching, yay for code re-use
+
 2002-02-22  Pawel Salek <pawsa@theochem.kth.se>
 
 	*libbalsa/address-book-extern.c, libbalsa/address-book-ldif.c,

@@ -863,6 +863,7 @@ attach_clicked(GtkWidget * widget, gpointer data)
     iconlist = GNOME_ICON_LIST(bsm->attachments[1]);
 
     fsw = gtk_file_selection_new(_("Attach file"));
+    gtk_window_set_wmclass(GTK_WINDOW(fsw), "file", "Balsa");
     gtk_object_set_user_data(GTK_OBJECT(fsw), bsm);
 
     fs = GTK_FILE_SELECTION(fsw);
@@ -879,7 +880,6 @@ attach_clicked(GtkWidget * widget, gpointer data)
 			      GTK_SIGNAL_FUNC(gtk_widget_destroy),
 			      GTK_OBJECT(fsw));
 
-    gtk_window_set_wmclass(GTK_WINDOW(fsw), "file", "Balsa");
     gtk_widget_show(fsw);
 
     return TRUE;
@@ -1897,6 +1897,7 @@ include_file_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     GtkWidget *file_selector;
 
     file_selector = gtk_file_selection_new(_("Include file"));
+    gtk_window_set_wmclass(GTK_WINDOW(file_selector), "file", "Balsa");
     gtk_object_set_user_data(GTK_OBJECT(file_selector), bsmsg);
 
     gtk_file_selection_hide_fileop_buttons(GTK_FILE_SELECTION
@@ -1916,7 +1917,6 @@ include_file_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 			      (gpointer) file_selector);
 
     /* Display that dialog */
-    gtk_window_set_wmclass(GTK_WINDOW(file_selector), "file", "Balsa");
     gtk_widget_show(file_selector);
 
     return TRUE;

@@ -1,3 +1,9 @@
+* Balsa-1.2.0 release. Release date 2001-09-18
+
+- exit clean up cleaned up.
+- message D&D improved.
+- final POP3 fixes.
+
 * Balsa-1.2.pre3 release. Release date 2001-08-31
 
 - POP3 code armoured (hopefully)

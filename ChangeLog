@@ -1,3 +1,9 @@
+2001-09-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* README, NEWS, configure.in: well deserved 1.2.0 release.
+	* src/sendmsg-window.c: hush gtk_file_selection warnings whenever
+	possible (fixed for gtk+-1.2.9, remains for gtk+-1.2.10).
+	
 2001-09-17  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox.c: passing NULL mailbox to mailbox_destroy is 

@@ -130,6 +130,21 @@ index_child_create_view (GnomeMDIChild * child)
 
   iw = INDEX_CHILD (child);
 
+  if (!mailbox_open_ref (iw->mailbox))
+    {
+      messagebox = gnome_message_box_new (_("Unable to Open Mailbox!"),
+					  GNOME_MESSAGE_BOX_ERROR,
+					  GNOME_STOCK_BUTTON_OK,
+					  NULL);
+      gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
+      gtk_window_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
+      gtk_widget_show (messagebox);
+      index_child_destroy(GTK_OBJECT(iw));
+      return NULL;
+    }
+
+  mailbox_open_unref (iw->mailbox);
+
   vpane = gtk_vpaned_new ();
   gtk_widget_show (vpane);
 
@@ -148,25 +163,6 @@ index_child_create_view (GnomeMDIChild * child)
 				      (MailboxWatcherFunc) mailbox_listener,
 					MESSAGE_NEW_MASK,
 					(gpointer) iw);
-
-  if (!mailbox_open_ref (iw->mailbox))
-    {
-      mailbox_watcher_remove (iw->mailbox, iw->watcher_id);
-
-      messagebox = gnome_message_box_new (_("Unable to Open Mailbox!"),
-					  GNOME_MESSAGE_BOX_ERROR,
-					  GNOME_STOCK_BUTTON_OK,
-					  NULL);
-      gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
-      gtk_window_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
-      gtk_widget_show (messagebox);
-      gtk_widget_destroy (iw->index);
-      gtk_widget_destroy (vpane);
-      g_free (iw);
-      iw = NULL;
-      return NULL;
-    }
-  mailbox_open_unref (iw->mailbox);
 
   iw->message = balsa_message_new ();
   gtk_paned_add2 (GTK_PANED (vpane), iw->message);

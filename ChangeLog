@@ -1,3 +1,9 @@
+2004-07-06  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: safety net.
+	* libbalsa/imap/imap-commands.[hc]: compilation fixes.
+	* src/main-window.c: do not crash on clicking "clear" in Find dialog.
+
 2004-07-05  Pawel Salek
 
 	* src/balsa-mblist.c: collapse multiple ::update_mailbox events.

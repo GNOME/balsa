@@ -24,7 +24,7 @@
 
 /* Any-State */
 int imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap);
-ImapResult imap_mbox_handle_noop(ImapMboxHandle *r);
+ImapResponse imap_mbox_handle_noop(ImapMboxHandle *r);
 
 /* Non-Authenticated State */
 
@@ -84,10 +84,11 @@ ImapResponse imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
 
 /* Experimental/Expansion */
 ImapResponse imap_handle_starttls(ImapMboxHandle *handle);
-ImapResult imap_mbox_scan(ImapMboxHandle *r, const char*what, const char*str);
+ImapResponse imap_mbox_scan(ImapMboxHandle *r, const char*what,
+                            const char*str);
 ImapResponse imap_mbox_unselect(ImapMboxHandle *h);
-ImapResult imap_mbox_thread(ImapMboxHandle *h, const char *how,
-                            ImapSearchKey *filter);
+ImapResponse imap_mbox_thread(ImapMboxHandle *h, const char *how,
+                              ImapSearchKey *filter);
 
 ImapResponse imap_mbox_uid_search(ImapMboxHandle *handle, ImapSearchKey *key,
                                   void (*cb)(unsigned uid, void *),

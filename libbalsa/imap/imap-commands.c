@@ -701,8 +701,8 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
                             unsigned seqno, const char *section,
                             ImapFetchBodyCb body_cb, void *arg)
 {
-  IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   char cmd[40];
+  IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   handle->body_cb  = body_cb;
   handle->body_arg = arg;
   snprintf(cmd, sizeof(cmd), "FETCH %u BODY[%s]", seqno, section);

@@ -1648,6 +1648,7 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
         gchar *hdr;
         ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle,
                                                    message->msgno);
+        g_return_if_fail(im); /* in case of msg number discrepancies */
         if(flags & LB_FETCH_STRUCTURE) {
             LibBalsaMessageBody *body = libbalsa_message_body_new(message);
             lbm_imap_construct_body(body, im->body);

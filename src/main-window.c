@@ -3116,7 +3116,7 @@ find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 		}
 		break;
             case FIND_RESPONSE_RESET:
-		reset_filter_cb(NULL, NULL);
+		reset_filter_cb(NULL, window);
 		/* fall through */
             default:
 		ok = GTK_RESPONSE_CANCEL; 

@@ -129,7 +129,7 @@ is_mh_message (gchar * str)
 
   /* check for ,[0-9]+ deleted messages */
   if (len && *str == ',' && is_mh_message (&str[1]))
-    return 0;
+    return 1;
 
   for (i = 0; i < len; i++)
     {
@@ -167,6 +167,7 @@ read_dir (gchar * prefix, struct dirent *d)
   if (S_ISDIR (st.st_mode))
     {
       mailbox_type = mailbox_valid (filename);
+      fprintf(stderr,"Mailbox name = %s,  mailbox type = %d\n", filename, mailbox_type);
       if (mailbox_type == MAILBOX_MH || mailbox_type == MAILBOX_MAILDIR)
 	{
 	  add_mailbox (d->d_name, filename, mailbox_type, 1);

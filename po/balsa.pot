@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-21 07:35-0400\n"
+"POT-Creation-Date: 1998-08-21 12:55-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -150,8 +150,17 @@ msgstr ""
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr ""
 
-#: src/mailbox-conf.c:112
+#: src/mailbox-conf.c:118
 msgid "Mailbox Configurator"
+msgstr ""
+
+#: src/mailbox-conf.c:321
+#, c-format
+msgid "Cannot create mailbox '%s': %s\n"
+msgstr ""
+
+#: src/mailbox-conf.c:322
+msgid "Cancel"
 msgstr ""
 
 #: src/mailbox-manager.c:69
@@ -307,11 +316,11 @@ msgid ""
 "http://www.gnome.org/cgi-bin/bugs"
 msgstr ""
 
-#: src/mblist-window.c:406
+#: src/mblist-window.c:425
 msgid "Add Mailbox"
 msgstr ""
 
-#: src/mblist-window.c:411
+#: src/mblist-window.c:430
 msgid "Edit Mailbox"
 msgstr ""
 

@@ -31,7 +31,9 @@
 #include <ctype.h>
 #include <sys/stat.h>
 #include <signal.h>
+#ifdef HAVE_SIGACTION
 #include <sigaction.h>
+#endif
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <sysexits.h>

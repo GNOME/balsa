@@ -26,32 +26,30 @@
 #include "misc.h"
 #include "save-restore.h"
 
-
+/*
+ * The new created mailbox has to be inserted into the Accounts
+ * vector of the config file.
+ */
 
 void
 add_mailbox_config (Mailbox * mailbox)
 {
   GString *gstring;
   gchar **mblist;
-
+  gint    nboxes;
+  
   GList *list = NULL;
   Mailbox *mb;
 
   gint i = 0;
 
   gstring = g_string_new (NULL);
-
-  mblist = g_new (gchar *, g_node_n_children (balsa_app.mailbox_nodes));
-#if 0
-  for (i = 0; list; i++)
-    {
-      mailbox = list->data;
-      mblist[i] = g_strdup (mailbox->name);
-      list = list->next;
-    }
-
-  gnome_config_set_vector ("/balsa/Global/Accounts", i, (const char *const *) mblist);
-#endif
+  
+  gnome_config_get_vector ("/balsa/Global/Accounts", &nboxes, &mblist);
+  mblist = g_realloc(mblist, sizeof (char*) * (nboxes + 1));
+  mblist[nboxes] = mailbox->name;
+  gnome_config_set_vector ("/balsa/Global/Accounts", nboxes + 1, mblist);
+    
   g_string_truncate (gstring, 0);
   g_string_sprintf (gstring, "/balsa/%s/", mailbox->name);
   gnome_config_push_prefix (gstring->str);

@@ -21,6 +21,6 @@
 
 #include "mailbox.h"
 
-void mailbox_conf_new (Mailbox * mailbox);
+void mailbox_conf_new (Mailbox * mailbox, gint add_new_mailbox);
 
 #endif /* __NEW_MAILBOX_H__ */

@@ -70,7 +70,7 @@ static void destroy_mblist_window (GtkWidget * widget);
 static void close_mblist_window (GtkWidget * widget);
 static void mailbox_select_cb (GtkCTree *, GtkCTreeNode *, gint);
 static void button_event_press_cb (GtkCList *, GdkEventButton *, gpointer);
-static GtkWidget * create_menu (GtkCTree * ctree, Mailbox * mailbox);
+static GtkWidget *create_menu (GtkCTree * ctree, Mailbox * mailbox);
 
 static void open_cb (GtkWidget *, gpointer);
 static void close_cb (GtkWidget *, gpointer);
@@ -140,7 +140,7 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->vbox), GTK_WIDGET (mblw->ctree), TRUE, TRUE, 0);
   gtk_widget_show (GTK_WIDGET (mblw->ctree));
 
-  mblist_redraw();
+  mblist_redraw ();
 
   height = GTK_CLIST (mblw->ctree)->rows * GTK_CLIST (mblw->ctree)->row_height;
   if (height > 300)
@@ -181,37 +181,61 @@ mblist_open_window (GnomeMDI * mdi)
 
 }
 
-void mblist_redraw()
+void 
+mblist_redraw ()
 {
+  GtkCTreeNode *ctnode;
   gchar *text[] =
-  {"Balsa"};  /* for root tree stub */
-  if (!GTK_IS_CTREE(mblw->ctree))
-	  return;
+  {"Balsa"};			/* for root tree stub */
+  if (!GTK_IS_CTREE (mblw->ctree))
+    return;
 
-  gtk_ctree_remove(mblw->ctree, mblw->parent);
+  gtk_ctree_remove (mblw->ctree, mblw->parent);
 
   gtk_clist_freeze (GTK_CLIST (mblw->ctree));
-
+#ifndef GTK_HAVE_FEATURES_1_1_2
+  mblw->parent = gtk_ctree_insert (mblw->ctree, NULL, NULL, text, 0, NULL,
+					NULL, NULL, NULL, FALSE, TRUE);
+#else
   mblw->parent = gtk_ctree_insert_node (mblw->ctree, NULL, NULL, text, 0, NULL,
 					NULL, NULL, NULL, FALSE, TRUE);
+#endif
 
   /* inbox */
   text[0] = "Inbox";
+#ifndef GTK_HAVE_FEATURES_1_1_2
+  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 5, inboxpix,
+			     inbox_mask, inboxpix, inbox_mask, FALSE, TRUE);
+  gtk_ctree_set_row_data (mblw->ctree, ctnode, balsa_app.inbox);
+#else
   ctnode = gtk_ctree_insert_node (mblw->ctree, mblw->parent, NULL, text, 5, inboxpix,
 			     inbox_mask, inboxpix, inbox_mask, FALSE, TRUE);
   gtk_ctree_node_set_row_data (mblw->ctree, ctnode, balsa_app.inbox);
+#endif
 
   /* outbox */
   text[0] = "Outbox";
+#ifndef GTK_HAVE_FEATURES_1_1_2
+  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 5, outboxpix,
+			  outbox_mask, outboxpix, outbox_mask, FALSE, TRUE);
+  gtk_ctree_set_row_data (mblw->ctree, ctnode, balsa_app.outbox);
+#else
   ctnode = gtk_ctree_insert_node (mblw->ctree, mblw->parent, NULL, text, 5, outboxpix,
 			  outbox_mask, outboxpix, outbox_mask, FALSE, TRUE);
   gtk_ctree_node_set_row_data (mblw->ctree, ctnode, balsa_app.outbox);
+#endif
 
   /* inbox */
   text[0] = "Trash";
+#ifndef GTK_HAVE_FEATURES_1_1_2
+  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 5, trashpix,
+			     trash_mask, trashpix, trash_mask, FALSE, TRUE);
+  gtk_ctree_set_row_data (mblw->ctree, ctnode, balsa_app.trash);
+#else
   ctnode = gtk_ctree_insert_node (mblw->ctree, mblw->parent, NULL, text, 5, trashpix,
 			     trash_mask, trashpix, trash_mask, FALSE, TRUE);
   gtk_ctree_node_set_row_data (mblw->ctree, ctnode, balsa_app.trash);
+#endif
 
   if (balsa_app.mailbox_nodes)
     {
@@ -249,7 +273,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 				   NULL, NULL,
 				   NULL, NULL,
 				   G_NODE_IS_LEAF (gnode), TRUE);
-	  gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
+	  gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
 	}
       else if (mbnode->mailbox && mbnode->name)
 	{
@@ -260,12 +284,12 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 				       NULL, NULL,
 				       NULL, NULL,
 				       G_NODE_IS_LEAF (gnode), TRUE);
-	      gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
+	      gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
 	    }
 	  else
 	    {
 	      /* normal mailbox */
-	      add_mailboxes_for_checking(mbnode->mailbox);
+	      add_mailboxes_for_checking (mbnode->mailbox);
 	      if (mailbox_have_new_messages (MAILBOX_LOCAL (mbnode->mailbox)->path))
 		gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 					 NULL, NULL,
@@ -277,7 +301,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 					 tray_empty, tray_empty_mask,
 					 FALSE, TRUE);
 
-	      gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
+	      gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
 	    }
 	}
     }
@@ -304,7 +328,7 @@ open_cb (GtkWidget * widget, gpointer data)
     return;
 
   ctnode = GTK_CLIST (mblw->ctree)->selection->data;
-  mailbox = gtk_ctree_node_get_row_data (mblw->ctree, ctnode);
+  mailbox = gtk_ctree_get_row_data (mblw->ctree, ctnode);
 
   if (!mailbox)
     return;
@@ -328,7 +352,7 @@ close_cb (GtkWidget * widget, gpointer data)
     return;
 
   ctnode = GTK_CLIST (mblw->ctree)->selection->data;
-  mailbox = gtk_ctree_node_get_row_data (mblw->ctree, ctnode);
+  mailbox = gtk_ctree_get_row_data (mblw->ctree, ctnode);
 
   if (mailbox)
     {
@@ -368,7 +392,7 @@ mailbox_select_cb (GtkCTree * ctree, GtkCTreeNode * row, gint column)
 
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     {
-      mailbox = gtk_ctree_node_get_row_data (ctree, row);
+      mailbox = gtk_ctree_get_row_data (ctree, row);
 
       /* bail now if the we've been called without a valid
        * mailbox */
@@ -407,8 +431,15 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
 static void
 mb_conf_cb (GtkWidget * widget, Mailbox * mailbox)
 {
-  mailbox_conf_new (mailbox);
+  mailbox_conf_new (mailbox, FALSE);
 }
+
+static void
+mb_add_cb (GtkWidget * widget, Mailbox * mailbox)
+{
+  mailbox_conf_new (mailbox, TRUE);
+}
+
 
 static GtkWidget *
 create_menu (GtkCTree * ctree, Mailbox * mailbox)
@@ -417,14 +448,14 @@ create_menu (GtkCTree * ctree, Mailbox * mailbox)
   menu = gtk_menu_new ();
   menuitem = gtk_menu_item_new_with_label (_ ("Add Mailbox"));
   gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-		      GTK_SIGNAL_FUNC (mb_conf_cb), NULL);
+		      GTK_SIGNAL_FUNC (mb_add_cb), mailbox);
   gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_widget_show(menuitem);
+  gtk_widget_show (menuitem);
   menuitem = gtk_menu_item_new_with_label (_ ("Edit Mailbox"));
   gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
 		      GTK_SIGNAL_FUNC (mb_conf_cb), mailbox);
   gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_widget_show(menuitem);
+  gtk_widget_show (menuitem);
 
   return menu;
 }

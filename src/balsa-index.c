@@ -600,9 +600,9 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 	    }
 	    g_array_append_val(deselected, msgno);
 	    g_array_remove_index(index->selected, i);
-	    if (msgno == sci.current_msgno)
-		current_depth = gtk_tree_path_get_depth(path);
 	}
+	if (msgno == sci.current_msgno)
+	    current_depth = gtk_tree_path_get_depth(path);
 	gtk_tree_path_free(path);
     }
 
@@ -768,7 +768,8 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
                                                      current_path)
                 && bndx_row_is_viewable(index, current_path)) {
                 gtk_tree_selection_select_path(selection, current_path);
-                if (msgno == (guint) index->current_message->msgno) {
+                if (index->current_message
+		    && msgno == (guint) index->current_message->msgno) {
                     gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index),
                                                  current_path, NULL, FALSE,
                                                  0, 0);

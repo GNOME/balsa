@@ -795,9 +795,12 @@ config_global_load(void)
     balsa_app.expunge_on_close =
         gnome_config_get_bool("ExpungeOnClose=true");
     balsa_app.expunge_auto = gnome_config_get_bool("AutoExpunge=true");
-    /* timeout in hours */
+    /* timeout in munutes (was hours, so fall back if needed) */
     balsa_app.expunge_timeout =
-        gnome_config_get_int("AutoExpungeHours=2") * 3600;
+        gnome_config_get_int("AutoExpungeMinutes") * 60;
+    if (!balsa_app.expunge_timeout)
+	balsa_app.expunge_timeout = 
+	    gnome_config_get_int("AutoExpungeHours=2") * 3600;
 
     gnome_config_pop_prefix();
 
@@ -1177,8 +1180,8 @@ config_save(void)
     gnome_config_set_bool("HideDeleted", libbalsa_mailbox_get_filter(NULL) & 1);
     gnome_config_set_bool("ExpungeOnClose", balsa_app.expunge_on_close);
     gnome_config_set_bool("AutoExpunge", balsa_app.expunge_auto);
-    gnome_config_set_int("AutoExpungeHours",
-                         balsa_app.expunge_timeout / 3600);
+    gnome_config_set_int("AutoExpungeMinutes",
+                         balsa_app.expunge_timeout / 60);
 
     gnome_config_pop_prefix();
 

@@ -88,7 +88,7 @@ typedef struct _PropertyUI {
     gint filter;
     GtkWidget *expunge_on_close;
     GtkWidget *expunge_auto;
-    GtkWidget *expunge_hours;
+    GtkWidget *expunge_minutes;
 
     GtkWidget *previewpane;
     GtkWidget *alternative_layout;
@@ -530,7 +530,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(G_OBJECT(pui->expunge_auto), "toggled",
 		     G_CALLBACK(expunge_auto_cb),
 		     property_box);
-    g_signal_connect(G_OBJECT(pui->expunge_hours), "changed",
+    g_signal_connect(G_OBJECT(pui->expunge_minutes), "changed",
 		     G_CALLBACK(properties_modified_cb),
 		     property_box);
 
@@ -830,7 +830,7 @@ apply_prefs(GtkDialog * pbox)
 	GTK_TOGGLE_BUTTON(pui->expunge_auto)->active;
     balsa_app.expunge_timeout =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
-					 (pui->expunge_hours)) * 3600;
+					 (pui->expunge_minutes)) * 60;
 
     /* external editor */
     balsa_app.edit_headers = GTK_TOGGLE_BUTTON(pui->edit_headers)->active;
@@ -1075,9 +1075,9 @@ set_prefs(void)
                                  balsa_app.expunge_on_close);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->expunge_auto),
 				 balsa_app.expunge_auto);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->expunge_hours),
-			      (float) balsa_app.expunge_timeout / 3600);
-    gtk_widget_set_sensitive(pui->expunge_hours,
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->expunge_minutes),
+			      (float) balsa_app.expunge_timeout / 60);
+    gtk_widget_set_sensitive(pui->expunge_minutes,
 			     GTK_TOGGLE_BUTTON(pui->expunge_auto)->active);
 
 
@@ -2535,14 +2535,14 @@ deleting_messages_group(GtkWidget * page)
                        FALSE, FALSE, 0);
     pm_page_add_to_size_group(page, pui->expunge_auto);
 
-    expunge_spinbutton_adj = gtk_adjustment_new(2, 1, 26, 1, 10, 10);
-    pui->expunge_hours =
+    expunge_spinbutton_adj = gtk_adjustment_new(120, 1, 1440, 1, 10, 10);
+    pui->expunge_minutes =
 	gtk_spin_button_new(GTK_ADJUSTMENT(expunge_spinbutton_adj), 1, 0);
-    gtk_widget_show(pui->expunge_hours);
-    gtk_widget_set_sensitive(pui->expunge_hours, FALSE);
-    gtk_box_pack_start(GTK_BOX(hbox), pui->expunge_hours, FALSE, FALSE, 0);
+    gtk_widget_show(pui->expunge_minutes);
+    gtk_widget_set_sensitive(pui->expunge_minutes, FALSE);
+    gtk_box_pack_start(GTK_BOX(hbox), pui->expunge_minutes, FALSE, FALSE, 0);
 
-    label = gtk_label_new(_("hours"));
+    label = gtk_label_new(_("minutes"));
     gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 0);
 
     return group;
@@ -3076,7 +3076,7 @@ expunge_auto_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean newstate =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->expunge_auto));
-    gtk_widget_set_sensitive(GTK_WIDGET(pui->expunge_hours), newstate);
+    gtk_widget_set_sensitive(GTK_WIDGET(pui->expunge_minutes), newstate);
 
     properties_modified_cb(widget, pbox);
 }

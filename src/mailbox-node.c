@@ -400,8 +400,10 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     
     gtk_menu_append(GTK_MENU(menu), menuitem);
     
-    /* If we didn't click on a mailbox node then there is only one option. */
+    if(mbnode == NULL) /* clicked on the empty space */
+	return menu;
 
+    /* If we didn't click on a mailbox node then there is only one option. */
     add_menu_entry(menu, NULL, NULL, mbnode);
 
     if (mbnode->mailbox) {

@@ -1,3 +1,8 @@
+2001-01-11   Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/mailbox-node.c: fix crash on right button click out of mailbox 
+	tree.
+
 2001-01-11  Berend De Schouwer <bds@jhb.ucs.co.za>
 
 	* src/sendmsg-window.c: better guess of default compose window size.

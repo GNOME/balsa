@@ -179,11 +179,9 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 	gtk_window_set_policy (GTK_WINDOW (property_box), FALSE, FALSE, FALSE);
 
         gnome_dialog_set_parent(GNOME_DIALOG(property_box), GTK_WINDOW(active_win));
-
-
+        gtk_object_set_data (GTK_OBJECT (property_box), "balsawindow", (gpointer) active_win);
         
-
-
+        /* Create the pages */
 	page = create_identity_page();
         gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Identity")) );
 
@@ -358,6 +356,7 @@ static void
 apply_prefs (GnomePropertyBox* pbox, gint page_num)
 {
 	gint i;
+        GtkWidget *balsa_window;
 
         if (page_num != -1)
                 return;
@@ -479,7 +478,8 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	 */
 	config_global_save ();
         balsa_mblist_redraw (balsa_app.mblist);
-        balsa_window_refresh (BALSA_WINDOW (GTK_WIDGET (pbox)->parent));
+        balsa_window = GTK_WIDGET (gtk_object_get_data (GTK_OBJECT (pbox), "balsawindow"));
+        balsa_window_refresh (BALSA_WINDOW (balsa_window));
 }
 
 

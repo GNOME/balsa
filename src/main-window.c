@@ -58,6 +58,9 @@
 
 #include "libinit_balsa/init_balsa.h"
 
+#include "pixmaps/reply_to_all.xpm"
+#include "pixmaps/reply_to_all_menu.xpm"
+
 #define MAILBOX_DATA "mailbox_data"
 
 #define APPBAR_KEY "balsa_appbar"
@@ -246,8 +249,8 @@ static GnomeUIInfo message_menu[] =
   {
     GNOME_APP_UI_ITEM, N_ ("Reply to _all"),
     N_("Reply to all recipients of the current message"),
-    replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_MENU_MAIL_RPL, 'A', 0, NULL
+    replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_DATA,
+    reply_to_all_menu_xpm, 'A', 0, NULL
   },
 #define MENU_MESSAGE_FORWARD_POS 7
     /* F */
@@ -366,9 +369,9 @@ static GnomeUIInfo main_toolbar[] =
   GNOMEUIINFO_ITEM_STOCK (N_ ("Reply"), N_ ("Reply"),
                           replyto_message_cb,
                           GNOME_STOCK_PIXMAP_MAIL_RPL),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Reply to all"), N_ ("Reply to all"),
-                          replytoall_message_cb,
-                          GNOME_STOCK_PIXMAP_MAIL_RPL),
+  GNOMEUIINFO_ITEM (N_ ("Reply to all"), N_ ("Reply to all"),
+                    replytoall_message_cb,
+                    reply_to_all_xpm),
   GNOMEUIINFO_ITEM_STOCK (N_ ("Forward"), N_ ("Forward"),
                           forward_message_cb,
                           GNOME_STOCK_PIXMAP_MAIL_FWD),
@@ -1391,7 +1394,7 @@ wrap_message_cb (GtkWidget * widget, gpointer data)
    balsa_app.browse_wrap = GTK_CHECK_MENU_ITEM(widget)->active;
 
    /* redisplay current message? */
-   index = balsa_window_find_current_index(BALSA_WINDOW (data));
+   index = GTK_WIDGET (balsa_window_find_current_index(BALSA_WINDOW (data)));
    if(index) 
       balsa_index_redraw_current ( BALSA_INDEX(index) );
 }

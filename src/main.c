@@ -300,6 +300,7 @@ main (int argc, char *argv[])
   /* TODO: select the first one, if any is open */ 
   if(gtk_notebook_get_current_page( GTK_NOTEBOOK(balsa_app.notebook) ) >=0 ) 
      gtk_notebook_set_page( GTK_NOTEBOOK(balsa_app.notebook), 0);
+
   gtk_main();
 
 #ifdef BALSA_USE_THREADS

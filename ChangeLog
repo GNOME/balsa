@@ -1,3 +1,8 @@
+2000-03-30  Matthew Guenther <mguenther@netcom.ca>
+	* src/main-window.c: changed reply to all to use reply_to_all.xpm, 
+	and reply_to_all_menu.xpm, pointer casting bug.
+	* src/pref-manager.c: fixed pointer casting bug.
+
 2000-03-30  Peter Williams <peter@newton.cx>
 	* src/arrow.xpm: moved to src/pixmaps/
 	* src/balsa-icons.{c,h}: added new arrow
@@ -173,8 +178,6 @@
 
 	* libbalsa/misc.c: make_string_from_list didn't handle NULL elements.
 	* libbalsa/misc.h:
-<<<<<<< ChangeLog
-	
 
 2000-03-06  Peter Williams  <peter@beta.newton.cx>
 
@@ -182,8 +185,6 @@
 	  from Birger Langkjer, increase size of date
 	  buffer from an unreasonable-small 27 characters
 	  to 128.
-=======
->>>>>>> 1.155
 
 2000-03-05  Pawel Salek  <pawsa@theochem.kth.se>
 

@@ -32,11 +32,14 @@
 
 #include "pixmaps/mini_dir_closed.xpm"
 #include "pixmaps/mini_dir_open.xpm"
+#include "pixmaps/mailbox.xpm"
 
 GdkPixmap *open_folder;
 GdkPixmap *closed_folder;
+GdkPixmap *mailboxpix;
 GdkBitmap *open_mask;
 GdkBitmap *closed_mask;
+GdkBitmap *mailbox_mask;
 
 typedef struct _MBListWindow MBListWindow;
 struct _MBListWindow
@@ -79,10 +82,13 @@ mblist_open_window (GnomeMDI * mdi)
 
   gtk_widget_realize (mblw->window);
   open_folder = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-			       &open_mask, transparent, mini_dir_open_xpm);
+				&open_mask, transparent, mini_dir_open_xpm);
 
   closed_folder = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-			   &closed_mask, transparent, mini_dir_closed_xpm);
+			    &closed_mask, transparent, mini_dir_closed_xpm);
+
+  mailboxpix = gdk_pixmap_create_from_xpm_d (mblw->window->window,
+				   &mailbox_mask, transparent, mailbox_xpm);
 
   mblw->mdi = mdi;
   gtk_signal_connect (GTK_OBJECT (mblw->window),
@@ -125,7 +131,7 @@ mblist_open_window (GnomeMDI * mdi)
 
   gtk_clist_thaw (GTK_CLIST (mblw->ctree));
 
-  gtk_widget_set_usize(GTK_WIDGET(mblw->ctree), -1, GTK_CLIST(mblw->ctree)->rows*GTK_CLIST(mblw->ctree)->row_height);
+  gtk_widget_set_usize (GTK_WIDGET (mblw->ctree), -1, GTK_CLIST (mblw->ctree)->rows * GTK_CLIST (mblw->ctree)->row_height);
 
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "tree_select_row",
 		      (GtkSignalFunc) mailbox_select_cb,
@@ -178,9 +184,9 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	}
       else if (mbnode->mailbox && mbnode->name)
 	{
-	  if (!strcmp (MAILBOX_LOCAL (mbnode->mailbox)->path, mbnode->name))
+	  if (mbnode->mailbox->type == MAILBOX_MH ||
+	      mbnode->mailbox->type == MAILBOX_MAILDIR)
 	    {
-	      /* probibly mh or maildir */
 	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2,
 				       NULL, NULL,
 				       NULL, NULL,
@@ -191,8 +197,8 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	    {
 	      /* normal mailbox */
 	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2,
-				       NULL, NULL,
-				       NULL, NULL,
+				       mailboxpix, mailbox_mask,
+				       mailboxpix, mailbox_mask,
 				       FALSE, TRUE);
 	      gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
 	    }

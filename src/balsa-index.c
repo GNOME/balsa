@@ -25,9 +25,15 @@
 #include "balsa-app.h"
 #include "balsa-index.h"
 
+#include "pixmaps/mailbox.xpm"
 
 /* constants */
 #define BUFFER_SIZE 1024
+
+
+GdkPixmap *mailboxpix;
+GdkBitmap *mailbox_mask;
+GdkColor *transparent = NULL;
 
 
 /* gtk widget */
@@ -172,9 +178,9 @@ balsa_index_init (BalsaIndex * bindex)
     NULL
   };
 
-  titles[3] = _("From");
-  titles[4] = _("Subject");
-  titles[5] = _("Date");
+  titles[3] = _ ("From");
+  titles[4] = _ ("Subject");
+  titles[5] = _ ("Date");
 
   GTK_WIDGET_SET_FLAGS (bindex, GTK_NO_WINDOW);
   bindex->mailbox = NULL;
@@ -184,6 +190,9 @@ balsa_index_init (BalsaIndex * bindex)
   GTK_BIN (bindex)->child =
     (GtkWidget *) clist = gtk_clist_new_with_titles (6, titles);
 
+  mailboxpix = gdk_pixmap_create_from_xpm_d (GTK_CLIST (GTK_BIN (bindex)->child)->clist_window,
+				   &mailbox_mask, transparent, mailbox_xpm);
+
   gtk_widget_set_parent (GTK_WIDGET (clist), GTK_WIDGET (bindex));
   gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_BROWSE);
@@ -191,8 +200,8 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_CENTER);
   gtk_clist_set_column_justification (clist, 2, GTK_JUSTIFY_CENTER);
   gtk_clist_set_column_width (clist, 0, 30);
-  gtk_clist_set_column_width (clist, 1, 9);
-  gtk_clist_set_column_width (clist, 2, 9);
+  gtk_clist_set_column_width (clist, 1, 16);
+  gtk_clist_set_column_width (clist, 2, 16);
   gtk_clist_set_column_width (clist, 3, 150);
   gtk_clist_set_column_width (clist, 4, 250);
   gtk_clist_set_column_width (clist, 5, 100);
@@ -374,7 +383,7 @@ balsa_index_add (BalsaIndex * bindex,
     return;
 
   text[0] = buff1;
-  text[1] = flag_str (message->flags);
+  text[1] = NULL;		/* flags */
   text[2] = NULL;		/* attachments */
   text[3] = buff2;
 
@@ -398,6 +407,15 @@ balsa_index_add (BalsaIndex * bindex,
   gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), row, 0, text[0]);
 
   gtk_clist_set_row_data (GTK_CLIST (GTK_BIN (bindex)->child), row, (gpointer) message);
+
+  if (message->flags & MESSAGE_FLAG_DELETED)
+    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, mailboxpix, mailbox_mask);
+  if (message->flags & MESSAGE_FLAG_FLAGGED)
+    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, mailboxpix, mailbox_mask);
+  if (message->flags & MESSAGE_FLAG_REPLIED)
+    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, mailboxpix, mailbox_mask);
+  if (message->flags & MESSAGE_FLAG_NEW)
+    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, mailboxpix, mailbox_mask);
 
   if (first_new_message == 0)
     if (message->flags & MESSAGE_FLAG_NEW)
@@ -497,10 +515,10 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
     return;
 
   if (!event || event->button != 3)
-	  return;
+    return;
 /*
-  gtk_clist_get_selection_info (clist, event->x, event->y + clist->voffset, &row, &column);
-*/
+   gtk_clist_get_selection_info (clist, event->x, event->y + clist->voffset, &row, &column);
+ */
   gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
   bindex = BALSA_INDEX (data);
   message = (Message *) gtk_clist_get_row_data (clist, row);

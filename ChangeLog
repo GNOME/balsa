@@ -1,8 +1,10 @@
 2001-08-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* Makefile.am: tar's I option is obsolete, use j.
-	* src/main.c:
-	* libbalsa/mailbox_imap.c (imap_delete_folder): 
+	* src/main.c: gconf_init returns GError instead of GConfError 
+	as of GConf-1.0.
+	* libbalsa/mailbox_imap.c (imap_delete_folder): unsubscribe
+	mailbox before deletion.
 
 2001-08-03  Pawel Salek  <pawsa@theochem.kth.se>
 

@@ -959,6 +959,41 @@ get_font_name(const gchar* base, int code) {
    return res;
 }   
 
+gchar* 
+get_koi_font_name(const gchar* base) {
+   static gchar type[] ="koi8";
+   gchar *res;
+   const gchar* ptr = base;
+   int dash_cnt = 0, len;
+
+   g_return_val_if_fail(base != NULL, NULL);
+
+   while(*ptr && dash_cnt<13) {
+      if(*ptr == '-') dash_cnt++;
+      
+      if(two_const_fields_to_end(ptr)) break;
+      ptr++;
+   }
+
+   /* defense against a patologically short base font wildcard implemented
+    * in the chunk below
+    * extra space for dwo dashes and '\0' */
+   len = ptr-base;
+   /* if(dash_cnt>12) len--; */
+   if(len<1) len = 1;
+   res = (gchar*)g_malloc(len+sizeof(type)+4);
+   if(balsa_app.debug)
+      fprintf(stderr,"base font name: koi8-r\n"
+	      "mallocating %d bytes\n", len+sizeof(type)+3 );
+
+   if(len>1) strncpy(res, base, len);
+   else { strncpy(res, "*", 1); len = 1; } 
+
+   sprintf(res+len,"-%s-r", type);
+   return res;
+}   
+
+
 /* HELPER FUNCTIONS ----------------------------------------------- */
 static gchar*
 find_body_font(BODY * bdy) 
@@ -1061,6 +1096,7 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gr
 	s.flags = 0;
 
 	mutt_mktemp( tmp_file_name );
+
 	if( (s.fpout = fopen( tmp_file_name, "w+")) == NULL ) {
 	    error_part(
 		group, 
@@ -1069,7 +1105,6 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gr
 		    tmp_file_name, strerror(errno)));
 	    return;
 	}
-	    
 
 	mutt_decode_attachment( bdy, &s );
 	fflush( s.fpout );

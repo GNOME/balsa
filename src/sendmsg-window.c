@@ -79,6 +79,7 @@ static gint iso_9_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_13_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_14_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_15_cb(GtkWidget* , BalsaSendmsg *);
+static gint koi8_r_cb(GtkWidget* , BalsaSendmsg *);
 
 /* Standard DnD types */
 enum
@@ -229,7 +230,9 @@ static GnomeUIInfo iso_charset_menu[] = {
 #define ISO_CHARSET_9_POS 7
   GNOMEUIINFO_ITEM_NONE( N_ ("_Turkish (ISO-8859-9)"), NULL, iso_9_cb),
 #define ISO_CHARSET_14_POS 8
-  GNOMEUIINFO_ITEM_NONE( N_ ("_Celtic (ISO-8859-14)"), NULL, iso_14_cb),
+  GNOMEUIINFO_ITEM_NONE( N_ ("Ce_ltic (ISO-8859-14)"), NULL, iso_14_cb),
+#define KOI8_R_POS 9
+  GNOMEUIINFO_ITEM_NONE( N_ ("C_yrillic (KOi8-R)"), NULL, koi8_r_cb),
   GNOMEUIINFO_END
 };
 
@@ -245,7 +248,8 @@ static gchar* iso_charset_names[] = {
    "ISO-8859-5",
    "ISO-8859-8",
    "ISO-8859-9",
-   "ISO-8859-14"
+   "ISO-8859-14",
+   "KOI8-R"
 };
 
 typedef struct {
@@ -1633,6 +1637,56 @@ set_iso_charset(BalsaSendmsg *msg, gint code, gint idx) {
    return FALSE;
 }
 
+static gint 
+set_koi8_charset(BalsaSendmsg *msg, gint idx) {
+   guint point, txt_len;
+   gchar* str, *koi_font_name, *iso_font_name, *font_name;
+   
+   if( ! GTK_CHECK_MENU_ITEM(iso_charset_menu[idx].widget)->active)
+      return TRUE;
+
+   msg->charset = iso_charset_names[idx];
+
+   koi_font_name = get_koi_font_name(balsa_app.message_font);
+   iso_font_name = get_font_name(balsa_app.message_font,1);
+   
+   font_name = (gchar*)g_malloc(strlen(koi_font_name)+strlen(iso_font_name)+2);
+   sprintf(font_name,"%s,%s",koi_font_name,iso_font_name);
+   g_free(koi_font_name);
+   g_free(iso_font_name);
+      
+   if(msg->font)
+     gdk_font_unref(msg->font);
+
+   if( !( msg->font = gdk_fontset_load (font_name)) ) {
+      printf("Cannot find font: %s\n", font_name);
+      g_free(font_name);
+      return TRUE;
+   }
+
+   if(balsa_app.debug) 
+      fprintf(stderr,"Loaded font with mask: %s\n", font_name);
+
+   g_free(font_name);
+   
+
+   gtk_text_freeze( GTK_TEXT(msg->text) );
+   point   = gtk_editable_get_position( GTK_EDITABLE(msg->text) ); 
+   txt_len = gtk_text_get_length( GTK_TEXT(msg->text) );
+   str     = gtk_editable_get_chars( GTK_EDITABLE(msg->text), 0, txt_len);
+   
+   gtk_text_set_point( GTK_TEXT(msg->text), 0);
+   gtk_text_forward_delete ( GTK_TEXT(msg->text), txt_len); 
+   
+   gtk_text_insert(GTK_TEXT(msg->text), msg->font , NULL, NULL, str, txt_len);
+   g_free(str);
+   gtk_text_thaw( GTK_TEXT(msg->text) );
+
+   gtk_editable_set_position( GTK_EDITABLE(msg->text), point);
+   return FALSE;
+
+}
+
 static gint iso_1_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  1, ISO_CHARSET_1_POS); }
 static gint iso_2_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
@@ -1651,4 +1705,6 @@ static gint iso_14_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg, 14, ISO_CHARSET_14_POS); }
 static gint iso_15_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg, 15, ISO_CHARSET_15_POS); }
+static gint koi8_r_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return set_koi8_charset(bsmsg, KOI8_R_POS); }
 

@@ -1,3 +1,10 @@
+2000-06-05  Matthew Guenther <mguenthe@attcanada.ca>
+
+	* src/balsa-message.[hc]: add get_koi_font_name to use alternate
+	(non ISO) Cyrillic character set.  
+	* src/sendmsg-window.c: add KOi8-R to character set menu,
+	set_koi8_charset function.
+
 2000-06-05  Pawel Salek <pawsa@theochem.kth.se>
 	* libbalsa/send.c,src/main-window.c: don't delete loose messages
 	* src/sendmsg-window.c: replying a message from a closed mailbox
@@ -46,7 +53,7 @@
 	Use new GOB 1.0.0 stuff and arrays as we should. Also
 	give away the GOB easter egg, I guess.
 
-2000-05-30  Matthew Guenther <mguenthe@netcom.ca>
+2000-05-30  Matthew Guenther <mguenthe@attcanada.ca>
 
 	* help/C/Makefile.am:  Use stylesheet images directory.
 	* help/C/balsa.sgml:  Correct copyright dates.
@@ -57,13 +64,13 @@
 	* src/balsa-message.c: bug #11949 fix
 	* src/balsa-index-page.c: bug #12606 fix.
 	
-2000-05-28  Matthew Guenther <mguenthe@netcom.ca>
+2000-05-28  Matthew Guenther <mguenthe@attcanada.ca>
 
 	* src/balsa-index-page.[ch]: patch to add "Store Address" menu
 	item to right-click menu in index, stores message From address in
 	address book.  From Thomas Fitzsimmons <fitzsim@ecf.utoronto.ca>.
 
-2000-05-28  Matthew Guenther <mguenthe@netcom.ca>
+2000-05-28  Matthew Guenther <mguenthe@attcanada.ca>
 
 	* help/C/balsa.sgml: Fixed section levels and ids so that the
 	Preferences dialog context-sensitive help will work properly.
@@ -91,11 +98,11 @@
 	* configure.in (BALSA_REVISION): This is now
 	development version 0.9.0.
 
-2000-05-22  Matthew Guenther  <mguenthe@netcom.ca>
+2000-05-22  Matthew Guenther  <mguenthe@attcanada.ca>
 	* src/main.c: added session management to Balsa, functions 
 	balsa_save_session and balsa_kill_session.
 
-2000-05-22  Matthew Guenther  <mguenthe@netcom.ca>
+2000-05-22  Matthew Guenther  <mguenthe@attcanada.ca>
 	* src/balsa-mblist.c (balsa_mblist_mailbox_style): mailbox 
 	counter fix.
 	* src/pref-manager.c (create_misc_page): cleaned up look of color 
@@ -250,7 +257,7 @@
 	Martynas Kunigëlis <mkunigelis@alna.lt> patch for Baltic language
 	support.
 
-2000-05-01  Matthew Guenther <mguenthe@netcom.ca>
+2000-05-01  Matthew Guenther <mguenthe@attcanada.ca>
 	* libbalsa/send.c (balsa_lookup_mime_type): fixed GNOME mime 
 	type lookup 
 
@@ -298,12 +305,12 @@
 	* src/Makefile.am (INCLUDES): Include $(top_builddir)/idl
 	  for the generated headers (when srcdir != builddir)
 
-2000-04-21  Matthew Guenther <mguenther@netcom.ca>
+2000-04-21  Matthew Guenther <mguenthe@attcanada.ca>
 	* libbalsa/message.c (message_is_multipart): changed to 
 	message_has_attachment and modified to a better way to determine
 	message attachment status.
 	
-2000-04-20  Matthew Guenther <mguenther@netcom.ca>
+2000-04-20  Matthew Guenther <mguenthe@attcanada.ca>
 	* libbalsa/message.c: added function message_is_multipart
 	* src/balsa-index.c (balsa_index_add): 
 	add icon to attachment column when message is multipart.
@@ -359,7 +366,7 @@
 
 	* configure.in : Added tr to ALL_LINGUAS .
 
-2000-04-16  Matthew Guenther <mguenther@netcom.ca>
+2000-04-16  Matthew Guenther <mguenthe@attcanada.ca>
 	* libbalsa/send.c (balsa_create_msg): Added balsa mime lookup
 	function balsa_lookup_mime_type to fix bug #4821
 			 
@@ -392,7 +399,7 @@
 
 	* configure.in: Add check for gob when using CVS source.
 
-2000-04-09  Matthew Guenther <mguenther@netcom.ca>
+2000-04-09  Matthew Guenther <mguenthe@attcanada.ca>
 	* src/address-book.c (ab_load): fix memory allocation bug, use more 
 	glib string functions, set ->name to ->id if no Id is present in the 
 	vcard.
@@ -408,7 +415,7 @@
 	* configure.in: Print a little warning if
 	  the source is CVS source.
 
-2000-04-08  Matthew Guenther <mguenther@netcom.ca>
+2000-04-08  Matthew Guenther <mguenthe@attcanada.ca>
 	* src/balsa-mblist.c (balsa_mblist_insert_mailbox): Fixed bug with 
 	mailbox info.
 
@@ -486,7 +493,7 @@
 	* src/balsa-app.c (cantfind_notice): Made Balsa
 	  gracefully handle a missing 'special mailbox'
 
-2000-03-30  Matthew Guenther <mguenther@netcom.ca>
+2000-03-30  Matthew Guenther <mguenthe@attcanada.ca>
 	* src/main-window.c: changed reply to all to use reply_to_all.xpm, 
 	and reply_to_all_menu.xpm, pointer casting bug.
 	* src/pref-manager.c: fixed pointer casting bug.
@@ -529,7 +536,7 @@
 	* main.c: reorganized the initial mailbox opening code.
 	* configure.in:  mailbox info switch on by default.
 	
-2000-03-25  Matthew Guenther <mguenther@netcom.ca>
+2000-03-25  Matthew Guenther <mguenthe@attcanada.ca>
 
 	* src/main-window.c: fixed opening of mailboxes on startup.
 	* src/balsa-mblist.[hc]: added balsa_mblist_open_inital() and 
@@ -543,7 +550,7 @@
 	* libbalsa/mailbox.c, src/balsa-mblist.c, src/balsa-message.c:
 	* src/main-window.c: bug hunting - message counting.
 	
-2000-03-24  Matthew Guenther <mguenther@netcom.ca>
+2000-03-24  Matthew Guenther <mguenthe@attcanada.ca>
 	* src/main-window.c: add next_unread_message_cb, associated menu 
 	and toolbar items.
 	* src/balsa-index.[hc]: add balsa_message_next_unread
@@ -570,7 +577,7 @@
 	* libmutt/rfc822.c: de-quotation handles commas in comments
 	* src/sendmsg-window.c: forward subject clarified.
 	
-2000-03-17 Matthew Guenther <mguenther@netcom.ca>
+2000-03-17 Matthew Guenther <mguenthe@attcanada.ca>
 	* src/sendmsg-window.c (bsmsg2message): enable In-Reply-To and 
 	References headers
 	* libbalsa/send.c (balsa_create_message): enable In-Reply-To and
@@ -646,7 +653,7 @@
 
 	* balsa.desktop: Irish translations
 
-2000-03-11  Matthew Guenther <mguenther@netcom.ca>
+2000-03-11  Matthew Guenther <mguenthe@attcanada.ca>
 	* libbalsa/misc.c:  Added style to MailboxNode
 	* src/mblist-window.c: Update mailbox style when changing 
 	mailboxes
@@ -711,7 +718,7 @@
 2000-2-26   Birger Langkjer <birger.langkjer@image.dk>
 	* Integrated a patch from Mikael Hermansson <mikeh@bahnhof.se>
 
-2000-2-25   Matthew Guenther <mguenther@netcom.ca>
+2000-2-25   Matthew Guenther <mguenthe@attcanada.ca>
 	* src/mblist-window.c:
 	* src/balsa-mblist.c: Added ability to display total number of 
 	messages and number of unread messages in the mailbox list.  Mailboxes
@@ -743,11 +750,11 @@
 	* balsa.desktop:
 	* Makefile.am: added desktop file for balsa.
 
-2000-2-1   Matthew Guenther <mguenther@netcom.ca>
+2000-2-1   Matthew Guenther <mguenthe@attcanada.ca>
 	* src/mblist-window.c: Column size saving code cleaned up, better
 	  implementation using notebook selection.  Good to go.
 	
-2000-1-29   Matthew Guenther <mguenther@netcom.ca>
+2000-1-29   Matthew Guenther <mguenthe@attcanada.ca>
 	
 	* src/balsa-app.h:
 	* src/balsa-app.c:

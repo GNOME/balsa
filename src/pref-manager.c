@@ -81,6 +81,8 @@ typedef struct _PropertyUI {
     GtkWidget *close_mailbox_minutes;
     GtkWidget *hide_deleted;
     GtkWidget *expunge_on_close;
+    GtkWidget *expunge_auto;
+    GtkWidget *expunge_hours;
 
     GtkWidget *previewpane;
     GtkWidget *alternative_layout;
@@ -306,6 +308,9 @@ static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox);
 
 static void convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox);
 
+static void expunge_on_close_cb(GtkWidget * widget, GtkWidget * pbox);
+static void expunge_auto_cb(GtkWidget * widget, GtkWidget * pbox);
+
 guint encoding_type[NUM_ENCODING_MODES] = {
     GMIME_PART_ENCODING_7BIT,
     GMIME_PART_ENCODING_8BIT,
@@ -508,7 +513,13 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(G_OBJECT(pui->hide_deleted), "toggled",
 		     G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->expunge_on_close), "toggled",
-		     G_CALLBACK(properties_modified_cb), property_box);
+		     G_CALLBACK(expunge_on_close_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->expunge_auto), "toggled",
+		     G_CALLBACK(expunge_auto_cb),
+		     property_box);
+    g_signal_connect(G_OBJECT(pui->expunge_hours), "changed",
+		     G_CALLBACK(properties_modified_cb),
+		     property_box);
 
     g_signal_connect(G_OBJECT(pui->browse_wrap), "toggled",
 		     G_CALLBACK(browse_modified_cb), property_box);
@@ -784,6 +795,11 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.expunge_on_close =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (pui->expunge_on_close));
+    balsa_app.expunge_auto =
+	GTK_TOGGLE_BUTTON(pui->expunge_auto)->active;
+    balsa_app.expunge_timeout =
+	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
+					 (pui->expunge_hours)) * 3600;
 
     /* external editor */
     balsa_app.edit_headers = GTK_TOGGLE_BUTTON(pui->edit_headers)->active;
@@ -1018,6 +1034,9 @@ set_prefs(void)
 				 balsa_app.close_mailbox_auto);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->close_mailbox_minutes),
 			      (float) balsa_app.close_mailbox_timeout / 60);
+    gtk_widget_set_sensitive(pui->close_mailbox_minutes,
+			     GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->
+    		    	    active);
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->hide_deleted),
@@ -1025,10 +1044,13 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->expunge_on_close),
                                  balsa_app.expunge_on_close);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->expunge_auto),
+				 balsa_app.expunge_auto);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->expunge_hours),
+			      (float) balsa_app.expunge_timeout / 3600);
+    gtk_widget_set_sensitive(pui->expunge_hours,
+			     GTK_TOGGLE_BUTTON(pui->expunge_auto)->active);
 
-    gtk_widget_set_sensitive(pui->close_mailbox_minutes,
-			     GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->
-    		    	    active);
 
     gtk_widget_set_sensitive(pui->check_mail_minutes,
 			     GTK_TOGGLE_BUTTON(pui->check_mail_auto)->
@@ -2446,6 +2468,8 @@ deleting_messages_group(GtkWidget * page)
 {
     GtkWidget *group;
     GtkWidget *label;
+    GtkWidget *hbox;
+    GtkObject *expunge_spinbutton_adj;
 
     group = pm_group_new(_("Deleting Messages"));
 
@@ -2459,13 +2483,33 @@ deleting_messages_group(GtkWidget * page)
     pui->hide_deleted =
         pm_group_add_check(group, _("Hide messages marked as deleted"));
 
-    label = gtk_label_new(_("The following setting is global."));
+    label = gtk_label_new(_("The following settings are global."));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
     pm_group_add(group, label);
     pui->expunge_on_close =
         pm_group_add_check(group, _("Expunge deleted messages "
 				    "when mailbox is closed"));
+
+    hbox = gtk_hbox_new(FALSE, COL_SPACING);
+    pm_group_add(group, hbox);
+
+    pui->expunge_auto =
+	gtk_check_button_new_with_label(_(" ...and if mailbox "
+                                          "is unused more than"));
+    gtk_box_pack_start(GTK_BOX(hbox), pui->expunge_auto,
+                       FALSE, FALSE, 0);
+    pm_page_add_to_size_group(page, pui->expunge_auto);
+
+    expunge_spinbutton_adj = gtk_adjustment_new(2, 1, 26, 1, 10, 10);
+    pui->expunge_hours =
+	gtk_spin_button_new(GTK_ADJUSTMENT(expunge_spinbutton_adj), 1, 0);
+    gtk_widget_show(pui->expunge_hours);
+    gtk_widget_set_sensitive(pui->expunge_hours, FALSE);
+    gtk_box_pack_start(GTK_BOX(hbox), pui->expunge_hours, FALSE, FALSE, 0);
+
+    label = gtk_label_new(_("hours"));
+    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 0);
 
     return group;
 }
@@ -2977,6 +3021,29 @@ mailbox_close_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->close_mailbox_minutes),
 			     newstate);
+
+    properties_modified_cb(widget, pbox);
+}
+
+static void
+expunge_on_close_cb(GtkWidget * widget, GtkWidget * pbox)
+{
+    gboolean newstate =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                     (pui->expunge_on_close));
+    gtk_widget_set_sensitive(GTK_WIDGET(pui->expunge_auto), newstate);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->expunge_auto),
+                                 newstate);
+
+    properties_modified_cb(widget, pbox);
+}
+
+static void
+expunge_auto_cb(GtkWidget * widget, GtkWidget * pbox)
+{
+    gboolean newstate =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->expunge_auto));
+    gtk_widget_set_sensitive(GTK_WIDGET(pui->expunge_hours), newstate);
 
     properties_modified_cb(widget, pbox);
 }

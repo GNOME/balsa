@@ -771,11 +771,17 @@ config_global_load(void)
 
     /* ... Progress Window Dialog */
     balsa_app.pwindow_option = d_get_gint("ProgressWindow", WHILERETR);
+
+    /* ... deleting messages: defaults enshrined here */
     balsa_app.hide_deleted =
         gnome_config_get_bool("HideDeleted=true");
     libbalsa_mailbox_set_filter(NULL, balsa_app.hide_deleted ? 1 : 0);
     balsa_app.expunge_on_close =
         gnome_config_get_bool("ExpungeOnClose=true");
+    balsa_app.expunge_auto = gnome_config_get_bool("AutoExpunge=true");
+    /* timeout in hours */
+    balsa_app.expunge_timeout =
+        gnome_config_get_int("AutoExpungeHours=2") * 3600;
 
     gnome_config_pop_prefix();
 
@@ -1153,6 +1159,9 @@ config_save(void)
 #endif /* ENABLE_TOUCH_UI */
     gnome_config_set_bool("HideDeleted", balsa_app.hide_deleted);
     gnome_config_set_bool("ExpungeOnClose", balsa_app.expunge_on_close);
+    gnome_config_set_bool("AutoExpunge", balsa_app.expunge_auto);
+    gnome_config_set_int("AutoExpungeHours",
+                         balsa_app.expunge_timeout / 3600);
 
     gnome_config_pop_prefix();
 

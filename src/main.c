@@ -61,10 +61,6 @@
 #include <gpgme.h>
 #endif
 
-/* we force expunge now and then so that mailboxes do not grow too
- * large. This is overriden by "do not expunge on close" setting. */
-#define EXPUNGE_UNUSED_MIN 120
-
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
 
@@ -441,7 +437,7 @@ scan_mailboxes_idle_cb()
 
 /* periodic_expunge_func makes sure that even the open mailboxes get
  * expunged now and than, even if they are opened longer than
- * EXPUNGE_PERIOD_HOURS. If we did not do it, the mailboxes would in
+ * balsa_app.expunge_timeout. If we did not do it, the mailboxes would in
  * principle grow indefinetely. */
 static gboolean
 mbnode_expunge_func(GtkTreeModel *model, GtkTreePath *path,
@@ -454,7 +450,7 @@ mbnode_expunge_func(GtkTreeModel *model, GtkTreePath *path,
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     if (mbnode->mailbox && libbalsa_mailbox_is_open(mbnode->mailbox)) {
         time_t tm = time(NULL);
-        if(tm-mbnode->last_use > EXPUNGE_UNUSED_MIN*60)
+        if(tm-mbnode->last_use > balsa_app.expunge_timeout)
             libbalsa_mailbox_sync_storage(mbnode->mailbox, TRUE);
     }
     g_object_unref(mbnode);
@@ -467,7 +463,7 @@ periodic_expunge_cb(void)
 {
 #if !defined(ENABLE_TOUCH_UI)
     /* should we enforce expunging now and then? Perhaps not... */
-    if(!balsa_app.expunge_on_close) return TRUE;
+    if(!balsa_app.expunge_auto) return TRUE;
 #endif
 
     libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,

@@ -1,6 +1,41 @@
 TODO LIST:
 
+
+Things needed for Balsa v0.5 (for GNOME 1.0 release)
+Fix/update/make-sure-they-work:
+ * POP3
+ * IMAP
+ * balsa-init
+
+New features/unfinished things:
+ * Filters
+ * CORBA
+ * update libmutt
+
+UI:
+ * Mailbox in the main window (as a handle.. should be reparentable)
+ * finish move and copy
+ * put deleted items in the trash and remove them from the current clist
+ * mailboxes with new mail should have bold text
+ * DND (drag and drop)
+ * MIME supporting icons.  use the new gnome metadata stuff that gmc uses?
+ * Use useful sounds
+ * New mail notification
+     - via sound
+     - change icon window incase Balsa is minimized to a different icon
+ * sending mail (code is awful, redo.  make useful for corba idl, support
+     external editors)
+ * auto-open mailboxes on startup
+ * Make things optional:
+     - inline images (on by default)
+     - check for new mail ever xx minutes
+     - open mailboxes on startup
+     - load mail from local mail directory
  * spell checking in the send window
+
+
+----------------------------------
+Old list.. may or may not be in above list
 
  * inbox/outbox/trash should be able to be IMAP
     this can be done by editing ~/.balsarc

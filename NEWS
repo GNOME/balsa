@@ -1,4 +1,11 @@
-* Balsa-2.0.11 release. Release date 2003-06-11
+* Balsa-2.0.12 release. Release date 2003-07-06
+
+- Added Undo and Redo in the message composer.
+- occasional mangling of text attachments fixed.
+- more information about attached messages is shown.
+- further GPG improvements.
+
+* Balsa-2.0.11 release. Release date 2003-05-11
 
 - text wrapping improvements.
 - charset encoding validation and conversion improvements.

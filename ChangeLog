@@ -1,3 +1,7 @@
+2003-07-06  Pawel Salek  <pawsa theochem.kth.se>
+
+	* NEWS, configure.in: release balsa-2.0.12.
+
 2003-07-05  Albrecht Dreß  <albrecht.dress@arcor.de>		
 
 	* src/balsa-message.c: show from and subject for attached 

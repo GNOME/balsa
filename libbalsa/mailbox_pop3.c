@@ -610,18 +610,22 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     if (libbalsa_mailbox_open(tmp_mailbox, NULL) && 
         m->inbox &&
         libbalsa_mailbox_total_messages(tmp_mailbox)) {
-	guint msgno = libbalsa_mailbox_total_messages(tmp_mailbox);
-	GList *msg_list = NULL;
+	guint msgno, total = libbalsa_mailbox_total_messages(tmp_mailbox);
+	GArray *messages = g_array_new(FALSE, FALSE, sizeof(guint));
 
-	do {
-	    LibBalsaMessage *message =
-		libbalsa_mailbox_get_message(tmp_mailbox, msgno);
-	    message->flags |= (LIBBALSA_MESSAGE_FLAG_NEW |
-			       LIBBALSA_MESSAGE_FLAG_RECENT);
-	    msg_list = g_list_prepend(msg_list, message);
-	} while (--msgno > 0);
+	for (msgno = 1; msgno <= total; msgno++)
+	    g_array_append_val(messages, msgno);
 
-	if (!libbalsa_messages_move(msg_list, m->inbox)) {    
+        if (!libbalsa_mailbox_messages_change_flags
+            (tmp_mailbox, messages,
+             LIBBALSA_MESSAGE_FLAG_NEW | LIBBALSA_MESSAGE_FLAG_RECENT, 0) ||
+	    !libbalsa_mailbox_sync_storage(tmp_mailbox, FALSE))
+            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                 _("Error setting flags on messages "
+                                   "in mailbox %s"), mailbox->name);
+
+	if (!libbalsa_mailbox_messages_move(tmp_mailbox, messages,
+                                            m->inbox)) {    
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 				 _("Error placing messages from %s on %s\n"
 				   "Messages are left in %s\n"),
@@ -630,8 +634,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 				 tmp_path);
 	    remove_tmp = FALSE;
 	}
-	g_list_foreach(msg_list, (GFunc)g_object_unref, NULL);
-	g_list_free(msg_list);
+	g_array_free(messages, TRUE);
         libbalsa_mailbox_close(tmp_mailbox, TRUE);
     }
     libbalsa_mailbox_pop3_config_changed(m);

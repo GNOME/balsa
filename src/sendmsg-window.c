@@ -124,7 +124,7 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
 static void
 remove_attachment (GtkWidget * widget, GnomeIconList * ilist)
 {
-  gint num = gtk_object_get_data (GTK_OBJECT (ilist), "selectednumbertoremove");
+  gint num = (gint) gtk_object_get_data (GTK_OBJECT (ilist), "selectednumbertoremove");
   gnome_icon_list_remove (ilist, num);
   gtk_object_remove_data (GTK_OBJECT (ilist), "selectednumbertoremove");
 }
@@ -148,9 +148,9 @@ static void
 select_attachment (GnomeIconList * ilist, gint num, GdkEventButton * event)
 {
 /*
-  if (!event || event->button != 3)
-    return;
-*/
+   if (!event || event->button != 3)
+   return;
+ */
   gtk_menu_popup (GTK_MENU (create_popup_menu (ilist, num)), NULL, NULL, NULL, NULL, event->button, event->time);
 }
 
@@ -383,7 +383,7 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 			      GTK_POLICY_AUTOMATIC,
 			      GTK_POLICY_AUTOMATIC);
   gtk_signal_connect (GTK_OBJECT (msg->attachments), "select_icon",
-		      GTK_SIGNAL_FUNC(select_attachment),
+		      GTK_SIGNAL_FUNC (select_attachment),
 		      NULL);
 
 

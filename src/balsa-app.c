@@ -388,6 +388,11 @@ balsa_app_init(void)
     /* printing */
     balsa_app.paper_size = g_strdup(DEFAULT_PAPER_SIZE);
 
+    balsa_app.print_header_font = g_strdup(DEFAULT_PRINT_HEADER_FONT);
+    balsa_app.print_footer_font = g_strdup(DEFAULT_PRINT_FOOTER_FONT);
+    balsa_app.print_body_font   = g_strdup(DEFAULT_PRINT_BODY_FONT);
+    balsa_app.print_highlight_cited = FALSE;
+
     /* address book */
     balsa_app.address_book_list = NULL;
     balsa_app.default_address_book = NULL;

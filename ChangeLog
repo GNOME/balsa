@@ -1,3 +1,10 @@
+2002-10-09  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-app.[ch]: define default print fonts.
+	* src/save-restore.c: save and restore fonts.
+	* src/print.c: print font selection.
+	* src/main-window.c: shortcuts in search dialog (PS).
+
 2002-09-29  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-mblist.c: fix edition of unselectable folders.

@@ -649,6 +649,20 @@ config_global_load(void)
     balsa_app.paper_size =
 	gnome_config_get_string("PaperSize=" DEFAULT_PAPER_SIZE);
 
+    g_free(balsa_app.print_header_font);
+    balsa_app.print_header_font =
+        gnome_config_get_string("PrintHeaderFont="
+                                DEFAULT_PRINT_HEADER_FONT);
+    g_free(balsa_app.print_footer_font);
+    balsa_app.print_footer_font =
+        gnome_config_get_string("PrintFooterFont="
+                                DEFAULT_PRINT_FOOTER_FONT);
+    g_free(balsa_app.print_body_font);
+    balsa_app.print_body_font =
+        gnome_config_get_string("PrintBodyFont="
+                                DEFAULT_PRINT_BODY_FONT);
+    balsa_app.print_highlight_cited =
+        gnome_config_get_bool("PrintHighlightCited=false");
     gnome_config_pop_prefix();
 
     /* Spelling options ... */
@@ -964,6 +978,13 @@ gint config_save(void)
     /* Printing options ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Printing/");
     gnome_config_set_string("PaperSize",balsa_app.paper_size);
+    gnome_config_set_string("PrintHeaderFont",
+                            balsa_app.print_header_font);
+    gnome_config_set_string("PrintBodyFont", balsa_app.print_body_font);
+    gnome_config_set_string("PrintFooterFont",
+                            balsa_app.print_footer_font);
+    gnome_config_set_bool("PrintHighlightCited",
+                          balsa_app.print_highlight_cited);
     gnome_config_pop_prefix();
 
     /* Spelling options ... */

@@ -74,7 +74,7 @@
  */
 #define MAX_QUOTED_COLOR 6
 #define DEFAULT_QUOTED_COLOR "#055"
-#define DEFAULT_QUOTE_REGEX  "^(([ \tA-Z])\1*[|>:}#])"
+#define DEFAULT_QUOTE_REGEX  "^(([ \tA-Z])\\1*[|>:}#])"
 
 #define DEFAULT_URL_COLOR    "dark blue"
 #define DEFAULT_BAD_ADDRESS_COLOR    "red"
@@ -89,6 +89,9 @@
 #define DEFAULT_SUBJECT_FONT "helvetica Bold 11"
 #define DEFAULT_DATE_FORMAT "%Y.%m.%d %H:%M"
 #define DEFAULT_PAPER_SIZE "A4"
+#define DEFAULT_PRINT_HEADER_FONT "Helvetica 11"
+#define DEFAULT_PRINT_BODY_FONT "Courier 10"
+#define DEFAULT_PRINT_FOOTER_FONT "Helvetica 7"
 #define DEFAULT_SELECTED_HDRS "from to date cc subject"
 #define DEFAULT_MESSAGE_TITLE_FORMAT "Message from %F: %s"
 #define DEFAULT_ENCODING ENC8BIT
@@ -310,6 +313,10 @@ extern struct BalsaApplication {
 
     /* printing */
     gchar* paper_size; /* A4 or Letter */
+    gchar* print_header_font;  /* font for printing headers */
+    gchar* print_body_font;    /* font for printing text parts */
+    gchar* print_footer_font;  /* font for printing footers */
+    gboolean print_highlight_cited;
 
     /* compose: shown headers */
     gchar *compose_headers;

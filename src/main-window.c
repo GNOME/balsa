@@ -2220,7 +2220,7 @@ display_new_mail_notification(int num_new)
     label=gtk_label_new(_("You have new mail waiting"));
     gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
     
-    ok_button=gtk_button_new_with_label(_("OK"));
+    ok_button=gtk_button_new_from_stock(GTK_STOCK_OK);
     GTK_WIDGET_SET_FLAGS (GTK_WIDGET (ok_button), GTK_CAN_DEFAULT);
     gtk_box_pack_start(GTK_BOX(dlg->action_area), ok_button, FALSE, FALSE, 0);
     gtk_widget_grab_default(ok_button);
@@ -2591,7 +2591,7 @@ address_book_cb(GtkWindow *widget, gpointer data)
 static GtkToggleButton*
 add_check_button(GtkWidget* table, const gchar* label, gint x, gint y)
 {
-    GtkWidget* res = gtk_check_button_new_with_label(label);
+    GtkWidget* res = gtk_check_button_new_with_mnemonic(label);
     gtk_table_attach(GTK_TABLE(table),
                      res,
                      x, x+1, y, y+1,

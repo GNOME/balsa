@@ -1533,10 +1533,14 @@ int imap_uid_search(CONTEXT* ctx, const char* query,
   BUFFER cmd;
   char num[11];
 
+  idata = ctx->data;
+  if (idata == NULL)
+    return -1;  /* Error return for libbalsa_mailbox_imap_get_matchings */
+  
   memset (&cmd, 0, sizeof (cmd));
   mutt_buffer_addstr (&cmd, "UID SEARCH ");
   mutt_buffer_addstr (&cmd, query);
-  idata = ctx->data;
+
   imap_cmd_start (idata, cmd.data);
   cnt = 0;
   do

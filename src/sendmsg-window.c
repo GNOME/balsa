@@ -757,7 +757,12 @@ fillBody(BalsaSendmsg *msg, Message * message, SendType type)
 	   balsa_app.sig_whenreply) ||
 	  ( (type == SEND_FORWARD) && balsa_app.sig_whenforward) ||
 	  ( (type == SEND_NORMAL) && balsa_app.sig_sending) ) {
-	gtk_text_insert   (GTK_TEXT(msg->text), NULL, NULL, NULL, "\n", 1);
+	/* gtk_text_insert   (GTK_TEXT(msg->text), NULL, NULL, NULL, "\n", 1);*/
+
+	if( balsa_app.sig_separator && g_strncasecmp(signature, "--\n" ,3) && 
+	   g_strncasecmp(signature, "-- \n" ,4) )
+	   gtk_text_insert   (GTK_TEXT(msg->text), NULL, NULL, NULL, 
+			      "-- \n", 4);
 	gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, 
 			 signature, strlen (signature));
      }

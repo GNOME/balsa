@@ -70,7 +70,7 @@ find_my_node (GNode * root,
 static gboolean
 traverse_find_path (GNode * node, gpointer* d)
 {
-   const gchar * path;
+  const gchar * path;
   if (!node->data ||
       !MAILBOX_IS_LOCAL( ((MailboxNode *) node->data)->mailbox ) )
      return FALSE;
@@ -84,12 +84,13 @@ traverse_find_path (GNode * node, gpointer* d)
 
 static GNode *
 mb_node_find_path (GNode * root, GTraverseType order, GTraverseFlags flags,
-		   gpointer data)
+		   const gchar* data)
 {
   gpointer d[2];
 
-  d[0] = data; d[1] = NULL;
-  g_node_traverse (root, order, flags, -1, traverse_find_path, d);
+  d[0] = (gchar*)data; d[1] = NULL;
+  g_node_traverse (root, order, flags, -1, 
+		   (GNodeTraverseFunc)traverse_find_path, d);
 
   return d[1];
 }

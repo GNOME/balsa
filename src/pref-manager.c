@@ -40,6 +40,7 @@ typedef struct _PropertyUI {
 	GtkRadioButton *toolbar_type[NUM_TOOLBAR_MODES];
 	GtkWidget *real_name, *email, *replyto, *signature;
 	GtkWidget *sig_whenforward, *sig_whenreply, *sig_sending;
+        GtkWidget *sig_separator;
 	
 	GtkWidget *pop3servers, *smtp_server, *mail_directory;
 	GtkWidget *rb_local_mua, *rb_smtp_server;
@@ -373,6 +374,8 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
 	gtk_signal_connect (GTK_OBJECT (pui->sig_whenreply), "toggled",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+	gtk_signal_connect (GTK_OBJECT (pui->sig_separator), "toggled",
+			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
 
 	gtk_signal_connect (GTK_OBJECT (pui->rb_smtp_server), "toggled",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
@@ -511,6 +514,7 @@ apply_prefs (GtkWidget * pbox, PropertyUI * pui)
 	balsa_app.sig_sending = GTK_TOGGLE_BUTTON (pui->sig_sending)->active;
 	balsa_app.sig_whenforward = GTK_TOGGLE_BUTTON (pui->sig_whenforward)->active;
 	balsa_app.sig_whenreply = GTK_TOGGLE_BUTTON (pui->sig_whenreply)->active;
+	balsa_app.sig_separator = GTK_TOGGLE_BUTTON (pui->sig_separator)->active;
 
 	/* 
 	 * display page 
@@ -644,6 +648,7 @@ set_prefs (void)
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON (pui->sig_sending), balsa_app.sig_sending);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON (pui->sig_whenforward), balsa_app.sig_whenforward);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON (pui->sig_whenreply), balsa_app.sig_whenreply);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON (pui->sig_separator), balsa_app.sig_separator);
 
 	if (balsa_app.smtp_server) 
 		gtk_entry_set_text (GTK_ENTRY (pui->smtp_server), balsa_app.smtp_server);
@@ -841,7 +846,7 @@ create_signature_page ( )
 	gtk_widget_show (frame1);
 	gtk_box_pack_start( GTK_BOX(vbox), frame1, FALSE, FALSE, 0 );
 
-	table1 = gtk_table_new (5, 2, FALSE);
+	table1 = gtk_table_new (6, 2, FALSE);
 	gtk_widget_show (table1);
 	gtk_container_add (GTK_CONTAINER (frame1), table1);
 	gtk_container_set_border_width (GTK_CONTAINER (table1), 10);
@@ -905,6 +910,13 @@ create_signature_page ( )
 	label1 = gtk_label_new (_("Use signature file when:"));
 	gtk_widget_show (label1);
 	gtk_table_attach (GTK_TABLE (table1), label1, 0, 1, 0, 1,
+			  (GtkAttachOptions) (GTK_FILL),
+			  (GtkAttachOptions) (0), 0, 0);
+
+	pui->sig_separator = gtk_check_button_new_with_label (
+	   _("enable signature separator"));
+	gtk_widget_show ( pui->sig_separator);
+	gtk_table_attach (GTK_TABLE (table1),  pui->sig_separator, 1, 2, 5, 6,
 			  (GtkAttachOptions) (GTK_FILL),
 			  (GtkAttachOptions) (0), 0, 0);
 	

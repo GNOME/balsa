@@ -1,3 +1,16 @@
+2000-03-15  Pawel Salek<pawsa@theochem.kth.se>
+	
+	* src/balsa-app.[hc], src/pref-manager.c,src/save-restore.c,
+	* src/sendmsg-window.c: signature separator handling.
+	* src/local-mailbox.c: compilation warning removed.
+	
+2000-03-14  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c, src/balsa-app.c, src/balsa-mblist.c, 
+	* src/mailbox-conf.c, src/main-window.c:
+	The deleting mailboxes via Balsa is expected to work properly now.
+	Some minor bug fixes.
+
 2000-03-14  Pawel Salek <pawsa@theochem.kth.se>
 	* src/balsa-app.c: handles lack of trash nicely
 	* src/mailbox-conf.c: ultimate solution of the mailbox 

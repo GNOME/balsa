@@ -104,6 +104,7 @@ extern struct BalsaApplication
   gboolean sig_sending;
   gboolean sig_whenforward;
   gboolean sig_whenreply;
+  gboolean sig_separator;
   gchar *signature_path;
   
   BalsaMBList *mblist;

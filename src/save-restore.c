@@ -677,6 +677,11 @@ config_global_load (void)
   else
     balsa_app.sig_whenforward = atoi ( field );
 
+  if ((field = pl_dict_get_str (globals, "SigSeparator")) == NULL)
+    balsa_app.sig_separator = TRUE;
+  else
+    balsa_app.sig_separator = atoi ( field );
+
   /* smtp server */
   if ((field = pl_dict_get_str (globals, "SMTPServer")) == NULL)
     ;				/* an optional field for now */
@@ -965,6 +970,9 @@ config_global_save (void)
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.sig_whenreply);
     pl_dict_add_str_str (globals, "SigReply", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.sig_separator);
+    pl_dict_add_str_str (globals, "SigSeparator", tmp);
 
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.toolbar_style);

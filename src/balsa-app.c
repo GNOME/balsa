@@ -95,6 +95,7 @@ balsa_app_init (void)
 
   balsa_app.local_mail_directory = NULL;
   balsa_app.signature_path = NULL;
+  balsa_app.sig_separator = TRUE;
   balsa_app.smtp_server = NULL;
 
   balsa_app.inbox = NULL;

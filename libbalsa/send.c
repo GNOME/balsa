@@ -31,6 +31,8 @@
 #include <pthread.h>
 #endif
 
+#include <sys/socket.h>
+
 /* FIXME: This balsa dependency must go... */
 #include "../src/balsa-app.h"
 

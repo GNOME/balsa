@@ -1,5 +1,11 @@
 2001-02-18  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* src/balsa-index.c: fix threading.
+	* src/main-window.[hc]: update threading menu when mailbox index
+	switched.
+
+2001-02-18  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* libbalsa/folder-scanners.[hc]: 
 	initial support for subscribed mailboxes.
 	* libbalsa/mailbox.c: lock mailbox in libbalsa_mailbox_load_messages().

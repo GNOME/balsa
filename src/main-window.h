@@ -57,6 +57,7 @@ void balsa_window_refresh(BalsaWindow * window);
 void balsa_window_open_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
 void balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
 void balsa_window_enable_continue(void);
+void balsa_window_set_threading_menu(int);
 void balsa_change_window_layout(BalsaWindow *window);
 gboolean mail_progress_notify_cb(void);
 gboolean send_progress_notify_cb(void);

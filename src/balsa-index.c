@@ -539,8 +539,6 @@ static void *open_in_thread(void* mailbox)
 gboolean
 balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
 {
-    GList *list;
-    guint i = 0;
     LibBalsaMailbox* mailbox;
     gchar *msg;
 
@@ -625,26 +623,10 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
 		       GTK_SIGNAL_FUNC(mailbox_messages_delete_cb),
 		       (gpointer) bindex);
 
-    gtk_clist_freeze(GTK_CLIST(bindex->ctree));
-    list = mailbox->message_list;
-
-    while (list) {
-	balsa_index_add(bindex, LIBBALSA_MESSAGE(list->data));
-	list = list->next;
-	i++;
-    }
-
     /* do threading */
     balsa_index_set_sort_order(bindex, mbnode->sort_field, 
 			       mbnode->sort_type);
     balsa_index_set_threading_type(bindex, mbnode->threading_type);
-
-    gtk_clist_thaw(GTK_CLIST(bindex->ctree));
-
-    /* FIXME this might could be cleaned up some */
-    if(bindex->first_new_message==NULL && i)
-	bindex->first_new_message=
-	    LIBBALSA_MESSAGE(gtk_clist_get_row_data(GTK_CLIST (bindex->ctree), i-1));
 
     gtk_idle_add((GtkFunction) moveto_handler, bindex);
 
@@ -2062,26 +2044,60 @@ replace_attached_data(GtkObject * obj, const gchar * key, GtkObject * data)
 	gtk_object_ref(data);
 }
 
-
+/* balsa_index_set_threading_type:
+   FIXME: balsa_index_threading() requires that the index has been freshly
+   recreated. This should not be necessary.
+*/
 void
 balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
 {
+    GList *list;
     LibBalsaMailbox* mailbox = NULL;
+    guint i=0;
+    GtkCList *clist;
+    BalsaMessage *msg;
 
     g_return_if_fail (bindex);
+    g_return_if_fail (GTK_IS_CLIST(bindex->ctree));
     g_return_if_fail (bindex->mailbox_node != NULL);
     g_return_if_fail (bindex->mailbox_node->mailbox != NULL);
 
+    clist = GTK_CLIST(bindex->ctree);
     bindex->threading_type = thtype;
-
+    
     mailbox = bindex->mailbox_node->mailbox;
-    	
-    gtk_clist_freeze(GTK_CLIST(bindex->ctree));
-    balsa_index_threading(bindex);
-    gtk_clist_sort(GTK_CLIST(bindex->ctree));
-    DO_CLIST_WORKAROUND(GTK_CLIST(bindex->ctree));
-    gtk_clist_thaw(GTK_CLIST(bindex->ctree));
 
+    gtk_clist_freeze(clist);
+    gtk_clist_clear(clist);
+    list = mailbox->message_list;
+    
+    while (list) {
+	balsa_index_add(bindex, LIBBALSA_MESSAGE(list->data));
+	list = list->next;
+	i++;
+    }
+
+    /* do threading */
+    balsa_index_threading(bindex);
+    gtk_clist_sort(clist);
+    DO_CLIST_WORKAROUND(clist);
+    gtk_clist_thaw(clist);
+
+    /* FIXME this might could be cleaned up some */
+    if(bindex->first_new_message==NULL && i)
+	bindex->first_new_message=
+	    LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, i-1));
+
+    msg = BALSA_MESSAGE(balsa_app.main_window->preview);
+    if ( msg && msg->message &&
+	(i=gtk_clist_find_row_from_data(clist, msg->message))>=0
+	&& gtk_clist_row_is_visible(clist, i) != GTK_VISIBILITY_FULL) {
+	gtk_clist_moveto(clist, i, 0, 1.0, 0.0);
+	gtk_clist_select_row(clist, i, 0);
+    }
+
+    /* set the menu apriopriately */
+    balsa_window_set_threading_menu(thtype);
 }
 
 void

@@ -128,7 +128,7 @@ static void check_mailbox_list(GList * list);
 static void mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node,
 			       gpointer data);
 
-static void enable_mailbox_menus(LibBalsaMailbox * mailbox);
+static void enable_mailbox_menus(BalsaMailboxNode * mbnode);
 static void enable_message_menus(LibBalsaMessage * message);
 static void enable_edit_menus(BalsaMessage * bm);
 
@@ -313,11 +313,14 @@ static GnomeUIInfo shown_hdrs_menu[] = {
 };
 
 static GnomeUIInfo threading_menu[] = {
+#define MENU_THREADING_FLAT_POS 0
     GNOMEUIINFO_RADIOITEM(N_("_Flat index"), N_("No threading at all"),
 			 threading_flat_cb, NULL),
+#define MENU_THREADING_SIMPLE_POS 1
     GNOMEUIINFO_RADIOITEM(N_("S_imple threading"),
 			  N_("Simple threading algorithm"),
 			  threading_simple_cb, NULL),
+#define MENU_THREADING_JWZ_POS 2
     GNOMEUIINFO_RADIOITEM(N_("_JWZ threading"), 
 			  N_("Elaborate JWZ threading"),
 			  threading_jwz_cb, NULL),
@@ -790,15 +793,13 @@ balsa_window_new()
  * on if there is a mailbox open. 
  */
 static void
-enable_mailbox_menus(LibBalsaMailbox * mailbox)
+enable_mailbox_menus(BalsaMailboxNode * mbnode)
 {
+    LibBalsaMailbox *mailbox = NULL;
     gboolean enable;
 
-    if (mailbox == NULL)
-	enable = FALSE;
-    else
-	enable = TRUE;
-
+    enable =  (mbnode != NULL);
+    if(mbnode) mailbox = mbnode->mailbox;
     if (mailbox && mailbox->readonly) {
 	gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_COMMIT_POS].widget, FALSE);
     } else {
@@ -829,6 +830,16 @@ enable_mailbox_menus(LibBalsaMailbox * mailbox)
 			     enable);
     gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_DELETE_POS].widget,
 			     enable);
+
+    gtk_widget_set_sensitive(threading_menu[MENU_THREADING_FLAT_POS].widget,
+			     enable);
+    gtk_widget_set_sensitive(threading_menu[MENU_THREADING_SIMPLE_POS].widget,
+			     enable);
+    gtk_widget_set_sensitive(threading_menu[MENU_THREADING_JWZ_POS].widget,
+			     enable);
+
+    if(mbnode)
+	balsa_window_set_threading_menu(mbnode->threading_type);
 }
 
 /*
@@ -935,6 +946,28 @@ balsa_window_enable_continue(void)
     }
 }
 
+void
+balsa_window_set_threading_menu(int option)
+{
+    int pos;
+    switch(option) {
+    case BALSA_INDEX_THREADING_FLAT:
+    pos = MENU_THREADING_FLAT_POS; break;
+    case BALSA_INDEX_THREADING_SIMPLE:
+    pos = MENU_THREADING_SIMPLE_POS; break;
+    case BALSA_INDEX_THREADING_JWZ:
+    pos = MENU_THREADING_JWZ_POS; break;
+    default: return;
+    }
+    gtk_signal_handler_block_by_func(GTK_OBJECT(threading_menu[pos].widget),
+				     threading_menu[pos].moreinfo, 
+				     balsa_app.main_window);
+    gtk_check_menu_item_set_active
+	(GTK_CHECK_MENU_ITEM(threading_menu[pos].widget), TRUE);
+    gtk_signal_handler_unblock_by_func(GTK_OBJECT(threading_menu[pos].widget),
+				       threading_menu[pos].moreinfo,
+				       balsa_app.main_window);
+}
 
 /* balsa_window_open_mbnode: 
    opens mailbox, creates message index. mblist_open_mailbox() is what
@@ -1006,7 +1039,7 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
 	g_list_prepend(balsa_app.open_mailbox_list, mbnode->mailbox);
 
     /* Enable relavent menu items... */
-    enable_mailbox_menus(mbnode->mailbox);
+    enable_mailbox_menus(mbnode);
 }
 
 /* balsa_window_real_close_mbnode:
@@ -2226,7 +2259,7 @@ notebook_switch_page_cb(GtkWidget * notebook,
 	enable_message_menus(NULL);
     }
 
-    enable_mailbox_menus(mailbox);
+    enable_mailbox_menus(BALSA_INDEX(index)->mailbox_node);
 }
 
 static void
@@ -2234,7 +2267,12 @@ balsa_window_select_message_cb(GtkWidget * widget,
 			       LibBalsaMessage * message,
 			       GdkEventButton * bevent, gpointer data)
 {
-    enable_mailbox_menus(message->mailbox);
+    BalsaIndex *index;
+
+    index = 
+	BALSA_INDEX(balsa_window_find_current_index(balsa_app.main_window));
+    g_return_if_fail(index);
+    enable_mailbox_menus(index->mailbox_node);
     enable_message_menus(message);
 }
 
@@ -2243,7 +2281,12 @@ balsa_window_unselect_message_cb(GtkWidget * widget,
 				 LibBalsaMessage * message,
 				 GdkEventButton * bevent, gpointer data)
 {
-    enable_mailbox_menus(message->mailbox);
+    BalsaIndex *index;
+
+    index = 
+	BALSA_INDEX(balsa_window_find_current_index(balsa_app.main_window));
+    g_return_if_fail(index);
+    enable_mailbox_menus(index->mailbox_node);
 /*     enable_message_menus(NULL); */
 /*     enable_edit_menus(NULL); */
 }

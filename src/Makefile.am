@@ -1,3 +1,5 @@
+CFLAGS += -Wall -Wmissing-prototypes -Wpointer-arith
+
 bin_PROGRAMS = balsa
 
 balsa_SOURCES =	\

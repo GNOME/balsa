@@ -1,3 +1,5 @@
+CFLAGS += -Wall -Wmissing-prototypes -Wpointer-arith
+
 noinst_LIBRARIES = libbalsa.a
 
 libbalsa_a_SOURCES = \

@@ -109,9 +109,9 @@ ab_clear_clist(GtkCList * clist)
 static gint
 ab_delete_compare(gconstpointer a, gconstpointer b)
 {
-	if ((gint) a > (gint) b)
+	if (GPOINTER_TO_INT(a) > GPOINTER_TO_INT(b))
 		return 1;
-	else if ((gint) a == (gint) b)
+	else if (GPOINTER_TO_INT(a) == GPOINTER_TO_INT(b))
 		return 0;
 	else
 		return -1;
@@ -120,7 +120,7 @@ ab_delete_compare(gconstpointer a, gconstpointer b)
 static gint
 ab_switch_cb(GtkWidget * widget, gpointer data)
 {
-	GtkWidget      *from = (GtkWidget *) data;
+	GtkWidget      *from = GTK_WIDGET(data);
 	GtkWidget      *to = (data == book_clist) ? add_clist : book_clist;
 	GList          *glist = GTK_CLIST(from)->selection;
 	GList          *deletelist = NULL, *pointer;
@@ -130,13 +130,13 @@ ab_switch_cb(GtkWidget * widget, gpointer data)
 		gchar          *listdata[2];
 		AddressData    *addy_data;
 		
-		num = (gint) (pointer->data);
+		num = GPOINTER_TO_INT(pointer->data);
 		
 		addy_data = gtk_clist_get_row_data(GTK_CLIST(from), num);
 		listdata[0] = addy_data->name;
 		listdata[1] = addy_data->addy;
 		
-		deletelist = g_list_append(deletelist, (gpointer) num);
+		deletelist = g_list_append(deletelist, GINT_TO_POINTER(num));
 
 		num = gtk_clist_append(GTK_CLIST(to), listdata);
 		gtk_clist_set_row_data(GTK_CLIST(to), num, (gpointer) addy_data);
@@ -145,7 +145,7 @@ ab_switch_cb(GtkWidget * widget, gpointer data)
 	deletelist = g_list_sort(deletelist, (GCompareFunc) ab_delete_compare);
 
 	for (pointer = g_list_last(deletelist); pointer != NULL; pointer = g_list_previous(pointer)) {
-		gtk_clist_remove(GTK_CLIST(from), (gint) (pointer->data));
+		gtk_clist_remove(GTK_CLIST(from), GPOINTER_TO_INT(pointer->data));
 	}
 
 	g_list_free(deletelist);

@@ -309,12 +309,11 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 				   (GMimeParserHeaderRegexFunc)
 				   lbm_mbox_header_cb, &msg_info);
 
-    msg_info.end = g_mime_parser_tell(gmime_parser);
     while (!g_mime_stream_eos(mbox->gmime_stream)) {
 	msg_info.status = -1;
 	msg_info.x_status  = -1;
 	mime_message = g_mime_parser_construct_message(gmime_parser);
-	msg_info.start = msg_info.end;
+	msg_info.start = g_mime_parser_get_from_offset(gmime_parser);
 	msg_info.end = g_mime_parser_tell(gmime_parser);
 	if (msg_info.end > msg_info.start) {
 	    msg_info.from = g_mime_parser_get_from(gmime_parser);

@@ -55,11 +55,7 @@ balsa_BASE_SOURCES =	\
 	toolbar-factory.c	\
 	toolbar-factory.h
 
-balsa_IDL_SOURCES = \
-	balsa-common.c		\
-	balsa-skels.c		\
-	balsa-stubs.c		
-balsa_IDL_SOURCES = 
+balsa_IDL_SOURCES = # balsa-common.c balsa-skels.c balsa-stubs.c		
 
 balsa_SOURCES = $(balsa_BASE_SOURCES) $(balsa_IDL_SOURCES)
 

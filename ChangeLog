@@ -1,3 +1,8 @@
+2001-09-28  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/Makefile.am (balsa_IDL_SOURCES): previous form broke with 
+	automake-1.5
+
 2001-09-25  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Toralf Lund <toralf@kscanners.com> - handle distribution lists.

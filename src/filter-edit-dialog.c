@@ -88,7 +88,7 @@ build_option_menu (option_list options[],
  * Builds the left side of the dialog
  */
 static GtkWidget *
-build_left_side ()
+build_left_side (GtkWidget **clist_ptr)
 {
     GtkWidget *vbox, *bbox, *button;
     GtkWidget *pixmap;
@@ -193,6 +193,8 @@ build_left_side ()
     gtk_container_add (GTK_CONTAINER (bbox), button);
 
     gtk_widget_show_all (vbox);
+
+    *clist_ptr = clist;
 
     return vbox;
 }				/* end build_left_side() */
@@ -681,7 +683,7 @@ build_action_page ()
  * Builds the right side of the dialog
  */
 static GtkWidget *
-build_right_side ()
+build_right_side (GtkWidget *clist)
 {
     GtkWidget *rightside;
     GtkWidget *notebook, *page;
@@ -709,7 +711,7 @@ build_right_side ()
     gtk_signal_connect(GTK_OBJECT(button),
                        "clicked",
                        GTK_SIGNAL_FUNC(fe_apply_pressed),
-                       NULL);
+                       clist);
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
     pixmap = gnome_stock_new_with_icon (GNOME_STOCK_MENU_UNDO);
@@ -717,7 +719,7 @@ build_right_side ()
     gtk_signal_connect(GTK_OBJECT(button),
                        "clicked",
                        GTK_SIGNAL_FUNC(fe_revert_pressed),
-                       NULL);
+                       clist);
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
     return rightside;
@@ -739,6 +741,7 @@ filter_edit_dialog (GList * filter_list)
     GtkWidget *hbox;
     GtkWidget *piece;
     GtkWidget *sep;
+    GtkWidget *clist;
 
     window = gnome_dialog_new (_ ("Balsa Filters"),
                                GNOME_STOCK_BUTTON_OK,
@@ -754,13 +757,13 @@ filter_edit_dialog (GList * filter_list)
     gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (window)->vbox),
                         hbox, FALSE, FALSE, 0);
 
-    piece = build_left_side ();
+    piece = build_left_side (&clist);
     gtk_box_pack_start (GTK_BOX (hbox), piece, FALSE, FALSE, 2);
 
     sep = gtk_vseparator_new ();
     gtk_box_pack_start (GTK_BOX (hbox), sep, FALSE, FALSE, 2);
 
-    piece = build_right_side ();
+    piece = build_right_side (clist);
     gtk_box_pack_start (GTK_BOX (hbox), piece, FALSE, FALSE, 2);
 
     gtk_widget_show_all (window);

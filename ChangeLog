@@ -1,3 +1,11 @@
+1999-02-01  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
+
+	* src/filter-edit-dialog.c (build_left_side): pass it a
+	GtkWidget ** parameter to get the clist pointer in.
+	(build_right_side): accept a GtkWidget * parameter in order
+	to pass it a clist for apply/revert callbacks userdata.
+	(filter_edit_dialog): utilize the above.
+	
 1999-01-20  Nat Friedman  <nat@nat.org>
 
 	* src/pref-manager.c (open_preferences_manager): Connect the help

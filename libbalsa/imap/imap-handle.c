@@ -230,6 +230,8 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host,
 {
   ImapResult rc;
 
+  g_return_val_if_fail(imap_mbox_is_disconnected(ret), IMAP_CONNECT_FAILED);
+
   g_free(ret->host);   ret->host   = g_strdup(host);
   g_free(ret->user);   ret->user   = g_strdup(user);
   g_free(ret->passwd); ret->passwd = g_strdup(passwd);

@@ -1,3 +1,10 @@
+2000-04-11  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/message.c: handle 'references' header properly
+	* libbalsa/misc.c: wrapping misalignment
+	* src/balsa-message.c: ':' to headers, memory leak
+	* src/sendmsg-window.c: multiple attachment bug fix.
+	
 2000-04-10  Peter Williams  <peter@beta.newton.cx>
 
 	* configure.in: Add check for gob when using CVS source.

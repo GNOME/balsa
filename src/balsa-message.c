@@ -611,7 +611,7 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 {
   double x1, x2, y1, y2;
   GList *p, * lst;
-  gchar **pair;
+  gchar **pair, *hdr;
   GnomeCanvasGroup *bm_root;
   GnomeCanvasGroup *row[2];
 
@@ -659,7 +659,9 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
       pair = p->data;
       if(balsa_app.browse_wrap)
 	  wrap_string(pair[1], balsa_app.wraplength-strlen(pair[0])-1);
-      add_header_gchar(pair[0], pair[0], pair[1],  row);
+      hdr = g_strconcat(pair[0], ":", NULL);
+      add_header_gchar(pair[0], hdr, pair[1],  row);
+      g_free(hdr);
       g_strfreev(pair);
   }
   g_list_free(lst);

@@ -214,7 +214,7 @@ wrap_string(gchar* str, int width)
    while(*ptr) {
       if(*ptr=='\t') te += 7;
       if(*ptr==' ') sppos = ptr;
-      if(ptr-lnbeg+1>width-te && sppos>=lnbeg+minl) {
+      if(ptr-lnbeg>width-te && sppos>=lnbeg+minl) {
 	 *sppos = '\n';
 	 lnbeg = ptr; te = 0;
       }

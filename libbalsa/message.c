@@ -271,8 +271,8 @@ message_user_hdrs(Message *message)
 	"Message-ID", g_strdup(cur->env->message_id) ) );
 
     for(tmp = cur->env->references; tmp; tmp = tmp->next) {
-	pair = g_strsplit(tmp->data,":",2);
-	res = g_list_append(res, pair);
+	res = g_list_append(res,create_hdr_pair(
+	"References", g_strdup(tmp->data)) );
     }
 
     for(tmp = cur->env->userhdrs; tmp; tmp = tmp->next) {

@@ -417,27 +417,28 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
 {
   GtkFileSelection *fs;
   GnomeIconList *iconlist;
-  gchar *filename, *dir, *p;
+  gchar *filename, *dir, *p, *sel_file;
   GList * node;
 
   fs = GTK_FILE_SELECTION (data);
   iconlist = GNOME_ICON_LIST (gtk_object_get_user_data (GTK_OBJECT (fs)));
 
-  dir = g_strdup(gtk_file_selection_get_filename(fs));
+  sel_file = g_strdup(gtk_file_selection_get_filename(fs));
+  dir = g_strdup(sel_file);
   p = strrchr(dir, '/');
   if (p)
       *(p + 1) = '\0';
 
+  add_attachment (iconlist, sel_file);
   for(node = GTK_CLIST(fs->file_list)->selection; node; 
       node = g_list_next(node) ) {
       gtk_clist_get_text(GTK_CLIST(fs->file_list), 
 			 GPOINTER_TO_INT(node->data), 0, &p);
       filename = g_strconcat(dir, p, NULL);
-      printf("open file %s\n", filename);
-      add_attachment (iconlist, filename);
+      if(strcmp(filename, sel_file) != 0)
+	  add_attachment (iconlist, filename);
+      g_free(filename);
   }
-  /* filename = g_strdup (gtk_file_selection_get_filename (fs));
-     add_attachment (iconlist, filename); */
 
   /* do not g_free(filename) - the add_attachment arg is not const */
 

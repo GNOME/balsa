@@ -542,17 +542,17 @@ static GList *libbalsa_address_book_vcard_alias_complete(LibBalsaAddressBook * a
 	
 	if (addr1 == addr2) {
 	    res = g_list_prepend(res, addr1);
-	    g_object_ref(G_OBJECT(addr1));
+	    g_object_ref(addr1);
 	    resa = g_list_next(resa);
 	    resb = g_list_next(resb);
 	} else if (resa != NULL && 
 		   (resb == NULL || address_compare(addr1, addr2) > 0) ) {
 	    res = g_list_prepend(res, addr1);
-	    g_object_ref(G_OBJECT(addr1));
+	    g_object_ref(addr1);
 	    resa = g_list_next(resa);
 	} else {
 	    res = g_list_prepend(res, addr2);
-	    g_object_ref(G_OBJECT(addr2));
+	    g_object_ref(addr2);
 	    resb = g_list_next(resb);
 	}
     }

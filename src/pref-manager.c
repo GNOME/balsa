@@ -2570,7 +2570,7 @@ address_book_delete_cb(GtkWidget * widget, gpointer data)
     if (balsa_app.default_address_book == address_book)
 	balsa_app.default_address_book = NULL;
 
-    g_object_unref(G_OBJECT(address_book));
+    g_object_unref(address_book);
 
     update_address_books();
 }

@@ -1,3 +1,14 @@
+2002-05-21  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/abook-completion.c:
+	* libbalsa/address-book-{ldap,ldif,vcard}.c:
+	* libbalsa/address-{book,entry}.[ch]:
+	* libbalsa/address.[ch], libbalsa/{mailbox,mailbox}.c
+	* src/{address-book,expand-alias,pref-manager,sendmsg-window}.c:
+	* src/store-address.c: remove deprecated code from LibBalsaAddress
+	and LibBalsaAddressEntry, transform addresses to GObjects - and
+	associated changes.
+
 2002-05-20  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/abook-completion.c, libbalsa/address-book-extern.[ch]:

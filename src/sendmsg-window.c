@@ -2927,7 +2927,7 @@ set_ready(LibBalsaAddressEntry * address_entry, BalsaSendmsgAddress *sma)
         if (list) {
             len = g_list_length(list);
 
-            g_list_foreach(list, (GFunc) gtk_object_destroy, NULL);
+            g_list_foreach(list, (GFunc) g_object_unref, NULL);
             g_list_free(list);
         } else {
             /* error */

@@ -203,7 +203,7 @@ store_address_from_entries(struct store_address_info * info,
     libbalsa_address_book_store_address(info->current_address_book,
                                         address);
 
-    gtk_object_destroy(GTK_OBJECT(address));
+    g_object_unref(address);
 }
 
 /* store_address_book_frame:

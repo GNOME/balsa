@@ -314,7 +314,7 @@ static void expand_addr_list(LibBalsaAddress *address, GList *ab_list)
 
 	if(ref) {
 	    member_list=g_list_append(member_list, ref);
-	    g_object_ref(G_OBJECT(ref));
+	    g_object_ref(ref);
 	    g_free(member_data);
 	} else
             notfound = g_list_append(notfound, member_data);
@@ -687,17 +687,17 @@ libbalsa_address_book_ldif_alias_complete(LibBalsaAddressBook * ab,
 
 	if (addr1 == addr2) {
 	    res = g_list_prepend(res, addr1);
-	    g_object_ref(G_OBJECT(addr1));
+	    g_object_ref(addr1);
 	    resa = g_list_next(resa);
 	    resb = g_list_next(resb);
 	} else if (resa != NULL &&
 		   (resb == NULL || address_compare(addr1, addr2) > 0) ) {
 	    res = g_list_prepend(res, addr1);
-	    g_object_ref(G_OBJECT(addr1));
+	    g_object_ref(addr1);
 	    resa = g_list_next(resa);
 	} else {
 	    res = g_list_prepend(res, addr2);
-	    g_object_ref(G_OBJECT(addr2));
+	    g_object_ref(addr2);
 	    resb = g_list_next(resb);
 	}
     }

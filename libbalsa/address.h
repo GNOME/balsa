@@ -23,13 +23,13 @@
 #ifndef __LIBBALSA_ADDRESS_H__
 #define __LIBBALSA_ADDRESS_H__
 
-#include <gtk/gtkobject.h>
+#include <glib-object.h>
 
 #define LIBBALSA_TYPE_ADDRESS				(libbalsa_address_get_type())
-#define LIBBALSA_ADDRESS(obj)				(GTK_CHECK_CAST (obj, LIBBALSA_TYPE_ADDRESS, LibBalsaAddress))
-#define LIBBALSA_ADDRESS_CLASS(klass)			(GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS, LibBalsaAddressClass))
-#define LIBBALSA_IS_ADDRESS(obj)			(GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_ADDRESS))
-#define LIBBALSA_IS_ADDRESS_CLASS(klass)		(GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS))
+#define LIBBALSA_ADDRESS(obj)				(G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_ADDRESS, LibBalsaAddress))
+#define LIBBALSA_ADDRESS_CLASS(klass)			(G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS, LibBalsaAddressClass))
+#define LIBBALSA_IS_ADDRESS(obj)			(G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_ADDRESS))
+#define LIBBALSA_IS_ADDRESS_CLASS(klass)		(G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS))
 
 typedef struct _LibBalsaAddress LibBalsaAddress;
 typedef struct _LibBalsaAddressClass LibBalsaAddressClass;
@@ -47,7 +47,7 @@ enum _LibBalsaAddressField {
 };
 
 struct _LibBalsaAddress {
-    GtkObject parent;
+    GObject parent;
 
     /*
      * ID
@@ -78,10 +78,10 @@ struct _LibBalsaAddress {
 };
 
 struct _LibBalsaAddressClass {
-    GtkObjectClass parent_class;
+    GObjectClass parent_class;
 };
 
-GtkType libbalsa_address_get_type(void);
+GType libbalsa_address_get_type(void);
  
 LibBalsaAddress *libbalsa_address_new(void);
 LibBalsaAddress *libbalsa_address_new_from_string(const gchar * address);

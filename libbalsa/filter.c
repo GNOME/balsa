@@ -30,6 +30,7 @@
  */
 
 #include <ctype.h>
+/* FIXME: */
 #include "src/balsa-app.h"
 #include "libbalsa.h"
 #include "libbalsa_private.h"

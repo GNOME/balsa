@@ -230,31 +230,31 @@ libbalsa_message_destroy(GtkObject * object)
     message->remail = NULL;
 
     if (message->from) {
-	gtk_object_unref(GTK_OBJECT(message->from));
+	g_object_unref(message->from);
 	message->from = NULL;
     }
     if (message->sender) {
-	gtk_object_unref(GTK_OBJECT(message->sender));
+	g_object_unref(message->sender);
 	message->sender = NULL;
     }
     if (message->reply_to) {
-	gtk_object_unref(GTK_OBJECT(message->reply_to));
+	g_object_unref(message->reply_to);
 	message->reply_to = NULL;
     }
     if(message->dispnotify_to) {
-	gtk_object_unref(GTK_OBJECT(message->dispnotify_to));
+	g_object_unref(message->dispnotify_to);
 	message->dispnotify_to = NULL;
     }
 
-    g_list_foreach(message->to_list, (GFunc) gtk_object_unref, NULL);
+    g_list_foreach(message->to_list, (GFunc) g_object_unref, NULL);
     g_list_free(message->to_list);
     message->to_list = NULL;
 
-    g_list_foreach(message->cc_list, (GFunc) gtk_object_unref, NULL);
+    g_list_foreach(message->cc_list, (GFunc) g_object_unref, NULL);
     g_list_free(message->cc_list);
     message->cc_list = NULL;
 
-    g_list_foreach(message->bcc_list, (GFunc) gtk_object_unref, NULL);
+    g_list_foreach(message->bcc_list, (GFunc) g_object_unref, NULL);
     g_list_free(message->bcc_list);
     message->bcc_list = NULL;
 
@@ -1013,10 +1013,10 @@ libbalsa_message_set_dispnotify(LibBalsaMessage *message,
 {
     g_return_if_fail(message);
     if(message->dispnotify_to) 
-	gtk_object_unref(GTK_OBJECT(message->dispnotify_to));
+	g_object_unref(message->dispnotify_to);
     message->dispnotify_to = address;
     if(address)
-	gtk_object_ref(GTK_OBJECT(message->dispnotify_to));
+	g_object_ref(message->dispnotify_to);
 }
 
 #ifndef MESSAGE_COPY_CONTENT

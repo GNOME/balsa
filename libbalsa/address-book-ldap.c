@@ -282,7 +282,7 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab, LibBalsaAddressBookLoa
 	e = ldap_next_entry(ldap_ab->directory, e)) {
 	address = libbalsa_address_book_ldap_get_address(ab, e);
 	callback(ab, address, closure);
-	g_object_unref(G_OBJECT(address));
+	g_object_unref(address);
     }
     
     callback(ab, NULL, closure);

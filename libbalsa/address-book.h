@@ -23,8 +23,6 @@
 #ifndef __LIBBALSA_ADDRESS_BOOK_H__
 #define __LIBBALSA_ADDRESS_BOOK_H__
 
-#include <glib-object.h>
-
 #include "address.h"
 
 #define LIBBALSA_TYPE_ADDRESS_BOOK			(libbalsa_address_book_get_type())

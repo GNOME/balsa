@@ -754,7 +754,7 @@ address_book_entry_new(LibBalsaAddress *address, gint which_multiple)
 
     abe = g_new(AddressBookEntry, 1);
 
-    gtk_object_ref(GTK_OBJECT(address));
+    g_object_ref(address);
 
     abe->ref_count = 1;
     abe->address = address;
@@ -774,7 +774,7 @@ address_book_entry_unref(AddressBookEntry *entry)
     if ( entry->ref_count > 0 ) 
 	return;
 
-    gtk_object_unref(GTK_OBJECT(entry->address));
+    g_object_unref(entry->address);
     g_free(entry);
 }
 

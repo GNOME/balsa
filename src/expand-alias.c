@@ -158,7 +158,7 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
 	if(balsa_app.debug)
             g_message("expand_alias_find_match(): Found [%s]", 
                       addr->full_name);
-	g_list_foreach(match, (GFunc)gtk_object_unref, NULL);
+	g_list_foreach(match, (GFunc)g_object_unref, NULL);
 	
 	/*
 	 * And now we handle the case of "No matches found."

@@ -307,7 +307,7 @@ libbalsa_mailbox_destroy(GtkObject * object)
 	libbalsa_mailbox_close(mailbox);
 
     if ( mailbox->mailing_list_address )
-	gtk_object_unref(GTK_OBJECT(mailbox->mailing_list_address));
+	g_object_unref(mailbox->mailing_list_address);
     mailbox->mailing_list_address = NULL;
 
     g_free(mailbox->config_prefix);
@@ -642,7 +642,7 @@ libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
     mailbox->name = gnome_config_get_string("Name=Mailbox");
 
     if ( mailbox->mailing_list_address ) 
-	gtk_object_unref(GTK_OBJECT(mailbox->mailing_list_address));
+	g_object_unref(mailbox->mailing_list_address);
     address = gnome_config_get_string_with_default("MailingListAddress", &def);
     if ( def == TRUE ) {
 	mailbox->mailing_list_address = NULL;

@@ -40,7 +40,7 @@ completion_data_new(LibBalsaAddress * address, gboolean alias)
 
     ret = g_new0(CompletionData, 1);
 
-    /*  gtk_object_ref(GTK_OBJECT(address)); */
+    g_object_ref(address);
     ret->address = address;
 
 #ifdef CASE_INSENSITIVE_NAME
@@ -59,7 +59,7 @@ completion_data_new(LibBalsaAddress * address, gboolean alias)
 void
 completion_data_free(CompletionData * data)
 {
-    /*  gtk_object_unref(GTK_OBJECT(data->address)); */
+    g_object_unref(data->address);
     g_free(data->string);
     g_free(data);
 }

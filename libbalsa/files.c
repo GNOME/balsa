@@ -21,6 +21,7 @@
  */
 
 #include "config.h"
+#include <string.h>
 #include <gnome.h>
 #include <libgnomevfs/gnome-vfs-mime-handlers.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
@@ -67,7 +68,7 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
 	    g_strconcat(permanent_prefixes[i], PATH_SEP_STR, splice,
 			PATH_SEP_STR, filename, NULL);
 
-	if (g_file_exists(cat))
+	if (g_file_test(cat, G_FILE_TEST_EXISTS))
 	    return cat;
 
 	g_free(cat);
@@ -86,7 +87,7 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
 	    g_strconcat(prefixes[i], PATH_SEP_STR, splice, PATH_SEP_STR,
 			filename, NULL);
 
-	if (g_file_exists(cat))
+	if (g_file_test(cat, G_FILE_TEST_EXISTS))
 	    return cat;
 
 	g_free(cat);
@@ -128,7 +129,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
     if ( icon_file ) 
 	icon = g_strdup (icon_file);
 
-    if (!icon || !g_file_exists (icon)) {
+    if (!icon || !g_file_test (icon, G_FILE_TEST_EXISTS)) {
 	gchar *gnome_icon, *p_gnome_icon, *tmp;
 	
 	gnome_icon = g_strdup_printf ("gnome-%s.png", content_type);   

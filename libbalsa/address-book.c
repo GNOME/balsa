@@ -68,7 +68,7 @@ GType libbalsa_address_book_get_type(void)
             NULL,               /* class_data */
 	    sizeof(LibBalsaAddressBook),
             0,                  /* n_preallocs */
-	    (GInstanceInitFunc) libbalsa_address_book_init,
+	    (GInstanceInitFunc) libbalsa_address_book_init
 	};
 
 	address_book_type =

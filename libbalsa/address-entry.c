@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <ctype.h>
+#include <string.h>
 
 /*
  * LibBalsa includes.
@@ -200,19 +201,22 @@ GtkType libbalsa_address_entry_get_type(void)
     static GtkType address_entry_type = 0;
 
     if (!address_entry_type) {
-	static const GtkTypeInfo address_entry_info = {
-	    "LibBalsaAddressEntry",
-	    sizeof(LibBalsaAddressEntry),
+	static const GTypeInfo address_entry_info = {
 	    sizeof(LibBalsaAddressEntryClass),
-	    (GtkClassInitFunc) libbalsa_address_entry_class_init,
-	    (GtkObjectInitFunc) libbalsa_address_entry_init,
-	    /* reserved_1 */ NULL,
-	    /* reserved_2 */ NULL,
-	    (GtkClassInitFunc) NULL,
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) libbalsa_address_entry_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(LibBalsaAddressEntry),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) libbalsa_address_entry_init
 	};
 
 	address_entry_type =
-	    gtk_type_unique(GTK_TYPE_ENTRY, &address_entry_info);
+            g_type_register_static(GTK_TYPE_ENTRY,
+	                           "LibBalsaAddressEntry",
+                                   &address_entry_info, 0);
     }
 
     return address_entry_type;
@@ -1867,7 +1871,9 @@ libbalsa_address_entry_new(void)
 {
     LibBalsaAddressEntry *entry;
 
-    entry = gtk_type_new(LIBBALSA_TYPE_ADDRESS_ENTRY);
+    entry =
+        LIBBALSA_ADDRESS_ENTRY(g_object_new
+                               (LIBBALSA_TYPE_ADDRESS_ENTRY, NULL));
     return GTK_WIDGET(entry);
 }
 

@@ -27,30 +27,33 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
-static GtkObjectClass *parent_class;
+static GObjectClass *parent_class;
 
 static void libbalsa_address_class_init(LibBalsaAddressClass * klass);
 static void libbalsa_address_init(LibBalsaAddress * ab);
-static void libbalsa_address_destroy(GtkObject * object);
+static void libbalsa_address_finalize(GObject * object);
 
-GtkType libbalsa_address_get_type(void)
+GType libbalsa_address_get_type(void)
 {
-    static GtkType address_type = 0;
+    static GType address_type = 0;
 
     if (!address_type) {
-	static const GtkTypeInfo address_info = {
-	    "LibBalsaAddress",
-	    sizeof(LibBalsaAddress),
+	static const GTypeInfo address_info = {
 	    sizeof(LibBalsaAddressClass),
-	    (GtkClassInitFunc) libbalsa_address_class_init,
-	    (GtkObjectInitFunc) libbalsa_address_init,
-	    /* reserved_1 */ NULL,
-	    /* reserved_2 */ NULL,
-	    (GtkClassInitFunc) NULL,
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) libbalsa_address_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(LibBalsaAddress),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) libbalsa_address_init
 	};
 
 	address_type =
-	    gtk_type_unique(gtk_object_get_type(), &address_info);
+	    g_type_register_static(G_TYPE_OBJECT,
+	                           "LibBalsaAddress",
+                                   &address_info, 0);
     }
 
     return address_type;
@@ -59,12 +62,12 @@ GtkType libbalsa_address_get_type(void)
 static void
 libbalsa_address_class_init(LibBalsaAddressClass * klass)
 {
-    GtkObjectClass *object_class;
+    GObjectClass *object_class;
 
-    parent_class = gtk_type_class(gtk_object_get_type());
+    parent_class = g_type_class_peek_parent(klass);
 
-    object_class = GTK_OBJECT_CLASS(klass);
-    object_class->destroy = libbalsa_address_destroy;
+    object_class = G_OBJECT_CLASS(klass);
+    object_class->finalize = libbalsa_address_finalize;
 }
 
 static void
@@ -81,7 +84,7 @@ libbalsa_address_init(LibBalsaAddress * addr)
 }
 
 static void
-libbalsa_address_destroy(GtkObject * object)
+libbalsa_address_finalize(GObject * object)
 {
     LibBalsaAddress *addr;
 
@@ -100,18 +103,17 @@ libbalsa_address_destroy(GtkObject * object)
     g_list_free(addr->address_list);
     addr->address_list = NULL;
 
-    g_list_foreach(addr->member_list, (GFunc) gtk_object_unref, NULL);
+    g_list_foreach(addr->member_list, (GFunc) g_object_unref, NULL);
     g_list_free(addr->member_list);
     addr->member_list = NULL;
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
+    G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
 LibBalsaAddress *
 libbalsa_address_new(void)
 {
-    return gtk_type_new(LIBBALSA_TYPE_ADDRESS);
+    return g_object_new(LIBBALSA_TYPE_ADDRESS, NULL);
 }
 
 /* returns only first address on the list; ignores remaining ones */
@@ -164,8 +166,6 @@ libbalsa_address_new_from_libmutt(ADDRESS * caddr)
     address = libbalsa_address_new();
 
     /* it will be owned by the caller */
-    gtk_object_ref(GTK_OBJECT(address));
-    gtk_object_sink(GTK_OBJECT(address));
 
     address->full_name = g_strdup(caddr->personal);
     if (caddr->mailbox)
@@ -237,9 +237,9 @@ static gchar *rfc2822_group(const gchar *full_name, GList *addr_list)
 
     if(full_name) { 
 	if(needs_quotes(full_name))
-	    g_string_sprintf(str, "\042%s\042: ", full_name);
+	    g_string_printf(str, "\042%s\042: ", full_name);
 	else
-	    g_string_sprintf(str, "%s: ", full_name);
+	    g_string_printf(str, "%s: ", full_name);
     }
 
     if(addr_list) {
@@ -250,7 +250,7 @@ static gchar *rfc2822_group(const gchar *full_name, GList *addr_list)
 	for(addr_entry=g_list_next(addr_list); addr_entry; 
 	    addr_entry=g_list_next(addr_entry)) {
 	    tmp_str = libbalsa_address_to_gchar(LIBBALSA_ADDRESS(addr_entry->data), 0);
-	    g_string_sprintfa(str, ", %s", tmp_str);
+	    g_string_append_printf(str, ", %s", tmp_str);
 	    g_free(tmp_str);
 	}
     }
@@ -276,7 +276,7 @@ static gchar *rfc2822_list(GList *list)
 
     for(addr_entry=g_list_next(list); addr_entry; 
 	addr_entry=g_list_next(addr_entry)) {
-	g_string_sprintfa(str, ", %s", (gchar *)addr_entry->data);
+	g_string_append_printf(str, ", %s", (gchar *)addr_entry->data);
     }
     retc=str->str;
     g_string_free(str, FALSE);

@@ -5,6 +5,8 @@
 	(build_right_side): accept a GtkWidget * parameter in order
 	to pass it a clist for apply/revert callbacks userdata.
 	(filter_edit_dialog): utilize the above.
+	* src/filter-edit-callbacks.c (unique_filter_name): actually
+	increment row.
 	
 1999-01-20  Nat Friedman  <nat@nat.org>
 

@@ -41,7 +41,7 @@ static gint unique_filter_name(GtkWidget *clist, gchar *name)
     len = strlen(name);
 
     while (gtk_clist_get_text(GTK_CLIST(clist),
-                              row,
+                              row++,
                               1,
                               &row_text))
     {

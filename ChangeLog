@@ -1,3 +1,7 @@
+2001-03-26  Stanislav Brabec  <utx@penguin.cz> 
+
+        * configure.in: Added Czech to ALL_LINGUAS.
+
 2001-03-22  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/body.c: save temporary file only when needed.

@@ -291,7 +291,7 @@ static void bm_modify_font_from_string(GtkWidget * widget,
 				       const char *font);
 
 static GtkWidget *
-bm_header_widget(guint border, gpointer data)
+bm_header_widget(BalsaMessage * bm)
 {
     GtkWidget *widget;
     GtkWidget *text_view;
@@ -300,7 +300,7 @@ bm_header_widget(guint border, gpointer data)
     widget = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 				   GTK_POLICY_NEVER, GTK_POLICY_NEVER);
-    gtk_container_set_border_width(GTK_CONTAINER(widget), border);
+    gtk_container_set_border_width(GTK_CONTAINER(widget), 10);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(widget),
 					GTK_SHADOW_IN);
 
@@ -318,7 +318,7 @@ bm_header_widget(guint border, gpointer data)
     gtk_widget_modify_base(text_view, GTK_STATE_NORMAL, &color);
 
     g_signal_connect(text_view, "key_press_event",
-		     G_CALLBACK(balsa_message_key_press_event), data);
+		     G_CALLBACK(balsa_message_key_press_event), bm);
     gtk_container_add(GTK_CONTAINER(widget), text_view);
 
     g_object_set_data(G_OBJECT(widget), BALSA_MESSAGE_TEXT_VIEW,
@@ -332,6 +332,8 @@ static void
 balsa_message_init(BalsaMessage * bm)
 {
     GtkWidget *scroll;
+    GtkWidget *vbox;
+    GtkWidget *header_box;
     GtkWidget *label;
     GtkTreeStore *model;
     GtkCellRenderer *renderer;
@@ -358,26 +360,24 @@ balsa_message_init(BalsaMessage * bm)
         gtk_container_add(GTK_CONTAINER(scroll), bm->cont_viewport);
         
         /* Event box so that the background can be set white */
-        bm->header_box = gtk_event_box_new();
-        gtk_widget_show (bm->header_box);
-        gdk_color_parse ("White", &color);
-        gtk_widget_modify_bg (GTK_WIDGET(bm->header_box), GTK_STATE_NORMAL, &color);
-        gtk_container_add(GTK_CONTAINER(bm->cont_viewport), bm->header_box);  
+    header_box = gtk_event_box_new();
+    gtk_widget_show(header_box);
+    gdk_color_parse("White", &color);
+    gtk_widget_modify_bg(GTK_WIDGET(header_box), GTK_STATE_NORMAL, &color);
+    gtk_container_add(GTK_CONTAINER(bm->cont_viewport), header_box);  
         
-        /* The vbox widget */
-    bm->vbox = gtk_vbox_new(FALSE, 1);  
-    gtk_widget_show(bm->vbox);  
-        gtk_container_add(GTK_CONTAINER(bm->header_box), bm->vbox);
+    vbox = gtk_vbox_new(FALSE, 1);  
+    gtk_widget_show(vbox);  
+    gtk_container_add(GTK_CONTAINER(header_box), vbox);
         
     /* Widget to hold headers */
-    bm->header_container =  bm_header_widget(10, bm);
-    gtk_box_pack_start(GTK_BOX(bm->vbox), bm->header_container,
-		       FALSE, FALSE, 0);
+    bm->header_container = bm_header_widget(bm);
+    gtk_box_pack_start(GTK_BOX(vbox), bm->header_container, FALSE, FALSE, 0);
 
     /* Widget to hold content */
     bm->content = gtk_vbox_new(FALSE, 1);
-        gtk_container_set_border_width (GTK_CONTAINER (bm->content), 10);
-    gtk_box_pack_start(GTK_BOX(bm->vbox), bm->content, TRUE, TRUE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(bm->content), 10);
+    gtk_container_add(GTK_CONTAINER(vbox), bm->content);
     gtk_widget_show(bm->content);
 
     /* structure view */
@@ -1620,7 +1620,7 @@ part_info_init_message(BalsaMessage * bm, BalsaPartInfo * info)
         }
         g_free(access_type);
     } else if (!g_ascii_strcasecmp("message/rfc822", body_type)) {
-        GtkWidget *emb_hdrs = bm_header_widget(0, bm);
+        GtkWidget *emb_hdrs = bm_header_widget(bm);
         
         display_embedded_headers(bm, info->body, emb_hdrs);
         
@@ -3199,6 +3199,19 @@ static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
     } else if (g_mime_content_type_is_type(type, "multipart", "alternative")) {
             /* Add the most suitable part. */
         add_body(bm, preferred_part(parent->parts));
+    } else if (g_mime_content_type_is_type(type, "message", "rfc822")) {
+	GtkWidget *child;
+	GtkWidget *save;
+
+	child = gtk_vbox_new(FALSE, 1);
+        gtk_container_set_border_width(GTK_CONTAINER(child), 10);
+	save = bm->content;
+	gtk_box_pack_start(GTK_BOX(save), child, TRUE, TRUE, 0);
+	gtk_widget_show(child);
+
+	bm->content = child;
+        add_multipart_mixed(bm, parent->parts);
+	bm->content = save;
     } else { /* default to multipart/mixed */
         add_multipart_mixed(bm, parent->parts);
     }
@@ -3278,12 +3291,11 @@ gtk_tree_hide_func(GtkTreeModel * model, GtkTreePath * path,
                    GtkTreeIter * iter, gpointer data)
 {
     BalsaPartInfo *info;
-    BalsaMessage * bm = (BalsaMessage *)data;
 
     gtk_tree_model_get(model, iter, PART_INFO_COLUMN, &info, -1);
     if (info) {
         if (info->widget && info->widget->parent)
-            gtk_container_remove(GTK_CONTAINER(bm->content),
+            gtk_container_remove(GTK_CONTAINER(info->widget->parent),
                                  info->widget);
         g_object_unref(G_OBJECT(info));
     }
@@ -3300,6 +3312,9 @@ hide_all_parts(BalsaMessage * bm)
         gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(bm->treeview)));
         bm->current_part = NULL;
     }
+
+    gtk_container_foreach(GTK_CONTAINER(bm->content),
+			  (GtkCallback) gtk_widget_hide, NULL);
 }
 
 /* 
@@ -3310,10 +3325,6 @@ static void
 select_part(BalsaMessage * bm, BalsaPartInfo *info)
 {
     hide_all_parts(bm);
-
-#if 0
-    bm_modify_font_from_string(bm->header_text, balsa_app.message_font);
-#endif
 
     bm->current_part = add_part(bm, info);
 

@@ -1,5 +1,4 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
-/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2002 Stuart Parmenter and others,
@@ -165,7 +164,7 @@ libbalsa_make_string_from_list(const GList * the_list)
 gchar *
 libbalsa_make_string_from_list_p(const GList * the_list)
 {
-    gchar *retc, *str;
+    gchar *str;
     GList *list;
     GString *gs = g_string_new(NULL);
     LibBalsaAddress *addy;
@@ -186,10 +185,7 @@ libbalsa_make_string_from_list_p(const GList * the_list)
 	list = list->next;
     }
 
-    retc = g_strdup(gs->str);
-    g_string_free(gs, 1);
-
-    return retc;
+    return g_string_free(gs, FALSE);
 }
 
 
@@ -286,16 +282,7 @@ size_t libbalsa_readfile_nostat(FILE * fp, char **buf)
     } while( r != 0 );
 
     size = gstr->len;
-    *buf = (char *) g_malloc(size + 1);
-    if (*buf == NULL) {
-	g_string_free(gstr, TRUE);
-	return -1;
-    }
-
-    strncpy(*buf, gstr->str, size);
-    (*buf)[size] = '\0';
-
-    g_string_free(gstr, TRUE);
+    *buf = g_string_free(gstr, FALSE);
 
     return size;
 }
@@ -443,8 +430,7 @@ unwrap_rfc2646(gchar * str, gboolean from_screen)
                 break;
             }
         }
-        text->str = string->str;
-        g_string_free(string, FALSE);
+        text->str = g_string_free(string, FALSE);
         if (chomp) {
             gchar *p = text->str;
             while (*p)
@@ -538,15 +524,11 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
                     continue;
 
                 if (!*str || len > width) {
-                    gint tmp;
                     /* allow an overlong first word, otherwise back up
                      * str */
                     if (len > width && !first_word)
                         str = line_break;
-                    tmp = *str;
-                    *str = '\0';
-                    g_string_append(result, start);
-                    *str = tmp;
+                    g_string_append_len(result, start, str - start);
                     break;
                 }
                 first_word = FALSE;
@@ -609,15 +591,12 @@ libbalsa_wrap_rfc2646(gchar * par, gint width, gboolean from_screen,
                       gboolean to_screen)
 {
     GString *result;
-    gchar *str;
 
     result = libbalsa_process_text_rfc2646(par, width, from_screen,
                                            to_screen, FALSE);
     g_free(par);
-    str = result->str;
-    g_string_free(result, FALSE);
 
-    return str;
+    return g_string_free(result, FALSE);
 }
 
 /* libbalsa_flowed_rfc2646:

@@ -140,9 +140,8 @@ index_child_new (GnomeMDI * mdi, Mailbox * mailbox)
 
 	gtk_widget_show_all (dialog);
 	gnome_dialog_button_connect (GNOME_DIALOG (dialog), 0, set_password, entry);
-	gnome_dialog_set_modal (GNOME_DIALOG (dialog));
-	gnome_dialog_run_and_hide (GNOME_DIALOG (dialog));
-	gtk_widget_destroy (dialog);
+	gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
+	gnome_dialog_run_and_close (GNOME_DIALOG (dialog));
       }
   }
 

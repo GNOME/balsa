@@ -174,9 +174,8 @@ item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data)
       gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (save_dialog)->vbox), file_entry, FALSE, FALSE, 10);
       gtk_widget_show (file_entry);
       gnome_dialog_button_connect (GNOME_DIALOG (save_dialog), 0, save_MIME_part, info);
-      gnome_dialog_set_modal (GNOME_DIALOG (save_dialog));
-      gnome_dialog_run_and_hide (GNOME_DIALOG (save_dialog));
-      gtk_widget_destroy (save_dialog);
+      gtk_window_set_modal(GTK_WINDOW(save_dialog), TRUE);
+      gnome_dialog_run_and_close (GNOME_DIALOG (save_dialog));
       break;
     default:
       break;
@@ -216,7 +215,7 @@ save_MIME_part (GtkObject * o, BalsaSaveFileInfo * info)
 
       snprintf (msg, 1023, _ (" Open of %s failed:%s "), msg_filename, strerror (errno));
       msgbox = gnome_message_box_new (msg, "Error", _ ("Ok"), NULL);
-      gnome_dialog_set_modal (GNOME_DIALOG (msgbox));
+      gtk_window_set_modal (GTK_WINDOW (msgbox), TRUE);
       gnome_dialog_run (GNOME_DIALOG (msgbox));
       return;
     }
@@ -231,7 +230,7 @@ save_MIME_part (GtkObject * o, BalsaSaveFileInfo * info)
 
       snprintf (msg, 1023, _ (" Open of %s failed:%s "), filename, strerror (errno));
       msgbox = gnome_message_box_new (msg, "Error", _ ("Ok"), NULL);
-      gnome_dialog_set_modal (GNOME_DIALOG (msgbox));
+      gtk_window_set_modal(GTK_WINDOW (msgbox), TRUE);
       gnome_dialog_run (GNOME_DIALOG (msgbox));
       return;
     }

@@ -1,3 +1,11 @@
+1998-12-08  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
+
+	* src/index-child.c, src/balsa-message.c: changed gnome_dialog_set_modal()
+	to gtk_window_set_modal() and use gnome_dialog_run_close() instead of
+	gnome_dialog_run_and_hide() and gtk_widget_destroy(). 
+	* main-window.c (refresh_main_window): DON'T use gnome_mdi_set_mode() to
+	refresh display. this gets you into trouble and would look butt ugly anyway.
+	
 1998-11-29  Miguel de Icaza  <miguel@nuclecu.unam.mx>
 
 	* src/sendmsg-window.c (create_info_pane): GnomeIconList no longer

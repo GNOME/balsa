@@ -314,7 +314,9 @@ refresh_main_window (void)
    * set the toolbar style
    */
   gtk_toolbar_set_style (GTK_TOOLBAR (GNOME_APP (mdi->active_window)->toolbar), balsa_app.toolbar_style);
-  gnome_mdi_set_mode (mdi, balsa_app.mdi_style);
+
+  /* This IS WRONG!!!!!!!!!!! refreshing SHOULDN'T reset mode! bad things might happen! */
+  /* gnome_mdi_set_mode (mdi, balsa_app.mdi_style); */
 }
 
 /*

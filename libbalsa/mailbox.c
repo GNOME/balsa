@@ -1065,12 +1065,18 @@ libbalsa_mailbox_add_message_stream(LibBalsaMailbox * mailbox,
 				    GMimeStream * msg,
 				    LibBalsaMessageFlag flags)
 {
+    gboolean retval;
+
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
     g_mime_stream_reset(msg);
-    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->add_message(mailbox, msg,
-							    flags);
+    retval = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->add_message(mailbox,
+							      msg, flags);
+    if (retval > 0 && (flags & LIBBALSA_MESSAGE_FLAG_NEW))
+	mailbox->has_unread_messages = TRUE;
+
+    return retval;
 }
 
 void

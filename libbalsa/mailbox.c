@@ -133,23 +133,30 @@ static Message *translate_message (HEADER * cur);
 static Address *translate_address (ADDRESS * caddr);
 
 
+/* We're gonna set Mutt global vars here */
 void
 mailbox_init ()
 {
   struct utsname utsname;
-  char *p, buffer[STRING], error[STRING];
+  char *p;
+
+  
   uname (&utsname);
+ 
+  Username = g_get_user_name();
+
+  Homedir = g_get_home_dir();
+
+  Realname = g_get_real_name();
+
   /* some systems report the FQDN instead of just the hostname */
   if ((p = strchr (utsname.nodename, '.')))
-    {
-      Hostname = mutt_substrdup (utsname.nodename, p);
-      p++;
-      strfcpy (buffer, p, sizeof (buffer));	/* save the domain for below */
-    }
+    Hostname = mutt_substrdup (utsname.nodename, p);
   else
-    Hostname = safe_strdup (utsname.nodename);
+    Hostname = g_strdup (utsname.nodename);
 
-  Tempdir = safe_strdup ((p = getenv ("TMPDIR")) ? p : "/tmp");
+  Shell = g_strdup ((p = getenv ("SHELL")) ? p : "/bin/sh");
+  Tempdir = g_get_tmp_dir();
 }
 
 

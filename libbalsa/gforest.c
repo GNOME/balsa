@@ -20,18 +20,17 @@
 #include <glib.h>
 #include "gforrest.h"
 
-GForrest *g_forrest_new(void)
+GForest *
+g_forest_new (void)
 {
-	GForrest *gf;
+  GForest *gf;
 
-	gf = g_malloc(sizeof(GForrest));
-	gf->key = NULL;
-	gf->data = NULL;
-	gf->list = NULL;
-	gf->sibling = NULL;
-	gf->children = NULL;
+  gf = g_malloc (sizeof (GForrest));
+  gf->key = NULL;
+  gf->data = NULL;
+  gf->list = NULL;
+  gf->sibling = NULL;
+  gf->children = NULL;
 
-	return gf;
+  return gf;
 }
-
-

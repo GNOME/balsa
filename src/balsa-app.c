@@ -104,7 +104,7 @@ read_signature ()
   int fd, ret;
   struct stat stats;
   gchar path[PATH_MAX];
-  sprintf (path, "%s/.signature", getenv ("HOME"));
+  sprintf (path, "%s/.signature", g_get_home_dir());
   fd = open (path, O_RDONLY);
   if (fd == -1)
     {

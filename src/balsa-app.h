@@ -75,7 +75,7 @@
  * Default colour for quoted text
  * oh no, I used the US spelling.
  */
-#define MAX_QUOTED_COLOR 6
+#define MAX_QUOTED_COLOR 2
 #define DEFAULT_QUOTED_COLOR "#055"
 #define DEFAULT_QUOTE_REGEX  "^[ \\t]*[|>:}#]"
 

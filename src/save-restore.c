@@ -678,12 +678,7 @@ config_global_load(void)
 
     {
 	int i;
-#if MAX_QUOTED_COLOR != 6
-#warning 'default_quoted_color' array needs to be updated
-#endif
-	gchar *default_quoted_color[6] = {
-	    "#088", "#800", "#080",
-	    "#008", "#880", "#808"};
+	gchar *default_quoted_color[MAX_QUOTED_COLOR] = {"#088", "#800"};
 	for(i=0;i<MAX_QUOTED_COLOR;i++) {
 	    gchar *text = g_strdup_printf("QuotedColor%d=%s", i, i<6 ?
 			  default_quoted_color[i] : DEFAULT_QUOTED_COLOR);

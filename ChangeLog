@@ -1,3 +1,8 @@
+2002-02-27  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-mblist.c: port.
+	* src/balsa-index.c: remove redundant call to balsa_index_init().
+
 2002-02-25  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/*: remove uncesessary #includes (PS)

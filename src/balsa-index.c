@@ -413,7 +413,6 @@ balsa_index_new(void)
 {
     BalsaIndex* bindex;
     bindex = BALSA_INDEX (gtk_type_new(BALSA_TYPE_INDEX));
-    balsa_index_init (bindex);
     return GTK_WIDGET(bindex);
 }
 

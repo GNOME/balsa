@@ -24,7 +24,11 @@
 #include <gnome.h>
 #include <gtk/gtkfeatures.h>
 #include <string.h>
+#if BALSA_MAJOR < 2
 #include <gdk/gdkprivate.h>
+#else
+#include <gdk/gdkfont.h>
+#endif                          /* BALSA_MAJOR < 2 */
 
 #include "balsa-app.h"
 #include "balsa-icons.h"
@@ -113,7 +117,7 @@ static void select_mailbox(GtkCTree * ctree, GtkCTreeNode * row, gint column);
 /* helpers */
 static void __mbnode_set_tab_style(BalsaMailboxNode *mbnode, GtkStyle *style, gint unread);
 
-guint
+GtkType
 balsa_mblist_get_type(void)
 {
     static guint mblist_type = 0;
@@ -125,8 +129,9 @@ balsa_mblist_get_type(void)
 	    sizeof(BalsaMBListClass),
 	    (GtkClassInitFunc) balsa_mblist_class_init,
 	    (GtkObjectInitFunc) balsa_mblist_init,
-	    (GtkArgSetFunc) NULL,
-	    (GtkArgGetFunc) NULL,
+	    (gpointer) NULL,
+	    (gpointer) NULL,
+	    (GtkClassInitFunc) NULL
 	};
 
 	mblist_type = gtk_type_unique(gtk_ctree_get_type(), &mblist_info);
@@ -412,10 +417,12 @@ mblist_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 	switch(event->button) {
 	case 3:
 	    gtk_signal_handler_block_by_func(GTK_OBJECT(bmbl),
-				     select_mailbox, NULL);
+				             GTK_SIGNAL_FUNC(select_mailbox),
+                                             NULL);
 	    gtk_ctree_select(ctree, node);
 	    gtk_signal_handler_unblock_by_func(GTK_OBJECT(bmbl),
-					       select_mailbox, NULL);
+					       GTK_SIGNAL_FUNC(select_mailbox),
+                                               NULL);
 	    gtk_menu_popup(GTK_MENU(
 		balsa_mailbox_node_get_context_menu(mbnode)), NULL,
 			   NULL, NULL, NULL, event->button, event->time);
@@ -464,14 +471,24 @@ mblist_key_press_cb(GtkWidget * widget, GdkEventKey * event, gpointer data)
 static void
 balsa_mblist_init(BalsaMBList * tree)
 {
+#if BALSA_MAJOR < 2
+    GtkCTree *ctree = GTK_CTREE(tree);
+#endif                          /* BALSA_MAJOR < 2 */
+    GtkCList *clist = GTK_CLIST(tree);
     GtkStyle* style;
     GdkFont* font;
     gint text_height;
-    unsigned i;
-    char *titles[3] = { N_("Mailbox"), N_("Unread"), N_("Total") };
-    for (i = 0; i < ELEMENTS(titles); i++) titles[i] = _(titles[i]);
 
-    gtk_ctree_construct(GTK_CTREE(tree), 3, 0, titles);
+    gtk_object_set(GTK_OBJECT(tree),
+                   "n_columns", 3,
+                   "tree_column", 0,
+                   NULL);
+#if BALSA_MAJOR < 2
+    ctree->tree_column = 0;
+#endif                          /* BALSA_MAJOR < 2 */
+    gtk_clist_set_column_title(clist, 0, _("Mailbox"));
+    gtk_clist_set_column_title(clist, 1, _("Unread"));
+    gtk_clist_set_column_title(clist, 2, _("Total"));
 
     gtk_signal_connect_after(GTK_OBJECT(tree), "tree_expand",
                              GTK_SIGNAL_FUNC(mailbox_tree_expand), NULL);
@@ -482,7 +499,11 @@ balsa_mblist_init(BalsaMBList * tree)
                     balsa_app.mblist_show_mb_content_info, NULL);
 
     style = gtk_widget_get_style (GTK_WIDGET (tree));
+#if BALSA_MAJOR < 2
     font = style->font;
+#else
+    font = gtk_style_get_font(style);
+#endif                          /* BALSA_MAJOR < 2 */
     text_height = font->ascent + font->descent+2;
 
     if(text_height < 16) /* pixmap height */
@@ -621,7 +642,8 @@ balsa_mblist_disconnect_mailbox_signals(GtkCTree * tree,
 
     if (mbnode->mailbox) {
 	gtk_signal_disconnect_by_func(GTK_OBJECT(mbnode->mailbox),
-				      balsa_mblist_unread_messages_changed_cb,
+				      GTK_SIGNAL_FUNC
+                                      (balsa_mblist_unread_messages_changed_cb),
 				      (gpointer) tree);
     }
 }
@@ -836,8 +858,12 @@ balsa_mblist_set_style(BalsaMBList * mblist)
 
     /* Attempt to set the font to bold */
     font = balsa_widget_get_bold_font(GTK_WIDGET(mblist));
+#if BALSA_MAJOR < 2
     gdk_font_unref(style->font);
     style->font = font;		/*Now refed in get_bold_font */
+#else
+    gtk_style_set_font(style, font);
+#endif                          /* BALSA_MAJOR < 2 */
 
     /* Get and attempt to allocate the colour */
     color = balsa_app.mblist_unread_color;
@@ -1364,7 +1390,8 @@ mblist_remove_mblist_node(BalsaMBList *mblist, BalsaMailboxNode *mbnode,
 {
     if (mbnode->mailbox)
 	gtk_signal_disconnect_by_func(GTK_OBJECT(mbnode->mailbox),
-				      balsa_mblist_unread_messages_changed_cb,
+				      GTK_SIGNAL_FUNC
+                                      (balsa_mblist_unread_messages_changed_cb),
 				      (gpointer) GTK_CTREE(mblist));
     gtk_ctree_remove_node(GTK_CTREE(mblist), node);
 }
@@ -1397,6 +1424,7 @@ balsa_widget_get_bold_font(GtkWidget * widget)
     gchar **temp_xlfd;
     GdkFont *font;
     GtkStyle *style;
+#if BALSA_MAJOR < 2
     GSList *list;
     gint i = 0;
 
@@ -1409,6 +1437,22 @@ balsa_widget_get_bold_font(GtkWidget * widget)
 
     /* Split the XLFD into it's components */
     temp_xlfd = g_strsplit(old_xlfd, "-", 14);
+#else
+    gchar *tmp;
+    gint i = 0;
+
+    style = gtk_widget_get_style(widget);
+    font = gtk_style_get_font(style);
+
+    /* Get the current font XLFD */
+    old_xlfd = g_strdup(pango_font_description_get_family(style->font_desc));
+    if ((tmp = strchr(old_xlfd, ',')))
+                *tmp = '\0';
+
+    /* Split the XLFD into it's components */
+    temp_xlfd = g_strsplit(old_xlfd, "-", 14);
+    g_free(old_xlfd);
+#endif                          /* BALSA_MAJOR < 2 */
     while (i < 4 && temp_xlfd[i])
 	i++;
     if (i > 3) {
@@ -1430,7 +1474,11 @@ balsa_widget_get_bold_font(GtkWidget * widget)
 	font = gdk_font_load(old_xlfd);
 
 	if (font == NULL)
+#if BALSA_MAJOR < 2
 	    font = style->font;
+#else
+	    font = gtk_style_get_font(style);
+#endif                          /* BALSA_MAJOR < 2 */
     }
 
     gdk_font_ref(font);

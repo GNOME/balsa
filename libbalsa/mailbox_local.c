@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
+ *
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -102,6 +104,8 @@ libbalsa_mailbox_local_new(const gchar *path, gboolean create)
 	struct stat st;
 	int fd;
 
+	libbalsa_lock_mutt();
+
 	switch ( mx_get_magic(path) ) {
 	case M_MBOX:
 	case M_MMDF:
@@ -119,7 +123,9 @@ libbalsa_mailbox_local_new(const gchar *path, gboolean create)
 	default:
 		type =  LIBBALSA_MAILBOX_LOCAL_MBOX;
 	}
-  
+
+	libbalsa_unlock_mutt();
+
 	if ( type == LIBBALSA_MAILBOX_LOCAL_MBOX && 
 	     (fd=stat(path, &st)) == -1 /* && errno == -ENOENT */ ) {
 		if (!create)
@@ -183,7 +189,9 @@ libbalsa_mailbox_local_open(LibBalsaMailbox *mailbox, gboolean append)
 	if (CLIENT_CONTEXT_OPEN (mailbox)) {
 		if ( append ) {
 			/* we need the mailbox to be opened fresh i think */
+			libbalsa_lock_mutt();
 			mx_close_mailbox( CLIENT_CONTEXT(mailbox), NULL);
+			libbalsa_unlock_mutt();
 		} else {
 			/* incriment the reference count */
 			mailbox->open_ref++;
@@ -198,10 +206,12 @@ libbalsa_mailbox_local_open(LibBalsaMailbox *mailbox, gboolean append)
 		return;
 	}
 
+	libbalsa_lock_mutt();
 	if ( append ) 
 		CLIENT_CONTEXT (mailbox) = mx_open_mailbox (local->path, M_APPEND, NULL);
 	else
 		CLIENT_CONTEXT (mailbox) = mx_open_mailbox (local->path, 0, NULL);
+	libbalsa_unlock_mutt();
 
 	if (CLIENT_CONTEXT_OPEN (mailbox)) {
 		mailbox->messages = 0;
@@ -271,8 +281,12 @@ static void libbalsa_mailbox_local_check (LibBalsaMailbox *mailbox)
 		LOCK_MAILBOX(mailbox);
 
 		index_hint = CLIENT_CONTEXT (mailbox)->vcount;
+		
+		libbalsa_lock_mutt();
+		i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint, 0);
+		libbalsa_unlock_mutt();
 
-		if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint, 0)) < 0) {
+		if (i < 0) {
 			g_print ("mx_check_mailbox() failed on %s\n", mailbox->name);
 		} else if (i == M_NEW_MAIL || i == M_REOPENED) {
 			mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount - mailbox->messages;

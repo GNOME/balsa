@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
+ *
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,9 +46,12 @@ libbalsa_address_new_from_string(gchar* str) {
 	ADDRESS *address = NULL;
 	LibBalsaAddress *addr = NULL;
 
+	libbalsa_lock_mutt();
 	address = rfc822_parse_adrlist (address, str);
 	addr = libbalsa_address_new_from_libmutt (address);
 	rfc822_free_address (&address);
+	libbalsa_unlock_mutt();
+
 	return addr;
 }
 
@@ -56,6 +61,8 @@ libbalsa_address_new_list_from_string (gchar * the_str)
 	ADDRESS *address = NULL;
 	LibBalsaAddress *addr = NULL;
 	GList *list = NULL;
+
+	libbalsa_lock_mutt();
 	address = rfc822_parse_adrlist (address, the_str);
 
 	while (address)
@@ -65,6 +72,8 @@ libbalsa_address_new_list_from_string (gchar * the_str)
 		address = address->next;
 	}
 	rfc822_free_address( &address );
+	libbalsa_unlock_mutt();
+
 	return list;
 }
 

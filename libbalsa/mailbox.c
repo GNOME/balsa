@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
+ *
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,17 +23,7 @@
 #include "config.h"
 
 #include <glib.h>
-#include <stdarg.h>
 #include <ctype.h>
-/* this should be removed.  it is only used for _() for internationalzation */
-#include <gnome.h>
-
-#include <stdio.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <string.h>
-#include <time.h>
-#include <dirent.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
@@ -161,7 +153,7 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
 				GTK_TYPE_NONE, 1, GTK_TYPE_BOOL);
 
 	/* Virtual functions. Use GTK_RUN_NO_HOOKS
-	   which prevents the signal being connected to */
+	   which prevents the signal being connected to them */
 	libbalsa_mailbox_signals[GET_MESSAGE_STREAM] =
 		gtk_signal_new ("get-message-stream",
 				GTK_RUN_LAST|GTK_RUN_NO_HOOKS,
@@ -210,7 +202,6 @@ libbalsa_mailbox_init(LibBalsaMailbox *mailbox)
 	mailbox->unread_messages = 0;
 	mailbox->total_messages = 0;
 	mailbox->message_list = NULL;
-
 }
 
 static void 
@@ -252,6 +243,9 @@ libbalsa_mailbox_close(LibBalsaMailbox *mailbox)
 void
 libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox *mailbox, gboolean has_unread)
 {
+	g_return_if_fail(mailbox != NULL);
+	g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
 	gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[SET_UNREAD_MESSAGES_FLAG], has_unread);
 }
 
@@ -305,12 +299,17 @@ libbalsa_mailbox_real_close(LibBalsaMailbox *mailbox)
 		 * messages -- the expunge may not have to be done */
 		if (CLIENT_CONTEXT_OPEN (mailbox))
 		{
+			/* We are careful to take/release locks in the correct order here */
+			libbalsa_lock_mutt();
 			while( (check=mx_close_mailbox (CLIENT_CONTEXT (mailbox), NULL) )) {
+				libbalsa_unlock_mutt();
 				UNLOCK_MAILBOX (mailbox);
 				g_print("libbalsa_mailbox_real_close: close failed, retrying...\n");
 				libbalsa_mailbox_check(mailbox);
 				LOCK_MAILBOX (mailbox);
+				libbalsa_lock_mutt();
 			}
+			libbalsa_unlock_mutt();
 			free (CLIENT_CONTEXT (mailbox));
 			CLIENT_CONTEXT (mailbox) = NULL;
 		}
@@ -328,7 +327,9 @@ libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox *mailbox, gboolea
 void
 libbalsa_mailbox_sort (LibBalsaMailbox * mailbox, LibBalsaMailboxSort sort)
 {
+	libbalsa_lock_mutt();
 	mutt_sort_headers (CLIENT_CONTEXT (mailbox), sort);
+	libbalsa_unlock_mutt();
 }
 
 /*
@@ -387,7 +388,6 @@ libbalsa_mailbox_load_messages (LibBalsaMailbox * mailbox)
 			message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
         
 			mailbox->unread_messages++;
-
 		}
 
 		if (cur->deleted)
@@ -436,30 +436,35 @@ LibBalsaMailboxType
 libbalsa_mailbox_valid (gchar * filename)
 {
 	struct stat st;
+	LibBalsaMailboxType ret;
 
 	if (stat (filename, &st) == -1)
 		return MAILBOX_UNKNOWN;
 
+	libbalsa_lock_mutt();
 	switch (mx_get_magic (filename)) {
 	case M_MBOX:
-		return MAILBOX_MBOX;
+		ret = MAILBOX_MBOX;
 		break;
 	case M_MMDF:
-		return MAILBOX_MBOX;
+		ret = MAILBOX_MBOX;
 		break;
 	case M_MH:
-		return MAILBOX_MH;
+		ret = MAILBOX_MH;
 		break;
 	case M_MAILDIR:
-		return MAILBOX_MAILDIR;
+		ret = MAILBOX_MAILDIR;
 		break;
 	case M_IMAP:
-		return MAILBOX_IMAP;
+		ret = MAILBOX_IMAP;
 		break;
 	default:
-		return MAILBOX_UNKNOWN;
+		ret = MAILBOX_UNKNOWN;
 		break;
 	}
+	libbalsa_unlock_mutt();
+
+	return ret;
 }
 
 void libbalsa_mailbox_commit_changes( LibBalsaMailbox *mailbox )
@@ -531,7 +536,7 @@ translate_message (HEADER * cur)
   
 	/* Get fcc from message */
 	for (tmp = cenv->userhdrs; tmp; ) {
-		if (mutt_strncasecmp ("X-Mutt-Fcc:", tmp->data, 11) == 0) {
+		if (g_strncasecmp ("X-Mutt-Fcc:", tmp->data, 11) == 0) {
 			p = tmp->data + 11;
 			SKIPWS (p);
 			
@@ -539,7 +544,7 @@ translate_message (HEADER * cur)
 				message->fcc_mailbox = g_strdup(p);
 			else 
 				message->fcc_mailbox = NULL;
-		} else if (mutt_strncasecmp ("X-Mutt-Fcc:", tmp->data, 18) == 0) {
+		} else if (g_strncasecmp ("X-Mutt-Fcc:", tmp->data, 18) == 0) {
 			/* Is X-Mutt-Fcc correct? */
 			p = tmp->data + 18;
 			SKIPWS (p);

@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
+ *
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -117,7 +119,7 @@ libbalsa_message_body_type(LibBalsaMessageBody *body)
 	}
 
 	g_assert_not_reached();
-	return TYPEOTHER;
+	return LIBBALSA_MESSAGE_BODY_TYPE_OTHER;
 }  
 
 gchar *libbalsa_message_body_get_parameter(LibBalsaMessageBody *body, const gchar *param)
@@ -126,7 +128,9 @@ gchar *libbalsa_message_body_get_parameter(LibBalsaMessageBody *body, const gcha
 
 	g_return_val_if_fail(body != NULL, NULL);
 
+	libbalsa_lock_mutt();
 	res = mutt_get_parameter(param, body->mutt_body->parameter);
+	libbalsa_unlock_mutt();
 
 	return g_strdup(res);
 }
@@ -134,10 +138,13 @@ gchar *libbalsa_message_body_get_parameter(LibBalsaMessageBody *body, const gcha
 gboolean
 libbalsa_message_body_save_temporary ( LibBalsaMessageBody *body, gchar *prefix)
 {
+	/* FIXME: Role our own mktemp that doesn't need a large array (use g_strdup_printf) */
 	if ( body->temp_filename == NULL ) {
 		gchar tmp_file_name[PATH_MAX + 1];
 
+		libbalsa_lock_mutt();
 		mutt_mktemp (tmp_file_name);
+		libbalsa_unlock_mutt();
 
 		body->temp_filename = g_strdup(tmp_file_name);
 	}
@@ -152,8 +159,7 @@ libbalsa_message_body_save (LibBalsaMessageBody *body, gchar *prefix, gchar *fil
 
 	stream = libbalsa_mailbox_get_message_stream (body->message->mailbox, body->message);
   
-	if ( stream == NULL )
-		return FALSE;
+	g_return_val_if_fail ( stream != NULL, FALSE);
 
 	fseek (stream, body->mutt_body->offset, 0);
 
@@ -164,13 +170,14 @@ libbalsa_message_body_save (LibBalsaMessageBody *body, gchar *prefix, gchar *fil
 	if ( !s.fpout )
 		return FALSE;
 
+	libbalsa_lock_mutt();
 	mutt_decode_attachment (body->mutt_body, &s);
+	libbalsa_unlock_mutt();
 
 	fflush (s.fpout);
 	fclose (s.fpout);
   
 	return TRUE;
-  
 }
 
 gchar *libbalsa_message_body_get_content_type(LibBalsaMessageBody *body)
@@ -189,3 +196,4 @@ gboolean libbalsa_message_body_is_multipart (LibBalsaMessageBody *body)
 {
 	return is_multipart(body->mutt_body);
 }
+

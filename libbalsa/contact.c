@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
+ *
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +22,6 @@
 
 #include "config.h"
 
-#include <gnome.h>
 #include <glib.h>
 
 #include "libbalsa.h"
@@ -45,20 +46,19 @@ libbalsa_contact_new (void)
 void
 libbalsa_contact_free (LibBalsaContact * contact)
 {
-
-	if (!contact)
-		return;
+	g_return_if_fail ( contact != NULL );
 
 	g_free(contact->card_name);
 	g_free(contact->first_name);
 	g_free(contact->last_name);  
 	g_free(contact->organization);
 	g_free(contact->email_address);
-  
+
 	g_free(contact);
 }
 
-void libbalsa_contact_list_free(GList * contact_list)
+void
+libbalsa_contact_list_free(GList * contact_list)
 {
 	GList *list;
 

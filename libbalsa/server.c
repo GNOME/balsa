@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 2000 Stuart Parmenter
+ *
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +35,15 @@ static void libbalsa_server_real_set_username(LibBalsaServer *server, const gcha
 static void libbalsa_server_real_set_password(LibBalsaServer *server, const gchar *passwd);
 static void libbalsa_server_real_set_host(LibBalsaServer *server, const gchar *host, gint port);
 
+enum {
+	SET_USERNAME,
+	SET_PASSWORD,
+	SET_HOST,
+	LAST_SIGNAL
+};
+
+static guint libbalsa_server_signals[LAST_SIGNAL];
+
 GtkType
 libbalsa_server_get_type (void)
 {
@@ -55,15 +66,6 @@ libbalsa_server_get_type (void)
 
 	return server_type;
 }
-
-enum {
-	SET_USERNAME,
-	SET_PASSWORD,
-	SET_HOST,
-	LAST_SIGNAL
-};
-
-static guint libbalsa_server_signals[LAST_SIGNAL];
 
 static void
 libbalsa_server_class_init (LibBalsaServerClass *klass)

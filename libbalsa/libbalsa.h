@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1999 Stuart Parmenter
+ *
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,5 +64,10 @@ void libbalsa_init (void (*error_func) (const char *fmt,...));
 void libbalsa_set_spool (gchar *spool);
 
 gchar *libbalsa_guess_mail_spool( void );
+
+void libbalsa_error(const char *fmt, ...);
+
+void libbalsa_lock_mutt(void);
+void libbalsa_unlock_mutt(void);
 
 #endif /* __LIBBALSA_H__ */

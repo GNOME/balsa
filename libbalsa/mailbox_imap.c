@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
+ *
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,8 +45,6 @@ static void libbalsa_mailbox_imap_check (LibBalsaMailbox *mailbox);
 static void server_settings_changed(LibBalsaServer *server, LibBalsaMailbox *mailbox);
 static void server_user_settings_changed_cb(LibBalsaServer *server, gchar* string, LibBalsaMailbox *mailbox);
 static void server_host_settings_changed_cb(LibBalsaServer *server, gchar* host, gint port, LibBalsaMailbox *mailbox);
-
-static void set_mutt_username (LibBalsaMailboxImap *mailbox);
 
 GtkType
 libbalsa_mailbox_imap_get_type (void)
@@ -96,7 +96,8 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap *mailbox)
 	mailbox->tmp_file_path = NULL;
 
 	remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
-	remote->server = LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_POP3));
+	remote->server = LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_IMAP));
+	remote->server->port = 143;
 
 	gtk_signal_connect(GTK_OBJECT(remote->server), "set-username",
 			   GTK_SIGNAL_FUNC(server_user_settings_changed_cb), (gpointer)mailbox);
@@ -135,16 +136,6 @@ libbalsa_mailbox_imap_new(void)
 	mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_IMAP);
 
 	return GTK_OBJECT(mailbox);
-}
-
-/* This needs a better name */
-static void
-set_mutt_username (LibBalsaMailboxImap * mb)
-{
-	g_return_if_fail (LIBBALSA_IS_MAILBOX_IMAP(mb));
-
-	ImapUser = LIBBALSA_MAILBOX_REMOTE_SERVER(mb)->user;
-	ImapPass = LIBBALSA_MAILBOX_REMOTE_SERVER(mb)->passwd;
 }
 
 /* Unregister an old notification and add a current one */
@@ -192,7 +183,9 @@ libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
 	if (CLIENT_CONTEXT_OPEN (mailbox)) {
 		if ( append ) {
 			/* we need the mailbox to be opened fresh i think */
+			libbalsa_lock_mutt();
 			mx_close_mailbox( CLIENT_CONTEXT(mailbox), NULL);
+			libbalsa_unlock_mutt();
 		} else {
 			/* incriment the reference count */
 			mailbox->open_ref++;
@@ -209,13 +202,18 @@ libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
 			      server->host,
 			      server->port,
 			      imap->path);
+	
+	libbalsa_lock_mutt();
 
-	set_mutt_username ( imap );
+	ImapUser = LIBBALSA_MAILBOX_REMOTE_SERVER(imap)->user;
+	ImapPass = LIBBALSA_MAILBOX_REMOTE_SERVER(imap)->passwd;
 
 	if ( append ) 
 		CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp, M_APPEND, NULL);
 	else
 		CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp, 0, NULL);
+
+	libbalsa_unlock_mutt();
 
 	g_free (tmp);
 
@@ -265,12 +263,17 @@ static void libbalsa_mailbox_imap_check (LibBalsaMailbox *mailbox)
 
 		index_hint = CLIENT_CONTEXT (mailbox)->vcount;
 
+		libbalsa_lock_mutt();
+
 		if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint, 0)) < 0) {
 			g_print ("mx_check_mailbox() failed on %s\n", mailbox->name);
 		} else if (i == M_NEW_MAIL || i == M_REOPENED) {
 			mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount - mailbox->messages;
 			libbalsa_mailbox_load_messages (mailbox);
 		}
+
+		libbalsa_unlock_mutt();
+
 		UNLOCK_MAILBOX (mailbox);
 	}
 }

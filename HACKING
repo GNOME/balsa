@@ -35,6 +35,37 @@ contains.
 
 See existing source for a general idea.
 
+Threads
+-------
+
+Their are three locks which are important to balsa: 
+
+1) The GDK lock - this protects GDK and GTK+. 
+
+2) The lock on each mailbox.
+
+3) The libmutt lock - this is maintained by libbalsa and is used
+because libmutt is not threadsafe.
+
+libbalsa API functions expect to always be called with the GDK lock
+held and the mutt lock not held (remember this when calling API funcs
+from within libbalsa). The GDK lock may be released, but you must be
+careful and should relock it before returning. You must be careful
+when the GDK lock is not held that libmutt doesn't call mutt_error or
+anything which calls GTK functions.
+
+In order to avoid deadlocks it is important that the locks are always
+taken in the same order. That is gdk lock first, then any mailbox
+lock, then libmutt lock. Note that this doesn't mean you must take all
+those locks - but if you do take them it must be in that order.
+
+If you want just the mutt lock and not the GDK lock this is OK - but
+you may not try to take the GDK lock whilst holding the mutt lock -
+you must release the mutt lock first.
+
+Be careful to avoid deadlock when locking multiple mailboxes (FIXME:
+This sentance isn't much help to anyone ;-)
+
 Coding Style
 ------------
 

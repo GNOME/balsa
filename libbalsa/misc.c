@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ *
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,21 +22,16 @@
 
 #include "config.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/utsname.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <ctype.h>
 
-#include <gnome.h>
+#include <gnome.h> 
 
 #include "libbalsa.h"
 #include "mailbackend.h"
 
-#include "../libmutt/imap.h"
+#include "libmutt/imap.h"
 
 MailboxNode *
 mailbox_node_new (const gchar * name, LibBalsaMailbox * mb, gint i)
@@ -64,6 +61,7 @@ void mailbox_node_destroy(MailboxNode * mbn)
 }
 
 /* ------------------------------------------ */
+
 ImapDir *imapdir_new(void)
 {
 	ImapDir *id = g_new0(ImapDir, 1);
@@ -136,7 +134,7 @@ add_imap_mbox_cb(const char * file, int isdir, gpointer data)
 		return;
 
 	if( (ptr=strrchr(file, '/')) !=NULL)
-		basename = ptr+1; /* 1 is for the spearator */
+		basename = ptr+1; /* 1 is for the separator */
 	else
 		basename = file;
 
@@ -157,7 +155,7 @@ add_imap_mbox_cb(const char * file, int isdir, gpointer data)
 	if (isdir) {
 		MailboxNode *mbnode;
 		mbnode = mailbox_node_new (file, NULL, TRUE);
-		mbnode->expanded = FALSE; /* should come from the IMAPDir conf */
+		mbnode->expanded = FALSE; /* FIXME: should come from the IMAPDir conf */
 		node = g_node_new (mbnode);
 	} else {
 		LibBalsaServer *server;
@@ -192,18 +190,30 @@ imapdir_scan(ImapDir * id)
 	MailboxNode *mbnode;
 	gchar * p = g_strdup_printf("{%s:%i}INBOX", id->host, id->port);
 
+	libbalsa_lock_mutt();
+
+	/* FIXME: Is this needed? All calls which rely on this should
+	 * be locked by the mutt lock */
 	user = ImapUser;   ImapUser = id->user; 
 	pass = ImapPass;   ImapPass = id->passwd;
 
 	mbnode = mailbox_node_new (id->path, NULL, TRUE);
-	mbnode->expanded = FALSE; /* should come from the IMAPDir conf */
-	if(id->file_tree) g_node_destroy(id->file_tree);
+	mbnode->expanded = FALSE; /* FIXME: should come from the IMAPDir conf */
+
+	if(id->file_tree)
+		g_node_destroy(id->file_tree);
+
 	id->file_tree = g_node_new (mbnode);
 
 	res = imap_browse_foreach(p, id->path, add_imap_mbox_cb, id);
 	g_free(mbnode->name);
 	mbnode->name = g_strdup(id->host);
-	ImapUser = user;   ImapPass = pass;
+	
+	ImapUser = user;
+	ImapPass = pass;
+
+	libbalsa_unlock_mutt();
+
 	return res;
 }
 
@@ -218,8 +228,10 @@ libbalsa_get_hostname (void)
 	return g_strdup (utsname.nodename);
 }
 
+/* FIXME: Move to address.c and change name to
+ *   libbalsa_address_list_to_string or something */
 gchar *
-make_string_from_list (GList * the_list)
+libbalsa_make_string_from_list (GList * the_list)
 {
 	gchar *retc, *str;
 	GList *list;
@@ -252,7 +264,7 @@ make_string_from_list (GList * the_list)
    returns the number of read characters.
 */
 size_t
-readfile (FILE * fp, char **buf)
+libbalsa_readfile (FILE * fp, char **buf)
 {
 	size_t size;
 	off_t offset;
@@ -350,9 +362,12 @@ libbalsa_wrap_string(gchar* str, int width)
    is a thin wrapper around mutt_set_charset() to get rid of mutt dependices
    in balsa.
 */
-void libbalsa_set_charset(const gchar* charset)
+void 
+libbalsa_set_charset(const gchar* charset)
 {
+	libbalsa_lock_mutt();
 	mutt_set_charset((gchar*)charset);
+	libbalsa_unlock_mutt();
 }
 
 

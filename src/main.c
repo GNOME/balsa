@@ -212,6 +212,9 @@ main (int argc, char *argv[])
 
   balsa_app_init ();
 
+  /* Initialize libbalsa */
+  libbalsa_init (balsa_error);
+
 #ifdef USE_PIXBUF
   gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
   gtk_widget_set_default_visual(gdk_rgb_get_visual());
@@ -226,9 +229,6 @@ main (int argc, char *argv[])
 
   /* checking for valid config files */
   config_init ();
-
-  /* Initialize libbalsa */
-  libbalsa_init (balsa_error);
 
   /* load mailboxes */
   config_mailboxes_init ();

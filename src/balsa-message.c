@@ -512,7 +512,7 @@ add_header_glist(BalsaMessage *bm, gchar *header, gchar* label, GList * list)
 	   libbalsa_find_word(header, balsa_app.selected_headers) ) )
     return;
   
-  value = make_string_from_list (list);
+  value = libbalsa_make_string_from_list (list);
   
   add_header_gchar(bm, header, label, value);
   
@@ -937,7 +937,7 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
   if( (fp = fopen( info->body->temp_filename, "r")) == NULL) 
     balsa_warning("Cannot create temporary file.");
 
-  alloced = readfile( fp, &ptr );
+  alloced = libbalsa_readfile( fp, &ptr );
  
   if( ptr ) {
     gboolean ishtml;

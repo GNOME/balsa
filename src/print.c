@@ -236,9 +236,9 @@ void print_message(GtkWidget *widget, gpointer data)
 	fprintf(fp, "\n\n");
 	fprintf(fp, "From:    \t%s\n", tmp);
 	fprintf(fp, "Sent:    \t%s\n", date);
-	tmp = make_string_from_list (message->to_list);
+	tmp = libbalsa_make_string_from_list (message->to_list);
 	fprintf(fp, "To:      \t%s\n", tmp);
-	tmp = make_string_from_list (message->cc_list);
+	tmp = libbalsa_make_string_from_list (message->cc_list);
 	fprintf(fp, "Cc:      \t%s\n", tmp);
 	fprintf(fp, "Subject: \t%s\n", message->subject);
 	fprintf(fp, "\n");

@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ *
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,20 +22,10 @@
 
 #include "config.h"
 
-#include <stdio.h>
-#include <errno.h>
-#include <sys/utsname.h>
-#include <string.h>
-#include <time.h>
-#include <gnome.h>
-
+#include "libbalsa.h"
 #include "mailbackend.h"
 
-#include "libbalsa.h"
-
-#include "misc.h"
-
-#include "mime.h"
+/* FIXME: The content of this file could go to message.c */
 
 /* FIXME: unnecesary global */
 GString *reply;
@@ -64,7 +56,7 @@ process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar 
 		libbalsa_message_body_save_temporary(body, reply_prefix_str);
     
 		part = fopen (body->temp_filename, "r");
-		alloced = readfile (part, &ptr);
+		alloced = libbalsa_readfile (part, &ptr);
     
 		if (reply) {
 			reply = g_string_append (reply, "\n");
@@ -88,8 +80,7 @@ process_mime_multipart (LibBalsaMessage * message, LibBalsaMessageBody * body, g
 }
 
 GString *
-content2reply (LibBalsaMessage * message,
-	       gchar *reply_prefix_str)    /* arp */
+content2reply (LibBalsaMessage * message, gchar *reply_prefix_str)
 {
 	LibBalsaMessageBody *body;
 

@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
+ *
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +21,9 @@
  */
 
 #include "config.h"
-#include <glib.h>
-#include <stdarg.h>
 
-#include <stdio.h>
-#include <sys/utsname.h>
-#include <sys/stat.h>
-#include <string.h>
-#include <time.h>
+#include <glib.h>
+
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
 #endif
@@ -180,9 +177,6 @@ libbalsa_message_class_init (LibBalsaMessageClass *klass)
 	klass->set_flagged = libbalsa_message_real_set_flagged;
 }
 
-/*
- * messages
- */
 LibBalsaMessage *
 libbalsa_message_new(void)
 {
@@ -207,8 +201,6 @@ libbalsa_message_destroy(GtkObject *object)
   
 	message = LIBBALSA_MESSAGE(object);
 
-	/* Is it really necesary to zero stuff in a destroy function?
-	   The memory is about to be free()'d anyway... */
 	g_free (message->remail);                      message->remail = NULL;
 	libbalsa_address_free (message->from);         message->from = NULL;
 	libbalsa_address_free (message->sender);       message->sender = NULL;
@@ -259,7 +251,7 @@ libbalsa_message_charset (LibBalsaMessage *message)
 */
 static gchar**
 create_hdr_pair(const gchar * name, gchar* value) {
-	gchar ** item = g_malloc(sizeof(gchar*)*3);
+	gchar ** item = g_new(gchar*, 3);
 	item[0] = g_strdup(name);
 	item[1] = value;
 	item[2] = NULL;
@@ -319,9 +311,11 @@ libbalsa_message_copy (LibBalsaMessage * message, LibBalsaMailbox * dest)
 
 	libbalsa_mailbox_open(dest, FALSE);
 
+	libbalsa_lock_mutt();
 	mutt_append_message (CLIENT_CONTEXT (dest),
 			     CLIENT_CONTEXT (message->mailbox),
 			     cur, 0, 0);
+	libbalsa_unlock_mutt();
 
 	dest->total_messages++;
 	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW ) dest->unread_messages++;
@@ -341,15 +335,20 @@ libbalsa_message_move (LibBalsaMessage * message, LibBalsaMailbox * dest)
 
 	libbalsa_mailbox_open(dest, TRUE);
 
+	libbalsa_lock_mutt();
+
 	mutt_parse_mime_message (CLIENT_CONTEXT (message->mailbox), cur);
 
 	mutt_append_message (CLIENT_CONTEXT (dest),
 			     CLIENT_CONTEXT (message->mailbox),
 			     cur, 0, 0);
 
+	libbalsa_unlock_mutt();
+
 	dest->total_messages++;
 
-	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW ) dest->unread_messages++;
+	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW ) 
+		dest->unread_messages++;
 
 	libbalsa_mailbox_close (dest);
   
@@ -359,18 +358,6 @@ libbalsa_message_move (LibBalsaMessage * message, LibBalsaMailbox * dest)
 static void
 libbalsa_message_real_clear_flags(LibBalsaMessage *message)
 {
-#if 0
-	char tmp[BUFFER_SIZE];
-
-	LOCK_MAILBOX (message->mailbox);
-	RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
-
-	mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_REPLIED, 1);
-	sprintf (tmp, "%ld", message->msgno);
-	mail_clearflag (CLIENT_STREAM (message->mailbox), tmp, "\\DELETED");
-	mail_clearflag (CLIENT_STREAM (message->mailbox), tmp, "\\ANSWERED");
-#endif
-
 	LOCK_MAILBOX (message->mailbox);
 
 	message->flags = 0;
@@ -387,8 +374,11 @@ libbalsa_message_real_set_answered_flag(LibBalsaMessage *message, gboolean set)
 	RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
 	cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
-
+	
+	libbalsa_lock_mutt();
 	mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_REPLIED, TRUE);
+	libbalsa_unlock_mutt();
+
 	message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
 
 	UNLOCK_MAILBOX (message->mailbox);
@@ -404,8 +394,10 @@ libbalsa_message_real_set_read_flag(LibBalsaMessage *message, gboolean set)
 	RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
 	if (set && (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)) {
+		libbalsa_lock_mutt();
 		mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_READ, TRUE);
 		mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_OLD, FALSE);
+		libbalsa_unlock_mutt();
 
 		message->flags &= ~LIBBALSA_MESSAGE_FLAG_NEW;
 		message->mailbox->unread_messages-- ;
@@ -414,7 +406,9 @@ libbalsa_message_real_set_read_flag(LibBalsaMessage *message, gboolean set)
 			libbalsa_mailbox_set_unread_messages_flag(message->mailbox, FALSE);
       
 	} else if (!set){
+		libbalsa_lock_mutt();
 		mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_READ, TRUE);
+		libbalsa_unlock_mutt();
 
 		message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
 		message->mailbox->unread_messages++;
@@ -433,11 +427,15 @@ libbalsa_message_real_set_flagged(LibBalsaMessage *message, gboolean set)
 	RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
 	if (!set && (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)) {
+		libbalsa_lock_mutt();
 		mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_FLAG, FALSE);
+		libbalsa_unlock_mutt();
 
 		message->flags &= ~LIBBALSA_MESSAGE_FLAG_FLAGGED;
 	} else if (set){
+		libbalsa_lock_mutt();
 		mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_FLAG, TRUE);
+		libbalsa_unlock_mutt();
 
 		message->flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
 	}
@@ -454,8 +452,10 @@ libbalsa_message_real_set_deleted_flag(LibBalsaMessage *message, gboolean set)
 	RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
     
 	if (set && !(message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
+		libbalsa_lock_mutt();
 		mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, TRUE);
-	
+		libbalsa_unlock_mutt();
+
 		message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
 		if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
 			message->mailbox->unread_messages--;
@@ -467,8 +467,10 @@ libbalsa_message_real_set_deleted_flag(LibBalsaMessage *message, gboolean set)
 		message->mailbox->total_messages--;
 
 	} else if (!set){
+		libbalsa_lock_mutt();
 		mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, FALSE);
-	
+		libbalsa_unlock_mutt();
+
 		message->flags &= ~LIBBALSA_MESSAGE_FLAG_DELETED;
 		if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
 			message->mailbox->unread_messages++;
@@ -603,7 +605,9 @@ libbalsa_message_body_ref (LibBalsaMessage * message)
 	/*
 	 * load message body
 	 */
+	libbalsa_lock_mutt();
 	msg = mx_open_message (CLIENT_CONTEXT (message->mailbox), cur->msgno);
+	libbalsa_unlock_mutt();
 
 	if (!msg) {
 		message->body_ref--;
@@ -613,12 +617,16 @@ libbalsa_message_body_ref (LibBalsaMessage * message)
 	fseek (msg->fp, cur->content->offset, 0);
   
 	if (cur->content->type == TYPEMULTIPART) {
+		libbalsa_lock_mutt();
 		cur->content->parts = mutt_parse_multipart (msg->fp,
 							    mutt_get_parameter ("boundary", cur->content->parameter),
 							    cur->content->offset + cur->content->length,
 							    strcasecmp ("digest", cur->content->subtype) == 0);
+		libbalsa_unlock_mutt();
 	} else if ( mutt_is_message_type(cur->content->type, cur->content->subtype) ) {
+		libbalsa_lock_mutt();
 		cur->content->parts = mutt_parse_messageRFC822(msg->fp, cur->content);
+		libbalsa_unlock_mutt();
 	}
 	if (msg != NULL) {
 #ifdef DEBUG
@@ -638,7 +646,10 @@ libbalsa_message_body_ref (LibBalsaMessage * message)
 		libbalsa_message_append_part (message, body);
 
 		message->body_ref++;
+
+		libbalsa_lock_mutt();
 		mx_close_message (&msg);
+		libbalsa_unlock_mutt();
 	}
 
 	/*
@@ -650,8 +661,7 @@ libbalsa_message_body_ref (LibBalsaMessage * message)
 
 	if (LIBBALSA_IS_MAILBOX_IMAP(message->mailbox))	{
 
-		if (LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path)
-			g_free (LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path);
+		g_free (LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path);
 
 		LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path =
 			g_strdup (cur->content->filename);
@@ -680,6 +690,7 @@ gint libbalsa_message_has_attachment (LibBalsaMessage* message)
   
 	msg_header = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
+	/* FIXME: Can be simplified into 1 if */
 	if (msg_header->content->type != TYPETEXT) {
 		tmp = 1;
 	} else {
@@ -713,8 +724,11 @@ ADDRESS_to_gchar (const ADDRESS * addr)
 	gchar buf[1024]; /* assume no single address is longer than this */
 
 	buf[0] = '\0';
+	libbalsa_lock_mutt();
 	rfc822_write_address(buf, sizeof(buf), (ADDRESS*)addr);
+	libbalsa_unlock_mutt();
 
+	/* FIXME: This looks dodgy to me [IJC] */
 	if(strlen(buf)>=sizeof(buf)-1)
 		fprintf(stderr,
 			"ADDRESS_to_gchar: the max allowed address length exceeded.\n");

@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
+ *
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +63,9 @@ void libbalsa_notify_register_mailbox (LibBalsaMailbox *mailbox)
 		return;
 	}
 
+	libbalsa_lock_mutt();
 	tmp = buffy_add_mailbox(path, user, passwd);
+	libbalsa_unlock_mutt();
 
 	g_free(path);
 
@@ -86,8 +90,12 @@ void libbalsa_notify_unregister_mailbox (LibBalsaMailbox *mailbox)
 	/* For some reason buffy_mailbox_remove is not exported by libmutt.
 	 * So we do it ourselves. Cut-n-paste from buffy.c
 	 */ 
+	libbalsa_lock_mutt();
+	if(!*tmp) {
+		libbalsa_unlock_mutt();
+		return; /* strange error */
+	}
 
-	if(!*tmp) return; /* strange error */
 	if(*tmp == bf) {
 
 		*tmp = (*tmp)->next;
@@ -97,8 +105,10 @@ void libbalsa_notify_unregister_mailbox (LibBalsaMailbox *mailbox)
 		while(*tmp && (*tmp)->next != bf) 
 			tmp = &(*tmp)->next;
 
-		if( !*tmp ) 
+		if( !*tmp ) {
+			libbalsa_unlock_mutt();
 			return; /* not found again, critical error! */
+		}
 
 		(*tmp)->next = bf->next;
 	}
@@ -107,13 +117,17 @@ void libbalsa_notify_unregister_mailbox (LibBalsaMailbox *mailbox)
 	safe_free((void **) &bf->passwd);
 	safe_free((void **) &bf->path);
 	safe_free((void **) &bf);
+
+	libbalsa_unlock_mutt();
 }
 
 void libbalsa_notify_start_check (void)
 {
 	/* Might as well use check rather than notify. All notify does is */
 	/* write messages for each mailbox */
+	libbalsa_lock_mutt();
 	mutt_buffy_check(FALSE);
+	libbalsa_unlock_mutt();
 }
 
 gint libbalsa_notify_check_mailbox (LibBalsaMailbox *mailbox)

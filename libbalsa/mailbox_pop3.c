@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
+ *
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -135,13 +137,18 @@ static void libbalsa_mailbox_pop3_open (LibBalsaMailbox *mailbox, gboolean appen
   
 	g_return_if_fail ( LIBBALSA_IS_MAILBOX_POP3(mailbox) );
 
-	LOCK_MAILBOX (mailbox);
+	/* FIXME: I was curious if this function was ever called... */
 
+	g_print ("Opened a POP3 mailbox!\n");
+
+	LOCK_MAILBOX (mailbox);
 
 	if (CLIENT_CONTEXT_OPEN (mailbox)) {
 		if ( append ) {
 			/* we need the mailbox to be opened fresh i think */
+			libbalsa_lock_mutt();
 			mx_close_mailbox( CLIENT_CONTEXT(mailbox), NULL);
+			libbalsa_unlock_mutt();
 		} else {
 			/* incriment the reference count */
 			mailbox->open_ref++;
@@ -152,18 +159,20 @@ static void libbalsa_mailbox_pop3_open (LibBalsaMailbox *mailbox, gboolean appen
 	}
 
 	pop = LIBBALSA_MAILBOX_POP3(mailbox);
-
+	
+	libbalsa_lock_mutt();
 	if ( append )
 		CLIENT_CONTEXT (mailbox) = mx_open_mailbox (LIBBALSA_MAILBOX_REMOTE_SERVER(pop)->host, M_APPEND, NULL);
 	else
 		CLIENT_CONTEXT (mailbox) = mx_open_mailbox (LIBBALSA_MAILBOX_REMOTE_SERVER(pop)->host, 0, NULL);
+	libbalsa_unlock_mutt();
 
 	if (CLIENT_CONTEXT_OPEN (mailbox)) {
 		mailbox->messages = 0;
 		mailbox->total_messages = 0;
 		mailbox->unread_messages = 0;
 		mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
-		libbalsa_mailbox_load_messages (mailbox); /*0*/
+		libbalsa_mailbox_load_messages (mailbox);
     
 		/* increment the reference count */
 		mailbox->open_ref++;
@@ -180,42 +189,53 @@ static void libbalsa_mailbox_pop3_open (LibBalsaMailbox *mailbox, gboolean appen
 
 static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox)
 {
-	char uid[80];
+	gchar uid[80];
 
 #ifdef BALSA_USE_THREADS
-	char msgbuf[160];
+	gchar *msgbuf;
 	MailThreadMessage *threadmsg;
 	void (*mutt_error_backup)( const char *, ... );
 
-	/* Otherwise we get multithreaded GTK+ calls... baaad */
-	mutt_error_backup = mutt_error;
-	mutt_error = error_in_thread;
-
 	/* Only check if lock has been set */
+#if 0 
+/* FIXME: IJC - I don't think this is needed */
+/* It is my intention that the libbalsa side of checking not care about threads (above locking libmutt) */
 	pthread_mutex_lock( &mailbox_lock);
 	if( !checking_mail ) {
+		libbalsa_unlock_mutt();
 		pthread_mutex_unlock( &mailbox_lock);
 		return;
 	}
 	pthread_mutex_unlock( &mailbox_lock );
+#endif
 #endif /* BALSA_USE_THREADS */
-  
+
 	if (LIBBALSA_MAILBOX_POP3 (mailbox)->check) {
 		LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+
+		libbalsa_lock_mutt();
+
+#ifdef BALSA_USE_THREADS
+		/* Otherwise we get multithreaded GTK+ calls... baaad */
+		mutt_error_backup = mutt_error;
+		mutt_error = error_in_thread;
+#endif
+
 		PopHost = g_strdup (server->host);
 		PopPort = (server->port);
 		PopPass = g_strdup (server->passwd);
 		PopUser = g_strdup (server->user);
 
 #ifdef BALSA_USE_THREADS
-		sprintf( msgbuf, "POP3: %s", mailbox->name );
+		msgbuf = g_strdup_printf( "POP3: %s", mailbox->name );
 		MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_SOURCE, msgbuf );
+		g_free(msgbuf);
 #endif
     
 		if( LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid == NULL)
 			uid[0] = 0;
 		else
-			strcpy( uid, LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid );
+			strcpy ( uid, LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid );
     
 		PopUID = uid;
 
@@ -233,8 +253,8 @@ static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox)
 
 		if( LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
 		    strcmp(LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid, uid) != 0) {
-			if( LIBBALSA_MAILBOX_POP3( mailbox )->last_popped_uid )
-				g_free ( LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid );
+
+			g_free ( LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid );
 
 			LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
       
@@ -248,11 +268,13 @@ static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox)
 				mailbox, mailbox_get_pkey(mailbox) );
 #endif
 		}
-	}
 
 #ifdef BALSA_USE_THREADS
-	mutt_error = mutt_error_backup;
+		mutt_error = mutt_error_backup;
 #endif
+		
+		libbalsa_unlock_mutt();
+	}
 
 }
 

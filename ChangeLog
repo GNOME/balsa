@@ -1,3 +1,16 @@
+2000-08-26  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/*.[ch]: Implemented a mutex around all libmutt
+	calls. Updated copyright in all files.
+	* HACKING: Add a section describing how locking should work.
+	* balsa.spec.in: Add AUTHORS and HACKING to %doc.
+	* src/balsa-message.c, src/print.c, src/sendmsg-window.c:
+	make_string_from_list->libbalsa_make_string_from_list and
+	readfile->libbalsa_readfile.
+	* src/main.c: Initialize libbalsa earlier, so the libmutt mutes is
+	created early on.
+	
+
 2000-08-25  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-app.[hc]: add attach_dir field to remember last

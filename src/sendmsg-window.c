@@ -1106,17 +1106,17 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
 
   if (type == SEND_CONTINUE) {
     if (message->to_list) {
-      tmp = make_string_from_list (message->to_list);
+      tmp = libbalsa_make_string_from_list (message->to_list);
       gtk_entry_set_text (GTK_ENTRY (msg->to[1]), tmp);
       g_free (tmp);
     }
     if (message->cc_list) {
-      tmp = make_string_from_list (message->cc_list);
+      tmp = libbalsa_make_string_from_list (message->cc_list);
       gtk_entry_set_text (GTK_ENTRY (msg->cc[1]), tmp);
       g_free (tmp);
     }
     if (message->bcc_list) {
-      tmp = make_string_from_list (message->bcc_list);
+      tmp = libbalsa_make_string_from_list (message->bcc_list);
       gtk_entry_set_text (GTK_ENTRY (msg->bcc[1]), tmp);
       g_free (tmp);
     }
@@ -1126,7 +1126,7 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
 
   if (type == SEND_REPLY_ALL)
     {
-      tmp = make_string_from_list (message->to_list);
+      tmp = libbalsa_make_string_from_list (message->to_list);
       gtk_entry_set_text (GTK_ENTRY (msg->cc[1]), tmp);
       g_free (tmp);
 
@@ -1134,7 +1134,7 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
 	{
 	  gtk_entry_append_text (GTK_ENTRY (msg->cc[1]), ", ");
 
-	  tmp = make_string_from_list (message->cc_list);
+	  tmp = libbalsa_make_string_from_list (message->cc_list);
 	  gtk_entry_append_text (GTK_ENTRY (msg->cc[1]), tmp);
 	  g_free (tmp);
 	}
@@ -1191,7 +1191,7 @@ read_signature (void)
   if (balsa_app.signature_path == NULL
       || !(fp = fopen (balsa_app.signature_path, "r")))
     return NULL;
-  len = readfile (fp, &ret);
+  len = libbalsa_readfile (fp, &ret);
   fclose (fp);
   if (len > 0 && ret[len - 1] == '\n')
      ret[len - 1] = '\0';

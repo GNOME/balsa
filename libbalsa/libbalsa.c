@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ *
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,11 +32,17 @@
 #include "libbalsa.h"
 #include "mailbackend.h"
 
+#ifdef BALSA_USE_THREADS
+static GMutex *mutt_lock;
+#endif
+
 void mutt_message (const char *fmt,...);
 void mutt_exit (int code);
 int mutt_yesorno (const char *msg, int def);
 int mutt_any_key_to_continue (const char *s);
 void mutt_clear_error (void);
+
+static void (*libbalsa_real_error_func)(const char *fmt,...);
 
 void
 mutt_message (const char *fmt,...)
@@ -72,9 +80,15 @@ libbalsa_init ( void (*error_func) (const char *fmt,...) )
 {
 	struct utsname utsname;
 	char *p;
-	gchar *tmp;
 
 	Spoolfile = libbalsa_guess_mail_spool();
+
+#ifdef BALSA_USE_THREADS
+	if ( ! g_thread_supported() ) {
+		g_error ("Threads have not been initialised.");
+	}
+	mutt_lock = g_mutex_new();
+#endif
 
 	uname (&utsname);
 
@@ -86,7 +100,8 @@ libbalsa_init ( void (*error_func) (const char *fmt,...) )
 
 	Hostname = libbalsa_get_hostname ();
 
-	mutt_error = error_func;
+	mutt_error = libbalsa_error;
+	libbalsa_real_error_func = error_func;
 
 	Fqdn = g_strdup (Hostname);
 
@@ -99,10 +114,7 @@ libbalsa_init ( void (*error_func) (const char *fmt,...) )
 		UserHeader = UserHeader->next;
 
 	UserHeader = mutt_new_list ();
-	tmp = g_malloc (17 + strlen (VERSION));
-	snprintf (tmp, 17 + strlen (VERSION), "X-Mailer: Balsa %s", VERSION);
-	UserHeader->data = g_strdup (tmp);
-	g_free (tmp);
+	UserHeader->data = g_strdup_printf ("X-Mailer: Balsa %s", VERSION);
   
 	set_option(OPTSAVEEMPTY);
 	set_option(OPTCHECKNEW);
@@ -120,6 +132,24 @@ libbalsa_set_spool (gchar *spool)
 		Spoolfile = g_strdup (spool);
 	else 
 		Spoolfile = libbalsa_guess_mail_spool();
+}
+
+/*
+ * These two functions control the libmutt lock. 
+ * This lock must be held around all mutt calls
+ */
+void libbalsa_lock_mutt(void)
+{
+#ifdef BALSA_USE_THREADS
+	g_mutex_lock(mutt_lock);
+#endif
+}
+
+void libbalsa_unlock_mutt(void)
+{
+#ifdef BALSA_USE_THREADS
+	g_mutex_unlock(mutt_lock);
+#endif
 }
 
 /* libbalsa_guess_mail_spool
@@ -160,4 +190,13 @@ libbalsa_guess_mail_spool( void )
 	 * some systems, and it's a good enough default if we
 	 * can't guess it any other way. */
 	return gnome_util_prepend_user_home( "mailbox" );
+}
+
+/* This function calls the real error func */
+/* FIXME: Need to look into providing a global option as to whether
+ * we should call gdk_thread_enter() here. This would be safe to do if the libmutt lock was held?
+ */
+void libbalsa_error(const char *fmt, ...)
+{
+	libbalsa_real_error_func(fmt);
 }

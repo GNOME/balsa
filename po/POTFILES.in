@@ -1,3 +1,4 @@
+# src/orbit-glue.c : disabled because it is excluded from the dist file
 libbalsa/address-book-ldap.c
 libbalsa/address-book-vcard.c
 libbalsa/address-book.c
@@ -20,16 +21,25 @@ libinit_balsa/balsa-druid-page-welcome.gob
 libinit_balsa/balsa-initdruid.gob
 libinit_balsa/helper.c
 libinit_balsa/init_balsa.c
-libmutt/mbox.c
-libmutt/mx.c
+libmutt/account.c
+libmutt/handler.c
 libmutt/imap/auth.c
+libmutt/imap/auth_anon.c
+libmutt/imap/auth_cram.c
 libmutt/imap/auth_gss.c
+libmutt/imap/auth_login.c
+libmutt/imap/auth_sasl.c
 libmutt/imap/browse.c
+libmutt/imap/command.c
 libmutt/imap/imap.c
 libmutt/imap/message.c
 libmutt/imap/util.c
-src/address-book.c
+libmutt/mbox.c
+libmutt/mutt_socket.c
+libmutt/mutt_ssl.c
+libmutt/mx.c
 src/address-book-config.c
+src/address-book.c
 src/balsa-app.c
 src/balsa-index.c
 src/balsa-mblist.c
@@ -42,7 +52,6 @@ src/mailbox-node.c
 src/main-window.c
 src/main.c
 src/message-window.c
-# src/orbit-glue.c : disabled because it is excluded from the dist file
 src/pref-manager.c
 src/print.c
 src/sendmsg-window.c

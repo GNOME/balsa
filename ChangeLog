@@ -1,5 +1,7 @@
-2005-03-22 09:56  PeterB
+2005-03-22 13:21  PeterB
 
+	* src/: balsa-message.c, sendmsg-window.c: always pass URI to
+	gnome_vfs_mime_application_launch.
 	* src/sendmsg-window.c: more appropriate version checks.
 	* libbalsa/libbalsa-conf.c: organize key-file info into structures.
 

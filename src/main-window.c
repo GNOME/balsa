@@ -1806,14 +1806,13 @@ enable_message_menus(BalsaWindow * window, LibBalsaMessage * message)
         &tu_message_more_menu[MENU_MESSAGE_STORE_ADDRESS_POS]
 #endif
     };
-    gboolean enable, enable_mod, enable_multi;
+    gboolean enable, enable_mod;
     guint i;
     GtkWidget *toolbar =
         balsa_toolbar_get_from_gnome_app(GNOME_APP(window));
 
     enable       = (message != NULL && message->mailbox != NULL);
     enable_mod   = (enable && !message->mailbox->readonly);
-    enable_multi = (enable && libbalsa_message_is_multipart(message));
 
     /* Handle menu items which require write access to mailbox */
     for(i=0; i<ELEMENTS(mods); i++)
@@ -1821,15 +1820,6 @@ enable_message_menus(BalsaWindow * window, LibBalsaMessage * message)
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_TRASH,
                                        enable_mod);
 
-    /* Handle items which require multiple parts to the mail */
-#if !defined(ENABLE_TOUCH_UI)
-    gtk_widget_set_sensitive(message_menu
-                             [MENU_MESSAGE_NEXT_PART_POS].widget, 
-                             enable_multi);
-    gtk_widget_set_sensitive(message_menu
-                             [MENU_MESSAGE_PREVIOUS_PART_POS].widget, 
-                             enable_multi);
-#endif /* ENABLE_TOUCH_UI */
     for(i=0; i<ELEMENTS(std_menu); i++)
         gtk_widget_set_sensitive(std_menu[i]->widget, enable);
 
@@ -1959,6 +1949,24 @@ balsa_window_enable_continue(BalsaWindow * window)
 }
 
 #if !defined(ENABLE_TOUCH_UI)
+static void
+enable_part_menu_items(BalsaWindow * window)
+{
+    BalsaMessage *msg = BALSA_MESSAGE(window->preview);
+    gboolean enable;
+
+    if (!msg || !msg->treeview)
+        return;
+
+    enable = balsa_message_has_next_part(msg);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_NEXT_PART_POS].
+                             widget, enable);
+
+    enable = balsa_message_has_previous_part(msg);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_PREVIOUS_PART_POS].
+                             widget, enable);
+}
+
 static void
 balsa_window_set_threading_menu(BalsaWindow * window, int option)
 {
@@ -3237,6 +3245,7 @@ next_part_cb(GtkWidget * widget, gpointer data)
     if (bw->preview) {
         balsa_message_next_part(BALSA_MESSAGE(bw->preview));
         enable_edit_menus(BALSA_MESSAGE(bw->preview));
+	enable_part_menu_items(bw);
     }
 }
 
@@ -3248,6 +3257,7 @@ previous_part_cb(GtkWidget * widget, gpointer data)
     if (bw->preview) {
         balsa_message_previous_part(BALSA_MESSAGE(bw->preview));
         enable_edit_menus(BALSA_MESSAGE(bw->preview));
+	enable_part_menu_items(bw);
     }
 }
 #endif /* ENABLE_TOUCH_UI */
@@ -4404,6 +4414,9 @@ static void
 select_part_cb(BalsaMessage * bm, gpointer data)
 {
     enable_edit_menus(bm);
+#if !defined(ENABLE_TOUCH_UI)
+    enable_part_menu_items(BALSA_WINDOW(data));
+#endif /*ENABLE_TOUCH_UI */
 }
 
 static void

@@ -3263,16 +3263,15 @@ tree_selection_get_first(GtkTreeModel * model, GtkTreePath * path,
     }
 }
 
-void
-balsa_message_next_part(BalsaMessage * bmessage)
+static BalsaPartInfo *
+bm_next_part_info(BalsaMessage * bmessage)
 {
     selFirst_T sel;
     GtkTreeView *gtv;
     GtkTreeModel *model;
-    BalsaPartInfo *info;
 
-    g_return_if_fail(bmessage != NULL);
-    g_return_if_fail(bmessage->treeview != NULL);
+    g_return_val_if_fail(bmessage != NULL, NULL);
+    g_return_val_if_fail(bmessage->treeview != NULL, NULL);
     
     gtv = GTK_TREE_VIEW(bmessage->treeview);
     model = gtk_tree_view_get_model(gtv);
@@ -3282,37 +3281,53 @@ balsa_message_next_part(BalsaMessage * bmessage)
     gtk_tree_selection_selected_foreach(gtk_tree_view_get_selection(gtv),
                                         tree_selection_get_first, &sel);
     if (!sel.found) {
-        /* select the first part if nothing is selected */
+        /* return the first part if nothing is selected */
         if (!gtk_tree_model_get_iter_first(model, &sel.sel_iter))
-            return;
+            return NULL;
     } else {
         GtkTreeIter child;
 
         /* If the first selected iter has a child, select it, otherwise take
-           next on the same level. If there is no next, don't move & beep */
+           next on the same level. If there is no next, return NULL */
         if (gtk_tree_model_iter_children (model, &child, &sel.sel_iter))
-            memcpy (&sel.sel_iter, &child, sizeof(GtkTreeIter));
-        else if (!gtk_tree_model_iter_next (model, &sel.sel_iter)) {
-            gdk_beep();
-            return;
-        }
+	    sel.sel_iter = child;
+        else if (!gtk_tree_model_iter_next (model, &sel.sel_iter))
+            return NULL;
     }
     
-    gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(gtv));
-    info = tree_next_valid_part_info(model, &sel.sel_iter);
-    select_part(bmessage, info);
+    return tree_next_valid_part_info(model, &sel.sel_iter);
 }
 
 void
-balsa_message_previous_part(BalsaMessage * bmessage)
+balsa_message_next_part(BalsaMessage * bmessage)
+{
+    BalsaPartInfo *info;
+    GtkTreeView *gtv;
+
+    if (!(info = bm_next_part_info(bmessage)))
+	return;
+
+    gtv = GTK_TREE_VIEW(bmessage->treeview);
+    gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(gtv));
+    select_part(bmessage, info);
+}
+
+gboolean
+balsa_message_has_next_part(BalsaMessage * bmessage)
+{
+    return bm_next_part_info(bmessage) != NULL;
+}
+
+static BalsaPartInfo *
+bm_previous_part_info(BalsaMessage * bmessage)
 {
     selFirst_T sel;
     GtkTreeView *gtv;
     GtkTreeModel *model;
     BalsaPartInfo *info;
 
-    g_return_if_fail(bmessage != NULL);
-    g_return_if_fail(bmessage->treeview != NULL);
+    g_return_val_if_fail(bmessage != NULL, NULL);
+    g_return_val_if_fail(bmessage->treeview != NULL, NULL);
     
     gtv = GTK_TREE_VIEW(bmessage->treeview);
     model = gtk_tree_view_get_model(gtv);
@@ -3322,9 +3337,9 @@ balsa_message_previous_part(BalsaMessage * bmessage)
     gtk_tree_selection_selected_foreach(gtk_tree_view_get_selection(gtv),
                                         tree_selection_get_first, &sel);
     if (!sel.found) {
-        /* select the first part if nothing is selected */
+        /* return the first part if nothing is selected */
         if (!gtk_tree_model_get_iter_first(model, &sel.sel_iter))
-            return;
+            return NULL;
     } else {
         GtkTreePath * path = gtk_tree_model_get_path(model, &sel.sel_iter);
 
@@ -3332,9 +3347,8 @@ balsa_message_previous_part(BalsaMessage * bmessage)
         do {
             if (!gtk_tree_path_prev (path)) {
                 if (gtk_tree_path_get_depth (path) <= 1) {
-                    gdk_beep();
                     gtk_tree_path_free(path);
-                    return;
+                    return NULL;
                 }
                 gtk_tree_path_up(path);
             }
@@ -3346,8 +3360,27 @@ balsa_message_previous_part(BalsaMessage * bmessage)
         gtk_tree_path_free(path);
     }
             
+    return info;
+}
+
+void
+balsa_message_previous_part(BalsaMessage * bmessage)
+{
+    BalsaPartInfo *info;
+    GtkTreeView *gtv;
+
+    if (!(info = bm_previous_part_info(bmessage)))
+	return;
+
+    gtv = GTK_TREE_VIEW(bmessage->treeview);
     gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(gtv));
     select_part(bmessage, info);
+}
+
+gboolean
+balsa_message_has_previous_part(BalsaMessage * bmessage)
+{
+    return bm_previous_part_info(bmessage) != NULL;
 }
 
 static LibBalsaMessageBody*

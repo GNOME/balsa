@@ -86,7 +86,9 @@ gboolean balsa_message_set(BalsaMessage * bmessage,
 			   LibBalsaMessage * message);
 
 void balsa_message_next_part(BalsaMessage * bmessage);
+gboolean balsa_message_has_next_part(BalsaMessage * bmessage);
 void balsa_message_previous_part(BalsaMessage * bmessage);
+gboolean balsa_message_has_previous_part(BalsaMessage * bmessage);
 void balsa_message_save_current_part(BalsaMessage * bmessage);
 
 void balsa_message_set_displayed_headers(BalsaMessage * bmessage,

@@ -283,7 +283,7 @@ balsa_index_page_close_and_destroy(GtkObject * obj)
     /*    printf( "Close and destroy!\n" ); */
 
     if (page->index) {
-	gtk_signal_disconnect_by_data((GTK_OBJECT(BALSA_INDEX(page->index)->mailbox),
+	gtk_signal_disconnect_by_data((GTK_OBJECT(BALSA_INDEX(page->index)->mailbox)),
 				       BALSA_INDEX(page->index));
 	gtk_widget_destroy(GTK_WIDGET(page->index));
 	page->index = NULL;

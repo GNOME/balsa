@@ -1,3 +1,7 @@
+2000-10-10  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/balsa-index-page.c: fixed typo that broke compilation. 
+
 2000-10-09  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/balsa-index-page.c: Disconnect signals from the mailbox when

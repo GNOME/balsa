@@ -1,3 +1,10 @@
+2004-02-13 11:36  PeterB
+
+	* libbalsa/mailbox_mbox.c: set msg_info.start as
+	g_mime_parser_get_from_offset() instead of end of previous message
+	(they can be different, if previous message has trailing garbage,
+	like some sent by the Balsa list-server!).
+
 2004-02-12 21:44  PeterB
 
 	* libbalsa/mailbox_local.c, libbalsa/mailbox_local.h,

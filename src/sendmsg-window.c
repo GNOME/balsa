@@ -200,8 +200,8 @@ create_menu (BalsaSendmsg * bmsg)
 
   menu_items[i] = NULL;
 /*
-  g_print ("%d menu items\n", i);
-*/
+   g_print ("%d menu items\n", i);
+ */
   gtk_window_add_accelerator_table (GTK_WINDOW (window), accel);
   return menubar;
 }
@@ -238,6 +238,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   BalsaSendmsg *msg = NULL;
   gchar *from;
   gint row;
+  gchar *tmp;
 
   msg = g_malloc (sizeof (BalsaSendmsg));
   switch (type)
@@ -325,11 +326,33 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   msg->subject = gtk_entry_new ();
   if (type != 0)
     {
-      gtk_entry_set_text (GTK_ENTRY (msg->subject), get_header ("subject", bindex->stream, row));
+      tmp = g_strdup (get_header ("subject", bindex->stream, row));
+      gtk_entry_set_text (GTK_ENTRY (msg->subject), tmp);
       if (type == 1)
-	gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
+	{
+	  if (strlen (tmp) < 2)
+	    gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
+	  else
+	    {
+	      if (!((tmp[0] == 'R' || tmp[0] == 'r') &&
+		    (tmp[1] == 'E' || tmp[1] == 'e') &&
+		    (tmp[2] == ':')))
+		gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
+	    }
+	}
       else if (type == 2)
-	gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Fw: ");
+	{
+	  if (strlen (tmp) < 2)
+	    gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
+	  else
+	    {
+	      if (!((tmp[0] == 'F' || tmp[0] == 'f') &&
+		    (tmp[1] == 'W' || tmp[1] == 'w') &&
+		    (tmp[2] == ':')))
+		gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Fw: ");
+	    }
+	}
+      g_free (tmp);
     }
 
   gtk_table_attach (GTK_TABLE (table), msg->subject, 1, 2, 2, 3,

@@ -1,3 +1,19 @@
+2003-06-25 07:47  PeterB
+
+	* src/sendmsg-window.c: Replace Reflow Paragraph and Reflow Message,
+	which were disabled for format=flowed, with Reflow Selected Text,
+	which is enabled for format=flowed: reflow and requote lines
+	containing selected text.
+	* src/quote-color.c: Use libbalsa_match_regex() in is_a_quote().
+	* libbalsa/: misc.c, misc.h: Implement libbalsa_unwrap_selection(),
+	which fixes broken wrapping and quoting, and libbalsa_match_regex(),
+	a slight generalization of is_a_quote().
+
+2003-06-24 18:19  PeterB
+
+	* src/main-window.c: Warn msgfmt about a translated string with a
+	natural `%' sign (#115888).
+
 2003-06-24 02:06  PeterB
 
 	* src/balsa-message.c: Don't leak memory when using popup menu.

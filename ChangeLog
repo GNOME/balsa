@@ -1,3 +1,7 @@
+2001-03-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/main-window.c: update open_mailbox_list on timeout mbox close
+	
 2001-03-05  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/mailbox_local.c: 

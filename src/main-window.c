@@ -1139,7 +1139,8 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
 	index = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i);
 	gtk_notebook_remove_page(GTK_NOTEBOOK(window->notebook), i);
 
-	gtk_widget_destroy(index);
+	gtk_object_destroy(GTK_OBJECT(index));
+	unregister_open_mailbox(mbnode->mailbox);
 
 	/* If this is the last notebook page clear the message preview
 	   and the status bar */
@@ -1159,7 +1160,6 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
 	    enable_message_menus(NULL);
 	    enable_edit_menus(NULL);
 	}
-	unregister_open_mailbox(mbnode->mailbox);
     }
 
     /* we use (BalsaIndex*) instead of BALSA_INDEX because we don't want
@@ -1199,6 +1199,7 @@ balsa_close_mailbox_on_timer(GtkWidget * widget, gpointer * data)
 	    if (balsa_app.debug)
 		fprintf(stderr, "Closing Page %d, time: %d\n", i, time);
 	    gtk_notebook_remove_page(GTK_NOTEBOOK(balsa_app.notebook), i);
+	    unregister_open_mailbox(BALSA_INDEX(index)->mailbox_node->mailbox);
 	    gtk_object_destroy(GTK_OBJECT(index));
 	    if (i < c)
 		c--;

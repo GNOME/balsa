@@ -1,3 +1,8 @@
+2004-07-09  Carlos Morgado  <chbm gnome.org>
+
+	* src/mailbox-node.c: 
+	back off the rest of Peter's patch (pawel 20040705) 
+
 2004-07-08  Pawel Salek
 
 	* libbalsa/mailbox_pop3.c: patch from 143263.

@@ -1426,8 +1426,12 @@ static gboolean
 mailbox_messages_changed_status_idle(struct msg_changed_data* arg)
 {
     gdk_threads_enter();
-    mailbox_messages_changed_status(arg->mb, arg->messages, arg->flag,
-				    arg->bindex);
+    if (arg->bindex) {
+        g_object_remove_weak_pointer(G_OBJECT(arg->bindex),
+                                     (gpointer) &arg->bindex);
+        mailbox_messages_changed_status(arg->mb, arg->messages, arg->flag,
+				        arg->bindex);
+    }
     gdk_threads_leave();
     g_list_foreach(arg->messages, (GFunc)g_object_unref, NULL);
     g_list_free(arg->messages);
@@ -1444,6 +1448,7 @@ mailbox_messages_changed_status_cb(LibBalsaMailbox * mb,
     struct msg_changed_data *arg = g_new(struct msg_changed_data,1);
     arg->mb = mb;       arg->messages = g_list_copy(messages);
     arg->flag = flag;   arg->bindex = bindex;
+    g_object_add_weak_pointer(G_OBJECT(bindex), (gpointer) &arg->bindex);
     g_list_foreach(arg->messages, (GFunc)g_object_ref, NULL);
     g_idle_add((GSourceFunc)mailbox_messages_changed_status_idle, arg);
 }

@@ -1638,7 +1638,9 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
     guint i;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
-    g_return_val_if_fail(!mailbox->readonly, FALSE);
+    g_return_val_if_fail(!mailbox->readonly
+                         || !((set | clear) & LIBBALSA_MESSAGE_FLAGS_REAL),
+                         FALSE);
 
     libbalsa_lock_mailbox(mailbox);
     retval = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->

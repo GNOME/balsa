@@ -89,7 +89,7 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 
 	mt = mailbox_valid( dup );
 	box = BALSA_MAILBOX( mailbox_new( mt ) );
-	box->name = g_strdup( prettyname );
+	box->name = g_strdup( gettext( prettyname ) );
 	(MAILBOX_LOCAL( box ))->path = dup;
 	config_mailbox_add( box, (char *) prettyname );
 	add_mailboxes_for_checking( box );
@@ -240,15 +240,15 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 		BalsaDruidPageDirectory *self = BALSA_DRUID_PAGE_DIRECTORY( _self );	
 
 		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->inbox ) ),
-			_("Inbox"), &error );
+			"Inbox", &error );
 		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->outbox ) ),
-			_("Outbox"), &error );
+			"Outbox", &error );
 		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->sentbox ) ),
-			_("Sentbox"), &error );
+			"Sentbox", &error );
 		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->draftbox ) ),
-			_("Draftbox"), &error );
+			"Draftbox", &error );
 		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->trash ) ),
-			_("Trash"), &error );
+			"Trash", &error );
 
 		self->_priv->paths_locked = TRUE;
 

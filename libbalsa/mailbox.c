@@ -1039,6 +1039,8 @@ static const GType mbox_model_col_type[] = {
     G_TYPE_STRING,   /* Subject  */
     G_TYPE_STRING,   /* Date     */
     G_TYPE_STRING,   /* size     */
+    G_TYPE_UINT,     /* FIXME PANGO_TYPE_WEIGHT can't be used
+		      * in static initialzation */
     G_TYPE_POINTER   /* message itself */
 };
 
@@ -1212,7 +1214,9 @@ mbox_model_get_value(GtkTreeModel *tree_model,
     /* assumed that only one view is showing the mailbox */
     GtkTreeView *tree = g_object_get_data(G_OBJECT(tree_model), "tree-view");
     GtkTreePath *path = gtk_tree_model_get_path(tree_model, iter);
-    GtkTreeViewColumn *col = gtk_tree_view_get_column(tree, column);
+    GtkTreeViewColumn *col =
+	gtk_tree_view_get_column(tree, (column == LB_MBOX_WEIGHT_COL
+					? LB_MBOX_FROM_COL : column));
     gtk_tree_view_get_visible_rect(tree, &a);
     gtk_tree_view_get_cell_area(tree, path, col, &b);
     gtk_tree_view_widget_to_tree_coords(tree, b.x, b.y, &c.x, &c.y);
@@ -1261,6 +1265,11 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 	break;
     case LB_MBOX_MESSAGE_COL:
 	g_value_set_pointer(value, msg); break;
+    case LB_MBOX_WEIGHT_COL:
+	g_value_set_uint(value,
+			 (msg && LIBBALSA_MESSAGE_IS_UNREAD(msg)) ?
+			 PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
+	break;
     }
 }
 

@@ -1,5 +1,7 @@
-2003-02-01 12:06  PeterB
+2003-02-01 14:22  PeterB
 
+	* libbalsa/mailbox.h: Add LB_MAILBOX_SORT_SENDER to the
+	LibBalsaMailboxSortFields enum.
 	* src/balsa-index.c: Add sorting by sender and subject; use gtk+
 	methods to do the work. Simplify bndx_moveto (Manu). Fix a
         memory leak in bndx_copy_tree.

@@ -122,7 +122,7 @@ libbalsa_address_new_from_string(const gchar * str)
     InternetAddressList *list;
     gchar *tmp = g_strdup(str);
     
-    libbalsa_utf8_sanitize(&tmp, FALSE, WEST_EUROPE, NULL);
+    libbalsa_utf8_sanitize(&tmp, FALSE, NULL);
     list = internet_address_parse_string(tmp);
     g_free(tmp);
     if (!list)
@@ -145,7 +145,7 @@ libbalsa_address_new_list_from_string(const gchar * str)
 
     gchar *tmp = g_strdup(str);
     
-    libbalsa_utf8_sanitize(&tmp, FALSE, WEST_EUROPE, NULL);
+    libbalsa_utf8_sanitize(&tmp, FALSE, NULL);
     l = list = internet_address_parse_string(tmp);
     g_free(tmp);
     if (!list)

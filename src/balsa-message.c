@@ -579,7 +579,7 @@ save_part(BalsaPartInfo * info)
 
     if (filename) {
         libbalsa_utf8_sanitize(&filename, balsa_app.convert_unknown_8bit, 
-                               balsa_app.convert_unknown_8bit_codeset, NULL);
+                               NULL);
         gtk_file_selection_set_filename(GTK_FILE_SELECTION(save_dialog),
                                         filename);
         g_free(filename);
@@ -875,7 +875,7 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
         gint signres = libbalsa_is_pgp_signed(body);
 
         libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
-                               balsa_app.convert_unknown_8bit_codeset, NULL);
+                               NULL);
 
         if (signres > 0) {
             LibBalsaSignatureInfo *checkResult;
@@ -1024,7 +1024,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
             gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
         
             libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
-                                   balsa_app.convert_unknown_8bit_codeset, NULL);
+                                   NULL);
             
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("The message sent by %s with subject \"%s\" contains a \"multipart/encrypted\" part, but it's structure is invalid."),
@@ -1203,7 +1203,8 @@ add_header_gchar(BalsaMessage * bm, GtkTextView *view, const gchar * header,
         wrapped_value = g_strdup(value);
         libbalsa_wrap_string(wrapped_value,
                              balsa_app.wraplength - BALSA_INDENT_CHARS);
-        libbalsa_utf8_sanitize(&wrapped_value, balsa_app.convert_unknown_8bit, balsa_app.convert_unknown_8bit_codeset, NULL);
+        libbalsa_utf8_sanitize(&wrapped_value, balsa_app.convert_unknown_8bit,
+                               NULL);
         gtk_text_buffer_insert_with_tags(buffer, &insert,
                                          wrapped_value, -1,
                                          indent_tag, font_tag, NULL);
@@ -2113,12 +2114,12 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 #endif
 
         if (!libbalsa_utf8_sanitize(&ptr, balsa_app.convert_unknown_8bit,
-                                    balsa_app.convert_unknown_8bit_codeset, &target_cs)) {
+                                    &target_cs)) {
             gchar *from = bm_sender_to_gchar(bm->message->headers->from, 0);
             gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
         
             libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
-                                   balsa_app.convert_unknown_8bit_codeset, NULL);
+                                   NULL);
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("The message sent by %s with subject \"%s\" contains 8-bit characters, but no header describing the used codeset (converted to %s)"),
                                  from, subject,
@@ -2146,7 +2147,6 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
                 sig_res = 
                     libbalsa_rfc2440_decrypt_buffer(&ptr, charset, 
                                                     balsa_app.convert_unknown_8bit,
-                                                    balsa_app.convert_unknown_8bit_codeset,
                                                     TRUE, &info->body->sig_info,
                                                     balsa_app.date_string, NULL);
 
@@ -2172,7 +2172,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
                 gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
         
                 libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
-                                       balsa_app.convert_unknown_8bit_codeset, NULL);
+                                       NULL);
                 
 #ifdef HAVE_GPG
                 if (sig_res == GPGME_SIG_STAT_NOKEY) {
@@ -2534,7 +2534,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
         else if (body->filename) {
             gchar * filename = g_strdup(body->filename);
             libbalsa_utf8_sanitize(&filename, balsa_app.convert_unknown_8bit, 
-                                   balsa_app.convert_unknown_8bit_codeset, NULL);
+                                   NULL);
             icon_title =
                 g_strdup_printf("%s (%s)", filename, content_type);
             g_free(filename);

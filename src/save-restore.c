@@ -718,7 +718,7 @@ config_global_load(void)
 	gnome_config_get_bool("ConvertUnknown8Bit=false");
     balsa_app.convert_unknown_8bit_codeset =
 	gnome_config_get_int("ConvertUnknown8BitCodeset=" DEFAULT_BROKEN_CODESET);
-
+    libbalsa_set_fallback_codeset(balsa_app.convert_unknown_8bit_codeset);
     gnome_config_pop_prefix();
 
     /* Interface Options ... */

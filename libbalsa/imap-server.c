@@ -50,7 +50,7 @@ static gboolean connection_cleanup(gpointer ptr);
 #define CONNECTION_CLEANUP_NOOP_TIME	(20*60)
 
 G_LOCK_DEFINE_STATIC(imap_servers);
-GHashTable *imap_servers;
+static GHashTable *imap_servers = NULL;
 
 struct handle_info {
     ImapMboxHandle *handle;
@@ -175,6 +175,10 @@ libbalsa_imap_server_finalize(GObject * object)
     server = LIBBALSA_SERVER(object);
     imap_server = LIBBALSA_IMAP_SERVER(object);
 
+    G_LOCK(imap_servers);
+    g_hash_table_remove(imap_servers, imap_server->key);
+    G_UNLOCK(imap_servers);
+    
     g_source_remove(imap_server->connection_cleanup_id);
 
 #if 0
@@ -699,7 +703,8 @@ static void close_all_connections_cb(gpointer key, gpointer value,
 void libbalsa_imap_server_close_all_connections(void)
 {
     G_LOCK(imap_servers);
-    g_hash_table_foreach(imap_servers, close_all_connections_cb, NULL);
+    if(imap_servers) 
+        g_hash_table_foreach(imap_servers, close_all_connections_cb, NULL);
     G_UNLOCK(imap_servers);
 }
 

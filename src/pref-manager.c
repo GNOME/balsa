@@ -933,6 +933,7 @@ apply_prefs(GtkDialog * pbox)
 	gtk_menu_get_active(GTK_MENU(gtk_option_menu_get_menu(GTK_OPTION_MENU(pui->convert_unknown_8bit_codeset))));
     balsa_app.convert_unknown_8bit_codeset = 
 	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item), "balsa-data"));
+    libbalsa_set_fallback_codeset(balsa_app.convert_unknown_8bit_codeset);
 
     /*
      * close window and free memory

@@ -1115,6 +1115,17 @@ libbalsa_mktempdir (char **s)
     return TRUE;
 }
 
+/* libbalsa_set_fallback_codeset: sets the codeset for incorrectly
+ * encoded characters. */
+static LibBalsaCodeset sanitize_fallback_codeset = WEST_EUROPE;
+LibBalsaCodeset
+libbalsa_set_fallback_codeset(LibBalsaCodeset codeset)
+{     
+    LibBalsaCodeset ret = sanitize_fallback_codeset;
+    sanitize_fallback_codeset = codeset;
+    return ret;
+}
+    
 /* libbalsa_utf8_sanitize
  *
  * Validate utf-8 text, and if validation fails, replace each offending
@@ -1133,7 +1144,7 @@ libbalsa_mktempdir (char **s)
  * NOTE:    The text is either modified in place or replaced and freed.
  */
 gboolean
-libbalsa_utf8_sanitize(gchar **text, gboolean fallback, LibBalsaCodeset codeset,
+libbalsa_utf8_sanitize(gchar **text, gboolean fallback,
 		       gchar const **target)
 {
     if (target)
@@ -1151,7 +1162,8 @@ libbalsa_utf8_sanitize(gchar **text, gboolean fallback, LibBalsaCodeset codeset,
 	/* */
 	gint b_written;
 	GError *conv_error = NULL;
-	const gchar *use_enc = libbalsa_get_codeset_name(*text, codeset);
+	const gchar *use_enc =
+            libbalsa_get_codeset_name(*text, sanitize_fallback_codeset);
 	gchar *p = g_convert(*text, strlen(*text), "utf-8", use_enc, NULL,
 			     &b_written, &conv_error);
 

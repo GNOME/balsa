@@ -126,7 +126,7 @@ lsv_show_message(const char *message, LibBalsaSourceViewerInfo * lsvi,
 	tmp = g_strescape(message, "\n\"");
     else {
 	tmp = g_strdup(message);
-	libbalsa_utf8_sanitize(&tmp, FALSE, (LibBalsaCodeset) 0, NULL);
+	libbalsa_utf8_sanitize(&tmp, FALSE, NULL);
     }
     if (tmp) {
 	gtk_text_buffer_insert_at_cursor(buffer, tmp, -1);

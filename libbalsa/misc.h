@@ -98,8 +98,9 @@ gchar *libbalsa_truncate_string(const gchar * str, gint length, gint dots);
 gchar *libbalsa_expand_path(const gchar *path);
 void libbalsa_contract_path(gchar *path);
 gboolean libbalsa_mktempdir(gchar ** name);
+LibBalsaCodeset libbalsa_set_fallback_codeset(LibBalsaCodeset codeset);
 gboolean libbalsa_utf8_sanitize(gchar ** text, gboolean fallback,
-                                LibBalsaCodeset codeset, gchar const **target);
+                                gchar const **target);
 void libbalsa_insert_with_url(GtkTextBuffer * buffer,
                               const char *chars,
                               GtkTextTag * tag,

@@ -444,6 +444,7 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
 	mailbox->msg_tree = NULL;
     }
 
+    mailbox->stamp++;
     UNLOCK_MAILBOX(mailbox);
 }
 
@@ -1645,8 +1646,7 @@ get_from_field(LibBalsaMessage *message)
     
     from = append_dots ? g_strconcat(name_str, ",...", NULL)
                        : g_strdup(name_str);
-    /* FIXME: use balsa_app.convert_8bit_codeset */
-    libbalsa_utf8_sanitize(&from, TRUE, WEST_EUROPE, NULL);
+    libbalsa_utf8_sanitize(&from, TRUE, NULL);
     return from;
 }
 
@@ -1826,6 +1826,11 @@ mbox_model_iter_nth_child(GtkTreeModel	* tree_model,
 
     node = parent ? parent->user_data
 		  : LIBBALSA_MAILBOX(tree_model)->msg_tree;
+    if(!node) /* the tree has been destroyed already (mailbox has been
+               * closed), there is nothing to iterate over. This happens
+               * only if mailbox is closed but a view is still active. 
+               */
+        return FALSE;
     node = g_node_nth_child(node, n);
 
     if (node) {

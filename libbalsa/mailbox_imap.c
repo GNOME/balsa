@@ -1318,6 +1318,7 @@ lb_set_headers(LibBalsaMessageHeaders *headers, ImapEnvelope *  envelope,
     if(is_embedded) {
         headers->subject = 
             g_mime_utils_header_decode_text(envelope->subject);
+        libbalsa_utf8_sanitize(&headers->subject, TRUE, NULL);
     }
 }
 
@@ -1391,6 +1392,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     envelope        = imsg->envelope;
     message->length = imsg->rfc822size;
     message->subj   = g_mime_utils_header_decode_text(envelope->subject);
+    libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
     message->sender =
 	libbalsa_address_new_from_imap_address(envelope->sender);
     libbalsa_message_set_in_reply_to_from_string(message,
@@ -1555,7 +1557,8 @@ get_section_for(LibBalsaMessage *msg, LibBalsaMessageBody *part)
 	parent = parent->parts;
 
     if(!is_child_of(parent, part, section, TRUE)) {
-        g_warning("Internal error, part not found.\n");
+        g_warning("Internal error, part %p not found in msg %p.\n",
+                  part, msg);
         g_string_free(section, TRUE);
         return g_strdup("1");
     }

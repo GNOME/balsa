@@ -949,8 +949,7 @@ libbalsa_rfc2440_encrypt_buffer(const gchar *buffer, const gchar *sign_for,
  */
 GpgmeSigStat
 libbalsa_rfc2440_decrypt_buffer(gchar **buffer, const gchar *charset,
-				gboolean fallback, LibBalsaCodeset codeset,
-				gboolean append_info, 
+				gboolean fallback, gboolean append_info, 
 				LibBalsaSignatureInfo **sig_info,
 				const gchar *date_string, GtkWindow *parent)
 {
@@ -1043,7 +1042,7 @@ libbalsa_rfc2440_decrypt_buffer(gchar **buffer, const gchar *charset,
 	    gchar const *target = NULL;
 	    result = g_strndup(plain_buffer, datasize);
 
-	    if (!libbalsa_utf8_sanitize(&result, fallback, codeset, &target))
+	    if (!libbalsa_utf8_sanitize(&result, fallback, &target))
 		libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
 				     _("The OpenPGP encrypted message part contains 8-bit characters, but no header describing the used codeset (converted to %s)"),
 				     target ? target : "\"?\"");

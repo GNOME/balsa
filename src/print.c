@@ -351,7 +351,7 @@ prepare_header_real(PrintInfo * pi, LibBalsaMessageBody * sig_body,
 
     subject = g_strdup(the_subject);
     libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit,
-			   balsa_app.convert_unknown_8bit_codeset, NULL);
+			   NULL);
     if (subject) {
 	print_header_string (&pdata->headers, "subject", _("Subject:"),
 			     subject);
@@ -463,7 +463,7 @@ prepare_message_header(PrintInfo * pi, LibBalsaMessageBody * body)
 
     /* create the footer */
     libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit,
-			   balsa_app.convert_unknown_8bit_codeset, NULL);
+			   NULL);
     if (subject)
 	footer_string = g_string_new(subject);
     g_free(subject);
@@ -892,7 +892,7 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
 
     /* be sure the we have correct utf-8 stuff here... */
     libbalsa_utf8_sanitize(&textbuf, balsa_app.convert_unknown_8bit,
-			   balsa_app.convert_unknown_8bit_codeset, NULL);
+			   NULL);
     
     /* wrap lines (if necessary) */
     pdata->textlines = 

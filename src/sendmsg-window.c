@@ -2091,7 +2091,6 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
         personStr = g_strdup(orig_address);
         libbalsa_utf8_sanitize(&personStr,
                                balsa_app.convert_unknown_8bit,
-                               balsa_app.convert_unknown_8bit_codeset,
                                NULL);
     } else
         personStr = g_strdup(_("you"));
@@ -2113,7 +2112,7 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
 
 	subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
 	libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit,
-			       balsa_app.convert_unknown_8bit_codeset, NULL);
+			       NULL);
 	if (subject)
 	    g_string_append_printf(body, "%s %s\n", _("Subject:"), subject);
 	g_free(subject);
@@ -2169,7 +2168,7 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
 
 	    g_string_free(body, FALSE);
 	    libbalsa_utf8_sanitize(&buf, balsa_app.convert_unknown_8bit,
-				   balsa_app.convert_unknown_8bit_codeset, NULL);
+				   NULL);
 	    body = g_string_new(buf);
 	    g_free(buf);
 	    g_string_prepend(body, str);
@@ -2289,7 +2288,7 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
     if(!message) return;
     subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
     libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit,
-			   balsa_app.convert_unknown_8bit_codeset, NULL);
+			   NULL);
 
     switch (type) {
     case SEND_REPLY:
@@ -2797,7 +2796,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
         if (addr) {
             tmp = libbalsa_address_to_gchar(addr, 0);
             libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
-                                   balsa_app.convert_unknown_8bit_codeset,
                                    NULL);
             gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), tmp);
             g_free(tmp);
@@ -2819,14 +2817,14 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	tmp = libbalsa_make_string_from_list(message->headers->to_list);
 
  	libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
- 			       balsa_app.convert_unknown_8bit_codeset, NULL);
+ 			       NULL);
 	gtk_entry_set_text(GTK_ENTRY(bsmsg->cc[1]), tmp);
 	g_free(tmp);
 
 	if (message->headers->cc_list) {
 	    tmp = libbalsa_make_string_from_list(message->headers->cc_list);
  	    libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
- 				   balsa_app.convert_unknown_8bit_codeset, NULL);
+ 				   NULL);
 	    append_comma_separated(GTK_EDITABLE(bsmsg->cc[1]), tmp);
 	    g_free(tmp);
 	}
@@ -4174,7 +4172,7 @@ set_list_post_address(BalsaSendmsg * bsmsg)
             libbalsa_address_to_gchar(message->mailbox->view->
                                       mailing_list_address, 0);
  	libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
- 			       balsa_app.convert_unknown_8bit_codeset, NULL);
+ 			       NULL);
         gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), tmp);
         g_free(tmp);
     } else {

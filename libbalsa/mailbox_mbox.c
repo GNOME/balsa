@@ -514,7 +514,7 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
 	    break;
     }
     if (i == messages) {
-	g_message("No modified messages.\n");
+	/* g_message("No modified messages.\n"); */
 	return TRUE;
     }
 

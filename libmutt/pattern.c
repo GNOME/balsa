@@ -68,7 +68,7 @@ Flags[] =
   { 'p', M_PERSONAL_RECIP,	0,		NULL },
   { 'P', M_PERSONAL_FROM,	0,		NULL },
   { 'Q', M_REPLIED,		0,		NULL },
-  { 'R', M_READ,		0,		NULL },
+  { 'R', MFLAG_READ,		0,		NULL },
   { 'r', M_DATE_RECEIVED,	0,		eat_date },
   { 's', M_SUBJECT,		0,		eat_regexp },
   { 'S', M_SUPERSEDED,		0,		NULL },
@@ -756,7 +756,7 @@ mutt_pattern_exec (struct pattern_t *pat, pattern_exec_flag flags, CONTEXT *ctx,
       return (pat->not ^ h->replied);
     case M_OLD:
       return (pat->not ? (!h->old || h->read) : (h->old && !h->read));
-    case M_READ:
+    case MFLAG_READ:
       return (pat->not ^ h->read);
     case M_DELETED:
       return (pat->not ^ h->deleted);

@@ -52,9 +52,9 @@ int mutt_change_flag (HEADER *h, int bf)
     case 'o':
     case 'O':
       if (h)
-	mutt_set_flag (Context, h, M_READ, !bf);
+	mutt_set_flag (Context, h, MFLAG_READ, !bf);
       else
-	mutt_tag_set_flag (M_READ, !bf);
+	mutt_tag_set_flag (MFLAG_READ, !bf);
       flag = M_OLD;
       break;
 

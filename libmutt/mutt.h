@@ -146,7 +146,7 @@ enum
   M_NEW,
   M_OLD,
   M_REPLIED,
-  M_READ,
+  MFLAG_READ,
   M_UNREAD,
   M_DELETE,
   M_UNDELETE,

@@ -103,7 +103,7 @@ void mutt_set_flag (CONTEXT *ctx, HEADER *h, int flag, int bf)
       }
       break;
 
-    case M_READ:
+    case MFLAG_READ:
       if (bf)
       {
 	if (!h->read)

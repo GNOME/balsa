@@ -126,7 +126,7 @@ int mutt_display_message (HEADER *cur, const char *attach_msg_status)
       {
 	mutt_view_attachment (msg->fp, cur->content, M_REGULAR);
 	mx_close_message (&msg);
-	mutt_set_flag (Context, cur, M_READ, 1);
+	mutt_set_flag (Context, cur, MFLAG_READ, 1);
       }
       return 0;
     }
@@ -191,7 +191,7 @@ int mutt_display_message (HEADER *cur, const char *attach_msg_status)
     mutt_system (buf);
     unlink (tempfile);
     keypad (stdscr, MUTT_TRUE);
-    mutt_set_flag (Context, cur, M_READ, 1);
+    mutt_set_flag (Context, cur, MFLAG_READ, 1);
     if (option (OPTPROMPTAFTER))
     {
       mutt_ungetch (mutt_any_key_to_continue ("Command: "));

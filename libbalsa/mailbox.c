@@ -1165,7 +1165,7 @@ message_read (Message * message)
   LOCK_MAILBOX (message->mailbox);
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
-  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_READ, TRUE);
+  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, MFLAG_READ, TRUE);
   mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_OLD, FALSE);
 
   message->flags &= ~MESSAGE_FLAG_NEW;
@@ -1182,7 +1182,7 @@ message_unread (Message * message)
   LOCK_MAILBOX (message->mailbox);
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
-  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_READ, TRUE);
+  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, MFLAG_READ, TRUE);
 
   message->flags |= MESSAGE_FLAG_NEW;
   send_watcher_mark_unread_message (message->mailbox, message);

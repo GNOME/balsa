@@ -1313,7 +1313,7 @@ mutt_pager (const char *banner, const char *fname, int do_color, pager_t *extra,
   if (IsHeader (extra) && !extra->hdr->read)
   {
     Context->msgnotreadyet = extra->hdr->msgno;
-    mutt_set_flag (Context, extra->hdr, M_READ, 1);
+    mutt_set_flag (Context, extra->hdr, MFLAG_READ, 1);
   }
 
   lineInfo = safe_malloc (sizeof (struct line_t) * (maxLine = LINES));

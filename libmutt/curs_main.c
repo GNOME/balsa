@@ -1185,7 +1185,7 @@ int mutt_index_menu (int attach_msg /* invoked while attaching a message */)
 		  Context->hdrs[Context->v2r[j]]->old)
 		mutt_set_flag (Context, Context->hdrs[Context->v2r[j]], M_NEW, 1);
 	      else
-		mutt_set_flag (Context, Context->hdrs[Context->v2r[j]], M_READ, 1);
+		mutt_set_flag (Context, Context->hdrs[Context->v2r[j]], MFLAG_READ, 1);
 	    }
 	  }
 	  menu->redraw = REDRAW_STATUS | REDRAW_INDEX;
@@ -1195,7 +1195,7 @@ int mutt_index_menu (int attach_msg /* invoked while attaching a message */)
 	  if (CURHDR->read || CURHDR->old)
 	    mutt_set_flag (Context, CURHDR, M_NEW, 1);
 	  else
-	    mutt_set_flag (Context, CURHDR, M_READ, 1);
+	    mutt_set_flag (Context, CURHDR, MFLAG_READ, 1);
 
 	  if (option (OPTRESOLVE))
 	  {
@@ -1526,7 +1526,7 @@ int mutt_index_menu (int attach_msg /* invoked while attaching a message */)
 	CHECK_MSGCOUNT;
 	CHECK_READONLY;
 
-	rc = mutt_thread_set_flag (CURHDR, M_READ, 1,
+	rc = mutt_thread_set_flag (CURHDR, MFLAG_READ, 1,
 				   op == OP_MAIN_READ_THREAD ? 0 : 1);
 
 	if (rc != -1)

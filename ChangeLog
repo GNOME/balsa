@@ -1,3 +1,14 @@
+1998-12-18  Jeff Garzik  <jgarzik@pobox.com>
+
+	* libbalsa/mailbox.c, libmutt/commands.c, libmutt/curs_main.c,
+	  libmutt/flaglib.c, libmutt/flags.c, libmutt/mutt.h,
+	  libmutt/mx.c, libmutt/pager.c, libmutt/pattern.c:
+	s/M_READ/MFLAG_READ/ - Solaris system defines M_READ
+
+	* libbalsa/misc.c: call g_malloc instead of malloc, because we
+	call g_free in the allocated memory later on.
+	From wmorgan@syntony.org.
+ 
 1998-12-17  Jeff Garzik  <jgarzik@pobox.com>
 
 	* libmutt/sendlib.c:

@@ -1733,7 +1733,8 @@ balsa_close_commit_mailbox_on_timer(GtkWidget * widget, gpointer * data)
         if (balsa_app.commit_mailbox_auto &&
             time < 31+balsa_app.commit_mailbox_timeout &&
             /* only do this once */
-            time > balsa_app.commit_mailbox_timeout ) {
+            time > balsa_app.commit_mailbox_timeout &&
+	    !BALSA_INDEX(index)->mailbox_node->mailbox->readonly) {
             if (balsa_app.debug)
                 fprintf(stderr, "Commiting %s, time: %d\n",
                         BALSA_INDEX(index)->mailbox_node->mailbox->url ,

@@ -8,7 +8,10 @@
 	balsa_window_set_threading_menu.
 	* src/balsa-index.c: Rethread after removing messages; implement
 	and use a new helper, bndx_select_message;
-	balsa_window_set_threading_menu is now handled in main window.
+	balsa_window_set_threading_menu is now handled in main window;
+        don't clear the index when changing threading style.
+	* src/balsa-index-threading.c: Threading code must not assume
+	the index is initally flat.
 
 2003-01-11  Pawel Salek  <pawsa@theochem.kth.se>
 

@@ -1,3 +1,8 @@
+2002-05-19  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_imap.c: get rid of gdbm message cache - too
+	resource-hungry. One could disable mutt's cache now.
+
 2002-05-19  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/identity.c: grab focus, finalize the conversion to GObject.

@@ -40,7 +40,10 @@ typedef struct _BalsaIndexClass BalsaIndexClass;
 struct _BalsaIndex
 {
   GtkBin bin;
+
   Mailbox *mailbox;
+  guint watcher_id;
+  GList *selection;
 };
 
 struct _BalsaIndexClass
@@ -62,7 +65,7 @@ void balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox);
 
 /* adds a new message */
 void balsa_index_add (BalsaIndex * bindex, Message * message);
-void balsa_index_set_flag (BalsaIndex * bindex, Message * message, gchar * flag);
+void balsa_index_update_flag (BalsaIndex * bindex, Message * message);
 
 
 /* select up/down the index */

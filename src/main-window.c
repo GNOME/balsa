@@ -565,6 +565,7 @@ create_toolbar ()
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RCV),
 			     (GtkSignalFunc) check_new_messages_cb,
 			     "Check Email");
+  gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), mw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
@@ -704,8 +705,14 @@ move_resize_cb ()
 static void
 check_new_messages_cb (GtkWidget * widget)
 {
+  MainWindow *mainwindow;
 
+  g_return_if_fail (widget != NULL);
 
+  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+
+  if (mainwindow->mailbox)
+    mailbox_check_new_messages (mainwindow->mailbox);
 }
 
 
@@ -763,7 +770,6 @@ next_message_cb (GtkWidget * widget)
   g_return_if_fail (widget != NULL);
 
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-
   balsa_index_select_next (BALSA_INDEX (mainwindow->index));
 }
 
@@ -776,7 +782,6 @@ previous_message_cb (GtkWidget * widget)
   g_return_if_fail (widget != NULL);
 
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-
   balsa_index_select_previous (BALSA_INDEX (mainwindow->index));
 }
 
@@ -784,11 +789,20 @@ previous_message_cb (GtkWidget * widget)
 static void
 delete_message_cb (GtkWidget * widget)
 {
+  GList *list;
   MainWindow *mainwindow;
 
   g_return_if_fail (widget != NULL);
 
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+
+  list = BALSA_INDEX (mainwindow->index)->selection;
+  while (list)
+    {
+      message_delete ((Message *) list->data);
+      list = list->next;
+    }
+
   balsa_index_select_next (BALSA_INDEX (mainwindow->index));
 }
 
@@ -796,11 +810,20 @@ delete_message_cb (GtkWidget * widget)
 static void
 undelete_message_cb (GtkWidget * widget)
 {
+  GList *list;
   MainWindow *mainwindow;
 
   g_return_if_fail (widget != NULL);
 
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+
+  list = BALSA_INDEX (mainwindow->index)->selection;
+  while (list)
+    {
+      message_undelete ((Message *) list->data);
+      list = list->next;
+    }
+
   balsa_index_select_next (BALSA_INDEX (mainwindow->index));
 }
 
@@ -820,20 +843,25 @@ mailbox_select_cb (GtkWidget * widget)
   mailbox = (Mailbox *) gtk_object_get_data (GTK_OBJECT (widget), MAILBOX_DATA);
 
 
-  /* bail now if the we've been called without a valid mailbox */
+  /* 
+   * bail now if the we've been called without a valid mailbox
+   */
   if (!mailbox)
     return;
 
 
-  /* let's not open a currently-open mailbox */
+  /* 
+   * let's not open a currently-open mailbox
+   */
   if (mailbox == mainwindow->mailbox)
     return;
 
-  balsa_index_set_mailbox (BALSA_INDEX (mainwindow->index), mailbox);
   watcher_id = mailbox_watcher_set (mailbox,
 				    (MailboxWatcherFunc) mailbox_listener,
 				    MESSAGE_NEW_MASK,
 				    (gpointer) mainwindow);
+
+  balsa_index_set_mailbox (BALSA_INDEX (mainwindow->index), mailbox);
 
   /* try to open the new mailbox */
   if (mailbox_open_ref (mailbox))
@@ -881,10 +909,6 @@ mailbox_listener (MailboxWatcherMessage * mw_message)
 
   switch (mw_message->type)
     {
-    case MESSAGE_NEW:
-      balsa_index_add (BALSA_INDEX (mainwindow->index), mw_message->message);
-      break;
-
     default:
       break;
     }

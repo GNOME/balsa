@@ -112,16 +112,10 @@ MailboxPrivate;
 static Mailbox *client_mailbox = NULL;
 
 
-/*
- * the number of new messages as returned by the c-client
- */
-static glong new_messages = 0;
-
-
 /* 
  * prototypes
  */
-static void load_messages (Mailbox * mailbox);
+static void load_messages (Mailbox * mailbox, gint emit);
 static void free_messages (Mailbox * mailbox);
 
 static void send_watcher_mark_read_message (Mailbox * mailbox, Message * message);
@@ -134,9 +128,6 @@ static Message *translate_message (ENVELOPE * cenv);
 static Address *translate_address (ADDRESS * caddr);
 
 
-
-
-
 /*
  * necessary for initalizing the fucking c-client library
  */
@@ -145,7 +136,6 @@ mailbox_init ()
 {
 #include "linkage.c"
 }
-
 
 
 /*
@@ -201,6 +191,7 @@ mailbox_new (MailboxType type)
   WATCHER_LIST (mailbox) = NULL;
   mailbox->open_ref = 0;
   mailbox->messages = 0;
+  mailbox->new_messages = 0;
   mailbox->message_list = NULL;
 
   return mailbox;
@@ -310,7 +301,7 @@ mailbox_open_ref (Mailbox * mailbox)
 
   if (CLIENT_STREAM_OPEN (mailbox))
     {
-      load_messages (mailbox);
+      load_messages (mailbox, 0);
 
       /* incriment the reference count */
       mailbox->open_ref++;
@@ -365,8 +356,11 @@ mailbox_check_new_messages (Mailbox * mailbox)
 
   UNLOCK_MAILBOX ();
 
-  if (new_messages)
-    return TRUE;
+  if (mailbox->new_messages > 0)
+    {
+      load_messages (mailbox, 1);
+      return TRUE;
+    }
   else
     return FALSE;
 }
@@ -476,19 +470,23 @@ mailbox_watcher_remove_by_data (Mailbox * mailbox, gpointer data)
  * private
  */
 static void
-load_messages (Mailbox * mailbox)
+load_messages (Mailbox * mailbox, gint emit)
 {
   glong msgno;
   Message *message;
   ENVELOPE *envelope;
   MESSAGECACHE *elt;
-  gint remaining = new_messages;
 
-
-  for (msgno = mailbox->messages - new_messages + 1; msgno <= CLIENT_STREAM (mailbox)->nmsgs; msgno++)
+  for (msgno = mailbox->messages - mailbox->new_messages + 1; 
+       msgno <= mailbox->messages; 
+       msgno++)
     {
       envelope = mail_fetchenvelope (CLIENT_STREAM (mailbox), msgno);
       elt = mail_elt (CLIENT_STREAM (mailbox), msgno);
+
+      message = translate_message (envelope);
+      message->mailbox = mailbox;
+      message->msgno = msgno;
 
       if (!elt->seen)
 	message->flags |= MESSAGE_FLAG_NEW;
@@ -502,12 +500,11 @@ load_messages (Mailbox * mailbox)
       if (elt->answered)
 	message->flags |= MESSAGE_FLAG_ANSWERED;
 
-      message = translate_message (envelope);
-      message->mailbox = mailbox;
-      message->msgno = msgno;
-
       mailbox->message_list = g_list_append (mailbox->message_list, message);
-      send_watcher_new_message (mailbox, message, remaining--);
+      mailbox->new_messages--;
+      
+      if (emit)
+	send_watcher_new_message (mailbox, message, mailbox->new_messages);
 
       /* 
        * give time to gtk so the GUI isn't blocked
@@ -517,6 +514,7 @@ load_messages (Mailbox * mailbox)
 	gtk_main_iteration ();
     }
 }
+
 
 static void
 free_messages (Mailbox * mailbox)
@@ -927,11 +925,23 @@ message_body_ref (Message * message)
       return;
     }
 
+  /*
+   * load message body -- lameness
+   */
   body = body_new ();
-  body->buffer = g_strdup(mail_fetchtext (CLIENT_STREAM (message->mailbox), message->msgno));
-  
+  body->buffer = g_strdup(mail_fetchtext (CLIENT_STREAM (message->mailbox), 
+					  message->msgno));
   message->body_list = g_list_append (message->body_list, body);
   message->body_ref++;
+
+  /*
+   * emit read message
+   */
+  if (message->flags & MESSAGE_FLAG_NEW)
+    {
+      message->flags &= !MESSAGE_FLAG_NEW;
+      send_watcher_mark_read_message (message->mailbox, message);
+    }
 }
 
 
@@ -1076,15 +1086,15 @@ mm_exists (MAILSTREAM * stream, unsigned long number)
    * set the number of messages and the number of new
    * messages
    */
+  client_mailbox->new_messages += number - client_mailbox->messages;
   client_mailbox->messages = stream->nmsgs;
-  new_messages = number;
 
   if (balsa_app.debug)
     {
       g_print ("mm_exists: %s %d messages %d new_messages\n",
 	       client_mailbox->name,
 	       client_mailbox->messages,
-	       new_messages);
+	       client_mailbox->new_messages);
     }
 }
 

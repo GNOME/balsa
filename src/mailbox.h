@@ -107,6 +107,7 @@ struct _Mailbox
   guint open_ref;
 
   glong messages;
+  glong new_messages;
   GList *message_list;
 };
 

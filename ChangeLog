@@ -1,3 +1,8 @@
+2002-12-15  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_check): 
+	handle M_REOPENED
+
 2002-12-15 11:59  PeterB
 
 	* src/sendmsg-window.c: (sendmsg_window_new, create_info_pane)

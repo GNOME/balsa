@@ -757,7 +757,6 @@ libbalsa_messages_delete(GList * messages)
     }
 }
 
-
 #ifdef DEBUG
 static char *
 mime_content_type2str(int contenttype)
@@ -887,9 +886,8 @@ libbalsa_message_body_unref(LibBalsaMessage * message)
 }
 
 gboolean
-libbalsa_message_has_attachment(LibBalsaMessage * message)
+libbalsa_message_is_multipart(LibBalsaMessage * message)
 {
-    gboolean ret;
     HEADER *msg_header;
 
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
@@ -898,13 +896,32 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
 
     msg_header = message->header;	
 
-    if (msg_header->content->type != TYPETEXT) {
-	ret = TRUE;
-    } else {
-	ret = g_strcasecmp("plain", msg_header->content->subtype) != 0;
+    if (msg_header->content->type == TYPEMULTIPART) {
+	return TRUE;
     }
+    
+    return FALSE;
+}
 
-    return ret;
+gboolean
+libbalsa_message_has_attachment(LibBalsaMessage * message)
+{
+    HEADER *msg_header;
+    LibBalsaMessageBody *body;
+
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
+    g_return_val_if_fail(message->mailbox, FALSE);
+    g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, FALSE);
+
+    msg_header = message->header;
+
+    /* FIXME: This is wrong, but less so than earlier versions; a message
+              has attachments if main message or one of the parts has 
+	      Content-type: multipart/mixed AND members with
+	      Content-disposition: attachment. Unfortunately, part list may
+	      not be available at this stage. */
+    return (msg_header->content->type==TYPEMULTIPART &&
+	    g_strcasecmp("mixed", msg_header->content->subtype)==0);
 }
 
 gchar *

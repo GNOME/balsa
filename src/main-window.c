@@ -1042,7 +1042,7 @@ enable_message_menus(LibBalsaMessage * message)
     }
 
     /* Handle items which require multiple parts to the mail */
-    if (message && !libbalsa_message_has_attachment(message)) {
+    if (message && !libbalsa_message_is_multipart(message)) {
         gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_NEXT_PART_POS].widget, FALSE);
         gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_PREVIOUS_PART_POS].widget, FALSE);
     } else {

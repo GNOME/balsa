@@ -212,6 +212,7 @@ gchar *libbalsa_message_size_to_gchar(LibBalsaMessage * message,
 
 const gchar *libbalsa_message_pathname(LibBalsaMessage * message);
 const gchar *libbalsa_message_charset(LibBalsaMessage * message);
+gboolean libbalsa_message_is_multipart(LibBalsaMessage * message);
 gboolean libbalsa_message_has_attachment(LibBalsaMessage * message);
 
 GList *libbalsa_message_user_hdrs(LibBalsaMessage * message);

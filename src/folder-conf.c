@@ -153,6 +153,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     FolderDialogData fcw;
     guint keyval;
     LibBalsaServer * s = mn ? mn->server : NULL;
+    gchar *default_server = libbalsa_guess_imap_server();
 
     fcw.mn = mn;
     fcw.dialog = GNOME_DIALOG(gnome_dialog_new(_("Remote IMAP folder"), 
@@ -179,7 +180,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 
     create_label(_("_Server:"), table, 1, &keyval);
     fcw.server = create_entry(fcw.dialog, table, validate_folder, &fcw, 1, 
-			  s ? s->host : "localhost",
+			  s ? s->host : default_server,
 			  keyval);
 
     create_label(_("_Port:"), table, 2, &keyval);

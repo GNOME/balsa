@@ -447,6 +447,9 @@ create_ldap_page(AddressBookConfig * abc)
     LibBalsaAddressBookLdap* ab;
     GnomeDialog* mcw = GNOME_DIALOG(abc->window);
     guint keyval;
+    gchar *host = libbalsa_guess_ldap_server();
+    gchar *base = libbalsa_guess_ldap_base();
+    gchar *name = libbalsa_guess_ldap_name();
 
     ab = (LibBalsaAddressBookLdap*)abc->address_book; /* may be NULL */
 
@@ -454,24 +457,32 @@ create_ldap_page(AddressBookConfig * abc)
 
     create_label(_("_Address Book Name"), table, 0, &keyval);
     abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
-				   ab ? abc->address_book->name : NULL, 
+				   ab ? abc->address_book->name : name, 
 				   keyval);
 
     create_label(_("_Host Name"), table, 1, &keyval);
     abc->ab_specific.ldap.host_name = 
 	create_entry(mcw, table, NULL, NULL, 1, 
-		     ab ? ab->host : NULL, keyval);
+		     ab ? ab->host : host, keyval);
 
     create_label(_("_Base Domain Name"), table, 2, &keyval);
     abc->ab_specific.ldap.base_dn = 
 	create_entry(mcw, table, NULL, NULL, 2, 
-		     ab ? ab->base_dn : NULL, keyval);
+		     ab ? ab->base_dn : base, keyval);
 
     abc->expand_aliases_button =
 	create_check(mcw, _("_Expand aliases as you type"), table, 3,
 		     ab ? abc->address_book->expand_aliases : TRUE);
 
     gtk_widget_show(table);
+
+    if(base)
+	g_free(base);
+    if(name)
+	g_free(name);
+    if(host)
+	g_free(host);
+
     return table;
 }
 #endif

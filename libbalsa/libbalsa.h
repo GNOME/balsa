@@ -77,6 +77,19 @@ gchar *libbalsa_guess_mail_spool(void);
 gboolean libbalsa_is_sending_mail(void);
 void libbalsa_wait_for_sending_thread(gint max_seconds);
 
+gchar *libbalsa_guess_pop_server(void);
+gchar *libbalsa_guess_imap_server(void);
+gchar *libbalsa_guess_ldap_server(void);
+
+gchar *libbalsa_guess_imap_inbox(void);
+
+gchar *libbalsa_guess_ldap_base(void);
+gchar *libbalsa_guess_ldap_name(void);
+
+gchar *libbalsa_guess_ldif_file(void);
+
+gboolean libbalsa_ldap_exists(const gchar *server);
+
 void libbalsa_lock_mutt(void);
 void libbalsa_unlock_mutt(void);
 

@@ -356,7 +356,11 @@ mblist_open_mailbox(LibBalsaMailbox * mailbox)
 {
     GtkWidget *page = NULL;
     int i, c;
-    GNode *gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
+    GNode *gnode;
+
+    balsa_mailbox_nodes_lock(FALSE);
+    gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
+    balsa_mailbox_nodes_unlock(FALSE);
 
     g_return_if_fail(gnode);
 
@@ -415,8 +419,11 @@ mblist_open_mailbox(LibBalsaMailbox * mailbox)
 void
 mblist_close_mailbox(LibBalsaMailbox * mailbox)
 {
-    GNode *gnode =
-	find_gnode_in_mbox_list(balsa_app.mailbox_nodes,mailbox);
+    GNode *gnode;
+    
+    balsa_mailbox_nodes_lock(FALSE);
+    gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes,mailbox);
+    balsa_mailbox_nodes_unlock(FALSE);
     g_return_if_fail(gnode);
     balsa_window_close_mbnode(balsa_app.main_window, 
 			      BALSA_MAILBOX_NODE(gnode->data));
@@ -685,14 +692,14 @@ balsa_mblist_repopulate(BalsaMBList * bmbl)
     if (balsa_app.mailbox_nodes) {
 	GNode *walk;
 	GtkCTreeNode *node;
-
+        balsa_mailbox_nodes_lock(FALSE);
 	for(walk = g_node_last_child(balsa_app.mailbox_nodes);
 	    walk; walk = walk->prev) {
 	    node =
 		gtk_ctree_insert_gnode(GTK_CTREE(bmbl), NULL, NULL, walk,
 				       mailbox_nodes_to_ctree, NULL);
-
 	}
+        balsa_mailbox_nodes_unlock(FALSE);
     }
     gtk_ctree_sort_recursive(GTK_CTREE(bmbl), NULL);
     balsa_mblist_have_new(bmbl);

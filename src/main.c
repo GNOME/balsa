@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -305,9 +305,10 @@ append_subtree_f(GNode* gn, gpointer data)
 static gboolean
 scan_mailboxes_idle_cb()
 {
-    gdk_threads_enter();
+    balsa_mailbox_nodes_lock(FALSE);
     g_node_traverse(balsa_app.mailbox_nodes, G_POST_ORDER, G_TRAVERSE_ALL, -1,
                     append_subtree_f, NULL);
+    balsa_mailbox_nodes_unlock(FALSE);
     balsa_mblist_repopulate(balsa_app.mblist);
     gdk_threads_leave();
     return FALSE; 
@@ -498,16 +499,18 @@ balsa_cleanup(void)
     gtk_signal_disconnect_by_data(GTK_OBJECT(balsa_app.notebook), NULL);
 
     /* close all mailboxes */
+    balsa_mailbox_nodes_lock(TRUE);
     g_node_traverse(balsa_app.mailbox_nodes,
 		    G_LEVEL_ORDER,
 		    G_TRAVERSE_ALL, 10, destroy_mbnode, NULL);
+    g_node_destroy(balsa_app.mailbox_nodes);
+    balsa_app.mailbox_nodes = NULL;
+    balsa_mailbox_nodes_unlock(TRUE);
     gtk_object_unref(GTK_OBJECT(balsa_app.inbox));
     gtk_object_unref(GTK_OBJECT(balsa_app.outbox));
     gtk_object_unref(GTK_OBJECT(balsa_app.sentbox));
     gtk_object_unref(GTK_OBJECT(balsa_app.draftbox));
     gtk_object_unref(GTK_OBJECT(balsa_app.trash));
-    g_node_destroy(balsa_app.mailbox_nodes);
-    balsa_app.mailbox_nodes = NULL;
     gnome_sound_shutdown();
     libbalsa_imap_close_all_connections();
     /* g_slist_free(opt_attach_list); */

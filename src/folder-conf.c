@@ -138,9 +138,11 @@ folder_conf_clicked_cb(GtkDialog* dialog, int response, FolderDialogData* fcw)
 	    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->list_inbox));
 	
 	if(insert) {
+            balsa_mailbox_nodes_lock(TRUE);
 	    g_node_append(balsa_app.mailbox_nodes, 
                           gnode = g_node_new(fcw->mn));
 	    balsa_mailbox_node_append_subtree(fcw->mn, gnode);
+            balsa_mailbox_nodes_unlock(TRUE);
 	    balsa_mblist_repopulate(balsa_app.mblist);
 	    config_folder_add(fcw->mn, NULL);
 	    update_mail_servers();
@@ -621,9 +623,13 @@ folder_conf_delete(BalsaMailboxNode* mbnode)
     config_folder_delete(mbnode);
 
     /* Remove the node from balsa's mailbox list */
+    balsa_mailbox_nodes_lock(FALSE);
     gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mbnode);
+    balsa_mailbox_nodes_unlock(FALSE);
     if(gnode) {
+        balsa_mailbox_nodes_lock(TRUE);
 	balsa_remove_children_mailbox_nodes(gnode);
+        balsa_mailbox_nodes_unlock(TRUE);
 	mblist_remove_mailbox_node(balsa_app.mblist, mbnode);
 	g_node_unlink(gnode);
 	g_node_destroy(gnode);

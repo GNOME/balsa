@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -426,14 +426,18 @@ balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
 {
     GNode *gnode;
 
+    balsa_mailbox_nodes_lock(FALSE);
     gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mn);
+    balsa_mailbox_nodes_unlock(FALSE);
 
     if(gnode) {
 	/* the expanded state needs to be preserved; it would 
 	   be reset when all the children are removed */
 	gboolean expanded = mn->expanded;
+        balsa_mailbox_nodes_lock(TRUE);
 	balsa_remove_children_mailbox_nodes(gnode);
 	balsa_mailbox_node_append_subtree(mn, gnode);
+        balsa_mailbox_nodes_unlock(TRUE);
 	mn->expanded = expanded;
 	balsa_mblist_repopulate(balsa_app.mblist);
         if (expanded)
@@ -441,6 +445,7 @@ balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
 	    mblist_scan_mailbox_node(balsa_app.mblist, mn);
     } else g_warning("folder node %s (%p) not found in hierarchy.\n",
 		     mn->name, mn);
+    balsa_mailbox_nodes_unlock(FALSE);
 }
 
 static void
@@ -741,12 +746,16 @@ find_by_url(GNode * root, GTraverseType order, GTraverseFlags flags,
     return d[1];
 }
 
-
+/* remove_mailbox_from_nodes:
+   must be called with balsa_mailbox_nodes_lock held.
+*/
 static GNode*
 remove_mailbox_from_nodes(LibBalsaMailbox* mailbox)
 {
-    GNode* gnode = find_by_url(balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
-			       G_TRAVERSE_ALL, mailbox->url);
+    GNode* gnode;
+
+    gnode = find_by_url(balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
+                        G_TRAVERSE_ALL, mailbox->url);
     if (gnode)
 	g_node_unlink(gnode);
     else
@@ -818,18 +827,24 @@ add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
 
 GNode* add_local_folder(GNode*root, const char*d_name, const char* path)
 {
-    GNode *node = g_node_new(balsa_mailbox_node_new_from_dir(path));
+    GNode *node, *found;
 
     if(!root)
 	return NULL;
 
     /* don't add if the folder is already in the configuration */
-    if (find_by_path(balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
-		     G_TRAVERSE_ALL, path))
+    balsa_mailbox_nodes_lock(FALSE);
+    found = find_by_path(balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
+                         G_TRAVERSE_ALL, path);
+    balsa_mailbox_nodes_unlock(FALSE);
+    if (found)
 	return NULL;
 
+    node = g_node_new(balsa_mailbox_node_new_from_dir(path));
+    balsa_mailbox_nodes_lock(TRUE);
     BALSA_MAILBOX_NODE(node->data)->parent = (BalsaMailboxNode*)root->data;
     g_node_append(root, node);
+    balsa_mailbox_nodes_unlock(TRUE);
     if (balsa_app.debug)
 	g_print(_("Local folder %s\n"), path );
 		

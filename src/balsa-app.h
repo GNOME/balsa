@@ -386,4 +386,7 @@ GtkWidget *create_entry(GtkDialog *mcw, GtkWidget * table,
 GtkWidget *create_check(GtkDialog *mcw, const gchar * label, 
 			GtkWidget * table, gint row, gboolean initval);
 
+void balsa_mailbox_nodes_lock(gboolean exclusive);
+void balsa_mailbox_nodes_unlock(gboolean exclusive);
+
 #endif				/* __BALSA_APP_H__ */

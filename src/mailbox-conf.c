@@ -298,7 +298,9 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 	balsa_app.inbox_input = g_list_remove(balsa_app.inbox_input, 
 					      mbnode);
     } else {
+        balsa_mailbox_nodes_lock(FALSE);
 	gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
+        balsa_mailbox_nodes_unlock(FALSE);
 	if (!gnode) {
 	    fprintf(stderr,
 		    _("Oooop! mailbox not found in balsa_app.mailbox "
@@ -745,7 +747,9 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 
 	if(update_config) {
 	    node =g_node_new(mbnode);
+            balsa_mailbox_nodes_lock(TRUE);
 	    g_node_append(balsa_app.mailbox_nodes, node);
+            balsa_mailbox_nodes_unlock(TRUE);
 	}
     } else if ( LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox) ) {
 	/* POP3 Mailboxes */
@@ -756,7 +760,9 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	update_imap_mailbox(mcw);
 
 	node = g_node_new(mbnode);
+        balsa_mailbox_nodes_lock(TRUE);
 	g_node_append(balsa_app.mailbox_nodes, node);
+        balsa_mailbox_nodes_unlock(TRUE);
 	update_mail_servers();
     } else {
 	g_assert_not_reached();
@@ -767,6 +773,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
     else {
 	gchar *dir; 
         GNode* parent = NULL;
+        balsa_mailbox_nodes_lock(FALSE);
         for(dir = g_strdup(libbalsa_mailbox_local_get_path(mcw->mailbox));
             strlen(dir)>1 /* i.e dir != "/" */ &&
                 !(parent = balsa_app_find_by_dir(balsa_app.mailbox_nodes,dir));
@@ -775,6 +782,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
             dir = tmp;
             printf("dir: %s\n", dir);
         }
+        balsa_mailbox_nodes_unlock(FALSE);
 	if(parent)
             balsa_mailbox_node_rescan(BALSA_MAILBOX_NODE(parent->data)); 
         else g_warning("parent for %s not found.\n", mcw->mailbox->name);

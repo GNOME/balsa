@@ -1259,8 +1259,10 @@ update_mail_servers(void)
      * we'll check everything at the top level in the mailbox_nodes
      * list:
      */
+    balsa_mailbox_nodes_lock(FALSE);
     g_node_children_foreach(balsa_app.mailbox_nodes, G_TRAVERSE_ALL,
 			    (GNodeForeachFunc) add_other_server, clist);
+    balsa_mailbox_nodes_unlock(FALSE);
     gtk_clist_select_row(clist, 0, 0);
     gtk_clist_thaw(clist);
 }

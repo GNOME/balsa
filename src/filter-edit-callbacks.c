@@ -1158,9 +1158,11 @@ fe_dialog_button_clicked(GtkWidget * dialog, gint button, gpointer data)
             gtk_clist_set_row_data(fe_filters_list,0,NULL);
 
         /* Update mailboxes filters */
+        balsa_mailbox_nodes_lock(TRUE);
         g_node_traverse(balsa_app.mailbox_nodes,
                         G_LEVEL_ORDER,
                         G_TRAVERSE_ALL, 10, update_filters_mailbox, NULL);
+        balsa_mailbox_nodes_unlock(TRUE);
 
         gnome_dialog_close(GNOME_DIALOG(dialog));
         config_filters_save();

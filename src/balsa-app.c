@@ -19,11 +19,15 @@
  * 02111-1307, USA.
  */
 
-#include "balsa-app.h"
-
+#include "config.h"
 #ifdef BALSA_USE_THREADS
+/* _XOPEN_SOURCE is needed for rwlocks */
+#define _XOPEN_SOURCE 500
 #include <pthread.h>
 #endif
+
+#include "balsa-app.h"
+
 
 /* Global application structure */
 struct BalsaApplication balsa_app;
@@ -180,8 +184,10 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 
     password = NULL;
     if (mbox) {
+        balsa_mailbox_nodes_lock(FALSE);
         g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_LEAFS,
 		-1, set_passwd_from_matching_server, server);
+        balsa_mailbox_nodes_unlock(FALSE);
 	if (server->passwd != NULL) {
 	    password = server->passwd;
 	    server->passwd = NULL;
@@ -757,4 +763,27 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
 
     /* didn't find a matching mailbox */
     return NULL;
+}
+/* balsa_mailbox_nodes_(un)lock:
+   locks/unlocks balsa_app.mailbox_nodes structure so we can modify it
+   from a thread.
+   exclusive asks for exclusive access.
+   obviously NO-OPs in the non-MT build.
+*/
+static pthread_rwlock_t mailbox_nodes_lock = PTHREAD_RWLOCK_INITIALIZER;
+void
+balsa_mailbox_nodes_lock(gboolean exclusive)
+{
+#ifdef BALSA_USE_THREADS
+    if(exclusive)
+        pthread_rwlock_wrlock(&mailbox_nodes_lock);
+    else
+        pthread_rwlock_rdlock(&mailbox_nodes_lock);
+#endif
+}
+void balsa_mailbox_nodes_unlock(gboolean exclusive)
+{
+#ifdef BALSA_USE_THREADS
+    pthread_rwlock_unlock(&mailbox_nodes_lock);
+#endif
 }

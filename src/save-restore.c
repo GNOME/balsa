@@ -408,7 +408,9 @@ config_mailbox_init(const gchar * prefix)
         gboolean special = TRUE;
 
 	node = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));
+        balsa_mailbox_nodes_lock(TRUE);
 	g_node_append(balsa_app.mailbox_nodes, node);
+        balsa_mailbox_nodes_unlock(TRUE);
 	if (strcmp("Inbox/", key) == 0)
 	    balsa_app.inbox = mailbox;
 	else if (strcmp("Outbox/", key) == 0)
@@ -438,8 +440,10 @@ config_folder_init(const gchar * prefix)
 
     g_return_val_if_fail(prefix != NULL, FALSE);
 
+    balsa_mailbox_nodes_lock(TRUE);
     if( (folder = balsa_mailbox_node_new_from_config(prefix)) )
 	g_node_append(balsa_app.mailbox_nodes, g_node_new(folder));
+    balsa_mailbox_nodes_unlock(TRUE);
 
     return folder != NULL;
 }				/* config_folder_init */
@@ -779,8 +783,10 @@ config_global_load(void)
 	gnome_config_pop_prefix();
 	return FALSE;
     }
+    balsa_mailbox_nodes_lock(TRUE);
     balsa_app.mailbox_nodes = g_node_new(balsa_mailbox_node_new_from_dir(
         balsa_app.local_mail_directory));
+    balsa_mailbox_nodes_unlock(TRUE);
 
     balsa_app.open_inbox_upon_startup =
 	gnome_config_get_bool("OpenInboxOnStartup=false");

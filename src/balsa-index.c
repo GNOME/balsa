@@ -2580,10 +2580,12 @@ populate_mru(GtkWidget * menu, BalsaIndex * bindex)
         mru_entry->url = mru->data;
         mru_entry->mailbox = NULL;
         mru_entry->bindex = bindex;
+        balsa_mailbox_nodes_lock(FALSE);
         g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER,
                         G_TRAVERSE_ALL, -1,
                         (gint(*)(GNode *, gpointer)) mru_search_cb,
                         mru_entry);
+        balsa_mailbox_nodes_unlock(FALSE);
         if (mru_entry->mailbox == NULL) {
             g_free(mru_entry);
             tmp = g_list_next(mru);

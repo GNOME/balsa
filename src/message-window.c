@@ -820,9 +820,11 @@ load_mru(MessageWindow * mw)
 	mru_entry->url=mru->data;
 	mru_entry->mailbox=NULL;
 	mru_entry->mw=mw;
+        balsa_mailbox_nodes_lock(FALSE);
 	g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_ALL,
 			-1, (gint (*)(GNode *, gpointer))find_url_cb, 
 			mru_entry);
+        balsa_mailbox_nodes_unlock(FALSE);
 
 	if(mru_entry->mailbox == NULL) {
 	    /* could not find mailbox of given URL; *

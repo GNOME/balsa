@@ -2529,8 +2529,10 @@ threading_flat_cb(GtkWidget * widget, gpointer data)
     if(!GTK_CHECK_MENU_ITEM(widget)->active) return;
     index = balsa_window_find_current_index(balsa_app.main_window);
     g_return_if_fail(index);
+    balsa_mailbox_nodes_lock(FALSE);
     gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, 
                                     BALSA_INDEX(index)->mailbox_node->mailbox);
+    balsa_mailbox_nodes_unlock(FALSE);
     g_return_if_fail(gnode);
     BALSA_MAILBOX_NODE(gnode->data)->threading_type = 
         BALSA_INDEX_THREADING_FLAT;
@@ -2547,8 +2549,10 @@ threading_simple_cb(GtkWidget * widget, gpointer data)
     if(!GTK_CHECK_MENU_ITEM(widget)->active) return;
     index = balsa_window_find_current_index(balsa_app.main_window);
     g_return_if_fail(index);
+    balsa_mailbox_nodes_lock(FALSE);
     gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, 
                                     BALSA_INDEX(index)->mailbox_node->mailbox);
+    balsa_mailbox_nodes_unlock(FALSE);
     g_return_if_fail(gnode);
     BALSA_MAILBOX_NODE(gnode->data)->threading_type = 
         BALSA_INDEX_THREADING_SIMPLE;
@@ -2565,8 +2569,10 @@ threading_jwz_cb(GtkWidget * widget, gpointer data)
     if(!GTK_CHECK_MENU_ITEM(widget)->active) return;
     index = balsa_window_find_current_index(balsa_app.main_window);
     g_return_if_fail(index);
+    balsa_mailbox_nodes_lock(FALSE);
     gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, 
                                     BALSA_INDEX(index)->mailbox_node->mailbox);
+    balsa_mailbox_nodes_unlock(FALSE);
     g_return_if_fail(gnode);
     BALSA_MAILBOX_NODE(gnode->data)->threading_type = 
         BALSA_INDEX_THREADING_JWZ;
@@ -2861,9 +2867,11 @@ mailbox_commit_each(GNode *node, gpointer data)
 static void
 mailbox_commit_all(GtkWidget * widget, gpointer data)
 {
+    balsa_mailbox_nodes_lock(FALSE);
     g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_ALL,
 		    -1, (GNodeTraverseFunc)mailbox_commit_each, 
 		    NULL);
+    balsa_mailbox_nodes_unlock(FALSE);
 }
 
 /* empty_trash:

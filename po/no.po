@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.4.9\n"
-"POT-Creation-Date: 2000-04-10 10:44+0200\n"
+"POT-Creation-Date: 2000-04-14 14:09+0200\n"
 "PO-Revision-Date: 2000-04-10 10:46+02:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@online.no>\n"
 "Language-Team: Norwegian <no@li.org>\n"
@@ -97,8 +97,8 @@ msgstr "Ferdig!"
 msgid "Please enter information about yourself."
 msgstr "Vennligst skriv inn informasjon om deg selv."
 
-#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:183
-#: src/address-book.c:400
+#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:185
+#: src/address-book.c:410
 msgid "Name:"
 msgstr "Navn:"
 
@@ -170,15 +170,15 @@ msgstr "Filen med stinavn \"%s\" er ikke en katalog."
 msgid "Configure Balsa"
 msgstr "Konfigurér Balsa"
 
-#: src/address-book.c:173
+#: src/address-book.c:175
 msgid "Add New Address"
 msgstr "Legg til ny adresse"
 
-#: src/address-book.c:190
+#: src/address-book.c:192
 msgid "E-Mail Address:"
 msgstr "E-post adresse:"
 
-#: src/address-book.c:269
+#: src/address-book.c:271
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -187,39 +187,39 @@ msgstr ""
 "Kunne ikke åpne ~/.gnome/GnomeCard.gcrd for lesing.\n"
 " - %s\n"
 
-#: src/address-book.c:272 src/sendmsg-window.c:381
+#: src/address-book.c:274 src/sendmsg-window.c:381
 msgid "OK"
 msgstr "OK"
 
-#: src/address-book.c:291
+#: src/address-book.c:293
 msgid "No-Id"
 msgstr "Ingen id"
 
-#: src/address-book.c:293
+#: src/address-book.c:301
 msgid "No-Name"
 msgstr "Uten navn"
 
-#: src/address-book.c:380 src/filter-edit-dialog.c:137
+#: src/address-book.c:390 src/filter-edit-dialog.c:137
 msgid "Name"
 msgstr "Navn"
 
-#: src/address-book.c:380
+#: src/address-book.c:390
 msgid "E-Mail Address"
 msgstr "E-post adresse"
 
-#: src/address-book.c:382 src/address-book.c:410 src/main-window.c:173
+#: src/address-book.c:392 src/address-book.c:420 src/main-window.c:173
 msgid "Address Book"
 msgstr "Adressebok"
 
-#: src/address-book.c:442
+#: src/address-book.c:452
 msgid "Send-To"
 msgstr "Send-til"
 
-#: src/address-book.c:456
+#: src/address-book.c:466
 msgid "Run GnomeCard"
 msgstr "Kjør GnomeKort"
 
-#: src/address-book.c:462
+#: src/address-book.c:472
 msgid "Re-Import"
 msgstr "Re-importer"
 
@@ -228,7 +228,7 @@ msgid "Mailbox password:"
 msgstr "Passord for postboks:"
 
 #. password field
-#: src/balsa-index-page.c:293 src/mailbox-conf.c:964 src/mailbox-conf.c:1063
+#: src/balsa-index-page.c:293 src/mailbox-conf.c:988 src/mailbox-conf.c:1087
 msgid "Password:"
 msgstr "Passord:"
 
@@ -277,7 +277,7 @@ msgstr "Emne"
 msgid "Date"
 msgstr "Dato"
 
-#: src/balsa-mblist.c:814
+#: src/balsa-mblist.c:813
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Vist postboks: %s med %ld meldinger, %ld nye"
@@ -290,9 +290,9 @@ msgstr "Lagre MIME-del"
 msgid "Save"
 msgstr "Lagre"
 
-#: src/balsa-message.c:166 src/balsa-message.c:224 src/mailbox-conf.c:641
-#: src/sendmsg-window.c:125 src/sendmsg-window.c:407 src/sendmsg-window.c:1073
-#: src/sendmsg-window.c:1363 src/sendmsg-window.c:1386
+#: src/balsa-message.c:166 src/balsa-message.c:224 src/mailbox-conf.c:665
+#: src/sendmsg-window.c:125 src/sendmsg-window.c:407 src/sendmsg-window.c:1074
+#: src/sendmsg-window.c:1364 src/sendmsg-window.c:1387
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -320,13 +320,13 @@ msgstr "Dato:"
 
 #. From:
 #: src/balsa-message.c:644 src/filter-edit-dialog.c:339
-#: src/sendmsg-window.c:578
+#: src/sendmsg-window.c:579
 msgid "From:"
 msgstr "Fra:"
 
 #. To:
 #: src/balsa-message.c:648 src/filter-edit-dialog.c:327
-#: src/sendmsg-window.c:580
+#: src/sendmsg-window.c:581
 msgid "To:"
 msgstr "Til:"
 
@@ -343,26 +343,26 @@ msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:654 src/sendmsg-window.c:586
+#: src/balsa-message.c:654 src/sendmsg-window.c:587
 msgid "Subject:"
 msgstr "Emne:"
 
-#: src/balsa-message.c:761
+#: src/balsa-message.c:763
 msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
 msgstr ""
 "<tr><td bgcolor=\"#f0f0f0\"> Du mottok en kodet fil av type applikasjon/"
 
-#: src/balsa-message.c:765
+#: src/balsa-message.c:767
 msgid "<P>The parameters of this message are:<BR>"
 msgstr "<P>Parameterene til denne meldingen er: <BR>"
 
-#: src/balsa-message.c:766
+#: src/balsa-message.c:768
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
 msgstr "<table border=0><tr><th>Attributt</th><th>Verdi</th></tr>\n"
 
-#: src/balsa-message.c:1161
+#: src/balsa-message.c:1163
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Åpning av %s feilet. Errno = %d, "
@@ -399,7 +399,7 @@ msgstr "Kropp"
 msgid "Match string:"
 msgstr "Finn streng:"
 
-#: src/filter-edit-dialog.c:416 src/mailbox-conf.c:280 src/mailbox-conf.c:1123
+#: src/filter-edit-dialog.c:416 src/mailbox-conf.c:280 src/mailbox-conf.c:1147
 #: src/pref-manager.c:863
 msgid "Add"
 msgstr "Legg til"
@@ -514,7 +514,7 @@ msgstr "Oooops! postboks ikke funnet i balsa_app.mailbox noder?\n"
 msgid "Mailbox Configurator"
 msgstr "Postbokskonfigurering"
 
-#: src/mailbox-conf.c:290 src/mailbox-conf.c:1117
+#: src/mailbox-conf.c:290 src/mailbox-conf.c:1141
 msgid "Update"
 msgstr "Oppdater"
 
@@ -562,70 +562,70 @@ msgstr "Du må fylle ut feltet for port"
 msgid "Some of the fields are blank."
 msgstr "Noen av feltene er tomme."
 
-#: src/mailbox-conf.c:640
+#: src/mailbox-conf.c:664
 #, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr "Kan ikke lage postboks '%s': %s\n"
 
 #. used to build a string: MAILBOXNAME " on " SERVERNAME
-#: src/mailbox-conf.c:707
+#: src/mailbox-conf.c:731
 msgid " on "
 msgstr " på "
 
-#: src/mailbox-conf.c:820
+#: src/mailbox-conf.c:844
 msgid "New mailbox type:"
 msgstr "Ny postboks type:"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:826
+#: src/mailbox-conf.c:850
 msgid "Local mailbox"
 msgstr "Lokal postboks"
 
-#: src/mailbox-conf.c:834
+#: src/mailbox-conf.c:858
 msgid "IMAP server"
 msgstr "IMAP tjener"
 
 #. mailbox name
-#: src/mailbox-conf.c:857 src/mailbox-conf.c:892 src/mailbox-conf.c:1009
+#: src/mailbox-conf.c:881 src/mailbox-conf.c:916 src/mailbox-conf.c:1033
 msgid "Mailbox Name:"
 msgstr "Navn på postboks"
 
 #. path to file
-#: src/mailbox-conf.c:867
+#: src/mailbox-conf.c:891
 msgid "Mailbox path:"
 msgstr "Sti til postboks:"
 
 #. pop server
-#: src/mailbox-conf.c:909 src/mailbox-conf.c:1019
+#: src/mailbox-conf.c:933 src/mailbox-conf.c:1043
 msgid "Server:"
 msgstr "Tjener:"
 
 #. pop port
-#: src/mailbox-conf.c:928 src/mailbox-conf.c:1033
+#: src/mailbox-conf.c:952 src/mailbox-conf.c:1057
 msgid "Port:"
 msgstr "Port:"
 
 #. username
-#: src/mailbox-conf.c:947 src/mailbox-conf.c:1048
+#: src/mailbox-conf.c:971 src/mailbox-conf.c:1072
 msgid "Username:"
 msgstr "Brukernavn:"
 
 #. toggle for check
-#: src/mailbox-conf.c:979 src/main-window.c:362
+#: src/mailbox-conf.c:1003 src/main-window.c:362
 msgid "Check"
 msgstr "Sjekk"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:987
+#: src/mailbox-conf.c:1011
 msgid "Delete from server"
 msgstr "Slett fra tjener"
 
-#: src/mailbox-conf.c:1076
+#: src/mailbox-conf.c:1100
 msgid "Folder path:"
 msgstr "Sti til mappe:"
 
-#: src/mailbox-conf.c:1158
+#: src/mailbox-conf.c:1182
 msgid "Mailbox"
 msgstr "Postboks"
 
@@ -1411,91 +1411,91 @@ msgstr "Kan ikke hente informasjon om filen '%s': %s\n"
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Vedlegget er ikke en vanlig fil: '%s'\n"
 
-#: src/sendmsg-window.c:461
+#: src/sendmsg-window.c:462
 msgid "Attach file"
 msgstr "Legg ved fil"
 
 #. cc:
-#: src/sendmsg-window.c:589
+#: src/sendmsg-window.c:590
 msgid "cc:"
 msgstr "cc:"
 
 #. bcc:
-#: src/sendmsg-window.c:592
+#: src/sendmsg-window.c:593
 msgid "bcc:"
 msgstr "bcc:"
 
 #. fcc:
-#: src/sendmsg-window.c:595
+#: src/sendmsg-window.c:596
 msgid "fcc:"
 msgstr "fcc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:623
+#: src/sendmsg-window.c:624
 msgid "Reply To:"
 msgstr "Svar til:"
 
 #. Attachment list
-#: src/sendmsg-window.c:627
+#: src/sendmsg-window.c:628
 msgid "Attachments:"
 msgstr "Vedlegg:"
 
 #. Comments:
-#: src/sendmsg-window.c:669
+#: src/sendmsg-window.c:670
 msgid "Comments:"
 msgstr "Kommentarer:"
 
 #. Keywords:
-#: src/sendmsg-window.c:672
+#: src/sendmsg-window.c:673
 msgid "Keywords:"
 msgstr "Nøkkelord:"
 
-#: src/sendmsg-window.c:749
+#: src/sendmsg-window.c:750
 msgid "you"
 msgstr "du"
 
-#: src/sendmsg-window.c:758
+#: src/sendmsg-window.c:759
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "På %s skrev %s:\n"
 
-#: src/sendmsg-window.c:760
+#: src/sendmsg-window.c:761
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s skrev:\n"
 
-#: src/sendmsg-window.c:830
+#: src/sendmsg-window.c:831
 msgid "Reply to "
 msgstr "Svar til "
 
-#: src/sendmsg-window.c:835
+#: src/sendmsg-window.c:836
 msgid "Forward message"
 msgstr "Videresend melding"
 
-#: src/sendmsg-window.c:840
+#: src/sendmsg-window.c:841
 msgid "Continue message"
 msgstr "Fortsett på en melding"
 
-#: src/sendmsg-window.c:845
+#: src/sendmsg-window.c:846
 msgid "New message"
 msgstr "Ny melding"
 
-#: src/sendmsg-window.c:1072
+#: src/sendmsg-window.c:1073
 msgid "Could not open the file.\n"
 msgstr "Kunne ikke åpne filen.\n"
 
-#: src/sendmsg-window.c:1078
+#: src/sendmsg-window.c:1079
 msgid "Loading..."
 msgstr "Laster..."
 
-#: src/sendmsg-window.c:1103
+#: src/sendmsg-window.c:1104
 msgid "Include file"
 msgstr "Inkluder fil"
 
-#: src/sendmsg-window.c:1361
+#: src/sendmsg-window.c:1362
 msgid "Cannot execute print command."
 msgstr "Kan ikke utføre utskriftskommando."
 
-#: src/sendmsg-window.c:1385
+#: src/sendmsg-window.c:1386
 msgid "Error executing lpr"
 msgstr "Feil under kjøring av lpr"

@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-22 11:04+0200\n"
-"PO-Revision-Date: 2004-09-22 11:30-0300\n"
+"POT-Creation-Date: 2004-09-23 10:59+0200\n"
+"PO-Revision-Date: 2004-09-23 07:50-0300\n"
 "Last-Translator: Raphael Higino <raphaelh@uai.com.br>\n"
 "Language-Team: Brazilian Portuguese <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -505,7 +505,7 @@ msgstr "Não foi possível criar uma caixa de mensagens do tipo %s"
 #. login information...
 #: libbalsa/mailbox_imap.c:501
 msgid "IMAP connection has been severed. Reconnecting..."
-msgstr ""
+msgstr "A conexão IMAP foi desfeita. Reconectando..."
 
 #: libbalsa/mailbox_imap.c:504
 #, c-format
@@ -551,7 +551,7 @@ msgstr "Enviando %ld kB"
 
 #: libbalsa/mailbox_imap.c:2338
 msgid "Server-side threading not supported."
-msgstr ""
+msgstr "O encadeamento usado pelo servidor não é suportado."
 
 #: libbalsa/mailbox_local.c:1260
 #, c-format
@@ -883,7 +883,7 @@ msgstr ""
 
 #: libbalsa/rfc3156.c:877
 msgid "The signature is invalid (Note: might be caused by gmime bug!)."
-msgstr ""
+msgstr "A assinatura é inválida (Nota: pode ser causado por um bug no gmime!)."
 
 #: libbalsa/rfc3156.c:880
 msgid "The signature could not be verified due to a missing key."
@@ -1237,12 +1237,16 @@ msgid ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
 msgstr ""
+"O servidor SMTP recusou a conexão.\n"
+"Verifique sua conexão com a Internet."
 
 #: libbalsa/send.c:1153
 msgid ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
 msgstr ""
+"O servidor SMTP não pode ser alcançado.\n"
+"Verifique sua conexão com a Internet."
 
 #: libbalsa/send.c:1162
 msgid "Message left in Outbox (try again later)"
@@ -1397,6 +1401,9 @@ msgid ""
 "be, in the Email application in the 'Preferences' and 'Identities' commands "
 "on the 'Tools' menu)"
 msgstr ""
+"As seguintes configurações também são necessárias (e você pode encontrá-las "
+"mais tarde, se for necessário, no programa de e-mail nos comandos "
+"'Preferências' e 'Identidades' no menu 'Ferramentas')"
 
 #: libinit_balsa/balsa-druid-page-user.c:56
 msgid ""
@@ -1404,6 +1411,9 @@ msgid ""
 "following information (if you have a Network Administrator, they may already "
 "have set this up for you):"
 msgstr ""
+"Quem quer que forneça sua conta de e-mail, tem que te dar as seguintes "
+"informações (se você tem um Administrador de Rede, ele pode já ter "
+"configurado isto pra você):"
 
 #: libinit_balsa/balsa-druid-page-user.c:62
 msgid "Yes, remember it"
@@ -1482,6 +1492,14 @@ msgid ""
 "-- or your Network Administrator at your place of work/study/similar may "
 "have set up your computer to connect to the network."
 msgstr ""
+"Antes que você possa enviar ou receber e-mails:\n"
+"\n"
+"-- ou você já deve ter acesso à Internet e uma conta de e-mail, fornecida "
+"por um provedor de Internet, e você já deve ter criado essa conexão de "
+"Internet no seu computador\n"
+"\n"
+"-- ou o seu Administrador de Rede no seu local de trabalho/estudo/ou similar "
+"pode ter configurado seu computador para conectar na rede."
 
 #: libinit_balsa/balsa-initdruid.c:79
 msgid ""
@@ -1841,9 +1859,9 @@ msgid "Moved to \"%s\"."
 msgstr "Movida para \"%s\"."
 
 #: src/balsa-index.c:2177
-#, fuzzy, c-format
+#, c-format
 msgid "Committing mailbox %s failed."
-msgstr "A transmissão da caixa de mensagens %s falhou."
+msgstr "A gravação da caixa de mensagens %s falhou."
 
 #: src/balsa-mblist.c:278
 msgid "Mailbox"
@@ -2153,6 +2171,10 @@ msgid ""
 "than once.\n"
 "Please close the other instances of this message and try again."
 msgstr ""
+"Essa operação não pode ser realizada porque essa mensagem está sendo exibida "
+"mais de uma vez.\n"
+"Por favor, feche as outras janelas que exibem essa mensagem e tente "
+"novamente."
 
 #: src/balsa-message.c:4606
 #, c-format
@@ -2664,7 +2686,7 @@ msgstr "Habilitar cache _persistente"
 
 #: src/folder-conf.c:314 src/mailbox-conf.c:1238
 msgid "Enable _bug workarounds"
-msgstr ""
+msgstr "Habilitar tratamento de _bugs"
 
 #: src/folder-conf.c:320 src/mailbox-conf.c:1127 src/mailbox-conf.c:1240
 msgid "_Advanced"
@@ -3022,6 +3044,8 @@ msgid ""
 "Scanning of %s failed: %s\n"
 "Check network connectivity."
 msgstr ""
+"A busca de %s falhou: %s\n"
+"Verifique a conectividade da rede."
 
 #: src/mailbox-node.c:430
 #, c-format
@@ -3031,7 +3055,7 @@ msgstr "A busca de %s falhou: %s"
 #: src/mailbox-node.c:479
 #, c-format
 msgid "Scanning %s. Please wait..."
-msgstr "Procurando %s. Aguarde..."
+msgstr "Buscando %s. Por favor aguarde..."
 
 #: src/mailbox-node.c:922
 msgid "Local _mbox mailbox..."
@@ -3051,7 +3075,7 @@ msgstr "Caixa de mensagem _IMAP remota..."
 
 #: src/mailbox-node.c:931
 msgid "Remote IMAP _folder..."
-msgstr "Pasta IMAP remota..."
+msgstr "_Pasta IMAP remota..."
 
 #: src/mailbox-node.c:933
 msgid "Remote IMAP _subfolder..."
@@ -3060,7 +3084,7 @@ msgstr "_Subpasta IMAP remota..."
 #. clicked on the empty space
 #: src/mailbox-node.c:944 src/mailbox-node.c:970
 msgid "_Rescan"
-msgstr ""
+msgstr "Procurar _novamente"
 
 # 15
 #: src/mailbox-node.c:953
@@ -3073,7 +3097,7 @@ msgstr "_Fechar"
 
 #: src/mailbox-node.c:962
 msgid "_Properties..."
-msgstr "Propriedades..."
+msgstr "_Propriedades..."
 
 #: src/mailbox-node.c:977
 msgid "_Subscribe"
@@ -3122,11 +3146,11 @@ msgstr "Pasta local %s\n"
 
 #: src/main-window.c:276
 msgid "Balsa closes files and connections. Please wait..."
-msgstr ""
+msgstr "O Balsa fecha arquivos e conexões. Por favor aguarde..."
 
 #: src/main-window.c:315 src/main-window.c:361
 msgid "_Deleted"
-msgstr "_Excluir"
+msgstr "E_xcluir"
 
 #: src/main-window.c:318
 msgid "Un_Deleted"
@@ -3553,7 +3577,9 @@ msgstr "Apagar Mensagens E_xcluídas"
 
 #: src/main-window.c:734 src/main-window.c:831
 msgid "Expunge messages marked as deleted in the currently opened mailbox"
-msgstr "Apaga as mensagens marcadas como excluídas na caixa de mensagens exibidas atualmente"
+msgstr ""
+"Apaga as mensagens marcadas como excluídas na caixa de mensagens exibidas "
+"atualmente"
 
 #: src/main-window.c:739 src/main-window.c:837
 msgid "Close mailbox"
@@ -3573,7 +3599,9 @@ msgstr "Selecionar _Filtros"
 
 #: src/main-window.c:749 src/main-window.c:1068
 msgid "Select filters to be applied automatically to current mailbox"
-msgstr "Seleciona filtros para serem aplicados automaticamente à caixa de mensagens atual"
+msgstr ""
+"Seleciona filtros para serem aplicados automaticamente à caixa de mensagens "
+"atual"
 
 #: src/main-window.c:762
 msgid "_Toolbars..."
@@ -3680,9 +3708,8 @@ msgid "_View filter"
 msgstr "_Ver filtro"
 
 #: src/main-window.c:949
-#, fuzzy
 msgid "Enable quick message index filter"
-msgstr "Incapaz de carregar o corpo da mensagem para aplicar o filtro"
+msgstr "Habilita o filtro rápido de índice de mensagens"
 
 #: src/main-window.c:985 src/main-window.c:1059 src/sendmsg-window.c:502
 #: src/sendmsg-window.c:560 src/sendmsg-window.c:620
@@ -4210,13 +4237,12 @@ msgstr "Faça checagem em segundo plano quita (sem mensagem na barra de status)"
 
 #: src/pref-manager.c:1711
 msgid "_POP message size limit:"
-msgstr ""
+msgstr "Tamanho limite de mensagens _POP:"
 
 #: src/pref-manager.c:1718
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
-# 4
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
 #: src/pref-manager.c:1737
@@ -4229,13 +4255,12 @@ msgstr "Expressão regular do texto citado"
 
 #: src/pref-manager.c:1752
 msgid "Wrap Incoming Text at:"
-msgstr "Quebrar entrada de texto em:"
+msgstr "Quebrar texto de entrada em:"
 
 #: src/pref-manager.c:1763 src/pref-manager.c:1937
 msgid "characters"
 msgstr "caracteres"
 
-#  handling of multipart/alternative
 #. handling of multipart/alternative
 #: src/pref-manager.c:1778
 msgid "Display of Multipart/Alternative Parts"
@@ -4245,7 +4270,6 @@ msgstr "Visualização de Multiparte/Partes Alternativas"
 msgid "prefer text/plain over html"
 msgstr "preferir texto a html"
 
-#  treatment of messages with 8-bit chars, but without proper MIME encoding
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
 #: src/pref-manager.c:1798
 msgid "National (8-bit) characters in broken messages without codeset header"
@@ -4314,7 +4338,8 @@ msgstr "Copiar a mensagem original quando responder"
 
 #: src/pref-manager.c:1964
 msgid "Don't include HTML parts as text when replying or forwarding mail"
-msgstr "Não incluir partes HTML como texto quando responder ou encaminhar mensagens"
+msgstr ""
+"Não incluir partes HTML como texto quando responder ou encaminhar mensagens"
 
 #: src/pref-manager.c:1967
 msgid "Forward a mail as attachment instead of quoting it"
@@ -4524,6 +4549,9 @@ msgid ""
 "The following setting is global, but may be overridden\n"
 "for the selected mailbox using Mailbox -> Hide messages:"
 msgstr ""
+"A seguintes configurações são globais, mas podem ser sobrepostas\n"
+"pela caixa de mensagens selecionada usando Caixa de Mensagens -> Ocultar "
+"mensagens:"
 
 #: src/pref-manager.c:2518
 msgid "Hide messages marked as deleted"
@@ -4558,9 +4586,8 @@ msgid "Remember open mailboxes between sessions"
 msgstr "Lembrar de caixas de mensagens abertas entre sessões"
 
 #: src/pref-manager.c:2588
-#, fuzzy
 msgid "Folder Scanning"
-msgstr "Procura pasta IMAP"
+msgstr "Busca em Pastas"
 
 #: src/pref-manager.c:2590
 msgid ""
@@ -4572,14 +4599,12 @@ msgstr ""
 "Para ver mais da árvore ao iniciar, escolha uma profundidade maior."
 
 #: src/pref-manager.c:2600
-#, fuzzy
 msgid "Scan local folders to depth"
-msgstr "Rastrear árvore até o fundo"
+msgstr "Buscar em pastas locais até a profundidade"
 
 #: src/pref-manager.c:2613
-#, fuzzy
 msgid "Scan IMAP folders to depth"
-msgstr "Rastrear árvore até o fundo"
+msgstr "Buscar em pastas IMAP até a profundidade"
 
 #: src/pref-manager.c:2678
 msgid "Address Book Name"
@@ -4599,7 +4624,7 @@ msgstr "Caixa de mensagem POP3 remota..."
 
 #: src/pref-manager.c:2998
 msgid "Show nothing"
-msgstr "Mostrar nada"
+msgstr "Não mostrar nada"
 
 #: src/pref-manager.c:2999
 msgid "Show dialog"
@@ -4632,13 +4657,12 @@ msgid "Page: %i/%i"
 msgstr "Página: %i/%i"
 
 #: src/print.c:667
-#, fuzzy
 msgid ""
 "Preparing an HTML part, which must start on a new page.\n"
 "Print this part?"
 msgstr ""
-"Processando uma parte HTML da mensagem que deve iniciar em uma nova página.\n"
-"Imprimir esta parte?"
+"Preparando uma parte HTML, que deve iniciar em uma nova página.\n"
+"Deseja imprimir esta parte?"
 
 #. gather some info about this part
 #. four fields, one terminator
@@ -4651,11 +4675,9 @@ msgid "File name:"
 msgstr "Nome do arquivo:"
 
 #: src/print.c:1299
-#, fuzzy, c-format
+#, c-format
 msgid "This is an inline OpenPGP signed %s message part:"
-msgstr ""
-"Essa é uma parte da mensagem %s com assinatura OpenPGP incluída:\n"
-"%s"
+msgstr "Essa é uma parte da mensagem %s com assinatura OpenPGP incluída:"
 
 #: src/print.c:1544
 msgid "Font available for printing"
@@ -4664,7 +4686,7 @@ msgstr "Fonte disponível para impressão"
 #: src/print.c:1550
 #, c-format
 msgid "Font <b>not</b> available for printing. Closest: %s"
-msgstr "Fonte <b>não</b> disponível para impressão. Mais proxima: %s"
+msgstr "Fonte <b>não</b> disponível para impressão. A mais próxima: %s"
 
 #: src/print.c:1563
 msgid "Select Font"
@@ -4917,7 +4939,7 @@ msgstr "_GnuPG usa o antigo modo OpenPGP"
 
 #: src/sendmsg-window.c:291
 msgid "_S/MIME mode (GpgSM)"
-msgstr ""
+msgstr "Modo _S/MIME (GpgSM)"
 
 #: src/sendmsg-window.c:306 src/sendmsg-window.c:478
 msgid "_Include File..."
@@ -4929,16 +4951,15 @@ msgstr "_Anexar arquivo..."
 
 #: src/sendmsg-window.c:312 src/sendmsg-window.c:480
 msgid "I_nclude Message(s)"
-msgstr "I_ncluir mensagens"
+msgstr "I_ncluir mensagem(ns)"
 
 #: src/sendmsg-window.c:315 src/sendmsg-window.c:483
 msgid "Attach _Message(s)"
-msgstr "Anexar _Mensagens"
+msgstr "Anexar _Mensagem(ns)"
 
 #: src/sendmsg-window.c:321 src/sendmsg-window.c:508
-#, fuzzy
 msgid "Sen_d"
-msgstr "Enviar"
+msgstr "En_viar"
 
 #: src/sendmsg-window.c:322 src/sendmsg-window.c:509 src/toolbar-factory.c:121
 msgid "Send this message"
@@ -4946,20 +4967,19 @@ msgstr "Enviar esta mensagem"
 
 #: src/sendmsg-window.c:326
 msgid "_Queue"
-msgstr "Por na fila de saída"
+msgstr "_Enfileirar"
 
 #: src/sendmsg-window.c:327 src/sendmsg-window.c:514
 msgid "Queue this message in Outbox for sending"
-msgstr "Por esta mensagem na Caixa de saída para enviar"
+msgstr "Põe esta mensagem na Caixa de saída para envio"
 
 #: src/sendmsg-window.c:331
 msgid "_Postpone"
-msgstr "Adiar"
+msgstr "_Adiar"
 
 #: src/sendmsg-window.c:334 src/sendmsg-window.c:495
-#, fuzzy
 msgid "_Save"
-msgstr "Salvar"
+msgstr "_Salvar"
 
 #: src/sendmsg-window.c:335 src/sendmsg-window.c:496
 msgid "Save this message"
@@ -4971,7 +4991,7 @@ msgstr "Imprimir a mensagem editada"
 
 #: src/sendmsg-window.c:368 src/sendmsg-window.c:525
 msgid "_Wrap Body"
-msgstr "Quebrar corpo"
+msgstr "_Quebrar corpo"
 
 #: src/sendmsg-window.c:372 src/sendmsg-window.c:529
 msgid "_Reflow Selected Text"
@@ -4979,7 +4999,7 @@ msgstr "_Refluxo do Texto Selecionado"
 
 #: src/sendmsg-window.c:377 src/sendmsg-window.c:557
 msgid "Insert Si_gnature"
-msgstr "Inserir Assinatura"
+msgstr "Inserir Assina_tura"
 
 #: src/sendmsg-window.c:381 src/sendmsg-window.c:533
 msgid "_Quote Message(s)"
@@ -4987,7 +5007,7 @@ msgstr "Citar Mensa_gem(ns)"
 
 #: src/sendmsg-window.c:386 src/sendmsg-window.c:606
 msgid "C_heck Spelling"
-msgstr "Verificar ortografia"
+msgstr "Verificar _Ortografia"
 
 #: src/sendmsg-window.c:387 src/sendmsg-window.c:607
 msgid "Check the spelling of the message"
@@ -5067,11 +5087,11 @@ msgstr "_Opções"
 
 #: src/sendmsg-window.c:504
 msgid "Sa_ve and Close"
-msgstr ""
+msgstr "Sal_var e Fechar"
 
 #: src/sendmsg-window.c:513
 msgid "Send _Later"
-msgstr ""
+msgstr "Enviar mais _tarde"
 
 #: src/sendmsg-window.c:735
 #, c-format
@@ -5080,7 +5100,7 @@ msgid ""
 "Save message to Draftbox?"
 msgstr ""
 "A mensagem para '%s' foi modificada.\n"
-"Salvar a mensagem em Rascunhos?"
+"Deseja salvar a mensagem em Rascunhos?"
 
 #: src/sendmsg-window.c:989
 msgid "Gnome editor is not defined in your preferred applications."
@@ -5208,14 +5228,13 @@ msgid "Choose charset"
 msgstr "Escolher codificação de caracteres"
 
 #: src/sendmsg-window.c:3434
-#, fuzzy
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file.\n"
 "(choose Generic UTF-8 if unsure)."
 msgstr ""
 "Este arquivo não está codificado em US-ASCII ou UTF-8.\n"
-"Por favor escolha o código usado para codificar o arquivo.\n"
+"Por favor escolha o conjunto de caracteres para codificar o arquivo.\n"
 "(na dúvida escolha UTF-8 Genérico)"
 
 #: src/sendmsg-window.c:3501
@@ -5263,14 +5282,12 @@ msgid "Message could not be queued in outbox"
 msgstr "A mensagem não pôde ser colocada na caixa de saída"
 
 #: src/sendmsg-window.c:3926
-#, fuzzy
 msgid "Message could not be saved in sentbox"
-msgstr "O livro de endereço não pôde ser acessado."
+msgstr "A mensagem não pôde ser salva na pasta Enviadas"
 
 #: src/sendmsg-window.c:3928
-#, fuzzy
 msgid "Message could not be sent"
-msgstr "O livro de endereço não pôde ser acessado."
+msgstr "A mensagem não pôde ser enviada"
 
 #: src/sendmsg-window.c:3932
 #, c-format
@@ -5278,29 +5295,26 @@ msgid "Send failed: %s"
 msgstr "Falha de envio: %s"
 
 #: src/sendmsg-window.c:4016
-#, fuzzy
 msgid "Could not postpone message."
-msgstr "Não foi possível anexar a mensagem"
+msgstr "Não foi possível adiar a mensagem."
 
 #: src/sendmsg-window.c:4030
-#, fuzzy
 msgid "Message postponed."
-msgstr "Fonte da Mensagem"
+msgstr "Mensagem adiada."
 
 #: src/sendmsg-window.c:4046
-#, fuzzy, c-format
+#, c-format
 msgid "Could not open draftbox: %s"
-msgstr "Não foi possível abrir %s"
+msgstr "Não foi possível abrir a pasta Rascunhos: %s"
 
 #: src/sendmsg-window.c:4068
-#, fuzzy
 msgid "Message saved."
-msgstr "Mensagem"
+msgstr "Mensagem salva."
 
 #: src/sendmsg-window.c:4230
 #, c-format
 msgid "Could not compile %s"
-msgstr "Não é possível compilar %s"
+msgstr "Não foi possível compilar %s"
 
 #: src/sendmsg-window.c:4718
 #, c-format
@@ -5556,9 +5570,8 @@ msgid "Close"
 msgstr "Fechar"
 
 #: src/toolbar-factory.c:133
-#, fuzzy
 msgid "Close the compose window"
-msgstr "Compor mensagem"
+msgstr "Fecha a janela de composição"
 
 #: src/toolbar-factory.c:134
 msgid ""
@@ -5748,9 +5761,8 @@ msgstr "Abaixo"
 #~ msgid "Total"
 #~ msgstr "Total"
 
-#, fuzzy
 #~ msgid "By _Date"
-#~ msgstr "Data"
+#~ msgstr "Por _Data"
 
 #~ msgid "Cannot access the message's body\n"
 #~ msgstr "Não é possível acessar o corpo da mensagem\n"

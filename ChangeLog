@@ -1,3 +1,7 @@
+2003-09-04 08:47  PeterB
+
+	* libbalsa/address-book-vcard.c: Test new_address fields.
+
 2003-09-03 16:34  PeterB
 
 	* doc/C/balsa.xml: Copy filter help from help/C/balsa.sgml.

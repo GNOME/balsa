@@ -1,3 +1,9 @@
+2003-11-02  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/mailbox_imap.c: smarter envelope prefetching.
+	* libbalsa/imap/imap-commands.[hc], imap-handle.h: 
+	implement imap_mbox_handle_fetch_set().
+
 2003-11-01  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/mailbox.[hc]: move SortTuple to header file.

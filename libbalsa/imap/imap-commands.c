@@ -100,6 +100,24 @@ need_fetch_view(unsigned seqno, struct fetch_data* fd)
   return need_fetch(no, fd);
 }
 
+struct fetch_data_set {
+  struct fetch_data fd;
+  unsigned *set;
+};
+static unsigned
+need_fetch_set(unsigned i, struct fetch_data_set* fd)
+{
+  unsigned seqno = fd->set[i-1];
+  return need_fetch(seqno, &fd->fd);
+}
+
+static unsigned
+need_fetch_view_set(unsigned i, struct fetch_data_set* fd)
+{
+  unsigned seqno = fd->set[i-1];
+  return need_fetch_view(seqno, &fd->fd);
+}
+
 /* RFC2060 */
 /* 6.1 Client Commands - Any State */
 
@@ -479,6 +497,36 @@ imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
   if(lo<1) lo = 1;
   if(hi>exists) hi = exists;
   seq = coalesce_seq_range(lo, hi, cf, &fd);
+  if(seq) {
+    const char* hdr[5];
+    int idx = 0;
+    hdr[idx++] = "UID";
+    if(ift & IMFETCH_ENV)        hdr[idx++] = "ENVELOPE";
+    if(ift & IMFETCH_BODYSTRUCT) hdr[idx++] = "BODY";
+    if(ift & IMFETCH_RFC822SIZE) hdr[idx++] = "RFC822.SIZE";
+    hdr[idx] = NULL;
+    rc = imap_mbox_handle_fetch(handle, seq, hdr);
+    g_free(seq);
+  } else rc = IMR_OK;
+  return rc;
+}
+
+ImapResponse
+imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
+                           unsigned *set, unsigned cnt, ImapFetchType ift)
+{
+  gchar * seq;
+  ImapResponse rc;
+  CoalesceFunc cf;
+  struct fetch_data_set fd;
+
+  if(cnt == 0) return IMR_OK;
+
+  fd.fd.h = handle; fd.fd.ift = ift;
+  fd.set = set;
+  cf = (CoalesceFunc)(mbox_view_is_active(&handle->mbox_view)
+                      ? need_fetch_view_set : need_fetch_set);
+  seq = coalesce_seq_range(1, cnt, cf, &fd);
   if(seq) {
     const char* hdr[5];
     int idx = 0;

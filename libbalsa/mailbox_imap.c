@@ -1329,27 +1329,63 @@ lb_set_headers(LibBalsaMessageHeaders *headers, ImapEnvelope *  envelope,
     }
 }
 
+struct collect_seq_data {
+    unsigned *msgno_arr;
+    unsigned first_msgno;
+    unsigned cnt;
+};
+
+static gboolean
+collect_seq_cb(GNode *node, gpointer data)
+{
+    /* we prefetch envelopes in chunks to save on RTTs */
+    static const unsigned MAX_CHUNK_LENGTH = 40; 
+    struct collect_seq_data *csd = (struct collect_seq_data*)data;
+    unsigned msgno = GPOINTER_TO_UINT(node->data);
+    if(csd->msgno_arr == NULL) {
+        if( msgno != csd->first_msgno)
+            return FALSE;
+        csd->msgno_arr =
+            g_malloc(MAX_CHUNK_LENGTH*sizeof(csd->msgno_arr[0]));
+        csd->cnt = 0;
+    }
+    csd->msgno_arr[csd->cnt++] = msgno;
+    return csd->cnt == MAX_CHUNK_LENGTH;
+}
+
+static int
+cmp_msgno(const void* a, const void *b)
+{
+    return (*(unsigned*)a) - (*(unsigned*)b);
+}
+
 static gboolean
 libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 				    LibBalsaMessage *message)
 {
-    struct message_info *msg_info;
     ImapResponse rc;
     ImapEnvelope *envelope;
-    int msgno, lo, hi;
+    struct collect_seq_data csd;
     ImapMessage* imsg;
     
     g_return_val_if_fail(mimap->opened, FALSE);
-    msg_info = message_info_from_msgno(mimap, message->msgno);
-    msgno = message->msgno;
-    lo = msgno>30 ? msgno-30 : 1; /* extra care when treating unsigned */
-    hi = msgno + 30;
-    rc = imap_mbox_handle_fetch_range(mimap->handle, lo, hi, 
-                                      IMFETCH_ENV|IMFETCH_RFC822SIZE);
-    if (rc != IMR_OK)
-	return FALSE;
-
-    imsg = imap_mbox_handle_get_msg(mimap->handle, message->msgno);
+    if( (imsg = imap_mbox_handle_get_msg(mimap->handle, message->msgno)) 
+        == NULL) {
+        csd.msgno_arr   = NULL;
+        csd.first_msgno = message->msgno;
+        csd.cnt         = 0;
+        g_node_traverse(LIBBALSA_MAILBOX(mimap)->msg_tree,
+                        G_PRE_ORDER, G_TRAVERSE_ALL, -1, collect_seq_cb,
+                        &csd);
+        qsort(csd.msgno_arr, csd.cnt, sizeof(csd.msgno_arr[0]), cmp_msgno);
+        rc = imap_mbox_handle_fetch_set(mimap->handle, csd.msgno_arr,
+                                        csd.cnt,
+                                        IMFETCH_ENV|IMFETCH_RFC822SIZE);
+        g_free(csd.msgno_arr);
+        if (rc != IMR_OK)
+            return FALSE;
+        imsg = imap_mbox_handle_get_msg(mimap->handle, message->msgno);
+    }
 
     g_return_val_if_fail(imsg, FALSE);
     lbimap_update_flags(message, imsg);
@@ -1788,12 +1824,6 @@ lbmi_compare_func(const SortTuple * a,
         return GPOINTER_TO_INT(a->node->data) - GPOINTER_TO_INT(b->node->data);
     else
         return GPOINTER_TO_INT(b->node->data) - GPOINTER_TO_INT(a->node->data);
-}
-
-static int
-cmp_msgno(const void* a, const void *b)
-{
-    return (*(unsigned*)a) - (*(unsigned*)b);
 }
 
 static void

@@ -45,6 +45,13 @@ ImapResponse imap_mbox_store_flag_m(ImapMboxHandle* h, unsigned msgcnt,
                                     unsigned *seqno, ImapMsgFlag flg, 
                                     gboolean state);
 
+ImapResponse imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
+                                          unsigned lo, unsigned hi,
+                                          ImapFetchType ift);
+ImapResponse imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
+                                        unsigned *set, unsigned cnt,
+                                        ImapFetchType ift);
+
 ImapResponse imap_mbox_handle_fetch_structure(ImapMboxHandle* handle,
                                               unsigned seqno);
 ImapResponse imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,

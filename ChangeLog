@@ -1,3 +1,7 @@
+2002-04-19  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/mailbox-nodes.c: make mailbox node locks upgradeable ro->rw.
+
 2002-04-18  Pawel Salek <pawsa@theochem.kth.se>
 
 	Scan mailboxes in a thread.

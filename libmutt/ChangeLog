@@ -16,7 +16,7 @@
 	* mutt_regex.h:
 	* mutt_sasl.h:
 	* mutt_socket.[hc]:
-	* mutt_ssl.h:
+	* mutt_ssl.[ch]:
 	* mx.c:
 	* parse.c:
 	* protos.h:

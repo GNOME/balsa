@@ -62,7 +62,7 @@ mailbox_type_description (MailboxType type)
     case MAILBOX_IMAP:
       return "IMAP";
       break;
-      
+
     case MAILBOX_NNTP:
       return "NNTP";
       break;
@@ -157,7 +157,7 @@ mailbox_new (MailboxType type)
       pop3->passwd = NULL;
       pop3->server = NULL;
       break;
-      
+
     case MAILBOX_IMAP:
       imap = (MailboxIMAP *) mailbox;
       imap->type = MAILBOX_IMAP;
@@ -168,7 +168,7 @@ mailbox_new (MailboxType type)
       imap->server = NULL;
       imap->path = NULL;
       break;
-      
+
     case MAILBOX_NNTP:
       nntp = (MailboxNNTP *) mailbox;
       nntp->type = MAILBOX_NNTP;
@@ -180,7 +180,7 @@ mailbox_new (MailboxType type)
       nntp->newsgroup = NULL;
       break;
     }
-  
+
   return mailbox;
 }
 
@@ -214,45 +214,45 @@ mailbox_free (Mailbox * mailbox)
     case MAILBOX_MBX:
       mbx = (MailboxMBX *) mailbox;
       if (mbx->path)
-	g_free(mbx->path);
+	g_free (mbx->path);
       break;
 
     case MAILBOX_MTX:
       mtx = (MailboxMTX *) mailbox;
       if (mtx->path)
-	g_free(mtx->path);
+	g_free (mtx->path);
       break;
 
     case MAILBOX_TENEX:
       tenex = (MailboxTENEX *) mailbox;
       if (tenex->path)
-	g_free(tenex->path);
+	g_free (tenex->path);
       break;
 
     case MAILBOX_MBOX:
       mbox = (MailboxMBox *) mailbox;
       if (mbox->path)
-	g_free(mbox->path);
+	g_free (mbox->path);
       break;
-      
+
     case MAILBOX_MMDF:
       mmdf = (MailboxMMDF *) mailbox;
       if (mmdf->path)
-	g_free(mmdf->path);
+	g_free (mmdf->path);
       break;
 
     case MAILBOX_UNIX:
       mbunix = (MailboxUNIX *) mailbox;
       if (mbunix->path)
-	g_free(mbunix->path);
+	g_free (mbunix->path);
       break;
 
     case MAILBOX_MH:
       mh = (MailboxMH *) mailbox;
       if (mh->path)
-	g_free(mh->path);
+	g_free (mh->path);
       break;
-      
+
     case MAILBOX_POP3:
       pop3 = (MailboxPOP3 *) mailbox;
       if (pop3->user)
@@ -264,7 +264,7 @@ mailbox_free (Mailbox * mailbox)
       if (pop3->server)
 	g_free (pop3->server);
       break;
-      
+
     case MAILBOX_IMAP:
       imap = (MailboxIMAP *) mailbox;
       if (imap->user)
@@ -276,7 +276,7 @@ mailbox_free (Mailbox * mailbox)
       if (imap->server)
 	g_free (imap->server);
       break;
-      
+
     case MAILBOX_NNTP:
       nntp = (MailboxNNTP *) mailbox;
       if (nntp->user)
@@ -480,6 +480,7 @@ mailbox_close (Mailbox * mailbox)
 gint
 current_mailbox_check ()
 {
-  mail_ping (balsa_app.current_mailbox->stream);
+  if (balsa_app.current_mailbox)
+    mail_ping (balsa_app.current_mailbox->stream);
   return TRUE;
 }

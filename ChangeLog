@@ -1,5 +1,6 @@
-2003-02-01 10:56  PeterB
+2003-02-01 11:14  PeterB
 
+	* src/balsa-index.c: Simplify bndx_moveto (Manu).
 	* src/main-window.c: Grey the body button in the search dialog if
 	the mailbox is IMAP (IMAP does not support search in body). (Manu)
 

@@ -1,3 +1,7 @@
+2005-01-03 19:09  PeterB/manu <eallaud@yahoo.fr>
+
+	* libbalsa/mailbox_local.c: check for NULL msg-id.
+
 2006-01-02  Pawel Salek
 
 	* libbalsa/filter.c, libbalsa/misc.[hc]: move in_string_utf8() to misc

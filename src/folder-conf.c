@@ -221,13 +221,9 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 
     gtk_widget_show_all(GTK_WIDGET(fcw.dialog));
 
-    /* all the widgets are ready, set the values */
     validate_folder(NULL, &fcw);
     gtk_widget_grab_focus(fcw.folder_name);
 
-    /* FIXME: I don't like this loop.
-     * but gnome_dialog_set_close(fcw.dialog, FALSE) appears to be broken
-     */
     gtk_signal_connect(GTK_OBJECT(fcw.dialog), "clicked", 
                        folder_conf_clicked_cb, &fcw);
     gnome_dialog_run(fcw.dialog);
@@ -518,7 +514,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 
     gtk_signal_connect(GTK_OBJECT(fcw.dialog), "clicked", 
                        subfolder_conf_clicked_cb, &fcw);
-    gnome_dialog_run_and_close(fcw.dialog);
+    gnome_dialog_run(fcw.dialog);
 }
 
 void

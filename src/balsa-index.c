@@ -1632,24 +1632,46 @@ balsa_message_replytogroup(GtkWidget * widget, gpointer user_data)
     compose_foreach(widget, BALSA_INDEX (user_data), SEND_REPLY_GROUP);
 }
 
+static void
+compose_from_list(GtkWidget * w, BalsaIndex * index, SendType send_type)
+{
+    GList *sel = GTK_CLIST(index->ctree)->selection;
+    GList *list = NULL;
+    BalsaSendmsg *sm;
+
+    while (sel) {
+        LibBalsaMessage *message =
+            gtk_ctree_node_get_row_data(index->ctree,
+                                        GTK_CTREE_NODE(sel->data));
+        list = g_list_append(list, message);
+        sel = g_list_next(sel);
+    }
+    sm = sendmsg_window_new_from_list(w, list, send_type);
+    gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
+                       GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
+                       NULL);
+
+    g_list_free(list);
+}
+
 void
 balsa_message_forward_attached(GtkWidget * widget, gpointer user_data)
 {
-    compose_foreach(widget, BALSA_INDEX (user_data), SEND_FORWARD_ATTACH);
+    compose_from_list(widget, BALSA_INDEX (user_data), SEND_FORWARD_ATTACH);
 }
 
 void
 balsa_message_forward_inline(GtkWidget * widget, gpointer user_data)
 {
-    compose_foreach(widget, BALSA_INDEX (user_data), SEND_FORWARD_INLINE);
+    compose_from_list(widget, BALSA_INDEX (user_data), SEND_FORWARD_INLINE);
 }
 
 void
 balsa_message_forward_default(GtkWidget * widget, gpointer user_data)
 {
-    compose_foreach(widget, BALSA_INDEX (user_data), 
-                    balsa_app.forward_attached 
-                    ? SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE);
+    compose_from_list(widget, BALSA_INDEX (user_data), 
+                      balsa_app.forward_attached 
+                      ? SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE);
 }
 
 void
@@ -1790,10 +1812,12 @@ balsa_message_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag,
         (flag ==
          LIBBALSA_MESSAGE_FLAG_NEW ? is_all_flagged : !is_all_flagged);
 
+    gtk_clist_freeze(GTK_CLIST(balsa_app.mblist));
     for (list=GTK_CLIST(index->ctree)->selection; list; list=list->next) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
         (*cb) (message, new_flag);
     }
+    gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
     libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
 }
 

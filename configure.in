@@ -4,6 +4,7 @@ dnl ###########################################################################
 
 AC_INIT(src/main.c)
 AM_CONFIG_HEADER(config.h)
+GNOME_VFS_REQUIRED=1.0.1
 
 dnl ###########################################################################
 dnl Versioning
@@ -106,6 +107,17 @@ AM_PATH_GNOME_PRINT([0.25.0], [
    printing_support="no (gnome-print >= 0.25 required)"
 ])
 
+dnl ###########################################################################
+dnl Check for gnome-vfs
+dnl ###########################################################################
+AC_CHECK_HEADER(libgnomevfs/gnome-vfs-mime-handlers.h,
+[],
+[ AC_MSG_ERROR(
+[ gnome-vfs-mime-handlers.h not found. 
+  Make sure you have gnome-vfs-devel installed.])
+]
+)
+gnome_libs="$gnome_libs vfs"
 
 dnl ###########################################################################
 dnl All the linguas, all the time.

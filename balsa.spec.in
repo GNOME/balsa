@@ -13,13 +13,14 @@ URL:       http://www.balsa.net/
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Packager: Pawel Salek <pawsa@theochem.kth.se>
 Requires: gtk+ >= 1.2.7
-Requires: gnome-libs >= 1.2.0
+Requires: gnome-libs >= 1.2.13
 Requires: libesmtp >= 0.8.6
 Provides: balsa
 
-BuildRequires:  libesmtp >= 0.7.1
-BuildRequires:  gnome-libs-devel >= 1.2.0
+BuildRequires:  libesmtp >= 0.8.6
+BuildRequires:  gnome-libs-devel >= 1.2.13
 BuildRequires:  gtk+-devel >= 1.2.7
+BuildRequires:  gnome-vfs-devel
 
 %description
 Balsa is an e-mail reader.  This client is part of the GNOME

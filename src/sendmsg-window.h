@@ -82,6 +82,9 @@ extern "C" {
 
     void sendmsg_window_process_url(const char *url, field_setter func,
 				    void *data);
+    BalsaSendmsg *sendmsg_window_new_from_list(GtkWidget * w,
+                                               GList * message_list,
+                                               SendType type);
 
 #ifdef __cplusplus
 }

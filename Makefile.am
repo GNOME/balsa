@@ -12,7 +12,6 @@ desktop_DATA = balsa.desktop
 EXTRA_DIST = \
 	balsa.1.in \
 	balsa.spec.in \
-	rpm-po.patch  \
 	balsa.desktop \
 	gnome-balsa2.png \
 	HACKING			\

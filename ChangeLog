@@ -1,3 +1,14 @@
+2001-11-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* Makefile.am: drop rpm-po.patch workaround dead.
+	* balsa.spec.in: require gnome-1.4
+	* configure.in: check for gnome-vfs
+	* libbalsa/message.c: don't set new messages new (#64415).
+	* src/balsa-index.c: forward multiple messages (#64378).+freeze/thaw.
+	* src/balsa-message.c: query VFS for attachment handlers (#62054).
+	* src/folder-conf.c: help button closed dialog (#62054).
+	* src/sendmsg-window.[hc]: second part of multiple msg forwarding.
+
 2001-11-12  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/message.h: make compile with MESSAGE_COPY_CONTENT

@@ -55,6 +55,8 @@
 #include "quote-color.h"
 #include "sendmsg-window.h"
 
+#include <libgnomevfs/gnome-vfs-mime-handlers.h>
+
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
 enum {
@@ -161,6 +163,7 @@ static void part_info_init_unknown(BalsaMessage * bm,
 static void part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info,
 				gchar * ptr, size_t len);
 #endif
+static GtkWidget* part_info_mime_button_vfs (BalsaPartInfo* info, const gchar* content_type);
 static GtkWidget* part_info_mime_button (BalsaPartInfo* info, const gchar* content_type, const gchar* key);
 static void part_context_menu_call_url(GtkWidget * menu_item, BalsaPartInfo * info);
 static void part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info);
@@ -238,6 +241,7 @@ balsa_message_init(BalsaMessage * bm)
 {
     bm->table = gtk_table_new(3, 1, FALSE);
     gtk_container_add(GTK_CONTAINER(bm), bm->table);
+
     gtk_widget_show(bm->table);
 
     bm->content = gtk_vbox_new(FALSE, 0);
@@ -1035,7 +1039,7 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
     GtkWidget *vbox;
     GtkWidget *button;
     gchar *msg;
-    const gchar *cmd;
+    const gchar *cmd, *content_desc;
     gchar *content_type;
     
 
@@ -1043,7 +1047,9 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
     gtk_container_set_border_width(GTK_CONTAINER(vbox), 10);
 
     content_type = libbalsa_message_body_get_content_type(info->body);
-    if ((cmd = gnome_mime_get_value(content_type, "view")) != NULL) {
+    if((button=part_info_mime_button_vfs(info, content_type))) {
+	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
+    } else if ((cmd = gnome_mime_get_value(content_type, "view")) != NULL) {
         button = part_info_mime_button (info, content_type, "view");
 	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
     } else if ((cmd = gnome_mime_get_value (content_type, "open")) != NULL) {
@@ -1055,7 +1061,11 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
 			   FALSE, FALSE, 1);
     }
 
+    if((content_desc=gnome_vfs_mime_get_description(content_type)))
+	msg = g_strdup_printf(_("Type: %s (%s)"), content_desc, content_type);
+    else
     msg = g_strdup_printf(_("Content Type: %s"), content_type);
+
     gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(msg), FALSE, FALSE, 1);
     g_free(msg);
 
@@ -1104,6 +1114,33 @@ part_info_mime_button (BalsaPartInfo* info, const gchar* content_type,
     return button;
 }
 
+
+static GtkWidget*
+part_info_mime_button_vfs (BalsaPartInfo* info, const gchar* content_type)
+{
+    GtkWidget* button=NULL;
+    gchar* msg;
+    const gchar* cmd;
+    GnomeVFSMimeApplication *app=
+	gnome_vfs_mime_get_default_application(content_type);
+
+    if(app) {
+	cmd = app->command;
+	msg = g_strdup_printf(_("View part with %s"), app->name);
+	button = gtk_button_new_with_label(msg);
+	gtk_object_set_data (GTK_OBJECT (button), "mime_action", 
+			     (gpointer) g_strdup(app->id)); /* *** */
+	g_free(msg);
+
+	gtk_signal_connect(GTK_OBJECT(button), "clicked",
+			   (GtkSignalFunc) part_context_menu_vfs_cb,
+			   (gpointer) info);
+
+	gnome_vfs_mime_application_free(app);
+	
+    }
+    return button;
+}
 
 static void
 display_multipart(BalsaMessage * bm, LibBalsaMessageBody * body)
@@ -2078,25 +2115,88 @@ display_content(BalsaMessage * bm)
 	display_part(bm, body);
 }
 
+static void add_vfs_menu_item(BalsaPartInfo *info, 
+			      const GnomeVFSMimeApplication *app)
+{
+    gchar *menu_label = g_strdup_printf(_("Open with %s"), app->name);
+    GtkWidget *menu_item = gtk_menu_item_new_with_label (menu_label);
+    
+    gtk_object_set_data (GTK_OBJECT (menu_item), "mime_action", 
+			 g_strdup(app->id));
+    gtk_signal_connect (GTK_OBJECT (menu_item), "activate",
+			GTK_SIGNAL_FUNC (part_context_menu_vfs_cb),
+			(gpointer) info);
+    gtk_menu_append (GTK_MENU (info->popup_menu), menu_item);
+    g_free (menu_label);
+}
+
+static gboolean in_gnome_vfs(const GnomeVFSMimeApplication *default_app, 
+			     const GList *short_list, const gchar *cmd) 
+{
+    gchar *cmd_base=g_strdup(cmd), *arg=strchr(cmd_base, '%');
+    
+    /* Note: Tries to remove the entrire argument containing %f etc., so that
+             we e.g. get rid of the whole "file:%f", not just "%f" */
+    if(arg) {
+	while(arg!=cmd && *arg!=' ')
+	    arg--;
+	
+	*arg='\0';
+    }
+    g_strstrip(cmd_base);
+    
+    if(default_app && default_app->command && strcmp(default_app->command, cmd_base)==0) {
+	g_free(cmd_base);
+	return TRUE;
+    } else {
+	const GList *item;
+
+	for(item=short_list; item; item=g_list_next(item)) {
+	    GnomeVFSMimeApplication *app=item->data;
+	    
+	    if(app->command && strcmp(app->command, cmd_base)==0) {
+		g_free(cmd_base);
+		return TRUE;
+	    }
+	}
+    }
+    g_free(cmd_base);
+    
+    return FALSE;
+}
+
 
 static void
 part_create_menu (BalsaPartInfo* info) 
+/* Remarks: Will add items in the following order:
+            1) Default application according to GnomeVFS.
+	    2) GNOME MIME/GnomeVFS key values that don't match default
+	       application or anything on the shortlist.
+	    3) GnomeVFS shortlist applications, with the default one (sometimes
+	       included on shortlist, sometimes not) excluded. */ 
 {
     GtkWidget* menu_item;
     GList* list;
-    GList* key_list;
+    GList* key_list, *app_list;
     gchar* content_type;
     gchar* key;
     const gchar* cmd;
     gchar* menu_label;
     gchar** split_key;
     gint i;
+    GnomeVFSMimeApplication *def_app, *app;
     
     info->popup_menu = gtk_menu_new ();
     
     content_type = libbalsa_message_body_get_content_type (info->body);
     key_list = list = gnome_mime_get_keys (content_type);
+    app_list = gnome_vfs_mime_get_short_list_applications(content_type);
+
+    if((def_app=gnome_vfs_mime_get_default_application(content_type))) {
+	add_vfs_menu_item(info, def_app);
+    }
     
+
     while (list) {
         key = list->data;
 
@@ -2106,14 +2206,14 @@ part_create_menu (BalsaPartInfo* info)
 	    && (!strstr(key, "_") || strstr(key, "."))
 	    && g_strncasecmp(key, "description", 11)) {
 	    
-            if ((cmd = gnome_mime_get_value (content_type, key)) != NULL) {
+            if ((cmd = gnome_mime_get_value (content_type, key)) != NULL &&
+		!in_gnome_vfs(def_app, app_list, cmd)) {
                 if (g_strcasecmp (key, "open") == 0 || 
                     g_strcasecmp (key, "view") == 0 || 
                     g_strcasecmp (key, "edit") == 0 ||
                     g_strcasecmp (key, "ascii-view") == 0) {
-                    
                     /* uppercase first letter, make label */
-                    menu_label = g_strdup (key);
+		    menu_label = g_strdup_printf ("%s (\"%s\")", key, cmd);
                     *menu_label = toupper (*menu_label);
                 } else {
                     split_key = g_strsplit (key, ".", -1);
@@ -2126,7 +2226,6 @@ part_create_menu (BalsaPartInfo* info)
                     menu_label = g_strdup (menu_label);
                     g_strfreev (split_key);
                 }
-                
                 menu_item = gtk_menu_item_new_with_label (menu_label);
                 gtk_object_set_data (GTK_OBJECT (menu_item), "mime_action", 
                                      key);
@@ -2140,6 +2239,20 @@ part_create_menu (BalsaPartInfo* info)
         list = g_list_next (list);
     }
 
+    list=app_list;
+
+    while (list) {
+	app=list->data;
+
+	if(app && (!def_app || strcmp(app->name, def_app->name)!=0)) {
+	    add_vfs_menu_item(info, app);
+	}
+
+        list = g_list_next (list);
+    }
+    gnome_vfs_mime_application_free(def_app);
+    
+
     menu_item = gtk_menu_item_new_with_label (_("Save..."));
     gtk_signal_connect (GTK_OBJECT (menu_item), "activate",
                         GTK_SIGNAL_FUNC (part_context_menu_save),
@@ -2149,6 +2262,7 @@ part_create_menu (BalsaPartInfo* info)
     gtk_widget_show_all (info->popup_menu);
 
     g_list_free (key_list);
+    gnome_vfs_mime_application_list_free (app_list);
     g_free (content_type);
 }
 
@@ -2296,6 +2410,38 @@ part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info)
 
     g_free(content_type);
 }
+
+
+static void
+part_context_menu_vfs_cb(GtkWidget * menu_item, BalsaPartInfo * info)
+{
+    gchar *id;
+    
+    if(id = gtk_object_get_data (GTK_OBJECT (menu_item), "mime_action")) {
+	GnomeVFSMimeApplication *app=
+	    gnome_vfs_mime_application_new_from_id(id);
+	if(app) {
+	    if (libbalsa_message_body_save_temporary(info->body, NULL)) {
+		gchar *exe_str=
+		    g_strdup_printf("%s %s%s", app->command,
+				    (app->expects_uris==GNOME_VFS_MIME_APPLICATION_ARGUMENT_TYPE_URIS?"file:":""),
+				    info->body->temp_filename);
+		
+		gnome_execute_shell(NULL, exe_str);
+		fprintf(stderr, "Executed: %s\n", exe_str);
+		g_free (exe_str);
+	    } else {
+		balsa_information(LIBBALSA_INFORMATION_WARNING,
+				  _("could not create temporary file %s"),
+				  info->body->temp_filename);
+	    }
+	    gnome_vfs_mime_application_free(app);    
+	} else {
+	    fprintf(stderr, "lookup for application %s returned NULL\n", id);
+	}
+    }
+}
+
 
 
 void

@@ -3401,3 +3401,38 @@ lang_ukrainian_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
 {
     set_locale(w, bsmsg, LOC_UKRAINIAN_POS);
 }
+
+/* sendmsg_window_new_from_list:
+ * like sendmsg_window_new, but takes a GList of messages, instead of a
+ * single message;
+ * called by compose_from_list (balsa-index.c)
+ */
+BalsaSendmsg *
+sendmsg_window_new_from_list(GtkWidget * w, GList * message_list,
+                             SendType type)
+{
+    BalsaSendmsg *bsmsg;
+    LibBalsaMessage *message;
+    gint pos;
+
+    g_return_val_if_fail(message_list != NULL, NULL);
+
+    message = message_list->data;
+    bsmsg = sendmsg_window_new(w, message, type);
+    if (type == SEND_FORWARD_INLINE)
+        pos = gtk_editable_get_position(GTK_EDITABLE(bsmsg->text));
+
+    while (message_list = g_list_next(message_list)) {
+        message = message_list->data;
+        if (type == SEND_FORWARD_ATTACH)
+            attach_message(bsmsg, message);
+        else if (type == SEND_FORWARD_INLINE) {
+            GString *body = quoteBody(bsmsg, message, type);
+            gtk_editable_insert_text(GTK_EDITABLE(bsmsg->text), body->str,
+                                     body->len, &pos);
+            g_string_free(body, TRUE);
+        }
+    }
+
+    return bsmsg;
+}

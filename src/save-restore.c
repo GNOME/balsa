@@ -629,12 +629,6 @@ config_global_load (void)
   else
     balsa_app.toolbar_style = atoi (field);
 
-  /* mdi style */
-  if ((field = pl_dict_get_str (globals, "MDIStyle")) == NULL)
-    balsa_app.mdi_style = GNOME_MDI_DEFAULT_MODE;
-  else
-    balsa_app.mdi_style = atoi (field);
-
   /* use the preview pane */
   if ((field = pl_dict_get_str (globals, "UsePreviewPane")) == NULL)
     balsa_app.previewpane = TRUE;
@@ -711,9 +705,6 @@ config_global_save (void)
     char tmp[MAX_PROPLIST_KEY_LEN];
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.toolbar_style);
     pl_dict_add_str_str (globals, "ToolbarStyle", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mdi_style);
-    pl_dict_add_str_str (globals, "MDIStyle", tmp);
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.debug);
     pl_dict_add_str_str (globals, "Debug", tmp);

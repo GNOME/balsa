@@ -245,7 +245,8 @@ main_window_init (void)
   gnome_mdi_set_menubar_template (mdi, main_menu);
   gnome_mdi_set_toolbar_template (mdi, main_toolbar);
 
-  gnome_mdi_set_mode (mdi, balsa_app.mdi_style);
+  /* we are forcing notebook mode. */
+  gnome_mdi_set_mode (mdi, GNOME_MDI_NOTEBOOK);
   gnome_mdi_open_toplevel (mdi);
 }
 

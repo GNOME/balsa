@@ -557,7 +557,7 @@ config_save (void)
   return TRUE;
 }				/* config_global_save */
 
-
+/* must use a sensible prefix, or this goes weird */
 static gchar*
 config_get_unused_section (const gchar *prefix)
 {
@@ -572,7 +572,7 @@ config_get_unused_section (const gchar *prefix)
   max = 0;
   while( (iterator = gnome_config_iterator_next(iterator, &key, &val)) ) {
     if(strncmp(key, prefix, pref_len) == 0) {
-      if(strlen(key+pref_len)>1 && (curr = atoi(key+pref_len+1)) && curr>max)
+      if(strlen(key+(pref_len-1))>1 && (curr = atoi(key+pref_len)+1) && curr>max)
 	max = curr;
     }
   }

@@ -1,3 +1,8 @@
+2000-09-11  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/save-restore.c: fixed a couple of off-by-1 errors in 
+	config_get_unused_section that caused config corruption
+
 2000-09-11  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/contact.c: Missing #include <string.h>

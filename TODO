@@ -83,3 +83,12 @@ that gmc uses?
 	indexing system
 	
 - Split Preferences window into several more managable chunks.
+
+
+Milestone 1.4 targets:
+----------------------
+- Merge upcoming stable mutt into libmutt
+- Filters
+- pop3 treated like imap on servers that support it
+- split server/mailbox configuration logically, redo secure connection 
+  settings

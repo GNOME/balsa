@@ -1,5 +1,21 @@
-2004-07-27 08:26  PeterB
+2004-07-27 20:04  PeterB
 
+	* src/: main-window.c, main-window.h: add `notify' to api for
+	check_new_messages_count.
+	* src/balsa-mblist.c: reselect current mailbox if it becomes
+	exposed; don't leave first mailbox highlighted on startup; check
+	for finalized mailbox; use `notify' argument to tell
+	check_new_messages_count not to popup the new mail message during
+	opening and rethreading.
+	* src/balsa-index.c: check messages for filtering out of the view
+	in an idle handler; don't act on selection-changed if
+	mailbox->state == LB_MAILBOX_STATE_TREECLEANING; unselect deleted
+	message, so it can be filtered out, even if it's the last message.
+	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c: check
+	for mailbox->state == LB_MAILBOX_STATE_CLOSING instead of using an
+	explicit `closing' argument.
+	* libbalsa/: mailbox.c, mailbox.h: add LibBalsaMailbox::state and
+	manage it.
 	* src/balsa-index.c: fix undelete.
 
 2004-07-27  Pawel Salek

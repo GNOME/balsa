@@ -71,8 +71,6 @@ ImapResponse imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
                                         unsigned *set, unsigned cnt,
                                         ImapFetchType ift);
 
-ImapResponse imap_mbox_handle_fetch_structure(ImapMboxHandle* handle,
-                                              unsigned seqno);
 ImapResponse imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
                                            unsigned seqno, FILE *fl);
 ImapResponse imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle,

@@ -1,3 +1,10 @@
+2004-04-11  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: fetch references and list-post. 
+	* libbalsa/message.c: remove unused data. Parse sequences of headers.xo
+	* libbalsa/imap/imap-commands.[hc]: simplify fetching code.
+	* libbalsa/imap/imap-handle.[hc]: handle HEADER.FIELDS.NOT.
+
 2004-04-07  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: do not quit when talking to non-IMAP servers

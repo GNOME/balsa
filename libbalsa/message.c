@@ -92,7 +92,6 @@ libbalsa_message_init(LibBalsaMessage * message)
     message->headers = g_new0(LibBalsaMessageHeaders, 1);
     message->flags = 0;
     message->mailbox = NULL;
-    message->remail = NULL;
     message->sender = NULL;
     message->subj = NULL;
     message->references = NULL;
@@ -141,9 +140,6 @@ libbalsa_message_finalize(GObject * object)
 
     libbalsa_message_headers_destroy(message->headers);
     message->headers = NULL;
-
-    g_free(message->remail);
-    message->remail = NULL;
 
     if (message->sender) {
 	g_object_unref(message->sender);
@@ -925,26 +921,20 @@ libbalsa_message_size_to_gchar (LibBalsaMessage * message, gboolean lines)
 {
     gchar retsize[32];
     glong length;   /* byte len */
-    gint lines_len; /* line len */
 
     g_return_val_if_fail(message != NULL, NULL);
     length    = LIBBALSA_MESSAGE_GET_LENGTH(message);
-    lines_len = LIBBALSA_MESSAGE_GET_LINES(message);
-    /* lines is int, length is long */
-    if (lines)
-        g_snprintf (retsize, sizeof(retsize), "%d", lines_len);
-    else {
-        if (length <= 32768) {
-            g_snprintf (retsize, sizeof(retsize), "%ld", length);
-        } else if (length <= (100*1024)) {
-            float tmp = (float)length/1024.0;
-            g_snprintf (retsize, sizeof(retsize), "%.1fK", tmp);
-        } else if (length <= (1024*1024)) {
-            g_snprintf (retsize, sizeof(retsize), "%ldK", length/1024);
-        } else {
-            float tmp = (float)length/(1024.0*1024.0);
-            g_snprintf (retsize, sizeof(retsize), "%.1fM", tmp);
-        }
+    /* length is long */
+    if (length <= 32768) {
+        g_snprintf (retsize, sizeof(retsize), "%ld", length);
+    } else if (length <= (100*1024)) {
+        float tmp = (float)length/1024.0;
+        g_snprintf (retsize, sizeof(retsize), "%.1fK", tmp);
+    } else if (length <= (1024*1024)) {
+        g_snprintf (retsize, sizeof(retsize), "%ldK", length/1024);
+    } else {
+        float tmp = (float)length/(1024.0*1024.0);
+        g_snprintf (retsize, sizeof(retsize), "%.1fM", tmp);
     }
 
     return g_strdup(retsize);
@@ -1371,21 +1361,10 @@ libbalsa_message_title(LibBalsaMessage * message, const gchar * format)
  *   references
  *   in_reply_to
  */
-gboolean
-libbalsa_message_set_header_from_string(LibBalsaMessage *message,
-					const gchar *line)
+static gboolean
+lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
+                 const gchar* value)
 {
-    gchar *name, *value, **pair;
-
-    pair = g_strsplit(line, ":", 2);
-    if (!(pair[0] && pair[1])) {
-	g_warning("Bad header line: \"%s\"", line);
-	g_strfreev(pair);
-	return FALSE;
-    }
-
-    name = g_strstrip(pair[0]);
-    value = g_strstrip(pair[1]);
     if (g_ascii_strcasecmp(name, "Subject") == 0) {
 	if (!strcmp(value, "DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA"))
 	    return FALSE;
@@ -1426,8 +1405,38 @@ libbalsa_message_set_header_from_string(LibBalsaMessage *message,
     } else
 #endif
     /* do nothing */;
+    message->headers->user_hdrs =
+        g_list_append(message->headers->user_hdrs,
+                      libbalsa_create_hdr_pair(g_strdup(name),
+                                               g_strdup(value)));
+    return TRUE;
+}
 
-    g_strfreev(pair);
+gboolean
+libbalsa_message_set_headers_from_string(LibBalsaMessage *message,
+                                         const gchar *lines)
+{
+    gchar *header, *value;
+    const gchar *val, *eoh;
+    do {
+        for(val = lines; *val && *val >32 && *val<126 && *val != ':'; val++)
+            ;
+        if(*val != ':') /* parsing error */
+            return FALSE;
+        for(eoh = val+1; *eoh && (eoh[0] != '\n' || isspace(eoh[1])); eoh++)
+            ;
+        header = g_strndup(lines, val-lines);
+        lines = eoh;
+        for(val=val+1; *val && isspace(*val); val++)
+            ;                           /* strip spaces at front... */
+        while(eoh>val && isspace(*eoh)) eoh--; /* .. and at the end */
+        value  = g_strndup(val, eoh-val+1);
+        
+        lbmsg_set_header(message, header, value);
+        g_free(header); g_free(value);
+        if(!*lines) break;
+        lines++;
+    } while(1);
     return TRUE;
 }
 
@@ -1465,8 +1474,8 @@ libbalsa_message_load_envelope_from_file(LibBalsaMessage *message,
 	    break;
 	}
 	line->data[line->len-1]='\0'; /* terminate line by overwriting '\n' */
-	if (libbalsa_message_set_header_from_string(message,
-						    line->data) == FALSE) {
+	if (libbalsa_message_set_headers_from_string(message,
+                                                     line->data) == FALSE) {
 	    ret = FALSE;
 	    break;
 	}

@@ -80,8 +80,14 @@ typedef enum {
   IMFETCH_ENV        = 1<<0,
   IMFETCH_BODYSTRUCT = 1<<1,
   IMFETCH_RFC822SIZE = 1<<2,
-  IMFETCH_CONTENT_TYPE = 1<<3,
-  IMFETCH_HEADER_MASK  = IMFETCH_CONTENT_TYPE
+  IMFETCH_UID        = 1<<3,
+  IMFETCH_CONTENT_TYPE = 1<<4,
+  IMFETCH_REFERENCES   = 1<<5,
+  IMFETCH_LIST_POST    = 1<<6,
+  IMFETCH_RFC822HEADERS = 1<<7,
+  IMFETCH_RFC822HEADERS_SELECTED = 1<<8, /* non-overlapping with ENV. */
+  IMFETCH_HEADER_MASK  = (IMFETCH_CONTENT_TYPE | IMFETCH_REFERENCES |
+                          IMFETCH_LIST_POST)
 } ImapFetchType;
 
 typedef struct _ImapMboxHandleClass ImapMboxHandleClass;

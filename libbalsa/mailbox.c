@@ -2274,14 +2274,8 @@ mbox_compare_size(LibBalsaMessage * message_a,
 
     g_return_val_if_fail(message_a && message_b, 0);
 
-    if (FALSE /* balsa_app.line_length */) {
-        size_a = LIBBALSA_MESSAGE_GET_LINES(message_a);
-        size_b = LIBBALSA_MESSAGE_GET_LINES(message_b);
-    } else {
-        size_a = LIBBALSA_MESSAGE_GET_LENGTH(message_a);
-        size_b = LIBBALSA_MESSAGE_GET_LENGTH(message_b);
-    }
-
+    size_a = LIBBALSA_MESSAGE_GET_LENGTH(message_a);
+    size_b = LIBBALSA_MESSAGE_GET_LENGTH(message_b);
     return size_a - size_b;
 }
 

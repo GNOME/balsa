@@ -2451,7 +2451,7 @@ ir_msg_att_body(ImapMboxHandle *h, int c, unsigned seqno)
 {
   ImapMessage *msg = h->msg_cache[seqno-1];
   ImapResponse rc;
-  char buf[15];	/* Just large enough to hold "HEADER.FIELDS". */
+  char buf[19];	/* Just large enough to hold "HEADER.FIELDS.NOT". */
 
   switch(c) {
   case '[': 
@@ -2462,7 +2462,9 @@ ir_msg_att_body(ImapMboxHandle *h, int c, unsigned seqno)
       break;
     }
     c = imap_get_atom(h->sio, buf, sizeof buf);
-    if (c == ' ' && g_ascii_strcasecmp(buf, "HEADER.FIELDS") == 0)
+    if (c == ' ' && 
+        (g_ascii_strcasecmp(buf, "HEADER.FIELDS") == 0 ||
+         g_ascii_strcasecmp(buf, "HEADER.FIELDS.NOT") == 0))
       rc = ir_body_header_fields(h->sio, msg);
     else
       rc = IMR_PROTOCOL;

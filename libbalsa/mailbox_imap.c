@@ -1496,6 +1496,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
         qsort(csd.msgno_arr, csd.cnt, sizeof(csd.msgno_arr[0]), cmp_msgno);
         rc = imap_mbox_handle_fetch_set(mimap->handle, csd.msgno_arr,
                                         csd.cnt,
+                                        IMFETCH_UID |
                                         IMFETCH_ENV |
 					IMFETCH_RFC822SIZE |
 					IMFETCH_CONTENT_TYPE);
@@ -1511,7 +1512,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 
     lb_set_headers(message->headers, imsg->envelope, FALSE);
     if ((hdr = imsg->fetched_header_fields) && *hdr && *hdr != '\r')
-	libbalsa_message_set_header_from_string(message, hdr);
+	libbalsa_message_set_headers_from_string(message, hdr);
     envelope        = imsg->envelope;
     message->length = imsg->rfc822size;
     message->subj   = g_mime_utils_8bit_header_decode(envelope->subject);
@@ -1630,11 +1631,18 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     g_return_if_fail(mimap->opened);
 
-    rc = imap_mbox_handle_fetch_structure(mimap->handle, message->msgno);
+    rc = imap_mbox_handle_fetch_range(mimap->handle, message->msgno,
+                                      message->msgno,
+                                      IMFETCH_BODYSTRUCT|
+                                      IMFETCH_LIST_POST |
+                                      IMFETCH_REFERENCES);
     if(rc == IMR_OK) { /* translate ImapData to LibBalsaMessage */
+        const gchar *hdr;
         ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle,
                                                    message->msgno);
         LibBalsaMessageBody *body = libbalsa_message_body_new(message);
+        if ((hdr = im->fetched_header_fields) && *hdr && *hdr != '\r')
+            libbalsa_message_set_headers_from_string(message, hdr);
 	lbm_imap_construct_body(body, im->body);
         libbalsa_message_append_part(message, body);
     }

@@ -103,8 +103,27 @@ need_fetch(unsigned seqno, struct fetch_data* fd)
       && fd->h->msg_cache[seqno-1]->body == NULL) return seqno;
   if( (fd->ift & IMFETCH_RFC822SIZE) 
       && fd->h->msg_cache[seqno-1]->rfc822size <0) return seqno;
-  if( (fd->ift & IMFETCH_CONTENT_TYPE) 
-      && fd->h->msg_cache[seqno-1]->fetched_header_fields == NULL) return seqno;
+  if( (fd->ift & IMFETCH_HEADER_MASK) 
+      && fd->h->msg_cache[seqno-1]->fetched_header_fields == NULL)
+    return seqno;
+  else {
+    const gchar *fetched_headers = 
+      fd->h->msg_cache[seqno-1]->fetched_header_fields;
+    /* FIXME: take care of case sensivity */
+    if(fd->ift & IMFETCH_CONTENT_TYPE &&
+       strstr(fetched_headers, "Content-Type:") == NULL) return seqno;
+    if(fd->ift & IMFETCH_REFERENCES &&
+       strstr(fetched_headers, "References:") == NULL) return seqno;
+    if(fd->ift & IMFETCH_LIST_POST &&
+       strstr(fetched_headers, "List-Post:") == NULL) return seqno;
+  }
+  /* FIXME: the tests below are unsatifactory... */
+  if( (fd->ift & IMFETCH_RFC822HEADERS) 
+      && fd->h->msg_cache[seqno-1]->fetched_header_fields == NULL)
+    return seqno;
+  if( (fd->ift & IMFETCH_RFC822HEADERS_SELECTED) 
+      && fd->h->msg_cache[seqno-1]->fetched_header_fields == NULL)
+    return seqno;
   return 0;
 }
 
@@ -536,6 +555,28 @@ imap_mbox_find_unseen(ImapMboxHandle * h,
 }
 
 /* 6.4.5 FETCH Command */
+static void
+ic_construct_header_list(const char **hdr, ImapFetchType ift)
+{
+  int idx = 0;
+  if(ift & IMFETCH_UID)        hdr[idx++] = "UID";
+  if(ift & IMFETCH_ENV)        hdr[idx++] = "ENVELOPE";
+  if(ift & IMFETCH_BODYSTRUCT) hdr[idx++] = "BODYSTRUCTURE";
+  if(ift & IMFETCH_RFC822SIZE) hdr[idx++] = "RFC822.SIZE";
+  if(ift & IMFETCH_HEADER_MASK) {
+    hdr[idx++] = "BODY.PEEK[HEADER.FIELDS (";
+    if(ift & IMFETCH_CONTENT_TYPE) hdr[idx++] = "CONTENT-TYPE";
+    if(ift & IMFETCH_REFERENCES)   hdr[idx++] = "REFERENCES";
+    if(ift & IMFETCH_LIST_POST)    hdr[idx++] = "LIST-POST";
+    hdr[idx++] = ")]";
+  }
+  if(ift & IMFETCH_RFC822HEADERS) hdr[idx++] = "RFC822.HEADERS";
+  if(ift & IMFETCH_RFC822HEADERS_SELECTED)
+    hdr[idx++] = "BODY.PEEK[HEADER.FIELDS.NOT (DATE SUBJECT FROM SENDER "
+      "REPLY-TO TO CC BCC IN-REPLY-TO MESSAGE-ID CONTENT-TYPE)]";
+  hdr[idx] = NULL;
+}
+
 ImapResponse
 imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
                              unsigned lo, unsigned hi, ImapFetchType ift)
@@ -554,18 +595,8 @@ imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
   if(hi>exists) hi = exists;
   seq = coalesce_seq_range(lo, hi, cf, &fd);
   if(seq) {
-    const char* hdr[8];
-    int idx = 0;
-    hdr[idx++] = "UID";
-    if(ift & IMFETCH_ENV)        hdr[idx++] = "ENVELOPE";
-    if(ift & IMFETCH_BODYSTRUCT) hdr[idx++] = "BODY";
-    if(ift & IMFETCH_RFC822SIZE) hdr[idx++] = "RFC822.SIZE";
-    if(ift & IMFETCH_HEADER_MASK) {
-      hdr[idx++] = "BODY.PEEK[HEADER.FIELDS (";
-      if(ift & IMFETCH_CONTENT_TYPE) hdr[idx++] = "CONTENT-TYPE";
-      hdr[idx++] = ")]";
-    }
-    hdr[idx] = NULL;
+    const char* hdr[12];
+    ic_construct_header_list(hdr, ift);
     rc = imap_mbox_handle_fetch(handle, seq, hdr);
     g_free(seq);
   } else rc = IMR_OK;
@@ -589,18 +620,8 @@ imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
                       ? need_fetch_view_set : need_fetch_set);
   seq = coalesce_seq_range(1, cnt, cf, &fd);
   if(seq) {
-    const char* hdr[8];
-    int idx = 0;
-    hdr[idx++] = "UID";
-    if(ift & IMFETCH_ENV)        hdr[idx++] = "ENVELOPE";
-    if(ift & IMFETCH_BODYSTRUCT) hdr[idx++] = "BODY";
-    if(ift & IMFETCH_RFC822SIZE) hdr[idx++] = "RFC822.SIZE";
-    if(ift & IMFETCH_HEADER_MASK) {
-      hdr[idx++] = "BODY.PEEK[HEADER.FIELDS (";
-      if(ift & IMFETCH_CONTENT_TYPE) hdr[idx++] = "CONTENT-TYPE";
-      hdr[idx++] = ")]";
-    }
-    hdr[idx] = NULL;
+    const char* hdr[12];
+    ic_construct_header_list(hdr, ift);
     rc = imap_mbox_handle_fetch(handle, seq, hdr);
     g_free(seq);
   } else rc = IMR_OK;
@@ -646,20 +667,6 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
   snprintf(cmd, sizeof(cmd), "FETCH %u BODY[%s]", seqno, section);
   return imap_cmd_exec(handle, cmd);
 }
-
-ImapResponse
-imap_mbox_handle_fetch_structure(ImapMboxHandle* handle, unsigned seqno)
-{
-  ImapResponse rc;
-  ImapMessage *im = imap_mbox_handle_get_msg(handle, seqno);
-  if(!im->body) {
-    char* cmd = g_strdup_printf("FETCH %u BODYSTRUCTURE", seqno);
-    rc = imap_cmd_exec(handle, cmd);
-    g_free(cmd);
-  } else rc = IMR_OK;
-  return rc;
-}
-
 
 /* 6.4.6 STORE Command */
 struct msg_set {

@@ -171,9 +171,6 @@ struct _LibBalsaMessage {
 
     GMimeMessage *mime_msg;
 
-    /* remail header if any */
-    gchar *remail;
-
     /* sender address */
     LibBalsaAddress *sender;
 
@@ -225,12 +222,9 @@ struct _LibBalsaMessage {
 #if MESSAGE_COPY_CONTENT
 #define LIBBALSA_MESSAGE_GET_NO(m)      ((m)->msgno)
     glong length;   /* byte len */
-    gint lines_len; /* line len */
 #define LIBBALSA_MESSAGE_GET_LENGTH(m)  ((m)->length)
-#define LIBBALSA_MESSAGE_GET_LINES(m) ((m)->lines_len)
 #else
 #define LIBBALSA_MESSAGE_GET_LENGTH(m) libbalsa_message_get_length(m)
-#define LIBBALSA_MESSAGE_GET_LINES(m)  libbalsa_message_get_lines(m)
 #define LIBBALSA_MESSAGE_GET_NO(m)  libbalsa_message_get_no(m)
 #endif
 
@@ -373,8 +367,8 @@ GList *libbalsa_message_refs_for_threading(LibBalsaMessage* msg);
 
 gboolean libbalsa_message_load_envelope_from_file(LibBalsaMessage *message,
 						  const char *filename);
-gboolean libbalsa_message_set_header_from_string(LibBalsaMessage *message,
-						 const gchar *str);
+gboolean libbalsa_message_set_headers_from_string(LibBalsaMessage *message,
+                                                  const gchar *str);
 void libbalsa_message_set_references_from_string(LibBalsaMessage * message,
 						 const gchar *str);
 void libbalsa_message_set_in_reply_to_from_string(LibBalsaMessage * message,

@@ -624,7 +624,7 @@ traverse_find_path(GNode * node, gpointer * d)
     mailbox = ((BalsaMailboxNode *) node->data)->mailbox;
 
     if(LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) 
-	path = LIBBALSA_MAILBOX_LOCAL(mailbox)->path;
+	path = libbalsa_mailbox_local_get_path(mailbox);
     else if(!mailbox)
 	path = ((BalsaMailboxNode *) node->data)->name;
     else 
@@ -662,24 +662,24 @@ add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
 	return NULL;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.inbox))
-	if (strcmp(path, LIBBALSA_MAILBOX_LOCAL(balsa_app.inbox)->path) ==
+	if (strcmp(path, libbalsa_mailbox_local_get_path(balsa_app.inbox)) ==
 	    0) return NULL;
     if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.outbox))
-	if (strcmp(path, LIBBALSA_MAILBOX_LOCAL(balsa_app.outbox)->path) ==
+	if (strcmp(path, libbalsa_mailbox_local_get_path(balsa_app.outbox)) ==
 	    0) return NULL;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.sentbox))
-	if (strcmp(path, LIBBALSA_MAILBOX_LOCAL(balsa_app.sentbox)->path)
+	if (strcmp(path, libbalsa_mailbox_local_get_path(balsa_app.sentbox))
 	    == 0)
 	    return NULL;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.draftbox))
-	if (strcmp(path, LIBBALSA_MAILBOX_LOCAL(balsa_app.draftbox)->path)
+	if (strcmp(path, libbalsa_mailbox_local_get_path(balsa_app.draftbox))
 	    == 0)
 	    return NULL;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.trash))
-	if (strcmp(path, LIBBALSA_MAILBOX_LOCAL(balsa_app.trash)->path) ==
+	if (strcmp(path, libbalsa_mailbox_local_get_path(balsa_app.trash)) ==
 	    0) return NULL;
 
     /* don't add if the mailbox is already in the configuration */
@@ -819,7 +819,7 @@ static GNode* add_imap_entry(GNode*root, const char* fn, char delim)
 /* add_imap_mailbox:
    add given mailbox unless its base name begins on dot.
    It is called as a callback from libmutt so it has to take measures not
-   to call libmutt again. In particular, it cannot call
+   to call libmutt again. In particular, it CANNOT call
    libbalsa_mailbox_imap_set_path because ut would call in turn 
    mailbox_notify_register, which calls in turn libmutt code.
    
@@ -847,11 +847,11 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
 	return node;
     gtk_signal_connect(GTK_OBJECT(mbnode), "show-prop-dialog",
 		       folder_conf_imap_sub_node, NULL);
-
     m = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
     libbalsa_mailbox_remote_set_server(
 	LIBBALSA_MAILBOX_REMOTE(m), BALSA_MAILBOX_NODE(root->data)->server);
     m->path = g_strdup(fn);
+    libbalsa_mailbox_imap_update_url(m);
     if(balsa_app.debug) 
 	printf("add_imap_mailbox: Adding mailbox of name %s (full path %s)\n", 
 	       basename, fn);

@@ -71,6 +71,7 @@ struct _LibBalsaMailbox {
 
     gchar *config_prefix;	/* unique string identifying mailbox in the config file */
     gchar *name;
+    gchar *url; /* Unique resource locator, file://, imap:// etc */
     /* context refers libmutt internal data.           * 
      * AVOID ACCESSING ITS CONTENT SINCE THE STRUCTURE *
      * DEFINITION MAY CHANGE WITHOUT WARNING.          */

@@ -691,12 +691,14 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
 	    g_assert_not_reached();
 	else {
 	    BalsaIconName in;
-	    if(mbnode->mailbox == balsa_app.inbox)
+	    if(mbnode->mailbox == balsa_app.draftbox)
+		in = BALSA_ICON_DRAFTBOX;
+	    else if(mbnode->mailbox == balsa_app.inbox)
 		in = BALSA_ICON_INBOX;
 	    else if(mbnode->mailbox == balsa_app.outbox)
 		in = BALSA_ICON_OUTBOX;
 	    else if(mbnode->mailbox == balsa_app.sentbox)
-		in = BALSA_ICON_TRAY_EMPTY;
+		in = BALSA_ICON_SENTBOX;
 	    else if(mbnode->mailbox == balsa_app.trash)
 		in = BALSA_ICON_TRASH;
 	    else

@@ -37,7 +37,6 @@ typedef struct _LibBalsaMailboxLocalClass LibBalsaMailboxLocalClass;
 struct _LibBalsaMailboxLocal {
     LibBalsaMailbox mailbox;
 
-    gchar *path;
 };
 
 struct _LibBalsaMailboxLocalClass {
@@ -49,6 +48,9 @@ struct _LibBalsaMailboxLocalClass {
 GtkObject *libbalsa_mailbox_local_new(const gchar * path, gboolean create);
 gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 				     const gchar * path);
+
+#define libbalsa_mailbox_local_get_path(mbox) ((LIBBALSA_MAILBOX(mbox))->url+7)
+
 void libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox);
 
 #endif				/* __LIBBALSA_MAILBOX_LOCAL_H__ */

@@ -147,7 +147,7 @@ libbalsa_mailbox_mh_new(const gchar * path, gboolean create)
     
     mailbox->is_directory = TRUE;
     
-    LIBBALSA_MAILBOX_LOCAL(mailbox)->path = g_strdup(path);
+    mailbox->url = g_strconcat("file://", path, NULL);
     
     if(libbalsa_mailbox_mh_create(path, create) < 0) {
 	gtk_object_destroy(GTK_OBJECT(mailbox));
@@ -174,7 +174,8 @@ libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox *mailbox, LibBalsaMessage
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox), NULL);
     g_return_val_if_fail (LIBBALSA_IS_MESSAGE(message), NULL);
 
-    filename = g_strdup_printf("%s/%s", LIBBALSA_MAILBOX_LOCAL(mailbox)->path,
+    filename = g_strdup_printf("%s/%s", 
+			       libbalsa_mailbox_local_get_path(mailbox),
 			       libbalsa_message_pathname(message));
 
     stream = fopen(filename, "r");
@@ -193,18 +194,20 @@ libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox *mailbox, LibBalsaMessage
 static void
 libbalsa_mailbox_mh_remove_files(LibBalsaMailboxLocal *mailbox)
 {
+    const gchar* path;
     g_return_if_fail(LIBBALSA_IS_MAILBOX_MH(mailbox));
+    path = libbalsa_mailbox_local_get_path(mailbox);
     g_print("DELETE MH\n");
 
-    if (!libbalsa_delete_directory_contents(mailbox->path)) {
+    if (!libbalsa_delete_directory_contents(path)) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("Could not remove contents of %s:\n%s"),
-			     mailbox->path, strerror(errno));
+			     path, strerror(errno));
 	return;
     }
-    if ( rmdir(mailbox->path) == -1 ) {
+    if ( rmdir(path) == -1 ) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("Could not remove %s:\n%s"),
-			     mailbox->path, strerror(errno));
+			     path, strerror(errno));
     }
 }

@@ -139,7 +139,7 @@ libbalsa_mailbox_mbox_new(const gchar * path, gboolean create)
     
     mailbox->is_directory = FALSE;
 	
-    LIBBALSA_MAILBOX_LOCAL(mailbox)->path = g_strdup(path);
+    mailbox->url = g_strconcat("file://", path, NULL);
 	
     if( libbalsa_mailbox_mbox_create(path, create) < 0 ) {
 	gtk_object_destroy(GTK_OBJECT(mailbox));
@@ -165,7 +165,7 @@ libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox *mailbox, LibBalsaMessa
 	g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox), NULL);
 	g_return_val_if_fail (LIBBALSA_IS_MESSAGE(message), NULL);
 
-	stream = fopen(LIBBALSA_MAILBOX_LOCAL(mailbox)->path, "r");
+	stream = fopen(libbalsa_mailbox_local_get_path(mailbox), "r");
 
 	return stream;
 }
@@ -175,8 +175,9 @@ libbalsa_mailbox_mbox_remove_files(LibBalsaMailboxLocal *mailbox)
 {
     g_return_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox));
 
-    if ( unlink(mailbox->path) == -1 )
+    if ( unlink(libbalsa_mailbox_local_get_path(mailbox)) == -1 )
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
 			     _("Could not remove %s:\n%s"), 
-			     mailbox->path, strerror(errno));
+			     libbalsa_mailbox_local_get_path(mailbox), 
+			     strerror(errno));
 }

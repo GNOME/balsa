@@ -250,14 +250,14 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
     if (libbalsa_create_msg(message, mqi->message,
 			    mqi->tempfile, encoding, 0)) {
 	libbalsa_lock_mutt();
-	mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(outbox)->path,
+	mutt_write_fcc(libbalsa_mailbox_local_get_path(outbox),
 		       mqi->message, NULL, 0, NULL);
 	libbalsa_unlock_mutt();
 	if (fccbox && (LIBBALSA_IS_MAILBOX_LOCAL(fccbox)
 		|| LIBBALSA_IS_MAILBOX_IMAP(fccbox))) {
 	    libbalsa_lock_mutt();
 	    if (LIBBALSA_IS_MAILBOX_LOCAL(fccbox)) {
-	    mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(fccbox)->path,
+	    mutt_write_fcc(libbalsa_mailbox_local_get_path(fccbox),
 			   mqi->message, NULL, 0, NULL);
 	    } else if (LIBBALSA_IS_MAILBOX_IMAP(fccbox)) {
 		imapfccbox = LIBBALSA_MAILBOX_IMAP(fccbox);
@@ -1218,7 +1218,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     else
 	tmp = NULL;
 
-    mutt_write_fcc(LIBBALSA_MAILBOX_LOCAL(draftbox)->path,
+    mutt_write_fcc(libbalsa_mailbox_local_get_path(draftbox),
 		   msg, tmp, 1, fcc);
     g_free(tmp);
     mutt_free_header(&msg);

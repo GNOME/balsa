@@ -252,6 +252,7 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
 
     mailbox->config_prefix = NULL;
     mailbox->name = NULL;
+    mailbox->url = NULL;
     CLIENT_CONTEXT(mailbox) = NULL;
 
     mailbox->open_ref = 0;
@@ -284,10 +285,12 @@ libbalsa_mailbox_destroy(GtkObject * object)
 	gtk_object_unref(GTK_OBJECT(mailbox->mailing_list_address));
     mailbox->mailing_list_address = NULL;
 
-    g_free(mailbox->name);
-    mailbox->name = NULL;
     g_free(mailbox->config_prefix);
     mailbox->config_prefix = NULL;
+    g_free(mailbox->name);
+    mailbox->name = NULL;
+    g_free(mailbox->url);
+    mailbox->url = NULL;
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));

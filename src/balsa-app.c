@@ -338,7 +338,7 @@ gboolean
 do_load_mailboxes(void)
 {
     if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.inbox)) {
-	libbalsa_set_spool(LIBBALSA_MAILBOX_LOCAL(balsa_app.inbox)->path);
+	libbalsa_set_spool(libbalsa_mailbox_local_get_path(balsa_app.inbox));
     } else if (LIBBALSA_IS_MAILBOX_IMAP(balsa_app.inbox)
 	       || LIBBALSA_IS_MAILBOX_POP3(balsa_app.inbox)) {
 	/* Do nothing */

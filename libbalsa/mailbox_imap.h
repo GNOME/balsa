@@ -53,6 +53,7 @@ struct _LibBalsaMailboxImapClass {
 
 GtkObject *libbalsa_mailbox_imap_new(void);
 
+void libbalsa_mailbox_imap_update_url(LibBalsaMailboxImap* mailbox);
 void libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap * mailbox,
 				    const gchar * path);
 

@@ -1,3 +1,23 @@
+2001-08-01  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* help/C/balsa.sgml: documentation updates (Peter Bloomfield).
+
+	Introduce URL field for mailbox to uniquely identify it.
+	* libbalsa/mailbox.[hc]: add url field.
+	* libbalsa/mailbox_imap.[hc]: use url field.
+	* libbalsa/mailbox_local.[hc]: remove redundant path field.
+	* libbalsa/mailbox_maildir.c: do not use removed path field.
+	* libbalsa/mailbox_mbox.c: same.
+	* libbalsa/mailbox_mh.c: same.
+	* libbalsa/notify.c: use URL field.
+	* libbalsa/send.c: do not use removed path field.
+	* src/balsa-app.c: same.
+	* src/balsa-icons.[hc]: add icons for draftbox and sentbox.
+	* src/balsa-mblist.c: use new icons.
+	* src/folder-conf.c: same.
+	* src/mailbox-conf.c: do not use removed path field.
+	* src/mailbox-node.c: same.
+	
 2001-07-31  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/main-window.c: menu entry for message view source.

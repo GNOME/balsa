@@ -355,9 +355,9 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 
 	local = LIBBALSA_MAILBOX_LOCAL(mailbox);
 
-	if (local->path)
+	if (mailbox->url)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.local.path),
-			       local->path);
+			       libbalsa_mailbox_local_get_path(local));
     } else if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	LibBalsaMailboxPop3 *pop3;
 	LibBalsaServer *server;
@@ -578,7 +578,7 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 					     (mailbox), filename)) != 0) {
 	    balsa_information(LIBBALSA_INFORMATION_WARNING,
 			      _("Rename of %s to %s failed:\n%s"),
-			      LIBBALSA_MAILBOX_LOCAL(mailbox)->path,
+			      libbalsa_mailbox_local_get_path(mailbox),
 			      filename, strerror(i));
 	    return;
 	}
@@ -676,7 +676,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
     if(update_config)
 	config_mailbox_add(mcw->mailbox, NULL);
     else {
-	gchar *dir = g_dirname(LIBBALSA_MAILBOX_LOCAL(mcw->mailbox)->path);
+	gchar *dir = g_dirname(libbalsa_mailbox_local_get_path(mcw->mailbox));
 	/* FIXME ME: find the node and rescan so it appears*/
 
 	g_free(dir);

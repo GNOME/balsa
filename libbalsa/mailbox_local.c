@@ -125,7 +125,6 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 static void
 libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox)
 {
-    mailbox->path = NULL;
 }
 
 GtkObject *
@@ -173,11 +172,12 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
     g_return_val_if_fail(path, -1);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox), -1);
 
-    if ( mailbox->path != NULL ) {
-	if (g_strcasecmp(path, mailbox->path) == 0)
+    if ( LIBBALSA_MAILBOX(mailbox)->url != NULL ) {
+	const gchar* cur_path = libbalsa_mailbox_local_get_path(mailbox);
+	if (g_strcasecmp(path, cur_path) == 0)
 	    return 0;
 	else 
-	    i = rename(mailbox->path, path);
+	    i = rename(cur_path, path);
     } else {
 	if(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox))
 	    i = libbalsa_mailbox_maildir_create(path, TRUE);
@@ -190,10 +190,10 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
     /* update mailbox data */
     if(!i) {
 	libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
-	g_free(mailbox->path);
-	mailbox->path = g_strdup(path);
+	g_free(LIBBALSA_MAILBOX(mailbox)->url);
+	LIBBALSA_MAILBOX(mailbox)->url = g_strconcat("file://", path, NULL);
 	libbalsa_notify_register_mailbox(LIBBALSA_MAILBOX(mailbox));
-	return(0);
+	return 0;
     } else
 	return errno;
 }
@@ -211,15 +211,12 @@ libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox)
 static void
 libbalsa_mailbox_local_destroy(GtkObject * object)
 {
-    LibBalsaMailboxLocal *mailbox;
+    LibBalsaMailbox *mailbox;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(object));
 
-    mailbox = LIBBALSA_MAILBOX_LOCAL(object);
-
-    libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
-
-    g_free(mailbox->path);
+    mailbox = LIBBALSA_MAILBOX(object);
+    libbalsa_notify_unregister_mailbox(mailbox);
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
@@ -236,6 +233,7 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
 {
     struct stat st;
     LibBalsaMailboxLocal *local;
+    const gchar* path;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
 
@@ -243,6 +241,7 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
 
     LOCK_MAILBOX(mailbox);
     local = LIBBALSA_MAILBOX_LOCAL(mailbox);
+    path = libbalsa_mailbox_local_get_path(mailbox);
 
     if (CLIENT_CONTEXT_OPEN(mailbox)) {
 	/* incriment the reference count */
@@ -252,14 +251,14 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
 	return;
     }
 
-    if (stat(local->path, &st) == -1) {
+    if (stat(path, &st) == -1) {
 	UNLOCK_MAILBOX(mailbox);
 	gdk_threads_enter();
 	return;
     }
     
     libbalsa_lock_mutt();
-    CLIENT_CONTEXT(mailbox) = mx_open_mailbox(local->path, 0, NULL);
+    CLIENT_CONTEXT(mailbox) = mx_open_mailbox(path, 0, NULL);
     libbalsa_unlock_mutt();
     
     if (!CLIENT_CONTEXT_OPEN(mailbox)) {
@@ -292,7 +291,7 @@ libbalsa_mailbox_local_append(LibBalsaMailbox * mailbox)
 
     res = g_new0(LibBalsaMailboxAppendHandle,1);
     libbalsa_lock_mutt();
-    res->context = mx_open_mailbox(LIBBALSA_MAILBOX_LOCAL(mailbox)->path, 
+    res->context = mx_open_mailbox(libbalsa_mailbox_local_get_path(mailbox), 
 				   M_APPEND, NULL);
     if(res->context == NULL) {
 	g_free(res);
@@ -350,7 +349,7 @@ libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 
     local = LIBBALSA_MAILBOX_LOCAL(mailbox);
 
-    gnome_config_set_string("Path", local->path);
+    gnome_config_set_string("Path", libbalsa_mailbox_local_get_path(local));
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->save_config)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->save_config(mailbox, prefix);
@@ -361,14 +360,16 @@ libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 				   const gchar * prefix)
 {
     LibBalsaMailboxLocal *local;
-
+    gchar* path;
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
 
     local = LIBBALSA_MAILBOX_LOCAL(mailbox);
 
-    g_free(local->path);
+    g_free(mailbox->url);
 
-    local->path = gnome_config_get_string("Path");
+    path = gnome_config_get_string("Path");
+    mailbox->url = g_strconcat("file://", path, NULL);
+    g_free(path);
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->load_config)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);

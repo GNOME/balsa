@@ -1,5 +1,5 @@
 <!DOCTYPE article PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.1//EN" [
-<!ENTITY version "1.0.0"> 
+<!ENTITY version "1.2.0"> 
 <!-- replace with actual application  version number-->]>
 
 <article id="index">
@@ -2845,13 +2845,14 @@
       selected a mailbox in an IMAP tree, only that tree is 
       shown for browsing; otherwise, all IMAP trees will be shown.</para>
 
-    <para>When the dialog is opened by right-clicking on an IMAP
+    <para>When the dialog is opened from the ``Mailbox->Edit'' menu item
+      with an IMAP folder selected, or by right-clicking on an IMAP
       mailbox and selecting ``Properties...'', the mailbox may be:
-    <itemizedlist mark="bullet">
-      <listitem><para>Renamed, by editing the folder name;</para></listitem>
-      <listitem><para>Moved, by browsing for a different parent folder
-	in the same tree.</para></listitem>
-    </itemizedlist></para>
+      <itemizedlist mark="bullet">
+        <listitem><para>Renamed, by editing the folder name;</para></listitem>
+        <listitem><para>Moved, by browsing for a different parent folder
+  	in the same tree.</para></listitem>
+      </itemizedlist></para>
   </sect2>
   </sect1>
 
@@ -2869,9 +2870,6 @@
 	    the main folders to be IMAP </link></para></listitem>
 
       <listitem><para><link linkend="inw-frozen"><application>Balsa</application>'s frozen!
-	  </link></para></listitem>
-
-      <listitem><para><link linkend="inw-no-print">It won't print!
 	  </link></para></listitem>
 
       <listitem><para><link linkend="inw-didnt-delete">I thought I
@@ -2898,25 +2896,16 @@
 	    sends and receives email. Use threading, if
 	    possible.</para></listitem>
 
-        <listitem><para><application>Balsa</application> is opening or
-	    closing a large mailbox. This could take a while, especially
-	    when this file is accessed via
-	    <acronym>NFS</acronym>.</para></listitem>
+        <listitem><para><application>Balsa</application> is
+	    downloading a new message or closing a large mailbox. This
+	    could take a while, especially when this file is accessed
+	    via <acronym>NFS</acronym>.</para></listitem>
 
         <listitem><para>A dialog box is being displayed but it is
 	    obscured by another one. This seems to happen under
 	    Sawfish. Try moving the windows around and see if there's a
 	    hidden dialog somewhere.</para></listitem>
       </itemizedlist>
-    </sect2>
-
-    <sect2 id="inw-no-print">
-      <title>It won't print!</title>
-
-      <para>Your print command is probably wrong. It defaults to
-	<command>&quot;a2ps -d -q %s&quot;</command>. Use the
-	configuration window to change it to something that
-	works.</para>
     </sect2>
 
     <sect2 id="inw-didnt-delete">
@@ -2944,14 +2933,17 @@
 
       <para>Were you checking your mail? Probably. This is the window
 	that displays progress for retrieving <acronym>POP3</acronym>
-	mail. If you don't have any <acronym>POP3</acronym> accounts, it
-	will still appear -- but it'll disappear almost instantly.</para>
+	mail. If you don't have any <acronym>POP3</acronym> accounts,
+	it will still appear -- but it'll disappear almost
+	instantly. You can disable displaying this window in
+	preferences.</para>
     </sect2>
 
     <sect2 id="inw-address-book">
       <title>The address book doesn't import my addresses.</title>
 
-      <para>Balsa attempts to open the file ~/.gnome/GnomeCard.gcrd. If
+      <para>Balsa attempts to open the file 
+        <filename>~/.gnome/GnomeCard.gcrd</filename>. If
 	you're not using this file, you may need to create a symlink so that
 	Balsa can open it.</para>
 
@@ -2969,17 +2961,30 @@
     <title>Authors</title>
     
     <para>
-      <application>Balsa</application> was written by
-      many people, including (in alphabetical order):
-
+      <application>Balsa</application> is currently developed by 
+      (in alphabetical order):
       <itemizedlist>
-	<listitem>
-	  <para>Hector Garcia Alvarez (<email>hector@scouts-es.org</email>)</para>
-	</listitem>	
-
 	<listitem><para>
 	    Matthew Guenther  (<email>guentherm@asme.org</email>)
-	  </para></listitem>
+	</para></listitem>
+
+	<listitem>
+	  <para>Carlos Morgado (<email>chbm@chbm.nu</email>)</para>
+	</listitem>	
+
+	<listitem>
+	  <para>Pawel Salek (<email>pawsa@theochem.kth.se</email>)</para>
+	</listitem>	
+      </itemizedlist>
+    </para>
+    <para>In the past, numerous people contributed to balsa, including
+    (in alphabetical order):
+
+      <itemizedlist>
+	<listitem><para>
+           Hector Garcia Alvarez (<email>hector@scouts-es.org</email>)
+        </para></listitem>	
+
 
 	<listitem>
 	  <para>Bruno Pires Marinho
@@ -2998,9 +3003,6 @@
 	  <para>David Pickens (<email>dpickens@iaesthetic.com</email>)</para>
 	</listitem>	
 	
-	<listitem>
-	  <para>Pawel Salek (<email>pawsa@theochem.kth.se</email>)</para>
-	</listitem>	
 
 	<listitem>
 	  <para>Peter Williams (<email>peter@newton.cx</email>)</para>

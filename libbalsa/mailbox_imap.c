@@ -176,10 +176,25 @@ libbalsa_mailbox_imap_new(void)
     return GTK_OBJECT(mailbox);
 }
 
+/* libbalsa_mailbox_imap_update_url:
+   this is to be used only by mailboxImap functions, with exception
+   for the folder scanner, which has to go around libmutt limitations.
+*/
+void
+libbalsa_mailbox_imap_update_url(LibBalsaMailboxImap* mailbox)
+{
+    LibBalsaServer* s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    g_free(LIBBALSA_MAILBOX(mailbox)->url);
+    LIBBALSA_MAILBOX(mailbox)->url =
+	g_strdup_printf("imap://%s:%i/%s", s->host, s->port, mailbox->path);
+}
+
 /* Unregister an old notification and add a current one */
 static void
 server_settings_changed(LibBalsaServer * server, LibBalsaMailbox * mailbox)
 {
+    fprintf(stderr, "changing server settings for '%s' (%p)\n",
+	    mailbox->url ? mailbox->url : "", mailbox->url);
     libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
 
     if (server->user && server->passwd && server->host)
@@ -192,6 +207,8 @@ libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap* mailbox, const gchar* path)
     g_return_if_fail(mailbox);
     g_free(mailbox->path);
     mailbox->path = g_strdup(path);
+    libbalsa_mailbox_imap_update_url(mailbox);
+
     g_return_if_fail(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
     server_settings_changed(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
 			    LIBBALSA_MAILBOX(mailbox));
@@ -209,6 +226,7 @@ server_host_settings_changed_cb(LibBalsaServer * server, gchar * host,
 				gint port, LibBalsaMailbox * mailbox)
 {
     server_settings_changed(server, mailbox);
+    libbalsa_mailbox_imap_update_url(LIBBALSA_MAILBOX_IMAP(mailbox));
 }
 
 void
@@ -233,7 +251,6 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxImap *imap;
     LibBalsaServer *server;
-    gchar *tmp;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox));
 
@@ -258,12 +275,8 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     gdk_threads_leave();
     libbalsa_lock_mutt();
     reset_mutt_passwords(server);
-
-    tmp = g_strdup_printf("{%s:%i}%s",
-			  server->host, server->port, imap->path);
-    CLIENT_CONTEXT(mailbox) = mx_open_mailbox(tmp, 0, NULL);
+    CLIENT_CONTEXT(mailbox) = mx_open_mailbox(mailbox->url, 0, NULL);
     libbalsa_unlock_mutt();
-    g_free(tmp);
 
     if (CLIENT_CONTEXT_OPEN(mailbox)) {
 	mailbox->readonly = CLIENT_CONTEXT(mailbox)->readonly;
@@ -292,18 +305,13 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 static LibBalsaMailboxAppendHandle* 
 libbalsa_mailbox_imap_append(LibBalsaMailbox * mailbox)
 {
-    gchar* tmp;
     LibBalsaServer *server;
     LibBalsaMailboxAppendHandle* res = g_new0(LibBalsaMailboxAppendHandle,1);
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
     libbalsa_lock_mutt();
     reset_mutt_passwords(server);
-    tmp = g_strdup_printf("{%s:%i}%s",
-			  server->host, server->port, 
-			  LIBBALSA_MAILBOX_IMAP(mailbox)->path);
-    res->context = mx_open_mailbox(tmp, M_APPEND, NULL);
-    g_free(tmp);
+    res->context = mx_open_mailbox(mailbox->url, M_APPEND, NULL);
 
     if(res->context == NULL) {
 	g_free(res);
@@ -441,20 +449,14 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
 
     server_settings_changed(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
 			    mailbox);
+    libbalsa_mailbox_imap_update_url(LIBBALSA_MAILBOX_IMAP(mailbox));
 }
 
 void libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox, 
 				     gboolean subscribe)
 {
-    gchar* p;
-    LibBalsaServer* server;
     g_return_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox));
-
-    server = LIBBALSA_MAILBOX_REMOTE(mailbox)->server;
-    p = g_strdup_printf("{%s:%i}%s", server->host, server->port, 
-			LIBBALSA_MAILBOX_IMAP(mailbox)->path);
-    imap_subscribe(p, subscribe);
-    g_free(p);
+    imap_subscribe(LIBBALSA_MAILBOX(mailbox)->url, subscribe);
 }
 
 /* imap_close_all_connections:
@@ -500,9 +502,5 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
 
 	instead we'll use our own new method:
     */
-    LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-    gchar *imap_path = g_strdup_printf("imap://%s:%i/%s", server->host,
-				server->port, mailbox->path);
-    imap_mailbox_delete(imap_path);
-    g_free(imap_path);
+    imap_mailbox_delete(LIBBALSA_MAILBOX(mailbox)->url);
 }

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,9 +24,12 @@
 
 #include "balsa-icons.h"
 
+#include "pixmaps/draftbox.xpm"
 #include "pixmaps/inbox.xpm"
 #include "pixmaps/outbox.xpm"
+#include "pixmaps/sentbox.xpm"
 #include "pixmaps/trash.xpm"
+
 
 #include "pixmaps/dir_closed.xpm"
 #include "pixmaps/dir_open.xpm"
@@ -62,8 +65,10 @@ struct _BalsaIcon {
     GdkBitmap *b;
 };
 
+static BalsaIcon draftbox;
 static BalsaIcon inbox;
 static BalsaIcon outbox;
+static BalsaIcon sentbox;
 static BalsaIcon trash;
 
 static BalsaIcon tray_empty;
@@ -90,8 +95,10 @@ create_icon(gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
 void
 balsa_icons_init(void)
 {
+    create_icon(draftbox_xpm, &draftbox.p, &draftbox.b);
     create_icon(inbox_xpm, &inbox.p, &inbox.b);
     create_icon(outbox_xpm, &outbox.p, &outbox.b);
+    create_icon(sentbox_xpm, &sentbox.p, &sentbox.b);
     create_icon(trash_xpm, &trash.p, &trash.b);
 
     create_icon(tray_empty_xpm, &tray_empty.p, &tray_empty.b);
@@ -113,35 +120,25 @@ GdkPixmap *
 balsa_icon_get_pixmap(BalsaIconName name)
 {
     switch (name) {
-    case BALSA_ICON_INBOX:
-	return inbox.p;
-    case BALSA_ICON_OUTBOX:
-	return outbox.p;
-    case BALSA_ICON_TRASH:
-	return trash.p;
+    case BALSA_ICON_DRAFTBOX:	return draftbox.p;
+    case BALSA_ICON_INBOX:      return inbox.p;
+    case BALSA_ICON_OUTBOX:     return outbox.p;
+    case BALSA_ICON_SENTBOX:    return sentbox.p;
+    case BALSA_ICON_TRASH:      return trash.p;
 
-    case BALSA_ICON_TRAY_EMPTY:
-	return tray_empty.p;
-    case BALSA_ICON_TRAY_FULL:
-	return tray_full.p;
+    case BALSA_ICON_TRAY_EMPTY: return tray_empty.p;
+    case BALSA_ICON_TRAY_FULL: 	return tray_full.p;
 
-    case BALSA_ICON_DIR_CLOSED:
-	return dir_closed.p;
-    case BALSA_ICON_DIR_OPEN:
-	return dir_open.p;
+    case BALSA_ICON_DIR_CLOSED:	return dir_closed.p;
+    case BALSA_ICON_DIR_OPEN:	return dir_open.p;
 
-    case BALSA_ICON_REPLIED:
-	return replied.p;
-    case BALSA_ICON_FORWARDED:
-	return forwarded.p;
+    case BALSA_ICON_REPLIED:	return replied.p;
+    case BALSA_ICON_FORWARDED:	return forwarded.p;
 
-    case BALSA_ICON_ENVELOPE:
-	return envelope.p;
+    case BALSA_ICON_ENVELOPE:	return envelope.p;
 
-    case BALSA_ICON_ARROW:
-	return arrow.p;
-    case BALSA_ICON_MULTIPART:
-	return multipart.p;
+    case BALSA_ICON_ARROW:	return arrow.p;
+    case BALSA_ICON_MULTIPART:	return multipart.p;
     }
     return NULL;
 }
@@ -150,35 +147,25 @@ GdkBitmap *
 balsa_icon_get_bitmap(BalsaIconName name)
 {
     switch (name) {
-    case BALSA_ICON_INBOX:
-	return inbox.b;
-    case BALSA_ICON_OUTBOX:
-	return outbox.b;
-    case BALSA_ICON_TRASH:
-	return trash.b;
+    case BALSA_ICON_DRAFTBOX:	return draftbox.b;
+    case BALSA_ICON_INBOX:	return inbox.b;
+    case BALSA_ICON_OUTBOX:	return outbox.b;
+    case BALSA_ICON_SENTBOX:	return sentbox.b;
+    case BALSA_ICON_TRASH:	return trash.b;
 
-    case BALSA_ICON_TRAY_EMPTY:
-	return tray_empty.b;
-    case BALSA_ICON_TRAY_FULL:
-	return tray_full.b;
+    case BALSA_ICON_TRAY_EMPTY:	return tray_empty.b;
+    case BALSA_ICON_TRAY_FULL:	return tray_full.b;
 
-    case BALSA_ICON_DIR_CLOSED:
-	return dir_closed.b;
-    case BALSA_ICON_DIR_OPEN:
-	return dir_open.b;
+    case BALSA_ICON_DIR_CLOSED:	return dir_closed.b;
+    case BALSA_ICON_DIR_OPEN:	return dir_open.b;
 
-    case BALSA_ICON_REPLIED:
-	return replied.b;
-    case BALSA_ICON_FORWARDED:
-	return forwarded.b;
+    case BALSA_ICON_REPLIED:	return replied.b;
+    case BALSA_ICON_FORWARDED:	return forwarded.b;
 
-    case BALSA_ICON_ENVELOPE:
-	return envelope.b;
+    case BALSA_ICON_ENVELOPE:	return envelope.b;
 
-    case BALSA_ICON_ARROW:
-	return arrow.b;
-    case BALSA_ICON_MULTIPART:
-	return multipart.b;
+    case BALSA_ICON_ARROW:	return arrow.b;
+    case BALSA_ICON_MULTIPART:	return multipart.b;
 
     }
     return NULL;

@@ -41,21 +41,20 @@ void
 libbalsa_notify_register_mailbox(LibBalsaMailbox * mailbox)
 {
     BUFFY *tmp;
-    gchar *path = NULL, *user, *passwd;
+    const gchar *path = NULL;
+    gchar *user, *passwd;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
-	path = g_strdup(LIBBALSA_MAILBOX_LOCAL(mailbox)->path);
+	path = libbalsa_mailbox_local_get_path(mailbox);
 	user = passwd = NULL;
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 	LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 	if (server->user && server->passwd) {
-	    gchar *p =  LIBBALSA_MAILBOX_IMAP(mailbox)->path;
-	    path = g_strdup_printf("{%s:%i}%s", server->host, server->port,
-				   p ? p : "");
 	    user = server->user;
 	    passwd = server->passwd;
+	    path = mailbox->url;
 	} else {
 	    return;
 	}
@@ -66,8 +65,6 @@ libbalsa_notify_register_mailbox(LibBalsaMailbox * mailbox)
     libbalsa_lock_mutt();
     tmp = buffy_add_mailbox(path, user, passwd);
     libbalsa_unlock_mutt();
-
-    g_free(path);
 
     g_hash_table_insert(notify_hash, mailbox, tmp);
 }

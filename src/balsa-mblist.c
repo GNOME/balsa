@@ -912,6 +912,7 @@ update_mailbox_idle(struct update_mbox_data*umd)
                                      (gpointer) &umd->store);
         bmbl_update_mailbox(umd->store, umd->mailbox, umd->total_messages);
     }
+    g_object_set_data(G_OBJECT(umd->mailbox), "mblist-update", NULL);
     gdk_threads_leave();
     g_free(umd);
     return FALSE;
@@ -923,7 +924,9 @@ bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, GtkTreeStore * store)
     struct update_mbox_data *umd;
     g_return_if_fail(mailbox);
     g_return_if_fail(store);
-
+    if(g_object_get_data(G_OBJECT(mailbox), "mblist-update"))
+        return;
+    g_object_set_data(G_OBJECT(mailbox), "mblist-update", GINT_TO_POINTER(1));
     umd = g_new(struct update_mbox_data,1);
     umd->mailbox = mailbox; umd->store = store;
     umd->total_messages = libbalsa_mailbox_total_messages(mailbox);

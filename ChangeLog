@@ -1,9 +1,17 @@
+2004-07-05  Pawel Salek
+
+	* src/balsa-mblist.c: collapse multiple ::update_mailbox events.
+	* src/balsa-message.c: set proper date on MDN (Albrecht Dreß).
+	* src/mailbox-node.c: make sure "changed" is set for scanned mailboxes.
+	* libbalsa/{misc,address-book-vcard}.c: 64bit-fixes from FC2.
+	* libinit_balsa/balsa-druid-page-directory.c: spoolbox from FC2.
+
 2004-07-04  Carlos Morgado  <chbm gnome.org>
 
 	* libbalsa/imap/imap-handle.c (imap_mbox_connect): 
 	plug slight memory leak in handle->sio
 
-2004-06-03  Pawel Salek
+2004-07-03  Pawel Salek
 
 	* configure.in, NEWS: release 2.1.90
 	* libbalsa/imap/imap-handle.c: fix without-ssl build.

@@ -285,7 +285,7 @@ load_vcard_file(LibBalsaAddressBook *ab)
 		address->address_list = g_list_reverse(address_list);
 
 		if (name) {
-                    gint bread, bwritten;
+                    gsize bread, bwritten;
                     GError *err = NULL;
                     gchar *cved = g_locale_to_utf8(name, -1, 
                                                    &bread, &bwritten, &err);

@@ -1181,7 +1181,7 @@ libbalsa_utf8_sanitize(gchar **text, gboolean fallback,
 	    *p = '?';
     } else {
 	/* */
-	gint b_written;
+	gsize b_written;
 	GError *conv_error = NULL;
 	const gchar *use_enc =
             libbalsa_get_codeset_name(*text, sanitize_fallback_codeset);

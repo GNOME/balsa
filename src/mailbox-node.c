@@ -441,6 +441,7 @@ imap_dir_cb_real(void* r)
 	    imap_scan_attach_mailbox(n, item);
         if(item->marked)
             libbalsa_mailbox_set_unread_messages_flag(n->mailbox, TRUE);
+        balsa_mblist_mailbox_node_append(n->parent, n);
 	balsa_mblist_mailbox_node_redraw(n);
 	g_object_unref(n);
         
@@ -1184,7 +1185,6 @@ imap_scan_create_mbnode(BalsaMailboxNode * root, imap_scan_item * isi,
     mbnode->scanned = isi->scanned;
 
     g_object_ref(mbnode);
-    balsa_mblist_mailbox_node_append(mbnode->parent, mbnode);
     g_object_unref(parent);
 
     return mbnode;

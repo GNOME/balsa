@@ -3875,8 +3875,8 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     message = libbalsa_message_new();
     dummy = libbalsa_address_to_gchar(balsa_app.current_ident->address, 0);
     message->headers->from = libbalsa_address_new_from_string(dummy);
-    g_message("%s: from: %s", __FUNCTION__, dummy);
     g_free (dummy);
+    message->headers->date = time(NULL);
     LIBBALSA_MESSAGE_SET_SUBJECT(message,
                                  g_strdup("Message Disposition Notification"));
     dummy = libbalsa_address_to_gchar(for_msg->headers->dispnotify_to, 0);

@@ -76,7 +76,7 @@ init_balsa_app (int argc, char *argv[])
 
 
   /* create main window */
-  balsa_app.timer = gtk_timeout_add (5 * 60 * 1000, current_mailbox_check, NULL);
+/*  balsa_app.timer = gtk_timeout_add (5 * 60 * 1000, current_mailbox_check, NULL); */
 }
 
 

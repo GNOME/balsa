@@ -76,10 +76,16 @@ static gboolean libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox
                                                             flags);
 static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 					   LibBalsaMessage * message );
-static void libbalsa_mailbox_mh_change_message_flags(LibBalsaMailbox * mailbox,
-						     guint msgno,
-						     LibBalsaMessageFlag set,
-						     LibBalsaMessageFlag clear);
+static gboolean
+libbalsa_mailbox_mh_messages_change_flags(LibBalsaMailbox * mailbox,
+                                          GArray * msgnos,
+                                          LibBalsaMessageFlag set,
+                                          LibBalsaMessageFlag clear);
+static gboolean
+libbalsa_mailbox_mh_msgno_has_flags(LibBalsaMailbox * mailbox,
+                                    guint msgno,
+                                    LibBalsaMessageFlag set,
+                                    LibBalsaMessageFlag unset);
 static guint libbalsa_mailbox_mh_total_messages(LibBalsaMailbox * mailbox);
 
 
@@ -138,8 +144,10 @@ libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass * klass)
     libbalsa_mailbox_class->fetch_message_structure =
 	libbalsa_mailbox_mh_fetch_message_structure;
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_mh_add_message;
-    libbalsa_mailbox_class->change_message_flags =
-	libbalsa_mailbox_mh_change_message_flags;
+    libbalsa_mailbox_class->messages_change_flags =
+	libbalsa_mailbox_mh_messages_change_flags;
+    libbalsa_mailbox_class->msgno_has_flags =
+	libbalsa_mailbox_mh_msgno_has_flags;
     libbalsa_mailbox_class->total_messages =
 	libbalsa_mailbox_mh_total_messages;
 
@@ -1116,24 +1124,71 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
     return 1;
 }
 
-static void
-libbalsa_mailbox_mh_change_message_flags(LibBalsaMailbox * mailbox, guint msgno,
-					   LibBalsaMessageFlag set,
-					   LibBalsaMessageFlag clear)
+static gboolean
+libbalsa_mailbox_mh_messages_change_flags(LibBalsaMailbox * mailbox,
+                                          GArray * msgnos,
+                                          LibBalsaMessageFlag set,
+                                          LibBalsaMessageFlag clear)
 {
-    struct message_info *msg_info;
+    guint i;
+    guint changed = 0;
 
-    msg_info =
-	lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox), msgno);
+    for (i = 0; i < msgnos->len; i++) {
+        guint msgno = g_array_index(msgnos, guint, i);
+        struct message_info *msg_info =
+            lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox),
+                                           msgno);
+        LibBalsaMessageFlag old_flags;
+        gboolean was_unread_undeleted, is_unread_undeleted;
 
-    g_return_if_fail (msg_info != NULL);
+	if (msg_info->flags == INVALID_FLAG)
+	    msg_info->flags = msg_info->orig_flags;
+        old_flags = msg_info->flags;
+
+        msg_info->flags |= set;
+        msg_info->flags &= ~clear;
+        if (old_flags == msg_info->flags)
+            continue;
+        ++changed;
+
+        if (msg_info->message)
+            msg_info->message->flags = msg_info->flags;
+
+        libbalsa_mailbox_index_set_flags(mailbox, msgno, msg_info->flags);
+        libbalsa_mailbox_msgno_changed(mailbox, msgno);
+
+        was_unread_undeleted = (old_flags & LIBBALSA_MESSAGE_FLAG_NEW)
+            && !(old_flags & LIBBALSA_MESSAGE_FLAG_DELETED);
+        is_unread_undeleted = (msg_info->flags & LIBBALSA_MESSAGE_FLAG_NEW)
+            && !(msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED);
+        mailbox->unread_messages +=
+            is_unread_undeleted - was_unread_undeleted;
+    }
+
+    if (changed > 0) {
+        libbalsa_mailbox_set_unread_messages_flag(mailbox,
+                                                  mailbox->unread_messages
+                                                  > 0);
+        libbalsa_mailbox_local_queue_sync(LIBBALSA_MAILBOX_LOCAL(mailbox));
+    }
+
+    return TRUE;
+}
+
+static gboolean
+libbalsa_mailbox_mh_msgno_has_flags(LibBalsaMailbox * mailbox, guint msgno,
+                                    LibBalsaMessageFlag set,
+                                    LibBalsaMessageFlag unset)
+{
+    struct message_info *msg_info =
+        lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox),
+                                       msgno);
+
     if (msg_info->flags == INVALID_FLAG)
 	msg_info->flags = msg_info->orig_flags;
-    msg_info->flags |= set;
-    msg_info->flags &= ~clear;
 
-    libbalsa_mailbox_index_set_flags(mailbox, msgno, msg_info->flags);
-    libbalsa_mailbox_local_queue_sync(LIBBALSA_MAILBOX_LOCAL(mailbox));
+    return (msg_info->flags & set) == set
+        && (msg_info->flags & unset) == 0;
 }
 
 static guint

@@ -142,8 +142,9 @@ libbalsa_condition_prepend_regex(LibBalsaCondition* cond,
 }
 
 gboolean
-match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
-		gboolean mbox_locked)
+libbalsa_condition_matches(LibBalsaCondition* cond,
+			   LibBalsaMessage * message,
+			   gboolean mbox_locked)
 {
     gboolean match = FALSE;
     gchar * str;
@@ -314,12 +315,16 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
         match = LIBBALSA_MESSAGE_HAS_FLAG(message, cond->match.flags);
         break;
     case CONDITION_AND:
-        match = match_condition(cond->match.andor.left, message, mbox_locked)
-            &&  match_condition(cond->match.andor.right, message, mbox_locked);
+        match = libbalsa_condition_matches(cond->match.andor.left,
+					   message, mbox_locked)
+            &&  libbalsa_condition_matches(cond->match.andor.right,
+					   message, mbox_locked);
         break;
     case CONDITION_OR:
-        match = match_condition(cond->match.andor.left, message, mbox_locked)
-            ||  match_condition(cond->match.andor.right, message, mbox_locked);
+        match = libbalsa_condition_matches(cond->match.andor.left,
+					   message, mbox_locked)
+            ||  libbalsa_condition_matches(cond->match.andor.right,
+					   message, mbox_locked);
         break;
     case CONDITION_NONE:
         break;
@@ -373,9 +378,9 @@ libbalsa_filter_match(GSList * filter_list, GList * messages,
 	for (lst=filter_list;!match &&  lst;lst=g_slist_next(lst)) {
 	    filt=(LibBalsaFilter*)lst->data;
 	    match = 
-		match_condition(filt->condition,
-                                LIBBALSA_MESSAGE(messages->data),
-                                mbox_locked);
+		libbalsa_condition_matches(filt->condition,
+					   LIBBALSA_MESSAGE(messages->data),
+					   mbox_locked);
 	}
 	if (match && !g_list_find(filt->matching_messages, messages->data)) {
 	    /* We hold a reference on the matching messages, to be sure they 
@@ -538,4 +543,29 @@ libbalsa_filter_get_by_name(const gchar * fname)
          list=g_slist_next(list))
         ;
     return list ? (LibBalsaFilter*)list->data : NULL;
+}
+
+/* Check whether the condition tests the message body, and if so,
+ * whether it's already loaded; used by the imap mailbox driver to
+ * decide whether to do a server-side match. */
+gboolean
+libbalsa_condition_can_match(LibBalsaCondition * cond,
+			     LibBalsaMessage * message)
+{
+    if (!message)
+	return FALSE;
+
+    switch (cond->type) {
+    case CONDITION_STRING:
+	return !(CONDITION_CHKMATCH(cond, CONDITION_MATCH_BODY)
+		 && message->body_list == NULL);
+    case CONDITION_AND:
+    case CONDITION_OR:
+	return libbalsa_condition_can_match(cond->match.andor.left,
+					    message)
+	    && libbalsa_condition_can_match(cond->match.andor.right,
+					    message);
+    default:
+	return TRUE;
+    }
 }

@@ -123,10 +123,6 @@ LibBalsaCondition* libbalsa_condition_new_bool_ptr(gboolean negated,
 LibBalsaCondition* libbalsa_condition_clone(LibBalsaCondition* cnd);
 void               libbalsa_condition_free (LibBalsaCondition*); 
 
-gboolean           match_condition(LibBalsaCondition* cond,
-                                   LibBalsaMessage * message,
-                                   gboolean mbox_locked);
-
 
 typedef enum {
     FILTER_NOOP,
@@ -305,5 +301,9 @@ void libbalsa_filters_set_filter_list(GSList** list);
  */
 gchar *filter_strerror(gint filter_errnum);
 void filter_perror(const gchar * s);
+
+/* Test */
+gboolean libbalsa_condition_can_match(LibBalsaCondition * cond,
+				      LibBalsaMessage * message);
 
 #endif				/* __FILTER_H__ */

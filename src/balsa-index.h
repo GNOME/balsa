@@ -63,8 +63,6 @@ extern "C" {
         gboolean next_message;
 	GSList *selected;
 
-        GTimeVal last_use;
-
 	gboolean line_length;
 
         /* signal handler ids */

@@ -54,6 +54,8 @@ static gboolean connection_cleanup(gpointer ptr);
 #define CONNECTION_CLEANUP_IDLE_TIME    (10*60)
 /* Send NOOP after 20 minutes to keep a connection alive */
 #define CONNECTION_CLEANUP_NOOP_TIME    (20*60)
+/* We try to avoid too many connections per server */
+#define MAX_CONNECTIONS_PER_SERVER 20
 
 G_LOCK_DEFINE_STATIC(imap_servers);
 static GHashTable *imap_servers = NULL;
@@ -152,7 +154,7 @@ libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
     server->type = LIBBALSA_SERVER_IMAP;
     imap_server->key = NULL;
     imap_server->lock = g_mutex_new();
-    imap_server->max_connections = 40;
+    imap_server->max_connections = MAX_CONNECTIONS_PER_SERVER;
     imap_server->used_connections = 0;
     imap_server->used_handles = NULL;
     imap_server->free_handles = NULL;
@@ -245,12 +247,12 @@ is_info_cb(ImapMboxHandle *h, ImapResponse rc, const gchar* str, void *arg)
         fmt = _("IMAP server %s error: %s");
         it = LIBBALSA_INFORMATION_ERROR;
         break;
-    default: 
-        return;
-        /* As much as it is fun to watch different commands succeed,
-         * it is just a distraction for the users, isn't it? */
+    case IMR_BYE: 
+    case IMR_NO: 
         /* IMAP host name + message */
-        /* fmt = _("%s: %s");  it = LIBBALSA_INFORMATION_MESSAGE; break; */
+        fmt = _("%s: %s");  it = LIBBALSA_INFORMATION_MESSAGE; break;
+    default:
+        return;
     }
     libbalsa_information(it, fmt, is->host, str);
 }
@@ -576,9 +578,11 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
                 g_list_delete_link(imap_server->free_handles, conn);
         }
     }
-    /* create if used < max connections */
+    /* create if used < max connections;
+     * always leave one connection for actions without user, i.e.
+     * those that do not SELECT any mailbox. */
     if (!info
-        && imap_server->used_connections < imap_server->max_connections) {
+        && imap_server->used_connections < imap_server->max_connections-1) {
         g_mutex_unlock(imap_server->lock);
         info = lb_imap_server_info_new(server);
         if (!info)
@@ -602,7 +606,16 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
         imap_server->free_handles =
             g_list_delete_link(imap_server->free_handles, conn);
     }
-    if (info && imap_mbox_is_disconnected(info->handle)) {
+    if(!info) {
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_TOOMANYOPEN_ERROR,
+                    _("Exceeded the number of connections per server %s"),
+                    server->host);
+        g_mutex_unlock(imap_server->lock);
+        return NULL;
+    }
+
+    if (imap_mbox_is_disconnected(info->handle)) {
         rc=imap_mbox_handle_connect(info->handle, server->host,
                                     REQ_SSL(server));
         if(rc != IMAP_SUCCESS) {
@@ -619,15 +632,13 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
         }
     }
     /* add handle to used list */
-    if (info) {
-        info->last_user = user;
-        imap_server->used_handles = g_list_prepend(imap_server->used_handles,
-                                                   info);
-        imap_server->used_connections++;
-    }
+    info->last_user = user;
+    imap_server->used_handles = g_list_prepend(imap_server->used_handles,
+                                               info);
+    imap_server->used_connections++;
     g_mutex_unlock(imap_server->lock);
 
-    return info ? info->handle : NULL;
+    return info->handle;
 }
 
 /**

@@ -48,6 +48,7 @@ struct _LibBalsaMailboxPop3 {
     gboolean delete_from_server;
     gchar *filter_cmd;
     LibBalsaMailbox *inbox;
+    gint msg_size_limit;
     unsigned filter:1; /* filter through procmail/filter_cmd? */
     unsigned disable_apop:1; /* Some servers claim to support it but
                               * they do not. */
@@ -62,7 +63,8 @@ struct _LibBalsaMailboxPop3Class {
 GObject *libbalsa_mailbox_pop3_new(void);
 void libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox,
                                      LibBalsaMailbox *inbox);
-
+void libbalsa_mailbox_pop3_set_msg_size_limit(LibBalsaMailboxPop3 *mailbox,
+                                              gint sz_limit);
 extern int PopDebug;
 
 #endif				/* __LIBBALSA_MAILBOX_POP3_H__ */

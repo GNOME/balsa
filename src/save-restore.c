@@ -847,6 +847,7 @@ config_global_load(void)
     balsa_app.check_imap=d_get_gint("CheckIMAP", 1);
     balsa_app.check_imap_inbox=d_get_gint("CheckIMAPInbox", 0);
     balsa_app.quiet_background_check=d_get_gint("QuietBackgroundCheck", 0);
+    balsa_app.msg_size_limit=d_get_gint("POPMsgSizeLimit", 20000);
     gnome_config_pop_prefix();
 
     /* folder scanning */
@@ -1201,6 +1202,7 @@ config_save(void)
     gnome_config_set_int("CheckIMAPInbox", balsa_app.check_imap_inbox);
     gnome_config_set_int("QuietBackgroundCheck",
 			 balsa_app.quiet_background_check);
+    gnome_config_set_int("POPMsgSizeLimit", balsa_app.msg_size_limit);
 
     gnome_config_pop_prefix();
 

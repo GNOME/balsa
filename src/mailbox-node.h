@@ -65,12 +65,13 @@ struct _BalsaMailboxNode {
     BalsaMailboxNode *parent; /* NULL for root-level folders & mailboxes */
     LibBalsaMailbox *mailbox; /* != NULL for leaves only */
     gchar *name;       /* used for folders, i.e. when mailbox == NULL */
+    time_t last_use;   /* for closing least recently used mailboxes */
     BalsaMailboxNodeStyle style;
-    int remote:1;   /* is dirname or server field used in data union.
-		     * If there is a need for more types, make a subclass. */
     /* folder data */
     gchar* config_prefix;
     gchar* dir;      
+    int remote:1;   /* is dirname or server field used in data union.
+		     * If there is a need for more types, make a subclass. */
     int expanded:1; 
     /* mailbox data */
     LibBalsaServer * server; /* Used only by remote; is referenced */

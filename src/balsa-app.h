@@ -214,6 +214,7 @@ extern struct BalsaApplication {
     gint check_imap;
     gint check_imap_inbox;
     gint quiet_background_check;
+    gint msg_size_limit; /* for POP mailboxes; in kB */
 
     /* GUI settings */
     gint mw_width;

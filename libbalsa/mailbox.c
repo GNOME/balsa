@@ -446,6 +446,20 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
     return mailbox;
 }
 
+static void
+libbalsa_mailbox_free_mindex(LibBalsaMailbox *mailbox)
+{
+    if(mailbox->mindex) {
+        unsigned i;
+        /* we could have used g_ptr_array_foreach but it is >=2.4.0 */
+        for(i=0; i<mailbox->mindex->len; i++)
+            libbalsa_mailbox_index_entry_free
+                (g_ptr_array_index(mailbox->mindex, i));
+        g_ptr_array_free(mailbox->mindex, TRUE);
+        mailbox->mindex = NULL;
+    }
+}
+
 static void lbm_set_threading(LibBalsaMailbox * mailbox,
                               LibBalsaMailboxThreadingType thread_type);
 gboolean
@@ -469,6 +483,8 @@ libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err)
             LIBBALSA_MAILBOX_GET_CLASS(mailbox)->open_mailbox(mailbox, err);
         if(retval)
             mailbox->open_ref++;
+        else
+            libbalsa_mailbox_free_mindex(mailbox);
     }
 
     libbalsa_unlock_mailbox(mailbox);
@@ -513,15 +529,7 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
             g_node_destroy(mailbox->msg_tree);
             mailbox->msg_tree = NULL;
         }
-        if(mailbox->mindex) {
-            unsigned i;
-            /* we could have used g_ptr_array_foreach but it is >=2.4.0 */
-            for(i=0; i<mailbox->mindex->len; i++)
-                libbalsa_mailbox_index_entry_free
-                    (g_ptr_array_index(mailbox->mindex, i));
-            g_ptr_array_free(mailbox->mindex, TRUE);
-            mailbox->mindex = NULL;
-        }
+        libbalsa_mailbox_free_mindex(mailbox);
         mailbox->stamp++;
     }
 

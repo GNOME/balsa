@@ -129,6 +129,7 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox)
     mailbox->check = FALSE;
     mailbox->delete_from_server = FALSE;
     mailbox->inbox = NULL;
+    mailbox->msg_size_limit = -1;
 
     mailbox->filter = FALSE;
     mailbox->filter_cmd = NULL;
@@ -517,6 +518,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     }
     for(i=1; i<=msgcnt; i++) {
         char *msg_path = mode->get_path(dest_path, i);
+        unsigned msg_size = pop_get_msg_size(pop, i);
 #if POP_SYNC
         FILE *f;
 #endif
@@ -526,6 +528,13 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
             g_hash_table_insert(current_uids, full_uid, GINT_TO_POINTER(1));
             if(g_hash_table_lookup(uids, full_uid))
                 continue;
+        }
+        if(m->msg_size_limit>0 && msg_size >= (unsigned)m->msg_size_limit) {
+            libbalsa_information
+                (LIBBALSA_INFORMATION_WARNING,
+                 _("POP3 message %d oversized: %d kB - skipped."),
+                 i, msg_size);
+            continue;
         }
 #if POP_SYNC
         libbalsa_mailbox_progress_notify(mailbox,
@@ -702,4 +711,11 @@ libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox,
     pop = LIBBALSA_MAILBOX_POP3(mailbox);
 
 	pop->inbox=inbox;
+}
+
+void
+libbalsa_mailbox_pop3_set_msg_size_limit(LibBalsaMailboxPop3 *pop,
+                                         gint sz_limit)
+{
+    pop->msg_size_limit = sz_limit;
 }

@@ -1862,9 +1862,9 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
 static gboolean
 balsa_close_commit_mailbox_on_timer(GtkWidget * widget, gpointer * data)
 {
-    GTimeVal current_time;
+    time_t current_time;
     GtkWidget *page;
-    int i, c, time;
+    int i, c, delta_time;
 
     if (!balsa_app.notebook)
         return FALSE;
@@ -1872,7 +1872,7 @@ balsa_close_commit_mailbox_on_timer(GtkWidget * widget, gpointer * data)
         return TRUE;
 
     gdk_threads_enter();
-    g_get_current_time(&current_time);
+    time(&current_time);
 
     c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
 
@@ -1881,25 +1881,26 @@ balsa_close_commit_mailbox_on_timer(GtkWidget * widget, gpointer * data)
           gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
          i++) {
 	BalsaIndex *index = BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
-        time = current_time.tv_sec - index->last_use.tv_sec;
+        delta_time = current_time - index->mailbox_node->last_use;
         if (balsa_app.commit_mailbox_auto &&
-            time < 31+balsa_app.commit_mailbox_timeout &&
+            delta_time < 31+balsa_app.commit_mailbox_timeout &&
             /* only do this once */
-            time > balsa_app.commit_mailbox_timeout &&
+            delta_time > balsa_app.commit_mailbox_timeout &&
 	    !BALSA_INDEX(index)->mailbox_node->mailbox->readonly) {
             if (balsa_app.debug)
                 fprintf(stderr, "Commiting %s, time: %d\n",
                         BALSA_INDEX(index)->mailbox_node->mailbox->url ,
-                        time);
+                        delta_time);
             libbalsa_mailbox_sync_storage
                 (BALSA_INDEX(index)->mailbox_node->mailbox, FALSE);
         }
 	if (i == c)
             continue;
         if (balsa_app.close_mailbox_auto &&
-	    time > balsa_app.close_mailbox_timeout) {
+	    delta_time > balsa_app.close_mailbox_timeout) {
             if (balsa_app.debug)
-                fprintf(stderr, "Closing Page %d, time: %d\n", i, time);
+                fprintf(stderr, "Closing Page %d unused for %d s\n",
+                        i, delta_time);
             unregister_open_mailbox(index->mailbox_node->mailbox);
             gtk_notebook_remove_page(GTK_NOTEBOOK(balsa_app.notebook), i);
             if (i < c)
@@ -2067,6 +2068,8 @@ check_mailbox_list(GList * mailbox_list)
     while (list) {
         mailbox = BALSA_MAILBOX_NODE(list->data)->mailbox;
         libbalsa_mailbox_pop3_set_inbox(mailbox, balsa_app.inbox);
+        libbalsa_mailbox_pop3_set_msg_size_limit
+            (LIBBALSA_MAILBOX_POP3(mailbox), balsa_app.msg_size_limit*1024);
         libbalsa_mailbox_check(mailbox);
         list = g_list_next(list);
     }

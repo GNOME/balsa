@@ -1241,7 +1241,7 @@ imap_get_string_with_lookahead(struct siobuf* sio, int c)
     if( c != 0x0d) { printf("lit1:%d\n",c); return NULL;}
     if( (c=sio_getc(sio)) != 0x0a) { printf("lit1:%d\n",c); return NULL;}
     res = g_malloc(len+1);
-    sio_read(sio, res, len);
+    if(len>0) sio_read(sio, res, len);
     res[len] = '\0';
   }
   return res;

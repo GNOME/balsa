@@ -1018,14 +1018,14 @@ balsa_mblist_open_mailbox(LibBalsaMailbox * mailbox)
 
     /* If we currently have a page open, update the time last visited */
     if (index) {
-	g_get_current_time(&BALSA_INDEX(index)->last_use);
+	time(&BALSA_INDEX(index)->mailbox_node->last_use);
     }
     
     i = balsa_find_notebook_page_num(mailbox);
     if (i != -1) {
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(balsa_app.notebook), i);
         index = balsa_window_find_current_index(balsa_app.main_window);
-	g_get_current_time(&BALSA_INDEX(index)->last_use);
+	time(&BALSA_INDEX(index)->mailbox_node->last_use);
         balsa_index_set_column_widths(BALSA_INDEX(index));
     } else { /* page with mailbox not found, open it */
 	balsa_window_open_mbnode(balsa_app.main_window, mbnode);
@@ -1052,6 +1052,58 @@ balsa_mblist_close_mailbox(LibBalsaMailbox * mailbox)
 
     balsa_window_close_mbnode(balsa_app.main_window, mbnode);
     g_object_unref(mbnode);
+}
+
+/* balsa_mblist_close_lru_peer_mbx closes least recently used mailbox
+ * on the same server as the one given as the argument: some IMAP
+ * servers limit the number of simultaneously open connections. */
+struct lru_data {
+    GtkTreePath     *ancestor_path;
+    BalsaMailboxNode *mbnode;
+};
+
+static gboolean
+get_lru_descendant(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
+                   gpointer data)
+{
+    struct lru_data *dt  = (struct lru_data*)data;
+    BalsaMailboxNode *mbnode;
+
+    if(!gtk_tree_path_is_descendant(path, dt->ancestor_path))
+        return FALSE;
+    gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
+    if(mbnode->mailbox && libbalsa_mailbox_is_open(mbnode->mailbox) &&
+       (!dt->mbnode || (mbnode->last_use < dt->mbnode->last_use)) )
+        dt->mbnode = mbnode; 
+
+    else g_object_unref(mbnode);
+    return FALSE;
+}
+
+gboolean
+balsa_mblist_close_lru_peer_mbx(BalsaMBList * mblist,
+                                LibBalsaMailbox *mailbox)
+{
+    GtkTreeModel *model;
+    GtkTreeIter   iter;
+    struct lru_data dt;
+    g_return_val_if_fail(mailbox, FALSE);
+
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(mblist));
+
+    if(!balsa_find_iter_by_data(&iter, mailbox))
+        return FALSE;
+    dt.ancestor_path = gtk_tree_model_get_path(model, &iter);
+    while(gtk_tree_path_get_depth(dt.ancestor_path)>1)
+        gtk_tree_path_up(dt.ancestor_path);
+
+    dt.mbnode = NULL;
+    gtk_tree_model_foreach(model, get_lru_descendant, &dt);
+    if(dt.mbnode) {
+        balsa_window_close_mbnode(balsa_app.main_window, dt.mbnode);
+        g_object_unref(dt.mbnode);
+    }
+    return dt.mbnode != NULL;
 }
 
 /* balsa_mblist_default_signal_bindings:

@@ -420,7 +420,6 @@ bndx_instance_init(BalsaIndex * index)
                      G_CALLBACK(bndx_drag_cb), NULL);
 
     balsa_index_set_column_widths(index);
-    g_get_current_time (&index->last_use);
     gtk_widget_show_all (GTK_WIDGET(index));
 }
 
@@ -785,6 +784,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     LibBalsaMailbox* mailbox;
     gchar *msg;
     gboolean successp;
+    gint try_cnt;
 
     g_return_val_if_fail(BALSA_IS_INDEX(index), TRUE);
     g_return_val_if_fail(index->mailbox_node == NULL, TRUE);
@@ -796,11 +796,19 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
 			  mbnode->mailbox->name);
     gnome_appbar_push(balsa_app.appbar, msg);
     g_free(msg);
-    gdk_threads_leave();
-    successp = libbalsa_mailbox_open(mailbox, err);
-    gdk_threads_enter();
-    if (!balsa_app.main_window)
-	return FALSE;
+    try_cnt = 0;
+    do {
+        gdk_threads_leave();
+        successp = libbalsa_mailbox_open(mailbox, err);
+        gdk_threads_enter();
+        if (!balsa_app.main_window)
+            return FALSE;
+        if(successp &&
+           !(*err && (*err)->code == LIBBALSA_MAILBOX_TOOMANYOPEN_ERROR))
+            break;
+        balsa_mblist_close_lru_peer_mbx(balsa_app.mblist, mailbox);
+        g_clear_error(err);
+    } while(try_cnt++<3);
     gnome_appbar_pop(balsa_app.appbar);
 
     if (!successp)
@@ -850,6 +858,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
 
     /* Create a search-iter for SEARCH UNDELETED. */
     index->search_iter = libbalsa_mailbox_search_iter_new(&cond_undeleted);
+    time(&index->mailbox_node->last_use);
 
     return FALSE;
 }
@@ -1175,7 +1184,7 @@ bndx_mailbox_changed_func(BalsaIndex * bindex)
         gtk_tree_path_free(path);
     }
 
-    g_get_current_time (&bindex->last_use);
+    time(&bindex->mailbox_node->last_use);
     bndx_changed_find_row(bindex);
 }
 

@@ -72,6 +72,7 @@ typedef struct _PropertyUI {
     GtkWidget *check_mail_auto;
     GtkWidget *check_mail_minutes;
     GtkWidget *quiet_background_check;
+    GtkWidget *msg_size_limit;
     GtkWidget *check_imap;
     GtkWidget *check_imap_inbox;
     GtkWidget *notify_new_mail_dialog;
@@ -491,6 +492,8 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     g_signal_connect(G_OBJECT(pui->quiet_background_check), "toggled",
 		     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->msg_size_limit), "changed",
+		     G_CALLBACK(properties_modified_cb), property_box);
 
     g_signal_connect(G_OBJECT(pui->check_imap), "toggled",
 		     G_CALLBACK(imap_toggled_cb), property_box);
@@ -746,6 +749,9 @@ apply_prefs(GtkDialog * pbox)
 					 (pui->check_mail_minutes));
     balsa_app.quiet_background_check =
 	GTK_TOGGLE_BUTTON(pui->quiet_background_check)->active;
+    balsa_app.msg_size_limit =
+	gtk_spin_button_get_value_as_float(GTK_SPIN_BUTTON
+                                           (pui->msg_size_limit))*1024;
     balsa_app.check_imap =
 	GTK_TOGGLE_BUTTON(pui->check_imap)->active;
     balsa_app.check_imap_inbox =
@@ -1009,6 +1015,8 @@ set_prefs(void)
     gtk_toggle_button_set_active(
 	GTK_TOGGLE_BUTTON(pui->quiet_background_check),
 	balsa_app.quiet_background_check);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->msg_size_limit),
+			      ((float) balsa_app.msg_size_limit)/1024);
     gtk_toggle_button_set_active(
 	GTK_TOGGLE_BUTTON(pui->check_imap),
 	balsa_app.check_imap);
@@ -1631,7 +1639,7 @@ checking_group(GtkWidget * page)
     GtkWidget *label;
 
     group = pm_group_new(_("Checking"));
-    table = create_table(4, 4, page);
+    table = create_table(5, 4, page);
     pm_group_add(group, table);
 
     pui->check_mail_auto = gtk_check_button_new_with_mnemonic(
@@ -1671,6 +1679,18 @@ checking_group(GtkWidget * page)
 	_("Do background check quietly (no messages in status bar)"));
     gtk_table_attach(GTK_TABLE(table), pui->quiet_background_check,
                      0, 4, 3, 4, GTK_FILL, 0, 0, 0);
+
+    label = gtk_label_new_with_mnemonic(_("_POP message size limit:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 4, 5,
+                     GTK_FILL, 0, 0, 0);
+    pui->msg_size_limit = gtk_spin_button_new_with_range(0.1, 100, 0.1);
+    gtk_table_attach(GTK_TABLE(table), pui->msg_size_limit, 1, 2, 4, 5,
+                     GTK_FILL, 0, 0, 0);
+    label = gtk_label_new(_("MB"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 2, 3, 4, 5,
+                     GTK_FILL, 0, 0, 0);
     
     return group;
 }

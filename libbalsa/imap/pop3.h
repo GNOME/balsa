@@ -72,6 +72,7 @@ void     pop_set_usercb    (PopHandle *pop, ImapUserCb user_cb, void *arg_cb);
 void     pop_set_infocb    (PopHandle *pop, PopUserCb user_cb, void *arg_cb);
 gboolean pop_connect       (PopHandle *pop, const char *host, GError **err);
 unsigned pop_get_exists    (PopHandle *pop, GError **err);
+unsigned pop_get_msg_size  (PopHandle *pop, unsigned msgno);
 unsigned long pop_get_total_size(PopHandle *pop);
 const char* pop_get_uid    (PopHandle *pop, unsigned msgno, GError **err);
 
@@ -88,7 +89,7 @@ gboolean pop_destroy(PopHandle *pop, GError **err);
    request. Generally, asynchronous request should not be interleaved
    with synchronous ones. The callback may be called several times for
    fetch request. The first one is always one of OK or ERR. If the
-   first response if err, the callback should not hope any more. If
+   first response is ERR, the callback should not hope any more. If
    the first response is OK, and the request is fetch, subsequent
    multiple calls with codes DATA and eveventally last one with DONE
    will follow.

@@ -83,6 +83,7 @@ struct PopHandle_ {
 
   unsigned      msg_cnt;
   unsigned long total_size;
+  GArray    *msg_sizes;
   GPtrArray *uids;
 
   ImapMonitorCb monitor_cb;
@@ -116,6 +117,7 @@ pop_new(void)
   pop->timeout = -1;
   pop->tls_mode = IMAP_TLS_ENABLED;
   pop->tls_enabled = 0;
+  pop->msg_sizes = g_array_new(FALSE, TRUE, sizeof(unsigned));
   return pop;
 }
 
@@ -424,6 +426,42 @@ pop_stls(PopHandle *pop, GError **err)
 }
 #endif
 
+static gboolean
+parse_list_response(PopHandle *pop, char *line, ssize_t sz, GError **err)
+{
+  if(sio_gets(pop->sio, line, sz) && strncmp(line, "+OK", 3) == 0) {
+    pop->total_size = 0;
+    pop->msg_cnt    = 0;
+    do {
+      unsigned msg, msg_size;
+      if(!sio_gets(pop->sio, line, sz)) {
+        g_set_error(err, IMAP_ERROR, IMAP_POP_PROTOCOL_ERROR,
+                    "Server %s did not respond to LIST command",
+                    pop->host);
+        return FALSE;
+      }
+      if(line[0]=='.' && (line[1] == '\r' || line[1] == '\n'))
+        break;
+      if( sscanf(line, "%u%u", &msg, &msg_size) < 2 ) {
+        g_set_error(err, IMAP_ERROR, IMAP_POP_PROTOCOL_ERROR,
+                    "Server %s did not response correctly to LIST: %s",
+                    pop->host, line);
+        return FALSE;
+      }
+      if(pop->msg_sizes->len < msg)
+        g_array_set_size(pop->msg_sizes, msg);
+      g_array_index(pop->msg_sizes,unsigned,msg-1) = msg_size;
+      pop->total_size += msg_size;
+    } while(1);
+    pop->msg_cnt = pop->msg_sizes->len;
+    return TRUE;
+  } else {
+    g_set_error(err, IMAP_ERROR, IMAP_POP_PROTOCOL_ERROR,
+                "Server %s answered to LIST command: %s",
+                pop->host, line);
+    return FALSE;
+  }
+}
 
 /** pop_connect connects and authenticates using usercb */
 gboolean
@@ -506,21 +544,10 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
   }
   pop->state = IMHS_AUTHENTICATED;
   /* get basic information about the mailbox */
-  sio_write(pop->sio, "Stat\r\n", 6);
-  sio_flush(pop->sio);
-  if(sio_gets(pop->sio, line, sizeof(line)) && strncmp(line, "+OK", 3) == 0) {
-    if( sscanf(line + 3, " %u %lu", &pop->msg_cnt, &pop->total_size) < 2 ) {
-      g_set_error(err, IMAP_ERROR, IMAP_POP_PROTOCOL_ERROR,
-                  "Server %s did not return message count: %s",
-                  pop->host, line);
-      return FALSE;
-    }
-  } else {
-    g_set_error(err, IMAP_ERROR, IMAP_POP_PROTOCOL_ERROR,
-                "Server %s did not respond to Stat command.",
-                pop->host);
+  sio_write(pop->sio, "List\r\n", 6); sio_flush(pop->sio);
+  if(!parse_list_response(pop, line, sizeof(line), err))
     return FALSE;
-  }
+
   pop->max_req_queue_len = 
     pop_can_do(pop, POP_CAP_PIPELINING) /* && pop->enable_pipe */
     ? POP_QUEUE_LEN/2 : 1;
@@ -531,6 +558,13 @@ unsigned
 pop_get_exists(PopHandle *pop, GError **err)
 {
   return pop->msg_cnt;
+}
+
+unsigned
+pop_get_msg_size(PopHandle *pop, unsigned msgno)
+{
+  return (msgno <= pop->msg_cnt)
+    ? g_array_index(pop->msg_sizes, unsigned, msgno-1) : 0;
 }
 
 unsigned long
@@ -623,6 +657,7 @@ pop_destroy(PopHandle *pop, GError **err)
     }
     g_ptr_array_free(pop->uids, TRUE);
   }
+  g_array_free(pop->msg_sizes, TRUE);
   g_free(pop->host);
   g_free(pop);
   return res;

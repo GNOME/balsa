@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.9.2\n"
 "POT-Creation-Date: 2001-01-22 00:58+0100\n"
-"PO-Revision-Date: 2001-01-22 20:30+01:00\n"
+"PO-Revision-Date: 2001-01-27 20:30+01:00\n"
 "Last-Translator: Keld Simonsen <keld@dkuug.dk>\n"
 "Language-Team: Danish <dansk@klid.dk>\n"
 "MIME-Version: 1.0\n"
@@ -213,6 +213,15 @@ msgstr "Modtager besked %d af %d"
 #, c-format
 msgid "Received %d bytes of %d"
 msgstr "Modtog %d byte af %d"
+
+#. We create here the progress bar
+#: libbalsa/send.c:273 libbalsa/send.c:276
+msgid "Sending Mail..."
+msgstr "Sender post..."
+
+#: libbalsa/send.c:273
+msgid "Hide"
+msgstr "Skjul"
 
 #: libbalsa/send.c:416
 msgid ""
@@ -694,45 +703,45 @@ msgstr "Certifikat gemt"
 msgid "Continue?"
 msgstr "Fortsæt?"
 
-#: src/address-book.c:160 src/filter-edit-dialog.c:130
+#: src/address-book.c:161 src/filter-edit-dialog.c:130
 msgid "Name"
 msgstr "Navn"
 
-#: src/address-book.c:160
+#: src/address-book.c:161
 msgid "E-Mail Address"
 msgstr "Epostadresse"
 
-#: src/address-book.c:163
+#: src/address-book.c:164
 msgid "Address Book"
 msgstr "Adressebog"
 
 #. Entry widget for finding an address
-#: src/address-book.c:242
+#: src/address-book.c:243
 msgid "Search for Name:"
 msgstr "Søg efter navn:"
 
-#: src/address-book.c:310
+#: src/address-book.c:311
 msgid "Send-To"
 msgstr "Send-til"
 
-#: src/address-book.c:329
+#: src/address-book.c:330
 msgid "Run GnomeCard"
 msgstr "Kør GnomeCard"
 
-#: src/address-book.c:337
+#: src/address-book.c:338
 msgid "Re-Import"
 msgstr "Genimportér"
 
 #. mode switching stuff
-#: src/address-book.c:346
+#: src/address-book.c:347
 msgid "Treat multiple addresses as:"
 msgstr "Behandl flere adresser som:"
 
-#: src/address-book.c:350
+#: src/address-book.c:351
 msgid "alternative addresses for the same person"
 msgstr "andre adresser for den samme person"
 
-#: src/address-book.c:355
+#: src/address-book.c:356
 msgid "a distribution list"
 msgstr "en distributionsliste"
 
@@ -906,7 +915,7 @@ msgid "Save"
 msgstr "Gem"
 
 #: src/balsa-message.c:291 src/mailbox-conf.c:170 src/mailbox-conf.c:180
-#: src/sendmsg-window.c:160 src/sendmsg-window.c:665
+#: src/sendmsg-window.c:160 src/sendmsg-window.c:666
 msgid "Cancel"
 msgstr "Annullér"
 
@@ -924,7 +933,7 @@ msgid " Could not save %s:%s "
 msgstr " Kunne ikke gemme %s:%s "
 
 #. Subject:
-#: src/balsa-message.c:643 src/print.c:358 src/sendmsg-window.c:949
+#: src/balsa-message.c:643 src/print.c:358 src/sendmsg-window.c:950
 msgid "Subject:"
 msgstr "Emne:"
 
@@ -934,28 +943,28 @@ msgstr "Dato:"
 
 #. From:
 #: src/balsa-message.c:651 src/filter-edit-dialog.c:316 src/print.c:348
-#: src/sendmsg-window.c:940
+#: src/sendmsg-window.c:941
 msgid "From:"
 msgstr "Fra:"
 
 #. To:
 #: src/balsa-message.c:655 src/filter-edit-dialog.c:306 src/print.c:353
-#: src/sendmsg-window.c:943
+#: src/sendmsg-window.c:944
 msgid "To:"
 msgstr "Til:"
 
 #. cc:
-#: src/balsa-message.c:656 src/sendmsg-window.c:951
+#: src/balsa-message.c:656 src/sendmsg-window.c:952
 msgid "Cc:"
 msgstr "Cc:"
 
 #. bcc:
-#: src/balsa-message.c:657 src/sendmsg-window.c:955
+#: src/balsa-message.c:657 src/sendmsg-window.c:956
 msgid "Bcc:"
 msgstr "Bcc:"
 
 #. fcc:
-#: src/balsa-message.c:660 src/sendmsg-window.c:959
+#: src/balsa-message.c:660 src/sendmsg-window.c:960
 msgid "Fcc:"
 msgstr "Fcc:"
 
@@ -1097,7 +1106,7 @@ msgstr "Krop"
 msgid "Match string:"
 msgstr "Find tekst:"
 
-#: src/filter-edit-dialog.c:384 src/sendmsg-window.c:574
+#: src/filter-edit-dialog.c:384 src/sendmsg-window.c:575
 msgid "Remove"
 msgstr "Fjern"
 
@@ -2576,7 +2585,7 @@ msgstr "_Sprog"
 msgid "_Options"
 msgstr "_Indstillinger"
 
-#: src/sendmsg-window.c:638
+#: src/sendmsg-window.c:639
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -2584,88 +2593,88 @@ msgstr ""
 "Vedhæftningsikonen (balsa/attachment.png) kunne ikke findes.\n"
 "Det betyder desværre at du ikke kan vedhæfte filer.\n"
 
-#: src/sendmsg-window.c:653
+#: src/sendmsg-window.c:654
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Kan ikke få oplysninger om filen '%s': %s\n"
 
-#: src/sendmsg-window.c:659
+#: src/sendmsg-window.c:660
 #, c-format
 msgid "Attachment is not a regular file or cannot be read: '%s'\n"
 msgstr "Bilaget er ikke en almindelig fil eller kan ikke læses: '%s'\n"
 
-#: src/sendmsg-window.c:735
+#: src/sendmsg-window.c:736
 msgid "Attach file"
 msgstr "Vedhæft bilag"
 
 #. Reply To:
-#: src/sendmsg-window.c:982
+#: src/sendmsg-window.c:983
 msgid "Reply To:"
 msgstr "Svar til:"
 
 #. Attachment list
-#: src/sendmsg-window.c:986
+#: src/sendmsg-window.c:987
 msgid "Attachments:"
 msgstr "Bilag:"
 
 #. Comments:
-#: src/sendmsg-window.c:1031
+#: src/sendmsg-window.c:1032
 msgid "Comments:"
 msgstr "Kommentarer:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1034
+#: src/sendmsg-window.c:1035
 msgid "Keywords:"
 msgstr "Nøgleord:"
 
-#: src/sendmsg-window.c:1128
+#: src/sendmsg-window.c:1129
 msgid "you"
 msgstr "dig"
 
-#: src/sendmsg-window.c:1133
+#: src/sendmsg-window.c:1134
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "%s skrev %s:\n"
 
-#: src/sendmsg-window.c:1136
+#: src/sendmsg-window.c:1137
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s skrev:\n"
 
-#: src/sendmsg-window.c:1227
+#: src/sendmsg-window.c:1228
 msgid "Reply to "
 msgstr "Svar "
 
-#: src/sendmsg-window.c:1232
+#: src/sendmsg-window.c:1233
 msgid "Forward message"
 msgstr "Videresend brev"
 
-#: src/sendmsg-window.c:1237
+#: src/sendmsg-window.c:1238
 msgid "Continue message"
 msgstr "Fortsæt brev"
 
-#: src/sendmsg-window.c:1242
+#: src/sendmsg-window.c:1243
 msgid "New message"
 msgstr "Nyt brev"
 
-#: src/sendmsg-window.c:1554
+#: src/sendmsg-window.c:1555
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Kunne ikke åbne filen %s.\n"
 
-#: src/sendmsg-window.c:1556
+#: src/sendmsg-window.c:1557
 msgid "Loading..."
 msgstr "Indlæser..."
 
-#: src/sendmsg-window.c:1583
+#: src/sendmsg-window.c:1584
 msgid "Include file"
 msgstr "Inkludér fil"
 
-#: src/sendmsg-window.c:1866
+#: src/sendmsg-window.c:1867
 msgid "Cannot execute print command."
 msgstr "Kan ikke udføre printerkommando."
 
-#: src/sendmsg-window.c:1889
+#: src/sendmsg-window.c:1890
 msgid "Error executing lpr"
 msgstr "Fejl under kørsel af lpr"
 

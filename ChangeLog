@@ -1,5 +1,10 @@
 2003-07-08  Danilo Šegan  <dsegan@gmx.net>
 
+	* src/main-window.c (show_about_box): Use the "translator_credits"
+	in Gnome about box - fixes bug #116994.
+
+2003-07-08  Danilo Šegan  <dsegan@gmx.net>
+
 	* balsa.desktop, sounds/balsa.soundlist, sounds/email.soundlist:
 	Added Serbian translations.
 

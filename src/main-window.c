@@ -1672,6 +1672,8 @@ show_about_box(void)
         NULL
     };
 
+    const gchar *translator_credits = _("translator_credits");
+
 
     /* only show one about box at a time */
     if (about) {
@@ -1697,7 +1699,7 @@ show_about_box(void)
 #else
                             authors,
                             documenters,
-                            "",
+			    strcmp (translator_credits, "translator_credits") != 0 ? translator_credits : NULL,
                             gdk_pixbuf_new_from_file("balsa/balsa_logo.png",
                                                      NULL)
 #endif                          /* BALSA_MAJOR < 2 */

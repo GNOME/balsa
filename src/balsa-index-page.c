@@ -516,7 +516,8 @@ static GtkWidget *
 create_menu(BalsaIndex * bindex)
 {
     GtkWidget *menu, *menuitem, *submenu, *smenuitem;
-    GtkWidget *bmbl;
+    GtkWidget *bmbl, *scroll;
+    GtkRequisition req;
 
     BALSA_DEBUG();
 
@@ -564,20 +565,37 @@ create_menu(BalsaIndex * bindex)
     menuitem = gtk_menu_item_new_with_label(_("Transfer"));
     gtk_widget_set_sensitive(menuitem, !bindex->mailbox->readonly);
     submenu = gtk_menu_new();
+
     smenuitem = gtk_menu_item_new();
     gtk_signal_connect(GTK_OBJECT(smenuitem), "button_release_event",
 		       (GtkSignalFunc) close_if_transferred_cb,
 		       (gpointer) bindex);
+
+    scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), 
+				   GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+
     bmbl = balsa_mblist_new();
     gtk_signal_connect(GTK_OBJECT(bmbl), "select_mailbox",
 		       (GtkSignalFunc) transfer_messages_cb,
 		       (gpointer) bindex);
+    
+    /* Force the mailbox list to be a reasonable size. */
+    gtk_widget_size_request(bmbl, &req);
+    if ( req.height > balsa_app.mw_height )
+	req.height = balsa_app.mw_height;
+    if ( req.width > gdk_screen_width() ) 
+	req.width = gdk_screen_width() - 2*GTK_CONTAINER(scroll)->border_width; 
+    gtk_widget_set_usize(GTK_WIDGET(bmbl), req.width, req.height);
 
-    gtk_widget_set_usize(GTK_WIDGET(bmbl), balsa_app.mblist_width, -1);
-    gtk_container_add(GTK_CONTAINER(smenuitem), bmbl);
+    gtk_container_add(GTK_CONTAINER(scroll), bmbl);
+    gtk_container_add(GTK_CONTAINER(smenuitem), scroll);
     gtk_menu_append(GTK_MENU(submenu), smenuitem);
+
     gtk_widget_show(bmbl);
+    gtk_widget_show(scroll);
     gtk_widget_show(smenuitem);
+
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
     gtk_menu_append(GTK_MENU(menu), menuitem);
     gtk_widget_show(menuitem);

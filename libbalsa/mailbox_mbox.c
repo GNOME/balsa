@@ -599,6 +599,7 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 	    g_array_remove_index(mbox->messages_info, msgno - 1);
 	}
 	g_mime_stream_reset(mbox->gmime_stream);
+	mailbox->unread_messages = 0;
     }
     last_msgno = mbox->messages_info->len;
     parse_mailbox(mbox);

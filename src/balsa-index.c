@@ -125,8 +125,8 @@ date_compare (GtkCList * clist,
 
 static gint
 numeric_compare (GtkCList * clist,
-	      gconstpointer ptr1,
-	      gconstpointer ptr2)
+		 gconstpointer ptr1,
+		 gconstpointer ptr2)
 {
   Message *m1, *m2;
   glong t1, t2;
@@ -234,8 +234,7 @@ clist_click_column (GtkCList * clist, gint column, gpointer data)
 
   if (column == 0)
     gtk_clist_set_compare_func (clist, numeric_compare);
-  else
-  if (column == 5)
+  else if (column == 5)
     gtk_clist_set_compare_func (clist, date_compare);
   else
     gtk_clist_set_compare_func (clist, NULL);
@@ -710,14 +709,11 @@ mailbox_listener (MailboxWatcherMessage * mw_message)
     case MESSAGE_REPLIED:
       balsa_index_update_flag (bindex, mw_message->message);
       break;
-/*
-   case MESSAGE_NEW:
-   balsa_index_add (bindex, mw_message->message);
-   break;
- */
+    case MESSAGE_NEW:
+      balsa_index_add (bindex, mw_message->message);
+      break;
     case MESSAGE_DELETE:
       break;
-
     default:
       break;
     }

@@ -505,6 +505,7 @@ gint
 mailbox_check_new_messages (Mailbox * mailbox)
 {
   gint i = 0;
+  gint index_hint;
 
   if (!mailbox)
     return FALSE;
@@ -512,14 +513,16 @@ mailbox_check_new_messages (Mailbox * mailbox)
   LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
   RETURN_VAL_IF_CONTEXT_CLOSED (mailbox, FALSE);
 
-  if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), NULL)) < 0)
+  index_hint = CLIENT_CONTEXT (mailbox)->vcount;
+
+  if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint)) < 0)
     {
       UNLOCK_MAILBOX ();
       g_print ("error or something\n");
     }
   else if (i == M_NEW_MAIL || i == M_REOPENED)
     {
-
+      g_print ("got new mail! yippie!\n");
       mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount - mailbox->messages;
 
       if (mailbox->new_messages > 0)
@@ -1337,7 +1340,9 @@ message_body_ref (Message * message)
     }
   if (msg != NULL)
     {
+#if 0
       BODY *bdy = cur->content;
+#endif
       if (balsa_app.debug)
 	{
 	  fprintf (stderr, "After loading message\n");

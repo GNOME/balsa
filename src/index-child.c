@@ -193,6 +193,17 @@ index_child_destroy (GtkObject * obj)
     (*GTK_OBJECT_CLASS (parent_class)->destroy) (GTK_OBJECT (ic));
 }
 
+static gboolean
+check_for_new_mail (GtkWidget * widget)
+{
+  g_return_if_fail (BALSA_IS_INDEX (widget));
+
+  mailbox_check_new_messages (BALSA_INDEX (widget)->mailbox);
+  g_print ("Checking for new mail in: %s\n", BALSA_INDEX (widget)->mailbox->name);
+
+  return TRUE;
+}
+
 static GtkWidget *
 index_child_create_view (GnomeMDIChild * child)
 {
@@ -231,6 +242,9 @@ index_child_create_view (GnomeMDIChild * child)
   gtk_widget_show_all (vpane);
 
   balsa_index_set_mailbox (BALSA_INDEX (ic->index), ic->mailbox);
+/*
+   gtk_idle_add ((GtkFunction) check_for_new_mail, ic->index);
+ */
   gtk_signal_connect (GTK_OBJECT (ic->index), "select_message",
 		      (GtkSignalFunc) index_select_cb, ic);
   return (vpane);

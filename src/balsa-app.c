@@ -45,9 +45,6 @@ struct BalsaApplication balsa_app;
 static int mailboxes_init (void);
 static void special_mailboxes (void);
 static gint read_signature (void);
-#if 0
-static gint check_for_new_messages ();
-#endif
 
 static void
 error_exit_cb (GtkWidget * widget, gpointer data)
@@ -161,12 +158,6 @@ init_balsa_app (int argc, char *argv[])
     }
 
   open_main_window ();
-
-  /* start timers */
-#if 0
-  balsa_app.new_messages_timer = gtk_timeout_add (5, check_for_new_messages, NULL);
-  balsa_app.check_mail_timer = gtk_timeout_add (5 * 60 * 1000, current_mailbox_check, NULL);
-#endif
 }
 
 gint
@@ -218,29 +209,6 @@ read_signature (void)
   fclose (fp);
   return TRUE;
 }
-
-#if 0
-static gint
-check_for_new_messages ()
-{
-  if (!balsa_app.current_mailbox)
-    return TRUE;
-
-  if (balsa_app.current_mailbox->stream->lock)
-    {
-      if (balsa_app.debug)
-	fprintf (stderr, "Lock exists, waiting\n");
-    }
-  else if (balsa_app.new_messages > 0 && balsa_app.current_index_child)
-    {
-      balsa_index_append_new_messages (BALSA_INDEX (balsa_app.current_index_child->index));
-      balsa_app.new_messages = 0;
-    }
-
-  return TRUE;
-}
-#endif
-
 
 static gint
 mailboxes_init (void)

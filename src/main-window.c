@@ -398,7 +398,7 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
 			     _ ("Check"),
-			     ("Check Email"),
+			     _ ("Check Email"),
 			     NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RCV),
   /*                   (GtkSignalFunc) check_new_messages_cb, */

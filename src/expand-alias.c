@@ -24,6 +24,7 @@
 #include "libbalsa.h"
 
 #include <gnome.h>
+#include <string.h>
 
 
 #include "balsa-app.h"

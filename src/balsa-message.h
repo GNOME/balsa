@@ -73,7 +73,7 @@ struct _BalsaMessageClass {
 	void (*select_part) (BalsaMessage * message);
 };
 
-guint balsa_message_get_type(void);
+GtkType balsa_message_get_type(void);
 GtkWidget *balsa_message_new(void);
 
 void balsa_message_clear(BalsaMessage * bmessage);

@@ -176,7 +176,7 @@ static GtkTreeViewClass *parent_class = NULL;
 GtkType
 balsa_index_get_type(void)
 {
-    static guint balsa_index_type = 0;
+    static GtkType balsa_index_type = 0;
 
     if (!balsa_index_type) {
         static const GTypeInfo balsa_index_info = {
@@ -899,8 +899,8 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
     /* if last message is removed, clear the preview */
     if (!gtk_tree_model_get_iter_first(model, &iter)) {
         bndx_set_current_message(index, NULL);
-        gtk_signal_emit(GTK_OBJECT(index),
-                        balsa_index_signals[UNSELECT_ALL_MESSAGES], NULL);
+        g_signal_emit(G_OBJECT(index),
+                      balsa_index_signals[UNSELECT_ALL_MESSAGES], 0, NULL);
     } else {
         /* restore the selection */
         LibBalsaMessage *last_message = NULL;
@@ -1444,15 +1444,15 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
                                         &message);
 
     /* in case a message was unselected: */
-    gtk_signal_emit(GTK_OBJECT(index),
-                    balsa_index_signals[UNSELECT_MESSAGE], NULL);
+    g_signal_emit(G_OBJECT(index),
+                  balsa_index_signals[UNSELECT_MESSAGE], 0, NULL);
     if (message) {
-        gtk_signal_emit(GTK_OBJECT(index),
-                        balsa_index_signals[SELECT_MESSAGE], message);
+        g_signal_emit(G_OBJECT(index),
+                      balsa_index_signals[SELECT_MESSAGE], 0, message);
         bndx_set_current_message(index, message);
     } else if (gtk_tree_model_get_iter_first(model, &iter))
-        gtk_signal_emit(GTK_OBJECT(index),
-                        balsa_index_signals[UNSELECT_ALL_MESSAGES], NULL);
+        g_signal_emit(G_OBJECT(index),
+                      balsa_index_signals[UNSELECT_ALL_MESSAGES], 0, NULL);
 }
 
 static gboolean
@@ -1511,9 +1511,8 @@ bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
         BalsaSendmsg *sm =
             sendmsg_window_new(GTK_WIDGET(balsa_app.main_window),
                                message, SEND_CONTINUE);
-        gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
-                           GTK_SIGNAL_FUNC
-                           (sendmsg_window_destroy_cb), NULL);
+        g_signal_connect(G_OBJECT(sm->window), "destroy",
+                         G_CALLBACK(sendmsg_window_destroy_cb), NULL);
     } else
         message_window_new(message);
 }
@@ -1528,7 +1527,7 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
 {
     BalsaIndex *index = BALSA_INDEX(tree_view);
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
-    GtkTreePath *current_path;
+    GtkTreePath *current_path = NULL;
 
     /* if current message has become viewable, reselect it */
     if (bndx_find_message(index, &current_path, NULL,
@@ -1544,9 +1543,20 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
                                               G_CALLBACK
                                               (bndx_selection_changed),
                                               index);
+        } else {
+            gtk_tree_path_free(current_path);
+            current_path = NULL;
         }
-        gtk_tree_path_free(current_path);
     }
+
+    /* scroll to current message if it became viewable, or to child of
+     * expanded row otherwise */
+    if (!current_path) {
+        current_path = gtk_tree_path_copy(path);
+        gtk_tree_path_down(current_path);
+    }
+    bndx_scroll_to_row(index, current_path);
+    gtk_tree_path_free(current_path);
 
     bndx_set_style(BALSA_INDEX(tree_view), path);
 }
@@ -1687,9 +1697,9 @@ balsa_index_close_and_destroy(GtkObject * obj)
 
     /* remove idle callbacks and attached data */
     balsa_index_idle_remove(index);
-    message = gtk_object_get_data(obj, "message");
+    message = g_object_get_data(G_OBJECT(obj), "message");
     if (message != NULL) {
-        gtk_object_remove_data (obj, "message");
+        g_object_set_data (G_OBJECT(obj), "message", NULL);
         g_object_unref (message);
     }
 
@@ -1774,9 +1784,8 @@ bndx_compose_foreach(GtkWidget * w, BalsaIndex * index,
         LibBalsaMessage *message = list->data;
         BalsaSendmsg *sm = sendmsg_window_new(NULL, message, send_type);
 
-        gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
-                           GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
-                           NULL);
+        g_signal_connect(G_OBJECT(sm->window), "destroy",
+                         G_CALLBACK(sendmsg_window_destroy_cb), NULL);
     }
     g_list_free(l);
 }
@@ -1821,9 +1830,8 @@ bndx_compose_from_list(GtkWidget * w, BalsaIndex * index,
 
     if (list) {
         sm = sendmsg_window_new_from_list(w, list, send_type);
-        gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
-                           GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
-                           NULL);
+        g_signal_connect(G_OBJECT(sm->window), "destroy",
+                         G_CALLBACK(sendmsg_window_destroy_cb), NULL);
 
         g_list_free(list);
     }
@@ -2089,7 +2097,7 @@ idle_handler_cb(GtkWidget * widget)
 	return FALSE;
     }
 
-    message = gtk_object_get_data(GTK_OBJECT(widget), "message");
+    message = g_object_get_data(G_OBJECT(widget), "message");
  
     /* get the preview pane from the index page's BalsaWindow parent */
     index = BALSA_INDEX (widget);
@@ -2108,7 +2116,7 @@ idle_handler_cb(GtkWidget * widget)
 
     /* replace_attached_data (GTK_OBJECT (widget), "message", NULL); */
     if (message != NULL) {
-        gtk_object_remove_data (GTK_OBJECT (widget), "message");
+        g_object_set_data (G_OBJECT (widget), "message", NULL);
         g_object_unref (G_OBJECT (message));
     }
     
@@ -2141,7 +2149,7 @@ bndx_popup_menu_create(BalsaIndex * index)
         GtkSignalFunc func;
     } entries[] = {
         {
-        GNOME_STOCK_MENU_BOOK_OPEN, N_("View Source"),
+        GNOME_STOCK_BOOK_OPEN, N_("View Source"),
                 GTK_SIGNAL_FUNC(bndx_view_source)}, {
         BALSA_PIXMAP_MENU_REPLY, N_("Reply..."),
                 GTK_SIGNAL_FUNC(balsa_message_reply)}, {
@@ -2153,7 +2161,7 @@ bndx_popup_menu_create(BalsaIndex * index)
                 GTK_SIGNAL_FUNC(balsa_message_forward_attached)}, {
         BALSA_PIXMAP_MENU_FORWARD, N_("Forward Inline..."),
                 GTK_SIGNAL_FUNC(balsa_message_forward_inline)}, {
-    GNOME_STOCK_MENU_BOOK_RED, N_("Store Address..."),
+        GNOME_STOCK_BOOK_RED, N_("Store Address..."),
                 GTK_SIGNAL_FUNC(balsa_store_address)}};
     GtkWidget *menu, *menuitem, *submenu;
     unsigned i;
@@ -2165,17 +2173,17 @@ bndx_popup_menu_create(BalsaIndex * index)
                                entries[i].func, index);
 
     index->delete_item =
-        create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH,
+        create_stock_menu_item(menu, GNOME_STOCK_TRASH,
                                _("Delete"),
                                GTK_SIGNAL_FUNC(balsa_message_delete),
                                index);
     index->undelete_item =
-        create_stock_menu_item(menu, GNOME_STOCK_MENU_UNDELETE,
+        create_stock_menu_item(menu, GTK_STOCK_UNDELETE,
                                _("Undelete"),
                                GTK_SIGNAL_FUNC(balsa_message_undelete),
                                index);
     index->move_to_trash_item =
-        create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH,
+        create_stock_menu_item(menu, GNOME_STOCK_TRASH,
                                _("Move To Trash"),
                                GTK_SIGNAL_FUNC
                                (balsa_message_move_to_trash), index);
@@ -2192,11 +2200,11 @@ bndx_popup_menu_create(BalsaIndex * index)
 
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
 
-    gtk_menu_append(GTK_MENU(menu), menuitem);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     menuitem = gtk_menu_item_new_with_label(_("Move to"));
     index->move_to_item = menuitem;
-    gtk_menu_append(GTK_MENU(menu), menuitem);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     return menu;
 }
@@ -2272,10 +2280,9 @@ create_stock_menu_item(GtkWidget * menu, const gchar * type,
     gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
 #endif                          /* BALSA_MAJOR < 2 */
 
-    gtk_signal_connect(GTK_OBJECT(menuitem),
-		       "activate", (GtkSignalFunc) cb, data);
+    g_signal_connect(G_OBJECT(menuitem), "activate", G_CALLBACK(cb), data);
 
-    gtk_menu_append(GTK_MENU(menu), menuitem);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     return menuitem;
 }
@@ -2340,11 +2347,11 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
     GtkTreePath *path;
     GtkTreeIter iter;
 
-    gtk_signal_handler_block_by_func(GTK_OBJECT(index),
-                                     GTK_SIGNAL_FUNC(expand ?
-                                                     bndx_tree_expand_cb :
-                                                     bndx_tree_collapse_cb),
-                                     NULL);
+    g_signal_handlers_block_by_func(GTK_OBJECT(index),
+                                    G_CALLBACK(expand ?
+                                               bndx_tree_expand_cb :
+                                               bndx_tree_collapse_cb),
+                                    NULL);
     g_signal_handlers_block_by_func(selection,
                                     G_CALLBACK(bndx_selection_changed),
                                     index);
@@ -2369,11 +2376,11 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
     g_signal_handlers_unblock_by_func(selection,
                                       G_CALLBACK(bndx_selection_changed),
                                       index);
-    gtk_signal_handler_unblock_by_func(GTK_OBJECT(index),
-                                       GTK_SIGNAL_FUNC(expand ?
-                                                       bndx_tree_expand_cb :
-                                                       bndx_tree_collapse_cb),
-                                       NULL);
+    g_signal_handlers_unblock_by_func(G_OBJECT(index),
+                                      G_CALLBACK(expand ?
+                                                 bndx_tree_expand_cb :
+                                                 bndx_tree_collapse_cb),
+                                      NULL);
 }
 
 /* balsa_index_set_threading_type:

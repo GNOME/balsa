@@ -159,7 +159,7 @@ static gint bmbl_core_mailbox(LibBalsaMailbox * mailbox);
 GtkType
 balsa_mblist_get_type(void)
 {
-    static guint mblist_type = 0;
+    static GtkType mblist_type = 0;
 
     if (!mblist_type) {
 	static const GTypeInfo mblist_info = {
@@ -386,17 +386,19 @@ bmbl_init(BalsaMBList * mblist)
                                            bmbl_selection_func, NULL,
                                            NULL);
 
-    gtk_signal_connect_after(GTK_OBJECT(tree_view), "row-expanded",
-                             GTK_SIGNAL_FUNC(bmbl_tree_expand), NULL);
-    gtk_signal_connect(GTK_OBJECT(tree_view), "row-collapsed",
-                       GTK_SIGNAL_FUNC(bmbl_tree_collapse), NULL);
+    g_signal_connect_after(G_OBJECT(tree_view), "row-expanded",
+                           G_CALLBACK(bmbl_tree_expand), NULL);
+    g_signal_connect(G_OBJECT(tree_view), "row-collapsed",
+                     G_CALLBACK(bmbl_tree_collapse), NULL);
     mblist->toggled_handler_id =
         g_signal_connect(G_OBJECT(store), "row-has-child-toggled",
                          G_CALLBACK(bmbl_child_toggled_cb),
                          tree_view);
 
-    gtk_object_set(GTK_OBJECT(mblist), "show_content_info",
-                   balsa_app.mblist_show_mb_content_info, NULL);
+    g_object_set(G_OBJECT(mblist),
+                 "show_content_info",
+                 balsa_app.mblist_show_mb_content_info,
+                 NULL);
 
     gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(store), 0,
                                     bmbl_row_compare,
@@ -510,13 +512,13 @@ bmbl_child_toggled_cb(GtkTreeModel * model, GtkTreePath * path,
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
     if (mbnode && mbnode->expanded
         && !gtk_tree_view_row_expanded(tree_view, path)) {
-        gtk_signal_handler_block_by_func(GTK_OBJECT(tree_view),
-                                         G_CALLBACK(bmbl_tree_expand),
-                                         NULL);
+        g_signal_handlers_block_by_func(G_OBJECT(tree_view),
+                                        G_CALLBACK(bmbl_tree_expand),
+                                        NULL);
         gtk_tree_view_expand_row(tree_view, path, FALSE);
-        gtk_signal_handler_unblock_by_func(GTK_OBJECT(tree_view),
-                                           G_CALLBACK
-                                           (bmbl_tree_expand), NULL);
+        g_signal_handlers_unblock_by_func(G_OBJECT(tree_view),
+                                          G_CALLBACK(bmbl_tree_expand),
+                                          NULL);
     }
 }
 
@@ -558,15 +560,23 @@ bmbl_row_compare(GtkTreeModel * model, GtkTreeIter * iter1,
             } else if (m1) {
                 if (bmbl_core_mailbox(m1))
                     return -1;
-                else
-                    return g_ascii_strcasecmp(m1->name,
-                                              g_basename(mbnode2->name));
+                else {
+                    gchar *name = g_path_get_basename(mbnode2->name);
+                    gint tmp = g_ascii_strcasecmp(m1->name, name);
+
+                    g_free(name);
+                    return tmp;
+                }
             } else if (m2) {
                 if (bmbl_core_mailbox(m2)) 
                     return 1;
-                else
-                    return g_ascii_strcasecmp(g_basename(mbnode1->name),
-                                              m2->name);
+                else {
+                    gchar *name = g_path_get_basename(mbnode1->name);
+                    gint tmp = g_ascii_strcasecmp(name, m2->name);
+
+                    g_free(name);
+                    return tmp;
+                }
             } else {
                 return 0;
             }
@@ -980,19 +990,18 @@ balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
     GtkTreeSelection *selection;
     gint i;
 
-    gtk_signal_connect(GTK_OBJECT(mblist), "button_press_event",
-                       GTK_SIGNAL_FUNC(bmbl_button_press_cb), NULL);
-    gtk_signal_connect_after(GTK_OBJECT(mblist), "size-allocate",
-                             GTK_SIGNAL_FUNC(bmbl_column_resize),
-                             NULL);
+    g_signal_connect(G_OBJECT(mblist), "button_press_event",
+                     G_CALLBACK(bmbl_button_press_cb), NULL);
+    g_signal_connect_after(G_OBJECT(mblist), "size-allocate",
+                           G_CALLBACK(bmbl_column_resize), NULL);
     gtk_tree_view_enable_model_drag_dest(GTK_TREE_VIEW(mblist),
                                          bmbl_drop_types,
                                          ELEMENTS(bmbl_drop_types),
                                          GDK_ACTION_DEFAULT |
                                          GDK_ACTION_COPY |
                                          GDK_ACTION_MOVE);
-    gtk_signal_connect(GTK_OBJECT(mblist), "drag-data-received",
-                       GTK_SIGNAL_FUNC(bmbl_drag_cb), NULL);
+    g_signal_connect(G_OBJECT(mblist), "drag-data-received",
+                     G_CALLBACK(bmbl_drag_cb), NULL);
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(mblist));
     g_signal_connect(G_OBJECT(selection), "changed",
@@ -1727,20 +1736,21 @@ bmbl_mru_menu(GtkWindow * window, GList ** url_list,
             mru_list = g_slist_prepend(mru_list, mru);
             item =
                 gtk_menu_item_new_with_label(mailbox ? mailbox->name : "");
-            gtk_menu_append(GTK_MENU(menu), item);
+            gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
             g_signal_connect(item, "activate",
                              G_CALLBACK(bmbl_mru_activate_cb), mru);
         }
     }
 
-    gtk_menu_append(GTK_MENU(menu), gtk_separator_menu_item_new());
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu),
+                          gtk_separator_menu_item_new());
 
     mru = bmbl_mru_new(url_list, user_func, user_data, NULL);
     mru->window = window;
     mru->setup_cb = setup_cb;
     mru_list = g_slist_prepend(mru_list, mru);
     item = gtk_menu_item_new_with_label(_("Other..."));
-    gtk_menu_append(GTK_MENU(menu), item);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
     g_signal_connect(item, "activate",
                      G_CALLBACK(bmbl_mru_show_tree), mru);
 
@@ -1848,7 +1858,7 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
      * window. This is the user choice and required because the mblist
      * widget saves the size in balsa_app.mblist_width */
     req.width = balsa_app.mblist_width;
-    gtk_widget_set_usize(GTK_WIDGET(mblist), req.width, req.height);
+    gtk_widget_set_size_request(GTK_WIDGET(mblist), req.width, req.height);
 
     gtk_container_add(GTK_CONTAINER(scroll), mblist);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), scroll);
@@ -1973,13 +1983,13 @@ struct _BalsaMBListMRUOption {
     GtkWindow *window;
     GList **url_list;
     GtkOptionMenu *option_menu;
-    gchar **url;
+    gchar *url;
 };
 typedef struct _BalsaMBListMRUOption BalsaMBListMRUOption;
 
 /* Forward references */
 static void bmbl_mru_option_menu_setup(BalsaMBListMRUOption * mro);
-static void bmbl_mru_option_menu_cb(gchar * url, gpointer data);
+static void bmbl_mru_option_menu_cb(const gchar * url, gpointer data);
 static gboolean bmbl_mru_option_menu_destroy_cb(GtkWidget * widget,
                                                 GdkEvent * event,
                                                 gpointer data);
@@ -1989,7 +1999,6 @@ static gboolean bmbl_mru_option_menu_destroy_cb(GtkWidget * widget,
  *
  * window:      parent window for the dialog;
  * url_list:    pointer to a list of urls;
- * url:         pointer to a gchar * variable.
  *
  * Returns a GtkOptionMenu.
  *
@@ -2001,27 +2010,69 @@ static gboolean bmbl_mru_option_menu_destroy_cb(GtkWidget * widget,
  * and the url_list is updated.
  */
 GtkWidget *
-balsa_mblist_mru_option_menu(GtkWindow * window, GList ** url_list,
-                             gchar ** url)
+balsa_mblist_mru_option_menu(GtkWindow * window, GList ** url_list)
 {
-    GtkWidget *option_menu = gtk_option_menu_new();
-    BalsaMBListMRUOption *mro = g_new(BalsaMBListMRUOption, 1);
+    GtkWidget *option_menu;
+    BalsaMBListMRUOption *mro;
 
     g_return_val_if_fail(url_list != NULL, NULL);
-    g_return_val_if_fail(url != NULL, NULL);
+
+    option_menu = gtk_option_menu_new();
+    mro = g_new(BalsaMBListMRUOption, 1);
 
     mro->window = window;
     mro->url_list = url_list;
     mro->option_menu = GTK_OPTION_MENU(option_menu);
-    mro->url = url;
     bmbl_mru_option_menu_setup(mro);
     g_signal_connect(option_menu, "destroy-event",
                      G_CALLBACK(bmbl_mru_option_menu_destroy_cb), mro);
+    g_object_set_data(G_OBJECT(option_menu), "mro", mro);
 
     /* initial setting */
-    *url = g_strdup((const gchar *) (*url_list)->data);
+    mro->url = g_strdup((const gchar *) (*url_list)->data);
 
     return option_menu;
+}
+
+/*
+ * balsa_mblist_mru_option_menu_set
+ *
+ * option_menu: a GtkOptionMenu created by balsa_mblist_mru_option_menu;
+ * url:         URL of a mailbox
+ *
+ * Adds url to the front of the url_list managed by option_menu, resets
+ * option_menu to show the new url, and stores a copy in the mro
+ * structure.
+ */
+void
+balsa_mblist_mru_option_menu_set(GtkWidget * option_menu, const gchar *url)
+{
+    BalsaMBListMRUOption *mro =
+        g_object_get_data(G_OBJECT(option_menu), "mro");
+    
+    balsa_mblist_mru_add(mro->url_list, url);
+    bmbl_mru_option_menu_setup(mro);
+    bmbl_mru_option_menu_cb(url, mro);
+}
+
+/*
+ * balsa_mblist_mru_option_menu_get
+ *
+ * option_menu: a GtkOptionMenu created by balsa_mblist_mru_option_menu.
+ *
+ * Returns the address of the current URL.
+ *
+ * Note that the url is held in the mro structure, and is freed when the
+ * widget is destroyed. The calling code must make its own copy of the
+ * string if it is needed more than temporarily.
+ */
+const gchar *
+balsa_mblist_mru_option_menu_get(GtkWidget * option_menu)
+{
+    BalsaMBListMRUOption *mro =
+        g_object_get_data(G_OBJECT(option_menu), "mro");
+
+    return mro->url;
 }
 
 /*
@@ -2036,13 +2087,14 @@ balsa_mblist_mru_option_menu(GtkWindow * window, GList ** url_list,
 static void
 bmbl_mru_option_menu_setup(BalsaMBListMRUOption * mro)
 {
+    GtkOptionMenu *option_menu = mro->option_menu;
     GtkWidget *menu = bmbl_mru_menu(mro->window, mro->url_list,
                                     G_CALLBACK(bmbl_mru_option_menu_cb),
                                     mro, TRUE,
                                     G_CALLBACK
                                     (bmbl_mru_option_menu_setup));
 
-    gtk_option_menu_set_menu(mro->option_menu, menu);
+    gtk_option_menu_set_menu(option_menu, menu);
 }
 
 /*
@@ -2051,12 +2103,12 @@ bmbl_mru_option_menu_setup(BalsaMBListMRUOption * mro)
  * Callback passed to bmbl_mru_menu.
  */
 static void
-bmbl_mru_option_menu_cb(gchar * url, gpointer data)
+bmbl_mru_option_menu_cb(const gchar * url, gpointer data)
 {
     BalsaMBListMRUOption *mro = (BalsaMBListMRUOption *) data;
 
-    g_free(*mro->url);
-    *mro->url = g_strdup(url);
+    g_free(mro->url);
+    mro->url = g_strdup(url);
 }
 
 /*
@@ -2067,8 +2119,11 @@ bmbl_mru_option_menu_cb(gchar * url, gpointer data)
  */
 static gboolean
 bmbl_mru_option_menu_destroy_cb(GtkWidget * widget, GdkEvent * event,
-                                gpointer mro)
+                                gpointer data)
 {
+    BalsaMBListMRUOption *mro = (BalsaMBListMRUOption *) data;
+
+    g_free(mro->url);
     g_free(mro);
     return FALSE;
 }

@@ -173,10 +173,8 @@ static void handle_mdn_request(LibBalsaMessage *message);
 static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg, gboolean manual);
 static GtkWidget* create_mdn_dialog (gchar *sender, gchar *mdn_to_address,
 				     LibBalsaMessage *send_msg);
-static gboolean mdn_dialog_delete(GtkWidget * dialog, GdkEvent * event,
-                                  gpointer user_data);
-static void no_mdn_reply (GtkWidget *widget, gpointer user_data);
-static void send_mdn_reply (GtkWidget *widget, gpointer user_data);
+static void mdn_dialog_response(GtkWidget * dialog, gint response,
+                                gpointer user_data);
 
 static BalsaPartInfo* part_info_new(LibBalsaMessageBody* body,
 				    LibBalsaMessage* msg);
@@ -184,24 +182,27 @@ static void part_info_free(BalsaPartInfo* info);
 static GtkTextTag * quote_tag(GtkTextBuffer * buffer, gint level);
 static gboolean resize_idle(GtkWidget * widget);
 
-guint balsa_message_get_type()
+GtkType
+balsa_message_get_type()
 {
-    static guint balsa_message_type = 0;
+    static GtkType balsa_message_type = 0;
 
     if (!balsa_message_type) {
-	GtkTypeInfo balsa_message_info = {
-	    "BalsaMessage",
-	    sizeof(BalsaMessage),
+	static const GTypeInfo balsa_message_info = {
 	    sizeof(BalsaMessageClass),
-	    (GtkClassInitFunc) balsa_message_class_init,
-	    (GtkObjectInitFunc) balsa_message_init,
-	    (gpointer) NULL,
-	    (gpointer) NULL,
-	    (GtkClassInitFunc) NULL
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) balsa_message_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(BalsaMessage),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) balsa_message_init
 	};
 
 	balsa_message_type =
-	    gtk_type_unique(gtk_viewport_get_type(), &balsa_message_info);
+	    g_type_register_static(GTK_TYPE_VIEWPORT, "BalsaMessage",
+                                   &balsa_message_info, 0);
     }
 
     return balsa_message_type;
@@ -216,11 +217,13 @@ balsa_message_class_init(BalsaMessageClass * klass)
     object_class = GTK_OBJECT_CLASS(klass);
 
     balsa_message_signals[SELECT_PART] =
-	gtk_signal_new("select-part",
-		       GTK_RUN_FIRST,
-		       BALSA_TYPE_MESSAGE,
-		       GTK_SIGNAL_OFFSET(BalsaMessageClass, select_part),
-		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
+	g_signal_new("select-part",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_FIRST,
+                     G_STRUCT_OFFSET(BalsaMessageClass, select_part),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__VOID,
+		     G_TYPE_NONE, 0);
 
     object_class->destroy = balsa_message_destroy;
 
@@ -243,9 +246,9 @@ balsa_message_init(BalsaMessage * bm)
     gtk_text_view_set_editable(GTK_TEXT_VIEW(bm->header_text), FALSE);
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(bm->header_text), 2);
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(bm->header_text), 2);
-    gtk_signal_connect(GTK_OBJECT(bm->header_text), "key_press_event",
-		       (GtkSignalFunc) balsa_message_key_press_event,
-		       (gpointer) bm);
+    g_signal_connect(G_OBJECT(bm->header_text), "key_press_event",
+		     G_CALLBACK(balsa_message_key_press_event),
+		     (gpointer) bm);
     gtk_box_pack_start(GTK_BOX(bm->vbox), bm->header_text, FALSE, FALSE, 0);
 
     /* Widget to hold content */
@@ -257,11 +260,11 @@ balsa_message_init(BalsaMessage * bm)
     bm->part_list = gnome_icon_list_new(100, NULL, FALSE);
     gnome_icon_list_set_selection_mode(GNOME_ICON_LIST(bm->part_list),
 				       GTK_SELECTION_MULTIPLE);
-    gtk_signal_connect(GTK_OBJECT(bm->part_list), "select_icon",
-		       GTK_SIGNAL_FUNC(select_icon_cb), bm);
-    gtk_signal_connect(GTK_OBJECT(bm->part_list), "size_request",
-		       GTK_SIGNAL_FUNC(balsa_icon_list_size_request),
-		       (gpointer) bm);
+    g_signal_connect(G_OBJECT(bm->part_list), "select_icon",
+		     G_CALLBACK(select_icon_cb), bm);
+    g_signal_connect(G_OBJECT(bm->part_list), "size_request",
+		     G_CALLBACK(balsa_icon_list_size_request),
+		     (gpointer) bm);
     gtk_box_pack_end(GTK_BOX(bm->vbox), bm->part_list, FALSE, FALSE, 0);
 
     bm->current_part = NULL;
@@ -324,7 +327,7 @@ save_dialog_ok(GtkWidget* save_dialog, BalsaPartInfo * info)
 	= gtk_file_selection_get_filename(GTK_FILE_SELECTION(save_dialog));
     
     g_free(balsa_app.save_dir);
-    balsa_app.save_dir = g_dirname(filename);
+    balsa_app.save_dir = g_path_get_dirname(filename);
     
     if ( access(filename, F_OK) == 0 ) {
 	GtkWidget *confirm;
@@ -403,7 +406,7 @@ balsa_message_new(void)
 {
     BalsaMessage *bm;
 
-    bm = gtk_type_new(balsa_message_get_type());
+    bm = g_object_new(BALSA_TYPE_MESSAGE, NULL);
 
     return GTK_WIDGET(bm);
 }
@@ -772,39 +775,13 @@ part_info_init_application(BalsaMessage * bm, BalsaPartInfo * info)
 static void
 part_info_init_image(BalsaMessage * bm, BalsaPartInfo * info)
 {
-    GdkPixbuf *pb;
-
-    GdkPixmap *pixmap = NULL;
-    GdkBitmap *mask = NULL;
-
     GtkWidget *image;
-    GError *err = NULL;
 
     libbalsa_message_body_save_temporary(info->body, NULL);
-
-    pb = gdk_pixbuf_new_from_file(info->body->temp_filename, &err);
-    if (err) {
-        g_print("Error loading pixbuf %s: %s\n",
-                info->body->temp_filename, err->message);
-        g_error_free(err);
-	return;
-    }
-
-    gdk_pixbuf_render_pixmap_and_mask(pb, &pixmap, &mask, 0);
-    gdk_pixbuf_unref(pb);
-
-    if (pixmap) {
-	image = gtk_pixmap_new(pixmap, mask);
-	info->widget = image;
-	info->focus_widget = image;
-	info->can_display = TRUE;
-    }
-
-    if (pixmap)
-	gdk_pixmap_unref(pixmap);
-    if (mask)
-	gdk_bitmap_unref(mask);
-
+    image = gtk_image_new_from_file(info->body->temp_filename);
+    info->widget = image;
+    info->focus_widget = image;
+    info->can_display = TRUE;
 }
 
 typedef enum _rfc_extbody_t {
@@ -853,8 +830,8 @@ part_info_init_message_extbody_url(BalsaMessage * bm, BalsaPartInfo * info,
 
 	url = g_strdup_printf("file:%s", local_name);
 	msg = g_string_new(_("Content Type: external-body\n"));
-	g_string_sprintfa(msg, _("Access type: local-file\n"));
-	g_string_sprintfa(msg, _("File name: %s"), local_name);
+	g_string_append_printf(msg, _("Access type: local-file\n"));
+	g_string_append_printf(msg, _("File name: %s"), local_name);
 	g_free(local_name);
     } else if (url_type == RFC2017_EXTBODY_URL) {
 	gchar *local_name;
@@ -869,8 +846,8 @@ part_info_init_message_extbody_url(BalsaMessage * bm, BalsaPartInfo * info,
 
 	url = g_strdup(local_name);
 	msg = g_string_new(_("Content Type: external-body\n"));
-	g_string_sprintfa(msg, _("Access type: URL\n"));
-	g_string_sprintfa(msg, _("URL: %s"), url);
+	g_string_append_printf(msg, _("Access type: URL\n"));
+	g_string_append_printf(msg, _("URL: %s"), url);
 	g_free(local_name);
     } else { /* *FTP* */
 	gchar *ftp_dir, *ftp_name, *ftp_site;
@@ -899,13 +876,13 @@ part_info_init_message_extbody_url(BalsaMessage * bm, BalsaPartInfo * info,
 				  url_type == RFC2046_EXTBODY_TFTP ? "tftp" : "ftp",
 				  ftp_site, ftp_name);
 	msg = g_string_new(_("Content Type: external-body\n"));
-	g_string_sprintfa(msg, _("Access type: %s\n"),
+	g_string_append_printf(msg, _("Access type: %s\n"),
 			  url_type == RFC2046_EXTBODY_TFTP ? "tftp" :
 			  url_type == RFC2046_EXTBODY_FTP ? "ftp" : "anon-ftp");
-	g_string_sprintfa(msg, _("FTP site: %s\n"), ftp_site);
+	g_string_append_printf(msg, _("FTP site: %s\n"), ftp_site);
 	if (ftp_dir)
-	    g_string_sprintfa(msg, _("Directory: %s\n"), ftp_dir);
-	g_string_sprintfa(msg, _("File name: %s"), ftp_name);
+	    g_string_append_printf(msg, _("Directory: %s\n"), ftp_dir);
+	g_string_append_printf(msg, _("File name: %s"), ftp_name);
 	g_free(ftp_dir);
 	g_free(ftp_name);
 	g_free(ftp_site);
@@ -920,10 +897,10 @@ part_info_init_message_extbody_url(BalsaMessage * bm, BalsaPartInfo * info,
 
     button = gtk_button_new_with_label(url);
     gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 5);
-    gtk_object_set_data(GTK_OBJECT(button), "call_url", url);
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-		       GTK_SIGNAL_FUNC(part_context_menu_call_url),
-		       (gpointer) info);
+    g_object_set_data(G_OBJECT(button), "call_url", url);
+    g_signal_connect(G_OBJECT(button), "clicked",
+		     G_CALLBACK(part_context_menu_call_url),
+		     (gpointer) info);
 
     gtk_widget_show_all(vbox);
 
@@ -952,10 +929,10 @@ part_info_init_message_extbody_mail(BalsaMessage * bm, BalsaPartInfo * info)
 	libbalsa_message_body_get_parameter(info->body, "subject");
 
     msg = g_string_new(_("Content Type: external-body\n"));
-    msg = g_string_append (msg, _("Access type: mail-server\n"));
-    g_string_sprintfa(msg, _("Mail server: %s\n"), mail_site);
+    g_string_append (msg, _("Access type: mail-server\n"));
+    g_string_append_printf(msg, _("Mail server: %s\n"), mail_site);
     if (mail_subject)
-	g_string_sprintfa(msg, _("Subject: %s\n"), mail_subject);
+	g_string_append_printf(msg, _("Subject: %s\n"), mail_subject);
     g_free(mail_subject);
     g_free(mail_site);
 
@@ -968,9 +945,9 @@ part_info_init_message_extbody_mail(BalsaMessage * bm, BalsaPartInfo * info)
 
     button = gtk_button_new_with_label(_("Send message to obtain this part"));
     gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 5);
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-		       GTK_SIGNAL_FUNC(part_context_menu_mail),
-		       (gpointer) info);
+    g_signal_connect(G_OBJECT(button), "clicked",
+		     G_CALLBACK(part_context_menu_mail),
+		     (gpointer) info);
 
     gtk_widget_show_all(vbox);
 
@@ -986,14 +963,14 @@ part_info_init_message(BalsaMessage * bm, BalsaPartInfo * info)
     g_return_if_fail(info->body);
 
     body_type = libbalsa_message_body_get_content_type(info->body);
-    if (!g_strcasecmp("message/external-body", body_type)) {
+    if (!g_ascii_strcasecmp("message/external-body", body_type)) {
 	gchar *access_type;
 	rfc_extbody_id *extbody_type = rfc_extbodys;
 
 	access_type = 
 	    libbalsa_message_body_get_parameter(info->body, "access-type");
 	while (extbody_type->id_string && 
-	       g_strcasecmp(extbody_type->id_string, access_type))
+	       g_ascii_strcasecmp(extbody_type->id_string, access_type))
 	    extbody_type++;
 	switch (extbody_type->action) {
 	case RFC2046_EXTBODY_FTP:
@@ -1070,9 +1047,8 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
 
     button = gtk_button_new_with_label(_("Save part"));
     gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 5);
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-		       (GtkSignalFunc) part_context_menu_save,
-		       (gpointer) info);
+    g_signal_connect(G_OBJECT(button), "clicked",
+		     G_CALLBACK(part_context_menu_save), (gpointer) info);
 
     gtk_widget_show_all(vbox);
 
@@ -1094,12 +1070,11 @@ part_info_mime_button (BalsaPartInfo* info, const gchar* content_type,
     cmd = gnome_vfs_mime_get_value (content_type, (char*) key);
     msg = g_strdup_printf(_("View part with %s"), cmd);
     button = gtk_button_new_with_label(msg);
-    gtk_object_set_data (GTK_OBJECT (button), "mime_action",  (gpointer) key);
+    g_object_set_data (G_OBJECT (button), "mime_action",  (gpointer) key);
     g_free(msg);
 
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-                       (GtkSignalFunc) part_context_menu_cb,
-                       (gpointer) info);
+    g_signal_connect(G_OBJECT(button), "clicked",
+                     G_CALLBACK(part_context_menu_cb), (gpointer) info);
 
     return button;
 }
@@ -1118,13 +1093,13 @@ part_info_mime_button_vfs (BalsaPartInfo* info, const gchar* content_type)
 	cmd = app->command;
 	msg = g_strdup_printf(_("View part with %s"), app->name);
 	button = gtk_button_new_with_label(msg);
-	gtk_object_set_data (GTK_OBJECT (button), "mime_action", 
+	g_object_set_data (G_OBJECT (button), "mime_action", 
 			     (gpointer) g_strdup(app->id)); /* *** */
 	g_free(msg);
 
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			   (GtkSignalFunc) part_context_menu_vfs_cb,
-			   (gpointer) info);
+	g_signal_connect(G_OBJECT(button), "clicked",
+			 G_CALLBACK(part_context_menu_vfs_cb),
+                         (gpointer) info);
 
 	gnome_vfs_mime_application_free(app);
 	
@@ -1545,7 +1520,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         return;
 
     content_type = libbalsa_message_body_get_content_type(info->body);
-    ishtml = (g_strcasecmp(content_type, "text/html") == 0);
+    ishtml = (g_ascii_strcasecmp(content_type, "text/html") == 0);
     g_free(content_type);
 
     /* This causes a memory leak */
@@ -1586,14 +1561,14 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
                                pango_font_description_from_string
                                (balsa_app.message_font));
 
-        gtk_signal_connect(GTK_OBJECT(item), "key_press_event",
-                           (GtkSignalFunc) balsa_message_key_press_event,
+        g_signal_connect(G_OBJECT(item), "key_press_event",
+                         G_CALLBACK(balsa_message_key_press_event),
                            (gpointer) bm);
-        gtk_signal_connect(GTK_OBJECT(item), "focus_in_event",
-                           (GtkSignalFunc) balsa_message_focus_in_part,
+        g_signal_connect(G_OBJECT(item), "focus_in_event",
+                         G_CALLBACK(balsa_message_focus_in_part),
                            (gpointer) bm);
-        gtk_signal_connect(GTK_OBJECT(item), "focus_out_event",
-                           (GtkSignalFunc) balsa_message_focus_out_part,
+        g_signal_connect(G_OBJECT(item), "focus_out_event",
+                         G_CALLBACK(balsa_message_focus_out_part),
                            (gpointer) bm);
         allocate_quote_colors(GTK_WIDGET(bm), balsa_app.quoted_color,
                               0, MAX_QUOTED_COLOR - 1);
@@ -1624,18 +1599,15 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
             regfree(&rex);
         }
 
-        gtk_signal_connect_after(GTK_OBJECT(item), "realize",
-                                 (GtkSignalFunc) fix_text_widget,
-                                 url_list);
+        g_signal_connect_after(G_OBJECT(item), "realize",
+                               G_CALLBACK(fix_text_widget), url_list);
         if (url_list) {
-            gtk_signal_connect_after(GTK_OBJECT(item), "button_press_event",
-                                     (GtkSignalFunc)store_button_coords, 
-                                     NULL);
-            gtk_signal_connect(GTK_OBJECT(item),
-                               "button_release_event",
-                               (GtkSignalFunc) check_call_url, url_list);
-            gtk_signal_connect(GTK_OBJECT(item), "motion-notify-event",
-                               (GtkSignalFunc) check_over_url, url_list);
+            g_signal_connect_after(G_OBJECT(item), "button_press_event",
+                                   G_CALLBACK(store_button_coords), NULL);
+            g_signal_connect(G_OBJECT(item), "button_release_event",
+                             G_CALLBACK(check_call_url), url_list);
+            g_signal_connect(G_OBJECT(item), "motion-notify-event",
+                             G_CALLBACK(check_over_url), url_list);
         }
 
         g_free(ptr);
@@ -1670,15 +1642,13 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
     html_document_write_stream(document, ptr, len);
     html_document_close_stream (document);
 
-    gtk_signal_connect(GTK_OBJECT(html), "size_request",
-		       (GtkSignalFunc) balsa_gtk_html_size_request,
-		       (gpointer) bm);
+    g_signal_connect(G_OBJECT(html), "size_request",
+		     G_CALLBACK(balsa_gtk_html_size_request),
+                     (gpointer) bm);
     g_signal_connect(G_OBJECT(document), "link_clicked",
-		     G_CALLBACK(balsa_gtk_html_link_clicked),
-		     NULL);
-    gtk_signal_connect(GTK_OBJECT(html), "on_url",
-		       GTK_SIGNAL_FUNC(balsa_gtk_html_on_url),
-		       bm);
+		     G_CALLBACK(balsa_gtk_html_link_clicked), NULL);
+    g_signal_connect(G_OBJECT(html), "on_url",
+		     G_CALLBACK(balsa_gtk_html_on_url), bm);
 
     gtk_widget_show(html);
 
@@ -1747,7 +1717,7 @@ part_info_init(BalsaMessage * bm, BalsaPartInfo * info)
 
     /* The widget is unref'd in part_info_free */
     if(info->widget) {
-	gtk_object_ref(GTK_OBJECT(info->widget));
+	g_object_ref(G_OBJECT(info->widget));
 	gtk_object_sink(GTK_OBJECT(info->widget));
     }
 
@@ -1765,8 +1735,8 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body)
     gboolean is_multipart=libbalsa_message_body_is_multipart(body);
 
     if(!is_multipart ||
-       g_strcasecmp(content_type, "multipart/mixed")==0 ||
-       g_strcasecmp(content_type, "multipart/alternative")==0) {
+       g_ascii_strcasecmp(content_type, "multipart/mixed")==0 ||
+       g_ascii_strcasecmp(content_type, "multipart/alternative")==0) {
     info = part_info_new(body, bm->message);
 
 	if (is_multipart) {
@@ -1815,12 +1785,12 @@ static void add_vfs_menu_item(BalsaPartInfo *info,
     gchar *menu_label = g_strdup_printf(_("Open with %s"), app->name);
     GtkWidget *menu_item = gtk_menu_item_new_with_label (menu_label);
     
-    gtk_object_set_data (GTK_OBJECT (menu_item), "mime_action", 
+    g_object_set_data (G_OBJECT (menu_item), "mime_action", 
 			 g_strdup(app->id));
-    gtk_signal_connect (GTK_OBJECT (menu_item), "activate",
+    g_signal_connect (G_OBJECT (menu_item), "activate",
 			GTK_SIGNAL_FUNC (part_context_menu_vfs_cb),
 			(gpointer) info);
-    gtk_menu_append (GTK_MENU (info->popup_menu), menu_item);
+    gtk_menu_shell_append (GTK_MENU_SHELL (info->popup_menu), menu_item);
     g_free (menu_label);
 }
 
@@ -1897,18 +1867,18 @@ part_create_menu (BalsaPartInfo* info)
     while (list) {
         key = list->data;
 
-        if (key && g_strcasecmp (key, "icon-filename") 
-	    && g_strncasecmp (key, "fm-", 3)
+        if (key && g_ascii_strcasecmp (key, "icon-filename") 
+	    && g_ascii_strncasecmp (key, "fm-", 3)
 	    /* Get rid of additional GnomeVFS entries: */
 	    && (!strstr(key, "_") || strstr(key, "."))
-	    && g_strncasecmp(key, "description", 11)) {
+	    && g_ascii_strncasecmp(key, "description", 11)) {
 	    
             if ((cmd = gnome_vfs_mime_get_value (content_type, key)) != NULL &&
 		!in_gnome_vfs(def_app, app_list, cmd)) {
-                if (g_strcasecmp (key, "open") == 0 || 
-                    g_strcasecmp (key, "view") == 0 || 
-                    g_strcasecmp (key, "edit") == 0 ||
-                    g_strcasecmp (key, "ascii-view") == 0) {
+                if (g_ascii_strcasecmp (key, "open") == 0 || 
+                    g_ascii_strcasecmp (key, "view") == 0 || 
+                    g_ascii_strcasecmp (key, "edit") == 0 ||
+                    g_ascii_strcasecmp (key, "ascii-view") == 0) {
                     /* uppercase first letter, make label */
 		    menu_label = g_strdup_printf ("%s (\"%s\")", key, cmd);
                     *menu_label = toupper (*menu_label);
@@ -1924,12 +1894,12 @@ part_create_menu (BalsaPartInfo* info)
                     g_strfreev (split_key);
                 }
                 menu_item = gtk_menu_item_new_with_label (menu_label);
-                gtk_object_set_data (GTK_OBJECT (menu_item), "mime_action", 
-                                     key);
-                gtk_signal_connect (GTK_OBJECT (menu_item), "activate",
-                                    GTK_SIGNAL_FUNC (part_context_menu_cb),
-                                    (gpointer) info);
-                gtk_menu_append (GTK_MENU (info->popup_menu), menu_item);
+                g_object_set_data (G_OBJECT (menu_item), "mime_action", 
+                                   key);
+                g_signal_connect (G_OBJECT (menu_item), "activate",
+                                  G_CALLBACK (part_context_menu_cb),
+                                  (gpointer) info);
+                gtk_menu_shell_append (GTK_MENU_SHELL (info->popup_menu), menu_item);
                 g_free (menu_label);
             }
         }
@@ -1951,10 +1921,9 @@ part_create_menu (BalsaPartInfo* info)
     
 
     menu_item = gtk_menu_item_new_with_label (_("Save..."));
-    gtk_signal_connect (GTK_OBJECT (menu_item), "activate",
-                        GTK_SIGNAL_FUNC (part_context_menu_save),
-                        (gpointer) info);
-    gtk_menu_append (GTK_MENU (info->popup_menu), menu_item);
+    g_signal_connect (G_OBJECT (menu_item), "activate",
+                      G_CALLBACK (part_context_menu_save), (gpointer) info);
+    gtk_menu_shell_append (GTK_MENU_SHELL (info->popup_menu), menu_item);
 
     gtk_widget_show_all (info->popup_menu);
 
@@ -1983,13 +1952,13 @@ part_info_free(BalsaPartInfo* info)
 	GList *widget_list;
 	
 	widget_list = 
-	    gtk_object_get_data(GTK_OBJECT(info->widget), "url-list");
+	    g_object_get_data(G_OBJECT(info->widget), "url-list");
  	free_url_list(widget_list);
         /* FIXME: Why unref will not do? */
-	gtk_object_destroy(GTK_OBJECT(info->widget));
+	gtk_widget_destroy(info->widget);
     }
     if (info->popup_menu)
-	gtk_object_destroy(GTK_OBJECT(info->popup_menu));
+	gtk_widget_destroy(info->popup_menu);
 
     g_free(info);
 }
@@ -2004,7 +1973,7 @@ part_context_menu_save(GtkWidget * menu_item, BalsaPartInfo * info)
 static void
 part_context_menu_call_url(GtkWidget * menu_item, BalsaPartInfo * info)
 {
-    gchar *url = gtk_object_get_data (GTK_OBJECT (menu_item), "call_url");
+    gchar *url = g_object_get_data (G_OBJECT (menu_item), "call_url");
     GError *err = NULL;
 
     g_return_if_fail(url);
@@ -2085,7 +2054,7 @@ part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info)
 
 
     content_type = libbalsa_message_body_get_content_type(info->body);
-    key = gtk_object_get_data (GTK_OBJECT (menu_item), "mime_action");
+    key = g_object_get_data (G_OBJECT (menu_item), "mime_action");
 
     if (key != NULL
         && (cmd = gnome_vfs_mime_get_value(content_type, key)) != NULL) {
@@ -2118,7 +2087,7 @@ part_context_menu_vfs_cb(GtkWidget * menu_item, BalsaPartInfo * info)
 {
     gchar *id;
     
-    if((id = gtk_object_get_data (GTK_OBJECT (menu_item), "mime_action"))) {
+    if((id = g_object_get_data (G_OBJECT (menu_item), "mime_action"))) {
 	GnomeVFSMimeApplication *app=
 	    gnome_vfs_mime_application_new_from_id(id);
 	if(app) {
@@ -2209,7 +2178,7 @@ preferred_part(LibBalsaMessageBody *parts)
     for(body=parts; body; body=body->next) {
 	content_type = libbalsa_message_body_get_content_type(body);
 
-	if(g_strcasecmp(content_type, "text/html")==0) {
+	if(g_ascii_strcasecmp(content_type, "text/html")==0) {
 	    g_free(content_type);
 	    return body;
 	}
@@ -2220,7 +2189,7 @@ preferred_part(LibBalsaMessageBody *parts)
     for(body=parts; body; body=body->next) {
 	content_type = libbalsa_message_body_get_content_type(body);
 
-	if(g_strcasecmp(content_type, "text/plain")==0) {
+	if(g_ascii_strcasecmp(content_type, "text/plain")==0) {
 	    g_free(content_type);
 	    return body;
 	}
@@ -2269,10 +2238,10 @@ static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
     if(parent->parts) {
 	gchar *content_type = 
 	    libbalsa_message_body_get_content_type(parent);
-	if(g_strcasecmp(content_type, "multipart/related")==0) {
+	if(g_ascii_strcasecmp(content_type, "multipart/related")==0) {
 	    /* Add the first part */
 	    add_body(bm, parent->parts);
-	} else if(g_strcasecmp(content_type, "multipart/alternative")==0) {
+	} else if(g_ascii_strcasecmp(content_type, "multipart/alternative")==0) {
 	    /* Add the most suitable part. */
 	    add_body(bm, preferred_part(parent->parts));
 	} else {
@@ -2350,9 +2319,8 @@ static BalsaPartInfo *add_part(BalsaMessage *bm, gint part)
             if (GTK_IS_LAYOUT(info->widget)) {
                 GtkAdjustment *vadj =
                     gtk_layout_get_vadjustment(GTK_LAYOUT(info->widget));
-                gtk_signal_connect(GTK_OBJECT(vadj), "changed",
-                                   (GtkSignalFunc) vadj_change_cb,
-                                   info->widget);
+                g_signal_connect(G_OBJECT(vadj), "changed",
+                                 G_CALLBACK(vadj_change_cb), info->widget);
             }
 	}
 	add_multipart(bm, info->body);
@@ -2401,8 +2369,7 @@ select_part(BalsaMessage * bm, gint part)
     bm->current_part = add_part(bm, part);
 
     if(bm->current_part)
-	gtk_signal_emit(GTK_OBJECT(bm),
-			balsa_message_signals[SELECT_PART]);
+	g_signal_emit(G_OBJECT(bm), balsa_message_signals[SELECT_PART], 0);
 
     scroll_set(GTK_VIEWPORT(bm)->hadjustment, 0);
     scroll_set(GTK_VIEWPORT(bm)->vadjustment, 0);
@@ -2425,7 +2392,7 @@ scroll_set(GtkAdjustment * adj, gint value)
     adj->value = MIN(adj->value, upper);
     adj->value = MAX(adj->value, 0.0);
 
-    gtk_signal_emit_by_name(GTK_OBJECT(adj), "value_changed");
+    g_signal_emit_by_name(G_OBJECT(adj), "value_changed", 0);
 }
 
 static void
@@ -2439,7 +2406,7 @@ scroll_change(GtkAdjustment * adj, gint diff)
     adj->value = MIN(adj->value, upper);
     adj->value = MAX(adj->value, 0.0);
 
-    gtk_signal_emit_by_name(GTK_OBJECT(adj), "value_changed");
+    g_signal_emit_by_name(G_OBJECT(adj), "value_changed", 0);
 }
 
 static gint
@@ -2668,7 +2635,7 @@ rfc2298_address_equal(LibBalsaAddress *a, LibBalsaAddress *b)
     /* now compare the strings */
     if (!a_atpos || !b_atpos || a_atpos != b_atpos || 
 	strncmp (a_string, b_string, a_atpos) ||
-	g_strcasecmp (a_atptr, b_atptr)) {
+	g_ascii_strcasecmp (a_atptr, b_atptr)) {
 	g_free (a_string);
 	g_free (b_string);
 	return FALSE;
@@ -2756,7 +2723,7 @@ handle_mdn_request(LibBalsaMessage *message)
 			      balsa_app.encoding_style,
 			      balsa_app.send_rfc2646_format_flowed);
 #endif
-	gtk_object_destroy(GTK_OBJECT(mdn));
+	g_object_unref(G_OBJECT(mdn));
     }
 }
 
@@ -2810,120 +2777,56 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     return message;
 }
 
-static GtkWidget* create_mdn_dialog (gchar *sender, gchar *mdn_to_address, 
-				     LibBalsaMessage *send_msg)
+static GtkWidget *
+create_mdn_dialog(gchar * sender, gchar * mdn_to_address,
+                  LibBalsaMessage * send_msg)
 {
-  GtkWidget *mdn_dialog;
-  GtkWidget *dialog_vbox;
-  GtkWidget *hbox;
-  GtkWidget *pixmap;
-  GtkWidget *label;
-  GtkWidget *dialog_action_area;
-  GtkWidget *button_no;
-  GtkWidget *button_yes;
-  gchar *l_text;
+    GtkWidget *mdn_dialog;
 
-  mdn_dialog = gtk_dialog_new_with_buttons(_("reply to MDN?"), 
-                                           GTK_WINDOW(balsa_app.main_window),
-                                           GTK_DIALOG_DESTROY_WITH_PARENT,
-                                           NULL);
-  gtk_object_set_user_data (GTK_OBJECT (mdn_dialog), send_msg);
+    mdn_dialog =
+        gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+                               GTK_DIALOG_DESTROY_WITH_PARENT,
+                               GTK_MESSAGE_QUESTION,
+                               GTK_BUTTONS_YES_NO,
+                               _("The sender of this mail, %s, "
+                                 "requested \n"
+                                 "a Message Disposition Notification"
+                                 "(MDN) to be returned to `%s'.\n"
+                                 "Do you want to send "
+                                 "this notification?"),
+                               sender, mdn_to_address);
+    gtk_window_set_title(GTK_WINDOW(mdn_dialog), _("reply to MDN?"));
+    g_object_set_data(G_OBJECT(mdn_dialog), "balsa-send-msg", send_msg);
+    g_signal_connect(G_OBJECT(mdn_dialog), "response",
+                     G_CALLBACK(mdn_dialog_response), NULL);
 
-  dialog_vbox = GTK_DIALOG (mdn_dialog)->vbox;
-
-  hbox = gtk_hbox_new (FALSE, 10);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox), hbox, TRUE, TRUE, 0);
-
-  pixmap = gnome_pixmap_new_from_file (BALSA_DATA_PREFIX
-                                       "/pixmaps/gnome-question.png");
-  gtk_box_pack_start (GTK_BOX (hbox), pixmap, TRUE, TRUE, 0);
-
-  l_text = g_strdup_printf(
-      _("The sender of this mail, %s, requested \n"
-	"a Message Disposition Notification (MDN) to be returned to `%s'.\n"
-	"Do you want to send this notification?"),
-      sender, mdn_to_address);
-  label = gtk_label_new (l_text);
-  g_free (l_text);
-  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_LEFT);
-  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
-
-  dialog_action_area = GTK_DIALOG (mdn_dialog)->action_area;
-  gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area), 
-			     GTK_BUTTONBOX_END);
-  gtk_button_box_set_spacing (GTK_BUTTON_BOX (dialog_action_area), 8);
-
-  button_no = gtk_dialog_add_button(GTK_DIALOG(mdn_dialog), 
-                                       GTK_STOCK_NO, GTK_RESPONSE_NO);
-  GTK_WIDGET_SET_FLAGS (button_no, GTK_CAN_DEFAULT);
-  
-  button_yes = gtk_dialog_add_button(GTK_DIALOG(mdn_dialog), 
-                                     GTK_STOCK_YES, GTK_RESPONSE_YES);
-  GTK_WIDGET_SET_FLAGS (button_yes, GTK_CAN_DEFAULT);
-
-  gtk_signal_connect (GTK_OBJECT (mdn_dialog), "delete_event",
-                      GTK_SIGNAL_FUNC (mdn_dialog_delete), NULL);
-  gtk_signal_connect (GTK_OBJECT (button_no), "clicked",
-                      GTK_SIGNAL_FUNC (no_mdn_reply), mdn_dialog);
-  gtk_signal_connect (GTK_OBJECT (button_yes), "clicked",
-                      GTK_SIGNAL_FUNC (send_mdn_reply), mdn_dialog);
-
-  gtk_widget_grab_focus (button_no);
-  gtk_widget_grab_default (button_no);
-  return mdn_dialog;
+    return mdn_dialog;
 }
 
-static gboolean mdn_dialog_delete (GtkWidget *dialog, GdkEvent *event, 
-			           gpointer user_data)
+static void
+mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
 {
-    LibBalsaMessage *send_msg;
+    LibBalsaMessage *send_msg =
+        LIBBALSA_MESSAGE(g_object_get_data(G_OBJECT(dialog),
+                                           "balsa-send-msg"));
 
-    send_msg = 
-	LIBBALSA_MESSAGE(gtk_object_get_user_data (GTK_OBJECT (dialog)));
-    gtk_object_destroy(GTK_OBJECT(send_msg));
-    gtk_widget_hide (dialog);
-    gtk_object_destroy(GTK_OBJECT(dialog));
-
-    return TRUE;
-}
-
-static void no_mdn_reply (GtkWidget *widget, gpointer user_data)
-{
-    GtkWidget *dialog = GTK_WIDGET (user_data);
-    LibBalsaMessage *send_msg;
-
-    send_msg = 
-	LIBBALSA_MESSAGE(gtk_object_get_user_data (GTK_OBJECT (dialog)));
-    gtk_object_destroy(GTK_OBJECT(send_msg));
-    gtk_widget_hide (dialog);
-    gtk_object_destroy(GTK_OBJECT(dialog));
-}
-
-
-static void send_mdn_reply (GtkWidget *widget, gpointer user_data)
-{
-    GtkWidget *dialog = GTK_WIDGET (user_data);
-    LibBalsaMessage *send_msg;
-
-    send_msg = 
-	LIBBALSA_MESSAGE(gtk_object_get_user_data (GTK_OBJECT (dialog)));
+    if (response == GTK_RESPONSE_YES) {
 #if ENABLE_ESMTP
-    libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
-			  balsa_app.encoding_style,  
-			  balsa_app.smtp_server,
-			  balsa_app.smtp_authctx,
-			  balsa_app.smtp_tls_mode,
-			  balsa_app.send_rfc2646_format_flowed);
+        libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
+                              balsa_app.encoding_style,
+                              balsa_app.smtp_server,
+                              balsa_app.smtp_authctx,
+                              balsa_app.smtp_tls_mode,
+                              balsa_app.send_rfc2646_format_flowed);
 #else
-    libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
-			  balsa_app.encoding_style,
-			  balsa_app.send_rfc2646_format_flowed);
+        libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
+                              balsa_app.encoding_style,
+                              balsa_app.send_rfc2646_format_flowed);
 #endif
-    gtk_object_destroy(GTK_OBJECT(send_msg));
-    gtk_widget_hide (dialog);
-    gtk_object_destroy(GTK_OBJECT(dialog));
+    }
+
+    g_object_unref(G_OBJECT(send_msg));
+    gtk_widget_destroy(dialog);
 }
 
 /* quote_tag:

@@ -510,6 +510,21 @@ struct {
     {"uk_UK", "KOI8-U", N_("Ukrainian")}
 };
 
+static void
+append_comma_separated(GtkEditable *editable, const gchar * text)
+{
+    gint position;
+
+    if (!text)
+        return;
+
+    gtk_editable_set_position(editable, -1);
+    position = gtk_editable_get_position(editable);
+    if (position > 0)
+        gtk_editable_insert_text(editable, ", ", 2, &position);
+    gtk_editable_insert_text(editable, text, -1, &position);
+    gtk_editable_set_position(editable, position);
+}
 
 /* the callback handlers */
 static void
@@ -531,23 +546,8 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
 	gchar *t =
             balsa_address_book_get_recipients(BALSA_ADDRESS_BOOK(ab));
 
-        if (t) {
-            gint position = -1;
-
-            /* append */
-            gtk_editable_set_position(GTK_EDITABLE(address_entry),
-                                      position);
-            position =
-                gtk_editable_get_position(GTK_EDITABLE(address_entry));
-            if (position > 0)
-                gtk_editable_insert_text(GTK_EDITABLE(address_entry), ", ",
-                                         2, &position);
-            gtk_editable_insert_text(GTK_EDITABLE(address_entry), t,
-                                     -1, &position);
-            gtk_editable_set_position(GTK_EDITABLE(address_entry),
-                                      position);
-            g_free(t);
-        }
+        append_comma_separated(GTK_EDITABLE(address_entry), t);
+        g_free(t);
     }
     gtk_widget_destroy(ab);
 }
@@ -1862,8 +1862,7 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
                              msg->orig_message->fcc_url);
     msg->fcc[1] =
         balsa_mblist_mru_option_menu(GTK_WINDOW(msg->window),
-                                     &balsa_app.fcc_mru,
-                                     &msg->fcc_url);
+                                     &balsa_app.fcc_mru);
     align = gtk_alignment_new(0, 0.5, 0, 1);
     gtk_container_add(GTK_CONTAINER(align), msg->fcc[1]);
     gtk_table_attach(GTK_TABLE(table), align, 1, 3, 5, 6,
@@ -2524,6 +2523,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg = g_malloc(sizeof(BalsaSendmsg));
     msg->charset  = NULL;
     msg->locale   = NULL;
+    msg->fcc_url  = NULL;
     msg->ident = balsa_app.current_ident;
     msg->update_config = FALSE;
     msg->modified = FALSE; 
@@ -2797,20 +2797,27 @@ sendmsg_window_process_url(const char *url, field_setter func, void *data)
    sets given field of the compose window to the specified value.
 */
 void
-sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
-			      const gchar* val)
+sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
+                         const gchar * val)
 {
-    GtkWidget* entry;
+    GtkWidget *entry;
     g_return_if_fail(bsmsg);
- 
-    if     (g_strcasecmp(key, "to")     ==0) entry = bsmsg->to[1];
+
+    if (g_strcasecmp(key, "body") == 0) {
+        GtkTextBuffer *buffer =
+            gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+
+        gtk_text_buffer_insert_at_cursor(buffer, val, -1);
+
+        return;
+    } else if (g_strcasecmp(key, "to")     ==0) entry = bsmsg->to[1];
     else if(g_strcasecmp(key, "subject")==0) entry = bsmsg->subject[1];
     else if(g_strcasecmp(key, "cc")     ==0) entry = bsmsg->cc[1];
     else if(g_strcasecmp(key, "bcc")    ==0) entry = bsmsg->bcc[1];
     else if(g_strcasecmp(key, "replyto")==0) entry = bsmsg->reply_to[1];
     else return;
 
-    gtk_entry_set_text(GTK_ENTRY(entry), val);
+    append_comma_separated(GTK_EDITABLE(entry), val);
 }
 
 static gchar *
@@ -3026,6 +3033,10 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->bcc[1]));
     message->bcc_list = libbalsa_address_new_list_from_string(ctmp);
 
+    /* get the fcc-box from the option menu widget */
+    bsmsg->fcc_url =
+        g_strdup(balsa_mblist_mru_option_menu_get(bsmsg->fcc[1]));
+
     ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->reply_to[1]));
     if (*ctmp)
 	message->reply_to = libbalsa_address_new_from_string(ctmp);
@@ -3123,7 +3134,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 {
     gboolean successful = TRUE;
     LibBalsaMessage *message;
-    LibBalsaMailbox *fcc = NULL;
+    LibBalsaMailbox *fcc;
 
     if (!is_ready_to_send(bsmsg))
 	return FALSE;

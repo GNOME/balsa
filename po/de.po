@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-12-19 14:37+0100\n"
-"PO-Revision-Date: 2004-12-19 15:29+0100\n"
+"POT-Creation-Date: 2004-12-21 17:56+0100\n"
+"PO-Revision-Date: 2004-12-21 17:57+0100\n"
 "Last-Translator: Hendrik Brandt <heb@gnome-de.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -752,7 +752,8 @@ msgstr "POP3-Fehler: %s"
 #, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr ""
-"Das Postfach %s kann nur gelesen werden: Markierungen können nicht geändert werden."
+"Das Postfach %s kann nur gelesen werden: Markierungen können nicht geändert "
+"werden."
 
 #: libbalsa/mime.c:92
 msgid ""
@@ -881,7 +882,9 @@ msgstr "Unbekanntes Problem bei der Verschlüsselungsmethode für Protokoll %s."
 #: libbalsa/rfc3156.c:106
 #, c-format
 msgid "%s: could not retreive crypto engine information: %s."
-msgstr "%s: Informationen zur Verschlüsselungsmethode konnten nicht abgerufen werden: %s."
+msgstr ""
+"%s: Informationen zur Verschlüsselungsmethode konnten nicht abgerufen "
+"werden: %s."
 
 #: libbalsa/rfc3156.c:110
 #, c-format
@@ -902,7 +905,9 @@ msgstr "gpgme-Kontext konnte nicht angelegt werden"
 
 #: libbalsa/rfc3156.c:270 libbalsa/rfc3156.c:741
 msgid "Enter passphrase to unlock the secret key for signing"
-msgstr "Bitte geben Sie das Passwort ein, um den Geheimschlüssel für Ihre Signatur freizugeben"
+msgstr ""
+"Bitte geben Sie das Passwort ein, um den Geheimschlüssel für Ihre Signatur "
+"freizugeben"
 
 #: libbalsa/rfc3156.c:291 libbalsa/rfc3156.c:295 libbalsa/rfc3156.c:770
 msgid "signing failed"
@@ -1375,7 +1380,8 @@ msgstr ""
 
 #: libbalsa/send.c:1853 libbalsa/send.c:1929
 msgid "This message will not be encrypted for the BCC: recipient(s)."
-msgstr "Diese Nachricht wird für die Empfänger einer Blindkopie nicht verschlüsselt."
+msgstr ""
+"Diese Nachricht wird für die Empfänger einer Blindkopie nicht verschlüsselt."
 
 #. host, authentication method
 #: libbalsa/server.c:376
@@ -2285,7 +2291,8 @@ msgstr "Auf Empfangsbestätigung antworten?"
 msgid ""
 "This is an inline %s signed %s message part:\n"
 "%s"
-msgstr "Dies ist ein integrierter %s signierter %s Nachrichtenteil:\n"
+msgstr ""
+"Dies ist ein integrierter %s signierter %s Nachrichtenteil:\n"
 "%s"
 
 #: src/balsa-message.c:4484 src/print.c:1303
@@ -2317,8 +2324,8 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
 "it's structure is invalid."
 msgstr ""
-"Die von %s verschickte Nachricht mit Betreff »%s« enthält einen verschlüsselten Teil, "
-"dessen Struktur jedoch ungültig ist."
+"Die von %s verschickte Nachricht mit Betreff »%s« enthält einen "
+"verschlüsselten Teil, dessen Struktur jedoch ungültig ist."
 
 #: src/balsa-message.c:4663
 #, c-format
@@ -2326,8 +2333,9 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
 "but this crypto protocol is not available."
 msgstr ""
-"Die von %s verschickte Nachricht mit Betreff »%s« enthält einen mit PGP verschlüsselten Teil, "
-"jedoch ist dieses Verschlüsselungsprotokoll nicht verfügbar."
+"Die von %s verschickte Nachricht mit Betreff »%s« enthält einen mit PGP "
+"verschlüsselten Teil, jedoch ist dieses Verschlüsselungsprotokoll nicht "
+"verfügbar."
 
 #: src/balsa-message.c:4676
 #, c-format
@@ -2335,8 +2343,9 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
 "but this crypto protocol is not available."
 msgstr ""
-"Die von %s verschickte Nachricht mit Betreff »%s« enthält einen als S/MIME verschlüsselten Teil, "
-"jedoch ist dieses Verschlüsselungsprotokoll nicht verfügbar."
+"Die von %s verschickte Nachricht mit Betreff »%s« enthält einen als S/MIME "
+"verschlüsselten Teil, jedoch ist dieses Verschlüsselungsprotokoll nicht "
+"verfügbar."
 
 #: src/balsa-message.c:4730
 #, c-format
@@ -2344,8 +2353,9 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but it's "
 "structure is invalid. The signature, if there is any, can not be checked."
 msgstr ""
-"Die von %s verschickte Nachricht mit Betreff »%s« enthält einen verschlüsselten Teil, "
-"dessen Struktur jedoch ungültig ist. Falls eine Signatur existiert, kann diese nicht überprüft werden."
+"Die von %s verschickte Nachricht mit Betreff »%s« enthält einen "
+"verschlüsselten Teil, dessen Struktur jedoch ungültig ist. Falls eine "
+"Signatur existiert, kann diese nicht überprüft werden."
 
 #: src/balsa-message.c:4743
 #, c-format
@@ -2353,8 +2363,9 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
 "this crypto protocol is not available."
 msgstr ""
-"Die von %s verschickte Nachricht mit Betreff »%s« enthält einen verschlüsselten Teil, "
-"jedoch ist das Verschlüsselungsprotokoll nicht verfügbar."
+"Die von %s verschickte Nachricht mit Betreff »%s« enthält einen "
+"verschlüsselten Teil, jedoch ist das Verschlüsselungsprotokoll nicht "
+"verfügbar."
 
 #: src/balsa-message.c:4746
 msgid "PGP"
@@ -2366,12 +2377,14 @@ msgstr "Gültige Signatur erkannt"
 
 #: src/balsa-message.c:4771
 msgid "Detected a good signature with insufficient validity"
-msgstr "Es wurde eine fehlerfreie Signatur mit unzureichender Gültigkeit erkannt"
-""
+msgstr ""
+"Es wurde eine fehlerfreie Signatur mit unzureichender Gültigkeit erkannt"
 
 #: src/balsa-message.c:4776 src/balsa-message.c:4874
 msgid "Detected a good signature with insufficient validity/trust"
-msgstr "Es wurde eine fehlerfreie Signatur mit unzureichender Gültigkeit oder unzureichendem Vertrauen erkannt"
+msgstr ""
+"Es wurde eine fehlerfreie Signatur mit unzureichender Gültigkeit oder "
+"unzureichendem Vertrauen erkannt"
 
 #: src/balsa-message.c:4783 src/balsa-message.c:4880
 #, c-format
@@ -3715,7 +3728,9 @@ msgstr "_Gelöschte Nachrichten entfernen"
 
 #: src/main-window.c:736 src/main-window.c:833
 msgid "Expunge messages marked as deleted in the currently opened mailbox"
-msgstr "Alle als gelöscht markierten Nachrichten im aktuell geöffneten Postfach endgültig entfernen"
+msgstr ""
+"Alle als gelöscht markierten Nachrichten im aktuell geöffneten Postfach "
+"endgültig entfernen"
 
 #: src/main-window.c:741 src/main-window.c:839
 msgid "Close mailbox"
@@ -3735,7 +3750,9 @@ msgstr "_Filter auswählen"
 
 #: src/main-window.c:751 src/main-window.c:1072
 msgid "Select filters to be applied automatically to current mailbox"
-msgstr "Bitte wählen Sie die Filter aus, welche automatisch auf das aktuelle Postfach angwendet werden sollen"
+msgstr ""
+"Bitte wählen Sie die Filter aus, welche automatisch auf das aktuelle "
+"Postfach angwendet werden sollen"
 
 #: src/main-window.c:764
 msgid "_Toolbars..."
@@ -3905,7 +3922,8 @@ msgstr "Betreff oder Absender _enthält:"
 msgid ""
 "Unable to Open Mailbox!\n"
 "%s."
-msgstr "Postfach konnte nicht geöffnet werden!\n"
+msgstr ""
+"Postfach konnte nicht geöffnet werden!\n"
 "%s."
 
 #: src/main-window.c:2519
@@ -4157,7 +4175,7 @@ msgstr "Die Nachricht in das Müll-Postfach verschieben"
 msgid "M_ove"
 msgstr "_Verschieben"
 
-#: src/message-window.c:362
+#: src/message-window.c:365
 #, c-format
 msgid "Message from %s: %s"
 msgstr "Nachricht von %s: %s"
@@ -4648,7 +4666,8 @@ msgstr "Nachrichten löschen"
 msgid ""
 "The following setting is global, but may be overridden\n"
 "for the selected mailbox using Mailbox -> Hide messages:"
-msgstr "Die folgende Einstellung ist global, kann jedoch für ein ausgewähltes "
+msgstr ""
+"Die folgende Einstellung ist global, kann jedoch für ein ausgewähltes "
 "Postfach durch »Postfach -> Verstecken« überschrieben werden:"
 
 #: src/pref-manager.c:2796
@@ -4661,7 +4680,9 @@ msgstr "Die folgenden Einstellungen sind global."
 
 #: src/pref-manager.c:2803
 msgid "Expunge deleted messages when mailbox is closed"
-msgstr "Als gelöscht markierte Nachrichten endgültig entfernen, wenn Postfach geschlossen wird"
+msgstr ""
+"Als gelöscht markierte Nachrichten endgültig entfernen, wenn Postfach "
+"geschlossen wird"
 
 #: src/pref-manager.c:2810
 msgid " ...and if mailbox is unused more than"

@@ -136,6 +136,14 @@ void mutt_fetchPopMail (void)
     return;
   }
 
+  DM( "Open buffer mailbox" );
+
+  if (mx_open_mailbox (NONULL(Spoolfile), M_APPEND, &ctx) == NULL) {
+	  mutt_error( "Cannot open the temporary mailbox to spool POP3 messages: \"%s\"", Spoolfile );
+	  return;
+  }
+
+
 #ifndef LIBMUTT   
   if (!getPass ()) return;
 #endif
@@ -154,6 +162,7 @@ void mutt_fetchPopMail (void)
     if ((he = gethostbyname (NONULL(PopHost))) == NULL)
     {
       mutt_error ("Could not find address for host %s.", PopHost);
+      mx_fastclose_mailbox (&ctx);
       return;
     }
     memcpy ((void *)&sin.sin_addr, *(he->h_addr_list), he->h_length);
@@ -171,8 +180,10 @@ void mutt_fetchPopMail (void)
 
   DM( "Connected; hello" );
 
-  if (getLine (s, buffer, sizeof (buffer)) == -1)
-    goto fail;
+  if (getLine (s, buffer, sizeof (buffer)) == -1) {
+	  mx_fastclose_mailbox (&ctx);
+	  goto fail;
+  }
 
   if (mutt_strncmp (buffer, "+OK", 3) != 0)
   {
@@ -186,8 +197,10 @@ void mutt_fetchPopMail (void)
   snprintf (buffer, sizeof(buffer), "user %s\r\n", PopUser);
   write (s, buffer, mutt_strlen (buffer));
 
-  if (getLine (s, buffer, sizeof (buffer)) == -1)
-    goto fail;
+  if (getLine (s, buffer, sizeof (buffer)) == -1) {
+      mx_fastclose_mailbox (&ctx);
+      goto fail;
+  }
 
   if (mutt_strncmp (buffer, "+OK", 3) != 0)
   {
@@ -201,8 +214,10 @@ void mutt_fetchPopMail (void)
   snprintf (buffer, sizeof(buffer), "pass %s\r\n", NONULL(PopPass));
   write (s, buffer, mutt_strlen (buffer));
   
-  if (getLine (s, buffer, sizeof (buffer)) == -1)
-    goto fail;
+  if (getLine (s, buffer, sizeof (buffer)) == -1) {
+	  mx_fastclose_mailbox (&ctx);
+	  goto fail;
+  }
 
   if (mutt_strncmp (buffer, "+OK", 3) != 0)
   {
@@ -220,8 +235,10 @@ void mutt_fetchPopMail (void)
   /* find out how many messages are in the mailbox. */
   write (s, "stat\r\n", 6);
   
-  if (getLine (s, buffer, sizeof (buffer)) == -1)
-    goto fail;
+  if (getLine (s, buffer, sizeof (buffer)) == -1) {
+	  mx_fastclose_mailbox (&ctx);
+	  goto fail;
+  }
 
   if (mutt_strncmp (buffer, "+OK", 3) != 0)
   {
@@ -238,13 +255,6 @@ void mutt_fetchPopMail (void)
   {
     mutt_message ("No new mail in POP mailbox.");
     goto finish;
-  }
-
-  DM( "Open buffer mailbox" );
-
-  if (mx_open_mailbox (NONULL(Spoolfile), M_APPEND, &ctx) == NULL) {
-	  DM( "open failed" );
-	  goto finish;
   }
 
  first_msg = 1;

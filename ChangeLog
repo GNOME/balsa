@@ -1,5 +1,9 @@
 2000-06-10  Peter Williams  <peter@beta.newton.cx>
 
+	* libmutt/pop.c: Open the spoolbox and make sure that it works
+	BEFORE we waste time connecting to the server, a report an error
+	if the mailbox doesn't work.
+	
 	* libinit_balsa/balsa-druid-page-{user,finish,error}.gob:
 	Fix nasty crash-causing typo (can't class an object to its class....)
 

@@ -188,7 +188,6 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi, GtkWidget *app)
 		      (GtkSignalFunc) check_new_messages_cb,
 		      NULL);
 #endif
-  gtk_object_set_user_data (GTK_OBJECT (w), mw);
   gtk_widget_show (w);
 
 
@@ -237,8 +236,6 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi, GtkWidget *app)
   gtk_widget_show (w);
   gtk_widget_add_accelerator (w, "activate", accel, 'R', GDK_CONTROL_MASK, 0);
 
-  gtk_object_set_user_data (GTK_OBJECT (w), (gpointer) mw);
-
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
 		      (GtkSignalFunc) replyto_message_cb,
@@ -250,8 +247,6 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi, GtkWidget *app)
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_FWD, _ ("Forward"));
   gtk_widget_show (w);
-
-  gtk_object_set_user_data (GTK_OBJECT (w), (gpointer) mw);
 
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
@@ -269,8 +264,6 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi, GtkWidget *app)
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_TRASH, _ ("Delete"));
   gtk_widget_show (w);
 
-  gtk_object_set_user_data (GTK_OBJECT (w), (gpointer) mw);
-
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
 		      (GtkSignalFunc) delete_message_cb,
@@ -284,8 +277,6 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi, GtkWidget *app)
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Undelete"));
   gtk_widget_show (w);
-
-  gtk_object_set_user_data (GTK_OBJECT (w), (gpointer) mw);
 
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
@@ -419,7 +410,6 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi, GtkWidget *app)
 	/*		     (GtkSignalFunc) check_new_messages_cb, */
 			     (GtkSignalFunc) NULL,
 			     "Check Email");
-  gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), mw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
@@ -434,7 +424,6 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi, GtkWidget *app)
 	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_TRASH),
 			     (GtkSignalFunc) delete_message_cb,
 			     NULL);
-  gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
@@ -460,7 +449,6 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi, GtkWidget *app)
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RPL),
 			     (GtkSignalFunc) replyto_message_cb,
 			     "Reply");
-  gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
@@ -472,7 +460,6 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi, GtkWidget *app)
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_FWD),
 			     (GtkSignalFunc) forward_message_cb,
 			     "Forward");
-  gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
@@ -487,7 +474,6 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi, GtkWidget *app)
 		gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_BACK),
 			     (GtkSignalFunc) previous_message_cb,
 			     "Open Previous Message");
-  gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
@@ -499,7 +485,6 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi, GtkWidget *app)
 	     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_FORWARD),
 			     (GtkSignalFunc) next_message_cb,
 			     "Open Next Message");
-  gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
   return GTK_TOOLBAR(mw->toolbar);

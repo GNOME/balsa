@@ -64,6 +64,8 @@ static void libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
 static void libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
+static gboolean libbalsa_mailbox_real_close_backend (LibBalsaMailbox *
+						     mailbox);
 
 /* Callbacks */
 static void messages_status_changed_cb(LibBalsaMailbox * mb,
@@ -242,6 +244,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->can_match = libbalsa_mailbox_real_can_match;
     klass->save_config  = libbalsa_mailbox_real_save_config;
     klass->load_config  = libbalsa_mailbox_real_load_config;
+    klass->close_backend  = libbalsa_mailbox_real_close_backend;
 }
 
 static void
@@ -680,6 +683,12 @@ libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
     mailbox->name = gnome_config_get_string("Name=Mailbox");
 }
 
+static gboolean
+libbalsa_mailbox_real_close_backend(LibBalsaMailbox * mailbox)
+{
+    return TRUE;		/* Default is noop. */
+}
+
 GType
 libbalsa_mailbox_type_from_path(const gchar * path)
 /* libbalsa_get_mailbox_storage_type:
@@ -759,10 +768,9 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno)
     /* Invalidate iters. */
     mailbox->stamp++;
     iter.stamp = mailbox->stamp;
+    g_node_append(mailbox->msg_tree, iter.user_data);
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
 
-    /* Grow msg_tree before emitting the signal. */
-    g_node_append(mailbox->msg_tree, iter.user_data);
     g_signal_emit_by_name(mailbox, "row-inserted", path, &iter);
     gtk_tree_path_free(path);
 }
@@ -911,11 +919,17 @@ libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox)
 gboolean
 libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox, gboolean expunge)
 {
+    gboolean retval;
+
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(!mailbox->readonly, TRUE);
 
-    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->sync(mailbox, expunge);
+    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
+    retval = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->sync(mailbox, expunge);
+    UNLOCK_MAILBOX(mailbox);
+
+    return retval;
 }
 
 LibBalsaMessage*

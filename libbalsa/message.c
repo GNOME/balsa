@@ -713,6 +713,8 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read,
                           gboolean fetch_all_headers)
 {
     LibBalsaFetchFlag flags = 0;
+    gboolean retval = TRUE;
+
     g_return_val_if_fail(message, FALSE);
     if (!message->mailbox) return FALSE;
     g_return_val_if_fail(MAILBOX_OPEN(message->mailbox), FALSE);
@@ -726,13 +728,15 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read,
         /* not fetched yet */
         flags |= LB_FETCH_STRUCTURE;
 
-    if(flags)
-        libbalsa_mailbox_fetch_message_structure(message->mailbox, message,
-                                                 flags);
-    message->body_ref++;
+    if (flags)
+        retval =
+            libbalsa_mailbox_fetch_message_structure(message->mailbox,
+                                                     message, flags);
+    if (retval)
+	message->body_ref++;
     libbalsa_unlock_mailbox(message->mailbox);
     
-    return TRUE;
+    return retval;
 }
 
 
@@ -1279,22 +1283,23 @@ libbalsa_message_set_headers_from_string(LibBalsaMessage *message,
     return lb_message_set_headers_from_string(message, lines, TRUE);
 }
 
-gboolean
-libbalsa_message_load_envelope_from_file(LibBalsaMessage *message,
-					 const char *filename)
+void
+libbalsa_message_load_envelope(LibBalsaMessage *message)
 {
-    int fd;
     GMimeStream *gmime_stream;
     GMimeStream *gmime_stream_buffer;
     GByteArray *line;
     char lookahead;
     gboolean ret = FALSE;
 
-    fd = open(filename, O_RDONLY);
-    gmime_stream = g_mime_stream_fs_new(fd);
+    gmime_stream =
+	libbalsa_mailbox_get_message_stream(message->mailbox, message);
+    if (!gmime_stream)
+	return;
     gmime_stream_buffer = g_mime_stream_buffer_new(gmime_stream,
 					GMIME_STREAM_BUFFER_BLOCK_READ);
-    g_mime_stream_unref(gmime_stream);
+    g_object_unref(gmime_stream);
+
     line = g_byte_array_new();
     do {
 	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
@@ -1326,7 +1331,6 @@ libbalsa_message_load_envelope_from_file(LibBalsaMessage *message,
     if (ret) {
 	/* calculate size */
     }
-    g_mime_stream_unref(gmime_stream_buffer);
+    g_object_unref(gmime_stream_buffer);
     g_byte_array_free(line, TRUE);
-    return ret;
 }

@@ -340,8 +340,7 @@ LibBalsaMessageAttach libbalsa_message_get_attach_icon(LibBalsaMessage *
 
 GList *libbalsa_message_refs_for_threading(LibBalsaMessage* msg);
 
-gboolean libbalsa_message_load_envelope_from_file(LibBalsaMessage *message,
-						  const char *filename);
+void libbalsa_message_load_envelope(LibBalsaMessage *message);
 gboolean libbalsa_message_set_headers_from_string(LibBalsaMessage *message,
                                                   const gchar *str);
 void libbalsa_message_set_references_from_string(LibBalsaMessage * message,

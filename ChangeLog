@@ -1,5 +1,8 @@
-2003-12-02 05:17  PeterB
+2003-12-02 15:26  PeterB
 
+	* libbalsa/body.c: Unref the message returned by
+	g_mime_message_part_get_message(); simplify set-mime-body
+	recursion.
 	* src/balsa-message.c: Display message/rfc822 (Pawel); simplify
 	display-part recursion.
 

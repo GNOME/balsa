@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.4.9\n"
-"POT-Creation-Date: 2000-04-06 10:41+0200\n"
-"PO-Revision-Date: 2000-04-06 10:41+02:00\n"
+"POT-Creation-Date: 2000-04-10 10:44+0200\n"
+"PO-Revision-Date: 2000-04-10 10:46+02:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@online.no>\n"
 "Language-Team: Norwegian <no@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -277,7 +277,7 @@ msgstr "Emne"
 msgid "Date"
 msgstr "Dato"
 
-#: src/balsa-mblist.c:811
+#: src/balsa-mblist.c:814
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Vist postboks: %s med %ld meldinger, %ld nye"
@@ -291,8 +291,8 @@ msgid "Save"
 msgstr "Lagre"
 
 #: src/balsa-message.c:166 src/balsa-message.c:224 src/mailbox-conf.c:641
-#: src/sendmsg-window.c:125 src/sendmsg-window.c:407 src/sendmsg-window.c:1056
-#: src/sendmsg-window.c:1346 src/sendmsg-window.c:1369
+#: src/sendmsg-window.c:125 src/sendmsg-window.c:407 src/sendmsg-window.c:1073
+#: src/sendmsg-window.c:1363 src/sendmsg-window.c:1386
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -320,13 +320,13 @@ msgstr "Dato:"
 
 #. From:
 #: src/balsa-message.c:644 src/filter-edit-dialog.c:339
-#: src/sendmsg-window.c:561
+#: src/sendmsg-window.c:578
 msgid "From:"
 msgstr "Fra:"
 
 #. To:
 #: src/balsa-message.c:648 src/filter-edit-dialog.c:327
-#: src/sendmsg-window.c:563
+#: src/sendmsg-window.c:580
 msgid "To:"
 msgstr "Til:"
 
@@ -343,26 +343,26 @@ msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:654 src/sendmsg-window.c:569
+#: src/balsa-message.c:654 src/sendmsg-window.c:586
 msgid "Subject:"
 msgstr "Emne:"
 
-#: src/balsa-message.c:769
+#: src/balsa-message.c:761
 msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
 msgstr ""
 "<tr><td bgcolor=\"#f0f0f0\"> Du mottok en kodet fil av type applikasjon/"
 
-#: src/balsa-message.c:773
+#: src/balsa-message.c:765
 msgid "<P>The parameters of this message are:<BR>"
 msgstr "<P>Parameterene til denne meldingen er: <BR>"
 
-#: src/balsa-message.c:774
+#: src/balsa-message.c:766
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
 msgstr "<table border=0><tr><th>Attributt</th><th>Verdi</th></tr>\n"
 
-#: src/balsa-message.c:1169
+#: src/balsa-message.c:1161
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Åpning av %s feilet. Errno = %d, "
@@ -879,8 +879,8 @@ msgid "Get new mail on startup"
 msgstr "Hent ny post ved oppstart"
 
 #: src/main.c:103
-msgid "Compose a new email to EMAIL@ADRESS"
-msgstr "Skriv en ny e-post til E-POST@ADRESSE"
+msgid "Compose a new email to EMAIL@ADDRESS"
+msgstr "Skriv en ny melding til E-POST@ADRESSE"
 
 #: src/main.c:104
 msgid "Opens MAILBOXNAME"
@@ -1411,91 +1411,91 @@ msgstr "Kan ikke hente informasjon om filen '%s': %s\n"
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Vedlegget er ikke en vanlig fil: '%s'\n"
 
-#: src/sendmsg-window.c:446
+#: src/sendmsg-window.c:461
 msgid "Attach file"
 msgstr "Legg ved fil"
 
 #. cc:
-#: src/sendmsg-window.c:572
+#: src/sendmsg-window.c:589
 msgid "cc:"
 msgstr "cc:"
 
 #. bcc:
-#: src/sendmsg-window.c:575
+#: src/sendmsg-window.c:592
 msgid "bcc:"
 msgstr "bcc:"
 
 #. fcc:
-#: src/sendmsg-window.c:578
+#: src/sendmsg-window.c:595
 msgid "fcc:"
 msgstr "fcc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:606
+#: src/sendmsg-window.c:623
 msgid "Reply To:"
 msgstr "Svar til:"
 
 #. Attachment list
-#: src/sendmsg-window.c:610
+#: src/sendmsg-window.c:627
 msgid "Attachments:"
 msgstr "Vedlegg:"
 
 #. Comments:
-#: src/sendmsg-window.c:652
+#: src/sendmsg-window.c:669
 msgid "Comments:"
 msgstr "Kommentarer:"
 
 #. Keywords:
-#: src/sendmsg-window.c:655
+#: src/sendmsg-window.c:672
 msgid "Keywords:"
 msgstr "Nøkkelord:"
 
-#: src/sendmsg-window.c:732
+#: src/sendmsg-window.c:749
 msgid "you"
 msgstr "du"
 
-#: src/sendmsg-window.c:741
+#: src/sendmsg-window.c:758
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "På %s skrev %s:\n"
 
-#: src/sendmsg-window.c:743
+#: src/sendmsg-window.c:760
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s skrev:\n"
 
-#: src/sendmsg-window.c:813
+#: src/sendmsg-window.c:830
 msgid "Reply to "
 msgstr "Svar til "
 
-#: src/sendmsg-window.c:818
+#: src/sendmsg-window.c:835
 msgid "Forward message"
 msgstr "Videresend melding"
 
-#: src/sendmsg-window.c:823
+#: src/sendmsg-window.c:840
 msgid "Continue message"
 msgstr "Fortsett på en melding"
 
-#: src/sendmsg-window.c:828
+#: src/sendmsg-window.c:845
 msgid "New message"
 msgstr "Ny melding"
 
-#: src/sendmsg-window.c:1055
+#: src/sendmsg-window.c:1072
 msgid "Could not open the file.\n"
 msgstr "Kunne ikke åpne filen.\n"
 
-#: src/sendmsg-window.c:1061
+#: src/sendmsg-window.c:1078
 msgid "Loading..."
 msgstr "Laster..."
 
-#: src/sendmsg-window.c:1086
+#: src/sendmsg-window.c:1103
 msgid "Include file"
 msgstr "Inkluder fil"
 
-#: src/sendmsg-window.c:1344
+#: src/sendmsg-window.c:1361
 msgid "Cannot execute print command."
 msgstr "Kan ikke utføre utskriftskommando."
 
-#: src/sendmsg-window.c:1368
+#: src/sendmsg-window.c:1385
 msgid "Error executing lpr"
 msgstr "Feil under kjøring av lpr"

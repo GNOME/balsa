@@ -155,19 +155,19 @@ static GnomeUIInfo settings_menu[] =
 };
 static GnomeUIInfo help_menu[] =
 {
-  GNOMEUIINFO_ITEM_STOCK ("_About...", NULL, show_about_box, GNOME_STOCK_MENU_ABOUT),
-#if 0
   GNOMEUIINFO_HELP ("balsa"),
-#endif
+
+  GNOMEUIINFO_MENU_ABOUT_ITEM(show_about_box, NULL),
+
   GNOMEUIINFO_END
 };
 static GnomeUIInfo main_menu[] =
 {
-  GNOMEUIINFO_SUBTREE ("_File", file_menu),
+  GNOMEUIINFO_MENU_FILE_TREE(file_menu),
   GNOMEUIINFO_SUBTREE ("_Message", message_menu),
   GNOMEUIINFO_SUBTREE ("Mail_boxes", mailbox_menu),
   GNOMEUIINFO_SUBTREE ("_Settings", settings_menu),
-  GNOMEUIINFO_SUBTREE ("_Help", help_menu),
+  GNOMEUIINFO_MENU_HELP_TREE(help_menu),
   GNOMEUIINFO_END
 };
 

@@ -33,25 +33,25 @@
  * SLcurses_waddnstr() can't take a "const char *", so this is only
  * declared "static" (sigh)
  */
-static char EditorHelp[] = "\
-~~		insert a line begining with a single ~\n\
-~b users	add users to the Bcc: field\n\
-~c users	add users to the Cc: field\n\
-~f messages	include messages\n\
-~F messages	same as ~f, except also include headers\n\
-~h		edit the message header\n\
-~m messages	include and quote messages\n\
-~M messages	same as ~m, except include headers\n\
-~p		print the message\n\
-~q		write file and quit editor\n\
-~r file		read a file into the editor\n\
-~t users	add users to the To: field\n\
-~u		recall the previous line\n\
-~v		edit message with the $visual editor\n\
-~w file		write message to file\n\
-~x		abort changes and quit editor\n\
-~?		this message\n\
-.		on a line by itself ends input\n";
+static char EditorHelp[] = ""
+"~~		insert a line begining with a single ~\n"
+"~b users	add users to the Bcc: field\n"
+"~c users	add users to the Cc: field\n"
+"~f messages	include messages\n"
+"~F messages	same as ~f, except also include headers\n"
+"~h		edit the message header\n"
+"~m messages	include and quote messages\n"
+"~M messages	same as ~m, except include headers\n"
+"~p		print the message\n"
+"~q		write file and quit editor\n"
+"~r file		read a file into the editor\n"
+"~t users	add users to the To: field\n"
+"~u		recall the previous line\n"
+"~v		edit message with the $visual editor\n"
+"~w file		write message to file\n"
+"~x		abort changes and quit editor\n"
+"~?		this message\n"
+".		on a line by itself ends input\n";
 
 static char **
 be_snarf_data (FILE *f, char **buf, int *bufmax, int *buflen, int offset,

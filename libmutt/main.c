@@ -30,28 +30,28 @@
 #include <sys/stat.h>
 #include <sys/utsname.h>
 
-const char Notice[] = "\
-Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>\n\
-Mutt comes with ABSOLUTELY NO WARRANTY; for details type `mutt -vv'.\n\
-Mutt is free software, and you are welcome to redistribute it\n\
-under certain conditions; type `mutt -vv' for details.\n";
+const char Notice[] = ""
+"Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>\n"
+"Mutt comes with ABSOLUTELY NO WARRANTY; for details type `mutt -vv'.\n"
+"Mutt is free software, and you are welcome to redistribute it\n"
+"under certain conditions; type `mutt -vv' for details.\n";
 
-const char Copyright[] = "\
-Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>\n\
-\n\
-    This program is free software; you can redistribute it and/or modify\n\
-    it under the terms of the GNU General Public License as published by\n\
-    the Free Software Foundation; either version 2 of the License, or\n\
-    (at your option) any later version.\n\
-\n\
-    This program is distributed in the hope that it will be useful,\n\
-    but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
-    GNU General Public License for more details.\n\
-\n\
-    You should have received a copy of the GNU General Public License\n\
-    along with this program; if not, write to the Free Software\n\
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n";
+const char Copyright[] = ""
+"Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>\n"
+"\n"
+"    This program is free software; you can redistribute it and/or modify\n"
+"    it under the terms of the GNU General Public License as published by\n"
+"    the Free Software Foundation; either version 2 of the License, or\n"
+"    (at your option) any later version.\n"
+"\n"
+"    This program is distributed in the hope that it will be useful,\n"
+"    but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"    GNU General Public License for more details.\n"
+"\n"
+"    You should have received a copy of the GNU General Public License\n"
+"    along with this program; if not, write to the Free Software\n"
+"    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n";
 
 void mutt_exit (int code)
 {
@@ -63,31 +63,31 @@ static void mutt_usage (void)
 {
   printf ("Mutt %s (%s)\n", VERSION, ReleaseDate);
   puts (
-"usage: mutt [ -nRzZ ] [ -e <cmd> ] [ -F <file> ] [ -m <type> ] [ -f <file> ]\n\
-       mutt [ -nx ] [ -e <cmd> ] [ -a <file> ] [ -F <file> ] [ -H <file> ] [ -i <file> ] [ -s <subj> ] [ -b <addr> ] [ -c <addr> ] <addr> [ ... ]\n\
-       mutt [ -n ] [ -e <cmd> ] [ -F <file> ] -p\n\
-       mutt -v[v]\n\
-\n\
-options:\n\
-  -a <file>\tattach a file to the message\n\
-  -b <address>\tspecify a blind carbon-copy (BCC) address\n\
-  -c <address>\tspecify a carbon-copy (CC) address\n\
-  -e <command>\tspecify a command to be executed after initialization\n\
-  -f <file>\tspecify which mailbox to read\n\
-  -F <file>\tspecify an alternate muttrc file\n\
-  -H <file>\tspecify a draft file to read header from\n\
-  -i <file>\tspecify a file which Mutt should include in the reply\n\
-  -m <type>\tspecify a default mailbox type\n\
-  -n\t\tcauses Mutt not to read the system Muttrc\n\
-  -p\t\trecall a postponed message\n\
-  -R\t\topen mailbox in read-only mode\n\
-  -s <subj>\tspecify a subject (must be in quotes if it has spaces)\n\
-  -v\t\tshow version and compile-time definitions\n\
-  -x\t\tsimulate the mailx send mode\n\
-  -y\t\tselect a mailbox specified in your `mailboxes' list\n\
-  -z\t\texit immediately if there are no messages in the mailbox\n\
-  -Z\t\topen the first folder with new message, exit immediately if none\n\
-  -h\t\tthis help message");
+"usage: mutt [ -nRzZ ] [ -e <cmd> ] [ -F <file> ] [ -m <type> ] [ -f <file> ]\n"
+"       mutt [ -nx ] [ -e <cmd> ] [ -a <file> ] [ -F <file> ] [ -H <file> ] [ -i <file> ] [ -s <subj> ] [ -b <addr> ] [ -c <addr> ] <addr> [ ... ]\n"
+"       mutt [ -n ] [ -e <cmd> ] [ -F <file> ] -p\n"
+"       mutt -v[v]\n"
+"\n"
+"options:\n"
+"  -a <file>\tattach a file to the message\n"
+"  -b <address>\tspecify a blind carbon-copy (BCC) address\n"
+"  -c <address>\tspecify a carbon-copy (CC) address\n"
+"  -e <command>\tspecify a command to be executed after initialization\n"
+"  -f <file>\tspecify which mailbox to read\n"
+"  -F <file>\tspecify an alternate muttrc file\n"
+"  -H <file>\tspecify a draft file to read header from\n"
+"  -i <file>\tspecify a file which Mutt should include in the reply\n"
+"  -m <type>\tspecify a default mailbox type\n"
+"  -n\t\tcauses Mutt not to read the system Muttrc\n"
+"  -p\t\trecall a postponed message\n"
+"  -R\t\topen mailbox in read-only mode\n"
+"  -s <subj>\tspecify a subject (must be in quotes if it has spaces)\n"
+"  -v\t\tshow version and compile-time definitions\n"
+"  -x\t\tsimulate the mailx send mode\n"
+"  -y\t\tselect a mailbox specified in your `mailboxes' list\n"
+"  -z\t\texit immediately if there are no messages in the mailbox\n"
+"  -Z\t\topen the first folder with new message, exit immediately if none\n"
+"  -h\t\tthis help message");
 
   exit (0);
 }

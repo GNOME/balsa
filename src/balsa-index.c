@@ -450,6 +450,8 @@ balsa_index_select_next (BalsaIndex * bindex)
       list = list->next;
     }
 
+  gtk_clist_unselect_all(clist);
+
   gtk_clist_select_row (clist, h + 1, -1);
 
   if (gtk_clist_row_is_visible (clist, h + 1) != GTK_VISIBILITY_FULL)
@@ -482,6 +484,8 @@ balsa_index_select_previous (BalsaIndex * bindex)
 	h = i;
       list = list->next;
     }
+
+  gtk_clist_unselect_all(clist);
 
   gtk_clist_select_row (clist, h - 1, -1);
 

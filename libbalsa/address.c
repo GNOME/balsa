@@ -875,6 +875,11 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries)
 LibBalsaAddress*
 libbalsa_address_new_from_edit_entries(GtkWidget **entries)
 {
+#define SET_FIELD(f,e)\
+  do{ (f) = g_strstrip(gtk_editable_get_chars(GTK_EDITABLE(e), 0, -1));\
+      if( !(f) || !*(f)) { g_free(f); (f) = NULL; }                    \
+ else { while( (p=strchr(address->full_name,';'))) *p = ','; }  } while(0)
+
     LibBalsaAddress *address;
     char *p, *addr;
     /* FIXME: This problem should be solved in the VCard
@@ -883,36 +888,15 @@ libbalsa_address_new_from_edit_entries(GtkWidget **entries)
        by commas. */
 
     address = libbalsa_address_new();
-    address->full_name = 
-        g_strstrip(gtk_editable_get_chars
-    	       (GTK_EDITABLE(entries[FULL_NAME]), 0, -1));
-    while( (p=strchr(address->full_name,';'))) *p = ',';
-    address->first_name =
-        g_strstrip(gtk_editable_get_chars
-    	       (GTK_EDITABLE(entries[FIRST_NAME]), 0, -1));
-    while( (p=strchr(address->first_name,';'))) *p = ',';
-    address->middle_name =
-        g_strstrip(gtk_editable_get_chars
-    	       (GTK_EDITABLE(entries[MIDDLE_NAME]), 0, -1));
-    while( (p=strchr(address->middle_name,';'))) *p = ',';
-    address->last_name =
-        g_strstrip(gtk_editable_get_chars
-    	       (GTK_EDITABLE(entries[LAST_NAME]), 0, -1));
-    while( (p=strchr(address->last_name,';'))) *p = ',';
-    address->nick_name =
-        g_strstrip(gtk_editable_get_chars
-    	       (GTK_EDITABLE(entries[NICK_NAME]), 0, -1));
-    while( (p=strchr(address->nick_name,';'))) *p = ',';
-    address->organization =
-        g_strstrip(gtk_editable_get_chars
-    	       (GTK_EDITABLE(entries[ORGANIZATION]), 0, -1));
-    while( (p=strchr(address->organization,';'))) *p = ',';
+    SET_FIELD(address->full_name,   entries[FULL_NAME]);
+    SET_FIELD(address->first_name,  entries[FIRST_NAME]);
+    SET_FIELD(address->middle_name, entries[MIDDLE_NAME]);
+    SET_FIELD(address->last_name,   entries[LAST_NAME]);
+    SET_FIELD(address->nick_name,   entries[NICK_NAME]);
+    SET_FIELD(address->organization,entries[ORGANIZATION]);
+    SET_FIELD(addr,                 entries[EMAIL_ADDRESS]);
 
-    addr = g_strstrip(gtk_editable_get_chars
-                      (GTK_EDITABLE(entries[EMAIL_ADDRESS]),
-                       0, -1));
-    while( (p=strchr(addr, ';'))) *p = ',';
-
-    address->address_list = g_list_append(address->address_list,addr);
+    if(addr)
+        address->address_list = g_list_append(address->address_list,addr);
     return address;
 }

@@ -158,6 +158,8 @@ AC_CHECK_LIB(aspell, new_aspell_speller,,[
      ], -lstdc++ -lpspell-modules)
   ], -lstdc++)
 
+AC_CHECK_HEADER(pspell/pspell.h,,
+    AC_MSG_ERROR([** aspell/pspell library found but not related header files. This probably means corresponding aspell-devel package is not installed ]))
 
 dnl ###########################################################################
 dnl All the linguas, all the time.

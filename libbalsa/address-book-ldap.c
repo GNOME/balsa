@@ -444,9 +444,7 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
     int cnt, rc;
     char *cn[]   = {NULL, NULL};
     char *gn[]   = {NULL, NULL};
-#if 1
     char *org[]  = {NULL, NULL};
-#endif
     char *sn[]   = {NULL, NULL};
     char *mail[] = {NULL, NULL};
     LibBalsaAddressBookLdap *ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
@@ -485,13 +483,11 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
         SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_ADD,"sn",sn,address->last_name);
         cnt++;
     }
-#if 1
     if(address->organization) {
         SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_ADD,"o",org,
                address->organization);
         cnt++;
     }
-#endif
     SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_ADD,"mail",mail,
                (char*)address->address_list->data);
     cnt++;
@@ -592,9 +588,7 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
     int rc, cnt;
     char *cn[]   = {NULL, NULL};
     char *gn[]   = {NULL, NULL};
-#if 1
     char *org[]  = {NULL, NULL};
-#endif
     char *sn[]   = {NULL, NULL};
     LibBalsaAddressBookLdap *ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
 
@@ -653,7 +647,6 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
                    address->last_name);
         cnt++;
     }
-#if 1
     if(!STREQ(address->organization,newval->organization)) {
         if(newval->organization)
             SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_REPLACE,"o",
@@ -663,9 +656,10 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
                    org, address->organization);
         cnt++;
     }
-#endif
     mods[cnt] = NULL;
 
+    if(cnt == 0) /* nothing to modify */
+        return LBABERR_OK; 
     cnt = 0;
     do {
         rc = ldap_modify_s(ldap_ab->directory, dn, mods);

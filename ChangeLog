@@ -1,3 +1,9 @@
+2003-08-18  Pawel Salek  <pawsa theochem.kth.se>
+
+	* configure.in: improve aspell detection (120180).
+	* libbalsa/address.c: use NULLs instead of empty strings.
+	* libbalsa/address-book-ldap.c: detect no-op modifications.
+
 2003-08-14 19:33  PeterB
 
 	* src/mailbox-conf.c: Check whether a mailbox view is already in

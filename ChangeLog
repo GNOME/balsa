@@ -1,3 +1,8 @@
+2002-12-02  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-app.h: simplify QuoteRegex so even simple regex libs
+	can parse it (spell check failed miserably on this).
+
 2002-11-30  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/address-book.c: reduce number of dependencies.

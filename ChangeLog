@@ -1,5 +1,8 @@
-2004-11-21 12:22  PeterB
+2004-11-21 13:30  PeterB
 
+	* src/sendmsg-window.c: don't use
+	libbalsa_address_entry_show_matches when NEW_ADDRESS_ENTRY_WIDGET
+	is undefined.
 	* configure.in: use enableval, not withval, with --enable-* option.
 
 2004-11-20  Pawel Salek

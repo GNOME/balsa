@@ -1,5 +1,6 @@
 2004-04-16  Christian Rose  <menthos@menthos.com>
 
+	* .cvsignore: Cleaned up a bit.
 	* POTFILES.in: Sorted and added missing file.
 	* POTFILES.skip: Removed non-existing entry.
 	* sv.po: Updated Swedish translation.

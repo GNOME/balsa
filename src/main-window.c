@@ -4049,3 +4049,16 @@ update_view_menu(void)
         balsa_message_set_wrap(BALSA_MESSAGE(balsa_app.main_window->preview),
                                balsa_app.browse_wrap);
 }
+
+/* Update the notebook tab label when the mailbox name is changed. */
+void
+balsa_window_update_tab(BalsaMailboxNode * mbnode)
+{
+    gint i = balsa_find_notebook_page_num(mbnode->mailbox);
+    if (i != -1) {
+	GtkWidget *page =
+	    gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i);
+	gtk_notebook_set_tab_label(GTK_NOTEBOOK(balsa_app.notebook), page,
+				   balsa_notebook_label_new(mbnode));
+    }
+}

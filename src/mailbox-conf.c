@@ -795,9 +795,13 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 	    return;
 	}
         if(mcw->mailbox_name) {
+	    BalsaMailboxNode *mbnode = balsa_find_mailbox(mcw->mailbox);
 	    name = gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name));
             g_free(mailbox->name);
             mailbox->name = g_strdup(name);
+	    balsa_mblist_mailbox_node_redraw(mbnode);
+	    balsa_window_update_tab(mbnode);
+	    g_object_unref(mbnode);
         } else {
 	    mailbox->name = g_path_get_basename(filename);
             balsa_mailbox_local_append(mailbox);

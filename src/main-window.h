@@ -77,6 +77,7 @@ LibBalsaCondition* balsa_window_get_view_filter(BalsaWindow *window);
 void balsa_window_refresh(BalsaWindow * window);
 void balsa_window_open_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
 void balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
+void balsa_window_update_tab(BalsaMailboxNode * mbnode);
 void enable_empty_trash(TrashState status);
 void balsa_window_enable_continue(BalsaWindow * window);
 void balsa_change_window_layout(BalsaWindow *window);

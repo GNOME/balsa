@@ -1,3 +1,8 @@
+2005-02-15 20:41  PeterB
+
+	* libbalsa/: body.c, mailbox_mbox.c: let GMimeStreams work
+	end-to-end when possible.
+
 2005-02-14  Kjartan Maraas  <kmaraas@gnome.org>
 
 	* configure.in: Add «nb» to ALL_LINGUAS.

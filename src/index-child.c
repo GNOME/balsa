@@ -299,9 +299,8 @@ static void
 message_status_set_new_cb (GtkWidget * widget, Message * message)
 {
   g_return_if_fail (widget != NULL);
-#if 0
-  message_new (message);
-#endif
+
+  message_unread (message);
   /* balsa_index_select_next (BALSA_INDEX (mainwindow->index)); */
 }
 
@@ -309,9 +308,9 @@ static void
 message_status_set_read_cb (GtkWidget * widget, Message * message)
 {
   g_return_if_fail (widget != NULL);
-#if 0
+
   message_read (message);
-#endif
+
   /* balsa_index_select_next (BALSA_INDEX (mainwindow->index)); */
 }
 

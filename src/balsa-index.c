@@ -348,6 +348,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 			 (MailboxWatcherFunc) mailbox_listener,
 			 MESSAGE_MARK_ANSWER_MASK |
 			 MESSAGE_MARK_READ_MASK |
+			 MESSAGE_MARK_UNREAD_MASK |
 			 MESSAGE_MARK_DELETE_MASK |
 			 MESSAGE_MARK_UNDELETE_MASK |
 			 MESSAGE_DELETE_MASK |
@@ -528,9 +529,7 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
 
   if (!event || event->button != 3)
     return;
-/*
-   gtk_clist_get_selection_info (clist, event->x, event->y + clist->voffset, &row, &column);
- */
+
   gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
   bindex = BALSA_INDEX (data);
   message = (Message *) gtk_clist_get_row_data (clist, row);
@@ -597,6 +596,7 @@ mailbox_listener (MailboxWatcherMessage * mw_message)
   switch (mw_message->type)
     {
     case MESSAGE_MARK_READ:
+    case MESSAGE_MARK_UNREAD:
     case MESSAGE_MARK_DELETE:
     case MESSAGE_MARK_UNDELETE:
     case MESSAGE_FLAGGED:

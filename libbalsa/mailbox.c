@@ -126,6 +126,7 @@ static void free_messages (Mailbox * mailbox);
 static void send_watcher_mark_clear_message (Mailbox * mailbox, Message * message);
 static void send_watcher_mark_answer_message (Mailbox * mailbox, Message * message);
 static void send_watcher_mark_read_message (Mailbox * mailbox, Message * message);
+static void send_watcher_mark_unread_message (Mailbox * mailbox, Message * message);
 static void send_watcher_mark_delete_message (Mailbox * mailbox, Message * message);
 static void send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message);
 static void send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining);
@@ -620,7 +621,7 @@ free_messages (Mailbox * mailbox)
   GList *list;
   Message *message;
 
-  list = g_list_first(mailbox->message_list);
+  list = g_list_first (mailbox->message_list);
   while (list)
     {
       message = list->data;
@@ -705,6 +706,31 @@ send_watcher_mark_read_message (Mailbox * mailbox, Message * message)
       list = list->next;
 
       if (watcher->mask & MESSAGE_MARK_READ_MASK)
+	{
+	  mw_message.data = watcher->data;
+	  (*watcher->func) (&mw_message);
+	}
+    }
+}
+
+static void
+send_watcher_mark_unread_message (Mailbox * mailbox, Message * message)
+{
+  GList *list;
+  MailboxWatcherMessage mw_message;
+  MailboxWatcher *watcher;
+
+  mw_message.type = MESSAGE_MARK_UNREAD;
+  mw_message.mailbox = mailbox;
+  mw_message.message = message;
+
+  list = WATCHER_LIST (mailbox);
+  while (list)
+    {
+      watcher = list->data;
+      list = list->next;
+
+      if (watcher->mask & MESSAGE_MARK_UNREAD_MASK)
 	{
 	  mw_message.data = watcher->data;
 	  (*watcher->func) (&mw_message);
@@ -978,7 +1004,7 @@ message_reply (Message * message)
   LOCK_MAILBOX (message->mailbox);
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
-  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_REPLIED, 1);
+  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_REPLIED, TRUE);
 
   message->flags |= MESSAGE_FLAG_REPLIED;
   send_watcher_mark_answer_message (message->mailbox, message);
@@ -1009,6 +1035,38 @@ message_clear_flags (Message * message)
 
 
 void
+message_read (Message * message)
+{
+  HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
+
+  LOCK_MAILBOX (message->mailbox);
+  RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
+
+  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_READ, FALSE);
+
+  message->flags &= ~MESSAGE_FLAG_NEW;
+  send_watcher_mark_read_message (message->mailbox, message);
+
+  UNLOCK_MAILBOX ();
+}
+
+void
+message_unread (Message * message)
+{
+  HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
+
+  LOCK_MAILBOX (message->mailbox);
+  RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
+
+  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_READ, TRUE);
+
+  message->flags |= MESSAGE_FLAG_NEW;
+  send_watcher_mark_unread_message (message->mailbox, message);
+
+  UNLOCK_MAILBOX ();
+}
+
+void
 message_delete (Message * message)
 {
   HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
@@ -1016,7 +1074,7 @@ message_delete (Message * message)
   LOCK_MAILBOX (message->mailbox);
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
-  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, 1);
+  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, TRUE);
 
   message->flags |= MESSAGE_FLAG_DELETED;
   send_watcher_mark_delete_message (message->mailbox, message);
@@ -1033,7 +1091,7 @@ message_undelete (Message * message)
   LOCK_MAILBOX (message->mailbox);
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
-  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, 0);
+  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, FALSE);
 
   message->flags &= ~MESSAGE_FLAG_DELETED;
   send_watcher_mark_undelete_message (message->mailbox, message);
@@ -1214,8 +1272,7 @@ message_body_ref (Message * message)
    */
   if (message->flags & MESSAGE_FLAG_NEW)
     {
-      message->flags &= !MESSAGE_FLAG_NEW;
-      send_watcher_mark_read_message (message->mailbox, message);
+      message_read (message);
     }
 
   if (message->mailbox->type == MAILBOX_IMAP)

@@ -51,6 +51,7 @@ typedef enum
     MESSAGE_MARK_CLEAR,		/* clear all flags */
     MESSAGE_MARK_ANSWER,	/* message has been answered */
     MESSAGE_MARK_READ,		/* message has changed from new to read */
+    MESSAGE_MARK_UNREAD,	/* message has changed from read to new */
     MESSAGE_MARK_DELETE,	/* message has been marked deleted */
     MESSAGE_MARK_UNDELETE,	/* message has been marked undeleted */
     MESSAGE_DELETE,		/* message has been deleted */
@@ -66,12 +67,13 @@ typedef enum
     MESSAGE_MARK_CLEAR_MASK = 1,
     MESSAGE_MARK_ANSWER_MASK = 1 << 1,
     MESSAGE_MARK_READ_MASK = 1 << 2,
-    MESSAGE_MARK_DELETE_MASK = 1 << 3,
-    MESSAGE_MARK_UNDELETE_MASK = 1 << 4,
-    MESSAGE_DELETE_MASK = 1 << 5,
-    MESSAGE_NEW_MASK = 1 << 6,
-    MESSAGE_FLAGGED_MASK = 1 << 7,
-    MESSAGE_REPLIED_MASK = 1 << 8
+    MESSAGE_MARK_UNREAD_MASK = 1 << 3,
+    MESSAGE_MARK_DELETE_MASK = 1 << 4,
+    MESSAGE_MARK_UNDELETE_MASK = 1 << 5,
+    MESSAGE_DELETE_MASK = 1 << 6,
+    MESSAGE_NEW_MASK = 1 << 7,
+    MESSAGE_FLAGGED_MASK = 1 << 8,
+    MESSAGE_REPLIED_MASK = 1 << 9
   }
 MailboxWatcherMessageMask;
 
@@ -114,8 +116,6 @@ struct _Mailbox
     GList *message_list;
 
     GList *children;
-
-    GTree *thread;
   };
 
 
@@ -273,6 +273,9 @@ Message *message_new ();
 void message_free (Message * message);
 
 void message_move (Message * message, Mailbox * mailbox);
+
+void message_read (Message * message);
+void message_unread (Message * message);
 void message_delete (Message * message);
 void message_undelete (Message * message);
 

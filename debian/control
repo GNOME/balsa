@@ -1,7 +1,7 @@
 Source: balsa
-Section: x11
+Section: net
 Priority: optional
-Maintainer: Stuart Parmenter <pavlov@innerx.net>
+Maintainer: Ole J. Tetlie <olet@debian.org>
 Standards-Version: 2.4.0.0
 
 Package: balsa

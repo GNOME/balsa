@@ -10,7 +10,7 @@ build: build-stamp
 build-stamp:
 	dh_testdir
 
-	./autogen.sh --prefix=/usr
+	./configure --prefix=/usr
 	# Add here commands to compile the package.
 	make CFLAGS="-O2 -g -Wall"
 
@@ -23,6 +23,7 @@ clean:
 
 	# Add here commands to clean up after the build process.
 	-$(MAKE) distclean
+	rm -f */.deps/* config.cache config.log config.status
 
 	dh_clean
 
@@ -39,7 +40,7 @@ binary-arch: build
 	dh_installdirs
 
 	# Add here commands to install the files into debian/tmp
-	$(MAKE) install prefix=`pwd`/debian/tmp/usr
+	DESTDIR=`pwd`/debian/tmp $(MAKE) install
 
 	dh_installdocs
 	dh_installexamples

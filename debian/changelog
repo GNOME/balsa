@@ -1,8 +1,16 @@
-balsa (0.4.7-1) unstable; urgency=low
+balsa (0.4.6.2-1) frozen unstable; urgency=low
 
-  * New upstream release.
+  * Cleans up .deps and some config files in the clean target
+  * Upstream bugfix only release. Fixes a bug that makes it
+    impossible to start balsa without a valid ~/.balsa.
 
- -- Stuart Parmenter <pavlov@innerx.net>  Sun, 06 Sep 1998 20:52:03 -0400
+ -- Ole J. Tetlie <olet@debian.org>  Sat, 17 Oct 1998 22:42:13 +0200
+
+balsa (0.4.6-1) unstable; urgency=low
+
+  * New upstream.
+
+ -- Ole J. Tetlie <olet@debian.org>  Thu, 15 Oct 1998 21:18:14 +0200
 
 balsa (0.4.5-1) unstable; urgency=low
 
@@ -18,5 +26,5 @@ balsa (0.4.0-1) unstable; urgency=low
 
 Local variables:
 mode: debian-changelog
-add-log-mailing-address: "pavlov@innerx.net"
+add-log-mailing-address: "olet@debian.org"
 End:

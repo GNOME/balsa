@@ -1,5 +1,5 @@
 usr/bin
-usr/sbin
-usr/doc
-usr/man
-usr/lib
+usr/share/pixmaps/balsa
+usr/doc/balsa
+usr/man/man1
+usr/lib/menu

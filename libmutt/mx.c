@@ -25,6 +25,9 @@
 #include "keymap.h"
 
 
+#ifdef _PGPPATH
+#include "pgp.h"
+#endif
 
 #ifdef USE_IMAP
 #include "imap.h"
@@ -51,12 +54,9 @@
 #include <utime.h>
 #endif
 
-/* HP-UX and ConvexOS don't have this macro */
-#ifndef S_ISLNK
-#define S_ISLNK(x) (((x) & S_IFMT) == S_IFLNK ? 1 : 0)
-#endif
 
-#define mutt_is_spool(s)  (strcmp (NONULL(Spoolfile), s) == 0)
+#define mutt_is_spool(s)  (mutt_strcmp (Spoolfile, s) == 0)
+
 #ifdef USE_DOTLOCK
 /* parameters: 
  * path - file to lock
@@ -70,22 +70,23 @@ static int invoke_dotlock(const char *path, int flags, int retry)
   char cmd[LONG_STRING + _POSIX_PATH_MAX];
   char r[SHORT_STRING];
   char *f;
-
+  
   if(flags & DL_FL_RETRY)
     snprintf(r, sizeof(r), "-r %d ", retry ? MAXLOCKATTEMPT : 0);
- 
+  
   f = mutt_quote_filename(path);
-
+  
   snprintf(cmd, sizeof(cmd),
-	   "%s %s%s%s%s%s%s",
+	   "%s %s%s%s%s%s%s%s",
 	   DOTLOCK,
 	   flags & DL_FL_TRY ? "-t " : "",
 	   flags & DL_FL_UNLOCK ? "-u " : "",
 	   flags & DL_FL_USEPRIV ? "-p " : "",
 	   flags & DL_FL_FORCE ? "-f " : "",
+	   flags & DL_FL_UNLINK ? "-d " : "",
 	   flags & DL_FL_RETRY ? r : "",
 	   f);
-
+  
   FREE(&f);
 
   return mutt_system(cmd);
@@ -101,22 +102,29 @@ static int dotlock_file (const char *path, int retry)
 {
   int r;
   int flags = DL_FL_USEPRIV | DL_FL_RETRY;
-
+  
   if(retry) retry = 1;
 
 retry_lock:
   mutt_clear_error();
   if((r = invoke_dotlock(path, flags, retry)) == DL_EX_EXIST)
   {
-    char msg[LONG_STRING];
-
-    snprintf(msg, sizeof(msg), "Lock count exceeded, remove lock for %s?",
-	     path);
-    if(retry && mutt_yesorno(msg, 1) == 1)
+    if (!option (OPTNOCURSES))
     {
-      flags |= DL_FL_FORCE;
-      retry--;
-      goto retry_lock;
+      char msg[LONG_STRING];
+      
+      snprintf(msg, sizeof(msg), "Lock count exceeded, remove lock for %s?",
+	       path);
+      if(retry && mutt_yesorno(msg, 1) == 1)
+      {
+	flags |= DL_FL_FORCE;
+	retry--;
+	goto retry_lock;
+      }
+    } 
+    else
+    {
+      mutt_error ( "Can't dotlock %s.\n", path);
     }
   }
   return (r == DL_EX_OK ? 0 : -1);
@@ -244,7 +252,7 @@ int mx_lock_file (const char *path, int fd, int excl, int dot, int timeout)
   return 0;
 }
 
-int mx_unlock_file (const char *path, int fd)
+int mx_unlock_file (const char *path, int fd, int dot)
 {
 #ifdef USE_FCNTL
   struct flock unlockit = { F_UNLCK, 0, 0, 0 };
@@ -260,7 +268,8 @@ int mx_unlock_file (const char *path, int fd)
 #endif
 
 #ifdef USE_DOTLOCK
-  undotlock_file (path);
+  if (dot)
+    undotlock_file (path);
 #endif
   
   return 0;
@@ -283,6 +292,32 @@ FILE *mx_open_file_lock (const char *path, const char *mode)
   return (f);
 }
 
+void mx_unlink_empty (const char *path)
+{
+  int fd;
+#ifndef USE_DOTLOCK
+  char b;
+#endif
+
+  if ((fd = open (path, O_RDWR)) == -1)
+    return;
+  
+  if (mx_lock_file (path, fd, 1, 0, 1) == -1)
+  {
+    close (fd);
+    return;
+  }
+
+#ifdef USE_DOTLOCK
+  invoke_dotlock (path, DL_FL_UNLINK, 1);
+#else
+  if  (read (fd, &b, 1) != 1)
+    unlink (path);
+#endif
+
+  mx_unlock_file (path, fd, 0);
+}
+
 /* try to figure out what type of mailbox ``path'' is
  *
  * return values:
@@ -300,55 +335,6 @@ int mx_is_imap(const char *p)
 
 #endif
 
-static int is_mh_message (char * str)
-{
-  int i, len;
-  len = strlen (str);
-
-  /* check for ,[0-9]+ deleted messages */
-  if (len && *str == ',')
-    if (is_mh_message (&str[1]))
-      return 1;
-
-  for (i = 0; i < len; i++)
-    {
-      if (!isdigit (str[i]))
-        {
-          return 0;
-        }
-    }
-  return 1;
-}
-
-static int mx_is_mh(const char* p)
-{
-  struct stat st;
-  DIR* dirp;
-  struct dirent* de;
-
-  /* here we now it's a directory and there's no `cur' subdir in this
-     directory. Because no other mailing system is using directories
-     as folders it should be a MH folder.
-     
-     Problem: subdirs with a name of the form [0-9]+ are not
-     reckognized.
-  */
-
-  if (!(dirp = opendir(p)))
-    return 0;
-
-  while ((de = readdir(dirp)) != NULL)
-  {
-    if (is_mh_message(de->d_name))
-    {
-      closedir(dirp);
-      return 1;
-    }
-  }
-  closedir(dirp);
-  return 0;
-}
-  
 int mx_get_magic (const char *path)
 {
   struct stat st;
@@ -377,9 +363,14 @@ int mx_get_magic (const char *path)
       return (M_MAILDIR);
 
     /* check for mh-style mailbox */
-    if (mx_is_mh(path))
+
+    snprintf (tmp, sizeof (tmp), "%s/.mh_sequences", path);
+    if (access (tmp, F_OK) == 0)
       return (M_MH);
 
+    snprintf (tmp, sizeof (tmp), "%s/.xmhcache", path);
+    if (access (tmp, F_OK) == 0)
+      return (M_MH);
   }
   else if (st.st_size == 0)
   {
@@ -396,9 +387,9 @@ int mx_get_magic (const char *path)
 #endif
 
     fgets (tmp, sizeof (tmp), f);
-    if (strncmp ("From ", tmp, 5) == 0)
+    if (mutt_strncmp ("From ", tmp, 5) == 0)
       magic = M_MBOX;
-    else if (strcmp (MMDF_SEP, tmp) == 0)
+    else if (mutt_strcmp (MMDF_SEP, tmp) == 0)
       magic = M_MMDF;
     fclose (f);
 #ifndef BUFFY_SIZE
@@ -427,14 +418,16 @@ int mx_get_magic (const char *path)
  */
 int mx_set_magic (const char *s)
 {
-  if (strcasecmp (s, "mbox") == 0)
+  if (mutt_strcasecmp (s, "mbox") == 0)
     DefaultMagic = M_MBOX;
-  else if (strcasecmp (s, "mmdf") == 0)
+  else if (mutt_strcasecmp (s, "mmdf") == 0)
     DefaultMagic = M_MMDF;
-  else if (strcasecmp (s, "mh") == 0)
+  else if (mutt_strcasecmp (s, "mh") == 0)
     DefaultMagic = M_MH;
-  else if (strcasecmp (s, "maildir") == 0)
+  else if (mutt_strcasecmp (s, "maildir") == 0)
     DefaultMagic = M_MAILDIR;
+  else if (mutt_strcasecmp (s, "kendra") == 0)
+    DefaultMagic = M_KENDRA;
   else
     return (-1);
 
@@ -578,7 +571,7 @@ CONTEXT *mx_open_mailbox (const char *path, int flags, CONTEXT *pctx)
     ctx = safe_malloc (sizeof (CONTEXT));
   memset (ctx, 0, sizeof (CONTEXT));
   ctx->path = safe_strdup (path);
-  set_option(OPTCHECKNEW);
+
   ctx->msgnotreadyet = -1;
   ctx->collapsed = 0;
   
@@ -623,8 +616,8 @@ CONTEXT *mx_open_mailbox (const char *path, int flags, CONTEXT *pctx)
   set_option (OPTFORCEREFRESH);
 
   /* create hash tables */
-  ctx->id_hash = hash_create (257);
-  ctx->subj_hash = hash_create (257);
+  ctx->id_hash = hash_create (1031);
+  ctx->subj_hash = hash_create (1031);
 
   if (!ctx->quiet)
     mutt_message ("Reading %s...", ctx->path);
@@ -683,6 +676,9 @@ CONTEXT *mx_open_mailbox (const char *path, int flags, CONTEXT *pctx)
 void mx_fastclose_mailbox (CONTEXT *ctx)
 {
   int i;
+
+  if(!ctx) 
+    return;
   
 #ifdef USE_IMAP
   if (ctx->magic == M_IMAP)
@@ -715,6 +711,7 @@ static int sync_mailbox (CONTEXT *ctx)
 
   if (!ctx->quiet)
     mutt_message ("Writing %s...", ctx->path);
+
   switch (ctx->magic)
   {
     case M_MBOX:
@@ -737,6 +734,11 @@ static int sync_mailbox (CONTEXT *ctx)
 #endif /* USE_IMAP */
   }
 
+#if 0
+  if (!ctx->quiet && rc == -1)
+    mutt_error ( "Could not synchronize mailbox %s!", ctx->path);
+#endif
+  
 #ifdef BUFFY_SIZE
   if (tmp && tmp->new == 0)
     mutt_update_mailbox (tmp);
@@ -752,6 +754,10 @@ int mx_close_mailbox (CONTEXT *ctx)
   CONTEXT f;
   char mbox[_POSIX_PATH_MAX];
   char buf[SHORT_STRING];
+
+  if (!ctx) return 0;
+
+  ctx->closing = 1;
 
   if (ctx->readonly || ctx->dontwrite)
   {
@@ -786,7 +792,6 @@ int mx_close_mailbox (CONTEXT *ctx)
       isSpool = 1;
       strfcpy (mbox, p, sizeof (mbox));
     }
-    
     else
     {
 #endif
@@ -808,13 +813,18 @@ int mx_close_mailbox (CONTEXT *ctx)
 #ifndef LIBMUTT
   if (ctx->deleted)
   {
-    snprintf (buf, sizeof (buf), "Purge %d deleted message%s?",
-	      ctx->deleted, ctx->deleted == 1 ? "" : "s");
+    snprintf (buf, sizeof (buf), ctx->deleted == 1
+	     ? "Purge %d deleted message?" : "Purge %d deleted messages?",
+	      ctx->deleted);
     if ((purge = query_quadoption (OPT_DELETE, buf)) < 0)
       return (-1);
   }
 #endif
 
+#ifdef USE_IMAP
+  /* IMAP servers managed the OLD flag themselves */
+  if (ctx->magic != M_IMAP)
+#endif
   if (option (OPTMARKOLD))
   {
     for (i = 0; i < ctx->msgcount; i++)
@@ -835,9 +845,16 @@ int mx_close_mailbox (CONTEXT *ctx)
     {
       if (ctx->hdrs[i]->read && !ctx->hdrs[i]->deleted)
       {
-	mutt_append_message (&f, ctx, ctx->hdrs[i], 0, CH_UPDATE_LEN);
-	ctx->hdrs[i]->deleted = 1;
-	ctx->deleted++;
+	if (mutt_append_message (&f, ctx, ctx->hdrs[i], 0, CH_UPDATE_LEN) == 0)
+	{
+	  ctx->hdrs[i]->deleted = 1;
+	  ctx->deleted++;
+	}
+	else
+	{
+	  mx_close_mailbox (&f);
+	  return -1;
+	}
       }
     }
 
@@ -874,12 +891,90 @@ int mx_close_mailbox (CONTEXT *ctx)
   if (ctx->msgcount == ctx->deleted &&
       (ctx->magic == M_MMDF || ctx->magic == M_MBOX) &&
       !mutt_is_spool(ctx->path) && !option (OPTSAVEEMPTY))
-    unlink (ctx->path);
+    mx_unlink_empty (ctx->path);
 #endif
   mx_fastclose_mailbox (ctx);
 
   return 0;
 }
+
+
+/* update a Context structure's internal tables. */
+
+void mx_update_tables(CONTEXT *ctx, int committing)
+{
+  int i, j;
+  
+  /* update memory to reflect the new state of the mailbox */
+  ctx->vcount = 0;
+  ctx->vsize = 0;
+  ctx->tagged = 0;
+  ctx->deleted = 0;
+  ctx->new = 0;
+  ctx->unread = 0;
+  ctx->changed = 0;
+  ctx->flagged = 0;
+#define this_body ctx->hdrs[j]->content
+  for (i = 0, j = 0; i < ctx->msgcount; i++)
+  {
+    if ((committing && !ctx->hdrs[i]->deleted) || 
+	(!committing && ctx->hdrs[i]->active))
+    {
+      if (i != j)
+      {
+	ctx->hdrs[j] = ctx->hdrs[i];
+	ctx->hdrs[i] = NULL;
+      }
+      ctx->hdrs[j]->msgno = j;
+      if (ctx->hdrs[j]->virtual != -1)
+      {
+	ctx->v2r[ctx->vcount] = j;
+	ctx->hdrs[j]->virtual = ctx->vcount++;
+	ctx->vsize += this_body->length + this_body->offset -
+	  this_body->hdr_offset;
+      }
+
+      if(committing)
+	ctx->hdrs[j]->changed = 0;
+      else
+      {
+	if (ctx->hdrs[j]->deleted)
+	  ctx->deleted++;
+	if (ctx->hdrs[j]->changed)
+	  ctx->changed++;
+      }
+
+      if (ctx->hdrs[j]->tagged)
+	ctx->tagged++;
+      if (ctx->hdrs[j]->flagged)
+	ctx->flagged++;
+      if (!ctx->hdrs[j]->read)
+      { 
+	ctx->unread++;
+	if (!ctx->hdrs[j]->old)
+	  ctx->new++;
+      } 
+
+      j++;
+    }
+    else
+    {
+      if (ctx->magic == M_MH || ctx->magic == M_MAILDIR)
+	ctx->size -= (ctx->hdrs[i]->content->length +
+		      ctx->hdrs[i]->content->offset -
+		      ctx->hdrs[i]->content->hdr_offset);
+      /* remove message from the hash tables */
+      if (ctx->hdrs[i]->env->real_subj)
+	hash_delete (ctx->subj_hash, ctx->hdrs[i]->env->real_subj, ctx->hdrs[i], NULL);
+      if (ctx->hdrs[i]->env->message_id)
+	hash_delete (ctx->id_hash, ctx->hdrs[i]->env->message_id, ctx->hdrs[i], NULL);
+      mutt_free_header (&ctx->hdrs[i]);
+    }
+  }
+#undef this_body
+  ctx->msgcount = j;
+}
+
 
 /* save changes to mailbox
  *
@@ -889,7 +984,7 @@ int mx_close_mailbox (CONTEXT *ctx)
  */
 int mx_sync_mailbox (CONTEXT *ctx)
 {
-  int rc, i, j;
+  int rc, i;
 
   if (ctx->dontwrite)
   {
@@ -921,8 +1016,9 @@ int mx_sync_mailbox (CONTEXT *ctx)
   {
     char buf[SHORT_STRING];
 
-    snprintf (buf, sizeof (buf), "Purge %d deleted message%s?",
-	      ctx->deleted, ctx->deleted == 1 ? "" : "s");
+    snprintf (buf, sizeof (buf), ctx->deleted == 1
+	     ? "Purge %d deleted message?" : "Purge %d deleted messages?",
+	      ctx->deleted);
     if ((rc = query_quadoption (OPT_DELETE, buf)) < 0)
       return (-1);
     else if (rc == M_NO)
@@ -950,135 +1046,15 @@ int mx_sync_mailbox (CONTEXT *ctx)
       return 0;
     }
 
-    /* update memory to reflect the new state of the mailbox */
-    ctx->vcount = 0;
-    ctx->vsize = 0;
-    ctx->tagged = 0;
-    ctx->deleted = 0;
-    ctx->new = 0;
-    ctx->unread = 0;
-    ctx->changed = 0;
-    ctx->flagged = 0;
-#define this_body ctx->hdrs[j]->content
-    for (i = 0, j = 0; i < ctx->msgcount; i++)
-    {
-      if (!ctx->hdrs[i]->deleted)
-      {
-	if (i != j)
-	{
-	  ctx->hdrs[j] = ctx->hdrs[i];
-	  ctx->hdrs[i] = NULL;
-	}
-	ctx->hdrs[j]->msgno = j;
-	if (ctx->hdrs[j]->virtual != -1)
-	{
-	  ctx->v2r[ctx->vcount] = j;
-	  ctx->hdrs[j]->virtual = ctx->vcount++;
-	  ctx->vsize += this_body->length + this_body->offset -
-	                this_body->hdr_offset;
-	}
-	ctx->hdrs[j]->changed = 0;
-	if (ctx->hdrs[j]->tagged)
-	  ctx->tagged++;
-	if (ctx->hdrs[j]->flagged)
-	  ctx->flagged++;
-	if (!ctx->hdrs[j]->read)
-	{ 
-	  ctx->unread++;
-	  if (!ctx->hdrs[j]->old)
-	    ctx->new++;
-	} 
-	j++;
-      }
-      else
-      {
-	if (ctx->magic == M_MH || ctx->magic == M_MAILDIR)
-	 ctx->size -= (ctx->hdrs[i]->content->length +
-	               ctx->hdrs[i]->content->offset -
-		       ctx->hdrs[i]->content->hdr_offset);
-	/* remove message from the hash tables */
-	if (ctx->hdrs[i]->env->real_subj)
-	  hash_delete (ctx->subj_hash, ctx->hdrs[i]->env->real_subj, ctx->hdrs[i], NULL);
-	if (ctx->hdrs[i]->env->message_id)
-	  hash_delete (ctx->id_hash, ctx->hdrs[i]->env->message_id, ctx->hdrs[i], NULL);
-	mutt_free_header (&ctx->hdrs[i]);
-      }
-    }
-#undef this_body
-    ctx->msgcount = j;
-
-    set_option (OPTSORTCOLLAPSE);
+    mx_update_tables(ctx, 1);
     mutt_sort_headers (ctx, 1); /* rethread from scratch */
-    unset_option (OPTSORTCOLLAPSE);
   }
 
   return (rc);
 }
 
-int mh_open_new_message (MESSAGE *msg, CONTEXT *dest, HEADER *hdr)
-{
-  int hi = 1;
-  int fd, n;
-  char *cp;
-  char path[_POSIX_PATH_MAX];
-  DIR *dirp;
-  struct dirent *de;
 
-  do
-  {
-    if ((dirp = opendir (dest->path)) == NULL)
-    {
-      mutt_perror (dest->path);
-      return (-1);
-    }
-
-    /* figure out what the next message number is */
-    while ((de = readdir (dirp)) != NULL)
-    {
-      cp = de->d_name;
-      while (*cp)
-      {
-	if (!isdigit ((unsigned char) *cp))
-	  break;
-	cp++;
-      }
-      if (!*cp)
-      {
-	n = atoi (de->d_name);
-	if (n > hi)
-	  hi = n;
-      }
-    }
-    closedir (dirp);
-    hi++;
-    snprintf (path, sizeof (path), "%s/%d", dest->path, hi);
-    if ((fd = open (path, O_WRONLY | O_EXCL | O_CREAT, 0600)) == -1)
-    {
-      if (errno != EEXIST)
-      {
-	mutt_perror (path);
-	return (-1);
-      }
-    }
-  }
-  while (fd < 0);
-
-  if ((msg->fp = fdopen (fd, "w")) == NULL)
-    return (-1);
-
-  return 0;
-}
-
-int maildir_open_new_message (MESSAGE *msg, CONTEXT *dest, HEADER *hdr)
-{
-  char tmp[_POSIX_PATH_MAX];
-  char path[_POSIX_PATH_MAX];
-
-  maildir_create_filename (dest->path, hdr, path, tmp);
-  if ((msg->fp = safe_fopen (tmp, "w")) == NULL)
-    return (-1);
-  return 0;
-}
+/* {maildir,mh}_open_new_message are in mh.c. */
 
 int mbox_open_new_message (MESSAGE *msg, CONTEXT *dest, HEADER *hdr)
 {
@@ -1095,7 +1071,6 @@ int imap_open_new_message (MESSAGE *msg, CONTEXT *dest, HEADER *hdr)
   if ((msg->fp = safe_fopen (tmp, "w")) == NULL)
     return (-1);
   msg->path = safe_strdup(tmp);
-  msg->ctx = dest;
   return 0;
 }
 #endif
@@ -1144,8 +1119,8 @@ MESSAGE *mx_open_new_message (CONTEXT *dest, HEADER *hdr, int flags)
     if (dest->magic == M_MMDF)
       fputs (MMDF_SEP, msg->fp);
 
-    if ((msg->magic != M_MAILDIR) && ((msg->magic != M_MH) && msg->magic != M_IMAP) && 
-	(flags & M_ADD_FROM))
+    if ((msg->magic == M_MBOX || msg->magic ==  M_MMDF) &&
+	flags & M_ADD_FROM)
     {
       if (hdr)
       {
@@ -1170,182 +1145,6 @@ MESSAGE *mx_open_new_message (CONTEXT *dest, HEADER *hdr, int flags)
     safe_free ((void **) &msg);
 
   return msg;
-}
-
-int mutt_reopen_mailbox (CONTEXT *ctx, int *index_hint)
-{
-  int (*cmp_headers) (const HEADER *, const HEADER *) = NULL;
-  HEADER **old_hdrs;
-  int old_msgcount;
-  int msg_mod = 0;
-  int index_hint_set;
-  int i, j;
-  int rc = -1;
-
-  /* silent operations */
-  ctx->quiet = 1;
-  
-  mutt_message ("Reopening mailbox...");
-  
-  /* our heuristics require the old mailbox to be unsorted */
-  if (Sort != SORT_ORDER)
-  {
-    short old_sort;
-
-    old_sort = Sort;
-    Sort = SORT_ORDER;
-    mutt_sort_headers (ctx, 1);
-    Sort = old_sort;
-  }
-
-  /* save the old headers */
-  old_msgcount = ctx->msgcount;
-  old_hdrs = ctx->hdrs;
-
-  /* simulate a close */
-  hash_destroy (&ctx->id_hash, NULL);
-  hash_destroy (&ctx->subj_hash, NULL);
-  safe_free ((void **) &ctx->v2r);
-  if (ctx->readonly)
-  {
-    for (i = 0; i < ctx->msgcount; i++)
-      mutt_free_header (&(ctx->hdrs[i])); /* nothing to do! */
-      safe_free ((void **) &ctx->hdrs);
-  }
-  else
-    ctx->hdrs = NULL;
-
-  ctx->hdrmax = 0;	/* force allocation of new headers */
-  ctx->msgcount = 0;
-  ctx->vcount = 0;
-  ctx->tagged = 0;
-  ctx->deleted = 0;
-  ctx->new = 0;
-  ctx->unread = 0;
-  ctx->flagged = 0;
-  ctx->changed = 0;
-  ctx->id_hash = hash_create (257);
-  ctx->subj_hash = hash_create (257);
-
-  switch (ctx->magic)
-  {
-    case M_MBOX:
-      fseek (ctx->fp, 0, 0);
-      cmp_headers = mbox_strict_cmp_headers;
-      rc = mbox_parse_mailbox (ctx);
-      break;
-
-    case M_MMDF:
-      fseek (ctx->fp, 0, 0);
-      cmp_headers = mbox_strict_cmp_headers;
-      rc = mmdf_parse_mailbox (ctx);
-      break;
-
-    case M_MH:
-      /* cmp_headers = mh_strict_cmp_headers; */
-      rc = mh_read_dir (ctx, NULL);
-      break;
-
-    case M_MAILDIR:
-      /* cmp_headers = maildir_strict_cmp_headers; */
-      rc = maildir_read_dir (ctx);
-      break;
-
-    default:
-      rc = -1;
-      break;
-  }
-  
-  if (rc == -1)
-  {
-    /* free the old headers */
-    for (j = 0; j < old_msgcount; j++)
-      mutt_free_header (&(old_hdrs[j]));
-    safe_free ((void **) &old_hdrs);
-
-    ctx->quiet = 0;
-    return (-1);
-  }
-
-  /* now try to recover the old flags */
-
-  index_hint_set = (index_hint == NULL);
-
-  if (!ctx->readonly)
-  {
-    for (i = 0; i < ctx->msgcount; i++)
-    {
-      int found = 0;
-
-      /* some messages have been deleted, and new  messages have been
-       * appended at the end; the heuristic is that old messages have then
-       * "advanced" towards the beginning of the folder, so we begin the
-       * search at index "i"
-       */
-      for (j = i; j < old_msgcount; j++)
-      {
-	if (old_hdrs[j] == NULL)
-	  continue;
-	if (cmp_headers (ctx->hdrs[i], old_hdrs[j]))
-	{
-	  found = 1;
-	  break;
-	}
-      }
-      if (!found)
-      {
-	for (j = 0; j < i; j++)
-	{
-	  if (old_hdrs[j] == NULL)
-	    continue;
-	  if (cmp_headers (ctx->hdrs[i], old_hdrs[j]))
-	  {
-	    found = 1;
-	    break;
-	  }
-	}
-      }
-
-      if (found)
-      {
-	/* this is best done here */
-	if (!index_hint_set && *index_hint == j)
-	  *index_hint = i;
-
-	if (old_hdrs[j]->changed)
-	{
-	  /* Only update the flags if the old header was changed;
-	   * otherwise, the header may have been modified externally,
-	   * and we don't want to lose _those_ changes
-	   */
-	  mutt_set_flag (ctx, ctx->hdrs[i], M_FLAG, old_hdrs[j]->flagged);
-	  mutt_set_flag (ctx, ctx->hdrs[i], M_REPLIED, old_hdrs[j]->replied);
-	  mutt_set_flag (ctx, ctx->hdrs[i], M_OLD, old_hdrs[j]->old);
-	  mutt_set_flag (ctx, ctx->hdrs[i], MFLAG_READ, old_hdrs[j]->read);
-	}
-	mutt_set_flag (ctx, ctx->hdrs[i], M_DELETE, old_hdrs[j]->deleted);
-	mutt_set_flag (ctx, ctx->hdrs[i], M_TAG, old_hdrs[j]->tagged);
-
-	/* we don't need this header any more */
-	mutt_free_header (&(old_hdrs[j]));
-      }
-    }
-
-    /* free the remaining old headers */
-    for (j = 0; j < old_msgcount; j++)
-    {
-      if (old_hdrs[j])
-      {
-	mutt_free_header (&(old_hdrs[j]));
-	msg_mod = 1;
-      }
-    }
-    safe_free ((void **) &old_hdrs);
-  }
-
-  ctx->quiet = 0;
-
-  return ((ctx->changed || msg_mod) ? M_REOPENED : M_NEW_MAIL);
 }
 
 /* check for new mail */
@@ -1389,30 +1188,31 @@ MESSAGE *mx_open_message (CONTEXT *ctx, int msgno)
 
     case M_MH:
     case M_MAILDIR:
+    {
+      HEADER *cur = ctx->hdrs[msgno];
+      char path[_POSIX_PATH_MAX];
+      
+      snprintf (path, sizeof (path), "%s/%s", ctx->path, cur->path);
+      if ((msg->fp = fopen (path, "r")) == NULL)
       {
-	HEADER *cur = ctx->hdrs[msgno];
-	char path[_POSIX_PATH_MAX];
-
-	snprintf (path, sizeof (path), "%s/%s", ctx->path, cur->path);
-	if ((msg->fp = fopen (path, "r")) == NULL)
-	{
-	  mutt_perror (path);
-	  dprint (1, (debugfile, "mx_open_message: fopen: %s: %s (errno %d).\n",
-		      path, strerror (errno), errno));
-	  FREE (&msg);
-	}
+	mutt_perror (path);
+	dprint (1, (debugfile, "mx_open_message: fopen: %s: %s (errno %d).\n",
+		    path, strerror (errno), errno));
+	FREE (&msg);
       }
-      break;
-
+    }
+    break;
+    
 #ifdef USE_IMAP
     case M_IMAP:
+    {
       if (imap_fetch_message (msg, ctx, msgno) != 0)
 	FREE (&msg);
       break;
+    }
 #endif /* USE_IMAP */
 
     default:
-
       dprint (1, (debugfile, "mx_open_message(): function not implemented for mailbox type %d.\n", ctx->magic));
       FREE (&msg);
       break;
@@ -1420,45 +1220,87 @@ MESSAGE *mx_open_message (CONTEXT *ctx, int msgno)
   return (msg);
 }
 
+/* commit a message to a folder */
+
+int mx_commit_message (MESSAGE *msg, CONTEXT *ctx)
+{
+  int r = 0;
+
+  if (!(msg->write && ctx->append))
+  {
+    dprint (1, (debugfile, "mx_commit_message(): msg->write = %d, ctx->append = %d\n",
+		msg->write, ctx->append));
+    return -1;
+  }
+
+  switch (msg->magic)
+  {
+    case M_MMDF:
+    {
+      fputs (MMDF_SEP, msg->fp);
+      break;
+    }
+    
+    case M_MBOX:
+    {
+      fputc ('\n', msg->fp);
+      break;
+    }
+
+    case M_KENDRA:
+    {
+      fputs (KENDRA_SEP, msg->fp);
+      break;
+    }
+
+#ifdef USE_IMAP
+    case M_IMAP:
+    {
+      if ((r = safe_fclose (&msg->fp)) == 0)
+	r = imap_append_message (ctx, msg);
+      break;
+    }
+#endif
+    
+    case M_MAILDIR:
+    {
+      if ((r = safe_fclose (&msg->fp)) == 0)
+	r = maildir_commit_message (ctx, msg, NULL);
+      break;
+    }
+    
+    case M_MH:
+    {
+      if ((r = safe_fclose (&msg->fp)) == 0)
+	r = mh_commit_message (ctx, msg, NULL);
+      break;
+    }
+  }
+  return r;
+}
+
 /* close a pointer to a message */
 int mx_close_message (MESSAGE **msg)
 {
   int r = 0;
 
-  if ((*msg)->write)
-  {
-    /* add the message terminator */
-    switch ((*msg)->magic)
-    {
-      case M_MMDF:
-	fputs (MMDF_SEP, (*msg)->fp);
-	break;
-
-      case M_MBOX:
-	fputc ('\n', (*msg)->fp);
-	break;
-    }
-  }
-
-  switch ((*msg)->magic) 
-  {
-    case M_MH:
-    case M_MAILDIR:
-      r = fclose ((*msg)->fp);
-      break;
-
+  if ((*msg)->magic == M_MH || (*msg)->magic == M_MAILDIR
 #ifdef USE_IMAP
-    case M_IMAP:
-      r = fclose ((*msg)->fp);
-      if ((*msg)->write && (*msg)->ctx->append)
-      {
-	r = imap_append_message ((*msg)->ctx, *msg);
-	unlink ((*msg)->path);
-      }
+      || (*msg)->magic == M_IMAP
 #endif
+      )
+  {
+    r = safe_fclose (&(*msg)->fp);
+  }
+  else
+    (*msg)->fp = NULL;
 
-    default:
-      break;
+  if ((*msg)->path)
+  {
+    dprint (1, (debugfile, "mx_close_message (): unlinking %s\n",
+		(*msg)->path));
+    unlink ((*msg)->path);
+    FREE (&(*msg)->path);
   }
 
   FREE (msg);
@@ -1496,11 +1338,11 @@ void mx_update_context (CONTEXT *ctx)
 
 
 
+#ifdef _PGPPATH
+  /* NOTE: this _must_ be done before the check for mailcap! */
+  h->pgp = pgp_query (h->content);
+#endif /* _PGPPATH */
 
-
-
-    if (mutt_needs_mailcap (h->content))
-      h->mailcap = 1;
   if (h->flagged)
     ctx->flagged++;
   if (h->deleted)

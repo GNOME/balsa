@@ -227,8 +227,8 @@ parse_quote(const char *s, GString *token, RFC822Error* err)
             else {
                 token->str[token->len-1] = *s;
             }
-            s++;
         }
+	s++;
     }
     *err = RFC822_ERR_MISMATCH_QUOTE;
     return NULL;

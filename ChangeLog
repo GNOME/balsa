@@ -1,3 +1,7 @@
+2002-12-27  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/address.c: wrong location of a bracket ->infinite loop.
+
 2002-12-26  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/address.c: fix an address parsing bug introduced yesterday.

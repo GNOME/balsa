@@ -1,3 +1,5 @@
+# translation of es.po to 
+# translation of es.po to Español
 # traducción de es.po al Spanish
 # translation of es.po to Spanish
 # translation of balsa.HEAD.po to Spanish
@@ -9,15 +11,16 @@
 # Héctor García Álvarez <hector@scouts-es.org>, 1999-2000.
 # Francisco Javier F. Serrador <serrador@arrakis.es>, 2003.
 # Francisco Javier F. Serrador <serrador@cvs.gnome.org>, 2004.
+# Jorge Bernal <koke@sindominio.net>, 2004.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-04-11 00:52+0100\n"
-"PO-Revision-Date: 2004-10-24 21:40+0200\n"
-"Last-Translator: Francisco Javier F. Serrador <serrador@cvs.gnome.org>\n"
-"Language-Team: Spanish <traductores@es.gnome.org>\n"
+"PO-Revision-Date: 2004-11-16 00:10+0100\n"
+"Last-Translator: \n"
+"Language-Team:  <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -206,7 +209,7 @@ msgstr "Ha ocurrido un error durante el movimiento de mensajes: %s"
 #: libbalsa/gmime-application-pkcs7.c:246
 #: libbalsa/gmime-application-pkcs7.c:389
 msgid "Failed to decrypt MIME part: parse error"
-msgstr ""
+msgstr "Fallo al descifrar la parte MIME: error de parseo"
 
 #: libbalsa/gmime-gpgme-context.c:288 libbalsa/rfc3156.c:1501
 #, c-format
@@ -259,8 +262,7 @@ msgstr "%s: la verificación de la firma falló: %s"
 
 #: libbalsa/gmime-gpgme-context.c:583
 msgid "combined signing and encryption is only defined for RFC 2440"
-msgstr ""
-"la firma y el descifrado combinado sólo están definidos para el RFC 2440"
+msgstr "la firma y el descifrado combinado sólo están definidos para el RFC 2440"
 
 #: libbalsa/gmime-gpgme-context.c:653
 #, c-format
@@ -646,7 +648,7 @@ msgstr "%s: Abriendo %s Refcount: %d\n"
 #: libbalsa/mailbox_imap.c:1031 libbalsa/mailbox_imap.c:2045
 #, c-format
 msgid "Downloading %ld kB"
-msgstr "Descargando %ld kiB"
+msgstr "Descargando %ld KiB"
 
 #: libbalsa/mailbox_imap.c:1398
 #, c-format
@@ -665,7 +667,7 @@ msgstr "Nu se encontró ruta para el buzón «%s», usando «%s»"
 #: libbalsa/mailbox_imap.c:2232
 #, c-format
 msgid "Uploading %ld kB"
-msgstr "Subiendo %ld kiB"
+msgstr "Subiendo %ld KiB"
 
 #: libbalsa/mailbox_imap.c:2419
 msgid "Server-side threading not supported."
@@ -761,9 +763,8 @@ msgstr "No se puede abrir el buzón."
 # src/pref-manager.c:1087
 # src/pref-manager.c:1218
 #: libbalsa/mailbox_mbox.c:475
-#, fuzzy
 msgid "Mailbox is not in mbox format."
-msgstr "El buzón no existe."
+msgstr "El buzón no está en formato mbox."
 
 # libbalsa/mailbox.c:262
 # libbalsa/mailbox.c:275
@@ -788,9 +789,9 @@ msgstr "%s: no se pudo obtener el flujo mime nuevo."
 # libmutt/mx.c:459 libmutt/mx.c:605
 # libmutt/mx.c:459 libmutt/mx.c:605
 #: libbalsa/mailbox_mbox.c:1575
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s is not in mbox format."
-msgstr "%s no es un buzón."
+msgstr "%s: %s no está en formato mbox."
 
 # libmutt/mx.c:1375
 # libmutt/mx.c:1375
@@ -841,7 +842,7 @@ msgstr "Falló al marcar los mensajes en el %s"
 #: libbalsa/mailbox_pop3.c:212
 #, c-format
 msgid "Error appending message %d from %s to %s: %s"
-msgstr "Ha ocurrido un error al agrgar el mensaje %d de %s a %s: %s"
+msgstr "Ha ocurrido un error al agregar el mensaje %d de %s a %s: %s"
 
 # src/pref-manager.c:192
 # src/pref-manager.c:191
@@ -853,7 +854,7 @@ msgstr "Descargando mensaje %d de %d"
 #: libbalsa/mailbox_pop3.c:397
 #, c-format
 msgid "Received %ld kB of %ld"
-msgstr "Se han recibido %ld kiB de %ld"
+msgstr "Se han recibido %ld KiB de %ld"
 
 # libmutt/mx.c:848
 # libmutt/mx.c:848
@@ -889,7 +890,7 @@ msgstr "Error al acceder al buzón POP3 %s:%s\n"
 #: libbalsa/mailbox_pop3.c:583
 #, c-format
 msgid "POP3 message %d oversized: %d kB - skipped."
-msgstr "El mensaje POP3 %d sobrepasa el tamaño: %d kiB - se salta."
+msgstr "El mensaje POP3 %d sobrepasa el tamaño: %d KiB - se salta."
 
 #: libbalsa/mailbox_pop3.c:594
 #, c-format
@@ -911,8 +912,7 @@ msgstr "Error POP3: %s."
 #: libbalsa/message.c:555 libbalsa/message.c:595
 #, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
-msgstr ""
-"El buzón de origen (%s) es de sólo lectura. No se pueden cambiar los flags."
+msgstr "El buzón de origen (%s) es de sólo lectura. No se pueden cambiar los flags."
 
 #: libbalsa/mime.c:92
 msgid ""
@@ -1002,8 +1002,7 @@ msgstr "la creación de un contexto gpgme ha fallado"
 
 #: libbalsa/rfc3156.c:270 libbalsa/rfc3156.c:741
 msgid "Enter passphrase to unlock the secret key for signing"
-msgstr ""
-"Introduzca la frase de paso para desbloquear la clave secreta para firmar"
+msgstr "Introduzca la frase de paso para desbloquear la clave secreta para firmar"
 
 # libmutt/imap/auth.c:373
 # libmutt/imap/auth.c:373
@@ -1057,10 +1056,8 @@ msgid "The signature is valid but expired."
 msgstr "La firma es válida pero expiró."
 
 #: libbalsa/rfc3156.c:981
-msgid ""
-"The signature is valid but the key used to verify the signature has expired."
-msgstr ""
-"La firma es válida pero la clave usada para verificar la firma ha expirado."
+msgid "The signature is valid but the key used to verify the signature has expired."
+msgstr "La firma es válida pero la clave usada para verificar la firma ha expirado."
 
 #: libbalsa/rfc3156.c:984
 msgid ""
@@ -1086,8 +1083,7 @@ msgstr "Esta parte no es una firma PGP real."
 
 #: libbalsa/rfc3156.c:995
 msgid "The signature could not be verified due to an invalid crypto engine."
-msgstr ""
-"La firma no pudo ser verificada debido a un motor criptográfico inválido."
+msgstr "La firma no pudo ser verificada debido a un motor criptográfico inválido."
 
 #: libbalsa/rfc3156.c:998 libbalsa/rfc3156.c:1661
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
@@ -1522,7 +1518,7 @@ msgstr ""
 
 #: libbalsa/send.c:1847 libbalsa/send.c:1923
 msgid "This message will not be encrypted for the BCC: recipient(s)."
-msgstr "Este mensaje no será encriptado para los destinatarios BCC:"
+msgstr "Este mensaje no será encriptado para los destinatarios Cco:"
 
 #. host, authentication method
 #: libbalsa/server.c:376
@@ -1647,7 +1643,7 @@ msgid ""
 "'/'."
 msgstr ""
 "La ruta «%s» debe ser especificada de modo absoluto -- debe comenzar con un "
-"«/»"
+"«/»."
 
 # libinit_balsa/balsa-druid-page-directory.gob:101
 # libinit_balsa/balsa-druid-page-directory.gob:101
@@ -2853,8 +2849,7 @@ msgstr "Coincide cuando no tiene ninguna de estas marcas:"
 
 #: src/filter-edit-callbacks.c:535
 msgid "You must specify the name of the user header to match on"
-msgstr ""
-"Debe especificar el nombre de la cabecera de usuario con la que coincidir"
+msgstr "Debe especificar el nombre de la cabecera de usuario con la que coincidir"
 
 #: src/filter-edit-callbacks.c:556
 msgid "You must specify at least one field for matching"
@@ -2958,8 +2953,7 @@ msgstr "Dentro/fuera del intervalo de fechas"
 
 #: src/filter-edit-callbacks.c:1083
 msgid "Match when one flag is set/when no flag is set"
-msgstr ""
-"Coincide cuando tiene una marca puesta/cuando no tiene una marca puesta"
+msgstr "Coincide cuando tiene una marca puesta/cuando no tiene una marca puesta"
 
 # src/filter-edit-dialog.c:271
 # src/filter-edit-dialog.c:263
@@ -4429,8 +4423,7 @@ msgstr "_Purgar los mensajes borrados"
 
 #: src/main-window.c:737 src/main-window.c:834
 msgid "Expunge messages marked as deleted in the currently opened mailbox"
-msgstr ""
-"Purgar los mensajes marcados como borrados en el buzón actualmente abierto"
+msgstr "Purgar los mensajes marcados como borrados en el buzón actualmente abierto"
 
 # src/main-window.c:399
 # src/main-window.c:401
@@ -4458,8 +4451,7 @@ msgstr "Seleccionar _filtros"
 
 #: src/main-window.c:752 src/main-window.c:1073
 msgid "Select filters to be applied automatically to current mailbox"
-msgstr ""
-"Seleccionar los filtros que se aplicarán automáticamente al buzón actual"
+msgstr "Seleccionar los filtros que se aplicarán automáticamente al buzón actual"
 
 #: src/main-window.c:765
 msgid "_Toolbars..."
@@ -4800,9 +4792,9 @@ msgstr "Sólo puede aplicar filtros en su buzón\n"
 
 # libmutt/mbox.c:1028
 #: src/main-window.c:4191
-#, fuzzy, c-format
+#, c-format
 msgid "Could not open trash: %s"
-msgstr "No se pudo abrir el buzón de borradores: %s"
+msgstr "No se pudo abrir la papelera: %s"
 
 # libmutt/mx.c:1050
 # libmutt/mx.c:1050
@@ -5668,7 +5660,7 @@ msgstr "Escrutar las carpetas locales hasta la profundidad"
 
 #: src/pref-manager.c:2888
 msgid "Scan IMAP folders to depth"
-msgstr "Escrutar las carpetas IMAP hasta laprofundidad"
+msgstr "Escrutar las carpetas IMAP hasta la profundidad"
 
 # src/pref-manager.c:1999
 # src/pref-manager.c:2225
@@ -5844,8 +5836,7 @@ msgstr ""
 "ventana de redacción."
 
 #: src/save-restore.c:1008
-msgid ""
-"The option to request a MDN is now on the Options menu of the compose window."
+msgid "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 "La opción para solicitar un MDN está ahora en el menú de Opciones de la "
 "ventana de redacción."
@@ -6072,7 +6063,7 @@ msgstr "_Posponer"
 # src/balsa-message.c:1417
 #: src/sendmsg-window.c:334 src/sendmsg-window.c:495
 msgid "_Save"
-msgstr "_Guardar..."
+msgstr "_Guardar"
 
 # libmutt/imap/browse.c:93
 # libmutt/imap/browse.c:93
@@ -6190,8 +6181,7 @@ msgstr "_Cifrar mensaje"
 
 #: src/sendmsg-window.c:438 src/sendmsg-window.c:598
 msgid "signs the message using GnuPG for all To: and CC: recipients"
-msgstr ""
-"firma el mensaje usando GNUPG para todos los destinatarios en Para: y Cc:"
+msgstr "firma el mensaje usando GNUPG para todos los destinatarios en Para: y Cc:"
 
 #: src/sendmsg-window.c:458 src/sendmsg-window.c:634
 msgid "_Show"
@@ -6451,13 +6441,13 @@ msgstr "El envío falló: %s"
 # src/balsa-message.c:713
 #: src/sendmsg-window.c:4128
 msgid "Could not postpone message."
-msgstr "No se pudo postponer el mensaje."
+msgstr "No se pudo posponer el mensaje."
 
 # src/main-window.c:421
 # src/main-window.c:428
 #: src/sendmsg-window.c:4142
 msgid "Message postponed."
-msgstr "Mensaje postpuesto"
+msgstr "Mensaje pospuesto."
 
 # libmutt/mbox.c:1028
 #: src/sendmsg-window.c:4158
@@ -6560,7 +6550,7 @@ msgstr "¿Guardar esta dirección y cerrar el diálogo?"
 # src/mblist-window.c:551
 #: src/store-address.c:214
 msgid "No address book selected...."
-msgstr "No hay una libreta de direcciones seleccionada..."
+msgstr "No hay una libreta de direcciones seleccionada…"
 
 # libbalsa/address-book.c:163
 # libbalsa/address-book.c:170
@@ -6869,7 +6859,7 @@ msgstr "Vista previa del mensaje"
 
 #: src/toolbar-factory.c:148
 msgid "Show preview pane"
-msgstr "Muestra el panel de previsualización"
+msgstr "Muestra el panel de vista previa"
 
 #: src/toolbar-factory.c:150
 msgid "Sign"
@@ -6972,1151 +6962,3 @@ msgstr "Subir"
 msgid "Down"
 msgstr "Bajar"
 
-# libmutt/mbox.c:712
-#~ msgid "Error copying message to mailbox %s!"
-#~ msgstr "Falló al copiar el mensaje al buzón «%s»."
-
-#~ msgid ""
-#~ "Error placing messages from %s on %s\n"
-#~ "Messages are left in %s\n"
-#~ msgstr ""
-#~ "Error al dejar los mensajes de %s en %s\n"
-#~ "Los mensajes se han dejado en %s\n"
-
-#~ msgid "POP3 temp mailbox %s was not removed (system error message: %s)"
-#~ msgstr ""
-#~ "El archivo temporal del buzón POP3 %s no fue eliminado (mensaje de error "
-#~ "del sistema: %s)"
-
-#~ msgid "IMAP SEARCH UNSEEN request failed for mailbox %s"
-#~ msgstr "La solicitud IMAP SEARCH UNSEEN falló para el buzón %s"
-
-#~ msgid "Source mailbox (%s) is readonly. Cannot move messages"
-#~ msgstr ""
-#~ "El buzón de origen (%s) es de sólo lectura. No se pueden mover los "
-#~ "mensajes"
-
-#~ msgid "The signature is invalid (Note: might be caused by gmime bug!)."
-#~ msgstr "La firma es inválida (Nota: quizá este causada por un bug gmime)."
-
-#~ msgid ""
-#~ "Error copying message to mailbox %s!\n"
-#~ "Mailbox might have been corrupted!"
-#~ msgstr ""
-#~ "Error copiando mensaje al buzón %s.\n"
-#~ "El buzón quizás se haya corrompido."
-
-#~ msgid ""
-#~ "Error writing to temporary file %s.\n"
-#~ "Check the directory permissions."
-#~ msgstr ""
-#~ "Error escribiendo al archivo temporal %s.\n"
-#~ "Compruebe los permisos del directorio."
-
-# src/sendmsg-window.c:1403
-# src/sendmsg-window.c:1454
-#~ msgid "Cannot open temporary file %s."
-#~ msgstr "No se pudo abrir el archivo temporal %s."
-
-#~ msgid ""
-#~ "SMTP server refused connection.\n"
-#~ "Balsa by default uses submission service (587).\n"
-#~ "If you want to submit mail using relay service (25),specify it explicitly "
-#~ "via: \"host:smtp\".\n"
-#~ "Message is left in outbox."
-#~ msgstr ""
-#~ "El servidor SMTP rehusó la conexión.\n"
-#~ "Balsa por omisión usa el servicio de envío (587).\n"
-#~ "Si quiere enviar correo usando el servicio de reenvío (25), especifíquelo "
-#~ "explícitamente por medio de  «host:smtp».\n"
-#~ "El mensaje se ha dejado en la bandeja de salida."
-
-# libinit_balsa/balsa-druid-page-user.gob:75
-# libinit_balsa/balsa-druid-page-user.gob:75
-#~ msgid "Please enter information about yourself."
-#~ msgstr "Ingrese la siguiente información sobre usted."
-
-# libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:225
-# src/address-book.c:435
-# libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:252
-# src/address-book.c:470
-#~ msgid "_Name:"
-#~ msgstr "_Nombre:"
-
-# libinit_balsa/balsa-druid-page-welcome.gob:50
-# libinit_balsa/balsa-druid-page-welcome.gob:50
-#~ msgid ""
-#~ "You seem to be running Balsa for the first time. The following steps will "
-#~ "set up Balsa by asking a few simple questions. Once you have completed "
-#~ "these steps, you can always change them later in Balsa's preferences. If "
-#~ "any files or directories need to be created, it will be done so "
-#~ "automatically.\n"
-#~ "  Please check the about box in Balsa's main window for more information "
-#~ "about contacting the authors or reporting bugs."
-#~ msgstr ""
-#~ "Parece que va a utilizar Balsa por primera vez. Los siguientes pasos\n"
-#~ "configurarán Balsa mediante unas simples preguntas. Una vez que termine\n"
-#~ "este proceso, podrá siempre modificar sus datos en las preferencias\n"
-#~ "de Balsa. Si algún archivo necesita ser creado, se hará automáticamente.\n"
-#~ "Acuda a la opción «Acerca de» en Balsa para obtener más\n"
-#~ "información sobre como contactar con los autores o cómo informar de "
-#~ "fallos\n"
-#~ "en Balsa."
-
-# src/balsa-mblist.c:218
-# src/balsa-mblist.c:218
-#~ msgid "Total"
-#~ msgstr "Total"
-
-# src/balsa-index.c:305
-# src/balsa-index.c:298
-#~ msgid "By _Date"
-#~ msgstr "Por _fecha"
-
-#~ msgid "By sending date"
-#~ msgstr "Por fecha de envío"
-
-# libbalsa/address-book.c:163
-# libbalsa/address-book.c:170
-#~ msgid "Cannot access the message's body\n"
-#~ msgstr "No se puede acceder al cuerpo del mensaje\n"
-
-#~ msgid "Display message size as number of lines"
-#~ msgstr "Mostrar tamaño de mensaje como número de líneas"
-
-#~ msgid "hours"
-#~ msgstr "horas"
-
-#~ msgid "invalid crypto engine for RFC2440"
-#~ msgstr "motor de cifrado inválido para RFC2440"
-
-# src/balsa-message.c:301
-# src/balsa-message.c:331
-#~ msgid "%s: could not get data: %s"
-#~ msgstr "%s: no se pudo obtener los datos: %s"
-
-# src/balsa-message.c:301
-# src/balsa-message.c:331
-#~ msgid "Could not send \"%s\" to \"%s\""
-#~ msgstr "No se pudo enviar «%s» a «%s»"
-
-#~ msgid "GnuPG rebuilds the trust database and is currently not available."
-#~ msgstr ""
-#~ "GnuPG está reconstruyendo la base de datos de confianza y ahora no está "
-#~ "disponible."
-
-#~ msgid "remember passphrase for"
-#~ msgstr "recordar contraseña durante"
-
-#~ msgid ""
-#~ "The mailbox \"%s\" does not appear to be valid.\n"
-#~ "Your system does not allow for creation of mailboxes\n"
-#~ "in /var/spool/mail. Balsa wouldn't function properly\n"
-#~ "until the system created the mailboxes. Please change\n"
-#~ "the mailbox path or check your system configuration."
-#~ msgstr ""
-#~ "El buzón «%s» no parece ser válido.\n"
-#~ "Su sistema no permite la creación de buzones en\n"
-#~ "/var/spool/mail. Balsa no podrá funcionar adecuadamente\n"
-#~ "hasta que el sistema haya creado los buzones. Cambie\n"
-#~ "la ruta de su buzón o verifique la configuración de\n"
-#~ "su sistema."
-
-#~ msgid "Show from _name"
-#~ msgstr "Mostrar el _nombre"
-
-# src/store-address.c:137
-# src/store-address.c:149
-#~ msgid "Show _Patches"
-#~ msgstr "Mostrar _parches"
-
-# src/main-window.c:396
-# src/main-window.c:395
-#~ msgid "Co_mmit Current"
-#~ msgstr "E_fectuar el actual"
-
-#~ msgid "Commit _All"
-#~ msgstr "Efectuar _todo"
-
-#~ msgid "Commit the changes in all mailboxes"
-#~ msgstr "Efectuar los cambios en todos los buzones"
-
-#~ msgid "Edit/Apply _Filters"
-#~ msgstr "_Editar/Aplicar filtros"
-
-#~ msgid "Filter the content of the selected mailbox"
-#~ msgstr "Filtrar el contenido del buzón seleccionado"
-
-# src/pref-manager.c:1058
-# src/pref-manager.c:1188
-#~ msgid "_Remove Duplicates"
-#~ msgstr "_Eliminar duplicados"
-
-#~ msgid "Remove duplicated messages from the selected mailbox"
-#~ msgstr "Eliminar mensajes duplicados desde el buzón seleccionado"
-
-#~ msgid "Message window title format:"
-#~ msgstr "Formato del título de la ventana de mensaje:"
-
-#~ msgid "Delete immediately and irretrievably"
-#~ msgstr "Borra inmediatamente e irrecuperablemente"
-
-# src/balsa-message.c:1247
-# src/balsa-message.c:1417
-#~ msgid "Sa_ve"
-#~ msgstr "_Guardar"
-
-# src/sendmsg-window.c:891
-# src/sendmsg-window.c:934
-#~ msgid "_Attachments"
-#~ msgstr "_Adjuntos"
-
-# src/main-window.c:444
-# src/main-window.c:451
-#~ msgid "Co_mments"
-#~ msgstr "Co_mentarios"
-
-#~ msgid "_Keywords"
-#~ msgstr "_Palabras clave"
-
-# src/main-window.c:444
-# src/main-window.c:451
-#~ msgid "Comments:"
-#~ msgstr "Comentarios:"
-
-#~ msgid "Keywords:"
-#~ msgstr "Palabras clave:"
-
-# libmutt/mx.c:1375
-# libmutt/mx.c:1375
-#~ msgid "Cancel this message"
-#~ msgstr "Cancelar este mensaje"
-
-#~ msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
-#~ msgstr "**** ERROR: Existe un bloqueo del buzón: %s ***\n"
-
-# src/pref-manager.c:1162
-# src/pref-manager.c:1298
-#~ msgid "Remote IMAP folder set"
-#~ msgstr "Conjunto de carpetas IMAP remotas"
-
-#~ msgid "Use SS_L (IMAPS)"
-#~ msgstr "Usar S_SL (IMAPS)"
-
-# src/mailbox-conf.c:185
-# src/mailbox-conf.c:184
-#~ msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-#~ msgstr ""
-#~ "¡Upps! El buzón no ha sido encontrado en los nodos balsa_app.mailbox\n"
-
-# libmutt/imap/auth.c:296
-# libmutt/imap/auth.c:296
-#~ msgid "Use _APOP Authentication"
-#~ msgstr "Usar autentificación _APOP"
-
-#~ msgid "Use SS_L (pop3s)"
-#~ msgstr "Usar SS_L (pop3s)"
-
-#~ msgid ""
-#~ "Unable to Open Mailbox!\n"
-#~ "Please check the mailbox settings."
-#~ msgstr ""
-#~ "No se puede abrir el buzón\n"
-#~ "Verifique la configuración del buzón."
-
-# src/balsa-message.c:651
-# src/balsa-message.c:713
-#~ msgid "Could not save message."
-#~ msgstr "No se pudo guardar el mensaje."
-
-# src/balsa-message.c:1316
-# src/balsa-message.c:1474
-#~ msgid "Cannot sign message: could not create gpgme context: %s"
-#~ msgstr "No se pudo firmar el mensaje: no se pudo crear contexto gpgme: %s"
-
-# src/balsa-message.c:1316
-# src/balsa-message.c:1474
-#~ msgid "Cannot sign message: could not get gpgme data from istream: %s"
-#~ msgstr ""
-#~ "No se pudo firmar el mensaje: gpgme no pudo obtener datos del archivo: %s"
-
-# src/balsa-message.c:1316
-# src/balsa-message.c:1474
-#~ msgid "Cannot sign message: gpgme could not create new data: %s"
-#~ msgstr "No se pudo firmar el mensaje: gpgme no pudo crear datos nuevos: %s"
-
-#~ msgid "Cannot sign message: gpgme signing failed: %s"
-#~ msgstr "No se pudo firmar el mensaje: la firma gpgme falló:%s"
-
-# src/balsa-message.c:301
-# src/balsa-message.c:331
-#~ msgid "Cannot sign message: could not get gpgme data: %s"
-#~ msgstr ""
-#~ "No se pudo firmar el mensaje: no se pudo obtener los datos gpgme: %s"
-
-# src/balsa-message.c:1316
-# src/balsa-message.c:1474
-#~ msgid ""
-#~ "Cannot verify message signature: could not get gpgme data from istream: %s"
-#~ msgstr ""
-#~ "No se pudo verificar la firma del mensaje: gpgme no pudo obtener datos "
-#~ "del flujo istream: %s"
-
-#~ msgid ""
-#~ "Cannot verify message signature: could not get gpgme data from sigstream: "
-#~ "%s"
-#~ msgstr ""
-#~ "No se pudo verificar la firma del mensaje: gpgme no pudo obtener los "
-#~ "datos desde el flujo sigtream: %s"
-
-# src/balsa-message.c:1316
-# src/balsa-message.c:1474
-#~ msgid "Cannot encrypt message: could not create gpgme recipients set: %s"
-#~ msgstr ""
-#~ "No se pudo encriptar el mensaje: no se pudo crear el conjunto de "
-#~ "destinatarios gpgme: %s"
-
-# src/balsa-message.c:1316
-# src/balsa-message.c:1474
-#~ msgid "Cannot encrypt message: could not get gpgme data from istream: %s"
-#~ msgstr ""
-#~ "No se pudo encriptar el mensaje: gpgme no pudo obtener datos del flujo "
-#~ "istream: %s"
-
-# src/balsa-message.c:1316
-# src/balsa-message.c:1474
-#~ msgid "Cannot encrypt message: gpgme could not create new data: %s"
-#~ msgstr ""
-#~ "No se pudo encriptar el mensaje: gpgme no pudo crear datos nuevos: %s"
-
-#~ msgid "Cannot encrypt message: gpgme encryption failed: %s"
-#~ msgstr "No se pudo encriptar el mensaje: la encriptación gpgpme falló: %s"
-
-# src/balsa-message.c:301
-# src/balsa-message.c:331
-#~ msgid "Cannot encrypt message: could not get gpgme data: %s"
-#~ msgstr ""
-#~ "No se pudo encriptar el mensaje: no se pudo obtener los datos gpgme: %s"
-
-# src/balsa-message.c:1316
-# src/balsa-message.c:1474
-#~ msgid "Cannot decrypt message: could not get gpgme data from istream: %s"
-#~ msgstr ""
-#~ "No se pudo desencriptar el mensaje: gpgme no pudo obtener datos del flujo "
-#~ "istream: %s"
-
-# src/balsa-message.c:1316
-# src/balsa-message.c:1474
-#~ msgid "Cannot decrypt message: gpgme could not create new data: %s"
-#~ msgstr ""
-#~ "No se pudo desencriptar el mensaje: gpgme no pudo crear datos nuevos: %s"
-
-#~ msgid "Cannot decrypt message: gpgme decrypting failed: %s"
-#~ msgstr ""
-#~ "No se pudo desencriptar el mensaje: la desencriptación gpgme falló: %s"
-
-# src/balsa-message.c:301
-# src/balsa-message.c:331
-#~ msgid "Cannot decrypt message: could not get gpgme data: %s"
-#~ msgstr ""
-#~ "No se pudo desencriptar el mensaje:no se pudo obtener los datos gpgme: %s"
-
-# src/balsa-message.c:301
-# src/balsa-message.c:331
-#~ msgid "Failed to execute gpgme: %s"
-#~ msgstr "Fallo al ejecutar gpgme: %s"
-
-#~ msgid "GPG sign by default"
-#~ msgstr "Firmar con GPG de forma predeterminada"
-
-# libmutt/imap/imap_ssl.c:452
-# libmutt/imap/imap_ssl.c:452
-#~ msgid "<b>This certificate belongs to:</b>\n"
-#~ msgstr "<b>Este certificado pertenece a:</b>\n"
-
-#~ msgid ""
-#~ "IMAP SEARCH command failed for mailbox %s\n"
-#~ "or query was incompatible with IMAP (perhaps you use regular "
-#~ "expressions)\n"
-#~ "falling back to default searching method"
-#~ msgstr ""
-#~ "EL comando IMAP SEARCH falló para el buzón %s\n"
-#~ "o la petición fue incompatible con IMAP (quizás usó expresiones "
-#~ "regulares)\n"
-#~ "volviendo al método de búsqueda preestablecido"
-
-#~ msgid "IMAP SEARCH command failed for mailbox %s\n"
-#~ msgstr "El comando IMAP SEARCH falló para el buzón %s \n"
-
-#~ msgid "connection error"
-#~ msgstr "error de conexión"
-
-#~ msgid "POP command execution failed"
-#~ msgstr "Falló la ejecución de comando POP"
-
-#~ msgid "Could not run the delivery program (procmail)"
-#~ msgstr "No se pudo ejecutar el programa de distribución (procmail)"
-
-# libmutt/mbox.c:1028
-#~ msgid "Could not open mailbox for spooling"
-#~ msgstr "No se pudo abrir el buzón para encolar mensajes"
-
-#~ msgid "Host not found"
-#~ msgstr "Anfitrión no encontrado"
-
-# src/main-window.c:444
-# src/main-window.c:451
-#~ msgid "Connection refused"
-#~ msgstr "Conexión rechazada"
-
-# libmutt/imap/auth.c:296
-# libmutt/imap/auth.c:296
-#~ msgid "Authentication failed"
-#~ msgstr "Falló la autenticación"
-
-#~ msgid "GMimeGPG signature verification failed: %s"
-#~ msgstr "La verificación de la firma GMimeGPG falló: %s"
-
-#~ msgid "This part contains at least two signatures with different status."
-#~ msgstr "Esta parte contiene al menos dos firmas con estados distintos"
-
-#~ msgid "bad status"
-#~ msgstr "estado inválido"
-
-# src/main-window.c:317 src/message-window.c:126
-# src/main-window.c:322 src/message-window.c:119
-#~ msgid "Enter passsphrase to OpenPGP sign the first message part"
-#~ msgstr ""
-#~ "Introduzca contraseña para que OpenGPG firma la primera parte del mensaje"
-
-#~ msgid "Enter passsphrase to decrypt message part"
-#~ msgstr "Introduzca la frase de paso para descifrar la parte del mensaje"
-
-#~ msgid ""
-#~ "The OpenPGP encrypted message part contains 8-bit characters, but no "
-#~ "header describing the used codeset (converted to %s)"
-#~ msgstr ""
-#~ "La parte cifrada del mensaje contiene caracteres de 8 bits, pero no hay "
-#~ "una cabecera describiendo el conjunto de códigos (se ha convertido a %s) "
-
-#~ msgid ""
-#~ "%s\n"
-#~ "Do you want to run gpg to import the public key with fingerprint %s?"
-#~ msgstr ""
-#~ "%s\n"
-#~ "¿Quiere ejecutar gpg para importar la clave pública con huella %s?"
-
-# libmutt/imap/imap_ssl.c:481
-# libmutt/imap/imap_ssl.c:481
-#~ msgid "Fingerprint"
-#~ msgstr "Huella"
-
-# src/balsa-message.c:301
-# src/balsa-message.c:331
-#~ msgid "could not get a private key for %s"
-#~ msgstr "no se pudo obtener una clave privada para %s"
-
-# src/balsa-message.c:1316
-# src/balsa-message.c:1474
-#~ msgid "could not create gpgme recipients set: %s"
-#~ msgstr "no se pudo crear el conjunto de destinatarios gpgme: %s"
-
-# src/balsa-message.c:301
-# src/balsa-message.c:331
-#~ msgid "could not add recipient %s: %s"
-#~ msgstr "no se pudo añadir remitente %s: %s"
-
-# src/main-window.c:317 src/message-window.c:126
-# src/main-window.c:322 src/message-window.c:119
-#~ msgid "Enter passsphrase to sign message"
-#~ msgstr "Introduzca contraseña para firmar el mensaje"
-
-#~ msgid "Unable to open sentbox - could not get IMAP server information"
-#~ msgstr ""
-#~ "No se pudo abrir la bandeja de salida - no se pudo obtener la información "
-#~ "del servidor IMAP"
-
-# src/pref-manager.c:1087
-# src/pref-manager.c:1218
-#~ msgid "Mailbox Colors"
-#~ msgstr "Colores del buzón"
-
-# src/balsa-mblist.c:755
-# src/balsa-mblist.c:736
-#~ msgid "Mailbox with unread messages color"
-#~ msgstr "Color del buzón con mensajes no leídos"
-
-#~ msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
-#~ msgstr "*** ERROR: Flujo del buzón cerrado: %s ***\n"
-
-# libbalsa/mailbox_imap.c:261
-# libbalsa/mailbox_imap.c:284
-#~ msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-#~ msgstr "LibBalsaMailboxImap: Abriendo %s Refcount: %d\n"
-
-# libbalsa/mailbox_local.c:221
-# libbalsa/mailbox_local.c:257
-#~ msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-#~ msgstr "LibBalsaMailboxLocal: Abriendo %s Refcount: %d\n"
-
-# libmutt/mbox.c:1028
-#~ msgid "Couldn't open destination mailbox (%s) for writing"
-#~ msgstr "No se pudo abrir para escritura el buzón de destino (%s)"
-
-# libmutt/mbox.c:1028
-#~ msgid "Couldn't open destination mailbox (%s) for copying"
-#~ msgstr "No se pudo abrir el buzón de destino (%s) para copia"
-
-# libbalsa/mailbox.c:275
-# libbalsa/mailbox.c:290
-#~ msgid "gpgme could not get data from mailbox file: %s"
-#~ msgstr "gpgme no pudo obtener datos del archivo de buzón: %s"
-
-# libbalsa/address-book.c:176
-# libbalsa/address-book.c:186
-#~ msgid "could not get gpgme decrypted data: %s"
-#~ msgstr "no se pudo obtener los datos desencriptados por gpgme: %s"
-
-#~ msgid ""
-#~ "[-- Error:  Could not display any parts of Multipart/Alternative! --]\n"
-#~ msgstr ""
-#~ "[-- Error. No se puede mostrar ninguna parte de Multipart/Alternative "
-#~ "--]\n"
-
-# src/sendmsg-window.c:891
-# src/sendmsg-window.c:934
-#~ msgid "[-- Attachment #%d"
-#~ msgstr "[-- Adjunto #%d"
-
-#~ msgid "[-- Type: %s/%s, Encoding: %s, Size: %s --]\n"
-#~ msgstr "[-- Tipo: %s/%s, Codificación: %s, Tamaño: %s --]\n"
-
-#~ msgid "[-- Autoview using %s --]\n"
-#~ msgstr "[-- Vista automática usando %s --]\n"
-
-#~ msgid "Invoking autoview command: %s"
-#~ msgstr "Invocando comando de vista automática %s"
-
-# src/main-window.c:259
-# src/main-window.c:262
-#~ msgid "Can't create filter"
-#~ msgstr "No se puede crear el filtro"
-
-#~ msgid "[-- Can't run %s. --]\n"
-#~ msgstr "[-- No se puede ejecutar %s. --]\n"
-
-#~ msgid "[-- Autoview stderr of %s --]\n"
-#~ msgstr "[-- Vista automática de la salida estándar de error de %s --]\n"
-
-#~ msgid "[-- Error: message/external-body has no access-type parameter --]\n"
-#~ msgstr ""
-#~ "[-- Error: El mensaje/cuerpo externo no tiene parámetro de tipo de acceso "
-#~ "--]\n"
-
-#~ msgid "[-- This %s/%s attachment "
-#~ msgstr "[-- Este %s/%s adjunto "
-
-#~ msgid "(size %s bytes) "
-#~ msgstr "(tamaño %s bytes) "
-
-#~ msgid "has been deleted --]\n"
-#~ msgstr "ha sido borrado --]\n"
-
-#~ msgid "[-- on %s --]\n"
-#~ msgstr "[-- en %s --]\n"
-
-#~ msgid ""
-#~ "[-- This %s/%s attachment is not included, --]\n"
-#~ "[-- and the indicated external source has --]\n"
-#~ "[-- expired. --]\n"
-#~ msgstr ""
-#~ "[-- Este adjunto %s/%s no está incluido, --]\n"
-#~ "[-- y la fuente externa indicada ha caducado]\n"
-#~ "\n"
-
-#~ msgid "[-- This %s/%s attachment is not included, --]\n"
-#~ msgstr "[-- Este %s/%s adjunto no está incluido, --]\n"
-
-#~ msgid "[-- and the indicated access-type %s is unsupported --]\n"
-#~ msgstr "[--y el tipo de acceso indicado %s no está soportado --]\n"
-
-#~ msgid "Error: multipart/signed has no protocol."
-#~ msgstr "Error: multipart/signed no tiene protocolo"
-
-#~ msgid "Error: multipart/encrypted has no protocol parameter!"
-#~ msgstr "Error: multipart/encrypted no tiene parámetro de protocolo"
-
-# libmutt/mbox.c:741
-#~ msgid "Unable to open temporary file!"
-#~ msgstr "No se pudo crear el archivo temporal"
-
-#~ msgid "[-- %s/%s is unsupported "
-#~ msgstr "[-- %s/%s no está soportado"
-
-#~ msgid "(use '%s' to view this part)"
-#~ msgstr "(use «%s» para ver esta parte)"
-
-#~ msgid "(need 'view-attachments' bound to key!)"
-#~ msgstr "(necesita asignar una tecla a «ver adjuntos»)"
-
-# libmutt/imap/auth.c:296
-# libmutt/imap/auth.c:296
-#~ msgid "No authenticators available"
-#~ msgstr "No hay autentificación disponible"
-
-# libmutt/imap/auth.c:197
-# libmutt/imap/auth.c:197
-#~ msgid "Authenticating (anonymous)..."
-#~ msgstr "Autenticando (anónimo)..."
-
-# libmutt/imap/auth.c:296
-# libmutt/imap/auth.c:296
-#~ msgid "Anonymous authentication failed."
-#~ msgstr "Falló la autenticación anónima."
-
-# libmutt/imap/auth.c:110
-# libmutt/imap/auth.c:110
-#~ msgid "Authenticating (CRAM-MD5)..."
-#~ msgstr "Autenticando (CRAM-MD5)..."
-
-# libmutt/imap/auth.c:324
-# libmutt/imap/auth.c:324
-#~ msgid "CRAM-MD5 authentication failed."
-#~ msgstr "Falló la autenticación CRAM-MD5."
-
-# libmutt/imap/auth_gss.c:88
-# libmutt/imap/auth_gss.c:88
-#~ msgid "Authenticating (GSSAPI)..."
-#~ msgstr "Autenticando (GSSAPI)..."
-
-# libmutt/imap/auth.c:296
-# libmutt/imap/auth.c:296
-#~ msgid "GSSAPI authentication failed."
-#~ msgstr "Falló la autenticación GSSAPI."
-
-#~ msgid "LOGIN disabled on this server."
-#~ msgstr "LOGIN deshabilitado en este servidor."
-
-# libmutt/imap/auth.c:361
-# libmutt/imap/auth.c:361
-#~ msgid "Logging in..."
-#~ msgstr "Iniciando sesión..."
-
-# libmutt/imap/auth_gss.c:88
-# libmutt/imap/auth_gss.c:88
-#~ msgid "Authenticating (SASL)..."
-#~ msgstr "Autenticando (SASL)..."
-
-# libmutt/imap/auth.c:296
-# libmutt/imap/auth.c:296
-#~ msgid "SASL authentication failed."
-#~ msgstr "Falló la autenticación SASL."
-
-#~ msgid "%s is an invalid IMAP path"
-#~ msgstr "%s es una ruta IMAP no válida"
-
-# libmutt/imap/browse.c:93
-# libmutt/imap/browse.c:93
-#~ msgid "Getting namespaces..."
-#~ msgstr "Obteniendo espacios de nombres..."
-
-# libmutt/imap/browse.c:120
-# libmutt/imap/browse.c:120
-#~ msgid "Getting folder list..."
-#~ msgstr "Obteniendo lista de carpetas..."
-
-# src/filter-edit-dialog.c:52
-# src/filter-edit-dialog.c:50
-#~ msgid "No such folder"
-#~ msgstr "No existe la carpeta"
-
-# src/main-window.c:399
-# src/main-window.c:401
-#~ msgid "Create mailbox: "
-#~ msgstr "Crear buzón: "
-
-# libmutt/mx.c:899 libmutt/mx.c:1056
-# libmutt/mx.c:899 libmutt/mx.c:1056
-#~ msgid "Mailbox must have a name."
-#~ msgstr "El buzón debe tener un nombre."
-
-# src/pref-manager.c:1491
-# src/pref-manager.c:1644
-#~ msgid "Fatal error.  Message count is out of sync!"
-#~ msgstr "Error fatal.  El número de mensajes está desincronizado."
-
-# src/sendmsg-window.c:1694
-# src/sendmsg-window.c:1749
-#~ msgid "Closing connection to %s..."
-#~ msgstr "Cerrando la conexión a %s..."
-
-#~ msgid "This IMAP server is ancient. Mutt does not work with it."
-#~ msgstr "Este servidor IMAP es muy antiguo. Mutt no puede trabajar con él."
-
-# libmutt/imap/imap_ssl.c:229
-# libmutt/imap/imap_ssl.c:229
-#~ msgid "Secure connection with TLS?"
-#~ msgstr "¿Quiere asegurar la conexión usando TLS?"
-
-# libmutt/imap/imap_ssl.c:229
-# libmutt/imap/imap_ssl.c:229
-#~ msgid "Connecting to %s ..."
-#~ msgstr "Conectando a %s ..."
-
-#~ msgid "Could not negotiate TLS connection"
-#~ msgstr "No se pudo negociar la conexión TLS"
-
-# libmutt/mx.c:630
-# libmutt/mx.c:630
-#~ msgid "Selecting %s..."
-#~ msgstr "Seleccionando %s..."
-
-#~ msgid "Unable to append to IMAP mailboxes at this server"
-#~ msgstr "No se pudo añadir a los buzones IMAP en este servidor"
-
-# src/pref-manager.c:1316
-# src/pref-manager.c:1460
-#~ msgid "Create %s?"
-#~ msgstr "¿Crear %s?"
-
-#~ msgid "Closing connection to IMAP server..."
-#~ msgstr "Cerrando la conexión al servidor IMAP..."
-
-#~ msgid "Expunge failed"
-#~ msgstr "La compactación del buzón falló"
-
-#~ msgid "Saving message status flags... [%d/%d]"
-#~ msgstr "Guardando marcas de estado del mensaje... [%d/%d]"
-
-# libmutt/mx.c:848
-# libmutt/mx.c:848
-#~ msgid "Expunging messages from server..."
-#~ msgstr "Borrando los mensajes desde el servidor"
-
-# src/pref-manager.c:1087
-# src/pref-manager.c:1218
-#~ msgid "Bad mailbox name"
-#~ msgstr "Nombre del buzón incorrecto"
-
-# libmutt/mx.c:719
-# libmutt/mx.c:719
-#~ msgid "Subscribing to %s..."
-#~ msgstr "Suscribiendo a %s..."
-
-# libmutt/mx.c:719
-# libmutt/mx.c:719
-#~ msgid "Unsubscribing to %s..."
-#~ msgstr "Desuscribiendo a %s..."
-
-#~ msgid "Unable to fetch headers from this IMAP server version."
-#~ msgstr ""
-#~ "No se pueden obtener las cabeceras de esta versión del servidor IMAP."
-
-# libmutt/mbox.c:788
-#~ msgid "Fetching message headers... [%d/%d]"
-#~ msgstr "Obteniendo cabeceras de mensaje... [%d/%d]"
-
-# libmutt/imap/browse.c:93
-# libmutt/imap/browse.c:93
-#~ msgid "Fetching message..."
-#~ msgstr "Obteniendo mensaje..."
-
-#~ msgid "The message index is incorrect. Try reopening the mailbox."
-#~ msgstr "El índice de mensajes es incorrecto. Intente reabrir el buzón."
-
-# libmutt/mx.c:848
-# libmutt/mx.c:848
-#~ msgid "Uploading message ..."
-#~ msgstr "Subiendo el mensaje ...."
-
-# libmutt/mx.c:848
-# libmutt/mx.c:848
-#~ msgid "Copying %d messages to %s..."
-#~ msgstr "Copiando %d mensajes a %s..."
-
-# libmutt/imap/util.c:43
-# libmutt/imap/util.c:43
-#~ msgid "Continue?"
-#~ msgstr "¿Continuar?"
-
-# src/mailbox-conf.c:485
-# src/mailbox-conf.c:490
-#~ msgid "%s [%s]\n"
-#~ msgstr "%s [%s]\n"
-
-#~ msgid "Out of memory!"
-#~ msgstr "Se agotó la memoria."
-
-# libmutt/mbox.c:134 libmutt/mbox.c:292
-# libmutt/mbox.c:134 libmutt/mbox.c:292
-#~ msgid "Reading %s... %d (%d%%)"
-#~ msgstr "Leyendo %s... %d (%d%%)"
-
-# libmutt/mbox.c:158 libmutt/mbox.c:217
-# libmutt/mbox.c:158 libmutt/mbox.c:217
-#~ msgid "Mailbox is corrupt!"
-#~ msgstr "El buzón está corrompido"
-
-# libmutt/mbox.c:666
-#~ msgid "Mailbox was corrupted!"
-#~ msgstr "El buzón fue corrompido"
-
-# libmutt/mbox.c:703 libmutt/mbox.c:978
-#~ msgid "Fatal error!  Could not reopen mailbox!"
-#~ msgstr "Error fatal. No se pudo reabrir el buzón."
-
-# libmutt/mbox.c:741
-#~ msgid "Could not create temporary file!"
-#~ msgstr "No se pudo crear el archivo temporal"
-
-# libmutt/mbox.c:758
-#~ msgid "sync: mbox modified, but no modified messages! (report this bug)"
-#~ msgstr ""
-#~ "sync: buzón modificado, pero no se encuentra ningún mensaje modificado "
-#~ "(informe de este error)"
-
-# libmutt/mbox.c:788
-#~ msgid "Writing messages... %d (%d%%)"
-#~ msgstr "Escribiendo mensajes... %d (%d%%)"
-
-#~ msgid "Committing changes..."
-#~ msgstr "Efectuando cambios..."
-
-# libmutt/mbox.c:962
-#~ msgid "Write failed!  Saved partial mailbox to %s"
-#~ msgstr ""
-#~ "Ha fallado la escritura. El buzón ha quedado parcialmente guardado en %s"
-
-# libmutt/mbox.c:1028
-#~ msgid "Could not reopen mailbox!"
-#~ msgstr "No se pudo reabrir el buzón."
-
-# libmutt/imap/imap_ssl.c:229
-# libmutt/imap/imap_ssl.c:229
-#~ msgid "Connection to %s closed"
-#~ msgstr "Conectando a %s cerrada"
-
-#~ msgid "SSL is unavailable."
-#~ msgstr "SSL no disponible."
-
-#~ msgid "Preconnect command failed."
-#~ msgstr "Falló el comando de preconexión."
-
-# src/sendmsg-window.c:1694
-# src/sendmsg-window.c:1749
-#~ msgid "Error talking to %s (%s)"
-#~ msgstr "Error conectando a %s (%s)"
-
-# libmutt/mx.c:630
-# libmutt/mx.c:630
-#~ msgid "Looking up %s..."
-#~ msgstr "Buscando %s..."
-
-# libbalsa/send.c:788
-# libbalsa/send.c:794
-#~ msgid "Could not find the host \"%s\""
-#~ msgstr "No se puede encontrar el hospedador «%s»"
-
-# libmutt/imap/imap_ssl.c:229
-# libmutt/imap/imap_ssl.c:229
-#~ msgid "Connecting to %s..."
-#~ msgstr "Conectando a %s..."
-
-# src/sendmsg-window.c:1403
-# src/sendmsg-window.c:1454
-#~ msgid "Could not connect to %s (%s)."
-#~ msgstr "No se pudo conectar a %s: (%s)."
-
-# libmutt/imap/imap_ssl.c:123
-# libmutt/imap/imap_ssl.c:123
-#~ msgid "Failed to find enough entropy on your system"
-#~ msgstr "No se encontró suficiente entropía en su sistema"
-
-# libmutt/imap/imap_ssl.c:91
-# libmutt/imap/imap_ssl.c:91
-#~ msgid "Filling entropy pool: %s...\n"
-#~ msgstr "Llenando almacén de entropía %s...\n"
-
-#~ msgid "%s has insecure permissions!"
-#~ msgstr "%s tiene permisos inseguros"
-
-# libmutt/imap/imap_ssl.c:138
-# libmutt/imap/imap_ssl.c:138
-#~ msgid "SSL disabled due the lack of entropy"
-#~ msgstr "Se ha deshabilitado SSL debido a la falta de entropía"
-
-#~ msgid "I/O error"
-#~ msgstr "Error de E/S"
-
-#~ msgid "unspecified protocol error"
-#~ msgstr "error de protocolo no especificado"
-
-#~ msgid "SSL failed: %s"
-#~ msgstr "Falló SSL. %s"
-
-# libmutt/imap/imap_ssl.c:218
-# libmutt/imap/imap_ssl.c:218
-#~ msgid "Unable to get certificate from peer"
-#~ msgstr "No se fue capaz de obtener el certificado del compañero"
-
-# libmutt/imap/imap_ssl.c:229
-# libmutt/imap/imap_ssl.c:229
-#~ msgid "SSL connection using %s (%s)"
-#~ msgstr "Conexión SSL usando %s (%s)"
-
-# libmutt/imap/imap_ssl.c:279
-# libmutt/imap/imap_ssl.c:279
-#~ msgid "[unable to calculate]"
-#~ msgstr "[incapaz de calcular]"
-
-# libmutt/imap/imap_ssl.c:372
-# libmutt/imap/imap_ssl.c:372
-#~ msgid "Server certificate is not yet valid"
-#~ msgstr "El certificado del servidor no es válido aún"
-
-# libmutt/imap/imap_ssl.c:379
-# libmutt/imap/imap_ssl.c:379
-#~ msgid "Server certificate has expired"
-#~ msgstr "El certificado del servidor ha expirado"
-
-# libmutt/imap/imap_ssl.c:521
-# libmutt/imap/imap_ssl.c:521
-#~ msgid "Warning: Couldn't save certificate"
-#~ msgstr "Aviso: No se pudo guardar el certificado"
-
-# libmutt/imap/imap_ssl.c:523
-# libmutt/imap/imap_ssl.c:523
-#~ msgid "Certificate saved"
-#~ msgstr "Certificado guardado"
-
-# libmutt/imap/imap_ssl.c:452
-# libmutt/imap/imap_ssl.c:452
-#~ msgid "This certificate belongs to:"
-#~ msgstr "Este certificado pertenece a:"
-
-# libmutt/imap/imap_ssl.c:462
-# libmutt/imap/imap_ssl.c:462
-#~ msgid "This certificate was issued by:"
-#~ msgstr "Este certificado fue emitido por:"
-
-# libmutt/imap/imap_ssl.c:472
-# libmutt/imap/imap_ssl.c:472
-#~ msgid "This certificate is valid"
-#~ msgstr "Este certificado es válido"
-
-# libmutt/imap/imap_ssl.c:473
-# libmutt/imap/imap_ssl.c:473
-#~ msgid "   from %s"
-#~ msgstr "   de %s"
-
-# libmutt/imap/imap_ssl.c:475
-# libmutt/imap/imap_ssl.c:475
-#~ msgid "     to %s"
-#~ msgstr "     para %s"
-
-# libmutt/imap/imap_ssl.c:481
-# libmutt/imap/imap_ssl.c:481
-#~ msgid "Fingerprint: %s"
-#~ msgstr "Huella: %s"
-
-# libmutt/imap/imap_ssl.c:483
-# libmutt/imap/imap_ssl.c:483
-#~ msgid "SSL Certificate check"
-#~ msgstr "Comprobación del certificado SSL"
-
-# libmutt/imap/imap_ssl.c:486
-# libmutt/imap/imap_ssl.c:486
-#~ msgid "(r)eject, accept (o)nce, (a)ccept always"
-#~ msgstr "(r)echazar, aceptar s(ó)lo una vez, (a)ceptar siempre"
-
-# libmutt/imap/imap_ssl.c:487
-# libmutt/imap/imap_ssl.c:487
-#~ msgid "roa"
-#~ msgstr "roa"
-
-# libmutt/imap/imap_ssl.c:491
-# libmutt/imap/imap_ssl.c:491
-#~ msgid "(r)eject, accept (o)nce"
-#~ msgstr "(r)echazar, aceptar s(ó)lo una vez"
-
-# libmutt/imap/imap_ssl.c:492
-# libmutt/imap/imap_ssl.c:492
-#~ msgid "ro"
-#~ msgstr "ro"
-
-# libmutt/imap/imap_ssl.c:496
-# libmutt/imap/imap_ssl.c:496
-#~ msgid "Exit  "
-#~ msgstr "Salir  "
-
-# libmutt/imap/imap_ssl.c:498
-# libmutt/imap/imap_ssl.c:498
-#~ msgid "Help"
-#~ msgstr "Ayuda"
-
-# libmutt/mx.c:630
-# libmutt/mx.c:630
-#~ msgid "Reading %s... %d"
-#~ msgstr "Leyendo %s... %d"
-
-# libmutt/mx.c:119
-# libmutt/mx.c:119
-#~ msgid "Lock count exceeded, remove lock for %s?"
-#~ msgstr "Contador del bloqueo superado, ¿quiere quitar el bloqueo de %s?"
-
-# libmutt/mx.c:131
-# libmutt/mx.c:131
-#~ msgid "Can't dotlock %s.\n"
-#~ msgstr "No se puede bloquear %s.\n"
-
-# libmutt/mx.c:542
-# libmutt/mx.c:542
-#~ msgid "Couldn't lock %s\n"
-#~ msgstr "No se pudo bloquear %s\n"
-
-# libmutt/mx.c:630
-# libmutt/mx.c:630
-#~ msgid "Reading %s..."
-#~ msgstr "Leyendo %s..."
-
-# libmutt/mx.c:719
-# libmutt/mx.c:719
-#~ msgid "Writing %s..."
-#~ msgstr "Escribiendo %s..."
-
-# libmutt/mx.c:746
-# libmutt/mx.c:746
-#~ msgid "Could not synchronize mailbox %s!"
-#~ msgstr "No se pudo sincronizar el buzón %s."
-
-# libmutt/mx.c:899 libmutt/mx.c:1056
-# libmutt/mx.c:899 libmutt/mx.c:1056
-#~ msgid "Mailbox is unchanged."
-#~ msgstr "El buzón no ha cambiado."
-
-# libmutt/mx.c:929
-# libmutt/mx.c:929
-#~ msgid "%d kept, %d moved, %d deleted."
-#~ msgstr "%d guardados, %d movidos, %d borrados."
-
-# libmutt/mx.c:932 libmutt/mx.c:1098
-# libmutt/mx.c:932 libmutt/mx.c:1098
-#~ msgid "%d kept, %d deleted."
-#~ msgstr "%d guardados, %d borrados."
-
-# libmutt/mx.c:1040
-# libmutt/mx.c:1040
-#~ msgid " Press '%s' to toggle write"
-#~ msgstr " Pulse «%s» para (des)activar la escritura"
-
-# libmutt/mx.c:1043
-# libmutt/mx.c:1043
-#~ msgid "Use 'toggle-write' to re-enable write!"
-#~ msgstr "Use «activar escritura» para reactivar la escritura."
-
-# libmutt/mx.c:1045
-# libmutt/mx.c:1045
-#~ msgid "Mailbox is marked unwritable. %s"
-#~ msgstr "El buzón está marcado como no escribible. %s"
-
-# libmutt/mx.c:1050
-# libmutt/mx.c:1050
-#~ msgid "Mailbox is read-only."
-#~ msgstr "El buzón es de sólo lectura."
-
-# libmutt/mx.c:1065
-# libmutt/mx.c:1065
-#~ msgid "Purge %d deleted message?"
-#~ msgstr "¿Purgar %d mensajes borrados?"
-
-# libmutt/mx.c:1095
-# libmutt/mx.c:1095
-#~ msgid "%d kept."
-#~ msgstr "%d guardados."
-
-#~ msgid "multipart message has no boundary parameter!"
-#~ msgstr "El mensaje multiparte no tiene parámetro de límite"
-
-#~ msgid "No boundary parameter found! [report this error]"
-#~ msgstr "No se encontró ningún parámetro de límite [informe de este error]"
-
-#~ msgid "%s no longer exists!"
-#~ msgstr "%s no existe"
-
-# src/balsa-message.c:301
-# src/balsa-message.c:331
-#~ msgid "Can't stat %s: %s"
-#~ msgstr "No se pudo guardar %s:%s "
-
-# libmutt/mx.c:459 libmutt/mx.c:605
-# libmutt/mx.c:459 libmutt/mx.c:605
-#~ msgid "%s isn't a regular file."
-#~ msgstr "%s no es un archivo regular."
-
-#~ msgid "Output of the delivery process"
-#~ msgstr "Salida del proceso de entrega"
-
-# src/filter-edit-dialog.c:222
-# src/filter-edit-dialog.c:218
-#~ msgid "New"
-#~ msgstr "Nuevo"
-
-#~ msgid "Delete the current message"
-#~ msgstr "Borrar el mensaje actual"
-
-# libmutt/mx.c:1375
-# libmutt/mx.c:1375
-#~ msgid "Undelete the message"
-#~ msgstr "Recuperar el mensaje"
-
-#~ msgid "_Toggle"
-#~ msgstr "_Conmutar"
-
-# src/filter-edit-dialog.c:570
-# src/filter-edit-dialog.c:491
-#~ msgid "Search for Name:"
-#~ msgstr "Buscar por el nombre:"
-
-# libbalsa/address-book-ldap.c:172
-# libbalsa/address-book-ldap.c:188
-#~ msgid ""
-#~ "Failed to initialise LDAP server.\n"
-#~ "Check that the servername is valid."
-#~ msgstr ""
-#~ "Falló la inicialización del servidor LDAP.\n"
-#~ "Compruebe que el nombre del servidor es válido."
-
-#~ msgid "Couldn't enable TLS on the LDAP connection: %s"
-#~ msgstr "No se pudo activar TLS en la conexión LDAP: %s"
-
-# libbalsa/address-book-ldap.c:182
-# libbalsa/address-book-ldap.c:198
-#~ msgid ""
-#~ "Failed to bind to server: %s\n"
-#~ "Check that the server name is valid."
-#~ msgstr ""
-#~ "Falló al vincularse al servidor: %s\n"
-#~ "Compruebe que el nombre del servidor es válido."
-
-# libbalsa/address-book-ldap.c:230
-# libbalsa/address-book-ldap.c:246
-#~ msgid "Failed to do a search: %s.Check that the base name is valid."
-#~ msgstr ""
-#~ "Falló al efectuar la búsqueda: %s. Compruebe que el nombre base es válido."
-
-#~ msgid "Sorry, no semicolons are allowed in the name!\n"
-#~ msgstr "No se permiten puntos y comas en el nombre\n"
-
-#~ msgid "External editor command:"
-#~ msgstr "Comando del editor externo:"
-
-#~ msgid "Print..."
-#~ msgstr "Imprimir..."
-
-# src/main-window.c:444
-# src/main-window.c:451
-#~ msgid "_Comments"
-#~ msgstr "_Comentarios"
-
-#~ msgid "Couldn't set protocol version to LDAPv3."
-#~ msgstr "No se pudo establecer la versión del protocolo a LDAPv3"

@@ -302,15 +302,10 @@ struct SelectDialogInfo_ {
 typedef struct SelectDialogInfo_ SelectDialogInfo;
 
 /* Forward references: */
+static void sd_destroy_notify(SelectDialogInfo * sdi);
 static void sd_response_cb(GtkWidget * dialog, gint response,
                            SelectDialogInfo * sdi);
-static void sd_row_activated_cb(GtkTreeView * treeview, GtkTreeIter * arg1,
-                                GtkTreePath * arg2,
-                                SelectDialogInfo * sdi);
-static void sd_row_toggled_cb(GtkCellRendererToggle * cellrenderertoggle,
-                              gchar * path, SelectDialogInfo * sdi);
 static void sd_idle_add_response_ok(SelectDialogInfo * sdi);
-static void sd_idle_remove_response_ok(SelectDialogInfo * sdi);
 static gboolean sd_response_ok(SelectDialogInfo * sdi);
 
 /* Tree columns: */
@@ -350,7 +345,7 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
     sdi->parent = parent;
     g_object_set_data_full(G_OBJECT(parent),
                            LIBBALSA_IDENTITY_SELECT_DIALOG_KEY,
-                           sdi, g_free);
+                           sdi, (GDestroyNotify) sd_destroy_notify);
     sdi->update = update;
     sdi->data = data;
     sdi->idle_handler_id = 0;
@@ -365,10 +360,10 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 
     sdi->tree = tree =
-        libbalsa_identity_tree(G_CALLBACK(sd_row_toggled_cb), sdi,
+        libbalsa_identity_tree(G_CALLBACK(sd_idle_add_response_ok), sdi,
                                _("Current"));
-    g_signal_connect(G_OBJECT(tree), "row-activated",
-                     G_CALLBACK(sd_row_activated_cb), sdi);
+    g_signal_connect_swapped(G_OBJECT(tree), "row-activated",
+                             G_CALLBACK(sd_idle_add_response_ok), sdi);
     identity_list_update_real(GTK_TREE_VIEW(tree), identities, initial_id);
 
     frame = gtk_frame_new(NULL);
@@ -379,6 +374,17 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
 
     gtk_widget_show_all(dialog);
     gtk_widget_grab_focus(tree);
+}
+
+/* GDestroyNotify for sdi. */
+static void
+sd_destroy_notify(SelectDialogInfo * sdi)
+{
+    if (sdi->idle_handler_id) {
+        gtk_idle_remove(sdi->idle_handler_id);
+        sdi->idle_handler_id = 0;
+    }
+    g_free(sdi);
 }
 
 /* Callback for the dialog's "response" signal. */
@@ -399,34 +405,15 @@ sd_response_cb(GtkWidget * dialog, gint response, SelectDialogInfo * sdi)
         }
     }
 
-    sd_idle_remove_response_ok(sdi);
-
     /* Clear the data set on the parent window, so we know that the
-     * dialog was destroyed. This will also trigger the GDestroyNotify,
-     * which g_frees sdi. */
+     * dialog was destroyed. This will also trigger the GDestroyNotify
+     * function, sd_destroy_notify.
+     */
     g_object_set_data(G_OBJECT(sdi->parent),
                       LIBBALSA_IDENTITY_SELECT_DIALOG_KEY,
                       NULL);
 
     gtk_widget_destroy(dialog);
-}
-
-/* Callback for the "row-activated" signal: close the dialog after this
- * signal has been handled. */
-static void
-sd_row_activated_cb(GtkTreeView * treeview, GtkTreeIter * arg1,
-                    GtkTreePath * arg2, SelectDialogInfo * sdi)
-{
-    sd_idle_add_response_ok(sdi);
-}
-
-/* Callback for the "toggled" signal: close the dialog after this signal
- * has been handled. */
-static void
-sd_row_toggled_cb(GtkCellRendererToggle * cellrenderertoggle,
-                  gchar * path, SelectDialogInfo * sdi)
-{
-    sd_idle_add_response_ok(sdi);
 }
 
 /* Helper for adding idles. */
@@ -436,16 +423,6 @@ sd_idle_add_response_ok(SelectDialogInfo * sdi)
     if (!sdi->idle_handler_id)
         sdi->idle_handler_id =
             gtk_idle_add((GtkFunction) sd_response_ok, sdi);
-}
-
-/* Helper for removing idles. */
-static void
-sd_idle_remove_response_ok(SelectDialogInfo * sdi)
-{
-    if (sdi->idle_handler_id) {
-        gtk_idle_remove(sdi->idle_handler_id);
-        sdi->idle_handler_id = 0;
-    }
 }
 
 /* Idle handler for sending the OK response to the dialog. */
@@ -548,8 +525,12 @@ libbalsa_identity_tree(GCallback toggled_cb, gpointer toggled_data,
     g_object_unref(store);
 
     renderer = gtk_cell_renderer_toggle_new();
-    g_signal_connect(G_OBJECT(renderer), "toggled",
-                     toggled_cb, toggled_data ? toggled_data : tree);
+    if (toggled_data)
+        g_signal_connect_swapped(G_OBJECT(renderer), "toggled",
+                                 toggled_cb, toggled_data);
+    else
+        g_signal_connect(G_OBJECT(renderer), "toggled",
+                         toggled_cb, tree);
     column =
         gtk_tree_view_column_new_with_attributes(toggled_title, renderer,
                                                  "radio", DEFAULT_COLUMN,

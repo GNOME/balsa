@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 2\n"
-"POT-Creation-Date: 2002-09-21 05:19+0200\n"
-"PO-Revision-Date: 2002-09-21 15:06+0700\n"
+"POT-Creation-Date: 2002-09-25 05:21+0200\n"
+"PO-Revision-Date: 2002-09-25 19:32+0700\n"
 "Last-Translator: Trinh Minh Thanh <tmthanh@linuxmail.org>\n"
 "Language-Team: Gnome-Vi Team <Gnomevi-list@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -250,8 +250,8 @@ msgstr "Lỗi: Nhận dạng có tên đó đã tồn tại rồi"
 msgid "Do you really want to delete the selected identity?"
 msgstr "Có thật sự muốn xoá Nhận dạng được chọn không ?"
 
-#: libbalsa/identity.c:974 src/address-book-config.c:621 src/folder-conf.c:167
-#: src/folder-conf.c:419 src/pref-manager.c:2836
+#: libbalsa/identity.c:974 src/address-book-config.c:535 src/folder-conf.c:167
+#: src/folder-conf.c:419 src/pref-manager.c:2832
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "Lỗi hiển thị %s: %s\n"
@@ -521,7 +521,7 @@ msgstr "Ẩn"
 msgid "Unable to open sentbox - could not get IMAP server information"
 msgstr "Không thể mở hộp thư đi - không thể lấy thông tin về máy chủ IMAP"
 
-#: libbalsa/send.c:774
+#: libbalsa/send.c:776
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -529,40 +529,40 @@ msgstr ""
 "Lỗi đệ trình thông điệp, bỏ nó vào trong hộp thư đi.\n"
 "Hệ thống sẽ cố đệ trình lại thông điệp cho tới khi bạn xoá nó."
 
-#: libbalsa/send.c:802
+#: libbalsa/send.c:804
 msgid "Connected to MTA"
 msgstr "Đã kết nối với MTA"
 
-#: libbalsa/send.c:809
+#: libbalsa/send.c:811
 #, c-format
 msgid "From: %d <%s>"
 msgstr "Từ: %d <%s>"
 
-#: libbalsa/send.c:812
+#: libbalsa/send.c:814
 #, c-format
 msgid "From %s: %d %s"
 msgstr "Từ %s: %d %s"
 
-#: libbalsa/send.c:820
+#: libbalsa/send.c:822
 #, c-format
 msgid "To: %d <%s>"
 msgstr "Tới: %d <%s>"
 
-#: libbalsa/send.c:823
+#: libbalsa/send.c:825
 #, c-format
 msgid "To %s: %d %s"
 msgstr "Tới %s: %d %s"
 
-#: libbalsa/send.c:847
+#: libbalsa/send.c:849
 #, c-format
 msgid "%d %s"
 msgstr "%d %s"
 
-#: libbalsa/send.c:860
+#: libbalsa/send.c:862
 msgid "Disconnected"
 msgstr "Thôi kết nối"
 
-#: libbalsa/send.c:1031
+#: libbalsa/send.c:1033
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -576,7 +576,7 @@ msgstr ""
 "smtp\".\n"
 "Thông điệp được bỏ lại trong hộp thư đi."
 
-#: libbalsa/send.c:1041
+#: libbalsa/send.c:1043
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1488,151 +1488,163 @@ msgstr "Lỗi khi gửi thông điệp, child exited %d (%s)."
 msgid "Output of the delivery process"
 msgstr "Output của tiến trình phân phối"
 
-#: src/address-book-config.c:112
-msgid "Address Book Configuration"
-msgstr "Cấu Hình Sổ Địa Chỉ"
+#: src/address-book-config.c:142
+msgid "Add Address Book"
+msgstr "Thêm Sổ Địa Chỉ"
 
-#: src/address-book-config.c:139
-msgid "Update"
-msgstr "Cập Nhật"
+#: src/address-book-config.c:150
+msgid "Modify Address Book"
+msgstr "Biến Đổi Sổ Địa Chỉ"
 
-#: src/address-book-config.c:314
+#: src/address-book-config.c:185
 msgid "New Address Book type:"
 msgstr "Loại Sổ Địa Chỉ Mới:"
 
-#: src/address-book-config.c:323
+#: src/address-book-config.c:194
 msgid "VCard Address Book (GnomeCard)"
 msgstr "Sổ Địa Chỉ VCard (GnomeCard)"
 
-#: src/address-book-config.c:336
+#: src/address-book-config.c:207
 msgid "External query (a program)"
 msgstr "Tra vấn bên ngoài (một chương trình)"
 
-#: src/address-book-config.c:348
+#: src/address-book-config.c:219
 msgid "LDIF Address Book"
 msgstr "Sổ Địa Chỉ LDIF"
 
-#: src/address-book-config.c:363
+#: src/address-book-config.c:234
 msgid "LDAP Address Book"
 msgstr "Sổ Địa Chỉ LDAP"
 
-#: src/address-book-config.c:371
+#: src/address-book-config.c:242
 msgid "Balsa is not compiled with LDAP support"
 msgstr "Balsa không được biên dịch với hỗ trợ LDAP"
 
 #. mailbox name
-#: src/address-book-config.c:395 src/address-book-config.c:440
-#: src/address-book-config.c:502 src/address-book-config.c:562
+#: src/address-book-config.c:286 src/address-book-config.c:331
+#: src/address-book-config.c:393 src/address-book-config.c:453
 msgid "_Address Book Name"
 msgstr "Tên _Sổ Địa Chỉ"
 
-#: src/address-book-config.c:400
+#: src/address-book-config.c:291
 msgid "File name"
 msgstr "Tên Tập Tin"
 
-#: src/address-book-config.c:407
+#: src/address-book-config.c:298
 msgid "Select path for VCARD address book"
 msgstr "Chọn đường dẫn cho sổ địa chỉ VCard"
 
-#: src/address-book-config.c:412 src/address-book-config.c:471
-#: src/address-book-config.c:521 src/address-book-config.c:578
+#: src/address-book-config.c:303 src/address-book-config.c:362
+#: src/address-book-config.c:412 src/address-book-config.c:469
 msgid "_Expand aliases as you type"
 msgstr "Trải rộng các alias khi bạn gõ phím"
 
-#: src/address-book-config.c:445
+#: src/address-book-config.c:336
 msgid "Load program location"
 msgstr "Nạp vị trí chương trình"
 
-#: src/address-book-config.c:452
+#: src/address-book-config.c:343
 msgid "Select load program for address book"
 msgstr "Chọn nạp chương trình cho sổ địa chỉ"
 
-#: src/address-book-config.c:458
+#: src/address-book-config.c:349
 msgid "Save program location"
 msgstr "Lưu vị trí chương trình"
 
-#: src/address-book-config.c:464
+#: src/address-book-config.c:355
 msgid "Select save program for address book"
 msgstr "Chọn lưu chương trình cho sổ địa chỉ"
 
-#: src/address-book-config.c:508
+#: src/address-book-config.c:399
 msgid "_File name"
 msgstr "Tên _Tập Tin"
 
-#: src/address-book-config.c:515
+#: src/address-book-config.c:406
 msgid "Select path for LDIF address book"
 msgstr "Chọn đường dẫn cho sổ địa chỉ LDIF"
 
-#: src/address-book-config.c:567
+#: src/address-book-config.c:458
 msgid "_Host Name"
 msgstr "Tên _Máy chủ"
 
-#: src/address-book-config.c:572
+#: src/address-book-config.c:463
 msgid "_Base Domain Name"
 msgstr "Tên Miền _Cơ bản"
 
 #. FIXME : I saw a lot of different ways to create button with
 #. pixmaps, hope this one is correct
 #. Right/Add button
-#: src/address-book-config.c:639 src/filter-edit-callbacks.c:845
+#: src/address-book-config.c:553 src/filter-edit-callbacks.c:845
 #: src/filter-run-dialog.c:313
 msgid "Add"
 msgstr "Thêm"
 
-#: src/address-book-config.c:685 src/address-book-config.c:713
+#: src/address-book-config.c:578 src/address-book-config.c:582
+msgid "address book file"
+msgstr "tập tin sổ địa chỉ"
+
+#: src/address-book-config.c:586
+msgid "load program"
+msgstr "nạp chương trình"
+
+#: src/address-book-config.c:589
+msgid "save program"
+msgstr "Lưu chương trình"
+
+#: src/address-book-config.c:621
 #, c-format
 msgid ""
-"The address book file path '%s' is not correct.\n"
-"Do you want to correct the file name?"
+"The %s path '%s' is not correct.\n"
+"Do you want to correct the path?"
 msgstr ""
-"Đường dẫn của tập tin sổ địa chỉ '%s' không đúng.\n"
-"Có muốn sửa lại tên tập tin không?"
+"Đường dẫn %s '%s' không đúng.\n"
+"Có muốn hiệu chỉnh đường dẫn không?"
 
-#: src/address-book.c:161 src/filter-edit-dialog.c:193
+#: src/address-book.c:164 src/filter-edit-dialog.c:193
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
 #: src/filter-run-dialog.c:292
 msgid "Name"
 msgstr "Tên"
 
-#: src/address-book.c:169
+#: src/address-book.c:172
 msgid "E-Mail Address"
 msgstr "Địa Chỉ E-Mail"
 
-#: src/address-book.c:202
+#: src/address-book.c:205
 msgid "Address Book"
 msgstr "Sổ Địa Chỉ"
 
 #. Entry widget for finding an address
-#: src/address-book.c:259
+#: src/address-book.c:262
 msgid "Search for Name:"
 msgstr "Tìm theo tên:"
 
-#: src/address-book.c:318
+#: src/address-book.c:321
 msgid "Send-To"
 msgstr "Gửi-đến"
 
-#: src/address-book.c:338
+#: src/address-book.c:341
 msgid "Run GnomeCard"
 msgstr "Chạy GnomeCard"
 
-#: src/address-book.c:346
+#: src/address-book.c:349
 msgid "Re-Import"
 msgstr "Nhập-Lại"
 
 #. mode switching stuff
-#: src/address-book.c:356
+#: src/address-book.c:359
 msgid "Treat multiple addresses as:"
 msgstr "Đối xử với đa địa chỉ như là:"
 
-#: src/address-book.c:360
+#: src/address-book.c:363
 msgid "alternative addresses for the same person"
 msgstr "các địa chỉ thay thế cho cùng một người"
 
-#: src/address-book.c:365
+#: src/address-book.c:368
 msgid "a distribution list"
 msgstr "danh sách phân phối"
 
-#: src/balsa-app.c:60
+#: src/balsa-app.c:66
 #, c-format
 msgid ""
 "Opening remote mailbox %s.\n"
@@ -1641,16 +1653,16 @@ msgstr ""
 "Đang mở hộp thư ở xa %s.\n"
 "Mật khẩu cho %s@%s:"
 
-#: src/balsa-app.c:65
+#: src/balsa-app.c:71
 #, c-format
 msgid "Mailbox password for %s@%s:"
 msgstr "Mật khẩu hộp thư cho %s@%s:"
 
-#: src/balsa-app.c:68
+#: src/balsa-app.c:74
 msgid "Password needed"
 msgstr "Mật khẩu cần dùng"
 
-#: src/balsa-app.c:725
+#: src/balsa-app.c:793
 #, c-format
 msgid "Multiple mailboxes named \"%s\""
 msgstr "Đa hộp thư có tên  \"%s\""
@@ -1680,61 +1692,61 @@ msgstr "Đang mở hộp thư %s. Hãy đợi..."
 msgid "To"
 msgstr "Đến"
 
-#: src/balsa-index.c:2019
+#: src/balsa-index.c:2010
 msgid "View Source"
 msgstr "Xem Nguồn"
 
-#: src/balsa-index.c:2021
+#: src/balsa-index.c:2012
 msgid "Reply..."
 msgstr "Trả Lời..."
 
-#: src/balsa-index.c:2023
+#: src/balsa-index.c:2014
 msgid "Reply To All..."
 msgstr "Trả Lời Tất..."
 
-#: src/balsa-index.c:2025
+#: src/balsa-index.c:2016
 msgid "Reply To Group..."
 msgstr "Trả Lời Nhóm..."
 
-#: src/balsa-index.c:2027
+#: src/balsa-index.c:2018
 msgid "Forward Attached..."
 msgstr "Chuyển Tiếp Dạng Đính Kèm..."
 
-#: src/balsa-index.c:2029
+#: src/balsa-index.c:2020
 msgid "Forward Inline..."
 msgstr "Chuyển Tiếp Dạng Trong Dòng..."
 
-#: src/balsa-index.c:2031
+#: src/balsa-index.c:2022
 msgid "Store Address..."
 msgstr "Lưu trữ Địa Chỉ..."
 
-#: src/balsa-index.c:2044 src/filter-edit-dialog.c:216 src/mailbox-node.c:773
+#: src/balsa-index.c:2035 src/filter-edit-dialog.c:216 src/mailbox-node.c:773
 msgid "Delete"
 msgstr "Xoá"
 
-#: src/balsa-index.c:2049
+#: src/balsa-index.c:2040
 msgid "Undelete"
 msgstr "Thôi xoá"
 
-#: src/balsa-index.c:2054
+#: src/balsa-index.c:2045
 msgid "Move To Trash"
 msgstr "Chuyển vào Sọt Rác"
 
-#: src/balsa-index.c:2058
+#: src/balsa-index.c:2049
 msgid "Toggle"
 msgstr "Chốt"
 
-#: src/balsa-index.c:2061 src/filter-edit-callbacks.c:778
+#: src/balsa-index.c:2052 src/filter-edit-callbacks.c:778
 #: src/main-window.c:437
 msgid "Flagged"
 msgstr "Cắm Cờ"
 
-#: src/balsa-index.c:2064 src/balsa-mblist.c:340
+#: src/balsa-index.c:2055 src/balsa-mblist.c:340
 #: src/filter-edit-callbacks.c:778
 msgid "Unread"
 msgstr "Chưa Đọc"
 
-#: src/balsa-index.c:2072
+#: src/balsa-index.c:2063
 msgid "Move to"
 msgstr "Chuyển Đến"
 
@@ -2401,8 +2413,7 @@ msgid ""
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
 msgstr ""
 "Việc này sẽ xoá bỏ thư mục %s ra khỏi danh sách.\n"
-"Có thể dùng \"Thư Mục IMAP Mới\" sau này để bổ sung lại thư "
-"mục này.\n"
+"Có thể dùng \"Thư Mục IMAP Mới\" sau này để bổ sung lại thư mục này.\n"
 
 #: src/folder-conf.c:635
 msgid "Confirm"
@@ -2450,8 +2461,8 @@ msgid ""
 msgstr ""
 "Việc này sẽ xoá bỏ hộp thư \"%s\" khỏi danh sách các hộp thư.\n"
 "Bạn cũng có thể xoá tập tin trên đĩa hay tập tin liên quan với hộp thư\n"
-"này. Nếu không xoá tập tin của nó trên đĩa thì có thể \"Thêm Hộp Thư\" "
-"để truy cập lại nó sau này.\n"
+"này. Nếu không xoá tập tin của nó trên đĩa thì có thể \"Thêm Hộp Thư\" để "
+"truy cập lại nó sau này.\n"
 "Bạn thích làm gì ?"
 
 #: src/mailbox-conf.c:254 src/mailbox-conf.c:292
@@ -2594,11 +2605,11 @@ msgstr "Hộp thư Maildir cục bộ..."
 msgid "Local MH mailbox..."
 msgstr "Hộp thư MH cục bộ..."
 
-#: src/mailbox-node.c:736 src/main-window.c:275 src/pref-manager.c:2603
+#: src/mailbox-node.c:736 src/main-window.c:275 src/pref-manager.c:2599
 msgid "Remote IMAP mailbox..."
 msgstr "Hộp thư IMAP ở xa..."
 
-#: src/mailbox-node.c:739 src/main-window.c:281 src/pref-manager.c:2609
+#: src/mailbox-node.c:739 src/main-window.c:281 src/pref-manager.c:2605
 msgid "Remote IMAP folder..."
 msgstr "Thư mục IMAP ở xa..."
 
@@ -3171,60 +3182,60 @@ msgstr "Balsa: %s"
 msgid "Cannot access the message's body\n"
 msgstr "Không thể truy cập thân thông điệp\n"
 
-#: src/main.c:118
+#: src/main.c:115
 msgid "Get new mail on startup"
 msgstr "Nhận thư mới khi khởi chạy"
 
-#: src/main.c:120
+#: src/main.c:117
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Viết thư mới để gửi cho EMAIL@ADDRESS"
 
-#: src/main.c:122
+#: src/main.c:119
 msgid "Attach file at PATH"
 msgstr "Đính kèm tập tin tại đường dẫn"
 
-#: src/main.c:124
+#: src/main.c:121
 msgid "Opens MAILBOXNAME"
 msgstr "Mở TÊNHỘPTHƯ"
 
-#: src/main.c:124
+#: src/main.c:121
 msgid "MAILBOXNAME"
 msgstr "TÊNHỘPTHƯ"
 
-#: src/main.c:127
+#: src/main.c:124
 msgid "Opens first unread mailbox"
 msgstr "Mở hộp thư chưa đọc đầu tiên"
 
-#: src/main.c:130
+#: src/main.c:127
 msgid "Opens default Inbox on startup"
 msgstr "Mở hộp thư mặc định khi khởi chạy"
 
-#: src/main.c:132
+#: src/main.c:129
 msgid "Debug POP3 connection"
 msgstr "Gỡ rối kết nối POP3"
 
-#: src/main.c:163 src/main.c:168 src/main.c:174 src/main.c:180 src/main.c:186
+#: src/main.c:160 src/main.c:165 src/main.c:171 src/main.c:177 src/main.c:183
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa không thể mở hộp thư \"%s\"."
 
-#: src/main.c:163
+#: src/main.c:160
 msgid "Inbox"
 msgstr "HỘP THƯ ĐẾN"
 
-#: src/main.c:169
+#: src/main.c:166
 msgid "Outbox"
 msgstr "HỘP THƯ ĐI"
 
-#: src/main.c:175
+#: src/main.c:172
 msgid "Sentbox"
 msgstr "THƯ ĐÃ GỬI"
 
-#: src/main.c:181
+#: src/main.c:178
 msgid "Draftbox"
 msgstr "HỘP THƯ NHÁP"
 
-#: src/main.c:186
+#: src/main.c:183
 msgid "Trash"
 msgstr "SỌT RÁC"
 
@@ -3292,7 +3303,7 @@ msgstr "Trong khi lấy lại thông điệp"
 msgid "Until Closed"
 msgstr "Đến khi đóng"
 
-#: src/pref-manager.c:250 src/pref-manager.c:2772 src/pref-manager.c:2808
+#: src/pref-manager.c:250 src/pref-manager.c:2768 src/pref-manager.c:2804
 msgid "Never"
 msgstr "Không bao giờ"
 
@@ -3796,39 +3807,39 @@ msgstr "Mở rộng các alias"
 msgid "_Set as default"
 msgstr "_Lập là Mặc định"
 
-#: src/pref-manager.c:2597
+#: src/pref-manager.c:2593
 msgid "Remote POP3 mailbox..."
 msgstr "Hộp thư POP3 ở xa..."
 
-#: src/pref-manager.c:2750
+#: src/pref-manager.c:2746
 msgid "Show nothing"
 msgstr "Không hiển thị gì cả"
 
-#: src/pref-manager.c:2751
+#: src/pref-manager.c:2747
 msgid "Show dialog"
 msgstr "Hiển thị thoại"
 
-#: src/pref-manager.c:2752
+#: src/pref-manager.c:2748
 msgid "Show in list"
 msgstr "Hiển thị trong danh sách"
 
-#: src/pref-manager.c:2753
+#: src/pref-manager.c:2749
 msgid "Print to console"
 msgstr "In ra Console"
 
-#: src/pref-manager.c:2773
+#: src/pref-manager.c:2769
 msgid "Ask me"
 msgstr "Hãy hỏi tôi"
 
-#: src/pref-manager.c:2774
+#: src/pref-manager.c:2770
 msgid "Always"
 msgstr "Luôn luôn"
 
-#: src/pref-manager.c:2809
+#: src/pref-manager.c:2805
 msgid "If Possible"
 msgstr "Nếu có thể"
 
-#: src/pref-manager.c:2810
+#: src/pref-manager.c:2806
 msgid "Required"
 msgstr "Được yêu cầu"
 
@@ -4675,6 +4686,12 @@ msgstr "Các nút hiện có"
 #: src/toolbar-prefs.c:765
 msgid "Current toolbar"
 msgstr "Thanh công cụ hiện thời"
+
+#~ msgid "Address Book Configuration"
+#~ msgstr "Cấu Hình Sổ Địa Chỉ"
+
+#~ msgid "Update"
+#~ msgstr "Cập Nhật"
 
 #~ msgid "Memory allocation error"
 #~ msgstr "Lỗi cấp phát bộ nhớ"

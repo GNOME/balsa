@@ -1,3 +1,7 @@
+2001-11-12  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/message.h: make compile with MESSAGE_COPY_CONTENT
+
 2001-11-11  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* help/C/Makefile.am: update for new help file.

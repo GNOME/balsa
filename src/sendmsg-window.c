@@ -40,7 +40,7 @@ static GtkWidget *create_menu (BalsaSendmsg *);
 
 static gchar *gt_replys (gchar *);
 
-static GtkWidget *menu_items[6];
+static GtkWidget *menu_items[7];
 GtkTooltips *tooltips;
 
 
@@ -209,6 +209,8 @@ create_menu (BalsaSendmsg * bmsg)
   gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
+  if (balsa_app.debug)
+     g_print("Menu items in sendmsg-window.c: %i\n",i);
 
   menu_items[i] = NULL;
   gtk_window_add_accel_group (GTK_WINDOW (window), accel);

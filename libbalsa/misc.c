@@ -109,6 +109,29 @@ get_int_set_default (const char *path,
 }
 
 gchar *
+address_to_gchar (Address * addr)
+{
+  gchar *retc;
+
+  GString *gs = g_string_new (NULL);
+
+  if (addr->personal)
+    {
+      gs = g_string_append (gs, addr->personal);
+      gs = g_string_append_c (gs, ' ');
+    }
+  if (addr->mailbox)
+    {
+      gs = g_string_append_c (gs, '<');
+      gs = g_string_append (gs, addr->mailbox);
+      gs = g_string_append_c (gs, '>');
+    }
+  retc = g_strdup (gs->str);
+  g_string_free (gs, TRUE);
+  return retc;
+}
+
+gchar *
 make_string_from_list (GList * the_list)
 {
   gchar *retc;
@@ -121,17 +144,7 @@ make_string_from_list (GList * the_list)
   while (list)
     {
       addy = list->data;
-      if (addy->personal)
-	{
-	  gs = g_string_append (gs, addy->personal);
-	  gs = g_string_append_c (gs, ' ');
-	}
-      if (addy->mailbox)
-	{
-	  gs = g_string_append_c (gs, '<');
-	  gs = g_string_append (gs, addy->mailbox);
-	  gs = g_string_append_c (gs, '>');
-	}
+      gs = g_string_append(gs,address_to_gchar(addy));
 
       if (list->next)
 	gs = g_string_append (gs, ", ");

@@ -36,6 +36,7 @@ send_message (Message * message, gchar * smtp_server, glong debug)
   HEADER *msg;
   gchar *text;
   gchar buffer[PATH_MAX];
+  gchar *tmp;
 
   msg = mutt_new_header ();
 
@@ -57,7 +58,9 @@ send_message (Message * message, gchar * smtp_server, glong debug)
 /*
   process_user_header (msg->env);
 */
-  msg->env->from = g_strdup (message->from);
+  tmp = address_to_gchar(message->from);
+  msg->env->from = rfc822_parse_adrlist(msg->env->from, tmp);
+  g_free(tmp);
   msg->env->subject = g_strdup(message->subject);
 
   msg->env->to = rfc822_parse_adrlist (msg->env->to, make_string_from_list(message->to_list));

@@ -368,6 +368,8 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
+  if (balsa_app.debug)
+    g_print ("Menu items in main-window.c %i\n", i);
 
   menu_items[i] = NULL;
   /*
@@ -395,7 +397,7 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     _("Check"),
+			     _ ("Check"),
 			     ("Check Email"),
 			     NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RCV),
@@ -410,8 +412,8 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     _("Delete"),
-			     _("Delete Message"),
+			     _ ("Delete"),
+			     _ ("Delete Message"),
 			     NULL,
 	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_TRASH),
 			     (GtkSignalFunc) delete_message_cb,
@@ -424,8 +426,8 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     _("Compose"),
-			     _("Compose Message"),
+			     _ ("Compose"),
+			     _ ("Compose Message"),
 			     NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_NEW),
 			     (GtkSignalFunc) new_message_cb,
@@ -435,8 +437,8 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     _("Reply"),
-			     _("Reply"),
+			     _ ("Reply"),
+			     _ ("Reply"),
 			     NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RPL),
 			     (GtkSignalFunc) replyto_message_cb,
@@ -446,8 +448,8 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     _("Forward"),
-			     _("Forward"),
+			     _ ("Forward"),
+			     _ ("Forward"),
 			     NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_FWD),
 			     (GtkSignalFunc) forward_message_cb,
@@ -460,8 +462,8 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     _("Previous"),
-			     _("Open Previous Message"),
+			     _ ("Previous"),
+			     _ ("Open Previous Message"),
 			     NULL,
 		gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_BACK),
 			     (GtkSignalFunc) previous_message_cb,
@@ -471,8 +473,8 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     _("Next"),
-			     _("Open Next Message"),
+			     _ ("Next"),
+			     _ ("Open Next Message"),
 			     NULL,
 	     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_FORWARD),
 			     (GtkSignalFunc) next_message_cb,
@@ -509,7 +511,7 @@ show_about_box ()
 			   BALSA_VERSION,
 			   "Copyright (C) 1997-98",
 			   authors,
-			   _("Balsa is a E-Mail Client"),
+			   _ ("Balsa is a E-Mail Client"),
 			   NULL);
 
   gtk_signal_connect (GTK_OBJECT (about),
@@ -628,7 +630,7 @@ static gboolean
 mblist_add_mailbox_traverse_nodes (GNode * node, gpointer data)
 {
   if (node->data)
-    mblist_add_mailbox (((MailboxNode*)node->data)->mailbox);
+    mblist_add_mailbox (((MailboxNode *) node->data)->mailbox);
 
   return FALSE;
 }
@@ -657,8 +659,8 @@ static void
 mailbox_close_child (GtkWidget * widget)
 {
   if (balsa_app.current_index_child)
-  gnome_mdi_remove_child(mdi, GNOME_MDI_CHILD(balsa_app.current_index_child),
-			 TRUE);
+    gnome_mdi_remove_child (mdi, GNOME_MDI_CHILD (balsa_app.current_index_child),
+			    TRUE);
 }
 
 static void

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-04 09:21-0400\n"
+"POT-Creation-Date: 1998-08-04 14:02-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -102,7 +102,7 @@ msgstr ""
 msgid "Undelete"
 msgstr ""
 
-#: src/index-child.c:286 src/main-window.c:247 src/main-window.c:413
+#: src/index-child.c:286 src/main-window.c:247 src/main-window.c:415
 msgid "Delete"
 msgstr ""
 
@@ -166,11 +166,11 @@ msgstr ""
 msgid "New"
 msgstr ""
 
-#: src/main-window.c:218 src/main-window.c:438 src/main-window.c:439
+#: src/main-window.c:218 src/main-window.c:440 src/main-window.c:441
 msgid "Reply"
 msgstr ""
 
-#: src/main-window.c:231 src/main-window.c:449 src/main-window.c:450
+#: src/main-window.c:231 src/main-window.c:451 src/main-window.c:452
 msgid "Forward"
 msgstr ""
 
@@ -216,39 +216,39 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: src/main-window.c:398
+#: src/main-window.c:400
 msgid "Check"
 msgstr ""
 
-#: src/main-window.c:414
+#: src/main-window.c:416
 msgid "Delete Message"
 msgstr ""
 
-#: src/main-window.c:427
+#: src/main-window.c:429
 msgid "Compose"
 msgstr ""
 
-#: src/main-window.c:428
+#: src/main-window.c:430
 msgid "Compose Message"
 msgstr ""
 
-#: src/main-window.c:463
+#: src/main-window.c:465
 msgid "Previous"
 msgstr ""
 
-#: src/main-window.c:464
+#: src/main-window.c:466
 msgid "Open Previous Message"
 msgstr ""
 
-#: src/main-window.c:474
+#: src/main-window.c:476
 msgid "Next"
 msgstr ""
 
-#: src/main-window.c:475
+#: src/main-window.c:477
 msgid "Open Next Message"
 msgstr ""
 
-#: src/main-window.c:512
+#: src/main-window.c:514
 msgid "Balsa is a E-Mail Client"
 msgstr ""
 
@@ -351,15 +351,15 @@ msgstr ""
 msgid "Contents"
 msgstr ""
 
-#: src/sendmsg-window.c:242
+#: src/sendmsg-window.c:244
 msgid "New message"
 msgstr ""
 
-#: src/sendmsg-window.c:254
+#: src/sendmsg-window.c:256
 msgid "Reply to "
 msgstr ""
 
-#: src/sendmsg-window.c:266
+#: src/sendmsg-window.c:268
 msgid "Forward message"
 msgstr ""
 

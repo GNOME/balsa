@@ -17,8 +17,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 1.1.x\n"
-"POT-Creation-Date: 2001-03-14 00:45+0100\n"
-"PO-Revision-Date: 2001-03-14 00:44+0100\n"
+"POT-Creation-Date: 2001-03-15 16:37+0100\n"
+"PO-Revision-Date: 2001-03-15 16:37+100\n"
 "Last-Translator: Christian Meyer <chrisime@gnome.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -120,17 +120,23 @@ msgstr "LibBalsaMailboxLocal: %s wird geöffnet; Ref.-Zähler: %d\n"
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
 msgstr "Das Postfach \"%s\" scheint kein Maildir-Postfach zu sein."
 
-#: libbalsa/mailbox_maildir.c:120
-msgid "Sorry. Balsa doesn't (yet) know how to create a maildir mailbox"
-msgstr ""
-"Tut mir leid. Balsa weiß (noch) nicht, wie ein Maildir-Postfach angelegt wird"
+#: libbalsa/mailbox_maildir.c:122
+#, c-format
+msgid "Could not create a MailDir directory at %s (%s)"
+msgstr "MailDir-Verzeichnis konnte in %s (%s) nicht angelegt werden"
 
-#: libbalsa/mailbox_maildir.c:172 libbalsa/mailbox_mh.c:171
+#: libbalsa/mailbox_maildir.c:129 libbalsa/mailbox_maildir.c:137
+#: libbalsa/mailbox_maildir.c:147
+#, c-format
+msgid "Could not create a MailDir at %s (%s)"
+msgstr "MailDir konnte in %s (%s) nicht angelegt werden"
+
+#: libbalsa/mailbox_maildir.c:206 libbalsa/mailbox_mh.c:184
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Öffnen von %s fehlgeschlagen. Fehlernummer = %d, "
 
-#: libbalsa/mailbox_maildir.c:190 libbalsa/mailbox_mh.c:188
+#: libbalsa/mailbox_maildir.c:224 libbalsa/mailbox_mh.c:201
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
@@ -139,8 +145,8 @@ msgstr ""
 "Der Inhalt von %s konnte nicht entfernt werden:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:196 libbalsa/mailbox_mbox.c:180
-#: libbalsa/mailbox_mh.c:194
+#: libbalsa/mailbox_maildir.c:230 libbalsa/mailbox_mbox.c:180
+#: libbalsa/mailbox_mh.c:207
 #, c-format
 msgid ""
 "Could not remove %s:\n"
@@ -159,10 +165,15 @@ msgstr "Postfach %s scheint kein Mbox-Postfach zu sein."
 msgid "Mailbox %s does not appear to be a Mh mailbox."
 msgstr "Postfach %s scheint kein Mh-Postfach zu sein."
 
-#: libbalsa/mailbox_mh.c:119
-msgid "Sorry. Balsa doesn't (yet) know how to create a mh mailbox"
-msgstr ""
-"Tut mir leid. Balsa weiß (noch) nicht, wie ein Mh-Postfach angelegt wird."
+#: libbalsa/mailbox_mh.c:122
+#, c-format
+msgid "Could not create MH directory at %s (%s)"
+msgstr "MH-Verzeichnis konnte in %s (%s) nicht angelegt werden"
+
+#: libbalsa/mailbox_mh.c:129
+#, c-format
+msgid "Could not create MH structure at %s (%s)"
+msgstr "MH-Struktur konnte in %s (%s) nicht angelegt werden"
 
 #: libbalsa/mailbox_pop3.c:200
 #, c-format
@@ -1132,7 +1143,7 @@ msgstr "Weiterleiten..."
 msgid "Undelete"
 msgstr "Wiederherstellen"
 
-#: src/balsa-index.c:1828 src/filter-edit-dialog.c:224 src/mailbox-node.c:516
+#: src/balsa-index.c:1828 src/filter-edit-dialog.c:224 src/mailbox-node.c:550
 #: src/main-window.c:551 src/pref-manager.c:1235 src/pref-manager.c:2023
 msgid "Delete"
 msgstr "Löschen"
@@ -1182,7 +1193,7 @@ msgstr "MIME-Abschnitt speichern"
 msgid "Save"
 msgstr "Speichern"
 
-#: src/balsa-message.c:291 src/folder-conf.c:200 src/mailbox-conf.c:169
+#: src/balsa-message.c:291 src/folder-conf.c:191 src/mailbox-conf.c:169
 #: src/mailbox-conf.c:179 src/sendmsg-window.c:160 src/sendmsg-window.c:630
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -1359,7 +1370,7 @@ msgstr "Aufwärts"
 msgid "Down"
 msgstr "Abwärts"
 
-#: src/filter-edit-dialog.c:218 src/mailbox-node.c:497 src/main-window.c:379
+#: src/filter-edit-dialog.c:218 src/mailbox-node.c:531 src/main-window.c:379
 msgid "New"
 msgstr "Neu"
 
@@ -1510,7 +1521,7 @@ msgstr "Nur _abonnierte Ordner"
 msgid "_Prefix"
 msgstr "_Präfix"
 
-#: src/folder-conf.c:186
+#: src/folder-conf.c:177
 msgid ""
 "This folder is not stored in configuration.I do not yet know how to remove "
 "it from remote server."
@@ -1518,7 +1529,7 @@ msgstr ""
 "Der Ordner ist nicht in der Konfiguration gespeichert. Es ist noch nicht "
 "möglich, ihn von dem entfernten Server zu  löschen."
 
-#: src/folder-conf.c:194
+#: src/folder-conf.c:185
 #, c-format
 msgid ""
 "This will remove the folder %s from the list.\n"
@@ -1530,7 +1541,7 @@ msgstr ""
 "hinzuzufügen.\n"
 "Was würden Sie gerne tun?"
 
-#: src/folder-conf.c:199 src/mailbox-conf.c:167 src/mailbox-conf.c:178
+#: src/folder-conf.c:190 src/mailbox-conf.c:167 src/mailbox-conf.c:178
 msgid "Remove from list"
 msgstr "Aus Liste entfernen"
 
@@ -1663,63 +1674,67 @@ msgstr "_Ordnerpfad:"
 msgid "The folder edition to be written."
 msgstr "Die zu schreibende Ordnerausgabe."
 
-#: src/mailbox-node.c:484 src/main-window.c:231
+#: src/mailbox-node.c:518 src/main-window.c:231
 msgid "Local mbox mailbox..."
 msgstr "Lokales Mbox-Postfach..."
 
-#: src/mailbox-node.c:486 src/main-window.c:236
+#: src/mailbox-node.c:520 src/main-window.c:236
 msgid "Local Maildir mailbox..."
 msgstr "Lokales Maildir-Postfach..."
 
-#: src/mailbox-node.c:488 src/main-window.c:241
+#: src/mailbox-node.c:522 src/main-window.c:241
 msgid "Local MH mailbox..."
 msgstr "Lokales MH-Postfach..."
 
-#: src/mailbox-node.c:490 src/main-window.c:246
+#: src/mailbox-node.c:524 src/main-window.c:246
 msgid "Remote IMAP mailbox..."
 msgstr "IMAP-Postfach im Netz..."
 
-#: src/mailbox-node.c:493 src/main-window.c:252
+#: src/mailbox-node.c:527 src/main-window.c:252
 msgid "Remote IMAP folder..."
 msgstr "IMAP-Ordner im Netz..."
 
-#: src/mailbox-node.c:511
+#: src/mailbox-node.c:545
 msgid "Open"
 msgstr "Öffnen"
 
-#: src/mailbox-node.c:513
+#: src/mailbox-node.c:547
 msgid "Close"
 msgstr "Schließen"
 
-#: src/mailbox-node.c:515
+#: src/mailbox-node.c:549
 msgid "Properties..."
 msgstr "Eigenschaften..."
 
-#: src/mailbox-node.c:521
+#: src/mailbox-node.c:556
 msgid "Subscribe"
 msgstr "Abonnieren"
 
-#: src/mailbox-node.c:522
+#: src/mailbox-node.c:557
 msgid "Unsubscribe"
 msgstr "Abbestellen"
 
-#: src/mailbox-node.c:526
+#: src/mailbox-node.c:562
 msgid "Mark as Inbox"
 msgstr "Als Eingang markieren"
 
-#: src/mailbox-node.c:528
+#: src/mailbox-node.c:564
 msgid "Mark as Sentbox"
 msgstr "Als Gesendet markieren"
 
-#: src/mailbox-node.c:530
+#: src/mailbox-node.c:566
 msgid "Mark as Trash"
 msgstr "Als Müll markieren"
 
-#: src/mailbox-node.c:532
+#: src/mailbox-node.c:568
 msgid "Mark as Draftbox"
 msgstr "Als Entwürfe markieren"
 
-#: src/mailbox-node.c:637
+#: src/mailbox-node.c:570
+msgid "Rescan"
+msgstr "Neu einlesen"
+
+#: src/mailbox-node.c:676
 #, c-format
 msgid "Local mailbox loaded as: %s\n"
 msgstr "Lokales Postfach geladen als: %s\n"

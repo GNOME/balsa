@@ -469,7 +469,7 @@ destroy_mbnode(GNode * node, gpointer data)
 	    unlink(tmpfile);
 	g_free(tmpfile);
     }
-    gtk_object_destroy(GTK_OBJECT(mbnode));
+    g_object_unref(G_OBJECT(mbnode));
     return FALSE;
 }
 

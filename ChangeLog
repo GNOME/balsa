@@ -1,3 +1,22 @@
+2002-09-20  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/mailbox-node.[ch], src/balsa-app.c,src/main.c: 
+	BalsaMailboxNode subclasses GObject.
+	* src/balsa-index.[ch]: give up on scrolling with use_align = 
+	FALSE; ref/unref the mailbox_node.
+
+	* src/mailbox-node.c: initial sort by date.
+	* src/main-window.c: use balsa_window_idle_replace to clear the 
+	preview; remove some dynamic casts.
+
+	* src/balsa-icons.c: replace deprecated items.
+	* src/balsa-mblist.c: avoid passing NULL strings to 
+	g_ascii_strcasecmp.
+	* src/folder-conf.c, src/mailbox-conf.c: replace deprecated 
+	items; use GtkMessageDialog; handle dialog responses.
+	* src/information-dialog.c: port the list from GtkCList to 
+	GtkTreeView; replace other deprecated items.
+
 2002-09-18  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/pop3.c: msg count instead of byte count (HEAD:20020623)

@@ -593,6 +593,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
      * set the new mailbox
      */
     index->mailbox_node = mbnode;
+    g_object_ref(G_OBJECT(mbnode));
     /*
      * rename "from" column to "to" for outgoing mail
      */
@@ -882,10 +883,7 @@ bndx_scroll_to_row(BalsaIndex * index, GtkTreePath * path)
      * widget is exposed, because it's not yet implemented in parts of
      * GtkTreeView. */
     gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
-                                 index->scroll_use_align,
-                                 0.5, 0);
-    /* It should be OK to use FALSE after the first scroll: */
-    index->scroll_use_align = FALSE;
+                                 TRUE, 0.5, 0);
 }
 
 static void
@@ -1016,7 +1014,6 @@ bndx_expand_to_row_and_select(BalsaIndex * index, GtkTreeIter * iter)
         return;
     path = gtk_tree_model_get_path(model, iter);
     bndx_expand_to_row(index, path);
-    index->scroll_use_align = TRUE;
     bndx_select_row(index, path);
     gtk_tree_path_free(path);
 }
@@ -1378,16 +1375,8 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
                           index->current_message)) {
         if (!gtk_tree_selection_path_is_selected(selection, current_path)
             && bndx_row_is_viewable(tree_view, current_path)) {
-            g_signal_handlers_block_by_func(selection,
-                                            G_CALLBACK
-                                            (bndx_selection_changed),
-                                            index);
             gtk_tree_view_set_cursor(GTK_TREE_VIEW(index), current_path,
                                      NULL, FALSE);
-            g_signal_handlers_unblock_by_func(selection,
-                                              G_CALLBACK
-                                              (bndx_selection_changed),
-                                              index);
         } else {
             gtk_tree_path_free(current_path);
             current_path = NULL;
@@ -1400,7 +1389,6 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
         current_path = gtk_tree_path_copy(path);
         gtk_tree_path_down(current_path);
     }
-    index->scroll_use_align = TRUE;
     bndx_scroll_to_row(index, current_path);
     gtk_tree_path_free(current_path);
 
@@ -1658,6 +1646,7 @@ balsa_index_close_and_destroy(GtkObject * obj)
                                              0, 0, NULL, NULL,
                                              index);
 	libbalsa_mailbox_close(mailbox);
+        g_object_unref(G_OBJECT(index->mailbox_node));
 	index->mailbox_node = NULL;
     }
 
@@ -2178,7 +2167,6 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
 	    approach would be to change preview, e.g. to top of thread. */
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
-    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreePath *path;
     GtkTreeIter iter;
 
@@ -2187,15 +2175,11 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
                                                bndx_tree_expand_cb :
                                                bndx_tree_collapse_cb),
                                     NULL);
-    g_signal_handlers_block_by_func(selection,
-                                    G_CALLBACK(bndx_selection_changed),
-                                    index);
 
     if (expand)
         gtk_tree_view_expand_all(tree_view);
     else
         gtk_tree_view_collapse_all(tree_view);
-    index->scroll_use_align = TRUE;
 
     path = gtk_tree_path_new();
     bndx_set_style_recursive(index, path);     /* chbm */
@@ -2209,9 +2193,6 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
         gtk_tree_path_free(path);
     }
 
-    g_signal_handlers_unblock_by_func(selection,
-                                      G_CALLBACK(bndx_selection_changed),
-                                      index);
     g_signal_handlers_unblock_by_func(G_OBJECT(index),
                                       G_CALLBACK(expand ?
                                                  bndx_tree_expand_cb :

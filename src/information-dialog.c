@@ -32,8 +32,6 @@
 #include "balsa-app.h"
 #include "information-dialog.h"
 
-static GtkWidget *information_list = NULL;
-
 static void balsa_information_list(LibBalsaInformationType type,
 				   char *msg);
 static void balsa_information_dialog(LibBalsaInformationType type,
@@ -46,12 +44,15 @@ static void
 balsa_information_list_response_cb(GtkDialog * dialog, gint response,
                                    gpointer data)
 {
+    GtkWidget *list = data;
+    GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(list));
+
     switch (response) {
     case GTK_RESPONSE_APPLY:
-	gtk_clist_clear(GTK_CLIST(information_list));
+	gtk_list_store_clear(GTK_LIST_STORE(model));
 	break;
-    case GTK_RESPONSE_CLOSE:
-	gtk_object_destroy(GTK_OBJECT(dialog)); /* FIXME: should not do it */
+    default:
+	gtk_widget_destroy(GTK_WIDGET(dialog));
 	break;
     }
 }
@@ -128,6 +129,31 @@ balsa_information_dialog(LibBalsaInformationType type, char *msg)
     gtk_widget_destroy(messagebox);
 }
 
+/* 
+ * make the list widget
+ */
+static GtkWidget *
+balsa_information_list_new(void)
+{
+    GtkListStore *list_store;
+    GtkTreeView *view;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+
+    list_store = gtk_list_store_new(1, G_TYPE_STRING);
+    view = GTK_TREE_VIEW(gtk_tree_view_new_with_model
+                         (GTK_TREE_MODEL(list_store)));
+    g_object_unref(list_store);
+
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
+                                                      "text", 0, NULL);
+    gtk_tree_view_append_column(view, column);
+    gtk_tree_view_set_headers_visible(view, FALSE);
+
+    return GTK_WIDGET(view);
+}
+
 /*
  * Pops up a dialog containing a list of warnings.
  *
@@ -137,10 +163,13 @@ balsa_information_dialog(LibBalsaInformationType type, char *msg)
 static void
 balsa_information_list(LibBalsaInformationType type, char *msg)
 {
-    gchar *outstr[1];
-    gint new_row;
+    static GtkWidget *information_list = NULL;
+    gchar *outstr;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    GtkTreePath *path;
 
-    outstr[0] = msg;
+    outstr = msg;
     /* this may break UNICODE strings */
     for(;*msg; msg++)
 	if(*msg == '\n') *msg= ' ';
@@ -153,7 +182,7 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
 	    gtk_dialog_new_with_buttons(_("Balsa Information"), 
                                         GTK_WINDOW(balsa_app.main_window),
                                         GTK_DIALOG_DESTROY_WITH_PARENT,
-                                        _("Clear"), GTK_RESPONSE_APPLY,
+                                        GTK_STOCK_CLEAR, GTK_RESPONSE_APPLY,
                                         GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                         NULL);
 	/* Default is to close */
@@ -161,16 +190,14 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
                                         GTK_RESPONSE_CLOSE);
 
 	/* Reset the policy gtk_dialog_new makes itself non-resizable */
-	gtk_window_set_policy(GTK_WINDOW(information_dialog), TRUE, TRUE,
-                              FALSE);
+	gtk_window_set_resizable(GTK_WINDOW(information_dialog), TRUE);
 	gtk_window_set_default_size(GTK_WINDOW(information_dialog), 350,
 				    200);
 	gtk_window_set_wmclass(GTK_WINDOW(information_dialog),
 			       "Information", "Balsa");
 
-	gtk_signal_connect(GTK_OBJECT(information_dialog), "response",
-			   GTK_SIGNAL_FUNC
-			   (balsa_information_list_response_cb), NULL);
+        g_object_add_weak_pointer(G_OBJECT(information_dialog),
+                                  (gpointer) &information_list);
 
 	/* A scrolled window for the list. */
 	scrolled_window = gtk_scrolled_window_new(NULL, NULL);
@@ -183,26 +210,29 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
 	gtk_widget_show(scrolled_window);
 
 	/* The list itself */
-	information_list = gtk_clist_new(1);
-	gtk_signal_connect(GTK_OBJECT(information_list), "destroy",
-			   GTK_SIGNAL_FUNC(gtk_widget_destroyed),
-                           &information_list);
-	gtk_clist_set_reorderable(GTK_CLIST(information_list), FALSE);
+	information_list = balsa_information_list_new();
 	gtk_container_add(GTK_CONTAINER(scrolled_window),
 			  information_list);
-	gtk_clist_set_column_auto_resize(GTK_CLIST(information_list), 0,
-					 TRUE);
+        g_signal_connect(G_OBJECT(information_dialog), "response",
+                         G_CALLBACK(balsa_information_list_response_cb),
+                         information_list);
+
 	gtk_widget_show(information_list);
 
 	gtk_widget_show(information_dialog);
     }
 
-    new_row = gtk_clist_append(GTK_CLIST(information_list), outstr);
-    gtk_clist_moveto(GTK_CLIST(information_list), new_row, 0, 0.0, 0.0);
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(information_list));
+    gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+    gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, outstr, -1);
+    path = gtk_tree_model_get_path(model, &iter);
+    gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(information_list),
+                                 path, NULL, TRUE, 1, 0);
+    gtk_tree_path_free(path);
 
     /* FIXME: Colour hilight the list */
 
-    gnome_appbar_set_status(balsa_app.appbar, outstr[0]);
+    gnome_appbar_set_status(balsa_app.appbar, outstr);
 
 }
 

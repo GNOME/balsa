@@ -1407,7 +1407,7 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
 
         if (page == NULL) {
             gtk_window_set_title(GTK_WINDOW(window), "Balsa");
-            balsa_message_clear(BALSA_MESSAGE(window->preview));
+            balsa_window_idle_replace(window, NULL);
             gnome_appbar_set_default(balsa_app.appbar, "Mailbox closed");
 
             /* Disable menus */
@@ -1497,7 +1497,6 @@ balsa_window_refresh(BalsaWindow * window)
 #endif                          /* BALSA_MAJOR < 2 */
     GtkWidget *toolbar;
     GtkWidget *index;
-    BalsaMessage *bmsg;
     GtkWidget *paned;
 
     g_return_if_fail(window);
@@ -1516,14 +1515,11 @@ balsa_window_refresh(BalsaWindow * window)
 	paned = GTK_WIDGET(balsa_app.notebook)->parent;
     g_assert(paned != NULL);
     if (balsa_app.previewpane) {
-        LibBalsaMessage *message = BALSA_WINDOW(window)->current_message;
-        BALSA_WINDOW(window)->current_message = NULL;
-        balsa_window_idle_replace(BALSA_WINDOW(window), message);
+        LibBalsaMessage *message = window->current_message;
+        window->current_message = NULL;
+        balsa_window_idle_replace(window, message);
 	gtk_paned_set_position(GTK_PANED(paned), balsa_app.notebook_height);
     } else {
-	bmsg = BALSA_MESSAGE(BALSA_WINDOW(window)->preview);
-	if (bmsg)
-	    balsa_message_clear(bmsg);
 	/* Set the height to something really big (those new hi-res
 	   screens and all :) */
 	gtk_paned_set_position(GTK_PANED(paned), G_MAXINT);
@@ -3016,16 +3012,16 @@ notebook_switch_page_cb(GtkWidget * notebook,
                         GtkNotebookPage * notebookpage, guint page_num)
 {
     GtkWidget *page;
-    GtkWidget *index;
+    BalsaIndex *index;
     BalsaWindow *window;
     LibBalsaMailbox *mailbox;
     gchar *title;
 
     page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), page_num);
-    index = gtk_bin_get_child(GTK_BIN(page));
+    index = BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
 
-    mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
-    window = BALSA_WINDOW(BALSA_INDEX(index)->window);
+    mailbox = index->mailbox_node->mailbox;
+    window = BALSA_WINDOW(index->window);
     window->current_index = GTK_WIDGET(index);
 
     if (mailbox->name) {
@@ -3041,15 +3037,15 @@ notebook_switch_page_cb(GtkWidget * notebook,
         gtk_window_set_title(GTK_WINDOW(window), "Balsa");
     }
 
-    balsa_window_idle_replace(window, BALSA_INDEX(index)->current_message);
-    enable_message_menus(BALSA_INDEX(index)->current_message);
-    enable_mailbox_menus(BALSA_INDEX(index));
+    balsa_window_idle_replace(window, index->current_message);
+    enable_message_menus(index->current_message);
+    enable_mailbox_menus(index);
 
     balsa_mblist_focus_mailbox(balsa_app.mblist, mailbox);
     balsa_mblist_set_status_bar(mailbox);
 
-    balsa_index_refresh_date(BALSA_INDEX(index));
-    balsa_index_refresh_size(BALSA_INDEX(index));
+    balsa_index_refresh_date(index);
+    balsa_index_refresh_size(index);
 }
 
 static void

@@ -557,7 +557,8 @@ bmbl_row_compare(GtkTreeModel * model, GtkTreeIter * iter1,
                     return -1;
                 else {
                     gchar *name = g_path_get_basename(mbnode2->name);
-                    gint tmp = g_ascii_strcasecmp(m1->name, name);
+                    gint tmp =
+                        m1->name ? g_ascii_strcasecmp(name, m1->name) : -1;
 
                     g_free(name);
                     return tmp;
@@ -567,7 +568,8 @@ bmbl_row_compare(GtkTreeModel * model, GtkTreeIter * iter1,
                     return 1;
                 else {
                     gchar *name = g_path_get_basename(mbnode1->name);
-                    gint tmp = g_ascii_strcasecmp(name, m2->name);
+                    gint tmp =
+                        m2->name ? g_ascii_strcasecmp(name, m2->name) : 1;
 
                     g_free(name);
                     return tmp;

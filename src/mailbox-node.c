@@ -28,6 +28,7 @@
 #endif
 
 #include <unistd.h>
+#include <string.h>
 #include "balsa-app.h"
 #include "folder-scanners.h"
 #include "folder-conf.h"
@@ -43,12 +44,12 @@
    Folders can additionally scan associated directory or IMAP server to
    retrieve their tree of mailboxes.
 */
-static GtkObjectClass *parent_class = NULL;
+static GObjectClass *parent_class = NULL;
 
 static void balsa_mailbox_node_class_init(BalsaMailboxNodeClass *
 					     klass);
 static void balsa_mailbox_node_init(BalsaMailboxNode * mn);
-static void balsa_mailbox_node_destroy(GtkObject * object);
+static void balsa_mailbox_node_finalize(GObject * object);
 
 static void balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn,
 						const gchar * prefix);
@@ -75,24 +76,27 @@ enum {
 
 static guint balsa_mailbox_node_signals[LAST_SIGNAL];
 
-GtkType balsa_mailbox_node_get_type(void)
+GType
+balsa_mailbox_node_get_type(void)
 {
-    static GtkType mailbox_node_type = 0;
+    static GType mailbox_node_type = 0;
 
     if (!mailbox_node_type) {
-	static const GtkTypeInfo mailbox_node_info = {
-	    "BalsaMailboxNode",
-	    sizeof(BalsaMailboxNode),
+	static const GTypeInfo mailbox_node_info = {
 	    sizeof(BalsaMailboxNodeClass),
-	    (GtkClassInitFunc)  balsa_mailbox_node_class_init,
-	    (GtkObjectInitFunc) balsa_mailbox_node_init,
-	    /* reserved_1 */ NULL,
-	    /* reserved_2 */ NULL,
-	    (GtkClassInitFunc) NULL,
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc)  balsa_mailbox_node_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(BalsaMailboxNode),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) balsa_mailbox_node_init
 	};
 
 	mailbox_node_type =
-	    gtk_type_unique(gtk_object_get_type(), &mailbox_node_info);
+	    g_type_register_static(G_TYPE_OBJECT, "BalsaMailboxNode",
+                                   &mailbox_node_info, 0);
     }
     
     return mailbox_node_type;
@@ -101,40 +105,55 @@ GtkType balsa_mailbox_node_get_type(void)
 static void
 balsa_mailbox_node_class_init(BalsaMailboxNodeClass * klass)
 {
-    GtkObjectClass *object_class;
+    GObjectClass *object_class;
 
-    parent_class = gtk_type_class(GTK_TYPE_OBJECT);
+    parent_class = g_type_class_peek_parent(klass);
 
-    object_class = GTK_OBJECT_CLASS(klass);
+    object_class = G_OBJECT_CLASS(klass);
 
     balsa_mailbox_node_signals[SAVE_CONFIG] =
-	gtk_signal_new("save-config", GTK_RUN_FIRST, BALSA_TYPE_MAILBOX_NODE,
-		       GTK_SIGNAL_OFFSET(BalsaMailboxNodeClass, save_config),
-		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
-		       GTK_TYPE_POINTER);
+	g_signal_new("save-config",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_FIRST,
+                     G_STRUCT_OFFSET(BalsaMailboxNodeClass, save_config),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__POINTER,
+		     G_TYPE_NONE, 1,
+	             G_TYPE_POINTER);
     balsa_mailbox_node_signals[LOAD_CONFIG] =
-	gtk_signal_new("load-config", GTK_RUN_FIRST, BALSA_TYPE_MAILBOX_NODE,
-		       GTK_SIGNAL_OFFSET(BalsaMailboxNodeClass, load_config),
-		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
-		       GTK_TYPE_POINTER);
+	g_signal_new("load-config",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_FIRST,
+                     G_STRUCT_OFFSET(BalsaMailboxNodeClass, load_config),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__POINTER,
+		     G_TYPE_NONE, 1,
+	             G_TYPE_POINTER);
     balsa_mailbox_node_signals[SHOW_PROP_DIALOG] =
-	gtk_signal_new("show-prop-dialog", GTK_RUN_LAST, BALSA_TYPE_MAILBOX_NODE,
-		       GTK_SIGNAL_OFFSET(BalsaMailboxNodeClass, 
-					 show_prop_dialog),
-		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
+	g_signal_new("show-prop-dialog",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_LAST,
+                     G_STRUCT_OFFSET(BalsaMailboxNodeClass,
+                                     show_prop_dialog),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__VOID,
+		     G_TYPE_NONE, 0);
     balsa_mailbox_node_signals[APPEND_SUBTREE] =
-	gtk_signal_new("append-subtree", GTK_RUN_FIRST, BALSA_TYPE_MAILBOX_NODE,
-		       GTK_SIGNAL_OFFSET(BalsaMailboxNodeClass, 
-					 append_subtree),
-		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
-		       GTK_TYPE_POINTER);
+	g_signal_new("append-subtree",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_FIRST,
+                     G_STRUCT_OFFSET(BalsaMailboxNodeClass, append_subtree),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__POINTER,
+		     G_TYPE_NONE, 1,
+	             G_TYPE_POINTER);
 
     klass->save_config = balsa_mailbox_node_real_save_config;
     klass->load_config = balsa_mailbox_node_real_load_config;
     klass->show_prop_dialog = NULL;
     klass->append_subtree   = NULL;
 
-    object_class->destroy = balsa_mailbox_node_destroy;
+    object_class->finalize = balsa_mailbox_node_finalize;
 }
 
 static void
@@ -148,13 +167,13 @@ balsa_mailbox_node_init(BalsaMailboxNode * mn)
     mn->config_prefix = NULL;
     mn->threading_type = BALSA_INDEX_THREADING_SIMPLE;
     mn->sort_type = GTK_SORT_DESCENDING;
-    mn->sort_field = BALSA_SORT_NO;
+    mn->sort_field = BALSA_SORT_DATE;
     mn->subscribed = FALSE;
     mn->scanned = FALSE;
 }
 
 static void
-balsa_mailbox_node_destroy(GtkObject * object)
+balsa_mailbox_node_finalize(GObject * object)
 {
     BalsaMailboxNode *mn;
 
@@ -168,8 +187,7 @@ balsa_mailbox_node_destroy(GtkObject * object)
     g_free(mn->dir);           mn->dir = NULL;
     g_free(mn->config_prefix); mn->config_prefix = NULL;
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
+    G_OBJECT_CLASS(parent_class)->finalize(G_OBJECT(object));
 }
 
 static void
@@ -200,10 +218,11 @@ balsa_mailbox_node_real_load_config(BalsaMailboxNode* mn, const gchar * prefix)
 }
 
 
-BalsaMailboxNode*
+BalsaMailboxNode *
 balsa_mailbox_node_new(void)
 {
-    BalsaMailboxNode *mn = gtk_type_new(balsa_mailbox_node_get_type());
+    BalsaMailboxNode *mn =
+        g_object_new(balsa_mailbox_node_get_type(), NULL);
     return mn;
 }
 
@@ -249,8 +268,8 @@ imap_scan_attach_mailbox(GNode* node, const gchar* fn)
     if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
         /* it already has a mailbox */
         return;
-    gtk_signal_connect(GTK_OBJECT(mbnode), "show-prop-dialog",
-                       GTK_SIGNAL_FUNC(folder_conf_imap_sub_node), NULL);
+    g_signal_connect(G_OBJECT(mbnode), "show-prop-dialog",
+                     G_CALLBACK(folder_conf_imap_sub_node), NULL);
     m = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
     libbalsa_mailbox_remote_set_server(
         LIBBALSA_MAILBOX_REMOTE(m),
@@ -370,8 +389,8 @@ balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox * mb)
     BalsaMailboxNode *mbn;
     mbn = BALSA_MAILBOX_NODE(balsa_mailbox_node_new());
     mbn->mailbox = mb;
-    gtk_signal_connect(GTK_OBJECT(mbn), "show-prop-dialog", 
-		       GTK_SIGNAL_FUNC(mailbox_conf_edit), NULL);
+    g_signal_connect(G_OBJECT(mbn), "show-prop-dialog", 
+		     G_CALLBACK(mailbox_conf_edit), NULL);
     return mbn;
 }
 
@@ -387,10 +406,10 @@ balsa_mailbox_node_new_from_dir(const gchar* dir)
     g_free(tmppath);
     mbn->name = g_strdup(dir);
     mbn->dir  = g_strdup(dir);
-    gtk_signal_connect(GTK_OBJECT(mbn), "show-prop-dialog", 
-		       GTK_SIGNAL_FUNC(dir_conf_edit), NULL);
-    gtk_signal_connect(GTK_OBJECT(mbn), "append-subtree", 
-		       GTK_SIGNAL_FUNC(read_dir_cb), NULL);
+    g_signal_connect(G_OBJECT(mbn), "show-prop-dialog", 
+		     G_CALLBACK(dir_conf_edit), NULL);
+    g_signal_connect(G_OBJECT(mbn), "append-subtree", 
+		     G_CALLBACK(read_dir_cb), NULL);
     return mbn;
 }
 
@@ -417,10 +436,10 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
 #else
     printf("Server loaded, host: %s\n", folder->server->host);
 #endif
-    gtk_signal_connect(GTK_OBJECT(folder), "show-prop-dialog", 
-		       GTK_SIGNAL_FUNC(folder_conf_imap_node), NULL);
-    gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 
-		       GTK_SIGNAL_FUNC(imap_dir_cb), NULL);
+    g_signal_connect(G_OBJECT(folder), "show-prop-dialog", 
+		     G_CALLBACK(folder_conf_imap_node), NULL);
+    g_signal_connect(G_OBJECT(folder), "append-subtree", 
+		     G_CALLBACK(imap_dir_cb), NULL);
     g_signal_connect(G_OBJECT(folder->server), "get-password",
                      G_CALLBACK(ask_password), NULL);
     balsa_mailbox_node_load_config(folder, prefix);
@@ -435,7 +454,7 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
     folder->sort_type = gnome_config_get_int_with_default("SortType", &def);
     if(def) folder->sort_type = GTK_SORT_ASCENDING;
     folder->sort_field = gnome_config_get_int_with_default("SortField", &def);
-    if(def) folder->sort_field = BALSA_SORT_NO;
+    if(def) folder->sort_field = BALSA_SORT_DATE;
     gnome_config_pop_prefix();
 
     return folder;
@@ -449,8 +468,8 @@ balsa_mailbox_node_new_imap_node(LibBalsaServer* s, const char*p)
 
     folder->server = s;
     folder->dir = g_strdup(p);
-    gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 
-		       GTK_SIGNAL_FUNC(imap_dir_cb), NULL);
+    g_signal_connect(G_OBJECT(folder), "append-subtree", 
+		     G_CALLBACK(imap_dir_cb), NULL);
 
     return folder;
 }
@@ -476,23 +495,23 @@ balsa_mailbox_node_new_imap_folder(LibBalsaServer* s, const char*p)
     BalsaMailboxNode * folder = balsa_mailbox_node_new_imap_node(s, p);
     g_assert(s);
 
-    gtk_signal_connect(GTK_OBJECT(folder), "show-prop-dialog", 
-		        GTK_SIGNAL_FUNC(folder_conf_imap_node), NULL);
+    g_signal_connect(G_OBJECT(folder), "show-prop-dialog", 
+		     G_CALLBACK(folder_conf_imap_node), NULL);
     return folder;
 }
 
 void
 balsa_mailbox_node_show_prop_dialog(BalsaMailboxNode* mn)
 {
-    gtk_signal_emit(GTK_OBJECT(mn),
-		    balsa_mailbox_node_signals[SHOW_PROP_DIALOG]);
+    g_signal_emit(G_OBJECT(mn),
+		  balsa_mailbox_node_signals[SHOW_PROP_DIALOG], 0);
 }
 
 void
 balsa_mailbox_node_append_subtree(BalsaMailboxNode * mn, GNode *r)
 {
-    gtk_signal_emit(GTK_OBJECT(mn),
-		    balsa_mailbox_node_signals[APPEND_SUBTREE], r);
+    g_signal_emit(G_OBJECT(mn),
+		  balsa_mailbox_node_signals[APPEND_SUBTREE], 0, r);
 }
 
 void 
@@ -508,15 +527,15 @@ balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data)
 void
 balsa_mailbox_node_load_config(BalsaMailboxNode* mn, const gchar* prefix)
 {
-    gtk_signal_emit(GTK_OBJECT(mn),
-		    balsa_mailbox_node_signals[LOAD_CONFIG], prefix);
+    g_signal_emit(G_OBJECT(mn),
+		  balsa_mailbox_node_signals[LOAD_CONFIG], 0, prefix);
 }
 
 void
 balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* prefix)
 {
-    gtk_signal_emit(GTK_OBJECT(mn),
-		    balsa_mailbox_node_signals[SAVE_CONFIG], prefix);
+    g_signal_emit(G_OBJECT(mn),
+		  balsa_mailbox_node_signals[SAVE_CONFIG], 0, prefix);
 }
 
 void
@@ -531,7 +550,8 @@ balsa_mailbox_local_rescan_parent(LibBalsaMailbox* mbx)
         strlen(dir)>1 /* i.e dir != "/" */ &&
             !(parent = balsa_find_dir(balsa_app.mailbox_nodes,dir));
         ) {
-        gchar* tmp =  g_dirname(dir); g_free(dir);
+        gchar* tmp =  g_path_get_dirname(dir);
+        g_free(dir);
         dir = tmp;
     }
     if(parent)
@@ -582,10 +602,10 @@ add_menu_entry(GtkWidget * menu, const gchar * label, GtkSignalFunc cb,
 	: gtk_menu_item_new();
 
     if (cb)
-	gtk_signal_connect(GTK_OBJECT(menuitem), "activate",
-			   GTK_SIGNAL_FUNC(cb), mbnode);
+	g_signal_connect(G_OBJECT(menuitem), "activate",
+			 G_CALLBACK(cb), mbnode);
 
-    gtk_menu_append(GTK_MENU(menu), menuitem);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     gtk_widget_show(menuitem);
 }
 
@@ -703,8 +723,8 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 
     menu = gtk_menu_new();
     /* it's a single-use menu, so we must destroy it when we're done */
-    gtk_signal_connect(GTK_OBJECT(menu), "selection-done",
-                       GTK_SIGNAL_FUNC(gtk_object_destroy), NULL);
+    g_signal_connect(G_OBJECT(menu), "selection-done",
+                     G_CALLBACK(gtk_object_destroy), NULL);
 
     submenu = gtk_menu_new();
     add_menu_entry(submenu, _("Local mbox mailbox..."),  
@@ -726,7 +746,7 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
     gtk_widget_show(menuitem);
     
-    gtk_menu_append(GTK_MENU(menu), menuitem);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     
     if(mbnode == NULL) {/* clicked on the empty space */
         add_menu_entry(menu, _("Rescan"), GTK_SIGNAL_FUNC(mb_rescan_cb), 
@@ -739,19 +759,19 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     if (mbnode->mailbox) {
 	if (mbnode->mailbox->open_ref == 0)
 	    add_menu_entry(menu, _("Open"),
-                           GTK_SIGNAL_FUNC(mb_open_cb), mbnode);
+                           G_CALLBACK(mb_open_cb), mbnode);
 	else
 	    add_menu_entry(menu, _("Close"),
-                           GTK_SIGNAL_FUNC(mb_close_cb), mbnode);
+                           G_CALLBACK(mb_close_cb), mbnode);
     }
-    if (gtk_signal_handler_pending(GTK_OBJECT(mbnode),
-				   balsa_mailbox_node_signals[SHOW_PROP_DIALOG],
-				   FALSE))
-	add_menu_entry(menu, _("Properties..."),
-                       GTK_SIGNAL_FUNC(mb_conf_cb), mbnode);
+    if (g_signal_has_handler_pending(G_OBJECT(mbnode),
+                                     balsa_mailbox_node_signals
+                                     [SHOW_PROP_DIALOG], 0, FALSE))
+        add_menu_entry(menu, _("Properties..."),
+                       G_CALLBACK(mb_conf_cb), mbnode);
     if (mbnode->mailbox || mbnode->config_prefix)
 	add_menu_entry(menu, _("Delete"), 
-                       GTK_SIGNAL_FUNC(mb_del_cb),  mbnode);
+                       G_CALLBACK(mb_del_cb),  mbnode);
 
     
     if (mbnode->mailbox) {

@@ -66,9 +66,6 @@ extern "C" {
 	gchar *date_string;
 	gboolean line_length;
 
-        /* work around an unimplemented GtkTreeView feature */
-        gboolean scroll_use_align;
-
         /* idle handler data */
         guint idle_handler_id;
         GSList *update_flag_list;

@@ -96,8 +96,8 @@ void
 balsa_icon_create(const gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
 {
     /* Is there any reason to use gdkpixbuf here? */
-    *pmap = gdk_pixmap_create_from_xpm_d(GDK_ROOT_PARENT(), bmap, 0,
-                                         (gchar **) data);
+    *pmap = gdk_pixmap_create_from_xpm_d(gdk_get_default_root_window(),
+                                         bmap, 0, (gchar **) data);
 }
 
 static void

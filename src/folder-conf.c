@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include <gnome.h>
+#include <string.h>
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "folder-conf.h"
@@ -224,9 +225,8 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 
     fcw.remember = create_check(fcw.dialog, _("_Remember password"), 
                                 table, 4, s ? s->remember_passwd : TRUE);
-    gtk_signal_connect(GTK_OBJECT(fcw.remember), "toggled",
-                       GTK_SIGNAL_FUNC(remember_cb), 
-                       &fcw);
+    g_signal_connect(G_OBJECT(fcw.remember), "toggled",
+                     G_CALLBACK(remember_cb), &fcw);
 
     label = create_label(_("_Password:"), table, 5);
     fcw.password = create_entry(fcw.dialog, table, NULL, NULL, 5,
@@ -246,8 +246,8 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     fcw.use_ssl = create_check(fcw.dialog,
 			       _("Use SSL (IMAPS)"),
 			       table, 9, s ? s->use_ssl : FALSE);
-    gtk_signal_connect(GTK_OBJECT(fcw.use_ssl), "toggled",
-                       GTK_SIGNAL_FUNC(imap_use_ssl_cb), &fcw);
+    g_signal_connect(G_OBJECT(fcw.use_ssl), "toggled",
+                     G_CALLBACK(imap_use_ssl_cb), &fcw);
 #endif
 
     gtk_widget_show_all(GTK_WIDGET(fcw.dialog));
@@ -385,7 +385,7 @@ browse_button_cb(GtkWidget * widget, gpointer data)
 	req.height = balsa_app.mw_height;
     else if ( req.height < balsa_app.mw_height/4)
 	req.height = balsa_app.mw_height/4;
-    gtk_widget_set_usize(tree_view, req.width, req.height);
+    gtk_window_set_default_size(GTK_WINDOW(dialog), req.width, req.height);
 
     gtk_container_add(GTK_CONTAINER(scroll), tree_view);
 
@@ -588,10 +588,9 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                                      GTK_SIGNAL_FUNC(validate_sub_folder),
 				     &fcw, 0, fcw.old_parent, label);
 
-    browse_button = gtk_button_new_with_label(_("_Browse..."));
-    gtk_signal_connect(GTK_OBJECT(browse_button), "clicked",
-		       (GtkSignalFunc) browse_button_cb,
-		       (gpointer) &fcw);
+    browse_button = gtk_button_new_with_label(_("Browse..."));
+    g_signal_connect(G_OBJECT(browse_button), "clicked",
+		     G_CALLBACK(browse_button_cb), (gpointer) &fcw);
     gtk_table_attach(GTK_TABLE(subtable), browse_button, 2, 3, 0, 1,
 	GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
     gtk_table_attach(GTK_TABLE(table), subtable, 1, 2, 1, 2,
@@ -608,7 +607,6 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 void
 folder_conf_delete(BalsaMailboxNode* mbnode)
 {
-    gchar* msg;
     GtkWidget* ask;
     GNode* gnode;
     gint response;
@@ -626,25 +624,19 @@ folder_conf_delete(BalsaMailboxNode* mbnode)
 	return;
     }
 	
-    msg = g_strdup_printf
-	(_("This will remove the folder %s from the list.\n"
-	   "You may use \"New IMAP Folder\" later to add this folder again.\n"
-	   "What would you like to do?"),
-	 mbnode->name);
-    ask = gtk_dialog_new_with_buttons(_("Question"),
-                                      GTK_WINDOW(balsa_app.main_window),
-                                      GTK_DIALOG_MODAL,
-                                      _("Remove from list"), GTK_RESPONSE_OK,
-                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                      NULL);
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(ask)->vbox),
-                      gtk_label_new(msg));
-    g_free(msg);
-    gtk_widget_show_all(ask);
+    ask = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window), 0,
+                                 GTK_MESSAGE_QUESTION,
+                                 GTK_BUTTONS_OK_CANCEL,
+                                 _("This will remove the folder "
+                                   "\"%s\" from the list.\n"
+                                   "You may use \"New IMAP Folder\" "
+                                   "later to add this folder again.\n"),
+                                 mbnode->name);
+    gtk_window_set_title(GTK_WINDOW(ask), _("Confirm"));
 
     response = gtk_dialog_run(GTK_DIALOG(ask));
     gtk_widget_destroy(ask);
-    if(response == GTK_RESPONSE_CANCEL)
+    if(response != GTK_RESPONSE_OK)
 	return;
 
     /* Delete it from the config file and internal nodes */

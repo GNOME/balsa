@@ -360,8 +360,6 @@ balsa_message_init(BalsaMessage * bm)
 				G_TYPE_STRING);
     bm->treeview = gtk_tree_view_new_with_model (GTK_TREE_MODEL(model));
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW (bm->treeview));
-    g_signal_connect(bm->treeview, "row-collapsed",
-		     G_CALLBACK(gtk_tree_view_expand_all), NULL);
     g_signal_connect(bm->treeview, "row-activated",
 		     G_CALLBACK(tree_activate_row_cb), bm);    
     g_signal_connect(bm->treeview, "button_press_event",
@@ -885,13 +883,10 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
 static void
 balsa_message_clear_tree(BalsaMessage * bm)
 {
-    GtkTreeSelection *selection;
     GtkTreeModel *model;
 
     g_return_if_fail(bm != NULL);
 
-    selection = 
-	gtk_tree_view_get_selection(GTK_TREE_VIEW(bm->treeview));
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview));
     gtk_tree_store_clear(GTK_TREE_STORE(model));
     bm->info_count = 0;

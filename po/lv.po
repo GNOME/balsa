@@ -3984,7 +3984,7 @@ msgid "Error during filters loading: "
 msgstr "Kļūda ielādējot filtrus: "
 
 #: src/save-restore.c:555
-#, c-format
+#, fuzzy, c-format
 msgid "Error during filters loading: %s\n"
 "Filters may not be correct."
 msgstr "Kļūda ielādējot filtrus: %s\n"

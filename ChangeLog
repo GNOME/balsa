@@ -1,3 +1,10 @@
+2004-08-19 08:47  PeterB
+
+	* src/mailbox-node.c: connect only once to server's "get-password"
+	signal.
+	* libbalsa/mailbox_imap.c: allow subscribe and unsubscribe for a
+	closed mailbox.
+
 2004-08-18 14:33  PeterB
 
 	* src/folder-conf.c: redraw row when descriptive name is changed.

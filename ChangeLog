@@ -1,3 +1,12 @@
+2003-11-16  Carlos Morgado  <chbm gnome.org>
+
+	* src/balsa-bonobo.h:
+	* src/balsa-bonobo.c:
+	* idl/balsa.idl:
+	* idl/balsa-composer.idl:
+	* src/main.c: 
+	bonoboizaiton - lacking server implementation, makefiles
+
 2003-11-15 07:41  PeterB
 
 	* src/main-window.c: Add a weak pointer to window->current_message.

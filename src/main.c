@@ -101,6 +101,27 @@ static GSList* opt_attach_list = NULL;
 /* opt_compose_email: To: field for the compose window */
 static gchar *opt_compose_email = NULL;
 
+
+static void
+balsa_handle_automation_options() {
+#if 0
+   CORBA_Object factory;
+   CORBA_Environment ev;
+
+   /* we only bonobo handle compose */
+   g_return_if_fail( opt_compose_email != NULL );
+
+
+   factory = bonobo_activation_activate_from_id ("OAFIID:GNOME_Balsa_Factory",
+						  Bonobo_ACTIVATION_FLAG_EXISTING_ONLY,
+						  NULL, &ev);
+   g_return_if_fail (factory != NULL);
+   
+   /* there already is a server. good */
+
+#endif   
+}
+
 /* balsa_init:
    FIXME - check for memory leaks.
 */
@@ -132,11 +153,9 @@ balsa_init(int argc, char **argv)
 	{NULL, '\0', 0, NULL, 0}	/* end the list */
     };
 
-#if BALSA_MAJOR < 2
-    context = poptGetContext(PACKAGE, argc, argv, options, 0);
-#else
+
     context = poptGetContext(PACKAGE, argc, (const char **)argv, options, 0);
-#endif                          /* BALSA_MAJOR < 2 */
+
     while((opt = poptGetNextOpt(context)) > 0) {
         switch (opt) {
 	    case 'a':
@@ -151,7 +170,10 @@ balsa_init(int argc, char **argv)
                        GNOME_PARAM_POPT_TABLE, options,
                        GNOME_PARAM_APP_PREFIX, BALSA_STD_PREFIX,
                        GNOME_PARAM_APP_DATADIR, BALSA_STD_PREFIX "/share",
+		       GNOME_PARAM_HUMAN_READABLE_NAME, _("The Balsa E-Mail Client"),
                        NULL);
+
+    balsa_handle_automation_options();  
 }
 
 /* check_special_mailboxes: 
@@ -352,6 +374,7 @@ main(int argc, char *argv[])
     setlocale(LC_CTYPE,
               (const char *) gnome_i18n_get_language_list("LC_CTYPE")->data);
 #endif
+
 
 #ifdef HAVE_GPGME
     /* initialise the gpgme library */

@@ -1,3 +1,10 @@
+2004-09-07 08:05  PeterB
+
+	* src/balsa-message.c: remove assertion; do not set charset--now
+	handled by all backends.
+	* libbalsa/message.c: avoid casts.
+	* libbalsa/mailbox_imap.c: set content type before caching part.
+
 2004-09-06 12:11  PeterB
 
 	* src/balsa-message.c: check mailbox only if we are displaying a

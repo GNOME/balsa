@@ -257,7 +257,7 @@ mailbox_conf_new (LibBalsaMailbox * mailbox, gint add_mbox)
 
   mcw = g_malloc (sizeof (MailboxConfWindow));
 
-  mcw->mailbox =  0;
+  mcw->mailbox = 0;
 
   mcw->the_page = MC_PAGE_LOCAL;	/* default next page to LOCAL */
 
@@ -756,11 +756,11 @@ conf_add_mailbox (LibBalsaMailbox **mbox)
 static void
 mailbox_conf_close (GtkWidget * widget, gboolean save)
 {
-  LibBalsaMailbox *mailbox;
   int return_value;
 
   if ( save ) 
   {
+    LibBalsaMailbox *mailbox = mcw->mailbox;
     mailbox = mcw->mailbox;
     
     if (mcw->add == FALSE)		/* we are updating the mailbox */
@@ -794,8 +794,8 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
     /* If we were given a mailbox to add and the user canceled then
      * destroy that mailbox
      */
-    if ( mailbox && mcw->add ) 
-      gtk_object_destroy ( GTK_OBJECT(mailbox) ) ;
+    if ( mcw->mailbox && mcw->add ) 
+      gtk_object_destroy ( GTK_OBJECT(mcw->mailbox) ) ;
   }
   
   /* close the new mailbox window */

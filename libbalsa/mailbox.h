@@ -164,7 +164,7 @@ FILE *libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
 void libbalsa_mailbox_sort(LibBalsaMailbox * mailbox,
 			   LibBalsaMailboxSort sort);
 
-gint libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox);
+gint libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete);
 
 void libbalsa_mailbox_check(LibBalsaMailbox * mailbox);
 

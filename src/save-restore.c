@@ -140,6 +140,9 @@ load_toolbars(void)
     balsa_app.toolbars=	(char ***)g_malloc(sizeof(char *)*MAXTOOLBARS);
     
     balsa_app.toolbar_count=d_get_gint("ToolbarCount", 0);
+    if(balsa_app.toolbar_count>=MAXTOOLBARS)   /* most likely, this means   */
+        balsa_app.toolbar_count=MAXTOOLBARS-1; /* configure file corruption */
+
     for(i=0; i<balsa_app.toolbar_count; i++) {
 	balsa_app.toolbars[i]=
 	    (char **)g_malloc(sizeof(char *)*MAXTOOLBARITEMS);
@@ -154,6 +157,9 @@ load_toolbars(void)
 	
 	sprintf(tmpkey, "Toolbar%dItemCount", i);
 	items=d_get_gint(tmpkey, 0);
+        if(items>=MAXTOOLBARS)        /* most likely, this means   */
+            items=MAXTOOLBARS-1;      /* configure file corruption */
+
 	
 	for(j=0; j<items; j++) {
 	    sprintf(tmpkey, "Toolbar%dItem%d", i, j);
@@ -614,6 +620,10 @@ config_global_load(void)
     /* ... Progress Window Dialog */
     balsa_app.pwindow_option = d_get_gint("ProgressWindow", WHILERETR);
     balsa_app.drag_default_is_move = d_get_gint("DragDefaultIsMove", 0);
+    balsa_app.delete_immediately =
+        gnome_config_get_bool("DeleteImmediately=false");
+    balsa_app.hide_deleted =
+        gnome_config_get_bool("HideDeleted=false");
 
     gnome_config_pop_prefix();
 
@@ -902,6 +912,10 @@ gint config_save(void)
     gnome_config_set_bool("PageDownMod", balsa_app.pgdownmod);
     gnome_config_set_int("PageDownPercent", balsa_app.pgdown_percent);
     gnome_config_set_int("DragDefaultIsMove", balsa_app.drag_default_is_move);
+    gnome_config_set_bool("DeleteImmediately",
+                          balsa_app.delete_immediately);
+    gnome_config_set_bool("HideDeleted",
+                          balsa_app.hide_deleted);
 
     gnome_config_pop_prefix();
 

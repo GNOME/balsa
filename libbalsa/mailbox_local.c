@@ -270,8 +270,7 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
     mailbox->messages = 0;
     mailbox->total_messages = 0;
     mailbox->unread_messages = 0;
-    mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount
-	- CLIENT_CONTEXT(mailbox)->deleted;
+    mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount;
     mailbox->open_ref++;
     UNLOCK_MAILBOX(mailbox);
     gdk_threads_enter();

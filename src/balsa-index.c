@@ -106,6 +106,7 @@ static GtkCTreeNode *balsa_index_find_node(BalsaIndex * bindex,
 					   ,gint op,GSList * conditions
 #endif
 					   );
+static void balsa_index_select_next_threaded(BalsaIndex * bindex);
 static void balsa_index_transfer_messages(BalsaIndex * bindex,
                                           LibBalsaMailbox * mailbox);
 static void balsa_index_idle_remove(gpointer data);
@@ -150,6 +151,7 @@ static void tree_expand_cb(GtkCTree * ctree, GList * node,
                            gpointer user_data);
 static void tree_collapse_cb(GtkCTree * ctree, GList * node,
                            gpointer user_data);
+static void hide_deleted(BalsaIndex * bindex, gboolean hide);
 
 /* Callbacks */
 static gint mru_search_cb(GNode *node, struct FolderMRUEntry *entry);
@@ -712,6 +714,11 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
 
     g_return_if_fail(bindex != NULL);
     g_return_if_fail(message != NULL);
+
+    if (balsa_app.hide_deleted 
+        && message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+        return;
+
     mailbox = bindex->mailbox_node->mailbox;
     
     if (mailbox == NULL)
@@ -1118,6 +1125,7 @@ balsa_index_scan_selection(GtkCTree * ctree, GtkCTreeNode * node,
                            struct BalsaIndexScanInfo *b)
 {
     GList *list;
+    LibBalsaMessage *message;
 
     for (list = b->selection; list; list = g_list_next(list)) {
         if (list->data == node) {
@@ -1127,12 +1135,18 @@ balsa_index_scan_selection(GtkCTree * ctree, GtkCTreeNode * node,
                 /* clear any `next' node we found before */
                 b->next = NULL;
             }
-            b->selection = g_list_remove(b->selection, list);
+            b->selection = g_list_remove_link(b->selection, list);
+            g_list_free_1(list);
             return;
         }
     }
 
     /* this node isn't selected */
+    message = LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(ctree, node));
+    /* skip any DELETED message, as it may really be deleted before we
+     * get a chance to show it */
+    if (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+        return;
 
     if (b->next == NULL)
         /* save it whether or not it's viewable */
@@ -1146,7 +1160,7 @@ balsa_index_scan_selection(GtkCTree * ctree, GtkCTreeNode * node,
  * finds and selects a message after moving one or more message out of
  * the index
  */
-void
+static void
 balsa_index_select_next_threaded(BalsaIndex * bindex)
 {
     GtkCTreeNode *node;
@@ -1802,7 +1816,7 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
 
         /* sync with backend AFTER adjacent message is selected.
          * Update the style and message counts in the mailbox list */
-        libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
+        balsa_index_sync_backend(index->mailbox_node->mailbox);
         balsa_mblist_update_mailbox(balsa_app.mblist,
                                     index->mailbox_node->mailbox);
         // balsa_index_redraw_current(index);
@@ -1843,13 +1857,6 @@ balsa_message_undelete(GtkWidget * widget, gpointer user_data)
 	libbalsa_message_delete(message, FALSE);
 	list = list->next;
     }
-
-/* XXX - Not sure this is relevant - this function apparently clears
- * the 'Status: D' flag, but doesn't appear to move messages around.
- */
-    enable_empty_trash(TRASH_CHECK);
-
-    balsa_index_select_next(index);
 }
 
 gint
@@ -1910,7 +1917,7 @@ balsa_message_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag,
         (*cb) (message, new_flag);
     }
     gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
-    libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
+    balsa_index_sync_backend(index->mailbox_node->mailbox);
 }
 
 /* This function toggles the FLAGGED attribute of a list of messages
@@ -2078,6 +2085,9 @@ create_menu(BalsaIndex * bindex)
     GtkRequisition req;
     LibBalsaMailbox* mailbox;
     unsigned i;
+    GList *list;
+    gboolean any_deleted = FALSE;
+    gboolean any_not_deleted = FALSE;
  
     BALSA_DEBUG();
     mailbox = bindex->mailbox_node->mailbox;
@@ -2088,14 +2098,27 @@ create_menu(BalsaIndex * bindex)
         create_stock_menu_item(menu, entries[i].icon, _(entries[i].label),
                                entries[i].func, bindex, TRUE);
 
-    create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH,
-			   _("Delete"), balsa_message_delete, bindex,
-			   !mailbox->readonly);
-    if (mailbox == balsa_app.trash) {
+    for (list = GTK_CLIST(bindex->ctree)->selection; list;
+         list = g_list_next(list)) {
+        LibBalsaMessage *message =
+            LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data
+                             (GTK_CTREE(bindex->ctree), list->data));
+        if (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+            any_deleted = TRUE;
+        else
+            any_not_deleted = TRUE;
+    }
+    if (any_not_deleted) {
+        create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH,
+                               _("Delete"), balsa_message_delete, bindex,
+                               !mailbox->readonly);
+    }
+    if (any_deleted) {
 	create_stock_menu_item(menu, GNOME_STOCK_MENU_UNDELETE,
 			       _("Undelete"), balsa_message_undelete,
 			       bindex, !mailbox->readonly);
-    } else {
+    }
+    if (mailbox != balsa_app.trash) {
 	create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH,
 			       _("Move To Trash"), balsa_message_move_to_trash,
 			       bindex, !mailbox->readonly);
@@ -2230,22 +2253,10 @@ balsa_index_transfer_messages(BalsaIndex * bindex,
 	messages=g_list_append(messages, message);
     }
 
-    if(messages!=NULL) {
-	libbalsa_messages_move(messages, mailbox);
-	g_list_free(messages);
-    }
+    balsa_index_transfer(messages, bindex->mailbox_node->mailbox,
+                         mailbox, bindex, FALSE);
+    g_list_free(messages);
    
-    /* select another message depending on where we are in the list */
-    balsa_index_select_next_threaded(bindex);
-
-    libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
-
-    if (mailbox == balsa_app.trash) {
-	enable_empty_trash(TRASH_FULL);
-    } else if (bindex->mailbox_node->mailbox == balsa_app.trash) {
-	enable_empty_trash(TRASH_CHECK);
-    }
-
     balsa_remove_from_folder_mru(mailbox->url);
     balsa_add_to_folder_mru(mailbox->url);
     gtk_object_set_data(GTK_OBJECT(bindex), "transferredp", (gpointer) 1);
@@ -2623,4 +2634,80 @@ balsa_index_idle_clear(gpointer data)
     if (ret)
         handler.id = 0;
     return ret;
+}
+
+/* balsa_index_hide_deleted:
+ * called from pref manager when balsa_app.hide_deleted is changed.
+ */
+void
+balsa_index_hide_deleted(gboolean hide)
+{
+    gint i;
+    GtkWidget *page;
+
+    for (i = 0; (page =
+                 gtk_notebook_get_nth_page(GTK_NOTEBOOK
+                                           (balsa_app.notebook),
+                                           i)) != NULL; ++i)
+        hide_deleted(BALSA_INDEX(page), hide);
+}
+
+/* hide_deleted:
+ * hide (or show, if hide is FALSE) deleted messages.
+ */
+static void
+hide_deleted(BalsaIndex * bindex, gboolean hide)
+{
+    LibBalsaMailbox *mailbox = bindex->mailbox_node->mailbox;
+    GList *list;
+    GList *messages = NULL;
+
+    for (list = mailbox->message_list; list; list = g_list_next(list)) {
+        LibBalsaMessage *message = LIBBALSA_MESSAGE(list->data);
+
+        if (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+            messages = g_list_prepend(messages, message);
+    }
+
+    if (hide)
+        mailbox_messages_delete_cb(bindex, messages);
+    else
+        mailbox_messages_new_cb(bindex, messages);
+
+    g_list_free(messages);
+}
+
+/* balsa_index_sync_backend:
+ * wrapper for libbalsa_mailbox_sync_backend.
+ */
+
+void
+balsa_index_sync_backend(LibBalsaMailbox *mailbox)
+{
+    if (balsa_app.hide_deleted || balsa_app.delete_immediately)
+        libbalsa_mailbox_sync_backend(mailbox, balsa_app.delete_immediately);
+}
+
+void
+balsa_index_transfer(GList * messages, LibBalsaMailbox * from_mailbox,
+                     LibBalsaMailbox * to_mailbox, BalsaIndex *bindex,
+                     gboolean copy)
+{
+    if (messages == NULL)
+        return;
+
+    if (copy)
+        libbalsa_messages_copy(messages, to_mailbox);
+    else {
+        libbalsa_messages_move(messages, to_mailbox);
+        balsa_index_select_next_threaded(bindex);
+        balsa_index_sync_backend(from_mailbox);
+    }
+
+    balsa_mblist_update_mailbox(balsa_app.mblist, to_mailbox);
+
+    if (from_mailbox == balsa_app.trash && !copy)
+        enable_empty_trash(TRASH_CHECK);
+    else if (to_mailbox == balsa_app.trash)
+        enable_empty_trash(TRASH_FULL);
 }

@@ -637,8 +637,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 	mailbox->messages = 0;
 	mailbox->total_messages = 0;
 	mailbox->unread_messages = 0;
-	mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount
-	- CLIENT_CONTEXT(mailbox)->deleted;
+	mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount;
         LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity = 
             ((IMAP_DATA*)CLIENT_CONTEXT(mailbox)->data)->uid_validity;
 	if(mailbox->open_ref == 0)

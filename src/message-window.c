@@ -754,6 +754,7 @@ transfer_message_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column,
     GtkCList* clist=NULL;
     BalsaIndex* bindex = NULL;
     BalsaMailboxNode *mbnode;
+    GList *list;
 
     g_return_if_fail(mw != NULL);
 
@@ -768,13 +769,11 @@ transfer_message_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column,
 	return;
     
     mw->transferred = TRUE;
-    libbalsa_message_move(mw->message, mbnode->mailbox);
-    
-    if(bindex != NULL && bindex->ctree != NULL) {
-	/* select another message depending on where we are in the list */
-	balsa_index_select_next_threaded(bindex);
-	libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
-    }
+
+    list = g_list_append(NULL, mw->message);
+    balsa_index_transfer(list, mw->message->mailbox, mbnode->mailbox,
+                         bindex, FALSE);
+    g_list_free_1(list);
     
     balsa_remove_from_folder_mru(mbnode->mailbox->url);
     balsa_add_to_folder_mru(mbnode->mailbox->url);
@@ -847,6 +846,7 @@ mru_select_cb(GtkWidget *widget, struct BalsaMRUEntry *entry)
     
     LibBalsaMailbox *mailbox=entry->mailbox;
     
+    GList *list;
     GtkCList* clist=NULL;
     BalsaIndex* bindex = NULL;
 
@@ -857,13 +857,10 @@ mru_select_cb(GtkWidget *widget, struct BalsaMRUEntry *entry)
 	return;
 
     mw->transferred = TRUE;
-    libbalsa_message_move(mw->message, mailbox);
-    
-    if(bindex != NULL && bindex->ctree != NULL) {
-	/* select another message depending on where we are in the list */
-	balsa_index_select_next_threaded(bindex);
-	libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
-    }
+
+    list = g_list_append(NULL, mw->message);
+    balsa_index_transfer(list, mw->message->mailbox, mailbox, bindex, FALSE);
+    g_list_free_1(list);
     
     balsa_remove_from_folder_mru(mailbox->url);
     balsa_add_to_folder_mru(mailbox->url);

@@ -1,5 +1,4 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
-/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
@@ -70,8 +69,10 @@ typedef struct _PropertyUI {
     GtkWidget *mdn_reply_clean_menu, *mdn_reply_notclean_menu;
 
     GtkWidget *close_mailbox_auto;
-    GtkWidget *drag_default_is_move;
     GtkWidget *close_mailbox_minutes;
+    GtkWidget *drag_default_is_move;
+    GtkWidget *delete_immediately;
+    GtkWidget *hide_deleted;
 
     GtkWidget *previewpane;
     GtkWidget *alternative_layout;
@@ -386,11 +387,16 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(pui->close_mailbox_auto), "toggled",
 		       GTK_SIGNAL_FUNC(mailbox_timer_modified_cb), property_box);
 
+    gtk_signal_connect(GTK_OBJECT(pui->close_mailbox_minutes), "changed",
+		       GTK_SIGNAL_FUNC(mailbox_timer_modified_cb), property_box);
+
     gtk_signal_connect(GTK_OBJECT(pui->drag_default_is_move), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
 
-    gtk_signal_connect(GTK_OBJECT(pui->close_mailbox_minutes), "changed",
-		       GTK_SIGNAL_FUNC(mailbox_timer_modified_cb), property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->delete_immediately), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->hide_deleted), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
 
     gtk_signal_connect(GTK_OBJECT(pui->browse_wrap), "toggled",
 		       GTK_SIGNAL_FUNC(browse_modified_cb), property_box);
@@ -660,11 +666,23 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 
     balsa_app.close_mailbox_auto =
 	GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->active;
-    balsa_app.drag_default_is_move =
-	GTK_TOGGLE_BUTTON(pui->drag_default_is_move)->active;
     balsa_app.close_mailbox_timeout =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
 					 (pui->close_mailbox_minutes));
+    balsa_app.drag_default_is_move =
+	GTK_TOGGLE_BUTTON(pui->drag_default_is_move)->active;
+    balsa_app.delete_immediately =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                     (pui->delete_immediately));
+    {
+        gboolean hide =
+            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                         (pui->hide_deleted));
+        if (balsa_app.hide_deleted != hide) {
+            balsa_app.hide_deleted = hide;
+            balsa_index_hide_deleted(hide);
+        }
+    }
 
     /* external editor */
     g_free(balsa_app.extern_editor_command);
@@ -898,10 +916,17 @@ set_prefs(void)
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->close_mailbox_auto),
 				 balsa_app.close_mailbox_auto);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->drag_default_is_move),
-				 balsa_app.drag_default_is_move);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->close_mailbox_minutes),
 			      (float) balsa_app.close_mailbox_timeout);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->drag_default_is_move),
+				 balsa_app.drag_default_is_move);
+
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                 (pui->delete_immediately),
+                                 balsa_app.delete_immediately);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                 (pui->hide_deleted),
+                                 balsa_app.hide_deleted);
 
     gtk_widget_set_sensitive(pui->close_mailbox_minutes,
 			     GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->
@@ -2167,6 +2192,27 @@ create_misc_page(gpointer data)
     gtk_widget_show(pui->drag_default_is_move);
     gtk_box_pack_start(GTK_BOX(vbox10), pui->drag_default_is_move, 
 		       FALSE, FALSE, 0);
+
+    {
+        GtkWidget *frame = gtk_frame_new(_("Deleting Messages"));
+        GtkWidget *vbox = vbox_in_container(frame);
+
+        gtk_container_set_border_width(GTK_CONTAINER(frame), 5);
+        gtk_box_pack_start(GTK_BOX(vbox9), frame, FALSE, FALSE, 0);
+
+        pui->delete_immediately =
+            gtk_check_button_new_with_label(_("Delete immediately "
+                                              "and irretrievably"));
+        gtk_box_pack_start(GTK_BOX(vbox), pui->delete_immediately, FALSE,
+                           FALSE, 0);
+
+        pui->hide_deleted =
+            gtk_check_button_new_with_label(_("Hide deleted messages"));
+        gtk_box_pack_start(GTK_BOX(vbox), pui->hide_deleted, FALSE,
+                           FALSE, 0);
+
+        gtk_widget_show_all(frame);
+    }
 
     return vbox9;
 }

@@ -59,7 +59,8 @@ static void libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
 static void message_status_changed_cb(LibBalsaMessage * message, gboolean set,
 				      LibBalsaMailbox * mb);
 
-static void libbalsa_mailbox_sync_backend_real(LibBalsaMailbox * mailbox);
+static void libbalsa_mailbox_sync_backend_real(LibBalsaMailbox * mailbox,
+                                               gboolean delete);
 static LibBalsaMessage *translate_message(HEADER * cur);
 
 enum {
@@ -372,6 +373,8 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
+    /* remove messages flagged for deleting, before closing: */
+    libbalsa_mailbox_sync_backend(mailbox, TRUE);
     gtk_signal_emit(GTK_OBJECT(mailbox),
 		    libbalsa_mailbox_signals[CLOSE_MAILBOX]);
     if(mailbox->open_ref <1) mailbox->context = NULL;
@@ -521,7 +524,7 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 	    free(CLIENT_CONTEXT(mailbox));
 	    CLIENT_CONTEXT(mailbox) = NULL;
 	}
-    } else libbalsa_mailbox_sync_backend_real(mailbox);
+    } else libbalsa_mailbox_sync_backend_real(mailbox, TRUE);
 
     UNLOCK_MAILBOX(mailbox);
 }
@@ -598,19 +601,19 @@ libbalsa_mailbox_link_message(LibBalsaMailbox * mailbox, LibBalsaMessage*msg)
 {
     msg->mailbox = mailbox;
     
-    gtk_signal_connect(GTK_OBJECT(msg), "clear-flags",
+    gtk_signal_connect_after(GTK_OBJECT(msg), "clear-flags",
                        GTK_SIGNAL_FUNC(message_status_changed_cb),
                        mailbox);
-    gtk_signal_connect(GTK_OBJECT(msg), "set-answered",
+    gtk_signal_connect_after(GTK_OBJECT(msg), "set-answered",
                        GTK_SIGNAL_FUNC(message_status_changed_cb),
                        mailbox);
-    gtk_signal_connect(GTK_OBJECT(msg), "set-read",
+    gtk_signal_connect_after(GTK_OBJECT(msg), "set-read",
                        GTK_SIGNAL_FUNC(message_status_changed_cb),
                        mailbox);
-    gtk_signal_connect(GTK_OBJECT(msg), "set-deleted",
+    gtk_signal_connect_after(GTK_OBJECT(msg), "set-deleted",
                        GTK_SIGNAL_FUNC(message_status_changed_cb),
                        mailbox);
-    gtk_signal_connect(GTK_OBJECT(msg), "set-flagged",
+    gtk_signal_connect_after(GTK_OBJECT(msg), "set-flagged",
                        GTK_SIGNAL_FUNC(message_status_changed_cb),
                        mailbox);
 
@@ -647,8 +650,14 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
     for (msgno = mailbox->messages; mailbox->new_messages > 0; msgno++) {
 	cur = CLIENT_CONTEXT(mailbox)->hdrs[msgno];
 
-	if (!(cur && cur->env && cur->content && !cur->deleted))
+	if (!(cur && cur->env && cur->content)) {
+            /* we'd better decrement mailbox->new_messages, in case this
+             * defective message was included in the count; otherwise,
+             * we'll increment msgno too far, and try to access an
+             * invalid header */
+            mailbox->new_messages--;
 	    continue;
+        }
 
 	if (cur->env->subject &&
 	    !strcmp(cur->env->subject,
@@ -733,6 +742,8 @@ libbalsa_mailbox_commit(LibBalsaMailbox* mailbox)
 	return FALSE;
 
     LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
+    /* remove messages flagged for deleting, before committing: */
+    libbalsa_mailbox_sync_backend_real(mailbox, TRUE);
     libbalsa_lock_mutt();
     index_hint = CLIENT_CONTEXT(mailbox)->vcount;
     rc = mx_sync_mailbox(CLIENT_CONTEXT(mailbox), &index_hint);
@@ -792,23 +803,33 @@ GtkType libbalsa_mailbox_type_from_path(const gchar * filename)
     return ret;
 }
 
+/* libbalsa_mailbox_sync_backend_real
+ * synchronize the frontend and libbalsa: build a list of messages
+ * marked as deleted, and:
+ * 1. emit the "messages-delete" signal, so the frontend can drop them
+ *    from the BalsaIndex;
+ * 2. if delete == TRUE, delete them from the LibBalsaMailbox.
+ */
 static void
-libbalsa_mailbox_sync_backend_real(LibBalsaMailbox * mailbox)
+libbalsa_mailbox_sync_backend_real(LibBalsaMailbox * mailbox,
+                                   gboolean delete)
 {
+    GList *list;
     GList *message_list;
-    GList *tmp_message_list;
     LibBalsaMessage *current_message;
     GList *p=NULL;
+    GList *q = NULL;
 
-    message_list = mailbox->message_list;
-    while (message_list) {
+    for (message_list = mailbox->message_list; message_list;
+         message_list = g_list_next(message_list)) {
 	current_message = LIBBALSA_MESSAGE(message_list->data);
-	tmp_message_list = message_list->next;
 	if (current_message->flags & LIBBALSA_MESSAGE_FLAG_DELETED) {
 	    p=g_list_append(p, current_message);
+            if (delete)
+                q = g_list_prepend(q, message_list);
 	}
-	message_list = tmp_message_list;
     }
+
     if(p){
 	gtk_signal_emit(GTK_OBJECT(mailbox),
 			libbalsa_mailbox_signals[MESSAGES_DELETE],
@@ -816,39 +837,34 @@ libbalsa_mailbox_sync_backend_real(LibBalsaMailbox * mailbox)
 	g_list_free(p);
     }
 
-    message_list = mailbox->message_list;
-    while (message_list) {
-	current_message = LIBBALSA_MESSAGE(message_list->data);
-	tmp_message_list = message_list->next;
-	if (current_message->flags & LIBBALSA_MESSAGE_FLAG_DELETED) {
-	    current_message->mailbox = NULL;
-	    gtk_object_unref(GTK_OBJECT(current_message));
+    if (delete) {
+        for (list = q; list; list = g_list_next(list)) {
+            message_list = list->data;
+            current_message =
+                LIBBALSA_MESSAGE(message_list->data);
+            current_message->mailbox = NULL;
+            gtk_object_unref(GTK_OBJECT(current_message));
 	    mailbox->message_list =
 		g_list_remove_link(mailbox->message_list, message_list);
+            g_list_free_1(message_list);
 	}
-	message_list = tmp_message_list;
-	
+        g_list_free(q);
     }
 }
 
 /* libbalsa_mailbox_sync_backend:
-   synchronizes the backend with LibBalsaMailbox.
-
-   NOTE: this is not a proper mailbox commit function.  When
-   implementing proper one note that the msg numbers are changed after
-   commit so one has to re-read messages from mutt structures.
-   Actually, re-reading is a wrong approach because it slows down
-   balsa like hell. I know, I tried it (re-reading).
-*/
+ * use libbalsa_mailbox_sync_backend_real to synchronize the frontend and
+ * libbalsa
+ */
 gint
-libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox)
+libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete)
 {
     gint res = 0;
 
     /* only open mailboxes can be commited; lock it instead of opening */
     g_return_val_if_fail(CLIENT_CONTEXT_OPEN(mailbox), 0);
     LOCK_MAILBOX_RETURN_VAL(mailbox, 0);
-    libbalsa_mailbox_sync_backend_real(mailbox);
+    libbalsa_mailbox_sync_backend_real(mailbox, delete);
     UNLOCK_MAILBOX(mailbox);
     return res;
 }

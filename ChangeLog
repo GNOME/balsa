@@ -1,3 +1,26 @@
+2002-01-20  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* balsa.spec.in: "requires: pspell" was missing.
+
+	* help/C/balsa.sgml: help for "hide on Delete" and "delete
+	immediately" checkboxes.
+	* libbalsa/address-entry.c: 
+	* libbalsa/filter-file.c: g_list_free() is freqently overkill,
+	use g_list_free_1() instead.
+	* libbalsa/mailbox.[hc]: implement "hide-on-delete" functions.
+	The main change is to add extra parameter to sync_backend().
+	* libbalsa/mailbox_{imap,local}.c: change accordingly.
+	* src/balsa-app.h: add delete_immediately and hide_deleted fields.
+	* src/balsa-index.[hc]: use them for syncing mailboxes with indexes.
+	implement balsa_index_transfer() for moving/copying messages 
+	that update UI as well.
+	* src/balsa-mblist.c: use balsa_index_transfer().
+	* src/main-window.c: same.
+	* src/message-window.c: ditto.
+	* src/pref-manager.c: configure delete_immediately and hide_deleted.
+	* src/save-restore.c: save&restore them (+toolbar fix from Albrecht).
+	* src/sendmsg-window.c: use updated sync_backend() API.
+	
 2002-01-16  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-app.c: do not remove main level inboxes and folders

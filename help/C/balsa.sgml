@@ -2564,6 +2564,51 @@ align="center"></graphic>
   </listitem>
 </varlistentry>
 
+<varlistentry>
+  <term><guilabel>Automatically close mailbox</guilabel></term>
+  <listitem>
+    <para>&Balsa; can close mailboxes for you after the specified time.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Drag-and-drop moves messages by default</guilabel></term>
+  <listitem>
+    <para>When you drag and drop a message to a destination mailbox, it
+    may be moved (not leaving a copy in the source mailbox) or copied.
+    This option sets the default action; use the Control key when
+    dragging to have the opposite effect.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Delete immediately</guilabel></term> <listitem>
+    <para>When you delete a message or messages, &Balsa; can either
+      delete them immediately, or flag them as deleted and actually delete
+      them later. If they are flagged as deleted, you can then go back
+      and Undelete them if you change your mind. Messages flagged as
+      deleted are removed when you close the mailbox or when you commit
+      changes.</para>
+    <para>This option has no effect on trashing messages by moving
+      them to the Trash folder;
+      a message may always be retrieved from the Trash,
+      until the Trash folder is emptied.</para>
+    <para>You should be aware that &Balsa; <emphasis>moves</emphasis>
+      a message from one mailbox to another by first making a copy
+      in the new mailbox, and then deleting the original.
+      This option affects the handling of such a deleted message,
+      as well as messages that you delete explicitly.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Hide deleted messages</guilabel></term> <listitem>
+  <para>When &Balsa; is not deleting messages immediately, you can use
+    this option to control whether deleted messages are shown in the
+    mailbox index.</para>
+  </listitem>
+</varlistentry>
+
 </variablelist>
 </sect1>
 

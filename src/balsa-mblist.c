@@ -1527,30 +1527,10 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
 	mailbox = mbnode->mailbox;
 
         /* cannot transfer to the originating mailbox */
-        if (mailbox != NULL && mailbox != orig_mailbox) {
-            switch (context->action) {
-            case GDK_ACTION_MOVE:
-                libbalsa_messages_move (messages, mailbox);
-                balsa_index_select_next_threaded
-                    (balsa_find_index_by_mailbox(orig_mailbox));
-                break;
-
-            case GDK_ACTION_DEFAULT:
-            case GDK_ACTION_COPY:
-            default:
-                libbalsa_messages_copy (messages, mailbox);
-                break;
-            }
-
-            libbalsa_mailbox_sync_backend (orig_mailbox);
-	    balsa_mblist_update_mailbox(balsa_app.mblist, mailbox);
-
-	    if (mailbox == balsa_app.trash) {
-		enable_empty_trash(TRASH_FULL);
-	    } else if (orig_mailbox == balsa_app.trash) {
-		enable_empty_trash(TRASH_CHECK);
-	    }
-        }
+        if (mailbox != NULL && mailbox != orig_mailbox)
+            balsa_index_transfer(messages, orig_mailbox, mailbox, 
+                                 balsa_find_index_by_mailbox(orig_mailbox),
+                                 context->action != GDK_ACTION_MOVE);
     }
     
     

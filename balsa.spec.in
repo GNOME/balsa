@@ -16,6 +16,7 @@ Requires: gtk+ >= 1.2.7
 Requires: gnome-libs >= 1.2.13
 Requires: gnome-vfs >= 1.0.0
 Requires: libesmtp >= 0.8.6
+Requires: pspell
 Provides: balsa
 
 BuildRequires:  libesmtp >= 0.8.6
@@ -23,6 +24,7 @@ BuildRequires:  gnome-libs-devel >= 1.2.13
 BuildRequires:  gtk+-devel >= 1.2.7
 BuildRequires:  gdk-pixbuf-devel
 BuildRequires:  gnome-vfs-devel
+BuildRequires:  pspell-devel
 
 %description
 Balsa is an e-mail reader.  This client is part of the GNOME

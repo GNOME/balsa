@@ -156,6 +156,7 @@ libbalsa_conditions_new_from_config(gchar * prefix,
     gint pref_len=strlen(CONDITION_SECTION_PREFIX)+strlen(filter_section_name);
     gint err=FILTER_NOERR;
     GList * tmp_list=NULL;
+    GList *l;
 
     FILTER_SETFLAG(fil,FILTER_VALID);
     FILTER_SETFLAG(fil,FILTER_COMPILED);
@@ -204,12 +205,13 @@ libbalsa_conditions_new_from_config(gchar * prefix,
 	/* We sort the list of temp conditions, then
 	   we populate the conditions list of the filter */
 	tmp_list=g_list_sort(tmp_list,compare_conditions_order);
-	for (;tmp_list;) {
+        l = tmp_list;
+	for (;tmp_list; tmp_list = g_list_next(tmp_list)) {
 	    tmp=(LibBalsaTempCondition *)(tmp_list->data);
 	    libbalsa_filter_prepend_condition(fil,tmp->cnd);
 	    g_free(tmp);
-	    tmp_list=g_list_remove_link(tmp_list,tmp_list);
 	}
+        g_list_free(l);
 	/* We don't do a g_list_reverse because the comparison func
 	   which dictate the order of the list after the sort is already
 	   reversed */

@@ -2932,7 +2932,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	} else if (bsmsg->type == SEND_CONTINUE) {
 	    if (bsmsg->orig_message) {
 		libbalsa_message_delete(bsmsg->orig_message, TRUE);
-		libbalsa_mailbox_sync_backend(bsmsg->orig_message->mailbox);
+		balsa_index_sync_backend(bsmsg->orig_message->mailbox);
 	    }
 	}
     }
@@ -2998,7 +2998,7 @@ message_postpone(BalsaSendmsg * bsmsg)
     if(successp) {
 	if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message) {
 	    libbalsa_message_delete(bsmsg->orig_message, TRUE);
-	    libbalsa_mailbox_sync_backend(bsmsg->orig_message->mailbox);
+	    balsa_index_sync_backend(bsmsg->orig_message->mailbox);
 	}
     }
     gtk_object_unref(GTK_OBJECT(message));

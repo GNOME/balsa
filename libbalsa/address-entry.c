@@ -878,7 +878,7 @@ libbalsa_delete_forward_word(LibBalsaAddressEntry *address_entry)
 	if (list != NULL) {
 	    input->list = g_list_remove_link(input->list, list);
 	    libbalsa_emailData_free(list->data);
-	    g_list_free(list);
+	    g_list_free_1(list);
 	}
 
     /*
@@ -894,7 +894,7 @@ libbalsa_delete_forward_word(LibBalsaAddressEntry *address_entry)
 	    input->active = NULL;
 	input->list = g_list_remove_link(input->list, list);
 	libbalsa_emailData_free(list->data);
-	g_list_free(list);
+	g_list_free_1(list);
 	if (input->active != NULL) {
 	    addy = input->active->data;
 	    g_assert(addy != NULL);
@@ -947,7 +947,7 @@ libbalsa_delete_backward_word(LibBalsaAddressEntry *address_entry)
 	if (list != NULL) {
 	    input->list = g_list_remove_link(input->list, list);
 	    libbalsa_emailData_free(list->data);
-	    g_list_free(list);
+	    g_list_free_1(list);
 	}
 
     /*
@@ -964,11 +964,7 @@ libbalsa_delete_backward_word(LibBalsaAddressEntry *address_entry)
 	}
 	input->list = g_list_remove_link(input->list, list);
 	libbalsa_emailData_free(list->data);
-	/*
-	list->next = NULL;
-	list->prev = NULL;
-	*/
-	g_list_free(list);
+	g_list_free_1(list);
 	if (input->active != NULL) {
 	    addy = input->active->data;
 	    g_assert(addy != NULL);
@@ -1027,10 +1023,7 @@ libbalsa_delete_to_line_end(LibBalsaAddressEntry *address_entry)
 	  */
 	 libbalsa_emailData_free(list->data);
 	 input->list = g_list_remove_link(input->list, list);
-	 list->data = NULL;
-	 list->prev = NULL;
-	 list->next = NULL;
-	 g_list_free(list);
+	 g_list_free_1(list);
     }
     /* libbalsa_inputData_free(address_entry->input); 
      * look above: the line below is not necessary */
@@ -1592,8 +1585,7 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
 	    */
 	   input->list = g_list_remove_link(input->list, input->active);
 	   libbalsa_emailData_free(addy);
-	   input->active->data = NULL;
-	   g_list_free(input->active);
+	   g_list_free_1(input->active);
 	   input->active = list;
        }
 
@@ -1680,8 +1672,7 @@ libbalsa_delete_forward_character(LibBalsaAddressEntry *address_entry)
 	     */
 	    input->list = g_list_remove_link(input->list, list);
 	    libbalsa_emailData_free(extra);
-	    list->data = NULL;
-	    g_list_free(list);
+	    g_list_free_1(list);
 	}
     /*
      * Normal character needs deleting.
@@ -2383,8 +2374,8 @@ libbalsa_cut_clipboard(LibBalsaAddressEntry *address_entry)
 	     list != end;
 	     list = g_list_next(start)) {
 	    libbalsa_emailData_free(list->data);
-	    list->data = NULL;
 	    g_list_remove_link(address_entry->input->list, list);
+            g_list_free_1(list);
 	}
     }
 

@@ -93,8 +93,13 @@ extern "C" {
 
     void balsa_index_redraw_current(BalsaIndex *);
 
+/* move or copy a list of messages */
+    void balsa_index_transfer(GList * messages,
+                              LibBalsaMailbox * from_mailbox,
+                              LibBalsaMailbox * to_mailbox,
+                              BalsaIndex * from_bindex, gboolean copy);
+
 /* select up/down the index */
-    void balsa_index_select_next_threaded(BalsaIndex * bindex);
     void balsa_index_select_next(BalsaIndex *);
     void balsa_index_select_next_unread(BalsaIndex * bindex);
     void balsa_index_select_next_flagged(BalsaIndex * bindex);
@@ -141,6 +146,12 @@ extern "C" {
 				   gint, gpointer);
     void balsa_index_refresh_size (GtkNotebook *, GtkNotebookPage *,
 				   gint, gpointer);
+
+    /* Change the display of all indexes when balsa_app.hide_deleted is
+     * changed */
+    void balsa_index_hide_deleted(gboolean hide);
+    void balsa_index_sync_backend(LibBalsaMailbox * mailbox);
+
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

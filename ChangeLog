@@ -1,3 +1,12 @@
+2002-05-10  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/files.[hc] (libbalsa_icon_finder): return icon mime
+	type if requested.
+	* libbalsa/misc.c: gnome-vfs requires absolute paths and unusually
+	interprets const return type (#81359).
+	* src/{balsa-message.c, print.c}: use updated API.
+	* src/sendmsg-window.[hc]: ditto.
+	
 2002-05-08  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/address.[hc]: libbalsa_address_new_*from_string()

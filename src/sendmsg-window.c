@@ -1072,7 +1072,7 @@ add_extbody_attachment(GnomeIconList *ilist,
     attach->delete_on_destroy = delete_on_destroy;
     attach->as_extbody = TRUE;
 
-    pix = libbalsa_icon_finder("message/external-body", attach->filename);
+    pix = libbalsa_icon_finder("message/external-body", attach->filename,NULL);
     label = g_strdup_printf ("%s (%s)", attach->filename, 
 			     "message/external-body");
     pos = gnome_icon_list_append(ilist, pix, label);
@@ -1212,10 +1212,8 @@ file_attachment(GtkWidget * widget, GnomeIconList * ilist)
     gnome_icon_list_remove(ilist, num);
     
     /* as this worked before, don't do too much (==any) error checking... */
-    content_type = attach->force_mime_type
-        ? g_strdup(attach->force_mime_type) 
-	: libbalsa_lookup_mime_type(attach->filename);
-    pix = libbalsa_icon_finder(content_type, attach->filename);
+    pix = libbalsa_icon_finder(attach->force_mime_type, attach->filename,
+                               &content_type);
     label = g_strdup_printf ("%s (%s)", g_basename(attach->filename), 
 			     content_type);
     gnome_icon_list_insert(ilist, num, pix, label);
@@ -1313,17 +1311,13 @@ destroy_attachment (gpointer data)
    adds given filename to the list.
    takes over the ownership of filename.
 */
-void
+gboolean
 add_attachment(GnomeIconList * iconlist, char *filename, 
                gboolean is_a_temp_file, const gchar *forced_mime_type)
 {
     GtkWidget *msgbox;
-    gchar *content_type;
+    gchar *content_type = NULL;
     gchar *pix, *err_msg;
-
-    content_type = forced_mime_type ? g_strdup(forced_mime_type)
-	: libbalsa_lookup_mime_type(filename);
-    pix = libbalsa_icon_finder(content_type, filename);
 
     if (balsa_app.debug)
 	fprintf(stderr, "Trying to attach '%s'\n", filename);
@@ -1337,9 +1331,9 @@ add_attachment(GnomeIconList * iconlist, char *filename,
         gtk_widget_destroy(msgbox);
 	g_free(err_msg);
         g_free(content_type);
-	return;
+	return FALSE;
     }
-
+    pix = libbalsa_icon_finder(forced_mime_type, filename, &content_type);
     if (pix && (err_msg=check_if_regular_file(pix)) == NULL) {
 	gint pos;
 	gchar *label;
@@ -1356,9 +1350,9 @@ add_attachment(GnomeIconList * iconlist, char *filename,
             g_error_free(err);
         }
 
-        label =
-            g_strdup_printf("%s (%s)", utf8name ? utf8name : basename,
-                            content_type);
+        label = g_strdup_printf("%s (%s)", 
+                                utf8name ? utf8name : basename,
+                                content_type);
 
 	pos = gnome_icon_list_append(iconlist, pix, label);
 	attach_data->filename = filename;
@@ -1386,8 +1380,9 @@ add_attachment(GnomeIconList * iconlist, char *filename,
 		 _("Default attachment pixmap (attachment.png) cannot be found:\n"
 		   "Your balsa installation is corrupted."));
     }
-    g_free ( pix ) ;
+    g_free(pix) ;
     g_free(content_type);
+    return TRUE;
 }
 
 static gchar* 

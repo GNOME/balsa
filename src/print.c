@@ -676,7 +676,7 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
 	conttype = libbalsa_lookup_mime_type(body->filename);
 
     /* get a pixbuf according to the mime type */
-    icon_name = libbalsa_icon_finder(conttype, NULL);
+    icon_name = libbalsa_icon_finder(conttype, NULL, NULL);
     pdata->pixbuf = gdk_pixbuf_new_from_file(icon_name, &err);
     if(err) { g_warning("error loading pixbuf."); g_error_free(err); }
     pdata->image_width = gdk_pixbuf_get_width (pdata->pixbuf);

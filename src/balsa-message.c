@@ -1752,7 +1752,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body)
     else
 	icon_title = g_strdup_printf("(%s)", content_type);
 
-    pix = libbalsa_icon_finder(content_type, body->filename);
+    pix = libbalsa_icon_finder(content_type, body->filename, NULL);
 
     part_create_menu (info);
     pos = gnome_icon_list_append(GNOME_ICON_LIST(bm->part_list),

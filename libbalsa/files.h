@@ -41,6 +41,7 @@ gchar *balsa_file_finder(const gchar * filename, const gchar * splice,
 #define balsa_pixmap_finder_no_warn(filename) \
     (balsa_file_finder((filename), "pixmaps", NULL, FALSE))
 
-gchar *libbalsa_icon_finder(const char *mime_type, const char *filename);
+gchar *libbalsa_icon_finder(const char *mime_type, const char *filename,
+                            gchar** used_type);
 
 #endif

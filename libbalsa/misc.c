@@ -38,20 +38,30 @@
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
+/* libbalsa_lookup_mime_type:
+   find out mime type of a file. Must work for both relative and absolute
+   paths.
+*/
 gchar*
 libbalsa_lookup_mime_type(const gchar * path)
 {
     GnomeVFSFileInfo* vi = gnome_vfs_file_info_new();
-    gchar* res;
+    gchar* uri, *mime_type;
 
-    g_return_val_if_fail(path != NULL, NULL);
-
-    gnome_vfs_get_file_info (path, vi,
+    if(g_path_is_absolute(path))
+        uri = g_strconcat("file://", path, NULL);
+    else {
+        gchar* curr_dir = g_get_current_dir();
+        uri = g_strconcat("file://", curr_dir, "/", path, NULL);
+        g_free(curr_dir);
+    }
+    gnome_vfs_get_file_info (uri, vi,
                              GNOME_VFS_FILE_INFO_GET_MIME_TYPE
                              | GNOME_VFS_FILE_INFO_FOLLOW_LINKS);
-    res = g_strdup(gnome_vfs_file_info_get_mime_type(vi));
+    g_free(uri);
+    mime_type = g_strdup(gnome_vfs_file_info_get_mime_type(vi));
     gnome_vfs_file_info_unref(vi);
-    return res;
+    return mime_type;
 }
 
 gchar *

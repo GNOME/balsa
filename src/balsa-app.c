@@ -181,31 +181,32 @@ balsa_app_init (void)
 gint
 do_load_mailboxes (void)
 {
+  gchar *spool;
   if( check_special_mailboxes () )
 	return FALSE;
 
-  load_local_mailboxes ();
-
-    switch (balsa_app.inbox->type)
-    {
-    case MAILBOX_MAILDIR:
-    case MAILBOX_MBOX:
-    case MAILBOX_MH: 
-      mailbox_init (MAILBOX_LOCAL (balsa_app.inbox)->path,
-		    balsa_error,
-		    update_gui);
+  switch (balsa_app.inbox->type)
+  {
+  case MAILBOX_MAILDIR:
+  case MAILBOX_MBOX:
+  case MAILBOX_MH: 
+      spool = g_strdup(MAILBOX_LOCAL (balsa_app.inbox)->path);
+      break;
+      
+  case MAILBOX_IMAP:
+  case MAILBOX_POP3:
+      spool = balsa_guess_mail_spool();
       break;
 
-    case MAILBOX_IMAP:
-      mailbox_init (getenv("MAIL"), balsa_error, update_gui);
-      break;
-
-    case MAILBOX_POP3:
-      break;
-    default:
+  default:
       fprintf (stderr, "do_load_mailboxes: Unknown inbox mailbox type\n");
-      break;
-    }
+      return FALSE;
+  }
+
+  mailbox_init (spool, balsa_error, update_gui);
+  g_free(spool);
+
+  load_local_mailboxes ();
 
   return TRUE;
 }

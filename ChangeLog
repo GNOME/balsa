@@ -1,3 +1,8 @@
+2000-06-12  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.c: redundant resetting of Spoolfile removed.
+	* src/balsa-app.c: use balsa_guess_mail_spool for setting Spoolfile.
+	
 2000-06-11  Peter Williams  <peter@beta.newton.cx>
 
 	* src/mblist-window.c (mblist_create_context_menu): Fix typo

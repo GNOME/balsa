@@ -230,13 +230,13 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
   balsa_error_toggle_fatality( FALSE );
 
   list = g_list_first (mailboxes);
-
- /* if (to->type != MAILBOX_MBOX)
-    return;
-  */
   
-  Spoolfile = MAILBOX_LOCAL (to)->path;
-
+  /* 1. Spoolfile is set in mailbox_init; 
+     2. the 'to' folder doesn't have to be local, can be IMAP
+     3. remove this comment when its meaning become obvious.
+     Spoolfile = MAILBOX_LOCAL (to)->path;
+  */
+     
   while (list)
   {
     mailbox = list->data;

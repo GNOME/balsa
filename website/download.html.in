@@ -76,7 +76,7 @@
 	<th colspan="2" align=left><big>Experimental release</big></th>
 </tr>
 <tr>
-<td colspan="2"><b>2000.06.21</b>: This is pretty much all we have in CVS: new
+<td colspan="2"><b>2000.07.03</b>: This is pretty much all we have in CVS: new
 message browser, improved address book handling, more reliable mailbox
 backend. The code has however some experimental and unfinished
 features enabled so be warned! The POP problems some people

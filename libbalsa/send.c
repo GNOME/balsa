@@ -219,19 +219,23 @@ ensure_send_progress_dialog()
     GtkWidget* label;
     if(send_dialog) return;
 
-    send_dialog = gnome_dialog_new(_("Sending Mail..."), _("Hide"), NULL);
+    send_dialog = gtk_dialog_new_with_buttons(_("Sending Mail..."), 
+                                              NULL,
+                                              GTK_DIALOG_DESTROY_WITH_PARENT,
+                                              _("Hide"), 
+                                              GTK_RESPONSE_NONE,
+                                              NULL);
     gtk_window_set_wmclass(GTK_WINDOW(send_dialog), "send_dialog", "Balsa");
-    gnome_dialog_set_close(GNOME_DIALOG(send_dialog), TRUE);
     label = gtk_label_new(_("Sending Mail..."));
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(send_dialog)->vbox),
 		       label, FALSE, FALSE, 0);
 
     send_progress_message = gtk_label_new("");
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(send_dialog)->vbox),
 		       send_progress_message, FALSE, FALSE, 0);
 
     send_dialog_bar = gtk_progress_bar_new();
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(send_dialog)->vbox),
 		       send_dialog_bar, FALSE, FALSE, 0);
 
     gtk_widget_show_all(send_dialog);

@@ -2,6 +2,9 @@
 
 	* src/print.c: make print work with new API (still some warnings
 	displayed occassionally).
+	* libbalsa/{send.c,identity.c}: use GtkDialog instead of
+	GnomeDialog.
+	* src/main-window.c: run identity dialog with gtk_dialog_run().
 	
 2002-04-11 Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 

@@ -559,7 +559,8 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
     }
 
     if (d)
-	    libbalsa_messages_delete (d, TRUE);
+        libbalsa_messages_change_flag (d, LIBBALSA_MESSAGE_FLAG_DELETED,
+                                       TRUE);
 
     libbalsa_mailbox_check(dest);
     return r;
@@ -755,8 +756,9 @@ libbalsa_message_reply(LibBalsaMessage * message)
 
 /* Assume all messages come from the same mailbox */
 void
-libbalsa_messages_read(GList * messages,
-		       gboolean set)
+libbalsa_messages_change_flag(GList * messages,
+                              LibBalsaMessageFlag flag,
+                              gboolean set)
 {
     GList * notif_list = NULL;
     LibBalsaMessage * message;
@@ -764,8 +766,8 @@ libbalsa_messages_read(GList * messages,
     /* Construct the list of messages that actually change state */
     while (messages) {
 	message = LIBBALSA_MESSAGE(messages->data);
-	if ( (set && (LIBBALSA_MESSAGE_IS_UNREAD(message))) ||
-	     (!set && !(LIBBALSA_MESSAGE_IS_UNREAD(message))) )
+ 	if ( (set && !(message->flags & flag)) ||
+             (!set && (message->flags & flag)) )
 	    notif_list = g_list_prepend(notif_list, message);
 	messages = g_list_next(messages);
     }
@@ -778,101 +780,17 @@ libbalsa_messages_read(GList * messages,
 	RETURN_IF_MAILBOX_CLOSED(mbox);
 	while (lst) {
 	    message = LIBBALSA_MESSAGE(lst->data);	    
-	    if (!set)
-		libbalsa_message_set_flag(message, LIBBALSA_MESSAGE_FLAG_NEW, 0);
+	    if (set)
+		libbalsa_message_set_flag(message, flag, 0);
 	    else
-		libbalsa_message_set_flag(message, 0, LIBBALSA_MESSAGE_FLAG_NEW);
+		libbalsa_message_set_flag(message, 0, flag);
 	    lst = g_list_next(lst);
 	}
 
 	UNLOCK_MAILBOX(mbox);
 	/* Emission of notification to the owning mailbox */
 	libbalsa_mailbox_messages_status_changed(mbox, notif_list,
-						 LIBBALSA_MESSAGE_FLAG_NEW);
-	g_list_free(notif_list);
-    }
-}
-
-/* Assume all messages come from the same mailbox */
-void
-libbalsa_messages_flag(GList * messages, gboolean flag)
-{
-    GList * notif_list = NULL;
-    LibBalsaMessage * message;
-
-    g_return_if_fail(messages != NULL);
-    g_return_if_fail( LIBBALSA_MESSAGE(messages->data)->mailbox);
-
-    /* Construct the list of messages that actually change state */
-    while (messages) {
-	message = LIBBALSA_MESSAGE(messages->data);
-	if ( (flag && !(LIBBALSA_MESSAGE_IS_FLAGGED(message))) ||
-	     (!flag && (LIBBALSA_MESSAGE_IS_FLAGGED(message))) )
-	    notif_list = g_list_prepend(notif_list, message);
-	messages = g_list_next(messages);
-    }
-    
-    if (notif_list) {
-	LibBalsaMailbox * mbox = LIBBALSA_MESSAGE(notif_list->data)->mailbox;
-	GList * lst = notif_list;
-
-	LOCK_MAILBOX(mbox);
-	RETURN_IF_MAILBOX_CLOSED(mbox);
-
-	while (lst) {
-	    message = LIBBALSA_MESSAGE(lst->data);
-	    if (flag)
-		libbalsa_message_set_flag(message, LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
-	    else
-		libbalsa_message_set_flag(message, 0, LIBBALSA_MESSAGE_FLAG_FLAGGED);
-	    lst = g_list_next(lst);
-	}
-
-	UNLOCK_MAILBOX(mbox);
-	/* Emission of notification to the owning mailbox */
-	libbalsa_mailbox_messages_status_changed(mbox, notif_list,
-						 LIBBALSA_MESSAGE_FLAG_FLAGGED);    
-	g_list_free(notif_list);
-    }
-}
-
-/* Slightly optimized version for a list of message [un]deletions
-   Assume that all messages are in the same mailbox
-*/
-void
-libbalsa_messages_delete(GList * messages, gboolean del)
-{
-    LibBalsaMessage *message = NULL;
-    GList *notif_list = NULL;
-
-    /* Construct the list of messages that actually change state */
-    while (messages) {
-	message = LIBBALSA_MESSAGE(messages->data);
-        if ((del && !(LIBBALSA_MESSAGE_IS_DELETED(message)))
-            || (!del && (LIBBALSA_MESSAGE_IS_DELETED(message))))
-	    notif_list = g_list_prepend(notif_list, message);
-	messages = g_list_next(messages);
-    }
-    if (notif_list) {
-	LibBalsaMailbox *mbox = LIBBALSA_MESSAGE(notif_list->data)->mailbox;
-	GList *lst = notif_list;
-
-	LOCK_MAILBOX(mbox);
-	RETURN_IF_MAILBOX_CLOSED(mbox);
-
-	do {
-	    message = LIBBALSA_MESSAGE(lst->data);
-	    g_assert(message->mailbox == mbox);
-	    if (del)
-		libbalsa_message_set_flag(message, LIBBALSA_MESSAGE_FLAG_DELETED, 0);
-	    else
-		libbalsa_message_set_flag(message, 0, LIBBALSA_MESSAGE_FLAG_DELETED);
-	} while ((lst = g_list_next(lst)) != NULL);
-	UNLOCK_MAILBOX(mbox);
-
-	/* Emission of notification to the owning mailbox */
-	libbalsa_mailbox_messages_status_changed(mbox, notif_list,
-						 LIBBALSA_MESSAGE_FLAG_DELETED);
+						 flag);
 	g_list_free(notif_list);
     }
 }
@@ -1000,7 +918,8 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
     if ((LIBBALSA_MESSAGE_IS_UNREAD(message)) && read) {
 	GList * messages = g_list_prepend(NULL, message);
 	
-	libbalsa_messages_read(messages, TRUE);
+	libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_NEW,
+                                      FALSE);
 	g_list_free(messages);
     }
     return TRUE;

@@ -160,10 +160,10 @@ static void save_current_part_cb(GtkWidget * widget, gpointer data);
 static void view_msg_source_cb(GtkWidget * widget, gpointer data);
 
 static void trash_message_cb(GtkWidget * widget, gpointer data);
-static void delete_message_cb(GtkWidget * widget, gpointer data);
-static void undelete_message_cb(GtkWidget * widget, gpointer data);
 static void toggle_flagged_message_cb(GtkWidget * widget, gpointer data);
+static void toggle_deleted_message_cb(GtkWidget * widget, gpointer data);
 static void toggle_new_message_cb(GtkWidget * widget, gpointer data);
+static void toggle_answered_message_cb(GtkWidget * widget, gpointer data);
 static void store_address_cb(GtkWidget * widget, gpointer data);
 static void wrap_message_cb(GtkWidget * widget, gpointer data);
 static void show_no_headers_cb(GtkWidget * widget, gpointer data);
@@ -202,6 +202,7 @@ static void remove_duplicates_cb(GtkWidget * widget, gpointer data);
 static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
 
+static void view_menu_cb(GtkWidget * widget, gpointer data);
 static void mailbox_commit_changes(GtkWidget * widget, gpointer data);
 static void mailbox_commit_all(GtkWidget * widget, gpointer data);
 
@@ -445,16 +446,26 @@ static GnomeUIInfo message_toggle_menu[] = {
 #define MENU_MESSAGE_TOGGLE_FLAGGED_POS 0
     /* ! */
     {
-        GNOME_APP_UI_ITEM, N_("Flagged"), N_("Toggle flagged"),
+        GNOME_APP_UI_ITEM, N_("_Flagged"), N_("Toggle flagged"),
         toggle_flagged_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         BALSA_PIXMAP_MENU_FLAGGED, 'X', 0, NULL
     },
-#define MENU_MESSAGE_TOGGLE_NEW_POS 1
-    /* ! */
+#define MENU_MESSAGE_TOGGLE_DELETED_POS 1
+    { GNOME_APP_UI_ITEM, N_("_Deleted"), 
+      N_("Toggle deleted flag"),
+      toggle_deleted_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+      GNOME_STOCK_TRASH, 'D', GDK_CONTROL_MASK, NULL },
+#define MENU_MESSAGE_TOGGLE_NEW_POS 2
     {
-        GNOME_APP_UI_ITEM, N_("New"), N_("Toggle New"),
+        GNOME_APP_UI_ITEM, N_("_New"), N_("Toggle New"),
         toggle_new_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         BALSA_PIXMAP_MENU_NEW, 'R', GDK_CONTROL_MASK, NULL
+    },
+#define MENU_MESSAGE_TOGGLE_ANSWERED_POS 3
+    {
+        GNOME_APP_UI_ITEM, N_("_Answered"), N_("Toggle Answered"),
+        toggle_answered_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+        BALSA_PIXMAP_MENU_NEW, 0, 0, NULL
     },
     GNOMEUIINFO_END
 };
@@ -546,23 +557,11 @@ static GnomeUIInfo message_menu[] = {
         trash_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         GNOME_STOCK_TRASH, 'D', 0, NULL
     },
-#define MENU_MESSAGE_DELETE_POS 15
-    { GNOME_APP_UI_ITEM, N_("_Delete"), 
-      N_("Delete the current message"),
-      delete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      GNOME_STOCK_TRASH, 'D', GDK_CONTROL_MASK, NULL },
-#define MENU_MESSAGE_UNDEL_POS 16
-    /* U */
-    {
-        GNOME_APP_UI_ITEM, N_("_Undelete"), N_("Undelete the message"),
-        undelete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-        GTK_STOCK_UNDELETE, 'U', 0, NULL
-    },
-#define MENU_MESSAGE_TOGGLE_POS 17
+#define MENU_MESSAGE_TOGGLE_POS 15
     /* ! */
-    GNOMEUIINFO_SUBTREE(N_("_Toggle"), message_toggle_menu),
+    GNOMEUIINFO_SUBTREE(N_("_Toggle flag"), message_toggle_menu),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_STORE_ADDRESS_POS 19
+#define MENU_MESSAGE_STORE_ADDRESS_POS 17
     /* S */
     {
         GNOME_APP_UI_ITEM, N_("_Store Address..."),
@@ -619,7 +618,21 @@ static GnomeUIInfo mailbox_menu[] = {
                            mailbox_conf_delete_cb,
                            GTK_STOCK_REMOVE),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_COMMIT_POS 10
+#define MENU_MAILBOX_VIEW_DELETED_POS 10
+    GNOMEUIINFO_TOGGLEITEM_DATA
+    (N_("_Deleted messages"),  "",
+     view_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_DELETED), NULL),
+    GNOMEUIINFO_TOGGLEITEM_DATA
+    (N_("_Read messages"),     "",
+     view_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_NEW), NULL),
+    GNOMEUIINFO_TOGGLEITEM_DATA
+    (N_("_Flagged messages"),  "",
+     view_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_FLAGGED), NULL),
+    GNOMEUIINFO_TOGGLEITEM_DATA
+    (N_("_Answered messages"), "",
+     view_menu_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_REPLIED), NULL),
+    GNOMEUIINFO_SEPARATOR,
+#define MENU_MAILBOX_COMMIT_POS 15
     GNOMEUIINFO_ITEM_STOCK(
         N_("Co_mmit Current"),
         N_("Commit the changes in the currently opened mailbox"),
@@ -630,21 +643,21 @@ static GnomeUIInfo mailbox_menu[] = {
         N_("Commit the changes in all mailboxes"),
         mailbox_commit_all,
         GTK_STOCK_REFRESH),
-#define MENU_MAILBOX_CLOSE_POS 12
+#define MENU_MAILBOX_CLOSE_POS 17
     GNOMEUIINFO_ITEM_STOCK(N_("_Close"), N_("Close mailbox"),
                            mailbox_close_cb, GTK_STOCK_CLOSE),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_EMPTY_TRASH_POS 14
+#define MENU_MAILBOX_EMPTY_TRASH_POS 19
     GNOMEUIINFO_ITEM_STOCK(N_("Empty _Trash"),
                            N_("Delete messages from the Trash mailbox"),
                            empty_trash, GTK_STOCK_REMOVE),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_APPLY_FILTERS 16
+#define MENU_MAILBOX_APPLY_FILTERS 21
     GNOMEUIINFO_ITEM_STOCK(N_("Edit/Apply _Filters"),
                            N_("Filter the content of the selected mailbox"),
                            filter_run_cb, GTK_STOCK_PROPERTIES),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_REMOVE_DUPLICATES 18
+#define MENU_MAILBOX_REMOVE_DUPLICATES 23
     GNOMEUIINFO_ITEM_STOCK(N_("_Remove Duplicates"),
                            N_("Remove duplicated messages "
                               "from the selected mailbox"),
@@ -1117,12 +1130,12 @@ enable_message_menus(LibBalsaMessage * message)
         BALSA_PIXMAP_MARKED_NEW,  BALSA_PIXMAP_PRINT
     };
     const static GnomeUIInfo* mods[] = { /* menu items to modify message */
-        &message_menu[MENU_MESSAGE_DELETE_POS], 
         &message_menu[MENU_MESSAGE_TRASH_POS],
-        &message_menu[MENU_MESSAGE_UNDEL_POS],
         &message_menu[MENU_MESSAGE_TOGGLE_POS],
+        &message_toggle_menu[MENU_MESSAGE_TOGGLE_DELETED_POS],
         &message_toggle_menu[MENU_MESSAGE_TOGGLE_FLAGGED_POS],
-        &message_toggle_menu[MENU_MESSAGE_TOGGLE_NEW_POS]
+        &message_toggle_menu[MENU_MESSAGE_TOGGLE_NEW_POS],
+        &message_toggle_menu[MENU_MESSAGE_TOGGLE_ANSWERED_POS]
     };
     /* menu items requiring a message */
     const static GnomeUIInfo* std_menu[] = { 
@@ -2501,36 +2514,38 @@ trash_message_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-delete_message_cb(GtkWidget * widget, gpointer data)
+toggle_deleted_message_cb(GtkWidget * widget, gpointer data)
 {
-    balsa_message_delete(widget,
-                         balsa_window_find_current_index(BALSA_WINDOW
-                                                         (data)));
+    LibBalsaMessageFlag f = LIBBALSA_MESSAGE_FLAG_DELETED; 
+    printf("%s: %d\n", __func__, f);
+    balsa_index_toggle_flag
+        (BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))),
+         f);
 }
 
 
 static void
 toggle_flagged_message_cb(GtkWidget * widget, gpointer data)
 {
-    balsa_message_toggle_flagged(widget,
-                                 balsa_window_find_current_index
-                                 (BALSA_WINDOW(data)));
+    balsa_index_toggle_flag
+        (BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))),
+         LIBBALSA_MESSAGE_FLAG_FLAGGED);
 }
 
 static void
 toggle_new_message_cb(GtkWidget * widget, gpointer data)
 {
-    balsa_message_toggle_new(widget,
-                                 balsa_window_find_current_index
-                                 (BALSA_WINDOW(data)));
+    balsa_index_toggle_flag
+        (BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))),
+         LIBBALSA_MESSAGE_FLAG_NEW);
 }
 
 static void
-undelete_message_cb(GtkWidget * widget, gpointer data)
+toggle_answered_message_cb(GtkWidget * widget, gpointer data)
 {
-    balsa_message_undelete(widget,
-                           balsa_window_find_current_index(BALSA_WINDOW
-                                                           (data)));
+    balsa_index_toggle_flag
+        (BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))),
+         LIBBALSA_MESSAGE_FLAG_REPLIED);
 }
 
 static void
@@ -2900,6 +2915,11 @@ mailbox_tab_close_cb(GtkWidget * widget, gpointer data)
    balsa_window_real_close_mbnode(balsa_app.main_window, (BalsaMailboxNode *)data);
 }
 
+static void
+view_menu_cb(GtkWidget * widget, gpointer data)
+{
+    printf("%s\n", __func__);
+}
 
 static void
 mailbox_commit_changes(GtkWidget * widget, gpointer data)
@@ -2959,8 +2979,9 @@ empty_trash(void)
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.trash));
     if(!libbalsa_mailbox_open(balsa_app.trash)) return;
 
-    libbalsa_messages_delete(LIBBALSA_MAILBOX_LOCAL(balsa_app.trash)->msg_list,
-                             TRUE);
+    libbalsa_messages_change_flag
+        (LIBBALSA_MAILBOX_LOCAL(balsa_app.trash)->msg_list,
+         LIBBALSA_MESSAGE_FLAG_DELETED, TRUE);
     libbalsa_mailbox_close(balsa_app.trash);
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
                                 balsa_app.trash);

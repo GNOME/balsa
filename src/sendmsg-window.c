@@ -3508,7 +3508,9 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	} else if (bsmsg->type == SEND_CONTINUE) {
 	    GList * messages = g_list_prepend(NULL, bsmsg->orig_message);
 
-	    libbalsa_messages_delete(messages, TRUE);
+	    libbalsa_messages_change_flag(messages,
+                                          LIBBALSA_MESSAGE_FLAG_DELETED,
+                                          TRUE);
 	    g_list_free(messages);
 	}
     }
@@ -3593,7 +3595,9 @@ message_postpone(BalsaSendmsg * bsmsg)
 	if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message) {
 	    GList * messages = g_list_prepend(NULL, bsmsg->orig_message);
 
-	    libbalsa_messages_delete(messages, TRUE);
+	    libbalsa_messages_change_flag(messages,
+                                          LIBBALSA_MESSAGE_FLAG_DELETED,
+                                          TRUE);
 	    g_list_free(messages);
 	}
     }

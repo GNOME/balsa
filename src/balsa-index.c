@@ -1514,7 +1514,9 @@ bndx_do_delete(BalsaIndex* index, gboolean move_to_trash)
 	    libbalsa_messages_move(messages, balsa_app.trash);
 	    enable_empty_trash(TRASH_FULL);
 	} else {
-	    libbalsa_messages_delete(messages, TRUE);
+	    libbalsa_messages_change_flag(messages,
+                                          LIBBALSA_MESSAGE_FLAG_DELETED,
+                                          TRUE);
 	    if (index == trash)
 		enable_empty_trash(TRASH_CHECK);
 	}
@@ -1530,29 +1532,6 @@ balsa_message_move_to_trash(GtkWidget * widget, gpointer user_data)
 {
     g_return_if_fail(user_data != NULL);
     bndx_do_delete(BALSA_INDEX(user_data), TRUE);
-}
-
-void
-balsa_message_delete(GtkWidget * widget, gpointer user_data)
-{
-    g_return_if_fail(user_data != NULL);
-    bndx_do_delete(BALSA_INDEX(user_data), FALSE);
-}
-
-void
-balsa_message_undelete(GtkWidget * widget, gpointer user_data)
-{
-    GList *l;
-     BalsaIndex* index;
-
-    g_return_if_fail(widget != NULL);
-    g_return_if_fail(user_data != NULL);
-
-    index = BALSA_INDEX (user_data);
-
-    l = balsa_index_selected_list(index);
-    libbalsa_messages_delete(l, FALSE);
-    g_list_free(l);
 }
 
 gint
@@ -1578,9 +1557,8 @@ balsa_find_notebook_page_num(LibBalsaMailbox * mailbox)
 /* This function toggles the given attribute of a list of messages,
    using given callback.
  */
-static void
-balsa_message_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag,
-                          void(*cb)(GList*, gboolean))
+void
+balsa_index_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag)
 {
     GList *list, *l;
     int is_all_flagged = TRUE;
@@ -1595,43 +1573,37 @@ balsa_message_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag,
 	}
     }
 
-    /* If they all have the flag set, then unset them. Otherwise, set
-     * them all.
-     * Note: the callback for `toggle unread' changes the `read' flag,
-     * but the callback for `toggle flagged' changes `flagged'
-     */
-
-    new_flag =
-        (flag ==
-         LIBBALSA_MESSAGE_FLAG_NEW ? is_all_flagged : !is_all_flagged);
-
-    (*cb) (l, new_flag);
+    libbalsa_messages_change_flag(l, flag, !is_all_flagged);
 }
 
+static void
+bi_toggle_deleted_cb(GtkWidget * widget, gpointer user_data)
+{
+    g_return_if_fail(user_data != NULL);
+
+    balsa_index_toggle_flag(BALSA_INDEX(user_data), 
+                            LIBBALSA_MESSAGE_FLAG_DELETED);
+}
 /* This function toggles the FLAGGED attribute of a list of messages
  */
-void
-balsa_message_toggle_flagged(GtkWidget * widget, gpointer user_data)
+static void
+bi_toggle_flagged_cb(GtkWidget * widget, gpointer user_data)
 {
     g_return_if_fail(user_data != NULL);
 
-    balsa_message_toggle_flag(BALSA_INDEX(user_data), 
-                              LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                              libbalsa_messages_flag);
+    balsa_index_toggle_flag(BALSA_INDEX(user_data), 
+                            LIBBALSA_MESSAGE_FLAG_FLAGGED);
 }
 
-
-/* This function toggles the NEW attribute of a list of messages
- */
-void
-balsa_message_toggle_new(GtkWidget * widget, gpointer user_data)
+static void
+bi_toggle_new_cb(GtkWidget * widget, gpointer user_data)
 {
     g_return_if_fail(user_data != NULL);
 
-    balsa_message_toggle_flag(BALSA_INDEX(user_data), 
-                              LIBBALSA_MESSAGE_FLAG_NEW,
-                              libbalsa_messages_read);
+    balsa_index_toggle_flag(BALSA_INDEX(user_data), 
+                            LIBBALSA_MESSAGE_FLAG_NEW);
 }
+
 
 static void
 mru_menu_cb(gchar * url, BalsaIndex * index)
@@ -1684,12 +1656,12 @@ bndx_popup_menu_create(BalsaIndex * index)
     index->delete_item =
         create_stock_menu_item(menu, GNOME_STOCK_TRASH,
                                _("_Delete"),
-                               GTK_SIGNAL_FUNC(balsa_message_delete),
+                               GTK_SIGNAL_FUNC(bi_toggle_deleted_cb),
                                index);
     index->undelete_item =
         create_stock_menu_item(menu, GTK_STOCK_UNDELETE,
                                _("_Undelete"),
-                               GTK_SIGNAL_FUNC(balsa_message_undelete),
+                               GTK_SIGNAL_FUNC(bi_toggle_deleted_cb),
                                index);
     index->move_to_trash_item =
         create_stock_menu_item(menu, GNOME_STOCK_TRASH,
@@ -1701,10 +1673,10 @@ bndx_popup_menu_create(BalsaIndex * index)
     submenu = gtk_menu_new();
     create_stock_menu_item(submenu, BALSA_PIXMAP_MENU_FLAGGED,
                            _("_Flagged"),
-                           GTK_SIGNAL_FUNC(balsa_message_toggle_flagged),
+                           GTK_SIGNAL_FUNC(bi_toggle_flagged_cb),
                            index);
     create_stock_menu_item(submenu, BALSA_PIXMAP_MENU_NEW, _("_Unread"),
-                           GTK_SIGNAL_FUNC(balsa_message_toggle_new),
+                           GTK_SIGNAL_FUNC(bi_toggle_new_cb),
                            index);
 
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
@@ -1911,7 +1883,9 @@ balsa_index_remove_duplicates(BalsaIndex * index)
 	    libbalsa_messages_move(messages, balsa_app.trash);
 	    enable_empty_trash(TRASH_FULL);
 	} else {
-	    libbalsa_messages_delete(messages, TRUE);
+	    libbalsa_messages_change_flag(messages, 
+                                          LIBBALSA_MESSAGE_FLAG_DELETED,
+                                          TRUE);
             enable_empty_trash(TRASH_CHECK);
 	}
 	g_list_free(messages);

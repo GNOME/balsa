@@ -586,7 +586,9 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	} else {
 	    GList * messages = g_list_prepend(NULL, msg);
 
-            libbalsa_messages_flag(messages, TRUE);
+            libbalsa_messages_change_flag(messages,
+                                          LIBBALSA_MESSAGE_FLAG_FLAGGED,
+                                          TRUE);
 	    g_list_free(messages);
 	    /*
 	       The message needs to be filtered and the newlines converted to
@@ -802,13 +804,16 @@ handle_successful_send (smtp_message_t message, void *be_verbose)
 	if (mqi != NULL && mqi->orig != NULL && mqi->refcount <= 0) {
 	    if (mqi->orig->mailbox) {
 		messages = g_list_prepend(NULL, mqi->orig);
-		libbalsa_messages_delete(messages, TRUE);
+		libbalsa_messages_change_flag(messages,
+                                              LIBBALSA_MESSAGE_FLAG_DELETED,
+                                              TRUE);
 		g_list_free(messages);
 	    }
 	}
     } else {
 	messages = g_list_prepend(NULL, mqi->orig);
-        libbalsa_messages_flag(messages, FALSE);
+        libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_FLAGGED,
+                                      FALSE);
 	g_list_free(messages);
 	/* XXX - Show the poor user the status codes and message. */
         if(*(gboolean*)be_verbose) {
@@ -1016,7 +1021,9 @@ handle_successful_send(MessageQueueItem *mqi)
     if (mqi->orig->mailbox) {
 	GList * messages = g_list_prepend(NULL, mqi->orig);
 
-	libbalsa_messages_delete(messages, TRUE);
+	libbalsa_messages_change_flag(messages, 
+                                      LIBBALSA_MESSAGE_FLAG_DELETED,
+                                      TRUE);
 	g_list_free(messages);
     }
     mqi->status = MQI_SENT;

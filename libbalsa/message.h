@@ -59,7 +59,7 @@ enum _LibBalsaMessageFlag {
     LIBBALSA_MESSAGE_FLAG_DELETED = 1 << 2,
     LIBBALSA_MESSAGE_FLAG_REPLIED = 1 << 3,
     LIBBALSA_MESSAGE_FLAG_FLAGGED = 1 << 4,
-    LIBBALSA_MESSAGE_FLAG_RECENT = 1 << 5,
+    LIBBALSA_MESSAGE_FLAG_RECENT = 1 << 5
 };
 
 enum _LibBalsaMsgCreateResult {
@@ -267,12 +267,12 @@ gboolean libbalsa_messages_move(GList * messages,
 gboolean libbalsa_messages_copy(GList * messages,
                                 LibBalsaMailbox * dest);
 
-void libbalsa_messages_delete(GList * messages, gboolean del);
-
-void libbalsa_messages_read(GList * messages, gboolean read);
-void libbalsa_messages_flag(GList * messages, gboolean flag);
+void libbalsa_messages_change_flag(GList * messages,
+                                   LibBalsaMessageFlag flag,
+                                   gboolean set);
 
 void libbalsa_message_reply(LibBalsaMessage * message);
+void libbalsa_message_clear_recent(LibBalsaMessage * message);
 void libbalsa_message_clear_recent(LibBalsaMessage * message);
 
 void libbalsa_message_append_part(LibBalsaMessage * message,

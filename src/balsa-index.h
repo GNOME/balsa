@@ -132,11 +132,9 @@ extern "C" {
     void balsa_message_continue(GtkWidget * widget, gpointer data);
 
     void balsa_message_move_to_trash(GtkWidget * widget, gpointer user_data);
-    void balsa_message_delete(GtkWidget * widget, gpointer user_data);
-    void balsa_message_undelete(GtkWidget * widget, gpointer user_data);
 
-    void balsa_message_toggle_flagged(GtkWidget * widget, gpointer user_data);
-    void balsa_message_toggle_new(GtkWidget * widget, gpointer user_data);
+    void balsa_message_toggle_flag(BalsaIndex *index,
+                                   LibBalsaMessageFlag flag);
 
     void balsa_index_reset(BalsaIndex * index);
     gint balsa_find_notebook_page_num(LibBalsaMailbox * mailbox);

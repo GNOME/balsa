@@ -515,7 +515,6 @@ imap_flags_cb(unsigned seqno, LibBalsaMailboxImap *mimap)
     struct message_info *msg_info = message_info_from_msgno(mimap, seqno);
     ImapMessage *imsg  = imap_mbox_handle_get_msg(mimap->handle, seqno);
     if(msg_info->message) {
-        printf("updating flags...\n");
         lbimap_update_flags(msg_info->message, imsg);
         libbalsa_message_set_icons(msg_info->message);
         libbalsa_mailbox_msgno_changed(LIBBALSA_MAILBOX(mimap), seqno);
@@ -822,7 +821,10 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
     } else {
         LOCK_MAILBOX(mailbox);
-	libbalsa_mailbox_imap_noop(LIBBALSA_MAILBOX_IMAP(mailbox));
+        if(LIBBALSA_MAILBOX_IMAP(mailbox)->handle)
+            libbalsa_mailbox_imap_noop(LIBBALSA_MAILBOX_IMAP(mailbox));
+        else 
+            g_warning("mailbox has open_ref>0 but no handle!\n");
         UNLOCK_MAILBOX(mailbox);
 
 	run_filters_on_reception(LIBBALSA_MAILBOX_IMAP(mailbox));

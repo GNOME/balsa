@@ -255,7 +255,7 @@ msgstr ""
 
 #: src/mailbox-conf.c:194
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-msgstr "Åoåop! brevlådda ej funnen i balsa_app.mailbox-noder?\n"
+msgstr "Åoåop! brevlåda ej funnen i balsa_app.mailbox-noder?\n"
 
 #: src/mailbox-conf.c:238
 msgid "Mailbox Configurator"
@@ -407,7 +407,7 @@ msgstr "Skapa ett nytt meddelande"
 
 #: src/main-window.c:189 src/message-window.c:54
 msgid "_Reply"
-msgstr "Svara"
+msgstr "_Svara"
 
 #: src/main-window.c:189
 msgid "Reply to the current message"
@@ -415,7 +415,7 @@ msgstr "Svara på nuvarande meddelande"
 
 #: src/main-window.c:195 src/message-window.c:60
 msgid "Reply to _all"
-msgstr "Svara till alla"
+msgstr "Svara till _alla"
 
 #: src/main-window.c:196
 msgid "Reply to all recipients of the current message"
@@ -423,7 +423,7 @@ msgstr "Svara till alla mottagare av nuvarande meddelande"
 
 #: src/main-window.c:202 src/message-window.c:67
 msgid "_Forward"
-msgstr "Eftersänd"
+msgstr "_Eftersänd"
 
 #: src/main-window.c:202
 msgid "Forward the current message"
@@ -431,7 +431,7 @@ msgstr "Eftersänd nuvarande meddelande"
 
 #: src/main-window.c:208
 msgid "_Continue"
-msgstr "Fortsätt"
+msgstr "_Fortsätt"
 
 #: src/main-window.c:208
 msgid "Continue editing current message"
@@ -439,7 +439,7 @@ msgstr "Fortsätt redigera nuvarande meddelande"
 
 #: src/main-window.c:215 src/main-window.c:258
 msgid "_Delete"
-msgstr "Radera"
+msgstr "_Radera"
 
 #: src/main-window.c:215
 msgid "Delete the current message"
@@ -447,7 +447,7 @@ msgstr "Radera nuvarande meddelande"
 
 #: src/main-window.c:221
 msgid "_Undelete"
-msgstr "Återskapa"
+msgstr "_Återskapa"
 
 #: src/main-window.c:221
 msgid "Undelete the message"
@@ -467,7 +467,7 @@ msgstr "Lista"
 
 #: src/main-window.c:249
 msgid "_Open"
-msgstr "Öppna"
+msgstr "_Öppna"
 
 #: src/main-window.c:249
 msgid "Open the selected mailbox"
@@ -475,7 +475,7 @@ msgstr "Öppna den valda brevlådan"
 
 #: src/main-window.c:251
 msgid "_Close"
-msgstr "Stäng"
+msgstr "_Stäng"
 
 #: src/main-window.c:251
 msgid "Close the selected mailbox"
@@ -483,7 +483,7 @@ msgstr "Stäng den valda brevlådan"
 
 #: src/main-window.c:254
 msgid "_Add"
-msgstr "Lägg till"
+msgstr "_Lägg till"
 
 #: src/main-window.c:254
 msgid "Add a new mailbox"
@@ -527,11 +527,11 @@ msgstr "Ta bort meddelanden från papperskorgbrevlådan"
 
 #: src/main-window.c:269
 msgid "O_pened"
-msgstr "Öppnad"
+msgstr "Ö_ppnad"
 
 #: src/main-window.c:275
 msgid "_Filters..."
-msgstr "Filter..."
+msgstr "_Filter..."
 
 #: src/main-window.c:275
 msgid "Manage filters"
@@ -539,11 +539,11 @@ msgstr "Sköt om filter"
 
 #: src/main-window.c:293
 msgid "_Message"
-msgstr "Meddelande"
+msgstr "_Meddelande"
 
 #: src/main-window.c:294
 msgid "Mail_boxes"
-msgstr "Brevlådor"
+msgstr "_Brevlådor"
 
 #: src/main-window.c:302
 msgid "Check Email"
@@ -716,7 +716,7 @@ msgstr "E-postadress:"
 #. reply-to address
 #: src/pref-manager.c:642
 msgid "Reply-to address:"
-msgstr "Address att svara till:"
+msgstr "Adress att svara till:"
 
 #. Signature stuff
 #: src/pref-manager.c:653

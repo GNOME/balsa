@@ -514,14 +514,15 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
 }
 
 ImapResponse
-imap_mbox_handle_fetch_structure(ImapMboxHandle* handle, const gchar *seq)
+imap_mbox_handle_fetch_structure(ImapMboxHandle* handle, unsigned seqno)
 {
-  char* cmd;
   ImapResponse rc;
-  
-  cmd = g_strdup_printf("FETCH %s BODY", seq);
-  rc = imap_cmd_exec(handle, cmd);
-  g_free(cmd);
+  ImapMessage *im = imap_mbox_handle_get_msg(handle, seqno);
+  if(!im->body) {
+    char* cmd = g_strdup_printf("FETCH %u BODY", seqno);
+    rc = imap_cmd_exec(handle, cmd);
+    g_free(cmd);
+  } else rc = IMR_OK;
   return rc;
 }
 

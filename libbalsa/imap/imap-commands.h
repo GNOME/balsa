@@ -38,6 +38,8 @@ ImapResponse imap_mbox_store_flag_m(ImapMboxHandle* h, unsigned msgcnt,
                                     unsigned *seqno, ImapMsgFlag flg, 
                                     gboolean state);
 
+ImapResponse imap_mbox_handle_fetch_structure(ImapMboxHandle* handle,
+                                              unsigned seqno);
 ImapResponse imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
                                            unsigned seqno, FILE *fl);
 ImapResponse imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle,

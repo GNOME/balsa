@@ -1314,11 +1314,9 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
 {
     ImapResponse rc;
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-    char seq[15];
-
     g_return_if_fail(mimap->opened);
-    snprintf(seq, sizeof(seq), "%u", (unsigned)message->msgno);
-    rc = imap_mbox_handle_fetch_structure(mimap->handle, seq);
+
+    rc = imap_mbox_handle_fetch_structure(mimap->handle, message->msgno);
     if(rc == IMR_OK) { /* translate ImapData to LibBalsaMessage */
         ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle,
                                                    message->msgno);
@@ -1326,7 +1324,6 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
 	lbm_imap_construct_body(body, im->body);
         libbalsa_message_append_part(message, body);
     }
-    printf("%s: body list: %p\n", __func__, message->body_list);
 }
 
 static gboolean

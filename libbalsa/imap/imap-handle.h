@@ -121,9 +121,6 @@ ImapResponse imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
                                           unsigned lo, unsigned hi,
                                           ImapFetchType ift);
 
-ImapResponse imap_mbox_handle_fetch_structure(ImapMboxHandle* handle,
-                                              const gchar *seq);
-
 ImapMessage* imap_mbox_handle_get_msg(ImapMboxHandle* handle, unsigned seqno);
 ImapMessage* imap_mbox_handle_get_msg_v(ImapMboxHandle* handle, unsigned no);
 unsigned imap_mbox_get_msg_no(ImapMboxHandle* h, unsigned no);

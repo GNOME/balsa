@@ -477,8 +477,8 @@ load_messages (Mailbox * mailbox, gint emit)
   ENVELOPE *envelope;
   MESSAGECACHE *elt;
 
-  for (msgno = mailbox->messages - mailbox->new_messages + 1; 
-       msgno <= mailbox->messages; 
+  for (msgno = mailbox->messages - mailbox->new_messages + 1;
+       msgno <= mailbox->messages;
        msgno++)
     {
       envelope = mail_fetchenvelope (CLIENT_STREAM (mailbox), msgno);
@@ -502,7 +502,7 @@ load_messages (Mailbox * mailbox, gint emit)
 
       mailbox->message_list = g_list_append (mailbox->message_list, message);
       mailbox->new_messages--;
-      
+
       if (emit)
 	send_watcher_new_message (mailbox, message, mailbox->new_messages);
 
@@ -892,6 +892,9 @@ translate_message (ENVELOPE * cenv)
 {
   Message *message;
 
+  if (!cenv)
+    return NULL;
+
   message = message_new ();
 
   message->remail = g_strdup (cenv->remail);
@@ -910,15 +913,15 @@ translate_message (ENVELOPE * cenv)
 }
 
 
-void 
+void
 message_body_ref (Message * message)
 {
   Body *body;
 
- 
+
   if (!message)
     return;
- 
+
   if (message->body_ref > 0)
     {
       message->body_ref++;
@@ -929,8 +932,8 @@ message_body_ref (Message * message)
    * load message body -- lameness
    */
   body = body_new ();
-  body->buffer = g_strdup(mail_fetchtext (CLIENT_STREAM (message->mailbox), 
-					  message->msgno));
+  body->buffer = g_strdup (mail_fetchtext (CLIENT_STREAM (message->mailbox),
+					   message->msgno));
   message->body_list = g_list_append (message->body_list, body);
   message->body_ref++;
 
@@ -945,12 +948,12 @@ message_body_ref (Message * message)
 }
 
 
-void 
+void
 message_body_unref (Message * message)
 {
   GList *list;
   Body *body;
-  
+
   if (!message)
     return;
 

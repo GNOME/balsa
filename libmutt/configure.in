@@ -252,9 +252,12 @@ if test "x$with_gss" != xno  ; then
            gssdir="$dir"; break
         fi
     done
-    # keep CPP set for subsequent CHECK_HEADERS
-    CFLAGS="$CFLAGS -I$dir/include"
-
+    if test x"$dir" != xdefault; then
+        # keep CPP set for subsequent CHECK_HEADERS
+        CPP="$save_CPP -I$dir/include"
+        CFLAGS="$CFLAGS -I$dir/include"
+    fi
+    echo "dir='$dir' gssdir='$gssdir'"
     if test -z "$gssdir"; then
 	AC_MSG_ERROR([GSS requested but no GSS headers found])
     else
@@ -267,9 +270,10 @@ if test "x$with_gss" != xno  ; then
 	save_LIBS="$LIBS"
 	for lib in krb5 des asn1 roken crypt com_err ; do
 	    LIBS="$LIBS -l$lib"
-	    AC_CACHE_VAL(ac_cv_lib_$lib,
-		AC_TRY_LINK(, [main()], [eval av_cv_lib_$lib=yes
-		    extra_libs="$extra_libs -l$lib"], [eval av_cv_lib_$lib=no]))
+            AC_CACHE_CHECK([for -l$lib],[ac_cv_lib_$lib],
+                   AC_TRY_LINK(, [main()], [eval ac_cv_lib_$lib=yes],
+                           [eval ac_cv_lib_$lib=no]))
+           eval "test x\"\$ac_cv_lib_$lib\" = xyes" && extra_libs="$extra_libs -l$lib"
 	    LIBS="$save_LIBS"
 	done
 

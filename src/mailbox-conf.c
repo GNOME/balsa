@@ -109,6 +109,7 @@ mailbox_conf_new (Mailbox * mailbox, gint add_mbox)
 
   mcw = g_malloc (sizeof (MailboxConfWindow));
   mcw->mailbox = mcw->current = 0;
+  mcw->next_page = MC_PAGE_LOCAL;
   if (add_mbox)
     mcw->current = mailbox;
   else
@@ -205,8 +206,10 @@ mailbox_conf_set_values (Mailbox * mailbox)
       gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_LOCAL);
       if (mailbox)
 	{
+	  GtkWidget* filename_entry = gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(mcw->local_mailbox_path));
+	  
 	  gtk_entry_set_text (GTK_ENTRY (mcw->local_mailbox_name), mailbox->name);
-	  gtk_entry_set_text (GTK_ENTRY (mcw->local_mailbox_path), MAILBOX_LOCAL (mailbox)->path);
+	  gtk_entry_set_text (GTK_ENTRY (filename_entry), MAILBOX_LOCAL (mailbox)->path);
 	}
       break;
     case MAILBOX_POP3:
@@ -235,7 +238,7 @@ mailbox_conf_set_values (Mailbox * mailbox)
 
 
 static void
-conf_update_mailbox (Mailbox * mailbox)
+conf_update_mailbox (Mailbox * mailbox, gchar* old_mbox_name)
 {
   if (!mailbox)
     return;
@@ -245,13 +248,16 @@ conf_update_mailbox (Mailbox * mailbox)
     case MAILBOX_MH:
     case MAILBOX_MAILDIR:
     case MAILBOX_MBOX:
-
-      g_free (mailbox->name);
-      g_free (MAILBOX_LOCAL (mailbox)->path);
-      mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)));
-      MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_path)));
-
-      update_mailbox_config (mailbox);
+      {
+	gchar* filename =
+	  gtk_entry_get_text (GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(mcw->local_mailbox_path))));
+	g_free (mailbox->name);
+	g_free (MAILBOX_LOCAL (mailbox)->path);
+	mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)));
+	MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
+	
+	update_mailbox_config (mailbox, old_mbox_name);
+      }
       break;
 
     case MAILBOX_POP3:
@@ -265,7 +271,7 @@ conf_update_mailbox (Mailbox * mailbox)
       MAILBOX_POP3 (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)));
       MAILBOX_POP3 (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)));
 
-      update_mailbox_config (mailbox);
+      update_mailbox_config (mailbox, old_mbox_name);
       break;
 
     case MAILBOX_IMAP:
@@ -282,7 +288,7 @@ conf_update_mailbox (Mailbox * mailbox)
       MAILBOX_IMAP (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_server)));
       MAILBOX_IMAP (mailbox)->port = strtol (gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)), (char **) NULL, 10);
 
-      update_mailbox_config (mailbox);
+      update_mailbox_config (mailbox, old_mbox_name);
       break;
     }
 }
@@ -298,7 +304,9 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 
   if (mcw->mailbox && save)
     {
-      conf_update_mailbox (mcw->mailbox);
+      gchar* old_mbox_name = g_strdup(mailbox->name);
+      conf_update_mailbox (mcw->mailbox, old_mbox_name);
+      g_free(old_mbox_name);
       /* TODO cleanup */
       return;
     }
@@ -323,7 +331,6 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 		  free(ptr);
 		  gnome_dialog_set_modal(GNOME_DIALOG(msgbox));
 		  gnome_dialog_run(GNOME_DIALOG(msgbox));
-		  gtk_widget_destroy(msgbox);
 		  return;
 		}
 	      close(fd);
@@ -394,6 +401,7 @@ create_new_page ()
   radio_button = gtk_radio_button_new_with_label (NULL, "Local");
   gtk_box_pack_start (GTK_BOX (vbox), radio_button, FALSE, FALSE, 0);
   gtk_signal_connect (GTK_OBJECT (radio_button), "clicked", GTK_SIGNAL_FUNC (set_next_page), MC_PAGE_LOCAL);
+  gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (radio_button), TRUE);
   gtk_widget_show (radio_button);
 
   /* pop3 mailbox */
@@ -419,6 +427,7 @@ create_new_page ()
   gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox), BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
   gtk_widget_show (bbox);
 
+  
   return vbox;
 }
 

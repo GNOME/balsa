@@ -203,6 +203,7 @@ create_welcome_page ()
   gtk_text_freeze (GTK_TEXT (text));
   gtk_text_set_editable (GTK_TEXT (text), TRUE);
   gtk_text_set_word_wrap (GTK_TEXT (text), TRUE);
+  gtk_widget_realize(text);
   gtk_text_insert (GTK_TEXT (text), NULL, NULL, NULL, buf, 2048);
   g_free (buf);
   gtk_text_thaw (GTK_TEXT(text));

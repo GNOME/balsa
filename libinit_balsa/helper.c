@@ -46,18 +46,11 @@ static void entry_changed_cb(GtkEntry * entry, EntryData * ed);
 
 /* ************************************************************************** */
 
-#if BALSA_MAJOR < 2
-GdkImlibImage *
-balsa_init_get_png(const gchar * fname)
-{
-    GdkImlibImage *img;
-#else
 GdkPixbuf *
 balsa_init_get_png(const gchar * fname)
 {
     GdkPixbuf *img;
     GError *err = NULL;
-#endif                          /* BALSA_MAJOR < 2 */
     gchar *fullpath;
 
     g_return_val_if_fail(fname != NULL, NULL);
@@ -67,15 +60,11 @@ balsa_init_get_png(const gchar * fname)
     if (!fullpath)
         return NULL;
 
-#if BALSA_MAJOR < 2
-    img = gdk_imlib_load_image(fullpath);
-#else
     img = gdk_pixbuf_new_from_file(fullpath, &err);
     if (err) {
         g_print(_("Error loading %s: %s\n"), fullpath, err->message);
         g_error_free(err);
     }
-#endif                          /* BALSA_MAJOR < 2 */
     g_free(fullpath);
 
     return img;
@@ -99,14 +88,9 @@ balsa_init_add_table_entry(GtkTable * table, guint num, gchar * ltext,
 
     e = gtk_entry_new();
     gtk_entry_set_text(GTK_ENTRY(e), etext);
-#if BALSA_MAJOR < 2
-    gtk_signal_connect(GTK_OBJECT(e), "changed",
-                       GTK_SIGNAL_FUNC(entry_changed_cb), ed);
-#else
     g_signal_connect(G_OBJECT(e), "changed",
                      G_CALLBACK(entry_changed_cb), ed);
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), e);
-#endif                          /* BALSA_MAJOR < 2 */
     gtk_table_attach(table, GTK_WIDGET(e), 1, 2, num + 1, num + 2,
                      GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 8, 4);
 
@@ -137,14 +121,6 @@ entry_changed_cb(GtkEntry * entry, EntryData * ed)
 
     if (GNOME_IS_DRUID(ed->druid)) {
         /* Don't let them continue unless all entries have something. */
-#if BALSA_MAJOR < 2
-        if (ENTRY_MASTER_P_DONE(ed->master)) {
-            gnome_druid_set_buttons_sensitive(ed->druid, TRUE, TRUE, TRUE);
-        } else {
-            gnome_druid_set_buttons_sensitive(ed->druid, TRUE, FALSE,
-                                              TRUE);
-        }
-#else
         if (ENTRY_MASTER_P_DONE(ed->master)) {
             gnome_druid_set_buttons_sensitive(ed->druid, TRUE, TRUE, TRUE,
                                               FALSE);
@@ -152,7 +128,6 @@ entry_changed_cb(GtkEntry * entry, EntryData * ed)
             gnome_druid_set_buttons_sensitive(ed->druid, TRUE, FALSE, TRUE,
                                               FALSE);
         }
-#endif                          /* BALSA_MAJOR < 2 */
     }
 }
 

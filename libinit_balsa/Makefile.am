@@ -1,6 +1,8 @@
 noinst_LIBRARIES = libinit_balsa.a
 
 libinit_balsa_a_SOURCES = 		\
+	balsa-druid-page-defclient.c	\
+	balsa-druid-page-defclient.h	\
 	balsa-druid-page-directory.c	\
 	balsa-druid-page-directory.h	\
 	balsa-druid-page-finish.c	\

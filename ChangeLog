@@ -1,3 +1,16 @@
+2004-02-08  Pawel Salek
+
+	Install as default mailer if requested by user (see bug 131606,
+	closely based on the patch by Michael Petullo)
+	* libinit_balsa/Makefile.am: add balsa-druid-page-defclient.[hc]
+
+	* libinit_balsa/balsa-druid-page-{directory,finish,user,welcome}.c:
+	* libinit_balsa/helper.c: remove 1.x remainings.
+	* libinit_balsa/balsa-initdruid.c: plug in defuser page.
+	* src/balsa-app.h: add default_client field.
+	* src/main.c: update gconf data if requested.
+	* src/save-restore.[hc]: implement config_defclient_save().
+
 2004-02-07 18:08  PeterB
 
 	* src/sendmsg-window.c: Steve Wall <balsa-user@wallfamily.us>;
@@ -9,7 +22,7 @@
 	Add persistent view filters.
 	* libbalsa/mailbox_imap.c: modify accordingly.
 	* libbalsa/mailbox_{local,maildir,mbox,mh}.c: ditto.
-	* libbalsa/{message,send}.c: do not do pointless threading.
+	* libbalsa/{message,send}.c: do not thread without need.
 	* src/balsa-app.h: remove global view filter - do it per mailbox.
 	* src/main-window.[hc]: support for per-mailbox view filters.
 	* src/save-restore.c: config support for that.

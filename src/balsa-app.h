@@ -384,6 +384,9 @@ extern struct BalsaApplication {
 
     GHashTable *mailbox_views;
 
+    /* use as default email client for GNOME */
+    int default_client;
+
 } balsa_app;
 
 #define BALSA_IS_MAILBOX_SPECIAL(a) ((a)==balsa_app.inbox || (a)==balsa_app.trash || (a)==balsa_app.outbox||(a)==balsa_app.draftbox || (a)==balsa_app.sentbox)

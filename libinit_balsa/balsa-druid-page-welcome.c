@@ -25,15 +25,9 @@ static void balsa_druid_page_welcome_prepare(GnomeDruidPage * page,
                                              GnomeDruid * druid);
 
 void
-#if BALSA_MAJOR < 2
-balsa_druid_page_welcome(GnomeDruid * druid, GdkImlibImage * default_logo)
-{
-    GnomeDruidPageStart *page;
-#else
 balsa_druid_page_welcome(GnomeDruid * druid, GdkPixbuf * default_logo)
 {
     GnomeDruidPageEdge *page;
-#endif                          /* BALSA_MAJOR < 2 */
     static const gchar title[] = N_("Welcome to Balsa!");
     static const gchar text[] =
         N_
@@ -47,18 +41,6 @@ balsa_druid_page_welcome(GnomeDruid * druid, GdkPixbuf * default_logo)
          "for more information about contacting the authors "
          "or reporting bugs.");
 
-#if BALSA_MAJOR < 2
-    page = GNOME_DRUID_PAGE_START(gnome_druid_page_start_new());
-    gnome_druid_page_start_set_title(page, _(title));
-    gnome_druid_page_start_set_text(page, _(text));
-    gnome_druid_page_start_set_logo(page, default_logo);
-    gnome_druid_page_start_set_watermark(page,
-                                         balsa_init_get_png
-                                         ("balsa-watermark.png"));
-    gtk_signal_connect(GTK_OBJECT(page), "prepare",
-                       GTK_SIGNAL_FUNC(balsa_druid_page_welcome_prepare),
-                       NULL);
-#else
     page =
         GNOME_DRUID_PAGE_EDGE(gnome_druid_page_edge_new
                               (GNOME_EDGE_START));
@@ -71,7 +53,6 @@ balsa_druid_page_welcome(GnomeDruid * druid, GdkPixbuf * default_logo)
     g_signal_connect(G_OBJECT(page), "prepare",
                      G_CALLBACK(balsa_druid_page_welcome_prepare),
                      NULL);
-#endif                          /* BALSA_MAJOR < 2 */
     gnome_druid_append_page(druid, GNOME_DRUID_PAGE(page));
     gnome_druid_set_page(druid, GNOME_DRUID_PAGE(page));
 }
@@ -79,11 +60,7 @@ balsa_druid_page_welcome(GnomeDruid * druid, GdkPixbuf * default_logo)
 static void
 balsa_druid_page_welcome_prepare(GnomeDruidPage * page, GnomeDruid * druid)
 {
-#if BALSA_MAJOR < 2
-    gnome_druid_set_buttons_sensitive(druid, FALSE, TRUE, TRUE);
-#else
     /* FIXME: provide help */
     gnome_druid_set_buttons_sensitive(druid, FALSE, TRUE, TRUE, FALSE);
-#endif                          /* BALSA_MAJOR < 2 */
     gnome_druid_set_show_finish(druid, FALSE);
 }

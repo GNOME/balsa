@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include <string.h>
+#include <gconf/gconf-client.h>
 #include <gnome.h>
 #include "balsa-app.h"
 #include "save-restore.h"
@@ -1782,6 +1783,56 @@ check_for_old_sigs(GList * id_list_tmp)
             /* set new-style executable var*/
             id_tmp->sig_executable=TRUE;
             printf("Setting converted signature as executable.\n");
+        }
+    }
+}
+
+void
+config_defclient_save(void)
+{
+    static struct {
+        const char *key, *val;
+    } gconf_string[] = {
+        {"/desktop/gnome/url-handlers/mailto/command",     "balsa -m \"%s\""},
+        {"/desktop/gnome/url-handlers/mailto/description", "Email" }};
+    static struct {
+        const char *key; gboolean val;
+    } gconf_bool[] = {
+        {"/desktop/gnome/url-handlers/mailto/need-terminal", FALSE},
+        {"/desktop/gnome/url-handlers/mailto/enabled",       TRUE}};
+
+    if (balsa_app.default_client) {
+        GError *err = NULL;
+        GConfClient *gc;
+        unsigned i;
+        gc = gconf_client_get_default(); /* FIXME: error handling */
+        if (gc == NULL) {
+            balsa_information(LIBBALSA_INFORMATION_WARNING,
+                              _("Error opening GConf database\n"));
+            return;
+        }
+        for(i=0; i<ELEMENTS(gconf_string); i++) {
+            gconf_client_set_string(gc, gconf_string[i].key, 
+                                    gconf_string[i].val, &err);
+            if (err) {
+                balsa_information(LIBBALSA_INFORMATION_WARNING,
+                                  _("Error setting GConf field: %s\n"),
+                                  err->message);
+                g_error_free(err);
+                return;
+            }
+        }
+        for(i=0; i<ELEMENTS(gconf_bool); i++) {
+            gconf_client_set_bool(gc, gconf_bool[i].key,
+                                  gconf_bool[i].val, &err);
+            if (err) {
+                balsa_information(LIBBALSA_INFORMATION_WARNING,
+                                  _("Error setting GConf field: %s\n"),
+                                  err->message);
+                g_error_free(err);
+                return;
+            }
+            g_object_unref(gc);
         }
     }
 }

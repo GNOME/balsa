@@ -99,11 +99,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
 }
 
 void
-#if BALSA_MAJOR < 2
-balsa_druid_page_user(GnomeDruid * druid, GdkImlibImage * default_logo)
-#else
 balsa_druid_page_user(GnomeDruid * druid, GdkPixbuf * default_logo)
-#endif                          /* BALSA_MAJOR < 2 */
 {
     BalsaDruidPageUser *user;
     GnomeDruidPageStandard *page;
@@ -114,19 +110,11 @@ balsa_druid_page_user(GnomeDruid * druid, GdkPixbuf * default_logo)
     gnome_druid_page_standard_set_logo(page, default_logo);
     balsa_druid_page_user_init(user, page, druid);
     gnome_druid_append_page(druid, GNOME_DRUID_PAGE(page));
-#if BALSA_MAJOR < 2
-    gtk_signal_connect(GTK_OBJECT(page), "prepare",
-                       GTK_SIGNAL_FUNC(balsa_druid_page_user_prepare),
-                       user);
-    gtk_signal_connect(GTK_OBJECT(page), "next",
-                       GTK_SIGNAL_FUNC(balsa_druid_page_user_next), user);
-#else
     g_signal_connect(G_OBJECT(page), "prepare",
                      G_CALLBACK(balsa_druid_page_user_prepare),
                      user);
     g_signal_connect(G_OBJECT(page), "next",
                      G_CALLBACK(balsa_druid_page_user_next), user);
-#endif                          /* BALSA_MAJOR < 2 */
 }
 
 static void
@@ -135,19 +123,11 @@ balsa_druid_page_user_prepare(GnomeDruidPage * page, GnomeDruid * druid,
 {
     /* Don't let them continue unless all entries have something. */
 
-#if BALSA_MAJOR < 2
-    if (ENTRY_MASTER_DONE(user->emaster)) {
-        gnome_druid_set_buttons_sensitive(druid, TRUE, TRUE, TRUE);
-    } else {
-        gnome_druid_set_buttons_sensitive(druid, TRUE, FALSE, TRUE);
-    }
-#else
     if (ENTRY_MASTER_DONE(user->emaster)) {
         gnome_druid_set_buttons_sensitive(druid, TRUE, TRUE, TRUE, FALSE);
     } else {
         gnome_druid_set_buttons_sensitive(druid, TRUE, FALSE, TRUE, FALSE);
     }
-#endif                          /* BALSA_MAJOR < 2 */
 
     gnome_druid_set_show_finish(druid, FALSE);
 }

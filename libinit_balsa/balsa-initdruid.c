@@ -26,6 +26,7 @@
 #include "balsa-druid-page-welcome.h"
 #include "balsa-druid-page-user.h"
 #include "balsa-druid-page-directory.h"
+#include "balsa-druid-page-defclient.h"
 #include "balsa-druid-page-finish.h"
 
 /* here are local prototypes */
@@ -35,15 +36,12 @@ static void balsa_initdruid_cancel(GnomeDruid * druid);
 static void
 balsa_initdruid_init(GnomeDruid * druid)
 {
-#if BALSA_MAJOR < 2
-    GdkImlibImage *default_logo = balsa_init_get_png("balsa-logo.png");
-#else
     GdkPixbuf *default_logo = balsa_init_get_png("balsa-logo.png");
-#endif                          /* BALSA_MAJOR < 2 */
 
     balsa_druid_page_welcome(druid, default_logo);
     balsa_druid_page_user(druid, default_logo);
     balsa_druid_page_directory(druid, default_logo);
+    balsa_druid_page_defclient(druid, default_logo);
     balsa_druid_page_finish(druid, default_logo);
 }
 
@@ -57,15 +55,9 @@ balsa_initdruid(GtkWindow * window)
 
     druid = GNOME_DRUID(gnome_druid_new());
     gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(druid));
-#if BALSA_MAJOR < 2
-    gtk_signal_connect(GTK_OBJECT(druid), "cancel",
-                       GTK_SIGNAL_FUNC(balsa_initdruid_cancel), NULL);
-    gtk_object_ref(GTK_OBJECT(window));
-#else
     g_signal_connect(G_OBJECT(druid), "cancel",
                      G_CALLBACK(balsa_initdruid_cancel), NULL);
     g_object_ref(G_OBJECT(window));
-#endif /* BALSA_MAJOR < 2 */
 
     balsa_initdruid_init(druid);
 }

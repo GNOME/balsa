@@ -191,6 +191,7 @@ libbalsa_show_message_source(LibBalsaMessage * msg, const gchar * font,
                              gboolean* escape_specials)
 {
     GtkWidget *text;
+    PangoFontDescription *desc;
     GtkWidget *interior;
     GtkWidget *window;
     LibBalsaSourceViewerInfo *lsvi;
@@ -200,7 +201,11 @@ libbalsa_show_message_source(LibBalsaMessage * msg, const gchar * font,
     g_return_if_fail(msg->header);
 
     text = gtk_text_view_new();
-    gtk_widget_modify_font(text, pango_font_description_from_string(font));
+
+    desc = pango_font_description_from_string(font);
+    gtk_widget_modify_font(text, desc);
+    pango_font_description_free(desc);
+
     gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
 #if GTK_CHECK_VERSION(2, 4, 0)
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD_CHAR);
@@ -215,6 +220,7 @@ libbalsa_show_message_source(LibBalsaMessage * msg, const gchar * font,
     gtk_container_add(GTK_CONTAINER(interior), GTK_WIDGET(text));
 
     window = gnome_app_new("balsa", _("Message Source"));
+    g_object_set_data(G_OBJECT(window), "text", text);
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
     gtk_window_set_default_size(GTK_WINDOW(window), 500, 400);

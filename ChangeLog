@@ -1,3 +1,7 @@
+2004-01-20 11:54  PeterB
+
+	* src/main-window.c: frame the paned contents.
+
 2004-01-19 22:41  PeterB
 
 	* src/: balsa-message.c, balsa-message.h: make BalsaMessage

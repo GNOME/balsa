@@ -1,3 +1,15 @@
+2003-11-17 08:23  PeterB
+
+	* src/balsa-index.c: Rename message_status_changed_cb as
+	bndx_row_changed_cb; use "row-changed" signal instead of
+	"messages-status-changed", which may be emitted without the gdk
+	lock; remove obsolete "messages-removed" signal handler.
+	* libbalsa/message.c: Set flags before notifying the mailbox--the
+	mailbox in turn triggers a UI change which needs the new flags.
+	* libbalsa/mailbox_local.c: Cleanup.
+	* libbalsa/: mailbox.c, mailbox.h: Remove obsolete
+	"messages-removed" signal.
+
 2003-11-16 20:09  PeterB
 
 	* src/balsa-index.c: Select another message when current message is

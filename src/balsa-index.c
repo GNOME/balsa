@@ -235,6 +235,12 @@ bndx_destroy(GtkObject * obj)
 	index->current_message = NULL;
     }
 
+    if (index->selected) {
+	g_slist_foreach(index->selected, (GFunc) g_object_unref, NULL);
+	g_slist_free(index->selected);
+	index->selected = NULL;
+    }
+
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
         (*GTK_OBJECT_CLASS(parent_class)->destroy) (obj);
 }

@@ -485,27 +485,51 @@ find_all_cb(ImapMboxHandle* handle, unsigned seqno, void*arg)
   ms->seqno[ms->msgcnt++] = seqno;
 }
 
-ImapResponse
-imap_mbox_find_all(ImapMboxHandle *h, const char *search_str,
-                   unsigned *msgcnt, unsigned**msgs)
+static ImapResponse
+imap_mbox_find_helper(ImapMboxHandle * h,
+		      const char     * cmd,
+		      unsigned       * msgcnt,
+		      unsigned      ** msgs)
 {
   ImapResponse rc;
   void *arg;
   ImapSearchCb cb;
   struct find_all_data fad;
-  gchar *cmd;
-  const char *filter_str = mbox_view_get_str(&h->mbox_view);
 
   fad.allocated = fad.msgcnt = 0;  fad.seqno = NULL;
   cb  = h->search_cb;  h->search_cb  = (ImapSearchCb)find_all_cb;
   arg = h->search_arg; h->search_arg = &fad;
-  cmd = g_strdup_printf("SEARCH ALL (SUBJECT \"%s\"%s%s)",
-                        search_str, *filter_str?" ":"", filter_str);
   rc = imap_cmd_exec(h, cmd);
-  g_free(cmd);
   h->search_cb = cb; h->search_arg = arg;
   *msgcnt = fad.msgcnt; *msgs = fad.seqno;
   return rc;
+}
+
+ImapResponse
+imap_mbox_find_all(ImapMboxHandle * h,
+		   const char     * search_str,
+		   unsigned       * msgcnt,
+		   unsigned      ** msgs)
+{
+  const char *filter_str;
+  gchar *cmd;
+  ImapResponse rc;
+
+  filter_str = mbox_view_get_str(&h->mbox_view);
+  cmd = g_strdup_printf("SEARCH ALL (SUBJECT \"%s\"%s%s)", search_str,
+			*filter_str ? " " : "", filter_str);
+  rc = imap_mbox_find_helper(h, cmd, msgcnt, msgs);
+  g_free(cmd);
+
+  return rc;
+}
+
+ImapResponse
+imap_mbox_find_unseen(ImapMboxHandle * h,
+		      unsigned       * msgcnt,
+		      unsigned      ** msgs)
+{
+  return imap_mbox_find_helper(h, "SEARCH UNSEEN", msgcnt, msgs);
 }
 
 /* 6.4.5 FETCH Command */

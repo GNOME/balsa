@@ -148,6 +148,8 @@ unsigned imap_mbox_find_next(ImapMboxHandle* handle, unsigned start,
                              const char *search_str);
 ImapResponse imap_mbox_find_all(ImapMboxHandle *h, const char *search_str,
                                 unsigned *msgcnt, unsigned**msgs);
+ImapResponse imap_mbox_find_unseen(ImapMboxHandle * h, unsigned *msgcnt,
+				   unsigned **msgs);
 
 unsigned imap_mbox_set_view(ImapMboxHandle *h, ImapMsgFlag f, gboolean state);
 unsigned imap_mbox_set_sort(ImapMboxHandle *h, ImapSortKey isr, 

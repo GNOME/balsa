@@ -22,13 +22,12 @@
 #include "config.h"
 
 #include <gnome.h>
-#include <gdk-pixbuf/gdk-pixbuf.h>
 
-#include "balsa-app.h"
 #include "filter-run.h"
 #include "mailbox-filter.h"
+#include "balsa-app.h"
+#include "balsa-icons.h"
 #include "save-restore.h"
-#include "pixmaps/other_enabled.xpm"
 
 /* fe_already_open is TRUE when the filters dialog is opened, we use
  * this to prevent incoherency if we have both filters dialog and
@@ -83,15 +82,6 @@ populate_available_filters_list(GtkCList * clist,GSList * mailbox_filters)
     }
 }
 
-static void
-get_pixmap_and_mask_from_xpm(char* xpm[],
-                             GdkPixmap **pixmap, GdkBitmap **mask)
-{
-    GdkPixbuf *pb = gdk_pixbuf_new_from_xpm_data((const char**)xpm);
-    gdk_pixbuf_render_pixmap_and_mask(pb, pixmap, mask, 0);
-    gdk_pixbuf_unref(pb);
-}
-
 /* Set the icon corresponding to the when type */
 
 static void
@@ -101,7 +91,10 @@ set_icon(GtkCList * clist,gint row,gint when)
     GdkBitmap *mask;
     gint i;
 
-    get_pixmap_and_mask_from_xpm(other_enabled_xpm, &pixmap, &mask);
+    gnome_stock_pixmap_gdk(BALSA_PIXMAP_OTHER_ENABLED,
+			   GNOME_STOCK_PIXMAP_REGULAR,
+			   &pixmap,
+			   &mask);
 
     for (i=0;i<FILTER_WHEN_NB;i++)
 	if (when & (1 << i))

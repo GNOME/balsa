@@ -194,7 +194,7 @@ build_left_side(void)
        | -- --  |
        \--------/
      */
-    vbox = gtk_vbox_new(FALSE, 2);
+    vbox = gtk_vbox_new(FALSE, 0);
 
     /* the clist */
     gtk_widget_push_visual(gdk_rgb_get_visual());
@@ -226,17 +226,17 @@ build_left_side(void)
 
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(fe_filters_list));
 
-    gtk_box_pack_start(GTK_BOX(vbox), sw, TRUE, TRUE, 2);
+    gtk_box_pack_start(GTK_BOX(vbox), sw, TRUE, TRUE, 6);
 
     /* new and delete buttons */
     bbox = gtk_hbutton_box_new();
-    gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 2);
+    gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 6);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
-    gtk_button_box_set_child_size(GTK_BUTTON_BOX(bbox),
+    /*    gtk_button_box_set_child_size(GTK_BUTTON_BOX(bbox),
 				  BALSA_BUTTON_WIDTH / 2,
-				  BALSA_BUTTON_HEIGHT / 2);
+				  BALSA_BUTTON_HEIGHT / 2);*/
 
-    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 6);
 
     /* new button */
     pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_NEW);
@@ -268,7 +268,7 @@ build_match_page()
     GtkWidget *box = NULL;
 
     /* The notebook page */
-    page = gtk_table_new(10, 15, FALSE);
+    page = gtk_table_new(5, 9, FALSE);
 
     /* The name entry */
 
@@ -276,32 +276,27 @@ build_match_page()
     gtk_table_attach(GTK_TABLE(page),
 		     fe_name_label,
 		     0, 2, 0, 1,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 6, 6);
     fe_name_entry = gtk_entry_new_with_max_length(256);
     gtk_table_attach(GTK_TABLE(page),
 		     fe_name_entry,
-		     2, 10, 0, 1,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+		     2, 5, 0, 1,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 6, 6);
 
     /* The filter op-code : "OR" or "AND" all the conditions */ 
 
     label = gtk_label_new(_("Operation between conditions"));
     gtk_table_attach(GTK_TABLE(page),
 		     label,
-		     0, 5, 1, 2,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
-
-    box = gtk_vbox_new(FALSE, 2);
-    gtk_table_attach(GTK_TABLE(page),
-		     box,
-		     5, 10, 1, 3,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
-
+		     0, 2, 1, 2,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 6, 6);
     fe_op_codes_option_menu = build_option_menu(fe_op_codes,
 						ELEMENTS(fe_op_codes),
 						NULL);
-    gtk_box_pack_start(GTK_BOX(box), fe_op_codes_option_menu, FALSE, FALSE,
-		       2);
+    gtk_table_attach(GTK_TABLE(page),
+		     fe_op_codes_option_menu,
+		     2, 5, 1, 2,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 6, 6);
 
     /* list of conditions defining how this filter matches */
 
@@ -313,7 +308,7 @@ build_match_page()
 		     scroll,
 		     0, 5, 4, 8,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, 2, 2);
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, 6, 6);
     fe_conditions_list = GTK_CLIST(gtk_clist_new(1));
 
     gtk_clist_set_selection_mode(fe_conditions_list, GTK_SELECTION_BROWSE);
@@ -331,22 +326,21 @@ build_match_page()
     gtk_table_attach(GTK_TABLE(page),
 		     box,
 		     0, 5, 8, 9,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 6, 6);
     fe_condition_edit_button = gtk_button_new_with_label(_("Edit"));
     gtk_widget_set_sensitive(fe_condition_edit_button,FALSE);
-    gtk_box_pack_start(GTK_BOX(box), fe_condition_edit_button, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(box), fe_condition_edit_button, TRUE, TRUE, 6);
     gtk_signal_connect(GTK_OBJECT(fe_condition_edit_button),
 		       "clicked", GTK_SIGNAL_FUNC(fe_edit_condition), 
                        GINT_TO_POINTER(0));
     button = gtk_button_new_with_label(_("New"));
-    gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 6);
     gtk_signal_connect(GTK_OBJECT(button),
 		       "clicked", GTK_SIGNAL_FUNC(fe_edit_condition), 
                        GINT_TO_POINTER(1));
     fe_condition_delete_button = gtk_button_new_with_label(_("Remove"));
     gtk_widget_set_sensitive(fe_condition_delete_button, FALSE);
-    gtk_box_pack_start(GTK_BOX(box), fe_condition_delete_button, TRUE, 
-                       TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(box), fe_condition_delete_button, TRUE, TRUE, 6);
     gtk_signal_connect(GTK_OBJECT(fe_condition_delete_button),
 		       "clicked",
 		       GTK_SIGNAL_FUNC(fe_condition_remove_pressed), NULL);
@@ -366,14 +360,14 @@ build_action_page(GtkWindow * window)
     GtkWidget *page, *frame, *table;
     GtkWidget *box;
 
-    page = gtk_vbox_new(TRUE, 5);
+    page = gtk_vbox_new(TRUE, 6);
 
     /* The notification area */
 
     frame = gtk_frame_new(_("Notification:"));
     gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
-    gtk_box_pack_start(GTK_BOX(page), frame, FALSE, FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(page), frame, FALSE, FALSE, 6);
     gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
 
     table = gtk_table_new(3, 2, FALSE);
@@ -383,31 +377,31 @@ build_action_page(GtkWindow * window)
     fe_sound_button = gtk_check_button_new_with_label(_("Play sound:"));
     gtk_table_attach(GTK_TABLE(table), fe_sound_button,
 		     0, 1, 0, 1,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 6, 6);
 
     fe_sound_entry =
 	gnome_file_entry_new("filter_sounds", _("Use Sound..."));
     gtk_table_attach(GTK_TABLE(table), fe_sound_entry, 1, 2, 0, 1,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 6, 6);
 
     fe_popup_button = gtk_check_button_new_with_label(_("Popup text:"));
     gtk_table_attach(GTK_TABLE(table),
 		     fe_popup_button,
 		     0, 1, 1, 2,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 6, 6);
     fe_popup_entry = gtk_entry_new_with_max_length(255);
     gtk_table_attach(GTK_TABLE(table),
 		     fe_popup_entry,
 		     1, 2, 1, 2,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 6, 6);
 
     /* The action area */
     frame = gtk_frame_new(_("Action to perform:"));
     gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
-    gtk_box_pack_start(GTK_BOX(page), frame, FALSE, FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(page), frame, FALSE, FALSE, 6);
 
-    box = gtk_vbox_new(TRUE, 2);
+    box = gtk_hbox_new(TRUE, 6);
     gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
     gtk_container_add(GTK_CONTAINER(frame), box);
 
@@ -416,7 +410,7 @@ build_action_page(GtkWindow * window)
 					      GTK_SIGNAL_FUNC
 					      (fe_action_selected));
     gtk_box_pack_start(GTK_BOX(box), fe_action_option_menu,
-                       TRUE, FALSE, 1);
+                       TRUE, TRUE, 6);
 
     /* FIXME : we use the global mru folder list, perhaps we should use
        our own. We'll see this later, for now let's make something usable
@@ -425,7 +419,7 @@ build_action_page(GtkWindow * window)
     */
     fe_mailboxes = balsa_mblist_mru_option_menu(window,
 						&balsa_app.folder_mru);
-    gtk_box_pack_start(GTK_BOX(box), fe_mailboxes, TRUE, FALSE, 1);
+    gtk_box_pack_start(GTK_BOX(box), fe_mailboxes, TRUE, TRUE, 6);
 
     return page;
 }				/* end build_action_page() */
@@ -443,12 +437,12 @@ build_right_side(GtkWindow * window)
     GtkWidget *notebook, *page;
     GtkWidget *bbox, *pixmap;
 
-    rightside = gtk_vbox_new(FALSE, 0);
+    rightside = gtk_vbox_new(FALSE, 6);
 
     /* the main notebook */
     notebook = gtk_notebook_new();
     gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_TOP);
-    gtk_box_pack_start(GTK_BOX(rightside), notebook, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(rightside), notebook, TRUE, TRUE, 6);
 
     page = build_match_page();
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
@@ -459,7 +453,7 @@ build_right_side(GtkWindow * window)
 
     /* button box */
     bbox = gtk_hbutton_box_new();
-    gtk_box_pack_start(GTK_BOX(rightside), bbox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rightside), bbox, FALSE, FALSE, 6);
 
     fe_apply_button = gnome_stock_button(GNOME_STOCK_BUTTON_APPLY);
     gtk_signal_connect(GTK_OBJECT(fe_apply_button),
@@ -521,16 +515,16 @@ filters_edit_dialog(void)
     gtk_window_set_policy (GTK_WINDOW (fe_window), TRUE, TRUE, FALSE);
 
     /* main hbox */
-    hbox = gtk_hbox_new(FALSE, 0);
+    hbox = gtk_hbox_new(FALSE, 6);
     gtk_box_pack_start(GTK_BOX(fe_window->vbox),
-		       hbox, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE, 2);
+		       hbox, TRUE, TRUE, 6);
+    gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE, 6);
     gtk_box_pack_start(GTK_BOX(hbox), gtk_vseparator_new(),
-		       FALSE, FALSE, 2);
+		       FALSE, FALSE, 6);
 
     fe_right_page = build_right_side(GTK_WINDOW(fe_window));
     gtk_widget_set_sensitive(fe_right_page, FALSE);
-    gtk_box_pack_start(GTK_BOX(hbox), fe_right_page, TRUE, TRUE, 2);
+    gtk_box_pack_start(GTK_BOX(hbox), fe_right_page, TRUE, TRUE, 6);
 
     fe_user_headers_list = NULL;
 

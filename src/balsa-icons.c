@@ -93,6 +93,8 @@
 
 #include "pixmaps/other_close.xpm"
 
+#include "pixmaps/other_enabled.xpm"
+
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
 typedef struct _BalsaIcon BalsaIcon;
@@ -278,6 +280,7 @@ register_balsa_pixmaps(void)
 
 	/* Other icons */
 	{ BALSA_PIXMAP_OTHER_CLOSE,		other_close_xpm,    9, 9 },
+	{ BALSA_PIXMAP_OTHER_ENABLED,		other_enabled_xpm,    9, 9 },
     };
 
     unsigned i;

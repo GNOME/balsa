@@ -72,6 +72,8 @@
 
 #define BALSA_PIXMAP_OTHER_CLOSE		"other_close"
 
+#define BALSA_PIXMAP_OTHER_ENABLED              "other_enabled"
+
 typedef enum {
     BALSA_ICON_MBOX_DRAFT,
     BALSA_ICON_MBOX_IN,

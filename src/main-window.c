@@ -90,6 +90,10 @@ create_main_window ()
   /* message index */
   hbox = gtk_hbox_new (TRUE, 0);
   mw->index = balsa_index_new ();
+  if (gdk_screen_width() > 640 && gdk_screen_height() > 480)
+  gtk_widget_set_usize(mw->index,1, 200);
+  else
+  gtk_widget_set_usize(mw->index,1, 133);
   gtk_container_border_width (GTK_CONTAINER (mw->index), 2);
   gtk_box_pack_start (GTK_BOX (hbox), mw->index, TRUE, TRUE, 2);
 

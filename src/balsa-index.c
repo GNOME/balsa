@@ -262,14 +262,18 @@ balsa_index_set_stream (BalsaIndex * bindex,
   append_messages (bindex, 1, bindex->last_message);
 
   if (GTK_CLIST (GTK_BIN (bindex)->child)->rows > 0)
-  {
-    if (first_new_mesgno != 0)
     {
-      gtk_clist_select_row (GTK_CLIST (GTK_BIN (bindex)->child), first_new_mesgno - 1, -1);
-      gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), first_new_mesgno-1, 0, 0.5, 0.0);
+      if (first_new_mesgno != 0)
+	{
+	  gtk_clist_select_row (GTK_CLIST (GTK_BIN (bindex)->child), first_new_mesgno - 1, -1);
+	  gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), first_new_mesgno - 1, 0, 0.0, 0.0);
+	}
+      else
+	{
+	  gtk_clist_select_row (GTK_CLIST (GTK_BIN (bindex)->child), bindex->last_message - 1, -1);
+	  gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), bindex->last_message - 1, 0, 1.0, 1.0);
+	}
     }
-    else gtk_clist_select_row (GTK_CLIST (GTK_BIN (bindex)->child), 0, -1);
-  }
   gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child),
 				GTK_SELECTION_BROWSE);
 }
@@ -437,8 +441,8 @@ balsa_delete_message (BalsaIndex * bindex)
 
   sprintf (tmp, "%ld", row + 1);
   mail_setflag (bindex->stream, tmp, "\\DELETED");
-  gtk_clist_select_row (clist, row+1, -1);
-  gtk_clist_moveto (clist, row+1, 0, 0.5, 0.0);
+  gtk_clist_select_row (clist, row + 1, -1);
+  gtk_clist_moveto (clist, row + 1, 0, 0.5, 0.0);
 }
 
 void
@@ -458,9 +462,9 @@ balsa_undelete_message (BalsaIndex * bindex)
   gtk_clist_set_text (clist, row, 1, NULL);
 
   sprintf (tmp, "%ld", row + 1);
-  mail_clearflag(bindex->stream, tmp, "\\DELETED");
-  gtk_clist_select_row (clist, row+1, -1);
-  gtk_clist_moveto (clist, row+1, 0, 0.5, 0.0);
+  mail_clearflag (bindex->stream, tmp, "\\DELETED");
+  gtk_clist_select_row (clist, row + 1, -1);
+  gtk_clist_moveto (clist, row + 1, 0, 0.5, 0.0);
 }
 
 static void

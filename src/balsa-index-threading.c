@@ -221,7 +221,6 @@ get_container(LibBalsaMessage * message, GHashTable * id_table)
      *   + Store this message in the Container's message slot.
      * else
      *   + Create a new Container object holding this message;
-     *     this message;
      *   + Index the Container by Message-ID in id_table.
      */
 

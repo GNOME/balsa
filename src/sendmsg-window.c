@@ -1469,7 +1469,7 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
     if ((signature = read_signature(msg)) != NULL) {
 	if (((type == SEND_REPLY || type == SEND_REPLY_ALL || type == SEND_REPLY_GROUP) &&
 	     balsa_app.current_ident->sig_whenreply) ||
-	    ((type == SEND_FORWARD_ATTACH || type == SEND_FORWARD_QUOTE) && 
+	    ((type == SEND_FORWARD_ATTACH || type == SEND_FORWARD_INLINE) && 
 	     balsa_app.current_ident->sig_whenforward) ||
 	    (type == SEND_NORMAL && balsa_app.current_ident->sig_sending)) {
 
@@ -1564,7 +1564,7 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message, SendType type)
 	break;
 
     case SEND_FORWARD_ATTACH:
-    case SEND_FORWARD_QUOTE:
+    case SEND_FORWARD_INLINE:
 	if (!subject) {
 	    if (message->from && message->from->address_list)
 		newsubject = g_strdup_printf("%s from %s",
@@ -1679,7 +1679,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	break;
 
     case SEND_FORWARD_ATTACH:
-    case SEND_FORWARD_QUOTE:
+    case SEND_FORWARD_INLINE:
 	window = gnome_app_new("balsa", _("Forward message"));
 	msg->orig_message = message;
 	break;
@@ -1886,7 +1886,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 
 
     if (type == SEND_NORMAL || type == SEND_FORWARD_ATTACH || 
-	type == SEND_FORWARD_QUOTE)
+	type == SEND_FORWARD_INLINE)
 	gtk_widget_grab_focus(msg->to[1]);
     else
 	gtk_widget_grab_focus(msg->text);

@@ -157,7 +157,7 @@ static void replyto_message_cb(GtkWidget * widget, gpointer data);
 static void replytoall_message_cb(GtkWidget * widget, gpointer data);
 static void replytogroup_message_cb(GtkWidget * widget, gpointer data);
 static void forward_message_attached_cb(GtkWidget * widget, gpointer data);
-static void forward_message_quoted_cb(GtkWidget * widget, gpointer data);
+static void forward_message_inline_cb(GtkWidget * widget, gpointer data);
 static void forward_message_default_cb(GtkWidget * widget, gpointer data);
 static void continue_message_cb(GtkWidget * widget, gpointer data);
 
@@ -455,7 +455,7 @@ static GnomeUIInfo message_menu[] = {
         replytogroup_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         BALSA_PIXMAP_MAIL_RPL_GROUP_MENU, 'G', 0, NULL
     },
-#define MENU_MESSAGE_FORWARD_POS 3
+#define MENU_MESSAGE_FORWARD_ATTACH_POS 3
     /* F */
     {
         GNOME_APP_UI_ITEM, N_("_Forward attached..."),
@@ -463,10 +463,11 @@ static GnomeUIInfo message_menu[] = {
         forward_message_attached_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL
     },
+#define MENU_MESSAGE_FORWARD_INLINE_POS 4
     {
-        GNOME_APP_UI_ITEM, N_("Forward quoted..."),
-        N_("Forward the current message quoted"),
-        forward_message_quoted_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+        GNOME_APP_UI_ITEM, N_("Forward inline..."),
+        N_("Forward the current message inline"),
+        forward_message_inline_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         GNOME_STOCK_MENU_MAIL_FWD, 'F', GDK_CONTROL_MASK, NULL
     },
     GNOMEUIINFO_SEPARATOR,
@@ -981,7 +982,8 @@ enable_message_menus(LibBalsaMessage * message)
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_REPLY_POS].widget, enable);
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_REPLY_ALL_POS].widget, enable);
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_REPLY_GROUP_POS].widget, enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_FORWARD_POS].widget, enable);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_FORWARD_ATTACH_POS].widget, enable);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_FORWARD_INLINE_POS].widget, enable);
 
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_STORE_ADDRESS_POS].widget, enable);
 
@@ -2110,9 +2112,9 @@ forward_message_attached_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-forward_message_quoted_cb(GtkWidget * widget, gpointer data)
+forward_message_inline_cb(GtkWidget * widget, gpointer data)
 {
-    balsa_message_forward_quoted(widget,
+    balsa_message_forward_inline(widget,
         balsa_window_find_current_index(BALSA_WINDOW(data)));
 }
 

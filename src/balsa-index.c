@@ -1666,17 +1666,17 @@ balsa_message_forward_attached(GtkWidget * widget, gpointer user_data)
 
 
 void
-balsa_message_forward_quoted(GtkWidget * widget, gpointer user_data)
+balsa_message_forward_inline(GtkWidget * widget, gpointer user_data)
 {
-    balsa_message_forward(widget, user_data, SEND_FORWARD_QUOTE);
+    balsa_message_forward(widget, user_data, SEND_FORWARD_INLINE);
 }
 
 
 void
 balsa_message_forward_default(GtkWidget * widget, gpointer user_data)
 {
-    balsa_message_forward(widget, user_data, 
-	balsa_app.forward_attached ? SEND_FORWARD_ATTACH : SEND_FORWARD_QUOTE);
+    balsa_message_forward(widget, user_data, balsa_app.forward_attached 
+			  ? SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE);
 }
 
 
@@ -2092,12 +2092,12 @@ create_menu(BalsaIndex * bindex)
 			   bindex, TRUE);
 
     create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_FWD,
-			   _("Forward Attached..."), balsa_message_forward_attached,
-			   bindex, TRUE);
+			   _("Forward Attached..."), 
+			   balsa_message_forward_attached, bindex, TRUE);
 
     create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_FWD,
-			   _("Forward Quoted..."), balsa_message_forward_quoted,
-			   bindex, TRUE);
+			   _("Forward Inline..."), 
+			   balsa_message_forward_inline, bindex, TRUE);
 
     create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH,
 			   _("Delete"), balsa_message_delete, bindex,
@@ -2377,6 +2377,11 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
 
     clist = GTK_CLIST(bindex->ctree);
     bindex->threading_type = thtype;
+    
+    gtk_ctree_set_line_style (
+            bindex->ctree,
+            (thtype == BALSA_INDEX_THREADING_FLAT)?
+                GTK_CTREE_LINES_NONE: GTK_CTREE_LINES_SOLID);
     
     mailbox = bindex->mailbox_node->mailbox;
 

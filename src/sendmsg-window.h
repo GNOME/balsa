@@ -32,7 +32,7 @@ extern "C" {
 	SEND_REPLY_ALL,		/* by Reply All           */
 	SEND_REPLY_GROUP,       /* by Reply to Group      */
 	SEND_FORWARD_ATTACH,    /* by Forward attached    */
-	SEND_FORWARD_QUOTE,     /* by Forward quoted      */
+	SEND_FORWARD_INLINE,    /* by Forward inline      */
 	SEND_CONTINUE		/* by Continue postponed  */
     } SendType;
 

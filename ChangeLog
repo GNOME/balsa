@@ -8,6 +8,8 @@
 	* libbalsa/identity.c: handle cancelling identity selection (wil).
 	* src/toolbar-factory.c: add "empty thrash" to the legal main toolbar
 	buttons list.
+
+	replace forward "quoted" with forward "inline.
 	
 2001-09-22  Pawel Salek  <pawsa@theochem.kth.se>
 

@@ -54,7 +54,7 @@ static void replyto_message_cb(GtkWidget * widget, gpointer data);
 static void replytoall_message_cb(GtkWidget * widget, gpointer data);
 static void replytogroup_message_cb(GtkWidget * widget, gpointer data);
 static void forward_message_attached_cb(GtkWidget * widget, gpointer data);
-static void forward_message_quoted_cb(GtkWidget * widget, gpointer data);
+static void forward_message_inline_cb(GtkWidget * widget, gpointer data);
 static void forward_message_default_cb(GtkWidget * widget, gpointer data);
 
 static void next_part_cb(GtkWidget * widget, gpointer data);
@@ -145,12 +145,14 @@ static GnomeUIInfo message_menu[] = {
      BALSA_PIXMAP_MAIL_RPL_GROUP_MENU, 'G', 0, NULL},
     /* F */
     {
-     GNOME_APP_UI_ITEM, N_("_Forward attached..."), N_("Forward this message as attachment"),
+     GNOME_APP_UI_ITEM, N_("_Forward attached..."), 
+     N_("Forward this message as attachment"),
      forward_message_attached_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL},
     {
-     GNOME_APP_UI_ITEM, N_("Forward quoted..."), N_("Forward this message quoted"),
-     forward_message_quoted_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+     GNOME_APP_UI_ITEM, N_("Forward inline..."), 
+     N_("Forward this message inline"),
+     forward_message_inline_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      GNOME_STOCK_MENU_MAIL_FWD, 'F', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
     {
@@ -414,14 +416,14 @@ forward_message_attached_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-forward_message_quoted_cb(GtkWidget * widget, gpointer data)
+forward_message_inline_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) data;
 
     g_return_if_fail(widget != NULL);
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_new(widget, mw->message, SEND_FORWARD_QUOTE);
+    sendmsg_window_new(widget, mw->message, SEND_FORWARD_INLINE);
 }
 
 static void
@@ -432,8 +434,8 @@ forward_message_default_cb(GtkWidget * widget, gpointer data)
     g_return_if_fail(widget != NULL);
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_new(widget, mw->message,
-        balsa_app.forward_attached ? SEND_FORWARD_ATTACH : SEND_FORWARD_QUOTE);
+    sendmsg_window_new(widget, mw->message, balsa_app.forward_attached 
+		       ? SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE);
 }
 
 static void

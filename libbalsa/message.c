@@ -285,7 +285,7 @@ libbalsa_message_charset(LibBalsaMessage * message)
     return g_strdup(tmp);
 }
 
-LibBalsaAddress *
+static LibBalsaAddress *
 libbalsa_address_new_from_libmutt(ADDRESS * caddr)
 {
     LibBalsaAddress *address;
@@ -302,6 +302,45 @@ libbalsa_address_new_from_libmutt(ADDRESS * caddr)
 					      g_strdup(caddr->mailbox));
 
     return address;
+}
+
+static GList*
+libbalsa_address_list_from_libmutt(ADDRESS *addy)
+{
+    GList *res = NULL;
+    LibBalsaAddress *addr = NULL;
+    int in_group = 0;
+        
+    for (; addy; addy = addy->next) {
+        if(in_group) {
+            g_return_val_if_fail(addr != NULL, res);
+            if(addy->mailbox) {
+                addr->address_list = 
+                    g_list_append(addr->address_list, 
+                                  g_strdup(addy->mailbox));
+            } else {
+                in_group = 0;
+                res = g_list_append(res, addr);
+                addr = NULL;
+            }
+        } else {
+            g_return_val_if_fail(addr == NULL,res);
+            addr = libbalsa_address_new();
+            if(addy->group) {
+                in_group = 1;
+                addr->full_name = g_strdup(addy->mailbox);
+            } else {
+                if(addy->personal)
+                    addr->full_name = g_strdup(addy->personal);
+                addr->address_list =
+                    g_list_append(addr->address_list, 
+                                  g_strdup(addy->mailbox));
+                res = g_list_prepend(res, addr);
+                addr = NULL;
+            }
+        }
+    }
+    return g_list_reverse(res);
 }
 
 /* message_user_hdrs:
@@ -1200,38 +1239,14 @@ libbalsa_message_headers_from_mutt(LibBalsaMessageHeaders *headers,
         headers->dispnotify_to =
             libbalsa_address_new_from_libmutt(cenv->dispnotify_to);
 
-    if (!headers->to_list) {
-        ADDRESS *addy;
-        for (addy = cenv->to; addy; addy = addy->next) {
-            LibBalsaAddress *addr =
-                libbalsa_address_new_from_libmutt(addy);
-            if (addr)
-                headers->to_list = g_list_prepend(headers->to_list, addr);
-        }
-	headers->to_list = g_list_reverse(headers->to_list);
-    }
+    if (!headers->to_list)
+        headers->to_list = libbalsa_address_list_from_libmutt(cenv->to);
 
-    if (!headers->cc_list) {
-        ADDRESS *addy;
-        for (addy = cenv->cc; addy; addy = addy->next) {
-            LibBalsaAddress *addr =
-                libbalsa_address_new_from_libmutt(addy);
-            if (addr)
-                headers->cc_list = g_list_prepend(headers->cc_list, addr);
-        }
-	headers->cc_list = g_list_reverse(headers->cc_list);
-    }
+    if (!headers->cc_list)
+        headers->cc_list = libbalsa_address_list_from_libmutt(cenv->cc);
 
-    if (!headers->bcc_list) {
-        ADDRESS *addy;
-        for (addy = cenv->bcc; addy; addy = addy->next) {
-            LibBalsaAddress *addr =
-                libbalsa_address_new_from_libmutt(addy);
-            if (addr)
-                headers->bcc_list = g_list_prepend(headers->bcc_list, addr);
-        }
-	headers->bcc_list = g_list_reverse(headers->bcc_list);
-    }
+    if (!headers->bcc_list)
+        headers->bcc_list = libbalsa_address_list_from_libmutt(cenv->bcc);
 
     if (!headers->user_hdrs)
         headers->user_hdrs = libbalsa_message_user_hdrs_from_mutt(mheader);

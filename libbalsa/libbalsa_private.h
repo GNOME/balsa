@@ -27,7 +27,6 @@
 
 #include "libmutt/mutt.h"
 
-LibBalsaAddress *libbalsa_address_new_from_libmutt(ADDRESS * caddr);
 /* private interfaces to avoid the libbalsa API */
 /* address.c: */
 gchar *libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n);

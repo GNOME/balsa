@@ -2053,3 +2053,29 @@ libbalsa_delete_link(GList * list, GList * link)
     return g_list_delete_link(list, link);
 #endif                          /* BALSA_MAJOR == 1 */
 }
+
+/* libbalsa_address_entry_get_list:
+   create list of LibBalsaAddress objects corresponding to the
+   entry content. If possible, references objects from the address books.
+   if not, creates new ones.
+   The objects must be dereferenced later and the list disposed, eg.
+   g_list_foreach(l, g_object_unref, NULL); g_list_free(l);
+*/
+GList*
+libbalsa_address_entry_get_list(LibBalsaAddressEntry *address_entry)
+{
+    GList *l, *res = NULL;
+    for(l = g_list_first(address_entry->active); l;  l = l->next) {
+        emailData *ed = l->data;
+        if(!ed->user || !*ed->user)
+            continue;
+        if(ed->address) {
+            g_object_ref(ed->address);
+            res = g_list_append(res, ed->address);
+        } else {
+            res = g_list_append(res, 
+                                libbalsa_address_new_from_string(ed->user));
+        }
+    }
+    return res;
+}

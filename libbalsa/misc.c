@@ -146,8 +146,7 @@ libbalsa_make_string_from_list_p(const GList * the_list)
 
     for (list = the_list; list; list = list->next) {
         LibBalsaAddress *addy = list->data;
-        gchar *str = libbalsa_address_to_gchar_p(addy, 0);
-
+        gchar *str = libbalsa_address_to_gchar_p(addy, -1);
         if (str) {
             if (gs->len > 0)
                 g_string_append(gs, ", ");

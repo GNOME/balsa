@@ -154,12 +154,13 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
 	    }
 	    addr = LIBBALSA_ADDRESS(search->data);
 	}
-	output=libbalsa_address_to_gchar(addr, 0);
+	output=libbalsa_address_to_gchar(addr, -1);
 
 	if(balsa_app.debug)
             g_message("expand_alias_find_match(): Found [%s]", 
                       addr->full_name);
 	g_list_foreach(match, (GFunc)g_object_unref, NULL);
+
 	
 	/*
 	 * And now we handle the case of "No matches found."
@@ -168,5 +169,6 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
     if (prefix) g_free(prefix);
 
     addy->match = output;
+    addy->address = addr;
 }
 

@@ -1,3 +1,8 @@
+2003-03-20  Carlos Morgado  <chbm chbm.nu>
+
+	* imap/utf7.c: fix exploitable buffer overflow
+	http://marc.theaimsgroup.com/?l=mutt-dev&m=104811170330897&w=2
+
 2003-02-10  Carlos Morgado  <chbm@chbm.nu>
 
 	* configure.in: remove the autoconf-2.52 dependency

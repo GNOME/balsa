@@ -214,10 +214,10 @@ index_child_create_view (GnomeMDIChild * child)
   IndexChild *ic;
 
   ic = INDEX_CHILD (child);
-
+#if 0
   if (balsa_app.previewpane)
     {
-
+#endif
       vpane = gtk_vpaned_new ();
 
       ic->index = balsa_index_new ();
@@ -243,12 +243,14 @@ index_child_create_view (GnomeMDIChild * child)
       gtk_widget_set_usize (vpane, 1, 250);
 
       gtk_widget_show_all (vpane);
+#if 0
     }
   else
     {
       ic->index = balsa_index_new ();
       gtk_widget_show(ic->index);
     }
+#endif
 
   balsa_index_set_mailbox (BALSA_INDEX (ic->index), ic->mailbox);
 

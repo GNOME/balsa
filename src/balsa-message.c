@@ -357,7 +357,7 @@ next_part_height (GnomeCanvasGroup * group)
   gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (group), &x1, &y1, &x2, &y2);
 
   r = y2 - y1;
-  r += 50;
+  r += 25;
 
   return r;
 }
@@ -476,16 +476,8 @@ body2canvas (BalsaMessage * bmessage, Message * message)
     GNOME_CANVAS_GROUP (gnome_canvas_item_new (bm_root,
 					       GNOME_TYPE_CANVAS_GROUP,
 					       "x", (double) 10.0,
-					       "y", (double) (y2 - y1) + 20,
+					       "y", (double) (y2 - y1) + 15,
 					       NULL));
-
-  gnome_canvas_item_new (bmessage->body, GNOME_TYPE_CANVAS_TEXT,
-			 "x", (double) 0,
-			 "y", (double) 0,
-			 "anchor", GTK_ANCHOR_NW,
-			 "font", "fixed",
-			 "text", 
-			 "                                                                                                   ", NULL);
 
   message_body_ref (message);
   content2canvas (message, bmessage->body);

@@ -691,6 +691,7 @@ bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
     BalsaMailboxNode *mbnode = NULL;
     gint event_button;
     guint event_time;
+    GtkWidget *menu;
 
     if (path) {
         GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
@@ -708,8 +709,14 @@ bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
         event_button = 0;
         event_time = gtk_get_current_event_time();
     }
-    gtk_menu_popup(GTK_MENU(balsa_mailbox_node_get_context_menu(mbnode)),
-                   NULL, NULL, NULL, NULL, event_button, event_time);
+
+    menu = balsa_mailbox_node_get_context_menu(mbnode);
+    g_object_ref(menu);
+    gtk_object_sink(GTK_OBJECT(menu));
+    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
+		   event_button, event_time);
+    g_object_unref(menu);
+
     if (mbnode)
 	g_object_unref(mbnode);
 }

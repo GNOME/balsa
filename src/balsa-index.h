@@ -68,6 +68,8 @@ extern "C" {
         /* signal handler ids */
         gulong selection_changed_id;
         gulong row_expanded_id;
+
+	LibBalsaMailboxSearchIter *search_iter;
     };
 
     struct _BalsaIndexClass {
@@ -114,7 +116,8 @@ extern "C" {
     void balsa_index_select_next_flagged(BalsaIndex * bindex);
     void balsa_index_select_previous(BalsaIndex *);
 
-    void balsa_index_find(BalsaIndex * bindex, LibBalsaCondition *condition,
+    void balsa_index_find(BalsaIndex * bindex,
+			  LibBalsaMailboxSearchIter * search_iter,
                           gboolean previous);
 
 /* balsa index page stuff */

@@ -62,16 +62,6 @@ static gboolean bndx_row_is_viewable(BalsaIndex * index,
                                      GtkTreePath * path);
 static void bndx_expand_to_row_and_select(BalsaIndex * index,
                                           GtkTreeIter * iter);
-static gboolean bndx_find_row_and_select(BalsaIndex * index,
-					 LibBalsaMessageFlag flag,
-					 LibBalsaCondition *condition,
-					 gboolean previous,
-					 gboolean threaded);
-static gboolean bndx_find_row(BalsaIndex * index,
-                              GtkTreeIter * pos, gboolean reverse_search,
-                              LibBalsaMessageFlag flag,
-                              LibBalsaCondition *condition,
-                              gboolean threaded);
 static void bndx_changed_find_row(BalsaIndex * index);
 
 /* mailbox callbacks */
@@ -222,6 +212,11 @@ bndx_destroy(GtkObject * obj)
 						 0, 0, NULL, NULL, index);
 	    gtk_tree_view_set_model(GTK_TREE_VIEW(index), NULL);
 	    libbalsa_mailbox_close(mailbox);
+
+	    if (index->search_iter) {
+		libbalsa_mailbox_search_iter_free(index->search_iter);
+		index->search_iter = NULL;
+	    }
 	}
         g_object_unref(index->mailbox_node);
 	index->mailbox_node = NULL;
@@ -651,6 +646,17 @@ balsa_index_scroll_on_open(BalsaIndex *index)
     }
 }
 
+static LibBalsaCondition cond_undeleted =
+{
+    TRUE,
+    CONDITION_FLAG,
+    {
+       {
+           LIBBALSA_MESSAGE_FLAG_DELETED
+       }
+    }
+};
+
 /* balsa_index_load_mailbox_node:
    open mailbox_node, the opening is done in thread to keep UI alive.
    NOTES:
@@ -735,6 +741,9 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
 #endif
     gtk_tree_view_set_model(tree_view, GTK_TREE_MODEL(mailbox));
 
+    /* Create a search-iter for SEARCH UNDELETED. */
+    index->search_iter = libbalsa_mailbox_search_iter_new(&cond_undeleted);
+
     return FALSE;
 }
 
@@ -776,186 +785,180 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
  *   callback for the edit=>find menu action
  */
 
+typedef enum {
+    BNDX_SEARCH_DIRECTION_NEXT,
+    BNDX_SEARCH_DIRECTION_PREV
+} BndxSearchDirection;
+
+typedef enum {
+    BNDX_SEARCH_VIEWABLE_ANY,
+    BNDX_SEARCH_VIEWABLE_ONLY
+} BndxSearchViewable;
+
+typedef enum {
+    BNDX_SEARCH_START_ANY,
+    BNDX_SEARCH_START_CURRENT
+} BndxSearchStart;
+
+typedef enum {
+    BNDX_SEARCH_WRAP_YES,
+    BNDX_SEARCH_WRAP_NO
+} BndxSearchWrap;
+
+static gboolean
+bndx_find_root(BalsaIndex * index, GtkTreeIter * iter)
+{
+    GtkTreeView *tree_view = GTK_TREE_VIEW(index);
+    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+
+    if (!gtk_tree_model_get_iter_first(model, iter))
+	return FALSE;
+
+    iter->user_data = NULL;
+    return TRUE;
+}
+
+static gboolean
+bndx_search_iter(BalsaIndex * index,
+		 LibBalsaMailboxSearchIter * search_iter,
+		 GtkTreeIter * iter,
+		 BndxSearchDirection direction,
+		 BndxSearchViewable viewable,
+		 guint stop_msgno)
+{
+    gboolean found;
+
+    do {
+	GtkTreePath *path;
+
+	found =
+	    libbalsa_mailbox_search_iter_step(index->mailbox_node->mailbox,
+					      search_iter, iter,
+					      direction ==
+					      BNDX_SEARCH_DIRECTION_NEXT,
+					      stop_msgno);
+	if (!found)
+	    break;
+	if (viewable == BNDX_SEARCH_VIEWABLE_ANY)
+	    break;
+
+	path = gtk_tree_model_get_path(GTK_TREE_MODEL
+				       (index->mailbox_node->mailbox),
+				       iter);
+	found = bndx_row_is_viewable(index, path);
+	gtk_tree_path_free(path);
+    } while (!found);
+
+    return found;
+}
+
+static gboolean
+bndx_search_iter_and_select(BalsaIndex * index,
+			    LibBalsaMailboxSearchIter * search_iter,
+			    BndxSearchDirection direction,
+			    BndxSearchViewable viewable,
+			    BndxSearchStart start,
+			    BndxSearchWrap wrap)
+{
+    GtkTreeIter iter;
+    guint stop_msgno;
+
+    if (!(bndx_find_message(index, NULL, &iter, index->current_message)
+	  || (start == BNDX_SEARCH_START_ANY
+	      && bndx_find_root(index, &iter))))
+	return FALSE;
+
+    stop_msgno = 0;
+    if (wrap == BNDX_SEARCH_WRAP_YES && index->current_message)
+	stop_msgno = index->current_message->msgno;
+    if (!bndx_search_iter(index, search_iter, &iter, direction, viewable,
+			  stop_msgno))
+	return FALSE;
+
+    bndx_expand_to_row_and_select(index, &iter);
+    return TRUE;
+}
+
 void
 balsa_index_select_next(BalsaIndex * index)
 {
-    bndx_find_row_and_select(index, (LibBalsaMessageFlag) 0,
-                             NULL, FALSE, FALSE);
+    bndx_search_iter_and_select(index, index->search_iter,
+				BNDX_SEARCH_DIRECTION_NEXT,
+				BNDX_SEARCH_VIEWABLE_ONLY,
+				BNDX_SEARCH_START_CURRENT,
+				BNDX_SEARCH_WRAP_NO);
 }
 
 static void
 bndx_select_next_threaded(BalsaIndex * index)
 {
-    if (!bndx_find_row_and_select(index, (LibBalsaMessageFlag) 0,
-                                  NULL, FALSE, TRUE))
-	balsa_index_select_previous(index);
+    if (!bndx_search_iter_and_select(index, index->search_iter,
+				     BNDX_SEARCH_DIRECTION_NEXT,
+				     BNDX_SEARCH_VIEWABLE_ANY,
+				     BNDX_SEARCH_START_CURRENT,
+				     BNDX_SEARCH_WRAP_NO))
+	bndx_search_iter_and_select(index, index->search_iter,
+				    BNDX_SEARCH_DIRECTION_PREV,
+				    BNDX_SEARCH_VIEWABLE_ONLY,
+				    BNDX_SEARCH_START_CURRENT,
+				    BNDX_SEARCH_WRAP_NO);
 }
 
 void
 balsa_index_select_previous(BalsaIndex * index)
 {
-    bndx_find_row_and_select(index, (LibBalsaMessageFlag) 0,
-                             NULL, TRUE, FALSE);
+    bndx_search_iter_and_select(index, index->search_iter,
+				BNDX_SEARCH_DIRECTION_PREV,
+				BNDX_SEARCH_VIEWABLE_ONLY,
+				BNDX_SEARCH_START_CURRENT,
+				BNDX_SEARCH_WRAP_NO);
+}
+
+void
+balsa_index_find(BalsaIndex * index,
+		 LibBalsaMailboxSearchIter * search_iter,
+		 gboolean previous)
+{
+    bndx_search_iter_and_select(index, search_iter,
+				(previous ? BNDX_SEARCH_DIRECTION_PREV :
+				 BNDX_SEARCH_DIRECTION_NEXT),
+				BNDX_SEARCH_VIEWABLE_ANY,
+				BNDX_SEARCH_START_ANY,
+				BNDX_SEARCH_WRAP_NO);
+}
+
+static void
+bndx_select_next_with_flag(BalsaIndex * index, LibBalsaMessageFlag flag)
+{
+    LibBalsaCondition cond_flag, cond_and;
+    LibBalsaMailboxSearchIter *search_iter;
+
+    cond_flag.negate      = FALSE;
+    cond_flag.type        = CONDITION_FLAG;
+    cond_flag.match.flags = flag;
+    cond_and.negate            = FALSE;
+    cond_and.type              = CONDITION_AND;
+    cond_and.match.andor.left  = &cond_flag;
+    cond_and.match.andor.right = &cond_undeleted;
+    search_iter = libbalsa_mailbox_search_iter_new(&cond_and);
+
+    bndx_search_iter_and_select(index, search_iter,
+				BNDX_SEARCH_DIRECTION_NEXT,
+				BNDX_SEARCH_VIEWABLE_ANY,
+				BNDX_SEARCH_START_ANY,
+				BNDX_SEARCH_WRAP_YES);
 }
 
 void
 balsa_index_select_next_unread(BalsaIndex * index)
 {
-    bndx_find_row_and_select(index, LIBBALSA_MESSAGE_FLAG_NEW,
-                             NULL, FALSE, TRUE);
+    bndx_select_next_with_flag(index, LIBBALSA_MESSAGE_FLAG_NEW);
 }
 
 void
 balsa_index_select_next_flagged(BalsaIndex * index)
 {
-    bndx_find_row_and_select(index, LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                             NULL, FALSE, TRUE);
-}
-
-void
-balsa_index_find(BalsaIndex * index, LibBalsaCondition *condition,
-                 gboolean previous)
-{
-    bndx_find_row_and_select(index, (LibBalsaMessageFlag) 0,
-                             condition, previous, TRUE);
-}
-
-/* Helpers for the message selection methods. */
-static gboolean
-bndx_find_row_and_select(BalsaIndex * index,
-                         LibBalsaMessageFlag flag,
-                         LibBalsaCondition *condition,
-                         gboolean previous,
-			 gboolean threaded)
-{
-    GtkTreeIter pos;
-
-    if (bndx_find_row(index, &pos, previous, flag, condition, threaded)) {
-	bndx_expand_to_row_and_select(index, &pos);
-	return TRUE;
-    }
-
-    return FALSE;
-}
-
-/* bndx_find_row:
- * common search code--look for next or previous, with or without flag
- *
- * Returns TRUE if the search succeeds.
- * On success, *pos points to the new message.
- * On failure, *pos is unchanged.
- */
-static LibBalsaCondition cond_undeleted = 
-{
-    TRUE,
-    CONDITION_FLAG,
-    {
-	{
-	    LIBBALSA_MESSAGE_FLAG_DELETED
-	}
-    }
-};
-
-static gboolean
-bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
-              gboolean reverse_search, LibBalsaMessageFlag flag,
-              LibBalsaCondition *condition, gboolean threaded)
-{
-    GtkTreeView *tree_view = GTK_TREE_VIEW(index);
-    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-    GtkTreeIter iter;
-    gboolean found;
-    gboolean wrap = (flag != (LibBalsaMessageFlag) 0);
-    LibBalsaCondition cond_flag, cond_and;
-    guint wrap_to_msgno;
-    LibBalsaMailboxSearchIter *search_iter;
-
-    g_return_val_if_fail(index != NULL, FALSE);
-
-    if (!bndx_find_message(index, NULL, &iter, index->current_message)) {
-        /* The current_message is NULL (or we otherwise can't find
-         * it); if we're looking for a plain next or prev, just return
-         * FALSE. */
-        if (!(flag || condition))
-            return FALSE;
-
-        wrap = FALSE;
-        /* Search from the first message, unless... */
-        if (!gtk_tree_model_get_iter_first(model, &iter))
-            /* ...index is empty, or... */
-            return FALSE;
-        if (reverse_search) {
-            /* ...search from the last message. */
-            GtkTreeIter tmp = iter;
-
-	    for (;;)
-		if (gtk_tree_model_iter_next(model, &tmp))
-		    iter = tmp;
-                else if (gtk_tree_model_iter_children(model, &tmp, &iter))
-		    iter = tmp;
-		else break;
-        }
-    }
-
-    if (!condition)
-	/* Next, previous, next-unread, and next-flagged should ignore
-	 * deleted messages; we'll allow Edit => Find to search all
-	 * messages. */
-	condition = &cond_undeleted;
-
-    if (flag != (LibBalsaMessageFlag) 0) {
-	cond_flag.negate      = FALSE;
-	cond_flag.type        = CONDITION_FLAG;
-	cond_flag.match.flags = flag;
-	cond_and.negate       = FALSE;
-	cond_and.type         = CONDITION_AND;
-	cond_and.match.andor.left  = &cond_flag;
-	cond_and.match.andor.right = condition;
-	condition = &cond_and;
-    }
-
-    search_iter =
-	libbalsa_mailbox_search_iter_new(index->mailbox_node->mailbox,
-					 &iter, condition);
-    wrap_to_msgno =
-	(wrap && index->current_message) ? index->current_message->msgno : 0;
-    do {
-	found =
-	    libbalsa_mailbox_search_iter_step(index->mailbox_node->mailbox,
-					      search_iter,
-					      !reverse_search);
-	if (found) {
-	    if (!threaded) {
-		GtkTreePath *path;
-
-		path = gtk_tree_model_get_path(model, &iter);
-		found = bndx_row_is_viewable(index, path);
-		gtk_tree_path_free(path);
-	    }
-	} else if (wrap) {
-	    wrap = FALSE;
-	    /* Search from the first message, unless... */
-	    gtk_tree_model_get_iter_first(model, &iter);
-	    if (reverse_search) {
-		/* ...search from the last message. */
-		GtkTreeIter tmp = iter;
-
-		for (;;)
-		    if (gtk_tree_model_iter_next(model, &tmp))
-			iter = tmp;
-		    else if (gtk_tree_model_iter_children(model, &tmp, &iter))
-			iter = tmp;
-		    else break;
-	    }
-	} else break;
-    } while (!found);
-    libbalsa_mailbox_search_iter_free(index->mailbox_node->mailbox,
-				      search_iter);
-
-    if (found && pos)
-	*pos = iter;
-
-    return found;
+    bndx_select_next_with_flag(index, LIBBALSA_MESSAGE_FLAG_FLAGGED);
 }
 
 /* bndx_expand_to_row_and_select:
@@ -1704,8 +1707,7 @@ static void
 bndx_changed_find_row(BalsaIndex * index)
 {
     GtkTreeIter iter;
-    GtkTreeIter tmp;
-    LibBalsaMailboxSearchIter *search_iter;
+    gpointer tmp;
 
     if (!bndx_find_message(index, NULL, &iter, index->current_message)) {
 	index->next_message = FALSE;
@@ -1713,19 +1715,16 @@ bndx_changed_find_row(BalsaIndex * index)
 	return;
     }
 
-    search_iter =
-	libbalsa_mailbox_search_iter_new(index->mailbox_node->mailbox,
-					 &iter, &cond_undeleted);
-    tmp = iter;
+    tmp = iter.user_data;
     index->next_message =
-	libbalsa_mailbox_search_iter_step(index->mailbox_node->mailbox,
-					  search_iter, TRUE);
-    iter = tmp;
+	bndx_search_iter(index, index->search_iter, &iter,
+			 BNDX_SEARCH_DIRECTION_NEXT,
+			 BNDX_SEARCH_VIEWABLE_ONLY, 0);
+    iter.user_data = tmp;
     index->prev_message =
-	libbalsa_mailbox_search_iter_step(index->mailbox_node->mailbox,
-					  search_iter, FALSE);
-    libbalsa_mailbox_search_iter_free(index->mailbox_node->mailbox,
-				      search_iter);
+	bndx_search_iter(index, index->search_iter, &iter,
+			 BNDX_SEARCH_DIRECTION_PREV,
+			 BNDX_SEARCH_VIEWABLE_ONLY, 0);
 
     g_signal_emit(G_OBJECT(index), balsa_index_signals[INDEX_CHANGED], 0);
 }

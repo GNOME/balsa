@@ -1,5 +1,7 @@
-2003-10-22 06:14  PeterB
+2003-10-22 07:11  PeterB
 
+	* libbalsa/mailbox_imap.c: Use g_mime_utils_header_decode_text
+	instead of deprecated g_mime_utils_8bit_header_decode.
 	* libbalsa/mailbox_imap.c: Decode addresses.
 	* libbalsa/imap/imap-handle.c: Check protocol in addresses.
 

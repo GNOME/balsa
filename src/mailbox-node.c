@@ -346,7 +346,7 @@ imap_dir_cb_real(void* r)
     imap_scan_destroy_tree(&imap_tree);
 
     /* register whole tree */
-    if(BALSA_MAILBOX_NODE(root->data)->name)
+    if(balsa_app.debug && BALSA_MAILBOX_NODE(root->data)->name)
         printf("imap_dir_cb:  main mailbox node %s mailbox is %p\n", 
                BALSA_MAILBOX_NODE(root->data)->name, 
                BALSA_MAILBOX_NODE(root->data)->mailbox);
@@ -435,10 +435,12 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
     libbalsa_server_load_config(folder->server);
 
 #ifdef USE_SSL  
-    printf("Server loaded, host: %s, %s.\n", folder->server->host,
-	   folder->server->use_ssl ? "SSL" : "no SSL");
+    if(balsa_app.debug)
+	printf("Server loaded, host: %s, %s.\n", folder->server->host,
+	       folder->server->use_ssl ? "SSL" : "no SSL");
 #else
-    printf("Server loaded, host: %s\n", folder->server->host);
+    if(balsa_app.debug)
+	printf("Server loaded, host: %s\n", folder->server->host);
 #endif
     g_signal_connect(G_OBJECT(folder), "show-prop-dialog", 
 		     G_CALLBACK(folder_conf_imap_node), NULL);
@@ -630,7 +632,7 @@ balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
     }
 
     g_node_destroy(tmp_node);
-#endif                          /* defined(BALSA_USE_THREADS) && defined(THREADED_IMAP_SCAN_FIXED) */
+#endif  /* defined(BALSA_USE_THREADS) && defined(THREADED_IMAP_SCAN_FIXED) */
 }
 
 /* balsa_mailbox_node_scan_children:

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -55,10 +55,12 @@ struct _FolderDialogData {
 #endif
 };
 
+/* FIXME: identity_name will leak on cancelled folder edition */
+
 struct _SubfolderDialogData {
     FOLDER_CONF_COMMON;
-    GtkWidget *parent_folder, *folder_name, *identity;
-    gchar *old_folder, *old_parent;
+    GtkWidget *parent_folder, *folder_name, *identity_label;
+    gchar *old_folder, *old_parent, *identity_name;
     BalsaMailboxNode *parent;   /* (new) parent of the mbnode.  */
     /* Used for renaming and creation */
 };
@@ -316,7 +318,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     fcw->list_inbox = create_check(fcw->dialog, _("_Always show INBOX"), 
                                   table, 7, mn ? mn->list_inbox : TRUE); 
 
-    label = create_label(_("_Prefix"), table, 8);
+    label = create_label(_("Pr_efix"), table, 8);
     fcw->prefix = create_entry(fcw->dialog, table, NULL, NULL, 8,
 			      mn ? mn->dir : NULL, label);
     
@@ -501,18 +503,48 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
 }
 
 static void
+ident_updated_cb(SubfolderDialogData * sdd, LibBalsaIdentity* identity)
+{
+    if(identity) {
+	g_free(sdd->identity_name);
+	sdd->identity_name = g_strdup(identity->identity_name);
+	gtk_label_set_text(GTK_LABEL(sdd->identity_label), sdd->identity_name);
+    }
+}
+
+static void
+ident_change_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
+{
+    LibBalsaIdentity* ident = balsa_app.current_ident;
+    GList *l;
+    if(sdd->identity_name) {
+	for(l=balsa_app.identities; l; l = l = g_list_next(l))
+	    if( strcmp(sdd->identity_name, 
+		       LIBBALSA_IDENTITY(l->data)->identity_name)==0) {
+		ident = LIBBALSA_IDENTITY(l->data);
+		break;
+	    }
+    }
+		
+    libbalsa_identity_select_dialog(GTK_WINDOW(sdd->dialog),
+				    _("Select Identity"),
+				    balsa_app.identities,
+				    ident,
+				    (LibBalsaIdentityCallback)ident_updated_cb,
+				    sdd);
+}
+
+static void
 subfolder_conf_clicked_ok(SubfolderDialogData * sdd)
 {
-    gchar *parent, *folder, *identity;
+    gchar *parent, *folder;
 
     parent =
         gtk_editable_get_chars(GTK_EDITABLE(sdd->parent_folder), 0, -1);
     folder = gtk_editable_get_chars(GTK_EDITABLE(sdd->folder_name), 0, -1);
-    g_print("sdd->old_parent=%s\n", sdd->old_parent);
-    g_print("sdd->old_folder=%s\n", sdd->old_folder);
-    identity = sdd->identity
-        ? gtk_editable_get_chars(GTK_EDITABLE(sdd->identity), 0, -1)
-        : NULL;
+    if(balsa_app.debug)
+	g_print("sdd->old_parent=%s\nsdd->old_folder=%s\n",
+		sdd->old_parent, sdd->old_folder);
 
     if (sdd->mbnode) {
         /* rename */
@@ -592,7 +624,8 @@ folder, parent);
         } else {
             LibBalsaMailbox *mbx = sdd->mbnode->mailbox;
             g_free(mbx->identity_name);
-            mbx->identity_name = identity;
+            mbx->identity_name = sdd->identity_name;
+            sdd->identity_name = NULL;
             config_views_save();
         }
     } else {
@@ -603,7 +636,6 @@ folder, parent);
 
         /* see it as server sees it: */
         balsa_mailbox_node_rescan(sdd->parent);
-        g_free(identity);       /* OOPS NOT USED */
     }
     g_free(parent);
     g_free(folder);
@@ -617,9 +649,9 @@ folder, parent);
 void
 folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 {
-    GtkWidget *frame, *table, *subtable, *browse_button, *label;
+    GtkWidget *frame, *table, *subtable, *button, *label, *box;
     SubfolderDialogData *sdd;
-    static SubfolderDialogData *sdd_new;
+    static SubfolderDialogData *sdd_new = NULL;
 
     /* Allow only one dialog per mailbox node, and one with mn == NULL
      * for creating a new subfolder. */
@@ -649,6 +681,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 	sdd->mbnode = mn;
 	sdd->parent = mn->parent;
 	sdd->old_folder = mn->mailbox->name;
+	sdd->identity_name = g_strdup(mn->mailbox->identity_name);
     } else {
 	/* create */
 	BalsaMailboxNode *mbnode =
@@ -660,6 +693,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 	    sdd->mbnode = NULL;
         sdd->old_folder = NULL;
         sdd->parent = NULL;
+	sdd->identity_name = NULL;
     }
     sdd->old_parent = sdd->mbnode ? sdd->mbnode->parent->dir : NULL;
 
@@ -691,7 +725,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 			       _("Create subfolder"));
     gtk_box_pack_start(GTK_BOX(sdd->dialog->vbox),
                        frame, TRUE, TRUE, 0);
-    table = gtk_table_new(3, 2, FALSE);
+    table = gtk_table_new(3, 3, FALSE);
     gtk_container_add(GTK_CONTAINER(frame), table);
  
     /* INPUT FIELD CREATION */
@@ -706,24 +740,27 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                                      GTK_SIGNAL_FUNC(validate_sub_folder),
 				     sdd, 0, sdd->old_parent, label);
 
-    browse_button = gtk_button_new_with_mnemonic(_("_Browse..."));
-    g_signal_connect(G_OBJECT(browse_button), "clicked",
+    button = gtk_button_new_with_mnemonic(_("_Browse..."));
+    g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(browse_button_cb), (gpointer) sdd);
-    gtk_table_attach(GTK_TABLE(subtable), browse_button, 2, 3, 0, 1,
+    gtk_table_attach(GTK_TABLE(subtable), button, 2, 3, 0, 1,
 	GTK_EXPAND | GTK_FILL, GTK_FILL, 5, 5);
     gtk_table_attach(GTK_TABLE(table), subtable, 1, 2, 1, 2,
 	GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
 
-    if (mn) {
-        /* For the `Properties' dialog, add an identity widget; as of now,
-         * we can't associate an identity with a new subfolder, so we don't
-         * make the widget. */
-        label = create_label(_("_Identity:"), table, 2);
-        sdd->identity =
-            create_entry(sdd->dialog, table, NULL, sdd, 2,
-                         mn->mailbox->identity_name, label);
-    } else
-        sdd->identity = NULL;
+    label = create_label(_("Identity:"), table, 2);
+    box = gtk_hbox_new(FALSE, 5);
+    sdd->identity_label = gtk_label_new(sdd->identity_name 
+					? sdd->identity_name : "");
+    gtk_box_pack_start(GTK_BOX(box), sdd->identity_label, TRUE, TRUE, 5);
+
+    button = gtk_button_new_with_mnemonic(_("C_hange..."));
+    g_signal_connect(G_OBJECT(button), "clicked", 
+		     G_CALLBACK(ident_change_button_cb), sdd);
+    gtk_box_pack_start(GTK_BOX(box), button, FALSE, TRUE, 5);
+    gtk_table_attach(GTK_TABLE(table), box, 1, 2, 2, 3,
+	GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
+
 
     gtk_widget_show_all(GTK_WIDGET(sdd->dialog));
 

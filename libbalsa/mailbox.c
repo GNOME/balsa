@@ -587,7 +587,7 @@ libbalsa_mailbox_load_view(LibBalsaMailbox * mbx)
     g_free(address);
 
     g_free(mbx->identity_name);
-    mbx->identity_name = gnome_config_get_string("Identity=Default");
+    mbx->identity_name = gnome_config_get_string("Identity");
 
     mbx->threading_type = gnome_config_get_int_with_default("Threading", &def);
     if(def) mbx->threading_type = LB_MAILBOX_THREADING_SIMPLE;

@@ -62,9 +62,9 @@ struct _MailboxConfWindow {
 
     void (*ok_handler)(MailboxConfWindow*);
     GtkWidget *mailbox_name;
-    GtkWidget* identity;
+    GtkWidget* identity_label;
     GtkType mailbox_type;
-
+    gchar *identity_name;
     union {
 	/* for local mailboxes */
 	struct local { 
@@ -368,9 +368,43 @@ conf_response_cb(GtkDialog* dialog, gint response, gpointer data)
 }
 
 static void
-free_data(GtkWidget* w, gpointer data)
+free_data(GtkWidget* w, MailboxConfWindow* mcw)
 {
-    g_free(data);
+    g_free(mcw->identity_name);
+    g_free(mcw);
+}
+
+static void
+ident_updated_cb(MailboxConfWindow* mcw, LibBalsaIdentity* identity)
+{
+    if(identity) {
+	g_free(mcw->identity_name);
+	mcw->identity_name = g_strdup(identity->identity_name);
+	gtk_label_set_text(GTK_LABEL(mcw->identity_label), mcw->identity_name);
+    }
+}
+
+/* FIXME: this is identical to folder-conf.c: functionc */
+static void
+ident_change_button_cb(GtkWidget * widget, MailboxConfWindow* mcw)
+{
+    LibBalsaIdentity* ident = balsa_app.current_ident;
+    GList *l;
+    if(mcw->identity_name) {
+	for(l=balsa_app.identities; l; l = l = g_list_next(l))
+	    if( strcmp(mcw->identity_name, 
+		       LIBBALSA_IDENTITY(l->data)->identity_name)==0) {
+		ident = LIBBALSA_IDENTITY(l->data);
+		break;
+	    }
+    }
+		
+    libbalsa_identity_select_dialog(GTK_WINDOW(mcw->window),
+				    _("Select Identity"),
+				    balsa_app.identities,
+				    ident,
+				    (LibBalsaIdentityCallback)ident_updated_cb,
+				    mcw);
 }
 
 #define BALSA_OK_SENSITIVE_KEY "balsa-ok-sensitive"
@@ -463,8 +497,9 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	gtk_entry_set_text(GTK_ENTRY(mcw->mailbox_name),
 			   mailbox->name);
 
-    if(mcw->identity && mailbox->identity_name)
-	gtk_entry_set_text(GTK_ENTRY(mcw->identity), mailbox->identity_name);
+    if(mcw->identity_label && mailbox->identity_name)
+	gtk_label_set_text(GTK_LABEL(mcw->identity_label), 
+                           mailbox->identity_name);
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
 	LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
@@ -728,10 +763,10 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 	update_imap_mailbox(mcw);
     }
 
-    if(mcw->identity) {
-	const gchar *name = gtk_entry_get_text(GTK_ENTRY(mcw->identity));
+    if(mcw->identity_name) {
 	g_free(mailbox->identity_name);
-	mailbox->identity_name = g_strdup(name);
+	mailbox->identity_name = mcw->identity_name;
+        mcw->identity_name = NULL;
     }
 
     if (mailbox->config_prefix)
@@ -832,8 +867,8 @@ create_page(MailboxConfWindow *mcw)
 static GtkWidget *
 create_local_mailbox_page(MailboxConfWindow *mcw)
 {
-    GtkWidget *table;
-    GtkWidget *file, *label;
+    GtkWidget *table, *box;
+    GtkWidget *file, *label, *button;
     table = gtk_table_new(3, 2, FALSE);
 
     /* mailbox name */
@@ -869,9 +904,17 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
     gtk_table_attach(GTK_TABLE(table), file, 1, 2, 1, 2,
 		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
-    label = create_label(_("_Identity:"), table, 2);
-    mcw->identity = create_entry(mcw->window, table,
-				 NULL, mcw, 2, NULL, label);
+    label = create_label(_("Identity:"), table, 2);
+    box = gtk_hbox_new(FALSE, 5);
+    mcw->identity_label = gtk_label_new("");
+    gtk_box_pack_start(GTK_BOX(box), mcw->identity_label, TRUE, TRUE, 5);
+
+    button = gtk_button_new_with_mnemonic(_("C_hange..."));
+    g_signal_connect(G_OBJECT(button), "clicked", 
+		     G_CALLBACK(ident_change_button_cb), mcw);
+    gtk_box_pack_start(GTK_BOX(box), button, FALSE, TRUE, 5);
+    gtk_table_attach(GTK_TABLE(table), box, 1, 2, 2, 3,
+	GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
 
     gtk_widget_grab_focus(mcw->mailbox_name ? mcw->mailbox_name :
 			  GTK_WIDGET(mcw->mb_data.local.path));
@@ -890,7 +933,8 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
     mcw->mailbox_name = create_entry(mcw->window, table,
 				     GTK_SIGNAL_FUNC(check_for_blank_fields),
 				     mcw, 0, NULL, label);
-    mcw->identity = NULL;
+    mcw->identity_label = NULL;
+    mcw->identity_name  = NULL;
     /* pop server */
     label = create_label(_("_Server:"), table, 1);
     mcw->mb_data.pop3.server = create_entry(mcw->window, table,
@@ -968,8 +1012,8 @@ entry_activated(GtkEntry * entry, gpointer data)
 static GtkWidget *
 create_imap_mailbox_page(MailboxConfWindow *mcw)
 {
-    GtkWidget *table, *label;
-    GtkWidget *entry;
+    GtkWidget *table, *label, *box;
+    GtkWidget *entry, *button;
 
     table = gtk_table_new(8, 2, FALSE);
 
@@ -1034,9 +1078,17 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
                      G_CALLBACK(imap_use_ssl_cb), mcw);
 #endif
 
-    label = create_label(_("_Identity:"), table, 0);
-    mcw->identity = create_entry(mcw->window, table,
-				 NULL, mcw, 8, NULL, label);
+    label = create_label(_("_Identity:"), table, 8);
+    box = gtk_hbox_new(FALSE, 5);
+    mcw->identity_label = gtk_label_new("");
+    gtk_box_pack_start(GTK_BOX(box), mcw->identity_label, TRUE, TRUE, 5);
+
+    button = gtk_button_new_with_mnemonic(_("C_hange..."));
+    g_signal_connect(G_OBJECT(button), "clicked", 
+		     G_CALLBACK(ident_change_button_cb), mcw);
+    gtk_box_pack_start(GTK_BOX(box), button, FALSE, TRUE, 5);
+    gtk_table_attach(GTK_TABLE(table), box, 1, 2, 8, 9,
+	GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
 
     gtk_widget_grab_focus(mcw->mailbox_name? 
                           mcw->mailbox_name : mcw->mb_data.imap.server);

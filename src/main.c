@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -209,6 +209,9 @@ mailboxes_init(void)
 	balsa_init_begin();
 	return;
     }
+    gdk_threads_enter();
+    config_views_load();
+    gdk_threads_leave();
 }
 
 
@@ -311,6 +314,7 @@ scan_mailboxes_idle_cb()
     g_node_traverse(balsa_app.mailbox_nodes, G_POST_ORDER, G_TRAVERSE_ALL, -1,
                     append_subtree_f, NULL);
     balsa_mailbox_nodes_unlock(TRUE);
+    config_views_load();
     gdk_threads_leave();
 
     if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox)

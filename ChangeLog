@@ -1,3 +1,11 @@
+2003-01-25  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/filter.c: fix possible mail duplication on filtring (Manu).
+	* libbalsa/mailbox.c: default NULL identity.
+	* src/{mailbox,folder}-conf.c: improve mailbox identity edition.
+	* src/mailbox-node.c: remove debugging output.
+	* src/main.c: load identities.
+
 2003-01-25  PeterB
 
 	* src/balsa-index.c: Two patches from Manu <e.allaud@wanadoo.fr>:

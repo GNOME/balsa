@@ -645,9 +645,8 @@ static GnomeUIInfo settings_menu[] = {
 };
 
 static GnomeUIInfo help_menu[] = {
-    GNOMEUIINFO_MENU_ABOUT_ITEM(show_about_box, NULL),
-    GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_HELP("balsa"),
+    GNOMEUIINFO_MENU_ABOUT_ITEM(show_about_box, NULL),
     GNOMEUIINFO_END
 };
 

@@ -62,8 +62,9 @@ new_icon (gchar ** xpm, GtkWidget * window)
 }
 
 GtkWidget *
-create_toolbar (GtkWidget * window)
+create_toolbar (MainWindow *mw)
 {
+  GtkWidget *window=mw->window;
   GtkWidget *toolbar;
   GtkWidget *toolbarbutton;
 
@@ -169,6 +170,12 @@ GTK_SIGNAL_FUNC(current_mailbox_check),
 		   "Context Sensitive Help", "Context Sensitive Help", NULL,
 					   new_icon (p16_xpm, window), NULL,
 					   "Context Sensitive Help");
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  mw->mailbox_option_menu = gtk_option_menu_new ();
+  gtk_toolbar_append_widget (GTK_TOOLBAR (toolbar), mw->mailbox_option_menu, NULL, NULL);
+  gtk_widget_show (mw->mailbox_option_menu);
 
   gtk_widget_show (toolbar);
   return toolbar;
@@ -404,25 +411,6 @@ create_main_window ()
   gtk_widget_show (vbox);
 
 
-  /* toolbar */
-  mw->toolbar = gtk_toolbar_new (GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_BOTH);
-  gtk_box_pack_start (GTK_BOX (vbox), mw->toolbar, FALSE, TRUE, 2);
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (mw->toolbar));
-
-  label = gtk_label_new ("Mailbox:");
-  gtk_toolbar_append_widget (GTK_TOOLBAR (mw->toolbar), label, NULL, NULL);
-  gtk_widget_show (label);
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (mw->toolbar));
-
-  mw->mailbox_option_menu = gtk_option_menu_new ();
-  gtk_toolbar_append_widget (GTK_TOOLBAR (mw->toolbar), mw->mailbox_option_menu, NULL, NULL);
-  gtk_widget_show (mw->mailbox_option_menu);
-
-  gtk_widget_show (mw->toolbar);
-
-
   /* panned widget */
   vpane = gtk_vpaned_new ();
   gtk_box_pack_start (GTK_BOX (vbox), vpane, TRUE, TRUE, 0);
@@ -461,8 +449,9 @@ create_main_window ()
   gnome_app_set_menus (GNOME_APP (mw->window),
 		       GTK_MENU_BAR (create_menu (mw->window)));
 
+  mw->toolbar=create_toolbar (mw);
   gnome_app_set_toolbar (GNOME_APP (mw->window),
-			 GTK_TOOLBAR (create_toolbar (mw->window)));
+			 GTK_TOOLBAR (mw->toolbar));
 
   gtk_widget_show (mw->window);
   return mw;

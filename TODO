@@ -9,13 +9,16 @@ Note: This list is not complete, but here for the authors
 
 Stuart
 ---------------------------------------------------------
- * gnomize sendmsg-window
  * bug tigert about getting new icons for toolbar
- * remove old toolbar
  * add choice for POP3/IMAP/MBOX to new account box.
  * fix deleting accounts
- * look at smtp code crashing if gtk_text is empty
 
+sendmsg-window TODO:
+ * gnomize sendmsg-window
+ * move attach and spell check to toolbar for sendmsg-window
+ * look at smtp code crashing if gtk_text is empty
+ * sendmsg-window crashes if it is used to send an email
+   and then gone back into.
 
 
 Jay

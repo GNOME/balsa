@@ -72,9 +72,6 @@
 /* Define if you have the __argz_stringify function.  */
 #undef HAVE___ARGZ_STRINGIFY
 
-/* Define if you have the argp_parse function.  */
-#undef HAVE_ARGP_PARSE
-
 /* Define if you have the dcgettext function.  */
 #undef HAVE_DCGETTEXT
 
@@ -110,6 +107,9 @@
 
 /* Define if you have the strndup function.  */
 #undef HAVE_STRNDUP
+
+/* Define if you have the strnlen function.  */
+#undef HAVE_STRNLEN
 
 /* Define if you have the strtok_r function.  */
 #undef HAVE_STRTOK_R

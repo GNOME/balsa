@@ -8,6 +8,7 @@
 	URLs passed as argument to -m option.
 	* src/sendmsg-window.[hc]: provide sendmsg_window_set_field() to
 	set fields from -m option.
+	* libbalsa/message.c: add some harmless but useful sanity tests.
 
 	* configure.in: bump the version number to 1.0.0. 
 	Time for a glass of champagne! Thanks to everybody participating!

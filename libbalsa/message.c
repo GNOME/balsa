@@ -260,6 +260,7 @@ libbalsa_message_destroy(GtkObject * object)
 const gchar *
 libbalsa_message_pathname(LibBalsaMessage * message)
 {
+    g_return_val_if_fail(message->mailbox, NULL);
     return CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno]->path;
 }
 
@@ -302,11 +303,13 @@ create_hdr_pair(const gchar * name, gchar * value)
 GList *
 libbalsa_message_user_hdrs(LibBalsaMessage * message)
 {
-    HEADER *cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+    HEADER *cur;
     LIST *tmp;
     GList *res = NULL;
     gchar **pair;
 
+    g_return_val_if_fail(message->mailbox, NULL);
+    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
     g_assert(cur != NULL);
     g_assert(cur->env != NULL);
 
@@ -359,6 +362,7 @@ libbalsa_message_copy(LibBalsaMessage * message, LibBalsaMailbox * dest)
 {
     HEADER *cur;
 
+    g_return_val_if_fail(message->mailbox, FALSE);
     RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, FALSE);
 
     cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
@@ -393,6 +397,7 @@ libbalsa_message_move(LibBalsaMessage * message, LibBalsaMailbox * dest)
 
     g_return_val_if_fail(message != NULL, FALSE);
     g_return_val_if_fail(dest != NULL, FALSE);
+    g_return_val_if_fail(message->mailbox,FALSE);
     RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, FALSE);
 
     cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
@@ -436,10 +441,9 @@ libbalsa_message_move(LibBalsaMessage * message, LibBalsaMailbox * dest)
 static void
 libbalsa_message_real_clear_flags(LibBalsaMessage * message)
 {
+    g_return_if_fail(message->mailbox);
     LOCK_MAILBOX(message->mailbox);
-
     message->flags = 0;
-
     UNLOCK_MAILBOX(message->mailbox);
 }
 
@@ -449,6 +453,7 @@ libbalsa_message_real_set_answered_flag(LibBalsaMessage * message,
 {
     HEADER *cur;
 
+    g_return_if_fail(message->mailbox);
     LOCK_MAILBOX(message->mailbox);
     RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
 
@@ -467,12 +472,14 @@ static void
 libbalsa_message_real_set_read_flag(LibBalsaMessage * message,
 				    gboolean set)
 {
+    HEADER *cur;
 
-    HEADER *cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+    g_return_if_fail(message->mailbox);
 
     LOCK_MAILBOX(message->mailbox);
     RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
-
+    
+    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
     if (set && (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)) {
 	libbalsa_lock_mutt();
 	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_READ, TRUE);
@@ -502,11 +509,13 @@ libbalsa_message_real_set_read_flag(LibBalsaMessage * message,
 static void
 libbalsa_message_real_set_flagged(LibBalsaMessage * message, gboolean set)
 {
-    HEADER *cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+    HEADER *cur;
 
+    g_return_if_fail(message->mailbox);
     LOCK_MAILBOX(message->mailbox);
     RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
 
+    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
     if (!set && (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)) {
 	libbalsa_lock_mutt();
 	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_FLAG,
@@ -529,11 +538,14 @@ static void
 libbalsa_message_real_set_deleted_flag(LibBalsaMessage * message,
 				       gboolean set)
 {
-    HEADER *cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+    HEADER *cur;
 
+    g_return_if_fail(message->mailbox);
+    
     LOCK_MAILBOX(message->mailbox);
     RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
 
+    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
     if (set && !(message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
 	libbalsa_lock_mutt();
 	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_DELETE,

@@ -230,7 +230,7 @@ load_mailboxes (gchar * name)
       MAILBOX_IMAP (mailbox)->user = gnome_config_get_string ("username");
       MAILBOX_IMAP (mailbox)->passwd = gnome_config_get_string ("password");
       MAILBOX_IMAP (mailbox)->server = gnome_config_get_string ("server");
-      MAILBOX_IMAP (mailbox)->port = get_int_set_default ("port",143);
+      MAILBOX_IMAP (mailbox)->port = get_int_set_default ("port", 143);
       MAILBOX_IMAP (mailbox)->path = gnome_config_get_string ("Path");
       node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
       g_node_append (balsa_app.mailbox_nodes, node);
@@ -254,6 +254,7 @@ void
 restore_global_settings ()
 {
   GString *path;
+  gchar tmp[PATH_MAX];
 
   /* set to Global configure section */
   gnome_config_push_prefix ("/balsa/Global/");
@@ -270,16 +271,31 @@ restore_global_settings ()
   /* organization */
   balsa_app.organization = get_string_set_default ("organization", "None");
 
-  /* important mailboxes */
-  balsa_app.inbox_path = get_string_set_default ("inbox", NULL);
-  balsa_app.outbox_path = get_string_set_default ("outbox", NULL);
-  balsa_app.trash_path = get_string_set_default ("trash", NULL);
-
   /* directory */
   path = g_string_new (NULL);
   g_string_sprintf (path, "%s/Mail", g_get_home_dir ());
   balsa_app.local_mail_directory = get_string_set_default ("local mail directory", path->str);
-  g_string_free (path, 1);
+
+  /* important mailboxes */
+  balsa_app.inbox_path = gnome_config_get_string ("inbox");
+  if (!balsa_app.outbox_path)
+    {
+      g_snprintf (tmp, PATH_MAX, "%s/%s", MAILPATH, g_get_user_name());
+      balsa_app.inbox_path = g_strdup (tmp);
+    }
+  balsa_app.outbox_path = gnome_config_get_string ("outbox");
+  if (!balsa_app.outbox_path)
+    {
+      g_snprintf (tmp, PATH_MAX, "%s/Mail/outbox", path->str);
+      balsa_app.outbox_path = g_strdup (tmp);
+    }
+  balsa_app.trash_path = gnome_config_get_string ("trash");
+  if (!balsa_app.trash_path)
+    {
+      g_snprintf (tmp, PATH_MAX, "%s/Mail/trash", path->str);
+      balsa_app.trash_path = g_strdup (tmp);
+    }
+  g_string_free (path, TRUE);
 
   /* smtp server */
   balsa_app.smtp_server = get_string_set_default ("smtp server", "localhost");

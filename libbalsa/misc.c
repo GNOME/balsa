@@ -79,8 +79,14 @@ get_string_set_default (const char *path,
   result = NULL;
   buffer = g_string_new (NULL);
 
-  g_string_sprintf (buffer, "%s=%s", path, value);
-  result = gnome_config_get_string_with_default (buffer->str, &unset);
+  if (value)
+    {
+      g_string_sprintf (buffer, "%s=%s", path, value);
+      result = gnome_config_get_string_with_default (buffer->str, &unset);
+    }
+  else
+    result = gnome_config_get_string_with_default (path, &unset);
+
   if (unset)
     gnome_config_set_string (path, value);
 

@@ -1,3 +1,6 @@
+# Dillion Chen <dillon.chen@turbolinux.com.cn>
+#   Updated and QA by Wang Jian <lark@linux.net.cn>
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
@@ -386,22 +389,21 @@ msgstr "正在写邮件... %d (%d%%)"
 #: libmutt/mbox.c:962
 #, c-format
 msgid "Write failed!  Saved partial mailbox to %s"
-msgstr ""
+msgstr "写错误! 将部分邮件箱保存到 %s"
 
 # src/main-window.c:171
 #: libmutt/mbox.c:1028
-#, fuzzy
 msgid "Could not reopen mailbox!"
-msgstr "关闭当前打开的邮箱"
+msgstr "无法重新打开邮件箱!"
 
 #: libmutt/mbox.c:1066
 msgid "Reopening mailbox..."
-msgstr ""
+msgstr "正在重新打开邮件箱..."
 
 #: libmutt/mx.c:119
 #, c-format
 msgid "Lock count exceeded, remove lock for %s?"
-msgstr ""
+msgstr "超过锁计数, 删除 %s 的锁?"
 
 #: libmutt/mx.c:131
 #, c-format
@@ -410,155 +412,147 @@ msgstr ""
 
 #: libmutt/mx.c:189
 msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr ""
+msgstr "在试图进行 fcntl 锁的时候超时!"
 
 #: libmutt/mx.c:195
 #, c-format
 msgid "Waiting for fcntl lock... %d"
-msgstr ""
+msgstr "等待 fcntl 锁... %d"
 
 #: libmutt/mx.c:223
 msgid "Timeout exceeded while attempting flock lock!"
-msgstr ""
+msgstr "在试图进行 flock 锁的时候超时!"
 
 #: libmutt/mx.c:230
 #, c-format
 msgid "Waiting for flock attempt... %d"
-msgstr ""
+msgstr "等待 flock 锁... %d"
 
 # src/mailbox-conf.c:640
 #: libmutt/mx.c:459 libmutt/mx.c:605
-#, fuzzy, c-format
+#, c-format
 msgid "%s is not a mailbox."
-msgstr "本地邮箱"
+msgstr "%s 不是邮件箱."
 
 #: libmutt/mx.c:542
 #, c-format
 msgid "Couldn't lock %s\n"
-msgstr ""
+msgstr "无法锁住 %s\n"
 
 #: libmutt/mx.c:630
 #, c-format
 msgid "Reading %s..."
-msgstr ""
+msgstr "正在读 %s..."
 
 #: libmutt/mx.c:719
 #, c-format
 msgid "Writing %s..."
-msgstr ""
+msgstr "正在写 %s..."
 
 #: libmutt/mx.c:746
 #, c-format
 msgid "Could not synchronize mailbox %s!"
-msgstr ""
+msgstr "无法同步邮件箱 %s!"
 
 #: libmutt/mx.c:848
 #, c-format
 msgid "Moving read messages to %s..."
-msgstr ""
+msgstr "正在把已读邮件移到 %s..."
 
 # src/pref-manager.c:441
 #: libmutt/mx.c:899 libmutt/mx.c:1056
-#, fuzzy
 msgid "Mailbox is unchanged."
-msgstr "邮箱名"
+msgstr "邮件箱没有改动."
 
 #: libmutt/mx.c:929
 #, c-format
 msgid "%d kept, %d moved, %d deleted."
-msgstr ""
+msgstr "保留 %d, 移动 %d, 删除 %d."
 
 #: libmutt/mx.c:932 libmutt/mx.c:1098
 #, c-format
 msgid "%d kept, %d deleted."
-msgstr ""
+msgstr "保留 %d, 删除 %d."
 
 #: libmutt/mx.c:1040
 #, c-format
 msgid " Press '%s' to toggle write"
-msgstr ""
+msgstr " 按 '%s' 来调整写"
 
 #: libmutt/mx.c:1043
 msgid "Use 'toggle-write' to re-enable write!"
-msgstr ""
+msgstr "使用 'toggle-write' 来允许写!"
 
 #: libmutt/mx.c:1045
 #, c-format
 msgid "Mailbox is marked unwritable. %s"
-msgstr ""
+msgstr "邮件箱标记为不可读. %s"
 
 #: libmutt/mx.c:1050
 msgid "Mailbox is read-only."
-msgstr ""
+msgstr "邮件箱是只读的."
 
 # src/main-window.c:139
 #: libmutt/mx.c:1065
-#, fuzzy, c-format
+#, c-format
 msgid "Purge %d deleted message?"
-msgstr "取消删除邮件"
-
-# src/main-window.c:139
-#: libmutt/mx.c:1065
-#, fuzzy, c-format
-msgid "Purge %d deleted messages?"
-msgstr "取消删除邮件"
+msgstr "清除 %d 个已删除的邮件?"
 
 #: libmutt/mx.c:1095
 #, c-format
 msgid "%d kept."
-msgstr ""
+msgstr "保留 %d."
 
 # src/main-window.c:139
 #: libmutt/mx.c:1375
-#, fuzzy
 msgid "Can't write message"
-msgstr "取消删除邮件"
+msgstr "无法写邮件"
 
 #: libmutt/imap/auth.c:110
 msgid "Authenticating (CRAM-MD5)..."
-msgstr ""
+msgstr "正在进行身份验证 (CRAM-MD5)..."
 
 #: libmutt/imap/auth.c:202
 msgid "Authenticating (anonymous)..."
-msgstr ""
+msgstr "正在进行身份验证 (匿名)..."
 
 #: libmutt/imap/auth.c:288
 msgid "Anonymous authentication not supported."
-msgstr ""
+msgstr "不支持匿名的身份验证."
 
 #: libmutt/imap/auth.c:301
 msgid "GSSAPI authentication failed."
-msgstr ""
+msgstr "GSSAPI 身份验证失败."
 
 #: libmutt/imap/auth.c:329
 msgid "CRAM-MD5 authentication failed."
-msgstr ""
+msgstr "CRAM-MD5 身份验证失败."
 
 #: libmutt/imap/auth.c:344
 msgid "Skipping CRAM-MD5 authentication."
-msgstr ""
+msgstr "跳过 CRAM-MD5 身份验证."
 
 #: libmutt/imap/auth.c:366
 msgid "Logging in..."
-msgstr ""
+msgstr "正在登录..."
 
 #. Login failed, try again
 #: libmutt/imap/auth.c:378
 msgid "Login failed."
-msgstr ""
+msgstr "登录失败."
 
 #. now begin login
 #: libmutt/imap/auth_gss.c:88
 msgid "Authenticating (GSSAPI)..."
-msgstr ""
+msgstr "正在进行身份验证 (GSSAPI)..."
 
 #: libmutt/imap/browse.c:93
 msgid "Getting namespaces..."
-msgstr ""
+msgstr "正在取得名字空间..."
 
 #: libmutt/imap/browse.c:120
 msgid "Getting folder list..."
-msgstr ""
+msgstr "正在取得文件夹列表..."
 
 #: libmutt/imap/imap_ssl.c:92
 msgid "Filling entropy pool"
@@ -3042,161 +3036,3 @@ msgstr ""
 #: src/store-address.c:254
 msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr ""
-
-# src/mailbox-conf.c:782
-#, fuzzy
-#~ msgid "Unable to get APOP seed from server"
-#~ msgstr "从服务器删除"
-
-# src/balsa-init.c:261 src/pref-manager.c:377
-#, fuzzy
-#~ msgid "E-Mail Address:"
-#~ msgstr "邮件地址"
-
-# src/filter-edit-dialog.c:704
-#, fuzzy
-#~ msgid "Path"
-#~ msgstr "匹配"
-
-# src/balsa-init.c:110
-#~ msgid "Welcome To Balsa!"
-#~ msgstr "欢迎来到Balsa"
-
-# src/balsa-init.c:137
-#~ msgid "welcome"
-#~ msgstr "欢迎"
-
-# src/balsa-init.c:142
-#~ msgid "general"
-#~ msgstr "一般"
-
-# src/balsa-init.c:147
-#~ msgid "mailboxs"
-#~ msgstr "邮箱"
-
-# src/balsa-init.c:195
-#~ msgid "You seem to be running Balsa for the first time.\n"
-#~ msgstr "似乎你是第一次运行Balsa\n"
-
-# src/balsa-init.c:196
-#~ msgid ""
-#~ "The following steps will setup Balsa by asking a few simple questions.  "
-#~ msgstr "下面这些步骤通过询问一些简单问题来设置Balsa"
-
-# src/balsa-init.c:197
-#~ msgid ""
-#~ "Once you have completed these steps, you can always change them at a later "
-#~ "time through Balsa's preferences.  "
-#~ msgstr "一旦你完成这些设置,随后你还可以改变这些设置通过Balsa参数选择"
-
-# src/balsa-init.c:198
-#~ msgid ""
-#~ "Please check the about box in Balsa's main window for more information on "
-#~ "contacting the authors or reporting bugs."
-#~ msgstr "请在Balsa的主窗口选取关于...,它将给出作者或错误报告等更多的信息"
-
-# src/balsa-init.c:331
-#~ msgid "Inbox Path:"
-#~ msgstr "收件箱路径"
-
-# src/balsa-init.c:345
-#~ msgid "Outbox Path:"
-#~ msgstr "发信箱路径"
-
-# src/balsa-init.c:357
-#~ msgid "Trash Path:"
-#~ msgstr "废纸篓路径"
-
-# src/balsa-init.c:368
-#~ msgid ""
-#~ "If you wish to use IMAP for these\n"
-#~ "please change them inside Balsa\n"
-#~ msgstr ""
-#~ "如果你希望使用IMAP,\n"
-#~ "请在Balsa中改变设置\n"
-
-# src/balsa-init.c:471 src/balsa-init.c:478 src/balsa-init.c:485
-#~ msgid ""
-#~ "Mailbox \"%s\" is not valid.\n"
-#~ "\n"
-#~ "Would you like to create it?"
-#~ msgstr "邮箱%s无效,你是否要创建它?"
-
-# src/balsa-init.c:512
-#~ msgid "Unable to procede without a valid mailbox.  Please try again."
-#~ msgstr "没有有效的邮箱所以无法处理.请再试一次"
-
-# src/balsa-message.c:232 src/balsa-message.c:247
-#~ msgid "Ok"
-#~ msgstr "确定"
-
-# src/balsa-message.c:650
-#~ msgid ""
-#~ "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
-#~ "application/"
-#~ msgstr ""
-#~ "<tr><td bgcolor=\"#f0f0f0\">你收到一个编码文件类型为application的文件"
-
-# src/balsa-message.c:654
-#~ msgid "<P>The parameters of this message are:<BR>"
-#~ msgstr "<P>这条消息的参数是:<BR>"
-
-# src/balsa-message.c:655
-#~ msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
-#~ msgstr "<table bord=0><tr><th>属性</th><th>价值</th></tr>\n"
-
-# src/balsa-message.c:847
-#~ msgid "Open of %s failed. Errno = %d, "
-#~ msgstr "打开%s失败.错误号=%d"
-
-# src/index-child.c:419
-#~ msgid "Change Status"
-#~ msgstr "改变状态"
-
-# src/index-child.c:434
-#~ msgid "Replied"
-#~ msgstr "回复"
-
-# src/index-child.c:440
-#~ msgid "Forwarded"
-#~ msgstr "转发"
-
-# src/main-window.c:155
-#~ msgid "List"
-#~ msgstr "列出"
-
-# src/main-window.c:161
-#~ msgid "Close the selected mailbox"
-#~ msgstr "关闭选定的邮箱"
-
-# src/main-window.c:164
-#~ msgid "_Add"
-#~ msgstr "添加"
-
-# src/ddmain-window.c:171
-#~ msgid "C_lose current"
-#~ msgstr "C_关闭当前"
-
-# src/main-window.c:176
-#~ msgid "O_pened"
-#~ msgstr "O_打开"
-
-# src/main-window.c:201
-#~ msgid "Mail_boxes"
-#~ msgstr "邮箱"
-
-# src/main-window.c:294
-#~ msgid "Mailboxes/Opened/"
-#~ msgstr "邮箱/打开/"
-
-# src/pref-manager.c:565
-#~ msgid "View mailbox content informations "
-#~ msgstr "浏览邮箱内容信息"
-
-# src/sendmsg-window.c:675
-#~ msgid "On %s "
-#~ msgstr "在 %s"
-
-# libbalsa/mailbox.c:496
-#~ msgid "Mailbox: Closing %s Refcount: %d\n"
-#~ msgstr "邮箱:关闭%s 索引计算%d\n"

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
-"POT-Creation-Date: 1998-06-20 15:26+0200\n"
+"POT-Creation-Date: 1998-07-15 13:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Vincent Renardias <vincent@waw.com>\n"
 "Language-Team: Vincent Renardias <vincent@waw.com>\n"
@@ -14,94 +14,106 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/sendmsg-window.c:138
+#: src/sendmsg-window.c:136
 msgid "Send"
 msgstr "Envoyer"
 
-#: src/sendmsg-window.c:149
+#: src/sendmsg-window.c:147
 msgid "Attach File"
 msgstr "Attacher fichier"
 
-#: src/addrbook-manager.c:180 src/sendmsg-window.c:160
+#: src/addrbook-manager.c:180 src/main-window.c:279 src/sendmsg-window.c:158
 msgid "Close"
 msgstr "Fermer"
 
-#: src/main-window.c:305 src/sendmsg-window.c:168
+#: src/main-window.c:256 src/sendmsg-window.c:166
 msgid "Message"
 msgstr "Message"
 
-#: src/sendmsg-window.c:175
+#: src/sendmsg-window.c:173
 msgid "Cut"
 msgstr "Couper"
 
-#: src/sendmsg-window.c:182
+#: src/sendmsg-window.c:180
 msgid "Copy"
 msgstr "Copier"
 
-#: src/sendmsg-window.c:189
+#: src/sendmsg-window.c:187
 msgid "Paste"
 msgstr "Coller"
 
-#: src/sendmsg-window.c:196
+#: src/sendmsg-window.c:194
 msgid "Edit"
 msgstr "Edition"
 
-#: src/addrbook-manager.c:195 src/sendmsg-window.c:204
+#: src/addrbook-manager.c:195 src/sendmsg-window.c:202
 msgid "Contents"
 msgstr "Contenu"
 
-#: src/addrbook-manager.c:200 src/main-window.c:373 src/sendmsg-window.c:209
+#: src/addrbook-manager.c:200 src/main-window.c:347 src/sendmsg-window.c:207
 msgid "Help"
 msgstr "Aide"
 
-#: src/addrbook-manager.c:188 src/main-window.c:222
+#: src/addrbook-manager.c:188 src/main-window.c:177
 msgid "File"
 msgstr "Fichier"
 
-#: src/main-window.c:192
+#: src/main-window.c:89
+msgid "Mailboxes/<Separator>"
+msgstr "Boites aux lettres/<Separator>"
+
+#: src/main-window.c:147
 msgid "Get New Mail"
 msgstr "Récupérer les nouveaux messages"
 
-#: src/main-window.c:210
+#: src/main-window.c:165
 msgid "Exit"
 msgstr "Quitter"
 
-#: src/main-window.c:232
+#: src/main-window.c:187
 msgid "New"
 msgstr "Nouveau"
 
-#: src/main-window.c:245
+#: src/main-window.c:200
 msgid "Reply"
 msgstr "Répondre"
 
-#: src/main-window.c:258
-msgid "Foward"
+#: src/main-window.c:213
+msgid "Forward"
 msgstr "Faire suivre"
 
-#: src/main-window.c:274
+#: src/main-window.c:229
 msgid "Delete"
 msgstr "Effacer"
 
-#: src/main-window.c:290
+#: src/main-window.c:243
 msgid "Undelete"
 msgstr "Récupérer"
 
-#: src/main-window.c:316
+#: src/main-window.c:261
+msgid "MDI"
+msgstr "MDI"
+
+#: src/main-window.c:268
 msgid "Mailbox List"
 msgstr "Liste des B.A.L."
 
-#: src/main-window.c:327
+#: src/main-window.c:294
+msgid "Mailboxes"
+msgstr "Boites aux lettres"
+
+#: src/main-window.c:303
 msgid "Preferences..."
 msgstr "Préférences..."
 
-#: src/main-window.c:338
+#: src/main-window.c:314
 msgid "Mailbox Manager..."
 msgstr "Gestionnaire de dossiers..."
 
-#: src/main-window.c:350
+#: src/main-window.c:326
 msgid "Settings"
 msgstr "Configuration"
 
-#: src/main-window.c:360
+#: src/main-window.c:334
 msgid "About"
 msgstr "A Propos"

@@ -1,5 +1,6 @@
-2004-05-28 07:01  PeterB
+2004-05-28 10:44  PeterB
 
+	* src/main-window.c: tweak border width.
 	* src/: balsa-index.c, balsa-index.h: rest of the previous commit!
 	* doc/C/balsa.xml, src/main-window.c: redesign Edit->Find dialog,
 	and add help.

@@ -466,6 +466,8 @@ mw_destroy_window(MessageWindow * mw)
     g_object_unref(mw->window);
     gtk_widget_destroy(mw->window);
     gdk_threads_leave();
+
+    return FALSE;
 }
 
 static void

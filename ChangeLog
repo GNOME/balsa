@@ -1,3 +1,14 @@
+2003-05-11  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* NEWS, configure.in: release 1.4.4.
+
+2003-05-11  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Fixes from Leif Harcke:
+	* Makefile.am: put balsa.desktop in proper location (bug 112712).
+	* help/C/Makefile.am: add needed -V option (bug 99353).
+	* balsa.spec.in: change accordingly.
+
 2003-03-31  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/folder-conf.c (folder_conf_imap_sub_node): fix crash 

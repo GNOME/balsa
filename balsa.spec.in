@@ -2,9 +2,9 @@
 %define redhat 1
 %define mdk    0
 %if %redhat
-%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-system-install --disable-more-warnings
+%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-system-install --disable-more-warnings  --enable-gtkhtml --with-gss=/usr/kerberos --enable-ldap  --with-ssl
 %endif
-%if %mdk || 1
+%if %mdk
 %define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-more-warnings --enable-gtkhtml --with-ssl
 %endif
 
@@ -82,7 +82,7 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 %doc README COPYING ChangeLog NEWS TODO AUTHORS HACKING docs/mh-mail-HOWTO
 %doc docs/vconvert.awk docs/pine2vcard
 %{_bindir}/balsa
-%{_datadir}/applications/balsa.desktop
+%{_datadir}/gnome/apps/Internet/balsa.desktop
 %{_datadir}/gnome/help/balsa/*
 %{_datadir}/pixmaps/*
 %{_datadir}/sounds/balsa/*
@@ -91,6 +91,12 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 
 
 %changelog
+* Sat May 10 2003 Leif Harcke <lharcke@stanford.edu>
+- clean doc tree and force build of HTML documentation using
+  Red Hat 7.2/7.3 required -V option to jw (#99353)
+- put balsa.desktop in the proper place for Gnome 1.4 (#112712)
+- fix crash when File->New->Remote IMAP subfolder (#112656)
+
 * Sun Jun 24 2001 Spider <spider@darkmere.wanfear.com>
 - remove all defined paths to user-specified. 
 - update configures, locales, update esmtp as a requires/buildrequires 

@@ -1,12 +1,12 @@
 #intl dir needed for tarball --disable-nls build.
-SUBDIRS = m4  macros intl po sounds images help libmutt libbalsa libinit_balsa src
+SUBDIRS = m4 macros intl po sounds images help libmutt libbalsa libinit_balsa src
 
 man_MANS=balsa.1
 
 pixmapdir = $(datadir)/pixmaps
 pixmap_DATA = gnome-balsa2.png
 
-desktopdir = $(datadir)/applications
+desktopdir = $(datadir)/gnome/apps/Internet
 desktop_DATA = balsa.desktop
 
 EXTRA_DIST = config.rpath  \

@@ -26,9 +26,9 @@ all: index.html
 
 index.html: $(SGML_FILES)
 	if test "$(HAVE_JW)" = 'yes' ; then 		\
-		jw -c /etc/sgml/catalog balsa.sgml -o balsa; \
+		jw -V '%use-id-as-filename%' -o balsa balsa.sgml; \
 	else 						\
-		db2html balsa.sgml; 	\
+		db2html -V '%use-id-as-filename%' balsa.sgml; 	\
 	fi
 	-cp balsa/index.html index.html || touch index.html
 

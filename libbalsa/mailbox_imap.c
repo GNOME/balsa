@@ -55,6 +55,7 @@ struct _LibBalsaMailboxImap {
     LibBalsaMailboxRemote mailbox;
     ImapMboxHandle *handle;     /* stream that has this mailbox selected */
     guint handle_refs;		/* reference counter */
+    gint search_stamp;		/* search result validator */
 
     gchar *path;		/* Imap local path (third part of URL) */
     ImapUID      uid_validity;
@@ -529,6 +530,7 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
             lbimap_update_flags(msg_info->message, imsg);
             libbalsa_message_set_icons(msg_info->message);
             libbalsa_mailbox_msgno_changed(mailbox, seqno[i]);
+	    ++mimap->search_stamp;
             
             list = g_list_prepend(NULL, msg_info->message);
             libbalsa_mailbox_messages_status_changed
@@ -536,14 +538,6 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
                  (old_flags ^
                   msg_info->message->flags));
             g_list_free_1(list);
-            /* changing flags does not remove or add elements so
-               invalidating iterators should not be necessary, should
-               it?  In any case, we do it here in the loop body or not
-               at all, if we do not want to dead-lock. Also, if we
-               decide to act on changed flags, we should probably do
-               it in msgno_changed() for consistency.
-               libbalsa_mailbox_invalidate_iters(mailbox);
-            */
         }
     }
     if (!locked)
@@ -560,7 +554,7 @@ update_counters_and_filter(void *data)
 
     gdk_threads_enter();
     LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE); /* or retry? */
-    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
+    libbalsa_mailbox_run_filters_on_reception(mailbox);
     lbm_imap_get_unseen(LIBBALSA_MAILBOX_IMAP(mailbox));
     UNLOCK_MAILBOX(mailbox);
     gdk_threads_leave();
@@ -591,6 +585,7 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
             g_array_append_val(mimap->messages_info, a);
             libbalsa_mailbox_msgno_inserted(mailbox, i);
         } while (++i <= cnt);
+	++mimap->search_stamp;
 
         /* we run filters and get unseen messages in a idle callback:
          * these things do not need to be done immediately and we do 
@@ -613,6 +608,7 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     struct message_info *msg_info = message_info_from_msgno(mimap, seqno);
     libbalsa_mailbox_msgno_removed(mailbox, seqno);
+    ++mimap->search_stamp;
     if(msg_info->message) {
 	gchar *fn =
             get_cache_name_body(mimap, IMAP_MESSAGE_UID(msg_info->message));
@@ -758,8 +754,12 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     }
 
     mailbox->first_unread = imap_mbox_handle_first_unseen(mimap->handle);
-    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
+    libbalsa_mailbox_run_filters_on_reception(mailbox);
     lbm_imap_get_unseen(mimap);
+    if (mimap->search_stamp)
+	++mimap->search_stamp;
+    else
+	mimap->search_stamp = mailbox->stamp;
 
 #ifdef DEBUG
     g_print(_("%s: Opening %s Refcount: %d\n"),
@@ -902,7 +902,7 @@ libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox, guint msgno,
 	return libbalsa_condition_matches(search_iter->condition,
 					  msg_info->message, TRUE);
 
-    if (search_iter->stamp != mailbox->stamp && search_iter->mailbox
+    if (search_iter->stamp != mimap->search_stamp && search_iter->mailbox
 	&& LIBBALSA_MAILBOX_GET_CLASS(search_iter->mailbox)->
 	search_iter_free)
 	LIBBALSA_MAILBOX_GET_CLASS(search_iter->mailbox)->
@@ -923,7 +923,7 @@ libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox, guint msgno,
 	}
 	search_iter->user_data = matchings;
 	search_iter->mailbox = mailbox;
-	search_iter->stamp = mailbox->stamp;
+	search_iter->stamp = mimap->search_stamp;
     }
 
     return g_hash_table_lookup(matchings, GUINT_TO_POINTER(msgno)) != NULL;
@@ -1532,15 +1532,9 @@ static LibBalsaMessage*
 libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     struct message_info *msg_info;
-    LibBalsaMailboxImap *mimap;
+    LibBalsaMailboxImap *mimap = (LibBalsaMailboxImap *) mailbox;
 
-    mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     msg_info = message_info_from_msgno(mimap, msgno);
-
-    if (!msg_info) {
-	printf("%s returns NULL\n", __func__);
-	return NULL;
-    }
 
     if (!msg_info->message) {
         LibBalsaMessage *msg = libbalsa_message_new();
@@ -1959,6 +1953,8 @@ lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox, GArray * seqno,
     if (rc1 == IMR_OK && rc2 == IMR_OK) {
 	LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
 	unsigned i;
+
+	++mimap->search_stamp;
 
 	for (i = 0; i < seqno->len; i++) {
 	    guint msgno = g_array_index(seqno, guint, i);

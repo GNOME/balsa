@@ -4531,16 +4531,20 @@ wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
+#if NEW_ADDRESS_ENTRY_WIDGET
     GtkWidget *focus_widget;
+#endif /* NEW_ADDRESS_ENTRY_WIDGET */
     GtkTextView *text_view;
     GtkTextBuffer *buffer;
     regex_t rex;
 
+#if NEW_ADDRESS_ENTRY_WIDGET
     focus_widget = gtk_window_get_focus(GTK_WINDOW(bsmsg->window));
     if (focus_widget && GTK_IS_ENTRY(focus_widget)
         && libbalsa_address_entry_show_matches((GtkEntry *) focus_widget))
         return;
 
+#endif /* NEW_ADDRESS_ENTRY_WIDGET */
     if (!bsmsg->flow)
 	return;
 

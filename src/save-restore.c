@@ -550,11 +550,11 @@ config_global_load(void)
     /* We must load filters before mailboxes, because they refer to the filters list */
     config_filters_load();
     if (filter_errno!=FILTER_NOERR) {
-	filter_perror(_("Error during filters loading : "));
+	filter_perror(_("Error during filters loading: "));
  	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("Error during filters loading : %s\n%s"),
- 			     filter_strerror(filter_errno),
-			     _("Filters may not be correct"));
+			     _("Error during filters loading: %s\n"
+			       "Filters may not be correct."),
+ 			     filter_strerror(filter_errno));
     }
 
     /* find and convert old-style signature entries */

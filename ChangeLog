@@ -1,3 +1,10 @@
+2002-12-28  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/filter-run-dialog.c, src/save-restore.c:
+	* libbalsa/filter.c: fix spelling (#102092).
+	* src/sendmsg-window.c: do not allow to send stuff with wrong charset.
+	* libbalsa/send.c: Activate "Hide" button.
+
 2002-12-27 14:18  PeterB
 
 	* libbalsa/filter-funcs.c (compare_filters): Fix a memory leak.

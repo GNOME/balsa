@@ -193,6 +193,13 @@ GtkWidget *send_dialog = NULL;
 GtkWidget *send_dialog_bar = NULL;
 
 static void
+send_dialog_response_cb(GtkWidget* w, gint response)
+{
+    if(response == GTK_RESPONSE_CLOSE)
+	gtk_widget_destroy(w);
+}
+
+static void
 send_dialog_destroy_cb(GtkWidget* w)
 {
     send_dialog = NULL;
@@ -228,6 +235,8 @@ ensure_send_progress_dialog()
 		       send_dialog_bar, FALSE, FALSE, 0);
 
     gtk_widget_show_all(send_dialog);
+    g_signal_connect(G_OBJECT(send_dialog), "response", 
+		     G_CALLBACK(send_dialog_response_cb), NULL);
     g_signal_connect(G_OBJECT(send_dialog), "destroy", 
 		     G_CALLBACK(send_dialog_destroy_cb), NULL);
     /* Progress bar done */

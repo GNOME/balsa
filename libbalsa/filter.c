@@ -421,7 +421,7 @@ filters_prepare_to_run(GSList * filters)
 	fil=(LibBalsaFilter*) filters->data;
 	if (!FILTER_CHKFLAG(fil,FILTER_VALID)) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-                                     _("Invalid filter : %s"),fil->name);
+                                     _("Invalid filter: %s"),fil->name);
 	    ok=FALSE;
 	}
 	else if (!FILTER_CHKFLAG(fil,FILTER_COMPILED))
@@ -472,9 +472,10 @@ void libbalsa_filter_match_mailbox(GSList * filter_list, LibBalsaMailbox * mbox)
     UNLOCK_MAILBOX(mbox);
 }
 
-/* Apply all filters on their matching messages (call libbalsa_filter_match before)
- * returns TRUE if the trash bin has been filled
- * FIXME : Should position filter_errno on errors (bad command action,bad destination mailbox...)
+/* Apply all filters on their matching messages (call
+ * libbalsa_filter_match before) returns TRUE if the trash bin has
+ * been filled FIXME: Should position filter_errno on errors (bad
+ * command action,bad destination mailbox...)
  */
 
 gboolean
@@ -503,7 +504,7 @@ libbalsa_filter_apply(GSList * filter_list)
             mbox = url_to_mailbox_mapper(filt->action_string);
             if (!mbox)
                 libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-                                     _("Bad mailbox name for filter : %s"),
+                                     _("Bad mailbox name for filter: %s"),
                                      filt->name);
             else if (!libbalsa_messages_copy(filt->matching_messages,mbox))
                 libbalsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -522,7 +523,7 @@ libbalsa_filter_apply(GSList * filter_list)
             mbox = url_to_mailbox_mapper(filt->action_string);
             if (!mbox)
                 libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-                                     _("Bad mailbox name for filter : %s"),
+                                     _("Bad mailbox name for filter: %s"),
                                      filt->name);
             else if (!libbalsa_messages_move(filt->matching_messages,mbox))
                 libbalsa_information(LIBBALSA_INFORMATION_ERROR,

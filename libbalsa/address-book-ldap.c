@@ -228,7 +228,7 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
 	ldap_unbind_s(ab->directory);
 	return FALSE;
     }
-    // ldap_enable_cache(ab->directory, LDAP_CACHE_TIMEOUT, 0);
+    /* ldap_enable_cache(ab->directory, LDAP_CACHE_TIMEOUT, 0); */
     return TRUE;
 }
 

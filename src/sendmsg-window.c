@@ -3129,19 +3129,50 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     return message;
 }
 
-/* "send message" menu and toolbar callback */
+/* "send message" menu and toolbar callback.
+ * FIXME: automatic charset detection, as libmutt does for strings?
+ */
 static gint
 send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 {
     gboolean successful = TRUE;
     LibBalsaMessage *message;
     LibBalsaMailbox *fcc;
+    const gchar* ctmp;
+    gchar *res;
+    GError *err = NULL;
+    gsize bytes_read, bytes_written;
+    GtkTextIter start, end;
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 
     if (!is_ready_to_send(bsmsg))
 	return FALSE;
 
     if (balsa_app.debug)
 	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
+
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
+    ctmp = gtk_text_iter_get_text(&start, &end);
+    res = g_convert(ctmp, strlen(ctmp), bsmsg->charset, "UTF-8", 
+		    &bytes_read, &bytes_written, &err);
+
+    g_free(res);
+    if(err) {
+	gchar *err_msg = 
+	    g_strdup_printf(_("The message cannot be encoded in charset %s.\n"
+			      "Please choose a language for this message."),
+			    bsmsg->charset);
+	GtkWidget* msgbox = gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
+						   GTK_DIALOG_MODAL,
+						   GTK_MESSAGE_ERROR,
+						   GTK_BUTTONS_OK,
+						   err_msg);
+	gtk_dialog_run(GTK_DIALOG(msgbox));
+        gtk_widget_destroy(msgbox);
+	g_error_free(err);
+	return FALSE;
+    }
 
     message = bsmsg2message(bsmsg);
     fcc = balsa_find_mailbox_by_url(bsmsg->fcc_url);

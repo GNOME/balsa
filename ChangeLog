@@ -1,3 +1,8 @@
+2004-11-24 07:02  PeterB
+
+	* libbalsa/address-entry.c: do not set up completions before widget
+	is realized.
+
 2004-11-23 20:31  PeterB
 
 	* src/balsa-message.c: do not check mailbox when selecting message

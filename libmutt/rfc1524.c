@@ -29,11 +29,14 @@
 #include "mutt.h"
 #include "rfc1524.h"
 
-#include <ctype.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/wait.h>
 #include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <errno.h>
+#include <unistd.h>
 
 /* The command semantics include the following:
  * %s is the filename that contains the mail body data
@@ -48,12 +51,18 @@
  * In addition, this function returns a 0 if the command works on a file,
  * and 1 if the command works on a pipe.
  */
-int rfc1524_expand_command (BODY *a, char *filename, char *type, 
+int rfc1524_expand_command (BODY *a, char *filename, char *_type,
     char *command, int clen)
 {
   int x=0,y=0;
   int needspipe = MUTT_TRUE;
   char buf[LONG_STRING];
+  char type[LONG_STRING];
+  
+  strfcpy (type, _type, sizeof (type));
+  
+  if (option (OPTMAILCAPSANITIZE))
+    mutt_sanitize_filename (type, 0);
 
   while (command[x] && x<clen && y<sizeof(buf)) 
   {
@@ -67,36 +76,46 @@ int rfc1524_expand_command (BODY *a, char *filename, char *type,
       if (command[x] == '{') 
       {
 	char param[STRING];
+	char pvalue[LONG_STRING];
 	int z = 0;
 	char *ret = NULL;
+	char *pv;
 
 	x++;
 	while (command[x] && command[x] != '}' && z<sizeof(param))
 	  param[z++] = command[x++];
 	param[z] = '\0';
 	dprint(2,(debugfile,"Parameter: %s  Returns: %s\n",param,ret));
-	ret = mutt_get_parameter(param,a->parameter);
+	pv = mutt_get_parameter (param, a->parameter);
+	strfcpy (pvalue, NONULL(pv), sizeof (pvalue));
+	if (option (OPTMAILCAPSANITIZE)) 
+	  mutt_sanitize_filename (pvalue, 0);
+	ret = mutt_quote_filename (pvalue);
 	dprint(2,(debugfile,"Parameter: %s  Returns: %s\n",param,ret));
 	z = 0;
 	while (ret && ret[z] && y<sizeof(buf))
 	  buf[y++] = ret[z++];
+	FREE(&ret);
       }
       else if (command[x] == 's' && filename != NULL)
       {
-        char *fn = mutt_quote_filename(filename);
-        int i;
-      
-        for(i = 0; fn[i] && y < sizeof(buf); i++)
-          buf[y++] = fn[i];
-      
-        FREE(&fn);
-
+	char *fn = mutt_quote_filename(filename);
+	int i;
+	
+	for(i = 0; fn[i] && y < sizeof(buf); i++)
+	  buf[y++] = fn[i];
+	
+	FREE(&fn);
 	needspipe = MUTT_FALSE;
       }
       else if (command[x] == 't')
       {
-	while (*type && y < sizeof (buf))
-	  buf[y++] = *type++;
+	char *t = mutt_quote_filename (type);
+	char *s;
+	
+	for (s = t; *s && y < sizeof (buf);)
+	  buf[y++] = *s++;
+	FREE (&t);
       }
       x++;
     }
@@ -206,10 +225,10 @@ static int rfc1524_mailcap_parse (BODY *a,
 
       /* check type */
       ch = get_field (buf);
-      if (strcasecmp (buf, type) &&
-	  (strncasecmp (buf, type, btlen) ||
+      if (mutt_strcasecmp (buf, type) &&
+	  (mutt_strncasecmp (buf, type, btlen) ||
 	   (buf[btlen] != 0 &&			/* implicit wild */
-	    strcmp (buf + btlen, "/*"))))	/* wildsubtype */
+	    mutt_strcmp (buf + btlen, "/*"))))	/* wildsubtype */
 	continue;
 
       /* next field is the viewcommand */
@@ -231,53 +250,53 @@ static int rfc1524_mailcap_parse (BODY *a,
 	ch = get_field (ch);
 	dprint (2, (debugfile, "field: %s\n", field));
 
-	if (!strcasecmp (field, "needsterminal"))
+	if (!mutt_strcasecmp (field, "needsterminal"))
 	{
 	  if (entry)
 	    entry->needsterminal = MUTT_TRUE;
 	}
-	else if (!strcasecmp (field, "copiousoutput"))
+	else if (!mutt_strcasecmp (field, "copiousoutput"))
 	{
 	  copiousoutput = MUTT_TRUE;
 	  if (entry)
 	    entry->copiousoutput = MUTT_TRUE;
 	}
-	else if (!strncasecmp (field, "composetyped", 12))
+	else if (!mutt_strncasecmp (field, "composetyped", 12))
 	{
 	  /* this compare most occur before compose to match correctly */
 	  if (get_field_text (field + 12, entry ? &entry->composetypecommand : NULL,
 			      type, filename, line))
 	    composecommand = MUTT_TRUE;
 	}
-	else if (!strncasecmp (field, "compose", 7))
+	else if (!mutt_strncasecmp (field, "compose", 7))
 	{
 	  if (get_field_text (field + 7, entry ? &entry->composecommand : NULL,
 			      type, filename, line))
 	    composecommand = MUTT_TRUE;
 	}
-	else if (!strncasecmp (field, "print", 5))
+	else if (!mutt_strncasecmp (field, "print", 5))
 	{
 	  if (get_field_text (field + 5, entry ? &entry->printcommand : NULL,
 			      type, filename, line))
 	    printcommand = MUTT_TRUE;
 	}
-	else if (!strncasecmp (field, "edit", 4))
+	else if (!mutt_strncasecmp (field, "edit", 4))
 	{
 	  if (get_field_text (field + 4, entry ? &entry->editcommand : NULL,
 			      type, filename, line))
 	    editcommand = MUTT_TRUE;
 	}
-	else if (!strncasecmp (field, "nametemplate", 12))
+	else if (!mutt_strncasecmp (field, "nametemplate", 12))
 	{
 	  get_field_text (field + 12, entry ? &entry->nametemplate : NULL,
 			  type, filename, line);
 	}
-	else if (!strncasecmp (field, "x-convert", 9))
+	else if (!mutt_strncasecmp (field, "x-convert", 9))
 	{
 	  get_field_text (field + 9, entry ? &entry->convert : NULL,
 			  type, filename, line);
 	}
-	else if (!strncasecmp (field, "test", 4))
+	else if (!mutt_strncasecmp (field, "test", 4))
 	{
 	  /* 
 	   * This routine executes the given test command to determine
@@ -289,7 +308,7 @@ static int rfc1524_mailcap_parse (BODY *a,
 	  if (get_field_text (field + 4, &test_command, type, filename, line)
 	      && test_command)
 	  {
-	    len = strlen (test_command) + STRING;
+	    len = mutt_strlen (test_command) + STRING;
 	    safe_realloc ((void **) &test_command, len);
 	    rfc1524_expand_command (a, NULL, type, test_command, len);
 	    if (mutt_system (test_command))
@@ -384,7 +403,7 @@ int rfc1524_mailcap_lookup (BODY *a, char *type, rfc1524_entry *entry, int opt)
    * and overriden by the MAILCAPS environment variable, and, just to be nice, 
    * we'll make it specifiable in .muttrc
    */
-  if (!*curr)
+  if (!curr || !*curr)
   {
     mutt_error ("No mailcap path specified");
     return 0;
@@ -429,6 +448,7 @@ void mutt_adv_mktemp (char *s, size_t l)
   char tmp[_POSIX_PATH_MAX];
   char *period;
   size_t sl;
+  struct stat sb;
   
   strfcpy (buf, NONULL (Tempdir), sizeof (buf));
   mutt_expand_path (buf, sizeof (buf));
@@ -441,7 +461,7 @@ void mutt_adv_mktemp (char *s, size_t l)
   {
     strfcpy (tmp, s, sizeof (tmp));
     snprintf (s, l, "%s/%s", buf, tmp);
-    if (access (s, F_OK) != 0)
+    if (lstat (s, &sb) == -1 && errno == ENOENT)
       return;
     if ((period = strrchr (tmp, '.')) != NULL)
       *period = 0;
@@ -450,7 +470,7 @@ void mutt_adv_mktemp (char *s, size_t l)
     if (period != NULL)
     {
       *period = '.';
-      sl = strlen(s);
+      sl = mutt_strlen(s);
       strfcpy(s + sl, period, l - sl);
     }
   }
@@ -475,27 +495,27 @@ static void strnfcpy(char *d, char *s, size_t siz, size_t len)
 }
 
 int rfc1524_expand_filename (char *nametemplate,
-                             char *oldfile,
-                             char *newfile,
-                             size_t nflen)
+			     char *oldfile, 
+			     char *newfile,
+			     size_t nflen)
 {
   int i, j, k, ps, r;
   char *s;
-  short lmatch = 0, rmatch = 0;
+  short lmatch = 0, rmatch = 0; 
   char left[_POSIX_PATH_MAX];
   char right[_POSIX_PATH_MAX];
-
+  
   newfile[0] = 0;
 
   /* first, ignore leading path components.
    */
-
+  
   if (nametemplate && (s = strrchr (nametemplate, '/')))
     nametemplate = s + 1;
 
   if (oldfile && (s = strrchr (oldfile, '/')))
     oldfile = s + 1;
-
+    
   if (!nametemplate)
   {
     if (oldfile)
@@ -511,27 +531,27 @@ int rfc1524_expand_filename (char *nametemplate,
     /* first, compare everything left from the "%s" 
      * (if there is one).
      */
-
+    
     lmatch = 1; ps = 0;
     for(i = 0; nametemplate[i]; i++)
     {
       if(nametemplate[i] == '%' && nametemplate[i+1] == 's')
-      {
-        ps = 1;
-        break;
+      { 
+	ps = 1;
+	break;
       }
 
       /* note that the following will _not_ read beyond oldfile's end. */
 
       if(lmatch && nametemplate[i] != oldfile[i])
-        lmatch = 0;
+	lmatch = 0;
     }
 
     if(ps)
     {
-
+      
       /* If we had a "%s", check the rest. */
-
+      
       /* now, for the right part: compare everything right from 
        * the "%s" to the final part of oldfile.
        * 
@@ -544,31 +564,31 @@ int rfc1524_expand_filename (char *nametemplate,
        *   must not be counted again.  That's done by the
        *   condition (j >= (lmatch ? i : 0)).
        */
-
+      
       rmatch = 1;
 
-      for(r = 0, j = strlen(oldfile) - 1, k = strlen(nametemplate) - 1 ;
-          j >= (lmatch ? i : 0) && k >= i + 2;
-          j--, k--)
+      for(r = 0, j = mutt_strlen(oldfile) - 1, k = mutt_strlen(nametemplate) - 1 ;
+	  j >= (lmatch ? i : 0) && k >= i + 2;
+	  j--, k--)
       {
-        if(nametemplate[k] != oldfile[j])
-        {
-          rmatch = 0;
-          break;
-        }
+	if(nametemplate[k] != oldfile[j])
+	{
+	  rmatch = 0;
+	  break;
+	}
       }
-
+      
       /* Now, check if we had a full match. */
-
+      
       if(k >= i + 2)
-        rmatch = 0;
-
+	rmatch = 0;
+      
       if(lmatch) *left = 0;
       else strnfcpy(left, nametemplate, sizeof(left), i);
-
+      
       if(rmatch) *right = 0;
       else strfcpy(right, nametemplate + i + 2, sizeof(right));
-
+      
       snprintf(newfile, nflen, "%s%s%s", left, oldfile, right);
     }
     else
@@ -577,14 +597,14 @@ int rfc1524_expand_filename (char *nametemplate,
       strfcpy(newfile, nametemplate, nflen);
     }
   }
-
+  
   mutt_adv_mktemp(newfile, nflen);
 
   if(rmatch && lmatch)
     return 0;
-  else
+  else 
     return 1;
-
+  
 }
 
 /* If rfc1524_expand_command() is used on a recv'd message, then
@@ -594,6 +614,11 @@ int rfc1524_expand_filename (char *nametemplate,
  * This function returns 0 on successful move, 1 on old file doesn't exist,
  * 2 on new file already exists, and 3 on other failure.
  */
+
+/* note on access(2) use: No dangling symlink problems here due to
+ * safe_fopen().
+ */
+
 int mutt_rename_file (char *oldfile, char *newfile)
 {
   FILE *ofp, *nfp;

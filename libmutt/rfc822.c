@@ -29,6 +29,7 @@
 #define FREE(x) safe_free(x)
 #define ISSPACE isspace
 #define strfcpy(a,b,c) {if (c) {strncpy(a,b,c);a[c-1]=0;}}
+#define STRING 128
 #include "rfc822.h"
 #endif
 
@@ -300,7 +301,10 @@ add_addrspec (ADDRESS **top, ADDRESS **last, const char *phrase,
   ADDRESS *cur = rfc822_new_address ();
   
   if (parse_addr_spec (phrase, comment, commentlen, commentmax, cur) == NULL)
+  {
+    rfc822_free_address (&cur);
     return;
+  }
 
   if (*last)
     (*last)->next = cur;
@@ -390,7 +394,7 @@ ADDRESS *rfc822_parse_adrlist (ADDRESS *top, const char *s)
 	phrase[phraselen] = 0;
 	add_addrspec (&top, &last, phrase, comment, &commentlen, sizeof (comment) - 1);
       }
-      else if (commentlen && !last->personal)
+      else if (commentlen && last && !last->personal)
       {
 	comment[commentlen] = 0;
 	last->personal = safe_strdup (comment);
@@ -483,7 +487,7 @@ void rfc822_qualify (ADDRESS *addr, const char *host)
   for (; addr; addr = addr->next)
     if (!addr->group && addr->mailbox && strchr (addr->mailbox, '@') == NULL)
     {
-      p = safe_malloc (strlen (addr->mailbox) + strlen (host) + 2);
+      p = safe_malloc (mutt_strlen (addr->mailbox) + mutt_strlen (host) + 2);
       sprintf (p, "%s@%s", addr->mailbox, host);
       safe_free ((void **) &addr->mailbox);
       addr->mailbox = p;
@@ -534,7 +538,7 @@ void rfc822_write_address_single (char *buf, size_t buflen, ADDRESS *addr)
     if (!buflen)
       goto done;
     strfcpy (pbuf, addr->val, buflen);
-    len = strlen (pbuf);
+    len = mutt_strlen (pbuf);
     pbuf += len;
     buflen -= len;
     if (addr->group)
@@ -581,7 +585,7 @@ void rfc822_write_address_single (char *buf, size_t buflen, ADDRESS *addr)
       if (!buflen)
 	goto done;
       strfcpy (pbuf, addr->personal, buflen);
-      len = strlen (pbuf);
+      len = mutt_strlen (pbuf);
       pbuf += len;
       buflen -= len;
     }
@@ -605,7 +609,7 @@ void rfc822_write_address_single (char *buf, size_t buflen, ADDRESS *addr)
     if (!buflen)
       goto done;
     strfcpy (pbuf, addr->mailbox, buflen);
-    len = strlen (pbuf);
+    len = mutt_strlen (pbuf);
     pbuf += len;
     buflen -= len;
 
@@ -646,7 +650,7 @@ done:
 void rfc822_write_address (char *buf, size_t buflen, ADDRESS *addr)
 {
   char *pbuf = buf;
-  size_t len = strlen (buf);
+  size_t len = mutt_strlen (buf);
   
   buflen--; /* save room for the terminal nul */
 
@@ -675,7 +679,7 @@ void rfc822_write_address (char *buf, size_t buflen, ADDRESS *addr)
 
     /* this should be safe since we always have at least 1 char passed into
        the above call, which means `pbuf' should always be nul terminated */
-    len = strlen (pbuf);
+    len = mutt_strlen (pbuf);
     pbuf += len;
     buflen -= len;
 
@@ -758,7 +762,11 @@ int main (int argc, char **argv)
 {
   ADDRESS *list;
   char buf[256];
+# if 0
   char *str = "michael, Michael Elkins <me@cs.hmc.edu>, testing a really complex address: this example <@contains.a.source.route@with.multiple.hosts:address@example.com>;, lothar@of.the.hillpeople (lothar)";
+# else
+  char *str = "a b c ";
+# endif
   
   list = rfc822_parse_adrlist (NULL, str);
   buf[0] = 0;

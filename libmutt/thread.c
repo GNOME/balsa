@@ -1,4 +1,9 @@
 /*
+ * WORK IN PROGRESS ALERT: Daniel Eisenbud <daniel@math.berkeley.edu>
+ * is currently working on this code.  Contact him before working on it!
+ */
+
+/*
  * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
  *
  *     This program is free software; you can redistribute it and/or modify
@@ -22,18 +27,40 @@
 #include <string.h>
 #include <ctype.h>
 
+/* returns 1 if `a' is a descendant (child) of thread `b' */
+static int is_descendant (HEADER *a, HEADER *b)
+{
+  /* find the top parent of the thread */
+  while (a->parent)
+    a = a->parent;
+  return (a == b);
+}
+
 /* This function makes use of the fact that Mutt stores message references in
-   reverse order (i.e., last to first).  This is optiminal since we would like
-   to find the most recent message to which "cur" refers itself.  */
+ * reverse order (i.e., last to first).  This is optiminal since we would like
+ * to find the most recent message to which "cur" refers itself.  
+ */
+
 static HEADER *find_reference (HEADER *cur, CONTEXT *ctx)
 {
   LIST *refs = cur->env->references;
-  void *ptr;
+  HEADER *ptr;
 
   for (; refs; refs = refs->next)
+  {
+    /* ups, this message is in a reference loop. bad. */
+    if (cur->env->message_id && !strcmp (cur->env->message_id, refs->data))
+      continue;
+    
     if ((ptr = hash_find (ctx->id_hash, refs->data)))
-      return ptr;
+    {
+      if (is_descendant (ptr, cur))
+	continue;
 
+      return ptr;
+    }
+  }
+  
   return NULL;
 }
 
@@ -42,18 +69,25 @@ static int need_display_subject (CONTEXT *ctx, HEADER *tree)
 {
   HEADER *tmp;
 
+  /* if our subject is different from our parent's, display it */
   if (tree->subject_changed)
     return (1);
+
+  /* if our subject is different from that of our closest previously displayed
+   * sibling, display the subject */
   for (tmp = tree->prev; tmp; tmp = tmp->prev)
   {
     if (tmp->virtual >= 0 || (tmp->collapsed && (!ctx->pattern || tmp->limited)))
     {
-      if (!tmp->subject_changed)
-	return (0);
+      if (tmp->subject_changed)
+	return (1);
       else
 	break;
     }
   }
+  
+  /* if there is a parent-to-child subject change anywhere between us and our
+   * closest displayed ancestor, display the subject */
   for (tmp = tree->parent; tmp; tmp = tmp->parent)
   {
     if (tmp->virtual >= 0 || (tmp->collapsed && (!ctx->pattern || tmp->limited)))
@@ -61,11 +95,15 @@ static int need_display_subject (CONTEXT *ctx, HEADER *tree)
     else if (tmp->subject_changed)
       return (1);
   }
-  return (0);
+  
+  /* if we have no visible parent or previous sibling, display the subject */
+  return (1);
 }
 
 /* determines whether a later sibling or the child of a later 
-   sibling is displayed.  */
+ * sibling is displayed.  
+ */
+
 static int is_next_displayed (CONTEXT *ctx, HEADER *tree)
 {
   int depth = 0;
@@ -116,7 +154,8 @@ void mutt_linearize_tree (CONTEXT *ctx, int linearize)
   HEADER **array = ctx->hdrs + (Sort & SORT_REVERSE ? ctx->msgcount - 1 : 0);
 
   /* A NULL tree should never be passed here, but may occur if there is
-     a cycle.  */
+   * a cycle.  
+   */
   if (!tree)
     return;
 
@@ -258,18 +297,12 @@ static void insert_message (HEADER **tree, HEADER *msg, sort_t *sortFunc)
   msg->next = NULL;
 }
 
-/* returns 1 if `a' is a descendant (child) of thread `b' */
-static int is_descendant (HEADER *a, HEADER *b)
-{
-  /* find the top parent of the thread */
-  while (a->parent)
-    a = a->parent;
-  return (a == b);
-}
 
 /* find the best possible match for a parent mesage based upon subject.
-   if there are multiple matches, the one which was sent the latest, but
-   before the current message, is used. */
+ * if there are multiple matches, the one which was sent the latest, but
+ * before the current message, is used. 
+ */
+
 static HEADER *find_subject (CONTEXT *ctx, HEADER *cur)
 {
   struct hash_elem *ptr;
@@ -291,7 +324,7 @@ static HEADER *find_subject (CONTEXT *ctx, HEADER *cur)
 	  cur->date_sent >= tmp->date_sent &&
 	  (!last || (last->date_sent <= tmp->date_sent)) &&
 	  tmp->env->real_subj &&
-	  strcmp (env->real_subj, tmp->env->real_subj) == 0)
+	  mutt_strcmp (env->real_subj, tmp->env->real_subj) == 0)
       {
 	last = tmp; /* best match so far */
       }
@@ -442,14 +475,14 @@ static void move_descendants (HEADER **tree, HEADER *cur, sort_t *usefunc)
   {
     /* only need to look at the last reference */
     if (tmp->env->references &&
-	strcmp (tmp->env->references->data, cur->env->message_id) == 0)
+	mutt_strcmp (tmp->env->references->data, cur->env->message_id) == 0)
     {
       /* remove message from current location */
       unlink_message (tree, tmp);
 
       tmp->parent = cur;
       if (cur->env->real_subj && tmp->env->real_subj)
-	tmp->subject_changed = strcmp (tmp->env->real_subj, cur->env->real_subj) ? 1 : 0;
+	tmp->subject_changed = mutt_strcmp (tmp->env->real_subj, cur->env->real_subj) ? 1 : 0;
       else
 	tmp->subject_changed = (cur->env->real_subj || tmp->env->real_subj) ? 1 : 0;
       tmp->fake_thread = 0; /* real reference */
@@ -540,7 +573,7 @@ void mutt_sort_threads (CONTEXT *ctx, int init)
       {
 	CUR->parent = tmp;
 	if (CUR->env->real_subj && tmp->env->real_subj)
-	  CUR->subject_changed = strcmp (tmp->env->real_subj, CUR->env->real_subj) ? 1 : 0;
+	  CUR->subject_changed = mutt_strcmp (tmp->env->real_subj, CUR->env->real_subj) ? 1 : 0;
 	else
 	  CUR->subject_changed = (CUR->env->real_subj || tmp->env->real_subj) ? 1 : 0;
       }
@@ -734,6 +767,7 @@ int _mutt_traverse_thread (CONTEXT *ctx, HEADER *cur, int flag)
 
   if (flag & (M_THREAD_COLLAPSE | M_THREAD_UNCOLLAPSE))
   {
+    cur->pair = 0; /* force index entry's color to be re-evaluated */
     cur->collapsed = flag & M_THREAD_COLLAPSE;
     if (cur->virtual != -1)
     {
@@ -760,6 +794,7 @@ int _mutt_traverse_thread (CONTEXT *ctx, HEADER *cur, int flag)
   {
     if (flag & (M_THREAD_COLLAPSE | M_THREAD_UNCOLLAPSE))
     {
+      cur->pair = 0; /* force index entry's color to be re-evaluated */
       cur->collapsed = flag & M_THREAD_COLLAPSE;
       if (!roothdr && CHECK_LIMIT)
       {

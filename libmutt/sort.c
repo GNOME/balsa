@@ -78,7 +78,7 @@ int compare_subject (const void *a, const void *b)
   else if (!(*pb)->env->real_subj)
     rc = 1;
   else
-    rc = strcasecmp ((*pa)->env->real_subj, (*pb)->env->real_subj);
+    rc = mutt_strcasecmp ((*pa)->env->real_subj, (*pb)->env->real_subj);
   AUXSORT(rc,a,b);
   return (SORTCODE (rc));
 }
@@ -112,7 +112,7 @@ int compare_to (const void *a, const void *b)
 
   fa = mutt_get_name ((*ppa)->env->to);
   fb = mutt_get_name ((*ppb)->env->to);
-  result = strcasecmp (fa, fb);
+  result = mutt_strcasecmp (fa, fb);
   AUXSORT(result,a,b);
   return (SORTCODE (result));
 }
@@ -126,7 +126,7 @@ int compare_from (const void *a, const void *b)
 
   fa = mutt_get_name ((*ppa)->env->from);
   fb = mutt_get_name ((*ppb)->env->from);
-  result = strcasecmp (fa, fb);
+  result = mutt_strcasecmp (fa, fb);
   AUXSORT(result,a,b);
   return (SORTCODE (result));
 }
@@ -178,8 +178,8 @@ sort_t *mutt_get_sort_func (int method)
 void mutt_sort_headers (CONTEXT *ctx, int init)
 {
   int i;
+  HEADER *h;
   sort_t *sortfunc;
-  int collapse = (option (OPTSORTCOLLAPSE)) ? 0 : 1;
   
   unset_option (OPTNEEDRESORT);
 
@@ -240,25 +240,34 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
 
   /* adjust the virtual message numbers */
   ctx->vcount = 0;
-  if (collapse)
-    ctx->collapsed = 0;
   for (i = 0; i < ctx->msgcount; i++)
   {
     HEADER *cur = ctx->hdrs[i];
-    if (cur->virtual != -1 || (collapse && cur->collapsed && (!ctx->pattern || cur->limited)))
+    if (cur->virtual != -1 || (cur->collapsed && (!ctx->pattern || cur->limited)))
     {
       cur->virtual = ctx->vcount;
       ctx->v2r[ctx->vcount] = i;
       ctx->vcount++;
     }
     cur->msgno = i;
-    cur->num_hidden = mutt_get_hidden (ctx, cur);
-    if (collapse)
-      cur->collapsed = 0;
-  }
 #ifndef LIBMUTT
   mutt_cache_index_colors(ctx);
 #endif
+  }
+
+  /* re-collapse threads marked as collapsed */
+  if ((Sort & SORT_MASK) == SORT_THREADS)
+  {
+    h = ctx->tree;
+    while (h)
+    {
+      if (h->collapsed)
+	mutt_collapse_thread (ctx, h);
+      h = h->next;
+    }
+    mutt_set_virtual (ctx);
+  }
+
   if (!ctx->quiet)
     mutt_clear_error ();
 }

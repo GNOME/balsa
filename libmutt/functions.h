@@ -77,6 +77,7 @@ struct binding_t OpMain[] = {
   { "delete-pattern",		OP_MAIN_DELETE_PATTERN,		"D" },
   { "delete-thread",		OP_DELETE_THREAD,		"\004" },
   { "delete-subthread",		OP_DELETE_SUBTHREAD,		"\033d" },
+  { "edit",			OP_EDIT_MESSAGE,		"e" },
   { "forward-message",		OP_FORWARD_MESSAGE,		"f" },
   { "flag-message",		OP_FLAG_MESSAGE,		"F" },
   { "group-reply",		OP_GROUP_REPLY,			"g" },
@@ -129,6 +130,13 @@ struct binding_t OpMain[] = {
 
 
 
+#ifdef _PGPPATH
+  { "extract-keys",		OP_EXTRACT_KEYS,		"\013" },
+  { "forget-passphrase",	OP_FORGET_PASSPHRASE,		"\006" },
+  { "mail-key",			OP_MAIL_KEY,			"\033k" },
+  { "decrypt-copy",		OP_DECRYPT_COPY,		NULL },
+  { "decrypt-save",		OP_DECRYPT_SAVE,		NULL },
+#endif
 
 
 
@@ -145,6 +153,7 @@ struct binding_t OpPager[] = {
   { "delete-message",	OP_DELETE,			"d" },
   { "delete-thread",	OP_DELETE_THREAD,		"\004" },
   { "delete-subthread",	OP_DELETE_SUBTHREAD,		"\033d" },
+  { "edit",		OP_EDIT_MESSAGE,		"e" },
   { "forward-message",	OP_FORWARD_MESSAGE,		"f" },
   { "flag-message",	OP_FLAG_MESSAGE,		"F" },
   { "group-reply",	OP_GROUP_REPLY,			"g" },
@@ -206,63 +215,13 @@ struct binding_t OpPager[] = {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#ifdef _PGPPATH
+  { "extract-keys",	OP_EXTRACT_KEYS,		"\013" },
+  { "forget-passphrase",OP_FORGET_PASSPHRASE,		"\006" },
+  { "mail-key",		OP_MAIL_KEY,			"\033k" },
+  { "decrypt-copy",		OP_DECRYPT_COPY,		NULL },
+  { "decrypt-save",		OP_DECRYPT_SAVE,		NULL },
+#endif
 
 
 
@@ -288,6 +247,9 @@ struct binding_t OpAttach[] = {
 
 
 
+#ifdef _PGPPATH
+  { "extract-keys",	OP_EXTRACT_KEYS,		"\013" },
+#endif
 
 
 
@@ -313,7 +275,6 @@ struct binding_t OpCompose[] = {
   { "get-attachment",	OP_COMPOSE_GET_ATTACHMENT,	"G" },
   { "ispell",		OP_COMPOSE_ISPELL,		"i" },
   { "print-entry",	OP_PRINT,			"l" },
-  { "redraw-screen",	OP_REDRAW,			"\014" },
   { "edit-mime",	OP_COMPOSE_EDIT_MIME,		"m" },
   { "new-mime",		OP_COMPOSE_NEW_MIME,		"n" },
   { "postpone-message",	OP_COMPOSE_POSTPONE_MESSAGE,	"P" },
@@ -322,12 +283,18 @@ struct binding_t OpCompose[] = {
   { "edit-subject",	OP_COMPOSE_EDIT_SUBJECT,	"s" },
   { "edit-to",		OP_COMPOSE_EDIT_TO,		"t" },
   { "edit-type",	OP_COMPOSE_EDIT_TYPE,		"\024" },
+  { "write-fcc",	OP_COMPOSE_WRITE_MESSAGE,	"w" },
   { "toggle-unlink",	OP_COMPOSE_TOGGLE_UNLINK,	"u" },
   { "update-encoding",	OP_COMPOSE_UPDATE_ENCODING,	"U" },
   { "view-attach",	OP_VIEW_ATTACH,			M_ENTER_S },
   { "send-message",	OP_COMPOSE_SEND_MESSAGE,	"y" },
   { "pipe-entry",	OP_PIPE,			"|" },
 
+#ifdef _PGPPATH
+  { "attach-key",	OP_COMPOSE_ATTACH_KEY,		"\033k" },
+  { "forget-passphrase",OP_FORGET_PASSPHRASE,		"\006"  },
+  { "pgp-menu",		OP_COMPOSE_PGP_MENU,		"p" 	},
+#endif
 
   { NULL,		0,				NULL }
 };
@@ -355,9 +322,6 @@ struct binding_t OpBrowser[] = {
 /* External Query Menu */
 struct binding_t OpQuery[] = {
   { "create-alias",	OP_CREATE_ALIAS,	"a" },
-  { "search",		OP_SEARCH,		"/" },
-  { "search-reverse",	OP_SEARCH_REVERSE,	"\033/" },
-  { "search-opposite",	OP_SEARCH_OPPOSITE,	NULL },
   { "mail",		OP_MAIL,		"m" },
   { "query",		OP_QUERY,		"Q" },
   { "query-append",	OP_QUERY_APPEND,	"A" },
@@ -385,3 +349,10 @@ struct binding_t OpEditor[] = {
 
 
 
+#ifdef _PGPPATH
+struct binding_t OpPgp[] = {
+  { "verify-key",	OP_VERIFY_KEY,		"c" },
+  { "view-name",	OP_VIEW_ID,		"%" },
+  { NULL,		0,				NULL }
+};
+#endif /* _PGPPATH */

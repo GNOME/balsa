@@ -22,6 +22,10 @@
 #include "mailbox.h"
 #include "mx.h"
 
+#ifdef _PGPPATH
+#include "pgp.h"
+#endif
+
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
@@ -146,6 +150,7 @@ HEADER *mutt_dup_header(HEADER *h)
 
 void mutt_free_header (HEADER **h)
 {
+  if(!h || !*h) return;
   mutt_free_envelope (&(*h)->env);
   mutt_free_body (&(*h)->content);
   safe_free ((void **) &(*h)->tree);
@@ -158,7 +163,7 @@ int mutt_matches_ignore (const char *s, LIST *t)
 {
   for (; t; t = t->next)
   {
-    if (!strncasecmp (s, t->data, strlen (t->data)) || *t->data == '*')
+    if (!mutt_strncasecmp (s, t->data, mutt_strlen (t->data)) || *t->data == '*')
       return 1;
   }
   return 0;
@@ -270,14 +275,14 @@ void *safe_calloc (size_t nmemb, size_t size)
     return NULL;
   if (!(p = calloc (nmemb, size)))
   {
-    mutt_error ("Out of memory");
+    mutt_error ("Out of memory!");
     sleep (1);
     mutt_exit (1);
   }
   return p;
 }
 
-void *safe_malloc (unsigned int siz)
+void *safe_malloc (size_t siz)
 {
   void *p;
 
@@ -333,12 +338,24 @@ void safe_free (void **p)
   }
 }
 
+int safe_fclose (FILE **f)
+{
+  int r = 0;
+  
+  if (*f)
+    r = fclose (*f);
+      
+  *f = NULL;
+  return r;
+}
+
 char *safe_strdup (const char *s)
 {
   char *p;
   size_t l;
 
-  if (!s || !*s) return 0;
+  if (!s || !*s)
+    return 0;
   l = strlen (s) + 1;
   p = (char *)safe_malloc (l);
   memcpy (p, s, l);
@@ -375,11 +392,34 @@ int mutt_copy_bytes (FILE *in, FILE *out, size_t size)
 char *mutt_get_parameter (const char *s, PARAMETER *p)
 {
   for (; p; p = p->next)
-    if (strcasecmp (s, p->attribute) == 0)
+    if (mutt_strcasecmp (s, p->attribute) == 0)
       return (p->value);
 
   return NULL;
 }
+
+void mutt_set_parameter (const char *attribute, const char *value, PARAMETER **p)
+{
+  PARAMETER *q;
+  for(q = *p; q; q =  q->next)
+  {
+    if (mutt_strcasecmp (attribute, q->attribute) == 0)
+    {
+      safe_free((void **) &q->value);
+      q->value = safe_strdup(value);
+      return;
+    }
+  }
+  
+  q = mutt_new_parameter();
+  q->attribute = safe_strdup(attribute);
+  q->value = safe_strdup(value);
+  q->next = *p;
+  *p = q;
+}
+
+
+
 
 /* returns 1 if Mutt can't display this type of data, 0 otherwise */
 int mutt_needs_mailcap (BODY *m)
@@ -388,15 +428,20 @@ int mutt_needs_mailcap (BODY *m)
   {
     case TYPETEXT:
 
-      if (!strcasecmp ("plain", m->subtype) ||
-	  !strcasecmp ("rfc822-headers", m->subtype) ||
-	  !strcasecmp ("enriched", m->subtype))
+      if (!mutt_strcasecmp ("plain", m->subtype) ||
+	  !mutt_strcasecmp ("rfc822-headers", m->subtype) ||
+	  !mutt_strcasecmp ("enriched", m->subtype))
 	return 0;
       break;
 
 
 
-
+#ifdef _PGPPATH
+    case TYPEAPPLICATION:
+      if(mutt_is_application_pgp(m))
+	return 0;
+      break;
+#endif /* _PGPPATH */
 
 
     case TYPEMULTIPART:
@@ -415,12 +460,19 @@ int mutt_is_text_type (int t, char *s)
 
   if (t == TYPEMESSAGE)
   {
-    if (!strcasecmp ("delivery-status", s))
+    if (!mutt_strcasecmp ("delivery-status", s))
       return 1;
   }
 
 
 
+#ifdef _PGPPATH
+  if (t == TYPEAPPLICATION)
+  {
+    if (!mutt_strcasecmp ("pgp-keys", s))
+      return 1;
+  }
+#endif /* _PGPPATH */
 
 
 
@@ -440,6 +492,8 @@ void mutt_free_envelope (ENVELOPE **p)
   rfc822_free_address (&(*p)->mail_followup_to);
   safe_free ((void **) &(*p)->subject);
   safe_free ((void **) &(*p)->message_id);
+  safe_free ((void **) &(*p)->supersedes);
+  safe_free ((void **) &(*p)->date);
   mutt_free_list (&(*p)->references);
   mutt_free_list (&(*p)->userhdrs);
   safe_free ((void **) p);
@@ -484,20 +538,6 @@ char *mutt_strlower (char *s)
   return (s);
 }
 
-/* strcmp() allowing NULL pointers */
-int mutt_strcmp (const char *s1, const char *s2)
-{
-  if (s1 != NULL)
-  {
-    if (s2 != NULL)
-      return strcmp (s1, s2);
-    else
-      return (1);
-  }
-  else
-    return ((s2 == NULL) ? 0 : -1);
-}
-
 #ifndef LIBMUTT
 void mutt_free_alias (ALIAS **p)
 {
@@ -537,12 +577,12 @@ void mutt_pretty_mailbox (char *s)
   }
   *q = 0;
 
-  if (strncmp (s, NONULL (Maildir), (len = strlen (NONULL (Maildir)))) == 0 && s[len] == '/')
+  if (mutt_strncmp (s, Maildir, (len = mutt_strlen (Maildir))) == 0 && s[len] == '/')
   {
     *s++ = '=';
     strcpy (s, s + len);
   }
-  else if (strncmp (s, NONULL(Homedir), (len = strlen (NONULL(Homedir)))) == 0 &&
+  else if (mutt_strncmp (s, Homedir, (len = mutt_strlen (Homedir))) == 0 &&
 	   s[len] == '/')
   {
     *s++ = '~';
@@ -586,22 +626,23 @@ int mutt_copy_stream (FILE *fin, FILE *fout)
   return 0;
 }
 
+void mutt_expand_file_fmt (char *dest, size_t destlen, const char *fmt, const char *src)
+{
+  char *_src = mutt_quote_filename(src);
+  
+  mutt_expand_fmt(dest, destlen, fmt, _src);
+  safe_free((void **) &_src);
+}
+
 void mutt_expand_fmt (char *dest, size_t destlen, const char *fmt, const char *src)
 {
   const char *p = fmt;
   const char *last = p;
   size_t len;
-  char *_src;
   size_t slen;
   int found = 0;
 
-  /* some rationale should be given here: mutt's quoting
-   * rules are similar enough to the shell's rules so we
-   * can use mutt_quote_filename() even for patterns.
-   */
-
-  _src = mutt_quote_filename(src);
-  slen = strlen (_src);
+  slen = mutt_strlen (src);
   
   while ((p = strchr (p, '%')) != NULL)
   {
@@ -647,9 +688,112 @@ void mutt_expand_fmt (char *dest, size_t destlen, const char *fmt, const char *s
   if (found)
     strfcpy (dest, last, destlen);
   else
-    snprintf (dest, destlen, "%s %s", fmt, _src);
+    snprintf (dest, destlen, "%s %s", fmt, src);
   
-  FREE(&_src);
+}
+
+static int 
+compare_stat (struct stat *osb, struct stat *nsb)
+{
+  if (osb->st_dev != nsb->st_dev || osb->st_ino != nsb->st_ino ||
+      osb->st_rdev != nsb->st_rdev)
+  {
+    return -1;
+  }
+
+  return 0;
+}
+
+int safe_symlink(const char *oldpath, const char *newpath)
+{
+  struct stat osb, nsb;
+
+  if(!oldpath || !newpath)
+    return -1;
+  
+  if(unlink(newpath) == -1 && errno != ENOENT)
+    return -1;
+  
+  if (oldpath[0] == '/')
+  {
+    if (symlink (oldpath, newpath) == -1)
+      return -1;
+  }
+  else
+  {
+    char abs_oldpath[_POSIX_PATH_MAX];
+
+    if ((getcwd (abs_oldpath, sizeof abs_oldpath) == NULL) ||
+	(strlen (abs_oldpath) + 1 + strlen (oldpath) + 1 > sizeof abs_oldpath))
+    return -1;
+  
+    strcat (abs_oldpath, "/");
+    strcat (abs_oldpath, oldpath);
+    if (symlink (abs_oldpath, newpath) == -1)
+      return -1;
+  }
+
+  if(stat(oldpath, &osb) == -1 || stat(newpath, &nsb) == -1
+     || compare_stat(&osb, &nsb) == -1)
+  {
+    unlink(newpath);
+    return -1;
+  }
+  
+  return 0;
+}
+
+/* 
+ * This function is supposed to do nfs-safe renaming of files.
+ * 
+ * Warning: We don't check whether src and target are equal.
+ */
+
+int safe_rename (const char *src, const char *target)
+{
+  struct stat ssb, tsb;
+
+  if (!src || !target)
+    return -1;
+
+  if (link (src, target) != 0)
+  {
+    return -1;
+  }
+
+  /*
+   * Stat both links and check if they are equal.
+   */
+  
+  if (stat (src, &ssb) == -1)
+  {
+    return -1;
+  }
+  
+  if (stat (target, &tsb) == -1)
+  {
+    return -1;
+  }
+
+  /* 
+   * pretend that the link failed because the target file
+   * did already exist.
+   */
+
+  if (compare_stat (&ssb, &tsb) == -1)
+  {
+    errno = EEXIST;
+    return -1;
+  }
+
+  /*
+   * Unlink the original link.  Should we really ignore the return
+   * value here? XXX
+   */
+
+  unlink (src);
+
+  return 0;
 }
 
 int safe_open (const char *path, int flags)
@@ -662,8 +806,7 @@ int safe_open (const char *path, int flags)
 
   /* make sure the file is not symlink */
   if (lstat (path, &osb) < 0 || fstat (fd, &nsb) < 0 ||
-      osb.st_dev != nsb.st_dev || osb.st_ino != nsb.st_ino ||
-      osb.st_rdev != nsb.st_rdev)
+      compare_stat(&osb, &nsb) == -1)
   {
     dprint (1, (debugfile, "safe_open(): %s is a symlink!\n", path));
     close (fd);
@@ -699,7 +842,7 @@ FILE *safe_fopen (const char *path, const char *mode)
 #ifndef LIBMUTT
 /* return 0 on success, -1 on error */
 int mutt_check_overwrite (const char *attname, const char *path,
-				char *fname, size_t flen, int flags) 
+				char *fname, size_t flen, int *append) 
 {
   char tmp[_POSIX_PATH_MAX];
   struct stat st;
@@ -724,12 +867,24 @@ int mutt_check_overwrite (const char *attname, const char *path,
     else
       snprintf (fname, flen, "%s/%s", path, attname);
   }
-
-  if (flags != M_SAVE_APPEND &&
-      access (fname, F_OK) == 0 && 
-      mutt_yesorno ("File exists, overwrite?", 0) != 1)
-    return (-1);
   
+  if (*append == 0 && access (fname, F_OK) == 0)
+  {
+    switch (mutt_multi_choice
+	    ("File exists, (o)verwrite, (a)ppend, or (c)ancel?", "oac"))
+    {
+      case -1: /* abort */
+      case 3:  /* cancel */
+	return -1;
+
+      case 2: /* append */
+        *append = M_SAVE_APPEND;
+        break;
+      case 1: /* overwrite */
+        *append = M_SAVE_OVERWRITE;
+        break;
+    }
+  }
   return 0;
 }
 #endif
@@ -737,7 +892,7 @@ void mutt_remove_trailing_ws (char *s)
 {
   char *p;
 
-  for (p = s + strlen (s) - 1 ; p >= s && ISSPACE (*p) ; p--)
+  for (p = s + mutt_strlen (s) - 1 ; p >= s && ISSPACE (*p) ; p--)
     *p = 0;
 }
 
@@ -791,15 +946,15 @@ void mutt_safe_path (char *s, size_t l, ADDRESS *a)
       *p = '_';
 }
 
-static char safe_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+@{}._-:%";
+static char safe_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+@{}._-:%/";
 
-void mutt_sanitize_filename(char *f)
+void mutt_sanitize_filename(char *f, short slash)
 {
   if(!f) return;
 
   for(; *f; f++)
   {
-    if(!strchr(safe_chars, *f))
+    if((slash && *f == '/') || !strchr(safe_chars, *f))
       *f = '_';
   }
 }
@@ -875,7 +1030,6 @@ char *mutt_substrdup (const char *begin, const char *end)
 void mutt_FormatString (char *dest,		/* output buffer */
 			size_t destlen,		/* output buffer len */
 			const char *src,	/* template string */
-			const int width,	/* width to format to */
 			format_t *callback,	/* callback for processing */
 			unsigned long data,	/* callback data */
 			format_flag flags)	/* callback flags */
@@ -971,8 +1125,8 @@ void mutt_FormatString (char *dest,		/* output buffer */
 	if (count > wlen)
 	{
 	  count -= wlen; /* how many chars left on this line */
-	  mutt_FormatString (buf, sizeof (buf), src, COLS, callback, data, flags);
-	  len = strlen (buf);
+	  mutt_FormatString (buf, sizeof (buf), src, callback, data, flags);
+	  len = mutt_strlen (buf);
 	  if (count > len)
 	  {
 	    count -= len; /* how many chars to pad */
@@ -1010,7 +1164,7 @@ void mutt_FormatString (char *dest,		/* output buffer */
 	/* use callback function to handle this case */
 	src = callback (buf, sizeof (buf), ch, src, prefix, ifstring, elsestring, data, flags);
 
-	if ((len = strlen (buf)) + wlen > destlen)
+	if ((len = mutt_strlen (buf)) + wlen > destlen)
 	  len = (destlen - wlen > 0) ? (destlen - wlen) : 0;
 	memcpy (wptr, buf, len);
 	wptr += len;
@@ -1071,7 +1225,7 @@ void mutt_FormatString (char *dest,		/* output buffer */
 FILE *mutt_open_read (const char *path, pid_t *thepid)
 {
   FILE *f;
-  int len = strlen (path);
+  int len = mutt_strlen (path);
 
   if (path[len - 1] == '|')
   {
@@ -1121,7 +1275,9 @@ int mutt_save_confirm (const char *s, struct stat *st)
   }
   else
   {
+#ifdef USE_IMAP
     if (magic != M_IMAP)
+#endif /* execute the block unconditionally if we don't use imap */
     {
       st->st_mtime = 0;
       st->st_atime = 0;
@@ -1163,7 +1319,7 @@ char *mutt_quote_filename(const char *f)
   
   for(i = 0, l = 3; f[i]; i++, l++)
   {
-    if(f[i] == '\'')
+    if(f[i] == '\'' || f[i] == '`')
       l += 3;
   }
   
@@ -1174,11 +1330,11 @@ char *mutt_quote_filename(const char *f)
   
   for(i = 0; f[i]; i++)
   {
-    if(f[i] == '\'')
+    if(f[i] == '\'' || f[i] == '`')
     {
       d[l++] = '\'';
       d[l++] = '\\';
-      d[l++] = '\'';
+      d[l++] = f[i];
       d[l++] = '\'';
     }
     else
@@ -1189,4 +1345,58 @@ char *mutt_quote_filename(const char *f)
   d[l]   = '\0';
   
   return d;
+}
+
+void state_prefix_putc(char c, STATE *s)
+{
+  if (s->flags & M_PENDINGPREFIX)
+  {
+    state_reset_prefix(s);
+    if (s->prefix)
+      state_puts(s->prefix, s);
+  }
+
+  state_putc(c, s);
+
+  if(c == '\n')
+    state_set_prefix(s);
+}
+
+int state_printf(STATE *s, const char *fmt, ...)
+{
+  int rv;
+  va_list ap;
+
+  va_start (ap, fmt);
+  rv = vfprintf(s->fpout, fmt, ap);
+  va_end(ap);
+  
+  return rv;
+}
+
+/* NULL-pointer aware string comparison functions */
+
+int mutt_strcmp(const char *a, const char *b)
+{
+  return strcmp(NONULL(a), NONULL(b));
+}
+
+int mutt_strcasecmp(const char *a, const char *b)
+{
+  return strcasecmp(NONULL(a), NONULL(b));
+}
+
+int mutt_strncmp(const char *a, const char *b, size_t l)
+{
+  return strncmp(NONULL(a), NONULL(b), l);
+}
+
+int mutt_strncasecmp(const char *a, const char *b, size_t l)
+{
+  return strncasecmp(NONULL(a), NONULL(b), l);
+}
+
+size_t mutt_strlen(const char *a)
+{
+  return a ? strlen (a) : 0;
 }

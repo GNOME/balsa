@@ -134,8 +134,6 @@ open_mailbox_manager ()
   update_mailbox_list ();
   gtk_widget_show (mmw->list);
 
-  gtk_widget_realize(mmw->list);
-
   /* one vbox to hold them all... */
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (hbox), vbox, FALSE, FALSE, 10);
@@ -700,7 +698,6 @@ nb_main_new_mailbox (void)
   gtk_widget_show (mailboxtype);
 
   menuofmailboxtypes = gtk_menu_new ();
-  gtk_widget_show (menuofmailboxtypes);
 
   menuitem = gtk_menu_item_new_with_label ("mbx");
   gtk_menu_append (GTK_MENU (menuofmailboxtypes), menuitem);

@@ -1,5 +1,7 @@
-2004-06-06 07:17  PeterB
+2004-06-06 18:39  PeterB
 
+	* libbalsa/mailbox_mbox.c: change preface or postface only when
+	non-NULL.
 	* libbalsa/mailbox_mbox.c: space-stuff From_ lines in multipart
 	preface and postface.
 

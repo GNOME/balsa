@@ -32,6 +32,8 @@
 
 #include "libbalsa.h"
 #include "misc.h"
+#include "../libmutt/mailbox.h"
+#include "imap.h"
 
 MailboxNode *
 mailbox_node_new (const gchar * name, Mailbox * mb, gint i)
@@ -57,6 +59,123 @@ void mailbox_node_destroy(MailboxNode * mbn)
   g_free(mbn->name);
   g_free(mbn);
 }
+
+/* ------------------------------------------ */
+ImapDir *imapdir_new(void)
+{
+    return g_new0(ImapDir, 1);
+}
+
+/* imapdir_destroy:
+   destroys the ImapDir structure. For future possible compatibility with 
+   GtkObject, leaves the structure in sane state.
+*/
+void imapdir_destroy(ImapDir *imap_dir)
+{
+    g_return_if_fail(imap_dir != NULL);
+    g_free(imap_dir->name);               imap_dir->name = NULL; 
+    g_free(imap_dir->path);               imap_dir->path = NULL;
+    g_free(imap_dir->user);               imap_dir->user = NULL;
+    g_free(imap_dir->passwd);             imap_dir->passwd = NULL;
+    g_free(imap_dir->host);               imap_dir->host = NULL;
+    if(imap_dir->file_tree) {
+	g_node_destroy(imap_dir->file_tree);  imap_dir->file_tree = NULL;
+    }
+}
+
+static gboolean
+do_traverse (GNode * node, gpointer data)
+{
+  gpointer *d = data;
+  if (!node->data)
+    return FALSE;
+  if (strcmp (((MailboxNode *) node->data)->name, (gchar *) d[0]) != 0)
+    return TRUE;
+
+  d[1] = node;
+  return FALSE;
+}
+
+
+static GNode *
+find_imap_parent_node (GNode * root, const gchar *path)
+{
+    gpointer d[2];
+    gchar * basename;
+
+    if (root == NULL) return NULL;
+    if( (basename= strrchr(path, '/')) != NULL) /* use proper IMAP delimiter */
+	basename = g_strndup(path, basename-path);
+    else  /* this may happen only for root */
+	    basename = g_strdup(path);
+    
+    d[0] = basename; d[1] = NULL;
+    g_node_traverse (root, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1, do_traverse, d);
+    g_free(basename);
+    return d[1];
+}
+
+static void
+add_imap_mbox_cb(const char * file, int isdir, gpointer data)
+{
+    ImapDir *p = (ImapDir*) data;
+    gchar *imap_path;
+    GNode *rnode;
+    GNode *node;
+    MailboxIMAP *mailbox;
+
+    imap_path = g_strdup_printf("%s: %s%s", p->host, p->path,file);
+    
+    if (isdir) {
+	MailboxNode *mbnode;
+	
+	mbnode = mailbox_node_new (imap_path, NULL, TRUE);
+	mbnode->expanded = FALSE; /* should come from the IMAPDir conf */
+	node = g_node_new (mbnode);
+    }
+    else {
+	mailbox = BALSA_MAILBOX_IMAP(mailbox_new(MAILBOX_IMAP));
+	BALSA_MAILBOX(mailbox)->name = g_strdup (file+1);
+	mailbox->server->user   = g_strdup(p->user);
+	mailbox->server->passwd = g_strdup(p->passwd);
+	mailbox->server->host   = g_strdup(p->host);
+	mailbox->server->port   = p->port;
+	mailbox->path	        = g_strconcat(p->path,file, NULL);
+	mailbox_add_for_checking ( BALSA_MAILBOX(mailbox) );
+	node = g_node_new (mailbox_node_new (
+	    imap_path, BALSA_MAILBOX(mailbox), FALSE));
+    }
+    
+    rnode = find_imap_parent_node(p->file_tree, imap_path);
+    if (rnode)
+	g_node_append (rnode, node);
+    else {
+	if(p->file_tree) 
+	    g_warning("add_imap_mbox_cb: algorith is screwed, report it.\n");
+	p->file_tree = node;
+    }
+}
+
+/* imapdir_scan:
+   scans given IMAP tree and creates respective mailboxes, stores the tree
+   in id->file_tree.
+   FIXME: do error checking.
+ */
+   
+void imapdir_scan(ImapDir * id)
+{
+    gchar * user, *pass;
+    gchar * p = g_strdup_printf("{%s:%i}INBOX", id->host, id->port);
+
+    user = ImapUser;   ImapUser = id->user; 
+    pass = ImapPass;   ImapPass = id->passwd;
+
+    imap_browse_foreach(p, id->path, add_imap_mbox_cb, id);
+    ImapUser = user;   ImapPass = pass;
+}
+
+/* ------------------------------------------ */
+
 gchar *
 g_get_host_name (void)
 {

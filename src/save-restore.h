@@ -52,6 +52,8 @@ gint config_mailbox_delete (const Mailbox *mailbox);
 gint config_mailbox_update (Mailbox * mailbox, const gchar * old_mbox_pkey);
 gint config_mailboxes_init (void);
 
+gint config_imapdir_add(ImapDir *dir);
+
 gint config_global_load (void);
 gint config_global_save (void);
 

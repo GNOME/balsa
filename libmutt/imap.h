@@ -28,4 +28,8 @@ int imap_sync_mailbox (CONTEXT *ctx);
 void imap_fastclose_mailbox (CONTEXT *ctx);
 int imap_buffy_check (char *path);
 
+typedef void (*ImapBrowseCb)(const char * path, int isdir, void *);
+const char* imap_browse_foreach(const char* server, const char* path,
+				ImapBrowseCb cb, void* data);
+
 #endif

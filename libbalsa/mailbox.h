@@ -256,7 +256,6 @@ void mailbox_sort (Mailbox * mailbox, MailboxSort sort);
  * create and destroy a mailbox structure
  */
 GtkObject *mailbox_new (MailboxType type);
-void mailbox_free (Mailbox * mailbox);
 gint mailbox_check_new_messages (Mailbox * mailbox);
 
 /*

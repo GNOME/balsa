@@ -35,7 +35,7 @@
 #include "misc.h"
 #include "save-restore.h"
 #include "mailbox-conf.h"
-#include "../libmutt/mutt.h"
+#include "mutt.h"
 
 static proplist_t pl_dict_add_str_str (proplist_t dict_arg, gchar * string1,
 				       gchar * string2);
@@ -187,6 +187,69 @@ config_save (gchar * user_filename)
 }				/* config_save */
 
 
+static void
+add_prop_mailbox(proplist_t mbox_dict, char *key_arg)
+{
+  proplist_t accounts, temp_str;
+  char key[MAX_PROPLIST_KEY_LEN];
+
+  /* Initialize the key in case it is accidentally used uninitialized */
+  strcpy (key, "AnErrorOccurred");
+
+  /* If the configuration file has not been started, create it */
+  if (balsa_app.proplist == NULL)
+    {
+      /* This is the special undocumented way to create an empty dictionary */
+      balsa_app.proplist =
+	PLMakeDictionaryFromEntries (NULL, NULL, NULL);
+    }
+  
+  /* Now, add this newly created account to the list of mailboxes in
+     the configuration file. */
+  temp_str = PLMakeString ("Accounts");
+  accounts = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
+  PLRelease (temp_str);
+  
+  if (accounts == NULL)
+    {
+      if (key_arg == NULL)
+	strcpy (key, "m1");
+      else
+	snprintf (key, sizeof (key), "%s", key_arg);
+      
+      /* If there is no Accounts list in the global proplist, create
+         one and add it to the global configuration dictionary. */
+      temp_str = PLMakeString (key);
+      accounts = PLMakeDictionaryFromEntries (temp_str, mbox_dict, NULL);
+      PLRelease (temp_str);
+      
+      temp_str = PLMakeString ("Accounts");
+      PLInsertDictionaryEntry (balsa_app.proplist, temp_str, accounts);
+      PLRelease (temp_str);
+    }
+  else
+    {
+      /* Before we can add the mailbox to the configuration, we need
+         to pick a unique key for it.  "Inbox", "Outbox" and "Trash"
+         all have unique keys, but for all other mailboxes, we are
+         simply passed NULL, meaning that we must supply the key ourselves. */
+      if (key_arg == NULL)
+	{
+	  int mbox_max;
+	  
+	  mbox_max = config_mailbox_get_highest_number (accounts);
+	  snprintf (key, sizeof (key), "m%d", mbox_max + 1);
+	}
+      else
+	snprintf (key, sizeof (key), "%s", key_arg);
+      
+      /* If there is already an Accounts list, just add this new mailbox */
+      temp_str = PLMakeString (key);
+      PLInsertDictionaryEntry (accounts, temp_str, mbox_dict);
+      PLRelease (temp_str);
+    }
+}
+
 /* This routine inserts a new mailbox into the configuration's
  * accounts vector, modifying both the resident and on-disk
  * configurations.  The mailbox is specified by 'mailbox', and 'key'
@@ -199,11 +262,7 @@ config_save (gchar * user_filename)
 gint
 config_mailbox_add (Mailbox * mailbox, char *key_arg)
 {
-  proplist_t mbox_dict, accounts, temp_str;
-  char key[MAX_PROPLIST_KEY_LEN];
-
-  /* Initialize the key in case it is accidentally used uninitialized */
-  strcpy (key, "AnErrorOccurred");
+  proplist_t mbox_dict;
 
   /* Each mailbox is stored as a Proplist dictionary of mailbox settings.
      First create the dictionary, then add it to the "accounts" section
@@ -308,58 +367,7 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
       return FALSE;
     }
 
-  /* If the configuration file has not been started, create it */
-  if (balsa_app.proplist == NULL)
-    {
-      /* This is the special undocumented way to create an empty dictionary */
-      balsa_app.proplist =
-	PLMakeDictionaryFromEntries (NULL, NULL, NULL);
-    }
-
-  /* Now, add this newly created account to the list of mailboxes in
-     the configuration file. */
-  temp_str = PLMakeString ("Accounts");
-  accounts = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
-  PLRelease (temp_str);
-
-  if (accounts == NULL)
-    {
-      if (key_arg == NULL)
-	strcpy (key, "m1");
-      else
-	snprintf (key, sizeof (key), "%s", key_arg);
-
-      /* If there is no Accounts list in the global proplist, create
-         one and add it to the global configuration dictionary. */
-      temp_str = PLMakeString (key);
-      accounts = PLMakeDictionaryFromEntries (temp_str, mbox_dict, NULL);
-      PLRelease (temp_str);
-
-      temp_str = PLMakeString ("Accounts");
-      PLInsertDictionaryEntry (balsa_app.proplist, temp_str, accounts);
-      PLRelease (temp_str);
-    }
-  else
-    {
-      /* Before we can add the mailbox to the configuration, we need
-         to pick a unique key for it.  "Inbox", "Outbox" and "Trash"
-         all have unique keys, but for all other mailboxes, we are
-         simply passed NULL, meaning that we must supply the key ourselves. */
-      if (key_arg == NULL)
-	{
-	  int mbox_max;
-	
-	  mbox_max = config_mailbox_get_highest_number (accounts);
-	  snprintf (key, sizeof (key), "m%d", mbox_max + 1);
-	}
-      else
-	snprintf (key, sizeof (key), "%s", key_arg);
-
-      /* If there is already an Accounts list, just add this new mailbox */
-      temp_str = PLMakeString (key);
-      PLInsertDictionaryEntry (accounts, temp_str, mbox_dict);
-      PLRelease (temp_str);
-    }
+  add_prop_mailbox(mbox_dict, key_arg);
 
   return config_save (BALSA_CONFIG_FILE);
 }				/* config_mailbox_add */
@@ -450,6 +458,62 @@ config_mailboxes_init (void)
   return TRUE;
 }				/* config_mailboxes_init */
 
+gint 
+config_imapdir_add(ImapDir * dir)
+{
+  proplist_t mbox_dict;
+  char tmp[MAX_PROPLIST_KEY_LEN];
+
+  mbox_dict = pl_dict_add_str_str (NULL, "Type", "IMAPDir");
+  pl_dict_add_str_str (mbox_dict, "Name",   dir->name);
+  pl_dict_add_str_str (mbox_dict, "Server", dir->host);
+
+  /* Add the Port entry */
+  snprintf (tmp, sizeof (tmp), "%d", dir->port);
+  pl_dict_add_str_str (mbox_dict, "Port",   tmp);
+
+  pl_dict_add_str_str (mbox_dict, "Path",     dir->path);
+  pl_dict_add_str_str (mbox_dict, "Username", dir->user);
+
+  if (dir->passwd != NULL)
+  {
+      gchar *buff;
+      buff = rot (dir->passwd);
+      pl_dict_add_str_str (mbox_dict, "Password", buff);
+      g_free (buff);
+  }
+
+  add_prop_mailbox(mbox_dict, NULL);
+  return TRUE;
+}
+
+static gboolean
+get_raw_imap_data(proplist_t mbox, gchar ** username, gchar **passwd, 
+		  gchar ** server,  gint * port, gchar **path)
+{
+    gchar *field;
+    if ((field = pl_dict_get_str (mbox, "Username")) == NULL)
+	return FALSE;
+    else *username = g_strdup(field);
+
+    if( (field = pl_dict_get_str (mbox, "Password")) != NULL)
+	*passwd = rot (field);
+    else *passwd = NULL;
+    if ((field = pl_dict_get_str (mbox, "Server")) == NULL)
+	return FALSE;
+    else *server = g_strdup(field);
+    
+    *port = ((field = pl_dict_get_str (mbox, "Port")) == NULL)
+	     ? 143 : atol(field);
+
+    if( (field = pl_dict_get_str (mbox, "Path")) == NULL)
+	return FALSE;
+    else *path = g_strdup(field);
+
+    return TRUE;
+}
+
+
 /* Initialize the specified mailbox, creating the internal data
    structures which represent the mailbox. */
 static gint
@@ -500,7 +564,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 	  mailbox = BALSA_MAILBOX(mailbox_new (mailbox_type));
 	  mailbox->name = mailbox_name;
 	  MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
-        mailbox_add_for_checking(mailbox);
+	  mailbox_add_for_checking(mailbox);
 	}
       else
 	{
@@ -558,35 +622,33 @@ config_mailbox_init (proplist_t mbox, gchar * key)
     }
   else if (!strcasecmp (type, "IMAP"))	/* IMAP Mailbox */
     {
+      MailboxIMAP * m;
       mailbox = BALSA_MAILBOX(mailbox_new (MAILBOX_IMAP));
       mailbox->name = mailbox_name;
-
-      if ((field = pl_dict_get_str (mbox, "Username")) == NULL)
-	return FALSE;
-      MAILBOX_IMAP (mailbox)->server->user = g_strdup (field);
-
-      if ((field = pl_dict_get_str (mbox, "Password")) != NULL)
-      {
-	gchar *buff;
-	buff = rot (field);
-	MAILBOX_IMAP (mailbox)->server->passwd = g_strdup (buff);
-	g_free (buff);
+      m = MAILBOX_IMAP(mailbox);
+      if( !get_raw_imap_data(mbox, &m->server->user, 
+			     &m->server->passwd, &m->server->host,
+			     &m->server->port, &m->path) ){
+	  gtk_object_destroy( GTK_OBJECT(mailbox) );
+	  return FALSE;
       }
-      else
-	MAILBOX_IMAP (mailbox)->server->passwd = NULL;
-
-      if ((field = pl_dict_get_str (mbox, "Server")) == NULL)
-	return FALSE;
-      MAILBOX_IMAP (mailbox)->server->host = g_strdup (field);
-
-      if ((field = pl_dict_get_str (mbox, "Port")) == NULL)
-	return FALSE;
-      MAILBOX_IMAP (mailbox)->server->port = atol (field);
-
-      if ((field = pl_dict_get_str (mbox, "Path")) == NULL)
-	return FALSE;
-      MAILBOX_IMAP (mailbox)->path = g_strdup (field);
       mailbox_add_for_checking(mailbox);
+    }
+  else if (!strcasecmp (type, "IMAPDir")) {
+      ImapDir * id = imapdir_new();
+
+      if( !get_raw_imap_data(mbox, &id->user, &id->passwd, &id->host,&id->port,
+			     &id->path) ){
+	  imapdir_destroy(id);
+	  return FALSE;
+      }
+      /* list'em and add'em. The rest is irrelevant. */
+      imapdir_scan(id);
+
+      g_node_append (balsa_app.mailbox_nodes, id->file_tree);
+      id->file_tree = NULL;
+      imapdir_destroy(id);
+      return TRUE;
     }
   else
     {

@@ -24,6 +24,7 @@
 #include "globals.h"
 #include "mutt_socket.h"
 #include "sort.h"
+#include "imap.h"
 
 #include <unistd.h>
 #include <netinet/in.h>
@@ -2137,3 +2138,173 @@ int imap_buffy_check (char *path)
   return recent;
 }
 
+/* -------------------------------------------------------------------
+   Pawel's stuff
+*/
+
+/* this module implements a way to import all the mailboxes from the remote 
+   IMAP server.
+   Motto: collect scrap - save the earth!
+*/
+/* Ugly mutt's hack */
+
+enum FolderState {
+    NOINFR  = 1,
+    FDUMMY  = 1 << 1,
+    FMRKTMP = 1 << 2,
+    FFDIR   = 1 << 3
+};
+
+/* eof - end of flag list */
+static const char *
+get_flags(char * buf, char *flags, char ** eof)
+{
+    char * param;
+    int len;
+
+    param = buf + 7;      /* strlen ("* LIST ") */
+    if (*param != '(')
+	return "Missing flags in LIST response";
+        
+    param++;
+    if ((*eof = strchr(param, ')')) == NULL)
+	return "Unterminated flag list in LIST response";
+
+    len = *eof - param;
+    if (len > 126)
+	return "Flag list too long in LIST response";
+
+    strncpy(flags, param, len);
+    flags[len] = '\0';
+
+    return NULL;
+}
+
+static const char *
+process_list_output(CONTEXT *ctx, const char* dir, ImapBrowseCb cb, void *data)
+{
+    char buf[LONG_STRING];
+    char seq[16];
+    char flags[127], *param, *p, *fname;
+    const char *err_msg = NULL;
+    enum FolderState fflags; 
+
+    /*
+     * Send LIST
+     */
+    imap_make_sequence(seq, sizeof(seq));
+    snprintf(buf, sizeof(buf), "%s LIST \"%s\" \"*\"\r\n", seq, dir);
+    mutt_socket_write (CTX_DATA->conn, buf);
+    
+    /* process the LIST output */
+
+    while(1) {
+	if (mutt_socket_read_line_d(buf, sizeof(buf), CTX_DATA->conn) == -1)
+	    return "Communication error on LIST";
+	
+	if (strncmp(buf, seq, strlen(seq)) == 0)
+	    return NULL;
+	
+	if (strncmp(buf, "* LIST", 6) != 0)
+            return "Unexpected response from server";
+
+	/* my code */
+	if(err_msg = get_flags(buf, flags, &p)) return err_msg;
+
+        param = p;
+	
+	fflags = 0;
+	
+        if ((p = strtok(flags, " ")) != NULL)
+	    do {
+		if (!strcasecmp(p, "\\Noinferiors"))
+		{fflags |= NOINFR; printf("inf "); }
+		else
+		    if (!strcasecmp(p, "\\Noselect"))
+			{fflags |= FDUMMY; printf("nosel "); }
+		    else
+			if (!strcasecmp(p, "\\Marked"))
+			    {fflags |= FMRKTMP;  printf("mark "); }
+	    } while ((p = strtok(NULL, " ")) != NULL);
+	
+        param++;
+        while (*param == ' ')
+	    param++;
+	
+        if ((p = strchr(param, ' ')) == NULL)	{
+            mutt_error("Missing folder name in LIST response");
+            break;
+        }
+
+        while (*p == ' ')
+	    p++;
+	
+        if (*p == '\"') {
+            p++;
+        }
+        
+        fname = p + strlen(dir);
+        while (*p != '\"' && *p) {
+            p++;
+        }
+        *p = '\0';
+	(*cb)(fname, fflags & FDUMMY, data);
+	
+    }
+    /* not reached */
+}
+
+/* imap_server_load_mboxes:
+   loads recursively mailbox list from the IMAP server and appends them
+   to the balsa_app.mailbox_nodes structure.
+   Corresponds to examine_directory.
+*/
+const char *
+imap_browse_foreach(const char* imap, const char *path, 
+		    ImapBrowseCb cb, void* data)
+{
+    CONTEXT ctx;
+    CONNECTION *conn;
+    IMAP_DATA *idata;
+    char host[SHORT_STRING];
+    char seq[16];
+    char *pc = NULL;
+    int port;
+
+    const char * err_msg = NULL;
+    
+    /*
+     * Open IMAP server
+     */
+    memset(&ctx, 0, sizeof(ctx));
+    ctx.path = (char *) safe_strdup(imap);
+
+    if (imap_parse_path (ctx.path, host, sizeof (host), &port, &pc))
+	return "Misformed IMAP path";
+
+    conn = mutt_socket_select_connection (host, port, 0);
+    idata = CONN_DATA;
+
+    if (!idata || (idata->state != IMAP_AUTHENTICATED))
+    {
+	if (!idata || (idata->state == IMAP_SELECTED) || 
+	    (idata->state == IMAP_CONNECTED))
+	{
+	    /* create a new connection, the current one isn't useful */
+	    idata = safe_calloc (1, sizeof (IMAP_DATA));
+
+	    conn = mutt_socket_select_connection (host, port, M_NEW_SOCKET);
+	    conn->data = idata;
+	    idata->conn = conn;
+	}
+	if (imap_open_connection (idata, conn))
+	    return "Could not connect to the IMAP server";
+    }
+    ctx.data = (void *) idata;
+
+    err_msg = process_list_output(&ctx, path, cb, data);
+    
+    imap_close_connection(&ctx); 
+    FREE( &(ctx.path) );
+    return err_msg;
+}

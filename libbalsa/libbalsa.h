@@ -24,6 +24,7 @@ typedef struct _Mailbox Mailbox;
 typedef struct _Message Message;
 typedef struct _Address Address;
 typedef struct _Contact Contact;
+typedef struct _ImapDir ImapDir;
 typedef struct _Body Body;
 typedef struct _Server Server;
 
@@ -31,6 +32,7 @@ typedef struct _Server Server;
 #include "message.h"
 #include "address.h"
 #include "contact.h"
+#include "imapdir.h"
 #include "body.h"
 #include "files.h"
 

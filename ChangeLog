@@ -1,3 +1,13 @@
+2000-06-17  Pawel Salek  <pawsa@theochem.kth.se>
+
+	IMAP directory stuff, usable version. Terminology needs polishing.
+	
+	* libbalsa/{libbalsa.h,imapdir.h}: ImapDir structure definition
+	* libbalsa/misc.c: imapdir_* functions.
+	* libmutt/imap.[hc]: imap_browse_foreach() added.
+	* src/mailbox-conf.c: adding IMAP folder sets.
+	* src/save-restore.[ch]: saving/reading IMAP folder sets.
+	
 2000-06-16  Peter Williams  <peter@beta.newton.cx>
 
 	* src/balsa-index-page.c (store_address_dialog_button_clicked_cb): Ditto

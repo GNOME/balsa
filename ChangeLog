@@ -1,3 +1,15 @@
+2000-12-22  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox_local.[ch]: New signal "remove-files".
+	* libbalsa/mailbox_mbox.c: Implement "remove-files".
+	* libbalsa/mailbox_mh.c: Implement "remove-files".
+	* libbalsa/mailbox_maildir.c: Implement "remove-files".
+	* libbalsa/misc.[ch]: New function
+	libbalsa_delete_directory_contents.
+	* src/mailbox-conf.c: Use remove-files instead of callng rm -rf!
+	Give user choice of remove from list, remove from disk aswell or cancel
+	when removing a local mailbox.
+
 2000-12-21  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/main-window.c: Show adddress book non-modal.

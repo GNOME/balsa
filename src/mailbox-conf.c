@@ -83,7 +83,6 @@ static void mailbox_conf_add(MailboxConfWindow *conf_window);
 
 /* misc functions */
 static void mailbox_conf_set_values(MailboxConfWindow *mcw);
-static void mailbox_remove_files(gchar * name);
 
 static void fill_in_imap_data(MailboxConfWindow *mcw, gchar ** name, gchar ** path);
 static void update_imap_mailbox(MailboxConfWindow *mcw);
@@ -105,67 +104,50 @@ void mailbox_conf_edit_imap_server(GtkWidget * widget, gpointer data);
 #endif
 
 void
-mailbox_remove_files(gchar * mbox_path)
-{
-    gchar cmd[PATH_MAX + 8];
-    snprintf(cmd, sizeof(cmd), "rm -rf '%s'", mbox_path);
-    system(cmd);
-}
-
-static void
-yes_no_reply_cb(gint reply, gpointer data)
-{
-    gboolean *answer = (gboolean *) data;
-
-    if (reply == GNOME_YES)
-	*answer = TRUE;
-    else if (reply == GNOME_NO)
-	*answer = FALSE;
-    else
-	g_error("Unknown replyto Yes/No dialog: %d\n", reply);
-}
-
-void
 mailbox_conf_delete(LibBalsaMailbox * mailbox)
 {
     GNode *gnode;
     gchar *msg;
-    gboolean answer = FALSE;
+    gint button;
     GtkWidget *ask;
+    gint cancel_button;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
 	/* FIXME: Should prompt to remove file aswell */
-	msg =
-	    g_strdup_printf(_
-			    ("This will remove the mailbox %s and it's files permanently from your system.\n"
-			     "Are you sure you want to remove this mailbox?"),
-mailbox->name);
+	msg = g_strdup_printf(_("This will remove the mailbox %s from the list of mailboxes.\n"
+				"You may also the disk file associated with this mailbox.\n"
+				"If you do not remove the file on disk you may \"Add  Mailbox\" to access the mailbox again.\n"
+				"What would you like to do?"),
+			      mailbox->name);
+	ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
+				    _("Remove mailbox from list"), _("Remove mailbox from list and disk"),
+				    _("Cancel"), NULL);
+	cancel_button = 3;
+	g_free(msg);
     } else {
-	msg =
-	    g_strdup_printf(_
-			    ("This will remove the mailbox %s from the list of mailboxes\n"
-			     "You may use \"Add Mailbox\" later to access this mailbox again\n"
-			     "Are you sure you want to remove this mailbox?"),
-mailbox->name);
+	msg = g_strdup_printf(_("This will remove the mailbox %s from the list of mailboxes\n"
+				"You may use \"Add Mailbox\" later to access this mailbox again\n"
+				"What would you like to do?"),
+			      mailbox->name);
+	ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
+				    _("Remove mailbox from list"),
+				    _("Cancel"),
+				    NULL);
+	cancel_button = 2;
+	g_free(msg);
     }
+    
+    gnome_dialog_set_parent(GNOME_DIALOG(ask), GTK_WINDOW(balsa_app.main_window));
+    gtk_window_set_modal(GTK_WINDOW(ask), TRUE);
 
-    ask = gnome_question_dialog_modal_parented(msg, (GnomeReplyCallback)
-					       yes_no_reply_cb,
-					       (gpointer) & answer,
-					       GTK_WINDOW
-					       (balsa_app.main_window));
+    button = gnome_dialog_run(GNOME_DIALOG(ask));
 
-    g_free(msg);
-
-    gnome_dialog_run(GNOME_DIALOG(ask));
-    if (answer == FALSE) {
+    if ( button == cancel_button ) 
 	return;
-    }
 
     /* Don't forget to remove the node from balsa's mailbox list */
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
-	balsa_app.inbox_input =
-	    g_list_remove(balsa_app.inbox_input, mailbox);
+	balsa_app.inbox_input = g_list_remove(balsa_app.inbox_input, mailbox);
     } else {
 	gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
 	if (!gnode) {
@@ -174,6 +156,7 @@ mailbox->name);
 		      "nodes?\n"));
 	} else {
 	    g_node_unlink(gnode);
+	    g_node_destroy(gnode);
 	}
     }
 
@@ -181,17 +164,19 @@ mailbox->name);
     config_mailbox_delete(mailbox);
 
     /* Close the mailbox, in case it was open */
-    if (LIBBALSA_IS_MAILBOX_POP3(mailbox))
+    if (!LIBBALSA_IS_MAILBOX_POP3(mailbox))
 	balsa_window_close_mailbox(balsa_app.main_window, mailbox);
 
     /* Delete local files */
-    if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox))
-	mailbox_remove_files(LIBBALSA_MAILBOX_LOCAL(mailbox)->path);
+    if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox) && button == 1)
+	libbalsa_mailbox_local_remove_files(LIBBALSA_MAILBOX_LOCAL(mailbox));
 
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox))
 	update_pop3_servers();
     else
 	balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
+
+    gtk_object_unref(GTK_OBJECT(mailbox));
 }
 
 /*

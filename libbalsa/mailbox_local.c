@@ -39,6 +39,12 @@
 #include "threads.h"
 #endif
 
+enum {
+    REMOVE_FILES,
+    LAST_SIGNAL
+};
+static guint libbalsa_mailbox_local_signals[LAST_SIGNAL];
+
 static LibBalsaMailboxClass *parent_class = NULL;
 
 static void libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass *klass);
@@ -88,6 +94,18 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 
     parent_class = gtk_type_class(libbalsa_mailbox_get_type());
 
+    libbalsa_mailbox_local_signals[REMOVE_FILES] =
+	gtk_signal_new("remove-files",
+		       GTK_RUN_LAST,
+		       object_class->type,
+		       GTK_SIGNAL_OFFSET(LibBalsaMailboxLocalClass,
+					 remove_files),
+		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
+
+    gtk_object_class_add_signals(object_class, libbalsa_mailbox_local_signals,
+				 LAST_SIGNAL);
+
+
     object_class->destroy = libbalsa_mailbox_local_destroy;
 
     libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_local_open;
@@ -97,6 +115,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 	libbalsa_mailbox_local_save_config;
     libbalsa_mailbox_class->load_config =
 	libbalsa_mailbox_local_load_config;
+
+    klass->remove_files = NULL;
 }
 
 static void
@@ -161,6 +181,16 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
     mailbox->path = g_strdup(path);
     libbalsa_notify_register_mailbox(LIBBALSA_MAILBOX(mailbox));
     return 0;
+}
+
+void
+libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox)
+{
+    g_return_if_fail (LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
+
+    gtk_signal_emit(GTK_OBJECT(mailbox),
+		    libbalsa_mailbox_local_signals[REMOVE_FILES]);
+
 }
 
 static void

@@ -25,6 +25,7 @@
 #include <sys/utsname.h>
 #include <errno.h>
 #include <ctype.h>
+#include <dirent.h>
 
 #include <gnome.h>
 
@@ -678,4 +679,47 @@ find_gnode_in_mbox_list(GNode * gnode_list, LibBalsaMailbox * mailbox)
 		    find_mailbox_func, d);
     retval = d[1];
     return retval;
+}
+
+/* Delete the contents of a directory (not the directory itself).
+   Return TRUE if everything was OK.
+   If FALSE is returned then errno will be set to some useful value.
+*/
+gboolean
+libbalsa_delete_directory_contents(const gchar *path)
+{
+    struct stat sb;
+    DIR *d;
+    struct dirent *de;
+    gchar *new_path;
+
+    d = opendir(path);
+    g_return_val_if_fail(d, FALSE);
+
+    for (de = readdir(d); de; de = readdir(d)) {
+	if ( g_strcasecmp(de->d_name, ".") == 0 ||
+	     g_strcasecmp(de->d_name, "..") == 0 )
+	    continue;
+	new_path = g_strdup_printf("%s/%s", path, de->d_name);
+
+	stat(new_path, &sb);
+	if ( S_ISDIR(sb.st_mode) ) {
+	    if ( !libbalsa_delete_directory_contents(new_path) )
+		goto error;
+	    if ( rmdir(new_path) == -1 )
+		goto error;
+	} else {
+	    if ( unlink( new_path ) == -1 )
+		goto error;
+	}
+	g_free(new_path); new_path = 0;
+    }
+
+    closedir(d);
+    return TRUE;
+    
+ error:
+    g_free(new_path);
+    closedir(d);
+    return FALSE;
 }

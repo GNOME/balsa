@@ -39,6 +39,7 @@ static void libbalsa_mailbox_maildir_destroy(GtkObject * object);
 
 static FILE *libbalsa_mailbox_maildir_get_message_stream(LibBalsaMailbox *mailbox,
 						       LibBalsaMessage *message);
+static void libbalsa_mailbox_maildir_remove_files(LibBalsaMailboxLocal *mailbox);
 
 GtkType libbalsa_mailbox_maildir_get_type(void)
 {
@@ -68,9 +69,11 @@ libbalsa_mailbox_maildir_class_init(LibBalsaMailboxMaildirClass * klass)
 {
     GtkObjectClass *object_class;
     LibBalsaMailboxClass *libbalsa_mailbox_class;
+    LibBalsaMailboxLocalClass *libbalsa_mailbox_local_class;
 
     object_class = GTK_OBJECT_CLASS(klass);
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
+    libbalsa_mailbox_local_class = LIBBALSA_MAILBOX_LOCAL_CLASS(klass);
 
     parent_class = gtk_type_class(libbalsa_mailbox_local_get_type());
 
@@ -78,6 +81,9 @@ libbalsa_mailbox_maildir_class_init(LibBalsaMailboxMaildirClass * klass)
 
     libbalsa_mailbox_class->get_message_stream =
 	libbalsa_mailbox_maildir_get_message_stream;
+
+    libbalsa_mailbox_local_class->remove_files = 
+	libbalsa_mailbox_maildir_remove_files;
 
 }
 
@@ -161,3 +167,22 @@ libbalsa_mailbox_maildir_get_message_stream(LibBalsaMailbox *mailbox, LibBalsaMe
 	return stream;
 }
 
+static void
+libbalsa_mailbox_maildir_remove_files(LibBalsaMailboxLocal *mailbox)
+{
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
+    
+    g_print("DELETE MAILDIR\n");
+
+    if (!libbalsa_delete_directory_contents(mailbox->path)) {
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			     _("Could not remove contents of %s:\n%s"),
+			     mailbox->path, strerror(errno));
+	return;
+    }
+    if ( rmdir(mailbox->path) == -1 ) {
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			     _("Could not remove %s:\n%s"),
+			     mailbox->path, strerror(errno));
+    }
+}

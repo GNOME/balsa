@@ -42,11 +42,13 @@ struct _LibBalsaMailboxLocal {
 
 struct _LibBalsaMailboxLocalClass {
     LibBalsaMailboxClass klass;
+
+    void (*remove_files)(LibBalsaMailboxLocal *mb);
 };
 
 GtkObject *libbalsa_mailbox_local_new(const gchar * path, gboolean create);
 gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 				     const gchar * path);
-
+void libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox);
 
 #endif				/* __LIBBALSA_MAILBOX_LOCAL_H__ */

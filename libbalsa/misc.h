@@ -85,4 +85,7 @@ void libbalsa_marshall_POINTER__POINTER_POINTER(GtkObject *object,
 GNode *find_gnode_in_mbox_list(GNode * gnode_list,
 			       LibBalsaMailbox * mailbox);
 
+gboolean libbalsa_delete_directory_contents(const gchar *path);
+
+
 #endif				/* __LIBBALSA_MISC_H__ */

@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- *
+
  * This file handles Balsa's interaction with libPropList, which stores
  * Balsa's configuration information.
  *
@@ -34,95 +34,95 @@
 #include "misc.h"
 #include "save-restore.h"
 
-static proplist_t pl_dict_add_str_str(proplist_t dict_arg, gchar * string1,
-				      gchar * string2);
-static gchar * pl_dict_get_str(proplist_t dict, gchar * str);
-static proplist_t config_mailbox_get_by_name(gchar * name);
+static proplist_t pl_dict_add_str_str (proplist_t dict_arg, gchar * string1,
+				       gchar * string2);
+static gchar *pl_dict_get_str (proplist_t dict, gchar * str);
+static proplist_t config_mailbox_get_by_name (gchar * name);
 static proplist_t config_mailbox_get_key (proplist_t mailbox);
-static gint config_mailbox_init(proplist_t mbox, gchar * key);
+static gint config_mailbox_init (proplist_t mbox, gchar * key);
 
 /* Load the configuration from the specified file. The filename is
    taken to be relative to the user's home directory, as if "~/" had
    been prepended.  Returns TRUE on success and FALSE on failure. */
 gint
-config_load(gchar * user_filename)
+config_load (gchar * user_filename)
 {
-  char * filename;
+  char *filename;
 
   /* Deallocate the internal proplist first */
   if (balsa_app.proplist != NULL)
-    PLRelease(balsa_app.proplist);
+    PLRelease (balsa_app.proplist);
 
   /* Construct the filename by appending 'user_filename' to the user's
      home directory. */
-  filename = g_malloc(strlen(user_filename) + strlen(g_get_home_dir()) + 2);
-  strcpy(filename, g_get_home_dir());
-  strcat(filename, "/");
-  strcat(filename, user_filename);
+  filename = g_malloc (strlen (user_filename) + strlen (g_get_home_dir ()) + 2);
+  strcpy (filename, g_get_home_dir ());
+  strcat (filename, "/");
+  strcat (filename, user_filename);
 
   balsa_app.proplist = PLGetProplistWithPath (filename);
 
-  g_free(filename);
+  g_free (filename);
 
   if (balsa_app.proplist == NULL)
     return FALSE;
 
   return TRUE;
-} /* config_load */
+}				/* config_load */
 
 /* Save the internal configuration information into the specified
    file.  Just as with load_config, the specified filename is taken to
    be relative to the user's home directory.  Returns TRUE on success
    and FALSE on failure. */
 gint
-config_save(gchar * user_filename)
+config_save (gchar * user_filename)
 {
   proplist_t temp_str;
-  char * filename;
+  char *filename;
   int fd;
 
   /* Be sure that there is data to save first */
   if (balsa_app.proplist == NULL)
     {
-      fprintf(stderr, "config_save: proplist is NULL!\n");
+      fprintf (stderr, "config_save: proplist is NULL!\n");
       return FALSE;
     }
 
   /* Construct the filename by appending 'user_filename' to the user's
      home directory. */
-  filename = g_malloc(strlen(user_filename) + strlen(g_get_home_dir()) + 2);
-  strcpy(filename, g_get_home_dir());
-  strcat(filename, "/");
-  strcat(filename, user_filename);
+  filename = g_malloc (strlen (user_filename) + strlen (g_get_home_dir ()) + 2);
+  strcpy (filename, g_get_home_dir ());
+  strcat (filename, "/");
+  strcat (filename, user_filename);
 
   /* Set the property list's filename */
-  temp_str = PLMakeString(filename);
-  balsa_app.proplist = PLSetFilename(balsa_app.proplist, temp_str);
-  PLRelease(temp_str);
+  temp_str = PLMakeString (filename);
+  balsa_app.proplist = PLSetFilename (balsa_app.proplist, temp_str);
+  PLRelease (temp_str);
 
   /* There might be passwords and things in the file, so we chmod the
      file to 0600 BEFORE we write any data into it.  This involves
      creating the file independently of PLSave. */
-  fd = creat(filename, 0600);
+  fd = creat (filename, 0600);
   if (fd < 0)
     {
-      fprintf(stderr, "config_save: Error writing config file %s!\n",
-	      filename);
-      g_free(filename);
+      fprintf (stderr, "config_save: Error writing config file %s!\n",
+	       filename);
+      g_free (filename);
       return FALSE;
     }
-  close(fd);
-  
-  if (! PLSave(balsa_app.proplist, 0))
+  close (fd);
+
+  if (!PLSave (balsa_app.proplist, 0))
     {
-      fprintf(stderr, "config_save: Error writing %s!\n", filename);
+      fprintf (stderr, "config_save: Error writing %s!\n", filename);
       return FALSE;
     }
 
-  g_free(filename);
+  g_free (filename);
 
   return TRUE;
-} /* config_save */
+}				/* config_save */
 
 
 /*
@@ -135,15 +135,9 @@ config_save(gchar * user_filename)
  * failure.
  */
 gint
-config_mailbox_add (Mailbox * mailbox, char * key)
+config_mailbox_add (Mailbox * mailbox, char *key)
 {
   proplist_t mbox_dict, accounts, temp_str;
-  GNode *node;
-
-  /* Add the new mailbox to the internal mailbox tree. */
-  node = g_node_new (mailbox_node_new (mailbox->name, mailbox,
-				       mailbox->type != MAILBOX_MBOX));
-  g_node_append (balsa_app.mailbox_nodes, node);
 
   /* Each mailbox is stored as a Proplist dictionary of mailbox settings.
      First create the dictionary, then add it to the "accounts" section
@@ -154,65 +148,65 @@ config_mailbox_add (Mailbox * mailbox, char * key)
     case MAILBOX_MH:
     case MAILBOX_MAILDIR:
       /* Create a new mailbox configuration with the following entries:
-	   Type = local;
-	   Name = ... ;
-	   Path = ... ;
-      */
-      mbox_dict = pl_dict_add_str_str(NULL, "Type", "local");
-      pl_dict_add_str_str(mbox_dict, "Name", mailbox->name);
-      pl_dict_add_str_str(mbox_dict, "Path", MAILBOX_LOCAL (mailbox)->path );
+         Type = local;
+         Name = ... ;
+         Path = ... ;
+       */
+      mbox_dict = pl_dict_add_str_str (NULL, "Type", "local");
+      pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
+      pl_dict_add_str_str (mbox_dict, "Path", MAILBOX_LOCAL (mailbox)->path);
 
       break;
 
     case MAILBOX_POP3:
       /* Create a new mailbox configuration with the following entries:
-	    Type = POP3;
-	    Name = ...;
-	    Username = ...;
-	    Password = ...;
-	    Server = ...;
-      */
-      mbox_dict = pl_dict_add_str_str(NULL, "Type", "POP3");
-      pl_dict_add_str_str(mbox_dict, "Name", mailbox->name);
-      pl_dict_add_str_str(mbox_dict, "Username",
-			  MAILBOX_POP3 (mailbox)->user );
-      pl_dict_add_str_str(mbox_dict, "Password",
-			  MAILBOX_POP3 (mailbox)->passwd );
-      pl_dict_add_str_str(mbox_dict, "Server", MAILBOX_POP3 (mailbox)->server);
+         Type = POP3;
+         Name = ...;
+         Username = ...;
+         Password = ...;
+         Server = ...;
+       */
+      mbox_dict = pl_dict_add_str_str (NULL, "Type", "POP3");
+      pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
+      pl_dict_add_str_str (mbox_dict, "Username",
+			   MAILBOX_POP3 (mailbox)->user);
+      pl_dict_add_str_str (mbox_dict, "Password",
+			   MAILBOX_POP3 (mailbox)->passwd);
+      pl_dict_add_str_str (mbox_dict, "Server", MAILBOX_POP3 (mailbox)->server);
 
       break;
 
     case MAILBOX_IMAP:
       /* Create a new mailbox configuration with the following entries:
-	    Type = IMAP;
-	    Name = ...;
-	    Server = ...;
-	    Port = ...;
-	    Path = ...;
-	    Username = ...;
-	    Password = ...;
-      */
-      mbox_dict = pl_dict_add_str_str(NULL, "Type", "IMAP");
-      pl_dict_add_str_str(mbox_dict, "Name", mailbox->name);
-      pl_dict_add_str_str(mbox_dict, "Server", MAILBOX_IMAP (mailbox)->server);
+         Type = IMAP;
+         Name = ...;
+         Server = ...;
+         Port = ...;
+         Path = ...;
+         Username = ...;
+         Password = ...;
+       */
+      mbox_dict = pl_dict_add_str_str (NULL, "Type", "IMAP");
+      pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
+      pl_dict_add_str_str (mbox_dict, "Server", MAILBOX_IMAP (mailbox)->server);
 
       /* Add the Port entry */
       {
 	char tmp[32];
-	snprintf(tmp, sizeof(tmp), "%d", MAILBOX_IMAP (mailbox)->port );
-	pl_dict_add_str_str(mbox_dict, "Port", tmp);
+	snprintf (tmp, sizeof (tmp), "%d", MAILBOX_IMAP (mailbox)->port);
+	pl_dict_add_str_str (mbox_dict, "Port", tmp);
       }
 
-      pl_dict_add_str_str(mbox_dict, "Path", MAILBOX_IMAP (mailbox)->path);
-      pl_dict_add_str_str(mbox_dict, "Username",
-			  MAILBOX_IMAP (mailbox)->user);
-      pl_dict_add_str_str(mbox_dict, "Password",
-			  MAILBOX_IMAP (mailbox)->passwd );
+      pl_dict_add_str_str (mbox_dict, "Path", MAILBOX_IMAP (mailbox)->path);
+      pl_dict_add_str_str (mbox_dict, "Username",
+			   MAILBOX_IMAP (mailbox)->user);
+      pl_dict_add_str_str (mbox_dict, "Password",
+			   MAILBOX_IMAP (mailbox)->passwd);
 
       break;
 
     default:
-      fprintf(stderr, "config_mailbox_add: Unknown mailbox type!\n");
+      fprintf (stderr, "config_mailbox_add: Unknown mailbox type!\n");
       return FALSE;
     }
 
@@ -221,36 +215,36 @@ config_mailbox_add (Mailbox * mailbox, char * key)
     {
       /* This is the special undocumented way to create an empty dictionary */
       balsa_app.proplist =
-	PLMakeDictionaryFromEntries(NULL, NULL, NULL);
+	PLMakeDictionaryFromEntries (NULL, NULL, NULL);
     }
 
   /* Now, add this newly created account to the list of mailboxes in
      the configuration file. */
-  temp_str = PLMakeString("Accounts");
+  temp_str = PLMakeString ("Accounts");
   accounts = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
-  PLRelease(temp_str);
+  PLRelease (temp_str);
   if (accounts == NULL)
     {
       /* If there is no Accounts list in the global proplist, create
-	 one and add it to the global configuration dictionary. */
-      temp_str = PLMakeString(key);
-      accounts = PLMakeDictionaryFromEntries(temp_str, mbox_dict, NULL);
+         one and add it to the global configuration dictionary. */
+      temp_str = PLMakeString (key);
+      accounts = PLMakeDictionaryFromEntries (temp_str, mbox_dict, NULL);
       PLRelease (temp_str);
 
-      temp_str = PLMakeString("Accounts");
-      PLInsertDictionaryEntry(balsa_app.proplist, temp_str, accounts);
-      PLRelease(temp_str);
+      temp_str = PLMakeString ("Accounts");
+      PLInsertDictionaryEntry (balsa_app.proplist, temp_str, accounts);
+      PLRelease (temp_str);
     }
   else
     {
       /* If there is already an Accounts list, just add this new mailbox */
-      temp_str = PLMakeString(key);
-      PLInsertDictionaryEntry(accounts, temp_str, mbox_dict);
-      PLRelease(temp_str);
+      temp_str = PLMakeString (key);
+      PLInsertDictionaryEntry (accounts, temp_str, mbox_dict);
+      PLRelease (temp_str);
     }
 
-  return config_save ( BALSA_CONFIG_FILE );
-} /* config_mailbox_add */
+  return config_save (BALSA_CONFIG_FILE);
+}				/* config_mailbox_add */
 
 /*
  * Find  the named mailbox from the balsa_app.mailbox_nodes by it's
@@ -258,32 +252,33 @@ config_mailbox_add (Mailbox * mailbox, char * key)
  */
 
 static gint
-find_mailbox_func(GNode* g1, gpointer data)
+find_mailbox_func (GNode * g1, gpointer data)
 {
-  MailboxNode* n1 = (MailboxNode*)g1->data;
-  gpointer*    d  = data;
-  gchar*       name = *(gchar**)data;
-  
+  MailboxNode *n1 = (MailboxNode *) g1->data;
+  gpointer *d = data;
+  gchar *name = *(gchar **) data;
+
   if (!n1)
     return FALSE;
-  if (strcmp(n1->name, name) != 0) {
-    return FALSE;
-  }
+  if (strcmp (n1->name, name) != 0)
+    {
+      return FALSE;
+    }
   *(++d) = g1;
   return TRUE;
 }
 
 
-static GNode*
-find_gnode_in_mbox_list(GNode* gnode_list, gchar* mbox_name)
+static GNode *
+find_gnode_in_mbox_list (GNode * gnode_list, gchar * mbox_name)
 {
   gpointer d[2];
-  GNode*   retval;
-  
+  GNode *retval;
+
   d[0] = mbox_name;
   d[1] = NULL;
-  
-  g_node_traverse(gnode_list, G_IN_ORDER, G_TRAVERSE_LEAFS, -1, find_mailbox_func, d);
+
+  g_node_traverse (gnode_list, G_IN_ORDER, G_TRAVERSE_LEAFS, -1, find_mailbox_func, d);
   retval = d[1];
   return retval;
 }
@@ -296,130 +291,130 @@ gint
 config_mailbox_delete (gchar * name)
 {
   proplist_t accounts, mbox, temp_str;
-  GNode*     gnode;
+  GNode *gnode;
   if (balsa_app.proplist == NULL)
     {
-      fprintf(stderr, "config_mailbox_delete: No configuration loaded!\n");
+      fprintf (stderr, "config_mailbox_delete: No configuration loaded!\n");
       return FALSE;
     }
-  
+
   /* Grab the list of accounts */
-  temp_str = PLMakeString("Accounts");
+  temp_str = PLMakeString ("Accounts");
   accounts = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
   PLRelease (temp_str);
   if (accounts == NULL)
     return FALSE;
 
   /* Grab the specified mailbox */
-  mbox = config_mailbox_get_by_name(name);
+  mbox = config_mailbox_get_by_name (name);
   if (mbox == NULL)
     return FALSE;
 
   accounts = PLRemoveDictionaryEntry (accounts, mbox);
-  
+
   /* Don't forget to remove the node from balsa's mailbox list */
-	gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, name);
+  gnode = find_gnode_in_mbox_list (balsa_app.mailbox_nodes, name);
   if (!gnode)
     {
-      fprintf(stderr,"Oooop! mailbox not found in balsa_app.mailbox nodes?\n");
+      fprintf (stderr, "Oooop! mailbox not found in balsa_app.mailbox nodes?\n");
     }
-  else 
+  else
     {
-      g_node_unlink(gnode);
+      g_node_unlink (gnode);
     }
-  config_save(BALSA_CONFIG_FILE);
+  config_save (BALSA_CONFIG_FILE);
   return TRUE;
-} /* config_mailbox_delete */
+}				/* config_mailbox_delete */
 
 /* Update the configuration information for the specified mailbox. */
 gint
 config_mailbox_update (Mailbox * mailbox, gchar * old_mbox_name)
 {
   proplist_t mbox, mbox_key;
-  gchar * key;
+  gchar *key;
 
   mbox = config_mailbox_get_by_name (old_mbox_name);
   mbox_key = config_mailbox_get_key (mbox);
   if (mbox_key == NULL)
     key = "generic";
   else
-    key = PLGetString(mbox_key);
-  
-  config_mailbox_delete (old_mbox_name);
-  config_mailbox_add (mailbox, key );
+    key = PLGetString (mbox_key);
 
-  return config_save ( BALSA_CONFIG_FILE );
-} /* config_mailbox_update */
+  config_mailbox_delete (old_mbox_name);
+  config_mailbox_add (mailbox, key);
+
+  return config_save (BALSA_CONFIG_FILE);
+}				/* config_mailbox_update */
 
 /* This function initializes all the mailboxes internally, going through
    the list of all the mailboxes in the configuration file one by one. */
 gint
-config_mailboxes_init(void)
+config_mailboxes_init (void)
 {
   proplist_t accounts, temp_str, mbox, key;
   int num_elements, i;
 
-  g_assert(balsa_app.proplist != NULL);
+  g_assert (balsa_app.proplist != NULL);
 
-  temp_str = PLMakeString("Accounts");
+  temp_str = PLMakeString ("Accounts");
   accounts = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
   PLRelease (temp_str);
 
   if (accounts == NULL)
     return FALSE;
 
-  num_elements = PLGetNumberOfElements(accounts);
-  for (i = 0 ; i < num_elements ; i++)
+  num_elements = PLGetNumberOfElements (accounts);
+  for (i = 0; i < num_elements; i++)
     {
-      key = PLGetArrayElement(accounts, i);
-      mbox = PLGetDictionaryEntry(accounts, key);
-      config_mailbox_init (mbox, PLGetString(key));
+      key = PLGetArrayElement (accounts, i);
+      mbox = PLGetDictionaryEntry (accounts, key);
+      config_mailbox_init (mbox, PLGetString (key));
     }
 
   return TRUE;
-} /* config_mailboxes_init */
+}				/* config_mailboxes_init */
 
 /* Initialize the specified mailbox, creating the internal data
    structures which represent the mailbox. */
 static gint
-config_mailbox_init(proplist_t mbox, gchar * key)
+config_mailbox_init (proplist_t mbox, gchar * key)
 {
   proplist_t accounts, temp_str;
   MailboxType mailbox_type;
-  Mailbox * mailbox;
-  gchar * mailbox_name, * type, * field;
-  GNode * node;
+  Mailbox *mailbox;
+  gchar *mailbox_name, *type, *field;
+  GNode *node;
 
-  g_assert(mbox != NULL);
-  g_assert(key != NULL);
+  g_assert (mbox != NULL);
+  g_assert (key != NULL);
 
   mailbox_type = MAILBOX_UNKNOWN;
   mailbox = NULL;
 
   /* Grab the list of mailboxes */
-  temp_str = PLMakeString("Accounts");
+  temp_str = PLMakeString ("Accounts");
   accounts = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
   PLRelease (temp_str);
   if (accounts == NULL)
     return FALSE;
 
   /* All mailboxes have a type and a name.  Grab those. */
-  type = pl_dict_get_str(mbox, "Type");
+  type = pl_dict_get_str (mbox, "Type");
   if (type == NULL)
     {
-      fprintf(stderr, "config_mailbox_init: mailbox type not set\n");
+      fprintf (stderr, "config_mailbox_init: mailbox type not set\n");
       return FALSE;
     }
-  mailbox_name = g_strdup( pl_dict_get_str(mbox, "Name"));
+  mailbox_name = g_strdup (pl_dict_get_str (mbox, "Name"));
   if (mailbox_name == NULL)
-    mailbox_name = g_strdup("Friendly Mailbox Name");
+    mailbox_name = g_strdup ("Friendly Mailbox Name");
 
   /* Now grab the mailbox-type-specific fields */
-  if (!strcasecmp(type, "local")) /* Local mailbox */
+  if (!strcasecmp (type, "local"))	/* Local mailbox */
     {
-      gchar * path;
+      gchar *path;
 
-      path = pl_dict_get_str(mbox, "Path");
+      path = pl_dict_get_str (mbox, "Path");
       if (path == NULL)
 	return FALSE;
 
@@ -432,65 +427,65 @@ config_mailbox_init(proplist_t mbox, gchar * key)
 	}
       else
 	{
-	  fprintf(stderr, "config_mailbox_init: Cannot identify type of "
-		  "local mailbox %s\n", mailbox_name);
+	  fprintf (stderr, "config_mailbox_init: Cannot identify type of "
+		   "local mailbox %s\n", mailbox_name);
 	  return FALSE;
 	}
     }
-  else if (!strcasecmp(type, "POP3")) /* POP3 mailbox */
+  else if (!strcasecmp (type, "POP3"))	/* POP3 mailbox */
     {
       mailbox = mailbox_new (MAILBOX_POP3);
       mailbox->name = mailbox_name;
 
-      if ((field = pl_dict_get_str(mbox, "Username")) == NULL)
+      if ((field = pl_dict_get_str (mbox, "Username")) == NULL)
 	return FALSE;
-      MAILBOX_POP3 (mailbox)->user = g_strdup(field);
+      MAILBOX_POP3 (mailbox)->user = g_strdup (field);
 
-      if ((field = pl_dict_get_str(mbox, "Password")) == NULL)
+      if ((field = pl_dict_get_str (mbox, "Password")) == NULL)
 	return FALSE;
-      MAILBOX_POP3 (mailbox)->passwd = g_strdup(field);
+      MAILBOX_POP3 (mailbox)->passwd = g_strdup (field);
 
-      if ((field = pl_dict_get_str(mbox, "Server")) == NULL)
+      if ((field = pl_dict_get_str (mbox, "Server")) == NULL)
 	return FALSE;
-      MAILBOX_POP3 (mailbox)->server = g_strdup(field);
+      MAILBOX_POP3 (mailbox)->server = g_strdup (field);
 
       balsa_app.inbox_input =
 	g_list_append (balsa_app.inbox_input, mailbox);
     }
-  else if (!strcasecmp(type, "IMAP")) /* IMAP Mailbox */
+  else if (!strcasecmp (type, "IMAP"))	/* IMAP Mailbox */
     {
       mailbox = mailbox_new (MAILBOX_IMAP);
       mailbox->name = mailbox_name;
 
-      if ((field = pl_dict_get_str(mbox, "Username")) == NULL)
+      if ((field = pl_dict_get_str (mbox, "Username")) == NULL)
 	return FALSE;
-      MAILBOX_IMAP (mailbox)->user = g_strdup(field);
+      MAILBOX_IMAP (mailbox)->user = g_strdup (field);
 
-      if ((field = pl_dict_get_str(mbox, "Password")) == NULL)
+      if ((field = pl_dict_get_str (mbox, "Password")) == NULL)
 	return FALSE;
-      MAILBOX_IMAP (mailbox)->passwd = g_strdup(field);
+      MAILBOX_IMAP (mailbox)->passwd = g_strdup (field);
 
-      if ((field = pl_dict_get_str(mbox, "Server")) == NULL)
+      if ((field = pl_dict_get_str (mbox, "Server")) == NULL)
 	return FALSE;
-      MAILBOX_IMAP (mailbox)->server = g_strdup(field);
+      MAILBOX_IMAP (mailbox)->server = g_strdup (field);
 
-      if ((field = pl_dict_get_str(mbox, "Port")) == NULL)
+      if ((field = pl_dict_get_str (mbox, "Port")) == NULL)
 	return FALSE;
-      MAILBOX_IMAP (mailbox)->port = atoi ( field );
+      MAILBOX_IMAP (mailbox)->port = atoi (field);
 
-      if ((field = pl_dict_get_str(mbox, "Path")) == NULL)
+      if ((field = pl_dict_get_str (mbox, "Path")) == NULL)
 	return FALSE;
-      MAILBOX_IMAP (mailbox)->path = g_strdup( field );
+      MAILBOX_IMAP (mailbox)->path = g_strdup (field);
 
       /* FIXME Why do I do this for IMAP mailboxes and not for any
-	 other kinds?  I Don't understand.  Stuart? */
+         other kinds?  I Don't understand.  Stuart? */
       node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
       g_node_append (balsa_app.mailbox_nodes, node);
     }
   else
     {
-      fprintf(stderr, "config_mailbox_init: Unknown mailbox type \"%s\" "
-	      "on mailbox %s\n", type, mailbox_name);
+      fprintf (stderr, "config_mailbox_init: Unknown mailbox type \"%s\" "
+	       "on mailbox %s\n", type, mailbox_name);
     }
 
   if (strcmp ("Inbox", key) == 0)
@@ -517,99 +512,99 @@ config_mailbox_init(proplist_t mbox, gchar * key)
     }
 
   return TRUE;
-} /* config_mailbox_init */
+}				/* config_mailbox_init */
 
 
 /* Load Balsa's global settings */
 gint
-config_global_load(void)
+config_global_load (void)
 {
   proplist_t globals, temp_str;
-  gchar * field;
+  gchar *field;
 
-  g_assert(balsa_app.proplist != NULL);
-  
-  temp_str = PLMakeString("Globals");
+  g_assert (balsa_app.proplist != NULL);
+
+  temp_str = PLMakeString ("Globals");
   globals = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
-  PLRelease(temp_str);
+  PLRelease (temp_str);
   if (globals == NULL)
     {
-      fprintf(stderr, "config_global_load: Global settings not "
-	      "present in config file!\n");
+      fprintf (stderr, "config_global_load: Global settings not "
+	       "present in config file!\n");
       return FALSE;
     }
 
   /* user's real name */
-  if ((field = pl_dict_get_str(globals, "RealName")) == NULL)
+  if ((field = pl_dict_get_str (globals, "RealName")) == NULL)
     return FALSE;
-  balsa_app.real_name = g_strdup(field);
+  balsa_app.real_name = g_strdup (field);
 
   /* user's real name */
-  if ((field = pl_dict_get_str(globals, "UserName")) == NULL)
+  if ((field = pl_dict_get_str (globals, "UserName")) == NULL)
     return FALSE;
-  balsa_app.username = g_strdup(field);
+  balsa_app.username = g_strdup (field);
 
   /* hostname */
-  if ((field = pl_dict_get_str(globals, "HostName")) == NULL)
+  if ((field = pl_dict_get_str (globals, "HostName")) == NULL)
     return FALSE;
-  balsa_app.hostname = g_strdup(field);
+  balsa_app.hostname = g_strdup (field);
 
   /* directory */
-  if ((field = pl_dict_get_str(globals, "LocalMailDir")) == NULL)
+  if ((field = pl_dict_get_str (globals, "LocalMailDir")) == NULL)
     return FALSE;
-  balsa_app.local_mail_directory = g_strdup(field);
+  balsa_app.local_mail_directory = g_strdup (field);
 
   /* smtp server */
-  if ((field = pl_dict_get_str(globals, "SMTPServer")) == NULL)
-    ; /* an optional field for now */
-  balsa_app.smtp_server = g_strdup(field);
+  if ((field = pl_dict_get_str (globals, "SMTPServer")) == NULL)
+    ;				/* an optional field for now */
+  balsa_app.smtp_server = g_strdup (field);
 
   return TRUE;
-} /* config_global_load */
+}				/* config_global_load */
 
 gint
-config_global_save(void)
+config_global_save (void)
 {
   proplist_t globals, temp_str;
 
-  g_assert(balsa_app.proplist != NULL);
+  g_assert (balsa_app.proplist != NULL);
 
-  temp_str = PLMakeString("Globals");
-  globals = PLGetDictionaryEntry(balsa_app.proplist, temp_str);
+  temp_str = PLMakeString ("Globals");
+  globals = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
   if (globals != NULL)
     {
       /* Out with the old */
-      PLRemoveDictionaryEntry(balsa_app.proplist, temp_str);
+      PLRemoveDictionaryEntry (balsa_app.proplist, temp_str);
     }
-  PLRelease(temp_str);
+  PLRelease (temp_str);
 
   /* Create a new dictionary of global configurations */
   if (balsa_app.real_name != NULL)
-    globals = pl_dict_add_str_str(NULL, "RealName", balsa_app.real_name);
+    globals = pl_dict_add_str_str (NULL, "RealName", balsa_app.real_name);
   if (balsa_app.username != NULL)
-    pl_dict_add_str_str(globals, "UserName", balsa_app.username);
+    pl_dict_add_str_str (globals, "UserName", balsa_app.username);
   if (balsa_app.hostname != NULL)
-    pl_dict_add_str_str(globals, "HostName", balsa_app.hostname);
+    pl_dict_add_str_str (globals, "HostName", balsa_app.hostname);
   if (balsa_app.local_mail_directory != NULL)
-    pl_dict_add_str_str(globals, "LocalMailDir",
-			balsa_app.local_mail_directory);
+    pl_dict_add_str_str (globals, "LocalMailDir",
+			 balsa_app.local_mail_directory);
   if (balsa_app.smtp_server != NULL)
-    pl_dict_add_str_str(globals, "SMTPServer", balsa_app.smtp_server);
+    pl_dict_add_str_str (globals, "SMTPServer", balsa_app.smtp_server);
 
   /* Add it to configuration file */
-  temp_str = PLMakeString("Globals");
-  PLInsertDictionaryEntry(balsa_app.proplist, temp_str, globals);
-  PLRelease(temp_str);
+  temp_str = PLMakeString ("Globals");
+  PLInsertDictionaryEntry (balsa_app.proplist, temp_str, globals);
+  PLRelease (temp_str);
 
-  return config_save( BALSA_CONFIG_FILE );
+  return config_save (BALSA_CONFIG_FILE);
 
-} /* config_global_save */
+}				/* config_global_save */
 
 /* This is a little helper routine which adds a simple entry of the
    form "string1 = string2;" to a dictionary.  If dict_arg is NULL,
    a new dictionary is created and returned. */
 static proplist_t
-pl_dict_add_str_str(proplist_t dict_arg, gchar * string1, gchar * string2)
+pl_dict_add_str_str (proplist_t dict_arg, gchar * string1, gchar * string2)
 {
   proplist_t prop_string1, prop_string2, dict;
 
@@ -620,42 +615,42 @@ pl_dict_add_str_str(proplist_t dict_arg, gchar * string1, gchar * string2)
   /* If we are passed a null dictionary, then we are expected to
      create the dictionary from the entry and return it */
   if (dict == NULL)
-    dict = PLMakeDictionaryFromEntries (prop_string1, prop_string2, NULL );
+    dict = PLMakeDictionaryFromEntries (prop_string1, prop_string2, NULL);
   else
-    PLInsertDictionaryEntry(dict, prop_string1, prop_string2);
+    PLInsertDictionaryEntry (dict, prop_string1, prop_string2);
 
-  PLRelease(prop_string1);
-  PLRelease(prop_string2);
+  PLRelease (prop_string1);
+  PLRelease (prop_string2);
 
   return dict;
-} /* pl_dict_add_str_str */
+}				/* pl_dict_add_str_str */
 
 /* A helper routine to get the corresponding value for the string-type
    key 'str' in 'dict'.  Returns the string-value of the corresponding
    value on success and NULL on failure. */
 static gchar *
-pl_dict_get_str(proplist_t dict, gchar * str)
+pl_dict_get_str (proplist_t dict, gchar * str)
 {
   proplist_t temp_str, elem;
 
-  temp_str = PLMakeString(str);
+  temp_str = PLMakeString (str);
   elem = PLGetDictionaryEntry (dict, temp_str);
   PLRelease (temp_str);
 
   if (elem == NULL)
     return NULL;
 
-  if (! PLIsString(elem))
+  if (!PLIsString (elem))
     return NULL;
 
-  return PLGetString(elem);
-} /* pl_dict_get_str */
+  return PLGetString (elem);
+}				/* pl_dict_get_str */
 
 /* Grab the mailbox whose 'Name' field's string value matches 'name'.
    Returns a handle to the proplist_t for the mailbox if it exists and
    NULL otherwise. */
 static proplist_t
-config_mailbox_get_by_name(gchar * name)
+config_mailbox_get_by_name (gchar * name)
 {
   proplist_t temp_str, accounts, mbox, name_prop, mbox_key;
   int num_elements, i;
@@ -663,32 +658,32 @@ config_mailbox_get_by_name(gchar * name)
   g_assert (balsa_app.proplist != NULL);
 
   /* Grab the list of accounts */
-  temp_str = PLMakeString("Accounts");
+  temp_str = PLMakeString ("Accounts");
   accounts = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
   PLRelease (temp_str);
 
- if (accounts == NULL)
+  if (accounts == NULL)
     return NULL;
-  
+
   /* Walk the list of all mailboxes until one with a matching "Name" field
      is found. */
-  num_elements = PLGetNumberOfElements(accounts);
-  temp_str = PLMakeString("Name");
-  for ( i = 0 ; i < num_elements ; i ++)
+  num_elements = PLGetNumberOfElements (accounts);
+  temp_str = PLMakeString ("Name");
+  for (i = 0; i < num_elements; i++)
     {
-      mbox_key = PLGetArrayElement(accounts, i);
+      mbox_key = PLGetArrayElement (accounts, i);
       if (mbox_key == NULL)
 	continue;
 
-      mbox = PLGetDictionaryEntry(accounts, mbox_key);
+      mbox = PLGetDictionaryEntry (accounts, mbox_key);
       if (mbox == NULL)
 	continue;
 
-      name_prop = PLGetDictionaryEntry(mbox, temp_str);
+      name_prop = PLGetDictionaryEntry (mbox, temp_str);
       if (name_prop == NULL)
 	continue;
 
-      if (! strcmp( PLGetString(name_prop), name))
+      if (!strcmp (PLGetString (name_prop), name))
 	{
 	  PLRelease (temp_str);
 	  return mbox;
@@ -698,7 +693,7 @@ config_mailbox_get_by_name(gchar * name)
   PLRelease (temp_str);
 
   return NULL;
-} /* config_mailbox_get_by_name */
+}				/* config_mailbox_get_by_name */
 
 static proplist_t
 config_mailbox_get_key (proplist_t mailbox)
@@ -709,22 +704,22 @@ config_mailbox_get_key (proplist_t mailbox)
   g_assert (balsa_app.proplist != NULL);
 
   /* Grab the list of accounts */
-  temp_str = PLMakeString("Accounts");
+  temp_str = PLMakeString ("Accounts");
   accounts = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
   PLRelease (temp_str);
 
- if (accounts == NULL)
+  if (accounts == NULL)
     return NULL;
 
- /* Walk the list of all mailboxes until the matching mailbox is found */
-  num_elements = PLGetNumberOfElements(accounts);
-  for ( i = 0 ; i < num_elements ; i ++)
+  /* Walk the list of all mailboxes until the matching mailbox is found */
+  num_elements = PLGetNumberOfElements (accounts);
+  for (i = 0; i < num_elements; i++)
     {
-      mbox_key = PLGetArrayElement(accounts, i);
+      mbox_key = PLGetArrayElement (accounts, i);
       if (mbox_key == NULL)
 	continue;
 
-      mbox = PLGetDictionaryEntry(accounts, mbox_key);
+      mbox = PLGetDictionaryEntry (accounts, mbox_key);
 
       if (mbox == mailbox)
 	return mbox_key;
@@ -732,4 +727,4 @@ config_mailbox_get_key (proplist_t mailbox)
     }
 
   return NULL;
-} /* pl_dict_get_key */
+}				/* pl_dict_get_key */

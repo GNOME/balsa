@@ -84,7 +84,7 @@ GtkWidget *fe_match_label;
 GtkWidget *fe_action_label;
 
 /* type notebook */
-GtkNotebook *fe_type_notebook;
+GtkWidget *fe_type_notebook;
 
 /* its pages */
 GtkWidget *fe_type_notebook_simple_page;
@@ -103,12 +103,36 @@ void fe_apply_pressed(GtkWidget *widget,
 void fe_revert_pressed(GtkWidget *widget,
 		       gpointer data);
 
-/* type notebook checkbuttons */
+/* match page widgets */
+
+/* containers for radiobuttons */
+GtkWidget *fe_type_frame;
+GtkWidget *fe_type_box;
+/* type notebook radiobuttons */
 GtkWidget *fe_simple;
 GtkWidget *fe_regex;
 GtkWidget *fe_exec;
-/* state variable (which toggle is selected)*/
-gint fe_type_state;
 /* their callback */
 void fe_checkbutton_toggled(GtkWidget *widget,
 			    gpointer data);
+
+/* Name field */
+GtkWidget *fe_name_label;
+GtkWidget *fe_name_entry;
+
+/* when field */
+GtkWidget *fe_when_frame;
+GtkWidget *fe_when_box;
+/* The buttons thereof */
+GtkWidget *fe_when_match;
+GtkWidget *fe_when_nomatch;
+GtkWidget *fe_when_always;
+
+/* group field (inbound, outbound, etc) */
+GtkWidget *fe_group_frame;
+GtkWidget *fe_group_box;
+/* the buttons thereof */
+GtkWidget *fe_group_inbound;
+GtkWidget *fe_group_outbound;
+GtkWidget *fe_group_presend;
+GtkWidget *fe_group_demand;

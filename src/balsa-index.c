@@ -51,6 +51,7 @@ static void balsa_index_init (BalsaIndex * bindex);
 static void balsa_index_size_request (GtkWidget * widget, GtkRequisition * requisition);
 static void balsa_index_size_allocate (GtkWidget * widget, GtkAllocation * allocation);
 
+static gint date_compare (GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2);
 static void clist_click_column (GtkCList * clist, gint column, gpointer data);
 
 
@@ -92,6 +93,34 @@ static void balsa_index_marshal_signal_1 (GtkObject * object,
 static gint balsa_index_signals[LAST_SIGNAL] =
 {0};
 static GtkBinClass *parent_class = NULL;
+
+static gint
+date_compare (GtkCList * clist,
+	      gconstpointer ptr1,
+	      gconstpointer ptr2)
+{
+  Message *m1, *m2;
+  time_t t1, t2;
+
+  GtkCListRow *row1 = (GtkCListRow *) ptr1;
+  GtkCListRow *row2 = (GtkCListRow *) ptr2;
+
+  m1 = row1->data;
+  m2 = row2->data;
+
+  if (!m1 || !m2)
+    return 0;
+
+  t1 = m1->datet;
+  t2 = m2->datet;
+
+  if (t1 < t2)
+    return 1;
+  if (t1 > t2)
+    return -1;
+
+  return 0;
+}
 
 guint
 balsa_index_get_type ()
@@ -173,6 +202,11 @@ clist_click_column (GtkCList * clist, gint column, gpointer data)
     }
   else
     gtk_clist_set_sort_column (clist, column);
+
+  if (column == 5)
+    gtk_clist_set_compare_func (clist, date_compare);
+  else
+    gtk_clist_set_compare_func (clist, NULL);
 
   gtk_clist_sort (clist);
 }
@@ -361,8 +395,8 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (mailbox == NULL)
     return;
 
- main_window_set_cursor(GDK_WATCH);
-  
+  main_window_set_cursor (GDK_WATCH);
+
   /*
    * release the old mailbox
    */
@@ -419,9 +453,9 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (bindex->first_new_message == 0)
     bindex->first_new_message = i;
 
- main_window_set_cursor(-1);
+  main_window_set_cursor (-1);
 
- gtk_idle_add ((GtkFunction) moveto_handler, bindex);
+  gtk_idle_add ((GtkFunction) moveto_handler, bindex);
 }
 
 void

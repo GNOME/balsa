@@ -1030,6 +1030,7 @@ message_new (void)
   message->mailbox = NULL;
   message->remail = NULL;
   message->date = NULL;
+  message->datet = 0;
   message->from = NULL;
   message->sender = NULL;
   message->reply_to = NULL;
@@ -1241,13 +1242,12 @@ translate_message (HEADER * cur)
   cenv = cur->env;
 
   message = message_new ();
-/*
-   message->remail = g_strdup (cenv->remail);
- */
+
   footime = localtime (&cur->date_sent);
 
   strftime (rettime, sizeof (rettime), "%a, %d %b %Y %H:%M:%S", footime);
 
+  message->datet = cur->date_sent;
   message->date = g_strdup (rettime);
   message->from = translate_address (cenv->from);
   message->sender = translate_address (cenv->sender);

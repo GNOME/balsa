@@ -201,6 +201,7 @@ struct _Message
 
     /* message composition date string */
     gchar *date;
+    time_t datet;
 
     /* from, sender, and reply addresses */
     Address *from;

@@ -443,7 +443,8 @@ balsa_window_new ()
   appbar = GNOME_APPBAR(gnome_appbar_new(TRUE, TRUE, GNOME_PREFERENCES_USER));
   gnome_app_set_statusbar(GNOME_APP(window), GTK_WIDGET(appbar));
   gtk_object_set_data(GTK_OBJECT(window), APPBAR_KEY, appbar);
-
+  balsa_app.appbar=appbar;
+  
   gtk_window_set_policy(GTK_WINDOW(window), TRUE, TRUE, FALSE);
   gtk_window_set_default_size(GTK_WINDOW(window), balsa_app.mw_width, balsa_app.mw_height);
 
@@ -870,6 +871,12 @@ mail_progress_notify_cb( )
 		gtk_label_set_text( GTK_LABEL(progress_dialog_message), "" );
 	        gtk_widget_show_all( progress_dialog );
 	      }
+	    else 
+              {
+	        gnome_appbar_clear_stack(balsa_app.appbar);
+		gnome_appbar_push(balsa_app.appbar,
+				threadmessage->message_string);
+	      }
 	    break;
 	  case MSGMAILTHREAD_MSGINFO:
 	    if( progress_dialog && GTK_IS_WIDGET( progress_dialog ) )
@@ -877,6 +884,12 @@ mail_progress_notify_cb( )
 		gtk_label_set_text( GTK_LABEL(progress_dialog_message), 
 				  threadmessage->message_string );
 		gtk_widget_show_all( progress_dialog );
+	      }
+	    else 
+	      {
+	        gnome_appbar_clear_stack(balsa_app.appbar);
+		gnome_appbar_push(balsa_app.appbar,
+				threadmessage->message_string);
 	      }
 	    break;
 	  case MSGMAILTHREAD_UPDATECONFIG:
@@ -889,15 +902,20 @@ mail_progress_notify_cb( )
 	    UNLOCK_MAILBOX (balsa_app.inbox);
 	    break;
 	  case MSGMAILTHREAD_FINISHED:
-	    if( balsa_app.pwindow_option != UNTILCLOSED )
+	    if( balsa_app.pwindow_option == WHILERETR && progress_dialog
+			    && GTK_IS_WIDGET ( progress_dialog ))
 	      {
-		if( progress_dialog && GTK_IS_WIDGET( progress_dialog ))
-		  gtk_widget_destroy( progress_dialog );
+		gtk_widget_destroy( progress_dialog );
 		progress_dialog = NULL;
 	      }
 	    else if( progress_dialog && GTK_IS_WIDGET( progress_dialog ))
 		gtk_label_set_text( GTK_LABEL(progress_dialog_source), 
 				  "Finished Checking." );
+	    else
+	      {
+	        gnome_appbar_clear_stack(balsa_app.appbar);
+	        gnome_appbar_push(balsa_app.appbar,"Finished Checking.");
+	      }
 	    break;
 	  default:
 	    fprintf ( stderr, " Unknown: %s \n", 

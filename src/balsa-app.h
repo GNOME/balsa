@@ -131,7 +131,10 @@ extern struct BalsaApplication
   gint checkbox;
   /* printing */
   Printing_t PrintCommand;
-      
+
+  /* appbar */
+  GnomeAppBar* appbar;
+  
 }
 balsa_app;
 

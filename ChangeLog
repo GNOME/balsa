@@ -1,3 +1,8 @@
+2001-06-18  Matthew Guenther  <guentherm@asme.org>
+
+	* src/balsa-identity.c (identity_list_update): Properly initialize
+	pointer to NULL
+
 2001-06-18  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/sendmsg-window.c: change the quit_add levels from 0 to 1

@@ -574,6 +574,7 @@ identity_list_update(GtkCList* clist)
     gchar* text[2];
     gint i = 0;
 
+    text[0] = NULL;
 
     gtk_clist_freeze(clist);
     gtk_clist_clear(clist);

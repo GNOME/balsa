@@ -315,6 +315,7 @@ create_mailboxes_page (void)
   GtkWidget *table;
   GtkWidget *label;
   GString *gs;
+  gchar *spool;
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
@@ -328,7 +329,9 @@ create_mailboxes_page (void)
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL, 10, 10);
   prefs->inbox = gtk_entry_new ();
-  gtk_entry_set_text (GTK_ENTRY (prefs->inbox), getenv ("MAIL"));
+  spool = getenv ("MAIL");
+  if (spool)
+    gtk_entry_set_text (GTK_ENTRY (prefs->inbox), spool);
   gtk_table_attach (GTK_TABLE (table), prefs->inbox, 1, 2, 0, 1,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
@@ -487,7 +490,7 @@ complete_cb (GtkWidget * widget, gpointer data)
   g_free (balsa_app.real_name);
   balsa_app.real_name = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->real_name)));
 
-  g_free(balsa_app.email);
+  g_free (balsa_app.email);
   balsa_app.email = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->email)));
 
   g_free (balsa_app.smtp_server);

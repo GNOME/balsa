@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
 "POT-Creation-Date: 2000-05-13 04:18+0200\n"
-"PO-Revision-Date: 2000-05-07 19:30+02:00\n"
+"PO-Revision-Date: 2000-05-13 15:30+02:00\n"
 "Last-Translator: Keld Simonsen <keld@dkuug.dk>\n"
 "Language-Team: Danish <dansk@klid.dk>\n"
 "MIME-Version: 1.0\n"
@@ -409,76 +409,70 @@ msgstr "<P>Parametrene for dette brev er: <BR>"
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
 msgstr "<table border=0><tr><th>Attribut</th><th>Værdi</th></tr>\n"
 
-#: src/balsa-message.c:1166
+#: src/balsa-message.c:1167
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Åbning af %s mislykkedes. Fejlnr. = %d, "
 
 #: src/filter-edit-dialog.c:30
-#, fuzzy
 msgid "Inbound"
-msgstr "Indbakke"
+msgstr "Indgående"
 
 #: src/filter-edit-dialog.c:31
-#, fuzzy
 msgid "Outbound"
-msgstr "Udbakke"
+msgstr "Udgående"
 
 #: src/filter-edit-dialog.c:32
 msgid "Pre-send"
-msgstr ""
+msgstr "For-send"
 
 #: src/filter-edit-dialog.c:33
-#, fuzzy
 msgid "Demand"
-msgstr "Send"
+msgstr "Hvis ønsket"
 
 #: src/filter-edit-dialog.c:38
-#, fuzzy
 msgid "Matches"
-msgstr "Match"
+msgstr "Matcher"
 
 #: src/filter-edit-dialog.c:39
 msgid "Doesn't Match"
-msgstr ""
+msgstr "Matcher ikke"
 
 #: src/filter-edit-dialog.c:40
 msgid "Always"
-msgstr ""
+msgstr "Altid"
 
 #: src/filter-edit-dialog.c:45
 msgid "Simple"
-msgstr ""
+msgstr "Simpel"
 
 #: src/filter-edit-dialog.c:46
 msgid "Regular Expression"
-msgstr ""
+msgstr "Regulært udtryk"
 
 #: src/filter-edit-dialog.c:47
-#, fuzzy
 msgid "External Command"
-msgstr "Printerkommando:"
+msgstr "Ekstern kommando"
 
 #: src/filter-edit-dialog.c:52
 msgid "Copy to folder:"
-msgstr ""
+msgstr "Kopiér til folder:"
 
 #: src/filter-edit-dialog.c:53
 msgid "Move to folder:"
-msgstr ""
+msgstr "Flyt til folder:"
 
 #: src/filter-edit-dialog.c:54
 msgid "Print on printer:"
-msgstr ""
+msgstr "Udskriv til printer:"
 
 #: src/filter-edit-dialog.c:55
-#, fuzzy
 msgid "Run program:"
-msgstr "Kør ved:"
+msgstr "Kør program:"
 
 #: src/filter-edit-dialog.c:56
 msgid "Send to Trash"
-msgstr ""
+msgstr "Send til papirkurv"
 
 #: src/filter-edit-dialog.c:134
 msgid "On"
@@ -1622,31 +1616,4 @@ msgstr "Kan ikke udføre printerkommando."
 
 #: src/sendmsg-window.c:1413
 msgid "Error executing lpr"
-msgstr "Fejl under køring af lpr"
-
-#~ msgid "Spell Check"
-#~ msgstr "Stavekontrol"
-
-#~ msgid "Unable to Open Mailbox!"
-#~ msgstr "Kunne ikke åbne postkasse!"
-
-#~ msgid "All of the fields must be filled in"
-#~ msgstr "Alle felter skal udfyldes"
-
-#~ msgid "EMAIL;INTERNET:%s\n"
-#~ msgstr "EMAIL;INTERNET:%s\n"
-
-#~ msgid "Local Mailbox Loaded as: %s\n"
-#~ msgstr "Lokal postkasse indlæst som: %s\n"
-
-#~ msgid "Mail_boxes"
-#~ msgstr "_Postkasser"
-
-#~ msgid "_From"
-#~ msgstr "F_ra"
-
-#~ msgid "Show _selected headers"
-#~ msgstr "Vis _valgte brevhoveder"
-
-#~ msgid "View mailbox content informations"
-#~ msgstr "Vis information om postkasseindhold "
+msgstr "Fejl under kørsel af lpr"

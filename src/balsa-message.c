@@ -201,9 +201,7 @@ balsa_message_set (BalsaMessage * bmessage,
   buff = g_realloc (buff, strlen (buff) + strlen (HTML_FOOT) + 1);
   strcat (buff, HTML_FOOT);
 
-#ifdef DEBUG
   fprintf (stderr, buff);
-#endif
 /* set message contents */
   gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), buff);
   g_free (buff);
@@ -328,10 +326,10 @@ text2html (char *buff)
   for (i = 0; i < len; i++)
     {
       if (buff[i] == '\r' && buff[i + 1] == '\n' &&
-		      buff[i+2] == '\r' && buff[i+3] == '\n')
+	  buff[i + 2] == '\r' && buff[i + 3] == '\n')
 	{
 	  gs = g_string_append (gs, "</tt></p><p><tt>\n");
-	  i+=3;
+	  i += 3;
 	}
       else if (buff[i] == '\r' && buff[i + 1] == '\n')
 	{
@@ -351,11 +349,25 @@ text2html (char *buff)
 	{
 	  gs = g_string_append (gs, "<br>\n");
 	}
+      else if (buff[i] == ' ' && buff[i + 1] == ' ' && buff[i + 2] == ' ')
+	{
+	  gs = g_string_append (gs, "&nbsp; &nbsp;");
+	  i += 2;
+	}
+      else if (buff[i] == ' ' && buff[i + 1] == ' ')
+	{
+	  gs = g_string_append (gs, "&nbsp; ");
+	  i++;
+	}
       else
 	switch (buff[i])
 	  {
+	    /* for single spaces (not multiple (look above)) do *not*
+	     * replace with a &nbsp; or lines will not wrap! bad
+	     * thing(tm)
+	     */
 	  case ' ':
-	    gs = g_string_append (gs, "&nbsp;");
+	    gs = g_string_append (gs, " ");
 	    break;
 	  case '<':
 	    gs = g_string_append (gs, "&lt;");

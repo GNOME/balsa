@@ -125,21 +125,26 @@ static GnomeUIInfo file_menu[] =
 #define MENU_FILE_INCLUDE_POS 0
   GNOMEUIINFO_ITEM_STOCK(N_ ("_Include File..."), NULL,
 			 include_file_cb, GNOME_STOCK_MENU_OPEN),
+
 #define MENU_FILE_ATTACH_POS 1
   GNOMEUIINFO_ITEM_STOCK(N_ ("_Attach file..."), NULL, 
 			 attach_clicked, GNOME_STOCK_MENU_ATTACH),
   GNOMEUIINFO_SEPARATOR,
+
 #define MENU_FILE_SEND_POS 3
   GNOMEUIINFO_ITEM_STOCK(N_ ("_Send"),N_ ("Send the currently edited message"),
 			 send_message_cb, GNOME_STOCK_MENU_MAIL_SND),
+
 #define MENU_FILE_POSTPONE_POS 4
   GNOMEUIINFO_ITEM_STOCK(N_ ("_Postpone"), NULL, 
 			 postpone_message_cb, GNOME_STOCK_MENU_SAVE),
+
 #define MENU_FILE_PRINT_POS 5
   GNOMEUIINFO_ITEM_STOCK(N_ ("Print"), N_ ("Print the edited message"), 
 			  print_message_cb, GNOME_STOCK_PIXMAP_PRINT),
   GNOMEUIINFO_SEPARATOR,
-#define MENU_FILE_PRINT_POS 7
+
+#define MENU_FILE_CLOSE_POS 6
   GNOMEUIINFO_MENU_CLOSE_ITEM(close_window, NULL),
 
   GNOMEUIINFO_END
@@ -258,7 +263,7 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
 	 strcat(newStr, headerDescs[i].name);
 	 strcat(newStr, " ");
       }
-   if(balsa_app.compose_headers) // should never fail...
+   if(balsa_app.compose_headers) /* should never fail... */
       g_free(balsa_app.compose_headers);
    
    balsa_app.compose_headers = g_strdup(newStr);
@@ -266,7 +271,7 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
    gtk_widget_destroy (bsm->window);
    if(balsa_app.debug) printf("balsa_sendmsg_destroy: Freeing bsm\n");
    g_free (bsm);
-   bsm = NULL; // useless - it is just a local variable...
+   bsm = NULL; /* useless - it is just a local variable... */
 }
 
 static void
@@ -353,11 +358,11 @@ check_if_regular_file (const gchar *filename)
   gint result = TRUE;
 
   if (stat (filename, &s)) {
-    ptr = g_strdup_printf (_ ("Cannot get info on file '%s': %s\n"), filename,
+    ptr = g_strdup_printf (_ ("Cannot get info on file \'%s\': %s\n"), filename,
 			   strerror (errno));
     result = FALSE;
   } else if (!S_ISREG (s.st_mode)) {
-    ptr = g_strdup_printf (_ ("Attachment is not a regular file: '%s'\n"), 
+    ptr = g_strdup_printf (_ ("Attachment is not a regular file: \'%s\'\n"), 
 			   filename);
     result = FALSE;
   }
@@ -384,7 +389,7 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
   filename = g_strdup (gtk_file_selection_get_filename (fs));
   add_attachment (iconlist, filename);
 
-  /* don't g_free(filename) - the add_attachment arg is not const */
+  /* do not g_free(filename) - the add_attachment arg is not const */
 
   gtk_widget_destroy (GTK_WIDGET (fs));
 }
@@ -1492,11 +1497,11 @@ static void set_menus(BalsaSendmsg *msg)
 
    for(i=0; i<sizeof(headerDescs)/sizeof(headerDescs[0]); i++)
       if(findWord(headerDescs[i].name, balsa_app.compose_headers) ) {
-	 // show... (well, it's already been shown).
+	      /* show... (well, it's already been shown). */
 	    gtk_check_menu_item_set_active(
 	    GTK_CHECK_MENU_ITEM(view_menu[i].widget), TRUE );
       } else {
-	 // or hide...
+	      /* or hide... */
 	 GTK_SIGNAL_FUNC(view_menu[i].moreinfo)(view_menu[i].widget,msg);
       }
 
@@ -1538,7 +1543,7 @@ two_const_fields_to_end(const gchar* ptr) {
 static gchar* 
 get_font_name(const gchar* base, int code) {
    static gchar type[] ="iso8859";
-   //g_snprintf(font_name,sizeof(font_name),"%s-%d",base_mask,code);
+   /* g_snprintf(font_name,sizeof(font_name),"%s-%d",base_mask,code); */
    gchar *res;
    const gchar* ptr = base;
    int dash_cnt = 0, len;
@@ -1553,9 +1558,9 @@ get_font_name(const gchar* base, int code) {
       ptr++;
    }
 
-   // defense against a patologically short base font wildcard implemented
-   // in the chunk below
-   // extra space for dwo dashes and '\0'
+   /* defense against a patologically short base font wildcard implemented
+    * in the chunk below
+    * extra space for dwo dashes and '\0' */
    len = ptr-base;
    if(dash_cnt>12) len--;
    if(len<1) len = 1;

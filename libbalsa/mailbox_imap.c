@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -208,6 +208,7 @@ void
 libbalsa_mailbox_imap_update_url(LibBalsaMailboxImap* mailbox)
 {
     LibBalsaServer* s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    gchar* enc = libbalsa_urlencode(s->user);
     g_free(LIBBALSA_MAILBOX(mailbox)->url);
     LIBBALSA_MAILBOX(mailbox)->url =  
         g_strdup_printf("imap%s://%s@%s/%s", 
@@ -216,7 +217,8 @@ libbalsa_mailbox_imap_update_url(LibBalsaMailboxImap* mailbox)
 #else
                         "",
 #endif
-                        s->user, s->host, mailbox->path? mailbox->path : "");
+                        enc, s->host, mailbox->path? mailbox->path : "");
+    g_free(enc);
 }
 
 /* Unregister an old notification and add a current one */

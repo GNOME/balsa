@@ -287,6 +287,7 @@ balsa_message_class_init(BalsaMessageClass * klass)
 }
 
 #define BALSA_MESSAGE_TEXT_VIEW "balsa-message-text-view"
+#define BALSA_MESSAGE_CONTENT   "balsa-message-content"
 static void bm_modify_font_from_string(GtkWidget * widget,
 				       const char *font);
 
@@ -300,7 +301,6 @@ bm_header_widget(BalsaMessage * bm)
     widget = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 				   GTK_POLICY_NEVER, GTK_POLICY_NEVER);
-    gtk_container_set_border_width(GTK_CONTAINER(widget), 10);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(widget),
 					GTK_SHADOW_IN);
 
@@ -328,18 +328,52 @@ bm_header_widget(BalsaMessage * bm)
     return widget;
 }
 
+#define PADDING      6
+#define BIG_PADDING 10
+static GtkWidget *
+bm_message_widget(GtkWidget * headers, gboolean embedded)
+{
+    GtkWidget *message_box;
+    GtkWidget *content;
+    GtkWidget *retval;
+
+    message_box = gtk_vbox_new(FALSE, PADDING);
+    gtk_box_pack_start(GTK_BOX(message_box), headers, FALSE, FALSE, 0);
+
+    content = gtk_vbox_new(FALSE, PADDING);
+
+    if (embedded) {
+	gtk_box_pack_start(GTK_BOX(message_box), content, TRUE, TRUE, 0);
+	gtk_container_set_border_width(GTK_CONTAINER(message_box),
+				       PADDING);
+	retval = gtk_frame_new(NULL);
+	gtk_container_add(GTK_CONTAINER(retval), message_box);
+    } else {
+	gtk_box_pack_start(GTK_BOX(message_box), content, TRUE, TRUE,
+			   BIG_PADDING - PADDING);
+	gtk_container_set_border_width(GTK_CONTAINER(message_box),
+				       BIG_PADDING);
+	retval = message_box;
+    }
+
+    gtk_widget_show_all(retval);
+    g_object_set_data(G_OBJECT(retval), BALSA_MESSAGE_CONTENT, content);
+
+    return retval;
+}
+
 static void
 balsa_message_init(BalsaMessage * bm)
 {
     GtkWidget *scroll;
-    GtkWidget *vbox;
-    GtkWidget *header_box;
     GtkWidget *label;
+    GtkWidget *message_widget;
+    GtkWidget *text_view;
     GtkTreeStore *model;
     GtkCellRenderer *renderer;
     GtkTreeSelection *selection;
-    GdkColor color;
-        
+    GtkStyle * text_style;
+
     /* Notebook to hold content + structure */
     bm->notebook = gtk_notebook_new();
     gtk_notebook_set_show_border(GTK_NOTEBOOK(bm->notebook), FALSE);
@@ -355,30 +389,27 @@ balsa_message_init(BalsaMessage * bm)
     gtk_widget_show(label);
     gtk_notebook_append_page(GTK_NOTEBOOK(bm->notebook), scroll, label);
     gtk_widget_show(scroll);
-        bm->cont_viewport = gtk_viewport_new(NULL, NULL);
+    bm->cont_viewport = gtk_viewport_new(NULL, NULL);
     gtk_widget_show(bm->cont_viewport);
-        gtk_container_add(GTK_CONTAINER(scroll), bm->cont_viewport);
-        
-        /* Event box so that the background can be set white */
-    header_box = gtk_event_box_new();
-    gtk_widget_show(header_box);
-    gdk_color_parse("White", &color);
-    gtk_widget_modify_bg(GTK_WIDGET(header_box), GTK_STATE_NORMAL, &color);
-    gtk_container_add(GTK_CONTAINER(bm->cont_viewport), header_box);  
-        
-    vbox = gtk_vbox_new(FALSE, 1);  
-    gtk_widget_show(vbox);  
-    gtk_container_add(GTK_CONTAINER(header_box), vbox);
-        
+    gtk_container_add(GTK_CONTAINER(scroll), bm->cont_viewport);
+
     /* Widget to hold headers */
     bm->header_container = bm_header_widget(bm);
-    gtk_box_pack_start(GTK_BOX(vbox), bm->header_container, FALSE, FALSE, 0);
 
-    /* Widget to hold content */
-    bm->content = gtk_vbox_new(FALSE, 1);
-    gtk_container_set_border_width(GTK_CONTAINER(bm->content), 10);
-    gtk_container_add(GTK_CONTAINER(vbox), bm->content);
-    gtk_widget_show(bm->content);
+    /* Make background of the view-port the same as the base color of the
+     * text (well, usually). */
+    text_view = g_object_get_data(G_OBJECT(bm->header_container),
+				  BALSA_MESSAGE_TEXT_VIEW);
+    text_style = gtk_style_copy(text_view->style);
+    text_style->bg[GTK_STATE_NORMAL] = text_style->base[GTK_STATE_NORMAL];
+    gtk_widget_set_style(bm->cont_viewport, text_style);
+    g_object_unref(text_style);
+
+    /* Widget to hold message */
+    message_widget = bm_message_widget(bm->header_container, FALSE);
+    gtk_container_add(GTK_CONTAINER(bm->cont_viewport), message_widget);
+    bm->content = g_object_get_data(G_OBJECT(message_widget),
+				    BALSA_MESSAGE_CONTENT);
 
     /* structure view */
     model = gtk_tree_store_new (NUM_COLUMNS,
@@ -386,7 +417,7 @@ balsa_message_init(BalsaMessage * bm)
                                 GDK_TYPE_PIXBUF,
                                 G_TYPE_STRING);
     bm->treeview = gtk_tree_view_new_with_model (GTK_TREE_MODEL(model));
-        gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (bm->treeview), TRUE);
+    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (bm->treeview), TRUE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW (bm->treeview));
     g_signal_connect(bm->treeview, "row-activated",
                      G_CALLBACK(tree_activate_row_cb), bm);    
@@ -3199,19 +3230,6 @@ static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
     } else if (g_mime_content_type_is_type(type, "multipart", "alternative")) {
             /* Add the most suitable part. */
         add_body(bm, preferred_part(parent->parts));
-    } else if (g_mime_content_type_is_type(type, "message", "rfc822")) {
-	GtkWidget *child;
-	GtkWidget *save;
-
-	child = gtk_vbox_new(FALSE, 1);
-        gtk_container_set_border_width(GTK_CONTAINER(child), 10);
-	save = bm->content;
-	gtk_box_pack_start(GTK_BOX(save), child, TRUE, TRUE, 0);
-	gtk_widget_show(child);
-
-	bm->content = child;
-        add_multipart_mixed(bm, parent->parts);
-	bm->content = save;
     } else { /* default to multipart/mixed */
         add_multipart_mixed(bm, parent->parts);
     }
@@ -3256,32 +3274,54 @@ vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
                                      widget, g_object_unref);
 }
 
-static BalsaPartInfo *add_part(BalsaMessage *bm, BalsaPartInfo *info)
+static BalsaPartInfo *
+add_part(BalsaMessage * bm, BalsaPartInfo * info)
 {
-    if (info) {
-        GtkTreeSelection *selection = 
-            gtk_tree_view_get_selection(GTK_TREE_VIEW(bm->treeview));
+    GtkWidget *save;
+    GtkTreeSelection *selection;
 
-        if (info->path && 
-            !gtk_tree_selection_path_is_selected (selection, info->path))
-            gtk_tree_selection_select_path(selection, info->path);
+    if (!info)
+	return NULL;
 
-        if (info->widget == NULL)
-            part_info_init(bm, info);
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(bm->treeview));
 
-        if (info->widget) {
-            gtk_container_add(GTK_CONTAINER(bm->content), info->widget);
-            gtk_widget_show(info->widget);
-            if (GTK_IS_LAYOUT(info->widget)) {
-                GtkAdjustment *vadj =
-                    gtk_layout_get_vadjustment(GTK_LAYOUT(info->widget));
-                g_signal_connect(G_OBJECT(vadj), "changed",
-                                 G_CALLBACK(vadj_change_cb), info->widget);
-            }
-        }
-        add_multipart(bm, info->body);
+    if (info->path &&
+	!gtk_tree_selection_path_is_selected(selection, info->path))
+	gtk_tree_selection_select_path(selection, info->path);
+
+    if (info->widget == NULL)
+	part_info_init(bm, info);
+
+    save = NULL;
+
+    if (info->widget) {
+	gchar *content_type =
+	    libbalsa_message_body_get_content_type(info->body);
+	if (strcmp(content_type, "message/rfc822") == 0) {
+	    GtkWidget *message_widget =
+		bm_message_widget(info->widget, TRUE);
+	    gtk_container_add(GTK_CONTAINER(bm->content), message_widget);
+	    save = bm->content;
+	    bm->content = g_object_get_data(G_OBJECT(message_widget),
+					    BALSA_MESSAGE_CONTENT);
+	} else
+	    gtk_container_add(GTK_CONTAINER(bm->content), info->widget);
+	g_free(content_type);
+
+	gtk_widget_show(info->widget);
+	if (GTK_IS_LAYOUT(info->widget)) {
+	    GtkAdjustment *vadj =
+		gtk_layout_get_vadjustment(GTK_LAYOUT(info->widget));
+	    g_signal_connect(G_OBJECT(vadj), "changed",
+			     G_CALLBACK(vadj_change_cb), info->widget);
+	}
     }
-    
+
+    add_multipart(bm, info->body);
+
+    if (save)
+	bm->content = save;
+
     return info;
 }
 
@@ -3304,17 +3344,28 @@ gtk_tree_hide_func(GtkTreeModel * model, GtkTreePath * path,
 }
 
 static void
+bm_hide_all_helper(GtkWidget * widget, gpointer data)
+{
+    if (GTK_IS_CONTAINER(widget))
+	gtk_container_foreach(GTK_CONTAINER(widget), bm_hide_all_helper,
+			      NULL);
+    gtk_widget_destroy(widget);
+}
+
+static void
 hide_all_parts(BalsaMessage * bm)
 {
     if (bm->current_part) {
-        gtk_tree_model_foreach(gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview)),
-                               gtk_tree_hide_func, bm);
-        gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(bm->treeview)));
-        bm->current_part = NULL;
+	gtk_tree_model_foreach(gtk_tree_view_get_model
+			       (GTK_TREE_VIEW(bm->treeview)),
+			       gtk_tree_hide_func, bm);
+	gtk_tree_selection_unselect_all(gtk_tree_view_get_selection
+					(GTK_TREE_VIEW(bm->treeview)));
+	bm->current_part = NULL;
     }
 
     gtk_container_foreach(GTK_CONTAINER(bm->content),
-			  (GtkCallback) gtk_widget_hide, NULL);
+			  bm_hide_all_helper, NULL);
 }
 
 /* 

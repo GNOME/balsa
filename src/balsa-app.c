@@ -202,9 +202,7 @@ read_signature (void)
   FILE *fp;
   size_t len;
 
-  gchar path[PATH_MAX];
-  sprintf (path, "%s/.signature", g_get_home_dir ());
-  if (!(fp = fopen (path, "r")))
+  if (!(fp = fopen (balsa_app.signature_path, "r")))
     return FALSE;
   len = readfile (fp, &balsa_app.signature);
   if (len != 0)

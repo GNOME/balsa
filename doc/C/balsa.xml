@@ -219,12 +219,12 @@ This is version 2.719 of the Balsa manual.
 
 <para>
   &Balsa;'s main window has three major areas. To the left is the
-  <interface>mailbox list</interface>. This displays all the mailboxes
+  <link linkend="subwin-mblist"><interface>mailbox list</interface>
+  </link>. This displays all the mailboxes
   &Balsa; knows about; it will scan for ones in your local mail
   directory. (This means &Balsa; works well with &procmail;.)  It will
   also list &IMAP; or &POP3; mailboxes that you have configured.  If
-  the <link linkend="preferences-3"><guilabel>Show Mailbox
-  Info</guilabel></link> preference is set, two columns will also be
+  the "Show Mailbox Info" preference is set, two columns will also be
   displayed next to the mailbox names containing the number of unread
   and total messages in each mailbox that has unread messages.  (The
   other mailboxes will not have their contents probed.) Also, any
@@ -233,13 +233,15 @@ This is version 2.719 of the Balsa manual.
 </para>
 
 <para>
-  At the top-right is a view of the currently open mailbox. You can
+  At the top-right is a view of the currently open mailbox, called the
+  <link linkend="subwin-msgindex">message index</link>. You can
   browse messages and manipulate them here.
 </para>
 
  <para>
-  At the bottom-right of &Balsa;'s main window is the message
-  view. This displays the message selected in the message listing. You
+  At the bottom-right of &Balsa;'s main window is the
+  <link linkend="subwin-msgview">message view</link>.
+  This displays the message selected in the message listing. You
   can save attachments, view attachments, and read incoming email
   here.
 </para>
@@ -381,7 +383,7 @@ This is version 2.719 of the Balsa manual.
 	<para>
 	  <menuchoice>
 	    <shortcut>
-	      <keycombo><keysym>Ctrl</keysym><keysym>A</keysym></keycombo>
+	      <keycombo><keysym>Ctrl</keysym><keysym>T</keysym></keycombo>
 	    </shortcut>
 	    <guimenu>File</guimenu>
 	    <guimenuitem>Send Queued Mail</guimenuitem>
@@ -394,12 +396,26 @@ This is version 2.719 of the Balsa manual.
       <listitem>
 	<para>
 	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>B</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>File</guimenu>
+	    <guimenuitem>Send and Receive Mail</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Send all mail waiting in the Outbox mailbox to the
+	  mail server now and retrieve any new messages.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
 	    <guimenu>File</guimenu>
 	    <guimenuitem>Print</guimenuitem>
 	  </menuchoice> &mdash; 
 
 	  Print the currently selected message (displayed in
-	  the preview pane.)
+	  the message view pane.)
 	</para>
       </listitem>
 
@@ -556,146 +572,65 @@ This is version 2.719 of the Balsa manual.
 	  Select the headers to display in the message pane.
 	</para>
       </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>View</guimenu>
+	     <guimenuitem>Flat index</guimenuitem>
+	  </menuchoice>,
+        <menuchoice><guimenuitem>Simple threading</guimenuitem></menuchoice>,
+        <menuchoice><guimenuitem>JWZ threading</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Select the type of threading used to sort the messages in the list pane.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>E</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Expand All</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Expand all threads in the currently displayed mailbox.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>L</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Collapse All</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Collapse all threads in the currently displayed mailbox.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>View</guimenu>
+	     <guimenuitem>Zoom In</guimenuitem>
+	  </menuchoice>,
+        <menuchoice><guimenuitem>Zoom Out</guimenuitem></menuchoice>,
+        <menuchoice><guimenuitem>Zoom 100%</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Alter the font size of HTML messages.
+	  Plain text messages will always use the font specified in the
+	   <link linkend="preferences">Preferences</link> window.
+	</para>
+      </listitem>
+
     </itemizedlist>
 
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><guimenu>Message</guimenu></term>
-  
-  <listitem>
-    <para>This menu has commands for manipulating messages.</para>
-    <itemizedlist>
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <shortcut><keysym>R</keysym></shortcut>
-	    <guimenu>Message</guimenu>
-	    <guimenuitem>Reply...</guimenuitem>
-	  </menuchoice> &mdash; 
-	  Reply to the currently selected message(s).
-        </para>
-      </listitem>
-
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <shortcut><keysym>A</keysym></shortcut>
-	    <guimenu>Message</guimenu>
-	    <guimenuitem>Reply To All...</guimenuitem>
-	  </menuchoice> &mdash; 
-
-	  Reply to the currently selected message(s), sending the
-	  reply to all senders and recipients of the message.
-	</para>
-      </listitem>
-
-      <listitem>
-	<para><menuchoice>
-	    <shortcut><keysym>F</keysym></shortcut>
-	    <guimenu>Message</guimenu>
-	    <guimenuitem>Forward...</guimenuitem>
-	  </menuchoice> &mdash; 
-
-	  Forward the currently selected message(s).
-	</para>
-      </listitem>
-
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <shortcut>
-	      <keycombo><keysym>Ctrl</keysym><keysym>.</keysym></keycombo>
-	    </shortcut>
-	    <guimenu>Message</guimenu>
-	    <guimenuitem>Next Part</guimenuitem>
-	  </menuchoice> &mdash; 
-
-	  View the next part of the message (if the message is
-	  multi-part).
-	</para>
-      </listitem>
-
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <shortcut>
-	      <keycombo><keysym>Ctrl</keysym><keysym>,</keysym></keycombo>
-	    </shortcut>
-	    <guimenu>Message</guimenu>
-	    <guimenuitem>Previous Part</guimenuitem>
-	  </menuchoice> &mdash; 
-
-	  View the previous part of the message.
-	</para>
-      </listitem>
-
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <shortcut>
-              <keycombo><keysym>Ctrl</keysym><keysym>S</keysym></keycombo>
-	    </shortcut>
-	    <guimenu>Message</guimenu>
-	    <guimenuitem>Save Current Part...</guimenuitem>
-	  </menuchoice> &mdash; 
-
-	  Save the currently selected part of the message to a file.
-	</para>
-      </listitem>
-
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <shortcut><keysym>D</keysym></shortcut>
-	    <guimenu>Message</guimenu>
-	    <guimenuitem>Delete</guimenuitem>
-	  </menuchoice> &mdash; 
-	  
-	  Delete the currently selected message(s).
-	</para>
-      </listitem>
-
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <shortcut><keysym>U</keysym></shortcut>
-	    <guimenu>Message</guimenu>
-	    <guimenuitem>Undelete</guimenuitem>
-	  </menuchoice> &mdash; 
-
-	  Undelete the currently selected message (currently non-functional).
-	</para>
-      </listitem>
-
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <shortcut><keysym>X</keysym></shortcut>
-	    <guimenu>Message</guimenu>
-	    <guimenuitem>Toggle Flagged</guimenuitem>
-	  </menuchoice> &mdash; 
-
-	  Toggle the flag on the currently selected message(s).  This
-	  is shown as an exclamation mark next in the message index.
-	</para>
-      </listitem>
-
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <shortcut><keysym>S</keysym></shortcut>
-	    <guimenu>Message</guimenu>
-	    <guimenuitem>Store Address...</guimenuitem>
-	  </menuchoice> &mdash; 
-
-	  Add the sender of the currently selected message to
-	  your address book.
-	</para>
-      </listitem>
-	      
-    </itemizedlist>
   </listitem>
 </varlistentry>
 
@@ -740,6 +675,57 @@ This is version 2.719 of the Balsa manual.
 	  </menuchoice> &mdash; 
 
 	  Select the next unread message in the current mailbox.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo>
+	        <keysym>Ctrl</keysym><keysym>Alt</keysym><keysym>F</keysym>
+	      </keycombo>
+	    </shortcut>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Next Flagged</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Select the next flagged message in the current mailbox.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Hide messages</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  A submenu listing all the types of messages that may be hidden and
+	  unhidden in the current mailbox.  Types in the submenu are toggled
+	  when selected.  A Checkmark indicates it is currently hidden.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Reset Filter</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Resets to the mailbox filter.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Select All</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Selects all messages in the current mailbox.
 	</para>
       </listitem>
 
@@ -803,7 +789,7 @@ This is version 2.719 of the Balsa manual.
 	<para>
 	  <menuchoice>
 	    <guimenu>Mailbox</guimenu>
-	    <guimenuitem>Edit/Apply Filters</guimenuitem>
+	    <guimenuitem>Select Filters</guimenuitem>
 	  </menuchoice> &mdash; 
 
 	  Pop up a dialog that allows you to control which filters are
@@ -811,27 +797,264 @@ This is version 2.719 of the Balsa manual.
 	</para>
       </listitem>
 
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <guimenu>Mailbox</guimenu>
-	    <guimenuitem>Remove Duplicates</guimenuitem>
-	  </menuchoice> &mdash; 
-
-          Remove messages with duplicate message-IDs. If one of the
-          duplicates is marked as `replied-to', that one will be
-          retained. 
-
-          No attempt is made to verify that the messages really are
-          duplicated. You could leave deleted messages visible, and
-          check individually that the correct ones have been deleted.
-	</para>
-      </listitem>
-
     </itemizedlist>
 
   </listitem>
 </varlistentry>
+
+<sect2 id="subwin-messagemenu">
+<varlistentry>
+  <term><guimenu>Message</guimenu></term>
+  
+  <listitem>
+    <para>This menu has commands for manipulating messages.</para>
+    <itemizedlist>
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>R</keysym></shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Reply...</guimenuitem>
+	  </menuchoice> &mdash; 
+	  Reply to the currently selected message(s).
+        </para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>A</keysym></shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Reply to All...</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Reply to the currently selected message(s), sending the
+	  reply to all senders and recipients of the message.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>G</keysym></shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Reply to Group...</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Reply to a mailing list, instead of the sender to that list.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para><menuchoice>
+	    <shortcut><keysym>F</keysym></shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Forward attached...</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Forward the currently selected message(s) as an attachment.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para><menuchoice>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Forward inline...</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Forward the currently selected message(s), quoted inline.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>.</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Next Part</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  View the next part of the message (if the message is
+	  multi-part).
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+	      <keycombo><keysym>Ctrl</keysym><keysym>,</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Previous Part</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  View the previous part of the message.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+              <keycombo><keysym>Ctrl</keysym><keysym>S</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Save Current Part...</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Save the currently selected part of the message to a file.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut>
+              <keycombo><keysym>Ctrl</keysym><keysym>U</keysym></keycombo>
+	    </shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>View Source...</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Opens a new window that displays the raw message as received from the 
+       <glossterm linkend="glossary-mta">MTA</glossterm>.
+   </para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Copy</guimenuitem>
+	  </menuchoice> &mdash; 
+	  
+	  Copies to the clipboard any text selected in the message view of
+	  the current message.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Select Text</guimenuitem>
+	  </menuchoice> &mdash; 
+	  
+	  Selects the entire text of the current message in the message view.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>D</keysym></shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Move to Trash</guimenuitem>
+	  </menuchoice> &mdash; 
+	  
+	  Moves the currently selected message(s) to the Trash.
+	</para>
+      </listitem>
+
+    <listitem>
+      <itemizedlist>
+
+	<variablelist>
+	  <varlistentry>
+    <term>
+      <menuchoice>
+        <guimenu>Message</guimenu><guisubmenu>Toggle flag</guisubmenu>
+      </menuchoice>
+    </term>
+
+	<listitem>
+	  <para>
+	    <menuchoice>
+         <shortcut><keysym>X</keysym></shortcut>
+	      <guimenu>Message</guimenu>
+ 	      <guisubmenu>Toggle flag</guisubmenu>
+	      <guimenuitem>Flagged</guimenuitem>
+	    </menuchoice> &mdash; 
+			    
+	  Toggle the flag on the currently selected message(s).  This
+	  is shown as an exclamation mark next in the message index.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    <menuchoice>
+         <shortcut>
+           <keycombo><keysym>Ctrl</keysym><keysym>D</keysym></keycombo>
+         </shortcut>
+	      <guimenu>Message</guimenu>
+	      <guisubmenu>Toggle flag</guisubmenu>
+	      <guimenuitem>Deleted</guimenuitem>
+	    </menuchoice> &mdash; 
+			    
+	  Marks the message as set for deletion.  The message will be
+	  actually removed from the backing mailstore when it is
+	  "expunged" either manually, or as specified in the
+	  <link linkend="preferences">Preferences</link>.
+	  The icon is a small trash can.
+	  </para>
+	</listitem>
+			
+	<listitem>
+	  <para>
+	    <menuchoice>
+         <shortcut>
+           <keycombo><keysym>Ctrl</keysym><keysym>R</keysym></keycombo>
+         </shortcut>
+	      <guimenu>Message</guimenu>
+	      <guisubmenu>Toggle flag</guisubmenu>
+	      <guimenuitem>New</guimenuitem>
+	    </menuchoice> &mdash; 
+
+		 Marks a message that has been read as new, and vice-versa.
+		 The message will display the standard icon and font for a
+		 new message.
+	  </para>
+	</listitem>
+			
+	<listitem>
+	  <para>
+	    <menuchoice>
+	      <guimenu>Message</guimenu>
+	      <guisubmenu>Toggle flag</guisubmenu>
+	      <guimenuitem>Answered</guimenuitem>
+	    </menuchoice> &mdash; 
+
+       Toggles the reply icon for a message.
+	  </para>
+	</listitem>
+
+	  </varlistentry>
+	</variablelist>
+
+      </itemizedlist>
+    </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <shortcut><keysym>S</keysym></shortcut>
+	    <guimenu>Message</guimenu>
+	    <guimenuitem>Store Address...</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Add the sender of the currently selected message to
+	  your address book.
+	</para>
+      </listitem>
+	      
+    </itemizedlist>
+  </listitem>
+</varlistentry>
+</sect2>
 
 <varlistentry>
 <term><guimenu>Settings</guimenu></term>
@@ -908,17 +1131,16 @@ This is version 2.719 of the Balsa manual.
 
 <para>
   The message index displays the messages in the current folder, and
-  lets you choose which folders messages to view. Click on the
-  notebook tabs, or click on a folder in the <link
-  linkend="subwin-mblist"><interface>mailbox list</interface></link>
-  to bring it to the front.
+  lets you choose which messages to view. Click on the notebook tabs,
+  or click on a folder in the <link linkend="subwin-mblist"><interface>
+  mailbox list</interface></link> to bring it to the front.
 </para>
       
 <para>
   From the message index you can do a lot. Clicking on a message will
   cause it to be displayed in the message view. Right-clicking on it
   will give a pop-up menu letting you reply to the message (or forward
-  it, etc.) and move it to another folder (using the Transfer menu
+  it, etc.) and move it to another folder (using the "Move to" menu
   item).  Double-clicking on a message will open it in a separate
   window.  Also, it is possible to drag and drop messages from the
   index to other mailboxes in the mailbox list and open mailbox
@@ -927,88 +1149,62 @@ This is version 2.719 of the Balsa manual.
 
 <para>The pop-up (context) menu contains the following items:</para>
 
-<variablelist>
-  <varlistentry>
-  <term><menuchoice><guimenuitem>Reply</guimenuitem></menuchoice></term>
-  <listitem>
-    <para>Reply to the currently selected message(s).</para>
-  </listitem>
-  </varlistentry>
+<itemizedlist>
+      <listitem>
+	<para>
+    <menuchoice><guimenuitem>Reply</guimenuitem></menuchoice>,
+    <menuchoice><guimenuitem>Reply To All</guimenuitem></menuchoice>,
+    <menuchoice><guimenuitem>Reply To Group</guimenuitem></menuchoice>,
+    <menuchoice><guimenuitem>Forward Attached</guimenuitem></menuchoice>,
+    <menuchoice><guimenuitem>Forward Inline</guimenuitem></menuchoice>,
+    <menuchoice><guimenuitem>Store Address</guimenuitem></menuchoice>,
+    <menuchoice><guimenuitem>Delete</guimenuitem></menuchoice>,
+    <menuchoice><guimenuitem>Undelete</guimenuitem></menuchoice>,
+    <menuchoice><guimenuitem>Move To Trash</guimenuitem></menuchoice>,
+    <menuchoice><guimenuitem>Toggle Flagged</guimenuitem></menuchoice>,
+    <menuchoice><guimenuitem>Toggle Unread</guimenuitem></menuchoice>,
+    <menuchoice><guimenuitem>Move to</guimenuitem></menuchoice>,
+    <menuchoice><guimenuitem>View Source</guimenuitem></menuchoice> &mdash;
 
-  <varlistentry>
-  <term><menuchoice><guimenuitem>Reply To All</guimenuitem></menuchoice></term>
-  <listitem>
-    <para>
-      Reply to the currently selected message(s), sending the reply to
-      all the recipients and senders of the message.
-    </para>
-  </listitem>
-  </varlistentry>
+     These perform the same actions as their counterparts in the
+     <link linkend="subwin-messagemenu">message menu</link>.
+	</para>
+      </listitem>
+</itemizedlist>
 
-  <varlistentry>
-  <term><menuchoice><guimenuitem>Forward</guimenuitem></menuchoice></term>
-  <listitem>
-    <para>Forward the currently selected message(s).</para>
-  </listitem>
-</varlistentry>
+<itemizedlist>
+<listitem>
+  <para>
+    <menuchoice>
+      <guimenu>Move to</guimenu>
+	  </menuchoice> &mdash;
+	  
+     Moves the currently selected message(s) to another mailbox.
+     When this menu item is selected a list of available mailboxes
+     is displayed from which the destination should be selected. 
+  </para>
+</listitem>
+</itemizedlist>
 
-<varlistentry>
-  <term><menuchoice><guimenuitem>Move To Trash</guimenuitem></menuchoice></term>
-  <listitem><para>Deletes the currently message(s).</para>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term>
-    <menuchoice><guimenuitem>Store Address...</guimenuitem></menuchoice>
-  </term>
-  <listitem>
-    <para>Store the sender of the current address in the
-    address book.</para>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term>
-    <menuchoice><guimenuitem>Toggle Flagged</guimenuitem></menuchoice>
-  </term>
-
-  <listitem>
-    <para>
-     Toggle the priority flag on the currently selected message(s).
-     This is shown as an exclamation mark in the message index.</para>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><menuchoice><guimenuitem>Transfer</guimenuitem></menuchoice></term>
-  <listitem>
-    <para>
-      Transfer currently selected message(s) to another mailbox.  When
-      this menu item is selected a list of available mailboxes is
-      displayed from which the destination should be selected.
-    </para>
-  </listitem>
-</varlistentry>
-
-</variablelist>
 </sect2>
 
 <sect2 id="subwin-msgview">
 <title>The Message View</title>
 
 <para>
-  The message view displays the message that is selected in mailbox
+  This displays the email that is selected in the message
   index.  Message headers are displayed above the main text of the
   message, unless they have been disabled.  The text of the message is
   shown below the headers.
 </para>
 
 <para>
-  If the message is multipart the different sections will be shown
-  below the main message text.  Each part can be selected and &Balsa;
-  will attempt to display it.  If it is unable to it will display a
-  screen allowing you to save the attachment to a file.
+  If the message is multipart, an attachment icon will appear beside
+  the headers.  Clicking this icon will display a list of the parts
+  from which you may select one.  If &Balsa; is unable to display
+  it, you will be given a choice of applications known to handle the
+  part.  Additionally, there is always an option to save the attachment
+  to a file.
 </para>
 
 <note>

@@ -1,5 +1,7 @@
-2005-03-20 12:58  PeterB
+2005-03-20 15:03  PeterB
 
+	* libbalsa/libbalsa-conf.c: initialize only once in non-threaded
+	build.
 	* libbalsa/libbalsa-conf.c: store new config files in ~/.balsa.
 	* configure.in, libbalsa/misc.c, libbalsa/misc.h,
 	src/balsa-message.c, src/sendmsg-window.c: more appropriate version

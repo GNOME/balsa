@@ -2,31 +2,32 @@
 # Copyright (C) 2000 Free Software Foundation, Inc.
 # Spiros Papadimitriou <spapadim+@cs.cmu.edu>, 2000.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.6.0\n"
-"POT-Creation-Date: 2000-03-15 17:33-0500\n"
+"POT-Creation-Date: 2000-03-21 13:18+0000\n"
 "PO-Revision-Date: 2000-03-15 20:16-0500\n"
 "Last-Translator: Spiros Papadimitriou <spapadim+@cs.cmu.edu>\n"
 "Language-Team: Greek <nls@tux.hellug.gr>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-7\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: src/address-book.c:165
+#
+# File: src/address-book.c, line: 165
 msgid "Add New Address"
 msgstr "Νέα Διεύθυνση"
-
-#: balsa-druid-page-user.gob:82 src/address-book.c:171 src/address-book.c:309
+#
+# File: balsa-druid-page-user.gob, line: 82
+# File: src/address-book.c, line: 171
+# File: src/address-book.c, line: 309
 msgid "Name:"
 msgstr "Όνομα:"
-
-#: src/address-book.c:177
+#
+# File: src/address-book.c, line: 177
 msgid "E-Mail Address:"
 msgstr "Διεύθυνση Μηνύματος:"
-
-#: src/address-book.c:205
+#
+# File: src/address-book.c, line: 205
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -34,326 +35,351 @@ msgid ""
 msgstr ""
 "Αδυναμία ανοίγματος του ~/.gnome/GnomeCard.gcrd για ανάγνωση.\n"
 " - %s\n"
-
-#: src/address-book.c:224
+#
+# File: src/address-book.c, line: 224
 #, c-format
 msgid "EMAIL;INTERNET:%s\n"
 msgstr "EMAIL;INTERNET:%s\n"
-
-#: src/address-book.c:228
+#
+# File: src/address-book.c, line: 228
 msgid "No-Name"
 msgstr "Ανώνυμο"
-
-#: src/address-book.c:289 src/filter-edit-dialog.c:137
+#
+# File: src/address-book.c, line: 289
+# File: src/filter-edit-dialog.c, line: 137
 msgid "Name"
 msgstr "Όνομα"
-
-#: src/address-book.c:289
+#
+# File: src/address-book.c, line: 289
 msgid "E-Mail Address"
 msgstr "Διεύθυνση Μηνύματος"
-
-#: src/address-book.c:291 src/address-book.c:319 src/main-window.c:165
+#
+# File: src/address-book.c, line: 291
+# File: src/address-book.c, line: 319
+# File: src/main-window.c, line: 167
 msgid "Address Book"
 msgstr "Διευθυνσιολόγιο"
-
-#: src/address-book.c:351
+#
+# File: src/address-book.c, line: 351
 msgid "Send-To"
 msgstr "Αποστολή-Προς"
-
-#: src/address-book.c:365
+#
+# File: src/address-book.c, line: 365
 msgid "Run GnomeCard"
 msgstr "Εκτέλεση GnomeCard"
-
-#: src/address-book.c:371
+#
+# File: src/address-book.c, line: 371
 msgid "Re-Import"
 msgstr "Επανεισαγωγή"
-
-#: src/balsa-index-page.c:287
+#
+# File: src/balsa-index-page.c, line: 287
 msgid "Mailbox password:"
 msgstr "Συνθηματικό γραμματοκιβωτίου:"
-
+#
 #. password field
-#: src/balsa-index-page.c:293 src/mailbox-conf.c:949 src/mailbox-conf.c:1038
+# File: src/balsa-index-page.c, line: 293
+# File: src/mailbox-conf.c, line: 949
+# File: src/mailbox-conf.c, line: 1038
 msgid "Password:"
 msgstr "Συνθηματικό:"
-
-#: src/balsa-index-page.c:318
+#
+# File: src/balsa-index-page.c, line: 318
 msgid "Unable to Open Mailbox!"
 msgstr "Αδυναμία ανοίγματος γραμματοκιβωτίου!"
-
-#: src/balsa-index-page.c:571 src/filter-edit-dialog.c:224
+#
+# File: src/balsa-index-page.c, line: 572
+# File: src/filter-edit-dialog.c, line: 224
 msgid "New"
 msgstr "Νέο"
-
-#: src/balsa-index-page.c:579 src/main-window.c:329
+#
+# File: src/balsa-index-page.c, line: 580
+# File: src/main-window.c, line: 340
 msgid "Reply"
 msgstr "Απάντηση"
-
-#: src/balsa-index-page.c:587 src/main-window.c:332
+#
+# File: src/balsa-index-page.c, line: 588
+# File: src/main-window.c, line: 343
 msgid "Reply to all"
 msgstr "Απάντηση σε όλους"
-
-#: src/balsa-index-page.c:595 src/main-window.c:335
+#
+# File: src/balsa-index-page.c, line: 596
+# File: src/main-window.c, line: 346
 msgid "Forward"
 msgstr "Προώθηση"
-
-#: src/balsa-index-page.c:603 src/filter-edit-dialog.c:230
-#: src/main-window.c:322 src/pref-manager.c:1008
+#
+# File: src/balsa-index-page.c, line: 604
+# File: src/filter-edit-dialog.c, line: 230
+# File: src/main-window.c, line: 333
+# File: src/pref-manager.c, line: 1020
 msgid "Delete"
 msgstr "Διαγραφή"
-
-#: src/balsa-index-page.c:611
+#
+# File: src/balsa-index-page.c, line: 612
 msgid "Undelete"
 msgstr "Επαναφορά"
-
-#: src/balsa-index-page.c:619
+#
+# File: src/balsa-index-page.c, line: 620
 msgid "Transfer"
 msgstr "Μεταφορά"
-
-#: src/balsa-index.c:250
+#
+# File: src/balsa-index.c, line: 250
 msgid "From"
 msgstr "Από"
-
-#: src/balsa-index.c:251 src/filter-edit-dialog.c:351
+#
+# File: src/balsa-index.c, line: 251
+# File: src/filter-edit-dialog.c, line: 351
 msgid "Subject"
 msgstr "Θέμα"
-
-#: src/balsa-index.c:252
+#
+# File: src/balsa-index.c, line: 252
 msgid "Date"
 msgstr "Ημ/νία"
-
-#: src/balsa-message.c:165 src/balsa-message.c:169
+#
+# File: src/balsa-message.c, line: 166
+# File: src/balsa-message.c, line: 170
 msgid "Save MIME Part"
 msgstr "Αποθήκευση Τμήματος MIME"
-
-#: src/balsa-message.c:166 src/balsa-message.c:224
+#
+# File: src/balsa-message.c, line: 167
+# File: src/balsa-message.c, line: 225
 msgid "Save"
 msgstr "Αποθήκευση"
-
-#: src/balsa-message.c:166 src/balsa-message.c:224 src/mailbox-conf.c:629
-#: src/sendmsg-window.c:123 src/sendmsg-window.c:395 src/sendmsg-window.c:1051
-#: src/sendmsg-window.c:1327 src/sendmsg-window.c:1350
+#
+# File: src/balsa-message.c, line: 167
+# File: src/balsa-message.c, line: 225
+# File: src/mailbox-conf.c, line: 629
+# File: src/sendmsg-window.c, line: 125
+# File: src/sendmsg-window.c, line: 402
+# File: src/sendmsg-window.c, line: 1051
+# File: src/sendmsg-window.c, line: 1343
+# File: src/sendmsg-window.c, line: 1366
 msgid "Cancel"
 msgstr "Άκυρο"
-
-#: src/balsa-message.c:167 src/balsa-message.c:225
+#
+# File: src/balsa-message.c, line: 168
+# File: src/balsa-message.c, line: 226
 msgid "Please choose a filename to save this part of the message as:"
 msgstr "Παρακαλώ επιλέξτε όνομα αρχείου για αποθήκευση του τμήματος:"
-
-#: src/balsa-message.c:223 src/balsa-message.c:227
+#
+# File: src/balsa-message.c, line: 224
+# File: src/balsa-message.c, line: 228
 msgid "Save Text"
 msgstr "Αποθήκευση Κειμένου"
-
-#: src/balsa-message.c:298 src/balsa-message.c:313
+#
+# File: src/balsa-message.c, line: 299
+# File: src/balsa-message.c, line: 314
 #, c-format
 msgid " Open of %s failed:%s "
 msgstr "Αποτυχία ανοίγματος του %s:%s "
-
-#: src/balsa-message.c:299 src/balsa-message.c:314
+#
+# File: src/balsa-message.c, line: 300
+# File: src/balsa-message.c, line: 315
 msgid "Ok"
 msgstr "Εντάξει"
-
-#: src/balsa-message.c:623
+#
+# File: src/balsa-message.c, line: 624
 msgid "Date:"
 msgstr "Ημ/νία:"
-
+#
 #. From:
-#: src/balsa-message.c:627 src/filter-edit-dialog.c:339
-#: src/sendmsg-window.c:541
+# File: src/balsa-message.c, line: 628
+# File: src/filter-edit-dialog.c, line: 339
+# File: src/sendmsg-window.c, line: 556
 msgid "From:"
 msgstr "Από:"
-
+#
 #. To:
-#: src/balsa-message.c:631 src/filter-edit-dialog.c:327
-#: src/sendmsg-window.c:543
+# File: src/balsa-message.c, line: 632
+# File: src/filter-edit-dialog.c, line: 327
+# File: src/sendmsg-window.c, line: 558
 msgid "To:"
 msgstr "Πρός:"
-
-#: src/balsa-message.c:632
+#
+# File: src/balsa-message.c, line: 633
 msgid "Cc:"
 msgstr "Αντίγραφα:"
-
-#: src/balsa-message.c:633
+#
+# File: src/balsa-message.c, line: 634
 msgid "Bcc:"
 msgstr "Κρυφά αντίγραφα:"
-
-#: src/balsa-message.c:636
+#
+# File: src/balsa-message.c, line: 637
 msgid "Fcc:"
 msgstr "Αντίγραφα αρχείου:"
-
+#
 #. Subject:
-#: src/balsa-message.c:637 src/sendmsg-window.c:549
+# File: src/balsa-message.c, line: 638
+# File: src/sendmsg-window.c, line: 564
 msgid "Subject:"
 msgstr "Θέμα:"
-
-## NOTE: Keep "application/" in xlation, since it is part
-##       of formal (untranslatable) MIME type name.
-
-#: src/balsa-message.c:752
+#
+# # NOTE: Keep "application/" in xlation, since it is part
+# #       of formal (untranslatable) MIME type name.
+# File: src/balsa-message.c, line: 753
 msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
 msgstr ""
 "<tr><td bgcolor=\"#f0f0f0\"> Έχετε λάβει κωδικοποιημένο αρχείο τύπου "
 "εφαρμογής: application/"
-
-#: src/balsa-message.c:756
+#
+# File: src/balsa-message.c, line: 757
 msgid "<P>The parameters of this message are:<BR>"
 msgstr "<P>Οι παράμετροι του παρόντος μηνύματος είναι:<BR>"
-
-#: src/balsa-message.c:757
+#
+# File: src/balsa-message.c, line: 758
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
 msgstr "<table border=0><tr><th>Ιδιότητα</th><th>Τιμή</th></tr>\n"
-
-#: src/balsa-message.c:1152
+#
+# File: src/balsa-message.c, line: 1153
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Ανεπιτυχές άνοιγμα του %s. Κωδ. σφάλματος (errno) = %d, "
-
-#: src/filter-edit-dialog.c:136
+#
+# File: src/filter-edit-dialog.c, line: 136
 msgid "On"
 msgstr "Ενεργό"
-
-#: src/filter-edit-dialog.c:201
+#
+# File: src/filter-edit-dialog.c, line: 201
 msgid "Up"
 msgstr "Επάνω"
-
-#: src/filter-edit-dialog.c:207
+#
+# File: src/filter-edit-dialog.c, line: 207
 msgid "Down"
 msgstr "Κάτω"
-
-## NOTE: xlated this way to be consistent with xlation
-##       of "Match string:" message.
-
-#: src/filter-edit-dialog.c:273
+#
+# # NOTE: xlated this way to be consistent with xlation
+# #       of "Match string:" message.
+# File: src/filter-edit-dialog.c, line: 273
 msgid "Match in:"
 msgstr "Αναζήτηση σε:"
-
-#: src/filter-edit-dialog.c:291
+#
+# File: src/filter-edit-dialog.c, line: 291
 msgid "All"
 msgstr "Παντού"
-
-#: src/filter-edit-dialog.c:303
+#
+# File: src/filter-edit-dialog.c, line: 303
 msgid "Header"
 msgstr "Επικεφαλίδα"
-
-#: src/filter-edit-dialog.c:315
+#
+# File: src/filter-edit-dialog.c, line: 315
 msgid "Body"
 msgstr "Σώμα"
-
-## NOTE: (see previous note)
-
-#: src/filter-edit-dialog.c:364
+#
+# # NOTE: (see previous note)
+# File: src/filter-edit-dialog.c, line: 364
 msgid "Match string:"
 msgstr "Ακολουθία αναζήτησης:"
-
-#: src/filter-edit-dialog.c:416 src/mailbox-conf.c:278 src/mailbox-conf.c:1094
-#: src/pref-manager.c:995
+#
+# File: src/filter-edit-dialog.c, line: 416
+# File: src/mailbox-conf.c, line: 278
+# File: src/mailbox-conf.c, line: 1094
+# File: src/pref-manager.c, line: 1007
 msgid "Add"
 msgstr "Προσθήκη"
-
-#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:317
+#
+# File: src/filter-edit-dialog.c, line: 427
+# File: src/sendmsg-window.c, line: 324
 msgid "Remove"
 msgstr "Διαγραφή"
-
-#: src/filter-edit-dialog.c:456
+#
+# File: src/filter-edit-dialog.c, line: 456
 msgid "Command:"
 msgstr "Εντολή:"
-
+#
 #. The name entry
-#: src/filter-edit-dialog.c:492
+# File: src/filter-edit-dialog.c, line: 492
 msgid "Filter name:"
 msgstr "Όνομα φίλτρου:"
-
+#
 #. The "Process when:" option menu
-#: src/filter-edit-dialog.c:511
+# File: src/filter-edit-dialog.c, line: 511
 msgid "Process when:"
 msgstr "Επεξεργασία κατά:"
-
+#
 #. The "Run on:" option menu
-#: src/filter-edit-dialog.c:542
+# File: src/filter-edit-dialog.c, line: 542
 msgid "Run on:"
 msgstr "Εκτέλεση σε:"
-
+#
 #. the type notebook's option menu
-#: src/filter-edit-dialog.c:572
+# File: src/filter-edit-dialog.c, line: 572
 msgid "Search type:"
 msgstr "Τύπος αναζήτησης:"
-
+#
 #. The notification area
-#: src/filter-edit-dialog.c:628
+# File: src/filter-edit-dialog.c, line: 628
 msgid "Notification:"
 msgstr "Ειδοποίηση:"
-
+#
 #. Notification buttons
-#: src/filter-edit-dialog.c:637
+# File: src/filter-edit-dialog.c, line: 637
 msgid "Play sound:"
 msgstr "Ήχος:"
-
-#: src/filter-edit-dialog.c:645
+#
+# File: src/filter-edit-dialog.c, line: 645
 msgid "Use Sound..."
 msgstr "Χρήση Ήχου..."
-
-## FIX todo
-
-#: src/filter-edit-dialog.c:654
+#
+# # FIX todo
+# File: src/filter-edit-dialog.c, line: 654
 msgid "Popup text:"
-msgstr ""
-
+msgstr "Κείμενο:"
+#
 #. The action area
-#: src/filter-edit-dialog.c:673
+# File: src/filter-edit-dialog.c, line: 673
 msgid "Action to perform:"
 msgstr "Ενέργεια:"
-
+#
 #. The disposition area
-#: src/filter-edit-dialog.c:694
+# File: src/filter-edit-dialog.c, line: 694
 msgid "Disposition:"
 msgstr "Τοποθέτηση:"
-
-#: src/filter-edit-dialog.c:702
+#
+# File: src/filter-edit-dialog.c, line: 702
 msgid "Place/leave in default folder"
 msgstr "Τοποθέτηση στον εξ' ορισμού φάκελο"
-
-## FIX??
-
-#: src/filter-edit-dialog.c:707
+#
+# # FIX??
+# File: src/filter-edit-dialog.c, line: 707
 msgid "Do not place/leave in default folder"
 msgstr "Όχι τοποθέτηση στον εξ' ορισμού φάκελο"
-
-#: src/filter-edit-dialog.c:712
+#
+# File: src/filter-edit-dialog.c, line: 712
 msgid "Stop filtering here"
 msgstr "Τέλος φιλτραρίσματος εδώ"
-
-#: src/filter-edit-dialog.c:740
+#
+# File: src/filter-edit-dialog.c, line: 740
 msgid "Match"
 msgstr "Αναζήτηση"
-
-#: src/filter-edit-dialog.c:743
+#
+# File: src/filter-edit-dialog.c, line: 743
 msgid "Action"
 msgstr "Ενέργεια"
-
-#: src/filter-edit-dialog.c:757
+#
+# File: src/filter-edit-dialog.c, line: 757
 msgid "Revert"
 msgstr "Επαναφορά"
-
-#: src/filter-edit-dialog.c:785
+#
+# File: src/filter-edit-dialog.c, line: 785
 msgid "Balsa Filters"
 msgstr "Φίλτρα Balsa"
-
-#: src/local-mailbox.c:204
+#
+# File: src/local-mailbox.c, line: 204
 #, c-format
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr "Άνοιγμα Τοπικού Γραμ/κιβωτίου ως: %s\n"
-
-#: src/mailbox-conf.c:158
+#
+# File: src/mailbox-conf.c, line: 158
 msgid ""
 "This will remove the mailbox and it's files permanently from your system.\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
-"Πρόκειται να διαγράψετε μόνιμα το γραμ/κιβώτιο με τα περιεχόμενά του από το σύστημα.\n"
+"Πρόκειται να διαγράψετε μόνιμα το γραμ/κιβώτιο με τα περιεχόμενά του από το "
+"σύστημα.\n"
 "Είσαστε βεβέβαιοι ότι θέλετε να τα διαγράψετε;"
-
-#: src/mailbox-conf.c:163
+#
+# File: src/mailbox-conf.c, line: 163
 msgid ""
 "This will remove the mailbox from the list of mailboxes\n"
 "You may use \"Add Mailbox\" later to access this mailbox again\n"
@@ -362,624 +388,652 @@ msgstr ""
 "Πρόκειτε να διαγράψετε το γραμ/κιβώτιο απο τον κατάλογο γραμ/κιβωτίων.\n"
 "Μπορείτε να το προσθέσετε αργότερα με το  \"Νέο Γραμματοκιβώτιο\"\n"
 "Είσαστε βεβέβαιοι ότι θέλετε να το διαγράψετε;"
-
-#: src/mailbox-conf.c:191
+#
+# File: src/mailbox-conf.c, line: 191
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Ωχ! δε βρέθηκε γραμματοκιβώτιο στους κόμβους του balsa_app.mailbox;\n"
-
-#: src/mailbox-conf.c:235
+#
+# File: src/mailbox-conf.c, line: 235
 msgid "Mailbox Configurator"
 msgstr "Ρυθμίσεις Γραμματοκιβωτίου"
-
-#: src/mailbox-conf.c:288 src/mailbox-conf.c:1088
+#
+# File: src/mailbox-conf.c, line: 288
+# File: src/mailbox-conf.c, line: 1088
 msgid "Update"
 msgstr "Ενημέρωση"
-
-#: src/mailbox-conf.c:420
+#
+# File: src/mailbox-conf.c, line: 420
 msgid "You need to fill in the folderpath field."
 msgstr "Πρέπει να συμπληρώσετε το πεδίο διαδρομής φακέλου."
-
-#: src/mailbox-conf.c:424
+#
+# File: src/mailbox-conf.c, line: 424
 msgid "You need to fill in the IMAP Server field"
 msgstr "Πρέπει να συμπληρώσετε το πεδίο εξυπηρέτη IMAP"
-
-#: src/mailbox-conf.c:428
+#
+# File: src/mailbox-conf.c, line: 428
 msgid "You need to fill in the username field"
 msgstr "Πρέπει να συμπληρώσετε το πεδίο ονόματος χρήστη"
-
-#: src/mailbox-conf.c:432
+#
+# File: src/mailbox-conf.c, line: 432
 msgid "You need to fill in the password field"
 msgstr "Πρέπει να συμπληρώσετε το πεδίο συνθηματικού"
-
-#: src/mailbox-conf.c:436
+#
+# File: src/mailbox-conf.c, line: 436
 msgid "You need to fill in the port field"
 msgstr "Πρέπει να συμπληρώσετε το πεδίο θύρας"
-
-#: src/mailbox-conf.c:439
+#
+# File: src/mailbox-conf.c, line: 439
 msgid "All of the fields must be filled in"
 msgstr "Πρέπει να συμπληρώσετε όλα τα πεδία"
-
-#: src/mailbox-conf.c:446 src/mailbox-conf.c:459
+#
+# File: src/mailbox-conf.c, line: 446
+# File: src/mailbox-conf.c, line: 459
 msgid "You need to fill in the Mailbox Name field."
 msgstr "Πρέπει να συμπληρώσετε το πεδίο ονόματος γραμ/κιβωτίου"
-
-#: src/mailbox-conf.c:463
+#
+# File: src/mailbox-conf.c, line: 463
 msgid "You need to fill in the user field."
 msgstr "Πρέπει να συμπληρώσετε το πεδίο χρήστη."
-
-#: src/mailbox-conf.c:467
+#
+# File: src/mailbox-conf.c, line: 467
 msgid "You need to fill in the password field."
 msgstr "Πρέπει να συμπληρώσετε το πεδίο συνθηματικού."
-
-#: src/mailbox-conf.c:471
+#
+# File: src/mailbox-conf.c, line: 471
 msgid "You need to fill in the server field."
 msgstr "Πρέπει να συμπληρώσετε το πεδίο εξυπηρέτη."
-
-#: src/mailbox-conf.c:475
+#
+# File: src/mailbox-conf.c, line: 475
 msgid "You need to fill in the port field."
 msgstr "Πρέπει να συμπληρώσετε το πεδίο θύρας."
-
-#: src/mailbox-conf.c:479
+#
+# File: src/mailbox-conf.c, line: 479
 msgid "Some of the fields are blank."
 msgstr "Μερικά από τα πεδία είναι κενά."
-
-#: src/mailbox-conf.c:628
+#
+# File: src/mailbox-conf.c, line: 628
 #, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr "Αποτυχία δημιουργίας γραμ/κιβωτίου '%s': %s\n"
-
+#
 #. used to build a string: MAILBOXNAME " on " SERVERNAME
-#: src/mailbox-conf.c:693
+# File: src/mailbox-conf.c, line: 693
 msgid " on "
 msgstr " στο "
-
-#: src/mailbox-conf.c:805
+#
+# File: src/mailbox-conf.c, line: 805
 msgid "New mailbox type:"
 msgstr "Τύπος νέου γραμ/κιβωτίου:"
-
+#
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:811
+# File: src/mailbox-conf.c, line: 811
 msgid "Local mailbox"
 msgstr "Τοπικό"
-
-#: src/mailbox-conf.c:819
+#
+# File: src/mailbox-conf.c, line: 819
 msgid "IMAP server"
 msgstr "Εξυπηρέτης IMAP"
-
+#
 #. mailbox name
-#: src/mailbox-conf.c:842 src/mailbox-conf.c:877
+# File: src/mailbox-conf.c, line: 842
+# File: src/mailbox-conf.c, line: 877
 msgid "Mailbox Name:"
 msgstr "Όνομα Γραμ/κιβωτίου:"
-
+#
 #. path to file
-#: src/mailbox-conf.c:852
+# File: src/mailbox-conf.c, line: 852
 msgid "Mailbox path:"
 msgstr "Διαδρομή Γραμ/κιβωτίου:"
-
+#
 #. pop server
-#: src/mailbox-conf.c:894 src/mailbox-conf.c:994
+# File: src/mailbox-conf.c, line: 894
+# File: src/mailbox-conf.c, line: 994
 msgid "Server:"
 msgstr "Εξυπηρέτης:"
-
+#
 #. pop port
-#: src/mailbox-conf.c:913 src/mailbox-conf.c:1008
+# File: src/mailbox-conf.c, line: 913
+# File: src/mailbox-conf.c, line: 1008
 msgid "Port:"
 msgstr "Θύρα:"
-
+#
 #. username
-#: src/mailbox-conf.c:932 src/mailbox-conf.c:1023
+# File: src/mailbox-conf.c, line: 932
+# File: src/mailbox-conf.c, line: 1023
 msgid "Username:"
 msgstr "Όνομα χρήστη:"
-
+#
 #. toggle for check
-#: src/mailbox-conf.c:964 src/main-window.c:318
+# File: src/mailbox-conf.c, line: 964
+# File: src/main-window.c, line: 329
 msgid "Check"
 msgstr "Έλεγχος"
-
+#
 #. toggle for deletion from server
-#: src/mailbox-conf.c:972
+# File: src/mailbox-conf.c, line: 972
 msgid "Delete from server"
 msgstr "Διαγραφή από εξυπηρέτη"
-
-#: src/mailbox-conf.c:1051
+#
+# File: src/mailbox-conf.c, line: 1051
 msgid "Folder path:"
 msgstr "Διαδρομή φακέλου:"
-
-#: src/mailbox-conf.c:1129
+#
+# File: src/mailbox-conf.c, line: 1129
 msgid "Mailbox"
 msgstr "Γραμ/κιβώτιο"
-
-#: src/main-window.c:159
+#
+# File: src/main-window.c, line: 161
 msgid "_Get new mail"
 msgstr "_Λήψη νέων μηνυμάτων"
-
-#: src/main-window.c:159
+#
+# File: src/main-window.c, line: 161
 msgid "Fetch new incoming mail"
 msgstr "Λήψη νέων εισερχομένων μηνυμάτων"
-
-#: src/main-window.c:165
+#
+# File: src/main-window.c, line: 167
 msgid "Opens the address book"
 msgstr "Άνοιγμα διευθυνσιολογίου"
-
-#: src/main-window.c:172
+#
+# File: src/main-window.c, line: 174
 msgid "Pr_int"
 msgstr "Εκτύ_πωση"
-
-#: src/main-window.c:172
+#
+# File: src/main-window.c, line: 174
 msgid "Print current mail"
 msgstr "Εκτύπωση παρόντος μηνύματς"
-
-#: src/main-window.c:197
+#
+# File: src/main-window.c, line: 199
 msgid "N_o headers"
 msgstr "_Καμία επικεφαλίδα"
-
-#: src/main-window.c:199
+#
+# File: src/main-window.c, line: 201
 msgid "_Selected headers"
 msgstr "Επι_λεγμένες επικεφαλίδες"
-
-#: src/main-window.c:201
+#
+# File: src/main-window.c, line: 203
 msgid "All _headers"
 msgstr "Πλή_ρεις επικεφαλίδες"
-
-#: src/main-window.c:210
+#
+# File: src/main-window.c, line: 212
 msgid "_New"
 msgstr "_Νέο"
-
-#: src/main-window.c:210
+#
+# File: src/main-window.c, line: 212
 msgid "Compose a new message"
 msgstr "Σύνθεση νέου μηνύματος"
-
-#: src/main-window.c:216 src/message-window.c:54
+#
+# File: src/main-window.c, line: 218
+# File: src/message-window.c, line: 54
 msgid "_Reply"
 msgstr "_Απάντηση"
-
-#: src/main-window.c:216
+#
+# File: src/main-window.c, line: 218
 msgid "Reply to the current message"
 msgstr "Απάντηση στο παρόν μήνυμα"
-
-#: src/main-window.c:222 src/message-window.c:60
+#
+# File: src/main-window.c, line: 224
+# File: src/message-window.c, line: 60
 msgid "Reply to _all"
 msgstr "Απάντηση σε ό_λους"
-
-#: src/main-window.c:223
+#
+# File: src/main-window.c, line: 225
 msgid "Reply to all recipients of the current message"
 msgstr "Απάντηση σε όλους τους αποδέκτες του παρόντος μηνύματος"
-
-#: src/main-window.c:229 src/message-window.c:67
+#
+# File: src/main-window.c, line: 231
+# File: src/message-window.c, line: 67
 msgid "_Forward"
 msgstr "_Προώθηση"
-
-#: src/main-window.c:229
+#
+# File: src/main-window.c, line: 231
 msgid "Forward the current message"
 msgstr "Προώθηση του παρόντος μηνύματος"
-
-#: src/main-window.c:235
+#
+# File: src/main-window.c, line: 237
 msgid "_Continue"
 msgstr "_Συνέχεια"
-
-#: src/main-window.c:235
+#
+# File: src/main-window.c, line: 237
 msgid "Continue editing current message"
 msgstr "Συνέχεια διόρθωσης του παρόντος μηνύματος"
-
-#: src/main-window.c:242 src/main-window.c:277
+#
+# File: src/main-window.c, line: 244
+# File: src/main-window.c, line: 279
 msgid "_Delete"
 msgstr "_Διαγραφή"
-
-#: src/main-window.c:242
+#
+# File: src/main-window.c, line: 244
 msgid "Delete the current message"
 msgstr "Διαγραφή παρόντος μηνύματος"
-
-#: src/main-window.c:248
+#
+# File: src/main-window.c, line: 250
 msgid "_Undelete"
 msgstr "Επα_ναφορά"
-
-#: src/main-window.c:248
+#
+# File: src/main-window.c, line: 250
 msgid "Undelete the message"
 msgstr "Επαναφορά διαγεγραμμένου μηνύματος"
-
-#: src/main-window.c:254
+#
+# File: src/main-window.c, line: 256
 msgid "_Wrap"
 msgstr "Αλλα_γή σειράς"
-
-#: src/main-window.c:269
+#
+# File: src/main-window.c, line: 271
 msgid "List"
 msgstr "Κατάλογος"
-
-#: src/main-window.c:273
+#
+# File: src/main-window.c, line: 275
 msgid "_Add"
 msgstr "_Νέο"
-
-#: src/main-window.c:273
+#
+# File: src/main-window.c, line: 275
 msgid "Add a new mailbox"
 msgstr "Προσθήκη νέου γραμματοκιβωτίου"
-
-#: src/main-window.c:275
+#
+# File: src/main-window.c, line: 277
 msgid "_Edit"
 msgstr "_Διόρθωση"
-
-#: src/main-window.c:275
+#
+# File: src/main-window.c, line: 277
 msgid "Edit the selected mailbox"
 msgstr "Διόρθωση επιλεγμένου γραμματοκιβωτίου"
-
-#: src/main-window.c:277
+#
+# File: src/main-window.c, line: 279
 msgid "Delete the selected mailbox"
 msgstr "Διαγραφή επιλεγμένου γραμματοκιβωτίου"
-
-#: src/main-window.c:280
+#
+# File: src/main-window.c, line: 282
 msgid "Co_mmit current"
 msgstr "Κατα_χώρηση παρόντος"
-
-#: src/main-window.c:280
+#
+# File: src/main-window.c, line: 282
 msgid "Commit the changes in the currently opened mailbox"
 msgstr "Καταχώρηση αλλαγών στο τρέχον ανοιχτό γραμ/κιβώτιο"
-
-#: src/main-window.c:282
+#
+# File: src/main-window.c, line: 284
 msgid "_Close"
 msgstr "_Κλείσιμο"
-
-#: src/main-window.c:282
+#
+# File: src/main-window.c, line: 284
 msgid "Close mailbox"
 msgstr "Κλείσιμο γραμματοκιβωτίου"
-
-#: src/main-window.c:285
+#
+# File: src/main-window.c, line: 287
 msgid "Empty _Trash"
 msgstr "Άδειασμα Απορριμά_των"
-
-#: src/main-window.c:285
+#
+# File: src/main-window.c, line: 287
 msgid "Delete Messages from the trash mailbox"
 msgstr "Διαγραφή μηνυμάτων από το γραμ/κιβώτιο απορριμάτων"
-
-#: src/main-window.c:291
+#
+# File: src/main-window.c, line: 293
 msgid "_Filters..."
 msgstr "_Φίλτρα"
-
-#: src/main-window.c:291
+#
+# File: src/main-window.c, line: 293
 msgid "Manage filters"
 msgstr "Διαχείριση φίλτρων"
-
-#: src/main-window.c:309
+#
+# File: src/main-window.c, line: 302
+msgid "_Show mailbox tree"
+msgstr "_Εμφάνιση δέντρου γραμματοκιβωτίου"
+#
+# File: src/main-window.c, line: 305
+msgid "Show mailbox _tabs"
+msgstr "Εμφάνιση ό_ψεων γραμματοκιβωτίου"
+#
+# File: src/main-window.c, line: 320
 msgid "_Message"
 msgstr "_Μήνυμα"
-
-#: src/main-window.c:310
+#
+# File: src/main-window.c, line: 321
 msgid "Mail_boxes"
 msgstr "Γ_ραμματοκιβώτια"
-
-#: src/main-window.c:318
+#
+# File: src/main-window.c, line: 329
 msgid "Check Email"
 msgstr "Έλεγχος Μηνυμάτων"
-
-#: src/main-window.c:322
+#
+# File: src/main-window.c, line: 333
 msgid "Delete Message"
 msgstr "Διαγραφή Μηνύματος"
-
-#: src/main-window.c:326
+#
+# File: src/main-window.c, line: 337
 msgid "Compose"
 msgstr "Σύνθεση"
-
-#: src/main-window.c:326
+#
+# File: src/main-window.c, line: 337
 msgid "Compose Message"
 msgstr "Σύνθεση Μηνύματος"
-
-#: src/main-window.c:338
+#
+# File: src/main-window.c, line: 349
 msgid "Continue"
 msgstr "Συνέχεια"
-
-#: src/main-window.c:343
+#
+# File: src/main-window.c, line: 354
 msgid "Previous"
 msgstr "Προηγ."
-
-#: src/main-window.c:343
+#
+# File: src/main-window.c, line: 354
 msgid "Open Previous message"
 msgstr "Άνοιγμα προηγούμενου μηνύματος"
-
-#: src/main-window.c:348
+#
+# File: src/main-window.c, line: 359
 msgid "Next"
 msgstr "Επόμενο"
-
-#: src/main-window.c:348
+#
+# File: src/main-window.c, line: 359
 msgid "Open Next message"
 msgstr "Άνοιγμα επόμενου μηνύματος"
-
-#: src/main-window.c:353 src/print.c:82 src/sendmsg-window.c:120
-#: src/sendmsg-window.c:148
+#
+# File: src/main-window.c, line: 364
+# File: src/print.c, line: 82
+# File: src/sendmsg-window.c, line: 122
+# File: src/sendmsg-window.c, line: 150
 msgid "Print"
 msgstr "Εκτύπωση"
-
-#: src/main-window.c:353
+#
+# File: src/main-window.c, line: 364
 msgid "Print current message"
 msgstr "Εκτύπωση παρόντος μηνύματος"
-
-#: src/main-window.c:798
+#
+# File: src/main-window.c, line: 821
 msgid "Copyright (C) 1997-1999"
 msgstr "Πνευματικά δικαιώματα (C) 1997-1999"
-
-#: src/main-window.c:800
+#
+# File: src/main-window.c, line: 823
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
 "\n"
 "If you need to report bugs, please do so at: http://bugs.gnome.org/"
 msgstr ""
-"Ο πελάτης ηλ. ταχυδρομείου Balsa είναι μέρος του περιβάλλοντος εργασίας GNOME.  "
-"Πληροφορίες για το Balsa υπάρχουν στο http://www.balsa.net/\n"
+"Ο πελάτης ηλ. ταχυδρομείου Balsa είναι μέρος του περιβάλλοντος εργασίας "
+"GNOME.  Πληροφορίες για το Balsa υπάρχουν στο http://www.balsa.net/\n"
 "\n"
 "Παρακαλώ αναφέρατε τυχόν σφαλμάτα στο: http://bugs.gnome.org/"
-
-#: src/main.c:101
+#
+# File: src/main.c, line: 101
 msgid "Get new mail on startup"
 msgstr "Λήψη νέων μηνυμάτων κατά την εκκίνηση"
-
-#: src/main.c:102
+#
+# File: src/main.c, line: 102
 msgid "Compose a new email to EMAIL@ADRESS"
 msgstr "Σύνθεση νέου μηνύματος προς ΠΑΡΑΛΗΠΤΗ@ΔΙΕΥΘΥΝΣΗ"
-
-#: src/main.c:103
+#
+# File: src/main.c, line: 103
 msgid "Opens MAILBOXNAME"
 msgstr "Άνοιγμα ΓΡΑΜΜΑΤΟΚΙΒΩΤΙΟΥ"
-
-#: src/main.c:103
+#
+# File: src/main.c, line: 103
 msgid "MAILBOXNAME"
 msgstr "ΓΡΑΜΜΑΤΟΚΙΒΩΤΙΟ"
-
-#: src/main.c:104
+#
+# File: src/main.c, line: 104
 msgid "Opens first unread mailbox"
 msgstr "Άνοιγμα πρώτου αδιάβαστου γραμ/κιβωτίου"
-
-#: src/mblist-window.c:376
+#
+# File: src/mblist-window.c, line: 375
 msgid "Open Mailbox"
 msgstr "Άνοιγμα Γραμ/κιβωτίου"
-
-#: src/mblist-window.c:382
+#
+# File: src/mblist-window.c, line: 381
 msgid "Close Mailbox"
 msgstr "Κλείσιμο Γραμ/κιβωτίου"
-
-#: src/mblist-window.c:389
+#
+# File: src/mblist-window.c, line: 388
 msgid "Add New Mailbox"
 msgstr "Νέο Γραμ/κιβώτιο"
-
-#: src/mblist-window.c:397
+#
+# File: src/mblist-window.c, line: 396
 msgid "Edit Mailbox Properties"
 msgstr "Ιδιότητες Γραμ/κιβωτίου"
-
-#: src/mblist-window.c:403
+#
+# File: src/mblist-window.c, line: 402
 msgid "Delete Mailbox"
 msgstr "Διαγραφή Γραμ/κιβωτίου"
-
-#: src/mblist-window.c:430 src/mblist-window.c:446 src/mblist-window.c:464
-#: src/mblist-window.c:479
+#
+# File: src/mblist-window.c, line: 429
+# File: src/mblist-window.c, line: 445
+# File: src/mblist-window.c, line: 463
+# File: src/mblist-window.c, line: 478
 msgid "No mailbox selected."
 msgstr "Δεν έχει επιλεχθεί γραμ/κιβώτιο."
-
-#: src/message-window.c:54
+#
+# File: src/message-window.c, line: 54
 msgid "Reply to this message"
 msgstr "Απάντηση στο παρόν μήνυμα"
-
-#: src/message-window.c:61
+#
+# File: src/message-window.c, line: 61
 msgid "Reply to all recipients of this message"
 msgstr "Απάντηση σε όλους τους παραλήπτες του μηνύματος"
-
-#: src/message-window.c:67
+#
+# File: src/message-window.c, line: 67
 msgid "Forward this message"
 msgstr "Προώθηση παρόντος μηνύματος"
-
-#: src/pref-manager.c:123
+#
+# File: src/pref-manager.c, line: 126
 msgid "Text"
 msgstr "Κείμενο"
-
-#: src/pref-manager.c:124
+#
+# File: src/pref-manager.c, line: 127
 msgid "Icons"
 msgstr "Εικονίδια"
-
-#: src/pref-manager.c:125
+#
+# File: src/pref-manager.c, line: 128
 msgid "Both"
 msgstr "Και τα δύο"
-
-#: src/pref-manager.c:137
+#
+# File: src/pref-manager.c, line: 140
 msgid "7bits"
 msgstr "7 bit"
-
-#: src/pref-manager.c:138
+#
+# File: src/pref-manager.c, line: 141
 msgid "8bits"
 msgstr "8 bit"
-
-## FIX todo
-
-#: src/pref-manager.c:139
+#
+# # FIX todo
+# File: src/pref-manager.c, line: 142
 msgid "quoted"
-msgstr ""
-
-#: src/pref-manager.c:151
+msgstr "εισαγώμενο"
+#
+# File: src/pref-manager.c, line: 154
 msgid "While Retrieving Messages"
 msgstr "Κατά τη Λήψη Μηνυμάτων"
-
-#: src/pref-manager.c:152
+#
+# File: src/pref-manager.c, line: 155
 msgid "Until Closed"
 msgstr "Μέχρι Κλείσιμο"
-
-#: src/pref-manager.c:153
+#
+# File: src/pref-manager.c, line: 156
 msgid "Never"
 msgstr "Ποτέ"
-
-#: src/pref-manager.c:187
+#
+# File: src/pref-manager.c, line: 190
 msgid "Balsa Preferences"
 msgstr "Ρυθμίσεις Balsa"
-
-#: src/pref-manager.c:265 src/pref-manager.c:775
+#
+# File: src/pref-manager.c, line: 268
+# File: src/pref-manager.c, line: 787
 msgid "Identity"
 msgstr "Ταυτότητα"
-
-#: src/pref-manager.c:274 src/pref-manager.c:845 src/pref-manager.c:923
+#
+# File: src/pref-manager.c, line: 277
+# File: src/pref-manager.c, line: 857
+# File: src/pref-manager.c, line: 935
 msgid "Signature"
 msgstr "Υπογραφή"
-
-#: src/pref-manager.c:282
+#
+# File: src/pref-manager.c, line: 285
 msgid "Mail Servers"
 msgstr "Εξυπηρέτες Ταχ/μείου"
-
-#: src/pref-manager.c:290
+#
+# File: src/pref-manager.c, line: 293
 msgid "Mail Options"
 msgstr "Επιλογές Μηνυμάτων"
-
-#: src/pref-manager.c:298 src/pref-manager.c:1345
+#
+# File: src/pref-manager.c, line: 301
+# File: src/pref-manager.c, line: 1357
 msgid "Display"
 msgstr "Εμφάνιση"
-
-#: src/pref-manager.c:306 src/pref-manager.c:1370 src/pref-manager.c:1415
+#
+# File: src/pref-manager.c, line: 309
+# File: src/pref-manager.c, line: 1382
+# File: src/pref-manager.c, line: 1427
 msgid "Printing"
 msgstr "Εκτύπωση"
-
-#: src/pref-manager.c:314 src/pref-manager.c:1456 src/pref-manager.c:1474
+#
+# File: src/pref-manager.c, line: 317
+# File: src/pref-manager.c, line: 1468
+# File: src/pref-manager.c, line: 1486
 msgid "Encoding"
 msgstr "Κωδικοποίηση"
-
-#: src/pref-manager.c:322 src/pref-manager.c:1498
+#
+# File: src/pref-manager.c, line: 325
+# File: src/pref-manager.c, line: 1513
 msgid "Misc"
 msgstr "Διάφορα"
-
-#: src/pref-manager.c:330
+#
+# File: src/pref-manager.c, line: 333
 msgid "Startup"
 msgstr "Εκκίνηση"
-
-#: src/pref-manager.c:799
+#
+# File: src/pref-manager.c, line: 811
 msgid "Your name:"
 msgstr "Το όνομά σας:"
-
-#: src/pref-manager.c:806
+#
+# File: src/pref-manager.c, line: 818
 msgid "E-mail address:"
 msgstr "Διεύθυνση αποστολέα:"
-
-#: src/pref-manager.c:812
+#
+# File: src/pref-manager.c, line: 824
 msgid "Reply-to address:"
 msgstr "Διεύθυνση απαντήσεων:"
-
-#: src/pref-manager.c:857
+#
+# File: src/pref-manager.c, line: 869
 msgid "Select your signature file"
 msgstr "Επιλέξτε αρχείο υπογραφής"
-
-#: src/pref-manager.c:867
+#
+# File: src/pref-manager.c, line: 879
 msgid "sending mail"
 msgstr "αποστολή μηνυμάτων"
-
-#: src/pref-manager.c:873
+#
+# File: src/pref-manager.c, line: 885
 msgid "replying to mail"
 msgstr "απάντηση σε μηνύματα"
-
-#: src/pref-manager.c:879
+#
+# File: src/pref-manager.c, line: 891
 msgid "forwarding mail"
 msgstr "προώθηση μηνυμάτων"
-
-#: src/pref-manager.c:894
+#
+# File: src/pref-manager.c, line: 906
 msgid ">"
 msgstr ">"
-
-#: src/pref-manager.c:896
+#
+# File: src/pref-manager.c, line: 908
 msgid "Signature file:"
 msgstr "Αρχείο υπογραφής:"
-
-#: src/pref-manager.c:903
+#
+# File: src/pref-manager.c, line: 915
 msgid "Reply prefix:"
 msgstr "Πρόθεμα απάντησης:"
-
-#: src/pref-manager.c:910
+#
+# File: src/pref-manager.c, line: 922
 msgid "Use signature file when:"
 msgstr "Χρήση υπογραφής όταν:"
-
-#: src/pref-manager.c:917
+#
+# File: src/pref-manager.c, line: 929
 msgid "enable signature separator"
 msgstr "χρήση διαχωριστικού υπογραφής"
-
-## NOTE: skip "remote" for brevity
-
-#: src/pref-manager.c:954
+#
+# # NOTE: skip "remote" for brevity
+# File: src/pref-manager.c, line: 966
 msgid "Remote Malibox Servers"
 msgstr "Εξυπηρέτες Γραμ/κιβωτίων"
-
-#: src/pref-manager.c:979
+#
+# File: src/pref-manager.c, line: 991
 msgid "Type"
 msgstr "Τύπος"
-
-#: src/pref-manager.c:983
+#
+# File: src/pref-manager.c, line: 995
 msgid "Mailbox name"
 msgstr "Όνομα γραμ/κιβωτίου"
-
-#: src/pref-manager.c:1002
+#
+# File: src/pref-manager.c, line: 1014
 msgid "Modify"
 msgstr "Τροποποίηση"
-
-#: src/pref-manager.c:1014
+#
+# File: src/pref-manager.c, line: 1026
 msgid "Local mail"
 msgstr "Τοπικά μηνύματα"
-
-#: src/pref-manager.c:1029
+#
+# File: src/pref-manager.c, line: 1041
 msgid "Select your local mail directory"
 msgstr "Επιλέξετε τον τοπικό κατάλογο μηνυμάτων"
-
-#: src/pref-manager.c:1039
+#
+# File: src/pref-manager.c, line: 1051
 msgid "Outgoing mail"
 msgstr "Εξερχόμενα μηνύματα"
-
-## NOTE: skip "remote" for brevity (also above)
-
-#: src/pref-manager.c:1058
+#
+# # NOTE: skip "remote" for brevity (also above)
+# File: src/pref-manager.c, line: 1070
 msgid "Remote SMTP Server"
 msgstr "Εξυπηρέτης SMTP"
-
-## FIX??
-
-#: src/pref-manager.c:1065
+#
+# # FIX??
+# File: src/pref-manager.c, line: 1077
 msgid "Local mail user agent"
 msgstr "Τοπικός πράκτορας ταχ/μείου"
-
-#: src/pref-manager.c:1094
+#
+# File: src/pref-manager.c, line: 1106
 msgid "Incoming"
 msgstr "Εισερχόμενα"
-
-#: src/pref-manager.c:1098
+#
+# File: src/pref-manager.c, line: 1110
 msgid "Outgoing"
 msgstr "Εξερχόμενα"
-
-#: src/pref-manager.c:1117
+#
+# File: src/pref-manager.c, line: 1129
 msgid "Checking"
 msgstr "Έλεγχος"
-
-#: src/pref-manager.c:1127
+#
+# File: src/pref-manager.c, line: 1139
 msgid "Minutes"
 msgstr "Λεπτά"
-
-#: src/pref-manager.c:1141
+#
+# File: src/pref-manager.c, line: 1153
 msgid "Check mail automatically every:"
 msgstr "Αυτόματος έλεγχος νέων μηνυμάτων κάθε:"
-
-#: src/pref-manager.c:1164
+#
+# File: src/pref-manager.c, line: 1176
 msgid "Word Wrap"
 msgstr "Αλλαγή Γραμμής"
-
-#: src/pref-manager.c:1175
+#
+# File: src/pref-manager.c, line: 1187
 msgid "Wrap Outgoing Text at:"
 msgstr "Αλλαγή Γραμμής Κειμένου σε:"
-
-#: src/pref-manager.c:1190
+#
+# File: src/pref-manager.c, line: 1202
 msgid "Characters"
 msgstr "Χαρακτήρες"
-
-#: src/pref-manager.c:1196
+#
+# File: src/pref-manager.c, line: 1208
 msgid "Other options"
 msgstr "Λοιπές επιλογές"
-
-#: src/pref-manager.c:1207
+#
+# File: src/pref-manager.c, line: 1219
 msgid "Default Bcc to:"
 msgstr "Εξ' ορισμού κρυφό αντιγρ. προς:"
-
-#: src/pref-manager.c:1244
+#
+# File: src/pref-manager.c, line: 1256
 msgid "Main window"
 msgstr "Κυρίως παράθυρο"
-
-#: src/pref-manager.c:1252
+#
+# File: src/pref-manager.c, line: 1264
 msgid "use preview pane"
 msgstr "χρήση φύλλου προεπισκόπησης"
-
+#
 #.
 #. * This is not ready, yet!
 #. *
@@ -988,83 +1042,93 @@ msgstr "χρήση φύλλου προεπισκόπησης"
 #. * pawels: is replaced by the code connected to "selected headers" field
 #. * below. To be removed.
 #.
-#: src/pref-manager.c:1265
+# File: src/pref-manager.c, line: 1277
 msgid "View all headers"
 msgstr "Εμφάνιση πλήρων επικεφαλίδων"
-
-#: src/pref-manager.c:1271
+#
+# File: src/pref-manager.c, line: 1283
 msgid "Show mailbox statistics in left pane"
 msgstr "Στατιστικά γραμ/κιβωτίου στο αριστερό φύλλο"
-
-#: src/pref-manager.c:1278
+#
+# File: src/pref-manager.c, line: 1290
 msgid "Toolbars"
 msgstr "Γραμμές Εργ."
-
-#: src/pref-manager.c:1295
+#
+# File: src/pref-manager.c, line: 1307
 msgid "Display progress dialog"
 msgstr "Εμφάνιση διαλόγου προόδου"
-
-#: src/pref-manager.c:1303
+#
+# File: src/pref-manager.c, line: 1315
 msgid "Display Formats"
 msgstr "Μορφές Εμφάνισης"
-
-#: src/pref-manager.c:1310
+#
+# File: src/pref-manager.c, line: 1322
 msgid "Date encoding (for strftime):"
 msgstr "Γραφή ημ/νίας (για το strftime):"
-
-#: src/pref-manager.c:1322
+#
+# File: src/pref-manager.c, line: 1334
 msgid "Selected headers:"
 msgstr "Επιλεγμένες επικεφαλίδες:"
-
-#: src/pref-manager.c:1398
+#
+# File: src/pref-manager.c, line: 1410
 msgid "characters"
 msgstr "χαρακτήρες"
-
-#: src/pref-manager.c:1402
+#
+# File: src/pref-manager.c, line: 1414
 msgid "Print command:"
 msgstr "Εντολή εκτύπωσης:"
-
-#: src/pref-manager.c:1408
+#
+# File: src/pref-manager.c, line: 1420
 msgid "Break line at:"
 msgstr "Αλλαγή γραμμής σε:"
-
-#: src/pref-manager.c:1442
+#
+# File: src/pref-manager.c, line: 1454
 msgid "Charset"
 msgstr "Σύνολο χαρακτήων"
-
-#: src/pref-manager.c:1508
+#
+# File: src/pref-manager.c, line: 1523
 msgid "Debug"
 msgstr "Αποσφαλμάτωση"
-
-#: src/pref-manager.c:1512
+#
+# File: src/pref-manager.c, line: 1527
 msgid "Empty trash on exit"
 msgstr "Άδειασμα απορριμάτων κατά την έξοδο"
-
-#: src/pref-manager.c:1516
+#
+# File: src/pref-manager.c, line: 1531
 msgid "Font"
 msgstr "Γραμματοσειρά"
-
-#: src/pref-manager.c:1544
+#
+# File: src/pref-manager.c, line: 1559
 msgid "Select a font to use"
 msgstr "Επιλογή γραμματοσειράς"
-
-#: src/pref-manager.c:1548
+#
+# File: src/pref-manager.c, line: 1563
 msgid "Browse..."
 msgstr "Εξερεύνηση..."
-
-#: src/pref-manager.c:1553
+#
+# File: src/pref-manager.c, line: 1568
 msgid "Preview pane"
 msgstr "Φύλλο προεπισκόπισης"
-
-#: src/pref-manager.c:1573
+#
+#. mblist unread colour
+# File: src/pref-manager.c, line: 1576
+msgid "Colors"
+msgstr "Χρώματα"
+#
+# File: src/pref-manager.c, line: 1585
+# File: src/pref-manager.c, line: 1593
+msgid "Mailbox with unread messages colour"
+msgstr "Χρώμα γραμματοκιβωτίου με αδιάβαστα μηνύματα"
+#
+# File: src/pref-manager.c, line: 1614
 msgid "Options"
 msgstr "Επιλογές"
-
-#: src/pref-manager.c:1583
+#
+# File: src/pref-manager.c, line: 1624
 msgid "Check mail upon startup"
 msgstr "Έλεγχος μηνυμάτων κατά την εκκίνηση"
-
-#: src/print.c:95
+#
+# File: src/print.c, line: 95
 #, c-format
 msgid ""
 "Enter print command below\n"
@@ -1072,289 +1136,311 @@ msgid ""
 msgstr ""
 "Δώστε εντολή εκτύπωσης\n"
 "Μην ξεχάσετε το '%s'"
-
-#: src/print.c:103
+#
+# File: src/print.c, line: 103
 msgid "Print Command:"
 msgstr "Εντολή Εκτύπωσης:"
-
-#: src/sendmsg-window.c:104
+#
+# File: src/sendmsg-window.c, line: 106
 msgid "Send"
 msgstr "Αποστολή"
-
-#: src/sendmsg-window.c:104
+#
+# File: src/sendmsg-window.c, line: 106
 msgid "Send this mail"
 msgstr "Αποστολή παρόντος μηνύματος"
-
-#: src/sendmsg-window.c:108
+#
+# File: src/sendmsg-window.c, line: 110
 msgid "Attach"
 msgstr "Επισύναψη"
-
-#: src/sendmsg-window.c:108
+#
+# File: src/sendmsg-window.c, line: 110
 msgid "Add attachments to this message"
 msgstr "Προσθήκη συννημένων αρχείων στο παρόν μήνυμα"
-
-#: src/sendmsg-window.c:112
+#
+# File: src/sendmsg-window.c, line: 114
 msgid "Postpone"
 msgstr "Αναβολή"
-
-#: src/sendmsg-window.c:112
+#
+# File: src/sendmsg-window.c, line: 114
 msgid "Continue this message later"
 msgstr "Συνέχεια παρόντος μηνύματος αργότερα"
-
-#: src/sendmsg-window.c:116
+#
+# File: src/sendmsg-window.c, line: 118
 msgid "Spelling"
 msgstr "Ορθογραφία"
-
-#: src/sendmsg-window.c:116
+#
+# File: src/sendmsg-window.c, line: 118
 msgid "Check Spelling"
 msgstr "Έλεγχος Ορθογραφίας"
-
-#: src/sendmsg-window.c:131
+#
+# File: src/sendmsg-window.c, line: 133
 msgid "_Include File..."
 msgstr "Συμπερί_ληψη αρχείου"
-
-#: src/sendmsg-window.c:135
+#
+# File: src/sendmsg-window.c, line: 137
 msgid "_Attach file..."
 msgstr "Επισύνα_ψη αρχείου..."
-
-#: src/sendmsg-window.c:140
+#
+# File: src/sendmsg-window.c, line: 142
 msgid "_Send"
 msgstr "Απο_στολή"
-
-#: src/sendmsg-window.c:140
+#
+# File: src/sendmsg-window.c, line: 142
 msgid "Send the currently edited message"
 msgstr "Αποστολή παρόντος μηνύματος"
-
-#: src/sendmsg-window.c:144
+#
+# File: src/sendmsg-window.c, line: 146
 msgid "_Postpone"
 msgstr "Ανα_βολή"
-
-#: src/sendmsg-window.c:148
+#
+# File: src/sendmsg-window.c, line: 150
 msgid "Print the edited message"
 msgstr "Εκτύπωση παρόντος μηνύματος"
-
-#: src/sendmsg-window.c:166
+#
+# File: src/sendmsg-window.c, line: 168
 msgid "_Wrap body"
 msgstr "Α_λλαγή γραμμής"
-
-#: src/sendmsg-window.c:166
+#
+# File: src/sendmsg-window.c, line: 168
 msgid "Wrap message lines"
 msgstr "Αυτόματη αλλαγή γραμμών στο κείμενο"
-
-#: src/sendmsg-window.c:170
+#
+# File: src/sendmsg-window.c, line: 172
 msgid "_Reflow paragraph"
 msgstr "Μορ_φοποίηση παραγράφου"
-
-#: src/sendmsg-window.c:173
+#
+# File: src/sendmsg-window.c, line: 175
 msgid "R_eflow message"
 msgstr "Μορφοποίη_ση μηνύματος"
-
-#: src/sendmsg-window.c:182
+#
+# File: src/sendmsg-window.c, line: 184
 msgid "Fr_om"
 msgstr "_Από"
-
-#: src/sendmsg-window.c:184
+#
+# File: src/sendmsg-window.c, line: 186
 msgid "_To"
 msgstr "_Πρός"
-
-#: src/sendmsg-window.c:186
+#
+# File: src/sendmsg-window.c, line: 188
 msgid "_Subject"
 msgstr "_Θέμα"
-
-#: src/sendmsg-window.c:188
+#
+# File: src/sendmsg-window.c, line: 190
 msgid "_Cc"
 msgstr "Α_ντίγραφα"
-
-#: src/sendmsg-window.c:190
+#
+# File: src/sendmsg-window.c, line: 192
 msgid "_Bcc"
 msgstr "Κ_ρυφά αντίγραφα"
-
-#: src/sendmsg-window.c:192
+#
+# File: src/sendmsg-window.c, line: 194
 msgid "_Fcc"
 msgstr "Αντίγραφα αρ_χείου"
-
-#: src/sendmsg-window.c:194
+#
+# File: src/sendmsg-window.c, line: 196
 msgid "_Reply To"
 msgstr "Α_πάντηση Προς"
-
-#: src/sendmsg-window.c:196
+#
+# File: src/sendmsg-window.c, line: 198
 msgid "_Attachments"
 msgstr "Επισυνά_ψεις"
-
-#: src/sendmsg-window.c:204
+#
+# File: src/sendmsg-window.c, line: 200
+msgid "_Comments"
+msgstr "_Σχόλια"
+#
+# File: src/sendmsg-window.c, line: 202
+msgid "_Keywords"
+msgstr "_Λεκτικά"
+#
+# File: src/sendmsg-window.c, line: 210
 msgid "_Western (ISO-8859-1)"
 msgstr "_Δυτικό (ISO-8859-1)"
-
-#: src/sendmsg-window.c:206
+#
+# File: src/sendmsg-window.c, line: 212
 msgid "W_estern (ISO-8859-15)"
 msgstr "Δ_υτικό (ISO-8859-15)"
-
-#: src/sendmsg-window.c:208
+#
+# File: src/sendmsg-window.c, line: 214
 msgid "_Central European (ISO-8859-2)"
 msgstr "_Κεντροευρωπαϊκό (ISO-8859-2)"
-
-#: src/sendmsg-window.c:210
+#
+# File: src/sendmsg-window.c, line: 216
 msgid "_South European (ISO-8859-3)"
 msgstr "Νο_τιοευρωπαϊκό (ISO-8859-3)"
-
-#: src/sendmsg-window.c:212
+#
+# File: src/sendmsg-window.c, line: 218
 msgid "Cy_rillic (ISO-8859-5)"
 msgstr "Κυ_ριλλικά (ISO-8859-5)"
-
-#: src/sendmsg-window.c:214
+#
+# File: src/sendmsg-window.c, line: 220
 msgid "_Hebrew (ISO-8859-8)"
 msgstr "Ε_βραϊκά (ISO-8859-8)"
-
-#: src/sendmsg-window.c:216
+#
+# File: src/sendmsg-window.c, line: 222
 msgid "_Turkish (ISO-8859-9)"
 msgstr "_Τουρκικά (ISO-8859-9)"
-
-#: src/sendmsg-window.c:252
+#
+# File: src/sendmsg-window.c, line: 259
 msgid "_Show"
 msgstr "_Εμφάνιση"
-
-#: src/sendmsg-window.c:253
+#
+# File: src/sendmsg-window.c, line: 260
 msgid "_ISO Charset"
 msgstr "Σύνολο Χαρακτήρων _ISO"
-
-#: src/sendmsg-window.c:367
+#
+# File: src/sendmsg-window.c, line: 374
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
 msgstr ""
 "Το εικονίδιο επισυνάψεων (balsa/attachment.png) δε βρέθηκε.\n"
 "Αυτό σημαίνει ότι δεν μπορείτε να επισυνάψετε αρχεία.\n"
-
-#: src/sendmsg-window.c:369
+#
+# File: src/sendmsg-window.c, line: 376
 msgid "OK"
 msgstr "Εντάξει"
-
-#: src/sendmsg-window.c:385
+#
+# File: src/sendmsg-window.c, line: 392
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Δεν βρίσκω πληροφορίες για το αρχείο '%s': %s\n"
-
-#: src/sendmsg-window.c:389
+#
+# File: src/sendmsg-window.c, line: 396
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Η επισύναψη δεν είναι κανονικό αρχείο: '%s'\n"
-
-#: src/sendmsg-window.c:434
+#
+# File: src/sendmsg-window.c, line: 441
 msgid "Attach file"
 msgstr "Επισύναψη αρχείου"
-
+#
 #. cc:
-#: src/sendmsg-window.c:559
+# File: src/sendmsg-window.c, line: 567
 msgid "cc:"
 msgstr "Αντίγραφα:"
-
+#
 #. bcc:
-#: src/sendmsg-window.c:562
+# File: src/sendmsg-window.c, line: 570
 msgid "bcc:"
 msgstr "Κρυφά αντίγραφα:"
-
+#
 #. fcc:
-#: src/sendmsg-window.c:565
+# File: src/sendmsg-window.c, line: 573
 msgid "fcc:"
 msgstr "Αντίγραφα αρχείου:"
-
+#
 #. Reply To:
-#: src/sendmsg-window.c:593
+# File: src/sendmsg-window.c, line: 601
 msgid "Reply To:"
 msgstr "Απάντηση Προς:"
-
+#
 #. Attachment list
-#: src/sendmsg-window.c:597
+# File: src/sendmsg-window.c, line: 605
 msgid "Attachments:"
 msgstr "Επισυνάψεις:"
-
-## NOTE: Obviously, this is intended to be used within
-##       next msg, thus the choice of xlation...
-
-#: src/sendmsg-window.c:709
+#
+#. Comments:
+# File: src/sendmsg-window.c, line: 647
+msgid "Comments:"
+msgstr "Σχόλια:"
+#
+#. Keywords:
+# File: src/sendmsg-window.c, line: 650
+msgid "Keywords:"
+msgstr "Λέξεις κλειδιά:"
+#
+# # NOTE: Obviously, this is intended to be used within
+# #       next msg, thus the choice of xlation...
+# File: src/sendmsg-window.c, line: 724
 msgid "you"
 msgstr "υποφαινόμενος"
-
-#: src/sendmsg-window.c:718
+#
+# File: src/sendmsg-window.c, line: 733
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "Στις %s ο/η %s έγραψε:\n"
-
-#: src/sendmsg-window.c:720
+#
+# File: src/sendmsg-window.c, line: 735
 #, c-format
 msgid "%s wrote:\n"
 msgstr "Ο/Η %s έγραψε:\n"
-
-#: src/sendmsg-window.c:791
+#
+# File: src/sendmsg-window.c, line: 806
 msgid "Reply to "
 msgstr "Απάντηση προς "
-
-#: src/sendmsg-window.c:796
+#
+# File: src/sendmsg-window.c, line: 811
 msgid "Forward message"
 msgstr "Προωθημένο μήνυμα"
-
-#: src/sendmsg-window.c:801
+#
+# File: src/sendmsg-window.c, line: 816
 msgid "Continue message"
 msgstr "Συνέχεια μηνύματος"
-
-#: src/sendmsg-window.c:806
+#
+# File: src/sendmsg-window.c, line: 821
 msgid "New message"
 msgstr "Νέο μήνυμα"
-
-#: src/sendmsg-window.c:1050
+#
+# File: src/sendmsg-window.c, line: 1050
 msgid "Could not open the file.\n"
 msgstr "Άνοιγμα αρχείου αδύνατο.\n"
-
-#: src/sendmsg-window.c:1056
+#
+# File: src/sendmsg-window.c, line: 1056
 msgid "Loading..."
 msgstr "Ανάγνωση..."
-
-#: src/sendmsg-window.c:1081
+#
+# File: src/sendmsg-window.c, line: 1081
 msgid "Include file"
 msgstr "Συμπερίληψη αρχείου"
-
-#: src/sendmsg-window.c:1325
+#
+# File: src/sendmsg-window.c, line: 1341
 msgid "Cannot execute print command."
 msgstr "Εκτέλεση εντολής εκτύπωσης αδύνατη."
-
-#: src/sendmsg-window.c:1349
+#
+# File: src/sendmsg-window.c, line: 1365
 msgid "Error executing lpr"
 msgstr "Σφάλμα κατά την εκτέλεση του lpr"
-
-#: src/spell-check.c:136
+#
+# File: src/spell-check.c, line: 136
 msgid "Spell Check"
 msgstr "Έλεγχος Ορθογραφίας"
-
-#: libbalsa/mailbox.c:594
+#
+# File: libbalsa/mailbox.c, line: 594
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr "Γραμ/κιβώτιο: Άνοιγμα %s Αρ. αναφορών: %d\n"
-
-#: libbalsa/mailbox.c:614
+#
+# File: libbalsa/mailbox.c, line: 614
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Γραμ/κιβώτιο: Κλείσιμο %s Αρ. αναφορών: %d\n"
-
-#: libinit_balsa/helper.c:138
+#
+# File: libinit_balsa/helper.c, line: 138
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
-msgstr "Η διαδρομή %s πρέπει να ξεκινά από την αρχή του συστήματος αρχείων (δηλ. με /)."
-
-#: libinit_balsa/helper.c:148 libinit_balsa/helper.c:166
+msgstr ""
+"Η διαδρομή %s πρέπει να ξεκινά από την αρχή του συστήματος αρχείων (δηλ. με "
+"/)."
+#
+# File: libinit_balsa/helper.c, line: 148
+# File: libinit_balsa/helper.c, line: 166
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
-msgstr "Δημιουργία καταλόγου ανεπιτυχής: πρόβλημα με τη mkdir() στη διαδρομή \"%s\"."
-
-#: libinit_balsa/helper.c:155 libinit_balsa/helper.c:172
+msgstr ""
+"Δημιουργία καταλόγου ανεπιτυχής: πρόβλημα με τη mkdir() στη διαδρομή \"%s\"."
+#
+# File: libinit_balsa/helper.c, line: 155
+# File: libinit_balsa/helper.c, line: 172
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
 msgstr "Το αρχείο με διαδρομή \"%s\" δεν είναι κατάλογος."
-
-#: libinit_balsa/init_balsa.c:36
+#
+# File: libinit_balsa/init_balsa.c, line: 36
 msgid "Configure Balsa"
 msgstr "Ρυθμίσεις Balsa"
-
-#: balsa-druid-page-directory.gob:58
+#
+# File: balsa-druid-page-directory.gob, line: 58
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
@@ -1362,98 +1448,98 @@ msgid ""
 msgstr ""
 "Η διαδρομή \"%s\" πρέπει να είναι σε κανονική μορφή -- δηλαδή να ξεκινά με "
 "'/'."
-
-#: balsa-druid-page-directory.gob:76
+#
+# File: balsa-druid-page-directory.gob, line: 76
 #, c-format
 msgid "An error occurred when attempting to creat(2) the file \"%s\"."
 msgstr "Πρόεκυψε σφάλμα κατά τη δημιουργία με creat(2) του αρχείου \"%s\"."
-
-#: balsa-druid-page-directory.gob:84
+#
+# File: balsa-druid-page-directory.gob, line: 84
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "Το γραμ/κιβώτιο \"%s\" δεν φαίνεται να είναι έγκυρο."
-
-#: balsa-druid-page-directory.gob:146
+#
+# File: balsa-druid-page-directory.gob, line: 146
 msgid ""
 "Please confirm the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
 "Παρακαλώ επιβεβαιώστε την τοποθεσία των εξ' ορισμού αρχείων μηνυμάτων.\n"
 "Αυτά θα δημιουργηθούν εφόσον είναι απαραίτητο."
-
-#: balsa-druid-page-directory.gob:157
+#
+# File: balsa-druid-page-directory.gob, line: 157
 msgid "Inbox:"
 msgstr "Εισερχόμενα:"
-
+#
 #. This used to set all the mail directories to their proper values
 #. * as in the prepare code. But at this point balsa_app.local_mail_directory
 #. * is NULL, so we use a dummy value.
 #.
-#: balsa-druid-page-directory.gob:166
+# File: balsa-druid-page-directory.gob, line: 166
 msgid "Outbox:"
 msgstr "Εξερχόμενα:"
-
-#: balsa-druid-page-directory.gob:169
+#
+# File: balsa-druid-page-directory.gob, line: 169
 msgid "Sentbox:"
 msgstr "Απεσταλμένα:"
-
-#: balsa-druid-page-directory.gob:172
+#
+# File: balsa-druid-page-directory.gob, line: 172
 msgid "Draftbox:"
 msgstr "Πρόχειρα:"
-
-#: balsa-druid-page-directory.gob:175
+#
+# File: balsa-druid-page-directory.gob, line: 175
 msgid "Trash:"
 msgstr "Απορρίματα:"
-
-#: balsa-druid-page-directory.gob:186
+#
+# File: balsa-druid-page-directory.gob, line: 186
 msgid "Mail Files"
 msgstr "Αρχεία Μηνυμάτων"
-
-#: balsa-druid-page-directory.gob:259
+#
+# File: balsa-druid-page-directory.gob, line: 259
 msgid "Problem Creating Mailboxes"
 msgstr "Πρόβλημα κατα τη δημιουργία γραμ/κιβωτίων"
-
-#: balsa-druid-page-finish.gob:44
+#
+# File: balsa-druid-page-finish.gob, line: 44
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
 msgstr ""
 "Εγκαταστήσατε επιτυχώς το Balsa.  Καλή διασκέδαση!\n"
 "   -- Η ομάδα ανάπτυξης του Balsa"
-
-#: balsa-druid-page-finish.gob:56
+#
+# File: balsa-druid-page-finish.gob, line: 56
 msgid "All Done!"
 msgstr "Τέλος!"
-
-#: balsa-druid-page-user.gob:74
+#
+# File: balsa-druid-page-user.gob, line: 74
 msgid "Please enter information about yourself."
 msgstr "Παρακαλώ δώστε τις πληροφοριές για τον εαυτό σας."
-
-#: balsa-druid-page-user.gob:86
+#
+# File: balsa-druid-page-user.gob, line: 86
 msgid "Email address:"
 msgstr "Διεύθυνση αποστολέα:"
-
-#: balsa-druid-page-user.gob:90
+#
+# File: balsa-druid-page-user.gob, line: 90
 msgid "SMTP Server:"
 msgstr "Εξυπηρέτης SMTP:"
-
-#: balsa-druid-page-user.gob:93
+#
+# File: balsa-druid-page-user.gob, line: 93
 msgid "Local Mail Directory:"
 msgstr "Τοπικός Κατάλογος Μηνυμάτων:"
-
-#: balsa-druid-page-user.gob:103
+#
+# File: balsa-druid-page-user.gob, line: 103
 msgid "User Settings"
 msgstr "Ρυθμίσεις Χρήστη"
-
-#: balsa-druid-page-user.gob:151
+#
+# File: balsa-druid-page-user.gob, line: 151
 msgid "Local Mail Problem"
 msgstr "Πρόβλημα Τοπικών Μηνυμάτων"
-
-#: balsa-druid-page-welcome.gob:47
+#
+# File: balsa-druid-page-welcome.gob, line: 47
 msgid "Welcome to Balsa!"
 msgstr "Καλωσορίσατε στο BALSA!"
-
-#: balsa-druid-page-welcome.gob:50
+#
+# File: balsa-druid-page-welcome.gob, line: 50
 msgid ""
 "You seem to be running Balsa for the first time. The following\n"
 "steps will set up Balsa by asking a few simple questions. Once\n"
@@ -1470,8 +1556,8 @@ msgstr ""
 "ή κατάλογοι, αυτό θα γίνει αυτόματα. Παρακαλώ δείτε το πλαίσιο \"Περί\"\n"
 "στο κυρίως παράθυρο του Balsa για περισσότερες πληροφοριές επικοινωνίας\n"
 "με τους συγγραφής ή αναφοράς σφαλμάτων."
-
-#: balsa-initdruid.gob:91
+#
+# File: balsa-initdruid.gob, line: 91
 msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"

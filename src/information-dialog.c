@@ -270,7 +270,8 @@ static gboolean
 status_bar_refresh(gpointer data)
 {
     gdk_threads_enter();
-    gnome_appbar_refresh(balsa_app.appbar);
+    if (balsa_app.appbar)
+        gnome_appbar_refresh(balsa_app.appbar);
     gdk_threads_leave();
     bar_timeout_id = 0; /* FIXME: thread locking here! */
     return FALSE;
@@ -280,6 +281,8 @@ static void
 balsa_information_bar(GtkWindow *parent, LibBalsaInformationType type,
                       const char *msg)
 {
+    if (!balsa_app.appbar)
+        return;
     gnome_appbar_set_status(balsa_app.appbar, msg);
     if(bar_timeout_id)
         g_source_remove(bar_timeout_id);

@@ -3,7 +3,7 @@
 	Do not store authorization data in ImapMboxHandle.
 	* libbalsa/imap-server.c: make imap alerts work with balsa.
 	* libbalsa/mailbox.c: stick to C comment style.
-	* libbalsa/mailbox_imap.c: decode attachment names.
+	* libbalsa/mailbox_imap.c: decode attachment names. clean cache.
 
 	* libbalsa/imap/auth-cram.c: use user_cb to get whatever
 	authorization data is needed.

@@ -395,58 +395,72 @@ get_cache_name_body(LibBalsaMailboxImap* mailbox, ImapUID uid)
 /* clean_cache:
    removes unused entries from the cache file.
 */
+struct file_info {
+    char  *name;
+    off_t  size;
+    time_t time;
+};
+static gint
+cmp_by_time (gconstpointer  a, gconstpointer  b)
+{
+    return ((const struct file_info*)b)->time
+        -((const struct file_info*)a)->time;
+}
+
+static void
+clean_dir(const char *dir_name)
+{
+    static const off_t MAX_MBOX_CACHE_SIZE = 10*1024*1024; /* 10MB */
+    DIR* dir;
+    struct dirent* key;
+    GList *list, *lst;
+    off_t sz;
+    dir = opendir(dir_name);
+    if(!dir)
+        return;
+
+    list = NULL;
+    while ( (key=readdir(dir)) != NULL) {
+        struct stat st;
+        struct file_info *fi;
+        gchar *fname = g_strconcat(dir_name, "/", key->d_name, NULL);
+        if(stat(fname, &st) == -1 || !S_ISREG(st.st_mode))
+            continue;
+        fi = g_new(struct file_info,1);
+        fi->name = fname;
+        fi->size = st.st_size;
+        fi->time = st.st_atime;
+        list = g_list_prepend(list, fi);
+    }
+    closedir(dir);
+
+    g_list_sort(list, cmp_by_time);
+    sz = 0;
+    for(lst = list; lst; lst = lst->next) {
+        struct file_info *fi = (struct file_info*)(lst->data);
+        sz += fi->size;
+        if(sz>MAX_MBOX_CACHE_SIZE) {
+            printf("removing %s\n", fi->name);
+            unlink(fi->name);
+        }
+        g_free(fi->name);
+        g_free(fi);
+    }
+    g_list_free(list);
+}
+
 static gboolean
 clean_cache(LibBalsaMailbox* mailbox)
 {
-    DIR* dir;
-    struct dirent* key;
-    gchar* fname =  get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "body");
-    ImapUID uid[2];
-    GHashTable *present_uids;
-    GList *lst, *remove_list;
-    ImapUID uid_validity = LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity;
+    gchar* dir;
 
-    return TRUE; /* FIXME: implement proper cache cleaning scheme */
-    dir = opendir(fname);
-    if(!dir) {
-        g_free(fname);
-        return FALSE;
-    }
-
-    present_uids = g_hash_table_new(g_direct_hash, g_direct_equal);
-    remove_list  = NULL;
-
-#ifdef UID_CACHE_PRESENT
-    for(lst = mailbox->message_list; lst; lst = lst->next) {
-        ImapUID u = IMAP_MESSAGE_UID(LIBBALSA_MESSAGE(lst->data));
-        g_hash_table_insert(present_uids, UID_TO_POINTER(u), &present_uids);
-    }
-#endif
-    while ( (key=readdir(dir)) != NULL) {
-        if(sscanf(key->d_name,"%u-%u", &uid[0], &uid[1])!=2)
-            continue;
-        if( uid[0] != uid_validity 
-            || !g_hash_table_lookup(present_uids, UID_TO_POINTER(uid[1]))) {
-            remove_list = 
-                g_list_prepend(remove_list, UID_TO_POINTER(uid[1]));
-        }
-    }
-    closedir(dir);
-    g_hash_table_destroy(present_uids);
+    dir = get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "body");
+    clean_dir(dir);
+    g_free(dir);
+    dir = get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "part");
+    clean_dir(dir);
+    g_free(dir);
     
-    for(lst = remove_list; lst; lst = lst->next) {
-        unsigned uid = GPOINTER_TO_UINT(lst->data);
-        gchar *fn = g_strdup_printf("%s/%u-%u", fname, uid_validity, uid);
-        if(unlink(fn))
-            libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-                                 "Unlinked %s\n", fn);
-        else
-            libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-                                 "Could not unlink %s\n", fn);
-        g_free(fn);
-    }
-    g_list_free(remove_list);
-    g_free(fname);
     return TRUE;
 }
 

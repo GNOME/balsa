@@ -364,8 +364,10 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int over_ssl)
 
   g_return_val_if_fail(imap_mbox_is_disconnected(ret), IMAP_CONNECT_FAILED);
 #if !defined(USE_TLS)
-  if(over_ssl)
+  if(over_ssl) {
+    imap_mbox_handle_set_msg(ret,"SSL requested but SSL support not compiled");
     return IMAP_UNSECURE;
+  }
 #else
   ret->over_ssl = over_ssl;
 #endif
@@ -525,11 +527,15 @@ imap_mbox_connect(ImapMboxHandle* handle)
 #ifdef USE_TLS
   if(handle->over_ssl) {
     SSL *ssl = imap_create_ssl();
-    if(!ssl) return IMAP_UNSECURE;
+    if(!ssl) {
+      imap_mbox_handle_set_msg(handle,"SSL context could not be created");
+      return IMAP_UNSECURE;
+    }
     if(imap_setup_ssl(handle->sio, handle->host, ssl,
                       handle->user_cb, handle->user_arg)) 
       handle->using_tls = 1;
     else {
+      imap_mbox_handle_set_msg(handle,"SSL negotiation failed");
       imap_handle_disconnect(handle);
       return IMAP_UNSECURE;
     }
@@ -551,17 +557,20 @@ imap_mbox_connect(ImapMboxHandle* handle)
     resp = IMR_OK; /* secured already with SSL */
   else if(handle->tls_mode != IMAP_TLS_DISABLED &&
           imap_mbox_handle_can_do(handle, IMCAP_STARTTLS)) {
-    if( imap_handle_starttls(handle) != IMR_OK)
+    if( imap_handle_starttls(handle) != IMR_OK) {
+      imap_mbox_handle_set_msg(handle,"TLS negotiation failed");
       return IMAP_UNSECURE; /* TLS negotiation error */
+    }
     resp = IMR_OK; /* secured with TLS */
   } else
     resp = IMR_NO; /* not over SSL and TLS unavailable */
 #else
   resp = IMR_NO;
 #endif
-  if(handle->tls_mode == IMAP_TLS_REQUIRED && resp != IMR_OK)
+  if(handle->tls_mode == IMAP_TLS_REQUIRED && resp != IMR_OK) {
+    imap_mbox_handle_set_msg(handle,"TLS required but not available");
     return IMAP_UNSECURE;
-    
+  }
   return IMAP_SUCCESS;
 }
 

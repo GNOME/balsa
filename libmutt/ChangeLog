@@ -1,3 +1,7 @@
+2003-02-23  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* {,imap/}Makefile.am: support distcheck target.
+
 2003-01-30  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* mutt_socket.c: do as you say regarding the returned value.

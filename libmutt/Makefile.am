@@ -91,4 +91,4 @@ libmutt_a_SOURCES = \
 SUBDIRS = imap
 
 DEFS = -DSHAREDIR=\"$(sharedir)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DLIBMUTT
-INCLUDES=-I. -I./imap
+INCLUDES=-I${top_srcdir} -I${top_srcdir}/imap -I${top_builddir}

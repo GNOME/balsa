@@ -42,43 +42,10 @@
 #define FILTER_REGCOMP       (REG_NEWLINE | REG_NOSUB | REG_EXTENDED)
 #define FILTER_REGEXEC       0
 
-/* Conditions definitions */
-
-/*  match flags */
-#define CONDITION_EMPTY         0       /* for initialization */
-#define CONDITION_MATCH_TO      1<<0	/* match in the To: field */
-#define CONDITION_MATCH_FROM    1<<1	/* match in the From: field */
-#define CONDITION_MATCH_SUBJECT 1<<2	/* match in the Subject field */
-#define CONDITION_MATCH_CC      1<<3	/* match in the cc: field */
-#define CONDITION_MATCH_US_HEAD 1<<4    /* match in a user header */
-#define CONDITION_MATCH_BODY    1<<7	/* match in the body */
-
-/* match_fields macros */
-#define CONDITION_SETMATCH(x, y) \
-          ((((LibBalsaCondition*)(x))->match_fields) |= (y))
-#define CONDITION_CLRMATCH(x, y) \
-          ((((LibBalsaCondition*)(x))->match_fields) &= ~(y))
-#define CONDITION_CHKMATCH(x, y) \
-          ((((LibBalsaCondition*)(x))->match_fields) & (y))
-
 /* regex struct */
-typedef struct _LibBalsaConditionRegex {
+struct _LibBalsaConditionRegex {
     gchar *string;
     regex_t *compiled;
-} LibBalsaConditionRegex;
-
-/* Filter defintions */
-
-/* filter flags */
-#define FILTER_EMPTY         0	/* for clearing bitfields */
-
-#define FILTER_VALID         1<<1	/* ready to filter (eg regex strings 
-					   have been compiled with regcomp(), with no errors...) */					
-#define FILTER_COMPILED      1<<2	/* the filter needs to be compiled (ie there are uncompiled regex) */
-
-/* flag operation macros */
-#define FILTER_SETFLAG(x, y) ((((LibBalsaFilter*)(x))->flags) |= (y))
-#define FILTER_CLRFLAG(x, y) ((((LibBalsaFilter*)(x))->flags) &= ~(y))
-#define FILTER_CHKFLAG(x, y) ((((LibBalsaFilter*)(x))->flags) & (y))
+};
 
 #endif				/* __FILTER_PRIVATE_H__ */

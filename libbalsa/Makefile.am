@@ -78,7 +78,8 @@ libbalsa_a_SOURCES = 		\
 EXTRA_DIST = \
 	libbalsa-marshal.list
 
-INCLUDES=-I. -I${top_srcdir} -I${top_builddir}/libmutt \
+INCLUDES= -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
+	-I${top_srcdir}/libmutt -I${top_builddir}/libmutt \
 	$(BALSA_CFLAGS)
 
 DEFS = -DLIBMUTT                \

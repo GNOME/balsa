@@ -16,7 +16,7 @@ DEFS = -DSHAREDIR=\"$(sharedir)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DLIBMUTT
 
 EXTRA_DIST = BUGS README TODO auth_anon.c auth_cram.c auth_gss.c auth_sasl.c
 
-INCLUDES = -I$(top_srcdir) -I../intl
+INCLUDES = -I$(top_builddir) -I$(top_srcdir)/imap -I$(top_srcdir)
 
 noinst_LIBRARIES = libimap.a
 noinst_HEADERS = auth.h imap_private.h message.h

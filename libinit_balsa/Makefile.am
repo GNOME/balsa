@@ -16,8 +16,8 @@ libinit_balsa_a_SOURCES = 		\
 	init_balsa.c			\
 	init_balsa.h
 
-INCLUDES=-I. -I$(top_srcdir) \
-	-I$(top_srcdir)/libmutt \
+INCLUDES=-I$(top_builddir) -I$(top_srcdir) \
+	-I$(top_builddir)/libmutt -I$(top_srcdir)/libmutt \
 	-I$(top_srcdir)/libbalsa \
 	-I$(top_srcdir)/src \
         $(BALSA_CFLAGS)

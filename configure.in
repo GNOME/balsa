@@ -8,7 +8,7 @@ dnl ###########################################################################
 SCROLLKEEPER_REQUIRED=0.1.4
 BALSA_MAJOR=2
 BALSA_REVISION=0
-BALSA_PATCHLEVEL=8
+BALSA_PATCHLEVEL=9
 BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
 
 AC_SUBST(BALSA_MAJOR)
@@ -102,25 +102,15 @@ dnl ###########################################################################
 AC_CONFIG_SUBDIRS(libmutt)
 
 dnl ###########################################################################
-dnl --enable-deprecated-pspell
+dnl Spell check detection.
 dnl ###########################################################################
-AC_ARG_ENABLE(deprecated-pspell, [  --enable-deprecated-pspell      Enable pspell support instead of default aspell.],[
-	enable_deprecated_pspell=$enableval
-],[
-	enable_deprecated_pspell=no
-])
 
-if test x$enable_deprecated_pspell = xyes ; then
-  AC_CHECK_LIB(pspell, new_pspell_manager,,[
-	AC_MSG_ERROR([*** pspell(-devel) not found. Please check http://www.balsa.net for information on the required files.])
-  ], -lstdc++ -lpspell-modules)
-else
-  AC_CHECK_LIB(aspell, new_aspell_speller,,[
-	AC_MSG_ERROR([*** aspell library not found.
-If You have deprecated pspell, please try to use --enable-deprecated-pspell
-configure switch. Upgrade to aspell>=0.50 is strongly recommended.])
+AC_CHECK_LIB(aspell, new_aspell_speller,,[
+    AC_CHECK_LIB(pspell, new_pspell_manager,,[
+        AC_MSG_ERROR([*** Neither aspell >=0.50 (recommended) nor pspell (deprecated) library was found. Please check http://balsa.gnome.org for information on the required files. Alternatively, check config.log for clues.])
+     ], -lstdc++ -lpspell-modules)
   ], -lstdc++)
-fi
+
 
 dnl Reset
 # LDFLAGS="$balsa_save_LDFLAGS"
@@ -352,8 +342,8 @@ AC_MSG_CHECKING([whether to build SSL support])
 if test "x$with_ssl" != xno  ; then
 # openssl >=0.9.7 is pkg-config compatible.
    if pkg-config openssl >/dev/null 2>&1; then
-      LIBS="$LIBS `pkg-config --libs openssl`"
-      CPPFLAGS="`pkg-config --cflags-only-I openssl` $CPPFLAGS"
+      BALSA_LIBS="$BALSA_LIBS `pkg-config --libs openssl`"
+      BALSA_CFLAGS="`pkg-config --cflags-only-I openssl` $BALSA_CFLAGS"
       AC_MSG_RESULT(yes)
       AC_DEFINE(USE_SSL,1,[Defined when SSL support is to be compiled.])
    else
@@ -377,9 +367,9 @@ if test "x$with_ssl" != xno  ; then
           AC_MSG_ERROR([SSL requested but no SSL headers found.])
        else
           AC_MSG_RESULT(yes)
-          LIBS="$LIBS -lssl -lcrypto"
+          BALSA_LIBS="$BALSA_LIBS -lssl -lcrypto"
 	  if test "x$ssldir" != xdefault ; then
-		CPPFLAGS="-I${ssldir}/include $CPPFLAGS"
+		BALSA_CFLAGS="-I${ssldir}/include $BALSA_CFLAGS"
 	  fi
 	  ac_cv_path_openssl=$ssldir
 	  AC_DEFINE(USE_SSL,1,[Defined when SSL support is to be compiled.])

@@ -27,7 +27,6 @@
 
 #include <string.h>
 #include "mailbox-filter.h"
-#include "filter-private.h"
 #include "filter-funcs.h"
 #include "filter-run.h"
 #include "balsa-app.h"

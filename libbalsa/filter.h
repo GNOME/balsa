@@ -34,6 +34,8 @@
 
 #include "libbalsa.h"
 
+typedef struct _LibBalsaConditionRegex LibBalsaConditionRegex;
+
 /* Conditions definition :
  * a condition is the basic component of a filter
  * It can be of type (mimic the old filter types) :
@@ -164,6 +166,13 @@ typedef struct _LibBalsaFilter {
  * we can use filter engine for a lot of different purpose : search
  * functions, virtual folders..., not only filtering
  */
+
+void libbalsa_condition_regex_set(LibBalsaConditionRegex * reg, gchar *str);
+/* returns pointer to internal data, treat with caution! */
+const gchar* libbalsa_condition_regex_get(LibBalsaConditionRegex * reg);
+
+void libbalsa_condition_prepend_regex(LibBalsaCondition* cond,
+                                      LibBalsaConditionRegex *new_reg);
 
 gint match_condition(LibBalsaCondition* cond,LibBalsaMessage* message,
 		     gboolean mbox_locked);

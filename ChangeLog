@@ -1,5 +1,14 @@
 2003-02-23  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* NEWS, configure.in: prepare 2.0.9 release.
+	* balsa.desktop: startup notification support.
+	* {libinit_balsa,libbalsa,src}/Makefile.am: support distcheck target.
+	* libbalsa/filter-{funcs.[hc],private.h}: cleanup API.
+	* libbalsa/filter.[hc]: ditto.
+	* src/filter-{run,edit}-callbacks.c: use cleaner API.
+
+2003-02-23  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* src/balsa-app.c: fix deadlock on filtering.
 	* libbalsa/filter.c: applying filters in presence of deleted messages
 	fixed (Emmanuel).

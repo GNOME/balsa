@@ -1,3 +1,10 @@
+* Balsa-2.0.9 release. Release date 2003-02-23
+
+- some crashes and deadlocks fixed.
+- bugs in --without-esmtp build fixed.
+- autocommit feature misbehaviors fixed.
+- filtering in presence of deleted messages fixed.
+
 * Balsa-2.0.8 release. Release date 2003-02-16
 
 - infinite loops in message threading fixed.

@@ -27,6 +27,7 @@
  */
 
 #include "filter-funcs.h"
+#include "filter-private.h"
 
 /* Conditions */
 

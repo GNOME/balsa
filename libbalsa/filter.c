@@ -103,6 +103,29 @@ in_string(const gchar * s1,const gchar * s2)
 /*------------------------------------------------------------------------
   ---- Helper functions (also exported to have a fine-grained API) -------
 */
+/* libbalsa_condition_regex_set:
+   steals the string.
+*/
+void
+libbalsa_condition_regex_set(LibBalsaConditionRegex * reg, gchar *str)
+{
+    g_free(reg->string);
+    reg->string = str;
+}
+
+const gchar*
+libbalsa_condition_regex_get(LibBalsaConditionRegex * reg)
+{
+    return reg->string;
+}
+
+void
+libbalsa_condition_prepend_regex(LibBalsaCondition* cond,
+                                 LibBalsaConditionRegex * new_reg)
+{
+  cond->match.regexs =
+      g_slist_prepend(cond->match.regexs, new_reg);
+}
 
 gboolean
 match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,

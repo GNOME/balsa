@@ -31,7 +31,6 @@
 
 #include <string.h>
 #include "filter.h"
-#include "filter-private.h"
 #include "filter-funcs.h"
 #include "filter-edit.h"
 #include "filter-file.h"
@@ -530,10 +529,11 @@ condition_validate(LibBalsaCondition* new_cnd)
 
     case CONDITION_REGEX:
         do {
+            gchar* str;
+            gtk_tree_model_get(model, &iter, 0, &str, -1);
             new_reg = libbalsa_condition_regex_new();
-            gtk_tree_model_get(model, &iter, 0, &new_reg->string, -1);
-            new_cnd->match.regexs =
-                g_slist_prepend(new_cnd->match.regexs, new_reg);
+            libbalsa_condition_regex_set(new_reg, str);
+            libbalsa_condition_prepend_regex(new_cnd, new_reg);
         } while (gtk_tree_model_iter_next(model, &iter));
         break;
 
@@ -658,8 +658,9 @@ fill_condition_widgets(LibBalsaCondition* cnd)
         for (regex = cnd->match.regexs; regex; regex = g_slist_next(regex)) {
             gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
             gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0,
-                               ((LibBalsaConditionRegex *) regex->data)->
-                               string, -1);
+                               libbalsa_condition_regex_get
+                               ((LibBalsaConditionRegex *) regex->data),
+                               -1);
         }
         if (cnd->match.regexs) {
             /* initially, select first regex */

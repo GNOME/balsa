@@ -186,6 +186,7 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
 			     gboolean* escape_specials)
 {
     GtkWidget *text;
+    PangoFontDescription *desc;
     GtkWidget *interior;
     GtkWidget *window;
     LibBalsaSourceViewerInfo *lsvi;
@@ -194,7 +195,11 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
     g_return_if_fail(MAILBOX_OPEN(msg->mailbox));
 
     text = gtk_text_view_new();
-    gtk_widget_modify_font(text, pango_font_description_from_string(font));
+
+    desc = pango_font_description_from_string(font);
+    gtk_widget_modify_font(text, desc);
+    pango_font_description_free(desc);
+
     gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD);
 

@@ -368,9 +368,16 @@ void libbalsa_mailbox_filter_view(LibBalsaMailbox *mailbox,...);
 /** libbalsa_mailbox_set_threading() uses backend-optimized threading mode
     to produce a tree of messages. The tree is put in msg_tree and used
     later by GtkTreeModel interface.
+    libbalsa_mailbox_set_threading() is the public method;
+    libbalsa_mailbox_set_msg_tree and libbalsa_mailbox_unlink_and_prepend
+    are helpers for the subclass methods.
 */
 void libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
 				    LibBalsaMailboxThreadingType thread_type);
+void libbalsa_mailbox_set_msg_tree(LibBalsaMailbox * mailbox,
+				   GNode * msg_tree);
+void libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
+					 GNode * node, GNode * parent);
 
 LibBalsaMailboxView *libbalsa_mailbox_view_new(void);
 void libbalsa_mailbox_view_free(LibBalsaMailboxView * view);

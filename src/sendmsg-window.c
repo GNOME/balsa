@@ -3264,7 +3264,8 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 					   balsa_app.encoding_style,
 					   bsmsg->flow); 
 #endif
-    if (successful && bsmsg->orig_message) {
+    if (successful && bsmsg->orig_message
+        && bsmsg->orig_message->mailbox) {
 	if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
 	    bsmsg->type == SEND_REPLY_GROUP) {
 	    libbalsa_message_reply(bsmsg->orig_message);

@@ -92,6 +92,9 @@ static gint balsa_save_session(GnomeClient * client, gint phase,
 			       GnomeSaveStyle save_style, gint is_shutdown,
 			       GnomeInteractStyle interact_style,
 			       gint is_fast, gpointer client_data);
+gboolean initial_open_unread_mailboxes(void); 
+/* yes void is there cause gcc is tha suck */
+gboolean initial_open_inbox(void);
 
 /* We need separate variable for storing command line requests to check the 
    mail because such selection cannot be stored in balsa_app and later 
@@ -131,7 +134,16 @@ balsa_handle_automation_options() {
        if (cmd_check_mail_on_startup) 
 	   GNOME_Balsa_Application_checkmail (app, &ev);
 
+       if (cmd_open_unread_mailbox)
+	   GNOME_Balsa_Application_openUnread (app, &ev);
 
+       if (cmd_open_inbox)
+	   GNOME_Balsa_Application_openInbox (app, &ev);
+
+       if (cmd_line_open_mailboxes)
+	   GNOME_Balsa_Application_openMailbox (app,
+					       cmd_line_open_mailboxes,
+					       &ev);
 
        if (opt_compose_email || opt_attach_list) {
 	   GNOME_Balsa_Composer_attachs *attachs;
@@ -340,7 +352,7 @@ threads_destroy(void)
    open mailboxes on startup if requested so.
    This is an idle handler. Be sure to use gdk_threads_{enter/leave}
  */
-static gboolean
+gboolean
 initial_open_unread_mailboxes()
 {
     GList *i, *gl;
@@ -360,7 +372,7 @@ initial_open_unread_mailboxes()
 }
 
 
-static gboolean
+gboolean
 initial_open_inbox()
 {
     if (!balsa_app.inbox)

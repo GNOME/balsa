@@ -64,6 +64,10 @@ static void impl_balsa_application_openUnread (PortableServer_Servant _servant,
 					       CORBA_Environment * ev);
 static void impl_balsa_application_openInbox (PortableServer_Servant _servant,
 					      CORBA_Environment * ev);
+/* from main.c */
+gboolean initial_open_unread_mailboxes();
+gboolean initial_open_inbox();
+
 
 /*
  *
@@ -220,19 +224,21 @@ static void
 impl_balsa_application_openMailbox (PortableServer_Servant _servant,
 				    const CORBA_char * name,
 				    CORBA_Environment * ev) {
-
+    gchar **urls = g_strsplit(name, ";", 20);
+    g_idle_add((GSourceFunc) open_mailboxes_idle_cb, urls);
+    
 }
 
 static void
 impl_balsa_application_openUnread (PortableServer_Servant _servant,
 				   CORBA_Environment * ev) {
-
+    g_idle_add((GSourceFunc) initial_open_unread_mailboxes, NULL);
 }
 
 static void
 impl_balsa_application_openInbox (PortableServer_Servant _servant,
 				  CORBA_Environment * ev) {
-
+    initial_open_inbox();
 }
  
 static void

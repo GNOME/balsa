@@ -1,3 +1,9 @@
+2004-01-04  Carlos Morgado  <chbm gnome.org>
+
+	* src/balsa-bonobo.c: 
+	* src/main.c: 
+	implement the other cli options
+
 2004-01-04  Pawel Salek
 
 	* libbalsa/mailbox.[hc]: add filt_in and filt_out methods in an
@@ -10,7 +16,7 @@
 
 2004-01-04  Francisco Javier F. Serrador  <serrador@cvs.gnome.org>
 
-	* src/main.c: Fixed typo staartup-->startup
+	* src/main.c: Fixed typo staartup-->startup	
 
 2004-01-04  Carlos Morgado  <chbm gnome.org>
 

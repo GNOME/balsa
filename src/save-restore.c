@@ -700,6 +700,20 @@ config_global_load (void)
   if( balsa_app.check_mail_auto )
     update_timer( TRUE, balsa_app.check_mail_timer );
 
+  /* Word Wrap */
+  if ((field = pl_dict_get_str (globals, "WordWrap")) == NULL)
+    balsa_app.wordwrap = TRUE;
+  else
+    balsa_app.wordwrap = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "WrapLength")) == NULL)
+    balsa_app.wraplength = 74;
+  else
+    balsa_app.wraplength = atoi (field);
+
+  if (balsa_app.wraplength < 40 )
+    balsa_app.wraplength = 40;
+
   /* toolbar style */
   if ((field = pl_dict_get_str (globals, "ToolbarStyle")) == NULL)
     balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
@@ -897,6 +911,12 @@ config_global_save (void)
 
   snprintf (tmp, sizeof (tmp), "%d", balsa_app.check_mail_timer);
   pl_dict_add_str_str (globals, "CheckMailMinutes", tmp);
+
+  snprintf (tmp, sizeof (tmp), "%d", balsa_app.wordwrap );
+  pl_dict_add_str_str (globals, "WordWrap", tmp);
+
+  snprintf (tmp, sizeof (tmp), "%d", balsa_app.wraplength);
+  pl_dict_add_str_str (globals, "WrapLength", tmp);
 
   /* arp --- "LeadinStr" into cfg. */
   if (balsa_app.quote_str != NULL)

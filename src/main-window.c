@@ -925,12 +925,9 @@ mail_progress_notify_cb( )
 	      }
 	    if (progress_dialog && GTK_IS_WIDGET ( progress_dialog ) ) 
 	      gtk_progress_bar_update(GTK_PROGRESS_BAR(progress_dialog_bar),
-				      (gfloat)threadmessage->num_bytes/
-				      (gfloat)threadmessage->tot_bytes);
+				      percent);
 	    else 
-	      gnome_appbar_set_progress(balsa_app.appbar,
-					(gfloat)threadmessage->num_bytes/
-					(gfloat)threadmessage->tot_bytes);
+	      gnome_appbar_set_progress(balsa_app.appbar, percent);
 	    break;
 	  case MSGMAILTHREAD_FINISHED:
 	    
@@ -944,13 +941,13 @@ mail_progress_notify_cb( )
 	      {	
 		gtk_label_set_text( GTK_LABEL(progress_dialog_source), 
 				    "Finished Checking." );
-		gtk_progress_bar_update(GTK_PROGRESS_BAR(progress_dialog_bar),0);
+		gtk_progress_bar_update(GTK_PROGRESS_BAR(progress_dialog_bar),0.0);
 	      }
 	    else
 	      {
 	        gnome_appbar_clear_stack(balsa_app.appbar);
 	        gnome_appbar_push(balsa_app.appbar,"Finished Checking.");
-		gnome_appbar_set_progress(balsa_app.appbar,0);
+		gnome_appbar_set_progress(balsa_app.appbar,0.0);
 	      }
 	    break;
 	  default:

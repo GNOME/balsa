@@ -48,6 +48,8 @@ typedef struct _PropertyUI
     GtkWidget *previewpane;
     GtkWidget *debug;		/* enable/disable debugging */
     GtkRadioButton *pwindow_type[NUM_PWINDOW_MODES];
+    GtkWidget *wordwrap;
+    GtkWidget *wraplength;
 
 #ifdef BALSA_SHOW_INFO
     GtkWidget *mblist_show_mb_content_info;
@@ -143,7 +145,7 @@ void update_pop3_servers (void);
 static void properties_modified_cb (GtkWidget *, GnomePropertyBox *);
 static void font_changed (GtkWidget * widget, GnomePropertyBox * pbox);
 void timer_modified_cb (GtkWidget * widget,  GnomePropertyBox * pbox);
-
+void wrap_modified_cb( GtkWidget *widget, GnomePropertyBox *pbox);
 static void pop3_add_cb (GtkWidget * widget, gpointer data);
 static void pop3_edit_cb (GtkWidget * widget, gpointer data);
 static void pop3_del_cb (GtkWidget * widget, gpointer data);
@@ -278,6 +280,10 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 		      GTK_SIGNAL_FUNC (timer_modified_cb), pui->pbox);
   gtk_signal_connect (GTK_OBJECT (pui->check_mail_minutes), "changed",
 		      GTK_SIGNAL_FUNC (timer_modified_cb), pui->pbox);
+  gtk_signal_connect (GTK_OBJECT (pui->wordwrap), "toggled",
+		      GTK_SIGNAL_FUNC (wrap_modified_cb), pui->pbox);
+  gtk_signal_connect (GTK_OBJECT (pui->wraplength), "changed",
+		      GTK_SIGNAL_FUNC (wrap_modified_cb), pui->pbox);
 
   /* arp */
   gtk_signal_connect (GTK_OBJECT (pui->quote_str), "changed",
@@ -402,6 +408,10 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
   else
     update_timer( FALSE, 0);
 
+  balsa_app.wordwrap = GTK_TOGGLE_BUTTON(pui->wordwrap)->active;
+  balsa_app.wraplength = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->wraplength));
+
+
   /* arp */
   g_free (balsa_app.quote_str);
   balsa_app.quote_str =
@@ -497,6 +507,15 @@ set_prefs (void)
 
   gtk_widget_set_sensitive (pui->check_mail_minutes,
 			    GTK_TOGGLE_BUTTON(pui->check_mail_auto)->active);
+
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->wordwrap),
+				balsa_app.wordwrap);
+  gtk_spin_button_set_value (GTK_SPIN_BUTTON (pui->wraplength), 
+		(float) balsa_app.wraplength );
+
+  gtk_widget_set_sensitive (pui->wraplength,
+			    GTK_TOGGLE_BUTTON(pui->wordwrap)->active);
+
 
   /* arp */
   gtk_entry_set_text (GTK_ENTRY (pui->quote_str), balsa_app.quote_str);
@@ -856,6 +875,8 @@ create_misc_page ()
 {
   GtkWidget *vbox;
   GtkWidget *frame;
+  GtkWidget *hbox;
+  GtkObject *adj;
 
   /* arp */
   GtkWidget *vbox1;
@@ -890,6 +911,20 @@ create_misc_page ()
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
   gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (table), TRUE, TRUE, 2);
+
+  /* word wrap */
+  adj = gtk_adjustment_new( 1.0, 40.0, 200.0, 1.0, 5.0, 0.0);
+  hbox = gtk_hbox_new(FALSE, 5);
+  
+  pui->wordwrap = gtk_check_button_new_with_label( "Wrap Outgoing Text at:" );
+  pui->wraplength = gtk_spin_button_new(GTK_ADJUSTMENT(adj), 0, 0);
+  gtk_box_pack_start( GTK_BOX(hbox), pui->wordwrap, FALSE, FALSE, 5);
+
+  label = gtk_label_new( "Characters" );
+  gtk_box_pack_start( GTK_BOX(hbox), pui->wordwrap, FALSE, FALSE, 2);
+  gtk_box_pack_start( GTK_BOX(hbox), pui->wraplength, FALSE, FALSE, 2);
+  gtk_box_pack_start( GTK_BOX(hbox), label, FALSE, FALSE, 2);
+  gtk_box_pack_start( GTK_BOX(vbox), hbox, FALSE, FALSE, 5);
 
   /* font picker */
   table = gtk_table_new (1, 3, FALSE);
@@ -1127,5 +1162,17 @@ void timer_modified_cb( GtkWidget *widget, GnomePropertyBox *pbox)
 
   properties_modified_cb( widget, pbox );
 
+}
+
+void wrap_modified_cb( GtkWidget *widget, GnomePropertyBox *pbox)
+{
+  if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->wordwrap)))
+      gtk_widget_set_sensitive( GTK_WIDGET(pui->wraplength),
+				 TRUE );
+  else
+      gtk_widget_set_sensitive( GTK_WIDGET(pui->wraplength),
+				 FALSE );
+
+  properties_modified_cb( widget, pbox );
 }
 

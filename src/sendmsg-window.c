@@ -128,8 +128,8 @@ static gchar* prep_signature(LibBalsaIdentity* ident, gchar* sig);
 static void update_msg_identity(BalsaSendmsg*, LibBalsaIdentity*);
 
 static void sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
-static GString *
-quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type);
+static GString *quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message,
+                          SendType type);
 static void set_list_post_address(BalsaSendmsg * msg);
 static gboolean set_list_post_rfc2369(BalsaSendmsg * msg, GList * p);
 static gchar *rfc2822_skip_comments(gchar * str);
@@ -736,6 +736,19 @@ fill_language_menu()
     lang_menu[LANG_CURRENT_POS].label = (char *) locales[idxsys].lang_name;
 }
 
+static struct {
+    gchar *label;
+    glong struct_offset;
+} headers[] = {
+    { N_("To:"),       G_STRUCT_OFFSET(BalsaSendmsg, to[1])},
+    { N_("From:"),     G_STRUCT_OFFSET(BalsaSendmsg, from[1])},
+    { N_("Reply-To:"), G_STRUCT_OFFSET(BalsaSendmsg, reply_to[1])},
+    { N_("Bcc:"),      G_STRUCT_OFFSET(BalsaSendmsg, bcc[1])},
+    { N_("Cc:"),       G_STRUCT_OFFSET(BalsaSendmsg, cc[1])},
+    { N_("Comments:"), G_STRUCT_OFFSET(BalsaSendmsg, comments[1])},
+    { N_("Subject:"),  G_STRUCT_OFFSET(BalsaSendmsg, subject[1])}
+};
+
 static gboolean
 edit_with_gnome_check(gpointer data) {
     FILE *tmp;
@@ -758,32 +771,28 @@ edit_with_gnome_check(gpointer data) {
         return TRUE;
     }
     gdk_threads_enter();
-    if(balsa_app.edit_headers) {
-	while(fgets(line, sizeof(line), tmp)) {
-            if(line[strlen(line)-1] == '\n')line[strlen(line)-1] = '\0';
-            if(!strncmp(line, "To: ", 4))
-                gtk_entry_set_text(GTK_ENTRY(data_real->msg->to[1]),
-                                   line + 4);
-            else if(!strncmp(line, "From: ", 6))
-                gtk_entry_set_text(GTK_ENTRY(data_real->msg->from[1]), 
-                                   line+6);
-            else if(!strncmp(line, "Reply-To: ", 10))
-                gtk_entry_set_text(GTK_ENTRY(data_real->msg->reply_to[1]), 
-                                   line+10);
-            else if(!strncmp(line, "Bcc: ", 5))
-                gtk_entry_set_text(GTK_ENTRY(data_real->msg->bcc[1]), 
-                                   line+5);
-            else if(!strncmp(line, "Cc: ", 4))
-                gtk_entry_set_text(GTK_ENTRY(data_real->msg->cc[1]), 
-                                   line+4);
-            else if(!strncmp(line, "Comments: ", 10))
-                gtk_entry_set_text(GTK_ENTRY(data_real->msg->comments[1]), 
-                                   line+10);
-            else if(!strncmp(line, "Subject: ", 9))
-                gtk_entry_set_text(GTK_ENTRY(data_real->msg->subject[1]), 
-                                   line+9);
-            else break;
-	}
+    if (balsa_app.edit_headers) {
+        while (fgets(line, sizeof(line), tmp)) {
+            guint i;
+
+            if (line[strlen(line) - 1] == '\n')
+                line[strlen(line) - 1] = '\0';
+
+            for (i = 0; i < ELEMENTS(headers); i++) {
+                gchar *p = _(headers[i].label);
+                guint len = strlen(p);
+
+                if (!strncmp(line, p, len)) {
+                    GtkWidget *widget =
+                        G_STRUCT_MEMBER(GtkWidget *, data_real->msg,
+                                        headers[i].struct_offset);
+                    gtk_entry_set_text(GTK_ENTRY(widget), line + len + 1);
+                    break;
+                }
+            }
+            if (i >= ELEMENTS(headers))
+                break;
+        }
     }
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(data_real->msg->text));
 
@@ -832,25 +841,15 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* msg)
     tmp   = fdopen(tmpfd, "w+");
     
     if(balsa_app.edit_headers) {
-        const gchar
-            *from = gtk_entry_get_text(GTK_ENTRY(msg->from[1])),
-            *to = gtk_entry_get_text(GTK_ENTRY(msg->to[1])),
-            *reply_to = gtk_entry_get_text(GTK_ENTRY(msg->reply_to[1])),
-            *cc = gtk_entry_get_text(GTK_ENTRY(msg->cc[1])),
-            *bcc = gtk_entry_get_text(GTK_ENTRY(msg->bcc[1])),
-	    *subject = gtk_entry_get_text(GTK_ENTRY(msg->subject[1])),
-	    *comments = gtk_entry_get_text(GTK_ENTRY(msg->comments[1]));
-	
-	/* Write all the headers */
-	fprintf(tmp, 
-                "From: %s\n"
-                "To: %s\n"
-                "Cc: %s\n"
-                "Bcc: %s\n"
-                "Subject: %s\n"
-                "Reply-To: %s\n"
-                "Comments: %s\n\n\n",
-                from, to, cc, bcc, subject, reply_to, comments);
+        guint i;
+
+        for (i = 0; i < ELEMENTS(headers); i++) {
+            GtkWidget *widget = G_STRUCT_MEMBER(GtkWidget *, msg,
+                                                headers[i].struct_offset);
+            const gchar *p = gtk_entry_get_text(GTK_ENTRY(widget));
+            fprintf(tmp, "%s %s\n", _(headers[i].label), p);
+        }
+        fprintf(tmp, "\n");
     }
 
     gtk_widget_set_sensitive(GTK_WIDGET(msg->text), FALSE);
@@ -2136,64 +2135,44 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	body = g_string_new(str);
 	g_free(str);
 
-	if (date) {
-	    str = g_strdup_printf(_("Date: %s\n"), date);
-	    g_string_append(body, str);
-	    g_free(str);
-	}
+	if (date)
+	    g_string_append_printf(body, "%s %s\n", _("Date:"), date);
 
 	subject = LIBBALSA_MESSAGE_GET_SUBJECT(message);
-	if (subject) {
-	    str = g_strdup_printf(_("Subject: %s\n"), subject);
-	    g_string_append(body, str);
-	    g_free(str);
-	}
+	if (subject)
+	    g_string_append_printf(body, "%s %s\n", _("Subject:"), subject);
 
 	if (message->from) {
 	    gchar *from = libbalsa_address_to_gchar(message->from, 0);
-	    str = g_strdup_printf(_("From: %s\n"), from);
-	    g_string_append(body, str);
+	    g_string_append_printf(body, "%s %s\n", _("From:"), from);
 	    g_free(from);
-	    g_free(str);
 	}
 
 	if (message->to_list) {
 	    gchar *to_list = libbalsa_make_string_from_list(message->to_list);
-	    str = g_strdup_printf(_("To: %s\n"), to_list);
-	    g_string_append(body, str);
+	    g_string_append_printf(body, "%s %s\n", _("To:"), to_list);
 	    g_free(to_list);
-	    g_free(str);
 	}
 
 	if (message->cc_list) {
 	    gchar *cc_list = libbalsa_make_string_from_list(message->cc_list);
-	    str = g_strdup_printf(_("CC: %s\n"), cc_list);
-	    g_string_append(body, str);
+	    g_string_append_printf(body, "%s %s\n", _("Cc:"), cc_list);
 	    g_free(cc_list);
-	    g_free(str);
 	}
 
-	str = g_strdup_printf(_("Message-ID: %s\n"), message->message_id);
-	g_string_append(body, str);
-	g_free(str);
+	g_string_append_printf(body, _("Message-ID: %s\n"),
+                               message->message_id);
 
 	if (message->references) {
 	    GList *ref_list = message->references;
 
-	    str = g_strdup_printf(_("References: %s"),
-                                  (gchar *) ref_list->data);
-	    g_string_append(body, str);
-	    g_free(str);
-	    ref_list = ref_list->next;
+	    g_string_append(body, _("References:"));
 
-	    while (ref_list) {
-		str = g_strdup_printf(" %s", (gchar *) ref_list->data);
-		g_string_append(body, str);
-		g_free(str);
-		ref_list = ref_list->next;
-	    }
+	    for (ref_list = message->references; ref_list;
+                 ref_list = g_list_next(ref_list))
+		g_string_append_printf(body, " %s", (gchar *) ref_list->data);
 		
-	    g_string_append(body, "\n");
+	    g_string_append_c(body, '\n');
 	}
     } else {
 	if (date)
@@ -2230,7 +2209,7 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 static void
 fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 {
-    GString *body = NULL;
+    GString *body;
     gchar *signature;
     gboolean reply_any = (type == SEND_REPLY || type == SEND_REPLY_ALL
                           || type == SEND_REPLY_GROUP);
@@ -2252,8 +2231,8 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
        || (type == SEND_NORMAL && msg->ident->sig_sending)) {
 
 	    if (msg->ident->sig_separator
-		&& g_ascii_strncasecmp(signature, "--\n", 3)
-		&& g_ascii_strncasecmp(signature, "-- \n", 4)) {
+		&& strncmp(signature, "--\n", 3)
+		&& strncmp(signature, "-- \n", 4)) {
 		gchar * tmp = g_strconcat("-- \n", signature, NULL);
 		g_free(signature);
 		signature = tmp;

@@ -79,6 +79,10 @@ void libbalsa_marshall_POINTER__POINTER_POINTER(GtkObject *object,
 void libbalsa_marshal_POINTER__INT_POINTER(GtkObject *object,
                                            GtkSignalFunc func,
                                            gpointer func_data, GtkArg *args);
+void libbalsa_marshal_NONE__INT_INT_INT_STRING(GtkObject *object,
+                                               GtkSignalFunc func,
+                                               gpointer func_data,
+                                               GtkArg *args);
 
 gboolean libbalsa_delete_directory_contents(const gchar *path);
 gchar *libbalsa_truncate_string(const gchar * str, gint length, gint dots);

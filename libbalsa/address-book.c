@@ -25,7 +25,6 @@
 #include <gnome.h>
 
 #include "address-book.h"
-#include "information.h"
 #include "misc.h"
 
 static GtkObjectClass *parent_class = NULL;
@@ -173,29 +172,21 @@ libbalsa_address_book_new_from_config(const gchar * prefix)
     type_str = gnome_config_get_string_with_default("Type", &got_default);
 
     if (got_default == TRUE) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Cannot load address book %s"), prefix);
+        /* type entry missing, skip it */
 	gnome_config_pop_prefix();
 	return NULL;
     }
 
     type = gtk_type_from_name(type_str);
     if (type == 0) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("No such address book type: %s"), type_str);
+        /* type unknown, skip it */
 	g_free(type_str);
 	gnome_config_pop_prefix();
 	return NULL;
     }
 
     address_book = gtk_type_new(type);
-    if (address_book == NULL) {
-	libbalsa_information
-	    (LIBBALSA_INFORMATION_WARNING,
-	     _("Could not create a address book of type %s"),
-	     type_str);
-    } else
-	libbalsa_address_book_load_config(address_book, prefix);
+    libbalsa_address_book_load_config(address_book, prefix);
 
     gnome_config_pop_prefix();
     g_free(type_str);

@@ -47,9 +47,12 @@ struct _LibBalsaMailboxPop3 {
 
 struct _LibBalsaMailboxPop3Class {
     LibBalsaMailboxRemoteClass klass;
+ 
+    void (*config_changed) (LibBalsaMailboxPop3* mailbox);
 };
 
 GtkObject *libbalsa_mailbox_pop3_new(void);
-void libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox, LibBalsaMailbox *inbox);
+void libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox,
+                                     LibBalsaMailbox *inbox);
 
 #endif				/* __LIBBALSA_MAILBOX_POP3_H__ */

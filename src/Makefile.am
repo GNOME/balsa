@@ -3,8 +3,8 @@ bin_PROGRAMS = balsa
 balsa_BASE_SRCLIST =	\
 	address-book-config.c	\
 	address-book-config.h	\
-	address-book.c		\
-	address-book.h		\
+	ab-window.c		\
+	ab-window.h		\
 	balsa-app.c		\
 	balsa-app.h		\
 	balsa-icons.c		\

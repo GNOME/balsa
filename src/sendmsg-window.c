@@ -75,7 +75,7 @@
 #endif
 
 #include "sendmsg-window.h"
-#include "address-book.h"
+#include "ab-window.h"
 #include "address-entry.h"
 #include "expand-alias.h"
 #include "print.h"
@@ -558,7 +558,7 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
                                (GTK_OBJECT(widget),
                                 "address-entry-widget"));
 
-    ab = balsa_address_book_new(TRUE);
+    ab = balsa_ab_window_new(TRUE);
     gnome_dialog_set_parent(GNOME_DIALOG(ab), 
 			    GTK_WINDOW(snd_msg_wind->window));
 
@@ -566,7 +566,7 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
     button = gnome_dialog_run(GNOME_DIALOG(ab));
     if ( button == 0 ) {
 	gchar *t;
-	t = balsa_address_book_get_recipients(BALSA_ADDRESS_BOOK(ab));
+	t = balsa_ab_window_get_recipients(BALSA_AB_WINDOW(ab));
 	append_comma_separated(GTK_ENTRY(address_entry), t);
 	g_free(t);
     }

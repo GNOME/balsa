@@ -30,7 +30,6 @@
 
 #include "libbalsa.h"
 
-#include "address-book.h"
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-index.h"

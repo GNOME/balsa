@@ -93,6 +93,7 @@ enum {
     MESSAGES_ADDED,
     MESSAGES_REMOVED,
     GET_MESSAGE_STREAM,
+    PROGRESS_NOTIFY,
     CHECK,
     SET_UNREAD_MESSAGES_FLAG,
     SAVE_CONFIG,
@@ -218,11 +219,14 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 					 get_message_stream),
 		       libbalsa_marshal_POINTER__OBJECT, GTK_TYPE_POINTER,
 		       1, LIBBALSA_TYPE_MESSAGE);
-    libbalsa_mailbox_signals[CHECK] =
-	gtk_signal_new("check", GTK_RUN_LAST | GTK_RUN_NO_HOOKS,
+    libbalsa_mailbox_signals[PROGRESS_NOTIFY] =
+	gtk_signal_new("progress-notify", GTK_RUN_FIRST,
 		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaMailboxClass, check),
-		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
+		       GTK_SIGNAL_OFFSET(LibBalsaMailboxClass,progress_notify),
+		       libbalsa_marshal_NONE__INT_INT_INT_STRING, 
+                       GTK_TYPE_NONE, 4,
+                       GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_INT,
+                       GTK_TYPE_STRING);
     libbalsa_mailbox_signals[SAVE_CONFIG] =
 	gtk_signal_new("save-config",
 		       GTK_RUN_LAST,
@@ -256,6 +260,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->messages_removed = NULL;
 
     klass->get_message_stream = NULL;
+    klass->progress_notify    = NULL;
     klass->check = NULL;
     klass->save_config  = libbalsa_mailbox_real_save_config;
     klass->load_config  = libbalsa_mailbox_real_load_config;
@@ -444,6 +449,21 @@ libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,
     gtk_signal_emit(GTK_OBJECT(mailbox),
 		    libbalsa_mailbox_signals[SET_UNREAD_MESSAGES_FLAG],
 		    has_unread);
+}
+
+/* libbalsa_mailbox_progress_notify:
+   there has been a progress in current operation.
+*/
+void
+libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
+                                 int type, int prog, int tot, const gchar* msg)
+{
+    g_return_if_fail(mailbox != NULL);
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    gtk_signal_emit(GTK_OBJECT(mailbox),
+                    libbalsa_mailbox_signals[PROGRESS_NOTIFY],
+                    type, prog, tot, msg);
 }
 
 void

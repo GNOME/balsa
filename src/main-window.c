@@ -35,7 +35,7 @@
 #include "libbalsa.h"
 #include "send.h"
 
-#include "address-book.h"
+#include "ab-window.h"
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-index.h"
@@ -2499,7 +2499,7 @@ address_book_cb(GtkWindow *widget, gpointer data)
 {
     GtkWidget *ab;
 
-    ab = balsa_address_book_new(FALSE);
+    ab = balsa_ab_window_new(FALSE);
     gnome_dialog_set_parent(GNOME_DIALOG(ab), GTK_WINDOW(balsa_app.main_window));
 
     gtk_widget_show(GTK_WIDGET(ab));

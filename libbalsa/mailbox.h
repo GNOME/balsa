@@ -123,6 +123,8 @@ struct _LibBalsaMailboxClass {
     void (*messages_status_changed) (LibBalsaMailbox * mailbox,
 				     GList * messages,
 				     gint flag);
+    void (*progress_notify) (LibBalsaMailbox * mailbox, int type,
+                             int prog, int tot, const gchar* msg);
     void (*set_unread_messages_flag) (LibBalsaMailbox * mailbox,
 				      gboolean flag);
 
@@ -158,6 +160,9 @@ void libbalsa_mailbox_remove_messages(LibBalsaMailbox * mbox,
 
 void libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,
 					       gboolean has_unread);
+void libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
+                                      int type, int prog, int tot,
+                                      const gchar* msg);
 
 FILE *libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
 					  LibBalsaMessage * message);

@@ -790,6 +790,25 @@ libbalsa_marshal_POINTER__INT_POINTER(GtkObject *object,
 }
 
 
+typedef gpointer(*GtkSignal_NONE__INT_INT_INT_STRING) (GtkObject *object,
+                                                       int param1,
+                                                       int param2,
+                                                       int param3,
+                                                       const gchar* param4,
+                                                       gpointer user_data);
+void
+libbalsa_marshal_NONE__INT_INT_INT_STRING(GtkObject *object, 
+                                          GtkSignalFunc func,
+                                          gpointer func_data, GtkArg *args)
+{
+    GtkSignal_NONE__INT_INT_INT_STRING rfunc;
+
+    rfunc = (GtkSignal_NONE__INT_INT_INT_STRING) func;
+    (*rfunc) (object, GTK_VALUE_INT(args[0]), 
+              GTK_VALUE_INT(args[1]), GTK_VALUE_INT(args[2]),
+              GTK_VALUE_STRING(args[3]), func_data);
+}
+
 /* Delete the contents of a directory (not the directory itself).
    Return TRUE if everything was OK.
    If FALSE is returned then errno will be set to some useful value.

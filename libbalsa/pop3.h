@@ -36,16 +36,17 @@ typedef enum {
     POP_AUTH_FAILED
 } PopStatus;
 
-typedef void (*ProgressCallback)(char *msg, int prog, int tot);
+typedef void (*ProgressCallback)(void* m, 
+                                 char *msg, int prog, int tot);
 
 PopStatus libbalsa_fetch_pop_mail_direct (LibBalsaMailboxPop3 * mailbox, 
 					  const gchar * spoolfile, 
-					  ProgressCallback prog_cb, 
-					  gchar* uid);
+					  gchar* uid, 
+					  ProgressCallback prog_cb, void*data);
 
 PopStatus libbalsa_fetch_pop_mail_filter (LibBalsaMailboxPop3 * mailbox, 
-					  ProgressCallback prog_cb, 
-					  gchar* uid);
+					  gchar* uid,
+					  ProgressCallback prog_cb, void*data);
 
 const gchar *pop_get_errstr(PopStatus status);
 

@@ -1,3 +1,18 @@
+2002-11-30  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/address-book.c: reduce number of dependencies.
+	* libbalsa/filter.[hc]: remove balsa_app dependencies.
+	* libbalsa/libbalsa.c: mailbox_lock is a LibBalsaMailbox thing.
+	* libbalsa/mailbox.[ch]: add "progress-notify" signal.
+	* libbalsa/mailbox_pop3.[hc]: add "config-changed" signal.
+	* libbalsa/misc.[hc]: add marshaller used by progress-notify.
+	* libbalsa/pop3.[ch]: adapt to "progress-notify" signal.
+	* src/Makefile.am: rename address-book to ab-window.
+	* src/{sendmsg,main}-window.c: use new address book preview code.
+	* src/main.c: initialize filters code.
+	* src/save-restore.c: setup pop3 callbacks.
+	* src/toolbar-prefs.c: remove redundant #include.
+
 2002-11-21  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/libbalsa.c: Initialize MH* libmutt variables (#99067).

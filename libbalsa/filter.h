@@ -238,6 +238,11 @@ void filters_run_dialog(LibBalsaMailbox *mbox);
 void
 filters_export_dialog(void);
 
+void libbalsa_filters_set_trash(LibBalsaMailbox* new_trash);
+typedef LibBalsaMailbox* (*UrlToMailboxMapper)(const gchar* url);
+void libbalsa_filters_set_url_mapper(UrlToMailboxMapper u2mm);
+void libbalsa_filters_set_filter_list(GSList** list);
+
 /*
  * Error calls
  */

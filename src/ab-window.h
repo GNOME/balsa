@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,22 +19,22 @@
  * 02111-1307, USA.
  */
 
-#ifndef __ADDRESS_BOOK_H__
-#define __ADDRESS_BOOK_H__
+#ifndef __AB_WINDOW_H__
+#define __AB_WINDOW_H__
 
 BEGIN_GNOME_DECLS
 
-#define BALSA_TYPE_ADDRESS_BOOK            (balsa_address_book_get_type ())
-#define BALSA_ADDRESS_BOOK(obj)            (GTK_CHECK_CAST ((obj), BALSA_TYPE_ADDRESS_BOOK, BalsaAddressBook))
-#define BALSA_ADDRESS_BOOK_CLASS(klass)    (GTK_CHECK_CLASS_CAST ((klass), BALSA_TYPE_ADDRESS_BOOK, BalsaAddressBookClass))
-#define BALSA_IS_ADDRESS_BOOK(obj)         (GTK_CHECK_TYPE ((obj), BALSA_TYPE_ADDRESS_BOOK))
-#define BALSA_IS_ADDRESS_BOOK_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), BALSA_TYPE_ADDRESS_BOOK))
+#define BALSA_TYPE_AB_WINDOW            (balsa_ab_window_get_type ())
+#define BALSA_AB_WINDOW(obj)            (GTK_CHECK_CAST ((obj), BALSA_TYPE_AB_WINDOW, BalsaAbWindow))
+#define BALSA_AB_WINDOW_CLASS(klass)    (GTK_CHECK_CLASS_CAST ((klass), BALSA_TYPE_AB_WINDOW, BalsaAbWindowClass))
+#define BALSA_IS_AB_WINDOW(obj)         (GTK_CHECK_TYPE ((obj), BALSA_TYPE_AB_WINDOW))
+#define BALSA_IS_AB_WINDOW_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), BALSA_TYPE_AB_WINDOW))
 
 
-typedef struct _BalsaAddressBook BalsaAddressBook;
-typedef struct _BalsaAddressBookClass BalsaAddressBookClass;
+typedef struct _BalsaAbWindow BalsaAbWindow;
+typedef struct _BalsaAbWindowClass BalsaAbWindowClass;
 
-struct _BalsaAddressBook 
+struct _BalsaAbWindow 
 {
     GnomeDialog parent;
 
@@ -60,19 +60,19 @@ struct _BalsaAddressBook
     GtkWidget *arrow_box;
 };
 
-struct _BalsaAddressBookClass
+struct _BalsaAbWindowClass
 {
     GnomeDialogClass parent_class;
 };
 
-GtkType balsa_address_book_get_type(void);
-GtkWidget *balsa_address_book_new(gboolean composing);
+GtkType balsa_ab_window_get_type(void);
+GtkWidget *balsa_ab_window_new(gboolean composing);
 
-gchar *balsa_address_book_get_recipients(BalsaAddressBook *ab);
+gchar *balsa_ab_window_get_recipients(BalsaAbWindow *ab);
 
 END_GNOME_DECLS
 
-#endif				/* __ADDRESS_BOOK_H__ */
+#endif				/* __AB_WINDOW_H__ */
 
 
 

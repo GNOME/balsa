@@ -194,6 +194,9 @@ imap_check_capability(ImapMboxHandle* handle)
 int
 imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap)
 {
+  if(cap == IMCAP_FETCHBODY)
+    return handle->can_fetch_body;
+
   /* perhaps it already has capabilities? */
   if(!handle->has_capabilities)
     imap_check_capability(handle);

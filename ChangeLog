@@ -1,3 +1,14 @@
+2004-09-03  Pawel Salek
+
+	* libbalsa/address-book-gpe.c: more consistent behaviour (perhaps
+	needs to be discussed).
+	* libbalsa/mailbox_imap.c: detect and work around Exchange bugs
+	explicitely.
+	* libbalsa/imap/imap-{commands,handle}.c: set ::can_fetch_body.
+	* libbalsa/imap/imap-handle.h: add ImapMboxHandle::can_fetch_body.
+	* libinit_balsa/balsa-initdruid.c: quit on destroy signal.
+	* src/expand-alias.c: expand addresses differently.
+
 2004-09-03 08:48  PeterB
 
 	* src/balsa-message.c: leave vertical scrollbar in place while html

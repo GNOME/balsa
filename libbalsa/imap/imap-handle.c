@@ -384,6 +384,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
 
   /* reset some handle status */
   handle->has_capabilities = FALSE;
+  handle->can_fetch_body = TRUE;
   if(handle->sio) {
     sio_detach(handle->sio);
     handle->sio = NULL;
@@ -428,7 +429,8 @@ imap_mbox_connect(ImapMboxHandle* handle)
     handle->state = IMHS_DISCONNECTED;
     return IMAP_PROTOCOL_ERROR;
   }
-
+  handle->can_fetch_body = 
+    (strncmp(handle->last_msg, "Microsoft Exchange", 18) != 0);
 #if defined(USE_TLS)
   if(handle->over_ssl)
     resp = IMR_OK; /* secured already with SSL */

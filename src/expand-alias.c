@@ -158,7 +158,10 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
 	    }
 	    addr = LIBBALSA_ADDRESS(search->data);
 	}
-	output=libbalsa_address_to_gchar(addr, -1);
+        /* FIXME: in principle, we should pass -1 instead of 0 but the
+         * group support is incomplete and these things has to be done
+         * in one shot otherwise they do more harm than good. */
+	output=libbalsa_address_to_gchar(addr, 0);
         addy->address = addr;
         g_object_ref(addy->address);
 

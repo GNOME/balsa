@@ -82,6 +82,9 @@ struct _ImapMboxHandle {
   unsigned using_tls:1;
 #endif
   unsigned readonly_mbox:1;
+  unsigned can_fetch_body:1; /* set for servers that always respond
+                              * correctly to FETCH x BODY[y]
+                              * requests. */
 };
 
 #define IMAP_MBOX_IS_DISCONNECTED(h)  ((h)->state == IMHS_DISCONNECTED)

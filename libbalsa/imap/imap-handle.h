@@ -74,6 +74,9 @@ typedef enum
   IMCAP_CHILDREN,               /* RFC 3348 */
   IMCAP_LITERAL,                /* RFC 2088 */
   IMCAP_SASLIR,                 /* imap-sasl-initial-response: SASL-IR */
+  IMCAP_FETCHBODY,              /* basic imap implemented correctly by
+                                 * most imap servers but not all. We
+                                 * have to detect that. */
   IMCAP_MAX
 } ImapCapability;
 

@@ -234,11 +234,9 @@ gpe_read_attr(void *arg, int argc, char **argv, char **names)
             !a->nick_name) a->nick_name = g_strdup(argv[1]);
     else if(g_ascii_strcasecmp(argv[0], "WORK.ORGANIZATION") == 0 &&
             !a->organization) a->organization = g_strdup(argv[1]);
-    else if(g_ascii_strcasecmp(argv[0], "HOME.EMAIL") == 0 &&
-            !a->address_list)
+    else if(g_ascii_strcasecmp(argv[0], "HOME.EMAIL") == 0)
         a->address_list = g_list_prepend(a->address_list, g_strdup(argv[1]));
-    else if(g_ascii_strcasecmp(argv[0], "WORK.EMAIL") == 0 &&
-            !a->address_list)
+    else if(g_ascii_strcasecmp(argv[0], "WORK.EMAIL") == 0)
         a->address_list = g_list_prepend(a->address_list, g_strdup(argv[1]));
     return 0;
 }

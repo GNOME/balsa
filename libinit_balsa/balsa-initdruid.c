@@ -59,6 +59,8 @@ balsa_initdruid(GtkWindow * window)
     gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(druid));
     g_signal_connect(G_OBJECT(druid), "cancel",
                      G_CALLBACK(balsa_initdruid_cancel), NULL);
+    g_signal_connect(G_OBJECT(druid), "destroy",
+                     G_CALLBACK(exit), NULL);
     g_object_ref(G_OBJECT(window));
 
     balsa_initdruid_init(druid);

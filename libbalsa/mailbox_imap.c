@@ -1821,7 +1821,8 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
 
     /* work around some server bugs... */
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-    if(libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(server),
+    if(!imap_mbox_handle_can_do(mimap->handle, IMCAP_FETCHBODY) ||
+       libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(server),
                                     ISBUG_FETCH)){
         /* we could optimize this part a little bit: we do not need to
          * keep reopening the stream. */

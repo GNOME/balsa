@@ -172,7 +172,7 @@ print_wrap_string(gchar ** str, GnomeFont * font, gint width, gint tab_width)
 		lines++;
 		line_width = 
 		    gnome_font_get_width_utf8(font, 
-						&wrapped->str[last_space + 1]);
+                                              &wrapped->str[last_space + 1]);
 	    }
 	}
 	line = eol;
@@ -269,14 +269,14 @@ start_new_page(PrintInfo * pi)
 		       ypos);
     gnome_print_show_with_charset(pi, page_no, pi->conv_data);
     g_free(page_no);
-    gtk_object_unref(GTK_OBJECT(font));
+    g_object_unref(font);
     
     /* print the footer */
     font = gnome_font_find(BALSA_PRINT_HEAD_FONT, BALSA_PRINT_FOOT_SIZE);
     gnome_print_setfont(pi->pc, font);
     print_foot_lines(pi, font, pi->margin_bottom - 2 * BALSA_PRINT_FOOT_SIZE,
 		     BALSA_PRINT_FOOT_SIZE, pi->footer);
-    gtk_object_unref(GTK_OBJECT(font));
+    g_object_unref(font);
     pi->ypos = pi->margin_bottom + pi->printable_height;
 }
 
@@ -402,7 +402,7 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
 
     font = gnome_font_find(BALSA_PRINT_HEAD_FONT, BALSA_PRINT_FOOT_SIZE);
     print_wrap_string(&pi->footer, font, pi->printable_width, pi->tab_width);
-    gtk_object_unref(GTK_OBJECT(font));    
+    g_object_unref(font);    
     
     /* calculate the label width */
     pdata->header_label_width = 0;
@@ -442,7 +442,7 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
 	    lines * BALSA_PRINT_HEAD_SIZE;
     } else
 	pi->ypos -= lines * BALSA_PRINT_HEAD_SIZE;
-    gtk_object_unref(GTK_OBJECT(font));
+    g_object_unref(font);
 
     pi->print_parts = g_list_append (pi->print_parts, pdata);
 }
@@ -498,7 +498,7 @@ print_header(PrintInfo * pi, gpointer * data)
 	g_strfreev(pair);
 	p = g_list_next(p);
     }
-    gtk_object_unref(GTK_OBJECT(font));
+    g_object_unref(font);
 }
 
 /*
@@ -603,7 +603,7 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
     font = gnome_font_find(BALSA_PRINT_BODY_FONT, BALSA_PRINT_BODY_SIZE);
     pdata->lines = print_wrap_string(&pdata->textbuf, font, pi->printable_width,
 				     pi->tab_width);
-    gtk_object_unref(GTK_OBJECT(font));
+    g_object_unref(G_OBJECT(font));
 
     /* calculate the y end position */
     if (pi->ypos - pdata->lines * BALSA_PRINT_BODY_SIZE < pi->margin_bottom) {
@@ -645,7 +645,7 @@ print_plaintext(PrintInfo * pi, gpointer * data)
     }
     if (pdata->conv != (iconv_t)(-1))
 	iconv_close(pdata->conv);
-    gtk_object_unref(GTK_OBJECT(font));
+    g_object_unref(G_OBJECT(font));
     g_free (pdata->textbuf);
 }
 
@@ -720,7 +720,7 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
     } else
 	pi->ypos -= pdata->part_height;
     
-    gtk_object_unref(GTK_OBJECT(font));
+    g_object_unref(G_OBJECT(font));
     g_free(conttype);
 
     pi->print_parts = g_list_append (pi->print_parts, pdata);
@@ -767,7 +767,7 @@ print_default(PrintInfo * pi, gpointer data)
     }
     pi->ypos -= (pdata->part_height - pdata->text_height) / 2.0 -
 	BALSA_PRINT_HEAD_SIZE;
-    gtk_object_unref(GTK_OBJECT(font));
+    g_object_unref(G_OBJECT(font));
     g_strfreev(pdata->labels);
 }
 
@@ -934,7 +934,7 @@ print_info_new(const gchar * paper, LibBalsaMessage * msg,
     font = gnome_font_find(BALSA_PRINT_BODY_FONT, BALSA_PRINT_BODY_SIZE);
     pi->chars_per_line =
 	(gint) (pi->printable_width / gnome_font_get_width_utf8(font, "X"));
-    gtk_object_unref(GTK_OBJECT(font));
+    g_object_unref(G_OBJECT(font));
 
     pi->tab_width = 8;
     pi->pages = 1;
@@ -1034,7 +1034,7 @@ is_font_ok(const gchar * font_name)
 			    "Printing is not possible"), font_name);
 	return FALSE;
     }
-    gtk_object_unref(GTK_OBJECT(test_font));
+    g_object_unref(G_OBJECT(test_font));
     return TRUE;
 }
 
@@ -1061,10 +1061,10 @@ message_print_cb(GtkWidget * widget, gpointer cbdata)
 
 /* callback to read new paper selection */
 static void 
-paper_changed (GtkEntry *paper_selector, gchar *paper_size)
+paper_changed (GtkEntry *paper_selector, gchar **paper_size)
 {
-    g_free(paper_size);
-    paper_size = g_strdup(gtk_entry_get_text(paper_selector));
+    g_free(*paper_size);
+    *paper_size = g_strdup(gtk_entry_get_text(paper_selector));
 }
 
 /*
@@ -1090,7 +1090,7 @@ print_paper_select_new(GtkWidget * dialog)
 				  g_list_copy(gnome_print_paper_get_list()));
     gtk_entry_set_text(entry, balsa_app.paper_size);
     gtk_signal_connect(GTK_OBJECT(entry), "changed",
-		       GTK_SIGNAL_FUNC(paper_changed), balsa_app.paper_size);
+		       GTK_SIGNAL_FUNC(paper_changed), &balsa_app.paper_size);
     gtk_container_add (GTK_CONTAINER(frame), combo);
     gtk_widget_show_all(frame);
 }
@@ -1113,23 +1113,23 @@ message_print(LibBalsaMessage * msg)
      * add paper selection combo to print dialog
      */
     print_paper_select_new(dialog);
-    gnome_dialog_set_parent(GNOME_DIALOG(dialog),
-			    GTK_WINDOW(balsa_app.main_window));
+    /* gtk_widget_set_parent_window(dialog, 
+       GTK_WINDOW(balsa_app.main_window)); */
     gtk_window_set_wmclass(GTK_WINDOW(dialog), "print", "Balsa");
 
-    switch (gnome_dialog_run(GNOME_DIALOG(dialog))) {
+    switch (gtk_dialog_run(GTK_DIALOG(dialog))) {
     case GNOME_PRINT_DIALOG_RESPONSE_PRINT:
 	break;
     case GNOME_PRINT_DIALOG_RESPONSE_PREVIEW:
 	preview = TRUE;
 	break;
     case GNOME_PRINT_DIALOG_RESPONSE_CANCEL:
-	gnome_dialog_close(GNOME_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
     default:
 	return;
     }
     pi = print_info_new(balsa_app.paper_size, msg, GNOME_PRINT_DIALOG(dialog));
-    gnome_dialog_close(GNOME_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
 
     /* do the Real Job */
     print_message(pi);
@@ -1141,7 +1141,7 @@ message_print(LibBalsaMessage * msg)
 	gtk_widget_show(preview_widget);
     } else {
 	gnome_print_master_print(pi->master);
-	gtk_object_unref(GTK_OBJECT(pi->master));
+	g_object_unref(G_OBJECT(pi->master));
     }
 
     print_info_destroy(pi);

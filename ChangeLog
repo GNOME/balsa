@@ -1,3 +1,8 @@
+2002-04-12  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/print.c: make print work with new API (still some warnings
+	displayed occassionally).
+	
 2002-04-11 Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/spell-check.[hc]: make spell checking work.

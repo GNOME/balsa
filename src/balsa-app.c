@@ -598,6 +598,9 @@ open_mailboxes_idle_cb(gchar ** urls)
 		    *tmp, mbox);
 	if (mbox)
 	    balsa_mblist_open_mailbox(mbox);
+        else
+            balsa_information(LIBBALSA_INFORMATION_WARNING,
+                              _("Couldn't open mailbox \"%s\""), *tmp);
     }
     g_strfreev(urls);
 
@@ -1058,6 +1061,7 @@ balsa_app_descend(const gchar * url)
     badi.len = 0;
     badi.url = url;
     badi.mbnode = NULL;
+
     balsa_mailbox_nodes_lock(FALSE);
     g_node_traverse(balsa_app.mailbox_nodes, G_PRE_ORDER, G_TRAVERSE_LEAFS,
                     -1, (GNodeTraverseFunc) balsa_app_descend_func, &badi);

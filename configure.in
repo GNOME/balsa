@@ -45,7 +45,7 @@ PKG_CHECK_MODULES(BALSA, [
 glib-2.0
 libgnome-2.0
 libgnomeui-2.0
-gtk+-2.0 >= 2.0
+gtk+-2.0 >= 2.4
 gnome-vfs-2.0
 gnome-vfs-module-2.0
 $gnome_extras

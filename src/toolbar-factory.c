@@ -167,27 +167,12 @@ const int toolbar_button_count =
 void
 balsa_toolbar_remove_all(GtkWidget * widget)
 {
-#if GTK_CHECK_VERSION(2, 4, 0)
     GList *child, *children;
     
     children = gtk_container_get_children(GTK_CONTAINER(widget));
     for (child = children; child; child = child->next)
         gtk_widget_destroy(child->data);
     g_list_free(children);
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    GtkToolbar *toolbar = GTK_TOOLBAR(widget);
-    
-    /* we must be extremely careful here. unparenting used in original
-     * code modifies the children list with gtk+2.4 so we have to
-     * do toolbar cleanup differently. */
-    while (toolbar->children) {
-	GtkToolbarChild *child = toolbar->children->data;
-	if (child->type == GTK_TOOLBAR_CHILD_SPACE)
-	    gtk_toolbar_remove_space(toolbar, 0);
-	else
-	    gtk_container_remove(GTK_CONTAINER(widget), child->widget);
-    }
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 /* update_all_toolbars:
@@ -311,19 +296,11 @@ balsa_toolbar_refresh(GtkWidget * toolbar)
         BalsaToolbarIcon *bti;
         gint button;
         gchar *text, *tmp;
-#if GTK_CHECK_VERSION(2, 4, 0)
 	GtkToolItem *tool_item;
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-        gint type;
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
         if (!*icon) {
-#if GTK_CHECK_VERSION(2, 4, 0)
             gtk_toolbar_insert(GTK_TOOLBAR(toolbar),
                                gtk_separator_tool_item_new(), -1);
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-            gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
             continue;
         }
 
@@ -346,13 +323,7 @@ balsa_toolbar_refresh(GtkWidget * toolbar)
         }
 
         switch (toolbar_buttons[button].type) {
-#if !GTK_CHECK_VERSION(2, 4, 0)
-        case TOOLBAR_BUTTON_TYPE_RADIO:
-            type = GTK_TOOLBAR_CHILD_RADIOBUTTON;
-            break;
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
         case TOOLBAR_BUTTON_TYPE_TOGGLE:
-#if GTK_CHECK_VERSION(2, 4, 0)
 	    tool_item = gtk_toggle_tool_button_new_from_stock(icon);
             gtk_toggle_tool_button_set_active(GTK_TOGGLE_TOOL_BUTTON
                                               (tool_item), bti->active);
@@ -361,23 +332,15 @@ balsa_toolbar_refresh(GtkWidget * toolbar)
 	    if (bti->callback)
 		g_signal_connect(G_OBJECT(tool_item), "toggled",
                                  G_CALLBACK(bti->callback), bti->user_data);
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-            type = GTK_TOOLBAR_CHILD_TOGGLEBUTTON;
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
             break;
         case TOOLBAR_BUTTON_TYPE_BUTTON:
         default:
-#if GTK_CHECK_VERSION(2, 4, 0)
 	    tool_item = gtk_tool_button_new_from_stock(icon);
 	    if (bti->callback)
 		g_signal_connect(G_OBJECT(tool_item), "clicked",
                                  G_CALLBACK(bti->callback), bti->user_data);
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-            type = GTK_TOOLBAR_CHILD_BUTTON;
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
             break;
         }
-#if GTK_CHECK_VERSION(2, 4, 0)
 	gtk_tool_button_set_label(GTK_TOOL_BUTTON(tool_item), text);
         gtk_tool_item_set_tooltip(tool_item,
                                   GTK_TOOLBAR(toolbar)->tooltips,
@@ -385,35 +348,14 @@ balsa_toolbar_refresh(GtkWidget * toolbar)
                                   _(toolbar_buttons[button].help_text));
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), tool_item, -1);
 	bti->widget = GTK_WIDGET(tool_item);
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-        bti->widget =
-            gtk_toolbar_append_element(GTK_TOOLBAR(toolbar), type, NULL,
-                                       text,
-                                       _(toolbar_buttons[button].help_text),
-                                       _(toolbar_buttons[button].help_text),
-                                       gtk_image_new_from_stock(icon,
-                                           GTK_ICON_SIZE_LARGE_TOOLBAR),
-                                       GTK_SIGNAL_FUNC(bti->callback),
-                                       bti->user_data);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 	g_object_add_weak_pointer(G_OBJECT(bti->widget),
 				  (gpointer) &bti->widget);
         GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(bti->widget), GTK_CAN_FOCUS);
         g_free(text);
         gtk_widget_set_sensitive(bti->widget, bti->sensitive);
-#if !GTK_CHECK_VERSION(2, 4, 0)
-        if (type == GTK_TOOLBAR_CHILD_TOGGLEBUTTON) {
-            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(bti->widget),
-                                         bti->active);
-            g_signal_connect(G_OBJECT(bti->widget), "toggled",
-                             G_CALLBACK(bt_button_toggled), bti);
-        }
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     }
 
-#if GTK_CHECK_VERSION(2, 4, 0)
     gtk_widget_show_all(toolbar);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     parent = gtk_widget_get_parent(toolbar);
     if (parent)
         gtk_widget_queue_resize(parent);
@@ -488,13 +430,8 @@ balsa_toolbar_set_button_active(GtkWidget * toolbar, const gchar * icon,
 
     bti->active = active;
     if (bti->widget)
-#if GTK_CHECK_VERSION(2, 4, 0)
         gtk_toggle_tool_button_set_active(GTK_TOGGLE_TOOL_BUTTON
                                           (bti->widget), active);
-#else                           /* GTK_CHECK_VERSION(2, 4, 0) */
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(bti->widget),
-                                     active);
-#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 /* Signal handlers. */
@@ -503,12 +440,8 @@ balsa_toolbar_set_button_active(GtkWidget * toolbar, const gchar * icon,
 static void
 bt_button_toggled(GtkWidget * button, BalsaToolbarIcon * bti)
 {
-#if GTK_CHECK_VERSION(2, 4, 0)
     bti->active =
         gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(button));
-#else                           /* GTK_CHECK_VERSION(2, 4, 0) */
-    bti->active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
-#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 /* Handler for the "destroy" signal. */

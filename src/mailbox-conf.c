@@ -133,7 +133,6 @@ struct menu_data {
     const char *label;
     int tag;
 };
-#if GTK_CHECK_VERSION(2, 4, 0)
 struct mailbox_conf_combo_box_info {
     GSList *tags;
 };
@@ -166,23 +165,6 @@ mailbox_conf_combo_box_make(GtkComboBox * combo_box, unsigned cnt,
                            mailbox_conf_combo_box_info_free);
 }
 
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-static GtkWidget*
-get_combo_menu(unsigned cnt, const struct menu_data *data)
-{
-    GtkWidget *menu       = gtk_menu_new();
-    unsigned i;
-    for(i=0; i<cnt; i++) {
-        GtkWidget *menu_item =
-            gtk_menu_item_new_with_label(_(data[i].label));
-        g_object_set_data(G_OBJECT(menu_item), "balsa-data",
-                          GINT_TO_POINTER(data[i].tag));
-        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-    }
-    gtk_widget_show_all(menu);
-    return menu;
-}
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 static void
 bsc_ssl_toggled_cb(GtkWidget * widget, BalsaServerConf * bsc)
@@ -229,20 +211,11 @@ balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc, LibBalsaServer *s,
     gtk_table_attach(bsc->table, label, 0, 1, 1, 2,
 		     GTK_FILL, GTK_FILL, 0, 0);
 
-#if GTK_CHECK_VERSION(2, 4, 0)
     bsc->tls_option = gtk_combo_box_new_text();
     mailbox_conf_combo_box_make(GTK_COMBO_BOX(bsc->tls_option),
                                 ELEMENTS(tls_menu), tls_menu);
     gtk_combo_box_set_active(GTK_COMBO_BOX(bsc->tls_option),
                              s ? s->tls_mode : LIBBALSA_TLS_ENABLED);
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    bsc->tls_option = gtk_option_menu_new ();
-    bsc->tls_mode = get_combo_menu(ELEMENTS(tls_menu), tls_menu);
-    gtk_option_menu_set_menu (GTK_OPTION_MENU(bsc->tls_option),
-			      bsc->tls_mode);
-    gtk_option_menu_set_history (GTK_OPTION_MENU (bsc->tls_option),
-				 s ? s->tls_mode : LIBBALSA_TLS_ENABLED);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_table_attach(bsc->table, bsc->tls_option, 1, 2, 1, 2,
 		     GTK_FILL, GTK_FILL, 5, 5);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), bsc->tls_option);
@@ -304,13 +277,8 @@ balsa_server_conf_set_values(BalsaServerConf *bsc, LibBalsaServer *server)
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(bsc->use_ssl), 
                                  server->use_ssl);
-#if GTK_CHECK_VERSION(2, 4, 0)
     gtk_combo_box_set_active(GTK_COMBO_BOX(bsc->tls_option),
                              server->tls_mode);
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    gtk_option_menu_set_history (GTK_OPTION_MENU (bsc->tls_option),
-				 server->tls_mode);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_widget_set_sensitive(bsc->tls_option, !server->use_ssl);
 }
 
@@ -324,7 +292,6 @@ balsa_server_conf_get_use_ssl(BalsaServerConf *bsc)
 LibBalsaTlsMode
 balsa_server_conf_get_tls_mode(BalsaServerConf *bsc)
 {
-#if GTK_CHECK_VERSION(2, 4, 0)
     struct mailbox_conf_combo_box_info *info =
         g_object_get_data(G_OBJECT(bsc->tls_option),
                           BALSA_MC_COMBO_BOX_INFO);
@@ -332,11 +299,6 @@ balsa_server_conf_get_tls_mode(BalsaServerConf *bsc)
 
     return (LibBalsaTlsMode)
         GPOINTER_TO_INT(g_slist_nth_data(info->tags, active));
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    GtkWidget *menu_item = gtk_menu_get_active(GTK_MENU(bsc->tls_mode));
-    return GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item),
-                                             "balsa-data"));
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 /* END BalsaServerConf ===================================== */
@@ -1265,16 +1227,7 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
 
     label = create_label(_("F_older Path:"), table, ++row);
 
-#if GTK_CHECK_VERSION(2, 4, 0)
     mcw->mb_data.imap.folderpath = entry = gtk_entry_new();
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    entry = gnome_entry_new("IMAPFolderHistory");
-    mcw->mb_data.imap.folderpath = gnome_entry_gtk_entry(GNOME_ENTRY(entry));
-    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX");
-    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX.Sent");
-    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX.Draft");
-    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX.outbox");
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.folderpath), "INBOX");
 
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), 
@@ -1394,14 +1347,10 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
 	    { N_("If Possible"), LB_MAILBOX_CHK_CRYPT_MAYBE  },
 	    { N_("Always"),      LB_MAILBOX_CHK_CRYPT_ALWAYS }
 	};
-#if !GTK_CHECK_VERSION(2, 4, 0)
-	GtkWidget * chk_crypt_w;
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 	
 	create_label(_("decrypt and check\nsignatures automatically"), table, ++row);
 	
 	box = gtk_hbox_new(FALSE, 12);
-#if GTK_CHECK_VERSION(2, 4, 0)
         view_info->chk_crypt = gtk_combo_box_new_text();
         mailbox_conf_combo_box_make(GTK_COMBO_BOX(view_info->chk_crypt),
                                     ELEMENTS(chk_crypt_menu),
@@ -1411,15 +1360,6 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
                                  (mailbox));
         gtk_box_pack_start(GTK_BOX(box), view_info->chk_crypt, FALSE,
                            FALSE, 0);
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-	chk_crypt_w = gtk_option_menu_new ();
-	view_info->chk_crypt = get_combo_menu(ELEMENTS(chk_crypt_menu), chk_crypt_menu);
-	gtk_option_menu_set_menu (GTK_OPTION_MENU(chk_crypt_w),
-				  view_info->chk_crypt);
-	gtk_option_menu_set_history (GTK_OPTION_MENU (chk_crypt_w),
-				     libbalsa_mailbox_get_crypto_mode(mailbox));
-	gtk_box_pack_start(GTK_BOX(box), chk_crypt_w, FALSE, FALSE, 0);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 	gtk_table_attach(GTK_TABLE(table), box, 1, 2, row, row + 1,
 			 GTK_FILL, 0, 0, 0);
     }
@@ -1432,7 +1372,6 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
 static LibBalsaChkCryptoMode
 balsa_mailbox_conf_get_crypto_mode(BalsaMailboxConfView *view_info)
 {
-#if GTK_CHECK_VERSION(2, 4, 0)
     struct mailbox_conf_combo_box_info *info =
         g_object_get_data(G_OBJECT(view_info->chk_crypt),
                           BALSA_MC_COMBO_BOX_INFO);
@@ -1441,11 +1380,6 @@ balsa_mailbox_conf_get_crypto_mode(BalsaMailboxConfView *view_info)
 
     return (LibBalsaChkCryptoMode)
         GPOINTER_TO_INT(g_slist_nth_data(info->tags, active));
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    GtkWidget *menu_item = gtk_menu_get_active(GTK_MENU(view_info->chk_crypt));
-    return GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item),
-                                             "balsa-data"));
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 #endif
 

@@ -141,9 +141,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
     gchar *icon;
     GdkPixbuf *pixbuf = NULL;
     gint width, height;
-#if GTK_CHECK_VERSION(2, 4, 0)
     GtkIconTheme *icon_theme;
-#endif
 
     if (!gtk_icon_size_lookup(size, &width, &height))
 	width = height = 16;
@@ -152,18 +150,9 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
         content_type = g_strdup(mime_type);
     else if(filename)
         content_type = libbalsa_lookup_mime_type(filename);
-#if GTK_CHECK_VERSION(2, 4, 0)
     else
 	content_type = g_strdup("application/octet-stream");
 
-#else                           /* GTK_CHECK_VERSION(2, 4, 0) */
-    else {
-        if(used_type) *used_type = g_strdup("application/octet-stream");
-        return libbalsa_default_attachment_pixbuf(width);
-    }
-#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
-  
-#if GTK_CHECK_VERSION(2, 4, 0)
     /* gtk+ 2.4.0 and above: use the default icon theme to get the icon */
     if ((icon_theme = gtk_icon_theme_get_default()))
 	if ((icon =
@@ -180,7 +169,6 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
 		return pixbuf;
 	    }
 	}
-#endif
 
     icon_file = gnome_vfs_mime_get_icon(content_type);
     
@@ -244,146 +232,28 @@ add_vfs_menu_item(GtkMenu * menu, const GnomeVFSMimeApplication *app,
     g_free (menu_label);
 }
 
-
-#if !GTK_CHECK_VERSION(2, 4, 0)
-static gboolean in_gnome_vfs(const GnomeVFSMimeApplication *default_app, 
-                             const GList *short_list, const gchar *cmd) 
-{
-    gchar *cmd_base=g_strdup(cmd), *arg=strchr(cmd_base, '%');
-    
-    /* Note: Tries to remove the entrire argument containing %f etc., so that
-             we e.g. get rid of the whole "file:%f", not just "%f" */
-    if(arg) {
-        while(arg!=cmd && *arg!=' ')
-            arg--;
-        
-        *arg='\0';
-    }
-    g_strstrip(cmd_base);
-    
-    if(default_app && default_app->command &&
-       strcmp(default_app->command, cmd_base)==0) {
-        g_free(cmd_base);
-        return TRUE;
-    } else {
-        const GList *item;
-
-        for(item=short_list; item; item=g_list_next(item)) {
-            GnomeVFSMimeApplication *app=item->data;
-            
-            if(app->command && strcmp(app->command, cmd_base)==0) {
-                g_free(cmd_base);
-                return TRUE;
-            }
-        }
-    }
-    g_free(cmd_base);
-    
-    return FALSE;
-}
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
-
 /* helper: fill the passed menu with vfs items */
 void
 libbalsa_fill_vfs_menu_by_content_type(GtkMenu * menu, const gchar * content_type,
 				       GCallback callback, gpointer data)
 {
     GList* list;
-#if GTK_CHECK_VERSION(2, 4, 0)
     GnomeVFSMimeApplication *def_app;
     GList *app_list;
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    GtkWidget *menu_item;
-    GList* key_list, *app_list;
-    gchar* key;
-    const gchar* cmd;
-    gchar* menu_label;
-    gchar** split_key;
-    gint i;
-    GnomeVFSMimeApplication *def_app, *app;
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     
-#if !GTK_CHECK_VERSION(2, 4, 0)
-    key_list = list = gnome_vfs_mime_get_key_list(content_type);
-    /* gdk_threads_leave(); releasing GDK lock was necessary for broken
-     * gnome-vfs versions */
-    app_list = gnome_vfs_mime_get_short_list_applications(content_type);
-    /* gdk_threads_enter(); */
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
-
     if((def_app=gnome_vfs_mime_get_default_application(content_type))) {
         add_vfs_menu_item(menu, def_app, callback, data);
     }
     
 
-#if GTK_CHECK_VERSION(2, 4, 0)
     app_list = gnome_vfs_mime_get_all_applications(content_type);
     for (list = app_list; list; list = list->next) {
         GnomeVFSMimeApplication *app = list->data;
         if (app && (!def_app || strcmp(app->name, def_app->name) != 0))
             add_vfs_menu_item(menu, app, callback, data);
     }
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    while (list) {
-        key = list->data;
-
-        if (key && g_ascii_strcasecmp (key, "icon-filename") 
-            && g_ascii_strncasecmp (key, "fm-", 3)
-	    && g_ascii_strncasecmp (key, "category", 8)
-            /* Get rid of additional GnomeVFS entries: */
-            && (!strstr(key, "_") || strstr(key, "."))
-            && g_ascii_strncasecmp(key, "description", 11)) {
-            
-            if ((cmd = gnome_vfs_mime_get_value (content_type, key)) != NULL &&
-                !in_gnome_vfs(def_app, app_list, cmd)) {
-                if (g_ascii_strcasecmp (key, "open") == 0 || 
-                    g_ascii_strcasecmp (key, "view") == 0 || 
-                    g_ascii_strcasecmp (key, "edit") == 0 ||
-                    g_ascii_strcasecmp (key, "ascii-view") == 0) {
-                    /* uppercase first letter, make label */
-                    menu_label = g_strdup_printf ("%s (\"%s\")", key, cmd);
-                    *menu_label = toupper (*menu_label);
-                } else {
-                    split_key = g_strsplit (key, ".", -1);
-
-                    i = 0;
-                    while (split_key[i+1] != NULL) {
-                        ++i;
-                    }
-                    menu_label = split_key[i];
-                    menu_label = g_strdup (menu_label);
-                    g_strfreev (split_key);
-                }
-                menu_item = gtk_menu_item_new_with_label (menu_label);
-                g_object_set_data (G_OBJECT (menu_item), "mime_action", 
-                                   key);
-                g_signal_connect (G_OBJECT (menu_item), "activate",
-				  callback, data);
-                gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-                g_free (menu_label);
-            }
-        }
-        list = g_list_next (list);
-    }
-
-    list=app_list;
-
-    while (list) {
-        app=list->data;
-
-        if(app && (!def_app || strcmp(app->name, def_app->name)!=0)) {
-            add_vfs_menu_item(menu, app, callback, data);
-        }
-
-        list = g_list_next (list);
-    }
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     gnome_vfs_mime_application_free(def_app);
     
-
-#if !GTK_CHECK_VERSION(2, 4, 0)
-    g_list_free (key_list);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     gnome_vfs_mime_application_list_free (app_list);
 }
 

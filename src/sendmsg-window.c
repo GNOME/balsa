@@ -67,7 +67,6 @@
 #include "sendmsg-window.h"
 #include "ab-window.h"
 #include "address-entry.h"
-#include "expand-alias.h"
 #include "print.h"
 #include "spell-check.h"
 #include "toolbar-factory.h"
@@ -852,9 +851,6 @@ address_book_response(GtkWidget * ab, gint response,
     g_object_set_data(G_OBJECT(parent), BALSA_SENDMSG_ADDRESS_BOOK_KEY,
                       NULL);
     gtk_widget_set_sensitive(GTK_WIDGET(address_entry), TRUE);
-#if !NEW_ADDRESS_ENTRY_WIDGET
-    libbalsa_address_entry_fill_input(address_entry);
-#endif /* NEW_ADDRESS_ENTRY_WIDGET */
 }
 
 static gint
@@ -1281,11 +1277,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     gchar* message_text;
     gchar* compare_str;
     gchar** message_split;
-#if OLD_FROM
-    gchar* tmpstr=libbalsa_address_to_gchar(ident->address, 0);
-#else
     gchar* tmpstr;
-#endif /* OLD_FROM */
     const gchar* subject;
     gint replen, fwdlen;
     
@@ -1296,13 +1288,8 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 
 
     /* change entries to reflect new identity */
-#if OLD_FROM
-    gtk_entry_set_text(GTK_ENTRY(bsmsg->from[1]), tmpstr);
-    g_free(tmpstr);
-#else
     gtk_combo_box_set_active(GTK_COMBO_BOX(bsmsg->from[1]),
                              g_list_index(balsa_app.identities, ident));
-#endif /* OLD_FROM */
 
 #if !defined(ENABLE_TOUCH_UI)
     gtk_entry_set_text(GTK_ENTRY(bsmsg->reply_to[1]), ident->replyto);
@@ -1653,19 +1640,7 @@ hide_attachment_widget(BalsaSendmsg *bsmsg)
         gtk_widget_hide(GTK_WIDGET(bsmsg->attachments[pos]));
 }
 
-#if !NEW_CHARSET_WIDGET
-static const gchar* conv_charsets[] = {
- "ISO-8859-1", "ISO-8859-15", "ISO-8859-2", "ISO-8859-9", "ISO-8859-13",
- "EUC-KR", "ISO-2022-JP", "EUC-TW", "KOI8-R"
-};
-enum{
-    CHARSET_COLUMN,
-    N_COLUMNS
-};
-#endif                          /* NEW_CHARSET_WIDGET */
-
 /* Ask the user for a charset; returns ((LibBalsaCodeset) -1) on cancel. */
-#if NEW_CHARSET_WIDGET
 static void
 sw_charset_combo_box_changed(GtkComboBox * combo_box,
                              GtkWidget * charset_button)
@@ -1673,29 +1648,12 @@ sw_charset_combo_box_changed(GtkComboBox * combo_box,
     gtk_widget_set_sensitive(charset_button,
                              gtk_combo_box_get_active(combo_box) == 0);
 }
-#else                           /* NEW_CHARSET_WIDGET */
-static void
-sw_charset_button_toggled(GtkToggleButton * check_button, GtkWidget * tree)
-{
-    gtk_widget_set_sensitive(tree,
-                             gtk_toggle_button_get_active(check_button));
-}
-#endif                          /* NEW_CHARSET_WIDGET */
 
 static gboolean
 sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
                     const gchar * mime_type)
 {
-#if NEW_CHARSET_WIDGET
     GtkWidget *combo_box = NULL;
-#else                           /* NEW_CHARSET_WIDGET */
-    guint i;
-    GtkCellRenderer *renderer;
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-    GtkTreeViewColumn *column;
-    GtkTreeSelection *select;
-#endif                          /* NEW_CHARSET_WIDGET */
     gint codeset = -1;
     GtkWidget *dialog =
         gtk_dialog_new_with_buttons(_("Choose charset"),
@@ -1704,7 +1662,6 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     NULL);
-#if NEW_CHARSET_WIDGET
     GtkWidget *info =
         gtk_label_new(_("This file is not encoded in US-ASCII or UTF-8.\n"
                         "Please choose the charset used to encode the file."));
@@ -1744,79 +1701,6 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
         if (!change_type || !*change_type)
 	    codeset = gtk_combo_box_get_active(GTK_COMBO_BOX(charset_button));
     }
-#else                           /* NEW_CHARSET_WIDGET */
-    GtkWidget *check_button = NULL;
-    GtkWidget *info =
-        gtk_label_new(_("This file is not encoded in US-ASCII or UTF-8.\n"
-                        "Please choose the charset used to encode the file.\n"));
-    GtkListStore *store;
-    GtkWidget *tree;
-    GtkWidget *scroll;
-
-    store = gtk_list_store_new(N_COLUMNS, G_TYPE_STRING);
-    tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-    g_object_unref(store);
-
-    renderer = gtk_cell_renderer_text_new();
-    column =
-        gtk_tree_view_column_new_with_attributes("Name", renderer,
-                                                 "text", CHARSET_COLUMN,
-						 NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
-
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), info,
-                       FALSE, TRUE, 5);
-
-    scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
-				   GTK_POLICY_AUTOMATIC,
-				   GTK_POLICY_AUTOMATIC);
-    gtk_widget_set_size_request(scroll, -1, 160);
-    gtk_container_add(GTK_CONTAINER(scroll), tree);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), scroll,
-                       TRUE, TRUE, 5);
-
-    gtk_widget_show(info);
-    gtk_widget_show_all(scroll);
-    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-
-    for (i = 0; i < ELEMENTS(conv_charsets); i++) {
-        gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter, CHARSET_COLUMN, conv_charsets[i],
-                           -1);
-    }
-
-    if (change_type) {
-        gchar *label = g_strdup_printf(_("_Attach as %s type \"%s\""),
-                                       "MIME", "application/octet-stream");
-        check_button = gtk_check_button_new_with_mnemonic(label);
-        g_free(label);
-        g_signal_connect(G_OBJECT(check_button), "toggled",
-                         G_CALLBACK(sw_charset_button_toggled), tree);
-        gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), check_button,
-                           TRUE, TRUE, 5);
-    }
-
-    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
-        if (change_type)
-            *change_type =
-                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                             (check_button));
-        if (!change_type || !*change_type) {
-	    gchar *charset;
-
-            select = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
-            if (gtk_tree_selection_get_selected(select, &model, &iter))
-                gtk_tree_model_get(model, &iter, CHARSET_COLUMN, &charset,
-                                   -1);
-	    for (codeset = LIBBALSA_NUM_CODESETS; --codeset >= 0;)
-		if (!g_ascii_strcasecmp(charset,
-                                        libbalsa_codeset_info[codeset].std))
-		    break;
-	    g_free(charset);
-        }
-    }
-#endif                          /* NEW_CHARSET_WIDGET */
 
     gtk_widget_destroy(dialog);
     return (LibBalsaCodeset) codeset;
@@ -2574,10 +2458,6 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
 		      ELEMENTS(email_field_drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
-#if !NEW_ADDRESS_ENTRY_WIDGET
-    libbalsa_address_entry_set_find_match(LIBBALSA_ADDRESS_ENTRY(arr[1]),
-		       expand_alias_find_match);
-#endif /* NEW_ADDRESS_ENTRY_WIDGET */
     libbalsa_address_entry_set_domain(LIBBALSA_ADDRESS_ENTRY(arr[1]),
 		       bsmsg->ident->domain);
     g_signal_connect(G_OBJECT(arr[1]), "changed",
@@ -2610,8 +2490,6 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
     set_ready(LIBBALSA_ADDRESS_ENTRY(arr[1]), sma);
 }
 
-#if OLD_FROM
-#else
 static void
 sw_combo_box_changed(GtkComboBox * combo_box, BalsaSendmsg * bsmsg)
 {
@@ -2658,8 +2536,6 @@ create_from_entry(GtkWidget * table, BalsaSendmsg * bsmsg)
                      G_CALLBACK(sw_combo_box_changed), bsmsg);
     create_email_or_string_entry(table, _("F_rom:"), 0, bsmsg->from);
 }
-#endif /* OLD_FROM */
-
 
 static gboolean 
 attachment_button_press_cb(GtkWidget * widget, GdkEventButton * event,
@@ -2785,13 +2661,7 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
     bsmsg->bad_address_style = NULL;
 
     /* From: */
-#if OLD_FROM
-    create_email_entry(table, _("F_rom:"), 0, GNOME_STOCK_BOOK_BLUE,
-                       bsmsg, bsmsg->from,
-                       &bsmsg->from_info, 1, 1);
-#else
     create_from_entry(table, bsmsg);
-#endif /* OLD_FROM */
 
     /* To: */
     create_email_entry(table, _("_To:"), 1, GNOME_STOCK_BOOK_RED,
@@ -3065,11 +2935,7 @@ create_text_area(BalsaSendmsg * bsmsg)
     gtk_text_buffer_create_tag(buffer, "soft", NULL);
     gtk_text_buffer_create_tag(buffer, "url", NULL);
     gtk_text_view_set_editable(text_view, TRUE);
-#if GTK_CHECK_VERSION(2, 4, 0)
     gtk_text_view_set_wrap_mode(text_view, GTK_WRAP_WORD_CHAR);
-#else
-    gtk_text_view_set_wrap_mode(text_view, GTK_WRAP_WORD);
-#endif
 
     table = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(table),
@@ -3631,14 +3497,8 @@ guess_identity(BalsaSendmsg* bsmsg)
 static void
 setup_headers_from_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity *ident)    
 {
-#if OLD_FROM
-    gchar* str = libbalsa_address_to_gchar(ident->address, 0);
-    gtk_entry_set_text(GTK_ENTRY(bsmsg->from[1]), str);
-    g_free(str); 
-#else
     gtk_combo_box_set_active(GTK_COMBO_BOX(bsmsg->from[1]),
                              g_list_index(balsa_app.identities, ident));
-#endif /* OLD_FROM */
 #if !defined(ENABLE_TOUCH_UI)
     if(ident->replyto)
         gtk_entry_set_text(GTK_ENTRY(bsmsg->reply_to[1]), ident->replyto);
@@ -3945,16 +3805,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     if (type == SEND_CONTINUE) {
 	setup_headers_from_message(bsmsg, message);
 
-#if OLD_FROM
-	/* Replace "From" and "Reply-To" with values from the
-	 * continued messages - they may have been hand edited. */
-	if (message->headers->from != NULL)
-	    gtk_entry_set_text(GTK_ENTRY(bsmsg->from[1]),
-			       libbalsa_address_to_gchar(message->headers->from, 0));
-#else
-	/* Replace "Reply-To" with value from the continued messages -
-	 * it may have been hand edited. */
-#endif /* OLD_FROM */
 #if !defined(ENABLE_TOUCH_UI)
 	if (message->headers->reply_to != NULL)
 	    gtk_entry_set_text(GTK_ENTRY(bsmsg->reply_to[1]),
@@ -4274,13 +4124,8 @@ static gboolean
 is_ready_to_send(BalsaSendmsg * bsmsg)
 {
     gboolean ready;
-#if OLD_FROM
-    ready = bsmsg->from_info.ready && bsmsg->to_info.ready
-        && bsmsg->cc_info.ready && bsmsg->bcc_info.ready;
-#else
     ready = bsmsg->to_info.ready
         && bsmsg->cc_info.ready && bsmsg->bcc_info.ready;
-#endif /* OLD_FROM */
 #if !defined(ENABLE_TOUCH_UI)
     ready = ready && bsmsg->reply_to_info.ready;
 #endif
@@ -4291,41 +4136,14 @@ static void
 address_changed_cb(LibBalsaAddressEntry * address_entry,
                    BalsaSendmsgAddress * sma)
 {
-#if NEW_ADDRESS_ENTRY_WIDGET
     set_ready(address_entry, sma);
     check_readiness(sma->bsmsg);
-#else /* NEW_ADDRESS_ENTRY_WIDGET */
-    if (!libbalsa_address_entry_matching(address_entry)) {
-        set_ready(address_entry, sma);
-        check_readiness(sma->bsmsg);
-    }
-#endif /* NEW_ADDRESS_ENTRY_WIDGET */
 }
 
 static void
 set_ready(LibBalsaAddressEntry * address_entry, BalsaSendmsgAddress *sma)
 {
-#if NEW_ADDRESS_ENTRY_WIDGET
     gint len = libbalsa_address_entry_addresses(address_entry);
-#else /* NEW_ADDRESS_ENTRY_WIDGET */
-    gint len = 0;
-    const gchar *tmp = gtk_entry_get_text(GTK_ENTRY(address_entry));
-
-    if (*tmp) {
-        GList *list = libbalsa_address_new_list_from_string(tmp);
-
-        if (list) {
-            len = g_list_length(list);
-
-            g_list_foreach(list, (GFunc) g_object_unref, NULL);
-            g_list_free(list);
-        } else {
-            /* error */
-            len = -1;
-        }
-
-    }
-#endif /* NEW_ADDRESS_ENTRY_WIDGET */
 
     if (len < sma->min_addresses
         || (sma->max_addresses >= 0 && len > sma->max_addresses)) {
@@ -4436,24 +4254,16 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 #if !defined(ENABLE_TOUCH_UI)
     const gchar *ctmp;
 #endif
-#if OLD_FROM
-#else
     gint active;
     LibBalsaIdentity *ident;
-#endif /* OLD_FROM */
 
     g_assert(bsmsg != NULL);
     message = libbalsa_message_new();
 
-#if OLD_FROM
-    ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->from[1]));
-    message->headers->from = libbalsa_address_new_from_string(ctmp);
-#else
     active = gtk_combo_box_get_active(GTK_COMBO_BOX(bsmsg->from[1]));
     ident = g_list_nth_data(balsa_app.identities, active);
     message->headers->from = libbalsa_address_new();
     libbalsa_address_set_copy(message->headers->from, ident->address);
-#endif /* OLD_FROM */
 
     tmp = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->subject[1]), 0, -1);
     strip_chars(tmp, "\r\n");
@@ -4701,14 +4511,6 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 static void
 send_message_toolbar_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-#if !NEW_ADDRESS_ENTRY_WIDGET
-    libbalsa_address_entry_clear_to_send(LIBBALSA_ADDRESS_ENTRY
-                                         (bsmsg->to[1]));
-    libbalsa_address_entry_clear_to_send(LIBBALSA_ADDRESS_ENTRY
-                                         (bsmsg->cc[1]));
-    libbalsa_address_entry_clear_to_send(LIBBALSA_ADDRESS_ENTRY
-                                         (bsmsg->bcc[1]));
-#endif /* NEW_ADDRESS_ENTRY_WIDGET */
     send_message_handler(bsmsg, balsa_app.always_queue_sent_mail);
 }
 
@@ -4717,18 +4519,6 @@ send_message_toolbar_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static gint
 send_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-#if !NEW_ADDRESS_ENTRY_WIDGET
-    /*
-     * First, check if aliasing is on, and get it to nullify the
-     * match.  Otherwise we send mail to "John (John Doe <jdoe@public.com>)"
-     */
-    libbalsa_address_entry_clear_to_send(LIBBALSA_ADDRESS_ENTRY
-                                         (bsmsg->to[1]));
-    libbalsa_address_entry_clear_to_send(LIBBALSA_ADDRESS_ENTRY
-                                         (bsmsg->cc[1]));
-    libbalsa_address_entry_clear_to_send(LIBBALSA_ADDRESS_ENTRY
-                                         (bsmsg->bcc[1]));
-#endif /* NEW_ADDRESS_ENTRY_WIDGET */
     return send_message_handler(bsmsg, FALSE);
 }
 
@@ -4981,20 +4771,16 @@ wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-#if NEW_ADDRESS_ENTRY_WIDGET
     GtkWidget *focus_widget;
-#endif /* NEW_ADDRESS_ENTRY_WIDGET */
     GtkTextView *text_view;
     GtkTextBuffer *buffer;
     regex_t rex;
 
-#if NEW_ADDRESS_ENTRY_WIDGET
     focus_widget = gtk_window_get_focus(GTK_WINDOW(bsmsg->window));
     if (focus_widget && GTK_IS_ENTRY(focus_widget)
         && libbalsa_address_entry_show_matches((GtkEntry *) focus_widget))
         return;
 
-#endif /* NEW_ADDRESS_ENTRY_WIDGET */
     if (!bsmsg->flow)
 	return;
 
@@ -5073,11 +4859,7 @@ toggle_entry(BalsaSendmsg * bbsmsg, GtkWidget * entry[], int pos, int cnt)
 static gint
 toggle_from_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-#if OLD_FROM
-    return toggle_entry(bsmsg, bsmsg->from, MENU_TOGGLE_FROM_POS, 3);
-#else
     return toggle_entry(bsmsg, bsmsg->from, MENU_TOGGLE_FROM_POS, 2);
-#endif /* OLD_FROM */
 }
 
 static gint
@@ -5155,16 +4937,10 @@ toggle_sign_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void 
 toggle_sign_tb_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-#if GTK_CHECK_VERSION(2, 4, 0)
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                    (bsmsg->gpg_sign_menu_item),
                                    gtk_toggle_tool_button_get_active
                                    (GTK_TOGGLE_TOOL_BUTTON(widget)));
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
-				   gtk_toggle_button_get_active
-				   (GTK_TOGGLE_BUTTON(widget)));
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 
@@ -5202,16 +4978,10 @@ toggle_encrypt_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void 
 toggle_encrypt_tb_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-#if GTK_CHECK_VERSION(2, 4, 0)
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                    (bsmsg->gpg_encrypt_menu_item),
                                    gtk_toggle_tool_button_get_active
                                    (GTK_TOGGLE_TOOL_BUTTON(widget)));
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
-				   gtk_toggle_button_get_active
-				   (GTK_TOGGLE_BUTTON(widget)));
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 
@@ -5502,11 +5272,6 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
 {
     gchar *title_format;
     gchar *title;
-
-#if !NEW_ADDRESS_ENTRY_WIDGET
-    if (libbalsa_address_entry_matching(LIBBALSA_ADDRESS_ENTRY(bsmsg->to[1])))
-        return;
-#endif /* NEW_ADDRESS_ENTRY_WIDGET */
 
     switch (bsmsg->type) {
     case SEND_REPLY:

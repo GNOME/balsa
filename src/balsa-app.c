@@ -656,14 +656,8 @@ BalsaMailboxNode *
 balsa_find_mailbox(LibBalsaMailbox * mailbox)
 {
     BalsaFind bf;
-#if !GTK_CHECK_VERSION(2, 4, 0)
-    gboolean is_sub_thread = libbalsa_am_i_subthread();
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
-#if !GTK_CHECK_VERSION(2, 4, 0)
-    if (is_sub_thread)
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
-	gdk_threads_enter();
+    gdk_threads_enter();
 
     bf.data = mailbox;
     bf.mbnode = NULL;
@@ -671,10 +665,7 @@ balsa_find_mailbox(LibBalsaMailbox * mailbox)
         gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
                                find_mailbox, &bf);
 
-#if !GTK_CHECK_VERSION(2, 4, 0)
-    if (is_sub_thread)
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
-	gdk_threads_leave();
+    gdk_threads_leave();
 
     return bf.mbnode;
 }

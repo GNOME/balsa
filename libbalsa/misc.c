@@ -1321,7 +1321,6 @@ libbalsa_get_codeset_name(const gchar * txt, LibBalsaCodeset Codeset)
     return info->std;
 }
 
-#if NEW_CHARSET_WIDGET
 /* Create a GtkComboBox with the national charsets as options;
  * called when some text is found to be neither US-ASCII nor UTF-8, so
  * the list includes neither of these. */
@@ -1351,7 +1350,6 @@ libbalsa_charset_button_new(void)
 
     return combo_box;
 }
-#endif                          /* NEW_CHARSET_WIDGET */
 
 /* Helper */
 static void

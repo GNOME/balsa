@@ -26,10 +26,6 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
 
-#if GTK_CHECK_VERSION(2, 4, 0)
-# define NEW_CHARSET_WIDGET TRUE
-#endif
-
 #if ENABLE_ESMTP
 #include <auth-client.h>
 #endif
@@ -86,9 +82,7 @@ struct _LibBalsaCodesetInfo {
     const gchar *win;
 };
 extern LibBalsaCodesetInfo libbalsa_codeset_info[];
-#if NEW_CHARSET_WIDGET
 GtkWidget *libbalsa_charset_button_new(void);
-#endif                          /* NEW_CHARSET_WIDGET */
 LibBalsaTextAttribute libbalsa_text_attr_string(const gchar * string);
 LibBalsaTextAttribute libbalsa_text_attr_file(const gchar * filename);
 const gchar *libbalsa_file_get_charset(const gchar * filename);

@@ -325,7 +325,6 @@ mailboxes_init(gboolean check_only)
 
 
 #ifdef BALSA_USE_THREADS
-#if GTK_CHECK_VERSION(2, 4, 0)
 /* Recursive mutex for gdk_threads_{enter,leave}. */
 static pthread_mutex_t balsa_threads_mutex;
 
@@ -338,9 +337,9 @@ balsa_threads_enter(void)
 static void
 balsa_threads_leave(void)
 {
+    gdk_display_flush(gdk_display_get_default());
     pthread_mutex_unlock(&balsa_threads_mutex);
 }
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 static void
 threads_init(void)
@@ -353,11 +352,9 @@ threads_init(void)
         g_warning("pthread_mutexattr_init failed with %d\n", status);
     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
     pthread_mutex_init(&mailbox_lock, &attr);
-#if GTK_CHECK_VERSION(2, 4, 0)
     pthread_mutex_init(&balsa_threads_mutex, &attr);
     gdk_threads_set_lock_functions(G_CALLBACK(balsa_threads_enter),
                                    G_CALLBACK(balsa_threads_leave));
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     gdk_threads_init();
 
     pthread_mutexattr_destroy(&attr);
@@ -390,9 +387,7 @@ threads_destroy(void)
 {
     pthread_mutex_destroy(&mailbox_lock);
     pthread_mutex_destroy(&send_messages_lock);
-#if GTK_CHECK_VERSION(2, 4, 0)
     pthread_mutex_destroy(&balsa_threads_mutex);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 #endif				/* BALSA_USE_THREADS */
@@ -604,10 +599,8 @@ main(int argc, char *argv[])
     
     /* checking for valid config files */
     config_init(cmd_get_stats);
-#if NEW_ADDRESS_ENTRY_WIDGET
     libbalsa_address_entry_set_address_book_list(balsa_app.
                                                  address_book_list);
-#endif /* NEW_ADDRESS_ENTRY_WIDGET */
 
     libbalsa_mailbox_view_table =
 	g_hash_table_new_full(g_str_hash, g_str_equal,

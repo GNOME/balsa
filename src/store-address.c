@@ -249,21 +249,13 @@ store_address_book_frame(StoreAddressInfo * info)
 {
     GList *ab_list;
     GtkWidget *frame = gtk_frame_new(_("Choose Address Book"));
-#if GTK_CHECK_VERSION(2, 4, 0)
     GtkWidget *combo_box;
-#else
-    GtkWidget *ab_option, *menu_item, *ab_menu;
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     LibBalsaAddressBook *address_book;
     guint default_ab_offset = 0;
 
-#if GTK_CHECK_VERSION(2, 4, 0)
     combo_box = gtk_combo_box_new_text();
     g_signal_connect(combo_box, "changed",
                      G_CALLBACK(store_address_book_menu_cb), info);
-#else
-    ab_menu = gtk_menu_new();
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     if (balsa_app.address_book_list) {
 	info->current_address_book = balsa_app.default_address_book;
 
@@ -275,36 +267,18 @@ store_address_book_frame(StoreAddressInfo * info)
 	    if (info->current_address_book == NULL)
 		info->current_address_book = address_book;
 
-#if GTK_CHECK_VERSION(2, 4, 0)
 	    gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box),
                                       address_book->name);
 	    if (address_book == balsa_app.default_address_book)
 		gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box),
                                          default_ab_offset);
-#else
-	    menu_item = gtk_menu_item_new_with_label(address_book->name);
-	    gtk_menu_shell_append(GTK_MENU_SHELL(ab_menu), menu_item);
-
-	    g_signal_connect(G_OBJECT(menu_item), "activate",
-			     G_CALLBACK(store_address_book_menu_cb), info);
-            g_object_set_data(G_OBJECT(menu_item),"address-book",
-                              GUINT_TO_POINTER(default_ab_offset));
-
-	    if (address_book == balsa_app.default_address_book)
-		gtk_menu_set_active(GTK_MENU(ab_menu), default_ab_offset);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 	    default_ab_offset++;
 
 	}
     }
-#if GTK_CHECK_VERSION(2, 4, 0)
     gtk_container_add(GTK_CONTAINER(frame), combo_box);
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    ab_option = gtk_option_menu_new();
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(ab_option), ab_menu);
-    gtk_container_add(GTK_CONTAINER(frame), ab_option);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
+
     return frame;
 }
 
@@ -342,13 +316,7 @@ static void
 store_address_book_menu_cb(GtkWidget * widget, 
                            StoreAddressInfo * info)
 {
-#if GTK_CHECK_VERSION(2, 4, 0)
     guint i = gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    guint i =
-        GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(widget),
-                                           "address-book"));
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     GList *nth = g_list_nth(balsa_app.address_book_list, i);
     if(nth)
         info->current_address_book = LIBBALSA_ADDRESS_BOOK(nth->data);

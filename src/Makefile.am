@@ -17,8 +17,6 @@ balsa_BASE_SRCLIST =	\
 	balsa-mblist.h		\
 	balsa-message.c		\
 	balsa-message.h		\
-	expand-alias.c		\
-	expand-alias.h		\
 	filter-edit-callbacks.c	\
 	filter-edit-dialog.c	\
 	filter-edit.h		\

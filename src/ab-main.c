@@ -169,7 +169,6 @@ bab_set_address_book(LibBalsaAddressBook *ab, GtkWidget* list,
     return TRUE;
 }
 
-#if GTK_CHECK_VERSION(2, 4, 0)
 static void
 select_address_book_cb(GtkRadioAction * action, GtkRadioAction * current,
                        gpointer callback_data)
@@ -186,22 +185,6 @@ select_address_book_cb(GtkRadioAction * action, GtkRadioAction * current,
     bab_set_address_book(LIBBALSA_ADDRESS_BOOK(l->data),
                          contacts_app.entry_list, NULL);
 }
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-static void
-select_address_book_cb(gpointer callback_data, guint callback_action,
-                       GtkWidget *w)
-{
-    GList *l;
-
-    if(!GTK_CHECK_MENU_ITEM(w)->active) return;
-    l = g_list_nth(contacts_app.address_book_list,
-                          GPOINTER_TO_INT(callback_data));
-    if(!l) return;
-    ab_set_edit_widget(NULL, FALSE);
-    bab_set_address_book(LIBBALSA_ADDRESS_BOOK(l->data),
-                         contacts_app.entry_list, NULL);
-}
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 static void
 address_changed_cb(GtkWidget *w, gpointer data)
@@ -213,11 +196,7 @@ address_changed_cb(GtkWidget *w, gpointer data)
 
 
 static void
-#if GTK_CHECK_VERSION(2, 4, 0)
 edit_new_person_cb(GtkAction * action, gpointer user_data)
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-edit_new_person_cb(gpointer callback_data, guint callback_action, GtkWidget *w)
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 {
     GtkWidget *ew;
     contacts_app.displayed_address = NULL;
@@ -228,7 +207,6 @@ edit_new_person_cb(gpointer callback_data, guint callback_action, GtkWidget *w)
     gtk_widget_set_sensitive(contacts_app.remove_button, FALSE);
 }
 
-#if GTK_CHECK_VERSION(2, 4, 0)
 /* Normal items */
 static GtkActionEntry entries[] = {
     {"FileMenu", NULL, "_File"},
@@ -347,70 +325,6 @@ get_main_menu(GtkWidget * window, GtkWidget ** menubar,
         /* Finally, return the actual menu bar created by the UIManager. */
         *menubar = gtk_ui_manager_get_widget(ui_manager, "/MainMenu");
 }
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-static GtkItemFactoryEntry menu_items[] = {
-  { "/_File",         NULL,         NULL, 0, "<Branch>" },
-  { "/File/_New",     "<control>N", NULL, 0, NULL },
-  { "/File/_Open",    "<control>O", (GtkItemFactoryCallback)NULL,
-0, NULL },
-  { "/File/_Save",    "<control>S", NULL, 0, NULL },
-  { "/File/Save _As", NULL,         NULL, 0, NULL },
-  { "/File/sep1",     NULL,         NULL, 0, "<Separator>" },
-  { "/File/_Quit",     "<control>Q", (GtkItemFactoryCallback)gtk_main_quit, 
-    0, NULL },
-  { "/File/sep2",     NULL,         NULL, 0, "<Separator>" },
-  { "/_Entry",         NULL,        NULL, 0, "<Branch>" },
-  { "/Entry/_New Person", NULL,   edit_new_person_cb, 0, NULL },
-  { "/Entry/_New Group",  NULL,   (GtkItemFactoryCallback)NULL, 0, NULL },
-  { "/_Help",          NULL,         NULL, 0, "<LastBranch>" },
-  { "/_Help/_About",   NULL,         NULL, 0, NULL },
-};
-
-static void
-get_main_menu(GtkWidget  *window, GtkWidget **menubar, GList* address_books)
-{
-    GtkItemFactory *item_factory;
-    GtkAccelGroup *accel_group;
-    gint nmenu_items = sizeof(menu_items)/sizeof(menu_items[0]);
-    GList *ab;
-    int cnt;
-    gchar *first_ab_path = NULL;
-
-    accel_group = gtk_accel_group_new();
-    item_factory = gtk_item_factory_new (GTK_TYPE_MENU_BAR, "<main>",
-                                       accel_group);
-    gtk_item_factory_create_items (item_factory, nmenu_items,
-                                   menu_items, window);
-    
-    for(cnt=1, ab= address_books; ab; ab = ab->next, cnt++) {
-        LibBalsaAddressBook *address_book = LIBBALSA_ADDRESS_BOOK(ab->data);
-        GtkItemFactoryEntry gife;
-        gife.path = g_strdup_printf("/File/_%d:%s", cnt,
-                                    address_book->name);
-        gife.accelerator = cnt<=9 
-            ? g_strdup_printf("<control>%d", cnt) : NULL;
-        gife.callback = select_address_book_cb;
-        gife.callback_action = 0;
-        gife.item_type = first_ab_path ? first_ab_path : "<RadioItem>";
-        gife.extra_data = NULL;
-        gtk_item_factory_create_item(item_factory, &gife, 
-                                     GINT_TO_POINTER(cnt-1), 1);
-        g_free(gife.accelerator);
-        g_free(gife.path);
-        if(!first_ab_path)
-            first_ab_path = g_strdup_printf("/File/1:%s",
-                                    address_book->name);
-    }
-    g_free(first_ab_path);
-    /* Attach the new accelerator group to the window. */
-    gtk_window_add_accel_group (GTK_WINDOW (window), accel_group);
-    
-    if (menubar)
-        /* Finally, return the actual menu bar created by the item factory. */
-        *menubar = gtk_item_factory_get_widget (item_factory, "<main>");
-}
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
-
 
 static void
 ab_set_edit_widget(GtkWidget *w, gboolean can_remove)

@@ -1488,18 +1488,9 @@ libbalsa_identity_set_crypt_protocol(LibBalsaIdentity* ident, gint protocol)
 static void
 add_show_menu(const char* label, gint value, GtkWidget* menu)
 {
-#if GTK_CHECK_VERSION(2, 4, 0)
     GArray *values = g_object_get_data(G_OBJECT(menu), "identity-value");
     gtk_combo_box_append_text(GTK_COMBO_BOX(menu), label);
     g_array_append_val(values, value);
-#else
-    GtkWidget *menu_item = gtk_menu_item_new_with_label(label);
-
-    gtk_widget_show(menu_item);
-    g_object_set_data(G_OBJECT(menu_item), "identity-value",
-                      GINT_TO_POINTER(value));
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 
@@ -1508,13 +1499,11 @@ add_show_menu(const char* label, gint value, GtkWidget* menu)
  * explaining the contents.  A reference to the entry is stored as
  * object data attached to the dialog with the given key.
  */
-#if GTK_CHECK_VERSION(2, 4, 0)
 static void
 ident_dialog_free_values(GArray * values)
 {
     g_array_free(values, TRUE);
 }
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 static void
 ident_dialog_add_option_menu(GtkWidget * table, gint row, GtkDialog * dialog,
@@ -1522,28 +1511,19 @@ ident_dialog_add_option_menu(GtkWidget * table, gint row, GtkDialog * dialog,
 {
     GtkWidget *label;
     GtkWidget *opt_menu;
-#if GTK_CHECK_VERSION(2, 4, 0)
     GArray *values;
-#else
-    GtkWidget *menu;
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     label = gtk_label_new_with_mnemonic(label_name);
     gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
 
-#if GTK_CHECK_VERSION(2, 4, 0)
     opt_menu = gtk_combo_box_new_text();
     values = g_array_new(FALSE, FALSE, sizeof(gint));
     g_object_set_data_full(G_OBJECT(opt_menu), "identity-value", values,
                            (GDestroyNotify) ident_dialog_free_values);
-#else
-    opt_menu = gtk_option_menu_new ();
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_table_attach_defaults(GTK_TABLE(table), opt_menu, 1, 2, row, row + 1);
     g_object_set_data(G_OBJECT(dialog), menu_key, opt_menu);
 
-#if GTK_CHECK_VERSION(2, 4, 0)
     add_show_menu(_("GnuPG using MIME mode"), LIBBALSA_PROTECT_RFC3156,
                   opt_menu);
     add_show_menu(_("GnuPG using OpenPGP mode"), LIBBALSA_PROTECT_OPENPGP,
@@ -1551,15 +1531,6 @@ ident_dialog_add_option_menu(GtkWidget * table, gint row, GtkDialog * dialog,
 #ifdef HAVE_SMIME
     add_show_menu(_("S/MIME mode"), LIBBALSA_PROTECT_SMIMEV3, opt_menu);
 #endif
-#else
-    menu = gtk_menu_new();
-    add_show_menu(_("GnuPG using MIME mode"), LIBBALSA_PROTECT_RFC3156, menu);
-    add_show_menu(_("GnuPG using OpenPGP mode"), LIBBALSA_PROTECT_OPENPGP, menu);
-#ifdef HAVE_SMIME
-    add_show_menu(_("S/MIME mode"), LIBBALSA_PROTECT_SMIMEV3, menu);
-#endif
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(opt_menu), menu);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 
@@ -1571,58 +1542,34 @@ ident_dialog_get_menu(GtkDialog * dialog, const gchar * key)
 {
     GtkWidget * menu;
     gint value;
-#if GTK_CHECK_VERSION(2, 4, 0)
     GArray *values;
 
     menu = g_object_get_data(G_OBJECT(dialog), key);
     value = gtk_combo_box_get_active(GTK_COMBO_BOX(menu));
     values = g_object_get_data(G_OBJECT(menu), "identity-value");
-    value = g_array_index(values, guint, value);
-#else
     
-    menu = gtk_option_menu_get_menu (GTK_OPTION_MENU(g_object_get_data(G_OBJECT(dialog), key)));
-    value = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(gtk_menu_get_active (GTK_MENU(menu))), "identity-value"));
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
-    
-    return value;
+    return g_array_index(values, gint, value);
 }
 
 
 static void
 display_frame_set_menu(GtkDialog * dialog, const gchar* key, gint * value)
 {
-#if GTK_CHECK_VERSION(2, 4, 0)
     GtkComboBox *opt_menu = g_object_get_data(G_OBJECT(dialog), key);
-#else
-    GtkOptionMenu * opt_menu =
-        GTK_OPTION_MENU(g_object_get_data(G_OBJECT(dialog), key));
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
  
     switch (*value)
         {
         case LIBBALSA_PROTECT_OPENPGP:
-#if GTK_CHECK_VERSION(2, 4, 0)
 	    gtk_combo_box_set_active(opt_menu, 1);
-#else
-            gtk_option_menu_set_history(opt_menu, 1);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
             break;
 #ifdef HAVE_SMIME
         case LIBBALSA_PROTECT_SMIMEV3:
-#if GTK_CHECK_VERSION(2, 4, 0)
 	    gtk_combo_box_set_active(opt_menu, 2);
-#else
-            gtk_option_menu_set_history(opt_menu, 2);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
             break;
 #endif
         case LIBBALSA_PROTECT_RFC3156:
         default:
-#if GTK_CHECK_VERSION(2, 4, 0)
 	    gtk_combo_box_set_active(opt_menu, 0);
-#else
-            gtk_option_menu_set_history(opt_menu, 0);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
             *value = LIBBALSA_PROTECT_RFC3156;
         }
 }

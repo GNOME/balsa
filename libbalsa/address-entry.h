@@ -26,11 +26,6 @@
 
 #include "address.h"
 
-#if GTK_CHECK_VERSION(2, 4, 0)
-#define NEW_ADDRESS_ENTRY_WIDGET TRUE
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
-
-#if NEW_ADDRESS_ENTRY_WIDGET
 typedef GtkEntry LibBalsaAddressEntry;
 #define LIBBALSA_ADDRESS_ENTRY(obj) GTK_ENTRY(obj)
 #define LIBBALSA_IS_ADDRESS_ENTRY(obj) GTK_IS_ENTRY(obj)
@@ -38,89 +33,6 @@ void libbalsa_address_entry_set_address_book_list(GList *
                                                   address_book_list);
 gboolean libbalsa_address_entry_show_matches(GtkEntry * address_entry);
 gint libbalsa_address_entry_addresses(GtkEntry * entry);
-#else /* NEW_ADDRESS_ENTRY_WIDGET */
-
-#define FOCUS_LOST 0
-#define FOCUS_TAINTED 1
-#define FOCUS_CACHED 2
-
-/*************************************************************************
- *                                                                       *
- * Structures that the widget uses extensively.                          *
- *                                                                       *
- *************************************************************************/
-
-/*
- * A structure that describes an e-mail entry.  That is, it contains
- * the user input, and the alias expansian of ONE e-mail entry.
- *
- * user  is the user's input.  This is a character string.  If this
- *       contains an '@', '%' or '!', we won't expand.
- *       @ for smtp, and ! for uucp.  There are no leading spaces,
- *       but there can be trailing spaces if the user pressed 'space'.
- *
- * match is the current match to the user's input.  If this is NULL,
- *       there is no match.
- *
- * cursor is the last known cursor position in the input.  It is
- *        offset from the first character in the input, and may
- *        not exceed the length of the input.
- *        -1 is cursor not set.
- *
- * tabs is the number of tab keys pressed.  In essence, this is the
- *      nth match of the user input.
- */
-typedef struct {
-    gchar *user;
-    gchar *match;
-    LibBalsaAddress *address;
-    unsigned cursor; /* position in terms of bytes, not UTF-8 characters */
-    gint tabs;
-} emailData;
-
-
-/*************************************************************************
- *                                                                       *
- * A subclass of gtkentry to allow alias completion.                     *
- *                                                                       *
- *************************************************************************/
-
-#define LIBBALSA_TYPE_ADDRESS_ENTRY		(libbalsa_address_entry_get_type())
-#define LIBBALSA_ADDRESS_ENTRY(obj)		(GTK_CHECK_CAST (obj, LIBBALSA_TYPE_ADDRESS_ENTRY, LibBalsaAddressEntry))
-#define LIBBALSA_ADDRESS_ENTRY_CLASS(klass)	(GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS_ENTRY, LibBalsaAddressEntryClass))
-#define LIBBALSA_IS_ADDRESS_ENTRY(obj)		(GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_ADDRESS_ENTRY))
-#define LIBBALSA_IS_ADDRESS_ENTRY_CLASS(klass)	(GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_ENTRY))
-
-/* LibBalsaAddressEntry is typedef'd here, but the structure is declared
- * in address-entry.c to keep it opaque */
-typedef struct _LibBalsaAddressEntry LibBalsaAddressEntry;
-typedef struct _LibBalsaAddressEntryClass LibBalsaAddressEntryClass;
-
-
-struct _LibBalsaAddressEntryClass {
-    GtkEntryClass parent_class;
-};
-
-
-/*************************************************************************
- *                                                                       *
- * Functions that outside programs are allowed to call to act on the     *
- * widget.                                                               *
- *                                                                       *
- * LibBalsaAddressEntry subclasses GtkEntry, so any gtk_entry_* or       *
- * gtk_editable_* method may also be used, by casting accordingly.       *
- *                                                                       *
- *************************************************************************/
-
-GtkType libbalsa_address_entry_get_type(void);
-void libbalsa_address_entry_set_find_match(LibBalsaAddressEntry *, void *);
-void libbalsa_address_entry_clear_to_send(LibBalsaAddressEntry *
-                                          address_entry);
-void libbalsa_address_entry_fill_input(LibBalsaAddressEntry *address_entry);
-gboolean libbalsa_address_entry_matching(LibBalsaAddressEntry *
-                                         address_entry);
-
-#endif /* NEW_ADDRESS_ENTRY_WIDGET */
 GtkWidget *libbalsa_address_entry_new(void);
 void libbalsa_address_entry_set_domain(LibBalsaAddressEntry *, void *);
 GList *libbalsa_address_entry_get_list(LibBalsaAddressEntry *address_entry);

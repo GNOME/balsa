@@ -285,7 +285,7 @@ bi_apply_other_column_settings(GtkTreeViewColumn *column,
 
     gtk_tree_view_column_set_alignment(column, 0.5);
 
-#if GTK_CHECK_VERSION(2,4,0) && defined(TREE_VIEW_FIXED_HEIGHT)
+#if defined(TREE_VIEW_FIXED_HEIGHT)
     gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
 #endif
 }
@@ -301,7 +301,7 @@ bndx_instance_init(BalsaIndex * index)
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
 
-#if GTK_CHECK_VERSION(2,4,0) && defined(TREE_VIEW_FIXED_HEIGHT)
+#if defined(TREE_VIEW_FIXED_HEIGHT)
     {
         GValue val = {0};
         g_value_init (&val, G_TYPE_BOOLEAN);
@@ -462,16 +462,6 @@ bndx_instance_init(BalsaIndex * index)
 
 /* First some helpers. */
 
-#if !GTK_CHECK_VERSION(2, 2, 0)
-static void
-bndx_selection_any(GtkTreeModel * model, GtkTreePath * path,
-		   GtkTreeIter * iter, gpointer data)
-{
-    gboolean *have_selected = data;
-    *have_selected = TRUE;
-}
-#endif				/* !GTK_CHECK_VERSION(2, 2, 0) */
-
 static void
 bndx_deselected_free(GArray * deselected)
 {
@@ -563,15 +553,8 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     if (mailbox->state == LB_MAILBOX_STATE_TREECLEANING)
         return;
 
-#if GTK_CHECK_VERSION(2, 2, 0)
     have_selected =
 	gtk_tree_selection_count_selected_rows(selection) > 0;
-#else
-    have_selected = FALSE;
-
-    gtk_tree_selection_selected_foreach(selection, bndx_selection_any,
-					&have_selected);
-#endif /* GTK_CHECK_VERSION(2, 2, 0) */
 
     /* Check previously selected messages. */
     deselected =
@@ -1053,11 +1036,6 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     /* libbalsa functions must be called with gdk unlocked
      * but balsa_index - locked!
      */
-#if GTK_CHECK_VERSION(2, 4, 0)
-    gdk_display_flush(gdk_display_get_default());
-#else
-    gdk_flush();
-#endif
     gdk_threads_leave();
     libbalsa_mailbox_set_view_filter(mailbox,
                                      balsa_window_get_view_filter
@@ -1349,7 +1327,7 @@ balsa_index_set_column_widths(BalsaIndex * index)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
 
-#if GTK_CHECK_VERSION(2,4,0) && defined(TREE_VIEW_FIXED_HEIGHT)
+#if defined(TREE_VIEW_FIXED_HEIGHT)
     /* so that fixed width works properly */
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_MSGNO_COL),

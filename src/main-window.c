@@ -2102,9 +2102,7 @@ balsa_notebook_label_new (BalsaMailboxNode* mbnode)
        GtkWidget *but = gtk_button_new();
        GtkWidget *ev = gtk_event_box_new();
 
-#if GTK_CHECK_VERSION(2, 4, 0)
        gtk_event_box_set_visible_window(GTK_EVENT_BOX(ev), FALSE);
-#endif
 
     bw_notebook_label_style(GTK_LABEL(lab),
 			    mbnode->mailbox->has_unread_messages);
@@ -2226,11 +2224,6 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
     /* scroll may select the message and GtkTreeView does not like selecting
      * without being shown first. */
     balsa_index_scroll_on_open(index);
-#if GTK_CHECK_VERSION(2, 4, 0)
-    gdk_display_flush(gdk_display_get_default());
-#else
-    gdk_flush();
-#endif
     gdk_threads_leave();    
 #ifdef BALSA_USE_THREADS
     pthread_mutex_unlock(&open_lock);

@@ -1850,7 +1850,6 @@ balsa_mblist_mru_drop(GList ** list, const gchar * url)
     }
 }
 
-#if GTK_CHECK_VERSION(2, 4, 0)
 /* balsa_mblist_mru_option_menu: create a GtkComboBox to manage an MRU
  * list */
 
@@ -2068,169 +2067,6 @@ balsa_mblist_mru_option_menu_get(GtkWidget * combo_box)
     return g_slist_nth_data(mro->real_urls, active);
 }
 
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-
-/* balsa_mblist_mru_option_menu: create a GtkOptionMenu to manage an MRU
- * list */
-
-/* The info that needs to be passed around */
-struct _BalsaMBListMRUOption {
-    GtkWindow *window;
-    GList **url_list;
-    GtkOptionMenu *option_menu;
-    gchar *url;
-};
-typedef struct _BalsaMBListMRUOption BalsaMBListMRUOption;
-
-/* Forward references */
-static void bmbl_mru_option_menu_setup(BalsaMBListMRUOption * mro);
-static void bmbl_mru_option_menu_init(BalsaMBListMRUOption * mro);
-static void bmbl_mru_option_menu_cb(const gchar * url, gpointer data);
-static void bmbl_mru_option_menu_destroy_cb(BalsaMBListMRUOption * mro);
-
-/*
- * balsa_mblist_mru_option_menu:
- *
- * window:      parent window for the dialog;
- * url_list:    pointer to a list of urls;
- *
- * Returns a GtkOptionMenu.
- *
- * Takes a list of urls and creates an option menu with an entry for
- * each one that resolves to a mailbox, labeled with the mailbox name,
- * including the special case of an empty url and a NULL mailbox.
- * Adds a last entry that pops up the whole mailbox tree. When an item
- * is clicked, the corresponding url is stored in *url,
- * and the url_list is updated.
- */
-GtkWidget *
-balsa_mblist_mru_option_menu(GtkWindow * window, GList ** url_list)
-{
-    GtkWidget *option_menu;
-    BalsaMBListMRUOption *mro;
-
-    g_return_val_if_fail(url_list != NULL, NULL);
-
-    option_menu = gtk_option_menu_new();
-    mro = g_new(BalsaMBListMRUOption, 1);
-
-    mro->window = window;
-    mro->url_list = url_list;
-    mro->option_menu = GTK_OPTION_MENU(option_menu);
-    mro->url = NULL;
-    bmbl_mru_option_menu_setup(mro);
-    bmbl_mru_option_menu_init(mro);
-    g_object_set_data_full(G_OBJECT(option_menu), "mro", mro, 
-                           (GDestroyNotify) bmbl_mru_option_menu_destroy_cb);
-
-    return option_menu;
-}
-
-/*
- * balsa_mblist_mru_option_menu_set
- *
- * option_menu: a GtkOptionMenu created by balsa_mblist_mru_option_menu;
- * url:         URL of a mailbox
- *
- * Adds url to the front of the url_list managed by option_menu, resets
- * option_menu to show the new url, and stores a copy in the mro
- * structure.
- */
-void
-balsa_mblist_mru_option_menu_set(GtkWidget * option_menu, const gchar *url)
-{
-    BalsaMBListMRUOption *mro =
-        g_object_get_data(G_OBJECT(option_menu), "mro");
-    
-    balsa_mblist_mru_add(mro->url_list, url);
-    bmbl_mru_option_menu_setup(mro);
-    bmbl_mru_option_menu_cb(url, mro);
-}
-
-/*
- * balsa_mblist_mru_option_menu_get
- *
- * option_menu: a GtkOptionMenu created by balsa_mblist_mru_option_menu.
- *
- * Returns the address of the current URL.
- *
- * Note that the url is held in the mro structure, and is freed when the
- * widget is destroyed. The calling code must make its own copy of the
- * string if it is needed more than temporarily.
- */
-const gchar *
-balsa_mblist_mru_option_menu_get(GtkWidget * option_menu)
-{
-    BalsaMBListMRUOption *mro =
-        g_object_get_data(G_OBJECT(option_menu), "mro");
-
-    return mro->url;
-}
-
-/*
- * bmbl_mru_option_menu_setup:
- *
- * mro:         pointer to a BalsaMBListMRUOption structure.
- *
- * Creates the menu for the option menu, and sets it. Called by
- * balsa_mblist_mru_option_menu, and also passed to bmbl_mru_menu
- * as the setup_cb.
- */
-static void
-bmbl_mru_option_menu_setup(BalsaMBListMRUOption * mro)
-{
-    GtkOptionMenu *option_menu = mro->option_menu;
-    GtkWidget *menu = bmbl_mru_menu(mro->window, mro->url_list,
-                                    G_CALLBACK(bmbl_mru_option_menu_cb),
-                                    mro, TRUE,
-                                    G_CALLBACK
-                                    (bmbl_mru_option_menu_setup));
-
-    gtk_option_menu_set_menu(option_menu, menu);
-}
-
-/*
- * bmbl_mru_option_menu_cb:
- *
- * Callback passed to bmbl_mru_menu.
- */
-static void
-bmbl_mru_option_menu_cb(const gchar * url, gpointer data)
-{
-    BalsaMBListMRUOption *mro = (BalsaMBListMRUOption *) data;
-
-    g_free(mro->url);
-    mro->url = g_strdup(url);
-}
-
-/*
- * bmbl_mru_option_menu_destroy_cb:
- *
- * Free the allocated BalsaMBListMRUOption structure.
- */
-static void
-bmbl_mru_option_menu_destroy_cb(BalsaMBListMRUOption * mro)
-{
-    g_free(mro->url);
-    g_free(mro);
-}
-
-/* Initialize mro->url by activating the top menu item on
- * mro->option_menu.
- */
-static void
-bmbl_mru_option_menu_init(BalsaMBListMRUOption * mro)
-{
-    GtkWidget *menu =
-	    gtk_option_menu_get_menu(GTK_OPTION_MENU(mro->option_menu));
-    GList *children = GTK_MENU_SHELL(menu)->children;
-    if (g_list_length(children) > 1) {
-        GtkMenuItem *item = children->data;
-        gtk_menu_item_activate(item);
-    }
-}
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
-
 void
 balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox)
 {
@@ -2263,12 +2099,7 @@ bmbl_expand_to_row(BalsaMBList * mblist, GtkTreePath * path)
 
     if (gtk_tree_path_up(tmp) && gtk_tree_path_get_depth(tmp) > 0
         && !gtk_tree_view_row_expanded(GTK_TREE_VIEW(mblist), tmp)) {
-#if GTK_CHECK_VERSION(2, 2, 0)
 	gtk_tree_view_expand_to_path(GTK_TREE_VIEW(mblist), tmp);
-#else
-        bmbl_expand_to_row(mblist, tmp);
-        gtk_tree_view_expand_row(GTK_TREE_VIEW(mblist), tmp, FALSE);
-#endif
     }
 
     gtk_tree_path_free(tmp);

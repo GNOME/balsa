@@ -1324,11 +1324,6 @@ balsa_send_message_real(SendMessageInfo* info)
     
     gdk_threads_enter();
     libbalsa_mailbox_close(info->outbox, TRUE);
-#if GTK_CHECK_VERSION(2, 4, 0)
-    gdk_display_flush(gdk_display_get_default());
-#else
-    gdk_flush();
-#endif
     gdk_threads_leave();
 
     message_queue = NULL;
@@ -1385,64 +1380,6 @@ get_mailbox_names(GList *list, GList *address_list)
     return list;
 }
 #endif
-
-#if !NEW_CHARSET_WIDGET
-/* Check whether a file is all ascii or utf-8, and return charset
- * accordingly (NULL if it's neither).
- */
-static const gchar *
-lbs_file_get_charset(const gchar * filename)
-{
-    FILE *fp;
-    gchar buf[80];
-    gchar *new_chars = buf;
-    gboolean is_ascii = TRUE;
-    gboolean is_utf8 = TRUE;
-
-    fp = fopen(filename, "r");
-    if (!fp)
-	return NULL;
-
-    while (fgets(new_chars, (sizeof buf) - (new_chars - buf), fp)) {
-	gchar *p;
-	gunichar c = 0;
-
-	if (is_ascii) {
-	    for (p = new_chars; *p; p++) {
-		if (*p & 0x80) {
-		    is_ascii = FALSE;
-		    break;
-		}
-	    }
-	}
-
-	for (p = buf; p < buf + sizeof buf && *p; p = g_utf8_next_char(p)) {
-	    c = g_utf8_get_char_validated(p, -1);
-	    if (c >= (gunichar) (-2))
-		break;
-	}
-
-	if (c == (gunichar) (-1)) {
-	    is_utf8 = FALSE;
-	    break;
-	}
-
-	/* copy any remaining bytes, including the terminating '\0', to
-	 * start of buffer */
-	for (new_chars = buf; (*new_chars = *p++) != '\0'; new_chars++)
-	    /* Nothing. */ ;
-    }
-
-    fclose(fp);
-
-    if (is_ascii)
-	return "us-ascii";
-    else if (is_utf8)
-	return "utf-8";
-    else
-	return NULL;
-}
-#endif                          /* NEW_CHARSET_WIDGET */
 
 /* We could have used g_strsplit_set(s, "/;", 3) but it is not
  * available in older glib. */
@@ -1535,11 +1472,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 
 		if (!strcasecmp(mime_type[0], "text")
 		    && !(charset = body->charset)) {
-#if NEW_CHARSET_WIDGET
 		    charset = libbalsa_file_get_charset(body->filename);
-#else                           /* NEW_CHARSET_WIDGET */
-		    charset = lbs_file_get_charset(body->filename);
-#endif                          /* NEW_CHARSET_WIDGET */
 		    if (!charset) {
 			static const gchar default_type[] =
 			    "application/octet-stream";

@@ -84,7 +84,6 @@ GtkWidget * fe_condition_delete_button,* fe_condition_edit_button;
 
 /* ******************************** */
 
-#if GTK_CHECK_VERSION(2, 4, 0)
 option_list fe_search_type[] = {
     {N_("Simple"), CONDITION_STRING},
     {N_("Regular Expression"), CONDITION_REGEX},
@@ -104,27 +103,6 @@ option_list fe_op_codes[] = {
     {N_("OR"), FILTER_OP_OR},
     {N_("AND"), FILTER_OP_AND}
 };
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-option_list fe_search_type[] = {
-    {N_("Simple"), CONDITION_STRING, NULL},
-    {N_("Regular Expression"), CONDITION_REGEX, NULL},
-    {N_("Date interval"),CONDITION_DATE,NULL},
-    {N_("Flag condition"),CONDITION_FLAG,NULL}
-};
-
-option_list fe_actions[] = {
-    {N_("Copy to folder:"), FILTER_COPY, NULL},
-    {N_("Move to folder:"), FILTER_MOVE, NULL},
-    {N_("Print on printer:"), FILTER_PRINT, NULL},
-    {N_("Run program:"), FILTER_RUN, NULL},
-    {N_("Send to Trash"), FILTER_TRASH, NULL}
-};
-
-option_list fe_op_codes[] = {
-    {N_("OR"), FILTER_OP_OR, NULL},
-    {N_("AND"), FILTER_OP_AND, NULL}
-};
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 /* ******************************** */
 void
@@ -147,19 +125,16 @@ fe_enable_right_page(gboolean enabled)
  *    GtkOptionMenu - the menu created
  */
 
-#if GTK_CHECK_VERSION(2, 4, 0)
 static void
 fe_combo_box_info_free(struct fe_combo_box_info * info)
 {
     g_slist_free(info->values);
     g_free(info);
 }
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 GtkWidget *
 fe_build_option_menu(option_list options[], gint num, GCallback func)
 {
-#if GTK_CHECK_VERSION(2, 4, 0)
     GtkWidget *combo_box;
     struct fe_combo_box_info *info;
     int i;
@@ -184,35 +159,6 @@ fe_build_option_menu(option_list options[], gint num, GCallback func)
                            info, (GDestroyNotify) fe_combo_box_info_free);
 
     return combo_box;
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    GtkWidget *option_menu;
-    GtkWidget *menu;
-    int i;
-
-    if (num < 1)
-	return (NULL);
-
-    menu = gtk_menu_new();
-
-    for (i = 0; i < num; i++) {
-	options[i].widget =
-	    gtk_menu_item_new_with_label(_(options[i].text));
-	g_object_set_data(G_OBJECT(options[i].widget), "value",
-			  GINT_TO_POINTER(options[i].value));
-
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu), options[i].widget);
-	if (func)
-	    g_signal_connect(G_OBJECT(options[i].widget), "activate",
-			     func, GINT_TO_POINTER(options[i].value));
-	gtk_widget_show(options[i].widget);
-    }
-
-    option_menu = gtk_option_menu_new();
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu), menu);
-    gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), 0);
-
-    return (option_menu);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }				/* end fe_build_option_menu */
 
 /*
@@ -649,10 +595,6 @@ filters_edit_dialog(void)
                            0, cpfil->name, 1, cpfil, -1);
     }
 
-#if !GTK_CHECK_VERSION(2, 4, 0)
-    /* To make sure we have at least one item in the combo list */
-    fe_add_new_user_header("X-Mailer");
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     if (filter_errno!=FILTER_NOERR) {
 	filter_perror(filter_strerror(filter_errno));
 	gtk_widget_destroy(GTK_WIDGET(fe_window));

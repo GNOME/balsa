@@ -1540,7 +1540,7 @@ accept_low_trust_key(const gchar * name, gpgme_user_id_t uid,
 					   "<b>%s</b>\n\n%s\n%s",
 					   message1,
 					   message2,
-					   _("Use this key nevertheless?"));
+					   _("Use this key anyway?"));
 			      
     /* ask the user */
     result = gtk_dialog_run(GTK_DIALOG(dialog));

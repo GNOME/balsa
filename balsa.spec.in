@@ -100,13 +100,21 @@ rm "$RPM_BUILD_ROOT%{_bindir}"/balsa-ab
 [ -n "$RPM_BUILD_DIR/%{name}-%{version}" ] && rm -rf "$RPM_BUILD_DIR/%{name}-%{version}"
 
 %post
-if which scrollkeeper-update>/dev/null 2>&1; then
-    scrollkeeper-update
+which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
+
+if which gtk-update-icon-cache >/dev/null 2>&1; then
+    # cf. images/Makefile - this is probably incomplete.
+    gtk-update-icon-cache %{_datadir}/balsa/hicolor
+    gtk-update-icon-cache %{_datadir}/icons/hicolor
 fi
 
 %postun
 which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
-
+if which gtk-update-icon-cache >/dev/null 2>&1; then
+    # cf. images/Makefile - this is probably incomplete.
+    gtk-update-icon-cache %{_datadir}/balsa/hicolor
+    gtk-update-icon-cache %{_datadir}/icons/hicolor
+fi
 %files -f %{name}.lang
 %defattr(-, root, root)
 %doc README COPYING ChangeLog NEWS TODO AUTHORS HACKING docs/mh-mail-HOWTO

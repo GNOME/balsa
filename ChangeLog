@@ -1,3 +1,9 @@
+2005-03-24 Pawel Salek
+
+	* libbalsa/address-book-ldap.c: add missing libbalsa-conf.h
+	* balsa.spec.in: update icon cache after rpm installation.
+	* images/Makefile.am: bug 171388.
+
 2005-03-23 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* src/balsa-message.c, libbalsa/gmime-gpgme-context.c,

@@ -1,3 +1,10 @@
+2001-11-11  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* help/C/Makefile.am: update for new help file.
+	* help/C/balsa.sgml: partially update and order.
+	* src/balsa-index.c: Thread expansion/collapse improvements (Peter).
+	* src/pref-manager.c: update for new help file.
+	
 2001-11-10  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/address.c: better mail address quoting (#62429).

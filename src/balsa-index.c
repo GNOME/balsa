@@ -1299,13 +1299,41 @@ button_event_press_cb(GtkWidget * ctree, GdkEventButton * event, gpointer data)
 
 /* tree_expand_cb:
  * callback on expand events
- * set/reset unread style, as appropriate, and check visibility of child */
+ * set/reset unread style, as appropriate
+ * if current message has become viewable, check its visibility,
+ * scrolling only until it is at foot of window;
+ * otherwise find last viewable message in thread and check its
+ * visibility, scrolling only until node is at foot of window, but not
+ * so far that the clicked-on message scrolls off the top */
 static void
 tree_expand_cb(GtkCTree * ctree, GList * node, gpointer user_data)
 {
-    GtkCTreeNode *child = GTK_CTREE_ROW(node)->children;
+    GtkCTreeNode *child = NULL;
+    GtkCTreeNode *parent = NULL;
+    if (GTK_CLIST(ctree)->selection) {
+        /* current message... */
+        GtkCTreeNode *current =
+            g_list_last(GTK_CLIST(ctree)->selection)->data;
+        if (gtk_ctree_is_ancestor(ctree, GTK_CTREE_NODE(node), current)
+            /* ...is in thread... */
+            && gtk_ctree_is_viewable(ctree, current))
+            /* ...and viewable:
+             * check visibility of current only */
+            child = current;
+    }
+    if (child == NULL) {
+        /* get last child... */
+        child = gtk_ctree_last(ctree, GTK_CTREE_ROW(node)->children);
+        while (child && !gtk_ctree_is_viewable(ctree, child))
+            /* ...that is viewable */
+            child = GTK_CTREE_ROW(child)->parent;
+        /* check visibility of parent, too */
+        parent = GTK_CTREE_NODE(node);
+    }
     if (child)
         balsa_index_check_visibility(GTK_CLIST(ctree), child, 1.0);
+    if (parent)
+        balsa_index_check_visibility(GTK_CLIST(ctree), parent, 0.0);
     balsa_index_set_style(BALSA_INDEX(user_data), GTK_CTREE_NODE(node));
 }
 

@@ -3,7 +3,6 @@ SGML_FILES = \
 
 EXTRA_DIST = \
 	topic.dat \
-	win-config-gen \
 	$(SGML_FILES)
 
 balsa_helpdir = $(gnomedatadir)/gnome/help/balsa/C
@@ -11,8 +10,6 @@ balsa_helpdir = $(gnomedatadir)/gnome/help/balsa/C
 balsa_help_DATA = \
 	topic.dat \
 	index.html
-
-NUM_PREF_PAGES = 11
 
 GDP_STYLESHEET = \
 	stylesheet/dsssl/docbook-gnome/gdp-both.dsl
@@ -27,8 +24,6 @@ MANUAL_IMAGES := $(wildcard images/*.png)
 # Only build html by default
 all: index.html
 
-# This is where the SGML bit is cool
-# older db2html don't support the stylesheets, detect it.
 index.html: $(SGML_FILES)
 	if test "$(HAVE_JW)" = 'yes' ; then 		\
 		jw -c /etc/sgml/catalog balsa.sgml -o balsa; \
@@ -36,7 +31,6 @@ index.html: $(SGML_FILES)
 		db2html balsa.sgml; 	\
 	fi
 	-cp balsa/index.html index.html
-	-cd balsa && ../win-config-gen $(NUM_PREF_PAGES)
 
 epsimages: $(MANUAL_IMAGES)
 

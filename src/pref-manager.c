@@ -234,7 +234,7 @@ const gchar *spell_check_suggest_mode_label[NUM_SUGGEST_MODES] = {
 void
 open_preferences_manager(GtkWidget * widget, gpointer data)
 {
-    static GnomeHelpMenuEntry help_entry = { NULL, "win-config" };
+    static GnomeHelpMenuEntry help_entry = { NULL, "preferences" };
     GnomeApp *active_win = GNOME_APP(data);
     gint i;
 

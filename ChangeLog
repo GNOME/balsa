@@ -1,5 +1,10 @@
 2002-09-21  Carlos Morgado  <chbm@chbm.nu>
 
+	* src/balsa-app.c (ask_password_mt): upport deadlock
+	fix from HEAD
+
+2002-09-21  Carlos Morgado  <chbm@chbm.nu>
+
 	* libbalsa/libbalsa.c: add utf-8 as fallback on SendCharset
 	* src/save-restore.c: fix reassigning sentbox
 	* libbalsa/mailbox_imap.c: add user to imap url

@@ -37,6 +37,7 @@
 
 #ifdef LIBMUTT
 #define sleep(a) 
+static char *extract_message_id (const char *s);
 #endif
 
 /* Reads an arbitrarily long header field, and looks ahead for continuation

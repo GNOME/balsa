@@ -951,7 +951,6 @@ bndx_in_messages_list(BalsaIndex * index, gint msgno)
     if (msgno+1> match->msgno_end)
 	new_end = msgno+NB_MESSAGES_FORWARD;
 
-    g_print("msgno=%d [%d,%d],[%d,%d]\n",msgno,match->msgno_beg,match->msgno_end,new_begin,new_end);
     /* Extend the interval if needed */
     if (new_begin!=-1 || new_end!=-1) {
 	gchar * imap_query =

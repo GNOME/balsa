@@ -179,7 +179,7 @@ int mutt_socket_readln_d (char* buf, size_t buflen, CONNECTION* conn, int dbg)
   dprint (dbg, (debugfile, "< %s\n", buf));
   
   /* number of bytes read, not strlen */
-  return i + 1;
+  return i;
 }
 
 CONNECTION* mutt_socket_head (void)

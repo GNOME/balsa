@@ -832,7 +832,7 @@ imap_matched(unsigned uid, ImapSearchData* data)
     if(m) 
         g_hash_table_insert(data->res, m, m);
     else
-        printf("Could not find UID: %ud in message list\n", uid);
+        printf("Could not find UID: %u in message list\n", uid);
 }
 */
 static void

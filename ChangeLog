@@ -1,3 +1,12 @@
+2004-11-17  Pawel Salek
+
+	* TRANSLATABLE_FILES: 
+	* sounds/{Makefile.am,balsa.soundlist.in}:
+	* src/main-window.c: consolidate sound lists #127751, Craig Routledge.
+	* libbalsa/mailbox_imap.c: add content-type-encoding to cache files.
+	* libbalsa/imap/auth-gssapi.c: include gssapi.h directly.
+	* src/message-window.c: focus directly on message (#158514).
+
 2004-11-17 09:16  PeterB
 
 	* libbalsa/send.c: combine flag changes.

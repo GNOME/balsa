@@ -3104,7 +3104,7 @@ display_new_mail_notification(int num_new, int has_new)
 
     if (balsa_app.notify_new_mail_sound)
         gnome_triggers_do("New mail has arrived", "email",
-                          "email", "newmail", NULL);
+                          "balsa", "newmail", NULL);
 
     if (!balsa_app.notify_new_mail_dialog)
         return;

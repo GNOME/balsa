@@ -2013,6 +2013,18 @@ append_str(const char *buf, int buflen, void *arg)
     dt->pos += buflen;
 }
 
+static const char*
+encoding_names(ImapBodyEncoding enc)
+{
+    switch(enc) {
+    case IMBENC_7BIT:   return "7bit";
+    default:
+    case IMBENC_8BIT:   return "8bit";
+    case IMBENC_BINARY: return "binary";
+    case IMBENC_BASE64: return "base64";
+    case IMBENC_QUOTED: return "quoted-printable";
+    }
+}
 static gboolean
 lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
                                  LibBalsaMessageBody * part)
@@ -2069,9 +2081,14 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
             g_free(part_name);
             return FALSE; /* something better ? */
         }
-        fputs(im->fetched_header_fields && msg->body_list == part
-              ? im->fetched_header_fields
-              : "MIME-version: 1.0\r\ncontent-type: text/plain\r\n", fp);
+        /* this has to match the condition in imap-commands.c */
+        if(strcmp(section, "1") == 0 && im && im->body &&
+           im->body->media_basic != IMBMEDIA_MESSAGE_RFC822 &&
+           im->body->media_basic != IMBMEDIA_MULTIPART) {
+            fputs("MIME-version: 1.0\r\ncontent-type: text/plain\r\n", fp);
+            fprintf(fp, "Content-Transfer-Encoding: %s\r\n\r\n",
+                    encoding_names(dt.body->encoding));
+        }
 	fwrite(dt.block, dt.body->octets, 1, fp);
 	fseek(fp, 0, SEEK_SET);
     }

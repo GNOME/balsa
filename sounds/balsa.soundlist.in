@@ -4,3 +4,7 @@ _description=Balsa E-mail reader
 [startup]
 file=balsa/startup.wav
 _description=Program startup
+
+[newmail]
+file=balsa/newmail.wav
+_description=New mail notification

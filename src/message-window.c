@@ -344,6 +344,7 @@ message_window_idle_handler(MessageWindow* mw)
     g_free(title);
 
     balsa_message_set(msg, message);
+    balsa_message_grab_focus(BALSA_MESSAGE(mw->bmessage));
     /* We may have triggered a mailbox-check, so we need to verify that
      * the message is still good. */
     if (!message->mailbox) {
@@ -592,6 +593,7 @@ message_window_new(LibBalsaMessage * message)
 			       GNOME_APP(mw->window)->accel_group,
 			       GDK_Escape, (GdkModifierType)0, 
                                (GtkAccelFlags) 0);
+    GTK_WIDGET_UNSET_FLAGS(toolbar, GTK_CAN_FOCUS);
 }
 
 static void

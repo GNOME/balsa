@@ -28,7 +28,7 @@
 #include "imap-auth.h"
 
 #if defined(HAVE_GSSAPI)
-#include <gssapi/gssapi.h>
+#include <gssapi.h>
 
 
 #include "imap_private.h"

@@ -1229,7 +1229,7 @@ create_display_page ( )
 #endif
 	
 #ifdef BALSA_SHOW_INFO
-	pui->mblist_show_mb_content_info = gtk_check_button_new_with_label (_("View mailbox content informations"));
+	pui->mblist_show_mb_content_info = gtk_check_button_new_with_label (_("Show mailbox statistics in left pane"));
 	gtk_widget_show (pui->mblist_show_mb_content_info);
 	gtk_box_pack_start (GTK_BOX (vbox7), pui->mblist_show_mb_content_info, FALSE, TRUE, 0);
 #endif BALSA_SHOW_INFO

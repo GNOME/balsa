@@ -184,7 +184,7 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 	libbalsa_notify_register_mailbox(LIBBALSA_MAILBOX(mailbox));
 	return 0;
     } else
-	return errno;
+	return errno ? errno : -1;
 }
 
 void

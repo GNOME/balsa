@@ -345,13 +345,13 @@ libbalsa_message_body_is_inline(LibBalsaMessageBody * body)
 {
     const gchar *disposition;
 
-    if (body->mime_part) {
-	GMimePart *mime_part;
-	g_return_val_if_fail(GMIME_IS_PART(body->mime_part), FALSE);
+    g_return_val_if_fail(body->mime_part == NULL ||
+			 GMIME_IS_OBJECT(body->mime_part), FALSE);
 
-	mime_part = GMIME_PART(body->mime_part);
-	disposition = g_mime_part_get_content_disposition(mime_part);
-    } else
+    if (body->mime_part)
+	disposition = g_mime_object_get_header(body->mime_part,
+					       "Content-Disposition");
+    else
 	disposition = body->content_dsp;
 
     return (disposition

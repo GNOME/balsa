@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 1.0.0\n"
-"POT-Creation-Date: 2003-01-21 09:21+0100\n"
-"PO-Revision-Date: 2003-01-21 10:36+0100\n"
+"POT-Creation-Date: 2003-08-23 09:17+0200\n"
+"PO-Revision-Date: 2003-08-23 09:33+0200\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian <no@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -257,7 +257,9 @@ msgstr "<b>Dette sertifikatet tilhører:</b>\n"
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
-msgstr "\n<b>Dette sertifikatet ble utstedt av:</b>\n"
+msgstr ""
+"\n"
+"<b>Dette sertifikatet ble utstedt av:</b>\n"
 
 #: libbalsa/libbalsa.c:524
 #, c-format
@@ -543,6 +545,10 @@ msgid ""
 "via: \"host:smtp\".\n"
 "Message is left in outbox."
 msgstr ""
+"SMTP-tjener nektet forbindelsen.\n"
+"Balsa bruker «submission service (587)» som forvalg.\n"
+"Hvis du ønsker å levere meldinger ved bruk av «relay service (25)» må du spesifisere dette eksplisitt via «vert:smtp»\n"
+"Meldingen ligger i utboksen."
 
 #: libbalsa/send.c:1058
 #, c-format
@@ -550,6 +556,8 @@ msgid ""
 "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
 msgstr ""
+"Problemer med SMTP-tjener (%d): %s\n"
+"Meldingen ligger i utboksen."
 
 #: libbalsa/source-viewer.c:46 src/main-window.c:513
 msgid "_Select Text"
@@ -1444,11 +1452,11 @@ msgstr "Kunne ikke åpne %s"
 #: libmutt/sendlib.c:2115
 #, c-format
 msgid "Error sending message, child exited %d (%s)."
-msgstr ""
+msgstr "Feil under sending av melding. Underprosess avluttet %d (%s)."
 
 #: libmutt/sendlib.c:2122
 msgid "Output of the delivery process"
-msgstr ""
+msgstr "Utskrift fra leveringsprosessen"
 
 #: src/address-book-config.c:145
 msgid "Add Address Book"
@@ -1561,14 +1569,14 @@ msgid "The address book file path \"%s\" is not correct. %s"
 msgstr "Stien til adressebokfilen, «%s», er ikke riktig. %s"
 
 #: src/address-book-config.c:653
-#, c-format, fuzzy
+#, c-format
 msgid "The load program path \"%s\" is not correct. %s"
-msgstr "Filen med stinavn \"%s\" er ikke en katalog."
+msgstr "Sti for å laste program «%s» er ikke riktig. %s"
 
 #: src/address-book-config.c:656
-#, fuzzy, c-format
+#, c-format
 msgid "The save program path \"%s\" is not correct. %s"
-msgstr "Filen med stinavn \"%s\" er ikke en katalog."
+msgstr "Sti for å lagre program «%s» er ikke korrekt. %s"
 
 #: src/address-book-config.c:659
 #, c-format
@@ -1995,13 +2003,12 @@ msgid "Match when none of these flags is set:"
 msgstr "Treff når ingen av disse flaggene er satt:"
 
 #: src/filter-edit-callbacks.c:446
-#, fuzzy
 msgid "You must specify the name of the user header to match on"
-msgstr "Du må spesifisere navn på "
+msgstr "Du må spesifisere navn på brukerspesifisert header du vil søke etter"
 
 #: src/filter-edit-callbacks.c:461
 msgid "You must specify at least one field for matching"
-msgstr ""
+msgstr "Du må oppgi minst ett felt for søking"
 
 #: src/filter-edit-callbacks.c:471
 msgid "You must provide a string"
@@ -2009,19 +2016,19 @@ msgstr "Du må oppgi en streng"
 
 #: src/filter-edit-callbacks.c:478
 msgid "You must provide at least one regular expression"
-msgstr ""
+msgstr "Du må oppgi minst ett vanlig uttrykk"
 
 #: src/filter-edit-callbacks.c:490
 msgid "Low date is incorrect"
-msgstr ""
+msgstr "Nedre dato er ikke korrekt"
 
 #: src/filter-edit-callbacks.c:501
 msgid "High date is incorrect"
-msgstr ""
+msgstr "Øvre dato er ikke korrekt"
 
 #: src/filter-edit-callbacks.c:509
 msgid "Low date is greater than high date"
-msgstr ""
+msgstr "Nedre dato er større enn øvre dato"
 
 #: src/filter-edit-callbacks.c:783
 msgid "Deleted"
@@ -2037,11 +2044,11 @@ msgstr "Flaggede"
 
 #: src/filter-edit-callbacks.c:797
 msgid "One of the specified f_ields contains"
-msgstr ""
+msgstr "Ett av de spesifiserte f_eltene inneholder"
 
 #: src/filter-edit-callbacks.c:812
 msgid "Contain/Does _Not Contain"
-msgstr ""
+msgstr "Inneholder/I_nneholder ikke"
 
 #: src/filter-edit-callbacks.c:826
 msgid "_One of the regular expressions matches"
@@ -2062,15 +2069,15 @@ msgstr "Fje_rn"
 
 #: src/filter-edit-callbacks.c:861
 msgid "One _Matches/None Matches"
-msgstr ""
+msgstr "Ett _treff/ingen treff"
 
 #: src/filter-edit-callbacks.c:898
 msgid "Inside/outside the date interval"
-msgstr ""
+msgstr "Innenfor/utenfor datointervallet"
 
 #: src/filter-edit-callbacks.c:945
 msgid "Match when one flag is set/when no flag is set"
-msgstr ""
+msgstr "Treff når ett flagg er satt/når ingen flagg er satt"
 
 #. builds the toggle buttons to specify fields concerned by the conditions of
 #. * the filter
@@ -2110,9 +2117,8 @@ msgid "_Cc:"
 msgstr "_Cc:"
 
 #: src/filter-edit-callbacks.c:1028
-#, fuzzy
 msgid "_User header:"
-msgstr "Br_ukernavn:"
+msgstr "Br_ukerspesifisert header:"
 
 #: src/filter-edit-callbacks.c:1052
 msgid "Search T_ype:"
@@ -2150,7 +2156,7 @@ msgstr "Du må oppgi en lyd som skal spilles av"
 #: src/filter-edit-callbacks.c:1895
 #, c-format
 msgid "(Example: write December 31, 2000, as %s)"
-msgstr ""
+msgstr "(Eksempel: skriv 31 desember 2000, som %s)"
 
 #: src/filter-edit-dialog.c:88 src/pref-manager.c:340
 msgid "Simple"
@@ -2256,7 +2262,8 @@ msgstr "Gjør om"
 
 #: src/filter-edit-dialog.c:481
 msgid "A filter run dialog is open.Close it before you can modify filters."
-msgstr "En «Kjør filter»-dialog er åpen. Du må lukke den før du kan endre på filtre."
+msgstr ""
+"En «Kjør filter»-dialog er åpen. Du må lukke den før du kan endre på filtre."
 
 #: src/filter-edit-dialog.c:494
 msgid "Balsa Filters"
@@ -2271,7 +2278,8 @@ msgstr "Kan ikke eksportere filter %s. En feil oppsto."
 msgid ""
 "There are opened filter run dialogs, close them before you can modify "
 "filters."
-msgstr "Det finnes åpne «Kjør filtre»-dialoger. Lukk dem før du kan endre på filtre."
+msgstr ""
+"Det finnes åpne «Kjør filtre»-dialoger. Lukk dem før du kan endre på filtre."
 
 #: src/filter-export-dialog.c:73
 msgid "Balsa Filters Export"
@@ -2287,11 +2295,12 @@ msgid ""
 "The destination mailbox of the filter \"%s\" is \"%s\"\n"
 "You can't associate it with the same mailbox (that causes recursion)."
 msgstr ""
+"Målpostboksen for filter «%s» er «%s»\n"
+"Du kan ikke assosiere det med samme postboks da dette skaper rekursjon."
 
 #: src/filter-run-dialog.c:187
-#, fuzzy
 msgid "Balsa Filters of Mailbox: "
-msgstr "Balsa filtre"
+msgstr "Filtre for postboks: "
 
 #: src/filter-run-dialog.c:228
 msgid "On reception"
@@ -2312,13 +2321,10 @@ msgid "Do_wn"
 msgstr "_Ned"
 
 #: src/filter-run-dialog.c:397
-#, fuzzy
 msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
-msgstr ""
-"Det finnes dialoger for kjøring av filtre. Du må lukke dem før du kan endre "
-"på filtre"
+msgstr "Filterdialogen er åpen. Lukk den før du kan kjør filtre på noen av postboksene"
 
 #: src/folder-conf.c:261
 msgid "Remote IMAP folder"
@@ -2488,7 +2494,7 @@ msgid "No mailbox selected."
 msgstr "Ingen postboks valgt."
 
 #: src/mailbox-conf.c:233
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Mailbox \"%s\" is used by balsa and I cannot remove it.\n"
 "If you really want to remove it, assign its function\n"
@@ -2499,7 +2505,7 @@ msgstr ""
 "til en annen postboks."
 
 #: src/mailbox-conf.c:243
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
 "also delete the disk file or files associated with this mailbox.\n"
@@ -2507,10 +2513,8 @@ msgid ""
 "mailbox again.\n"
 "What would you like to do?"
 msgstr ""
-"Dette vil fjerne postboksen %s fra listen over postbokser.\n"
-"Du kan også fjerne filen som er assosiert med denne postboksen på disken.\n"
-"Hvis du ikke fjerner filen på disk, kan du bruke \"Legg til postboks\" "
-"senere for å aksessere denne postboksen igjen.\n"
+"Dette vil fjerne postboksen «%s» fra listen over postbokser. Du kan også fjerne filen eller filene som er assosiert med denne postboksen på disken.\n"
+"Hvis du ikke fjerner filen på disk, kan du bruke «Legg til postboks» senere for å aksessere denne postboksen igjen.\n"
 "Hva vil du gjøre?"
 
 #: src/mailbox-conf.c:255
@@ -2526,7 +2530,7 @@ msgid "_Cancel"
 msgstr "_Avbryt"
 
 #: src/mailbox-conf.c:264
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This will remove the mailbox \"%s\" and all its messages from your IMAP "
 "server.  If %s has subfolders, it will still appear as a node in the folder "
@@ -2534,11 +2538,9 @@ msgid ""
 "You may use \"New IMAP subfolder\" later to add a mailbox with this name.\n"
 "What would you like to do?"
 msgstr ""
-"Dette vil fjerne postboksen %s og alle dens meldinger fra din IMAP-tjener.\n"
-"Hvis %s har undermapper vil den fremdeles være der som en node i "
-"mappetreet.\n"
-"Du kan bruke \"Ny IMAP-undermappe\" senere for å legge til en postboks med "
-"dette\n"
+"Dette vil fjerne postboksen «%s» og alle dens meldinger fra din IMAP-tjener.\n"
+"Hvis %s har undermapper vil den fremdeles være der som en node i mappetreet.\n"
+"Du kan bruke «Ny IMAP-undermappe» senere for å legge til en postboks med dette\n"
 "navnet.\n"
 "Hva vil du gjøre?"
 
@@ -2547,15 +2549,15 @@ msgid "_Remove from server"
 msgstr "Fje_rn fra tjener"
 
 #: src/mailbox-conf.c:284
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
 "You may use \"Add Mailbox\" later to access this mailbox again.\n"
 "What would you like to do?"
 msgstr ""
-"Dette vil fjerne postboksen %s fra listen over postbokser.\n"
-"Du kan bruke \"Legg til postboks\" senere for å aksessere denne postboksen\n"
-"igjen. Hva vil du gjøre?"
+"Dette vil fjerne postboksen «%s» fra listen over postbokser.\n"
+"Du kan bruke «Legg til postboks» senere for å aksessere denne postboksen igjen.\n"
+"Hva vil du gjøre?"
 
 #: src/mailbox-conf.c:293
 msgid "_Remove from list"
@@ -3216,9 +3218,8 @@ msgid "In:"
 msgstr "Inn::"
 
 #: src/main-window.c:2834
-#, fuzzy
 msgid "You can apply filters only on mailbox\n"
-msgstr "Ugyldige filtre %s for postboks %s"
+msgstr "Du kan kun bruke filtre på postboks\n"
 
 #: src/main-window.c:2869 src/main-window.c:2888
 #, c-format
@@ -3519,7 +3520,7 @@ msgstr "Reformater meldinger av type `text/plain; format=flowed'"
 #. handling of multipart/alternative
 #: src/pref-manager.c:1743
 msgid "Display of Multipart/Alternative Parts"
-msgstr ""
+msgstr "Visning av Multipart/Alternative-deler"
 
 #: src/pref-manager.c:1746
 msgid "prefer text/plain over html"
@@ -3540,15 +3541,14 @@ msgstr ""
 "(MDN), send denne i følgende tilfeller:"
 
 #: src/pref-manager.c:1776
-#, fuzzy
 msgid ""
 "The message header looks clean\n"
 "(the notify-to address is equal to the return path,\n"
 "I am in the \"To:\" or \"Cc:\" list)."
 msgstr ""
-"meldingshodet ser ut til å være i orden\n"
-"(\"notify-to\" adressen er lik returstien, jeg er i \"to:\" eller \"cc:\" "
-"listen)"
+"Meldingshodet ser ut til å være i orden\n"
+"(\"notify-to\" adressen er lik returstien,\n"
+"jeg er i «To:»- eller «Cc:»-listen)"
 
 #: src/pref-manager.c:1794
 msgid "The message header looks suspicious."
@@ -3722,7 +3722,7 @@ msgstr "Skrivevindu"
 
 #: src/pref-manager.c:2180
 msgid "Invalid or incomplete address label color"
-msgstr ""
+msgstr "Ugyldig eller ukomplett farge på adresseetikett"
 
 #. create a 2nd notebook page for the fonts
 #: src/pref-manager.c:2204 src/print.c:1215
@@ -3808,7 +3808,7 @@ msgstr "Sletter meldinger"
 
 #: src/pref-manager.c:2473
 msgid "Delete immediately and irretrievably"
-msgstr ""
+msgstr "Skett med en gang og uten mulighet til å hente tilbake"
 
 #: src/pref-manager.c:2476
 msgid "Hide deleted messages"
@@ -3941,6 +3941,8 @@ msgid ""
 "Balsa could not find font \"%s\".\n"
 "Use the \"Fonts\" page on the \"Print message\" dialog to change it."
 msgstr ""
+"Balsa kunne ikke finne skriften «%s».\n"
+"Bruk fanen «Skrifter» i dialogen «Skriv ut melding» for å endre den."
 
 #: src/print.c:1374
 msgid "Balsa: message print preview"
@@ -3951,11 +3953,13 @@ msgid "Error during filters loading: "
 msgstr "Feil under lasting av filtre: "
 
 #: src/save-restore.c:556
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Error during filters loading: %s\n"
 "Filters may not be correct."
-msgstr "Fil %s kan ikke leses\n"
+msgstr ""
+"Feil under lasting av filtre: %s\n"
+"Noen filtre er kanskje ikke korrekt."
 
 #: src/sendmsg-window.c:178
 msgid "_Include File..."
@@ -4051,11 +4055,11 @@ msgstr "Velg identitet som skal brukes for meldingen"
 
 #: src/sendmsg-window.c:268
 msgid "_Edit with Gnome-Editor"
-msgstr ""
+msgstr "R_ediger med forvalgt redigeringsprogram for GNOME"
 
 #: src/sendmsg-window.c:269
 msgid "Edit the current message with the default Gnome editor"
-msgstr ""
+msgstr "Rediger denne meldingen med forvalgt redigeringsprogram for GNOME"
 
 #: src/sendmsg-window.c:281
 msgid "Fr_om"
@@ -4252,7 +4256,7 @@ msgstr "Vi_s"
 
 #: src/sendmsg-window.c:522
 msgid "_Language"
-msgstr "_Språk"
+msgstr "S_pråk"
 
 #: src/sendmsg-window.c:524
 msgid "_Options"
@@ -4423,6 +4427,8 @@ msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
 msgstr ""
+"Denne filen er ikke kodet i US-ASCII eller UTF-8.\n"
+"Vennligst velg tegnset som er brukt for å kode filen."
 
 #: src/sendmsg-window.c:2959
 #, c-format
@@ -4439,6 +4445,8 @@ msgid ""
 "The message cannot be encoded in charset %s.\n"
 "Please choose a language for this message."
 msgstr ""
+"Meldingen kan ikke kodes i tegnsett %s.\n"
+"Vennligst velg et språk for denne meldingen."
 
 #: src/sendmsg-window.c:3924
 #, c-format
@@ -4761,14 +4769,12 @@ msgid "Close current mailbox"
 msgstr "Lukk aktiv postboks"
 
 #: src/toolbar-factory.c:144
-#, fuzzy
 msgid "Msg Preview"
-msgstr "Forhåndsvisning"
+msgstr "Forhåndsvisning av melding"
 
 #: src/toolbar-factory.c:145
-#, fuzzy
 msgid "Show preview pane"
-msgstr "Bruk forhåndsvisningsområde"
+msgstr "Vis forhåndsvisningsområde"
 
 #: src/toolbar-factory.c:227
 #, c-format
@@ -4811,7 +4817,7 @@ msgstr "Forhåndsvisning"
 
 #: src/toolbar-prefs.c:438
 msgid "_Restore toolbar to standard buttons"
-msgstr ""
+msgstr "Gjenopp_rett verktøylinje til forvalgte knapper"
 
 #: src/toolbar-prefs.c:457
 msgid "Available buttons"
@@ -4828,286 +4834,3 @@ msgstr "Opp"
 #: src/toolbar-prefs.c:506
 msgid "Down"
 msgstr "Ned"
-
-#~ msgid ""
-#~ "Could not open external query address book %s while trying to parse "
-#~ "output from: %s"
-#~ msgstr ""
-#~ "Kunne ikke åpne ekstern adressebok for spørring %s samtidig med tolking "
-#~ "av utskrift fra: %s"
-
-#~ msgid "Could not add address to address book %s while trying to execute: %s"
-#~ msgstr "Kunne ikke legge til adressen i addressebok %s under kjøring av: %s"
-
-#~ msgid "Could not stat ldif address book: %s"
-#~ msgstr "Kan ikke kjøre stat på ldif-adressebok: %s"
-
-#~ msgid "%s is already in address book."
-#~ msgstr "%s er allerede i adresseboken."
-
-#~ msgid "Cannot open LDIF address book %s for saving\n"
-#~ msgstr "Kan ikke åpne LDIF-adressebok %s for lagring\n"
-
-#~ msgid "Could not stat vcard address book: %s"
-#~ msgstr "Kan ikke kjøre stat på vCard-adressebok: %s"
-
-#~ msgid "Could not open vCard address book %s."
-#~ msgstr "Kan ikke åpne vCard-adressebok %s."
-
-#~ msgid "Cannot open vCard address book %s for saving\n"
-#~ msgstr "Kan ikke åpne vCard-adressebok %s for lagring\n"
-
-#~ msgid "No such address book type: %s"
-#~ msgstr "Ingen slik addressebok-type: %s"
-
-#~ msgid "Could not create a address book of type %s"
-#~ msgstr "Kunne ikke opprette en addressebok av type %s"
-
-#~ msgid "Set Default"
-#~ msgstr "Sett som standard"
-
-#~ msgid "Append Signature"
-#~ msgstr "Legg til signatur"
-
-#~ msgid "Cannot delete default profile, please make another default first."
-#~ msgstr ""
-#~ "Kan ikke slette forvalgt profil. Vennligst lag en ny standardprofil først."
-
-#~ msgid "Delete"
-#~ msgstr "Slett"
-
-#~ msgid "Do"
-#~ msgstr "Gjør"
-
-#~ msgid "Do Not"
-#~ msgstr "Ikke gjør"
-
-#~ msgid "Source mailbox (%s) is readonly. Cannot move message"
-#~ msgstr "Kildepostboks (%s) er skrivebeskyttet. Kan ikke flytte melding"
-
-#~ msgid "SMTP server problem: %s"
-#~ msgstr "Problem med SMTP-tjener: %s"
-
-#~ msgid "[-- name: %s --]\n"
-#~ msgstr "[-- navn: %s --]\n"
-
-#~ msgid "This certificate accepted but not verified !!!"
-#~ msgstr "Dette sertifikatet er akseptert men ikke verifisert !!!"
-
-#~ msgid "Address Book Configuration"
-#~ msgstr "Konfigurasjon av adressebok"
-
-#~ msgid "_Address Book Name"
-#~ msgstr "N_avn på adressebok"
-
-#~ msgid "Reply..."
-#~ msgstr "Svar..."
-
-#~ msgid "Store Address..."
-#~ msgstr "Lagre adresse..."
-
-#~ msgid "Undelete"
-#~ msgstr "Angre slett"
-
-#~ msgid "Move"
-#~ msgstr "Flytt"
-
-#~ msgid "Folder"
-#~ msgstr "Mappe"
-
-#~ msgid "balsa/pixbuf: Could not load image. It is likely corrupted."
-#~ msgstr "balsa/pixbuf: Kunne ikke laste bildet. Det sannsynligvis korrupt."
-
-#~ msgid "All headers"
-#~ msgstr "Alle headere"
-
-#~ msgid ""
-#~ "This is a mailbox in your local directory.\n"
-#~ "Change the path instead.\n"
-#~ "Mailbox not Updated.\n"
-#~ msgstr ""
-#~ "Dette er en postbok i din lokale katalog.\n"
-#~ "Endre stien i stedet.\n"
-#~ "Postboks ikke oppdatert.\n"
-
-#~ msgid "Print currently selected messages"
-#~ msgstr "Skriv ut valgt melding"
-
-#~ msgid "_Customize..."
-#~ msgstr "_Tilpass..."
-
-#~ msgid "You have new mail waiting"
-#~ msgstr "Du har nye meldinger som venter"
-
-#~ msgid "OK"
-#~ msgstr "OK"
-
-#~ msgid "Search a message"
-#~ msgstr "Søk i en melding"
-
-#~ msgid "Text"
-#~ msgstr "Tekst"
-
-#~ msgid "Icons"
-#~ msgstr "Ikoner"
-
-#~ msgid "Both"
-#~ msgstr "Begge"
-
-#~ msgid "Yes"
-#~ msgstr "Ja"
-
-#~ msgid "Display Formats"
-#~ msgstr "Vis formater"
-
-#~ msgid "Preview Font"
-#~ msgstr "Skrifttype for forhåndsvisning"
-
-#~ msgid "Preview pane"
-#~ msgstr "Forhåndsvisningsområde"
-
-#~ msgid "Subject Header Font"
-#~ msgstr "Skrifttype for emneoverskrift"
-
-#~ msgid ""
-#~ "This version of balsa is compiled without gnome-print support.\n"
-#~ "Printing is not possible."
-#~ msgstr ""
-#~ "Denne versjonen av balsa er kompilert uten støtte for gnome-print.\n"
-#~ "Utskrift er ikke mulig"
-
-#~ msgid "Balsa could not find paper type \"%s\".\n"
-#~ msgstr "Balsa kunne ikke finne papirtype \"%s\".\n"
-
-#~ msgid "Using paper type \"%s\" from /etc/paper.config instead\n"
-#~ msgstr "Bruker papirtype \"%s\" fra /etc/papaer.config i stedet\n"
-
-#~ msgid ""
-#~ "Balsa could not find font %s\n"
-#~ "Printing is not possible"
-#~ msgstr ""
-#~ "Balsa kunne ikke finne skrifttypen %s\n"
-#~ "Utskrift er ikke mulig"
-
-#~ msgid "Balsa could not find paper type \"%s\", using system default.\n"
-#~ msgstr ""
-#~ "Balsa kunne ikke finne papirtype \"%s\", bruker forvalgt verdi for "
-#~ "systemet.\n"
-
-#~ msgid "Check your paper type configuration or balsa preferences\n"
-#~ msgstr "Sjekk konfigurasjon av papirtype eller brukervalg i balsa\n"
-
-#~ msgid "Paper"
-#~ msgstr "Papir"
-
-#~ msgid "Closing the Compose Window"
-#~ msgstr "Lukker skrivevinduet"
-
-#~ msgid ""
-#~ "The attachment pixmap (%s) cannot be used.\n"
-#~ " %s"
-#~ msgstr ""
-#~ "Bilde for vedlegg (%s) kan ikke brukes.\n"
-#~ " %s"
-
-#~ msgid ""
-#~ "Default attachment pixmap (balsa/attachment.png) cannot be found:\n"
-#~ "Your balsa installation is corrupted."
-#~ msgstr ""
-#~ "Forvalgt bilde for vedlegg (balsa/attachment.png) kan ikke finnes:\n"
-#~ "Din installasjon av balsa er korrpupt."
-
-#~ msgid "Attachments:"
-#~ msgstr "Vedlegg:"
-
-#~ msgid "Loading..."
-#~ msgstr "Laster..."
-
-#~ msgid ""
-#~ "Balsa has been compiled without gnome-print support.\n"
-#~ "Printing is not possible."
-#~ msgstr ""
-#~ "Balsa er kompilert uten støtte for gnome-print.\n"
-#~ "Utskrift er ikke mulig"
-
-#~ msgid "Card Name:"
-#~ msgstr "Navn på kort:"
-
-#~ msgid "-"
-#~ msgstr "-"
-
-#~ msgid "+"
-#~ msgstr "+"
-
-#~ msgid "Could not load image. It is most likely corrupted."
-#~ msgstr "Kunne ikke laste bildet. Det sannsynligvis korrupt."
-
-#~ msgid "Couldn't render image\n"
-#~ msgstr "Kunne ikke rendre bildet\n"
-
-#~ msgid "_Port:"
-#~ msgstr "_Port:"
-
-#~ msgid "Inbound"
-#~ msgstr "Innkommende"
-
-#~ msgid "Outbound"
-#~ msgstr "Utgående"
-
-#~ msgid "Before Sending"
-#~ msgstr "Før sending"
-
-#~ msgid "Demand"
-#~ msgstr "Forlang"
-
-#~ msgid "Matches"
-#~ msgstr "Passer"
-
-#~ msgid "Doesn't Match"
-#~ msgstr "Passer ikke"
-
-#~ msgid "On"
-#~ msgstr "På"
-
-#~ msgid "Match string:"
-#~ msgstr "Finn streng:"
-
-#~ msgid "Command:"
-#~ msgstr "Kommando:"
-
-#~ msgid "Process when:"
-#~ msgstr "Prosseser når:"
-
-#~ msgid "Run on:"
-#~ msgstr "Kjør ved:"
-
-#~ msgid "Disposition:"
-#~ msgstr "Disposisjon:"
-
-#~ msgid "Place/leave in default folder"
-#~ msgstr "Plasser/la ligge i standard mappe"
-
-#~ msgid "Do not place/leave in default folder"
-#~ msgstr "Ikke plasser/la ligge i standard mappe"
-
-#~ msgid "Stop filtering here"
-#~ msgstr "Stopp filtrering her"
-
-#~ msgid "In order to store an address, you must select a message.\n"
-#~ msgstr "For å lagre en adresse må du først velge den.\n"
-
-#~ msgid "You may only store one address at a time.\n"
-#~ msgstr "Du kan kun lagre en adresse om gangen.\n"
-
-#~ msgid "This message doesn't contain an e-mail address.\n"
-#~ msgstr "Denne meldingen inneholder ikke en e-post adresse.\n"
-
-#~ msgid "Contact Information"
-#~ msgstr "Kontaktinformasjon"
-
-#~ msgid ""
-#~ "Reply\n"
-#~ "to list"
-#~ msgstr ""
-#~ "Svar\n"
-#~ "til listen"

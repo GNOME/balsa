@@ -95,6 +95,7 @@ libbalsa_show_file(FILE* f, long length)
     GtkWidget* text;
     GtkTextBuffer* buffer;
     char buf[1024];
+    GtkTextIter start;
 
     window = gnome_app_new("balsa", _("Message Source"));
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
@@ -129,6 +130,8 @@ libbalsa_show_file(FILE* f, long length)
     }
 
     gtk_window_set_default_size(GTK_WINDOW(window), 500, 400);
+    gtk_text_buffer_get_start_iter(buffer, &start);
+    gtk_text_buffer_place_cursor(buffer, &start);
     gtk_widget_show_all(window);
 }
 

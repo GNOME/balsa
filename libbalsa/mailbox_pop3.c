@@ -219,7 +219,8 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox)
 }
 
 /* libbalsa_mailbox_pop3_check:
-   checks=downloads POP3 mail. 
+   checks=downloads POP3 mail.
+   LOCKING : assumes gdk lock HELD and other locks (libmutt, mailbox) NOT HELD
 */
 static void
 libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)

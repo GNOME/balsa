@@ -1700,12 +1700,8 @@ check_mailbox_list(GList * mailbox_list)
     list = g_list_first(mailbox_list);
     while (list) {
         mailbox = BALSA_MAILBOX_NODE(list->data)->mailbox;
-
-        gdk_threads_enter();
         libbalsa_mailbox_pop3_set_inbox(mailbox, balsa_app.inbox);
         libbalsa_mailbox_check(mailbox);
-        gdk_threads_leave();
-
         list = g_list_next(list);
     }
 }
@@ -1935,6 +1931,9 @@ check_messages_thread(gpointer data)
 
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, "POP3", 0, 0);
         
+    /* Lock gdk to be thread safe (check funcs assume gdk lock HELD) */
+    gdk_threads_enter();
+
     check_mailbox_list(balsa_app.inbox_input);
 
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL,
@@ -1948,6 +1947,7 @@ check_messages_thread(gpointer data)
                     -1, (GNodeTraverseFunc) count_unread_msgs_func,
                     &new_msgs_after);
     balsa_mailbox_nodes_unlock(FALSE);
+    gdk_threads_leave();
 
     new_msgs_after-=new_msgs_before;
     if(new_msgs_after < 0)

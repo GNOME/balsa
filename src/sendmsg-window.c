@@ -884,11 +884,7 @@ repl_identity_signature(BalsaSendmsg* msg, LibBalsaIdentity* new_ident,
                                        *replace_offset + siglen);
     gtk_text_buffer_delete(buffer, &ins, &end);
 
-    if (!new_sig) {
-        return;
-    } else {
-        newsiglen = strlen(new_sig);
-    }
+    newsiglen = strlen(new_sig);
     
     /* check to see if this is a reply or forward and compare identity
      * settings to determine whether to add signature */
@@ -985,60 +981,54 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
     old_sig = read_signature(msg);
     old_sig = prep_signature(old_ident, old_sig);
 
-    if (old_sig)
-        siglen = strlen(old_sig);
-    else 
-        siglen = 0;
-
     /* switch identities in msg here so we can use read_signature
      * again */
     msg->ident = ident;
     new_sig = read_signature(msg);
     new_sig = prep_signature(ident, new_sig);
+    if(!new_sig) new_sig = g_strdup("");
 
-    /* split on sig separator */
     gtk_text_buffer_get_bounds(buffer, &start, &end);
     message_text = gtk_text_iter_get_text(&start, &end);
-    message_split = g_strsplit(message_text, "\n-- \n", 0);
-    
-    while (message_split[i]) {
-        /* put sig separator back to search */
-        compare_str = g_strconcat("\n-- \n", message_split[i], NULL);
-
-        /* try to find occurance of old signature */        
-        if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
-            repl_identity_signature(msg, ident, old_ident, &replace_offset, 
-                                    siglen, new_sig);
-        }
-
-        if (i == 0) {
-            replace_offset += strlen(message_split[i]);
-        } else {
-            replace_offset += strlen(compare_str);
-        }
-
-        g_free(compare_str);
-        i++;
-    }
-
-
-    /* if no sig seperators found, do a slower brute force approach */
-    if (!message_split[0] || !message_split[1]) {
-        compare_str = message_text;
-        replace_offset = 0;
-        
-        while (*compare_str) {
+    if (!old_sig) {
+        replace_offset = msg->ident->sig_prepend ? 0 : strlen(message_text);
+        repl_identity_signature(msg, ident, old_ident, &replace_offset,
+                                0, new_sig);
+    } else {
+        /* split on sig separator */
+        message_split = g_strsplit(message_text, "\n-- \n", 0);
+        siglen = strlen(old_sig);
+        while (message_split[i]) {
+            /* put sig separator back to search */
+            compare_str = g_strconcat("\n-- \n", message_split[i], NULL);
+            
+            /* try to find occurance of old signature */
             if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
-                repl_identity_signature(msg, ident, old_ident, &replace_offset,
-                                        siglen, new_sig);
+                repl_identity_signature(msg, ident, old_ident,
+                                        &replace_offset, siglen, new_sig);
             }
-
-            replace_offset++;
-            compare_str++;
+            
+            replace_offset += strlen(i ? compare_str : message_split[i]);
+            g_free(compare_str);
+            i++;
         }
+        /* if no sig seperators found, do a slower brute force approach */
+        if (!message_split[0] || !message_split[1]) {
+            compare_str = message_text;
+            replace_offset = 0;
+            
+            while (*compare_str) {
+                if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
+                    repl_identity_signature(msg, ident, old_ident,
+                                            &replace_offset, siglen, new_sig);
+                }
+                replace_offset++;
+                compare_str++;
+            }
+        }
+        g_strfreev(message_split);
     }
-
-    g_strfreev(message_split);
+    
     g_free(old_sig);
     g_free(new_sig);
     g_free(message_text);

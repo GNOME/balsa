@@ -754,6 +754,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
    NOTE: mx_check_mailbox can close mailbox(). Be cautious.
    We have to set Timeout to 0 because mutt would not allow checking several
    mailboxes in row.
+   LOCKING : assumes gdk lock HELD, and other (libmutt, mailbox) locks NOT HELD
 */
 static void
 libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
@@ -766,7 +767,9 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	long newmsg, timeout;
 	gint index_hint;
 	g_return_if_fail(CLIENT_CONTEXT(mailbox));
-	
+
+	/* Release the lock during the backend work */
+	gdk_threads_leave();
 	LOCK_MAILBOX(mailbox);
 	newmsg = CLIENT_CONTEXT(mailbox)->msgcount  
 	    - CLIENT_CONTEXT(mailbox)->deleted - mailbox->messages;
@@ -791,10 +794,15 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 		CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
 	    
 	    UNLOCK_MAILBOX(mailbox);
+	    /* Reacquire the lock before leaving and calling
+	       libbalsa_mailbox_load_messages which assumes gdk lock held */
+	    gdk_threads_enter();
 	    libbalsa_mailbox_load_messages(mailbox);
 	} else {
             /* update flags here */
 	    UNLOCK_MAILBOX(mailbox);
+	    /* Reacquire the lock before leaving */
+	    gdk_threads_enter();
 	}
     }
 }

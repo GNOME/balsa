@@ -1,3 +1,12 @@
+2002-12-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: switch signatures properly even if one of
+	them is empty.
+	* libbalsa/source-viewer.c: position cursor at the top.
+	* libbalsa/mailbox_{local,imap,pop3}.c:
+	* src/main-window.c: quick fix for double-lock problems. the true
+	solution is to remove gdk_thread locks from libbalsa. (Emmanuel)
+
 2002-12-10 20:57  PeterB
 
 	* src/toolbar-prefs.c: refresh GtkTreeView list of current buttons

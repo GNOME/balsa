@@ -307,6 +307,9 @@ libbalsa_mailbox_local_append(LibBalsaMailbox * mailbox)
     return res;
 }
 
+/* As all check functions, this one assumes gdk lock HELD
+   and other locks NOT HELD.
+*/
 static void
 libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
 {
@@ -316,6 +319,9 @@ libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
     } else {
 	gint i = 0;
 	gint index_hint;
+
+	/* Release lock before doing the backend work */
+	gdk_threads_leave();
 
 	LOCK_MAILBOX(mailbox);
 
@@ -332,9 +338,14 @@ libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
 	    mailbox->new_messages =
 		CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
 	    UNLOCK_MAILBOX(mailbox);
+	    /* Reacquire the lock before leaving and calling
+	       libbalsa_mailbox_load_messages which assumes gdk lock held */
+	    gdk_threads_enter();
 	    libbalsa_mailbox_load_messages(mailbox);
 	} else {
 	    UNLOCK_MAILBOX(mailbox);
+	    /* Reacquire the lock before leaving */
+	    gdk_threads_enter();
 	}
     }
 }

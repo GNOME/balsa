@@ -1682,3 +1682,19 @@ libbalsa_unlock_file (const char *path, int fd, int dot)
                                                                                 
     return 0;
 }
+
+#ifndef HAVE_GLIB22
+gboolean
+libbalsa_str_has_prefix(const gchar * str, const gchar * prefix)
+{
+    g_return_val_if_fail(str != NULL, FALSE);
+    g_return_val_if_fail(prefix != NULL, FALSE);
+
+    while (*prefix == *str && *prefix) {
+	++prefix;
+	++str;
+    }
+
+    return *prefix == '\0';
+}
+#endif				/* HAVE_GLIB22 */

@@ -2164,7 +2164,9 @@ mailbox_commit_changes(GtkWidget * widget, gpointer data)
     g_return_if_fail(index != NULL);
 
     current_mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
-    if (libbalsa_mailbox_commit_changes(current_mailbox) != 0)
+    
+    if (0 /* FIXME: write the true commit function.
+	     libbalsa_mailbox_commit_changes(current_mailbox) != 0 */)
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Commiting mailbox %s failed."),
 			  current_mailbox->name);
@@ -2176,7 +2178,6 @@ mailbox_commit_changes(GtkWidget * widget, gpointer data)
 void
 empty_trash(void)
 {
-    BalsaIndex *index;
     GList *message;
 
     libbalsa_mailbox_open(balsa_app.trash);
@@ -2187,12 +2188,8 @@ empty_trash(void)
 	libbalsa_message_delete(message->data);
 	message = message->next;
     }
-    libbalsa_mailbox_commit_changes(balsa_app.trash);
-
     libbalsa_mailbox_close(balsa_app.trash);
-
-    if ((index = balsa_find_index_by_mailbox(balsa_app.trash)))
-	balsa_index_reset(index);
+    balsa_mblist_update_mailbox(balsa_app.mblist, balsa_app.trash);
 }
 
 static void
@@ -2551,8 +2548,8 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
             break;
         }
         
-        libbalsa_mailbox_commit_changes (orig_mailbox);
-        balsa_index_reset (index);
+        libbalsa_mailbox_sync_backend (orig_mailbox);
+	balsa_mblist_update_mailbox(balsa_app.mblist, orig_mailbox);
     }
 
     g_list_free (messages);

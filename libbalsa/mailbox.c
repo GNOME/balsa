@@ -55,6 +55,7 @@ static void libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
 static void message_status_changed_cb(LibBalsaMessage * message,
 				      LibBalsaMailbox * mb);
 
+static void libbalsa_mailbox_sync_backend_real(LibBalsaMailbox * mailbox);
 static LibBalsaMessage *translate_message(HEADER * cur);
 
 enum {
@@ -502,7 +503,7 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 	    free(CLIENT_CONTEXT(mailbox));
 	    CLIENT_CONTEXT(mailbox) = NULL;
 	}
-    }
+    } else libbalsa_mailbox_sync_backend_real(mailbox);
 
     UNLOCK_MAILBOX(mailbox);
 }
@@ -737,41 +738,28 @@ GtkType libbalsa_mailbox_type_from_path(const gchar * filename)
     return ret;
 }
 
-/* libbalsa_mailbox_commit_changes:
-   commits the changes to the file. note that the msg numbers are changed 
-   after commit so one has to re-read messages from mutt structures.
-   Actually, re-reading is a wrong approach because it slows down balsa
-   like hell. I know, I tried it (re-reading).  */
-gint
-libbalsa_mailbox_commit_changes(LibBalsaMailbox * mailbox)
+static void
+libbalsa_mailbox_sync_backend_real(LibBalsaMailbox * mailbox)
 {
     GList *message_list;
     GList *tmp_message_list;
     LibBalsaMessage *current_message;
-    gint res = 0;
+    GList *p=NULL;
 
-    /* only open mailboxes can be commited; lock it instead of opening */
-    g_return_val_if_fail(CLIENT_CONTEXT_OPEN(mailbox), 0);
-    LOCK_MAILBOX_RETURN_VAL(mailbox, 0);
-
-    /* examine all the message in the mailbox */
-    {
-	GList *p=NULL;
-	message_list = mailbox->message_list;
-	while (message_list) {
-	    current_message = LIBBALSA_MESSAGE(message_list->data);
-	    tmp_message_list = message_list->next;
-	    if (current_message->flags & LIBBALSA_MESSAGE_FLAG_DELETED) {
-		p=g_list_append(p, current_message);
-	    }
-	    message_list = tmp_message_list;
+    message_list = mailbox->message_list;
+    while (message_list) {
+	current_message = LIBBALSA_MESSAGE(message_list->data);
+	tmp_message_list = message_list->next;
+	if (current_message->flags & LIBBALSA_MESSAGE_FLAG_DELETED) {
+	    p=g_list_append(p, current_message);
 	}
-	if(p){
-	    gtk_signal_emit(GTK_OBJECT(mailbox),
-			    libbalsa_mailbox_signals[MESSAGES_DELETE],
-			    p);
-	    g_list_free(p);
-	}
+	message_list = tmp_message_list;
+    }
+    if(p){
+	gtk_signal_emit(GTK_OBJECT(mailbox),
+			libbalsa_mailbox_signals[MESSAGES_DELETE],
+			p);
+	g_list_free(p);
     }
 
     message_list = mailbox->message_list;
@@ -785,8 +773,29 @@ libbalsa_mailbox_commit_changes(LibBalsaMailbox * mailbox)
 		g_list_remove_link(mailbox->message_list, message_list);
 	}
 	message_list = tmp_message_list;
-
+	
     }
+}
+
+/* libbalsa_mailbox_sync_backend:
+   synchronizes the backend with LibBalsaMailbox.
+
+   NOTE: this is not a proper mailbox commit function.  When
+   implementing proper one note that the msg numbers are changed after
+   commit so one has to re-read messages from mutt structures.
+   Actually, re-reading is a wrong approach because it slows down
+   balsa like hell. I know, I tried it (re-reading).
+*/
+gint
+libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox)
+{
+    gint res = 0;
+
+    /* only open mailboxes can be commited; lock it instead of opening */
+    g_return_val_if_fail(CLIENT_CONTEXT_OPEN(mailbox), 0);
+    LOCK_MAILBOX_RETURN_VAL(mailbox, 0);
+    libbalsa_mailbox_sync_backend_real(mailbox);
+
 #if 0
     libbalsa_lock_mutt();
     res = 0; /* FIXME: mx_sync_mailbox (CLIENT_CONTEXT(mailbox), NULL); */

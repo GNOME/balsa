@@ -820,7 +820,6 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
 
     gdk_threads_enter();
     libbalsa_mailbox_close(info->outbox);
-    libbalsa_mailbox_commit_changes(info->outbox);
     gdk_threads_leave();
 
     total_messages_left = 0;
@@ -893,7 +892,6 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
     
     gdk_threads_enter();
     libbalsa_mailbox_close(info->outbox);
-    libbalsa_mailbox_commit_changes(info->outbox);
     gdk_threads_leave();
 
     message_queue = NULL;

@@ -1562,7 +1562,7 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
                 break;
             }
             
-            libbalsa_mailbox_commit_changes (orig_mailbox);
+            libbalsa_mailbox_sync_backend (orig_mailbox);
 	    balsa_mblist_update_mailbox(balsa_app.mblist, mailbox);
         }
     }

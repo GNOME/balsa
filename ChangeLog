@@ -1,9 +1,18 @@
 2001-06-20  Pawel Salek  <pawsa@theochem.kth.se>
 
+	Rename libbalsa_mailbox_commit_changes() to more apriopriate
+	libbalsa_mailbox_sync_backend() (When I think about it now,
+	sync_with_libmutt() would be more specific...). And also:
 	* src/balsa-mblist.c: get rid of one more balsa_index_reset();
 	clean up the code.
 	* libbalsa/message.c: fix message counting and uninitialized
 	variable usage.
+	* libbalsa/send.c: commiting closed mailboxes makes no sense.
+	* src/balsa-index.c: yet another balsa_index_reset() removed.
+	* src/main-window.c: two balsa_index_reset() removed.
+	* src/sendmsg-window.c: commit()->sync_backend()
+	* libbalsa/mailbox.[hc]: closing mailbox that are still referred forces
+	sync_backend(). commit()->sync_backend()
 	
 2001-06-19  Pawel Salek  <pawsa@theochem.kth.se>
 

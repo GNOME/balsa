@@ -1958,8 +1958,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	} else if (bsmsg->type == SEND_CONTINUE) {
 	    if (bsmsg->orig_message) {
 		libbalsa_message_delete(bsmsg->orig_message);
-		libbalsa_mailbox_commit_changes(bsmsg->
-						orig_message->mailbox);
+		libbalsa_mailbox_sync_backend(bsmsg->orig_message->mailbox);
 	    }
 	}
     }
@@ -2018,7 +2017,7 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
     if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message) {
 	libbalsa_message_delete(bsmsg->orig_message);
-	libbalsa_mailbox_commit_changes(bsmsg->orig_message->mailbox);
+	libbalsa_mailbox_sync_backend(bsmsg->orig_message->mailbox);
     }
 
     gtk_object_destroy(GTK_OBJECT(message));

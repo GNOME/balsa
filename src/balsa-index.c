@@ -1507,28 +1507,20 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
 	g_list_free(messages);
     }
     
+    libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
+
     /* select another message depending on where we are in the list */
     if (GTK_CLIST(index->ctree)->rows > 1) {
         if (select_next)
             balsa_index_select_next(index);
 	else
             balsa_index_select_previous(index);
-    } else {
-        /* Update the style and message counts in the mailbox list */
-        balsa_mblist_update_mailbox(balsa_app.mblist, 
+    } 
+    /* Update the style and message counts in the mailbox list */
+    balsa_mblist_update_mailbox(balsa_app.mblist, 
                                     index->mailbox_node->mailbox);
-    }
     
-    libbalsa_mailbox_commit_changes(index->mailbox_node->mailbox);
-
-    /*
-     * If messages moved to trash mailbox and it's open in the
-     * notebook, reset the contents.
-     */
-    if (move_to_trash && trash)
-	balsa_index_reset(trash);
-
-    balsa_index_redraw_current(index);
+    // balsa_index_redraw_current(index);
 }
 
 void
@@ -1630,7 +1622,7 @@ balsa_message_toggle_flagged(GtkWidget * widget, gpointer user_data)
 
 	list = list->next;
     }
-    libbalsa_mailbox_commit_changes(index->mailbox_node->mailbox);
+    libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
 }
 
 
@@ -1675,7 +1667,7 @@ balsa_message_toggle_new(GtkWidget * widget, gpointer user_data)
 
 	list = list->next;
     }
-    libbalsa_mailbox_commit_changes(index->mailbox_node->mailbox);
+    libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
 }
 
 /* balsa_index_reset:
@@ -2001,8 +1993,7 @@ transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column,
 	g_list_free(messages);
     }
 
-    g_print("transfer_messages_cb: commit...\n");
-    libbalsa_mailbox_commit_changes(bindex->mailbox_node->mailbox);
+    libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
 
     gtk_object_set_data(GTK_OBJECT(bindex), "transferredp", (gpointer) 1);
 }

@@ -1233,7 +1233,8 @@ bsmsg2message(BalsaSendmsg *bsmsg)
       strlen(tmp)>0) 
      message->reply_to = make_address_from_string(tmp);
 
-  if (bsmsg->orig_message != NULL) {
+  if (bsmsg->orig_message != NULL && 
+      !GTK_OBJECT_DESTROYED(bsmsg->orig_message) ) {
     message->references = g_strdup (bsmsg->orig_message->message_id);
     
     footime = localtime (&bsmsg->orig_message->datet);

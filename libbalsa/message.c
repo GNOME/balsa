@@ -57,7 +57,7 @@ enum {
   SET_ANSWERED,
   SET_READ,
   SET_DELETED,
-	SET_FLAGGED,
+  SET_FLAGGED,
   LAST_SIGNAL
 };
 
@@ -189,28 +189,32 @@ message_new(void)
   return message;
 }
 
+/* libbalsa_message_real_destroy:
+   destroy methods must leave object in 'sane' state. 
+   This means NULLifing released pointers.
+*/
 static void
 libbalsa_message_real_destroy(GtkObject *object)
 {
-	Message *message;
-
-	g_return_if_fail(object != NULL);
-	g_return_if_fail(LIBBALSA_IS_MESSAGE(object));
-	
-	message = LIBBALSA_MESSAGE(object);
-
-	g_free (message->remail);
-	g_free (message->date);
-	address_free (message->from);
-	address_free (message->sender);
-	address_free (message->reply_to);
-	address_list_free(message->to_list);
-	address_list_free(message->cc_list);
-	address_list_free(message->bcc_list);
-	g_free (message->subject);
-        g_free (message->references);
-	g_free (message->in_reply_to);
-	g_free (message->message_id); 
+  Message *message;
+  
+  g_return_if_fail(object != NULL);
+  g_return_if_fail(LIBBALSA_IS_MESSAGE(object));
+  
+  message = LIBBALSA_MESSAGE(object);
+  
+  g_free (message->remail);             message->remail = NULL;
+  g_free (message->date);               message->date = NULL;
+  address_free (message->from);         message->from = NULL;
+  address_free (message->sender);       message->sender = NULL;
+  address_free (message->reply_to);     message->reply_to = NULL;
+  address_list_free(message->to_list);  message->to_list = NULL;
+  address_list_free(message->cc_list);  message->cc_list = NULL;
+  address_list_free(message->bcc_list); message->bcc_list = NULL;
+  g_free (message->subject);            message->subject = NULL;
+  g_free (message->references);         message->references = NULL;
+  g_free (message->in_reply_to);        message->in_reply_to = NULL;
+  g_free (message->message_id);         message->message_id = NULL;
 }
 
 void

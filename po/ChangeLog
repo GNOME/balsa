@@ -1,3 +1,9 @@
+2000-07-15  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* POTFILES.in: Clean up a little. Remove files that aren't
+	in the build. Also I question the value of _() marking code
+	that is in #ifdef DEBUG clauses.
+	
 2000-07-15  Valek Filiooiv  <frob@df.ru>
 
 	* ru.po: updated russian translation.

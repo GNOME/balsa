@@ -25,11 +25,5 @@ src/sendmsg-window.c
 libbalsa/mailbox_imap.c
 libbalsa/mailbox_local.c
 libbalsa/mailbox_pop3.c
-libinit_balsa/balsa-druid-page-directory.c
-libinit_balsa/balsa-druid-page-finish.c
-libinit_balsa/balsa-druid-page-user.c
-libinit_balsa/balsa-druid-page-welcome.c
-libinit_balsa/balsa-initdruid.c
 libmutt/mbox.c
 libmutt/mx.c
-src/spell-check.c

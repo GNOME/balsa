@@ -144,9 +144,12 @@ balsa_address_book_list(BalsaAddressBook * ab, GCallback row_activated_cb)
     GtkTreeViewColumn *column;
     GtkTreeSelection *selection;
 
-    store = gtk_list_store_new(N_COLUMNS,
-                               G_TYPE_STRING,
-                               G_TYPE_STRING, G_TYPE_INT, G_TYPE_OBJECT);
+    store =
+        gtk_list_store_new(N_COLUMNS,
+                           G_TYPE_STRING,   /* LIST_COLUMN_NAME           */
+                           G_TYPE_STRING,   /* LIST_COLUMN_ADDRESS_STRING */
+                           G_TYPE_OBJECT,   /* LIST_COLUMN_ADDRESS        */
+                           G_TYPE_INT);     /* LIST_COLUMN_WHICH          */
     gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(store), 0,
                                     balsa_address_book_compare_entries,
                                     GINT_TO_POINTER(0), NULL);
@@ -428,6 +431,7 @@ balsa_address_book_get_recipients(BalsaAddressBook * ab)
                            LIST_COLUMN_ADDRESS, &address,
                            LIST_COLUMN_WHICH, &which_multiple, -1);
         text = libbalsa_address_to_gchar(address, which_multiple);
+	g_object_unref(G_OBJECT(address));
         if (text) {
             if (str->len > 0)
                 g_string_append(str, ", ");
@@ -496,7 +500,7 @@ balsa_address_book_swap_real(GtkTreeModel * model, GtkTreePath * path,
      * already reffed it, so it won't be finalized, even if there
      * were no other outstanding refs. */
     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
-
+    g_object_unref(G_OBJECT(address));
     g_free(name);
     g_free(address_string);
 }
@@ -576,6 +580,7 @@ balsa_address_book_activate_address(GtkTreeView * view,
                            LIST_COLUMN_ADDRESS, &address,
                            LIST_COLUMN_WHICH, &which_multiple, -1);
         addr = libbalsa_address_to_gchar(address, which_multiple);
+	g_object_unref(G_OBJECT(address));
         gtk_entry_set_text(GTK_ENTRY(snd->to[1]), addr);
         g_free(addr);
 

@@ -27,9 +27,15 @@
 #include <pthread.h>
 #endif
 
+/* for creat(2) */
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#include "filter-funcs.h"
 #include "misc.h"
 #include "balsa-app.h"
-
+#include "save-restore.h"
 
 /* Global application structure */
 struct BalsaApplication balsa_app;
@@ -423,6 +429,66 @@ balsa_app_init(void)
     balsa_app.folder_mru=NULL;
     balsa_app.fcc_mru=NULL;
     balsa_app.drag_default_is_move=0;
+}
+
+/* Word of comment: previous definition of this function used access()
+function before attempting creat/unlink operation. In PS opinion, the
+speed gain is negligible or negative: the number of called system
+functions in present case is constant and equal to 1; the previous
+version called system function either once or twice per directory. */
+static gboolean
+destroy_mbnode(GNode * node, gpointer data)
+{
+    BalsaMailboxNode *mbnode = (BalsaMailboxNode *) node->data;
+
+    if(mbnode == NULL) /* true for root node only */
+	return FALSE;
+    
+    if (!mbnode->mailbox) {
+	gchar *tmpfile = g_strdup_printf("%s/.expanded", mbnode->name);
+	if (mbnode->expanded)
+	    close(creat(tmpfile, S_IRUSR | S_IWUSR));
+	else
+	    unlink(tmpfile);
+	g_free(tmpfile);
+    }
+    g_object_unref(G_OBJECT(mbnode));
+    return FALSE;
+}
+
+void
+balsa_app_destroy(void)
+{
+    if (balsa_app.empty_trash_on_exit)
+	empty_trash();
+
+    config_save();
+
+    g_list_foreach(balsa_app.address_book_list, (GFunc)g_object_unref, NULL);
+    g_slist_foreach(balsa_app.filters,          (GFunc)libbalsa_filter_free, 
+		    GINT_TO_POINTER(TRUE));
+
+    /* FIXME: stop switching notebook pages in a more elegant way.
+       Probably, the cleanest solution is to call enable_menus_xxx
+       functions from an idle function connected to balsa_message_set. */
+    gtk_signal_disconnect_by_data(GTK_OBJECT(balsa_app.notebook), NULL);
+
+    /* close all mailboxes */
+    balsa_mailbox_nodes_lock(TRUE);
+    g_node_traverse(balsa_app.mailbox_nodes,
+		    G_LEVEL_ORDER,
+		    G_TRAVERSE_ALL, 10, destroy_mbnode, NULL);
+    g_node_destroy(balsa_app.mailbox_nodes);
+    balsa_app.mailbox_nodes = NULL;
+    balsa_mailbox_nodes_unlock(TRUE);
+    g_object_unref(G_OBJECT(balsa_app.inbox));
+    g_object_unref(G_OBJECT(balsa_app.outbox));
+    g_object_unref(G_OBJECT(balsa_app.sentbox));
+    g_object_unref(G_OBJECT(balsa_app.draftbox));
+    g_object_unref(G_OBJECT(balsa_app.trash));
+    libbalsa_imap_close_all_connections();
+    /* g_slist_free(opt_attach_list); */
+    if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");
 }
 
 gboolean

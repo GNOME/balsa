@@ -1054,7 +1054,8 @@ print_info_new(CommonInfo * ci)
     prepare_header(pi, NULL);
     
     /* now get the message contents... */
-    if (libbalsa_message_body_ref(pi->message, TRUE)) {
+    if (!pi->message->mailbox 
+        || libbalsa_message_body_ref(pi->message, TRUE)) {
         scan_body(pi, pi->message->body_list);
         libbalsa_message_body_unref(pi->message);
     }
@@ -1307,10 +1308,15 @@ common_info_destroy(CommonInfo * ci)
 static void
 common_info_cleanup(CommonInfo * ci)
 {
-    g_object_weak_unref(G_OBJECT(ci->message),
-                        (GWeakNotify) common_info_destroy, ci);
-    g_object_set_data(G_OBJECT(ci->message), BALSA_PRINT_COMMON_INFO_KEY,
-                      NULL);
+    if (ci->message->mailbox) {
+        /* a message we're reading */
+        g_object_weak_unref(G_OBJECT(ci->message),
+                            (GWeakNotify) common_info_destroy, ci);
+        g_object_set_data(G_OBJECT(ci->message),
+                          BALSA_PRINT_COMMON_INFO_KEY, NULL);
+    } else
+        /* temporary message from the compose window */
+        g_object_unref(ci->message);
 
     common_info_destroy(ci);
 }
@@ -1381,11 +1387,16 @@ message_print(LibBalsaMessage * msg)
     }
 
     ci = g_new(CommonInfo, 1);
-    g_object_set_data(G_OBJECT(msg), BALSA_PRINT_COMMON_INFO_KEY, ci);
     common_info_setup(ci);
 
     ci->message = msg;
-    g_object_weak_ref(G_OBJECT(msg), (GWeakNotify) common_info_destroy, ci);
+    if (msg->mailbox) {
+        /* a message we're reading */
+        g_object_set_data(G_OBJECT(msg), BALSA_PRINT_COMMON_INFO_KEY, ci);
+        g_object_weak_ref(G_OBJECT(msg), (GWeakNotify) common_info_destroy, ci);
+    } else 
+        /* temporary message from the compose window */
+        g_object_ref(msg);
     ci->master = BALSA_GNOME_PRINT_UI_NEW;
 
     /* FIXME: this sets the paper size in the GnomePrintConfig. We can

@@ -330,12 +330,12 @@ msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr "Désolé, pas de ':' dans le nom!\n"
 
 #: src/balsa-index-page.c:870
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Unable to open %s for read.\n"
 " - %s\n"
 msgstr ""
-"Impossible d'ouvrir ~/.gnome/GnomeCard.gcrd en lecture.\n"
+"Impossible d'ouvrir %s en lecture.\n"
 " - %s\n"
 
 #: src/balsa-index-page.c:875
@@ -352,17 +352,14 @@ msgstr ""
 "Lancez GnomeCard si vous souhaitez le mettre à jour.\n"
 
 #: src/balsa-index-page.c:1145
-#, fuzzy
 msgid "Card Name:"
-msgstr "Nom de carte : "
+msgstr "Nom de la Carte : "
 
 #: src/balsa-index-page.c:1145
-#, fuzzy
 msgid "First Name:"
 msgstr "Prénom : "
 
 #: src/balsa-index-page.c:1146
-#, fuzzy
 msgid "Last Name:"
 msgstr "Nom : "
 
@@ -371,7 +368,6 @@ msgid "Organization:"
 msgstr "Société :"
 
 #: src/balsa-index-page.c:1147
-#, fuzzy
 msgid "Email Address:"
 msgstr "Adresse E-Mail : "
 
@@ -404,7 +400,6 @@ msgid "Date"
 msgstr "Date"
 
 #: src/balsa-index.c:362
-#, fuzzy
 msgid "To"
 msgstr "À"
 
@@ -451,7 +446,6 @@ msgid " Open of %s failed:%s "
 msgstr " L'ouverture de %s a échoué: %s "
 
 #: src/balsa-message.c:271
-#, fuzzy
 msgid "Error"
 msgstr "Erreur "
 
@@ -493,7 +487,6 @@ msgid "Subject:"
 msgstr "Sujet : "
 
 #: src/balsa-message.c:620
-#, fuzzy
 msgid "Couldn't render image\n"
 msgstr "Impossible d'afficher l'image\n"
 
@@ -512,22 +505,19 @@ msgid "Content Type: %s"
 msgstr "Content Type: %s"
 
 #: src/balsa-message.c:683
-#, fuzzy, c-format
+#, c-format
 msgid "Filename: %s"
-msgstr "Nom du fichier : "
+msgstr "Nom du fichier : %s"
 
 #: src/balsa-message.c:690
-#, fuzzy
 msgid "Save part"
-msgstr "Enregistrer la partie MIME"
+msgstr "Enregistrer la partie"
 
 #: src/filter-edit-dialog.c:30
-#, fuzzy
 msgid "Inbound"
 msgstr "Entrant"
 
 #: src/filter-edit-dialog.c:31
-#, fuzzy
 msgid "Outbound"
 msgstr "Sortant"
 
@@ -541,13 +531,12 @@ msgid "Demand"
 msgstr "Envoyer"
 
 #: src/filter-edit-dialog.c:38
-#, fuzzy
 msgid "Matches"
 msgstr "Correspond"
 
 #: src/filter-edit-dialog.c:39
 msgid "Doesn't Match"
-msgstr "Ne correspond pas"
+msgstr "Ne Correspond Pas"
 
 #: src/filter-edit-dialog.c:40
 msgid "Always"
@@ -562,9 +551,8 @@ msgid "Regular Expression"
 msgstr "Expression régulière"
 
 #: src/filter-edit-dialog.c:47
-#, fuzzy
 msgid "External Command"
-msgstr "Commande d'impression: "
+msgstr "Commande Externe"
 
 #: src/filter-edit-dialog.c:52
 msgid "Copy to folder:"
@@ -579,12 +567,10 @@ msgid "Print on printer:"
 msgstr "Imprime sur l'imprimante :"
 
 #: src/filter-edit-dialog.c:55
-#, fuzzy
 msgid "Run program:"
-msgstr "Commande à appliquer : "
+msgstr "Executer le programme : "
 
 #: src/filter-edit-dialog.c:56
-#, fuzzy
 msgid "Send to Trash"
 msgstr "Envoyer à la Poubelle"
 
@@ -790,9 +776,9 @@ msgid "Some of the fields are blank."
 msgstr "Certains des champs sont vides."
 
 #: src/mailbox-conf.c:638
-#, fuzzy, c-format
+#, c-format
 msgid "%s on %s"
-msgstr " sur "
+msgstr "%s sur %s"
 
 # , c-format
 #: src/mailbox-conf.c:678
@@ -815,7 +801,6 @@ msgid "Single IMAP folder"
 msgstr "Dossier IMAP simple"
 
 #: src/mailbox-conf.c:867
-#, fuzzy
 msgid "IMAP folder set"
 msgstr "Ensemble de dossiers IMAP"
 
@@ -915,29 +900,24 @@ msgid "Next Unread Message"
 msgstr "Message Non Lu Suivant"
 
 #: src/main-window.c:243 src/message-window.c:94
-#, fuzzy
 msgid "Next Part"
 msgstr "Partie Suivante"
 
 #: src/main-window.c:243 src/message-window.c:94
-#, fuzzy
 msgid "Next Part in Message"
 msgstr "Partie Suivante du message"
 
 #: src/main-window.c:249 src/message-window.c:99
-#, fuzzy
 msgid "Previous Part"
 msgstr "Partie précédente"
 
 #: src/main-window.c:249 src/message-window.c:99
-#, fuzzy
 msgid "Previous Part in Message"
 msgstr "Partie précédente du message"
 
 #: src/main-window.c:255 src/message-window.c:104
-#, fuzzy
 msgid "Save Current Part"
-msgstr "Enregistrer la partie MIME courante"
+msgstr "Enregistrer la Partie Courante"
 
 #: src/main-window.c:256 src/message-window.c:105
 msgid "Save Current Part in Message"
@@ -1004,9 +984,8 @@ msgid "_Toggle flagged"
 msgstr "Marque"
 
 #: src/main-window.c:323
-#, fuzzy
 msgid "_Store Address"
-msgstr "Sauver l'adre_sse"
+msgstr "Enregi_strer l'Adresse"
 
 #: src/main-window.c:323
 msgid "Store address of sender in addressbook"
@@ -1199,18 +1178,16 @@ msgid "Mark as Inbox"
 msgstr "Marque comme Inbox"
 
 #: src/mblist-window.c:423
-#, fuzzy
 msgid "Mark as Sentbox"
-msgstr "Marque comme Sentbox"
+msgstr "Marquer comme Sentbox"
 
 #: src/mblist-window.c:424
 msgid "Mark as Trash"
-msgstr "Marque comme Poubelle"
+msgstr "Marquer comme Poubelle"
 
 #: src/mblist-window.c:425
-#, fuzzy
 msgid "Mark as Draftbox"
-msgstr "Marque comme Draftbox"
+msgstr "Marquer comme Draftbox"
 
 #: src/mblist-window.c:448 src/mblist-window.c:464 src/mblist-window.c:482
 #: src/mblist-window.c:497
@@ -1486,12 +1463,10 @@ msgid "Empty trash on exit"
 msgstr "Vider la poubelle en quittant"
 
 #: src/pref-manager.c:1404
-#, fuzzy
 msgid "Address book location"
-msgstr "Carnet d'Adresses"
+msgstr "Emplacement du carnet d'adresses"
 
 #: src/pref-manager.c:1409
-#, fuzzy
 msgid "Select your address book file"
 msgstr "Choisissez votre fichier de carnet d'adresses"
 
@@ -1773,12 +1748,12 @@ msgid "you"
 msgstr "vous"
 
 #: src/sendmsg-window.c:786
-#, fuzzy, c-format
+#, c-format
 msgid "On %s %s wrote:\n"
 msgstr "Le %s, %s a écrit :\n"
 
 #: src/sendmsg-window.c:788
-#, fuzzy, c-format
+#, c-format
 msgid "%s wrote:\n"
 msgstr "%s a écrit :\n"
 

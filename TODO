@@ -10,10 +10,9 @@ Note: This list is not complete, but here for the authors
 Stuart
 ---------------------------------------------------------
  * bug tigert about getting new icons for toolbar
- * add choice for POP3/IMAP/MBOX to new account box.
- * fix deleting accounts
- * remove attach and spell check from main-window toolbar
- * free EVERYTHING the account manager window when closed.
+ * #mh/ requires a .mh_profile in ~ which looks something
+   like:  "Path: Mail", telling it to get mh folders from
+   ~/Mail
 
 sendmsg-window TODO:
  * free EVERYTHING in the sendmsg-window when it is closed.

@@ -102,30 +102,29 @@ setup_local_mailboxes ()
 }
 
 
-/* PAVLOV: This is where you can hard-code your own
- *         mailbox for testing!
+/* This is where you can hard-code your own
+ *  mailbox for testing!
  */
 static void
 my_special_mailbox ()
 {
   MailboxPOP3 *pop3;
   MailboxMH *mh;
-
-  /*
+/*
   pop3 = (MailboxPOP3 *) mailbox_new (MAILBOX_POP3);
   pop3->name = g_strdup ("MyPOP Box");
-  pop3->user = g_strdup ("jay");
+  pop3->user = g_strdup ("pavlov");
   pop3->passwd = g_strdup ("");
-  pop3->server = g_strdup ("zen");
+  pop3->server = g_strdup ("venus");
 
   balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
-  */
+*/
 /*
   mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
   mh->name = g_strdup ("GNOME CVS");
-  mh->path = g_strdup ("/home/pavlov/Mail/gnomecvs");
+  mh->path = g_strdup ("gnomecvs");
 
-  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
+  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
 */
 }
 

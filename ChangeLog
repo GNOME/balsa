@@ -1,3 +1,9 @@
+2003-07-17 11:02  PeterB
+
+	* src/balsa-index.c: Add new messages in expanded subthread if
+	balsa_app.expand_tree is TRUE
+	(http://mail.gnome.org/archives/balsa-list/2003-July/msg00054.html).
+
 2003-07-16  Pawel Salek  <pawsa theochem.kth.se>
 
 	* src/main.c: remove console warning questioned in bug 114036.

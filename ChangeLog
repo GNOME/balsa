@@ -1,3 +1,9 @@
+2004-12-09 15:45  PeterB
+
+	* libbalsa/address-entry.c, libbalsa/address-entry.h,
+	src/sendmsg-window.c: implement libbalsa_address_entry_addresses()
+	and use it to move address-counting to libbalsa.
+
 2004-12-08 15:11  PeterB
 
 	* libbalsa/address.c: use InternetAddress methods to manage quoting

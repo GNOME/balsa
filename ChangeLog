@@ -1,3 +1,7 @@
+2004-07-27 08:26  PeterB
+
+	* src/balsa-index.c: fix undelete.
+
 2004-07-27  Pawel Salek
 
 	* libbalsa/imap-server.c: add MAX_CONNECTIONS_PER_SERVER

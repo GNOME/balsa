@@ -450,6 +450,9 @@ balsa_index_select_next (BalsaIndex * bindex)
       list = list->next;
     }
 
+  if (h + 1 >= clist->rows)
+    return;
+
   gtk_clist_unselect_all (clist);
 
   gtk_clist_select_row (clist, h + 1, -1);

@@ -1350,7 +1350,7 @@ show_about_box(void)
 			    _("Copyright (C) 1997-2001"),
 			    authors,
 			    _
-			    ("The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n\nIf you need to report bugs, please do so at: http://bugs.gnome.org/"),
+			    ("The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n\nIf you need to report bugs, please do so at: http://bugzilla.gnome.org/"),
 			    "balsa/balsa_logo.png");
 
     gtk_signal_connect(GTK_OBJECT(about),

@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-05-27 03:00+0200\n"
-"PO-Revision-Date: 2004-05-27 13:51+0200\n"
+"POT-Creation-Date: 2004-05-29 14:01+0200\n"
+"PO-Revision-Date: 2004-05-29 18:01+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -615,27 +615,27 @@ msgstr "Nelze vytvořit MH adresář na %s (%s)"
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Nelze vytvořit MH strukturu na %s (%s)"
 
-#: libbalsa/mailbox_pop3.c:341
+#: libbalsa/mailbox_pop3.c:335
 #, c-format
 msgid "Retrieving Message %d of %d"
 msgstr "Získávají se zprávy (%d z %d)"
 
-#: libbalsa/mailbox_pop3.c:364
+#: libbalsa/mailbox_pop3.c:358
 #, c-format
 msgid "Received %ld kB of %ld"
 msgstr "Přijato %ld kB z %ld"
 
-#: libbalsa/mailbox_pop3.c:378
+#: libbalsa/mailbox_pop3.c:372
 #, c-format
 msgid "Saving POP message to %s failed."
 msgstr "Ukládání zprávy POP do %s selhalo."
 
-#: libbalsa/mailbox_pop3.c:388
+#: libbalsa/mailbox_pop3.c:382
 #, c-format
 msgid "Transfering POP message to %s failed."
 msgstr "Přenos zprávy POP do %s selhal."
 
-#: libbalsa/mailbox_pop3.c:465 libbalsa/mailbox_pop3.c:476
+#: libbalsa/mailbox_pop3.c:459 libbalsa/mailbox_pop3.c:470
 #, c-format
 msgid ""
 "POP3 mailbox %s temp file error:\n"
@@ -644,32 +644,32 @@ msgstr ""
 "Chyba dočasného souboru poštovní schránky %s protokolu POP3:\n"
 "%s"
 
-#: libbalsa/mailbox_pop3.c:504
+#: libbalsa/mailbox_pop3.c:498
 #, c-format
 msgid "POP3 mailbox %s error: %s\n"
 msgstr "Chyba poštovní schránky pop3 %s: %s\n"
 
-#: libbalsa/mailbox_pop3.c:540
+#: libbalsa/mailbox_pop3.c:534
 #, c-format
 msgid "POP3 error: cannot open %s for writing."
 msgstr "Chyba POP3: nemohu otevřít %s pro zápis."
 
-#: libbalsa/mailbox_pop3.c:548
+#: libbalsa/mailbox_pop3.c:542
 #, c-format
 msgid "POP3 error: cannot close %s."
 msgstr "Chyba POP3: nemohu zavřít %s."
 
-#: libbalsa/mailbox_pop3.c:574
+#: libbalsa/mailbox_pop3.c:568
 #, c-format
 msgid "POP3 error: %s."
 msgstr "Chyba POP3: %s."
 
-#: libbalsa/mailbox_pop3.c:597
+#: libbalsa/mailbox_pop3.c:591
 #, c-format
 msgid "POP3 mailbox %s temp mailbox error:\n"
 msgstr "Chyba dočasného souboru poštovní schránky %s protokolu POP3:\n"
 
-#: libbalsa/mailbox_pop3.c:620
+#: libbalsa/mailbox_pop3.c:614
 #, c-format
 msgid ""
 "Error placing messages from %s on %s\n"
@@ -678,7 +678,7 @@ msgstr ""
 "Chyba při umísťování zpráv z %s do %s.\n"
 "Zprávy byly ponechány v %s.\n"
 
-#: libbalsa/mailbox_pop3.c:639
+#: libbalsa/mailbox_pop3.c:633
 #, c-format
 msgid "POP3 temp mailbox %s was not removed (system error message: %s)"
 msgstr ""
@@ -1638,69 +1638,69 @@ msgstr "Velikost"
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Otevírá se poštovní schránka %s. Čekejte, prosím..."
 
-#: src/balsa-index.c:1503 src/main-window.c:484 src/message-window.c:142
+#: src/balsa-index.c:1506 src/main-window.c:484 src/message-window.c:142
 msgid "_Reply..."
 msgstr "_Odpovědět..."
 
-#: src/balsa-index.c:1505
+#: src/balsa-index.c:1508
 msgid "Reply To _All..."
 msgstr "Odpovědět vš_em..."
 
-#: src/balsa-index.c:1507
+#: src/balsa-index.c:1510
 msgid "Reply To _Group..."
 msgstr "Odpovědět _skupině..."
 
-#: src/balsa-index.c:1509
+#: src/balsa-index.c:1512
 msgid "_Forward Attached..."
 msgstr "Přeposlat _jako přílohu..."
 
-#: src/balsa-index.c:1511
+#: src/balsa-index.c:1514
 msgid "Forward _Inline..."
 msgstr "Přeposlat uvn_itř..."
 
-#: src/balsa-index.c:1513 src/main-window.c:574
+#: src/balsa-index.c:1516 src/main-window.c:574
 msgid "_Store Address..."
 msgstr "_Uložit adresu..."
 
-#: src/balsa-index.c:1528 src/filter-edit-dialog.c:216 src/mailbox-node.c:967
+#: src/balsa-index.c:1531 src/filter-edit-dialog.c:216 src/mailbox-node.c:967
 #: src/pref-manager.c:1521 src/pref-manager.c:2640
 msgid "_Delete"
 msgstr "_Odstranit"
 
-#: src/balsa-index.c:1533
+#: src/balsa-index.c:1536
 msgid "_Undelete"
 msgstr "O_bnovit smazané"
 
-#: src/balsa-index.c:1538
+#: src/balsa-index.c:1541
 msgid "Move To _Trash"
 msgstr "Přesunout do _koše"
 
-#: src/balsa-index.c:1542
+#: src/balsa-index.c:1545
 msgid "T_oggle"
 msgstr "_Označit"
 
-#: src/balsa-index.c:1546 src/main-window.c:456 src/main-window.c:613
+#: src/balsa-index.c:1549 src/main-window.c:456 src/main-window.c:613
 msgid "_Flagged"
 msgstr "O_značena"
 
-#: src/balsa-index.c:1549
+#: src/balsa-index.c:1552
 msgid "_Unread"
 msgstr "_Nepřečtené"
 
-#: src/balsa-index.c:1557
+#: src/balsa-index.c:1560
 msgid "_Move to"
 msgstr "_Přesunout do"
 
-#: src/balsa-index.c:1565
+#: src/balsa-index.c:1568
 msgid "_View Source"
 msgstr "Zobrazit zdro_j"
 
-#: src/balsa-index.c:1802
+#: src/balsa-index.c:1805
 #, c-format
 msgid "Failed to copy messages to mailbox \"%s\"."
 msgstr "Nemohu zkopírovat zprávy do poštovní schránky \"%s\"."
 
-#: src/balsa-index.c:1803
+#: src/balsa-index.c:1806
 #, c-format
 msgid "Failed to copy message to mailbox \"%s\"."
 msgstr "Nemohu zkopírovat zprávu do poštovní schránky \"%s\"."
@@ -2181,17 +2181,17 @@ msgstr "_Všechny"
 msgid "C_lear"
 msgstr "Vy_mazat"
 
-#: src/filter-edit-callbacks.c:1011 src/main-window.c:2967
+#: src/filter-edit-callbacks.c:1011 src/main-window.c:2976
 msgid "_Body"
 msgstr "_Těle"
 
 #. To:
-#: src/filter-edit-callbacks.c:1018 src/main-window.c:2968
+#: src/filter-edit-callbacks.c:1018 src/main-window.c:2977
 #: src/sendmsg-window.c:1947
 msgid "_To:"
 msgstr "_Pro:"
 
-#: src/filter-edit-callbacks.c:1025 src/main-window.c:2969
+#: src/filter-edit-callbacks.c:1025 src/main-window.c:2978
 msgid "_From:"
 msgstr "_Od:"
 
@@ -2199,7 +2199,7 @@ msgstr "_Od:"
 msgid "_Subject"
 msgstr "Pře_dmět"
 
-#: src/filter-edit-callbacks.c:1040 src/main-window.c:2971
+#: src/filter-edit-callbacks.c:1040 src/main-window.c:2980
 msgid "_Cc:"
 msgstr "_Kopie:"
 
@@ -3459,50 +3459,67 @@ msgstr[0] "Obdrželi jste %d novou zprávu."
 msgstr[1] "Obdrželi jste %d nové zprávy."
 msgstr[2] "Obdrželi jste %d nových zpráv."
 
-#: src/main-window.c:2926
+#: src/main-window.c:2938
 msgid "Search mailbox"
 msgstr "Prohledávat poštovní schránku"
 
-#: src/main-window.c:2930
-msgid "Fi_lter"
-msgstr "_Filtr"
-
-#: src/main-window.c:2940
-msgid "_Reverse search"
-msgstr "Ob_rácené hledání"
-
-#: src/main-window.c:2943
+#: src/main-window.c:2955
 msgid "_Search for:"
 msgstr "_Hledat:"
 
-#: src/main-window.c:2956
+#. builds the toggle buttons to specify fields concerned by
+#. * the search.
+#: src/main-window.c:2968
 msgid "In:"
 msgstr "V:"
 
-#: src/main-window.c:2970
+#: src/main-window.c:2979
 msgid "S_ubject"
 msgstr "_Předmět"
 
-#: src/main-window.c:3106
+#. Frame with Apply and Clear buttons
+#: src/main-window.c:2984
+msgid "Show only matching messages"
+msgstr "Zobrazovat jen odpovídající zprávy"
+
+#. Frame with OK button
+#: src/main-window.c:3005
+msgid "Open next matching message"
+msgstr "Otevřít následující odpovídající zprávu"
+
+#: src/main-window.c:3016
+msgid "_Reverse search"
+msgstr "Ob_rácené hledání"
+
+#: src/main-window.c:3021
+msgid "_Wrap around"
+msgstr "_Přecházet přes okraj"
+
+#: src/main-window.c:3097
+#, c-format
+msgid "Error displaying help: %s\n"
+msgstr "Chyba při zobrazování nápovědy: %s\n"
+
+#: src/main-window.c:3180
 msgid "You can apply filters only on mailbox\n"
 msgstr "Filtry lze aplikovat pouze na poštovní schránky\n"
 
-#: src/main-window.c:3358 src/main-window.c:3383
+#: src/main-window.c:3432 src/main-window.c:3457
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Potvrzení změn v poštovní schránce %s selhalo."
 
-#: src/main-window.c:3526
+#: src/main-window.c:3600
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (jen pro čtení)"
 
-#: src/main-window.c:3528
+#: src/main-window.c:3602
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3630
+#: src/main-window.c:3704
 msgid "Cannot access the message's body\n"
 msgstr "Nelze přistupovat k tělu zprávy\n"
 
@@ -5283,6 +5300,9 @@ msgstr "Nahoru"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Dolů"
+
+#~ msgid "Fi_lter"
+#~ msgstr "_Filtr"
 
 #~ msgid "Remote IMAP folder set"
 #~ msgstr "Sada vzdálených složek IMAP"

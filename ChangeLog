@@ -1,3 +1,10 @@
+Sat Aug 01 20:25:23 1998  George Lebl  <jirka@5z.com>
+
+	* src/index-child.c: fixed up the destroy handler
+
+	* src/main-window.c: user remove instead of destroy to close
+	  a child
+
 Thu Jul 30 21:26:22 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
 
 	* libmutt/configure.in, mx.c, parse.c, pop.c, send.c

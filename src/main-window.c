@@ -655,7 +655,8 @@ mblist_window_cb (GtkWidget * widget)
 static void
 mailbox_close_child (GtkWidget * widget)
 {
-  gtk_object_destroy (GTK_OBJECT (balsa_app.current_index_child));
+  gnome_mdi_remove_child(mdi, GNOME_MDI_CHILD(balsa_app.current_index_child),
+			 TRUE);
 }
 
 static void

@@ -168,6 +168,7 @@ mblist_open_mailbox (Mailbox * mailbox)
 	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),i);
 	page = gtk_object_get_data(GTK_OBJECT(page),"indexpage");
 	g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use);
+
 	return;
       }
   }

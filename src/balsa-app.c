@@ -123,6 +123,13 @@ balsa_app_init (void)
   balsa_app.wordwrap = TRUE;
   balsa_app.wraplength = 79;
 
+  balsa_app.index_num_width = NUM_DEFAULT_WIDTH;
+  balsa_app.index_unread_width = UNREAD_DEFAULT_WIDTH;
+  balsa_app.index_flag_width = FLAG_DEFAULT_WIDTH;
+  balsa_app.index_from_width = FROM_DEFAULT_WIDTH;
+  balsa_app.index_subject_width = SUBJECT_DEFAULT_WIDTH;
+  balsa_app.index_date_width = DATE_DEFAULT_WIDTH;
+  
   /* arp */
   balsa_app.quote_str = NULL;
 

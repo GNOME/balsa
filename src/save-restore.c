@@ -767,6 +767,38 @@ config_global_load (void)
   else
     balsa_app.mblist_width = atoi (field);
 
+  /* restore column sizes from previous session */
+  if ((field = pl_dict_get_str (globals, "IndexNumWidth")) == NULL)
+    balsa_app.index_num_width = NUM_DEFAULT_WIDTH;
+  else
+    balsa_app.index_num_width = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "IndexUnreadWidth")) == NULL)
+    balsa_app.index_unread_width = UNREAD_DEFAULT_WIDTH;
+  else
+    balsa_app.index_unread_width = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "IndexFlagWidth")) == NULL)
+    balsa_app.index_flag_width = FLAG_DEFAULT_WIDTH;
+  else
+    balsa_app.index_flag_width = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "IndexFromWidth")) == NULL)
+    balsa_app.index_from_width = FROM_DEFAULT_WIDTH;
+  else
+    balsa_app.index_from_width = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "IndexSubjectWidth")) == NULL)
+    balsa_app.index_subject_width = SUBJECT_DEFAULT_WIDTH;
+  else
+    balsa_app.index_subject_width = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "IndexDateWidth")) == NULL)
+    balsa_app.index_date_width = DATE_DEFAULT_WIDTH;
+  else
+    balsa_app.index_date_width = atoi (field);
+
+
   /* FIXME this can be removed later */
   /* PKGW: why comment this out? Breaks my Transfer context menu. */
   if (balsa_app.mblist_width < 100)
@@ -918,6 +950,27 @@ config_global_save (void)
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_width);
     pl_dict_add_str_str (globals, "MailboxListWidth", tmp);
 
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.notebook_height);
+    pl_dict_add_str_str (globals, "NotebookHeight", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_num_width);
+    pl_dict_add_str_str (globals, "IndexNumWidth", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_unread_width);
+    pl_dict_add_str_str (globals, "IndexUnreadWidth", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_flag_width);
+    pl_dict_add_str_str (globals, "IndexFlagWidth", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_from_width);
+    pl_dict_add_str_str (globals, "IndexFromWidth", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_subject_width);
+    pl_dict_add_str_str (globals, "IndexSubjectWidth", tmp);
+    
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_date_width);
+    pl_dict_add_str_str (globals, "IndexDateWidth", tmp);
+    
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.notebook_height);
     pl_dict_add_str_str (globals, "NotebookHeight", tmp);
 

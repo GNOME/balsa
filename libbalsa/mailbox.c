@@ -669,7 +669,7 @@ mailbox_check_new_messages (Mailbox * mailbox)
     }
   else if (i == M_NEW_MAIL || i == M_REOPENED)
     {
-      // g_print ("got new mail! yippie!\n");
+      /* g_print ("got new mail! yippie!\n"); */
       mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount - mailbox->messages;
 
       if (mailbox->new_messages > 0)

@@ -1,3 +1,19 @@
+2000-1-29   Matthew Guenther <mguenther@netcom.ca>
+	
+	* src/balsa-app.h:
+	* src/balsa-app.c:
+	* src/pref-manager.c:
+	* src/balsa-index.c: Added the ability to save index column sizes
+	  between mailboxes and sessions.  Rough. 
+
+2000-1-29   Matthew Guenther <mguenther@netcom.ca>
+	
+	* src/balsa-app.h:
+	* src/balsa-app.c:
+	* src/pref-manager.c:
+	* src/balsa-index.c: Added the ability to save index column sizes
+	  between mailboxes and sessions.  Rough. 
+
 2000-1-18  Joaquim Fellmann <joaquim@hrnet.fr>
 	
 	* src/pref-manager.c: i18n a forgotten string.

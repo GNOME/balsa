@@ -51,9 +51,10 @@ typedef struct
  *    string is string to send
  */
 
-#define  MSGMAILTHREAD( message, type, string, num, tot) \
+#define  MSGMAILTHREAD( message, type, mbox, string, num, tot) \
   message = malloc( sizeof( MailThreadMessage )); \
   message->message_type = type; \
+  message->mailbox = mbox; \
   strncpy( message->message_string, string, strlen(string) + 1 ); \
   message->num_bytes=num;\
   message->tot_bytes=tot;\

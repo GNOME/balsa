@@ -70,6 +70,7 @@ static void video2canvas (Message *, BODY * bdy, FILE * fp, GnomeCanvasGroup * g
 static void multipart2canvas (Message *, BODY * bdy, FILE * fp, GnomeCanvasGroup * group);
 static void message2canvas (Message *, BODY * bdy, FILE * fp, GnomeCanvasGroup * group);
 static void image2canvas (Message *, BODY * bdy, FILE * fp, GnomeCanvasGroup * group);
+
 static void application2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group);
 static void audio2canvas (Message *, BODY * bdy, FILE * fp, GnomeCanvasGroup * group);
 
@@ -642,12 +643,12 @@ audio2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
 
 }
 
-
 static void
 application2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
   GnomeCanvasItem *item;
   BalsaSaveFileInfo *info;
+
 
   /* create text */
   item = balsa_message_text_item ("--APPLICATION--", group, 0.0,
@@ -660,6 +661,7 @@ application2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *
    * when the mouse is moved over it */
   gtk_signal_connect (GTK_OBJECT (item), "event",
 		      GTK_SIGNAL_FUNC (item_event), info);
+
 #if 0
   gchar link_bfr[128];
   PARAMETER *bdy_parameter = bdy->parameter;
@@ -839,9 +841,11 @@ part2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
       audio2canvas (message, bdy, fp, group);
       break;
     case TYPEAPPLICATION:
-      if (balsa_app.debug)
+      if (balsa_app.debug){
 	fprintf (stderr, "part: application\n");
-      application2canvas (message, bdy, fp, group);
+	fprintf (stderr, "subtype: %s\n", bdy->subtype);
+      }
+      application2canvas(message, bdy, fp, group);
       break;
     case TYPEIMAGE:
       if (balsa_app.debug)

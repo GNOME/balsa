@@ -40,7 +40,6 @@ static gint date_compare (GtkCList * clist, gconstpointer ptr1, gconstpointer pt
 static gint numeric_compare (GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2);
 static void clist_click_column (GtkCList * clist, gint column, gpointer data);
 
-
 /* statics */
 static void clist_set_col_img_from_flag (BalsaIndex *, gint, Message *);
 static void mailbox_listener (MailboxWatcherMessage * mw_message);
@@ -65,6 +64,14 @@ static void unselect_message (GtkWidget * widget,
                               gint column,
                               GdkEventButton * bevent,
                               gpointer * data);
+static void resize_column_event_cb (GtkCList * clist, 
+				    gint column, 
+				    gint width, 
+				    gpointer * data);
+
+static void column_size_refresh_cb (GtkCList * clist,
+				    GdkRectangle * area,
+				    gpointer * data);
 
 /* signals */
 enum
@@ -262,12 +269,12 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_clist_set_column_justification (clist, 0, GTK_JUSTIFY_RIGHT);
   gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_CENTER);
   gtk_clist_set_column_justification (clist, 2, GTK_JUSTIFY_CENTER);
-  gtk_clist_set_column_width (clist, 0, 40);
-  gtk_clist_set_column_width (clist, 1, 16);
-  gtk_clist_set_column_width (clist, 2, 16);
-  gtk_clist_set_column_width (clist, 3, 170);
-  gtk_clist_set_column_width (clist, 4, 260);
-  gtk_clist_set_column_width (clist, 5, 80);
+  gtk_clist_set_column_width (clist, 0, balsa_app.index_num_width);
+  gtk_clist_set_column_width (clist, 1, balsa_app.index_unread_width);
+  gtk_clist_set_column_width (clist, 2, balsa_app.index_flag_width);
+  gtk_clist_set_column_width (clist, 3, balsa_app.index_from_width);
+  gtk_clist_set_column_width (clist, 4, balsa_app.index_subject_width);
+  gtk_clist_set_column_width (clist, 5, balsa_app.index_date_width);
   gtk_clist_set_row_height (clist, 16);
   
   gtk_signal_connect (GTK_OBJECT (clist),
@@ -289,6 +296,19 @@ balsa_index_init (BalsaIndex * bindex)
 		      "button_release_event",
 		      (GtkSignalFunc) button_event_release_cb,
 		      (gpointer) bindex);
+
+  /* We want to catch column resize attempts to store the new value(s) */
+  gtk_signal_connect (GTK_OBJECT (clist),
+		      "resize_column",
+		      GTK_SIGNAL_FUNC (resize_column_event_cb),
+		      NULL);
+
+  /* We also want the column sizes to be updated when new notebooks are
+     brought forward, this seems to be the easiest way */
+  gtk_signal_connect (GTK_OBJECT (clist),
+		      "draw",
+		      GTK_SIGNAL_FUNC (column_size_refresh_cb),
+		      NULL);
   
   gtk_widget_show (GTK_WIDGET (clist));
   gtk_widget_ref (GTK_WIDGET (clist));
@@ -652,6 +672,59 @@ unselect_message (GtkWidget * widget,
 		     bevent);
 }
 
+/* When a column is resized, store the new size for later use */
+static void resize_column_event_cb (GtkCList * clist, 
+				    gint column, 
+				    gint width, 
+				    gpointer * data)
+{
+  switch (column)
+  {
+  case 0:
+    balsa_app.index_num_width = width;
+    break;
+    
+  case 1:
+    balsa_app.index_unread_width = width;
+    break;
+    
+  case 2:
+    balsa_app.index_flag_width = width;
+    break;
+    
+  case 3:
+    balsa_app.index_from_width = width;
+    break;
+    
+  case 4:
+    balsa_app.index_subject_width = width;
+    break;
+    
+  case 5:
+    balsa_app.index_date_width = width;
+    break;
+
+  default:
+    if (balsa_app.debug)
+      fprintf (stderr, "** Error: Unknown column resize\n");
+  }
+}
+
+/* Update all of the column sizes when the list is shown, to allow all
+   notebook pages to have the same column width even when only revisiting open
+   pages */
+static void column_size_refresh_cb (GtkCList * clist,
+				    GdkRectangle * area,
+				    gpointer * data)
+{
+  gtk_clist_set_column_width (clist, 0, balsa_app.index_num_width);
+  gtk_clist_set_column_width (clist, 1, balsa_app.index_unread_width);
+  gtk_clist_set_column_width (clist, 2, balsa_app.index_flag_width);
+  gtk_clist_set_column_width (clist, 3, balsa_app.index_from_width);
+  gtk_clist_set_column_width (clist, 4, balsa_app.index_subject_width);
+  gtk_clist_set_column_width (clist, 5, balsa_app.index_date_width);
+}
+  
 /*
  * listen for mailbox messages
  */

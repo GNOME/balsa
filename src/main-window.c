@@ -476,7 +476,7 @@ balsa_window_new ()
 
   gnome_app_set_contents(GNOME_APP(window), hpaned);
 
-  // XXX
+  /* XXX */
   window->mblist = balsa_mailbox_list_window_new(window);
   gtk_paned_pack1(GTK_PANED(hpaned), window->mblist, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(hpaned), vpaned, TRUE, TRUE);
@@ -871,20 +871,20 @@ check_messages_thread( Mailbox *mbox )
  */
   MailThreadMessage *threadmessage;
 
-  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "POP3",0,0 );
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, NULL, "POP3", 0, 0);
   check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input); 
 
-  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "IMAP",0,0 );
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, NULL, "IMAP", 0, 0);
   check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
 
-  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "Local Mail",0,0 );
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, NULL, "Local Mail", 0,0);
 
   if( CLIENT_CONTEXT_OPEN(mbox)) {
     mailbox_check_new_messages( mbox );
-    MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_LOAD, mbox->name,0,0 );
+    MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_LOAD, mbox, mbox->name, 0,0 );
   }
 
-  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_FINISHED, "Finished",0,0 );
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_FINISHED, NULL, "Finished", 0, 0 );
 
   pthread_mutex_lock( &mailbox_lock );
   checking_mail = 0;
@@ -970,9 +970,9 @@ mail_progress_notify_cb( )
 		      MAILBOX_POP3(threadmessage->mailbox)->mailbox.name ); 
 	    break;
 	  case MSGMAILTHREAD_LOAD:
-	    LOCK_MAILBOX (balsa_app.inbox);
-	    load_messages (balsa_app.inbox, 1);
-	    UNLOCK_MAILBOX (balsa_app.inbox);
+	    LOCK_MAILBOX(threadmessage->mailbox);
+	    load_messages(threadmessage->mailbox, 1);
+	    UNLOCK_MAILBOX(threadmessage->mailbox);
 	    break;
 	  case MSGMAILTHREAD_PROGRESS:
 	    percent = (gfloat)threadmessage->num_bytes/

@@ -38,6 +38,14 @@
 #define MW_DEFAULT_WIDTH 640
 #define MW_DEFAULT_HEIGHT 480
 
+/* column width settings */
+#define NUM_DEFAULT_WIDTH 40
+#define UNREAD_DEFAULT_WIDTH 16
+#define FLAG_DEFAULT_WIDTH 16
+#define FROM_DEFAULT_WIDTH 170
+#define SUBJECT_DEFAULT_WIDTH 260
+#define DATE_DEFAULT_WIDTH 138
+
 #define MAILBOX_MANAGER_WIDTH 350
 #define MAILBOX_MANAGER_HEIGHT 400
 
@@ -107,6 +115,15 @@ extern struct BalsaApplication
   gint mw_width;
   gint mw_height;
   gint mblist_width;
+  
+  /* Column width settings */
+  gint index_num_width;
+  gint index_unread_width;
+  gint index_flag_width;
+  gint index_from_width;
+  gint index_subject_width;
+  gint index_date_width;
+  
 /*  gint mblist_height; PKGW: unused */
     gint notebook_height; /* PKGW: used :-) */
 

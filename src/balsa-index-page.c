@@ -830,7 +830,7 @@ store_address_dialog_button_clicked_cb(GtkWidget *widget, gint which, GtkWidget 
             {
                 if(entry_str[cnt2] == ';')
                 {
-                    msg = _("No ;'s!\n");
+                    msg = _("Sorry, no semicolons are allowed in the name!\n");
                     gtk_editable_select_region(GTK_EDITABLE(entries[cnt]), 0, -1);
                     gtk_widget_grab_focus(GTK_WIDGET(entries[cnt]));
                     box = gnome_message_box_new(msg,

@@ -1,5 +1,8 @@
 2000-06-16  Peter Williams  <peter@beta.newton.cx>
 
+	* src/balsa-index-page.c (store_address_dialog_button_clicked_cb): Ditto
+	here -- the completely confusing "No ;'s" to something more meaningful.
+
 	* src/filter-edit-dialog.c (fe_run_on): Change the confusing
 	string "Pre-Send" to "Before Sending" for the translators.
 

@@ -4543,11 +4543,10 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info)
 
     /* force loading the gmime body if necessary (aka imap hack) */
     if (!info->body->mime_part) {
-	ssize_t dummy;
 	GMimeContentType * cont_type;
 
-	libbalsa_mailbox_get_message_part(info->body->message, info->body,
-					  &dummy);
+	if (!libbalsa_mailbox_get_message_part(info->body->message, info->body))
+	    return FALSE;
 	
 	/* the crypto stuff needs to know the charset in the gmime world */
 	cont_type = (GMimeContentType *)

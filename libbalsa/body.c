@@ -363,8 +363,6 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
 gboolean
 libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
 {
-    const char *buf;
-    ssize_t len;
     GMimeStream *stream, *filter_stream;
     gchar *mime_type = NULL;
     const char *charset;
@@ -387,11 +385,14 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
     }
     g_free(mime_type);
 
-    buf = libbalsa_mailbox_get_message_part(body->message, body, &len);
-    if (len > 0) {
-	if (g_mime_stream_write(stream, (char *) buf, len) == -1)
-	    retval = FALSE;
-    } else if (len < 0) {
+    if (libbalsa_mailbox_get_message_part(body->message, body)) {
+	GMimeDataWrapper *wrapper;
+
+	wrapper = g_mime_part_get_content_object(GMIME_PART(body->mime_part));
+	if (g_mime_data_wrapper_write_to_stream(wrapper, stream) == -1)
+            retval = FALSE;
+	g_object_unref(wrapper);
+    } else {
 	/* Not a GMimePart... */
 	if (body->mime_part != NULL
 	    && g_mime_object_write_to_stream(body->mime_part, stream) == -1)

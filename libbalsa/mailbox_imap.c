@@ -117,9 +117,8 @@ static void libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
                                                   LibBalsaFetchFlag flags);
 static void libbalsa_mailbox_imap_fetch_headers(LibBalsaMailbox *mailbox,
                                                 LibBalsaMessage *message);
-static const gchar* libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
-                                                       LibBalsaMessageBody *,
-                                                       ssize_t *);
+static gboolean libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
+						   LibBalsaMessageBody *);
 
 static int libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
 					     LibBalsaMessage * message );
@@ -1854,10 +1853,9 @@ append_str(const char *buf, int buflen, void *arg)
     dt->pos += buflen;
 }
 
-static const gchar*
+static gboolean
 libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
-                                   LibBalsaMessageBody *part,
-                                   ssize_t *sz)
+                                   LibBalsaMessageBody *part)
 {
     GMimeStream *partstream = NULL;
 
@@ -1913,7 +1911,7 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
                 g_free(section); 
                 g_strfreev(pair);
                 g_free(part_name);
-		return NULL; /* something better ? */
+		return FALSE; /* something better ? */
             }
 	    if( (dt.body->media_basic == IMBMEDIA_TEXT) &&
 		!g_ascii_strcasecmp( "plain", dt.body->media_subtype ) ) {
@@ -1955,11 +1953,7 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
         g_free(part_name);
     }
 
-    if (GMIME_IS_PART(part->mime_part))
-	return g_mime_part_get_content(GMIME_PART(part->mime_part), sz);
-
-    *sz = -1;
-    return NULL;
+    return GMIME_IS_PART(part->mime_part);
 }
 
 /* libbalsa_mailbox_imap_add_message: 

@@ -79,9 +79,8 @@ static void libbalsa_mailbox_local_release_message(LibBalsaMailbox *
 						   LibBalsaMessage *
 						   message);
 
-static const gchar* libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
-                                                        LibBalsaMessageBody *,
-                                                        ssize_t *sz);
+static gboolean libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
+						    LibBalsaMessageBody *);
 
 GType
 libbalsa_mailbox_local_get_type(void)
@@ -597,17 +596,13 @@ libbalsa_mailbox_local_fetch_headers(LibBalsaMailbox * mailbox,
     }
 }
 
-static const gchar*
+static gboolean
 libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
-                                    LibBalsaMessageBody *part, ssize_t *len)
+                                    LibBalsaMessageBody *part)
 {
-    g_return_val_if_fail(part->mime_part, NULL);
+    g_return_val_if_fail(part->mime_part, FALSE);
 
-    if (GMIME_IS_PART(part->mime_part))
-	return g_mime_part_get_content(GMIME_PART(part->mime_part), len);
-
-    *len = -1;
-    return NULL;
+    return GMIME_IS_PART(part->mime_part);
 }
 
 /*--------------------------------*/

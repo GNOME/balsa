@@ -1,5 +1,16 @@
 2004-08-15  Pawel Salek
 
+	* NEWS, configure.in: release 2.2.3.
+
+2004-08-15  Albrecht Dreß
+
+	* libbalsa/body.c, libbalsa/mailbox.[hc]:
+	* libbalsa/mailbox_{imap,local}.c: avoid g_mime_part_get_content
+	and GMmime bugs.
+	* src/balsa-message.c: use changed API.
+
+2004-08-15  Pawel Salek
+
 	* libbalsa/filter-funcs.c: initialize structure (Manu).
 	* libbalsa/mailbox_imap.c: reconnect on BYE, too.
 	* libbalsa/imap/imap-handle.c: preserve BYE server message.

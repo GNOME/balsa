@@ -1,3 +1,10 @@
+* Balsa-2.2.3 release. Release date 2004-08-15
+
+- periodic expunge code crash fixed.
+- fixed recovery from broken IMAP connections.
+- startup speedup.
+- some memory leaks fixed.
+
 * Balsa-2.2.2 release. Release date 2004-08-08
 
 - configurable hiding of deleted messages.

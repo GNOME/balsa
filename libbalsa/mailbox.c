@@ -1642,18 +1642,17 @@ libbalsa_mailbox_set_msg_headers(LibBalsaMailbox *mailbox,
     }
 }
 
-const gchar*
+gboolean
 libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
-                                  LibBalsaMessageBody *part,
-                                  ssize_t *sz)
+                                  LibBalsaMessageBody *part)
 {
-    g_return_val_if_fail(message != NULL, NULL);
-    g_return_val_if_fail(message->mailbox != NULL, NULL);
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(message->mailbox), NULL);
-    g_return_val_if_fail(part != NULL, NULL);
+    g_return_val_if_fail(message != NULL, FALSE);
+    g_return_val_if_fail(message->mailbox != NULL, FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(message->mailbox), FALSE);
+    g_return_val_if_fail(part != NULL, FALSE);
 
     return LIBBALSA_MAILBOX_GET_CLASS(message->mailbox)
-        ->get_message_part(message, part, sz);
+        ->get_message_part(message, part);
 }
 
 GMimeStream *

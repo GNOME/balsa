@@ -229,8 +229,8 @@ struct _LibBalsaMailboxClass {
                           LibBalsaMessage * message);
     void (*release_message) (LibBalsaMailbox * mailbox,
 			     LibBalsaMessage * message);
-    const gchar *(*get_message_part) (LibBalsaMessage     *message,
-                                      LibBalsaMessageBody *part, ssize_t*);
+    gboolean (*get_message_part) (LibBalsaMessage *message,
+				  LibBalsaMessageBody *part);
     GMimeStream *(*get_message_stream) (LibBalsaMailbox * mailbox,
 					LibBalsaMessage * message);
 
@@ -325,9 +325,8 @@ void libbalsa_mailbox_set_msg_headers(LibBalsaMailbox * mailbox,
 /** libbalsa_mailbox_get_message_stream() returns an allocated block containing
     selected, single part of the message.
 */
-const gchar *libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
-                                               LibBalsaMessageBody *part, 
-                                               ssize_t *sz);
+gboolean libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
+					   LibBalsaMessageBody *part);
 
 /** libbalsa_mailbox_get_message_stream() returns a message stream associated
     with full RFC822 text of the message.

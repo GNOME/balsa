@@ -1845,6 +1845,172 @@ balsa_mblist_mru_drop(GList ** list, const gchar * url)
     }
 }
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+/* balsa_mblist_mru_option_menu: create a GtkComboBox to manage an MRU
+ * list */
+
+/* The info that needs to be passed around */
+struct _BalsaMBListMRUOption {
+    GtkWindow *window;
+    GList **url_list;
+    GSList *real_urls;
+};
+typedef struct _BalsaMBListMRUOption BalsaMBListMRUOption;
+
+/* Helper. */
+static void bmbl_mru_combo_box_changed(GtkComboBox * combo_box,
+                                       BalsaMBListMRUOption * mro);
+static void
+bmbl_mru_combo_box_setup(GtkComboBox * combo_box)
+{
+    BalsaMBListMRUOption *mro =
+        g_object_get_data(G_OBJECT(combo_box), "mro");
+    GList *list;
+    gint i;
+
+    gtk_combo_box_set_active(combo_box, -1);
+    for (i = g_slist_length(mro->real_urls) + 1; --i >= 0;)
+        gtk_combo_box_remove_text(combo_box, i);
+    g_slist_foreach(mro->real_urls, (GFunc) g_free, NULL);
+    g_slist_free(mro->real_urls);
+    mro->real_urls = NULL;
+
+    for (list = *mro->url_list; list; list = list->next) {
+        const gchar *url = list->data;
+        LibBalsaMailbox *mailbox;
+
+        if ((mailbox = balsa_find_mailbox_by_url(url)) || !*url) {
+            gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box),
+                                      mailbox ? mailbox->name : "");
+            mro->real_urls = g_slist_append(mro->real_urls, g_strdup(url));
+        }
+    }
+
+    gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), _("Other..."));
+    gtk_combo_box_set_active(combo_box, 0);
+}
+
+/* Callbacks */
+static void
+bmbl_mru_combo_box_changed(GtkComboBox * combo_box,
+                           BalsaMBListMRUOption * mro)
+{
+    BalsaMBListMRUEntry mru;
+    const gchar *url;
+    gint active = gtk_combo_box_get_active(combo_box);
+
+    if (active < 0)
+	return;
+    if ((url = g_slist_nth_data(mro->real_urls, active))) {
+	/* Move this url to the top. */
+	balsa_mblist_mru_add(mro->url_list, url);
+        return;
+    }
+
+    /* User clicked on "Other..." */
+    mru.window = mro->window;
+    mru.url_list = mro->url_list;
+    mru.user_func = NULL;
+    mru.setup_cb = NULL;
+    mru.user_data = combo_box;
+    mru.url = NULL;
+    bmbl_mru_show_tree(NULL, &mru);
+    g_free(mru.url);
+    bmbl_mru_combo_box_setup(combo_box);
+}
+
+static void
+bmbl_mru_combo_box_destroy_cb(BalsaMBListMRUOption * mro)
+{
+    g_slist_foreach(mro->real_urls, (GFunc) g_free, NULL);
+    g_slist_free(mro->real_urls);
+    g_free(mro);
+}
+
+/*
+ * balsa_mblist_mru_option_menu:
+ *
+ * window:      parent window for the dialog;
+ * url_list:    pointer to a list of urls;
+ *
+ * Returns a GtkComboBox.
+ *
+ * Takes a list of urls and creates a combo-box with an entry for
+ * each one that resolves to a mailbox, labeled with the mailbox name,
+ * including the special case of an empty url and a NULL mailbox.
+ * Adds a last entry that pops up the whole mailbox tree. When an item
+ * is clicked, the url_list is updated.
+ */
+
+GtkWidget *
+balsa_mblist_mru_option_menu(GtkWindow * window, GList ** url_list)
+{
+    GtkWidget *combo_box;
+    BalsaMBListMRUOption *mro;
+
+    g_return_val_if_fail(url_list != NULL, NULL);
+
+    combo_box = gtk_combo_box_new_text();
+    mro = g_new(BalsaMBListMRUOption, 1);
+
+    mro->window = window;
+    mro->url_list = url_list;
+    mro->real_urls = NULL;
+
+    g_object_set_data_full(G_OBJECT(combo_box), "mro", mro,
+                           (GDestroyNotify) bmbl_mru_combo_box_destroy_cb);
+    bmbl_mru_combo_box_setup(GTK_COMBO_BOX(combo_box));
+    g_signal_connect(G_OBJECT(combo_box), "changed",
+                     G_CALLBACK(bmbl_mru_combo_box_changed), mro);
+
+    return combo_box;
+}
+
+/*
+ * balsa_mblist_mru_option_menu_set
+ *
+ * combo_box: a GtkComboBox created by balsa_mblist_mru_option_menu;
+ * url:       URL of a mailbox
+ *
+ * Adds url to the front of the url_list managed by combo_box, resets
+ * combo_box to show the new url, and stores a copy in the mro
+ * structure.
+ */
+void
+balsa_mblist_mru_option_menu_set(GtkWidget * combo_box, const gchar * url)
+{
+    BalsaMBListMRUOption *mro =
+        g_object_get_data(G_OBJECT(combo_box), "mro");
+
+    balsa_mblist_mru_add(mro->url_list, url);
+    bmbl_mru_combo_box_setup(GTK_COMBO_BOX(combo_box));
+}
+
+/*
+ * balsa_mblist_mru_option_menu_get
+ *
+ * combo_box: a GtkComboBox created by balsa_mblist_mru_option_menu.
+ *
+ * Returns the address of the current URL.
+ *
+ * Note that the url is held in the mro structure, and is freed when the
+ * widget is destroyed. The calling code must make its own copy of the
+ * string if it is needed more than temporarily.
+ */
+const gchar *
+balsa_mblist_mru_option_menu_get(GtkWidget * combo_box)
+{
+    gint active;
+    BalsaMBListMRUOption *mro =
+        g_object_get_data(G_OBJECT(combo_box), "mro");
+
+    active = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_box));
+
+    return g_slist_nth_data(mro->real_urls, active);
+}
+
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
+
 /* balsa_mblist_mru_option_menu: create a GtkOptionMenu to manage an MRU
  * list */
 
@@ -2004,6 +2170,7 @@ bmbl_mru_option_menu_init(BalsaMBListMRUOption * mro)
         gtk_menu_item_activate(item);
     }
 }
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 void
 balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox)

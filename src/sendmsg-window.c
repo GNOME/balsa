@@ -29,10 +29,8 @@
 #include "misc.h"
 #include "sendmsg-window.h"
 #include "mailbox.h"
-#include "mail.h"
-#include "osdep.h"
-#include "rfc822.h"
-#include "smtp.h"
+
+#include "mailbackend.h"
 
 gint delete_event (GtkWidget *, gpointer);
 

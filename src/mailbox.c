@@ -16,14 +16,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
+#include "config.h"
+
 #include <stdio.h>
 #include <gnome.h>
 
 #include "balsa-app.h"
 #include "mailbox.h"
 
-/* c-client shit includes */
-#include "c-client.h"
+
+#include "mailbackend.h"
 
 
 #define BUFFER_SIZE 1024

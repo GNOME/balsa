@@ -125,6 +125,8 @@ static void filter_dlg_cb (GtkWidget * widget, gpointer data);
 
 static void mailbox_close_child (GtkWidget * widget, gpointer data);
 static void mailbox_commit_changes (GtkWidget * widget, gpointer data);
+static void mailbox_empty_trash(GtkWidget * widget, gpointer data);
+
 static void about_box_destroy_cb (void);
 
 static void set_icon (GnomeApp * app);
@@ -254,6 +256,9 @@ static GnomeUIInfo mailbox_menu[] =
   GNOMEUIINFO_ITEM_STOCK (N_ ("Co_mmit current"), N_("Commit the changes in the currently opened mailbox"),
 			  mailbox_commit_changes, GNOME_STOCK_MENU_REFRESH),
   GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Empty _Trash"), N_("Delete Messages from the trash mailbox"), mailbox_empty_trash, GNOME_STOCK_PIXMAP_REMOVE),
+  GNOMEUIINFO_SEPARATOR,
+
   GNOMEUIINFO_SUBTREE (N_("O_pened"), open_mailboxes),
   GNOMEUIINFO_END
 };
@@ -1138,6 +1143,29 @@ mailbox_commit_changes (GtkWidget * widget, gpointer data)
   mailbox_commit_flagged_changes(current_mailbox);
 }
 
+static void
+mailbox_empty_trash(GtkWidget * widget, gpointer data)
+{
+  BalsaIndexPage *page;
+  GList *message;
+
+  balsa_mailbox_open(balsa_app.trash);
+
+  message = balsa_app.trash->message_list;
+
+  while(message)
+    {
+      message_delete(message->data);
+      message = message->next;
+    }
+  mailbox_commit_flagged_changes(balsa_app.trash);
+
+  balsa_mailbox_close(balsa_app.trash);
+
+  if((page=balsa_find_notebook_page(balsa_app.trash)))
+    balsa_index_page_reset( page );
+
+}
 
 static void
 about_box_destroy_cb (void)

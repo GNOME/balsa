@@ -327,29 +327,29 @@ We assume that we've been detached from the notebook.
 */
 void balsa_index_page_close_and_destroy( GtkObject *obj )
 {
-	BalsaIndexPage *page;
+  BalsaIndexPage *page;
 
-	g_return_if_fail( obj );
-	page = BALSA_INDEX_PAGE( obj );
+  g_return_if_fail( obj );
+  page = BALSA_INDEX_PAGE( obj );
 
 /*    printf( "Close and destroy!\n" );*/
 
-	if( page->index ) {
-		gtk_widget_destroy( GTK_WIDGET( page->index ) );
-		page->index = NULL;
-	}
+  if( page->index ) {
+    gtk_widget_destroy( GTK_WIDGET( page->index ) );
+    page->index = NULL;
+  }
 
-	if( page->sw ) {
-		gtk_widget_destroy( GTK_WIDGET( page->sw ) );
-		page->sw = NULL;
-	}
+  if( page->sw ) {
+    gtk_widget_destroy( GTK_WIDGET( page->sw ) );
+    page->sw = NULL;
+  }
 	
-	/*page->window references our owner*/
+  /*page->window references our owner*/
 	
-	if( page->mailbox ) {
-		mailbox_open_unref( page->mailbox );
-		page->mailbox = NULL;
-	}
+  if( page->mailbox ) {
+    mailbox_open_unref( page->mailbox );
+    page->mailbox = NULL;
+  }
 }
 
 static gint handler = 0;
@@ -610,7 +610,7 @@ static void
 transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event, BalsaIndex * bindex)
 {
   GtkCList *clist;
-  BalsaIndexPage *page;
+  BalsaIndexPage *page=NULL;
   GList *list;
   Message *message;
 

@@ -1,4 +1,9 @@
-2002-04-28  Pawel Salek <pawsa@theochem.kth.se>
+2002-04-28  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/sendmsg-window.c: alternative mailbox referencing scheme.
+	* src/balsa-message.c: work around gnome_icon_list(?) bug.
+
+2002-04-27  Pawel Salek <pawsa@theochem.kth.se>
 
 	* configure.in, {libbalsa,src}/Makefile.am, libbalsa/mailbox.[ch]:
 	* libbalsa/mailbox_{local,pop3}.c, libbalsa/message.c: 

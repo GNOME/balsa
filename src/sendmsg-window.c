@@ -606,6 +606,9 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
     if (bsm->orig_message) {
 	if (bsm->orig_message->mailbox)
 	    libbalsa_mailbox_close(bsm->orig_message->mailbox);
+        /* check again! */
+	if (bsm->orig_message->mailbox)
+	    gtk_object_unref(GTK_OBJECT(bsm->orig_message->mailbox));
 	gtk_object_unref(GTK_OBJECT(bsm->orig_message));
     }
 
@@ -2552,16 +2555,23 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	msg->orig_message = NULL;
 	break;
     }
-    if (message) { /* ref message so we don't lose it even if it is deleted */
+    if (msg->orig_message) {
+        /* ref message so we don't lose it even if it is deleted */
 	gtk_object_ref(GTK_OBJECT(message));
 	/* reference the original mailbox so we don't loose the
 	   mail even if the mailbox is closed. Alternatively,
 	   one could try using weak references or destroy notification
 	   to take care of it. In such a case, the orig_message field
 	   would be cleared
+
+           we'll reference it both by opening it, in caseit's closed
+           elsewhere, and by ref'ing it, in case the mbnode that owns
+           it is destroyed in a rescan
 	*/
-	if (message->mailbox)
+	if (message->mailbox) {
 	    libbalsa_mailbox_open(message->mailbox);
+            gtk_object_ref(GTK_OBJECT(message->mailbox));
+        }
     }
     msg->window = window;
     msg->type = type;
@@ -3291,6 +3301,9 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 	if(bsmsg->orig_message) {
 	    if(bsmsg->orig_message->mailbox)
 		libbalsa_mailbox_close(bsmsg->orig_message->mailbox);
+            /* check again! */
+	    if(bsmsg->orig_message->mailbox)
+	        gtk_object_unref(GTK_OBJECT(bsmsg->orig_message->mailbox));
 	    gtk_object_unref(GTK_OBJECT(bsmsg->orig_message));
 	}
 	bsmsg->type=SEND_CONTINUE;

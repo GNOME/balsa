@@ -16,6 +16,7 @@
 	* src/mailbox-conf.c: move commonly used function to balsa-app
 	* src/main-window.c: gdk_pixbuf fixes.
 	* src/print.c: use paper size from configuration.
+	* src/save-restore.c: save&restore paper size from configuration.
 	
 2001-02-18  Matthew Guenther  <guentherm@asme.org>
 

@@ -1,3 +1,12 @@
+* Balsa-1.1.1 development release. Release date 2001-02-06
+
+- IMAP folders semi-ofically working.
+- IMAP code considerably improved.
+- IMAP mailbox checking functional.
+- preferences dialog improvements.
+- numerous bug fixes.
+
+
 * Balsa-1.1.0 development release. Release date 2001-01-22
 
 - aliases support improved A LOT.

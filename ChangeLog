@@ -1,3 +1,7 @@
+2001-02-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* README,INSTALL,NEWS, configure.in: bump version number to 1.1.1
+
 2001-02-04  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/address-book.c: config_pop_prefix on error.

@@ -621,10 +621,10 @@ imap_mbox_handle_fetch(ImapMboxHandle* handle, const gchar *seq,
 {
   char* cmd;
   int i;
-  GString* hdr = g_string_new("FLAGS");
+  GString* hdr = g_string_new(headers[0]);
   ImapResponse rc;
   
-  for(i=0; headers[i]; i++) {
+  for(i=1; headers[i]; i++) {
     if (hdr->str[hdr->len - 1] != '(' && headers[i][0] != ')')
       g_string_append_c(hdr, ' ');
     g_string_append(hdr, headers[i]);

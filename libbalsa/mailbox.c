@@ -387,6 +387,8 @@ libbalsa_mailbox_finalize(GObject * object)
     mailbox->name = NULL;
     g_free(mailbox->url);
     mailbox->url = NULL;
+    libbalsa_condition_free(mailbox->view_filter);
+    mailbox->view_filter = NULL;
 
     /* The LibBalsaMailboxView is owned by balsa_app.mailbox_views. */
     mailbox->view = NULL;

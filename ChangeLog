@@ -1,3 +1,8 @@
+2000-08-16  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/message.c (libbalsa_message_body_ref): Add support for
+	message/rfc822, fixes bug #21128, probably some others too.
+
 2000-08-16  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox.c, libbalsa/mailbox_local.c: fixed mailbox

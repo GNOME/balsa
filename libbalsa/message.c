@@ -615,19 +615,22 @@ libbalsa_message_body_ref (LibBalsaMessage * message)
    * load message body
    */
   msg = mx_open_message (CLIENT_CONTEXT (message->mailbox), cur->msgno);
+
   if (!msg)
     {
       message->body_ref--;
       return;
     }
   fseek (msg->fp, cur->content->offset, 0);
-
+  
   if (cur->content->type == TYPEMULTIPART)
     {
       cur->content->parts = mutt_parse_multipart (msg->fp,
 		   mutt_get_parameter ("boundary", cur->content->parameter),
 				cur->content->offset + cur->content->length,
 			 strcasecmp ("digest", cur->content->subtype) == 0);
+    } else if ( mutt_is_message_type(cur->content->type, cur->content->subtype) ) {
+      cur->content->parts = mutt_parse_messageRFC822(msg->fp, cur->content);
     }
   if (msg != NULL)
     {

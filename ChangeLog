@@ -1,3 +1,7 @@
+2005-04-06 16:45  PeterB
+
+	* libbalsa/body.c: ensure stream is a filter-stream.
+
 2005-04-05 20:36  PeterB
 
 	* src/sendmsg-window.c, src/sendmsg-window.h, libbalsa/filter.c,

@@ -654,6 +654,21 @@ config_global_load (void)
   else
     balsa_app.signature_path = g_strdup (field);
 
+  if ((field = pl_dict_get_str (globals, "SigSending")) == NULL)
+    balsa_app.sig_sending = TRUE;
+  else
+   balsa_app.sig_sending = atoi ( field );
+
+  if ((field = pl_dict_get_str (globals, "SigReply")) == NULL)
+    balsa_app.sig_whenreply = TRUE;
+  else
+    balsa_app.sig_whenreply = atoi ( field );
+
+  if ((field = pl_dict_get_str (globals, "SigForward")) == NULL)
+    balsa_app.sig_whenforward = TRUE;
+  else
+    balsa_app.sig_whenforward = atoi ( field );
+
   /* smtp server */
   if ((field = pl_dict_get_str (globals, "SMTPServer")) == NULL)
     ;				/* an optional field for now */
@@ -804,6 +819,17 @@ config_global_save (void)
 
   {
     char tmp[MAX_PROPLIST_KEY_LEN];
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.sig_sending);
+    pl_dict_add_str_str (globals, "SigSending", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.sig_whenforward);
+    pl_dict_add_str_str (globals, "SigForward", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.sig_whenreply);
+    pl_dict_add_str_str (globals, "SigReply", tmp);
+
+
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.toolbar_style);
     pl_dict_add_str_str (globals, "ToolbarStyle", tmp);
 

@@ -37,13 +37,13 @@ typedef struct _PropertyUI
     GnomePropertyBox *pbox;
     GtkRadioButton *toolbar_type[NUM_TOOLBAR_MODES];
     GtkWidget *real_name, *email, *replyto, *signature;
+    GtkWidget *sig_whenforward, *sig_whenreply, *sig_sending;
 
     GtkWidget *pop3servers, *smtp_server, *mail_directory;
     GtkWidget *rb_local_mua, *rb_smtp_server;
 
     GtkWidget *previewpane;
     GtkWidget *debug;		/* enable/disable debugging */
-    GtkWidget *checkbox;
 
 #ifdef BALSA_SHOW_INFO
     GtkWidget *mblist_show_mb_content_info;
@@ -231,6 +231,13 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
   gtk_signal_connect (GTK_OBJECT (pui->replyto), "changed",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
 
+  gtk_signal_connect (GTK_OBJECT (pui->sig_sending), "toggled",
+		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+  gtk_signal_connect (GTK_OBJECT (pui->sig_whenforward), "toggled",
+		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+  gtk_signal_connect (GTK_OBJECT (pui->sig_whenreply), "toggled",
+		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+
   gtk_signal_connect (GTK_OBJECT (pui->rb_smtp_server), "toggled",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
   gtk_signal_connect (GTK_OBJECT (pui->rb_smtp_server), "toggled",
@@ -241,7 +248,6 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
   gtk_signal_connect (GTK_OBJECT (pui->signature), "changed",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
-
 
   /* arp */
   gtk_signal_connect (GTK_OBJECT (pui->quote_str), "changed",
@@ -328,6 +334,10 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
   g_free (balsa_app.local_mail_directory);
   balsa_app.local_mail_directory = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->mail_directory)));
 
+  balsa_app.sig_sending = GTK_TOGGLE_BUTTON (pui->sig_sending)->active;
+  balsa_app.sig_whenforward = GTK_TOGGLE_BUTTON (pui->sig_whenforward)->active;
+  balsa_app.sig_whenreply = GTK_TOGGLE_BUTTON (pui->sig_whenreply)->active;
+
   /* 
    * display page 
    */
@@ -411,6 +421,10 @@ set_prefs (void)
 
   gtk_entry_set_text (GTK_ENTRY (pui->signature), balsa_app.signature_path);
 
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON (pui->sig_sending), balsa_app.sig_sending);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON (pui->sig_whenforward), balsa_app.sig_whenforward);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON (pui->sig_whenreply), balsa_app.sig_whenreply);
+
   if (balsa_app.smtp_server) 
       gtk_entry_set_text (GTK_ENTRY (pui->smtp_server), balsa_app.smtp_server);
    
@@ -492,16 +506,21 @@ update_pop3_servers (void)
 static GtkWidget *
 create_identity_page (void)
 {
+
   GtkWidget *vbox;
+  GtkWidget *hbox;
   GtkWidget *frame;
   GtkWidget *table;
   GtkWidget *label;
   GtkWidget *signature;
 
-  vbox = gtk_vbox_new (FALSE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
+  GtkWidget *frame1;
+  GtkWidget *vbox1;
+  GtkWidget *table1;
 
-  /* identity frame */
+  vbox = gtk_vbox_new (FALSE, 0);
+  gtk_container_set_border_width(GTK_CONTAINER (vbox), 10);
+
   frame = gtk_frame_new (_("Identity"));
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
 
@@ -539,19 +558,41 @@ create_identity_page (void)
   gtk_table_attach (GTK_TABLE (table), pui->replyto, 1, 2, 2, 3,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
-  /* signature */
-  label = gtk_label_new (_ ("Signature:"));
+
+  /* Signature stuff */
+  frame1 = gtk_frame_new (_("Signature"));
+  gtk_box_pack_start (GTK_BOX (vbox), frame1, FALSE, FALSE, 5);
+
+  table1 = gtk_table_new (8, 6, FALSE);
+  gtk_container_set_border_width (GTK_CONTAINER (table1), 5);
+  gtk_container_add (GTK_CONTAINER (frame1), table1);
+
+
+  label = gtk_label_new (_ ("Signature file:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
+  gtk_table_attach (GTK_TABLE (table1), label, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL, 10, 10);
 
   signature = gnome_file_entry_new ("Signature", "Signature");
-  gtk_table_attach (GTK_TABLE (table), signature, 1, 2, 3, 4,
+  gtk_table_attach (GTK_TABLE (table1), signature, 1, 2, 0, 1,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
   pui->signature = gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (signature));
 
+  pui->sig_sending = gtk_check_button_new_with_label ( _("Include signature when sending mail"));
+  gtk_table_attach (GTK_TABLE (table1), pui->sig_sending, 1, 2, 1, 2,
+		    GTK_FILL, GTK_FILL, 0, 0);
+
+  pui->sig_whenforward = gtk_check_button_new_with_label ( _("Include signature when forwarding mail"));
+  gtk_table_attach (GTK_TABLE (table1), pui->sig_whenforward, 2, 3, 1, 2,
+		    GTK_FILL, GTK_FILL, 0, 0);
+
+  pui->sig_whenreply = gtk_check_button_new_with_label ( _("Include signature when replying to mail"));
+  gtk_table_attach (GTK_TABLE (table1), pui->sig_whenreply, 1, 2, 3, 4,
+		    GTK_FILL, GTK_FILL, 0, 0);
+
   return vbox;
+
 }
 
 /*
@@ -742,9 +783,6 @@ create_misc_page ()
 
   pui->debug = gtk_check_button_new_with_label (_("Debug"));
   gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (pui->debug), TRUE, TRUE, 2);
-
-  pui->checkbox = gtk_check_button_new_with_label(_("Show check box"));
-  gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (pui->checkbox), TRUE, TRUE, 2);
 
   /* arp --- table containing leadin label and string. */
   table = gtk_table_new (1, 2, FALSE);

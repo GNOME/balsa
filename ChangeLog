@@ -1,5 +1,10 @@
-2002-10-27  Carlos Morgado  <chbm chbm.nu>
+2002-10-27  Carlos Morgado  <chbm@chbm.nu>
 
+	* src/sendmsg-window.c: added Hebrew and UTF-8 
+	to language list
+
+2002-10-27  Carlos Morgado  <chbm@chbm.nu>
+	
 	* libbalsa/filter.c (match_condition): fix no-threads build
 
 2002-10-23  Peter Bloomfield  <PeterBloomfield@MindSpring.com>

@@ -345,40 +345,44 @@ struct {
     {"fr_FR", "ISO-8859-15", N_("French")},
 #define LOC_GREEK_POS     11 
     {"el_GR", "ISO-8859-7", N_("Greek")},
-#define LOC_HUNGARIAN_POS 12
+#define LOC_HEBREW_POS    12
+    {"he_IL", "UTF-8", N_("Hebrew")},
+#define LOC_HUNGARIAN_POS 13
     {"hu_HU", "ISO-8859-2", N_("Hungarian")},
-#define LOC_ITALIAN_POS   13
+#define LOC_ITALIAN_POS   14
     {"it_IT", "ISO-8859-15", N_("Italian")},
-#define LOC_JAPANESE_POS  14
+#define LOC_JAPANESE_POS  15
     {"ja_JP", "euc-jp", N_("Japanese")},
-#define LOC_KOREAN_POS    15
+#define LOC_KOREAN_POS    16
     {"ko_KR", "euc-kr", N_("Korean")},
-#define LOC_LATVIAN_POS    16
+#define LOC_LATVIAN_POS    17
     {"lv_LV", "ISO-8859-13", N_("Latvian")},
-#define LOC_LITHUANIAN_POS    17
+#define LOC_LITHUANIAN_POS    18
     {"lt_LT", "ISO-8859-13", N_("Lithuanian")},
-#define LOC_NORWEGIAN_POS 18
+#define LOC_NORWEGIAN_POS 19
     {"no_NO", "ISO-8859-1", N_("Norwegian")},
-#define LOC_POLISH_POS    19
+#define LOC_POLISH_POS    20
     {"pl_PL", "ISO-8859-2", N_("Polish")},
-#define LOC_PORTUGESE_POS 20
+#define LOC_PORTUGESE_POS 21
     {"pt_PT", "ISO-8859-15", N_("Portugese")},
-#define LOC_ROMANIAN_POS 21
+#define LOC_ROMANIAN_POS 22
     {"ro_RO", "ISO-8859-2", N_("Romanian")},
-#define LOC_RUSSIAN_ISO_POS   22
+#define LOC_RUSSIAN_ISO_POS   23
     {"ru_SU", "ISO-8859-5", N_("Russian (ISO)")},
-#define LOC_RUSSIAN_KOI_POS   23
+#define LOC_RUSSIAN_KOI_POS   24
     {"ru_RU", "KOI8-R", N_("Russian (KOI)")},
-#define LOC_SLOVAK_POS    24
+#define LOC_SLOVAK_POS    25
     {"sk_SK", "ISO-8859-2", N_("Slovak")},
-#define LOC_SPANISH_POS   25
+#define LOC_SPANISH_POS   26
     {"es_ES", "ISO-8859-15", N_("Spanish")},
-#define LOC_SWEDISH_POS   26
+#define LOC_SWEDISH_POS   27
     {"sv_SE", "ISO-8859-1", N_("Swedish")},
-#define LOC_TURKISH_POS   27
+#define LOC_TURKISH_POS   28
     {"tr_TR", "ISO-8859-9", N_("Turkish")},
-#define LOC_UKRAINIAN_POS 28
-    {"uk_UK", "KOI8-U", N_("Ukrainian")}
+#define LOC_UKRAINIAN_POS 29
+    {"uk_UK", "KOI8-U", N_("Ukrainian")},
+#define LOC_UTF8_POS 30
+    {"", "UTF-8", N_("Generic UTF-8")}
 };
 
 static void lang_set_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
@@ -410,6 +414,8 @@ static GnomeUIInfo locale_aj_menu[] = {
                           GINT_TO_POINTER(LOC_GERMAN_POS), NULL),
     GNOMEUIINFO_ITEM_DATA(N_("Greek"), NULL, lang_set_cb,
                           GINT_TO_POINTER(LOC_GREEK_POS), NULL),
+    GNOMEUIINFO_ITEM_DATA(N_("Hebrew"), NULL, lang_set_cb,
+                          GINT_TO_POINTER(LOC_HEBREW_POS), NULL),
     GNOMEUIINFO_ITEM_DATA(N_("Hungarian"), NULL, lang_set_cb,
                           GINT_TO_POINTER(LOC_HUNGARIAN_POS), NULL),
     GNOMEUIINFO_ITEM_DATA(N_("Italian"), NULL, lang_set_cb,
@@ -448,6 +454,8 @@ static GnomeUIInfo locale_kz_menu[] = {
                           GINT_TO_POINTER(LOC_TURKISH_POS), NULL),
     GNOMEUIINFO_ITEM_DATA(N_("Ukrainian"), NULL, lang_set_cb,
                           GINT_TO_POINTER(LOC_UKRAINIAN_POS), NULL),
+    GNOMEUIINFO_ITEM_DATA(N_("UTF-8"), NULL, lang_set_cb,
+                          GINT_TO_POINTER(LOC_UTF8_POS), NULL),
     GNOMEUIINFO_END
 };
 

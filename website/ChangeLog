@@ -1,3 +1,9 @@
+2000-08-30  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* main.html.in: Add sections for mailing list and bug reporting
+	* download.html.in: Change the email address on this page to point
+	to balsa-list@gnome.org instead of balsa-maintainers@@theochem.kth.se
+
 2000-08-28  Pawel Salek <pawsa@theochem.kth.se>
 
 	* main.html.in, download.html.in: 0.9.3 announcement.

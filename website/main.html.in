@@ -52,6 +52,42 @@
 </table>
 </div>
 
+<!-- Mailing List Info -->
+
+<div align="left">
+<table width="80%">
+
+<tr>
+	<th align="left"><big>Mailing List</big></th>
+</tr>
+<tr>
+	<td><p>
+	Balsa has a mailing list:<br>
+	<a href="mailto:balsa-list@gnome.org"><address>balsa-list@gnome.org</address></a><br>
+	To subscribe or to checkout the archives visit the <a
+	href="http://mail.gnome.org/mailman/listinfo/balsa-list">Balsa list
+	webpage</a>. It is generally considered polite to check the archives before posting.
+	</p></td>
+</tr>
+</table>
+</div>
+
+<!-- Bug reporting information -->
+
+<div align="left">
+<table width="80%">
+
+<tr>
+	<th align="left"><big>Reporting Bugs</big></th>
+</tr>
+<tr>
+	<td><p>
+	For instructions on how to report a bug with Balsa see the <a href="bugs.html">bug reporting instructions</a>
+	</p></td>
+</tr>
+</table>
+</div>
+
 <!-- The quadrant of links -->
 <div align="center">
 <table cellpadding="10">

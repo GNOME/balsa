@@ -216,6 +216,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->get_message = NULL;
     klass->prepare_threading = NULL;
     klass->fetch_message_structure = NULL;
+    klass->fetch_headers           = NULL;
     klass->release_message = libbalsa_mailbox_real_release_message;
     klass->get_message_part = NULL;
     klass->get_message_stream = NULL;
@@ -1421,6 +1422,20 @@ libbalsa_mailbox_release_message(LibBalsaMailbox * mailbox,
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)
 	->release_message(mailbox, message);
+}
+
+void
+libbalsa_mailbox_set_msg_headers(LibBalsaMailbox *mailbox,
+                                 LibBalsaMessage *message)
+{
+    g_return_if_fail(mailbox != NULL);
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_return_if_fail(message != NULL);
+
+    if(!message->has_all_headers) {
+        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->fetch_headers(mailbox, message);
+        message->has_all_headers = 1;
+    }
 }
 
 const gchar*

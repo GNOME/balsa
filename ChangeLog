@@ -1,3 +1,12 @@
+2004-04-12  Pawel Salek
+
+	* libbalsa/mailbox.[hc]: fetch headers smarter.
+	* libbalsa/mailbox_imap.c: provide subclasses for _fetch_headers.
+	* libbalsa/mailbox_local.c: ditto.
+	* libbalsa/message.[hc]: use it.
+	* libbalsa/imap/imap-commands.c: cleanup.
+	* src/sendmsg-window.c: make sure we know all the relevant headers.
+
 2004-04-11  Carlos Morgado  <chbm gnome.org>
 
 	* libbalsa/Makefile.am: 

@@ -71,6 +71,8 @@ static void libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *mailbox,
 static void libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
                                                    LibBalsaMessage *message,
                                                    LibBalsaFetchFlag flags);
+static void libbalsa_mailbox_local_fetch_headers(LibBalsaMailbox *mailbox,
+                                                 LibBalsaMessage *message);
 static void libbalsa_mailbox_local_release_message(LibBalsaMailbox *
 						   mailbox,
 						   LibBalsaMessage *
@@ -146,6 +148,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
         libbalsa_mailbox_local_prepare_threading;
     libbalsa_mailbox_class->fetch_message_structure = 
         libbalsa_mailbox_local_fetch_structure;
+    libbalsa_mailbox_class->fetch_headers = 
+        libbalsa_mailbox_local_fetch_headers;
     libbalsa_mailbox_class->release_message =
 	        libbalsa_mailbox_local_release_message;
     libbalsa_mailbox_class->get_message_part = 
@@ -491,6 +495,14 @@ libbalsa_mailbox_local_release_message(LibBalsaMailbox * mailbox,
     }
 }
 
+static void
+libbalsa_mailbox_local_fetch_headers(LibBalsaMailbox *mailbox,
+                                     LibBalsaMessage *message)
+{
+    g_return_if_fail(message->headers->user_hdrs == NULL);
+    message->headers->user_hdrs = 
+        libbalsa_message_user_hdrs_from_gmime(message->mime_msg);
+}
 
 static const gchar*
 libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,

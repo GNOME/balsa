@@ -231,6 +231,7 @@ struct _LibBalsaMessage {
     /* Indices into the arrays of rendered icons. */
     LibBalsaMessageStatus status_icon;
     LibBalsaMessageAttach attach_icon;
+    unsigned has_all_headers:1;
 };
 
 #define LIBBALSA_MESSAGE_HAS_FLAG(message, mask) \

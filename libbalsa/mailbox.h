@@ -208,6 +208,8 @@ struct _LibBalsaMailboxClass {
     void (*fetch_message_structure)(LibBalsaMailbox *mailbox,
                                     LibBalsaMessage * message,
                                     LibBalsaFetchFlag flags);
+    void (*fetch_headers)(LibBalsaMailbox *mailbox,
+                          LibBalsaMessage * message);
     void (*release_message) (LibBalsaMailbox * mailbox,
 			     LibBalsaMessage * message);
     const gchar *(*get_message_part) (LibBalsaMessage     *message,
@@ -298,6 +300,9 @@ void libbalsa_mailbox_fetch_message_structure(LibBalsaMailbox *mailbox,
     for other backends.
 */
 void libbalsa_mailbox_release_message(LibBalsaMailbox * mailbox,
+				      LibBalsaMessage * message);
+
+void libbalsa_mailbox_set_msg_headers(LibBalsaMailbox * mailbox,
 				      LibBalsaMessage * message);
 
 /** libbalsa_mailbox_get_message_stream() returns an allocated block containing

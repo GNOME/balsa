@@ -103,12 +103,11 @@ need_fetch(unsigned seqno, struct fetch_data* fd)
       && fd->h->msg_cache[seqno-1]->body == NULL) return seqno;
   if( (fd->ift & IMFETCH_RFC822SIZE) 
       && fd->h->msg_cache[seqno-1]->rfc822size <0) return seqno;
-  if( (fd->ift & IMFETCH_HEADER_MASK) 
-      && fd->h->msg_cache[seqno-1]->fetched_header_fields == NULL)
-    return seqno;
-  else {
+  if(fd->ift & IMFETCH_HEADER_MASK) {
     const gchar *fetched_headers = 
       fd->h->msg_cache[seqno-1]->fetched_header_fields;
+    if(fetched_headers == NULL)
+        return seqno;
     /* FIXME: take care of case sensivity */
     if(fd->ift & IMFETCH_CONTENT_TYPE &&
        strstr(fetched_headers, "Content-Type:") == NULL) return seqno;
@@ -118,11 +117,9 @@ need_fetch(unsigned seqno, struct fetch_data* fd)
        strstr(fetched_headers, "List-Post:") == NULL) return seqno;
   }
   /* FIXME: the tests below are unsatifactory... */
-  if( (fd->ift & IMFETCH_RFC822HEADERS) 
-      && fd->h->msg_cache[seqno-1]->fetched_header_fields == NULL)
+  if(fd->ift & IMFETCH_RFC822HEADERS)
     return seqno;
-  if( (fd->ift & IMFETCH_RFC822HEADERS_SELECTED) 
-      && fd->h->msg_cache[seqno-1]->fetched_header_fields == NULL)
+  if(fd->ift & IMFETCH_RFC822HEADERS_SELECTED)
     return seqno;
   return 0;
 }
@@ -559,6 +556,7 @@ static void
 ic_construct_header_list(const char **hdr, ImapFetchType ift)
 {
   int idx = 0;
+  if(ift & IMFETCH_FLAGS)      hdr[idx++] = "FLAGS";
   if(ift & IMFETCH_UID)        hdr[idx++] = "UID";
   if(ift & IMFETCH_ENV)        hdr[idx++] = "ENVELOPE";
   if(ift & IMFETCH_BODYSTRUCT) hdr[idx++] = "BODYSTRUCTURE";
@@ -595,7 +593,7 @@ imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
   if(hi>exists) hi = exists;
   seq = coalesce_seq_range(lo, hi, cf, &fd);
   if(seq) {
-    const char* hdr[12];
+    const char* hdr[13];
     ic_construct_header_list(hdr, ift);
     rc = imap_mbox_handle_fetch(handle, seq, hdr);
     g_free(seq);
@@ -620,7 +618,7 @@ imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
                       ? need_fetch_view_set : need_fetch_set);
   seq = coalesce_seq_range(1, cnt, cf, &fd);
   if(seq) {
-    const char* hdr[12];
+    const char* hdr[13];
     ic_construct_header_list(hdr, ift);
     rc = imap_mbox_handle_fetch(handle, seq, hdr);
     g_free(seq);

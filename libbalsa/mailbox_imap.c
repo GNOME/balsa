@@ -109,6 +109,8 @@ static void libbalsa_mailbox_imap_prepare_threading(LibBalsaMailbox *mailbox,
 static void libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
                                                   LibBalsaMessage *message,
                                                   LibBalsaFetchFlag flags);
+static void libbalsa_mailbox_imap_fetch_headers(LibBalsaMailbox *mailbox,
+                                                LibBalsaMessage *message);
 static const gchar* libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
                                                        LibBalsaMessageBody *,
                                                        ssize_t *);
@@ -233,6 +235,8 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
         libbalsa_mailbox_imap_prepare_threading;
     libbalsa_mailbox_class->fetch_message_structure = 
         libbalsa_mailbox_imap_fetch_structure;
+    libbalsa_mailbox_class->fetch_headers = 
+        libbalsa_mailbox_imap_fetch_headers;
     libbalsa_mailbox_class->get_message_part = 
         libbalsa_mailbox_imap_get_msg_part;
     libbalsa_mailbox_class->get_message_stream =
@@ -1496,6 +1500,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
         qsort(csd.msgno_arr, csd.cnt, sizeof(csd.msgno_arr[0]), cmp_msgno);
         rc = imap_mbox_handle_fetch_set(mimap->handle, csd.msgno_arr,
                                         csd.cnt,
+                                        IMFETCH_FLAGS |
                                         IMFETCH_UID |
                                         IMFETCH_ENV |
 					IMFETCH_RFC822SIZE |
@@ -1633,18 +1638,32 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
 
     rc = imap_mbox_handle_fetch_range(mimap->handle, message->msgno,
                                       message->msgno,
-                                      IMFETCH_BODYSTRUCT|
-                                      IMFETCH_LIST_POST |
-                                      IMFETCH_REFERENCES);
+                                      IMFETCH_BODYSTRUCT);
+    if(rc == IMR_OK) { /* translate ImapData to LibBalsaMessage */
+        ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle,
+                                                   message->msgno);
+        LibBalsaMessageBody *body = libbalsa_message_body_new(message);
+	lbm_imap_construct_body(body, im->body);
+        libbalsa_message_append_part(message, body);
+    }
+}
+
+static void
+libbalsa_mailbox_imap_fetch_headers(LibBalsaMailbox *mailbox,
+                                    LibBalsaMessage *message)
+{
+    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    ImapResponse rc =
+        imap_mbox_handle_fetch_range(mimap->handle,
+                                     message->msgno,
+                                     message->msgno,
+                                     IMFETCH_RFC822HEADERS_SELECTED);
     if(rc == IMR_OK) { /* translate ImapData to LibBalsaMessage */
         const gchar *hdr;
         ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle,
                                                    message->msgno);
-        LibBalsaMessageBody *body = libbalsa_message_body_new(message);
         if ((hdr = im->fetched_header_fields) && *hdr && *hdr != '\r')
             libbalsa_message_set_headers_from_string(message, hdr);
-	lbm_imap_construct_body(body, im->body);
-        libbalsa_message_append_part(message, body);
     }
 }
 

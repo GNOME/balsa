@@ -52,7 +52,6 @@ static void libbalsa_message_class_init(LibBalsaMessageClass * klass);
 static void libbalsa_message_init(LibBalsaMessage * message);
 
 static void libbalsa_message_finalize(GObject * object);
-static GList * libbalsa_message_user_hdrs(LibBalsaMessage * message);
 
 #ifdef DEBUG
 static char *mime_content_type2str(int contenttype);
@@ -101,6 +100,7 @@ libbalsa_message_init(LibBalsaMessage * message)
     message->parameters = NULL;
     message->body_ref = 0;
     message->body_list = NULL;
+    message->has_all_headers = 0;
 }
 
 
@@ -326,8 +326,8 @@ libbalsa_message_find_user_hdr(LibBalsaMessage * message, const gchar * find)
     LibBalsaMessageHeaders *headers = message->headers;
     
     g_return_val_if_fail(headers, NULL);
-    if (!headers->user_hdrs) 
-        headers->user_hdrs = libbalsa_message_user_hdrs(message);
+    if (!headers->user_hdrs && message->mailbox) 
+        libbalsa_mailbox_set_msg_headers(message->mailbox, message);
 
     for (list = headers->user_hdrs; list; list = g_list_next(list)) {
         tmp = list->data;
@@ -434,16 +434,6 @@ libbalsa_message_user_hdrs_from_gmime(GMimeMessage * message)
 			  prepend_header_misc, &res);
 
     return g_list_reverse(res);
-}
-
-
-static GList *
-libbalsa_message_user_hdrs(LibBalsaMessage * message)
-{
-    /* message not attached to an mailbox -> no extra headers */
-    if(message->mailbox ==NULL) return NULL;
-
-    return libbalsa_message_user_hdrs_from_gmime(message->mime_msg);
 }
 
 /* libbalsa_message_get_part_by_id:

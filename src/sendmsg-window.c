@@ -3832,22 +3832,37 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     }
 
     if (type == SEND_REPLY_ALL) {
-	tmp = internet_address_list_to_string(message->headers->to_list,
-		                              FALSE);
+	InternetAddressList *addr_lists[2] =
+	    { message->headers->to_list, message->headers->cc_list };
+	GString *new_cc = g_string_new("");
+	gint n;
 
- 	libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
- 			       NULL);
+	for (n = 0; n < 2; n++) {
+	    InternetAddressList *this_list = addr_lists[n];
+
+	    while (this_list) {
+		InternetAddress *addr = this_list->address;
+
+		/* do not insert my current identity into the cc: list */
+		if (addr &&
+		    !libbalsa_ia_rfc2821_equal(addr, bsmsg->ident->ia)) {
+		    if ((tmp = internet_address_to_string (addr, FALSE))) {
+			if (new_cc->len > 0)
+			    g_string_append(new_cc, ", ");
+			new_cc = g_string_append(new_cc, tmp);
+			g_free(tmp);
+		    }
+		}
+		this_list = this_list->next;
+	    }
+	}
+	 
+	tmp = new_cc->str;
+	g_string_free(new_cc, FALSE);
+	libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
+			       NULL);
 	gtk_entry_set_text(GTK_ENTRY(bsmsg->cc[1]), tmp);
 	g_free(tmp);
-
-	if (message->headers->cc_list) {
-	    tmp = internet_address_list_to_string(message->headers->cc_list,
-		                                  FALSE);
- 	    libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
- 				   NULL);
-	    append_comma_separated(GTK_EDITABLE(bsmsg->cc[1]), tmp);
-	    g_free(tmp);
-	}
     }
     gnome_app_set_contents(GNOME_APP(window), main_box);
 

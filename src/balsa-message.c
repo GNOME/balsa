@@ -211,8 +211,6 @@ static gboolean img_check_size(GtkImage **widget_p);
 static GtkNotebookClass *parent_class = NULL;
 
 /* stuff needed for sending Message Disposition Notifications */
-static gboolean rfc2298_address_equal(const InternetAddressList * a,
-                                      const InternetAddressList * b);
 static void handle_mdn_request(LibBalsaMessage *message);
 static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
                                           gboolean manual);
@@ -3823,11 +3821,7 @@ balsa_message_grab_focus(BalsaMessage * bmessage)
     return TRUE;
 }
 
-/* rfc2298_address_equal
-   compares two addresses according to rfc2298: local-part@domain is equal,
-   if the local-parts are case sensitive equal, but the domain case-insensitive
-*/
-static const gchar *
+static const InternetAddress *
 bm_get_mailbox(const InternetAddressList * list)
 {
     InternetAddress *ia;
@@ -3844,40 +3838,7 @@ bm_get_mailbox(const InternetAddressList * list)
     if (!ia || ia->type == INTERNET_ADDRESS_NONE)
 	return NULL;
 
-    return ia->value.addr;
-}
-
-static gboolean 
-rfc2298_address_equal(const InternetAddressList *a,
-	              const InternetAddressList *b)
-{
-    const gchar *a_string, *b_string, *a_atptr, *b_atptr;
-    gint a_atpos, b_atpos;
-
-    if (!a || !b)
-        return FALSE;
-
-    a_string = bm_get_mailbox (a);
-    b_string = bm_get_mailbox (b);
-
-    if (!a_string || !b_string)
-        return FALSE;
-    
-    /* first find the "@" in the two addresses */
-    a_atptr = strchr (a_string, '@');
-    b_atptr = strchr (b_string, '@');
-    if (!a_atptr || !b_atptr)
-        return FALSE;
-    a_atpos = a_atptr - a_string;
-    b_atpos = b_atptr - b_string;
-
-    /* now compare the strings */
-    if (!a_atpos || !b_atpos || a_atpos != b_atpos || 
-        strncmp (a_string, b_string, a_atpos) ||
-        g_ascii_strcasecmp (a_atptr, b_atptr))
-        return FALSE;
-    else
-        return TRUE;
+    return ia;
 }
 
 static void
@@ -3899,29 +3860,29 @@ handle_mdn_request(LibBalsaMessage *message)
         use_from = message->sender;
     else
         use_from = NULL;
+    /* note: neither Disposition-Notification-To: nor Reply-To:, From: or
+       Sender: may be address groups */
     suspicious =
-        !rfc2298_address_equal (message->headers->dispnotify_to, use_from);
+	!libbalsa_ia_rfc2821_equal(message->headers->dispnotify_to->address,
+				   use_from->address);
     
     if (!suspicious) {
-        InternetAddressList *ident =
-            internet_address_list_prepend(NULL,
-                                          balsa_app.current_ident->ia);
-
         /* Try to find "my" address first in the to, then in the cc list */
         list = message->headers->to_list;
         found = FALSE;
         while (list && !found) {
-            found = rfc2298_address_equal(ident, list);
+            found = libbalsa_ia_rfc2821_equal(balsa_app.current_ident->ia,
+					      bm_get_mailbox(list));
             list = list->next;
         }
         if (!found) {
             list = message->headers->cc_list;
             while (list && !found) {
-                found = rfc2298_address_equal(ident, list);
+                found = libbalsa_ia_rfc2821_equal(balsa_app.current_ident->ia,
+						  bm_get_mailbox(list));
                 list = list->next;
             }
         }
-	internet_address_list_destroy(ident);
         suspicious = !found;
     }
     

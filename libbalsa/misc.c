@@ -1997,3 +1997,36 @@ libbalsa_str_has_prefix(const gchar * str, const gchar * prefix)
     return *prefix == '\0';
 }
 #endif				/* HAVE_GLIB22 */
+
+
+/* libbalsa_ia_rfc2821_equal
+   compares two addresses according to rfc2821: local-part@domain is equal,
+   if the local-parts are case sensitive equal, but the domain case-insensitive
+*/
+gboolean
+libbalsa_ia_rfc2821_equal(const InternetAddress * a,
+			  const InternetAddress * b)
+{
+    const gchar *a_atptr, *b_atptr;
+    gint a_atpos, b_atpos;
+
+    if (!a || !b || a->type != INTERNET_ADDRESS_NAME ||
+	b->type != INTERNET_ADDRESS_NAME)
+        return FALSE;
+
+    /* first find the "@" in the two addresses */
+    a_atptr = strchr(a->value.addr, '@');
+    b_atptr = strchr(b->value.addr, '@');
+    if (!a_atptr || !b_atptr)
+        return FALSE;
+    a_atpos = a_atptr - a->value.addr;
+    b_atpos = b_atptr - b->value.addr;
+
+    /* now compare the strings */
+    if (!a_atpos || !b_atpos || a_atpos != b_atpos || 
+        strncmp(a->value.addr, b->value.addr, a_atpos) ||
+        g_ascii_strcasecmp(a_atptr, b_atptr))
+        return FALSE;
+    else
+        return TRUE;
+}

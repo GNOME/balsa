@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <gtk/gtk.h>
+#include <gmime/gmime.h>
 
 #if ENABLE_ESMTP
 #include <auth-client.h>
@@ -152,5 +153,8 @@ int libbalsa_safe_rename (const char *src, const char *target);
 #else				/* HAVE_GLIB22 */
 gboolean libbalsa_str_has_prefix(const gchar * str, const gchar * prefix);
 #endif				/* HAVE_GLIB22 */
+
+gboolean libbalsa_ia_rfc2821_equal(const InternetAddress * a,
+				   const InternetAddress * b);
 
 #endif				/* __LIBBALSA_MISC_H__ */

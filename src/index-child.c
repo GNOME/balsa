@@ -162,6 +162,7 @@ index_child_create_view (GnomeMDIChild * child)
 
   iw->message = balsa_message_new ();
   gtk_paned_add2 (GTK_PANED (vpane), iw->message);
+  gtk_widget_set_usize(vpane, 1, 250);
   gtk_widget_show (iw->message);
 
 

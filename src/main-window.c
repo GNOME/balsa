@@ -92,6 +92,8 @@ open_main_window ()
 
   gnome_mdi_set_mode (mdi, balsa_app.mdi_style);
 
+  gtk_widget_set_usize (mdi->active_window, 670, 435);
+
   refresh_main_window ();
 }
 
@@ -491,8 +493,8 @@ show_about_box ()
   GtkWidget *about;
   gchar *authors[] =
   {
-    "Jay Painter <jpaint@gimp.org>",
     "Stuart Parmenter <pavlov@pavlov.net>",
+    "Jay Painter <jpaint@gimp.org>",
     NULL
   };
 

@@ -67,6 +67,13 @@ struct _NewMailboxWindow
     GtkWidget *imap_mailbox_path;
     GtkWidget *imap_username;
     GtkWidget *imap_password;
+    int imap_use_fixed_path;
+
+    GtkWidget *pop_mailbox_name;
+    GtkWidget *pop_server;
+    GtkWidget *pop_port;
+    GtkWidget *pop_username;
+    GtkWidget *pop_password;
 
   };
 
@@ -78,6 +85,7 @@ static GList *open_mailbox_list = NULL;
 /* notebook pages */
 static GtkWidget *create_new_page (NewMailboxWindow * nmw);
 static GtkWidget *create_local_mailbox_page ();
+static GtkWidget *create_pop_mailbox_page ();
 static GtkWidget *create_imap_mailbox_page ();
 
 
@@ -90,6 +98,7 @@ static void refresh_button_state (NewMailboxWindow * nmw);
 
 /* callbacks for new page */
 static void local_mailbox_type_cb (GtkWidget * widget);
+static void pop_mailbox_type_cb (GtkWidget * widget);
 static void imap_mailbox_type_cb (GtkWidget * widget);
 
 static void next_cb (GtkWidget * widget);
@@ -104,10 +113,11 @@ static void imap_mailbox_name_changed_cb (GtkWidget * widget);
 static void imap_mailbox_standard_path_cb (GtkWidget * widget);
 static void imap_mailbox_fixed_path_cb (GtkWidget * widget);
 
+/* what pop callbacks??? */
+
 /* misc */
 static void set_new_mailbox_data (GtkObject * object, NewMailboxWindow * nmw);
 static NewMailboxWindow *get_new_mailbox_data (GtkObject * object);
-
 
 void
 open_new_mailbox (Mailbox * mailbox)
@@ -186,10 +196,9 @@ open_new_mailbox (Mailbox * mailbox)
 			    create_local_mailbox_page (nmw),
 			    label);
 
-
   label = gtk_label_new ("pp");
   gtk_notebook_append_page (GTK_NOTEBOOK (nmw->notebook),
-			    create_new_page (nmw),
+			    create_pop_mailbox_page (nmw),
 			    label);
 
   label = gtk_label_new ("ip");
@@ -288,6 +297,16 @@ ok_new_mailbox (GtkWidget * widget)
       break;
 
     case NM_PAGE_POP3:
+
+      menu = gtk_option_menu_get_menu (GTK_OPTION_MENU (nmw->local_type_menu));
+      menuitem = gtk_menu_get_active (GTK_MENU (menu));
+      mailbox = mailbox_new (MAILBOX_POP3);
+      mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_mailbox_name)));
+      MAILBOX_POP3 (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_username)));
+      MAILBOX_POP3 (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_password)));
+      MAILBOX_POP3 (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_server)));
+      balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
+      add_mailbox_config (mailbox);
       break;
 
     case NM_PAGE_IMAP:
@@ -306,9 +325,7 @@ ok_new_mailbox (GtkWidget * widget)
 
       node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
       g_node_append (balsa_app.mailbox_nodes, node);
-
       add_mailbox_config (mailbox);
-
       break;
     }
 
@@ -440,11 +457,10 @@ create_new_page (NewMailboxWindow * nmw)
 
   gtk_signal_connect (GTK_OBJECT (radio_button),
 		      "clicked",
-		      (GtkSignalFunc) local_mailbox_type_cb,
+		      (GtkSignalFunc) pop_mailbox_type_cb,
 		      NULL);
 
   gtk_widget_show (radio_button);
-
 
 
   radio_button = gtk_radio_button_new_with_label
@@ -608,6 +624,102 @@ create_local_mailbox_page (NewMailboxWindow * nmw)
 }
 
 static GtkWidget *
+create_pop_mailbox_page (NewMailboxWindow * nmw)
+{
+  GtkWidget *return_widget;
+  GtkWidget *table;
+  GtkWidget *label;
+
+  return_widget = table = gtk_table_new (4, 2, FALSE);
+  gtk_widget_show (table);
+
+  /* mailbox name */
+
+  label = gtk_label_new ("Mailbox Name:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+
+  gtk_widget_show (label);
+
+  nmw->pop_mailbox_name = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), nmw->pop_mailbox_name, 1, 2, 0, 1,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
+
+  set_new_mailbox_data (GTK_OBJECT (nmw->pop_mailbox_name), nmw);
+
+/*
+   gtk_signal_connect (GTK_OBJECT (nmw->pop_mailbox_name),
+   "changed",
+   (GtkSignalFunc) pop_mailbox_name_changed_cb,
+   NULL);
+ */
+
+  gtk_widget_show (nmw->pop_mailbox_name);
+
+  /* pop server */
+
+  label = gtk_label_new ("Server:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+
+  gtk_widget_show (label);
+
+  nmw->pop_server = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), nmw->pop_server, 1, 2, 1, 2,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
+
+  gtk_entry_append_text (GTK_ENTRY (nmw->pop_server), "localhost");
+
+  set_new_mailbox_data (GTK_OBJECT (nmw->pop_server), nmw);
+
+  gtk_widget_show (nmw->pop_server);
+
+  /* username  */
+
+  label = gtk_label_new ("Username:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (label);
+  nmw->pop_username = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), nmw->pop_username, 1, 2, 3, 4,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
+
+  gtk_entry_append_text (GTK_ENTRY (nmw->pop_username), balsa_app.username);
+  set_new_mailbox_data (GTK_OBJECT (nmw->pop_username), nmw);
+
+  gtk_widget_show (nmw->pop_username);
+
+  /* password field */
+
+  label = gtk_label_new ("Password:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 4, 5,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (label);
+  nmw->pop_password = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), nmw->pop_password, 1, 2, 4, 5,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
+  gtk_entry_set_visibility (GTK_ENTRY (nmw->pop_password), FALSE);
+
+  set_new_mailbox_data (GTK_OBJECT (nmw->pop_password), nmw);
+
+  gtk_widget_show (nmw->pop_password);
+  return return_widget;
+}
+
+
+static GtkWidget *
 create_imap_mailbox_page (NewMailboxWindow * nmw)
 {
   GtkWidget *return_widget;
@@ -618,9 +730,11 @@ create_imap_mailbox_page (NewMailboxWindow * nmw)
   GtkWidget *frame;
   GtkWidget *radio_button;
 
+  nmw->imap_use_fixed_path = FALSE;
 
   return_widget = table = gtk_table_new (6, 2, FALSE);
   gtk_widget_show (table);
+
   /* mailbox name */
 
   label = gtk_label_new ("IMAP Mailbox Name:");
@@ -752,7 +866,7 @@ create_imap_mailbox_page (NewMailboxWindow * nmw)
 
 
   radio_button = gtk_radio_button_new_with_label
-    (gtk_radio_button_group (GTK_RADIO_BUTTON (radio_button)), "Mailbox Path");
+    (gtk_radio_button_group (GTK_RADIO_BUTTON (radio_button)), "Path ...");
   gtk_table_attach (GTK_TABLE (table), radio_button, 0, 1, 1, 2,
 		    GTK_FILL, GTK_FILL | GTK_EXPAND,
 		    0, 0);
@@ -774,7 +888,6 @@ create_imap_mailbox_page (NewMailboxWindow * nmw)
   gtk_widget_set_sensitive (nmw->imap_mailbox_path, FALSE);
 
   return return_widget;
-
 }
 
 
@@ -790,15 +903,16 @@ local_mailbox_type_cb (GtkWidget * widget)
 }
 
 static void
-imap_mailbox_type_cb (GtkWidget * widget)
+pop_mailbox_type_cb (GtkWidget * widget)
 {
   NewMailboxWindow *nmw = get_new_mailbox_data (GTK_OBJECT (widget));
   NewMailboxPageType type = (NewMailboxPageType) gtk_object_get_user_data (GTK_OBJECT (widget));
   nmw->next_page = type;
 }
 
+
 static void
-pop_mailbox_type_cb (GtkWidget * widget)
+imap_mailbox_type_cb (GtkWidget * widget)
 {
   NewMailboxWindow *nmw = get_new_mailbox_data (GTK_OBJECT (widget));
   NewMailboxPageType type = (NewMailboxPageType) gtk_object_get_user_data (GTK_OBJECT (widget));
@@ -817,6 +931,7 @@ next_cb (GtkWidget * widget)
       break;
 
     case NM_PAGE_POP3:
+      gtk_notebook_set_page (GTK_NOTEBOOK (nmw->notebook), NM_PAGE_POP3);
       break;
 
     case NM_PAGE_IMAP:
@@ -842,7 +957,6 @@ local_mailbox_name_changed_cb (GtkWidget * widget)
   g_string_append (str, gtk_entry_get_text (GTK_ENTRY (widget)));
 
   gtk_entry_set_text (GTK_ENTRY (nmw->local_mailbox_path), str->str);
-
   g_string_free (str, TRUE);
 }
 
@@ -875,6 +989,8 @@ local_mailbox_fixed_path_cb (GtkWidget * widget)
 
 /*
  * pop3 page callbacks
+ *
+ * there are none
  */
 
 /*
@@ -888,8 +1004,14 @@ imap_mailbox_name_changed_cb (GtkWidget * widget)
   GString *str;
 
   str = g_string_new ("INBOX");
-  g_string_append_c (str, '.');
-  g_string_append (str, gtk_entry_get_text (GTK_ENTRY (widget)));
+
+  if (nmw->imap_use_fixed_path)
+    {
+
+      g_string_append_c (str, '.');
+      g_string_append (str, gtk_entry_get_text (GTK_ENTRY (widget)));
+
+    }
 
   gtk_entry_set_text (GTK_ENTRY (nmw->imap_mailbox_path), str->str);
   g_string_free (str, TRUE);
@@ -898,23 +1020,30 @@ imap_mailbox_name_changed_cb (GtkWidget * widget)
 static void
 imap_mailbox_fixed_path_cb (GtkWidget * widget)
 {
+
+  GString *str;
   NewMailboxWindow *nmw = get_new_mailbox_data (GTK_OBJECT (widget));
+
+  str = g_string_new ("INBOX.");
+  g_string_append (str, gtk_entry_get_text (GTK_ENTRY (nmw->imap_mailbox_name)));
+  gtk_entry_set_text (GTK_ENTRY (nmw->imap_mailbox_path), str->str);
+  g_string_free (str, TRUE);
   gtk_widget_set_sensitive (nmw->imap_mailbox_path, TRUE);
+  nmw->imap_use_fixed_path = TRUE;
 }
 
 static void
 imap_mailbox_standard_path_cb (GtkWidget * widget)
 {
-  NewMailboxWindow *nmw = get_new_mailbox_data (GTK_OBJECT (widget));
+
   GString *str;
+  NewMailboxWindow *nmw = get_new_mailbox_data (GTK_OBJECT (widget));
 
   str = g_string_new ("INBOX");
-//  g_string_append (str, gtk_entry_get_text (GTK_ENTRY (nmw->imap_mailbox_name)));                       
-
   gtk_widget_set_sensitive (nmw->imap_mailbox_path, FALSE);
   gtk_entry_set_text (GTK_ENTRY (nmw->imap_mailbox_path), str->str);
-
   g_string_free (str, TRUE);
+  nmw->imap_use_fixed_path = FALSE;
 }
 
 

@@ -816,7 +816,8 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
                                         "multipart", "mixed");
     } else {
         /* use "exact" algorithm */
-        return has_attached_part(message->body_list);
+        return (has_attached_part(message->body_list->next) ||
+		has_attached_part(message->body_list->parts));
     }
  }
 

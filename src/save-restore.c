@@ -225,7 +225,7 @@ restore_global_settings ()
   balsa_app.username = get_string_set_default ("user name", g_get_user_name());
 
   /* hostname */
-  balsa_app.hostname = get_string_set_default ("host name", mylocalhost ());
+  balsa_app.hostname = get_string_set_default ("host name", "localhost");
 
   /* organization */
   balsa_app.organization = get_string_set_default ("organization", "None");

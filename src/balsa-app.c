@@ -107,6 +107,9 @@ init_balsa_app (int argc, char *argv[])
 void
 do_load_mailboxes ()
 {
+  if (!balsa_app.inbox)
+    restore_global_settings ();
+
   switch (balsa_app.inbox->type)
     {
     case MAILBOX_MAILDIR:
@@ -122,9 +125,9 @@ do_load_mailboxes ()
       break;
     }
 
-  read_signature ();
   mailboxes_init ();
   load_local_mailboxes ();
+  read_signature ();
   special_mailboxes ();
 }
 

@@ -12,6 +12,7 @@
 	* src/balsa-message.h: i18n api changes.
 	* src/sendmsg-window.c: use new i18n api. Implement the changing
 	of charset in messages in The Right Way - by changing styles.
+	* libbalsa/body.c: rfc2047-decode attachment names.
 	
 2000-10-30  Ian Campbell  <ijc25@cam.ac.uk>
 

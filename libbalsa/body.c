@@ -79,7 +79,9 @@ libbalsa_message_body_set_mutt_body(LibBalsaMessageBody * body,
 
     body->mutt_body = mutt_body;
     body->filename = g_strdup(mutt_body->filename);
-
+    if(body->filename)
+	rfc2047_decode(body->filename, body->filename, 
+		       strlen(body->filename)+1);
     if (mutt_body->next) {
 	body->next = libbalsa_message_body_new(body->message);
 	libbalsa_message_body_set_mutt_body(body->next, mutt_body->next);

@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Balsa 2\n"
-"POT-Creation-Date: 2002-09-28 05:19+0200\n"
-"PO-Revision-Date: 2002-09-25 19:32+0700\n"
+"Project-Id-Version: Balsa 2.x\n"
+"POT-Creation-Date: 2002-10-14 05:21+0200\n"
+"PO-Revision-Date: 2002-09-25 08:30+0700\n"
 "Last-Translator: Trinh Minh Thanh <tmthanh@linuxmail.org>\n"
 "Language-Team: Gnome-Vi Team <Gnomevi-list@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,8 @@ msgstr ""
 msgid ""
 "Could not open external query address book %s while trying to parse output "
 "from: %s"
-msgstr "Không thể mở sổ địa chỉ tra vấn ngoài %s khi đang cố phân tích output từ: %s"
+msgstr ""
+"Không thể mở sổ địa chỉ tra vấn ngoài %s khi đang cố phân tích output từ: %s"
 
 #. The externq database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:243 libbalsa/address-book-ldap.c:384
@@ -57,7 +58,8 @@ msgstr ""
 #: libbalsa/address-book-ldap.c:273 libbalsa/address-book-ldap.c:589
 #, c-format
 msgid "Failed to do a search: %s.Check that the base name is valid."
-msgstr "Không thực hiện tìm kiếm %s được. Hãy kiểm tra tên cơ bản có hợp lệ không."
+msgstr ""
+"Không thực hiện tìm kiếm %s được. Hãy kiểm tra tên cơ bản có hợp lệ không."
 
 #: libbalsa/address-book-ldif.c:225
 #, c-format
@@ -196,7 +198,7 @@ msgid "Domain:"
 msgstr "Miền:"
 
 #. bcc:
-#: libbalsa/identity.c:667 src/balsa-message.c:748 src/print.c:373
+#: libbalsa/identity.c:667 src/balsa-message.c:749 src/print.c:327
 #: src/sendmsg-window.c:1878 src/store-address.c:275
 msgid "Bcc:"
 msgstr "Bản sao ẩn:"
@@ -333,17 +335,17 @@ msgstr "Không có loại hộp thư như vậy: %s"
 #: libbalsa/mailbox.c:395
 #, c-format
 msgid "Could not create a mailbox of type %s"
-msgstr "Không thể tạo loại hộp thư : %s"
+msgstr "Không thể tạo loại hộp thư %s"
 
-#: libbalsa/mailbox_imap.c:658
+#: libbalsa/mailbox_imap.c:657
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxImap: Mở %s Refcount: %d\n"
 
 #: libbalsa/mailbox_local.c:288
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxLocal: Mở %s Refcount: %d\n"
 
 #: libbalsa/mailbox_maildir.c:115
 #, c-format
@@ -372,7 +374,7 @@ msgid ""
 "Could not remove contents of %s:\n"
 "%s"
 msgstr ""
-"Không thể gỡ bỏ nội dung của %s:\n"
+"Không thể xóa bỏ nội dung của %s:\n"
 "%s"
 
 #: libbalsa/mailbox_maildir.c:235 libbalsa/mailbox_mbox.c:178
@@ -382,7 +384,7 @@ msgid ""
 "Could not remove %s:\n"
 "%s"
 msgstr ""
-"Không thể bỏ %s:\n"
+"Không thể xóa bỏ %s:\n"
 "%s"
 
 #: libbalsa/mailbox_mbox.c:113
@@ -450,7 +452,8 @@ msgstr "Hộp thư nguồn (%s) chỉ cho phép đọc. Không thể di chuyển
 #: libbalsa/message.c:493
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
-msgstr "Hộp thư nguồn (%s) chỉ cho phép đọc. Không thể di chuyển các thông điệp."
+msgstr ""
+"Hộp thư nguồn (%s) chỉ cho phép đọc. Không thể di chuyển các thông điệp."
 
 #: libbalsa/message.c:502 libbalsa/message.c:616
 #, c-format
@@ -596,11 +599,6 @@ msgstr "Chọn toàn bộ thư"
 msgid "Message Source"
 msgstr "Nguồn Thông Điệp"
 
-#: libbalsa/source-viewer.c:127
-#, c-format
-msgid "Conversion error: %s\n"
-msgstr "Lỗi chuyển đổi: %s\n"
-
 #: libinit_balsa/balsa-druid-page-directory.c:38
 msgid "Inbox:"
 msgstr "Hộp thư đến:"
@@ -626,7 +624,8 @@ msgstr "Sọt rác:"
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
-msgstr "Phải chỉ định đường dẫn \"%s\" theo đúng quy tắc -- nó phải bắt đầu bằng '/'."
+msgstr ""
+"Phải chỉ định đường dẫn \"%s\" theo đúng quy tắc -- nó phải bắt đầu bằng '/'."
 
 #: libinit_balsa/balsa-druid-page-directory.c:121
 #, c-format
@@ -755,12 +754,14 @@ msgstr "Lỗi nạp %s: %s\n"
 #: libinit_balsa/helper.c:177
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
-msgstr "Đường dẫn %s phải liên quan đến hệ thống tập tin root (bắt đầu bằng /)."
+msgstr ""
+"Đường dẫn %s phải liên quan đến hệ thống tập tin root (bắt đầu bằng /)."
 
 #: libinit_balsa/helper.c:190 libinit_balsa/helper.c:214
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
-msgstr "Không thể tạo đưc thư mục: không chạy được mkdir() trên đường dẫn \"%s\"."
+msgstr ""
+"Không thể tạo đưc thư mục: không chạy được mkdir() trên đường dẫn \"%s\"."
 
 #: libinit_balsa/helper.c:200 libinit_balsa/helper.c:223
 #, c-format
@@ -773,7 +774,8 @@ msgstr "Cấu Hình Balsa"
 
 #: libmutt/handler.c:1333
 msgid "[-- Error:  Could not display any parts of Multipart/Alternative! --]\n"
-msgstr "[-- Lỗi:  Không thể hiển thị bất kỳ phần nào của Multipart/Alternative! --]\n"
+msgstr ""
+"[-- Lỗi:  Không thể hiển thị bất kỳ phần nào của Multipart/Alternative! --]\n"
 
 #: libmutt/handler.c:1453
 #, c-format
@@ -1661,118 +1663,118 @@ msgstr "Mật khẩu hộp thư cho %s@%s:"
 msgid "Password needed"
 msgstr "Mật khẩu cần dùng"
 
-#: src/balsa-app.c:793
+#: src/balsa-app.c:798
 #, c-format
 msgid "Multiple mailboxes named \"%s\""
 msgstr "Đa hộp thư có tên  \"%s\""
 
-#: src/balsa-index.c:237
+#: src/balsa-index.c:239
 msgid "From"
 msgstr "Từ"
 
-#: src/balsa-index.c:238 src/filter-edit-callbacks.c:1000
+#: src/balsa-index.c:240 src/filter-edit-callbacks.c:1000
 msgid "Subject"
 msgstr "Chủ đề"
 
-#: src/balsa-index.c:239
+#: src/balsa-index.c:241
 msgid "Date"
 msgstr "Ngày"
 
-#: src/balsa-index.c:240
+#: src/balsa-index.c:242
 msgid "Size"
 msgstr "Kích thước"
 
-#: src/balsa-index.c:569
+#: src/balsa-index.c:571
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Đang mở hộp thư %s. Hãy đợi..."
 
-#: src/balsa-index.c:606
+#: src/balsa-index.c:608
 msgid "To"
 msgstr "Đến"
 
-#: src/balsa-index.c:2023
+#: src/balsa-index.c:2027
 msgid "_View Source"
 msgstr "_Xem Nguồn"
 
-#: src/balsa-index.c:2025 src/main-window.c:453 src/message-window.c:126
+#: src/balsa-index.c:2029 src/main-window.c:453 src/message-window.c:126
 msgid "_Reply..."
 msgstr "Trả Lời..."
 
-#: src/balsa-index.c:2027
+#: src/balsa-index.c:2031
 msgid "Reply To _All..."
 msgstr "Trả Lời T_ất..."
 
-#: src/balsa-index.c:2029
+#: src/balsa-index.c:2033
 msgid "Reply To _Group..."
 msgstr "Trả Lời _Nhóm..."
 
-#: src/balsa-index.c:2031
+#: src/balsa-index.c:2035
 msgid "_Forward Attached..."
 msgstr "_Chuyển Tiếp Dạng Đính Kèm..."
 
-#: src/balsa-index.c:2033
+#: src/balsa-index.c:2037
 msgid "Forward _Inline..."
 msgstr "Chuyển Tiếp Dạng Trong _Dòng..."
 
-#: src/balsa-index.c:2035 src/main-window.c:555
+#: src/balsa-index.c:2039 src/main-window.c:555
 msgid "_Store Address..."
 msgstr "Lưu trữ địa chỉ..."
 
-#: src/balsa-index.c:2048 src/main-window.c:537 src/pref-manager.c:1424
-#: src/pref-manager.c:2438
+#: src/balsa-index.c:2052 src/mailbox-node.c:773 src/main-window.c:537
+#: src/pref-manager.c:1424 src/pref-manager.c:2438
 msgid "_Delete"
 msgstr "_Xoá"
 
-#: src/balsa-index.c:2053 src/main-window.c:544
+#: src/balsa-index.c:2057 src/main-window.c:544
 msgid "_Undelete"
 msgstr "Thôi xoá"
 
-#: src/balsa-index.c:2058
+#: src/balsa-index.c:2062
 msgid "Move To _Trash"
 msgstr "Chuyển vào _Sọt Rác"
 
-#: src/balsa-index.c:2062
+#: src/balsa-index.c:2066
 msgid "T_oggle"
 msgstr "Ch_ốt"
 
-#: src/balsa-index.c:2065
+#: src/balsa-index.c:2069
 msgid "_Flagged"
 msgstr "C_ắm Cờ"
 
-#: src/balsa-index.c:2068
+#: src/balsa-index.c:2072
 msgid "_Unread"
 msgstr "Ch_ưa Đọc"
 
-#: src/balsa-index.c:2076
+#: src/balsa-index.c:2080
 msgid "_Move to"
 msgstr "Ch_uyển đến"
 
-#: src/balsa-mblist.c:320
+#: src/balsa-mblist.c:321
 msgid "Mailbox"
 msgstr "HỘP THƯ"
 
-#: src/balsa-mblist.c:343 src/filter-edit-callbacks.c:778
+#: src/balsa-mblist.c:344 src/filter-edit-callbacks.c:778
 msgid "Unread"
 msgstr "Chưa Đọc"
 
-#: src/balsa-mblist.c:363
+#: src/balsa-mblist.c:364
 msgid "Total"
 msgstr "Tổng cộng"
 
-#: src/balsa-mblist.c:954 src/balsa-mblist.c:999
+#: src/balsa-mblist.c:961 src/balsa-mblist.c:1006
 msgid "Failed to find mailbox"
 msgstr "Không tìm được hộp thư"
 
-#: src/balsa-mblist.c:1779
+#: src/balsa-mblist.c:1786
 msgid "_Other..."
 msgstr "_Khác..."
 
-#: src/balsa-mblist.c:1858
+#: src/balsa-mblist.c:1865
 msgid "Choose destination folder"
 msgstr "Chọn thư mục đích"
 
-#: src/balsa-mblist.c:2163
+#: src/balsa-mblist.c:2170
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Hiển thị hộp thư: %s với %ld thư, %ld thư mới"
@@ -1790,139 +1792,139 @@ msgstr " Không thể lưu %s: %s"
 msgid "Save MIME Part"
 msgstr "Lưu phần MIME"
 
-#: src/balsa-message.c:728 src/print.c:344
+#: src/balsa-message.c:729 src/print.c:298
 msgid "Subject:"
 msgstr "Chủ đề:"
 
-#: src/balsa-message.c:732 src/print.c:350
+#: src/balsa-message.c:733 src/print.c:304
 msgid "Date:"
 msgstr "Ngày:"
 
-#: src/balsa-message.c:737 src/filter-edit-callbacks.c:993 src/print.c:361
+#: src/balsa-message.c:738 src/filter-edit-callbacks.c:993 src/print.c:315
 #: src/store-address.c:272
 msgid "From:"
 msgstr "Từ:"
 
-#: src/balsa-message.c:743
+#: src/balsa-message.c:744
 msgid "Reply-To:"
 msgstr "Trả Lời Tới:"
 
-#: src/balsa-message.c:746 src/filter-edit-callbacks.c:986 src/print.c:371
+#: src/balsa-message.c:747 src/filter-edit-callbacks.c:986 src/print.c:325
 #: src/store-address.c:273
 msgid "To:"
 msgstr "Đến:"
 
 #. cc:
-#: src/balsa-message.c:747 src/filter-edit-callbacks.c:1007 src/print.c:372
+#: src/balsa-message.c:748 src/filter-edit-callbacks.c:1007 src/print.c:326
 #: src/sendmsg-window.c:1873 src/store-address.c:274
 msgid "Cc:"
 msgstr "Đồng gửi:"
 
-#: src/balsa-message.c:751 src/print.c:374
+#: src/balsa-message.c:752 src/print.c:328
 msgid "Fcc:"
 msgstr "Đồng chuyển tiếp:"
 
-#: src/balsa-message.c:756 src/print.c:380
+#: src/balsa-message.c:757 src/print.c:334
 msgid "Disposition-Notification-To:"
 msgstr "Xắp Xếp-Thông Báo-Đến:"
 
-#: src/balsa-message.c:861 src/balsa-message.c:877 src/balsa-message.c:907
-#: src/balsa-message.c:960
+#: src/balsa-message.c:862 src/balsa-message.c:878 src/balsa-message.c:908
+#: src/balsa-message.c:961
 msgid "Content Type: external-body\n"
 msgstr "Loại nội dung: thân ngoài\n"
 
-#: src/balsa-message.c:862
+#: src/balsa-message.c:863
 msgid "Access type: local-file\n"
 msgstr "Kiểu truy cập: tập tin cục bộ\n"
 
-#: src/balsa-message.c:863 src/balsa-message.c:914
+#: src/balsa-message.c:864 src/balsa-message.c:915
 #, c-format
 msgid "File name: %s"
 msgstr "Tên tập tin: %s"
 
-#: src/balsa-message.c:878
+#: src/balsa-message.c:879
 msgid "Access type: URL\n"
 msgstr "Kiểu truy cập: URL\n"
 
-#: src/balsa-message.c:879
+#: src/balsa-message.c:880
 #, c-format
 msgid "URL: %s"
 msgstr "URL: %s"
 
-#: src/balsa-message.c:908
+#: src/balsa-message.c:909
 #, c-format
 msgid "Access type: %s\n"
 msgstr "Kiểu truy cập: %s\n"
 
-#: src/balsa-message.c:911
+#: src/balsa-message.c:912
 #, c-format
 msgid "FTP site: %s\n"
 msgstr "FTP site: %s\n"
 
-#: src/balsa-message.c:913
+#: src/balsa-message.c:914
 #, c-format
 msgid "Directory: %s\n"
 msgstr "Thư Mục: %s\n"
 
-#: src/balsa-message.c:961
+#: src/balsa-message.c:962
 msgid "Access type: mail-server\n"
 msgstr "Kiểu truy cập: máy chủ thư\n"
 
-#: src/balsa-message.c:962
+#: src/balsa-message.c:963
 #, c-format
 msgid "Mail server: %s\n"
 msgstr "Máy chủ Thư: %s\n"
 
-#: src/balsa-message.c:964 src/sendmsg-window.c:2164
+#: src/balsa-message.c:965 src/sendmsg-window.c:2164
 #, c-format
 msgid "Subject: %s\n"
 msgstr "Chủ đề: %s\n"
 
-#: src/balsa-message.c:975
+#: src/balsa-message.c:976
 msgid "Send message to obtain this part"
 msgstr "Gửi thông điệp để lấy được phần này"
 
-#: src/balsa-message.c:1056
+#: src/balsa-message.c:1057
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
 "Không có hành động mở hay xem được chỉ định trong GNOME MIME cho loại nội "
 "dung này"
 
-#: src/balsa-message.c:1061
+#: src/balsa-message.c:1062
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Loại: %s (%s)"
 
-#: src/balsa-message.c:1063
+#: src/balsa-message.c:1064
 #, c-format
 msgid "Content Type: %s"
 msgstr "Loại nội dung: %s"
 
-#: src/balsa-message.c:1069
+#: src/balsa-message.c:1070
 #, c-format
 msgid "Filename: %s"
 msgstr "Tên Tập Tin: %s"
 
-#: src/balsa-message.c:1077
+#: src/balsa-message.c:1078
 msgid "Save part"
 msgstr "Lưu phần"
 
-#: src/balsa-message.c:1100 src/balsa-message.c:1123
+#: src/balsa-message.c:1101 src/balsa-message.c:1124
 #, c-format
 msgid "View part with %s"
 msgstr "Xem phần bằng %s"
 
-#: src/balsa-message.c:1503
+#: src/balsa-message.c:1504
 #, c-format
 msgid "Calling URL %s..."
 msgstr "Đang gọi URL %s..."
 
-#: src/balsa-message.c:1512 src/balsa-message.c:2020 src/balsa-message.c:2532
+#: src/balsa-message.c:1513 src/balsa-message.c:2023 src/balsa-message.c:2535
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Lỗi hiển thị %s: %s\n"
 
-#: src/balsa-message.c:1543
+#: src/balsa-message.c:1544
 #, c-format
 msgid ""
 "Error writing to temporary file %s.\n"
@@ -1931,26 +1933,26 @@ msgstr ""
 "Lỗi khi ghi vào tập tin tạm %s.\n"
 "Hãy kiểm tra quyền truy cập."
 
-#: src/balsa-message.c:1551
+#: src/balsa-message.c:1552
 #, c-format
 msgid "Cannot open temporary file %s."
 msgstr "Không thể mở tập tin tạm %s."
 
-#: src/balsa-message.c:1823
+#: src/balsa-message.c:1826
 #, c-format
 msgid "Open with %s"
 msgstr "Mở bằng %s"
 
-#: src/balsa-message.c:1961
+#: src/balsa-message.c:1964
 msgid "Save..."
 msgstr "Lưu..."
 
-#: src/balsa-message.c:2101 src/balsa-message.c:2146
+#: src/balsa-message.c:2104 src/balsa-message.c:2149
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "không thể tạo tập tin tạm %s"
 
-#: src/balsa-message.c:2817
+#: src/balsa-message.c:2820
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -1961,7 +1963,7 @@ msgstr ""
 "gửi trả lại Thông Báo Xắp Xếp Thông Điệp (MDN) đến `%s'.\n"
 "Bạn có muốn gửi thông báo này không?"
 
-#: src/balsa-message.c:2824
+#: src/balsa-message.c:2827
 msgid "reply to MDN?"
 msgstr "trả lời MDN?"
 
@@ -2160,11 +2162,11 @@ msgstr "Và"
 
 #. new button
 #: src/filter-edit-dialog.c:210 src/filter-edit-dialog.c:305
-#: src/mailbox-node.c:745 src/main-window.c:442
+#: src/main-window.c:442
 msgid "New"
 msgstr "Mới"
 
-#: src/filter-edit-dialog.c:216 src/mailbox-node.c:773
+#: src/filter-edit-dialog.c:216
 msgid "Delete"
 msgstr "Xoá"
 
@@ -2219,7 +2221,8 @@ msgstr "Trở lại"
 
 #: src/filter-edit-dialog.c:480
 msgid "A filter run dialog is open.Close it before you can modify filters."
-msgstr "Đang mở thoại chạy trình lọc. Hãy đóng nó trước khi thay đổi trình lọc."
+msgstr ""
+"Đang mở thoại chạy trình lọc. Hãy đóng nó trước khi thay đổi trình lọc."
 
 #: src/filter-edit-dialog.c:493
 msgid "Balsa Filters"
@@ -2311,9 +2314,10 @@ msgstr "_Tên Mô Tả:"
 msgid "_Server:"
 msgstr "Máy _Chủ:"
 
-#: src/folder-conf.c:220
-msgid "_User name:"
-msgstr "Tên _Người Dùng:"
+#. username
+#: src/folder-conf.c:220 src/mailbox-conf.c:877
+msgid "Use_r name:"
+msgstr "Tên Người Dùng:"
 
 #: src/folder-conf.c:226
 msgid "_Remember password"
@@ -2324,8 +2328,8 @@ msgid "_Password:"
 msgstr "_Mật khẩu:"
 
 #: src/folder-conf.c:236
-msgid "_Subscribed folders only"
-msgstr "Chỉ các thư mục được _mô tả"
+msgid "Subscribed _folders only"
+msgstr "Chỉ các t_hư mục được mô tả"
 
 #: src/folder-conf.c:238
 msgid "_Always show INBOX"
@@ -2336,8 +2340,8 @@ msgid "_Prefix"
 msgstr "Tiền tố"
 
 #: src/folder-conf.c:247
-msgid "Use SSL (IMAPS)"
-msgstr "Dùng SSL (IMAPS)"
+msgid "Use SS_L (IMAPS)"
+msgstr "Dùng SS_L (IMAPS)"
 
 #: src/folder-conf.c:367
 msgid "Select parent folder"
@@ -2366,8 +2370,7 @@ msgstr "Câu hỏi"
 msgid "Rename INBOX"
 msgstr "Đổi tên HỘP THƯ ĐẾN"
 
-#: src/folder-conf.c:451 src/mailbox-conf.c:256 src/mailbox-conf.c:277
-#: src/mailbox-conf.c:293 src/toolbar-factory.c:169
+#: src/folder-conf.c:451 src/toolbar-factory.c:169
 msgid "Cancel"
 msgstr "Bỏ qua"
 
@@ -2471,13 +2474,17 @@ msgstr ""
 "truy cập lại nó sau này.\n"
 "Bạn thích làm gì ?"
 
-#: src/mailbox-conf.c:254 src/mailbox-conf.c:292
-msgid "Remove from list"
-msgstr "Xoá bỏ khỏi danh sách"
+#: src/mailbox-conf.c:254
+msgid "Remove from _list"
+msgstr "Xoá khỏi _danh sách"
 
 #: src/mailbox-conf.c:255
-msgid "Remove from list and disk"
-msgstr "Xoá bỏ khỏi danh sách và đĩa"
+msgid "Remove from list and _disk"
+msgstr "Xoá khỏi danh sách và đĩ_a"
+
+#: src/mailbox-conf.c:256 src/mailbox-conf.c:277 src/mailbox-conf.c:293
+msgid "_Cancel"
+msgstr "Bỏ _qua"
 
 #: src/mailbox-conf.c:263
 #, c-format
@@ -2494,8 +2501,8 @@ msgstr ""
 "thư với tên này. Bạn thích làm gì?"
 
 #: src/mailbox-conf.c:276
-msgid "Remove from server"
-msgstr "Xoa bỏ khỏi máy chủ"
+msgid "_Remove from server"
+msgstr "Xóa _bỏ khỏi máy chủ"
 
 #: src/mailbox-conf.c:283
 #, c-format
@@ -2507,6 +2514,10 @@ msgstr ""
 "Việc này sẽ xoá bỏ hộp thư \"%s\" khỏi danh sách hộp thư\n"
 "Có thể dùng \"Thêm Hộp Thư\" về sau để truy cập lại hộp\n"
 "thư này. Bạn thích làm gì?"
+
+#: src/mailbox-conf.c:292
+msgid "_Remove from list"
+msgstr "Xoá _bỏ khỏi danh sách"
 
 #: src/mailbox-conf.c:343
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
@@ -2548,11 +2559,6 @@ msgstr "Đường dẫn Hộp Thư:"
 msgid "Mailbox Path"
 msgstr "Đường dẫn Hộp Thư"
 
-#. username
-#: src/mailbox-conf.c:877 src/mailbox-conf.c:965
-msgid "_Username:"
-msgstr "Tên _Người Dùng:"
-
 #. password field
 #: src/mailbox-conf.c:883 src/mailbox-conf.c:979
 msgid "Pass_word:"
@@ -2575,8 +2581,13 @@ msgid "_Enable check for new mail"
 msgstr "_Bật kiểm tra thư mới"
 
 #: src/mailbox-conf.c:916
-msgid "_Use SSL (pop3s)"
-msgstr "_Dùng SSL (pop3s)"
+msgid "Use SS_L (pop3s)"
+msgstr "Dùng SS_L (pop3s)"
+
+#. username
+#: src/mailbox-conf.c:965
+msgid "_Username:"
+msgstr "Tên _Người Dùng:"
 
 #: src/mailbox-conf.c:973
 msgid "_Remember Password"
@@ -2587,8 +2598,8 @@ msgid "F_older Path:"
 msgstr "Đường dẫn Thư mục:"
 
 #: src/mailbox-conf.c:1007
-msgid "Use SSL (imaps)"
-msgstr "Dùng SSL (imaps)"
+msgid "Use SS_L (imaps)"
+msgstr "Dùng SS_L (imaps)"
 
 #: src/mailbox-node.c:237
 msgid "The folder edition to be written."
@@ -2599,75 +2610,79 @@ msgstr "Biên soạn thư mục để ghi."
 msgid "Scanning %s. Please wait..."
 msgstr "Đang quét %s. Hãy đợi..."
 
-#: src/mailbox-node.c:730 src/main-window.c:258
-msgid "Local mbox mailbox..."
-msgstr "Hộp thư mbox cục bộ..."
+#: src/mailbox-node.c:730
+msgid "Local _mbox mailbox..."
+msgstr "Hộp thư _mbox cục bộ..."
 
-#: src/mailbox-node.c:732 src/main-window.c:263
-msgid "Local Maildir mailbox..."
-msgstr "Hộp thư Maildir cục bộ..."
+#: src/mailbox-node.c:732
+msgid "Local Mail_dir mailbox..."
+msgstr "Hộp thư Mail_dir cục bộ..."
 
-#: src/mailbox-node.c:734 src/main-window.c:268
-msgid "Local MH mailbox..."
-msgstr "Hộp thư MH cục bộ..."
+#: src/mailbox-node.c:734
+msgid "Local M_H mailbox..."
+msgstr "Hộp thư M_H cục bộ..."
 
-#: src/mailbox-node.c:736 src/main-window.c:273 src/pref-manager.c:2599
-msgid "Remote IMAP mailbox..."
-msgstr "Hộp thư IMAP ở xa..."
+#: src/mailbox-node.c:736
+msgid "Remote _IMAP mailbox..."
+msgstr "Hộp thư _IMAP ở xa..."
 
-#: src/mailbox-node.c:739 src/main-window.c:279 src/pref-manager.c:2605
-msgid "Remote IMAP folder..."
-msgstr "Thư mục IMAP ở xa..."
+#: src/mailbox-node.c:739
+msgid "Remote IMAP _folder..."
+msgstr "Thư mụ_c IMAP ở xa..."
 
-#: src/mailbox-node.c:741 src/main-window.c:284
-msgid "Remote IMAP subfolder..."
-msgstr "Thư mục con IMAP ở xa..."
+#: src/mailbox-node.c:741
+msgid "Remote IMAP _subfolder..."
+msgstr "Thư mục c_on IMAP ở xa..."
+
+#: src/mailbox-node.c:745 src/main-window.c:293
+msgid "_New"
+msgstr "Mới"
 
 #. clicked on the empty space
 #: src/mailbox-node.c:752 src/mailbox-node.c:784 src/mailbox-node.c:805
-msgid "Rescan"
-msgstr "Quét lại"
+msgid "_Rescan"
+msgstr "Q_uét lại"
 
 #: src/mailbox-node.c:761
-msgid "Open"
-msgstr "Mở"
+msgid "_Open"
+msgstr "_Mở"
 
-#: src/mailbox-node.c:764 src/toolbar-factory.c:179
-msgid "Close"
+#: src/mailbox-node.c:764 src/main-window.c:621
+msgid "_Close"
 msgstr "Đóng"
 
 #: src/mailbox-node.c:770
-msgid "Properties..."
+msgid "_Properties..."
 msgstr "Thuộc tính..."
 
 #: src/mailbox-node.c:780
-msgid "Subscribe"
-msgstr "Đăng ký"
+msgid "_Subscribe"
+msgstr "Đăng _ký"
 
 #: src/mailbox-node.c:782
-msgid "Unsubscribe"
+msgid "_Unsubscribe"
 msgstr "Thôi đăng ký"
 
 #: src/mailbox-node.c:790
-msgid "Mark as Inbox"
+msgid "Mark as _Inbox"
 msgstr "Đánh dấu là Hộp Thư Đến"
 
 #: src/mailbox-node.c:793
-msgid "Mark as Sentbox"
-msgstr "Đánh dấu là Hộp Thư Đi"
+msgid "_Mark as Sentbox"
+msgstr "Đánh _dấu là Hộp Thư Đi"
 
 #: src/mailbox-node.c:796
-msgid "Mark as Trash"
-msgstr "Đánh dấu là Sọt Rác"
+msgid "Mark as _Trash"
+msgstr "Đánh dấu là Sọt _Rác"
 
 #: src/mailbox-node.c:799
-msgid "Mark as Draftbox"
+msgid "Mark as D_raftbox"
 msgstr "Đánh dấu là Hộp Thư Nháp"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
 #: src/mailbox-node.c:802
-msgid "Edit/Apply filters"
-msgstr "Biên soạn/Áp dụng trình lọc"
+msgid "_Edit/Apply filters"
+msgstr "Biên _soạn/Áp dụng trình lọc"
 
 #: src/mailbox-node.c:891
 #, c-format
@@ -2687,33 +2702,53 @@ msgstr "Thông điệp..."
 msgid "Compose a new message"
 msgstr "Viết thư mới"
 
+#: src/main-window.c:258
+msgid "Local mbox mailbox..."
+msgstr "Hộp thư mbox cục bộ..."
+
 #: src/main-window.c:259
 msgid "Add a new mbox style mailbox"
 msgstr "Thêm hộp thư mới kiểu mbox"
+
+#: src/main-window.c:263
+msgid "Local Maildir mailbox..."
+msgstr "Hộp thư Maildir cục bộ..."
 
 #: src/main-window.c:264
 msgid "Add a new Maildir style mailbox"
 msgstr "Thêm hộp thư mới kiểu Maildir"
 
+#: src/main-window.c:268
+msgid "Local MH mailbox..."
+msgstr "Hộp thư MH cục bộ..."
+
 #: src/main-window.c:269
 msgid "Add a new MH style mailbox"
 msgstr "Thêm hộp thư mới kiểu MH"
+
+#: src/main-window.c:273 src/pref-manager.c:2599
+msgid "Remote IMAP mailbox..."
+msgstr "Hộp thư IMAP ở xa..."
 
 #: src/main-window.c:274
 msgid "Add a new IMAP mailbox"
 msgstr "Thêm hộp thư mới IMAP"
 
+#: src/main-window.c:279 src/pref-manager.c:2605
+msgid "Remote IMAP folder..."
+msgstr "Thư mục IMAP ở xa..."
+
 #: src/main-window.c:280
 msgid "Add a new IMAP folder"
 msgstr "Thêm thư mục IMAP mới"
 
+#: src/main-window.c:284
+msgid "Remote IMAP subfolder..."
+msgstr "Thư mục con IMAP ở xa..."
+
 #: src/main-window.c:285
 msgid "Add new IMAP subfolder"
 msgstr "Thêm thư mục con IMAP mới"
-
-#: src/main-window.c:293
-msgid "_New"
-msgstr "Mới"
 
 #: src/main-window.c:297
 msgid "_Continue"
@@ -3025,10 +3060,6 @@ msgid "Commit the changes in all mailboxes"
 msgstr "Ủy thác các thay đổi trong mọi hộp thư"
 
 #: src/main-window.c:621
-msgid "_Close"
-msgstr "Đóng"
-
-#: src/main-window.c:621
 msgid "Close mailbox"
 msgstr "Đóng hộp thư"
 
@@ -3120,10 +3151,6 @@ msgstr "Lỗi gửi đi: %s"
 #: src/main-window.c:2220
 msgid "You have new mail waiting"
 msgstr "Bạn có thư mới đang đợi"
-
-#: src/main-window.c:2223
-msgid "OK"
-msgstr "OK"
 
 #: src/main-window.c:2623
 msgid "Search mailbox"
@@ -3449,7 +3476,8 @@ msgstr "Hiển thị thông điệp nếu có thư mới đến"
 
 #: src/pref-manager.c:1607
 msgid "Do background check quietly (no messages in status bar)"
-msgstr "Chạy kiểm tra ở nền một cách thầm lặng (không hiển thị lên thanh trạng thái)"
+msgstr ""
+"Chạy kiểm tra ở nền một cách thầm lặng (không hiển thị lên thanh trạng thái)"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
@@ -3669,7 +3697,8 @@ msgstr "Cửa Sổ Biên Soạn"
 msgid "Invalid or incomplete address label color"
 msgstr "Màu của nhãn địa chỉ không đầy đủ hay không hợp lệ"
 
-#: src/pref-manager.c:2065
+#. create a 2nd notebook page for the fonts
+#: src/pref-manager.c:2065 src/print.c:1183
 msgid "Fonts"
 msgstr "Phông"
 
@@ -3846,45 +3875,50 @@ msgstr "Nếu có thể"
 msgid "Required"
 msgstr "Được yêu cầu"
 
-#. print the page number
-#: src/print.c:261
+#: src/print.c:217
 #, c-format
 msgid "Page: %i/%i"
 msgstr "Trang: %i/%i"
 
-#: src/print.c:589 src/print.c:939
-#, c-format
-msgid ""
-"Can not convert %s, falling back to US-ASCII.\n"
-"Some characters may be printed incorrectly."
-msgstr ""
-"Không thể chuyển đổi %s, quay lại US-ASCII.\n"
-"Có thể không in ra đúng một số ký tự."
-
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:688
+#: src/print.c:725
 msgid "Type:"
 msgstr "Loại:"
 
-#: src/print.c:691
+#: src/print.c:728
 msgid "Filename:"
 msgstr "Tên tập tin:"
 
-#: src/print.c:1022
-#, c-format
-msgid ""
-"Balsa could not find font %s\n"
-"Printing is not possible"
-msgstr ""
-"Không thể tìm thấy phông %s\n"
-"Không in ra được"
-
-#: src/print.c:1061
+#: src/print.c:1174
 msgid "Print message"
 msgstr "In thông điệp"
 
-#: src/print.c:1101
+#: src/print.c:1186
+msgid "Header font"
+msgstr "Phông cho Header"
+
+#: src/print.c:1188
+msgid "Body font"
+msgstr "Phông cho Thân"
+
+#: src/print.c:1190
+msgid "Footer font"
+msgstr "Phông cho Footer"
+
+#. highlight cited stuff
+#: src/print.c:1194
+msgid "Highlight cited text"
+msgstr "Nổi bật văn bản trích dẫn"
+
+#: src/print.c:1240
+#, c-format
+msgid ""
+"Balsa could not find font \"%s\".\n"
+"Use the \"Fonts\" page on the \"Print message\" dialog to change it."
+msgstr ""
+
+#: src/print.c:1339
 msgid "Balsa: message print preview"
 msgstr "Balsa: xem trước trang in thông điệp"
 
@@ -4668,6 +4702,10 @@ msgstr "Xoá hết Sọt Rác"
 msgid "Delete messages from the trash mailbox"
 msgstr "Xoá các thông điệp khỏi hộp thư rác"
 
+#: src/toolbar-factory.c:179
+msgid "Close"
+msgstr "Đóng"
+
 #: src/toolbar-factory.c:180
 msgid "Close current mailbox"
 msgstr "Đóng hộp thư hiện thời"
@@ -4710,6 +4748,26 @@ msgstr "Các nút hiện có"
 msgid "Current toolbar"
 msgstr "Thanh công cụ hiện thời"
 
+#~ msgid "Conversion error: %s\n"
+#~ msgstr "Lỗi chuyển đổi: %s\n"
+
+#~ msgid "OK"
+#~ msgstr "OK"
+
+#~ msgid ""
+#~ "Can not convert %s, falling back to US-ASCII.\n"
+#~ "Some characters may be printed incorrectly."
+#~ msgstr ""
+#~ "Không thể chuyển đổi %s, quay lại US-ASCII.\n"
+#~ "Có thể không in ra đúng một số ký tự."
+
+#~ msgid ""
+#~ "Balsa could not find font %s\n"
+#~ "Printing is not possible"
+#~ msgstr ""
+#~ "Không thể tìm thấy phông %s\n"
+#~ "Không in ra được"
+
 #~ msgid "Reply..."
 #~ msgstr "Trả Lời..."
 
@@ -4730,4 +4788,3 @@ msgstr "Thanh công cụ hiện thời"
 
 #~ msgid "All headers"
 #~ msgstr "Toàn bộ các Header"
-

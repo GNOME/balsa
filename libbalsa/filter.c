@@ -120,6 +120,18 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 	    g_free(str);
 	    if (match) break;
 	}
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
+	    if (cond->user_header) {
+		GList * header =
+		    libbalsa_message_find_user_hdr(message, cond->user_header);
+
+		if (header) {
+		    gchar ** tmp = header->data;
+		    match = in_string(tmp[1],cond->match.string);
+		    if (match) break;
+		}
+	    }
+	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
 	    gboolean is_new = (message->flags & LIBBALSA_MESSAGE_FLAG_NEW);
 	    if (!libbalsa_message_body_ref(message)) {
@@ -165,6 +177,18 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
 		if (str) match=REGEXEC(*(regex->compiled),str)==0;
 		g_free(str);
 		if (match) break;
+	    }
+	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
+		if (cond->user_header) {
+		    GList * header =
+			libbalsa_message_find_user_hdr(message, cond->user_header);
+		    
+		    if (header) {
+			gchar ** tmp = header->data;
+			if (tmp[1] && (match=REGEXEC(*(regex->compiled),tmp[1])==0))
+			    break;
+		    }
+		}
 	    }
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
                 gboolean is_new = (message->flags & LIBBALSA_MESSAGE_FLAG_NEW);
@@ -254,6 +278,7 @@ libbalsa_filter_build_imap_query(FilterOpType op, GSList* condlist)
             query = extend_query(query, "CC", cond->match.string, op);
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY))
             query = extend_query(query, "TEXT", cond->match.string, op);
+	/* FIXME : extend that for user headers matching */
     }
     str = query->str;
     g_string_free(query, FALSE);
@@ -261,8 +286,6 @@ libbalsa_filter_build_imap_query(FilterOpType op, GSList* condlist)
 }
 
 /*--------- Filtering functions -------------------------------*/
-
-/* FIXME : Add error reporting for each filter */
 
 gint
 filters_prepare_to_run(GSList * filters)
@@ -287,21 +310,18 @@ filters_prepare_to_run(GSList * filters)
 /*
  * Run all filters until one matches (so order of filter is important)
  * filters must be valid and compiled (ie filters_prepare_to_run have been called before)
- * Assume that all messages come from ONE mailbox
- * returns TRUE if the trash bin has been filled
- * FIXME : Should position filter_errno on errors (bad command action,bad destination mailbox...)
+ * In general you'll call this function with mailbox lock held (ie you locked the mailbox
+ * you're filtering before calling this function)
  */
 
-gboolean
-filters_run_on_messages(GSList * filter_list, GList * messages)
+void
+libbalsa_filter_match(GSList * filter_list, GList * messages)
 {
     gint match;
     GSList * lst;
-    GList * lst_messages;
     LibBalsaFilter * filt=NULL;
-    gboolean result=FALSE;
 
-    if (!filter_list || ! messages) return FALSE;
+    if (!filter_list || ! messages) return;
 
     for (;messages;messages=g_list_next(messages)) {
 
@@ -316,17 +336,38 @@ filters_run_on_messages(GSList * filter_list, GList * messages)
 	    filt->matching_messages=g_list_prepend(filt->matching_messages,LIBBALSA_MESSAGE(messages->data));
 	}
     }
+}
 
-    /* OK we have done all the matching thing, now we take every action for matching messages */
+void libbalsa_filter_match_mailbox(GSList * filter_list, LibBalsaMailbox * mbox)
+{
+    LOCK_MAILBOX(mbox);
+    libbalsa_filter_match(filter_list, mbox->message_list);
+    UNLOCK_MAILBOX(mbox);
+}
+
+/* Apply all filters on their matching messages (call libbalsa_filter_match before)
+ * returns TRUE if the trash bin has been filled
+ * FIXME : Should position filter_errno on errors (bad command action,bad destination mailbox...)
+ */
+
+gboolean
+libbalsa_filter_apply(GSList * filter_list)
+{
+    GSList * lst;
+    GList * lst_messages;
+    LibBalsaFilter * filt=NULL;
+    gboolean result=FALSE;
+    LibBalsaMailbox *mbox;
+
+    if (!filter_list) return FALSE;
 
     for (lst=filter_list;lst;lst=g_slist_next(lst)) {
-	LibBalsaMailbox *mbox;
  
 	filt=(LibBalsaFilter*)lst->data;
-	if (FILTER_CHKFLAG(filt,FILTER_SOUND)) {
+	if (filt->sound) {
 	    /* FIXME : Emit sound */
 	}
-	if (FILTER_CHKFLAG(filt,FILTER_POPUP)) {
+	if (filt->popup_text) {
 	    /* FIXME : Print popup text */
 	}
 	if (filt->matching_messages) {

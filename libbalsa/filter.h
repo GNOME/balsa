@@ -74,6 +74,8 @@ typedef struct _LibBalsaCondition {
 	LibBalsaMessageFlag flags;
     } match;
     guint match_fields;         /* Contains the flag mask for CONDITION_FLAG type */
+    gchar * user_header;        /* This is !=NULL and gives the name of the user
+				   header against which we make the match */
 } LibBalsaCondition;
 
 /* Filter definition :
@@ -178,13 +180,27 @@ gchar* libbalsa_filter_build_imap_query(FilterOpType, GSList* conditions);
 
 gint filters_prepare_to_run(GSList * filters);
 
-/* filters_run_on_messages run all filters on the list of messages
- * It returns TRUE if the trash bin has been filled with something
- * this is used to call enable_empty_trash after
- * FIXME : No locking is done for now
+/* libbalsa_filter_match run all filters on the list of messages
+   each filter is stuffed with the list of its matching messages
+   you must call libbalsa_filter_apply after to make the filters
+   act on their matching messages (this split is needed for proper
+   locking)
  */
 
-gboolean filters_run_on_messages(GSList * filter_list, GList * messages);
+void libbalsa_filter_match(GSList * filter_list, GList * messages);
+
+/* Same but on mailbox, convenience function that locks the mailbox
+   before calling libbalsa_filter_match */
+
+void libbalsa_filter_match_mailbox(GSList * filter_list, LibBalsaMailbox * mbox);
+
+/* libbalsa_filter_apply will let all filters to apply on their
+ * matching messages (you must call libbalsa_filters_match before)
+ * It returns TRUE if the trash bin has been filled with something
+ * this is used to call enable_empty_trash after
+ */
+
+gboolean libbalsa_filter_apply(GSList * filter_list);
 
 /* libalsa_extract_new_messages : returns a sublist of the messages list containing all
    "new" messages, ie just retrieved mails

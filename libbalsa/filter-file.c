@@ -72,6 +72,8 @@ libbalsa_condition_new_from_config()
     newc->type          = gnome_config_get_int("Type");
     newc->condition_not = gnome_config_get_bool("Condition-not");
     newc->match_fields  = gnome_config_get_int("Match-fields");
+    if (CONDITION_CHKMATCH(newc,CONDITION_MATCH_US_HEAD))
+	newc->user_header = gnome_config_get_string("User-header");
 
     switch(newc->type) {
     case CONDITION_SIMPLE:
@@ -244,12 +246,10 @@ libbalsa_filter_new_from_config(void)
 	g_free(newf->sound);
 	newf->sound=NULL;
     }
-    else FILTER_SETFLAG(newf,FILTER_SOUND);
-    if (newf->popup_text=='\0') {
+    if (newf->popup_text[0]=='\0') {
 	g_free(newf->popup_text);
 	newf->popup_text=NULL;
     }
-    else FILTER_SETFLAG(newf,FILTER_POPUP);
 
     return newf;
 }
@@ -277,6 +277,10 @@ libbalsa_condition_save_config(LibBalsaCondition * cond)
 	gnome_config_clean_key("High-date");
     }
     if (cond->type!=CONDITION_FLAG) gnome_config_clean_key("Flags");
+    if (!CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD))
+	gnome_config_clean_key("User-header");
+    else
+	gnome_config_set_string("User-header",cond->user_header);
 
     switch(cond->type) {
     case CONDITION_SIMPLE:

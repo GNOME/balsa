@@ -308,10 +308,10 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
         filters = libbalsa_mailbox_filters_when(mailbox->filters,
 						FILTER_WHEN_INCOMING);
 	if (filters) {
-	    if (filters_prepare_to_run(filters))
-		filters_run_on_messages(filters, tmp_mailbox->message_list);
-	    /* FIXME : do better error report */
-	    else g_warning("Filter error\n");
+	    if (filters_prepare_to_run(filters)) {
+		libbalsa_filter_match(filters, tmp_mailbox->message_list);
+		libbalsa_filter_apply(filters);
+	    }
 	    g_slist_free(filters);
 	}
 

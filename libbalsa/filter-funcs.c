@@ -75,6 +75,8 @@ libbalsa_condition_free(LibBalsaCondition* cond)
 	/* to avoid warnings */
 	break;
     }
+    if (cond->user_header)
+	g_free(cond->user_header);
     g_free(cond);
 }	                       /* end libbalsa_condition_free() */
 
@@ -96,8 +98,9 @@ libbalsa_condition_new(void)
 
     newc->type = CONDITION_NONE;
     newc->match_fields = CONDITION_EMPTY;
-    newc->condition_not=FALSE;
+    newc->condition_not = FALSE;
     newc->match.string = NULL;
+    newc->user_header = NULL;
     filter_errno=FILTER_NOERR;
 
     return newc;
@@ -132,6 +135,7 @@ libbalsa_condition_clone(LibBalsaCondition* cnd)
     new_cnd->condition_not = cnd->condition_not;
     new_cnd->match_fields  = cnd->match_fields;
     new_cnd->type          = cnd->type;
+    new_cnd->user_header   = g_strdup(cnd->user_header);
     switch (new_cnd->type) {
     case CONDITION_SIMPLE:
         new_cnd->match.string=g_strdup(cnd->match.string);
@@ -207,8 +211,8 @@ condition_regcomp(LibBalsaConditionRegex* cre)
  *
  * Position filter_errno (by calling condition_regcomp)
  */
-static void
-condition_compile_regexs(LibBalsaCondition* cond)
+void
+libbalsa_condition_compile_regexs(LibBalsaCondition* cond)
 {
     GSList * regex;
 
@@ -231,6 +235,8 @@ static void
 filter_condition_validity(LibBalsaFilter* fil, LibBalsaCondition* cond)
 {
     /* Test validity of condition */
+    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD) && (!cond->user_header || cond->user_header[0]=='\0'))
+	FILTER_CLRFLAG(fil,FILTER_VALID);
     switch (cond->type) {
     case CONDITION_SIMPLE:
 	if (!cond->match.string)
@@ -281,7 +287,7 @@ libbalsa_filter_compile_regexs(LibBalsaFilter* fil)
     if (fil->conditions) {
 	GSList * lst;
 	for (lst=fil->conditions;lst && filter_errno==FILTER_NOERR;lst=g_slist_next(lst))
-	    condition_compile_regexs((LibBalsaCondition*) lst->data);
+	    libbalsa_condition_compile_regexs((LibBalsaCondition*) lst->data);
 	if (filter_errno != FILTER_NOERR) {
 	    gchar * errorstring =
                 g_strdup_printf("Unable to compile filter %s", fil->name);
@@ -406,6 +412,7 @@ match_field_decode(LibBalsaCondition* cnd,GString * buffer,gchar * str_format)
 	    str=g_string_append(str,"\"Subject\"");
 	coma=TRUE;
     }
+    /* FIXME : see how to export conditions matching user headers */
     g_string_append(str,"] ");
     if (str->len>3) {
 	gchar * temp=g_strdup_printf(str_format,"header",str->str);

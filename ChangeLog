@@ -1,3 +1,17 @@
+2002-06-03  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/filter-{file,funcs.[hc],private.h}: add ability to
+	filter on user header. 
+	* libbalsa/filter.[hc]: use cond->user_header for filtering.
+	* libbalsa/mailbox_{pop3,local}.c: reception code to use the new
+	filtering funcs (and add correct locking).
+	* src/filter-edit-{callbacks.dialog}.c:
+	* src/filter-edit.h, src/filter-run-callbacks.c: UI for user
+	headers + fix crash on re-edition of cancelled condition edit.
+
+	* libbalsa/mailbox_imap.c: write to cache in binary mode to
+	preserve message sizes (Pawel).
+
 2002-05-28  Carlos Morgado  <chbm@cprm.net>
 
 	* src/sendmsg-window.c (save_message_cb): remove ready_to_send

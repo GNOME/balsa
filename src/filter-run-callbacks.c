@@ -28,6 +28,7 @@
 #include <gnome.h>
 
 #include <string.h>
+
 #include "mailbox-filter.h"
 #include "filter-private.h"
 #include "filter-funcs.h"
@@ -95,7 +96,8 @@ run_filters_on_mailbox(GtkCList * clist,LibBalsaMailbox *mbox)
     if (!filters_prepare_to_run(filters))
 	return FALSE;
     gtk_clist_freeze(GTK_CLIST(balsa_app.mblist));
-    if (filters_run_on_messages(filters,mbox->message_list))
+    libbalsa_filter_match_mailbox(filters,mbox);
+    if (libbalsa_filter_apply(filters))
 	enable_empty_trash(TRASH_FULL);
     gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
     g_slist_free(filters);

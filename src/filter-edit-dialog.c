@@ -57,6 +57,9 @@ GtkWidget *fe_name_entry;
 /* widget for the conditions */
 GtkCList *fe_conditions_list;
 
+/* List of strings in the combo of user headers name */
+GList * fe_user_headers_list;
+
 /* notification field */
 GtkWidget *fe_sound_button;
 GtkWidget *fe_sound_entry;
@@ -155,28 +158,6 @@ build_option_menu(option_list options[], gint num, GtkSignalFunc func)
 
     return (option_menu);
 }				/* end build_option_menu */
-
-/* Free filters associated with clist row */
-void
-fe_free_associated_filters(void)
-{
-    gint row;
-
-    for (row=0;row<fe_filters_list->rows;row++)
-	libbalsa_filter_free((LibBalsaFilter*)
-                             gtk_clist_get_row_data(fe_filters_list,row),
-                             GINT_TO_POINTER(TRUE));
-}
-
-void
-fe_free_associated_conditions(void)
-{
-    gint row;
-
-    for (row=0; row<fe_conditions_list->rows; row++)
-	libbalsa_condition_free((LibBalsaCondition *)
-                                gtk_clist_get_row_data(fe_conditions_list,row));
-}
 
 static void
 fe_clist_unselect_row(GtkWidget * widget, gint row, gint column, 
@@ -416,8 +397,9 @@ build_action_page()
     gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
     gtk_box_pack_start(GTK_BOX(page), frame, FALSE, FALSE, 2);
+    gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
 
-    table = gtk_table_new(2, 2, FALSE);
+    table = gtk_table_new(3, 2, FALSE);
     gtk_container_add(GTK_CONTAINER(frame), table);
 
     /* Notification buttons */
@@ -587,6 +569,7 @@ filters_edit_dialog(void)
     gtk_widget_set_sensitive(fe_right_page, FALSE);
     gtk_box_pack_start(GTK_BOX(hbox), piece, TRUE, TRUE, 2);
 
+    fe_user_headers_list=NULL;
     /* Populate the clist of filters */
 
     for(filter_list=balsa_app.filters; 
@@ -618,6 +601,12 @@ filters_edit_dialog(void)
             LibBalsaCondition *c = (LibBalsaCondition*)cnds->data;
 	    cpfil->conditions = 
                 g_slist_prepend(cpfil->conditions,libbalsa_condition_clone(c));
+
+	    /* If this condition is a match on a user header,
+	       add the user header name to the combo list */
+	    if (CONDITION_CHKMATCH(c,CONDITION_MATCH_US_HEAD) &&
+		c->user_header && c->user_header[0])
+		fe_add_new_user_header(c->user_header);
         }
 	cpfil->conditions=g_slist_reverse(cpfil->conditions);
 
@@ -631,6 +620,8 @@ filters_edit_dialog(void)
 	gtk_clist_set_row_data(fe_filters_list,row,(gpointer)cpfil);
     }
 
+    /* To make sure we have at least one item in the combo list */
+    fe_add_new_user_header("X-Mailer");
     if (filter_errno!=FILTER_NOERR) {
 	filter_perror(filter_strerror(filter_errno));
 	gnome_dialog_close(fe_window);

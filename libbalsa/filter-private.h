@@ -50,6 +50,7 @@
 #define CONDITION_MATCH_FROM    1<<1	/* match in the From: field */
 #define CONDITION_MATCH_SUBJECT 1<<2	/* match in the Subject field */
 #define CONDITION_MATCH_CC      1<<3	/* match in the cc: field */
+#define CONDITION_MATCH_US_HEAD 1<<4    /* match in a user header */
 #define CONDITION_MATCH_BODY    1<<7	/* match in the body */
 
 /* match_fields macros */
@@ -74,8 +75,6 @@ typedef struct _LibBalsaConditionRegex {
 #define FILTER_VALID         1<<1	/* ready to filter (eg regex strings 
 					   have been compiled with regcomp(), with no errors...) */					
 #define FILTER_COMPILED      1<<2	/* the filter needs to be compiled (ie there are uncompiled regex) */
-#define FILTER_SOUND         1<<4	/* play a sound when matches */
-#define FILTER_POPUP         1<<5	/* popup text when matches */
 
 /* flag operation macros */
 #define FILTER_SETFLAG(x, y) ((((LibBalsaFilter*)(x))->flags) |= (y))

@@ -724,7 +724,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
     msg_name   = g_strdup_printf("%s/%u-%u", cache_name, 
                                  LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity,
                                  IMAP_MESSAGE_UID(message));
-    stream = fopen(msg_name,"rt");
+    stream = fopen(msg_name,"rb");
     if(!stream) {
         MESSAGE *msg = safe_calloc(1, sizeof(MESSAGE));
         msg->magic = CLIENT_CONTEXT(mailbox)->magic;
@@ -736,7 +736,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 	if(stream) { /* don't cache negatives */
             FILE * cache;
             mkdir(cache_name, S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
-            cache = fopen(msg_name,"wt");
+            cache = fopen(msg_name,"wb");
             if(! (cache && mutt_copy_stream(stream, cache) ==0) ) 
 		g_warning("Writing to cache file '%s' failed.", msg_name);
             fclose(cache);

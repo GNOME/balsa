@@ -1,4 +1,9 @@
 2000-08-10  Ian Campbell  <ijc25@cam.ac.uk>
+ 
+	* src/balsa-message.c: Fix save_part to properly destroy dialogs
+	on error. Fix a memory leak in find_body_font.
+
+2000-08-10  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/balsa-message.c: Removed obsolete FIXME 
 	* src/pref-manager.c: Use libbalsa_set_charset instead of

@@ -264,6 +264,8 @@ save_part (BalsaPartInfo *info)
   /* button 0 == OK */
   if ( button == 0 ) {
 
+    gtk_widget_hide (GTK_WIDGET(save_dialog));
+
     filename = gtk_entry_get_text (GTK_ENTRY (gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (file_entry))));
     
     if ( ! libbalsa_message_body_save ( info->body, NULL, filename ) )
@@ -273,16 +275,12 @@ save_part (BalsaPartInfo *info)
       
       msg = g_strdup_printf ( _ (" Could not save %s:%s "), filename, strerror (errno));
       
-      gtk_object_destroy(GTK_OBJECT(save_dialog));
-      
       msgbox = gnome_error_dialog_parented (msg, GTK_WINDOW(balsa_app.main_window));
 
-      gnome_dialog_run (GNOME_DIALOG (msgbox));
-      
       g_free(msg);
-      gtk_object_destroy(GTK_OBJECT(msgbox));
+
+      gnome_dialog_run_and_close (GNOME_DIALOG (msgbox));
       
-      return;
     }
   }
 
@@ -822,17 +820,21 @@ get_koi_font_name(const gchar* base, const gchar* code) {
 static gchar*
 find_body_font(LibBalsaMessageBody * body) 
 {
-   gchar * font_name = NULL, *charset;
-
-   charset = libbalsa_message_body_get_parameter(body, "charset");
-
-   if ( charset )
-   {
-      if ( g_strncasecmp(charset,"iso-8859-",9) != 0 ) 
-	return NULL;
+  gchar * font_name = NULL, *charset;
+  
+  charset = libbalsa_message_body_get_parameter(body, "charset");
+  
+  if ( charset )
+  {
+    if ( g_strncasecmp(charset,"iso-8859-",9) != 0 )
+      font_name = NULL;
+    else
       font_name = get_font_name(balsa_app.message_font, atoi(charset+9));
-   } 
-   return font_name;
+  } 
+
+  g_free(charset);
+
+  return font_name;
 }
 
 

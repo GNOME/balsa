@@ -1,3 +1,11 @@
+2000-09-28  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/address-book.c: Don't swap the message between clists if we are in
+	 browse	mode. Credit for the dbl-click in address book stuff
+	 applied on 2000-09-27 should have gone to James A . Laska
+	 <james_laska@yahoo.com> but I forgot. He fixed this too.
+	* src/expand-alias.c: Initialise the lists of data to NULL.
+
 2000-09-28  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* Makefile.am: add bzdist target (is it the right way of doing it?)

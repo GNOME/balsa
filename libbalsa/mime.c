@@ -73,8 +73,6 @@ process_mime_part (Message * message, BODY * bdy, FILE * msg_stream, gchar *repl
 		mutt_decode_attachment (bdy, &s);
 		fflush (s.fpout);
 		alloced = readfile (s.fpout, &ptr);
-		if (ptr)
-		  ptr[alloced - 1] = '\0';
 		if (reply)
 		  {
 		    reply = g_string_append (reply, "\n");

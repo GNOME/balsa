@@ -1,4 +1,3 @@
-
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -705,8 +704,6 @@ other2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
   mutt_decode_attachment (bdy, &s);
   fflush (s.fpout);
   alloced = readfile (s.fpout, &text);
-  if (text)
-    text[alloced - 1] = '\0';
 
   balsa_message_text_item (text, group, 0.0, next_part_height (group), NULL);
 
@@ -1021,8 +1018,6 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gr
 	if( ptr ) {
 		gchar *linktext = "--TEXT--";
 		gboolean showtext, showlink;
-
-		ptr[alloced - 1] = '\0';
 
 		if( g_strcasecmp( bdy->subtype, "html" ) == 0 ) {
 			linktext = "--HTML--";

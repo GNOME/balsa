@@ -387,14 +387,13 @@ idle_handler_cb(GtkWidget * widget)
       if (BALSA_MESSAGE(bmsg)) {
 	 if (message) {
               balsa_message_set(BALSA_MESSAGE(bmsg), message);
-	      balsa_mblist_update_mailbox (balsa_app.mblist, message->mailbox);
+	      mailbox_commit_flagged_changes (message->mailbox); 
 	 } else
               balsa_message_clear (BALSA_MESSAGE (bmsg));
       }
   }
 
   handler = 0;
-  
   balsa_mblist_update_mailbox (balsa_app.mblist, 
 			       BALSA_INDEX(widget)->mailbox);
 

@@ -742,7 +742,6 @@ balsa_mblist_update_mailbox (BalsaMBList * mblist, Mailbox * mailbox)
   /* moving selection to the respective mailbox.
      this is neccessary when the previous mailbox was closed and
      redundant if the mailboxes were switched (notebook_switch_page)
-     The select/unselect pari moves the focus.
   */
   if(gtk_ctree_node_nth (&mblist->ctree,GTK_CLIST(&mblist->ctree)->focus_row)
      != node) {
@@ -751,9 +750,9 @@ balsa_mblist_update_mailbox (BalsaMBList * mblist, Mailbox * mailbox)
      if (gtk_ctree_node_is_visible (&mblist->ctree, node)!=GTK_VISIBILITY_FULL)
 	gtk_ctree_node_moveto (&mblist->ctree,node, 0, 1.0, 0.0);
   }
-
+  
   desc = g_strdup_printf("Shown mailbox: %s with %ld messages, %ld new", 
-			 mailbox->name, mailbox->messages,
+			 mailbox->name, mailbox->total_messages,
 			 mailbox->unread_messages);
   gnome_appbar_set_default (balsa_app.appbar, desc);
   g_free(desc);

@@ -609,10 +609,13 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbo
 	(BALSA_INDEX_PAGE( page ))->sw = NULL; /* This was just toasted */
 	gtk_object_destroy( GTK_OBJECT( page ) );
 
-        /* If this is the last notebook page clear the message preview */
+        /* If this is the last notebook page clear the message preview
+	 and the status bar */
         page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), 0);
-        if (page == NULL)
-            balsa_message_clear (BALSA_MESSAGE( window->preview ));
+        if (page == NULL) {
+	   balsa_message_clear (BALSA_MESSAGE( window->preview ));
+	   gnome_appbar_set_default (balsa_app.appbar, "Mailbox closed");
+	}
       }
 }
 

@@ -397,7 +397,11 @@ balsa_exit (void)
   gtk_main_quit();
 }
 
-
+/* balsa_window_destroy
+   It may be called from balsa_window_destroy or balsa_exit; this is why
+   it should not make assumptions about the presence of the like
+   the notebook and so on.
+*/
 static void
 empty_trash( void )
 {
@@ -416,7 +420,8 @@ empty_trash( void )
 
 	balsa_mailbox_close(balsa_app.trash);
 
-	if ( (page=balsa_find_notebook_page(balsa_app.trash)))
+	if ( balsa_app.notebook && 
+	     (page=balsa_find_notebook_page(balsa_app.trash)))
 		balsa_index_page_reset( page );
 }
 

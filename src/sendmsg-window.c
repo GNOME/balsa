@@ -276,7 +276,8 @@ static void
 balsa_sendmsg_destroy (BalsaSendmsg * bsm)
 {
    int i;
-   gchar  newStr[sizeof(headerDescs)/sizeof(headerDescs[0])*20];
+   gchar newStr[ELEMENTS(headerDescs)*20]; /* assumes that longest header ID
+					      has no more than 19 characters */
 
    g_assert(bsm != NULL);
    
@@ -295,9 +296,9 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
    gtk_widget_destroy (bsm->window);
    if(balsa_app.debug) printf("balsa_sendmsg_destroy: Freeing bsm\n");
    g_free (bsm);
-   bsm = NULL; /* useless - it is just a local variable... */
 }
 
+/* remove_attachment - right mouse button callback */
 static void
 remove_attachment (GtkWidget * widget, GnomeIconList * ilist)
 {
@@ -325,7 +326,6 @@ create_popup_menu (GnomeIconList * ilist, gint num)
 }
 
 /* select_icon --------------------------------------------------------------
-
    This signal is emitted when an icon becomes selected. If the event
    argument is NULL, then it means the icon became selected due to a
    range or rubberband selection. If it is non-NULL, it means the icon
@@ -418,6 +418,7 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
   gtk_widget_destroy (GTK_WIDGET (fs));
 }
 
+/* attach_clicked - menu and toolbar callback */
 static gint
 attach_clicked (GtkWidget * widget, gpointer data)
 {
@@ -447,6 +448,7 @@ attach_clicked (GtkWidget * widget, gpointer data)
   return TRUE;
 }
 
+/* attachments_add - attachments field D&D callback */
 static void
 attachments_add (GtkWidget * widget,
 		 GdkDragContext * context,
@@ -469,6 +471,7 @@ attachments_add (GtkWidget * widget,
   gnome_uri_list_free_strings (names);
 }
 
+/* to_add - e-mail (To, From, Cc, Bcc) field D&D callback */
 static void
 to_add (GtkWidget * widget,
 		 GdkDragContext * context,
@@ -519,6 +522,10 @@ create_email_entry(GtkWidget* table, const gchar * label, int y_pos,
 		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 }
 
+/* create_info_pane 
+   creates upper panel with the message headers: From, To, ... and 
+   returns it.
+*/
 static GtkWidget *
 create_info_pane (BalsaSendmsg * msg, SendType type)
 {
@@ -632,8 +639,8 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   return table;
 }
 
-/* create_text_area should not have any hard-coded assumptions about the 
-   font charset that is to be used.
+/* create_text_area 
+   Creates the text entry part of the compose window.
 */
 static GtkWidget *
 create_text_area (BalsaSendmsg * msg)
@@ -715,7 +722,6 @@ quoteBody(BalsaSendmsg *msg, Message * message, SendType type)
 
    gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, 
 		    str, strlen (str));
-   
    g_free (str);
 
    rbdy = content2reply (message, 
@@ -759,6 +765,7 @@ fillBody(BalsaSendmsg *msg, Message * message, SendType type)
   }
   gtk_editable_set_position( GTK_EDITABLE(msg->text), 0);
 }
+
 
 BalsaSendmsg *
 sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
@@ -810,8 +817,8 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
   msg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS    ].widget;
   msg->ready_widgets[1] = file_menu[MENU_FILE_POSTPONE_POS].widget;
-  msg->ready_widgets[2] = file_menu[TOOL_SEND_POS         ].widget;
-  msg->ready_widgets[3] = file_menu[TOOL_POSTPONE_POS     ].widget;
+  msg->ready_widgets[2] = main_toolbar[TOOL_SEND_POS      ].widget;
+  msg->ready_widgets[3] = main_toolbar[TOOL_POSTPONE_POS  ].widget;
 /* create the top portion with the to, from, etc in it */
   gtk_paned_add1 (GTK_PANED(paned), create_info_pane (msg, type));
 
@@ -1013,12 +1020,9 @@ read_signature (void)
     return NULL;
   len = readfile (fp, &ret);
   fclose (fp);
-  if (len > 0) {
-    if (ret[len - 1] == '\n')
-      ret[len - 1] = '\0';
-    else
-      ret[len] = '\0';
-  }
+  if (len > 0 && ret[len - 1] == '\n')
+     ret[len - 1] = '\0';
+
   return ret;
 }
 
@@ -1093,7 +1097,10 @@ static gint include_file_cb (GtkWidget *widget, BalsaSendmsg *bsmsg) {
 }
 
 
-static gint 
+/* is_ready_to_send returns TRUE if the message is ready to send or 
+   postpone. It tests currently only the "To" field
+*/
+static gboolean
 is_ready_to_send(BalsaSendmsg * bsmsg) {
    gchar *tmp;
    size_t len;
@@ -1118,16 +1125,15 @@ is_ready_to_send(BalsaSendmsg * bsmsg) {
    return TRUE;
 }
 
-
-static gint
-send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
+/* bsmsg2message
+   creates Message struct based on given BalsaMessage
+*/
+static Message *
+bsmsg2message(BalsaSendmsg *bsmsg)
 {
-  Message *message;
-  Body *body;
-  gchar *tmp;
-  gchar *def_charset;
-
-  if(! is_ready_to_send(bsmsg)) return FALSE;
+  Message * message;
+  Body * body;
+  gchar * tmp;
 
   message = message_new ();
 
@@ -1137,13 +1143,57 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   message->subject = g_strdup (gtk_entry_get_text 
 			       (GTK_ENTRY (bsmsg->subject[1])));
 
-  message->to_list = make_list_from_string (gtk_entry_get_text
-					    (GTK_ENTRY (bsmsg->to[1])));
-  message->cc_list = make_list_from_string (gtk_entry_get_text 
-					    (GTK_ENTRY (bsmsg->cc[1])));
-  message->bcc_list = make_list_from_string (gtk_entry_get_text 
-					     (GTK_ENTRY (bsmsg->bcc[1])));
+  message->to_list = make_list_from_string (
+     gtk_entry_get_text (GTK_ENTRY (bsmsg->to[1])));
+  message->cc_list = make_list_from_string (
+     gtk_entry_get_text (GTK_ENTRY (bsmsg->cc[1])));
+  message->bcc_list = make_list_from_string (
+     gtk_entry_get_text (GTK_ENTRY (bsmsg->bcc[1])));
   
+  if( (tmp = gtk_entry_get_text (GTK_ENTRY (bsmsg->reply_to[1]))) != NULL &&
+      strlen(tmp)>0) 
+     message->reply_to = make_address_from_string(tmp);
+
+  body = body_new ();
+
+  body->buffer = gtk_editable_get_chars(GTK_EDITABLE (bsmsg->text), 0,
+					gtk_text_get_length (
+					   GTK_TEXT (bsmsg->text)));
+  if(balsa_app.wordwrap)
+     wrap_string (body->buffer, balsa_app.wraplength);
+
+  body->charset = g_strdup(bsmsg->charset);
+
+  message->body_list = g_list_append (message->body_list, body);
+
+  {				/* handle attachments */
+    gint i;
+    for (i = 0; i < GNOME_ICON_LIST (bsmsg->attachments[1])->icons; i++) {
+      body = body_new ();
+	/* PKGW: This used to be g_strdup'ed. However, the original pointer 
+	   was strduped and never freed, so we'll take it. */
+      body->filename = (gchar *) 
+	 gnome_icon_list_get_icon_data(GNOME_ICON_LIST(bsmsg->attachments[1]),
+				      i);
+      message->body_list = g_list_append (message->body_list, body);
+    }
+  }
+
+  return message;
+}
+
+/* "send message" menu and toolbar callback */
+static gint
+send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+  Message *message;
+  gchar *tmp;
+  gchar *def_charset;
+
+  if(! is_ready_to_send(bsmsg)) return FALSE;
+
+  message = bsmsg2message(bsmsg);
+
   tmp = gtk_entry_get_text (GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry));
   message->fcc_mailbox = NULL;
   if (balsa_app.mailbox_nodes && tmp != NULL) {
@@ -1168,36 +1218,6 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
       }
     }
   }
-
-  if( (tmp = gtk_entry_get_text (GTK_ENTRY (bsmsg->reply_to[1]))) != NULL &&
-      strlen(tmp)>0) 
-     message->reply_to = make_address_from_string(tmp);
-
-  body = body_new ();
-
-  body->buffer = gtk_editable_get_chars ( GTK_EDITABLE (bsmsg->text), 0, -1);
-  if(balsa_app.wordwrap)
-    wrap_string (body->buffer, balsa_app.wraplength);
-  body->charset = g_strdup(bsmsg->charset);
-
-  message->body_list = g_list_append (message->body_list, body);
-  
-
-  {				/* handle attachments */
-    gint i;
-    Body *abody;
-
-    for (i = 0; i < GNOME_ICON_LIST (bsmsg->attachments[1])->icons; i++)
-      {
-	abody = body_new ();
-	/* PKGW: This used to be g_strdup'ed. However, the original pointer 
-	   was strduped and never freed, so we'll take it. */
-	abody->filename = (gchar *) gnome_icon_list_get_icon_data 
-	   (GNOME_ICON_LIST (bsmsg->attachments[1]), i);
-	message->body_list = g_list_append (message->body_list, abody);
-      }
-  }
-
 
   /* not a really nice way of setting and restoring charset..  */
   def_charset =  balsa_app.charset;
@@ -1235,58 +1255,15 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   return TRUE;
 }
 
+/* "postpone message" menu and toolbar callback */
 static gint
 postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
   Message *message;
-  Body *body;
-  gchar *tmp;
 
   if(! is_ready_to_send(bsmsg) ) return FALSE;
 
-  message = message_new ();
-
-  message->from = make_address_from_string(gtk_entry_get_text 
-					   (GTK_ENTRY (bsmsg->from[1])));
-
-  message->subject = g_strdup (gtk_entry_get_text 
-			       (GTK_ENTRY (bsmsg->subject[1])));
-
-  message->to_list = make_list_from_string (
-     gtk_entry_get_text (GTK_ENTRY (bsmsg->to[1])));
-  message->cc_list = make_list_from_string (
-     gtk_entry_get_text (GTK_ENTRY (bsmsg->cc[1])));
-  message->bcc_list = make_list_from_string (
-     gtk_entry_get_text (GTK_ENTRY (bsmsg->bcc[1])));
-  
-  if( (tmp = gtk_entry_get_text (GTK_ENTRY (bsmsg->reply_to[1]))) != NULL &&
-      strlen(tmp)>0) 
-     message->reply_to = make_address_from_string(tmp);
-
-
-  body = body_new ();
-
-  body->buffer = gtk_editable_get_chars(GTK_EDITABLE (bsmsg->text), 0,
-					gtk_text_get_length (
-					   GTK_TEXT (bsmsg->text)));
-  body->charset = g_strdup(bsmsg->charset);
-
-  message->body_list = g_list_append (message->body_list, body);
-
-  {				/* handle attachments */
-    gint i;
-    Body *abody;
-
-    for (i = 0; i < GNOME_ICON_LIST (bsmsg->attachments[1])->icons; i++) {
-      abody = body_new ();
-      /* PKGW: see above about why this isn't strduped. */
-      abody->filename = (gchar *) 
-	gnome_icon_list_get_icon_data(GNOME_ICON_LIST(bsmsg->attachments[1]),
-				      i);
-      message->body_list = g_list_append (message->body_list, abody);
-    }
-  }
-  
+  message = bsmsg2message(bsmsg);
 
   if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL)
       && bsmsg->orig_message)
@@ -1424,16 +1401,19 @@ reflow_body_cb (GtkWidget * widget, BalsaSendmsg *bsmsg) {
    do_reflow(GTK_TEXT(bsmsg->text), -1);
 }
 
+/* To field "changed" signal callback. */
 static void
 check_readiness(GtkEditable *w, BalsaSendmsg *msg) 
 {
    gint i;
-   gint state = is_ready_to_send(msg);
+   gboolean state = is_ready_to_send(msg);
 
-   for(i=0; i<sizeof(msg->ready_widgets)/sizeof(msg->ready_widgets[0]); i++) 
+   for(i=0; i<ELEMENTS(msg->ready_widgets); i++)
       gtk_widget_set_sensitive(msg->ready_widgets[i], state);
 }
 
+/* toggle_entry auxiliary function for "header show/hide" toggle menu entries.
+ */
 static gint 
 toggle_entry (GtkWidget *entry[], int pos, int cnt)
 {
@@ -1514,11 +1494,8 @@ static void set_menus(BalsaSendmsg *msg)
 }
 
 /* hardcoded charset set :
-   text is the GtkText message edit widget, code is the iso-8859 character 
-   set encoding and pos is the menu position.
-   gtk_text_set_point doesn't work.
-   gtk_text_get_point doesn't work if the cursor pointer position was changed
-   by a mouse click
+   msg is the compose window, code is the iso-8859 character and
+   idx - corresponding entry index in iso_charset_names and similar.
 */
 
 

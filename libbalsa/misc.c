@@ -101,6 +101,9 @@ make_string_from_list (GList * the_list)
   return retc;
 }
 
+/* readfile allocates enough space for the ending '\0' characeter as well.
+   returns the number of read characters.
+*/
 size_t
 readfile (FILE * fp, char **buf)
 {
@@ -123,7 +126,7 @@ readfile (FILE * fp, char **buf)
 
   lseek (fd, 0, SEEK_SET);
 
-  *buf = (char *) g_malloc (size);
+  *buf = (char *) g_malloc (size+1);
   if (*buf == NULL)
     {
       return -1;
@@ -146,7 +149,7 @@ readfile (FILE * fp, char **buf)
 	  return -1;
 	}
     }
-
+  (*buf)[size] = '\0';
   return size;
 }
 

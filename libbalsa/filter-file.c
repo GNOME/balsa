@@ -59,8 +59,6 @@ filter_load (GList * filter_list, gchar * filter_file)
     }
 
   len = readfile (fp, &buf);
-  if (len != 0)
-    buf[len - 1] = '\0';
   fclose (fp);
 
   return (0);

@@ -898,19 +898,10 @@ lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
 	g_mime_message_get_date(mime_msg, &headers->date, NULL);
 
     if (!headers->to_list) {
-	const InternetAddressList *addy, *start;
+	const InternetAddressList *start;
 	start = g_mime_message_get_recipients(mime_msg,
 					      GMIME_RECIPIENT_TYPE_TO);
-	for (addy = start; addy; addy = addy->next) {
-	    LibBalsaAddress *addr = addr = libbalsa_address_new();
-	    addr->full_name = g_strdup(addy->address->name);
-	    addr->address_list =
-		g_list_append(addr->address_list,
-			      g_strdup(addy->address->value.addr));
-	    if (addr)
-		headers->to_list = g_list_prepend(headers->to_list, addr);
-	}
-	headers->to_list = g_list_reverse(headers->to_list);
+	headers->to_list = libbalsa_address_new_list_from_gmime(start);
     }
 
     if (!headers->content_type) {
@@ -945,35 +936,17 @@ lb_message_headers_extra_from_gmime(LibBalsaMessageHeaders *headers,
         headers->dispnotify_to = libbalsa_address_new_from_gmime(g_mime_message_get_header(mime_msg, "Disposition-Notification-To"));
 
     if (!headers->cc_list) {
-	const InternetAddressList *addy, *start;
+	const InternetAddressList *start;
 	start = g_mime_message_get_recipients(mime_msg,
 					      GMIME_RECIPIENT_TYPE_CC);
-	for (addy = start; addy; addy = addy->next) {
-	    LibBalsaAddress *addr = addr = libbalsa_address_new();
-	    addr->full_name = g_strdup(addy->address->name);
-	    addr->address_list =
-		g_list_append(addr->address_list,
-			      g_strdup(addy->address->value.addr));
-            headers->cc_list = g_list_prepend(headers->cc_list, addr);
-	}
-	headers->cc_list = g_list_reverse(headers->cc_list);
+	headers->cc_list = libbalsa_address_new_list_from_gmime(start);
     }
 
     if (!headers->bcc_list) {
-	const InternetAddressList *addy, *start;
+	const InternetAddressList *start;
 	start = g_mime_message_get_recipients(mime_msg,
 					      GMIME_RECIPIENT_TYPE_BCC);
-	for (addy = start; addy; addy = addy->next) {
-	    LibBalsaAddress *addr = addr = libbalsa_address_new();
-	    addr->full_name = g_strdup(addy->address->name);
-	    addr->address_list =
-		g_list_append(addr->address_list,
-			      g_strdup(addy->address->value.addr));
-	    if (addr)
-		headers->bcc_list =
-		    g_list_prepend(headers->bcc_list, addr);
-	}
-	headers->bcc_list = g_list_reverse(headers->bcc_list);
+	headers->bcc_list = libbalsa_address_new_list_from_gmime(start);
     }
 
     /* Get fcc from message */

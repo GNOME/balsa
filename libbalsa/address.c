@@ -159,30 +159,63 @@ libbalsa_address_set_copy(LibBalsaAddress *dest, LibBalsaAddress *src)
     dest->address_list = g_list_reverse(dest->address_list);
 }
 
-GList*
+GList *
+libbalsa_address_new_list_from_gmime(const InternetAddressList *
+                                     address_list)
+{
+    const InternetAddressList *list;
+    GList *lst = NULL;
+
+    for (list = address_list; list; list = list->next) {
+        InternetAddress *internet_address = list->address;
+        LibBalsaAddress *addr;
+
+        if (internet_address->type == INTERNET_ADDRESS_NONE)
+            continue;
+
+        addr = libbalsa_address_new();
+        addr->full_name = g_strdup(internet_address->name);
+        if (internet_address->type == INTERNET_ADDRESS_NAME)
+            addr->address_list =
+                g_list_append(addr->address_list,
+                              g_strdup(internet_address->value.addr));
+        else if (internet_address->type == INTERNET_ADDRESS_GROUP) {
+            InternetAddressList *member;
+
+            for (member = internet_address->value.members; member;
+                 member = member->next) {
+                InternetAddress *member_address = member->address;
+
+                if (member_address->type != INTERNET_ADDRESS_NAME) {
+                    g_message("Ignoring non-name address");
+                    continue;
+                }
+                addr->address_list =
+                    g_list_append(addr->address_list,
+                                  g_strdup(member_address->value.addr));
+            }
+        }                       /* else not reached */
+        lst = g_list_prepend(lst, addr);
+    }
+
+    return g_list_reverse(lst);
+}
+
+GList *
 libbalsa_address_new_list_from_string(const gchar * str)
 {
-    LibBalsaAddress* addr;
-    InternetAddressList *list, *l;
-    GList* lst = NULL;
+    gchar *tmp;
+    InternetAddressList *address_list;
+    GList *lst;
 
-    gchar *tmp = g_strdup(str);
-    
+    tmp = g_strdup(str);
     libbalsa_utf8_sanitize(&tmp, FALSE, NULL);
-    l = list = internet_address_parse_string(tmp);
+    address_list = internet_address_parse_string(tmp);
     g_free(tmp);
-    if (!list)
-	return NULL;
 
-    while(list) {
-	addr = libbalsa_address_new();
-	addr->full_name = g_strdup(list->address->name);
-	addr->address_list = g_list_append(addr->address_list, 
-					   g_strdup(list->address->value.addr));
-	lst = g_list_append(lst, addr);
-	list = list->next;
-    }
-    internet_address_list_destroy(l);
+    lst = libbalsa_address_new_list_from_gmime(address_list);
+    internet_address_list_destroy(address_list);
+
     return lst;
 }
 

@@ -24,6 +24,7 @@
 #define __LIBBALSA_ADDRESS_H__
 
 #include <gtk/gtk.h>
+#include <gmime/gmime.h>
 
 #define LIBBALSA_TYPE_ADDRESS				(libbalsa_address_get_type())
 #define LIBBALSA_ADDRESS(obj)				(G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_ADDRESS, LibBalsaAddress))
@@ -93,6 +94,8 @@ LibBalsaAddress *libbalsa_address_new(void);
 LibBalsaAddress *libbalsa_address_new_from_string(const gchar * address);
 void libbalsa_address_set_copy(LibBalsaAddress *dest, LibBalsaAddress *src);
 gchar *libbalsa_address_to_gchar(LibBalsaAddress * address, gint n);
+GList *libbalsa_address_new_list_from_gmime(const InternetAddressList *
+                                            address_list);
 GList *libbalsa_address_new_list_from_string(const gchar * address);
 
 /* get pointer to descriptive name (full name if available, or e-mail) */

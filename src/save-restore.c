@@ -291,6 +291,7 @@ config_mailbox_add (LibBalsaMailbox * mailbox, const char *key_arg)
        Server = ...;
        Check = 0 | 1;
        Delete =  0 | 1;
+       Apop = 0 | 1;
     */
     mbox_dict = pl_dict_add_str_str (NULL, "Type", "POP3");
     pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
@@ -319,6 +320,8 @@ config_mailbox_add (LibBalsaMailbox * mailbox, const char *key_arg)
       
       snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3(mailbox)->delete_from_server);
       pl_dict_add_str_str (mbox_dict, "Delete", tmp);
+      snprintf (tmp,  sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3(mailbox)->use_apop);
+      pl_dict_add_str_str (mbox_dict, "Apop", tmp);
     }
     
     if ((LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid) != NULL)
@@ -611,6 +614,11 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 	LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid = NULL;
       else
 	LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup (field);
+
+      if ((field = pl_dict_get_str (mbox, "Apop")) == NULL)
+	LIBBALSA_MAILBOX_POP3 (mailbox)->use_apop = FALSE;
+      else
+	LIBBALSA_MAILBOX_POP3 (mailbox)->use_apop = atol (field);
 
       balsa_app.inbox_input =
 	g_list_append (balsa_app.inbox_input, mailbox);

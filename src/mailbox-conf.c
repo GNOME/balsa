@@ -87,7 +87,7 @@ struct _MailboxConfWindow
     GtkWidget *pop_password;
     GtkWidget *pop_check;
     GtkWidget *pop_delete_from_server;
-
+    GtkWidget *pop_apop;
   };
 
 static MailboxConfWindow *mcw;

@@ -3593,8 +3593,6 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    GList *draft_entry;
-
     if (!message_postpone(bsmsg))
         return;
 
@@ -3606,9 +3604,7 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     bsmsg->type = SEND_CONTINUE;
 
     libbalsa_mailbox_open(balsa_app.draftbox);
-    draft_entry = g_list_last(balsa_app.draftbox->message_list);
-    bsmsg->orig_message = LIBBALSA_MESSAGE(draft_entry->data);
-    bsmsg->orig_message->mailbox = balsa_app.draftbox;
+    bsmsg->orig_message = balsa_app.draftbox->message_list->data;
     g_object_ref(G_OBJECT(bsmsg->orig_message));
 }
 

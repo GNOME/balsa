@@ -283,7 +283,7 @@ libbalsa_server_load_config(LibBalsaServer * server, gint default_port)
 	server->port = default_port;
     server->user = gnome_config_private_get_string("Username");
     server->passwd = gnome_config_private_get_string("Password");
-    if(server->passwd[0] == '\0') {
+    if(server->passwd && server->passwd[0] == '\0') {
 	g_free(server->passwd);
 	server->passwd = NULL;
     }

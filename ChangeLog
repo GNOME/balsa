@@ -1,3 +1,8 @@
+2001-04-16  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/server.c: (libbalsa_server_load_config) fix bug #52914
+	(mailboxes without password field in config)
+
 2001-04-15  Matthew Guenther  <guentherm@asme.org>
 
 	* src/balsa-index.[hc]: Add balsa_index_set_first_new_message to

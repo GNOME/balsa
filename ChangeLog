@@ -1,3 +1,15 @@
+2004-09-29  Pawel Salek
+
+	* libbalsa/address-book-ldap.c: compare result with LDAP_OPT_SUCCESS
+	* libbalsa/mailbox.[hc]: add capability query function (until
+	client side IMAP sorting and threading is implemented).
+	* libbalsa/mailbox_imap.c: add its implementation.
+	* libbalsa/send.c: change flags more carefully.
+	* src/folder-conf.c: "Show INBOX" was not saved on edition due to
+	incorrect statement order.
+	* src/main-window.c: touch-ui fixes.
+	* src/save-restore.c: do not crash on corrupted config.
+
 2004-09-28 13:58  Albrecht Dreß <albrecht.dress@arcor.de>
 
 	* src/balsa-message.c: fix one line dropped in commit.

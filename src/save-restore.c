@@ -1853,8 +1853,10 @@ load_mru(GList **mru)
     
     count=d_get_gint("MRUCount", 0);
     for(i=0;i<count;i++) {
+        gchar *val;
 	sprintf(tmpkey, "MRU%d", i+1);
-	(*mru)=g_list_append((*mru), gnome_config_get_string(tmpkey));
+        if( (val = gnome_config_get_string(tmpkey)) != NULL )
+            (*mru)=g_list_append((*mru), val);
     }
 }
 

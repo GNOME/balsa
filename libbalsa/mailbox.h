@@ -141,6 +141,10 @@ typedef enum {
 } LibBalsaChkCryptoMode;
 #endif
 
+enum LibBalsaMailboxCapability {
+    LIBBALSA_MAILBOX_CAN_SORT,
+    LIBBALSA_MAILBOX_CAN_THREAD
+};
 
 /*
  * structures
@@ -269,6 +273,8 @@ struct _LibBalsaMailboxClass {
 				       LibBalsaMessageFlag clear);
     gboolean (*messages_copy) (LibBalsaMailbox * mailbox, GArray *msgnos,
 			       LibBalsaMailbox * dest);
+    gboolean (*can_do) (LibBalsaMailbox *mailbox,
+                        enum LibBalsaMailboxCapability cap);
     void (*set_threading) (LibBalsaMailbox * mailbox,
 			   LibBalsaMailboxThreadingType thread_type);
     void (*update_view_filter) (LibBalsaMailbox * mailbox,
@@ -436,6 +442,9 @@ void libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
 void libbalsa_mailbox_set_view_filter(LibBalsaMailbox   *mailbox,
                                       LibBalsaCondition *filter_condition,
                                       gboolean update_immediately);
+
+gboolean libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
+                                 enum LibBalsaMailboxCapability cap);
 
 /** libbalsa_mailbox_set_threading() uses backend-optimized threading mode
     to produce a tree of messages. The tree is put in msg_tree and used

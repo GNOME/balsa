@@ -59,6 +59,8 @@ static gboolean
 libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
                                     GArray * msgnos,
                                     LibBalsaMailbox * dest);
+static gboolean libbalsa_mailbox_real_can_do(LibBalsaMailbox* mbox,
+                                             enum LibBalsaMailboxCapability c);
 static void libbalsa_mailbox_real_sort(LibBalsaMailbox* mbox,
                                        GArray *sort_array);
 static gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox  *mailbox,
@@ -223,6 +225,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->change_message_flags = NULL;
     klass->messages_change_flags = libbalsa_mailbox_real_messages_change_flags;
     klass->messages_copy  = libbalsa_mailbox_real_messages_copy;
+    klass->can_do = libbalsa_mailbox_real_can_do;
     klass->set_threading = NULL;
     klass->update_view_filter = NULL;
     klass->sort = libbalsa_mailbox_real_sort;
@@ -1764,6 +1767,25 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
     }
     libbalsa_unlock_mailbox(mailbox);
 }
+
+/* Inquire method: check whether mailbox driver can perform operation
+   in question. In principle, all operations should be supported but
+   some of them may be expensive under certain circumstances and are
+   best avoided. */
+static gboolean
+libbalsa_mailbox_real_can_do(LibBalsaMailbox* mbox,
+                             enum LibBalsaMailboxCapability cap)
+{
+    return TRUE;
+}
+
+gboolean
+libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
+                        enum LibBalsaMailboxCapability cap)
+{
+    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->can_do(mailbox, cap);
+}
+
 
 #if CACHE_UNSEEN_CHILD
 /* GNode traverse func, called top-down: clear the current node's

@@ -194,11 +194,6 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     libbalsa_server_set_password(s,
                                  gtk_entry_get_text(GTK_ENTRY
                                                     (fcw->password)));
-    /* Set host after all other server changes, as it triggers
-     * save-to-config for any folder or mailbox using this server. */
-    libbalsa_server_set_host(s, host, 
-                             balsa_server_conf_get_use_ssl(&fcw->bsc));
-
     if (!fcw->mbnode) {
         fcw->mbnode = balsa_mailbox_node_new_imap_folder(s, NULL);
 	/* mbnode will be unrefed in folder_conf_response. */
@@ -219,6 +214,11 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->subscribed));
     fcw->mbnode->list_inbox =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->list_inbox));
+
+    /* Set host after all other server changes, as it triggers
+     * save-to-config for any folder or mailbox using this server. */
+    libbalsa_server_set_host(s, host, 
+                             balsa_server_conf_get_use_ssl(&fcw->bsc));
 
     if (insert) {
 	balsa_mblist_mailbox_node_append(NULL, fcw->mbnode);

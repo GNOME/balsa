@@ -243,7 +243,7 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
     /* ignore error if the V3 LDAP cannot be set */
     v3_enabled = 
         ldap_set_option(ab->directory, LDAP_OPT_PROTOCOL_VERSION, &version)
-       == LDAP_SUCCESS;
+       == LDAP_OPT_SUCCESS;
     if(!v3_enabled) ldap_perror(ab->directory, "ldap_set_option");
     if(v3_enabled && ab->enable_tls) {
 #ifdef HAVE_LDAP_TLS

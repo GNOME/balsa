@@ -146,6 +146,8 @@ static gboolean lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox,
                                                GArray * seqno,
                                               LibBalsaMessageFlag set,
                                               LibBalsaMessageFlag clear);
+static gboolean libbalsa_mailbox_imap_can_do(LibBalsaMailbox* mbox,
+                                             enum LibBalsaMailboxCapability c);
 
 static void libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 						LibBalsaMailboxThreadingType
@@ -257,6 +259,8 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
 	libbalsa_mailbox_imap_change_message_flags;
     libbalsa_mailbox_class->messages_change_flags =
 	lbm_imap_messages_change_flags;
+    libbalsa_mailbox_class->can_do =
+	libbalsa_mailbox_imap_can_do;
     libbalsa_mailbox_class->set_threading =
 	libbalsa_mailbox_imap_set_threading;
     libbalsa_mailbox_class->update_view_filter =
@@ -1964,8 +1968,9 @@ append_str(const char *buf, int buflen, void *arg)
     struct part_data *dt = (struct part_data*)arg;
 
     if(dt->pos + buflen > dt->body->octets) {
+        /* 
         fprintf(stderr, "IMAP server sends too much data but we just "
-                "reallocate the block.\n");
+                "reallocate the block.\n"); */
 	dt->body->octets = dt->pos + buflen;
 	dt->block = g_realloc(dt->block, dt->body->octets);
     }
@@ -2292,6 +2297,24 @@ lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox, GArray * seqno,
 	return TRUE;
     } else
 	return FALSE;
+}
+
+static gboolean
+libbalsa_mailbox_imap_can_do(LibBalsaMailbox* mbox,
+                             enum LibBalsaMailboxCapability c)
+{
+    LibBalsaMailboxImap *mimap;
+    if(!mbox)
+        return TRUE;
+    mimap = LIBBALSA_MAILBOX_IMAP(mbox);
+    switch(c) {
+    case LIBBALSA_MAILBOX_CAN_SORT:
+        return imap_mbox_handle_can_do(mimap->handle, IMCAP_SORT);
+    case LIBBALSA_MAILBOX_CAN_THREAD:
+        return imap_mbox_handle_can_do(mimap->handle, IMCAP_THREAD_REFERENCES);
+    default:
+        return TRUE;
+    }
 }
 
 static ImapSortKey

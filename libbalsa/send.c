@@ -770,7 +770,7 @@ disp_recipient_status(smtp_recipient_t recipient,
 }
 
 static void
-handle_successful_send (smtp_message_t message, void *be_verbose)
+handle_successful_send(smtp_message_t message, void *be_verbose)
 {
     MessageQueueItem *mqi;
     const smtp_status_t *status;
@@ -783,10 +783,14 @@ handle_successful_send (smtp_message_t message, void *be_verbose)
     if (mqi != NULL)
       mqi->refcount--;
 
-    messages = g_list_prepend(NULL, mqi->orig);
-    libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                                  FALSE);
-    g_list_free(messages);
+    if(mqi != NULL && mqi->orig != NULL && mqi->orig->mailbox) {
+        messages = g_list_prepend(NULL, mqi->orig);
+        libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_FLAGGED,
+                                      FALSE);
+        g_list_free(messages);
+    } else printf("mqi: %p mqi->orig: %p mqi->orig->mailbox: %p\n",
+                  mqi, mqi ? mqi->orig : NULL, 
+                  mqi&&mqi->orig ? mqi->orig->mailbox : NULL);
     status = smtp_message_transfer_status (message);
     if (status->code / 100 == 2) {
 	if (mqi != NULL && mqi->orig != NULL && mqi->refcount <= 0 &&
@@ -799,13 +803,20 @@ handle_successful_send (smtp_message_t message, void *be_verbose)
 	    if (mqi->orig->mailbox && fccurl) {
                 LibBalsaMailbox *fccbox = mqi->finder(fccurl[1]);
                 remove = libbalsa_mailbox_copy_message(mqi->orig, fccbox)>=0;
+                if(!remove) 
+                    libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
+                                         _("Saving sent message to %s failed"),
+                                         fccbox->url);
             }
-            if(remove) {
-                messages = g_list_prepend(NULL, mqi->orig);
-                libbalsa_messages_change_flag
-                    (messages, LIBBALSA_MESSAGE_FLAG_DELETED, TRUE);
-                g_list_free(messages);
-	    }
+            /* If copy failed, mark the message again as flagged -
+               otherwise it will get resent again. And again, and
+               again... */
+            messages = g_list_prepend(NULL, mqi->orig);
+            libbalsa_messages_change_flag
+                (messages, 
+                 remove ? LIBBALSA_MESSAGE_FLAG_DELETED : 
+                 LIBBALSA_MESSAGE_FLAG_FLAGGED, TRUE);
+            g_list_free(messages);
 	}
     } else {
 	/* XXX - Show the poor user the status codes and message. */

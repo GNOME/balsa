@@ -637,7 +637,7 @@ static GnomeUIInfo message_menu[] = {
         GNOME_APP_UI_ITEM, N_("_View Source..."),
         N_("View source form of the message"),
         view_msg_source_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-        GNOME_STOCK_BOOK_OPEN, 'v', GDK_CONTROL_MASK, NULL
+        GNOME_STOCK_BOOK_OPEN, 'U', GDK_CONTROL_MASK, NULL
     },
 	GNOMEUIINFO_SEPARATOR,   
 #define MENU_MESSAGE_COPY_POS 11
@@ -931,7 +931,7 @@ static GnomeUIInfo tu_view_more_menu[] = {
     GNOMEUIINFO_TOGGLEITEM(N_("_Wrap"), N_("Wrap message lines"),
                            wrap_message_cb, NULL),
     GNOMEUIINFO_SUBTREE(N_("_Sort Mailbox"), tu_view_sort_menu),
-    GNOMEUIINFO_SUBTREE(N_("_Hide messages"), mailbox_hide_menu),
+    GNOMEUIINFO_SUBTREE(N_("H_ide messages"), mailbox_hide_menu),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_VIEW_EXPAND_ALL_POS (MENU_VIEW_NEXT_FLAGGED_POS+7)
     { GNOME_APP_UI_ITEM, N_("E_xpand All"),
@@ -1655,17 +1655,20 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
         &tu_mailbox_menu[MENU_MAILBOX_EXPUNGE_POS],
         &tu_mailbox_menu[MENU_MAILBOX_CLOSE_POS],
         &tu_tools_filters_menu[TOOLS_SELECT_FILTER_POS],
-        &tu_sort_l_menu[VIEW_SORT_MSGNO_POS],
-        &tu_sort_l_menu[VIEW_SORT_SENDER_POS],
-        &tu_sort_l_menu[VIEW_SORT_SUBJECT_POS],
-        &tu_sort_l_menu[VIEW_SORT_MSGNO_POS],
-        &tu_sort_l_menu[VIEW_SORT_SIZE_POS],
-        &tu_sort_l_menu[VIEW_SORT_THREAD_POS],
         &tu_view_more_menu[MENU_VIEW_NEXT_FLAGGED_POS],
         &tu_view_more_menu[MENU_VIEW_EXPAND_ALL_POS],
         &tu_view_more_menu[MENU_VIEW_COLLAPSE_ALL_POS]
 #endif /* ENABLE_TOUCH_UI */
     };
+#if defined(ENABLE_TOUCH_UI)
+    const static GnomeUIInfo *sort_entries[] = {
+        &tu_sort_l_menu[VIEW_SORT_MSGNO_POS],
+        &tu_sort_l_menu[VIEW_SORT_SENDER_POS],
+        &tu_sort_l_menu[VIEW_SORT_SUBJECT_POS],
+        &tu_sort_l_menu[VIEW_SORT_MSGNO_POS],
+        &tu_sort_l_menu[VIEW_SORT_SIZE_POS]
+    };
+#endif /* ENABLE_TOUCH_UI */
 
     LibBalsaMailbox *mailbox = NULL;
     BalsaMailboxNode *mbnode = NULL;
@@ -1684,6 +1687,18 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
     } else {
         gtk_widget_set_sensitive(EXPUNGE_WIDGET, enable);
     }
+#if defined(ENABLE_TOUCH_UI)
+    {gboolean can_sort, can_thread;
+    can_sort = mailbox &&
+        libbalsa_mailbox_can_do(mailbox, LIBBALSA_MAILBOX_CAN_SORT);
+    can_thread = mailbox &&
+        libbalsa_mailbox_can_do(mailbox, LIBBALSA_MAILBOX_CAN_THREAD);
+    for(i=0; i < ELEMENTS(sort_entries); i++)
+        gtk_widget_set_sensitive(sort_entries[i]->widget, can_sort);
+    gtk_widget_set_sensitive(tu_sort_l_menu[VIEW_SORT_THREAD_POS].widget,
+                             can_thread);
+    }
+#endif
 
     /* Toolbar */
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_PREVIOUS, 

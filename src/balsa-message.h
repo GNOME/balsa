@@ -39,13 +39,15 @@ typedef struct _BalsaMessageClass BalsaMessageClass;
 
 struct _BalsaMessage
 {
-  GtkBin bin;
+  GnomeCanvas canvas;
+  GList *html; /* list of xmhtml widgets */
+  
   Message *message;
 };
 
 struct _BalsaMessageClass
 {
-    GtkBinClass parent_class;
+    GnomeCanvasClass parent_class;
 };
 
 guint balsa_message_get_type (void);

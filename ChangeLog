@@ -1,5 +1,7 @@
-2003-02-08 10:15  PeterB
+2003-02-08  PeterB
 
+	* src/balsa-index-threading.c: When a message is duplicated, use
+	the replied-to copy as the head of a subthread.
 	* src/balsa-mblist.c: Clean up sorting the mailbox list (Manu);
 	simplify bmbl_row_compare.
 

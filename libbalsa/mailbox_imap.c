@@ -285,13 +285,15 @@ assure_balsa_dir(void)
 }
 
 static gchar*
-get_cache_name(LibBalsaMailbox* mailbox, const gchar* type)
+get_cache_name(LibBalsaMailboxImap* mailbox, const gchar* type)
 {
-    gchar* fname, *start = strchr(mailbox->config_prefix, '/');
-    gchar* postfix = g_strconcat(".", mailbox->config_prefix,
-                                 type, ".db", NULL);
-    for(start = strchr(postfix, '/')+1; *start; start++)
-        if(*start =='/') *start='-';
+    gchar* fname, *start;
+    LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    gchar* postfix = g_strconcat(".balsa/", s->host, "-",
+                                 (mailbox->path ? mailbox->path : "INBOX"),
+                                 "-", type, ".db", NULL);
+    for(start=strchr(postfix+7, '/'); start; start = strchr(start,'/'))
+        *start='-';
 
     fname = gnome_util_prepend_user_home(postfix);
     g_free(postfix);
@@ -463,7 +465,7 @@ load_cache(LibBalsaMailbox* mailbox)
     GDBM_FILE dbf;
     datum key, nextkey, header;
     LibBalsaMessage* message;
-    gchar* fname =  get_cache_name(mailbox, "headers");
+    gchar* fname =  get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "headers");
 
     dbf = gdbm_open(fname, 0, GDBM_READER, 0, NULL);
     g_free(fname);
@@ -498,7 +500,7 @@ save_to_cache(LibBalsaMailbox* mailbox)
         printf("No mutt context available to save.\n");
         return TRUE;
     }
-    fname = get_cache_name(mailbox, "headers");
+    fname = get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "headers");
     assure_balsa_dir();
 
     printf("Cache file: %s\n", fname);
@@ -530,7 +532,7 @@ clean_cache(LibBalsaMailbox* mailbox)
     GDBM_FILE dbf;
     datum key, nextkey, header;
     LibBalsaMessage* message;
-    gchar* fname =  get_cache_name(mailbox, "body");
+    gchar* fname =  get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "body");
     ImapUID uid[2];
     GHashTable *present_uids;
     GList *lst, *remove_list;
@@ -709,7 +711,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
     RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, FALSE);
 
-    fname = get_cache_name(mailbox, "body");
+    fname = get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "body");
     dbf = gdbm_open(fname, 0, GDBM_READER, S_IRUSR|S_IWUSR, NULL);
     uid[0] = LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity;
     uid[1] = IMAP_MESSAGE_UID(message);

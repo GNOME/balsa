@@ -97,8 +97,10 @@ gboolean balsa_message_can_select(BalsaMessage * bmessage);
 gboolean balsa_message_grab_focus(BalsaMessage * bmessage);
 
 void reflow_string(gchar * str, gint mode, gint * cur_pos, int width);
+#ifdef HAVE_GTKHTML
 gboolean balsa_message_can_zoom(BalsaMessage * bm);
 void balsa_message_zoom(BalsaMessage * bm, gint in_out);
+#endif				/* HAVE_GTKHTML */
 
 #ifdef __cplusplus
 }

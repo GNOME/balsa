@@ -3796,23 +3796,19 @@ prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list)
     }
 }
 
+#ifdef HAVE_GTKHTML
 /* Does the current part support zoom? */
 gboolean
 balsa_message_can_zoom(BalsaMessage * bm)
 {
-#ifdef HAVE_GTKHTML
     return (bm && bm->current_part
 	    && HTML_IS_VIEW(bm->current_part->widget));
-#else
-    return FALSE;
-#endif /* HAVE_GTKHTML */
 }
 
 /* Zoom an HtmlView item. */
 void
 balsa_message_zoom(BalsaMessage * bm, gint in_out)
 {
-#ifdef HAVE_GTKHTML
     if (!balsa_message_can_zoom(bm))
 	return;
 
@@ -3829,5 +3825,5 @@ balsa_message_zoom(BalsaMessage * bm, gint in_out)
     default:
 	break;
     }
-#endif /* HAVE_GTKHTML */
 }
+#endif /* HAVE_GTKHTML */

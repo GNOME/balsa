@@ -125,7 +125,9 @@ static gboolean imap_check_test(const gchar * path);
 static void enable_mailbox_menus(BalsaIndex * index);
 static void enable_message_menus(LibBalsaMessage * message);
 static void enable_edit_menus(BalsaMessage * bm);
+#ifdef HAVE_GTKHTML
 static void enable_view_menus(BalsaMessage * bm);
+#endif				/* HAVE_GTKHTML */
 static void register_open_mailbox(LibBalsaMailbox *m);
 static void unregister_open_mailbox(LibBalsaMailbox *m);
 static gboolean is_open_mailbox(LibBalsaMailbox *m);
@@ -175,7 +177,9 @@ static void threading_change_cb(GtkWidget * widget, gpointer data);
 static void balsa_window_set_threading_menu(int option);
 static void expand_all_cb(GtkWidget * widget, gpointer data);
 static void collapse_all_cb(GtkWidget * widget, gpointer data);
+#ifdef HAVE_GTKHTML
 static void zoom_cb(GtkWidget * widget, gpointer data);
+#endif				/* HAVE_GTKHTML */
 
 static void address_book_cb(GtkWindow *widget, gpointer data);
 
@@ -417,6 +421,7 @@ static GnomeUIInfo view_menu[] = {
      N_("Collapse all expanded threads"),
      collapse_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
      NULL, 'L', GDK_CONTROL_MASK, NULL},
+#ifdef HAVE_GTKHTML
     GNOMEUIINFO_SEPARATOR,
 #define MENU_VIEW_ZOOM_IN MENU_VIEW_COLLAPSE_ALL_POS + 2
     { GNOME_APP_UI_ITEM, N_("Zoom _In"), N_("Increase magnification"),
@@ -432,6 +437,7 @@ static GnomeUIInfo view_menu[] = {
     { GNOME_APP_UI_ITEM, N_("Zoom _100%"), N_("No magnification"),
       zoom_cb, GINT_TO_POINTER(0), NULL, GNOME_APP_PIXMAP_STOCK,
       GTK_STOCK_ZOOM_100, 0, 0, NULL},
+#endif				/* HAVE_GTKHTML */
     GNOMEUIINFO_END
 };
 
@@ -997,7 +1003,9 @@ balsa_window_new()
     enable_mailbox_menus(NULL);
     enable_message_menus(NULL);
     enable_edit_menus(NULL);
+#ifdef HAVE_GTKHTML
     enable_view_menus(NULL);
+#endif				/* HAVE_GTKHTML */
     balsa_window_enable_continue();
 
     /* set initial state of toggle preview pane button */
@@ -1171,6 +1179,7 @@ enable_edit_menus(BalsaMessage * bm)
                              widget, enable);
 }
 
+#ifdef HAVE_GTKHTML
 /*
  * Enable/disable the Zoom menu items on the View menu.
  */
@@ -1182,6 +1191,7 @@ enable_view_menus(BalsaMessage * bm)
     gtk_widget_set_sensitive(view_menu[MENU_VIEW_ZOOM_OUT].widget, enable);
     gtk_widget_set_sensitive(view_menu[MENU_VIEW_ZOOM_100].widget, enable);
 }
+#endif				/* HAVE_GTKHTML */
 
 /*
  * Enable/disable menu items/toolbar buttons which depend
@@ -2627,6 +2637,7 @@ collapse_all_cb(GtkWidget * widget, gpointer data)
     balsa_index_update_tree(BALSA_INDEX(index), FALSE);
 }
 
+#ifdef HAVE_GTKHTML
 static void
 zoom_cb(GtkWidget * widget, gpointer data)
 {
@@ -2636,6 +2647,7 @@ zoom_cb(GtkWidget * widget, gpointer data)
 			(G_OBJECT(widget), GNOMEUIINFO_KEY_UIDATA));
     balsa_message_zoom(BALSA_MESSAGE(bm), in_out);
 }
+#endif				/* HAVE_GTKHTML */
 
 static void
 address_book_cb(GtkWindow *widget, gpointer data)
@@ -3144,7 +3156,9 @@ static void
 select_part_cb(BalsaMessage * bm, gpointer data)
 {
     enable_edit_menus(bm);
+#ifdef HAVE_GTKHTML
     enable_view_menus(bm);
+#endif				/* HAVE_GTKHTML */
 }
 
 static void

@@ -1,3 +1,8 @@
+2004-06-06 07:17  PeterB
+
+	* libbalsa/mailbox_mbox.c: space-stuff From_ lines in multipart
+	preface and postface.
+
 2004-06-04 17:47  PeterB
 
 	* libbalsa/mailbox.c, libbalsa/mailbox.h, libbalsa/mailbox_imap.c,

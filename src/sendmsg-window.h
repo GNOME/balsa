@@ -71,6 +71,9 @@ extern "C" {
 				     SendType);
     void sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
 				  const gchar* val);
+
+void add_attachment(GnomeIconList * iconlist, char *filename);
+
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

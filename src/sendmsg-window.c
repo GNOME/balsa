@@ -674,7 +674,7 @@ select_attachment(GnomeIconList * ilist, gint num, GdkEventButton * event,
    adds given filename to the list.
    takes over the ownership of filename.
 */
-static void
+void
 add_attachment(GnomeIconList * iconlist, char *filename)
 {
     GtkWidget *msgbox;

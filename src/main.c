@@ -109,6 +109,8 @@ balsa_init(int argc, char **argv)
 	 N_("Get new mail on startup"), NULL},
 	{"compose", 'm', POPT_ARG_STRING, &(balsa_app.compose_email),
 	 0, N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
+	{"attach", 'a', POPT_ARG_STRING, &(balsa_app.attach_file),
+	 0, N_("Attach file at PATH"), "PATH"},
 	{"open-mailbox", 'o', POPT_ARG_STRING, &(cmd_line_open_mailboxes),
 	 0, N_("Opens MAILBOXNAME"), N_("MAILBOXNAME")},
 	{"open-unread-mailbox", 'u', POPT_ARG_NONE,
@@ -378,13 +380,28 @@ main(int argc, char *argv[])
 
     gdk_rgb_init();
 
-    if (balsa_app.compose_email) {
+    if (balsa_app.compose_email || balsa_app.attach_file) {
 	BalsaSendmsg *snd;
 	snd = sendmsg_window_new(window, NULL, SEND_NORMAL);
-	if(strncmp(balsa_app.compose_email, "mailto:", 7) == 0)
-	    process_url(balsa_app.compose_email+7, 
-			sendmsg_window_set_field, snd);
-	else sendmsg_window_set_field(snd,"to", balsa_app.compose_email);
+	if(balsa_app.compose_email) {
+	    if(strncmp(balsa_app.compose_email, "mailto:", 7) == 0)
+	        process_url(balsa_app.compose_email+7, 
+		    	sendmsg_window_set_field, snd);
+	    else sendmsg_window_set_field(snd,"to", balsa_app.compose_email);
+	}
+	if (balsa_app.attach_file) {
+	    gchar *ptr = balsa_app.attach_file;
+	    gchar *delim;
+	    gchar *attachment;
+	    while ((delim = strchr (ptr, ','))) {
+		    *delim = '\0';
+		    attachment = g_strdup(ptr);
+		    add_attachment(GNOME_ICON_LIST(snd->attachments[1]), attachment);
+		    ptr = delim + 1;
+            }
+	    attachment = g_strdup(ptr);
+	    add_attachment(GNOME_ICON_LIST(snd->attachments[1]), attachment);
+	}
     } else
 	gtk_widget_show(window);
 

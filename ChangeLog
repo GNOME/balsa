@@ -1,3 +1,12 @@
+2001-07-01  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/main.c: 
+	* src/sendmsg-window.h: 
+	* src/sendmsg-window.c: 
+	* src/balsa-app.h:
+	patch from "W. Michael Petullo" <balsa@flyn.org> that adds
+	attachments options on the command line
+
 2001-06-27  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-mblist.c: return to old DnD behaviour.

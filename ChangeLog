@@ -1,3 +1,15 @@
+2005-02-20 Craig Routledge <webstuff at craigroutledge dot com>
+
+	* src/main-window.c: bump the date in the about dialog.
+	* doc/C/balsa.xml: bring the Main Window section of the help file
+	up to sync with the user interface.
+	* src/balsa-message.c: add tooltips to the "check crypto" and
+	"attachment" icons.
+
+2005-02-20 11:29  PeterB
+
+	* src/balsa-message.c: make OK the default response in save dialog.
+
 2005-02-16 20:20  Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* libbalsa/misc.c, libbalsa/misc.h, src/balsa-message.c,

@@ -181,7 +181,6 @@ libbalsa_address_book_ldap_new(const gchar *name, const gchar *host,
     ab->name = g_strdup(name);
     ldap->host = g_strdup(host);
     ldap->base_dn = g_strdup(base_dn);
-    ldap->base_dn = g_strdup(base_dn);
     ldap->bind_dn = g_strdup(bind_dn);
     ldap->passwd = g_strdup(passwd);
     ldap->enable_tls = enable_tls;
@@ -211,6 +210,7 @@ static gboolean
 libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
 {
     int result;
+    int version = LDAP_VERSION3;
 
     g_return_val_if_fail(ab->host != NULL, FALSE);
 
@@ -223,16 +223,11 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
 	return FALSE;
     }
 
+    /* ignore error if the V3 LDAP cannot be set */
+    ldap_set_option(ab->directory, LDAP_OPT_PROTOCOL_VERSION, &version);
+
     if(ab->enable_tls) {
 #ifdef HAVE_LDAP_TLS
-        int version = LDAP_VERSION3;
-        if (ldap_set_option(ab->directory, LDAP_OPT_PROTOCOL_VERSION, &version)
-            != LDAP_OPT_SUCCESS) {
-            libbalsa_information
-                (LIBBALSA_INFORMATION_WARNING,
-                 _("Couldn't set protocol version to LDAPv3."));
-        }
-
         /* turn TLS on */
         result = ldap_start_tls_s(ab->directory, NULL, NULL);
         if(result != LDAP_SUCCESS) {

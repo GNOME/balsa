@@ -101,9 +101,13 @@ struct _LibBalsaMessageHeaders {
     /* File Carbon Copy Mailbox URL */
     gchar *fcc_url;
 
-    /* user headers */
+    /* other headers */
     GList *user_hdrs;
 };
+
+/** FREE_HEADER_LIST() frees user_hdrs */
+#define FREE_HEADER_LIST(l) do{ g_list_foreach((l),(GFunc)g_strfreev,NULL);\
+                                g_list_free(l); } while(0)
 
 struct _LibBalsaMessage {
     GObject object;
@@ -117,6 +121,7 @@ struct _LibBalsaMessage {
     /* headers */
     MuttHeader* header;
     LibBalsaMessageHeaders *headers;
+    int updated; /** whether complete headers have been fetched */
 
     /* remail header if any */
     gchar *remail;
@@ -144,9 +149,6 @@ struct _LibBalsaMessage {
 
     /* replied message ID; from address on date */
     gchar *in_reply_to;
-
-    /* miscellaneous headers */
-    GList *user_headers;
 
     /* message ID */
     gchar *message_id;

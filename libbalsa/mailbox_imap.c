@@ -804,6 +804,12 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 	imap_update_header_info(msg, CLIENT_CONTEXT(mailbox),
 				message->header->msgno);
     }
+    if(!message->updated) {
+        FREE_HEADER_LIST(message->headers->user_hdrs);
+        message->headers->user_hdrs = 
+            libbalsa_message_user_hdrs_from_mutt(message->header);
+        message->updated = 1;
+    }
     FREE(&msg);
     g_free(msg_name);
     g_free(cache_name); 

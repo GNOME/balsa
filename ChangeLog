@@ -1,3 +1,12 @@
+2003-07-18  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/address-book-ldap.c: try to use LDAPV3 whenever available
+	- partially address bug 116953.
+	* libbalsa/mailbox_imap.c: update headers if needed (bug 117723)
+	* libbalsa/message.c: refresh headers if needed.
+	* libbalsa/message.h: add an 'updated' flag. Remove user_headers.
+	* libbalsa/send.c: adjust accordingly.
+
 2003-07-17 11:29  PeterB
 
 	* src/balsa-index.c: Leave thread expanded when deleting message(s)

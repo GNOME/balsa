@@ -1308,7 +1308,7 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
     hdr->env->bcc = rfc822_parse_adrlist(hdr->env->bcc, tmp);
     g_free(tmp);
 
-     for (list = message->user_headers; list; list = g_list_next(list)) {
+     for (list=message->headers->user_hdrs; list; list=g_list_next(list)) {
         tmp_hdr = mutt_new_list();
         tmp_hdr->next = hdr->env->userhdrs;
         tmp_hdr->data = g_strjoinv(": ", list->data);

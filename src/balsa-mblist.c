@@ -1215,62 +1215,70 @@ static gint
 balsa_mblist_row_compare(GtkCList* clist, gconstpointer ptr1, 
                          gconstpointer ptr2)
 {
-        LibBalsaMailbox* m1 = NULL;
-        LibBalsaMailbox* m2 = NULL;
-        BalsaMailboxNode* node1 = NULL;
-        BalsaMailboxNode* node2 = NULL;
-        GtkCListRow* row1 = NULL;
-        GtkCListRow* row2 = NULL;
-        gint core1 = 0;
-        gint core2 = 0;
+    LibBalsaMailbox* m1 = NULL;
+    LibBalsaMailbox* m2 = NULL;
+    BalsaMailboxNode* node1 = NULL;
+    BalsaMailboxNode* node2 = NULL;
+    GtkCListRow* row1 = NULL;
+    GtkCListRow* row2 = NULL;
+    gint core1 = 0;
+    gint core2 = 0;
 
 
-        row1 = (GtkCListRow*) ptr1;
-        row2 = (GtkCListRow*) ptr2;
+    row1 = (GtkCListRow*) ptr1;
+    row2 = (GtkCListRow*) ptr2;
         
-        g_return_val_if_fail(row1, -1);
-        g_return_val_if_fail(row2, 1);
+    g_return_val_if_fail(row1, -1);
+    g_return_val_if_fail(row2, 1);
         
-        m1 = ((BalsaMailboxNode*)row1->data)->mailbox;
-        m2 = ((BalsaMailboxNode*)row2->data)->mailbox;
+    m1 = ((BalsaMailboxNode*)row1->data)->mailbox;
+    m2 = ((BalsaMailboxNode*)row2->data)->mailbox;
 
-        switch (clist->sort_column) {
-        case 0:
-            if (!m1 || !m2) {
-                /* compare using names, potentially mailboxnodes */
-                node1 = (BalsaMailboxNode*)row1->data;
-                node2 = (BalsaMailboxNode*)row2->data;
+    switch (clist->sort_column) {
+    case 0:
+        if (!m1 || !m2) {
+            /* compare using names, potentially mailboxnodes */
+            node1 = (BalsaMailboxNode*)row1->data;
+            node2 = (BalsaMailboxNode*)row2->data;
 
-                if (!m1 && !m2) {
-                    return g_strcasecmp(node1->name, node2->name);
-                } else if (m1) {
-                    if (balsa_mblist_core_mailbox(m1))
-                        return -1;
-                    else
-                        return g_strcasecmp(m1->name, g_basename(node2->name));
-                } else {
-                    if (balsa_mblist_core_mailbox(m2)) 
-                        return 1;
-                    else
-                        return g_strcasecmp(g_basename(node1->name), m2->name);
-                }
-            } else if (balsa_mblist_core_mailbox(m1) || 
-                       balsa_mblist_core_mailbox(m2)) {
-                core1 = balsa_mblist_core_mailbox(m1);
-                core2 = balsa_mblist_core_mailbox(m2);
-                return core2 - core1;
+            if (!m1 && !m2) {
+                return g_strcasecmp(node1->name, node2->name);
+            } else if (m1) {
+                if (balsa_mblist_core_mailbox(m1))
+                    return -1;
+                else
+                    return g_strcasecmp(m1->name, g_basename(node2->name));
+            } else if (m2) {
+                if (balsa_mblist_core_mailbox(m2)) 
+                    return 1;
+                else
+                    return g_strcasecmp(g_basename(node1->name), m2->name);
             } else {
-                return g_strcasecmp(m1->name, m2->name);
-            } 
-        case 1:
+                return 0;
+            }
+        } else if (balsa_mblist_core_mailbox(m1) || 
+                   balsa_mblist_core_mailbox(m2)) {
+            core1 = balsa_mblist_core_mailbox(m1);
+            core2 = balsa_mblist_core_mailbox(m2);
+            return core2 - core1;
+        } else {
+            return g_strcasecmp(m1->name, m2->name);
+        } 
+    case 1:
+        if (m1 && m2) 
             return m2->unread_messages - m1->unread_messages;
-
-        case 2:
-            return m2->total_messages - m1->total_messages;
-    
-        default:
+        else
             return 0;
-        }
+
+    case 2:
+        if (m1 && m2)
+            return m2->total_messages - m1->total_messages;
+        else
+            return 0;
+    
+    default:
+        return 0;
+    }
 }
 
 

@@ -495,6 +495,9 @@ set_prefs (void)
   gtk_spin_button_set_value (GTK_SPIN_BUTTON (pui->check_mail_minutes), 
 		(float) balsa_app.check_mail_timer );
 
+  gtk_widget_set_sensitive (pui->check_mail_minutes,
+			    GTK_TOGGLE_BUTTON(pui->check_mail_auto)->active);
+
   /* arp */
   gtk_entry_set_text (GTK_ENTRY (pui->quote_str), balsa_app.quote_str);
 

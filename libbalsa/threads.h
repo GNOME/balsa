@@ -5,8 +5,11 @@
  * thread globals
  */
 
+extern pthread_t              send_mail;
 extern pthread_mutex_t        mailbox_lock;
+extern pthread_mutex_t        send_messages_lock;
 extern int                    checking_mail;
+extern int                    sending_mail;
 extern int                    mail_thread_pipes[2];
 extern GIOChannel             *mail_thread_msg_send;
 extern GIOChannel             *mail_thread_msg_receive;

@@ -47,11 +47,15 @@
 
 /* Globals for Thread creation, messaging, pipe I/O */
 pthread_t			get_mail_thread;
+pthread_t                       send_mail;
 pthread_mutex_t			mailbox_lock;
+pthread_mutex_t                 send_messages_lock;
 int				checking_mail;
+int                             sending_mail;
 int				mail_thread_pipes[2];
 GIOChannel 		*mail_thread_msg_send;
 GIOChannel 		*mail_thread_msg_receive;
+
 
 static void threads_init( gboolean init );
 #endif
@@ -183,7 +187,9 @@ threads_init( gboolean init )
   {
     g_thread_init( NULL );
     pthread_mutex_init( &mailbox_lock, NULL );
+    pthread_mutex_init( &send_messages_lock, NULL );
     checking_mail = 0;
+    sending_mail = 0;
 	if( pipe( mail_thread_pipes) < 0 )
 	{
 	   g_log ("BALSA Init", G_LOG_LEVEL_DEBUG, "Error opening pipes.\n" );
@@ -198,6 +204,7 @@ threads_init( gboolean init )
   else
   {
     pthread_mutex_destroy( &mailbox_lock );
+    pthread_mutex_destroy( &send_messages_lock );
   }
 }
 #endif

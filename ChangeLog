@@ -1,3 +1,16 @@
+1999-12-07  David Pickens <dsp@iAesthetic.com>
+	* Added multi-threaded send mail (if --enable-threads):
+	  libbalsa/send.c, libbalsa/threads.h,
+	  src/main.c, src/threads.h
+
+1999-12-05  David Pickens  <dsp@iAesthetic.com>
+
+	* /cvs/gnome/balsa/src/balsa-app.c, 
+	* /cvs/gnome/balsa/src/balsa-app.h, 
+	* /cvs/gnome/balsa/src/main-window.c, 
+	* /cvs/gnome/balsa/src/pref-manager.c, 
+	* /cvs/gnome/balsa/src/save-restore.c: Added progress dialog options
+
 1999-12-05  Peter Williams  <peter@wgwill.ne.mediaone.net>
 
 	* src/balsa-init.c (balsa_init_window_new, druid_destroy_cb):

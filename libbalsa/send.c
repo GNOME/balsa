@@ -23,6 +23,10 @@
 #include <string.h>
 #include <gnome.h>
 
+#ifdef BALSA_USE_THREADS
+#include <pthread.h>
+#endif
+
 #include "../src/balsa-app.h"
 #include "mailbox.h"
 #include "misc.h"
@@ -43,14 +47,33 @@
 //#include <sys/stat.h>
 #include <fcntl.h>
 
+#ifdef BALSA_USE_THREADS
+#include <threads.h>
+
+typedef struct
+{
+  HEADER *message;
+  int *next_message;
+  Mailbox *fcc;
+  char tempfile[_POSIX_PATH_MAX];
+} MessageQueueItem;
+
+MessageQueueItem *last_message;
+#endif
+
 /* prototype this so that this file doesn't whine.  this function isn't in
  * mutt any longer, so we had to provide it inside mutt for libmutt :-)
  */
 int mutt_send_message (HEADER * msg);
+guint balsa_send_message_real(HEADER *msg, char *tempfile, Mailbox *fcc );
 static void encode_descriptions (BODY * b);
 int balsa_smtp_send (HEADER *msg, char *file, char *server);
 int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg);
 gboolean balsa_create_msg (Message * message, HEADER *msg, char *tempfile, int queu);
+
+#ifdef BALSA_USE_THREADS
+void balsa_send_thread(MessageQueueItem *first_message);
+#endif
 
 BODY *add_mutt_body_plain (void);
 
@@ -106,12 +129,103 @@ gboolean
 balsa_send_message (Message * message)
 {
   HEADER *msg;
-  int i=0;
   char tempfile[_POSIX_PATH_MAX];
+#ifdef BALSA_USE_THREADS
+  MessageQueueItem *new_message;
+#endif
 
   msg = mutt_new_header ();
 
   balsa_create_msg (message, msg, tempfile, 0);
+
+#ifdef BALSA_USE_THREADS
+  new_message = malloc( sizeof( MessageQueueItem ) );
+
+  new_message->message = msg;  
+
+  new_message->fcc = message->fcc_mailbox;
+
+  strncpy( new_message->tempfile, tempfile, sizeof(new_message->tempfile) );
+
+  pthread_mutex_lock( &send_messages_lock );
+  if( sending_mail )
+    {
+      /* add to the queue of messages waiting to be sent */
+      last_message->next_message = new_message;
+      last_message = new_message;
+      new_message->next_message = NULL;
+      pthread_mutex_unlock( &send_messages_lock );
+    } else {
+      /* start queue of messages to send and initiate thread */
+      last_message = new_message;
+      new_message->next_message = NULL;
+      /* initiate threads */
+      sending_mail = TRUE;
+      pthread_create( &send_mail,
+  		NULL,
+  		(void *) &balsa_send_thread,
+		new_message );
+      pthread_mutex_unlock( &send_messages_lock );
+    }
+#else  /*non-threaded code */
+
+  balsa_send_message_real( msg, tempfile, message->fcc_mailbox );
+
+#endif
+
+  /* loop through messages in outbox -- moved up from smtp */
+#if 0 
+  GList *lista;
+  Message *message;
+  HEADER *queu_msg;
+  char file[_POSIX_PATH_MAX];
+
+
+  /* We do messages in queu now */
+   
+  balsa_mailbox_open (balsa_app.outbox);
+  
+  if (balsa_app.outbox->message_list != NULL)
+      lista = balsa_app.outbox->message_list ;
+  else
+      lista = NULL ;
+  
+  while (lista != NULL)
+  {
+ 
+    message = LIBBALSA_MESSAGE(lista->data); 
+    queu_msg = mutt_new_header ();
+  
+    balsa_create_msg (message, queu_msg, file, 1);
+  
+  /* If something happen we do not delete the message */
+    
+    if ((balsa_smtp_protocol ( s, file, queu_msg)) == 0 )
+    {
+       snprintf (buffer, 512, "RSET\r\n", server);
+       write (s, buffer, strlen (buffer));
+       if (smtp_answer (s) == 0)
+          return -1;
+    }
+    else
+    {
+       fprintf (stderr, "Mensaje borrado\n");
+       message_delete(message);
+    }
+  
+    lista = lista->next ;  
+  }
+    
+  balsa_mailbox_close (balsa_app.outbox);
+#endif
+
+  return TRUE;
+}
+
+guint
+balsa_send_message_real(HEADER *msg, char *tempfile, Mailbox *fcc )
+{
+  int i;
 
   if (balsa_app.smtp) 
      i = balsa_smtp_send (msg,tempfile,balsa_app.smtp_server);
@@ -121,52 +235,61 @@ balsa_send_message (Message * message)
   if (i==-1)
   {
     mutt_write_fcc (MAILBOX_LOCAL (balsa_app.outbox)->path, msg, NULL, 1);
+    /* todo:  enable w/ message to main thread */
+#ifndef BALSA_USE_THREADS
     if (balsa_app.outbox->open_ref > 0)
        mailbox_check_new_messages (balsa_app.outbox);
+#endif
     mutt_free_header (&msg);
 
  /* Since we didn´t send the mail we don´t save it at send_mailbox */
     return TRUE;
   }
 
-
-  
-/**********************************************************************
- * Here we continue with normal old file
- * ********************************************************************/
-  
-  
   if ((balsa_app.sentbox->type == MAILBOX_MAILDIR ||
        balsa_app.sentbox->type == MAILBOX_MH ||
        balsa_app.sentbox->type == MAILBOX_MBOX) &&
-       message->fcc_mailbox != NULL) {
-    mutt_write_fcc (MAILBOX_LOCAL (message->fcc_mailbox)->path, msg, NULL, 0);
-    if (message->fcc_mailbox->open_ref > 0)
-        mailbox_check_new_messages (message->fcc_mailbox);
-  }
-#if 0
-  switch (balsa_app.outbox->type)
-    {
-    case MAILBOX_MAILDIR:
-    case MAILBOX_MH:
-    case MAILBOX_MBOX:
-      /*
-         send_message (msg, MAILBOX_LOCAL(balsa_app.outbox)->path);
-       */
-      mutt_send_message (msg);
-      break;
-    case MAILBOX_IMAP:
-      mutt_send_message (msg);
-      break;
-    default:
-      break;
-    }
+       fcc != NULL) {
+    mutt_write_fcc (MAILBOX_LOCAL (fcc)->path, msg, NULL, 0);
+    /* todo:  enable from message to main thread via pipe */
+#ifndef BALSA_USE_THREADS
+    if (fcc->open_ref > 0)
+        mailbox_check_new_messages (fcc);
 #endif
-
+  }
   mutt_free_header (&msg);
 
   return TRUE;
 }
+
+#ifdef BALSA_USE_THREADS
+void balsa_send_thread(MessageQueueItem *first_message)
+{
+  MessageQueueItem *current_message, *next_message;
+
+  pthread_mutex_lock( &send_messages_lock );
+  current_message = first_message;
+
+  do
+    {
+      pthread_mutex_unlock( &send_messages_lock );
+
+      balsa_send_message_real( current_message->message, 
+			       current_message->tempfile, 
+			       current_message->fcc ); 
+
+      pthread_mutex_lock( &send_messages_lock );
+      next_message = current_message->next_message;
+      free( current_message );
+      current_message = next_message;
+    } while( current_message );
+
+  sending_mail = FALSE;
+  last_message = NULL;
+  pthread_mutex_unlock( &send_messages_lock );
+  pthread_exit(0); 
+}
+#endif
 
 gboolean
 balsa_postpone_message (Message * message)
@@ -415,10 +538,6 @@ int balsa_smtp_send (HEADER *msg, char *tempfile, char *server)
   struct hostent *he;
   char buffer[525]; /* Maximum allow by RFC */
   int n, s, error = 0, SmtpPort=25;
-  GList *lista;
-  Message *message;
-  HEADER *queu_msg;
-  char file[_POSIX_PATH_MAX];
   
 /* Here we make the conecction */  
   s = socket (AF_INET, SOCK_STREAM, IPPROTO_IP);
@@ -473,48 +592,8 @@ int balsa_smtp_send (HEADER *msg, char *tempfile, char *server)
   }
   
   unlink (tempfile);
-
-  
-   /* We do messages in queu now */
-   
-  balsa_mailbox_open (balsa_app.outbox);
-  
-  if (balsa_app.outbox->message_list != NULL)
-      lista = balsa_app.outbox->message_list ;
-  else
-      lista = NULL ;
-  
-  while (lista != NULL)
-  {
- 
-    message = LIBBALSA_MESSAGE(lista->data); 
-    queu_msg = mutt_new_header ();
-  
-    balsa_create_msg (message, queu_msg, file, 1);
-  
-  /* If something happen we do not delete the message */
-    
-    if ((balsa_smtp_protocol ( s, file, queu_msg)) == 0 )
-    {
-       snprintf (buffer, 512, "RSET\r\n", server);
-       write (s, buffer, strlen (buffer));
-       if (smtp_answer (s) == 0)
-          return -1;
-    }
-    else
-    {
-       fprintf (stderr, "Mensaje borrado\n");
-       message_delete(message);
-    }
-  
-    lista = lista->next ;  
-  }
-    
-  balsa_mailbox_close (balsa_app.outbox);
-      
   
 /* We close the conection */
-
   
   snprintf (buffer, sizeof(buffer),"QUIT\r\n");
   write (s, buffer, strlen (buffer));
@@ -674,4 +753,6 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
         return TRUE;
         
 }
+
+
 

@@ -1,3 +1,7 @@
+2003-10-19 19:55  PeterB
+
+	* src/: balsa-message.c, save-restore.c: Plug memory leaks.
+
 2003-10-14  Pawel Salek  <pawsa theochem.kth.se>
 
 	* src/information-dialog.[ch]:

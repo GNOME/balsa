@@ -267,6 +267,7 @@ mailbox_open_ref (Mailbox * mailbox)
       break;
     }
 
+  mailbox->messages = mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
 
   if (CLIENT_CONTEXT_OPEN (mailbox))
     {
@@ -308,13 +309,13 @@ mailbox_open_unref (Mailbox * mailbox)
       /* now close the mail stream and expunge deleted
        * messages -- the expunge may not have to be done */
       if (CLIENT_CONTEXT_OPEN (mailbox))
-      {
-        /* If it closed we have no context. If it didnt close right
-           don't ask me what to do - AC */
-           
-        if(mx_close_mailbox (CLIENT_CONTEXT (mailbox))==0)
-		CLIENT_CONTEXT (mailbox) = NULL;
-      }
+	{
+	  /* If it closed we have no context. If it didnt close right
+	     don't ask me what to do - AC */
+
+	  if (mx_close_mailbox (CLIENT_CONTEXT (mailbox)) == 0)
+	    CLIENT_CONTEXT (mailbox) = NULL;
+	}
     }
 
   UNLOCK_MAILBOX ();
@@ -324,22 +325,32 @@ mailbox_open_unref (Mailbox * mailbox)
 gint
 mailbox_check_new_messages (Mailbox * mailbox)
 {
+  gint i = 0;
+
   LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
   RETURN_VAL_IF_CONTEXT_CLOSED (mailbox, FALSE);
 
   mx_check_mailbox (CLIENT_CONTEXT (mailbox), NULL);
-
-  UNLOCK_MAILBOX ();
-
-  if (mailbox->new_messages > 0)
+  if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), NULL)) < 0)
     {
-      load_messages (mailbox, 1);
-      return TRUE;
+      UNLOCK_MAILBOX ();
+      g_print ("error or something\n");
     }
-  else
-    return FALSE;
-}
+  else if (i == M_NEW_MAIL || i == M_REOPENED)
+    {
+      UNLOCK_MAILBOX ();
 
+      mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount - mailbox->messages;
+
+      if (mailbox->new_messages > 0)
+	{
+	  load_messages (mailbox, 1);
+	  return TRUE;
+	}
+      else
+	return FALSE;
+    }
+}
 
 guint
 mailbox_watcher_set (Mailbox * mailbox,
@@ -451,11 +462,14 @@ load_messages (Mailbox * mailbox, gint emit)
   Message *message;
   HEADER *cur;
 
-  for (msgno = mailbox->messages - mailbox->new_messages + 1;
+  for (msgno = mailbox->messages - mailbox->new_messages;
        msgno <= mailbox->messages;
        msgno++)
     {
       cur = CLIENT_CONTEXT (mailbox)->hdrs[msgno];
+
+      if (!cur)
+        continue;
 
       message = translate_message (cur->env);
       message->mailbox = mailbox;

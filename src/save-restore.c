@@ -727,10 +727,27 @@ config_global_load(void)
 	}
     }
     balsa_app.smtp_user = gnome_config_get_string("ESMTPUser");
-    balsa_app.smtp_passphrase = gnome_config_get_string("ESMTPPassphrase");
+    balsa_app.smtp_passphrase = 
+        gnome_config_private_get_string("ESMTPPassphrase");
+    if(balsa_app.smtp_passphrase) {
+        gchar* tmp = libbalsa_rot(balsa_app.smtp_passphrase);
+        g_free(balsa_app.smtp_passphrase); 
+        balsa_app.smtp_passphrase = tmp;
+    }
+#ifndef BREAK_BACKWARD_COMPATIBILITY_AT_14
+    if(!balsa_app.smtp_passphrase)
+        balsa_app.smtp_passphrase = 
+            gnome_config_get_string("ESMTPPassphrase");
+#endif
     balsa_app.smtp_tls_mode = gnome_config_get_int("ESMTPTLSMode=0");
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
-    balsa_app.smtp_certificate_passphrase = gnome_config_get_string("ESMTPCertificatePassphrase");
+    balsa_app.smtp_certificate_passphrase = 
+        gnome_config_private_get_string("ESMTPCertificatePassphrase");
+    if(balsa_app.smtp_certificate_passphrase) {
+        gchar* tmp = libbalsa_rot(balsa_app.smtp_certificate_passphrase);
+        g_free(balsa_app.smtp_certificate_passphrase);
+        balsa_app.smtp_certificate_passphrase = tmp;
+    }
 #endif
 #endif
     /* ... outgoing mail */
@@ -987,14 +1004,24 @@ gint config_save(void)
     gnome_config_pop_prefix();
 
     /* Sending options ... */
+    gnome_config_clean_section(BALSA_CONFIG_PREFIX "Sending/");
+    gnome_config_private_clean_section(BALSA_CONFIG_PREFIX "Sending/");
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Sending/");
 #if ENABLE_ESMTP
     gnome_config_set_string("ESMTPServer", balsa_app.smtp_server);
     gnome_config_set_string("ESMTPUser", balsa_app.smtp_user);
-    gnome_config_set_string("ESMTPPassphrase", balsa_app.smtp_passphrase);
+    if(balsa_app.smtp_passphrase) {
+        gchar* tmp = libbalsa_rot(balsa_app.smtp_passphrase);
+        gnome_config_private_set_string("ESMTPPassphrase", tmp);
+        g_free(tmp);
+    }
     gnome_config_set_int("ESMTPTLSMode", balsa_app.smtp_tls_mode);
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
-    gnome_config_set_string("ESMTPCertificatePassphrase", balsa_app.smtp_certificate_passphrase);
+    if(balsa_app.smtp_certificate_passphrase) {
+        gchar* tmp = balsa_app.smtp_certificate_passphrase;
+        gnome_config_private_set_string("ESMTPCertificatePassphrase", tmp);
+        g_free(tmp);
+    }
 #endif 
 #endif 
     gnome_config_set_int("EncodingStyle", balsa_app.encoding_style);

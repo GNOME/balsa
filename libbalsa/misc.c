@@ -666,6 +666,7 @@ libbalsa_flowed_rfc2646(LibBalsaMessageBody * body)
    is a thin wrapper around mutt_set_charset() to get rid of mutt dependices
    in balsa.
 */
+void mutt_set_charset (char *charset);
 const char*
 libbalsa_set_charset(const gchar * charset)
 {

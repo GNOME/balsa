@@ -1,3 +1,10 @@
+2002-04-24  Pawel Salek <pawsa@theochem.kth.se>
+
+	* NEWS, configure.in: release balsa-2.0.0
+	* libbalsa/libbalsa.[hc]: define global libbalsa_rot13().
+	* libbalsa/server.c: use it.
+	* src/save-restore.c: store passwords mangled in private section.
+
 2002-04-24  Hasbullah Bin Pit <sebol@ikhlas.com>
 
 	* configure.in: Added Malay (ms)to ALL_LINGUAS.

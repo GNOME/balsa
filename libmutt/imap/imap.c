@@ -976,6 +976,8 @@ int imap_sync_mailbox (CONTEXT* ctx, int expunge, int* index_hint)
       mutt_buffer_addstr (&cmd, "UID STORE ");
       mutt_buffer_addstr (&cmd, uid);
 
+#ifndef LIBMUTT
+      /* BALSA: we do not yet support attachment deletion */
       /* if attachments have been deleted we delete the message and reupload
        * it. This works better if we're expunging, of course. */
       if (ctx->hdrs[n]->attach_del)
@@ -990,6 +992,7 @@ int imap_sync_mailbox (CONTEXT* ctx, int expunge, int* index_hint)
 	else
 	  _mutt_save_message (ctx->hdrs[n], appendctx, 1, 0, 0);
       }
+#endif
       flags[0] = '\0';
       
       imap_set_flag (idata, IMAP_ACL_SEEN, ctx->hdrs[n]->read, "\\Seen ",

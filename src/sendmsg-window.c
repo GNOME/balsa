@@ -853,14 +853,13 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* msg)
 static void 
 change_identity_dialog_cb(GtkWidget* widget, BalsaSendmsg* msg)
 {
-    LibBalsaIdentity* ident;
-
-    ident = libbalsa_identity_select_dialog(GTK_WINDOW(msg->window),
-					    _("Select Identity"),
-					    &balsa_app.identities,
-					    &msg->ident);
-    if (ident != NULL)        
-	update_msg_identity(msg, ident);
+    libbalsa_identity_select_dialog(GTK_WINDOW(msg->window),
+                                    _("Select Identity"),
+                                    balsa_app.identities,
+                                    msg->ident,
+                                    ((LibBalsaIdentityCallback)
+                                     update_msg_identity),
+                                    msg);
 }
 
 
@@ -960,7 +959,6 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
     LibBalsaIdentity* old_ident;
 
     
-    g_return_if_fail(msg->ident != ident);
     g_return_if_fail(ident != NULL);
 
 

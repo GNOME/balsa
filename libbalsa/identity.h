@@ -97,13 +97,18 @@ extern "C"
     void libbalsa_identity_set_sig_separator(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_sig_prepend(LibBalsaIdentity*, gboolean);
 
-    gint libbalsa_identity_config_dialog(GtkWindow * parent,
+    void libbalsa_identity_config_dialog(GtkWindow * parent,
                                          GList ** identities,
                                          LibBalsaIdentity ** current);
-    LibBalsaIdentity* libbalsa_identity_select_dialog(GtkWindow* parent, 
-						      const gchar* prompt,
-						      GList** identities, 
-						      LibBalsaIdentity**);
+
+    typedef void (*LibBalsaIdentityCallback) (gpointer data,
+                                              LibBalsaIdentity * identity);
+    void libbalsa_identity_select_dialog(GtkWindow * parent,
+                                         const gchar * prompt,
+                                         GList * identities,
+                                         LibBalsaIdentity * initial_id,
+                                         LibBalsaIdentityCallback update,
+                                         gpointer data);
 
     LibBalsaIdentity* libbalsa_identity_new_config(const gchar* prefix,
 						   const gchar* name);

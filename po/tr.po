@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8.0pre1\n"
-"POT-Creation-Date: 2000-05-27 12:56+0200\n"
-"PO-Revision-Date: 2000-05-27 12:57+0200\n"
+"POT-Creation-Date: 2000-05-30 19:31+0200\n"
+"PO-Revision-Date: 2000-05-30 19:33+0200\n"
 "Last-Translator: Fatih Demir <kabalak@gmx.net>\n"
 "Language-Team: Turkish <tr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -103,7 +103,7 @@ msgid "Please enter information about yourself."
 msgstr "Lütfen kendinle alakalý bilgilerini ver."
 
 #: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:205
-#: src/address-book.c:451
+#: src/address-book.c:450
 msgid "Name:"
 msgstr "Isim:"
 
@@ -187,7 +187,7 @@ msgstr "Yeni bir adres ekle"
 msgid "E-Mail Address:"
 msgstr "ePosta adresi:"
 
-#: src/address-book.c:291
+#: src/address-book.c:291 src/balsa-index-page.c:1043
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -196,39 +196,41 @@ msgstr ""
 "~/.gnome/GnomeCard.gcrd'yi okuyamadým .\n"
 " - %s\n"
 
-#: src/address-book.c:294 src/sendmsg-window.c:393
+#: src/address-book.c:294 src/balsa-index-page.c:1025
+#: src/balsa-index-page.c:1046 src/balsa-index-page.c:1082
+#: src/sendmsg-window.c:393
 msgid "OK"
 msgstr "Oldu"
 
-#: src/address-book.c:313
+#: src/address-book.c:312
 msgid "No-Id"
 msgstr "Id'siz"
 
-#: src/address-book.c:321
+#: src/address-book.c:320
 msgid "No-Name"
 msgstr "Isim'siz"
 
-#: src/address-book.c:416 src/filter-edit-dialog.c:135
+#: src/address-book.c:415 src/filter-edit-dialog.c:135
 msgid "Name"
 msgstr "Isim"
 
-#: src/address-book.c:416
+#: src/address-book.c:415
 msgid "E-Mail Address"
 msgstr "ePosta adresi"
 
-#: src/address-book.c:423 src/address-book.c:461 src/main-window.c:173
+#: src/address-book.c:422 src/address-book.c:460 src/main-window.c:173
 msgid "Address Book"
 msgstr "Adres rehberi"
 
-#: src/address-book.c:493
+#: src/address-book.c:492
 msgid "Send-To"
 msgstr "Cevapla"
 
-#: src/address-book.c:507
+#: src/address-book.c:506
 msgid "Run GnomeCard"
 msgstr "GnomeCard'ý çalýþtýr"
 
-#: src/address-book.c:513
+#: src/address-book.c:512
 msgid "Re-Import"
 msgstr "Yeniden tara"
 
@@ -257,16 +259,16 @@ msgstr "Tasarýlar kutusu"
 msgid "Trash"
 msgstr "Çöp kutusu"
 
-#: src/balsa-index-page.c:289
+#: src/balsa-index-page.c:290
 msgid "Mailbox password:"
 msgstr "ePosta kutusu parolasý:"
 
 #. password field
-#: src/balsa-index-page.c:297 src/mailbox-conf.c:992 src/mailbox-conf.c:1091
+#: src/balsa-index-page.c:298 src/mailbox-conf.c:992 src/mailbox-conf.c:1091
 msgid "Password:"
 msgstr "Parola:"
 
-#: src/balsa-index-page.c:323
+#: src/balsa-index-page.c:324
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -274,34 +276,73 @@ msgstr ""
 "ePosta kutusunu açamadým !\n"
 "Lütfen ePosta kutusu ayarlarýný bir daha gözden geçir ."
 
-#: src/balsa-index-page.c:586 src/filter-edit-dialog.c:222
+#: src/balsa-index-page.c:587 src/filter-edit-dialog.c:222
 msgid "New"
 msgstr "Yeni"
 
-#: src/balsa-index-page.c:594 src/main-window.c:373
+#: src/balsa-index-page.c:595 src/main-window.c:373
 msgid "Reply"
 msgstr "Cevap"
 
-#: src/balsa-index-page.c:602 src/main-window.c:376
+#: src/balsa-index-page.c:603 src/main-window.c:376
 msgid "Reply to all"
 msgstr "Hepsine cevap ver"
 
-#: src/balsa-index-page.c:610 src/main-window.c:379
+#: src/balsa-index-page.c:611 src/main-window.c:379
 msgid "Forward"
 msgstr "Ilet"
 
-#: src/balsa-index-page.c:618 src/filter-edit-dialog.c:228
+#: src/balsa-index-page.c:619 src/filter-edit-dialog.c:228
 #: src/main-window.c:366 src/pref-manager.c:886
 msgid "Delete"
 msgstr "Sil"
 
-#: src/balsa-index-page.c:626
+#: src/balsa-index-page.c:627
 msgid "Undelete"
 msgstr "Kurtar"
 
-#: src/balsa-index-page.c:634
+#: src/balsa-index-page.c:635
+msgid "Store Address"
+msgstr "Adresi kaydet"
+
+#: src/balsa-index-page.c:643
 msgid "Transfer"
 msgstr "Taþý"
+
+#: src/balsa-index-page.c:1023
+msgid "You may only store one address at a time.\n"
+msgstr "Bir def'asýnda sadce bir adres kaydettirebilirsin.\n"
+
+#: src/balsa-index-page.c:1079
+#, c-format
+msgid ""
+"There is already an address book entry for %s.\n"
+"Run GnomeCard if you would like to edit your address book entries.\n"
+msgstr ""
+"%s için zaten bir adres yapraðý vardýr.\n"
+"Adres defterinin birimlerini deðiþtirmek istiyorsan, GnomeCard'ý çalýþtýr.\n"
+
+#: src/balsa-index-page.c:1097
+msgid ""
+"\n"
+"BEGIN:VCARD\n"
+msgstr ""
+"\n"
+"BEGIN:VCARD\n"
+
+#: src/balsa-index-page.c:1098
+#, c-format
+msgid "FN:%s\n"
+msgstr "FN:%s\n"
+
+#: src/balsa-index-page.c:1099
+#, c-format
+msgid "EMAIL;INTERNET:%s\n"
+msgstr "EMAIL;INTERNET:%s\n"
+
+#: src/balsa-index-page.c:1100
+msgid "END:VCARD\n"
+msgstr "END:VCARD\n"
 
 #: src/balsa-index.c:252
 msgid "From"
@@ -990,8 +1031,8 @@ msgid "Get new mail on startup"
 msgstr "Baþlarken yeni ePostayý al"
 
 #: src/main.c:110
-msgid "Compose a new email to EMAIL@ADDRESS"
-msgstr "EMAIL@ADDRESS'e yeni bir ePosta yaz"
+msgid "Compose a new email to kabalak@gmx.net"
+msgstr "kabalak@gmx.net'e yeni bir ePosta yaz"
 
 #: src/main.c:112
 msgid "Opens MAILBOXNAME"

@@ -1,5 +1,6 @@
 2001-08-22  Carlos Morgado  <chbm@chbm.nu>
 
+	based on patch from M . Thielker <balsa@t-data.com>
 	* src/main-window.c: 
 	* libbalsa/mailbox_pop3.c: 
 	* libbalsa/mailbox_pop3.h: 

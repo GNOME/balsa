@@ -2040,7 +2040,12 @@ balsa_window_refresh(BalsaWindow * window)
     g_assert(paned != NULL);
     if (balsa_app.previewpane) {
         LibBalsaMessage *message = window->current_message;
-        window->current_message = NULL;
+	if (message) {
+	    /* Steal the current message, so we can refresh it. */
+	    g_object_remove_weak_pointer(G_OBJECT(message),
+					 (gpointer) &window->current_message);
+	    window->current_message = NULL;
+	}
         balsa_window_idle_replace(window, message);
 	gtk_paned_set_position(GTK_PANED(paned), balsa_app.notebook_height);
     } else {

@@ -37,7 +37,7 @@ struct BalsaApplication balsa_app;
 
 /* prototypes */
 static void load_global_settings ();
-static int options_init ();
+static int mailboxes_init ();
 static void setup_local_mailboxes ();
 static void my_special_mailbox ();
 
@@ -62,7 +62,7 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.timer = 0;
 
   restore_global_settings ();
-  options_init ();
+  mailboxes_init ();
   setup_local_mailboxes ();
   my_special_mailbox ();
 
@@ -75,179 +75,21 @@ init_balsa_app (int argc, char *argv[])
 
 
 static gint
-options_init (void)
+mailboxes_init (void)
 {
-  MailboxMBX *mbx;
-  MailboxMTX *mtx;
-  MailboxTENEX *tenex;
-  MailboxMBox *mbox;
-  MailboxMMDF *mmdf;
-  MailboxUNIX *unixmb;
-  MailboxMH *mh;
+  gchar **mailboxes;
+  gint num;
+  gint i;
 
-  MailboxPOP3 *pop3;
-  MailboxIMAP *imap;
-  MailboxNNTP *nntp;
+  gnome_config_get_vector("/balsa/Global/Accounts",&num,&mailboxes);
+  for(i=0;num>i;i++)
+  {
+	  printf("Loaded mailbox: %s\n",mailboxes[i]);
+	  load_mailboxes(mailboxes[i]);
+  }
 
-  gint i = 0;
-  gint type;
-  gchar *name;
-  gchar *envmail;
-
-  GString *gstring, *buffer;
-
-  gstring = g_string_new (NULL);
-  buffer = g_string_new (NULL);
-
-  for (i = 0;; i++)
-    {
-      g_string_truncate (buffer, 0);
-      g_string_sprintf (buffer, "/balsa/Accounts/%i", i);
-
-      if (gnome_config_get_string (buffer->str))
-	{
-	  g_string_truncate (gstring, 0);
-	  gstring = g_string_append (gstring, "/balsa/");
-	  gstring = g_string_append (gstring, gnome_config_get_string (buffer->str));
-	  gstring = g_string_append (gstring, "/");
-
-	  fprintf (stderr, "%s\n", gstring->str);
-
-	  gnome_config_pop_prefix ();
-	  gnome_config_push_prefix (gstring->str);
-
-	  name = gnome_config_get_string ("Name");
-	  type = gnome_config_get_int ("Type=0");
-
-	  switch (type)
-	    {
-	    case 0:		/*  MBX  */
-	      mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
-	      mbx->name = gnome_config_get_string ("Name");
-	      mbx->path = gnome_config_get_string ("Path");
-	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
-	      break;
-	    case 1:		/*  MTX  */
-	      mtx = (MailboxMTX *) mailbox_new (MAILBOX_MTX);
-	      mtx->name = gnome_config_get_string ("Name");
-	      mtx->path = gnome_config_get_string ("Path");
-	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mtx);
-	      break;
-	    case 2:		/*  TENEX  */
-	      tenex = (MailboxTENEX *) mailbox_new (MAILBOX_TENEX);
-	      tenex->name = gnome_config_get_string ("Name");
-	      tenex->path = gnome_config_get_string ("Path");
-	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, tenex);
-	      break;
-	    case 3:		/*  MBox  */
-	      mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
-	      mbox->name = gnome_config_get_string ("Name");
-	      mbox->path = gnome_config_get_string ("Path");
-	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
-	      break;
-	    case 4:		/*  MMDF  */
-	      mmdf = (MailboxMMDF *) mailbox_new (MAILBOX_MMDF);
-	      mmdf->name = gnome_config_get_string ("Name");
-	      mmdf->path = gnome_config_get_string ("Path");
-	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mmdf);
-	      break;
-	    case 5:		/*  UNIX  */
-	      unixmb = (MailboxUNIX *) mailbox_new (MAILBOX_UNIX);
-	      unixmb->name = gnome_config_get_string ("Name");
-	      unixmb->path = gnome_config_get_string ("Path");
-	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, unixmb);
-	      break;
-	    case 6:		/*  MH  */
-	      mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
-	      mh->name = gnome_config_get_string ("Name");
-	      mh->path = gnome_config_get_string ("Path");
-	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
-	      break;
-	    case 7:		/*  POP3  */
-	      pop3 = (MailboxPOP3 *) mailbox_new (MAILBOX_POP3);
-	      pop3->name = gnome_config_get_string ("Name");
-	      pop3->user = gnome_config_get_string ("username");
-	      pop3->passwd = gnome_config_get_string ("password");
-	      pop3->server = gnome_config_get_string ("server");
-	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
-	      break;
-	    case 8:		/*  IMAP  */
-	      imap = (MailboxIMAP *) mailbox_new (MAILBOX_IMAP);
-	      imap->name = gnome_config_get_string ("Name");
-	      imap->user = gnome_config_get_string ("username");
-	      imap->passwd = gnome_config_get_string ("password");
-	      imap->server = gnome_config_get_string ("server");
-	      imap->path = gnome_config_get_string ("Path");
-	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, imap);
-	      break;
-	    case 9:		/*  NNTP  */
-	      nntp = (MailboxNNTP *) mailbox_new (MAILBOX_NNTP);
-	      nntp->name = gnome_config_get_string ("Name");
-	      nntp->user = gnome_config_get_string ("username");
-	      nntp->passwd = gnome_config_get_string ("password");
-	      nntp->server = gnome_config_get_string ("server");
-	      nntp->newsgroup = gnome_config_get_string ("newsgroup");
-	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, nntp);
-	      break;
-	    }
-	  gnome_config_pop_prefix ();
-	}
-      else
-	{
-	  if (i == 0)
-	    {
-		    envmail=getenv("MAIL");
-	      if (envmail)
-		{
-		  add_mailbox_config (0, "Default", envmail, 0);
-
-		  mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
-		  mbx->name = "Default";
-		  mbx->path = envmail;
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
-		}
-	      g_string_free (gstring, 1);
-	      g_string_free (buffer, 1);
-	      return -1;
-	    }
-	  break;
-	}
-    }
-  gnome_config_pop_prefix ();
-  gnome_config_sync ();
-  g_string_free (gstring, 1);
-  g_string_free (buffer, 1);
-  return i;
+  return 1;
 }
-
-
-
-void
-mailbox_add_gnome_config (gint num, gchar * name, gchar * path, gint type)
-{
-  GString *gstring;
-
-  gstring = g_string_new (NULL);
-
-  gnome_config_push_prefix ("/balsa/Accounts/");
-  g_string_truncate (gstring, 0);
-  g_string_sprintf (gstring, "%i", num);
-  gnome_config_set_string (gstring->str, name);
-  gnome_config_pop_prefix ();
-
-  g_string_truncate (gstring, 0);
-  g_string_sprintf (gstring, "/balsa/%s/", name);
-  gnome_config_push_prefix (gstring->str);
-  gnome_config_set_string ("Name", name);
-  gnome_config_set_string ("Path", path);
-  gnome_config_set_int ("Type", type);
-  gnome_config_pop_prefix ();
-
-  gnome_config_sync ();
-  g_string_free (gstring, 1);
-}
-
-
 
 static void
 setup_local_mailboxes ()

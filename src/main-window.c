@@ -18,6 +18,7 @@
  */
 
 #include <string.h>
+#include "../config.h"
 #include "main-window.h"
 #include "balsa-message.h"
 #include "balsa-index.h"
@@ -27,7 +28,6 @@
 #include "pref-manager.h"
 #include "mailbox-manager.h"
 #include "addrbook-manager.h"
-#include "../config.h"
 
 GtkWidget *bottom_pbar;
 

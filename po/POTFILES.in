@@ -1,0 +1,3 @@
+src/sendmsg-window.c
+src/addrbook-manager.c
+src/main-window.c

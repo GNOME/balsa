@@ -1,0 +1,148 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 1998-04-29 18:34-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+
+#: src/sendmsg-window.c:129
+msgid "Send"
+msgstr ""
+
+#: src/sendmsg-window.c:134
+msgid "Attach File"
+msgstr ""
+
+#: src/addrbook-manager.c:179 src/sendmsg-window.c:143
+msgid "Close"
+msgstr ""
+
+#: src/main-window.c:453 src/sendmsg-window.c:151
+msgid "Message"
+msgstr ""
+
+#: src/sendmsg-window.c:158
+msgid "Cut"
+msgstr ""
+
+#: src/sendmsg-window.c:165
+msgid "Copy"
+msgstr ""
+
+#: src/sendmsg-window.c:172
+msgid "Paste"
+msgstr ""
+
+#: src/sendmsg-window.c:179
+msgid "Edit"
+msgstr ""
+
+#: src/addrbook-manager.c:194 src/sendmsg-window.c:187
+msgid "Contents"
+msgstr ""
+
+#: src/addrbook-manager.c:199 src/main-window.c:546 src/sendmsg-window.c:192
+msgid "Help"
+msgstr ""
+
+#: src/addrbook-manager.c:187 src/main-window.c:377
+msgid "File"
+msgstr ""
+
+#: src/main-window.c:334
+msgid "Get New Mail"
+msgstr ""
+
+#.
+#. w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Save mailbox..."));
+#. gtk_widget_show (w);
+#. gtk_menu_append (GTK_MENU (menu), w);
+#. menu_items[i++] = w;
+#.
+#. w = gtk_menu_item_new ();
+#. gtk_widget_show (w);
+#. gtk_menu_append (GTK_MENU (menu), w);
+#.
+#. w = gnome_stock_menu_item (GNOME_STOCK_MENU_PRINT, _ ("Print..."));
+#. gtk_widget_show (w);
+#. gtk_menu_append (GTK_MENU (menu), w);
+#. menu_items[i++] = w;
+#.
+#. w = gtk_menu_item_new ();
+#. gtk_widget_show (w);
+#. gtk_menu_append (GTK_MENU (menu), w);
+#.
+#: src/main-window.c:367
+msgid "Exit"
+msgstr ""
+
+#: src/main-window.c:385
+msgid "New"
+msgstr ""
+
+#: src/main-window.c:395
+msgid "Reply"
+msgstr ""
+
+#.
+#. w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Reply to All"));
+#. gtk_widget_show (w);
+#. gtk_menu_append (GTK_MENU (menu), w);
+#. menu_items[i++] = w;
+#.
+#: src/main-window.c:410
+msgid "Foward"
+msgstr ""
+
+#: src/main-window.c:433
+msgid "Delete"
+msgstr ""
+
+#: src/main-window.c:443
+msgid "Undelete"
+msgstr ""
+
+#: src/main-window.c:463
+msgid "Preferences..."
+msgstr ""
+
+#: src/main-window.c:473
+msgid "Mailbox Manager..."
+msgstr ""
+
+#: src/main-window.c:483
+msgid "Settings"
+msgstr ""
+
+#: src/main-window.c:494
+msgid "Toolbar"
+msgstr ""
+
+#: src/main-window.c:500
+msgid "Icons"
+msgstr ""
+
+#: src/main-window.c:509
+msgid "Text"
+msgstr ""
+
+#: src/main-window.c:518
+msgid "Both"
+msgstr ""
+
+#: src/main-window.c:527
+msgid "View"
+msgstr ""
+
+#: src/main-window.c:537
+msgid "About"
+msgstr ""

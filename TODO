@@ -9,7 +9,7 @@ Note: This list is not complete, but here for the authors
 
 Stuart
 ---------------------------------------------------------
- * bug tigert about getting new icons for toolbar
+ * Add text labels below icons (optional!)
  * #mh/ requires a .mh_profile in ~ which looks something
    like:  "Path: Mail", telling it to get mh folders from
    ~/Mail
@@ -19,10 +19,10 @@ Stuart
  * lockfile so that Balsa can only be run once.  c-client
    doesn't like like two programms accessing the same
    mailboxes at the same time.
- 
+
 sendmsg-window TODO:
  * look at smtp code crashing if gtk_text is empty
-
+-- need to check 4-29-98
 
 
 Jay

@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <gtk/gtk.h>
+#include "../config.h"
 #include <gnome.h>
 #include "balsa-app.h"
 #include "addrbook-manager.h"

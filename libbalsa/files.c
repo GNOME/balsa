@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,9 +22,14 @@
 
 #include "config.h"
 #include <gnome.h>
+#include <libgnomevfs/gnome-vfs-mime-handlers.h>
 
 #include "misc.h"
 #include "files.h"
+
+#if BALSA_MAJOR > 1
+#define PATH_SEP_STR G_DIR_SEPARATOR_S
+#endif
 
 static const gchar *permanent_prefixes[] = {
 /*	BALSA_DATA_PREFIX,
@@ -103,15 +108,21 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
 gchar *
 libbalsa_icon_finder(const char *mime_type, const char *filename)
 {
-    const char *content_type, *icon_file;
+    char *content_type;
+    const char *icon_file;
     gchar *icon = NULL;
     
-    content_type = (!mime_type) ? 
-	libbalsa_lookup_mime_type(filename) : 
-	mime_type;
-
+    if(mime_type)
+        content_type = g_strdup(mime_type);
+    else {
+        if(!filename)
+            return balsa_pixmap_finder ("balsa/attachment.png");
+        content_type = g_strdup(libbalsa_lookup_mime_type(mime_type));
+    }
+    /* FIXME:
+       or icon_file = gnome_desktop_item_find_icon(GVMGI(content_Type)?) 
+    icon_file = gnome_vfs_mime_get_icon(content_type); */
     icon_file = gnome_mime_get_value (content_type, "icon-filename");
-
     if ( icon_file ) 
 	icon = g_strdup (icon_file);
 
@@ -135,6 +146,6 @@ libbalsa_icon_finder(const char *mime_type, const char *filename)
 	
 	g_free (gnome_icon);
     }
-
+    g_free(content_type);
     return (icon);
 }

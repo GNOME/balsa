@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,12 @@
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
-#include "mailbackend.h"
+#include "misc.h"
+
+/* GTK_CLASS_TYPE for 1.2<->1.3/2.0 GTK+ compatibility */
+#ifndef GTK_CLASS_TYPE
+#define GTK_CLASS_TYPE(x) (GTK_OBJECT_CLASS(x)->type)
+#endif /* GTK_CLASS_TYPE */
 
 static GtkObjectClass *parent_class = NULL;
 static void libbalsa_server_class_init(LibBalsaServerClass * klass);
@@ -89,19 +94,21 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
     libbalsa_server_signals[SET_USERNAME] =
 	gtk_signal_new("set-username",
 		       GTK_RUN_FIRST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaServerClass,
 					 set_username),
 		       gtk_marshal_NONE__STRING, GTK_TYPE_NONE, 1,
 		       GTK_TYPE_STRING);
     libbalsa_server_signals[SET_PASSWORD] =
-	gtk_signal_new("set-password", GTK_RUN_FIRST, object_class->type,
+	gtk_signal_new("set-password", GTK_RUN_FIRST,
+                       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaServerClass,
 					 set_password),
 		       gtk_marshal_NONE__STRING, GTK_TYPE_NONE, 1,
 		       GTK_TYPE_STRING);
     libbalsa_server_signals[SET_HOST] =
-	gtk_signal_new("set-host", GTK_RUN_FIRST, object_class->type,
+	gtk_signal_new("set-host", GTK_RUN_FIRST,
+                       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaServerClass, set_host),
 #ifdef USE_SSL
 		       gtk_marshal_NONE__POINTER_INT, GTK_TYPE_NONE, 2,

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -242,6 +242,7 @@ filter_condition_validity(LibBalsaFilter* fil, LibBalsaCondition* cond)
 	FILTER_CLRFLAG(fil,FILTER_COMPILED);
 	break;
     case CONDITION_FLAG:
+    case CONDITION_DATE:
     case CONDITION_NONE:
 	break;
     }
@@ -507,6 +508,9 @@ libbalsa_filter_export_sieve(LibBalsaFilter* fil, gchar* filename)
 	    buffer=g_string_append(buffer,"discard;\n");
 	    break;
 	    /* FIXME how to code other actions */
+        case FILTER_NOTHING:
+        case FILTER_PRINT:
+        case FILTER_RUN:
 	}
 	buffer=g_string_append(buffer,"}\n");
     }

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,7 @@
 
 #include "mailbackend.h"
 #include "mailbox_imap.h"
+#include "misc.h"
 #include "information.h"
 
 #ifdef BALSA_USE_THREADS
@@ -325,8 +326,7 @@ add_mutt_body_as_extbody(const gchar *filename, const gchar *mime_type)
     mutt_mktemp(buffer);
     body->filename = g_strdup(buffer);
     tempfp = safe_fopen(body->filename, "w+");
-    fprintf(tempfp, "Note: this is _not_ the real body!\n",
-	    mime_type);
+    fprintf(tempfp, "Note: this is _not_ the real body!\n");
     fclose(tempfp);
 
     libbalsa_unlock_mutt();
@@ -391,8 +391,6 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 		       gboolean flow)
 {
     MessageQueueItem *mqi;
-    LibBalsaServer *server;
-
 
     g_return_if_fail(message);
 
@@ -1206,7 +1204,6 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     BODY *last, *newbdy;
     gchar *tmp;
     LibBalsaMessageBody *body;
-    LibBalsaServer *server;
     int thereturn; 
 
     libbalsa_lock_mutt();

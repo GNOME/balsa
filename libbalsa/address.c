@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -280,22 +280,6 @@ static gchar *rfc2822_list(GList *list)
     return retc;
 }
 
-
-
-
-static LibBalsaAddress *find_address(const gchar *addr_str, 
-				     LibBalsaAddress *match_addr)
-{
-    GList *ab_list;             /* To iterate address books   */
-    LibBalsaAddressBook *ab;
-    
-    /* *** TODO: Search all address books or just the one match_addr 
-                 belongs for entries containing addr_str in address list.
-                 Return first one that's not a distribution list. */
-    return NULL;
-}
-
-
 /* 
    Get a string version of this address.
 
@@ -312,7 +296,6 @@ gchar *
 libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n)
 {
     gchar *retc = NULL;
-    gboolean dist_list = TRUE;
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 

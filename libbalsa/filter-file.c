@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,8 +31,11 @@
  * filter * libbalsa_filter_new_from_config(void)
  */
 
-#include <sys/types.h>
+/* define _XOPEN_SOURCE to make strptime visible */
+#define _XOPEN_SOURCE
+#include <stdio.h>
 #include <time.h>
+#include <sys/types.h>
 #include "filter-file.h"
 #include "filter-private.h"
 #include "filter-funcs.h"
@@ -291,12 +294,12 @@ libbalsa_condition_save_config(LibBalsaCondition * cond)
 	break;
     case CONDITION_DATE:
 	if (cond->match.interval.date_low)
-	    strftime(str,sizeof(str),"%x",
+	    strftime(str,sizeof(str),"%G-%m-%d",
                      localtime(&cond->match.interval.date_low));
 	else str[0]='\0';
 	gnome_config_set_string("Low-date",str);
 	if (cond->match.interval.date_high)
-	    strftime(str,sizeof(str),"%x",
+	    strftime(str,sizeof(str),"%G-%m-%d",
                      localtime(&cond->match.interval.date_high));
 	else str[0]='\0';
 	gnome_config_set_string("High-date",str);
@@ -311,10 +314,10 @@ libbalsa_condition_save_config(LibBalsaCondition * cond)
 
 static void
 libbalsa_real_clean_condition_sections(gchar * buffer,gchar * num_pointer,
-				       gint num_len, gint begin)
+				       gint begin)
 {
     while (TRUE) {
-	snprintf(num_pointer,num_len,"%d/",begin++);
+	sprintf(num_pointer,"%d/",begin++);
 	if (gnome_config_has_section(buffer)) {
 	    g_print("Cleaning section %s\n",buffer);
 	    gnome_config_clean_section(buffer);
@@ -323,7 +326,7 @@ libbalsa_real_clean_condition_sections(gchar * buffer,gchar * num_pointer,
     }
 }
 
-#define CONDITION_SECTION_MAX "999"
+#define CONDITION_SECTION_MAX "9999999999"
 
 /* libbalsa_clean_condition_sections:
  */
@@ -331,7 +334,6 @@ void
 libbalsa_clean_condition_sections(const gchar * prefix,
 				  const gchar * filter_section_name)
 {
-    gint nb=0,tmp_len=strlen(CONDITION_SECTION_MAX)+2;
     gchar * buffer,* tmp;
     
     /* We allocate once for all a buffer to store conditions sections names */
@@ -339,7 +341,7 @@ libbalsa_clean_condition_sections(const gchar * prefix,
 			     "%s:" CONDITION_SECTION_MAX "/",
 			     prefix, filter_section_name);
     tmp=strrchr(buffer,':')+1;
-    libbalsa_real_clean_condition_sections(buffer,tmp,tmp_len,0);
+    libbalsa_real_clean_condition_sections(buffer,tmp,0);
     g_free(buffer);
 }
 
@@ -355,7 +357,7 @@ void
 libbalsa_conditions_save_config(GSList * conds, const gchar * prefix,
 				const gchar * filter_section_name)
 {
-    gint nb=0,tmp_len=strlen(CONDITION_SECTION_MAX)+2;
+    gint nb=0;
     gchar * buffer,* tmp;
 
     /* We allocate once for all a buffer to store conditions sections names */
@@ -364,13 +366,13 @@ libbalsa_conditions_save_config(GSList * conds, const gchar * prefix,
 			     prefix,filter_section_name);
     tmp=strrchr(buffer,':')+1;
     for (;conds;conds=g_slist_next(conds),nb++) {
-	snprintf(tmp,tmp_len,"%d/",nb);
-	g_print("Saving condition : %s \n", buffer, filter_section_name);
+	sprintf(tmp, "%d/", nb);
+	g_print("Saving condition : %s in %s\n", buffer, filter_section_name);
 	gnome_config_push_prefix(buffer);
 	libbalsa_condition_save_config((LibBalsaCondition*) conds->data);
 	gnome_config_pop_prefix();
     }
-    libbalsa_real_clean_condition_sections(buffer,tmp,tmp_len,nb);
+    libbalsa_real_clean_condition_sections(buffer, tmp, nb);
     g_free(buffer);
 }
 

@@ -37,7 +37,6 @@ typedef struct header MuttHeader;
 #include "message.h"
 #include "body.h"
 #include "files.h"
-#include "misc.h"
 #include "mime.h"
 #include "notify.h"
 

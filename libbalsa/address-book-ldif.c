@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -302,7 +302,7 @@ static LibBalsaAddress *find_addr(GList *ab_list, const gchar *id)
 static void expand_addr_list(LibBalsaAddress *address, GList *ab_list)
 {
     GList *member, *notfound = NULL;
-    GList *member_list=NULL, *l;
+    GList *member_list=NULL;
     
     for(member=address->address_list; member; member=g_list_next(member) ) {
 	gchar *member_data=member->data;

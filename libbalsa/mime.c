@@ -2,7 +2,7 @@
 /* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,6 +26,7 @@
 
 #include "libbalsa.h"
 #include "mailbackend.h"
+#include "misc.h"
 
 /* FIXME: The content of this file could go to message.c */
 

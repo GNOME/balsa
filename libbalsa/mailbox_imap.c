@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -530,8 +530,7 @@ static gboolean
 clean_cache(LibBalsaMailbox* mailbox)
 {
     GDBM_FILE dbf;
-    datum key, nextkey, header;
-    LibBalsaMessage* message;
+    datum key, nextkey;
     gchar* fname =  get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "body");
     ImapUID uid[2];
     GHashTable *present_uids;

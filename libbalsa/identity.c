@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -97,8 +97,9 @@ libbalsa_identity_get_type()
                 sizeof(LibBalsaIdentityClass),
                 (GtkClassInitFunc) libbalsa_identity_class_init,
                 (GtkObjectInitFunc) libbalsa_identity_init,
-                (GtkArgSetFunc) NULL,
-                (GtkArgGetFunc) NULL
+                /* reserved_1 */ NULL,
+                /* reserved_2 */ NULL,
+                (GtkClassInitFunc) NULL
             };
         
         libbalsa_identity_type = 
@@ -570,8 +571,9 @@ new_ident_cb(GtkButton* button, gpointer user_data)
 
     ident = LIBBALSA_IDENTITY(libbalsa_identity_new());
     parent = gtk_object_get_data(GTK_OBJECT(user_data), "parent-window");
-    dialog = setup_ident_dialog(parent, TRUE, ident, ident_dialog_add_cb, 
-				user_data);
+    dialog = setup_ident_dialog(parent, TRUE, ident, 
+                                (GtkSignalFunc)ident_dialog_add_cb, 
+                                user_data);
     gnome_dialog_run(GNOME_DIALOG(dialog));
 }
 
@@ -594,7 +596,8 @@ edit_ident_cb(GtkButton* button, gpointer user_data)
     row = GPOINTER_TO_INT(list->data);
     ident = LIBBALSA_IDENTITY(gtk_clist_get_row_data(clist, row));
     parent = gtk_object_get_data(GTK_OBJECT(clist), "parent-window");
-    dialog = setup_ident_dialog(parent, FALSE, ident, ident_dialog_edit_cb, 
+    dialog = setup_ident_dialog(parent, FALSE, ident, 
+                                (GtkSignalFunc)ident_dialog_edit_cb, 
 				clist);
     gnome_dialog_run(GNOME_DIALOG(dialog));
 }

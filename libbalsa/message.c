@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -32,6 +32,7 @@
    
 #include "config.h"
 
+#include <ctype.h>
 #include <glib.h>
 
 #ifdef BALSA_USE_THREADS
@@ -42,10 +43,17 @@
 #include "libbalsa_private.h"
 
 #include "mailbackend.h"
+/* needed for truncate_string */
+#include "misc.h"
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
 #endif
+
+/* GTK_CLASS_TYPE for 1.2<->1.3/2.0 GTK+ compatibility */
+#ifndef GTK_CLASS_TYPE
+#define GTK_CLASS_TYPE(x) (GTK_OBJECT_CLASS(x)->type)
+#endif /* GTK_CLASS_TYPE */
 
 static void libbalsa_message_class_init(LibBalsaMessageClass * klass);
 static void libbalsa_message_init(LibBalsaMessage * message);
@@ -143,7 +151,7 @@ libbalsa_message_class_init(LibBalsaMessageClass * klass)
     libbalsa_message_signals[CLEAR_FLAGS] =
 	gtk_signal_new("clear-flags",
 		       GTK_RUN_FIRST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
 					 clear_flags),
 		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
@@ -151,7 +159,7 @@ libbalsa_message_class_init(LibBalsaMessageClass * klass)
     libbalsa_message_signals[SET_ANSWERED] =
 	gtk_signal_new("set-answered",
 		       GTK_RUN_FIRST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
 					 set_answered),
 		       gtk_marshal_NONE__BOOL, GTK_TYPE_NONE, 1,
@@ -160,7 +168,7 @@ libbalsa_message_class_init(LibBalsaMessageClass * klass)
     libbalsa_message_signals[SET_READ] =
 	gtk_signal_new("set-read",
 		       GTK_RUN_FIRST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass, set_read),
 		       gtk_marshal_NONE__BOOL,
 		       GTK_TYPE_NONE, 1, GTK_TYPE_BOOL);
@@ -168,7 +176,7 @@ libbalsa_message_class_init(LibBalsaMessageClass * klass)
     libbalsa_message_signals[SET_DELETED] =
 	gtk_signal_new("set-deleted",
 		       GTK_RUN_LAST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
 					 set_deleted),
 		       gtk_marshal_NONE__BOOL, GTK_TYPE_NONE, 1,
@@ -213,7 +221,6 @@ static void
 libbalsa_message_destroy(GtkObject * object)
 {
     LibBalsaMessage *message;
-    GList *list;
 
     g_return_if_fail(object != NULL);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(object));
@@ -892,7 +899,6 @@ gboolean
 libbalsa_message_has_attachment(LibBalsaMessage * message)
 {
     HEADER *msg_header;
-    LibBalsaMessageBody *body;
     gboolean res;
 
     g_return_val_if_fail(message, FALSE);

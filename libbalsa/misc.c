@@ -2,7 +2,7 @@
 /* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,40 +28,28 @@
 #include <string.h>
 #include <errno.h>
 #include <dirent.h>
-/* for gnome mime functions ... */
-#include <gnome.h>
 
-#include "libbalsa.h"
+#include <libgnomevfs/gnome-vfs-file-info.h>
+#include <libgnomevfs/gnome-vfs-ops.h>
+
+#include "misc.h"
 #include "libbalsa_private.h"
-#include "mailbackend.h"
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
-#define GNOME_MIME_BUG_WORKAROUND 1
-
-/* balsa_lookup_mime_type:
- *
- * Description: This is a function to use the gnome mime functions to
- * get the type and subtype for later use. 
- * it includes a workaround for notorious gnome-mime bug.
- * */
-const gchar*
-libbalsa_lookup_mime_type(const gchar * path) {
-    const gchar *mime_type;
-
-    mime_type =
-	gnome_mime_type_or_default_of_file(path, "application/octet-stream");
-#ifdef GNOME_MIME_BUG_WORKAROUND
-    /* the function above returns for certains files a string which is
-       not a proper MIME type, e.g. "PDF document". Surprizingly, 
-       gnome_mime_type() does not fail in this case. This bug has been 
-       filed in bugzilla. Still not fixed.
-    */
-    if(strchr(mime_type, '/') == NULL)
-	mime_type = 
-	    gnome_mime_type_or_default(path, "application/octet-stream");
-#endif
-    return mime_type;
+gchar*
+libbalsa_lookup_mime_type(const gchar * path)
+{
+    GnomeVFSFileInfo* vi = gnome_vfs_file_info_new();
+    gchar* res;
+    gchar* uri = g_strconcat("file://", path, NULL);
+    gnome_vfs_get_file_info (uri, vi,
+                             GNOME_VFS_FILE_INFO_GET_MIME_TYPE
+                             | GNOME_VFS_FILE_INFO_FOLLOW_LINKS);
+    g_free(uri);
+    res = g_strdup(gnome_vfs_file_info_get_mime_type(vi));
+    gnome_vfs_file_info_unref(vi);
+    return res;
 }
 
 gchar *

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,7 @@
 
 #include "libbalsa.h"
 #include "mailbackend.h"
+#include "misc.h"
 
 
 #ifdef BALSA_USE_THREADS
@@ -89,8 +90,12 @@ void
 libbalsa_init(LibBalsaInformationFunc information_callback)
 {
     struct utsname utsname;
-    char *p;
+    const char *p;
 
+    if (!gnome_vfs_init ()) {
+        fprintf (stderr, "Cannot initialize the GNOME Virtual File System.\n");
+        return;
+    }
     Spoolfile = libbalsa_guess_mail_spool();
 
 #ifdef BALSA_USE_THREADS
@@ -102,14 +107,12 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 
     uname(&utsname);
 
-    Username = g_get_user_name();
-
-    Homedir = g_get_home_dir();
-
-    Realname = g_get_real_name();
-
-    Hostname = libbalsa_get_hostname();
-    Domainname = libbalsa_get_domainname();
+    /* Username, Homedir etc. are really const char* */
+    Username   = (char*)g_get_user_name();
+    Homedir    = (char*)g_get_home_dir();
+    Realname   = (char*)g_get_real_name();
+    Hostname   = (char*)libbalsa_get_hostname();
+    Domainname = (char*)libbalsa_get_domainname();
 
     libbalsa_real_information_func = information_callback;
 
@@ -122,8 +125,8 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 
     Sendmail = SENDMAIL;
 
-    Shell = g_strdup((p = g_getenv("SHELL")) ? p : "/bin/sh");
-    Tempdir = g_get_tmp_dir();
+    Shell   = g_strdup((p = g_getenv("SHELL")) ? p : "/bin/sh");
+    Tempdir = (char*)g_get_tmp_dir();
 
     if (UserHeader)
 	UserHeader = UserHeader->next;
@@ -325,7 +328,6 @@ gchar *libbalsa_guess_imap_inbox()
 gchar *libbalsa_guess_ldap_base()
 {
     gchar *server = libbalsa_guess_ldap_server();
-    char *domain;
 
     /* Note: Assumes base dn is "o=<domain name>". Somewhat speculative... */
     if(server) {

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -267,7 +267,7 @@ gboolean libbalsa_address_is_dist_list(const LibBalsaAddressBook *ab,
 				       const LibBalsaAddress *address)
 {
     return (address->member_list!=NULL || 
-	    ab->dist_list_mode && g_list_length(address->address_list)>1);
+	    (ab->dist_list_mode && g_list_length(address->address_list)>1));
 }
 
 

@@ -936,9 +936,7 @@ create_entry(GtkDialog *mcw, GtkWidget * table,
     }
 
     gtk_label_set_mnemonic_widget(GTK_LABEL(hotlabel), entry);
-    g_signal_connect_swapped(G_OBJECT(entry), "activate",
-                             G_CALLBACK(gtk_window_activate_default),
-                             mcw);
+
     /* Watch for changes... */
     if(changed_func)
 	g_signal_connect(G_OBJECT(entry), "changed", 

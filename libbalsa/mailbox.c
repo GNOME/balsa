@@ -127,7 +127,7 @@ check_all_pop3_hosts (LibBalsaMailbox *to, GList *mailboxes)
       PopPass = g_strdup (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd);
 
 #ifdef BALSA_USE_THREADS
-      sprintf( msgbuf, "POP3: %s", LIBBALSA_MAILBOX_POP3(mailbox)->mailbox.name );
+      sprintf( msgbuf, "POP3: %s", LIBBALSA_MAILBOX(mailbox)->name );
       MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_SOURCE, msgbuf );
 #endif
  

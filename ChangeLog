@@ -1,3 +1,10 @@
+2004-07-14 11:23  PeterB
+
+	* src/save-restore.c: save all mailbox-views in the hash table, not
+	just those in the mailbox tree.
+	* src/balsa-app.c: mark a mailbox-view as not open if we fail to
+	open it.
+
 2004-07-13  Carlos Morgado  <chbm gnome.org>
 
 	* libbalsa/imap/imap_private.h: include config.h, 

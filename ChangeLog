@@ -1,5 +1,16 @@
 1998-12-14  Jeff Garzik <jgarzik@pobox.com>
 
+	* src/main-window.c:
+	- Re-enabled Mailbox/Delete menu item; it takes into account lack
+	  of selection now.
+	- Updated for new gnome-dock-item-new args.
+
+	* src/message-window.c:
+	- Continued futile efforts to close the message window via
+	  File/Close.
+
+1998-12-14  Jeff Garzik <jgarzik@pobox.com>
+
 	* libbalsa/mailbox.[ch]:
 	Added simple IMAP support stubs.
 

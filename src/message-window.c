@@ -73,7 +73,7 @@ message_window_new (Message * message)
   mw = g_malloc0 (sizeof (MessageWindow));
 
   mw->window = gnome_app_new ("balsa", "Message");
-  gtk_object_set_data (GTK_OBJECT (mw->window), "msgwin", mw);
+  gtk_object_set_data (GTK_OBJECT (mw->window), "msgwin", mw->window);
 
   gtk_signal_connect (GTK_OBJECT (mw->window),
 		      "destroy",
@@ -85,8 +85,7 @@ message_window_new (Message * message)
 		      (GtkSignalFunc) gtk_false,
 		      NULL);
 
-  gnome_app_create_menus_with_data ( GNOME_APP (mw->window), main_menu,
-  				     mw->window );
+  gnome_app_create_menus_with_data (GNOME_APP (mw->window), main_menu, mw);
 
   vbox = gtk_vbox_new (TRUE, 0);
   gnome_app_set_contents (GNOME_APP (mw->window), vbox);
@@ -129,7 +128,7 @@ destroy_message_window (GtkWidget * widget)
 static void
 close_message_window(GtkWidget * widget, gpointer data)
 {
-  destroy_message_window(GTK_WIDGET(data));
+  gtk_signal_emit_by_name (GTK_OBJECT (data), "destroy");
 }
 
 

@@ -154,11 +154,11 @@ static GnomeUIInfo mailbox_menu[] =
     GNOME_APP_UI_ITEM, N_ ("Edit"), NULL, mblist_menu_edit_cb, NULL,
     NULL, GNOME_APP_PIXMAP_NONE, GNOME_STOCK_MENU_PROP, 'E', 0, NULL
   },
+#endif
   {
     GNOME_APP_UI_ITEM, N_ ("Delete"), NULL, mblist_menu_delete_cb, NULL,
     NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
   },
-#endif
   GNOMEUIINFO_ITEM_STOCK ("Close", NULL, mailbox_close_child, GNOME_STOCK_MENU_CLOSE),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_END
@@ -694,9 +694,10 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
 
-  dock_item = gnome_dock_item_new (GNOME_DOCK_ITEM_BEH_NEVER_HORIZONTAL);
-  gnome_dock_item_set_shadow_type (GNOME_DOCK_ITEM (dock_item), GTK_SHADOW_NONE);
-
+  dock_item = gnome_dock_item_new (_("Mailboxes"),
+  				   GNOME_DOCK_ITEM_BEH_NEVER_HORIZONTAL);
+  gnome_dock_item_set_shadow_type (GNOME_DOCK_ITEM (dock_item),
+  				   GTK_SHADOW_NONE);
 
   mblw->sw = gtk_scrolled_window_new (NULL, NULL);
   mblw->ctree = GTK_CTREE (balsa_mblist_new ());

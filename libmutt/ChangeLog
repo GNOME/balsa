@@ -1,3 +1,7 @@
+2001-02-13  Carlos Morgado  <chbm@cprm.net>
+
+	* imap/auth.c: (imap_authenticate) bugfix iterating authenticators 
+
 2001-02-13  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* Makefile.am: fix SSL build.

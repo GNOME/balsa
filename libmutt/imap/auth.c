@@ -48,7 +48,8 @@ int imap_authenticate (IMAP_DATA* idata)
   imap_auth_t* authenticator = imap_authenticators;
   int r = -1;
 
-  while (authenticator)
+  /* BUGFIX - someone forgot the * in mutt */
+  while (*authenticator)
   {
     if ((r = (*authenticator)(idata)) != IMAP_AUTH_UNAVAIL)
       return r;

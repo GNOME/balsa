@@ -899,8 +899,14 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap,
 static void
 lbm_imap_get_unseen(LibBalsaMailboxImap * mimap)
 {
-    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
-    guint i, count, total = imap_mbox_handle_get_exists(mimap->handle);
+    LibBalsaMailbox *mailbox;
+    guint i, count, total;
+
+    if (!mimap->handle)
+	return;
+
+    mailbox = LIBBALSA_MAILBOX(mimap);
+    total = imap_mbox_handle_get_exists(mimap->handle);
     mailbox->first_unread = total;
     for(i=count=0; i<total; i++) {
         if(imap_mbox_handle_msgno_has_flags(mimap->handle,

@@ -1,5 +1,7 @@
-2004-11-03 21:36  PeterB
+2004-11-03 21:46  PeterB
 
+	* libbalsa/address-entry.c: pop down completions on receiving
+	focus.
 	* libbalsa/address-entry.c: update completion list on cursor
 	movement.
 	* libbalsa/address-entry.c: test for NULL name; clean up completion

@@ -257,7 +257,9 @@ balsa_index_init(BalsaIndex * bindex)
 {
     GtkCList *clist;
     GtkObject* adj;
-
+    GdkPixmap* pixmap;
+    GdkPixmap* mask;
+    
 
     /*
      * status
@@ -366,7 +368,6 @@ balsa_index_init(BalsaIndex * bindex)
                          index_drag_types, ELEMENTS(index_drag_types),
                          GDK_ACTION_DEFAULT | GDK_ACTION_COPY | 
                          GDK_ACTION_MOVE);
-
     gtk_signal_connect (GTK_OBJECT (bindex->ctree), "drag-data-get",
                         GTK_SIGNAL_FUNC (index_drag_cb), NULL);
 
@@ -1712,15 +1713,17 @@ balsa_index_reset(BalsaIndex * index)
 void
 balsa_index_update_message(BalsaIndex * index)
 {
+    gint row;
     GtkObject *message;
     GtkCList *list;
 
     list = GTK_CLIST(index->ctree);
-    if (g_list_find(list->selection, (gpointer) list->focus_row) == NULL)
+    row = bi_get_largest_selected (list);
+
+    if (row < 0)
 	message = NULL;
     else
-	message =
-	    GTK_OBJECT(gtk_clist_get_row_data(list, list->focus_row));
+	message = GTK_OBJECT(gtk_clist_get_row_data(list, row));
 
     replace_attached_data(GTK_OBJECT(index), "message", message);
 

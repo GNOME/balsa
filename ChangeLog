@@ -1,3 +1,7 @@
+1999-02-11  Sergey Panov  <sipan@mit.edu>
+
+	* src/main.c, src/Makefile.am: turn on internationalization
+
 1999-02-01  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
 
 	* src/filter-edit-dialog.c (build_left_side): pass it a

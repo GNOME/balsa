@@ -149,6 +149,10 @@ mailboxes_init (void)
 int
 main (int argc, char *argv[])
 {
+  /* Initialize the i18n stuff */
+  bindtextdomain (PACKAGE, GNOMELOCALEDIR);
+  textdomain (PACKAGE);
+ 
   balsa_init (argc, argv);
 
   balsa_app_init ();

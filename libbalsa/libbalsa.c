@@ -72,6 +72,17 @@ mutt_exit(int code)
 {
 }
 
+void
+mutt_perror (const char *s)
+{
+  char *p = strerror (errno);
+
+  dprint (1, (debugfile, "%s: %s (errno = %d)\n", s, 
+      p ? p : "unknown error", errno));
+  mutt_error ("%s: %s (errno = %d)", s, p ? p : _("unknown error"), errno);
+}
+
+
 int
 mutt_yesorno(const char *msg, int def)
 {
@@ -121,7 +132,6 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 
     Sendmail = SENDMAIL;
 
-    libbalsa_set_charset("UTF-8");
     Shell   = g_strdup((p = g_getenv("SHELL")) ? p : "/bin/sh");
     Tempdir = (char*)g_get_tmp_dir();
 
@@ -137,6 +147,11 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 #ifdef USE_SSL
     set_option(OPTSSLSYSTEMCERTS);
 #endif /* USE_SSL */
+    /* FIXME : I want libmutt to keep track of "new" messages 
+       We use this to know which messages have been just appended
+       to the mailbox, this way we can do automatic filtering
+       on incoming mails only */
+    set_option(OPTMARKOLD);
 
     FileMask.rx = (regex_t *) safe_malloc (sizeof (regex_t));
     REGCOMP(FileMask.rx,"!^\\.[^.]",0);
@@ -438,3 +453,9 @@ libbalsa_mutt_error(const char *fmt, ...)
 	libbalsa_information_varg(LIBBALSA_INFORMATION_WARNING, fmt, va_args);
     va_end(va_args);
 }
+/* wraper function */
+void 
+libbalsa_mktemp (char *s) {
+    mutt_mktemp(s);
+}
+

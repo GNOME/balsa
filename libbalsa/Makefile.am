@@ -68,6 +68,7 @@ libbalsa_a_SOURCES = 		\
 	pop3.c			\
 	pop3.h			\
 	send.c			\
+	send.h			\
 	server.c		\
 	server.h		\
 	source-viewer.c		\
@@ -75,7 +76,8 @@ libbalsa_a_SOURCES = 		\
 
 
 
-INCLUDES=-I${top_srcdir} -I${top_builddir}/libmutt \
+INCLUDES=-I. -I${top_srcdir} -I${top_builddir}/libmutt \
 	$(BALSA_CFLAGS)
 
+DEFS = -DLIBMUTT
 

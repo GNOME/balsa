@@ -38,10 +38,11 @@
 #include "filter.h"
 #include "libbalsa.h"
 #include "libbalsa_private.h"
+#include "misc.h"
 #include "mx.h"
 #include "imap/message.h"
 #include "imap/imap_private.h"
-#include "misc.h"
+#include "mailbackend.h"
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"

@@ -34,6 +34,7 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
+#include "send.h"
 #include "mailbackend.h"
 #include "mailbox_imap.h"
 #include "misc.h"
@@ -45,7 +46,6 @@
 
 #if ENABLE_ESMTP
 #include <stdarg.h>
-#include <libesmtp.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1112,7 +1112,8 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
 
     while ( (mqi = get_msg2send()) != NULL) {
 	libbalsa_lock_mutt();
-	i = mutt_invoke_sendmail(mqi->message->env->to,
+	i = mutt_invoke_sendmail(mqi->message->env->from,
+				 mqi->message->env->to,
 				 mqi->message->env->cc,
 				 mqi->message->env->bcc,
 				 mqi->tempfile,
@@ -1156,6 +1157,8 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
 
 static void
 message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
+    LIST *tmp_hdr;
+    GList *list;
     gchar *tmp;
 
     libbalsa_lock_mutt();
@@ -1214,9 +1217,52 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
 
     tmp = libbalsa_make_string_from_list_p(message->bcc_list);
     hdr->env->bcc = rfc822_parse_adrlist(hdr->env->bcc, tmp);
-    libbalsa_unlock_mutt();
     g_free(tmp);
 
+     for (list = message->user_headers; list; list = g_list_next(list)) {
+        tmp_hdr = mutt_new_list();
+        tmp_hdr->next = hdr->env->userhdrs;
+        tmp_hdr->data = g_strjoinv(": ", list->data);
+        hdr->env->userhdrs = tmp_hdr;
+    }
+
+    libbalsa_unlock_mutt();
+}
+
+static void
+message_add_references(LibBalsaMessage* message, HEADER* msg) 
+{
+    LIST* in_reply_to;
+    LIST* references;
+    GList* list;
+
+    /* If the message has references set, add them to he envelope */
+    if (message->references != NULL) {
+        list = message->references;
+        libbalsa_lock_mutt();
+        msg->env->references = mutt_new_list();
+       references = msg->env->references;
+       references->data = g_strdup(list->data);
+       list = list->next;
+
+       while (list != NULL) {
+           references->next = mutt_new_list();
+           references = references->next;
+           references->data = g_strdup(list->data);
+           references->next = NULL;
+           list = list->next;
+       }
+        
+
+       /* There's no specific header for In-Reply-To, just
+        * add it to the user headers */ 
+        in_reply_to = mutt_new_list();
+       in_reply_to->next = msg->env->userhdrs;
+       in_reply_to->data =
+           g_strconcat("In-Reply-To: ", message->in_reply_to, NULL);
+       msg->env->userhdrs = in_reply_to;
+        libbalsa_unlock_mutt();
+    }
 }
 
 gboolean
@@ -1236,6 +1282,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     libbalsa_unlock_mutt();
 
     message2HEADER(message, msg);
+    message_add_references(message, msg);
 
     body = message->body_list;
 
@@ -1260,9 +1307,9 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 		/* Do this here because we don't want
 		 * to use libmutt's mime types */
 		if (!body->mime_type) {
-                    gchar *tmp = libbalsa_lookup_mime_type(body->filename);
-		    mime_type = g_strsplit(tmp, "/", 2);
-                    g_free(tmp);
+		    gchar* mt = libbalsa_lookup_mime_type(body->filename);
+		    mime_type = g_strsplit(mt,"/", 2);
+                    g_free(mt);
                 } else
 		    mime_type = g_strsplit(body->mime_type, "/", 2);
 		/* use BASE64 encoding for non-text mime types 
@@ -1361,7 +1408,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     return thereturn>=0;
 }
 
-/* balsa_create_msg:
+/* libbalsa_create_msg:
    copies message to msg.
    PS: seems to be broken when queu == 1 - further execution of
    mutt_free_header(mgs) leads to crash.
@@ -1373,41 +1420,12 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
     FILE *tempfp;
     HEADER *msg_tmp;
     MESSAGE *mensaje;
-    LIST *in_reply_to;
-    LIST *references;
     LibBalsaMessageBody *body;
-    GList *list;
     gchar **mime_type;
     gboolean res = TRUE;
 
     message2HEADER(message, msg);
-
-    /* If the message has references set, add them to he envelope */
-    if (message->references != NULL) {
-	list = message->references;
-        libbalsa_lock_mutt();
-	msg->env->references = mutt_new_list();
-	references = msg->env->references;
-	references->data = g_strdup(list->data);
-	list = list->next;
-
-	while (list != NULL) {
-	    references->next = mutt_new_list();
-	    references = references->next;
-	    references->data = g_strdup(list->data);
-	    references->next = NULL;
-	    list = list->next;
-	}
-        libbalsa_unlock_mutt();
-
-	/* There's no specific header for In-Reply-To, just
-	 * add it to the user headers */ in_reply_to = mutt_new_list();
-	in_reply_to->next = msg->env->userhdrs;
-	in_reply_to->data =
-	    g_strconcat("In-Reply-To: ", message->in_reply_to, NULL);
-	msg->env->userhdrs = in_reply_to;
-    }
-
+    message_add_references(message, msg);
 
     if (message->mailbox)
 	libbalsa_message_body_ref(message);
@@ -1423,12 +1441,15 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	newbdy = NULL;
 
 	if (body->filename) {
-            if (body->attach_as_extbody) {
-                gchar *tmp =
-                    body->mime_type ? g_strdup(body->mime_type) :
-                    libbalsa_lookup_mime_type(body->filename);
-                newbdy = add_mutt_body_as_extbody(body->filename, tmp);
-                g_free(tmp);
+	    if (body->attach_as_extbody) {
+                if(body->mime_type)
+                    newbdy = add_mutt_body_as_extbody(body->filename, 
+                                                      body->mime_type);
+                else {
+                    gchar* mt = libbalsa_lookup_mime_type(body->filename);
+                    newbdy = add_mutt_body_as_extbody(body->filename, mt);
+                    g_free(mt);
+                }
 	    } else {
 		libbalsa_lock_mutt();
 		newbdy = mutt_make_file_attach(body->filename);
@@ -1442,10 +1463,9 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 		    /* Do this here because we don't want
 		     * to use libmutt's mime types */
                     if (!body->mime_type) {
-                        gchar *tmp =
-                            libbalsa_lookup_mime_type(body->filename);
-                        mime_type = g_strsplit(tmp, "/", 2);
-                        g_free(tmp);
+                        gchar *mt = libbalsa_lookup_mime_type(body->filename);
+                        mime_type = g_strsplit(mt, "/", 2);
+                        g_free(mt);
                     } else
 			mime_type = g_strsplit(body->mime_type, "/", 2);
 		    /* use BASE64 encoding for non-text mime types 
@@ -1489,7 +1509,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	} else {
 	    /* safe_free bug patch: steal it! */
             libbalsa_lock_mutt();
-	    msg->content = mutt_copy_body(body->mutt_body, NULL);
+	    msg->content = libmutt_copy_body(body->mutt_body, NULL);
             libbalsa_unlock_mutt();
 	}
 
@@ -1529,7 +1549,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
             return FALSE;
         }
 
-	mutt_write_rfc822_header(tempfp, msg->env, msg->content, -1);
+	mutt_write_rfc822_header(tempfp, msg->env, msg->content, -1,0);
 	fputc('\n', tempfp);	/* tie off the header. */
 
 	if ((mutt_write_mime_body(msg->content, tempfp) == -1)) {

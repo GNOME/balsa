@@ -35,7 +35,7 @@
  * in gtk2>=2.3.5 b. may expose some bugs in gtk.
  */
 #define TREE_VIEW_FIXED_HEIGHT 1
-/* #undef TREE_VIEW_FIXED_HEIGHT */
+#undef TREE_VIEW_FIXED_HEIGHT
 
 #include "config.h"
 
@@ -1334,7 +1334,7 @@ balsa_index_selected_list_func(GtkTreeModel * model, GtkTreePath * path,
 /*
  * balsa_index_selected_list: create a GList of selected messages
  *
- * Free with g_list_free.
+ * Free with g_list_foreach(l,g_object_unref)/g_list_free.
  */
 GList *
 balsa_index_selected_list(BalsaIndex * index)

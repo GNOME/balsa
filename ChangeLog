@@ -1,3 +1,8 @@
+2004-03-28 14:33  PeterB
+
+	* libbalsa/libbalsa.c: lock the mutex before waiting on the
+	condition.
+
 2004-03-28  Pawel Salek
 
 	* libbalsa/mailbox_local.c: remove the idle sync handler on finalize.

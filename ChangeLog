@@ -1,3 +1,7 @@
+2002-03-01  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/folder-conf.c: ported.
+	
 2002-02-27  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-mblist.c: port.

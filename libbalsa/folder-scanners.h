@@ -39,7 +39,8 @@ void libbalsa_scanner_local_dir(gpointer rnode, const gchar * prefix,
 				LocalCheck check_local_path,
 				LocalMark mark_local_path,
 				LocalHandler folder_handler, 
-				LocalHandler mailbox_handler);
+                                LocalHandler mailbox_handler,
+                                GType parent_type);
 
 void libbalsa_scanner_imap_dir(gpointer rnode, LibBalsaServer * server, 
                                const gchar* path, gboolean subscribed, 

@@ -142,7 +142,7 @@ balsa_index_marshal_signal_1 (GtkObject * object,
   BalsaIndexSignal1 rfunc;
 
   rfunc = (BalsaIndexSignal1) func;
-  (*rfunc) (object, GTK_VALUE_POINTER (args[0]), 
+  (*rfunc) (object, GTK_VALUE_POINTER (args[0]),
 	    GTK_VALUE_BOXED (args[1]), func_data);
 }
 

@@ -42,16 +42,22 @@ static GList *open_mailbox_list = NULL;
 void create_new_index (Mailbox * mailbox);
 
 /* callbacks */
-static void destroy_index_window (GtkWidget * widget);
+static gint destroy_index_window (GtkWidget * widget);
 static void close_index_window (GtkWidget * widget);
 static void refresh_index_window (IndexWindow * iw);
 static void mailbox_listener (MailboxWatcherMessage * iw_message);
 static void index_select_cb (GtkWidget * widget, Message * message, GdkEventButton *);
 
 static void set_index_window_data (GtkObject * object, IndexWindow * iw);
-static IndexWindow * get_index_window_data (GtkObject * object);
+static IndexWindow *get_index_window_data (GtkObject * object);
 
-static GtkWidget * create_menu(BalsaIndex * bindex, Message *message);
+static GtkWidget *create_menu (BalsaIndex * bindex, Message * message);
+
+/* menu item callbacks */
+static void delete_message_cb (GtkWidget * widget, Message * message);
+static void undelete_message_cb (GtkWidget * widget, Message * message);
+
+
 
 void
 create_new_index (Mailbox * mailbox)
@@ -72,7 +78,7 @@ create_new_index (Mailbox * mailbox)
 
   iw->window = gnome_app_new ("balsa", iw->mailbox->name);
 
-  set_index_window_data(GTK_OBJECT(iw->window),iw);
+  set_index_window_data (GTK_OBJECT (iw->window), iw);
   gtk_signal_connect (GTK_OBJECT (iw->window),
 		      "destroy",
 		      (GtkSignalFunc) destroy_index_window,
@@ -80,7 +86,7 @@ create_new_index (Mailbox * mailbox)
 
   gtk_signal_connect (GTK_OBJECT (iw->window),
 		      "delete_event",
-		      (GtkSignalFunc) gtk_false,
+		      (GtkSignalFunc) destroy_index_window,
 		      NULL);
 
   vbox = gtk_vbox_new (TRUE, 0);
@@ -146,7 +152,7 @@ close_index_window (GtkWidget * widget)
   gtk_widget_destroy (iw->index);
 }
 
-static void
+static gint
 destroy_index_window (GtkWidget * widget)
 {
   IndexWindow *iw = get_index_window_data (GTK_OBJECT (widget));
@@ -157,9 +163,13 @@ destroy_index_window (GtkWidget * widget)
 
 #endif
 
+  mailbox_open_unref (iw->mailbox);
+  mailbox_watcher_remove (iw->mailbox, iw->watcher_id);
+
   close_index_window (widget);
 
   g_free (iw);
+  return TRUE;
 }
 
 
@@ -183,7 +193,7 @@ mailbox_listener (MailboxWatcherMessage * iw_message)
 static void
 index_select_cb (GtkWidget * widget,
 		 Message * message,
-		 GdkEventButton *bevent)
+		 GdkEventButton * bevent)
 {
   g_return_if_fail (widget != NULL);
   g_return_if_fail (BALSA_IS_INDEX (widget));
@@ -191,13 +201,13 @@ index_select_cb (GtkWidget * widget,
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     message_window_new (message);
   else if (bevent && bevent->button == 3)
-    gtk_widget_show (create_menu(BALSA_INDEX(widget), message));
+    gtk_widget_show (create_menu (BALSA_INDEX (widget), message));
 }
 /*
  * CLIST Callbacks
  */
 static GtkWidget *
-create_menu (BalsaIndex * bindex, Message *message)
+create_menu (BalsaIndex * bindex, Message * message)
 {
   GtkWidget *menu, *menuitem, *submenu, *smenuitem;
   Mailbox *mailbox;
@@ -264,9 +274,42 @@ create_menu (BalsaIndex * bindex, Message *message)
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
-  menuitem = gtk_menu_item_new_with_label ("Delete");
+  if (message->flags & MESSAGE_FLAG_DELETED)
+    {
+      menuitem = gtk_menu_item_new_with_label ("Undelete");
+      gtk_signal_connect (GTK_OBJECT (menuitem),
+			  "activate",
+			  (GtkSignalFunc) undelete_message_cb,
+			  message);
+    }
+  else
+    {
+      menuitem = gtk_menu_item_new_with_label ("Delete");
+      gtk_signal_connect (GTK_OBJECT (menuitem),
+			  "activate",
+			  (GtkSignalFunc) delete_message_cb,
+			  message);
+    }
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
   return menu;
+}
+
+static void
+delete_message_cb (GtkWidget * widget, Message * message)
+{
+  g_return_if_fail (widget != NULL);
+
+  message_delete (message);
+  /* balsa_index_select_next (BALSA_INDEX (mainwindow->index)); */
+}
+
+static void
+undelete_message_cb (GtkWidget * widget, Message * message)
+{
+  g_return_if_fail (widget != NULL);
+
+  message_undelete (message);
+  /* balsa_index_select_next (BALSA_INDEX (mainwindow->index)); */
 }

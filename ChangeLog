@@ -1,3 +1,8 @@
+2002-04-30  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/send.c: be more verbose on most common SMTP
+	configuration error (submission vs smtp).
+
 2002-04-28  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/sendmsg-window.c: alternative mailbox referencing scheme.

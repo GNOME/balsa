@@ -82,7 +82,7 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 %doc README COPYING ChangeLog NEWS TODO AUTHORS HACKING docs/mh-mail-HOWTO
 %doc docs/vconvert.awk docs/pine2vcard
 %{_bindir}/balsa
-%{_datadir}/gnome/apps/Internet/balsa.desktop
+%{_datadir}/applications/balsa.desktop
 %{_datadir}/gnome/help/balsa/*
 %{_datadir}/pixmaps/*
 %{_datadir}/sounds/balsa/*

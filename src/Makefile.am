@@ -10,7 +10,6 @@ balsa_BASE_SRCLIST =	\
 	balsa-icons.c		\
 	balsa-icons.h		\
 	balsa-index-threading.c	\
-	balsa-index-threading.h	\
 	balsa-index.c		\
 	balsa-index.h		\
 	balsa-mblist.c		\
@@ -70,8 +69,9 @@ balsa_SOURCES = $(balsa_BASE_SRCLIST) $(balsa_IDL_SRCLIST)
 
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
-	-I$(top_srcdir) \
-	-I$(top_srcdir)/libbalsa
+	-I$(top_builddir) -I$(top_srcdir) \
+	-I$(top_srcdir)/libbalsa \
+	-I$(top_builddir)/libmutt -I$(top_srcdir)/libmutt
 
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\

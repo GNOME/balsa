@@ -5,7 +5,7 @@ EXTRA_DIST = \
 	topic.dat \
 	$(SGML_FILES)
 
-balsa_helpdir = $(gnomedatadir)/gnome/help/balsa/C
+balsa_helpdir = $(datadir)/gnome/help/balsa/C
 
 balsa_help_DATA = \
 	topic.dat \

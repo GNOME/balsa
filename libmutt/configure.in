@@ -76,7 +76,7 @@ else
   AC_CHECK_FUNC(snprintf, [AC_DEFINE(HAVE_SNPRINTF)], [mutt_cv_snprintf=yes])
   AC_CHECK_FUNC(vsnprintf, [AC_DEFINE(HAVE_VSNPRINTF)], [mutt_cv_snprintf=yes])
   if test $mutt_cv_snprintf != yes; then
-    AC_ERROR([Sorry, cannot compile this any longer.])
+    AC_LIBOBJ([snprintf])
   fi
 fi
 

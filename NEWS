@@ -1,3 +1,8 @@
+* Balsa-1.4.3 release. Release date 2003-03-24
+
+- number of bugs fixed (52168, 102472, 102470, 105605, 106508).
+- some build fixes (e.g against openssl-0.9.7)
+
 * Balsa-1.4.2 release. Release date 2002-12-22
 
 - fix crash on concurrent access to local mailboxes.

@@ -75,7 +75,8 @@ libbalsa_a_SOURCES = 		\
 
 
 
-INCLUDES=-I. -I${top_srcdir} -I${top_builddir}/libmutt \
+INCLUDES=-I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
+	-I${top_srcdir}/libmutt -I${top_builddir}/libmutt \
 	$(PCRE_CFLAGS)
 
 DEFS = -DLIBMUTT

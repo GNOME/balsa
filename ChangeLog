@@ -1,3 +1,10 @@
+2003-03-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* NEWS, configure.in: release balsa-1.4.3
+	* Makefile.am: fix distcheck target.
+	* {help/C,images,libbalsa,libinit_balsa,sounds,src}/Makefile.am: ditto.
+	* balsa.spec.in: possibly better file location.
+	
 2003-02-27  Carlos Morgado  <chbm@cprm.net>
 
 	* libbalsa/libbalsa.c: 

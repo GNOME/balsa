@@ -1,13 +1,13 @@
 # The wonderfull balsa translation made for world piece. 
 # Copyright (C) 2000 Free Software Foundation, Inc.
 # Dennis Smit <synap@area101.penguin.nl>, 2000.
-# Mendel Mobach <mendel@mobach.nl>, 2000.
+# Mendel Mobach <mendel@mobach.nl>
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa\n"
 "POT-Creation-Date: 2000-07-17 20:38+0200\n"
-"PO-Revision-Date: 2000-07-17 22:44+0200\n"
+"PO-Revision-Date: 2000-07-18 11:13+0200\n"
 "Last-Translator: Mendel Mobach <mendel@mobach.nl> \n"
 "Language-Team: Dutch (for info synap@area101.penguin.nl) \n"
 "MIME-Version: 1.0\n"
@@ -1197,7 +1197,7 @@ msgstr "Signatuur"
 
 #: src/pref-manager.c:197
 msgid "Mail Servers"
-msgstr "Mail Servers"
+msgstr "Email servers"
 
 #: src/pref-manager.c:200
 msgid "Mail Options"
@@ -1528,11 +1528,11 @@ msgstr "Wrap bericht lijnen"
 
 #: src/sendmsg-window.c:178
 msgid "_Reflow paragraph"
-msgstr ""
+msgstr "_Reflow paragraaf"
 
 #: src/sendmsg-window.c:181
 msgid "R_eflow message"
-msgstr ""
+msgstr "R_eflow bericht"
 
 #: src/sendmsg-window.c:190
 msgid "Fr_om"
@@ -1631,6 +1631,8 @@ msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
 msgstr ""
+"Het bestandsplaatje (balsa/attachment.png) kan niet worden gevonden\n"
+"dat betekend dat U geen bestanden kunt meezenden.\n"
 
 #: src/sendmsg-window.c:423
 #, c-format
@@ -1674,12 +1676,12 @@ msgstr "Bijlages:"
 #. Comments:
 #: src/sendmsg-window.c:698
 msgid "Comments:"
-msgstr ""
+msgstr "Commentaar:"
 
 #. Keywords:
 #: src/sendmsg-window.c:701
 msgid "Keywords:"
-msgstr ""
+msgstr "Sleutelwoorden:"
 
 #: src/sendmsg-window.c:779
 msgid "you"
@@ -1688,12 +1690,12 @@ msgstr "u"
 #: src/sendmsg-window.c:789
 #, c-format
 msgid "On %s %s wrote:\n"
-msgstr ""
+msgstr "Op %s %s schrijf:\n"
 
 #: src/sendmsg-window.c:792
 #, c-format
 msgid "%s wrote:\n"
-msgstr ""
+msgstr "%s schreef:\n"
 
 #: src/sendmsg-window.c:862
 msgid "Reply to "
@@ -1705,7 +1707,7 @@ msgstr "Doorsturen bericht"
 
 #: src/sendmsg-window.c:872
 msgid "Continue message"
-msgstr ""
+msgstr "Verder gaan met bericht"
 
 #: src/sendmsg-window.c:877
 msgid "New message"
@@ -1713,65 +1715,65 @@ msgstr "Nieuw bericht"
 
 #: src/sendmsg-window.c:1109
 msgid "Could not open the file.\n"
-msgstr ""
+msgstr "Kan het bestand niet openen.\n"
 
 #: src/sendmsg-window.c:1115
 msgid "Loading..."
-msgstr ""
+msgstr "Laden...."
 
 #: src/sendmsg-window.c:1140
 msgid "Include file"
-msgstr ""
+msgstr "Bestand invoegen"
 
 #: src/sendmsg-window.c:1396
 msgid "Cannot execute print command."
-msgstr ""
+msgstr "Kan het de print opdrachtregel niet uitvoeren."
 
 #: src/sendmsg-window.c:1420
 msgid "Error executing lpr"
-msgstr ""
+msgstr "Fout bij het uitvoeren van lpr"
 
 #: libbalsa/mailbox_imap.c:202
-#, fuzzy, c-format
+#, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-msgstr "Postvak:  %s refcount: %d\n"
+msgstr "LibBalsaMailboxImap: Openen %s Refcount: %d\n"
 
 #: libbalsa/mailbox_local.c:218
-#, fuzzy, c-format
+#, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-msgstr "Postvak:  %s refcount: %d\n"
+msgstr "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 
 #: libbalsa/mailbox_pop3.c:179
-#, fuzzy, c-format
+#, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
-msgstr "Postvak:  %s refcount: %d\n"
+msgstr "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 
 #: libmutt/mbox.c:134 libmutt/mbox.c:292
 msgid "Reading %s... %d (%d%%)"
-msgstr ""
+msgstr "Lezen %s... %d(%d%%)"
 
 #: libmutt/mbox.c:158 libmutt/mbox.c:217
-#, fuzzy
+#
 msgid "Mailbox is corrupt!"
-msgstr "Pad van postvak:"
+msgstr "Uw postbus is beschadigd."
 
 #: libmutt/mbox.c:665
-#, fuzzy
+#
 msgid "Mailbox was corrupted!"
-msgstr "Wachtwoord voor postvak:"
+msgstr "Postbus was beschadigd!"
 
 #: libmutt/mbox.c:702 libmutt/mbox.c:977
 msgid "Fatal error!  Could not reopen mailbox!"
-msgstr ""
+msgstr "Fatale fout: kan uw postbus niet heropenenen."
 
 #: libmutt/mbox.c:711
-#, fuzzy
+#
 msgid "Unable to lock mailbox!"
-msgstr "Postvak kan niet geopend worden!"
+msgstr "Kan uw postbus niet verzegelen!"
 
 #: libmutt/mbox.c:740
 msgid "Could not create temporary file!"
-msgstr ""
+msgstr "Kan geen tijdelijk bestand aanmaken!"
 
 #. this means ctx->changed or ctx->deleted was set, but no
 #. * messages were found to be changed or deleted.  This should
@@ -1779,54 +1781,54 @@ msgstr ""
 #.
 #: libmutt/mbox.c:757
 msgid "sync: mbox modified, but no modified messages! (report this bug)"
-msgstr ""
+msgstr "(leaving original because its a bug) sync: mbox modified, but no modified messages! (report this bug)"
 
 #: libmutt/mbox.c:787
 msgid "Writing messages... %d (%d%%)"
-msgstr ""
+msgstr "schrijven bericht.... %d (%d%%)"
 
 #: libmutt/mbox.c:961
 #, c-format
 msgid "Write failed!  Saved partial mailbox to %s"
-msgstr ""
+msgstr "Schrijven faalde! Opslaan van postbus naar %s"
 
 #: libmutt/mbox.c:1027
-#, fuzzy
+#
 msgid "Could not reopen mailbox!"
-msgstr "Sluit het geopende postvak"
+msgstr "Kan uw postbus niet heropenen."
 
 #: libmutt/mbox.c:1065
-#, fuzzy
+#
 msgid "Reopening mailbox..."
-msgstr "Open Post-vak"
+msgstr "Heropenen van postbus."
 
 #: libmutt/mx.c:119
 #, c-format
 msgid "Lock count exceeded, remove lock for %s?"
-msgstr ""
+msgstr "Verzegelingsnummers zijn op, haal verzegeling weg voor %s?"
 
 #: libmutt/mx.c:131
 #, c-format
 msgid "Can't dotlock %s.\n"
-msgstr ""
+msgstr "Kan %s niet 'dotlock-en'.\n"
 
 #: libmutt/mx.c:189
 msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr ""
+msgstr "TImeout overschreden terwijl ik probeerde fcntl te locken!"
 
 #: libmutt/mx.c:195
 #, c-format
 msgid "Waiting for fcntl lock... %d"
-msgstr ""
+msgstr "wachtend op fcntl lock.... %d"
 
 #: libmutt/mx.c:223
 msgid "Timeout exceeded while attempting flock lock!"
-msgstr ""
+msgstr "TImeout overschreden terwijl ik probeerde flock te locken!"
 
 #: libmutt/mx.c:230
 #, c-format
 msgid "Waiting for flock attempt... %d"
-msgstr ""
+msgstr "wachtend op flock lock.... %d"
 
 #: libmutt/mx.c:459 libmutt/mx.c:605
 #, c-format
@@ -1846,71 +1848,71 @@ msgstr "Lezen %s...."
 #: libmutt/mx.c:719
 #, c-format
 msgid "Writing %s..."
-msgstr ""
+msgstr "Schrijven %s..."
 
 #: libmutt/mx.c:746
 #, c-format
 msgid "Could not synchronize mailbox %s!"
-msgstr ""
+msgstr "Kan postbus %s niet synchroniseren!"
 
 #: libmutt/mx.c:848
 #, c-format
 msgid "Moving read messages to %s..."
-msgstr ""
+msgstr "Verplaatsen van gelezen berichten naar %s..."
 
 #: libmutt/mx.c:899 libmutt/mx.c:1056
-#, fuzzy
+#
 msgid "Mailbox is unchanged."
-msgstr "Naam van postvak"
+msgstr "Postbus is niet veranderd"
 
 #: libmutt/mx.c:929
 #, c-format
 msgid "%d kept, %d moved, %d deleted."
-msgstr ""
+msgstr "%s bewaard, %d verplaatst, %d verwijderd."
 
 #: libmutt/mx.c:932 libmutt/mx.c:1098
 #, c-format
 msgid "%d kept, %d deleted."
-msgstr ""
+msgstr "%d bewaard, %d verwijderd."
 
 #: libmutt/mx.c:1040
 #, c-format
 msgid " Press '%s' to toggle write"
-msgstr ""
+msgstr "Druk op '%s'  om schrijven in te stellen."
 
 #: libmutt/mx.c:1043
 msgid "Use 'toggle-write' to re-enable write!"
-msgstr ""
+msgstr "Kan de schijven flag niet meer aanzetten."
 
 #: libmutt/mx.c:1045
 #, c-format
 msgid "Mailbox is marked unwritable. %s"
-msgstr ""
+msgstr "Postbus is gemarkeerd als alleen lezen. %s"
 
 #: libmutt/mx.c:1050
-#, fuzzy
+#
 msgid "Mailbox is read-only."
-msgstr "Naam van postvak"
+msgstr "Postbus is alleen lezen."
 
 #: libmutt/mx.c:1065
-#, fuzzy, c-format
+#, c-format
 msgid "Purge %d deleted message?"
-msgstr "Druk het bewerkte bericht af"
+msgstr "Gooi %d berichten weg?"
 
 #: libmutt/mx.c:1065
-#, fuzzy, c-format
+#, c-format
 msgid "Purge %d deleted messages?"
-msgstr "Druk het bewerkte bericht af"
+msgstr "Verwijder %d berichten compleet?"
 
 #: libmutt/mx.c:1095
 #, c-format
 msgid "%d kept."
-msgstr ""
+msgstr "%d bewaard."
 
 #: libmutt/mx.c:1375
-#, fuzzy
+#
 msgid "Can't write message"
-msgstr "Haal het bericht terug"
+msgstr "Kan het bericht niet schijven"
 
 #~ msgid "Mailbox: Closing %s Refcount: %d\n"
 #~ msgstr "Postvak: Sluiten van %s Refcount: %d\n"

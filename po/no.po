@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8.0\n"
-"POT-Creation-Date: 2000-07-16 00:05+0200\n"
+"POT-Creation-Date: 2000-07-18 13:35+0200\n"
 "PO-Revision-Date: 2000-07-16 00:15+02:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@online.no>\n"
 "Language-Team: Norwegian <no@li.org>\n"
@@ -372,7 +372,7 @@ msgstr "Dato"
 msgid "To"
 msgstr "Til"
 
-#: src/balsa-mblist.c:225 src/mailbox-conf.c:1165
+#: src/balsa-mblist.c:225 src/mailbox-conf.c:1185
 msgid "Mailbox"
 msgstr "Postboks"
 
@@ -560,7 +560,7 @@ msgstr "Kropp"
 msgid "Match string:"
 msgstr "Finn streng:"
 
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:300 src/mailbox-conf.c:1130
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1150
 #: src/pref-manager.c:890
 msgid "Add"
 msgstr "Legg til"
@@ -650,7 +650,7 @@ msgid "Balsa Filters"
 msgstr "Balsa filtre"
 
 #. FIXME: Should prompt to remove file aswell
-#: src/mailbox-conf.c:180
+#: src/mailbox-conf.c:181
 #, c-format
 msgid ""
 "This will remove the mailbox %s and it's files permanently from your "
@@ -660,7 +660,7 @@ msgstr ""
 "Dette vil fjerne postboksen %s, og dens filer, fra systemet ditt for godt.\n"
 "Er du sikker på at du vil fjerne denne postboksen?"
 
-#: src/mailbox-conf.c:185
+#: src/mailbox-conf.c:186
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
@@ -671,126 +671,118 @@ msgstr ""
 "Du kan bruke \"Legg til postboks\" senere for å aksessere denne postboksen\n"
 "igjen. Er du sikker på at du vil fjerne denne postboksen?"
 
-#: src/mailbox-conf.c:213
+#: src/mailbox-conf.c:214
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Oooops! postboks ikke funnet i balsa_app.mailbox noder?\n"
 
-#: src/mailbox-conf.c:255
+#: src/mailbox-conf.c:268
 msgid "Mailbox Configurator"
 msgstr "Postbokskonfigurering"
 
-#: src/mailbox-conf.c:310 src/mailbox-conf.c:1124
+#: src/mailbox-conf.c:330 src/mailbox-conf.c:1144
 msgid "Update"
 msgstr "Oppdater"
 
-#: src/mailbox-conf.c:442 src/mailbox-conf.c:448 src/mailbox-conf.c:472
+#: src/mailbox-conf.c:458 src/mailbox-conf.c:464 src/mailbox-conf.c:488
 msgid "You need to fill in the Mailbox Name field."
 msgstr "Du må fylle ut feltet for navn på postboksen."
 
-#: src/mailbox-conf.c:451
+#: src/mailbox-conf.c:467
 msgid "You need to fill in the folderpath field."
 msgstr "Du må fylle ut feltet for mappesti."
 
-#: src/mailbox-conf.c:453
+#: src/mailbox-conf.c:469
 msgid "You need to fill in the IMAP Server field"
 msgstr "Du må fylle ut feltet for IMAP-tjener"
 
-#: src/mailbox-conf.c:455
+#: src/mailbox-conf.c:471
 msgid "You need to fill in the username field"
 msgstr "Du må fylle ut feltet for brukernavn"
 
-#: src/mailbox-conf.c:457
-msgid "You need to fill in the password field"
-msgstr "Du må fylle ut feltet for passord"
-
-#: src/mailbox-conf.c:459
+#: src/mailbox-conf.c:475
 msgid "You need to fill in the port field"
 msgstr "Du må fylle ut feltet for port"
 
-#: src/mailbox-conf.c:476
+#: src/mailbox-conf.c:492
 msgid "You need to fill in the user field."
 msgstr "Du må fylle ut feltet for bruker."
 
-#: src/mailbox-conf.c:480
-msgid "You need to fill in the password field."
-msgstr "Du må fylle ut feltet for passord."
-
-#: src/mailbox-conf.c:484
+#: src/mailbox-conf.c:500
 msgid "You need to fill in the server field."
 msgstr "Du må fylle ut feltet for tjener."
 
-#: src/mailbox-conf.c:488
+#: src/mailbox-conf.c:504
 msgid "You need to fill in the port field."
 msgstr "Du må fylle ut feltet for port"
 
-#: src/mailbox-conf.c:492
+#: src/mailbox-conf.c:508
 msgid "Some of the fields are blank."
 msgstr "Noen av feltene er tomme."
 
-#: src/mailbox-conf.c:626
+#: src/mailbox-conf.c:642
 #, c-format
 msgid "%s on %s"
 msgstr "%s på %s"
 
-#: src/mailbox-conf.c:815
+#: src/mailbox-conf.c:835
 msgid "New mailbox type:"
 msgstr "Ny postboks type:"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:821
+#: src/mailbox-conf.c:841
 msgid "Local mailbox"
 msgstr "Lokal postboks"
 
-#: src/mailbox-conf.c:831
+#: src/mailbox-conf.c:851
 msgid "Single IMAP folder"
 msgstr "Enkel IMAP-mappe"
 
-#: src/mailbox-conf.c:840
+#: src/mailbox-conf.c:860
 msgid "IMAP folder set"
 msgstr "IMAP mappesett"
 
 #. mailbox name
-#: src/mailbox-conf.c:865 src/mailbox-conf.c:900 src/mailbox-conf.c:1017
+#: src/mailbox-conf.c:885 src/mailbox-conf.c:920 src/mailbox-conf.c:1037
 msgid "Mailbox Name:"
 msgstr "Navn på postboks"
 
 #. path to file
-#: src/mailbox-conf.c:875
+#: src/mailbox-conf.c:895
 msgid "Mailbox path:"
 msgstr "Sti til postboks:"
 
 #. pop server
-#: src/mailbox-conf.c:917 src/mailbox-conf.c:1027
+#: src/mailbox-conf.c:937 src/mailbox-conf.c:1047
 msgid "Server:"
 msgstr "Tjener:"
 
 #. pop port
-#: src/mailbox-conf.c:936 src/mailbox-conf.c:1041
+#: src/mailbox-conf.c:956 src/mailbox-conf.c:1061
 msgid "Port:"
 msgstr "Port:"
 
 #. username
-#: src/mailbox-conf.c:955 src/mailbox-conf.c:1056
+#: src/mailbox-conf.c:975 src/mailbox-conf.c:1076
 msgid "Username:"
 msgstr "Brukernavn:"
 
 #. password field
-#: src/mailbox-conf.c:972 src/mailbox-conf.c:1071
+#: src/mailbox-conf.c:992 src/mailbox-conf.c:1091
 msgid "Password:"
 msgstr "Passord:"
 
 #. toggle for check
-#: src/mailbox-conf.c:987 src/main-window.c:399
+#: src/mailbox-conf.c:1007 src/main-window.c:399
 msgid "Check"
 msgstr "Sjekk"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:995
+#: src/mailbox-conf.c:1015
 msgid "Delete from server"
 msgstr "Slett fra tjener"
 
-#: src/mailbox-conf.c:1084
+#: src/mailbox-conf.c:1104
 msgid "Folder path:"
 msgstr "Sti til mappe:"
 
@@ -1137,8 +1129,8 @@ msgstr "Merk som søppel"
 msgid "Mark as Draftbox"
 msgstr "Merk som skisse-mappe"
 
-#: src/mblist-window.c:449 src/mblist-window.c:465 src/mblist-window.c:484
-#: src/mblist-window.c:499
+#: src/mblist-window.c:446 src/mblist-window.c:462 src/mblist-window.c:481
+#: src/mblist-window.c:496
 msgid "No mailbox selected."
 msgstr "Ingen postboks valgt."
 
@@ -1740,17 +1732,17 @@ msgstr "Kan ikke utføre utskriftskommando."
 msgid "Error executing lpr"
 msgstr "Feil under kjøring av lpr"
 
-#: libbalsa/mailbox_imap.c:201
+#: libbalsa/mailbox_imap.c:202
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: Åpner %s referansetall: %d\n"
 
-#: libbalsa/mailbox_local.c:215
+#: libbalsa/mailbox_local.c:218
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxLocal: Åpner %s referansetall: %d\n"
 
-#: libbalsa/mailbox_pop3.c:173
+#: libbalsa/mailbox_pop3.c:179
 #, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: Åpner %s referansetall: %d\n"
@@ -1785,7 +1777,8 @@ msgstr "Kunne ikke opprette midlertidig fil!"
 #.
 #: libmutt/mbox.c:757
 msgid "sync: mbox modified, but no modified messages! (report this bug)"
-msgstr "synk: mbox endret, men ingen endrede meldinger! (rapporter denne feilen)"
+msgstr ""
+"synk: mbox endret, men ingen endrede meldinger! (rapporter denne feilen)"
 
 #: libmutt/mbox.c:787
 msgid "Writing messages... %d (%d%%)"
@@ -1912,3 +1905,9 @@ msgstr "%d beholdt."
 #: libmutt/mx.c:1375
 msgid "Can't write message"
 msgstr "Kan ikke skrive melding"
+
+#~ msgid "You need to fill in the password field"
+#~ msgstr "Du må fylle ut feltet for passord"
+
+#~ msgid "You need to fill in the password field."
+#~ msgstr "Du må fylle ut feltet for passord."

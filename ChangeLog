@@ -5,6 +5,13 @@
 
 2004-01-27 22:48  PeterB
 
+	* libbalsa/: mailbox_local.c, mailbox_local.h, mailbox_maildir.c,
+	mailbox_mbox.c, mailbox_mh.c, message.c, message.h: make
+	GMimeMessage for mbox only when needed; implement
+	fetch_message_structure method for mbox; populate message headers
+	for mbox at parse time instead of load-message time; move release
+	method from local backends to LibBalsaMailboxLocal; add separate
+	GMimeMessage argument to libbalsa_message_headers_update.
 	* libbalsa/pop3.c: copy uid to caller's buffer only if it's valid.
 	* libbalsa/imap/: imap-commands.c, imap-handle.h: implement
 	imap_mbox_find_unseen(): gets the list and count of unseen

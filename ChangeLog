@@ -1,5 +1,7 @@
 2003-01-11  PeterB
 
+        * src/balsa-index.c (balsa_index_set_threading_type): Reselect
+        current message after rethreading.
 	* libbalsa/filter.c, libbalsa/message.h, libbalsa/send.c,
 	src/balsa-index.c, src/balsa-message.c: Use macros to examine
 	LibBalsaMessage flags.

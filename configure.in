@@ -88,7 +88,13 @@ AC_ARG_ENABLE([gtkhtml], [  --enable-gtkhtml        Use GtkHTML if available (ex
 AC_MSG_RESULT($use_gtkhtml)
 
 if test x"$use_gtkhtml" = xyes ; then 
-    if $PKG_CONFIG --exists libgtkhtml-3.0 ; then
+    if $PKG_CONFIG --exists libgtkhtml-3.1 ; then
+	PKG_CHECK_MODULES(HTML, [
+	libgtkhtml-3.1
+	])
+        AC_DEFINE(HAVE_GTKHTML3,1,[Defined when GtkHtml-3 can be used.])
+        AC_DEFINE(HAVE_GTKHTML,1,[Defined when GtkHtml can be used.])
+    elif $PKG_CONFIG --exists libgtkhtml-3.0 ; then
 	PKG_CHECK_MODULES(HTML, [
 	libgtkhtml-3.0
 	])

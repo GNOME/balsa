@@ -626,15 +626,6 @@ undelete_message_cb (GtkWidget * widget)
   balsa_index_select_next (BALSA_INDEX (balsa_app.current_index_child->index));
 }
 
-static gboolean
-mblist_add_mailbox_traverse_nodes (GNode * node, gpointer data)
-{
-  if (node->data)
-    mblist_add_mailbox (((MailboxNode *) node->data)->mailbox);
-
-  return FALSE;
-}
-
 static void
 mblist_window_cb (GtkWidget * widget)
 {
@@ -645,14 +636,6 @@ mblist_window_cb (GtkWidget * widget)
   mblist_add_mailbox (balsa_app.inbox);
   mblist_add_mailbox (balsa_app.outbox);
   mblist_add_mailbox (balsa_app.trash);
-
-
-  g_node_traverse (balsa_app.mailbox_nodes,
-		   G_LEVEL_ORDER,
-		   G_TRAVERSE_ALL,
-		   10,
-		   mblist_add_mailbox_traverse_nodes,
-		   NULL);
 }
 
 static void

@@ -48,13 +48,16 @@ static void mailbox_select_cb (GtkCTree *, GtkCTreeNode *, gint);
 static void open_cb (GtkWidget *, gpointer);
 static void close_cb (GtkWidget *, gpointer);
 
+static gboolean mailbox_nodes_to_ctree (GtkCTree *, guint, GNode *, GtkCTreeNode *, gpointer);
+
 void
 mblist_open_window (GnomeMDI * mdi)
 {
   GtkWidget *bbox;
   GtkWidget *button;
   gchar *text[] =
-  {NULL, "Balsa"};
+  {"Balsa", NULL};
+  gint i=0;
 
   if (mblw)
     return;
@@ -75,7 +78,7 @@ mblist_open_window (GnomeMDI * mdi)
 		      (GtkSignalFunc) gtk_false,
 		      NULL);
 
-  mblw->ctree = GTK_CTREE (gtk_ctree_new (2, 1));
+  mblw->ctree = GTK_CTREE (gtk_ctree_new (1, 0));
   gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED);
   gtk_clist_set_policy (GTK_CLIST (mblw->ctree), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->vbox), GTK_WIDGET (mblw->ctree), TRUE, TRUE, 0);
@@ -83,6 +86,16 @@ mblist_open_window (GnomeMDI * mdi)
 
   mblw->parent = gtk_ctree_insert (mblw->ctree, NULL, NULL, text, 0, NULL,
 				   NULL, NULL, NULL, FALSE, TRUE);
+
+  gtk_clist_freeze (GTK_CLIST (mblw->ctree));
+
+  if (balsa_app.mailbox_nodes)
+    if (balsa_app.mailbox_nodes->children)
+      gtk_ctree_insert_gnode (mblw->ctree, mblw->parent, NULL,
+	   balsa_app.mailbox_nodes->children, mailbox_nodes_to_ctree, &i);
+
+  gtk_clist_thaw (GTK_CLIST (mblw->ctree));
+
 
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "tree_select_row",
 		      (GtkSignalFunc) mailbox_select_cb,
@@ -108,6 +121,58 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_widget_show (button);
 
   gtk_widget_show (mblw->window);
+
+}
+
+static gboolean
+mailbox_nodes_to_ctree (GtkCTree * ctree,
+			guint depth,
+			GNode * gnode,
+			GtkCTreeNode * cnode,
+			gpointer data)
+{
+  MailboxNode *mbnode;
+
+  if (!gnode || (!(mbnode = gnode->data)))
+    return FALSE;
+
+  if (mbnode->mailbox->type == MAILBOX_IMAP ||
+      mbnode->mailbox->type == MAILBOX_POP3)
+    return FALSE;
+
+  if (mbnode->mailbox)
+    {
+      if (mbnode->mailbox && mbnode->name)
+	{
+	  if (!strcmp (MAILBOX_LOCAL (mbnode->mailbox)->path, mbnode->name))
+	    {
+	      /* probibly mh or maildir */
+	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2, NULL,
+				       NULL, NULL, NULL,
+				       G_NODE_IS_LEAF (gnode), TRUE);
+	      gtk_ctree_set_text (ctree, cnode, 1, mbnode->mailbox->name);
+	      gtk_ctree_set_row_data(ctree,cnode,mbnode->mailbox);
+	    }
+	  else
+	    {
+	      /* normal mailbox */
+	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2, NULL,
+				       NULL, NULL, NULL,
+				       FALSE, TRUE);
+	      gtk_ctree_set_text (ctree, cnode, 1, mbnode->mailbox->name);
+	      gtk_ctree_set_row_data(ctree,cnode,mbnode->mailbox);
+	    }
+	}
+    }
+  if (mbnode->name && !mbnode->mailbox)
+    {
+      /* new directory, but not a mailbox */
+      gtk_ctree_set_node_info (ctree, cnode, g_basename (mbnode->name), 2, NULL,
+			       NULL, NULL, NULL,
+			       G_NODE_IS_LEAF (gnode), TRUE);
+      gtk_ctree_set_text (ctree, cnode, 1, mbnode->mailbox->name);
+    }
+  return TRUE;
 }
 
 static void
@@ -158,19 +223,14 @@ mblist_add_mailbox (Mailbox * mailbox)
 {
   GtkCTreeNode *sibling;
   gchar *text[2];
-
-  if (mailbox)
-    {
-      if (mailbox->type == MAILBOX_MBOX)
-	if (mailbox_have_new_messages (MAILBOX_LOCAL (mailbox)->path))
-	  text[0] = "N";
-	else
-	  text[0] = NULL;
-      text[1] = mailbox->name;
-      sibling = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 0, NULL,
-				  NULL, NULL, NULL, TRUE, TRUE);
-      gtk_ctree_set_row_data (mblw->ctree, sibling, mailbox);
-    }
+/*
+   if (mailbox)
+   {
+   sibling = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 0, NULL,
+   NULL, NULL, NULL, TRUE, TRUE);
+   gtk_ctree_set_row_data (mblw->ctree, sibling, mailbox);
+   }
+ */
 }
 
 void

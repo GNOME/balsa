@@ -73,7 +73,7 @@ imap_use_ssl_cb(GtkToggleButton * button, FolderDialogData * fcw)
 
     if( (colon=strchr(host,':')) != NULL) 
         *colon = '\0';
-    newhost = g_strconcat(host, ":", port);
+    newhost = g_strconcat(host, ":", port, NULL);
     gtk_entry_set_text(GTK_ENTRY(fcw->server), newhost);
     g_free(newhost);
 }

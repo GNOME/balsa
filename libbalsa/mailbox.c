@@ -772,17 +772,14 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
     mailbox->open_ref--;
 
     if (mailbox->open_ref == 0) {
-	libbalsa_mailbox_free_messages(mailbox);
-
 	/* now close the mail stream and expunge deleted
 	 * messages -- the expunge may not have to be done */
 	/* We are careful to take/release locks in the correct order here */
 	cnt = 0;
-	while( MAILBOX_OPEN(mailbox) && cnt < RETRIES_COUNT &&
+	while( cnt < RETRIES_COUNT &&
 	       (check = libbalsa_mailbox_close_backend(mailbox)) == FALSE) {
 	    UNLOCK_MAILBOX(mailbox);
-	    g_print
-		("libbalsa_mailbox_real_close: %d trial failed.\n", cnt);
+	    g_print("libbalsa_mailbox_real_close: %d trial failed.\n", cnt);
 //	    usleep(100000); /* wait tenth second */
 	    libbalsa_mailbox_check(mailbox);
 	    LOCK_MAILBOX(mailbox);
@@ -791,7 +788,8 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 	if(cnt>=RETRIES_COUNT)
 	    g_print("libbalsa_mailbox_real_close: changes to %s lost.\n",
 		    mailbox->name);
-	
+
+	libbalsa_mailbox_free_messages(mailbox);
     } else libbalsa_mailbox_sync_backend_real(mailbox, TRUE);
 
     UNLOCK_MAILBOX(mailbox);

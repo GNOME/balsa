@@ -1,3 +1,8 @@
+2003-09-07  Carlos Morgado  <chbm gnome.org>
+
+	* libbalsa/mailbox.c: free the message list only *after* closing 
+	the backend
+
 2003-09-07  Carlos Morgado <chbm gnome.org>
 
 	* src/Makefile.am: alter link order

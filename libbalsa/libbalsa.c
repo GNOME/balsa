@@ -528,13 +528,15 @@ static pthread_cond_t mailbox_cond = PTHREAD_COND_INITIALIZER;
 void
 libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
 {
+    pthread_t thread_id = pthread_self();
     pthread_mutex_lock(&mailbox_lock);
-    while (mailbox->lock)
+    while (mailbox->lock && mailbox->thread_id != thread_id)
 	pthread_cond_wait(&mailbox_cond, &mailbox_lock);
     /* We'll assume that no-one would destroy a mailbox while we've been
      * trying to lock it. If they have, we have larger problems than
      * this reference! */
-    mailbox->lock = TRUE;
+    mailbox->lock++;
+    mailbox->thread_id = thread_id;
     pthread_mutex_unlock(&mailbox_lock);
 }
 
@@ -542,8 +544,8 @@ void
 libbalsa_unlock_mailbox(LibBalsaMailbox * mailbox)
 {
     pthread_mutex_lock(&mailbox_lock);
-    mailbox->lock = FALSE;
-    pthread_cond_broadcast(&mailbox_cond);
+    if(!--mailbox->lock)
+        pthread_cond_broadcast(&mailbox_cond);
     pthread_mutex_unlock(&mailbox_lock);
 }
 #endif				/* BALSA_USE_THREADS */

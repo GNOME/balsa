@@ -1134,11 +1134,12 @@ libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox,
  * Mailbox views
  */
 void
-libbalsa_mailbox_set_view(LibBalsaMailbox *mailbox,
-                          LibBalsaMessageFlag set,
-                          LibBalsaMessageFlag clear)
+libbalsa_mailbox_filter_view(LibBalsaMailbox *mailbox,...)
 {
+    va_list alist;
     g_warning("Implement me!");
+    va_start(alist, mailbox);
+    va_end(alist);
 }
 
 /* FIXME: we should inform the treeview that we have rehashed the rows.

@@ -151,7 +151,11 @@ struct _LibBalsaMailbox {
     gchar *url; /* Unique resource locator, file://, imap:// etc */
     guint open_ref;
     
-    gboolean lock;
+    int lock; /* 0 if mailbox is unlocked; */
+              /* >0 if mailbox is (recursively locked). */
+#ifdef BALSA_USE_THREADS
+    pthread_t thread_id; /* id of thread that locked the mailbox */
+#endif
     gboolean is_directory;
     gboolean readonly;
     gboolean disconnected;
@@ -360,11 +364,7 @@ void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
 /*
  * Mailbox views-related functions.
  */
-/* provide only those messages that have set flags set, and clear flags
- * cleared. */
-void libbalsa_mailbox_set_view(LibBalsaMailbox *mailbox,
-                               LibBalsaMessageFlag set,
-                               LibBalsaMessageFlag clear);
+void libbalsa_mailbox_filter_view(LibBalsaMailbox *mailbox,...);
 
 /** libbalsa_mailbox_set_threading() uses backend-optimized threading mode
     to produce a tree of messages. The tree is put in msg_tree and used

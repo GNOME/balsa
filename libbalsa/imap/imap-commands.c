@@ -303,18 +303,18 @@ imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
                  ImapMsgFlags flags, size_t sz,
                  ImapAppendFunc dump_cb, void *arg)
 {
-  ImapCmdTag tag;
+  unsigned cmdno;
   ImapResponse rc;
   /* FIXME: quoting */
   gchar *cmd = g_strdup_printf("APPEND \"%s\" {%d}", mbox, sz);
-  rc = imap_cmd_start(handle, cmd, tag);
+  rc = imap_cmd_start(handle, cmd, &cmdno);
   g_free(cmd);
   if (rc<0) /* irrecoverable connection error. */
     return IMR_SEVERED;
 
   sio_flush(handle->sio);
   do {
-    rc = imap_cmd_step (handle, tag);
+    rc = imap_cmd_step (handle, cmdno);
   } while (rc == IMR_UNTAGGED);
   
   if (rc == IMR_RESPOND) {
@@ -330,7 +330,7 @@ imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
     sio_write(handle->sio, "\r\n", 2);
     sio_flush(handle->sio);
     do {
-      rc = imap_cmd_step (handle, tag);
+      rc = imap_cmd_step (handle, cmdno);
     } while (rc == IMR_UNTAGGED);
   } /* FIXME: else unexpected response */
   return rc;

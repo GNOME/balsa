@@ -1,3 +1,17 @@
+2003-11-23  Pawel Salek
+
+	* libbalsa/libbalsa.c: make the mailbox_lock recursive.
+	* libbalsa/libbalsa_private.h, src/main.c: ditto.
+	* libbalsa/mailbox.[hc]: continue filtered view implementation.
+	* libbalsa/mailbox_imap.c: remove debugging output.
+
+	* libbalsa/imap/{auth-cram,imap-auth,imap-commands,imap-handle}.c:
+	allow for nested IMAP command execution.
+	* libbalsa/imap/imap-handle.h: cleanup prototypes.
+	* libbalsa/imap/imap_private.h: add cmd_queue and tasks lists.
+	* src/balsa-index.c: preleminary call to filter_view().
+	* src/main-window.c: alternative ui for view filtering.
+
 2003-11-23 11:22  PeterB
 
 	* libbalsa/mailbox.c: Before removing a node from the msg_tree,

@@ -30,6 +30,7 @@
 
 #include "imap-auth.h"
 #include "util.h"
+#include "imap_private.h"
 
 #define LONG_STRING 1024
 
@@ -45,7 +46,7 @@ imap_auth_cram(ImapMboxHandle* handle, const char* user, const char* pass)
 {
   char ibuf[LONG_STRING*2], obuf[LONG_STRING];
   unsigned char hmac_response[MD5_DIGEST_LEN];
-  ImapCmdTag tag;
+  unsigned cmdno;
   int len;
   int rc;
 
@@ -58,7 +59,7 @@ imap_auth_cram(ImapMboxHandle* handle, const char* user, const char* pass)
   if(user == NULL || pass == NULL)
     return IMAP_AUTH_FAILURE;
 
-  if(imap_cmd_start(handle, "AUTHENTICATE CRAM-MD5", tag) <0)
+  if(imap_cmd_start(handle, "AUTHENTICATE CRAM-MD5", &cmdno) <0)
     return IMAP_AUTH_FAILURE;
 
   /* From RFC 2195:
@@ -69,7 +70,7 @@ imap_auth_cram(ImapMboxHandle* handle, const char* user, const char* pass)
    */
   imap_handle_flush(handle);
   do
-    rc = imap_cmd_step(handle, tag);
+    rc = imap_cmd_step(handle, cmdno);
   while(rc == IMR_UNTAGGED);
 
   if (rc != IMR_RESPOND) {
@@ -114,7 +115,7 @@ imap_auth_cram(ImapMboxHandle* handle, const char* user, const char* pass)
   imap_handle_flush(handle);
 
   do
-    rc = imap_cmd_step (handle, tag);
+    rc = imap_cmd_step (handle, cmdno);
   while (rc == IMR_UNTAGGED);
 
   if (rc != IMR_OK) {

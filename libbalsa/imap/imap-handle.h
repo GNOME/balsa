@@ -25,6 +25,7 @@ int imap_mbox_is_selected     (ImapMboxHandle *h);
 
 /* imap server responses, as defined in rfc-2060 */
 typedef enum {
+  IMR_UNKNOWN = 1, /* unknown, no response received yet, must be non-zero. */
   IMR_SEVERED,  /* OK, this is a connection problem */
   IMR_BYE,      /* unexpected but clean bye from server */
   IMR_UNTAGGED, /* this is seen only in low-level: "*" */
@@ -161,14 +162,5 @@ const char *mbox_view_get_str(MboxView *mv);
 ImapMboxHandleState imap_mbox_handle_get_state(ImapMboxHandle *h);
 void imap_mbox_handle_set_state(ImapMboxHandle *h,
                                 ImapMboxHandleState newstate);
-
-ImapResponse imap_cmd_exec(ImapMboxHandle* handle, const char* cmd);
-char* imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz);
-
-/* even more private functions */
-int imap_cmd_start(ImapMboxHandle* handle, const char* cmd, char* tag);
-ImapResponse imap_cmd_step(ImapMboxHandle* handle, const char* tag);
-int imap_handle_write(ImapMboxHandle *conn, const char *buf, size_t len);
-void imap_handle_flush(ImapMboxHandle *handle);
 
 #endif

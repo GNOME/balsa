@@ -54,7 +54,7 @@ do {\
       return;\
     }\
   else\
-    mailbox->lock = TRUE;\
+    mailbox->lock++;\
 } while (0)
 
 
@@ -66,10 +66,10 @@ do {\
       return (val);\
     }\
   else\
-    mailbox->lock = TRUE;\
+    mailbox->lock++;\
 } while (0)
 
-#define UNLOCK_MAILBOX(mailbox)          mailbox->lock = FALSE;
+#define UNLOCK_MAILBOX(mailbox)          ((mailbox)->lock--)
 
 #endif
 

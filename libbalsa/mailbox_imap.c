@@ -523,8 +523,6 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
 {
     unsigned cnt = imap_mbox_handle_get_exists(mimap->handle);
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
-    printf("%s old=%u new=%u\n", __func__,
-           (unsigned)mailbox->total_messages, cnt);
     if(cnt<mimap->messages_info->len) { /* remove messages */
         printf("%s: expunge ignored?\n", __func__);
     } else { /* new messages arrived */
@@ -546,7 +544,6 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
 
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     struct message_info *msg_info = message_info_from_msgno(mimap, seqno);
-    printf("%s %d\n", __func__, seqno);
     libbalsa_mailbox_msgno_removed(mailbox, seqno);
     if(msg_info->message)
         g_object_unref(G_OBJECT(msg_info->message));

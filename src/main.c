@@ -19,6 +19,7 @@
  * 02111-1307, USA.
  */
 
+#define _XOPEN_SOURCE 500
 #include "config.h"
 
 #include <gnome.h>
@@ -239,9 +240,16 @@ mailboxes_init(void)
 static void
 threads_init(void)
 {
+    int status;
+    pthread_mutexattr_t attr;
     g_thread_init(NULL);
     gdk_threads_init();
-    pthread_mutex_init(&mailbox_lock, NULL);
+    
+    if( (status=pthread_mutexattr_init(&attr)) )
+        g_warning("pthread_mutexattr_init failed with %d\n", status);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&mailbox_lock, &attr);
+    pthread_mutexattr_destroy(&attr);
     pthread_mutex_init(&send_messages_lock, NULL);
     checking_mail = 0;
     updating_progressbar = 0;

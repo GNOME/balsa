@@ -124,6 +124,7 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->recent = 0;
   handle->msg_cache = NULL;
   handle->doing_logout = FALSE;
+  handle->cmd_queue = g_hash_table_new(NULL, NULL);
 
   handle->info_cb  = NULL;
   handle->info_arg = NULL;
@@ -367,7 +368,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
     sio_set_monitorcb(handle->sio, handle->monitor_cb, handle->monitor_arg);
 
   handle->state = IMHS_CONNECTED;
-  if (imap_cmd_step(handle, "") != IMR_UNTAGGED) {
+  if (imap_cmd_step(handle, 0) != IMR_UNTAGGED) {
     g_warning("imap_mbox_connect:unexpected initial response\n");
     sio_detach(handle->sio);
     close(handle->sd);
@@ -382,11 +383,12 @@ imap_mbox_connect(ImapMboxHandle* handle)
   return IMAP_SUCCESS;
 }
 
-static void
+static unsigned
 imap_make_tag(ImapCmdTag tag)
 {
   static unsigned no = 0; /* MT-locking here */
-  sprintf(tag, "a%06x", no++);
+  sprintf(tag, "%x", ++no);
+  return no;
 }
 
 #define IS_ATOM_CHAR(c) (strchr("(){ %*\"\\]",(c))==NULL&&(c)>0x1f&&(c)!=0x7f)
@@ -519,11 +521,46 @@ imap_mbox_handle_finalize(GObject* gobject)
   g_free(handle->user);    handle->user   = NULL;
   g_free(handle->passwd);  handle->passwd = NULL;
   g_free(handle->mbox);    handle->mbox   = NULL;
+
+  g_hash_table_destroy(handle->cmd_queue); handle->cmd_queue = NULL;
+
   mbox_view_dispose(&handle->mbox_view);
   imap_mbox_resize_cache(handle, 0);
 }
 
+typedef void (*ImapTasklet)(ImapMboxHandle*, void*);
+struct tasklet {
+  ImapTasklet task;
+  void *data;
+};
+static void
+imap_handle_add_task(ImapMboxHandle* handle, ImapTasklet task, void* data)
+{
+  struct tasklet * t = g_new(struct tasklet, 1);
+  t->task = task;
+  t->data = data;
+  handle->tasks = g_slist_prepend(handle->tasks, t);
+}
 
+/* care needs to be taken: tasklet can trigger an IMAP command, which
+   in turn would call imap_handle_process_tasks. We need to steal the
+   pointer to the list.
+*/
+
+static void
+imap_handle_process_tasks(ImapMboxHandle* handle)
+{
+  GSList *begin = handle->tasks, *l;
+
+  handle->tasks = NULL;
+  for(l = begin; l; l = l->next) {
+    struct tasklet *t = (struct tasklet*)l->data;
+    t->task(handle, t->data);
+  }
+  g_slist_foreach(begin, (GFunc)g_free, NULL);
+  g_slist_free(begin);
+}
+    
 ImapResponse
 imap_mbox_handle_fetch(ImapMboxHandle* handle, const gchar *seq, 
                        const gchar* headers[])
@@ -871,12 +908,12 @@ imap_code(const gchar* resp)
 #endif
 
 int
-imap_cmd_start(ImapMboxHandle* handle, const char* cmd, ImapCmdTag tag)
+imap_cmd_start(ImapMboxHandle* handle, const char* cmd, unsigned *cmdno)
 {
   int rc;
-
+  ImapCmdTag tag;
   g_return_val_if_fail(handle, -1);
-  imap_make_tag(tag);
+  *cmdno = imap_make_tag(tag);
   rc = sio_printf(handle->sio, "%s %s\r\n", tag, cmd);
   if(rc<0) {
     sio_detach(handle->sio); close(handle->sd);
@@ -891,9 +928,11 @@ imap_cmd_start(ImapMboxHandle* handle, const char* cmd, ImapCmdTag tag)
  * Reads only as much as needed using buffered input.
  */
 ImapResponse
-imap_cmd_step(ImapMboxHandle* handle, const gchar* cmd)
+imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
 {
-  char tag[12];
+  ImapCmdTag tag;
+  ImapResponse rc;
+  unsigned cmdno;
 
   /* FIXME: sanity test */
   g_return_val_if_fail(handle, IMR_BAD);
@@ -901,27 +940,45 @@ imap_cmd_step(ImapMboxHandle* handle, const gchar* cmd)
 
   imap_cmd_get_tag(handle->sio, tag, sizeof(tag)); /* handle errors */
   /* handle untagged messages. The caller still gets its shot afterwards. */
-    if (strcmp(tag, "*") == 0) {
-      ImapResponse rc = ir_handle_response(handle);
-      if(rc == IMR_BYE) {
-        return handle->doing_logout ? IMR_UNTAGGED : IMR_BYE;
-      }
-      if( rc!=IMR_OK)
-        puts("cmd_step protocol error");
-      return IMR_UNTAGGED;
+  if (strcmp(tag, "*") == 0) {
+    gpointer p;
+    rc = ir_handle_response(handle);
+    if(rc == IMR_BYE) {
+      return handle->doing_logout ? IMR_UNTAGGED : IMR_BYE;
     }
+    if( rc!=IMR_OK)
+      puts("cmd_step protocol error");
+    p = g_hash_table_lookup(handle->cmd_queue,
+                            GUINT_TO_POINTER(lastcmd));
+    if(p==NULL) /* True for initial response only: no command has been
+                 * sent but we get untagged response anyway */
+      return IMR_UNTAGGED;
+    else {
+      g_hash_table_remove(handle->cmd_queue, GUINT_TO_POINTER(lastcmd));
+      return rc;
+    }
+  }
 
   /* server demands a continuation response from us */
   if (strcmp(tag, "+") == 0)
     return IMR_RESPOND;
 
   /* tagged completion code is the only alternative. */
-  if (strcmp(tag,cmd) == 0) {
-     return ir_handle_response(handle);
+  /* our command tags are hexadecimal numbers */
+  if(sscanf(tag, "%x", &cmdno) != 1) {
+    printf("scanning '%s' for tag number failed. Cannot recover.\n", tag);
+    return IMR_BAD;
   }
-  printf("tag='%s'\n", tag);
-  g_assert_not_reached(); /* or protocol error */
-  return IMR_UNTAGGED; 
+
+  rc = ir_handle_response(handle);
+  if(cmdno == lastcmd)
+    return rc;
+  else {
+    g_hash_table_insert(handle->cmd_queue,
+                        GUINT_TO_POINTER(cmdno),
+                        GINT_TO_POINTER(rc));
+    return IMR_UNTAGGED;
+  }
 }
 
 /* imap_cmd_exec: 
@@ -932,7 +989,7 @@ imap_cmd_step(ImapMboxHandle* handle, const gchar* cmd)
 ImapResponse
 imap_cmd_exec(ImapMboxHandle* handle, const char* cmd)
 {
-  ImapCmdTag tag;
+  unsigned cmdno;
   ImapResponse rc;
 
   g_return_val_if_fail(handle, IMR_BAD);
@@ -940,13 +997,13 @@ imap_cmd_exec(ImapMboxHandle* handle, const char* cmd)
     return IMR_SEVERED;
 
   /* create sequence for command */
-  rc = imap_cmd_start(handle, cmd, tag);
+  rc = imap_cmd_start(handle, cmd, &cmdno);
   if (rc<0) /* irrecoverable connection error. */
     return IMR_SEVERED;
 
   sio_flush(handle->sio);
   do {
-    rc = imap_cmd_step (handle, tag);
+    rc = imap_cmd_step (handle, cmdno);
   } while (rc == IMR_UNTAGGED);
 
   if (rc != IMR_OK)
@@ -1287,6 +1344,7 @@ ir_list_lsub(ImapMboxHandle *h, ImapHandleSignal signal)
   int flags = 0;
   char buf[LONG_STRING], *s;
   int c, delim;
+  ImapResponse rc;
 
   if(sio_getc(h->sio) != '(') return IMR_PROTOCOL;
 
@@ -1316,10 +1374,11 @@ ir_list_lsub(ImapMboxHandle *h, ImapHandleSignal signal)
   if(sio_getc(h->sio) != ' ') return IMR_PROTOCOL;
   /* mailbox */
   s = imap_get_astring(h->sio, &c);
+  rc = ir_check_crlf(h, c);
   g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[signal],
                 0, delim, &flags, s);
   g_free(s);
-  return ir_check_crlf(h, c);
+  return rc;
 }
 
 static ImapResponse
@@ -1383,13 +1442,13 @@ static ImapResponse
 ir_exists(ImapMboxHandle *h, unsigned seqno)
 {
   unsigned old_exists = h->exists;
-
+  ImapResponse rc = ir_check_crlf(h, sio_getc(h->sio));
   imap_mbox_resize_cache(h, seqno);
   mbox_view_resize(&h->mbox_view, old_exists, seqno);
 
   g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[EXISTS_NOTIFY], 0);
                 
-  return ir_check_crlf(h, sio_getc(h->sio));
+  return rc;
 }
 
 static ImapResponse
@@ -1403,6 +1462,7 @@ ir_recent(ImapMboxHandle *h, unsigned seqno)
 static ImapResponse
 ir_expunge(ImapMboxHandle *h, unsigned seqno)
 {
+  ImapResponse rc = ir_check_crlf(h, sio_getc(h->sio));
   g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[EXPUNGE_NOTIFY],
 		0, seqno);
   
@@ -1414,7 +1474,15 @@ ir_expunge(ImapMboxHandle *h, unsigned seqno)
   }
   h->exists--;
   mbox_view_expunge(&h->mbox_view, seqno);
-  return ir_check_crlf(h, sio_getc(h->sio));
+  return rc;
+}
+
+static void
+flags_tasklet(ImapMboxHandle *h, void *data)
+{
+  unsigned seqno = GPOINTER_TO_UINT(data);
+  if(h->flags_cb)
+    h->flags_cb(seqno, h->flags_arg);
 }
 
 static ImapResponse
@@ -1437,7 +1505,7 @@ ir_msg_att_flags(ImapMboxHandle *h, int c, unsigned seqno)
   } while(c!=-1 && c != ')');
 
   if(h->flags_cb)
-    h->flags_cb(seqno, h->flags_arg);
+    imap_handle_add_task(h, flags_tasklet, GUINT_TO_POINTER(seqno));
   return IMR_OK;
 }
 
@@ -2495,7 +2563,7 @@ ir_handle_response(ImapMboxHandle *h)
   int c;
   char atom[LONG_STRING];
   unsigned i, seqno;
-
+  ImapResponse rc;
   c = imap_get_atom(h->sio, atom, sizeof(atom));
   if( isdigit(atom[0]) ) {
     if (c != ' ')
@@ -2507,8 +2575,8 @@ ir_handle_response(ImapMboxHandle *h)
     for(i=0; i<ELEMENTS(NumHandlers); i++) {
       if(g_ascii_strncasecmp(atom, NumHandlers[i].response, 
                              NumHandlers[i].keyword_len) == 0) {
-        return
-          NumHandlers[i].handler(h, seqno);
+        rc = NumHandlers[i].handler(h, seqno);
+        break;
       }
     }
   } else {
@@ -2517,11 +2585,12 @@ ir_handle_response(ImapMboxHandle *h)
     for(i=0; i<ELEMENTS(ResponseHandlers); i++) {
       if(g_ascii_strncasecmp(atom, ResponseHandlers[i].response, 
                              ResponseHandlers[i].keyword_len) == 0) {
-	return
-	  ResponseHandlers[i].handler(h);
+        rc = ResponseHandlers[i].handler(h);
+        break;
       }
     }
   }
+  imap_handle_process_tasks(h);
   return IMR_OK; /* FIXME: unknown response is really a failure */
 }
 

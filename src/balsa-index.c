@@ -1004,6 +1004,7 @@ bndx_find_row_func(LibBalsaMessage * message,
                    GList * exclude,
                    gboolean viewable)
 {
+    g_return_val_if_fail(message, FALSE);
     if (LIBBALSA_MESSAGE_IS_DELETED(message))
         return FALSE;
 
@@ -1911,8 +1912,10 @@ static void
 bndx_hide_deleted(BalsaIndex * index, gboolean hide)
 {
     LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
-    libbalsa_mailbox_set_view(mailbox, 0, 
-                              hide ? LIBBALSA_MESSAGE_FLAG_DELETED : 0);
+    libbalsa_mailbox_filter_view(mailbox,
+                                 CONDITION_FLAG,
+                                 LIBBALSA_MESSAGE_FLAG_DELETED,
+                                 hide);
 }
 
 /* Transfer messages. */

@@ -150,8 +150,9 @@ static void response_cb(GtkDialog * dialog, gint response, gpointer data);
 static void select_attachment(GnomeIconList * ilist, gint num,
                               GdkEventButton * event, gpointer data);
 static gboolean sw_popup_menu_cb(GtkWidget * widget, gpointer data);
-/* helper */
+/* helpers */
 static gboolean sw_do_popup(GnomeIconList * ilist, GdkEventButton * event);
+static gint sw_header_height(BalsaSendmsg * bsmsg);
 
 /* Standard DnD types */
 enum {
@@ -1867,8 +1868,9 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     GtkWidget *table;
     GtkWidget *frame;
     GtkWidget *align;
+    GtkWidget *scroll;
 
-    table = gtk_table_new(11, 3, FALSE);
+    msg->header_table = table = gtk_table_new(11, 3, FALSE);
     gtk_table_set_row_spacings(GTK_TABLE(table), 2);
     gtk_table_set_col_spacings(GTK_TABLE(table), 2);
 
@@ -1990,8 +1992,16 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     /* Keywords: */
     create_string_entry(table, _("Keywords:"), 9, msg->keywords);
 
-    gtk_widget_show_all(table);
-    return table;
+    /* Scrolled window to hold the header table. */
+    scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
+                                   GTK_POLICY_NEVER,
+                                   GTK_POLICY_AUTOMATIC);
+    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll),
+                                          table);
+    gtk_widget_show_all(scroll);
+
+    return scroll;
 }
 
 /* drag_data_quote - text area D&D callback */
@@ -2742,7 +2752,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	    g_free(tmp);
 	}
     }
-    gtk_paned_set_position(GTK_PANED(paned), -1);
+    gtk_paned_set_position(GTK_PANED(paned), sw_header_height(msg));
     gnome_app_set_contents(GNOME_APP(window), paned);
 
     /* Connect to "text-changed" here, so that we catch the initial text
@@ -3651,15 +3661,12 @@ toggle_entry(BalsaSendmsg * bmsg, GtkWidget * entry[], int pos, int cnt)
     } else {
 	while (cnt--)
 	    gtk_widget_hide(GTK_WIDGET(entry[cnt]));
-
-	/* force size recomputation if embedded in paned */
-        for (parent = entry[0]; parent; 
-             parent = gtk_widget_get_parent(parent))
-	    if (GTK_IS_PANED(parent)) {
-	        gtk_paned_set_position(GTK_PANED(parent), -1);
-                break;
-            }
     }
+
+    /* force size recomputation if embedded in paned */
+    parent = gtk_widget_get_ancestor(entry[0], GTK_TYPE_PANED);
+    if (parent)
+        gtk_paned_set_position(GTK_PANED(parent), sw_header_height(bmsg));
 
     if(bmsg->update_config) { /* then save the config */
 	str[0] = '\0';
@@ -4120,4 +4127,15 @@ sendmsg_window_set_title(BalsaSendmsg * msg)
                             gtk_entry_get_text(GTK_ENTRY(msg->subject[1])));
     gtk_window_set_title(GTK_WINDOW(msg->window), title);
     g_free(title);
+}
+
+static gint
+sw_header_height(BalsaSendmsg * bsmsg)
+{
+    GtkRequisition requisition;
+
+    gtk_widget_size_request(bsmsg->header_table, &requisition);
+
+    /* FIXME is this magic number 2 a widget property? */
+    return requisition.height + 2;
 }

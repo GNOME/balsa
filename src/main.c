@@ -72,11 +72,6 @@ GIOChannel *mail_thread_msg_receive;
 GIOChannel *send_thread_msg_send;
 GIOChannel *send_thread_msg_receive;
 
-/* Thread for updating mblist */
-pthread_t mblist_thread;
-/* we use the mailbox_lock pthread_mutex */
-int updating_mblist;
-
 /* Semaphore to prevent dual use of appbar progressbar */
 int updating_progressbar;
 
@@ -224,7 +219,6 @@ threads_init(void)
     pthread_mutex_init(&mailbox_lock, NULL);
     pthread_mutex_init(&send_messages_lock, NULL);
     checking_mail = 0;
-    updating_mblist = 0;
     updating_progressbar = 0;
     if (pipe(mail_thread_pipes) < 0) {
 	g_log("BALSA Init", G_LOG_LEVEL_DEBUG,

@@ -580,6 +580,9 @@ libmutt_ask_for_cert_acceptance(X509 *cert)
     static pthread_mutex_t ask_cert_lock = PTHREAD_MUTEX_INITIALIZER;
     AskCertData acd;
 
+    if (pthread_self() == libbalsa_get_main_thread())
+	return ask_cert_real(cert);
+
     pthread_mutex_lock(&ask_cert_lock);
     pthread_cond_init(&acd.cond, NULL);
     acd.cert = cert;

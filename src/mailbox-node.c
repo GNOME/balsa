@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-#ifdef BALSA_USE_THREADS
+#if defined(BALSA_USE_THREADS) && defined(THREADED_IMAP_SCAN_FIXED)
 #include <pthread.h>
 /* for sched_yield() prototype */
 #include <sched.h>
@@ -223,10 +223,8 @@ dir_conf_edit(BalsaMailboxNode* mb)
 static void
 read_dir_cb(BalsaMailboxNode* mb, GNode* r)
 {
-    gdk_threads_leave();
     libbalsa_scanner_local_dir(r, mb->name, 
 			       add_local_folder, add_local_mailbox);
-    gdk_threads_enter();
     /* FIXME: we should just redo local subtree starting from root, but... */
     balsa_mblist_repopulate(balsa_app.mblist_tree_store);
 }
@@ -313,7 +311,6 @@ imap_dir_cb_real(void* r)
     balsa_mailbox_nodes_unlock(FALSE);
 
     /* phase b. */
-    gdk_threads_enter();
     balsa_mailbox_nodes_lock(FALSE);
     for(item=imap_tree.list; item; item = item->next) {
 	n = imap_scan_create_mbnode(root, item->fn, 
@@ -332,10 +329,9 @@ imap_dir_cb_real(void* r)
     /* FIXME: we should just redo local subtree starting from root, but... */
     balsa_mblist_repopulate(balsa_app.mblist_tree_store);
     balsa_mailbox_nodes_unlock(FALSE);
-    gdk_threads_leave();
     imap_scan_destroy_tree(&imap_tree);
     gnome_appbar_pop(balsa_app.appbar);
-    printf("%d: Done\n", (int)time(NULL));
+    if(balsa_app.debug) printf("%d: Scanning done.\n", (int)time(NULL));
     return NULL;
 }
 
@@ -344,20 +340,18 @@ imap_dir_cb(BalsaMailboxNode* mb, GNode* r)
 {
     gchar* msg;
     BalsaMailboxNode* mroot=mb;
-#ifdef BALSA_USE_THREADS
+#if defined(BALSA_USE_THREADS) && defined(THREADED_IMAP_SCAN_FIXED)
     pthread_t scan_th_id;
 #endif
     while(mroot->parent)
 	mroot = mroot->parent;
     msg = g_strdup_printf(_("Scanning %s. Please wait..."), mroot->name);
     gnome_appbar_push(balsa_app.appbar, msg);
-    printf("%d: %s\n", (int)time(NULL), msg);
     g_free(msg);
     /* process UI events */
     while(gtk_events_pending()) 
 	gtk_main_iteration();
-    gdk_threads_leave();
-#ifdef BALSA_USE_THREADS
+#if defined(BALSA_USE_THREADS) && defined(THREADED_IMAP_SCAN_FIXED)
     pthread_create(&scan_th_id, NULL, imap_dir_cb_real, r);
     pthread_detach(scan_th_id);
     /* give the thread change to start and grab the lock 
@@ -368,7 +362,6 @@ imap_dir_cb(BalsaMailboxNode* mb, GNode* r)
 #else
     imap_dir_cb_real(r);
 #endif
-    gdk_threads_enter();
 }
 
 BalsaMailboxNode *

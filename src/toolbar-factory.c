@@ -24,10 +24,6 @@
 #include <string.h>
 #include <gnome.h>
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
-
 #include "libbalsa.h"
 
 #include "address-book.h"
@@ -45,10 +41,6 @@
 #include "sendmsg-window.h"
 #include "store-address.h"
 #include "save-restore.h"
-
-#ifdef BALSA_USE_THREADS
-#include "threads.h"
-#endif
 
 #include "libinit_balsa/init_balsa.h"
 

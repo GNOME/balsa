@@ -1,3 +1,13 @@
+2002-09-09  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/address-book-ldap.c: fix class struct size declaration.
+	* libbalsa/libbalsa.c: ask_cert() can be called now from all threads.
+	* src/balsa-mblist.c: remove dependence on threads.
+	* src/toolbar-{prefs,factory}.c: ditto.
+	* src/mailbox-node.c: disable scanning in a thread until a
+	reliable scheme is developed.
+	* src/main.c: remove unused, thread-related variables.
+	
 2002-09-08  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/filter-edit-{callbacks, dialog}.c, src/filter-edit.h, 

@@ -38,11 +38,6 @@
 #include "mailbox-node.h"
 #include "main-window.h"
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#include "threads.h"
-#endif
-
 /* object arguments */
 enum {
     PROP_0,

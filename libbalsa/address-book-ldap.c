@@ -93,7 +93,7 @@ GType libbalsa_address_book_ldap_get_type(void)
 
     if (!address_book_ldap_type) {
 	static const GTypeInfo address_book_ldap_info = {
-	    sizeof(LibBalsaAddressBookLdap),
+	    sizeof(LibBalsaAddressBookLdapClass),
             NULL,               /* base_init */
             NULL,               /* base_finalize */
 	    (GClassInitFunc) libbalsa_address_book_ldap_class_init,

@@ -41,8 +41,10 @@ init_balsa_app (int argc, char *argv[])
 #include "linkage.c"
 
   /* initalize application structure before ALL ELSE */
-  balsa_app.user_name = NULL;
-  balsa_app.email = NULL;
+  balsa_app.real_name = NULL;
+  balsa_app.username = NIL;
+  balsa_app.hostname = NIL;
+/*  balsa_app.email = NULL; */
   balsa_app.organization = NULL;
   balsa_app.local_mail_directory = NULL;
   balsa_app.smtp_server = NULL;
@@ -275,7 +277,7 @@ setup_local_mailboxes ()
 
 		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
 /*
- *		      mailbox_add_gnome_config (i, mbox->name, mbox->path, 3);
+ *                  mailbox_add_gnome_config (i, mbox->name, mbox->path, 3);
  */
 		    }
 		  if (!strcmp (drv->name, "unix"))
@@ -286,7 +288,7 @@ setup_local_mailboxes ()
 
 		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, unixmb);
 /*
- * 		      mailbox_add_gnome_config (i, unixmb->name, unixmb->path, 5);
+ *                  mailbox_add_gnome_config (i, unixmb->name, unixmb->path, 5);
  */
 		    }
 		  i++;
@@ -370,11 +372,14 @@ load_global_settings ()
   /* set to Global configure section */
   gnome_config_push_prefix ("/balsa/Global/");
 
-  /* user's text name */
-  balsa_app.user_name = get_string_set_default ("user name", pw->pw_gecos);
+  /* user's real name */
+  balsa_app.real_name = get_string_set_default ("real name", pw->pw_gecos);
 
-  /* email */
-  balsa_app.email = get_string_set_default ("email", pw->pw_name);
+  /* user name */
+  balsa_app.username = get_string_set_default ("user name", pw->pw_name);
+
+  /* hostname */
+  balsa_app.hostname = get_string_set_default ("host name", mylocalhost ());
 
   /* organization */
   balsa_app.organization = get_string_set_default ("organization", "None");

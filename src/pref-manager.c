@@ -26,7 +26,7 @@ struct _PreferencesManagerWindow
   GtkWidget *window;
 
   /* identity */
-  GtkWidget *user_name;
+  GtkWidget *real_name;
   GtkWidget *email;
   GtkWidget *organization;
 
@@ -139,12 +139,12 @@ create_identity_page ()
   gtk_widget_show (label);
 
 
-  pmw->user_name = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), pmw->user_name, 1, 2, 0, 1, 
+  pmw->real_name = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pmw->real_name, 1, 2, 0, 1, 
 		    GTK_EXPAND | GTK_FILL, 
 		    GTK_EXPAND | GTK_FILL, 
 		    0, 0);
-  gtk_widget_show (pmw->user_name);
+  gtk_widget_show (pmw->real_name);
 
 
   /* email address */
@@ -190,8 +190,8 @@ create_identity_page ()
 static void
 refresh_identity_data ()
 {
-  gtk_entry_set_text (GTK_ENTRY (pmw->user_name), balsa_app.user_name);
-  gtk_entry_set_text (GTK_ENTRY (pmw->email), balsa_app.email);
+  gtk_entry_set_text (GTK_ENTRY (pmw->real_name), balsa_app.real_name);
+  gtk_entry_set_text (GTK_ENTRY (pmw->email), balsa_app.username);
   gtk_entry_set_text (GTK_ENTRY (pmw->organization), balsa_app.organization);
 }
 

@@ -29,8 +29,12 @@
 /* global balsa application structure */
 struct
   {
-    gchar *user_name;
-    gchar *email;
+    gchar *real_name;
+
+    gchar *username;
+    gchar *hostname;
+
+ /*   gchar *email; */
     gchar *organization;
     gchar *local_mail_directory;
 

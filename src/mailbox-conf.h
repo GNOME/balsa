@@ -21,7 +21,6 @@
 
 #include "mailbox.h"
 
-void new_mailbox_dlg ();
-void edit_mailbox_dlg (Mailbox * mailbox,MailboxType type);
+void mailbox_conf_new (Mailbox * mailbox);
 
 #endif /* __NEW_MAILBOX_H__ */

@@ -155,7 +155,6 @@ static void about_box_destroy_cb (void);
 
 static void set_icon (GnomeApp * app);
 
-static void notebook_size_alloc_cb( GtkWidget *notebook, GtkAllocation *alloc );
 static void notebook_switch_page_cb( GtkWidget *notebook,
                                      GtkNotebookPage *page, guint page_num );
 
@@ -520,19 +519,13 @@ balsa_window_new ()
   
   gtk_window_set_policy(GTK_WINDOW(window), TRUE, TRUE, FALSE);
 
-  /*gtk_window_set_default_size(GTK_WINDOW(window), balsa_app.mw_width, balsa_app.mw_height);*/
-  uiroot = cfg_memory_default_root();
-  cfg_memory_add_to_window( GTK_WINDOW( window ), uiroot, "Main-Window", 333, 222 );
-  cfg_location_free( uiroot );
-
   vpaned = gtk_vpaned_new();
   hpaned = gtk_hpaned_new();
+
   window->notebook = gtk_notebook_new();
   gtk_notebook_set_show_tabs(GTK_NOTEBOOK(window->notebook), 
 			     balsa_app.show_notebook_tabs);
   gtk_notebook_set_show_border(GTK_NOTEBOOK(window->notebook), FALSE);
-  gtk_signal_connect( GTK_OBJECT(window->notebook), "size_allocate", 
-		      GTK_SIGNAL_FUNC(notebook_size_alloc_cb), NULL );
   gtk_signal_connect( GTK_OBJECT(window->notebook), "switch_page", 
 		      GTK_SIGNAL_FUNC(notebook_switch_page_cb), NULL );
   balsa_app.notebook=window->notebook;
@@ -546,21 +539,23 @@ balsa_window_new ()
   window->mblist = balsa_mailbox_list_window_new(window);
   gtk_paned_pack1(GTK_PANED(hpaned), window->mblist, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(hpaned), vpaned, TRUE, TRUE);
-  /*PKGW: do it this way, without the usizes.*/
-  if(balsa_app.show_mblist)
-     gtk_check_menu_item_set_active(
-	GTK_CHECK_MENU_ITEM(settings_menu[MENU_SETTINGS_MBLIST_POS].widget),
-	balsa_app.show_mblist);
+
+  gtk_check_menu_item_set_active(
+	  GTK_CHECK_MENU_ITEM(settings_menu[MENU_SETTINGS_MBLIST_POS].widget),
+	  balsa_app.show_mblist);
   
   gtk_paned_pack1(GTK_PANED(vpaned), window->notebook, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(vpaned), preview, TRUE, TRUE);
 
-  /*PKGW: do it this way, without the usizes.*/
-  if (balsa_app.previewpane)
-    gtk_paned_set_position( GTK_PANED(vpaned), balsa_app.notebook_height );
-  else
     /* Set it to something really high */
+  if (balsa_app.previewpane == 0 )
     gtk_paned_set_position ( GTK_PANED (vpaned), G_MAXINT);  
+
+  uiroot = cfg_memory_default_root();
+  cfg_memory_add_to_window( GTK_WINDOW( window ), uiroot, "Main-Window", 640, 480 );
+  cfg_memory_add_to_paned( GTK_PANED( vpaned ), uiroot, "MBList-Pane", 200 );
+  cfg_memory_add_to_paned( GTK_PANED( hpaned ), uiroot, "Notebook-Pane", 300 );
+  cfg_location_free( uiroot );
 
   gtk_widget_show(vpaned);
   gtk_widget_show(hpaned);
@@ -828,7 +823,6 @@ balsa_window_refresh (BalsaWindow *window)
 
     if (balsa_app.previewpane) {
       balsa_index_redraw_current (BALSA_INDEX (index));
-      gtk_paned_set_position (GTK_PANED (paned), balsa_app.notebook_height);
     } else {
       bmsg = BALSA_MESSAGE (BALSA_WINDOW (balsa_window)->preview);
       if (bmsg)
@@ -1512,7 +1506,6 @@ show_mbtree_cb(GtkWidget * widget, gpointer data)
    balsa_app.show_mblist = GTK_CHECK_MENU_ITEM(widget)->active;
    if(balsa_app.show_mblist) {
       gtk_widget_show(BALSA_WINDOW (data)->mblist);
-      gtk_paned_set_position( GTK_PANED(parent), balsa_app.mblist_width);
    }
    else {
       gtk_widget_hide(BALSA_WINDOW(data)->mblist);
@@ -1625,13 +1618,6 @@ set_icon (GnomeApp * app)
 #ifdef USE_PIXBUF
   gdk_pixbuf_unref(pb);
 #endif
-}
-
-/* PKGW: remember when they change the position of the vpaned. */
-static void notebook_size_alloc_cb( GtkWidget *notebook, GtkAllocation *alloc )
-{
-  if (balsa_app.previewpane)
-    balsa_app.notebook_height = alloc->height;
 }
 
 /* When page is switched we change the preview window and the selected 

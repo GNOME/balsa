@@ -66,8 +66,6 @@ static void balsa_mblist_set_arg(GtkObject * object,
 static void balsa_mblist_get_arg(GtkObject * object, 
 				 GtkArg * arg, 
 				 guint arg_id);
-static void balsa_mblist_column_resize (GtkCList * clist, gint column, 
-					gint size, gpointer data);
 static void balsa_mblist_column_click (GtkCList * clist, gint column, 
 				       gpointer data);
 
@@ -129,12 +127,6 @@ balsa_mblist_destroy (GtkObject * obj)
   BalsaMBList *del;
 
   del = BALSA_MBLIST (obj);
-
-  /* this happens too late.. so these are set to 1x1 */
-  /* PKGW: ... so 1x1 is the dimension that gets saved on exit. No.
-   * balsa_app.mblist_width = GTK_WIDGET(del)->allocation.width;
-   * balsa_app.mblist_height = GTK_WIDGET(del)->allocation.height;
-   */
 
   if (GTK_OBJECT_CLASS(parent_class)->destroy)
     (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(del));
@@ -258,13 +250,7 @@ balsa_mblist_init (BalsaMBList * tree)
 
 #ifdef BALSA_SHOW_INFO
 
-
-  gtk_clist_set_column_width (GTK_CLIST (tree), 1, 
-                              balsa_app.mblist_newmsg_width);
   gtk_clist_set_column_justification (GTK_CLIST (tree), 1, GTK_JUSTIFY_RIGHT);
-
-  gtk_clist_set_column_width (GTK_CLIST (tree), 2, 
-                              balsa_app.mblist_totalmsg_width);
   gtk_clist_set_column_justification (GTK_CLIST (tree), 2, GTK_JUSTIFY_RIGHT);
 
   gtk_clist_set_sort_column (GTK_CLIST (tree),0);
@@ -288,11 +274,6 @@ balsa_mblist_init (BalsaMBList * tree)
 		      (GtkSignalFunc) button_event_press_cb,
 		      (gpointer) NULL);
 
-  gtk_signal_connect (GTK_OBJECT (tree),
-		      "resize_column",
-		      GTK_SIGNAL_FUNC (balsa_mblist_column_resize),
-		      (gpointer) NULL);
-  
   gtk_signal_connect (GTK_OBJECT (tree),
 		      "click_column",
 		      GTK_SIGNAL_FUNC (balsa_mblist_column_click),
@@ -588,39 +569,6 @@ mailbox_tree_collapse (GtkCTree * ctree, GList * node, gpointer data)
     
   mbnode = gtk_ctree_node_get_row_data (ctree, GTK_CTREE_NODE (node));
   mbnode->expanded = FALSE;
-}
-
-/* balsa_mblist_column_resize [MBG]
- *
- * clist: The clist (in this case ctree), that is having it's columns resized.
- * column: The column being resized
- * size:  The new size of the column
- * data:  The data passed on to the callback when it was connected (NULL)
- *
- * Description: This callback assigns the new column widths to the balsa_app,
- * so they can be saved and restored between sessions.
- * */
-static void 
-balsa_mblist_column_resize (GtkCList * clist, gint column, 
-                            gint size, gpointer data)
-{
-  switch (column)
-  {
-  case 0:
-    balsa_app.mblist_name_width = size;
-    break;
-#ifdef BALSA_SHOW_INFO
-  case 1:
-    balsa_app.mblist_newmsg_width = size;
-    break;
-  case 2:
-    balsa_app.mblist_totalmsg_width = size;
-    break;
-#endif
-  default:
-    if (balsa_app.debug)
-      fprintf (stderr, "** Error: Unknown column resize\n");
-  }
 }
 
 /* balsa_mblist_column_click [MBG]

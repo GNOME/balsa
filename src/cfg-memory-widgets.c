@@ -34,12 +34,19 @@ static gboolean clist_load( GtkCList *clist, const cfg_location_t *root );
 static void clist_destroy( GtkWidget *clist );
 static void clist_save( GtkWidget *clist, const cfg_location_t *root );
 
+static gboolean paned_load( GtkPaned *paned, const cfg_location_t *root );
+static void paned_destroy( GtkWidget *paned );
+static void paned_save( GtkWidget *paned, const cfg_location_t *root );
+
 /* ************************************************************************ */
 
 void cfg_memory_add_to_window( GtkWindow *window, const cfg_location_t *root, const gchar *name, guint32 default_w, guint32 default_h );
 void cfg_memory_add_to_clist( GtkCList *clist, const cfg_location_t *root, const gchar *name, gint numcolumns, ... );
+void cfg_memory_add_to_paned( GtkPaned *paned, const cfg_location_t *root, const gchar *name, gint offset );
+
 void cfg_memory_write_all( const cfg_location_t *root );
 cfg_location_t *cfg_memory_default_root( void );
+
 void cfg_memory_clist_sync_from( GtkCList *clist, const cfg_location_t *root );
 void cfg_memory_clist_sync_to( GtkCList *clist, const cfg_location_t *root );
 
@@ -50,9 +57,11 @@ static const gchar width_key[] = "Width";
 static const gchar height_key[] = "Height";
 static const gchar col_width_format[] = "Column%dWidth";
 static const gchar col_count_key[] = "ColumnCount";
+static const gchar offset_key[] = "Offset";
 
 static GSList *memory_windows = NULL;
 static GSList *memory_clists = NULL;
+static GSList *memory_paneds = NULL;
 
 /* ************************************************************************ */
 
@@ -62,7 +71,6 @@ void cfg_memory_add_to_window( GtkWindow *window, const cfg_location_t *root, co
 	g_return_if_fail( root );
 	g_return_if_fail( name );
 	g_return_if_fail( GTK_IS_WINDOW( window ) );
-
 
 	gtk_object_set_data( GTK_OBJECT( window ), object_key, g_strdup( name ) );
 	gtk_signal_connect( GTK_OBJECT( window ), "destroy", GTK_SIGNAL_FUNC( window_destroy ), NULL );
@@ -116,6 +124,29 @@ void cfg_memory_add_to_clist( GtkCList *clist, const cfg_location_t *root, const
 	memory_clists = g_slist_prepend( memory_clists, (gpointer) clist );
 }
 
+void cfg_memory_add_to_paned( GtkPaned *paned, const cfg_location_t *root, const gchar *name, gint offset )
+{
+	g_return_if_fail( paned );
+	g_return_if_fail( root );
+	g_return_if_fail( name );
+	g_return_if_fail( GTK_IS_PANED( paned ) );
+
+	gtk_object_set_data( GTK_OBJECT( paned ), object_key, g_strdup( name ) );
+	gtk_signal_connect( GTK_OBJECT( paned ), "destroy", GTK_SIGNAL_FUNC( paned_destroy ), NULL );
+
+	if( paned_load( paned, root ) ) {
+		cfg_location_t *home;
+
+		home = cfg_location_godown( root, name );	
+		cfg_location_put_num( home, offset_key, offset );
+		cfg_location_free( home );
+		paned_load( paned, root );
+	}
+
+	memory_paneds = g_slist_prepend( memory_paneds, (gpointer) paned );
+}
+
+
 void cfg_memory_write_all( const cfg_location_t *root )
 {
 	GSList *iter;
@@ -125,6 +156,9 @@ void cfg_memory_write_all( const cfg_location_t *root )
 
 	for( iter = memory_clists; iter; iter = iter->next )
 		clist_save( GTK_WIDGET( iter->data ), root );
+
+	for( iter = memory_paneds; iter; iter = iter->next )
+		paned_save( GTK_WIDGET( iter->data ), root );
 }
 
 cfg_location_t *cfg_memory_default_root( void )
@@ -270,3 +304,61 @@ static void clist_save( GtkWidget *clist, const cfg_location_t *root )
 
 	cfg_location_free( home );
 }
+
+static gboolean paned_load( GtkPaned *paned, const cfg_location_t *root )
+{
+	gchar *name;
+	cfg_location_t *home;
+	guint32 offset = 0;
+
+	name = gtk_object_get_data( GTK_OBJECT( paned ), object_key );
+	g_return_val_if_fail( name, TRUE );
+	home = cfg_location_godown( root, name );
+
+	if( cfg_location_get_num( home, offset_key, &offset, 0 ) || offset == 0 ) {
+		cfg_location_free( home );
+		return TRUE;
+	}
+
+	gtk_paned_set_position( GTK_PANED( paned ), offset );
+	cfg_location_free( home );
+	return FALSE;
+}
+
+static void paned_destroy( GtkWidget *paned )
+{
+	cfg_location_t *home;
+
+	g_return_if_fail( GTK_IS_PANED( paned ) );
+
+	home = gtk_object_get_data( GTK_OBJECT( paned ), object_key );
+	if( home )
+		cfg_location_free( home );
+
+	memory_paneds = g_slist_remove( memory_paneds, paned );
+}
+
+static void paned_save( GtkWidget *paned, const cfg_location_t *root )
+{
+	gchar *name;
+	cfg_location_t *home;
+	GtkWidget *child;
+
+	g_return_if_fail( GTK_IS_PANED( paned ) );
+
+	name = gtk_object_get_data( GTK_OBJECT( paned ), object_key );
+	g_return_if_fail( name );
+	home = cfg_location_godown( root, name );
+
+	child = (GTK_PANED( paned ))->child1;
+
+	if( child == NULL )
+		cfg_location_put_num( home, offset_key, 0 );
+	else if( GTK_IS_HPANED( paned ) )
+		cfg_location_put_num( home, offset_key, (GTK_WIDGET( child ))->allocation.width );
+	else
+		cfg_location_put_num( home, offset_key, (GTK_WIDGET( child ))->allocation.height );
+
+	cfg_location_free( home );
+}
+

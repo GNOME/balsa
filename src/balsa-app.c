@@ -116,7 +116,6 @@ balsa_app_init (void)
   balsa_app.previewpane = TRUE;
 
   /* GUI settings */
-  balsa_app.mblist_width = 100;
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
   balsa_app.pwindow_option = WHILERETR;
   balsa_app.wordwrap = TRUE;
@@ -127,12 +126,8 @@ balsa_app_init (void)
   balsa_app.show_mblist = TRUE;
   balsa_app.show_notebook_tabs = FALSE;
 
-/* Mailbox list column width (not fully implemented) */
-  balsa_app.mblist_name_width = MBNAME_DEFAULT_WIDTH;
 #ifdef BALSA_SHOW_INFO
   balsa_app.mblist_show_mb_content_info = FALSE;
-  balsa_app.mblist_newmsg_width = NEWMSGCOUNT_DEFAULT_WIDTH;
-  balsa_app.mblist_totalmsg_width = TOTALMSGCOUNT_DEFAULT_WIDTH;
 #endif
 
   balsa_app.mblist_unread_color.red = MBLIST_UNREAD_COLOR_RED;

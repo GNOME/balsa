@@ -1,3 +1,15 @@
+2000-05-12  Peter Williams  <peter@beta.newton.cx>
+
+	* src/cfg-memory-widgets.[ch]: Add memory for GtkPaneds, to store
+	position of slider and all that good stuff.
+
+	* src/balsa-app.h: Remove many more UI state variables from 
+	BalsaApplication
+
+	* src/balsa-app.c, src/balsa-index-page.c, src/balsa-mblist.c,
+	src/cfg-balsa.c, src/main-window.c, src/mblist-window.c: Changes
+	  ancillary to those above.
+	
 2000-05-12  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/balsa-message.c: #9422 bug fix.

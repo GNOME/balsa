@@ -565,13 +565,9 @@ static const cfg_parm_t parms_BalsaApp[] = {
 	{ "UseSigSeparator", BALSA_OFFSET_BalsaApp_ELEM_sig_separator, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },
 	{ "SignatureFile", BALSA_OFFSET_BalsaApp_ELEM_signature_path, CPT_STR, NULL, cfg_type_const_init_str( NULL, fetch_sigpath, NULL ) },
 	{ "AutoCheckMail", BALSA_OFFSET_BalsaApp_ELEM_check_mail_auto, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },
-	{ "MailboxListWidth", BALSA_OFFSET_BalsaApp_ELEM_mblist_width, CPT_NUM, NULL, cfg_type_const_init_num( DEFAULT_MBLIST_WIDTH, 1, 0, CPNF_USEMIN ) },
-	{ "NotebookHeight", BALSA_OFFSET_BalsaApp_ELEM_notebook_height, CPT_NUM, NULL, cfg_type_const_init_num( DEFAULT_NOTEBOOK_HEIGHT, 1, 0, CPNF_USEMIN ) },
 
 #ifdef BALSA_SHOW_INFO
 	{ "MBListInfoShow", BALSA_OFFSET_BalsaApp_ELEM_mblist_show_mb_content_info, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },
-	{ "MBListInfoNewWidth", BALSA_OFFSET_BalsaApp_ELEM_mblist_newmsg_width, CPT_NUM, NULL, cfg_type_const_init_num( NEWMSGCOUNT_DEFAULT_WIDTH, 1, 0, CPNF_USEMIN ) },
-	{ "MBListInfoTotalWidth", BALSA_OFFSET_BalsaApp_ELEM_mblist_totalmsg_width, CPT_NUM, NULL, cfg_type_const_init_num( TOTALMSGCOUNT_DEFAULT_WIDTH, 1, 0, CPNF_USEMIN ) },
 #endif
 
 	{ "PWindowSetting", BALSA_OFFSET_BalsaApp_ELEM_pwindow_option, CPT_NUM, NULL, cfg_type_const_init_num( WHILERETR, WHILERETR, NEVER, CPNF_USEMIN | CPNF_USEMAX ) },

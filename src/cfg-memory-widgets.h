@@ -32,8 +32,11 @@
 
 void cfg_memory_add_to_window( GtkWindow *window, const cfg_location_t *root, const gchar *name, guint32 default_w, guint32 default_h );
 void cfg_memory_add_to_clist( GtkCList *clist, const cfg_location_t *root, const gchar *name, gint numcolumns, ... );
+void cfg_memory_add_to_paned( GtkPaned *paned, const cfg_location_t *root, const gchar *name, gint offset );
+
 void cfg_memory_write_all( const cfg_location_t *root );
 cfg_location_t *cfg_memory_default_root( void );
+
 void cfg_memory_clist_sync_from( GtkCList *clist, const cfg_location_t *root );
 void cfg_memory_clist_sync_to( GtkCList *clist, const cfg_location_t *root );
 

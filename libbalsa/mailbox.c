@@ -103,7 +103,9 @@ static Address *translate_address (ADDRESS * caddr);
 Server *server_new(ServerType type);
 void server_free(Server *server);
 
-/* We're gonna set Mutt global vars here */
+/* We're gonna set Mutt global vars here.
+   NOTE: we take over the inbox_path ownership! 
+*/
 void
 mailbox_init (gchar * inbox_path,
 		void (*error_func) (const char *fmt,...),

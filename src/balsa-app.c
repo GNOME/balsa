@@ -204,7 +204,6 @@ do_load_mailboxes (void)
   }
 
   mailbox_init (spool, balsa_error, update_gui);
-  g_free(spool);
 
   load_local_mailboxes ();
 

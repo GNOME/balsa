@@ -1,3 +1,11 @@
+2002-06-25  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/libbalsa.c: improve certificate window layout. Use GtkDialog
+	* src/main-window.c: compile with --disable-threads
+	* src/main.c: GDK-lock idle functions.
+	* src/message-window.c: open messages in separate window in idle
+	function, not during window creation - this could lock WM.
+
 2002-06-23  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/folder-conf.c: fix IMAP subfolder creation (broken on 06-09).

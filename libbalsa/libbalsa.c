@@ -497,7 +497,7 @@ ask_cert_real(X509 *cert)
     unsigned i;
     int ret;
 
-    GString* str = g_string_new(_("This certificate belongs to:\n"));
+    GString* str = g_string_new(_("<b>This certificate belongs to:</b>\n"));
 
     name = X509_NAME_oneline(X509_get_subject_name (cert), buf, sizeof (buf));
     for (i = 0; i < ELEMENTS(part); i++) {
@@ -505,7 +505,7 @@ ask_cert_real(X509 *cert)
         g_string_append_c(str, '\n');
     }
 
-    g_string_append(str, _("\nThis certificate was issued by:\n"));
+    g_string_append(str, _("\n<b>This certificate was issued by:</b>\n"));
     name = X509_NAME_oneline(X509_get_issuer_name(cert), buf, sizeof (buf));
     for (i = 0; i < ELEMENTS(part); i++) {
         g_string_append(str, x509_get_part (name, part[i]));
@@ -514,31 +514,35 @@ ask_cert_real(X509 *cert)
 
     buf[0] = '\0';
     x509_fingerprint (buf, sizeof (buf), cert);
-    c = g_strdup_printf(_("This certificate is valid\n"
+    c = g_strdup_printf(_("<b>This certificate is valid</b>\n"
                           "from %s\n"
                           "to %s\n"
-                          "Fingerprint: %s"),
+                          "<b>Fingerprint:</b> %s"),
                         asn1time_to_string(X509_get_notBefore(cert)),
                         asn1time_to_string(X509_get_notAfter(cert)),
                         buf);
     g_string_append(str, c); g_free(c);
 
-    dialog = gnome_dialog_new(_("IMAP TLS certificate"), 
-                              _("Accept Once"),_("Accept&Save"),
-                              _("Reject"), NULL);
+    dialog = gtk_dialog_new_with_buttons(_("IMAP TLS certificate"), NULL,
+                                         GTK_DIALOG_MODAL,
+                                         _("_Accept Once"), 0,
+                                         _("Accept&_Save"), 1,
+                                         _("_Reject"), GTK_RESPONSE_CANCEL, 
+                                         NULL);
     label = gtk_label_new(str->str);
     g_string_free(str, TRUE);
-
+    gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
     gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(dialog)->vbox),
                        label, TRUE, TRUE, 1);
     gtk_widget_show(label);
 
-    switch(gnome_dialog_run_and_close(GNOME_DIALOG(dialog))) {
+    switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
     case 0: ret = OP_MAX; break;
     case 1: ret = OP_SAVE; libbalsa_assure_balsa_dir(); break;
-    case 2:
+    case GTK_RESPONSE_CANCEL:
     default: ret = OP_EXIT; break;
     }
+    gtk_widget_destroy(dialog);
     return ret;
 }
 

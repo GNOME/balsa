@@ -1818,7 +1818,7 @@ check_new_messages_real(GtkWidget *widget, gpointer data, int type)
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
                            mailbox_check_func, NULL);
-    balsa_mblist_have_new(balsa_app.mblist);
+    balsa_mblist_have_new(balsa_app.mblist_tree_store);
 #endif
 }
 

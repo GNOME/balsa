@@ -263,17 +263,19 @@ threads_destroy(void)
 static gboolean
 initial_open_unread_mailboxes()
 {
-    GList *i, *gl = balsa_mblist_find_all_unread_mboxes();
+    GList *i, *gl;
+    gdk_threads_enter();
+    gl = balsa_mblist_find_all_unread_mboxes();
 
-    if (!gl)
-	return FALSE;
-
-    for (i = g_list_first(gl); i; i = g_list_next(i)) {
-	printf("opening %s..\n", (LIBBALSA_MAILBOX(i->data))->name);
-	balsa_mblist_open_mailbox(LIBBALSA_MAILBOX(i->data));
+    if (gl) {
+        for (i = g_list_first(gl); i; i = g_list_next(i)) {
+            printf("opening %s..\n", (LIBBALSA_MAILBOX(i->data))->name);
+            if(0)
+                balsa_mblist_open_mailbox(LIBBALSA_MAILBOX(i->data));
+        }
+        g_list_free(gl);
     }
-    g_list_free(gl);
-
+    gdk_threads_leave();
     return FALSE;
 }
 
@@ -285,7 +287,9 @@ initial_open_inbox()
 	return FALSE;
 
     printf("opening %s..\n", (LIBBALSA_MAILBOX(balsa_app.inbox))->name);
+    gdk_threads_enter();
     balsa_mblist_open_mailbox(LIBBALSA_MAILBOX(balsa_app.inbox));
+    gdk_threads_leave();
     
     return FALSE;
 }

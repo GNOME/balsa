@@ -1220,10 +1220,12 @@ mailbox_messages_changed_status(LibBalsaMailbox * mb,
 	/* These messages are flagged as deleted, but we must remove them from
 	   the index because of the prefs
 	 */
+#if 0
 #if 1
         g_warning("%s called but not finished.", __func__);
 #else
 	bndx_messages_remove(bindex,messages);
+#endif
 #endif
         return;
     }
@@ -1296,6 +1298,7 @@ bndx_messages_add(BalsaIndex * bindex, GList *messages)
 {
     GList *list;
 
+#if 0
 #if 1
     g_warning("%s called but not finished.\n", __func__);
 #else
@@ -1306,6 +1309,7 @@ bndx_messages_add(BalsaIndex * bindex, GList *messages)
     }
     balsa_index_threading(bindex, 
 			  bindex->mailbox_node->mailbox->view->threading_type);
+#endif
 #endif
     for (list = messages; list; list = g_list_next(list)) {
         LibBalsaMessage *msg = (LibBalsaMessage *) list->data;
@@ -1370,6 +1374,7 @@ mailbox_messages_added_cb(BalsaIndex * bindex, GList *messages)
 static void
 mailbox_messages_removed_cb(BalsaIndex * bindex, GList * messages)
 {
+#if 0
 #if 1
     g_warning("%s called but not implemented.\n", __func__);
 #else
@@ -1379,6 +1384,7 @@ mailbox_messages_removed_cb(BalsaIndex * bindex, GList * messages)
     g_object_add_weak_pointer(G_OBJECT(bindex), (gpointer) &arg->bindex);
     g_list_foreach(arg->messages, (GFunc)g_object_ref, NULL);
     g_idle_add((GSourceFunc)mailbox_messages_func_idle, arg);
+#endif
 #endif
 }
 

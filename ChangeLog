@@ -1,5 +1,6 @@
-2003-02-27 14:54  PeterB
+2003-02-27 15:55  PeterB
 
+	* libbalsa/source-viewer.c: Make text not editable (!)
 	* src/: balsa-index.c, balsa-index.h, main-window.c: Implement
 	Mailbox=>_Remove Duplicates.
 

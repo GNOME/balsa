@@ -13,6 +13,8 @@
 	* src/mailbox-node.c: set  BalsaMailboxNode:dir field for local dirs.
 	* src/main.c: add -i - open mailbox on startup (Toralf Lund).
 	* balsa.1.in: add -i description.
+	* libinit_balsa/balsa-druid-page-finish.gob,balsa-initdruid.gob:
+	detect the gnome address book BEFORE saving the configuration.
 
 	Michael Broaddus <mbroaddu@indy.net>
 	* libbalsa/identity.[hc]: add sig_executable field and its UI.

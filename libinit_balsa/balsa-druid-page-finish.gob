@@ -28,6 +28,7 @@
 
 %{
 #include "save-restore.h"
+#include "balsa-app.h"
 %}
 
 class Balsa:Druid:Page:Finish from Balsa:Druid:Page {
@@ -68,7 +69,17 @@ class Balsa:Druid:Page:Finish from Balsa:Druid:Page {
 	}
 
 	override (Gnome:Druid:Page) void
-	finish( Gnome:Druid:Page *_self, Gtk:Widget *druid (check type null) ) {
+	finish( Gnome:Druid:Page *_self, Gtk:Widget *druid (check type null) ) {		gchar *address_book;
+		address_book = gnome_util_home_file("GnomeCard.gcrd");
+		if ( g_file_exists(address_book) ) {
+		  LibBalsaAddressBook *ab = libbalsa_address_book_vcard_new(_("GnomeCard Address Book"),
+									    address_book);
+
+		  balsa_app.address_book_list = g_list_prepend(balsa_app.address_book_list, ab);
+		  balsa_app.default_address_book = ab;
+		}
+		g_free(address_book);
+
 		config_save();
 		balsa_initdruid_finished( BALSA_INITDRUID( druid ) );
 	}

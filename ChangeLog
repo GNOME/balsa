@@ -1,3 +1,8 @@
+2003-12-10 15:45  PeterB
+
+	* src/message-window.c: Idle handler must return FALSE (Nuno
+	Monteiro <nuno@itsari.org>).
+
 2003-12-08 22:32  PeterB
 
 	* src/message-window.c: Set a new message in the same

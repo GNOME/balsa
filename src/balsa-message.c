@@ -1099,21 +1099,16 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
     g_free(msg);
 
     hbox = gtk_hbox_new(TRUE, 6);
-    if ((button = part_info_mime_button_vfs(info, content_type))) {
+    if ((button = part_info_mime_button_vfs(info, content_type))
+        || (button = part_info_mime_button(info, content_type, "view"))
+        || (button = part_info_mime_button(info, content_type, "open")))
         gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-    } else if ((button = part_info_mime_button(info, content_type,
-                                               "view"))) {
-        gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-    } else if ((button = part_info_mime_button(info, content_type,
-                                               "open"))) {
-        gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-    } else {
+    else
         gtk_box_pack_start(GTK_BOX(vbox),
                            gtk_label_new(_("No open or view action "
                                            "defined in GNOME MIME "
                                            "for this content type")),
                            FALSE, FALSE, 0);
-    }
     g_free(content_type);
 
     button = gtk_button_new_with_label(_("Save part"));

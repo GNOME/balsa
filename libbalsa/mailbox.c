@@ -718,9 +718,6 @@ libbalsa_mailbox_link_message(LibBalsaMailbox * mailbox, LibBalsaMessage*msg)
 
     if (msg->flags & LIBBALSA_MESSAGE_FLAG_NEW)
         mailbox->unread_messages++;
-    /* take over the ownership */
-    g_object_ref ( G_OBJECT(msg) );
-    gtk_object_sink( GTK_OBJECT(msg) );
     mailbox->message_list = g_list_append(mailbox->message_list, msg);
     mailbox->total_messages++;
 }

@@ -25,6 +25,7 @@
 
 #include <stdlib.h>		/* for malloc() */
 #include <pthread.h>
+#include <gtk/gtk.h>
 
 /*
  * thread globals

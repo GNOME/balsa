@@ -33,11 +33,18 @@ extern "C"
 
     GType libbalsa_identity_get_type(void);
 
-#define LIBBALSA_TYPE_IDENTITY          (libbalsa_identity_get_type ())
-#define LIBBALSA_IDENTITY(obj)          (G_TYPE_CHECK_INSTANCE_CAST (obj, libbalsa_identity_get_type (), LibBalsaIdentity))
-#define LIBBALSA_IDENTITY_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST (klass, libbalsa_identity_get_type (), LibBalsaIdentityClass))
-#define LIBBALSA_IS_IDENTITY(obj)       (G_TYPE_CHECK_INSTANCE_TYPE (obj, libbalsa_identity_get_type ()))
-#define LIBBALSA_IS_IDENTITY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE (klass, BALSA_TYPE_IDENTITY))
+#define LIBBALSA_TYPE_IDENTITY \
+    (libbalsa_identity_get_type ())
+#define LIBBALSA_IDENTITY(obj) \
+    (G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_IDENTITY, \
+                                 LibBalsaIdentity))
+#define LIBBALSA_IDENTITY_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_IDENTITY, \
+                              LibBalsaIdentityClass))
+#define LIBBALSA_IS_IDENTITY(obj) \
+    (G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_IDENTITY))
+#define LIBBALSA_IS_IDENTITY_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_IDENTITY))
 
     typedef struct _LibBalsaIdentity LibBalsaIdentity;
     typedef struct _LibBalsaIdentityClass LibBalsaIdentityClass;

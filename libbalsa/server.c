@@ -28,6 +28,7 @@
 
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 
+#include <gtk/gtk.h>
 
 
 /* GTK_CLASS_TYPE for 1.2<->1.3/2.0 GTK+ compatibility */

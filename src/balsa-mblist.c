@@ -1537,8 +1537,11 @@ balsa_mblist_focus_mailbox(BalsaMBList * mblist, LibBalsaMailbox * mailbox)
 
             gtk_tree_selection_select_iter(selection, &iter);
             path = gtk_tree_model_get_path(model, &iter);
+            /* We'd like to scroll only enough to get the mailbox into
+             * the scrolled window, but that's not currently implemented
+             * in GtkTreeView */
             gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(mblist), path, NULL,
-                                         FALSE, 0, 0);
+                                         TRUE, 0.5, 0);
             gtk_tree_path_free(path);
         }
         return TRUE;

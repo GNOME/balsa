@@ -52,15 +52,10 @@
 #include "threads.h"
 #endif
 
-/* GTK_CLASS_TYPE for 1.2<->1.3/2.0 GTK+ compatibility */
-#ifndef GTK_CLASS_TYPE
-#define GTK_CLASS_TYPE(x) (GTK_OBJECT_CLASS(x)->type)
-#endif /* GTK_CLASS_TYPE */
-
 static void libbalsa_message_class_init(LibBalsaMessageClass * klass);
 static void libbalsa_message_init(LibBalsaMessage * message);
 
-static void libbalsa_message_destroy(GtkObject * object);
+static void libbalsa_message_finalize(GObject * object);
 
 /* Signal Hanlders */
 static void libbalsa_message_real_clear_flags(LibBalsaMessage * message);
@@ -88,28 +83,30 @@ enum {
     LAST_SIGNAL
 };
 
-static GtkObjectClass *parent_class = NULL;
+static GObjectClass *parent_class = NULL;
 static guint libbalsa_message_signals[LAST_SIGNAL] = { 0 };
 
-GtkType
+GType
 libbalsa_message_get_type()
 {
-    static GtkType libbalsa_message_type = 0;
+    static GType libbalsa_message_type = 0;
 
     if (!libbalsa_message_type) {
-	static const GtkTypeInfo libbalsa_message_info = {
-	    "LibBalsaMessage",
-	    sizeof(LibBalsaMessage),
+	static const GTypeInfo libbalsa_message_info = {
 	    sizeof(LibBalsaMessageClass),
-	    (GtkClassInitFunc) libbalsa_message_class_init,
-	    (GtkObjectInitFunc) libbalsa_message_init,
-	    /* reserved_1 */ NULL,
-	    /* reserved_2 */ NULL,
-	    (GtkClassInitFunc) NULL,
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) libbalsa_message_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(LibBalsaMessage),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) libbalsa_message_init
 	};
 
 	libbalsa_message_type =
-	    gtk_type_unique(gtk_object_get_type(), &libbalsa_message_info);
+	    g_type_register_static(G_TYPE_OBJECT, "LibBalsaMessage",
+                                   &libbalsa_message_info, 0);
     }
 
     return libbalsa_message_type;
@@ -145,56 +142,55 @@ libbalsa_message_init(LibBalsaMessage * message)
 static void
 libbalsa_message_class_init(LibBalsaMessageClass * klass)
 {
-    GtkObjectClass *object_class;
+    GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
-    object_class = (GtkObjectClass *) klass;
-
-    parent_class = gtk_type_class(gtk_object_get_type());
+    parent_class = g_type_class_peek_parent(klass);
 
     libbalsa_message_signals[CLEAR_FLAGS] =
-	gtk_signal_new("clear-flags",
-		       GTK_RUN_FIRST,
-		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
-					 clear_flags),
-		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
+	g_signal_new("clear-flags",
+                     G_TYPE_FROM_CLASS(object_class),
+		     G_SIGNAL_RUN_FIRST,
+		     G_STRUCT_OFFSET(LibBalsaMessageClass, clear_flags),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
     libbalsa_message_signals[SET_ANSWERED] =
-	gtk_signal_new("set-answered",
-		       GTK_RUN_FIRST,
-		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
-					 set_answered),
-		       gtk_marshal_NONE__BOOL, GTK_TYPE_NONE, 1,
-		       GTK_TYPE_BOOL);
+	g_signal_new("set-answered",
+                     G_TYPE_FROM_CLASS(object_class),
+		     G_SIGNAL_RUN_FIRST,
+		     G_STRUCT_OFFSET(LibBalsaMessageClass, set_answered),
+                     NULL, NULL,
+		     g_cclosure_marshal_VOID__BOOLEAN, G_TYPE_NONE, 1,
+		     G_TYPE_BOOLEAN);
 
     libbalsa_message_signals[SET_READ] =
-	gtk_signal_new("set-read",
-		       GTK_RUN_FIRST,
-		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass, set_read),
-		       gtk_marshal_NONE__BOOL,
-		       GTK_TYPE_NONE, 1, GTK_TYPE_BOOL);
+	g_signal_new("set-read",
+                     G_TYPE_FROM_CLASS(object_class),
+		     G_SIGNAL_RUN_FIRST,
+		     G_STRUCT_OFFSET(LibBalsaMessageClass, set_read),
+                     NULL, NULL,
+		     g_cclosure_marshal_VOID__BOOLEAN, G_TYPE_NONE, 1,
+		     G_TYPE_BOOLEAN);
 
     libbalsa_message_signals[SET_DELETED] =
-	gtk_signal_new("set-deleted",
-		       GTK_RUN_LAST,
-		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
-					 set_deleted),
-		       gtk_marshal_NONE__BOOL, GTK_TYPE_NONE, 1,
-		       GTK_TYPE_BOOL);
+	g_signal_new("set-deleted",
+                     G_TYPE_FROM_CLASS(object_class),
+		     G_SIGNAL_RUN_LAST,
+		     G_STRUCT_OFFSET(LibBalsaMessageClass, set_deleted),
+                     NULL, NULL,
+		     g_cclosure_marshal_VOID__BOOLEAN, G_TYPE_NONE, 1,
+		     G_TYPE_BOOLEAN);
 
     libbalsa_message_signals[SET_FLAGGED] =
-	gtk_signal_new("set-flagged",
-		       GTK_RUN_FIRST,
-		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaMessageClass,
-					 set_flagged),
-		       gtk_marshal_NONE__BOOL, GTK_TYPE_NONE, 1,
-		       GTK_TYPE_BOOL);
+	g_signal_new("set-flagged",
+                     G_TYPE_FROM_CLASS(object_class),
+		     G_SIGNAL_RUN_FIRST,
+		     G_STRUCT_OFFSET(LibBalsaMessageClass, set_flagged),
+                     NULL, NULL,
+		     g_cclosure_marshal_VOID__BOOLEAN, G_TYPE_NONE, 1,
+		     G_TYPE_BOOLEAN);
 
-    object_class->destroy = libbalsa_message_destroy;
+    object_class->finalize = libbalsa_message_finalize;
 
     klass->clear_flags = libbalsa_message_real_clear_flags;
     klass->set_answered = libbalsa_message_real_set_answered_flag;
@@ -208,17 +204,17 @@ libbalsa_message_new(void)
 {
     LibBalsaMessage *message;
 
-    message = gtk_type_new(LIBBALSA_TYPE_MESSAGE);
+    message = g_object_new(LIBBALSA_TYPE_MESSAGE, NULL);
 
     return message;
 }
 
-/* libbalsa_message_destroy:
-   destroy methods must leave object in 'sane' state. 
+/* libbalsa_message_finalize:
+   finalize methods must leave object in 'sane' state. 
    This means NULLifing released pointers.
 */
 static void
-libbalsa_message_destroy(GtkObject * object)
+libbalsa_message_finalize(GObject * object)
 {
     LibBalsaMessage *message;
 
@@ -282,8 +278,7 @@ libbalsa_message_destroy(GtkObject * object)
     g_list_free(message->references_for_threading);
     message->references_for_threading=NULL;
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
+    G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
 const gchar *
@@ -370,7 +365,7 @@ libbalsa_message_find_user_hdr(LibBalsaMessage * message, const gchar * find)
     for (list = message->user_headers; list; list = g_list_next(list)) {
         tmp = list->data;
         
-        if (g_strncasecmp(tmp[0], find, strlen(find)) == 0) 
+        if (g_ascii_strncasecmp(tmp[0], find, strlen(find)) == 0) 
             return list;
     }
     
@@ -779,8 +774,8 @@ libbalsa_message_flag(LibBalsaMessage * message, gboolean flag)
     g_return_if_fail(message != NULL);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
-    gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[SET_FLAGGED], flag);
+    g_signal_emit(G_OBJECT(message),
+		  libbalsa_message_signals[SET_FLAGGED], 0, flag);
 }
 
 
@@ -790,8 +785,8 @@ libbalsa_message_clear_flags(LibBalsaMessage * message)
     g_return_if_fail(message != NULL);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
-    gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[CLEAR_FLAGS]);
+    g_signal_emit(G_OBJECT(message),
+		  libbalsa_message_signals[CLEAR_FLAGS], 0);
 }
 
 
@@ -801,8 +796,8 @@ libbalsa_message_reply(LibBalsaMessage * message)
     g_return_if_fail(message != NULL);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
-    gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[SET_ANSWERED], TRUE);
+    g_signal_emit(G_OBJECT(message),
+		  libbalsa_message_signals[SET_ANSWERED], 0, TRUE);
 }
 
 void
@@ -811,8 +806,8 @@ libbalsa_message_read(LibBalsaMessage * message, gboolean read)
     g_return_if_fail(message != NULL);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
-    gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[SET_READ], read);
+    g_signal_emit(G_OBJECT(message),
+		  libbalsa_message_signals[SET_READ], 0, read);
 }
 
 void
@@ -822,8 +817,8 @@ libbalsa_message_delete(LibBalsaMessage * message, gboolean del)
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
     g_return_if_fail(message->mailbox != NULL);
 
-    gtk_signal_emit(GTK_OBJECT(message),
-		    libbalsa_message_signals[SET_DELETED], del);
+    g_signal_emit(G_OBJECT(message),
+		  libbalsa_message_signals[SET_DELETED], 0, del);
 }
 
 void
@@ -834,8 +829,8 @@ libbalsa_messages_delete(GList * messages)
 
     while(messages){
       message=(LibBalsaMessage *)(messages->data);
-      gtk_signal_emit(GTK_OBJECT(message),
-  	  	      libbalsa_message_signals[SET_DELETED], TRUE);
+      g_signal_emit(G_OBJECT(message),
+  	  	    libbalsa_message_signals[SET_DELETED], 0, TRUE);
       messages=g_list_next(messages);
     }
 }
@@ -935,14 +930,16 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
     
     if (cur->content->type == TYPEMULTIPART) {
 	libbalsa_lock_mutt();
-	cur->content->parts = 
+        cur->content->parts =
             mutt_parse_multipart(msg->fp,
-                                 mutt_get_parameter
-                                 ("boundary",
-                                  cur->content->parameter),
-                                 cur->content->offset + cur->content->length,
-                                 strcasecmp("digest",cur->content->subtype) 
-                                 == 0);
+                                 mutt_get_parameter("boundary",
+                                                    cur->content->
+                                                    parameter),
+                                 cur->content->offset +
+                                 cur->content->length,
+                                 g_ascii_strcasecmp("digest",
+                                                    cur->content->
+                                                    subtype) == 0);
 	libbalsa_unlock_mutt();
     } else
 	if (mutt_is_message_type
@@ -1042,7 +1039,7 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
 	      Content-disposition: attachment. Unfortunately, part list may
 	      not be available at this stage. */
     res = (msg_header->content->type==TYPEMULTIPART &&
-	    g_strcasecmp("mixed", msg_header->content->subtype)==0);
+	    g_ascii_strcasecmp("mixed", msg_header->content->subtype)==0);
 
     UNLOCK_MAILBOX(message->mailbox);
     return res;
@@ -1255,7 +1252,7 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
     /* Get fcc from message */
     for (tmp = cenv->userhdrs; tmp; tmp = tmp->next) {
         if (!message->fcc_url
-            && g_strncasecmp("X-Mutt-Fcc:", tmp->data, 11) == 0) {
+            && g_ascii_strncasecmp("X-Mutt-Fcc:", tmp->data, 11) == 0) {
             gchar *p = tmp->data + 11;
             SKIPWS(p);
 
@@ -1380,8 +1377,10 @@ libbalsa_message_title(LibBalsaMessage * message, const gchar * format)
 
         tmp1 = libbalsa_truncate_string(tmp, length, dots);
         g_free(tmp);
-        g_string_append(string, tmp1);
-        g_free(tmp1);
+        if (tmp1) {
+            g_string_append(string, tmp1);
+            g_free(tmp1);
+        }
 
         if (c)
             ++format;
@@ -1405,7 +1404,7 @@ libbalsa_message_find_by_message_id(LibBalsaMailbox * mailbox, gchar * msgid)
     for (list = mailbox->message_list; list; list = g_list_next(list)) {
         message = list->data;
         
-        if (g_strcasecmp(message->message_id, msgid) == 0) {
+        if (g_ascii_strcasecmp(message->message_id, msgid) == 0) {
             return message;
         }
     }

@@ -23,7 +23,6 @@
 #define __LIBBALSA_MESSAGE_H__
 
 #include <glib.h>
-#include <gtk/gtk.h>
 
 #include <time.h>
 
@@ -34,11 +33,17 @@
 #endif
 
 /* #define MESSAGE_COPY_CONTENT 1 */
-#define LIBBALSA_TYPE_MESSAGE                      (libbalsa_message_get_type())
-#define LIBBALSA_MESSAGE(obj)                      (GTK_CHECK_CAST(obj, LIBBALSA_TYPE_MESSAGE, LibBalsaMessage))
-#define LIBBALSA_MESSAGE_CLASS(klass)              (GTK_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_MESSAGE, LibBalsaMessageClass))
-#define LIBBALSA_IS_MESSAGE(obj)                   (GTK_CHECK_TYPE(obj, LIBBALSA_TYPE_MESSAGE))
-#define LIBBALSA_IS_MESSAGE_CLASS(klass)           (GTK_CHECK_CLASS_TYPE(klass, LIBBALSA_TYPE_MESSAGE))
+#define LIBBALSA_TYPE_MESSAGE \
+    (libbalsa_message_get_type())
+#define LIBBALSA_MESSAGE(obj) \
+    (G_TYPE_CHECK_INSTANCE_CAST(obj, LIBBALSA_TYPE_MESSAGE, LibBalsaMessage))
+#define LIBBALSA_MESSAGE_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_MESSAGE, \
+                             LibBalsaMessageClass))
+#define LIBBALSA_IS_MESSAGE(obj) \
+    (G_TYPE_CHECK_INSTANCE_TYPE(obj, LIBBALSA_TYPE_MESSAGE))
+#define LIBBALSA_IS_MESSAGE_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_TYPE(klass, LIBBALSA_TYPE_MESSAGE))
 
 typedef struct _LibBalsaMessageClass LibBalsaMessageClass;
 typedef enum _LibBalsaMessageFlag LibBalsaMessageFlag;
@@ -51,7 +56,7 @@ enum _LibBalsaMessageFlag {
 };
 
 struct _LibBalsaMessage {
-    GtkObject object;
+    GObject object;
 
     /* the mailbox this message belongs to */
     LibBalsaMailbox *mailbox;
@@ -127,7 +132,7 @@ struct _LibBalsaMessage {
  ((m)->flags&LIBBALSA_MESSAGE_FLAG_FLAGGED)
 
 struct _LibBalsaMessageClass {
-    GtkObjectClass parent_class;
+    GObjectClass parent_class;
 
     /* deal with flags being set/unset */
     /* Signal: */
@@ -143,7 +148,7 @@ struct _LibBalsaMessageClass {
 };
 
 
-GtkType libbalsa_message_get_type(void);
+GType libbalsa_message_get_type(void);
 
 /*
  * messages

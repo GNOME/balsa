@@ -97,8 +97,8 @@ static gint balsa_message_key_press_event(GtkWidget * widget,
 					  GdkEventKey * event,
 					  BalsaMessage * bm);
 
-static void message_destroyed_cb(LibBalsaMessage * message,
-				 BalsaMessage * bm);
+static void bm_message_weak_ref_cb(BalsaMessage * bm,
+                                   LibBalsaMessage * message);
 
 static void display_headers(BalsaMessage * bm);
 static void display_content(BalsaMessage * bm);
@@ -434,10 +434,12 @@ select_icon_cb(GnomeIconList * ilist, gint num, GdkEventButton * event,
 }
 
 static void
-message_destroyed_cb(LibBalsaMessage * message, BalsaMessage * bm)
+bm_message_weak_ref_cb(BalsaMessage * bm, LibBalsaMessage * message)
 {
-    if (bm->message == message)
+    if (bm->message == message) {
+        bm->message = NULL;
 	balsa_message_set(bm, NULL);
+    }
 }
 
 void
@@ -471,13 +473,12 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 
     select_part(bm, -1);
     if (bm->message != NULL) {
-	gtk_signal_disconnect_by_func(GTK_OBJECT(bm->message),
-				      GTK_SIGNAL_FUNC
-				      (message_destroyed_cb),
-				      (gpointer) bm);
+        g_object_weak_unref(G_OBJECT(bm->message),
+	   	            (GWeakNotify) bm_message_weak_ref_cb,
+		            (gpointer) bm);
 	libbalsa_message_body_unref(bm->message);
+        bm->message = NULL;
     }
-    bm->message = NULL;
     gnome_icon_list_clear(GNOME_ICON_LIST(bm->part_list));
 
     if (message == NULL) {
@@ -488,9 +489,9 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 
     bm->message = message;
 
-    gtk_signal_connect(GTK_OBJECT(message), "destroy",
-		       GTK_SIGNAL_FUNC(message_destroyed_cb),
-		       (gpointer) bm);
+    g_object_weak_ref(G_OBJECT(message),
+		      (GWeakNotify) bm_message_weak_ref_cb,
+		      (gpointer) bm);
 
     is_new = message->flags & LIBBALSA_MESSAGE_FLAG_NEW;
     if(!libbalsa_message_body_ref(bm->message)) 
@@ -2071,7 +2072,7 @@ part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info)
 			  balsa_app.encoding_style,
 			  FALSE);
 #endif
-    gtk_object_destroy(GTK_OBJECT(message));    
+    g_object_unref(G_OBJECT(message));    
 }
 
 
@@ -2176,7 +2177,7 @@ balsa_message_previous_part(BalsaMessage * bmessage)
     GnomeIconList *gil;
     guint icons;
     GList *list;
-    guint index = 0;
+    gint index = 0;
 
     g_return_if_fail(bmessage != NULL);
     g_return_if_fail(bmessage->part_list != NULL);

@@ -609,7 +609,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
         /* check again! */
 	if (bsm->orig_message->mailbox)
 	    g_object_unref(G_OBJECT(bsm->orig_message->mailbox));
-	gtk_object_unref(GTK_OBJECT(bsm->orig_message));
+	g_object_unref(G_OBJECT(bsm->orig_message));
     }
 
     if (balsa_app.debug)
@@ -2541,7 +2541,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     }
     if (msg->orig_message) {
         /* ref message so we don't lose it even if it is deleted */
-	gtk_object_ref(GTK_OBJECT(message));
+	g_object_ref(G_OBJECT(message));
 	/* reference the original mailbox so we don't loose the
 	   mail even if the mailbox is closed. Alternatively,
 	   one could try using weak references or destroy notification
@@ -3146,7 +3146,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	}
     }
 
-    gtk_object_destroy(GTK_OBJECT(message));
+    g_object_unref(G_OBJECT(message));
     gtk_widget_destroy(bsmsg->window);
 
     return TRUE;
@@ -3216,7 +3216,7 @@ message_postpone(BalsaSendmsg * bsmsg)
 	    balsa_index_sync_backend(bsmsg->orig_message->mailbox);
 	}
     }
-    gtk_object_destroy(GTK_OBJECT(message));
+    g_object_unref(G_OBJECT(message));
     return successp;
 }
 
@@ -3250,12 +3250,12 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
             /* check again! */
 	    if(bsmsg->orig_message->mailbox)
 	        g_object_unref(G_OBJECT(bsmsg->orig_message->mailbox));
-	    gtk_object_unref(GTK_OBJECT(bsmsg->orig_message));
+	    g_object_unref(G_OBJECT(bsmsg->orig_message));
 	}
 	bsmsg->type=SEND_CONTINUE;
 	bsmsg->orig_message=LIBBALSA_MESSAGE(draft_entry->data);
 	bsmsg->orig_message->mailbox=balsa_app.draftbox;
-	gtk_object_ref(GTK_OBJECT(bsmsg->orig_message));
+	g_object_ref(G_OBJECT(bsmsg->orig_message));
     
     }
 }

@@ -140,8 +140,8 @@ static void bndx_drag_cb(GtkWidget* widget,
                                 guint info,
                                 guint time,
                                 gpointer user_data);
-static void replace_attached_data(GtkObject * obj, const gchar * key, 
-                                  GtkObject * data);
+static void replace_attached_data(GObject * obj, const gchar * key,
+                                  GObject * data);
 static GtkWidget* bndx_popup_menu_create(BalsaIndex * index);
 static GtkWidget* bndx_popup_menu_prepare(BalsaIndex * index);
 static GtkWidget *create_stock_menu_item(GtkWidget * menu,
@@ -269,7 +269,7 @@ balsa_index_init(BalsaIndex * index)
 
     tree_store =
         gtk_tree_store_new(BNDX_N_COLUMNS,
-                           G_TYPE_OBJECT,    /* BNDX_MESSAGE_COLUMN */
+                           G_TYPE_POINTER,   /* BNDX_MESSAGE_COLUMN */
                            G_TYPE_STRING,    /* BNDX_INDEX_COLUMN   */
                            GDK_TYPE_PIXBUF,  /* BNDX_STATUS_COLUMN  */
                            GDK_TYPE_PIXBUF,  /* BNDX_ATTACH_COLUMN  */
@@ -817,9 +817,13 @@ static gboolean
 bndx_find_message(BalsaIndex * index, GtkTreePath ** path,
                   GtkTreeIter * iter, LibBalsaMessage *message)
 {
-    GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
+    GtkTreeModel *model;
     struct BndxFindInfo bfi;
 
+    if (!message)
+        return FALSE;
+
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
     bfi.message = message;
     bfi.path = path;
     bfi.iter = iter;
@@ -850,11 +854,15 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
      * since we previously called select_next_threaded() */
     selected = balsa_index_selected_list(index);
 
-    /* make a list of children that need to be moved up */
     for (list = messages; list; list = g_list_next(list)) {
+        /* Look if the message to be removed was in the selection, and
+         * remove it if yes */
+        selected = g_list_remove(selected, list->data);
+
         if (bndx_find_message(index, NULL, &iter, list->data)) {
             GtkTreeIter child_iter;
 
+            /* make a list of children that need to be moved up */
             if (gtk_tree_model_iter_children(model, &child_iter, &iter)) {
                 LibBalsaMessage *message;
 
@@ -866,7 +874,9 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
                         children = g_list_prepend(children, message);
                 } while (gtk_tree_model_iter_next(model, &child_iter));
             }
-        }
+        } else
+            /* a NULL message will be ignored */
+            list->data = NULL;
     }
 
     g_signal_handlers_block_by_func(selection,
@@ -891,17 +901,28 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
         bndx_set_current_message(index, NULL);
         gtk_signal_emit(GTK_OBJECT(index),
                         balsa_index_signals[UNSELECT_ALL_MESSAGES], NULL);
-    } else
+    } else {
         /* restore the selection */
+        LibBalsaMessage *last_message = NULL;
+        GtkTreePath *last_path = NULL;
+
         for (list = selected; list; list = g_list_next(list))
             if (bndx_find_message(index, &path, NULL, list->data)) {
                 gtk_tree_selection_select_path(selection, path);
-                bndx_scroll_to_row(index, path);
-                gtk_tree_path_free(path);
-                bndx_set_current_message(index, list->data);
+                if (last_path)
+                    gtk_tree_path_free(last_path);
+                last_path = path;
+                last_message = list->data;
             }
 
-    g_list_free(selected);
+        if (last_path) {
+            bndx_scroll_to_row(index, last_path);
+            bndx_set_current_message(index, last_message);
+            gtk_tree_path_free(last_path);
+        }
+        g_list_free(selected);
+    }
+
     g_signal_handlers_unblock_by_func(selection,
                                       G_CALLBACK(bndx_selection_changed),
                                       index);
@@ -1660,7 +1681,7 @@ balsa_index_close_and_destroy(GtkObject * obj)
 {
     BalsaIndex *index;
     LibBalsaMailbox* mailbox;
-    GtkObject* message;
+    GObject* message;
 
     g_return_if_fail(obj != NULL);
     index = BALSA_INDEX(obj);
@@ -1670,7 +1691,7 @@ balsa_index_close_and_destroy(GtkObject * obj)
     message = gtk_object_get_data(obj, "message");
     if (message != NULL) {
         gtk_object_remove_data (obj, "message");
-        gtk_object_unref (message);
+        g_object_unref (message);
     }
 
     /*page->window references our owner */
@@ -2089,7 +2110,7 @@ idle_handler_cb(GtkWidget * widget)
     /* replace_attached_data (GTK_OBJECT (widget), "message", NULL); */
     if (message != NULL) {
         gtk_object_remove_data (GTK_OBJECT (widget), "message");
-        gtk_object_unref (GTK_OBJECT (message));
+        g_object_unref (G_OBJECT (message));
     }
     
     /* Update the style and message counts in the mailbox list */
@@ -2296,17 +2317,17 @@ sendmsg_window_destroy_cb(GtkWidget * widget, gpointer data)
 */
 
 static void
-replace_attached_data(GtkObject * obj, const gchar * key, GtkObject * data)
+replace_attached_data(GObject * obj, const gchar * key, GObject * data)
 {
-    GtkObject *old;
+    GObject *old;
 
-    if ((old = gtk_object_get_data(obj, key)))
-	gtk_object_unref(old);
+    if ((old = g_object_get_data(obj, key)))
+	g_object_unref(old);
 
-    gtk_object_set_data(obj, key, data);
+    g_object_set_data(obj, key, data);
 
     if (data)
-	gtk_object_ref(data);
+	g_object_ref(data);
 }
 
 void
@@ -2509,7 +2530,7 @@ bndx_set_current_message(gpointer data, gpointer message)
         return;
 
     balsa_index_idle_remove(data);
-    replace_attached_data(GTK_OBJECT(data), "message", message);
+    replace_attached_data(G_OBJECT(data), "message", message);
     handler.id = gtk_idle_add((GtkFunction) idle_handler_cb, data);
     handler.data = data;
 }

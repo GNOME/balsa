@@ -603,29 +603,15 @@ CFLAGS=`echo $CFLAGS | sed 's,-I/usr/include ,,g'`
 AC_MSG_CHECKING([for CVS information])
 AC_MSG_RESULT($BALSA_FROM_CVS)
 
-dnl  ########################################################################
-dnl older autoconf packages forget to define USE_NLS and INTLLIBS, 
-dnl take care of it.
-dnl  ########################################################################
-if test "$USE_INCLUDED_LIBINTL" = "" ; then
-   USE_INCLUDED_LIBINTL=no
-   BUILD_INCLUDED_LIBINTL=no
-   INTLLIBS=""
-fi
+dnl ########################################################################
+dnl configure gettext: po directory, set USE_NLS etc
+dnl ########################################################################
 
-AC_SUBST(USE_INCLUDED_LIBINTL)
-AC_SUBST(BUILD_INCLUDED_LIBINTL)
-AC_SUBST(INTLLIBS)
-
-if test "$USE_NLS" = ""; then
-  USE_NLS=no
-fi
-AC_SUBST(USE_NLS)
+AM_GNU_GETTEXT
 
 dnl ##########################################################################
 dnl Create files.
 dnl ##########################################################################
-AM_PO_SUBDIRS(po) 
 
 AC_OUTPUT([
 Makefile

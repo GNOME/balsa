@@ -192,7 +192,6 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 				     gboolean flow, gboolean postponing,
 				     GMimeMessage** return_mime_message);
 static LibBalsaMsgCreateResult libbalsa_create_msg(LibBalsaMessage * message,
-				    MessageQueueItem * mqi,
 				    gint encoding, gboolean flow);
 static LibBalsaMsgCreateResult
 libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
@@ -393,13 +392,11 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 		       LibBalsaMailbox * fccbox, gint encoding,
 		       gboolean flow)
 {
-    MessageQueueItem *mqi;
     LibBalsaMsgCreateResult result;
 
     g_return_val_if_fail(message, LIBBALSA_MESSAGE_CREATE_ERROR);
 
-    mqi = msg_queue_item_new(message);
-    if ((result = libbalsa_create_msg(message, mqi, encoding, flow)) ==
+    if ((result = libbalsa_create_msg(message, encoding, flow)) ==
 	LIBBALSA_MESSAGE_CREATE_OK) {
         libbalsa_mailbox_copy_message( message, outbox );
 	if (fccbox) {
@@ -412,7 +409,6 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 	}
 	libbalsa_mailbox_check(outbox);
     } 
-    msg_queue_item_destroy(mqi);
 
     return result;
 }
@@ -1125,13 +1121,18 @@ balsa_send_message_real(SendMessageInfo* info)
        on the messages with a 2xx status recorded against them.  However
        its possible for individual recipients to fail too.  Need a way to
        report it all.  */
-    gdk_threads_enter();
+    /* Do we really need to grab the gdk lock? If so, we'd have to drop
+     * it again before calling libbalsa_messages_change_flag().
+     * gdk_threads_enter();
+     */
     smtp_enumerate_messages (info->session, handle_successful_send, 
                              &session_started);
 
     libbalsa_mailbox_close(info->outbox);
-    gdk_flush();
-    gdk_threads_leave();
+    /*
+     * gdk_flush();
+     * gdk_threads_leave();
+     */
 
     send_lock();
 #ifdef BALSA_USE_THREADS
@@ -1384,7 +1385,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		content = g_mime_data_wrapper_new_with_stream(stream, encoding);
 		g_mime_stream_unref(stream);
 		g_mime_part_set_content_object(mime_part, content);
-		g_mime_object_unref(GMIME_OBJECT(content));
+		g_object_unref(content);
 	    }
 	} else if (body->buffer) {
 #ifdef HAVE_GPGME
@@ -1693,29 +1694,20 @@ libbalsa_set_message_id(GMimeMessage * mime_message)
    copies message to msg.
 */ 
 static LibBalsaMsgCreateResult
-libbalsa_create_msg(LibBalsaMessage * message, MessageQueueItem *mqi,
+libbalsa_create_msg(LibBalsaMessage * message,
 		    gint encoding, gboolean flow)
 {
-    LibBalsaMsgCreateResult res;
-    GMimeStream *mem_stream;
-    GMimeMessage *mime_message;
-
-    res = libbalsa_message_create_mime_message(message, encoding, flow, FALSE,
-					       &mime_message);
-    if (res != LIBBALSA_MESSAGE_CREATE_OK) {
-	return res;
+    if (!message->mime_msg) {
+	LibBalsaMsgCreateResult res =
+	    libbalsa_message_create_mime_message(message, encoding, flow,
+						 FALSE,
+						 &message->mime_msg);
+	if (res != LIBBALSA_MESSAGE_CREATE_OK)
+	    return res;
     }
 
-    libbalsa_set_message_id(mime_message);
+    libbalsa_set_message_id(message->mime_msg);
 
-    mem_stream = g_mime_stream_mem_new();
-    g_mime_message_write_to_stream(mime_message, mem_stream);
-    g_mime_object_unref(GMIME_OBJECT(mime_message));
-
-    mqi->stream = mem_stream;
-    if (mqi->stream == NULL)
-	return LIBBALSA_MESSAGE_CREATE_ERROR;
-  
     return LIBBALSA_MESSAGE_CREATE_OK;
 }
 

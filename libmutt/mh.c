@@ -864,7 +864,7 @@ int mh_check_mailbox(CONTEXT *ctx, int *index_hint)
     ctx->mtime_cur = st_cur.st_mtime;
   ctx->mtime = st.st_mtime;
 
-#if 0
+#ifndef LIBMUTT
   if(Sort != SORT_ORDER)
   {
     short old_sort;
@@ -1003,7 +1003,7 @@ int mh_check_mailbox(CONTEXT *ctx, int *index_hint)
   {
     short old_sort;
     int old_count;
-
+#ifndef LIBMUTT
     if (Sort != SORT_ORDER)
     {
       old_sort = Sort;
@@ -1011,7 +1011,7 @@ int mh_check_mailbox(CONTEXT *ctx, int *index_hint)
       mutt_sort_headers (ctx, 1);
       Sort = old_sort;
     }
-  
+#endif  
     old_count = ctx->msgcount;
     for (i = 0, j = 0; i < old_count; i++)
     {

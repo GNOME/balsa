@@ -1,3 +1,9 @@
+2001-09-13  Carlos Morgado  <chbm@chbm.nu>
+
+	* mh.c (mh_check_mailbox): fix(?) mh/maildir bug where index
+	doesn't correspond to displayed messages
+	
+
 2001-09-04  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* parse.c: rfc2047 decode dispname field.

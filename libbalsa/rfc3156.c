@@ -885,7 +885,7 @@ libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)
 	    ("The signature could not be verified due to an invalid crypto engine.");
     case GPG_ERR_TRY_AGAIN:
 	return _
-	    ("GnuPG rebuilds the trust database and is currently not available.");
+	    ("GnuPG is rebuilding the trust database and is currently unavailable.");
     default:
 	g_message("stat %d: %s %s", stat, gpgme_strsource(stat), gpgme_strerror(stat));
 	return _("An error prevented the signature verification.");

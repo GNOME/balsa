@@ -2458,7 +2458,7 @@ show_about_box(void)
         "Peter Bloomfield <PeterBloomfield@bellsouth.net>",
 	"Bart Visscher <magick@linux-fan.com>",
         "Emmanuel Allaud <e.allaud@wanadoo.fr>",
-        "Carlos Morgado <chbm@chbm.nu>",
+        "Carlos Morgado <chbm@gnome.org>",
         "Pawel Salek <pawsa@theochem.kth.se>",
         "and many others (see AUTHORS file)",
         NULL

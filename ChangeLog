@@ -1,3 +1,8 @@
+2004-08-08  Carlos Morgado  <chbm gnome.org>
+
+	* src/main-window.c (show_about_box): update my email
+	* libbalsa/rfc3156.c: unduplicate message
+
 2004-08-08  Pawel Salek
 
 	* NEWS, configure.in: release 2.2.2.

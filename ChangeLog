@@ -1,5 +1,6 @@
-2005-02-28 08:20  PeterB
+2005-02-28 08:52  PeterB
 
+	* libbalsa/misc.c: fix test for "<URL:".
 	* src/balsa-index.c: mysterious adjustment to width of icon
 	columns [fixes Bug 168733].
 

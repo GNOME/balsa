@@ -221,7 +221,9 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     if (!m->check) return;
 
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(m);
-    if(!server->passwd) return;
+    if(!server->passwd &&
+       !(server->passwd = libbalsa_server_get_password(server, mailbox)))
+       return;
 
     /* Unlock GDK - this is safe since libbalsa_error is threadsafe. */
     gdk_threads_leave();

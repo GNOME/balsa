@@ -12,7 +12,7 @@ dnl ###########################################################################
 
 BALSA_MAJOR=1
 BALSA_REVISION=3
-BALSA_PATCHLEVEL=1
+BALSA_PATCHLEVEL=2
 
 BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
 VERSION="$BALSA_VERSION"
@@ -51,7 +51,7 @@ dnl this should come after `AC_PROG_CC'
 GNOME_X_CHECKS
 
 AC_CHECK_LIB(pspell, new_pspell_manager,,[
-	AC_MSG_ERROR([*** libpspell(-devel) not found.  Please check http://www.balsa.net for information on the required files.])
+	AC_MSG_ERROR([*** libpspell(-devel) not found.  Please check http://balsa.gnome.org/ for information on the required files.])
 ], -lstdc++ -lpspell-modules)
 
 dnl Reset
@@ -357,7 +357,7 @@ AC_MSG_RESULT([yes])
 	AC_CHECK_LIB(esmtp, smtp_start_session, AC_DEFINE(ENABLE_ESMTP) LIBS="$LIBS -lesmtp", AC_MSG_ERROR([*** You enabled ESMTP but esmtp library is not found.]), -lesmtp)
 	AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients, AC_DEFINE(ENABLE_ESMTP), AC_MSG_ERROR([*** You enabled ESMTP but esmtp library doesn't support
 	'require_all_recipients'. Please get a Balsa aware
-	libESMTP from http://www.balsa.net/main.html or compile
+	libESMTP from http://balsa.gnome.org/main.html or compile
 	libESMTP with './configure --enable-require-all-recipients'.]), -lesmtp)
 	test "$with_esmtp" != yes && LIBS="$LIBS -L$with_esmtp/lib"
 else

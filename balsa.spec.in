@@ -1,7 +1,4 @@
-%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-system-install --disable-more-warnings --disable-pcre --enable-all
-# we disable PCRE because it introduces dependency on KDE packages,
-# it is better to reduce number of dependencies in the standard build
-# and link against glibc version of regex library.
+%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-system-install --disable-more-warnings --enable-all
 Summary:   Balsa Mail Client
 Name:      balsa
 Version:   @BALSA_VERSION@
@@ -9,7 +6,7 @@ Release:   1
 Copyright: GPL
 Group:     Applications/Internet
 Source0:   %{name}-%{version}.tar.bz2
-URL:       http://www.balsa.net/
+URL:       http://balsa.gnome.org/
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Packager: Pawel Salek <pawsa@theochem.kth.se>
 Requires: gtk+ >= 1.2.7

@@ -1591,31 +1591,6 @@ show_about_box(void)
     gtk_widget_show(about);
 }
 
-
-/* fill_mailbox_passwords:
-   fills in missing POP3 passwords. Must be called in the main thread,
-   or g_main_run() will complain and hang.
-*/
-static void
-fill_mailbox_passwords(GList * mailbox_list)
-{
-    GList *list;
-    LibBalsaMailbox *mailbox;
-    LibBalsaServer *s;
-
-    list = g_list_first(mailbox_list);
-    while (list) {
-        mailbox = BALSA_MAILBOX_NODE(list->data)->mailbox;
-        if(LIBBALSA_IS_MAILBOX_POP3(mailbox) && 
-           LIBBALSA_MAILBOX_POP3(mailbox)->check) {
-            s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-            if (!s->passwd)
-                s->passwd = libbalsa_server_get_password(s, mailbox);
-        }
-        list = g_list_next(list);
-    }
-}
-
 /* Check all mailboxes in a list
  *
  */
@@ -1755,7 +1730,6 @@ check_new_messages_real(GtkWidget *widget, gpointer data, int type)
 
     pthread_mutex_unlock(&mailbox_lock);
 
-    fill_mailbox_passwords(balsa_app.inbox_input);
     if (type == TYPE_CALLBACK && 
         (balsa_app.pwindow_option == WHILERETR ||
          (balsa_app.pwindow_option == UNTILCLOSED && progress_dialog)))
@@ -1771,7 +1745,6 @@ check_new_messages_real(GtkWidget *widget, gpointer data, int type)
      */
     pthread_detach(get_mail_thread);
 #else
-    fill_mailbox_passwords(balsa_app.inbox_input);
     libbalsa_notify_start_check(imap_check_test);
     check_mailbox_list(balsa_app.inbox_input);
 

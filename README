@@ -15,7 +15,7 @@ Authors:
 
 Website:
 -------
-	http://www.balsa.net/
+	http://balsa.gnome.org/
 
 
 Description:
@@ -35,11 +35,12 @@ complete descriptions are here.
 or unfinsished, such as filtering and spell-checking. This
 is really use-at-your-own-risk.
 
---enable-info
-	Enable an information pane displaying the status of
-all of your mailboxes in the righthand pane, such as unread
-messages, etc. This *can* cause problems, but is basically
-stable now, so it is enabled by default.
+--enable-pcre
+	Enable Perl-Compatible Regular Expressions (PCRE). The only
+reason one might to disable them is to reduce the list of
+dependencies. Otherwise, they provide only adventages. The most
+important is locale-awareness (ordinary RE libraries cannot
+distinguish word boundaries for non ISO-8859-1.
 
 --disable-more-warnings
 	Balsa by default is very sensitive to compilation warnings
@@ -227,7 +228,7 @@ filename=/path/to/your/browser
 
 Reporting Bugs:
 --------------
-	See http://www.balsa.net/bugs.html for instructions.  Do not
+	See http://balsa.gnome.org/bugs.html for instructions.  Do not
 report bugs with GtkHTML - it is quite unstable. Patches are welcome.
 
 

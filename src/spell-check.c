@@ -1210,7 +1210,7 @@ next_word(BalsaSpellCheck * spell_check)
     static const guchar *locale_tables = NULL;
     gint rm[3];
 #else
-    const gchar *new_word_regex = "\\<[[:alpha:]']+\\>";
+    const gchar *new_word_regex = "[[:alpha:]']+";
     static regex_t *new_word_rex = NULL;
     regmatch_t rm;
 #endif

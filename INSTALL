@@ -1,6 +1,6 @@
-Balsa E-Mail Client 1.1.x
+Balsa E-Mail Client 1.3.x
 
-Copyright (C) 1997-2001 Stuart Parmenter and others, see AUTHORS file.
+Copyright (C) 1997-2002 Stuart Parmenter and others, see AUTHORS file.
 
 See 'COPYING' for license information.
 See 'AUTHORS' for a list of contributors.
@@ -13,14 +13,14 @@ Please make sure you have the following things:
 	gnome-libs  >= 1.2.1  (see notes below)
 	gnome-print >= 0.25
 	libpspell   >= 0.11.2 (and at least one spell check module)
-	libesmtp    >= 0.8.3   http://www.stafford.uklinux.net/libesmtp/
+	libesmtp    >= 0.8.9   http://www.stafford.uklinux.net/libesmtp/
 	
 	If you do not have these, please check:
 
-	http://www.balsa.net/download.html
+	http://balsa.gnome.org/download.html
 
 	for links to these packages. Or try http://www.gnome.org, 
-	http://www.gtk.org, and http://www.enlightenment.org.
+	http://www.gtk.org, http://www.ximian.com.
 
 	Note that some of these modules have their own requirements.
 	Installation of pspell is known to be troublesome, make sure 

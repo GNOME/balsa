@@ -1,4 +1,4 @@
-.TH Balsa 1 "03 November 2001" Version @VERSION@
+.TH Balsa 1 "26 February 2002" Version @VERSION@
 .SH NAME
 Balsa - the GNOME email client.
 
@@ -64,13 +64,13 @@ Dumps the POP3 communication to stderr. Useful for debugging POP3
 connections.
 
 .SH WEBSITE
-http://www.balsa.net/
+http://balsa.gnome.org/
 
 .SH SUGGESTIONS AND BUG REPORTS
 Any bugs found should be reported to the Balsa Developer mailing list
 at balsa-list@gnome.org or you may want to make use of the online
 bug-tracking system available on the web at
-http://bugs.gnome.org/. See http://www.balsa.net/bugs.html
+http://bugzilla.gnome.org/. See http://balsa.gnome.org/bugs.html
 for more information on reporting bugs.
 
 Before reporting bugs, please check to see if the bug is mentioned 
@@ -88,7 +88,7 @@ better.
 
 .SH AUTHORS
 See the AUTHORS file included with Balsa, probably at
-/usr/doc/balsa-@VERSION@/AUTHORS
+/usr/share/doc/balsa-@VERSION@/AUTHORS
 
 .SH FILES
 .BR ~/.gnome/balsa
@@ -103,7 +103,7 @@ Balsa's POP and IMAP passwords file.
 .BR sendmail (8)
 
 .SH COPYRIGHT
-(c) 1997-2001 Stuart Parmenter and others, see AUTHORS for a list of people.
+(c) 1997-2002 Stuart Parmenter and others, see AUTHORS for a list of people.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted,

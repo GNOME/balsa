@@ -64,7 +64,6 @@ INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
 	-I$(top_srcdir) \
 	-I$(top_srcdir)/libbalsa \
-	-I$(top_builddir)/libmutt \
 	-I$(top_srcdir)/libmutt \
 	 $(GNOME_INCLUDEDIR)
 

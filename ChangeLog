@@ -1,3 +1,13 @@
+2000-10-04  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/Makefile.am: Don't need to include $(top_builddir)/libmutt.
+	* src/main-window.[ch]: Enable/disable the continue toolbar button
+	and menu items. Export balsa_window_enable_continue. Initial patch 
+	was from James A . Laska <james_laska@yahoo.com>. Also Some random
+	indentation cleanups.
+	* src/balsa-index-page.c: Call balsa_window_enable_continue when a
+	send message window is destroyed.
+
 2000-10-03  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox_imap.c (mailbox_open): fix memory leak.

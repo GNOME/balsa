@@ -27,6 +27,7 @@
 #include "balsa-message.h"
 #include "main-window.h"
 #include "message-window.h"
+#include "main-window.h"
 #include "misc.h"
 #include "balsa-index-page.h"
 #include "store-address.h"
@@ -60,9 +61,10 @@ static void index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpo
 
 /* menu item callbacks */
 
-static gint
-close_if_transferred_cb(BalsaMBList * bmbl, GdkEvent *event, BalsaIndex * bi);
+static gint close_if_transferred_cb(BalsaMBList * bmbl, GdkEvent *event, BalsaIndex * bi);
 static void transfer_messages_cb (BalsaMBList *, LibBalsaMailbox *, GtkCTreeNode *, GdkEventButton *, BalsaIndex *);
+
+static void sendmsg_window_destroy_cb(GtkWidget *widget, gpointer data);
 
 static GtkObjectClass *parent_class = NULL;
 
@@ -677,6 +679,7 @@ balsa_message_reply (GtkWidget * widget, gpointer index)
 {
   GList     *list;
   LibBalsaMessage   *message;
+  BalsaSendmsg *sm;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail(index != NULL);
@@ -685,7 +688,9 @@ balsa_message_reply (GtkWidget * widget, gpointer index)
   while (list)
   {
     message = gtk_clist_get_row_data(GTK_CLIST (index), GPOINTER_TO_INT(list->data));
-    sendmsg_window_new (widget, message, SEND_REPLY);
+    sm = sendmsg_window_new (widget, message, SEND_REPLY);
+    gtk_signal_connect( GTK_OBJECT(sm->window), "destroy",
+			GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb), NULL);
     list = list->next;
   }
 }
@@ -695,6 +700,7 @@ balsa_message_replytoall (GtkWidget * widget, gpointer index)
 {
   GList     *list;
   LibBalsaMessage   *message;
+  BalsaSendmsg *sm;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail(index != NULL);
@@ -703,7 +709,9 @@ balsa_message_replytoall (GtkWidget * widget, gpointer index)
   while (list)
   {
     message = gtk_clist_get_row_data(GTK_CLIST (index), GPOINTER_TO_INT(list->data));
-    sendmsg_window_new (widget, message, SEND_REPLY_ALL);
+    sm = sendmsg_window_new (widget, message, SEND_REPLY_ALL);
+    gtk_signal_connect( GTK_OBJECT(sm->window), "destroy",
+			GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb), NULL);
     list = list->next;
   }
 }
@@ -713,6 +721,7 @@ balsa_message_forward (GtkWidget * widget, gpointer index)
 {
   GList     *list;
   LibBalsaMessage   *message;
+  BalsaSendmsg *sm;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail(index != NULL);
@@ -721,7 +730,9 @@ balsa_message_forward (GtkWidget * widget, gpointer index)
   while (list)
   {
     message = gtk_clist_get_row_data(GTK_CLIST (index), GPOINTER_TO_INT(list->data));
-    sendmsg_window_new (widget, message, SEND_FORWARD);
+    sm = sendmsg_window_new (widget, message, SEND_FORWARD);
+    gtk_signal_connect( GTK_OBJECT(sm->window), "destroy",
+			GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb), NULL);
     list = list->next;
   }
 }
@@ -732,6 +743,7 @@ balsa_message_continue (GtkWidget * widget, gpointer index)
 {
   GList   *list;
   LibBalsaMessage *message;
+  BalsaSendmsg *sm;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail(index != NULL);
@@ -740,7 +752,9 @@ balsa_message_continue (GtkWidget * widget, gpointer index)
   while (list)
   {
     message = gtk_clist_get_row_data(GTK_CLIST(index), GPOINTER_TO_INT(list->data));
-    sendmsg_window_new (widget, message, SEND_CONTINUE);
+    sm = sendmsg_window_new (widget, message, SEND_CONTINUE);
+    gtk_signal_connect( GTK_OBJECT(sm->window), "destroy",
+			GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb), NULL);
     list = list->next;
   } 
 }
@@ -877,4 +891,10 @@ balsa_message_undelete (GtkWidget * widget, gpointer index)
     list = list->next;
   }
   balsa_index_select_next (index);
+}
+
+static void
+sendmsg_window_destroy_cb(GtkWidget *widget, gpointer data)
+{
+  balsa_window_enable_continue();
 }

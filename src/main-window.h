@@ -62,6 +62,7 @@ GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
 void       balsa_window_refresh(BalsaWindow *window);
 void       balsa_window_open_mailbox();
 void       balsa_window_close_mailbox();
+void       balsa_window_enable_continue(void);
 gboolean   mail_progress_notify_cb(void);
 gboolean   send_progress_notify_cb(void);
 gint       check_new_messages_auto_cb( gpointer data );

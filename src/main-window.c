@@ -169,6 +169,7 @@ static void mw_size_alloc_cb( GtkWidget *window, GtkAllocation *alloc );
 
 static void notebook_switch_page_cb( GtkWidget *notebook,
                                      GtkNotebookPage *page, guint page_num );
+static void send_msg_window_destroy_cb ( GtkWidget *widget, gpointer data );
 
 static GnomeUIInfo file_new_menu[] =
 {
@@ -586,6 +587,7 @@ balsa_window_new ()
   enable_mailbox_menus(NULL);
   enable_message_menus(NULL);
   enable_edit_menus(NULL);
+  balsa_window_enable_continue();
 
   /* we can only set icon after realization, as we have no windows before. */
   gtk_signal_connect (GTK_OBJECT (window), "realize",
@@ -764,6 +766,7 @@ enable_message_menus(LibBalsaMessage *message)
   gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_FORWARD_POS].widget, enable);
   gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_PRINT_POS].widget, enable);
 
+  balsa_window_enable_continue();
 }
 
 /*
@@ -782,6 +785,25 @@ enable_edit_menus(BalsaMessage *bm)
   gtk_widget_set_sensitive ( edit_menu[MENU_EDIT_SELECT_ALL_POS].widget, enable);
 }
 
+/*
+ * Enable/disable the continue buttons
+ */
+void
+balsa_window_enable_continue (void)
+{
+  /* Check msg count in draftbox */
+  if ( balsa_app.draftbox ) {
+    libbalsa_mailbox_open(balsa_app.draftbox, FALSE);
+    if (balsa_app.draftbox->total_messages > 0) {
+      gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_CONTINUE_POS].widget, TRUE);
+      gtk_widget_set_sensitive ( file_menu[MENU_FILE_CONTINUE_POS].widget, TRUE);
+    } else {
+      gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_CONTINUE_POS].widget, FALSE);
+      gtk_widget_set_sensitive ( file_menu[MENU_FILE_CONTINUE_POS].widget, FALSE);
+    }
+    libbalsa_mailbox_close(balsa_app.draftbox);
+  }
+}
 
 void
 balsa_window_set_cursor (BalsaWindow *window,
@@ -805,19 +827,20 @@ balsa_window_real_set_cursor (BalsaWindow *window,
   gdk_window_set_cursor (GTK_WIDGET(window)->window, cursor);
 }
 
-
-
-
-void balsa_window_open_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
+void
+balsa_window_open_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
 {
   g_return_if_fail(window != NULL);
   g_return_if_fail(BALSA_IS_WINDOW(window));
 
-  gtk_signal_emit(GTK_OBJECT(window), window_signals[OPEN_MAILBOX], mailbox);
+  if (mailbox->open_ref == 0) 
+    gtk_signal_emit(GTK_OBJECT(window), window_signals[OPEN_MAILBOX], mailbox);
+  else 
+    mblist_open_mailbox (mailbox);
 }
 
-/*void balsa_window_open_mailbox(BalsaWindow *window, Mailbox *mailbox)*/
-void balsa_window_close_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
+void
+balsa_window_close_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
 {
   g_return_if_fail(window != NULL);
   g_return_if_fail(BALSA_IS_WINDOW (window));
@@ -825,7 +848,8 @@ void balsa_window_close_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
   gtk_signal_emit(GTK_OBJECT(window), window_signals[CLOSE_MAILBOX], mailbox);
 }
 
-static void balsa_window_real_open_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
+static void
+balsa_window_real_open_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
 {
 	GtkObject *page;
 	BalsaIndex *index;
@@ -865,10 +889,9 @@ static void balsa_window_real_open_mailbox(BalsaWindow *window, LibBalsaMailbox 
 }
 
 
-static void balsa_window_real_close_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
+static void
+balsa_window_real_close_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
 {
-/*  printf("FIXME: Can't close mailboxes.\n"); 
-    Sadly, we don't get the IndexPage pointer given to us. Ah well. */
   GtkWidget *page;
   BalsaIndex* index = NULL;
   gint i;
@@ -913,7 +936,8 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, LibBalsaMailbox
     balsa_mblist_focus_mailbox (balsa_app.mblist, index->mailbox);
 }
 
-gboolean balsa_close_mailbox_on_timer(GtkWidget *widget, gpointer *data)
+gboolean
+balsa_close_mailbox_on_timer(GtkWidget *widget, gpointer *data)
 {
   GTimeVal current_time;
   GtkWidget *page, *index_page;
@@ -1538,7 +1562,10 @@ GtkWidget *balsa_window_find_current_index(BalsaWindow *window)
 static void
 new_message_cb (GtkWidget * widget, gpointer data)
 {
-  sendmsg_window_new (widget, NULL, SEND_NORMAL);
+  BalsaSendmsg *smwindow;
+  smwindow = sendmsg_window_new (widget, NULL, SEND_NORMAL);
+  gtk_signal_connect( GTK_OBJECT(smwindow->window), "destroy",
+		      GTK_SIGNAL_FUNC(send_msg_window_destroy_cb), NULL);
 }
 
 
@@ -1990,3 +2017,10 @@ select_part_cb(BalsaMessage *bm, gpointer data)
 {
   enable_edit_menus(bm);
 }
+
+static void
+send_msg_window_destroy_cb ( GtkWidget *widget, gpointer data )
+{
+  balsa_window_enable_continue();
+}
+

@@ -2128,11 +2128,16 @@ bmbl_mru_option_menu_init(BalsaMBListMRUOption * mro)
 void
 balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox)
 {
-    gchar *desc =
-        g_strdup_printf(_("Shown mailbox: %s with %d messages, %ld new"),
-			mailbox->name,
-			libbalsa_mailbox_total_messages(mailbox),
-                        mailbox->unread_messages);
+    guint total_messages = libbalsa_mailbox_total_messages(mailbox);
+    gchar *desc;
+
+    desc =
+	g_strdup_printf(ngettext
+			("Shown mailbox: %s with %d message, %ld new",
+			 "Shown mailbox: %s with %d messages, %ld new",
+			 total_messages),
+			mailbox->name, total_messages,
+			mailbox->unread_messages);
 
     gnome_appbar_set_default(balsa_app.appbar, desc);
     g_free(desc);

@@ -832,7 +832,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	    
 	    new_message = msg_queue_item_new(queu);
 	    if (!libbalsa_create_msg(queu, new_message->message,
-				     new_message->tempfile, encoding, 1)) {
+				     new_message->tempfile, 
+				     encoding, flow, 1)) {
 		msg_queue_item_destroy(new_message);
 	    } else {
 		if (mqi)

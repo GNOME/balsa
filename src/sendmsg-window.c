@@ -1430,8 +1430,7 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	    str = g_strdup_printf(_("%s wrote:\n"), personStr);
 	body = content2reply(message,
 			     (type == SEND_REPLY || type == SEND_REPLY_ALL || 
-			      type == SEND_REPLY_GROUP || 
-			      type == SEND_FORWARD_QUOTE) ?
+			      type == SEND_REPLY_GROUP) ?
 			     balsa_app.quote_str : NULL,
 			     balsa_app.wordwrap ? balsa_app.wraplength : -1,
 			     balsa_app.reply_strip_html, msg->flow);
@@ -1621,6 +1620,36 @@ text_changed(GtkWidget* w, BalsaSendmsg* msg)
     msg->modified = TRUE;
 }
 
+static void
+set_entry_from_address_list(GtkEntry* field, GList* list)
+{
+    if (list) {
+	gchar* tmp = libbalsa_make_string_from_list(list);
+	gtk_entry_set_text(field, tmp);
+	g_free(tmp);
+    }
+}
+
+static void
+setup_headers_from_message(BalsaSendmsg* cw, LibBalsaMessage *message)
+{
+    set_entry_from_address_list(GTK_ENTRY(cw->to[1]),  message->to_list);
+    set_entry_from_address_list(GTK_ENTRY(cw->cc[1]),  message->cc_list);
+    set_entry_from_address_list(GTK_ENTRY(cw->bcc[1]), message->bcc_list);
+}
+
+static void
+setup_headers_from_identity(BalsaSendmsg* cw, LibBalsaIdentity *ident)    
+{
+    gchar* str = libbalsa_address_to_gchar(ident->address, -1);
+    gtk_entry_set_text(GTK_ENTRY(cw->from[1]), str); 
+    g_free(str); 
+    if(ident->replyto)
+	gtk_entry_set_text(GTK_ENTRY(cw->reply_to[1]), ident->replyto);
+    if(ident->bcc)
+	gtk_entry_set_text(GTK_ENTRY(cw->bcc[1]), ident->bcc);
+}
+
 BalsaSendmsg *
 sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 		   SendType type)
@@ -1629,8 +1658,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     GtkWidget *paned = gtk_vpaned_new();
     BalsaSendmsg *msg = NULL;
     GList *list;
-    gchar* tmp;
     unsigned i;
+    gchar* tmp;
 
     msg = g_malloc(sizeof(BalsaSendmsg));
     msg->font     = NULL;
@@ -1788,25 +1817,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 /* FIXME: have it get the identity from the To: field 
  * of the previous message */
     /* From: */
-    {
-        gchar *from;
-	from = g_strdup_printf("%s <%s>", 
-			       balsa_app.current_ident->address->full_name,
-		 	       (gchar *) balsa_app.current_ident->address->
-                               address_list->data);
-	gtk_entry_set_text(GTK_ENTRY(msg->from[1]), from); 
-	g_free(from); 
-    } 
-    
-    /* Reply To */
-    if (balsa_app.current_ident->replyto)
-	gtk_entry_set_text(GTK_ENTRY(msg->reply_to[1]), 
-			   balsa_app.current_ident->replyto);
-    
-    /* Bcc: */
-    if (balsa_app.current_ident->bcc)
-	gtk_entry_set_text(GTK_ENTRY(msg->bcc[1]), 
-			   balsa_app.current_ident->bcc);
+
+    setup_headers_from_identity(msg, balsa_app.current_ident);
 
     /* Fcc: */
     if (type == SEND_CONTINUE && message->fcc_mailbox != NULL)
@@ -1816,23 +1828,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     /* Subject: */
     set_entry_to_subject(GTK_ENTRY(msg->subject[1]), message, type);
 
-    if (type == SEND_CONTINUE) {
-	if (message->to_list) {
-	    tmp = libbalsa_make_string_from_list(message->to_list);
-	    gtk_entry_set_text(GTK_ENTRY(msg->to[1]), tmp);
-	    g_free(tmp);
-	}
-	if (message->cc_list) {
-	    tmp = libbalsa_make_string_from_list(message->cc_list);
-	    gtk_entry_set_text(GTK_ENTRY(msg->cc[1]), tmp);
-	    g_free(tmp);
-	}
-	if (message->bcc_list) {
-	    tmp = libbalsa_make_string_from_list(message->bcc_list);
-	    gtk_entry_set_text(GTK_ENTRY(msg->bcc[1]), tmp);
-	    g_free(tmp);
-	}
-    }
+    if (type == SEND_CONTINUE)
+	setup_headers_from_message(msg, message);
 
     if (type == SEND_REPLY_ALL) {
 	tmp = libbalsa_make_string_from_list(message->to_list);
@@ -2329,7 +2326,8 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
                                            bsmsg->flow);
 #else
         successful = libbalsa_message_send(message, balsa_app.outbox, fcc,
-					   balsa_app.encoding_style); 
+					   balsa_app.encoding_style,
+					   bsmsg->flow); 
 #endif
     libbalsa_set_charset(old_charset);
     if (successful) {

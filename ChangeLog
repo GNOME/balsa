@@ -1,6 +1,13 @@
 2001-09-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: don't detect LIBTOOL twice.
+	* libbalsa/send.c: 
+	* src/sendmsg-window.c: compile with --disable-esmtp.
+	* src/balsa-index.c: remove guiding lines for flat index 
+	(wil@dready.org).
+	* libbalsa/identity.c: handle cancelling identity selection (wil).
+	* src/toolbar-factory.c: add "empty thrash" to the legal main toolbar
+	buttons list.
 	
 2001-09-22  Pawel Salek  <pawsa@theochem.kth.se>
 
@@ -69,7 +76,7 @@
 	* src/save-restore.c: s&r it.
 	* src/sendmsg-window.[hc]: the meat of attachment forwarding code.
 	
-	Stephen P. Wall <Steve_Wall@redcom.com>:
+	Steve Wall <hitched97@myrealbox.com>:
 	* src/balsa-icons.[hc]: reply_to_group toolbar icon.
 	* src/balsa-index.[hc]: reply to grup UI modified.
 	* src/balsa-mblist.c: enable/disable empty trash toolbar button.
@@ -100,7 +107,7 @@
 	
 2001-09-18  Pawel Salek  <pawsa@theochem.kth.se>
 
-	* src/balsa-message.c: preview url in the status bar (hitched97
+	* src/balsa-message.c: preview url in the status bar (Steve Wall
 	<hitched97@myrealbox.com> + Albrecht Dreﬂ
 	<albrecht.dress@arcormail.de>).
 

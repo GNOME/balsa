@@ -364,7 +364,7 @@ libbalsa_identity_select_dialog(GtkWindow* parent, const gchar* prompt,
 
     choice = gnome_dialog_run(GNOME_DIALOG(dialog));
     
-    if (choice == 1) /* what about cancel? */
+    if (choice != 0)
         return NULL;
     
     return ident;

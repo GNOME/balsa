@@ -1,3 +1,6 @@
+1999-12-24  Héctor García Álvarez <hector@scouts-es.org>
+	* libbalsa/send.c: Now Balsa send queued messages as it should.
+ 
 1999-12-21  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
 
 	* src/main-window.c (balsa_window_refresh):

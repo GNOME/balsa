@@ -32,6 +32,7 @@
 #include "misc.h"
 #include "mailbackend.h"
 #include "send.h"
+#include "libbalsa_private.h"
 
 #include "mime.h"
 
@@ -161,7 +162,7 @@ balsa_send_message (Message * message)
   current_message = first_message ;
   this_last = first_message; 
   
-#if 0
+
   /* this is disabled until we have time to go through libmutt */
 
   /* We do messages in queu now */
@@ -208,7 +209,7 @@ balsa_send_message (Message * message)
   }
     
   balsa_mailbox_close (balsa_app.outbox);
-#endif
+
 
 #ifdef BALSA_USE_THREADS
 
@@ -706,8 +707,11 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
   gchar *tmp;
   GList *list;
   FILE *tempfp;
-
-
+  HEADER *msg_tmp;
+  MESSAGE *mensaje;
+  char datos[10];
+  
+				
   if (!msg->env)
     msg->env = mutt_new_envelope ();
 
@@ -802,7 +806,6 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
   if (queu == 0)
   {
 	mutt_mktemp (tmpfile);
-//	file = &tmpfile;
 	if ((tempfp = safe_fopen (tmpfile, "w")) == NULL)
  	     return (-1);
 
@@ -827,23 +830,27 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
   }
   else
   {
-  	switch (message->mailbox->type)
-        {
-		case MAILBOX_MH:
-  		case MAILBOX_MAILDIR:
-    		  {
-      			  snprintf (tmpfile, PATH_MAX, "%s/%s", MAILBOX_LOCAL (message->mailbox)->path, message_pathname (message));
-  //      		  file = tmpfile;
-        		  break;
-      		  }
-                default:
-  //                  file = fopen (MAILBOX_LOCAL (message->mailbox)->path, "r");
-   	            break;
-	}
+   
+       msg_tmp = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];  
+       mutt_parse_mime_message (CLIENT_CONTEXT (message->mailbox), msg_tmp);
+       mensaje = mx_open_message(CLIENT_CONTEXT (message->mailbox),msg_tmp->msgno);
+	       
+       mutt_mktemp (tmpfile);
+       if ((tempfp = safe_fopen (tmpfile, "w")) == NULL)
+          return (-1);
+       _mutt_copy_message (tempfp, mensaje->fp , msg_tmp, msg_tmp->content ,0 ,0);
+		       
+
+       if (fclose (tempfp) != 0)
+       {
+           mutt_perror (tmpfile);
+           unlink (tmpfile);
+           return (-1);
+       }
 
   }	 
 
-        return TRUE;
+ return TRUE;
         
 }
 

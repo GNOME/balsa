@@ -41,18 +41,13 @@
 
 static LibBalsaMailboxClass *parent_class = NULL;
 
-static void libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass *
-					      klass);
+static void libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass *klass);
 static void libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox);
 static void libbalsa_mailbox_local_destroy(GtkObject * object);
 
 static void libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox,
 					gboolean append);
 static void libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox);
-static FILE *libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox *
-						       mailbox,
-						       LibBalsaMessage *
-						       message);
 
 static void libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
@@ -96,8 +91,6 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
     object_class->destroy = libbalsa_mailbox_local_destroy;
 
     libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_local_open;
-    libbalsa_mailbox_class->get_message_stream =
-	libbalsa_mailbox_local_get_message_stream;
     libbalsa_mailbox_class->check = libbalsa_mailbox_local_check;
 
     libbalsa_mailbox_class->save_config =
@@ -115,9 +108,7 @@ libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox)
 GtkObject *
 libbalsa_mailbox_local_new(const gchar * path, gboolean create)
 {
-    LibBalsaMailbox *mailbox;
-    LibBalsaMailboxType type;
-    int fd, magic_type;
+    int magic_type;
 
     libbalsa_lock_mutt();
     magic_type = mx_get_magic(path);
@@ -126,44 +117,26 @@ libbalsa_mailbox_local_new(const gchar * path, gboolean create)
     switch (magic_type) {
     case M_MBOX:
     case M_MMDF:
-	type = LIBBALSA_MAILBOX_LOCAL_MBOX;
+	return libbalsa_mailbox_mbox_new(path, create);
 	break;
     case M_MH:
-	type = LIBBALSA_MAILBOX_LOCAL_MH;
+	return libbalsa_mailbox_mh_new(path, create);
 	break;
     case M_MAILDIR:
-	type = LIBBALSA_MAILBOX_LOCAL_MAILDIR;
+	return libbalsa_mailbox_maildir_new(path, create);
 	break;
     case M_IMAP:
 	g_warning("Got IMAP as type for local mailbox\n");
 	return NULL;
     default:			/* mailbox non-existent or unreadable */
-	if (!create)
-	    return NULL;
-	if ((fd = creat(path, S_IRUSR | S_IWUSR)) == -1) {
-	    g_warning("An error:\n%s\n occured while trying to "
-		      "create the mailbox \"%s\"\n",
-		      strerror(errno), path);
-	    return NULL;
-	} else
-	    close(fd);
+	g_warning("Unknown mailbox type\n");
+	return NULL;
     }
-
-    mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_LOCAL);
-
-    if (type != LIBBALSA_MAILBOX_LOCAL_MBOX)
-	mailbox->is_directory = TRUE;
-
-    LIBBALSA_MAILBOX_LOCAL(mailbox)->type = type;
-    LIBBALSA_MAILBOX_LOCAL(mailbox)->path = g_strdup(path);
-
-    libbalsa_notify_register_mailbox(mailbox);
-
-    return GTK_OBJECT(mailbox);
 }
 
 /* libbalsa_mailbox_local_set_path:
    returrns errno on error, 0 on success
+   FIXME: Needs to work for maildir and mh
 */
 gint
 libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
@@ -172,10 +145,13 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
     int i;
     /* rename */
     g_return_val_if_fail(path, 0);
-    if (strcmp(path, LIBBALSA_MAILBOX_LOCAL(mailbox)->path) == 0)
-	return 0;
-    if ((i = rename(LIBBALSA_MAILBOX_LOCAL(mailbox)->path, path)) != 0)
-	return i;
+
+    if ( LIBBALSA_MAILBOX_LOCAL(mailbox)->path != NULL ) {
+	if (g_strcasecmp(path, LIBBALSA_MAILBOX_LOCAL(mailbox)->path) == 0)
+	    return 0;
+	if ((i = rename(LIBBALSA_MAILBOX_LOCAL(mailbox)->path, path)) != 0)
+	    return i;
+    }
 
     /* update mailbox data */
     libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
@@ -263,46 +239,6 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
 
 }
 
-static FILE *
-libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox * mailbox,
-					  LibBalsaMessage * message)
-{
-    LibBalsaMailboxLocal *local;
-
-    FILE *stream = NULL;
-    gchar *filename;
-
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox), NULL);
-    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
-
-    local = LIBBALSA_MAILBOX_LOCAL(mailbox);
-
-    switch (local->type) {
-    case LIBBALSA_MAILBOX_LOCAL_MH:
-    case LIBBALSA_MAILBOX_LOCAL_MAILDIR:
-	filename =
-	    g_strdup_printf("%s/%s", local->path,
-			    libbalsa_message_pathname(message));
-	stream = fopen(filename, "r");
-	if (!stream || ferror(stream)) {
-	    fprintf(stderr, "Open of %s failed. Errno = %d, ",
-		    filename, errno);
-	    g_free(filename);
-	    perror(NULL);
-	    return NULL;
-	}
-	break;
-    case LIBBALSA_MAILBOX_LOCAL_MBOX:
-	stream = fopen(local->path, "r");
-	break;
-    default:
-	g_error("Unknown type of local mailbox %d\n", local->type);
-	break;
-    }
-
-    return stream;
-}
-
 static void
 libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
 {
@@ -361,28 +297,6 @@ libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
     g_free(local->path);
 
     local->path = gnome_config_get_string("Path");
-
-    /* FIXME: Maybe we should save the type... */
-
-    libbalsa_lock_mutt();
-
-    switch (mx_get_magic(local->path)) {
-    case M_MBOX:
-    case M_MMDF:
-	local->type = LIBBALSA_MAILBOX_LOCAL_MBOX;
-	break;
-    case M_MH:
-	local->type = LIBBALSA_MAILBOX_LOCAL_MH;
-	break;
-    case M_MAILDIR:
-	local->type = LIBBALSA_MAILBOX_LOCAL_MAILDIR;
-	break;
-    default:
-	local->type = LIBBALSA_MAILBOX_LOCAL_MBOX;
-    }
-
-    libbalsa_unlock_mutt();
-
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->load_config)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);

@@ -180,13 +180,29 @@ static void send_msg_window_destroy_cb(GtkWidget * widget, gpointer data);
 static GnomeUIInfo file_new_menu[] = {
 #define MENU_FILE_NEW_MESSAGE_POS 0
     {
-     GNOME_APP_UI_ITEM, N_("_Message..."), N_("Compose a new message"),
-     new_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     GNOME_STOCK_MENU_MAIL_NEW, 'M', 0, NULL},
+	GNOME_APP_UI_ITEM, N_("_Message..."), N_("Compose a new message"),
+	new_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+	GNOME_STOCK_MENU_MAIL_NEW, 'M', 0, NULL
+    },
     GNOMEUIINFO_SEPARATOR,
-#define MENU_FILE_NEW_NEW_MAILBOX_POS 1
+#define MENU_FILE_NEW_MBOX_POS 2
+    GNOMEUIINFO_ITEM_STOCK(N_("Local Mbox mailbox..."), N_("Add a new mbox style mailbox"),
+			   mblist_menu_add_mbox_cb, GNOME_STOCK_PIXMAP_ADD),
+#define MENU_FILE_NEW_MAILDIR_POS 2
+    GNOMEUIINFO_ITEM_STOCK(N_("Local Maildir mailbox..."), N_("Add a new maildir style mailbox"),
+			   mblist_menu_add_maildir_cb, GNOME_STOCK_PIXMAP_ADD),
+#define MENU_FILE_NEW_MH_POS 3
+    GNOMEUIINFO_ITEM_STOCK(N_("Local MH mailbox..."), N_("Add a new MH style mailbox"),
+			   mblist_menu_add_mh_cb, GNOME_STOCK_PIXMAP_ADD),
+#define MENU_FILE_NEW_IMAP_POS 4
+    GNOMEUIINFO_ITEM_STOCK(N_("Remote IMAP mailbox..."), N_("Add a new IMAP mailbox"),
+			   mblist_menu_add_imap_cb, GNOME_STOCK_PIXMAP_ADD),
+    
+#if 0 
+#define MENU_FILE_NEW_NEW_MAILBOX_POS 2
     GNOMEUIINFO_ITEM_STOCK(N_("_Mailbox..."), N_("Add a new mailbox"),
 			   mblist_menu_add_cb, GNOME_STOCK_PIXMAP_ADD),
+#endif
     GNOMEUIINFO_END
 };
 
@@ -1135,7 +1151,6 @@ check_mailbox_list(GList * mailbox_list)
 	gdk_threads_leave();
 
 	list = g_list_next(list);
-
     }
 }
 
@@ -1794,6 +1809,7 @@ address_book_cb(GtkWindow *widget, gpointer data)
     ab = balsa_address_book_new(FALSE);
     gnome_dialog_set_parent(GNOME_DIALOG(ab), GTK_WINDOW(balsa_app.main_window));
 
+    /* FIXME: Run's as modal. Need to find a way to not do this. I suspect there isn't one. */
     gnome_dialog_run_and_close(GNOME_DIALOG(ab));
 }
 

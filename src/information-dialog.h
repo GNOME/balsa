@@ -27,6 +27,7 @@ enum _BalsaInformationShow {
     BALSA_INFORMATION_SHOW_NONE = 0,
     BALSA_INFORMATION_SHOW_DIALOG,
     BALSA_INFORMATION_SHOW_LIST,
+    BALSA_INFORMATION_SHOW_STDERR,
 };
 
 void balsa_information(LibBalsaInformationType type, const char *fmt, ...);

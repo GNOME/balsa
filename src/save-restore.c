@@ -257,11 +257,9 @@ config_mailbox_init(const gchar * prefix)
     else if (strcmp("Trash/", key) == 0)
 	balsa_app.trash = mailbox;
     else {
-	is_mh = LIBBALSA_IS_MAILBOX_LOCAL(mailbox)
-	    && LIBBALSA_MAILBOX_LOCAL(mailbox)->type ==
-	    LIBBALSA_MAILBOX_LOCAL_MH;
+	is_mh = LIBBALSA_IS_MAILBOX_MH(mailbox);
 
-	node = g_node_new(mailbox_node_new(g_strdup(mailbox->name),
+	node = g_node_new(mailbox_node_new(mailbox->name,
 					   mailbox, is_mh));
 	g_node_append(balsa_app.mailbox_nodes, node);
     }
@@ -290,6 +288,8 @@ config_global_load(void)
 	d_get_gint("ShowErrorMessages", BALSA_INFORMATION_SHOW_DIALOG);
     balsa_app.debug_message =
 	d_get_gint("ShowDebugMessages", BALSA_INFORMATION_SHOW_NONE);
+    balsa_app.fatal_message = 
+	d_get_gint("ShowFatalMessages", BALSA_INFORMATION_SHOW_DIALOG);
 
     gnome_config_pop_prefix();
 
@@ -520,9 +520,11 @@ gint config_save(void)
     gnome_config_set_int("ShowWarningMessages", balsa_app.warning_message);
     gnome_config_set_int("ShowErrorMessages", balsa_app.error_message);
     gnome_config_set_int("ShowDebugMessages", balsa_app.debug_message);
+    gnome_config_set_int("ShowFatalMessages", balsa_app.fatal_message);
     gnome_config_pop_prefix();
 
-/* Section for geometry ... *//* FIXME: Saving window sizes is the WM's job?? */
+    /* Section for geometry ... */
+    /* FIXME: Saving window sizes is the WM's job?? */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Geometry/");
 
     /* ... column width settings */

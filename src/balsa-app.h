@@ -277,6 +277,7 @@ extern struct BalsaApplication {
     BalsaInformationShow warning_message;
     BalsaInformationShow error_message;
     BalsaInformationShow debug_message;
+    BalsaInformationShow fatal_message;
 
     /* Tooltips */
     GtkTooltips *tooltips;

@@ -57,6 +57,9 @@ typedef struct body MuttBody;
 #include "mailbox_remote.h"
 #include "mailbox_pop3.h"
 #include "mailbox_imap.h"
+#include "mailbox_mbox.h"
+#include "mailbox_mh.h"
+#include "mailbox_maildir.h"
 
 #ifdef BALSA_SHOW_ALL
 #include "filter.h"

@@ -31,19 +31,11 @@
 
 GtkType libbalsa_mailbox_local_get_type(void);
 
-typedef enum _LibBalsaMailboxLocalType LibBalsaMailboxLocalType;
 typedef struct _LibBalsaMailboxLocal LibBalsaMailboxLocal;
 typedef struct _LibBalsaMailboxLocalClass LibBalsaMailboxLocalClass;
 
-enum _LibBalsaMailboxLocalType {
-    LIBBALSA_MAILBOX_LOCAL_MH,
-    LIBBALSA_MAILBOX_LOCAL_MBOX,
-    LIBBALSA_MAILBOX_LOCAL_MAILDIR
-};
-
 struct _LibBalsaMailboxLocal {
     LibBalsaMailbox mailbox;
-    LibBalsaMailboxLocalType type;
 
     gchar *path;
 };

@@ -24,7 +24,8 @@
 
 #include "libbalsa.h"
 
-void mailbox_conf_new(LibBalsaMailbox * mailbox, gint add_new_mailbox);
+void mailbox_conf_new(GtkType mailbox_type);
+void mailbox_conf_edit(LibBalsaMailbox * mailbox);
 void mailbox_conf_delete(LibBalsaMailbox * mailbox);
 
 #endif				/* __MAILBOX_CONF_H__ */

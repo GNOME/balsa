@@ -82,7 +82,7 @@ ask_password(LibBalsaServer * server, LibBalsaMailbox * mbox)
 				  GTK_WINDOW(balsa_app.main_window));
     g_free(prompt);
     gnome_dialog_run_and_close(GNOME_DIALOG(dialog));
-
+    
     return passwd;
 }
 

@@ -306,6 +306,34 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
 	return NULL;
     }
 
+    /* Handle Local mailboxes. 
+     * They are now separate classes for each type 
+     * FIXME: This should be removed in som efuture release.
+     */
+    if ( type == LIBBALSA_TYPE_MAILBOX_LOCAL ) {
+	int magic_type;
+	gchar *path = gnome_config_get_string("Path");
+
+	libbalsa_lock_mutt();
+	magic_type = mx_get_magic(path);
+	libbalsa_unlock_mutt();
+
+	g_free(path);
+
+	switch (magic_type) {
+	case M_MBOX:
+	    type = LIBBALSA_TYPE_MAILBOX_MBOX;
+	    break;
+	case M_MAILDIR:
+	    type = LIBBALSA_TYPE_MAILBOX_MAILDIR;
+	    break;
+	case M_MH:
+	    type = LIBBALSA_TYPE_MAILBOX_MH;
+	    break;
+	default:
+	    break;
+	}
+    }
     mailbox = gtk_type_new(type);
     if (mailbox == NULL) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,

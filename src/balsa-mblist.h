@@ -61,7 +61,11 @@ void balsa_mblist_update_mailbox(BalsaMBList * mblist,
 gboolean balsa_mblist_focus_mailbox(BalsaMBList * bmbl,
 				    LibBalsaMailbox * mailbox);
 
-void mblist_menu_add_cb(GtkWidget * widget, gpointer data);
+void mblist_menu_add_mbox_cb(GtkWidget * widget, gpointer data);
+void mblist_menu_add_maildir_cb(GtkWidget * widget, gpointer data);
+void mblist_menu_add_mh_cb(GtkWidget * widget, gpointer data);
+void mblist_menu_add_imap_cb(GtkWidget * widget, gpointer data);
+
 void mblist_menu_edit_cb(GtkWidget * widget, gpointer data);
 void mblist_menu_delete_cb(GtkWidget * widget, gpointer data);
 void mblist_menu_open_cb(GtkWidget * widget, gpointer data);

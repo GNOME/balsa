@@ -40,10 +40,7 @@ mailbox_node_new(const gchar * name, LibBalsaMailbox * mb, gint i)
     mbn = g_new(MailboxNode, 1);
     mbn->name = g_strdup(name);
 
-    if (mb)
-	mbn->mailbox = mb;
-    else
-	mbn->mailbox = NULL;
+    mbn->mailbox = mb;
 
     mbn->IsDir = i;
     mbn->expanded = FALSE;

@@ -42,6 +42,8 @@ static void balsa_information_list(LibBalsaInformationType type,
 				   char *msg);
 static void balsa_information_dialog(LibBalsaInformationType type,
 				     char *msg);
+static void balsa_information_stderr(LibBalsaInformationType type,
+				     char *msg);
 
 /* Handle button clicks in the warning window */
 /* Button 0 is clear, button 1 is close */
@@ -86,6 +88,9 @@ balsa_information(LibBalsaInformationType type, const char *fmt, ...)
     case LIBBALSA_INFORMATION_DEBUG:
 	show = balsa_app.debug_message;
 	break;
+    case LIBBALSA_INFORMATION_FATAL:
+	show = balsa_app.fatal_message;
+	break;
     }
 
     switch (show) {
@@ -97,9 +102,17 @@ balsa_information(LibBalsaInformationType type, const char *fmt, ...)
     case BALSA_INFORMATION_SHOW_LIST:
 	balsa_information_list(type, msg);
 	break;
+    case BALSA_INFORMATION_SHOW_STDERR:
+	balsa_information_stderr(type, msg);
+	break;
     }
 
     g_free(msg);
+
+    if (type == LIBBALSA_INFORMATION_FATAL)
+	balsa_exit();
+
+
 }
 
 /*
@@ -117,9 +130,6 @@ balsa_information_dialog(LibBalsaInformationType type, char *msg)
 				    GTK_WINDOW(balsa_app.main_window));
 
     gtk_window_set_position(GTK_WINDOW(messagebox), GTK_WIN_POS_CENTER);
-
-    if (type == LIBBALSA_INFORMATION_ERROR)
-	balsa_exit();
 
 }
 
@@ -192,4 +202,23 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
 
     gnome_appbar_set_status(balsa_app.appbar, outstr[0]);
 
+}
+
+static void 
+balsa_information_stderr(LibBalsaInformationType type, char *msg)
+{
+    switch (type) {
+    case LIBBALSA_INFORMATION_WARNING:
+	fprintf(stderr, _("WARNING: "));
+	break;
+    case LIBBALSA_INFORMATION_ERROR:
+	fprintf(stderr, _("ERROR: "));
+	break;
+    case LIBBALSA_INFORMATION_FATAL:
+	fprintf(stderr, _("FATAL: "));
+	break;
+    default:
+	break;
+    }
+    fprintf(stderr, msg);
 }

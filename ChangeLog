@@ -1,3 +1,53 @@
+2000-12-12  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox_mbox.c:
+	* libbalsa/mailbox_mbox.h:
+	* libbalsa/mailbox_maildir.c:
+	* libbalsa/mailbox_maildir.h:
+	* libbalsa/mailbox_mh.c:
+	* libbalsa/mailbox_mh.h:
+	* libbalsa/Makefile.am:
+	New mailbox objects, representing different types of local
+	mailbox. Split from LibBalsaMailboxLocal (which is the parent of
+	all of these)
+	* libbalsa/libbalsa.h: Include headers from above
+	* libbalsa/mailbox.c: When loading a mailbox from the config, be
+	sure to load the correct sort of local mailbox subclass  if we get
+	LibBalsaMailboxLocal as the type. The next time the mailbox is
+	saved it should save it's new type correctly.
+	* libbalsa/mailbox_local.c: Lots of stuff has moved into
+	subclasses. libbalsa_mailbox_local_new now tries to create the
+	correct sub class based on the magic number.
+	* libbalsa/mailbox_local.h: LibBalsaMailboxLocalType is no longer
+	needed (it is implicit in the type of object now).
+	
+	* src/balsa-mblist.c: Use new interface to mailbox_conf. Populate
+	the ContextMenu->New menus with an entry for each type of
+	mailbox. Add a menu callback for each type of mailbox that appears
+	in the New submenu. 
+	* src/balsa-mblist.h: Prototype new menu callbacks
+	* src/main-window.c: Populate the File->New menu.
+	
+	* src/mailbox-conf.c: Substancial rewrite, API is cleaner, lots of
+	stuff has been simplified by making the dialog modal and making
+	better use of the built in feature of GnomeDialog. New API means
+	we don't need to keep track of which page we are on and removes
+	MailboxConfPageType. Added ALT+key accelerators to all
+	fields. Clarified some field names.
+	* src/mailbox-conf.h: Expose new API
+	
+	* libbalsa/information.h: New message type "FATAL"
+	* src/balsa-app.h: Store option for how to display fatal messages.
+	* src/information-dialog.[ch]: Handle FATAL error messages. ERROR
+	messages no longer cause balsa to exit. Added a new type of
+	display - dump to console.
+	* src/pref-manager.c: Configure the new FATAL message display
+	message. Also use new mailbox-conf interface.
+	* src/save-restore.c: Save/Restore FATAL message display
+	type. Plug a memory leak. Detecting an MH mailbox is now easier.
+
+	* libbalsa/misc.c: Fix a small thinko.
+	
 2000-12-11  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/sendmsg-window.c: Add support for sending in Romanian.

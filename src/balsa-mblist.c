@@ -292,13 +292,7 @@ mb_close_cb(GtkWidget * widget, LibBalsaMailbox * mailbox)
 static void
 mb_conf_cb(GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
-    mailbox_conf_new(mailbox, FALSE);
-}
-
-static void
-mb_add_cb(GtkWidget * widget, LibBalsaMailbox * mailbox)
-{
-    mailbox_conf_new(NULL, TRUE);
+    mailbox_conf_edit(mailbox);
 }
 
 static void
@@ -348,13 +342,27 @@ static GtkWidget *
 mblist_create_context_menu(GtkCTree * ctree, LibBalsaMailbox * mailbox)
 {
     GtkWidget *menu;
+    GtkWidget *submenu;
+    GtkWidget *menuitem;
 
     /*  g_return_val_if_fail(mailbox != NULL, NULL); */
 
     menu = gtk_menu_new();
 
-    add_menu_entry(menu, _("Add New Mailbox..."), mb_add_cb, mailbox);
-
+    submenu = gtk_menu_new();
+    add_menu_entry(submenu, _("Local Mbox Mailbox..."), mblist_menu_add_mbox_cb, NULL);
+    add_menu_entry(submenu, _("Local Maildir Mailbox..."), mblist_menu_add_maildir_cb, NULL);
+    add_menu_entry(submenu, _("Local MH Mailbox..."), mblist_menu_add_mh_cb, NULL);
+    add_menu_entry(submenu, _("Remote IMAP Mailbox..."), mblist_menu_add_imap_cb, NULL);
+    gtk_widget_show(submenu);
+    
+    menuitem = gtk_menu_item_new_with_label(_("New"));
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem),
+			      submenu);
+    gtk_widget_show(menuitem);
+    
+    gtk_menu_append(GTK_MENU(menu), menuitem);
+    
     /* If we didn't click on a mailbox then there is only one option. */
     if (mailbox == NULL)
 	return menu;
@@ -443,9 +451,27 @@ mblist_open_mailbox(LibBalsaMailbox * mailbox)
 }
 
 void
-mblist_menu_add_cb(GtkWidget * widget, gpointer data)
+mblist_menu_add_mbox_cb(GtkWidget * widget, gpointer data)
 {
-    mailbox_conf_new(NULL, TRUE);
+    mailbox_conf_new(LIBBALSA_TYPE_MAILBOX_MBOX);
+}
+
+void
+mblist_menu_add_maildir_cb(GtkWidget * widget, gpointer data)
+{
+    mailbox_conf_new(LIBBALSA_TYPE_MAILBOX_MAILDIR);
+}
+
+void
+mblist_menu_add_mh_cb(GtkWidget * widget, gpointer data)
+{
+    mailbox_conf_new(LIBBALSA_TYPE_MAILBOX_MH);
+}
+
+void
+mblist_menu_add_imap_cb(GtkWidget * widget, gpointer data)
+{
+    mailbox_conf_new(LIBBALSA_TYPE_MAILBOX_IMAP);
 }
 
 void
@@ -460,7 +486,7 @@ mblist_menu_edit_cb(GtkWidget * widget, gpointer data)
 	return;
     }
 
-    mailbox_conf_new(mailbox, FALSE);
+    mailbox_conf_edit(mailbox);
 }
 
 

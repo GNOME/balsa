@@ -74,6 +74,7 @@ typedef struct _PropertyUI {
     GtkWidget *warning_message_menu;
     GtkWidget *error_message_menu;
     GtkWidget *debug_message_menu;
+    GtkWidget *fatal_message_menu;
 
     /* arp */
     GtkWidget *quote_str;
@@ -1521,7 +1522,7 @@ create_display_page(gpointer data)
     gtk_box_pack_start(GTK_BOX(vbox2), information_frame, FALSE, FALSE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(information_frame), 5);
 
-    information_table = create_table(4, 2, GTK_CONTAINER(information_frame));
+    information_table = create_table(5, 2, GTK_CONTAINER(information_frame));
     /* gtk_table_set_row_spacings(GTK_TABLE(information_table), 1);
        gtk_table_set_col_spacings(GTK_TABLE(information_table), 5); */
 
@@ -1564,8 +1565,21 @@ create_display_page(gpointer data)
     gtk_table_attach(GTK_TABLE(information_table), option_menu, 1, 2, 2, 3,
 		     GTK_EXPAND | GTK_FILL, 0, 0, 0);
 
-    label = gtk_label_new(_("Debug Messages"));
+    label = gtk_label_new(_("Fatal Error Messages"));
     gtk_table_attach(GTK_TABLE(information_table), label, 0, 1, 3, 4,
+		     GTK_FILL, 0, 0, 0);
+
+    option_menu = gtk_option_menu_new();
+    pui->fatal_message_menu = create_information_message_menu();
+    gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu),
+			     pui->fatal_message_menu);
+    gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu),
+				balsa_app.fatal_message);
+    gtk_table_attach(GTK_TABLE(information_table), option_menu, 1, 2, 3, 4,
+		     GTK_EXPAND | GTK_FILL, 0, 0, 0);
+
+    label = gtk_label_new(_("Debug Messages"));
+    gtk_table_attach(GTK_TABLE(information_table), label, 0, 1, 4, 5,
 		     GTK_FILL, 0, 0, 0);
 
     option_menu = gtk_option_menu_new();
@@ -1574,7 +1588,7 @@ create_display_page(gpointer data)
 			     pui->debug_message_menu);
     gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu),
 				balsa_app.debug_message);
-    gtk_table_attach(GTK_TABLE(information_table), option_menu, 1, 2, 3, 4,
+    gtk_table_attach(GTK_TABLE(information_table), option_menu, 1, 2, 4, 5,
 		     GTK_EXPAND | GTK_FILL, 0, 0, 0);
 
     return vbox2;
@@ -2022,7 +2036,7 @@ pop3_edit_cb(GtkWidget * widget, gpointer data)
     if (!mailbox)
 	return;
 
-    mailbox_conf_new(mailbox, FALSE);
+    mailbox_conf_edit(mailbox);
 }
 
 static void
@@ -2112,10 +2126,7 @@ address_book_delete_cb(GtkWidget * widget, gpointer data)
 static void
 pop3_add_cb(GtkWidget * widget, gpointer data)
 {
-    LibBalsaMailbox *mb = LIBBALSA_MAILBOX(libbalsa_mailbox_pop3_new());
-
-    /* If the user cancels this will be destroyed */
-    mailbox_conf_new(mb, TRUE);
+    mailbox_conf_new(LIBBALSA_TYPE_MAILBOX_POP3);
 }
 
 static void
@@ -2229,9 +2240,10 @@ static GtkWidget *
 create_information_message_menu(void)
 {
     GtkWidget *menu = gtk_menu_new();
-    add_show_menu(_("Show Nothing"), BALSA_INFORMATION_SHOW_NONE,   menu);
-    add_show_menu(_("Show Dialog"),  BALSA_INFORMATION_SHOW_DIALOG, menu);
-    add_show_menu(_("Show In List"), BALSA_INFORMATION_SHOW_LIST,   menu);
+    add_show_menu(_("Show Nothing"),     BALSA_INFORMATION_SHOW_NONE,   menu);
+    add_show_menu(_("Show Dialog"),      BALSA_INFORMATION_SHOW_DIALOG, menu);
+    add_show_menu(_("Show In List"),     BALSA_INFORMATION_SHOW_LIST,   menu);
+    add_show_menu(_("Print to console"), BALSA_INFORMATION_SHOW_STDERR, menu);
     return menu;
 }
 

@@ -28,6 +28,9 @@
 #include "balsa-message.h"
 #include "mime.h"
 #include "misc.h"
+#ifdef USE_PIXBUF
+#include <gdk-pixbuf/gdk-pixbuf.h>
+#endif
 
 #define BGLINKCOLOR "LightSteelBlue1"
 
@@ -682,10 +685,15 @@ image2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
   GnomeCanvasItem *item;
   BalsaSaveFileInfo *info;
 
+#ifndef USE_PIXBUF
   GdkImlibImage *im;
+#else
+  GdkPixbuf *pb;
+#endif
   gchar *filename;
 
   filename = save_mime_part (message, bdy);
+#ifndef USE_PIXBUF
   im = gdk_imlib_load_image (filename);
   item = gnome_canvas_item_new (group,
 				gnome_canvas_image_get_type (),
@@ -696,6 +704,18 @@ image2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
 				"height", (double) im->rgb_height,
 				"anchor", GTK_ANCHOR_NW,
 				NULL);
+#else
+  pb = gdk_pixbuf_new_from_file(filename);
+  item = gnome_canvas_item_new (group,
+				gnome_canvas_pixbuf_get_type(),
+				"pixbuf", pb,
+				"x", 0.0,
+				"y", next_part_height(group),
+				"width", (double) gdk_pixbuf_get_width(pb),
+				"height", (double) gdk_pixbuf_get_height(pb),
+				"anchor", GTK_ANCHOR_NW,
+				NULL);
+#endif
   info = balsa_save_file_info_new (NULL, message, bdy);
   gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), info);
 

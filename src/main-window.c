@@ -23,6 +23,10 @@
 #include <gdk/gdkx.h>
 #include <X11/Xutil.h>
 
+#ifdef USE_PIXBUF
+#include <gdk-pixbuf/gdk-pixbuf.h>
+#endif
+
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
 #endif

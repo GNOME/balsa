@@ -23,6 +23,7 @@
 
 #include <gnome.h>
 #include <string.h>
+
 #include "balsa-app.h"
 #include "mailbox-conf.h"
 #include "main-window.h"

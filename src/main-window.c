@@ -27,6 +27,7 @@
 #include "index-child.h"
 #include "mailbox.h"
 #include "misc.h"
+#include "main.h"
 #include "mailbox-manager.h"
 #include "main-window.h"
 #include "mblist-window.h"
@@ -41,17 +42,13 @@ static GnomeMDI *mdi = NULL;
 
 static gint about_box_visible = FALSE;
 
-/* external decs */
-extern void balsa_exit ();
-
-
 /* main window widget components */
 static GtkMenuBar *create_menu (GnomeMDI *, GtkWidget * app);
 static GtkToolbar *create_toolbar (GnomeMDI *, GtkWidget * app);
 
 
 /* dialogs */
-static void show_about_box ();
+static void show_about_box (void);
 
 
 /* callbacks */
@@ -71,10 +68,10 @@ static void undelete_message_cb (GtkWidget * widget);
 static void mblist_window_cb (GtkWidget * widget);
 static void mailbox_close_child (GtkWidget * widget);
 
-static void about_box_destroy_cb ();
+static void about_box_destroy_cb (void);
 
 void
-open_main_window ()
+open_main_window (void)
 {
   /* main window */
   mdi = GNOME_MDI (gnome_mdi_new ("balsa", "Balsa"));
@@ -103,7 +100,7 @@ open_main_window ()
  * close the main window 
  */
 void
-close_main_window ()
+close_main_window (void)
 {
   if (gnome_mdi_remove_all (mdi, FALSE))
     gtk_object_destroy (GTK_OBJECT (mdi));
@@ -116,7 +113,7 @@ close_main_window ()
  * refresh data in the main window
  */
 void
-refresh_main_window ()
+refresh_main_window (void)
 {
   /*
    * set the toolbar style
@@ -485,7 +482,7 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
  * show the about box for Balsa
  */
 static void
-show_about_box ()
+show_about_box (void)
 {
   GtkWidget *about;
   const gchar *authors[] =
@@ -654,7 +651,7 @@ mailbox_close_child (GtkWidget * widget)
 }
 
 static void
-about_box_destroy_cb ()
+about_box_destroy_cb (void)
 {
   about_box_visible = FALSE;
 }

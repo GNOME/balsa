@@ -24,12 +24,14 @@
 #include <fcntl.h>
 #include <proplist.h>
 #include <unistd.h>
+#include <stdio.h>
 
 #include "balsa-app.h"
 #include "balsa-index.h"
 #include "balsa-init.h"
 #include "local-mailbox.h"
 #include "misc.h"
+#include "main.h"
 #include "mailbox.h"
 #include "save-restore.h"
 #include "index-child.h"
@@ -41,9 +43,9 @@ struct BalsaApplication balsa_app;
 
 
 /* prototypes */
-static int mailboxes_init ();
-static void special_mailboxes ();
-static gint read_signature ();
+static int mailboxes_init (void);
+static void special_mailboxes (void);
+static gint read_signature (void);
 #if 0
 static gint check_for_new_messages ();
 #endif
@@ -55,7 +57,7 @@ error_exit_cb (GtkWidget * widget, gpointer data)
 }
 
 static void
-balsa_error (char *fmt,...)
+balsa_error (char *fmt, ...)
 {
   GtkWidget *messagebox;
   va_list ap;
@@ -153,7 +155,7 @@ init_balsa_app (int argc, char *argv[])
 }
 
 void
-do_load_mailboxes ()
+do_load_mailboxes (void)
 {
   read_signature ();
   mailboxes_init ();
@@ -182,7 +184,7 @@ do_load_mailboxes ()
 }
 
 static gint
-read_signature ()
+read_signature (void)
 {
   FILE *fp;
   size_t len;
@@ -228,6 +230,6 @@ mailboxes_init (void)
 }
 
 static void
-special_mailboxes ()
+special_mailboxes (void)
 {
 }

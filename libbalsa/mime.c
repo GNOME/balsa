@@ -32,6 +32,8 @@
 #include "mailbox.h"
 #include "misc.h"
 
+#include "mime.h"
+
 
 #define  obstack_chunk_alloc g_malloc
 #define  obstack_chunk_free  g_free

@@ -74,26 +74,26 @@ gchar *mdi_type_label[NUM_MDI_MODES] =
 
 
 /* notebook pages */
-static GtkWidget *create_identity_page ();
-static GtkWidget *create_mailboxes_page ();
-static GtkWidget *create_view_page ();
-static GtkWidget *create_mdi_page ();
+static GtkWidget *create_identity_page (void);
+static GtkWidget *create_mailboxes_page (void);
+static GtkWidget *create_view_page (void);
+static GtkWidget *create_mdi_page (void);
 
 
 /* save the settings */
-static void apply_prefs ();
+static void apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui);
 
 /* cancel the changes and don't save */
-static void cancel_prefs ();
+static void cancel_prefs (void);
 
 /* set defaults */
-static void set_prefs ();
+static void set_prefs (void);
 
 static void properties_modified_cb (GtkWidget *, GnomePropertyBox *);
 
 
 void
-open_preferences_manager ()
+open_preferences_manager (void)
 {
   GtkWidget *label;
   gint i;
@@ -178,7 +178,7 @@ open_preferences_manager ()
 
 
 static void
-cancel_prefs ()
+cancel_prefs (void)
 {
   gtk_widget_destroy (GTK_WIDGET (pui->pbox));
   g_free (pui);
@@ -259,7 +259,7 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
  * refresh data in the preferences window
  */
 void
-set_prefs ()
+set_prefs (void)
 {
   gint i;
   GString *str;
@@ -299,7 +299,7 @@ set_prefs ()
  * identity notebook page
  */
 static GtkWidget *
-create_identity_page ()
+create_identity_page (void)
 {
   GtkWidget *vbox;
   GtkWidget *table;

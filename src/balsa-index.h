@@ -55,7 +55,7 @@ struct _BalsaIndexClass
 
 
 guint balsa_index_get_type (void);
-GtkWidget * balsa_index_new ();
+GtkWidget * balsa_index_new (void);
 
 
 /* sets the mail stream; if it's a new stream, then it's 

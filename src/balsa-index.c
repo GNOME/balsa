@@ -291,7 +291,7 @@ balsa_index_size_allocate (GtkWidget * widget,
 
 
 GtkWidget *
-balsa_index_new ()
+balsa_index_new (void)
 {
   BalsaIndex *bindex;
   bindex = gtk_type_new (balsa_index_get_type ());

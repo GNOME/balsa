@@ -25,7 +25,7 @@ extern "C"
 {
 #endif				/* __cplusplus */
 
-gboolean send_message (Message * message, gchar *smtp_server, glong debug);
+gboolean send_message (Message * message, gchar * smtp_server, glong debug);
 
 
 #ifdef __cplusplus

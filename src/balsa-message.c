@@ -167,7 +167,7 @@ balsa_message_size_allocate (GtkWidget * widget,
 
 
 GtkWidget *
-balsa_message_new ()
+balsa_message_new (void)
 {
   BalsaMessage *bmessage;
   bmessage = gtk_type_new (balsa_message_get_type ());

@@ -21,12 +21,11 @@
 
 
 /* open the preferences manager window */
-void open_preferences_manager ();
-
+void open_preferences_manager (void);
 
 /* refresh any data displayed in the preferences manager
  * window in case it has changed */
-void refresh_preferences_manager ();
+void refresh_preferences_manager (void);
 
 
 #endif

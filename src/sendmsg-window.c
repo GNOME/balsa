@@ -28,6 +28,7 @@
 #include "balsa-index.h"
 #include "mailbox.h"
 #include "misc.h"
+#include "mime.h"
 #include "mailbox.h"
 #include "send.h"
 #include "sendmsg-window.h"
@@ -35,6 +36,8 @@
 static void send_message_cb (GtkWidget *, BalsaSendmsg *);
 static void close_window (GtkWidget *, gpointer);
 static GtkWidget *create_menu (BalsaSendmsg *);
+
+static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 
 static gchar *gt_replys (gchar *);
 
@@ -102,7 +105,7 @@ create_toolbar (BalsaSendmsg * bsmw)
 }
 
 
-void
+static void
 balsa_sendmsg_destroy (BalsaSendmsg * bsm)
 {
   gtk_widget_destroy (bsm->to);

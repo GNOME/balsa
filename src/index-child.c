@@ -34,7 +34,7 @@ static void index_child_class_init (IndexChildClass *);
 static void index_child_init (IndexChild *);
 
 guint
-index_child_get_type ()
+index_child_get_type (void)
 {
   static guint index_type = 0;
 

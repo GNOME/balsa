@@ -17,14 +17,9 @@
  * 02111-1307, USA.
  */
 
-#ifndef __main_window_h__
-#define __main_window_h__
+#ifndef __MAIN_H__
+#define __MAIN_H__
 
-#include "mailbox.h"
+void balsa_exit (void);
 
-void open_main_window (void);
-void close_main_window (void);
-void refresh_main_window (void);
-void main_window_set_mailbox (Mailbox * mailbox);
-
-#endif /* __main_window_h__ */
+#endif /* __MAIN_H__ */

@@ -17,14 +17,25 @@
  * 02111-1307, USA.
  */
 
-#ifndef __main_window_h__
-#define __main_window_h__
+#ifndef __MIME_H__
+#define __MIME_H__
+
+#include <obstack.h>
+#include <stdio.h>
 
 #include "mailbox.h"
 
-void open_main_window (void);
-void close_main_window (void);
-void refresh_main_window (void);
-void main_window_set_mailbox (Mailbox * mailbox);
+GString * content2reply (Message * message);
+gchar * content2html (Message * message);
+void part2html (BODY * bdy, FILE * fp, struct obstack *html_bfr);
+void other2html (BODY * bdy, FILE * fp, struct obstack *bfr);
+void mimetext2html (BODY * bdy, FILE * fp, struct obstack *bfr);
+void video2html (BODY * bdy, FILE * fp, struct obstack *bfr);
+void multipart2html (BODY * bdy, FILE * fp, struct obstack *bfr);
+void message2html (BODY * bdy, FILE * fp, struct obstack *bfr);
+void image2html (BODY * bdy, FILE * fp, struct obstack *bfr);
+void application2html (BODY * bdy, FILE * fp, struct obstack *bfr);
+void audio2html (BODY * bdy, FILE * fp, struct obstack *bfr);
 
-#endif /* __main_window_h__ */
+
+#endif /* __MIME_H__ */

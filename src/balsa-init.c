@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <gnome.h>
+#include "main.h"
 #include "balsa-app.h"
 #include "balsa-init.h"
 #include "balsa.xpm"
@@ -67,10 +68,10 @@ static void next_cb (GtkWidget *);
 static void prev_cb (GtkWidget *);
 static void complete_cb (GtkWidget *);
 
-static GtkWidget *create_welcome_page ();
-static GtkWidget *create_general_page ();
-static GtkWidget *create_mailboxes_page ();
-static GtkWidget *create_finished_page ();
+static GtkWidget *create_welcome_page (void);
+static GtkWidget *create_general_page (void);
+static GtkWidget *create_mailboxes_page (void);
+static GtkWidget *create_finished_page (void);
 
 
 /*
@@ -84,7 +85,7 @@ initialize_balsa (int argc, char *argv[])
 }
 
 void
-balsa_init_window_new ()
+balsa_init_window_new (void)
 {
   GtkWidget *vbox;
   GtkWidget *pixmap;
@@ -175,7 +176,7 @@ balsa_init_window_new ()
 }
 
 static GtkWidget *
-create_welcome_page ()
+create_welcome_page (void)
 {
   GtkWidget *vbox;
   GtkWidget *text;
@@ -215,7 +216,7 @@ create_welcome_page ()
 }
 
 static GtkWidget *
-create_general_page ()
+create_general_page (void)
 {
   GtkWidget *vbox;
   GtkWidget *table;
@@ -290,7 +291,7 @@ create_general_page ()
 }
 
 static GtkWidget *
-create_mailboxes_page ()
+create_mailboxes_page (void)
 {
   GtkWidget *vbox;
   GtkWidget *table;
@@ -348,7 +349,7 @@ create_mailboxes_page ()
 }
 
 static GtkWidget *
-create_finished_page ()
+create_finished_page (void)
 {
   GtkWidget *vbox;
   GtkWidget *button;

@@ -49,7 +49,7 @@ struct _BalsaMessageClass
 };
 
 guint balsa_message_get_type (void);
-GtkWidget * balsa_message_new ();
+GtkWidget * balsa_message_new (void);
 void balsa_message_clear (BalsaMessage * bmessage);
 void balsa_message_set (BalsaMessage * bmessage, Message * message);
 

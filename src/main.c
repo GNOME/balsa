@@ -27,6 +27,8 @@
 #include "misc.h"
 #include "save-restore.h"
 
+#include "main.h"
+
 int
 main (int argc, char *argv[])
 {
@@ -37,7 +39,7 @@ main (int argc, char *argv[])
   gtk_main ();
   return 0;
 }
-
+ 
 static gboolean
 close_all_mailboxes (GNode * node, gpointer data)
 {
@@ -61,7 +63,7 @@ close_all_mailboxes (GNode * node, gpointer data)
 }
 
 void
-balsa_exit ()
+balsa_exit (void)
 {
   Mailbox *mailbox;
 

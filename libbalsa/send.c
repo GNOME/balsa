@@ -26,8 +26,8 @@
 #include "balsa-app.h"
 #include "mailbox.h"
 #include "misc.h"
-
 #include "mailbackend.h"
+#include "send.h"
 
 gboolean
 send_message (Message * message, gchar * smtp_server, glong debug)

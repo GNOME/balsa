@@ -267,10 +267,12 @@ void mailbox_watcher_remove_by_data (Mailbox * mailbox, gpointer data);
 /*
  * messages
  */
-Message *message_new ();
+Message *message_new (void);
 void message_free (Message * message);
 
+void message_copy (Message * message, Mailbox * dest);
 void message_move (Message * message, Mailbox * mailbox);
+void message_clear_flags (Message * message);
 
 void message_read (Message * message);
 void message_unread (Message * message);
@@ -278,6 +280,7 @@ void message_delete (Message * message);
 void message_undelete (Message * message);
 
 void message_answer (Message * message);
+void message_reply (Message * message);
 
 void message_body_ref (Message * message);
 void message_body_unref (Message * message);
@@ -286,14 +289,14 @@ void message_body_unref (Message * message);
 /*
  * addresses
  */
-Address *address_new ();
+Address *address_new (void);
 void address_free (Address * address);
 
 
 /*
  * body
  */
-Body *body_new ();
+Body *body_new (void);
 void body_free (Body * body);
 
 
@@ -304,5 +307,7 @@ MailboxType mailbox_type_from_description (gchar * description);
 gchar *mailbox_type_description (MailboxType type);
 MailboxType mailbox_valid (gchar * filename);
 gchar *message_pathname(Message *message);
+
+char * mime_content_type2str (int contenttype);
 
 #endif /* __MAILBOX_H__ */

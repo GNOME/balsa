@@ -1008,7 +1008,7 @@ mailbox_valid (gchar * filename)
  * messages
  */
 Message *
-message_new ()
+message_new (void)
 {
   Message *message;
 
@@ -1431,7 +1431,7 @@ message_body_unref (Message * message)
  * addresses
  */
 Address *
-address_new ()
+address_new (void)
 {
   Address *address;
 

@@ -1,3 +1,7 @@
+2000-09-06  Carlos Morgado  <chbm@chbm.nu>
+
+	* idl/balsa.idl: added new idl
+
 2000-09-06  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libinit_balsa/libinit.c: Add gdk_threads_{enter,leave} calls

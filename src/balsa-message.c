@@ -281,7 +281,8 @@ save_part(BalsaPartInfo * info)
     GtkWidget *save_dialog;
     GtkWidget *file_entry;
     gint button;
-
+    gboolean do_save, result;
+    
     g_return_if_fail(info != 0);
 
     save_dialog = gnome_dialog_new(_("Save MIME Part"),
@@ -315,31 +316,46 @@ save_part(BalsaPartInfo * info)
 
     /* button 0 == OK */
     if (button == 0) {
-
 	gtk_widget_hide(GTK_WIDGET(save_dialog));
 
-	filename =
-	    gtk_entry_get_text(GTK_ENTRY
-			       (gnome_file_entry_gtk_entry
-				(GNOME_FILE_ENTRY(file_entry))));
+	filename = gtk_entry_get_text(
+	    GTK_ENTRY(gnome_file_entry_gtk_entry
+		      (GNOME_FILE_ENTRY(file_entry))));
 
-	if (!libbalsa_message_body_save(info->body, NULL, filename)) {
-	    gchar *msg;
-	    GtkWidget *msgbox;
+	if ( access(filename, F_OK) == 0 ) {
+	    GtkWidget *confirm;
+	    gint b;
 
-	    msg =
-		g_strdup_printf(_(" Could not save %s:%s "), filename,
-				strerror(errno));
-
-	    msgbox =
-		gnome_error_dialog_parented(msg,
-					    GTK_WINDOW
-					    (balsa_app.main_window));
-
-	    g_free(msg);
-
-	    gnome_dialog_run_and_close(GNOME_DIALOG(msgbox));
-
+	    /* File exists. check if they really want to overright */
+	    confirm = gnome_question_dialog_modal_parented(
+		_("File already exists. Overwrite?"),
+		NULL, NULL, GTK_WINDOW(balsa_app.main_window));
+	    b = gnome_dialog_run_and_close(GNOME_DIALOG(confirm));
+	    if ( b == 0 )
+		do_save = TRUE;
+	    else
+		do_save = FALSE;
+	} else {
+	    do_save = TRUE;
+	}
+	
+	if ( do_save ) {
+	    result = libbalsa_message_body_save(info->body, NULL, filename);
+	    if (!result) {
+		gchar *msg;
+		GtkWidget *msgbox;
+		
+		msg = g_strdup_printf(_(" Could not save %s:%s "), 
+				      filename,
+				    strerror(errno));
+		
+		msgbox = gnome_error_dialog_parented(msg, GTK_WINDOW
+						     (balsa_app.main_window));
+		
+		g_free(msg);
+		
+		gnome_dialog_run_and_close(GNOME_DIALOG(msgbox));
+	    }
 	}
     }
 

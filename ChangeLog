@@ -1,3 +1,8 @@
+2000-12-15  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-message.c (save_part): If the file selected to save
+	the part to exists, ask user to confirm overrighing the file.
+
 2000-12-12  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/mailbox.[ch]: Remove LibBalsaMailboxType, since each

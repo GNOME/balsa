@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.10\n"
 "POT-Creation-Date: 2003-05-11 06:08+0800\n"
-"PO-Revision-Date: 2003-05-19 07:59+0800\n"
-"Last-Translator: Abel Cheung <maddog@linux.org.hk>\n"
+"PO-Revision-Date: 2002-04-12 22:56+0800\n"
+"Last-Translator: Joe Man <trmetal@yahoo.com.hk>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -68,12 +68,11 @@ msgstr "沒有錯誤"
 
 #: libbalsa/address-book.c:333
 msgid "Cannot read from address book"
-msgstr "無法載入通訊錄 %s"
+msgstr "無法讀取通訊錄"
 
 #: libbalsa/address-book.c:334
-#, fuzzy
 msgid "Cannot write to address book"
-msgstr "無法載入通訊錄 %s"
+msgstr "無法寫入通訊錄"
 
 #: libbalsa/address-book.c:335
 msgid "Cannot connect to server"
@@ -81,7 +80,7 @@ msgstr "無法連接至伺服器"
 
 #: libbalsa/address-book.c:336
 msgid "Cannot search in the address book"
-msgstr ""
+msgstr "無法在通訊錄中搜尋"
 
 #: libbalsa/address-book.c:338
 msgid "Cannot add duplicate entry"
@@ -105,7 +104,7 @@ msgstr "正規表示式格式錯誤"
 
 #: libbalsa/filter-error.c:49
 msgid "Attempt to apply an invalid filter"
-msgstr ""
+msgstr "嘗試使用無效的過濾條件"
 
 #: libbalsa/filter-file.c:440
 #, c-format
@@ -119,7 +118,7 @@ msgstr ""
 #: libbalsa/filter.c:477
 #, c-format
 msgid "Invalid filter: %s"
-msgstr ""
+msgstr "過濾條件無效：%s"
 
 #: libbalsa/filter.c:591 libbalsa/filter.c:610
 #, c-format
@@ -132,11 +131,11 @@ msgstr "複製郵件時發生錯誤"
 
 #: libbalsa/filter.c:603
 msgid "Error when trashing messages"
-msgstr ""
+msgstr "丟掉郵件時發生錯誤"
 
 #: libbalsa/filter.c:614
 msgid "Error when moving messages"
-msgstr ""
+msgstr "移動郵件時發生錯誤"
 
 # Don't translate Re: and Fwd: -- Abel
 #. should "re" be localized ?
@@ -196,58 +195,51 @@ msgstr "轉寄字句(_O)："
 
 #: libbalsa/identity.c:779
 msgid "Signature _Path:"
-msgstr ""
+msgstr "簽名檔路徑(_P)："
 
 #: libbalsa/identity.c:783
 msgid "_Execute Signature"
-msgstr ""
+msgstr "執行簽名檔中的內容(_E)"
 
 #: libbalsa/identity.c:786
 msgid "Incl_ude Signature"
-msgstr ""
+msgstr "包括簽名檔(_U)"
 
 #: libbalsa/identity.c:789
-#, fuzzy
 msgid "Include Signature When For_warding"
-msgstr "轉寄郵件時附加簽章"
+msgstr "轉寄郵件時附加簽名檔(_W)"
 
 #: libbalsa/identity.c:792
-#, fuzzy
 msgid "Include Signature When Rep_lying"
-msgstr "回覆郵件時附加簽章"
+msgstr "回覆郵件時附加簽名檔"
 
 #: libbalsa/identity.c:795
-#, fuzzy
 msgid "_Add Signature Separator"
-msgstr "包含簽章分隔線"
+msgstr "加入簽名檔分隔線(_A)"
 
 #: libbalsa/identity.c:798
-#, fuzzy
 msgid "Prepend Si_gnature"
-msgstr "在最前加入簽章"
+msgstr "簽名檔位於郵件最前部分(_G)"
 
 #: libbalsa/identity.c:803
 msgid "GPG sign by default"
-msgstr ""
+msgstr "預設使用 GPG 簽署"
 
 #: libbalsa/identity.c:809
 msgid "GPG encrypt by default"
 msgstr "預設以 GPG 加密"
 
 #: libbalsa/identity.c:944
-#, fuzzy
 msgid "Error: The identity does not have a name"
-msgstr "錯誤：必須要提供一個名稱給身分"
+msgstr "錯誤：該身分沒有名稱"
 
 #: libbalsa/identity.c:954
-#, fuzzy
 msgid "Error: An identity with that name already exists"
-msgstr "錯誤：相同名稱的身分已經存在"
+msgstr "錯誤：已經有一個相同名稱的身分存在"
 
 #: libbalsa/identity.c:1111
-#, fuzzy
 msgid "Do you really want to delete the selected identity?"
-msgstr "是否確定刪除選定的身分？"
+msgstr "是否確定刪除指定的身分？"
 
 #: libbalsa/identity.c:1144
 #, c-format
@@ -470,10 +462,10 @@ msgstr "無法開啟目的地郵箱 (%s) 寫入資料"
 msgid "Couldn't open destination mailbox (%s) for copying"
 msgstr "無法開啟目的地郵箱 (%s) 複製資料"
 
+# FIXME: Should this be translated? -- Abel
 #: libbalsa/message.c:1134
-#, fuzzy
 msgid "(No subject)"
-msgstr "(沒有主旨)"
+msgstr "(No subject)"
 
 #: libbalsa/mime.c:85 libbalsa/rfc3156.c:64
 msgid ""
@@ -942,7 +934,7 @@ msgstr "全選(_S)"
 
 #: libbalsa/source-viewer.c:47 src/main-window.c:514
 msgid "Select entire mail"
-msgstr "選取郵件的所有內容"
+msgstr "選取郵件的全部內容"
 
 #: libbalsa/source-viewer.c:100
 msgid "Message Source"
@@ -1203,7 +1195,7 @@ msgstr ""
 #: libmutt/handler.c:1821
 #, fuzzy
 msgid "Error: multipart/signed has no protocol."
-msgstr "錯誤：多重郵件/簽章部分，沒有指定通訊協定。"
+msgstr "錯誤：多重郵件/簽名檔部分，沒有指定通訊協定。"
 
 #: libmutt/handler.c:1834
 #, fuzzy
@@ -1281,7 +1273,7 @@ msgstr "SASL 認證失敗。"
 #: libmutt/imap/browse.c:85 libmutt/imap/imap.c:537
 #, c-format
 msgid "%s is an invalid IMAP path"
-msgstr ""
+msgstr "%s 是無效的 IMAP 郵箱路徑"
 
 #: libmutt/imap/browse.c:102
 msgid "Getting namespaces..."
@@ -2110,9 +2102,8 @@ msgid "T_oggle"
 msgstr "切換(_O)"
 
 #: src/balsa-index.c:1912
-#, fuzzy
 msgid "_Flagged"
-msgstr "標記"
+msgstr ""
 
 #: src/balsa-index.c:1915
 msgid "_Unread"
@@ -2289,7 +2280,6 @@ msgid "Subject: %s\n"
 msgstr "主旨：%s\n"
 
 #: src/balsa-message.c:1184
-#, fuzzy
 msgid "Send message to obtain this part"
 msgstr ""
 
@@ -2447,9 +2437,8 @@ msgid "Replied"
 msgstr "已回覆"
 
 #: src/filter-edit-callbacks.c:781 src/main-window.c:426
-#, fuzzy
 msgid "Flagged"
-msgstr "標記"
+msgstr ""
 
 #: src/filter-edit-callbacks.c:795
 msgid "One of the specified f_ields contains"
@@ -2491,9 +2480,8 @@ msgstr ""
 #. builds the toggle buttons to specify fields concerned by the conditions of
 #. * the filter
 #: src/filter-edit-callbacks.c:961
-#, fuzzy
 msgid "Match In"
-msgstr "尋找範圍："
+msgstr "搜尋範圍"
 
 #: src/filter-edit-callbacks.c:973
 msgid "_All"
@@ -2527,7 +2515,7 @@ msgstr "副本(_C)："
 
 #: src/filter-edit-callbacks.c:1026
 msgid "_User header:"
-msgstr ""
+msgstr "用戶自選標頭字串(_U)："
 
 #: src/filter-edit-callbacks.c:1050
 msgid "Search T_ype:"
@@ -2535,24 +2523,24 @@ msgstr "搜尋方式(_Y)："
 
 #: src/filter-edit-callbacks.c:1124
 msgid "Edit condition for filter: "
-msgstr ""
+msgstr "修改過濾條件："
 
 #: src/filter-edit-callbacks.c:1531
 msgid "New filter"
-msgstr ""
+msgstr "新增過濾條件"
 
 #: src/filter-edit-callbacks.c:1660
 msgid "No filter name specified."
-msgstr ""
+msgstr "未為過濾條件命名。"
 
 #: src/filter-edit-callbacks.c:1665
 #, c-format
 msgid "Filter \"%s\" already exists."
-msgstr ""
+msgstr "過濾條件“%s”已經存在。"
 
 #: src/filter-edit-callbacks.c:1678
 msgid "Filter must have conditions."
-msgstr ""
+msgstr "過濾條件沒有內容。"
 
 #: src/filter-edit-callbacks.c:1737
 msgid "Filter has matched"
@@ -2560,7 +2548,7 @@ msgstr ""
 
 #: src/filter-edit-callbacks.c:1755
 msgid "You must provide a sound to play"
-msgstr "您必須指定可播放的音效檔"
+msgstr "您必須指定準備播放的音效檔"
 
 #: src/filter-edit-callbacks.c:1886
 #, c-format
@@ -2619,7 +2607,7 @@ msgstr "新增(_N)"
 #. The name entry
 #: src/filter-edit-dialog.c:242
 msgid "_Filter name:"
-msgstr ""
+msgstr "過濾條件名稱(_F)："
 
 #. The filter op-code : "OR" or "AND" all the conditions
 #: src/filter-edit-dialog.c:258
@@ -2658,28 +2646,24 @@ msgid "Action to perform:"
 msgstr "進行："
 
 #: src/filter-edit-dialog.c:437
-#, fuzzy
 msgid "Match"
-msgstr "規則"
+msgstr "符合"
 
 #: src/filter-edit-dialog.c:440
-#, fuzzy
 msgid "Action"
-msgstr "處理"
+msgstr ""
 
 #: src/filter-edit-dialog.c:452
-#, fuzzy
 msgid "Revert"
-msgstr "復原"
+msgstr "還原"
 
 #: src/filter-edit-dialog.c:481
 msgid "A filter run dialog is open.Close it before you can modify filters."
 msgstr ""
 
 #: src/filter-edit-dialog.c:494
-#, fuzzy
 msgid "Balsa Filters"
-msgstr "郵件規則"
+msgstr "郵件過濾條件"
 
 #: src/filter-export-callbacks.c:55
 #, c-format
@@ -2693,9 +2677,8 @@ msgid ""
 msgstr ""
 
 #: src/filter-export-dialog.c:73
-#, fuzzy
 msgid "Balsa Filters Export"
-msgstr "郵件規則"
+msgstr "匯出 Balsa 郵件過濾條件"
 
 #: src/filter-run-callbacks.c:136
 msgid "Error when applying filters"
@@ -2718,18 +2701,16 @@ msgid ""
 msgstr ""
 
 #: src/filter-run-dialog.c:188
-#, fuzzy
 msgid "Balsa Filters of Mailbox: "
-msgstr "郵件規則"
+msgstr ""
 
 #: src/filter-run-dialog.c:229
-#, fuzzy
 msgid "On reception"
-msgstr "選項"
+msgstr "收到郵件時"
 
 #: src/filter-run-dialog.c:241
 msgid "On exit"
-msgstr "離開時"
+msgstr "程式結束時"
 
 #. up button
 #: src/filter-run-dialog.c:350
@@ -2950,7 +2931,7 @@ msgid ""
 "You may use \"New IMAP subfolder\" later to add a mailbox with this name.\n"
 "What would you like to do?"
 msgstr ""
-"這將會從您的 IMAP 伺服器內移除郵箱 %s 及內存的所有郵件。\n"
+"這將會從您的 IMAP 伺服器內移除郵箱 %s 及內存的全部郵件。\n"
 "若 %s 具有副資料夾，它仍會在這裡顯示為一個郵箱。\n"
 "日後可使用 \"新增 IMAP 副資料夾\" 重新加入這個名稱的郵箱。\n"
 "是否確定移除這個資料夾？"
@@ -3082,9 +3063,8 @@ msgid "_To"
 msgstr "收件者(_T)"
 
 #: src/mailbox-node.c:236
-#, fuzzy
 msgid "The folder edition to be written."
-msgstr "已寫入資料夾的版次。"
+msgstr ""
 
 #: src/mailbox-node.c:367
 #, c-format
@@ -3156,12 +3136,12 @@ msgstr "標示為垃圾桶(_T)"
 #: src/mailbox-node.c:946
 #, fuzzy
 msgid "Mark as D_raftbox"
-msgstr "標示為草稿"
+msgstr "標示為草稿(_R)"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
 #: src/mailbox-node.c:949
 msgid "_Edit/Apply filters"
-msgstr ""
+msgstr "修改/套用過濾條件(_E)"
 
 #: src/mailbox-node.c:1046
 #, c-format
@@ -3187,7 +3167,7 @@ msgstr "本機 mbox 郵箱..."
 
 #: src/main-window.c:250
 msgid "Add a new mbox style mailbox"
-msgstr "新增一個 mbox 類別的郵箱"
+msgstr "新增一個 mbox 格式的郵箱"
 
 #: src/main-window.c:254
 msgid "Local Maildir mailbox..."
@@ -3195,7 +3175,7 @@ msgstr "本機 Maildir 郵箱..."
 
 #: src/main-window.c:255
 msgid "Add a new Maildir style mailbox"
-msgstr "新增一個 Maildir 類別的郵箱"
+msgstr "新增一個 Maildir 格式的郵箱"
 
 #: src/main-window.c:259
 msgid "Local MH mailbox..."
@@ -3203,7 +3183,7 @@ msgstr "本機 MH 郵箱..."
 
 #: src/main-window.c:260
 msgid "Add a new MH style mailbox"
-msgstr "新增一個 MH 類別的郵箱"
+msgstr "新增一個 MH 格式的郵箱"
 
 #: src/main-window.c:264 src/pref-manager.c:2877
 msgid "Remote IMAP mailbox..."
@@ -3211,7 +3191,7 @@ msgstr "遠端 IMAP 郵箱..."
 
 #: src/main-window.c:265
 msgid "Add a new IMAP mailbox"
-msgstr "新增一個 IMAP 類別的郵箱"
+msgstr "新增一個 IMAP 郵箱"
 
 #: src/main-window.c:270 src/pref-manager.c:2882
 msgid "Remote IMAP folder..."
@@ -3278,19 +3258,16 @@ msgid "Open the address book"
 msgstr "開啟通訊錄"
 
 #: src/main-window.c:350
-#, fuzzy
 msgid "F_ilters..."
-msgstr "規則(_F)..."
+msgstr "過濾條件(_I)..."
 
 #: src/main-window.c:350
-#, fuzzy
 msgid "Manage filters"
-msgstr "規則管理"
+msgstr "管理過濾條件"
 
 #: src/main-window.c:352
-#, fuzzy
 msgid "_Export Filters"
-msgstr "規則(_F)..."
+msgstr "匯出過濾條件(_E)"
 
 #: src/main-window.c:352
 msgid "Export filters as Sieve scripts"
@@ -3318,7 +3295,7 @@ msgstr "所有標頭(_H)"
 
 #: src/main-window.c:363
 msgid "Display all headers"
-msgstr "顯示郵件的所有標頭資料"
+msgstr "顯示郵件中的所有標頭資料"
 
 #: src/main-window.c:370
 #, fuzzy
@@ -3351,24 +3328,20 @@ msgid "Elaborate JWZ threading"
 msgstr "用進階演算方式 (JWZ) 將有關連的郵件組合排序"
 
 #: src/main-window.c:393
-#, fuzzy
 msgid "_Show Mailbox Tree"
 msgstr "郵箱清單(_S)"
 
 #: src/main-window.c:394
-#, fuzzy
 msgid "Toggle display of mailbox and folder tree"
-msgstr "顯示 / 隱藏 郵箱清單窗格"
+msgstr ""
 
 #: src/main-window.c:397
-#, fuzzy
 msgid "Show Mailbox _Tabs"
-msgstr "郵箱標簽(_T)"
+msgstr "顯示郵箱分頁標籤(_T)"
 
 #: src/main-window.c:398
-#, fuzzy
 msgid "Toggle display of mailbox notebook tabs"
-msgstr "顯示 / 隱藏 郵箱的標簽"
+msgstr "切換是否顯示郵箱分頁的標籤"
 
 #: src/main-window.c:402 src/message-window.c:109
 msgid "_Wrap"
@@ -3383,23 +3356,20 @@ msgid "_Expand All"
 msgstr "全部展開(_E)"
 
 #: src/main-window.c:411
-#, fuzzy
 msgid "Expand all threads"
-msgstr "將所有有關連的郵件展開"
+msgstr ""
 
 #: src/main-window.c:415
 msgid "_Collapse All"
 msgstr "全部摺疊(_C)"
 
 #: src/main-window.c:416
-#, fuzzy
 msgid "Collapse all expanded threads"
-msgstr "將所有有關連的郵件摺疊"
+msgstr ""
 
 #: src/main-window.c:426
-#, fuzzy
 msgid "Toggle flagged"
-msgstr "標記 / 取消標記 目前選定的郵件"
+msgstr ""
 
 #: src/main-window.c:433
 msgid "New"
@@ -3432,20 +3402,19 @@ msgstr "回覆郵件給電郵論壇"
 
 #: src/main-window.c:468 src/message-window.c:135
 msgid "_Forward attached..."
-msgstr "附件轉寄(_F)..."
+msgstr "附件形式轉寄(_F)..."
 
 #: src/main-window.c:469
 msgid "Forward the current message as attachment"
 msgstr "以附件形式轉寄郵件"
 
 #: src/main-window.c:475
-#, fuzzy
 msgid "Forward _inline..."
-msgstr "回函轉寄..."
+msgstr "回函形式轉寄(_I)..."
 
 #: src/main-window.c:476
 msgid "Forward the current message inline"
-msgstr "轉寄目前郵件，並將原文加入到回函內"
+msgstr "轉寄目前郵件，並將原文加入至回函內"
 
 #: src/main-window.c:483 src/message-window.c:146
 msgid "Next Part"
@@ -3526,7 +3495,7 @@ msgstr "全選"
 
 #: src/main-window.c:585
 msgid "Select all messages in current mailbox"
-msgstr "選取這個郵箱內的所有郵件"
+msgstr "選取這個郵箱內的全部郵件"
 
 #: src/main-window.c:591
 msgid "_Edit..."
@@ -3574,11 +3543,11 @@ msgstr "將垃圾桶郵箱內的所有郵件移除"
 
 #: src/main-window.c:621
 msgid "Edit/Apply _Filters"
-msgstr ""
+msgstr "修改/套用過濾條件(_F)"
 
 #: src/main-window.c:622
 msgid "Filter the content of the selected mailbox"
-msgstr ""
+msgstr "過濾指定郵箱中的郵件內容"
 
 #: src/main-window.c:626
 msgid "_Remove Duplicates"
@@ -3688,7 +3657,7 @@ msgstr "主旨(_U)"
 
 #: src/main-window.c:2827
 msgid "You can apply filters only on mailbox\n"
-msgstr ""
+msgstr "您只能在郵箱中使用過濾條件\n"
 
 #: src/main-window.c:2871 src/main-window.c:2890
 #, c-format
@@ -3792,7 +3761,7 @@ msgstr "以回函方式轉寄這封郵件"
 
 #: src/message-window.c:176
 msgid "M_ove"
-msgstr ""
+msgstr "移動(_O)"
 
 #: src/pref-manager.c:326
 msgid "7 Bits"
@@ -3876,7 +3845,7 @@ msgstr "土耳其文"
 
 #: src/pref-manager.c:365
 msgid "nordic"
-msgstr ""
+msgstr "北歐"
 
 #: src/pref-manager.c:366
 msgid "thai"
@@ -3884,11 +3853,11 @@ msgstr "泰文"
 
 #: src/pref-manager.c:367
 msgid "baltic"
-msgstr ""
+msgstr "波羅的海語系"
 
 #: src/pref-manager.c:368
 msgid "celtic"
-msgstr ""
+msgstr "塞爾特語支"
 
 #: src/pref-manager.c:369
 msgid "west european (euro)"
@@ -3994,7 +3963,7 @@ msgstr "使用 TLS"
 
 #: src/pref-manager.c:1640
 msgid "Certificate Pass Phrase"
-msgstr ""
+msgstr "加密證書的密碼字串"
 
 #: src/pref-manager.c:1658
 msgid "Incoming"
@@ -4021,9 +3990,8 @@ msgid "Check INBOX _only"
 msgstr "只檢查收件匣(_O)"
 
 #: src/pref-manager.c:1717
-#, fuzzy
 msgid "Display message if new mail has arrived in an open mailbox"
-msgstr "當新郵件到達時顯示訊息"
+msgstr "當新郵件到達已開啟的郵箱時顯示訊息"
 
 #: src/pref-manager.c:1722
 msgid "Do background check quietly (no messages in status bar)"
@@ -4056,7 +4024,7 @@ msgstr ""
 
 #: src/pref-manager.c:1784
 msgid "prefer text/plain over html"
-msgstr ""
+msgstr "使用純文字而不用 html"
 
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
 #: src/pref-manager.c:1802
@@ -4073,9 +4041,8 @@ msgstr ""
 
 #. How to handle received MDN requests
 #: src/pref-manager.c:1849
-#, fuzzy
 msgid "Message Disposition Notification Requests"
-msgstr "讀取回條"
+msgstr ""
 
 #: src/pref-manager.c:1851
 msgid ""
@@ -4205,9 +4172,8 @@ msgid "Date encoding (for strftime):"
 msgstr "日期 (strftime 格式)："
 
 #: src/pref-manager.c:2120
-#, fuzzy
 msgid "Selected headers:"
-msgstr "標頭 (要顯示的欄位)："
+msgstr "指定的標頭："
 
 #: src/pref-manager.c:2122
 msgid "Message window title format:"
@@ -4238,18 +4204,17 @@ msgid "Mailbox Colors"
 msgstr "郵箱色彩"
 
 #: src/pref-manager.c:2192
-#, fuzzy
 msgid "Mailbox with unread messages color"
-msgstr "郵箱含有未閱讀郵件時的色彩"
+msgstr "郵箱含有未閱讀郵件時的顏色"
 
 #: src/pref-manager.c:2206
 msgid "Message Colors"
 msgstr "郵件色彩"
 
 #: src/pref-manager.c:2217
-#, fuzzy, c-format
+#, c-format
 msgid "Quote level %d color"
-msgstr "第 %d 層前文色彩"
+msgstr "第 %d 層前文的顏色"
 
 #: src/pref-manager.c:2237
 msgid "Link Color"
@@ -4260,9 +4225,8 @@ msgid "Hyperlink color"
 msgstr "網址鏈結色彩"
 
 #: src/pref-manager.c:2250
-#, fuzzy
 msgid "Composition Window"
-msgstr "撰寫郵件"
+msgstr "撰寫郵件視窗"
 
 #: src/pref-manager.c:2254
 msgid "Invalid or incomplete address label color"
@@ -4283,7 +4247,7 @@ msgstr "選取..."
 
 #: src/pref-manager.c:2304
 msgid "Message Font"
-msgstr "郵件內容字型"
+msgstr "郵件內文字型"
 
 #: src/pref-manager.c:2330
 msgid "Message Subject Font"
@@ -4319,14 +4283,12 @@ msgid "Miscellaneous Spelling Settings"
 msgstr "其它拼字設定"
 
 #: src/pref-manager.c:2481
-#, fuzzy
 msgid "Check signature"
-msgstr "檢查簽章內容"
+msgstr "檢查簽名檔內容"
 
 #: src/pref-manager.c:2482
-#, fuzzy
 msgid "Check quoted"
-msgstr "檢查前文內容"
+msgstr "檢查引用的郵件內容"
 
 #: src/pref-manager.c:2507
 msgid "Miscellaneous"
@@ -4341,18 +4303,16 @@ msgid "Empty Trash on exit"
 msgstr "離開程式時清理垃圾桶"
 
 #: src/pref-manager.c:2516
-#, fuzzy
 msgid "Automatically close mailbox if unused more than"
-msgstr "自動關閉郵箱，若存取郵箱動作停止超逾"
+msgstr "自動關閉郵箱，如果沒有存取郵箱超過："
 
 #: src/pref-manager.c:2538
-#, fuzzy
 msgid "Automatically commit mailbox if unused more than"
-msgstr "自動關閉郵箱，若存取郵箱動作停止超逾"
+msgstr "自動寫入郵箱內容，如果沒有存取郵箱超過："
 
 #: src/pref-manager.c:2555
 msgid "Drag-and-drop moves messages by default"
-msgstr "拖放郵件時，預設動作是移動郵件而不是複製郵件"
+msgstr "拖曳郵件時，預設動作是移動郵件而不是複製郵件"
 
 #: src/pref-manager.c:2566
 msgid "Deleting Messages"
@@ -4519,7 +4479,7 @@ msgstr "Balsa：郵件預覽列印"
 
 #: src/save-restore.c:564
 msgid "Error during filters loading: "
-msgstr ""
+msgstr "載入過濾條件時發生錯誤："
 
 #: src/save-restore.c:566
 #, c-format
@@ -4527,6 +4487,8 @@ msgid ""
 "Error during filters loading: %s\n"
 "Filters may not be correct."
 msgstr ""
+"載入過濾條件時發生錯誤：%s\n"
+"過濾條件可能有錯。"
 
 #: src/save-restore.c:677
 msgid "The option not to recognize \"format=flowed\" text has been removed."
@@ -4544,9 +4506,8 @@ msgid ""
 msgstr ""
 
 #: src/sendmsg-window.c:191
-#, fuzzy
 msgid "_Include File..."
-msgstr "寫入檔案(_I)..."
+msgstr "在內文加入檔案(_I)..."
 
 #: src/sendmsg-window.c:194
 msgid "_Attach File..."
@@ -4602,9 +4563,8 @@ msgid "_Wrap Body"
 msgstr "自動換行(_W)"
 
 #: src/sendmsg-window.c:249
-#, fuzzy
 msgid "Insert Si_gnature"
-msgstr "加入簽章(_S)"
+msgstr "在郵件中加入簽名檔(_G)"
 
 #: src/sendmsg-window.c:253
 msgid "_Quote Message(s)"
@@ -4676,7 +4636,7 @@ msgstr "關鍵字(_K)"
 
 #: src/sendmsg-window.c:329 src/sendmsg-window.c:400
 msgid "Brazilian"
-msgstr "巴西文"
+msgstr "葡萄牙文(巴西)"
 
 #: src/sendmsg-window.c:331 src/sendmsg-window.c:402
 msgid "Catalan"
@@ -4777,11 +4737,11 @@ msgstr "羅馬尼亞文"
 
 #: src/sendmsg-window.c:380 src/sendmsg-window.c:452
 msgid "Russian (ISO)"
-msgstr "俄文 (ISO)"
+msgstr "俄文(ISO)"
 
 #: src/sendmsg-window.c:382 src/sendmsg-window.c:454
 msgid "Russian (KOI)"
-msgstr "俄文 (KOI)"
+msgstr "俄文(KOI)"
 
 #: src/sendmsg-window.c:384 src/sendmsg-window.c:456
 msgid "Slovak"
@@ -4988,15 +4948,17 @@ msgstr "郵件編號：%s\n"
 msgid "References:"
 msgstr "連結附件：%s"
 
+# FIXME: Don't translate it, any non-Chinese would not understand it -- Abel
 #: src/sendmsg-window.c:2251
-#, fuzzy, c-format
+#, c-format
 msgid "On %s, %s wrote:\n"
-msgstr "%2$s 在 %1$s 撰寫：\n"
+msgstr "On %s, %s wrote:\n"
 
+# FIXME: Same as above -- Abel
 #: src/sendmsg-window.c:2253
 #, c-format
 msgid "%s wrote:\n"
-msgstr "%s 撰寫：\n"
+msgstr "%s wrote:\n"
 
 #: src/sendmsg-window.c:3059
 msgid "Choose charset"
@@ -5016,9 +4978,8 @@ msgid "Could not open the file %s.\n"
 msgstr "無法開啟檔案 %s。\n"
 
 #: src/sendmsg-window.c:3153
-#, fuzzy
 msgid "Include file"
-msgstr "寫入檔案"
+msgstr ""
 
 #: src/sendmsg-window.c:3409
 #, c-format
@@ -5042,22 +5003,22 @@ msgstr ""
 #: src/sendmsg-window.c:4283
 #, c-format
 msgid "Reply to %s: %s"
-msgstr ""
+msgstr "回覆 %s：%s"
 
 #: src/sendmsg-window.c:4288
-#, fuzzy, c-format
+#, c-format
 msgid "Forward message to %s: %s"
-msgstr "轉寄郵件"
+msgstr "轉寄郵件給 %s：%s"
 
 #: src/sendmsg-window.c:4292
-#, fuzzy, c-format
+#, c-format
 msgid "Continue message to %s: %s"
-msgstr "繼續撰寫未完成郵件"
+msgstr "繼續撰寫未完成的郵件給 %s：%s"
 
 #: src/sendmsg-window.c:4296
-#, fuzzy, c-format
+#, c-format
 msgid "New message to %s: %s"
-msgstr "撰寫新郵件"
+msgstr "撰寫新郵件給 %s：%s"
 
 #: src/spell-check.c:509
 msgid "Replace the current word with the selected suggestion"
@@ -5094,15 +5055,15 @@ msgstr "拼字檢查"
 
 #: src/store-address.c:101
 msgid "Store address: no addresses"
-msgstr ""
+msgstr "儲存郵件地址：沒有地址"
 
 #: src/store-address.c:177
 msgid "Store Address"
-msgstr "紀錄郵址"
+msgstr "儲存郵件地址"
 
 #: src/store-address.c:192
 msgid "Save this address and close the dialog?"
-msgstr ""
+msgstr "是否儲存這個地址，然後關閉對話方塊？"
 
 #: src/store-address.c:209
 msgid "No address book selected...."
@@ -5118,11 +5079,11 @@ msgstr "選取通訊錄"
 
 #: src/store-address.c:310
 msgid "Choose Address"
-msgstr ""
+msgstr "選取郵件地址"
 
 #: src/store-address.c:356
 msgid "_Displayed Name:"
-msgstr ""
+msgstr "實際顯示的名稱(_D)："
 
 #: src/store-address.c:357
 msgid "_First Name:"
@@ -5226,7 +5187,7 @@ msgid ""
 "unread"
 msgstr ""
 "下封\n"
-"新件"
+"新郵件"
 
 #: src/toolbar-factory.c:111
 msgid "Open next unread message"
@@ -5237,8 +5198,8 @@ msgid ""
 "Next\n"
 "flagged"
 msgstr ""
-"下封\n"
-"標記"
+"下封標\n"
+"記郵件"
 
 #: src/toolbar-factory.c:113
 msgid "Open next flagged message"
@@ -5406,9 +5367,9 @@ msgid "_Wrap button labels"
 msgstr "按鈕文字可以換行(_W)"
 
 #: src/toolbar-prefs.c:376
-#, fuzzy, c-format
+#, c-format
 msgid "Error displaying toolbar help: %s\n"
-msgstr "從 %s 接收資料時發生錯誤：%s"
+msgstr ""
 
 #. Preview display
 #: src/toolbar-prefs.c:410
@@ -5449,20 +5410,8 @@ msgstr "下"
 #~ msgid "_Select All"
 #~ msgstr "全選(_S)"
 
-#~ msgid "Date: %s\n"
-#~ msgstr "日期：%s\n"
-
-#~ msgid "From: %s\n"
-#~ msgstr "寄件者：%s\n"
-
-#~ msgid "To: %s\n"
-#~ msgstr "收件者：%s\n"
-
-#~ msgid "CC: %s\n"
-#~ msgstr "副本：%s\n"
-
 #~ msgid "Delete messages from the trash mailbox"
-#~ msgstr "刪除在垃圾桶內的所有郵件"
+#~ msgstr "刪除在垃圾桶內的全部郵件"
 
 #~ msgid "Customize"
 #~ msgstr "自訂工具列"
@@ -5503,12 +5452,6 @@ msgstr "下"
 #~ msgid "Delete"
 #~ msgstr "刪除"
 
-#~ msgid "Do"
-#~ msgstr "需要"
-
-#~ msgid "Do Not"
-#~ msgstr "不要"
-
 #~ msgid "Source mailbox (%s) is readonly. Cannot move message"
 #~ msgstr "來源郵箱 (%s) 是唯讀的。無法移動郵件"
 
@@ -5517,12 +5460,6 @@ msgstr "下"
 
 #~ msgid "[-- name: %s --]\n"
 #~ msgstr "[-- 檔案名稱：%s --]\n"
-
-#~ msgid "This certificate accepted but not verified !!!"
-#~ msgstr "已接受這份憑證，但尚未驗証確實！！！"
-
-#~ msgid "Connecting with \"%s\"..."
-#~ msgstr "正在使用 \"%s\" 進行連線..."
 
 #~ msgid "Tunnel error talking to %s: %s"
 #~ msgstr "從 %s 接收資料時發生錯誤：%s"
@@ -5538,9 +5475,6 @@ msgstr "下"
 
 #~ msgid "Store Address..."
 #~ msgstr "紀錄郵址..."
-
-#~ msgid "Undelete"
-#~ msgstr "復原"
 
 #~ msgid "Folder"
 #~ msgstr "資料夾"
@@ -5559,18 +5493,6 @@ msgstr "下"
 
 #~ msgid "OK"
 #~ msgstr "確定"
-
-#~ msgid "Text"
-#~ msgstr "文字"
-
-#~ msgid "Icons"
-#~ msgstr "圖示"
-
-#~ msgid "Both"
-#~ msgstr "圖文"
-
-#~ msgid "Yes"
-#~ msgstr "是"
 
 #~ msgid "Preview Font"
 #~ msgstr "郵件字型"
@@ -5618,7 +5540,7 @@ msgstr "下"
 #~ msgstr "紀錄名稱："
 
 #~ msgid "Append Signature"
-#~ msgstr "附加簽章"
+#~ msgstr "附加簽名檔"
 
 #~ msgid "Could not load image. It is most likely corrupted."
 #~ msgstr "無法載入圖像。檔案應該已經損毀。"

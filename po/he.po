@@ -588,7 +588,7 @@ msgid "gpgme could not create new data object: %s"
 msgstr "gpgme אינו יכול ליצור אובייקט נתונים׃ %s"
 
 #: libbalsa/rfc3156.c:578
-#, c-format
+#, fuzzy, c-format
 msgid "gpgme decryption failed: %s"
 msgstr "פיענוח על-ידי gpgme נכשל׃"
 
@@ -863,7 +863,7 @@ msgid ""
 msgstr ""
 
 #: libbalsa/send.c:836
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "Relaying refused:\n"
 "%d: %s\n"
@@ -1923,22 +1923,22 @@ msgid "_Add"
 msgstr "_הוסף"
 
 #: src/address-book-config.c:652
-#, c-format
+#, fuzzy, c-format
 msgid "The address book file path \"%s\" is not correct. %s"
 msgstr "המסלול אל קובץ ספר הטלפונים׃ \"%s\" שגוי."
 
 #: src/address-book-config.c:655
-#, c-format
+#, fuzzy, c-format
 msgid "The load program path \"%s\" is not correct. %s"
 msgstr "המסלול אל תוכנת הטעינה׃ \"%s\" שגוי."
 
 #: src/address-book-config.c:658
-#, c-format
+#, fuzzy, c-format
 msgid "The save program path \"%s\" is not correct. %s"
 msgstr "המסלול אל תוכנת השמירה׃ \"%s\" שגוי."
 
 #: src/address-book-config.c:661
-#, c-format
+#, fuzzy, c-format
 msgid "The path \"%s\" is not correct. %s"
 msgstr "המסלול׃ \"%s\" שגוי."
 

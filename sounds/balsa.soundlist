@@ -1,6 +1,12 @@
 [__section_info__]
 description=Balsa E-mail reader
+description[es]=Lector de correo Balsa
+description[fr]=Lecteur de courrier Balsa
+description[wa]=Manaedjeu d' emilaedjes Balsa
 
 [startup]
 file=balsa/startup.wav
 description=Program startup
+description[es]=Inicio del programa
+description[fr]=Démarrage du programme
+description[wa]=Enondaedje do programe

@@ -1,6 +1,12 @@
 [__section_info__]
 description=E-mail
+description[es]=Correo-E
+description[fr]=Courrier éléctronique
+description[wa]=Emilaedje
 
 [newmail]
 file=balsa/newmail.wav
 description=New mail notification
+description[es]=Llegada de un nuevo mensaje
+description[fr]=Notification de nouveaux messages
+description[wa]=Vos avoz des noveas emiles

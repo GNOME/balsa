@@ -24,6 +24,7 @@
 
 #include <string.h>
 #include <glib.h>
+#include <unistd.h>
 
 #include "libbalsa.h"
 #include "mailbackend.h"

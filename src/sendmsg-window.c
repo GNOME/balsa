@@ -38,6 +38,7 @@
 
 #include "libbalsa.h"
 
+#include <locale.h>
 #include <stdio.h>
 #include <string.h>
 #include <gnome.h>

@@ -1,3 +1,12 @@
+2002-08-05  Pawel Salek <pawsa@theochem.kth.se>
+	Make stuff compile under autoconf 2.53
+	* autogen.sh: add --intl to gettextize
+	* configure.in: missing checks and templates.
+	* help/C/Makefile.am: disabled help rebuilding on error.
+	* libbalsa/{body,malbox,mailbox_local,mailbox_pop3,message}.c:
+	missing includes.
+	* src/sendmsg-window.c: same.
+	
 2002-08-02  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/filter-file.c: remove redundant #include.

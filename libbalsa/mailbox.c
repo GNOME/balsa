@@ -22,6 +22,7 @@
 #include "config.h"
 
 #include <ctype.h>
+#include <unistd.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>

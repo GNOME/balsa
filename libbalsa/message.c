@@ -33,8 +33,9 @@
 #include "config.h"
 
 #include <ctype.h>
-
 #include <glib.h>
+#include <unistd.h>
+
 #include <libgnome/gnome-defs.h>
 #include <libgnome/gnome-i18n.h> 
 

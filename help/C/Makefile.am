@@ -30,7 +30,7 @@ index.html: $(SGML_FILES)
 	else 						\
 		db2html balsa.sgml; 	\
 	fi
-	-cp balsa/index.html index.html
+	-cp balsa/index.html index.html || touch index.html
 
 epsimages: $(MANUAL_IMAGES)
 

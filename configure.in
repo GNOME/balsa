@@ -42,7 +42,6 @@ AC_STDC_HEADERS
 AC_PROG_YACC
 AM_PROG_LIBTOOL
 
-
 AM_PATH_GLIB([1.2.0],[],[
 	AC_MSG_ERROR([You need GLib installed -- GNOME requires this as well.])
 ],gthread)
@@ -82,6 +81,7 @@ dnl ###########################################################################
 AC_CHECK_HEADERS(libgnomeui/gnome-window-icon.h)
 AC_SUBST(HAVE_LIBGNOMEUI_GNOME_WINDOW_ICON_H)
 
+AC_CHECK_HEADERS(locale.h)
 dnl ###########################################################################
 dnl Check for gnome database manager header
 dnl ###########################################################################
@@ -93,7 +93,8 @@ dnl Check for gnome-print
 dnl ###########################################################################
 
 AM_PATH_GNOME_PRINT([0.25.0], [
-	AC_DEFINE(HAVE_GNOME_PRINT)
+	AC_DEFINE(HAVE_GNOME_PRINT,1,
+                  [Define whether printing support should be enabled.])
 	printing_support=yes
 	gnome_libs="$gnome_libs print"
 ], [ 
@@ -107,7 +108,6 @@ dnl ###########################################################################
 
 ALL_LINGUAS="az bg ca cs da de en_GB el es et fi fr ga hu it ja ko lt ms nl no nn pl pt pt_BR ro ru sk sl sv tr uk vi wa zh_CN zh_TW"
 LINGUAS="$ALL_LINGUAS"
-AM_GNOME_GETTEXT
 
 dnl ###########################################################################
 dnl Substitutions, defines, part I
@@ -120,10 +120,10 @@ AC_SUBST(LDFLAGS)
 dnl No choice about this
 gnome_cv_use_gnome=yes
 
-AC_DEFINE_UNQUOTED(BALSA_MAJOR, $BALSA_MAJOR)
-AC_DEFINE_UNQUOTED(BALSA_REVISION, $BALSA_REVISION)
-AC_DEFINE_UNQUOTED(BALSA_PATCHLEVEL, $BALSA_PATCHLEVEL)
-AC_DEFINE_UNQUOTED(BALSA_VERSION, "$BALSA_VERSION")
+AC_DEFINE_UNQUOTED(BALSA_MAJOR, $BALSA_MAJOR, [ major version number ])
+AC_DEFINE_UNQUOTED(BALSA_REVISION, $BALSA_REVISION, [ revision number ])
+AC_DEFINE_UNQUOTED(BALSA_PATCHLEVEL, $BALSA_PATCHLEVEL, [ patch level ])
+AC_DEFINE_UNQUOTED(BALSA_VERSION, "$BALSA_VERSION", [ complete version number])
 
 dnl ###########################################################################
 dnl More checks
@@ -140,10 +140,11 @@ AC_MSG_CHECKING([for isblank])
 AC_TRY_LINK( [#include <ctype.h>], [return isblank('a');],
 	     AC_MSG_RESULT(yes),
 	     [AC_MSG_RESULT(no)
-	      AC_DEFINE(isblank,isspace)] )
+	      AC_DEFINE(isblank,isspace,
+                   [Define if isspace should be used instead of isblank.])] )
 
-AM_HDR_SIGACTION
-AM_HDR_SIGSET
+dnl AM_HDR_SIGACTION
+dnl AM_HDR_SIGSET
 
 dnl ###########################################################################
 dnl ORBit support
@@ -166,7 +167,6 @@ AC_SUBST(BALSA_PATCHLEVEL)
 AC_SUBST(BALSA_RELEASE)
 AC_SUBST(BALSA_VERSION)
 
-AC_SUBST(LIBOBJS)
 AC_SUBST(LIBESD_LIB)
 
 dnl ###########################################################################
@@ -187,7 +187,8 @@ if test x"$use_threads" = xyes ; then
 		THREAD_LIBS=`$GLIB_CONFIG --libs gthread`
 		CFLAGS="$CFLAGS $THREAD_CFLAGS"
 		LIBS="$LIBS $THREAD_LIBS"
-		AC_DEFINE(BALSA_USE_THREADS,1)
+		AC_DEFINE(BALSA_USE_THREADS,1, 
+		[ define if balsa should use threads.])
 	else
 		AC_MSG_ERROR([Balsa requires GThread from GLib to use threading.])
 	fi
@@ -208,7 +209,7 @@ if test x"$use_gnome_vfs" = xyes ; then
     if gnome-config --libs vfs > /dev/null 2>&1; then
 	AC_MSG_RESULT(yes)
 	gnome_libs="$gnome_libs vfs oaf"
-	AC_DEFINE(HAVE_GNOME_VFS)
+	AC_DEFINE(HAVE_GNOME_VFS,1,[Define whether GNOME VFS is available.])
     else
 	AC_MSG_RESULT(no)
 	AC_MSG_RESULT([Gnome-VFS(-devel) library is not available.  It is highly])
@@ -258,7 +259,7 @@ if test x"$check_gtkhtml" = xyes ; then
 	if test x"$have_gtkhtml" = xyes ; then
 	       	AC_MSG_RESULT(yes)
 		gnome_libs="$gnome_libs gtkhtml"
-		AC_DEFINE(HAVE_GTKHTML)
+		AC_DEFINE(HAVE_GTKHTML,1,[Define if GtkHtml should be used.])
 	else
 	        AC_MSG_RESULT(not found)
 	fi
@@ -320,12 +321,18 @@ EOF
 `
 
 dnl Better way to do this?
-AC_DEFINE_UNQUOTED( BALSA_STD_PREFIX, "$BALSA_STD_PREFIX" )
-AC_DEFINE_UNQUOTED( BALSA_DATA_PREFIX, "$BALSA_DATA_PREFIX" )
-AC_DEFINE_UNQUOTED( GNOME_STD_PREFIX, "$GNOME_STD_PREFIX" )
-AC_DEFINE_UNQUOTED( GNOME_LIB_PREFIX, "$GNOME_LIB_PREFIX" )
-AC_DEFINE_UNQUOTED( GNOME_DATA_PREFIX, "$GNOME_DATA_PREFIX" )
-AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES` ) 
+AC_DEFINE_UNQUOTED( BALSA_STD_PREFIX, "$BALSA_STD_PREFIX", 
+		    [ standard directory prefix ])
+AC_DEFINE_UNQUOTED( BALSA_DATA_PREFIX, "$BALSA_DATA_PREFIX", 
+		    [ directory prefix for storing data files ] )
+AC_DEFINE_UNQUOTED( GNOME_STD_PREFIX, "$GNOME_STD_PREFIX",
+                    [GNOME standard prefix.] )
+AC_DEFINE_UNQUOTED( GNOME_LIB_PREFIX, "$GNOME_LIB_PREFIX",
+                    [GNOME library prefix.] )
+AC_DEFINE_UNQUOTED( GNOME_DATA_PREFIX, "$GNOME_DATA_PREFIX", 
+                    [GNOME data directory.] )
+AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES`,
+                    [Common file prefixes.] ) 
 dnl bleah
 
 dnl #########################################################################
@@ -341,7 +348,10 @@ AC_ARG_ENABLE([ldap], [  --enable-ldap           Use OpenLDAP if available [defa
 AC_MSG_CHECKING(whether to use LDAP)
 if test x"$use_ldap" = xyes ; then
 	AC_MSG_RESULT([yes])
-	AC_CHECK_LIB(ldap, ldap_search, AC_DEFINE(ENABLE_LDAP) LIBS="-lldap -llber -lresolv $LIBS", AC_MSG_ERROR([*** You enabled LDAP but ldap library is not found.]), -llber -lresolv)
+	AC_CHECK_LIB(ldap, ldap_search, 
+             AC_DEFINE(ENABLE_LDAP,1,
+                       [Define if LDAP address books should be enabled])
+             LIBS="-lldap -llber -lresolv $LIBS", AC_MSG_ERROR([*** You enabled LDAP but ldap library is not found.]), -llber -lresolv)
 else
 	AC_MSG_RESULT([no])
 fi
@@ -363,13 +373,16 @@ if test "x$with_esmtp" != xno  ; then
     test "$with_esmtp" != yes && LIBS="$LIBS -L$with_esmtp/lib"
     AC_CHECK_LIB(esmtp, smtp_start_session, LIBS="$LIBS -lesmtp -lpthread",
 	AC_MSG_ERROR([*** You enabled ESMTP but esmtp library is not found.]))
-    AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients, AC_DEFINE(ENABLE_ESMTP),
+    AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients, 
+                 AC_DEFINE(ENABLE_ESMTP,1,
+                           [Define if ESMTP support is to be enabled.]),
 	AC_MSG_ERROR([*** You enabled ESMTP but esmtp library doesn't support
 	    'require_all_recipients'. Please get a Balsa aware
 	    libESMTP from http://balsa.gnome.org/main.html or compile
 	    libESMTP with './configure --enable-require-all-recipients'.]))
     AC_CHECK_LIB(esmtp, smtp_starttls_set_password_cb,
-	AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE))
+	AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE,1,
+                  [Define if support for TLS client certificate is to be enabled.]))
     AC_CHECK_HEADER(libesmtp.h, ,
         	AC_MSG_ERROR([*** You enabled ESMTP but libestmp.h header
             is not found. Either it is installed in a not standard location
@@ -452,7 +465,8 @@ if test x"$check_pcre" = xyes ; then
 	       	AC_MSG_RESULT(yes)
 		CFLAGS="$CFLAGS `pcre-config --cflags-posix`"
 		LIBS="$LIBS `pcre-config --libs-posix`"
-		AC_DEFINE(HAVE_PCRE)
+		AC_DEFINE(HAVE_PCRE,1,
+		[Define if Perl Regular expressions library is to be used.])
 	else
 	        AC_MSG_RESULT(not found)
 	fi
@@ -514,7 +528,8 @@ if test "x$with_ssl" != xno; then
 		CPPFLAGS="-I${ssldir}/include $CPPFLAGS"
 	fi
 	ac_cv_path_openssl=$ssldir
-	AC_DEFINE(USE_SSL)
+	AC_DEFINE(USE_SSL,1,
+                  [Define if SSL connection encryption should be compiled.])
    fi
 else
    AC_MSG_RESULT(no)
@@ -579,26 +594,53 @@ else
 	BALSA_FROM_CVS=no
 fi
 
+dnl ########################################################################
+dnl some gnome configure scripts add -I/usr/include to CFLAGS that
+dnl triggers a gcc warning.
+dnl ########################################################################
+CFLAGS=`echo $CFLAGS | sed 's,-I/usr/include ,,g'`
+
 AC_MSG_CHECKING([for CVS information])
 AC_MSG_RESULT($BALSA_FROM_CVS)
+
+dnl  ########################################################################
+dnl older autoconf packages forget to define USE_NLS and INTLLIBS, 
+dnl take care of it.
+dnl  ########################################################################
+if test "$USE_INCLUDED_LIBINTL" = "" ; then
+   USE_INCLUDED_LIBINTL=no
+   BUILD_INCLUDED_LIBINTL=no
+   INTLLIBS=""
+fi
+
+AC_SUBST(USE_INCLUDED_LIBINTL)
+AC_SUBST(BUILD_INCLUDED_LIBINTL)
+AC_SUBST(INTLLIBS)
+
+if test "$USE_NLS" = ""; then
+  USE_NLS=no
+fi
+AC_SUBST(USE_NLS)
 
 dnl ##########################################################################
 dnl Create files.
 dnl ##########################################################################
+AM_PO_SUBDIRS(po) 
 
 AC_OUTPUT([
 Makefile
 balsa.1
 balsa.spec
-po/Makefile.in
-macros/Makefile
-intl/Makefile
-sounds/Makefile
-images/Makefile
-help/Makefile
 help/C/Makefile
+help/Makefile
+images/Makefile
+intl/Makefile
 libbalsa/Makefile
 libinit_balsa/Makefile
+macros/Makefile
+po/Makefile
+po/Makefile.in
+sounds/Makefile
 src/Makefile
 ])
 

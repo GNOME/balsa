@@ -864,6 +864,7 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
               LibBalsaCondition *condition, GList *exclude,
 	      gboolean threaded)
 {
+#if 1
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
     GtkTreePath *path;
@@ -929,6 +930,7 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
         return bndx_find_row(index, pos, TRUE, flag, condition,
                              exclude, threaded);
     return found;
+#else
     LibBalsaCondition cond_flag, cond_and;
     cond_flag.negate      = FALSE;
     cond_flag.type        = CONDITION_FLAG;
@@ -940,6 +942,7 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
     
     return  libbalsa_mailbox_find(index->mailbox_node->mailbox, pos,
                                   !reverse_search, &cond_and, exclude);
+#endif
 }
 
 static gboolean

@@ -2,7 +2,8 @@
 
 	* README, NEWS, configure.in: well deserved 1.2.0 release.
 	* src/sendmsg-window.c: hush gtk_file_selection warnings whenever
-	possible (fixed for gtk+-1.2.9, remains for gtk+-1.2.10).
+	possible (fixed for gtk+-1.2.9, remains for gtk+-1.2.10). 
+	Fix memory leaks (Peter Bloomfield).
 	
 2001-09-17  Pawel Salek  <pawsa@theochem.kth.se>
 

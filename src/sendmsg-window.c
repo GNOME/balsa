@@ -1930,24 +1930,26 @@ static gboolean
 is_ready_to_send(BalsaSendmsg * bsmsg)
 {
     GList* list = NULL;
+    GList* l;
     gchar *tmp;
     size_t len;
 
     list = g_list_append(list, gtk_entry_get_text(GTK_ENTRY(bsmsg->to[1])));
-    list = g_list_append(list, gtk_entry_get_text(GTK_ENTRY(bsmsg->from[1])));
+    l = list =
+        g_list_append(list, gtk_entry_get_text(GTK_ENTRY(bsmsg->from[1])));
 
     while (list) {
         tmp = (gchar*) list->data;
         len = strlen(tmp);
         
         if (len < 1) {		/* empty */
-            g_list_free(list);
+            g_list_free(l);
             return FALSE;
         }
         
 
         if (tmp[len - 1] == '@') {	/* this shouldn't happen */
-            g_list_free(list);
+            g_list_free(l);
             return FALSE;
         }
         
@@ -1955,7 +1957,7 @@ is_ready_to_send(BalsaSendmsg * bsmsg)
             if (strchr(tmp, '@')) {	
                 /* you won't have an @ in an address less than 4
                    characters */
-                g_list_free(list);
+                g_list_free(l);
                 return FALSE;
             }
             
@@ -1965,7 +1967,7 @@ is_ready_to_send(BalsaSendmsg * bsmsg)
         list = g_list_next(list);
     }
     
-    g_list_free(list);
+    g_list_free(l);
     return TRUE;
 }
 

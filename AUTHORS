@@ -1,16 +1,17 @@
-Versions 1.1.x:
+Versions 1.1.x and 1.2.0:
         Ian Campbell            <ijc@hellion.org.uk>
         Matthew Guenther        <mguenthe@attcanada.ca>
         Carlos Morgado          <chbm@chbm.nu>
         Pawel Salek             <pawsa@theochem.kth.se>
 
 	patch contributors and helping souls[*]:
-        Berend De Schouwer      <bds@jhb.ucs.co.za>
-        Stuart Parmenter	<pavlov@netscape.com>
-        Peter Bloomfield	<bloomfld@eos.ncsu.edu>
-        Peter Williams          <peter@newton.cx>
+        Peter Bloomfield	<PeterBloomfield@MindSpring.com>
         Albrecht Dreﬂ           <albrecht.dress@arcormail.de>
+        Berend De Schouwer      <bds@jhb.ucs.co.za>
         rached ben mustapha     <rbenmustapha@cvf.fr>
+        Stuart Parmenter	<pavlov@netscape.com>
+	Melanie Thielker 	<balsa@t-data.com>
+        Peter Williams          <peter@newton.cx>
 	and many others...
 
 Version 0.9.x and 1.0.0:

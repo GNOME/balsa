@@ -1,90 +1,5 @@
 TODO LIST:
 
-Fix/update/make-sure-they-work:
--------------------------------
-- [MOSTLY] POP3
-- [PARTIAL] IMAP
-- [MOSTLY] balsa-init
-- inbox/outbox/trash should be able to be IMAP.
-
-
-New features/unfinished things:
--------------------------------
-- [PARTIAL] Filters
-- [PARTIAL] CORBA
-- [MOSTLY] update libmutt
-- Check mail using external programs such as fetchmail
-
-
-UI:
----
-- [DONE] Message threading
-
-- Incorporate use of GNOME Docklet to indicate status of unread mail,
-status, etc.
-
-- [PARTIAL] finish move and copy
-
-- [DONE] DND messages into mailboxes
- 	- [DONE] Attachments in new mail
-     	- [DONE] move/copy messages via DND
-       		- [DONE] move
-       		- [DONE] copy
-
-- Fix mailbox creation/manipulation
-	- Add option to select type of desired local 
-	mailbox (mbox, Maildir,...)
-	- Should be able to put mailbox in subdirectories
-
-- [MOSTLY] MIME supporting icons.  use the new gnome metadata stuff
-that gmc uses?
-	- [DONE] Use mime icons for attachments for incoming &
-	outgoing messages
-	- Index attachment indicator should have a different icon
-	depending on the mime category (text/*, application/*,
-	image/*, etc.)
-
-- [PARTIAL] New mail notification
-	- [PARTIAL] via sound
-     	- change icon window in case Balsa is minimized to a different icon
-
-- [MOSTLY] sending mail (code is awful, redo.  make useful for corba
-  idl, support external editors)
-
-- [DONE] auto-open mailboxes on startup
-
-- [PARTIAL] Make things optional:
-	- inline images (on by default)
-     	- [DONE] check for new mail every xx minutes
-     	- load mail from local mail directory
-
-- [MOSTLY] Spell checking in the send window.
-	- [DONE] Improve next word heuristics (don't check quoted
-	text)
-	- [DONE] Implement "Change All" button
-	- [DONE] Error handling (from pspell and widget)
-	- [DONE] Destroy signal handler
-	- [DONE] configure.in magic to check for pspell 
-	- [DONE] Fix language selection
-	- Keep ignored words until message is sent or postponed
-	- Fix highlight colour, avoid potential theme conflict
-	- Automatically determine which modules are available
-	- Automatically determine which languages are available, 
-	highlight menu selections.
-
-- [DONE] menu and toolbar for message-window
-
-- [PARTIAL] Filtering
-	- Filter upon receipt of messages
-	- Filter can be applied manually to contents of mailbox at any
-	time (for fetchmail setups).
-	- Message search code should be able to share filter code.
-	- Virtual folders?  Probably require some form of mailbox
-	indexing system
-	
-- Split Preferences window into several more managable chunks.
-
-
 Milestone 1.4 targets:
 ----------------------
 - Merge upcoming stable mutt into libmutt
@@ -92,3 +7,22 @@ Milestone 1.4 targets:
 - have pop3 mailbox indexes on servers that support it
 - split server/mailbox configuration logically, redo secure connection 
   settings
+- decent mailing list support at address book and alias expansion levels.
+  (LDIF/LDAP seems to be the most apriopriate file format).
+
+New features/unfinished things:
+-------------------------------
+- [PARTIAL] Filters (patches semi-ready)
+- [PARTIAL] CORBA (for intelligent handling of multiple instances of balsa).
+- IMAP - update message flags immediately. Client-side caching
+- migrate to gnome-vfs, currently used gnome-mime is buggy.
+
+UI:
+---
+- Incorporate use of GNOME Docklet to indicate status of unread mail,
+status, etc.
+
+- inline images (patch in bugzilla)
+	
+- Split Preferences window into several more managable chunks.
+

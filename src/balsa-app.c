@@ -176,8 +176,15 @@ read_signature (void)
   if (!(fp = fopen (balsa_app.signature_path, "r")))
     return FALSE;
   len = readfile (fp, &balsa_app.signature);
-  if (len != 0)
-    balsa_app.signature[len - 1] = '\0';
+  if (len != 0) {
+/*    balsa_app.signature[len - 1] = '\0'; This may strip the last 
+      character of the user's sig if it does not end with a newline.
+ */
+      if( balsa_app.signature[len - 1] == '\n' ) 
+	  balsa_app.signature[len - 1] = '\0';
+      else
+	  balsa_app.signature[len] = '\0';
+  }
   fclose (fp);
   return TRUE;
 }

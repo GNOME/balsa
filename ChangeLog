@@ -1,3 +1,8 @@
+2003-03-06  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/filter.c: utf8-aware filtering.
+	* libbalsa/pop3.c: better UI feedback of the dowload progress.
+
 2003-03-04 11:26  PeterB
 
 	* libbalsa/misc.c: Fix infinite loop when not wrapping.

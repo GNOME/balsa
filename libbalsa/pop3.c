@@ -419,7 +419,7 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
     time_t last_update_time = time(NULL);
     char threadbuf[160];    
     sprintf(threadbuf, _("Retrieving Message %d of %d"), msgno, msgs);
-    prog_cb (prog_data, threadbuf, 0, 0);
+    prog_cb (prog_data, threadbuf, *num_bytes, tot_bytes);
 
     DM("POP3: fetching message %d", msgno);
     /* Now read the actual message. */

@@ -67,10 +67,12 @@ libbalsa_filters_set_filter_list(GSList** list)
 
 /* FIXME : filtering takes time, we should notify progress to user */
 
-/* in_string returns TRUE if s2 is a substring of s1
- * in_string is case insensitive */
+/* in_string_utf8 returns TRUE if s2 is a substring of s1
+ * in_string_utf8 is case insensitive
+ * this functions understands utf8 strings (as you might have guessed ;-)
+ */
 static gboolean
-in_string(const gchar * s1,const gchar * s2)
+in_string_utf8(const gchar * s1,const gchar * s2)
 {
     const gchar * p,* q;
 
@@ -81,17 +83,21 @@ in_string(const gchar * s1,const gchar * s2)
     /* OK both are non-NULL now*/
     /* If s2 is the empty string return TRUE */
     if (!*s2) return TRUE;
-
     while (*s1) {
 	/* We look for the first char of s2*/
-	for (;*s1 && toupper((int)*s2)!=toupper((int)*s1); s1++);
+	for (;*s1 &&
+		 g_unichar_toupper(g_utf8_get_char(s2))!=g_unichar_toupper(g_utf8_get_char(s1));
+	     s1 = g_utf8_next_char(s1));
 	if (*s1) {
 	    /* We found the first char let see if this potential match is an actual one */
-	    q=++s1;
-	    p=s2+1;
-	    while (*q && *p && toupper(*p)==toupper(*q)) {
-		p++;
-		q++;
+	    s1 = g_utf8_next_char(s1);
+	    q = s1;
+	    p = g_utf8_next_char(s2);
+	    while (*q && *p && 
+		   g_unichar_toupper(g_utf8_get_char(p))
+		   ==g_unichar_toupper(g_utf8_get_char(q))) {
+		p = g_utf8_next_char(p);
+		q = g_utf8_next_char(q);
 	    }
 	    /* We have a match if p has reached the end of s2, ie *p==0 */
 	    if (!*p) return TRUE;
@@ -143,18 +149,18 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
     case CONDITION_SIMPLE:
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO)) {
 	    str=libbalsa_make_string_from_list(message->to_list);
-	    match=in_string(str,cond->match.string);
+	    match=in_string_utf8(str,cond->match.string);
 	    g_free(str);
             if(match) break;
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)) {
 	    str=libbalsa_address_to_gchar(message->from,0);
-	    match=in_string(str,cond->match.string);
+	    match=in_string_utf8(str,cond->match.string);
 	    g_free(str);
 	    if (match) break;
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT)) {
-	    if (in_string(LIBBALSA_MESSAGE_GET_SUBJECT(message),
+	    if (in_string_utf8(LIBBALSA_MESSAGE_GET_SUBJECT(message),
                           cond->match.string)) { 
                 match = TRUE;
                 break;
@@ -162,7 +168,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC)) {
 	    str=libbalsa_make_string_from_list(message->cc_list);
-	    match=in_string(str,cond->match.string);
+	    match=in_string_utf8(str,cond->match.string);
 	    g_free(str);
 	    if (match) break;
 	}
@@ -173,7 +179,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 
 		if (header) {
 		    gchar ** tmp = header->data;
-		    if (in_string(tmp[1],cond->match.string)) {
+		    if (in_string_utf8(tmp[1],cond->match.string)) {
 			match = TRUE;
 			break;
 		    }
@@ -203,7 +209,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 	    if (mbox_locked)
 		LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
 	    if (body) {
-		if (body->str) match = in_string(body->str,cond->match.string);
+		if (body->str) match = in_string_utf8(body->str,cond->match.string);
 		g_string_free(body,TRUE);
 	    }
 	}

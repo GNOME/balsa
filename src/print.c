@@ -1334,15 +1334,21 @@ common_info_destroy(CommonInfo * ci)
 static void
 common_info_cleanup(CommonInfo * ci)
 {
+    GObject *object = G_OBJECT(ci->message);
+
     if (ci->message->mailbox) {
         /* a message we're reading */
-        g_object_weak_unref(G_OBJECT(ci->message),
-                            (GWeakNotify) common_info_destroy, ci);
-        g_object_set_data(G_OBJECT(ci->message),
-                          BALSA_PRINT_COMMON_INFO_KEY, NULL);
-    } else
+        g_object_set_data(object, BALSA_PRINT_COMMON_INFO_KEY, NULL);
+        g_object_weak_unref(object, (GWeakNotify) common_info_destroy, ci);
+    } else {
         /* temporary message from the compose window */
-        g_object_unref(ci->message);
+        GtkWindow *window =
+            gtk_window_get_transient_for(GTK_WINDOW(ci->dialog));
+        if (window)
+            g_object_set_data(G_OBJECT(window),
+                              BALSA_PRINT_COMMON_INFO_KEY, NULL);
+        g_object_unref(object);
+    }
 
     common_info_destroy(ci);
 }
@@ -1397,30 +1403,34 @@ print_response_cb(GtkDialog * dialog, gint response, CommonInfo * ci)
  *
  * the public method
  */
-GtkWidget *
+void
 message_print(LibBalsaMessage * msg, GtkWindow * parent)
 {
+    GObject *object;
     CommonInfo *ci;
     GnomePrintConfig *config;
 
-    g_return_val_if_fail(msg != NULL, NULL);
+    g_return_if_fail(msg != NULL);
 
     /* Show only one dialog per message. */
-    ci = g_object_get_data(G_OBJECT(msg), BALSA_PRINT_COMMON_INFO_KEY);
+    object = msg->mailbox
+        ? G_OBJECT(msg)         /* a message we're reading */
+        : G_OBJECT(parent);     /* temporary message from the compose window */
+    ci = g_object_get_data(object, BALSA_PRINT_COMMON_INFO_KEY);
     if (ci) {
         gdk_window_raise(ci->dialog->window);
-        return NULL;
+        return;
     }
 
     ci = g_new(CommonInfo, 1);
-    common_info_setup(ci);
+    g_object_set_data(object, BALSA_PRINT_COMMON_INFO_KEY, ci);
 
+    common_info_setup(ci);
     ci->message = msg;
-    if (msg->mailbox) {
+    if (msg->mailbox)
         /* a message we're reading */
-        g_object_set_data(G_OBJECT(msg), BALSA_PRINT_COMMON_INFO_KEY, ci);
         g_object_weak_ref(G_OBJECT(msg), (GWeakNotify) common_info_destroy, ci);
-    } else 
+    else 
         /* temporary message from the compose window */
         g_object_ref(msg);
     ci->master = BALSA_GNOME_PRINT_UI_NEW;
@@ -1443,6 +1453,4 @@ message_print(LibBalsaMessage * msg, GtkWindow * parent)
                      G_CALLBACK(print_response_cb), ci);
 
     gtk_widget_show_all(ci->dialog);
-
-    return ci->dialog;
 }

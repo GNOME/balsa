@@ -83,8 +83,6 @@ extern "C" {
         /* style for changing the color of address labels when the
          * address isn't valid: */
         GtkStyle *bad_address_style;  
-        /* If we open a print dialog... */
-        GtkWidget *print_dialog;
     };
 
     BalsaSendmsg *sendmsg_window_new(GtkWidget *, LibBalsaMessage *,

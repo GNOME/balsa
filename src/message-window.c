@@ -710,7 +710,7 @@ static void print_cb(GtkWidget * widget, gpointer data)
     LibBalsaMessage *msg;
     
     msg=mw->message;
-    message_print(msg);
+    message_print(msg, GTK_WINDOW(mw->window));
 }
 
 static void trash_cb(GtkWidget * widget, gpointer data)

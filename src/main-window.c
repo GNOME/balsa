@@ -1920,7 +1920,7 @@ message_print_cb(GtkWidget * widget, gpointer data)
 
     msg = BALSA_INDEX(index)->current_message;
     if (msg)
-        message_print(msg);
+        message_print(msg, GTK_WINDOW(data));
 }
 
 /* this one is called only in the threaded code */

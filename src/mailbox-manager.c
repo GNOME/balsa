@@ -221,6 +221,7 @@ nb_main_create ()
 
   notebook = gtk_notebook_new ();
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), FALSE);
+  gtk_notebook_set_show_border ( GTK_NOTEBOOK(notebook), FALSE);
   gtk_widget_show (notebook);
 
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), nb_main_new_mailbox (), gtk_label_new("new"));	/* 0 */
@@ -374,6 +375,7 @@ nb_add_create ()
 
   notebook = gtk_notebook_new ();
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), FALSE);
+  gtk_notebook_set_show_border ( GTK_NOTEBOOK(notebook), FALSE);
   gtk_widget_show (notebook);
 
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), nb_add_new_local (), gtk_label_new("local")); /* 0 */
@@ -398,7 +400,7 @@ nb_add_new_local ()
   gtk_widget_show (vbox);
 
   table = gtk_table_new (1, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
   gtk_widget_show (table);
 
   label = gtk_label_new ("Path:");
@@ -431,7 +433,7 @@ nb_add_new_pop3 ()
   gtk_widget_show (vbox);
 
   table = gtk_table_new (3, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
   gtk_widget_show (table);
 
   /* POP server name */
@@ -501,7 +503,7 @@ nb_add_new_imap ()
   gtk_widget_show (vbox);
 
   table = gtk_table_new (4, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
   gtk_widget_show (table);
 
   label = gtk_label_new ("IMAP server:");
@@ -580,7 +582,7 @@ nb_add_new_nntp ()
   gtk_widget_show (vbox);
 
   table = gtk_table_new (4, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
   gtk_widget_show (table);
 
   label = gtk_label_new ("NNTP server:");
@@ -665,7 +667,7 @@ nb_main_new_mailbox (void)
   gtk_widget_show (vbox);
 
   table = gtk_table_new (3, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
   gtk_widget_show (table);
 
   label = gtk_label_new ("Name:");

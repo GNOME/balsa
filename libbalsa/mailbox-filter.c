@@ -44,4 +44,6 @@ libbalsa_mailbox_filters_when(GSList * filters, gint when)
 	    lst=g_slist_prepend(lst,((LibBalsaMailboxFilter*)filters->data)->actual_filter);
 	}
     lst=g_slist_reverse(lst);
+
+    return(lst);
 }

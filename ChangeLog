@@ -1,3 +1,8 @@
+2001-11-26  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/threads.h: include pthread 
+	* libbalsa/mailbox-filter.c: add return statement 
+
 2001-11-25  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Merge filters.

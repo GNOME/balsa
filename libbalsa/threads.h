@@ -24,6 +24,7 @@
 #define __LIBBALSA_THREADS_H__
 
 #include <stdlib.h>		/* for malloc() */
+#include <pthread.h>
 
 /*
  * thread globals

@@ -1,3 +1,7 @@
+2005-01-05 09:05  PeterB
+
+	* libbalsa/mailbox_local.c: use second GNode tree in jwz-threading.
+
 2005-01-04  Pawel Salek
 
 	* libbalsa/mailbox_local.c: remove bogus test from msg matching (PB).

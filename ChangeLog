@@ -1,5 +1,20 @@
-2003-11-12 09:32  PeterB
+2003-11-12 16:26  PeterB
 
+	* src/balsa-message.c: Ref widget when passing to idle handler.
+	* libbalsa/message.c: Message now owns mime message.
+	* libbalsa/: mailbox_maildir.c, mailbox_mh.c: Message owns mime
+	message, not the mailbox structure; restore chaining up in close
+	method.
+	* libbalsa/mailbox_mbox.c: Unref message when removing it from
+	mailbox structure; restore chaining up in close method; message
+	takes over ownership of mime message.
+	* libbalsa/mailbox_imap.c: Update total_messages in EXISTS
+	callback; compare count with mimap->messages_info->len instead of
+	total_messages; combine signal disconnections into one.
+	* libbalsa/mailbox.c: Give a milder warning when msgno is not
+	found.
+	* libbalsa/body.c: Get Content-Disposition using
+	g_mime_object_get_header().
 	* libbalsa/mailbox_imap.c: Update total_messages on expunge;
 	disconnect signal handlers before releasing handle.
 	* libbalsa/imap/imap-handle.c: Use correct error code.

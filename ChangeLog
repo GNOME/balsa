@@ -1,3 +1,8 @@
+2002-06-17  Pawel Salek <pawsa@theochem.kth.se>
+
+	* balsa.spec.in: package help files.
+	* src/balsa-mblist.c: right-justify the mailbox counts (Peter).
+
 2002-06-13  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 	
 	* src/balsa-index.c, src/balsa-mblist.[ch], src/message-window.[ch]:

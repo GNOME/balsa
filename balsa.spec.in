@@ -85,8 +85,8 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 %doc docs/vconvert.awk docs/pine2vcard
 %{_bindir}/balsa
 %{_datadir}/gnome/apps/Internet/balsa.desktop
-%{_datadir}/gnome/help/balsa/*
-%{_datadir}/pixmaps/*
+%{_datadir}/gnome/help/balsa-manual/*
+%{_datadir}/balsa/pixmaps/*
 %{_datadir}/sounds/balsa/*
 %{_mandir}/man1/balsa.1*
 %config %{_sysconfdir}/sound/events/*

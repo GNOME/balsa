@@ -63,6 +63,7 @@ enum {
     WEIGHT_COLUMN,
     UNREAD_COLUMN,
     TOTAL_COLUMN,
+    ONE_COLUMN,
     N_COLUMNS
 };
 
@@ -319,8 +320,10 @@ bmbl_init(BalsaMBList * mblist)
 
     gtk_tree_view_set_model(tree_view, GTK_TREE_MODEL(store));
 
+    /* Mailbox icon and name go in first column. */
     column = gtk_tree_view_column_new();
     gtk_tree_view_column_set_title(column, _("Mailbox"));
+    gtk_tree_view_column_set_alignment(column, 0.5);
     renderer = gtk_cell_renderer_pixbuf_new();
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes(column, renderer,
@@ -338,26 +341,42 @@ bmbl_init(BalsaMBList * mblist)
                                          balsa_app.mblist_name_width);
     gtk_tree_view_append_column(tree_view, column);
 
+    /* Message counts are right-justified, each in a column centered
+     * under its heading. */
+    /* Unread message count column */
     column = gtk_tree_view_column_new();
     gtk_tree_view_column_set_title(column, _("Unread"));
+    gtk_tree_view_column_set_alignment(column, 0.5);
     renderer = gtk_cell_renderer_text_new();
-    gtk_tree_view_column_pack_end(column, renderer, FALSE);
+    gtk_tree_view_column_pack_start(column, renderer, TRUE);
+    renderer = gtk_cell_renderer_text_new();
+    gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes(column, renderer,
                                         "text", UNREAD_COLUMN,
+                                        "xalign", ONE_COLUMN,
                                         NULL);
+    renderer = gtk_cell_renderer_text_new();
+    gtk_tree_view_column_pack_start(column, renderer, TRUE);
     gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
     gtk_tree_view_column_set_fixed_width(column,
                                          balsa_app.mblist_newmsg_width);
     gtk_tree_view_column_set_visible(column, mblist->display_info);
     gtk_tree_view_append_column(tree_view, column);
 
+    /* Total message count column */
     column = gtk_tree_view_column_new();
     gtk_tree_view_column_set_title(column, _("Total"));
+    gtk_tree_view_column_set_alignment(column, 0.5);
     renderer = gtk_cell_renderer_text_new();
-    gtk_tree_view_column_pack_end(column, renderer, FALSE);
+    gtk_tree_view_column_pack_start(column, renderer, TRUE);
+    renderer = gtk_cell_renderer_text_new();
+    gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes(column, renderer,
                                         "text", TOTAL_COLUMN,
+                                        "xalign", ONE_COLUMN,
                                         NULL);
+    renderer = gtk_cell_renderer_text_new();
+    gtk_tree_view_column_pack_start(column, renderer, TRUE);
     gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
     gtk_tree_view_column_set_fixed_width(column,
                                          balsa_app.mblist_totalmsg_width);
@@ -407,7 +426,8 @@ bmbl_get_store(void)
                                GDK_TYPE_COLOR,    /* COLOR_COLUMN  */
                                PANGO_TYPE_WEIGHT, /* WEIGHT_COLUMN */
                                G_TYPE_STRING,     /* UNREAD_COLUMN */
-                               G_TYPE_STRING      /* TOTAL_COLUMN  */
+                               G_TYPE_STRING,     /* TOTAL_COLUMN  */
+                               G_TYPE_FLOAT       /* ONE_COLUMN    */
             );
 
     return balsa_app.mblist_tree_store;
@@ -1157,6 +1177,7 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
                        WEIGHT_COLUMN, PANGO_WEIGHT_NORMAL,
                        UNREAD_COLUMN, "",
                        TOTAL_COLUMN,  "",
+                       ONE_COLUMN,    1.0,
                        -1);
     g_free(name);
     return TRUE;

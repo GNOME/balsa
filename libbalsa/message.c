@@ -571,7 +571,7 @@ libbalsa_message_reply(LibBalsaMessage * message)
 
     g_return_if_fail(message->mailbox);
     LOCK_MAILBOX(message->mailbox);
-    RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
+    RETURN_IF_MAILBOX_CLOSED(message->mailbox);
 
     libbalsa_message_set_flag(message, LIBBALSA_MESSAGE_FLAG_REPLIED, 0);
 
@@ -604,7 +604,7 @@ libbalsa_messages_read(GList * messages,
 	GList * lst = notif_list;
 
 	LOCK_MAILBOX(mbox);
-	RETURN_IF_CLIENT_CONTEXT_CLOSED(mbox);
+	RETURN_IF_MAILBOX_CLOSED(mbox);
 	while (lst) {
 	    message = LIBBALSA_MESSAGE(lst->data);	    
 	    if (!set)
@@ -646,7 +646,7 @@ libbalsa_messages_flag(GList * messages, gboolean flag)
 	GList * lst = notif_list;
 
 	LOCK_MAILBOX(mbox);
-	RETURN_IF_CLIENT_CONTEXT_CLOSED(mbox);
+	RETURN_IF_MAILBOX_CLOSED(mbox);
 
 	while (lst) {
 	    message = LIBBALSA_MESSAGE(lst->data);
@@ -687,7 +687,7 @@ libbalsa_messages_delete(GList * messages, gboolean del)
 	GList *lst = notif_list;
 
 	LOCK_MAILBOX(mbox);
-	RETURN_IF_CLIENT_CONTEXT_CLOSED(mbox);
+	RETURN_IF_MAILBOX_CLOSED(mbox);
 
 	do {
 	    message = LIBBALSA_MESSAGE(lst->data);
@@ -713,7 +713,7 @@ libbalsa_message_clear_recent(LibBalsaMessage * message)
 
     g_return_if_fail(message->mailbox);
     LOCK_MAILBOX(message->mailbox);
-    RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
+    RETURN_IF_MAILBOX_CLOSED(message->mailbox);
 
     libbalsa_message_set_flag(message, 0, LIBBALSA_MESSAGE_FLAG_RECENT);
 
@@ -762,7 +762,7 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 
     g_return_val_if_fail(message, FALSE);
     if (!message->mailbox) return FALSE;
-    g_return_val_if_fail(CLIENT_CONTEXT_OPEN(message->mailbox), FALSE);
+    g_return_val_if_fail(MAILBOX_OPEN(message->mailbox), FALSE);
 
 
     if (message->body_ref > 0) {
@@ -1012,7 +1012,7 @@ libbalsa_message_get_subject(LibBalsaMessage* msg)
     const gchar *ret;
     if(!msg->subj &&
        msg->mime_msg && msg->mailbox) { /* a message in a mailbox... */
-        g_return_val_if_fail(CLIENT_CONTEXT_OPEN(msg->mailbox), NULL);
+        g_return_val_if_fail(MAILBOX_OPEN(msg->mailbox), NULL);
         ret = g_mime_message_get_subject(msg->mime_msg);
 	if (ret)
 	    LIBBALSA_MESSAGE_SET_SUBJECT(msg, (gchar*)

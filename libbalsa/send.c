@@ -346,7 +346,7 @@ write_remote_fcc(LibBalsaMailbox* fccbox, HEADER* m_msg)
 {
     LibBalsaServer* server = LIBBALSA_MAILBOX_REMOTE(fccbox)->server;
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(fccbox), -1);
-    if(CLIENT_CONTEXT_CLOSED(fccbox)) {
+    if(MAILBOX_CLOSED(fccbox)) {
         /* We cannot use LIBBALSA_REMOTE_MAILBOX_SERVER() here because */
         /* it will lock up when NO IMAP mailbox has been accessed since */
         /* balsa was started. This should be safe because we have already */

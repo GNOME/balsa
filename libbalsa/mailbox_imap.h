@@ -58,6 +58,15 @@ struct _LibBalsaMailboxImap {
     ImapAuthType auth_type;	/* accepted authentication type */
     ImapUID      uid_validity;
 
+    GHashTable* messages_info;
+    GPtrArray* msgno_2_msg_info;
+    ImapMboxHandle* handle;
+    time_t mtime;
+    time_t mtime_cur;
+    time_t mtime_new;
+    gchar *curdir;
+    gchar *newdir;
+
     /* Hash table containing the messages matching the conditions
      */
     GHashTable * matching_messages;

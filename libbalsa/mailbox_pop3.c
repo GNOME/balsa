@@ -180,7 +180,7 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox)
 
     LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
 
-    if (CLIENT_CONTEXT_OPEN(mailbox)) {
+    if (MAILBOX_OPEN(mailbox)) {
 	/* increment the reference count */
 	mailbox->open_ref++;
 	UNLOCK_MAILBOX(mailbox);
@@ -189,9 +189,8 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox)
 
     pop = LIBBALSA_MAILBOX_POP3(mailbox);
 
-    CLIENT_CONTEXT(mailbox) = mailbox;
 
-    if (CLIENT_CONTEXT_OPEN(mailbox)) {
+    if (MAILBOX_OPEN(mailbox)) {
 	mailbox->messages = 0;
 	mailbox->total_messages = 0;
 	mailbox->unread_messages = 0;

@@ -125,28 +125,5 @@ do {\
 
 #endif
 
-#ifndef CLIENT_CONTEXT
-#define CLIENT_CONTEXT(mailbox)          (mailbox->mailbox_data)
-#endif
-#define CLIENT_CONTEXT_OPEN(mailbox)     (CLIENT_CONTEXT (mailbox) != NULL)
-#define CLIENT_CONTEXT_CLOSED(mailbox)   (CLIENT_CONTEXT (mailbox) == NULL)
-#define RETURN_IF_CLIENT_CONTEXT_CLOSED(mailbox)\
-do {\
-  if (CLIENT_CONTEXT_CLOSED (mailbox))\
-    {\
-      g_print (_("*** ERROR: Mailbox Stream Closed: %s ***\n"), __PRETTY_FUNCTION__);\
-      UNLOCK_MAILBOX (mailbox);\
-      return;\
-    }\
-} while (0)
-#define RETURN_VAL_IF_CONTEXT_CLOSED(mailbox, val)\
-do {\
-  if (CLIENT_CONTEXT_CLOSED (mailbox))\
-    {\
-      g_print (_("*** ERROR: Mailbox Stream Closed: %s ***\n"), __PRETTY_FUNCTION__);\
-      UNLOCK_MAILBOX (mailbox);\
-      return (val);\
-    }\
-} while (0)
 
 #endif				/* __LIBBALSA_PRIVATE_H__ */

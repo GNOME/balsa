@@ -378,7 +378,6 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
     mailbox->config_prefix = NULL;
     mailbox->name = NULL;
     mailbox->url = NULL;
-    CLIENT_CONTEXT(mailbox) = NULL;
 
     mailbox->open_ref = 0;
     mailbox->messages = 0;
@@ -511,10 +510,10 @@ gboolean
 libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox)
 {
     if(mailbox->open_ref == 0) return TRUE;
-    if(CLIENT_CONTEXT_CLOSED(mailbox)) return FALSE;
+    if(MAILBOX_CLOSED(mailbox)) return FALSE;
 #if NOTUSED
     /* be cautious: implement second line of defence */
-    g_return_val_if_fail(CLIENT_CONTEXT(mailbox)->hdrs != NULL, FALSE);
+    g_return_val_if_fail(mailbox->message_list != NULL, FALSE);
 #endif
     return TRUE;
 }
@@ -529,7 +528,6 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
     libbalsa_mailbox_sync_backend(mailbox, TRUE);
     g_signal_emit(G_OBJECT(mailbox),
 		  libbalsa_mailbox_signals[CLOSE_MAILBOX], 0);
-    if(mailbox->open_ref <1) CLIENT_CONTEXT(mailbox) = NULL;
 }
 
 void
@@ -753,7 +751,7 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 	 * messages -- the expunge may not have to be done */
 	/* We are careful to take/release locks in the correct order here */
 	cnt = 0;
-	while( CLIENT_CONTEXT_OPEN(mailbox) && cnt < RETRIES_COUNT &&
+	while( MAILBOX_OPEN(mailbox) && cnt < RETRIES_COUNT &&
 	       (check = libbalsa_mailbox_close_backend(mailbox)) == FALSE) {
 	    UNLOCK_MAILBOX(mailbox);
 	    g_print
@@ -767,10 +765,6 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 	    g_print("libbalsa_mailbox_real_close: changes to %s lost.\n",
 		    mailbox->name);
 	
-	if(CLIENT_CONTEXT(mailbox)) {
-	    free(CLIENT_CONTEXT(mailbox));
-	    CLIENT_CONTEXT(mailbox) = NULL;
-	}
     } else libbalsa_mailbox_sync_backend_real(mailbox, TRUE);
 
     UNLOCK_MAILBOX(mailbox);
@@ -851,7 +845,7 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
     LibBalsaMessage *message;
     GList *messages=NULL;
 
-    if (CLIENT_CONTEXT_CLOSED(mailbox))
+    if (MAILBOX_CLOSED(mailbox))
 	return;
 
     LOCK_MAILBOX(mailbox);
@@ -927,9 +921,8 @@ gboolean
 libbalsa_mailbox_commit(LibBalsaMailbox* mailbox)
 {
     int rc;
-    int index_hint;
 
-    if (CLIENT_CONTEXT_CLOSED(mailbox))
+    if (MAILBOX_CLOSED(mailbox))
 	return FALSE;
 
     LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
@@ -1082,7 +1075,7 @@ libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete)
     gint res = 0;
 
     /* only open mailboxes can be commited; lock it instead of opening */
-    g_return_val_if_fail(CLIENT_CONTEXT_OPEN(mailbox), 0);
+    g_return_val_if_fail(MAILBOX_OPEN(mailbox), 0);
     LOCK_MAILBOX_RETURN_VAL(mailbox, 0);
     libbalsa_mailbox_sync_backend_real(mailbox, delete);
     UNLOCK_MAILBOX(mailbox);
@@ -1159,7 +1152,6 @@ messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
 int libbalsa_mailbox_copy_message(LibBalsaMessage *message, LibBalsaMailbox *dest)
 {
     GMimeStream *msg_stream;
-    gchar *msg_text;
     int result;
 
     msg_stream = libbalsa_mailbox_get_message_stream(message->mailbox, message);

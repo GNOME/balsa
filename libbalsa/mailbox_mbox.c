@@ -23,6 +23,7 @@
 #include "config.h"
 
 #include <gnome.h>
+#include <gmime/gmime-stream-fs.h>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -30,12 +31,7 @@
 #include <utime.h>
 
 #include "libbalsa.h"
-struct mbox_info {
-    GArray* messages_info;
-    GMimeStream *gmime_stream;
-    gint size;
-    time_t mtime;
-};
+
 struct message_info {
     LibBalsaMessage *message;
     GMimeMessage *mime_message;
@@ -45,7 +41,7 @@ struct message_info {
     LibBalsaMessageFlag flags;
     LibBalsaMessageFlag orig_flags;
 };
-#define CLIENT_CONTEXT(mailbox) ((struct mbox_info*)(mailbox)->mailbox_data)
+
 #include "libbalsa_private.h"
 #include "mailbackend.h"
 
@@ -209,16 +205,19 @@ libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox *mailbox, LibBalsaMessa
 {
 	GMimeStream *stream = NULL;
 	struct message_info *msg_info;
+	LibBalsaMailboxMbox *mbox;
 
 	g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox), NULL);
 	g_return_val_if_fail (LIBBALSA_IS_MESSAGE(message), NULL);
 
-	msg_info = &g_array_index(CLIENT_CONTEXT(mailbox)->messages_info,
+	mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
+
+	msg_info = &g_array_index(mbox->messages_info,
 				  struct message_info, message->msgno);
 	if (!msg_info)
 	    return NULL;
 
-	stream = g_mime_stream_substream(CLIENT_CONTEXT(mailbox)->gmime_stream,
+	stream = g_mime_stream_substream(mbox->gmime_stream,
 					 msg_info->start
 					 + strlen(msg_info->from) + 1,
 					 msg_info->end);
@@ -245,7 +244,7 @@ static int mbox_lock(LibBalsaMailbox * mailbox, GMimeStream *stream)
     if (stream)
 	fd = GMIME_STREAM_FS(stream)->fd;
     else
-	fd = GMIME_STREAM_FS(CLIENT_CONTEXT(mailbox)->gmime_stream)->fd;
+	fd = GMIME_STREAM_FS(LIBBALSA_MAILBOX_MBOX(mailbox)->gmime_stream)->fd;
     return mx_lock_file(path, fd, FALSE, TRUE, 1);
 }
 
@@ -256,7 +255,7 @@ static void mbox_unlock(LibBalsaMailbox * mailbox, GMimeStream *stream)
     if (stream)
 	fd = GMIME_STREAM_FS(stream)->fd;
     else
-	fd = GMIME_STREAM_FS(CLIENT_CONTEXT(mailbox)->gmime_stream)->fd;
+	fd = GMIME_STREAM_FS(LIBBALSA_MAILBOX_MBOX(mailbox)->gmime_stream)->fd;
     mx_unlock_file(path, fd, 1);
 }
 
@@ -267,11 +266,12 @@ parse_mailbox(LibBalsaMailbox * mailbox)
     GArray *messages_info;
     struct message_info msg_info;
     int new_messages = 0;
+    LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
 
     gmime_parser = 
-	g_mime_parser_new_with_stream(CLIENT_CONTEXT(mailbox)->gmime_stream);
+	g_mime_parser_new_with_stream(mbox->gmime_stream);
     g_mime_parser_set_scan_from(gmime_parser, TRUE);
-    messages_info = CLIENT_CONTEXT(mailbox)->messages_info;
+    messages_info = mbox->messages_info;
 
     msg_info.message = NULL;
     msg_info.start = g_mime_parser_tell(gmime_parser);
@@ -328,7 +328,7 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
     mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
     path = libbalsa_mailbox_local_get_path(mailbox);
 
-    if (CLIENT_CONTEXT_OPEN(mailbox)) {
+    if (MAILBOX_OPEN(mailbox)) {
 	/* increment the reference count */
 	mailbox->open_ref++;
 	UNLOCK_MAILBOX(mailbox);
@@ -349,18 +349,15 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
 
     if (mbox_lock(mailbox, gmime_stream)) {
 	g_mime_stream_unref(gmime_stream);
-	g_free(CLIENT_CONTEXT(mailbox));
-	CLIENT_CONTEXT(mailbox) = NULL;
 	UNLOCK_MAILBOX(mailbox);
 	return FALSE;
     }
 
-    CLIENT_CONTEXT(mailbox) = g_new(struct mbox_info, 1);
-    CLIENT_CONTEXT(mailbox)->size = st.st_size;
-    CLIENT_CONTEXT(mailbox)->mtime = st.st_mtime;
-    CLIENT_CONTEXT(mailbox)->gmime_stream = gmime_stream;
+    mbox->size = st.st_size;
+    mbox->mtime = st.st_mtime;
+    mbox->gmime_stream = gmime_stream;
 
-    CLIENT_CONTEXT(mailbox)->messages_info =
+    mbox->messages_info =
 	g_array_new(FALSE, FALSE, sizeof(struct message_info));
 
     if (!mailbox->readonly)
@@ -389,28 +386,30 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
 
 static void libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 {
+    g_return_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox));
+
     if (mailbox->open_ref == 0) {
 	if (libbalsa_notify_check_mailbox(mailbox))
 	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
     } else {
 	struct stat st;
-	struct mbox_info *info = CLIENT_CONTEXT(mailbox);
 	gchar buffer[10];
 	gchar *path;
-
-	g_return_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox));
+	LibBalsaMailboxMbox *mbox;
 
 	LOCK_MAILBOX(mailbox);
+		
+	mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
 	path = libbalsa_mailbox_local_get_path(mailbox);
 	if (stat(path, &st) == 0)
 	{
-	    if (st.st_mtime == info->mtime && st.st_size == info->size) {
+	    if (st.st_mtime == mbox->mtime && st.st_size == mbox->size) {
 		UNLOCK_MAILBOX(mailbox);
 		return;
 	    }
-	    if (st.st_size == info->size)
+	    if (st.st_size == mbox->size)
 	    {
-		info->mtime = st.st_mtime;
+		mbox->mtime = st.st_mtime;
 		UNLOCK_MAILBOX(mailbox);
 		return;
 	    }
@@ -429,11 +428,11 @@ static void libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 	     * that we should see the message separator at *exactly* what used
 	     * to be the end of the folder.
 	     */
-	    if (g_mime_stream_seek(info->gmime_stream, info->size,
+	    if (g_mime_stream_seek(mbox->gmime_stream, mbox->size,
 				   GMIME_STREAM_SEEK_SET) == -1)
 		g_message("libbalsa_notify_check_mailbox: "
 			  "g_mime_stream_seek() failed\n");
-	    if (g_mime_stream_read(info->gmime_stream, buffer,
+	    if (g_mime_stream_read(mbox->gmime_stream, buffer,
 				   sizeof(buffer)) == -1)
 	    {
 		g_message("libbalsa_notify_check_mailbox: "
@@ -441,12 +440,12 @@ static void libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 	    } else {
 		if (strncmp ("From ", buffer, 5) == 0)
 		{
-		    if (g_mime_stream_seek(info->gmime_stream, info->size,
+		    if (g_mime_stream_seek(mbox->gmime_stream, mbox->size,
 					   GMIME_STREAM_SEEK_SET) == -1)
 			g_message("libbalsa_notify_check_mailbox: "
 				  "g_mime_stream_seek() failed\n");
 		    parse_mailbox(mailbox);
-		    info->size = g_mime_stream_tell(info->gmime_stream);
+		    mbox->size = g_mime_stream_tell(mbox->gmime_stream);
 		    mbox_unlock(mailbox, NULL);
 		    UNLOCK_MAILBOX(mailbox);
 		    libbalsa_mailbox_load_messages(mailbox);
@@ -454,11 +453,11 @@ static void libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 		    return;
 		}
 	    }
-	    free_messages_info(info->messages_info);
+	    free_messages_info(mbox->messages_info);
 	    mailbox->messages=0;
-	    g_mime_stream_reset(info->gmime_stream);
+	    g_mime_stream_reset(mbox->gmime_stream);
 	    parse_mailbox(mailbox);
-	    info->size = g_mime_stream_tell(info->gmime_stream);
+	    mbox->size = g_mime_stream_tell(mbox->gmime_stream);
 	    mbox_unlock(mailbox, NULL);
 	    UNLOCK_MAILBOX(mailbox);
 	    libbalsa_mailbox_load_messages(mailbox);
@@ -472,12 +471,15 @@ static void libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 
 static gboolean libbalsa_mailbox_mbox_close_backend(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxMbox *mbox;
+
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox), FALSE);
-    free_messages_info(CLIENT_CONTEXT(mailbox)->messages_info);
-    g_mime_stream_unref(CLIENT_CONTEXT(mailbox)->gmime_stream);
-    g_array_free(CLIENT_CONTEXT(mailbox)->messages_info, TRUE);
-    g_free(CLIENT_CONTEXT(mailbox));
-    CLIENT_CONTEXT(mailbox) = NULL;
+    
+    mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
+
+    free_messages_info(mbox->messages_info);
+    g_mime_stream_unref(mbox->gmime_stream);
+   
     return TRUE;
 }
 
@@ -491,6 +493,7 @@ static gchar *libbalsa_tempfilename(void)
 
     return g_strdup(tmp_file_name);
 }
+
 
 static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
 {
@@ -510,17 +513,20 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
     gchar buffer[5];
     gboolean save_failed;
     GMimeParser *gmime_parser;
+    LibBalsaMailboxMbox *mbox;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_MBOX(mailbox), FALSE);
 
+    mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
+    
     /* find the first deleted/changed message. We save a lot of time by only
      * rewriting the mailbox from the point where it has actually changed.
      */
     msg_info = NULL;
-    messages = CLIENT_CONTEXT(mailbox)->messages_info->len;
+    messages = mbox->messages_info->len;
     for (i = 0; i < messages; i++)
     {
-	msg_info = &g_array_index(CLIENT_CONTEXT(mailbox)->messages_info,
+	msg_info = &g_array_index(mbox->messages_info,
 		       struct message_info, i);
 	if (msg_info->flags != msg_info->orig_flags)
 	    break;
@@ -556,7 +562,7 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
 	g_mime_stream_unref(gmime_stream);
 	return FALSE;
     }
-    if (st.st_size != CLIENT_CONTEXT(mailbox)->size)
+    if (st.st_size != mbox->size)
     {
 	mbox_unlock(mailbox, gmime_stream);
 	g_mime_stream_unref(gmime_stream);
@@ -573,10 +579,10 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
     }
     temp_stream = g_mime_stream_fs_new(i);
 
-    mbox_stream = CLIENT_CONTEXT(mailbox)->gmime_stream;
+    mbox_stream = mbox->gmime_stream;
     for (i = first, j = 0; i < messages; i++)
     {
-	msg_info = &g_array_index(CLIENT_CONTEXT(mailbox)->messages_info,
+	msg_info = &g_array_index(mbox->messages_info,
 		       struct message_info, i);
 	if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED) == 0)
 	{
@@ -653,9 +659,9 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
 	    && g_mime_stream_write_to_stream(temp_stream, gmime_stream) != -1)
 	{
 	    save_failed = FALSE;
-	    CLIENT_CONTEXT(mailbox)->size = g_mime_stream_tell(gmime_stream);
+	    mbox->size = g_mime_stream_tell(gmime_stream);
 	    ftruncate(GMIME_STREAM_FS(gmime_stream)->fd, 
-		      CLIENT_CONTEXT(mailbox)->size);
+		      mbox->size);
 	}
     }
     g_mime_stream_unref(temp_stream);
@@ -667,9 +673,12 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
 	 * so keep the temp copy around
 	 */
 	char *savefile;
-
-	savefile = g_strdup_printf ("%s/saved-mbox.%s-%s-%d", g_get_tmp_dir(),
-			 g_get_user_name(), g_basename(path), getpid ());
+	{
+	    gchar *foo = g_path_get_basename(path);
+	    savefile = g_strdup_printf ("%s/saved-mbox.%s-%s-%d", g_get_tmp_dir(),
+			 g_get_user_name(), foo, getpid ());
+	    g_free(foo);
+	}
 	rename (tempfile, savefile);
 	g_warning("Write failed!  Saved partial mailbox to %s", savefile);
 	g_free(savefile);
@@ -702,7 +711,7 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
     for (i = first, j = first; i < messages; i++)
     {
 	struct message_info *msg_info=
-	    &g_array_index(CLIENT_CONTEXT(mailbox)->messages_info,
+	    &g_array_index(mbox->messages_info,
 			   struct message_info, j);
 
 	g_free(msg_info->from);
@@ -734,7 +743,7 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
 	    }
 
 	} else {
-	    g_array_remove_index(CLIENT_CONTEXT(mailbox)->messages_info, j);
+	    g_array_remove_index(mbox->messages_info, j);
 	}
     }
     g_object_unref(G_OBJECT(gmime_parser));
@@ -751,7 +760,7 @@ static GMimeMessage *libbalsa_mailbox_mbox_get_message(
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox), NULL);
 
-    msg_info = &g_array_index(CLIENT_CONTEXT(mailbox)->messages_info,
+    msg_info = &g_array_index(LIBBALSA_MAILBOX_MBOX(mailbox)->messages_info,
 			      struct message_info, msgno);
 
     if (!msg_info)
@@ -767,10 +776,13 @@ static LibBalsaMessage *libbalsa_mailbox_mbox_load_message(
     LibBalsaMessage *message;
     struct message_info *msg_info;
     const char *header;
+    LibBalsaMailboxMbox *mbox;
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox), NULL);
 
-    msg_info = &g_array_index(CLIENT_CONTEXT(mailbox)->messages_info,
+    mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
+
+    msg_info = &g_array_index(mbox->messages_info,
 			      struct message_info, msgno);
 
     mailbox->new_messages--;
@@ -977,7 +989,7 @@ libbalsa_mailbox_mbox_change_message_flags(LibBalsaMailbox * mailbox,
 
     g_return_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox));
 
-    msg_info = &g_array_index(CLIENT_CONTEXT(mailbox)->messages_info,
+    msg_info = &g_array_index(LIBBALSA_MAILBOX_MBOX(mailbox)->messages_info,
 			      struct message_info, msgno);
 
     msg_info->flags |= set;

@@ -41,6 +41,28 @@
 #define LIBBALSA_IS_MAILBOX_CLASS(klass) \
     (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX))
 
+#define MAILBOX_OPEN(mailbox)     (mailbox != NULL)
+#define MAILBOX_CLOSED(mailbox)   (mailbox == NULL)
+#define RETURN_IF_MAILBOX_CLOSED(mailbox)\
+do {\
+  if (MAILBOX_CLOSED (mailbox))\
+    {\
+      g_print (_("*** ERROR: Mailbox Stream Closed: %s ***\n"), __PRETTY_FUNCTION__);\
+      UNLOCK_MAILBOX (mailbox);\
+      return;\
+    }\
+} while (0)
+#define RETURN_VAL_IF_CONTEXT_CLOSED(mailbox, val)\
+do {\
+  if (MAILBOX_CLOSED (mailbox))\
+    {\
+      g_print (_("*** ERROR: Mailbox Stream Closed: %s ***\n"), __PRETTY_FUNCTION__);\
+      UNLOCK_MAILBOX (mailbox);\
+      return (val);\
+    }\
+} while (0)
+
+
 /*
  * enums
  */
@@ -119,15 +141,14 @@ struct _LibBalsaMailboxView {
 
 struct _LibBalsaMailbox {
     GObject object;
-
+    
     gchar *config_prefix;       /* unique string identifying mailbox */
                                 /* in the config file                */
     gchar *name;                /* displayed name for a special mailbox; */
                                 /* Isn't it a GUI thing?                 */
     gchar *url; /* Unique resource locator, file://, imap:// etc */
-    void *mailbox_data;
     guint open_ref;
-
+    
     gboolean lock;
     gboolean is_directory;
     gboolean readonly;

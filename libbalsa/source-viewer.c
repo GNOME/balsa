@@ -190,7 +190,7 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
     LibBalsaSourceViewerInfo *lsvi;
 
     g_return_if_fail(msg);
-    g_return_if_fail(CLIENT_CONTEXT_OPEN(msg->mailbox));
+    g_return_if_fail(MAILBOX_OPEN(msg->mailbox));
 
     text = gtk_text_view_new();
     gtk_widget_modify_font(text, pango_font_description_from_string(font));

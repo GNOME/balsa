@@ -67,7 +67,7 @@ libbalsa_mailbox_remote_init(LibBalsaMailboxRemote * mailbox)
 }
 
 void 
-libbalsa_mailbox_remote_set_server(LibBalsaMailboxRemote*m, LibBalsaServer* s)
+libbalsa_mailbox_remote_set_server(LibBalsaMailboxRemote *m, LibBalsaServer *s)
 {
     if(m->server) g_object_unref(G_OBJECT(m->server));
     m->server = s;

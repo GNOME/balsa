@@ -1,4 +1,36 @@
-2003-09-05  Carlos Morgado  <chbm chbm.nu>
+2003-09-06  Carlos Morgado  <chbm chbm.nu>
+
+	* libbalsa/imap/md5.c: 
+	* libbalsa/imap/md5.c: 
+	* libbalsa/imap/Makefile.am: 
+	removed md5.*	
+
+	* libbalsa/imap/auth-cram.c (Repository): 
+	converted to GMime's md5-utils
+	
+	* libbalsa/source-viewer.c (Repository): 
+	* libbalsa/send.c (Repository): 
+	* libbalsa/message.c (Repository): 
+	* libbalsa/mailbox_remote.c (Repository): 
+	* libbalsa/mailbox_pop3.c (Repository): 
+	* libbalsa/mailbox_mh.h (Repository): 
+	* libbalsa/mailbox_mh.c (Repository): 
+	* libbalsa/mailbox_mbox.h (Repository): 
+	* libbalsa/mailbox_mbox.c (Repository): 
+	* libbalsa/mailbox_maildir.h (Repository): 
+	* libbalsa/mailbox_maildir.c (Repository): 
+	* libbalsa/mailbox_imap.h (Repository): 
+	* libbalsa/mailbox_imap.c (Repository): 
+	* libbalsa/mailbox.h (Repository): 
+	* libbalsa/mailbox.c (Repository): 
+	* libbalsa/libbalsa_private.h (Repository): 
+	removed CLIENT_CONTEXT*, used the libbalsamailbox subclassing, 
+	some Wall cleanups
+	
+	* AUTHORS: added magick@linux-fan.com
+
+	
+2003-09-05  Carlos Morgado  <chbm chbm.net>
 
 	* configure.in:
 	* libbalsa/:

@@ -1,4 +1,8 @@
-/*
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* Balsa E-Mail Client
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list
+ *
  * Copyright (C) 1999-2000 Brendan Cully <brendan@kublai.com>
  * 
  *     This program is free software; you can redistribute it and/or modify
@@ -19,10 +23,14 @@
 /* IMAP login/authentication code */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <glib.h>
+#include <gmime/md5-utils.h> 
 
-#include "md5.h"
 #include "imap-auth.h"
+#include "util.h"
+
 #define LONG_STRING 1024
 
 #define MD5_DIGEST_LEN 16
@@ -103,7 +111,8 @@ imap_auth_cram(ImapMboxHandle* handle, const char* user, const char* pass)
    * plus the additional debris
    */
   
-  lit_conv_to_base64(ibuf, obuf, strlen (obuf), sizeof(ibuf)-2);
+  lit_conv_to_base64((unsigned char *)ibuf, 
+		     (unsigned char *)obuf, strlen (obuf), sizeof(ibuf)-2);
   strncat (ibuf, "\r\n", sizeof (ibuf));
   imap_handle_write(handle, ibuf, strlen(ibuf));
 
@@ -124,7 +133,7 @@ static void
 hmac_md5 (const char* password, char* challenge,
           unsigned char* response)
 {  
-  MD5_CTX ctx;
+  MD5Context ctx;
   unsigned char ipad[MD5_BLOCK_LEN], opad[MD5_BLOCK_LEN];
   unsigned char secret[MD5_BLOCK_LEN+1];
   unsigned char hash_passwd[MD5_DIGEST_LEN];
@@ -137,9 +146,9 @@ hmac_md5 (const char* password, char* challenge,
   /* passwords longer than MD5_BLOCK_LEN bytes are substituted with their MD5
    * digests */
   if (secret_len > MD5_BLOCK_LEN) {
-    MD5Init (&ctx);
-    MD5Update (&ctx, (unsigned char*) password, secret_len);
-    MD5Final (hash_passwd, &ctx);
+    md5_init (&ctx);
+    md5_update (&ctx, (unsigned char*) password, secret_len);
+    md5_final (&ctx, hash_passwd);
     strncpy ((char*) secret, (char*) hash_passwd, MD5_DIGEST_LEN);
     secret_len = MD5_DIGEST_LEN;
   }
@@ -157,14 +166,14 @@ hmac_md5 (const char* password, char* challenge,
   }
 
   /* inner hash: challenge and ipadded secret */
-  MD5Init (&ctx);
-  MD5Update (&ctx, ipad, MD5_BLOCK_LEN);
-  MD5Update (&ctx, (unsigned char*) challenge, chal_len);
-  MD5Final (response, &ctx);
+  md5_init (&ctx);
+  md5_update (&ctx, ipad, MD5_BLOCK_LEN);
+  md5_update (&ctx, (unsigned char*) challenge, chal_len);
+  md5_final (&ctx, response);
 
   /* outer hash: inner hash and opadded secret */
-  MD5Init (&ctx);
-  MD5Update (&ctx, opad, MD5_BLOCK_LEN);
-  MD5Update (&ctx, response, MD5_DIGEST_LEN);
-  MD5Final (response, &ctx);
+  md5_init (&ctx);
+  md5_update (&ctx, opad, MD5_BLOCK_LEN);
+  md5_update (&ctx, response, MD5_DIGEST_LEN);
+  md5_final (&ctx, response);
 }

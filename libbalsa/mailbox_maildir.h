@@ -41,6 +41,14 @@ typedef struct _LibBalsaMailboxMaildirClass LibBalsaMailboxMaildirClass;
 
 struct _LibBalsaMailboxMaildir {
     LibBalsaMailboxLocal parent;
+
+    GHashTable* messages_info;
+    GPtrArray* msgno_2_msg_info;
+    time_t mtime;
+    time_t mtime_cur;
+    time_t mtime_new;
+    gchar *curdir;
+    gchar *newdir;
 };
 
 struct _LibBalsaMailboxMaildirClass {

@@ -15,8 +15,6 @@ libimap_a_SOURCES = \
 	imap-fetch.h	\
 	libimap-marshal.c	\
 	libimap-marshal.h	\
-	md5.c		\
-	md5.h		\
 	siobuf.c	\
 	siobuf.h	\
 	util.c		\

@@ -41,6 +41,11 @@ typedef struct _LibBalsaMailboxMboxClass LibBalsaMailboxMboxClass;
 
 struct _LibBalsaMailboxMbox {
     LibBalsaMailboxLocal parent;
+
+    GArray* messages_info;
+    GMimeStream *gmime_stream;
+    gint size;
+    time_t mtime;
 };
 
 struct _LibBalsaMailboxMboxClass {

@@ -81,7 +81,11 @@ GtkWidget *fe_matching_fields_from;
 GtkWidget *fe_matching_fields_subject;
 GtkWidget *fe_matching_fields_cc;
 /* Combo list for user headers and check button*/
+#if GTK_CHECK_VERSION(2, 4, 0)
+GtkWidget * fe_user_header;
+#else
 GtkCombo * fe_user_header;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 GtkWidget * fe_matching_fields_us_head;
 
 /* widget for the conditions */
@@ -226,8 +230,12 @@ unique_filter_name(const gchar * name)
     selection = gtk_tree_view_get_selection(fe_filters_list);
     for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
          valid = gtk_tree_model_iter_next(model, &iter)) {
+	gboolean matches;
+
         gtk_tree_model_get(model, &iter, 0, &row_text, -1);
-        if (strcmp(name, row_text) == 0
+	matches = strcmp(name, row_text) == 0;
+	g_free(row_text);
+        if (matches
             && !gtk_tree_selection_iter_is_selected(selection, &iter))
             return FALSE;
     }
@@ -258,6 +266,20 @@ fe_regexs_selection_changed(GtkTreeSelection *selection,
     gtk_widget_set_sensitive(fe_regex_remove_button, selected);
 }
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+/* Helper. */
+static gint
+fe_combo_box_get_value(GtkWidget * combo_box)
+{
+    struct fe_combo_box_info *info =
+        g_object_get_data(G_OBJECT(combo_box), BALSA_FE_COMBO_BOX_INFO);
+    /* Retrieve the selected item in the menu */
+    gint active = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_box));
+
+    return GPOINTER_TO_INT(g_slist_nth_data(info->values, active));
+}
+
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 /*
  * fe_typesmenu_cb()
  *
@@ -267,7 +289,12 @@ fe_regexs_selection_changed(GtkTreeSelection *selection,
 static void
 fe_typesmenu_cb(GtkWidget* widget, gpointer data)
 {
+#if GTK_CHECK_VERSION(2, 4, 0)
+    ConditionMatchType type =
+	(ConditionMatchType) fe_combo_box_get_value(widget);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     ConditionMatchType type=GPOINTER_TO_INT(data);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     condition_has_changed=TRUE;
     gtk_notebook_set_current_page(GTK_NOTEBOOK(fe_type_notebook),
@@ -323,12 +350,18 @@ update_condition_list_label(void)
 static ConditionMatchType
 get_condition_type(void)
 {
+#if GTK_CHECK_VERSION(2, 4, 0)
+    /* Set the type associated with the selected item */
+    return (ConditionMatchType)
+        fe_combo_box_get_value(fe_search_option_menu);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     GtkWidget * menu;
 
     /* Retrieve the selected item in the search type menu */
     menu=gtk_menu_get_active(GTK_MENU(gtk_option_menu_get_menu(GTK_OPTION_MENU(fe_search_option_menu))));
     /* Set the type associated with the selected item */
     return GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu),"value"));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 /* fe_negate_condition :handle pressing on the "Contain/Does not
@@ -384,8 +417,15 @@ fe_match_fields_buttons_cb(GtkWidget * widget, gpointer data)
 static void
 fe_match_field_user_header_cb(GtkWidget * widget)
 {
+#if GTK_CHECK_VERSION(2, 4, 0)
+    GtkToggleButton *button =
+        GTK_TOGGLE_BUTTON(fe_matching_fields_us_head);
+    gtk_widget_set_sensitive(fe_user_header,
+                             gtk_toggle_button_get_active(button));
+#else
     gtk_widget_set_sensitive(GTK_WIDGET(fe_user_header),
 			     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_matching_fields_us_head)));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     condition_has_changed=TRUE;
 }
 
@@ -393,15 +433,38 @@ void
 fe_add_new_user_header(const gchar * str)
 {
     GList *lst;
+#if GTK_CHECK_VERSION(2, 4, 0)
+    gint i, active;
+#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
 
     for (lst = fe_user_headers_list; lst; lst = g_list_next(lst))
         if (g_ascii_strcasecmp(str, (gchar *) lst->data) == 0)
             return;
 
     /* It's a new string, add it */
+#if GTK_CHECK_VERSION(2, 4, 0)
+    /* First clear the combo box... */
+    for (i = g_list_length(fe_user_headers_list); --i >= 0;)
+        gtk_combo_box_remove_text(GTK_COMBO_BOX(fe_user_header), i);
+
+#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
     fe_user_headers_list =
         g_list_insert_sorted(fe_user_headers_list, g_strdup(str),
                              (GCompareFunc) g_ascii_strcasecmp);
+#if GTK_CHECK_VERSION(2, 4, 0)
+
+    /* ...then remake it with the new string... */
+    active = -1;
+    for (lst = fe_user_headers_list, i = 0; lst; lst = lst->next, i++) {
+        gtk_combo_box_append_text(GTK_COMBO_BOX(fe_user_header),
+                                  lst->data);
+        if (!g_ascii_strcasecmp(str, lst->data))
+            active = i;
+    }
+
+    /* ...and make the new entry active. */
+    gtk_combo_box_set_active(GTK_COMBO_BOX(fe_user_header), active);
+#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 /* conditon_validate is responsible of validating
@@ -442,14 +505,24 @@ condition_validate(LibBalsaCondition* new_cnd)
             CONDITION_SETMATCH(new_cnd,CONDITION_MATCH_CC);
         if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_matching_fields_us_head))) {
 	    CONDITION_SETMATCH(new_cnd,CONDITION_MATCH_US_HEAD);
+#if GTK_CHECK_VERSION(2, 4, 0)
+            str =
+                gtk_editable_get_chars(GTK_EDITABLE
+                                       (GTK_BIN(fe_user_header)->child), 0,
+                                       -1);
+#else
             str = gtk_editable_get_chars(GTK_EDITABLE(fe_user_header->entry),
                                          0, -1);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 	    if (!str[0]) {
                 balsa_information(LIBBALSA_INFORMATION_ERROR,
                                   _("You must specify the name of the "
                                     "user header to match on"));
 		return FALSE;
 	    }
+#if GTK_CHECK_VERSION(2, 4, 0)
+            fe_add_new_user_header(str);
+#else
 	    fe_add_new_user_header(str);
 	    /* This piece of code replaces the combo list
 	       by a new one that contains the new string the user has entered
@@ -457,6 +530,7 @@ condition_validate(LibBalsaCondition* new_cnd)
 	    */
 	    gtk_combo_set_popdown_strings(fe_user_header,fe_user_headers_list);
 	    gtk_entry_set_text(GTK_ENTRY(fe_user_header->entry),str);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 	    g_free(str);
 	}
         else if (new_cnd->match.string.fields==CONDITION_EMPTY) {
@@ -525,8 +599,15 @@ condition_validate(LibBalsaCondition* new_cnd)
 
     new_cnd->negate = condition_not;
     if (CONDITION_CHKMATCH(new_cnd,CONDITION_MATCH_US_HEAD))
+#if GTK_CHECK_VERSION(2, 4, 0)
+        new_cnd->match.string.user_header =
+            gtk_editable_get_chars(GTK_EDITABLE
+                                   (GTK_BIN(fe_user_header)->child), 0,
+                                   -1);
+#else
 	new_cnd->match.string.user_header =
             g_strdup(gtk_entry_get_text(GTK_ENTRY(fe_user_header->entry)));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     /* Set the type specific fields of the condition */
     switch (new_cnd->type) {
     case CONDITION_STRING:
@@ -627,8 +708,13 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     gtk_notebook_set_current_page(GTK_NOTEBOOK(fe_type_notebook),
                                   cnd->type - 1);
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    gtk_combo_box_set_active(GTK_COMBO_BOX(fe_search_option_menu),
+                             cnd->type - 1);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_option_menu_set_history(GTK_OPTION_MENU(fe_search_option_menu), 
                                 cnd->type-1);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     /* First update matching fields
      * but if type is date or flag, these are meaning less so we disable them */
@@ -647,14 +733,26 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_us_head),
                                  CONDITION_CHKMATCH(cnd,CONDITION_MATCH_US_HEAD) && andmask);
     if (CONDITION_CHKMATCH(cnd,CONDITION_MATCH_US_HEAD) && andmask) {
+#if GTK_CHECK_VERSION(2, 4, 0)
+	gchar *tmp = cnd->match.string.user_header;
+	if (tmp && *tmp)
+	    fe_add_new_user_header(tmp);
+	gtk_widget_set_sensitive(fe_user_header,TRUE);
+#else
 	gtk_widget_set_sensitive(GTK_WIDGET(fe_user_header),TRUE);
 	gtk_entry_set_text(GTK_ENTRY(fe_user_header->entry),
                            cnd->match.string.user_header 
                            ? cnd->match.string.user_header : "");
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     }
     else {
+#if GTK_CHECK_VERSION(2, 4, 0)
+	gtk_widget_set_sensitive(fe_user_header,FALSE);
+	gtk_entry_set_text(GTK_ENTRY(GTK_BIN(fe_user_header)->child),"");
+#else
 	gtk_widget_set_sensitive(GTK_WIDGET(fe_user_header),FALSE);
 	gtk_entry_set_text(GTK_ENTRY(fe_user_header->entry),"");
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     }	
     /* Next update type specific fields */
     switch (cnd->type) {
@@ -710,7 +808,12 @@ fill_condition_widgets(LibBalsaCondition* cnd)
         /* To avoid warnings :), we should never get there */
 	break;
     }
+#if GTK_CHECK_VERSION(2, 4, 0)
+    gtk_combo_box_set_active(GTK_COMBO_BOX(fe_search_option_menu),
+                             cnd->type - 1);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_menu_set_active(GTK_MENU(gtk_option_menu_get_menu(GTK_OPTION_MENU(fe_search_option_menu))),cnd->type-1);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }            /* end fill_condition_widget */
 
 static void
@@ -974,6 +1077,9 @@ static
 void build_condition_dialog(GtkWidget * condition_dialog)
 {
     GtkWidget * table,* label,* button,* page,* box;
+#if GTK_CHECK_VERSION(2, 4, 0)
+    GList *list;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     page = gtk_table_new(7, 2, FALSE);
     /* builds the toggle buttons to specify fields concerned by the conditions of
@@ -1051,6 +1157,18 @@ void build_condition_dialog(GtkWidget * condition_dialog)
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
     g_signal_connect(G_OBJECT(fe_matching_fields_us_head), "toggled",
                      G_CALLBACK(fe_match_field_user_header_cb), NULL);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    fe_user_header = gtk_combo_box_entry_new_text();
+    for (list = fe_user_headers_list; list; list = list->next)
+        gtk_combo_box_append_text(GTK_COMBO_BOX(fe_user_header),
+                                  list->data);
+    g_signal_connect(G_OBJECT(fe_user_header), "changed",
+                     G_CALLBACK(fe_condition_changed_cb), NULL);
+    gtk_table_attach(GTK_TABLE(table),
+                     fe_user_header,
+                     1, 2, 3, 4,
+                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+#else
     fe_user_header = GTK_COMBO(gtk_combo_new());
     gtk_combo_set_value_in_list(fe_user_header,FALSE,FALSE);
     gtk_combo_set_case_sensitive(fe_user_header,FALSE);
@@ -1061,6 +1179,7 @@ void build_condition_dialog(GtkWidget * condition_dialog)
                      GTK_WIDGET(fe_user_header),
                      1, 2, 3, 4,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     
     box = gtk_hbox_new(FALSE, 5);
     gtk_table_attach(GTK_TABLE(page),
@@ -1219,6 +1338,7 @@ update_filters_mailbox(GtkTreeModel * model, GtkTreePath * path,
 	return FALSE;
 
     /* First we free the filters list (which is now obsolete) */
+    g_slist_foreach(mailbox->filters, (GFunc) g_free, NULL);
     g_slist_free(mailbox->filters);
     mailbox->filters = NULL;
     /* Second we replace old filters name by the new ones
@@ -1401,8 +1521,15 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
 void
 fe_action_selected(GtkWidget * widget, gpointer data)
 {
+#if GTK_CHECK_VERSION(2, 4, 0)
+    FilterActionType type =
+        (FilterActionType) fe_combo_box_get_value(widget);
+    gtk_widget_set_sensitive(GTK_WIDGET(fe_mailboxes),
+                             type != FILTER_TRASH);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_widget_set_sensitive(GTK_WIDGET(fe_mailboxes),
                              GPOINTER_TO_INT(data)!=FILTER_TRASH);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     set_button_sensitivities(TRUE);
 }                       /* end fe_action_selected() */
 
@@ -1687,7 +1814,9 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     GtkTreeIter cond_iter;
     LibBalsaFilter *fil,*old;
     const gchar *temp;
+#if !GTK_CHECK_VERSION(2, 4, 0)
     GtkWidget * menu;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     FilterActionType action;
     ConditionMatchType condition_op;
 
@@ -1707,12 +1836,18 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
         return;
     }
     
+#if GTK_CHECK_VERSION(2, 4, 0)
+    /* Set the type associated with the selected item */
+    action =
+        (FilterActionType) fe_combo_box_get_value(fe_action_option_menu);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     /* Retrieve the selected item in the action menu */
     menu = gtk_menu_get_active(GTK_MENU
                                (gtk_option_menu_get_menu
                                 (GTK_OPTION_MENU(fe_action_option_menu))));
     /* Set the type associated with the selected item */
     action=GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu),"value"));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     
     if (!gtk_tree_model_get_iter_first(cond_model, &cond_iter)) {
         balsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -1734,6 +1869,12 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
 
     /* Retrieve the selected item in the op codes menu */
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    /* Set the op-codes associated with the selected item */
+    condition_op =
+        (FilterOpType) fe_combo_box_get_value(fe_op_codes_option_menu) ==
+        FILTER_OP_OR ? CONDITION_OR : CONDITION_AND;
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     menu = gtk_menu_get_active(GTK_MENU
                                (gtk_option_menu_get_menu
                                 (GTK_OPTION_MENU
@@ -1743,6 +1884,7 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     condition_op =
 	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu), "value")) ==
 	FILTER_OP_OR ? CONDITION_OR : CONDITION_AND;
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     /* Retrieve all conditions for that filter */
 
@@ -1894,12 +2036,20 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
     gtk_entry_set_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fe_sound_entry))),
                        fil->sound!=NULL ? fil->sound : "");
     
+#if GTK_CHECK_VERSION(2, 4, 0)
+    gtk_combo_box_set_active(GTK_COMBO_BOX(fe_action_option_menu),
+                             fil->action - 1);
+    pos = (fil->condition
+           && fil->condition->type == CONDITION_AND) ? 1 : 0;
+    gtk_combo_box_set_active(GTK_COMBO_BOX(fe_op_codes_option_menu), pos);
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_option_menu_set_history(GTK_OPTION_MENU(fe_action_option_menu), 
                                 fil->action-1);
     pos = (fil->condition && fil->condition->type == CONDITION_AND)
         ? 1 : 0;
     gtk_option_menu_set_history(GTK_OPTION_MENU(fe_op_codes_option_menu), 
                                 pos);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     if (fil->action!=FILTER_TRASH && fil->action_string)
         balsa_mblist_mru_option_menu_set(fe_mailboxes,
                                          fil->action_string);

@@ -1,3 +1,7 @@
+2002-03-11  Carlos Morgado  <chbm@chbm.nu>
+
+	* mx.c (mx_sync_mailbox): ifdef away if(OPTSAVEEMPTY)
+
 2002-03-10  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in, lib.h: add proper NLS support.

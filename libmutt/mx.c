@@ -1167,6 +1167,7 @@ int mx_sync_mailbox (CONTEXT *ctx, int *index_hint)
 
     sleep (1); /* allow the user time to read the message */
 
+#ifndef LIBMUTT /* balsa: we always have OPTSAVEEMPTY */
     if (ctx->msgcount == ctx->deleted &&
 	(ctx->magic == M_MBOX || ctx->magic == M_MMDF) &&
 	!mutt_is_spool (ctx->path) && !option (OPTSAVEEMPTY))
@@ -1175,6 +1176,7 @@ int mx_sync_mailbox (CONTEXT *ctx, int *index_hint)
       mx_fastclose_mailbox (ctx);
       return 0;
     }
+#endif
     
     /* if we haven't deleted any messages, we don't need to resort */ 
     /* ... except for certain folder formats which need "unsorted" 

@@ -40,19 +40,17 @@ typedef struct _MainWindow MainWindow;
 struct _MainWindow
 {
   GtkWidget *window;
-  
   GtkWidget *menubar;
-  
   GtkWidget *toolbar;
   GtkWidget *mailbox_option_menu;
   GtkWidget *mailbox_menu;
   GtkWidget *move_menu;
-  
   GtkWidget *index;
-  
   GtkWidget *message_area;
-  
   GtkWidget *status_bar;
+
+  /* non-widgets */
+  Mailbox *mailbox;
 };
 static MainWindow *mw = NULL;
 
@@ -109,11 +107,10 @@ open_main_window ()
 
   mw = g_malloc (sizeof (MainWindow));
 
-
   /* structure initalizations */
   mw->mailbox_menu = NULL;
   mw->move_menu = NULL;
-
+  mw->mailbox = NULL;
 
 
   /* main window */
@@ -280,6 +277,10 @@ refresh_main_window ()
 
     }
   gtk_option_menu_set_menu (GTK_OPTION_MENU (mw->mailbox_option_menu), mw->mailbox_menu);
+  
+  /* now set the mailbox-menu back to it's previous state */
+  if (mw->mailbox)
+    main_window_set_mailbox (mw->mailbox);
 }
 
 
@@ -815,6 +816,7 @@ mailbox_select_cb (GtkWidget * widget)
 {
   MainWindow *mainwindow;
   Mailbox *mailbox;
+  GtkWidget *messagebox;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail (GTK_IS_MENU_ITEM (widget));
@@ -823,12 +825,40 @@ mailbox_select_cb (GtkWidget * widget)
   mailbox = (Mailbox *) gtk_object_get_data (GTK_OBJECT (widget), MAILBOX_DATA);
 
 
-  /* return if the mailbox is already the currently open mailbox */
+  /* bail now if the we've been called without a valid mailbox */
+  if (!mailbox)
+    return;
 
-  if (mailbox_open (mailbox))
+
+  /* let's not open a currently-open mailbox */
+  if (mailbox == mainwindow->mailbox)
+    return;
+
+
+  /* try to open the new mailbox */
+  if (mailbox_open_ref (mailbox))
     {
       balsa_index_set_mailbox (BALSA_INDEX (mainwindow->index), mailbox);
+
+      if (mainwindow->mailbox)
+	mailbox_open_unref (mainwindow->mailbox);
+
+      mainwindow->mailbox = mailbox;
       balsa_app.current_index = mainwindow->index;
+    }
+  else
+    {
+      messagebox = gnome_message_box_new ("Unable to Open Mailbox!",
+					  GNOME_MESSAGE_BOX_ERROR,
+					  GNOME_STOCK_BUTTON_OK,
+					  NULL);
+      gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
+      gtk_window_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
+      gtk_widget_show (messagebox);
+
+      /* reset the old mailbox */
+      if (mainwindow->mailbox)
+	main_window_set_mailbox (mainwindow->mailbox);
     }
 }
 

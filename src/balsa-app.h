@@ -33,6 +33,9 @@
 #define MAILBOX_MANAGER_WIDTH 350
 #define MAILBOX_MANAGER_HEIGHT 400
 
+#define MESSAGEBOX_WIDTH 450
+#define MESSAGEBOX_HEIGHT 150
+
 
 
 /* global balsa application structure */

@@ -98,7 +98,6 @@ typedef struct
 static Mailbox *client_mailbox = NULL;
 
 
-
 /*
  * necessary for initalizing the fucking c-client library
  */
@@ -118,15 +117,6 @@ mailbox_new (MailboxType type)
 {
   Mailbox *mailbox;
 
-
-  mailbox = (Mailbox *) g_malloc (sizeof (MailboxLocal));
-  mailbox->type = type;
-  mailbox->name = NULL;
-  mailbox->private = (void *) g_malloc (sizeof (MailboxPrivate));
-  CLIENT_STREAM (mailbox) = NIL;
-  mailbox->new_messages = 0;
-
-
   switch (type)
     {
     case MAILBOX_MBX:
@@ -136,16 +126,19 @@ mailbox_new (MailboxType type)
     case MAILBOX_MMDF:
     case MAILBOX_UNIX:
     case MAILBOX_MH:
+      mailbox = (Mailbox *) g_malloc (sizeof (MailboxLocal));
       MAILBOX_LOCAL (mailbox)->path = NULL;
       break;
 
     case MAILBOX_POP3:
+      mailbox = (Mailbox *) g_malloc (sizeof (MailboxPOP3));
       MAILBOX_POP3 (mailbox)->user = NULL;
       MAILBOX_POP3 (mailbox)->passwd = NULL;
       MAILBOX_POP3 (mailbox)->server = NULL;
       break;
 
     case MAILBOX_IMAP:
+      mailbox = (Mailbox *) g_malloc (sizeof (MailboxIMAP));
       MAILBOX_IMAP (mailbox)->user = NULL;
       MAILBOX_IMAP (mailbox)->passwd = NULL;
       MAILBOX_IMAP (mailbox)->server = NULL;
@@ -153,11 +146,20 @@ mailbox_new (MailboxType type)
       break;
 
     case MAILBOX_NNTP:
+      mailbox = (Mailbox *) g_malloc (sizeof (MailboxNNTP));
       MAILBOX_NNTP (mailbox)->server = NULL;
       MAILBOX_NNTP (mailbox)->newsgroup = NULL;
       break;
+
+    default:
+      return NULL;
     }
 
+  mailbox->type = type;
+  mailbox->name = NULL;
+  mailbox->private = (void *) g_malloc (sizeof (MailboxPrivate));
+  CLIENT_STREAM (mailbox) = NIL;
+  mailbox->new_messages = 0;
 
   return mailbox;
 }
@@ -212,20 +214,21 @@ mailbox_free (Mailbox * mailbox)
 
 
 gint
-mailbox_open (Mailbox * mailbox)
+mailbox_open_ref (Mailbox * mailbox)
 {
   gchar buffer[MAILTMPLEN];
   Mailbox *old_mailbox;
 
-
   LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
 
-  /* don't open a mailbox if it's already open 
-   * -- runtime sanity */
+
   if (CLIENT_STREAM_OPEN (mailbox))
     {
+      /* incriment the reference count */
+      mailbox->open_ref++;
+
       UNLOCK_MAILBOX ();
-      return FALSE;
+      return TRUE;
     }
 
 
@@ -265,9 +268,26 @@ mailbox_open (Mailbox * mailbox)
   UNLOCK_MAILBOX ();
 
   if (CLIENT_STREAM_OPEN (mailbox))
-    return TRUE;
+    {
+      /* incriment the reference count */
+      mailbox->open_ref++;
+      return TRUE;
+    }
   else
     return FALSE;
+}
+
+
+void
+mailbox_open_unref (Mailbox * mailbox)
+{
+  if (mailbox->open_ref == 0)
+    return;
+
+  mailbox->open_ref--;
+
+  if (mailbox->open_ref == 0)
+    mailbox_close (mailbox);
 }
 
 
@@ -332,33 +352,30 @@ mailbox_message_undelete (Mailbox * mailbox, glong msgno)
 }
 
 
-gchar *
-mailbox_message_from (Mailbox * mailbox, glong msgno)
+MessageHeader *
+mailbox_message_header (Mailbox * mailbox, glong msgno, gint allocate)
 {
-  static gchar from[BUFFER_SIZE];
+  static MessageHeader header = {NULL, NULL, NULL};
+  ENVELOPE *envelope;
 
   LOCK_MAILBOX_RETURN_VAL (mailbox, NULL);
   RETURN_VAL_IF_CLIENT_STRAM_CLOSED (mailbox, NULL);
 
-  mail_fetchfrom (from, CLIENT_STREAM (mailbox), msgno, (long) BUFFER_SIZE - 1);
+  g_free (header.from);
+  g_free (header.subject);
+  g_free (header.date);
+  header.from = NULL;
+  header.subject = NULL;
+  header.date = NULL;
+
+  envelope = mail_fetchenvelope (CLIENT_STREAM (mailbox), msgno);
+
+  header.from = g_strdup (envelope->from->personal);
+  header.subject = g_strdup (envelope->subject);
+  header.date = g_strdup (envelope->date);
 
   UNLOCK_MAILBOX ();
-  return from;
-}
-
-
-gchar *
-mailbox_message_subject (Mailbox * mailbox, glong msgno)
-{
-  static gchar subject[BUFFER_SIZE];
-
-  LOCK_MAILBOX_RETURN_VAL (mailbox, NULL);
-  RETURN_VAL_IF_CLIENT_STRAM_CLOSED (mailbox, NULL);
-
-  mail_fetchsubject (subject, CLIENT_STREAM (mailbox), msgno, (long) BUFFER_SIZE - 1);
-
-  UNLOCK_MAILBOX ();
-  return subject;
+  return &header;
 }
 
 
@@ -596,6 +613,8 @@ mm_login (NETMBX * mb, char *user, char *pwd, long trial)
   if (!client_mailbox)
     return;
 
+  if (balsa_app.debug)
+    g_print ("mm_login: \n");
 
   switch (client_mailbox->type)
     {

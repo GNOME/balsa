@@ -82,7 +82,7 @@ init_balsa_app (int argc, char *argv[])
   restore_global_settings ();
   mailboxes_init ();
   load_local_mailboxes ();
-
+  my_special_mailbox ();
 
   /* start timers */
 #if 0
@@ -162,4 +162,17 @@ mailboxes_init (void)
     }
 
   return 1;
+}
+
+
+static void
+my_special_mailbox ()
+{
+  Mailbox *mailbox;
+
+  mailbox = mailbox_new (MAILBOX_NNTP);
+  mailbox->name = g_strdup ("COLA");
+  MAILBOX_NNTP (mailbox)->server = g_strdup ("news.serv.net");
+  MAILBOX_NNTP (mailbox)->newsgroup = g_strdup ("comp.os.linux.announce");
+  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
 }

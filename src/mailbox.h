@@ -58,8 +58,7 @@ typedef struct _MailboxPOP3 MailboxPOP3;
 typedef struct _MailboxIMAP MailboxIMAP;
 typedef struct _MailboxNNTP MailboxNNTP;
 
-typedef struct _Message Message;
-
+typedef struct _MessageHeader MessageHeader;
 
 
 struct _Mailbox
@@ -67,6 +66,7 @@ struct _Mailbox
   MailboxType type;
   gchar *name;
   void *private;
+  guint open_ref;
 
   glong messages;
   glong new_messages;
@@ -105,6 +105,16 @@ struct _MailboxNNTP
 };
 
 
+/*
+ * message structures
+ */
+struct _MessageHeader
+{
+  gchar *from;
+  gchar *subject;
+  gchar *date;
+};
+
 
 
 /*
@@ -113,13 +123,21 @@ struct _MailboxNNTP
 void mailbox_init ();
 
 
+/* 
+ * open and close a mailbox -- but don't use mailbox_close
+ * directly unless you know what you're doing, the mailbox
+ * is normally closed when it has a open_ref == 0
+ */
+int mailbox_open_ref (Mailbox * mailbox);
+void mailbox_open_unref (Mailbox * mailbox);
+void mailbox_close (Mailbox * mailbox);
+
+
 /*
  * create and destroy a mailbox
  */
 Mailbox *mailbox_new (MailboxType type);
 void mailbox_free (Mailbox * mailbox);
-int mailbox_open (Mailbox * mailbox);
-void mailbox_close (Mailbox * mailbox);
 gint mailbox_check_new_messages (Mailbox * mailbox);
 
 
@@ -128,8 +146,8 @@ gint mailbox_check_new_messages (Mailbox * mailbox);
  */
 void mailbox_message_delete (Mailbox * mailbox, glong msgno);
 void mailbox_message_undelete (Mailbox * mailbox, glong msgno);
-gchar * mailbox_message_from (Mailbox * mailbox, glong msgno);
-gchar * mailbox_message_subject (Mailbox * mailbox, glong msgno);
+MessageHeader * mailbox_message_header (Mailbox * mailbox, glong msgno, gint allocate);
+
 
 
 /*

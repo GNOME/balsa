@@ -461,6 +461,7 @@ append_messages (BalsaIndex * bindex,
 		 glong last)
 {
   glong i;
+  MessageHeader *header;
   gchar message[BUFFER_SIZE];
   gchar *text[5];
 
@@ -469,14 +470,16 @@ append_messages (BalsaIndex * bindex,
 
   text[0] = NULL;
   text[1] = message;
-  text[4] = NULL;
 
   gtk_clist_freeze (GTK_CLIST (GTK_BIN (bindex)->child));
   for (i = first; i <= last; i++)
     {
+      header = mailbox_message_header (bindex->mailbox, i, FALSE);
+
       sprintf (text[1], "%d", i);
-      text[2] = mailbox_message_from (bindex->mailbox, i);
-      text[3] = mailbox_message_subject (bindex->mailbox, i);
+      text[2] = header->from;
+      text[3] = header->subject;
+      text[4] = header->date;
 
       gtk_clist_append (GTK_CLIST (GTK_BIN (bindex)->child), text);
       update_message_flag (bindex, i, "N");

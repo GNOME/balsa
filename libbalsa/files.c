@@ -23,6 +23,7 @@
 #include "config.h"
 #include <gnome.h>
 #include <libgnomevfs/gnome-vfs-mime-handlers.h>
+#include <libgnomevfs/gnome-vfs-utils.h>
 
 #include "misc.h"
 #include "files.h"
@@ -126,7 +127,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename)
 	icon = g_strdup (icon_file);
 
     if (!icon || !g_file_exists (icon)) {
-	gchar *gnome_icon, *p_gnome_icon;
+	gchar *gnome_icon, *p_gnome_icon, *tmp;
 	
 	gnome_icon = g_strdup_printf ("gnome-%s.png", content_type);   
 	
@@ -134,7 +135,12 @@ libbalsa_icon_finder(const char *mime_type, const char *filename)
 	if (p_gnome_icon != NULL)
 	    *p_gnome_icon = '-';
 
-	icon = balsa_pixmap_finder_no_warn (gnome_icon);
+        tmp = g_strconcat("document-icons/", gnome_icon, NULL);
+        icon = gnome_vfs_icon_path_from_filename(tmp);
+        g_free(tmp);
+
+	if (icon == NULL)
+            icon = balsa_pixmap_finder_no_warn (gnome_icon);
 
 	/*
 	 * FIXME: Should use a better icon. Since this one is small

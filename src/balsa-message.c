@@ -185,7 +185,6 @@ static BalsaPartInfo* part_info_new(LibBalsaMessageBody* body,
 static void part_info_free(BalsaPartInfo* info);
 static GtkTextTag * quote_tag(GtkTextBuffer * buffer, gint level);
 static gboolean resize_idle(GtkWidget * widget);
-static GtkWidget *balsa_message_icon_list(BalsaMessage * bm);
 
 guint balsa_message_get_type()
 {
@@ -256,7 +255,15 @@ balsa_message_init(BalsaMessage * bm)
     gtk_widget_show(bm->content);
 
     /* Widget to hold icons */
-    bm->part_list = balsa_message_icon_list(bm);
+    bm->part_list = gnome_icon_list_new(100, NULL, FALSE);
+    gnome_icon_list_set_selection_mode(GNOME_ICON_LIST(bm->part_list),
+				       GTK_SELECTION_MULTIPLE);
+    gtk_signal_connect(GTK_OBJECT(bm->part_list), "select_icon",
+		       GTK_SIGNAL_FUNC(select_icon_cb), bm);
+    gtk_signal_connect(GTK_OBJECT(bm->part_list), "size_request",
+		       GTK_SIGNAL_FUNC(balsa_icon_list_size_request),
+		       (gpointer) bm);
+    gtk_box_pack_end(GTK_BOX(bm->vbox), bm->part_list, FALSE, FALSE, 0);
 
     bm->current_part = NULL;
     bm->message = NULL;
@@ -472,11 +479,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	libbalsa_message_body_unref(bm->message);
     }
     bm->message = NULL;
-    /* FIXME: buggy?
-    gnome_icon_list_clear(GNOME_ICON_LIST(bm->part_list)); */
-    if (bm->part_list)
-        gtk_widget_destroy(bm->part_list);
-    bm->part_list = balsa_message_icon_list(bm);
+    gnome_icon_list_clear(GNOME_ICON_LIST(bm->part_list));
 
     if (message == NULL) {
 	gtk_widget_hide(bm->header_text);
@@ -2993,21 +2996,4 @@ find_url(GtkWidget * widget, gint x, gint y, GList * url_list)
     }
 
     return NULL;
-}
-
-static GtkWidget *
-balsa_message_icon_list(BalsaMessage * bm)
-{
-    GtkWidget *widget = gnome_icon_list_new(100, NULL, FALSE);
-
-    gnome_icon_list_set_selection_mode(GNOME_ICON_LIST(widget),
-                                       GTK_SELECTION_MULTIPLE);
-    gtk_signal_connect(GTK_OBJECT(widget), "select_icon",
-                       GTK_SIGNAL_FUNC(select_icon_cb), bm);
-    gtk_signal_connect(GTK_OBJECT(widget), "size_request",
-                       GTK_SIGNAL_FUNC(balsa_icon_list_size_request),
-                       (gpointer) bm);
-    gtk_box_pack_end(GTK_BOX(bm->vbox), widget, FALSE, FALSE, 0);
-
-    return widget;
 }

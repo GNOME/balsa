@@ -196,7 +196,7 @@ static GnomeUIInfo file_menu[] = {
     { GNOME_APP_UI_ITEM, N_("_Send"),
       N_("Send this message"),
       send_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_MENU_SEND, 'S', GDK_CONTROL_MASK|GDK_MOD1_MASK, NULL },
+      BALSA_PIXMAP_MENU_SEND, 'S', GDK_CONTROL_MASK|GDK_SHIFT_MASK, NULL },
 #define MENU_FILE_QUEUE_POS 6
     { GNOME_APP_UI_ITEM, N_("_Queue"),
       N_("Queue this message in Outbox for sending"),

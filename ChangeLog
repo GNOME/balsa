@@ -1,3 +1,9 @@
+2002-05-01  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-message.c: gnome_icon_list bug fixed; revert workaround.
+	* src/sendmsg-window.c: change send shortcut.
+	* libbalsa/files.c: look for document icons in proper place.
+
 2002-04-30  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/send.c: be more verbose on most common SMTP

@@ -27,6 +27,7 @@
 #include <libgnome/gnome-i18n.h>
 #include <gmime/gmime-stream-fs.h>
 
+#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>

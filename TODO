@@ -19,17 +19,20 @@ New features/unfinished things:
  * update libmutt
 
 UI:
- D Mailbox list in the main window (as a handle.. should be reparentable)
+ D Mailbox list in the main window
+     - Allow the mailbox tree to be resized
  * finish move and copy
  * put deleted items in the trash and remove them from the current clist
  * mailboxes with new mail should have bold text
- P DND (drag and drop)
+ P DND messages into mailboxes
+     P Attachments in new mail
+     * move/copy messages via DND
  * MIME supporting icons.  use the new gnome metadata stuff that gmc uses?
  * Use useful sounds
  * New mail notification
      P via sound
      * change icon window incase Balsa is minimized to a different icon
- * sending mail (code is awful, redo.  make useful for corba idl, support
+ P sending mail (code is awful, redo.  make useful for corba idl, support
      external editors)
  * auto-open mailboxes on startup
  * Make things optional:

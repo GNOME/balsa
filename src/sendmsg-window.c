@@ -4497,6 +4497,27 @@ is_charset_ok(BalsaSendmsg *bsmsg)
     gtk_text_buffer_get_bounds(buffer, &start, &end);
     tmp = gtk_text_iter_get_text(&start, &end);
     ok = sw_can_convert(tmp, -1,  bsmsg->charset, "UTF-8", NULL);
+
+    if (!ok) {
+	/* Try the corresponding CP125x charset, if any. */
+        const gchar *windows_charset =
+            g_mime_charset_iso_to_windows(bsmsg->charset);
+
+        if (strcmp(windows_charset,
+                   g_mime_charset_canon_name(bsmsg->charset))) {
+	    /* Yes, there is one. */
+            const gchar *iconv_charset =
+                g_mime_charset_iconv_name(windows_charset);
+
+            ok = sw_can_convert(tmp, -1, iconv_charset, "UTF-8", NULL);
+            if (ok) {
+		/* Change the message charset. */
+                g_free(bsmsg->charset);
+                bsmsg->charset = g_strdup(iconv_charset);
+            }
+        }
+    }
+
     g_free(tmp);
 
     if (!ok) {
@@ -4512,7 +4533,6 @@ is_charset_ok(BalsaSendmsg *bsmsg)
     return ok;
 }
 /* "send message" menu and toolbar callback.
- * FIXME: automatic charset detection, as libmutt does for strings?
  */
 static gint
 send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)

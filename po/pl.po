@@ -1,4 +1,4 @@
-# Copyright (C) 1999-2003 Free Software Foundation, Inc.
+# Copyright (C) 1999-2004 Free Software Foundation, Inc.
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Aktualną wersję tego pliku możesz odnaleźć w repozytorium cvs.gnome.pl
 # (:pserver:anonymous@cvs.gnome.pl:/gnomepl, puste hasło)
@@ -6,19 +6,21 @@
 # pomóc w jego rozwijaniu i pielęgnowaniu, napisz do nas na adres:
 # translators@gnome.pl
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# GNOME PL Team <translators@gnome.pl>, 1999-2003
+# GNOME PL Team <translators@gnome.pl>, 1999-2004
 # Paweł Dziekoński <pdziekonski@mml.ch.pwr.wroc.pl>, 1999
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-04-21 13:50+0200\n"
+"POT-Creation-Date: 2004-04-21 19:36+0200\n"
 "PO-Revision-Date: 2003-07-27 23:38+0100\n"
 "Last-Translator: Gnome PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
 
 #. The externq database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:255 libbalsa/address-book-ldap.c:401
@@ -165,14 +167,14 @@ msgstr ""
 #: libbalsa/gmime-gpgme-context.c:373 libbalsa/gmime-gpgme-context.c:499
 #: libbalsa/gmime-gpgme-context.c:621 libbalsa/gmime-gpgme-context.c:747
 msgid "invalid crypto engine for RFC2440"
-msgstr ""
+msgstr "błędny silnik szyfrowania dla RFC2440"
 
 #: libbalsa/gmime-gpgme-context.c:404 libbalsa/gmime-gpgme-context.c:508
 #: libbalsa/gmime-gpgme-context.c:530 libbalsa/gmime-gpgme-context.c:656
 #: libbalsa/gmime-gpgme-context.c:769
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not get data from stream: %s"
-msgstr "%s: nie można pobrać danych z pliku: %s"
+msgstr "%s: nie można pobrać danych ze strumienia: %s"
 
 #: libbalsa/gmime-gpgme-context.c:411 libbalsa/gmime-gpgme-context.c:518
 #: libbalsa/gmime-gpgme-context.c:664 libbalsa/gmime-gpgme-context.c:776
@@ -218,16 +220,16 @@ msgstr "%s: nie można utworzyć kontekstu: %s"
 
 #: libbalsa/gmime-gpgme-context.c:888
 msgid "the crypto engine for protocol OpenPGP is not available"
-msgstr ""
+msgstr "silnik szyfrowania dla protokołu OpenPGP nie jest dostępny"
 
 #: libbalsa/gmime-gpgme-context.c:898
 msgid "the crypto engine for protocol CMS is not available"
-msgstr ""
+msgstr "silnik szyfrowania dla protokołu CMS nie jest dostępny"
 
 #: libbalsa/gmime-gpgme-context.c:905
 #, c-format
 msgid "invalid crypto engine %d"
-msgstr ""
+msgstr "błędny silnik szyfrowania %d"
 
 #: libbalsa/gmime-gpgme-context.c:934 libbalsa/gmime-gpgme-context.c:945
 #, c-format
@@ -235,14 +237,14 @@ msgid "%s: could not list keys for %s: %s"
 msgstr "%s: nie można uzyskać listy kluczy dla: %s: %s"
 
 #: libbalsa/gmime-gpgme-context.c:957
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not find a key for %s"
-msgstr "%s: nie można uzyskać listy kluczy dla: %s: %s"
+msgstr "%s: nie można odnaleźć klucza dla %s"
 
 #: libbalsa/gmime-gpgme-context.c:969
-#, fuzzy, c-format
+#, c-format
 msgid "%s: multiple keys for %s"
-msgstr "%s: nie można uzyskać listy kluczy dla: %s: %s"
+msgstr "%s: wiele kluczy dla %s"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:91 libbalsa/mailbox_local.c:1030
@@ -329,18 +331,16 @@ msgid "Prepend Si_gnature"
 msgstr "Podpis na począt_ku"
 
 #: libbalsa/identity.c:817
-#, fuzzy
 msgid "sign messages by default"
-msgstr "Domyślnie przeciągnięcie i upuszczenie przenosi listy"
+msgstr "domyślne podpisywanie wiadomości"
 
 #: libbalsa/identity.c:823
-#, fuzzy
 msgid "encrypt messages by default"
-msgstr "Domyślnie szyfrowanie GPG"
+msgstr "domyślnie szyfrowanie wiadomości"
 
 #: libbalsa/identity.c:829
 msgid "default crypto protocol"
-msgstr ""
+msgstr "domyślny protokół szyfrowania"
 
 #: libbalsa/identity.c:976
 msgid "Error: The identity does not have a name"
@@ -365,43 +365,43 @@ msgstr "Zarządzanie tożsamościami"
 
 # narazie nie tłumaczone bo nie wiem gdzie to jest w menu
 #: libbalsa/identity.c:1505
-#, fuzzy
 msgid "GnuPG using MIME mode"
-msgstr "_GnuPG używa trybu MIME"
+msgstr "GnuPG używa trybu MIME"
 
 #: libbalsa/identity.c:1506
-#, fuzzy
 msgid "GnuPG using OpenPGP mode"
-msgstr "G_nuPG używa starego trybu OpenPGP"
+msgstr "GnuPG używa trybu OpenPGP"
 
 #: libbalsa/identity.c:1508
 msgid "S/MIME mode"
-msgstr ""
+msgstr "tryb S/MIME"
 
 #. IMAP host name + message
 #: libbalsa/imap-server.c:249
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "IMAP server %s alert:\n"
 "%s"
-msgstr "Serwery pocztowy: %s\n"
+msgstr ""
+"Alarm serwera IMAP %s:\n"
+"%s"
 
 #. IMAP host name + message
 #: libbalsa/imap-server.c:253
-#, fuzzy, c-format
+#, c-format
 msgid "IMAP server %s error: %s"
-msgstr "Serwery pocztowy: %s\n"
+msgstr "Błąd serwera IMAP %s: %s"
 
 #. IMAP host name + message
 #: libbalsa/imap-server.c:257
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s"
-msgstr "%s [%s]\n"
+msgstr "%s: %s"
 
 #: libbalsa/imap-server.c:332
-#, fuzzy, c-format
+#, c-format
 msgid "Could not send \"%s\" to \"%s\""
-msgstr "Nie można zapisać pliku %s: %s"
+msgstr "Nie można wysłać \"%s\" do \"%s\""
 
 #: libbalsa/libbalsa.c:279
 #, c-format
@@ -419,6 +419,9 @@ msgid ""
 "<b>Reason:</b> %s\n"
 "<b>This certificate belongs to:</b>\n"
 msgstr ""
+"Autentyczność tego certyfikatu nie może zostać potwierdzona.\n"
+"<b>Powód:</b> %s\n"
+"<b>Certyfikat ten należy do:</b>\n"
 
 #: libbalsa/libbalsa.c:498
 msgid ""
@@ -442,9 +445,8 @@ msgstr ""
 "<b>Odcisk:</b> %s"
 
 #: libbalsa/libbalsa.c:518
-#, fuzzy
 msgid "SSL/TLS certificate"
-msgstr "Certyfikat IMAP TLS"
+msgstr "Certyfikat SSL/TLS"
 
 #: libbalsa/libbalsa.c:520
 msgid "_Accept Once"
@@ -487,7 +489,7 @@ msgstr "Nie można utworzyć skrzynki typu %s"
 #: libbalsa/mailbox_imap.c:717
 #, c-format
 msgid "IMAP SEARCH UNSEEN request failed for mailbox %s"
-msgstr ""
+msgstr "Żądanie IMAP SEARCH UNSEEN dla skrzynki %s nie powiodło się"
 
 #: libbalsa/mailbox_imap.c:778 libbalsa/mailbox_maildir.c:475
 #: libbalsa/mailbox_mbox.c:410 libbalsa/mailbox_mh.c:479
@@ -510,9 +512,9 @@ msgid "Open of %s failed. Errno = %d, "
 msgstr "Nie można otworzyć %s. Kod błędu: %d, "
 
 #: libbalsa/mailbox_local.c:1198
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to sync mailbox \"%s\""
-msgstr "Nie można odnaleźć skrzynki"
+msgstr "Nie można zsynchronizować skrzynki \"%s\""
 
 #: libbalsa/mailbox_maildir.c:184
 #, c-format
@@ -555,19 +557,19 @@ msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "Skrzynka %s nie wydaje się być skrzynką typu Mbox."
 
 #: libbalsa/mailbox_mbox.c:1337
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not open %s."
-msgstr "Nie można otworzyć %s"
+msgstr "%s: nie można otworzyć %s."
 
 #: libbalsa/mailbox_mbox.c:1345
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not get new mime stream."
-msgstr "%s: nie można utworzyć nowych danych: %s"
+msgstr "%s: nie można pobrać nowego strumienia mime."
 
 #: libbalsa/mailbox_mbox.c:1355
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not get message stream."
-msgstr "%s: nie można pobrać danych: %s"
+msgstr "%s: nie można pobrać strumienia wiadomości."
 
 #: libbalsa/mailbox_mbox.c:1369
 #, c-format
@@ -575,6 +577,8 @@ msgid ""
 "Error copying message to mailbox %s!\n"
 "Mailbox might have been corrupted!"
 msgstr ""
+"Błąd kopiowania wiadomości do skrzynki %s!\n"
+"Skrzynka może być uszkodzona!"
 
 #: libbalsa/mailbox_mh.c:170
 #, c-format
@@ -597,19 +601,19 @@ msgid "Retrieving Message %d of %d"
 msgstr "Pobieranie listu %d z %d"
 
 #: libbalsa/mailbox_pop3.c:363
-#, fuzzy, c-format
+#, c-format
 msgid "Received %ld kB of %ld"
-msgstr "Pobrano %d bajtów z %d"
+msgstr "Otrzymano %ld kB z %ld"
 
 #: libbalsa/mailbox_pop3.c:377
-#, fuzzy, c-format
+#, c-format
 msgid "Saving POP message to %s failed."
-msgstr "Przenoszenie przeczytanych listów do %s..."
+msgstr "Zapisanie wiadomości POP do %s nie powiodło się."
 
 #: libbalsa/mailbox_pop3.c:387
 #, c-format
 msgid "Transfering POP message to %s failed."
-msgstr ""
+msgstr "Przeniesienie wiadomości POP do %s nie powiodło się."
 
 #: libbalsa/mailbox_pop3.c:457 libbalsa/mailbox_pop3.c:468
 #, c-format
@@ -621,26 +625,24 @@ msgstr ""
 "%s"
 
 #: libbalsa/mailbox_pop3.c:494
-#, fuzzy, c-format
+#, c-format
 msgid "POP3 mailbox %s error: %s\n"
-msgstr ""
-"Błąd przy próbie dostępu do skrzynki POP3 %s:\n"
-"%s"
+msgstr "Błąd skrzynki POP3 %s: %s\n"
 
 #: libbalsa/mailbox_pop3.c:530
 #, c-format
 msgid "POP3 error: cannot open %s for writing."
-msgstr ""
+msgstr "Błąd POP3: nie można otworzyć %s do zapisu."
 
 #: libbalsa/mailbox_pop3.c:538
 #, c-format
 msgid "POP3 error: cannot close %s."
-msgstr ""
+msgstr "Błąd POP3: nie można zamknąć %s."
 
 #: libbalsa/mailbox_pop3.c:564
-#, fuzzy, c-format
+#, c-format
 msgid "POP3 error: %s."
-msgstr "Błąd przy wysyłaniu: %s"
+msgstr "Błąd POP3: %s."
 
 #: libbalsa/mailbox_pop3.c:587
 #, c-format
@@ -657,11 +659,11 @@ msgstr ""
 "Listy pozostały w %s\n"
 
 #: libbalsa/mailbox_pop3.c:629
-#, fuzzy, c-format
+#, c-format
 msgid "POP3 temp mailbox %s was not removed (system error message: %s)"
 msgstr ""
-"Nie można utworzyć pliku tymczasowego skrzynki POP3 %s:\n"
-"%s"
+"Tymczasowa skrzynka POP3 %s nie została usunięta (komunikat błędu systemu: %"
+"s)"
 
 #: libbalsa/message.c:472
 #, c-format
@@ -670,10 +672,9 @@ msgstr ""
 "Skrzynka źródłowa (%s) jest tylko do odczytu. Nie można przenieść listów."
 
 #: libbalsa/message.c:647 libbalsa/message.c:689
-#, fuzzy, c-format
+#, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
-msgstr ""
-"Skrzynka źródłowa (%s) jest tylko do odczytu. Nie można przenieść listów."
+msgstr "Skrzynka (%s) jest tylko do odczytu: nie można zmienić flag."
 
 #: libbalsa/mime.c:80 src/balsa-message.c:1996 src/print.c:678
 #, c-format
@@ -761,57 +762,50 @@ msgstr ""
 #: libbalsa/rfc3156.c:649 libbalsa/rfc3156.c:744 libbalsa/rfc3156.c:749
 #: libbalsa/rfc3156.c:820 libbalsa/rfc3156.c:825
 msgid "creating a gpgme context failed"
-msgstr ""
+msgstr "utworzenie kontekstu gpgme nie powiodło się"
 
 #: libbalsa/rfc3156.c:303 libbalsa/rfc3156.c:659
-#, fuzzy
 msgid "Enter passphrase to unlock the secret key for signing"
-msgstr "Wprowadź hasło deszyfrujące list"
+msgstr "Wprowadź hasło odblokowujące tajny klucz podpisujący"
 
 #: libbalsa/rfc3156.c:323 libbalsa/rfc3156.c:327 libbalsa/rfc3156.c:687
-#, fuzzy
 msgid "signing failed"
-msgstr "%s: podpisanie nie powiodło się: %s"
+msgstr "podpisanie nie powiodło się"
 
 #: libbalsa/rfc3156.c:400 libbalsa/rfc3156.c:405 libbalsa/rfc3156.c:690
-#, fuzzy
 msgid "encryption failed"
-msgstr "%s: szyfrowanie nie powiodło się: %s"
+msgstr "szyfrowanie nie powiodło się"
 
 #: libbalsa/rfc3156.c:518 libbalsa/rfc3156.c:523 libbalsa/rfc3156.c:760
 #: libbalsa/rfc3156.c:766
-#, fuzzy
 msgid "signature verification failed"
-msgstr "%s: weryfikacja podpisu nie powiodła się: %s"
+msgstr "weryfikacja podpisu nie powiodła się"
 
 #: libbalsa/rfc3156.c:583 libbalsa/rfc3156.c:833
 msgid "Enter passphrase to decrypt message"
 msgstr "Wprowadź hasło deszyfrujące list"
 
 #: libbalsa/rfc3156.c:594 libbalsa/rfc3156.c:599
-#, fuzzy
 msgid "decryption failed"
-msgstr "%s: odszyfrowanie nie powiodło się: %s"
+msgstr "odszyfrowanie nie powiodło się"
 
 #: libbalsa/rfc3156.c:683 libbalsa/rfc3156.c:697
-#, fuzzy
 msgid "signing and encryption failed"
-msgstr "%s: podpisanie i szyfrowanie nie powiodło się: %s"
+msgstr "podpisanie i szyfrowanie nie powiodło się"
 
 #: libbalsa/rfc3156.c:700
-#, fuzzy, c-format
+#, c-format
 msgid "signing failed: %s"
-msgstr "%s: podpisanie nie powiodło się: %s"
+msgstr "podpisanie nie powiodło się: %s"
 
 #: libbalsa/rfc3156.c:703
-#, fuzzy, c-format
+#, c-format
 msgid "encryption failed: %s"
-msgstr "%s: szyfrowanie nie powiodło się: %s"
+msgstr "szyfrowanie nie powiodło się: %s"
 
 #: libbalsa/rfc3156.c:841 libbalsa/rfc3156.c:848
-#, fuzzy
 msgid "decryption and signature verification failed"
-msgstr "%s: rozszyfrowanie i weryfikacja podpisu nie powiodły się: %s"
+msgstr "odszyfrowanie i weryfikacja podpisu nie powiodło się"
 
 # valid to w sumie ważny, ale to jakoś mi nie pasuje
 #: libbalsa/rfc3156.c:884
@@ -830,7 +824,7 @@ msgstr ""
 
 #: libbalsa/rfc3156.c:892
 msgid "The signature is invalid (Note: might be caused by gmime bug!)."
-msgstr ""
+msgstr "Podpis nie jest poprawny (Uwaga: może być spowodowany błędem gmime!)."
 
 #: libbalsa/rfc3156.c:895
 msgid "The signature could not be verified due to a missing key."
@@ -847,9 +841,8 @@ msgstr ""
 
 # FIXME - a może zamiast depozytów to baza kluczy?
 #: libbalsa/rfc3156.c:903
-#, fuzzy
 msgid "GnuPG rebuilds the trust database and is currently not available."
-msgstr "Pogram GnuPG przebudowywuje bazę depozytów i jest obecnie niedostepny."
+msgstr "Pogram GnuPG przebudowywuje bazę depozytów i jest obecnie niedostępny."
 
 #: libbalsa/rfc3156.c:905
 msgid "An error prevented the signature verification."
@@ -887,12 +880,10 @@ msgid "bad validity"
 msgstr "błąd stwierdzenia ważności"
 
 #: libbalsa/rfc3156.c:933
-#, fuzzy
 msgid "PGP signature: "
-msgstr "Podpis PGP: %s"
+msgstr "Podpis PGP: "
 
 #: libbalsa/rfc3156.c:935
-#, fuzzy
 msgid "S/MIME signature: "
 msgstr "Podpis S/MIME: "
 
@@ -1194,6 +1185,8 @@ msgstr ""
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
+"Nie można ustalić zestawu znaków dla pliku tekstowego \"%s\"; wysyłanie jako "
+"typ mime \"%s\""
 
 #: libbalsa/send.c:1718 libbalsa/send.c:1794
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
@@ -1691,14 +1684,14 @@ msgid "_View Source"
 msgstr "_Wyświetl źródło"
 
 #: src/balsa-index.c:1767
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to copy messages to mailbox \"%s\"."
-msgstr "Nie można otworzyć skrzynki \"%s\""
+msgstr "Nie można skopiować wiadomości do skrzynki \"%s\"."
 
 #: src/balsa-index.c:1768
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to copy message to mailbox \"%s\"."
-msgstr "Nie można otworzyć skrzynki \"%s\""
+msgstr "Nie można skopiować wiadomości do skrzynki \"%s\"."
 
 #: src/balsa-mblist.c:327
 msgid "Mailbox"
@@ -1724,10 +1717,13 @@ msgstr "_Inny..."
 msgid "Choose destination folder"
 msgstr "Wybór folderu docelowego"
 
-#: src/balsa-mblist.c:2132
-#, fuzzy, c-format
-msgid "Shown mailbox: %s with %d messages, %ld new"
-msgstr "Widoczna skrzynka: %s; %ld listów, %ld nowych"
+#: src/balsa-mblist.c:2136
+#, c-format
+msgid "Shown mailbox: %s with %d message, %ld new"
+msgid_plural "Shown mailbox: %s with %d messages, %ld new"
+msgstr[0] "Widoczna skrzynka: %s z %d listem, %ld nowych"
+msgstr[1] "Widoczna skrzynka: %s z %d listami, %ld nowych"
+msgstr[2] "Widoczna skrzynka: %s z %d listami, %ld nowych"
 
 #: src/balsa-message.c:469
 msgid "Content"
@@ -1892,12 +1888,8 @@ msgstr ""
 "nagłówka opisującego użyty zestaw znaków (zmieniono na %s)"
 
 #: src/balsa-message.c:2131
-#, fuzzy
 msgid "This is an OpenPGP signed message part:\n"
-msgstr ""
-"\n"
-"--\n"
-"Część listu podpisana za pomocą OpenPGP:\n"
+msgstr "Część listu podpisana za pomocą OpenPGP:\n"
 
 #: src/balsa-message.c:2344
 msgid "mixed parts"
@@ -1964,21 +1956,21 @@ msgid "Reply to MDN?"
 msgstr "Czy odpowiedzieć na MDN?"
 
 #: src/balsa-message.c:3829
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
 "this crypto protocol is not available."
 msgstr ""
-"List wysłany przez %s o temacie \"%s\" zawiera zaszyfrowaną część, ale jej "
-"struktura jest niepoprawna."
+"List wysłany przez %s o temacie \"%s\" zawiera część zaszyfrowaną %s, ale "
+"ten protokół szyfrowania nie jest dostępny."
 
 #: src/balsa-message.c:3832
 msgid "PGP"
-msgstr ""
+msgstr "PGP"
 
 #: src/balsa-message.c:3832
 msgid "S/MIME"
-msgstr ""
+msgstr "S/MIME"
 
 #: src/balsa-message.c:3866 src/balsa-message.c:4163
 #, c-format
@@ -2020,22 +2012,22 @@ msgstr ""
 "struktura jest niepoprawna."
 
 #: src/balsa-message.c:3984
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
 "but this crypto protocol is not available."
 msgstr ""
-"List wysłany przez %s o temacie \"%s\" zawiera zaszyfrowaną część, ale jej "
-"struktura jest niepoprawna."
+"List wysłany przez %s o temacie \"%s\" zawiera część zaszyfrowaną PGP, ale "
+"ten protokół szyfrowania nie jest dostępny."
 
 #: src/balsa-message.c:3996
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
 "but this crypto protocol is not available."
 msgstr ""
-"List wysłany przez %s o temacie \"%s\" zawiera zaszyfrowaną część, ale jej "
-"struktura jest niepoprawna."
+"List wysłany przez %s o temacie \"%s\" zawiera część zaszyfrowaną S/MIME, "
+"ale ten protokół szyfrowania nie jest dostępny."
 
 #: src/balsa-message.c:4083 src/balsa-message.c:4274
 msgid "run gpg to import this key"
@@ -2169,17 +2161,17 @@ msgstr "_Wszystkie"
 msgid "C_lear"
 msgstr "Wyc_zyść"
 
-#: src/filter-edit-callbacks.c:1011 src/main-window.c:2935
+#: src/filter-edit-callbacks.c:1011 src/main-window.c:2934
 msgid "_Body"
 msgstr "Tr_eść"
 
 #. To:
-#: src/filter-edit-callbacks.c:1018 src/main-window.c:2936
+#: src/filter-edit-callbacks.c:1018 src/main-window.c:2935
 #: src/sendmsg-window.c:1949
 msgid "_To:"
 msgstr "D_la:"
 
-#: src/filter-edit-callbacks.c:1025 src/main-window.c:2937
+#: src/filter-edit-callbacks.c:1025 src/main-window.c:2936
 msgid "_From:"
 msgstr "O_d:"
 
@@ -2187,7 +2179,7 @@ msgstr "O_d:"
 msgid "_Subject"
 msgstr "_Temat"
 
-#: src/filter-edit-callbacks.c:1040 src/main-window.c:2939
+#: src/filter-edit-callbacks.c:1040 src/main-window.c:2938
 msgid "_Cc:"
 msgstr "_Cc:"
 
@@ -2352,9 +2344,9 @@ msgid "Balsa Filters"
 msgstr "Zarządzanie filtrami"
 
 #: src/filter-edit-dialog.c:560
-#, fuzzy, c-format
+#, c-format
 msgid "Filter \"%s\" has no condition."
-msgstr "Filtr musi zawierać warunki."
+msgstr "Filtr \"%s\" nie zawiera warunku."
 
 #: src/filter-export-callbacks.c:55
 #, c-format
@@ -2785,9 +2777,9 @@ msgid "The folder edition to be written."
 msgstr "Modyfikacja folderu nie została jeszcze zaimplementowana."
 
 #: src/mailbox-node.c:359
-#, fuzzy, c-format
+#, c-format
 msgid "Scanning of %s failed: %s"
-msgstr "%s: podpisanie nie powiodło się: %s"
+msgstr "Analizowanie %s nie powiodło się: %s"
 
 #: src/mailbox-node.c:415
 #, c-format
@@ -2865,9 +2857,9 @@ msgid "_Edit/Apply filters"
 msgstr "Z_modyfikuj lub uruchom filtry"
 
 #: src/mailbox-node.c:1089
-#, fuzzy, c-format
+#, c-format
 msgid "The path \"%s\" does not lead to a mailbox."
-msgstr "Skrzynka \"%s\" wydaje się być niepoprawna."
+msgstr "Ścieżka \"%s\" nie wskazuje na skrzynkę."
 
 #: src/mailbox-node.c:1103
 #, c-format
@@ -3120,28 +3112,24 @@ msgid "Toggle flagged"
 msgstr "Przełącza oznakowanie bieżącego listu"
 
 #: src/main-window.c:457 src/main-window.c:597
-#, fuzzy
 msgid "_Deleted"
-msgstr "_Usuń"
+msgstr "_Usunięty"
 
 #: src/main-window.c:458
-#, fuzzy
 msgid "Toggle deleted flag"
-msgstr "Przełącza oznaczenie listu jako nowy"
+msgstr "Przełącza oznaczenie listu jako usunięty"
 
 #: src/main-window.c:463
 msgid "Toggle New"
 msgstr "Przełącza oznaczenie listu jako nowy"
 
 #: src/main-window.c:469 src/main-window.c:615
-#, fuzzy
 msgid "_Answered"
-msgstr "_NP"
+msgstr "Z _odpowiedzią"
 
 #: src/main-window.c:469
-#, fuzzy
 msgid "Toggle Answered"
-msgstr "Przełącza oznaczenie listu jako nowy"
+msgstr "Przełącza oznaczenie listu jako z odpowiedzią"
 
 #: src/main-window.c:481 src/toolbar-factory.c:99
 msgid "Reply to the current message"
@@ -3221,38 +3209,32 @@ msgstr "Przenosi bieżący list do skrzynki śmietnika"
 
 #. !
 #: src/main-window.c:565
-#, fuzzy
 msgid "_Toggle flag"
-msgstr "Przełącza oznakowanie bieżącego listu"
+msgstr "_Przełącz flagę"
 
 #: src/main-window.c:571
 msgid "Store address of sender in addressbook"
 msgstr "Zapisuje adres nadawcy w książce adresowej"
 
 #: src/main-window.c:600
-#, fuzzy
 msgid "Un_Deleted"
-msgstr "Usunięty"
+msgstr "O_dzyskany"
 
 #: src/main-window.c:603
-#, fuzzy
 msgid "_Read"
-msgstr "Ponów"
+msgstr "P_rzeczytany"
 
 #: src/main-window.c:606
-#, fuzzy
 msgid "Un_read"
-msgstr "NP"
+msgstr "_Nieprzeczytany"
 
 #: src/main-window.c:612
-#, fuzzy
 msgid "Un_flagged"
-msgstr "Ozn_akowany"
+msgstr "Nieozn_akowany"
 
 #: src/main-window.c:618
-#, fuzzy
 msgid "Un_answered"
-msgstr "_Hasło"
+msgstr "Bez odpowiedz_i"
 
 #: src/main-window.c:626
 msgid "Next Message"
@@ -3272,24 +3254,21 @@ msgid "Next Flagged Message"
 msgstr "Następny oznakowany list"
 
 #: src/main-window.c:653
-#, fuzzy
 msgid "_Hide messages"
-msgstr "Ukrywanie usuniętych listów"
+msgstr "_Ukryj wiadomości"
 
 #. the next one is for testing only
 #: src/main-window.c:655
 msgid "Show from _name"
-msgstr ""
+msgstr "Wyświetl od _nazwy"
 
 #: src/main-window.c:657
-#, fuzzy
 msgid "Show _Patches"
-msgstr "Wyświetla wszystkie nagłówki"
+msgstr "Wyświetl ścież_ki"
 
 #: src/main-window.c:659
-#, fuzzy
 msgid "Reset _Filter"
-msgstr "Zarządzanie filtrami"
+msgstr "Wyczyść fi_ltr"
 
 #: src/main-window.c:664
 msgid "Select all"
@@ -3434,71 +3413,68 @@ msgstr "Błąd przy wysyłaniu: %s"
 msgid "Balsa: New mail"
 msgstr "Balsa: Nowa poczta"
 
-#: src/main-window.c:2460
+#: src/main-window.c:2459
 #, c-format
-msgid "You have received %d new messages."
-msgstr "Odebrano %d nowych listów."
+msgid "You have received %d new message."
+msgid_plural "You have received %d new messages."
+msgstr[0] "Odebrano %d nowy list."
+msgstr[1] "Odebrano %d nowe listy."
+msgstr[2] "Odebrano %d nowych listów."
 
-#: src/main-window.c:2461
-msgid "You have received 1 new message."
-msgstr "Odebrano jeden nowy list."
-
-#: src/main-window.c:2894
+#: src/main-window.c:2893
 msgid "Search mailbox"
 msgstr "Przeszukiwanie skrzynki"
 
-#: src/main-window.c:2898
-#, fuzzy
+#: src/main-window.c:2897
 msgid "Fi_lter"
-msgstr "F_iltr:"
+msgstr "F_iltr"
 
-#: src/main-window.c:2908
+#: src/main-window.c:2907
 msgid "_Reverse search"
 msgstr "Przeszukiwanie od _tyłu"
 
-#: src/main-window.c:2911
+#: src/main-window.c:2910
 msgid "_Search for:"
 msgstr "Wyszukiwany _napis:"
 
-#: src/main-window.c:2924
+#: src/main-window.c:2923
 msgid "In:"
 msgstr "Zakres:"
 
-#: src/main-window.c:2938
+#: src/main-window.c:2937
 msgid "S_ubject"
 msgstr "T_emat:"
 
-#: src/main-window.c:3074
+#: src/main-window.c:3073
 msgid "You can apply filters only on mailbox\n"
 msgstr "Można stosować filtry tylko na skrzynkach\n"
 
-#: src/main-window.c:3325 src/main-window.c:3344
+#: src/main-window.c:3324 src/main-window.c:3343
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Zapisanie zmian w skrzynce %s nie powiodło się."
 
-#: src/main-window.c:3483
+#: src/main-window.c:3482
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (tylko do odczytu)"
 
-#: src/main-window.c:3485
+#: src/main-window.c:3484
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3589
+#: src/main-window.c:3588
 msgid "Cannot access the message's body\n"
 msgstr "Nie można uzyskać dostępu do treści listu\n"
 
 #: src/main.c:203
-#, fuzzy
 msgid "Get new mail on startup"
 msgstr "Pobranie nowej poczty przy uruchamianiu"
 
 #: src/main.c:205
 msgid "Compose a new email to EMAIL@ADDRESS"
-msgstr "Tworzy nowy list do EMAIL@ADDRESS"
+msgstr "Tworzy nowy list do EMAIL@ADRES"
 
 #: src/main.c:207
 msgid "Attach file at PATH"
@@ -3525,9 +3501,8 @@ msgid "Debug POP3 connection"
 msgstr "Śledzenie połączenia POP3"
 
 #: src/main.c:219
-#, fuzzy
 msgid "Debug IMAP connection"
-msgstr "Śledzenie połączenia POP3"
+msgstr "Śledzenie połączenia IMAP"
 
 #: src/main.c:241
 msgid "The Balsa E-Mail Client"
@@ -3925,19 +3900,14 @@ msgstr ""
 "Pomijanie części w HTML-u przy odpowiadaniu na list lub jego przesyłaniu"
 
 #: src/pref-manager.c:1915
-#, fuzzy
 msgid "Forward a mail as attachment instead of quoting it"
-msgstr "Przycisk przesyłania załącza listy zamiast ich cytowania"
+msgstr "Przesyłanie listu jako załącznika zamiast cytowania"
 
 #: src/pref-manager.c:1918
-#, fuzzy
 msgid "Send button always queues outgoing mail in outbox"
-msgstr ""
-"Przycisk wysyłania kolejkuje pocztę wychodzącą w skrzynce zamiast ich "
-"wysyłania"
+msgstr "Przycisk wysyłania kolejkuje pocztę wychodzącą w skrzynce wychodzącej"
 
 #: src/pref-manager.c:1921
-#, fuzzy
 msgid "Copy outgoing messages to sentbox"
 msgstr "Kopiowanie wysyłanych listów do folderu poczty wysyłanej"
 
@@ -4203,9 +4173,8 @@ msgid "Show in list"
 msgstr "Wyświetlanie na liście"
 
 #: src/pref-manager.c:2930
-#, fuzzy
 msgid "Show in status bar"
-msgstr "Wyświetlanie na liście"
+msgstr "Wyświetlanie na pasku stanu"
 
 #: src/pref-manager.c:2931
 msgid "Print to console"
@@ -4240,12 +4209,11 @@ msgid "Page: %i/%i"
 msgstr "Strona: %i/%i"
 
 #: src/print.c:665
-#, fuzzy
 msgid ""
 "Preparing an HTML part, which must start on a new page.\n"
 "Print this part?"
 msgstr ""
-"Przetwarzanie części HTML listu, która musi się zacząć na nowej stronie.\n"
+"Przetwarzanie części HTML, która musi się zacząć na nowej stronie.\n"
 "Wydrukować tą część?"
 
 #. gather some info about this part
@@ -4637,7 +4605,7 @@ msgstr "G_nuPG używa starego trybu OpenPGP"
 
 #: src/sendmsg-window.c:405
 msgid "_S/MIME mode (GpgSM)"
-msgstr ""
+msgstr "Tryb _S/MIME (GpgSM)"
 
 #: src/sendmsg-window.c:417
 msgid "_Request Disposition Notification"
@@ -4686,9 +4654,8 @@ msgstr ""
 "Czy zapisać go w folderze Poczta robocza?"
 
 #: src/sendmsg-window.c:567 src/sendmsg-window.c:3801
-#, fuzzy
 msgid "Could not postpone message."
-msgstr "Nie można dołączyć listu"
+msgstr "Nie można odłożyć listu."
 
 #. Comments:
 #: src/sendmsg-window.c:682 src/sendmsg-window.c:2054
@@ -4872,14 +4839,12 @@ msgid "sending message with gpg mode %d"
 msgstr "wysyłanie listu z użyciem trybu gpg %d"
 
 #: src/sendmsg-window.c:3710
-#, fuzzy
 msgid "Send failed"
-msgstr "Polecenie CLOSE nie powiodło się"
+msgstr "Wysłanie nie powiodło się"
 
 #: src/sendmsg-window.c:3813
-#, fuzzy
 msgid "Could not save message."
-msgstr "Nie można dołączyć listu"
+msgstr "Nie można zapisać wiadomości."
 
 #: src/sendmsg-window.c:3991
 #, c-format
@@ -5276,655 +5241,3 @@ msgstr "Góra"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Dół"
-
-#~ msgid "GPG sign by default"
-#~ msgstr "Domyślnie podpisanie GPG"
-
-#~ msgid "unknown error"
-#~ msgstr "nieznany błąd"
-
-#~ msgid "<b>This certificate belongs to:</b>\n"
-#~ msgstr "<b>Certyfikat należy do:</b>\n"
-
-#~ msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
-#~ msgstr "*** BŁĄD: Strumień skrzynki został zamknięty: %s ***\n"
-
-#~ msgid ""
-#~ "IMAP SEARCH command failed for mailbox %s\n"
-#~ "or query was incompatible with IMAP (perhaps you use regular "
-#~ "expressions)\n"
-#~ "falling back to default searching method"
-#~ msgstr ""
-#~ "Polecenie IMAP SEARCH dla skrzynki %s nie powiodło się\n"
-#~ "lub zapytanie nie było zgodne z protokołem IMAP (być może użyto wyrażeń "
-#~ "regularnych).\n"
-#~ "Nastąpił powrót do domyślnej metody wyszukiwania"
-
-#~ msgid "Couldn't open destination mailbox (%s) for writing"
-#~ msgstr "Nie można otworzyć folderu docelowego (%s) do zapisu"
-
-#~ msgid "Couldn't open destination mailbox (%s) for copying"
-#~ msgstr "Nie można otworzyć folderu docelowego (%s) do kopiowania"
-
-#~ msgid "connection error"
-#~ msgstr "błąd przy połączeniu"
-
-#~ msgid "POP command execution failed"
-#~ msgstr "Błąd przy wykonywaniu polecenia POP"
-
-#~ msgid "Could not write the message"
-#~ msgstr "Nie można zapisać listu"
-
-#~ msgid "Could not run the delivery program (procmail)"
-#~ msgstr "Nie można uruchomić programu procmail"
-
-#~ msgid "Could not open mailbox for spooling"
-#~ msgstr "Nie można otworzyć skrzynki do sprawdzenia"
-
-#~ msgid "Host not found"
-#~ msgstr "Nie odnaleziono komputera"
-
-#~ msgid "Connection refused"
-#~ msgstr "Połączenie zostało odrzucone"
-
-#~ msgid "Authentication failed"
-#~ msgstr "Uwierzytelnienie nie powiodło się"
-
-#~ msgid "PGP Signature: "
-#~ msgstr "Podpis PGP: "
-
-#~ msgid "%s: could not get data from mailbox file: %s"
-#~ msgstr "%s: nie można pobrać danych z pliku skrzynki: %s"
-
-#~ msgid "%s: could not get decrypted data: %s"
-#~ msgstr "%s: nie można pobrać odszyfrowanych danych: %s"
-
-#~ msgid "The signature is invalid."
-#~ msgstr "Podpis jest niepoprawny."
-
-#~ msgid "Enter passsphrase to OpenPGP sign the first message part"
-#~ msgstr ""
-#~ "Wprowadź hasło w celu podpisania pierwszej części listu za pomocą OpenPGP"
-
-#~ msgid "%s: could not get data from buffer: %s"
-#~ msgstr "%s: nie można pobrać danych z bufora: %s"
-
-#~ msgid "Enter passsphrase to decrypt message part"
-#~ msgstr "Wprowadź hasło deszyfrujące list"
-
-#~ msgid ""
-#~ "The OpenPGP encrypted message part contains 8-bit characters, but no "
-#~ "header describing the used codeset (converted to %s)"
-#~ msgstr ""
-#~ "List zaszyfrowany za pomocą OpenPGP zawiera ośmiobitowe znaki, ale brak "
-#~ "nagłówka opisującego użyty zestaw znaków (zmieniono na %s)"
-
-#~ msgid "%s: could not retrieve key for %s: %s"
-#~ msgstr "%s: nie można pobrać klucza dla %s: %s"
-
-#~ msgid "could not get a private key for %s"
-#~ msgstr "nie można pobrać prywatnego klucza dla %s"
-
-#~ msgid "could not get a public key for %s"
-#~ msgstr "nie można pobrać klucza publicznego dla %s"
-
-#~ msgid "Enter passsphrase to sign message"
-#~ msgstr "Wprowadź hasło w celu podpisania listu"
-
-#~ msgid "Unable to open sentbox - could not get IMAP server information"
-#~ msgstr ""
-#~ "Nie można otworzyć folderu \"Poczta wysłana\" - brak informacji od "
-#~ "serwera IMAP"
-
-#~ msgid ""
-#~ "[-- Error:  Could not display any parts of Multipart/Alternative! --]\n"
-#~ msgstr ""
-#~ "[-- Błąd:  Nie można wyświetlić żadnej z części Multipart/Alternative! "
-#~ "--]\n"
-
-#~ msgid "[-- Attachment #%d"
-#~ msgstr "[-- Załącznik #%d"
-
-#~ msgid "[-- Type: %s/%s, Encoding: %s, Size: %s --]\n"
-#~ msgstr "[-- Typ: %s/%s, Kodowanie: %s, Rozmiar: %s --]\n"
-
-#~ msgid "[-- Autoview using %s --]\n"
-#~ msgstr "[-- Automatyczne wyświetlanie przy użyciu %s --]\n"
-
-#~ msgid "Invoking autoview command: %s"
-#~ msgstr "Wykonywanie polecenia automatycznego widoku: %s"
-
-#~ msgid "Can't create filter"
-#~ msgstr "Nie można utworzyć filtru"
-
-#~ msgid "[-- Can't run %s. --]\n"
-#~ msgstr "[-- Nie można uruchomić %s. --]\n"
-
-#~ msgid "[-- Autoview stderr of %s --]\n"
-#~ msgstr "[-- Wyjście błędów polecenia automatycznego widoku %s --]\n"
-
-#~ msgid "[-- Error: message/external-body has no access-type parameter --]\n"
-#~ msgstr "[-- Błąd: message/external-body bez parametru access-type --]\n"
-
-#~ msgid "[-- This %s/%s attachment "
-#~ msgstr "[-- Ten załącznik %s/%s "
-
-#~ msgid "(size %s bytes) "
-#~ msgstr "(rozmiar %s bajtów) "
-
-#~ msgid "has been deleted --]\n"
-#~ msgstr "został usunięty --]\n"
-
-#~ msgid "[-- on %s --]\n"
-#~ msgstr "[-- dnia %s --]\n"
-
-#~ msgid ""
-#~ "[-- This %s/%s attachment is not included, --]\n"
-#~ "[-- and the indicated external source has --]\n"
-#~ "[-- expired. --]\n"
-#~ msgstr ""
-#~ "[-- Ten załącznik %s/%s nie jest dołączony, --]\n"
-#~ "[-- a wskazane zewnętrzne źródło wygasło. --\n"
-
-#~ msgid "[-- This %s/%s attachment is not included, --]\n"
-#~ msgstr "[-- Ten załącznik %s/%s nie jest dołączony, --]\n"
-
-#~ msgid "[-- and the indicated access-type %s is unsupported --]\n"
-#~ msgstr ""
-#~ "[-- a wskazany typ dostępu (access-type) %s nie jest obsługiwany --]\n"
-
-#~ msgid "Error: multipart/signed has no protocol."
-#~ msgstr "Błąd: multipart/signed (wieloczęściowy/podpisany) bez protokołu."
-
-#~ msgid "Error: multipart/encrypted has no protocol parameter!"
-#~ msgstr ""
-#~ "Błąd: multipart/encrypted (wieloczęściowy/zaszyfrowany) bez parametru "
-#~ "protokołu!"
-
-#~ msgid "Unable to open temporary file!"
-#~ msgstr "Nie można otworzyć pliku tymczasowego!"
-
-#~ msgid "[-- %s/%s is unsupported "
-#~ msgstr "[-- %s/%s - nieobsługiwane "
-
-#~ msgid "(use '%s' to view this part)"
-#~ msgstr "(użyj \"%s\", aby wyświetlić tę część)"
-
-#~ msgid "(need 'view-attachments' bound to key!)"
-#~ msgstr "(wymaga 'view-attachments' powiązanego z klawiszem!)"
-
-#~ msgid "No authenticators available"
-#~ msgstr "Brak modułów uwierzytelniających"
-
-#~ msgid "Authenticating (anonymous)..."
-#~ msgstr "Uwierzytelnianie (anonimowe)..."
-
-#~ msgid "Anonymous authentication failed."
-#~ msgstr "Uwierzytelnienie anonimowe nie powiodło się."
-
-#~ msgid "Authenticating (CRAM-MD5)..."
-#~ msgstr "Uwierzytelnianie (CRAM-MD5)..."
-
-#~ msgid "CRAM-MD5 authentication failed."
-#~ msgstr "Uwierzytelnienie CRAM-MD5 nie powiodło się."
-
-#~ msgid "Authenticating (GSSAPI)..."
-#~ msgstr "Uwierzytelnianie (GSSAPI)..."
-
-#~ msgid "GSSAPI authentication failed."
-#~ msgstr "Uwierzytelnienie GSSAPI nie powiodło się."
-
-#~ msgid "LOGIN disabled on this server."
-#~ msgstr "Polecenie LOGIN nie działa na tym serwerze."
-
-#~ msgid "Logging in..."
-#~ msgstr "Logowanie..."
-
-#~ msgid "Login failed."
-#~ msgstr "Zalogowanie nie powiodło się."
-
-#~ msgid "Authenticating (SASL)..."
-#~ msgstr "Uwierzytelnianie (SASL)..."
-
-#~ msgid "SASL authentication failed."
-#~ msgstr "Uwierzytelnienie SASL nie powiodło się."
-
-#~ msgid "%s is an invalid IMAP path"
-#~ msgstr "%s nie jest poprawną ścieżką IMAP"
-
-#~ msgid "Getting namespaces..."
-#~ msgstr "Pobieranie przestrzeni nazw..."
-
-#~ msgid "Getting folder list..."
-#~ msgstr "Pobieranie listy folderów..."
-
-#~ msgid "No such folder"
-#~ msgstr "Nie ma takiego folderu"
-
-#~ msgid "Create mailbox: "
-#~ msgstr "Tworzona skrzynka: "
-
-#~ msgid "Mailbox must have a name."
-#~ msgstr "Skrzynka musi mieć nazwę."
-
-#~ msgid "Mailbox created."
-#~ msgstr "Skrzynka została utworzona."
-
-#~ msgid "Mailbox closed"
-#~ msgstr "Skrzynka została zamknięta"
-
-#~ msgid "Fatal error.  Message count is out of sync!"
-#~ msgstr "Poważny błąd.  Niezgodna liczba listów!"
-
-#~ msgid "Closing connection to %s..."
-#~ msgstr "Zamykanie połączenia z %s..."
-
-#~ msgid "This IMAP server is ancient. Mutt does not work with it."
-#~ msgstr "Ten serwer IMAP jest przestarzały. Mutt nie obsługuje tej wersji."
-
-#~ msgid "Secure connection with TLS?"
-#~ msgstr "Bezpieczne połączenie TLS?"
-
-#~ msgid "Connecting to %s ..."
-#~ msgstr "Nawiązywanie połączenia z %s ..."
-
-#~ msgid "Could not negotiate TLS connection"
-#~ msgstr "Nie można wynegocjować połączenia TLS"
-
-#~ msgid "Selecting %s..."
-#~ msgstr "Zaznaczanie %s..."
-
-#~ msgid "Error opening mailbox"
-#~ msgstr "Błąd przy otwieraniu skrzynki"
-
-#~ msgid "Unable to append to IMAP mailboxes at this server"
-#~ msgstr "Nie można dołączać listów do skrzynek IMAP na tym serwerze"
-
-#~ msgid "Create %s?"
-#~ msgstr "Utworzyć %s?"
-
-#~ msgid "Closing connection to IMAP server..."
-#~ msgstr "Zamykanie połączenia z serwerem IMAP..."
-
-#~ msgid "Marking %d messages deleted..."
-#~ msgstr "Zaznaczanie %d listów jako usuniętych..."
-
-#~ msgid "Expunge failed"
-#~ msgstr "Usunięcie nie powiodło się"
-
-#~ msgid "Saving message status flags... [%d/%d]"
-#~ msgstr "Zapisywanie znaczników stanu listów... [%d/%d]"
-
-#~ msgid "Expunging messages from server..."
-#~ msgstr "Usuwanie listów z serwera..."
-
-#~ msgid "Bad mailbox name"
-#~ msgstr "Niepoprawna nazwa skrzynki"
-
-#~ msgid "Subscribing to %s..."
-#~ msgstr "Zapisywanie do %s..."
-
-#~ msgid "Unsubscribing to %s..."
-#~ msgstr "Wypisywanie z %s..."
-
-#~ msgid "Unable to fetch headers from this IMAP server version."
-#~ msgstr "Z serwera w tej wersji nie można pobrać nagłówków."
-
-#~ msgid "Fetching message headers... [%d/%d]"
-#~ msgstr "Pobieranie nagłówków listów... [%d/%d]"
-
-#~ msgid "Fetching message..."
-#~ msgstr "Pobieranie listu..."
-
-#~ msgid "The message index is incorrect. Try reopening the mailbox."
-#~ msgstr "Niepoprawny indeks listu. Spróbuj ponownie otworzyć skrzynkę."
-
-#~ msgid "Uploading message ..."
-#~ msgstr "Wysyłanie listu..."
-
-#~ msgid "Copying %d messages to %s..."
-#~ msgstr "Kopiowanie %d listów do %s..."
-
-#~ msgid "Copying message %d to %s..."
-#~ msgstr "Kopiowanie %d. listu do %s..."
-
-#~ msgid "Continue?"
-#~ msgstr "Kontynuować?"
-
-#~ msgid "Out of memory!"
-#~ msgstr "Brak pamięci!"
-
-#~ msgid "Reading %s... %d (%d%%)"
-#~ msgstr "Odczytywanie %s... %d (%d%%)"
-
-#~ msgid "Mailbox is corrupt!"
-#~ msgstr "Skrzynka jest uszkodzona!"
-
-#~ msgid "Mailbox was corrupted!"
-#~ msgstr "Skrzynka została uszkodzona!"
-
-#~ msgid "Fatal error!  Could not reopen mailbox!"
-#~ msgstr "Poważny błąd! Nie można otworzyć ponownie skrzynki!"
-
-#~ msgid "Unable to lock mailbox!"
-#~ msgstr "Nie można zablokować skrzynki!"
-
-#~ msgid "Could not create temporary file!"
-#~ msgstr "Nie można utworzyć pliku tymczasowego!"
-
-#~ msgid "sync: mbox modified, but no modified messages! (report this bug)"
-#~ msgstr ""
-#~ "synchronizacja: skrzynka została zmieniona, lecz nie ma zmienionych "
-#~ "listów! (zgłoś ten błąd)"
-
-#~ msgid "Writing messages... %d (%d%%)"
-#~ msgstr "Zapisywanie listów... %d (%d%%)"
-
-#~ msgid "Committing changes..."
-#~ msgstr "Zatwierdzanie zmian..."
-
-#~ msgid "Write failed!  Saved partial mailbox to %s"
-#~ msgstr "Zapis nie powiódł się!  Zapisano część skrzynki do %s"
-
-#~ msgid "Could not reopen mailbox!"
-#~ msgstr "Nie można otworzyć ponownie skrzynki!"
-
-#~ msgid "Reopening mailbox..."
-#~ msgstr "Ponowne otwieranie skrzynki..."
-
-#~ msgid "Connection to %s closed"
-#~ msgstr "Zamknięto połączenie z %s"
-
-#~ msgid "SSL is unavailable."
-#~ msgstr "SSL nie jest dostępny."
-
-#~ msgid "Preconnect command failed."
-#~ msgstr "Polecenie preconnect nie powiodło się."
-
-#~ msgid "Error talking to %s (%s)"
-#~ msgstr "Błąd przy komunikacji z %s (%s)"
-
-#~ msgid "Looking up %s..."
-#~ msgstr "Wyszukiwanie %s..."
-
-#~ msgid "Could not find the host \"%s\""
-#~ msgstr "Nie można odnaleźć komputera \"%s\""
-
-#~ msgid "Connecting to %s..."
-#~ msgstr "Nawiązywanie połączenia z %s..."
-
-#~ msgid "Could not connect to %s (%s)."
-#~ msgstr "Nie można nawiązać połączenia z %s (%s)."
-
-#~ msgid "Failed to find enough entropy on your system"
-#~ msgstr "Nie można uzyskać w systemie wystarczającej entropii"
-
-#~ msgid "Filling entropy pool: %s...\n"
-#~ msgstr "Wypełnianie puli entropii: %s...\n"
-
-#~ msgid "%s has insecure permissions!"
-#~ msgstr "Uprawnienia do %s nie zapewniają bezpieczeństwa!"
-
-#~ msgid "SSL disabled due the lack of entropy"
-#~ msgstr "SSH został wyłączony z powodu braku entropii"
-
-#~ msgid "I/O error"
-#~ msgstr "błąd wejścia/wyjścia"
-
-#~ msgid "unspecified protocol error"
-#~ msgstr "nieokreślony błąd na poziomie protokołu"
-
-#~ msgid "SSL failed: %s"
-#~ msgstr "Błąd przy nawiązywaniu połączenia SSL: %s"
-
-#~ msgid "Unable to get certificate from peer"
-#~ msgstr "Nie można pobrać certyfikatu strony zdalnej"
-
-#~ msgid "SSL connection using %s (%s)"
-#~ msgstr "Połączenie SSL z użyciem %s (%s)"
-
-#~ msgid "[unable to calculate]"
-#~ msgstr "[nie można obliczyć]"
-
-#~ msgid "[invalid date]"
-#~ msgstr "[niepoprawna data]"
-
-#~ msgid "Server certificate is not yet valid"
-#~ msgstr "Certyfikat serwera nie jest jeszcze ważny"
-
-#~ msgid "Server certificate has expired"
-#~ msgstr "Upłynął czas ważności certyfikatu serwera"
-
-#~ msgid "Warning: Couldn't save certificate"
-#~ msgstr "Ostrzeżenie: Nie można zapisać certyfikatu"
-
-#~ msgid "Certificate saved"
-#~ msgstr "Certyfikat został zapisany"
-
-#~ msgid "This certificate belongs to:"
-#~ msgstr "Certyfikat należy do:"
-
-#~ msgid "This certificate was issued by:"
-#~ msgstr "Certyfikat został wydany przez:"
-
-#~ msgid "This certificate is valid"
-#~ msgstr "Certyfikat jest poprawny"
-
-#~ msgid "   from %s"
-#~ msgstr "   od %s"
-
-#~ msgid "     to %s"
-#~ msgstr "    do %s"
-
-#~ msgid "Fingerprint: %s"
-#~ msgstr "Odcisk palca: %s"
-
-#~ msgid "SSL Certificate check"
-#~ msgstr "Sprawdzenie certyfikatu SSL"
-
-#~ msgid "(r)eject, accept (o)nce, (a)ccept always"
-#~ msgstr "(o)drzuć, zaakceptuj (r)az, akceptuj (z)awsze"
-
-#~ msgid "roa"
-#~ msgstr "orz"
-
-#~ msgid "(r)eject, accept (o)nce"
-#~ msgstr "(o)drzuć, zaakceptuj (r)az"
-
-#~ msgid "ro"
-#~ msgstr "or"
-
-#~ msgid "Exit  "
-#~ msgstr "Zakończ"
-
-#~ msgid "Help"
-#~ msgstr "Pomoc"
-
-#~ msgid "Reading %s... %d"
-#~ msgstr "Odczytywanie %s... %d"
-
-#~ msgid "Lock count exceeded, remove lock for %s?"
-#~ msgstr "Przekroczono liczbę prób utworzenia blokady. Usunąć blokadę dla %s?"
-
-#~ msgid "Can't dotlock %s.\n"
-#~ msgstr "Nie można zablokować %s za pomocą pliku kropkowego.\n"
-
-#~ msgid "%s is not a mailbox."
-#~ msgstr "%s nie jest skrzynką"
-
-#~ msgid "Couldn't lock %s\n"
-#~ msgstr "Nie można zablokować %s\n"
-
-#~ msgid "Reading %s..."
-#~ msgstr "Odczytywanie %s..."
-
-#~ msgid "Writing %s..."
-#~ msgstr "Zapisywanie %s..."
-
-#~ msgid "Could not synchronize mailbox %s!"
-#~ msgstr "Nie można zsynchronizować skrzynki %s!"
-
-#~ msgid "Mailbox is unchanged."
-#~ msgstr "Skrzynka nie jest zmieniona."
-
-#~ msgid "%d kept, %d moved, %d deleted."
-#~ msgstr "%d zachowanych, %d przeniesionych, %d usuniętych."
-
-#~ msgid "%d kept, %d deleted."
-#~ msgstr "%d zachowanych, %d usuniętych."
-
-#~ msgid " Press '%s' to toggle write"
-#~ msgstr " Przyciśnij \"%s\" aby przełączyć zapis"
-
-#~ msgid "Use 'toggle-write' to re-enable write!"
-#~ msgstr "Wykorzystaj \"przełącz zapis\" aby ponownie zezwolić na zapis!"
-
-#~ msgid "Mailbox is marked unwritable. %s"
-#~ msgstr "Skrzynka jest zaznaczona jako niemodyfikowalna. %s"
-
-#~ msgid "Mailbox is read-only."
-#~ msgstr "Skrzynka jest tylko od odczytu."
-
-#~ msgid "Purge %d deleted message?"
-#~ msgstr "Usunąć na trwałe %d usunięty list?"
-
-#~ msgid "Purge %d deleted messages?"
-#~ msgstr "Usunąć na trwałe %d usuniętych listów?"
-
-#~ msgid "%d kept."
-#~ msgstr "%d zachowanych."
-
-#~ msgid "Can't write message"
-#~ msgstr "Nie można zapisać listu"
-
-#~ msgid "multipart message has no boundary parameter!"
-#~ msgstr "wieloczęściowy list bez parametru ograniczającego!"
-
-#~ msgid "No boundary parameter found! [report this error]"
-#~ msgstr "Nie odnaleziono parametru ograniczającego! [zgłoś ten błąd]"
-
-#~ msgid "%s no longer exists!"
-#~ msgstr "Plik %s już nie istnieje!"
-
-#~ msgid "Can't stat %s: %s"
-#~ msgstr "Nie można uzyskać informacji o pliku %s: %s "
-
-#~ msgid "%s isn't a regular file."
-#~ msgstr "%s nie jest zwykłym plikiem."
-
-#~ msgid "Error sending message, child exited %d (%s)."
-#~ msgstr ""
-#~ "Błąd przy wysyłaniu listu; potomek zakończył działanie z kodem %d (%s)."
-
-#~ msgid "Output of the delivery process"
-#~ msgstr "Wyjście z procesu dostarczającego"
-
-#~ msgid "run gpg to import key"
-#~ msgstr "uruchom program gpg aby zaimportować klucze"
-
-#~ msgid "detected a good signature"
-#~ msgstr "wykryto dobry podpis"
-
-#~ msgid "detected a good signature with insufficient validity/trust"
-#~ msgstr "wykryto dobry podpis z niewystarczającą ważnością/zaufaniem"
-
-#~ msgid ""
-#~ "The message sent by %s with subject \"%s\" contains a S/MIME signed part, "
-#~ "but balsa is not (yet) able to handle this format."
-#~ msgstr ""
-#~ "List wysłany przez %s o temacie \"%s\" zawiera podpisaną część S/MIME, "
-#~ "ale balsa nie potrafi (jeszcze) obłużyć tego formatu."
-
-#~ msgid ""
-#~ "The message sent by %s with subject \"%s\" contains a S/MIME encrypted "
-#~ "part, but balsa can not (yet) handle this format."
-#~ msgstr ""
-#~ "List wysłany przez %s o temacie \"%s\" zawiera zaszyfrowaną część S/MIME, "
-#~ "ale balsa nie potrafi (jeszcze) obłużyć tego formatu."
-
-#~ msgid "New"
-#~ msgstr "Nowy"
-
-#~ msgid "Delete the current message"
-#~ msgstr "Usuwa bieżący list"
-
-#~ msgid "Undelete the message"
-#~ msgstr "Odtwarza list"
-
-#~ msgid "_Toggle"
-#~ msgstr "P_rzełącz"
-
-#~ msgid "Mark all read"
-#~ msgstr "Wszystkie przeczytane"
-
-#~ msgid "Mark all messages in current mailbox as read"
-#~ msgstr "Zaznacza wszystkie listy w bieżącej skrzynce jako przeczytane"
-
-#~ msgid "Toolbar Buttons"
-#~ msgstr "Przyciski paska narzędziowego"
-
-#~ msgid "Mailbox Colors"
-#~ msgstr "Kolory skrzynek"
-
-#~ msgid "Mailbox with unread messages color"
-#~ msgstr "Kolor skrzynki z nieprzeczytanymi listami"
-
-#~ msgid "This part contains at least two signatures with different status."
-#~ msgstr "Ten element zawiera przynajmniej dwa podpisy z różnymi stanami."
-
-#~ msgid "bad status"
-#~ msgstr "niepoprawny stan"
-
-#~ msgid ""
-#~ "%s\n"
-#~ "Do you want to run gpg to import the public key with fingerprint %s?"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Czy chcesz uruchomić gpg w celu zaimportowania klucza publicznego z "
-#~ "odciskiem %s?"
-
-#~ msgid "Fingerprint"
-#~ msgstr "Odcisk palca"
-
-#~ msgid "could not create gpgme recipients set: %s"
-#~ msgstr "nie można utworzyć listy odbiorców gpgme: %s"
-
-#~ msgid "could not add recipient %s: %s"
-#~ msgstr "nie można dodać odbiorcy %s: %s"
-
-#~ msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-#~ msgstr "LibBalsaMailboxImap: Otwieranie %s Licznik odwołań: %d\n"
-
-#~ msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-#~ msgstr "LibBalsaMailboxLocal: Otwieranie %s Licznik odwołań: %d\n"
-
-#~ msgid "Search for Name:"
-#~ msgstr "Wyszukiwanie nazwy:"
-
-#~ msgid ""
-#~ "Failed to initialise LDAP server.\n"
-#~ "Check that the servername is valid."
-#~ msgstr ""
-#~ "Inicjacja serwera LDAP nie powiodła się.\n"
-#~ "Sprawdź, czy nazwa serwera jest poprawna."
-
-#~ msgid "Couldn't enable TLS on the LDAP connection: %s"
-#~ msgstr "Nie można włączyć TLS w połączeniu LDAP: %s"
-
-#~ msgid "TLS requested but TLS support not compiled in."
-#~ msgstr "Zażądano TLS, ale obsługa TLS nie jest wkompilowana."
-
-#~ msgid ""
-#~ "Failed to bind to server: %s\n"
-#~ "Check that the server name is valid."
-#~ msgstr ""
-#~ "Przyłączenie do serwera nie powiodło się: %s\n"
-#~ "Sprawdź, czy nazwa serwera jest poprawna."
-
-#~ msgid "Failed to do a search: %s.Check that the base name is valid."
-#~ msgstr ""
-#~ "Wyszukiwanie nie powiodło się: %s. Sprawdź, czy nazwa bazowa jest "
-#~ "poprawna."
-
-#~ msgid "Sorry, no semicolons are allowed in the name!\n"
-#~ msgstr "Niestety, umieszczanie średników w nazwie nie jest dopuszczalne!\n"

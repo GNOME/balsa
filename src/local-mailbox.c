@@ -75,14 +75,14 @@ read_dir (gchar * prefix, struct dirent *d)
   if (S_ISDIR (st.st_mode))
     {
       mailbox_type = mailbox_valid (filename);
-	if (mailbox_type == MAILBOX_MH)
+      if (mailbox_type == MAILBOX_MH)
 	add_mailbox (d->d_name, filename, mailbox_type);
       dpc = opendir (filename);
       if (!dpc)
 	return;
       while ((dc = readdir (dpc)) != NULL)
 	{
-	  if (!strncmp (dc->d_name, ".", 1))
+	  if (d->d_name[0] == '.')
 	    continue;
 
 	  read_dir (filename, dc);
@@ -92,11 +92,13 @@ read_dir (gchar * prefix, struct dirent *d)
 
   else
     {
-      if (!strisnum (d->d_name))
-	continue;
-      mailbox_type = mailbox_valid (filename);
-      if (mailbox_type != MAILBOX_UNKNOWN)
-	add_mailbox (d->d_name, filename, mailbox_type);
+      if (strisnum (d->d_name))
+	{
+
+	  mailbox_type = mailbox_valid (filename);
+	  if (mailbox_type != MAILBOX_UNKNOWN)
+	    add_mailbox (d->d_name, filename, mailbox_type);
+	}
     }
 }
 
@@ -112,9 +114,7 @@ load_local_mailboxes ()
 
   while ((d = readdir (dp)) != NULL)
     {
-      if (!strcmp (d->d_name, "."))
-	continue;
-      if (!strcmp (d->d_name, ".."))
+      if (d->d_name[0] == '.')
 	continue;
       read_dir (balsa_app.local_mail_directory, d);
     }

@@ -1,36 +1,59 @@
+Thu Jul 30 17:21:32 EDT 1998 Stuart Parmenter <pavlov@innerx.net
+
+	* libbalsa/mailbox.c, src/local-mailbox.c
+
+	Balsa now should read in mailboxes properly.  i.e. check to make sure
+	its valid, as well as check its type.  I believe it should load mh
+	folders now as well, although I havn't tested this yet, since I don't
+	have any mh folders.  Balsa will not open any files with characters
+	that are all numbers (i.e. mh messages), nor any files that start with
+	a '.'.
+
+
 Wed Jul 29 08:05:28 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
+
 	* src/balsa-init.c
+
 	Changed Balsa Init to use a gtk_dialog instead of a gnome_app window.
 	I'll probibly change this to a gnome_dialog later.  This should make
 	it look a little bit nicer.
 
 	*src/pref-manager.c
+
 	Changed the button box layout to SPREAD instead of END
+
 
 Tue Jul 28 21:43:58 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
 
 	* src/balsa-init.c
+
 	More work, should save your settings now.  Mailbox addition inside the
 	balsa-init still not there.  Balsa-app now uses balsa-init.c since its
 	pretty:)
 
+
 Tue Jul 28 21:19:38 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
 
 	* src/balsa-init.c
+
 	Started making balsa-init do something useful.  It is almost complete.  Once
 	complete, it will be what is started when Balsa is run for the first time.  It 
 	will setup all the information that Balsa needs to run correctly.
 
+
 Tue Jul 28 14:00:35 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
 
         * src/pref-manager.c
+
 	Removed open_main_window() call from pref manager if
 	balsa_app.current_index_child was NULL.  This was causing lots of
 	opened windows on startup.
 
+
 Tue Jul 28 04:01:40 1998 Stuart Parmenter <pavlov@innerx.net>
 
 	* TODO, INSTALL, README:
+
 	Update of the documentation (or sad excuse for that).  Added the INSTALL file
 	to replace the one thats automagically generated if it doesn't exist.  This
 	way we get a file that accually applies to the installation of balsa, and not

@@ -694,7 +694,6 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
 	    g_assert(msg_info->message);
 	    if (!expunge || 
 		(msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED) == 0) {
-		LibBalsaMessageBody *body;
 		msg_info->message->msgno = j + 1;
 		msg_info->start = g_mime_parser_tell(gmime_parser);
 		g_mime_object_unref(GMIME_OBJECT(msg_info->message->mime_msg));
@@ -709,18 +708,13 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
 		j++;
 		if (msg_info->message->body_list) {
 		    /*
-		     * FIXME: the mime_part contents can have moved,
 		     * reinit the message parts info
 		     */
-		    libbalsa_message_body_free(msg_info->message->
-					       body_list);
-		    msg_info->message->body_list = NULL;
-		    body = libbalsa_message_body_new(msg_info->message);
-		    libbalsa_message_body_set_mime_body(body,
+		    libbalsa_message_body_set_mime_body(msg_info->message->
+							body_list,
 							msg_info->message->
 							mime_msg->
 							mime_part);
-		    libbalsa_message_append_part(msg_info->message, body);
 		}
 
 	    } else {

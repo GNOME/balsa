@@ -1,5 +1,7 @@
-2003-05-28 19:23  PeterB
+2003-05-28 19:56  PeterB
 
+	* src/sendmsg-window.c: When replying, don't ref message->mailbox:
+	it can prevent Balsa from closing it properly.
 	* libbalsa/filter.c, libbalsa/message.c, libbalsa/send.c,
 	src/balsa-index.c, src/balsa-message.c, src/sendmsg-window.c: Check
 	for NULL message->from.

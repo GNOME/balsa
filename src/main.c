@@ -22,6 +22,7 @@
 #include "balsa-app.h"
 #include "c-client.h"
 #include "mailbox.h"
+#include "save-restore.h"
 
 
 int
@@ -60,6 +61,6 @@ balsa_exit ()
 
 
   gtk_timeout_remove (balsa_app.timer);
-  gnome_config_sync ();
+  save_global_settings ();
   gtk_exit (0);
 }

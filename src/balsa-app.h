@@ -28,6 +28,9 @@
 #define BALSA_BUTTON_HEIGHT  30
 #define BALSA_BUTTON_WIDTH  70
 
+#define MW_DEFAULT_WIDTH 640
+#define MW_DEFAULT_HEIGHT 480
+
 #define MAILBOX_MANAGER_WIDTH 350
 #define MAILBOX_MANAGER_HEIGHT 400
 
@@ -63,10 +66,12 @@ extern struct BalsaApplication
 
 
   /* GUI settings */
+  gint mw_width;
+  gint mw_height;
   GtkToolbarStyle toolbar_style;
 
-  gint new_messages;
 
+  gint new_messages;
   gint debug;
 }
 balsa_app;

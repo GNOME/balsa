@@ -72,6 +72,8 @@ static void show_about_box ();
 
 
 /* callbacks */
+static void move_resize_cb ();
+
 static void index_select_cb (GtkWidget * widget,  MAILSTREAM * stream, glong mesgno);
 static void next_message_cb (GtkWidget * widget);
 static void previous_message_cb (GtkWidget * widget);
@@ -110,10 +112,7 @@ open_main_window ()
   mw->window = gnome_app_new ("balsa", "Balsa");
   gtk_window_set_wmclass (GTK_WINDOW (mw->window), "balsa_app", "Balsa");
 
-  if (gdk_screen_width() > 640 && gdk_screen_height() > 480)
-    gtk_widget_set_usize (mw->window, 700, 600);
-  else
-    gtk_widget_set_usize (mw->window, 630, 400);
+  gtk_widget_set_usize (mw->window, balsa_app.mw_width, balsa_app.mw_height);
 
 
   gtk_signal_connect (GTK_OBJECT (mw->window),
@@ -125,6 +124,12 @@ open_main_window ()
 		      "delete_event",
 		      (GtkSignalFunc) gtk_false,
 		      NULL);
+
+  gtk_signal_connect (GTK_OBJECT (mw->window),
+		      "move_resize",
+		      (GtkSignalFunc) move_resize_cb,
+		      NULL);
+
 
 
   /* meubar and toolbar */
@@ -678,6 +683,18 @@ show_about_box ()
 /*
  * callbacks
  */
+static void
+move_resize_cb ()
+{
+  gdk_window_get_geometry (mw->window->window, 
+			   NULL, 
+			   NULL,
+			   &balsa_app.mw_width, 
+			   &balsa_app.mw_height, 
+			   NULL);
+}
+
+
 static void
 index_select_cb (GtkWidget * widget, 
 		 MAILSTREAM * stream,

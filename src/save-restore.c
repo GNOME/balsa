@@ -369,6 +369,10 @@ restore_global_settings ()
   /* smtp server */
   balsa_app.smtp_server = get_string_set_default ("smtp server", "localhost");
 
+  /* main window width & height */
+  balsa_app.mw_width = get_int_set_default ("main window width", balsa_app.mw_width);
+  balsa_app.mw_height = get_int_set_default ("main window height", balsa_app.mw_height);
+
   /* toolbar style */
   balsa_app.toolbar_style = get_int_set_default ("toolbar style", (gint) balsa_app.toolbar_style);
 
@@ -393,6 +397,8 @@ save_global_settings ()
   gnome_config_set_string ("organization", balsa_app.organization);
   gnome_config_set_string ("smtp server", balsa_app.smtp_server);
   gnome_config_set_string ("local mail directory", balsa_app.local_mail_directory);
+  gnome_config_set_int ("main window width", (gint) balsa_app.mw_width);
+  gnome_config_set_int ("main window height", (gint) balsa_app.mw_height);
   gnome_config_set_int ("toolbar style", (gint) balsa_app.toolbar_style);
   gnome_config_set_int ("debug", (gint) balsa_app.debug);
 

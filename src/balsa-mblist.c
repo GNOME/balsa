@@ -1811,6 +1811,7 @@ typedef struct _BalsaMBListMRUOption BalsaMBListMRUOption;
 
 /* Forward references */
 static void bmbl_mru_option_menu_setup(BalsaMBListMRUOption * mro);
+static void bmbl_mru_option_menu_init(BalsaMBListMRUOption * mro);
 static void bmbl_mru_option_menu_cb(const gchar * url, gpointer data);
 static gboolean bmbl_mru_option_menu_destroy_cb(GtkWidget * widget,
                                                 GdkEvent * event,
@@ -1844,14 +1845,13 @@ balsa_mblist_mru_option_menu(GtkWindow * window, GList ** url_list)
     mro->window = window;
     mro->url_list = url_list;
     mro->option_menu = GTK_OPTION_MENU(option_menu);
+    mro->url = NULL;
     bmbl_mru_option_menu_setup(mro);
+    bmbl_mru_option_menu_init(mro);
     gtk_signal_connect(GTK_OBJECT(option_menu), "destroy-event",
                        GTK_SIGNAL_FUNC(bmbl_mru_option_menu_destroy_cb),
                        mro);
     gtk_object_set_data(GTK_OBJECT(option_menu), "mro", mro);
-
-    /* initial setting */
-    mro->url = *url_list ? g_strdup((const gchar *)(*url_list)->data) : NULL;
 
     return option_menu;
 }
@@ -1874,7 +1874,7 @@ balsa_mblist_mru_option_menu_set(GtkWidget * option_menu, const gchar *url)
 
     balsa_mblist_mru_add(mro->url_list, url);
     bmbl_mru_option_menu_setup(mro);
-    bmbl_mru_option_menu_cb(url, mro);
+    bmbl_mru_option_menu_init(mro);
 }
 
 /*
@@ -1928,4 +1928,19 @@ bmbl_mru_option_menu_destroy_cb(GtkWidget * widget, GdkEvent * event,
     g_free(mro->url);
     g_free(mro);
     return FALSE;
+}
+
+/* Initialize mro->url by activating the top menu item on
+ * mro->option_menu.
+ */
+static void
+bmbl_mru_option_menu_init(BalsaMBListMRUOption * mro)
+{
+    GtkWidget *menu =
+	    gtk_option_menu_get_menu(GTK_OPTION_MENU(mro->option_menu));
+    GList *children = GTK_MENU_SHELL(menu)->children;
+    if (g_list_length(children) > 1) {
+        GtkMenuItem *item = children->data;
+        gtk_menu_item_activate(item);
+    }
 }

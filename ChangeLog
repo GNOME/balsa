@@ -1,3 +1,8 @@
+2002-11-20  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-mblist.c: initialize properly MRU list (reported
+	on balsa-list by Martin Leopold).
+
 2002-11-17  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/message.[ch]: clean up message signal scheme.

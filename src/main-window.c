@@ -58,6 +58,11 @@
 #include "threads.h"
 #endif
 
+#ifdef BALSA_SHOW_ALL
+#include "filter.h"
+#include "filter-funcs.h"
+#endif
+
 #include "libinit_balsa/init_balsa.h"
 
 #define MAILBOX_DATA "mailbox_data"
@@ -200,6 +205,9 @@ static void mark_all_cb(GtkWidget * widget, gpointer);
 static void select_part_cb(BalsaMessage * bm, gpointer data);
 
 #ifdef BALSA_SHOW_ALL
+static void find_real(BalsaIndex * bindex,gboolean again);
+static void find_cb(GtkWidget * widget, gpointer data);
+static void find_again_cb(GtkWidget * widget, gpointer data);
 static void filter_dlg_cb(GtkWidget * widget, gpointer data);
 static void filter_export_cb(GtkWidget * widget, gpointer data);
 #endif
@@ -332,10 +340,11 @@ static GnomeUIInfo file_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 #define MENU_FILE_ADDRESS_POS 9
     {
-     GNOME_APP_UI_ITEM, N_("_Address Book..."),
-     N_("Open the address book"),
-     address_book_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     GNOME_STOCK_MENU_BOOK_RED, 'B', 0, NULL},
+	GNOME_APP_UI_ITEM, N_("_Address Book..."),
+	N_("Open the address book"),
+	address_book_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+	GNOME_STOCK_MENU_BOOK_RED, 'B', 0, NULL
+    },
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_MENU_EXIT_ITEM(balsa_quit_nicely, NULL),
 
@@ -344,21 +353,21 @@ static GnomeUIInfo file_menu[] = {
 
 static GnomeUIInfo edit_menu[] = {
     /* FIXME: Features to hook up... */
-    /*  GNOMEUIINFO_MENU_UNDO_ITEM(NULL, NULL); */
-    /*  GNOMEUIINFO_MENU_REDO_ITEM(NULL, NULL); */
+    /*  GNOMEUIINFO_MENU_UNDO_ITEM(NULL, NULL), */
+    /*  GNOMEUIINFO_MENU_REDO_ITEM(NULL, NULL), */
     /*  GNOMEUIINFO_SEPARATOR, */
 #define MENU_EDIT_COPY_POS 0
     GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
 #define MENU_EDIT_SELECT_ALL_POS 1
     GNOMEUIINFO_MENU_SELECT_ALL_ITEM(select_all_cb, NULL),
-    /* GNOMEUINFO_SEPARATOR, */
-    /*  GNOMEUIINFO_MENU_FIND_ITEM(NULL, NULL); */
-    /*  GNOMEUIINFO_MENU_FIND_AGAIN_ITEM(NULL, NULL); */
+#ifdef BALSA_SHOW_ALL
+    GNOMEUIINFO_SEPARATOR,
+    GNOMEUIINFO_MENU_FIND_ITEM(find_cb, NULL),
+    GNOMEUIINFO_MENU_FIND_AGAIN_ITEM(find_again_cb, NULL),
     /*  GNOMEUIINFO_MENU_REPLACE_ITEM(NULL, NULL); */
 /*     GNOMEUIINFO_SEPARATOR, */
 /* #define MENU_EDIT_PREFERENCES_POS 3 */
 /*     GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL), */
-#ifdef BALSA_SHOW_ALL
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_ITEM_STOCK(N_("_Filters..."), N_("Manage filters"),
                            filter_dlg_cb, GNOME_STOCK_MENU_PROP),
@@ -2539,11 +2548,192 @@ address_book_cb(GtkWindow *widget, gpointer data)
 }
 
 #ifdef BALSA_SHOW_ALL
+
+static GtkToggleButton*
+add_check_button(GtkWidget* table, const gchar* label, gint x, gint y)
+{
+    GtkWidget* res = gtk_check_button_new_with_label(label);
+    gtk_table_attach(GTK_TABLE(table),
+                     res,
+                     x, x+1, y, y+1,
+                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+    return GTK_TOGGLE_BUTTON(res);
+}
+
+static void 
+find_real(BalsaIndex * bindex,gboolean again)
+{
+    /* FIXME : later we could do a search based on a complete filter */
+    static LibBalsaFilter * f=NULL;
+    /* Condition set up for the search, it will be of type
+       CONDITION_NONE if nothing has been set up */
+    static LibBalsaCondition * cnd=NULL;
+    GSList * conditions;
+    static gboolean reverse=FALSE;
+
+    if (!cnd) {
+	cnd=libbalsa_condition_new();
+        CONDITION_SETMATCH(cnd,CONDITION_MATCH_FROM);
+        CONDITION_SETMATCH(cnd,CONDITION_MATCH_SUBJECT);
+    }
+
+
+    /* first search, so set up the match rule(s) */
+    if (!again || (!f && cnd->type==CONDITION_NONE)) {
+	GnomeDialog* dia=
+            GNOME_DIALOG(gnome_dialog_new(_("Search a message"),
+                                          GNOME_STOCK_BUTTON_OK,
+                                          GNOME_STOCK_BUTTON_CANCEL,
+                                          NULL));
+	GtkWidget *reverse_button, *search_entry, *w, *page, *table;
+	GtkToggleButton *matching_body, *matching_from;
+        GtkToggleButton *matching_to, *matching_cc, *matching_subject;
+	gint ok;
+	
+	gnome_dialog_close_hides(dia,TRUE);
+
+	/* FIXME : we'll set up this callback later when selecting
+	   filters has been enabled
+	   gtk_signal_connect(GTK_OBJECT(dia),"clicked",
+	   find_dialog_button_cb,&f);
+	*/
+	reverse_button = gtk_check_button_new_with_label(_("Reverse search"));
+
+	page=gtk_table_new(2, 1, FALSE);
+	w = gtk_label_new(_("Search for:"));
+	gtk_table_attach(GTK_TABLE(page),w,0, 1, 0, 1,
+			 GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+	search_entry = gtk_entry_new_with_max_length(30);
+	gtk_table_attach(GTK_TABLE(page),search_entry,1, 2, 0, 1,
+			 GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+	gtk_box_pack_start(GTK_BOX(dia->vbox), page, FALSE, FALSE, 2);
+
+	/* builds the toggle buttons to specify fields concerned by
+         * the search. */
+	page = gtk_table_new(3, 7, FALSE);
+    
+	w = gtk_frame_new(_("In:"));
+	gtk_frame_set_label_align(GTK_FRAME(w), GTK_POS_LEFT, GTK_POS_TOP);
+	gtk_frame_set_shadow_type(GTK_FRAME(w), GTK_SHADOW_ETCHED_IN);
+	gtk_table_attach(GTK_TABLE(page),
+			 w,
+			 0, 3, 0, 2,
+			 GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    
+	table = gtk_table_new(3, 3, TRUE);
+	gtk_container_add(GTK_CONTAINER(w), table);
+		
+	matching_body    = add_check_button(table, _("Body"),    0, 0);
+	matching_to      = add_check_button(table, _("To:"),     1, 0);
+	matching_from    = add_check_button(table, _("From:"),   1, 1);
+        matching_subject = add_check_button(table, _("Subject"), 2, 0);
+	matching_cc      = add_check_button(table, _("Cc:"),     2, 1);
+	gtk_box_pack_start(GTK_BOX(dia->vbox), page, FALSE, FALSE, 2);
+
+	gtk_box_pack_start(GTK_BOX(dia->vbox), gtk_hseparator_new(), 
+                           FALSE, FALSE, 2);
+	gtk_box_pack_start(GTK_BOX(dia->vbox), reverse_button,TRUE,TRUE,0);
+	gtk_widget_show_all(dia->vbox);
+
+	if (cnd->match.string)
+	    gtk_entry_set_text(GTK_ENTRY(search_entry),cnd->match.string);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(reverse_button),reverse);
+	gtk_toggle_button_set_active(matching_body,
+				     CONDITION_CHKMATCH(cnd,
+                                                        CONDITION_MATCH_BODY));
+	gtk_toggle_button_set_active(matching_to,
+				     CONDITION_CHKMATCH(cnd,
+                                                        CONDITION_MATCH_TO));
+	gtk_toggle_button_set_active(matching_from,
+				     CONDITION_CHKMATCH(cnd,CONDITION_MATCH_FROM));
+	gtk_toggle_button_set_active(matching_subject,
+				     CONDITION_CHKMATCH(cnd,CONDITION_MATCH_SUBJECT));
+	gtk_toggle_button_set_active(matching_cc,
+				     CONDITION_CHKMATCH(cnd,CONDITION_MATCH_CC));
+
+        gtk_widget_grab_focus(search_entry);
+        gnome_dialog_editable_enters(dia, GTK_EDITABLE(search_entry));
+        gnome_dialog_set_default(dia, 0);
+	do {
+	    ok=gnome_dialog_run(dia);
+	    if (ok==0) {
+		reverse=GTK_TOGGLE_BUTTON(reverse_button)->active;
+		g_free(cnd->match.string);
+		cnd->match.string =
+                    g_strdup(gtk_entry_get_text(GTK_ENTRY(search_entry)));
+		cnd->match_fields=CONDITION_EMPTY;
+
+		if (gtk_toggle_button_get_active(matching_body))
+		    CONDITION_SETMATCH(cnd,CONDITION_MATCH_BODY);
+		if (gtk_toggle_button_get_active(matching_to))
+		    CONDITION_SETMATCH(cnd,CONDITION_MATCH_TO);
+		if (gtk_toggle_button_get_active(matching_subject))
+		    CONDITION_SETMATCH(cnd,CONDITION_MATCH_SUBJECT);
+		if (gtk_toggle_button_get_active(matching_from))
+		    CONDITION_SETMATCH(cnd,CONDITION_MATCH_FROM);
+		if (gtk_toggle_button_get_active(matching_cc))
+		    CONDITION_SETMATCH(cnd,CONDITION_MATCH_CC);
+		if (cnd->match_fields!=CONDITION_EMPTY && cnd->match.string[0])
+
+		    /* FIXME : We should print error messages, but for
+		     * that we should first make find dialog non-modal
+		     * balsa_information(LIBBALSA_INFORMATION_ERROR,_("You
+		     * must specify at least one field to look in"));
+		     * *balsa_information(LIBBALSA_INFORMATION_ERROR,_("You
+		     * must provide a non-empty string")); */
+
+		    ok=1;
+		else ok=-1;
+	    }
+	    else ok=-1;
+	}
+	while (ok==0);
+	gtk_widget_destroy(GTK_WIDGET(dia));
+	/* Here ok==1 means OK button was pressed, search is valid so let's go
+	 * else cancel was pressed return */
+	if (ok!=1) return;
+	cnd->type=CONDITION_SIMPLE;
+    }
+
+    if (f) {
+	GSList * lst=g_slist_append(NULL,f);
+	if (!filters_prepare_to_run(lst)) return;
+	g_slist_free(lst);
+	conditions=f->conditions;
+    }
+    else conditions=g_slist_append(NULL,cnd);
+
+    balsa_index_find(bindex,
+                     f ? f->conditions_op : FILTER_OP_OR,
+                     conditions, reverse);
+
+    /* FIXME : See if this does not lead to a segfault because of
+       balsa_index_scan_info */
+    if (!f) g_slist_free(conditions);
+}
+
+static void
+find_cb(GtkWidget * widget,gpointer data)
+{
+    GtkWidget * bindex;
+    if ((bindex=balsa_window_find_current_index(BALSA_WINDOW(data))))
+	find_real(BALSA_INDEX(bindex),FALSE);
+}
+
+static void
+find_again_cb(GtkWidget * widget,gpointer data)
+{
+    GtkWidget * bindex;
+    if ((bindex=balsa_window_find_current_index(BALSA_WINDOW(data))))
+	find_real(BALSA_INDEX(bindex),TRUE);
+}
+
 static void
 filter_dlg_cb(GtkWidget * widget, gpointer data)
 {
     filters_edit_dialog();
 }
+
 static void
 filter_export_cb(GtkWidget * widget, gpointer data)
 {

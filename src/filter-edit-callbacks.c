@@ -100,6 +100,14 @@ extern GtkWidget *fe_popup_entry;
 extern GtkWidget *fe_action_option_menu;
 extern GtkWidget *fe_action_entry;
 
+/* Different buttons that need to be greyed or ungreyed */
+extern GtkWidget * fe_delete_button;
+extern GtkWidget * fe_apply_button;
+extern GtkWidget * fe_revert_button;
+extern GtkWidget * fe_condition_delete_button;
+extern GtkWidget * fe_condition_edit_button;
+GtkWidget * fe_regex_remove_button;
+
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
 /* condition_has_changed allows us to be smart enough not to make the whole process
@@ -182,8 +190,11 @@ void fe_regexs_select_row(GtkWidget * widget, gint row, gint column,
 {
     gchar *str;
     
-    gtk_clist_get_text(fe_type_regex_list,row,0,&str);
-    gtk_entry_set_text(GTK_ENTRY(fe_type_regex_entry),str);
+    if (row<fe_type_regex_list->rows) {
+	gtk_clist_get_text(fe_type_regex_list,row,0,&str);
+	gtk_entry_set_text(GTK_ENTRY(fe_type_regex_entry),str);
+    }
+    else gtk_entry_set_text(GTK_ENTRY(fe_type_regex_entry),"");
 }
 
 /*
@@ -537,6 +548,7 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     case CONDITION_REGEX:
 	for (regex=cnd->match.regexs;regex;regex=g_slist_next(regex))
 	    gtk_clist_append(fe_type_regex_list,&(((LibBalsaConditionRegex *)regex->data)->string));
+	gtk_widget_set_sensitive(fe_regex_remove_button,cnd->match.regexs!=NULL);
 	fe_update_type_regex_label();
 	break;
     case CONDITION_DATE:
@@ -579,27 +591,33 @@ condition_dialog_button_clicked(GtkWidget * dialog, gint button,
 	if (condition_has_changed) {
 	    new_cnd = libbalsa_condition_new();
             if (!condition_validate(new_cnd))
-              return;
-            /* No error occured, condition is valid, so change/add it based on is_new_condition
-             * and only if something has changed of course
+		return;
+            /* No error occured, condition is valid, so change/add it
+             * based on is_new_condition and only if something has
+             * changed of course
              */
             if (condition_has_changed) {
-              if (!is_new_condition) {
-                /* We free the old condition*/
-                row=GPOINTER_TO_INT(fe_conditions_list->selection->data);
-                libbalsa_condition_free((LibBalsaCondition*)
-                                        gtk_clist_get_row_data(fe_conditions_list,row));
-              }
-              else {
-                gchar * str[]={""};
-                /* It was a new condition, so add it to the list */
-                row=gtk_clist_append(fe_conditions_list,str);
-                gtk_clist_select_row(fe_conditions_list,row,-1);
-              }
-              /* Associate the new condition to the row in the clist*/
-              gtk_clist_set_row_data(fe_conditions_list,row,new_cnd);
-              /* And refresh the conditions list */
-              update_condition_list_label();
+		if (!is_new_condition) {
+		    /* We free the old condition*/
+		    row=GPOINTER_TO_INT(fe_conditions_list->selection->data);
+		    libbalsa_condition_free((LibBalsaCondition*)
+					    gtk_clist_get_row_data(fe_conditions_list,row));
+		}
+		else {
+		    gchar * str[]={""};
+		    /* It was a new condition, so add it to the list */
+		    row=gtk_clist_append(fe_conditions_list,str);
+		    gtk_clist_select_row(fe_conditions_list,row,-1);
+		    /* We make the buttons sensitive if they were unsensitive */
+		    if (fe_conditions_list->rows==1) {
+			gtk_widget_set_sensitive(fe_condition_delete_button,TRUE);
+			gtk_widget_set_sensitive(fe_condition_edit_button,TRUE);
+		    }
+		}
+		/* Associate the new condition to the row in the clist*/
+		gtk_clist_set_row_data(fe_conditions_list,row,new_cnd);
+		/* And refresh the conditions list */
+		update_condition_list_label();
             }
 	}
     case 1:  /* Cancel button */
@@ -677,7 +695,7 @@ static void build_type_notebook()
 
     fe_type_regex_list = GTK_CLIST(gtk_clist_new(1));
 
-    gtk_clist_set_selection_mode(fe_type_regex_list, GTK_SELECTION_SINGLE);
+    gtk_clist_set_selection_mode(fe_type_regex_list, GTK_SELECTION_BROWSE);
     gtk_clist_set_row_height(fe_type_regex_list, 0);
     gtk_clist_set_reorderable(fe_type_regex_list, FALSE);
     gtk_clist_set_use_drag_icons(fe_type_regex_list, FALSE);
@@ -696,9 +714,9 @@ static void build_type_notebook()
     gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
     gtk_signal_connect(GTK_OBJECT(button),
 		       "clicked", GTK_SIGNAL_FUNC(fe_add_pressed), NULL);
-    button = gtk_button_new_with_label(_("Remove"));
-    gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
-    gtk_signal_connect(GTK_OBJECT(button),
+    fe_regex_remove_button = gtk_button_new_with_label(_("Remove"));
+    gtk_box_pack_start(GTK_BOX(box), fe_regex_remove_button, TRUE, TRUE, 0);
+    gtk_signal_connect(GTK_OBJECT(fe_regex_remove_button),
 		       "clicked",
 		       GTK_SIGNAL_FUNC(fe_remove_pressed), NULL);
     button = gtk_button_new_with_label(_("One matches/None matches"));
@@ -938,7 +956,6 @@ fe_edit_condition(GtkWidget * throwaway,gpointer is_new_cnd)
 	build_condition_dialog();
 	/* For now this box is modal */
 	gtk_window_set_modal(GTK_WINDOW(condition_dialog),TRUE);
-
     }
     title = g_strconcat(_("Edit condition for filter: "),
 			((LibBalsaFilter*)
@@ -958,7 +975,7 @@ void
 fe_conditions_select_row(GtkWidget * widget, gint row, gint column,
                          GdkEventButton * bevent, gpointer data)
 {
-    if (bevent == NULL)
+    if (bevent == NULL || row<0)
 	return;
 
     if (bevent->type == GDK_2BUTTON_PRESS)
@@ -974,11 +991,16 @@ fe_condition_remove_pressed(GtkWidget * widget, gpointer data)
     selected = fe_conditions_list->selection;
     
     if (!selected)
-      return;
+	return;
     row=GPOINTER_TO_INT(selected->data);
     libbalsa_condition_free((LibBalsaCondition*) 
                             gtk_clist_get_row_data(fe_conditions_list,row));
     gtk_clist_remove(fe_conditions_list,row);
+
+    if (!fe_conditions_list->rows) {
+	gtk_widget_set_sensitive(fe_condition_delete_button,FALSE);
+	gtk_widget_set_sensitive(fe_condition_edit_button,FALSE);
+    }
 }
 
 /**************** Filters ****************************/
@@ -1186,6 +1208,7 @@ void fe_add_pressed(GtkWidget * widget, gpointer throwaway)
     
     gtk_clist_append(fe_type_regex_list, &text);
     condition_has_changed=TRUE;
+    gtk_widget_set_sensitive(fe_regex_remove_button,TRUE);
 }			/* end fe_add_pressed() */
 
 /*
@@ -1205,6 +1228,8 @@ fe_remove_pressed(GtkWidget * widget, gpointer throwaway)
     
     gtk_clist_remove(fe_type_regex_list, GPOINTER_TO_INT(selected->data));
     condition_has_changed=TRUE;
+    if (!fe_type_regex_list->rows)
+	gtk_widget_set_sensitive(fe_regex_remove_button,FALSE);
 }			/* end fe_remove_pressed() */
 
 /************************************************************/
@@ -1352,6 +1377,23 @@ fe_delete_pressed(GtkWidget * widget, gpointer data)
     libbalsa_filter_free(fil, NULL);
     
     gtk_clist_remove(fe_filters_list, row);
+    if (row>=fe_filters_list->rows) row=fe_filters_list->rows-1;
+    if (row<0) {
+	/* We make the filters delete,revert,apply buttons unsensitive */
+	gtk_widget_set_sensitive(fe_delete_button,FALSE);
+	gtk_widget_set_sensitive(fe_apply_button,FALSE);
+	gtk_widget_set_sensitive(fe_revert_button,FALSE);
+	/* We clear all widgets */
+	gtk_entry_set_text(GTK_ENTRY(fe_name_entry),"");
+	gtk_entry_set_text(GTK_ENTRY(fe_popup_entry),"");
+	gtk_entry_set_text(GTK_ENTRY(fe_action_entry),"");
+	gtk_entry_set_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fe_sound_entry))),"");
+	gtk_clist_clear(fe_conditions_list);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button),FALSE);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_popup_button),FALSE);
+    }
+    else
+	gtk_clist_select_row(fe_filters_list,row,-1);
 }			/* end fe_delete_pressed() */
 
 /*
@@ -1533,8 +1575,11 @@ void fe_clist_select_row(GtkWidget * widget, gint row, gint column,
 
     fil=(LibBalsaFilter*)gtk_clist_get_row_data(fe_filters_list,row);
     
-    /* FIXME : Should be impossible */
-    g_assert(fil!=NULL);
+    /* FIXME : this seems necessary : this callback is called
+       really early, so early that the clist has not been populated
+       in between! (this is related to the selection mode
+       I have chosen : GTK_CLIST_SELECTION_BROWSE)*/
+    if (!fil) return;
     
     /* Populate all fields with filter data */
     gtk_entry_set_text(GTK_ENTRY(fe_name_entry),fil->name);
@@ -1544,9 +1589,9 @@ void fe_clist_select_row(GtkWidget * widget, gint row, gint column,
 		       FILTER_CHKFLAG(fil,FILTER_POPUP) ? fil->popup_text : "");
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button),
 				 FILTER_CHKFLAG(fil,FILTER_SOUND));
-    /*    gtk_entry_set_text(GTK_ENTRY(fe_sound_entry),
-	  FILTER_CHKFLAG(fil,FILTER_SOUND) ? fil->sound : "");*/
-
+    gtk_entry_set_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fe_sound_entry))),
+		       FILTER_CHKFLAG(fil,FILTER_SOUND) ? fil->sound : "");
+    
     gtk_option_menu_set_history(GTK_OPTION_MENU(fe_action_option_menu), fil->action-1);
     gtk_option_menu_set_history(GTK_OPTION_MENU(fe_op_codes_option_menu), fil->conditions_op-1);
 
@@ -1573,6 +1618,18 @@ void fe_clist_select_row(GtkWidget * widget, gint row, gint column,
     if (filter_errno!=FILTER_NOERR)
 	gnome_dialog_close(fe_window);
 
-    if (fe_conditions_list->rows)
+    if (fe_conditions_list->rows) {
 	gtk_clist_select_row(fe_conditions_list,0,-1);
+	gtk_widget_set_sensitive(fe_condition_delete_button,TRUE);
+	gtk_widget_set_sensitive(fe_condition_edit_button,TRUE);
+    }
+    else {
+	gtk_widget_set_sensitive(fe_condition_delete_button,FALSE);
+	gtk_widget_set_sensitive(fe_condition_edit_button,FALSE);
+    }
+
+    /* We make the filters delete,revert,apply buttons sensitive */
+    gtk_widget_set_sensitive(fe_delete_button,TRUE);
+    gtk_widget_set_sensitive(fe_apply_button,TRUE);
+    gtk_widget_set_sensitive(fe_revert_button,TRUE);
 }                      /* end fe_clist_select_row */

@@ -1,3 +1,11 @@
+2001-11-22  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/filter.c: fix searching From field.
+	* src/filter-edit-callbacks.c: UI filter improvements
+	* src/filter-edit-dialog.c:    (Emmanuel).
+	* src/main-window.c: search patch #63459 (Emmanuel).
+	* src/balsa-index.[ch]: ditto.
+
 2001-11-21  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/filter.h, libbalsa/mailbox-filter.h: make ANSI-compatible.

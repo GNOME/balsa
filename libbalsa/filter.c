@@ -101,7 +101,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message)
             if(match) break;
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)) {
-	    str=libbalsa_address_to_gchar(message->from,-1);
+	    str=libbalsa_address_to_gchar(message->from, 0);
 	    match=in_string(str,cond->match.string);
 	    g_free(str);
 	    if (match) break;

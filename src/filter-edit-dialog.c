@@ -69,6 +69,10 @@ GtkWidget *fe_popup_entry;
 GtkWidget *fe_action_option_menu;
 GtkWidget *fe_action_entry;
 
+/* Different buttons that need to be greyed or ungreyed */
+GtkWidget * fe_delete_button,* fe_apply_button,* fe_revert_button;
+GtkWidget * fe_condition_delete_button,* fe_condition_edit_button;
+
 /* ******************************** */
 
 option_list fe_search_type[] = {
@@ -217,17 +221,16 @@ build_left_side(void)
     gtk_widget_pop_colormap();
     gtk_widget_pop_visual();
 
-    gtk_clist_set_selection_mode(fe_filters_list, GTK_SELECTION_SINGLE);
+    gtk_clist_set_selection_mode(fe_filters_list, GTK_SELECTION_BROWSE);
     gtk_clist_set_row_height(fe_filters_list, 0);
     gtk_clist_column_titles_passive(fe_filters_list);
     gtk_clist_set_sort_column(fe_filters_list,0);
     gtk_clist_set_sort_type(fe_filters_list,GTK_SORT_ASCENDING);
     gtk_clist_set_auto_sort(fe_filters_list,TRUE);
-
-
-    gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(fe_filters_list));
     gtk_signal_connect(GTK_OBJECT(fe_filters_list), "select_row",
 		       GTK_SIGNAL_FUNC(fe_clist_select_row), NULL);
+
+    gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(fe_filters_list));
 
     gtk_box_pack_start(GTK_BOX(vbox), sw, TRUE, TRUE, 2);
 
@@ -249,10 +252,11 @@ build_left_side(void)
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* delete button */
     pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_TRASH);
-    button = gnome_pixmap_button(pixmap, _("Delete"));
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+    fe_delete_button = gnome_pixmap_button(pixmap, _("Delete"));
+    gtk_signal_connect(GTK_OBJECT(fe_delete_button), "clicked",
 		       GTK_SIGNAL_FUNC(fe_delete_pressed), NULL);
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_container_add(GTK_CONTAINER(bbox), fe_delete_button);
+    gtk_widget_set_sensitive(fe_delete_button,FALSE);
 
     return vbox;
 }				/* end build_left_side() */
@@ -318,7 +322,7 @@ build_match_page()
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, 2, 2);
     fe_conditions_list = GTK_CLIST(gtk_clist_new(1));
 
-    gtk_clist_set_selection_mode(fe_conditions_list,GTK_SELECTION_SINGLE);
+    gtk_clist_set_selection_mode(fe_conditions_list,GTK_SELECTION_BROWSE);
     gtk_clist_set_row_height(fe_conditions_list, 0);
     gtk_clist_set_reorderable(fe_conditions_list, FALSE);
     gtk_clist_set_use_drag_icons(fe_conditions_list, FALSE);
@@ -334,17 +338,17 @@ build_match_page()
 		     box,
 		     0, 5, 8, 9,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-    button = gtk_button_new_with_label(_("Edit"));
-    gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
-    gtk_signal_connect(GTK_OBJECT(button),
+    fe_condition_edit_button = gtk_button_new_with_label(_("Edit"));
+    gtk_box_pack_start(GTK_BOX(box), fe_condition_edit_button, TRUE, TRUE, 0);
+    gtk_signal_connect(GTK_OBJECT(fe_condition_edit_button),
 		       "clicked", GTK_SIGNAL_FUNC(fe_edit_condition), GINT_TO_POINTER(0));
     button = gtk_button_new_with_label(_("New"));
     gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
     gtk_signal_connect(GTK_OBJECT(button),
 		       "clicked", GTK_SIGNAL_FUNC(fe_edit_condition), GINT_TO_POINTER(1));
-    button = gtk_button_new_with_label(_("Remove"));
-    gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
-    gtk_signal_connect(GTK_OBJECT(button),
+    fe_condition_delete_button = gtk_button_new_with_label(_("Remove"));
+    gtk_box_pack_start(GTK_BOX(box), fe_condition_delete_button, TRUE, TRUE, 0);
+    gtk_signal_connect(GTK_OBJECT(fe_condition_delete_button),
 		       "clicked",
 		       GTK_SIGNAL_FUNC(fe_condition_remove_pressed), NULL);
 
@@ -431,7 +435,7 @@ build_right_side(void)
 {
     GtkWidget *rightside;
     GtkWidget *notebook, *page;
-    GtkWidget *bbox, *pixmap, *button;
+    GtkWidget *bbox, *pixmap;
 
     rightside = gtk_vbox_new(FALSE, 0);
 
@@ -451,18 +455,20 @@ build_right_side(void)
     bbox = gtk_hbutton_box_new();
     gtk_box_pack_start(GTK_BOX(rightside), bbox, FALSE, FALSE, 0);
 
-    button = gnome_stock_button(GNOME_STOCK_BUTTON_APPLY);
-    gtk_signal_connect(GTK_OBJECT(button),
+    fe_apply_button = gnome_stock_button(GNOME_STOCK_BUTTON_APPLY);
+    gtk_signal_connect(GTK_OBJECT(fe_apply_button),
 		       "clicked",
 		       GTK_SIGNAL_FUNC(fe_apply_pressed), NULL);
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_container_add(GTK_CONTAINER(bbox), fe_apply_button);
 
     pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_UNDO);
-    button = gnome_pixmap_button(pixmap, _("Revert"));
-    gtk_signal_connect(GTK_OBJECT(button),
+    fe_revert_button = gnome_pixmap_button(pixmap, _("Revert"));
+    gtk_signal_connect(GTK_OBJECT(fe_revert_button),
 		       "clicked",
 		       GTK_SIGNAL_FUNC(fe_revert_pressed), NULL);
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_container_add(GTK_CONTAINER(bbox), fe_revert_button);
+    gtk_widget_set_sensitive(fe_apply_button,FALSE);
+    gtk_widget_set_sensitive(fe_revert_button,FALSE);
 
     return rightside;
 }				/* end build_right_side() */
@@ -566,4 +572,6 @@ filters_edit_dialog(void)
     }
 
     gtk_widget_show_all(GTK_WIDGET(fe_window));
+    if (fe_filters_list->rows)
+	gtk_clist_select_row(fe_filters_list,0,-1);
 }

@@ -744,7 +744,6 @@ config_global_load(void)
 
     /* ... Progress Window Dialog */
     balsa_app.pwindow_option = d_get_gint("ProgressWindow", WHILERETR);
-    balsa_app.drag_default_is_move = d_get_gint("DragDefaultIsMove", 0);
     balsa_app.delete_immediately =
         gnome_config_get_bool("DeleteImmediately=false");
     balsa_app.hide_deleted =
@@ -1119,7 +1118,6 @@ config_save(void)
     gnome_config_set_bool("MsgSizeAsLines", balsa_app.line_length);
     gnome_config_set_bool("PageDownMod", balsa_app.pgdownmod);
     gnome_config_set_int("PageDownPercent", balsa_app.pgdown_percent);
-    gnome_config_set_int("DragDefaultIsMove", balsa_app.drag_default_is_move);
     gnome_config_set_bool("DeleteImmediately",
                           balsa_app.delete_immediately);
     gnome_config_set_bool("HideDeleted",

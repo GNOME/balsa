@@ -81,7 +81,6 @@ typedef struct _PropertyUI {
     GtkWidget *close_mailbox_minutes;
     GtkWidget *commit_mailbox_auto;
     GtkWidget *commit_mailbox_minutes;
-    GtkWidget *drag_default_is_move;
     GtkWidget *delete_immediately;
     GtkWidget *hide_deleted;
 
@@ -520,9 +519,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(G_OBJECT(pui->commit_mailbox_minutes), "changed",
 		     G_CALLBACK(mailbox_commit_timer_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->drag_default_is_move), "toggled",
-		     G_CALLBACK(properties_modified_cb), property_box);
-
     g_signal_connect(G_OBJECT(pui->delete_immediately), "toggled",
 		     G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->hide_deleted), "toggled",
@@ -802,8 +798,6 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.commit_mailbox_timeout =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
 					 (pui->commit_mailbox_minutes)) * 60;
-    balsa_app.drag_default_is_move =
-	GTK_TOGGLE_BUTTON(pui->drag_default_is_move)->active;
     balsa_app.delete_immediately =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (pui->delete_immediately));
@@ -1064,8 +1058,6 @@ set_prefs(void)
 				 balsa_app.commit_mailbox_auto);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->commit_mailbox_minutes),
 			      (float) balsa_app.commit_mailbox_timeout / 60);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->drag_default_is_move),
-				 balsa_app.drag_default_is_move);
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->delete_immediately),
@@ -2536,10 +2528,6 @@ misc_group(GtkWidget * page)
                        FALSE, FALSE, 0);
     label2 = gtk_label_new(_("minutes"));
     gtk_box_pack_start(GTK_BOX(hbox2), label2, FALSE, TRUE, 0);
-
-    pui->drag_default_is_move =
-        pm_group_add_check(group, _("Drag-and-drop moves "
-                                    "messages by default"));
 
     return group;
 }

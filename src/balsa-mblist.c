@@ -305,11 +305,10 @@ bmbl_drag_motion(GtkWidget * mblist, GdkDragContext * context, gint x,
                                     GTK_TREE_VIEW_DROP_INTO_OR_BEFORE);
     gtk_tree_path_free(path);
 
-    if (balsa_app.drag_default_is_move)
-        gdk_drag_status(context,
-                        (context->actions ==
-                         GDK_ACTION_COPY) ? GDK_ACTION_COPY :
-                        GDK_ACTION_MOVE, time);
+    gdk_drag_status(context,
+                    (context->actions ==
+                     GDK_ACTION_COPY) ? GDK_ACTION_COPY :
+                    GDK_ACTION_MOVE, time);
 
     return (ret_val && can_drop);
 }

@@ -76,17 +76,15 @@ static void messages_status_changed_cb(LibBalsaMailbox * mb,
    SET_UNREAD_MESSAGES_FLAG : tell the mailbox to change its properties.
    - MESSAGES_STATUS_CHANGED : notification signal sent by messages of the
    mailbox to tell that their status have changed.
-   - MESSAGES_ADDED, MESSAGES_REMOVED : notification signals sent by the mailbox
-   to allow the frontend to keep in sync. These signals are used when messages
-   are added or removed to the mailbox but not by the user. This is used when
-   eg the mailbox loads new messages (check new mails), or when the prefs
-   changed (eg "Hide Deleted Messages") and cause the deletion of messages.
+   - MESSAGES_ADDED: notification signal sent by the mailbox
+   to allow the frontend to keep in sync. This signal is used when messages
+   are added to the mailbox but not by the user. This is used when
+   eg the mailbox loads new messages (check new mails).
 */
 
 enum {
     MESSAGES_STATUS_CHANGED,
     MESSAGES_ADDED,
-    MESSAGES_REMOVED,
     PROGRESS_NOTIFY,
     SET_UNREAD_MESSAGES_FLAG,
     LAST_SIGNAL
@@ -191,21 +189,6 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      g_cclosure_marshal_VOID__POINTER, G_TYPE_NONE, 1,
                      G_TYPE_POINTER);
 
-    /* This signal is emitted by the mailbox when messages are removed
-       in order to sync with backend in general (this is different from
-       message deletion which is a user action).
-       GUI (see BalsaIndex) hooks on this signal to sync on the mailbox
-       content.
-    */ 
-    libbalsa_mailbox_signals[MESSAGES_REMOVED] =
-	g_signal_new("messages-removed",
-                     G_TYPE_FROM_CLASS(object_class),
-                     G_SIGNAL_RUN_FIRST,
-                     G_STRUCT_OFFSET(LibBalsaMailboxClass,
-                                     messages_removed),
-                     NULL, NULL,
-                     g_cclosure_marshal_VOID__POINTER, G_TYPE_NONE, 1,
-                     G_TYPE_POINTER);
 
     libbalsa_mailbox_signals[SET_UNREAD_MESSAGES_FLAG] =
 	g_signal_new("set-unread-messages-flag",
@@ -237,7 +220,6 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->progress_notify = NULL;
 
     klass->messages_added = NULL;
-    klass->messages_removed = NULL;
     klass->messages_status_changed = messages_status_changed_cb;
 
     klass->get_message = NULL;

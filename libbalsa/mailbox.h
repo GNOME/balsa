@@ -185,8 +185,6 @@ struct _LibBalsaMailboxClass {
 
     void (*messages_added) (LibBalsaMailbox * mailbox,
 			    GList * messages);
-    void (*messages_removed) (LibBalsaMailbox * mailbox,
-			      GList * messages);
     void (*message_append) (LibBalsaMailbox * mailbox,
 			    LibBalsaMessage * message);
     void (*messages_status_changed) (LibBalsaMailbox * mailbox,

@@ -256,6 +256,7 @@ balsa_app_init(void)
     balsa_app.index_from_width = FROM_DEFAULT_WIDTH;
     balsa_app.index_subject_width = SUBJECT_DEFAULT_WIDTH;
     balsa_app.index_date_width = DATE_DEFAULT_WIDTH;
+    balsa_app.index_size_width = SIZE_DEFAULT_WIDTH;
 
     /* file paths */
     balsa_app.attach_dir = NULL;

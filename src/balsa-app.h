@@ -48,12 +48,13 @@
 #define MW_DEFAULT_HEIGHT 480
 
 /* column width settings */
-#define NUM_DEFAULT_WIDTH 40
+#define NUM_DEFAULT_WIDTH 30
 #define STATUS_DEFAULT_WIDTH 16
 #define ATTACHMENT_DEFAULT_WIDTH 16
-#define FROM_DEFAULT_WIDTH 170
-#define SUBJECT_DEFAULT_WIDTH 260
-#define DATE_DEFAULT_WIDTH 138
+#define FROM_DEFAULT_WIDTH 160
+#define SUBJECT_DEFAULT_WIDTH 250
+#define DATE_DEFAULT_WIDTH 128
+#define SIZE_DEFAULT_WIDTH 40
 
 /* default width settings for the mailbox list columns, not fully utilized yet */
 #define MBNAME_DEFAULT_WIDTH 80
@@ -218,6 +219,7 @@ extern struct BalsaApplication {
     gint index_from_width;
     gint index_subject_width;
     gint index_date_width;
+    gint index_size_width;
 
     /*gint mblist_height; PKGW: unused */
     gint notebook_height;	/* PKGW: used :-) */
@@ -227,7 +229,6 @@ extern struct BalsaApplication {
     gboolean mblist_show_mb_content_info;
     gint mblist_newmsg_width;
     gint mblist_totalmsg_width;
-
 
     /* Colour of mailboxes with unread messages in mailbox list */
     GdkVisual *visual;

@@ -303,6 +303,7 @@ balsa_index_init(BalsaIndex * bindex)
     gtk_clist_set_column_width(clist, 3, balsa_app.index_from_width);
     gtk_clist_set_column_width(clist, 4, balsa_app.index_subject_width);
     gtk_clist_set_column_width(clist, 5, balsa_app.index_date_width);
+    gtk_clist_set_column_width(clist, 6, balsa_app.index_size_width);
     font = gtk_widget_get_style (GTK_WIDGET(clist))->font;
     row_height = font->ascent + font->descent+2;
     
@@ -1193,6 +1194,10 @@ resize_column_event_cb(GtkCList * clist, gint column, gint width,
 
     case 5:
 	balsa_app.index_date_width = width;
+	break;
+
+    case 6:
+	balsa_app.index_size_width = width;
 	break;
 
     default:

@@ -1,4 +1,14 @@
-2001-08-16  Carlos Morgado  <chbm@cprm.net>
+2001-08-17  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/save-restore.c: 
+	* src/balsa-mblist.c: 
+	* src/balsa-index.c: 
+	* src/balsa-app.c: 
+	* src/balsa-app.h: 
+	Peter Bloomfield: cleanup to mblist
+	Ali Akcaagac: cleanup to mblist, remember size column width
+	
+2001-08-16  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/send.c: patch from Manuel McLure <manuel@mclure.org>
 	to use mailbox->url instead of reconstructing it

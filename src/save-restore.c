@@ -451,6 +451,8 @@ config_global_load(void)
 	d_get_gint("IndexSubjectWidth", SUBJECT_DEFAULT_WIDTH);
     balsa_app.index_date_width =
 	d_get_gint("IndexDateWidth", DATE_DEFAULT_WIDTH);
+    balsa_app.index_size_width =
+	d_get_gint("IndexSizeWidth", SIZE_DEFAULT_WIDTH);
 
     /* ... window sizes */
     balsa_app.mw_width = gnome_config_get_int("MainWindowWidth=640");
@@ -756,6 +758,7 @@ gint config_save(void)
     gnome_config_set_int("IndexSubjectWidth",
 			 balsa_app.index_subject_width);
     gnome_config_set_int("IndexDateWidth", balsa_app.index_date_width);
+    gnome_config_set_int("IndexSizeWidth", balsa_app.index_size_width);
     gnome_config_set_int("MainWindowWidth", balsa_app.mw_width);
     gnome_config_set_int("MainWindowHeight", balsa_app.mw_height);
     gnome_config_set_int("MailboxListWidth", balsa_app.mblist_width);

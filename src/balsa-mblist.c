@@ -345,6 +345,9 @@ mblist_open_mailbox(LibBalsaMailbox * mailbox)
 	gtk_clist_set_column_width(GTK_CLIST
 				   ((BALSA_INDEX(page)->ctree)),
 				   5, balsa_app.index_date_width);
+	gtk_clist_set_column_width(GTK_CLIST
+				   ((BALSA_INDEX(page)->ctree)),
+				   6, balsa_app.index_size_width);
     } else { /* page with mailbox not found, open it */
 	balsa_window_open_mbnode(balsa_app.main_window, 
 				 BALSA_MAILBOX_NODE(gnode->data));
@@ -1021,8 +1024,7 @@ balsa_mblist_update_node_style(GtkCTree * ctree, GtkCTreeNode * node,
 	    tmp_is_leaf = GTK_CTREE_ROW(node)->is_leaf;
 	    tmp_expanded = GTK_CTREE_ROW(node)->expanded;
 	    
-	    icon = (mailbox == balsa_app.trash) 
-		? BALSA_ICON_TRASH : BALSA_ICON_TRAY_FULL;
+	    icon = BALSA_ICON_TRAY_FULL;
 	    
 	    gtk_ctree_set_node_info(ctree, node, mailbox->name, 5,
 				    balsa_icon_get_pixmap(icon),
@@ -1063,10 +1065,6 @@ balsa_mblist_update_node_style(GtkCTree * ctree, GtkCTreeNode * node,
 		
 		if (mailbox == balsa_app.inbox)
 		    icon = BALSA_ICON_INBOX;
-		else if (mailbox == balsa_app.outbox)
-		    icon = BALSA_ICON_OUTBOX;
-		else if (mailbox == balsa_app.trash)
-		    icon = BALSA_ICON_TRASH;
 		else
 		    icon = BALSA_ICON_TRAY_EMPTY;
 		

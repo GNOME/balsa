@@ -89,6 +89,14 @@ message_window_new (Message * message)
 
   gnome_app_set_contents (GNOME_APP (mw->window), sw);
 
+  /* FIXME: set it to the size of the canvas, unless it is
+   * bigger than the desktop, in which case it should be at about a
+   * 2/3 proportional size based on the size of the desktop and the
+   * height and width of the canvas.  [save and restore window size too]
+   */
+
+  gtk_window_set_default_size(GTK_WINDOW(mw->window), 400, 500);
+
   gtk_widget_show_all (mw->window);
 }
 

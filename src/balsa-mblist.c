@@ -514,10 +514,47 @@ bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
 {
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
     BalsaMailboxNode *mbnode;
+    GtkTreeIter child_iter;
 
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
     mbnode->expanded = TRUE;
     balsa_mailbox_node_scan_children(mbnode);
+
+    if (!mbnode->mailbox)
+        gtk_tree_store_set(GTK_TREE_STORE(model), iter,
+                           ICON_COLUMN,   
+                           gtk_widget_render_icon
+                           (GTK_WIDGET(balsa_app.main_window),
+                            BALSA_PIXMAP_MBOX_DIR_OPEN,
+                            GTK_ICON_SIZE_MENU, NULL),
+                           -1);
+
+    if (gtk_tree_model_iter_children(model, &child_iter, iter)) {
+        do {
+            gtk_tree_model_get(model, &child_iter,
+                               MBNODE_COLUMN, &mbnode, -1);
+            if (mbnode && mbnode->mailbox)
+                mbnode->mailbox->view->exposed = TRUE;
+        } while (gtk_tree_model_iter_next(model, &child_iter));
+    }
+}
+
+static void
+bmbl_tree_collapse_helper(GtkTreeModel * model, GtkTreeIter * iter)
+{
+    GtkTreeIter child_iter;
+
+    if (gtk_tree_model_iter_children(model, &child_iter, iter)) {
+        do {
+            BalsaMailboxNode *mbnode;
+
+            gtk_tree_model_get(model, &child_iter,
+                               MBNODE_COLUMN, &mbnode, -1);
+            if (mbnode->mailbox)
+                mbnode->mailbox->view->exposed = FALSE;
+            bmbl_tree_collapse_helper(model, &child_iter);
+        } while (gtk_tree_model_iter_next(model, &child_iter));
+    }
 }
 
 static void
@@ -529,6 +566,17 @@ bmbl_tree_collapse(GtkTreeView * tree_view, GtkTreeIter * iter,
 
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
     mbnode->expanded = FALSE;
+
+    if (!mbnode->mailbox)
+        gtk_tree_store_set(GTK_TREE_STORE(model), iter,
+                           ICON_COLUMN,   
+                           gtk_widget_render_icon
+                           (GTK_WIDGET(balsa_app.main_window),
+                            BALSA_PIXMAP_MBOX_DIR_CLOSED,
+                            GTK_ICON_SIZE_MENU, NULL),
+                           -1);
+
+    bmbl_tree_collapse_helper(model, iter);
 }
 
 /*
@@ -1171,12 +1219,12 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
 
             /* Make sure the show column is set before showing the
              * mailbox in the list. */
-            if (mailbox->show == LB_MAILBOX_SHOW_UNSET)
-                mailbox->show = ((   mailbox == balsa_app.sentbox
-                                  || mailbox == balsa_app.draftbox
-                                  || mailbox == balsa_app.outbox)
-                                 ? LB_MAILBOX_SHOW_TO
-                                 : LB_MAILBOX_SHOW_FROM);
+            if (mailbox->view->show == LB_MAILBOX_SHOW_UNSET)
+                mailbox->view->show = ((   mailbox == balsa_app.sentbox
+                                        || mailbox == balsa_app.draftbox
+                                        || mailbox == balsa_app.outbox)
+                                       ? LB_MAILBOX_SHOW_TO
+                                       : LB_MAILBOX_SHOW_FROM);
 	}
 	g_signal_connect(G_OBJECT(mailbox),
 			 "set-unread-messages-flag",

@@ -31,6 +31,12 @@
 #include "pgp.h"
 #endif
 
+#ifdef LIBMUTT
+#define _(a) (a)
+#define sleep(a) 
+#include <string.h>
+#endif
+
 static void flush_buffer(char* buf, size_t* len, CONNECTION* conn);
 static int msg_has_flag (LIST* flag_list, const char* flag);
 static IMAP_HEADER* msg_new_header (void);

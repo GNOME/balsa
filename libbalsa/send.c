@@ -510,13 +510,14 @@ libbalsa_message_postpone (LibBalsaMessage * message,
 	while (last && last->next)
 		last = last->next;
 
-	libbalsa_lock_mutt();
 	while ( body ) {
 		FILE *tempfp = NULL;
 		newbdy = NULL;
 
 		if (body->filename) {
+			libbalsa_lock_mutt();
 			newbdy = mutt_make_file_attach (body->filename);
+			libbalsa_unlock_mutt();
 		} else if (body->buffer) {
 			newbdy = add_mutt_body_plain (body->charset);
 			tempfp = safe_fopen (newbdy->filename, "w+");
@@ -533,17 +534,16 @@ libbalsa_message_postpone (LibBalsaMessage * message,
 
 			last = newbdy;
 		}
-
 		body = body->next;
 	}
 
+	libbalsa_lock_mutt();
 	if (msg->content) {
 		if (msg->content->next)
 			msg->content = mutt_make_multipart (msg->content);
 	}
 
 	mutt_prepare_envelope (msg->env);
-
 	encode_descriptions (msg->content);
 
 	if (reply_message != NULL)
@@ -557,17 +557,14 @@ libbalsa_message_postpone (LibBalsaMessage * message,
 	else
 		tmp = NULL;
 
-	mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (balsa_app.draftbox)->path, msg, tmp, 1, fcc);
+	mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (balsa_app.draftbox)->path,
+			msg, tmp, 1, fcc);
 	g_free(tmp);
-
+	mutt_free_header (&msg);
 	libbalsa_unlock_mutt();
 
 	if (balsa_app.draftbox->open_ref > 0)
 		libbalsa_mailbox_check (balsa_app.draftbox);
-
-	libbalsa_lock_mutt();
-	mutt_free_header (&msg);
-	libbalsa_unlock_mutt();
 
 	return TRUE;
 }

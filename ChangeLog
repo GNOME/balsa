@@ -1,3 +1,17 @@
+2000-09-02  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* README: added a comment on GSS
+	* configure.in:  use --with-gss option
+	* libbalsa/mailbox_imap.c: set ImapCRAMKey, too.
+	* libbalsa/message.c: imap code cleanup.
+	* libbalsa/send.c: fix deadlock on mail postpone.
+	* libmutt/configure.in: make imap default in a right way.
+	* libmutt-imap/Makefile.am: define LIBMUTT
+	* libmutt/imap/auth.c: be as verbose as the original code was.
+	* libmutt/imap/auth_gss.c: compile it.
+	* libmutt/imap/message.c: include <string.h>
+	* src/save-restore.c: major code cleanup.
+	
 2000-09-01  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox_imap.c(open): ask for password if unknown.

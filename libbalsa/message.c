@@ -657,12 +657,6 @@ libbalsa_message_body_ref (LibBalsaMessage * message)
 	 */
 	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
 		libbalsa_message_read (message);
-
-	if (LIBBALSA_IS_MAILBOX_IMAP(message->mailbox))	{
-		g_free (LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path);
-		LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path =
-			g_strdup (cur->content->filename);
-	}
 }
 
 

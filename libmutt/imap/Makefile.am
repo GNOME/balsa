@@ -13,7 +13,8 @@ endif
 
 EXTRA_DIST = BUGS README TODO imap_ssl.c imap_ssl.h auth_gss.c browse.c
 
-INCLUDES = -I$(top_srcdir) -I../intl
+CPPFLAGS=-DSHAREDIR=\"$(sharedir)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DLIBMUTT
+INCLUDES = -I$(top_srcdir)
 
 noinst_LIBRARIES = libimap.a
 noinst_HEADERS = imap_private.h imap_socket.h message.h $(SSLHEADERS) \

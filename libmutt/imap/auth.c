@@ -24,8 +24,14 @@
 #include "imap_private.h"
 #include "md5.h"
 
+
 #define MD5_BLOCK_LEN 64
 #define MD5_DIGEST_LEN 16
+
+#ifdef LIBMUTT
+#define _(a) (a)
+#define sleep(a) 
+#endif
 
 /* external authenticator prototypes */
 #ifdef USE_GSS
@@ -101,7 +107,7 @@ static int imap_auth_cram_md5 (IMAP_DATA* idata, const char* user,
   char seq[16];
 
   dprint (2, (debugfile, "Attempting CRAM-MD5 login...\n"));
-  /* BALSA: mutt_message (_("Authenticating (CRAM-MD5)...")); */
+  mutt_message _("Authenticating (CRAM-MD5)...");
   imap_make_sequence (seq, sizeof (seq));
   snprintf (obuf, LONG_STRING, "%s AUTHENTICATE CRAM-MD5\r\n", seq);
   mutt_socket_write (idata->conn, obuf);
@@ -188,7 +194,7 @@ static int imap_auth_anon (IMAP_DATA* idata)
   char seq[16];
 
   dprint (2, (debugfile, "Attempting anonymous login...\n"));
-  /* BALSA: mutt_message _("Authenticating (anonymous)..."); */
+  mutt_message _("Authenticating (anonymous)...");
   imap_make_sequence (seq, sizeof (seq));
   snprintf (obuf, LONG_STRING, "%s AUTHENTICATE ANONYMOUS\r\n", seq);
   mutt_socket_write (idata->conn, obuf);
@@ -274,7 +280,7 @@ int imap_authenticate (IMAP_DATA *idata, CONNECTION *conn)
     {
       if (!mutt_bit_isset (idata->capabilities, AUTH_ANON))
       {
-	mutt_error ("Anonymous authentication not supported.");
+	mutt_error _("Anonymous authentication not supported.");
 	return -1;
       }
       
@@ -287,7 +293,7 @@ int imap_authenticate (IMAP_DATA *idata, CONNECTION *conn)
     {
       if ((r = imap_auth_gss (idata, user)))
       {
-        mutt_error ("GSSAPI authentication failed.");
+        mutt_error _("GSSAPI authentication failed.");
         sleep (1);
       }
       else
@@ -315,7 +321,7 @@ int imap_authenticate (IMAP_DATA *idata, CONNECTION *conn)
       {
 	if ((r = imap_auth_cram_md5 (idata, user, ckey)))
 	{
-	  mutt_error ("CRAM-MD5 authentication failed.");
+	  mutt_error _("CRAM-MD5 authentication failed.");
 	  sleep (1);
 	  if (!(conn->mx.flags & M_IMAP_CRAM))
 	    FREE (&ImapCRAMKey);
@@ -330,8 +336,8 @@ int imap_authenticate (IMAP_DATA *idata, CONNECTION *conn)
       }
       else
       {
-	  /*BALSA: no msgmutt_message (_("Skipping CRAM-MD5 authentication."));
-	    sleep (1); */
+	mutt_message _("Skipping CRAM-MD5 authentication.");
+	sleep (1);
       }
     }
     else
@@ -352,7 +358,7 @@ int imap_authenticate (IMAP_DATA *idata, CONNECTION *conn)
     imap_quote_string (q_user, sizeof (q_user), user);
     imap_quote_string (q_pass, sizeof (q_pass), pass);
 
-    /* BALSA: no message mutt_message _("Logging in..."); */
+    mutt_message _("Logging in...");
     snprintf (buf, sizeof (buf), "LOGIN %s %s", q_user, q_pass);
     r = imap_exec (buf, sizeof (buf), idata, buf, IMAP_OK_FAIL);
     if (r == -1)
@@ -364,9 +370,8 @@ int imap_authenticate (IMAP_DATA *idata, CONNECTION *conn)
     else if (r == -2)
     {
       /* Login failed, try again */
-      mutt_error ("Login failed.");
+      mutt_error _("Login failed.");
       sleep (1);
-
       if (!(conn->mx.flags & M_IMAP_USER))
 	FREE (&ImapUser);
       if (!(conn->mx.flags & M_IMAP_PASS))

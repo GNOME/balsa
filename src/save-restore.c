@@ -38,9 +38,14 @@
 #include "mailbox-conf.h"
 #include "quote-color.h"
 
+static void pl_dict_add_remote (proplist_t dict_arg, 
+				const LibBalsaServer * server);
+static proplist_t d_add_gint(proplist_t dict_arg, gchar * string1, 
+				       gint iarg);
 static proplist_t pl_dict_add_str_str (proplist_t dict_arg, gchar * string1,
 				       gchar * string2);
 static gchar *pl_dict_get_str (proplist_t dict, gchar * str);
+static gint d_get_gint (proplist_t dict, gchar * key, gint def_val);
 static gchar* config_get_pkey(proplist_t mbox);
 static proplist_t config_mailbox_get_key_by_pkey (const gchar * pkey);
 static gint config_mailbox_init (proplist_t mbox, gchar * key);
@@ -295,34 +300,11 @@ config_mailbox_add (LibBalsaMailbox * mailbox, const char *key_arg)
     */
     mbox_dict = pl_dict_add_str_str (NULL, "Type", "POP3");
     pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
-    pl_dict_add_str_str (mbox_dict, "Username",
-			 LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->user);
-    /* Do not save the password if the field is NULL.  This is here
-       so that asving the password to the balsarc file can be optional */
-    if (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd)
-    {
-      gchar *buff;
-      buff = rot (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd);
-      pl_dict_add_str_str (mbox_dict, "Password",
-			   buff);
-      g_free (buff);
-    }
-    pl_dict_add_str_str (mbox_dict, "Server",
-			 LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->host);
-    {
-      char tmp[32];
-      
-      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->port);
-      pl_dict_add_str_str (mbox_dict, "Port", tmp);
-      
-      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3(mailbox)->check);
-      pl_dict_add_str_str (mbox_dict, "Check", tmp);
-      
-      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3(mailbox)->delete_from_server);
-      pl_dict_add_str_str (mbox_dict, "Delete", tmp);
-      snprintf (tmp,  sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3(mailbox)->use_apop);
-      pl_dict_add_str_str (mbox_dict, "Apop", tmp);
-    }
+    pl_dict_add_remote  (mbox_dict, LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
+    d_add_gint (mbox_dict, "Check", LIBBALSA_MAILBOX_POP3(mailbox)->check); 
+    d_add_gint (mbox_dict, "Delete",
+		LIBBALSA_MAILBOX_POP3(mailbox)->delete_from_server);
+    d_add_gint (mbox_dict, "Apop", LIBBALSA_MAILBOX_POP3(mailbox)->use_apop);
     
     if ((LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid) != NULL)
       pl_dict_add_str_str (mbox_dict, "LastUID", LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid);
@@ -340,27 +322,9 @@ config_mailbox_add (LibBalsaMailbox * mailbox, const char *key_arg)
     */
     mbox_dict = pl_dict_add_str_str (NULL, "Type", "IMAP");
     pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
-    pl_dict_add_str_str (mbox_dict, "Server",
-			 LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->host);
-    
-    /* Add the Port entry */
-    {
-      char tmp[MAX_PROPLIST_KEY_LEN];
-      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->port);
-      pl_dict_add_str_str (mbox_dict, "Port", tmp);
-    }
-    
-    pl_dict_add_str_str (mbox_dict, "Path", LIBBALSA_MAILBOX_IMAP (mailbox)->path);
-    pl_dict_add_str_str (mbox_dict, "Username",
-			 LIBBALSA_MAILBOX_REMOTE_SERVER (mailbox)->user);
-    
-    if (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd != NULL)
-    {
-      gchar *buff;
-      buff = rot (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd);
-      pl_dict_add_str_str (mbox_dict, "Password", buff);
-      g_free (buff);
-    }
+    pl_dict_add_remote  (mbox_dict, LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
+    pl_dict_add_str_str (mbox_dict, "Path", 
+			 LIBBALSA_MAILBOX_IMAP (mailbox)->path);
   }
   else
   {
@@ -499,9 +463,7 @@ get_raw_imap_data(proplist_t mbox, gchar ** username, gchar **passwd,
     if ((field = pl_dict_get_str (mbox, "Server")) == NULL)
 	return FALSE;
     else *server = g_strdup(field);
-    
-    *port = ((field = pl_dict_get_str (mbox, "Port")) == NULL)
-	     ? 143 : atol(field);
+    *port = d_get_gint (mbox, "Port", 143);
 
     if( (field = pl_dict_get_str (mbox, "Path")) == NULL)
 	return FALSE;
@@ -592,35 +554,21 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       field = pl_dict_get_str (mbox, "Server");
       if (field == NULL) 
 	return FALSE;
-      else {
-	gchar *port;
-	port = pl_dict_get_str (mbox, "Port");
-
-	if ( port != NULL )
-	  libbalsa_server_set_host (server, field, atoi(port));
-	else
-	  libbalsa_server_set_host (server, field, 110);
-      }
-
-      if ((field = pl_dict_get_str (mbox, "Check")) == NULL)
-	LIBBALSA_MAILBOX_POP3 (mailbox)->check = FALSE;
       else
-	LIBBALSA_MAILBOX_POP3 (mailbox)->check = atol (field);
+	libbalsa_server_set_host (server, field, 
+				  d_get_gint (mbox, "Port", 110));
 
-      if ((field = pl_dict_get_str (mbox, "Delete")) == NULL)
-	LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server = FALSE;
-      else
-	LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server = atol (field);
+      LIBBALSA_MAILBOX_POP3 (mailbox)->check = d_get_gint (mbox,"Check",FALSE);
+      LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server =
+	d_get_gint (mbox, "Delete", FALSE);
 
       if ((field = pl_dict_get_str (mbox, "LastUID")) == NULL)
 	LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid = NULL;
       else
 	LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup (field);
 
-      if ((field = pl_dict_get_str (mbox, "Apop")) == NULL)
-	LIBBALSA_MAILBOX_POP3 (mailbox)->use_apop = FALSE;
-      else
-	LIBBALSA_MAILBOX_POP3 (mailbox)->use_apop = atol (field);
+      LIBBALSA_MAILBOX_POP3 (mailbox)->use_apop =
+	d_get_gint (mbox, "Apop", FALSE);
 
       balsa_app.inbox_input =
 	g_list_append (balsa_app.inbox_input, mailbox);
@@ -682,33 +630,20 @@ config_mailbox_init (proplist_t mbox, gchar * key)
     }
 
   if (strcmp ("Inbox", key) == 0)
-    {
       balsa_app.inbox = mailbox;
-    }
-  else if (strcmp ("Outbox", key) == 0)
-    {
+  else if (strcmp ("Outbox",   key) == 0)
       balsa_app.outbox = mailbox;
-    }
-  else if (strcmp ("Sentbox", key) == 0)
-    {
+  else if (strcmp ("Sentbox",  key) == 0)
       balsa_app.sentbox = mailbox;
-    }
   else if (strcmp ("Draftbox", key) == 0)
-    {
       balsa_app.draftbox = mailbox;
-    }
-  else if (strcmp ("Trash", key) == 0)
-    {
+  else if (strcmp ("Trash",    key) == 0)
       balsa_app.trash = mailbox;
-    }
   else
     {
-      if (mailbox_type == MAILBOX_MH)
-	node = g_node_new (mailbox_node_new (g_strdup (mailbox->name),
-					     mailbox, TRUE));
-      else
-	node = g_node_new (mailbox_node_new (g_strdup (mailbox->name),
-					     mailbox, FALSE));
+      node = g_node_new (mailbox_node_new (g_strdup (mailbox->name),
+					   mailbox, 
+					   mailbox_type == MAILBOX_MH));
       g_node_append (balsa_app.mailbox_nodes, node);
     }
 
@@ -784,25 +719,10 @@ config_global_load (void)
   else
     balsa_app.signature_path = g_strdup (field);
 
-  if ((field = pl_dict_get_str (globals, "SigSending")) == NULL)
-    balsa_app.sig_sending = TRUE;
-  else
-   balsa_app.sig_sending = atoi ( field );
-
-  if ((field = pl_dict_get_str (globals, "SigReply")) == NULL)
-    balsa_app.sig_whenreply = TRUE;
-  else
-    balsa_app.sig_whenreply = atoi ( field );
-
-  if ((field = pl_dict_get_str (globals, "SigForward")) == NULL)
-    balsa_app.sig_whenforward = TRUE;
-  else
-    balsa_app.sig_whenforward = atoi ( field );
-
-  if ((field = pl_dict_get_str (globals, "SigSeparator")) == NULL)
-    balsa_app.sig_separator = TRUE;
-  else
-    balsa_app.sig_separator = atoi ( field );
+  balsa_app.sig_sending     = d_get_gint (globals, "SigSending",   TRUE);
+  balsa_app.sig_whenreply   = d_get_gint (globals, "SigReply",     TRUE);
+  balsa_app.sig_whenforward = d_get_gint (globals, "SigForward",   TRUE);
+  balsa_app.sig_separator   = d_get_gint (globals, "SigSeparator", TRUE);
 
   /* smtp server */
   if ((field = pl_dict_get_str (globals, "SMTPServer")) == NULL)
@@ -819,45 +739,26 @@ config_global_load (void)
    }
 
   /* Check mail timer */
-  if ((field = pl_dict_get_str (globals, "CheckMailAuto")) == NULL)
-    balsa_app.check_mail_auto = FALSE;
-  else
-    balsa_app.check_mail_auto = atoi (field);
-
-  if ((field = pl_dict_get_str (globals, "CheckMailMinutes")) == NULL)
-    balsa_app.check_mail_timer = 10;
-  else
-    balsa_app.check_mail_timer = atoi (field);
+  balsa_app.check_mail_auto =  d_get_gint (globals, "CheckMailAuto", FALSE);
+  balsa_app.check_mail_timer = d_get_gint (globals, "CheckMailMinutes", 10);
 
   if (balsa_app.check_mail_timer < 1 )
     balsa_app.check_mail_timer = 10;
 
   if( balsa_app.check_mail_auto )
-    update_timer( TRUE, balsa_app.check_mail_timer );
+    update_timer(TRUE, balsa_app.check_mail_timer );
 
   /* Word Wrap */
-  if ((field = pl_dict_get_str (globals, "WordWrap")) == NULL)
-    balsa_app.wordwrap = TRUE;
-  else
-    balsa_app.wordwrap = atoi (field);
-
-  if ((field = pl_dict_get_str (globals, "WrapLength")) == NULL)
-    balsa_app.wraplength = 79;
-  else
-    balsa_app.wraplength = atoi (field);
+  balsa_app.wordwrap   = d_get_gint (globals, "WordWrap",TRUE);
+  balsa_app.wraplength = d_get_gint (globals, "WrapLength",75);
 
   if (balsa_app.wraplength < 40 )
     balsa_app.wraplength = 40;
 
-  if ((field = pl_dict_get_str (globals, "BrowseWrap")) == NULL)
-    balsa_app.browse_wrap = TRUE;
-  else
-    balsa_app.browse_wrap = atoi (field);
+  balsa_app.browse_wrap = d_get_gint (globals, "BrowseWrap",TRUE);
 
-  if ((field = pl_dict_get_str (globals, "ShownHeaders")) == NULL)
-    balsa_app.shown_headers = HEADERS_SELECTED;
-  else
-    balsa_app.shown_headers = atoi (field);
+  balsa_app.shown_headers = d_get_gint (globals, "ShownHeaders",
+					HEADERS_SELECTED);
 
   g_free(balsa_app.selected_headers);
   if ((field = pl_dict_get_str (globals, "SelectedHeaders")) == NULL)
@@ -866,126 +767,53 @@ config_global_load (void)
     balsa_app.selected_headers = g_strdup (field);
   g_strdown(balsa_app.selected_headers);
 
-  if ((field = pl_dict_get_str (globals, "ShowMBList")) == NULL)
-    balsa_app.show_mblist = TRUE;
-  else
-    balsa_app.show_mblist = atoi (field);
-
-  if ((field = pl_dict_get_str (globals, "ShowTabs")) == NULL)
-    balsa_app.show_notebook_tabs = FALSE;
-  else
-    balsa_app.show_notebook_tabs = atoi (field);
+  balsa_app.show_mblist        = d_get_gint (globals, "ShowMBList",TRUE);
+  balsa_app.show_notebook_tabs = d_get_gint (globals, "ShowTabs",FALSE);
 
   /* toolbar style */
-  if ((field = pl_dict_get_str (globals, "ToolbarStyle")) == NULL)
-    balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
-  else
-    balsa_app.toolbar_style = atoi (field);
+  balsa_app.toolbar_style =d_get_gint(globals,"ToolbarStyle",GTK_TOOLBAR_BOTH);
 
   /* Progress Window Dialog */
-  if ((field = pl_dict_get_str (globals, "PWindowOption")) == NULL)
-    balsa_app.pwindow_option = WHILERETR;
-  else
-    balsa_app.pwindow_option = atoi (field);
+  balsa_app.pwindow_option = d_get_gint (globals, "PWindowOption",WHILERETR);
 
   /* use the preview pane */
-  if ((field = pl_dict_get_str (globals, "UsePreviewPane")) == NULL)
-    balsa_app.previewpane = TRUE;
-  else
-    balsa_app.previewpane = atoi (field);
-
+  balsa_app.previewpane = d_get_gint (globals, "UsePreviewPane",TRUE);
   
   /* column width settings */
-  if ((field = pl_dict_get_str (globals, "MBListNameWidth")) == NULL)
-    balsa_app.mblist_name_width = MBNAME_DEFAULT_WIDTH;
-  else
-    balsa_app.mblist_name_width = atoi(field);
+  balsa_app.mblist_name_width = 
+    d_get_gint (globals, "MBListNameWidth",MBNAME_DEFAULT_WIDTH);
   
-  if ((field = pl_dict_get_str (globals, "MBListNewMsgWidth")) == NULL)
-    balsa_app.mblist_newmsg_width = NEWMSGCOUNT_DEFAULT_WIDTH;
-  else
-    balsa_app.mblist_newmsg_width = atoi(field);
-
-  if ((field = pl_dict_get_str (globals, "MBListTotalMsgWidth")) == NULL)
-    balsa_app.mblist_totalmsg_width = TOTALMSGCOUNT_DEFAULT_WIDTH;
-  else
-    balsa_app.mblist_totalmsg_width = atoi(field);
+  balsa_app.mblist_newmsg_width = d_get_gint (globals, "MBListNewMsgWidth",NEWMSGCOUNT_DEFAULT_WIDTH);
+  balsa_app.mblist_totalmsg_width = d_get_gint (globals, "MBListTotalMsgWidth",TOTALMSGCOUNT_DEFAULT_WIDTH);
 
   /* show mailbox content info */
-  if ((field = pl_dict_get_str (globals, "ShowMailboxContentInfo")) == NULL)
-    balsa_app.mblist_show_mb_content_info = TRUE;
-  else
-    balsa_app.mblist_show_mb_content_info = atoi (field);
+  balsa_app.mblist_show_mb_content_info = d_get_gint (globals, "ShowMailboxContentInfo",TRUE);
 
   /* debugging enabled */
-  if ((field = pl_dict_get_str (globals, "Debug")) == NULL)
-    balsa_app.debug = FALSE;
-  else
-    balsa_app.debug = atoi (field);
+  balsa_app.debug = d_get_gint (globals, "Debug",FALSE);
 
   /* window sizes */
-  if ((field = pl_dict_get_str (globals, "MainWindowWidth")) == NULL)
-    balsa_app.mw_width = 640;
-  else
-    balsa_app.mw_width = atoi (field);
-
-  if ((field = pl_dict_get_str (globals, "MainWindowHeight")) == NULL)
-    balsa_app.mw_height = 480;
-  else
-    balsa_app.mw_height = atoi (field);
-
-  if ((field = pl_dict_get_str (globals, "MailboxListWidth")) == NULL)
-    balsa_app.mblist_width = 100;
-  else
-    balsa_app.mblist_width = atoi (field);
+  balsa_app.mw_width     = d_get_gint (globals, "MainWindowWidth",640);
+  balsa_app.mw_height    = d_get_gint (globals, "MainWindowHeight",480);
+  balsa_app.mblist_width = d_get_gint (globals, "MailboxListWidth",100);
 
   /* restore column sizes from previous session */
-  if ((field = pl_dict_get_str (globals, "IndexNumWidth")) == NULL)
-    balsa_app.index_num_width = NUM_DEFAULT_WIDTH;
-  else
-    balsa_app.index_num_width = atoi (field);
+  balsa_app.index_num_width = d_get_gint (globals, "IndexNumWidth",NUM_DEFAULT_WIDTH);
+  balsa_app.index_status_width = d_get_gint (globals, "IndexStatusWidth",STATUS_DEFAULT_WIDTH);
+  balsa_app.index_attachment_width = d_get_gint (globals, "IndexAttachmentWidth",ATTACHMENT_DEFAULT_WIDTH);
+  balsa_app.index_from_width = d_get_gint (globals, "IndexFromWidth",FROM_DEFAULT_WIDTH);
+  balsa_app.index_subject_width = d_get_gint (globals, "IndexSubjectWidth",SUBJECT_DEFAULT_WIDTH);
+  balsa_app.index_date_width = d_get_gint (globals, "IndexDateWidth",DATE_DEFAULT_WIDTH);
 
-  if ((field = pl_dict_get_str (globals, "IndexStatusWidth")) == NULL)
-    balsa_app.index_status_width = STATUS_DEFAULT_WIDTH;
-  else
-    balsa_app.index_status_width = atoi (field);
-
-  if ((field = pl_dict_get_str (globals, "IndexAttachmentWidth")) == NULL)
-    balsa_app.index_attachment_width = ATTACHMENT_DEFAULT_WIDTH;
-  else
-    balsa_app.index_attachment_width = atoi (field);
-
-  if ((field = pl_dict_get_str (globals, "IndexFromWidth")) == NULL)
-    balsa_app.index_from_width = FROM_DEFAULT_WIDTH;
-  else
-    balsa_app.index_from_width = atoi (field);
-
-  if ((field = pl_dict_get_str (globals, "IndexSubjectWidth")) == NULL)
-    balsa_app.index_subject_width = SUBJECT_DEFAULT_WIDTH;
-  else
-    balsa_app.index_subject_width = atoi (field);
-
-  if ((field = pl_dict_get_str (globals, "IndexDateWidth")) == NULL)
-    balsa_app.index_date_width = DATE_DEFAULT_WIDTH;
-  else
-    balsa_app.index_date_width = atoi (field);
-
-
-  /* FIXME this can be removed later */
   /* PKGW: why comment this out? Breaks my Transfer context menu. */
   if (balsa_app.mblist_width < 100)
       balsa_app.mblist_width = 170;
 
-  if ((field = pl_dict_get_str (globals, "NotebookHeight")) == NULL)
-    balsa_app.notebook_height = 170;
-  else
-    balsa_app.notebook_height = atoi (field);
+  balsa_app.notebook_height = d_get_gint (globals, "NotebookHeight",170);
   /* FIXME this can be removed later */
   /* PKGW see above */
   if (balsa_app.notebook_height < 100)
       balsa_app.notebook_height = 200;
-
-
 
   /* arp --- LeadinStr for "reply to" leadin. */
   g_free (balsa_app.quote_str);
@@ -1025,25 +853,14 @@ config_global_load (void)
   else 
       balsa_app.PrintCommand.PrintCommand = g_strdup(field);
 
-  if (( field = pl_dict_get_str (globals, "PrintLinesize")) == NULL)
-      balsa_app.PrintCommand.linesize = DEFAULT_LINESIZE;
-  else
-      balsa_app.PrintCommand.linesize = atoi(field);
-
-  if (( field = pl_dict_get_str (globals, "PrintBreakline")) == NULL )
-      balsa_app.PrintCommand.breakline = FALSE;
-  else
-      balsa_app.PrintCommand.breakline = atoi(field);
-
-  if (( field = pl_dict_get_str (globals, "CheckMailUponStartup")) == NULL )
-	  balsa_app.check_mail_upon_startup = FALSE;
-  else
-	  balsa_app.check_mail_upon_startup = atoi(field);
-
-  if (( field = pl_dict_get_str (globals, "RememberOpenMailboxes")) == NULL )
-	  balsa_app.remember_open_mboxes = FALSE;
-  else
-	  balsa_app.remember_open_mboxes = atoi(field);
+  balsa_app.PrintCommand.linesize = 
+    d_get_gint (globals, "PrintLinesize",DEFAULT_LINESIZE);
+  balsa_app.PrintCommand.breakline = 
+    d_get_gint (globals, "PrintBreakline",FALSE);
+  balsa_app.check_mail_upon_startup = 
+    d_get_gint (globals, "CheckMailUponStartup",FALSE);
+  balsa_app.remember_open_mboxes = 
+    d_get_gint (globals, "RememberOpenMailboxes",FALSE);
 
   if ( balsa_app.remember_open_mboxes &&
        ( field = pl_dict_get_str (globals, "OpenMailboxes")) != NULL &&
@@ -1055,61 +872,27 @@ config_global_load (void)
       } else balsa_app.open_mailbox = g_strdup(field);
   }
 
-  if (( field = pl_dict_get_str (globals, "EmptyTrash")) == NULL )
-	  balsa_app.empty_trash_on_exit = FALSE;
-  else
-	  balsa_app.empty_trash_on_exit = atoi(field);
+  balsa_app.empty_trash_on_exit = d_get_gint (globals, "EmptyTrash",FALSE);
 
   /* Here we load the unread mailbox colour for the mailbox list */
-  if ((field = pl_dict_get_str (globals, "MBListUnreadColorRed")) == NULL)
-    balsa_app.mblist_unread_color.red = MBLIST_UNREAD_COLOR_RED;
-  else
-    balsa_app.mblist_unread_color.red = atoi (field);
+  balsa_app.mblist_unread_color.red = d_get_gint (globals, "MBListUnreadColorRed",MBLIST_UNREAD_COLOR_RED);
 
-  if ((field = pl_dict_get_str (globals, "MBListUnreadColorGreen")) == NULL)
-    balsa_app.mblist_unread_color.green = MBLIST_UNREAD_COLOR_GREEN;
-  else
-    balsa_app.mblist_unread_color.green = atoi (field);
+  balsa_app.mblist_unread_color.green = d_get_gint (globals, "MBListUnreadColorGreen",MBLIST_UNREAD_COLOR_GREEN);
 
-  if ((field = pl_dict_get_str (globals, "MBListUnreadColorBlue")) == NULL)
-    balsa_app.mblist_unread_color.blue = MBLIST_UNREAD_COLOR_BLUE;
-  else
-    balsa_app.mblist_unread_color.blue = atoi (field);
+  balsa_app.mblist_unread_color.blue = d_get_gint (globals, "MBListUnreadColorBlue",MBLIST_UNREAD_COLOR_BLUE);
 
 
   /*
    * Here we load the quoted text colour for the mailbox list.
    * We load two colours, and recalculate the gradient.
    */
-  if ((field = pl_dict_get_str (globals, "QuotedColorStartRed")) == NULL)
-    balsa_app.quoted_color[0].red = QUOTED_COLOR_RED;
-  else
-    balsa_app.quoted_color[0].red = atoi (field);
+  balsa_app.quoted_color[0].red = d_get_gint (globals, "QuotedColorStartRed",QUOTED_COLOR_RED);
+  balsa_app.quoted_color[0].green = d_get_gint (globals, "QuotedColorStartGreen",QUOTED_COLOR_GREEN);
+  balsa_app.quoted_color[0].blue = d_get_gint (globals, "QuotedColorStartBlue",QUOTED_COLOR_BLUE);
 
-  if ((field = pl_dict_get_str (globals, "QuotedColorStartGreen")) == NULL)
-    balsa_app.quoted_color[0].green = QUOTED_COLOR_GREEN;
-  else
-    balsa_app.quoted_color[0].green = atoi (field);
-
-  if ((field = pl_dict_get_str (globals, "QuotedColorStartBlue")) == NULL)
-    balsa_app.quoted_color[0].blue = QUOTED_COLOR_BLUE;
-  else
-    balsa_app.quoted_color[0].blue = atoi (field);
-
-  if ((field = pl_dict_get_str (globals, "QuotedColorEndRed")) == NULL)
-    balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red = QUOTED_COLOR_RED;
-  else
-    balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red = atoi (field);
-
-  if ((field = pl_dict_get_str (globals, "QuotedColorEndGreen")) == NULL)
-    balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green = QUOTED_COLOR_GREEN;
-  else
-    balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green = atoi (field);
-
-  if ((field = pl_dict_get_str (globals, "QuotedColorEndBlue")) == NULL)
-    balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue = QUOTED_COLOR_BLUE;
-  else
-    balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue = atoi (field);
+  balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red = d_get_gint (globals, "QuotedColorEndRed",QUOTED_COLOR_RED);
+  balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green = d_get_gint (globals, "QuotedColorEndGreen",QUOTED_COLOR_GREEN);
+  balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue = d_get_gint (globals, "QuotedColorEndBlue",QUOTED_COLOR_BLUE);
 
   make_gradient (balsa_app.quoted_color, 0, MAX_QUOTED_COLOR - 1);
 
@@ -1123,11 +906,7 @@ config_global_load (void)
     balsa_app.ab_location = g_strdup (field);
   }
 
-  if (( field = pl_dict_get_str (globals, "AliasFlag")) == NULL )
-	  balsa_app.alias_find_flag = FALSE;
-  else
-	  balsa_app.alias_find_flag = atoi(field);
-
+  balsa_app.alias_find_flag = d_get_gint (globals, "AliasFlag",FALSE);
   /* How we format dates */
   if ((field = pl_dict_get_str (globals, "DateFormat")) != NULL) {
     g_free (balsa_app.date_string);
@@ -1141,8 +920,6 @@ gint
 config_global_save (void)
 {
   proplist_t globals, temp_str;
-  char tmp[MAX_PROPLIST_KEY_LEN];
-
   g_assert (balsa_app.proplist != NULL);
 
   temp_str = PLMakeString ("Globals");
@@ -1176,119 +953,53 @@ config_global_save (void)
     pl_dict_add_str_str (globals, "SignaturePath",
 			 balsa_app.signature_path);
 
+  d_add_gint (globals, "SigSending", balsa_app.sig_sending);
+  d_add_gint (globals, "SigForward", balsa_app.sig_whenforward);
+  d_add_gint (globals, "SigReply",   balsa_app.sig_whenreply);
+  d_add_gint (globals, "SigSeparator", balsa_app.sig_separator);
 
-  {
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.sig_sending);
-    pl_dict_add_str_str (globals, "SigSending", tmp);
+  d_add_gint (globals, "ToolbarStyle", balsa_app.toolbar_style);
+  d_add_gint (globals, "PWindowOption", balsa_app.pwindow_option);
+  d_add_gint (globals, "Debug", balsa_app.debug);
+  d_add_gint (globals, "UsePreviewPane", balsa_app.previewpane);
 
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.sig_whenforward);
-    pl_dict_add_str_str (globals, "SigForward", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.sig_whenreply);
-    pl_dict_add_str_str (globals, "SigReply", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.sig_separator);
-    pl_dict_add_str_str (globals, "SigSeparator", tmp);
-
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.toolbar_style);
-    pl_dict_add_str_str (globals, "ToolbarStyle", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.pwindow_option);
-    pl_dict_add_str_str (globals, "PWindowOption", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.debug);
-    pl_dict_add_str_str (globals, "Debug", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.previewpane);
-    pl_dict_add_str_str (globals, "UsePreviewPane", tmp);
-
-    if (balsa_app.smtp) 
-    {
-      snprintf (tmp, sizeof (tmp), "%d", balsa_app.smtp);
-      pl_dict_add_str_str (globals, "SMTP", tmp);
-    }
-
-    snprintf (tmp, sizeof(tmp), "%d", balsa_app.mblist_name_width);
-    pl_dict_add_str_str (globals, "MBListNameWidth", tmp);
-
-    snprintf (tmp, sizeof(tmp), "%d", balsa_app.mblist_newmsg_width);
-    pl_dict_add_str_str (globals, "MBListNewMsgWidth", tmp);
-
-    snprintf (tmp, sizeof(tmp), "%d", balsa_app.mblist_totalmsg_width);
-    pl_dict_add_str_str (globals, "MBListTotalMsgWidth", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_show_mb_content_info);
-    pl_dict_add_str_str (globals, "ShowMailboxContentInfo", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mw_width);
-    pl_dict_add_str_str (globals, "MainWindowWidth", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mw_height);
-    pl_dict_add_str_str (globals, "MainWindowHeight", tmp);
-
-/* We need to add 18 to the mailbox list width to prevent it from changing
-   after the exit (not sure why but possibly because of difference between
-   paned width and the ctree width. */
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_width);
-    pl_dict_add_str_str (globals, "MailboxListWidth", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.notebook_height);
-    pl_dict_add_str_str (globals, "NotebookHeight", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_num_width);
-    pl_dict_add_str_str (globals, "IndexNumWidth", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_status_width);
-    pl_dict_add_str_str (globals, "IndexStatusWidth", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_attachment_width);
-    pl_dict_add_str_str (globals, "IndexAttachmentWidth", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_from_width);
-    pl_dict_add_str_str (globals, "IndexFromWidth", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_subject_width);
-    pl_dict_add_str_str (globals, "IndexSubjectWidth", tmp);
-    
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_date_width);
-    pl_dict_add_str_str (globals, "IndexDateWidth", tmp);
-    
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.notebook_height);
-    pl_dict_add_str_str (globals, "NotebookHeight", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.encoding_style);
-    pl_dict_add_str_str (globals, "EncodingStyle", tmp);
-  }
-
-  snprintf (tmp, sizeof (tmp), "%d", balsa_app.check_mail_auto );
-  pl_dict_add_str_str (globals, "CheckMailAuto", tmp);
-
-  snprintf (tmp, sizeof (tmp), "%d", balsa_app.check_mail_timer);
-  pl_dict_add_str_str (globals, "CheckMailMinutes", tmp);
-
-  snprintf (tmp, sizeof (tmp), "%d", balsa_app.wordwrap );
-  pl_dict_add_str_str (globals, "WordWrap", tmp);
-
-  snprintf (tmp, sizeof (tmp), "%d", balsa_app.wraplength);
-  pl_dict_add_str_str (globals, "WrapLength", tmp);
-
-  snprintf (tmp, sizeof (tmp), "%d", balsa_app.browse_wrap );
-  pl_dict_add_str_str (globals, "BrowseWrap", tmp);
-
-  snprintf (tmp, sizeof (tmp), "%d", balsa_app.shown_headers );
-  pl_dict_add_str_str (globals, "ShownHeaders", tmp);
+  if (balsa_app.smtp) 
+    d_add_gint (globals, "SMTP", balsa_app.smtp);
+  
+  d_add_gint (globals, "MBListNameWidth",   balsa_app.mblist_name_width);
+  d_add_gint (globals, "MBListNewMsgWidth", balsa_app.mblist_newmsg_width);
+  d_add_gint (globals,"MBListTotalMsgWidth",balsa_app.mblist_totalmsg_width);
+  d_add_gint (globals, "ShowMailboxContentInfo", 
+	      balsa_app.mblist_show_mb_content_info);
+  
+  d_add_gint (globals, "MainWindowWidth",  balsa_app.mw_width);
+  d_add_gint (globals, "MainWindowHeight", balsa_app.mw_height);
+  
+  d_add_gint (globals, "MailboxListWidth", balsa_app.mblist_width);
+  d_add_gint (globals, "NotebookHeight",   balsa_app.notebook_height);
+  d_add_gint (globals, "IndexNumWidth",    balsa_app.index_num_width);
+  d_add_gint (globals, "IndexStatusWidth", balsa_app.index_status_width);
+  d_add_gint (globals, "IndexAttachmentWidth", 
+	      balsa_app.index_attachment_width);
+  
+  d_add_gint (globals, "IndexFromWidth",    balsa_app.index_from_width);
+  d_add_gint (globals, "IndexSubjectWidth", balsa_app.index_subject_width);
+  d_add_gint (globals, "IndexDateWidth",    balsa_app.index_date_width);
+  d_add_gint (globals, "EncodingStyle",     balsa_app.encoding_style);
+  d_add_gint (globals, "CheckMailAuto",     balsa_app.check_mail_auto);
+  d_add_gint (globals, "CheckMailMinutes",  balsa_app.check_mail_timer);
+  d_add_gint (globals, "WordWrap",          balsa_app.wordwrap );
+  d_add_gint (globals, "WrapLength",        balsa_app.wraplength);
+  d_add_gint (globals, "BrowseWrap",        balsa_app.browse_wrap );
+  d_add_gint (globals, "ShownHeaders",      balsa_app.shown_headers );
 
   if(balsa_app.selected_headers)
      pl_dict_add_str_str (globals, "SelectedHeaders", 
 			  balsa_app.selected_headers);
   else pl_dict_add_str_str (globals, "SelectedHeaders", DEFAULT_SELECTED_HDRS);
 
-  snprintf (tmp, sizeof (tmp), "%d", balsa_app.show_mblist );
-  pl_dict_add_str_str (globals, "ShowMBList", tmp);
-
-  snprintf (tmp, sizeof (tmp), "%d", balsa_app.show_notebook_tabs );
-  pl_dict_add_str_str (globals, "ShowTabs", tmp);
+  d_add_gint (globals, "ShowMBList", balsa_app.show_mblist );
+  d_add_gint (globals, "ShowTabs", balsa_app.show_notebook_tabs );
 
   /* arp --- "LeadinStr" into cfg. */
   if (balsa_app.quote_str != NULL)
@@ -1316,64 +1027,47 @@ config_global_save (void)
   else
       pl_dict_add_str_str(globals, "PrintCommand", "a2ps -d -q %s");
 
-  
-  snprintf (tmp, sizeof (tmp), "%d", balsa_app.PrintCommand.linesize);
-  pl_dict_add_str_str (globals, "PrintLinesize", tmp);
-  snprintf (tmp, sizeof (tmp), "%d", balsa_app.PrintCommand.breakline);
-  pl_dict_add_str_str (globals, "PrintBreakline", tmp);
-  
-  snprintf (tmp, sizeof (tmp), "%d", balsa_app.check_mail_upon_startup);
-  pl_dict_add_str_str (globals, "CheckMailUponStartup", tmp);
+  d_add_gint (globals, "PrintLinesize",  balsa_app.PrintCommand.linesize);
+  d_add_gint (globals, "PrintBreakline", balsa_app.PrintCommand.breakline);
+  d_add_gint (globals, "CheckMailUponStartup",
+	      balsa_app.check_mail_upon_startup);
 
   if( balsa_app.open_mailbox != NULL )
 	  pl_dict_add_str_str (globals, "OpenMailboxes", balsa_app.open_mailbox);
 
-  snprintf (tmp, sizeof (tmp), "%d", balsa_app.remember_open_mboxes);
-  pl_dict_add_str_str (globals, "RememberOpenMailboxes", tmp);
-
-  snprintf ( tmp, sizeof(tmp), "%d", balsa_app.empty_trash_on_exit);
-  pl_dict_add_str_str (globals, "EmptyTrash", tmp);
-
-  snprintf (tmp, sizeof (tmp), "%hd", balsa_app.mblist_unread_color.red);
-  pl_dict_add_str_str (globals, "MBListUnreadColorRed", tmp);
+  d_add_gint (globals, "RememberOpenMailboxes",
+			balsa_app.remember_open_mboxes); 
+  d_add_gint (globals, "EmptyTrash", balsa_app.empty_trash_on_exit);
   
-  snprintf (tmp, sizeof (tmp), "%hd", balsa_app.mblist_unread_color.green);
-  pl_dict_add_str_str (globals, "MBListUnreadColorGreen", tmp);
-
-  snprintf (tmp, sizeof (tmp), "%hd", balsa_app.mblist_unread_color.blue);
-  pl_dict_add_str_str (globals, "MBListUnreadColorBlue", tmp);
+  d_add_gint (globals, "MBListUnreadColorR", 
+	      balsa_app.mblist_unread_color.red);
+  d_add_gint (globals, "MBListUnreadColorG", 
+	      balsa_app.mblist_unread_color.green);
+  d_add_gint (globals, "MBListUnreadColorB", 
+	      balsa_app.mblist_unread_color.blue);
 
   /*
    * Quoted color - we only save the first and last, and recalculate
    * the gradient when Balsa starts.
    */
-  snprintf (tmp, sizeof (tmp), "%hd", balsa_app.quoted_color[0].red);
-  pl_dict_add_str_str (globals, "QuotedColorStartRed", tmp);
-  snprintf (tmp, sizeof (tmp), "%hd", balsa_app.quoted_color[0].green);
-  pl_dict_add_str_str (globals, "QuotedColorStartGreen", tmp);
-  snprintf (tmp, sizeof (tmp), "%hd", balsa_app.quoted_color[0].blue);
-  pl_dict_add_str_str (globals, "QuotedColorStartBlue", tmp);
-  snprintf (tmp, sizeof (tmp), "%hd",
-	balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red);
-  pl_dict_add_str_str (globals, "QuotedColorEndRed", tmp);
-  snprintf (tmp, sizeof (tmp), "%hd",
-	balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green);
-  pl_dict_add_str_str (globals, "QuotedColorEndGreen", tmp);
-  snprintf (tmp, sizeof (tmp), "%hd",
-	balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue);
-  pl_dict_add_str_str (globals, "QuotedColorEndBlue", tmp);
+  d_add_gint(globals, "QuotedColorStartRed",  balsa_app.quoted_color[0].red);
+  d_add_gint(globals, "QuotedColorStartGreen",balsa_app.quoted_color[0].green);
+  d_add_gint(globals, "QuotedColorStartBlue", balsa_app.quoted_color[0].blue);
+  d_add_gint (globals, "QuotedColorEndRed", 
+	     balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red);
+  d_add_gint (globals, "QuotedColorEndGreen", 
+	     balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green);
+  d_add_gint (globals, "QuotedColorEndBlue", 
+	      balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue);
   make_gradient (balsa_app.quoted_color, 0, MAX_QUOTED_COLOR - 1);
 
   /* address book */
-  snprintf (tmp, sizeof (tmp), "%d", balsa_app.ab_dist_list_mode);
-  pl_dict_add_str_str (globals, "AddressBookDistMode", tmp);
+  d_add_gint (globals, "AddressBookDistMode", balsa_app.ab_dist_list_mode);
 
   if (balsa_app.signature_path != NULL)
     pl_dict_add_str_str (globals, "AddressBookLocation", 
 			 balsa_app.ab_location);
-
-  snprintf ( tmp, sizeof(tmp), "%d", balsa_app.alias_find_flag);
-  pl_dict_add_str_str (globals, "AliasFlag", tmp);
+  d_add_gint (globals, "AliasFlag", balsa_app.alias_find_flag);
 
   if( balsa_app.date_string )
 	  pl_dict_add_str_str (globals, "DateFormat", balsa_app.date_string );
@@ -1411,6 +1105,36 @@ pl_dict_add_str_str (proplist_t dict_arg, gchar * string1, gchar * string2)
 
   return dict;
 }				/* pl_dict_add_str_str */
+
+static void
+pl_dict_add_remote (proplist_t dict_arg, const LibBalsaServer * server) 
+{
+  pl_dict_add_str_str (dict_arg, "Server",   server->host);
+  d_add_gint(dict_arg, "Port",     server->port);
+  pl_dict_add_str_str (dict_arg, "Username", server->user);
+  
+  if (server->passwd != NULL) {
+    gchar *buff;
+    buff = rot (server->passwd);
+    pl_dict_add_str_str (dict_arg, "Password", buff);
+    g_free (buff);
+  }
+}
+
+static proplist_t
+d_add_gint (proplist_t dict_arg, gchar * string1, gint iarg) 
+{
+  char tmp[MAX_PROPLIST_KEY_LEN];
+  snprintf (tmp, sizeof (tmp), "%d", iarg);
+  return pl_dict_add_str_str (dict_arg, string1, tmp);
+}
+
+static gint 
+d_get_gint (proplist_t dict, gchar * key, gint def_val)
+{
+  gchar * field = pl_dict_get_str (dict, key);
+  return field ? atoi(field) : def_val;
+}
 
 /* A helper routine to get the corresponding value for the string-type
    key 'str' in 'dict'.  Returns the string-value of the corresponding

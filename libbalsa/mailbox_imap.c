@@ -95,7 +95,7 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap *mailbox)
 {
 	LibBalsaMailboxRemote *remote;
 	mailbox->path = NULL;
-	mailbox->tmp_file_path = NULL;
+	mailbox->auth_type = AuthCram; /* reasonable default */
 
 	remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
 	remote->server = LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_IMAP));
@@ -170,6 +170,12 @@ server_host_settings_changed_cb(LibBalsaServer *server, gchar* host, gint port, 
 	server_settings_changed(server, mailbox);
 }
 
+/* libbalsa_mailbox_imap_open:
+   opens IMAP mailbox.
+   FIXME:
+   should intelligently use auth_type field to set ImapPass (for AuthLogin),
+   ImapCRAMKey (for AuthCram) or do not set anything (for AuthGSS)
+*/
 static void 
 libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
 {
@@ -209,22 +215,23 @@ libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
 
 	/* try getting password, quit on cancel */
 	if(!(server->passwd && *server->passwd) && 
-	   !((server->passwd = libbalsa_server_get_password(server, mailbox))
-	     && *server->passwd)) {
+	   !(server->passwd = libbalsa_server_get_password(server, mailbox))) {
 		libbalsa_unlock_mutt();
 		UNLOCK_MAILBOX (mailbox);
 		return;
 	}
 	ImapUser = server->user;
-	ImapPass = server->passwd;
+	
+	if(ImapPass) safe_free((void**)&ImapPass); /* because mutt does so */
+	ImapPass = strdup(server->passwd);
 
-	if ( append ) 
-		CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp, M_APPEND, NULL);
-	else
-		CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp, 0, NULL);
+	if(ImapCRAMKey) safe_free((void**)&ImapCRAMKey); 
+	ImapCRAMKey = strdup(server->passwd);
 
+	CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp, 
+						    append ? M_APPEND : 0,
+						    NULL);
 	libbalsa_unlock_mutt();
-
 	g_free (tmp);
 
 	if (CLIENT_CONTEXT_OPEN (mailbox)) {

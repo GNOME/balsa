@@ -55,6 +55,10 @@ locking and use fcntl/lockf functions instead.
 	This enables alternative fcntl file locking scheme. This
 function is sometimes troublesome over NFS but is POSIX compatible.
 
+--with-gss[=/usr/kerberos]
+	This enables GSSAPI Kerberos based authentication scheme. 
+Specify the kerberos directory as the argument.
+
 Libraries:
 	The binaries are compiled against gnome-libs-1.2.1, if you use
 older libraries, you will need to recompile balsa from the source.

@@ -19,7 +19,7 @@
 /* GSS login/authentication code */
 
 /* for HAVE_HEIMDAL */
-#include "config.h"
+#include "muttconfig.h"
 
 #include "mutt.h"
 #include "imap_private.h"
@@ -32,6 +32,11 @@
 #  include <gssapi/gssapi.h>
 #  include <gssapi/gssapi_generic.h>
 #endif
+
+/*#ifdef LIBMUTT */
+#define _(a) (a)
+#define sleep(a) 
+/* #endif */
 
 #define GSS_BUFSIZE 8192
 

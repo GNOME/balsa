@@ -34,12 +34,19 @@ GtkType libbalsa_mailbox_imap_get_type (void);
 typedef struct _LibBalsaMailboxImap LibBalsaMailboxImap;
 typedef struct _LibBalsaMailboxImapClass LibBalsaMailboxImapClass;
 
+enum _ImapAuthType {
+	AuthLogin,
+	AuthCram,
+	AuthGSS
+};
+typedef enum _ImapAuthType ImapAuthType;
+
 struct _LibBalsaMailboxImap
 {
 	LibBalsaMailboxRemote mailbox;
 
-	gchar *path;
-	gchar *tmp_file_path;
+	gchar *path;                  /* Imap path {host:port}mailbox */
+	ImapAuthType auth_type;       /* accepted authentication type */
 };
 
 struct _LibBalsaMailboxImapClass

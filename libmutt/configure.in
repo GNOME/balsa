@@ -212,6 +212,8 @@ AC_ARG_WITH(domain, [  --with-domain=DOMAIN       Specify your DNS domain name ]
 
 AC_DEFINE(USE_POP)
 AC_DEFINE(USE_IMAP)
+need_imap=yes
+
 AC_CHECK_FUNC(setsockopt, , AC_CHECK_LIB(socket, setsockopt))
 AC_CHECK_FUNC(gethostent, , AC_CHECK_LIB(nsl, gethostent))
 LIBIMAP="-Limap -limap"

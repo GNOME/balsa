@@ -1,4 +1,5 @@
 SUBDIRS = macros po intl sounds images help libmutt libbalsa libinit_balsa idl src @website_subdir@
+EXTRA_SUBDIRS = macros po intl sounds images help libmutt libbalsa libinit_balsa idl src website
 
 man_MANS=balsa.1
 

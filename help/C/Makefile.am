@@ -9,39 +9,47 @@ balsa_helpdir = $(datadir)/gnome/help/balsa/C
 
 balsa_help_DATA = \
 	topic.dat \
-	balsa.html
+	index.html
 
 # For now we don't use pictures but if later we use we just need to uncomment
 # the comment lines and add the images dir to CVS like the images it self
 
-all: 
+all: index.html
 
-balsa.html: balsa/balsa.htm
-	-cd $(srcdir) && cp balsa/balsa.htm balsa.html
+# This is where the SGML bit is cool
 
-#balsa/balsa.html: $(SGML_FILES)
-balsa/balsa.htm: balsa.sgml
-	-cd $(srcdir) && db2html balsa.sgml
+index.html: balsa/index.html
+	-cp balsa/index.html index.html
+
+balsa/index.html: $(SGML_FILES)
+	-db2html $<
+
+balsa.ps: $(SGML_FILES)
+	-db2ps $<
+
+balsa.rtf: $(SGML_FILES)
+	-db2rtf $<
+
+# Dist / install hook thingies
 
 dist-hook:
 	mkdir $(distdir)/balsa
 	-cp $(srcdir)/balsa/*.html $(distdir)/balsa
-	-cp $(srcdir)/balsa/balsa.html $(distdir)
-#	mkdir $(distdir)/images
-#	-cp $(srcdir)/images/*.gif $(srcdir)/images/*.jpg $(distdir)/images
+	mkdir $(distdir)/images
+	-cp $(srcdir)/images/*.png $(distdir)/images
+	mkdir $(distdir)/stylesheet-images
+	-cp $(srcdir)/balsa/stylesheet-images/*.gif $(distdir)/stylesheet-images
 
-install-data-local: balsa.html
-#	$(mkinstalldirs) $(DESTDIR)$(balsa_helpdir)/images
+install-data-local: index.html
+	$(mkinstalldirs) $(DESTDIR)$(balsa_helpdir)/images
+	$(mkinstalldirs) $(DESTDIR)$(balsa_helpdir)/stylesheet-images
 	-for file in $(srcdir)/balsa/*.html; do \
 	basefile=`basename $$file`; \
 	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/$$basefile; \
 	done
-#	-for file in $(srcdir)/images/*.jpg $(srcdir)/images/*.gif; do \
-#	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/images;\
-#	done
-
-balsa.ps: balsa.sgml
-	-db2ps $<
-
-balsa.rtf: balsa.sgml	
-	-db2rtf $<
+	-for file in $(srcdir)/images/*.png ; do \
+	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/images;\
+	done
+	-for file in $(srcdir)/balsa/stylesheet-images/*.gif ; do \
+	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/stylesheet-images;\
+	done

@@ -18,19 +18,20 @@ Source0:   %{name}-%{version}.tar.bz2
 URL:       http://balsa.gnome.org/
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Packager: Pawel Salek <pawsa@theochem.kth.se>
-Requires: gtk+ >= 1.2.7
-Requires: gnome-libs >= 1.2.13
-Requires: gnome-vfs >= 1.0.0
+Requires: gtk2 >= 2.0.0
+Requires: libgnome >= 2.0.0
+Requires: libgnomeui >= 2.0.0
+Requires: gnome-vfs2 >= 2.0.0
 Requires: libesmtp >= 0.8.6
 Requires: pspell
 Provides: balsa
 
 BuildRequires:  libesmtp >= 0.8.6
-BuildRequires:  gnome-libs-devel >= 1.2.13
-BuildRequires:  gtk+-devel >= 1.2.7
-BuildRequires:  gdk-pixbuf-devel
+BuildRequires:  gtk2-devel >= 2.0.0
+BuildRequires:  libgnome-devel >= 2.0.0
+BuildRequires:  libgnomeui-devel >= 2.0.0
+BuildRequires:  gnome-vfs2-devel >= 2.0.0
 %if %redhat
-BuildRequires:  gnome-vfs-devel
 BuildRequires:  pspell-devel
 %endif
 %if %mdk

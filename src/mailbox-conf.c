@@ -997,7 +997,7 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
     /* toggle for check */
     mcw->mb_data.pop3.check = 
 	create_check(mcw->window, _("_Enable check for new mail"), 
-		     table, 8, TRUE);
+		     table, 9, TRUE);
 
 #ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
     /*

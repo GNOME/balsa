@@ -214,10 +214,7 @@ libbalsa_mailbox_local_finalize(GObject * object)
 }
 
 /* libbalsa_mailbox_local_open:
-   THREADING: it is always called from a signal handler so the gdk lock
-   is held on entry. The lock is released on the time-consuming open
-   operation and taken back when job is finished.
-   Order is crucial to avoid deadlocks.
+   THREADING: It should never touch gdk lock.
 */
 static gboolean
 libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
@@ -228,10 +225,6 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox), FALSE);
 
-#ifdef BALSA_USE_THREADS
-    gdk_threads_leave();
-#endif
-
     LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
     local = LIBBALSA_MAILBOX_LOCAL(mailbox);
     path = libbalsa_mailbox_local_get_path(mailbox);
@@ -240,17 +233,11 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
 	/* incriment the reference count */
 	mailbox->open_ref++;
 	UNLOCK_MAILBOX(mailbox);
-#ifdef BALSA_USE_THREADS
-	gdk_threads_enter();
-#endif
 	return TRUE;
     }
 
     if (stat(path, &st) == -1) {
 	UNLOCK_MAILBOX(mailbox);
-#ifdef BALSA_USE_THREADS
-	gdk_threads_enter();
-#endif
 	return FALSE;
     }
     
@@ -260,9 +247,6 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
     
     if (!CLIENT_CONTEXT_OPEN(mailbox)) {
 	UNLOCK_MAILBOX(mailbox);
-#ifdef BALSA_USE_THREADS
-	gdk_threads_enter();
-#endif
 	return FALSE;
     }
     mailbox->readonly = CLIENT_CONTEXT(mailbox)->readonly;
@@ -272,9 +256,6 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
     mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount;
     mailbox->open_ref++;
     UNLOCK_MAILBOX(mailbox);
-#ifdef BALSA_USE_THREADS
-    gdk_threads_enter();
-#endif
     libbalsa_mailbox_load_messages(mailbox);
     
     /* increment the reference count */
@@ -340,8 +321,8 @@ run_filters_on_reception(LibBalsaMailbox * mailbox)
     }
 }
 
-/* As all check functions, this one assumes gdk lock HELD
-   and other locks NOT HELD.
+/* libbalsa_mailbox_local_check:
+   As all libbalsa functions, it should work with or without gdk lock.
 */
 static void
 libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
@@ -352,9 +333,6 @@ libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
     } else {
 	gint i = 0;
 	gint index_hint;
-
-	/* Release lock before doing the backend work */
-	gdk_threads_leave();
 
 	LOCK_MAILBOX(mailbox);
 
@@ -377,15 +355,10 @@ libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
 	    mailbox->new_messages =
 		CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
 	    UNLOCK_MAILBOX(mailbox);
-	    /* Reacquire the lock before leaving and calling
-	       libbalsa_mailbox_load_messages which assumes gdk lock held */
-	    gdk_threads_enter();
 	    libbalsa_mailbox_load_messages(mailbox);
 	    run_filters_on_reception(mailbox);
 	} else {
 	    UNLOCK_MAILBOX(mailbox);
-	    /* Reacquire the lock before leaving */
-	    gdk_threads_enter();
 	}
     }
 }

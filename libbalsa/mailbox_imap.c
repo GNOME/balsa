@@ -231,8 +231,6 @@ libbalsa_mailbox_imap_update_url(LibBalsaMailboxImap* mailbox)
 static void
 server_settings_changed(LibBalsaServer * server, LibBalsaMailbox * mailbox)
 {
-    fprintf(stderr, "changing server settings for '%s' (%p)\n",
-	    mailbox->url ? mailbox->url : "", mailbox->url);
     libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
 
     if (server->user && server->passwd && server->host)

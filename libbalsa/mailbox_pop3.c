@@ -244,9 +244,6 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
        !(server->passwd = libbalsa_server_get_password(server, mailbox)))
        return;
 
-    /* Unlock GDK - this is safe since libbalsa_error is threadsafe. */
-    gdk_threads_leave();
-        
     msgbuf = g_strdup_printf("POP3: %s", mailbox->name);
     libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_SOURCE,0,0,msgbuf);
     g_free(msgbuf);
@@ -269,7 +266,6 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 			     mailbox->name,
 			     g_strerror(errno));
 	g_free(tmp_path);
-        gdk_threads_enter();
 	return;
     }
     close(tmp_file);
@@ -297,9 +293,6 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
         libbalsa_mailbox_pop3_config_changed(LIBBALSA_MAILBOX_POP3(mailbox));
     } 
 
-    /* Regrab the gdk lock before leaving */
-    gdk_threads_enter();
-
     tmp_mailbox = (LibBalsaMailbox*)
         libbalsa_mailbox_local_new(tmp_path, FALSE);
     if(!tmp_mailbox)  {
@@ -310,7 +303,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	return;
     }	
     libbalsa_mailbox_open(tmp_mailbox);
-    if((m->inbox) && (tmp_mailbox->messages)) {
+    if( 0 && (m->inbox) && (tmp_mailbox->messages)) {
 	GSList * filters; 
 
 	 /* Load associated filters if needed */

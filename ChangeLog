@@ -1,3 +1,9 @@
+2003-02-14  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* balsa.spec.in: update requirements.
+	* libbalsa/mailbox_{local,imap,pop3}.c: remove unneeded locks.
+	* src/mailbox-conf.c: enable mailbox check had wrong table row index.
+
 2003-02-13  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/main-window.c: remove unneeded GDK locks.

@@ -1,3 +1,7 @@
+2000-10-01  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/sendmsg-window.c: Include locale.h. Fixes solaris build.
+
 2000-09-29  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* NEWS,README,configure.in: balsa-1.0.pre1 release.

@@ -43,6 +43,10 @@
 #include <gnome.h>
 #include <ctype.h>
 
+#ifdef HAVE_LOCALE_H
+#include <locale.h>
+#endif
+
 #include <sys/stat.h>	/* for check_if_regular_file() */
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -59,6 +63,7 @@
 #include <pthread.h>
 #include "threads.h"
 #endif
+
 #include "sendmsg-window.h"
 #include "address-book.h"
 #include "expand-alias.h"

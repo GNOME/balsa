@@ -72,6 +72,8 @@ static void audio2canvas (Message *, BODY * bdy, FILE * fp, GnomeCanvasGroup * g
 
 static gchar *save_mime_part (Message * message, BODY * body);
 
+static gint key_pressed (GtkWidget *widget, GdkEventKey *event, gpointer callback_data);
+static void button_pressed (GtkWidget *widget, GdkEventButton *event, gpointer callback_data);
 /* static */
 
 static GnomeCanvasClass *parent_class = NULL;
@@ -269,7 +271,9 @@ balsa_message_new (void)
   colormap = gtk_widget_get_colormap (GTK_WIDGET (bmessage));
   gdk_color_white (colormap, &style->bg[GTK_STATE_NORMAL]);
   gtk_widget_set_style (GTK_WIDGET (bmessage), style);
- 
+
+  gtk_signal_connect_after(GTK_OBJECT (bmessage), "key_press_event", GTK_SIGNAL_FUNC (key_pressed), NULL);
+  gtk_signal_connect(GTK_OBJECT (bmessage), "button_press_event", GTK_SIGNAL_FUNC (button_pressed), NULL);
  
   return GTK_WIDGET (bmessage);
 }
@@ -312,6 +316,65 @@ balsa_message_size_allocate (GtkWidget * widget, GtkAllocation * allocation)
 		       (y2 > allocation->height) ? y2 : allocation->height);
 }
 
+gint key_pressed (GtkWidget *widget, GdkEventKey *event, gpointer callback_data)
+{
+
+   int x;
+   int y;
+
+   double x2,x3;
+   double y2,y3;
+
+   if (event->keyval == GDK_Up) {
+      gnome_canvas_get_scroll_offsets (GNOME_CANVAS(widget), &x, &y);
+      gnome_canvas_scroll_to (GNOME_CANVAS(widget), x, y-15);
+      return (TRUE);
+   }
+   if (event->keyval == GDK_Down) {
+      gnome_canvas_get_scroll_offsets (GNOME_CANVAS(widget), &x, &y);
+      gnome_canvas_scroll_to (GNOME_CANVAS(widget), x, y+15);
+      return (TRUE);
+   }
+   if (event->keyval == GDK_Left) {
+      gnome_canvas_get_scroll_offsets (GNOME_CANVAS(widget), &x, &y);
+      gnome_canvas_scroll_to (GNOME_CANVAS(widget), x-15, y);
+      return (TRUE);
+   }
+   if (event->keyval == GDK_Right) {
+      gnome_canvas_get_scroll_offsets (GNOME_CANVAS(widget), &x, &y);
+      gnome_canvas_scroll_to (GNOME_CANVAS(widget), x+15, y);
+      return (TRUE);
+   }
+   if (event->keyval == GDK_Page_Up) {
+      gnome_canvas_get_scroll_offsets (GNOME_CANVAS(widget), &x, &y);
+      gnome_canvas_scroll_to (GNOME_CANVAS(widget), x, y-(GTK_WIDGET (widget))->allocation.height);
+      return (TRUE);
+   }
+   if (event->keyval == GDK_Page_Down) {
+      gnome_canvas_get_scroll_offsets (GNOME_CANVAS(widget), &x, &y);
+      gnome_canvas_scroll_to (GNOME_CANVAS(widget), x, y+(GTK_WIDGET (widget))->allocation.height);
+      return (TRUE);
+   }
+   if (event->keyval == GDK_Home) {
+      gnome_canvas_get_scroll_region (GNOME_CANVAS(widget), &x2, &y2, &x3, &y3);
+      gnome_canvas_get_scroll_offsets (GNOME_CANVAS(widget), &x, &y);
+      gnome_canvas_scroll_to (GNOME_CANVAS(widget), x, 0);
+      return (FALSE);
+   }
+   if (event->keyval == GDK_End) {
+      gnome_canvas_get_scroll_region (GNOME_CANVAS(widget), &x2, &y2, &x3, &y3);
+      gnome_canvas_get_scroll_offsets (GNOME_CANVAS(widget), &x, &y);
+      gnome_canvas_scroll_to (GNOME_CANVAS(widget), x, y3);
+      return (FALSE);
+   }
+
+   return (FALSE);
+}
+
+void button_pressed (GtkWidget *widget, GdkEventButton *event, gpointer callback_data)
+{
+  (*(GTK_WIDGET_CLASS (GTK_WIDGET(widget)->object.klass)->grab_focus))(widget);
+}
 
 void
 balsa_message_set (BalsaMessage * bmessage,

@@ -1,5 +1,6 @@
 1999-04-08 Jesse Sightler <jsight@pair.com>
 
+	* src/balsa-message.c: Added keyboard navigation.
 	* src/sendmsg-window.c: Improved general layout and added drag'n'drop
 	of addresses from Gnomecard.
 	* libbalsa/mime.c: Fixed failure to traverse all nodes of multipart msg.

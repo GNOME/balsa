@@ -88,7 +88,8 @@ extern "C" {
         GtkStyle *bad_address_style;  
 #ifdef HAVE_GPGME
 	guint gpg_mode;
-	GtkWidget *gpg_radio[2];
+	GtkWidget *gpg_sign_menu_item;
+	GtkWidget *gpg_encrypt_menu_item;
 #endif
         GtkWidget *header_table;
         GtkWidget *focus_widget;

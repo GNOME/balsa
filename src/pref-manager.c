@@ -78,9 +78,6 @@ open_preferences_manager ()
 
 
   pmw->window = gtk_dialog_new ();
-  gtk_widget_set_usize (pmw->window,
-			PREFERENCES_MANAGER_WIDTH,
-			PREFERENCES_MANAGER_HEIGHT);
   gtk_window_set_title (GTK_WINDOW (pmw->window), "Preferences");
   gtk_window_set_wmclass (GTK_WINDOW (pmw->window),
 			  "preferences_manager",

@@ -1,3 +1,10 @@
+2004-01-17 16:40  PeterB
+
+	* src/balsa-message.c: implement and use bm_message_widget to
+	create the main message and to put a frame around an embedded
+	message; set the background style of the view-port instead of using
+	an event-box.
+
 2004-01-15 22:13  PeterB
 
 	* src/: balsa-message.c, balsa-message.h: Nest embedded messages

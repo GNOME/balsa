@@ -1,6 +1,7 @@
-2005-01-12  Pawel Salek
+2005-01-22  Pawel Salek
 
-	* libbalsa/imap/imap-commands.c: work around broken dovecot indexes.
+	* libbalsa/mailbox_imap.c: do not loose content type paramters - fix
+	message wrapping on replying.
 
 2005-01-07 09:47  PeterB
 

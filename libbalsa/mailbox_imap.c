@@ -2131,8 +2131,9 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
         if(strcmp(section, "1") == 0 && im && im->body &&
            im->body->media_basic != IMBMEDIA_MESSAGE_RFC822 &&
            im->body->media_basic != IMBMEDIA_MULTIPART) {
-            fputs("MIME-version: 1.0\r\ncontent-type: text/plain\r\n", fp);
-            fprintf(fp, "Content-Transfer-Encoding: %s\r\n\r\n",
+            fprintf(fp,"MIME-version: 1.0\r\ncontent-type: %s\r\n"
+                    "Content-Transfer-Encoding: %s\r\n\r\n",
+                    part->content_type ? part->content_type : "text/plain",
                     encoding_names(dt.body->encoding));
         }
 	fwrite(dt.block, dt.body->octets, 1, fp);

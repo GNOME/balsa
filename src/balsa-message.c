@@ -41,6 +41,19 @@ static void balsa_message_size_allocate (GtkWidget * widget, GtkAllocation * all
 
 static void headers2canvas (BalsaMessage * bmessage, Message * message);
 static void body2canvas (BalsaMessage * bmessage, Message * message);
+static gboolean content2canvas (Message * message, GnomeCanvasGroup * group);
+
+static void part2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group);
+static void other2canvas (Message *, BODY * bdy, FILE * fp, GnomeCanvasGroup * group);
+static void mimetext2canvas (Message *, BODY * bdy, FILE * fp, GnomeCanvasGroup * group);
+static void video2canvas (Message *, BODY * bdy, FILE * fp, GnomeCanvasGroup * group);
+static void multipart2canvas (Message *, BODY * bdy, FILE * fp, GnomeCanvasGroup * group);
+static void message2canvas (Message *, BODY * bdy, FILE * fp, GnomeCanvasGroup * group);
+static void image2canvas (Message *, BODY * bdy, FILE * fp, GnomeCanvasGroup * group);
+static void application2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group);
+static void audio2canvas (Message *, BODY * bdy, FILE * fp, GnomeCanvasGroup * group);
+
+static gchar *save_mime_part (Message * message, BODY * body);
 
 /* static */
 
@@ -145,7 +158,7 @@ balsa_message_size_allocate (GtkWidget * widget, GtkAllocation * allocation)
   gnome_canvas_set_scroll_region (GNOME_CANVAS (widget), 0, 0, allocation->width, allocation->height);
 #endif
   gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (GNOME_CANVAS_GROUP (GNOME_CANVAS (widget)->root)),
-		  &x1, &y1, &x2, &y2);
+				&x1, &y1, &x2, &y2);
   gnome_canvas_set_scroll_region (GNOME_CANVAS (widget), x1 - 10, y1 - 10, x2 + 10, y2 + 10);
 
 }
@@ -193,7 +206,37 @@ balsa_message_text_item (gchar * text, GnomeCanvasGroup * group, double x, doubl
   return new;
 }
 
-static double 
+static GnomeCanvasItem *
+balsa_message_text_item_set_bg (GnomeCanvasItem * item, GnomeCanvasGroup * group, gchar * color)
+{
+  double x1, x2, y1, y2;
+  GnomeCanvasItem *new;
+
+  gnome_canvas_item_get_bounds (item, &x1, &y1, &x2, &y2);
+
+  new = gnome_canvas_item_new (group,
+			       gnome_canvas_rect_get_type (),
+			       "x1", x1,
+			       "y1", y1,
+			       "x2", x2,
+			       "y2", y2,
+			       "fill_color", color,
+			       NULL);
+
+  gnome_canvas_item_lower (new, 1);
+  return new;
+}
+
+static double
+next_part_height (GnomeCanvasGroup * group)
+{
+  double x1, x2, y1, y2;
+
+  gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (group), &x1, &y1, &x2, &y2);
+  return (y2 - y1) + 50;
+}
+
+static double
 next_row_height (GnomeCanvasGroup * row[])
 {
   double o, t;
@@ -314,7 +357,7 @@ body2canvas (BalsaMessage * bmessage, Message * message)
   message_body_unref (message);
 }
 
-void
+static void
 other2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
   STATE s;
@@ -333,28 +376,30 @@ other2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
   if (text)
     text[alloced - 1] = '\0';
 
-  balsa_message_text_item (text, group, 0.0, 0.0);
+  balsa_message_text_item (text, group, 0.0, next_part_height (group));
 
   g_free (text);
   fclose (s.fpout);
   unlink (tmp_file_name);
 }
 
-void
+static void
 audio2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
-  balsa_message_text_item ("--AUDIO--", group, 0.0, 0.0);
+  GnomeCanvasItem *item;
+  item = balsa_message_text_item ("--AUDIO--", group, 0.0, next_part_height (group));
+  balsa_message_text_item_set_bg (item, group, "mediumseagreen");
 }
 
 
-void
+static void
 application2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
 #if 0
   gchar link_bfr[128];
   PARAMETER *bdy_parameter = bdy->parameter;
 #endif
-  balsa_message_text_item ("--APPLICATION--", group, 0.0, 0.0);
+  balsa_message_text_item ("--APPLICATION--", group, 0.0, next_part_height (group));
 #if 0
   obstack_append_string (canvas_bfr,
 			 "<tr><td bgcolor=\"#f0f0f0\"> "
@@ -380,77 +425,55 @@ application2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *
 #endif
 }
 
-void
+static void
 image2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
-  gnome_canvas_item_new (group,
-			 GNOME_TYPE_CANVAS_TEXT,
-			 "x", 0.0,
-			 "y", 0.0,
-			 "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-			 "text", "--IMAGE--",
-			 NULL);
+  GnomeCanvasItem *item;
+  GdkImlibImage *im;
+  gchar *filename;
+
+  filename = save_mime_part (message, bdy);
+  im = gdk_imlib_load_image (filename);
+  item = gnome_canvas_item_new (group,
+				gnome_canvas_image_get_type (),
+				"image", im,
+				"x", 0.0,
+				"y", next_part_height (group),
+				"width", (double) im->rgb_width,
+				"height", (double) im->rgb_height,
+				"anchor", GTK_ANCHOR_NW,
+				NULL);
 }
 
-void
+static void
 message2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
-  gnome_canvas_item_new (group,
-			 GNOME_TYPE_CANVAS_TEXT,
-			 "x", 0.0,
-			 "y", 0.0,
-			 "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-			 "text", "--MESSAGE--",
-			 NULL);
+  GnomeCanvasItem *item;
+  item = balsa_message_text_item ("--MESSAGE--", group, 0.0, next_part_height (group));
+  balsa_message_text_item_set_bg (item, group, "mediumseagreen");
 }
 
-void
+static void
 multipart2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
-#if 0
   BODY *p;
-  PARAMETER *bdy_parameter = bdy->parameter;
 
-  if (balsa_app.debug)
-    {
-      obstack_append_string (canvas_bfr, "<tr><td>Multipart message parameter are:<BR>");
-      obstack_append_string (canvas_bfr, "<table border=\"0\" width=\"50%\" bgcolor=\"#dddddd\">\n");
-      obstack_append_string (canvas_bfr, "<tr><th>Attribute</th><th>Value</th></tr>\n");
-      while (bdy_parameter)
-	{
-	  obstack_append_string (canvas_bfr, "<tr><td>");
-	  obstack_append_string (canvas_bfr, bdy_parameter->attribute);
-	  obstack_append_string (canvas_bfr, "</td><td>");
-	  obstack_append_string (canvas_bfr, bdy_parameter->value);
-	  obstack_append_string (canvas_bfr, "</td></tr>");
-	  bdy_parameter = bdy_parameter->next;
-	}
-      obstack_append_string (canvas_bfr, "</table></td></tr>");
-    }
   for (p = bdy->parts; p; p = p->next)
     {
-      part2canvas (message, p, fp, canvas_bfr);
+      part2canvas (message, p, fp, group);
     }
-#endif
 }
 
 
-void
+static void
 video2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
-  gnome_canvas_item_new (group,
-			 GNOME_TYPE_CANVAS_TEXT,
-			 "x", 0.0,
-			 "y", 0.0,
-			 "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-			 "text", "--VIDEO--",
-			 NULL);
+  GnomeCanvasItem *item;
+  item = balsa_message_text_item ("--VIDEO--", group, 0.0, next_part_height (group));
+  balsa_message_text_item_set_bg (item, group, "mediumseagreen");
 }
 
-void
+static void
 mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
   STATE s;
@@ -470,32 +493,25 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gr
   if (ptr)
     {
       ptr[alloced - 1] = '\0';
-      if (strcmp (bdy->subtype, "canvas") == 0)
+      if (strcmp (bdy->subtype, "html") == 0)
 	{
-#if 0
-	  obstack_append_string (canvas_bfr, ptr);
-	  g_free (ptr);
-	  unlink (tmp_file_name);
-#endif
-	  return;
+	  GnomeCanvasItem *item;
+	  item = balsa_message_text_item ("--HTML--", group, 0.0, next_part_height (group));
+	  balsa_message_text_item_set_bg (item, group, "mediumseagreen");
+	  goto END;
 	}
-      gnome_canvas_item_new (group,
-			     GNOME_TYPE_CANVAS_TEXT,
-			     "x", 0.0,
-			     "y", 0.0,
-			     "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-			     "text", ptr,
-			     NULL);
+      /* add the text item to the canvas */
+      balsa_message_text_item (ptr, group, 0.0, next_part_height (group));
       g_free (ptr);
     }
+END:
   fclose (s.fpout);
   unlink (tmp_file_name);
   return;
 }
 
 
-void
+static void
 part2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
 
@@ -548,7 +564,7 @@ part2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 
 }
 
-gboolean
+static gboolean
 content2canvas (Message * message, GnomeCanvasGroup * group)
 {
   GList *body_list;
@@ -592,4 +608,46 @@ content2canvas (Message * message, GnomeCanvasGroup * group)
       body_list = g_list_next (body_list);
     }
   return TRUE;
+}
+
+static gchar *
+save_mime_part (Message * message, BODY * body)
+{
+  static char msg_filename[PATH_MAX + 1];
+  STATE s;
+
+  msg_filename[0] = '\0';
+
+  switch (message->mailbox->type)
+    {
+    case MAILBOX_MH:
+    case MAILBOX_MAILDIR:
+      {
+	snprintf (msg_filename, PATH_MAX, "%s/%s", MAILBOX_LOCAL (message->mailbox)->path, message_pathname (message));
+	s.fpin = fopen (msg_filename, "r");
+	break;
+      }
+    case MAILBOX_IMAP:
+    case MAILBOX_POP3:
+      s.fpin = fopen (MAILBOX_IMAP (message->mailbox)->tmp_file_path, "r");
+      break;
+    default:
+      s.fpin = fopen (MAILBOX_LOCAL (message->mailbox)->path, "r");
+      break;
+    }
+
+  mutt_mktemp (msg_filename);
+
+  s.prefix = 0;
+  s.fpout = fopen (msg_filename, "w");
+  fseek (s.fpin, body->offset, 0);
+  if (!s.fpout)
+    {
+      /* error */
+    }
+  mutt_decode_attachment (body, &s);
+  fclose (s.fpin);
+  fclose (s.fpout);
+
+  return msg_filename;
 }

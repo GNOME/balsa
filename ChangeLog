@@ -1,3 +1,14 @@
+2000-05-17  Peter Williams  <peter@beta.newton.cx>
+
+	* libinit_balsa/Makefile.am: Change the target of the
+	gob pattern rule in to include header files... I had
+	a build where it couldn't figure out how to generate
+	the header file. I don't know why it happened that once,
+	but this should fix it.
+	
+	* src/sendmsg-window.c: Include "main.h" to prototype
+	balsa_exit (generates a warning, oh nooooo)
+
 2000-05-14  Peter Williams  <peter@beta.newton.cx>
 
 	* src/cfg-memory-widgets.c (generic_*): New generic functions

@@ -40,6 +40,7 @@
 #include "send.h"
 #include "sendmsg-window.h"
 #include "address-book.h"
+#include "main.h"
 
 static gchar *read_signature (void);
 static gint include_file_cb (GtkWidget *, BalsaSendmsg *);

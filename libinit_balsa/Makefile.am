@@ -34,7 +34,7 @@ GOBFILES =				\
 	balsa-druid-page-directory.gob	\
 	balsa-druid-page-finish.gob
 
-%.c: %.gob
+%.c %.h: %.gob
 	gob --no-private-header $<
 
 EXTRA_DIST = $(GOBFILES) \

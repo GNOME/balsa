@@ -1,5 +1,8 @@
-2003-10-04 08:08  PeterB
+2003-10-04 10:03  PeterB
 
+	* libbalsa/: libbalsa.c, libbalsa.h, mailbox_local.h,
+	mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c: Make
+	libbalsa_mailbox_local_get_path() return (const gchar *).
 	* libbalsa/mailbox_local.c: Use g_node_traverse to visit nodes--it
 	really does visit all nodes.
 	* libbalsa/mailbox_imap.c: Set msgno correctly when unthreaded.

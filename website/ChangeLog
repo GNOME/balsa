@@ -1,3 +1,7 @@
+2000-12-18  Pawel Salek <pawsa@theochem.kth.se>
+
+	* main.html, download.html: 1.0.1 released.
+
 2000-12-14  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* faq.html: Add entry about /var/spool/mail permissions.

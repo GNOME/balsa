@@ -79,34 +79,18 @@ to enable LDAP, GSS or HTML support, which are disabled by default.</p>
 <li><a href="http://www.tvec.net/users/wabbit/">Randall Gibson's</a> Debian package (experimental).</li>
 </ul>
 
-<h3>Experimental release - 0.9.5</h3>
+<a name="dev"></a>
+<h3>Development release - 1.0.1</h3>
 
-<p>Development branch is frozen now and there is no new experimental
-releases.</p>
-
-<p><b>2000-09-18</b>: This is pretty much all we have in CVS: new
-message browser, improved address book handling, more reliable mailbox
-backend, alias expansion. We have also now GSS and
-CRAM-MD5 authorization for IMAP, and APOP for POP3. New 0.9.5 features 
-include:</p>
+<p><b>2000-12-18</b>: 1.0.1 version of balsa includes new threaded message
+index. You can download it as:</p>
 <ul>
-<li> improved multi-threading.</li>
-<li> new warning/error reporting code.</li>
-<li> LDAP support.</li>
-<li> spell check (pspell package required tu compile and use balsa).</li>
-<li> gnome-config used for storing/reading configuration.</li>
-<li> multiple address book support. vCard- and LDAP-types implemented.</li>
-<li> manual updates</li>
-<li> gnome-print used for printing.</li>
-</ul>
-<p>You can download it from:</p>
-<ul>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.5.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.5.tar.gz</a>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.5-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.5-1.src.rpm</a>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.5-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.5-1.i386.rpm</a>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.1.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.1.tar.gz</a>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.1-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.1-1.src.rpm</a>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.1-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.1-1.i386.rpm</a>
 </ul>
 
-<h3>CVS source</h3>
+<h3>CVS source &amp; build instructions</h3>
 
 <p>Balsa source is also available from GNOME 
 <a href="http://developer.gnome.org/tools/cvs.html">CVS
@@ -114,6 +98,14 @@ repository</a>. Check out <b>balsa</b> module. The CVS version is
 <em>sometimes</em> not sufficiently stable for everyday use it but has
 all the new features and is best starting point if you want to hack
 balsa.</p>
+
+<p>You will need <samp>pspell-devel</samp> (obligatory) and
+<samp>gnome-print-devel</samp> (optional) packages for building
+balsa. Get also <samp><a
+href="http://people.redhat.com/dcm/software.html">gnome-doc-tools</a></samp>
+or alternatively install <samp>png-support-3.?.dtd</samp> and
+<samp>gdp-both.dsl</samp> files yourself.</p>
+
 <hr>
 <address><a href="mailto:balsa-list@gnome.org">balsa-list@gnome.org</a></address>
 </body>

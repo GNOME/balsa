@@ -1,5 +1,11 @@
 1999-01-08  Nat Friedman  <nat@nat.org>
 
+	* src/message-window.c (forward_message_cb): Get the messagewindow
+ 	from the window's gtk data.
+	(replytoall_message_cb): Likewise.
+
+1999-01-08  Nat Friedman  <nat@nat.org>
+
 	* src/sendmsg-window.c (file_menu): Standardized.
 
 	(close_window): Fixed signature.

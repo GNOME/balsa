@@ -193,7 +193,8 @@ replyto_message_cb(GtkWidget * widget, gpointer data)
 static void
 replytoall_message_cb(GtkWidget * widget, gpointer data)
 {
-  MessageWindow *mw = (MessageWindow *) data;
+  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
+							     "msgwin");
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail (mw != NULL);
@@ -204,7 +205,8 @@ replytoall_message_cb(GtkWidget * widget, gpointer data)
 static void
 forward_message_cb(GtkWidget * widget, gpointer data)
 {
-  MessageWindow *mw = (MessageWindow *) data;
+  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
+							     "msgwin");
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail (mw != NULL);

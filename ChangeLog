@@ -1,3 +1,13 @@
+2000-08-03  Berend De Schouwer  <bds@jhb.ucs.co.za>
+	Address alias expansion.
+	* src/Makefile.am: added expand-alias.[ch]
+	* expand-alias.[ch]: alias expansion code
+	* src/address-book.[ch]:ab_load_addresses() added
+	* src/balsa-app.[ch]: balsa_warning() added
+	* src/balsa-message.c: set_wmclass(save_dialog, "save")
+	* src/pref-manager.c,src/save-restore.c: configuration code.
+	* src/sendmsg-window.c: alias expansion hooked.
+	
 2000-08-03  Ian Campbell  <ijc25@cam.ac.uk>
 
 	Window close bug fix.  Renamed balsa_message_create ->

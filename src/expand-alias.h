@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1998 Jay Painter and Stuart Parmenter
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,26 +16,29 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-#ifndef __ADDRESS_BOOK_H__
-#define __ADDRESS_BOOK_H__
+
+#ifndef __BALSA_EXPANDALIAS_H__
+#define __BALSA_EXPANDALIAS_H__
 
 #ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+extern "C"
+{
+#endif				/* __cplusplus */
 
-typedef struct {
-	gchar          *name;
-	gchar          *addy;
-	gchar          *upper;
-	gchar          *id;
-} AddressData;
-
-extern gint address_book_cb(GtkWidget * widget, gpointer data);
-extern GList* ab_load_addresses (void);
-
+extern void next_entrybox (GtkWidget *widget, GtkWidget *entry);
+extern gboolean key_pressed_cb(GtkWidget *widget, GdkEventKey *event,
+	gpointer user_data);
+extern gboolean button_pressed_cb(GtkWidget *widget, GdkEventButton *event,
+	gpointer user_data);
+extern gboolean lost_focus_cb(GtkWidget *widget, GdkEventFocus *event,
+	gpointer user_data);
+extern void destroy_cb (GtkWidget *widget, gpointer user_data);
+extern void alias_load_addressbook (void);
+extern void alias_free_addressbook (void);
+ 
 #ifdef __cplusplus
 }
-#endif /* __cplusplus */
+#endif				/* __cplusplus */
 
-#endif /* __ADDRESS_BOOK_H__ */
 
+#endif				/* __BALSA_EXPANDALIAS_H__ */

@@ -36,7 +36,7 @@
 
 typedef struct _PropertyUI {
 	GtkRadioButton *toolbar_type[NUM_TOOLBAR_MODES];
-	GtkWidget *real_name, *email, *replyto, *signature;
+	GtkWidget *real_name, *email, *replyto, *domain, *signature;
 	GtkWidget *sig_whenforward, *sig_whenreply, *sig_sending;
         GtkWidget *sig_separator;
 	
@@ -82,6 +82,7 @@ typedef struct _PropertyUI {
 
 	/* address book */
 	GtkWidget *ab_location;
+	GtkWidget *alias_find_flag;
 	  
 } PropertyUI;
 
@@ -241,6 +242,8 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->replyto), "changed",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
+	gtk_signal_connect (GTK_OBJECT (pui->domain), "changed",
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 
 	gtk_signal_connect (GTK_OBJECT (pui->sig_sending), "toggled",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
@@ -327,6 +330,9 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 	gtk_signal_connect (GTK_OBJECT (pui->ab_location), "changed",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 
+	gtk_signal_connect (GTK_OBJECT (pui->alias_find_flag), "toggled",
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
+
         /* Gnome Property Box Signals */
         gtk_signal_connect (GTK_OBJECT (property_box), "destroy",
                             GTK_SIGNAL_FUNC (destroy_pref_window_cb), pui);
@@ -383,6 +389,9 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 
 	g_free (balsa_app.replyto);
 	balsa_app.replyto = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->replyto)));
+	
+	g_free (balsa_app.domain);
+	balsa_app.domain = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->domain)));
 
 	g_free (balsa_app.smtp_server);
 	balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->smtp_server)));
@@ -485,6 +494,8 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	/* address book */
 	g_free (balsa_app.ab_location);
 	balsa_app.ab_location = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->ab_location)));
+	balsa_app.alias_find_flag =
+	   GTK_TOGGLE_BUTTON(pui->alias_find_flag)->active;
 
 	/* XXX */
 	/*  refresh_main_window (); */
@@ -524,6 +535,7 @@ set_prefs (void)
 
 	gtk_entry_set_text (GTK_ENTRY (pui->email), balsa_app.address->mailbox);
 	gtk_entry_set_text (GTK_ENTRY (pui->replyto), balsa_app.replyto);
+	gtk_entry_set_text (GTK_ENTRY (pui->domain), balsa_app.domain);
 
 	gtk_entry_set_text (GTK_ENTRY (pui->signature), balsa_app.signature_path);
 
@@ -609,7 +621,8 @@ set_prefs (void)
 	/* address book */
 	gtk_entry_set_text (GTK_ENTRY (pui->ab_location), 
 			    balsa_app.ab_location);
-
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
+	    pui->alias_find_flag), balsa_app.alias_find_flag);
 }
 
 void
@@ -671,7 +684,7 @@ create_identity_page( )
 	gtk_widget_show (frame1);
 	gtk_box_pack_start (GTK_BOX (vbox1), frame1, FALSE, FALSE, 0);
 
-	table1 = gtk_table_new (3, 2, FALSE);
+	table1 = gtk_table_new (4, 2, FALSE);
 	gtk_widget_show (table1);
 	gtk_container_add (GTK_CONTAINER (frame1), table1);
 	gtk_container_set_border_width (GTK_CONTAINER (table1), 10);
@@ -713,6 +726,18 @@ create_identity_page( )
 	pui->replyto = gtk_entry_new ();
 	gtk_widget_show (pui->replyto);
 	gtk_table_attach (GTK_TABLE (table1), pui->replyto, 1, 2, 2, 3,
+			  (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+			  (GtkAttachOptions) (0), 0, 0);
+
+	label1 = gtk_label_new (_("Default domain:"));
+	gtk_widget_show (label1);
+	gtk_table_attach (GTK_TABLE (table1), label1, 0, 1, 3, 4,
+			  (GtkAttachOptions) (GTK_FILL),
+			  (GtkAttachOptions) (0), 0, 0);
+
+	pui->domain = gtk_entry_new ();
+	gtk_widget_show (pui->domain);
+	gtk_table_attach (GTK_TABLE (table1), pui->domain, 1, 2, 3, 4,
 			  (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
 			  (GtkAttachOptions) (0), 0, 0);
 
@@ -1369,6 +1394,7 @@ create_misc_page ( )
 	GtkWidget *vbox9;
 	GtkWidget *frame13;
 	GtkWidget *vbox10;
+	GtkWidget *vbox11;
 	GtkWidget *frame14;
 	GtkWidget *table6;
 	GtkWidget *label27;
@@ -1399,23 +1425,6 @@ create_misc_page ( )
 	gtk_widget_show(pui->empty_trash);
 	gtk_box_pack_start (GTK_BOX (vbox10), pui->empty_trash, FALSE, FALSE, 0);
 	
-	/* address book */
-        ab_box = gtk_hbox_new (FALSE, 0);
-	gtk_box_pack_start_defaults (GTK_BOX (vbox10), ab_box);
-        gtk_widget_show (ab_box);
-        label = gtk_label_new (_("Address book location"));
-        gtk_widget_show (label);
-        gtk_box_pack_start (GTK_BOX (ab_box), label, FALSE, FALSE, 5);
-
-	fileentry1 = gnome_file_entry_new ("ADDRESS-BOOK-FILE", 
-					   _("Select your address book file"));
-	gtk_widget_show (fileentry1);
-	gnome_file_entry_set_modal (GNOME_FILE_ENTRY (fileentry1), TRUE);
-        gtk_box_pack_start (GTK_BOX (ab_box), fileentry1, 
-                            TRUE, TRUE, 5);
-	
-	pui->ab_location = 
-		gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (fileentry1));
 
 	/* font */
 	frame14 = gtk_frame_new (_("Font"));
@@ -1494,6 +1503,33 @@ create_misc_page ( )
         gtk_container_set_border_width (GTK_CONTAINER (ab_frame), 5);
 	gtk_box_pack_start (GTK_BOX (vbox9), ab_frame, FALSE, FALSE, 0);
 
+	vbox11 = gtk_vbox_new (FALSE, 0);
+	gtk_widget_show (vbox11);
+	gtk_container_add (GTK_CONTAINER (ab_frame), vbox11);
+	gtk_container_set_border_width (GTK_CONTAINER (vbox11), 5);
+
+        ab_box = gtk_hbox_new (FALSE, 0);
+	gtk_box_pack_start_defaults (GTK_BOX (vbox11), ab_box);
+        gtk_widget_show (ab_box);
+        label = gtk_label_new (_("Address book location"));
+        gtk_widget_show (label);
+        gtk_box_pack_start (GTK_BOX (ab_box), label, FALSE, FALSE, 5);
+
+	fileentry1 = gnome_file_entry_new ("ADDRESS-BOOK-FILE", 
+					   _("Select your address book file"));
+	gtk_widget_show (fileentry1);
+	gnome_file_entry_set_modal (GNOME_FILE_ENTRY (fileentry1), TRUE);
+        gtk_box_pack_start (GTK_BOX (ab_box), fileentry1, 
+                            TRUE, TRUE, 5);
+	
+	pui->ab_location = 
+		gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (fileentry1));
+
+	pui->alias_find_flag =
+	   gtk_check_button_new_with_label ( _("Expand aliases as you type"));
+	gtk_widget_show(pui->alias_find_flag);
+	gtk_box_pack_start (GTK_BOX (vbox11), pui->alias_find_flag,
+	      FALSE, FALSE, 0);
 
 	return vbox9;
 }

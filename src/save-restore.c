@@ -729,6 +729,13 @@ config_global_load (void)
   else
     balsa_app.replyto = g_strdup (field);
 
+  /* users's domain */
+  g_free (balsa_app.domain);
+  if ((field = pl_dict_get_str (globals, "Domain")) == NULL)
+    balsa_app.domain = g_strdup ("");
+  else
+    balsa_app.domain = g_strdup (field);
+
   /* bcc field for outgoing mails */
   g_free (balsa_app.bcc);
   if ((field = pl_dict_get_str (globals, "Bcc")) == NULL)
@@ -1055,6 +1062,11 @@ config_global_load (void)
     balsa_app.ab_location = g_strdup (field);
   }
 
+  if (( field = pl_dict_get_str (globals, "AliasFlag")) == NULL )
+	  balsa_app.alias_find_flag = FALSE;
+  else
+	  balsa_app.alias_find_flag = atoi(field);
+
   /* How we format dates */
   if ((field = pl_dict_get_str (globals, "DateFormat")) != NULL) {
     g_free (balsa_app.date_string);
@@ -1088,6 +1100,8 @@ config_global_save (void)
     pl_dict_add_str_str (globals, "Email", balsa_app.address->mailbox);
   if (balsa_app.replyto != NULL)
     pl_dict_add_str_str (globals, "ReplyTo", balsa_app.replyto);
+  if (balsa_app.domain != NULL)
+    pl_dict_add_str_str (globals, "Domain", balsa_app.domain);
   if (balsa_app.bcc != NULL)
     pl_dict_add_str_str (globals, "Bcc", balsa_app.bcc);
 
@@ -1276,6 +1290,9 @@ config_global_save (void)
   if (balsa_app.signature_path != NULL)
     pl_dict_add_str_str (globals, "AddressBookLocation", 
 			 balsa_app.ab_location);
+
+  snprintf ( tmp, sizeof(tmp), "%d", balsa_app.alias_find_flag);
+  pl_dict_add_str_str (globals, "AliasFlag", tmp);
 
   if( balsa_app.date_string )
 	  pl_dict_add_str_str (globals, "DateFormat", balsa_app.date_string );

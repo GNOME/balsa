@@ -41,6 +41,7 @@
 
 #include "sendmsg-window.h"
 #include "address-book.h"
+#include "expand-alias.h"
 #include "main.h"
 
 static gchar *read_signature (void);
@@ -261,6 +262,12 @@ typedef struct {
       guint length; 
 } headerMenuDesc;
 
+
+#define CASE_INSENSITIVE_NAME
+#define PRESERVE_CASE TRUE
+#define OVERWRITE_CASE FALSE
+
+
 headerMenuDesc headerDescs[] = { {"from", 3}, {"to", 3}, {"subject",2},
 				 {"cc", 3}, {"bcc",  3}, {"fcc",    2},
 				 {"replyto", 3}, {"attachments", 4},
@@ -281,6 +288,7 @@ static GnomeUIInfo main_menu[] =
   GNOMEUIINFO_END
 };
 
+
 /* the callback handlers */
 static gint
 close_window (GtkWidget * widget, gpointer data)
@@ -292,7 +300,12 @@ close_window (GtkWidget * widget, gpointer data)
 static gint
 delete_event_cb (GtkWidget * widget, GdkEvent *e, gpointer data)
 {
+  g_message ("delete_event_cb(): Start.\n");
+  g_message ("delete_event_cb(): Calling balsa_sendmsg_destroy().\n");
   balsa_sendmsg_destroy ((BalsaSendmsg*)data);
+  g_message ("delete_event_cb(): Calling alias_free_addressbook().\n");
+  alias_free_addressbook ();
+  g_message ("delete_event_cb(): End.\n");
   return TRUE;
 }
 
@@ -498,6 +511,7 @@ attach_clicked (GtkWidget * widget, gpointer data)
 		      (GtkSignalFunc) GTK_SIGNAL_FUNC(gtk_widget_destroy),
 		      GTK_OBJECT(fsw) );
 
+  gtk_window_set_wmclass (GTK_WINDOW (fsw), "file", "Balsa");
   gtk_widget_show (fsw);
 
   return TRUE;
@@ -548,6 +562,19 @@ to_add (GtkWidget * widget,
    }
 }
 
+
+/*
+ * static void create_string_entry()
+ * 
+ * Creates a gtk_label()/gtk_entry() pair.
+ *
+ * Input: GtkWidget* table       - Table to attach to.
+ *        const gchar* label     - Label string.
+ *        int y_pos              - position in the table.
+ *      
+ * Output: GtkWidget* arr[] - arr[0] will be the label widget.
+ *                          - arr[1] will be the entry widget.
+ */
 static void
 create_string_entry(GtkWidget* table, const gchar * label, int y_pos, 
 		    GtkWidget* arr[])
@@ -558,15 +585,35 @@ create_string_entry(GtkWidget* table, const gchar * label, int y_pos,
    gtk_table_attach (GTK_TABLE (table), arr[0], 0, 1, y_pos, y_pos+1,
 		     GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
    
-   arr[1] = gtk_entry_new ();
+   arr[1] = gtk_entry_new_with_max_length (2048);
    gtk_table_attach (GTK_TABLE (table), arr[1], 1, 2, y_pos, y_pos+1,
 		     GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
+   gtk_signal_connect (GTK_OBJECT (arr[1]), "activate",
+		     GTK_SIGNAL_FUNC (next_entrybox), arr[1]);
 }
 
+/*
+ * static void create_email_entry()
+ *
+ * Creates a gtk_label()/gtk_entry() and button in a table for
+ * e-mail entries, eg. To:.  It also sets up some callbacks in gtk.
+ *
+ * Input:  GtkWidget *table   - table to insert the widgets into.
+ *         const gchar *label - label to use.
+ *         int y_pos          - How far down in the table to put label.
+ *         const gchar *icon  - icon for the button.
+ * 
+ * Output: GtkWidget *arr[]   - An array of GtkWidgets, as follows:
+ *            arr[0]          - the label.
+ *            arr[1]          - the entrybox.
+ *            arr[2]          - the button.
+ */
 static void
 create_email_entry(GtkWidget* table, const gchar * label, int y_pos, 
 		   const gchar* icon, GtkWidget* arr[]) {
 
+   gint *focus_counter;
+   
    create_string_entry(table, label, y_pos, arr);
 
    arr[2] = gtk_button_new ();
@@ -576,14 +623,39 @@ create_email_entry(GtkWidget* table, const gchar * label, int y_pos,
 		      gnome_stock_pixmap_widget(NULL, icon));
    gtk_table_attach (GTK_TABLE (table), arr[2], 2, 3, y_pos, y_pos+1,
 		    0, 0, 0, 0);
-  gtk_signal_connect(GTK_OBJECT(arr[2]), "clicked", 
+   gtk_signal_connect(GTK_OBJECT(arr[2]), "clicked", 
 		     GTK_SIGNAL_FUNC(address_book_cb),
 		     (gpointer) arr[1]);
-  gtk_signal_connect (GTK_OBJECT (arr[1]), "drag_data_received",
+   gtk_signal_connect (GTK_OBJECT (arr[1]), "drag_data_received",
 		      GTK_SIGNAL_FUNC (to_add), NULL);
-  gtk_drag_dest_set (GTK_WIDGET (arr[1]), GTK_DEST_DEFAULT_ALL,
+   gtk_drag_dest_set (GTK_WIDGET (arr[1]), GTK_DEST_DEFAULT_ALL,
 		     email_field_drop_types, ELEMENTS (email_field_drop_types),
 		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
+   /*
+    * These will make sure that we know about every key pressed.
+    */
+#if 0
+   gtk_signal_connect (GTK_OBJECT (arr[1]), "activate",
+		     GTK_SIGNAL_FUNC (to_check), arr[1]);
+#endif
+   if (balsa_app.alias_find_flag)
+   {
+      gtk_signal_connect (GTK_OBJECT (arr[1]), "key-press-event",
+                          GTK_SIGNAL_FUNC (key_pressed_cb), arr[1]);
+      gtk_signal_connect (GTK_OBJECT (arr[1]), "button-press-event",
+                          GTK_SIGNAL_FUNC (button_pressed_cb), arr[1]);
+   }
+   /*
+    * And these make sure we rescan the input if the user plays
+    * around.
+    */
+   gtk_signal_connect (GTK_OBJECT (arr[1]), "focus-out-event",
+		       GTK_SIGNAL_FUNC (lost_focus_cb), arr[1]);
+   gtk_signal_connect (GTK_OBJECT (arr[1]), "destroy",
+		       GTK_SIGNAL_FUNC (destroy_cb), arr[1]);
+   focus_counter = g_malloc(sizeof(gint));
+   *focus_counter = 1;
+   gtk_object_set_data(GTK_OBJECT(arr[1]), "focus_c", focus_counter);
 }
 
 /* create_info_pane 
@@ -608,15 +680,18 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_signal_connect (GTK_OBJECT (msg->to[1]), "changed",
 		      GTK_SIGNAL_FUNC (check_readiness), msg);
 
-  
   /* Subject: */
   create_string_entry(table, _("Subject:"), 2, msg->subject);
+  gtk_object_set_data(GTK_OBJECT (msg->to[1]), "next_in_line",msg->subject[1]); 
 
   /* cc: */
   create_email_entry(table, _("cc:"),3, GNOME_STOCK_MENU_BOOK_YELLOW, msg->cc);
+  gtk_object_set_data(GTK_OBJECT (msg->subject[1]), "next_in_line",
+	msg->cc[1]); 
 
   /* bcc: */
   create_email_entry(table,_("bcc:"), 4,GNOME_STOCK_MENU_BOOK_GREEN, msg->bcc);
+  gtk_object_set_data(GTK_OBJECT (msg->cc[1]), "next_in_line", msg->bcc[1]); 
 
   /* fcc: */
   msg->fcc[0] = gtk_label_new (_("fcc:"));
@@ -628,6 +703,7 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   msg->fcc[1] = gtk_combo_new ();
   gtk_combo_set_use_arrows (GTK_COMBO (msg->fcc[1]), 0);
   gtk_combo_set_use_arrows_always (GTK_COMBO (msg->fcc[1]), 0);
+  gtk_object_set_data(GTK_OBJECT (msg->bcc[1]), "next_in_line", msg->fcc[1]); 
   
   if (balsa_app.mailbox_nodes) {
     GNode *walk;
@@ -650,6 +726,8 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   /* Reply To: */
   create_email_entry(table, _("Reply To:"), 6, GNOME_STOCK_MENU_BOOK_RED, 
 		     msg->reply_to);
+  gtk_object_set_data(GTK_OBJECT (msg->fcc[1]), "next_in_line",
+		      msg->reply_to[1]); 
 
   /* Attachment list */
   msg->attachments[0] = gtk_label_new (_("Attachments:"));
@@ -737,6 +815,9 @@ create_text_area (BalsaSendmsg * msg)
 		    GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
 
   gtk_widget_show_all( GTK_WIDGET(table) );
+
+  gtk_object_set_data(GTK_OBJECT (msg->reply_to[1]), "next_in_line",
+		      msg->text); 
 
   return table;
 }
@@ -855,6 +936,10 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
   msg->font = NULL;
   msg->charset = NULL;
 
+
+   if (balsa_app.alias_find_flag)
+      alias_load_addressbook();
+  
   switch (type)
     {
     case SEND_REPLY:
@@ -1061,6 +1146,7 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
   gtk_window_set_default_size ( 
      GTK_WINDOW(window), 
      (82 * 7) + (2 * msg->text->style->klass->xthickness), 35*12);
+  gtk_window_set_wmclass (GTK_WINDOW (window), "compose", "Balsa");
   gtk_widget_show (window);
 
 
@@ -1155,6 +1241,7 @@ static gint include_file_cb (GtkWidget *widget, BalsaSendmsg *bsmsg) {
 			      (gpointer) file_selector);
    
    /* Display that dialog */
+   gtk_window_set_wmclass (GTK_WINDOW (file_selector), "file", "Balsa");
    gtk_widget_show (file_selector);
 
    return TRUE;

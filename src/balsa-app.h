@@ -101,6 +101,7 @@ extern struct BalsaApplication
   /* personal information */
   LibBalsaAddress *address;
   gchar *replyto;
+  gchar *domain;
   gchar *bcc;
   
   gchar *local_mail_directory;
@@ -210,6 +211,7 @@ extern struct BalsaApplication
   /* address book */
   gboolean ab_dist_list_mode;
   gchar * ab_location;
+  gboolean alias_find_flag;
 }
 balsa_app;
 
@@ -217,6 +219,7 @@ balsa_app;
 void balsa_app_init (void);
 gboolean do_load_mailboxes (void);
 void update_timer( gboolean update, guint minutes );
+void balsa_warning (const char *fmt,...);
 void balsa_error_toggle_fatality( gboolean are_fatal );
 LibBalsaMailbox *balsa_find_mbox_by_name (const gchar *name);
 

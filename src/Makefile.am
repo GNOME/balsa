@@ -15,6 +15,8 @@ balsa_SOURCES =	\
 	balsa-mblist.h		\
 	balsa-message.c		\
 	balsa-message.h		\
+	expand-alias.c		\
+	expand-alias.h		\
 	filter-edit.h		\
 	filter-edit-callbacks.c	\
 	filter-edit-dialog.c	\

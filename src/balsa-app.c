@@ -81,6 +81,34 @@ balsa_error (const char *fmt,...)
 			      GTK_SIGNAL_FUNC (error_exit_cb), NULL);
 }
 
+/*
+ * Same as Balsa error, but won't abort.
+ */
+void
+balsa_warning (const char *fmt,...)
+{
+  GtkWidget *messagebox;
+  gchar outstr[522];
+  va_list ap;
+
+  va_start (ap, fmt);
+  vsprintf (outstr, fmt, ap);
+  va_end (ap);
+
+  g_warning (outstr);
+
+  /* Sometimes a different thread makes GTK+
+   * calls in here. How do we handle this???
+   */
+  messagebox = gnome_message_box_new (
+				      outstr,
+				      GNOME_MESSAGE_BOX_WARNING,
+				      GNOME_STOCK_BUTTON_OK,
+				      NULL);
+  gtk_window_set_wmclass (GTK_WINDOW (messagebox), "warning", "Balsa");
+  gnome_dialog_run (GNOME_DIALOG (messagebox));
+}
+
 
 void
 balsa_app_init (void)
@@ -91,6 +119,7 @@ balsa_app_init (void)
    */
   balsa_app.address = libbalsa_address_new ();
   balsa_app.replyto = NULL;
+  balsa_app.domain = NULL;
   balsa_app.bcc = NULL;
 
   balsa_app.local_mail_directory = NULL;

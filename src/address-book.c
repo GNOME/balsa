@@ -31,6 +31,7 @@ static GtkWidget *ab_entry;
 gint            composing;
 
 gint address_book_cb(GtkWidget * widget, gpointer data);
+GList* ab_load_addresses(void);
 
 static gint ab_gnomecard_cb(GtkWidget * widget, gpointer data);
 static gint ab_cancel_cb(GtkWidget * widget, gpointer data);
@@ -232,7 +233,7 @@ extract_name(const gchar *string)
    gchar ** fld, **name_arr;
    gchar * res = NULL;
 
-   fld = g_strsplit(string, ";",5);
+   fld = g_strsplit(string, ";", 5);
 
    cpt = 0;
    while(fld[cpt] != NULL)
@@ -243,19 +244,19 @@ extract_name(const gchar *string)
    name_arr = g_malloc((cpt+1)*sizeof(gchar*));
 
    j = 0;
-   if(cpt>PREFIX && fld[PREFIX] != '\0')
+   if(cpt>PREFIX && strlen (fld[PREFIX]) != 0)
       name_arr[j++] = g_strdup(fld[PREFIX]);
       
-   if(cpt>FIRST && fld[FIRST] != '\0')
+   if(cpt>FIRST && strlen (fld[FIRST]) != 0)
       name_arr[j++] = g_strdup(fld[FIRST]);
 
-   if(cpt>MIDDLE && fld[MIDDLE] != '\0')
+   if(cpt>MIDDLE && strlen (fld[MIDDLE]) != 0)
       name_arr[j++] = g_strdup(fld[MIDDLE]);
 
-   if(cpt>LAST && fld[LAST] != '\0')
+   if(cpt>LAST && strlen (fld[LAST]) != 0)
       name_arr[j++] = g_strdup(fld[LAST]);
 
-   if(cpt>SUFFIX && fld[SUFFIX] != '\0')
+   if(cpt>SUFFIX && strlen (fld[SUFFIX]) != 0)
       name_arr[j++] = g_strdup(fld[SUFFIX]);
 
    name_arr[j] = NULL;
@@ -373,7 +374,110 @@ ab_load(GtkWidget * widget, gpointer data)
    fclose(gc); 
 }
 
+
+/*
+ * ab_load_addresses (void)
+ *
+ * Loads all the addresses in the addressbook, and returns an
+ * GSList* structure.  Returns NULL if no addresses
+ * found, or the addressbook is invalid.
+ *
+ * GSList*->data will be an AddressData* structure.
+ */
+GList*
+ab_load_addresses (void) 
+{ 
+   FILE *gc; 
+   gchar string[LINE_LEN];
+   gchar *name = NULL, *email = NULL, *id = NULL;
+   gint in_vcard = FALSE;
+   GList* list = NULL;
+
+   gc = fopen(balsa_app.ab_location,"r"); 
+   if (!gc) return NULL;
+
+
+   list = NULL;
+   while (fgets (string, sizeof(string), gc)) 
+   { 
+      /*
+       * Check if it is a card.
+       */
+      if (g_strncasecmp (string, "BEGIN:VCARD", 11) == 0 ) {
+	 in_vcard = TRUE;
+	 continue;
+      }
+
+      /*
+       * We are done loading a card.
+       */
+      if (g_strncasecmp (string, "END:VCARD", 9) == 0) {
+	 AddressData *data;
+	 if (email) {
+	    data = g_malloc (sizeof(AddressData)); 
+	    data->id = id ? id : g_strdup(_("No-Id"));
+	    data->addy = email;
+            
+            if (name)
+              data->name = name;
+            else if (id) 
+              data->name = g_strdup (id);
+            else
+              data->name = g_strdup( _("No-Name") );
+
+	    data->upper = g_strdup (data->name);
+		g_strup (data->upper);
+	    list = g_list_append (list, data);
+
+	 } else { /* record without e-mail address, ignore */
+	    g_free (name);
+	    g_free (id);
+	 } 
+	 email = NULL;
+	 name = NULL;
+	 id = NULL;
+	 in_vcard = FALSE;
+	 continue;
+      }
+
+      if (!in_vcard) continue;
+
+      g_strchomp(string);
+
+      if (g_strncasecmp(string, "FN:", 3) == 0)
+      {
+        id = g_strdup(string+3);
+        continue;
+      }
+      if (g_strncasecmp(string, "N:", 2) == 0) {
+	 name = extract_name(string+2);
+	 continue;
+      }
+      /*
+       * fetch all e-mail fields
+       */
+      if (g_strncasecmp (string, "EMAIL;",6) == 0) {
+	  gchar * ptr = strchr(string,':');
+	  if(ptr) {
+	      if(email) {
+		  if(balsa_app.ab_dist_list_mode) {
+		      gchar * new = g_strconcat(email,", ", ptr+1, NULL);
+		      g_free (email); 
+		      email = new;
+		  } /* else ignore other addresses */
+	      } else 
+		  email = g_strdup (ptr+1);
+	  }
+      }
+   }	 
+   fclose(gc); 
+
+
+
+   return list;
+}
 	
+
 static void 
 ab_find(GtkWidget * group_entry) 
 { 
@@ -542,6 +646,7 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	/* Pack them into a box, then show all the widgets */
 	gtk_box_pack_start (GTK_BOX (vbox), radio1, TRUE, TRUE, 1);
 	gtk_box_pack_start (GTK_BOX (vbox), radio2, TRUE, TRUE, 1);
+    gtk_window_set_wmclass (GTK_WINDOW (dialog), "addressbook", "Balsa");
 	gtk_widget_show_all(dialog);
    
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio2), 

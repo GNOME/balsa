@@ -256,6 +256,7 @@ save_part (BalsaPartInfo *info)
 
   gnome_dialog_set_parent(GNOME_DIALOG(save_dialog), GTK_WINDOW(balsa_app.main_window));
   gtk_window_set_modal (GTK_WINDOW (save_dialog), TRUE);
+  gtk_window_set_wmclass (GTK_WINDOW (save_dialog), "save", "Balsa");
 
   button = gnome_dialog_run(GNOME_DIALOG (save_dialog));
 

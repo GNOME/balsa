@@ -1,3 +1,11 @@
+2000-08-31  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* main.html, index.html: Don't generate these html files. Use
+	relative links instead of replacing @websitr_root@
+	* main.html: Use more logical markup rather than copious tables.
+	Don't point people directly to balsa-list@gnome.org, ask them to
+	subscribe before posting.
+
 2000-08-30  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* main.html.in: Add sections for mailing list and bug reporting

@@ -511,6 +511,7 @@ libbalsa_filter_export_sieve(LibBalsaFilter* fil, gchar* filename)
         case FILTER_NOTHING:
         case FILTER_PRINT:
         case FILTER_RUN:
+	    break;
 	}
 	buffer=g_string_append(buffer,"}\n");
     }

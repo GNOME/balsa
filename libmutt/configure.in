@@ -40,11 +40,12 @@ esac
 dnl AC_PATH_PROG(SENDMAIL, sendmail, no, `echo $PATH | sed "s/:/ /"` /usr/sbin /usr/lib)
 dnl no need to replace ':' by ' ' 
 AC_PATH_PROG(SENDMAIL, sendmail, no, $PATH:/usr/sbin:/usr/lib)
-AC_DEFINE_UNQUOTED(SENDMAIL, "$ac_cv_path_SENDMAIL")
+AC_DEFINE_UNQUOTED(SENDMAIL, "$ac_cv_path_SENDMAIL",
+                   [Path to sendmail program.])
 
 AC_PATH_PROG(ISPELL, ispell, no)
 if test $ISPELL != no; then
-	AC_DEFINE_UNQUOTED(ISPELL, "$ISPELL")
+	AC_DEFINE_UNQUOTED(ISPELL, "$ISPELL",[Path to ispell program.])
 fi
 
 AC_HEADER_STDC
@@ -67,15 +68,15 @@ AC_REPLACE_FUNCS(strcasecmp)
 if test -f ../libbalsa/libbalsa.c ; then
 # if we're part of balsa, we're part of
 # gnome and thus have snprintf and vsnprintf
-  AC_DEFINE(HAVE_SNPRINTF)
-  AC_DEFINE(HAVE_VSNPRINTF)
+  AC_DEFINE(HAVE_SNPRINTF,1,[snprintf always available.])
+  AC_DEFINE(HAVE_VSNPRINTF,1,[vsnprintf always available.])
 else
 # otherwise test as usual
   mutt_cv_snprintf=no
-  AC_CHECK_FUNC(snprintf, [AC_DEFINE(HAVE_SNPRINTF)], [mutt_cv_snprintf=yes])
-  AC_CHECK_FUNC(vsnprintf, [AC_DEFINE(HAVE_VSNPRINTF)], [mutt_cv_snprintf=yes])
+  AC_CHECK_FUNC(snprintf, [AC_DEFINE(HAVE_SNPRINTF,1,[])], [mutt_cv_snprintf=yes])
+  AC_CHECK_FUNC(vsnprintf, [AC_DEFINE(HAVE_VSNPRINTF,1,[])], [mutt_cv_snprintf=yes])
   if test $mutt_cv_snprintf = yes; then
-    LIBOBJS="$LIBOBJS snprintf.o"
+    AC_LIBOBJ([snprintf])
   fi
 fi
 
@@ -88,41 +89,15 @@ AC_CHECK_FUNCS(strftime, break, [AC_CHECK_LIB(intl, strftime)])
 dnl AIX may not have fchdir()
 AC_CHECK_FUNCS(fchdir, [AC_DEFINE(HAVE_FCHDIR)], [mutt_cv_fchdir=no])
 
-
-mutt_cv_regex=yes
-AC_ARG_WITH(rx, [  --with-rx[=DIR]            Use GNU rx ],
-	[if test $withval != yes; then
-		if test -d $withval/lib; then
-			LIBS="$LIBS -L$withval/lib -lrx"
-			CPPFLAGS="-I$withval/include $CPPFLAGS"
-		else
-			LIBS="$LIBS -L$withval -lrx"
-			CPPFLAGS="-I$withval $CPPFLAGS"
-		fi
-		AC_DEFINE(USE_GNU_RX)
-		mutt_cv_regex=no
-	fi],
-	[AC_CHECK_FUNCS(regcomp, mutt_cv_regex=no)])
-
-if test $mutt_cv_regex = yes; then
-	if test -d ../rx-1.5; then
-		LIBS="$LIBS ../rx-1.5/rx/librx.a"
-		CPPFLAGS="-I../rx-1.5/rx $CPPFLAGS"
-	else
-		LIBOBJS="$LIBOBJS rx/librx.a"
-		CPPFLAGS="-I\$(srcdir)/rx $CPPFLAGS"
-	fi
-	AC_DEFINE(USE_GNU_RX)
-fi
-
 AC_ARG_WITH(homespool, [  --with-homespool[=FILE]    file in user's directory where new mail is spooled], with_homespool=${withval})
 if test x$with_homespool != x; then
 	if test $with_homespool = yes; then
 		with_homespool=mailbox
 	fi
-	AC_DEFINE_UNQUOTED(MAILPATH, "$with_homespool")
-	AC_DEFINE(HOMESPOOL)
-	AC_DEFINE(USE_DOTLOCK)
+	AC_DEFINE_UNQUOTED(MAILPATH, "$with_homespool",
+                           [Define to the path to the home spool.])
+	AC_DEFINE(HOMESPOOL,1,[Define if Home spool is to be used.])
+	AC_DEFINE(USE_DOTLOCK,1,[Define if dotlock is to be used.])
 	mutt_cv_setgid=no
 else
 	AC_ARG_WITH(mailpath, [  --with-mailpath=DIR        directory where spool mailboxes are located],
@@ -206,25 +181,19 @@ AC_ARG_WITH(sharedir, [  --with-sharedir=PATH       specify where to put arch in
 sharedir=$mutt_cv_sharedir
 AC_SUBST(sharedir)
 
-
-AC_ARG_WITH(domain, [  --with-domain=DOMAIN       Specify your DNS domain name ],
-	[if test $withval != yes; then
-		AC_DEFINE_UNQUOTED(DOMAIN, "$withval")
-	fi])
-
-#AC_DEFINE(USE_POP)
-AC_DEFINE(USE_IMAP)
+AC_DEFINE(USE_IMAP,1,[Always compile IMAP support.])
 need_imap=yes
 need_socket=yes
 
 AC_CHECK_FUNC(setsockopt, , AC_CHECK_LIB(socket, setsockopt))
 AC_CHECK_FUNC(gethostent, , AC_CHECK_LIB(nsl, gethostent))
 AC_CHECK_FUNCS(getaddrinfo)
-AC_DEFINE(USE_SOCKET)
+AC_DEFINE(USE_SOCKET,1,[Always use flexible socket code.])
 LIBIMAP="-Limap -limap"
 LIBIMAPDEPS="\$(top_srcdir)/imap/imap.h imap/libimap.a"
 AM_CONDITIONAL(BUILD_IMAP, test x$need_imap = xyes)
-LIBOBJS="$LIBOBJS account.o mutt_socket.o"
+AC_LIBOBJ([account])
+AC_LIBOBJ([mutt_socket])
 
 dnl ##########################################################################
 dnl Enable GSS?
@@ -290,10 +259,12 @@ if test "x$with_gss" != xno  ; then
 		LIBS="$LIBS -lkrb5"
 	    if test "$ac_cv_header_gssapi_h" = "yes"; then
 		AC_EGREP_HEADER(GSS_C_NT_HOSTBASED_SERVICE, gssapi.h,
-		    AC_DEFINE(HAVE_GSS_C_NT_HOSTBASED_SERVICE))
+		    AC_DEFINE(HAVE_GSS_C_NT_HOSTBASED_SERVICE,1,
+		    [Define if GSS C NT hostbased service is available.]))
 	    else
 		AC_EGREP_HEADER(GSS_C_NT_HOSTBASED_SERVICE, gssapi/gssapi.h,
-		    AC_DEFINE(HAVE_GSS_C_NT_HOSTBASED_SERVICE))
+		    AC_DEFINE(HAVE_GSS_C_NT_HOSTBASED_SERVICE,1,
+		    [Define if GSS C NT hostbased service is available.]))
 	    fi
 	fi
     fi
@@ -331,15 +302,15 @@ AC_ARG_WITH(ssl, [  --with-ssl[=PFX]         Compile in SSL socket support for I
 
 	  AC_CHECK_FUNCS(RAND_status RAND_egd)
 
-	  AC_DEFINE(USE_SSL)
+	  AC_DEFINE(USE_SSL,1,[Define if SSL support is to be compiled.])
 	  LIBS="$saved_LIBS"
 	  MUTTLIBS="$MUTTLIBS -lssl -lcrypto"
 	  need_ssl=yes
           
           dnl Some systems avoid certain patent-encumbered SSL routines
-          AC_CHECK_HEADER(openssl/rc5.h,,AC_DEFINE(NO_RC5))
-          AC_CHECK_HEADER(openssl/idea.h,,AC_DEFINE(NO_IDEA))
-          AC_CHECK_HEADER(openssl/rsa.h,,AC_DEFINE(NO_RSA))
+          AC_CHECK_HEADER(openssl/rc5.h,,AC_DEFINE(NO_RC5,1,[No RC5.]))
+          AC_CHECK_HEADER(openssl/idea.h,,AC_DEFINE(NO_IDEA,1,[No idea.]))
+          AC_CHECK_HEADER(openssl/rsa.h,,AC_DEFINE(NO_RSA,1,[No RSA.]))
 	fi
 ])
 AM_CONDITIONAL(USE_SSL, test x$need_ssl = xyes)
@@ -367,7 +338,7 @@ AC_ARG_WITH(sasl, [  --with-sasl[=DIR]          Use Cyrus SASL library for POP/I
 	  MUTT_LIB_OBJECTS="$MUTT_LIB_OBJECTS mutt_sasl.o"
 	  MUTTLIBS="$MUTTLIBS -lsasl"
 	  LIBS="$saved_LIBS"
-	  AC_DEFINE(USE_SASL)
+	  AC_DEFINE(USE_SASL,1,[Defined if SASL library is to be used.])
 	  need_sasl=yes
 	  need_md5=no
 	fi
@@ -404,37 +375,42 @@ AC_ARG_ENABLE(flock, [  --disable-fcntl            Do NOT use flock() to lock fi
 	[if test $enableval = no; then mutt_cv_flock=no; fi])
 
 if test $mutt_cv_flock = yes; then
-	AC_DEFINE(USE_FLOCK)
+	AC_DEFINE(USE_FLOCK,1,[Define if flock locking should be used.])
 fi
 
 AC_ARG_ENABLE(fcntl, [  --enable-fcntl             Use fcntl() to lock files],
 	[if test $enableval = yes; then
-		AC_DEFINE(USE_FCNTL)
+		AC_DEFINE(USE_FCNTL,1,[Define if fcntl locking should be used.])
 	fi])
 
 AC_ARG_ENABLE(nfs-fix, [  --enable-nfs-fix           Work around an NFS with broken attributes caching ],
 	[if test x$enableval = xyes; then
-                AC_DEFINE(NFS_ATTRIBUTE_HACK)
+                AC_DEFINE(NFS_ATTRIBUTE_HACK,1, 
+		[Define if libmutt should try to work around NFS issues.])
         fi])
 
 AC_ARG_ENABLE(buffy-size, [  --enable-buffy-size        Use file size attribute instead of access time ],
 	[if test x$enableval = xyes; then
-                AC_DEFINE(BUFFY_SIZE)
+                AC_DEFINE(BUFFY_SIZE,1,
+		[Defined when file size is to be used to discover changes to mailbox.])
         fi])
 
 AC_ARG_ENABLE(locales-fix, [  --enable-locales-fix       The result of isprint() is unreliable ],
 	[if test x$enableval = xyes; then
-                AC_DEFINE(LOCALES_HACK)
+                AC_DEFINE(LOCALES_HACK,1,[Enable locales hack.])
         fi])
 
 AC_ARG_WITH(exec-shell, [  --with-exec-shell=SHELL    Specify alternate shell (ONLY if /bin/sh is broken)],
 	[if test $withval != yes; then
-		AC_DEFINE_UNQUOTED(EXECSHELL, "$withval")
+		AC_DEFINE_UNQUOTED(EXECSHELL, "$withval",
+		   [Define to path to an alternate shell.])
 	fi])
 
 AC_ARG_ENABLE(exact-address, [  --enable-exact-address     enable regeneration of email addresses],
 	[if test $enableval = yes; then
-		AC_DEFINE(EXACT_ADDRESS)
+		AC_DEFINE(EXACT_ADDRESS,1,
+		   [Defined if email adresses can be regenerated.]
+		)
 	fi])
 
 
@@ -587,9 +563,9 @@ changequote([, ])dnl
                 mutt_cv_iconv_nontrans=no)
         LIBS="$mutt_save_LIBS")
 if test "$mutt_cv_iconv_nontrans" = yes; then
-  AC_DEFINE(ICONV_NONTRANS, 1)
+  AC_DEFINE(ICONV_NONTRANS, 1,[iconv parameter list, v.1])
 else
-  AC_DEFINE(ICONV_NONTRANS, 0)
+  AC_DEFINE(ICONV_NONTRANS, 0,[iconv parameter list, v.2])
 fi
 
 fi # libiconv
@@ -634,7 +610,7 @@ if test x"$check_pcre" = xyes ; then
 	if test x"$have_pcre" = xyes ; then
 	       	AC_MSG_RESULT(yes)
 		CFLAGS="$CFLAGS `pcre-config --cflags-posix`"
-		AC_DEFINE(HAVE_PCRE)
+		AC_DEFINE(HAVE_PCRE,1,[Define if PCRE library is available.]a<)
 	else
 	        AC_MSG_RESULT(not found)
 	fi

@@ -47,9 +47,6 @@ dist-hook: balsa.spec
 
 ## to automatically rebuild aclocal.m4 if any of the macros in
 ## `macros/' change
-@MAINT@include macros/macros.dep
-@MAINT@macros/macros.dep: macros/Makefile.am
-@MAINT@	cd macros && $(MAKE) macros.dep
 bzdist: distdir
 	-chmod -R a+r $(distdir)
 	$(TAR) chojf $(distdir).tar.bz2 $(distdir)

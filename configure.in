@@ -27,8 +27,6 @@ AC_PROG_CC
 AC_STDC_HEADERS
 AM_PROG_LIBTOOL
 AC_PROG_INTLTOOL
-AM_HDR_SIGACTION
-AM_HDR_SIGSET
 
 AC_DEFINE_UNQUOTED(BALSA_MAJOR, $BALSA_MAJOR,
                    [Define to the Balsa major version])
@@ -54,7 +52,7 @@ AC_MSG_RESULT($use_gtkhtml)
 if test x"$use_gtkhtml" = xyes ; then 
         gnome_extras="$gnome_extras libgtkhtml-2.0"
          # define it, pkg-config will fail in the worst case.
-        AC_DEFINE(HAVE_GTKHTML)
+        AC_DEFINE(HAVE_GTKHTML,1,[Defined when GtkHtml can be used.])
 fi
 
 dnl ###########################################################################
@@ -116,7 +114,8 @@ dnl ###########################################################################
 ALL_LINGUAS="az bg ca cs da de en_GB el es et fi fr ga hu it ja ko lt ms nl no nn pl pt pt_BR ro ru sk sl sv tr uk vi wa zh_CN zh_TW"
 GETTEXT_PACKAGE=balsa
 AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE")
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
+                   [The gettext package.])
 AM_GLIB_GNU_GETTEXT
 # AM_GNOME_GETTEXT above substs $DATADIRNAME
 # this is the directory where the *.{mo,gmo} files are installed
@@ -136,7 +135,8 @@ AC_MSG_CHECKING([for isblank])
 AC_TRY_LINK( [#include <ctype.h>], [return isblank('a');],
 	     AC_MSG_RESULT(yes),
 	     [AC_MSG_RESULT(no)
-	      AC_DEFINE(isblank,isspace)] )
+	      AC_DEFINE(isblank,isspace,
+                        [Redefined to isspace if isblank is not available.])] )
 
 dnl ###########################################################################
 dnl ORBit support
@@ -154,7 +154,7 @@ dnl ###########################################################################
 dnl Enable all? (=broken stuff)
 dnl ###########################################################################
 
-AC_DEFINE(BALSA_SHOW_ALL, true)
+AC_DEFINE(BALSA_SHOW_ALL, true, [true if all the features should be exposed.])
 AM_CONDITIONAL(BALSA_SHOW_ALL, true)
 
 dnl ###########################################################################
@@ -168,7 +168,7 @@ AC_ARG_ENABLE(threads, [  --enable-threads        Use threading for mail retriev
 ])
 
 if test x"$use_threads" = xyes; then 
-        AC_DEFINE(BALSA_USE_THREADS, 1)
+        AC_DEFINE(BALSA_USE_THREADS, 1, [Defined when balsa is to use threads.])
 fi
 
 dnl ###########################################################################
@@ -189,9 +189,12 @@ EOF
 `
 
 dnl Better way to do this?
-AC_DEFINE_UNQUOTED( BALSA_STD_PREFIX, "$BALSA_STD_PREFIX" )
-AC_DEFINE_UNQUOTED( BALSA_DATA_PREFIX, "$BALSA_DATA_PREFIX" )
-AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES` ) 
+AC_DEFINE_UNQUOTED( BALSA_STD_PREFIX, "$BALSA_STD_PREFIX",
+                   [Directory for all balsa fils.] )
+AC_DEFINE_UNQUOTED( BALSA_DATA_PREFIX, "$BALSA_DATA_PREFIX",
+	           [Directory for storing balsa data files.] )
+AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES`,
+	           [Common directories for storing balsa icons.] ) 
 dnl bleah
 
 dnl #########################################################################
@@ -207,7 +210,9 @@ AC_ARG_ENABLE([ldap], [  --enable-ldap           Use OpenLDAP if available [defa
 AC_MSG_CHECKING(whether to use LDAP)
 if test x"$use_ldap" = xyes ; then
 	AC_MSG_RESULT([yes])
-	AC_CHECK_LIB(ldap, ldap_search, AC_DEFINE(ENABLE_LDAP) LIBS="-lldap -llber -lresolv $LIBS", AC_MSG_ERROR([*** You enabled LDAP but ldap library is not found.]), -llber -lresolv)
+	AC_CHECK_LIB(ldap, ldap_search, AC_DEFINE(ENABLE_LDAP, 1,
+                 [Defined when the LDAP support is to be compiled in.])
+              LIBS="-lldap -llber -lresolv $LIBS", AC_MSG_ERROR([*** You enabled LDAP but ldap library is not found.]), -llber -lresolv)
 else
 	AC_MSG_RESULT([no])
 fi
@@ -230,13 +235,16 @@ if test "x$with_esmtp" != xno  ; then
     AC_CHECK_LIB(esmtp, smtp_start_session, LIBS="$LIBS -lesmtp -lpthread",
 	AC_MSG_ERROR([*** You enabled ESMTP but esmtp library is not found.]),
                  -lpthread)
-    AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients, AC_DEFINE(ENABLE_ESMTP),
+    AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients, 
+                 AC_DEFINE(ENABLE_ESMTP, 1, 
+                           [Defined when ESTMP support is to be enabled.]),
 	AC_MSG_ERROR([*** You enabled ESMTP but esmtp library doesn't support
 	    'require_all_recipients'. Please get a Balsa aware
 	    libESMTP from http://balsa.gnome.org/main.html or compile
 	    libESMTP with './configure --enable-require-all-recipients'.]))
     AC_CHECK_LIB(esmtp, smtp_starttls_set_password_cb,
-	AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE))
+	AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE,1,
+	         [Defined when libESMTP has TLS support.]))
 else
     AC_MSG_RESULT([no])
 fi
@@ -315,7 +323,8 @@ if test x"$check_pcre" = xyes ; then
                 PCRE_LIBS="`pcre-config --libs-posix`"
                 AC_SUBST(PCRE_LIBS)
 		BALSA_LIBS="$BALSA_LIBS $PCRE_LIBS"
-		AC_DEFINE(HAVE_PCRE)
+		AC_DEFINE(HAVE_PCRE,1,
+                          [Defined when PCRE library is available.])
 	else
 	        AC_MSG_RESULT(not found)
 	fi
@@ -364,7 +373,7 @@ if test "x$with_ssl" != xno; then
 		CPPFLAGS="-I${ssldir}/include $CPPFLAGS"
 	fi
 	ac_cv_path_openssl=$ssldir
-	AC_DEFINE(USE_SSL)
+	AC_DEFINE(USE_SSL,1,[Defined when SSL support is to be compiled.])
    fi
 else
    AC_MSG_RESULT(no)
@@ -467,14 +476,17 @@ AC_MSG_RESULT($BALSA_FROM_CVS)
 dnl ##########################################################################
 dnl Create files.
 dnl ##########################################################################
+AM_PO_SUBDIRS(po)
 
 AC_OUTPUT([
 Makefile
 balsa.1
 balsa.spec
 po/Makefile.in
+po/Makefile
 sounds/Makefile
 images/Makefile
+intl/Makefile
 help/Makefile
 help/C/Makefile
 libbalsa/Makefile

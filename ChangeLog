@@ -1,3 +1,8 @@
+2004-12-16 14:34  PeterB
+
+	* libbalsa/body.c: if body->mime_part is a GMimeMessagePart, get
+	the stream for its message, not the part.
+
 2004-12-15 06:43  PeterB
 
 	* libbalsa/body.c: add some checks.

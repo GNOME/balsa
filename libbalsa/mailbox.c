@@ -593,15 +593,27 @@ lbm_rethread(LibBalsaMailbox*m)
     return FALSE;
 }
 
+#define LB_MAILBOX_CHECK_ID_KEY "libbalsa-mailbox-check-id"
+
 void
 libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 {
+    guint id;
     guint added = 0;
 
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     libbalsa_lock_mailbox(mailbox);
+
+    id = GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(mailbox),
+                                            LB_MAILBOX_CHECK_ID_KEY));
+    if (id) {
+	/* Remove scheduled idle callback. */
+	g_source_remove(id);
+	g_object_set_data(G_OBJECT(mailbox), LB_MAILBOX_CHECK_ID_KEY,
+			  GUINT_TO_POINTER(0));
+    }
 
     g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_ADDED, &added);
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->check(mailbox);
@@ -3403,16 +3415,15 @@ libbalsa_mailbox_msgno_update_attach(LibBalsaMailbox * mailbox,
 }
 
 /* Queued check. */
-#define LB_MAILBOX_CHECK_KEY "libbalsa-mailbox-check-key"
 
 static void
 lbm_check_real(LibBalsaMailbox * mailbox)
 {
     libbalsa_lock_mailbox(mailbox);
+    g_object_set_data(G_OBJECT(mailbox), LB_MAILBOX_CHECK_ID_KEY,
+                      GUINT_TO_POINTER(0));
     if (MAILBOX_OPEN(mailbox))
         libbalsa_mailbox_check(mailbox);
-    g_object_set_data(G_OBJECT(mailbox), LB_MAILBOX_CHECK_KEY,
-                      GUINT_TO_POINTER(FALSE));
     libbalsa_unlock_mailbox(mailbox);
     g_object_unref(mailbox);
 }
@@ -3435,12 +3446,15 @@ lbm_check_idle(LibBalsaMailbox * mailbox)
 static void
 lbm_queue_check(LibBalsaMailbox * mailbox)
 {
+    guint id;
+
     if (GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(mailbox),
-                                           LB_MAILBOX_CHECK_KEY)))
+                                           LB_MAILBOX_CHECK_ID_KEY)))
+	/* Idle callback already scheduled. */
         return;
 
     g_object_ref(mailbox);
-    g_idle_add((GSourceFunc) lbm_check_idle, mailbox);
-    g_object_set_data(G_OBJECT(mailbox), LB_MAILBOX_CHECK_KEY,
-                      GUINT_TO_POINTER(TRUE));
+    id = g_idle_add((GSourceFunc) lbm_check_idle, mailbox);
+    g_object_set_data(G_OBJECT(mailbox), LB_MAILBOX_CHECK_ID_KEY,
+                      GUINT_TO_POINTER(id));
 }

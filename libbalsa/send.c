@@ -384,11 +384,7 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 						   threading_type);
                     */
             }
-            if (MAILBOX_OPEN(fccbox))
-                libbalsa_mailbox_check(fccbox);
 	}
-        if (MAILBOX_OPEN(outbox))
-            libbalsa_mailbox_check(outbox);
     } 
 
     return result;
@@ -1655,9 +1651,6 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	g_mime_message_set_header(message->mime_msg, "X-Balsa-Fcc", fcc);
 
     thereturn = libbalsa_mailbox_copy_message( message, draftbox );
-
-    if (MAILBOX_OPEN(draftbox))
-	libbalsa_mailbox_check(draftbox);
 
     return thereturn!=-1;
 }

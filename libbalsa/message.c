@@ -496,7 +496,6 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 
     libbalsa_unlock_mailbox(mailbox);
 
-    libbalsa_mailbox_check(dest);
     return r;
 }
 
@@ -558,8 +557,6 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
     g_array_free(msgnos, TRUE);
 
     libbalsa_unlock_mailbox(mailbox);
-
-    libbalsa_mailbox_check(dest);
 
     return retval;
 }

@@ -223,7 +223,7 @@ void build_type_notebook()
     
     /* The simple page of the type notebook */
 
-    fe_type_notebook_simple_page = gtk_table_new(5, 5, TRUE);
+    fe_type_notebook_simple_page = gtk_table_new(5, 5, FALSE);
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook),
 			     fe_type_notebook_simple_page,
 			     NULL);
@@ -315,7 +315,7 @@ void build_type_notebook()
 
     /* The regex page of the type notebook */
 
-    fe_type_notebook_regex_page = gtk_table_new(5, 5, TRUE);
+    fe_type_notebook_regex_page = gtk_table_new(5, 5, FALSE);
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook),
 			     fe_type_notebook_regex_page,
 			     NULL);
@@ -353,6 +353,10 @@ void build_type_notebook()
 		       TRUE,
 		       TRUE,
 		       0);
+    gtk_signal_connect(GTK_OBJECT(fe_type_regex_add),
+		       "clicked",
+		       GTK_SIGNAL_FUNC(fe_add_pressed),
+		       NULL);
     gtk_widget_show(fe_type_regex_add);
     fe_type_regex_remove = gtk_button_new_with_label("Remove");
     gtk_box_pack_start(GTK_BOX(fe_type_regex_box),
@@ -360,6 +364,10 @@ void build_type_notebook()
 		       TRUE,
 		       TRUE,
 		       0);
+    gtk_signal_connect(GTK_OBJECT(fe_type_regex_remove),
+		       "clicked",
+		       GTK_SIGNAL_FUNC(fe_remove_pressed),
+		       NULL);
     gtk_widget_show(fe_type_regex_remove);
 
     fe_type_regex_entry = gtk_entry_new_with_max_length(1023);
@@ -373,7 +381,7 @@ void build_type_notebook()
 
     /* The exec page of the type notebook */
 
-    fe_type_notebook_exec_page = gtk_table_new(5, 5, TRUE);
+    fe_type_notebook_exec_page = gtk_table_new(5, 5, FALSE);
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook),
 			     fe_type_notebook_exec_page,
 			     NULL);
@@ -607,7 +615,7 @@ void build_action_page()
 	"(\"Move\" implies \"Do not place/leave\" below)");
     gtk_table_attach(GTK_TABLE(fe_action_table),
 		     fe_move_label,
-		     2, 5, 2, 3,
+		     1, 5, 2, 3,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     5, 5);
@@ -662,7 +670,7 @@ void build_action_page()
 	"(Implies \"Stop filtering\" below)");
     gtk_table_attach(GTK_TABLE(fe_action_table),
 		     fe_delete_label,
-		     2, 5, 5, 6,
+		     1, 5, 5, 6,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     GTK_SHRINK,
 		     5, 5);

@@ -180,6 +180,11 @@ GtkWidget *fe_type_regex_box;
 GtkWidget *fe_type_regex_add;
 GtkWidget *fe_type_regex_remove;
 GtkWidget *fe_type_regex_entry;
+/* callbacks */
+void fe_add_pressed(GtkWidget *widget,
+		    gpointer data);
+void fe_remove_pressed(GtkWidget *widget,
+		       gpointer data);
 
 /* Entry for the type notebook exec page */
 GtkWidget *fe_type_exec_label;

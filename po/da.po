@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
 "POT-Creation-Date: 2000-05-07 04:58+0200\n"
-"PO-Revision-Date: 2000-05-04 23:30+02:00\n"
+"PO-Revision-Date: 2000-05-07 16:30+02:00\n"
 "Last-Translator: Keld Simonsen <keld@dkuug.dk>\n"
 "Language-Team: Danish <dansk@klid.dk>\n"
 "MIME-Version: 1.0\n"
@@ -318,13 +318,12 @@ msgid "Mailbox"
 msgstr "Postkasse"
 
 #: src/balsa-mblist.c:221
-#, fuzzy
 msgid "Unread"
-msgstr "Næste ulæste"
+msgstr "Ulæste"
 
 #: src/balsa-mblist.c:221
 msgid "Total"
-msgstr ""
+msgstr "Total"
 
 #: src/balsa-mblist.c:824
 #, c-format
@@ -537,25 +536,25 @@ msgid "Balsa Filters"
 msgstr "Balsa-filtre"
 
 #: src/mailbox-conf.c:159
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This will remove the mailbox %s and it's files permanently from your "
 "system.\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
-"Dette vil permanent fjerne postkassen og dens filer fra dit system.\n"
-"Er du sikker på at du vil fjerne denne postkasse?"
+"Dette vil fjerne postboksen %s, og dens filer, fra dit system for altid.\n"
+"Er du sikker på at du vil fjerne denne postboks?"
 
 #: src/mailbox-conf.c:164
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
 "You may use \"Add Mailbox\" later to access this mailbox again\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
-"Dette vil fjerne postkassen fra listen over postkasser\n"
-"Du kan bruge \"Tilføj postkasse\" senere for at åbne postkassen\n"
-"igen. Er du sikker på at du vil fjerne denne postkasse?"
+"Dette vil fjerne postboksen %s fra listen over postbokse.\n"
+"Du kan bruge \"Tilføj postboks\" senere for at tilgå denne postboks\n"
+"igen. Er du sikker på at du vil fjerne denne postboks?"
 
 #: src/mailbox-conf.c:193
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
@@ -1441,9 +1440,8 @@ msgid "_Turkish (ISO-8859-9)"
 msgstr "_Tyrkisk (ISO-8859-9)"
 
 #: src/sendmsg-window.c:233
-#, fuzzy
 msgid "_Celtic (ISO-8859-14)"
-msgstr "_Baltisk (ISO-8859-13)"
+msgstr "_Keltisk (ISO-8859-14)"
 
 #: src/sendmsg-window.c:271
 msgid "_Show"

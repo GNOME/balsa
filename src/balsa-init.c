@@ -27,7 +27,7 @@
 #include <fcntl.h>
 #include <string.h>
 
-#include "mailbox.h"
+#include "libbalsa.h"
 #include "main.h"
 #include "misc.h"
 #include "balsa-app.h"

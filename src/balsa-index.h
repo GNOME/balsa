@@ -21,7 +21,7 @@
 #define __BALSA_INDEX_H__
 
 #include <gnome.h>
-#include "mailbox.h"
+#include "libbalsa.h"
 
 #ifdef __cplusplus
 extern "C"

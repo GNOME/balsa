@@ -20,6 +20,7 @@
 #ifndef __MISC_H__
 #define __MISC_H__
 
+#include "libbalsa.h"
 
 gchar *address_to_gchar (Address * addr);
 gchar *make_string_from_list (GList *);

@@ -25,7 +25,6 @@
 
 
 #include <gnome.h>
-#include "mailbox.h"
 #include "main-window.h"
 
 

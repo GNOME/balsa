@@ -32,7 +32,7 @@
 #include "balsa-icons.h"
 #include "balsa-init.h"
 #include "main-window.h"
-#include "mailbox.h"
+#include "libbalsa.h"
 #include "misc.h"
 #include "save-restore.h"
 

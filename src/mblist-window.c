@@ -17,6 +17,7 @@
  * 02111-1307, USA.
  */
 
+#include "libbalsa.h"
 
 #include "mblist-window.h"
 
@@ -34,7 +35,6 @@
 #include "balsa-index-page.h"
 #include "balsa-mblist.h"
 #include "balsa-message.h"
-#include "mailbox.h"
 #include "misc.h"
 #include "main.h"
 #include "main-window.h"

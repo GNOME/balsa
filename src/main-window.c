@@ -23,6 +23,7 @@
 #include <gdk/gdkx.h>
 #include <X11/Xutil.h>
 
+#include "libbalsa.h"
 
 #include "balsa-app.h"
 #include "balsa-icons.h"
@@ -31,7 +32,6 @@
 #include "balsa-message.h"
 #include "filter.h"
 #include "balsa-index-page.h"
-#include "mailbox.h"
 #include "misc.h"
 #include "main.h"
 #include "main-window.h"

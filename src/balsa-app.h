@@ -21,7 +21,7 @@
 
 #include <gnome.h>
 #include <proplist.h>
-#include "mailbox.h"
+#include "libbalsa.h"
 #include "balsa-mblist.h"
 #include "balsa-index-page.h"
 

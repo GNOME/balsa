@@ -23,6 +23,8 @@
 
 #include "config.h"
 
+#include "libbalsa.h"
+
 #include <assert.h>
 
 #include <gnome.h>
@@ -32,7 +34,6 @@
 #include <fcntl.h>
 #include <string.h>
 #include "balsa-app.h"
-#include "mailbox.h"
 #include "misc.h"
 #include "save-restore.h"
 #include "../libmutt/mutt.h"

@@ -20,7 +20,7 @@
 #define __INDEX_CHILD_H__
 
 #include "main-window.h"
-#include "mailbox.h"
+#include "libbalsa.h"
 
 GtkType balsa_index_page_get_type(void);
 

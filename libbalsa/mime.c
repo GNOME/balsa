@@ -28,12 +28,13 @@
 
 #include "mailbackend.h"
 
-#include "mailbox.h"
+#include "libbalsa.h"
+
 #include "misc.h"
 
 #include "mime.h"
 
-  GString *reply;
+GString *reply;
 
 static gchar tmp_file_name[PATH_MAX + 1];
 

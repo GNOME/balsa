@@ -8,6 +8,10 @@ libbalsa_a_SOURCES = 		\
 	filter.h		\
 	mailbackend.h		\
 	mailbox.h		\
+	message.c		\
+	message.h		\
+	body.h			\
+	address.h		\
 	mime.h			\
 	misc.h			\
 	send.h			\

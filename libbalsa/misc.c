@@ -29,7 +29,7 @@
 
 #include <gnome.h>
 
-#include "mailbox.h"
+#include "libbalsa.h"
 #include "misc.h"
 
 MailboxNode *

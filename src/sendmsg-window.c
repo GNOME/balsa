@@ -19,6 +19,8 @@
 
 #include "config.h"
 
+#include "libbalsa.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <gnome.h>
@@ -33,10 +35,8 @@
 #include "balsa-app.h"
 #include "balsa-message.h"
 #include "balsa-index.h"
-#include "mailbox.h"
 #include "misc.h"
 #include "mime.h"
-#include "mailbox.h"
 #include "send.h"
 #include "sendmsg-window.h"
 

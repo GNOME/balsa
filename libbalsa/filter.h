@@ -12,8 +12,8 @@
 #include <sys/types.h>
 #include <regex.h>
 #include <glib.h>
-#include "mailbox.h"
 
+#include "libbalsa.h"
 
 /* filter match types */
 typedef enum

@@ -20,7 +20,11 @@
 #ifndef __MAILBOX_H__
 #define __MAILBOX_H__
 
+#include <glib.h>
+#include <gtk/gtk.h>
+
 #include "libmutt/mutt.h"
+
 
 /*
  * public macros
@@ -34,83 +38,68 @@
  * enumes
  */
 typedef enum
-  {
-    MAILBOX_MBOX,
-    MAILBOX_MH,
-    MAILBOX_MAILDIR,
-    MAILBOX_POP3,
-    MAILBOX_IMAP,
-    MAILBOX_UNKNOWN
-  }
-MailboxType;
+{
+  MAILBOX_MBOX,
+  MAILBOX_MH,
+  MAILBOX_MAILDIR,
+  MAILBOX_POP3,
+  MAILBOX_IMAP,
+  MAILBOX_UNKNOWN
+} MailboxType;
 
 typedef enum
-  {
-    MAILBOX_SORT_DATE = 1,
-    MAILBOX_SORT_SIZE = 2,
-    MAILBOX_SORT_SUBJECT = 3,
-    MAILBOX_SORT_FROM = 4,
-    MAILBOX_SORT_ORDER = 5,
-    MAILBOX_SORT_THREADS = 6,
-    MAILBOX_SORT_RECEIVED = 7,
-    MAILBOX_SORT_TO = 8,
-    MAILBOX_SORT_SCORE = 9,
-    MAILBOX_SORT_ALIAS = 10,
-    MAILBOX_SORT_ADDRESS = 11,
-    MAILBOX_SORT_MASK = 0xf,
-    MAILBOX_SORT_REVERSE = (1 << 4),
-    MAILBOX_SORT_LAST = (1 << 5)
-  }
-MailboxSort;
+{
+  MAILBOX_SORT_DATE = 1,
+  MAILBOX_SORT_SIZE = 2,
+  MAILBOX_SORT_SUBJECT = 3,
+  MAILBOX_SORT_FROM = 4,
+  MAILBOX_SORT_ORDER = 5,
+  MAILBOX_SORT_THREADS = 6,
+  MAILBOX_SORT_RECEIVED = 7,
+  MAILBOX_SORT_TO = 8,
+  MAILBOX_SORT_SCORE = 9,
+  MAILBOX_SORT_ALIAS = 10,
+  MAILBOX_SORT_ADDRESS = 11,
+  MAILBOX_SORT_MASK = 0xf,
+  MAILBOX_SORT_REVERSE = (1 << 4),
+  MAILBOX_SORT_LAST = (1 << 5)
+} MailboxSort;
 
 typedef enum
-  {
-    MESSAGE_MARK_CLEAR,		/* clear all flags */
-    MESSAGE_MARK_ANSWER,	/* message has been answered */
-    MESSAGE_MARK_READ,		/* message has changed from new to read */
-    MESSAGE_MARK_UNREAD,	/* message has changed from read to new */
-    MESSAGE_MARK_DELETE,	/* message has been marked deleted */
-    MESSAGE_MARK_UNDELETE,	/* message has been marked undeleted */
-    MESSAGE_DELETE,		/* message has been deleted */
-    MESSAGE_NEW,		/* message is new to the mailbox */
-    MESSAGE_FLAGGED,		/* the message was flagged */
-    MESSAGE_REPLIED,		/* the message was answered */
-    MESSAGE_APPEND              /* message has been appended */
-  }
-MailboxWatcherMessageType;
+{
+  MESSAGE_MARK_CLEAR,		/* clear all flags */
+  MESSAGE_MARK_ANSWER,		/* message has been answered */
+  MESSAGE_MARK_READ,		/* message has changed from new to read */
+  MESSAGE_MARK_UNREAD,		/* message has changed from read to new */
+  MESSAGE_MARK_DELETE,		/* message has been marked deleted */
+  MESSAGE_MARK_UNDELETE,	/* message has been marked undeleted */
+  MESSAGE_DELETE,		/* message has been deleted */
+  MESSAGE_NEW,			/* message is new to the mailbox */
+  MESSAGE_FLAGGED,		/* the message was flagged */
+  MESSAGE_REPLIED,		/* the message was answered */
+  MESSAGE_APPEND		/* message has been appended */
+} MailboxWatcherMessageType;
 
 
 typedef enum
-  {
-    MESSAGE_MARK_CLEAR_MASK = 1,
-    MESSAGE_MARK_ANSWER_MASK = 1 << 1,
-    MESSAGE_MARK_READ_MASK = 1 << 2,
-    MESSAGE_MARK_UNREAD_MASK = 1 << 3,
-    MESSAGE_MARK_DELETE_MASK = 1 << 4,
-    MESSAGE_MARK_UNDELETE_MASK = 1 << 5,
-    MESSAGE_DELETE_MASK = 1 << 6,
-    MESSAGE_NEW_MASK = 1 << 7,
-    MESSAGE_FLAGGED_MASK = 1 << 8,
-    MESSAGE_REPLIED_MASK = 1 << 9,
-    MESSAGE_APPEND_MASK = 1 << 10
-  }
-MailboxWatcherMessageMask;
-
-
-typedef enum
-  {
-    MESSAGE_FLAG_NEW = 1 << 1,
-    MESSAGE_FLAG_DELETED = 1 << 2,
-    MESSAGE_FLAG_REPLIED = 1 << 3,
-    MESSAGE_FLAG_FLAGGED = 1 << 4
-  }
-MessageFlags;
+{
+  MESSAGE_MARK_CLEAR_MASK = 1,
+  MESSAGE_MARK_ANSWER_MASK = 1 << 1,
+  MESSAGE_MARK_READ_MASK = 1 << 2,
+  MESSAGE_MARK_UNREAD_MASK = 1 << 3,
+  MESSAGE_MARK_DELETE_MASK = 1 << 4,
+  MESSAGE_MARK_UNDELETE_MASK = 1 << 5,
+  MESSAGE_DELETE_MASK = 1 << 6,
+  MESSAGE_NEW_MASK = 1 << 7,
+  MESSAGE_FLAGGED_MASK = 1 << 8,
+  MESSAGE_REPLIED_MASK = 1 << 9,
+  MESSAGE_APPEND_MASK = 1 << 10
+} MailboxWatcherMessageMask;
 
 
 /*
  * strucutres
  */
-typedef struct _Mailbox Mailbox;
 typedef struct _MailboxLocal MailboxLocal;
 typedef struct _MailboxPOP3 MailboxPOP3;
 typedef struct _MailboxIMAP MailboxIMAP;
@@ -118,145 +107,98 @@ typedef struct _MailboxIMAP MailboxIMAP;
 typedef struct _MailboxWatcherMessage MailboxWatcherMessage;
 typedef struct _MailboxWatcherMessageNew MailboxWatcherMessageNew;
 
-typedef struct _Message Message;
-typedef struct _Address Address;
-typedef struct _Body Body;
-
 struct _Mailbox
-  {
-    gboolean ismbnode; /* is also in MailboxNode... used to tell them apart */
-    MailboxType type;
-    gchar *name;
-    void *private;
-    guint open_ref;
+{
+  GtkObject object;
 
-    gboolean lock;
+  gboolean ismbnode; /* is also in MailboxNode... used to tell them apart */
+  MailboxType type;
+  gchar *name;
+  void *private;
+  guint open_ref;
 
-    glong messages;
-    glong new_messages;
-    GList *message_list;
+  gboolean lock;
 
-    /* info fields */
-    glong unread_messages; /* number of unread messages in the mailbox */
-    glong total_messages;  /* total number of messages in the mailbox  */
+  glong messages;
+  glong new_messages;
+  GList *message_list;
 
-  };
+  /* info fields */
+  glong unread_messages; /* number of unread messages in the mailbox */
+  glong total_messages;  /* total number of messages in the mailbox  */
+};
 
+
+struct _MailboxClass
+{
+  GtkObjectClass parent_class;
+
+  void (* message_new)     (Mailbox *mailbox,
+			    Message *message);
+
+  void (* message_delete)  (Mailbox *mailbox,
+			    Message *message);
+
+  void (* message_append)  (Mailbox *mailbox,
+			    Message *message);
+
+  /* message's flags changed */
+  void (* message_flagged) (Mailbox *mailbox,
+			    Message *message);
+
+};
 
 struct _MailboxLocal
-  {
-    Mailbox mailbox;
-    gchar *path;
-  };
+{
+  Mailbox mailbox;
+  gchar *path;
+};
 
 
 struct _MailboxPOP3
-  {
-    Mailbox mailbox;
-    gchar *user;
-    gchar *passwd;
-    gchar *server;
-    gboolean check;
-    gboolean delete_from_server;
-    gchar *last_popped_uid;
-  };
+{
+  Mailbox mailbox;
+  gchar *user;
+  gchar *passwd;
+  gchar *server;
+  gboolean check;
+  gboolean delete_from_server;
+  gchar *last_popped_uid;
+};
 
 
 struct _MailboxIMAP
-  {
-    Mailbox mailbox;
-    gchar *user;
-    gchar *passwd;
-    gchar *server;
-    gchar *path;
-    gint port;
-    gchar *tmp_file_path;
-  };
+{
+  Mailbox mailbox;
+  gchar *user;
+  gchar *passwd;
+  gchar *server;
+  gchar *path;
+  gint port;
+  gchar *tmp_file_path;
+};
 
 
 struct _MailboxWatcherMessage
-  {
-    MailboxWatcherMessageType type;
-    Mailbox *mailbox;
-    Message *message;
-    gpointer data;
-  };
+{
+  MailboxWatcherMessageType type;
+  Mailbox *mailbox;
+  Message *message;
+  gpointer data;
+};
 
 
 struct _MailboxWatcherMessageNew
-  {
-    /* common */
-    MailboxWatcherMessageType type;
-    Mailbox *mailbox;
-    Message *message;
-    gpointer data;
-    /* end common */
-
-    gint remaining;
-  };
-
-
-struct _Message
-  {
-    /* the mailbox this message belongs to */
-    Mailbox *mailbox;
-
-    /* flags */
-    MessageFlags flags;
-
-    /* the ordered numberic index of this message in 
-     * the mailbox beginning from 1, not 0 */
-    glong msgno;
-
-    /* remail header if any */
-    gchar *remail;
-
-    /* message composition date string */
-    gchar *date;
-    time_t datet;
-
-    /* from, sender, and reply addresses */
-    Address *from;
-    Address *sender;
-    Address *reply_to;
-
-    /* subject line */
-    gchar *subject;
-
-    /* primary, secondary, and blind recipent lists */
-    GList *to_list;
-    GList *cc_list;
-    GList *bcc_list;
-    
-    /* File Carbon Copy Mailbox */
-    Mailbox *fcc_mailbox;
-
-    /* replied message ID */
-    gchar *in_reply_to;
-
-    /* message ID */
-    gchar *message_id;
-
-    /* message body */
-    guint body_ref;
-    GList *body_list;
-  };
-
-
-struct _Address
-  {
-    gchar *personal;		/* full text name */
-    gchar *mailbox;		/* user name and host (mailbox name) on remote system */
-  };
-
-
-struct _Body
-  {
-    gchar *buffer;		/* holds raw data of the MIME part, or NULL */
-    gchar *htmlized;		/* holds htmlrep of buffer, or NULL */
-    BODY *mutt_body;		/* pointer to BODY struct of mutt message */
-    gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
-  };
+{
+  /* common */
+  MailboxWatcherMessageType type;
+  Mailbox *mailbox;
+  Message *message;
+  gpointer data;
+  /* end common */
+  
+  gint remaining;
+};
 
 
 /*
@@ -308,51 +250,12 @@ void mailbox_watcher_remove_by_data (Mailbox * mailbox, gpointer data);
 
 
 /*
- * messages
- */
-Message *message_new (void);
-void message_free (Message * message);
-
-void message_copy (Message * message, Mailbox * dest);
-void message_move (Message * message, Mailbox * mailbox);
-void message_clear_flags (Message * message);
-
-void message_read (Message * message);
-void message_unread (Message * message);
-void message_delete (Message * message);
-void message_undelete (Message * message);
-
-void message_answer (Message * message);
-void message_reply (Message * message);
-
-void message_body_ref (Message * message);
-void message_body_unref (Message * message);
-
-
-/*
- * addresses
- */
-Address *address_new (void);
-void address_free (Address * address);
-
-
-/*
- * body
- */
-Body *body_new (void);
-void body_free (Body * body);
-
-
-/*
  * misc mailbox releated functions
  */
 MailboxType mailbox_type_from_description (gchar * description);
 gchar *mailbox_type_description (MailboxType type);
 MailboxType mailbox_valid (gchar * filename);
-gchar *message_pathname (Message * message);
 gboolean mailbox_gather_content_info( Mailbox *mailbox );
 void mailbox_commit_flagged_changes( Mailbox *mailbox );
-
-char *mime_content_type2str (int contenttype);
 
 #endif /* __MAILBOX_H__ */

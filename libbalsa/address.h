@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1999 Stuart Parmenter
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-#ifndef __NEW_MAILBOX_H__
-#define __NEW_MAILBOX_H__
 
-#include "libbalsa.h"
+#ifndef __ADDRESS_H__
+#define __ADDRESS_H__
 
-void mailbox_conf_new (Mailbox * mailbox, gint add_new_mailbox, MailboxType type);
-void mailbox_conf_delete (Mailbox * mailbox);
-#endif /* __NEW_MAILBOX_H__ */
+#include <glib.h>
+#include "libmutt/mutt.h"
+
+struct _Address
+{
+  gchar *personal;		/* full text name */
+  gchar *mailbox;		/* user name and host (mailbox name) on remote system */
+};
+
+Address *address_new(void);
+void address_free(Address *address);
+
+#endif /* __ADDRESS_H__ */

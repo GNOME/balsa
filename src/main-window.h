@@ -20,9 +20,6 @@
 #ifndef __main_window_h__
 #define __main_window_h__
 
-#include "mailbox.h"
-
-
 #define BALSA_TYPE_WINDOW		       (balsa_window_get_type ())
 #define BALSA_WINDOW(obj)		       (GTK_CHECK_CAST (obj, BALSA_TYPE_WINDOW, BalsaWindow))
 #define BALSA_WINDOW_CLASS(klass)	       (GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_WINDOW, BalsaWindowClass))

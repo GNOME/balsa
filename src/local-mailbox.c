@@ -30,7 +30,7 @@
 
 #include "balsa-app.h"
 #include "local-mailbox.h"
-#include "mailbox.h"
+#include "libbalsa.h"
 #include "misc.h"
 
 

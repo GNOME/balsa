@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1999 Stuart Parmenter
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,23 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-#ifndef __NEW_MAILBOX_H__
-#define __NEW_MAILBOX_H__
 
-#include "libbalsa.h"
+#ifndef __BODY_H__
+#define __BODY_H__
 
-void mailbox_conf_new (Mailbox * mailbox, gint add_new_mailbox, MailboxType type);
-void mailbox_conf_delete (Mailbox * mailbox);
-#endif /* __NEW_MAILBOX_H__ */
+#include <glib.h>
+
+#include "libmutt/mutt.h"
+
+struct _Body
+{
+  gchar *buffer;		/* holds raw data of the MIME part, or NULL */
+  gchar *htmlized;		/* holds htmlrep of buffer, or NULL */
+  BODY *mutt_body;		/* pointer to BODY struct of mutt message */
+  gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
+};
+
+Body *body_new(void);
+void body_free(Body * body);
+
+#endif /* __BODY_H__ */

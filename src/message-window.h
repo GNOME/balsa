@@ -19,7 +19,7 @@
 #ifndef __MESSAGE_WINDOW_H__
 #define __MESSAGE_WINDOW_H__
 
-#include "mailbox.h"
+#include "libbalsa.h"
 
 void message_window_new (Message * message);
 

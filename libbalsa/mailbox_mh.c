@@ -352,6 +352,7 @@ lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh)
 static const gchar *LibBalsaMailboxMhUnseen = "unseen:";
 static const gchar *LibBalsaMailboxMhFlagged = "flagged:";
 static const gchar *LibBalsaMailboxMhReplied = "replied:";
+static const gchar *LibBalsaMailboxMhRecent = "recent:";
 
 static void
 lbm_mh_set_flag(LibBalsaMailboxMh * mh, guint fileno, LibBalsaMessageFlag flag)
@@ -383,6 +384,8 @@ lbm_mh_handle_seq_line(LibBalsaMailboxMh * mh, gchar * line)
 	flag = LIBBALSA_MESSAGE_FLAG_FLAGGED;
     else if (libbalsa_str_has_prefix(line, LibBalsaMailboxMhReplied))
 	flag = LIBBALSA_MESSAGE_FLAG_REPLIED;
+    else if (libbalsa_str_has_prefix(line, LibBalsaMailboxMhRecent))
+	flag = LIBBALSA_MESSAGE_FLAG_RECENT;
     else			/* unknown sequence */
 	return;
 
@@ -624,6 +627,10 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
     libbalsa_mailbox_local_load_messages(mailbox, last_msgno);
 }
 
+static gboolean libbalsa_mailbox_mh_sync_real(LibBalsaMailbox * mailbox,
+					      gboolean expunge,
+					      gboolean closing);
+
 static void
 libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox)
 {
@@ -632,7 +639,7 @@ libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox)
 
     if (mh->msgno_2_msg_info)
 	len = mh->msgno_2_msg_info->len;
-    libbalsa_mailbox_mh_sync(mailbox, TRUE);
+    libbalsa_mailbox_mh_sync_real(mailbox, TRUE, TRUE);
 
     if (mh->messages_info) {
 	g_hash_table_destroy(mh->messages_info);
@@ -722,10 +729,11 @@ lbm_mh_finish_line(struct line_info *li, GMimeStream * temp_stream,
 }
 
 static gboolean
-libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
+libbalsa_mailbox_mh_sync_real(LibBalsaMailbox * mailbox, gboolean expunge,
+			      gboolean closing)
 {
     LibBalsaMailboxMh *mh;
-    struct line_info unseen, flagged, replied;
+    struct line_info unseen, flagged, replied, recent;
     const gchar *path;
     gchar *tmp;
     guint msgno;
@@ -760,6 +768,8 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     flagged.line  = g_mime_stream_mem_new();
     replied.first = replied.last = -1;
     replied.line  = g_mime_stream_mem_new();
+    recent.first  = recent.last = -1;
+    recent.line   = g_mime_stream_mem_new();
 
     path = libbalsa_mailbox_local_get_path(mailbox);
 
@@ -768,6 +778,8 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	msg_info = lbm_mh_message_info_from_msgno(mh, msgno);
 	if (msg_info->flags == INVALID_FLAG)
 	    msg_info->flags = msg_info->orig_flags;
+	if (closing)
+	    msg_info->flags &= ~LIBBALSA_MESSAGE_FLAG_RECENT;
 
 	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
 	    /* MH just moves files out of the way when you delete them */
@@ -787,6 +799,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    lbm_mh_flag_line(msg_info, LIBBALSA_MESSAGE_FLAG_NEW, &unseen);
 	    lbm_mh_flag_line(msg_info, LIBBALSA_MESSAGE_FLAG_FLAGGED, &flagged);
 	    lbm_mh_flag_line(msg_info, LIBBALSA_MESSAGE_FLAG_REPLIED, &replied);
+	    lbm_mh_flag_line(msg_info, LIBBALSA_MESSAGE_FLAG_RECENT, &recent);
 	    if ((msg_info->flags ^ msg_info->orig_flags) &
 		LIBBALSA_MESSAGE_FLAG_DELETED) {
 		gchar *tmp;
@@ -817,6 +830,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     lbm_mh_print_line(&unseen);
     lbm_mh_print_line(&flagged);
     lbm_mh_print_line(&replied);
+    lbm_mh_print_line(&recent);
 
     /* Renumber */
     for (msgno = 1; msgno <= mh->msgno_2_msg_info->len; msgno++) {
@@ -833,6 +847,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	g_mime_stream_unref(unseen.line);
 	g_mime_stream_unref(flagged.line);
 	g_mime_stream_unref(replied.line);
+	g_mime_stream_unref(recent.line);
 	libbalsa_unlock_file(sequences_filename, sequences_fd, 1);
 	return FALSE;
     }
@@ -850,7 +865,8 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	if (line->data &&
 	    !libbalsa_str_has_prefix(line->data, LibBalsaMailboxMhUnseen) &&
 	    !libbalsa_str_has_prefix(line->data, LibBalsaMailboxMhFlagged) &&
-	    !libbalsa_str_has_prefix(line->data, LibBalsaMailboxMhReplied))
+	    !libbalsa_str_has_prefix(line->data, LibBalsaMailboxMhReplied) &&
+	    !libbalsa_str_has_prefix(line->data, LibBalsaMailboxMhRecent))
 	{
 	    /* unknown sequence */
 	    g_mime_stream_write(temp_stream, line->data, line->len);
@@ -859,16 +875,18 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     g_mime_stream_unref(gmime_stream_buffer);
     g_byte_array_free(line, TRUE);
 
-    /* write unseen, flagged and replied sequences */
+    /* write sequences */
     if (!lbm_mh_finish_line(&unseen, temp_stream, LibBalsaMailboxMhUnseen) ||
 	!lbm_mh_finish_line(&flagged, temp_stream, LibBalsaMailboxMhFlagged) ||
-	!lbm_mh_finish_line(&replied, temp_stream, LibBalsaMailboxMhReplied)) {
+	!lbm_mh_finish_line(&replied, temp_stream, LibBalsaMailboxMhReplied) ||
+	!lbm_mh_finish_line(&recent, temp_stream, LibBalsaMailboxMhRecent)) {
 	unlink(tmp);
 	g_free(tmp);
 	g_mime_stream_unref(temp_stream);
 	g_mime_stream_unref(unseen.line);
 	g_mime_stream_unref(flagged.line);
 	g_mime_stream_unref(replied.line);
+	g_mime_stream_unref(recent.line);
 	libbalsa_unlock_file(sequences_filename, sequences_fd, 1);
 	return FALSE;
     }
@@ -888,6 +906,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     g_mime_stream_unref(unseen.line);
     g_mime_stream_unref(flagged.line);
     g_mime_stream_unref(replied.line);
+    g_mime_stream_unref(recent.line);
 
     /* Record the mtimes; we'll just use the current time--someone else
      * might have changed something since we did, despite the file
@@ -896,6 +915,12 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 
     libbalsa_unlock_file(sequences_filename, sequences_fd, 1);
     return retval;
+}
+
+static gboolean
+libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
+{
+    return libbalsa_mailbox_mh_sync_real(mailbox, expunge, FALSE);
 }
 
 static struct message_info *
@@ -980,6 +1005,27 @@ libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox * mailbox,
 								  flags);
 }
 
+/* Update .mh_sequences when a new message is added to the mailbox;
+ * we'll just add new lines and let the next sync merge them with any
+ * existing lines. */
+static void
+lbm_mh_update_sequences(LibBalsaMailboxMh * mh, gint fileno,
+			LibBalsaMessageFlag flags)
+{
+    FILE *fp;
+
+    fp = fopen(mh->sequences_filename, "a");
+    if (flags & LIBBALSA_MESSAGE_FLAG_NEW)
+	fprintf(fp, "unseen: %d\n", fileno);
+    if (flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
+	fprintf(fp, "flagged: %d\n", fileno);
+    if (flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
+	fprintf(fp, "replied: %d\n", fileno);
+    if (flags & LIBBALSA_MESSAGE_FLAG_RECENT)
+	fprintf(fp, "recent: %d\n", fileno);
+    fclose(fp);
+}
+
 /* Called with mailbox locked. */
 static int
 libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
@@ -1051,6 +1097,9 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 	return -1;
 
     mh->last_fileno = fileno;
+
+    lbm_mh_update_sequences(mh, fileno,
+			    message->flags | LIBBALSA_MESSAGE_FLAG_RECENT);
 
     return 1;
 }

@@ -929,6 +929,8 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
     {
 	msg_info = &g_array_index(mbox->messages_info,
 		       struct message_info, i);
+	if (closing)
+	    msg_info->flags &= ~LIBBALSA_MESSAGE_FLAG_RECENT;
 	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
 	    break;
 	if (first < 0 && (msg_info->status < 0 || msg_info->x_status < 0))
@@ -1511,7 +1513,8 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     }
 
     orig = lbm_mbox_crlf_filter(orig);
-    orig = lbm_mbox_armor_stream(orig, message->flags);
+    orig = lbm_mbox_armor_stream(orig, (message->flags |
+					LIBBALSA_MESSAGE_FLAG_RECENT));
 
     if (g_mime_stream_write_string(dest, from) < (gint) strlen(from)
 	|| g_mime_stream_write_to_stream (orig, dest) < 0) {

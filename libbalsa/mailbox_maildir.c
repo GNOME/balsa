@@ -466,11 +466,12 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox, GError **err)
 	mdir->mtime_new = st.st_mtime;
     }
 
-    if (!mailbox->readonly)
-	mailbox->readonly = (access(path, W_OK)
-			     || access(mdir->curdir, W_OK)
-			     || access(mdir->newdir, W_OK)
-			     || access(mdir->tmpdir, W_OK)) ? TRUE : FALSE;
+    if (!mailbox->readonly
+	&& (access(mdir->curdir, W_OK) < 0
+	    || access(mdir->newdir, W_OK) < 0
+	    || access(mdir->tmpdir, W_OK) < 0))
+	mailbox->readonly = TRUE;
+
     mailbox->unread_messages = 0;
     parse_mailbox_subdirs(mailbox);
     LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_time = 0;
@@ -512,7 +513,6 @@ static void
 libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
 {
     struct stat st, st_cur, st_new;
-    const gchar *path;
     int modified = 0;
     LibBalsaMailboxMaildir *mdir;
     guint last_msgno;
@@ -521,9 +521,7 @@ libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
 
     mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
 
-    path = libbalsa_mailbox_local_get_path(mailbox);
-
-    if (stat(path, &st) == -1)
+    if (stat(mdir->tmpdir, &st) == -1)
 	return;
     if (st.st_mtime > mdir->mtime)
 	modified = 1;
@@ -578,7 +576,7 @@ free_message_info(struct message_info *msg_info)
 }
 
 static gboolean lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir,
-				      gboolean expunge);
+				      gboolean expunge, gboolean closing);
 
 static void
 libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox)
@@ -592,7 +590,7 @@ libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox)
 
     if (mdir->msgno_2_msg_info)
 	len = mdir->msgno_2_msg_info->len;
-    lbm_maildir_sync_real(mdir, TRUE);
+    lbm_maildir_sync_real(mdir, TRUE, TRUE);
 
     if (mdir->messages_info) {
 	g_hash_table_destroy(mdir->messages_info);
@@ -634,10 +632,12 @@ struct sync_info {
     gchar *path;
     GSList *removed_list;
     gboolean expunge;
+    gboolean closing;
+    gboolean ok;
 };
     
-static void maildir_sync_add(struct message_info *msg_info,
-			     const gchar * path);
+static gboolean maildir_sync_add(struct message_info *msg_info,
+				 const gchar * path);
 
 static void
 maildir_sync(gchar *key, struct message_info *msg_info, struct sync_info *si)
@@ -651,19 +651,28 @@ maildir_sync(gchar *key, struct message_info *msg_info, struct sync_info *si)
 	si->removed_list = g_slist_prepend(si->removed_list, msg_info);
 	return;
     }
-     
-    if (strcmp(msg_info->subdir, "cur") != 0
-	|| msg_info->flags != msg_info->orig_flags)
-	maildir_sync_add(msg_info, si->path);
+
+    if (si->closing)
+	msg_info->flags &= ~LIBBALSA_MESSAGE_FLAG_RECENT;
+    if (((msg_info->flags & LIBBALSA_MESSAGE_FLAG_RECENT)
+	 && strcmp(msg_info->subdir, "new") != 0)
+	|| ((!msg_info->flags & LIBBALSA_MESSAGE_FLAG_RECENT)
+	    && strcmp(msg_info->subdir, "cur") != 0)
+	|| msg_info->flags != msg_info->orig_flags) {
+	if (!maildir_sync_add(msg_info, si->path))
+	    si->ok = FALSE;
+    }
 }
 
-static void
+static gboolean
 maildir_sync_add(struct message_info *msg_info, const gchar * path)
 {
     gchar new_flags[10];
     int len;
+    const gchar *subdir;
     gchar *new;
     gchar *orig;
+    gboolean retval = TRUE;
 
     len = 0;
 
@@ -678,31 +687,42 @@ maildir_sync_add(struct message_info *msg_info, const gchar * path)
 
     new_flags[len] = '\0';
 
-    new = g_strdup_printf("%s/cur/%s%s%s", path, msg_info->key,
+    subdir = msg_info->flags & LIBBALSA_MESSAGE_FLAG_RECENT ? "new" : "cur";
+    new = g_strdup_printf("%s/%s/%s%s%s", path, subdir, msg_info->key,
 			  (len ? ":2," : ""), new_flags);
     orig = g_strdup_printf("%s/%s/%s", path, msg_info->subdir,
 			   msg_info->filename);
-    rename(orig, new);		/* FIXME: change to safe_rename??? */
+    if (strcmp(orig, new)) {
+	if (rename(orig, new) >= 0) /* FIXME: change to safe_rename??? */
+	    msg_info->subdir = subdir;
+	else
+	    retval = FALSE;
+    }
     g_free(orig);
     g_free(new);
     new = g_strdup_printf("%s%s%s", msg_info->key, (len ? ":2," : ""),
 			  new_flags);
     g_free(msg_info->filename);
-    msg_info->subdir = "cur";
     msg_info->filename = new;
     msg_info->orig_flags = msg_info->flags;
+
+    return retval;
 }
 
 static void
 maildir_renumber(gchar * key, struct message_info *msg_info,
 		      struct message_info *removed)
 {
-    if (msg_info->msgno > removed->msgno)
+    if (msg_info->msgno > removed->msgno) {
 	msg_info->msgno--;
+	if (msg_info->message)
+	    msg_info->message->msgno = msg_info->msgno;
+    }
 }
 
 static gboolean
-lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir, gboolean expunge)
+lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir, gboolean expunge,
+		      gboolean closing)
 {
     /*
      * foreach message_info
@@ -718,8 +738,14 @@ lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir, gboolean expunge)
 	g_strdup(libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX(mdir)));
     si.removed_list = NULL;
     si.expunge = expunge;
+    si.closing = closing;
+    si.ok = TRUE;
     g_hash_table_foreach(mdir->messages_info, (GHFunc) maildir_sync, &si);
     g_free(si.path);
+    if (!si.ok) {
+	g_slist_free(si.removed_list);
+	return FALSE;
+    }
 
     for (l = si.removed_list; l; l = l->next) {
 	struct message_info *removed = l->data;
@@ -748,7 +774,7 @@ libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     g_assert(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
 
     return lbm_maildir_sync_real(LIBBALSA_MAILBOX_MAILDIR(mailbox),
-				 expunge);
+				 expunge, FALSE);
 }
 
 static struct message_info *message_info_from_msgno(
@@ -832,6 +858,7 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     char *new_filename;
     struct message_info *msg_info;
     GMimeStream *in_stream;
+    gint retval;
 
     /* open tempfile */
     path = libbalsa_mailbox_local_get_path(mailbox);
@@ -867,12 +894,12 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     msg_info->subdir = "tmp";
     msg_info->key = g_strdup(new_filename);
     msg_info->filename = g_strdup(new_filename);
-    msg_info->flags = message->flags;
-    maildir_sync_add(msg_info, path);
+    msg_info->flags = message->flags | LIBBALSA_MESSAGE_FLAG_RECENT;
+    retval = maildir_sync_add(msg_info, path) ? 1 : -1;
     free_message_info(msg_info);
     g_free(tmp);
 
-    return 1;
+    return retval;
 }
 
 static void

@@ -1140,11 +1140,9 @@ void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
 {
     g_return_if_fail(mbox && messages);
 
-    LOCK_MAILBOX(mbox);
     g_signal_emit(G_OBJECT(mbox),
 		  libbalsa_mailbox_signals[MESSAGES_STATUS_CHANGED], 0,
 		  messages, flag);
-    UNLOCK_MAILBOX(mbox);
 }
 
 gboolean

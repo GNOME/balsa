@@ -57,9 +57,9 @@ enum _LibBalsaCodeset {
     RUSSIAN,            /* koi-8r */
     UKRAINE,            /* koi-8u */
     JAPAN,              /* euc-jp */
-    KOREA               /* euc-kr */
+    KOREA,              /* euc-kr */
+    LIBBALSA_NUM_CODESETS
 };
-#define LIBBALSA_NUM_CODESETS 18
 
 gchar *libbalsa_lookup_mime_type(const gchar * path);
 gchar *libbalsa_make_string_from_list(const GList *);

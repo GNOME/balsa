@@ -272,11 +272,13 @@ typedef struct {
 } LibBalsaMailboxLocalInfo;
 
 static void
-lbm_local_free_info(LibBalsaMailboxLocalInfo *threading_info)
+lbm_local_free_info(LibBalsaMailboxLocalInfo *info)
 {
-    g_free(threading_info->message_id);
-    g_list_foreach(threading_info->refs_for_threading, (GFunc) g_free, NULL);
-    g_list_free(threading_info->refs_for_threading);
+    g_free(info->message_id);
+    info->message_id = NULL;
+    g_list_foreach(info->refs_for_threading, (GFunc) g_free, NULL);
+    g_list_free(info->refs_for_threading);
+    info->refs_for_threading = NULL;
 }
     
 static void
@@ -294,11 +296,8 @@ libbalsa_mailbox_local_finalize(GObject * object)
     }
 
     if (ml->threading_info) {
-	guint i;
-	for (i = 0; i < ml->threading_info->len; i++)
-	    lbm_local_free_info(&g_array_index(ml->threading_info,
-					       LibBalsaMailboxLocalInfo,
-					       i));
+	/* The memory owned by ml->threading_info was freed on closing,
+	 * so we free only the array itself. */
 	g_array_free(ml->threading_info, TRUE);
 	ml->threading_info = NULL;
     }
@@ -354,6 +353,17 @@ libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox)
         g_source_remove(local->sync_id);
         local->sync_id = 0;
     }
+
+    if (local->threading_info) {
+	/* Free the memory owned by local->threading_info, but neither
+	 * free nor truncate the array. */
+	guint i;
+	for (i = 0; i < local->threading_info->len; i++)
+	    lbm_local_free_info(&g_array_index(local->threading_info,
+					       LibBalsaMailboxLocalInfo,
+					       i));
+    }
+
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
 }
@@ -423,18 +433,18 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox, guint msgno)
 
 	++new_messages;
 	if (local->threading_info) {
-	    LibBalsaMailboxLocalInfo threading_info = { 0 };
+	    LibBalsaMailboxLocalInfo info_val = { 0 };
 	    LibBalsaMailboxLocalInfo *info;
 
 	    while (local->threading_info->len < msgno)
-		g_array_append_val(local->threading_info, threading_info);
+		g_array_append_val(local->threading_info, info_val);
 	    info = &g_array_index(local->threading_info,
 				  LibBalsaMailboxLocalInfo, msgno - 1);
-	    if (!info->message_id)
-		info->message_id = g_strdup(msg->message_id);
-	    if (!info->refs_for_threading)
-		info->refs_for_threading =
-		    libbalsa_message_refs_for_threading(msg);
+	    g_assert(info->message_id == NULL);
+	    info->message_id = g_strdup(msg->message_id);
+	    g_assert(info->refs_for_threading == NULL);
+	    info->refs_for_threading =
+		libbalsa_message_refs_for_threading(msg);
 	    /* While we have the message, force mailbox to create
 	     * the index entry: */
 	    libbalsa_mailbox_msgno_get_subject(mailbox, msgno);

@@ -9,6 +9,7 @@
 	libbalsa_mailbox_remote_set_server().
 	* libbalsa/misc.c: remove remainings of old ImapDir code.
 	* libbalsa/folder-scanners.[hc]: added.
+	* libbalsa/libbalsa.h: remove deprecated imapdir.h
 
 	* src/Makefile.am: remove local-mailbox.[hc]
 	* src/balsa-app.c: remove deprecated local-mailbox.h

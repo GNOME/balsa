@@ -35,7 +35,6 @@ typedef struct body MuttBody;
 
 #include "address.h"
 #include "message.h"
-#include "imapdir.h"
 #include "body.h"
 #include "files.h"
 #include "misc.h"

@@ -308,15 +308,17 @@ get_main_menu(GtkWidget * window, GtkWidget ** menubar,
 
     for (cnt = 1, ab = address_books; ab; ab = ab->next, cnt++) {
         LibBalsaAddressBook *address_book;
+	gchar *label;
         guint merge_id;
         gchar *accelerator;
         GtkRadioAction *radio_action;
 
         address_book = LIBBALSA_ADDRESS_BOOK(ab->data);
 
-        radio_action = gtk_radio_action_new(address_book->name,
-                                            address_book->name, NULL,
-                                            NULL, cnt - 1);
+        label = g_strdup_printf("_%d:%s", cnt, address_book->name);
+        radio_action = gtk_radio_action_new(address_book->name, label,
+                                            NULL, NULL, cnt - 1);
+	g_free(label);
         if (group)
             gtk_radio_action_set_group(radio_action, group);
         else {

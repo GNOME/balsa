@@ -650,6 +650,7 @@ static void really_cb( gint reply, GnomeDruid *druid )
 
 static void finish_cb( GnomeDruidPage *page, GnomeDruid *druid )
 {
+    config_global_save();
     druid_destroy_cb( druid );
 }
 

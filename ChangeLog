@@ -1,3 +1,10 @@
+2004-01-11  Pawel Salek
+
+	* libbalsa/filter-funcs.[hc]: fix remaining problems with
+	converting LibBalsaCondition to/from string.
+	* src/filter-edit-{callbacks,dialog}.c: edit conditions correctly.
+	* src/save-restore.c: append filters to the filter list.
+
 2004-01-10 05:28  PeterB
 
 	* libbalsa/mailbox.c, libbalsa/mailbox.h, libbalsa/mailbox_imap.c,

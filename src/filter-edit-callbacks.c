@@ -1596,7 +1596,6 @@ fe_new_pressed(GtkWidget * widget, gpointer data)
     /* Fill the filter with default values */
 
     fil->name=g_strdup(new_item);
-    /* FIXME: fil->conditions_op=FILTER_OP_OR; */
 
     FILTER_SETFLAG(fil,FILTER_COMPILED);
     fil->action=FILTER_MOVE;
@@ -1680,6 +1679,7 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     const gchar *temp;
     GtkWidget * menu;
     FilterActionType action;
+    ConditionMatchType condition_op;
 
     if (!gtk_tree_selection_get_selected(selection, &model, &iter))
         return;
@@ -1730,11 +1730,10 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
                                  (fe_op_codes_option_menu))));
 
     /* Set the op-codes associated with the selected item */
+    condition_op =
+        GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu),"value"))
+        ? CONDITION_OR : CONDITION_AND;
 
-    /* FIXME:
-       fil->conditions_op =
-       GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu),"value"));
-    */
     /* Retrieve all conditions for that filter */
 
     FILTER_SETFLAG(fil,FILTER_VALID);
@@ -1746,12 +1745,14 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
      * filter_append_condition, So that's OK
      */
     FILTER_SETFLAG(fil,FILTER_COMPILED);
-
+    gtk_tree_model_get_iter_first(cond_model, &cond_iter);
     do {
         LibBalsaCondition *cond;
 
         gtk_tree_model_get(cond_model, &cond_iter, 1, &cond, -1);
-        libbalsa_filter_prepend_condition(fil, libbalsa_condition_clone(cond));
+        libbalsa_filter_prepend_condition(fil,
+                                          libbalsa_condition_clone(cond),
+                                          condition_op);
     } while (gtk_tree_model_iter_next(cond_model, &cond_iter));
 
     if (filter_errno!=FILTER_NOERR) {
@@ -1828,6 +1829,19 @@ fe_revert_pressed(GtkWidget * widget, gpointer data)
  * Callback function handling the selection of a row in the filter list
  * so that we can refresh the notebook page
  */
+static void
+fill_condition_list(GtkTreeModel *model, LibBalsaCondition *condition)
+{
+    GtkTreeIter iter;
+    if(!condition || condition->type == CONDITION_OR ||
+       condition->type == CONDITION_AND) return;
+
+    gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
+    gtk_list_store_set(GTK_LIST_STORE(model), &iter,
+                       0, _(fe_search_type[condition->type-1].text),
+                       1, libbalsa_condition_clone(condition),
+                       -1);
+}
 
 void
 fe_filters_list_selection_changed(GtkTreeSelection * selection,
@@ -1836,10 +1850,7 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
     GtkTreeModel *model;
     GtkTreeIter iter;
     LibBalsaFilter* fil;
-#if FIXME
-    LibBalsaCondition* cnd;
-    GSList *list;
-#endif
+    int pos;
 
     if (!gtk_tree_selection_get_selected(selection, &model, &iter)) {
         if (gtk_tree_model_iter_n_children(model, NULL) == 0)
@@ -1863,10 +1874,10 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
     
     gtk_option_menu_set_history(GTK_OPTION_MENU(fe_action_option_menu), 
                                 fil->action-1);
-#ifdef FIXME
+    pos = (fil->condition && fil->condition->type == CONDITION_AND)
+        ? 1 : 0;
     gtk_option_menu_set_history(GTK_OPTION_MENU(fe_op_codes_option_menu), 
-                                fil->conditions_op-1);
-#endif
+                                pos);
     if (fil->action!=FILTER_TRASH && fil->action_string)
         balsa_mblist_mru_option_menu_set(fe_mailboxes,
                                          fil->action_string);
@@ -1879,17 +1890,7 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
 
     /* Populate the conditions list */
     filter_errno=FILTER_NOERR;
-#if FIXME
-    for (list=fil->conditions;
-         list && filter_errno==FILTER_NOERR;list=g_slist_next(list)) {
-        cnd=(LibBalsaCondition*) list->data;
-        gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
-        gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                           0, _(fe_search_type[cnd->type-1].text),
-                           1, libbalsa_condition_clone(cnd),
-                           -1);
-    }
-#endif
+    fill_condition_list(model, fil->condition);
     if (filter_errno!=FILTER_NOERR)
         gtk_widget_destroy(fe_window);
 

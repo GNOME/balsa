@@ -552,19 +552,13 @@ filters_edit_dialog(void)
 
 	FILTER_CLRFLAG(cpfil,FILTER_COMPILED);
 	/* Copy conditions */
+        cpfil->condition = libbalsa_condition_clone(fil->condition);
 #if FIXME
-      	for (cnds=fil->conditions; cnds; cnds=g_slist_next(cnds)) {
-            LibBalsaCondition *c = (LibBalsaCondition*)cnds->data;
-	    cpfil->conditions = 
-                g_slist_prepend(cpfil->conditions,libbalsa_condition_clone(c));
-
-	    /* If this condition is a match on a user header,
-	       add the user header name to the combo list */
-	    if (CONDITION_CHKMATCH(c,CONDITION_MATCH_US_HEAD) &&
-		c->user_header && c->user_header[0])
-		fe_add_new_user_header(c->user_header);
-        }
-	cpfil->conditions=g_slist_reverse(cpfil->conditions);
+        /* If this condition is a match on a user header,
+           add the user header name to the combo list */
+        if (CONDITION_CHKMATCH(c,CONDITION_MATCH_US_HEAD) &&
+            c->user_header && c->user_header[0])
+            fe_add_new_user_header(c->user_header);
 #endif
 	cpfil->action=fil->action;
 	if (fil->action_string) 

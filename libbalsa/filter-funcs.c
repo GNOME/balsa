@@ -63,6 +63,7 @@ append_quoted_string(GString *res, const char *str)
             g_string_append_c(res, '\\');
         g_string_append_c(res, *str++);
     }
+    g_string_append_c(res, '"');
 }
 
 #ifndef FIXME
@@ -80,7 +81,7 @@ libbalsa_condition_new(void)
 #endif
 
 static LibBalsaCondition*
-libbalsa_condition_new_simple(gboolean negated, gchar **string)
+libbalsa_condition_new_string(gboolean negated, gchar **string)
 {
     LibBalsaCondition *cond;
     char *str, *user_header = NULL;
@@ -89,7 +90,7 @@ libbalsa_condition_new_simple(gboolean negated, gchar **string)
         ;
     if((*string)[i] != ' ')
         return NULL;
-    *string += i;
+    *string += i+1;
     if( headers & CONDITION_MATCH_US_HEAD) {
         user_header = get_quoted_string(string);
         if(!user_header)
@@ -236,7 +237,7 @@ libbalsa_condition_new_from_string(gchar **string)
         unsigned keylen;
         LibBalsaCondition *(*parser)(gboolean negate, gchar **str);
     } cond_types[] = {
-        { "STRING ", 7, libbalsa_condition_new_simple },
+        { "STRING ", 7, libbalsa_condition_new_string },
         { "DATE ",   5, libbalsa_condition_new_date   },
         { "FLAG ",   5, libbalsa_condition_new_flag   },
         { "AND ",    4, libbalsa_condition_new_and    },
@@ -394,9 +395,9 @@ libbalsa_condition_clone(LibBalsaCondition* cnd)
     switch (new_cnd->type) {
     case CONDITION_STRING:
         new_cnd->match.string.string  = g_strdup(cnd->match.string.string);
-    if (cnd->match.string.user_header)
-	new_cnd->match.string.user_header = 
-            g_strdup(cnd->match.string.user_header);
+    new_cnd->match.string.user_header 
+        = (cnd->match.string.user_header)
+        ? g_strdup(cnd->match.string.user_header) : NULL;
         break;
     case CONDITION_REGEX:
 # if 0
@@ -601,18 +602,17 @@ filter_condition_validity(LibBalsaFilter* fil, LibBalsaCondition* cond)
 }
 
 void
-libbalsa_filter_prepend_condition(LibBalsaFilter* fil, LibBalsaCondition* cond)
+libbalsa_filter_prepend_condition(LibBalsaFilter* fil, LibBalsaCondition* cond,
+                                  ConditionMatchType op)
 {
-    LibBalsaCondition *c;
-
     filter_condition_validity(fil,cond);
 
-    c = g_new(LibBalsaCondition,1);
-    c->negate = FALSE;
-    c->type = CONDITION_OR;
-    c->match.andor.left  = cond;
-    c->match.andor.right = fil->condition;
-    fil->condition = c;
+    if(fil->condition)
+        fil->condition = libbalsa_condition_new_bool_ptr(FALSE,op,
+                                                         fil->condition,
+                                                         cond);
+    else
+        fil->condition = cond;
 }
 
 /*

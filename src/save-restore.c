@@ -1638,6 +1638,8 @@ config_filters_load(void)
 	    fil = libbalsa_filter_new_from_config();
 	    FILTER_SETFLAG(fil,FILTER_VALID);
 	    FILTER_SETFLAG(fil,FILTER_COMPILED);
+            balsa_app.filters = 
+                g_slist_prepend(balsa_app.filters, fil);
 	    gnome_config_pop_prefix();
 	}
 	g_free(key);	

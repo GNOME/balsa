@@ -1,3 +1,18 @@
+2004-02-27 07:06  PeterB
+
+	* src/main-window.c: don't free the condition used by find_real.
+	* src/: balsa-index.c, balsa-index.h: use LibBalsaMailboxSearchIter
+	and revise search code; remove unnecessary searches; remove
+	"row-collapsed" signal handler.
+	* libbalsa/: mailbox_imap.c, mailbox_local.c: new api for
+	message_match class method; new search_iter_free class method for
+	freeing backend-specific data.
+	* libbalsa/: mailbox.c, mailbox.h: implement LibBalsaMailboxSearchIter:
+	change api for libbalsa_mailbox_message_match;
+	implement libbalsa_mailbox_search_iter_{new,free,step};
+	remove libbalsa_mailbox_find.
+	* libbalsa/filter-funcs.c: add missing lines (typos?).
+
 2004-02-26  Abel Cheung  <maddog@linux.org.hk>
 
 	* balsa.desktop: Fix badly encoded strings.

@@ -45,7 +45,7 @@ typedef size_t (*ImapAppendFunc)(char*, size_t, void*);
 ImapResponse imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
                               ImapMsgFlags flags, size_t sz, 
                               ImapAppendFunc dump_cb,  void* arg);
-#if USE_IMAP_APPEND_STR /* not used currently */
+#ifdef USE_IMAP_APPEND_STR /* not used currently */
 ImapResponse imap_mbox_append_str(ImapMboxHandle *handle, const char *mbox,
                               ImapMsgFlags flags, size_t sz, char *txt);
 #endif

@@ -46,8 +46,6 @@
 #include "siobuf.h"
 #include "util.h"
 
-FILE *debug_stream = NULL;
-
 #define LONG_STRING 512
 #define ELEMENTS(x) (sizeof (x) / sizeof(x[0]))
 
@@ -572,6 +570,8 @@ imap_mbox_handle_finalize(GObject* gobject)
 
   mbox_view_dispose(&handle->mbox_view);
   imap_mbox_resize_cache(handle, 0);
+
+  G_OBJECT_CLASS(parent_class)->finalize(gobject);  
 }
 
 typedef void (*ImapTasklet)(ImapMboxHandle*, void*);
@@ -714,7 +714,7 @@ imap_mbox_set_view(ImapMboxHandle *h, ImapMsgFlag fl, gboolean state)
   rc = imap_cmd_exec(h, cmd);
   g_free(cmd);
   h->search_cb = cb; h->search_arg = arg;
-  return 1;
+  return rc == IMR_OK;
 }
 
 const char*
@@ -1084,9 +1084,8 @@ imap_cmd_exec(ImapMboxHandle* handle, const char* cmd)
     return IMR_SEVERED;
 
   /* create sequence for command */
-  rc = imap_cmd_start(handle, cmd, &cmdno);
-  if (rc<0) /* irrecoverable connection error. */
-    return IMR_SEVERED;
+  if (imap_cmd_start(handle, cmd, &cmdno)<0)
+    return IMR_SEVERED;  /* irrecoverable connection error. */
 
   sio_flush(handle->sio);
   do {
@@ -1238,8 +1237,6 @@ imap_get_astring(struct siobuf *sio, int* lookahead)
 */
 
 #include "imap-handle.h"
-
-ImapResponse (*handler)(ImapMboxHandle *h);
 
 static void
 ignore_bad_charset(struct siobuf *sio, int c)
@@ -1432,7 +1429,7 @@ ir_list_lsub(ImapMboxHandle *h, ImapHandleSignal signal)
     "HasChildren", "HasNoChildren"
   };
   int flags = 0;
-  char buf[LONG_STRING], *s;
+  char buf[LONG_STRING], *s, *mbx;
   int c, delim;
   ImapResponse rc;
 
@@ -1464,10 +1461,12 @@ ir_list_lsub(ImapMboxHandle *h, ImapHandleSignal signal)
   if(sio_getc(h->sio) != ' ') return IMR_PROTOCOL;
   /* mailbox */
   s = imap_get_astring(h->sio, &c);
+  mbx = imap_mailbox_to_utf8(s);
   rc = ir_check_crlf(h, c);
   g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[signal],
-                0, delim, &flags, s);
+                0, delim, &flags, mbx);
   g_free(s);
+  g_free(mbx);
   return rc;
 }
 

@@ -28,4 +28,7 @@ void lit_conv_to_base64(char *out, const char *in,
                         size_t len, size_t olen);
 int lit_conv_from_base64(char *out, const char *in);
 
+char* imap_mailbox_to_utf8(const unsigned char *src);
+char* imap_utf8_to_mailbox(const unsigned char *src);
+
 #endif

@@ -30,7 +30,7 @@
 #include "imap_private.h"
 
 /* ordered from strongest to weakest */
-ImapAuthenticator imap_authenticators_arr[] = {
+static ImapAuthenticator imap_authenticators_arr[] = {
   imap_auth_cram,
   imap_auth_login,
   NULL

@@ -1,3 +1,17 @@
+2004-02-03  Pawel Salek
+
+	* libbalsa/imap/imap-auth.c: cleanup.
+	* libbalsa/imap/imap-commands.[hc]: use proper UTF-7 encoding.
+	* libbalsa/imap/imap-handle.[hc]: ditto. Cleanup.
+	* libbalsa/imap/util.[hc]: add routines for UTF-7 encoding.
+
+2004-02-30  Pawel Salek
+
+	* configure.in, NEWS: release 2.1.1
+	* libbalsa/mailbox.c: do not die when an unvisible message is
+	  modified.
+	* src/main-window.c: improve filtering support.
+
 2004-02-29 11:22  PeterB
 
 	* src/balsa-index.c: emit "changed" signal even when no message is

@@ -422,9 +422,30 @@ gchar *
 libbalsa_get_hostname(void)
 {
     struct utsname utsname;
+    gchar *p, *ret;
     uname(&utsname);
 
-    return g_strdup(utsname.nodename);
+    /* Some systems return Fqdn rather than just the hostname */
+    if ((p = strchr (utsname.nodename, '.')))
+    {
+	*p = 0;
+	ret = g_strdup (utsname.nodename);
+    } else {
+	ret = g_strdup (utsname.nodename);
+    }
+
+    return ret;
+}
+
+gchar *
+libbalsa_get_domainname(void)
+{
+    char domainname[SYS_NMLN];
+
+    if ( getdnsdomainname(domainname, SYS_NMLN) == 0 ) {
+	return g_strdup(domainname);
+    }
+    return NULL;
 }
 
 /* FIXME: Move to address.c and change name to

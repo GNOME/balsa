@@ -37,6 +37,8 @@
 static GMutex *mutt_lock;
 #endif
 
+static gchar *Domainname;
+
 void mutt_message(const char *fmt, ...);
 void mutt_exit(int code);
 int mutt_yesorno(const char *msg, int def);
@@ -98,12 +100,16 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     Realname = g_get_real_name();
 
     Hostname = libbalsa_get_hostname();
+    Domainname = libbalsa_get_domainname();
 
     libbalsa_real_information_func = information_callback;
 
     mutt_error = libbalsa_mutt_error;
 
-    Fqdn = g_strdup(Hostname);
+    if ( Domainname ) 
+	Fqdn = g_strdup_printf("%s.%s", Hostname, Domainname);
+    else
+	Fqdn = g_strdup(Hostname);
 
     Sendmail = SENDMAIL;
 

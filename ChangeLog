@@ -1,3 +1,13 @@
+2000-12-20  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/libbalsa.c (libbalsa_init): Properly construct Fqdn
+	from hostname and domainname. This makes Message-ID generation
+	much securer.
+
+	* libbalsa/misc.c (libbalsa_get_hostname): Strip domain name on
+	systems which return it.
+	(libbalsa_get_domainname): New function. Gets domain name.
+
 2000-12-19  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/balsa-message.c: Add a very simple link_clicked handler to

@@ -67,6 +67,7 @@ MailboxNode *mailbox_node_new(const gchar * name, LibBalsaMailbox * mb,
 void mailbox_node_destroy(MailboxNode * mbn);
 
 gchar *libbalsa_get_hostname(void);
+gchar *libbalsa_get_domainname(void);
 
 gboolean libbalsa_find_word(const gchar * word, const gchar * str);
 void libbalsa_wrap_string(gchar * str, int width);

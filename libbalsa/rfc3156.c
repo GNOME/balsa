@@ -36,6 +36,9 @@
 #  include "misc.h"
 #endif
 
+#include "padlock-keyhole.xpm"
+
+
 typedef struct _MailDataMBox MailDataMBox;
 typedef struct _MailDataBuffer MailDataBuffer;
 typedef struct _PassphraseCB PassphraseCB;
@@ -1573,6 +1576,8 @@ select_key_from_list(int secret_only, const gchar *for_address, GList *keys,
 		     GtkWindow *parent)
 {
     GtkWidget *dialog;
+    GtkWidget *vbox;
+    GtkWidget *label;
     GtkWidget *scrolled_window;
     GtkWidget *tree_view;
     GtkTreeStore *model;
@@ -1589,24 +1594,26 @@ select_key_from_list(int secret_only, const gchar *for_address, GList *keys,
 					 GTK_STOCK_OK, GTK_RESPONSE_OK,
 					 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 					 NULL);
-
+    vbox = gtk_vbox_new(FALSE, 12);
+    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), vbox);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 12);
     if (secret_only)
 	prompt = g_strdup_printf(_("Select the private key for the signer %s"),
 				 for_address);
     else
 	prompt = g_strdup_printf(_("Select the public key for the recipient %s"),
 				 for_address);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),
-		       gtk_label_new(prompt), FALSE, TRUE, 0);
+    label = gtk_label_new(prompt);
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
     g_free(prompt);
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
 
     scrolled_window = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolled_window),
 					 GTK_SHADOW_ETCHED_IN);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
-				    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),
-		       scrolled_window, TRUE, TRUE, 0);
+				    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 0);
 
     model = gtk_tree_store_new (GPG_KEY_NUM_COLUMNS, G_TYPE_STRING,
 				G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
@@ -1847,23 +1854,30 @@ read_cb_MailDataBuffer(void *hook, char *buffer, size_t count)
 #ifdef ENABLE_PCACHE
 /* helper functions for the passphrase cache */
 /*
- * destroy a bf_crypt_T data object by first overwriting the encrypted data
+ * destroy a pcache_elem_T object by first overwriting the encrypted data
  * with random crap and then freeing all allocated stuff
  */
-static bf_crypt_T *
-bf_destroy(bf_crypt_T *crypt)
+static void
+bf_destroy(pcache_elem_T * pcache_elem)
 {
-    if (crypt) {
-	unsigned char *p = crypt->buf;
+    bf_crypt_T * pf = pcache_elem->passphrase;
+    gint n;
+
+    fprintf(stderr, "%s for (pcache_elem_T *)%p\n", __FUNCTION__, pcache_elem);
+    if (pf) {
+	unsigned char *p = pf->buf;
 
 	if (p) {
-	    while (crypt->len--)
+	    while (pf->len--)
 		*p++ = random();
-	    g_free(crypt->buf);
+	    g_free(pf->buf);
 	}
-	g_free(crypt);
+	g_free(pf);
+	pcache_elem->passphrase = NULL;
     }
-    return NULL;
+    for (n = 0; n < MD5_DIGEST_LENGTH; n++)
+	pcache_elem->name[n] = random();
+    g_free(pcache_elem);
 }
 
 
@@ -1953,11 +1967,10 @@ pcache_timeout(pcache_T *cache)
 	pcache_elem_T *elem = (pcache_elem_T *)list->data;
 
 	if (elem->expires <= now) {
-	    GList *next = list->next;
+	    GList *next = g_list_next(list);
 
-	    elem->passphrase = bf_destroy(elem->passphrase);
-	    g_free(elem);
-	    cache->cache = g_list_delete_link(cache->cache, list);
+	    cache->cache = g_list_remove(cache->cache, elem);
+	    bf_destroy(elem);
 	    list = next;
 	} else
 	    list = g_list_next(list);
@@ -1992,9 +2005,8 @@ check_cache(pcache_T *cache, const gchar *uid_hint, int prev_was_bad)
 	if (!memcmp(tofind, elem->name, MD5_DIGEST_LENGTH)) {
 	    /* check if the last entry was bad */
 	    if (prev_was_bad) {
-		elem->passphrase = bf_destroy(elem->passphrase);
-		g_free(elem);
-		cache->cache = g_list_delete_link(cache->cache, list);
+		cache->cache = g_list_remove(cache->cache, elem);
+		bf_destroy(elem);
 		return NULL;
 	    } else
 		return bf_decrypt(elem->passphrase, &cache->bf_key);
@@ -2016,7 +2028,7 @@ destroy_cache(int signo)
     if (pcache) {
 	int n;
 
-	fprintf(stderr, "caught signal %d, destroy passphrase cache...\n",
+	fprintf(stderr, "caught signal %d, destroy passphrase cache keys...\n",
 		signo);
 	for (n = 0; n < 16; n++)
 	    pcache->bf_key.key[n] = 0;
@@ -2025,6 +2037,33 @@ destroy_cache(int signo)
 	pcache->cache = NULL;
     }
     segvhandler(signo);
+}
+
+
+/*
+ * destroy all cached passphrases and the cache itself (called upon exiting
+ * the main gtk loop)
+ */
+static gint
+clear_pcache(pcache_T *cache)
+{
+    gint n;
+
+    if (cache) {
+	fprintf(stderr, "erasing password cache at (pcache_T *)%p\n", cache);
+	if (cache->cache) {
+	    g_list_foreach(cache->cache, (GFunc)bf_destroy, NULL);
+	    g_list_free(cache->cache);
+	    cache->cache = NULL;
+	}
+
+	for (n = 0; n < 16; n++)
+	    cache->bf_key.key[n] = random();
+	for (n = 0; n < 8; n++)
+	    cache->bf_key.iv[n] = random();
+    }
+
+    return 0;
 }
 
 
@@ -2075,6 +2114,9 @@ init_pcache()
 	/* generate a random blowfish key */
 	RAND_bytes(cache->bf_key.key, 16);
 	RAND_bytes(cache->bf_key.iv, 8);
+
+	/* destroy the cache when exiting the application */
+	gtk_quit_add(0, (GtkFunction)clear_pcache, cache);
 	
 	/* install a segv handler to destroy the cache on crash */
 	segvhandler = signal(SIGSEGV, destroy_cache);
@@ -2111,7 +2153,8 @@ get_passphrase_real(PassphraseCB *cb_data, const gchar *uid_hint,
 		    int prev_was_bad)
 #endif
 {
-    GtkWidget *dialog, *entry;
+    static GdkPixbuf * padlock_keyhole = NULL;
+    GtkWidget *dialog, *entry, *vbox, *hbox;
     gchar *prompt, *passwd;
 #ifdef ENABLE_PCACHE
     GtkWidget *cache_but = NULL, *cache_min = NULL;
@@ -2124,7 +2167,19 @@ get_passphrase_real(PassphraseCB *cb_data, const gchar *uid_hint,
                                          GTK_STOCK_OK, GTK_RESPONSE_OK,
                                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                          NULL);
-    gtk_box_set_spacing(GTK_BOX(GTK_DIALOG(dialog)->vbox), 12);
+    
+    hbox = gtk_hbox_new(FALSE, 12);
+    gtk_container_set_border_width(GTK_CONTAINER(hbox), 12);
+    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), hbox);
+
+    vbox = gtk_vbox_new(FALSE, 12);
+    gtk_container_add(GTK_CONTAINER(hbox), vbox);
+    if (!padlock_keyhole)
+	padlock_keyhole = gdk_pixbuf_new_from_xpm_data(padlock_keyhole_xpm);
+    gtk_box_pack_start(GTK_BOX(vbox), gtk_image_new_from_pixbuf (padlock_keyhole), FALSE, FALSE, 0);
+
+    vbox = gtk_vbox_new(FALSE, 12);
+    gtk_container_add(GTK_CONTAINER(hbox), vbox);
     if (prev_was_bad)
 	prompt = 
 	    g_strdup_printf(_("The passphrase for this key was bad, please try again!\n\nKey: %s"),
@@ -2133,18 +2188,15 @@ get_passphrase_real(PassphraseCB *cb_data, const gchar *uid_hint,
 	prompt = 
 	    g_strdup_printf(_("Please enter the passphrase for the secret key!\n\nKey: %s"),
 			    uid_hint);
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
-                      gtk_label_new(prompt));
+    gtk_container_add(GTK_CONTAINER(vbox), gtk_label_new(prompt));
     g_free(prompt);
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
-                      entry = gtk_entry_new());
+    entry = gtk_entry_new();
+    gtk_container_add(GTK_CONTAINER(vbox), entry);
 
 #ifdef ENABLE_PCACHE
     if (pcache->enable) {
-	GtkWidget *hbox;
-
-	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
-			  hbox = gtk_hbox_new(FALSE, 12));
+	hbox = gtk_hbox_new(FALSE, 12);
+	gtk_container_add(GTK_CONTAINER(vbox), hbox);
 	cache_but = 
 	    gtk_check_button_new_with_label(_("remember passphrase for"));
 	gtk_box_pack_start(GTK_BOX(hbox), cache_but, FALSE, FALSE, 0);

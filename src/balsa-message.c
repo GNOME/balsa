@@ -231,7 +231,7 @@ static void part_info_init_pgp_signature(BalsaMessage * bm,
 					 BalsaPartInfo * info);
 static gboolean part_info_init_mimetext_rfc2440(BalsaMessage * bm,
 						BalsaPartInfo * info,
-						gchar * ptr, FILE * fp);
+						gchar ** ptr, FILE * fp);
 static GdkPixbuf * check_crypto_content(LibBalsaMessageBody * body,
 					gchar ** icon_title);
 
@@ -1910,7 +1910,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 
 #ifdef HAVE_GPGME
 	/* check and handle RFC2440 message parts */
-	show_get_pubkey_but = part_info_init_mimetext_rfc2440(bm, info, ptr, fp);
+	show_get_pubkey_but = part_info_init_mimetext_rfc2440(bm, info, &ptr, fp);
 #endif
 
         if (libbalsa_message_body_is_flowed(info->body)) {
@@ -3808,7 +3808,7 @@ part_info_init_pgp_signature(BalsaMessage * bm, BalsaPartInfo * info)
  */
 static gboolean
 part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info,
-				gchar * ptr, FILE * fp)
+				gchar ** ptr, FILE * fp)
 {
     gint rfc2440mode;
     gchar *charset;
@@ -3817,7 +3817,7 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info,
     gboolean rfc2440_no_pubkey = FALSE;
 
     /* check if this is a RFC2440 part */
-    rfc2440mode = libbalsa_rfc2440_check_buffer(ptr);
+    rfc2440mode = libbalsa_rfc2440_check_buffer(*ptr);
     if ((rfc2440mode & LIBBALSA_PROTECT_OPENPGP) == 0)
 	return FALSE;
 
@@ -3828,12 +3828,12 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info,
     /* do the rfc2440 stuff */
     if (rfc2440mode == LIBBALSA_PROTECT_SIGN)
 	sig_res = 
-	    libbalsa_rfc2440_check_signature(&ptr, charset, 
+	    libbalsa_rfc2440_check_signature(ptr, charset, 
 					     TRUE, &info->body->sig_info,
 					     balsa_app.date_string);
     else
 	sig_res = 
-	    libbalsa_rfc2440_decrypt_buffer(&ptr, charset, 
+	    libbalsa_rfc2440_decrypt_buffer(ptr, charset, 
 					    balsa_app.convert_unknown_8bit,
 					    balsa_app.convert_unknown_8bit_codeset,
 					    TRUE, &info->body->sig_info,
@@ -3898,7 +3898,7 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info,
     
     /* overwrite the tmp buffer */
     fp = freopen(info->body->temp_filename, "w+", fp);
-    fwrite(ptr, strlen(ptr), 1, fp);
+    fwrite(*ptr, strlen(*ptr), 1, fp);
     fflush(fp);
     g_free(charset);
 

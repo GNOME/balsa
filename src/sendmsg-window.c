@@ -701,9 +701,6 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     if (bsmsg->orig_message) {
 	if (bsmsg->orig_message->mailbox)
 	    libbalsa_mailbox_close(bsmsg->orig_message->mailbox);
-        /* check again! */
-	if (bsmsg->orig_message->mailbox)
-	    g_object_unref(G_OBJECT(bsmsg->orig_message->mailbox));
 	g_object_unref(G_OBJECT(bsmsg->orig_message));
     }
 
@@ -2714,19 +2711,10 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
         /* ref message so we don't lose it even if it is deleted */
 	g_object_ref(G_OBJECT(message));
 	/* reference the original mailbox so we don't loose the
-	   mail even if the mailbox is closed. Alternatively,
-	   one could try using weak references or destroy notification
-	   to take care of it. In such a case, the orig_message field
-	   would be cleared
-
-           we'll reference it both by opening it, in caseit's closed
-           elsewhere, and by ref'ing it, in case the mbnode that owns
-           it is destroyed in a rescan
-	*/
-	if (message->mailbox) {
+	 * mail even if the mailbox is closed.
+	 */
+	if (message->mailbox)
 	    libbalsa_mailbox_open(message->mailbox);
-            g_object_ref(G_OBJECT(message->mailbox));
-        }
     }
 
     g_signal_connect(G_OBJECT(bsmsg->window), "delete-event",
@@ -3581,30 +3569,23 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    gboolean thereturn;
-    
-    thereturn = message_postpone(bsmsg);
+    GList *draft_entry;
 
-    if(thereturn) {
-	GList *draft_entry;
+    if (!message_postpone(bsmsg))
+        return;
 
-	if(bsmsg->orig_message) {
-	    if(bsmsg->orig_message->mailbox)
-		libbalsa_mailbox_close(bsmsg->orig_message->mailbox);
-            /* check again! */
-	    if(bsmsg->orig_message->mailbox)
-	        g_object_unref(G_OBJECT(bsmsg->orig_message->mailbox));
-	    g_object_unref(G_OBJECT(bsmsg->orig_message));
-	}
-	bsmsg->type=SEND_CONTINUE;
-
-	libbalsa_mailbox_open(balsa_app.draftbox);
-	draft_entry=g_list_last(balsa_app.draftbox->message_list);
-	bsmsg->orig_message=LIBBALSA_MESSAGE(draft_entry->data);
-	bsmsg->orig_message->mailbox=balsa_app.draftbox;
-	g_object_ref(G_OBJECT(bsmsg->orig_message));
-    
+    if (bsmsg->orig_message) {
+        if (bsmsg->orig_message->mailbox)
+            libbalsa_mailbox_close(bsmsg->orig_message->mailbox);
+        g_object_unref(G_OBJECT(bsmsg->orig_message));
     }
+    bsmsg->type = SEND_CONTINUE;
+
+    libbalsa_mailbox_open(balsa_app.draftbox);
+    draft_entry = g_list_last(balsa_app.draftbox->message_list);
+    bsmsg->orig_message = LIBBALSA_MESSAGE(draft_entry->data);
+    bsmsg->orig_message->mailbox = balsa_app.draftbox;
+    g_object_ref(G_OBJECT(bsmsg->orig_message));
 }
 
 static void

@@ -21,7 +21,7 @@
 
 #include <string.h>
 #include <gnome.h>
-#if 0
+
 void mutt_message (const char *fmt, ...)
 {
 }
@@ -29,4 +29,8 @@ void mutt_message (const char *fmt, ...)
 void mutt_exit (int code)
 {
 }
-#endif
+
+int mutt_yesorno (const char *msg, int def)
+{
+  return 0;
+}

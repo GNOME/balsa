@@ -1,8 +1,11 @@
 bin_PROGRAMS = balsa
 
 balsa_SOURCES =	\
+	addrbook-manager.c	\
+	addrbook.c		\
 	balsa-app.c		\
 	balsa-index.c		\
+	balsa-init.c		\
 	balsa-message.c		\
 	index-child.c		\
 	local-mailbox.c		\
@@ -14,14 +17,13 @@ balsa_SOURCES =	\
 	new-mailbox.c		\
 	pref-manager.c		\
 	save-restore.c		\
-	sendmsg-window.c	\
-	addrbook.c		\
-	addrbook-manager.c	\
-	balsa-init.c
+	sendmsg-window.c
 
 INCLUDES=-I. -I../libbalsa $(GNOME_INCLUDEDIR)
 
-balsa_LDADD = $(top_builddir)/libmutt/libmutt.a \
+balsa_LDADD = \
+	$(top_builddir)/libbalsa/libbalsa.a \
+	$(top_builddir)/libmutt/libmutt.a \
 	$(top_builddir)/libbalsa/libbalsa.a \
 	$(GNOME_LIBDIR) \
 	$(GNOMEUI_LIBS) \

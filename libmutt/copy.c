@@ -97,7 +97,7 @@ mutt_copy_hdr (FILE *in, FILE *out, long off_start, long off_end, int flags,
 
   hdr_count = 1;
   x = 0;
-  error = FALSE;
+  error = MUTT_FALSE;
 
   /* We are going to read and collect the headers in an array
    * so we are able to do re-ordering.
@@ -210,7 +210,7 @@ mutt_copy_hdr (FILE *in, FILE *out, long off_start, long off_end, int flags,
 	  {
 	    if (fputs (prefix, out) == EOF)
 	    {
-	      error = TRUE;
+	      error = MUTT_TRUE;
 	      break;
 	    }
 	    print_prefix = 0;
@@ -221,7 +221,7 @@ mutt_copy_hdr (FILE *in, FILE *out, long off_start, long off_end, int flags,
 
 	  if (putc (*ch++, out) == EOF)
 	  {
-	    error = TRUE;
+	    error = MUTT_TRUE;
 	    break;
 	  }
 	}
@@ -232,7 +232,7 @@ mutt_copy_hdr (FILE *in, FILE *out, long off_start, long off_end, int flags,
       {      
 	if (fputs (headers[x], out) == EOF)
 	{
-	  error = TRUE;
+	  error = MUTT_TRUE;
 	  break;
 	}
       }

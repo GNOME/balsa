@@ -1,10 +1,10 @@
 noinst_LIBRARIES = libmutt.a
 
 libmutt_a_SOURCES = \
-	globals.c lib.c handler.c score.c sort.c thread.c \
-	date.c getdomain.c hash.c hook.c sigblock.c filter.c from.c \
-	parse.c rfc822.c rfc1524.c rfc2047.c sendlib.c \
-	mx.c mbox.c mh.c flaglib.c
+	copy.c date.c filter.c flaglib.c from.c getdomain.c globals.c \
+	handler.c hash.c hook.c lib.c mbox.c mh.c mx.c parse.c \
+	rfc1524.c rfc2047.c rfc822.c score.c sendlib.c sigblock.c \
+	sort.c thread.c
 
 #
 #	BOGUS FIX THE SHAREDIR SOMEONE

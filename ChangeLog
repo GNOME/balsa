@@ -1,3 +1,12 @@
+2001-11-02  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/address-book-config.c: mark two strings for translation.
+	* src/balsa-icons.[hc]: add "send/receive" menu and toolbar icons.
+	* src/balsa-index.c: plug last hole in idle function handling (PB).
+	* src/main-window.c: add "send/receive" callback (AA).
+	* src/toolbar-factory.c: add "send/receive" to legal mainwindow tools.
+	* src/toolbar-prefs.c: add "send/receive" button description.
+
 2001-10-31  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* NEWS: release balsa-1.2.2

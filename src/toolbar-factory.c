@@ -79,6 +79,7 @@ static int toolbar_map_entries=0;
 
 static char *toolbar0_legal[]={
     "",
+    BALSA_PIXMAP_SEND_RECEIVE,
     BALSA_PIXMAP_RECEIVE,
     BALSA_PIXMAP_TRASH,
     BALSA_PIXMAP_NEW,

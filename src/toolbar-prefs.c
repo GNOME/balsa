@@ -100,6 +100,8 @@ button_data toolbar_buttons[]={
      N_("Print current message"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_SEND, N_("Send"),
      N_("Send this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {BALSA_PIXMAP_SEND_RECEIVE, N_("Send /\nReceive"),
+     N_("Send and Receive messages"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_ATTACHMENT, N_("Attach"),
      N_("Add attachments to this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_SAVE, N_("Save"),

@@ -37,6 +37,7 @@
 #include "pixmaps/balsa_print.xpm"
 #include "pixmaps/balsa_save.xpm"
 #include "pixmaps/balsa_send.xpm"
+#include "pixmaps/balsa_send_receive.xpm"
 #include "pixmaps/balsa_trash.xpm"
 #include "pixmaps/balsa_trash_empty.xpm"
 #include "pixmaps/balsa_next_unread.xpm"
@@ -79,6 +80,7 @@
 #include "pixmaps/menu_previous.xpm"
 #include "pixmaps/menu_save.xpm"
 #include "pixmaps/menu_send.xpm"
+#include "pixmaps/menu_send_receive.xpm"
 #include "pixmaps/menu_compose.xpm"
 #include "pixmaps/menu_attachment.xpm"
 #include "pixmaps/menu_receive.xpm"
@@ -235,6 +237,7 @@ register_balsa_pixmaps(void)
 	{ BALSA_PIXMAP_PRINT,			balsa_print_xpm,	24, 24 },
 	{ BALSA_PIXMAP_SAVE,			balsa_save_xpm,		24, 24 },
 	{ BALSA_PIXMAP_SEND,			balsa_send_xpm,		24, 24 },
+	{ BALSA_PIXMAP_SEND_RECEIVE,		balsa_send_receive_xpm,	24, 24 },
 	{ BALSA_PIXMAP_TRASH,			balsa_trash_xpm,	24, 24 },
 	{ BALSA_PIXMAP_TRASH_EMPTY,		balsa_trash_empty_xpm,	24, 24 },
 	{ BALSA_PIXMAP_NEXT_UNREAD,		balsa_next_unread_xpm,	24, 24 },
@@ -259,6 +262,7 @@ register_balsa_pixmaps(void)
 	{ BALSA_PIXMAP_MENU_PREVIOUS,		menu_previous_xpm,	16, 16 },
 	{ BALSA_PIXMAP_MENU_SAVE,		menu_save_xpm,		16, 16 },
 	{ BALSA_PIXMAP_MENU_SEND,		menu_send_xpm,		16, 16 },
+	{ BALSA_PIXMAP_MENU_SEND_RECEIVE,	menu_send_receive_xpm,	16, 16 },
 	{ BALSA_PIXMAP_MENU_COMPOSE,		menu_compose_xpm,	16, 16 },
 	{ BALSA_PIXMAP_MENU_ATTACHMENT,		menu_attachment_xpm,	16, 16 },
 	{ BALSA_PIXMAP_MENU_RECEIVE,		menu_receive_xpm,	16, 16 },

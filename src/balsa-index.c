@@ -92,6 +92,10 @@ static void balsa_index_set_style(BalsaIndex * bindex, GtkCTreeNode *node);
 static void balsa_index_set_style_recursive(BalsaIndex * bindex, GtkCTreeNode *node);
 static void balsa_index_set_parent_style(BalsaIndex *bindex, GtkCTreeNode *node);
 static void populate_mru(GtkWidget *menu, BalsaIndex *bindex);
+static void balsa_index_idle_remove(gpointer data);
+static void balsa_index_idle_add(gpointer data, gpointer message);
+static gboolean balsa_index_idle_clear(gpointer data);
+
 
 /* mailbox callbacks */
 static void balsa_index_del (BalsaIndex * bindex, LibBalsaMessage * message);
@@ -133,8 +137,6 @@ enum {
 static GtkTargetEntry index_drag_types[] = {
     {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
 };
-
-static gint handler = 0;
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
@@ -819,10 +821,7 @@ balsa_index_del(BalsaIndex * bindex, LibBalsaMessage * message)
 
     /* if last message is removed, clear the preview */
     if (GTK_CLIST (bindex->ctree)->rows <= 0) {
-        replace_attached_data(GTK_OBJECT(bindex), "message", NULL);
-        if(handler)
-            gtk_idle_remove(handler);
-        handler = gtk_idle_add((GtkFunction) idle_handler_cb, bindex);
+        balsa_index_idle_add(bindex, NULL);
     }
 }
 
@@ -1193,9 +1192,7 @@ button_event_press_cb(GtkWidget * ctree, GdkEventButton * event,
 
     bindex = BALSA_INDEX(data);
     if (event->button == 3) {
-        if (handler != 0)
-            gtk_idle_remove(handler);
-	handler = 0;
+        balsa_index_idle_remove(bindex);
 
 	gtk_menu_popup(GTK_MENU(create_menu(bindex)),
 		       NULL, NULL, NULL, NULL,
@@ -1270,11 +1267,7 @@ select_message(GtkWidget * widget, GtkCTreeNode *row, gint column,
     }
 
     if(balsa_app.previewpane) {
-	replace_attached_data (GTK_OBJECT(bindex), "message", 
-			       GTK_OBJECT(message));
-        if(handler) 
-            gtk_idle_remove(handler);
-	handler = gtk_idle_add ((GtkFunction) idle_handler_cb, bindex);
+        balsa_index_idle_add(bindex, message);
     }
 }
 
@@ -1536,8 +1529,7 @@ balsa_index_close_and_destroy(GtkObject * obj)
     bindex = BALSA_INDEX(obj);
 
     /* remove idle callbacks and attached data */
-    if(handler) 
-        gtk_idle_remove(handler);
+    balsa_index_idle_remove(bindex);
     message = gtk_object_get_data(obj, "message");
     if (message != NULL) {
         gtk_object_remove_data (obj, "message");
@@ -1954,11 +1946,8 @@ balsa_index_update_message(BalsaIndex * index)
 
     message = 
 	(row < 0) ? NULL : GTK_OBJECT(gtk_clist_get_row_data(list, row));
-    replace_attached_data(GTK_OBJECT(index), "message", message);
 
-    if(handler) 
-        gtk_idle_remove(handler);
-    handler = gtk_idle_add ((GtkFunction) idle_handler_cb, index);
+    balsa_index_idle_add(index, message);
 }
 
 
@@ -2016,13 +2005,9 @@ idle_handler_cb(GtkWidget * widget)
     BalsaIndex* index;
     /* gpointer data; */
 
-    if (handler == 0)
-        return FALSE;
-
     gdk_threads_enter();
-    handler = 0;
     
-    if (!widget) {
+    if (!widget || !balsa_index_idle_clear(widget)) {
 	gdk_threads_leave();
 	return FALSE;
     }
@@ -2639,3 +2624,49 @@ mru_select_cb(GtkWidget *widget, struct FolderMRUEntry *entry)
     gtk_object_set_data(GTK_OBJECT(bindex), "transferredp", (gpointer) 1);
 }
 
+/* idle handler wrappers
+ *
+ * first a structure for holding the relevant info 
+ */
+static struct {
+    gpointer data;      /* data supplied to gtk_idle_add */
+    gint id;            /* id returned by gtk_idle_add   */
+} handler = {NULL, 0};
+
+/* balsa_index_idle_remove:
+ * if an idle handler has been set, with matching data, remove it
+ */
+static void
+balsa_index_idle_remove(gpointer data)
+{
+    if (handler.id && handler.data == data) {
+        gtk_idle_remove(handler.id);
+        handler.id = 0;
+    }
+}
+
+/* balsa_index_idle_add:
+ * first remove any existing handler with matching data, then set a new
+ * one
+ */
+static void
+balsa_index_idle_add(gpointer data, gpointer message)
+{
+    balsa_index_idle_remove(data);
+    replace_attached_data(GTK_OBJECT(data), "message", message);
+    handler.id = gtk_idle_add((GtkFunction) idle_handler_cb, data);
+    handler.data = data;
+}
+
+/* balsa_index_idle_clear:
+ * if the handler id is set and the data match, clear the id;
+ * return value shows success
+ */
+static gboolean
+balsa_index_idle_clear(gpointer data)
+{
+    gboolean ret = handler.id && handler.data == data;
+    if (ret)
+        handler.id = 0;
+    return ret;
+}

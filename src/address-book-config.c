@@ -366,7 +366,7 @@ create_vcard_page(AddressBookConfig * abc)
 
     abc->ab_specific.vcard.path =
 	gnome_file_entry_new("VCARD ADDRESS BOOK PATH",
-			     "Select path for address book");
+			     _("Select path for address book"));
     gtk_table_attach(GTK_TABLE(table), abc->ab_specific.vcard.path, 1, 2,
 		     1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
@@ -410,7 +410,7 @@ create_ldif_page(AddressBookConfig * abc)
 
     abc->ab_specific.ldif.path =
 	gnome_file_entry_new("LDIF ADDRESS BOOK PATH",
-			     "Select path for address book");
+			     _("Select path for address book"));
     gtk_table_attach(GTK_TABLE(table), abc->ab_specific.ldif.path, 1, 2,
 		     1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 

@@ -150,6 +150,7 @@ static void show_about_box(void);
 
 /* callbacks */
 static void send_outbox_messages_cb(GtkWidget *, gpointer data);
+static void send_receive_messages_cb(GtkWidget *, gpointer data);
 
 static void new_message_cb(GtkWidget * widget, gpointer data);
 static void replyto_message_cb(GtkWidget * widget, gpointer data);
@@ -316,7 +317,8 @@ static GnomeUIInfo file_menu[] = {
      BALSA_PIXMAP_MENU_SEND, 'T', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
 #define MENU_FILE_PRINT_POS 6
-    { GNOME_APP_UI_ITEM, N_("_Print..."), NULL,
+    { GNOME_APP_UI_ITEM, N_("_Print..."), 
+      N_("Print currently selected messages"),
       message_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       BALSA_PIXMAP_MENU_PRINT, 'P', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
@@ -498,7 +500,7 @@ static GnomeUIInfo message_menu[] = {
         GNOME_APP_UI_ITEM, N_("_View Source..."),
         N_("View source form of the message"),
         view_msg_source_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-        BALSA_PIXMAP_MENU_SAVE, 'v', GDK_CONTROL_MASK, NULL
+        GNOME_STOCK_MENU_BOOK_OPEN, 'v', GDK_CONTROL_MASK, NULL
     },
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MESSAGE_TRASH_POS 11
@@ -735,6 +737,7 @@ balsa_window_new()
         const char* icon_id;
         void (*callback)(GtkWidget *, gpointer);
     } callback_table[] = {
+        { BALSA_PIXMAP_SEND_RECEIVE,     send_receive_messages_cb },
         { BALSA_PIXMAP_RECEIVE,          check_new_messages_cb },
         { BALSA_PIXMAP_TRASH,            trash_message_cb },
         { BALSA_PIXMAP_NEW,              new_message_cb },
@@ -1738,6 +1741,21 @@ check_new_messages_real(GtkWidget *widget, gpointer data, int type)
                              mailbox_check_func, NULL);
     balsa_mblist_have_new(balsa_app.mblist);
 #endif
+}
+
+static void
+send_receive_messages_cb(GtkWidget * widget, gpointer data)
+{
+#if ENABLE_ESMTP
+    libbalsa_process_queue(balsa_app.outbox, balsa_app.encoding_style,
+                           balsa_app.smtp_server, balsa_app.smtp_authctx,
+                           balsa_app.smtp_tls_mode,
+                           balsa_app.send_rfc2646_format_flowed);
+#else
+    libbalsa_process_queue(balsa_app.outbox, balsa_app.encoding_style,
+                           balsa_app.send_rfc2646_format_flowed);
+#endif
+    check_new_messages_real(widget, data, TYPE_CALLBACK);
 }
 
 void

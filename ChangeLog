@@ -1,3 +1,11 @@
+2001-05-13  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/sendmsg-window.c (read_signature): 
+	* libbalsa/misc.h: 
+	* libbalsa/misc.c (libbalsa_readfile_nostat): 
+	patch from Julian M Catchen <julian@catchen.org> with small tweaks
+	
+
 2001-05-10  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbasa/message.c (libbalsa_message_charset): 

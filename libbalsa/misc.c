@@ -207,6 +207,61 @@ size_t libbalsa_readfile(FILE * fp, char **buf)
     return size;
 }
 
+/* readfile_nostat is identical to readfile except it reads to EOF.
+   This enables the use of pipes to programs for such things as
+   the signature file.
+*/
+size_t libbalsa_readfile_nostat(FILE * fp, char **buf)
+{
+    size_t size;
+    GString *gstr;
+    char rbuf[512];
+    size_t rlen = 512,
+    int r;
+    int fd;
+
+    *buf = NULL;
+    fd = fileno(fp);
+    if (!fp)
+	return 0;
+
+    r = read(fd, rbuf, rlen-1);
+    if (r <= 0)
+	return 0;
+
+    rbuf[r] = '\0';
+    gstr = g_string_new(rbuf);
+
+    do {
+	if ((r = read(fd, rbuf, rlen-1)) != 0) {
+	    /* chbm: if your sig is larger than 512 you deserve this */
+	    if ((r < 0) && (errno != EAGAIN) && (errno != EINTR)) {
+		perror("Error reading file:");
+		g_string_free(gstr, TRUE);
+		return -1;
+	    };
+	    if (r > 0) {
+		rbuf[r] = '\0';	
+		gstr = g_string_append(gstr,rbuf);
+	    }
+	}
+    } while( r != 0 );
+
+    size = gstr->len;
+    *buf = (char *) g_malloc(size + 1);
+    if (*buf == NULL) {
+	g_string_free(gstr, TRUE);
+	return -1;
+    }
+
+    strncpy(*buf, gstr->str, size);
+    (*buf)[size] = '\0';
+
+    g_string_free(gstr, TRUE);
+
+    return size;
+}
+
 /* libbalsa_find_word:
    searches given word delimited by blanks or string boundaries in given
    string. IS NOT case-sensitive.

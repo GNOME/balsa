@@ -1553,14 +1553,38 @@ read_signature(void)
 {
     FILE *fp;
     size_t len;
-    gchar *ret;
+    gint siglen;
+    gchar *ret, *p, *sigpath;
 
-    if (balsa_app.signature_path == NULL
-	|| !(fp = fopen(balsa_app.signature_path, "r")))
+    if (balsa_app.signature_path == NULL)
 	return NULL;
-    len = libbalsa_readfile(fp, &ret);
-    fclose(fp);
-    if(ret) ret = g_strstrip(ret);
+
+    for (p = balsa_app.signature_path; *p != '|' && *p != '\0'; p++);
+    /* Signature is a path to a program */
+    if (*p == '|') {
+	p++;
+	while (isspace(*p) && *p != '\0') p++; /* Forward past any spaces */
+
+	siglen = strlen(p);
+	sigpath = g_malloc(siglen+1);
+	strncpy(sigpath,p,siglen);
+	sigpath[siglen] = '\0';
+
+	if ((fp = popen(sigpath,"r")) == NULL)
+	    return NULL;
+	len = libbalsa_readfile_nostat(fp, &ret);
+	pclose(fp);
+	if(ret) ret = g_strstrip(ret);       
+	g_free(sigpath);
+    }
+    /* Signature is just a regular file. */
+    else {
+	if (!(fp = fopen(balsa_app.signature_path, "r")))
+	    return NULL;
+	len = libbalsa_readfile_nostat(fp, &ret);
+	fclose(fp);
+	if(ret) ret = g_strstrip(ret);
+    }
 
     return ret;
 }

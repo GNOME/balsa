@@ -30,6 +30,7 @@
 gchar *libbalsa_make_string_from_list(const GList *);
 
 size_t libbalsa_readfile(FILE * fp, char **buf);
+size_t libbalsa_readfile_nostat(FILE * fp, char **buf);
 
 gchar *libbalsa_get_hostname(void);
 gchar *libbalsa_get_domainname(void);

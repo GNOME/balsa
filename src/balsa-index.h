@@ -43,7 +43,6 @@ struct _BalsaIndex
 
   Mailbox *mailbox;
   guint watcher_id;
-  GList *selection;
 };
 
 struct _BalsaIndexClass

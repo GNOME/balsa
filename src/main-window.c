@@ -91,7 +91,7 @@ open_main_window ()
 
   gnome_mdi_set_mode (mdi, balsa_app.mdi_style);
 
-  gtk_widget_set_usize (GTK_WIDGET(mdi->active_window), 670, 435);
+  gtk_widget_set_usize (GTK_WIDGET (mdi->active_window), 670, 435);
 
   refresh_main_window ();
 }
@@ -593,15 +593,19 @@ previous_message_cb (GtkWidget * widget)
 static void
 delete_message_cb (GtkWidget * widget)
 {
+  GtkCList *clist;
   GList *list;
+  Message *message;
 
   if (!balsa_app.current_index_child)
     return;
 
-  list = BALSA_INDEX (balsa_app.current_index_child->index)->selection;
+  clist = GTK_CLIST (GTK_BIN (balsa_app.current_index_child->index)->child);
+  list = clist->selection;
   while (list)
     {
-      message_delete ((Message *) list->data);
+      message = gtk_clist_get_row_data (clist, (gint) list->data);
+      message_delete (message);
       list = list->next;
     }
 
@@ -612,15 +616,19 @@ delete_message_cb (GtkWidget * widget)
 static void
 undelete_message_cb (GtkWidget * widget)
 {
+  GtkCList *clist;
   GList *list;
+  Message *message;
 
   if (!balsa_app.current_index_child)
     return;
 
-  list = BALSA_INDEX (balsa_app.current_index_child->index)->selection;
+  clist = GTK_CLIST (GTK_BIN (balsa_app.current_index_child->index)->child);
+  list = clist->selection;
   while (list)
     {
-      message_undelete ((Message *) list->data);
+      message = gtk_clist_get_row_data (clist, (gint) list->data);
+      message_undelete (message);
       list = list->next;
     }
   balsa_index_select_next (BALSA_INDEX (balsa_app.current_index_child->index));

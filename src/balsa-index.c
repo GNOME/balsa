@@ -69,12 +69,6 @@ static void select_message (GtkWidget * widget,
 			    gint column,
 			    GdkEventButton * bevent,
 			    gpointer * data);
-static void unselect_message (GtkWidget * widget,
-			      gint row,
-			      gint column,
-			      GdkEventButton * bevent,
-			      gpointer * data);
-
 
 /* signals */
 enum
@@ -195,7 +189,6 @@ balsa_index_init (BalsaIndex * bindex)
 
   GTK_WIDGET_SET_FLAGS (bindex, GTK_NO_WINDOW);
   bindex->mailbox = NULL;
-  bindex->selection = NULL;
 
   /* create the clist */
   GTK_BIN (bindex)->child =
@@ -220,11 +213,6 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_signal_connect (GTK_OBJECT (clist),
 		      "select_row",
 		      (GtkSignalFunc) select_message,
-		      (gpointer) bindex);
-
-  gtk_signal_connect (GTK_OBJECT (clist),
-		      "unselect_row",
-		      (GtkSignalFunc) unselect_message,
 		      (gpointer) bindex);
 
   gtk_signal_connect (GTK_OBJECT (clist),
@@ -330,8 +318,6 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
     {
       mailbox_watcher_remove (mailbox, bindex->watcher_id);
       mailbox_open_unref (bindex->mailbox);
-      g_list_free (bindex->selection);
-      bindex->selection = NULL;
       gtk_clist_clear (GTK_CLIST (GTK_BIN (bindex)->child));
     }
 
@@ -534,8 +520,6 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
   bindex = BALSA_INDEX (data);
   message = (Message *) gtk_clist_get_row_data (clist, row);
 
-  bindex->selection = g_list_append (bindex->selection, message);
-
   gtk_clist_select_row (clist, row, -1);
 
   if (message)
@@ -558,32 +542,12 @@ select_message (GtkWidget * widget,
   bindex = BALSA_INDEX (data);
   message = (Message *) gtk_clist_get_row_data (GTK_CLIST (widget), row);
 
-  bindex->selection = g_list_append (bindex->selection, message);
-
   if (message)
     gtk_signal_emit (GTK_OBJECT (bindex),
 		     balsa_index_signals[SELECT_MESSAGE],
 		     message,
 		     bevent);
 }
-
-
-static void
-unselect_message (GtkWidget * widget,
-		  gint row,
-		  gint column,
-		  GdkEventButton * bevent,
-		  gpointer * data)
-{
-  BalsaIndex *bindex;
-  Message *message;
-
-  bindex = BALSA_INDEX (data);
-  message = (Message *) gtk_clist_get_row_data (GTK_CLIST (widget), row);
-
-  bindex->selection = g_list_remove (bindex->selection, message);
-}
-
 
 /*
  * listen for mailbox messages

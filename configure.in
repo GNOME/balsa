@@ -92,6 +92,7 @@ Makefile
 po/Makefile.in
 macros/Makefile
 intl/Makefile
+sounds/Makefile
 libbalsa/Makefile
 src/Makefile
 ],[sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])

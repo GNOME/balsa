@@ -1,5 +1,10 @@
+this documentation is out of date, but still applies somewhat.
+
+----
+
+(May 1998)
 Okay, let's try to document Balsa's mailbox abstraction for
-the c-client library.
+the libmutt library.
 
 
 Opening and Closing a Mailbox

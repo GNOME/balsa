@@ -34,6 +34,7 @@
 #include "main.h"
 #include "mailbox.h"
 #include "save-restore.h"
+#include "sound.h"
 #include "index-child.h"
 #include "main-window.h"
 
@@ -124,6 +125,8 @@ init_balsa_app (int argc, char *argv[])
 #ifdef HAVE_LIBESD
   balsa_app.esound_host = g_strdup ("localhost");
   balsa_app.esound = esd_open_sound (balsa_app.esound_host);
+
+  play_sound(gnome_datadir_file("sounds/estart.wav"));
 #endif
 
   if (config_load (BALSA_CONFIG_FILE) == FALSE)

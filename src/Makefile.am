@@ -19,6 +19,7 @@ balsa_SOURCES =	\
 	pref-manager.c		\
 	save-restore.c		\
 	sendmsg-window.c	\
+	sound.c			\
 	balsa-app.h		\
 	balsa-index.h		\
 	balsa-init.h		\
@@ -33,7 +34,8 @@ balsa_SOURCES =	\
 	message-window.h	\
 	pref-manager.h		\
 	save-restore.h		\
-	sendmsg-window.h
+	sendmsg-window.h	\
+	sound.h
 
 
 INCLUDES=-I. -I${top_srcdir}/libbalsa -I${top_srcdir} \

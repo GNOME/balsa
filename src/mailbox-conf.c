@@ -569,15 +569,28 @@ set_next_page (GtkWidget * widget, MailboxConfPageType type)
 static GtkWidget *
 create_new_page (void)
 {
+  GtkWidget *label;
   GtkWidget *vbox;
   GtkWidget *radio_button;
-
+  GtkWidget *pixmap;
+  gchar *logo;
+  
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
 
+  logo = gnome_unconditional_pixmap_file ("balsa_icon.png");
+  pixmap = gnome_pixmap_new_from_file (logo);
+  g_free (logo);
+  gtk_box_pack_start (GTK_BOX (vbox), pixmap, FALSE, FALSE, 0);
+  gtk_widget_show (pixmap);
+
+  label = gtk_label_new(_("New mailbox type:"));
+  gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
+  gtk_widget_show(label);
+  
   /* radio buttons */
   /* local mailbox */
-  radio_button = gtk_radio_button_new_with_label (NULL, "Local");
+  radio_button = gtk_radio_button_new_with_label (NULL, _("Local mailbox"));
   gtk_box_pack_start (GTK_BOX (vbox), radio_button, FALSE, FALSE, 0);
   gtk_signal_connect (GTK_OBJECT (radio_button), "clicked", GTK_SIGNAL_FUNC (set_next_page), (void *) MC_PAGE_LOCAL);
   gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (radio_button), TRUE);
@@ -585,7 +598,7 @@ create_new_page (void)
 
   /* imap mailbox */
   radio_button = gtk_radio_button_new_with_label
-    (gtk_radio_button_group (GTK_RADIO_BUTTON (radio_button)), "IMAP");
+    (gtk_radio_button_group (GTK_RADIO_BUTTON (radio_button)), _("IMAP server"));
   gtk_box_pack_start (GTK_BOX (vbox), radio_button, FALSE, FALSE, 0);
   gtk_signal_connect (GTK_OBJECT (radio_button), "clicked", GTK_SIGNAL_FUNC (set_next_page), (void *) MC_PAGE_IMAP);
   gtk_widget_show (radio_button);

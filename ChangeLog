@@ -1,5 +1,6 @@
-2003-04-22 15:02  PeterB
+2003-04-22 15:42  PeterB
 
+	* doc/C/balsa.xml: Fix #110881.
 	* src/message-window.c: Make closing the window more
 	robust (possible fix for #111178).  Protect against
 	destroying message window before idle handler

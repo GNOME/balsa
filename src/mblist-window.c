@@ -79,10 +79,10 @@ mblist_open_window (GnomeMDI * mdi)
 
   gtk_widget_realize (mblw->window);
   open_folder = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-			       &open_mask, &transparent, mini_dir_open_xpm);
+			       &open_mask, transparent, mini_dir_open_xpm);
 
   closed_folder = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-			   &closed_mask, &transparent, mini_dir_closed_xpm);
+			   &closed_mask, transparent, mini_dir_closed_xpm);
 
   mblw->mdi = mdi;
   gtk_signal_connect (GTK_OBJECT (mblw->window),
@@ -167,11 +167,15 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 
   if (mbnode->mailbox)
     {
-      if (mbnode->mailbox->type == MAILBOX_IMAP ||
-	  mbnode->mailbox->type == MAILBOX_POP3)
-	return FALSE;
-
-      if (mbnode->mailbox && mbnode->name)
+      if (mbnode->mailbox->type == MAILBOX_IMAP)
+	{
+	  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2,
+				   NULL, NULL,
+				   NULL, NULL,
+				   G_NODE_IS_LEAF (gnode), TRUE);
+	  gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
+	}
+      else if (mbnode->mailbox && mbnode->name)
 	{
 	  if (!strcmp (MAILBOX_LOCAL (mbnode->mailbox)->path, mbnode->name))
 	    {

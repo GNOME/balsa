@@ -492,7 +492,7 @@ static void
 show_about_box ()
 {
   GtkWidget *about;
-  gchar *authors[] =
+  const gchar *authors[] =
   {
     "Stuart Parmenter <pavlov@pavlov.net>",
     "Jay Painter <jpaint@gimp.org>",

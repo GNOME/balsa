@@ -36,7 +36,10 @@ struct _BalsaMBListClass
   {
     GtkCTreeClass parent_class;
 
-    void (*select_mailbox) (BalsaMBList * bmblist, Mailbox * mailbox);
+    void (*select_mailbox) (BalsaMBList * bmblist,
+		    Mailbox * mailbox,
+		    gint row,
+		    GdkEventButton *);
   };
 
 GtkWidget *balsa_mblist_new (void);

@@ -55,8 +55,7 @@ static MBListWindow *mblw = NULL;
 /* callbacks */
 static void destroy_mblist_window (GtkWidget * widget);
 static void close_mblist_window (GtkWidget * widget);
-static void mailbox_select_cb (GtkCTree *, GtkCTreeNode *, gint);
-static void button_event_press_cb (GtkCList *, GdkEventButton *, gpointer);
+static void mailbox_select_cb (BalsaMBList *, Mailbox *, GtkCTreeNode *, GdkEventButton *);
 static GtkWidget *create_menu (GtkCTree * ctree, Mailbox * mailbox);
 
 static void open_cb (GtkWidget *, gpointer);
@@ -128,16 +127,9 @@ mblist_open_window (GnomeMDI * mdi)
 
   height = GTK_CLIST (mblw->ctree)->rows * GTK_CLIST (mblw->ctree)->row_height;
 
-  gtk_signal_connect (GTK_OBJECT (mblw->ctree), "tree_select_row",
+  gtk_signal_connect (GTK_OBJECT (mblw->ctree), "select_mailbox",
 		      (GtkSignalFunc) mailbox_select_cb,
 		      (gpointer) NULL);
-
-  gtk_signal_connect (GTK_OBJECT (GTK_WIDGET (GTK_CLIST (mblw->ctree))),
-		      "button_press_event",
-		      (GtkSignalFunc) button_event_press_cb,
-		      (gpointer) NULL);
-
-
 
   bbox = gtk_hbutton_box_new ();
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->action_area), bbox, TRUE, TRUE, 0);
@@ -247,24 +239,15 @@ destroy_mblist_window (GtkWidget * widget)
 }
 
 static void
-mailbox_select_cb (GtkCTree * ctree, GtkCTreeNode * row, gint column)
+mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode *row, GdkEventButton * event)
 {
   IndexChild *index_child;
-  Mailbox *mailbox;
-  GdkEventButton *bevent = (GdkEventButton *) gtk_get_current_event ();
 
   if (!mblw)
     return;
 
-  if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
+  if (event && event->button == 1 && event->type == GDK_2BUTTON_PRESS)
     {
-      mailbox = gtk_ctree_node_get_row_data (ctree, row);
-
-      /* bail now if the we've been called without a valid
-       * mailbox */
-      if (!mailbox)
-	return;
-
       index_child = index_child_new (mblw->mdi, mailbox);
       if (index_child)
 	{
@@ -273,34 +256,18 @@ mailbox_select_cb (GtkCTree * ctree, GtkCTreeNode * row, gint column)
 	}
       main_window_set_cursor (-1);
 
-      gtk_ctree_set_node_info (ctree, row, mailbox->name, 5,
+      gtk_ctree_set_node_info (GTK_CTREE (bmbl),
+			       row,
+			       mailbox->name, 5,
 			       NULL, NULL,
 			       tray_empty, tray_empty_mask,
 			       FALSE, TRUE);
     }
-}
 
-static void
-button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
-{
-  gint row, column;
-  Mailbox *mailbox;
-
-  if (!mblw)
-    return;
-
-  if (event->window != clist->clist_window)
-    return;
-
-  if (!event || event->button != 3)
-    return;
-
-  gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
-  mailbox = gtk_clist_get_row_data (clist, row);
-
-  gtk_clist_select_row (clist, row, -1);
-
-  gtk_menu_popup (GTK_MENU (create_menu (GTK_CTREE (clist), mailbox)), NULL, NULL, NULL, NULL, event->button, event->time);
+  if (event && event->button == 3)
+    {
+      gtk_menu_popup (GTK_MENU (create_menu (GTK_CTREE (bmbl), mailbox)), NULL, NULL, NULL, NULL, event->button, event->time);
+    }
 }
 
 static void

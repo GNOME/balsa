@@ -1,3 +1,7 @@
+2003-09-30 18:11  PeterB
+
+	* libbalsa/mailbox.c: More tree model cleanup.
+
 2003-09-30  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/mailbox.c: part I of workaround for Gtk2 fetching

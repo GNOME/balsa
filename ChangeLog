@@ -1,3 +1,10 @@
+2001-07-14  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/main-window.c: add menu shortcut for identities.
+	* src/save-restore.c: remove from the config files removed identities.
+	* src/sendmsg-window.c: add menu shortcuts.
+	* libbalsa/identity.c: fix focus issues, memory leaks. 
+	
 2001-07-13  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* README, NEWS, configure.in: release balsa-1.1.7

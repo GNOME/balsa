@@ -530,7 +530,7 @@ static GnomeUIInfo mailbox_menu[] = {
 static GnomeUIInfo settings_menu[] = {
 #define MENU_SETTINGS_PREFERENCES_POS 0
     GNOMEUIINFO_MENU_PREFERENCES_ITEM (open_preferences_manager, NULL),
-    GNOMEUIINFO_ITEM_STOCK(N_("Identities..."), 
+    GNOMEUIINFO_ITEM_STOCK(N_("_Identities..."), 
                            N_("Create and set current identities"), 
                            ident_manage_dialog_cb, 
                            BALSA_PIXMAP_IDENTITY_MENU),

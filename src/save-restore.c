@@ -958,8 +958,11 @@ config_identities_save(void)
 {
     LibBalsaIdentity* ident;
     GList* list;
-    gchar** conf_vec, *prefix;
+    gchar** conf_vec, *prefix, *key, *val;
+    GList* old_identities = NULL;
     gint i = 0;
+    void* iterator;
+    int pref_len = strlen(IDENTITY_SECTION_PREFIX);
 
     conf_vec = g_malloc(sizeof(gchar*) * g_list_length(balsa_app.identities));
 
@@ -977,6 +980,23 @@ config_identities_save(void)
     gnome_config_pop_prefix();
     g_free(conf_vec);
 
+    /* clean removed sections */
+    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
+	if (strncmp(key, IDENTITY_SECTION_PREFIX, pref_len) == 0) {
+	    prefix = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
+	    old_identities = g_list_prepend(old_identities, prefix);
+	}
+	g_free(key);
+	g_free(val);
+    }
+    for(list=old_identities; list; list = g_list_next(list)) {
+	gnome_config_clean_section(list->data);
+	g_free(list->data);
+    }
+    g_list_free(old_identities);
+
+    /* save current */
     for (list = balsa_app.identities; list; list = g_list_next(list)) {
 	ident = LIBBALSA_IDENTITY(list->data);
 	prefix = g_strconcat(BALSA_CONFIG_PREFIX "identity-", 

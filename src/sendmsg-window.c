@@ -34,9 +34,9 @@
 #include "send.h"
 #include "sendmsg-window.h"
 
-static void send_message_cb (GtkWidget *, BalsaSendmsg *);
-static void attach_clicked (GtkWidget *, gpointer);
-static void close_window (GtkWidget *, gpointer);
+static gint send_message_cb (GtkWidget *, BalsaSendmsg *);
+static gint attach_clicked (GtkWidget *, gpointer);
+static gint close_window (GtkWidget *, gpointer);
 
 static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 
@@ -79,25 +79,26 @@ static GnomeUIInfo file_menu[] =
     NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ATTACH, 'H', 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
-  {
-    GNOME_APP_UI_ITEM, N_ ("_Close"), NULL, close_window, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_CLOSE, 'Q', 0, NULL
-  },
+
+  GNOMEUIINFO_MENU_CLOSE_ITEM(close_window, NULL),
+
   GNOMEUIINFO_END
 };
 
 static GnomeUIInfo main_menu[] =
 {
-  GNOMEUIINFO_SUBTREE ("_File", file_menu),
+  GNOMEUIINFO_MENU_FILE_TREE(file_menu),
   GNOMEUIINFO_END
 };
 
-static void
+static gint
 close_window (GtkWidget * widget, gpointer data)
 {
   BalsaSendmsg *bsm;
   bsm = data;
   balsa_sendmsg_destroy (bsm);
+
+  return TRUE;
 }
 
 
@@ -179,13 +180,14 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
   gtk_widget_destroy (GTK_WIDGET (fs));
 }
 
-static void
+static gint
 attach_dialog_cancel (GtkWidget * widget, gpointer data)
 {
   gtk_widget_destroy (GTK_WIDGET (data));
+  return TRUE;
 }
 
-static void
+static gint
 attach_clicked (GtkWidget * widget, gpointer data)
 {
   GtkWidget *fsw;
@@ -210,6 +212,8 @@ attach_clicked (GtkWidget * widget, gpointer data)
 		      fs);
 
   gtk_widget_show (fsw);
+
+  return TRUE;
 }
 
 static void
@@ -649,7 +653,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   gtk_widget_show_all (window);
 }
 
-static void
+static gint
 send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
   Message *message;
@@ -662,16 +666,16 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
     len = strlen (tmp);
 
     if (len < 1)		/* empty */
-      return;
+      return FALSE;
 
     if (tmp[len - 1] == '@')	/* this shouldn't happen */
-      return;
+      return FALSE;
 
     if (len < 4)
       {
 	if (strchr (tmp, '@'))	/* you won't have an @ in an
 				   address less than 4 characters */
-	  return;
+	  return FALSE;
 
 	/* assume they are mailing it to someone in their local domain */
       }
@@ -723,4 +727,6 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   g_list_free (message->body_list);
   message_free (message);
   balsa_sendmsg_destroy (bsmsg);
+
+  return TRUE;
 }

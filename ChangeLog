@@ -1,3 +1,8 @@
+2004-08-12 15:02  PeterB
+
+	* libbalsa/message.c: ignore error return caused by malformed
+	header.
+
 2004-08-11  Pawel Salek
 
 	* libbalsa/address-book.c: modify_address not only updates backend

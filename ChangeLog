@@ -1,5 +1,6 @@
-2003-02-03 13:42  PeterB
+2003-02-03 15:26  PeterB
 
+	* libbalsa/: mailbox.c, message.c: Code cleanup (Manu).
 	* src/: balsa-index-threading.c, balsa-index.c, balsa-index.h: Add
 	a hash table of GtkTreeRowReferences to BalsaIndex, and use it in
 	threading the index and finding messages.

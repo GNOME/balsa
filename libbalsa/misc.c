@@ -651,7 +651,8 @@ libbalsa_wrap_view(GtkTextView * view, gint length)
                     && !is_in_url(&iter, offset, url_tag))
                     brk_offset = offset;
             }
-            if (offset >= num_chars)
+
+            if (len < length)
                 break;
 
             if (brk_offset > quote_len && !g_unichar_isspace(c))
@@ -666,6 +667,7 @@ libbalsa_wrap_view(GtkTextView * view, gint length)
                             && !is_in_url(&iter, offset, url_tag)))
                     offset++;
                 if (offset >= num_chars)
+                    /* No next line break. */
                     break;
             }
 
@@ -803,7 +805,7 @@ is_in_url(GtkTextIter * iter, gint offset, GtkTextTag * url_tag)
 /* Forward references: */
 static gboolean prescanner(const gchar * p);
 static void mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter,
-                      GtkTextTag * tag, gchar * p);
+                      GtkTextTag * tag, const gchar * p);
 static regex_t *get_url_reg(void);
 
 void
@@ -881,9 +883,9 @@ libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
 /* Mark URLs in one line of the buffer */
 static void
 mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
-          gchar * line)
+          const gchar * line)
 {
-    gchar *p = line;
+    const gchar *p = line;
     regex_t *url_reg = get_url_reg();
     regmatch_t url_match;
     GtkTextIter start = *iter;

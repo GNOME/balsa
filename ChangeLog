@@ -1,3 +1,9 @@
+2003-01-03  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/message.c: 
+	* libbalsa/mailbox_imap.c: 
+	backport of pawel's fix for really using cached messages
+
 2003-01-02  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/body.[hc]: implement libbalsa_message_body_get_by_id()

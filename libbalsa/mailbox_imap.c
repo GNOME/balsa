@@ -706,6 +706,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 {
     FILE *stream = NULL;
     gchar* msg_name, *cache_name;
+    MESSAGE *msg;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
@@ -716,14 +717,13 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
                                  LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity,
                                  IMAP_MESSAGE_UID(message));
     stream = fopen(msg_name,"rb");
+    msg = safe_calloc(1, sizeof(MESSAGE));
+    msg->magic = CLIENT_CONTEXT(mailbox)->magic;
     if(!stream) {
-        MESSAGE *msg = safe_calloc(1, sizeof(MESSAGE));
-        msg->magic = CLIENT_CONTEXT(mailbox)->magic;
         libbalsa_lock_mutt();
         if (!imap_fetch_message(msg, CLIENT_CONTEXT(mailbox), 
                                 message->header->msgno)) 
             stream = msg->fp;
-	FREE(&msg);
 	if(stream) { /* don't cache negatives */
             FILE * cache;
             libbalsa_assure_balsa_dir();
@@ -735,7 +735,12 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 	    rewind(stream);
 	}
         libbalsa_unlock_mutt();
+    } else {
+	msg->fp = stream;
+	imap_update_header_info(msg, CLIENT_CONTEXT(mailbox),
+				message->header->msgno);
     }
+    FREE(&msg);
     g_free(msg_name);
     g_free(cache_name); 
     return stream;

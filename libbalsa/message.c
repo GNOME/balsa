@@ -768,20 +768,15 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 	return TRUE;
     }
 
+    msg = (MESSAGE *)g_malloc (sizeof (MESSAGE));
+    msg->fp = libbalsa_mailbox_get_message_stream(message->mailbox, message);
+    
     if(! message->mailbox->disconnected ) {
-	/*
-	 * load message body
-	 */
-	libbalsa_lock_mutt();
-	msg = mx_open_message(CLIENT_CONTEXT(message->mailbox), cur->msgno);
-	libbalsa_unlock_mutt();
-	
-	if (!msg) { /*FIXME: crude but necessary error handling */
+	if (!msg->fp) { /*FIXME: crude but necessary error handling */
 	    message->mailbox->disconnected = TRUE;
 	    message->mailbox->readonly = TRUE;
 	    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                                  "disconnected mode!");
-
             UNLOCK_MAILBOX(message->mailbox);
 	    if(CLIENT_CONTEXT_CLOSED(message->mailbox) ||
 	       CLIENT_CONTEXT(message->mailbox)->hdrs == NULL) 
@@ -790,23 +785,18 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 	} 
 	/* mx_open_message may have downloaded more headers (IMAP): */
 	libbalsa_message_headers_update(message);
-	UNLOCK_MAILBOX(message->mailbox);
 
 	fseek(msg->fp, cur->content->offset, 0);	
     } else {  /* disconnected mode */
-	UNLOCK_MAILBOX(message->mailbox);
-	msg = (MESSAGE *)g_malloc (sizeof (MESSAGE));
-	msg->fp = libbalsa_mailbox_get_message_stream(message->mailbox,
-						      message);
 	if(!msg->fp) {
+	    g_free(msg);
 	    return FALSE;
 	}
 	rewind(msg->fp);
 	/* ugly ugly ugly */
 	cur->env = mutt_read_rfc822_header (msg->fp, cur, 1, 0); 
 	rewind(msg->fp);
-    }
-    
+    }    
     if (cur->content->type == TYPEMULTIPART) {
 	libbalsa_lock_mutt();
 	cur->content->parts = 
@@ -843,16 +833,11 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 
 	message->body_ref++;
 
-	if(! message->mailbox->disconnected ) {
-	    libbalsa_lock_mutt();
-	    mx_close_message(&msg);
-	    libbalsa_unlock_mutt();
-	} else {
-	    fclose(msg->fp);
-	    g_free(msg);
-	}
+	fclose(msg->fp);
+	g_free(msg);
     }
-
+    UNLOCK_MAILBOX(message->mailbox);
+    
     /*
      * emit read message
      */

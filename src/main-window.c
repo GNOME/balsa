@@ -4375,8 +4375,11 @@ balsa_window_idle_cb(BalsaWindow * window)
 
     gdk_threads_enter();
 
-    balsa_message_set(BALSA_MESSAGE(window->preview),
-                      window->current_message);
+    /* Check that we still have a message, and that the message still
+     * has a mailbox; if the mailbox was closed, this test will fail. */
+    if (window->current_message && window->current_message->mailbox)
+	balsa_message_set(BALSA_MESSAGE(window->preview),
+                          window->current_message);
 
     index = g_object_get_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS);
     if (index) {

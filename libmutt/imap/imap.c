@@ -604,6 +604,15 @@ int imap_open_mailbox (CONTEXT* ctx)
       if ((pc = imap_get_flags (&(idata->flags), pc)) == NULL)
 	goto fail;
     }
+#ifdef LIBMUTT
+    else if (ascii_strncasecmp ("OK [UIDVALIDITY", pc, 15) == 0)
+    {
+      /* safe to call on NULL */
+      /* skip "OK [PERMANENT" so syntax is the same as FLAGS */
+      idata->uid_validity = atoi(pc+15);
+      printf("Got: %s (UIDVALIDITY: %d)\n", pc, idata->uid_validity);
+    }
+#endif
   }
   while (rc == IMAP_CMD_CONTINUE);
 

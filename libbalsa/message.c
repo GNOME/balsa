@@ -256,10 +256,7 @@ libbalsa_message_destroy(GtkObject * object)
     g_free(message->subj);
     message->subj = NULL;
 #endif
-    for (list = message->references; list; list = list->next) {
-	if (list->data)
-	    g_free(list->data);
-    }
+    g_list_foreach(message->references, (GFunc) g_free, NULL);
     g_list_free(message->references);
 
     message->references = NULL;
@@ -273,15 +270,8 @@ libbalsa_message_destroy(GtkObject * object)
     libbalsa_message_body_free(message->body_list);
     message->body_list = NULL;
 
-    if(message->references_for_threading!=NULL) {
-	GList *list=message->references_for_threading;
-	for(; list; list=g_list_next(list)){
-	    if(list->data)
-		g_free(list->data);
-	}
-	g_list_free (message->references_for_threading);
-	message->references_for_threading=NULL;
-    }
+    g_list_free(message->references_for_threading);
+    message->references_for_threading=NULL;
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
@@ -653,17 +643,22 @@ libbalsa_message_real_set_deleted_flag(LibBalsaMessage * message,
 
     g_return_if_fail(message->mailbox);
     
+    if ( (set && (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) ||
+         (!set && !(message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)))
+        return; /* no status change */
+ 
     LOCK_MAILBOX(message->mailbox);
     RETURN_IF_CLIENT_CONTEXT_CLOSED(message->mailbox);
-
     cur = message->header;
-    if (set && !(message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
-	libbalsa_lock_mutt();
-	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_DELETE,
-		      TRUE);
-	libbalsa_unlock_mutt();
 
+    libbalsa_lock_mutt();
+    mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_DELETE, set);
+    libbalsa_unlock_mutt();
+
+    if (set) {
 	message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
+	message->mailbox->total_messages--;
+
 	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
 	    message->mailbox->unread_messages--;
 
@@ -671,20 +666,11 @@ libbalsa_message_real_set_deleted_flag(LibBalsaMessage * message,
 		libbalsa_mailbox_set_unread_messages_flag(message->mailbox,
 							  FALSE);
 	}
-
-	message->mailbox->total_messages--;
-
-    } else if (!set) {
-	libbalsa_lock_mutt();
-	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_DELETE,
-		      FALSE);
-	libbalsa_unlock_mutt();
-
+    } else {
 	message->flags &= ~LIBBALSA_MESSAGE_FLAG_DELETED;
+	message->mailbox->total_messages++;
 	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
 	    message->mailbox->unread_messages++;
-	message->mailbox->total_messages++;
-
     }
 
     UNLOCK_MAILBOX(message->mailbox);
@@ -914,6 +900,7 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
 
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
     g_return_val_if_fail(message->mailbox, FALSE);
+    g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox), FALSE);
     g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, FALSE);
 
     msg_header = message->header;
@@ -1171,12 +1158,9 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
      * message structure with it, and allocate memory for another set of
      * g_strdup's? */
 
-    if (!message->references_for_threading)
-        for (tmp = cenv->references; tmp != NULL; tmp = tmp->next) {
-            message->references_for_threading =
-                g_list_prepend(message->references_for_threading,
-                               g_strdup(tmp->data));
-        }
+    if (!message->references_for_threading) 
+        message->references_for_threading = 
+            g_list_reverse(g_list_copy(message->references));
 #if 0
     /* According to  RFC 1036 (section 2.2.5), MessageIDs in References header
      * must be in the oldest first order; the direct parent should be last. 

@@ -167,7 +167,8 @@ libbalsa_mailbox_mh_destroy(GtkObject * object)
 }
 
 static FILE *
-libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox *mailbox, LibBalsaMessage *message)
+libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox *mailbox, 
+                                       LibBalsaMessage *message)
 {
     FILE *stream = NULL;
     gchar *filename;

@@ -36,8 +36,8 @@
 
 /*
  * #ifdef BALSA_LOCAL_INSTALL
- * #define gnome_pixmap_file( s ) g_strdup( g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps/", s, NULL ) )
- * #define gnome_unconditional_pixmap_file( s ) g_strdup( g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps", s, NULL ) )
+ * #define gnome_pixmap_file(s) g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps/", s, NULL ) 
+ * #define gnome_unconditional_pixmap_file(s) g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps", s, NULL ) 
  * #endif
  */
 

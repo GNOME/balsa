@@ -105,7 +105,7 @@ struct _LibBalsaMailboxClass {
     GtkObjectClass parent_class;
 
     /* Signals */
-    void (*open_mailbox) (LibBalsaMailbox * mailbox);
+    gboolean (*open_mailbox) (LibBalsaMailbox * mailbox);
     LibBalsaMailboxAppendHandle* (*open_mailbox_append)
 	(LibBalsaMailbox * mailbox);
     void (*close_mailbox) (LibBalsaMailbox * mailbox);
@@ -142,11 +142,12 @@ LibBalsaMailbox *libbalsa_mailbox_new_from_config(const gchar * prefix);
  * open and close a mailbox 
  */
 /* XXX these need to return a value if they failed */
-void libbalsa_mailbox_open(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_open(LibBalsaMailbox * mailbox);
 LibBalsaMailboxAppendHandle* 
 libbalsa_mailbox_open_append(LibBalsaMailbox * mailbox);
 int libbalsa_mailbox_close_append(LibBalsaMailboxAppendHandle* handle);
 void libbalsa_mailbox_close(LibBalsaMailbox * mailbox);
+void libbalsa_mailbox_link_message(LibBalsaMailbox * mbx, LibBalsaMessage*msg);
 void libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox);
 
 void libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox);

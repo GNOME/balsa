@@ -2811,7 +2811,7 @@ empty_trash(void)
 {
     GList *message;
 
-    libbalsa_mailbox_open(balsa_app.trash);
+    if(!libbalsa_mailbox_open(balsa_app.trash)) return;
 
     message = balsa_app.trash->message_list;
 

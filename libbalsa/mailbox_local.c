@@ -51,7 +51,7 @@ static void libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass *klass);
 static void libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox);
 static void libbalsa_mailbox_local_destroy(GtkObject * object);
 
-static void libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox);
+static gboolean libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox);
 static LibBalsaMailboxAppendHandle*
 libbalsa_mailbox_local_append(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox);
@@ -228,18 +228,18 @@ libbalsa_mailbox_local_destroy(GtkObject * object)
    operation and taken back when job is finished.
    Order is crucial to avoid deadlocks.
 */
-static void
+static gboolean
 libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
 {
     struct stat st;
     LibBalsaMailboxLocal *local;
     const gchar* path;
 
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox), FALSE);
 
     gdk_threads_leave();
 
-    LOCK_MAILBOX(mailbox);
+    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
     local = LIBBALSA_MAILBOX_LOCAL(mailbox);
     path = libbalsa_mailbox_local_get_path(mailbox);
 
@@ -248,13 +248,13 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
 	mailbox->open_ref++;
 	UNLOCK_MAILBOX(mailbox);
 	gdk_threads_enter();
-	return;
+	return TRUE;
     }
 
     if (stat(path, &st) == -1) {
 	UNLOCK_MAILBOX(mailbox);
 	gdk_threads_enter();
-	return;
+	return FALSE;
     }
     
     libbalsa_lock_mutt();
@@ -264,7 +264,7 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
     if (!CLIENT_CONTEXT_OPEN(mailbox)) {
 	UNLOCK_MAILBOX(mailbox);
 	gdk_threads_enter();
-	return;
+	return FALSE;
     }
     mailbox->readonly = CLIENT_CONTEXT(mailbox)->readonly;
     mailbox->messages = 0;
@@ -282,6 +282,7 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
     g_print(_("LibBalsaMailboxLocal: Opening %s Refcount: %d\n"),
 	    mailbox->name, mailbox->open_ref);
 #endif
+    return TRUE;
 }
 
 static LibBalsaMailboxAppendHandle*

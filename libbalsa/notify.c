@@ -141,7 +141,8 @@ libbalsa_notify_check_mailbox(LibBalsaMailbox * mailbox)
 
     if (bf == NULL) {
 	g_warning
-	    ("Did libbalsa_notify_check_mailbox on mailbox that isn't registered.");
+	    ("Did libbalsa_notify_check_mailbox on mailbox '%s' "
+             "that isn't registered.", mailbox->name);
 	return 0;
     }
 

@@ -615,6 +615,7 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
 {
     LibBalsaMailbox* mailbox;
     gchar *msg;
+    gboolean successp;
 
     g_return_val_if_fail (bindex != NULL, TRUE);
     g_return_val_if_fail (mbnode != NULL, TRUE);
@@ -625,10 +626,10 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
 			  mbnode->mailbox->name);
     gnome_appbar_push(balsa_app.appbar, msg);
     g_free(msg);
-    libbalsa_mailbox_open(mailbox);
+    successp = libbalsa_mailbox_open(mailbox);
     gnome_appbar_pop(balsa_app.appbar);
 
-    if (mailbox->open_ref == 0)
+    if (!successp)
 	return TRUE;
 
     /*

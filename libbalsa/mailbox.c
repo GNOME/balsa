@@ -56,7 +56,7 @@ static void libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
 
 /* Callbacks */
-static void message_status_changed_cb(LibBalsaMessage * message,
+static void message_status_changed_cb(LibBalsaMessage * message, gboolean set,
 				      LibBalsaMailbox * mb);
 
 static void libbalsa_mailbox_sync_backend_real(LibBalsaMailbox * mailbox);
@@ -125,11 +125,11 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 
     libbalsa_mailbox_signals[OPEN_MAILBOX] =
 	gtk_signal_new("open-mailbox",
-		       GTK_RUN_FIRST,
+		       GTK_RUN_LAST,
 		       object_class->type,
 		       GTK_SIGNAL_OFFSET(LibBalsaMailboxClass,
 					 open_mailbox),
-		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
+		       gtk_marshal_BOOL__NONE, GTK_TYPE_BOOL, 0);
 
     libbalsa_mailbox_signals[OPEN_MAILBOX_APPEND] =
 	gtk_signal_new("append-mailbox",
@@ -354,14 +354,16 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
     return mailbox;
 }
 
-void
+gboolean
 libbalsa_mailbox_open(LibBalsaMailbox * mailbox)
 {
-    g_return_if_fail(mailbox != NULL);
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    gboolean res;
+    g_return_val_if_fail(mailbox != NULL, FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
     gtk_signal_emit(GTK_OBJECT(mailbox),
-		    libbalsa_mailbox_signals[OPEN_MAILBOX]);
+		    libbalsa_mailbox_signals[OPEN_MAILBOX], &res);
+    return res;
 }
 
 void
@@ -372,6 +374,7 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
 
     gtk_signal_emit(GTK_OBJECT(mailbox),
 		    libbalsa_mailbox_signals[CLOSE_MAILBOX]);
+    mailbox->context = NULL;
 }
 
 LibBalsaMailboxAppendHandle* 
@@ -581,9 +584,43 @@ libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
     if ( def == TRUE ) {
 	mailbox->mailing_list_address = NULL;
     } else {
-	mailbox->mailing_list_address = libbalsa_address_new_from_string(address);
+	mailbox->mailing_list_address = 
+            libbalsa_address_new_from_string(address);
     }
     g_free(address);
+}
+
+/* libbalsa_mailbox_link_message:
+   MAKE sure the mailbox is LOCKed before entering this routine.
+*/ 
+void
+libbalsa_mailbox_link_message(LibBalsaMailbox * mailbox, LibBalsaMessage*msg)
+{
+    msg->mailbox = mailbox;
+    
+    gtk_signal_connect(GTK_OBJECT(msg), "clear-flags",
+                       GTK_SIGNAL_FUNC(message_status_changed_cb),
+                       mailbox);
+    gtk_signal_connect(GTK_OBJECT(msg), "set-answered",
+                       GTK_SIGNAL_FUNC(message_status_changed_cb),
+                       mailbox);
+    gtk_signal_connect(GTK_OBJECT(msg), "set-read",
+                       GTK_SIGNAL_FUNC(message_status_changed_cb),
+                       mailbox);
+    gtk_signal_connect(GTK_OBJECT(msg), "set-deleted",
+                       GTK_SIGNAL_FUNC(message_status_changed_cb),
+                       mailbox);
+    gtk_signal_connect(GTK_OBJECT(msg), "set-flagged",
+                       GTK_SIGNAL_FUNC(message_status_changed_cb),
+                       mailbox);
+
+    if (msg->flags & LIBBALSA_MESSAGE_FLAG_NEW)
+        mailbox->unread_messages++;
+    /* take over the ownership */
+    gtk_object_ref ( GTK_OBJECT(msg) );
+    gtk_object_sink( GTK_OBJECT(msg) );
+    mailbox->message_list = g_list_append(mailbox->message_list, msg);
+    mailbox->total_messages++;
 }
 
 /*
@@ -622,56 +659,10 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 	}
 
 	message = translate_message(cur);
-	message->mailbox = mailbox;
-
-	gtk_signal_connect(GTK_OBJECT(message), "clear-flags",
-			   GTK_SIGNAL_FUNC(message_status_changed_cb),
-			   mailbox);
-	gtk_signal_connect(GTK_OBJECT(message), "set-answered",
-			   GTK_SIGNAL_FUNC(message_status_changed_cb),
-			   mailbox);
-	gtk_signal_connect(GTK_OBJECT(message), "set-read",
-			   GTK_SIGNAL_FUNC(message_status_changed_cb),
-			   mailbox);
-	gtk_signal_connect(GTK_OBJECT(message), "set-deleted",
-			   GTK_SIGNAL_FUNC(message_status_changed_cb),
-			   mailbox);
-	gtk_signal_connect(GTK_OBJECT(message), "set-flagged",
-			   GTK_SIGNAL_FUNC(message_status_changed_cb),
-			   mailbox);
-
-	if (!cur->read) {
-	    message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
-
-	    mailbox->unread_messages++;
-	}
-
-	if (cur->deleted)
-	    message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
-
-	if (cur->flagged)
-	    message->flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
-
-	if (cur->replied)
-	    message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
-
-        message->msgno     = cur->msgno;
-        /* set the length */
-#ifdef MESSAGE_COPY_CONTENT
-        message->length = cur->content->length;
-        message->lines_len = cur->lines;
-#endif
-	/* take over the ownership */
-	mailbox->message_list =
-	    g_list_append(mailbox->message_list, message);
-	mailbox->total_messages++;
-	mailbox->messages++;
-	gtk_object_ref ( GTK_OBJECT(message) );
-	gtk_object_sink( GTK_OBJECT(message) );
-
-	mailbox->new_messages--;
-
+        libbalsa_mailbox_link_message(mailbox, message);
 	messages=g_list_append(messages, message);
+        mailbox->new_messages--;
+        mailbox->messages++;
     }
     UNLOCK_MAILBOX(mailbox);
 
@@ -746,8 +737,19 @@ libbalsa_mailbox_commit(LibBalsaMailbox* mailbox)
     index_hint = CLIENT_CONTEXT(mailbox)->vcount;
     rc = mx_sync_mailbox(CLIENT_CONTEXT(mailbox), &index_hint);
     libbalsa_unlock_mutt();
-    mailbox->messages = CLIENT_CONTEXT(mailbox)->msgcount;
-    UNLOCK_MAILBOX(mailbox);
+    if(rc==0) 
+        mailbox->messages = CLIENT_CONTEXT(mailbox)->msgcount;
+    
+    if(rc == M_NEW_MAIL || rc == M_REOPENED) {
+        mailbox->new_messages =
+            CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
+        
+	    UNLOCK_MAILBOX(mailbox);
+	    libbalsa_mailbox_load_messages(mailbox);
+            rc = 0;
+    } else {
+        UNLOCK_MAILBOX(mailbox);
+    }
 
     printf("libbalsa_mailbox_commit: synced, res=%i\n", rc);
     return rc ==0;
@@ -866,12 +868,28 @@ translate_message(HEADER * cur)
 
     message = libbalsa_message_new();
     message->header = cur;
+    message->msgno  = cur->msgno;
+        /* set the length */
+#ifdef MESSAGE_COPY_CONTENT
+    message->length = cur->content->length;
+    message->lines_len = cur->lines;
+#endif
+    if (!cur->read)
+        message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
+    if (cur->deleted)
+        message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
+    if (cur->flagged)
+        message->flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
+    if (cur->replied)
+        message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
+
     libbalsa_message_headers_update(message);
     return message;
 }
 
 static void
-message_status_changed_cb(LibBalsaMessage * message, LibBalsaMailbox * mb)
+message_status_changed_cb(LibBalsaMessage * message, gboolean set,
+                          LibBalsaMailbox * mb)
 {
     gtk_signal_emit(GTK_OBJECT(message->mailbox),
 		    libbalsa_mailbox_signals[MESSAGE_STATUS_CHANGED],

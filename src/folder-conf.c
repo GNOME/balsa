@@ -30,8 +30,8 @@
 
 typedef struct {
     GnomeDialog *dialog;
-    GtkWidget * folder_name, *server, *port, *username, *password, 
-	*subscribed, *list_inbox, *prefix;
+    GtkWidget * folder_name, *server, *port, *username, *remember,
+        *password, *subscribed, *list_inbox, *prefix;
 #ifdef USE_SSL
     GtkWidget *use_ssl;
 #endif
@@ -67,13 +67,24 @@ static void imap_use_ssl_cb(GtkToggleButton * button,
 static void
 imap_use_ssl_cb(GtkToggleButton * button, FolderDialogData * fcw)
 {
-    gint zero = 0;
-    GtkEditable *port = GTK_EDITABLE(fcw->port);
-    gboolean use_ssl = gtk_toggle_button_get_active(button);
-    gtk_editable_delete_text(port, 0, -1);
-    gtk_editable_insert_text(port, use_ssl ? "993" : "143", 3, &zero);
+    char *colon, *newhost;
+    const gchar* host = gtk_entry_get_text(GTK_ENTRY(fcw->server));
+    gchar* port = gtk_toggle_button_get_active(button) ? "993" : "143";
+
+    if( (colon=strchr(host,':')) != NULL) 
+        *colon = '\0';
+    newhost = g_strconcat(host, ":", port);
+    gtk_entry_set_text(GTK_ENTRY(fcw->server), newhost);
+    g_free(newhost);
 }
 #endif
+
+static void
+remember_cb(GtkToggleButton * button, FolderDialogData * fcw)
+{
+    gtk_widget_set_sensitive(fcw->password,
+                             gtk_toggle_button_get_active(button));
+}
 
 static void
 folder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
@@ -82,7 +93,6 @@ folder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
     LibBalsaServer * s = fcw->mn ? fcw->mn->server : NULL;
     static GnomeHelpMenuEntry help_entry = { NULL, "folder-config.html" };
     gboolean insert;
-    gint port_no;
     GNode *gnode;
 
     help_entry.name = gnome_app_id;
@@ -95,16 +105,16 @@ folder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
 	}
 	else insert = FALSE;
 	
-	port_no = atoi(gtk_entry_get_text(GTK_ENTRY(fcw->port)));
 	libbalsa_server_set_host(s, 
-                                 gtk_entry_get_text(GTK_ENTRY(fcw->server)), 
-				 port_no
+                                 gtk_entry_get_text(GTK_ENTRY(fcw->server))
 #ifdef USE_SSL
 				 , gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->use_ssl))
 #endif
                                  );
 	libbalsa_server_set_username
 	    (s, gtk_entry_get_text(GTK_ENTRY(fcw->username)));
+        s->remember_passwd = 
+            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->remember));
 	libbalsa_server_set_password
 	    (s, gtk_entry_get_text(GTK_ENTRY(fcw->password)));
 	
@@ -169,7 +179,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     frame = gtk_frame_new(_("Remote IMAP folder set"));
     gtk_box_pack_start(GTK_BOX(fcw.dialog->vbox),
                        frame, TRUE, TRUE, 0);
-    table = gtk_table_new(8, 2, FALSE);
+    table = gtk_table_new(9, 2, FALSE);
     gtk_container_add(GTK_CONTAINER(frame), table);
  
     /* INPUT FIELD CREATION */
@@ -183,39 +193,35 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 			  s ? s->host : default_server,
 			  keyval);
 
-    create_label(_("_Port:"), table, 2, &keyval);
-    if(s) {
-	gchar* tmp = g_strdup_printf("%d", s->port);
-	fcw.port = create_entry(fcw.dialog, table, NULL, NULL, 2, tmp, keyval);
-	g_free(tmp);
-    } else fcw.port = 
-	       create_entry(fcw.dialog, table, NULL, NULL, 2, "143", keyval);
-
-
     create_label(_("_User name:"), table, 3, &keyval);
     fcw.username = create_entry(fcw.dialog, table, validate_folder, &fcw, 3, 
 			    s ? s->user : g_get_user_name(), 
 			    keyval);
 
-    create_label(_("_Password:"), table, 4, &keyval);
-    fcw.password = create_entry(fcw.dialog, table, NULL, NULL, 4,
+    fcw.remember = create_check(fcw.dialog, _("_Remember password"), 
+                                table, 4, s ? s->remember_passwd : TRUE);
+    gtk_signal_connect(GTK_OBJECT(fcw.remember), "toggled", remember_cb, 
+                       &fcw);
+
+    create_label(_("_Password:"), table, 5, &keyval);
+    fcw.password = create_entry(fcw.dialog, table, NULL, NULL, 5,
 				s ? s->passwd : NULL, 
 				keyval);
     gtk_entry_set_visibility(GTK_ENTRY(fcw.password), FALSE);
 
     fcw.subscribed = create_check(fcw.dialog, _("_Subscribed folders only"), 
-                                  table, 5, mn ? mn->subscribed : FALSE);
+                                  table, 6, mn ? mn->subscribed : FALSE);
     fcw.list_inbox = create_check(fcw.dialog, _("_Always show INBOX"), 
-                                  table, 6, mn ? mn->list_inbox : TRUE); 
+                                  table, 7, mn ? mn->list_inbox : TRUE); 
 
-    create_label(_("_Prefix"), table, 7, &keyval);
-    fcw.prefix = create_entry(fcw.dialog, table, NULL, NULL, 7, 
+    create_label(_("_Prefix"), table, 8, &keyval);
+    fcw.prefix = create_entry(fcw.dialog, table, NULL, NULL, 8,
 			      mn ? mn->dir : NULL, keyval);
     
 #ifdef USE_SSL
     fcw.use_ssl = create_check(fcw.dialog,
 			       _("Use SSL (IMAPS)"),
-			       table, 8, s ? s->use_ssl : FALSE);
+			       table, 9, s ? s->use_ssl : FALSE);
     gtk_signal_connect(GTK_OBJECT(fcw.use_ssl), "toggled", imap_use_ssl_cb, 
                        &fcw);
 #endif

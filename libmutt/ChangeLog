@@ -1,3 +1,9 @@
+2002-01-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* imap/imap.c: read UID-VALIDITY.
+	* imap/imap_private.h: add uid_validity to IMAP_DATA
+	* imap/message.c: IN-REPLY-TO needed for threading (Peter B.).
+
 2001-12-19  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* rfc822.c: last ditch check.

@@ -54,6 +54,7 @@ struct _MailboxConfWindow {
 	    GtkWidget *server;
 	    GtkWidget *port;
 	    GtkWidget *username;
+            GtkWidget *remember;
 	    GtkWidget *password;
 	    GtkWidget *folderpath;
 #ifdef USE_SSL
@@ -64,7 +65,6 @@ struct _MailboxConfWindow {
 	/* for pop3 mailboxes */
 	struct {
 	    GtkWidget *server;
-	    GtkWidget *port;
 	    GtkWidget *username;
 	    GtkWidget *password;
 	    GtkWidget *check;
@@ -89,7 +89,8 @@ static void mailbox_conf_add(MailboxConfWindow *conf_window);
 /* misc functions */
 static void mailbox_conf_set_values(MailboxConfWindow *mcw);
 
-static void fill_in_imap_data(MailboxConfWindow *mcw, gchar ** name, gchar ** path);
+static void fill_in_imap_data(MailboxConfWindow *mcw, gchar ** name, 
+                              gchar ** path);
 static void update_imap_mailbox(MailboxConfWindow *mcw);
 
 static void update_pop_mailbox(MailboxConfWindow *mcw);
@@ -106,17 +107,21 @@ void mailbox_conf_edit_imap_server(GtkWidget * widget, gpointer data);
 
 
 #ifdef USE_SSL
-static void imap_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw);
+static void imap_use_ssl_cb(GtkToggleButton* w, MailboxConfWindow * mcw);
 
 static void
-imap_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw)
+imap_use_ssl_cb(GtkToggleButton * button, MailboxConfWindow * mcw)
 {
-    gint zero = 0;
-    GtkEditable *port = GTK_EDITABLE(mcw->mb_data.imap.port);
-    GtkToggleButton *button = GTK_TOGGLE_BUTTON(mcw->mb_data.imap.use_ssl);
-    gboolean use_ssl = gtk_toggle_button_get_active(button);
-    gtk_editable_delete_text(port, 0, -1);
-    gtk_editable_insert_text(port, use_ssl ? "993" : "143", 3, &zero);
+    char *colon, *newhost;
+    const gchar* host = 
+        gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.server));
+    gchar* port = gtk_toggle_button_get_active(button) ? "993" : "143";
+
+    if( (colon=strchr(host,':')) != NULL) 
+        *colon = '\0';
+    newhost = g_strconcat(host, ":", port, NULL);
+    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.server), newhost);
+    g_free(newhost);
 }
 
 #ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
@@ -125,12 +130,16 @@ static void pop3_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw);
 static void
 pop3_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw)
 {
-    gint zero = 0;
-    GtkEditable *port = GTK_EDITABLE(mcw->mb_data.pop3.port);
+    char *colon, *newhost;
+    const gchar* host = gtk_editable_get_text(mcw->mb_data.pop3.host);
     GtkToggleButton *button = GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.use_ssl);
-    gboolean use_ssl = gtk_toggle_button_get_active(button);
-    gtk_editable_delete_text(port, 0, -1);
-    gtk_editable_insert_text(port, use_ssl ? "995" : "110", 3, &zero);
+    gchar* port = gtk_toggle_button_get_active(button) ? "995" : "110";
+
+    if( (colon=strchr(text,':')) != NULL) 
+        *colon = '\0';
+    newhost = g_strconcat(host, ":", port);
+    gtk_editable_set_text(mcw->mb_data.pop3.host, newhost);
+    g_free(newhost);
 }
 #endif
 #endif
@@ -398,7 +407,6 @@ static void
 mailbox_conf_set_values(MailboxConfWindow *mcw)
 {
     LibBalsaMailbox * mailbox;
-    gchar *port;
 
     mailbox = mcw->mailbox;
 
@@ -409,9 +417,7 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 			   mailbox->name);
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
-	LibBalsaMailboxLocal *local;
-
-	local = LIBBALSA_MAILBOX_LOCAL(mailbox);
+	LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
 
 	if (mailbox->url)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.local.path),
@@ -423,15 +429,13 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
 	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
-	port = g_strdup_printf("%d", server->port);
 
 	if (server->host)
-	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.server), server->host);
-
-	gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.port), port);
-
+	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.server), 
+                               server->host);
 	if (server->user)
-	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.username), server->user);
+	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.username), 
+                               server->user);
 	if (server->passwd)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.password),
 			       server->passwd);
@@ -454,8 +458,6 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	    (GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter),
 	     pop3->filter);
 
-	g_free(port);
-
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 	LibBalsaMailboxImap *imap;
 	LibBalsaServer *server;
@@ -463,18 +465,18 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	imap = LIBBALSA_MAILBOX_IMAP(mailbox);
 	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
-	port = g_strdup_printf("%d", server->port);
-
 	if (server->host)
-	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.server), server->host);
+	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.server), 
+                               server->host);
 	if (server->user)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.username),
 			       server->user);
+	gtk_toggle_button_set_active
+            (GTK_TOGGLE_BUTTON(mcw->mb_data.imap.remember),
+	     server->remember_passwd);
 	if (server->passwd)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.password),
 			       server->passwd);
-	gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.port), port);
-
 	if (imap->path)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.folderpath),
 			       imap->path);
@@ -483,8 +485,9 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	    (GTK_TOGGLE_BUTTON(mcw->mb_data.imap.use_ssl),
 	     server->use_ssl);
 #endif
-
-	g_free(port);
+        if(!server->remember_passwd)
+            gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.password),
+                                     FALSE);
     }
 }
 
@@ -513,14 +516,10 @@ check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw)
 	    sensitive = FALSE;
 	else if (!strcmp(gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.username)), ""))
 	    sensitive = FALSE;
-	else if (!strcmp(gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.port)), ""))
-	    sensitive = FALSE;
     } else if ( gtk_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3) ) {
 	if (!strcmp(gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.username)), ""))
 	    sensitive = FALSE;
 	else if (!strcmp(gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.server)), ""))
-	    sensitive = FALSE;
-	else if (!strcmp(gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.port)), ""))
 	    sensitive = FALSE;
     }
 
@@ -572,9 +571,7 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 						    (mcw->mb_data.pop3.password)));
     libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
 			     gtk_entry_get_text(GTK_ENTRY
-						(mcw->mb_data.pop3.server)),
-			     atoi(gtk_entry_get_text
-				  (GTK_ENTRY(mcw->mb_data.pop3.port)))
+						(mcw->mb_data.pop3.server))
 #ifdef USE_SSL
 #ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
 			     , gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.use_ssl))
@@ -602,28 +599,30 @@ update_imap_mailbox(MailboxConfWindow *mcw)
 {
     gchar *path;
     LibBalsaMailboxImap *mailbox;
+    LibBalsaServer* server;
 
     mailbox = LIBBALSA_MAILBOX_IMAP(mcw->mailbox);
-
+    server  = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     g_free(LIBBALSA_MAILBOX(mailbox)->name);
     fill_in_imap_data(mcw, &LIBBALSA_MAILBOX(mailbox)->name, &path);
-    libbalsa_server_set_username(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+    libbalsa_server_set_username(server,
 				 gtk_entry_get_text(GTK_ENTRY
 						    (mcw->mb_data.imap.username)));
-    libbalsa_server_set_password(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+    server->remember_passwd = 
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->
+                                                       mb_data.imap.remember));
+    libbalsa_server_set_password(server,
 				 gtk_entry_get_text(GTK_ENTRY
 						    (mcw->mb_data.imap.password)));
-    libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+    libbalsa_server_set_host(server,
 			     gtk_entry_get_text(GTK_ENTRY
-						(mcw->mb_data.imap.server)),
-			     atoi(gtk_entry_get_text
-				  (GTK_ENTRY(mcw->mb_data.imap.port)))
+						(mcw->mb_data.imap.server))
 #ifdef USE_SSL
 			     , gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.imap.use_ssl))
 #endif
 );
 
-    gtk_signal_connect(GTK_OBJECT(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)),
+    gtk_signal_connect(GTK_OBJECT(server),
 		       "get-password", GTK_SIGNAL_FUNC(ask_password),
 		       mailbox);
 
@@ -859,12 +858,8 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
     create_label(_("_Server:"), table, 1, &keyval);
     mcw->mb_data.pop3.server = create_entry(mcw->window, table,
 				     GTK_SIGNAL_FUNC(check_for_blank_fields),
-				     mcw, 1, "localhost", keyval);
+				     mcw, 1, "localhost:110", keyval);
 
-    /* pop port */
-    create_label(_("_Port:"), table, 2, &keyval);
-    mcw->mb_data.pop3.port = create_entry(mcw->window, table, NULL,
-					  NULL, 2, "110", keyval);
 
     /* username  */
     create_label(_("_Username:"), table, 3, &keyval);
@@ -908,10 +903,18 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
     mcw->mb_data.pop3.use_ssl = 
 	create_check(mcw->window, _("_Use SSL (pop3s)"), 
 		     table, 9, FALSE);
-    gtk_signal_connect(GTK_OBJECT(mcw->mb_data.pop3.use_ssl), "toggled", pop3_use_ssl_cb, mcw);
+    gtk_signal_connect(GTK_OBJECT(mcw->mb_data.pop3.use_ssl), "toggled", 
+                       pop3_use_ssl_cb, mcw);
 #endif
 
     return table;
+}
+
+static void
+remember_toggle_cb(GtkToggleButton *remember_button, MailboxConfWindow *mcw)
+{
+    gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.password),
+                             gtk_toggle_button_get_active(remember_button));
 }
 
 static GtkWidget *
@@ -937,11 +940,6 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
 		     GTK_SIGNAL_FUNC(check_for_blank_fields),
 		     mcw, 1, "localhost", keyval);
 
-    /* imap server port number */
-    create_label(_("_Port:"), table, 2, &keyval);
-    mcw->mb_data.imap.port = 
-	create_entry(mcw->window, table, NULL, NULL, 2, "143", keyval);
-
     /* username  */
     create_label(_("_Username:"), table, 3, &keyval);
     mcw->mb_data.imap.username = 
@@ -949,13 +947,21 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
 		     GTK_SIGNAL_FUNC(check_for_blank_fields),
 		     mcw, 3, g_get_user_name(), keyval);
 
-    /* password field */
-    create_label(_("Pass_word:"), table, 4, &keyval);
+    /* toggle for remember password */
+    mcw->mb_data.imap.remember = 
+	create_check(mcw->window, _("_Remember Password"), table, 4,
+		     FALSE);
+    gtk_signal_connect(GTK_OBJECT(mcw->mb_data.imap.remember),
+		       "toggled", GTK_SIGNAL_FUNC(remember_toggle_cb),
+		       mcw);
+
+   /* password field */
+    create_label(_("Pass_word:"), table, 5, &keyval);
     mcw->mb_data.imap.password = 
-	create_entry(mcw->window, table, NULL, NULL, 4, NULL, keyval);
+	create_entry(mcw->window, table, NULL, NULL, 5, NULL, keyval);
     gtk_entry_set_visibility(GTK_ENTRY(mcw->mb_data.imap.password), FALSE);
 
-    create_label(_("F_older Path:"), table, 5, &keyval);
+    create_label(_("F_older Path:"), table, 6, &keyval);
 
     entry = gnome_entry_new("IMAP Folder History");
     mcw->mb_data.imap.folderpath = gnome_entry_gtk_entry(GNOME_ENTRY(entry));
@@ -972,26 +978,20 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
 		       "changed", GTK_SIGNAL_FUNC(check_for_blank_fields),
 		       mcw);
 
-    gnome_entry_append_history(GNOME_ENTRY(entry), 1,
-			       "INBOX");
-    gnome_entry_append_history(GNOME_ENTRY(entry), 1,
-			       "INBOX.Sent");
-    gnome_entry_append_history(GNOME_ENTRY(entry), 1,
-			       "INBOX.Draft");
-    gnome_entry_append_history(GNOME_ENTRY(entry), 1,
-			       "INBOX.outbox");
-
+    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX");
+    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX.Sent");
+    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX.Draft");
+    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX.outbox");
+    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, 6, 7,
+		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
 #ifdef USE_SSL
     /* toggle for SSL */
-    mcw->mb_data.imap.use_ssl = create_check(mcw->window, 
-					     _("Use SSL (imaps)"),
-					     table, 6, FALSE);
-    gtk_signal_connect(GTK_OBJECT(mcw->mb_data.imap.use_ssl), "toggled", imap_use_ssl_cb, mcw);
+    mcw->mb_data.imap.use_ssl = 
+        create_check(mcw->window, _("Use SSL (imaps)"), table, 7, FALSE);
+    gtk_signal_connect(GTK_OBJECT(mcw->mb_data.imap.use_ssl), "toggled", 
+                       imap_use_ssl_cb, mcw);
 #endif
-
-    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, 5, 6,
-		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
     return table;
 }

@@ -82,7 +82,8 @@ balsa_LDADD = \
 	$(top_builddir)/libmutt/libmutt.a	\
 	$(top_builddir)/libinit_balsa/libinit_balsa.a \
 	-lpspell \
-	-lltdl \
+	-lltdl	\
+	-lgdbm	\
 	$(INTLLIBS) \
 	$(PCRE_LIBS) \
 	$(PTHREAD_LIB)

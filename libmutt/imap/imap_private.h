@@ -181,6 +181,8 @@ typedef struct
   
   /* all folder flags - system flags AND keywords */
   LIST *flags;
+  /* BALSA: add uid_validity */
+  unsigned int uid_validity;
 } IMAP_DATA;
 /* I wish that were called IMAP_CONTEXT :( */
 

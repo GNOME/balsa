@@ -327,6 +327,8 @@ gint config_mailbox_update(LibBalsaMailbox * mailbox)
 
     key = mailbox_section_path(mailbox);
     res = gnome_config_has_section(key);
+    gnome_config_clean_section(key);
+    gnome_config_private_clean_section(key);
     gnome_config_push_prefix(key);
     libbalsa_mailbox_save_config(mailbox, key);
     g_free(key);

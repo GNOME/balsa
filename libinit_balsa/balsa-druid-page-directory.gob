@@ -4,7 +4,7 @@ requires 1.0.0
 %h{
 /*
  * Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2001 Stuart Parmenter and others, see AUTHORS.
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -117,11 +117,8 @@ static void unconditional_mailbox(const gchar *path, const gchar *prettyname,
 	}
 
 	if( url.host && LIBBALSA_IS_MAILBOX_REMOTE(*box) ) {
-	  if( !url.port )
-	    url.port = LIBBALSA_MAILBOX_REMOTE_SERVER(*box)->port;
-
 	  libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_SERVER(*box),
-				   url.host, url.port
+				   url.host
 #ifdef USE_SSL
 				   , ssl
 #endif

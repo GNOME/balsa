@@ -56,7 +56,8 @@ int imap_read_headers (IMAP_DATA* idata, int msgbegin, int msgend)
   int fetchlast = 0;
 #ifdef LIBMUTT
   const char *want_headers = 
-      "DATE FROM SUBJECT TO MESSAGE-ID REFERENCES CONTENT-TYPE LINES";
+      "DATE FROM SUBJECT TO MESSAGE-ID REFERENCES CONTENT-TYPE "
+      "IN-REPLY-TO LINES";
 #else
   const char *want_headers = "DATE FROM SUBJECT TO CC MESSAGE-ID REFERENCES CONTENT-TYPE IN-REPLY-TO REPLY-TO LINES X-LABEL";
 #endif

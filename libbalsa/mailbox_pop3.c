@@ -54,7 +54,7 @@ static void libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class *
 					     klass);
 static void libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox);
 
-static void libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox);
+static gboolean libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox);
 
 static void libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
@@ -122,8 +122,6 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox)
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server =
 	LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_POP3));
-    remote->server->port = 110;
-
 }
 
 static void
@@ -153,24 +151,24 @@ libbalsa_mailbox_pop3_new(void)
     return GTK_OBJECT(mailbox);
 }
 
-static void
+static gboolean
 libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxPop3 *pop;
 
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox));
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox), FALSE);
 
-    /* FIXME: I was curious if this function was ever called... */
+    /* FIXME: I wonder whether this function is ever called... */
 
     g_print("Opened a POP3 mailbox!\n");
 
-    LOCK_MAILBOX(mailbox);
+    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
 
     if (CLIENT_CONTEXT_OPEN(mailbox)) {
 	/* increment the reference count */
 	mailbox->open_ref++;
 	UNLOCK_MAILBOX(mailbox);
-	return;
+	return TRUE;
     }
 
     pop = LIBBALSA_MAILBOX_POP3(mailbox);
@@ -199,6 +197,7 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox)
     }
 
     UNLOCK_MAILBOX(mailbox);
+    return TRUE;
 }
 
 /* libbalsa_mailbox_pop3_check:
@@ -388,8 +387,7 @@ libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
 
     pop = LIBBALSA_MAILBOX_POP3(mailbox);
 
-    libbalsa_server_load_config(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
-				110);
+    libbalsa_server_load_config(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
 
     pop->check = gnome_config_get_bool("Check=false");
     pop->delete_from_server = gnome_config_get_bool("Delete=false");

@@ -36,7 +36,7 @@ static void libbalsa_server_real_set_username(LibBalsaServer * server,
 static void libbalsa_server_real_set_password(LibBalsaServer * server,
 					      const gchar * passwd);
 static void libbalsa_server_real_set_host(LibBalsaServer * server,
-					  const gchar * host, gint port
+					  const gchar * host
 #ifdef USE_SSL
 					  ,gboolean use_ssl
 #endif
@@ -104,11 +104,11 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
 	gtk_signal_new("set-host", GTK_RUN_FIRST, object_class->type,
 		       GTK_SIGNAL_OFFSET(LibBalsaServerClass, set_host),
 #ifdef USE_SSL
-		       gtk_marshal_NONE__POINTER_INT_INT, GTK_TYPE_NONE, 3,
-		       GTK_TYPE_STRING, GTK_TYPE_INT, GTK_TYPE_BOOL);
+		       gtk_marshal_NONE__POINTER_INT, GTK_TYPE_NONE, 2,
+		       GTK_TYPE_STRING, GTK_TYPE_BOOL);
 #else
-                       gtk_marshal_NONE__POINTER_INT, GTK_TYPE_NONE, 2,
-	               GTK_TYPE_STRING, GTK_TYPE_INT);
+                       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
+	               GTK_TYPE_STRING);
 #endif
 
 
@@ -134,9 +134,9 @@ static void
 libbalsa_server_init(LibBalsaServer * server)
 {
     server->host = NULL;
-    server->port = 0;
     server->user = NULL;
     server->passwd = NULL;
+    server->remember_passwd = TRUE;
 #ifdef USE_SSL
     server->use_ssl = FALSE;
 #endif
@@ -192,8 +192,7 @@ libbalsa_server_set_password(LibBalsaServer * server, const gchar * passwd)
 }
 
 void
-libbalsa_server_set_host(LibBalsaServer * server, const gchar * host,
-			 gint port
+libbalsa_server_set_host(LibBalsaServer * server, const gchar * host
 #ifdef USE_SSL
 			 , gboolean use_ssl
 #endif
@@ -203,7 +202,7 @@ libbalsa_server_set_host(LibBalsaServer * server, const gchar * host,
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
     gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_HOST],
-		    host, port
+		    host
 #ifdef USE_SSL
 		    , use_ssl
 #endif
@@ -248,8 +247,7 @@ libbalsa_server_real_set_password(LibBalsaServer * server,
 }
 
 static void
-libbalsa_server_real_set_host(LibBalsaServer * server, const gchar * host,
-			      gint port
+libbalsa_server_real_set_host(LibBalsaServer * server, const gchar * host
 #ifdef USE_SSL
 			      , gboolean use_ssl
 #endif
@@ -259,7 +257,6 @@ libbalsa_server_real_set_host(LibBalsaServer * server, const gchar * host,
 
     g_free(server->host);
     server->host = g_strdup(host);
-    server->port = port;
 #ifdef USE_SSL
     server->use_ssl = use_ssl;
 #endif 
@@ -301,23 +298,33 @@ rot(gchar * pass)
 
 /* libbalsa_server_load_config:
    load the server configuration using gnome-config.
-   Try to use sensible defaults.
+   Try to use sensible defaults. 
+   FIXME: Port field is kept here only for compatibility, drop after 1.4.x
+   release.
 */
 void
-libbalsa_server_load_config(LibBalsaServer * server, gint default_port)
+libbalsa_server_load_config(LibBalsaServer * server)
 {
     gboolean d;
     server->host = gnome_config_get_string("Server");
-    server->port = gnome_config_get_int_with_default("Port", &d);
-    if (d)
-	server->port = default_port;
+    if(strrchr(server->host, ':') == NULL) {
+        gint port;
+        port = gnome_config_get_int_with_default("Port", &d);
+        if (!d) {
+            gchar *newhost = g_strdup_printf("%s:%d", server->host, port);
+            g_free(server->host);
+            server->host = newhost;
+        }
+    }       
 #ifdef USE_SSL
     server->use_ssl = gnome_config_get_bool_with_default("SSL", &d);
     if (d)
 	server->use_ssl = FALSE;
 #endif
     server->user = gnome_config_private_get_string("Username");
-    server->passwd = gnome_config_private_get_string("Password");
+    server->remember_passwd = gnome_config_get_bool("RememberPasswd=true");
+    if(server->remember_passwd)
+        server->passwd = gnome_config_private_get_string("Password");
     if(server->passwd && server->passwd[0] == '\0') {
 	g_free(server->passwd);
 	server->passwd = NULL;
@@ -338,16 +345,16 @@ void
 libbalsa_server_save_config(LibBalsaServer * server)
 {
     gnome_config_set_string("Server", server->host);
-    gnome_config_set_int("Port", server->port);
     gnome_config_private_set_string("Username", server->user);
+    gnome_config_set_bool("RememberPasswd", server->remember_passwd);
 
-    if (server->passwd != NULL) {
+    if (server->remember_passwd && server->passwd != NULL) {
 	gchar *buff;
 	buff = rot(server->passwd);
 	gnome_config_private_set_string("Password", buff);
 	g_free(buff);
     }
 #ifdef USE_SSL
-    gnome_config_set_bool("SSL", server->use_ssl );
+    gnome_config_set_bool("SSL", server->use_ssl);
 #endif
 }

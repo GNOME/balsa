@@ -181,13 +181,13 @@ computeAuthHash(char *stamp, char *hash, const char *passwd) {
 }
 
 static PopStatus
-pop_connect(int *s, const gchar *host, gint port)
+pop_connect(int *s, const gchar *host)
 {
 #ifdef HAVE_GETADDRINFO
 /* --- IPv4/6 --- */
 
   /* "65536\0" */
-  char portstr[6];
+  gchar *hostname, *port;
   struct addrinfo hints;
   struct addrinfo* res;
   struct addrinfo* cur;
@@ -199,9 +199,14 @@ pop_connect(int *s, const gchar *host, gint port)
   hints.ai_family = ( 1/*option (OPTUSEIPV6) */) ?  AF_UNSPEC : AF_INET;
   hints.ai_socktype = SOCK_STREAM;
 
-  snprintf (portstr, sizeof (portstr), "%d", port);
-  if(getaddrinfo (host, portstr, &hints, &res))
-      return POP_HOST_NOT_FOUND;
+  hostname = g_strdup(host);
+  if( (port=strrchr(hostname, ':')) != NULL)
+      *(port++) = '\0';
+  else port = g_strdup("110");
+  rc = getaddrinfo (hostname, port, &hints, &res);
+  free(hostname);
+
+  if(rc) return POP_HOST_NOT_FOUND;
 
   for(cur = res; cur != NULL; cur = cur->ai_next) {
       *s = socket (cur->ai_family, cur->ai_socktype, cur->ai_protocol);
@@ -227,22 +232,28 @@ pop_connect(int *s, const gchar *host, gint port)
     struct sockaddr_in sin;
     gint32 n;
     struct hostent *he;
-    
+    char *port, *hostname;
+
+    hostname = g_strdup(host);
+    if( (port=strrchr(hostname,':')) != NULL)
+        (*port++) = '\0';
+
     *s = socket (AF_INET, SOCK_STREAM, IPPROTO_IP);
     
     memset ((char *) &sin, 0, sizeof(sin));
     sin.sin_family = AF_INET;
-    sin.sin_port = htons (port);
+    sin.sin_port = htons (atoi(port));
     
-    if ((n = inet_addr (host)) == -1) {
+    if ((n = inet_addr (hostname)) == -1) {
 	/* Must be a DNS name */
-	if ((he = gethostbyname (host)) == NULL)
+	if ((he = gethostbyname (hostname)) == NULL)
 	    return POP_HOST_NOT_FOUND;
 	memcpy ((void *)&sin.sin_addr, *(he->h_addr_list), he->h_length);
     }
     else
 	memcpy ((void *)&sin.sin_addr, (void *)&n, sizeof(n));
-    
+    g_free(hostname);
+
     if (connect(*s, (struct sockaddr *)&sin, sizeof(struct sockaddr_in)) == -1)
 	return POP_CONNECT_FAILED;
 #endif
@@ -577,7 +588,7 @@ typedef PopStatus
 
 static PopStatus
 fetch_pop_mail (const gchar *pop_host, const gchar *pop_user,
-		const gchar *pop_pass, gint pop_port,
+		const gchar *pop_pass, 
 		gboolean use_apop, gboolean delete_on_server,
 		gchar * last_uid, ProgressCallback prog_cb,
 		ProcessCallback proccb, const gchar *data)
@@ -592,7 +603,7 @@ fetch_pop_mail (const gchar *pop_host, const gchar *pop_user,
 
 
     DM("POP3 - begin connection");
-    status = pop_connect(&s, pop_host, pop_port);
+    status = pop_connect(&s, pop_host);
     if(status != POP_OK) return status;
     DM("POP3 Connected; hello");
 
@@ -631,7 +642,7 @@ libbalsa_fetch_pop_mail_direct (LibBalsaMailboxPop3* mailbox,
     g_return_val_if_fail(mailbox, POP_OK);
     
     s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-    return fetch_pop_mail(s->host, s->user,s->passwd, s->port,
+    return fetch_pop_mail(s->host, s->user,s->passwd, 
 			  mailbox->use_apop, mailbox->delete_from_server,
 			  uid, prog_cb, fetch_direct, spoolfile);
 }
@@ -643,7 +654,7 @@ libbalsa_fetch_pop_mail_filter (LibBalsaMailboxPop3* mailbox,
     g_return_val_if_fail(mailbox, POP_OK);
     
     s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-    return fetch_pop_mail(s->host, s->user,s->passwd, s->port,
+    return fetch_pop_mail(s->host, s->user,s->passwd, 
 			  mailbox->use_apop, mailbox->delete_from_server,
 			  uid, prog_cb, fetch_procmail, "procmail -f -");
 }

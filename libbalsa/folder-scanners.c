@@ -170,7 +170,6 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     libbalsa_lock_mutt();
     safe_free((void **)&ImapUser);   ImapUser = safe_strdup(server->user);
     safe_free((void **)&ImapPass);   ImapPass = safe_strdup(server->passwd);
-
     /* subscribed triggers a bug in libmutt, disable it now */
     if(subscribed)
 	set_option(OPTIMAPLSUB);
@@ -194,22 +193,21 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 	printf("Deph: %i -------------------------------------------\n", i);
 	for(el= g_list_first(list); el; el = g_list_next(el)) {
 	    if(*(char*)el->data)
-		imap_path = g_strdup_printf("imap%s://%s:%i/%s/", 
+		imap_path = g_strdup_printf("imap%s://%s/%s/", 
 #ifdef USE_SSL
 					    server->use_ssl ? "s" : "",
 #else
 					    "",
 #endif
-					    server->host, server->port, 
-					    (char*)el->data);
+					    server->host, (char*)el->data);
 	    else 
-		imap_path = g_strdup_printf("imap%s://%s:%i/", 
+		imap_path = g_strdup_printf("imap%s://%s/", 
 #ifdef USE_SSL
 					    server->use_ssl ? "s" : "",
 #else
 					    "",
 #endif
-					    server->host, server->port);
+					    server->host);
 	    FREE(&state.folder);
 	    imap_browse ((char*)imap_path,  &state);
 	    g_free(imap_path);

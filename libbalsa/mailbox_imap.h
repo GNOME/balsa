@@ -39,12 +39,16 @@ enum _ImapAuthType {
     AuthGSS
 };
 typedef enum _ImapAuthType ImapAuthType;
+typedef guint32 ImapUID;
+#define POINTER_TO_UID(p) GPOINTER_TO_UINT(p)
+#define UID_TO_POINTER(p) GUINT_TO_POINTER(p)
 
 struct _LibBalsaMailboxImap {
     LibBalsaMailboxRemote mailbox;
 
     gchar *path;		/* Imap path {host:port}mailbox */
     ImapAuthType auth_type;	/* accepted authentication type */
+    ImapUID      uid_validity;
 };
 
 struct _LibBalsaMailboxImapClass {

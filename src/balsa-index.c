@@ -688,7 +688,7 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
 {
     gchar buff1[32];
     gchar *text[7];
-    gchar* name_str;
+    gchar *name_str=NULL;
     GtkCTreeNode *node;
     GList *list;
     LibBalsaAddress *addy = NULL;
@@ -723,14 +723,10 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
 	    addy = message->from;
     }
 
-    if (addy) {
-	if (addy->full_name)
-	    name_str = addy->full_name;
-	else if (addy->address_list)
-	    name_str = addy->address_list->data;
-	else
-	    name_str = "";
-    } else
+    if (addy)
+	name_str=(gchar *)libbalsa_address_get_name(addy);
+    
+    if(!name_str)		/* !addy, or addy contained no name/address */
 	name_str = "";
 
     text[3] = append_dots ? g_strconcat(name_str, ",...", NULL)
@@ -1142,7 +1138,7 @@ static gboolean thread_has_unread(GtkCTree *ctree, GtkCTreeNode *node)
 	LibBalsaMessage *message=
 	    LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(ctree, child));
 
-	if(message && (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) ||
+	if(message && message->flags & LIBBALSA_MESSAGE_FLAG_NEW ||
 	   thread_has_unread(ctree, child)) 
 	    return TRUE;
     }

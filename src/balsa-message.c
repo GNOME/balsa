@@ -162,6 +162,8 @@ static void part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info,
 				gchar * ptr, size_t len);
 #endif
 static GtkWidget* part_info_mime_button (BalsaPartInfo* info, const gchar* content_type, const gchar* key);
+static void part_context_menu_call_url(GtkWidget * menu_item, BalsaPartInfo * info);
+static void part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info);
 static void part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info);
 static void part_context_menu_vfs_cb(GtkWidget * menu_item, BalsaPartInfo * info);
 static void part_create_menu (BalsaPartInfo* info);
@@ -825,11 +827,197 @@ part_info_init_image(BalsaMessage * bm, BalsaPartInfo * info)
 
 }
 
+typedef enum _rfc_extbody_t {
+    RFC2046_EXTBODY_FTP,
+    RFC2046_EXTBODY_ANONFTP,
+    RFC2046_EXTBODY_TFTP,
+    RFC2046_EXTBODY_LOCALFILE,
+    RFC2046_EXTBODY_MAILSERVER,
+    RFC2046_EXTBODY_UNKNOWN
+} rfc_extbody_t;
+
+typedef struct _rfc_extbody_id {
+    gchar *id_string;
+    rfc_extbody_t action;
+} rfc_extbody_id;
+
+static rfc_extbody_id rfc_extbodys[] = {
+    { "ftp",         RFC2046_EXTBODY_FTP },
+    { "anon-ftp",    RFC2046_EXTBODY_ANONFTP },
+    { "tftp",        RFC2046_EXTBODY_TFTP},
+    { "local-file",  RFC2046_EXTBODY_LOCALFILE},
+    { "mail-server", RFC2046_EXTBODY_MAILSERVER},
+    { NULL,          RFC2046_EXTBODY_UNKNOWN}};
+
+static void
+part_info_init_message_extbody_url(BalsaMessage * bm, BalsaPartInfo * info,
+				   rfc_extbody_t url_type)
+{
+    GtkWidget *vbox;
+    GtkWidget *button;
+    GString *msg = NULL;
+    gchar *url;
+
+    if (url_type == RFC2046_EXTBODY_LOCALFILE) {
+	gchar *local_name;
+
+	local_name = 
+	    libbalsa_message_body_get_parameter(info->body, "name");
+
+	if (!local_name) {
+	    part_info_init_unknown(bm, info);
+	    return;
+	}
+
+	url = g_strdup_printf("file:%s", local_name);
+	g_string_new(_("Content Type: external-body\n"));
+	g_string_sprintfa(msg, _("Access type: local-file\n"));
+	g_string_sprintfa(msg, _("File name: %s"), local_name);
+	g_free(local_name);
+    } else {
+	gchar *ftp_dir, *ftp_name, *ftp_site;
+	    
+	ftp_dir = 
+	    libbalsa_message_body_get_parameter(info->body, "directory");
+	ftp_name = 
+	    libbalsa_message_body_get_parameter(info->body, "name");
+	ftp_site = 
+	    libbalsa_message_body_get_parameter(info->body, "site");
+
+	if (!ftp_name || !ftp_site) {
+	    part_info_init_unknown(bm, info);
+	    g_free(ftp_dir);
+	    g_free(ftp_name);
+	    g_free(ftp_site);
+	    return;
+	}
+
+	if (ftp_dir)
+	    url = g_strdup_printf("%s://%s/%s/%s", 
+				  url_type == RFC2046_EXTBODY_TFTP ? "tftp" : "ftp",
+				  ftp_site, ftp_dir, ftp_name);
+	else
+	    url = g_strdup_printf("%s://%s/%s", 
+				  url_type == RFC2046_EXTBODY_TFTP ? "tftp" : "ftp",
+				  ftp_site, ftp_name);
+	msg = g_string_new(_("Content Type: external-body\n"));
+	g_string_sprintfa(msg, _("Access type: %s\n"),
+			  url_type == RFC2046_EXTBODY_TFTP ? "tftp" :
+			  url_type == RFC2046_EXTBODY_FTP ? "ftp" : "anon-ftp");
+	g_string_sprintfa(msg, _("FTP site: %s\n"), ftp_site);
+	if (ftp_dir)
+	    g_string_sprintfa(msg, _("Directory: %s\n"), ftp_dir);
+	g_string_sprintfa(msg, _("File name: %s"), ftp_name);
+	g_free(ftp_dir);
+	g_free(ftp_name);
+	g_free(ftp_site);
+    }
+
+    /* now create the widget... */
+    vbox = gtk_vbox_new(FALSE, 1);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 10);
+
+    gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(msg->str), FALSE, FALSE, 1);
+    g_string_free(msg, TRUE);
+
+    button = gtk_button_new_with_label(url);
+    gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 5);
+    gtk_object_set_data(GTK_OBJECT(button), "call_url", url);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+		       GTK_SIGNAL_FUNC(part_context_menu_call_url),
+		       (gpointer) info);
+
+    gtk_widget_show_all(vbox);
+
+    info->focus_widget = vbox;
+    info->widget = vbox;
+    info->can_display = FALSE;    
+}
+
+static void
+part_info_init_message_extbody_mail(BalsaMessage * bm, BalsaPartInfo * info)
+{
+    GtkWidget *vbox;
+    GtkWidget *button;
+    GString *msg = NULL;
+    gchar *mail_subject, *mail_site;
+	    
+    mail_site =
+	libbalsa_message_body_get_parameter(info->body, "server");
+
+    if (!mail_site) {
+	part_info_init_unknown(bm, info);
+	return;
+    }
+
+    mail_subject =
+	libbalsa_message_body_get_parameter(info->body, "subject");
+
+    msg = g_string_new(_("Content Type: external-body\n"));
+    msg = g_string_append (msg, _("Access type: mail-server\n"));
+    g_string_sprintfa(msg, _("Mail server: %s\n"), mail_site);
+    if (mail_subject)
+	g_string_sprintfa(msg, _("Subject: %s\n"), mail_subject);
+    g_free(mail_subject);
+    g_free(mail_site);
+
+    /* now create the widget... */
+    vbox = gtk_vbox_new(FALSE, 1);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 10);
+
+    gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(msg->str), FALSE, FALSE, 1);
+    g_string_free(msg, TRUE);
+
+    button = gtk_button_new_with_label(_("Send message to obtain this part"));
+    gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 5);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+		       GTK_SIGNAL_FUNC(part_context_menu_mail),
+		       (gpointer) info);
+
+    gtk_widget_show_all(vbox);
+
+    info->focus_widget = vbox;
+    info->widget = vbox;
+    info->can_display = FALSE;    
+}
+
 static void
 part_info_init_message(BalsaMessage * bm, BalsaPartInfo * info)
 {
-    g_print("TODO: part_info_init_message\n");
-    part_info_init_unknown(bm, info);
+    if (info->body && info->body->mutt_body && info->body->mutt_body->subtype &&
+	!g_strcasecmp("external-body", info->body->mutt_body->subtype)) {
+	gchar *access_type;
+	rfc_extbody_id *extbody_type = rfc_extbodys;
+
+	access_type = 
+	    libbalsa_message_body_get_parameter(info->body, "access-type");
+	while (extbody_type->id_string && 
+	       g_strcasecmp(extbody_type->id_string, access_type))
+	    extbody_type++;
+	switch (extbody_type->action) {
+	case RFC2046_EXTBODY_FTP:
+	case RFC2046_EXTBODY_ANONFTP:
+	case RFC2046_EXTBODY_TFTP:
+	case RFC2046_EXTBODY_LOCALFILE:
+	    part_info_init_message_extbody_url(bm, info, extbody_type->action);
+	    break;
+	case RFC2046_EXTBODY_MAILSERVER:
+	    part_info_init_message_extbody_mail(bm, info);
+	    break;
+	case RFC2046_EXTBODY_UNKNOWN:
+	    g_print("TODO: part_info_init_message (external-body, access-type %s)\n",
+		    access_type);
+	    part_info_init_unknown(bm, info);
+	    break;
+	default:
+	    g_error("Undefined external body action %d!", extbody_type->action);
+	    break;
+	}
+	g_free(access_type);
+    } else {
+	g_print("TODO: part_info_init_message\n");
+	part_info_init_unknown(bm, info);
+    }
 }
 
 static void
@@ -1994,6 +2182,76 @@ static void
 part_context_menu_save(GtkWidget * menu_item, BalsaPartInfo * info)
 {
     save_part(info);
+}
+
+
+static void
+part_context_menu_call_url(GtkWidget * menu_item, BalsaPartInfo * info)
+{
+    gchar *url = gtk_object_get_data (GTK_OBJECT (menu_item), "call_url");
+    
+    g_return_if_fail(url);
+    gnome_url_show(url);
+}
+
+
+static void
+part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info)
+{
+    LibBalsaMessage *message;
+    LibBalsaMessageBody *body;
+    gchar *data;
+    FILE *part;
+
+    /* create a message */
+    message = libbalsa_message_new();
+    data = libbalsa_address_to_gchar(balsa_app.current_ident->address, 0);
+    message->from = libbalsa_address_new_from_string(data);
+    g_free (data);
+
+    data = libbalsa_message_body_get_parameter(info->body, "subject");
+    if (data)
+	LIBBALSA_MESSAGE_SET_SUBJECT(message, data);
+
+    data = libbalsa_message_body_get_parameter(info->body, "server");
+    message->to_list = libbalsa_address_new_list_from_string(data);
+    g_free (data);
+
+    /* the original body my have some data to be returned as commands... */
+    body = libbalsa_message_body_new(message);
+
+    libbalsa_message_body_save_temporary(info->body, NULL);
+    part = fopen(info->body->temp_filename, "r");
+    if (part) {
+	gchar *p;
+
+	libbalsa_readfile(part, &data);
+	/* ignore everything before the first two newlines */
+	if ((p = strstr (data, "\n\n")))
+	    body->buffer = g_strdup(p + 2);
+	else
+	    body->buffer = g_strdup(data);
+	g_free(data);
+	fclose(part);
+    }
+    if (info->body->charset)
+	body->charset = g_strdup(info->body->charset);
+    else
+	body->charset = g_strdup("US-ASCII");
+    libbalsa_message_append_part(message, body);
+#if ENABLE_ESMTP
+    libbalsa_message_send(message, balsa_app.outbox, NULL,
+			  balsa_app.encoding_style,  
+			  balsa_app.smtp_server,
+			  balsa_app.smtp_authctx,
+			  balsa_app.smtp_tls_mode,
+			  FALSE);
+#else
+    libbalsa_message_send(message, balsa_app.outbox, NULL,
+			  balsa_app.encoding_style,
+			  FALSE);
+#endif
+    gtk_object_destroy(GTK_OBJECT(message));    
 }
 
 

@@ -1,5 +1,20 @@
 2001-09-25  Pawel Salek  <pawsa@theochem.kth.se>
 
+	Toralf Lund <toralf@kscanners.com> - handle distribution lists.
+	* libbalsa/address-book-ldif.c: the bulk of the support. 
+	* libbalsa/address-book.[hc]: addd libbalsa_address_is_dist_list() 
+	to distinguish between ordinary addresses and distribution lists.
+	* libbalsa/address.[hc]: add member_list and some conversion routines.
+	* src/address-book.c: use address_is_dist_list().
+	* src/balsa-index.c: cleanup using new address routines.
+	* src/expand-alias.c: cleanup.
+	* src/sendmsg-window.c: cleanup as well.
+
+	Albrecht Dreﬂ's external body (#61156).
+	* src/balsa-message.c: handle received external bodies.
+
+2001-09-25  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* src/print.c:
 	* src/sendmsg-window.c: Sun port (Steve Wall)
 	* src/balsa-message.c: unrealize GtkFileSelection widget 

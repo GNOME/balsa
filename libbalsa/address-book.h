@@ -101,6 +101,7 @@ void libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
 GList *libbalsa_address_book_alias_complete(LibBalsaAddressBook * ab, 
 					    const gchar *prefix,
 					    gchar **new_prefix);
-
+gboolean libbalsa_address_is_dist_list(const LibBalsaAddressBook *ab,
+				       const LibBalsaAddress *address);
 #endif
 

@@ -214,7 +214,19 @@ It is recommended to read procmail(1) and procmailrc(1) for more
 real-life examples and syntax explanation.
 
 
-Reporting Bugs: --------------
+Alternative browsers:
+--------------------
+Start from checking settings in your Gnome Control Center. If your
+version of gnomecc does provide option to change the default browser,
+you will need to create a file named gnome-moz-remote in your .gnome
+directory. It should contain the following:
+
+[Mozilla]
+filename=/path/to/your/browser
+
+
+Reporting Bugs:
+--------------
 	See http://www.balsa.net/bugs.html for instructions.  Do not
 report bugs with GtkHTML - it is quite unstable. Patches are welcome.
 

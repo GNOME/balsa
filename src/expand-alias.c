@@ -39,30 +39,6 @@
 #define CASE_INSENSITIVE_NAME
 
 /*
- * FIXME:  Should this come here?
- * 
- *         By putting it here, we slow it down, because we need to scan
- *         the match for ',' every time.
- *
- *         By putting it in the address books, its faster, but the user
- *         must type '"' to match relevant addresses...
- */
-static gchar *
-make_rfc822(gchar *full_name, gchar *address)
-{
-    gchar *new_str;
-    gint i;
-
-    for (i=0; full_name[i] && (full_name[i] != ','); i++);
-    if (full_name[i]) {
-	new_str = g_strdup_printf("\042%s\042 <%s>", full_name, address);
-	g_message("make_rfc822(): New str [%s]", new_str);
-    } else
-	new_str = g_strdup_printf("%s <%s>", full_name, address);
-    return new_str;
-}
-	
-/*
  * expand_alias_find_match()
  *
  * Takes an emailData structure, and scans the relevent Balsa
@@ -176,8 +152,8 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
 	    }
 	    addr = LIBBALSA_ADDRESS(search->data);
 	}
-	output = make_rfc822(addr->full_name,
-			     (gchar *) addr->address_list->data);
+	output=libbalsa_address_to_gchar(addr, 0);
+	
 	g_message("expand_alias_find_match(): Found [%s]", addr->full_name);
 	g_list_foreach(match, (GFunc)gtk_object_unref, NULL);
 	
@@ -191,5 +167,4 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
     if (addy->match)
 	g_message("expand_alias_find_match(): Setting to [%s]", addy->match);
 }
-
 

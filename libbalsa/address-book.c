@@ -262,6 +262,16 @@ libbalsa_address_book_alias_complete(LibBalsaAddressBook *ab,
 
 }
 
+
+gboolean libbalsa_address_is_dist_list(const LibBalsaAddressBook *ab,
+				       const LibBalsaAddress *address)
+{
+    return (address->member_list!=NULL || 
+	    ab->dist_list_mode && g_list_length(address->address_list)>1);
+}
+
+
+
 static void
 libbalsa_address_book_real_save_config(LibBalsaAddressBook * ab,
 				       const gchar * prefix)

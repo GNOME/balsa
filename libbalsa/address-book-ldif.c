@@ -264,7 +264,64 @@ address_new_prefill(GList* address_list, gchar* nickn, gchar* givenn,
     
     if (address->full_name == NULL)
 	address->full_name = g_strdup(_("No-Name"));
+
     return address;
+}
+    
+static LibBalsaAddress *find_addr(GList *ab_list, const gchar *id)
+ /* *** Is there a standard function for this? */
+{
+    GList *addr;
+    gchar *cmpId=g_strdup(id);
+    
+    g_strstrip(cmpId);
+    
+    for(addr=ab_list; addr; addr=g_list_next(addr)) {
+	LibBalsaAddress *addr_data=(LibBalsaAddress *)addr->data;
+	gchar *addr_id=g_strdup(addr_data->id);
+
+	g_strstrip(addr_id);
+
+	if(g_strcasecmp(cmpId, addr_id)==0) {
+	    g_free(addr_id);
+	    return addr_data;
+	}
+	g_free(addr_id);
+    }
+
+    g_free(cmpId);
+    
+    return NULL;
+}
+
+
+static void expand_addr_list(LibBalsaAddress *address, GList *ab_list)
+{
+    GList *member=address->address_list;
+    GList *member_list=NULL;
+    
+    while(member) {
+	gchar *member_data=member->data;
+	LibBalsaAddress *ref=find_addr(ab_list, member_data);
+
+	if(ref) {
+	    member_list=g_list_append(member_list, ref);
+	    gtk_object_ref(GTK_OBJECT(ref));
+	    member=g_list_remove(member, member_data);
+	    g_free(member_data);
+	} else
+	    member=g_list_next(member);
+    }
+    address->member_list=member_list;
+}
+
+static void expand_ldif_addr(GList *ab_list)
+{
+    GList *addr;
+    
+    for(addr=ab_list; addr; addr=g_list_next(addr)) {
+	expand_addr_list(addr->data, ab_list);
+    }
 }
     
 /* FIXME: Could stat the file to see if it has changed since last time 
@@ -376,12 +433,9 @@ load_ldif_file(LibBalsaAddressBook *ab)
 	    continue;
 	}
 
-	if (g_strncasecmp(line, "member:", 2) == 0) {
-	    gchar* str = strstr(line, "mail=");
-	    if(str)
+	if (g_strncasecmp(line, "member:", 7) == 0) {
 		address_list = g_list_append(address_list, 
-					     g_strdup(g_strchug(str+5)));
-
+					 g_strdup(g_strchug(line+7)));
 	    continue;
 	}
 
@@ -401,6 +455,7 @@ load_ldif_file(LibBalsaAddressBook *ab)
 	    address = address_new_prefill(address_list, nickname, givenname,
 					  surname, fullname, organization,id);
 
+
 	    /* FIXME: Split into Firstname and Lastname... */
 
 	    list = g_list_append(list, address);
@@ -412,6 +467,7 @@ load_ldif_file(LibBalsaAddressBook *ab)
 	    g_free(organization);
 	}
     }
+    expand_ldif_addr(list);
 
     list = g_list_sort(list, (GCompareFunc)address_compare);
     addr_ldif->address_list = list;
@@ -433,6 +489,7 @@ load_ldif_file(LibBalsaAddressBook *ab)
     completion_list = g_list_reverse(completion_list);
     g_completion_add_items(addr_ldif->alias_complete, completion_list);
     g_list_free(completion_list);
+    ab->dist_list_mode = FALSE; /* *** Clean up later */
 }
 
 /* build_name:

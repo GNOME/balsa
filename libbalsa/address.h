@@ -74,6 +74,7 @@ struct _LibBalsaAddress {
      * A list of user@domain.
      */
     GList *address_list;
+    GList *member_list;
 };
 
 struct _LibBalsaAddressClass {

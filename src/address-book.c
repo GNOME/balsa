@@ -606,7 +606,7 @@ balsa_address_book_load_cb(LibBalsaAddressBook *libbalsa_ab, LibBalsaAddress *ad
     if ( address == NULL )
 	return;
 
-    if ( libbalsa_ab->dist_list_mode && g_list_length(address->address_list) >1) {
+    if ( libbalsa_address_is_dist_list(libbalsa_ab, address) ) {
 
 	listdata[LIST_COLUMN_NAME] = address->full_name;
 	listdata[LIST_COLUMN_ADDRESS] = libbalsa_address_to_gchar(address, -1);

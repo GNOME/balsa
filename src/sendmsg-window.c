@@ -640,20 +640,11 @@ change_identity_dialog_cb(GtkWidget* widget, BalsaSendmsg* msg)
 static void
 update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
 {
-    gchar* tmpstr;
+    gchar* tmpstr=libbalsa_address_to_gchar(ident->address, 0);
     
-
     /* change entries to reflect new identity */
-
-    if (strlen(ident->address->full_name) && 
-        strlen(ident->address->address_list->data)) {
-        tmpstr = g_strdup_printf("%s <%s>", ident->address->full_name, 
-                                 (gchar*)ident->address->address_list->data);
         gtk_entry_set_text(GTK_ENTRY(msg->from[1]), tmpstr);
         g_free(tmpstr);
-    } else {
-        gtk_entry_set_text(GTK_ENTRY(msg->from[1]), ident->address->full_name);
-    }
 
     gtk_entry_set_text(GTK_ENTRY(msg->reply_to[1]), ident->replyto);
     
@@ -1569,8 +1560,7 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message, SendType type)
 	    if (message->from && message->from->address_list)
 		newsubject = g_strdup_printf("%s from %s",
 					     balsa_app.current_ident->forward_string,
-					     (gchar *) message->
-					     from->address_list->data);
+					     libbalsa_address_get_mailbox(message->from, 0));
 	    else
 		newsubject = g_strdup(balsa_app.current_ident->forward_string);
 	} else {
@@ -1590,9 +1580,7 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message, SendType type)
 		newsubject = 
 		    g_strdup_printf("%s %s [%s]",
 				    balsa_app.current_ident->forward_string, 
-				    tmp,
-				    (gchar *) message->
-				    from->address_list->data);
+				    tmp,  libbalsa_address_get_mailbox(message->from, 0));
 	    else {
 		newsubject = 
 		    g_strdup_printf("%s %s", 

@@ -77,6 +77,7 @@ libbalsa_address_init(LibBalsaAddress * addr)
     addr->last_name = NULL;
     addr->organization = NULL;
     addr->address_list = NULL;
+    addr->member_list = NULL;
 }
 
 static void
@@ -98,6 +99,10 @@ libbalsa_address_destroy(GtkObject * object)
     g_list_foreach(addr->address_list, (GFunc) g_free, NULL);
     g_list_free(addr->address_list);
     addr->address_list = NULL;
+
+    g_list_foreach(addr->member_list, (GFunc) gtk_object_unref, NULL);
+    g_list_free(addr->member_list);
+    addr->member_list = NULL;
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
@@ -136,9 +141,11 @@ libbalsa_address_new_list_from_string(gchar * the_str)
     address = rfc822_parse_adrlist(address, the_str);
 
     while (address) {
-	addr = libbalsa_address_new_from_libmutt(address);
-	list = g_list_append(list, addr);
-	address = address->next;
+        if (address->mailbox && !address->group) { /* *** For now */
+            addr = libbalsa_address_new_from_libmutt(address);
+            list = g_list_append(list, addr);
+        }
+        address = address->next;
     }
     rfc822_free_address(&address);
     libbalsa_unlock_mutt();
@@ -164,6 +171,97 @@ libbalsa_address_new_from_libmutt(ADDRESS * caddr)
     return address;
 }
 
+
+static gboolean needs_quotes(const gchar *str)
+{
+    return (strchr(str, ',')!=NULL); /* *** For now */
+
+}
+
+static gchar *rfc2822_mailbox(const gchar *full_name, gchar *address)
+{
+    gchar *new_str;
+
+    if(full_name && needs_quotes(full_name))
+	new_str = g_strdup_printf("\042%s\042 <%s>", full_name, address);
+    else if(full_name)
+	new_str = g_strdup_printf("%s <%s>", full_name, address);
+    else
+	new_str = g_strdup(address);
+}
+
+
+static gchar *rfc2822_group(const gchar *full_name, GList *addr_list)
+{
+    gchar *tmp_str;
+    GString *str = g_string_new("");
+    GList *addr_entry;
+
+    if(full_name) { 
+	if(needs_quotes(full_name))
+	    g_string_sprintf(str, "\042%s\042: ", full_name);
+	else
+	    g_string_sprintf(str, "%s: ", full_name);
+    }
+
+    if(addr_list) {
+	tmp_str = libbalsa_address_to_gchar(LIBBALSA_ADDRESS(addr_list->data), 0);
+	g_string_append(str, tmp_str);
+	g_free(tmp_str);
+
+	for(addr_entry=g_list_next(addr_list); addr_entry; 
+	    addr_entry=g_list_next(addr_entry)) {
+	    tmp_str = libbalsa_address_to_gchar(LIBBALSA_ADDRESS(addr_entry->data), 0);
+	    g_string_sprintfa(str, ", %s", tmp_str);
+	    g_free(tmp_str);
+	}
+    }
+    if(full_name)
+	g_string_append(str, ";");
+    
+    tmp_str=str->str;
+    g_string_free(str, FALSE);
+    
+    return tmp_str;
+}
+
+
+static gchar *rfc2822_list(GList *list)
+{
+    gchar *retc = NULL; 
+    GString *str;
+    GList *addr_entry;
+    
+    g_return_val_if_fail(list!=NULL, NULL);
+
+    str=g_string_new((gchar *)list->data);
+
+    for(addr_entry=g_list_next(list); addr_entry; 
+	addr_entry=g_list_next(list)) {
+	g_string_sprintfa(str, ", %s", (gchar *)addr_entry->data);
+    }
+    retc=str->str;
+    g_string_free(str, FALSE);
+
+    return retc;
+}
+
+
+
+
+static LibBalsaAddress *find_address(const gchar *addr_str, 
+				     LibBalsaAddress *match_addr)
+{
+    GList *ab_list;             /* To iterate address books   */
+    LibBalsaAddressBook *ab;
+    
+    /* *** TODO: Search all address books or just the one match_addr 
+                 belongs for entries containing addr_str in address list.
+                 Return first one that's not a distribution list. */
+    return NULL;
+}
+
+
 /* 
    Get a string version of this address.
 
@@ -174,41 +272,22 @@ gchar *
 libbalsa_address_to_gchar(LibBalsaAddress * address, gint n)
 {
     gchar *retc = NULL;
-    gchar *address_string;
-    GList *nth_address;
+    gboolean dist_list = TRUE;
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 
-    if ( n == -1 ) {
-	GString *str = NULL;
-
-	nth_address = address->address_list;
-	while ( nth_address ) {
-	    address_string = (gchar *)nth_address->data;
-	    if ( str )
-		g_string_sprintfa(str, ", %s", address_string);
-	    else
-		str = g_string_new(address_string);
-	    nth_address = g_list_next(nth_address);
-	}
-
-	if ( str ) {
-	    retc = str->str;
-	    g_string_free(str, FALSE);
-	} else { 
-	    retc = NULL;
-	}
+    if(address->member_list || (n==-1 && !address->address_list))
+	retc = rfc2822_group(address->full_name, address->member_list);
+    else if(n==-1) {
+	retc = rfc2822_list(address->address_list);
     } else {
+	GList *nth_address;
+
 	nth_address = g_list_nth(address->address_list, n);
+
 	g_return_val_if_fail(nth_address != NULL, NULL);
 
-	address_string = (gchar*)nth_address->data;
-
-	if (address->full_name) {
-	    retc = g_strdup_printf("%s <%s>", address->full_name, address_string);
-	} else {
-	    retc = g_strdup(address_string);
-	}
+	retc = rfc2822_mailbox(address->full_name, nth_address->data);
     }
     
     return retc;
@@ -253,3 +332,4 @@ libbalsa_address_get_mailbox(LibBalsaAddress * address, gint n)
 }
 
 #endif
+

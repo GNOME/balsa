@@ -206,7 +206,6 @@ balsa_message_set (BalsaMessage * bmessage,
 #endif
 /* set message contents */
   gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), buff);
-  printf (buff);
   g_free (buff);
 }
 
@@ -328,7 +327,13 @@ text2html (char *buff)
 
   for (i = 0; i < len; i++)
     {
-      if (buff[i] == '\r' && buff[i + 1] == '\n')
+      if (buff[i] == '\r' && buff[i + 1] == '\n' &&
+		      buff[i+2] == '\r' && buff[i+3] == '\n')
+	{
+	  gs = g_string_append (gs, "</tt></p><p><tt>\n");
+	  i+=3;
+	}
+      else if (buff[i] == '\r' && buff[i + 1] == '\n')
 	{
 	  gs = g_string_append (gs, "<br>\n");
 	  i++;

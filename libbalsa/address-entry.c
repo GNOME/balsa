@@ -2503,12 +2503,13 @@ lbae_completion_match_selected(GtkEntryCompletion * completion,
     return TRUE;
 }
 
+/*************************************************************
+ *     Callback for the entry's "notify" signal
+ *************************************************************/
 static void
 lbae_entry_notify(GtkEntry * entry, GParamSpec * spec, gpointer data)
 {
-    if (!strcmp(spec->name, "cursor-position")
-        || (!strcmp(spec->name, "has-focus")
-            && GTK_WIDGET_HAS_FOCUS(entry)))
+    if (!strcmp(spec->name, "cursor-position"))
         g_signal_emit_by_name(entry, "changed");
 }
 

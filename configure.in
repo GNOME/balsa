@@ -237,12 +237,13 @@ AC_ARG_ENABLE([gtkhtml], [  --enable-gtkhtml Use GtkHTML if available [default=n
 AC_MSG_CHECKING(whether to use GtkHTML)
 if test x"$check_gtkhtml" = xyes ; then
 	if gnome-config --libs gtkhtml > /dev/null 2>&1; then
-        	vers=`gnome-config --modversion gtkhtml`
+        	vers=`gnome-config --modversion gtkhtml | sed 's/^gtkhtml-//'`
 	        case $vers
         	in
-            		gtkhtml-0.4) have_gtkhtml=yes ;;
-                        gtkhtml-0.5) have_gtkhtml=yes ;;
-			*) have_gtkhtml=no ;;
+                       0.[[0123]])
+                               have_gtkhtml=no ;;
+                       *) 
+                               have_gtkhtml=yes ;;
         	esac
 	else
         	have_gtkhtml=no

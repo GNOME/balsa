@@ -64,6 +64,8 @@ struct _BalsaPartInfo
 static void balsa_message_class_init (BalsaMessageClass * klass);
 static void balsa_message_init (BalsaMessage * bm);
 
+static void balsa_message_destroy (GtkObject *object);
+
 static gint balsa_message_focus_in_part(GtkWidget *widget, GdkEventFocus *event, BalsaMessage *bm);
 static gint balsa_message_focus_out_part(GtkWidget *widget, GdkEventFocus *event, BalsaMessage *bm);
 
@@ -143,6 +145,12 @@ balsa_message_get_type ()
 static void
 balsa_message_class_init (BalsaMessageClass * klass)
 {
+  GtkObjectClass *object_class;
+
+  object_class = GTK_OBJECT_CLASS(klass);
+
+  object_class->destroy = balsa_message_destroy;
+
   parent_class = gtk_type_class (gtk_viewport_get_type ());
 }
 
@@ -183,6 +191,12 @@ balsa_message_init (BalsaMessage * bm)
   bm->wrap_text = balsa_app.browse_wrap;
   bm->shown_headers = balsa_app.shown_headers;
 
+}
+
+static void
+balsa_message_destroy (GtkObject *object)
+{
+  balsa_message_set ( BALSA_MESSAGE(object), NULL );
 }
 
 static gint 
@@ -275,7 +289,7 @@ save_part (BalsaPartInfo *info)
 }
 
 GtkWidget *
-balsa_message_create (void)
+balsa_message_new (void)
 {
   BalsaMessage *bm;
   
@@ -309,7 +323,8 @@ static void select_icon_cb (GnomeIconList * ilist, gint num, GdkEventButton * ev
 static void
 message_destroyed_cb(LibBalsaMessage *message, BalsaMessage *bm)
 {
-  balsa_message_set (bm, NULL);
+  if ( bm->message == message ) 
+    balsa_message_set (bm, NULL);
 }
 
 void
@@ -338,10 +353,10 @@ balsa_message_set (BalsaMessage * bm,
 
   select_part(bm, -1);
   if ( bm->message != NULL ) {
-    libbalsa_message_body_unref (bm->message);
     gtk_signal_disconnect_by_func ( GTK_OBJECT(bm->message), 
 				    GTK_SIGNAL_FUNC(message_destroyed_cb),
 				   (gpointer)bm);
+    libbalsa_message_body_unref (bm->message);
   }
   bm->message = NULL;
   bm->part_count = 0;

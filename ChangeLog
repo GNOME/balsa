@@ -1,3 +1,13 @@
+2000-08-03  Ian Campbell  <ijc25@cam.ac.uk>
+
+	Window close bug fix.  Renamed balsa_message_create ->
+	balsa_message_new which is conventional - this involved renaming
+	another balsa_message_new which sent a new message and making it
+	static.
+	* src/balsa-index-page.[hc]: renaming
+	* src/balsa-message.[hc]: added destructor balsa_message_destroy()
+	* src/main-window.c,src/message-window.c: renaming.
+	
 2000-08-03  Pawel Salek <pawsa@theochem.kth.se>
 
 	* configure.in: tested against gtkHTML 0.5 and enabled it.

@@ -56,7 +56,6 @@ GtkObject *balsa_index_page_new(BalsaWindow *window);
 gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, LibBalsaMailbox *mailbox);
 void balsa_index_page_close_and_destroy( GtkObject *obj );
 
-void balsa_message_new (GtkWidget * widget);
 void balsa_message_reply (GtkWidget * widget, gpointer index);
 void balsa_message_replytoall (GtkWidget * widget, gpointer index);
 void balsa_message_forward (GtkWidget * widget, gpointer index);

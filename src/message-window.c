@@ -188,7 +188,7 @@ message_window_new (LibBalsaMessage * message)
   scroll = gtk_scrolled_window_new(NULL, NULL);
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
-  mw->bmessage = balsa_message_create ();
+  mw->bmessage = balsa_message_new ();
 
   gtk_container_add(GTK_CONTAINER(scroll), mw->bmessage);
   gtk_widget_show(scroll);

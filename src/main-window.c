@@ -580,7 +580,7 @@ balsa_window_new ()
   scroll = gtk_scrolled_window_new(NULL, NULL);
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
-  window->preview = balsa_message_create();
+  window->preview = balsa_message_new();
 
   gtk_container_add(GTK_CONTAINER(scroll), window->preview);
   gtk_widget_show(scroll);
@@ -1386,7 +1386,7 @@ GtkWidget *balsa_window_find_current_index(BalsaWindow *window)
 static void
 new_message_cb (GtkWidget * widget, gpointer data)
 {
-  balsa_message_new (widget);
+  sendmsg_window_new (widget, NULL, SEND_NORMAL);
 }
 
 

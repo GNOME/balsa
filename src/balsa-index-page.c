@@ -90,6 +90,8 @@ static void balsa_index_page_init(BalsaIndexPage *page);
 void balsa_index_page_window_init(BalsaIndexPage *page);
 void balsa_index_page_close_and_destroy( GtkObject *obj );
 
+static void send_new_message (GtkWidget * widget);
+
 GtkType
 balsa_index_page_get_type (void)
 {
@@ -577,7 +579,7 @@ create_menu (BalsaIndex * bindex)
   menu = gtk_menu_new ();
   
   create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_NEW, _("New"),
-			 balsa_message_new, NULL);
+			 send_new_message, NULL);
 
   create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_RPL, _("Reply"),
 			 balsa_message_reply, bindex);
@@ -890,8 +892,8 @@ store_address_dialog_close(GtkWidget *widget, GtkWidget **entries)
 
 /* New Stuff */
 
-void
-balsa_message_new (GtkWidget * widget)
+static void
+send_new_message (GtkWidget * widget)
 {
   g_return_if_fail (widget != NULL);
   sendmsg_window_new (widget, NULL, SEND_NORMAL);

@@ -381,7 +381,7 @@ x509_fingerprint (char *s, int l, X509 * cert)
 
 */
 static int
-ask_cert_real(X509 *cert)
+ask_cert_real(X509 *cert, const char *explanation)
 {
 
     char *part[] =
@@ -391,7 +391,13 @@ ask_cert_real(X509 *cert)
     GtkWidget* dialog, *label;
     unsigned i;
 
-    GString* str = g_string_new(_("<b>This certificate belongs to:</b>\n"));
+    GString* str = g_string_new("");
+
+    g_string_printf(str, _("Authenticity of this certificate "
+                           "could not be verified.\n"
+                           "Reason: %s\n"
+                           "<b>This certificate belongs to:</b>\n"),
+                    explanation);
 
     name = X509_NAME_oneline(X509_get_subject_name (cert), buf, sizeof (buf));
     for (i = 0; i < ELEMENTS(part); i++) {
@@ -448,6 +454,7 @@ ask_cert_real(X509 *cert)
 typedef struct {
     pthread_cond_t cond;
     X509 *cert;
+    const char *expl;
     int res;
 } AskCertData;
 /* ask_cert_idle:
@@ -458,7 +465,7 @@ ask_cert_idle(gpointer data)
 {
     AskCertData* acd = (AskCertData*)data;
     gdk_threads_enter();
-    acd->res = ask_cert_real(acd->cert);
+    acd->res = ask_cert_real(acd->cert, acd->expl);
     gdk_threads_leave();
     pthread_cond_signal(&acd->cond);
     return FALSE;
@@ -468,17 +475,18 @@ ask_cert_idle(gpointer data)
    imap_dir_cb()/imap_folder_imap_dir().
 */
 int
-libbalsa_ask_for_cert_acceptance(X509 *cert)
+libbalsa_ask_for_cert_acceptance(X509 *cert, const char *explanation)
 {
     static pthread_mutex_t ask_cert_lock = PTHREAD_MUTEX_INITIALIZER;
     AskCertData acd;
 
     if (pthread_self() == libbalsa_get_main_thread())
-	return ask_cert_real(cert);
+	return ask_cert_real(cert, explanation);
 
     pthread_mutex_lock(&ask_cert_lock);
     pthread_cond_init(&acd.cond, NULL);
     acd.cert = cert;
+    acd.expl = explanation;
     g_idle_add(ask_cert_idle, &acd);
     pthread_cond_wait(&acd.cond, &ask_cert_lock);
     

@@ -341,6 +341,7 @@ imap_dir_cb_real(void* r)
     GNode* n, *root=(GNode*)r;
     GSList *list;
     BalsaMailboxNode*mb = root->data;
+    GError *error = NULL;
     imap_scan_tree imap_tree = { NULL, '.' };
 
     g_return_val_if_fail(mb->server, NULL);
@@ -349,8 +350,21 @@ imap_dir_cb_real(void* r)
                               mb->list_inbox, 
                               check_imap_path,
                               mark_imap_path,
-			      handle_imap_path,
-			      &imap_tree);
+                              handle_imap_path,
+                              &imap_tree,
+                              &error);
+    
+    if(error) {
+        libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                             _("Scanning of %s failed: %s"),
+                             mb->server->host,
+                             error->message);
+        g_error_free(error);
+        imap_scan_destroy_tree(&imap_tree);
+        gnome_appbar_pop(balsa_app.appbar);
+        return NULL;
+    }
+
     if (!balsa_app.mailbox_nodes) {
         /* Quitt'n time! */
         imap_scan_destroy_tree(&imap_tree);

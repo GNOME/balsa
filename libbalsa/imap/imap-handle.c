@@ -967,6 +967,10 @@ imap_cmd_start(ImapMboxHandle* handle, const char* cmd, unsigned *cmdno)
   int rc;
   ImapCmdTag tag;
   g_return_val_if_fail(handle, -1);
+  
+  if(IMAP_MBOX_IS_DISCONNECTED(handle))
+    return -1;
+
   *cmdno = imap_make_tag(tag);
   rc = sio_printf(handle->sio, "%s %s\r\n", tag, cmd);
   if(rc<0) {

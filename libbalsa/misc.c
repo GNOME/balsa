@@ -1063,25 +1063,21 @@ libbalsa_truncate_string(const gchar *str, gint length, gint dots)
 }
 
 /* libbalsa_expand_path:
-   expand ~ -> $HOME. libmutt did more, but we never advertived it
-   if someone complains, this is the stuff to fix
+   We handle only references to ~/.
 */
 gchar*
 libbalsa_expand_path(const gchar * path)
 {
-    char buf[_POSIX_PATH_MAX];
+    const gchar *home = g_get_home_dir();
    
-    if(path[0] == '~' && (path[1] == '/' || path[1] == '\0')) {
-	const gchar *foo = g_get_home_dir();
-	size_t len;
-
-	len = strlen(foo);
-	len++;
-	strcpy(buf, foo);
-	strncpy(buf + len, path+1, _POSIX_PATH_MAX-len);
+    if(path[0] == '~') {
+        if(path[1] == '/')
+            return g_strconcat(home, path+1, NULL);
+        else if(path[1] == '\0')
+            return g_strdup(home);
+        /* else: unrecognized combination */
     }
-
-    return g_strdup(buf);
+    return g_strdup(path);
 }
 
 

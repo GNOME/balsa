@@ -36,11 +36,12 @@ void libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix,
 				LocalHandler mailbox_handler);
 
 void libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server, 
-			       const gchar* path, gboolean subscribed, 
-			       gboolean list_inbox,
+                               const gchar* path, gboolean subscribed, 
+                               gboolean list_inbox,
                                ImapCheck check_imap_path,
                                ImapMark mark_imap_path,
-			       ImapHandler handle_imap_path,
-			       gpointer cb_data);
+                               ImapHandler handle_imap_path,
+                               gpointer cb_data, 
+                               GError **error);
 
 #endif				/* __FOLDER_SCANNERS_H__ */

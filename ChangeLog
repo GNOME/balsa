@@ -1,3 +1,13 @@
+2004-02-04  Pawel Salek
+
+	* libbalsa/folder-scanners.[hc]: add IMAP error handling.
+	* libbalsa/imap-server.c: show more info when certificate verify fails.
+	* libbalsa/libbalsa.c: ditto.
+	* libbalsa/libbalsa.h: try introducing GError to libbalsa.
+	* libbalsa/misc.c: fix libbalsa_expand_path() and sig problem.
+	* libbalsa/imap/imap-handle.c: error handling.
+	* src/mailbox-node.c: receive GError.
+
 2004-02-04 09:00  PeterB
 
 	* libbalsa/mailbox.c: simplify handling of unread message count and

@@ -310,7 +310,6 @@ libbalsa_is_cert_known(X509* cert)
     res = X509_verify_cert(&verify_ctx);
     X509_STORE_CTX_cleanup(&verify_ctx);
     X509_STORE_free(store);
-    printf("%s returns %d\n", __func__, res);
     return res;
 }
 
@@ -368,16 +367,17 @@ is_user_cb(ImapMboxHandle *h, ImapUserEventType ue, void *arg, ...)
         long vfy_result;
         SSL *ssl;
         X509 *cert;
+        const char *reason;
         ok = va_arg(alist, int*);
         vfy_result = va_arg(alist, long);
-        g_warning("IMAP:TLS: failed cert verification:\n"
-                  "%ld : %s.", vfy_result,
-                  X509_verify_cert_error_string(vfy_result));
+        reason =  X509_verify_cert_error_string(vfy_result);
+        printf("IMAP:TLS: failed cert verification:\n"
+               "%ld : %s.\n", vfy_result, reason);
         ssl = va_arg(alist, SSL*);
         cert = SSL_get_peer_certificate(ssl);
         *ok = libbalsa_is_cert_known(cert);
         if(!*ok) {
-            *ok = libbalsa_ask_for_cert_acceptance(cert);
+            *ok = libbalsa_ask_for_cert_acceptance(cert, reason);
             if(*ok == 2)
                 libbalsa_save_cert(cert);
         }
@@ -389,12 +389,12 @@ is_user_cb(ImapMboxHandle *h, ImapUserEventType ue, void *arg, ...)
     }
     case IME_TLS_NO_PEER_CERT: {
         ok = va_arg(alist, int*); *ok = 0;
-        g_warning("IMAP:TLS: Server presented no cert!");
+        printf("IMAP:TLS: Server presented no cert!\n");
         break;
     }
     case IME_TLS_WEAK_CIPHER: {
         ok = va_arg(alist, int*); *ok = 1;
-        g_warning("IMAP:TLS: Weak cipher accepted.");
+        printf("IMAP:TLS: Weak cipher accepted.\n");
         break;
     }
     default: g_warning("unhandled imap event type! Fix the code."); break;

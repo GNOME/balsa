@@ -224,15 +224,18 @@ libbalsa_imap_lsub_cb(ImapMboxHandle * handle, int delim,
  *                      be scanned;
  * depth:               depth of the recursion.
  */
-static void
+static gboolean
 libbalsa_imap_browse(const gchar * path, struct browser_state *state,
 		     ImapMboxHandle* handle, LibBalsaServer * server,
-		     ImapCheck check_imap_path, guint * depth)
+		     ImapCheck check_imap_path, guint * depth,
+                     GError **error)
 {
     gchar *imap_path;
     GList *list, *el;
     gboolean browse;
-
+    ImapResponse rc = IMR_OK;
+    gboolean ret = TRUE;
+    
     state->subfolders = NULL;
 
     if(*path && path[strlen(path) - 1] != state->delim)
@@ -244,7 +247,15 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
      * Note that flags in the LSUB response aren't authoritative
      * (UW-Imap is the only server thought to give incorrect flags). */
     if (state->subscribed) 
-	imap_mbox_lsub(handle, imap_path);
+	rc = imap_mbox_lsub(handle, imap_path);
+    if(rc != IMR_OK) {
+        g_free(imap_path);
+        g_set_error(error,
+                    LIBBALSA_SCANNER_ERROR,
+                    LIBBALSA_SCANNER_ERROR_IMAP,
+                    "%d", rc);
+        return FALSE;
+    }
 
     /* Send LIST command if either:
      * - we're not in subscribed mode; or
@@ -252,10 +263,15 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
      *   authoritative flags.
      */
     if (!state->subscribed || state->subfolders)
-	imap_mbox_list(handle, imap_path);
-
+	rc = imap_mbox_list(handle, imap_path);
     g_free(imap_path);
-
+    if(rc != IMR_OK) {
+        g_set_error(error,
+                    LIBBALSA_SCANNER_ERROR,
+                    LIBBALSA_SCANNER_ERROR_IMAP,
+                    "%d", rc);
+        return FALSE;
+    }
     /* Mark this path as scanned, without changing its selectable state. */
     state->mark_imap_path(path, -1, TRUE, state->cb_data);
 
@@ -268,14 +284,18 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
         browse = check_imap_path(el->data, server, *depth);
 
     if (browse)
-        for (el = list; el; el = g_list_next(el))
-            libbalsa_imap_browse(el->data, state, handle, server,
-				 check_imap_path, depth);
+        for (el = list; el; el = g_list_next(el)) {
+            ret = libbalsa_imap_browse(el->data, state, handle, server,
+                                       check_imap_path, depth, error);
+            if(!ret)
+                break;
+        }
 
     --*depth;
 
     g_list_foreach(list, (GFunc) g_free, NULL);
     g_list_free(list);
+    return ret;
 }
 
 void
@@ -285,7 +305,8 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
                           ImapCheck check_imap_path,
                           ImapMark mark_imap_path,
 			  ImapHandler handle_imap_path,
-			  gpointer cb_data)
+			  gpointer cb_data,
+                          GError **error)
 {
     struct browser_state state;
     int i;
@@ -295,8 +316,13 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     if (!LIBBALSA_IS_IMAP_SERVER(server))
 	    return;
     handle = libbalsa_imap_server_get_handle(LIBBALSA_IMAP_SERVER(server));
-    if (!handle)
+    if (!handle) { /* FIXME: propagate error here and translate message */
+        g_set_error(error,
+                    LIBBALSA_SCANNER_ERROR,
+                    LIBBALSA_SCANNER_ERROR_IMAP,
+                    "Could not connect to the server");
 	return;
+    }
 
     state.handle_imap_path = handle_imap_path;
     state.mark_imap_path   = mark_imap_path;
@@ -323,7 +349,8 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     }
 
     i = 0;
-    libbalsa_imap_browse(path, &state, handle, server, check_imap_path, &i);
+    libbalsa_imap_browse(path, &state, handle, server,
+                         check_imap_path, &i, error);
 
     g_signal_handler_disconnect(G_OBJECT(handle), list_handler_id);
     if (lsub_handler_id)

@@ -63,6 +63,21 @@ typedef struct _LibBalsaCondition LibBalsaCondition;
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
 /*
+ * Error domains for GError: only one for now, more to come.
+ */
+enum {
+    LIBBALSA_SCANNER_ERROR
+};
+
+/*
+ * Error codes for GError: only one for now, more to come.
+ */
+enum {
+    LIBBALSA_SCANNER_ERROR_IMAP
+};
+
+
+/*
  * Initialize the library
  */
 void libbalsa_init(LibBalsaInformationFunc information_callback);
@@ -95,7 +110,7 @@ void libbalsa_assure_balsa_dir(void);
 
 #ifdef USE_TLS
 #include <openssl/ssl.h>
-int libbalsa_ask_for_cert_acceptance(X509 *cert);
+int libbalsa_ask_for_cert_acceptance(X509 *cert, const gchar *explanation);
 #endif
 
 void libbalsa_message(const char *fmt, ...);

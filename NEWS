@@ -12,6 +12,11 @@ are:
 - manual updates
 - gnome-print used for printing.
 
+* Balsa-0.9.4 development release. elease date 2000-09-05.
+
+- IMAP CRAM-MD5 and GSSAPI authorization methods
+- POP3 APOP authorization method.
+
 * Balsa-0.9.3 development release. Release date 2000-08-28.
 
 This is a developement release with unfinished features.
@@ -24,11 +29,14 @@ and terminated.
 Do not report bugs with GtkHTML - it is quite unstable. Patches are
 welcome.
 
-If you experience coredumps or other strange behavior when upgrading
-Balsa, try removing ~/.balsarc. The format of the preferences file
-has changed and Balsa can get confused if an old one is present.
+* Balsa-0.9.2 development release. Release date 2000-08-15.
 
-We are trying to improve threading, and merge improved IMAP code
-(CRAM-MD5, GSS authentications). If you need these features, drop a
-line to balsa-maintaiers@theochem.kth.se, it will give us more
-motivation.
+- some bug fixes.
+
+* Balsa-0.9.1 development release. Release date 2000-08-06.
+
+- new message browser.
+- user defined location of the address book.
+- alias expansion support.
+- quoted text highlighting.
+- gtkHTML experimental support.

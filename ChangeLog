@@ -1,3 +1,8 @@
+2000-04-08  Peter Williams  <peter@beta.newton.cx>
+
+	* configure.in: Print a little warning if
+	  the source is CVS source.
+
 2000-04-08  Matthew Guenther <mguenther@netcom.ca>
 	* src/balsa-mblist.c (balsa_mblist_insert_mailbox): Fixed bug with 
 	mailbox info.

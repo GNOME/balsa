@@ -67,26 +67,13 @@ dnl AC_CHECK_LIB(des, des_encrypt)
 dnl AC_CHECK_LIB(krb, krb_sendauth)
 dnl AC_CHECK_LIB(acap, acap_OpenConnection)
 
-
 AM_HDR_SIGACTION
 AM_HDR_SIGSET
 
-
 dnl ORBit support
-AC_CHECK_PROG(ORBIT_CONFIG, orbit-config, orbit-config)
-if test -n "$ORBIT_CONFIG"; then
-	ORBIT_LIBS="`orbit-config --libs client server --use-service=name`"
-	ORBIT_CFLAGS="`orbit-config --cflags client server --use-service=name`"
-fi
-AC_SUBST(ORBIT_CFLAGS)
-AC_SUBST(ORBIT_LIBS)
+dnl Use 'failure' instead of 'dontfail' to make us bomb if no orbit.
+GNOME_ORBIT_HOOK([],dontfail)
 AM_CONDITIONAL(ORBIT_INSTALLED, test -n "$ORBIT_LIBS")
-
-ORB_LIBS="$ORBIT_LIBS"
-ORB_CFLAGS="$ORBIT_CFLAGS"
-
-AC_SUBST(ORB_LIBS)
-AC_SUBST(ORB_CFLAGS)
 
 dnl Automake @VARIABLE@ exports.
 AC_SUBST(BALSA_MAJOR)
@@ -95,6 +82,12 @@ AC_SUBST(BALSA_PATCHLEVEL)
 AC_SUBST(BALSA_VERSION)
 AC_SUBST(LIBOBJS)
 AC_SUBST(LIBESD_LIB)
+
+if test -d "${srcdir}/CVS" ; then
+	BALSA_FROM_CVS=yes
+else
+	BALSA_FROM_CVS=no
+fi
 
 dnl ######################################################################################
 dnl Enable all?
@@ -227,6 +220,7 @@ idl/Makefile
 src/Makefile
 ])
 
+echo ""
 echo "========= Final configuration ==================="
 echo "    Installing into prefix: $prefix"
 echo "      Using multithreading: $use_threads"
@@ -234,3 +228,14 @@ echo " Using incomplete features: $use_all"
 echo "        Using mailbox info: $use_info"
 echo "Installing some files into  "
 echo "            Gnome's prefix: $use_system_install (may require root privileges)"
+echo ""
+
+if test x"$BALSA_FROM_CVS" = xyes ; then
+	echo ""
+	echo "============================== NOTICE ================================"
+	echo "                 You are using Balsa from CVS source."
+	echo "  The program is likely to be unstable, contain incomplete features,"
+	echo "or just plain not work. Use it at your own risk. You have been warned."
+	echo "======================================================================"
+	echo ""
+fi

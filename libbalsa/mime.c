@@ -476,8 +476,9 @@ content2html (Message * message)
 	msg_stream = fopen (msg_filename, "r");
 	if (!msg_stream || ferror (msg_stream))
 	  {
-	    fprintf (stderr, "Open of %s failed. Errno = %d, errmsg = '%s'\n",
-		     msg_filename, errno, sys_errlist[errno]);
+	    fprintf (stderr, "Open of %s failed. Errno = %d, ",
+		     msg_filename, errno);
+	    perror (NULL);
 	    return;
 	  }
 	break;

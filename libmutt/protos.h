@@ -307,11 +307,11 @@ int getdnsdomainname (char *, size_t);
 #endif
 
 #ifndef HAVE_SNPRINTF
-extern int snprintf (char *, size_t, const char *, ...);
+extern int snprintf (char *, size_t, char *, ...);
 #endif
 
 #ifndef HAVE_VSNPRINTF
-extern int vsnprintf (char *, size_t, const char *, va_list);
+extern int vsnprintf (char *, size_t, char *, va_list);
 #endif
 
 #ifndef HAVE_STRERROR

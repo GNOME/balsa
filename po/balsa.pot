@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-11 17:46-0400\n"
+"POT-Creation-Date: 1998-08-12 18:55-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -111,6 +111,10 @@ msgstr ""
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr ""
 
+#: src/mailbox-conf.c:112
+msgid "Mailbox Configurator"
+msgstr ""
+
 #: src/mailbox-manager.c:69
 msgid "Account"
 msgstr ""
@@ -200,10 +204,18 @@ msgstr ""
 msgid "Preferences..."
 msgstr ""
 
-#: src/main-window.c:332
-msgid "Mailbox Manager..."
-msgstr ""
-
+#.
+#. w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Mailbox Manager..."));
+#. gtk_widget_show (w);
+#.
+#. gtk_signal_connect (GTK_OBJECT (w),
+#. "activate",
+#. (GtkSignalFunc) open_mailbox_manager,
+#. NULL);
+#.
+#. gtk_menu_append (GTK_MENU (menu), w);
+#. menu_items[i++] = w;
+#.
 #: src/main-window.c:344
 msgid "Settings"
 msgstr ""
@@ -250,6 +262,14 @@ msgstr ""
 
 #: src/main-window.c:514
 msgid "Balsa is a E-Mail Client"
+msgstr ""
+
+#: src/mblist-window.c:405
+msgid "Add Mailbox"
+msgstr ""
+
+#: src/mblist-window.c:410
+msgid "Edit Mailbox"
 msgstr ""
 
 #. identity page

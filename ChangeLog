@@ -6,6 +6,7 @@
 	GtkEntry/Editable methods.
 	* src/sendmsg-window.c: use GtkEntry/Editable methods on
 	LibBalsaAddressEntry widgets, instead of wrapped versions.
+	* src/save-restore.c: rot13 ESMTP certificate passphrase before saving.
 
 2002-05-07  Pawel Salek <pawsa@theochem.kth.se>
 

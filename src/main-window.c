@@ -530,7 +530,6 @@ void balsa_window_close_mailbox(BalsaWindow *window, Mailbox *mailbox)
   gtk_signal_emit(GTK_OBJECT(window), window_signals[CLOSE_MAILBOX], mailbox);
 }
 
-
 static void balsa_window_real_open_mailbox(BalsaWindow *window, Mailbox *mailbox)
 {
   GtkObject *page;
@@ -557,27 +556,18 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbo
 /*  printf("FIXME: Can't close mailboxes.\n"); 
     Sadly, we don't get the IndexPage pointer given to us. Ah well. */
     GtkWidget *page;
-    guint32 i;
+    gint i;
 
-    /*Eeeew.... we'd better hope that the mailbox is actually opened, or 
-      you're asking for Bad Things to Happen (TM).*/
-    i = 0;
-    while( 1 ) {
-	/* This is the scrolled window. */
-	page = gtk_notebook_get_nth_page( GTK_NOTEBOOK( window->notebook ), i );
-	if( page == NULL ) {
-	    g_warning( "Can't find mailbox \"%s\" in notebook!", mailbox->name );
-	    return;
-	}
-	page = gtk_object_get_data( GTK_OBJECT( page ), "indexpage" );
-	if( (BALSA_INDEX_PAGE( page ))->mailbox == mailbox )
-	    break;
-	i++;
-    }
+    i=balsa_find_notebook_page_num(mailbox);
 
-    gtk_notebook_remove_page( GTK_NOTEBOOK( window->notebook ), i );
-    (BALSA_INDEX_PAGE( page ))->sw = NULL; /* This was just toasted */
-    gtk_object_destroy( GTK_OBJECT( page ) );
+    if( i != -1 )
+      {
+	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),i);
+	page = gtk_object_get_data(GTK_OBJECT(page),"indexpage");
+	gtk_notebook_remove_page( GTK_NOTEBOOK( window->notebook ), i );
+	(BALSA_INDEX_PAGE( page ))->sw = NULL; /* This was just toasted */
+	gtk_object_destroy( GTK_OBJECT( page ) );
+      }
 }
 
 

@@ -65,4 +65,8 @@ void balsa_message_previous (GtkWidget * widget, gpointer index);
 void balsa_message_delete (GtkWidget * widget, gpointer index);
 void balsa_message_undelete (GtkWidget * widget, gpointer index);
 
+void balsa_index_page_reset(BalsaIndexPage *page);
+gint balsa_find_notebook_page_num(Mailbox *mailbox);
+BalsaIndexPage* balsa_find_notebook_page(Mailbox *mailbox);
+
 #endif /* __INDEX_CHILD_H__ */

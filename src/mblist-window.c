@@ -155,42 +155,22 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
 void
 mblist_open_mailbox (Mailbox * mailbox)
 {
-  //  IndexChild *index_child;
   GtkWidget *page;
   int i;
 
   if (!mblw)
     return;
 
-  /* PKGW: check if already open. Is this way of doing it ok?
-     Can open_ref be increased other than opening the MB in
-     a window?
-   */
   if( mailbox->open_ref ) {
-    i = 0;
-    /* This code is borrowed from the mailbox delete code:          *
-     * We need a consistent way of associating the page widget      *
-     * with the actual mailbox. --David                             */
-    while( TRUE ) {
-	/* This is the scrolled window. */
-	page = gtk_notebook_get_nth_page( GTK_NOTEBOOK( balsa_app.notebook ), i );
-	if( page == NULL ) {
-	    g_warning( "Can't find mailbox \"%s\" in notebook!", mailbox->name );
-	    return;
-	}
-	page = gtk_object_get_data( GTK_OBJECT( page ), "indexpage" );
-	if( (BALSA_INDEX_PAGE( page ))->mailbox == mailbox )
-	  {
-	    gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook),i);
-	    return;
-	  }
-	i++;
-    }
-    return;
+    i = balsa_find_notebook_page_num( mailbox );
+    if( i != -1 )
+      {
+	gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook),i);
+	return;
+      }
   }
 
   balsa_window_open_mailbox(BALSA_WINDOW(mblw->window), mailbox);
-  //  index_child = index_child_new (mblw->window, mailbox);
 
   balsa_window_set_cursor(BALSA_WINDOW(mblw->window), NULL);
     
@@ -212,8 +192,6 @@ mblist_open_mailbox (Mailbox * mailbox)
     FALSE, TRUE);
     
     gtk_ctree_node_set_row_style (GTK_CTREE (bmbl), row, NULL);*/
-  
-  
 }
 
 

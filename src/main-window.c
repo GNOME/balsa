@@ -830,8 +830,10 @@ delete_cb(GtkWidget* main_window)
 static void
 size_allocate_cb(GtkWidget * widget, GtkAllocation * alloc)
 {
-    if (balsa_app.show_mblist)
-	balsa_app.mblist_width = widget->parent->allocation.width;
+    if (balsa_app.show_mblist) {
+	GtkWidget *paned = gtk_widget_get_ancestor(widget, GTK_TYPE_PANED);
+	balsa_app.mblist_width = gtk_paned_get_position(GTK_PANED(paned));
+    }
 }
 
 /* Toolbar buttons and their callbacks. */
@@ -3264,8 +3266,10 @@ balsa_change_window_layout(BalsaWindow *window)
 static void
 notebook_size_alloc_cb(GtkWidget * notebook, GtkAllocation * alloc)
 {
-    if (balsa_app.previewpane)
-        balsa_app.notebook_height = alloc->height;
+    if (balsa_app.previewpane) {
+	GtkWidget *paned = gtk_widget_get_ancestor(notebook, GTK_TYPE_PANED);
+        balsa_app.notebook_height = gtk_paned_get_position(GTK_PANED(paned));
+    }
 }
 
 static void

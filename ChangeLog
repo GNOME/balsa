@@ -1,3 +1,10 @@
+2003-11-06 23:45  PeterB
+
+	* libbalsa/: mailbox_mh.c, mailbox_mh.h: Rework with a message hash
+	table instead of a sparse array.
+	* libbalsa/mailbox_mbox.c: Notify tree-model promptly when a
+	message is removed from the mailbox's internal structures.
+
 2003-11-05  Pawel Salek
 
 	* libbalsa/mailbox.c: compile with --disable-threads.

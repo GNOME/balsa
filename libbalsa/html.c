@@ -267,12 +267,14 @@ libbalsa_html_new(const gchar * text, size_t len,
 	g_signal_connect(G_OBJECT(document), "link-clicked",
 			 link_clicked_cb, NULL);
 
+    /* We need to first set_document and then do *_stream() operations
+     * or gtkhtml2 will crash. */
+    html = html_view_new();
+    html_view_set_document(HTML_VIEW(html), document);
+
     html_document_open_stream(document, "text/html");
     html_document_write_stream(document, text, len);
     html_document_close_stream(document);
-
-    html = html_view_new();
-    html_view_set_document(HTML_VIEW(html), document);
 
     return html;
 }

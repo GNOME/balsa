@@ -2713,11 +2713,9 @@ find_real(BalsaIndex * bindex, gboolean again)
 	if (cnd->match.string)
 	    gtk_entry_set_text(GTK_ENTRY(search_entry),cnd->match.string);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(reverse_button),reverse);
-	if (!LIBBALSA_IS_MAILBOX_IMAP(bindex->mailbox_node->mailbox))
-	    gtk_toggle_button_set_active(matching_body,
-					 CONDITION_CHKMATCH(cnd,
-							    CONDITION_MATCH_BODY));
-	else gtk_widget_set_sensitive(GTK_WIDGET(matching_body), FALSE);
+	gtk_toggle_button_set_active(matching_body,
+				     CONDITION_CHKMATCH(cnd,
+							CONDITION_MATCH_BODY));
 	gtk_toggle_button_set_active(matching_to,
 				     CONDITION_CHKMATCH(cnd,
                                                         CONDITION_MATCH_TO));

@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 2000-08-12 16:17+0000\n"
-"PO-Revision-Date: 2000-08-12 16:18+00:00\n"
+"POT-Creation-Date: 2000-08-15 20:38+0000\n"
+"PO-Revision-Date: 2000-08-15 20:39+00:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -223,29 +223,29 @@ msgstr "Импортировать только первый адрес"
 msgid "Import all adresses"
 msgstr "Импортировать все адреса"
 
-#: src/balsa-app.c:235 src/balsa-app.c:240 src/balsa-app.c:245
-#: src/balsa-app.c:250 src/balsa-app.c:255
+#: src/balsa-app.c:236 src/balsa-app.c:241 src/balsa-app.c:246
+#: src/balsa-app.c:251 src/balsa-app.c:256
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa не может открыть ваш почтовый ящик \"%s\""
 
-#: src/balsa-app.c:235
+#: src/balsa-app.c:236
 msgid "Inbox"
 msgstr "Входящие"
 
-#: src/balsa-app.c:240
+#: src/balsa-app.c:241
 msgid "Outbox"
 msgstr "Исходящие"
 
-#: src/balsa-app.c:245
+#: src/balsa-app.c:246
 msgid "Sentbox"
 msgstr "Отправленные"
 
-#: src/balsa-app.c:250
+#: src/balsa-app.c:251
 msgid "Draftbox"
 msgstr "Черновики"
 
-#: src/balsa-app.c:255
+#: src/balsa-app.c:256
 msgid "Trash"
 msgstr "Мусорная корзина"
 
@@ -1080,11 +1080,11 @@ msgstr "Напечатать"
 msgid "Print current message"
 msgstr "Напечатать текущее письмо"
 
-#: src/main-window.c:933
+#: src/main-window.c:932
 msgid "Copyright (C) 1997-2000"
 msgstr "Авторское право (С) 1997-2000"
 
-#: src/main-window.c:935
+#: src/main-window.c:934
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -1096,29 +1096,34 @@ msgstr ""
 "Сообщить об обнаруженных ошибках можно по адресу "
 "http://www.gnome.org/cgi-bin/bugs"
 
+#: src/main-window.c:1261
+#, c-format
+msgid "Sending error: %s"
+msgstr "Ошибка отправки: %s"
+
 #: src/main-window.c:1496
 msgid ""
 "In order to store an address, you must open a mailbox and select a message.\n"
 msgstr ""
 "Чтобы сохранить адрес, вы должны открыть почтовый ящик и выбрать сообщение.\n"
 
-#: src/main.c:88
+#: src/main.c:92
 msgid "Get new mail on startup"
 msgstr "Проверить почту при запуске"
 
-#: src/main.c:90
+#: src/main.c:94
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Cоставить новое письмо для EMAIL@ADRESS"
 
-#: src/main.c:92
+#: src/main.c:96
 msgid "Opens MAILBOXNAME"
 msgstr "Открывается MAILBOXNAME"
 
-#: src/main.c:92
+#: src/main.c:96
 msgid "MAILBOXNAME"
 msgstr "MAILBOXNAME"
 
-#: src/main.c:93
+#: src/main.c:97
 msgid "Opens first unread mailbox"
 msgstr "Открыть первый почтовый ящик с непрочитанными письмами"
 

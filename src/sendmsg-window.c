@@ -161,35 +161,35 @@ static GnomeUIInfo file_menu[] = {
 			   include_file_cb, GNOME_STOCK_MENU_OPEN),
 #define MENU_FILE_ATTACH_POS 1
     GNOMEUIINFO_ITEM_STOCK(N_("_Attach File..."), NULL,
-			   attach_clicked, GNOME_STOCK_MENU_ATTACH),
+			   attach_clicked, BALSA_PIXMAP_MENU_ATTACHMENT),
 #define MENU_MSG_INCLUDE_POS 2
     GNOMEUIINFO_ITEM_STOCK(N_("_Include Message(s)"), NULL,
-			   include_message_cb, GNOME_STOCK_MENU_MAIL),
+			   include_message_cb, BALSA_PIXMAP_MENU_NEW),
 #define MENU_FILE_ATTACH_MSG_POS 3
     GNOMEUIINFO_ITEM_STOCK(N_("Attach _Message(s)"), NULL,
-			   attach_message_cb, GNOME_STOCK_MENU_MAIL_FWD),
+			   attach_message_cb, BALSA_PIXMAP_MENU_FORWARD),
 #define MENU_FILE_SEPARATOR1_POS 4
     GNOMEUIINFO_SEPARATOR,
 
 #define MENU_FILE_SEND_POS 5
-    { GNOME_APP_UI_ITEM, N_("_Send"), 
+    { GNOME_APP_UI_ITEM, N_("_Send"),
       N_("Send this message"),
       send_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      GNOME_STOCK_MENU_MAIL_SND, 'S', GDK_CONTROL_MASK, NULL },
+      BALSA_PIXMAP_MENU_SEND, 'S', GDK_CONTROL_MASK, NULL },
 #define MENU_FILE_QUEUE_POS 6
-    { GNOME_APP_UI_ITEM, N_("_Queue"), 
+    { GNOME_APP_UI_ITEM, N_("_Queue"),
       N_("Queue this message in Outbox for sending"),
       queue_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      GNOME_STOCK_MENU_MAIL_SND, 'Q', GDK_CONTROL_MASK, NULL },
+      BALSA_PIXMAP_MENU_SEND, 'Q', GDK_CONTROL_MASK, NULL },
 #define MENU_FILE_POSTPONE_POS 7
     GNOMEUIINFO_ITEM_STOCK(N_("_Postpone"), NULL,
-			   postpone_message_cb, GNOME_STOCK_MENU_SAVE),
+			   postpone_message_cb, BALSA_PIXMAP_MENU_SAVE),
 #define MENU_FILE_SAVE_POS 8
     GNOMEUIINFO_ITEM_STOCK(N_("_Save"), NULL,
-			   save_message_cb, GNOME_STOCK_MENU_SAVE),
+			   save_message_cb, BALSA_PIXMAP_MENU_SAVE),
 #define MENU_FILE_PRINT_POS 9
     GNOMEUIINFO_ITEM_STOCK(N_("Print..."), N_("Print the edited message"),
-			   print_message_cb, GNOME_STOCK_MENU_PRINT),
+			   print_message_cb, BALSA_PIXMAP_MENU_PRINT),
 #define MENU_FILE_SEPARATOR2_POS 10
     GNOMEUIINFO_SEPARATOR,
 
@@ -199,7 +199,7 @@ static GnomeUIInfo file_menu[] = {
     GNOMEUIINFO_END
 };
 
-/* Cut, Copy&Paste are in our case just a placeholders because they work 
+/* Cut, Copy&Paste are in our case just a placeholders because they work
    anyway */
 static GnomeUIInfo edit_menu[] = {
     GNOMEUIINFO_MENU_CUT_ITEM(cut_cb, NULL),
@@ -242,7 +242,7 @@ static GnomeUIInfo edit_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("Select _Identity..."), 
                            N_("Select the Identity to use for the message"),
                            change_identity_dialog_cb,
-                           BALSA_PIXMAP_IDENTITY_MENU),
+                           BALSA_PIXMAP_MENU_IDENTITY),
     GNOMEUIINFO_END
 };
 
@@ -274,9 +274,12 @@ static GnomeUIInfo view_menu[] = {
 };
 
 static char * main_toolbar_spell_disable[] = {
-    GNOME_STOCK_PIXMAP_MAIL_SND,  GNOME_STOCK_PIXMAP_ATTACH,
-    GNOME_STOCK_PIXMAP_SAVE, BALSA_PIXMAP_IDENTITY,
-    GNOME_STOCK_PIXMAP_SPELLCHECK, GNOME_STOCK_PIXMAP_CLOSE
+    BALSA_PIXMAP_SEND,
+    BALSA_PIXMAP_ATTACHMENT,
+    BALSA_PIXMAP_SAVE,
+    BALSA_PIXMAP_IDENTITY,
+    GNOME_STOCK_PIXMAP_SPELLCHECK,
+    GNOME_STOCK_PIXMAP_CLOSE
 };
 
 #if MENU_TOGGLE_KEYWORDS_POS+1 != VIEW_MENU_LENGTH
@@ -2110,18 +2113,17 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     gtk_widget_set_sensitive(edit_menu[EDIT_MENU_REFLOW_MESSAGE].widget,
                              !msg->flow);
 
-    set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_MAIL_SND,
+    set_toolbar_button_callback(1, BALSA_PIXMAP_SEND,
 				GTK_SIGNAL_FUNC(send_message_toolbar_cb), msg);
-    set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_ATTACH,
+    set_toolbar_button_callback(1, BALSA_PIXMAP_ATTACHMENT,
 				GTK_SIGNAL_FUNC(attach_clicked), msg);
-    set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_SAVE,
+    set_toolbar_button_callback(1, BALSA_PIXMAP_SAVE,
 				GTK_SIGNAL_FUNC(save_message_cb), msg);
     set_toolbar_button_callback(1, BALSA_PIXMAP_IDENTITY,
-				GTK_SIGNAL_FUNC(change_identity_dialog_cb), 
-				msg);
+				GTK_SIGNAL_FUNC(change_identity_dialog_cb),msg);
     set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_SPELLCHECK,
 				GTK_SIGNAL_FUNC(spell_check_cb), msg);
-    set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_PRINT,
+    set_toolbar_button_callback(1, BALSA_PIXMAP_PRINT,
 				GTK_SIGNAL_FUNC(print_message_cb), msg);
     set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_CLOSE,
 				GTK_SIGNAL_FUNC(close_window_cb), msg);
@@ -2133,9 +2135,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->ready_widgets[1] = file_menu[MENU_FILE_QUEUE_POS].widget;
     msg->ready_widgets[2] = file_menu[MENU_FILE_POSTPONE_POS].widget;
     msg->ready_widgets[3] = get_tool_widget(window, TOOLBAR_COMPOSE,
-                                            GNOME_STOCK_PIXMAP_MAIL_SND);
+                                            BALSA_PIXMAP_SEND);
     msg->ready_widgets[4] = get_tool_widget(window, TOOLBAR_COMPOSE,
-                                            GNOME_STOCK_PIXMAP_SAVE);
+                                            BALSA_PIXMAP_SAVE);
     msg->current_language_menu = lang_menu[LANG_CURRENT_POS].widget;
 
     /* set options - just the Disposition Notification request for now */

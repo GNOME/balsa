@@ -703,18 +703,18 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
 	else {
 	    BalsaIconName in;
 	    if(mbnode->mailbox == balsa_app.draftbox)
-		in = BALSA_ICON_DRAFTBOX;
+		in = BALSA_ICON_MBOX_DRAFT;
 	    else if(mbnode->mailbox == balsa_app.inbox)
-		in = BALSA_ICON_INBOX;
+		in = BALSA_ICON_MBOX_IN;
 	    else if(mbnode->mailbox == balsa_app.outbox)
-		in = BALSA_ICON_OUTBOX;
+		in = BALSA_ICON_MBOX_OUT;
 	    else if(mbnode->mailbox == balsa_app.sentbox)
-		in = BALSA_ICON_SENTBOX;
+		in = BALSA_ICON_MBOX_SENT;
 	    else if(mbnode->mailbox == balsa_app.trash)
-		in = BALSA_ICON_TRASH;
+		in = BALSA_ICON_MBOX_TRASH;
 	    else
 		in = (mbnode->mailbox->new_messages > 0)
-		? BALSA_ICON_TRAY_FULL : BALSA_ICON_TRAY_EMPTY;
+		? BALSA_ICON_MBOX_TRAY_FULL : BALSA_ICON_MBOX_TRAY_EMPTY;
 
 	    gtk_ctree_set_node_info(ctree, cnode,
 				    mbnode->mailbox->name, 5,
@@ -734,11 +734,11 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
 	/* new directory, but not a mailbox */
 	gtk_ctree_set_node_info(ctree, cnode, g_basename(mbnode->name), 5,
 				balsa_icon_get_pixmap
-				(BALSA_ICON_DIR_CLOSED),
+				(BALSA_ICON_MBOX_DIR_CLOSED),
 				balsa_icon_get_bitmap
-				(BALSA_ICON_DIR_CLOSED),
-				balsa_icon_get_pixmap(BALSA_ICON_DIR_OPEN),
-				balsa_icon_get_bitmap(BALSA_ICON_DIR_OPEN),
+				(BALSA_ICON_MBOX_DIR_CLOSED),
+				balsa_icon_get_pixmap(BALSA_ICON_MBOX_DIR_OPEN),
+				balsa_icon_get_bitmap(BALSA_ICON_MBOX_DIR_OPEN),
 				FALSE, mbnode->expanded);
 	gtk_ctree_node_set_selectable(ctree, cnode, FALSE);
     }
@@ -1032,7 +1032,7 @@ balsa_mblist_update_node_style(GtkCTree * ctree, GtkCTreeNode * node,
 	    tmp_is_leaf = GTK_CTREE_ROW(node)->is_leaf;
 	    tmp_expanded = GTK_CTREE_ROW(node)->expanded;
 	    
-	    icon = BALSA_ICON_TRAY_FULL;
+	    icon = BALSA_ICON_MBOX_TRAY_FULL;
 	    
 	    gtk_ctree_set_node_info(ctree, node, mailbox->name, 5,
 				    balsa_icon_get_pixmap(icon),
@@ -1072,9 +1072,9 @@ balsa_mblist_update_node_style(GtkCTree * ctree, GtkCTreeNode * node,
 		tmp_expanded = GTK_CTREE_ROW(node)->expanded;
 		
 		if (mailbox == balsa_app.inbox)
-		    icon = BALSA_ICON_INBOX;
+		    icon = BALSA_ICON_MBOX_IN;
 		else
-		    icon = BALSA_ICON_TRAY_EMPTY;
+		    icon = BALSA_ICON_MBOX_TRAY_EMPTY;
 		
 		gtk_ctree_set_node_info(ctree, node, mailbox->name, 5,
 					balsa_icon_get_pixmap(icon),

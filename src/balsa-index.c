@@ -1065,35 +1065,40 @@ balsa_index_set_col_images(BalsaIndex * bindex, GtkCTreeNode *node,
     GdkPixmap* bitmap;
 
     ctree = bindex->ctree;
-    
+
     if (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
 	gtk_ctree_node_set_pixmap(ctree, node, 1,
-				  balsa_icon_get_pixmap(BALSA_ICON_TRASH),
-				  balsa_icon_get_bitmap(BALSA_ICON_TRASH));
+				  balsa_icon_get_pixmap(BALSA_ICON_MBOX_TRASH),
+				  balsa_icon_get_bitmap(BALSA_ICON_MBOX_TRASH));
     else if (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED) {
-        gnome_stock_pixmap_gdk (BALSA_PIXMAP_FLAGGED, "regular", 
-                                &pixmap, &bitmap);
-	gtk_ctree_node_set_pixmap(ctree, node, 1, pixmap, bitmap);
+	gtk_ctree_node_set_pixmap(ctree, node, 1,
+				  balsa_icon_get_pixmap(BALSA_ICON_INFO_FLAGGED),
+				  balsa_icon_get_bitmap(BALSA_ICON_INFO_FLAGGED));
     }
-    
+
     else if (message->flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
 	gtk_ctree_node_set_pixmap(ctree, node, 1,
-				  balsa_icon_get_pixmap(BALSA_ICON_REPLIED),
-				  balsa_icon_get_bitmap(BALSA_ICON_REPLIED));
+				  balsa_icon_get_pixmap(BALSA_ICON_INFO_REPLIED),
+				  balsa_icon_get_bitmap(BALSA_ICON_INFO_REPLIED));
 
     else if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
 	gtk_ctree_node_set_pixmap(ctree, node, 1,
-				  balsa_icon_get_pixmap(BALSA_ICON_ENVELOPE),
-				  balsa_icon_get_bitmap(BALSA_ICON_ENVELOPE));
+				  balsa_icon_get_pixmap(BALSA_ICON_INFO_NEW),
+				  balsa_icon_get_bitmap(BALSA_ICON_INFO_NEW));
     else
-	gtk_ctree_node_set_text(ctree, node, 1, NULL);
+        gtk_ctree_node_set_text(ctree, node, 1, NULL);
+    /* Alternatively, we could show an READ icon:
+     * gtk_ctree_node_set_pixmap(ctree, node, 1,
+     * balsa_icon_get_pixmap(BALSA_ICON_INFO_READ),
+     * balsa_icon_get_bitmap(BALSA_ICON_INFO_READ)); 
+     */
 
     tmp = libbalsa_message_has_attachment(message);
 
     if (tmp) {
 	gtk_ctree_node_set_pixmap(ctree, node, 2,
-				  balsa_icon_get_pixmap(BALSA_ICON_MULTIPART),
-				  balsa_icon_get_bitmap(BALSA_ICON_MULTIPART));
+				  balsa_icon_get_pixmap(BALSA_ICON_INFO_ATTACHMENT),
+				  balsa_icon_get_bitmap(BALSA_ICON_INFO_ATTACHMENT));
     }
 }
 
@@ -2028,8 +2033,6 @@ idle_handler_cb(GtkWidget * widget)
     return FALSE;
 }
 
-
-
 static GtkWidget *
 create_menu(BalsaIndex * bindex)
 {
@@ -2038,29 +2041,28 @@ create_menu(BalsaIndex * bindex)
     GtkRequisition req;
     LibBalsaMailbox* mailbox;
     GList *tmp;
-    
 
     BALSA_DEBUG();
     mailbox = bindex->mailbox_node->mailbox;
-    
+
     menu = gtk_menu_new();
 
-    create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_RPL, _("Reply..."),
+    create_stock_menu_item(menu, BALSA_PIXMAP_MENU_REPLY, _("Reply..."),
 			   balsa_message_reply, bindex, TRUE);
 
-    create_stock_menu_item(menu, BALSA_PIXMAP_MAIL_RPL_ALL_MENU,
+    create_stock_menu_item(menu, BALSA_PIXMAP_MENU_REPLY_ALL,
 			   _("Reply To All..."), balsa_message_replytoall,
 			   bindex, TRUE);
 
-    create_stock_menu_item(menu, BALSA_PIXMAP_MAIL_RPL_GROUP_MENU,
+    create_stock_menu_item(menu, BALSA_PIXMAP_MENU_REPLY_GROUP,
 			   _("Reply To Group..."), balsa_message_replytogroup,
 			   bindex, TRUE);
 
-    create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_FWD,
+    create_stock_menu_item(menu, BALSA_PIXMAP_MENU_FORWARD,
 			   _("Forward Attached..."), 
 			   balsa_message_forward_attached, bindex, TRUE);
 
-    create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_FWD,
+    create_stock_menu_item(menu, BALSA_PIXMAP_MENU_FORWARD,
 			   _("Forward Inline..."), 
 			   balsa_message_forward_inline, bindex, TRUE);
 
@@ -2083,21 +2085,21 @@ create_menu(BalsaIndex * bindex)
 
     menuitem = gtk_menu_item_new_with_label(_("Toggle"));
     submenu = gtk_menu_new();
-    
-    create_stock_menu_item( submenu, BALSA_PIXMAP_FLAGGED, _("Flagged"),
+
+    create_stock_menu_item( submenu, BALSA_PIXMAP_MENU_FLAGGED, _("Flagged"),
 			    balsa_message_toggle_flagged, bindex, TRUE);
-     
-    create_stock_menu_item( submenu, BALSA_PIXMAP_ENVELOPE, _("Unread"),
-		    balsa_message_toggle_new, bindex, TRUE);
+
+    create_stock_menu_item( submenu, BALSA_PIXMAP_MENU_NEW, _("Unread"),
+			    balsa_message_toggle_new, bindex, TRUE);
 
     gtk_widget_show(submenu);
 
     gtk_widget_show(menuitem);
-    
+
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
 
     gtk_menu_append(GTK_MENU(menu), menuitem);
-    
+
     g_list_foreach(mru_list, (GFunc)g_free, NULL);
     g_list_free(mru_list);
     mru_list=NULL;
@@ -2134,7 +2136,7 @@ create_menu(BalsaIndex * bindex)
     gtk_signal_connect(GTK_OBJECT(bmbl), "tree_select_row",
 		       (GtkSignalFunc) transfer_messages_cb,
 		       (gpointer) bindex);
-    
+
     /* Force the mailbox list to be a reasonable size. */
     gtk_widget_size_request(bmbl, &req);
     if ( req.height > balsa_app.mw_height )

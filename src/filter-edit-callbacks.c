@@ -32,7 +32,7 @@
 #include "filter-private.h"
 #include "filter-funcs.h"
 #include "filter-edit.h"
-#include "pixmaps/enabled.xpm"
+#include "pixmaps/other_enabled.xpm"
 
 #ifdef USE_PIXBUF
 #include <gdk-pixbuf/gdk-pixbuf.h>
@@ -296,7 +296,7 @@ fe_new_pressed(GtkWidget * widget, gpointer data) {
     new_row = gtk_clist_append(GTK_CLIST(clist), new_item);
     
     /* now for the pixmap from gdk */
-    get_pixmap_and_mask_from_xpm(enabled_xpm, &pixmap, &mask);
+    get_pixmap_and_mask_from_xpm(other_enabled_xpm, &pixmap, &mask);
     gtk_clist_set_pixmap(GTK_CLIST(clist),
 			 new_row, 0, pixmap, mask);
     
@@ -400,7 +400,7 @@ clist_button_event_press(GtkWidget * clist,
 		gtk_clist_select_row(GTK_CLIST(clist), row, -1);
 	    } else {
 		/* now for the pixmap from gdk */
-		get_pixmap_and_mask_from_xpm(enabled_xpm, &pixmap, &mask);
+		get_pixmap_and_mask_from_xpm(other_enabled_xpm, &pixmap, &mask);
 		gtk_clist_set_pixmap(GTK_CLIST(clist), row, 0, pixmap,
 				     mask);
 		gdk_pixmap_unref(pixmap);

@@ -1,3 +1,12 @@
+2001-10-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Total icon lift-up by Ali Akcaagac.
+	* src/ balsa-icons.[hc], balsa-index.c, balsa-mblist.c, 
+	filter-edit-callbacks.c, main-window.c, message-window.c,
+	sendmsg-window.c, toolbar-factory.c, toolbar-prefs.c:
+	use updated, more systematic icon names.
+	* src/pixmap/*.xpm: new icons.
+
 2001-10-15  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-message.c: 

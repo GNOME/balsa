@@ -130,45 +130,45 @@ static GnomeUIInfo message_menu[] = {
     {
      GNOME_APP_UI_ITEM, N_("_Reply..."), N_("Reply to this message"),
      replyto_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     GNOME_STOCK_MENU_MAIL_RPL, 'R', 0, NULL},
+     BALSA_PIXMAP_MENU_REPLY, 'R', 0, NULL},
     /* A */
     {
      GNOME_APP_UI_ITEM, N_("Reply to _All..."),
      N_("Reply to all recipients of this message"),
      replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MAIL_RPL_ALL_MENU, 'A', 0, NULL},
+     BALSA_PIXMAP_MENU_REPLY_ALL, 'A', 0, NULL},
     /* G */
     {
      GNOME_APP_UI_ITEM, N_("Reply to _Group..."),
      N_("Reply to mailing list"),
      replytogroup_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MAIL_RPL_GROUP_MENU, 'G', 0, NULL},
+     BALSA_PIXMAP_MENU_REPLY_GROUP, 'G', 0, NULL},
     /* F */
     {
-     GNOME_APP_UI_ITEM, N_("_Forward attached..."), 
+     GNOME_APP_UI_ITEM, N_("_Forward attached..."),
      N_("Forward this message as attachment"),
      forward_message_attached_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL},
+     BALSA_PIXMAP_MENU_FORWARD, 'F', 0, NULL},
     {
      GNOME_APP_UI_ITEM, N_("Forward inline..."), 
      N_("Forward this message inline"),
      forward_message_inline_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     GNOME_STOCK_MENU_MAIL_FWD, 'F', GDK_CONTROL_MASK, NULL},
+     BALSA_PIXMAP_MENU_FORWARD, 'F', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
     {
      GNOME_APP_UI_ITEM, N_("Next Part"), N_("Next part in Message"),
      next_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     GNOME_STOCK_MENU_FORWARD, '.', GDK_CONTROL_MASK, NULL},
+     BALSA_PIXMAP_MENU_NEXT, '.', GDK_CONTROL_MASK, NULL},
     {
      GNOME_APP_UI_ITEM, N_("Previous Part"),
      N_("Previous part in Message"),
      previous_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     GNOME_STOCK_MENU_BACK, ',', GDK_CONTROL_MASK, NULL},
+     BALSA_PIXMAP_MENU_PREVIOUS, ',', GDK_CONTROL_MASK, NULL},
     {
      GNOME_APP_UI_ITEM, N_("Save Current Part..."),
      N_("Save current part in message"),
      save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     GNOME_STOCK_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL},
+     BALSA_PIXMAP_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_END
 };
 
@@ -252,45 +252,45 @@ message_window_new(LibBalsaMessage * message)
 
     mw->show_all_headers_save=-1;
     mw->headers_shown=balsa_app.shown_headers;
-    
-    set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_MAIL_RPL,
+
+    set_toolbar_button_callback(2, BALSA_PIXMAP_REPLY,
 				GTK_SIGNAL_FUNC(replyto_message_cb), mw);
-    set_toolbar_button_callback(2, BALSA_PIXMAP_MAIL_RPL_ALL,
+    set_toolbar_button_callback(2, BALSA_PIXMAP_REPLY_ALL,
 				GTK_SIGNAL_FUNC(replytoall_message_cb), mw);
-    set_toolbar_button_callback(2, BALSA_PIXMAP_MAIL_RPL_GROUP,
+    set_toolbar_button_callback(2, BALSA_PIXMAP_REPLY_GROUP,
 				GTK_SIGNAL_FUNC(replytogroup_message_cb), mw);
-    set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_MAIL_FWD,
+    set_toolbar_button_callback(2, BALSA_PIXMAP_FORWARD,
 				GTK_SIGNAL_FUNC(forward_message_default_cb), mw);
-    set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_BACK,
+    set_toolbar_button_callback(2, BALSA_PIXMAP_PREVIOUS,
 				GTK_SIGNAL_FUNC(previous_part_cb), mw);
-    set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_FORWARD,
+    set_toolbar_button_callback(2, BALSA_PIXMAP_NEXT,
 				GTK_SIGNAL_FUNC(next_part_cb), mw);
     set_toolbar_button_callback(2, BALSA_PIXMAP_NEXT_UNREAD,
 				GTK_SIGNAL_FUNC(next_unread_cb), mw);
     set_toolbar_button_callback(2, BALSA_PIXMAP_NEXT_FLAGGED,
 				GTK_SIGNAL_FUNC(next_flagged_cb), mw);
-    set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_TRASH,
+    set_toolbar_button_callback(2, BALSA_PIXMAP_TRASH,
 				GTK_SIGNAL_FUNC(trash_cb), mw);
-    set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_PRINT,
+    set_toolbar_button_callback(2, BALSA_PIXMAP_PRINT,
 				GTK_SIGNAL_FUNC(print_cb), mw);
-    set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_SAVE,
+    set_toolbar_button_callback(2, BALSA_PIXMAP_SAVE,
 				GTK_SIGNAL_FUNC(save_current_part_cb), mw);
     set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_CLOSE,
 				GTK_SIGNAL_FUNC(close_message_window), mw);
-    set_toolbar_button_callback(2, BALSA_PIXMAP_SHOW_ALL_HEADERS,
+    set_toolbar_button_callback(2, BALSA_PIXMAP_SHOW_HEADERS,
 				GTK_SIGNAL_FUNC(show_all_headers_tool_cb), mw);
-    
+
     gnome_app_set_toolbar(GNOME_APP(mw->window),
 			  get_toolbar(GTK_WIDGET(mw->window), 
 				      TOOLBAR_MESSAGE));
-    
+
     set_toolbar_button_sensitive(mw->window, 2,
-				 GNOME_STOCK_PIXMAP_BACK, FALSE);
+				 BALSA_PIXMAP_PREVIOUS, FALSE);
     set_toolbar_button_sensitive(mw->window, 2,
-				 GNOME_STOCK_PIXMAP_FORWARD, FALSE);
-    
+				 BALSA_PIXMAP_NEXT, FALSE);
+
     gtk_window_set_wmclass(GTK_WINDOW(mw->window), "message", "Balsa");
-    
+
     gtk_signal_connect(GTK_OBJECT(mw->window),
 		       "destroy",
 		       GTK_SIGNAL_FUNC(destroy_message_window), mw);
@@ -339,15 +339,15 @@ message_window_new(LibBalsaMessage * message)
     gtk_widget_show(mw->window);
 
     balsa_message_set(BALSA_MESSAGE(mw->bmessage), message);
-    
+
     if(mw->bmessage != NULL &&
        ((BalsaMessage *)mw->bmessage)->part_list != NULL) {
 	gil=GNOME_ICON_LIST(((BalsaMessage *)mw->bmessage)->part_list);
 	if(gil->icons >= 2) {
 	    set_toolbar_button_sensitive(mw->window, 2,
-					 GNOME_STOCK_PIXMAP_BACK, TRUE);
+					 BALSA_PIXMAP_PREVIOUS, TRUE);
 	    set_toolbar_button_sensitive(mw->window, 2,
-					 GNOME_STOCK_PIXMAP_FORWARD, TRUE);
+					 BALSA_PIXMAP_NEXT, TRUE);
 	}
     }
 }
@@ -556,20 +556,20 @@ static void next_unread_cb(GtkWidget * widget, gpointer data)
     BalsaIndex *idx;
     GtkCList *list;
     LibBalsaMessage *msg;
-    
+
     balsa_index_select_next_unread(
 	idx=BALSA_INDEX(
 	    balsa_window_find_current_index(balsa_app.main_window)));
-    
+
     list=GTK_CLIST(idx->ctree);
     if(g_list_length(list->selection) != 1)
 	return;
-    
+
     msg=LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(GTK_CTREE(list),
 						     list->selection->data));
     if(!msg)
 	return;
-    
+
     gtk_widget_destroy(GTK_WIDGET(mw->window));
     message_window_new(msg);
 }
@@ -580,20 +580,20 @@ static void next_flagged_cb(GtkWidget * widget, gpointer data)
     BalsaIndex *idx;
     GtkCList *list;
     LibBalsaMessage *msg;
-    
+
     balsa_index_select_next_flagged(
 	idx=BALSA_INDEX(
 	    balsa_window_find_current_index(balsa_app.main_window)));
-    
+
     list=GTK_CLIST(idx->ctree);
     if(g_list_length(list->selection) != 1)
 	return;
-    
+
     msg=LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(GTK_CTREE(list),
 						     list->selection->data));
     if(!msg)
 	return;
-    
+
     gtk_widget_destroy(GTK_WIDGET(mw->window));
     message_window_new(msg);
 }
@@ -633,16 +633,16 @@ static void trash_cb(GtkWidget * widget, gpointer data)
 		GTK_CTREE(list), list->selection->data) == msg) {
 				/* Clear the selection on the current row */
 		gtk_clist_unselect_row(list, row, 0);
-		
+
 		if(list->rows > 1) {
 		    if(newrow >= list->rows-1) /* Must back up */
 			--newrow;
 		    else
 			++newrow;
-		    
+
 		    if(newrow < 0)
 			newrow=0;
-		    
+
 		    /* Set new selected row */
 		    gtk_clist_select_row(list, newrow, 0);
 		}
@@ -650,12 +650,12 @@ static void trash_cb(GtkWidget * widget, gpointer data)
 	}
 	gtk_clist_remove(list, row);
     }
-    
+
     if(msg->mailbox != balsa_app.trash)
 	libbalsa_message_move(msg, balsa_app.trash);
     else
 	libbalsa_message_delete(msg);
-    
+
     gtk_widget_destroy(GTK_WIDGET(mw->window));
 }
 
@@ -664,10 +664,10 @@ static void show_all_headers_tool_cb(GtkWidget * widget, gpointer data)
     MessageWindow *mw = (MessageWindow *) (data);
     GtkWidget *btn;
 
-    btn=get_tool_widget(GTK_WIDGET(mw->window), 2, BALSA_PIXMAP_SHOW_ALL_HEADERS);
+    btn=get_tool_widget(GTK_WIDGET(mw->window), 2, BALSA_PIXMAP_SHOW_HEADERS);
     if(!btn)
         return;
-   
+
     if(GTK_TOGGLE_BUTTON(btn)->active)  {
         mw->show_all_headers_save=mw->headers_shown;
 		mw->headers_shown=HEADERS_ALL;
@@ -676,7 +676,7 @@ static void show_all_headers_tool_cb(GtkWidget * widget, gpointer data)
     } else {
         if(mw->show_all_headers_save == -1)
             return;
-	
+
         switch(mw->show_all_headers_save) {
         case HEADERS_NONE:
             show_no_headers_cb(widget, data);
@@ -699,7 +699,7 @@ void reset_show_all_headers(MessageWindow *mw)
 
     mw->show_all_headers_save=-1;
     btn=get_tool_widget(GTK_WIDGET(mw->window), 2, 
-			BALSA_PIXMAP_SHOW_ALL_HEADERS);
+			BALSA_PIXMAP_SHOW_HEADERS);
     if(btn)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn), FALSE);
 }
@@ -711,7 +711,7 @@ static void populate_move_menu(MessageWindow *mw)
     GtkWidget *bmbl;
     GtkWidget *submenu, *smenuitem;
     GtkRequisition req;
-    
+
     if(mw->message->mailbox->readonly) {
 	gtk_widget_set_sensitive(mw->move_menu, FALSE);
 	return;
@@ -719,17 +719,17 @@ static void populate_move_menu(MessageWindow *mw)
 
     /* Load Folder MRU */
     load_mru(mw);
-    
+
     item=gtk_menu_item_new();
     gtk_menu_append(GTK_MENU(GTK_MENU_ITEM(mw->move_menu)->submenu), item);
     gtk_widget_show(item);
-    
+
     /* Create standard entry */
     item=gtk_menu_item_new_with_label(_("Folder"));
-    
+
     gtk_menu_append(GTK_MENU(GTK_MENU_ITEM(mw->move_menu)->submenu), item);
     gtk_widget_show(item);
-    
+
     submenu=gtk_menu_new();
     smenuitem=gtk_menu_item_new();
 
@@ -737,30 +737,30 @@ static void populate_move_menu(MessageWindow *mw)
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(scroller),
                                     GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     bmbl = balsa_mblist_new();
-    
+
     gtk_widget_size_request(bmbl, &req);
-    
+
     if ( req.height > balsa_app.mw_height )
 	req.height = balsa_app.mw_height;
-    
+
     req.width=balsa_app.mblist_width;
     gtk_widget_set_usize(GTK_WIDGET(bmbl), req.width, req.height);
-    
+
     gtk_container_add(GTK_CONTAINER(scroller), bmbl);
     gtk_container_add(GTK_CONTAINER(smenuitem), scroller);
-    
+
     gtk_menu_append(GTK_MENU(submenu), smenuitem);
     gtk_widget_show(bmbl);
     gtk_widget_show(scroller);
     gtk_widget_show(smenuitem);
     gtk_widget_show(submenu);
-    
+
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), submenu);
-    
+
     gtk_signal_connect (GTK_OBJECT(smenuitem), "button_release_event",
                         (GtkSignalFunc) close_if_transferred_cb,
                         (gpointer) mw);
-    
+
     gtk_signal_connect(GTK_OBJECT(bmbl), "tree_select_row",
                (GtkSignalFunc) transfer_message_cb,
 		       (gpointer) mw);

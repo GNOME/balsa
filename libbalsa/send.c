@@ -54,9 +54,8 @@ send_message (Message * message, gchar * smtp_server, glong debug)
   msg->content->filename = g_strdup (buffer);
   tempfp = safe_fopen (buffer, "w+");
 
-/*
-   process_user_header (msg->env);
- */
+  msg->env->userhdrs = UserHeader;
+
   tmp = address_to_gchar (message->from);
   msg->env->from = rfc822_parse_adrlist (msg->env->from, tmp);
   g_free (tmp);

@@ -1,5 +1,6 @@
-2003-03-01 16:23  PeterB
+2003-03-02 07:48  PeterB
 
+	* src/sendmsg-window.c: Make address book dialog non-modal.
 	* src/ab-window.c: Fix packing options.
 
 2003-02-28  Pawel Salek  <pawsa@theochem.kth.se>

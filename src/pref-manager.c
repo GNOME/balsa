@@ -33,9 +33,14 @@ struct _PreferencesManagerWindow
   GtkWidget *real_name;
   GtkWidget *email;
   GtkWidget *organization;
-  GtkWidget *mail_directory;
   GtkWidget *smtp_server;
 
+  /* mailboxes */
+  GtkWidget *mail_directory;
+  GtkWidget *mail_inbox;
+  GtkWidget *mail_outbox;
+  GtkWidget *mail_trash;
+  
   /* view */
      /* toolbar */
   GtkWidget *toolbar_text;
@@ -61,6 +66,7 @@ static PreferencesManagerWindow *pmw = NULL;
 
 /* notebook pages */
 static GtkWidget *create_identity_page ();
+static GtkWidget *create_mailboxes_page ();
 static GtkWidget *create_view_page ();
 static GtkWidget *create_mdi_page ();
 
@@ -134,6 +140,12 @@ open_preferences_manager ()
   label = gtk_label_new ("Identity");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
 			    create_identity_page (),
+			    label);
+
+  /* mailboxes page */
+  label = gtk_label_new ("Mailboxes");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+			    create_mailboxes_page (),
 			    label);
 
   /* view page */
@@ -444,6 +456,94 @@ create_identity_page ()
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
   gtk_widget_show (pmw->mail_directory);
+
+
+  return vbox;
+}
+
+/*
+ * mailboxes notebook page
+ */
+static GtkWidget *
+create_mailboxes_page ()
+{
+  GtkWidget *vbox;
+  GtkWidget *table;
+  GtkWidget *label;
+
+
+  vbox = gtk_vbox_new (FALSE, 0);
+  gtk_container_border_width (GTK_CONTAINER (vbox), 10);
+  gtk_widget_show (vbox);
+
+
+  table = gtk_table_new (4, 2, FALSE);
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
+  gtk_widget_show (table);
+
+
+  label = gtk_label_new ("Local mail directory:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (label);
+
+
+  pmw->mail_directory = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pmw->mail_directory, 1, 2, 0, 1,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
+  gtk_widget_show (pmw->mail_directory);
+
+
+  /* inbox path */
+  label = gtk_label_new ("Inbox Path:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (label);
+
+
+  pmw->mail_inbox = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pmw->mail_inbox, 1, 2, 1, 2,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
+  gtk_widget_show (pmw->mail_inbox);
+
+
+
+  /* outbox path */
+  label = gtk_label_new ("Outbox Path:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (label);
+
+
+  pmw->mail_outbox = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pmw->mail_outbox, 1, 2, 2, 3,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
+  gtk_widget_show (pmw->mail_outbox);
+
+
+  /* trash path */
+  label = gtk_label_new ("Trash Path:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (label);
+
+
+  pmw->mail_trash = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pmw->mail_trash, 1, 2, 3, 4,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
+  gtk_widget_show (pmw->mail_trash);
 
 
   return vbox;

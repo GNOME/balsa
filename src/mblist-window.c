@@ -132,19 +132,23 @@ mailbox_select_cb (GtkCTree * ctree, GtkCTreeNode * row, gint column)
 {
   IndexChild *index_child;
   Mailbox *mailbox;
+  GdkEventButton *bevent = (GdkEventButton*)gtk_get_current_event ();
 
-  mailbox = gtk_ctree_get_row_data (ctree, row);
-
-  /* bail now if the we've been called without a valid
-   * mailbox */
-  if (!mailbox)
-    return;
-
-  index_child = index_child_new (mblw->mdi, mailbox);
-  if (index_child)
+  if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     {
-      gnome_mdi_add_child (mblw->mdi, GNOME_MDI_CHILD (index_child));
-      gnome_mdi_add_view (mblw->mdi, GNOME_MDI_CHILD (index_child));
-    }
+      mailbox = gtk_ctree_get_row_data (ctree, row);
+
+      /* bail now if the we've been called without a valid
+       * mailbox */
+      if (!mailbox)
+	return;
+
+      index_child = index_child_new (mblw->mdi, mailbox);
+      if (index_child)
+	{
+	  gnome_mdi_add_child (mblw->mdi, GNOME_MDI_CHILD (index_child));
+	  gnome_mdi_add_view (mblw->mdi, GNOME_MDI_CHILD (index_child));
+	}
 /* TODO TODO FIXME remove index-child from list here */
+    }
 }

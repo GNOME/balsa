@@ -109,8 +109,8 @@ index_child_destroy (GtkObject * obj)
   mailbox_watcher_remove (ic->mailbox, ic->watcher_id);
   mailbox_open_unref (ic->mailbox);
 
-  if(GTK_OBJECT_CLASS(parent_class)->destroy)
-   (* GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(ic));
+  if (GTK_OBJECT_CLASS (parent_class)->destroy)
+    (*GTK_OBJECT_CLASS (parent_class)->destroy) (GTK_OBJECT (ic));
 }
 
 static GtkWidget *

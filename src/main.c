@@ -29,6 +29,7 @@
 int
 main (int argc, char *argv[])
 {
+  gtk_init (&argc, &argv);
   gnome_init ("balsa", NULL, argc, argv, 0, NULL);
   init_balsa_app (argc, argv);
 

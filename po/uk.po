@@ -2583,9 +2583,8 @@ msgid "Selected headers:"
 msgstr "Вибран╕ заголовки:"
 
 #: src/pref-manager.c:1624
-#, fuzzy
 msgid "Status Messages"
-msgstr "Налагоджувальн╕ пов╕домлення"
+msgstr "Пов╕домлення стану"
 
 #: src/pref-manager.c:1625 src/pref-manager.c:1635
 msgid "Information Messages"
@@ -2608,48 +2607,41 @@ msgid "Debug Messages"
 msgstr "Налагоджувальн╕ пов╕домлення"
 
 #: src/pref-manager.c:1658
-#, fuzzy
 msgid "Colors"
 msgstr "Кольори"
 
 #: src/pref-manager.c:1660
-#, fuzzy
 msgid "Mailbox Colors"
-msgstr "Конф╕╜уратор поштово╖ скриньки"
+msgstr "Кольори поштово╖ скриньки"
 
 #: src/pref-manager.c:1666
-#, fuzzy
 msgid "Mailbox with unread messages color"
-msgstr "Кол╕р скриньки з непрчитаними пов╕домленнями"
+msgstr "Кол╕р скриньки з непрочитаними пов╕домленнями"
 
 #: src/pref-manager.c:1668
-#, fuzzy
 msgid "Message Colors"
-msgstr "Пов╕домлення"
+msgstr "Кольори пов╕домлення"
 
 #: src/pref-manager.c:1674
-#, fuzzy, c-format
+#, c-format
 msgid "Quote level %d color"
-msgstr "Вторинний кол╕р цитат"
+msgstr "Кол╕р цитати р╕вня %d"
 
 #: src/pref-manager.c:1682
-#, fuzzy
 msgid "Fonts"
-msgstr "Шрифт"
+msgstr "Шрифти"
 
 #: src/pref-manager.c:1684
-#, fuzzy
 msgid "Preview Font"
-msgstr "Панель попереднього перегляду"
+msgstr "Перегляд шрифту"
 
 #: src/pref-manager.c:1701 src/pref-manager.c:1735
 msgid "Select a font to use"
 msgstr "Вибер╕ть шрифт для використання"
 
 #: src/pref-manager.c:1704 src/pref-manager.c:1738
-#, fuzzy
 msgid "Select..."
-msgstr "Стерти..."
+msgstr "В╕д╕брати..."
 
 #: src/pref-manager.c:1711 src/pref-manager.c:1746
 msgid "Preview pane"
@@ -2696,7 +2688,6 @@ msgid "Debug"
 msgstr "Налагодження"
 
 #: src/pref-manager.c:1870
-#, fuzzy
 msgid "Empty Trash on exit"
 msgstr "Спорожнити см╕тник на виход╕"
 
@@ -2730,17 +2721,14 @@ msgid "Set as default"
 msgstr "Зробити типовим"
 
 #: src/pref-manager.c:2208
-#, fuzzy
 msgid "Show nothing"
-msgstr "Не показувати"
+msgstr "Не показувати н╕чого"
 
 #: src/pref-manager.c:2209
-#, fuzzy
 msgid "Show dialog"
 msgstr "Показувати д╕алог"
 
 #: src/pref-manager.c:2210
-#, fuzzy
 msgid "Show in list"
 msgstr "Показувати в списку"
 
@@ -2750,16 +2738,15 @@ msgstr "Надрукувати на консоль"
 
 #: src/pref-manager.c:2221
 msgid "Ask me"
-msgstr ""
+msgstr "Спитати мене"
 
 #: src/print.c:41
-#, fuzzy
 msgid ""
 "This version of balsa is compiled without gnome-print support.\n"
 "Printing is not possible."
 msgstr ""
-"Не вдалося знайти шрифт %s\n"
-"Друк не можливий"
+"Цю верс╕ю Balsa скомп╕льовано без п╕дтримки gnome-print.\n"
+"Друк не можливий."
 
 #: src/print.c:283
 #, c-format
@@ -2788,9 +2775,8 @@ msgid "Send"
 msgstr "В╕д╕слати"
 
 #: src/sendmsg-window.c:136 src/sendmsg-window.c:178
-#, fuzzy
 msgid "Send this message"
-msgstr "В╕д╕слати цю кореспонденц╕ю"
+msgstr "В╕д╕слати це пов╕домлення"
 
 #: src/sendmsg-window.c:141
 msgid "Attach"
@@ -2809,14 +2795,12 @@ msgid "Continue this message later"
 msgstr "Продовжити написання цього пов╕домлення п╕зн╕ше"
 
 #: src/sendmsg-window.c:153
-#, fuzzy
 msgid "Run a spell check on the current message"
 msgstr "Виконати перев╕рку орфограф╕╖ поточного пов╕домлення"
 
 #: src/sendmsg-window.c:160
-#, fuzzy
 msgid "Cancel this message"
-msgstr "В╕дпов╕сти на це пов╕домлення"
+msgstr "В╕дм╕нити це пов╕домлення"
 
 #: src/sendmsg-window.c:167
 msgid "_Include File..."
@@ -2835,9 +2819,8 @@ msgid "_Queue"
 msgstr "Черга"
 
 #: src/sendmsg-window.c:183
-#, fuzzy
 msgid "Queue this message in Outbox for sending"
-msgstr "Поставити це пов╕домлення у чергу на в╕дправлення"
+msgstr "Поставити це пов╕домлення у чергу на в╕дсилання у Вих╕дн╕"
 
 #: src/sendmsg-window.c:187
 msgid "_Postpone"
@@ -3040,7 +3023,6 @@ msgid "_Language"
 msgstr "Мова"
 
 #: src/sendmsg-window.c:372
-#, fuzzy
 msgid "_Options"
 msgstr "Параметри"
 
@@ -3050,30 +3032,31 @@ msgid ""
 "The attachment pixmap (%s) cannot be used.\n"
 " %s"
 msgstr ""
+"П╕ктограму долучення (%s) не може бути використано.\n"
+" %s"
 
 #: src/sendmsg-window.c:658
-#, fuzzy
 msgid ""
 "Default attachment pixmap (balsa/attachment.png) cannot be found:\n"
 "Your balsa installation is corrupted."
 msgstr ""
-"Не знайдено п╕ктограми долучення (balsa/attachment.png).\n"
-"Нажаль, це означа╓ те, що ви не зможете долучати жодних файл╕в.\n"
+"Не знайдено типово╖ п╕ктограми долучення (balsa/attachment.png).\n"
+"Вашу встановлення Balsa з╕псоване."
 
 #: src/sendmsg-window.c:671
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot get info on file '%s': %s"
-msgstr "Неможливо отримати ╕нформац╕ю про файл '%s': %s\n"
+msgstr "Неможливо отримати ╕нформац╕ю про файл \"%s\": %s"
 
 #: src/sendmsg-window.c:676
-#, fuzzy, c-format
+#, c-format
 msgid "Attachment %s is not a regular file."
-msgstr "Долучення не ╓ звичайним файлом чи не може бути зчитане: \"%s\"\n"
+msgstr "Долучення %s не ╓ звичайним файлом."
 
 #: src/sendmsg-window.c:679
 #, c-format
 msgid "File %s cannot be read\n"
-msgstr ""
+msgstr "Файл %s не може бути зчитано\n"
 
 #: src/sendmsg-window.c:746
 msgid "Attach file"
@@ -3104,18 +3087,14 @@ msgid "you"
 msgstr "ви"
 
 #: src/sendmsg-window.c:1144
-#, fuzzy, c-format
+#, c-format
 msgid "On %s %s wrote:\n"
-msgstr ""
-"\n"
-"В %s %s писали:\n"
+msgstr "В %s %s писали:\n"
 
 #: src/sendmsg-window.c:1147
-#, fuzzy, c-format
+#, c-format
 msgid "%s wrote:\n"
-msgstr ""
-"\n"
-"%s писали:\n"
+msgstr "%s писаи:\n"
 
 #: src/sendmsg-window.c:1238
 msgid "Reply to "
@@ -3135,11 +3114,11 @@ msgstr "Нове пов╕домлення"
 
 #: src/sendmsg-window.c:1378 src/sendmsg-window.c:1379
 msgid "Re:"
-msgstr ""
+msgstr "Re:"
 
 #: src/sendmsg-window.c:1404 src/sendmsg-window.c:1405
 msgid "Fwd:"
-msgstr ""
+msgstr "Fwd:"
 
 #: src/sendmsg-window.c:1586
 #, c-format
@@ -3155,13 +3134,12 @@ msgid "Include file"
 msgstr "Включити файл"
 
 #: src/sendmsg-window.c:1890
-#, fuzzy
 msgid ""
 "Balsa has been compiled without gnome-print support.\n"
 "Printing is not possible."
 msgstr ""
-"Не вдалося знайти шрифт %s\n"
-"Друк не можливий"
+"Balsa скомп╕льовано без п╕дтримки gnome-print.\n"
+"Друк не можливий."
 
 #: src/spell-check.c:482
 msgid "Replace the current word with the selected suggestion"
@@ -3221,7 +3199,7 @@ msgstr "Ви можете зберегти лише одну адресу за раз.\n"
 
 #: src/store-address.c:103
 msgid "This message doesn't contain an e-mail address.\n"
-msgstr "Це пов╕домлення не м╕стить адрес е-пошти.\n"
+msgstr "Це пов╕домлення не м╕стить адрес електронно╖ адреси.\n"
 
 #: src/store-address.c:151
 msgid "Store Address"

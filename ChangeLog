@@ -1,3 +1,11 @@
+2001-02-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-index.c: make it compile with -Werror with and without
+	BALSA_USE_THREADS
+	* src/mailbox-conf.c:
+	* src/mailbox-node.c:  some one-liners in mailbox&folder 
+	configuration.
+	
 2001-02-16  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-index.c: make compile with -Werror 

@@ -170,6 +170,9 @@ balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * prefix)
     libbalsa_server_save_config(mn->server);
     gnome_config_set_string("Name",      mn->name);
     gnome_config_set_string("Directory", mn->dir);
+
+    g_free(mn->config_prefix);
+    mn->config_prefix = g_strdup(prefix);
 }
 
 static void

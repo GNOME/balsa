@@ -524,7 +524,7 @@ moveto_handler(BalsaIndex * bindex)
    functional (and that's MOST important; think long before modyfying it)
    but perhaps we could write it nicer?
 */
-#if 0
+#if BALSA_USE_THREADS
 static gboolean is_opening =FALSE;
 static void *open_in_thread(void* mailbox)
 {
@@ -546,6 +546,7 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
     gchar *msg;
 
 #ifdef BALSA_USE_THREADS
+    void*data;
     static pthread_mutex_t open_lock = PTHREAD_MUTEX_INITIALIZER;
     pthread_t open_thread;
     if(pthread_mutex_trylock(&open_lock) != 0)  /* already opening */

@@ -204,18 +204,14 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 	libbalsa_mailbox_local_remove_files(LIBBALSA_MAILBOX_LOCAL(
              mailbox));
 
-    if (LIBBALSA_IS_MAILBOX_POP3(mailbox))
-	update_pop3_servers();
-    else
-	balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
-
     gtk_object_unref(GTK_OBJECT(mailbox));
 
     /* Remove the node from balsa's mailbox list */
-    if (LIBBALSA_IS_MAILBOX_POP3(mailbox))
+    if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	balsa_app.inbox_input = g_list_remove(balsa_app.inbox_input, 
 					      mbnode);
-    else {
+	update_pop3_servers();
+    } else {
 	gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
 	if (!gnode) {
 	    fprintf(stderr,
@@ -224,7 +220,8 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 	} else {
 	    g_node_unlink(gnode);
 	    g_node_destroy(gnode); /* this will remove mbnode */
-	}
+	    balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
+ 	}
     }
 }
 

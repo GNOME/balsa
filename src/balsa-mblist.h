@@ -69,4 +69,11 @@ BalsaMailboxNode *balsa_mblist_get_node_by_mailbox(BalsaMBList * mblist,
 gboolean balsa_mblist_remove_mailbox_node(GtkTreeStore * store,
                                           BalsaMailboxNode * mbnode);
 void balsa_mblist_scan_mailbox_node(BalsaMailboxNode * mbnode);
+GtkWidget *balsa_mblist_mru_menu(GtkWindow * window, GList ** url_list,
+                                 GCallback user_func, gpointer user_data);
+void balsa_mblist_mru_add(GList ** url_list, const gchar * url);
+void balsa_mblist_mru_drop(GList ** url_list, const gchar * url);
+GtkWidget *balsa_mblist_mru_option_menu(GtkWindow * window, 
+                                        GList ** url_list,
+                                        gchar ** url);
 #endif

@@ -621,6 +621,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
     if (bsm->bad_address_style)
         g_object_unref(G_OBJECT(bsm->bad_address_style));
     quit_on_close = bsm->quit_on_close;
+    g_free(bsm->fcc_url);
 
     g_free(bsm);
 
@@ -1799,8 +1800,7 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     GtkWidget *table;
     GtkWidget *frame;
     GtkWidget *sc;
-    GList     *glist = NULL;
-
+    GtkWidget *align;
 
     table = gtk_table_new(11, 3, FALSE);
     gtk_table_set_row_spacings(GTK_TABLE(table), 2);
@@ -1839,24 +1839,26 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     gtk_table_attach(GTK_TABLE(table), msg->fcc[0], 0, 1, 5, 6, GTK_FILL,
 		     GTK_FILL | GTK_SHRINK, 0, 0);
 
-    msg->fcc[1] = gtk_combo_new();
-    gtk_combo_set_use_arrows(GTK_COMBO(msg->fcc[1]), 0);
-    gtk_combo_set_use_arrows_always(GTK_COMBO(msg->fcc[1]), 0);
-
-    glist = g_list_append(glist, balsa_app.sentbox->name);
-    glist = g_list_append(glist, balsa_app.draftbox->name);
-    glist = g_list_append(glist, balsa_app.outbox->name);
-    glist = g_list_append(glist, balsa_app.trash->name);
-    if (balsa_app.copy_to_sentbox)
-	glist = g_list_append(glist, "");
-    else
-	glist = g_list_prepend(glist, "");
-
-    /* FIXME: glist = g_list_concat(glist, mblist_get_mailbox_name_list()) */
-
-    gtk_combo_set_popdown_strings(GTK_COMBO(msg->fcc[1]), glist);
-    gtk_table_attach(GTK_TABLE(table), msg->fcc[1], 1, 3, 5, 6,
-		     GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
+    if (!balsa_app.fcc_mru)
+        balsa_mblist_mru_add(&balsa_app.fcc_mru, balsa_app.sentbox->url);
+    balsa_mblist_mru_add(&balsa_app.fcc_mru, "");
+    if (balsa_app.copy_to_sentbox) {
+        /* move the NULL option to the bottom */
+        balsa_app.fcc_mru = g_list_reverse(balsa_app.fcc_mru);
+        balsa_mblist_mru_add(&balsa_app.fcc_mru, "");
+        balsa_app.fcc_mru = g_list_reverse(balsa_app.fcc_mru);
+    }
+    if (type == SEND_CONTINUE && msg->orig_message->fcc_url)
+        balsa_mblist_mru_add(&balsa_app.fcc_mru,
+                             msg->orig_message->fcc_url);
+    msg->fcc[1] =
+        balsa_mblist_mru_option_menu(GTK_WINDOW(msg->window),
+                                     &balsa_app.fcc_mru,
+                                     &msg->fcc_url);
+    align = gtk_alignment_new(0, 0.5, 0, 1);
+    gtk_container_add(GTK_CONTAINER(align), msg->fcc[1]);
+    gtk_table_attach(GTK_TABLE(table), align, 1, 3, 5, 6,
+		     GTK_FILL, GTK_FILL, 0, 0);
 
     /* Reply To: */
     create_email_entry(table, _("Reply To:"), 6, GNOME_STOCK_MENU_BOOK_BLUE,
@@ -2632,11 +2634,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     /* From: */
     setup_headers_from_identity(msg, msg->ident);
 
-    /* Fcc: */
-    if (type == SEND_CONTINUE && message->fcc_mailbox != NULL)
-	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(msg->fcc[1])->entry),
-			   message->fcc_mailbox);
-
     /* Subject: */
     set_entry_to_subject(GTK_ENTRY(msg->subject[1]), message, type, msg->ident);
 
@@ -3106,9 +3103,6 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	}
     }
 
-    message->fcc_mailbox =
-        gtk_editable_get_chars(GTK_EDITABLE
-                               (GTK_COMBO(bsmsg->fcc[1])->entry), 0, -1);
     message->date = time(NULL);
 
     return message;
@@ -3129,9 +3123,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
 
     message = bsmsg2message(bsmsg);
-    fcc = message->fcc_mailbox && *(message->fcc_mailbox)
-	? balsa_find_mailbox_by_name(message->fcc_mailbox)
-	: NULL;
+    fcc = balsa_find_mailbox_by_url(bsmsg->fcc_url);
 
     if(queue_only)
 	libbalsa_message_queue(message, balsa_app.outbox, fcc,
@@ -3217,14 +3209,14 @@ message_postpone(BalsaSendmsg * bsmsg)
     if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
         bsmsg->type == SEND_REPLY_GROUP))
 	successp = libbalsa_message_postpone(message, balsa_app.draftbox,
-				  bsmsg->orig_message,
-				  message->fcc_mailbox,
+                                             bsmsg->orig_message,
+                                             bsmsg->fcc_url,
                                              balsa_app.encoding_style,
                                              bsmsg->flow);
     else
 	successp = libbalsa_message_postpone(message, balsa_app.draftbox, 
-                                  NULL,
-				  message->fcc_mailbox,
+                                             NULL,
+                                             bsmsg->fcc_url,
                                              balsa_app.encoding_style,
                                              bsmsg->flow);
     if(successp) {

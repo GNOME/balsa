@@ -372,7 +372,7 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
     print_header_list(&pdata->headers, "cc", _("Cc:"), pi->message->cc_list);
     print_header_list(&pdata->headers, "bcc", _("Bcc:"), pi->message->bcc_list);
     print_header_string (&pdata->headers, "fcc", _("Fcc:"),
-			 pi->message->fcc_mailbox);
+			 pi->message->fcc_url);
 
     if (pi->message->dispnotify_to) {
 	gchar *mdn_to = libbalsa_address_to_gchar(pi->message->dispnotify_to, 0);

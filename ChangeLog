@@ -1,3 +1,17 @@
+2002-06-13  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+	
+	* src/balsa-index.c, src/balsa-mblist.[ch], src/message-window.[ch]:
+	- consolidate the mru code into balsa-mblist.c;
+	- define a new GtkOptionMenu mru widget. 
+	* libbalsa/message.[ch], src/print.c, src/balsa-message.c:
+	replace fcc_mailbox with fcc_url.
+	* libbalsa/send.c: eliminate mqi->fcc.
+	* src/balsa-app.[ch], src/save-restore.c: add and manage 
+	balsa_app.fcc_url
+	* src/sendmsg-window.[ch]: use the mru option menu for the fcc-box.
+	* src/main.c: use UTF-8 always for translated text (Christophe
+	Fergeau <christophe.fergeau@laposte.net>)
+
 2002-06-10  Pawel Salek <pawsa@theochem.kth.se>
 
 	* configure.in, NEWS: release balsa-2.0.1

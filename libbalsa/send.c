@@ -59,7 +59,6 @@ struct _MessageQueueItem {
 #if !ENABLE_ESMTP
     MessageQueueItem *next_message;
 #endif
-    gchar *fcc;
     char tempfile[_POSIX_PATH_MAX];
 #if !ENABLE_ESMTP
     enum {MQI_WAITING, MQI_FAILED,MQI_SENT} status;
@@ -133,9 +132,6 @@ msg_queue_item_new(LibBalsaMessage * message)
     libbalsa_unlock_mutt();
 #if !ENABLE_ESMTP
     mqi->next_message = NULL;
-#endif
-    mqi->fcc = g_strdup(message->fcc_mailbox);
-#if !ENABLE_ESMTP
     mqi->status = MQI_WAITING;
 #endif
     mqi->tempfile[0] = '\0';
@@ -151,8 +147,6 @@ msg_queue_item_destroy(MessageQueueItem * mqi)
     if (mqi->message)
 	mutt_free_header(&mqi->message);
     libbalsa_unlock_mutt();
-    if (mqi->fcc)
-	g_free(mqi->fcc);
     g_free(mqi);
 }
 

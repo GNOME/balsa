@@ -332,6 +332,7 @@ main(int argc, char *argv[])
 #ifdef ENABLE_NLS
     /* Initialize the i18n stuff */
     bindtextdomain(PACKAGE, GNOMELOCALEDIR);
+    bind_textdomain_codeset(PACKAGE, "UTF-8");
     textdomain(PACKAGE);
     /* FIXME: gnome_i18n_get_language seems to have gone away; 
      * is this a reasonable replacement? */

@@ -851,6 +851,11 @@ config_global_load(void)
     load_mru(&balsa_app.folder_mru);
     gnome_config_pop_prefix();
 
+	/* FCC MRU */
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FccMRU/");
+    load_mru(&balsa_app.fcc_mru);
+    gnome_config_pop_prefix();
+
     return TRUE;
 }				/* config_global_load */
 
@@ -1113,6 +1118,10 @@ gint config_save(void)
 	
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FolderMRU/");
     save_mru(balsa_app.folder_mru);
+    gnome_config_pop_prefix();
+
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FccMRU/");
+    save_mru(balsa_app.fcc_mru);
     gnome_config_pop_prefix();
 
     gnome_config_sync();
@@ -1477,7 +1486,7 @@ save_mru(GList *mru)
     char tmpkey[32];
     GList *ltmp;
     
-    for(ltmp=g_list_first(balsa_app.folder_mru),i=0;
+    for(ltmp=g_list_first(mru),i=0;
 	ltmp; ltmp=g_list_next(ltmp),i++) {
 	sprintf(tmpkey, "MRU%d", i+1);
 	gnome_config_set_string(tmpkey, (gchar *)(ltmp->data));

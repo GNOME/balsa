@@ -67,6 +67,8 @@ extern "C" {
 	GtkWidget *current_language_menu;
 	/* identity related data */
 	LibBalsaIdentity* ident;
+        /* fcc mailbox */
+        gchar *fcc_url;
 	/* widgets to be disabled when the address is incorrect */
 	GtkWidget *ready_widgets[5];
 	GtkWidget *view_checkitems[VIEW_MENU_LENGTH];

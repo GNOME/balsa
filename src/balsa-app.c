@@ -413,6 +413,7 @@ balsa_app_init(void)
 
     /* Message filing */
     balsa_app.folder_mru=NULL;
+    balsa_app.fcc_mru=NULL;
     balsa_app.drag_default_is_move=0;
 }
 

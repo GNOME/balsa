@@ -1,3 +1,8 @@
+2000-09-10  Carlos Morgado  <chbm@chbm.nu>
+
+	* proplisttognome.pl: utility to convert old style config to new.
+	not nearly done
+
 2000-09-09  Matthew Guenther <guentherm@asme.org>
 
 	* src/spell-check.c (next_word): Fix next word heuristics, switch

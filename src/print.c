@@ -820,10 +820,9 @@ print_info_new(const gchar * paper, LibBalsaMessage * msg,
     prepare_header(pi, NULL);
     
     the_charset = (gchar *)libbalsa_message_charset(msg);
-    if (the_charset) {
+    if (the_charset)
 	pi->conv_data = iconv_open("utf8", the_charset);
-	g_free(the_charset);
-    } else
+    else
 	pi->conv_data = iconv_open("utf8", "iso-8859-1");
 
     /* now get the message contents... */

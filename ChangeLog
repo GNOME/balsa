@@ -1,5 +1,10 @@
 2001-05-10  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* libbasa/message.c (libbalsa_message_charset): 
+	* src/print.c: don't free strings you don't own. 
+	
+2001-05-10  Pawel Salek  <pawsa@theochem.kth.se>
+
 	From Albrecht Dreﬂ <albrecht.dress@arcormail.de>:
 	* src/print.c: compute the number of pages properly.
 	* src/balsa-app.h: added field for url color

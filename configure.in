@@ -32,9 +32,17 @@ AM_PROG_LIBTOOL
 dnl this should come after `AC_PROG_CC'
 GNOME_X_CHECKS
 
+balsa_save_LDFLAGS="$LDFLAGS"
+balsa_save_LIBS="$LIBS"
+
+LDFLAGS="$LDFLAGS `echo $GTK_LIBS | sed 's/\(.*\)\(-lgtk.*\)/\1/'`"
+LIBS="$LIBS $GTK_LIBS"
+
 AC_CHECK_LIB(PropList, PLGetProplistWithPath, ,
 AC_MSG_ERROR([*** libPropList not found.  Please check http://www.balsa.net for information on the required files.]),)
 
+LDFLAGS="$balsa_save_LDFLAGS"
+LIBS="$balsa_save_LIBS"
 
 ALL_LINGUAS="ko de fr ga fi"
 AM_GNU_GETTEXT

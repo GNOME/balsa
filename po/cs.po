@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-08-19 00:02+0100\n"
-"PO-Revision-Date: 2004-06-14 19:02+0200\n"
+"PO-Revision-Date: 2004-08-20 23:16+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -44,7 +44,7 @@ msgstr "Beze jména"
 
 #: libbalsa/address-book-ldap.c:261
 msgid "TLS requested but not compiled in"
-msgstr ""
+msgstr "Vyžadováno TLS, ale není zakompilováno"
 
 #: libbalsa/address-book.c:399 libbalsa/filter-error.c:45
 msgid "No error"
@@ -200,9 +200,8 @@ msgid "%s: signature verification failed: %s"
 msgstr "%s: ověření podpisu selhalo: %s"
 
 #: libbalsa/gmime-gpgme-context.c:582
-#, fuzzy
 msgid "combined signing and encryption is only defined for RFC 2440"
-msgstr "podepisování a šifrování selhalo"
+msgstr "kombinované podepisování a šifrování je definováno jen pro RFC 2440"
 
 #: libbalsa/gmime-gpgme-context.c:652
 #, c-format
@@ -411,7 +410,7 @@ msgstr "Nemohu se připojit k serveru: %s"
 #: libbalsa/imap-server.c:638
 #, c-format
 msgid "Exceeded the number of connections per server %s"
-msgstr ""
+msgstr "Překročen počet připojení k serveru %s"
 
 #: libbalsa/libbalsa.c:279
 #, c-format
@@ -419,9 +418,8 @@ msgid "LDAP Directory for %s"
 msgstr "Adresář LDAP pro %s"
 
 #: libbalsa/libbalsa.c:384
-#, fuzzy
 msgid "Invalid date"
-msgstr "[neplatné datum]"
+msgstr "Neplatné datum"
 
 #: libbalsa/libbalsa.c:400 src/pref-manager.c:1226 src/pref-manager.c:1323
 msgid "Unknown"
@@ -500,12 +498,12 @@ msgstr "Nelze vytvořit poštovní schránku typu %s"
 #. login information...
 #: libbalsa/mailbox_imap.c:481
 msgid "IMAP connection has been severed. Reconnecting..."
-msgstr ""
+msgstr "Spojení IMAP bylo přerušeno. Připojuji se znovu..."
 
 #: libbalsa/mailbox_imap.c:484
 #, c-format
 msgid "IMAP server has shut the connection: %s Reconnecting..."
-msgstr ""
+msgstr "Server IMAP uzavřel spojení: %s. Připojuji se znovu..."
 
 #: libbalsa/mailbox_imap.c:825
 #, c-format
@@ -530,7 +528,7 @@ msgstr ""
 
 #: libbalsa/mailbox_imap.c:2186
 msgid "Server-side threading not supported."
-msgstr ""
+msgstr "Vlákna na straně serveru nejsou podporována."
 
 #: libbalsa/mailbox_local.c:1267
 #, c-format
@@ -671,7 +669,7 @@ msgstr "Chyba poštovní schránky pop3 %s: %s\n"
 #: libbalsa/mailbox_pop3.c:535
 #, c-format
 msgid "POP3 message %d oversized: %d kB - skipped."
-msgstr ""
+msgstr "Zpráva POP3 %d příliš velká: %d kB - přeskočena."
 
 #: libbalsa/mailbox_pop3.c:546
 #, c-format
@@ -865,11 +863,10 @@ msgid ""
 msgstr "Podpis je platný, ale klíč použitý k ověření podpisu vypršel."
 
 #: libbalsa/rfc3156.c:874
-#, fuzzy
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
-msgstr "Podpis je platný, ale klíč použitý k ověření podpisu vypršel."
+msgstr "Podpis je platný, ale klíč použitý k ověření podpisu byl odvolán."
 
 #: libbalsa/rfc3156.c:877
 msgid "The signature is invalid (Note: might be caused by gmime bug!)."
@@ -1009,37 +1006,33 @@ msgstr ""
 
 #: libbalsa/rfc3156.c:978
 msgid " revoked"
-msgstr ""
+msgstr " odvolán"
 
 #: libbalsa/rfc3156.c:983
-#, fuzzy
 msgid " expired"
-msgstr "Odpovězeno"
+msgstr " vypršel"
 
 #: libbalsa/rfc3156.c:988
 msgid " disabled"
-msgstr ""
+msgstr " zakázán"
 
 #: libbalsa/rfc3156.c:993
-#, fuzzy
 msgid " invalid"
-msgstr "[neplatné datum]"
+msgstr " neplatný"
 
 #: libbalsa/rfc3156.c:996
 #, c-format
 msgid ""
 "\n"
 "Key attributes:%s"
-msgstr ""
+msgstr "\nAtributy klíče:%s"
 
 #: libbalsa/rfc3156.c:998
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Key attribute:%s"
-msgstr ""
-"\n"
-"Klíč vytvořen dne: %s"
+msgstr "\nAtribut klíče:%s"
 
 #: libbalsa/rfc3156.c:1002
 #, c-format
@@ -1256,7 +1249,7 @@ msgstr "Tato zpráva nebude šifrována pro příjemce skrytých kopií."
 #: libbalsa/server.c:370
 #, c-format
 msgid "Logging in to %s using %s"
-msgstr ""
+msgstr "Přihlašuji se k %s pomocí %s"
 
 #: libbalsa/source-viewer.c:52 src/main-window.c:645
 msgid "_Select Text"
@@ -1459,22 +1452,20 @@ msgid "Configure Balsa"
 msgstr "Nastavení Balsy"
 
 #: sounds/balsa.soundlist.in.h:1
-#, fuzzy
 msgid "Balsa E-mail reader"
-msgstr "Filtry Balsy"
+msgstr "Poštovní klient Balsa"
 
 #: sounds/balsa.soundlist.in.h:2
 msgid "Program startup"
-msgstr ""
+msgstr "Spouštění programu"
 
 #: sounds/email.soundlist.in.h:1
 msgid "E-mail"
-msgstr ""
+msgstr "E-mail"
 
 #: sounds/email.soundlist.in.h:2
-#, fuzzy
 msgid "New mail notification"
-msgstr "Žádné zvětšení"
+msgstr "Upozornění na novou poštu"
 
 #: src/ab-main.c:337 src/ab-window.c:167 src/filter-edit-dialog.c:193
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
@@ -1772,12 +1763,12 @@ msgstr "Nemohu zkopírovat zprávu do poštovní schránky \"%s\"."
 #: src/balsa-index.c:1956
 #, c-format
 msgid "Copied to \"%s\"."
-msgstr ""
+msgstr "Zkopírováno do \"%s\"."
 
 #: src/balsa-index.c:1957
-#, fuzzy, c-format
+#, c-format
 msgid "Moved to \"%s\"."
-msgstr "Přesunout do _koše"
+msgstr "Přesunuto do \"%s\"."
 
 #: src/balsa-index.c:2073
 #, c-format
@@ -1890,9 +1881,9 @@ msgid "Disposition-Notification-To:"
 msgstr "Oznámení o doručení pro:"
 
 #: src/balsa-message.c:1591
-#, fuzzy, c-format
+#, c-format
 msgid "Error loading attached image: %s\n"
-msgstr "Chyba při načítání %s: %s\n"
+msgstr "Chyba při načítání připojeného obrázku: %s\n"
 
 #: src/balsa-message.c:1661 src/balsa-message.c:1677 src/balsa-message.c:1709
 #: src/balsa-message.c:1762
@@ -1947,9 +1938,8 @@ msgid "Subject: %s\n"
 msgstr "Předmět: %s\n"
 
 #: src/balsa-message.c:1778
-#, fuzzy
 msgid "Se_nd message to obtain this part"
-msgstr "Pro obdržení této části pošlete zprávu"
+msgstr "P_ro obdržení této části pošlete zprávu"
 
 #: src/balsa-message.c:1883
 #, c-format
@@ -1968,14 +1958,13 @@ msgstr ""
 "zobrazení"
 
 #: src/balsa-message.c:1903
-#, fuzzy
 msgid "S_ave part"
-msgstr "Uložit část"
+msgstr "_Uložit část"
 
 #: src/balsa-message.c:1927 src/balsa-message.c:1952
-#, fuzzy, c-format
+#, c-format
 msgid "View _part with %s"
-msgstr "Prohlédnout část pomocí %s"
+msgstr "Z_obrazit část pomocí %s"
 
 #: src/balsa-message.c:2231
 #, c-format
@@ -2031,19 +2020,18 @@ msgid "rfc822 message (from %s, subject \"%s\")"
 msgstr "zpráva rfc822 (od %s, předmět \"%s\")"
 
 #: src/balsa-message.c:2737
-#, fuzzy
 msgid "complete message"
-msgstr "Vytvořit zprávu"
+msgstr "celá zpráva"
 
 #: src/balsa-message.c:2754
-#, fuzzy, c-format
+#, c-format
 msgid "part %s: %s (file %s)"
-msgstr "%s: podepisování selhalo: %s"
+msgstr "část %s: %s (soubor %s)"
 
 #: src/balsa-message.c:2765
-#, fuzzy, c-format
+#, c-format
 msgid "part %s: %s"
-msgstr "%s: %s"
+msgstr "část %s: %s"
 
 #: src/balsa-message.c:2855
 #, c-format
@@ -2151,9 +2139,8 @@ msgstr ""
 "tento šifrovací protokol není k dispozici."
 
 #: src/balsa-message.c:4513 src/balsa-message.c:4730
-#, fuzzy
 msgid "_Run gpg to import this key"
-msgstr "spustit gpg pro import tohoto klíče"
+msgstr "_Spustit gpg pro import tohoto klíče"
 
 #: src/filter-edit-callbacks.c:286
 msgid "One of the specified fields contains:"
@@ -2567,11 +2554,11 @@ msgstr "_Základní"
 
 #: src/folder-conf.c:287
 msgid "_Max number of connections"
-msgstr ""
+msgstr "_Maximální počet spojení"
 
 #: src/folder-conf.c:294 src/mailbox-conf.c:1201
 msgid "Enable _persistent cache"
-msgstr ""
+msgstr "Povolit _trvalou keš"
 
 #: src/folder-conf.c:301 src/mailbox-conf.c:1095 src/mailbox-conf.c:1204
 msgid "_Advanced"
@@ -2602,7 +2589,6 @@ msgid "Subscribed _folders only"
 msgstr "Pouze přihlášené složk_y"
 
 #: src/folder-conf.c:336
-#, fuzzy
 msgid "Always show _INBOX"
 msgstr "Vždy zobrazovat _INBOX"
 
@@ -2914,11 +2900,13 @@ msgid "The folder edition to be written."
 msgstr "Úpravy složky budou zapsány."
 
 #: src/mailbox-node.c:420
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Scanning of %s failed: %s\n"
 "Check network connectivity."
-msgstr "Zkoumání %s selhalo: %s"
+msgstr ""
+"Zkoumání %s selhalo: %s\n"
+"Zkontrolujte připojení k síti."
 
 #: src/mailbox-node.c:422
 #, c-format
@@ -3017,7 +3005,7 @@ msgstr "Místní složka %s\n"
 
 #: src/main-window.c:274
 msgid "Balsa closes files and connections. Please wait..."
-msgstr ""
+msgstr "Balsa zavírá soubory a spojení. Počkejte prosím..."
 
 #: src/main-window.c:313 src/main-window.c:359
 msgid "_Deleted"
@@ -3370,9 +3358,8 @@ msgstr "Uložit tuto část..."
 
 #
 #: src/main-window.c:629 src/main-window.c:1043
-#, fuzzy
 msgid "Save currently displayed part of message"
-msgstr "Uložit tuto část zprávy"
+msgstr "Uložit právě zobrazovanou část zprávy"
 
 #: src/main-window.c:635 src/main-window.c:995 src/message-window.c:185
 msgid "_View Source..."
@@ -3452,14 +3439,12 @@ msgid "Delete the selected mailbox"
 msgstr "Odstranit vybranou poštovní schránku"
 
 #: src/main-window.c:731
-#, fuzzy
 msgid "E_xpunge Deleted Messages"
-msgstr "Odstranit vymazané zprávy (počet: %d)?"
+msgstr "_Odstranit vymazané zprávy"
 
 #: src/main-window.c:732 src/main-window.c:829
-#, fuzzy
 msgid "Expunge messages marked as deleted in the currently opened mailbox"
-msgstr "Potvrdit změny v této otevřené poštovní schránce"
+msgstr "Odstranit zprávy označené jako vymazané v otevřené poštovní schránce"
 
 #: src/main-window.c:737 src/main-window.c:835
 msgid "Close mailbox"
@@ -3474,14 +3459,12 @@ msgid "Delete messages from the Trash mailbox"
 msgstr "Odstranit zprávy z koše"
 
 #: src/main-window.c:746
-#, fuzzy
 msgid "Select _Filters"
-msgstr "Zrušit _filtr"
+msgstr "Vybrat _filtry"
 
 #: src/main-window.c:747 src/main-window.c:1065
-#, fuzzy
 msgid "Select filters to be applied automatically to current mailbox"
-msgstr "Vybrat všechny zprávy v této poštovní schránce"
+msgstr "Vybrat filtry, které automaticky používat v aktuální poštovní schránce"
 
 #: src/main-window.c:760
 msgid "_Toolbars..."
@@ -3508,122 +3491,102 @@ msgid "_Message"
 msgstr "_Zpráva"
 
 #: src/main-window.c:789
-#, fuzzy
 msgid "New mailbox..."
-msgstr "Vzdálená poštovní schránka typu POP3..."
+msgstr "Nová poštovní schránka..."
 
 #: src/main-window.c:794
-#, fuzzy
 msgid "New \"Maildir\" mailbox..."
-msgstr "Místní poštovní schránka typu Maildir..."
+msgstr "Nová poštovní schránka \"Maildir\"..."
 
 #: src/main-window.c:798
-#, fuzzy
 msgid "New \"MH\" mailbox..."
-msgstr "Místní poštovní schránka typu MH..."
+msgstr "Nová poštovní schránka \"MH\"..."
 
 #: src/main-window.c:828
-#, fuzzy
 msgid "_Compress Mailbox"
-msgstr "Zavřít poštovní schránku"
+msgstr "_Komprimovat poštovní schránku"
 
 #: src/main-window.c:858
-#, fuzzy
 msgid "Mail_boxes"
-msgstr "Poštovní schrán_ka"
+msgstr "_Poštovní schránky"
 
 #: src/main-window.c:883
 msgid "By _Arrival"
-msgstr ""
+msgstr "Podle _příchodu"
 
 #: src/main-window.c:883
 msgid "Arrival order"
-msgstr ""
+msgstr "Podle příchodu"
 
 #: src/main-window.c:887
-#, fuzzy
 msgid "By _Sender"
-msgstr "Po_slat"
+msgstr "Podle ode_sílatele"
 
 #: src/main-window.c:887
 msgid "Sender order"
-msgstr ""
+msgstr "Podle odesílatele"
 
 #: src/main-window.c:891
-#, fuzzy
 msgid "By S_ubject"
-msgstr "_Předmět"
+msgstr "Podle _předmětu"
 
 #: src/main-window.c:891
-#, fuzzy
 msgid "Subject order"
-msgstr "Předmět"
+msgstr "Podle předmětu"
 
 #: src/main-window.c:895
-#, fuzzy
 msgid "By _Date"
-msgstr "Datum"
+msgstr "Podle _datum"
 
 #: src/main-window.c:895
 msgid "By sending date"
-msgstr ""
+msgstr "Podle data odeslání"
 
 #: src/main-window.c:899
-#, fuzzy
 msgid "By Si_ze"
-msgstr "Velikost"
+msgstr "Podle _velikosti"
 
 #: src/main-window.c:899
-#, fuzzy
 msgid "By message size"
-msgstr "Zalamovat text zprávy"
+msgstr "Podle velikosti zprávy"
 
 #: src/main-window.c:903
-#, fuzzy
 msgid "_Threaded"
-msgstr "Vlákna"
+msgstr "_Vlákna"
 
 #: src/main-window.c:903
-#, fuzzy
 msgid "Use message threading"
-msgstr "J_ednoduchá vlákna"
+msgstr "Používat vlákna zpráv"
 
 #: src/main-window.c:927
-#, fuzzy
 msgid "_Headers"
-msgstr "_Bez hlaviček"
+msgstr "_Hlavičky"
 
 #: src/main-window.c:930
-#, fuzzy
 msgid "_Sort Mailbox"
-msgstr "Zobrazovat _strom poštovních schránek"
+msgstr "_Seřadit poštovní schránku"
 
 #: src/main-window.c:945
-#, fuzzy
 msgid "_View filter"
-msgstr "Nový filtr"
+msgstr "_Zobrazit filtr"
 
 #: src/main-window.c:946
-#, fuzzy
 msgid "Enable quick message index filter"
-msgstr "Nelze načíst tělo zprávy pro srovnání s filtrem"
+msgstr "Povolit rychlý filtr indexu zpráv"
 
 #: src/main-window.c:982 src/main-window.c:1056 src/sendmsg-window.c:501
 #: src/sendmsg-window.c:559 src/sendmsg-window.c:619
-#, fuzzy
 msgid "_More"
-msgstr "_Korejština"
+msgstr "_Více"
 
 #: src/main-window.c:1015
-#, fuzzy
 msgid "_New..."
-msgstr "_Nová"
+msgstr "_Nová..."
 
 #. F
 #: src/main-window.c:1035
-#, fuzzy
 msgid "_Forward..."
-msgstr "Přeposlat"
+msgstr "_Přeposlat..."
 
 #: src/main-window.c:1036 src/toolbar-factory.c:105
 msgid "Forward the current message"
@@ -3631,29 +3594,24 @@ msgstr "Přeposlat tuto zprávu"
 
 #. D
 #: src/main-window.c:1049
-#, fuzzy
 msgid "_Delete to Trash"
 msgstr "Přesunout do _koše"
 
 #: src/main-window.c:1061
-#, fuzzy
 msgid "_Manage..."
-msgstr "_Změnit..."
+msgstr "_Spravovat..."
 
 #: src/main-window.c:1064
-#, fuzzy
 msgid "_Select _Filters"
-msgstr "Zrušit _filtr"
+msgstr "_Vybrat _filtry"
 
 #: src/main-window.c:1082
-#, fuzzy
 msgid "_Filters"
-msgstr "_Filtr"
+msgstr "_Filtry"
 
 #: src/main-window.c:1098 src/sendmsg-window.c:635
-#, fuzzy
 msgid "_Tools"
-msgstr "_Lišty nástrojů..."
+msgstr "_Nástroje..."
 
 #: src/main-window.c:1202
 msgid ""
@@ -3665,7 +3623,7 @@ msgstr ""
 
 #: src/main-window.c:1372
 msgid "Subject or Sender _Contains:"
-msgstr ""
+msgstr "Předmět nebo odesílatel _obsahuje:"
 
 #: src/main-window.c:2154
 #, c-format
@@ -3725,9 +3683,8 @@ msgstr[2] "Obdrželi jste %d nových zpráv."
 
 #
 #: src/main-window.c:3059
-#, fuzzy
 msgid "You have new mail."
-msgstr "Obdrželi jste %d novou zprávu."
+msgstr "Máte novou poštu."
 
 #: src/main-window.c:3609
 msgid "Search mailbox"
@@ -3854,9 +3811,8 @@ msgid "Trash"
 msgstr "Koš"
 
 #: src/main.c:470
-#, fuzzy
 msgid "Compressing mail folders..."
-msgstr "Získávání seznamu složek..."
+msgstr "Komprimuji složky pošty..."
 
 #: src/message-window.c:81
 msgid "N_o Headers"
@@ -3897,9 +3853,9 @@ msgid "M_ove"
 msgstr "_Přesunout"
 
 #: src/message-window.c:274
-#, fuzzy, c-format
+#, c-format
 msgid "Message from %s: %s"
-msgstr "Nová zpráva pro %s: %s"
+msgstr "Zpráva od %s: %s"
 
 #: src/pref-manager.c:321
 msgid "7 Bits"
@@ -4138,11 +4094,11 @@ msgstr "Kontrolovat tiše na pozadí (žádné zprávy ve stavové liště)"
 
 #: src/pref-manager.c:1675
 msgid "_POP message size limit:"
-msgstr ""
+msgstr "_Limit velikosti zprávy POP:"
 
 #: src/pref-manager.c:1682
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
@@ -4445,29 +4401,28 @@ msgid ""
 "The following setting is global, but may be overridden\n"
 "for the selected mailbox using Mailbox -> Hide messages:"
 msgstr ""
+"Následující nastavení je globální, ale může být změněno\n"
+"pro zvolenou poštovní schránku pomocí Poštovní schránka -> Skrýt zprávy:"
 
 #: src/pref-manager.c:2484
-#, fuzzy
 msgid "Hide messages marked as deleted"
-msgstr "Označuji %d zpráv jako smazané..."
+msgstr "Skrývat zprávy označené jako smazané"
 
 #: src/pref-manager.c:2486
 msgid "The following settings are global."
-msgstr ""
+msgstr "Následující nastavení jsou globální."
 
 #: src/pref-manager.c:2491
-#, fuzzy
 msgid "Expunge deleted messages when mailbox is closed"
-msgstr "Automaticky zobrazit zprávu při otevření poštovní schránky"
+msgstr "Odstraňovat vymazané zprávy při zavření poštovní schránky"
 
 #: src/pref-manager.c:2498
-#, fuzzy
 msgid " ...and if mailbox is unused more than"
-msgstr "Automaticky potvrdit poštovní schránku, pokud není používána déle než "
+msgstr "...a pokud poštovní schránka není používána déle než"
 
 #: src/pref-manager.c:2511
 msgid "hours"
-msgstr ""
+msgstr "hodin"
 
 #: src/pref-manager.c:2533
 msgid "Options"
@@ -4856,9 +4811,8 @@ msgid "Attach _Message(s)"
 msgstr "Připojit _zprávu(y)"
 
 #: src/sendmsg-window.c:320 src/sendmsg-window.c:507
-#, fuzzy
 msgid "Sen_d"
-msgstr "Poslat"
+msgstr "Po_slat"
 
 #
 #: src/sendmsg-window.c:321 src/sendmsg-window.c:508 src/toolbar-factory.c:121
@@ -4989,12 +4943,11 @@ msgstr "V_olby"
 
 #: src/sendmsg-window.c:503
 msgid "Sa_ve and Close"
-msgstr ""
+msgstr "U_ložit a zavřít"
 
 #: src/sendmsg-window.c:512
-#, fuzzy
 msgid "Send _Later"
-msgstr "Odesílání selhalo"
+msgstr "Odeslat po_zději"
 
 #: src/sendmsg-window.c:733
 #, c-format
@@ -5177,36 +5130,33 @@ msgid "sending message with gpg mode %d"
 msgstr "odesílám zprávu s režimem gpg %d"
 
 #: src/sendmsg-window.c:3913
-#, fuzzy
 msgid "Message could not be created"
-msgstr "Nelze přistupovat k adresáři."
+msgstr "Zprávu nelze vytvořit"
 
 #: src/sendmsg-window.c:3915
 msgid "Message could not be queued in outbox"
-msgstr ""
+msgstr "Zprávu nebylo možné zařadit do schránky 'Pošta k odeslání'"
 
 #: src/sendmsg-window.c:3917
 msgid "Message could not be saved in senbox"
-msgstr ""
+msgstr "Zprávu nebylo možné uložit mezi odeslané"
 
 #: src/sendmsg-window.c:3919
-#, fuzzy
 msgid "Message could not be sent"
-msgstr "%s: nemohu otevřít %s."
+msgstr "Zprávu nelze odeslat"
 
 #: src/sendmsg-window.c:3923
-#, fuzzy, c-format
+#, c-format
 msgid "Send failed: %s"
-msgstr "Odesílání selhalo"
+msgstr "Odesílání selhalo: %s"
 
 #: src/sendmsg-window.c:4007
 msgid "Could not postpone message."
 msgstr "Nemohu odložit zprávu."
 
 #: src/sendmsg-window.c:4021
-#, fuzzy
 msgid "Message postponed."
-msgstr "Písmo zprávy"
+msgstr "Zpráva odložena."
 
 #: src/sendmsg-window.c:4037
 #, c-format
@@ -5214,9 +5164,8 @@ msgid "Could not open draftbox: %s"
 msgstr "Nemohu otevřít Rozepsanou poštu: %s"
 
 #: src/sendmsg-window.c:4059
-#, fuzzy
 msgid "Message saved."
-msgstr "Zpráva"
+msgstr "Zpráva uložena."
 
 #: src/sendmsg-window.c:4221
 #, c-format
@@ -5479,9 +5428,8 @@ msgid "Close"
 msgstr "Zavřít"
 
 #: src/toolbar-factory.c:133
-#, fuzzy
 msgid "Close the compose window"
-msgstr "Editační okno"
+msgstr "Zavřít editační okno"
 
 #
 #: src/toolbar-factory.c:134
@@ -5623,512 +5571,3 @@ msgstr "Nahoru"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Dolů"
-
-#~ msgid "invalid crypto engine for RFC2440"
-#~ msgstr "neplatný šifrovací engine pro RFC2440"
-
-#~ msgid "%s: could not get data: %s"
-#~ msgstr "%s: nemohu získat data: %s"
-
-#~ msgid "Could not send \"%s\" to \"%s\""
-#~ msgstr "Nemohu odeslat \"%s\" pro \"%s\""
-
-#~ msgid "GnuPG rebuilds the trust database and is currently not available."
-#~ msgstr ""
-#~ "GnuPG znovu sestavuje databázi důvěry a momentálně není k dispozici."
-
-#~ msgid "remember passphrase for"
-#~ msgstr "pamatovat si hesla"
-
-#~ msgid ""
-#~ "The mailbox \"%s\" does not appear to be valid.\n"
-#~ "Your system does not allow for creation of mailboxes\n"
-#~ "in /var/spool/mail. Balsa wouldn't function properly\n"
-#~ "until the system created the mailboxes. Please change\n"
-#~ "the mailbox path or check your system configuration."
-#~ msgstr ""
-#~ "Poštovní schránka \"%s\" se nezdá být platná.\n"
-#~ "Váš systém nepovoluje vytváření poštovních schránek\n"
-#~ "ve /var/spool/mail. Balsa by nepracovala správně, pokud\n"
-#~ "by v systému nebyly vytvořeny tyto schránky. Změňte\n"
-#~ "prosím cestu ke schránkám nebo zkontrolujte nastavení systému."
-
-#~ msgid "Show from _name"
-#~ msgstr "Zobrazovat od _jména"
-
-#~ msgid "Show _Patches"
-#~ msgstr "Zobrazit _patche"
-
-#~ msgid "Co_mmit Current"
-#~ msgstr "Potvrdit _současnou"
-
-#~ msgid "Commit _All"
-#~ msgstr "Potvrdit vš_e"
-
-#~ msgid "Commit the changes in all mailboxes"
-#~ msgstr "Potvrdit změny ve všech poštovních schránkách"
-
-#~ msgid "Edit/Apply _Filters"
-#~ msgstr "Upravit/Aplikovat _filtry"
-
-#~ msgid "Filter the content of the selected mailbox"
-#~ msgstr "Filtrovat obsah vybrané poštovní schránky"
-
-#~ msgid "_Remove Duplicates"
-#~ msgstr "Odst_ranit duplikáty"
-
-#
-#~ msgid "Remove duplicated messages from the selected mailbox"
-#~ msgstr "Odstranit duplikované zprávy z vybrané poštovní schránky"
-
-#~ msgid "Message window title format:"
-#~ msgstr "Formát titulku okna se zprávou:"
-
-#~ msgid "Delete immediately and irretrievably"
-#~ msgstr "Odstraňovat hned a nevratně"
-
-#~ msgid "Sa_ve"
-#~ msgstr "_Uložit"
-
-#~ msgid "_Attachments"
-#~ msgstr "Pří_lohy"
-
-#~ msgid "Co_mments"
-#~ msgstr "_Komentáře"
-
-#~ msgid "_Keywords"
-#~ msgstr "Klíčo_vá slova"
-
-#~ msgid "Comments:"
-#~ msgstr "Komentáře:"
-
-#~ msgid "Keywords:"
-#~ msgstr "Klíčová slova:"
-
-#
-#~ msgid "Cancel this message"
-#~ msgstr "Zrušit tuto zprávu"
-
-#~ msgid "Remote IMAP folder set"
-#~ msgstr "Sada vzdálených složek IMAP"
-
-#~ msgid "Could not save message."
-#~ msgstr "Nemohu uložit zprávu."
-
-#~ msgid "unknown error"
-#~ msgstr "neznámá chyba"
-
-#~ msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
-#~ msgstr "*** CHYBA: Uzavřen stream schránky: %s ***\n"
-
-#~ msgid ""
-#~ "IMAP SEARCH command failed for mailbox %s\n"
-#~ "or query was incompatible with IMAP (perhaps you use regular "
-#~ "expressions)\n"
-#~ "falling back to default searching method"
-#~ msgstr ""
-#~ "Příkaz IMAP SEARCH selhal pro poštovní schránku %s\n"
-#~ "nebo byl dotaz nekompatibilní s IMAP (možná jste použili regulární "
-#~ "výrazy)\n"
-#~ "Používám implicitní metodu vyhledávání"
-
-#~ msgid "connection error"
-#~ msgstr "chyba spojení"
-
-#~ msgid "Connection refused"
-#~ msgstr "Spojení odmítnuto"
-
-#~ msgid "Authentication failed"
-#~ msgstr "Ověřování totožnosti selhalo"
-
-#~ msgid "PGP Signature: "
-#~ msgstr "Podpis PGP: "
-
-#~ msgid "%s: could not get data from mailbox file: %s"
-#~ msgstr "%s: nemohu získat data ze souboru schránky: %s"
-
-#~ msgid "%s: could not get decrypted data: %s"
-#~ msgstr "%s: nemohu získat dešifrovaná data: %s"
-
-#~ msgid "The signature is invalid."
-#~ msgstr "Podpis je platný."
-
-#~ msgid "%s: could not get data from buffer: %s"
-#~ msgstr "%s: nemohu získat data z bufferu: %s"
-
-#~ msgid ""
-#~ "The OpenPGP encrypted message part contains 8-bit characters, but no "
-#~ "header describing the used codeset (converted to %s)"
-#~ msgstr ""
-#~ "Část zprávy šifrovaná s OpenPGP obsahuje osmibitové znaky, ale ne "
-#~ "hlavičku popisující použitou znakovou sadu (zkonvertováno do %s)"
-
-#~ msgid "%s: could not retrieve key for %s: %s"
-#~ msgstr "%s: nemohu získat klíč pro %s: %s"
-
-#~ msgid "could not get a public key for %s"
-#~ msgstr "nemohu získat veřejný klíč pro %s"
-
-#~ msgid "[-- Attachment #%d"
-#~ msgstr "[-- Příloha #%d"
-
-#~ msgid "[-- Type: %s/%s, Encoding: %s, Size: %s --]\n"
-#~ msgstr "[-- Typ: %s/%s, Kódování: %s, Velikost: %s --]\n"
-
-#~ msgid "[-- Autoview using %s --]\n"
-#~ msgstr "[-- Automaticky prohlédnout pomocí %s --]\n"
-
-#~ msgid "[-- Autoview stderr of %s --]\n"
-#~ msgstr "[-- Automaticky prohlédnout chybový výstup %s --]\n"
-
-#~ msgid "[-- Error: message/external-body has no access-type parameter --]\n"
-#~ msgstr ""
-#~ "[-- Chyba: zpráva/vnější-tělo neobsahuje parametr typu přístupu --]\n"
-
-#~ msgid "[-- This %s/%s attachment "
-#~ msgstr "[-- Tato %s/%s příloha "
-
-#~ msgid "(size %s bytes) "
-#~ msgstr "(velikost %s bajtů) "
-
-#~ msgid "has been deleted --]\n"
-#~ msgstr "byla smazána --]\n"
-
-#~ msgid "[-- on %s --]\n"
-#~ msgstr "[-- na %s --]\n"
-
-#~ msgid ""
-#~ "[-- This %s/%s attachment is not included, --]\n"
-#~ "[-- and the indicated external source has --]\n"
-#~ "[-- expired. --]\n"
-#~ msgstr ""
-#~ "[-- Tato %s/%s příloha není ve zprávě obsažena --]\n"
-#~ "[-- a vnější zdroj, na nějž odkazuje, již neexistuje --]\n"
-
-#~ msgid "[-- This %s/%s attachment is not included, --]\n"
-#~ msgstr "[-- Tato %s/%s příloha není ve zprávě obsažena --]\n"
-
-#~ msgid "[-- and the indicated access-type %s is unsupported --]\n"
-#~ msgstr "[-- a udaný typ přístupu %s není podporován --]\n"
-
-#~ msgid "Error: multipart/signed has no protocol."
-#~ msgstr "Chyba: multipart/signed nemá protokol."
-
-#~ msgid "Error: multipart/encrypted has no protocol parameter!"
-#~ msgstr "Chyba: multipart/encrypted neobsahuje parametr protokolu!"
-
-#~ msgid "[-- %s/%s is unsupported "
-#~ msgstr "[-- %s/%s není podporováno "
-
-#~ msgid "(use '%s' to view this part)"
-#~ msgstr "(použijte '%s' pro zobrazení této části)"
-
-#~ msgid "(need 'view-attachments' bound to key!)"
-#~ msgstr "(je nutný 'view-attachments' přiřazený ke klávese!)"
-
-#~ msgid "No authenticators available"
-#~ msgstr "Nejsou k dispozici žádné ověřovače"
-
-#~ msgid "Anonymous authentication failed."
-#~ msgstr "Anonymní ověření totožnosti selhalo."
-
-#~ msgid "CRAM-MD5 authentication failed."
-#~ msgstr "Ověření totožnosti CRAM-MD5 selhalo."
-
-#~ msgid "GSSAPI authentication failed."
-#~ msgstr "Ověření totožnosti GSSAPI selhalo."
-
-#~ msgid "LOGIN disabled on this server."
-#~ msgstr "LOGIN na tomto serveru zakázáno."
-
-#~ msgid "Logging in..."
-#~ msgstr "Přihlašování se..."
-
-#~ msgid "SASL authentication failed."
-#~ msgstr "Ověření totožnosti SASL selhalo."
-
-#~ msgid "%s is an invalid IMAP path"
-#~ msgstr "%s není platná cesta IMAP"
-
-#~ msgid "Getting namespaces..."
-#~ msgstr "Získávání jmenných prostorů..."
-
-#~ msgid "No such folder"
-#~ msgstr "Taková složka neexistuje"
-
-#~ msgid "Create mailbox: "
-#~ msgstr "Vytvořit poštovní schránku: "
-
-#~ msgid "Mailbox must have a name."
-#~ msgstr "Poštovní schránka musí mít název."
-
-#~ msgid "Fatal error.  Message count is out of sync!"
-#~ msgstr "Zásadní chyba. Počet zpráv není synchronizován!"
-
-#~ msgid "This IMAP server is ancient. Mutt does not work with it."
-#~ msgstr ""
-#~ "Tento IMAP server je velmi zastaralý. Mutt s ním neumí spolupracovat."
-
-#~ msgid "Secure connection with TLS?"
-#~ msgstr "Bezpečné připojení s TLS?"
-
-#~ msgid "Connecting to %s ..."
-#~ msgstr "Připojování k %s..."
-
-#~ msgid "Create %s?"
-#~ msgstr "Vytvořit %s?"
-
-#~ msgid "Expunge failed"
-#~ msgstr "Odstraňování selhalo"
-
-#~ msgid "Saving message status flags... [%d/%d]"
-#~ msgstr "Ukládám příznaky stavu zprávy... [%d/%d]"
-
-#~ msgid "Expunging messages from server..."
-#~ msgstr "Odstraňuji zprávy ze serveru..."
-
-#~ msgid "Bad mailbox name"
-#~ msgstr "Chybný název poštovní schránky"
-
-#~ msgid "The message index is incorrect. Try reopening the mailbox."
-#~ msgstr "Index zpráv je nesprávný. Zkuste znovu otevřít poštovní schránku."
-
-#~ msgid "Continue?"
-#~ msgstr "Pokračovat?"
-
-#~ msgid "Out of memory!"
-#~ msgstr "Nedostatek paměti!"
-
-#~ msgid "Mailbox is corrupt!"
-#~ msgstr "Poštovní schránka je poškozená!"
-
-#~ msgid "Mailbox was corrupted!"
-#~ msgstr "Poštovní schránka byla poškozená!"
-
-#~ msgid "sync: mbox modified, but no modified messages! (report this bug)"
-#~ msgstr ""
-#~ "sync: schránka změněna, ale nejsou v ní změněné zprávy! (nahlaste tuto "
-#~ "chybu)"
-
-#~ msgid "Write failed!  Saved partial mailbox to %s"
-#~ msgstr "Zápis selhal!  Neúplná poštovní schránka byla uložena do %s"
-
-#~ msgid "Connection to %s closed"
-#~ msgstr "Připojení k %s uzavřeno"
-
-#~ msgid "SSL is unavailable."
-#~ msgstr "SSL není k dispozici"
-
-#~ msgid "Preconnect command failed."
-#~ msgstr "Příkaz před připojením selhal."
-
-#~ msgid "Error talking to %s (%s)"
-#~ msgstr "Chyba při komunikaci s %s (%s)"
-
-#~ msgid "Looking up %s..."
-#~ msgstr "Vyhledávám %s..."
-
-#~ msgid "Connecting to %s..."
-#~ msgstr "Připojování k %s..."
-
-#~ msgid "Failed to find enough entropy on your system"
-#~ msgstr "Ve vašem systému se nepodařilo najít dostatek entropie"
-
-#~ msgid "%s has insecure permissions!"
-#~ msgstr "%s nemá bezpečná oprávnění!"
-
-#~ msgid "SSL disabled due the lack of entropy"
-#~ msgstr "SSL zablokováno kvůli nedostatku entropie"
-
-#~ msgid "I/O error"
-#~ msgstr "Chyba vstupu/výstupu"
-
-#~ msgid "unspecified protocol error"
-#~ msgstr "nespecifikovaná chyba protokolu"
-
-#~ msgid "SSL failed: %s"
-#~ msgstr "SSL selhalo: %s"
-
-#~ msgid "SSL connection using %s (%s)"
-#~ msgstr "Spojení SSL pomocí %s (%s)"
-
-#~ msgid "Server certificate is not yet valid"
-#~ msgstr "Certifikát serveru ještě není platný"
-
-#~ msgid "Server certificate has expired"
-#~ msgstr "Certifikát serveru propadl"
-
-#~ msgid "Certificate saved"
-#~ msgstr "Certifikát uložen"
-
-#~ msgid "This certificate belongs to:"
-#~ msgstr "Tento certifikát patří:"
-
-#~ msgid "This certificate was issued by:"
-#~ msgstr "Tento certifikát byl vydán:"
-
-#~ msgid "This certificate is valid"
-#~ msgstr "Tento certifikát je platný"
-
-#~ msgid "   from %s"
-#~ msgstr "     od %s"
-
-#~ msgid "     to %s"
-#~ msgstr "     pro %s"
-
-#~ msgid "Fingerprint: %s"
-#~ msgstr "Otisk: %s"
-
-#~ msgid "SSL Certificate check"
-#~ msgstr "Ověření SSL certifikátu"
-
-#~ msgid "(r)eject, accept (o)nce, (a)ccept always"
-#~ msgstr "(z)amítnout, přijmout (t)eď, přijmout (v)ždy"
-
-#~ msgid "roa"
-#~ msgstr "ztv"
-
-#~ msgid "(r)eject, accept (o)nce"
-#~ msgstr "(z)amítnout, přijmout (t)eď"
-
-#~ msgid "ro"
-#~ msgstr "zt"
-
-#~ msgid "Exit  "
-#~ msgstr "Konec"
-
-#~ msgid "Help"
-#~ msgstr "Nápověda"
-
-#~ msgid "Lock count exceeded, remove lock for %s?"
-#~ msgstr "Počet zámků byl překročen, odebrat zámek z %s?"
-
-#~ msgid "%s is not a mailbox."
-#~ msgstr "%s není poštovní schránka."
-
-#~ msgid "Mailbox is unchanged."
-#~ msgstr "Poštovní schránka je nezměněná."
-
-#~ msgid "%d kept, %d moved, %d deleted."
-#~ msgstr "ponecháno %d, přesunuto %d, vymazáno %d."
-
-#~ msgid "%d kept, %d deleted."
-#~ msgstr "ponecháno %d, vymazáno %d."
-
-#~ msgid " Press '%s' to toggle write"
-#~ msgstr " Stiskni '%s' pro změnu příznaků zapisovatelnosti"
-
-#~ msgid "Use 'toggle-write' to re-enable write!"
-#~ msgstr "Použijte 'toggle-write' pro povolení zápisu!"
-
-#~ msgid "Mailbox is marked unwritable. %s"
-#~ msgstr "Poštovní schránka je označena jako nezapisovatelná. %s"
-
-#~ msgid "Mailbox is read-only."
-#~ msgstr "Poštovní schránka je jen pro čtení."
-
-#~ msgid "Purge %d deleted message?"
-#~ msgstr "Odstranit vymazanou zprávu (počet: %d)?"
-
-#~ msgid "%d kept."
-#~ msgstr "%d ponecháno."
-
-#~ msgid "multipart message has no boundary parameter!"
-#~ msgstr "zpráva s více částmi neobsahuje parametr hranice!"
-
-#~ msgid "No boundary parameter found! [report this error]"
-#~ msgstr "Nebyl nalezen parametr hranice! [nahlaste tuto chybu]"
-
-#~ msgid "%s no longer exists!"
-#~ msgstr "%s již neexistuje!"
-
-#~ msgid "%s isn't a regular file."
-#~ msgstr "%s není obyčejný soubor."
-
-#~ msgid "Error sending message, child exited %d (%s)."
-#~ msgstr "Chyba při posílání zprávy, potomek skončil s kódem %d (%s)."
-
-#~ msgid "Output of the delivery process"
-#~ msgstr "Výstup doručovacího procesu"
-
-#~ msgid "run gpg to import key"
-#~ msgstr "spustit gpg pro import klíče"
-
-#~ msgid "detected a good signature"
-#~ msgstr "detekován dobrý podpis"
-
-#~ msgid "detected a good signature with insufficient validity/trust"
-#~ msgstr "detekován dobrý podpis s nedostatečnou platností/důvěrou"
-
-#~ msgid ""
-#~ "The message sent by %s with subject \"%s\" contains a S/MIME signed part, "
-#~ "but balsa is not (yet) able to handle this format."
-#~ msgstr ""
-#~ "Zpráva odeslaná %s s předmětem \"%s\" obsahuje část podepsanou S/MIME, "
-#~ "ale balza (zatím) neumí zpracovat tento formát."
-
-#~ msgid ""
-#~ "The message sent by %s with subject \"%s\" contains a S/MIME encrypted "
-#~ "part, but balsa can not (yet) handle this format."
-#~ msgstr ""
-#~ "Zpráva odeslaná %s s předmětem \"%s\" obsahuje část šifrovanou S/MIME, "
-#~ "ale balza (zatím) neumí zpracovat tento formát."
-
-#~ msgid "New"
-#~ msgstr "Nová"
-
-#~ msgid "Delete the current message"
-#~ msgstr "Odstranit tuto zprávu"
-
-#~ msgid "Undelete the message"
-#~ msgstr "Obnovit smazanou zprávu"
-
-#
-#~ msgid "_Toggle"
-#~ msgstr "Přepnou_t"
-
-#~ msgid "Mark all read"
-#~ msgstr "Označit vše jako přečtené"
-
-#~ msgid "Mark all messages in current mailbox as read"
-#~ msgstr "Označit všechny zprávy v aktuální schránce jako přečtené"
-
-#~ msgid "Toolbar Buttons"
-#~ msgstr "Tlačítka lišty nástrojů"
-
-#~ msgid "Mailbox Colors"
-#~ msgstr "Barvy poštovní schránky"
-
-#~ msgid "Mailbox with unread messages color"
-#~ msgstr "Barva poštovní schránky s nepřečtenými zprávami"
-
-#~ msgid "Fingerprint"
-#~ msgstr "Otisk"
-
-#~ msgid "This part contains at least two signatures with different status."
-#~ msgstr "Tato část obsahuje alespoň dva podpisy s různým stavem."
-
-#~ msgid "bad status"
-#~ msgstr "špatný stav"
-
-#~ msgid ""
-#~ "%s\n"
-#~ "Do you want to run gpg to import the public key with fingerprint %s?"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Chcete spustit gpg pro import veřejného klíče s otiskem %s?"
-
-#~ msgid "Search for Name:"
-#~ msgstr "Hledat jméno:"
-
-#~ msgid "_Comments"
-#~ msgstr "Ko_mentáře"
-
-#~ msgid "Trust"
-#~ msgstr "Důvěra"
-
-#~ msgid "_Reflow Paragraph"
-#~ msgstr "Přefo_rmátovat odstavec"
-
-#~ msgid "R_eflow Message"
-#~ msgstr "Př_eformátovat zprávu"

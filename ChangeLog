@@ -1,3 +1,8 @@
+2003-03-07 11:44  PeterB
+
+	* src/balsa-index.c: Don't count deleted messages when looking for
+	duplicates.
+
 2003-03-06 13:54  PeterB
 
 	* src/: sendmsg-window.c, spell-check.c, spell-check.h: Non-modal

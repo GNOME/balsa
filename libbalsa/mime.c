@@ -347,6 +347,7 @@ mimetext2html (BODY * bdy, FILE * fp, struct obstack *bfr)
       unlink (tmp_file_name);
       return;
     }
+  obstack_append_string (bfr, "<tt>");
   text2html (ptr, bfr);
   g_free (ptr);
   fclose (s.fpout);

@@ -38,7 +38,7 @@
  */
 
 /* Holds all the mailboxes which are registered for checking */
-//static GHashTable *notify_hash;
+/* static GHashTable *notify_hash; */
 
 void
 libbalsa_notify_init(void)

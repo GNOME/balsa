@@ -21,7 +21,8 @@
 
 #include "config.h"
 
-#define _ISOC99_SOURCE 1
+#define _XOPEN_SOURCE 500
+
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -31,6 +32,7 @@
 #include <pwd.h>
 #include <ctype.h>
 #include <gtk/gtk.h>
+#include <limits.h>
 
 #include "libbalsa.h"
 #include "folder-scanners.h"
@@ -38,6 +40,10 @@
 #include "imap-handle.h"
 #include "imap-commands.h"
 #include "imap-server.h"
+
+#ifndef PATH_MAX
+#define PATH_MAX _POSIX_PATH_MAX
+#endif
 
 static void
 libbalsa_scanner_mdir(gpointer rnode, const gchar * prefix,

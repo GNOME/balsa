@@ -1125,9 +1125,9 @@ libbalsa_message_set_references_from_string(LibBalsaMessage * message,
 					    const gchar *str)
 {
     g_return_if_fail(message->references == NULL);
-    g_return_if_fail(str != NULL);
 
-    message->references = references_decode(str);
+    if(str) /* empty references are acceptable but require no action. */
+        message->references = references_decode(str);
 }
 
 void

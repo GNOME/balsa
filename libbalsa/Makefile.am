@@ -80,7 +80,6 @@ libbalsa_a_SOURCES = 		\
 	mime.h			\
 	misc.c			\
 	misc.h			\
-	notify.c		\
 	notify.h		\
 	rfc3156.c		\
 	rfc3156.h		\

@@ -22,8 +22,8 @@
 
 #include "config.h"
 
-#define _BSD_SOURCE    1
-#define _ISOC99_SOURCE 1
+#define _BSD_SOURCE     1 
+#define _POSIX_C_SOURCE 199309L
 
 #include <fcntl.h>
 #include <errno.h>

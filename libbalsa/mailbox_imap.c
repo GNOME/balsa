@@ -29,6 +29,9 @@
    with this.
 */
 #include "config.h"
+
+#define _XOPEN_SOURCE 500
+
 #include <dirent.h>
 #include <string.h>
 #include <ctype.h>
@@ -877,9 +880,12 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
     g_assert(LIBBALSA_IS_MAILBOX_IMAP(mailbox));
 
     if (!MAILBOX_OPEN(mailbox)) {
+#if BALSA_ENABLE_DEPRECATED
 	if (libbalsa_notify_check_mailbox(mailbox))
 	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
+#endif
 	return;
+
     }
 
     if (LIBBALSA_MAILBOX_IMAP(mailbox)->handle)

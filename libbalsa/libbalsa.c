@@ -22,6 +22,8 @@
 
 #include "config.h"
 
+#define _XOPEN_SOURCE 500
+
 #include <glib.h>
 #include <gnome.h>
 
@@ -29,6 +31,7 @@
 #include <stdlib.h>
 #include <sys/utsname.h>
 #include <stdarg.h>
+#include <unistd.h>
 
 #if ENABLE_LDAP
 #include <ldap.h>

@@ -26,6 +26,10 @@
 #include <gdk/gdk.h>
 #include <gmime/gmime.h>
 
+#ifdef BALSA_USE_THREADS
+#include <pthread.h>
+#endif
+
 #include "libbalsa.h"
 
 #define LIBBALSA_TYPE_MAILBOX \

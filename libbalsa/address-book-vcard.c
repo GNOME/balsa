@@ -431,8 +431,10 @@ libbalsa_address_book_vcard_add_address(LibBalsaAddressBook * ab,
     GList *list;
     LibBalsaAddress *address;
     FILE *fp;
+    LibBalsaABErr res;
 
-    if(!load_vcard_file(ab)) return LBABERR_CANNOT_READ;
+    load_vcard_file(ab); /* Ignore reading error, we may be adding */
+                         /* the first address. */
 
     list = LIBBALSA_ADDRESS_BOOK_VCARD(ab)->address_list;
     while (list) {
@@ -468,9 +470,10 @@ libbalsa_address_book_vcard_add_address(LibBalsaAddressBook * ab,
     for (list = new_address->address_list; list; list = g_list_next(list))
 	fprintf(fp, "EMAIL;INTERNET:%s\n", (gchar *) list->data);
 
-    fprintf(fp, "END:VCARD\n\n");
+    res = fprintf(fp, "END:VCARD\n\n") == 1 
+        ? LBABERR_OK : LBABERR_CANNOT_WRITE;
     fclose(fp);
-    return LBABERR_OK;
+    return res;
 }
 
 static LibBalsaABErr

@@ -23,12 +23,19 @@
 #ifndef __LIBBALSA_NOTIFY_H__
 #define __LIBBALSA_NOTIFY_H__
 
+
+#ifdef BALSA_ENABLE_DEPRECATED
 /* Initialize the notification system */
 void libbalsa_notify_init(void);
 
 /* Add a mailbox to the notification system */
 void libbalsa_notify_register_mailbox(LibBalsaMailbox * mailbox);
 void libbalsa_notify_unregister_mailbox(LibBalsaMailbox * mailbox);
+#else
+#define libbalsa_notify_init()
+#define libbalsa_notify_register_mailbox(mailbox)
+#define libbalsa_notify_unregister_mailbox(mailbox)
+#endif
 
 /* Call libbalsa_notify_start_check before checking each mailbox */
 void libbalsa_notify_start_check(gboolean imap_check_test(const gchar *path));

@@ -2100,7 +2100,8 @@ check_new_messages_real(GtkWidget *widget, gpointer data, int type)
      */
     pthread_detach(get_mail_thread);
 #else
-    libbalsa_notify_start_check(imap_check_test);
+
+    /* NOT USED: libbalsa_notify_start_check(imap_check_test); */
     check_mailbox_list(balsa_app.inbox_input);
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
@@ -2199,7 +2200,7 @@ check_messages_thread(gpointer data)
 
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL,
                   "Local Mail", 0, 0);
-    libbalsa_notify_start_check(imap_check_test);
+    /* NOT USED: libbalsa_notify_start_check(imap_check_test); */
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc) mailbox_check_func,

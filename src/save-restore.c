@@ -20,6 +20,8 @@
  */
 #include "config.h"
 
+#define _XOPEN_SOURCE 500
+
 #include <string.h>
 #include <gconf/gconf-client.h>
 #include <gnome.h>

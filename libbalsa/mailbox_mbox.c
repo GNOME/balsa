@@ -22,6 +22,8 @@
 
 #include "config.h"
 
+#define _XOPEN_SOURCE 500
+
 #include <gnome.h>
 #include <gmime/gmime-stream-fs.h>
 
@@ -30,6 +32,9 @@
 #include <errno.h>
 #include <utime.h>
 #include <string.h>
+
+/* we include time because pthread.h may require it when compiled with c89 */
+#include <time.h>
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -612,7 +617,7 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox)
     }
     if (mbox->gmime_stream) {
 	g_mime_stream_unref(mbox->gmime_stream);
-	mbox->gmime_stream = NULL;	// chbm: is this correct ?
+	mbox->gmime_stream = NULL;	/* chbm: is this correct? */
     }
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
@@ -1267,7 +1272,7 @@ lbm_mbox_message_new(GMimeMessage * mime_message,
 	if (strchr(header, 'O') == NULL) /* not found == RECENT */
 	    flags |= LIBBALSA_MESSAGE_FLAG_RECENT;
     } else
-	    flags |= LIBBALSA_MESSAGE_FLAG_NEW;
+	    flags |= LIBBALSA_MESSAGE_FLAG_NEW |  LIBBALSA_MESSAGE_FLAG_RECENT;
     header = g_mime_message_get_header (mime_message, "X-Status");
     if (header) {
 	if (strchr(header, 'D') != NULL) /* found == DELETED */

@@ -7,6 +7,8 @@ balsa_BASE_SRCLIST =	\
 	ab-window.h		\
 	balsa-app.c		\
 	balsa-app.h		\
+	balsa-bonobo.c		\
+	balsa-bonobo.h		\
 	balsa-icons.c		\
 	balsa-icons.h		\
 	balsa-index.c		\
@@ -59,20 +61,19 @@ balsa_BASE_SRCLIST =	\
 	toolbar-prefs.c		\
 	toolbar-prefs.h
 
-balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h \
-			balsa-bonobo.c balsa-bonobo.h
+balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h
+balsa_IDL_OBJS    = Balsa-common.o Balsa-skels.o Balsa-stubs.o
 
-balsa_SOURCES = $(balsa_BASE_SRCLIST) $(balsa_IDL_SRCLIST)
+balsa_SOURCES = $(balsa_BASE_SRCLIST)
 
 EXTRA_DIST = \
 	Balsa.idl
 
-# auto* *SHOULD* figure this out *grr*
-$(balsa_BASE_SRCLIST): $(balsa_IDL_SRCLIST)
-
 idldir = $(datadir)/idl
 idl_DATA = Balsa.idl
 
+# auto* *SHOULD* figure this out *grr*
+$(balsa_BASE_SRCLIST): $(balsa_IDL_SRCLIST)
 
 $(balsa_IDL_SRCLIST): $(idl_DATA) 
 	$(ORBIT_IDL) -I $(LIBBONOBO_IDL) -I $(BONOBO_ACTIVATION_IDL) $(idl_DATA)
@@ -87,6 +88,7 @@ balsa_LDADD = \
 	$(top_builddir)/libinit_balsa/libinit_balsa.a \
 	$(top_builddir)/libbalsa/libbalsa.a	\
 	$(top_builddir)/libbalsa/imap/libimap.a	\
+	$(balsa_IDL_OBJS) \
 	-lltdl	\
 	$(INTLLIBS) \
         $(BALSA_LIBS)

@@ -77,7 +77,6 @@
 #define DEFAULT_SUBJECT_FONT "-*-fixed-bold-r-normal-*-*-*-*-*-c-*-iso8859-1"
 #define DEFAULT_DATE_FORMAT "%Y.%m.%d %H:%M:%S %z"
 #define DEFAULT_SELECTED_HDRS "from to date cc subject"
-#define DEFAULT_CHARSET "ISO-8859-1"
 #define DEFAULT_ENCODING ENC8BIT
 #define DEFAULT_LINESIZE 78
 
@@ -123,7 +122,7 @@ const gchar **spell_check_modules_name;
 
 /* The suggestion modes available to pspell.  If this is changed,
  * don't forget to also update the array in pref-manager.c containing
- * the labels us ed in the preferences dialog. 
+ * the labels used in the preferences dialog. 
  * */
 #define NUM_SUGGEST_MODES 3
 typedef enum _SpellCheckSuggestMode SpellCheckSuggestMode;
@@ -241,7 +240,6 @@ extern struct BalsaApplication {
 
     /* encoding stuff */
     gint encoding_style;
-    gchar *charset;
     gchar *date_string;
 
     /* gint checkbox; */

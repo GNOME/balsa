@@ -1,3 +1,10 @@
+2000-11-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* imap/imap_auth.c: fix CRAM authorization bug: the code assumed 
+	that the AUTHORIZATION command cannot get untagged response.
+	* imap/imap_ssl.c: make it compile (user certification selection 
+	hs beed disabled).
+
 2000-09-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* pop.c: use LAST if UIDL fails (patch contributed by 

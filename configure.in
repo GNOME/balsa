@@ -345,9 +345,9 @@ AC_DEFINE_UNQUOTED( GNOME_LIB_PREFIX, "$GNOME_LIB_PREFIX" )
 AC_DEFINE_UNQUOTED( GNOME_DATA_PREFIX, "$GNOME_DATA_PREFIX" )
 AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES` ) dnl bleah
 
-dnl ######################################################################################
+dnl ##########################################################################
 dnl Things needed by CVS user
-dnl ######################################################################################
+dnl ##########################################################################
 
 if test x"$BALSA_FROM_CVS" = xyes ; then
 	AC_CHECK_PROG(HAS_GOB, gob, yes, no)
@@ -357,9 +357,9 @@ if test x"$BALSA_FROM_CVS" = xyes ; then
 	fi
 fi
 
-dnl ######################################################################################
+dnl ##########################################################################
 dnl Enable GSS?
-dnl ######################################################################################
+dnl ##########################################################################
 
 AC_ARG_WITH(gss, [  --with-gss            Enable GSS [default=no]],[
 	with_gss=$withval
@@ -376,6 +376,25 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+
+dnl ##########################################################################
+dnl Enable SSL?
+dnl ##########################################################################
+
+AC_ARG_WITH(ssl, [  --with-ssl            Enable SSL [default=no]],[
+	with_ssl=$withval
+],[
+	with_ssl=no
+])
+
+AC_MSG_CHECKING([whether to build SSL support])
+if test "x$with_ssl" != xno  ; then
+	AC_MSG_RESULT([yes])
+	LIBS="$LIBS -lcrypto -lssl"
+	test "$with_ssl" != yes && LIBS="$LIBS -L$with_ssl/lib"
+else
+	AC_MSG_RESULT([no])
+fi
 
 dnl #############################################################
 dnl turn warnings into errors to enforce clean code
@@ -394,9 +413,9 @@ if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
         -Werror"
 fi
 
-dnl ######################################################################################
+dnl ##########################################################################
 dnl Create files.
-dnl ######################################################################################
+dnl ##########################################################################
 
 AC_OUTPUT([
 Makefile
@@ -414,9 +433,9 @@ libinit_balsa/Makefile
 src/Makefile
 ])
 
-dnl ######################################################################################
+dnl ##########################################################################
 dnl Summary
-dnl ######################################################################################
+dnl ##########################################################################
 
 echo ""
 echo "================ Final configuration ==================="

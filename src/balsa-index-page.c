@@ -358,8 +358,6 @@ idle_handler_cb(GtkWidget * widget)
 
     handler = 0;
 
-    gnome_appbar_pop(balsa_app.appbar);
-
     if (message)
 	gtk_object_unref(GTK_OBJECT(message));
 

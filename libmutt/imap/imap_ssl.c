@@ -37,6 +37,7 @@
 #include "imap_ssl.h"
 
 #ifdef LIBMUTT
+#include <unistd.h>
 #define _(a) (a)
 #define sleep(a) 
 #endif
@@ -441,6 +442,7 @@ static int ssl_check_certificate (sslsockdata * data)
     return 1;
   }
 
+#ifndef LIBMUTT
   /* interactive check from user */
   menu = mutt_new_menu ();
   menu->max = 19;
@@ -530,4 +532,5 @@ static int ssl_check_certificate (sslsockdata * data)
   }
   mutt_menuDestroy (&menu);
   return (done == 2);
+#endif /* LIBMUTT */
 }

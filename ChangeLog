@@ -1,3 +1,13 @@
+2000-11-13  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: add --with-ssl configuration option. ssl support
+	compiles now but has not been tested yet.
+	* src/balsa-app.[hc]: remove  balsa_app.charset field that is used
+	no more.
+	* src/balsa-index-page.c: remove gnome_appbar_pop() without _push()
+	* src/pref-manager.c: remove charset field, start reorganization
+	of the layout to the old one (or the galeon's, if it tell more).
+	
 2000-11-12  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-mblist.c: additional check on public functions' 

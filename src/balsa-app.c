@@ -170,7 +170,6 @@ balsa_app_init(void)
 
     /*encoding */
     balsa_app.encoding_style = 0;
-    balsa_app.charset = NULL;
 
     /* compose: shown headers */
     balsa_app.compose_headers = NULL;

@@ -168,13 +168,18 @@ static int imap_auth_cram_md5 (IMAP_DATA* idata, const char* user,
   strcpy (ibuf + strlen (ibuf), "\r\n");
   mutt_socket_write (idata->conn, ibuf);
 
+#ifdef LIBMUTT
+  do {
+    if (mutt_socket_read_line_d(ibuf, LONG_STRING, idata->conn) < 0) return -1;
+    if (ibuf[0] == '*' && imap_handle_untagged (idata, ibuf) != 0)   return -1;
+  } while (mutt_strncmp (ibuf, seq, SEQLEN) != 0);
+#else
   if (mutt_socket_read_line_d (ibuf, LONG_STRING, idata->conn) < 0)
   {
     dprint (1, (debugfile, "Error receiving server response.\n"));
-
     return -1;
   }
-
+#endif
   if (imap_code (ibuf))
   {
     dprint (2, (debugfile, "CRAM login complete.\n"));

@@ -127,8 +127,9 @@ static void display_embedded_headers(BalsaMessage * bm,
 
 static void save_part(BalsaPartInfo * info);
 
-static BalsaPartInfo *add_part(BalsaMessage *bm, BalsaPartInfo *info);
-static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent);
+static LibBalsaMessageBody *add_part(BalsaMessage *bm, BalsaPartInfo *info);
+static LibBalsaMessageBody *add_multipart(BalsaMessage * bm,
+					  LibBalsaMessageBody * parent);
 static void select_part(BalsaMessage * bm, BalsaPartInfo *info);
 static void part_context_menu_save(GtkWidget * menu_item,
                                    BalsaPartInfo * info);
@@ -3202,51 +3203,63 @@ part_info_from_body(BalsaMessage *bm, const LibBalsaMessageBody *body)
 }
 
 
-static void add_body(BalsaMessage *bm, 
-                     LibBalsaMessageBody *body)
+static LibBalsaMessageBody *
+add_body(BalsaMessage *bm, LibBalsaMessageBody *body)
 {
     if(body) {
         BalsaPartInfo *info = part_info_from_body(bm, body);
         
         if (info)
-            add_part(bm, info);
+	    body = add_part(bm, info);
         else
-            add_multipart(bm, body);
+	    body = add_multipart(bm, body);
     }
+
+    return body;
 }
 
-static void
+static LibBalsaMessageBody *
 add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body)
 {
+    LibBalsaMessageBody * retval = NULL;
     /* Add first (main) part + anything else with 
        Content-Disposition: inline */
     if (body) {
-        add_body(bm, body);
+        retval = add_body(bm, body);
         for (body = body->next; body; body = body->next) {
             if (libbalsa_message_body_is_inline(body)
                 || libbalsa_message_body_is_multipart(body))
                 add_body(bm, body);
         }
     }
+
+    return retval;
 }
 
-static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
+static LibBalsaMessageBody *
+add_multipart(BalsaMessage *bm, LibBalsaMessageBody *body)
 /* This function handles multiparts as specified by RFC2046 5.1 and
  * message/rfc822 types. */
 {
     GMimeContentType *type;
-    type=g_mime_content_type_new_from_string(parent->mime_type);
+
+    if (!body->parts)
+	return body;
+
+    type=g_mime_content_type_new_from_string(body->mime_type);
     if (g_mime_content_type_is_type(type, "multipart", "related")) {
         /* FIXME: more processing required see RFC1872 */
         /* Add the first part */
-        add_body(bm, parent->parts);
+        body = add_body(bm, body->parts);
     } else if (g_mime_content_type_is_type(type, "multipart", "alternative")) {
             /* Add the most suitable part. */
-        add_body(bm, preferred_part(parent->parts));
+        body = add_body(bm, preferred_part(body->parts));
     } else { /* default to multipart/mixed */
-        add_multipart_mixed(bm, parent->parts);
+	body = add_multipart_mixed(bm, body->parts);
     }
     g_mime_content_type_destroy(type);
+
+    return body;
 }
 
 static GtkWidget *old_widget, *new_widget;
@@ -3287,11 +3300,12 @@ vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
                                      widget, g_object_unref);
 }
 
-static BalsaPartInfo *
+static LibBalsaMessageBody *
 add_part(BalsaMessage * bm, BalsaPartInfo * info)
 {
     GtkWidget *save;
     GtkTreeSelection *selection;
+    LibBalsaMessageBody *body;
 
     if (!info)
 	return NULL;
@@ -3329,12 +3343,12 @@ add_part(BalsaMessage * bm, BalsaPartInfo * info)
 	}
     }
 
-    add_multipart(bm, info->body);
+    body = add_multipart(bm, info->body);
 
     if (save)
 	bm->content = save;
 
-    return info;
+    return body;
 }
 
 
@@ -3389,7 +3403,7 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
 {
     hide_all_parts(bm);
 
-    bm->current_part = add_part(bm, info);
+    bm->current_part = part_info_from_body(bm, add_part(bm, info));
 
     if(bm->current_part)
         g_signal_emit(G_OBJECT(bm), balsa_message_signals[SELECT_PART], 0);
@@ -3925,7 +3939,7 @@ prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list)
 gboolean
 balsa_message_can_zoom(BalsaMessage * bm)
 {
-    return libbalsa_html_can_zoom(bm->current_part->widget);
+    return libbalsa_html_can_zoom(bm->current_part->focus_widget);
 }
 
 /* Zoom an html item. */
@@ -3947,7 +3961,7 @@ balsa_message_zoom(BalsaMessage * bm, gint in_out)
      g_object_set_data(G_OBJECT(bm->message), BALSA_MESSAGE_ZOOM_KEY,
                      GINT_TO_POINTER(zoom));
 
-     libbalsa_html_zoom(bm->current_part->widget, in_out);
+     libbalsa_html_zoom(bm->current_part->focus_widget, in_out);
 
 }
 #endif /* HAVE_GTKHTML */

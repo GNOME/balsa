@@ -49,6 +49,11 @@ static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 static GtkWidget *menu_items[8];
 GtkTooltips *tooltips;
 
+/* Standard DnD types */
+enum {
+	TARGET_URI_LIST,
+};
+
 static GtkTargetEntry drop_types [] = {
 	{ "text/uri-list", 0, TARGET_URI_LIST }
 };
@@ -284,7 +289,7 @@ add_attachment (GnomeIconList *iconlist, char *filename)
 		iconlist,
 		gnome_unconditional_pixmap_file ("balsa/attachment.png"),
 		g_basename (filename));
-	gnome_ic on_list_set_icon_data (iconlist, pos, filename);
+	gnome_icon_list_set_icon_data (iconlist, pos, filename);
 }
 
 static void
@@ -467,7 +472,7 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   /* create icon list */
   msg->attachments = gnome_icon_list_new (100, NULL, FALSE);
   gtk_signal_connect (GTK_OBJECT (msg->attachments), "drag_data_received",
-		      GTK_SIGNAL_FUNC(attachment_add), NULL);
+		      GTK_SIGNAL_FUNC(attachments_add), NULL);
   gtk_drag_dest_set (GTK_WIDGET (msg->attachments), GTK_DEST_DEFAULT_ALL,
 		     drop_types, ELEMENTS(drop_types),
 		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);

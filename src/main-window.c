@@ -541,23 +541,25 @@ void balsa_window_close_mailbox(BalsaWindow *window, Mailbox *mailbox)
 
 static void balsa_window_real_open_mailbox(BalsaWindow *window, Mailbox *mailbox)
 {
-  GtkObject *page;
-  GtkWidget *label;
+	GtkObject *page;
+	GtkWidget *label;
 
 /*  label = gtk_label_new("blah"); PKGW: dunno why this was here. */
 
-  page = balsa_index_page_new(window);
-  balsa_index_page_load_mailbox(BALSA_INDEX_PAGE(page), mailbox);
+	page = balsa_index_page_new(window);
+	if( balsa_index_page_load_mailbox(BALSA_INDEX_PAGE(page), mailbox) )
+		/* The function will display a dialog on error */
+		return;
 
-  label = gtk_label_new(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->mailbox->name);
-
-  /* store for easy access */
-  gtk_object_set_data(GTK_OBJECT(BALSA_INDEX_PAGE(page)->sw), "indexpage", page);
-  gtk_notebook_append_page(GTK_NOTEBOOK(window->notebook), GTK_WIDGET(BALSA_INDEX_PAGE(page)->sw), label);
-
-  /* change the page to the newly selected notebook item */
-  gtk_notebook_set_page(GTK_NOTEBOOK(window->notebook),
-			gtk_notebook_page_num(GTK_NOTEBOOK(window->notebook), GTK_WIDGET(BALSA_INDEX_PAGE(page)->sw)));
+	label = gtk_label_new(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->mailbox->name);
+	
+	/* store for easy access */
+	gtk_object_set_data(GTK_OBJECT(BALSA_INDEX_PAGE(page)->sw), "indexpage", page);
+	gtk_notebook_append_page(GTK_NOTEBOOK(window->notebook), GTK_WIDGET(BALSA_INDEX_PAGE(page)->sw), label);
+	
+	/* change the page to the newly selected notebook item */
+	gtk_notebook_set_page(GTK_NOTEBOOK(window->notebook),
+			      gtk_notebook_page_num(GTK_NOTEBOOK(window->notebook), GTK_WIDGET(BALSA_INDEX_PAGE(page)->sw)));
 }
 
 static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbox)

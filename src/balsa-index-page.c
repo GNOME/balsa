@@ -262,7 +262,7 @@ set_password (GtkWidget * widget, GtkWidget * entry)
 }
 
 
-void balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
+gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
 {
   GtkWidget *messagebox;
   /*GdkCursor *cursor;*/
@@ -310,7 +310,7 @@ void balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
   if ((mailbox->type == MAILBOX_IMAP && !MAILBOX_IMAP(mailbox)->server->passwd) ||
       (mailbox->type == MAILBOX_POP3 && !MAILBOX_POP3(mailbox)->server->passwd))
   {
-    return;
+    return TRUE;
   }
 
   if (!mailbox_open_ref(mailbox))
@@ -322,10 +322,11 @@ void balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
     gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
     gtk_window_set_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
     gtk_widget_show (messagebox);
-    return;
+    return TRUE;
   }
 
   balsa_index_set_mailbox(BALSA_INDEX(page->index), mailbox);
+  return FALSE;
 }
 
 /* PKGW: you'd think this function would be a good idea. 

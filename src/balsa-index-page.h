@@ -53,7 +53,7 @@ struct _BalsaIndexPageClass
 
 GtkType balsa_index_page_get_type(void);
 GtkObject *balsa_index_page_new(BalsaWindow *window);
-void balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox *mailbox);
+gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox *mailbox);
 void balsa_index_page_close_and_destroy( GtkObject *obj );
 
 void balsa_message_new (GtkWidget * widget);

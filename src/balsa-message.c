@@ -145,6 +145,7 @@ balsa_message_set (BalsaMessage * bmessage,
 
   /* look into the parts of the message */
   mail_fetchstructure (stream, mesgno, &body);
+
   debug_mime_content (body);
 
   /* HTML header */
@@ -177,15 +178,15 @@ balsa_message_set (BalsaMessage * bmessage,
   /* message body */
   c = mail_fetchtext (stream, mesgno);
 /*
-  gs = text2html (c);
-  buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
-*/
+   gs = text2html (c);
+   buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
+ */
   buff = g_realloc (buff, strlen (buff) + strlen (c) + 1);
   strcat (buff, c);
 /*
-  strcat (buff, gs->str);
-  g_string_free (gs, 1);
-*/
+   strcat (buff, gs->str);
+   g_string_free (gs, 1);
+ */
   /* HTML footer */
   buff = g_realloc (buff, strlen (buff) + strlen (HTML_FOOT) + 1);
   strcat (buff, HTML_FOOT);
@@ -264,11 +265,12 @@ debug_mime_content (BODY * body)
   PARAMETER *par;
   PART *part;
 
-
   if (body->type == TYPEMULTIPART)
     {
-      for (i = 0, part = body->nested.part; part; part = part->next)
-	debug_mime_content (&part->body);
+      for (i = 0, part = body->nested.part; part; i++, part = part->next)
+	{
+	  debug_mime_content (&part->body);
+	}
     }
   else
     {

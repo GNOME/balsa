@@ -80,8 +80,8 @@ static GnomeUIInfo file_menu[] =
   },
   GNOMEUIINFO_SEPARATOR,
   {
-    GNOME_APP_UI_ITEM, N_ ("E_xit"), NULL, close_window, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_EXIT, 'Q', 0, NULL
+    GNOME_APP_UI_ITEM, N_ ("_Close"), NULL, close_window, NULL,
+    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_CLOSE, 'Q', 0, NULL
   },
   GNOMEUIINFO_END
 };

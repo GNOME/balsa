@@ -1,3 +1,20 @@
+1998-12-13  Jeff Garzik <jgarzik@pobox.com>
+
+	* src/main-window.c:
+	- Exported 'mdi' var, so we can grab it from other modules.
+	- Reordered check-new-mail action to check regardless of whether
+	  we check locally or not.
+
+	* src/pref-manager.c:
+	- Properly parent the prop box, so it minimizes when other
+	  windows are minimized.
+	- Select first item in POP3 server list.
+	  FIXME: needs to select "proper" item based on previous action, 
+	  add, delete, and modify.
+
+	* src/sendmsg-window.c:
+	Change menu item "Exit" to "Close".  We do not exit the app.
+
 1998-12-09  Herbert Valerio Riedel  <hvr@phoenix.twisted.hvrlab.ml.org>
 
 	* src/filter-edit.h, libbalsa/filter-funcs.h: added missing prototypes

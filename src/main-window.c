@@ -40,7 +40,7 @@
 
 #define MAILBOX_DATA "mailbox_data"
 
-static GnomeMDI *mdi = NULL;
+GnomeMDI *mdi = NULL;
 static GtkWidget *pbar;
 static guint pbar_timeout;
 
@@ -370,12 +370,10 @@ show_about_box (void)
 static void
 check_new_messages_cb (GtkWidget * widget, gpointer data)
 {
-  if (!balsa_app.current_index_child)
-    return;
+  if (balsa_app.current_index_child != NULL)
+    mailbox_check_new_messages (BALSA_INDEX (balsa_app.current_index_child->index)->mailbox);
 
   check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input);
-
-  mailbox_check_new_messages (BALSA_INDEX (balsa_app.current_index_child->index)->mailbox);
 }
 
 static void

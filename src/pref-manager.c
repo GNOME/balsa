@@ -45,6 +45,9 @@ typedef struct _PropertyUI
   }
 PropertyUI;
 
+/* main window, from main-window.c */
+extern GnomeMDI *mdi;
+
 static PropertyUI *pui;
 
 guint toolbar_type[NUM_TOOLBAR_MODES] =
@@ -94,6 +97,7 @@ open_preferences_manager (void)
 {
   GtkWidget *label;
   gint i;
+  GnomeApp *active_win;
 
   /* only one preferences manager window */
   if (pui)
@@ -105,6 +109,9 @@ open_preferences_manager (void)
   pui = g_malloc (sizeof (PropertyUI));
 
   pui->pbox = GNOME_PROPERTY_BOX (gnome_property_box_new ());
+
+  active_win = GNOME_APP(gnome_mdi_get_active_window(mdi));
+  gnome_dialog_set_parent(GNOME_DIALOG(pui->pbox), GTK_WINDOW(active_win));
 
   gtk_signal_connect (GTK_OBJECT (pui->pbox), "destroy",
 		      GTK_SIGNAL_FUNC (cancel_prefs), pui);
@@ -301,6 +308,7 @@ update_pop3_servers (void)
 	}
       list = list->next;
     }
+  gtk_clist_select_row(clist, 0, 0);
   gtk_clist_thaw (clist);
 }
 

@@ -18,8 +18,9 @@
  */
 #include "config.h"
 
-#define _POSIX_SOURCE 1
-#define _BSD_SOURCE   1
+#define _POSIX_C_SOURCE 199506L
+#define _XOPEN_SOURCE 500
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -168,8 +169,8 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
                  G_SIGNAL_RUN_FIRST,
                  G_STRUCT_OFFSET(ImapMboxHandleClass, list_response),
                  NULL, NULL,
-                 libimap_VOID__INT_STRING_POINTER, G_TYPE_NONE, 3,
-                 G_TYPE_INT, G_TYPE_STRING, G_TYPE_POINTER);
+                 libimap_VOID__INT_INT_POINTER, G_TYPE_NONE, 3,
+                 G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER);
 
   imap_mbox_handle_signals[LSUB_RESPONSE] = 
     g_signal_new("lsub-response",
@@ -177,8 +178,8 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
                  G_SIGNAL_RUN_FIRST,
                  G_STRUCT_OFFSET(ImapMboxHandleClass, lsub_response),
                  NULL, NULL,
-                 libimap_VOID__INT_STRING_POINTER, G_TYPE_NONE, 3,
-                 G_TYPE_INT, G_TYPE_STRING, G_TYPE_POINTER);
+                 libimap_VOID__INT_INT_POINTER, G_TYPE_NONE, 3,
+                 G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER);
 
   imap_mbox_handle_signals[EXPUNGE_NOTIFY] = 
     g_signal_new("expunge-notify",
@@ -1738,7 +1739,7 @@ ir_list_lsub(ImapMboxHandle *h, ImapHandleSignal signal)
     "Marked", "Unmarked", "Noselect", "Noinferiors",
     "HasChildren", "HasNoChildren"
   };
-  int flags = 0;
+  ImapMboxFlags flags = 0;
   char buf[LONG_STRING], *s, *mbx;
   int c, delim;
   ImapResponse rc;

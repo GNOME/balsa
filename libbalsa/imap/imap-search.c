@@ -17,10 +17,11 @@
  * 02111-1307, USA.
  */
 
-#define _POSIX_SOURCE 1
+#define _POSIX_C_SOURCE 199506L
+#define _XOPEN_SOURCE 500
+
 #include <string.h>
 #include <time.h>
-#undef _POSIX_SOURCE
 
 #include "siobuf.h"
 #include "imap-handle.h"

@@ -1,31 +1,21 @@
-# 
-#
-#
-#
-#
-#
-#
-#
-#
-#
-# Balsa hu.po
-# Copyright (C) 2000, 2004 Free Software Foundation, Inc.
+# Hungarian translation of balsa.
+# Copyright (C) 2000-2004 Free Software Foundation, Inc.
 # Sebi <jaques@freemail.hu>, 2000.
 # Gab <h9gab@freemail.hu>, 2000.
 # Andras Timar <timar@gnome.hu>, 2001.
 # Gabor Kelemen <kg0021@stud.unideb.hu>, 2004.
+# Laszlo Dvornik <dvornik@gnome.hu>, 2004.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Balsa VERSION\n"
+"Project-Id-Version: balsa\n"
 "POT-Creation-Date: 2004-04-05 11:34+0200\n"
-"PO-Revision-Date: 2004-04-27 09:22+0200\n"
-"Last-Translator: Gabor Kelemen <kg0021@stud.unideb.hu>\n"
+"PO-Revision-Date: 2004-07-08 19:33+0200\n"
+"Last-Translator: Laszlo Dvornik <dvornik@gnome.hu>\n"
 "Language-Team: Hungarian <gnome@gnome.hu>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.3.1\n"
-"Plural-Forms:  nplurals=1; plural=0;\n"
 
 #. The externq database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:255 libbalsa/address-book-ldap.c:401
@@ -185,7 +175,7 @@ msgstr "Nem lehet ellenőrizni az üzenet aláírását: nem lehet gpgme adatot 
 #: libbalsa/gmime-gpgme-context.c:392 libbalsa/rfc3156.c:774
 #, c-format
 msgid "gpgme signature verification failed: %s"
-msgstr "gpgme aláírás ellenőrzés sikertelen: %s"
+msgstr "gpgme aláírás-ellenőrzés sikertelen: %s"
 
 #: libbalsa/gmime-gpgme-context.c:441
 #, c-format
@@ -319,7 +309,7 @@ msgstr "Aláírás beillesztése _válaszoláskor"
 
 #: libbalsa/identity.c:806
 msgid "_Add Signature Separator"
-msgstr "_Aláíráselválasztó hozzáadása"
+msgstr "_Aláírás-elválasztó hozzáadása"
 
 #: libbalsa/identity.c:809
 msgid "Prepend Si_gnature"
@@ -400,7 +390,7 @@ msgstr "_Elfogadás egy alkalomra"
 
 #: libbalsa/libbalsa.c:431
 msgid "Accept&_Save"
-msgstr "Elfogadás és _mentés"
+msgstr "Elfogadás és m_entés"
 
 #: libbalsa/libbalsa.c:432
 msgid "_Reject"
@@ -430,7 +420,7 @@ msgstr "%s helyi postafiók útvonala hibás"
 #: libbalsa/mailbox.c:346
 #, c-format
 msgid "Could not create a mailbox of type %s"
-msgstr "%s típusú postafiók létrehozása sikertelen."
+msgstr "%s típusú postafiók létrehozása sikertelen"
 
 #: libbalsa/mailbox_imap.c:704
 #, c-format
@@ -460,7 +450,7 @@ msgstr "%s megnyitása sikertelen. Hibakód = %d, "
 #: libbalsa/mailbox_local.c:1188
 #, c-format
 msgid "Failed to sync mailbox \"%s\""
-msgstr "%s postafiók szinkronizálása sikertelen."
+msgstr "%s postafiók szinkronizálása sikertelen"
 
 #: libbalsa/mailbox_maildir.c:184
 #, c-format
@@ -554,7 +544,7 @@ msgstr "%ld/%ld bájt érkezett eddig"
 #: libbalsa/mailbox_pop3.c:377
 #, c-format
 msgid "Saving POP message to %s failed."
-msgstr "A POP üzenet mentése %s helyre nem sikerült"
+msgstr "A POP üzenet mentése %s helyre nem sikerült."
 
 #: libbalsa/mailbox_pop3.c:387
 #, c-format
@@ -588,7 +578,7 @@ msgstr "POP3 hiba: %s nem zárható le."
 #: libbalsa/mailbox_pop3.c:564
 #, c-format
 msgid "POP3 error: %s."
-msgstr "POP3 hiba: %s"
+msgstr "POP3 hiba: %s."
 
 #: libbalsa/mailbox_pop3.c:587
 #, c-format
@@ -705,7 +695,7 @@ msgstr ""
 #: libbalsa/rfc3156.c:346
 #, c-format
 msgid "GMimeGPG signature verification failed: %s"
-msgstr "GMimeGPG aláírásellenőrzés sikertelen: %s"
+msgstr "GMimeGPG aláírás-ellenőrzés sikertelen: %s"
 
 #: libbalsa/rfc3156.c:453
 msgid "Enter passphrase to decrypt message"
@@ -742,7 +732,7 @@ msgstr "Ez a rész nem valódi PGP aláírás."
 
 #: libbalsa/rfc3156.c:559
 msgid "An error prevented the signature verification."
-msgstr "Egy hiba megakadályozta az aláírásellenőrzést."
+msgstr "Egy hiba megakadályozta az aláírás-ellenőrzést."
 
 #: libbalsa/rfc3156.c:561
 msgid "This part contains at least two signatures with different status."
@@ -830,7 +820,7 @@ msgstr "Adja meg a jelszót az üzenetrész visszafejtéséhez"
 #: libbalsa/rfc3156.c:1002
 #, c-format
 msgid "gpgme decryption and signature verification failed: %s"
-msgstr "gpgme visszafejtés és aláírásellenőrzés sikertelen: %s"
+msgstr "gpgme visszafejtés és aláírás-ellenőrzés sikertelen: %s"
 
 #: libbalsa/rfc3156.c:1047
 #, c-format
@@ -838,7 +828,7 @@ msgid ""
 "The OpenPGP encrypted message part contains 8-bit characters, but no header "
 "describing the used codeset (converted to %s)"
 msgstr ""
-"Az openpgp-vel titkosított üzenetrész8 bites karaktereket tartalmaz, de nincs "
+"Az OpenPGP-vel titkosított üzenetrész 8 bites karaktereket tartalmaz, de nincs "
 "a használt kódolást leíró fejléce (konvertálva erre: %s)"
 
 #: libbalsa/rfc3156.c:1113
@@ -899,7 +889,7 @@ msgstr "végsőkig"
 
 #: libbalsa/rfc3156.c:1293
 msgid "Fingerprint"
-msgstr "Ujjlenyomat: %s"
+msgstr "Ujjlenyomat"
 
 #: libbalsa/rfc3156.c:1293
 msgid "Key ID"
@@ -994,7 +984,7 @@ msgstr "Írja be a jelszót az üzenet aláírásához"
 
 #: libbalsa/send.c:228 libbalsa/send.c:235
 msgid "Sending Mail..."
-msgstr "Levelelek küldése..."
+msgstr "Levelek küldése..."
 
 #: libbalsa/send.c:231 src/main-window.c:1984
 msgid "_Hide"
@@ -1180,7 +1170,7 @@ msgstr ""
 
 #: libinit_balsa/balsa-druid-page-directory.c:235
 msgid "Mail Files"
-msgstr "Levelező fajlok"
+msgstr "Levelező fájlok"
 
 #: libinit_balsa/balsa-druid-page-directory.c:324
 #, c-format
@@ -1273,7 +1263,7 @@ msgstr "Hiba történt %s betöltése közben: %s\n"
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr ""
-"\"%s\": az elérési útat a fájlrendszer gyökerétől kiindulva kell megadni (/-"
+"\"%s\": az elérési utat a fájlrendszer gyökerétől kiindulva kell megadni (/-"
 "el kezdődik)."
 
 #: libinit_balsa/helper.c:165 libinit_balsa/helper.c:189
@@ -1379,7 +1369,7 @@ msgstr "LDAP Címjegyzék"
 
 #: src/address-book-config.c:247
 msgid "Balsa is not compiled with LDAP support"
-msgstr "Nincs LDAP támogatás. Újra kell fordítani a Balsát LDAP támogatással."
+msgstr "Nincs LDAP-támogatás. Újra kell fordítani a Balsát LDAP-támogatással."
 
 #. mailbox name
 #: src/address-book-config.c:291 src/address-book-config.c:336
@@ -1603,7 +1593,7 @@ msgstr "Nem található a postafiók"
 
 #: src/balsa-mblist.c:1734
 msgid "_Other..."
-msgstr "_Egyéb.."
+msgstr "_Egyéb..."
 
 #: src/balsa-mblist.c:1802
 msgid "Choose destination folder"
@@ -2427,7 +2417,7 @@ msgstr "VÉGZETES: "
 
 #: src/mailbox-conf.c:218
 msgid "No mailbox selected."
-msgstr "Nincs postafiók kiválasztva"
+msgstr "Nincs postafiók kiválasztva."
 
 #: src/mailbox-conf.c:244
 #, c-format
@@ -2771,7 +2761,7 @@ msgstr "_Új levelek fogadása"
 
 #: src/main-window.c:305
 msgid "Fetch new incoming mail"
-msgstr "Újonnan beérkezet levelek letöltése"
+msgstr "Újonnan beérkezett levelek letöltése"
 
 #: src/main-window.c:311
 msgid "_Send Queued Mail"
@@ -3219,13 +3209,13 @@ msgid ""
 "\n"
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
-"A Balsa levelezőprogram a GNOME asztali környezet része. Információ a Balsa-ról a http://balsa.gnome.org címen található.\n"
+"A Balsa levelezőprogram a GNOME asztali környezet része. Információ a Balsa-ról a http://balsa.gnome.org/ címen található.\n"
 "\n"
-"Ha hibát talált akkor azt a http://bugzilla.gnome.org/  címen jelentheti."
+"Ha hibát talált, akkor azt a http://bugzilla.gnome.org/ címen jelentheti."
 
 #: src/main-window.c:1981
 msgid "Checking Mail..."
-msgstr "Levelelek lekérése..."
+msgstr "Levelek lekérése..."
 
 #: src/main-window.c:2284
 msgid "Finished Checking."
@@ -3302,11 +3292,11 @@ msgstr "Levelek letöltése indításkor"
 
 #: src/main.c:205
 msgid "Compose a new email to EMAIL@ADDRESS"
-msgstr "Új levél írása az EMAIL@ADRESS címre"
+msgstr "Új levél írása az E-MAIL@CÍM címre"
 
 #: src/main.c:207
 msgid "Attach file at PATH"
-msgstr "Fájl csatolása innen: PATH"
+msgstr "Fájl csatolása innen: ÚTVONAL"
 
 #: src/main.c:209
 msgid "Opens MAILBOXNAME"
@@ -3559,7 +3549,7 @@ msgstr "Típus"
 
 #: src/pref-manager.c:1505
 msgid "Mailbox Name"
-msgstr "Postafiók neve:"
+msgstr "Postafiók neve"
 
 #: src/pref-manager.c:1518 src/pref-manager.c:2621
 msgid "_Modify"
@@ -3655,7 +3645,7 @@ msgstr "Többrészes/Alternatív részes megjelenítés"
 
 #: src/pref-manager.c:1731
 msgid "prefer text/plain over html"
-msgstr "Szöveg előnyben részesítése htmllel szemben"
+msgstr "Szöveg előnyben részesítése HTML-lel szemben"
 
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
 #: src/pref-manager.c:1749
@@ -3800,7 +3790,7 @@ msgstr "Dátum kódolás (strftime):"
 
 #: src/pref-manager.c:2065
 msgid "Selected headers:"
-msgstr "Kiválasztott fejlécek"
+msgstr "Kiválasztott fejlécek:"
 
 #: src/pref-manager.c:2067
 msgid "Message window title format:"
@@ -3950,7 +3940,7 @@ msgstr "Levelek fogadása indításkor"
 
 #: src/pref-manager.c:2509
 msgid "Remember open mailboxes between sessions"
-msgstr "Használat során nyitvahagyott postafiók megjegyzése"
+msgstr "Használat során nyitva hagyott postafiók megjegyzése"
 
 #: src/pref-manager.c:2523
 msgid "IMAP Folder Scanning"
@@ -4116,7 +4106,7 @@ msgid ""
 "Error during filters loading: %s\n"
 "Filters may not be correct."
 msgstr ""
-"Hiba aszűrők betöltése közben: %s\n"
+"Hiba a szűrők betöltése közben: %s\n"
 "A szűrők hibásak lehetnek."
 
 #: src/save-restore.c:677
@@ -4528,7 +4518,7 @@ msgid ""
 "Possible reason: not enough temporary space"
 msgstr ""
 "Üzenet csatolása sikertelen.\n"
-"Lehetséges ok: nincs elég hely az átmeneti fájloknak."
+"Lehetséges ok: nincs elég hely az átmeneti fájloknak"
 
 #. From:
 #: src/sendmsg-window.c:1890
@@ -4600,7 +4590,7 @@ msgid ""
 msgstr ""
 "Ez a fájl nem US-ASCII vagy UTF-8 kódolást használ.\n"
 "Kérem válassza ki a fájl kódolásához használt karakterkészletet.\n"
-"(Ha bizonytalan, válassza az Általános-UTF-8-at)"
+"(Ha bizonytalan, válassza az Általános UTF-8-at)"
 
 #: src/sendmsg-window.c:3214
 #, c-format
@@ -4635,7 +4625,7 @@ msgstr ""
 #: src/sendmsg-window.c:3571
 #, c-format
 msgid "sending message with gpg mode %d"
-msgstr "Üzenet küldése %d. gpg móddal."
+msgstr "üzenet küldése %d. gpg móddal"
 
 #: src/sendmsg-window.c:3612
 msgid "Send failed"
@@ -4898,7 +4888,7 @@ msgstr "Azonosítás"
 
 #: src/toolbar-factory.c:129
 msgid "Set identity to use for this message"
-msgstr "Személyazonosság beállítása ezen levél elküldéséhez."
+msgstr "Személyazonosság beállítása ezen levél elküldéséhez"
 
 #: src/toolbar-factory.c:131
 msgid "Run a spell check"
@@ -5070,4 +5060,3 @@ msgstr "Időtúllépés. flock zárolás sikertelen!"
 #, c-format
 msgid "Waiting for flock attempt... %d"
 msgstr "Próbálkozom az flock zárolással... %d"
-

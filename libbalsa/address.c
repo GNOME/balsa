@@ -231,57 +231,16 @@ libbalsa_address_new_list_from_string(const gchar * str)
     return lst;
 }
 
-static gboolean
-needs_quotes(const gchar *str)
+static gchar *
+rfc2822_mailbox(const gchar * full_name, const gchar * address)
 {
-    gboolean quoted = FALSE;
-
-    while (*str) {
-        if (*str == '\\') {
-            if (*++str)
-                ++str;
-        } else {
-            if (*str == '"')
-                quoted = !quoted;
-            else if (!quoted
-                /* RFC 2822 specials, less '"': */
-                 && strchr("()<>[]:;@\\,.", *str))
-                return TRUE;
-            ++str;
-        }
-    }
-    return FALSE;
-}
-
-static gchar*
-rfc2822_mailbox(const gchar *full_name, gchar *address)
-{
+    InternetAddress *ia;
     gchar *new_str;
 
-    if(full_name && *full_name) {
-        gchar *dequote = g_new(char, strlen(full_name) + 1);
-        const gchar *p = full_name;
-        gchar *q = dequote;
-    
-        do {
-            if (*p == '\\') {
-                *q++ = *p++;
-                if (*p)
-                    *q++ = *p++;
-            } else if (*p == '"')
-                ++p;
-            else
-                *q++ = *p++;
-        } while (*p);
-        *q = '\0';
+    ia = internet_address_new_name(full_name, address);
+    new_str = internet_address_to_string(ia, FALSE);
+    internet_address_unref(ia);
 
-        if (needs_quotes(dequote))
-	    new_str = g_strdup_printf("\042%s\042 <%s>", dequote, address);
-        else
-            new_str = g_strdup_printf("%s <%s>", dequote, address);
-        g_free(dequote);
-    } else
-	new_str = g_strdup(address);
     return new_str;
 }
 
@@ -290,31 +249,20 @@ rfc2822_mailbox(const gchar *full_name, gchar *address)
 static gchar*
 rfc2822_group(const gchar *full_name, GList *addr_list)
 {
-    GString *str = g_string_new("");
-    GList *addr_entry;
+    InternetAddress *ia;
     gchar *res;
 
-    if(full_name) { 
-	if(needs_quotes(full_name))
-	    g_string_printf(str, "\042%s\042: ", full_name);
-	else
-	    g_string_printf(str, "%s: ", full_name);
-    }
+    ia = internet_address_new_group(full_name);
+    for (; addr_list; addr_list = addr_list->next) {
+	InternetAddress *member;
 
-    if(addr_list) {
-	g_string_append(str, (gchar*)addr_list->data);
-        
-	for(addr_entry=g_list_next(addr_list); addr_entry; 
-	    addr_entry=g_list_next(addr_entry)) {
-	    g_string_append_printf(str, ", %s", (gchar*)addr_entry->data);
-	}
+	member = internet_address_new_name(NULL, addr_list->data);
+	internet_address_add_member(ia, member);
+	internet_address_unref(member);
     }
-    if(full_name)
-	g_string_append(str, ";");
-    
-    res=str->str;
-    g_string_free(str, FALSE);
-    
+    res = internet_address_to_string(ia, FALSE);
+    internet_address_unref(ia);
+
     return res;
 }
 #endif
@@ -364,10 +312,10 @@ libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n)
             retc = rfc2822_mailbox(address->full_name,
                                    address->address_list->data);
     } else {
-	GList *nth_address = g_list_nth(address->address_list, n);
-	g_return_val_if_fail(nth_address != NULL, NULL);
+	const gchar *mailbox = g_list_nth_data(address->address_list, n);
+	g_return_val_if_fail(mailbox != NULL, NULL);
 
-	retc = rfc2822_mailbox(address->full_name, nth_address->data);
+	retc = rfc2822_mailbox(address->full_name, mailbox);
     }
 
     return retc;

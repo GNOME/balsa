@@ -346,6 +346,7 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
     mailbox->threading_type = LB_MAILBOX_THREADING_JWZ;
     mailbox->sort_type =  LB_MAILBOX_SORT_TYPE_ASC;
     mailbox->sort_field = LB_MAILBOX_SORT_DATE;
+    mailbox->show = LB_MAILBOX_SHOW_UNSET;
 }
 
 /*
@@ -709,6 +710,8 @@ libbalsa_mailbox_load_view(LibBalsaMailbox * mbx)
     if(def) mbx->sort_type = LB_MAILBOX_SORT_TYPE_ASC;
     mbx->sort_field = gnome_config_get_int_with_default("SortField", &def);
     if(def) mbx->sort_field = LB_MAILBOX_SORT_DATE;
+    mbx->show = gnome_config_get_int_with_default("Show", &def);
+    if(def) mbx->show = LB_MAILBOX_SHOW_UNSET;
 }
 
 /* libbalsa_mailbox_save_view:
@@ -731,6 +734,7 @@ libbalsa_mailbox_save_view(LibBalsaMailbox * mbx)
     gnome_config_set_int("Threading",   mbx->threading_type);
     gnome_config_set_int("SortType",    mbx->sort_type);
     gnome_config_set_int("SortField",   mbx->sort_field);
+    gnome_config_set_int("Show", mbx->show);
 }
 
 FILE *

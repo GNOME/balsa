@@ -92,6 +92,11 @@ typedef enum {
     LB_MAILBOX_SORT_SENDER
 } LibBalsaMailboxSortFields;
 
+typedef enum {
+    LB_MAILBOX_SHOW_UNSET = 0,
+    LB_MAILBOX_SHOW_FROM,
+    LB_MAILBOX_SHOW_TO
+} LibBalsaMailboxShow;
 
 /*
  * structures
@@ -145,6 +150,7 @@ struct _LibBalsaMailbox {
     LibBalsaMailboxThreadingType threading_type;
     LibBalsaMailboxSortType      sort_type;
     LibBalsaMailboxSortFields    sort_field;
+    LibBalsaMailboxShow          show;
 };
 
 struct _LibBalsaMailboxClass {

@@ -1,3 +1,9 @@
+1999-12-07  Peter Williams <peter@newton.cx>
+	* libinit_balsa/balsa-druid-page-error.gob: Added nice
+	  error page
+	* libinit_balsa/balsa-druid-page-user.gob: First real
+	  page, user settings (mailroot added to this page)
+	
 1999-12-07  David Pickens <dsp@iAesthetic.com>
 	* Added multi-threaded send mail (if --enable-threads):
 	  libbalsa/send.c, libbalsa/threads.h,

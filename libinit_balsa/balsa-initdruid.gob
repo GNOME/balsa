@@ -27,6 +27,7 @@
 %{
 #include "balsa-druid-page.h"
 #include "balsa-druid-page-welcome.h"
+#include "balsa-druid-page-user.h"
 #include "balsa-druid-page-finish.h"
 
 static void really_cb( gint reply, BalsaInitDruid *druid );
@@ -39,11 +40,6 @@ static void really_cb( gint reply, BalsaInitDruid *druid )
     }
 }
 
-static void joojuyfruits( void );
-
-static void joojuyfruits( void )
-{
-}
 %}
 
 class Balsa:InitDruid from Gnome:Druid {
@@ -52,32 +48,36 @@ class Balsa:InitDruid from Gnome:Druid {
 	private Gtk:Widget *std_boxes;
 	private Gtk:Widget *finish;
 	private Gtk:Widget *window;
+
 	public GdkImlibImage *default_logo;
 
 	public Gtk:Object *new( Gtk:Window *window (check type null) ) { 
 		GtkObject *self = GTK_OBJECT( GET_NEW );
+
 		(BALSA_INITDRUID( self ))->window = GTK_WIDGET( window );
 		gtk_object_ref( GTK_OBJECT( window ) );
 		gtk_container_add( GTK_CONTAINER( (BALSA_INITDRUID( self ))->window ), GTK_WIDGET( self ) );
+
 		return self;
 	 }
 
 	init( self ) {
-		joojuyfruits();
+		self->default_logo = balsa_init_get_png( "balsa-logo.png" );
 
-		self->welcome = GTK_WIDGET( balsa_druid_page_welcome_new() );
+		self->welcome = GTK_WIDGET( balsa_druid_page_welcome_new( self ) );
 		gnome_druid_append_page( GNOME_DRUID( self ), GNOME_DRUID_PAGE( self->welcome ) );
 	        gnome_druid_set_page( GNOME_DRUID( self ), GNOME_DRUID_PAGE( self->welcome ) );
 
-		self->user = NULL;
+		self->user = GTK_WIDGET( balsa_druid_page_user_new( self ) );
+		gnome_druid_append_page( GNOME_DRUID( self ), GNOME_DRUID_PAGE( self->user ) );
+
 		self->std_boxes = NULL;
 
 		self->finish = GTK_WIDGET( balsa_druid_page_finish_new() );
 		gnome_druid_append_page( GNOME_DRUID( self ), GNOME_DRUID_PAGE( self->finish ) );
 
-		(BALSA_DRUID_PAGE_WELCOME( self->welcome ))->next = self->finish;
-
-		self->default_logo = balsa_init_get_png( "balsa-logo.png" );
+		(BALSA_DRUID_PAGE_WELCOME( self->welcome ))->next = GNOME_DRUID_PAGE( self->user );
+		(BALSA_DRUID_PAGE( self->user ))->next = GNOME_DRUID_PAGE( self->finish );
 	}
 
 	override (Gnome:Druid) void 

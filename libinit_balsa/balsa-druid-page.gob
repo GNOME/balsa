@@ -25,19 +25,58 @@
 #include "balsa-initdruid.h"
 %}
 
+%{
+#include "balsa-druid-page-welcome.h"
+%}
+
 class Balsa:Druid:Page from Gnome:Druid:Page:Standard {
 	private GnomeDruidPage *prev;
 	private GnomeDruidPage *next;
+	private GnomeDruid *druid;
 
-	public Gtk:Object *new( void ) { GtkObject *me; me = GTK_OBJECT( GET_NEW ); return me; }
+	/*We are abstract*/
+	/*public Gtk:Object *new( void ) { GtkObject *me; me = GTK_OBJECT( GET_NEW ); return me; }*/
+
+	virtual private void
+	construct( self ) {
+		GnomeDruidPageStandard *std = GNOME_DRUID_PAGE_STANDARD( self );
+
+		std->background_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( std->canvas ) ),
+			GNOME_TYPE_CANVAS_RECT, NULL );
+
+		std->logoframe_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( std->canvas ) ),
+			GNOME_TYPE_CANVAS_RECT, NULL );
+
+		std->logo_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( std->canvas ) ),
+			GNOME_TYPE_CANVAS_IMAGE, NULL );
+		if( std->logo_image )
+			gnome_canvas_item_set( std->logo_item, "image", std->logo_image, NULL );
+
+		std->title_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( std->canvas ) ),
+			GNOME_TYPE_CANVAS_TEXT, 
+			"text", std->title,
+			"font", "-adobe-helvetica-bold-r-normal-*-*-180-*-*-p-*-iso8859-1",
+			"x", (gfloat) 15.0,
+			"y", (gfloat) 8 + 50.0 / 2.0,
+			"anchor", GTK_ANCHOR_WEST,
+			NULL );
+		
+		/*FIXME: don't make these copied straight out of the druid code. */
+		/*gnome_canvas_item_set( std->title_item, "x", 15.0, "y", (gfloat) 8 + 50.0 / 2.0, "anchor", GTK_ANCHOR_NORTH_WEST, NULL );*/
+	}
 	
 	override (Gnome:Druid:Page) gboolean 
 	next( Gnome:Druid:Page *_self, Gtk:Widget *druid (check null type) ) {
 		BalsaDruidPage *self = BALSA_DRUID_PAGE( _self );
+
+		self->druid = GNOME_DRUID( druid );
+
 		g_return_val_if_fail( self->next != NULL, FALSE );
+
 		if( BALSA_IS_DRUID_PAGE( self->next ) ) {
 			(BALSA_DRUID_PAGE(self->next))->prev = GNOME_DRUID_PAGE( self );
 		}
+
 		gnome_druid_set_page( GNOME_DRUID( druid ), self->next );
 		return TRUE;
 	}
@@ -45,12 +84,20 @@ class Balsa:Druid:Page from Gnome:Druid:Page:Standard {
 	override (Gnome:Druid:Page) gboolean 
 	back( Gnome:Druid:Page *_self, Gtk:Widget *druid (check null type) ) {
 		BalsaDruidPage *self = BALSA_DRUID_PAGE( _self );
+
+		self->druid = GNOME_DRUID( druid );
+
 		g_return_val_if_fail( self->prev != NULL, FALSE ); /*This should always be set.*/
+
 		if( BALSA_IS_DRUID_PAGE( self->prev ) ) {
 			(BALSA_DRUID_PAGE(self->prev))->next = GNOME_DRUID_PAGE( self );
+		} else if( BALSA_IS_DRUID_PAGE_WELCOME( self->prev ) ) {
+			(BALSA_DRUID_PAGE_WELCOME(self->prev))->next = GNOME_DRUID_PAGE( self );
 		}
+
 		gnome_druid_set_page( GNOME_DRUID( druid ), self->prev );
 		return TRUE;
 	}
 }
+
 

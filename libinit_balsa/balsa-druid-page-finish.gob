@@ -29,7 +29,11 @@
 class Balsa:Druid:Page:Finish from Balsa:Druid:Page {
 	private GtkWidget *text;
 
-	public Gtk:Object *new( void ) { return GTK_OBJECT( GET_NEW ); }
+	public Gtk:Object *new( void ) { 
+		GtkObject *self = GTK_OBJECT( GET_NEW );
+		balsa_druid_page_finish_construct( BALSA_DRUID_PAGE( self ) );
+		return self;
+	 }
 
 	init( self ) {
 		self->text = gtk_label_new( _(
@@ -39,28 +43,14 @@ class Balsa:Druid:Page:Finish from Balsa:Druid:Page {
 		gtk_label_set_justify( GTK_LABEL( self->text ), GTK_JUSTIFY_CENTER );
 		gtk_box_pack_start( GTK_BOX( (GNOME_DRUID_PAGE_STANDARD( self ))->vbox ), GTK_WIDGET( self->text ),
 			TRUE, TRUE, 8 );
-
-		balsa_druid_page_finish_construct( self );
-		gnome_druid_page_standard_set_title( GNOME_DRUID_PAGE_STANDARD( self ), _("All Done!") );
 	}
 
-	private void
-	construct( self ) {
+	override (Balsa:Druid:Page) void
+	construct( Balsa:Druid:Page *self ) {
 		GnomeDruidPageStandard *std = GNOME_DRUID_PAGE_STANDARD( self );
 
-		std->background_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( std->canvas ) ),
-			GNOME_TYPE_CANVAS_RECT, NULL );
-		std->logoframe_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( std->canvas ) ),
-			GNOME_TYPE_CANVAS_RECT, NULL );
-		std->logo_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( std->canvas ) ),
-			GNOME_TYPE_CANVAS_IMAGE, NULL );
-		std->title_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( std->canvas ) ),
-			GNOME_TYPE_CANVAS_TEXT, 
-			"text", std->title,
-			"font", "-adobe-helvetica-bold-r-normal-*-*-180-*-*-p-*-iso8859-1",
-			NULL );
-		
-		gnome_canvas_item_set( std->title_item, "x", 15.0, "y", (gfloat) 1, "anchor", GTK_ANCHOR_NORTH_WEST, NULL );
+		std->title = g_strdup( _("All Done!") );
+		PARENT_HANDLER( self );
 	}
 
 	override (Gnome:Druid:Page) void

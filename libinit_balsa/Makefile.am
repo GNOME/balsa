@@ -11,18 +11,24 @@ libinit_balsa_a_SOURCES = 		\
 BUILT_SOURCES =				\
 	balsa-initdruid.c		\
 	balsa-druid-page.c		\
+	balsa-druid-page-error.c	\
 	balsa-druid-page-welcome.c	\
+	balsa-druid-page-user.c		\
 	balsa-druid-page-finish.c	\
 	balsa-initdruid.h		\
 	balsa-druid-page.h		\
+	balsa-druid-page-error.h	\
 	balsa-druid-page-welcome.h	\
+	balsa-druid-page-user.h		\
 	balsa-druid-page-finish.h	
 endif
 
 GOBFILES =				\
 	balsa-initdruid.gob		\
 	balsa-druid-page.gob		\
+	balsa-druid-page-error.gob	\
 	balsa-druid-page-welcome.gob	\
+	balsa-druid-page-user.gob	\
 	balsa-druid-page-finish.gob
 
 %.c: %.gob

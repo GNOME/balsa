@@ -86,9 +86,10 @@ ab_okay_cb(GtkWidget * widget, gpointer data)
 			sprintf(new, "%s%s%s <%s>", new, 
 				((*new != '\0') ? ", " : ""), 
 				addy->name, addy->addy);
-			g_free(addy->name);
-			g_free(addy->addy);
-			g_free(addy);
+			g_free (addy->name);
+			g_free (addy->addy);
+                        g_free (addy->id);
+			g_free (addy);
 			gtk_clist_remove(GTK_CLIST(add_clist), 0);
 		}
 
@@ -105,9 +106,10 @@ ab_clear_clist(GtkCList * clist)
 	gpointer        row;
 	while ((row = gtk_clist_get_row_data(clist, 0))) {
 		AddressData    *addy = (AddressData *) row;
-		g_free(addy->name);
-		g_free(addy->addy);
-		g_free(addy);
+                g_free (addy->id);
+		g_free (addy->name);
+		g_free (addy->addy);
+		g_free (addy);
 		gtk_clist_remove(GTK_CLIST(clist), 0);
 	}
 }
@@ -278,19 +280,26 @@ ab_load(GtkWidget * widget, gpointer data)
    } 
    while ( fgets(string, sizeof(string), gc)) 
    { 
-      if ( strncasecmp(string, "BEGIN:VCARD", 11) == 0 ) {
+      if ( g_strncasecmp(string, "BEGIN:VCARD", 11) == 0 ) {
 	 in_vcard = TRUE;
 	 continue;
       }
 
-      if ( strncasecmp(string, "END:VCARD", 9) == 0) {
+      if ( g_strncasecmp(string, "END:VCARD", 9) == 0) {
 	 gint rownum; 
 	 AddressData *data;
 	 if(email) {
 	    data = g_malloc( sizeof(AddressData) ); 
 	    data->id = id ? id : g_strdup(N_("No-Id"));
 	    data->addy = email;
-	    data->name = name ? name : g_strdup( N_("No-Name") );
+            
+            if (name)
+              data->name = name;
+            else if (id) 
+              data->name = g_strdup (id);
+            else
+              g_strdup( N_("No-Name") );
+            
 	    listdata[0] = id;
 	    listdata[1] = email;
 	    rownum = gtk_clist_append(GTK_CLIST(book_clist), listdata); 
@@ -299,10 +308,11 @@ ab_load(GtkWidget * widget, gpointer data)
 	    name  = NULL;
 	    email = NULL;
 	    id = NULL;
-	 } else 
-	 {
-	    g_free(name);
-	    g_free(id);
+	 } else {
+	    g_free (name);
+            name = NULL;
+	    g_free (id);
+            id = NULL;
 	 } 
 
 	 in_vcard = FALSE;
@@ -310,21 +320,21 @@ ab_load(GtkWidget * widget, gpointer data)
       }
 
       if (!in_vcard) continue;
+
       g_strchomp(string);
 
-      if (strncasecmp(string, "FN:", 3) == 0)
+      if (g_strncasecmp(string, "FN:", 3) == 0)
       {
-		id = g_strdup(string+3);
-		continue;
+        id = g_strdup(string+3);
+        continue;
       }
-      if(strncasecmp(string, "N:", 2) == 0) {
+      if (g_strncasecmp(string, "N:", 2) == 0) {
 	 name = extract_name(string+2);
-	 /* printf("name : %s\n", name); */
 	 continue;
       }
 
       /* fetch only first internet e-mail field */
-      if(!email && strncasecmp(string, "EMAIL;INTERNET:",15) == 0)
+      if (!email && g_strncasecmp (string, "EMAIL;INTERNET:",15) == 0)
 	 email = g_strdup(string+15);
    }	 
 

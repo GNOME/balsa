@@ -161,6 +161,7 @@ static GnomeUIInfo main_toolbar[] = {
                            N_("Set identity to use for this message"),
                            change_identity_dialog_cb,
                            BALSA_PIXMAP_IDENTITY),
+    GNOMEUIINFO_SEPARATOR,
 #define TOOL_SPELLING_POS 7
     GNOMEUIINFO_ITEM_STOCK(N_("Spelling"),
 			   N_

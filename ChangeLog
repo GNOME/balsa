@@ -1,3 +1,7 @@
+2001-07-09  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/sendmsg-window.c: separator before identity button
+
 2001-07-07  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/pop3.c: use reentrant getaddrinfo instead of gethostbyname.

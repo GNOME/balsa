@@ -457,6 +457,10 @@ complete_cb (GtkWidget * widget)
   g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->smtp_server)));
 
+  /* FIXME XXX This is just so the thing works */
+  balsa_app.local_mail_directory = g_strdup( "/var/spool/mail" );
+
+
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
   mailbox = mailbox_new (type);
   mailbox->name = g_strdup ("Inbox");

@@ -30,6 +30,8 @@ struct _NewMailboxWindow
 
   GtkWidget *window;
   GtkWidget *notebook;
+  GtkWidget *back;
+  GtkWidget *forward;
 
   /* first page */
   GtkWidget *mailbox_type_menu;
@@ -49,6 +51,8 @@ static GtkWidget * create_second_page ();
 static void destroy_new_mailbox (GtkWidget * widget);
 static void close_new_mailbox (GtkWidget * widget);
 static void refresh_new_mailbox (NewMailboxWindow * nmw);
+static void refresh_button_state (NewMailboxWindow * nmw);
+
 
 static void back_cb (GtkWidget * widget);
 static void forward_cb (GtkWidget * widget);
@@ -67,6 +71,7 @@ void
 open_new_mailbox (Mailbox * mailbox)
 {
   NewMailboxWindow *nmw;
+  GList *list;
   GtkWidget *button;
   GtkWidget *bbox;
 
@@ -76,15 +81,25 @@ open_new_mailbox (Mailbox * mailbox)
    * suck bevis */
   if (mailbox)
     {
-      if (g_list_find (open_mailbox_list, mailbox))
-	return;
-      else
-	open_mailbox_list = g_list_append (open_mailbox_list, mailbox);
+      list = open_mailbox_list;
+
+      while (list)
+	{
+	  nmw = (NewMailboxWindow *) list->data;
+	  list = list->next;
+
+	  if (mailbox == nmw->mailbox)
+	    {
+	      gdk_window_raise (nmw->window->window);
+	      return;
+	    }
+	}
     }
 
 
   nmw = g_malloc (sizeof (NewMailboxWindow));
   nmw->mailbox = mailbox;
+  open_mailbox_list = g_list_append (open_mailbox_list, nmw);
 
 
   nmw->window = gtk_dialog_new ();
@@ -134,34 +149,34 @@ open_new_mailbox (Mailbox * mailbox)
 
 
   /* back button */
-  button = gtk_button_new_with_label ("Back");
-  gtk_container_add (GTK_CONTAINER (bbox), button);
-  set_new_mailbox_data (GTK_OBJECT (button), nmw);
+  nmw->back = gtk_button_new_with_label ("Back");
+  gtk_container_add (GTK_CONTAINER (bbox), nmw->back);
+  set_new_mailbox_data (GTK_OBJECT (nmw->back), nmw);
 
-  gtk_signal_connect (GTK_OBJECT (button),
+  gtk_signal_connect (GTK_OBJECT (nmw->back),
 		      "clicked",
 		      (GtkSignalFunc) back_cb,
 		      NULL);
 
-  gtk_widget_show (button);
+  gtk_widget_show (nmw->back);
 
 
   /* forward button */
-  button = gtk_button_new_with_label ("Forward");
-  gtk_container_add (GTK_CONTAINER (bbox), button);
+  nmw->forward = gtk_button_new_with_label ("Forward");
+  gtk_container_add (GTK_CONTAINER (bbox), nmw->forward);
 
-  set_new_mailbox_data (GTK_OBJECT (button), nmw);
+  set_new_mailbox_data (GTK_OBJECT (nmw->forward), nmw);
 
-  gtk_signal_connect (GTK_OBJECT (button),
+  gtk_signal_connect (GTK_OBJECT (nmw->forward),
 		      "clicked",
 		      (GtkSignalFunc) forward_cb,
 		      NULL);
 
-  gtk_widget_show (button);
+  gtk_widget_show (nmw->forward);
 
 
-  /* close button */
-  button = gnome_stock_button (GNOME_STOCK_BUTTON_CLOSE); 
+  /* cancel button */
+  button = gnome_stock_button (GNOME_STOCK_BUTTON_CANCEL); 
   gtk_container_add (GTK_CONTAINER (bbox), button);
   
   set_new_mailbox_data (GTK_OBJECT (button), nmw);
@@ -177,6 +192,7 @@ open_new_mailbox (Mailbox * mailbox)
 
 
   refresh_new_mailbox (nmw);
+  refresh_button_state (nmw);
   gtk_widget_show (nmw->window);
 }
 
@@ -187,8 +203,7 @@ destroy_new_mailbox (GtkWidget * widget)
   NewMailboxWindow *nmw = get_new_mailbox_data (GTK_OBJECT (widget));
 
   /* remove the mailbox from the open mailbox list */
-  if (nmw->mailbox && g_list_find (open_mailbox_list, nmw->mailbox))
-    open_mailbox_list = g_list_remove (open_mailbox_list, nmw->mailbox);
+  open_mailbox_list = g_list_remove (open_mailbox_list, nmw);
 
   g_free (nmw);
 }
@@ -300,6 +315,26 @@ refresh_new_mailbox (NewMailboxWindow * nmw)
 }
 
 
+static void
+refresh_button_state (NewMailboxWindow * nmw)
+{
+  switch (gtk_notebook_current_page (GTK_NOTEBOOK (nmw->notebook)))
+    {
+    case 0:
+      gtk_widget_set_sensitive (nmw->back, FALSE);
+      gtk_widget_set_sensitive (nmw->forward, TRUE);
+      break;
+
+    case 1:
+      gtk_widget_set_sensitive (nmw->back, TRUE);
+      gtk_widget_set_sensitive (nmw->forward, FALSE);
+      break;
+
+    default:
+      break;
+    }
+}
+
 
 /*
  * create notebook pages
@@ -354,57 +389,36 @@ create_second_page (NewMailboxWindow * nmw)
   gtk_widget_show (table);
 
 
-
-  /* POP server name */
-  label = gtk_label_new ("POP3 server:");
+  /* mailbox name */
+  label = gtk_label_new ("Name:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
-		    GTK_EXPAND | GTK_FILL,
-		    GTK_EXPAND | GTK_FILL,
-		    0, 0);
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
   gtk_widget_show (label);
 
 
   entry = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 0, 1,
-		    GTK_EXPAND | GTK_FILL,
-		    GTK_EXPAND | GTK_FILL,
-		    0, 0);
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
   gtk_widget_show (entry);
 
 
-  /* username on POP3 server */
-  label = gtk_label_new ("Username:");
+  /* mailbox path */
+  label = gtk_label_new ("Path:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
-		    GTK_EXPAND | GTK_FILL,
-		    GTK_EXPAND | GTK_FILL,
-		    0, 0);
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
   gtk_widget_show (label);
 
 
   entry = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 1, 2,
-		    GTK_EXPAND | GTK_FILL,
-		    GTK_EXPAND | GTK_FILL,
-		    0, 0);
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
   gtk_widget_show (entry);
-
-
-  /* password on POP3 server */
-  label = gtk_label_new ("Password:");
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
-		    GTK_EXPAND | GTK_FILL,
-		    GTK_EXPAND | GTK_FILL,
-		    0, 0);
-  gtk_widget_show (label);
-
-
-  entry = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, 2, 3,
-		    GTK_EXPAND | GTK_FILL,
-		    GTK_EXPAND | GTK_FILL,
-		    0, 0);
-  gtk_widget_show (entry);
-
 
 
   return table;
@@ -418,7 +432,12 @@ static void
 back_cb (GtkWidget * widget)
 {
   NewMailboxWindow *nmw = get_new_mailbox_data (GTK_OBJECT (widget));
+
+  if (gtk_notebook_current_page (GTK_NOTEBOOK (nmw->notebook)) == 0)
+    return;
+
   gtk_notebook_prev_page (GTK_NOTEBOOK (nmw->notebook));
+  refresh_button_state (nmw);
 }
 
 
@@ -427,7 +446,12 @@ static void
 forward_cb (GtkWidget * widget)
 {
   NewMailboxWindow *nmw = get_new_mailbox_data (GTK_OBJECT (widget));
+
+  if (gtk_notebook_current_page (GTK_NOTEBOOK (nmw->notebook)) == 1)
+    return;
+
   gtk_notebook_next_page (GTK_NOTEBOOK (nmw->notebook));
+  refresh_button_state (nmw);
 }
 
 

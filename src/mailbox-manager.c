@@ -67,7 +67,11 @@ open_mailbox_manager ()
 
   /* only one mailbox manager window */
   if (mmw)
-    return;
+    {
+      gdk_window_raise (mmw->window->window);
+      return;
+    }
+
 
   mmw = g_malloc (sizeof (MailboxManagerWindow));
 

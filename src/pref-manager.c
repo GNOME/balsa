@@ -82,7 +82,10 @@ open_preferences_manager ()
 
   /* only one preferences manager window */
   if (pmw)
-    return;
+    {
+      gdk_window_raise (pmw->window->window);
+      return;
+    }
 
   pmw = g_malloc (sizeof (PreferencesManagerWindow));
 

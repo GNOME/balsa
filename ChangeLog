@@ -1,3 +1,16 @@
+2004-10-26 06:48  PeterB
+
+	* libbalsa/: address-book-extern.c, address-book-ldif.c,
+	address-book-vcard.c, address-book.c, address.c, body.c, files.c,
+	filter-error.c, filter-file.c, filter.c, identity.c, imap-server.c,
+	libbalsa.c, mailbox-filter.c, mailbox.c, mailbox_imap.c,
+	mailbox_local.c, mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c,
+	mailbox_pop3.c, message.c, mime.c, misc.c, rfc3156.c, send.c,
+	server.c: include only documented Gnome header files, where
+	possible.
+	* libbalsa/source-viewer.c: GtkAction port is not a deprecation
+	issue--make it conditional on USE_GTK_ACTION.
+
 2004-10-25 12:59  PeterB
 
 	* src/: filter-edit-callbacks.c, filter-edit-dialog.c: populate

@@ -1507,8 +1507,6 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
 	g_list_free(messages);
     }
     
-    libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
-
     /* select another message depending on where we are in the list */
     if (GTK_CLIST(index->ctree)->rows > 1) {
         if (select_next)
@@ -1516,7 +1514,9 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
 	else
             balsa_index_select_previous(index);
     } 
-    /* Update the style and message counts in the mailbox list */
+    /* sync with backend AFTER adjacent message is selected.
+       Update the style and message counts in the mailbox list */
+    libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
     balsa_mblist_update_mailbox(balsa_app.mblist, 
                                     index->mailbox_node->mailbox);
     

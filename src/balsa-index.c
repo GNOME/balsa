@@ -795,7 +795,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
 			     G_CALLBACK(bndx_mailbox_changed_cb),
 			     (gpointer) index);
 
-    balsa_window_enable_mailbox_menus(index);
+    balsa_window_enable_mailbox_menus(balsa_app.main_window, index);
     /* libbalsa functions must be called with gdk unlocked
      * but balsa_index - locked!
      */
@@ -956,6 +956,8 @@ bndx_search_iter_and_select(BalsaIndex * index,
 void
 balsa_index_select_next(BalsaIndex * index)
 {
+    g_return_if_fail(BALSA_IS_INDEX(index));
+
     bndx_search_iter_and_select(index, index->search_iter,
 				BNDX_SEARCH_DIRECTION_NEXT,
 				BNDX_SEARCH_VIEWABLE_ONLY,
@@ -981,6 +983,8 @@ bndx_select_next_threaded(BalsaIndex * index)
 void
 balsa_index_select_previous(BalsaIndex * index)
 {
+    g_return_if_fail(BALSA_IS_INDEX(index));
+
     bndx_search_iter_and_select(index, index->search_iter,
 				BNDX_SEARCH_DIRECTION_PREV,
 				BNDX_SEARCH_VIEWABLE_ONLY,
@@ -993,6 +997,8 @@ balsa_index_find(BalsaIndex * index,
 		 LibBalsaMailboxSearchIter * search_iter,
 		 gboolean previous)
 {
+    g_return_if_fail(BALSA_IS_INDEX(index));
+
     bndx_search_iter_and_select(index, search_iter,
 				(previous ? BNDX_SEARCH_DIRECTION_PREV :
 				 BNDX_SEARCH_DIRECTION_NEXT),
@@ -1006,6 +1012,8 @@ bndx_select_next_with_flag(BalsaIndex * index, LibBalsaMessageFlag flag)
 {
     LibBalsaCondition cond_flag, cond_and;
     LibBalsaMailboxSearchIter *search_iter;
+
+    g_return_if_fail(BALSA_IS_INDEX(index));
 
     cond_flag.negate      = FALSE;
     cond_flag.type        = CONDITION_FLAG;

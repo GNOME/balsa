@@ -602,6 +602,7 @@ pop_destroy(PopHandle *pop, GError **err)
     }
     g_ptr_array_free(pop->uids, TRUE);
   }
+  g_free(pop->host);
   g_free(pop);
   return res;
 }

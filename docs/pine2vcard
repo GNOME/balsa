@@ -1,0 +1,87 @@
+#!/bin/sh
+# PROGAM:   pine2vcard v0.1
+# SCOPE:    converts pine addressbook to vcard addressbook
+# AUTHOR:   Jean-Marc Wislez
+# DATE:     2000-09-06
+# USAGE: pine2cvard output.gcard
+# it reads standard pine address book and writes it to the file given as
+# the only parameter.
+# ------------------------------ Settings -----------------------------
+
+# This is the standard addressbook location for pine
+
+PINEADDRESSBOOK="$HOME/.addressbook"
+
+# The file to which the freshly created addressbook entries will be
+# appended.
+if [ -z "$1" ]; then
+   echo "Usage: $0 output.gcard"
+   exit 1
+fi
+DESTINATION="$1"
+
+# These are the standard settings for the addressbook for pine.  
+# If you however decided to change the addressbook format, you can
+# update this section to reflect the changes.
+
+NICKNAME="1"
+FULLNAME="2"
+ADDRESS="3"
+FCC=""
+COMMENT=""
+
+# -------------------------- End of settings --------------------------
+
+echo "Converting addresses in $PINEADDRESSBOOK."
+echo "Appending VCARD entries to $DESTINATION."
+
+awk -F'\t' '                                                     \
+ BEGIN {count=0; DISTLISTS=""}                                  \
+{                                                                \
+  if (FULLNAME == "1") NAMESTRING=$1;                            \
+  if (FULLNAME == "2") NAMESTRING=$2;                            \
+  if (FULLNAME == "3") NAMESTRING=$3;                            \
+  if (FULLNAME == "4") NAMESTRING=$4;                            \
+  if (FULLNAME == "5") NAMESTRING=$5;                            \
+                                                                 \
+  if (ADDRESS == "1") EMAIL=$1;                                  \
+  if (ADDRESS == "2") EMAIL=$2;                                  \
+  if (ADDRESS == "3") EMAIL=$3;                                  \
+  if (ADDRESS == "4") EMAIL=$4;                                  \
+  if (ADDRESS == "5") EMAIL=$5;                                  \
+                                                                 \
+  if (NICKNAME == "1") NICK=$1;                                  \
+  if (NICKNAME == "2") NICK=$2;                                  \
+  if (NICKNAME == "3") NICK=$3;                                  \
+  if (NICKNAME == "4") NICK=$4;                                  \
+  if (NICKNAME == "5") NICK=$5;                                  \
+                                                                 \
+  if (COMMENT == "1") COMMENTS=$1;                               \
+  if (COMMENT == "2") COMMENTS=$2;                               \
+  if (COMMENT == "3") COMMENTS=$3;                               \
+  if (COMMENT == "4") COMMENTS=$4;                               \
+  if (COMMENT == "5") COMMENTS=$5;                               \
+                                                                 \
+  if (substr(EMAIL,1,1) == "(") DISTLISTS="yes";                \
+}                                                                \
+                                                                 \
+NAMESTRING ~ /,/ { split(NAMESTRING,name,", ");                  \
+         FN = name[2] " " name[1];                               \
+          N = name[1] ";" name[2] }                              \
+NAMESTRING !~ /,/ {N = ""; FN = NAMESTRING}                      \
+                                                                 \
+{ if (DISTLISTS!="yes") {count++;                                                       \
+  print "BEGIN:VCARD" >> DESTINATION;                            \
+  print "FN:" FN >> DESTINATION;                                 \
+  if (N != "") print "N:" N >> DESTINATION;                      \
+  print "REV:" REV >> DESTINATION;                               \
+  print "EMAIL;INTERNET:" EMAIL >> DESTINATION;                  \
+  print "NOTE;PINE-ABBREVIATION:" NICK >> DESTINATION;           \
+  if (COMMENTS != "") print "NOTE;QUOTED-PRINTABLE:" COMMENTS >> DESTINATION; \
+  print "END:VCARD\n" >> DESTINATION  } }                            \
+                                                                   \
+  END {printf ("Converted %d addresses.\n", count)};               \
+ ' REV="`date +%Y-%m-%dT%T`" NICKNAME="$NICKNAME"                  \
+    FULLNAME="$FULLNAME" ADDRESS="$ADDRESS" FCC="$FCC"             \
+    COMMENT="$COMMENT" DESTINATION="$DESTINATION" $PINEADDRESSBOOK    
+

@@ -63,6 +63,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-, root, root)
 %doc README COPYING ChangeLog NEWS TODO AUTHORS HACKING docs/mh-mail-HOWTO
+%doc docs/vconvert.awk docs/pine2vcard
 %{prefix}/bin/balsa
 /usr/share/gnome/apps/Internet/balsa.desktop
 %{prefix}/share/gnome/help/balsa/*

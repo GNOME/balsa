@@ -1,3 +1,12 @@
+2000-10-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* docs/vconvert.awk, docs/pine2vcard: the contributed address book
+	converters by Stewart Evans <stewart@lutris.com> and 
+	Jean-Marc Wislez <jmw@pandora.be>, respectively.
+	* Makefile.am: add these files to the tarball...
+	* balsa.spec.in: and to the rpm
+	* libbalsa/send.c: formatting touched.
+	
 2000-10-06  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/*: Fixed some places where indent didn't handle long lines

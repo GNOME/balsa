@@ -178,7 +178,7 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 	    gchar *path =
 		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
 					       (abc->ab_specific.vcard.path), FALSE);
-	    if (path != NULL)
+	    if (path != NULL) 
 		address_book = libbalsa_address_book_vcard_new(name, path);
 #ifdef ENABLE_LDAP
 	} else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP) {
@@ -318,7 +318,7 @@ create_vcard_page(AddressBookConfig * abc)
     gtk_table_attach(GTK_TABLE(table), abc->name_entry, 1, 2, 0, 1,
 		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
-    label = gtk_label_new(_("Path"));
+    label = gtk_label_new(_("File name"));
     gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
 		     GTK_FILL, GTK_FILL, 10, 10);
@@ -481,16 +481,55 @@ next_button_cb(GtkWidget * button, AddressBookConfig * abc)
     gtk_widget_grab_focus(abc->name_entry);
 }
 
+/* handle_close:
+   handle the request to add/update the address book data.
+   NOTE: create_type cannot be made the switch select expression.
+*/
+static void
+handle_close(AddressBookConfig * abc)
+{
+    GtkWidget *ask;
+    gint clicked_button;
+
+    abc->cancelled = FALSE;
+
+    if( (abc->address_book && 
+	 LIBBALSA_IS_ADDRESS_BOOK_VCARD(abc->address_book)) ||
+	(!abc->address_book&&
+	 abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD)) {
+	gchar *path =
+	    gnome_file_entry_get_full_path(
+		GNOME_FILE_ENTRY(abc->ab_specific.vcard.path), FALSE);
+	
+	if(!path) {
+	    gchar *msg = g_strdup_printf(
+		_("The address book file path '%s' is not correct.\n"
+		  "Do you want to correct the file name?"), 
+		gtk_entry_get_text(GTK_ENTRY(
+		    gnome_file_entry_gtk_entry(
+			GNOME_FILE_ENTRY(abc->ab_specific.vcard.path)))));
+	    ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
+					GNOME_STOCK_BUTTON_OK,
+					GNOME_STOCK_BUTTON_CANCEL, NULL);
+	    g_free(msg);
+	    gnome_dialog_set_default(GNOME_DIALOG(ask), 1);
+	    clicked_button = gnome_dialog_run_and_close(GNOME_DIALOG(ask));
+	    if(clicked_button == 0) return;
+	    else abc->cancelled = TRUE;
+	} else g_free(path);
+    }
+
+    gnome_dialog_close(GNOME_DIALOG(abc->window));
+}
 static void
 add_button_cb(GtkWidget * button, AddressBookConfig * abc)
 {
-    abc->cancelled = FALSE;
-    gnome_dialog_close(GNOME_DIALOG(abc->window));
+    handle_close(abc);
 }
 
 static void
 update_button_cb(GtkWidget * button, AddressBookConfig * abc)
 {
-    abc->cancelled = FALSE;
-    gnome_dialog_close(GNOME_DIALOG(abc->window));
+    printf("Update buttn cb\n");
+    handle_close(abc);
 }

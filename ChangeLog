@@ -5,6 +5,8 @@
 	* src/balsa-index-page.c,src/balsa-mblist.c: some extra tests
 	on function arguments.
 	* src/sendmsg-window.c: warn if the file to be attached is unreadable.
+	* src/address-book-config.c: fix #26292 (crash on address book entry
+	creation with empty file name).
 
 2000-10-17  Gediminas Paulauskas <menesis@delfi.lt>
 

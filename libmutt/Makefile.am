@@ -25,6 +25,7 @@ libmutt_a_SOURCES = \
 	md5c.c		\
 	mh.c 		\
 	mx.c 		\
+	mutt_ssl.c	\
 	mutt_socket.c	\
 	parse.c 	\
 	pattern.c 	\

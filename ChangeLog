@@ -1,3 +1,10 @@
+1999-01-08  Nat Friedman  <nat@nat.org>
+
+	* src/main-window.c (settings_menu): No separator before
+ 	Preferences.
+
+	(main_menu): Added N_() around "Message" and "Mailboxes"
+
 1999-01-08  bertrand  <Bertrand.Guiheneuf@inria.fr>
 
 	* src/index-child.c (index_child_new): when the mailbox

@@ -599,7 +599,7 @@ msgstr "В╕дм╕чання %d пов╕домлень стертими..."
 #: libmutt/imap/imap.c:896
 #, c-format
 msgid "Saving message status flags... [%d/%d]"
-msgstr ""
+msgstr "Збереження ╕ндикатор╕в стану пов╕домлень... [%d/%d]"
 
 #: libmutt/imap/imap.c:953
 #, fuzzy
@@ -711,7 +711,7 @@ msgstr "Перев╕дкривання поштово╖ скриньки"
 
 #: libmutt/mutt_socket.c:203
 msgid "SSL is unavailable."
-msgstr ""
+msgstr "SSL не доступний."
 
 #: libmutt/mutt_socket.c:239
 #, fuzzy
@@ -729,9 +729,9 @@ msgid "Could not find the host \"%s\""
 msgstr "Помилка: Не вдалось знайти адресу для машини %s."
 
 #: libmutt/mutt_socket.c:337 libmutt/mutt_socket.c:377
-#, fuzzy, c-format
+#, c-format
 msgid "Connecting to %s..."
-msgstr "З'╓днання з %s"
+msgstr "З'╓днання з %s..."
 
 #: libmutt/mutt_socket.c:400
 #, fuzzy, c-format
@@ -741,9 +741,8 @@ msgstr ""
 "%s"
 
 #: libmutt/mutt_socket.c:401
-#, fuzzy
 msgid "unknown error"
-msgstr "помилка з'╓днання"
+msgstr "нев╕дома помилка"
 
 #: libmutt/mutt_ssl.c:105
 msgid "Failed to find enough entropy on your system"
@@ -757,7 +756,7 @@ msgstr "Заповнення накопичувача ентроп╕╖"
 #: libmutt/mutt_ssl.c:128
 #, c-format
 msgid "%s has insecure permissions!"
-msgstr ""
+msgstr "%s ма╓ небезпечний режим доступу!"
 
 #: libmutt/mutt_ssl.c:147
 msgid "SSL disabled due the lack of entropy"
@@ -768,9 +767,9 @@ msgid "Unable to get certificate from peer"
 msgstr "Не вдалось отримати сертиф╕кат з вузла"
 
 #: libmutt/mutt_ssl.c:245
-#, fuzzy, c-format
+#, c-format
 msgid "SSL connection using %s (%s)"
-msgstr "SSL-з'╓днання використовуючи %s"
+msgstr "SSL-з'╓днання використовуючи %s (%s)"
 
 #: libmutt/mutt_ssl.c:275
 msgid "Unknown"
@@ -1093,13 +1092,13 @@ msgid "Date"
 msgstr "Дата"
 
 #: src/balsa-index.c:569
-#, fuzzy, c-format
+#, c-format
 msgid "Opening mailbox %s. Please wait..."
-msgstr "Перев╕дкривання поштово╖ скриньки"
+msgstr "В╕дкривання поштово╖ скриньки %s. Зачекайте..."
 
 #: src/balsa-index.c:601
 msgid "To"
-msgstr "До:"
+msgstr "До"
 
 #: src/balsa-index.c:1806
 #, fuzzy
@@ -1281,9 +1280,9 @@ msgid ""
 msgstr ""
 
 #: src/balsa-message.c:1154
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot open temporary file %s."
-msgstr "Неможливо в╕дкрити файл %s.\n"
+msgstr "Неможливо в╕дкрити тимчасовий файл %s."
 
 #: src/balsa-message.c:1471
 msgid "Save..."
@@ -1488,19 +1487,16 @@ msgid "Balsa Filters"
 msgstr "Ф╕льтри Balsa"
 
 #: src/folder-conf.c:63
-#, fuzzy
 msgid "Remote IMAP folder"
-msgstr "В╕ддалений сервер SMTP"
+msgstr "В╕ддалена тека IMAP"
 
 #: src/folder-conf.c:64
-#, fuzzy
 msgid "Create"
-msgstr "символи"
+msgstr "Створити"
 
 #: src/folder-conf.c:73
-#, fuzzy
 msgid "Remote IMAP folder set"
-msgstr "В╕ддалений сервер SMTP"
+msgstr "В╕ддалений наб╕р тек IMAP"
 
 #. INPUT FIELD CREATION
 #: src/folder-conf.c:80
@@ -1671,9 +1667,8 @@ msgid "_Filter messages through procmail"
 msgstr "Ф╕льтрувати пов╕домлення через procmail"
 
 #: src/mailbox-conf.c:765
-#, fuzzy
 msgid "_Check this mailbox for new mail"
-msgstr "Пер╕одично перев╕ряти цю поштову скриньку на нову пошту"
+msgstr "Перев╕ряти цю поштову скриньку на нову пошту"
 
 #: src/mailbox-conf.c:812
 msgid "F_older Path:"
@@ -1684,7 +1679,6 @@ msgid "The folder edition to be written."
 msgstr ""
 
 #: src/mailbox-node.c:528 src/main-window.c:230
-#, fuzzy
 msgid "Local mbox mailbox..."
 msgstr "Локальна скринька Mbox..."
 
@@ -1701,9 +1695,8 @@ msgid "Remote IMAP mailbox..."
 msgstr "В╕ддалена скринька IMAP..."
 
 #: src/mailbox-node.c:537 src/main-window.c:251
-#, fuzzy
 msgid "Remote IMAP folder..."
-msgstr "В╕ддалена скринька IMAP..."
+msgstr "В╕ддалена тека IMAP..."
 
 #: src/mailbox-node.c:555
 msgid "Open"
@@ -2498,14 +2491,12 @@ msgid "Default Bcc to:"
 msgstr "Типове Bcc до:"
 
 #: src/pref-manager.c:1489
-#, fuzzy
 msgid "Default Reply string:"
-msgstr "Типовий домен:"
+msgstr "Типовий рядок в╕дпов╕д╕:"
 
 #: src/pref-manager.c:1490
-#, fuzzy
 msgid "Default Forward string:"
-msgstr "Типовий домен:"
+msgstr "Типовий рядок пересилання:"
 
 #: src/pref-manager.c:1492
 msgid "Encoding"
@@ -2516,9 +2507,8 @@ msgid "Main window"
 msgstr "Основне в╕кно"
 
 #: src/pref-manager.c:1565
-#, fuzzy
 msgid "Use preview pane"
-msgstr "використати панель попереднього перегляду"
+msgstr "Використовувати панель попереднього перегляду"
 
 #: src/pref-manager.c:1567
 msgid "Show mailbox statistics in left pane"
@@ -2529,10 +2519,8 @@ msgid "Use alternative main window layout"
 msgstr "Використовувати альтернативну схему розташування головного в╕кна"
 
 #: src/pref-manager.c:1571
-#, fuzzy
 msgid "Automatically view message when mailbox opened"
-msgstr ""
-"Автоматично закривати поштову скриньку, якщо вона простоювала б╕льш н╕ж"
+msgstr "Автоматично показувати пов╕омлення коли в╕дкрито скриньку"
 
 #: src/pref-manager.c:1576
 msgid "Toolbars"

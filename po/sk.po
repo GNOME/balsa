@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-01-01 08:17+0100\n"
-"PO-Revision-Date: 2005-01-01 08:20+0100\n"
+"POT-Creation-Date: 2005-01-04 20:25+0100\n"
+"PO-Revision-Date: 2005-01-04 20:26+0100\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -99,9 +99,14 @@ msgstr "_Organizácia:"
 msgid "_Email Address:"
 msgstr "Adresa _elektronickej pošty:"
 
-#: libbalsa/body.c:115 libbalsa/mailbox_local.c:1002 libbalsa/message.c:835
+#: libbalsa/body.c:115 libbalsa/mailbox_local.c:1136 libbalsa/message.c:835
 msgid "(No subject)"
 msgstr "(Bez predmetu)"
+
+#: libbalsa/files.c:237
+#, c-format
+msgid "Open with %s"
+msgstr "Otvoriť pomocou %s"
 
 #: libbalsa/filter-error.c:46
 msgid "Syntax error in the filter configuration file"
@@ -124,31 +129,31 @@ msgstr "Pokus o aplikáciu neplatného filtra"
 msgid "Invalid filters %s for mailbox %s"
 msgstr "Neplatné filtre %s pre poštovú schránku %s"
 
-#: libbalsa/filter.c:166
+#: libbalsa/filter.c:127 libbalsa/mailbox_local.c:397
 msgid "Unable to load message body to match filter"
 msgstr "Nemôžem načítať telo správy pre filtráciu"
 
-#: libbalsa/filter.c:266
+#: libbalsa/filter.c:228
 #, c-format
 msgid "Invalid filter: %s"
 msgstr "Neplatný filter: %s"
 
-#: libbalsa/filter.c:303 libbalsa/filter.c:326
+#: libbalsa/filter.c:265 libbalsa/filter.c:288
 #, c-format
 msgid "Bad mailbox name for filter: %s"
 msgstr "Zlý názov poštovej schránky pre filter: %s"
 
-#: libbalsa/filter.c:307
+#: libbalsa/filter.c:269
 #, c-format
 msgid "Error when copying messages: %s"
 msgstr "Chyba pri kopírovaní správ: %s"
 
-#: libbalsa/filter.c:317
+#: libbalsa/filter.c:279
 #, c-format
 msgid "Error when trashing messages: %s"
 msgstr "Chyba pri zahadzovaní správ do koša: %s"
 
-#: libbalsa/filter.c:330
+#: libbalsa/filter.c:292
 #, c-format
 msgid "Error when moving messages: %s"
 msgstr "Chyba pri presúvaní správ: %s"
@@ -257,8 +262,8 @@ msgid "%s: multiple keys for %s"
 msgstr "%s: viacnásobné kľúče pre %s"
 
 #. should "re" be localized ?
-#: libbalsa/identity.c:92 libbalsa/mailbox_local.c:1138
-#: libbalsa/mailbox_local.c:1140 src/sendmsg-window.c:3370
+#: libbalsa/identity.c:92 libbalsa/mailbox_local.c:1272
+#: libbalsa/mailbox_local.c:1274 src/sendmsg-window.c:3370
 #: src/sendmsg-window.c:3371
 msgid "Re:"
 msgstr "Odp:"
@@ -481,22 +486,22 @@ msgstr "Akceptovať a _Uložiť"
 msgid "_Reject"
 msgstr "_Odmietnuť"
 
-#: libbalsa/mailbox.c:412
+#: libbalsa/mailbox.c:392
 #, c-format
 msgid "Cannot load mailbox %s"
 msgstr "Nemôžem nahrať poštovú schránku %s"
 
-#: libbalsa/mailbox.c:419
+#: libbalsa/mailbox.c:399
 #, c-format
 msgid "No such mailbox type: %s"
 msgstr "Neznámy typ poštovej schránky: %s"
 
-#: libbalsa/mailbox.c:436
+#: libbalsa/mailbox.c:416
 #, c-format
 msgid "Bad local mailbox path \"%s\""
 msgstr "Zlá cesta k miestnej poštovej schránke \"%s\""
 
-#: libbalsa/mailbox.c:441
+#: libbalsa/mailbox.c:421
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr "Nemôžem vytvoriť poštovú schránku typu %s"
@@ -547,12 +552,12 @@ msgstr "Odosielam %ld kB"
 msgid "Server-side threading not supported."
 msgstr "Vlákna na serveri nie sú podporované."
 
-#: libbalsa/mailbox_local.c:1287
+#: libbalsa/mailbox_local.c:1421
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Otváranie %s zlyhalo. Errno = %d, "
 
-#: libbalsa/mailbox_local.c:1309
+#: libbalsa/mailbox_local.c:1443
 #, c-format
 msgid "Failed to sync mailbox \"%s\""
 msgstr "Zlyhala synchronizácia poštovej schránky \"%s\""
@@ -741,92 +746,92 @@ msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr ""
 "Poštová schránka (%s) je len na čítanie: nepodarilo sa zmeniť príznaky."
 
-#: libbalsa/misc.c:1217
+#: libbalsa/misc.c:1256
 msgid "west european"
 msgstr "západoeurópsky"
 
-#: libbalsa/misc.c:1219 libbalsa/misc.c:1253
+#: libbalsa/misc.c:1258 libbalsa/misc.c:1292
 msgid "east european"
 msgstr "východoeurópsky"
 
-#: libbalsa/misc.c:1221
+#: libbalsa/misc.c:1260
 msgid "south european"
 msgstr "juhoeurópsky"
 
-#: libbalsa/misc.c:1223
+#: libbalsa/misc.c:1262
 msgid "north european"
 msgstr "severoeurópsky"
 
-#: libbalsa/misc.c:1225 libbalsa/misc.c:1255
+#: libbalsa/misc.c:1264 libbalsa/misc.c:1294
 msgid "cyrillic"
 msgstr "cyrilika"
 
-#: libbalsa/misc.c:1227 libbalsa/misc.c:1261
+#: libbalsa/misc.c:1266 libbalsa/misc.c:1300
 msgid "arabic"
 msgstr "arabský"
 
-#: libbalsa/misc.c:1229 libbalsa/misc.c:1257
+#: libbalsa/misc.c:1268 libbalsa/misc.c:1296
 msgid "greek"
 msgstr "grécky"
 
-#: libbalsa/misc.c:1231 libbalsa/misc.c:1259
+#: libbalsa/misc.c:1270 libbalsa/misc.c:1298
 msgid "hebrew"
 msgstr "hebrejský"
 
-#: libbalsa/misc.c:1233
+#: libbalsa/misc.c:1272
 msgid "turkish"
 msgstr "turecký"
 
-#: libbalsa/misc.c:1235
+#: libbalsa/misc.c:1274
 msgid "nordic"
 msgstr "severský"
 
-#: libbalsa/misc.c:1237
+#: libbalsa/misc.c:1276
 msgid "thai"
 msgstr "thajský"
 
-#: libbalsa/misc.c:1239 libbalsa/misc.c:1263
+#: libbalsa/misc.c:1278 libbalsa/misc.c:1302
 msgid "baltic"
 msgstr "baltský"
 
-#: libbalsa/misc.c:1241
+#: libbalsa/misc.c:1280
 msgid "celtic"
 msgstr "keltský"
 
-#: libbalsa/misc.c:1243
+#: libbalsa/misc.c:1282
 msgid "west europe (euro)"
 msgstr "západná európa (euro)"
 
-#: libbalsa/misc.c:1245
+#: libbalsa/misc.c:1284
 msgid "russian"
 msgstr "ruský"
 
-#: libbalsa/misc.c:1247
+#: libbalsa/misc.c:1286
 msgid "ukranian"
 msgstr "ukrajinský"
 
-#: libbalsa/misc.c:1249
+#: libbalsa/misc.c:1288
 msgid "japanese"
 msgstr "japonský"
 
-#: libbalsa/misc.c:1251
+#: libbalsa/misc.c:1290
 msgid "korean"
 msgstr "kórejský"
 
-#: libbalsa/misc.c:1787
+#: libbalsa/misc.c:1826
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "Časový interval vypršal počas pokusu urobiť zámok fcntl!"
 
-#: libbalsa/misc.c:1794
+#: libbalsa/misc.c:1833
 #, c-format
 msgid "Waiting for fcntl lock... %d"
 msgstr "Čakám na zámok fcntl... %d"
 
-#: libbalsa/misc.c:1822
+#: libbalsa/misc.c:1861
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "Časový interval vypršal počas pokusu urobiť zámok flock!"
 
-#: libbalsa/misc.c:1829
+#: libbalsa/misc.c:1868
 #, c-format
 msgid "Waiting for flock attempt... %d"
 msgstr "Čakám na pokus o flock... %d"

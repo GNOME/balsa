@@ -2688,7 +2688,10 @@
     <title>IMAP Folder configuration</title>
     
     <para>The folder configuration edit dialog allows you to configure
-      entire mailbox sets on remote IMAP servers.</para>
+      entire mailbox sets on remote IMAP servers.
+      <emphasis>Note</emphasis> that this IMAP folder support is 
+      still experimental and you may experience some difficulties 
+      if you have bad luck.</para>
 
     <itemizedlist mark="bullet">
       <listitem><para>Descriptive name is the name of the root node
@@ -2704,6 +2707,8 @@
         the IMAP server.</para></listitem>
       <listitem><para>Password is the password used for authorization
         on the IMAP server.</para></listitem>
+      <listitem><para>Check box allows you to choose all mailboxes
+        on the server, or only those you subscribed to.</para></listitem>
       <listitem><para>Prefix is the root mailbox on the server. You
         may leave it empty if you want to show all the folders on your
         server but if your IMAP server stores also other kind of files

@@ -1,3 +1,10 @@
+2001-03-29  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* help/C/balsa.sgml: update IMAP folders section.
+	* NEWS, configure.in: release 1.1.3.
+	* libbalsa/mailbox_imap.c: extra g_return_if_fail test
+	* libbalsa/notify.c: handle NULL paths as equal to "".	
+
 2001-03-26  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/pref-manager.c, src/sendmsg-window.c: remove remainings of

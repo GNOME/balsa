@@ -51,8 +51,9 @@ libbalsa_notify_register_mailbox(LibBalsaMailbox * mailbox)
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 	LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 	if (server->user && server->passwd) {
+	    gchar *p =  LIBBALSA_MAILBOX_IMAP(mailbox)->path;
 	    path = g_strdup_printf("{%s:%i}%s", server->host, server->port,
-				   LIBBALSA_MAILBOX_IMAP(mailbox)->path);
+				   p ? p : "");
 	    user = server->user;
 	    passwd = server->passwd;
 	} else {

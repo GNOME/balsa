@@ -344,7 +344,7 @@ static int cmd_handle_untagged (IMAP_DATA* idata)
     /* server shut down our connection */
     s += 3;
     SKIPWS (s);
-    mutt_error ("Server said good bye: %s", s);
+    mutt_error (_("One of IMAP connections has been closed: %s"), s);
     idata->status = IMAP_BYE;
     if (idata->state == IMAP_SELECTED)
       mx_fastclose_mailbox (idata->ctx);

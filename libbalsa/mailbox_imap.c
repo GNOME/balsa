@@ -190,7 +190,7 @@ libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap* mailbox, const gchar* path)
     g_return_if_fail(mailbox);
     g_free(mailbox->path);
     mailbox->path = g_strdup(path);
-
+    g_return_if_fail(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
     server_settings_changed(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
 			    LIBBALSA_MAILBOX(mailbox));
 }

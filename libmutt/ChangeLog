@@ -1,3 +1,8 @@
+2001-03-29  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* imap/command.c: change tiomout message to more apriopriate.
+	* mutt_socket.c: remove broken connections from the connection list.
+
 2001-03-22  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* parse.c: Patch from Albrecht Dreﬂ <albrecht.dress@arcormail.de> 

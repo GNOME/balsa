@@ -137,8 +137,7 @@ static GtkWidget *create_information_message_menu(void);
 
 static GtkWidget *incoming_page(gpointer);
 static GtkWidget *outgoing_page(gpointer);
-static void destroy_pref_window_cb(GtkWidget * pbox,
-				   PropertyUI * property_struct);
+static void destroy_pref_window_cb(GtkWidget * pbox, gpointer data);
 static void set_prefs(void);
 static void apply_prefs(GnomePropertyBox * pbox, gint page_num);
 void update_pop3_servers(void);
@@ -491,10 +490,10 @@ smtp_changed(void)
  */
 
 static void
-destroy_pref_window_cb(GtkWidget * pbox, PropertyUI * property_struct)
+destroy_pref_window_cb(GtkWidget * pbox, gpointer data)
 {
-    g_free(property_struct);
-    property_struct = NULL;
+    g_free(pui);
+    pui = NULL; 
     already_open = FALSE;
 }
 
@@ -575,7 +574,7 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.alternative_layout = GTK_TOGGLE_BUTTON(pui->alternative_layout)->active;
     balsa_app.view_message_on_open = GTK_TOGGLE_BUTTON (pui->view_message_on_open)->active;
     
-//    if (balsa_app.alt_layout_is_active != balsa_app.alternative_layout)
+    /* if (balsa_app.alt_layout_is_active != balsa_app.alternative_layout)  */
 	balsa_change_window_layout(balsa_app.main_window);
     
     balsa_app.smtp = GTK_TOGGLE_BUTTON(pui->rb_smtp_server)->active;
@@ -633,7 +632,6 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     entry_widget = gnome_entry_gtk_entry(GNOME_ENTRY(pui->quote_pattern));
     tmp = gtk_entry_get_text(GTK_ENTRY(entry_widget));
     balsa_app.quote_regex = libbalsa_deescape_specials(tmp);
-    g_free(tmp);
 
 #ifndef HAVE_GNOME_PRINT
     /* printing */
@@ -724,7 +722,7 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_mblist_repopulate(balsa_app.mblist);
     balsa_window =
 	GTK_WIDGET(gtk_object_get_data(GTK_OBJECT(pbox), "balsawindow"));
-    balsa_window_refresh(BALSA_WINDOW(balsa_window));
+    balsa_window_refresh(BALSA_WINDOW(balsa_window)); 
 }
 
 
@@ -995,8 +993,7 @@ update_pop3_servers(void)
 
     BalsaMailboxNode *mbnode;
 
-    if (!pui)
-	return;
+    g_return_if_fail(pui);
 
     clist = GTK_CLIST(pui->pop3servers);
 

@@ -28,6 +28,7 @@
 #include "mailbox-conf.h"
 #include "mailbox-node.h"
 #include "save-restore.h"
+#include "notify.h"
 
 /* MailboxNode object is a GUI representation of a mailbox, or entire 
    set of them. It can read itself from the configuration, save its data,
@@ -149,6 +150,7 @@ balsa_mailbox_node_destroy(GtkObject * object)
 
     mn = BALSA_MAILBOX_NODE(object);
 
+    printf("destroying mailbox-node object\n");
     /* FIXME: should we use references to mailboxes? */
     mn->parent  = NULL; 
     mn->mailbox = NULL;
@@ -196,12 +198,25 @@ read_dir_cb(BalsaMailboxNode* mb, GNode* r)
     scanner_local_dir(r, mb->name, add_local_folder, add_local_mailbox);
 }
 
+static gboolean
+register_mailbox(GNode* node, gpointer data)
+{
+    g_return_val_if_fail(node->data, FALSE);
+    g_return_val_if_fail(BALSA_MAILBOX_NODE(node->data)->mailbox, FALSE);
+
+    libbalsa_notify_register_mailbox(BALSA_MAILBOX_NODE(node->data)->mailbox);
+    return FALSE;
+}
+
 static void
 imap_dir_cb(BalsaMailboxNode* mb, GNode* r)
 {
     g_return_if_fail(mb->server);
     scanner_imap_dir(r, mb->server, mb->dir, 3,
 	     add_imap_folder, add_imap_mailbox);
+    /* register whole tree */
+    g_node_traverse(r, G_IN_ORDER, G_TRAVERSE_LEAFS, -1,
+		    (GNodeTraverseFunc) register_mailbox, NULL);
 }
 
 BalsaMailboxNode *
@@ -650,6 +665,11 @@ static GNode* add_imap_entry(GNode*root, const char* fn,
 
 /* add_imap_mailbox:
    add given mailbox unless its base name begins on dot.
+   It is called as a callback from libmutt so it has to take measures not
+   to call libmutt again. In particular, it cannot call
+   libbalsa_mailbox_imap_set_path because ut would call in turn 
+   mailbox_notify_register, which calls in turn libmutt code.
+   
 */
 static GNode*
 add_imap_mailbox(GNode*root, const char* fn, char delim)
@@ -664,7 +684,7 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
     m = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
     libbalsa_mailbox_remote_set_server(
 	LIBBALSA_MAILBOX_REMOTE(m), BALSA_MAILBOX_NODE(root->data)->server);
-    libbalsa_mailbox_imap_set_path(m, fn);
+    m->path = g_strdup(fn);
     printf("Adding mailbox of name %s\n", basename);
     LIBBALSA_MAILBOX(m)->name = g_strdup(basename);
     return add_imap_entry(root, fn, m, delim);

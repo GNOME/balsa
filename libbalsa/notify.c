@@ -50,8 +50,6 @@ libbalsa_notify_register_mailbox(LibBalsaMailbox * mailbox)
 	user = passwd = NULL;
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 	LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-	/* imap notify is broken. Fix it first. */
-	return;
 	if (server->user && server->passwd) {
 	    path = g_strdup_printf("{%s:%i}%s", server->host, server->port,
 				   LIBBALSA_MAILBOX_IMAP(mailbox)->path);
@@ -129,6 +127,7 @@ libbalsa_notify_start_check(void)
     /* Might as well use check rather than notify. All notify does is */
     /* write messages for each mailbox */
     libbalsa_lock_mutt();
+    set_option (OPTIMAPPASSIVE);
     mutt_buffy_check(FALSE);
     libbalsa_unlock_mutt();
 }

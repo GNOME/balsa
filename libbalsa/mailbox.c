@@ -299,6 +299,7 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
     if (got_default) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("Cannot load mailbox %s"), prefix);
+	gnome_config_pop_prefix();
 	return NULL;
     }
 

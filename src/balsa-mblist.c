@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -591,10 +591,9 @@ balsa_mblist_insert_mailbox(BalsaMBList * mblist,
 				   balsa_icon_get_bitmap(icon),
 				   NULL, NULL, TRUE, FALSE);
     mbnode = BALSA_MAILBOX_NODE(balsa_mailbox_node_new_from_mailbox(mailbox));
-    gtk_ctree_node_set_row_data_full(GTK_CTREE(mblist), ctnode, mbnode,
-				     (GtkDestroyNotify)
-				     gtk_object_destroy);
-
+    /* don't destroy mailbox nodes: they are owned by 
+       balsa_app.mailbox_nodes */
+    gtk_ctree_node_set_row_data(GTK_CTREE(mblist), ctnode, mbnode);
 }
 #endif
 
@@ -634,7 +633,7 @@ balsa_mblist_repopulate(BalsaMBList * bmbl)
 
     gtk_ctree_post_recursive(GTK_CTREE(bmbl), NULL,
 			     balsa_mblist_disconnect_mailbox_signals,
-			     NULL);
+			     NULL); 
 
     gtk_clist_freeze(GTK_CLIST(ctree));
     gtk_clist_clear(GTK_CLIST(ctree));

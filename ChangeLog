@@ -1,5 +1,18 @@
 2001-02-04  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* libbalsa/address-book.c: config_pop_prefix on error.
+	* libbalsa/mailbox.c: same.
+	* libbalsa/mailbox_imap.c: fix and enable IMAP checking support.
+	* libbalsa/notify.c: fix and enable imap checking support.
+	* src/balsa-index.c: use gtk_signal_connect_object instead of
+	gtk_signal_connect, it makes the code simpler. fix msg counting.
+	* src/balsa-mblist.c: don't destroy mailbox nodes on repopulate,
+	they are owned by balsa_app.mailbox_nodes.
+	* src/mailbox-node.c: register scanned IMAP mailboxes.
+	* src/pref-manager.c: don't free gtk_entry_get_text() result.
+	
+2001-02-04  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* help/C/balsa.sgml: add description of IMAP folder configuration.
 	* libbalsa/folder-scanners.c: be less verbose.
 	* libbalsa/mailbox.c: don't retry for ever on error.

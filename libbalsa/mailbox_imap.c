@@ -320,8 +320,8 @@ static void
 libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 {
     if (mailbox->open_ref == 0) {
-	/* if ( libbalsa_notify_check_mailbox(mailbox) )
-	   libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE); */
+	if ( libbalsa_notify_check_mailbox(mailbox) )
+	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE); 
     } else {
 	gint i = 0;
 	gint index_hint;
@@ -329,7 +329,6 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	LOCK_MAILBOX(mailbox);
 
 	index_hint = CLIENT_CONTEXT(mailbox)->vcount;
-
 	libbalsa_lock_mutt();
 	imap_allow_reopen(CLIENT_CONTEXT(mailbox));
 	if ((i = mx_check_mailbox(CLIENT_CONTEXT(mailbox), &index_hint, 0))

@@ -78,18 +78,13 @@ static void balsa_index_del (BalsaIndex * bindex, LibBalsaMessage * message);
 static void mailbox_message_changed_status_cb(LibBalsaMailbox * mb,
 					      LibBalsaMessage * message,
 					      BalsaIndex * bindex);
-static void mailbox_message_new_cb(LibBalsaMailbox * mb,
-				   LibBalsaMessage * message,
-				   BalsaIndex * bindex);
-static void mailbox_messages_new_cb(LibBalsaMailbox * mb,
-				    GList * messages,
-				    BalsaIndex * bindex);
-static void mailbox_message_delete_cb(LibBalsaMailbox * mb,
-				      LibBalsaMessage * message,
-				      BalsaIndex * bindex);
-static void mailbox_messages_delete_cb(LibBalsaMailbox * mb,
-				       GList  * message,
-				       BalsaIndex * bindex);
+static void mailbox_message_new_cb(BalsaIndex * bindex,
+				   LibBalsaMessage * message);
+static void mailbox_messages_new_cb(BalsaIndex * bindex, GList* messages);
+static void mailbox_message_delete_cb(BalsaIndex * bindex, 
+				      LibBalsaMessage * message);
+static void mailbox_messages_delete_cb(BalsaIndex * bindex, 
+				       GList  * message);
 
 /* clist callbacks */
 static void button_event_press_cb(GtkWidget * clist, GdkEventButton * event,
@@ -584,16 +579,16 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
     gtk_signal_connect(GTK_OBJECT(mailbox), "message-status-changed",
 		       GTK_SIGNAL_FUNC(mailbox_message_changed_status_cb),
 		       (gpointer) bindex);
-    gtk_signal_connect(GTK_OBJECT(mailbox), "message-new",
+    gtk_signal_connect_object(GTK_OBJECT(mailbox), "message-new",
 		       GTK_SIGNAL_FUNC(mailbox_message_new_cb),
 		       (gpointer) bindex);
-    gtk_signal_connect(GTK_OBJECT(mailbox), "messages-new",
+    gtk_signal_connect_object(GTK_OBJECT(mailbox), "messages-new",
 		       GTK_SIGNAL_FUNC(mailbox_messages_new_cb),
 		       (gpointer) bindex);
-    gtk_signal_connect(GTK_OBJECT(mailbox), "message-delete",
+    gtk_signal_connect_object(GTK_OBJECT(mailbox), "message-delete",
 		       GTK_SIGNAL_FUNC(mailbox_message_delete_cb),
 		       (gpointer) bindex);
-    gtk_signal_connect(GTK_OBJECT(mailbox), "messages-delete",
+    gtk_signal_connect_object(GTK_OBJECT(mailbox), "messages-delete",
 		       GTK_SIGNAL_FUNC(mailbox_messages_delete_cb),
 		       (gpointer) bindex);
 
@@ -1146,8 +1141,7 @@ mailbox_message_changed_status_cb(LibBalsaMailbox * mb,
 }
 
 static void
-mailbox_message_new_cb(LibBalsaMailbox * mb, LibBalsaMessage * message,
-		       BalsaIndex * bindex)
+mailbox_message_new_cb(BalsaIndex * bindex, LibBalsaMessage * message)
 {
     gnome_triggers_do("You have new mail!", "email", "newmail", NULL);
     gtk_clist_freeze(GTK_CLIST (bindex->ctree));
@@ -1158,11 +1152,12 @@ mailbox_message_new_cb(LibBalsaMailbox * mb, LibBalsaMessage * message,
       DO_CLIST_WORKAROUND(GTK_CLIST (bindex->ctree));
     }
     gtk_clist_thaw (GTK_CLIST (bindex->ctree));
+    balsa_mblist_update_mailbox(balsa_app.mblist, 
+                                bindex->mailbox_node->mailbox);
 }
 
 static void
-mailbox_messages_new_cb(LibBalsaMailbox * mb, GList *messages,
-		       BalsaIndex * bindex)
+mailbox_messages_new_cb(BalsaIndex * bindex, GList *messages)
 {
     LibBalsaMessage * message;
 
@@ -1177,18 +1172,19 @@ mailbox_messages_new_cb(LibBalsaMailbox * mb, GList *messages,
     gtk_clist_sort (GTK_CLIST (bindex->ctree));
     DO_CLIST_WORKAROUND(GTK_CLIST (bindex->ctree));
     gtk_clist_thaw (GTK_CLIST (bindex->ctree));
+
+    balsa_mblist_update_mailbox(balsa_app.mblist, 
+                                bindex->mailbox_node->mailbox);
 }
 
 static void
-mailbox_message_delete_cb(LibBalsaMailbox * mb, LibBalsaMessage * message,
-			  BalsaIndex * bindex)
+mailbox_message_delete_cb(BalsaIndex * bindex, LibBalsaMessage * message)
 {
     balsa_index_del(bindex, message);
 }
 
 static void
-mailbox_messages_delete_cb(LibBalsaMailbox * mb, GList * messages,
-			  BalsaIndex * bindex)
+mailbox_messages_delete_cb(BalsaIndex * bindex, GList * messages)
 {
     LibBalsaMessage * message;
     gtk_clist_freeze(GTK_CLIST(bindex->ctree));

@@ -80,7 +80,6 @@ libbalsa_address_init(LibBalsaAddress * addr)
     addr->last_name = NULL;
     addr->organization = NULL;
     addr->address_list = NULL;
-    addr->member_list = NULL;
 }
 
 static void
@@ -102,10 +101,6 @@ libbalsa_address_finalize(GObject * object)
     g_list_foreach(addr->address_list, (GFunc) g_free, NULL);
     g_list_free(addr->address_list);
     addr->address_list = NULL;
-
-    g_list_foreach(addr->member_list, (GFunc) g_object_unref, NULL);
-    g_list_free(addr->member_list);
-    addr->member_list = NULL;
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -601,11 +596,13 @@ rfc2822_mailbox(const gchar *full_name, gchar *address)
 }
 
 
-static gchar *rfc2822_group(const gchar *full_name, GList *addr_list)
+#if 0
+static gchar*
+rfc2822_group(const gchar *full_name, GList *addr_list)
 {
-    gchar *tmp_str;
     GString *str = g_string_new("");
     GList *addr_entry;
+    gchar *res;
 
     if(full_name) { 
 	if(needs_quotes(full_name))
@@ -615,28 +612,25 @@ static gchar *rfc2822_group(const gchar *full_name, GList *addr_list)
     }
 
     if(addr_list) {
-	tmp_str = libbalsa_address_to_gchar(LIBBALSA_ADDRESS(addr_list->data), 0);
-	g_string_append(str, tmp_str);
-	g_free(tmp_str);
-
+	g_string_append(str, (gchar*)addr_list->data);
+        
 	for(addr_entry=g_list_next(addr_list); addr_entry; 
 	    addr_entry=g_list_next(addr_entry)) {
-	    tmp_str = libbalsa_address_to_gchar(LIBBALSA_ADDRESS(addr_entry->data), 0);
-	    g_string_append_printf(str, ", %s", tmp_str);
-	    g_free(tmp_str);
+	    g_string_append_printf(str, ", %s", (gchar*)addr_entry->data);
 	}
     }
     if(full_name)
 	g_string_append(str, ";");
     
-    tmp_str=str->str;
+    res=str->str;
     g_string_free(str, FALSE);
     
-    return tmp_str;
+    return res;
 }
+#endif
 
-
-static gchar *rfc2822_list(GList *list)
+static gchar*
+rfc2822_list(GList *list)
 {
     gchar *retc = NULL; 
     GString *str;
@@ -666,15 +660,13 @@ libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n)
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 
-    if(address->member_list || (n==-1 && !address->address_list))
-	retc = rfc2822_group(address->full_name, address->member_list);
-    else if(n==-1) {
+    /* FIXME: for n==-1, we should be returning nice rfc822_group but
+     * the entry widgets have not proper support for group string format
+     * so we drop this idea for a while. */
+    if(n==-1)
 	retc = rfc2822_list(address->address_list);
-    } else {
-	GList *nth_address;
-
-	nth_address = g_list_nth(address->address_list, n);
-
+    else {
+	GList *nth_address = g_list_nth(address->address_list, n);
 	g_return_val_if_fail(nth_address != NULL, NULL);
 
 	retc = rfc2822_mailbox(address->full_name, nth_address->data);

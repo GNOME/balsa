@@ -261,11 +261,12 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_box_pack_start(GTK_BOX(vbox), ab_option, FALSE, FALSE, 0);
 
     /* Entry widget for finding an address */
-    find_label = gtk_label_new(_("Search for Name:"));
+    find_label = gtk_label_new_with_mnemonic(_("_Search for Name:"));
     gtk_widget_show(find_label);
 
     ab->filter_entry = gtk_entry_new();
     gtk_widget_show(ab->filter_entry);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(find_label), ab->filter_entry);
     g_signal_connect(G_OBJECT(ab->filter_entry), "changed",
 		     G_CALLBACK(balsa_ab_window_find), ab);
     
@@ -774,8 +775,11 @@ balsa_ab_window_find(GtkWidget * group_entry, BalsaAbWindow * ab)
 
             gtk_tree_selection_select_path(selection, path);
             if (first_path) {
+                gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
+#if 0
                 gtk_tree_view_scroll_to_cell(tree_view, path, NULL,
                                              TRUE, 0.5, 0);
+#endif
                 first_path = FALSE;
             }
             gtk_tree_path_free(path);

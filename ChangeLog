@@ -1,3 +1,10 @@
+2003-08-31  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/address-book-ldif.c: parse more reliably address groups.
+	* libbalsa/address.[ch]: remove member_list - it is redundant.
+	* libbalsa/address-book.c: adapt to above.
+	* src/ab-window.c: Add shortcuts and improve scrolling.
+
 2003-08-27  Pawel Salek  <pawsa theochem.kth.se>
 
 	* src/sendmsg-window.c: add Serbian language; fix locale associated

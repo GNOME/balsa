@@ -343,6 +343,26 @@ value_spec_to_string(gchar* str)
 	res = g_strdup(g_strstrip(str));
     return res;
 }
+
+/* member_value_to_mail:
+ * str: dn of a an address book entry.
+ * returns: email address associated with the entry.
+ * We are cheap and just parse the dn. This may not work generally.
+ */
+static gchar*
+member_value_to_mail(gchar* str)
+{
+    gchar *res, *unencoded = value_spec_to_string(str);
+    gchar *mail = strstr(unencoded, "mail=");
+    if(mail) {
+        gchar *eos = strchr(mail,',');
+        if(eos) *eos = '\0';
+        res = g_strdup(mail+5);
+    } else res = NULL;
+    g_free(unencoded);
+    return res;
+}
+
 	
 static gchar*
 read_line(FILE* f)
@@ -422,67 +442,6 @@ address_new_prefill(GList* address_list, gchar* nickn, gchar* givenn,
 	address->full_name = g_strdup(_("No-Name"));
 
     return address;
-}
-    
-static LibBalsaAddress*
-find_addr(GList *ab_list, const gchar *id)
- /* *** Is there a standard function for this? */
-{
-    GList *addr;
-    gchar *cmpId=g_strdup(id);
-    
-    g_strstrip(cmpId);
-    
-    for(addr=ab_list; addr; addr=g_list_next(addr)) {
-	LibBalsaAddress *addr_data=(LibBalsaAddress *)addr->data;
-	gchar *addr_id = g_strdup(addr_data->nick_name);
-
-	g_strstrip(addr_id);
-
-	if(g_ascii_strcasecmp(cmpId, addr_id)==0) {
-	    g_free(addr_id);
-	    return addr_data;
-	}
-	g_free(addr_id);
-    }
-
-    g_free(cmpId);
-    
-    return NULL;
-}
-
-/* expand_addr_list:
-   expands address list cautiously to avoid circular references.
-*/
-static void
-expand_addr_list(LibBalsaAddress *address, GList *ab_list)
-{
-    GList *member, *notfound = NULL;
-    GList *member_list=NULL;
-    
-    for(member=address->address_list; member; member=g_list_next(member) ) {
-	gchar *member_data=member->data;
-	LibBalsaAddress *ref=find_addr(ab_list, member_data);
-
-	if(ref && ref != address) {
-	    member_list=g_list_prepend(member_list, ref);
-	    g_object_ref(ref);
-	    g_free(member_data);
-	} else
-            notfound = g_list_prepend(notfound, member_data);
-    }
-    g_list_free(address->address_list);
-    address->address_list = g_list_reverse(notfound);
-    address->member_list=g_list_reverse(member_list);
-}
-
-static void expand_ldif_addr(GList *ab_list)
-{
-    GList *addr;
-    
-    for(addr=ab_list; addr; addr=g_list_next(addr)) {
-	expand_addr_list(addr->data, ab_list);
-    }
 }
     
 static gboolean
@@ -576,7 +535,7 @@ load_ldif_file(LibBalsaAddressBook *ab)
 	if (g_ascii_strncasecmp(line, "member:", 7) == 0) {
 		address_list = 
 		    g_list_prepend(address_list, 
-				   value_spec_to_string(g_strchug(line+7)));
+				   member_value_to_mail(g_strchug(line+7)));
 	    continue;
 	}
 
@@ -608,7 +567,6 @@ load_ldif_file(LibBalsaAddressBook *ab)
 	    g_free(organization);
 	}
     }
-    expand_ldif_addr(list);
 
     list = g_list_sort(list, (GCompareFunc)address_compare);
     addr_ldif->address_list = list;
@@ -630,7 +588,7 @@ load_ldif_file(LibBalsaAddressBook *ab)
     completion_list = g_list_reverse(completion_list);
     g_completion_add_items(addr_ldif->alias_complete, completion_list);
     g_list_free(completion_list);
-    ab->dist_list_mode = FALSE; /* *** Clean up later */
+    ab->dist_list_mode = TRUE;
     return TRUE;
 }
 

@@ -1,3 +1,11 @@
+2001-01-29  Matthew Guenther  <guentherm@asme.org>
+
+	* src/balsa-index.c (balsa_index_load_mailbox_node): fixed casting
+	bug.
+	* src/balsa-index.c (moveto_handler): now selects first
+	unread/last message instead of just moving there when opening a
+	mailbox.
+
 2001-01-28  Matthew Guenther  <guentherm@asme.org>
 
 	* src/Makefile.am: remove balsa-index-page.c from compilation.

@@ -496,21 +496,39 @@ clist_click_column(GtkCList * clist, gint column, gpointer data)
 }
 
 
+
 /* 
  * This is an idle handler. Be sure to use gdk_threads_{enter/leave}
+ * 
+ * Description: moves to the first unread message in the index, and
+ * selects it.
  */
 static gboolean
 moveto_handler(BalsaIndex * bindex)
 {
+    gint row = -1;
+    gpointer row_data = NULL;
+    GList* list = NULL;
+    
+
     if (!GTK_WIDGET_VISIBLE(GTK_WIDGET(bindex)))
 	return TRUE;
 
     gdk_threads_enter();
-    if(bindex->first_new_message != NULL)
-      gtk_clist_moveto(GTK_CLIST (bindex->ctree), 
-		       gtk_clist_find_row_from_data(GTK_CLIST (bindex->ctree),
-						    bindex->first_new_message),
-		       -1, 0.0, 0.0);
+
+    if(bindex->first_new_message != NULL) {
+        row_data = bindex->first_new_message;
+    } else if ((list = GTK_CLIST (bindex->ctree)->selection) != NULL) {
+        list = g_list_last (list);
+        row_data = list->data;
+    }
+        
+    if (row_data) {
+        row = gtk_clist_find_row_from_data (GTK_CLIST (bindex->ctree),
+                                            row_data);
+        balsa_index_select_row (bindex, row);
+    }
+    
     gdk_threads_leave();
 
     return FALSE;
@@ -572,7 +590,7 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
     if (mailbox == balsa_app.sentbox ||
 	mailbox == balsa_app.draftbox || mailbox == balsa_app.outbox) {
 
-	gtk_clist_set_column_title(GTK_CLIST(bindex), 3, _("To"));
+	gtk_clist_set_column_title(GTK_CLIST(bindex->ctree), 3, _("To"));
     }
     
 
@@ -1260,8 +1278,8 @@ balsa_index_refresh(BalsaIndex * bindex)
     clist = GTK_CLIST (bindex->ctree);
     gtk_clist_freeze(clist);
 
-    old_message =
-	gtk_clist_get_row_data(clist, bi_get_largest_selected(clist));
+    old_message = 
+        gtk_clist_get_row_data(clist, bi_get_largest_selected(clist));
     gtk_clist_unselect_all(clist);
     gtk_clist_clear(clist);
 
@@ -1293,7 +1311,7 @@ balsa_index_refresh(BalsaIndex * bindex)
     }
 
     if (gtk_clist_row_is_visible(clist, i) != GTK_VISIBILITY_FULL) 
-        gtk_clist_moveto(clist, i, 0, 0.0, 0.0);
+        gtk_clist_moveto(clist, i, -1, 0.5, 0.0);
 
     gtk_clist_thaw(clist);
 }

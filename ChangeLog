@@ -1,5 +1,9 @@
 2000-04-08  Peter Williams  <peter@beta.newton.cx>
 
+	* AUTHORS: Made this make more sense and reflect
+	  the changes in development team over the lifecycle
+	  of Balsa.
+
 	* configure.in: Print a little warning if
 	  the source is CVS source.
 

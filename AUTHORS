@@ -1,36 +1,61 @@
-Original Authors:
-  Stuart Parmenter       <pavlov@innerx.net>
-  Jay Painter            <jpaint@serv.net>
+Version 0.8.0:
 
--=-=-=-=-=-=-=-=-
+	Code from:
 
-Major Contributors:
- 0.6.0:
-  Peter Williams         <peter@newton.cx>
-  David Pickens          <dpickens@iaesthetic.com>
-  Héctor García Álvarez  <hector@scouts-es.org>
-  Bruno Pires Marinho    <bapm@camoes.rnl.ist.utl.pt>
+	Héctor García Álvarez	<hector@scouts-es.org>
+	Matthew Guenther	<mguenthe@netcom.ca>
+	Bruno Pires Marinho	<bapm@camoes.rnl.ist.utl.pt>
+	David Pickens		<dpickens@iaesthetic.com>
+	Pawel Salek		<pawsa@theochem.kth.se>
+	Peter Williams		<peter@newton.cx>
 
- 0.4.9:
-  Michael Lausch         <mla@gams.co.at>
+	Special thanks to:
 
--=-=-=-=-=-=-=-=-
+	Ian Campbell		<ijc25@cam.ac.uk>
+		for nice new message viewer (coming soon to
+		a CVS tree near you....)
+	Anthony DeRobertis	<asd@suespammers.org>
+		for patches and ideas
+	and our bug reporters and stompers
 
-Special thanks to:
+Versio 0.6.0:
 
-  Tuomas Kuosmanen <tigert@gimp.org>
-    for all the beutiful icons in Balsa!  These add so much to
-    Balsa!  I know I keep asking you for things and I really appriciate
-    everything you have done!  Also thanks for the awesome Balsa logo!
+	Code from:
 
-  Larry Ewing
-    for the amazing Balsa airplane
+	Héctor García Álvarez	<hector@scouts-es.org>
+	Bruno Pires Marinho	<bapm@camoes.rnl.ist.utl.pt>
+	David Pickens		<dpickens@iaesthetic.com>
+	Peter Williams		<peter@newton.cx>
+
+	Special thanks to:
+
+	Stuart Parmenter	<pavlov@netscape.com>
+		for letting us bring Balsa back to life.
+	and everyone else who contributed ideas and patches
+
+Version 0.4.9 and before:
+
+	Code from:
+
+	Michael Lausch		<mla@gams.co.at>
+	Jay Painter		<jpaint@serv.net>
+	Stuart Parmenter	<pavlov@netscape.com>
+
+	Special thanks to:
+
+	Tuomas Kuosmanen <tigert@gimp.org>
+		for all the beautiful icons in Balsa! They add so much to
+		Balsa!  I know I keep asking you for things and I really appreciate
+		everything you have done!  Also thanks for the awesome Balsa logo!
+
+	Larry Ewing
+		for the amazing Balsa airplane.
   
-  Nat Friedman <nat@nat.org>
-    for doing the libPropList work in Balsa.
+	Nat Friedman <nat@nat.org>
+		for doing the libPropList work in Balsa.
 
-  Manish Singh <yosh@gimp.org>
-    for always looking at stuff when I need help.  Especially with
-    autoconf stuff.
+	Manish Singh <yosh@gimp.org>
+		for always looking at stuff when I need help.  Especially with
+		autoconf stuff.
 
-  And everyone else I am sure I have left out here.
+	And everyone else I am sure I have left out here.

@@ -41,6 +41,10 @@ static void mailbox_listener (MailboxWatcherMessage * mw_message);
 
 
 /* clist callbacks */
+static void
+  button_event_press_cb (GtkCList * clist,
+			 GdkEventButton * event,
+			 gpointer data);
 static void select_message (GtkWidget * widget,
 			    gint row,
 			    gint column,
@@ -196,6 +200,11 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_signal_connect (GTK_OBJECT (clist),
 		      "unselect_row",
 		      (GtkSignalFunc) unselect_message,
+		      (gpointer) bindex);
+
+  gtk_signal_connect (GTK_OBJECT (clist),
+		      "button_press_event",
+		      (GtkSignalFunc) button_event_press_cb,
 		      (gpointer) bindex);
 
   gtk_widget_show (GTK_WIDGET (clist));
@@ -363,7 +372,7 @@ balsa_index_add (BalsaIndex * bindex,
 
   text[1] = flag_str (message->flags);
 
-  text[2] = NULL;  /* attachments */
+  text[2] = NULL;		/* attachments */
 
   text[3] = buff2;
 
@@ -474,6 +483,35 @@ flag_str (MessageFlags flags)
 
 
 /* CLIST callbacks */
+
+static void
+button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
+{
+  gint row, column;
+  Message *message;
+  BalsaIndex *bindex;
+
+  if (event->window != clist->clist_window)
+    return;
+
+  if (!event || event->button != 3)
+	  return;
+
+  gtk_clist_get_selection_info (clist, event->x, event->y + clist->voffset, &row, &column);
+
+  bindex = BALSA_INDEX (data);
+  message = (Message *) gtk_clist_get_row_data (clist, row);
+
+  bindex->selection = g_list_append (bindex->selection, message);
+
+  gtk_clist_select_row (clist, row, -1);
+
+  if (message)
+    gtk_signal_emit (GTK_OBJECT (bindex),
+		     balsa_index_signals[SELECT_MESSAGE],
+		     message,
+		     event);
+}
 
 static void
 select_message (GtkWidget * widget,

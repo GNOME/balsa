@@ -817,8 +817,10 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
     if (message->mime_msg) {
 	msg = message->mime_msg;
     } else {
-	message->mime_msg = msg = libbalsa_mailbox_get_message( message->mailbox,
-						message->msgno);
+	LibBalsaMessage *m;
+	g_warning("%s: this path should never be executed!", __func__);
+	m = libbalsa_mailbox_get_message(message->mailbox, message->msgno);
+	message->mime_msg = msg = m->mime_msg;
 	/* clean up potentialy prefetched headers, use headers from mime_msg */
 	libbalsa_message_headers_destroy(message->headers);
 	message->headers = g_new0(LibBalsaMessageHeaders, 1);

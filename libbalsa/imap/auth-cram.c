@@ -97,7 +97,7 @@ imap_auth_cram(ImapMboxHandle* handle, const char* user, const char* pass)
    *   blissfully RFC-compliant.
    */
   hmac_md5 (pass, obuf, hmac_response);
-  snprintf (obuf, sizeof (obuf),
+  g_snprintf (obuf, sizeof (obuf),
     "%s %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
     user,
     hmac_response[0], hmac_response[1], hmac_response[2], hmac_response[3],

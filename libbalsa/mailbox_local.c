@@ -255,6 +255,7 @@ libbalsa_mailbox_local_real_mbox_match(LibBalsaMailbox *mbox,
     UNLOCK_MAILBOX(mbox);
 }
 
+#if 0
 /* libbalsa_mailbox_free_messages:
    removes all the messages from the mailbox.
    Messages are unref'ed and not directly destroyed because they migt
@@ -289,7 +290,7 @@ libbalsa_mailbox_free_messages(LibBalsaMailboxLocal *mailbox)
     mbox->total_messages = 0;
     mbox->unread_messages = 0;
 }
-
+#endif
 
 /* libbalsa_mailbox_sync_backend_real
  * synchronize the frontend and libbalsa: build a list of messages

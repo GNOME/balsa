@@ -33,6 +33,7 @@
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
+#include "misc.h"
 /* for mx_lock_file and mx_unlock_file */
 #include "mailbackend.h"
 
@@ -62,7 +63,7 @@ static gboolean libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_mbox_close_backend(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox);
-static GMimeMessage *libbalsa_mailbox_mbox_get_message(
+static LibBalsaMessage *libbalsa_mailbox_mbox_get_message(
 						  LibBalsaMailbox * mailbox,
 						  guint msgno);
 static LibBalsaMessage *libbalsa_mailbox_mbox_load_message(
@@ -744,9 +745,8 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
     return TRUE;
 }
 
-static GMimeMessage *libbalsa_mailbox_mbox_get_message(
-						  LibBalsaMailbox * mailbox,
-						  guint msgno)
+static LibBalsaMessage*
+libbalsa_mailbox_mbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     struct message_info *msg_info;
 
@@ -758,7 +758,11 @@ static GMimeMessage *libbalsa_mailbox_mbox_get_message(
     if (!msg_info)
 	return NULL;
 
-    return msg_info->mime_message;
+    if (!msg_info->message)
+	msg_info->message = 
+	    libbalsa_mailbox_mbox_load_message(mailbox, msgno);
+
+    return msg_info->message;
 }
 
 static LibBalsaMessage*

@@ -58,10 +58,11 @@ static gboolean bndx_popup_menu(GtkWidget * widget);
 /* statics */
 
 /* Sorting */
+#if 0
 static gint date_compare(LibBalsaMessage * m1, LibBalsaMessage * m2);
 static gint numeric_compare(LibBalsaMessage * m1, LibBalsaMessage * m2);
 static gint size_compare(LibBalsaMessage * m1, LibBalsaMessage * m2);
-
+#endif
 /* Setting style */
 static void bndx_set_col_images(BalsaIndex * index, GtkTreeIter * iter,
                                 LibBalsaMessage * message);
@@ -100,13 +101,13 @@ static void bndx_changed_find_row(BalsaIndex * index);
 #if 0
 static void bndx_add_message(BalsaIndex * index, LibBalsaMessage * message);
 static void bndx_messages_remove(BalsaIndex * index, GList * messages);
-#endif
 static gboolean bndx_refresh_size_func(GtkTreeModel * model,
                                        GtkTreePath * path,
                                        GtkTreeIter * iter, gpointer data);
 static gboolean bndx_refresh_date_func(GtkTreeModel * model,
                                        GtkTreePath * path,
                                        GtkTreeIter * iter, gpointer data);
+#endif
 static void bndx_hide_deleted(BalsaIndex * index, gboolean hide);
 
 /* mailbox callbacks */
@@ -138,8 +139,11 @@ static void bndx_tree_collapse_cb(GtkTreeView * tree_view,
                                   GtkTreeIter * iter, GtkTreePath * path,
                                   gpointer user_data);
 static void bndx_column_click(GtkTreeViewColumn * column, gpointer data);
+#if 0
 static gint bndx_row_compare(GtkTreeModel * model, GtkTreeIter * iter1,
                              GtkTreeIter * iter2, gpointer data);
+static void bndx_moveto(BalsaIndex * index);
+#endif
 
 /* formerly balsa-index-page stuff */
 enum {
@@ -156,7 +160,6 @@ static void bndx_drag_cb(GtkWidget* widget,
                                 guint info,
                                 guint time,
                                 gpointer user_data);
-static void bndx_moveto(BalsaIndex * index);
 
 /* Popup menu */
 static GtkWidget* bndx_popup_menu_create(BalsaIndex * index);
@@ -191,14 +194,16 @@ static void bndx_expand_to_row(BalsaIndex * index, GtkTreePath * path);
 static void bndx_select_row(BalsaIndex * index, GtkTreePath * path);
 static void bndx_load_and_thread(BalsaIndex * index, int thtype);
 static void bndx_set_tree_store(BalsaIndex * index);
+static void bndx_set_threading_type(BalsaIndex * index, int thtype);
+#if 0
 static void bndx_set_sort_order(BalsaIndex * index,
 				LibBalsaMailboxSortFields field,
 				LibBalsaMailboxSortType order);
-static void bndx_set_threading_type(BalsaIndex * index, int thtype);
 static GNode *bndx_make_tree(BalsaIndex * index, GtkTreeIter * iter,
                              GtkTreePath * path);
 static void bndx_copy_tree(BalsaIndex * index, GNode * node,
                            GtkTreeIter * parent_iter);
+#endif
 
 /* Other callbacks. */
 static void bndx_store_address(GtkWidget * widget, gpointer data);
@@ -602,9 +607,9 @@ static void
 bndx_selection_changed_func(GtkTreeModel * model, GtkTreePath * path,
                             GtkTreeIter * iter, gpointer data)
 {
+#if 0
     struct BndxSelectionChangedInfo *sci = data;
 
-#if 0
     gtk_tree_model_get(model, iter, BNDX_MESSAGE_COLUMN, &sci->message,
                        -1);
     if (sci->message == sci->current_message)
@@ -896,6 +901,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
  * Description: moves to the first unread message in the index, or the
  * last message if none is unread, and selects it.
  */
+#if 0
 static void
 bndx_moveto(BalsaIndex * index)
 {
@@ -916,7 +922,7 @@ bndx_moveto(BalsaIndex * index)
     bndx_expand_to_row_and_select(index, &iter,
                                   balsa_app.view_message_on_open);
 }
-
+#endif
 /*
  * select message interfaces
  *
@@ -1596,10 +1602,10 @@ mailbox_messages_added_cb(BalsaIndex * bindex, GList *messages)
 static void
 mailbox_messages_removed_cb(BalsaIndex * bindex, GList * messages)
 {
-    struct index_list_pair *arg = g_new(struct index_list_pair,1);
 #if 1
     g_warning("%s called but not implemented.\n", __func__);
 #else
+    struct index_list_pair *arg = g_new(struct index_list_pair,1);
     arg->func = bndx_messages_remove; 
     arg->bindex  = bindex; arg->messages = g_list_copy(messages);
     g_object_add_weak_pointer(G_OBJECT(bindex), (gpointer) &arg->bindex);
@@ -2299,12 +2305,13 @@ static void
 bndx_hide_deleted(BalsaIndex * index, gboolean hide)
 {
     LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
+#if 1
+    libbalsa_mailbox_set_view(mailbox, 0, 
+                              hide ? LIBBALSA_MESSAGE_FLAG_DELETED : 0);
+#else
     GList *list;
     GList *messages = NULL;
 
-    libbalsa_mailbox_set_view(mailbox, 0, 
-                              hide ? LIBBALSA_MESSAGE_FLAG_DELETED : 0);
-#if 0
     for (list = mailbox->message_list; list; list = g_list_next(list)) {
         LibBalsaMessage *message = list->data;
 
@@ -2761,14 +2768,14 @@ bndx_select_row(BalsaIndex * index, GtkTreePath * path)
 static void
 bndx_load_and_thread(BalsaIndex * index, int thtype)
 {
+#if 1
+    bndx_set_tree_store(index);
+    g_warning("%s: enable backend supported threading here", __func__);
+#else
     LibBalsaMailbox *mailbox;
     GList *list;
 
     g_hash_table_foreach_remove(index->ref_table, (GHRFunc) gtk_true, NULL);
-    bndx_set_tree_store(index);
-#if 1
-    g_warning("enable backend supported threading here");
-#else
     mailbox = index->mailbox_node->mailbox;
     for (list = mailbox->message_list; list; list = list->next)
         bndx_add_message(index, list->data);
@@ -2809,6 +2816,7 @@ bndx_set_tree_store(BalsaIndex * index)
 #endif
 }
 
+#if 0
 /* Sort callback and helpers. */
 static gint
 bndx_row_compare(GtkTreeModel * model, GtkTreeIter * iter1,
@@ -2904,7 +2912,7 @@ bndx_set_sort_order(BalsaIndex * index, LibBalsaMailboxSortFields field,
 
     gtk_tree_sortable_set_sort_column_id(sortable, col_id, gtk_sort);
 }
-
+#endif
 static void
 bndx_set_threading_type(BalsaIndex * index, int thtype)
 {

@@ -98,9 +98,9 @@ static void libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
 
 static gboolean libbalsa_mailbox_imap_close_backend(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox);
-static GMimeMessage *libbalsa_mailbox_imap_get_message(
-						  LibBalsaMailbox * mailbox,
-						  guint msgno);
+static LibBalsaMessage* libbalsa_mailbox_imap_get_message(LibBalsaMailbox*
+							  mailbox,
+							  guint msgno);
 static LibBalsaMessage *libbalsa_mailbox_imap_load_message(
 						  LibBalsaMailbox * mailbox,
 						  guint msgno);
@@ -911,7 +911,6 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
     ImapResult rc = IMR_NO;
     ImapMboxHandle* handle;
     ImapSearchData * cbdata;
-    GList* msgs;
 
     *err = FALSE;
     
@@ -1364,7 +1363,7 @@ gboolean libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox)
     return TRUE;
 }
 
-GMimeMessage*
+LibBalsaMessage*
 libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     struct message_info *msg_info;
@@ -1405,7 +1404,12 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
 	g_object_unref(G_OBJECT(gmime_parser));
 	g_mime_stream_unref(gmime_stream);
     }
-    return msg_info->mime_message;
+
+    if (!msg_info->message)
+	msg_info->message =
+	    libbalsa_mailbox_imap_load_message(mailbox, msgno);
+
+    return msg_info->message;
 }
 
 static LibBalsaAddress *

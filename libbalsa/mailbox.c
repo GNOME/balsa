@@ -49,10 +49,6 @@ static void libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox
 							   * mailbox,
 							   gboolean flag);
-static gboolean libbalsa_mailbox_real_message_match(LibBalsaMailbox* mailbox,
-						    LibBalsaMessage * message,
-						    int op,
-						    GSList* conditions);
 static gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox* mailbox,
 						GSList * conditions);
 static void libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
@@ -210,6 +206,8 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->messages_status_changed = messages_status_changed_cb;
 
     klass->get_message_stream = NULL;
+    klass->get_message = NULL;
+    klass->load_message = NULL;
     klass->check = NULL;
     klass->message_match = NULL;
     klass->mailbox_match = NULL;
@@ -620,6 +618,7 @@ libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox * mailbox,
     mailbox->has_unread_messages = flag;
 }
 
+#if 0
 /* Default handler : just call match_conditions
    IMAP is the only mailbox type that implements its own way for that
  */
@@ -630,7 +629,7 @@ libbalsa_mailbox_real_message_match(LibBalsaMailbox* mailbox,
 {
     return match_conditions(op, conditions, message, FALSE);
 }
-
+#endif
 
 static void
 libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
@@ -861,14 +860,13 @@ libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox)
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->sync(mailbox);
 }
 
-GMimeMessage *
+LibBalsaMessage*
 libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     g_return_val_if_fail(mailbox != NULL, NULL);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
 
-    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message(mailbox,
-							    msgno);
+    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message(mailbox, msgno);
 }
 
 LibBalsaMessage *
@@ -965,7 +963,7 @@ static GtkTreePath *mbox_model_get_path        (GtkTreeModel      *tree_model,
 						GtkTreeIter       *iter);
 static void         mbox_model_get_value       (GtkTreeModel      *tree_model,
 						GtkTreeIter       *iter,
-						guint              column,
+						gint               column,
 						GValue            *value);
 static gboolean     mbox_model_iter_next       (GtkTreeModel      *tree_model,
 						GtkTreeIter       *iter);
@@ -1122,16 +1120,17 @@ mbox_model_get_path(GtkTreeModel *tree_model, GtkTreeIter  *iter)
 static void
 mbox_model_get_value(GtkTreeModel *tree_model,
 		     GtkTreeIter  *iter,
-		     guint column,
+		     gint column,
 		     GValue *value)
 {
     LibBalsaMailbox* lmm = LIBBALSA_MAILBOX(tree_model);
-    GMimeMessage* msg;
+    LibBalsaMessage* msg;
     guint msgno;
+    gchar *tmp;
     
     g_return_if_fail (iter != NULL);
     g_return_if_fail (iter->stamp == LIBBALSA_MAILBOX(tree_model)->stamp);
-    g_return_if_fail(column<ELEMENTS(mbox_model_col_type));
+    g_return_if_fail(column<(int)ELEMENTS(mbox_model_col_type));
  
     msgno = GPOINTER_TO_UINT( ((GNode*)iter->user_data)->data );
     msg = libbalsa_mailbox_get_message(lmm, msgno);
@@ -1144,13 +1143,15 @@ mbox_model_get_value(GtkTreeModel *tree_model,
     case LB_MBOX_ATTACH_COL:
 	g_value_set_string(value, "A");  break;
     case LB_MBOX_FROM_COL:
-	g_value_set_string(value,g_mime_message_get_header(msg, "from"));
+	tmp = libbalsa_address_to_gchar(msg->headers->from, -1);
+	g_value_set_string(value,tmp);
+	g_free(tmp);
         break;
     case LB_MBOX_SUBJECT_COL:
-	g_value_set_string(value, g_mime_message_get_header(msg, "subject"));
+	g_value_set_string(value, LIBBALSA_MESSAGE_GET_SUBJECT(msg));
 	break;
     case LB_MBOX_DATE_COL:
-	g_value_set_string(value, g_mime_message_get_header(msg, "date"));
+	g_value_set_string(value, g_mime_message_get_header(msg->mime_msg, "date"));
 	break;
     case LB_MBOX_SIZE_COL:
 	g_value_set_string(value, "unknown");

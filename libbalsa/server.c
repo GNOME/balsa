@@ -29,6 +29,7 @@
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 
 #include <string.h>
+#include <stdlib.h>
 
 static GObjectClass *parent_class = NULL;
 static void libbalsa_server_class_init(LibBalsaServerClass * klass);

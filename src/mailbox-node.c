@@ -76,7 +76,8 @@ static void handle_imap_path(const char *fn, char delim, int noselect,
 			     int noscan, void *data);
 static gint check_imap_path(const char *fn, LibBalsaServer * server,
 			    guint depth);
-static void mark_imap_path(const char *fn, void *data);
+static void mark_imap_path(const gchar * fn, gint noselect, gint noscan,
+			   gpointer data);
 
 enum {
     SAVE_CONFIG,
@@ -1274,10 +1275,15 @@ check_imap_path(const gchar *fn, LibBalsaServer * server, guint depth)
 
 /* mark_imap_path:
  *
- * find the imap_scan_item for fn and mark it as scanned.
+ * find the imap_scan_item for fn and set flags.
+ *
+ * noselect may be -1, 0, or 1; -1 means no change, 0 or 1
+ * mean set accordingly.
+ *
+ * noscan is always set
  */
 static void
-mark_imap_path(const char *fn, gpointer data)
+mark_imap_path(const gchar * fn, gint noselect, gint noscan, gpointer data)
 {
     imap_scan_tree *tree = data;
     GSList *list;
@@ -1287,10 +1293,14 @@ mark_imap_path(const char *fn, gpointer data)
     for (list = tree->list; list; list = list->next) {
         imap_scan_item *item = list->data;
         if (!strcmp(item->fn, fn)) {
-            item->scanned = TRUE;
-            if(balsa_app.debug) 
-	        printf(" mark path \"%s\" as scanned.\n", fn);
+            if (noselect >= 0)
+        	item->selectable = !noselect;
+            item->scanned = noscan;
+            if (balsa_app.debug)
+        	printf(" noselect %d, noscan %d.\n", noselect, noscan);
             break;
         }
     }
+    if (!list && balsa_app.debug)
+	printf(" not found.\n");
 }

@@ -148,24 +148,13 @@ struct browser_state
 };
 
 static void
-libbalsa_imap_add_folder(ImapMboxHandle * handle,
-			 int delim, ImapMboxFlags * flags, char *folder,
+libbalsa_imap_add_folder(char *folder, int delim, int noselect, int noscan,
 			 struct browser_state *state)
 {
-    gboolean noselect;
-    gboolean noscan;
-
-    g_return_if_fail(folder && *folder);
     if (folder[strlen(folder) - 1] == delim)
 	return;
 
     state->delim = delim;
-
-    noselect = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOSELECT) != 0);
-    /* These flags are different, but both mean that we don't need to
-     * scan the folder: */
-    noscan = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOINFERIORS)
-	      || IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASNOCHILDREN));
 
     /* this extra check is needed for subscribed folder handling. 
      * Read RFC when in doubt. */
@@ -177,6 +166,47 @@ libbalsa_imap_add_folder(ImapMboxHandle * handle,
 
     state->handle_imap_path(folder, delim, noselect, noscan,
 			    state->cb_data);
+}
+
+static void
+libbalsa_imap_list_cb(ImapMboxHandle * handle, int delim,
+		      ImapMboxFlags * flags, char *folder,
+		      struct browser_state *state)
+{
+    gboolean noselect;
+    gboolean noscan;
+
+    g_return_if_fail(folder && *folder);
+
+    noselect = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOSELECT) != 0);
+    /* These flags are different, but both mean that we don't need to
+     * scan the folder: */
+    noscan = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOINFERIORS)
+	      || IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASNOCHILDREN))
+	&& !IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASCHILDREN);
+
+    if (state->subscribed)
+	state->mark_imap_path(folder, noselect, noscan, state->cb_data);
+    else
+	libbalsa_imap_add_folder(folder, delim, noselect, noscan, state);
+}
+
+static void
+libbalsa_imap_lsub_cb(ImapMboxHandle * handle, int delim,
+		      ImapMboxFlags * flags, char *folder,
+		      struct browser_state *state)
+{
+    gboolean noselect;
+    gboolean noscan;
+
+    g_return_if_fail(folder && *folder);
+
+    noselect = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOSELECT) != 0);
+    noscan = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOINFERIORS)
+	      || IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASNOCHILDREN))
+	&& !IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASCHILDREN);
+
+    libbalsa_imap_add_folder(folder, delim, noselect, noscan, state);
 }
 
 /* executed with GDK lock OFF.
@@ -209,12 +239,24 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
     else 
         imap_path = g_strdup(path);
 
+    /* Send LSUB command if we're in subscribed mode, to find paths.
+     * Note that flags in the LSUB response aren't authoritative
+     * (UW-Imap is the only server thought to give incorrect flags). */
     if (state->subscribed) 
 	imap_mbox_lsub(handle, imap_path);
-    else
+
+    /* Send LIST command if either:
+     * - we're not in subscribed mode; or
+     * - we are, and the LSUB command gave any responses, to get
+     *   authoritative flags.
+     */
+    if (!state->subscribed || state->subfolders)
 	imap_mbox_list(handle, imap_path);
+
     g_free(imap_path);
-    state->mark_imap_path(path, state->cb_data);
+
+    /* Mark this path as scanned, without changing its selectable state. */
+    state->mark_imap_path(path, -1, TRUE, state->cb_data);
 
     list = state->subfolders;
     state->subfolders = NULL;
@@ -247,7 +289,7 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     struct browser_state state;
     int i;
     ImapMboxHandle* handle;
-    gulong handler_id;
+    gulong list_handler_id, lsub_handler_id;
 
     if (!LIBBALSA_IS_IMAP_SERVER(server))
 	    return;
@@ -256,14 +298,19 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 	return;
 
     state.handle_imap_path = handle_imap_path;
-    state.mark_imap_path  = mark_imap_path;
-    state.cb_data         = cb_data;
-    state.subscribed      = subscribed;
-    state.delim           = imap_mbox_handle_get_delim(handle, path);
+    state.mark_imap_path   = mark_imap_path;
+    state.cb_data          = cb_data;
+    state.subscribed       = subscribed;
+    state.delim            = imap_mbox_handle_get_delim(handle, path);
 
-    handler_id = g_signal_connect(G_OBJECT(handle), "list-response",
-                                  G_CALLBACK(libbalsa_imap_add_folder),
-                                  (gpointer) &state);
+    list_handler_id =
+	g_signal_connect(G_OBJECT(handle), "list-response",
+			 G_CALLBACK(libbalsa_imap_list_cb),
+			 (gpointer) & state);
+    lsub_handler_id = subscribed ?
+	g_signal_connect(G_OBJECT(handle), "lsub-response",
+			 G_CALLBACK(libbalsa_imap_lsub_cb),
+			 (gpointer) & state) : 0;
 
     if (list_inbox) {
         /* force INBOX into the mailbox list
@@ -272,11 +319,13 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
          * using this option is to pickup an INBOX that isn't in the
          * tree specified by the prefix */
         handle_imap_path("INBOX", '/', FALSE, TRUE, cb_data);
-        mark_imap_path("INBOX", cb_data);
     }
 
     i = 0;
     libbalsa_imap_browse(path, &state, handle, server, check_imap_path, &i);
-    g_signal_handler_disconnect(G_OBJECT(handle), handler_id);
+
+    g_signal_handler_disconnect(G_OBJECT(handle), list_handler_id);
+    if (lsub_handler_id)
+	g_signal_handler_disconnect(G_OBJECT(handle), lsub_handler_id);
     libbalsa_imap_server_release_handle(LIBBALSA_IMAP_SERVER(server), handle);
 }

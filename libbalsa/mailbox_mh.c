@@ -61,7 +61,7 @@ static gboolean libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox);
 static struct message_info *message_info_from_msgno(
 						  LibBalsaMailboxMh * mailbox,
 						  guint msgno);
-static GMimeMessage *libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox,
+static LibBalsaMessage *libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox,
 						     guint msgno);
 static LibBalsaMessage *libbalsa_mailbox_mh_load_message(
 				    LibBalsaMailbox * mailbox, guint msgno);
@@ -899,9 +899,8 @@ static struct message_info *message_info_from_msgno( LibBalsaMailboxMh * mailbox
     return msg_info;
 }
 
-static GMimeMessage *libbalsa_mailbox_mh_get_message(
-						  LibBalsaMailbox * mailbox,
-						  guint msgno)
+static LibBalsaMessage*
+libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     struct message_info *msg_info;
 
@@ -913,8 +912,7 @@ static GMimeMessage *libbalsa_mailbox_mh_get_message(
     if (!msg_info)
 	return NULL;
 
-    if (!msg_info->mime_message)
-    {
+    if (!msg_info->mime_message)  {
 	const gchar *path = libbalsa_mailbox_local_get_path(mailbox);
 	gchar *filename = g_build_filename(path, msg_info->filename, NULL);
 
@@ -932,12 +930,13 @@ static GMimeMessage *libbalsa_mailbox_mh_get_message(
 	g_mime_stream_unref(gmime_stream);
 	g_free(filename);
     }
-    return msg_info->mime_message;
+    if(!msg_info->message)
+	msg_info->message = libbalsa_mailbox_mh_load_message(mailbox, msgno);
+    return msg_info->message;
 }
 
-static LibBalsaMessage *libbalsa_mailbox_mh_load_message(
-						  LibBalsaMailbox * mailbox,
-						  guint msgno)
+static LibBalsaMessage*
+libbalsa_mailbox_mh_load_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMessage *message;
     struct message_info *msg_info;

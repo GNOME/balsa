@@ -74,6 +74,9 @@ extern "C" {
         gulong selection_changed_id;
         gulong row_expanded_id;
         gulong row_collapsed_id;
+
+        /* A table with a row reference for each message. */
+        GHashTable *ref_table;
     };
 
     struct _BalsaIndexClass {
@@ -144,9 +147,9 @@ extern "C" {
     gint balsa_find_notebook_page_num(LibBalsaMailbox * mailbox);
     void balsa_index_set_column_widths(BalsaIndex * index);
     GList * balsa_index_selected_list(BalsaIndex * index);
-    void balsa_index_move_subtree(GtkTreeModel * model, GtkTreePath * root,
-                                  GtkTreePath * new_parent,
-                                  GHashTable * ref_table);
+    void balsa_index_move_subtree(BalsaIndex * index,
+                                  GtkTreePath * root,
+                                  GtkTreePath * new_parent);
 
     /* Updating index columns when preferences change */
     void balsa_index_refresh_date (BalsaIndex * index);

@@ -1,3 +1,8 @@
+2004-05-07 00:32  PeterB
+
+	* libbalsa/: mailbox_maildir.c, mailbox_mh.c: load flags correctly.
+	* libbalsa/mailbox.c: manage has-unseen-child flag.
+
 2004-05-06 17:25  PeterB
 
 	* src/message-window.c: keep the message reffed, to hold the window

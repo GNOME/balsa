@@ -167,7 +167,7 @@ msgstr " Falló la apertura de %s:%s "
 
 #: src/balsa-message.c:232 src/balsa-message.c:247
 msgid "Ok"
-msgstr "Ok"
+msgstr "Aceptar"
 
 #. this is the first row, so we'll use 0.0 here
 #: src/balsa-message.c:519

@@ -26,6 +26,7 @@
 
 #include "libbalsa.h"
 #include "mailbackend.h"
+#include "buffy.h"
 
 /* Holds all the mailboxes which are registered for checking */
 static GHashTable *notify_hash;
@@ -111,10 +112,7 @@ libbalsa_notify_unregister_mailbox(LibBalsaMailbox * mailbox)
 	(*tmp)->next = bf->next;
     }
 
-    safe_free((void **) &bf->user);
-    safe_free((void **) &bf->passwd);
-    safe_free((void **) &bf->path);
-    safe_free((void **) &bf);
+    mutt_buffy_free(&bf);
 
     libbalsa_unlock_mutt();
 }

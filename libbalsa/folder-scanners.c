@@ -238,8 +238,7 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
         mark_imap_path("INBOX", cb_data);
     }
 
-    safe_free((void **)&ImapUser);   ImapUser = safe_strdup(server->user);
-    safe_free((void **)&ImapPass);   ImapPass = safe_strdup(server->passwd);
+    reset_mutt_passwords(server);
     /* subscribed triggers a bug in libmutt, disable it now */
     if(subscribed)
 	set_option(OPTIMAPLSUB);

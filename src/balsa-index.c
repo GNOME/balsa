@@ -483,14 +483,14 @@ bndx_column_click(GtkTreeViewColumn * column, gpointer data)
     LibBalsaMailboxView *view;
     GtkTreeView *tree_view = GTK_TREE_VIEW(data);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-    BndxTreeColumnId col_id;
+    gint col_id;
     GtkSortType gtk_sort;
 
     view = BALSA_INDEX(tree_view)->mailbox_node->mailbox->view;
     gtk_tree_sortable_get_sort_column_id(GTK_TREE_SORTABLE(model),
-                                         (gint *) &col_id, &gtk_sort);
+                                         &col_id, &gtk_sort);
 
-    switch (col_id) {
+    switch ((BndxTreeColumnId)col_id) {
     case BNDX_TREE_COLUMN_NO:
         view->sort_field = LB_MAILBOX_SORT_NO;
         break;

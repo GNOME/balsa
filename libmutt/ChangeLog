@@ -1,3 +1,7 @@
+2003-07-21  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* buffy.[hc]: add mutt_buffy_free() routine.
+
 2003-04-03  Albrecht Dress  <albrecht.dress@arcor.de>
 
 	* handler.c: remove LIBMUTT specific section.

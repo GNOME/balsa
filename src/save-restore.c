@@ -304,6 +304,7 @@ gint config_mailbox_add(LibBalsaMailbox * mailbox, const char *key_arg)
 	tmp = g_strdup_printf(BALSA_CONFIG_PREFIX MAILBOX_SECTION_PREFIX
 			      "%s/", key_arg);
 
+    gnome_config_clean_section(tmp);
     gnome_config_push_prefix(tmp);
     libbalsa_mailbox_save_config(mailbox, tmp);
     gnome_config_pop_prefix();

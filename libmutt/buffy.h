@@ -16,6 +16,8 @@
  *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifndef _BUFFY_H_
+#define _BUFFY_H_ 1
 typedef struct buffy_t
 {
   char *path;
@@ -44,3 +46,8 @@ BUFFY *mutt_find_mailbox (const char *path);
 void mutt_update_mailbox (BUFFY * b);
 #endif
 
+#ifdef LIBMUTT
+void mutt_buffy_free(BUFFY** bf);
+#endif
+
+#endif /* _BUFFY_H_ */

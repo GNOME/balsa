@@ -287,11 +287,11 @@ void
 reset_mutt_passwords(LibBalsaServer* server)
 {
     if (ImapUser)
-	safe_free((void **) &ImapUser);	/* because mutt does so */
+	free(ImapUser);    /* always do it consistently with strdup/free */
     ImapUser = strdup(server->user);
 
     if (ImapPass)
-	safe_free((void **) &ImapPass);	/* because mutt does so */
+	free(ImapPass);	   /* always do it consistently with strdup/free */
     ImapPass = strdup(server->passwd);
 }
 
@@ -780,8 +780,13 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
     msg_name   = g_strdup_printf("%s/%u-%u", cache_name, 
                                  LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity,
                                  IMAP_MESSAGE_UID(message));
+    /*
+    * NOTE: we use calloc here instead of safe_calloc() because
+    * imap_fetch_message() will never destroy this message - even on error -
+    * since it has no chance to inform that the pointer becomes invalid.
+    */
+    msg = g_new0(MESSAGE, 1);
     stream = fopen(msg_name,"rb");
-    msg = safe_calloc(1, sizeof(MESSAGE));
     msg->magic = CLIENT_CONTEXT(mailbox)->magic;
     if(!stream) {
         libbalsa_lock_mutt();
@@ -810,7 +815,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
             libbalsa_message_user_hdrs_from_mutt(message->header);
         message->updated = 1;
     }
-    FREE(&msg);
+    g_free(msg);
     g_free(msg_name);
     g_free(cache_name); 
     return stream;

@@ -15,7 +15,7 @@ PKG_NAME="Balsa"
 }
 
 if libtool --version >/dev/null 2>&1; then
-    vers=`libtool --version | sed -e "s/^[^0-9]*//" -e "s/ .*$//" | awk 'BEGIN { FS = "."; } { printf "%d", ($1 * 1000 + $2) * 1000 + $3;}'`
+    vers=`libtool --version | sed -e "s/^[^0-9]*//" | awk '{ split($1,a,"\."); print (a[1]*1000+a[2])*1000+a[3];exit 0;}'`
     if test "$vers" -ge 1003003; then
         true
     else

@@ -440,6 +440,19 @@ int mutt_buffy_check (int force)
   return (BuffyCount);
 }
 
+#ifdef LIBMUTT
+/* we want to keep this mess away from pure and clean balsa code :-).
+ * (look who says so! :-)
+ */
+void mutt_buffy_free(BUFFY** bf)
+{
+    safe_free((void **) &(*bf)->user);
+    safe_free((void **) &(*bf)->passwd);
+    safe_free((void **) &(*bf)->path);
+    safe_free(bf);
+}
+#endif
+
 #ifndef LIBMUTT
 int mutt_buffy_notify (void)
 {

@@ -1,3 +1,11 @@
+2003-07-21  Pawel Salek  <pawsa theochem.kth.se>
+
+	* autogen.sh: better scriptlet for libtool version detection.
+	* configure.in: remove -Wsign-promo - it is C++-specific.
+	* libbalsa/{folder-scanners,mailbox_imap,notify}.c: 
+	* src/balsa-index.c: compile with gcc-3.3 with no warnings.
+	* src/save-restore.c: clean mailbox sections.
+	
 2003-07-18 15:05  PeterB
 
 	* src/balsa-index.c: Expand row after setting message.

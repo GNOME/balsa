@@ -1,3 +1,10 @@
+2000-08-08  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/balsa-message.c: allow external message viewers as defined in 
+	gnome MIME.
+	* libbalsa/send.c(balsa_smtp_protocol): handle properly lines
+	beginning with dot.
+
 2000-08-08  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/mailbox.c:

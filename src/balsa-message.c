@@ -86,6 +86,7 @@ static void select_icon_cb(GnomeIconList *ilist, gint num,
 static void select_part(BalsaMessage *bm, gint part);
 static void free_icon_data(gpointer data);
 static void part_context_menu_save(GtkWidget *menu_item, BalsaPartInfo *info);
+static void part_context_menu_view(GtkWidget *menu_item, BalsaPartInfo *info);
 
 static void add_header_gchar(BalsaMessage *bm, gchar *header, gchar * label, 
 			     gchar * value);
@@ -239,7 +240,6 @@ save_part (BalsaPartInfo *info)
 
   save_dialog = gnome_dialog_new (_ ("Save MIME Part"),
 				  _ ("Save"), _ ("Cancel"), NULL);
-  label = gtk_label_new( _("Please choose a filename to save this part of the message as:") );
   file_entry = gnome_file_entry_new ("Balsa_MIME_Saver",
 				     _ ("Save MIME Part"));
 
@@ -247,18 +247,19 @@ save_part (BalsaPartInfo *info)
     gtk_entry_set_text (GTK_ENTRY (gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (file_entry))), info->body->filename);
   }
   
-  gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (save_dialog)->vbox), label, 
+  gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (save_dialog)->vbox), 
+		      gtk_label_new( _("Please choose a filename to save this part of the message as:")),
 		      FALSE, FALSE, 10);
-  gtk_widget_show (label);
 
   gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (save_dialog)->vbox), file_entry, 
 		      FALSE, FALSE, 10);
-  gtk_widget_show (file_entry);
 
   gnome_dialog_set_parent(GNOME_DIALOG(save_dialog), GTK_WINDOW(balsa_app.main_window));
   gtk_window_set_modal (GTK_WINDOW (save_dialog), TRUE);
   gtk_window_set_wmclass (GTK_WINDOW (save_dialog), "save", "Balsa");
 
+  gtk_widget_grab_focus(file_entry);
+  gtk_widget_show_all(save_dialog);
   button = gnome_dialog_run(GNOME_DIALOG (save_dialog));
 
   /* button 0 == OK */
@@ -667,39 +668,44 @@ part_info_init_unknown (BalsaMessage *bm, BalsaPartInfo *info)
   GtkWidget *label;
   GtkWidget *button;
   gchar *msg;
+  const gchar *cmd;
   gchar *content_type;
 
   vbox = gtk_vbox_new ( FALSE, 1 );
   gtk_container_set_border_width ( GTK_CONTAINER(vbox), 10 );
   
-  label = gtk_label_new ( _("Balsa does not know how to display this message part") );
-  gtk_box_pack_start ( GTK_BOX(vbox), label, FALSE, FALSE, 1 );
-  gtk_widget_show (label);
-
   content_type = libbalsa_message_body_get_content_type ( info->body );
-  msg = g_strdup_printf( _("Content Type: %s"), content_type);
-  g_free (content_type);
+  if((cmd=gnome_mime_get_value(content_type, "view")) != NULL) {
+    msg = g_strdup_printf( _("View part with %s"), cmd);
+    button = gtk_button_new_with_label (msg);
+    g_free(msg);
+    gtk_box_pack_start ( GTK_BOX(vbox), button, FALSE, FALSE, 2);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked", 
+		       (GtkSignalFunc)part_context_menu_view, (gpointer)info);
+  } else { 
+    gtk_box_pack_start ( GTK_BOX(vbox), gtk_label_new ( 
+      _("No view action defined in gnome MIME for this content type") ),
+			 FALSE, FALSE, 1 );
+  }
 
-  label = gtk_label_new ( msg );
-  gtk_box_pack_start ( GTK_BOX(vbox), label, FALSE, FALSE, 1 );
-  gtk_widget_show (label);
+  msg = g_strdup_printf( _("Content Type: %s"), content_type);
+  gtk_box_pack_start ( GTK_BOX(vbox),gtk_label_new (msg), FALSE, FALSE, 1 );
   g_free(msg);
 
   if (info->body->filename) {
     msg = g_strdup_printf( _("Filename: %s"), info->body->filename); 
-    label = gtk_label_new ( msg );
-    gtk_box_pack_start ( GTK_BOX(vbox), label, FALSE, FALSE, 1 );
-    gtk_widget_show (label);
+    gtk_box_pack_start ( GTK_BOX(vbox), gtk_label_new (msg), FALSE, FALSE, 1 );
     g_free(msg);
   }
 
+  g_free (content_type);
+
   button = gtk_button_new_with_label (_("Save part"));
-  gtk_box_pack_start ( GTK_BOX(vbox), button, FALSE, FALSE, 20 );
+  gtk_box_pack_start ( GTK_BOX(vbox), button, FALSE, FALSE, 5);
   gtk_signal_connect(GTK_OBJECT(button), "clicked", 
 		     (GtkSignalFunc)part_context_menu_save, (gpointer)info);
-  gtk_widget_show (button);
 
-  gtk_widget_show(vbox);
+  gtk_widget_show_all(vbox);
 
   info->focus_widget = vbox;
   info->widget = vbox;
@@ -1234,6 +1240,33 @@ static void
 part_context_menu_save(GtkWidget *menu_item, BalsaPartInfo *info)
 {
   save_part(info);
+}
+
+static void
+part_context_menu_view(GtkWidget *menu_item, BalsaPartInfo *info)
+{
+  gchar *content_type, *fpos;
+  const gchar *cmd;
+
+  content_type = libbalsa_message_body_get_content_type ( info->body );
+
+  if((cmd=gnome_mime_get_value(content_type, "view")) != NULL) {
+      if(!libbalsa_message_body_save_temporary (info->body, NULL)) {
+	balsa_warning(_("could not create temporary file %s"),
+		      info->body->temp_filename);
+	g_free(content_type);
+	return;
+      }
+
+      if( (fpos=strstr(cmd, "%f")) != NULL) {
+	gchar *exe_str, *cps = g_strdup(cmd);
+	cps[fpos-cmd+1] = 's';
+	exe_str = g_strdup_printf(cps, info->body->temp_filename);
+	gnome_execute_shell(NULL, exe_str);
+	fprintf(stderr,"Executed\n");
+      }
+  } else fprintf(stderr,"view for %s returned NULL\n", content_type);
+  g_free(content_type);
 }
 
 void 

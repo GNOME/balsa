@@ -697,7 +697,8 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
     tmpbuffer = message;
     while ((tmp = strstr(tmpbuffer,"\n"))!=NULL)
     {
-	    if(*tmpbuffer=='.') write(s,".",1); /* make sure dots won't hurt */
+            if(strncmp(tmpbuffer, ".\n", 2) == 0) 
+	       write(s,".",1); /* make sure dots won't hurt */
 	    len = (int)strcspn(tmpbuffer,"\n");
 	    
 	    if (*(tmp-1)!='\r')

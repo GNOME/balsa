@@ -1969,6 +1969,7 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
         GMimePart *prefilt;
         GMimeStream *gms;
         GMimePartEncodingType gmt;
+        GMimeContentType *type;
         LibBalsaMailboxImap* mimap;
         ImapMessage *im;
         ImapResponse rc;
@@ -2025,6 +2026,8 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
             partstream = g_mime_stream_file_new (fp);
 
         g_mime_part_set_encoding (prefilt, GMIME_PART_ENCODING_8BIT );
+        type = g_mime_content_type_new_from_string(part->content_type);
+        g_mime_part_set_content_type(prefilt, type);
         g_mime_part_write_to_stream (prefilt, partstream );
         g_mime_stream_flush (partstream);
 
@@ -2038,10 +2041,7 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
     {
         GMimeParser *parser =  
             g_mime_parser_new_with_stream (partstream);
-        GMimeContentType *type =
-            g_mime_content_type_new_from_string(part->content_type);
         part->mime_part = g_mime_parser_construct_part (parser);
-        g_mime_part_set_content_type(GMIME_PART(part->mime_part), type);
         g_object_unref (parser);
     }
     g_object_unref (partstream);

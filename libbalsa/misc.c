@@ -1612,7 +1612,7 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 		    /* check if we hit a multi-line URL... (see RFC 1738) */
 		    if (all_p && (p[url_match.rm_so - 1] == '<' ||
 				  (url_match.rm_so > 4 &&
-				   g_ascii_strcasecmp(p + url_match.rm_so - 5, "<URL:"))) &&
+				   g_ascii_strcasecmp(p + url_match.rm_so - 5, "<URL:") == 0)) &&
 			!strchr(p + url_match.rm_eo, '>')) {
 			regex_t *ml_url_reg = get_ml_url_reg();
 			regmatch_t ml_url_match;

@@ -1,3 +1,12 @@
+* Balsa-2.0.5 release. Release date 2003-01-05
+
+- IMAP message caching fixed.
+- use images attached to HTML messages.
+- make identity dialogs non-modal.
+- do charset conversion (if needed) on including files to compose windows.
+- do not allow to send messages with wrong charset.
+- number of other bugs fixed.
+
 * Balsa-2.0.4 release. Release date 2002-12-24
 
 - do not use any deprecated GNOME API.

@@ -1,3 +1,7 @@
+2003-01-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in, NEWS: release 2.0.5
+	
 2003-01-04  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/misc.[hc]: add libbalsa_{expand,contract}_path wrappers.

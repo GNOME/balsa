@@ -1,4 +1,4 @@
-%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-system-install --disable-more-warnings --disable-pcre
+%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-system-install --disable-more-warnings --disable-pcre --enable-all
 # we disable PCRE because it introduces dependency on KDE packages,
 # it is better to reduce number of dependencies in the standard build
 # and link against glibc version of regex library.
@@ -14,12 +14,14 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Packager: Pawel Salek <pawsa@theochem.kth.se>
 Requires: gtk+ >= 1.2.7
 Requires: gnome-libs >= 1.2.13
+Requires: gnome-vfs >= 1.0.0
 Requires: libesmtp >= 0.8.6
 Provides: balsa
 
 BuildRequires:  libesmtp >= 0.8.6
 BuildRequires:  gnome-libs-devel >= 1.2.13
 BuildRequires:  gtk+-devel >= 1.2.7
+BuildRequires:  gdk-pixbuf-devel
 BuildRequires:  gnome-vfs-devel
 
 %description

@@ -1,3 +1,7 @@
+2001-12-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* NEWS, configure.in, balsa.spec.in: development release 1.3.0.
+
 2001-12-15  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/sendmsg-window.c: format=flowed - de-stuff leading space.

@@ -772,13 +772,18 @@ prepare_log_attrs(PangoLogAttr * log_attrs, gint attrs_len,
 
     for (l = item_list; l; l = g_list_next(l)) {
         PangoItem *pango_item = l->data;
+        gchar *p, *q;
 
         pango_break(&line[pango_item->offset],
                     pango_item->length, &pango_item->analysis,
                     &log_attrs[num_chars], attrs_len - num_chars);
+
         /* We'll assume that it's OK to break at the start of a new
-         * item. */
-        if (!g_unichar_isspace(g_utf8_get_char(&line[pango_item->offset])))
+         * item, if it's preceded by a space. */
+        q = &line[pango_item->offset];
+        p = g_utf8_find_prev_char(line, q);
+        if (p && g_unichar_isspace(g_utf8_get_char(p))
+            && !g_unichar_isspace(g_utf8_get_char(q)))
             log_attrs[num_chars].is_line_break = TRUE;
         num_chars += pango_item->num_chars;
     }

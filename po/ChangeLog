@@ -1,3 +1,8 @@
+2002-04-12  Abel Cheung  <maddog@linux.org.hk>
+
+	* TRANSLATORS: Added zh_TW translator.
+	* zh_TW.po: Merged with newest pot file.
+
 2002-03-10  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* POTFILES.in: update after gob removal.

@@ -1,6 +1,7 @@
-2002-08-28  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+2002-08-29  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/sendmsg-window.c: libmutt does iconv, not we.
+	* src/main-window.c: reduce number of msg threading callbacks.
 
 2002-08-28  Pawel Salek <pawsa@theochem.kth.se>
 

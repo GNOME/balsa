@@ -90,7 +90,7 @@ static void
 balsa_message_init (BalsaMessage * bmessage)
 {
   bmessage->message = NULL;
-  bmessage->html = NULL;
+  bmessage->headers = NULL;
   bmessage->body = NULL;
 }
 
@@ -161,6 +161,7 @@ balsa_message_set (BalsaMessage * bmessage,
   if (bmessage->headers)
     {
       gtk_object_destroy (GTK_OBJECT (bmessage->headers));
+
       gtk_object_destroy (GTK_OBJECT (bmessage->body));
     }
 
@@ -186,20 +187,34 @@ balsa_message_text_item (gchar * text, GnomeCanvasGroup * group, double x, doubl
   return new;
 }
 
+static double 
+next_row_height (GnomeCanvasGroup * row[])
+{
+  double o, t;
+  double x1, x2, y1, y2;
+
+  gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (row[0]), &x1, &y1, &x2, &y2);
+  o = y2 - y1;
+
+  gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (row[1]), &x1, &y1, &x2, &y2);
+  t = y2 - y1;
+
+  if (o > t)
+    return o;
+  else
+    return t;
+}
+
 static void
 headers2canvas (BalsaMessage * bmessage, Message * message)
 {
-  double max_width = 0;
-  double text_height = 0;
   double next_height = 0;
   double x1, x2, y1, y2;
 
   GnomeCanvasGroup *bm_root;
-  GnomeCanvasItem *date_item = NULL, *date_data = NULL;
-  GnomeCanvasItem *to_item = NULL, *to_data = NULL;
-  GnomeCanvasItem *cc_item = NULL, *cc_data = NULL;
-  GnomeCanvasItem *from_item = NULL, *from_data = NULL;
-  GnomeCanvasItem *subject_item = NULL, *subject_data = NULL;
+  GnomeCanvasGroup *row[2];
+  GnomeCanvasItem *item;
+  GnomeCanvasItem *data;
 
   bm_root = GNOME_CANVAS_GROUP (GNOME_CANVAS (bmessage)->root);
 
@@ -210,169 +225,65 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 					       "y", (double) 10.0,
 					       NULL));
 
+  row[0] = GNOME_CANVAS_GROUP (gnome_canvas_item_new (bmessage->headers,
+						    GNOME_TYPE_CANVAS_GROUP,
+						      "x", (double) 0.0,
+						      "y", (double) 0.0,
+						      NULL));
+  row[1] = GNOME_CANVAS_GROUP (gnome_canvas_item_new (bmessage->headers,
+						    GNOME_TYPE_CANVAS_GROUP,
+						      "x", (double) 0.0,
+						      "y", (double) 0.0,
+						      NULL));
+
   if (message->date)
     {
-      date_item = balsa_message_text_item ("Date:", bmessage->headers, 0.0, 0.0);
-
-      gnome_canvas_item_get_bounds (date_item, &x1, &y1, &x2, &y2);
-
-      max_width = (x2 - x1);
-
-      if (text_height == 0)
-	text_height = y2 - y1;
-
-      next_height += text_height + 3;
+      /* this is the first row, so we'll use 0.0 here */
+      item = balsa_message_text_item ("Date:", row[0], 0.0, 0.0);
+      data = balsa_message_text_item (message->date, row[1], 0.0, 0.0);
     }
 
   if (message->to_list)
     {
-      to_item = balsa_message_text_item ("To:", bmessage->headers, 0.0, next_height);
-
-      gnome_canvas_item_get_bounds (to_item, &x1, &y1, &x2, &y2);
-
-      if ((x2 - x1) > max_width)
-	max_width = (x2 - x1);
-
-      if (text_height == 0)
-	text_height = y2 - y1;
-
-      next_height += text_height + 3;
-
+      next_height = next_row_height (row);
+      item = balsa_message_text_item ("To:", row[0], 0.0, next_height);
+      data = balsa_message_text_item (make_string_from_list (message->to_list),
+				      row[1], 0.0, next_height);
     }
 
   if (message->cc_list)
     {
-      cc_item = balsa_message_text_item ("Cc:", bmessage->headers, 0.0, next_height);
-
-      gnome_canvas_item_get_bounds (cc_item, &x1, &y1, &x2, &y2);
-
-      if ((x2 - x1) > max_width)
-	max_width = (x2 - x1);
-
-      if (text_height == 0)
-	text_height = y2 - y1;
-
-      next_height += text_height + 3;
+      next_height = next_row_height (row);
+      item = balsa_message_text_item ("Cc:", row[0], 0.0, next_height);
+      data = balsa_message_text_item (make_string_from_list (message->cc_list),
+				      row[1], 0.0, next_height);
     }
 
   if (message->from)
     {
-      from_item = balsa_message_text_item ("From:", bmessage->headers, 0.0, next_height);
+      gchar *from;
+      next_height = next_row_height (row);
 
-      gnome_canvas_item_get_bounds (from_item, &x1, &y1, &x2, &y2);
+      item = balsa_message_text_item ("From:", row[0], 0.0, next_height);
 
-      if ((x2 - x1) > max_width)
-	max_width = (x2 - x1);
+      if (message->from->personal)
+	from = g_strdup_printf ("%s <%s>", message->from->personal, message->from->mailbox);
+      else
+	from = g_strdup (message->from->mailbox);
 
-      if (text_height == 0)
-	text_height = y2 - y1;
-
-      next_height += text_height + 3;
+      data = balsa_message_text_item (from, row[1], 0.0, next_height);
+      g_free (from);
     }
 
   if (message->subject)
     {
-      subject_item = balsa_message_text_item ("Subject:", bmessage->headers, 0.0, next_height);
-
-      gnome_canvas_item_get_bounds (subject_item, &x1, &y1, &x2, &y2);
-
-      if ((x2 - x1) > max_width)
-	max_width = (x2 - x1);
-
-      if (text_height == 0)
-	text_height = y2 - y1;
-
-      next_height += text_height + 3;
+      next_height = next_row_height (row);
+      item = balsa_message_text_item ("Subject:", row[0], 0.0, next_height);
+      data = balsa_message_text_item (message->subject, row[1], 0.0, next_height);
     }
 
-  next_height = 0;
-  max_width += 50;
-
-  if (date_item)
-    {
-      date_data = balsa_message_text_item (message->date, bmessage->headers, max_width, next_height);
-
-      gnome_canvas_item_get_bounds (date_item, &x1, &y1, &x2, &y2);
-
-      if ((x2 - x1) > max_width)
-	max_width = (x2 - x1);
-
-      if (text_height == 0)
-	text_height = y2 - y1;
-
-      next_height += text_height + 3;
-    }
-
-  if (to_item)
-    {
-      to_data = balsa_message_text_item (make_string_from_list (message->to_list),
-				 bmessage->headers, max_width, next_height);
-
-      gnome_canvas_item_get_bounds (to_item, &x1, &y1, &x2, &y2);
-
-      if ((x2 - x1) > max_width)
-	max_width = (x2 - x1);
-
-      if (text_height == 0)
-	text_height = y2 - y1;
-
-      next_height += text_height + 3;
-    }
-
-  if (cc_item)
-    {
-      cc_data = balsa_message_text_item (make_string_from_list (message->cc_list),
-				 bmessage->headers, max_width, next_height);
-
-      gnome_canvas_item_get_bounds (cc_item, &x1, &y1, &x2, &y2);
-
-      if ((x2 - x1) > max_width)
-	max_width = (x2 - x1);
-
-      if (text_height == 0)
-	text_height = y2 - y1;
-
-      next_height += text_height + 3;
-    }
-
-  if (from_item)
-    {
-      gchar tbuff[1024];
-
-      if (message->from->personal)
-	snprintf (tbuff, 1024, "%s <%s>",
-		  message->from->personal,
-		  message->from->mailbox);
-      else
-	snprintf (tbuff, 1024, "%s", message->from->mailbox);
-
-      from_data = balsa_message_text_item (tbuff, bmessage->headers, max_width, next_height);
-
-      gnome_canvas_item_get_bounds (from_item, &x1, &y1, &x2, &y2);
-
-      if ((x2 - x1) > max_width)
-	max_width = (x2 - x1);
-
-      if (text_height == 0)
-	text_height = y2 - y1;
-
-      next_height += text_height + 3;
-    }
-
-  if (subject_item)
-    {
-      subject_data = balsa_message_text_item (message->subject, bmessage->headers, max_width, next_height);
-
-      gnome_canvas_item_get_bounds (subject_item, &x1, &y1, &x2, &y2);
-
-      if ((x2 - x1) > max_width)
-	max_width = (x2 - x1);
-
-      if (text_height == 0)
-	text_height = y2 - y1;
-
-      next_height += text_height + 3;
-    }
+  gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (row[0]), &x1, &y1, &x2, &y2);
+  gnome_canvas_item_move (GNOME_CANVAS_ITEM (row[1]), x2 - x1 + 30, 0.0);
 }
 
 
@@ -385,7 +296,6 @@ body2canvas (BalsaMessage * bmessage, Message * message)
   gchar *text;
 
   bm_root = GNOME_CANVAS_GROUP (GNOME_CANVAS (bmessage)->root);
-
 
   gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (bmessage->headers), &x1, &y1, &x2, &y2);
 

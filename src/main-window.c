@@ -223,15 +223,29 @@ static GnomeUIInfo main_menu[] =
 
 static GnomeUIInfo main_toolbar[] =
 {
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Check"), N_ ("Check Email"), check_new_messages_cb, GNOME_STOCK_PIXMAP_MAIL_RCV),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Check"), N_ ("Check Email"),
+                          check_new_messages_cb,
+                          GNOME_STOCK_PIXMAP_MAIL_RCV),
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Delete"), N_ ("Delete Message"), delete_message_cb, GNOME_STOCK_PIXMAP_TRASH),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Delete"), N_ ("Delete Message"),
+                          delete_message_cb,
+                          GNOME_STOCK_PIXMAP_TRASH),
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Compose"), N_ ("Compose Message"), new_message_cb, GNOME_STOCK_PIXMAP_MAIL_NEW),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Reply"), N_ ("Reply"), replyto_message_cb, GNOME_STOCK_PIXMAP_MAIL_RPL),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Reply to all"), N_ ("Reply to all"), replytoall_message_cb, GNOME_STOCK_PIXMAP_MAIL_RPL),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Forward"), N_ ("Forward"), forward_message_cb, GNOME_STOCK_PIXMAP_MAIL_FWD),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Continue"), N_ ("Continue"), continue_message_cb, GNOME_STOCK_PIXMAP_MAIL),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Compose"), N_ ("Compose Message"),
+                          new_message_cb,
+                          GNOME_STOCK_PIXMAP_MAIL_NEW),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Reply"), N_ ("Reply"),
+                          replyto_message_cb,
+                          GNOME_STOCK_PIXMAP_MAIL_RPL),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Reply to all"), N_ ("Reply to all"),
+                          replytoall_message_cb,
+                          GNOME_STOCK_PIXMAP_MAIL_RPL),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Forward"), N_ ("Forward"),
+                          forward_message_cb,
+                          GNOME_STOCK_PIXMAP_MAIL_FWD),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Continue"), N_ ("Continue"),
+                          continue_message_cb,
+                          GNOME_STOCK_PIXMAP_MAIL),
   GNOMEUIINFO_SEPARATOR,
   {
     GNOME_APP_UI_ITEM, N_ ("Previous"), N_("Open Previous message"),
@@ -264,30 +278,30 @@ main_window_set_cursor (gint type)
 
 
   for (list = mdi->windows; list; list = list->next)
-    {
-      widget = GTK_WIDGET (GNOME_APP (list->data));
-      appbar = GNOME_APPBAR (gtk_object_get_data (GTK_OBJECT(widget),
+  {
+    widget = GTK_WIDGET (GNOME_APP (list->data));
+    appbar = GNOME_APPBAR (gtk_object_get_data (GTK_OBJECT(widget),
 						  APPBAR_KEY));
-      pbar = gnome_appbar_get_progress(appbar);
+    pbar = gnome_appbar_get_progress(appbar);
       
-      if (type == -1)
-	{
-	  gtk_widget_set_sensitive (GTK_WIDGET (pbar), FALSE);
-          gtk_progress_set_activity_mode (GTK_PROGRESS (pbar), FALSE);
-          gtk_timeout_remove (pbar_timeout);
-          gtk_progress_set_value (GTK_PROGRESS (pbar), 0.0);
-	  gdk_window_set_cursor (widget->window, NULL);
-	}
-      else
-	{
-	  gtk_widget_set_sensitive (GTK_WIDGET (pbar), TRUE);
-          gtk_progress_set_activity_mode (GTK_PROGRESS (pbar), TRUE);
-          pbar_timeout = gtk_timeout_add (50, progress_timeout, pbar);
-	  cursor = gdk_cursor_new (type);
-	  gdk_window_set_cursor (widget->window, cursor);
-	  gdk_cursor_destroy (cursor);
-	}
+    if (type == -1)
+    {
+      gtk_widget_set_sensitive (GTK_WIDGET (pbar), FALSE);
+      gtk_progress_set_activity_mode (GTK_PROGRESS (pbar), FALSE);
+      gtk_timeout_remove (pbar_timeout);
+      gtk_progress_set_value (GTK_PROGRESS (pbar), 0.0);
+      gdk_window_set_cursor (widget->window, NULL);
     }
+    else
+    {
+      gtk_widget_set_sensitive (GTK_WIDGET (pbar), TRUE);
+      gtk_progress_set_activity_mode (GTK_PROGRESS (pbar), TRUE);
+      pbar_timeout = gtk_timeout_add (50, progress_timeout, pbar);
+      cursor = gdk_cursor_new (type);
+      gdk_window_set_cursor (widget->window, cursor);
+      gdk_cursor_destroy (cursor);
+    }
+  }
 }
 
 static void
@@ -295,12 +309,18 @@ destroy_mdi_cb (GnomeMDI * mdi, gpointer data)
 {
   gint x, y;
   gchar *geometry;
-  
-  geometry = gnome_geometry_string (GTK_WIDGET (mdi->active_window)->window);
-  gnome_parse_geometry (geometry, &x, &y, &balsa_app.mw_width, 
-                        &balsa_app.mw_height);
-  g_free (geometry);
-  balsa_exit ();
+ 
+  if (mdi->active_window)
+  {
+    geometry = gnome_geometry_string(GTK_WIDGET (mdi->active_window)->window);
+    gnome_parse_geometry(geometry,
+                         &x, &y,
+                         &balsa_app.mw_width, 
+                         &balsa_app.mw_height);
+    g_free (geometry);
+  }
+
+  balsa_exit();
 }
 
 static void

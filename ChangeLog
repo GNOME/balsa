@@ -1,3 +1,11 @@
+2004-09-01 08:26  PeterB
+
+	* src/: balsa-app.h, balsa-index.c, pref-manager.c, save-restore.c:
+	drop balsa_app.hide_deleted; add_pref_menu and attach_pref_menu
+	always use the same callback; implement default sort-field; update
+	current views when the default is changed; use
+	pm_page_add_to_size_group to align widgets.
+
 2004-08-31 20:07  PeterB
 
 	* src/message-window.c: check message->mailbox.

@@ -115,8 +115,10 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
     if(mime_type)
         content_type = g_strdup(mime_type);
     else {
-        if(!filename)
+        if(!filename) {
+            if(used_type) *used_type = g_strdup("application/octet-stream");
             return balsa_pixmap_finder ("balsa/attachment.png");
+        }
         content_type = libbalsa_lookup_mime_type(filename);
     }
     /* FIXME:

@@ -45,19 +45,27 @@
    returns an allocated mime-type.
    gnome_vfs_file_info_get_mime_type() theoretically returns a const value,
    but that string is const only until gnome_vfs_file_info_unref();
+   Must work for both absolute and relative file names.
 */
 gchar*
 libbalsa_lookup_mime_type(const gchar * path)
 {
     gchar *mime_type;
 #ifdef HAVE_GNOME_VFS
-    GnomeVFSFileInfo* vi;
-    g_return_val_if_fail(path != NULL, NULL);
+    GnomeVFSFileInfo* vi = gnome_vfs_file_info_new();
+    gchar* uri;
 
-    vi = gnome_vfs_file_info_new();
-    gnome_vfs_get_file_info (path, vi,
+    if(g_path_is_absolute(path))
+        uri = g_strconcat("file://", path, NULL);
+    else {
+        gchar* curr_dir = g_get_current_dir();
+        uri = g_strconcat("file://", curr_dir, "/", path, NULL);
+        g_free(curr_dir);
+    }
+    gnome_vfs_get_file_info (uri, vi,
                              GNOME_VFS_FILE_INFO_GET_MIME_TYPE
                              | GNOME_VFS_FILE_INFO_FOLLOW_LINKS);
+    g_free(uri);
     mime_type = g_strdup(gnome_vfs_file_info_get_mime_type(vi));
     gnome_vfs_file_info_unref(vi);
     return mime_type;

@@ -420,8 +420,11 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
     if ( type == LIBBALSA_TYPE_MAILBOX_LOCAL ) {
 	gchar *path = gnome_config_get_string("Path");
 	type = libbalsa_mailbox_type_from_path(path);
+	if (type == G_TYPE_OBJECT)
+	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+		                 _("Bad local mailbox path \"%s\""), path);
     }
-    mailbox = g_object_new(type, NULL);
+    mailbox = (type == G_TYPE_OBJECT ? NULL : g_object_new(type, NULL));
     if (mailbox == NULL)
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("Could not create a mailbox of type %s"),

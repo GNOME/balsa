@@ -60,7 +60,7 @@ static BalsaIcon forwarded;
 static BalsaIcon envelope;
 
 static void
-imlib_magic_stuff (gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
+create_icon (gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
 {
 /* FIXME imlib sucks and doesn't work. */
 #if 0
@@ -72,29 +72,29 @@ imlib_magic_stuff (gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
   gdk_imlib_destroy_image (im);
   im = NULL;
 #endif
-  *pmap = gdk_pixmap_create_from_xpm_d(GDK_ROOT_PARENT(),
-		  bmap,
-		  0,
-		  data);
+  *pmap = gdk_pixmap_create_from_xpm_d (GDK_ROOT_PARENT (),
+					bmap,
+					0,
+					data);
 }
 
 void
 balsa_icons_init (void)
 {
-  imlib_magic_stuff (inbox_xpm, &inbox.p, &inbox.b);
-  imlib_magic_stuff (outbox_xpm, &outbox.p, &outbox.b);
-  imlib_magic_stuff (trash_xpm, &trash.p, &trash.b);
+  create_icon (inbox_xpm, &inbox.p, &inbox.b);
+  create_icon (outbox_xpm, &outbox.p, &outbox.b);
+  create_icon (trash_xpm, &trash.p, &trash.b);
 
-  imlib_magic_stuff (tray_empty_xpm, &tray_empty.p, &tray_empty.b);
-  imlib_magic_stuff (tray_full_xpm, &tray_full.p, &tray_full.b);
+  create_icon (tray_empty_xpm, &tray_empty.p, &tray_empty.b);
+  create_icon (tray_full_xpm, &tray_full.p, &tray_full.b);
 
-  imlib_magic_stuff (dir_closed_xpm, &dir_closed.p, &dir_closed.b);
-  imlib_magic_stuff (dir_open_xpm, &dir_open.p, &dir_open.b);
+  create_icon (dir_closed_xpm, &dir_closed.p, &dir_closed.b);
+  create_icon (dir_open_xpm, &dir_open.p, &dir_open.b);
 
-  imlib_magic_stuff (replied_xpm, &replied.p, &replied.b);
-  imlib_magic_stuff (forwarded_xpm, &forwarded.p, &forwarded.b);
+  create_icon (replied_xpm, &replied.p, &replied.b);
+  create_icon (forwarded_xpm, &forwarded.p, &forwarded.b);
 
-  imlib_magic_stuff (envelope_xpm, &envelope.p, &envelope.b);
+  create_icon (envelope_xpm, &envelope.p, &envelope.b);
 }
 
 GdkPixmap *

@@ -103,8 +103,8 @@ static void select_part(BalsaMessage * bm, gint part);
 static void free_icon_data(gpointer data);
 static void part_context_menu_save(GtkWidget * menu_item,
 				   BalsaPartInfo * info);
-static void part_context_menu_view(GtkWidget * menu_item,
-				   BalsaPartInfo * info);
+/* static void part_context_menu_view(GtkWidget * menu_item, */
+/* 				   BalsaPartInfo * info); */
 
 static void add_header_gchar(BalsaMessage * bm, gchar * header,
 			     gchar * label, gchar * value);
@@ -144,6 +144,9 @@ static void part_info_init_unknown(BalsaMessage * bm,
 static void part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info,
 				gchar * ptr, size_t len);
 #endif
+static GtkWidget* part_info_mime_button (BalsaPartInfo* info, const gchar* content_type, gchar* key);
+static void part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info);
+static void part_create_menu (BalsaPartInfo* info);
 
 static GtkViewportClass *parent_class = NULL;
 
@@ -730,23 +733,22 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
     gchar *msg;
     const gchar *cmd;
     gchar *content_type;
+    
 
     vbox = gtk_vbox_new(FALSE, 1);
     gtk_container_set_border_width(GTK_CONTAINER(vbox), 10);
 
     content_type = libbalsa_message_body_get_content_type(info->body);
     if ((cmd = gnome_mime_get_value(content_type, "view")) != NULL) {
-	msg = g_strdup_printf(_("View part with %s"), cmd);
-	button = gtk_button_new_with_label(msg);
-	g_free(msg);
+        button = part_info_mime_button (info, content_type, "view");
 	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			   (GtkSignalFunc) part_context_menu_view,
-			   (gpointer) info);
+    } else if ((cmd = gnome_mime_get_value (content_type, "open")) != NULL) {
+        button = part_info_mime_button (info, content_type, "open");
+	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
     } else {
 	gtk_box_pack_start(GTK_BOX(vbox),
 			   gtk_label_new(_
-					 ("No view action defined in gnome MIME for this content type")),
+					 ("No open or view action defined in GNOME MIME for this content type")),
 			   FALSE, FALSE, 1);
     }
 
@@ -775,6 +777,30 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
     info->widget = vbox;
     info->can_display = FALSE;
 }
+
+
+static GtkWidget*
+part_info_mime_button (BalsaPartInfo* info, const gchar* content_type, gchar* key)
+{
+    GtkWidget* button;
+    gchar* msg;
+    const gchar* cmd;
+    
+
+    cmd = gnome_mime_get_value (content_type, key);
+    msg = g_strdup_printf(_("View part with %s"), cmd);
+    button = gtk_button_new_with_label(msg);
+    gtk_object_set_data (GTK_OBJECT (button), "mime_action", 
+                         (gpointer) key);
+    g_free(msg);
+
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       (GtkSignalFunc) part_context_menu_cb,
+                       (gpointer) info);
+
+    return button;
+}
+
 
 static void
 display_multipart(BalsaMessage * bm, LibBalsaMessageBody * body)
@@ -1268,7 +1294,6 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body)
     gchar *content_type = NULL;
     gchar *icon_title = NULL;
     gint pos;
-    GtkWidget *menu_item;
 
 
     if (libbalsa_message_body_is_multipart(body)) {
@@ -1285,7 +1310,6 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body)
     info = (BalsaPartInfo *) g_new0(BalsaPartInfo, 1);
     info->body = body;
     info->message = bm->message;
-    info->popup_menu = gtk_menu_new();
     info->can_display = FALSE;
 
     content_type = libbalsa_message_body_get_content_type(body);
@@ -1298,14 +1322,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body)
 
     pix = libbalsa_icon_finder(content_type, body->filename);
 
-    menu_item = gtk_menu_item_new_with_label(_("Save..."));
-    gtk_menu_append(GTK_MENU(info->popup_menu), menu_item);
-    gtk_widget_show(menu_item);
-
-    gtk_signal_connect(GTK_OBJECT(menu_item), "activate",
-		       (GtkSignalFunc) part_context_menu_save,
-		       (gpointer) info);
-
+    part_create_menu (info);
     pos = gnome_icon_list_append(GNOME_ICON_LIST(bm->part_list),
 				 pix, icon_title);
 
@@ -1328,6 +1345,76 @@ display_content(BalsaMessage * bm)
 	body = body->next;
     }
 }
+
+
+static void
+part_create_menu (BalsaPartInfo* info) 
+{
+    GtkWidget* menu_item;
+    GList* list;
+    GList* key_list;
+    gchar* content_type;
+    gchar* key;
+    const gchar* cmd;
+    gchar* menu_label;
+    gchar** split_key;
+    gint i = 0;
+
+    
+    info->popup_menu = gtk_menu_new ();
+    
+    content_type = libbalsa_message_body_get_content_type (info->body);
+    key_list = list = gnome_mime_get_keys (content_type);
+    
+    while (list) {
+        key = list->data;
+
+        if (key != NULL && g_strcasecmp (key, "icon-filename") && g_strncasecmp (key, "fm-", 3)) {
+            if ((cmd = gnome_mime_get_value (content_type, key)) != NULL) {
+                if (g_strcasecmp (key, "open") == 0 || 
+                    g_strcasecmp (key, "view") == 0 || 
+                    g_strcasecmp (key, "edit") == 0 ||
+                    g_strcasecmp (key, "ascii-view") == 0) {
+                    
+                    /* uppercase first letter, make label */
+                    menu_label = g_strdup (key);
+                    *menu_label = toupper (*menu_label);
+                } else {
+                    split_key = g_strsplit (key, ".", -1);
+
+                    while (split_key[i+1] != NULL) {
+                        ++i;
+                    }
+                    menu_label = split_key[i];
+                    menu_label = g_strdup (menu_label);
+                    g_strfreev (split_key);
+                }
+                
+                menu_item = gtk_menu_item_new_with_label (menu_label);
+                gtk_object_set_data (GTK_OBJECT (menu_item), "mime_action", 
+                                     key);
+                gtk_signal_connect (GTK_OBJECT (menu_item), "activate",
+                                    GTK_SIGNAL_FUNC (part_context_menu_cb),
+                                    (gpointer) info);
+                gtk_menu_append (GTK_MENU (info->popup_menu), menu_item);
+                g_free (menu_label);
+            }
+        }
+        list = g_list_next (list);
+    }
+
+    menu_item = gtk_menu_item_new_with_label ("Save...");
+    gtk_signal_connect (GTK_OBJECT (menu_item), "activate",
+                        GTK_SIGNAL_FUNC (part_context_menu_save),
+                        (gpointer) info);
+    gtk_menu_append (GTK_MENU (info->popup_menu), menu_item);
+
+    gtk_widget_show_all (info->popup_menu);
+
+    g_list_free (key_list);
+    g_free (content_type);
+}
+
 
 static void
 free_icon_data(gpointer data)
@@ -1357,20 +1444,26 @@ part_context_menu_save(GtkWidget * menu_item, BalsaPartInfo * info)
     save_part(info);
 }
 
+
 static void
-part_context_menu_view(GtkWidget * menu_item, BalsaPartInfo * info)
+part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info)
 {
     gchar *content_type, *fpos;
     const gchar *cmd;
+    gchar* key;
+
 
     content_type = libbalsa_message_body_get_content_type(info->body);
 
-    if ((cmd = gnome_mime_get_value(content_type, "view")) != NULL) {
+    key = gtk_object_get_data (GTK_OBJECT (menu_item), "mime_action");
+
+    if (key != NULL && (cmd = gnome_mime_get_value(content_type, key)) != NULL) {
 	if (!libbalsa_message_body_save_temporary(info->body, NULL)) {
 	    balsa_information(LIBBALSA_INFORMATION_WARNING,
 			      _("could not create temporary file %s"),
 			      info->body->temp_filename);
 	    g_free(content_type);
+            g_free (key);
 	    return;
 	}
 
@@ -1383,8 +1476,11 @@ part_context_menu_view(GtkWidget * menu_item, BalsaPartInfo * info)
 	}
     } else
 	fprintf(stderr, "view for %s returned NULL\n", content_type);
+
     g_free(content_type);
+    g_free (key);
 }
+
 
 void
 balsa_message_next_part(BalsaMessage * bmessage)

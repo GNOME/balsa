@@ -1,3 +1,9 @@
+2000-10-15  Matthew Guenther  <guentherm@asme.org>
+
+	* src/balsa-message.c: Changed attachment handling routine to
+	check for both "view" and "open" keys.  Made context menu
+	dynamically generated depending on attachment mime type actions.
+
 2000-10-14  Kjartan Maraas  <kmaraas@gnome.org>
 
 	* configure.in: Added "nn" to configure.in.

@@ -1,3 +1,11 @@
+1999-01-07  root  <guiheneu@linoleum.inria.fr>
+
+	* globals.h: added the variables Trashfile and Outboxfile
+	to store the path of the sepcial outbox/trash mailboxes
+
+	* mx.c (mutt_is_special_mailbox): added a macro to see if
+	a mailbox is trash/inbox or outbox
+
 1998-11-25  Herbert Valerio Riedel  <hvr@hvrlab.ml.org>
 
 	* socket.c: added #include <string.h>

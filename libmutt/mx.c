@@ -57,7 +57,9 @@
 #endif
 
 #define mutt_is_spool(s)  (strcmp (NONULL(Spoolfile), s) == 0)
-
+#define mutt_is_special_mailbox (strcmp (NONULL(Spoolfile), s) == 0 \
+				 strcmp (NONULL(Trashfile), s) == 0 \
+				 strcmp (NONULL(Outboxfile), s) == 0 )
 #ifdef USE_DOTLOCK
 /* parameters: 
  * path - file to lock

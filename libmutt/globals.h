@@ -74,6 +74,8 @@ WHERE char *Shell;
 WHERE char *Signature;
 WHERE char *SimpleSearch;
 WHERE char *Spoolfile;
+WHERE char *Trashfile;
+WHERE char *Outboxfile;
 WHERE char *StChars;
 WHERE char *StatusString;
 WHERE char *Tempdir;

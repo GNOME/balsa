@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
-"POT-Creation-Date: 1998-08-24 18:09-0400\n"
+"POT-Creation-Date: 1998-08-24 19:35-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Vincent Renardias <vincent@waw.com>\n"
 "Language-Team: Vincent Renardias <vincent@waw.com>\n"
@@ -50,15 +50,20 @@ msgid "You seem to be running Balsa for the first time.\n"
 msgstr ""
 
 #: src/balsa-init.c:182
-msgid "The following steps will setup Balsa by asking a few simple questions.  "
+msgid ""
+"The following steps will setup Balsa by asking a few simple questions.  "
 msgstr ""
 
 #: src/balsa-init.c:183
-msgid "Once you have completed these steps, you can always change them at a later time through Balsa's preferences.  "
+msgid ""
+"Once you have completed these steps, you can always change them at a later "
+"time through Balsa's preferences.  "
 msgstr ""
 
 #: src/balsa-init.c:184
-msgid "Please check the about box in Balsa's main window for more information on contacting the authors or reporting bugs."
+msgid ""
+"Please check the about box in Balsa's main window for more information on "
+"contacting the authors or reporting bugs."
 msgstr ""
 
 #. your name
@@ -110,7 +115,6 @@ msgstr ""
 msgid "Unable to Open Mailbox!"
 msgstr ""
 
-#. FIXME
 #: src/index-child.c:218
 msgid "Transfer"
 msgstr ""
@@ -130,7 +134,7 @@ msgstr ""
 # , fuzzy
 #: src/index-child.c:249
 msgid "Replied"
-msgstr "R\351pondre"
+msgstr "Répondre"
 
 # , fuzzy
 #: src/index-child.c:255
@@ -143,10 +147,11 @@ msgstr "Effacer"
 
 #: src/index-child.c:272 src/main-window.c:259
 msgid "Undelete"
-msgstr "R\351cup\351rer"
+msgstr "Récupérer"
 
 # , c-format
 #: src/local-mailbox.c:125
+#, c-format
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr ""
 
@@ -170,6 +175,7 @@ msgstr "Liste des B.A.L."
 
 # , c-format
 #: src/mailbox-conf.c:449
+#, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr ""
 
@@ -177,48 +183,13 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-# , fuzzy
-#: src/mailbox-manager.c:69
-msgid "Account"
-msgstr "A Propos"
-
-#: src/mailbox-manager.c:70
-msgid "Type"
-msgstr ""
-
-#: src/mailbox-manager.c:71
-msgid "Server"
-msgstr ""
-
-# , fuzzy
-#: src/mailbox-manager.c:86
-msgid "Mailbox Manager"
-msgstr "Gestionnaire de dossiers..."
-
-# , fuzzy
-#. edit account button
-#: src/mailbox-manager.c:140
-msgid "Edit..."
-msgstr "Edition"
-
-# , fuzzy
-#. edit account button
-#: src/mailbox-manager.c:153
-msgid "New..."
-msgstr "Nouveau"
-
-# , fuzzy
-#: src/mailbox-manager.c:166
-msgid "Delete..."
-msgstr "Effacer"
-
 #: src/main-window.c:88
 msgid "Mailboxes/<Separator>"
 msgstr "Boites aux lettres/<Separator>"
 
 #: src/main-window.c:149
 msgid "Get New Mail"
-msgstr "R\351cup\351rer les nouveaux messages"
+msgstr "Récupérer les nouveaux messages"
 
 #: src/main-window.c:166
 msgid "Check POP3"
@@ -238,7 +209,7 @@ msgstr "Nouveau"
 
 #: src/main-window.c:216 src/main-window.c:433 src/main-window.c:434
 msgid "Reply"
-msgstr "R\351pondre"
+msgstr "Répondre"
 
 #: src/main-window.c:229 src/main-window.c:444 src/main-window.c:445
 msgid "Forward"
@@ -263,7 +234,7 @@ msgstr "Boites aux lettres"
 
 #: src/main-window.c:315
 msgid "Preferences..."
-msgstr "Pr\351f\351rences..."
+msgstr "Préférences..."
 
 #.
 #. w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Mailbox Manager..."));
@@ -330,9 +301,11 @@ msgstr ""
 
 #: src/main-window.c:507
 msgid ""
-"The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n"
+"The Balsa email client is part of the GNOME desktop environment.  "
+"Information on Balsa can be found at http://www.balsa.net/\n"
 "\n"
-"If you need to report bugs, please do so at: http://www.gnome.org/cgi-bin/bugs"
+"If you need to report bugs, please do so at: "
+"http://www.gnome.org/cgi-bin/bugs"
 msgstr ""
 
 # , fuzzy
@@ -348,13 +321,14 @@ msgstr "Boites aux lettres"
 # , fuzzy
 #: src/mblist-window.c:500
 msgid "Delete Mailbox"
-msgstr "R\351cup\351rer les nouveaux messages"
+msgstr "Récupérer les nouveaux messages"
 
 #. identity page
 #: src/pref-manager.c:123
 msgid "Identity"
 msgstr ""
 
+#. view page
 #: src/pref-manager.c:137
 msgid "View"
 msgstr ""
@@ -413,7 +387,7 @@ msgstr "Message"
 # , fuzzy
 #: src/sendmsg-window.c:266
 msgid "Reply to "
-msgstr "R\351pondre"
+msgstr "Répondre"
 
 # , fuzzy
 #: src/sendmsg-window.c:279
@@ -422,15 +396,38 @@ msgstr "Faire suivre"
 
 # , c-format
 #: libbalsa/mailbox.c:452
+#, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr ""
 
 # , c-format
 #: libbalsa/mailbox.c:478
+#, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
 # , c-format
 #: libbalsa/mailbox.c:1340
+#, c-format
 msgid "Loading message: %s/%s\n"
 msgstr ""
+
+# , fuzzy
+#~ msgid "Account"
+#~ msgstr "A Propos"
+
+# , fuzzy
+#~ msgid "Mailbox Manager"
+#~ msgstr "Gestionnaire de dossiers..."
+
+# , fuzzy
+#~ msgid "Edit..."
+#~ msgstr "Edition"
+
+# , fuzzy
+#~ msgid "New..."
+#~ msgstr "Nouveau"
+
+# , fuzzy
+#~ msgid "Delete..."
+#~ msgstr "Effacer"

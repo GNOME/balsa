@@ -494,7 +494,8 @@ void
 libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox,
                                           GSList * filters)
 {
-    g_warning(" %s accesses list of messages directly, reimplement", __func__);
+    if (filters)
+	g_warning(" %s accesses list of messages directly, reimplement", __func__);
 #if 0
     GList * new_messages;
     gboolean free_filters = FALSE;
@@ -1046,7 +1047,6 @@ mbox_model_get_iter(GtkTreeModel *tree_model,
 		    GtkTreeIter  *iter,
 		    GtkTreePath  *path)
 {
-    LibBalsaMailbox* mbox = (LibBalsaMailbox*)tree_model;
     GtkTreeIter parent;
     const gint *indices;
     gint depth, i;
@@ -1059,10 +1059,10 @@ mbox_model_get_iter(GtkTreeModel *tree_model,
 
     g_return_val_if_fail(depth > 0, FALSE);
 
-    iter->user_data = mbox->msg_tree;
-    VALIDATE_ITER(iter, tree_model);
+    if (!mbox_model_iter_nth_child(tree_model, iter, NULL, indices[0]))
+	return FALSE;
 
-    for (i = 0; i < depth; i++) {
+    for (i = 1; i < depth; i++) {
 	parent = *iter;
 	if (!mbox_model_iter_nth_child(tree_model, iter, &parent,
 				       indices[i]))
@@ -1083,6 +1083,12 @@ mbox_model_get_path(GtkTreeModel	* tree_model,
     g_return_val_if_fail(VALID_ITER(iter, tree_model), NULL);
 
     node = iter->user_data;
+#define SANITY_CHECK
+#ifdef SANITY_CHECK
+    for (parent_node = node->parent; parent_node;
+	 parent_node = parent_node->parent)
+	g_return_val_if_fail(parent_node != node, NULL);
+#endif
     parent_node = node->parent;
 
     g_return_val_if_fail(parent_node != NULL, NULL);
@@ -1101,7 +1107,7 @@ mbox_model_get_path(GtkTreeModel	* tree_model,
     if (retval == NULL)
 	return NULL;
 
-    i = g_node_child_position(node->parent, node);
+    i = g_node_child_position(parent_node, node);
     if (i < 0) {
 	gtk_tree_path_free(retval);
 	return NULL;

@@ -1137,9 +1137,21 @@ imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
   rc = imap_cmd_exec(handle, cmd1);
   g_free(cmd1);
 
-  if(rc == IMR_OK)
-    for(i=0; i<cnt; i++)
-      msgno[i] = handle->mbox_view.arr[i];
+  if(rc == IMR_OK) {
+  /* one version of dovecot (which?) returned insufficient number of
+   * numbers, we need to work around it. */
+    if(handle->mbox_view.entries == cnt)
+      for(i=0; i<cnt; i++)
+        msgno[i] = handle->mbox_view.arr[i];
+    else {
+      for(i=0; i<cnt; i++)
+        msgno[i] = i + 1;
+      imap_mbox_handle_set_msg(handle,
+                               "bug in implementation of SORT command on "
+                               "IMAP server exposed.");
+      rc = IMR_NO;
+    }
+  }
 
   return rc;
 }

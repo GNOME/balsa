@@ -1,3 +1,7 @@
+2005-01-12  Pawel Salek
+
+	* libbalsa/imap/imap-commands.c: work around broken dovecot indexes.
+
 2005-01-07 09:47  PeterB
 
 	* src/main-window.c: Use hyphen instead of underscore in translator

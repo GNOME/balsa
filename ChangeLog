@@ -1,3 +1,10 @@
+2003-02-27  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-index.c: add extra protection via weak pointers.
+	* src/balsa-message.c: lock gdk in idle handler.
+	* src/sendmsg-window.c: use timeout instead of idle for checking
+	on external editor.
+
 2003-02-27 15:55  PeterB
 
 	* libbalsa/source-viewer.c: Make text not editable (!)

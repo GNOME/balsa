@@ -1533,7 +1533,9 @@ check_call_url(GtkWidget * widget, GdkEventButton * event,
 static gboolean
 status_bar_refresh(gpointer data)
 {
+    gdk_threads_enter();
     gnome_appbar_refresh(balsa_app.appbar);
+    gdk_threads_leave();
     return FALSE;
 }
 #define SCHEDULE_BAR_REFRESH()	g_timeout_add(5000, status_bar_refresh, NULL);

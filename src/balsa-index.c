@@ -1426,8 +1426,8 @@ mailbox_messages_changed_status_idle(struct msg_changed_data* arg)
         mailbox_messages_changed_status(arg->mb, arg->messages, arg->flag,
 				        arg->bindex);
     }
-    gdk_threads_leave();
     g_list_foreach(arg->messages, (GFunc)g_object_unref, NULL);
+    gdk_threads_leave();
     g_list_free(arg->messages);
     g_free(arg);
     return FALSE;
@@ -1492,9 +1492,13 @@ static gboolean
 mailbox_messages_func_idle(struct index_list_pair* arg)
 {
     gdk_threads_enter();
-    (arg->func)(arg->bindex, arg->messages);
-    gdk_threads_leave();
+    if(arg->bindex) {
+        g_object_remove_weak_pointer(G_OBJECT(arg->bindex),
+                                     (gpointer) &arg->bindex);
+	(arg->func)(arg->bindex, arg->messages);
+    }
     g_list_foreach(arg->messages, (GFunc)g_object_unref, NULL);
+    gdk_threads_leave();
     g_list_free(arg->messages);
     g_free(arg);
     return FALSE;
@@ -1506,6 +1510,7 @@ mailbox_messages_added_cb(BalsaIndex * bindex, GList *messages)
     struct index_list_pair *arg = g_new(struct index_list_pair,1);
     arg->func = bndx_messages_add; 
     arg->bindex  = bindex; arg->messages = g_list_copy(messages);
+    g_object_add_weak_pointer(G_OBJECT(bindex), (gpointer) &arg->bindex);
     g_list_foreach(arg->messages, (GFunc)g_object_ref, NULL);
     g_idle_add((GSourceFunc)mailbox_messages_func_idle, arg);
 }
@@ -1522,6 +1527,7 @@ mailbox_messages_removed_cb(BalsaIndex * bindex, GList * messages)
     struct index_list_pair *arg = g_new(struct index_list_pair,1);
     arg->func = bndx_messages_remove; 
     arg->bindex  = bindex; arg->messages = g_list_copy(messages);
+    g_object_add_weak_pointer(G_OBJECT(bindex), (gpointer) &arg->bindex);
     g_list_foreach(arg->messages, (GFunc)g_object_ref, NULL);
     g_idle_add((GSourceFunc)mailbox_messages_func_idle, arg);
 }

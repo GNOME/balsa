@@ -704,8 +704,8 @@ static gboolean
 edit_with_gnome_check(gpointer data) {
     FILE *tmp;
     balsa_edit_with_gnome_data *data_real = (balsa_edit_with_gnome_data *)data;
-    GtkTextBuffer *buffer =
-        gtk_text_view_get_buffer(GTK_TEXT_VIEW(data_real->msg->text));
+    GtkTextBuffer *buffer;
+
     pid_t pid;
     gint curposition;
     gchar line[81]; /* FIXME:All lines should wrap at this line */
@@ -721,6 +721,7 @@ edit_with_gnome_check(gpointer data) {
         perror("fopen");
         return TRUE;
     }
+    gdk_threads_enter();
     if(balsa_app.edit_headers) {
 	while(fgets(line, sizeof(line), tmp)) {
             if(line[strlen(line)-1] == '\n')line[strlen(line)-1] = '\0';
@@ -748,6 +749,8 @@ edit_with_gnome_check(gpointer data) {
             else break;
 	}
     }
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(data_real->msg->text));
+
     gtk_text_buffer_set_text(buffer, "", 0);
     curposition = 0;
     while(fgets(line, sizeof(line), tmp))
@@ -757,6 +760,8 @@ edit_with_gnome_check(gpointer data) {
     unlink(data_real->filename);
     gtk_widget_set_sensitive(data_real->msg->text, TRUE);
     g_free(data);
+    gdk_threads_leave();
+
     return FALSE;
 }
 
@@ -837,7 +842,7 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* msg)
     data->pid_editor = pid;
     data->filename = g_strdup(filename);
     data->msg = msg;
-    g_idle_add((GSourceFunc) edit_with_gnome_check, data);
+    g_timeout_add(200, (GSourceFunc)edit_with_gnome_check, data);
 }
 
 static void 

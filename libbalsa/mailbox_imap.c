@@ -727,6 +727,7 @@ static void
 imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
                 LibBalsaMailboxImap *mimap)
 {
+    ImapMessage *imsg;
     guint i;
 
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
@@ -737,17 +738,21 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
     libbalsa_mailbox_msgno_removed(mailbox, seqno);
     ++mimap->search_stamp;
     mimap->sort_field = -1;	/* Invalidate. */
-    if(msg_info->message) {
-	gchar **pair =
-            get_cache_name_pair(mimap, "body", 
-                                IMAP_MESSAGE_UID(msg_info->message));
+
+    /* Use imap_mbox_handle_get_msg(mimap->handle, seqno)->uid, not
+     * IMAP_MESSAGE_UID(msg_info->message), as the latter may try to
+     * fetch the message from the server. */
+    if ((imsg = imap_mbox_handle_get_msg(mimap->handle, seqno))) {
+	gchar **pair = get_cache_name_pair(mimap, "body", imsg->uid);
         gchar *fn = g_strconcat(pair[0], "/", pair[1], NULL);
         unlink(fn); /* ignore error; perhaps the message 
                      * was not in the cache.  */
         g_free(fn);
         g_strfreev(pair);
-        g_object_unref(G_OBJECT(msg_info->message));
     }
+
+    if(msg_info->message)
+        g_object_unref(msg_info->message);
     g_array_remove_index(mimap->messages_info, seqno-1);
 
     for (i = seqno - 1; i < mimap->messages_info->len; i++) {

@@ -2058,7 +2058,6 @@ libbalsa_keystroke_add_key(LibBalsaAddressEntry *address_entry, gchar *add)
     editable = GTK_EDITABLE(address_entry);
     if (editable->selection_start_pos != editable->selection_end_pos) {
 	libbalsa_cut_clipboard(address_entry);
-	return;
     }
 
     /*

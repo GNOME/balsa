@@ -182,8 +182,8 @@ AC_ARG_WITH(sharedir, [  --with-sharedir=PATH       specify where to put arch in
 sharedir=$mutt_cv_sharedir
 AC_SUBST(sharedir)
 
-AC_DEFINE(USE_IMAP,1,[Always compile IMAP support.])
-need_imap=yes
+dnl AC_DEFINE(USE_IMAP,0,[Always compile IMAP support.])
+need_imap=no
 need_socket=yes
 
 AC_CHECK_FUNC(setsockopt, , AC_CHECK_LIB(socket, setsockopt))

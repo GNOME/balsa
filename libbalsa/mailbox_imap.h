@@ -22,6 +22,8 @@
 #ifndef __LIBBALSA_MAILBOX_IMAP_H__
 #define __LIBBALSA_MAILBOX_IMAP_H__
 
+#include "imap/imap.h"
+
 #define LIBBALSA_TYPE_MAILBOX_IMAP \
     (libbalsa_mailbox_imap_get_type())
 #define LIBBALSA_MAILBOX_IMAP(obj) \
@@ -46,7 +48,6 @@ enum _ImapAuthType {
     AuthGSS
 };
 typedef enum _ImapAuthType ImapAuthType;
-typedef guint32 ImapUID;
 #define POINTER_TO_UID(p) GPOINTER_TO_UINT(p)
 #define UID_TO_POINTER(p) GUINT_TO_POINTER(p)
 
@@ -100,4 +101,6 @@ void reset_mutt_passwords(LibBalsaServer *);
 gchar *libbalsa_imap_path(LibBalsaServer * server, const gchar * path);
 gchar *libbalsa_imap_url(LibBalsaServer * server, const gchar * path);
 
+ImapMboxHandle *libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mailbox,
+						 LibBalsaServer *server);
 #endif				/* __LIBBALSA_MAILBOX_IMAP_H__ */

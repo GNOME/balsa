@@ -24,6 +24,7 @@
 
 #include <string.h>
 #include <libgnome/gnome-i18n.h>
+#include <gmime/gmime.h>
 
 #include "address.h"
 
@@ -504,17 +505,18 @@ rfc822_parse_adrlist(RFC822Address *top, const char *s, RFC822Error* err)
 LibBalsaAddress *
 libbalsa_address_new_from_string(const gchar * str)
 {
-    RFC822Error err;
-    RFC822Address* top = NULL, *list;
     LibBalsaAddress* addr;
+    InternetAddressList *list;
 
-    list = rfc822_parse_adrlist(top, str, &err);
-    if(!list || err != RFC822_OK) return NULL;
+    list = internet_address_parse_string(str);
+    if (!list)
+	return NULL;
+
     addr = libbalsa_address_new();
-    addr->full_name = g_strdup(list->comment);
+    addr->full_name = g_strdup(list->address->name);
     addr->address_list = g_list_append(addr->address_list, 
-                                       g_strdup(list->mailbox));
-    rfc822_address_free(top);
+				       g_strdup(list->address->value.addr));
+    internet_address_list_destroy(list);
     return addr;
 }
 
@@ -725,7 +727,7 @@ libbalsa_address_get_mailbox(LibBalsaAddress * address, gint n)
 
     nth_address = g_list_nth(address->address_list, n);
     g_return_val_if_fail(nth_address != NULL, NULL);
-    return (gchar*)nth_address->data;
+    return (const gchar*)nth_address->data;
 }
 
 

@@ -24,7 +24,6 @@
 #include "config.h"
 
 #include "libbalsa.h"
-#include "mailbackend.h"
 #include "misc.h"
 
 /* FIXME: The content of this file could go to message.c */
@@ -45,9 +44,14 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
                   gboolean flow)
 {
     FILE *part;
-    size_t alloced;
     gchar *res = NULL;
+    const gchar *const_res;
+    size_t allocated;
     GString *reply = NULL;
+    const GMimeContentType *type;
+    GMimeStream *stream, *filter_stream;
+    const char *charset;
+    GMimeFilter *filter;
 
     switch (libbalsa_message_body_type(body)) {
     case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
@@ -63,20 +67,31 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
                                        llen, ignore_html, flow);
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
+	type=g_mime_object_get_content_type(body->mime_part);
 	/* don't return text/html stuff... */
-	if (ignore_html && body->mutt_body->subtype &&
-	    !strcmp("html", body->mutt_body->subtype))
+	if (ignore_html && g_mime_content_type_is_type(type, "*", "html"))
 	    break;
-
-	libbalsa_message_body_save_temporary(body, NULL);
-
-	part = fopen(body->temp_filename, "r");
-	if (!part)
-	    break;
-	alloced = libbalsa_readfile(part, &res);
-	fclose(part);
-	if (!res)
-	    break;
+	stream = g_mime_stream_mem_new();
+	filter_stream = g_mime_stream_filter_new_with_stream(stream);
+	charset = libbalsa_message_body_charset(body);
+	if (!charset)
+	    charset="us-ascii";
+	filter = g_mime_filter_charset_new(charset, "UTF-8");
+	g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
+	const_res=g_mime_part_get_content(GMIME_PART(body->mime_part),
+					  &allocated);
+	if (!allocated || g_mime_stream_write(filter_stream, (char*)const_res,
+					      allocated) == -1 ||
+	    g_mime_stream_flush(filter_stream) == -1) {
+	    res = g_strdup("");
+	} else {
+	    g_mime_stream_write(stream, "", 1);
+	    res = GMIME_STREAM_MEM(stream)->buffer->data;
+	    GMIME_STREAM_MEM(stream)->owner = FALSE;
+	}
+	g_mime_stream_unref(filter_stream);
+	g_mime_stream_unref(stream);
+	g_object_unref(G_OBJECT(filter));
 
 #ifdef HAVE_GPGME
 	/* if this is a RFC 2440 signed part, strip the signature status */

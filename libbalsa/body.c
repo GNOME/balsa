@@ -29,6 +29,7 @@
 #include <libgnome/gnome-i18n.h>
 
 #include "libbalsa.h"
+/* for safe_fopen and struct stat */
 #include "mailbackend.h"
 
 LibBalsaMessageBody *
@@ -42,11 +43,9 @@ libbalsa_message_body_new(LibBalsaMessage * message)
     body->buffer = NULL;
     body->embhdrs = NULL;
     body->mime_type = NULL;
-    body->mutt_body = NULL;
     body->filename = NULL;
     body->temp_filename = NULL;
     body->charset = NULL;
-    body->disposition = DISPINLINE; /* reasonable ? */
 
 #ifdef HAVE_GPGME
     body->decrypt_file = NULL;
@@ -55,6 +54,8 @@ libbalsa_message_body_new(LibBalsaMessage * message)
 
     body->next = NULL;
     body->parts = NULL;
+
+    body->mime_part = NULL;
 
     return body;
 }
@@ -85,93 +86,96 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
     libbalsa_message_body_free(body->next);
     libbalsa_message_body_free(body->parts);
 
-    /* FIXME: Need to free MuttBody?? */
-
+    if (body->mime_part)
+	g_object_unref(G_OBJECT(body->mime_part));	
+    
     g_free(body);
 }
 
 
 static LibBalsaMessageHeaders *
-libbalsa_message_body_extract_embedded_headers(HEADER *hdr)
+libbalsa_message_body_extract_embedded_headers(GMimeMessage* msg)
 {
     LibBalsaMessageHeaders *ehdr;
-    ENVELOPE *env;
+    const char *subj;
+    int offset;
 
-    g_return_val_if_fail(hdr->env != NULL, NULL);
-    env = hdr->env;
     ehdr = g_new0(LibBalsaMessageHeaders, 1);
 
-    libbalsa_message_headers_from_mutt(ehdr, hdr);
-    ehdr->user_hdrs = libbalsa_message_user_hdrs_from_mutt(hdr);
+    libbalsa_message_headers_from_gmime(ehdr, msg);
+    ehdr->user_hdrs = libbalsa_message_user_hdrs_from_gmime(msg);
 
-    libbalsa_lock_mutt();
-
-    if (env->subject)
-	ehdr->subject = g_strdup(env->subject);
-    else if (env->real_subj)
-	ehdr->subject = g_strdup(env->real_subj);
+    subj = g_mime_message_get_subject(msg);
+    if (subj)
+	ehdr->subject = g_mime_utils_8bit_header_decode(subj);
     else 
 	ehdr->subject = g_strdup(_("(No subject)"));
-    if (env->date)
-	ehdr->date = mutt_parse_date(env->date, NULL);
-    else if (hdr->date_sent != 0)
-    	ehdr->date = hdr->date_sent;
-
-    libbalsa_unlock_mutt();
+    g_mime_message_get_date(msg, &ehdr->date, &offset);
 
     return ehdr;
 }
 
 
 void
-libbalsa_message_body_set_mutt_body(LibBalsaMessageBody * body,
-				    MuttBody * mutt_body)
+libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
+				    GMimeObject * mime_part)
 {
-    g_return_if_fail(body->mutt_body == NULL);
+    g_return_if_fail(body->mime_part == NULL);
 
-    body->mutt_body = mutt_body;
-    body->filename = g_strdup(mutt_body->filename);
-    if(body->filename)
-	rfc2047_decode(&body->filename);
+    g_object_ref(G_OBJECT(mime_part));	
+    if (body->mime_part)
+	g_object_unref(G_OBJECT(body->mime_part));	
+    body->mime_part = mime_part;
     if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE &&
-	body->mutt_body->subtype && body->mutt_body->hdr &&
-	!g_ascii_strcasecmp("rfc822", body->mutt_body->subtype))
+	GMIME_IS_MESSAGE_PART(body->mime_part)) {
+	GMimeMessagePart* message_part = GMIME_MESSAGE_PART(body->mime_part);
+	GMimeMessage* embedded_message =
+	    g_mime_message_part_get_message(message_part);
 	body->embhdrs =
-	    libbalsa_message_body_extract_embedded_headers(body->mutt_body->hdr);
-    if (mutt_body->next) {
-	body->next = libbalsa_message_body_new(body->message);
-	libbalsa_message_body_set_mutt_body(body->next, mutt_body->next);
-    }
-
-    if (mutt_body->parts) {
+	    libbalsa_message_body_extract_embedded_headers(embedded_message);
 	body->parts = libbalsa_message_body_new(body->message);
-	libbalsa_message_body_set_mutt_body(body->parts, mutt_body->parts);
+	libbalsa_message_body_set_mime_body(body->parts,
+					    embedded_message->mime_part);
+    } else
+    if (GMIME_IS_MULTIPART(mime_part))
+    {
+	LibBalsaMessageBody *part=NULL;
+	GList *child;
+	for (child=GMIME_MULTIPART(mime_part)->subparts; child; child=g_list_next(child))
+	{
+	    if (!part) {
+		part=body->parts = libbalsa_message_body_new(body->message);
+	    } else {
+		part->next = libbalsa_message_body_new(body->message);
+		part=part->next;
+	    }
+	    libbalsa_message_body_set_mime_body(part, child->data);
+	}
     }
 }
 
 LibBalsaMessageBodyType
 libbalsa_message_body_type(LibBalsaMessageBody * body)
 {
-    switch (body->mutt_body->type) {
-    case TYPEOTHER:
-	return LIBBALSA_MESSAGE_BODY_TYPE_OTHER;
-    case TYPEAUDIO:
+    const GMimeContentType *type=g_mime_object_get_content_type(body->mime_part);
+
+    if      (g_mime_content_type_is_type(type, "audio", "*"))
 	return LIBBALSA_MESSAGE_BODY_TYPE_AUDIO;
-    case TYPEAPPLICATION:
+    else if (g_mime_content_type_is_type(type, "application", "*"))
 	return LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION;
-    case TYPEIMAGE:
+    else if (g_mime_content_type_is_type(type, "image", "*"))
 	return LIBBALSA_MESSAGE_BODY_TYPE_IMAGE;
-    case TYPEMESSAGE:
+    else if (g_mime_content_type_is_type(type, "message", "*"))
 	return LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE;
-    case TYPEMODEL:
+    else if (g_mime_content_type_is_type(type, "model", "*"))
 	return LIBBALSA_MESSAGE_BODY_TYPE_MODEL;
-    case TYPEMULTIPART:
+    else if (g_mime_content_type_is_type(type, "multipart", "*"))
 	return LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART;
-    case TYPETEXT:
+    else if (g_mime_content_type_is_type(type, "text", "*"))
 	return LIBBALSA_MESSAGE_BODY_TYPE_TEXT;
-    case TYPEVIDEO:
+    else if (g_mime_content_type_is_type(type, "video", "*"))
 	return LIBBALSA_MESSAGE_BODY_TYPE_VIDEO;
-    }
+    else return LIBBALSA_MESSAGE_BODY_TYPE_OTHER;
 
     g_assert_not_reached();
     return LIBBALSA_MESSAGE_BODY_TYPE_OTHER;
@@ -181,13 +185,13 @@ gchar *
 libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 				    const gchar * param)
 {
-    gchar *res;
+    const gchar *res;
+    const GMimeContentType *type;
 
     g_return_val_if_fail(body != NULL, NULL);
 
-    libbalsa_lock_mutt();
-    res = mutt_get_parameter(param, body->mutt_body->parameter);
-    libbalsa_unlock_mutt();
+    type=g_mime_object_get_content_type(body->mime_part);
+    res = g_mime_content_type_get_parameter(type, param);
 
     return g_strdup(res);
 }
@@ -241,40 +245,40 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
                            const gchar * prefix,
 			   const gchar * filename)
 {
-    FILE *stream;
-    STATE s;
+    FILE *fpout;
+    const char *buf;
+    ssize_t len;
+    GMimeStream *stream, *filter_stream;
+    const char *charset;
+    GMimeFilter *filter;
 
-#ifdef HAVE_GPGME
-    if (body->decrypt_file)
-	stream = fopen(body->decrypt_file, "r");
-    else
-#endif
-    stream =
-	libbalsa_mailbox_get_message_stream(body->message->mailbox,
-					    body->message);
-
-    g_return_val_if_fail(stream != NULL, FALSE);
-
-    fseek(stream, body->mutt_body->offset, 0);
-
-    s.fpin = stream;
-    s.fpout = safe_fopen(filename, "w");
-    if (!s.fpout)
+    g_return_val_if_fail(GMIME_IS_PART(body->mime_part), FALSE);
+    fpout=safe_fopen(filename, "w");
+    if (!fpout)
 	return FALSE;
-    s.prefix = prefix;
-    /* convert everything but HTML - gtkhtml does conversion on its own. */
-    s.flags = 
-	(body->mutt_body->subtype && 
-	 strcmp(body->mutt_body->subtype, "html")==0) 
-     ? 0 : M_CHARCONV;
+    stream = g_mime_stream_file_new(fpout);
+    filter_stream = g_mime_stream_filter_new_with_stream(stream);
+    g_mime_stream_unref(stream);
+    charset = libbalsa_message_body_charset(body);
+    if (!charset)
+	charset="us-ascii";
+    filter = g_mime_filter_charset_new(charset, "UTF-8");
+    g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
+    g_object_unref(G_OBJECT(filter));
 
-    libbalsa_lock_mutt();
-    mutt_decode_attachment(body->mutt_body, &s);
-    libbalsa_unlock_mutt();
+    buf = g_mime_part_get_content(GMIME_PART(body->mime_part), &len);
+    if (len && g_mime_stream_write(filter_stream, (char*)buf, len) == -1) {
+	g_mime_stream_unref(filter_stream);
+	/* FIXME: unlink??? */
+	return FALSE;
+    }
+    if (g_mime_stream_flush(filter_stream) == -1) {
+	g_mime_stream_unref(filter_stream);
+	/* FIXME: unlink??? */
+	return FALSE;
+    }
 
-    fflush(s.fpout);
-    fclose(s.fpout);
-    fclose(s.fpin);
+    g_mime_stream_unref(filter_stream);
 
     return TRUE;
 }
@@ -284,34 +288,30 @@ libbalsa_message_body_get_content_type(LibBalsaMessageBody * body)
 {
     gchar *res;
 
-    libbalsa_lock_mutt();
-    if (body->mutt_body->subtype) {
-        gchar *tmp =
-	    g_strdup_printf("%s/%s", TYPE(body->mutt_body),
-			    body->mutt_body->subtype);
-        res = g_ascii_strdown(tmp, -1);
-        g_free(tmp);
-    } else
-	res = g_ascii_strdown(TYPE(body->mutt_body), -1);
-    libbalsa_unlock_mutt();
+    const GMimeContentType *type=g_mime_object_get_content_type(body->mime_part);
+    res=g_mime_content_type_to_string(type);
 
+    g_ascii_strdown(res, strlen(res));
     return res;
 }
 
 gboolean
 libbalsa_message_body_is_multipart(LibBalsaMessageBody * body)
 {
-    return is_multipart(body->mutt_body);
+    return GMIME_IS_MULTIPART(body->mime_part);
 }
 
 gboolean
 libbalsa_message_body_is_inline(LibBalsaMessageBody * body)
 {
-    gboolean res;
-    libbalsa_lock_mutt();
-    res = body->mutt_body && body->mutt_body->disposition==DISPINLINE;
-    libbalsa_unlock_mutt();
-    return res;
+    const gchar *disposition;
+    GMimePart *mime_part;
+    g_return_val_if_fail(body->mime_part != NULL, FALSE);
+    g_return_val_if_fail(GMIME_IS_PART(body->mime_part), FALSE);
+
+    mime_part = GMIME_PART(body->mime_part);
+    disposition=g_mime_part_get_content_disposition(mime_part);
+    return (disposition && g_strcasecmp(disposition, GMIME_DISPOSITION_INLINE)==0);
 }
 
 /* libbalsa_message_body_is_flowed:
@@ -362,9 +362,7 @@ libbalsa_message_body_get_by_id(LibBalsaMessageBody* body, const gchar* id)
     const gchar* bodyid;
 
     g_return_val_if_fail(id, NULL);
-    libbalsa_lock_mutt();
-    bodyid = mutt_get_parameter("id", body->mutt_body->parameter);
-    libbalsa_unlock_mutt();
+    bodyid = g_mime_object_get_content_id(body->mime_part);
 
     if( bodyid && strcmp(id, bodyid) ==0)
 	return body;

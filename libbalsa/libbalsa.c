@@ -36,6 +36,7 @@
 
 #include "libbalsa.h"
 #include "misc.h"
+/* For global mutt vars */
 #include "mailbackend.h"
 
 
@@ -107,7 +108,9 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     struct utsname utsname;
     const char *p;
 
+    /* FIXME: remove mutt vars */
     Spoolfile = libbalsa_guess_mail_spool();
+
     MhFlagged = "flagged";
     MhReplied = "replied";
     MhUnseen  = "unseen";
@@ -142,12 +145,6 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     Shell   = g_strdup((p = g_getenv("SHELL")) ? p : "/bin/sh");
     Tempdir = (char*)g_get_tmp_dir();
 
-    if (UserHeader)
-	UserHeader = UserHeader->next;
-
-    UserHeader = mutt_new_list();
-    UserHeader->data = g_strdup_printf("X-Mailer: Balsa %s", VERSION);
-
     set_option(OPTSAVEEMPTY);
     set_option(OPTCHECKNEW);
     set_option(OPTMHPURGE);
@@ -170,6 +167,7 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     SendCharset = "us-ascii:iso-8859-1:iso-8859-15:iso-8859-2:iso-8859-9:iso-8859-13:KOI8-R:iso-8859-5:euc-kr:euc-jp:UTF-8";    
 
     libbalsa_notify_init();
+    g_mime_init(0);
 
     /* Register our types */
     /* So that libbalsa_mailbox_new_from_config will work... */

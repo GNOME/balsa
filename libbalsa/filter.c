@@ -645,18 +645,14 @@ GList * libbalsa_extract_new_messages(GList * messages)
 {
     GList * extracted=NULL;
 
-    libbalsa_lock_mutt();
     for (;messages;messages=g_list_next(messages)) {
 	LibBalsaMessage * message = LIBBALSA_MESSAGE(messages->data);
-	HEADER * cur;
 
-	if (!message->header->old) {
+	if (!LIBBALSA_MESSAGE_IS_RECENT(message)) {
 	    extracted = g_list_prepend(extracted, message);
-	    cur = message->header;
-	    mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_OLD, TRUE);
+	    libbalsa_message_clear_recent(message);
 	}
     }
-    libbalsa_unlock_mutt();
     return extracted;
 }
 

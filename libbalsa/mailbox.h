@@ -27,6 +27,8 @@
 
 #include "libbalsa.h"
 
+#include <gmime/gmime.h>
+
 #define LIBBALSA_TYPE_MAILBOX \
     (libbalsa_mailbox_get_type())
 #define LIBBALSA_MAILBOX(obj) \
@@ -101,13 +103,6 @@ typedef enum {
 /*
  * structures
  */
-struct _CONTEXT;
-typedef struct _LibBalsaMailboxAppendHandle LibBalsaMailboxAppendHandle;
-
-struct _LibBalsaMailboxAppendHandle {
-    struct _CONTEXT* context;
-};
-
 typedef struct _LibBalsaMailboxClass LibBalsaMailboxClass;
 
 typedef struct _LibBalsaMailboxView LibBalsaMailboxView;
@@ -130,10 +125,7 @@ struct _LibBalsaMailbox {
     gchar *name;                /* displayed name for a special mailbox; */
                                 /* Isn't it a GUI thing?                 */
     gchar *url; /* Unique resource locator, file://, imap:// etc */
-    /* context refers libmutt internal data.           * 
-     * AVOID ACCESSING ITS CONTENT SINCE THE STRUCTURE *
-     * DEFINITION MAY CHANGE WITHOUT WARNING.          */
-    struct _CONTEXT* context;
+    void *mailbox_data;
     guint open_ref;
 
     gboolean lock;
@@ -159,11 +151,9 @@ struct _LibBalsaMailbox {
 
 struct _LibBalsaMailboxClass {
     GObjectClass parent_class;
-    
+
     /* Signals */
     gboolean (*open_mailbox) (LibBalsaMailbox * mailbox);
-    LibBalsaMailboxAppendHandle* (*open_mailbox_append)
-	 (LibBalsaMailbox * mailbox);
     void (*close_mailbox) (LibBalsaMailbox * mailbox);
 
     void (*messages_added) (LibBalsaMailbox * mailbox,
@@ -181,7 +171,7 @@ struct _LibBalsaMailboxClass {
 				      gboolean flag);
 
     /* Virtual Functions */
-    FILE *(*get_message_stream) (LibBalsaMailbox * mailbox,
+    GMimeStream *(*get_message_stream) (LibBalsaMailbox * mailbox,
 				 LibBalsaMessage * message);
     void (*check) (LibBalsaMailbox * mailbox);
     gboolean (*message_match) (LibBalsaMailbox * mailbox,
@@ -193,6 +183,15 @@ struct _LibBalsaMailboxClass {
 			   GSList * conditions);
     void (*save_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     void (*load_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
+    gboolean (*sync) (LibBalsaMailbox * mailbox);
+    GMimeMessage *(*get_message) (LibBalsaMailbox * mailbox, guint msgno);
+    LibBalsaMessage *(*load_message) (LibBalsaMailbox * mailbox, guint msgno);
+    int (*add_message) (LibBalsaMailbox * mailbox, GMimeStream *stream,
+			LibBalsaMessageFlag flags);
+    void (*change_message_flags) (LibBalsaMailbox * mailbox, guint msgno,
+					   LibBalsaMessageFlag set,
+					   LibBalsaMessageFlag clear);
+    gboolean (*close_backend)(LibBalsaMailbox * mailbox);
 };
 
 GType libbalsa_mailbox_get_type(void);
@@ -205,9 +204,6 @@ LibBalsaMailbox *libbalsa_mailbox_new_from_config(const gchar * prefix);
 /* XXX these need to return a value if they failed */
 gboolean libbalsa_mailbox_open(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox);
-LibBalsaMailboxAppendHandle* 
-libbalsa_mailbox_open_append(LibBalsaMailbox * mailbox);
-int libbalsa_mailbox_close_append(LibBalsaMailboxAppendHandle* handle);
 void libbalsa_mailbox_close(LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_link_message(LibBalsaMailbox * mbx, LibBalsaMessage*msg);
 void libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox);
@@ -221,7 +217,7 @@ void libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
                                       int type, int prog, int tot,
                                       const gchar* msg);
 
-FILE *libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
+GMimeStream *libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
 					  LibBalsaMessage * message);
 gint libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete);
 
@@ -261,6 +257,20 @@ void libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);
 void libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);
+
+int libbalsa_mailbox_copy_message(LibBalsaMessage *message, LibBalsaMailbox *dest);
+gboolean libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox);
+GMimeMessage *libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno);
+LibBalsaMessage *libbalsa_mailbox_load_message(LibBalsaMailbox * mailbox, guint msgno);
+int libbalsa_mailbox_add_message_stream(LibBalsaMailbox * mailbox,
+					GMimeStream *stream,
+					LibBalsaMessageFlag flags);
+int libbalsa_mailbox_add_message(LibBalsaMailbox * mailbox, const gchar * data,
+				 LibBalsaMessageFlag flags);
+void libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox, guint msgno,
+					   LibBalsaMessageFlag set,
+					   LibBalsaMessageFlag clear);
 
 /*
  * misc mailbox releated functions

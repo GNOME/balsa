@@ -47,15 +47,11 @@ static void libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass *klass);
 static void libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox);
 static void libbalsa_mailbox_local_finalize(GObject * object);
 
-static gboolean libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox);
-static LibBalsaMailboxAppendHandle*
-libbalsa_mailbox_local_append(LibBalsaMailbox * mailbox);
-static void libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox);
-
 static void libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
 static void libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
+
 GType
 libbalsa_mailbox_local_get_type(void)
 {
@@ -104,11 +100,6 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 		     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
     object_class->finalize = libbalsa_mailbox_local_finalize;
-
-    libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_local_open;
-    libbalsa_mailbox_class->open_mailbox_append 
-	= libbalsa_mailbox_local_append;
-    libbalsa_mailbox_class->check = libbalsa_mailbox_local_check;
 
     libbalsa_mailbox_class->save_config =
 	libbalsa_mailbox_local_save_config;
@@ -211,130 +202,6 @@ libbalsa_mailbox_local_finalize(GObject * object)
 	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
-/* libbalsa_mailbox_local_open:
-   THREADING: It should never touch gdk lock.
-*/
-static gboolean
-libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
-{
-    struct stat st;
-    LibBalsaMailboxLocal *local;
-    const gchar* path;
-
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox), FALSE);
-
-    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
-    local = LIBBALSA_MAILBOX_LOCAL(mailbox);
-    path = libbalsa_mailbox_local_get_path(mailbox);
-
-    if (CLIENT_CONTEXT_OPEN(mailbox)) {
-	/* incriment the reference count */
-	mailbox->open_ref++;
-	UNLOCK_MAILBOX(mailbox);
-	return TRUE;
-    }
-
-    if (stat(path, &st) == -1) {
-	UNLOCK_MAILBOX(mailbox);
-	return FALSE;
-    }
-    
-    libbalsa_lock_mutt();
-    CLIENT_CONTEXT(mailbox) = mx_open_mailbox(path, 0, NULL);
-    libbalsa_unlock_mutt();
-    
-    if (!CLIENT_CONTEXT_OPEN(mailbox)) {
-	UNLOCK_MAILBOX(mailbox);
-	return FALSE;
-    }
-    mailbox->readonly = CLIENT_CONTEXT(mailbox)->readonly;
-    mailbox->messages = 0;
-    mailbox->total_messages = 0;
-    mailbox->unread_messages = 0;
-    mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount;
-    mailbox->open_ref++;
-    UNLOCK_MAILBOX(mailbox);
-    libbalsa_mailbox_load_messages(mailbox);
-
-    /* We run the filters here also because new could have been put
-       in the mailbox with another mechanism than Balsa */
-    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
-
-    /* increment the reference count */
-#ifdef DEBUG
-    g_print(_("LibBalsaMailboxLocal: Opening %s Refcount: %d\n"),
-	    mailbox->name, mailbox->open_ref);
-#endif
-    return TRUE;
-}
-
-static LibBalsaMailboxAppendHandle*
-libbalsa_mailbox_local_append(LibBalsaMailbox * mailbox)
-{
-    LibBalsaMailboxAppendHandle* res;
-    g_return_val_if_fail(mailbox, NULL);
-
-    res = g_new0(LibBalsaMailboxAppendHandle,1);
-    libbalsa_lock_mutt();
-    res->context = mx_open_mailbox(libbalsa_mailbox_local_get_path(mailbox), 
-				   M_APPEND, NULL);
-    if(res->context == NULL) {
-	g_free(res);
-	res = NULL;
-    } else if (res->context->readonly) {
-	g_warning("Cannot open dest local mailbox '%s' for writing.", 
-		  mailbox->name);
-	mx_close_mailbox(res->context, NULL);
-	g_free(res);
-	res = NULL;
-    }
-    libbalsa_unlock_mutt();
-    return res;
-}
-
-/* libbalsa_mailbox_local_check:
-   As all libbalsa functions, it should work with or without gdk lock.
-*/
-static void
-libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
-{
-    if (mailbox->open_ref == 0) {
-	if (libbalsa_notify_check_mailbox(mailbox))
-	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
-    } else {
-	gint i = 0;
-	gint index_hint;
-
-	LOCK_MAILBOX(mailbox);
-
-	index_hint = CLIENT_CONTEXT(mailbox)->vcount;
-
-	libbalsa_lock_mutt();
-	i = mx_check_mailbox(CLIENT_CONTEXT(mailbox), &index_hint, 0);
-	libbalsa_unlock_mutt();
-
-	if (i < 0) {
-	    g_print("mx_check_mailbox() failed on %s\n", mailbox->name);
-	} 
-	if (i == M_REOPENED && (LIBBALSA_IS_MAILBOX_MBOX(mailbox)
-                                || LIBBALSA_IS_MAILBOX_MH(mailbox))) {
-	    /* redo everything from the start instead of looking
-	       only at new messages, but only for mboxes, maildir
-	       seems to break with this */
-	    libbalsa_mailbox_free_messages(mailbox);	    
-	}
-	if (i == M_NEW_MAIL || i == M_REOPENED) {
-	    mailbox->new_messages =
-		CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
-	    UNLOCK_MAILBOX(mailbox);
-	    libbalsa_mailbox_load_messages(mailbox);
-	    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
-	} else {
-	    UNLOCK_MAILBOX(mailbox);
-	}
-    }
-}
-
 static void
 libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 				   const gchar * prefix)
@@ -372,3 +239,4 @@ libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 
     libbalsa_notify_register_mailbox(mailbox);
 }
+

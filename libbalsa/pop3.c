@@ -41,8 +41,6 @@
 #include <gnome.h>
 
 #include "md5.h"
-#include "mutt.h"
-#include "libmutt/mailbox.h"
 #include "libbalsa.h"
 #include "pop3.h"
 
@@ -410,8 +408,10 @@ static PopStatus send_fetch_req(int s, int msgno, char* buffer, size_t bufsz)
     return POP_OK;
 }
 
+typedef size_t (*msg_append_func)(const char *, size_t len, void *data);
 static PopStatus
-fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs, 
+fetch_single_msg(int s, void *msg, msg_append_func msg_append,
+		 int msgno, int first_msg, int msgs, 
 		 int *num_bytes, int tot_bytes, 
                  ProgressCallback prog_cb, void* prog_data)
 {
@@ -462,7 +462,7 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
 	    p = buffer;
 	
 	/* fwrite(p, 1, chunk, stdout); */
-	if(fwrite (p, 1, (size_t) chunk, msg) != (size_t) chunk)
+	if(msg_append (p, (size_t) chunk, msg) != (size_t) chunk)
             return POP_WRITE_ERR;
     } /* end of while */
     
@@ -495,6 +495,12 @@ static PopStatus reset_server(int s, char* buffer, size_t bufsz)
     return POP_OK;
 }
 
+static size_t
+fetch_procmail_msg_append(const char *text, size_t len, void *data)
+{
+    return fwrite(text, 1, len, (FILE*)data);
+}
+
 static PopStatus
 fetch_procmail(int s, gint first_msg, gint msgs, gint tot_bytes,
 	       gboolean delete_on_server, const gchar * procmail_path,
@@ -515,7 +521,8 @@ fetch_procmail(int s, gint first_msg, gint msgs, gint tot_bytes,
 	    return POP_PROCMAIL_ERR;
 	}
 	
-	err = fetch_single_msg(s, msg, i, first_msg, msgs, &num_bytes, 
+	err = fetch_single_msg(s, msg, fetch_procmail_msg_append,
+			       i, first_msg, msgs, &num_bytes, 
 			       tot_bytes, prog_cb, prog_data);
 	if (pclose (msg) != 0 && err == POP_OK) err = POP_PROCMAIL_ERR;
 	
@@ -528,6 +535,11 @@ fetch_procmail(int s, gint first_msg, gint msgs, gint tot_bytes,
 }
 
 
+static size_t
+fetch_direct_msg_append(const char *text, size_t len, void *data)
+{
+    return g_mime_stream_write((GMimeStream*)data, (char*)text, len);
+}
 
 static PopStatus
 fetch_direct(int s, gint first_msg, gint msgs, gint tot_bytes,
@@ -537,44 +549,40 @@ fetch_direct(int s, gint first_msg, gint msgs, gint tot_bytes,
     gint i, num_bytes;
     char buffer[2048];
     PopStatus err = POP_OK;
-    CONTEXT ctx, *nctx;
-    MESSAGE *msg = NULL;
+    LibBalsaMailbox *mailbox;
+    GMimeStream *stream;
     
     g_return_val_if_fail(spoolfile, POP_OK);
 
-    libbalsa_lock_mutt();
-    nctx = mx_open_mailbox (spoolfile, M_APPEND, &ctx);
-    libbalsa_unlock_mutt();
-    if(nctx == NULL) return POP_OPEN_ERR;
+    mailbox = (LibBalsaMailbox*)libbalsa_mailbox_local_new(spoolfile, FALSE);
+    if(mailbox == NULL) return POP_OPEN_ERR;
 
     num_bytes=0;  
     for (i = first_msg; i <= msgs; i++) {
 	if( (err=send_fetch_req(s, i, buffer, sizeof(buffer))) != POP_OK)
 	    break;
-	libbalsa_lock_mutt();
-	msg = mx_open_new_message (&ctx, NULL, M_ADD_FROM);
-	libbalsa_unlock_mutt();
-	if (msg == NULL)  {
+	stream = g_mime_stream_mem_new();
+	if (stream == NULL)  {
 	    DM("POP3: Error while creating new message %d", i );
 	    err = POP_MSG_APPEND;
 	    break;
 	}
 
-	err = fetch_single_msg(s, msg->fp, i, first_msg, msgs, &num_bytes,
+	err = fetch_single_msg(s, stream, fetch_direct_msg_append, 
+			       i, first_msg, msgs, &num_bytes,
 			       tot_bytes, prog_cb, prog_data);
-	if(err != POP_OK) break;
-	libbalsa_lock_mutt();
-	if (mx_commit_message (msg, &ctx) != 0) err = POP_WRITE_ERR;
-	mx_close_message (&msg);
-	libbalsa_unlock_mutt();
+	if(err != POP_OK) {
+	    g_mime_stream_unref(stream);
+	    break;
+	}
+	libbalsa_mailbox_add_message_stream(mailbox, stream, 0);
+	g_mime_stream_unref(stream);
 	
 	if (err) break;
 	if (delete_on_server) delete_msg(s, i); /* ignore errors */
     }
     if (err != POP_OK) reset_server(s, buffer, sizeof(buffer));
-    libbalsa_lock_mutt();
-    mx_close_mailbox (&ctx, NULL);
-    libbalsa_unlock_mutt(); 
+    g_object_unref(G_OBJECT(mailbox));
     return err;
 }
 

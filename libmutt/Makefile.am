@@ -88,7 +88,7 @@ libmutt_a_SOURCES = \
 	url.h		\
 	$(SSLSOURCES)	$(SASLSOURCES)  $(NSSSOURCES)
 
-SUBDIRS = imap
+#SUBDIRS = imap
 
 DEFS = -DSHAREDIR=\"$(sharedir)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DLIBMUTT
 INCLUDES=-I${top_srcdir} -I${top_srcdir}/imap -I${top_builddir}

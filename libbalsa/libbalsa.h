@@ -30,10 +30,6 @@ typedef struct _LibBalsaMessageHeaders LibBalsaMessageHeaders;
 typedef struct _LibBalsaMessageBody LibBalsaMessageBody;
 typedef struct _LibBalsaServer LibBalsaServer;
 
-/* Opaque structures */
-typedef struct body MuttBody;
-typedef struct header MuttHeader;
-
 #include "address.h"
 #include "message.h"
 #include "body.h"

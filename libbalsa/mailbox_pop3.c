@@ -28,7 +28,6 @@
 #include <gtk/gtk.h>
 #include "libbalsa.h"
 #include "libbalsa_private.h"
-#include "mailbackend.h"
 #include "pop3.h"
 #include "mailbox.h"
 
@@ -190,17 +189,13 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox)
 
     pop = LIBBALSA_MAILBOX_POP3(mailbox);
 
-    libbalsa_lock_mutt();
-    CLIENT_CONTEXT(mailbox) =
-	mx_open_mailbox(LIBBALSA_MAILBOX_REMOTE_SERVER(pop)->host, 0,
-			NULL);
-    libbalsa_unlock_mutt();
+    CLIENT_CONTEXT(mailbox) = mailbox;
 
     if (CLIENT_CONTEXT_OPEN(mailbox)) {
 	mailbox->messages = 0;
 	mailbox->total_messages = 0;
 	mailbox->unread_messages = 0;
-	mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount;
+	mailbox->new_messages = 0;
 	libbalsa_mailbox_load_messages(mailbox);
 
 	/* increment the reference count */

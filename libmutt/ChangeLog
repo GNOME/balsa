@@ -1,3 +1,9 @@
+2003-09-05  Carlos Morgado  <chbm chbm.net>
+
+	* configure.in: 
+	* Makefile.am: 
+	commited Bart Visscher's GMime patch. you need gmime-2.0
+
 2003-08-19 14:17  PeterB
 
 	* imap/imap.c: Use value returned by

@@ -1,3 +1,5 @@
+SUBDIRS = imap
+
 noinst_LIBRARIES = libbalsa.a
 
 libbalsa_a_SOURCES = 		\
@@ -74,6 +76,8 @@ libbalsa_a_SOURCES = 		\
 	server.c		\
 	server.h		\
 	source-viewer.c		\
+	gmime-gpgme-context.c   \
+	gmime-gpgme-context.h   \
 	rfc3156.c		\
 	rfc3156.h
 
@@ -82,6 +86,7 @@ EXTRA_DIST = \
 
 INCLUDES= -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	-I${top_srcdir}/libmutt -I${top_builddir}/libmutt \
+	-I${top_srcdir}/libbalsa/imap \
 	$(BALSA_CFLAGS)
 
 DEFS = -DLIBMUTT                \

@@ -29,7 +29,7 @@
 #include "libbalsa_private.h"
 #include "rfc3156.h"
 
-#include <gpgme.h>
+#include "gmime-gpgme-context.h"
 
 #ifdef HAVE_XML2
 #  include <libxml/xmlmemory.h>
@@ -118,18 +118,31 @@ static void (*segvhandler)(int);
 static const gchar *libbalsa_gpgme_validity_to_gchar_short(GpgmeValidity validity);
 static const gchar *get_passphrase_cb(void *opaque, const char *desc,
 				      void **r_hd);
-static gchar *gpgme_signature(MailDataMBox *mailData, const gchar *sign_for,
-			      gchar **micalg, GtkWindow *parent);
+static GMimeMultipartSigned * gpgme_signature(GMimeObject *mps,
+					      const gchar *sign_for,
+					      GtkWindow *parent);
 static gchar *gpgme_encrypt_file(MailDataMBox *mailData, GList *encrypt_for);
 static int read_cb_MailDataMBox(void *hook, char *buffer, size_t count,
 				size_t *nread);
 static int read_cb_MailDataBuffer(void *hook, char *buffer, size_t count,
 				  size_t *nread);
 static void set_decrypt_file(LibBalsaMessageBody *body, const gchar *fname);
+static gchar * get_key_fingerprint(GpgmeCtx ctx, const gchar *name,
+				   int secret_only, GtkWindow *parent);
 static gboolean gpgme_add_signer(GpgmeCtx ctx, const gchar *signer);
 static gboolean gpgme_build_recipients(GpgmeRecipients *rcpt, GpgmeCtx ctx,
 				       GList *rcpt_list);
+static void get_sig_info_from_cipher_context(LibBalsaSignatureInfo* info,
+				       GMimeGpgMEContext* validity);
 static void get_sig_info_from_ctx(LibBalsaSignatureInfo* info, GpgmeCtx ctx);
+
+static GType libbalsa_g_mime_session_get_type (void);
+typedef struct _LibBalsaGMimeSession LibBalsaGMimeSession;
+struct _LibBalsaGMimeSession {
+	GMimeSession parent_object;
+	PassphraseCB *data;
+	gchar *passwd;
+};
 
 
 /* ==== public functions =================================================== */
@@ -203,36 +216,35 @@ libbalsa_signature_info_to_gchar(LibBalsaSignatureInfo * info,
 gint
 libbalsa_is_pgp_signed(LibBalsaMessageBody *body)
 {
-    BODY *mb_body, *mb_sig;
+    GMimeObject *mb_body, *mb_sig;
+    const GMimeContentType *content_type;
     const gchar *micalg;
     const gchar *protocol;
     gint result;
 
     g_return_val_if_fail(body != NULL, 0);
-    g_return_val_if_fail(body->mutt_body != NULL, 0);
-    if (!body->parts || !body->parts->next || !body->parts->next->mutt_body)
+    g_return_val_if_fail(body->mime_part != NULL, 0);
+    if (!body->parts || !body->parts->next || !body->parts->next->mime_part)
 	return 0;
 
-    libbalsa_lock_mutt();
-    mb_body = body->mutt_body;
-    mb_sig = body->parts->next->mutt_body;
+    mb_body = body->mime_part;
+    mb_sig = body->parts->next->mime_part;
+    content_type = g_mime_object_get_content_type(mb_body);
 
-    micalg = mutt_get_parameter("micalg", mb_body->parameter);
-    protocol = mutt_get_parameter("protocol", mb_body->parameter);
+    micalg = g_mime_content_type_get_parameter(content_type, "micalg");
+    protocol = g_mime_content_type_get_parameter(content_type, "protocol");
 
-    result = mb_body->type == TYPEMULTIPART && 
-	!g_ascii_strcasecmp("signed", mb_body->subtype);
+    result = g_mime_content_type_is_type(content_type, "multipart", "signed");
+    content_type = g_mime_object_get_content_type(mb_sig);
 
     if (result) {
 	if (!(micalg && !g_ascii_strncasecmp("pgp-", micalg, 4) &&
 	      protocol && !g_ascii_strcasecmp("application/pgp-signature", protocol) &&
-	      mb_sig->type == TYPEAPPLICATION &&
-	      !g_ascii_strcasecmp("pgp-signature", mb_sig->subtype)))
+	      g_mime_content_type_is_type(content_type,
+					  "application", "pgp-signature")))
 	    result = -1;  /* bad multipart/signed stuff... */
     }
 
-    libbalsa_unlock_mutt();
-    
     return result;
 }
 
@@ -245,34 +257,40 @@ libbalsa_is_pgp_signed(LibBalsaMessageBody *body)
 gint
 libbalsa_is_pgp_encrypted(LibBalsaMessageBody *body)
 {
+    const GMimeContentType *content_type;
     const gchar *protocol;
     LibBalsaMessageBody *cparts;
     gint result;
 
     g_return_val_if_fail(body != NULL, 0);
-    g_return_val_if_fail(body->mutt_body != NULL, 0);
+    g_return_val_if_fail(body->mime_part != NULL, 0);
+    if (body->parts == NULL)
+	return 0;
+    g_return_val_if_fail(body->parts->mime_part != NULL, 0);
 
-    libbalsa_lock_mutt();
-    protocol = mutt_get_parameter("protocol", body->mutt_body->parameter);
+    content_type = g_mime_object_get_content_type(body->mime_part);
+
+    protocol = g_mime_content_type_get_parameter(content_type, "protocol");
+
     cparts = body->parts;
 
     /* FIXME: verify that body contains "Version: 1" */
-    result = body->mutt_body->type == TYPEMULTIPART &&
-	!g_ascii_strcasecmp("encrypted", body->mutt_body->subtype);
+    result = g_mime_content_type_is_type(content_type, "multipart", "encrypted");
+    content_type = g_mime_object_get_content_type(cparts->mime_part);
 
     if (result) {
 	if (!(protocol &&
 	      !g_ascii_strcasecmp("application/pgp-encrypted", protocol) &&
-	      cparts && cparts->next && !cparts->next->next &&
-	      cparts->mutt_body->type == TYPEAPPLICATION && 
-	      !g_ascii_strcasecmp("pgp-encrypted", cparts->mutt_body->subtype) &&
-	      cparts->next->mutt_body->type == TYPEAPPLICATION &&
-	      !g_ascii_strcasecmp("octet-stream", cparts->next->mutt_body->subtype)))
+	      g_mime_content_type_is_type(content_type,
+					  "application", "pgp-encrypted") &&
+	      cparts->next && cparts->next->mime_part &&
+	      (content_type =
+		  g_mime_object_get_content_type(cparts->next->mime_part)) &&
+	      g_mime_content_type_is_type(content_type,
+					  "application", "octet-stream")))
 	    result = -1;  /* bad multipart/encrypted... */
     }
 
-    libbalsa_unlock_mutt();
-    
     return result;
 }
 
@@ -280,234 +298,114 @@ libbalsa_is_pgp_encrypted(LibBalsaMessageBody *body)
 gboolean
 libbalsa_body_check_signature(LibBalsaMessageBody* body)
 {
-    GpgmeCtx ctx;
-    GpgmeError err;
-    GpgmeData sig, plain;
-    MailDataMBox plainStream;
-    FILE *sigStream;
     LibBalsaSignatureInfo *sig_status;
-    BODY *msg_body, *sign_body;
-    LibBalsaMessage *msg;
+    GMimeSession *session;
+    GMimeCipherContext *ctx;
+    GMimeCipherValidity *valid;
+    GError *err=NULL;
 
     g_return_val_if_fail(body, FALSE);
-    g_return_val_if_fail(body->next, FALSE);
+    g_return_val_if_fail(body->parts, FALSE);
+    g_return_val_if_fail(body->parts->next, FALSE);
     g_return_val_if_fail(body->message, FALSE);
-    msg = body->message;
-    g_return_val_if_fail(!CLIENT_CONTEXT_CLOSED(msg->mailbox), FALSE);
 
     /* the 2nd part for RFC 3156 MUST be application/pgp-signature */
-    if (!body->next || !body->next->mutt_body ||
-	body->next->mutt_body->type != TYPEAPPLICATION ||
-	g_ascii_strcasecmp(body->next->mutt_body->subtype, "pgp-signature"))
+    if (!GMIME_IS_MULTIPART_SIGNED(body->mime_part))
 	return FALSE;
 
-    libbalsa_signature_info_destroy(body->next->sig_info);
-    body->next->sig_info = sig_status = g_new0(LibBalsaSignatureInfo, 1);
+    libbalsa_signature_info_destroy(body->parts->next->sig_info);
+    body->parts->next->sig_info = sig_status = g_new0(LibBalsaSignatureInfo, 1);
     sig_status->status = GPGME_SIG_STAT_ERROR;
-    
 
-    /* try to create a gpgme context */
-    if ((err = gpgme_new(&ctx)) != GPGME_No_Error) {
-	g_warning("could not create gpgme context: %s", gpgme_strerror(err));
-	return FALSE;
-    }
-    
-    /* create the body data stream */
-    if (body->decrypt_file)
-	plainStream.mailboxFile = safe_fopen(body->decrypt_file, "r");
-    else
-	plainStream.mailboxFile = 
-	    libbalsa_mailbox_get_message_stream(msg->mailbox, msg);
-    msg_body = body->mutt_body;
-    fseek(plainStream.mailboxFile, msg_body->hdr_offset, 0);
-    plainStream.bytes_left = msg_body->offset - msg_body->hdr_offset +
-	msg_body->length;
-    plainStream.last_was_cr = FALSE;
-    if ((err = gpgme_data_new_with_read_cb(&plain, read_cb_MailDataMBox, &plainStream)) !=
-	GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not get data from mailbox file: %s"), 
-			     gpgme_strerror(err));
-	gpgme_release(ctx);
-	fclose(plainStream.mailboxFile);
-	return FALSE;
-    }
 
-    /* create the signature data stream */
-    if (body->next->decrypt_file)
-	sigStream = safe_fopen(body->next->decrypt_file, "r");
-    else
-	sigStream = 
-	    libbalsa_mailbox_get_message_stream(msg->mailbox, msg);
-    sign_body = body->next->mutt_body;
-    if ((err = gpgme_data_new_from_filepart(&sig, NULL, sigStream,
-					    sign_body->offset,
-					    sign_body->length)) != 
-	GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not get data from mailbox file: %s"), 
-			     gpgme_strerror(err));
-	gpgme_data_release(plain);
-	gpgme_release(ctx);
-	fclose(plainStream.mailboxFile);
-	fclose(sigStream);
+    /* try to create GMimeGpgMEContext */
+    session = g_object_new(libbalsa_g_mime_session_get_type(), NULL, NULL);
+    ctx = g_mime_gpgme_context_new(session);
+    if (ctx == NULL) {
+	g_warning("could not create GMimeGPG context");
 	return FALSE;
     }
 
     /* verify the signature */
-    if ((err = gpgme_op_verify(ctx, sig, plain, &sig_status->status))
-	!= GPGME_No_Error) {
+    valid =
+	g_mime_multipart_signed_verify(GMIME_MULTIPART_SIGNED(body->mime_part),
+				       ctx, &err);
+    if (valid == NULL) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme signature verification failed: %s"),
-			     gpgme_strerror(err));
+			     _("GMimeGPG signature verification failed: %s"),
+			     err->message);
 	sig_status->status = GPGME_SIG_STAT_ERROR;
     } else
-	get_sig_info_from_ctx(sig_status, ctx);
+	get_sig_info_from_cipher_context(sig_status, GMIME_GPGME_CONTEXT(ctx));
+    g_mime_cipher_validity_free (valid);
 
-    gpgme_data_release(sig);
-    gpgme_data_release(plain);
-    gpgme_release(ctx);
-    fclose(plainStream.mailboxFile);
-    fclose(sigStream);
+    g_object_unref (ctx);
+    g_object_unref (session);
 
     return TRUE;
 }
 
 
 /*
- * Signs for rfc822_for and returns the mic algorithm in micalg. If successful,
- * returns in sign_body the following chain
+ * Signs for rfc822_for. If successful, returns in content the following chain
  *
+ *      multipart/signed
  *         |
- *         +---- original sign_body (sign_body->next == NULL)
+ *         +---- original sign_body
  *         +---- application/pgp-signature
  *
- * or
- *
- *         |
- *         +---- multipart/mixed
- *         |          +---- original sign_body chain (sign_body->next != NULL)
- *         +---- application/pgp-signature
  */
 gboolean
-libbalsa_sign_mutt_body(MuttBody **sign_body, const gchar *rfc822_for,
-			gchar **micalg, GtkWindow *parent)
+libbalsa_sign_mime_object(GMimeObject **content, const gchar *rfc822_for,
+			  GtkWindow *parent)
 {
-    MailDataMBox mailData;
-    gchar fname[PATH_MAX];
-    BODY *result, *sigbdy;
-    gchar *signature;
-    gboolean sign_multipart;
+    GMimeMultipartSigned *mps;
 
     /* paranoia checks */
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
-    g_return_val_if_fail(sign_body != NULL, FALSE);
-    g_return_val_if_fail(micalg != NULL, FALSE);
-
-    /* save the header and body(s) to sign in a file */
-    mutt_mktemp(fname);
-    mailData.mailboxFile = safe_fopen(fname, "w+");
-
-    libbalsa_lock_mutt();
-    sign_multipart = *sign_body && (*sign_body)->next;
-    if (sign_multipart)
-	/* create a new multipart... */
-	result = mutt_make_multipart(*sign_body, NULL);
-    else
-	result = *sign_body;
-
-    mutt_write_mime_header(result, mailData.mailboxFile);
-    fputc('\n', mailData.mailboxFile);
-    mutt_write_mime_body(result, mailData.mailboxFile);
-    fflush(mailData.mailboxFile);
-    rewind(mailData.mailboxFile);
-    mailData.bytes_left = INT_MAX;   /* process complete file */
-    mailData.last_was_cr = FALSE;
-    libbalsa_unlock_mutt();
+    g_return_val_if_fail(content != NULL, FALSE);
 
     /* call gpgme to create the signature */
-    signature = gpgme_signature(&mailData, rfc822_for, micalg, parent);
-    fclose(mailData.mailboxFile);
-    unlink(fname);
-    if (!signature) {
-	/* destroy result if sign_body was a new multipart */
-	if (sign_multipart) {
-	    result->parts = NULL;
-	    mutt_free_body(&result);
-	}
-	if (*micalg)
-	    g_free(*micalg);
-	*micalg = NULL;
+    mps = gpgme_signature(*content, rfc822_for, parent);
+    if (!mps) {
 	return FALSE;
     }
 
-    /* build the new mutt BODY chain */
-    libbalsa_lock_mutt();
-
-    /* append the signature BODY */
-    sigbdy = mutt_new_body();
-    sigbdy->type = TYPEAPPLICATION;
-    sigbdy->subtype = g_strdup("pgp-signature");
-    sigbdy->unlink = 1;
-    sigbdy->use_disp = 0;
-    sigbdy->disposition = DISPINLINE;
-    sigbdy->encoding = ENC7BIT;
-    sigbdy->filename = signature;
-
-    result->next = sigbdy;
-    libbalsa_unlock_mutt();
-
-    *sign_body = result;
+    g_mime_object_unref(GMIME_OBJECT(*content));
+    *content = GMIME_OBJECT(mps);
 
     return TRUE;
 }
 
 
 gboolean
-libbalsa_sign_encrypt_mutt_body(MuttBody **se_body, const gchar *rfc822_signer,
-				GList *rfc822_for, GtkWindow *parent)
+libbalsa_sign_encrypt_mime_object(GMimeObject **content,
+				  const gchar *rfc822_signer,
+				  GList *rfc822_for, GtkWindow *parent)
 {
-    BODY *sigbdy;
-    gboolean sign_multipart;
-    gchar *micalg;
+    GMimeObject *signed_object;
 
     /* paranoia checks */
     g_return_val_if_fail(rfc822_signer != NULL, FALSE);
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
-    g_return_val_if_fail(se_body != NULL, FALSE);
+    g_return_val_if_fail(content != NULL, FALSE);
 
-    sign_multipart = *se_body && (*se_body)->next;
+    /* we want to be able to restore */
+    signed_object = *content;
+    g_mime_object_ref(GMIME_OBJECT(signed_object));
 
-    /* according to rfc3156, we try to sign first... */
-    if (!libbalsa_sign_mutt_body(se_body, rfc822_signer, &micalg, parent))
+    if (!libbalsa_sign_mime_object(&signed_object, rfc822_signer, parent))
 	return FALSE;
 
-    /* the signed stuff is put into a multipart/signed container */
-    sigbdy = mutt_make_multipart(*se_body, "signed");
-    mutt_set_parameter("micalg", micalg, &sigbdy->parameter);
-    g_free(micalg);
-    mutt_set_parameter("protocol", "application/pgp-signature",
-		       &sigbdy->parameter);
-
-    /* encrypt the multipart/signed stuff */
-    if (!libbalsa_encrypt_mutt_body(&sigbdy, rfc822_for)) {
-	/* destroy the stuff left over from signing */
-	if (sign_multipart) {
-	    *se_body = sigbdy->parts->parts;
-	    sigbdy->parts->parts = NULL;
-	} else {
-	    *se_body = sigbdy->parts;
-	    sigbdy->parts = NULL;
-	    mutt_free_body(&(*se_body)->next);
-	}
-	mutt_free_body(&sigbdy);
+    if (!libbalsa_encrypt_mime_object(&signed_object, rfc822_for)) {
+	g_mime_object_unref(GMIME_OBJECT(signed_object));
 	return FALSE;
     }
-    *se_body = sigbdy;
+    g_mime_object_unref(GMIME_OBJECT(*content));
+    *content = signed_object;
 
     return TRUE;
 }
-
 
 /*
  * body points to an application/pgp-encrypted body. If decryption is
@@ -517,115 +415,56 @@ libbalsa_sign_encrypt_mutt_body(MuttBody **se_body, const gchar *rfc822_signer,
 LibBalsaMessageBody *
 libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
 {
-    LibBalsaMessage *message;
-    GpgmeCtx ctx;
-    GpgmeError err;
-    GpgmeData cipher, plain;
+    GMimeSession *session;
+    GMimeGpgMEContext *ctx;
     PassphraseCB cb_data;
-    BODY *cipher_body, *result;
-    gchar fname[PATH_MAX];
-    FILE *tempfp, *src;
-    gchar *plainData;
-    size_t plainSize;
+    GMimeMultipartEncrypted *mpe;
+    GMimeObject *mime_obj;
+    GError *err=NULL;
+    LibBalsaMessage *message;
 
     /* paranoia checks */
     g_return_val_if_fail(body != NULL, NULL);
     g_return_val_if_fail(body->message != NULL, NULL);
-    message = body->message;
 
-    /* get the encrypted message stream */
-    if (body->decrypt_file)
-	src = safe_fopen(body->decrypt_file, "r");
-    else
-	src = libbalsa_mailbox_get_message_stream(message->mailbox, message);
-    
-    /* try to create a gpgme context */
-    if ((err = gpgme_new(&ctx)) != GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not create gpgme context: %s"),
-			     gpgme_strerror(err));
+    /* try to create GMimeGpgMEContext */
+    session = g_object_new(libbalsa_g_mime_session_get_type(), NULL, NULL);
+    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session));
+    if (ctx == NULL) {
+	g_warning("could not create GMimeGPG context");
+	g_object_unref (session);
 	return body;
     }
-    cb_data.ctx = ctx;
+
+    ((LibBalsaGMimeSession*)session)->data = &cb_data;
+//    cb_data.ctx = ctx;
     cb_data.parent = parent;
     cb_data.title = _("Enter passphrase to decrypt message");
-    gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
-    
-    /* create the cipher data stream */
-    cipher_body = body->next->mutt_body;
-    if ((err = gpgme_data_new_from_filepart(&cipher, NULL, src, 
-					    cipher_body->offset,
-					    cipher_body->length)) != GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not get data from mailbox file: %s"), 
-			     gpgme_strerror(err));
-	gpgme_release(ctx);
-	fclose(src);
+    mpe = GMIME_MULTIPART_ENCRYPTED(body->mime_part);
+    mime_obj = g_mime_multipart_encrypted_decrypt(mpe,
+						  GMIME_CIPHER_CONTEXT(ctx),
+						  &err);
+    if (mime_obj == NULL) {
+	g_object_unref (ctx);
+	g_object_unref (session);
 	return body;
     }
-
-    /* create the plain data stream */
-    if ((err = gpgme_data_new(&plain)) != GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not create new data object: %s"),
-			     gpgme_strerror(err));
-	gpgme_data_release(cipher);
-	gpgme_release(ctx);
-	fclose(src);
-	return body;
-    }
-
-    /* try to decrypt */
-    if ((err = gpgme_op_decrypt(ctx, cipher, plain)) != GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme decryption failed: %s"),
-			     gpgme_strerror(err));
-	gpgme_data_release(plain);
-	gpgme_data_release(cipher);
-	gpgme_release(ctx);
-	fclose(src);
-	return body;
-    }
-    fclose(src);
-    gpgme_data_release(cipher);
-
-    /* save the decrypted data to a file */
-    if (!(plainData = gpgme_data_release_and_get_mem(plain, &plainSize))) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not get gpgme decrypted data: %s"),
-			     gpgme_strerror(err));
-	gpgme_release(ctx);
-	return body;
-    }
-	
-    mutt_mktemp(fname);
-    tempfp = safe_fopen(fname, "w+");
-    fwrite(plainData, 1, plainSize, tempfp);
-    rewind(tempfp);
-	
-    result = mutt_read_mime_header(tempfp, 0);
-    result->length = plainSize - result->offset;
-    mutt_parse_part(tempfp, result);
-
-    fclose(tempfp);
-
-    g_free(plainData);
-    gpgme_release(ctx);
-
-    /* release the current body chain and create a new one */
+    g_object_unref (ctx);
+    g_object_unref (session);
+    message = body->message;
     libbalsa_message_body_free(body);
     body = libbalsa_message_body_new(message);
-    libbalsa_message_body_set_mutt_body(body, result);
-    set_decrypt_file(body, fname);
-    
+    libbalsa_message_body_set_mime_body(body, mime_obj);
+    g_object_unref(G_OBJECT(mime_obj));	
     return body;
 }
 
 
 /*
- * Encrypts for rfc822_for. If successful, returns in encrypt_body the following
+ * Encrypts for rfc822_for. If successful, returns in content the following
  * chain
  *
+ *      multipart/encrypted
  *         |
  *         +---- application/pgp-encrypted
  *         +---- application/octet-stream, containing the original encrypt_body
@@ -633,85 +472,56 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
  *               into a multipart/mixed (encrypt_body->next != NULL)
  */
 gboolean
-libbalsa_encrypt_mutt_body(MuttBody **encrypt_body, GList *rfc822_for)
+libbalsa_encrypt_mime_object(GMimeObject **content, GList *rfc822_for)
 {
-    MailDataMBox mailData;
-    gchar fname[PATH_MAX];
-    FILE *tempfp;
-    BODY *result, *encbdy;
-    gchar *encfile;
-    gboolean encr_multipart;
+    GMimeSession *session;
+    GMimeGpgMEContext *ctx;
+    GPtrArray *recipients;
+    GMimeMultipartEncrypted *mpe;
+    GError *err=NULL;
 
     /* paranoia checks */
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
-    g_return_val_if_fail(encrypt_body != NULL, FALSE);
+    g_return_val_if_fail(content != NULL, FALSE);
 
-    /* save the header and body(s) to encrypt in a file */
-    mutt_mktemp(fname);
-    mailData.mailboxFile = safe_fopen(fname, "w+");
-
-    libbalsa_lock_mutt();
-    encr_multipart = *encrypt_body && (*encrypt_body)->next;
-    if (encr_multipart)
-	/* create a new multipart... */
-	encbdy = mutt_make_multipart(*encrypt_body, NULL);
-    else
-	encbdy = *encrypt_body;
-
-    mutt_write_mime_header(encbdy, mailData.mailboxFile);
-    fputc('\n', mailData.mailboxFile);
-    mutt_write_mime_body(encbdy, mailData.mailboxFile);
-    fflush(mailData.mailboxFile);
-    rewind(mailData.mailboxFile);
-    mailData.bytes_left = INT_MAX;   /* process complete file */
-    mailData.last_was_cr = FALSE;
-    libbalsa_unlock_mutt();
-
-    /* call gpgme to encrypt */
-    encfile = gpgme_encrypt_file(&mailData, rfc822_for);
-    fclose(mailData.mailboxFile);
-    unlink(fname);
-    if (!encfile) {
-	/* destroy encbdy if encr_body was a new multipart */
-	if (encr_multipart) {
-	    encbdy->parts = NULL;
-	    mutt_free_body(&encbdy);
-	}
+    /* try to create GMimeGpgMEContext */
+    session = g_object_new(libbalsa_g_mime_session_get_type(), NULL, NULL);
+    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session));
+    g_object_unref (session);
+    if (ctx == NULL) {
+	g_warning("could not create GMimeGPG context");
 	return FALSE;
     }
 
-    /* destroy the original (unencrypted) body */
-    libbalsa_lock_mutt();
-    mutt_free_body(&encbdy);
+    recipients = g_ptr_array_new();
+    while (rfc822_for) {
+        gchar *name = (gchar *)rfc822_for->data;
+	gchar *fingerprint;
+	if (!(fingerprint = get_key_fingerprint(ctx->gpgme_ctx,
+						(gchar*)name, 0, NULL))) {
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("could not get a key for %s"), name);
+	    g_object_unref (ctx);
+	    g_ptr_array_free(recipients, TRUE);
+	    return FALSE;
+	}
+	g_ptr_array_add(recipients, fingerprint);
+        rfc822_for = g_list_next(rfc822_for);
+    }
+    mpe = g_mime_multipart_encrypted_new();
+    if (g_mime_multipart_encrypted_encrypt(mpe, *content,
+					   GMIME_CIPHER_CONTEXT(ctx),
+					   recipients,
+					   &err) != 0) {
+	g_object_unref (ctx);
+	g_object_unref (mpe);
+	return FALSE;
+    }
 
-    /* build the new mutt BODY chain - part 1 */
-    result = mutt_new_body();
-    result->type = TYPEAPPLICATION;
-    result->subtype = g_strdup("pgp-encrypted");
-    result->unlink = 1;
-    result->use_disp = 0;
-    result->disposition = DISPINLINE;
-    result->encoding = ENC7BIT;
-
-    mutt_mktemp(fname);
-    result->filename = g_strdup(fname);
-    tempfp = safe_fopen(result->filename, "w+");
-    fputs("Version: 1\n", tempfp);
-    fclose(tempfp);
-    
-    /* part 2 */
-    result->next = encbdy = mutt_new_body();
-    encbdy->type = TYPEAPPLICATION;
-    encbdy->subtype = g_strdup("octet-stream");
-    encbdy->unlink = 1;
-    encbdy->use_disp = 0;
-    encbdy->disposition = DISPINLINE;
-    encbdy->encoding = ENC7BIT;
-    encbdy->filename = encfile;
-
-    libbalsa_unlock_mutt();
-
-    *encrypt_body = result;
+    g_mime_object_unref(GMIME_OBJECT(*content));
+    *content = GMIME_OBJECT(mpe);
+    g_ptr_array_free(recipients, TRUE);
+    g_object_unref (ctx);
 
     return TRUE;
 }
@@ -1409,6 +1219,30 @@ libbalsa_gpgme_validity_to_gchar_short(GpgmeValidity validity)
 	default:
 	    return _("bad validity");
 	}
+}
+
+
+/*
+ * extract the signature info fields from ctx
+ */
+static void
+get_sig_info_from_cipher_context(LibBalsaSignatureInfo* info,
+			   GMimeGpgMEContext* ctx)
+{
+    GpgmeSigStat stat;
+    GpgmeKey key;
+	
+    info->fingerprint = g_strdup(ctx->fingerprint);
+    info->validity =
+	gpgme_key_get_ulong_attr(ctx->key, GPGME_ATTR_VALIDITY, NULL, 0);
+    info->sign_name =
+	g_strdup(gpgme_key_get_string_attr(ctx->key, GPGME_ATTR_NAME, NULL, 0));
+    info->sign_email =
+	g_strdup(gpgme_key_get_string_attr(ctx->key, GPGME_ATTR_EMAIL,
+					   NULL, 0));
+    info->key_created =
+	gpgme_key_get_ulong_attr(ctx->key, GPGME_ATTR_CREATED, NULL, 0);
+    info->status = ctx->sig_status;
 }
 
 
@@ -2268,92 +2102,56 @@ get_gpgme_parameter(const gchar *gpgme_op_info, const gchar *element)
  * for sign_for. Return either a signature block or NULL on error. Upon
  * success, micalg is set to the used mic algorithm (must be freed).
  */
-static gchar *
-gpgme_signature(MailDataMBox *mailData, const gchar *sign_for, gchar **micalg,
+static GMimeMultipartSigned *
+gpgme_signature(GMimeObject *content,
+		const gchar *sign_for,
 		GtkWindow *parent)
 {
-    GpgmeCtx ctx;
-    GpgmeError err;
-    GpgmeData in, out;
-    size_t datasize;
-    gchar *signature_buffer, *signature_info;
+    GMimeSession *session;
+    GMimeGpgMEContext *ctx;
     PassphraseCB cb_data;
-    gchar fname[PATH_MAX];
-    FILE *tempfp;
+    GMimeMultipartSigned *mps;
+    GError *err=NULL;
+    gchar *micalg;
 
-    *micalg = NULL;
+    /* try to create GMimeGpgMEContext */
+    session = g_object_new(libbalsa_g_mime_session_get_type(), NULL, NULL);
+    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session));
+    if (ctx == NULL) {
+	g_warning("could not create GMimeGPG context");
+	g_object_unref (session);
+	return FALSE;
+    }
 
-    /* try to create a gpgme context */
-    if ((err = gpgme_new(&ctx)) != GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not create gpgme context: %s"),
-			     gpgme_strerror(err));
-	return NULL;
-    }
-    
-    /* find the secret key for the "sign_for" address */
-    if (!gpgme_add_signer(ctx, sign_for)) {
-	gpgme_release(ctx);
-	return NULL;
-    }
-  
-    /* let gpgme create the signature */
-    gpgme_set_armor(ctx, 1);
-    cb_data.ctx = ctx;
+    ((LibBalsaGMimeSession*)session)->data = &cb_data;
+//    cb_data.ctx = ctx;
     cb_data.parent = parent;
     cb_data.title = _("Enter passsphrase to sign message");
-    gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
-    if ((err = gpgme_data_new_with_read_cb(&in, read_cb_MailDataMBox,
-					   mailData)) != GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not get data from file: %s"), 
-			     gpgme_strerror(err));
-	gpgme_release(ctx);
-	return NULL;
+    /* find the secret key for the "sign_for" address */
+    if (!gpgme_add_signer(ctx->gpgme_ctx, sign_for)) {
+	g_warning("Setting key for signing");
+	g_object_unref (session);
+	return FALSE;
     }
-    if ((err = gpgme_data_new(&out)) != GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not create new data: %s"),
-			     gpgme_strerror(err));
-	gpgme_data_release(in);
-	gpgme_release(ctx);
-	return NULL;
-    }
-    if ((err = gpgme_op_sign(ctx, in, out, GPGME_SIG_MODE_DETACH)) != 
-	GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme signing failed: %s"),
-			     gpgme_strerror(err));
-	gpgme_data_release(out);
-	gpgme_data_release(in);
-	gpgme_release(ctx);
+
+    mps = g_mime_multipart_signed_new();
+    if (g_mime_multipart_signed_sign(mps, content, GMIME_CIPHER_CONTEXT(ctx),
+				     sign_for, GMIME_CIPHER_HASH_DEFAULT,
+				     &err) != 0) {
+	g_object_unref (ctx);
+	g_object_unref (session);
+	g_object_unref (mps);
 	return NULL;
     }
 
-    /* get the info about the used hash algorithm */
-    signature_info = gpgme_get_op_info(ctx, 0);
-    if (signature_info) {
-	*micalg = get_gpgme_parameter(signature_info, "micalg");
-	g_free(signature_info);
-    }
+    micalg = ctx->micalg;
+    g_mime_object_set_content_type_parameter(GMIME_OBJECT(mps),
+					     "micalg", micalg);
 
-    gpgme_data_release(in);
-    if (!(signature_buffer = gpgme_data_release_and_get_mem(out, &datasize))) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not get gpgme data: %s"),
-			     gpgme_strerror(err));
-	gpgme_release(ctx);
-	return NULL;
-    }
+    g_object_unref (ctx);
+    g_object_unref (session);
 
-    mutt_mktemp(fname);
-    tempfp = safe_fopen(fname, "w+");
-    fwrite(signature_buffer, 1, datasize, tempfp);
-    fclose(tempfp);
-    g_free(signature_buffer);
-
-    gpgme_release(ctx);
-    return g_strdup(fname);
+    return mps;
 }
 
 
@@ -2451,5 +2249,111 @@ set_decrypt_file(LibBalsaMessageBody *body, const gchar *fname)
     }
 }
 
+
+/* ==== local functions ==================================================== */
+typedef struct _LibBalsaGMimeSessionClass LibBalsaGMimeSessionClass;
+
+struct _LibBalsaGMimeSessionClass {
+	GMimeSessionClass parent_class;
+	
+};
+
+static void libbalsa_g_mime_session_class_init (LibBalsaGMimeSessionClass *klass);
+static void libbalsa_g_mime_session_init (LibBalsaGMimeSession *session, LibBalsaGMimeSessionClass *klass);
+
+static char *request_passwd (GMimeSession *session, const char *prompt,
+			     gboolean secret, const char *item,
+			     GError **err);
+static void forget_passwd    (GMimeSession *session,
+			      const char *item,
+			      GError **err);
+
+
+static GMimeSessionClass *parent_class = NULL;
+
+
+static GType
+libbalsa_g_mime_session_get_type (void)
+{
+	static GType type = 0;
+	
+	if (!type) {
+		static const GTypeInfo info = {
+			sizeof (LibBalsaGMimeSessionClass),
+			NULL, /* base_class_init */
+			NULL, /* base_class_finalize */
+			(GClassInitFunc) libbalsa_g_mime_session_class_init,
+			NULL, /* class_finalize */
+			NULL, /* class_data */
+			sizeof (LibBalsaGMimeSession),
+			0,    /* n_preallocs */
+			NULL, /* object_init */
+		};
+		
+		type = g_type_register_static (GMIME_TYPE_SESSION, "LibBalsaGMimeSession", &info, 0);
+	}
+	
+	return type;
+}
+
+
+static void
+libbalsa_g_mime_session_class_init (LibBalsaGMimeSessionClass *klass)
+{
+	GObjectClass *object_class = G_OBJECT_CLASS (klass);
+	GMimeSessionClass *session_class = GMIME_SESSION_CLASS (klass);
+	
+	parent_class = g_type_class_ref (GMIME_TYPE_SESSION);
+	
+	session_class->request_passwd = request_passwd;
+	session_class->forget_passwd = forget_passwd;
+}
+
+static char *
+request_passwd (GMimeSession *session, const char *prompt, gboolean secret, const char *item, GError **err)
+{
+    PassphraseCB *cb_data = ((LibBalsaGMimeSession *)session)->data;
+    char *passwd;
+    const char *desc = prompt;
+#ifdef BALSA_USE_THREADS
+    if (pthread_self() == libbalsa_get_main_thread())
+	passwd = get_passphrase_real(cb_data, desc);
+    else {
+	static pthread_mutex_t get_passphrase_lock = PTHREAD_MUTEX_INITIALIZER;
+	AskPassphraseData apd;
+
+	pthread_mutex_lock(&get_passphrase_lock);
+	pthread_cond_init(&apd.cond, NULL);
+	apd.cb_data = cb_data;
+	apd.desc = desc;
+	g_idle_add(get_passphrase_idle, &apd);
+	pthread_cond_wait(&apd.cond, &get_passphrase_lock);
+    
+	pthread_cond_destroy(&apd.cond);
+	pthread_mutex_unlock(&get_passphrase_lock);
+	pthread_mutex_destroy(&get_passphrase_lock);
+	passwd = apd.res;
+    }
+#else
+    passwd = get_passphrase_real(cb_data, desc);
+#endif
+    
+    ((LibBalsaGMimeSession *)session)->passwd = passwd;
+
+    return passwd;
+}
+
+static void
+forget_passwd (GMimeSession *session, const char *item, GError **err)
+{
+    gchar *passwd = ((LibBalsaGMimeSession *)session)->passwd;
+    if (passwd) {
+	/* paranoia: wipe passphrase from memory */
+	gchar *p = passwd;
+	while (*p)
+	    *p++ = random();
+	g_free(passwd);
+    }
+}
 
 #endif /* HAVE_GPGME */

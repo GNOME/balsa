@@ -904,6 +904,9 @@ config_global_load(void)
 #endif
     /* ... outgoing mail */
     balsa_app.encoding_style = gnome_config_get_int("EncodingStyle=2");
+    /* convert libmutt Quoted Printable to GMime type, for compatible */
+    if (balsa_app.encoding_style==3)
+        balsa_app.encoding_style = GMIME_PART_ENCODING_QUOTEDPRINTABLE;
     balsa_app.wordwrap = gnome_config_get_bool("WordWrap=true");
     balsa_app.wraplength = gnome_config_get_int("WrapLength=72");
     if (balsa_app.wraplength < 40)

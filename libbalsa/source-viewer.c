@@ -112,36 +112,25 @@ struct _LibBalsaSourceViewerInfo {
 typedef struct _LibBalsaSourceViewerInfo LibBalsaSourceViewerInfo;
 
 static void
-lsv_show_file(FILE * f, long length, LibBalsaSourceViewerInfo * lsvi,
-                   gboolean escape)
+lsv_show_message(const char *message, LibBalsaSourceViewerInfo * lsvi,
+		      gboolean escape)
 {
     GtkTextBuffer *buffer;
-    char buf[1024];
     GtkTextIter start;
+    gchar *tmp;
 
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(lsvi->text));
     gtk_text_buffer_set_text(buffer, "", 0);
 
-    if (length < 0)
-        length = 5 * 1024 * 1024;       /* random limit for the file size
-                                         * not likely to be used */
-    while (length > 0 && fgets(buf, sizeof(buf), f)) {
-        gint linelen = strlen(buf);
-        gchar *tmp;
-
-        if (linelen > length)
-            buf[length] = '\0';
-        if (escape)
-            tmp = g_strescape(buf, "\n\"");
-        else {
-            tmp = g_strdup(buf);
-            libbalsa_utf8_sanitize(&tmp, FALSE, (LibBalsaCodeset) 0, NULL);
-        }
-        if (tmp) {
-            gtk_text_buffer_insert_at_cursor(buffer, tmp, -1);
-            g_free(tmp);
-        }
-        length -= linelen;
+    if (escape)
+	tmp = g_strescape(message, "\n\"");
+    else {
+	tmp = g_strdup(message);
+	libbalsa_utf8_sanitize(&tmp, FALSE, (LibBalsaCodeset) 0, NULL);
+    }
+    if (tmp) {
+	gtk_text_buffer_insert_at_cursor(buffer, tmp, -1);
+	g_free(tmp);
     }
 
     gtk_text_buffer_get_start_iter(buffer, &start);
@@ -154,17 +143,23 @@ lsv_escape_cb(GtkWidget * widget, gpointer data)
     LibBalsaSourceViewerInfo *lsvi =
         g_object_get_data(G_OBJECT(data), "lsvi");
     LibBalsaMessage *msg = lsvi->msg;
-    HEADER *hdr;
-    FILE *f;
-    long length;
+    GMimeStream *msg_stream;
+    GMimeStream *mem_stream;
+    char *raw_message;
 
-    hdr = msg->header;
-    f = libbalsa_mailbox_get_message_stream(msg->mailbox, msg);
-    fseek(f, hdr->offset, 0);
-    length = (hdr->content->offset - hdr->offset) + hdr->content->length;
+    msg_stream = libbalsa_mailbox_get_message_stream(msg->mailbox, msg);
+    if (msg_stream == NULL)
+	return;
+
+    mem_stream = g_mime_stream_mem_new();
+    g_mime_stream_write_to_stream(msg_stream, mem_stream);
+    raw_message = GMIME_STREAM_MEM(mem_stream)->buffer->data;
+
     *(lsvi->escape_specials) = GTK_CHECK_MENU_ITEM(widget)->active;
-    lsv_show_file(f, length, lsvi, *(lsvi->escape_specials));
-    fclose(f);
+    lsv_show_message(raw_message, lsvi, *(lsvi->escape_specials));
+
+    g_mime_stream_unref(msg_stream);
+    g_mime_stream_unref(mem_stream);
 }
 
 static void
@@ -181,14 +176,13 @@ lsv_window_destroy_notify(LibBalsaSourceViewerInfo * lsvi)
         g_object_weak_unref(G_OBJECT(lsvi->msg),
                             (GWeakNotify) lsv_msg_weak_ref_notify, lsvi);
     g_free(lsvi);
-}
-
+  }
 /* libbalsa_show_message_source:
    pops up a window containing the source of the message msg.
 */
 void
-libbalsa_show_message_source(LibBalsaMessage * msg, const gchar * font,
-                             gboolean* escape_specials)
+libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
+			     gboolean* escape_specials)
 {
     GtkWidget *text;
     GtkWidget *interior;
@@ -196,8 +190,7 @@ libbalsa_show_message_source(LibBalsaMessage * msg, const gchar * font,
     LibBalsaSourceViewerInfo *lsvi;
 
     g_return_if_fail(msg);
-    g_return_if_fail(!CLIENT_CONTEXT_CLOSED(msg->mailbox));
-    g_return_if_fail(msg->header);
+    g_return_if_fail(CLIENT_CONTEXT_OPEN(msg->mailbox));
 
     text = gtk_text_view_new();
     gtk_widget_modify_font(text, pango_font_description_from_string(font));
@@ -239,23 +232,23 @@ libbalsa_show_message_source(LibBalsaMessage * msg, const gchar * font,
 #if 0
 /* testing program */
 int
-main(int argc, char *argv[])
+main(int argc, char* argv[])
 {
     int i, shown = 0;
     gtk_init(&argc, &argv);
 
-    for (i = 1; i < argc; i++) {
-        FILE *f = fopen(argv[i], "r");
-        if (f) {
-            show_file(f);
-            fclose(f);
-            shown = 1;
-        }
+    for(i=1; i<argc; i++) {
+	FILE* f = fopen(argv[i], "r");
+	if(f) {
+	    show_file(f);
+	    fclose(f);
+	    shown = 1;
+	}
     }
-    if (shown)
-        gtk_main();
+    if(shown)
+	gtk_main();
     else
-        fprintf(stderr, "No sensible args passed.\n");
+	fprintf(stderr, "No sensible args passed.\n");
 
     return !shown;
 }

@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <time.h>
 
+#include <gmime/gmime.h>
+
 #ifdef HAVE_GPGME
 #include "rfc3156.h"
 #endif
@@ -56,7 +58,8 @@ enum _LibBalsaMessageFlag {
     LIBBALSA_MESSAGE_FLAG_NEW = 1 << 1,
     LIBBALSA_MESSAGE_FLAG_DELETED = 1 << 2,
     LIBBALSA_MESSAGE_FLAG_REPLIED = 1 << 3,
-    LIBBALSA_MESSAGE_FLAG_FLAGGED = 1 << 4
+    LIBBALSA_MESSAGE_FLAG_FLAGGED = 1 << 4,
+    LIBBALSA_MESSAGE_FLAG_RECENT = 1 << 5,
 };
 
 enum _LibBalsaMsgCreateResult {
@@ -119,9 +122,10 @@ struct _LibBalsaMessage {
     LibBalsaMessageFlag flags;
 
     /* headers */
-    MuttHeader* header;
     LibBalsaMessageHeaders *headers;
     int updated; /** whether complete headers have been fetched */
+
+    GMimeMessage *mime_msg;
 
     /* remail header if any */
     gchar *remail;
@@ -141,7 +145,7 @@ struct _LibBalsaMessage {
 #define LIBBALSA_MESSAGE_GET_SUBJECT(m) libbalsa_message_get_subject(m)
 #endif
 #define LIBBALSA_MESSAGE_SET_SUBJECT(m,s) \
-        { g_free((m)->subj); (m)->subj = (s); }
+        do { g_free((m)->subj); (m)->subj = (s); } while (0)
 
     /* replied message ID's */
     GList *references;
@@ -196,6 +200,8 @@ struct _LibBalsaMessage {
     LIBBALSA_MESSAGE_HAS_FLAG(message, LIBBALSA_MESSAGE_FLAG_REPLIED)
 #define LIBBALSA_MESSAGE_IS_FLAGGED(message) \
     LIBBALSA_MESSAGE_HAS_FLAG(message, LIBBALSA_MESSAGE_FLAG_FLAGGED)
+#define LIBBALSA_MESSAGE_IS_RECENT(message) \
+    LIBBALSA_MESSAGE_HAS_FLAG(message, LIBBALSA_MESSAGE_FLAG_RECENT)
 
 struct _LibBalsaMessageClass {
     GObjectClass parent_class;
@@ -213,9 +219,9 @@ GType libbalsa_message_get_type(void);
  * message headers
  */
 void libbalsa_message_headers_destroy(LibBalsaMessageHeaders * headers);
-void libbalsa_message_headers_from_mutt(LibBalsaMessageHeaders *headers,
-					MuttHeader *mheader);
-GList *libbalsa_message_user_hdrs_from_mutt(MuttHeader* header);
+void libbalsa_message_headers_from_gmime(LibBalsaMessageHeaders *headers,
+					 GMimeMessage *msg);
+GList *libbalsa_message_user_hdrs_from_gmime(GMimeMessage *msg);
 
 
 /*
@@ -223,8 +229,6 @@ GList *libbalsa_message_user_hdrs_from_mutt(MuttHeader* header);
  */
 LibBalsaMessage *libbalsa_message_new(void);
 
-gboolean libbalsa_message_copy(LibBalsaMessage * message,
-			       LibBalsaMailbox * dest);
 gboolean libbalsa_message_save(LibBalsaMessage * message,
 			       const gchar *filename);
 gboolean libbalsa_messages_move(GList * messages,
@@ -238,6 +242,7 @@ void libbalsa_messages_read(GList * messages, gboolean read);
 void libbalsa_messages_flag(GList * messages, gboolean flag);
 
 void libbalsa_message_reply(LibBalsaMessage * message);
+void libbalsa_message_clear_recent(LibBalsaMessage * message);
 
 void libbalsa_message_append_part(LibBalsaMessage * message,
 				  LibBalsaMessageBody * body);

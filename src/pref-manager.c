@@ -316,9 +316,9 @@ static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox);
 static void convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox);
 
 guint encoding_type[NUM_ENCODING_MODES] = {
-    ENC7BIT,
-    ENC8BIT,
-    ENCQUOTEDPRINTABLE
+    GMIME_PART_ENCODING_7BIT,
+    GMIME_PART_ENCODING_8BIT,
+    GMIME_PART_ENCODING_QUOTEDPRINTABLE
 };
 
 gchar *encoding_type_label[NUM_ENCODING_MODES] = {

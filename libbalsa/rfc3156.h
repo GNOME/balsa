@@ -59,14 +59,14 @@ enum _LibBalsaMessageBodyRFC2440Mode {
 gint libbalsa_is_pgp_signed(LibBalsaMessageBody *body);
 gint libbalsa_is_pgp_encrypted(LibBalsaMessageBody *body);
 
-gboolean libbalsa_sign_mutt_body(MuttBody **sign_body, const gchar *rfc822_for,
-				 gchar **micalg, GtkWindow *parent);
-gboolean libbalsa_encrypt_mutt_body(MuttBody **encrypt_body,
-				    GList *rfc822_for);
-gboolean libbalsa_sign_encrypt_mutt_body(MuttBody **se_body,
-					 const gchar *rfc822_signer,
-					 GList *rfc822_for,
-					 GtkWindow *parent);
+gboolean libbalsa_sign_mime_object(GMimeObject **content,
+				   const gchar *rfc822_for,
+				   GtkWindow *parent);
+gboolean libbalsa_encrypt_mime_object(GMimeObject **content, GList *rfc822_for);
+gboolean libbalsa_sign_encrypt_mime_object(GMimeObject **content,
+					   const gchar *rfc822_signer,
+					   GList *rfc822_for,
+					   GtkWindow *parent);
 
 gboolean libbalsa_body_check_signature(LibBalsaMessageBody *body);
 LibBalsaMessageBody *libbalsa_body_decrypt(LibBalsaMessageBody *body,

@@ -35,8 +35,6 @@
 #include "libbalsa_private.h"
 
 #include "send.h"
-#include "mailbackend.h"
-#include "mailbox_imap.h"
 #include "misc.h"
 #include "information.h"
 
@@ -51,7 +49,7 @@ typedef struct _MessageQueueItem MessageQueueItem;
 
 struct _MessageQueueItem {
     LibBalsaMessage *orig;
-    HEADER *message;
+    GMimeStream *stream;
 #if !ENABLE_ESMTP
     MessageQueueItem *next_message;
 #endif
@@ -122,13 +120,11 @@ msg_queue_item_new(LibBalsaMessage * message)
 
     mqi = g_new(MessageQueueItem, 1);
     mqi->orig = message;
-    libbalsa_lock_mutt();
-    mqi->message = mutt_new_header();
-    libbalsa_unlock_mutt();
 #if !ENABLE_ESMTP
     mqi->next_message = NULL;
     mqi->status = MQI_WAITING;
 #endif
+    mqi->stream=NULL;
     mqi->tempfile[0] = '\0';
     return mqi;
 }
@@ -138,10 +134,8 @@ msg_queue_item_destroy(MessageQueueItem * mqi)
 {
     if (*mqi->tempfile)
 	unlink(mqi->tempfile);
-    libbalsa_lock_mutt();
-    if (mqi->message)
-	mutt_free_header(&mqi->message);
-    libbalsa_unlock_mutt();
+    if (mqi->stream)
+	g_mime_stream_unref(mqi->stream);
     g_free(mqi);
 }
 
@@ -177,13 +171,20 @@ send_message_info_destroy(SendMessageInfo *smi)
 }
 
 
+static gint
+libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part);
 
 static guint balsa_send_message_real(SendMessageInfo* info);
-static void encode_descriptions(BODY * b);
+static LibBalsaMsgCreateResult
+libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
+				     gboolean flow, gboolean postponing,
+				     GMimeMessage** return_mime_message);
 static LibBalsaMsgCreateResult libbalsa_create_msg(LibBalsaMessage * message,
-						   HEADER * msg, char *tempfile,
-						   gint encoding, gboolean flow,
-						   int queu);
+				    MessageQueueItem * mqi,
+				    gint encoding, gboolean flow);
+static LibBalsaMsgCreateResult
+libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
+				 MessageQueueItem *mqi);
 
 #ifdef BALSA_USE_THREADS
 void balsa_send_thread(MessageQueueItem * first_message);
@@ -254,90 +255,74 @@ ensure_send_progress_dialog()
 #endif
 
 
-/* from mutt's send.c */
-static void 
-encode_descriptions (BODY *b)
-{
-    BODY *t;
-    
-    for (t = b; t; t = t->next)
-	{
-	    if (t->description)
-		{
-		    rfc2047_encode_string (&t->description);
-		}
-	    if (t->parts)
-		encode_descriptions (t->parts);
-	}
-}
-
-static BODY *
-add_mutt_body_plain(const gchar * charset, gint encoding_style, 
+static GMimePart *
+add_mime_body_plain(LibBalsaMessageBody *body, gint encoding_style, 
 		    gboolean flow)
 {
-    BODY *body;
-    gchar buffer[PATH_MAX];
+    GMimePart *mime_part;
+    const gchar * charset;
+  
+    g_return_val_if_fail(body, NULL);
+    
+    charset=body->charset;
 
     g_return_val_if_fail(charset, NULL);
-    libbalsa_lock_mutt();
-    body = mutt_new_body();
 
-    body->type = TYPETEXT;
-    body->subtype = g_strdup("plain");
-    body->unlink = 1;
-    body->use_disp = 0;
-    body->force_charset = 1;
-    body->disposition = DISPINLINE;
+    if (body->mime_type) {
+        /* Use the suplied mime type */
+        gchar *type, *subtype;
 
-    body->encoding = encoding_style;
-
-    mutt_set_parameter("charset", charset, &body->parameter);
-    if (flow) {
-	mutt_set_parameter("DelSp", "Yes", &body->parameter);
-	mutt_set_parameter("Format", "Flowed", &body->parameter);
-    }
-
-    mutt_mktemp(buffer);
-    body->filename = g_strdup(buffer);
-    mutt_update_encoding(body);
-
-    libbalsa_unlock_mutt();
-
-    return body;
-}
-
-static BODY *
-add_mutt_body_as_extbody(const gchar *filename, const gchar *mime_type)
-{
-    BODY *body;
-    gchar buffer[PATH_MAX];
-    FILE *tempfp;
-
-    libbalsa_lock_mutt();
-    body = mutt_new_body();
-
-    body->type = TYPEMESSAGE;
-    body->subtype = g_strdup("external-body");
-    body->unlink = 1;
-    body->use_disp = 0;
-
-    body->encoding = ENC7BIT;
-    if(!strncmp( filename, "URL", 3 )) {
-	mutt_set_parameter("access-type", "URL", &body->parameter);
-	mutt_set_parameter("URL", filename + 4, &body->parameter);
+        type = g_strdup (body->mime_type);
+        if ((subtype = strchr (type, '/'))) {
+            *subtype++ = 0;
+            mime_part = g_mime_part_new_with_type(type, subtype);
+        } else {
+            mime_part = g_mime_part_new_with_type("text", "plain");
+        }
+        g_free (type);
     } else {
-	mutt_set_parameter("access-type", "local-file", &body->parameter);
-	mutt_set_parameter("name", filename, &body->parameter);
+        mime_part = g_mime_part_new_with_type("text", "plain");
     }
-    mutt_mktemp(buffer);
-    body->filename = g_strdup(buffer);
-    tempfp = safe_fopen(body->filename, "w+");
-    fprintf(tempfp, "Note: this is _not_ the real body!\n");
-    fclose(tempfp);
 
-    libbalsa_unlock_mutt();
+    g_mime_part_set_content_disposition(mime_part, GMIME_DISPOSITION_INLINE);
+    g_mime_part_set_encoding(mime_part, encoding_style);
+    g_mime_object_set_content_type_parameter(GMIME_OBJECT(mime_part),
+					     "charset", charset);
+    if (flow)
+	g_mime_object_set_content_type_parameter(GMIME_OBJECT(mime_part),
+						 "DelSp", "Yes");
+        g_mime_object_set_content_type_parameter(GMIME_OBJECT(mime_part),
+						 "Format", "Flowed");
 
-    return body;
+    if (!charset)
+	charset="us-ascii";
+    if (g_ascii_strcasecmp(charset, "UTF-8")!=0 &&
+	g_ascii_strcasecmp(charset, "UTF8")!=0)
+    {
+	GMimeStream *stream, *filter_stream;
+	GMimeFilter *filter;
+	GMimeDataWrapper *wrapper;
+
+	stream = g_mime_stream_mem_new();
+	filter_stream = g_mime_stream_filter_new_with_stream(stream);
+	filter = g_mime_filter_charset_new("UTF-8", charset);
+	g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
+
+	g_mime_stream_write(filter_stream, body->buffer, strlen(body->buffer));
+
+	wrapper = g_mime_data_wrapper_new();
+	g_mime_data_wrapper_set_stream(wrapper, stream);
+	g_mime_data_wrapper_set_encoding (wrapper, GMIME_PART_ENCODING_DEFAULT);
+	g_mime_part_set_content_object(mime_part, wrapper);
+
+	g_object_unref(G_OBJECT(wrapper));
+	g_object_unref(G_OBJECT(filter));
+	g_mime_stream_unref(filter_stream);
+	g_mime_stream_unref(stream);
+    } else
+	g_mime_part_set_content(mime_part, body->buffer, strlen(body->buffer));
+
+    return mime_part;
 }
 
 #if 0
@@ -385,6 +370,7 @@ write_remote_fcc(LibBalsaMailbox* fccbox, HEADER* m_msg)
     return mutt_write_fcc(LIBBALSA_MAILBOX(fccbox)->url,
                           m_msg, NULL, 0, NULL);
 }
+
 /* libbalsa_message_queue:
    places given message in the outbox. If fcc message field is set, saves
    it to fcc mailbox as well.
@@ -400,26 +386,19 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
     g_return_val_if_fail(message, LIBBALSA_MESSAGE_CREATE_ERROR);
 
     mqi = msg_queue_item_new(message);
-    set_option(OPTWRITEBCC);
-    if ((result = libbalsa_create_msg(message, mqi->message,
-				      mqi->tempfile, encoding, flow, 0)) ==
+    if ((result = libbalsa_create_msg(message, mqi, encoding, flow)) ==
 	LIBBALSA_MESSAGE_CREATE_OK) {
-	libbalsa_lock_mutt();
-	mutt_write_fcc(libbalsa_mailbox_local_get_path(outbox),
-		       mqi->message, NULL, 0, NULL);
+        libbalsa_mailbox_add_message_stream(outbox, mqi->stream, 0);
 	if (fccbox) {
-	    if (LIBBALSA_IS_MAILBOX_LOCAL(fccbox))
-	        mutt_write_fcc(libbalsa_mailbox_local_get_path(fccbox),
-			       mqi->message, NULL, 0, NULL);
-	    else if (LIBBALSA_IS_MAILBOX_IMAP(fccbox))
-                write_remote_fcc(fccbox, mqi->message);
+		if (LIBBALSA_IS_MAILBOX_LOCAL(fccbox) ||
+		    LIBBALSA_IS_MAILBOX_IMAP(fccbox)) {
+			libbalsa_mailbox_add_message_stream(fccbox,
+							    mqi->stream, 0);
+		}
+		libbalsa_mailbox_check(fccbox);
 	}
-	libbalsa_unlock_mutt();
 	libbalsa_mailbox_check(outbox);
-        if (fccbox)
-	    libbalsa_mailbox_check(fccbox);
     } 
-    unset_option(OPTWRITEBCC);
     msg_queue_item_destroy(mqi);
 
     return result;
@@ -472,57 +451,27 @@ libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
 /* [BCS] - libESMTP uses a callback function to read the message from the
    application to the SMTP server.
  */
-#define BUFLEN  8192
+#define BUFLEN	8192
 
 static const char *
 libbalsa_message_cb (void **buf, int *len, void *arg)
 {
     MessageQueueItem *current_message = arg;
-    struct ctx { FILE *fp; char buf[BUFLEN - sizeof (FILE *)]; } *ctx;
-    size_t octets;
-
-    if (*buf == NULL)
-      *buf = calloc (sizeof (struct ctx), 1);
-    ctx = (struct ctx *) *buf;
+    GMimeStreamMem *mem_stream = GMIME_STREAM_MEM(current_message->stream);
+    char *ptr;
 
     if (len == NULL) {
-	if (ctx->fp == NULL)
-	    ctx->fp = fopen (current_message->tempfile, "r");
-	else
-	    rewind (ctx->fp);
+	g_mime_stream_reset(current_message->stream);
 	return NULL;
     }
 
-    /* The message needs to be read a line at a time and the newlines
-       converted to \r\n because libmutt foolishly terminates lines in
-       the temporary file with the Unix \n despite RFC 2822 calling for
-       \r\n.  Furthermore RFC 822 states that bare \n and \r are acceptable
-       in messages and that individually they do not constitute a line
-       termination.  This requirement cannot be reconciled with storing
-       messages with Unix line terminations.  RFC 2822 relieves this
-       situation slightly by prohibiting bare \r and \n.
+    *len = g_mime_stream_length(current_message->stream)
+	    - g_mime_stream_tell(current_message->stream);
+    ptr = mem_stream->buffer->data
+	    + g_mime_stream_tell(current_message->stream);
+    g_mime_stream_seek(current_message->stream, *len, GMIME_STREAM_SEEK_CUR);
 
-       The following code cannot therefore work correctly in all
-       situations.  Furthermore it is very inefficient since it must
-       search for the \n.
-     */
-    if (ctx->fp == NULL) {
-        octets = 0;
-    } else if (fgets (ctx->buf, sizeof ctx->buf - 1, ctx->fp) == NULL) {
-	fclose (ctx->fp);
-	ctx->fp = NULL;
-        octets = 0;
-    } else {
-	char *p = strchr (ctx->buf, '\0');
-
-	if (p[-1] == '\n' && p[-2] != '\r') {
-	    strcpy (p - 1, "\r\n");
-	    p++;
-	}
-	octets = p - ctx->buf;
-    }
-    *len = octets;
-    return ctx->buf;
+    return ptr;
 }
 
 /* libbalsa_process_queue:
@@ -581,8 +530,6 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
     smtp_option_require_all_recipients (session, 1);
 
     for (lista = outbox->message_list; lista; lista = lista->next) {
-        gint encoding;
-        gboolean flow;
         LibBalsaMsgCreateResult created;
 
 	msg = LIBBALSA_MESSAGE(lista->data);
@@ -593,11 +540,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 
         libbalsa_message_body_ref(msg, TRUE);
 	new_message = msg_queue_item_new(msg);
-        encoding = msg->body_list->mutt_body->encoding;
-        flow = libbalsa_message_body_is_flowed(msg->body_list);
-        created =
-            libbalsa_create_msg(msg, new_message->message,
-                                new_message->tempfile, encoding, flow, 1);
+        created = libbalsa_fill_msg_queue_item_from_queu(msg, new_message);
         libbalsa_message_body_unref(msg);
 
 	if (created != LIBBALSA_MESSAGE_CREATE_OK) {
@@ -607,6 +550,43 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 
             libbalsa_messages_flag(messages, TRUE);
 	    g_list_free(messages);
+	    /*
+	       The message needs to be filtered and the newlines converted to
+	       \r\n because internally the lines foolishly terminate with the
+	       Unix \n despite RFC 2822 calling for \r\n.  Furthermore RFC 822
+	       states that bare \n and \r are acceptable in messages and that
+	       individually they do not constitute a line termination.  This
+	       requirement cannot be reconciled with storing messages with Unix
+	       line terminations.  RFC 2822 relieves this situation slightly by
+	       prohibiting bare \r and \n.
+
+	       The following code cannot therefore work correctly in all
+	       situations.  Furthermore it is very inefficient since it must
+	       search for the \n.
+	     */
+	    {
+		GMimeStream *mem_stream;
+		GMimeStream *filter_stream;
+		GMimeFilter *filter;
+
+		mem_stream = new_message->stream;
+		filter_stream =
+		    g_mime_stream_filter_new_with_stream(mem_stream);
+		filter =
+		    g_mime_filter_crlf_new( GMIME_FILTER_CRLF_ENCODE,
+					    GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+		g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream),
+					 filter);
+		g_object_unref(G_OBJECT(filter));
+		mem_stream = g_mime_stream_mem_new();
+		g_mime_stream_write_to_stream(filter_stream, mem_stream);
+		g_mime_stream_unref(filter_stream);
+		g_mime_stream_reset(mem_stream);
+		if (new_message->stream)
+		    g_mime_stream_unref(new_message->stream);
+		new_message->stream = mem_stream;
+	    }
+
 	    /* If the Bcc: recipient list is present, add a additional
 	       copy of the message to the session.  The recipient list
 	       for the main copy of the message is generated from the
@@ -736,10 +716,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	    /* Estimate the size of the message.  This need not be exact
 	       but it's better to err on the large side since some message
 	       headers may be altered during the transfer. */
-	    new_message->message_size = 0;
-	    if (stat (new_message->tempfile, &st) == 0) {
-		new_message->message_size = st.st_size;
-	    }
+	    new_message->message_size = g_mime_stream_length(new_message->stream);
 
 	    if (new_message->message_size > 0) {
 		estimate = new_message->message_size;
@@ -985,8 +962,6 @@ libbalsa_process_queue(LibBalsaMailbox* outbox)
 	
     mqi = message_queue;
     while (lista != NULL) {
-        gint encoding;
-        gboolean flow;
         LibBalsaMsgCreateResult created;
 
 	queu = LIBBALSA_MESSAGE(lista->data);
@@ -997,11 +972,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox)
 
         libbalsa_message_body_ref(queu, TRUE);
 	new_message = msg_queue_item_new(queu);
-        flow = libbalsa_message_body_is_flowed(queu->body_list);
-        encoding = queu->body_list->mutt_body->encoding;
-        created =
-            libbalsa_create_msg(queu, new_message->message,
-                                new_message->tempfile, encoding, flow, 1);
+        created = libbalsa_fill_msg_queue_item_from_queu(queu, new_message);
         libbalsa_message_body_unref(queu);
 	
 	if (created != LIBBALSA_MESSAGE_CREATE_OK) {
@@ -1203,6 +1174,7 @@ balsa_send_message_real(SendMessageInfo* info)
 #endif
 
     while ( (mqi = get_msg2send()) != NULL) {
+#if FIXME
 	libbalsa_lock_mutt();
 	i = mutt_invoke_sendmail(mqi->message->env->from,
 				 mqi->message->env->to,
@@ -1212,6 +1184,20 @@ balsa_send_message_real(SendMessageInfo* info)
 				 (mqi->message->content->encoding
 				  == ENC8BIT));
 	libbalsa_unlock_mutt();
+  if (eightbit && option (OPTUSE8BITMIME))
+    args = add_option (args, &argslen, &argsmax, "-B8BITMIME");
+
+  if (option (OPTENVFROM) && from && !from->next)
+  {
+    args = add_option (args, &argslen, &argsmax, "-f");
+    args = add_args   (args, &argslen, &argsmax, from);
+  }
+  args = add_option (args, &argslen, &argsmax, "--");
+  args = add_args (args, &argslen, &argsmax, to);
+  args = add_args (args, &argslen, &argsmax, cc);
+  args = add_args (args, &argslen, &argsmax, bcc);
+  send_msg() in libmutt/sendlib.c
+#endif
 	mqi->status = (i==0?MQI_SENT : MQI_FAILED);
     }
 
@@ -1246,115 +1232,300 @@ balsa_send_message_real(SendMessageInfo* info)
 
 
 static void
-message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
-    LIST *tmp_hdr;
-    GList *list;
-    gchar *tmp;
-
-    libbalsa_lock_mutt();
-
-    if (!hdr->env)
-	hdr->env = mutt_new_envelope();
-
-    hdr->env->userhdrs = mutt_new_list();
-
-    {
-	LIST *sptr = UserHeader;
-	LIST *dptr = hdr->env->userhdrs;
-	LIST *delptr = 0;
-
-	while (sptr) {
-	    dptr->data = g_strdup(sptr->data);
-	    sptr = sptr->next;
-	    delptr = dptr;
-	    dptr->next = mutt_new_list();
-	    dptr = dptr->next;
-	} safe_free((void **) &delptr->next);
-    }
-
-    if (message->headers->from) {
-        tmp = libbalsa_address_to_gchar_p(message->headers->from, 0);
-        hdr->env->from = rfc822_parse_adrlist(hdr->env->from, tmp);
-        g_free(tmp);
-    }
-
-    if (message->headers->reply_to) {
-	tmp = libbalsa_address_to_gchar_p(message->headers->reply_to, 0);
-
-	hdr->env->reply_to =
-	    rfc822_parse_adrlist(hdr->env->reply_to, tmp);
-
-	g_free(tmp);
-    }
-
-    if (message->headers->dispnotify_to) {
-	tmp = libbalsa_address_to_gchar_p(message->headers->dispnotify_to, 0);
-
-	hdr->env->dispnotify_to =
-	    rfc822_parse_adrlist(hdr->env->dispnotify_to, tmp);
-
-	g_free(tmp);
-    }
-
-    hdr->env->subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
-
-    tmp = libbalsa_make_string_from_list_p(message->headers->to_list);
-    hdr->env->to = rfc822_parse_adrlist(hdr->env->to, tmp);
-    g_free(tmp);
-
-    tmp = libbalsa_make_string_from_list_p(message->headers->cc_list);
-    hdr->env->cc = rfc822_parse_adrlist(hdr->env->cc, tmp);
-    g_free(tmp);
-
-    tmp = libbalsa_make_string_from_list_p(message->headers->bcc_list);
-    hdr->env->bcc = rfc822_parse_adrlist(hdr->env->bcc, tmp);
-    g_free(tmp);
-
-     for (list=message->headers->user_hdrs; list; list=g_list_next(list)) {
-        tmp_hdr = mutt_new_list();
-        tmp_hdr->next = hdr->env->userhdrs;
-        tmp_hdr->data = g_strjoinv(": ", list->data);
-        hdr->env->userhdrs = tmp_hdr;
-    }
-
-    libbalsa_unlock_mutt();
-}
-
-static void
-message_add_references(LibBalsaMessage* message, HEADER* msg) 
+message_add_references(LibBalsaMessage* message, GMimeMessage* msg) 
 {
-    LIST* in_reply_to;
-    LIST* references;
+    gchar* references;
+    gchar* references_dup;
     GList* list;
 
-    /* If the message has references set, add them to he envelope */
+    /* If the message has references set, add them to the envelope */
     if (message->references != NULL) {
-        list = message->references;
-        libbalsa_lock_mutt();
-        msg->env->references = mutt_new_list();
-       references = msg->env->references;
-       references->data = g_strdup(list->data);
-       list = list->next;
+	list = message->references;
+	references = g_strdup(list->data);
+	list = list->next;
 
-       while (list != NULL) {
-           references->next = mutt_new_list();
-           references = references->next;
-           references->data = g_strdup(list->data);
-           references->next = NULL;
+	while (list != NULL) {
+	    references_dup = g_strconcat(list->data, " ", references, NULL);
+	    g_free(references);
+	    references = references_dup;
            list = list->next;
        }
-        
+	g_mime_message_set_header(msg, "References", references);
 
-       /* There's no specific header for In-Reply-To, just
-        * add it to the user headers */ 
-        in_reply_to = mutt_new_list();
-       in_reply_to->next = msg->env->userhdrs;
-       in_reply_to->data =
-           g_strconcat("In-Reply-To: ", message->in_reply_to, NULL);
-       msg->env->userhdrs = in_reply_to;
-        libbalsa_unlock_mutt();
+	/* There's no specific header function for In-Reply-To */
+	g_mime_message_set_header(msg, "In-Reply-To", message->in_reply_to);
     }
 }
+
+#ifdef HAVE_GPGME
+static GList *
+get_mailbox_names(GList *list, GList *address_list)
+{
+    GList *recip;
+    LibBalsaAddress *addy; 
+    recip = g_list_first(address_list);
+    while (recip) {
+	char *mailbox;
+	addy = recip->data;
+	mailbox = (char*)libbalsa_address_get_mailbox(addy, 0);
+	list = g_list_append(list, mailbox);
+	recip = recip->next;
+    }
+
+    return list;
+}
+#endif
+
+
+static LibBalsaMsgCreateResult
+libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
+				     gboolean flow, gboolean postponing,
+				     GMimeMessage** return_mime_message)
+{
+    gchar **mime_type;
+    GMimeObject *mime_root = NULL;
+    GMimeMessage *mime_message;
+    LibBalsaMessageBody *body;
+    gchar *tmp;
+    GList *list;
+    LibBalsaMsgCreateResult res = LIBBALSA_MESSAGE_CREATE_OK;
+#ifdef HAVE_GPGME
+    gboolean can_create_rfc3156 = message->body_list != NULL;
+    if (postponing)
+	can_create_rfc3156 = FALSE;
+#endif
+
+    body = message->body_list;
+    if (body && body->next)
+	mime_root=GMIME_OBJECT(g_mime_multipart_new_with_subtype(message->subtype));
+
+    while (body) {
+	GMimePart *mime_part;
+	mime_part=NULL;
+
+	if (body->filename) {
+	    if (body->attach_as_extbody) {
+		GMimeObject *mime_obj;
+		mime_part=g_mime_part_new_with_type("message", "external-body");
+		g_mime_part_set_encoding(mime_part, GMIME_PART_ENCODING_7BIT);
+		mime_obj = GMIME_OBJECT(mime_part);
+		if(!strncmp( body->filename, "URL", 3 )) {
+		    g_mime_object_set_content_type_parameter(mime_obj,
+					     "access-type", "URL");
+		    g_mime_object_set_content_type_parameter(mime_obj,
+					     "URL", body->filename + 4);
+		} else {
+		    g_mime_object_set_content_type_parameter(mime_obj,
+					     "access-type", "local-file");
+		    g_mime_object_set_content_type_parameter(mime_obj,
+					     "name", body->filename);
+		}
+		g_mime_part_set_content(mime_part,
+					"Note: this is _not_ the real body!\n",
+					34);
+	    } else {
+		GMimeStream *stream;
+		GMimePartEncodingType encoding;
+		GMimeDataWrapper *content;
+		int fd;
+
+		if (!body->mime_type) {
+		    gchar* mt = libbalsa_lookup_mime_type(body->filename);
+		    mime_type = g_strsplit(mt,"/", 2);
+		    g_free(mt);
+		} else
+		    mime_type = g_strsplit(body->mime_type, "/", 2);
+		/* use BASE64 encoding for non-text mime types 
+		   use 8BIT for message */
+		mime_part=g_mime_part_new_with_type(mime_type[0], mime_type[1]);
+		g_mime_part_set_content_disposition(mime_part, GMIME_DISPOSITION_ATTACHMENT);
+		if(!strcasecmp(mime_type[0],"message") && 
+		   !strcasecmp(mime_type[1],"rfc822")) {
+		    g_mime_part_set_encoding(mime_part, GMIME_PART_ENCODING_8BIT);
+		    g_mime_part_set_content_disposition(mime_part, GMIME_DISPOSITION_INLINE);
+		} else if(strcasecmp(mime_type[0],"text") != 0)
+		{
+		    g_mime_part_set_encoding(mime_part, GMIME_PART_ENCODING_BASE64);
+		} else {
+		    /* is text, force unknown-8bit here. FIXME! PLEASE! */
+		    g_mime_object_set_content_type_parameter(GMIME_OBJECT(mime_part), "charset", "unknown-8bit");
+		}
+		g_strfreev(mime_type);
+
+		g_mime_part_set_filename(mime_part, body->filename);
+		encoding = g_mime_part_get_encoding(mime_part);
+		fd = open(body->filename, O_RDONLY);
+		stream = g_mime_stream_fs_new(fd);
+		content = g_mime_data_wrapper_new_with_stream(stream, encoding);
+		g_mime_stream_unref(stream);
+		g_mime_part_set_content_object(mime_part, content);
+		g_mime_object_unref(GMIME_OBJECT(content));
+	    }
+	} else if (body->buffer) {
+#ifdef HAVE_GPGME
+	    /* force quoted printable encoding if only signing is requested */
+	    mime_part = add_mime_body_plain(body,
+		((message->gpg_mode &
+		  (LIBBALSA_GPG_SIGN | LIBBALSA_GPG_ENCRYPT)
+		  ) == LIBBALSA_GPG_SIGN) ? GMIME_PART_ENCODING_QUOTEDPRINTABLE :
+					    encoding, flow);
+#ifdef HAVE_GPGME
+	    /* in '2440 mode, touch *only* the first body! */
+	    if (!postponing && body == body->message->body_list &&
+		message->gpg_mode > 0 &&
+		(message->gpg_mode & LIBBALSA_GPG_RFC2440) != 0) {
+		gint result = 
+		    libbalsa_create_rfc2440_buffer(body, mime_part);
+
+		if (result != LIBBALSA_MESSAGE_CREATE_OK) {
+		    g_object_unref(G_OBJECT(mime_part));
+		    g_object_unref(G_OBJECT(mime_root));
+		    return LIBBALSA_MESSAGE_CREATE_ERROR;
+		}
+	    }
+#endif
+#else
+	    mime_part = add_mime_body_plain(body, encoding, flow);
+#endif
+	}
+
+	if (mime_root) {
+	    g_mime_multipart_add_part(GMIME_MULTIPART(mime_root),
+				      GMIME_OBJECT(mime_part));
+	    g_object_unref(G_OBJECT(mime_part));
+	} else {
+	    mime_root = GMIME_OBJECT(mime_part);
+	}
+
+	body = body->next;
+    }
+
+#ifdef HAVE_GPGME
+    if (can_create_rfc3156 && message->gpg_mode > 0 &&
+	(message->gpg_mode & LIBBALSA_GPG_RFC2440) == 0) {
+	switch (message->gpg_mode)
+	    {
+	    case LIBBALSA_GPG_SIGN:   /* sign message */
+		{
+		    if (libbalsa_sign_mime_object(&mime_root,
+					   message->headers->from->address_list->data,
+					   NULL)) {
+		    } else {
+			/* FIXME: do we have to free any resources here??? */
+			return LIBBALSA_MESSAGE_SIGN_ERROR;
+		    }
+		    break;
+		}
+	    case LIBBALSA_GPG_ENCRYPT:
+	    case LIBBALSA_GPG_ENCRYPT | LIBBALSA_GPG_SIGN:
+		{
+		    GList *encrypt_for = NULL;
+		    gboolean success;
+
+		    /* build a list containing the addresses of all to:, cc:
+		       and the from: address. Note: don't add bcc: addresses
+		       as they would be visible in the encrypted block. */
+		    encrypt_for = get_mailbox_names(encrypt_for,
+						    message->headers->to_list);
+		    encrypt_for = get_mailbox_names(encrypt_for,
+						    message->headers->cc_list);
+		    encrypt_for = g_list_append(encrypt_for,
+					message->headers->from->address_list->data);
+		    if (message->headers->bcc_list)
+			libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+					     _("This message will not be encrpyted for the BCC: recipient(s)."));
+
+		    if (message->gpg_mode & LIBBALSA_GPG_SIGN)
+			success = 
+			    libbalsa_sign_encrypt_mime_object(&mime_root,
+					   message->headers->from->address_list->data,
+					   encrypt_for,
+					   NULL);
+		    else
+			success = 
+			    libbalsa_encrypt_mime_object(&mime_root,
+							 encrypt_for);
+		    g_list_free(encrypt_for);
+			
+		    if (!success) {
+			/* FIXME: do we have to free any resources here??? */
+			return LIBBALSA_MESSAGE_ENCRYPT_ERROR;
+		    }
+		    break;
+		}
+	    default:
+		g_error("illegal gpg_mode %d (" __FILE__ " line %d)",
+		    message->gpg_mode, __LINE__);
+	    }
+    }
+#endif
+    
+    mime_message = g_mime_message_new(TRUE);
+    if (mime_root) {
+	GList *param = message->parameters;
+
+ 	while (param) {
+ 	    gchar **vals = (gchar **)param->data;
+ 
+	    g_mime_object_set_content_type_parameter(GMIME_OBJECT(mime_root),
+						     vals[0], vals[1]);
+ 	    param = param->next;
+ 	}
+	g_mime_message_set_mime_part(mime_message, mime_root);
+	g_object_unref(G_OBJECT(mime_root));
+    }
+    message_add_references(message, mime_message);
+
+    if (message->headers->from)
+	g_mime_message_set_sender(mime_message,
+			libbalsa_address_to_gchar(message->headers->from, -1));
+    if (message->headers->reply_to)
+	g_mime_message_set_reply_to(mime_message,
+			libbalsa_address_to_gchar(message->headers->reply_to, -1));
+
+    if (LIBBALSA_MESSAGE_GET_SUBJECT(message))
+	g_mime_message_set_subject(mime_message,
+				   LIBBALSA_MESSAGE_GET_SUBJECT(message));
+
+    g_mime_message_set_date(mime_message, message->headers->date, 0); /* FIXME: Set GMT offset */
+
+    tmp = libbalsa_make_string_from_list(message->headers->to_list);
+    g_mime_message_add_recipients_from_string(mime_message,
+					      GMIME_RECIPIENT_TYPE_TO, tmp);
+    g_free(tmp);
+
+    tmp = libbalsa_make_string_from_list(message->headers->cc_list);
+    g_mime_message_add_recipients_from_string(mime_message,
+					      GMIME_RECIPIENT_TYPE_CC, tmp);
+    g_free(tmp);
+
+    tmp = libbalsa_make_string_from_list(message->headers->bcc_list);
+    g_mime_message_add_recipients_from_string(mime_message,
+					      GMIME_RECIPIENT_TYPE_BCC, tmp);
+    g_free(tmp);
+
+    if (message->headers->dispnotify_to) {
+	g_mime_message_add_header(mime_message, "Disposition-Notification-To",
+			libbalsa_address_to_gchar(message->headers->dispnotify_to, 0));
+    }
+
+    for (list = message->headers->user_hdrs; list; list = g_list_next(list)) {
+	gchar **pair;
+	pair = g_strsplit(list->data, ":", 1);
+	g_strchug(pair[1]);
+	g_mime_message_add_header(mime_message, pair[0], pair[1]);
+	g_strfreev(pair);
+    }
+
+    g_mime_message_add_header(mime_message, "X-Mailer",
+			      g_strdup_printf("Balsa %s", VERSION));
+
+    if (return_mime_message)
+	*return_mime_message = mime_message;
+
+    return LIBBALSA_MESSAGE_CREATE_OK;
+}
+
 
 gboolean
 libbalsa_message_postpone(LibBalsaMessage * message,
@@ -1362,108 +1533,15 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 			  LibBalsaMessage * reply_message,
 			  gchar * fcc, gint encoding,
 			  gboolean flow) {
-    HEADER *msg;
-    BODY *last, *newbdy;
     gchar *tmp;
-    LibBalsaMessageBody *body;
+    LibBalsaServer *server;
     int thereturn; 
+    GMimeMessage *mime_message;
+    GMimeStream *mem_stream;
 
-    libbalsa_lock_mutt();
-    msg = mutt_new_header();
-    libbalsa_unlock_mutt();
+    libbalsa_message_create_mime_message(message, encoding, flow, TRUE,
+					 &mime_message);
 
-    message2HEADER(message, msg);
-    message_add_references(message, msg);
-
-    body = message->body_list;
-
-    last = msg->content;
-    while (last && last->next)
-	last = last->next;
-
-    while (body) {
-	FILE *tempfp = NULL;
-	newbdy = NULL;
-
-	if (body->filename) {
-	    libbalsa_lock_mutt();
-	    newbdy = mutt_make_file_attach(body->filename);
-	    libbalsa_unlock_mutt();
-	    if (!newbdy) {
-		g_warning("Cannot attach file: %s.\nPostponing without it.",
-		     body->filename);
-	    } else {
-		gchar **mime_type;
-
-		/* Do this here because we don't want
-		 * to use libmutt's mime types */
-		if (!body->mime_type) {
-		    gchar* mt = libbalsa_lookup_mime_type(body->filename);
-		    mime_type = g_strsplit(mt,"/", 2);
-                    g_free(mt);
-                } else
-		    mime_type = g_strsplit(body->mime_type, "/", 2);
-		/* use BASE64 encoding for non-text mime types 
-		   use 8BIT for message */
-		libbalsa_lock_mutt();
-		newbdy->disposition = DISPATTACH;
-		if(!strcasecmp(mime_type[0],"message") && 
-		   !strcasecmp(mime_type[1],"rfc822")) {
-		    newbdy->encoding = ENC8BIT;
-		    newbdy->disposition = DISPINLINE;
-		} else if(strcasecmp(mime_type[0],"text") != 0)
-		    newbdy->encoding = ENCBASE64;
-		newbdy->type = mutt_check_mime_type(mime_type[0]);
-		g_free(newbdy->subtype);
-		newbdy->subtype = g_strdup(mime_type[1]);
-		libbalsa_unlock_mutt();
-		g_strfreev(mime_type);
-	    }
-	} else if (body->buffer) {
-	    newbdy = add_mutt_body_plain(body->charset, encoding, flow);
-	    newbdy->disposition = DISPINLINE;
-	    if (body->mime_type) {
-		/* change the type and subtype within the mutt body */
-		gchar *type, *subtype;
-		
-		type = g_strdup (body->mime_type);
-		if ((subtype = strchr (type, '/'))) {
-		    *subtype++ = 0;
-		    libbalsa_lock_mutt();
-		    newbdy->type = mutt_check_mime_type (type);
-		    libbalsa_unlock_mutt();
-		    newbdy->subtype = g_strdup(subtype);
-		}
-		g_free (type);
-	    }
-	    tempfp = safe_fopen(newbdy->filename, "w+");
-	    fputs(body->buffer, tempfp);
-	    fclose(tempfp);
-	    tempfp = NULL;
-	}
-
-	if (newbdy) {
-	    if (last)
-		last->next = newbdy;
-	    else
-		msg->content = newbdy;
-
-	    last = newbdy;
-	}
-	body = body->next;
-    }
-
-    { /* scope CHARSET */
-	libbalsa_lock_mutt();
-	if (msg->content) {
-	    if (msg->content->next)
-		msg->content = mutt_make_multipart(msg->content, message->subtype);
-	}
-	mutt_prepare_envelope(msg->env, FALSE);
-	encode_descriptions(msg->content);
-	libbalsa_unlock_mutt();
-    } 
-    
     if ((reply_message != NULL) && (reply_message->mailbox != NULL))
 	/* Just saves the message ID, mailbox type and mailbox name. We could
 	 * search all mailboxes for the ID but that would not be too fast. We
@@ -1476,60 +1554,45 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     else
 	tmp = NULL;
 
-    libbalsa_lock_mutt();
-    if (LIBBALSA_IS_MAILBOX_LOCAL(draftbox)) {
-	thereturn = mutt_write_fcc(libbalsa_mailbox_local_get_path(draftbox),
-				   msg, tmp, 1, fcc);
-    } else if (LIBBALSA_IS_MAILBOX_IMAP(draftbox)) {
-        thereturn = write_remote_fcc(draftbox, msg);
-    } else 
-	thereturn = -1;
+    /* Do something with tmp and mime_message */
+
+    mem_stream = g_mime_stream_mem_new();
+    g_mime_message_write_to_stream(mime_message, mem_stream);
+    thereturn=libbalsa_mailbox_add_message_stream(draftbox, mem_stream, 0);
+    g_mime_stream_unref(mem_stream);
+
     g_free(tmp);
-    mutt_free_header(&msg);
-    libbalsa_unlock_mutt();
+    g_mime_object_unref(GMIME_OBJECT(mime_message));
 
     if (draftbox->open_ref > 0)
 	libbalsa_mailbox_check(draftbox);
 
-    return thereturn>=0;
+    return thereturn!=-1;
 }
-
-
-#ifdef HAVE_GPGME
-static GList *
-get_mailbox_names(GList *list, ADDRESS *a)
-{
-    while (a) {
-	if (a->mailbox)
-	    list = g_list_append(list, a->mailbox);
-	a = a->next;
-    }
-    return list;
-}
-#endif
 
 
 #ifdef HAVE_GPGME
 static gint
-libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, HEADER * msg,
-			       gint mode)
+libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part)
 {
+    const gchar *content;
     gchar *cbuf, *rbuf = NULL;
+    LibBalsaMessage *message = body->message;
+    gint mode = message->gpg_mode;
+    guint len;
 
-    /* convert the buffer to the requested charset (if it's not utf-8) */
-    if (g_ascii_strcasecmp(body->charset, "utf-8"))
-	cbuf = g_convert(body->buffer, strlen(body->buffer),
-			 body->charset, "utf-8",
-			 NULL, NULL, NULL);
-    else
-	cbuf = g_strdup(body->buffer);
+    content = g_mime_part_get_content(mime_part, &len);
+    cbuf = g_strndup(content, len);
+
     g_return_val_if_fail(cbuf != NULL, LIBBALSA_MESSAGE_SIGN_ERROR);
     
     switch (mode & ~LIBBALSA_GPG_RFC2440)
 	{
 	case LIBBALSA_GPG_SIGN:   /* sign only */
-	    rbuf = libbalsa_rfc2440_sign_buffer(cbuf, msg->env->from->mailbox,
-						NULL);
+	    rbuf =
+		libbalsa_rfc2440_sign_buffer(cbuf, 
+					     message->headers->from->address_list->data,
+					     NULL);
 	    g_free(cbuf);
 	    if (!rbuf)
 		return LIBBALSA_MESSAGE_SIGN_ERROR;
@@ -1542,21 +1605,19 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, HEADER * msg,
 		/* build a list containing the addresses of all to:, cc:
 		   and the from: address. Note: don't add bcc: addresses
 		   as they would be visible in the encrypted block. */
-		encrypt_for = 
-		    get_mailbox_names(encrypt_for, msg->env->to);
-		encrypt_for =
-		    get_mailbox_names(encrypt_for, msg->env->cc);
+		encrypt_for = get_mailbox_names(encrypt_for, message->headers->to_list);
+		encrypt_for = get_mailbox_names(encrypt_for, message->headers->cc_list);
 		encrypt_for = g_list_append(encrypt_for,
-					    msg->env->from->mailbox);
-		if (msg->env->bcc)
+					    message->headers->from->address_list->data);
+		if (message->headers->bcc_list)
 		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 					 _("This message will not be encrpyted for the BCC: recipient(s)."));
 
 		if (mode & LIBBALSA_GPG_SIGN)
 		    rbuf = libbalsa_rfc2440_encrypt_buffer(cbuf, 
-							   msg->env->from->mailbox,
-							   encrypt_for,
-							   NULL);
+					     message->headers->from->address_list->data,
+					     encrypt_for,
+					     NULL);
 		else
 		    rbuf = libbalsa_rfc2440_encrypt_buffer(cbuf, 
 							   NULL,
@@ -1573,314 +1634,47 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, HEADER * msg,
 	    g_error("illegal gpg_mode %d (" __FILE__ " line %d)",
 		    mode, __LINE__);
 	}
-			
-    g_free(body->buffer);
-    body->buffer = rbuf;
+
+    g_mime_part_set_content(mime_part, rbuf, strlen(rbuf));
     return LIBBALSA_MESSAGE_CREATE_OK;
 }
 #endif
 
 
-/* libbalsa_create_msg:
+/* balsa_create_msg:
    copies message to msg.
-   PS: seems to be broken when queu == 1 - further execution of
-   mutt_free_header(mgs) leads to crash.
 */ 
 static LibBalsaMsgCreateResult
-libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
-		    gint encoding, gboolean flow, int queu) {
-    BODY *last, *newbdy;
-    FILE *tempfp;
-    HEADER *msg_tmp;
-    MESSAGE *mensaje;
-    LibBalsaMessageBody *body;
-    gchar **mime_type;
-    LibBalsaMsgCreateResult res = LIBBALSA_MESSAGE_CREATE_OK;
-#ifdef HAVE_GPGME
-    gboolean can_create_rfc3156 = message->body_list != NULL;
-#endif
-      
-    message2HEADER(message, msg);
-    message_add_references(message, msg);
+libbalsa_create_msg(LibBalsaMessage * message, MessageQueueItem *mqi,
+		    gint encoding, gboolean flow)
+{
+    LibBalsaMsgCreateResult res;
+    GMimeStream *mem_stream;
+    GMimeMessage *mime_message;
 
-    body = message->body_list;
-
-    last = msg->content;
-    while (last && last->next)
-	last = last->next;
-
-    while (body) {
-	FILE *tempfp = NULL;
-	newbdy = NULL;
-
-	if (body->filename) {
-	    if (body->attach_as_extbody) {
-                if(body->mime_type)
-                    newbdy = add_mutt_body_as_extbody(body->filename, 
-                                                      body->mime_type);
-                else {
-                    gchar* mt = libbalsa_lookup_mime_type(body->filename);
-                    newbdy = add_mutt_body_as_extbody(body->filename, mt);
-                    g_free(mt);
-                }
-	    } else {
-		libbalsa_lock_mutt();
-		newbdy = mutt_make_file_attach(body->filename);
-		libbalsa_unlock_mutt();
-		if (!newbdy) {
-		    g_warning
-			("Cannot attach file: %s.\nSending without it.",
-			 body->filename);
-		} else {
-		    
-		    /* Do this here because we don't want
-		     * to use libmutt's mime types */
-                    if (!body->mime_type) {
-                        gchar *mt = libbalsa_lookup_mime_type(body->filename);
-                        mime_type = g_strsplit(mt, "/", 2);
-                        g_free(mt);
-                    } else
-			mime_type = g_strsplit(body->mime_type, "/", 2);
-		    /* use BASE64 encoding for non-text mime types 
-		       use 8BIT for message */
-		    libbalsa_lock_mutt();
-		    newbdy->disposition = DISPATTACH;
-		    if(!strcasecmp(mime_type[0],"message") && 
-		       !strcasecmp(mime_type[1],"rfc822")) {
-			newbdy->encoding = ENC8BIT;
-			newbdy->disposition = DISPINLINE;
-		    } else if(strcasecmp(mime_type[0],"text") != 0) {
-			newbdy->encoding = ENCBASE64;
-		    } else {
-			/* is text, force unknown-8bit here. FIXME! PLEASE! */
-			newbdy->force_charset = 1;
-			mutt_set_parameter( "charset", "unknown-8bit", &newbdy->parameter );
-		    }
-		    newbdy->type = mutt_check_mime_type(mime_type[0]);
-		    g_free(newbdy->subtype);
-		    newbdy->subtype = g_strdup(mime_type[1]);
-		    libbalsa_unlock_mutt();
-		    g_strfreev(mime_type);
-		}
-	    }
-	} else if (body->buffer) {
-#ifdef HAVE_GPGME
-	    /* force quoted printable encoding if only signing is requested */
-	    newbdy =
-		add_mutt_body_plain(body->charset,
-				    ((message->gpg_mode & (LIBBALSA_GPG_SIGN | LIBBALSA_GPG_ENCRYPT)) == LIBBALSA_GPG_SIGN) ?
-				    ENCQUOTEDPRINTABLE : encoding, flow);
-#else
-	    newbdy =
-		add_mutt_body_plain(body->charset, encoding, flow);
-#endif
-	    if (body->mime_type) {
-		/* change the type and subtype within the mutt body */
-		gchar *type, *subtype;
-		
-		type = g_strdup (body->mime_type);
-		if ((subtype = strchr (type, '/'))) {
-		    *subtype++ = 0;
-		    libbalsa_lock_mutt();
-		    newbdy->type = mutt_check_mime_type (type);
-		    g_free(newbdy->subtype);
-		    newbdy->subtype = g_strdup(subtype);
-		    libbalsa_unlock_mutt();
-		}
-		g_free (type);
-	    }
-#ifdef HAVE_GPGME
-	    /* in '2440 mode, touch *only* the first body! */
-	    if (body == message->body_list && message->gpg_mode > 0 &&
-		(message->gpg_mode & LIBBALSA_GPG_RFC2440) != 0) {
-		gint result = 
-		    libbalsa_create_rfc2440_buffer(body, msg,
-						   message->gpg_mode);
-
-		if (result != LIBBALSA_MESSAGE_CREATE_OK)
-		    return result;
-		newbdy->noconv = 1;  /* it's already converted by gpgme... */
-	    }
-#endif
-	    tempfp = safe_fopen(newbdy->filename, "w+");
-	    fputs(body->buffer, tempfp);
-	    fclose(tempfp);
-	    tempfp = NULL;
-	} else {
-	    /* safe_free bug patch: steal it! */
-            libbalsa_lock_mutt();
-	    msg->content = libmutt_copy_body(body->mutt_body, NULL);
-            libbalsa_unlock_mutt();
-	}
-
-	if (newbdy) {
-	    if (last)
-		last->next = newbdy;
-	    else
-		msg->content = newbdy;
-
-	    last = newbdy;
-	}
-
-	body = body->next;
-    }
-    
-#ifdef HAVE_GPGME
-    if (can_create_rfc3156 && message->gpg_mode > 0 &&
-	(message->gpg_mode & LIBBALSA_GPG_RFC2440) == 0) {
-	switch (message->gpg_mode)
-	    {
-	    case LIBBALSA_GPG_SIGN:   /* sign message */
-		{
-		    gchar *micalg;
-		    if (libbalsa_sign_mutt_body(&msg->content,
-						msg->env->from->mailbox, &micalg, NULL)) {
-			/* signing was successful, update the message parameters */
-			gchar **params;
-			
-			g_free(message->subtype);
-			message->subtype = g_strdup("signed");
-			
-			params = g_new(gchar *, 3);
-			params[0] = g_strdup("micalg"); 
-			params[1] = micalg;
-			params[2] = NULL;
-			message->parameters = 
-			    g_list_prepend(message->parameters, params);
-			params = g_new(gchar *, 3);
-			params[0] = g_strdup("protocol"); 
-			params[1] = g_strdup("application/pgp-signature");
-			params[2] = NULL;
-			message->parameters = 
-			    g_list_prepend(message->parameters, params);
-		    } else {
-			/* FIXME: do we have to free any resources here??? */
-			return LIBBALSA_MESSAGE_SIGN_ERROR;
-		    }
-		    break;
-		}
-	    case LIBBALSA_GPG_ENCRYPT:
-	    case LIBBALSA_GPG_ENCRYPT | LIBBALSA_GPG_SIGN:
-		{
-		    GList *encrypt_for = NULL;
-		    gboolean success;
-
-		    /* build a list containing the addresses of all to:, cc:
-		       and the from: address. Note: don't add bcc: addresses
-		       as they would be visible in the encrypted block. */
-		    encrypt_for = get_mailbox_names(encrypt_for, msg->env->to);
-		    encrypt_for = get_mailbox_names(encrypt_for, msg->env->cc);
-		    encrypt_for = g_list_append(encrypt_for,
-						msg->env->from->mailbox);
-		    if (msg->env->bcc)
-			libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-					     _("This message will not be encrpyted for the BCC: recipient(s)."));
-
-		    if (message->gpg_mode & LIBBALSA_GPG_SIGN)
-			success = 
-			    libbalsa_sign_encrypt_mutt_body(&msg->content,
-							    msg->env->from->mailbox, 
-							    encrypt_for,
-							    NULL);
-		    else
-			success = 
-			    libbalsa_encrypt_mutt_body(&msg->content,
-						       encrypt_for);
-		    g_list_free(encrypt_for);
-			
-		    if (success) {
-			/* encryption was successful, update the message parameters */
-			gchar **params;
-			
-			g_free(message->subtype);
-			message->subtype = g_strdup("encrypted");
-			
-			params = g_new(gchar *, 3);
-			params[0] = g_strdup("protocol"); 
-			params[1] = g_strdup("application/pgp-encrypted");
-			params[2] = NULL;
-			message->parameters = 
-			    g_list_prepend(message->parameters, params);
-		    } else {
-			/* FIXME: do we have to free any resources here??? */
-			return LIBBALSA_MESSAGE_ENCRYPT_ERROR;
-		    }
-		    break;
-		}
-	    default:
-		g_error("illegal gpg_mode %d (" __FILE__ " line %d)",
-		    message->gpg_mode, __LINE__);
-	    }
-    }
-#endif
-    
-    { /* scope */
-	GList *param = message->parameters;
-	libbalsa_lock_mutt();
-	if (msg->content && msg->content->next)
-	    msg->content = mutt_make_multipart(msg->content, message->subtype);
- 	while (param) {
- 	    gchar **vals = (gchar **)param->data;
- 
- 	    mutt_set_parameter(vals[0], vals[1], &msg->content->parameter);
- 	    param = param->next;
- 	}
-	mutt_prepare_envelope(msg->env, TRUE);
-	encode_descriptions(msg->content);
-	libbalsa_unlock_mutt();
+    res = libbalsa_message_create_mime_message(message, encoding, flow, FALSE,
+					       &mime_message);
+    if (res != LIBBALSA_MESSAGE_CREATE_OK) {
+	return res;
     }
 
-    /* We create the message in MIME format here, we use the same format 
-     * for local delivery and for SMTP */
-    if (queu == 0) {
-        libbalsa_lock_mutt();
-	mutt_mktemp(tmpfile);
-	if ((tempfp = safe_fopen(tmpfile, "w")) == NULL) {
-            libbalsa_unlock_mutt();
-            return LIBBALSA_MESSAGE_CREATE_ERROR;
-        }
+    mem_stream = g_mime_stream_mem_new();
+    g_mime_message_write_to_stream(mime_message, mem_stream);
+    mqi->stream = mem_stream;
+    if (mqi->stream == NULL)
+	return LIBBALSA_MESSAGE_CREATE_ERROR;
+  
+    return LIBBALSA_MESSAGE_CREATE_OK;
+}
 
-	mutt_write_rfc822_header(tempfp, msg->env, msg->content, -1,0);
-	fputc('\n', tempfp);	/* tie off the header. */
-
-	if ((mutt_write_mime_body(msg->content, tempfp) == -1)) {
-	    fclose(tempfp);
-	    unlink(tmpfile);
-            libbalsa_unlock_mutt();
-            return LIBBALSA_MESSAGE_CREATE_ERROR;
-	}
-        libbalsa_unlock_mutt();
-	fputc('\n', tempfp);	/* tie off the body. */
-	if (fclose(tempfp) != 0) {
-	    mutt_perror(tmpfile);
-            unlink(tmpfile);
-            return LIBBALSA_MESSAGE_CREATE_ERROR;
-	}
-
-    } else { /* the message is in the queue */
-	msg_tmp = message->header;
-        libbalsa_lock_mutt();
-	mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox),
-				msg_tmp);
-	mensaje =
-	    mx_open_message(CLIENT_CONTEXT(message->mailbox),
-			    msg_tmp->msgno);
-
-	mutt_mktemp(tmpfile);
-	if ((tempfp = safe_fopen(tmpfile, "w")) == NULL) {
-            libbalsa_unlock_mutt();
-            return LIBBALSA_MESSAGE_CREATE_ERROR;
-        }
-	_mutt_copy_message(tempfp, mensaje->fp, msg_tmp,
-			   msg_tmp->content, 0, CH_NOSTATUS);
-
-	if (fclose(tempfp) != 0) {
-	    mutt_perror(tmpfile);
-	    unlink(tmpfile);
-            res = LIBBALSA_MESSAGE_CREATE_ERROR;
-	}
-        libbalsa_unlock_mutt();
-    }    
-
-    return res;
+static LibBalsaMsgCreateResult
+libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
+				 MessageQueueItem *mqi)
+{
+    mqi->stream = libbalsa_mailbox_get_message_stream(message->mailbox,
+						      message);
+    if (mqi->stream == NULL)
+	return LIBBALSA_MESSAGE_CREATE_ERROR;
+  
+    return LIBBALSA_MESSAGE_CREATE_OK;
 }

@@ -125,10 +125,11 @@ do {\
 
 #endif
 
-#define CLIENT_CONTEXT(mailbox)          (mailbox->context)
+#ifndef CLIENT_CONTEXT
+#define CLIENT_CONTEXT(mailbox)          (mailbox->mailbox_data)
+#endif
 #define CLIENT_CONTEXT_OPEN(mailbox)     (CLIENT_CONTEXT (mailbox) != NULL)
-#define CLIENT_CONTEXT_CLOSED(mailbox) \
-  (CLIENT_CONTEXT (mailbox) == NULL||CLIENT_CONTEXT (mailbox)->hdrs==NULL)
+#define CLIENT_CONTEXT_CLOSED(mailbox)   (CLIENT_CONTEXT (mailbox) == NULL)
 #define RETURN_IF_CLIENT_CONTEXT_CLOSED(mailbox)\
 do {\
   if (CLIENT_CONTEXT_CLOSED (mailbox))\

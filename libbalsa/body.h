@@ -26,6 +26,7 @@
 #include <stdio.h>
 
 #include <glib.h>
+#include <gmime/gmime.h>
 
 #include "config.h"
 
@@ -52,12 +53,11 @@ struct _LibBalsaMessageBody {
     gchar *buffer;		/* holds raw data of the MIME part, or NULL */
     LibBalsaMessageHeaders *embhdrs;  /* headers of a message/rfc822 part */
     gchar *mime_type;           /* the mime type/subtype of buffer, or NULL, if plain */
-    MuttBody *mutt_body;	/* pointer to BODY struct of mutt message */
     gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
     gboolean attach_as_extbody; /* if an attachment shall be appended as external-body (sending) */
     gchar *temp_filename;	/* Holds the filename of a the temporary file where this part is saved */
     gchar *charset;		/* the charset, used for sending, replying. */
-    guint disposition;      /* content-disposition */
+    GMimeObject *mime_part;	/* mime body */
 
 #ifdef HAVE_GPGME
     gchar *decrypt_file;        /* temp file for a decrypted body */
@@ -74,8 +74,8 @@ void libbalsa_message_body_free(LibBalsaMessageBody * body);
 LibBalsaMessageBodyType libbalsa_message_body_type(LibBalsaMessageBody *
 						   body);
 
-void libbalsa_message_body_set_mutt_body(LibBalsaMessageBody * body,
-					 MuttBody * mutt_body);
+void libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
+					 GMimeObject * mime_part);
 
 gboolean libbalsa_message_body_save(LibBalsaMessageBody * body,
 				    const gchar * prefixm,

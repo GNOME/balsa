@@ -812,7 +812,7 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
     pdata = g_malloc(sizeof(DefaultInfo));
     pdata->id_tag = BALSA_PRINT_TYPE_DEFAULT;
 
-    if (body->mutt_body)
+    if (body->mime_part)
 	conttype = libbalsa_message_body_get_content_type(body);
     else
 	conttype = libbalsa_lookup_mime_type(body->filename);
@@ -1113,7 +1113,7 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
 	if (body->buffer)
 	    conttype = g_strdup("text");
 	else
-	    if (!body->mutt_body)
+	    if (!body->mime_part)
 		conttype = g_strdup("default");
 	    else
 		conttype = libbalsa_message_body_get_content_type(body);

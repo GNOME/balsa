@@ -65,6 +65,7 @@ gtk+-2.0 >= 2.0
 gnome-vfs-2.0
 gnome-vfs-module-2.0
 $gnome_extras
+gmime-2.0
 ])
 AC_SUBST(BALSA_CFLAGS)
 AC_SUBST(BALSA_LIBS)
@@ -496,6 +497,7 @@ images/Makefile
 doc/Makefile
 doc/C/Makefile
 libbalsa/Makefile
+libbalsa/imap/Makefile
 libinit_balsa/Makefile
 src/Makefile
 ])

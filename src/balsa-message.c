@@ -814,14 +814,15 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
 
     for (; body; body = body->next) {
 	gint signres = libbalsa_is_pgp_signed(body);
-	
+
 	libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
 			       balsa_app.convert_unknown_8bit_codeset, NULL);
 
 	if (signres > 0) {
 	    LibBalsaSignatureInfo *checkResult;
+
 	    if (!body->parts->next->sig_info)
-		libbalsa_body_check_signature(body->parts);
+		libbalsa_body_check_signature(body);
 	    checkResult = body->parts->next->sig_info;
 
 	    if (checkResult) {
@@ -839,8 +840,19 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
 			libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
 					     _("detected a good signature with insufficient validity/trust"));
 		    }
+		    if (result != LIBBALSA_MESSAGE_SIGNATURE_BAD)
+			result = LIBBALSA_MESSAGE_SIGNATURE_GOOD;
+		    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+					 _("detected a good signature"));
 		} else {
 		    result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
+		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+					 _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
+					 sender, subject,
+					 libbalsa_gpgme_sig_stat_to_gchar(checkResult->status));
+		}
+	    } else {
+		result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
 
 #ifdef HAVE_GPG
 		    if (checkResult->status == GPGME_SIG_STAT_NOKEY) {
@@ -853,13 +865,6 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
 			g_free(msg);
 		    } else
 #endif
-		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-					 _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
-					 sender, subject,
-					 libbalsa_gpgme_sig_stat_to_gchar(checkResult->status));
-		}
-	    } else {
-		result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				     _("Checking the signature of the message sent by %s with subject \"%s\" failed with an error!"),
 				     sender, subject);
@@ -952,8 +957,8 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 
 	if (encrres > 0)
 	    /* try to decrypt the message... */
-	    message->body_list->parts =
-		libbalsa_body_decrypt(message->body_list->parts, NULL);
+	    message->body_list =
+		libbalsa_body_decrypt(message->body_list, NULL);
 	else if (encrres < 0) {
 	    gchar *sender = bm_sender_to_gchar(message->headers->from, -1);
 	    gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
@@ -3107,18 +3112,19 @@ static void add_body(BalsaMessage *bm,
 
 
 static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
-/* Remarks: *** The tests/assumptions made are NOT verified with the RFCs */
+/* This function handles multiparts as specified by RFC2046 5.1 */
 {
-    if(parent->parts) {
-	gchar *content_type = 
-	    libbalsa_message_body_get_content_type(parent);
-	if(g_ascii_strcasecmp(content_type, "multipart/related")==0) {
+    const GMimeContentType *type;
+    type=g_mime_object_get_content_type(parent->mime_part);
+    if (g_mime_content_type_is_type(type, "multipart", "*")) {
+        if (g_mime_content_type_is_type(type, "*", "related")) {
+            /* FIXME: more processing required see RFC1872 */
 	    /* Add the first part */
 	    add_body(bm, parent->parts);
-	} else if(g_ascii_strcasecmp(content_type, "multipart/alternative")==0) {
+        } else if (g_mime_content_type_is_type(type, "*", "alternative")) {
 	    /* Add the most suitable part. */
 	    add_body(bm, preferred_part(parent->parts));
-	} else {
+        } else { /* default to multipart/mixed */
 	    /* Add first (main) part + anything else with 
 	       Content-Disposition: inline */
 	    LibBalsaMessageBody *body=parent->parts;
@@ -3131,7 +3137,6 @@ static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
 		}
 	    }
 	}
-	g_free(content_type);
     }
 }
 

@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-12-27 04:56+0100\n"
-"PO-Revision-Date: 2002-12-27 23:24+0200\n"
+"POT-Creation-Date: 2002-12-28 04:55+0100\n"
+"PO-Revision-Date: 2002-12-28 19:23+0200\n"
 "Last-Translator: Artis Trops <hornet@navigator.lv>\n"
 "Language-Team: Latvian <ll10nt@os.lv>\n"
 "MIME-Version: 1.0\n"
@@ -477,60 +477,60 @@ msgstr "Saņemu Vēstuli %d no %d"
 msgid "Received %d bytes of %d"
 msgstr "Saņemti %d baiti no %d"
 
-#: libbalsa/send.c:212
-#: libbalsa/send.c:219
+#: libbalsa/send.c:211
+#: libbalsa/send.c:218
 msgid "Sending Mail..."
 msgstr "Sūtu Pastu..."
 
-#: libbalsa/send.c:215
-#: src/main-window.c:1777
+#: libbalsa/send.c:214
+#: src/main-window.c:1778
 msgid "_Hide"
 msgstr "_Slēpt"
 
-#: libbalsa/send.c:362
+#: libbalsa/send.c:360
 msgid "Unable to open sentbox - could not get IMAP server information"
 msgstr "Nevarēu atvērt nosūtītās - nevarēju saņemt IMAP servera informāciju"
 
-#: libbalsa/send.c:772
+#: libbalsa/send.c:768
 msgid "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
 msgstr "Vēstules sūtīšanas problēma, novietoju to jūsu izsūtnē.\n"
 "Sistēma mēģinās vēstuli sūtīt atkārtoti līdz jūs to izdzēsīsiet."
 
-#: libbalsa/send.c:800
+#: libbalsa/send.c:795
 msgid "Connected to MTA"
 msgstr "Pieslēdzies pie MTA"
 
-#: libbalsa/send.c:807
+#: libbalsa/send.c:802
 #, c-format
 msgid "From: %d <%s>"
 msgstr "No: %d <%s>"
 
-#: libbalsa/send.c:810
+#: libbalsa/send.c:805
 #, c-format
 msgid "From %s: %d %s"
 msgstr "No %s: %d %s"
 
-#: libbalsa/send.c:818
+#: libbalsa/send.c:813
 #, c-format
 msgid "To: %d <%s>"
 msgstr "Kam: %d <%s>"
 
-#: libbalsa/send.c:821
+#: libbalsa/send.c:816
 #, c-format
 msgid "To %s: %d %s"
 msgstr "Kam %s: %d %s"
 
-#: libbalsa/send.c:845
+#: libbalsa/send.c:840
 #, c-format
 msgid "%d %s"
 msgstr "%d %s"
 
-#: libbalsa/send.c:858
+#: libbalsa/send.c:853
 msgid "Disconnected"
 msgstr "Atlēdzies"
 
-#: libbalsa/send.c:1029
+#: libbalsa/send.c:1024
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -542,7 +542,7 @@ msgstr ""
 "Ja vēlaties sūtīt pastu, lietojot releja servisu (25), norādīt to īpaši kā: \"hostdators:smtp\".\n"
 "Vēstule atstāta izsūtnē."
 
-#: libbalsa/send.c:1039
+#: libbalsa/send.c:1034
 #, c-format
 msgid "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
@@ -1656,7 +1656,6 @@ msgid "From"
 msgstr "No"
 
 #: src/balsa-index.c:240
-#: src/filter-edit-callbacks.c:1002
 msgid "Subject"
 msgstr "Temats"
 
@@ -1709,7 +1708,8 @@ msgid "_Store Address..."
 msgstr "_Noglabāt Adresi..."
 
 #: src/balsa-index.c:2100
-#: src/mailbox-node.c:779
+#: src/filter-edit-dialog.c:216
+#: src/mailbox-node.c:777
 #: src/main-window.c:526
 #: src/pref-manager.c:1510
 #: src/pref-manager.c:2599
@@ -1746,7 +1746,7 @@ msgid "Mailbox"
 msgstr "Pastkastīte"
 
 #: src/balsa-mblist.c:344
-#: src/filter-edit-callbacks.c:775
+#: src/filter-edit-callbacks.c:783
 msgid "Unread"
 msgstr "Nelasītas"
 
@@ -1759,15 +1759,15 @@ msgstr "Kopā"
 msgid "Failed to find mailbox"
 msgstr "Neizdevās atrast pastkastīti"
 
-#: src/balsa-mblist.c:1781
+#: src/balsa-mblist.c:1780
 msgid "_Other..."
 msgstr "_Cits..."
 
-#: src/balsa-mblist.c:1842
+#: src/balsa-mblist.c:1841
 msgid "Choose destination folder"
 msgstr "Izvēlaties mērķa mapi"
 
-#: src/balsa-mblist.c:2154
+#: src/balsa-mblist.c:2153
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Parādītā pastkastīte: %s ar %ld vēstulēm, %ld jaunas"
@@ -1796,7 +1796,6 @@ msgid "Date:"
 msgstr "Datums:"
 
 #: src/balsa-message.c:776
-#: src/filter-edit-callbacks.c:995
 #: src/print.c:343
 #: src/store-address.c:272
 msgid "From:"
@@ -1807,7 +1806,6 @@ msgid "Reply-To:"
 msgstr "Atbildēt-Uz:"
 
 #: src/balsa-message.c:785
-#: src/filter-edit-callbacks.c:988
 #: src/print.c:353
 #: src/store-address.c:273
 msgid "To:"
@@ -1815,7 +1813,6 @@ msgstr "Kam:"
 
 #. cc:
 #: src/balsa-message.c:786
-#: src/filter-edit-callbacks.c:1009
 #: src/print.c:354
 #: src/sendmsg-window.c:1842
 #: src/store-address.c:274
@@ -1984,7 +1981,6 @@ msgid "reply to MDN?"
 msgstr "atbildēt uz MDN?"
 
 #: src/filter-edit-callbacks.c:284
-#: src/filter-edit-callbacks.c:788
 msgid "One of the specified fields contains:"
 msgstr "Viens no norādītajiem laukiem satur:"
 
@@ -1993,7 +1989,6 @@ msgid "None of the specified fields contains:"
 msgstr "Neviens no norādītajiem laukiem nesatur:"
 
 #: src/filter-edit-callbacks.c:287
-#: src/filter-edit-callbacks.c:815
 msgid "One of the regular expressions matches"
 msgstr "Viena no parastajām izteiksmēm atbilst"
 
@@ -2002,7 +1997,7 @@ msgid "None of the regular expressions matches"
 msgstr "Neviena no parastajām izteiksmēm neatbilst"
 
 #: src/filter-edit-callbacks.c:290
-#: src/filter-edit-callbacks.c:867
+#: src/filter-edit-callbacks.c:878
 msgid "Match when date is in the interval:"
 msgstr "Atbilst, kad datums ir intervālā:"
 
@@ -2011,7 +2006,7 @@ msgid "Match when date is outside the interval:"
 msgstr "Atbilst, kad datums ir ārpus intervāla:"
 
 #: src/filter-edit-callbacks.c:293
-#: src/filter-edit-callbacks.c:905
+#: src/filter-edit-callbacks.c:916
 msgid "Match when one of these flags is set:"
 msgstr "Atbilst, kad šie karodziņi ir iestatīti:"
 
@@ -2019,135 +2014,166 @@ msgstr "Atbilst, kad šie karodziņi ir iestatīti:"
 msgid "Match when none of these flags is set:"
 msgstr "Atbilst, kad neviens no šiem karodziņiem nav iestatīts:"
 
-#: src/filter-edit-callbacks.c:445
+#: src/filter-edit-callbacks.c:446
 msgid "You must specify the name of the user header to match on"
 msgstr "Jums jānorāda lietotāja galvenes noaukums, kuram atbilst"
 
-#: src/filter-edit-callbacks.c:460
+#: src/filter-edit-callbacks.c:461
 msgid "You must specify at least one field for matching"
 msgstr "Jums jānorāda vismaz viens lauks atbilstībai"
 
-#: src/filter-edit-callbacks.c:470
+#: src/filter-edit-callbacks.c:471
 msgid "You must provide a string"
 msgstr "Jums jāpiedāvā virkne"
 
-#: src/filter-edit-callbacks.c:477
+#: src/filter-edit-callbacks.c:478
 msgid "You must provide at least one regular expression"
 msgstr "Jums jāpiedāvā vismaz viena parastā izteiksme"
 
-#: src/filter-edit-callbacks.c:489
+#: src/filter-edit-callbacks.c:490
 msgid "Low date is incorrect"
 msgstr "Zemākais datums ir nepareizs"
 
-#: src/filter-edit-callbacks.c:500
+#: src/filter-edit-callbacks.c:501
 msgid "High date is incorrect"
 msgstr "Augstākais datums ir nepareizs"
 
-#: src/filter-edit-callbacks.c:508
+#: src/filter-edit-callbacks.c:509
 msgid "Low date is greater than high date"
 msgstr "Zemākais datums ir lielāks, nekā augstākais datums"
 
-#: src/filter-edit-callbacks.c:775
+#: src/filter-edit-callbacks.c:783
 msgid "Deleted"
 msgstr "Dzēsta"
 
-#: src/filter-edit-callbacks.c:775
+#: src/filter-edit-callbacks.c:783
 msgid "Replied"
 msgstr "Atbildēta"
 
-#: src/filter-edit-callbacks.c:775
+#: src/filter-edit-callbacks.c:783
 #: src/main-window.c:424
 msgid "Flagged"
 msgstr "Karogoto"
 
-#: src/filter-edit-callbacks.c:801
-msgid "Contain/Does not contain"
-msgstr "Satur/Nesatur"
+#: src/filter-edit-callbacks.c:797
+msgid "One of the specified f_ields contains"
+msgstr "Viens no norādītajiem _laukiem satur:"
+
+#: src/filter-edit-callbacks.c:812
+msgid "Contain/Does _Not Contain"
+msgstr "Satur/Nesa_tur"
+
+#: src/filter-edit-callbacks.c:826
+msgid "_One of the regular expressions matches"
+msgstr "_Viena no parastajām izteiksmēm atbilst"
 
 #. FIXME : I saw a lot of different ways to create button with
 #. pixmaps, hope this one is correct
 #. Right/Add button
-#: src/filter-edit-callbacks.c:842
+#: src/filter-edit-callbacks.c:853
 #: src/filter-run-dialog.c:312
-msgid "Add"
-msgstr "Pievienot"
+msgid "A_dd"
+msgstr "Pie_vienot"
 
 #. Left/Remove button
-#: src/filter-edit-callbacks.c:846
-#: src/filter-edit-dialog.c:309
+#: src/filter-edit-callbacks.c:857
+#: src/filter-edit-dialog.c:310
 #: src/filter-run-dialog.c:317
-#: src/sendmsg-window.c:1261
-msgid "Remove"
-msgstr "Izņemt"
+msgid "_Remove"
+msgstr "_Izņemt"
 
-#: src/filter-edit-callbacks.c:850
-msgid "One matches/None matches"
-msgstr "Viens atbilst/Neviens neatbilst"
+#: src/filter-edit-callbacks.c:861
+msgid "One _Matches/None Matches"
+msgstr "Viens _Atbilst/Neviens Neatbilst"
 
-#: src/filter-edit-callbacks.c:887
+#: src/filter-edit-callbacks.c:898
 msgid "Inside/outside the date interval"
 msgstr "Iekšpusē/ārpusē datuma intervālam"
 
-#: src/filter-edit-callbacks.c:934
+#: src/filter-edit-callbacks.c:945
 msgid "Match when one flag is set/when no flag is set"
 msgstr "Atbilst, kad iestatīts viens/neviens karodziņš"
 
 #. builds the toggle buttons to specify fields concerned by the conditions of
 #. * the filter
-#: src/filter-edit-callbacks.c:952
-msgid "Match in:"
-msgstr "Atbilst iekš:"
+#: src/filter-edit-callbacks.c:963
+msgid "Match In"
+msgstr "Atbilst Iekš"
 
-#: src/filter-edit-callbacks.c:964
-msgid "All"
-msgstr "Visi"
+#: src/filter-edit-callbacks.c:975
+msgid "_All"
+msgstr "_Visi"
 
-#: src/filter-edit-callbacks.c:972
-msgid "Clear"
-msgstr "Attīrīt"
+#: src/filter-edit-callbacks.c:983
+msgid "C_lear"
+msgstr "A_ttīrīt"
 
-#: src/filter-edit-callbacks.c:981
-msgid "Body"
-msgstr "Rumpis"
+#: src/filter-edit-callbacks.c:992
+#: src/main-window.c:2686
+msgid "_Body"
+msgstr "_Rumpis"
 
-#: src/filter-edit-callbacks.c:1016
-msgid "User header:"
-msgstr "Lietot galveni:"
+#. To:
+#: src/filter-edit-callbacks.c:999
+#: src/main-window.c:2687
+#: src/sendmsg-window.c:1831
+msgid "_To:"
+msgstr "_Kam:"
 
-#: src/filter-edit-callbacks.c:1034
-msgid "Selected condition search type:"
-msgstr "Izvēlētais nosacījuma meklēšanas tips:"
+#: src/filter-edit-callbacks.c:1006
+#: src/main-window.c:2688
+msgid "_From:"
+msgstr "_No:"
 
-#: src/filter-edit-callbacks.c:1117
+#: src/filter-edit-callbacks.c:1014
+#: src/main-window.c:2689
+#: src/sendmsg-window.c:297
+msgid "_Subject"
+msgstr "_Temats"
+
+#: src/filter-edit-callbacks.c:1021
+#: src/main-window.c:2690
+msgid "_Cc:"
+msgstr "_Cc:"
+
+#: src/filter-edit-callbacks.c:1028
+msgid "_User header:"
+msgstr "_Lietotāja Galvene:"
+
+#: src/filter-edit-callbacks.c:1052
+msgid "Search T_ype:"
+msgstr "Meklēšanas Ti_ps:"
+
+#: src/filter-edit-callbacks.c:1129
 msgid "Edit condition for filter: "
 msgstr "Rediģēt nosacījumu filtram: "
 
-#: src/filter-edit-callbacks.c:1528
+#: src/filter-edit-callbacks.c:1540
 msgid "New filter"
 msgstr "Jauns filtrs"
 
-#: src/filter-edit-callbacks.c:1656
+#: src/filter-edit-callbacks.c:1669
 msgid "No filter name specified."
 msgstr "Filtra nosaukums nav norādīts."
 
-#: src/filter-edit-callbacks.c:1661
+#: src/filter-edit-callbacks.c:1674
 #, c-format
 msgid "Filter \"%s\" already exists."
 msgstr "Filtrs \"%s\" jau eksistē."
 
-#: src/filter-edit-callbacks.c:1674
+#: src/filter-edit-callbacks.c:1687
 msgid "Filter must have conditions."
 msgstr "Filtram jābūt nosacījumiem."
 
-#: src/filter-edit-callbacks.c:1733
+#: src/filter-edit-callbacks.c:1746
 msgid "Filter has matched"
 msgstr "Filtrs atbilst"
 
-#: src/filter-edit-callbacks.c:1751
+#: src/filter-edit-callbacks.c:1764
 msgid "You must provide a sound to play"
 msgstr "Jums jānorāda skaņa, ko atskaņot"
 
-#: src/filter-edit-callbacks.c:1882
+#: src/filter-edit-callbacks.c:1895
 #, c-format
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr "(Piemērs: rakstiet Decembris 31, 2000, kā %s)"
@@ -2199,69 +2225,69 @@ msgstr "UN"
 
 #. new button
 #: src/filter-edit-dialog.c:210
-#: src/filter-edit-dialog.c:305
-#: src/main-window.c:431
-msgid "New"
-msgstr "Jauns"
-
-#: src/filter-edit-dialog.c:216
-msgid "Delete"
-msgstr "Dzēst"
+#: src/mailbox-node.c:749
+#: src/main-window.c:282
+msgid "_New"
+msgstr "_Jauns"
 
 #. The name entry
 #: src/filter-edit-dialog.c:242
-msgid "Filter name:"
-msgstr "Filtra nosaukums:"
+msgid "_Filter name:"
+msgstr "_Filtra nosaukums:"
 
 #. The filter op-code : "OR" or "AND" all the conditions
-#: src/filter-edit-dialog.c:257
+#: src/filter-edit-dialog.c:258
 msgid "Operation between conditions"
 msgstr "Operācija starp nosacījumiem"
 
-#: src/filter-edit-dialog.c:300
-msgid "Edit"
-msgstr "Rediģēt"
+#: src/filter-edit-dialog.c:301
+msgid "_Edit"
+msgstr "_Rediģēt"
+
+#: src/filter-edit-dialog.c:306
+msgid "Ne_w"
+msgstr "_Jauns"
 
 #. The notification area
-#: src/filter-edit-dialog.c:335
+#: src/filter-edit-dialog.c:336
 msgid "Notification:"
 msgstr "Paziņošana:"
 
 #. Notification buttons
-#: src/filter-edit-dialog.c:345
+#: src/filter-edit-dialog.c:346
 msgid "Play sound:"
 msgstr "Atskaņot skaņu:"
 
-#: src/filter-edit-dialog.c:351
+#: src/filter-edit-dialog.c:352
 msgid "Use Sound..."
 msgstr "Lietot Skaņu..."
 
-#: src/filter-edit-dialog.c:364
+#: src/filter-edit-dialog.c:365
 msgid "Popup text:"
 msgstr "Izlecošais teksts:"
 
 #. The action area
-#: src/filter-edit-dialog.c:385
+#: src/filter-edit-dialog.c:386
 msgid "Action to perform:"
 msgstr "Veicamā darbība:"
 
-#: src/filter-edit-dialog.c:436
+#: src/filter-edit-dialog.c:437
 msgid "Match"
 msgstr "Atbilst"
 
-#: src/filter-edit-dialog.c:439
+#: src/filter-edit-dialog.c:440
 msgid "Action"
 msgstr "Darbība"
 
-#: src/filter-edit-dialog.c:451
+#: src/filter-edit-dialog.c:452
 msgid "Revert"
 msgstr "Atgriezt"
 
-#: src/filter-edit-dialog.c:480
+#: src/filter-edit-dialog.c:481
 msgid "A filter run dialog is open.Close it before you can modify filters."
 msgstr "Filtra palaišanas dialogs ir atvērts. Aizveriet to pirms modificējas firus."
 
-#: src/filter-edit-dialog.c:493
+#: src/filter-edit-dialog.c:494
 msgid "Balsa Filters"
 msgstr "Balsa Filteri"
 
@@ -2290,8 +2316,8 @@ msgstr "Turpmākā pastkastīte filtram \"%s\" ir \"%s\"\n"
 "Jūs nevarat asociēt to ar to pašu pastkastīti (tas izraisa rekursiju)."
 
 #: src/filter-run-dialog.c:187
-msgid "Balsa Filters of mailbox : "
-msgstr "Balsa pastkastītes Filtri : "
+msgid "Balsa Filters of Mailbox : "
+msgstr "Balsa Filtri Pastkastītei : "
 
 #: src/filter-run-dialog.c:228
 msgid "On reception"
@@ -2303,15 +2329,13 @@ msgstr "Pie iziešanas"
 
 #. up button
 #: src/filter-run-dialog.c:349
-#: src/toolbar-prefs.c:490
-msgid "Up"
-msgstr "Augšup"
+msgid "_Up"
+msgstr "_Augšup"
 
 #. down button
 #: src/filter-run-dialog.c:354
-#: src/toolbar-prefs.c:506
-msgid "Down"
-msgstr "Lejup"
+msgid "Do_wn"
+msgstr "_Lejup"
 
 #: src/filter-run-dialog.c:397
 msgid "The filters dialog is opened, close it before you can run filters on any mailbox"
@@ -2343,14 +2367,14 @@ msgstr "Aprakstošais _Nosaukums:"
 
 #. pop server
 #: src/folder-conf.c:214
-#: src/mailbox-conf.c:870
-#: src/mailbox-conf.c:958
+#: src/mailbox-conf.c:877
+#: src/mailbox-conf.c:965
 msgid "_Server:"
 msgstr "_Serveris:"
 
 #. username
 #: src/folder-conf.c:220
-#: src/mailbox-conf.c:877
+#: src/mailbox-conf.c:884
 msgid "Use_r name:"
 msgstr "Lietotāj_a vārds:"
 
@@ -2563,61 +2587,61 @@ msgstr "Pārsaukšana %s par %s neizdevās:\n"
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:824
-#: src/mailbox-conf.c:864
-#: src/mailbox-conf.c:952
+#: src/mailbox-conf.c:828
+#: src/mailbox-conf.c:871
+#: src/mailbox-conf.c:959
 msgid "Mailbox _Name:"
 msgstr "Pastkastītes _Nosaukums:"
 
 #. path to file
-#: src/mailbox-conf.c:831
+#: src/mailbox-conf.c:835
 msgid "Mailbox _Path:"
 msgstr "Pastkastītes _Ceļš:"
 
-#: src/mailbox-conf.c:833
+#: src/mailbox-conf.c:837
 msgid "Mailbox Path"
 msgstr "Pastkastītes Ceļš"
 
 #. password field
-#: src/mailbox-conf.c:883
-#: src/mailbox-conf.c:979
+#: src/mailbox-conf.c:890
+#: src/mailbox-conf.c:986
 msgid "Pass_word:"
 msgstr "Pa_role"
 
-#: src/mailbox-conf.c:890
+#: src/mailbox-conf.c:897
 msgid "Use _APOP Authentication"
 msgstr "Lietot _APOP Autentifikāciju"
 
-#: src/mailbox-conf.c:896
+#: src/mailbox-conf.c:903
 msgid "_Delete messages from server after download"
 msgstr "_Dzēst vēstules no servera pēc lejuplādes"
 
-#: src/mailbox-conf.c:901
+#: src/mailbox-conf.c:908
 msgid "_Filter messages through procmail"
 msgstr "_Filtrēt vēstules caur procmail"
 
-#: src/mailbox-conf.c:906
+#: src/mailbox-conf.c:913
 msgid "_Enable check for new mail"
 msgstr "_Aktivizēt jauna pasta pārbaudi"
 
-#: src/mailbox-conf.c:916
+#: src/mailbox-conf.c:923
 msgid "Use SS_L (pop3s)"
 msgstr "Lietot SS_L (pop3)"
 
 #. username
-#: src/mailbox-conf.c:965
+#: src/mailbox-conf.c:972
 msgid "_Username:"
 msgstr "_Lietotājvārds:"
 
-#: src/mailbox-conf.c:973
+#: src/mailbox-conf.c:980
 msgid "_Remember Password"
 msgstr "_Atcerēties Paroli"
 
-#: src/mailbox-conf.c:984
+#: src/mailbox-conf.c:991
 msgid "F_older Path:"
 msgstr "_Mapes Ceļš:"
 
-#: src/mailbox-conf.c:1007
+#: src/mailbox-conf.c:1014
 msgid "Use SS_L (imaps)"
 msgstr "Lietot SS_L (imaps)"
 
@@ -2630,90 +2654,85 @@ msgstr "Mapes rediģējums, kas jāraksta"
 msgid "Scanning %s. Please wait..."
 msgstr "Skanēju %s. Lūdzu uzgaidiet..."
 
-#: src/mailbox-node.c:736
+#: src/mailbox-node.c:734
 msgid "Local _mbox mailbox..."
 msgstr "Lokālā _mbox pastkastīte..."
 
-#: src/mailbox-node.c:738
+#: src/mailbox-node.c:736
 msgid "Local Mail_dir mailbox..."
 msgstr "Lokālā Mail_dir pastkastīte..."
 
-#: src/mailbox-node.c:740
+#: src/mailbox-node.c:738
 msgid "Local M_H mailbox..."
 msgstr "Lokālā M_H pastkastīte..."
 
-#: src/mailbox-node.c:742
+#: src/mailbox-node.c:740
 msgid "Remote _IMAP mailbox..."
 msgstr "Attālinātā _IMAP pastkastīte..."
 
-#: src/mailbox-node.c:745
+#: src/mailbox-node.c:743
 msgid "Remote IMAP _folder..."
 msgstr "Attālinātā IMAP _mape..."
 
-#: src/mailbox-node.c:747
+#: src/mailbox-node.c:745
 msgid "Remote IMAP _subfolder..."
 msgstr "Attālinātā IMAP _apakšmape..."
 
-#: src/mailbox-node.c:751
-#: src/main-window.c:282
-msgid "_New"
-msgstr "_Jauns"
-
 #. clicked on the empty space
-#: src/mailbox-node.c:758
-#: src/mailbox-node.c:790
-#: src/mailbox-node.c:811
+#: src/mailbox-node.c:756
+#: src/mailbox-node.c:788
+#: src/mailbox-node.c:809
 msgid "_Rescan"
 msgstr "_Pārskanēt"
 
-#: src/mailbox-node.c:767
+#: src/mailbox-node.c:765
 msgid "_Open"
 msgstr "_Atvērt"
 
-#: src/mailbox-node.c:770
+#: src/mailbox-node.c:768
 #: src/main-window.c:610
 msgid "_Close"
 msgstr "_Aizvērt"
 
-#: src/mailbox-node.c:776
+#: src/mailbox-node.c:774
 msgid "_Properties..."
 msgstr "_Rekvizīti..."
 
-#: src/mailbox-node.c:786
+#: src/mailbox-node.c:784
 msgid "_Subscribe"
 msgstr "_Pierakstīties"
 
-#: src/mailbox-node.c:788
+#: src/mailbox-node.c:786
 msgid "_Unsubscribe"
 msgstr "_Atrakstīties"
 
-#: src/mailbox-node.c:796
+#: src/mailbox-node.c:794
 msgid "Mark as _Inbox"
 msgstr "Marķēt kā _Iesūtni"
 
-#: src/mailbox-node.c:799
+#: src/mailbox-node.c:797
 msgid "_Mark as Sentbox"
 msgstr "_Marķēt kā Nosūtītās"
 
-#: src/mailbox-node.c:802
+#: src/mailbox-node.c:800
 msgid "Mark as _Trash"
 msgstr "Marķēt kā _Atkritumkasti"
 
-#: src/mailbox-node.c:805
+#: src/mailbox-node.c:803
 msgid "Mark as D_raftbox"
 msgstr "Marķēt kā Sa_gataves"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:808
+#: src/mailbox-node.c:806
 msgid "_Edit/Apply filters"
 msgstr "_Rediģēt/Pielietot filtrus"
 
-#: src/mailbox-node.c:897
+#: src/mailbox-node.c:895
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Lokālā pastkastīte %s ielādēta kā: %s\n"
 
-#: src/mailbox-node.c:929
+#: src/mailbox-node.c:927
 #, c-format
 msgid "Local folder %s\n"
 msgstr "Lokālā mape %s\n"
@@ -2834,8 +2853,8 @@ msgid "Manage filters"
 msgstr "Pārvaldīt filtrus"
 
 #: src/main-window.c:350
-msgid "_Export filters"
-msgstr "_Eksportēt filtrus"
+msgid "_Export Filters"
+msgstr "_Eksportēt Filtrus"
 
 #: src/main-window.c:350
 msgid "Export filters as Sieve scripts"
@@ -2936,6 +2955,10 @@ msgstr "Sakļaut visus pavedienus"
 #: src/main-window.c:424
 msgid "Toggle flagged"
 msgstr "Slēgt karogoto"
+
+#: src/main-window.c:431
+msgid "New"
+msgstr "Jauns"
 
 #: src/main-window.c:431
 msgid "Toggle New"
@@ -3117,8 +3140,8 @@ msgid "Delete messages from the Trash mailbox"
 msgstr "Dzēst vēstules no Atkritumu pastkastītes"
 
 #: src/main-window.c:619
-msgid "Edit/Apply Filters"
-msgstr "Rediģēt/Pielietot Filtrus"
+msgid "Edit/Apply _Filters"
+msgstr "Rediģēt/Pielietot _Filtrus"
 
 #: src/main-window.c:620
 msgid "Filter the content of the selected mailbox"
@@ -3154,17 +3177,17 @@ msgid "Balsa is sending a mail now.\n"
 msgstr "Balsa pašlaik sūta pastu.\n"
 "Pārtraukt sūtīšanu?"
 
-#: src/main-window.c:1370
+#: src/main-window.c:1371
 msgid "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
 msgstr "Nevarēju Atvērt Pastkastīti!\n"
 "Lūdzu pārbaudiet pastkastītes uzstādījumus."
 
-#: src/main-window.c:1643
+#: src/main-window.c:1644
 msgid "Copyright (C) 1997-2002"
 msgstr "Autortiesības (C) 1997-2002"
 
-#: src/main-window.c:1647
+#: src/main-window.c:1648
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://balsa.gnome.org/\n"
 "\n"
@@ -3174,92 +3197,69 @@ msgstr ""
 "\n"
 "Ja jums nepieciešams paziņot par kļūdu, lūdzu dariet to iekš: http://bugzilla.gnome.org/"
 
-#: src/main-window.c:1774
+#: src/main-window.c:1775
 msgid "Checking Mail..."
 msgstr "Pārbaudu Pastu..."
 
-#: src/main-window.c:2073
+#: src/main-window.c:2074
 msgid "Finished Checking."
 msgstr "Pārbaude Pabeigta."
 
-#: src/main-window.c:2143
+#: src/main-window.c:2144
 #, c-format
 msgid "Sending error: %s"
 msgstr "Sūtīšanas kļūda: %s"
 
-#: src/main-window.c:2238
+#: src/main-window.c:2239
 msgid "Balsa: New mail"
 msgstr "Balsa: Jauns pasts"
 
-#: src/main-window.c:2248
+#: src/main-window.c:2249
 #, c-format
 msgid "You have received %d new messages."
 msgstr "Jūs esat saņēmis %d jaunas vēstules."
 
-#: src/main-window.c:2249
+#: src/main-window.c:2250
 msgid "You have received 1 new message."
 msgstr "Jūs esat saņēmis 1 jaunu vēstuli."
 
-#: src/main-window.c:2640
+#: src/main-window.c:2641
 msgid "Search mailbox"
 msgstr "Meklēt pastkastīti"
 
-#: src/main-window.c:2658
+#: src/main-window.c:2659
 msgid "_Reverse search"
 msgstr "_Apgriezt meklēšanu"
 
-#: src/main-window.c:2661
+#: src/main-window.c:2662
 msgid "_Search for:"
 msgstr "_Meklēt:"
 
-#: src/main-window.c:2674
+#: src/main-window.c:2675
 msgid "In:"
 msgstr "Iekš:"
 
-#: src/main-window.c:2685
-msgid "_Body"
-msgstr "_Rumpis"
-
-#. To:
-#: src/main-window.c:2686
-#: src/sendmsg-window.c:1831
-msgid "_To:"
-msgstr "_Kam:"
-
-#: src/main-window.c:2687
-msgid "_From:"
-msgstr "_No:"
-
-#: src/main-window.c:2688
-#: src/sendmsg-window.c:297
-msgid "_Subject"
-msgstr "_Temats"
-
-#: src/main-window.c:2689
-msgid "_Cc:"
-msgstr "_Cc:"
-
-#: src/main-window.c:2811
+#: src/main-window.c:2812
 msgid "You can apply filters only on mailbox\n"
 msgstr "Jūs varat pielietot filtrus tikai pastkastītēm\n"
 
-#: src/main-window.c:2846
-#: src/main-window.c:2865
+#: src/main-window.c:2847
+#: src/main-window.c:2866
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Izdarīšana pastkastītē %s neizdevās."
 
-#: src/main-window.c:3058
+#: src/main-window.c:3059
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (tikai lasīt)"
 
-#: src/main-window.c:3060
+#: src/main-window.c:3061
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3151
+#: src/main-window.c:3152
 msgid "Cannot access the message's body\n"
 msgstr "Nevaru piekļūt vēstules rumpim\n"
 
@@ -4340,6 +4340,10 @@ msgstr ""
 msgid "Attach as Reference?"
 msgstr "Piesaistīt kā Atsauci?"
 
+#: src/sendmsg-window.c:1261
+msgid "Remove"
+msgstr "Izņemt"
+
 #: src/sendmsg-window.c:1272
 msgid "attach as reference"
 msgstr "piesaistīt kā atsauci"
@@ -4832,4 +4836,12 @@ msgstr "Pieejamās pogas"
 #: src/toolbar-prefs.c:473
 msgid "Current toolbar"
 msgstr "Pašreizējā rīkjosla"
+
+#: src/toolbar-prefs.c:490
+msgid "Up"
+msgstr "Augšup"
+
+#: src/toolbar-prefs.c:506
+msgid "Down"
+msgstr "Lejup"
 

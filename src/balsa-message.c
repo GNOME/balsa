@@ -307,11 +307,15 @@ bm_header_widget_realized(GtkWidget * widget, BalsaMessage * bm)
 /* Callback for the "style-set" signal; reset colors when theme is
  * changed. */
 static void
-bm_header_widget_set_style(BalsaMessage * bm,
+bm_header_widget_set_style(GtkWidget * widget,
 			   GtkStyle * previous_style,
-			   GtkWidget * widget)
+			   BalsaMessage * bm)
 {
+    g_signal_handlers_block_by_func(widget, bm_header_widget_set_style,
+				    bm);
     bm_header_widget_realized(widget, bm);
+    g_signal_handlers_unblock_by_func(widget, bm_header_widget_set_style,
+				      bm);
 }
 
 static void bm_modify_font_from_string(GtkWidget * widget,
@@ -330,8 +334,8 @@ bm_header_widget_new(BalsaMessage * bm)
 					GTK_SHADOW_IN);
     g_signal_connect_after(widget, "realize",
 			   G_CALLBACK(bm_header_widget_realized), bm);
-    g_signal_connect_after(bm, "style-set",
-			   G_CALLBACK(bm_header_widget_set_style), widget);
+    g_signal_connect_after(widget, "style-set",
+			   G_CALLBACK(bm_header_widget_set_style), bm);
 
     text_view = gtk_text_view_new();
     bm_modify_font_from_string(text_view, balsa_app.message_font);

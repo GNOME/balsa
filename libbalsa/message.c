@@ -663,10 +663,10 @@ libbalsa_message_set_attach_icons(LibBalsaMessage * message)
 static void
 libbalsa_message_set_flag(LibBalsaMessage * message, LibBalsaMessageFlag set, LibBalsaMessageFlag clear)
 {
-    libbalsa_mailbox_change_message_flags(message->mailbox, message->msgno,
-					  set, clear);
     message->flags |= set;
     message->flags &= ~clear;
+    libbalsa_mailbox_change_message_flags(message->mailbox, message->msgno,
+					  set, clear);
     libbalsa_message_set_status_icons(message);
 }
 

@@ -492,9 +492,10 @@ if test "x$with_ssl" != xno  ; then
    fi
 fi
 
-if test "x$with_ssl" != xno && test -z "$ssldir"; then
-   AC_MSG_ERROR([SSL requested but no SSL headers found.])
-else
+if test "x$with_ssl" != xno; then
+   if test -z "$ssldir"; then
+      AC_MSG_ERROR([SSL requested but no SSL headers found.])
+   else
         AC_MSG_RESULT(yes)
         LIBS="$LIBS -lssl -lcrypto"
 	if test "x$ssldir" != xdefault ; then
@@ -502,6 +503,9 @@ else
 	fi
 	ac_cv_path_openssl=$ssldir
 	AC_DEFINE(USE_SSL)
+   fi
+else
+   AC_MSG_RESULT(no)
 fi
 
 dnl ##########################################################################

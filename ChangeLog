@@ -1,3 +1,7 @@
+2001-12-19  Carlos Morgado  <chbm@chbm.nu>
+
+	* configure.in: fix openssl check
+
 2001-12-16  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* NEWS, configure.in, balsa.spec.in: development release 1.3.0.

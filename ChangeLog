@@ -4,6 +4,8 @@
 
 2004-04-14 05:50  PeterB
 
+	* src/sendmsg-window.c: clear old auto-bcc when changing
+	identities, if that's the only bcc entry.
 	* src/sendmsg-window.c: be more careful when changing identities.
 
 2004-04-13 21:34  PeterB

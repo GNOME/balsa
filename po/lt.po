@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-core 0.6.0\n"
-"POT-Creation-Date: 2000-04-30 00:30+0200\n"
-"PO-Revision-Date: 2000-04-19 20:21+0100\n"
+"Project-Id-Version: balsa 0.8.0\n"
+"POT-Creation-Date: 2000-05-03 14:18+0200\n"
+"PO-Revision-Date: 2000-05-02 11:14+0100\n"
 "Last-Translator: Gediminas Paulauskas <menesis@delfi.lt>\n"
 "Language-Team: Lithuanian\n"
 "MIME-Version: 1.0\n"
@@ -42,14 +42,15 @@ msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "Paðto dëþutë ¥%s´ neatrodo, kad bûtø sveika."
 
 #: libinit_balsa/balsa-druid-page-directory.gob:146
+#, fuzzy
 msgid ""
-"Please confirm the locations of your default mail files.\n"
+"Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
 "Praðau, patvirtink vietas, kur bus tavo áprastinës paðto bylos.\n"
 "Jos bus sukurtos, jei reikës."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:157
+#: libinit_balsa/balsa-druid-page-directory.gob:163
 msgid "Inbox:"
 msgstr "Gauti:"
 
@@ -57,27 +58,27 @@ msgstr "Gauti:"
 #. * as in the prepare code. But at this point balsa_app.local_mail_directory
 #. * is NULL, so we use a dummy value.
 #.
-#: libinit_balsa/balsa-druid-page-directory.gob:166
+#: libinit_balsa/balsa-druid-page-directory.gob:172
 msgid "Outbox:"
 msgstr "Siunèiami:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:169
+#: libinit_balsa/balsa-druid-page-directory.gob:175
 msgid "Sentbox:"
 msgstr "Iðsiøsti:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:172
+#: libinit_balsa/balsa-druid-page-directory.gob:178
 msgid "Draftbox:"
 msgstr "Juodraðèiai:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:175
+#: libinit_balsa/balsa-druid-page-directory.gob:181
 msgid "Trash:"
 msgstr "Ðiukðlës:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:186
+#: libinit_balsa/balsa-druid-page-directory.gob:192
 msgid "Mail Files"
 msgstr "Laiðkø bylos"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:259
+#: libinit_balsa/balsa-druid-page-directory.gob:265
 msgid "Problem Creating Mailboxes"
 msgstr "Problema kuriant paðto dëþutes"
 
@@ -188,7 +189,7 @@ msgstr ""
 "Negaliu atidaryti ~/.gnome/GnomeCard.gcrd skaitymui.\n"
 " - %s\n"
 
-#: src/address-book.c:276 src/sendmsg-window.c:384
+#: src/address-book.c:276 src/sendmsg-window.c:389
 msgid "OK"
 msgstr "Gerai"
 
@@ -227,43 +228,38 @@ msgstr "Vël importuoti"
 #: src/balsa-app.c:217
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
-msgstr ""
+msgstr "Balsa negali atidaryti tavo ¥%s´ dëþutës."
 
 #: src/balsa-app.c:230
-#, fuzzy
 msgid "Inbox"
-msgstr "Gauti:"
+msgstr "Gauti"
 
 #: src/balsa-app.c:235
-#, fuzzy
 msgid "Outbox"
-msgstr "Siunèiami:"
+msgstr "Siunèiami"
 
 #: src/balsa-app.c:240
-#, fuzzy
 msgid "Sentbox"
-msgstr "Iðsiøsti:"
+msgstr "Iðsiøsti"
 
 #: src/balsa-app.c:245
-#, fuzzy
 msgid "Draftbox"
-msgstr "Juodraðèiai:"
+msgstr "Juodraðèiai"
 
 #: src/balsa-app.c:250
-#, fuzzy
 msgid "Trash"
-msgstr "Ðiukðlës:"
+msgstr "Ðiukðlës"
 
-#: src/balsa-index-page.c:287
+#: src/balsa-index-page.c:289
 msgid "Mailbox password:"
 msgstr "Paðto dëþutës slaptaþodis:"
 
 #. password field
-#: src/balsa-index-page.c:295 src/mailbox-conf.c:989 src/mailbox-conf.c:1088
+#: src/balsa-index-page.c:297 src/mailbox-conf.c:989 src/mailbox-conf.c:1088
 msgid "Password:"
 msgstr "Slaptaþodis:"
 
-#: src/balsa-index-page.c:321
+#: src/balsa-index-page.c:323
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -271,32 +267,32 @@ msgstr ""
 "Negaliu atidaryti paðto dëþutës!\n"
 "Praðau, patikrink dëþutës savybes."
 
-#: src/balsa-index-page.c:584 src/filter-edit-dialog.c:224
+#: src/balsa-index-page.c:586 src/filter-edit-dialog.c:224
 msgid "New"
 msgstr "Naujas"
 
-#: src/balsa-index-page.c:592 src/main-window.c:373
+#: src/balsa-index-page.c:594 src/main-window.c:373
 msgid "Reply"
 msgstr "Atsakyti"
 
-#: src/balsa-index-page.c:600 src/main-window.c:376
+#: src/balsa-index-page.c:602 src/main-window.c:376
 msgid "Reply to all"
 msgstr "Atsakyti visiems"
 
-#: src/balsa-index-page.c:608 src/main-window.c:379
+#: src/balsa-index-page.c:610 src/main-window.c:379
 msgid "Forward"
 msgstr "Persiøsti"
 
-#: src/balsa-index-page.c:616 src/filter-edit-dialog.c:230
+#: src/balsa-index-page.c:618 src/filter-edit-dialog.c:230
 #: src/main-window.c:366 src/pref-manager.c:885
 msgid "Delete"
 msgstr "Iðtrinti"
 
-#: src/balsa-index-page.c:624
+#: src/balsa-index-page.c:626
 msgid "Undelete"
 msgstr "Atitrinti"
 
-#: src/balsa-index-page.c:632
+#: src/balsa-index-page.c:634
 msgid "Transfer"
 msgstr "Perkelti"
 
@@ -326,8 +322,8 @@ msgid "Save"
 msgstr "Iðsaugoti"
 
 #: src/balsa-message.c:166 src/balsa-message.c:225 src/mailbox-conf.c:666
-#: src/sendmsg-window.c:125 src/sendmsg-window.c:410 src/sendmsg-window.c:1076
-#: src/sendmsg-window.c:1382 src/sendmsg-window.c:1405
+#: src/sendmsg-window.c:127 src/sendmsg-window.c:415 src/sendmsg-window.c:1081
+#: src/sendmsg-window.c:1387 src/sendmsg-window.c:1410
 msgid "Cancel"
 msgstr "Atðaukti"
 
@@ -354,13 +350,13 @@ msgstr "Data:"
 
 #. From:
 #: src/balsa-message.c:646 src/filter-edit-dialog.c:339
-#: src/sendmsg-window.c:581
+#: src/sendmsg-window.c:586
 msgid "From:"
 msgstr "Nuo:"
 
 #. To:
 #: src/balsa-message.c:650 src/filter-edit-dialog.c:327
-#: src/sendmsg-window.c:583
+#: src/sendmsg-window.c:588
 msgid "To:"
 msgstr "Kam:"
 
@@ -377,7 +373,7 @@ msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:656 src/sendmsg-window.c:589
+#: src/balsa-message.c:656 src/sendmsg-window.c:594
 msgid "Subject:"
 msgstr "Tema:"
 
@@ -439,7 +435,7 @@ msgstr "Ieðkoma eilutë:"
 msgid "Add"
 msgstr "Pridëti"
 
-#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:331
+#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:336
 msgid "Remove"
 msgstr "Paðalinti"
 
@@ -884,8 +880,8 @@ msgstr "Atidaryti tolesná laiðkà"
 msgid "Open Next Unread Message"
 msgstr "Atidaryti kità neskaitytà laiðkà"
 
-#: src/main-window.c:402 src/print.c:82 src/sendmsg-window.c:122
-#: src/sendmsg-window.c:150
+#: src/main-window.c:402 src/print.c:82 src/sendmsg-window.c:124
+#: src/sendmsg-window.c:152
 msgid "Print"
 msgstr "Spausdinti"
 
@@ -1091,9 +1087,8 @@ msgid "enable signature separator"
 msgstr "leisti paraðo skyriklá"
 
 #: src/pref-manager.c:831
-#, fuzzy
 msgid "Remote Mailbox Servers"
-msgstr "Nutolæ paðto serveriai"
+msgstr "Nutolusiø paðto dëþuèiø serveriai"
 
 #: src/pref-manager.c:856
 msgid "Type"
@@ -1270,7 +1265,7 @@ msgstr "Tikrinti paðtà pradþioje"
 
 #: src/pref-manager.c:1496
 msgid "Remember open mailboxes between sessions"
-msgstr ""
+msgstr "Prisiminti atidarytas dëþutës tarp sesijø"
 
 #: src/print.c:95
 #, c-format
@@ -1285,155 +1280,160 @@ msgstr ""
 msgid "Print Command:"
 msgstr "Spausdinimo komanda:"
 
-#: src/sendmsg-window.c:106
+#: src/sendmsg-window.c:108
 msgid "Send"
 msgstr "Siøsti"
 
-#: src/sendmsg-window.c:106
+#: src/sendmsg-window.c:108
 msgid "Send this mail"
 msgstr "Siøsti ðá laiðkà"
 
-#: src/sendmsg-window.c:110
+#: src/sendmsg-window.c:112
 msgid "Attach"
 msgstr "Prikabinti"
 
-#: src/sendmsg-window.c:110
+#: src/sendmsg-window.c:112
 msgid "Add attachments to this message"
 msgstr "Prikabinti bylas prie ðio laiðko"
 
-#: src/sendmsg-window.c:114
+#: src/sendmsg-window.c:116
 msgid "Postpone"
 msgstr "Atidëti"
 
-#: src/sendmsg-window.c:114
+#: src/sendmsg-window.c:116
 msgid "Continue this message later"
 msgstr "Tæsti ðá laiðkà vëliau"
 
-#: src/sendmsg-window.c:118
+#: src/sendmsg-window.c:120
 msgid "Spelling"
 msgstr "Raðyba"
 
-#: src/sendmsg-window.c:118
+#: src/sendmsg-window.c:120
 msgid "Check Spelling"
 msgstr "Tikrinti raðybà"
 
-#: src/sendmsg-window.c:133
+#: src/sendmsg-window.c:135
 msgid "_Include File..."
 msgstr "_Áterpti bylà..."
 
-#: src/sendmsg-window.c:137
+#: src/sendmsg-window.c:139
 msgid "_Attach file..."
 msgstr "_Prikabinti bylà..."
 
-#: src/sendmsg-window.c:142
+#: src/sendmsg-window.c:144
 msgid "_Send"
 msgstr "_Siøsti"
 
-#: src/sendmsg-window.c:142
+#: src/sendmsg-window.c:144
 msgid "Send the currently edited message"
 msgstr "Siøsti dabar redaguojamà laiðkà"
 
-#: src/sendmsg-window.c:146
+#: src/sendmsg-window.c:148
 msgid "_Postpone"
 msgstr "_Atidëti"
 
-#: src/sendmsg-window.c:150
+#: src/sendmsg-window.c:152
 msgid "Print the edited message"
 msgstr "Spausdinti esamà laiðkà"
 
-#: src/sendmsg-window.c:168
+#: src/sendmsg-window.c:170
 msgid "_Wrap body"
 msgstr "_Lauþyti kûnà"
 
-#: src/sendmsg-window.c:168
+#: src/sendmsg-window.c:170
 msgid "Wrap message lines"
 msgstr "Lauþyti laiðko eilutes"
 
-#: src/sendmsg-window.c:172
+#: src/sendmsg-window.c:174
 msgid "_Reflow paragraph"
 msgstr "_Sulieti paragrafà"
 
-#: src/sendmsg-window.c:175
+#: src/sendmsg-window.c:177
 msgid "R_eflow message"
 msgstr "Sulieti _laiðkà"
 
-#: src/sendmsg-window.c:184
+#: src/sendmsg-window.c:186
 msgid "Fr_om"
 msgstr "_Nuo"
 
-#: src/sendmsg-window.c:186
+#: src/sendmsg-window.c:188
 msgid "_To"
 msgstr "_Kam"
 
-#: src/sendmsg-window.c:188
+#: src/sendmsg-window.c:190
 msgid "_Subject"
 msgstr "_Tema"
 
-#: src/sendmsg-window.c:190
+#: src/sendmsg-window.c:192
 msgid "_Cc"
 msgstr "_Cc"
 
-#: src/sendmsg-window.c:192
+#: src/sendmsg-window.c:194
 msgid "_Bcc"
 msgstr "_Bcc"
 
-#: src/sendmsg-window.c:194
+#: src/sendmsg-window.c:196
 msgid "_Fcc"
 msgstr "_Fcc"
 
-#: src/sendmsg-window.c:196
+#: src/sendmsg-window.c:198
 msgid "_Reply To"
 msgstr "_Atsakyti á"
 
-#: src/sendmsg-window.c:198
+#: src/sendmsg-window.c:200
 msgid "_Attachments"
 msgstr "_Prikabinimai"
 
-#: src/sendmsg-window.c:200
+#: src/sendmsg-window.c:202
 msgid "_Comments"
 msgstr "_Komentarai"
 
-#: src/sendmsg-window.c:202
+#: src/sendmsg-window.c:204
 msgid "_Keywords"
 msgstr "_Raktaþodþiai"
 
-#: src/sendmsg-window.c:213
+#: src/sendmsg-window.c:215
 msgid "_Western (ISO-8859-1)"
 msgstr "_Western (ISO-8859-1)"
 
-#: src/sendmsg-window.c:215
+#: src/sendmsg-window.c:217
 msgid "W_estern (ISO-8859-15)"
 msgstr "W_estern (ISO-8859-15)"
 
-#: src/sendmsg-window.c:217
+#: src/sendmsg-window.c:219
 msgid "_Central European (ISO-8859-2)"
 msgstr "_Central European (ISO-8859-2)"
 
-#: src/sendmsg-window.c:219
+#: src/sendmsg-window.c:221
 msgid "_South European (ISO-8859-3)"
 msgstr "_South European (ISO-8859-3)"
 
-#: src/sendmsg-window.c:221
+#: src/sendmsg-window.c:223
+#, fuzzy
+msgid "_Baltic (ISO-8859-13)"
+msgstr "Cy_rillic (ISO-8859-5)"
+
+#: src/sendmsg-window.c:225
 msgid "Cy_rillic (ISO-8859-5)"
 msgstr "Cy_rillic (ISO-8859-5)"
 
-#: src/sendmsg-window.c:223
+#: src/sendmsg-window.c:227
 msgid "_Hebrew (ISO-8859-8)"
 msgstr "_Hebrew (ISO-8859-8)"
 
-#: src/sendmsg-window.c:225
+#: src/sendmsg-window.c:229
 msgid "_Turkish (ISO-8859-9)"
 msgstr "_Turkish (ISO-8859-9)"
 
-#: src/sendmsg-window.c:262
+#: src/sendmsg-window.c:267
 msgid "_Show"
 msgstr "_Rodyti"
 
-#: src/sendmsg-window.c:263
+#: src/sendmsg-window.c:268
 msgid "_ISO Charset"
 msgstr "_ISO koduotë"
 
-#: src/sendmsg-window.c:382
+#: src/sendmsg-window.c:387
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -1441,106 +1441,104 @@ msgstr ""
 "Prikabinimo paveikslëlio (balsa/attachment.png) neina rasti.\n"
 "Tai reiðkia, kad tu negali prikabinti jokiø bylø.\n"
 
-#: src/sendmsg-window.c:400
+#: src/sendmsg-window.c:405
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Negaliu gauti info apie bylà ¥%s´: %s\n"
 
-#: src/sendmsg-window.c:404
+#: src/sendmsg-window.c:409
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Prikabinimas nëra paprasta byla: ¥%s´\n"
 
-#: src/sendmsg-window.c:464
+#: src/sendmsg-window.c:469
 msgid "Attach file"
 msgstr "Prikabinti bylà"
 
 #. cc:
-#: src/sendmsg-window.c:592
+#: src/sendmsg-window.c:597
 msgid "cc:"
 msgstr "cc:"
 
 #. bcc:
-#: src/sendmsg-window.c:595
+#: src/sendmsg-window.c:600
 msgid "bcc:"
 msgstr "bcc:"
 
 #. fcc:
-#: src/sendmsg-window.c:598
+#: src/sendmsg-window.c:603
 msgid "fcc:"
 msgstr "fcc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:626
+#: src/sendmsg-window.c:631
 msgid "Reply To:"
 msgstr "Atsakyti á:"
 
 #. Attachment list
-#: src/sendmsg-window.c:630
+#: src/sendmsg-window.c:635
 msgid "Attachments:"
 msgstr "Prikabinimai:"
 
 #. Comments:
-#: src/sendmsg-window.c:672
+#: src/sendmsg-window.c:677
 msgid "Comments:"
 msgstr "Komentarai:"
 
 #. Keywords:
-#: src/sendmsg-window.c:675
+#: src/sendmsg-window.c:680
 msgid "Keywords:"
 msgstr "Raktaþodþiai:"
 
-#: src/sendmsg-window.c:752
+#: src/sendmsg-window.c:757
 msgid "you"
 msgstr "tu"
 
-#: src/sendmsg-window.c:761
+#: src/sendmsg-window.c:766
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "%s %s raðë:\n"
 
-#: src/sendmsg-window.c:763
+#: src/sendmsg-window.c:768
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s raðë:\n"
 
-#: src/sendmsg-window.c:833
+#: src/sendmsg-window.c:838
 msgid "Reply to "
 msgstr "Atsakyti á "
 
-#: src/sendmsg-window.c:838
+#: src/sendmsg-window.c:843
 msgid "Forward message"
 msgstr "Persiøsti laiðkà"
 
-#: src/sendmsg-window.c:843
+#: src/sendmsg-window.c:848
 msgid "Continue message"
 msgstr "Tæsti laiðkà"
 
-#: src/sendmsg-window.c:848
+#: src/sendmsg-window.c:853
 msgid "New message"
 msgstr "Naujas laiðkas"
 
-#: src/sendmsg-window.c:1075
+#: src/sendmsg-window.c:1080
 msgid "Could not open the file.\n"
 msgstr "Negaliu atidaryti bylos.\n"
 
-#: src/sendmsg-window.c:1081
+#: src/sendmsg-window.c:1086
 msgid "Loading..."
 msgstr "Ákeliu..."
 
-#: src/sendmsg-window.c:1106
+#: src/sendmsg-window.c:1111
 msgid "Include file"
 msgstr "Áterpti bylà"
 
-#: src/sendmsg-window.c:1380
+#: src/sendmsg-window.c:1385
 msgid "Cannot execute print command."
 msgstr "Negaliu ávykdyti spausdinimo komandos."
 
-#: src/sendmsg-window.c:1404
+#: src/sendmsg-window.c:1409
 msgid "Error executing lpr"
 msgstr "Klaida vykdant lpr"
 
-#: src/spell-check.c:136
-#, fuzzy
-msgid "Spell Check"
-msgstr "Tikrinti"
+#~ msgid "Spell Check"
+#~ msgstr "Tikrinti raðybà"

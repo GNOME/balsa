@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
-"POT-Creation-Date: 2000-04-30 00:30+0200\n"
+"POT-Creation-Date: 2000-05-03 14:19+0200\n"
 "PO-Revision-Date: 2000-04-26 13:30+02:00\n"
 "Last-Translator: Keld Simonsen <keld@dkuug.dk>\n"
 "Language-Team: Danish <dansk@klid.dk>\n"
@@ -44,14 +44,15 @@ msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "Postkassen \"%s\" ser ikke ud til at være gyldig."
 
 #: libinit_balsa/balsa-druid-page-directory.gob:146
+#, fuzzy
 msgid ""
-"Please confirm the locations of your default mail files.\n"
+"Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
 "Bekræft venligst placeringen af dine standard postfiler.\n"
 "Disse vil blive oprettet om nødvendigt."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:157
+#: libinit_balsa/balsa-druid-page-directory.gob:163
 msgid "Inbox:"
 msgstr "Indbakke:"
 
@@ -59,27 +60,27 @@ msgstr "Indbakke:"
 #. * as in the prepare code. But at this point balsa_app.local_mail_directory
 #. * is NULL, so we use a dummy value.
 #.
-#: libinit_balsa/balsa-druid-page-directory.gob:166
+#: libinit_balsa/balsa-druid-page-directory.gob:172
 msgid "Outbox:"
 msgstr "Udbakke:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:169
+#: libinit_balsa/balsa-druid-page-directory.gob:175
 msgid "Sentbox:"
 msgstr "Sendt_post:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:172
+#: libinit_balsa/balsa-druid-page-directory.gob:178
 msgid "Draftbox:"
 msgstr "Kladder:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:175
+#: libinit_balsa/balsa-druid-page-directory.gob:181
 msgid "Trash:"
 msgstr "Affald:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:186
+#: libinit_balsa/balsa-druid-page-directory.gob:192
 msgid "Mail Files"
 msgstr "Postfiler"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:259
+#: libinit_balsa/balsa-druid-page-directory.gob:265
 msgid "Problem Creating Mailboxes"
 msgstr "Problem ved oprettelse af postkasser"
 
@@ -190,7 +191,7 @@ msgstr ""
 "Kunne ikke åbne og læse ~/.gnome/GnomeCard.gcrd.\n"
 " - %s\n"
 
-#: src/address-book.c:276 src/sendmsg-window.c:384
+#: src/address-book.c:276 src/sendmsg-window.c:389
 msgid "OK"
 msgstr "Ok"
 
@@ -251,16 +252,16 @@ msgstr "Kladder"
 msgid "Trash"
 msgstr "Affald"
 
-#: src/balsa-index-page.c:287
+#: src/balsa-index-page.c:289
 msgid "Mailbox password:"
 msgstr "Adgangskode til postkasse:"
 
 #. password field
-#: src/balsa-index-page.c:295 src/mailbox-conf.c:989 src/mailbox-conf.c:1088
+#: src/balsa-index-page.c:297 src/mailbox-conf.c:989 src/mailbox-conf.c:1088
 msgid "Password:"
 msgstr "Adgangskode:"
 
-#: src/balsa-index-page.c:321
+#: src/balsa-index-page.c:323
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -268,32 +269,32 @@ msgstr ""
 "Kan ikke åbne postkassen!\n"
 "Venligst tjek indstillingerne for postkassen."
 
-#: src/balsa-index-page.c:584 src/filter-edit-dialog.c:224
+#: src/balsa-index-page.c:586 src/filter-edit-dialog.c:224
 msgid "New"
 msgstr "Ny"
 
-#: src/balsa-index-page.c:592 src/main-window.c:373
+#: src/balsa-index-page.c:594 src/main-window.c:373
 msgid "Reply"
 msgstr "Svar"
 
-#: src/balsa-index-page.c:600 src/main-window.c:376
+#: src/balsa-index-page.c:602 src/main-window.c:376
 msgid "Reply to all"
 msgstr "Svar alle"
 
-#: src/balsa-index-page.c:608 src/main-window.c:379
+#: src/balsa-index-page.c:610 src/main-window.c:379
 msgid "Forward"
 msgstr "Videresend"
 
-#: src/balsa-index-page.c:616 src/filter-edit-dialog.c:230
+#: src/balsa-index-page.c:618 src/filter-edit-dialog.c:230
 #: src/main-window.c:366 src/pref-manager.c:885
 msgid "Delete"
 msgstr "Slet"
 
-#: src/balsa-index-page.c:624
+#: src/balsa-index-page.c:626
 msgid "Undelete"
 msgstr "Fortryd slet"
 
-#: src/balsa-index-page.c:632
+#: src/balsa-index-page.c:634
 msgid "Transfer"
 msgstr "Overfør"
 
@@ -323,8 +324,8 @@ msgid "Save"
 msgstr "Gem"
 
 #: src/balsa-message.c:166 src/balsa-message.c:225 src/mailbox-conf.c:666
-#: src/sendmsg-window.c:125 src/sendmsg-window.c:410 src/sendmsg-window.c:1076
-#: src/sendmsg-window.c:1382 src/sendmsg-window.c:1405
+#: src/sendmsg-window.c:127 src/sendmsg-window.c:415 src/sendmsg-window.c:1081
+#: src/sendmsg-window.c:1387 src/sendmsg-window.c:1410
 msgid "Cancel"
 msgstr "Annullér"
 
@@ -351,13 +352,13 @@ msgstr "Dato:"
 
 #. From:
 #: src/balsa-message.c:646 src/filter-edit-dialog.c:339
-#: src/sendmsg-window.c:581
+#: src/sendmsg-window.c:586
 msgid "From:"
 msgstr "Fra:"
 
 #. To:
 #: src/balsa-message.c:650 src/filter-edit-dialog.c:327
-#: src/sendmsg-window.c:583
+#: src/sendmsg-window.c:588
 msgid "To:"
 msgstr "Til:"
 
@@ -374,7 +375,7 @@ msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:656 src/sendmsg-window.c:589
+#: src/balsa-message.c:656 src/sendmsg-window.c:594
 msgid "Subject:"
 msgstr "Emne:"
 
@@ -435,7 +436,7 @@ msgstr "Find tekst:"
 msgid "Add"
 msgstr "Tilføj"
 
-#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:331
+#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:336
 msgid "Remove"
 msgstr "Fjern"
 
@@ -880,8 +881,8 @@ msgstr "Åbn det næste brev"
 msgid "Open Next Unread Message"
 msgstr "Åbn det næste ulæste brev"
 
-#: src/main-window.c:402 src/print.c:82 src/sendmsg-window.c:122
-#: src/sendmsg-window.c:150
+#: src/main-window.c:402 src/print.c:82 src/sendmsg-window.c:124
+#: src/sendmsg-window.c:152
 msgid "Print"
 msgstr "Udskriv"
 
@@ -1280,155 +1281,160 @@ msgstr ""
 msgid "Print Command:"
 msgstr "Printerkommando:"
 
-#: src/sendmsg-window.c:106
+#: src/sendmsg-window.c:108
 msgid "Send"
 msgstr "Send"
 
-#: src/sendmsg-window.c:106
+#: src/sendmsg-window.c:108
 msgid "Send this mail"
 msgstr "Send dette brev"
 
-#: src/sendmsg-window.c:110
+#: src/sendmsg-window.c:112
 msgid "Attach"
 msgstr "Vedhæft"
 
-#: src/sendmsg-window.c:110
+#: src/sendmsg-window.c:112
 msgid "Add attachments to this message"
 msgstr "Vedhæft bilag til dette brev"
 
-#: src/sendmsg-window.c:114
+#: src/sendmsg-window.c:116
 msgid "Postpone"
 msgstr "Udsæt"
 
-#: src/sendmsg-window.c:114
+#: src/sendmsg-window.c:116
 msgid "Continue this message later"
 msgstr "Fortsæt dette brev senere"
 
-#: src/sendmsg-window.c:118
+#: src/sendmsg-window.c:120
 msgid "Spelling"
 msgstr "Stavning"
 
-#: src/sendmsg-window.c:118
+#: src/sendmsg-window.c:120
 msgid "Check Spelling"
 msgstr "Stavekontrol"
 
-#: src/sendmsg-window.c:133
+#: src/sendmsg-window.c:135
 msgid "_Include File..."
 msgstr "_Inkludér fil..."
 
-#: src/sendmsg-window.c:137
+#: src/sendmsg-window.c:139
 msgid "_Attach file..."
 msgstr "_Vedhæft bilag..."
 
-#: src/sendmsg-window.c:142
+#: src/sendmsg-window.c:144
 msgid "_Send"
 msgstr "_Send"
 
-#: src/sendmsg-window.c:142
+#: src/sendmsg-window.c:144
 msgid "Send the currently edited message"
 msgstr "Send det nuværende redigerede brev"
 
-#: src/sendmsg-window.c:146
+#: src/sendmsg-window.c:148
 msgid "_Postpone"
 msgstr "_Udsæt"
 
-#: src/sendmsg-window.c:150
+#: src/sendmsg-window.c:152
 msgid "Print the edited message"
 msgstr "Udskriv det redigerede brev"
 
-#: src/sendmsg-window.c:168
+#: src/sendmsg-window.c:170
 msgid "_Wrap body"
 msgstr "_Ombryd tekst"
 
-#: src/sendmsg-window.c:168
+#: src/sendmsg-window.c:170
 msgid "Wrap message lines"
 msgstr "Ombryd linier i brevet"
 
-#: src/sendmsg-window.c:172
+#: src/sendmsg-window.c:174
 msgid "_Reflow paragraph"
 msgstr "_Genombryd afsnit"
 
-#: src/sendmsg-window.c:175
+#: src/sendmsg-window.c:177
 msgid "R_eflow message"
 msgstr "G_enomflyd brev"
 
-#: src/sendmsg-window.c:184
+#: src/sendmsg-window.c:186
 msgid "Fr_om"
 msgstr "F_ra"
 
-#: src/sendmsg-window.c:186
+#: src/sendmsg-window.c:188
 msgid "_To"
 msgstr "_Til"
 
-#: src/sendmsg-window.c:188
+#: src/sendmsg-window.c:190
 msgid "_Subject"
 msgstr "_Emne"
 
-#: src/sendmsg-window.c:190
+#: src/sendmsg-window.c:192
 msgid "_Cc"
 msgstr "_Cc"
 
-#: src/sendmsg-window.c:192
+#: src/sendmsg-window.c:194
 msgid "_Bcc"
 msgstr "_Bcc"
 
-#: src/sendmsg-window.c:194
+#: src/sendmsg-window.c:196
 msgid "_Fcc"
 msgstr "_Fcc"
 
-#: src/sendmsg-window.c:196
+#: src/sendmsg-window.c:198
 msgid "_Reply To"
 msgstr "_Svar til"
 
-#: src/sendmsg-window.c:198
+#: src/sendmsg-window.c:200
 msgid "_Attachments"
 msgstr "B_ilag"
 
-#: src/sendmsg-window.c:200
+#: src/sendmsg-window.c:202
 msgid "_Comments"
 msgstr "_Kommentarer"
 
-#: src/sendmsg-window.c:202
+#: src/sendmsg-window.c:204
 msgid "_Keywords"
 msgstr "_Nøgleord"
 
-#: src/sendmsg-window.c:213
+#: src/sendmsg-window.c:215
 msgid "_Western (ISO-8859-1)"
 msgstr "_Vesteuropa (ISO-8859-1)"
 
-#: src/sendmsg-window.c:215
+#: src/sendmsg-window.c:217
 msgid "W_estern (ISO-8859-15)"
 msgstr "V_esteuropa (m. euro) (ISO-8859-15)"
 
-#: src/sendmsg-window.c:217
+#: src/sendmsg-window.c:219
 msgid "_Central European (ISO-8859-2)"
 msgstr "_Centraleuropa (ISO-8859-2)"
 
-#: src/sendmsg-window.c:219
+#: src/sendmsg-window.c:221
 msgid "_South European (ISO-8859-3)"
 msgstr "_Sydeuropa (ISO-8859-3)"
 
-#: src/sendmsg-window.c:221
+#: src/sendmsg-window.c:223
+#, fuzzy
+msgid "_Baltic (ISO-8859-13)"
+msgstr "_Kyrillisk (ISO-8859-5)"
+
+#: src/sendmsg-window.c:225
 msgid "Cy_rillic (ISO-8859-5)"
 msgstr "_Kyrillisk (ISO-8859-5)"
 
-#: src/sendmsg-window.c:223
+#: src/sendmsg-window.c:227
 msgid "_Hebrew (ISO-8859-8)"
 msgstr "_Hebraisk (ISO-8859-8)"
 
-#: src/sendmsg-window.c:225
+#: src/sendmsg-window.c:229
 msgid "_Turkish (ISO-8859-9)"
 msgstr "_Tyrkisk (ISO-8859-9)"
 
-#: src/sendmsg-window.c:262
+#: src/sendmsg-window.c:267
 msgid "_Show"
 msgstr "_Vis"
 
-#: src/sendmsg-window.c:263
+#: src/sendmsg-window.c:268
 msgid "_ISO Charset"
 msgstr "_ISO-tegnsæt"
 
-#: src/sendmsg-window.c:382
+#: src/sendmsg-window.c:387
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -1436,108 +1442,107 @@ msgstr ""
 "Vedhæftningsikonen (balsa/attachment.png) kunne ikke findes.\n"
 "Det betyder desværre at du ikke kan vedhæfte filer.\n"
 
-#: src/sendmsg-window.c:400
+#: src/sendmsg-window.c:405
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Kan ikke få oplysninger om filen '%s': %s\n"
 
-#: src/sendmsg-window.c:404
+#: src/sendmsg-window.c:409
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Bilaget er ikke en almindelig fil: '%s'\n"
 
-#: src/sendmsg-window.c:464
+#: src/sendmsg-window.c:469
 msgid "Attach file"
 msgstr "Vedhæft bilag"
 
 #. cc:
-#: src/sendmsg-window.c:592
+#: src/sendmsg-window.c:597
 msgid "cc:"
 msgstr "cc:"
 
 #. bcc:
-#: src/sendmsg-window.c:595
+#: src/sendmsg-window.c:600
 msgid "bcc:"
 msgstr "bcc:"
 
 #. fcc:
-#: src/sendmsg-window.c:598
+#: src/sendmsg-window.c:603
 msgid "fcc:"
 msgstr "fcc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:626
+#: src/sendmsg-window.c:631
 msgid "Reply To:"
 msgstr "Svar til:"
 
 #. Attachment list
-#: src/sendmsg-window.c:630
+#: src/sendmsg-window.c:635
 msgid "Attachments:"
 msgstr "Bilag:"
 
 #. Comments:
-#: src/sendmsg-window.c:672
+#: src/sendmsg-window.c:677
 msgid "Comments:"
 msgstr "Kommentarer:"
 
 #. Keywords:
-#: src/sendmsg-window.c:675
+#: src/sendmsg-window.c:680
 msgid "Keywords:"
 msgstr "Nøgleord:"
 
-#: src/sendmsg-window.c:752
+#: src/sendmsg-window.c:757
 msgid "you"
 msgstr "du"
 
-#: src/sendmsg-window.c:761
+#: src/sendmsg-window.c:766
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "En %s skrev %s:\n"
 
-#: src/sendmsg-window.c:763
+#: src/sendmsg-window.c:768
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s skrev:\n"
 
-#: src/sendmsg-window.c:833
+#: src/sendmsg-window.c:838
 msgid "Reply to "
 msgstr "Svar "
 
-#: src/sendmsg-window.c:838
+#: src/sendmsg-window.c:843
 msgid "Forward message"
 msgstr "Videresend brev"
 
-#: src/sendmsg-window.c:843
+#: src/sendmsg-window.c:848
 msgid "Continue message"
 msgstr "Fortsæt brev"
 
-#: src/sendmsg-window.c:848
+#: src/sendmsg-window.c:853
 msgid "New message"
 msgstr "Nyt brev"
 
-#: src/sendmsg-window.c:1075
+#: src/sendmsg-window.c:1080
 msgid "Could not open the file.\n"
 msgstr "Kunne ikke åbne filen.\n"
 
-#: src/sendmsg-window.c:1081
+#: src/sendmsg-window.c:1086
 msgid "Loading..."
 msgstr "Indlæser..."
 
-#: src/sendmsg-window.c:1106
+#: src/sendmsg-window.c:1111
 msgid "Include file"
 msgstr "Inkludér fil"
 
-#: src/sendmsg-window.c:1380
+#: src/sendmsg-window.c:1385
 msgid "Cannot execute print command."
 msgstr "Kan ikke udføre printerkommando."
 
-#: src/sendmsg-window.c:1404
+#: src/sendmsg-window.c:1409
 msgid "Error executing lpr"
 msgstr "Fejl under køring af lpr"
 
-#: src/spell-check.c:136
-msgid "Spell Check"
-msgstr "Stavekontrol"
+#~ msgid "Spell Check"
+#~ msgstr "Stavekontrol"
 
 #~ msgid "Unable to Open Mailbox!"
 #~ msgstr "Kunne ikke åbne postkasse!"

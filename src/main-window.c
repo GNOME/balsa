@@ -211,11 +211,11 @@ static GnomeUIInfo file_menu[] =
 
 static GnomeUIInfo shown_hdrs_menu[] =
 {
-   GNOMEUIINFO_RADIOITEM( N_ ("N_o headers"), NULL, 
+   GNOMEUIINFO_RADIOITEM( N_ ("N_o headers"), "Display no headers", 
 			  show_no_headers_cb, NULL),
-   GNOMEUIINFO_RADIOITEM( N_ ("_Selected headers"),NULL,
+   GNOMEUIINFO_RADIOITEM( N_ ("_Selected headers"),"Display selected headers",
 			  show_selected_cb, NULL),
-   GNOMEUIINFO_RADIOITEM( N_ ("All _headers"), NULL, 
+   GNOMEUIINFO_RADIOITEM( N_ ("All _headers"), "Display all headers", 
 			  show_all_headers_cb, NULL),
    GNOMEUIINFO_END
 };
@@ -293,7 +293,8 @@ static GnomeUIInfo message_menu[] =
 #define MENU_MESSAGE_CONTINUE_POS 12
     /* C */
   {
-    GNOME_APP_UI_ITEM, N_ ("_Continue"), N_("Continue editing current message"),
+    GNOME_APP_UI_ITEM, N_ ("_Continue"), 
+    N_("Continue editing current message"),
     continue_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL, 'C', 0, NULL
   },
@@ -329,7 +330,7 @@ static GnomeUIInfo message_menu[] =
   },
   GNOMEUIINFO_SEPARATOR,
 #define MENU_MESSAGE_WRAP_POS 20
-  GNOMEUIINFO_TOGGLEITEM( N_ ("_Wrap"), NULL, wrap_message_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_Wrap"), "Wrap message lines", wrap_message_cb, NULL),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_RADIOLIST(shown_hdrs_menu),
   GNOMEUIINFO_END
@@ -377,11 +378,9 @@ static GnomeUIInfo settings_menu[] =
   GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL),
   GNOMEUIINFO_SEPARATOR,
 #define MENU_SETTINGS_MBLIST_POS (MENU_SETTINGS_PREFS_POS+2)
-  GNOMEUIINFO_TOGGLEITEM( N_ ("_Show mailbox tree"), NULL, 
-			  show_mbtree_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_Show mailbox tree"), "Toggle display of mailbox and folder tree", show_mbtree_cb, NULL),
 #define MENU_SETTINGS_TABS_POS (MENU_SETTINGS_PREFS_POS+3)
-  GNOMEUIINFO_TOGGLEITEM( N_ ("Show mailbox _tabs"), NULL, 
-			  show_mbtabs_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_ ("Show mailbox _tabs"), "Toggle display of mailbox notebook tabs", show_mbtabs_cb, NULL),
   GNOMEUIINFO_END
 };
 static GnomeUIInfo help_menu[] =
@@ -548,8 +547,8 @@ balsa_window_new ()
   window = gtk_type_new (BALSA_TYPE_WINDOW);
   gnome_app_construct(GNOME_APP(window), "balsa", "Balsa");
 
-  gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
-  gnome_app_create_toolbar_with_data(GNOME_APP(window), main_toolbar, window);
+  gnome_app_create_menus_with_data (GNOME_APP(window), main_menu, window);
+  gnome_app_create_toolbar_with_data (GNOME_APP(window), main_toolbar, window);
 
   /* we can only set icon after realization, as we have no windows before. */
   gtk_signal_connect (GTK_OBJECT (window), "realize",
@@ -561,6 +560,7 @@ balsa_window_new ()
   gnome_app_set_statusbar(GNOME_APP(window), GTK_WIDGET(appbar));
   gtk_object_set_data(GTK_OBJECT(window), APPBAR_KEY, appbar);
   balsa_app.appbar=appbar;
+  gnome_app_install_appbar_menu_hints (GNOME_APPBAR (balsa_app.appbar), main_menu);
   
   gtk_window_set_policy(GTK_WINDOW(window), TRUE, TRUE, FALSE);
   gtk_window_set_default_size(GTK_WINDOW(window), balsa_app.mw_width, balsa_app.mw_height);
@@ -732,31 +732,38 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, LibBalsaMailbox
 {
 /*  printf("FIXME: Can't close mailboxes.\n"); 
     Sadly, we don't get the IndexPage pointer given to us. Ah well. */
-    GtkWidget *page;
-    gint i;
+  GtkWidget *page;
+  BalsaIndex* index = NULL;
+  gint i;
 
-    i=balsa_find_notebook_page_num(mailbox);
+  i = balsa_find_notebook_page_num(mailbox);
 
-    if( i != -1 )
-      {
-	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),i);
-	page = gtk_object_get_data(GTK_OBJECT(page),"indexpage");
-	gtk_notebook_remove_page( GTK_NOTEBOOK( window->notebook ), i );
+  if( i != -1 )
+  {
+    page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),i);
+    page = gtk_object_get_data(GTK_OBJECT(page),"indexpage");
+    gtk_notebook_remove_page( GTK_NOTEBOOK( window->notebook ), i );
 	
-	(BALSA_INDEX_PAGE( page ))->sw = NULL; /* This was just toasted */
-	gtk_object_destroy( GTK_OBJECT( page ) );
+    (BALSA_INDEX_PAGE( page ))->sw = NULL; /* This was just toasted */
+    gtk_object_destroy( GTK_OBJECT( page ) );
 
-        /* If this is the last notebook page clear the message preview
-	 and the status bar */
-        page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), 0);
-        if (page == NULL) {
-	  gtk_window_set_title(GTK_WINDOW(window), "Balsa");
-	  balsa_message_clear (BALSA_MESSAGE( window->preview ));
-	  gnome_appbar_set_default (balsa_app.appbar, "Mailbox closed");
-	}
-	g_free(balsa_app.open_mailbox);
-	balsa_app.open_mailbox = get_open_mailboxes_string();
-      }
+    /* If this is the last notebook page clear the message preview
+       and the status bar */
+    page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), 0);
+
+    if (page == NULL) {
+      gtk_window_set_title(GTK_WINDOW(window), "Balsa");
+      balsa_message_clear (BALSA_MESSAGE( window->preview ));
+      gnome_appbar_set_default (balsa_app.appbar, "Mailbox closed");
+    }
+
+    g_free(balsa_app.open_mailbox);
+    balsa_app.open_mailbox = get_open_mailboxes_string();
+  }
+  
+  index = BALSA_INDEX (balsa_window_find_current_index (window));
+  if (index)
+    balsa_mblist_focus_mailbox (balsa_app.mblist, index->mailbox);
 }
 
 gboolean balsa_close_mailbox_on_timer(GtkWidget *widget, gpointer *data)

@@ -30,7 +30,7 @@
       <firstname>Matthew</firstname> <surname>Guenther</surname>
       <affiliation>
 	<address>
-	  <email>mguenther@netcom.ca</email>
+	  <email>mguenthe@attcanada.ca</email>
 	</address>
       </affiliation>
     </author>
@@ -1923,7 +1923,7 @@
 	</listitem>	
 
 	<listitem><para>
-	    Matthew Guenther  (<email>mguenthe@netcom.ca</email>)
+	    Matthew Guenther  (<email>mguenthe@attcanada.ca</email>)
 	  </para></listitem>
 
 	<listitem>
@@ -1964,7 +1964,7 @@
     <para>
       This manual was written by Peter Williams
       (<email>peter@newton.cx</email>) &amp; Matthew Guenther
-      (<email>mguenther@netcom.ca</email>).
+      (<email>mguenthe@attcanada.ca</email>).
 
       Please send all comments and suggestions regarding the manual to
       the GNOME Documentation Project at <email>docs@gnome.org</email>

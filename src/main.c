@@ -57,6 +57,7 @@ pthread_t			get_mail_thread;
 pthread_t                       send_mail;
 pthread_mutex_t			mailbox_lock;
 pthread_mutex_t                 send_messages_lock;
+pthread_mutex_t                 appbar_lock;
 int				checking_mail;
 int                             sending_mail;
 int				mail_thread_pipes[2];
@@ -66,10 +67,13 @@ GIOChannel 		*mail_thread_msg_receive;
 GIOChannel              *send_thread_msg_send;
 GIOChannel              *send_thread_msg_receive;
 
+/* Thread for updating mblist */
 pthread_t mblist_thread;
 /* we use the mailbox_lock pthread_mutex */
 int updating_mblist;
-/* pipe for messaging to the thread */
+
+/* Semaphore to prevent dual use of appbar progressbar */
+int updating_progressbar;
 
 static void threads_init( gboolean init );
 #endif /* BALSA_USE_THREADS */
@@ -145,9 +149,11 @@ threads_init( gboolean init )
     g_thread_init( NULL );
     pthread_mutex_init( &mailbox_lock, NULL );
     pthread_mutex_init( &send_messages_lock, NULL );
+    pthread_mutex_init (&appbar_lock, NULL);
     checking_mail = 0;
     updating_mblist = 0;
     sending_mail = 0;
+    updating_progressbar = 0;
 	if( pipe( mail_thread_pipes) < 0 )
 	{
 	   g_log ("BALSA Init", G_LOG_LEVEL_DEBUG, "Error opening pipes.\n" );
@@ -172,6 +178,7 @@ threads_init( gboolean init )
   {
     pthread_mutex_destroy( &mailbox_lock );
     pthread_mutex_destroy( &send_messages_lock );
+    pthread_mutex_destroy (&appbar_lock);
   }
 }
 #endif /* BALSA_USE_THREADS */

@@ -61,5 +61,6 @@ void balsa_mblist_redraw (BalsaMBList * bmbl);
 guint balsa_mblist_get_type (void);
 void balsa_mblist_have_new (BalsaMBList * bmbl);
 void balsa_mblist_update_mailbox (BalsaMBList * mblist, LibBalsaMailbox * mailbox);
+gboolean balsa_mblist_focus_mailbox (BalsaMBList* bmbl, LibBalsaMailbox* mailbox);
 
 #endif

@@ -120,16 +120,14 @@ is_a_quote (gchar *str)
  */
 void
 allocate_quote_colors (GtkWidget *widget, GdkColor color[],
-      gint first, gint last)
+                       gint first, gint last)
 {
    gint i;
-   GdkColormap * colormap;
-  
+
    for (i = first; i <= last; i++)
    {
-      colormap = gdk_window_get_colormap (GTK_WIDGET(widget)->window);
-      if (!gdk_colormap_alloc_color (colormap, &color[i], FALSE, TRUE))
-	gdk_color_black (colormap, &color[i]);
+      if (!gdk_colormap_alloc_color (balsa_app.colormap, &color[i], FALSE, TRUE))
+	gdk_color_black (balsa_app.colormap, &color[i]);
    }
 }
 

@@ -362,7 +362,6 @@ idle_handler_cb(GtkWidget * widget)
   
   if (!data) {
     handler = 0;
-    gdk_threads_leave ();
     return FALSE;
   }
   
@@ -375,18 +374,20 @@ idle_handler_cb(GtkWidget * widget)
                     bevent->button, bevent->time);
   } else if (bmsg && BALSA_MESSAGE(bmsg)) {
       if (message)
-        balsa_message_set(BALSA_MESSAGE(bmsg), message);
+        balsa_message_set (BALSA_MESSAGE(bmsg), message);
       else
         balsa_message_clear (BALSA_MESSAGE (bmsg));
   }
   
   handler = 0;
 
+  gnome_appbar_pop (balsa_app.appbar);
+
   /* Update the style and message counts in the mailbox list */
-  balsa_mblist_have_new (balsa_app.mblist);
   balsa_mblist_update_mailbox (balsa_app.mblist, 
-                               BALSA_INDEX(widget)->mailbox);
-  
+                               BALSA_INDEX (widget)->mailbox);
+  balsa_mblist_have_new (balsa_app.mblist);
+
   gtk_object_remove_data (GTK_OBJECT (widget), "bevent");
   gtk_object_remove_data (GTK_OBJECT (widget), "message");
   gtk_object_remove_data (GTK_OBJECT (widget), "data");
@@ -447,7 +448,7 @@ index_select_cb (GtkWidget * widget,
      * adverse affect as described above
      * */
 /*     if (!handler) */
-	handler = gtk_idle_add ((GtkFunction) idle_handler_cb, widget);
+    handler = gtk_idle_add ((GtkFunction) idle_handler_cb, widget);
 }
 
 static void
@@ -475,7 +476,7 @@ index_unselect_cb (GtkWidget * widget,
      * adverse affect as described above
      * */
 /*     if (!handler) */
-	handler = gtk_idle_add ((GtkFunction) idle_handler_cb, widget);
+    handler = gtk_idle_add ((GtkFunction) idle_handler_cb, widget);
 }
 
 

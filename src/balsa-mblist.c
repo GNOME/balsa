@@ -725,7 +725,6 @@ balsa_mblist_have_new (BalsaMBList * bmbl)
     pthread_mutex_unlock (&mailbox_lock);
     return;
   }
-
   updating_mblist = 1;
   pthread_mutex_unlock (&mailbox_lock);
 
@@ -831,7 +830,7 @@ balsa_mblist_check_new (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
 #endif /* BALSA_USE_THREADS */
 
             desc = g_strdup_printf (_("Mailbox %s has %d new messages"), mailbox->name, new_messages);
-            gnome_appbar_set_default (balsa_app.appbar, desc);
+            gnome_appbar_push (balsa_app.appbar, desc);
             g_free (desc);
           }
         }
@@ -889,22 +888,9 @@ balsa_mblist_update_mailbox (BalsaMBList * mblist, LibBalsaMailbox * mailbox)
 
   gtk_clist_thaw (GTK_CLIST (&(mblist->ctree)));
 
-  /* moving selection to the respective mailbox.
-     this is neccessary when the previous mailbox was closed and
-     redundant if the mailboxes were switched (notebook_switch_page)
-     or the mailbox is checked for the new mail arrival
-  */
-  if(gtk_ctree_node_nth (&mblist->ctree,GTK_CLIST(&mblist->ctree)->focus_row)
-     != node) {
-     gtk_ctree_select  (GTK_CTREE(&mblist->ctree), node ); 
-     
-     if (gtk_ctree_node_is_visible (&mblist->ctree, node)!=GTK_VISIBILITY_FULL)
-	gtk_ctree_node_moveto (&mblist->ctree,node, 0, 1.0, 0.0);
-  }
-  
-  desc = g_strdup_printf(_("Shown mailbox: %s with %ld messages, %ld new"), 
-			 mailbox->name, mailbox->total_messages,
-			 mailbox->unread_messages);
+  desc = g_strdup_printf (_("Shown mailbox: %s with %ld messages, %ld new"), 
+                          mailbox->name, mailbox->total_messages,
+                          mailbox->unread_messages);
   gnome_appbar_set_default (balsa_app.appbar, desc);
   g_free(desc);
 }
@@ -1167,6 +1153,34 @@ mblist_mbnode_compare (gconstpointer a, gconstpointer b)
     return 1;
 }
 
+gboolean balsa_mblist_focus_mailbox (BalsaMBList* bmbl, LibBalsaMailbox* mailbox)
+{
+  GtkCTreeNode* node;
+  
+  if (!mailbox)
+    return FALSE;
+  
+  node = gtk_ctree_find_by_row_data_custom (GTK_CTREE (&bmbl->ctree), NULL,
+					    mailbox, mblist_mbnode_compare);
+  if (node != NULL) {
+    gtk_ctree_select (GTK_CTREE (&bmbl->ctree), node);
+
+    /* moving selection to the respective mailbox.
+       this is neccessary when the previous mailbox was closed and
+       redundant if the mailboxes were switched (notebook_switch_page)
+       or the mailbox is checked for the new mail arrival
+    */
+      
+    if (gtk_ctree_node_is_visible (GTK_CTREE (&bmbl->ctree), node) != GTK_VISIBILITY_FULL) {
+      gtk_ctree_node_moveto (GTK_CTREE (&bmbl->ctree),node, 0, 1.0, 0.0);
+    }
+
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
 /* balsa_widget_get_bold_font [MBG]
  * 
  * Description: This function takes a widget and returns a bold
@@ -1230,9 +1244,20 @@ balsa_mblist_thread (BalsaMBList* mblist)
   GList* list;
   GList* tmp;
   LibBalsaMailbox* mailbox;
+  gint i, number_of_mailboxes;
+
+  i = 0;
+  number_of_mailboxes = 0;
 
   list = mblist->update_list;
-  
+
+  pthread_mutex_lock (&appbar_lock);
+  if (!updating_progressbar) {
+    updating_progressbar = 1;
+    number_of_mailboxes = g_list_length (list);
+  }
+  pthread_mutex_unlock (&appbar_lock);
+
   gdk_threads_enter ();
   gtk_clist_freeze (GTK_CLIST (&(mblist->ctree)));
 
@@ -1262,6 +1287,10 @@ balsa_mblist_thread (BalsaMBList* mblist)
     tmp = list;
     list = list->next;
     g_list_remove (mblist->update_list, tmp->data);
+    i++;
+
+    if (number_of_mailboxes)
+      gnome_appbar_set_progress (balsa_app.appbar, i/number_of_mailboxes);
   }
 
   if (mblist->update_list) {
@@ -1271,12 +1300,17 @@ balsa_mblist_thread (BalsaMBList* mblist)
 
   gtk_ctree_post_recursive (GTK_CTREE (&(mblist->ctree)), NULL, balsa_mblist_folder_style, NULL);
 
+  gnome_appbar_set_progress (balsa_app.appbar, 0.0);
   gtk_clist_thaw (GTK_CLIST (&(mblist->ctree)));
   gdk_threads_leave ();
 
   pthread_mutex_lock (&mailbox_lock);
   updating_mblist = 0;
   pthread_mutex_unlock (&mailbox_lock);
+
+  pthread_mutex_lock (&appbar_lock);
+  updating_progressbar = 0;
+  pthread_mutex_lock (&appbar_lock);
         
   pthread_exit (0);
 }

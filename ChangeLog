@@ -1,3 +1,18 @@
+2000-08-15  Matthew Guenther <mguenthe@attcanada.ca>
+
+	* src/balsa-index-page.c: Fix mailbox updating, AppBar stuff.
+	* src/balsa-mblist.c (balsa_mblist_have_new): change
+	...appbar_set_default to ...appbar_push.
+	* src/balsa-mblist.c (balsa_mblist_update_mailbox): remove mailbox
+	re-focusing code from here, move to balsa_mblist_focus_mailbox.
+	* src/main-window.c: Install Appbar menu hints, add some menu item
+	tooltips.
+	* src/main-window.c: (balsa_window_real_close_mailbox): Add call
+	to balsa_mblist_focus_mailbox.
+	* src/main.c: Init Appbar progressbar lock.
+	* src/quote-color.c: Change colormap to use one allocated at startup.
+	* src/threads.h: Appbar progressbar lock defined.
+
 2000-08-15  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/main.c: Patch from Timothy Alan Chandler

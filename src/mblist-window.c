@@ -204,7 +204,7 @@ mblist_open_mailbox (LibBalsaMailbox * mailbox)
   }
 #endif
 
-  balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
+/*   balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree)); */
 }
 
 

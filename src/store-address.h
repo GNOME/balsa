@@ -1,6 +1,5 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
@@ -19,10 +18,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
+
 #ifndef __STORE_ADDRESS_DIALOG_H__
 #define __STORE_ADDRESS_DIALOG_H__
 
-void balsa_store_address (GtkWidget * widget, gpointer index);
+void balsa_store_address(GtkWidget * widget, gpointer index);
 
 #endif
-

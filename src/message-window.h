@@ -1,5 +1,7 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +18,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
+
 #ifndef __MESSAGE_WINDOW_H__
 #define __MESSAGE_WINDOW_H__
 
 #include "libbalsa.h"
 
-void message_window_new (LibBalsaMessage * message);
+void message_window_new(LibBalsaMessage * message);
 
-#endif /* __MESSAGE_WINDOW_H__ */
+#endif				/* __MESSAGE_WINDOW_H__ */

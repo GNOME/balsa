@@ -1,5 +1,7 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +22,6 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-void balsa_exit (void);
+void balsa_exit(void);
 
-#endif /* __MAIN_H__ */
+#endif				/* __MAIN_H__ */

@@ -1,5 +1,7 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +18,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
+
 #ifndef __LOCAL_MAILBOX_H__
 #define __LOCAL_MAILBOX_H__
 
-void load_local_mailboxes (void);
+void load_local_mailboxes(void);
 
-#endif /* __LOCAL_MAILBOX_H__ */
+#endif				/* __LOCAL_MAILBOX_H__ */

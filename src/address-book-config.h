@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-2000 Stuart Parmenter and others
  *                         See the file AUTHORS for a list.
@@ -23,6 +23,7 @@
 
 #include "libbalsa.h"
 
-LibBalsaAddressBook *balsa_address_book_config_new(LibBalsaAddressBook *address_book);
+LibBalsaAddressBook *balsa_address_book_config_new(LibBalsaAddressBook *
+						   address_book);
 
-#endif /* __ADDRESS_BOOK_CONFIG_H__ */
+#endif				/* __ADDRESS_BOOK_CONFIG_H__ */

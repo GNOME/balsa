@@ -1,5 +1,7 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +26,7 @@
 #include "libbalsa.h"
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif				/* __cplusplus */
 
 
@@ -34,67 +35,66 @@ extern "C"
 #define BALSA_IS_MESSAGE(obj)       GTK_CHECK_TYPE (obj, balsa_message_get_type ())
 
 
-  typedef struct _BalsaMessage BalsaMessage;
-  typedef struct _BalsaMessageClass BalsaMessageClass;
+    typedef struct _BalsaMessage BalsaMessage;
+    typedef struct _BalsaMessageClass BalsaMessageClass;
 
-  typedef struct _BalsaPartInfo BalsaPartInfo;
+    typedef struct _BalsaPartInfo BalsaPartInfo;
 
-  struct _BalsaMessage
-    {
-      GtkViewport parent;
+    struct _BalsaMessage {
+	GtkViewport parent;
 
-      /* The table widget */
-      GtkWidget *table;
+	/* The table widget */
+	GtkWidget *table;
 
-      /* Widget to hold headers */
-      GtkWidget *header_text;
-      ShownHeaders shown_headers;
+	/* Widget to hold headers */
+	GtkWidget *header_text;
+	ShownHeaders shown_headers;
 
-      /* Widget to hold content */
-      GtkWidget *content;
-      gboolean content_has_focus;
+	/* Widget to hold content */
+	GtkWidget *content;
+	gboolean content_has_focus;
 
-      /* Widget to hold icons */
-      GtkWidget *part_list;
-      gint part_count;
+	/* Widget to hold icons */
+	GtkWidget *part_list;
+	gint part_count;
 
-      gboolean wrap_text;
+	gboolean wrap_text;
 
-      BalsaPartInfo *current_part;
-      
-      LibBalsaMessage *message;
+	BalsaPartInfo *current_part;
+
+	LibBalsaMessage *message;
     };
 
-  struct _BalsaMessageClass
-    {
-      GtkViewportClass parent_class;
+    struct _BalsaMessageClass {
+	GtkViewportClass parent_class;
 
-      void (*select_part) (BalsaMessage *message);
+	void (*select_part) (BalsaMessage * message);
     };
 
-  guint balsa_message_get_type (void);
-  GtkWidget *balsa_message_new (void);
+    guint balsa_message_get_type(void);
+    GtkWidget *balsa_message_new(void);
 
-  void balsa_message_clear (BalsaMessage * bmessage);
-  void balsa_message_set (BalsaMessage * bmessage, LibBalsaMessage * message);
+    void balsa_message_clear(BalsaMessage * bmessage);
+    void balsa_message_set(BalsaMessage * bmessage,
+			   LibBalsaMessage * message);
 
-  void balsa_message_next_part (BalsaMessage *bmessage);
-  void balsa_message_previous_part (BalsaMessage *bmessage);
-  void balsa_message_save_current_part (BalsaMessage *bmessage);
+    void balsa_message_next_part(BalsaMessage * bmessage);
+    void balsa_message_previous_part(BalsaMessage * bmessage);
+    void balsa_message_save_current_part(BalsaMessage * bmessage);
 
-  void balsa_message_set_displayed_headers(BalsaMessage *bmessage, 
-					   ShownHeaders sh);
-  void balsa_message_set_wrap(BalsaMessage *bmessage, gboolean wrap);
+    void balsa_message_set_displayed_headers(BalsaMessage * bmessage,
+					     ShownHeaders sh);
+    void balsa_message_set_wrap(BalsaMessage * bmessage, gboolean wrap);
 
-  gboolean balsa_message_can_select(BalsaMessage *bmessage);
-  void balsa_message_copy_clipboard(BalsaMessage *bmessage);
-  void balsa_message_select_all(BalsaMessage *bmessage);
+    gboolean balsa_message_can_select(BalsaMessage * bmessage);
+    void balsa_message_copy_clipboard(BalsaMessage * bmessage);
+    void balsa_message_select_all(BalsaMessage * bmessage);
 
-  void reflow_string(gchar* str, gint mode, gint *cur_pos, int width);
+    void reflow_string(gchar * str, gint mode, gint * cur_pos, int width);
 
-   /* a helper functions; FIXME: find more proper location for them.  */
-   gchar* get_font_name(const gchar* base, const gchar *charset);
-   gchar* get_koi_font_name(const gchar* base, const gchar* code);
+/* a helper functions; FIXME: find more proper location for them.  */
+    gchar *get_font_name(const gchar * base, const gchar * charset);
+    gchar *get_koi_font_name(const gchar * base, const gchar * code);
 
 #ifdef __cplusplus
 }

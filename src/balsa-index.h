@@ -1,5 +1,7 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,62 +26,63 @@
 #include "libbalsa.h"
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif				/* __cplusplus */
-
 
 #define BALSA_INDEX(obj)          GTK_CHECK_CAST (obj, balsa_index_get_type (), BalsaIndex)
 #define BALSA_INDEX_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, balsa_index_get_type (), BalsaIndexClass)
 #define BALSA_IS_INDEX(obj)       GTK_CHECK_TYPE (obj, balsa_index_get_type ())
 
 
-  typedef struct _BalsaIndex BalsaIndex;
-  typedef struct _BalsaIndexClass BalsaIndexClass;
+    typedef struct _BalsaIndex BalsaIndex;
+    typedef struct _BalsaIndexClass BalsaIndexClass;
 
-  struct _BalsaIndex
-    {
-      GtkCList clist;
+    struct _BalsaIndex {
+	GtkCList clist;
 
-      LibBalsaMailbox *mailbox;
-      guint first_new_message;
+	LibBalsaMailbox *mailbox;
+	guint first_new_message;
     };
 
-  struct _BalsaIndexClass
-    {
-      GtkCListClass parent_class;
+    struct _BalsaIndexClass {
+	GtkCListClass parent_class;
 
-      void (*select_message) (BalsaIndex * bindex, LibBalsaMessage * message);
-      void (*unselect_message) (BalsaIndex * bindex, LibBalsaMessage * message);
+	void (*select_message) (BalsaIndex * bindex,
+				LibBalsaMessage * message);
+	void (*unselect_message) (BalsaIndex * bindex,
+				  LibBalsaMessage * message);
     };
 
-
-  guint balsa_index_get_type (void);
-  GtkWidget *balsa_index_new (void);
+    guint balsa_index_get_type(void);
+    GtkWidget *balsa_index_new(void);
 
 
 /* sets the mail stream; if it's a new stream, then it's 
  * contents is loaded into the index */
-  void balsa_index_set_mailbox (BalsaIndex * bindex, LibBalsaMailbox * mailbox);
-  void balsa_index_refresh (BalsaIndex* bindex);
+    void balsa_index_set_mailbox(BalsaIndex * bindex,
+				 LibBalsaMailbox * mailbox);
+    void balsa_index_refresh(BalsaIndex * bindex);
 
 
 /* adds a new message */
-  void balsa_index_add (BalsaIndex * bindex, LibBalsaMessage * message);
+    void balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message);
 /* del a message */
-  void balsa_index_del (BalsaIndex * bindex, LibBalsaMessage * message);
-  void balsa_index_update_flag (BalsaIndex * bindex, LibBalsaMessage * message);
+    void balsa_index_del(BalsaIndex * bindex, LibBalsaMessage * message);
+    void balsa_index_update_flag(BalsaIndex * bindex,
+				 LibBalsaMessage * message);
 
 
 /* select up/down the index */
-  void balsa_index_select_next (BalsaIndex *);
-  void balsa_index_select_next_unread (BalsaIndex * bindex);
-  void balsa_index_select_previous (BalsaIndex *);
-  void balsa_index_redraw_current (BalsaIndex *);
-  void balsa_index_select_row (BalsaIndex* bindex, gint row);
+    void balsa_index_select_next(BalsaIndex *);
+    void balsa_index_select_next_unread(BalsaIndex * bindex);
+    void balsa_index_select_previous(BalsaIndex *);
+    void balsa_index_redraw_current(BalsaIndex *);
+    void balsa_index_select_row(BalsaIndex * bindex, gint row);
 
 /* retrieve the selection */
-  extern void balsa_index_get_selected_rows( BalsaIndex *bindex, guint **rows, guint *nb_rows );
+    extern void balsa_index_get_selected_rows(BalsaIndex * bindex,
+					      guint ** rows,
+					      guint * nb_rows);
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,25 @@
-/* -*- C -*-
- * filter-edit-callbacks.c
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* Balsa E-Mail Client
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option) 
+ * any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * GNU General Public License for more details.
+ *  
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * 02111-1307, USA.
+ */
+
+/*
  * Callbacks for the filter edit dialog
  */
 
@@ -27,31 +46,27 @@
  * Returns:
  *    gchar* - the unique name
  */
-static gint unique_filter_name(GtkWidget *clist, gchar *name)
+static gint
+unique_filter_name(GtkWidget * clist, gchar * name)
 {
     gchar *row_text;
     gint len, row = 0;
-   
+
     g_return_val_if_fail(clist != NULL, 0);
     g_return_val_if_fail(GTK_IS_CLIST(clist), 0);
 
     if ((!name) || (name[0] == '\0'))
-        return(0);
+	return (0);
 
     len = strlen(name);
 
-    while (gtk_clist_get_text(GTK_CLIST(clist),
-                              row++,
-                              1,
-                              &row_text))
-    {
-        if ((len == strlen(row_text)) ||
-            (strncmp(name, row_text, len) == 0))
-            return(0);
-    } /* end while(gtk_clist_get_text()) */
+    while (gtk_clist_get_text(GTK_CLIST(clist), row++, 1, &row_text)) {
+	if ((len == strlen(row_text)) ||
+	    (strncmp(name, row_text, len) == 0)) return (0);
+    }				/* end while(gtk_clist_get_text()) */
 
-    return(1);
-} /* end unique_filter_name() */
+    return (1);
+}				/* end unique_filter_name() */
 
 /*
  * fe_dialog_button_clicked()
@@ -60,29 +75,26 @@ static gint unique_filter_name(GtkWidget *clist, gchar *name)
  * bottom of the dialog.  wooo.
  */
 void
-fe_dialog_button_clicked (GtkWidget * widget,
-                          gint button,
-                          gpointer data)
+fe_dialog_button_clicked(GtkWidget * widget, gint button, gpointer data)
 {
-    switch (button)
-    {
-    case 0:		/* OK button */
-        /* more destruction is needed.  But that is for later */
-        gtk_widget_destroy (widget);
-        break;
+    switch (button) {
+    case 0:			/* OK button */
+	/* more destruction is needed.  But that is for later */
+	gtk_widget_destroy(widget);
+	break;
 
-    case 1:		/* Cancel button */
-        /* more destruction is needed.  But that is for later */
-        gtk_widget_destroy (widget);
-        break;
+    case 1:			/* Cancel button */
+	/* more destruction is needed.  But that is for later */
+	gtk_widget_destroy(widget);
+	break;
 
-    case 2:		/* Help button */
-        /* more of something here */
+    case 2:			/* Help button */
+	/* more of something here */
 
     default:
-        /* we should NEVER get here */
-    }
-}                                /* end fe_dialog_button_clicked */
+	/* we should NEVER get here */
+	}
+	}			/* end fe_dialog_button_clicked */
 
 
 /*
@@ -91,189 +103,146 @@ fe_dialog_button_clicked (GtkWidget * widget,
  * Handles toggling of the type checkbuttons.
  * When they are toggled, the notebook page must change
  */
-void
-fe_checkbutton_toggled (GtkWidget * widget,
-                        gpointer data)
-{
-    if (GTK_CHECK_MENU_ITEM(widget)->active)
-    {
-        gtk_notebook_set_page (GTK_NOTEBOOK(fe_type_notebook),
-                               GPOINTER_TO_INT (data) - 1);
-    }
-}                                /* end fe_checkbutton_toggled() */
-
-
+	void
+	 fe_checkbutton_toggled(GtkWidget * widget, gpointer data) {
+	    if (GTK_CHECK_MENU_ITEM(widget)->active) {
+		gtk_notebook_set_page(GTK_NOTEBOOK(fe_type_notebook),
+				      GPOINTER_TO_INT(data) - 1);
+	    }
+	}			/* end fe_checkbutton_toggled() */
 /*
  * fe_action_selected()
  *
  * Callback for the "Action" option menu
- */
-void 
-fe_action_selected (GtkWidget * widget,
-                    gpointer data)
-{
-    gtk_widget_set_sensitive (GTK_WIDGET (fe_action_entry),
-                              TRUE);
-    switch (GPOINTER_TO_INT (data))
-    {
-    case FILTER_TRASH:		/* send to trash */
-        gtk_widget_set_sensitive (GTK_WIDGET (fe_action_entry),
-                                  FALSE);
-        gtk_widget_set_sensitive (GTK_WIDGET (fe_disp_continue),
-                                  FALSE);
-        /* fall through */
+ */ void
+	 fe_action_selected(GtkWidget * widget, gpointer data) {
+	    gtk_widget_set_sensitive(GTK_WIDGET(fe_action_entry), TRUE);
 
-    case FILTER_MOVE:		/* move to folder */
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (fe_disp_stop),
-                                     TRUE);
-        gtk_widget_set_sensitive (GTK_WIDGET (fe_disp_place),
-                                  FALSE);
-        break;
+	    switch (GPOINTER_TO_INT(data)) {
+	    case FILTER_TRASH:	/* send to trash */
+		gtk_widget_set_sensitive(GTK_WIDGET(fe_action_entry),
+					 FALSE);
+		gtk_widget_set_sensitive(GTK_WIDGET(fe_disp_continue),
+					 FALSE);
+		/* fall through */
 
-    case FILTER_COPY:		/* copy to folder */
-    case FILTER_PRINT:		/* print on printer */
-    case FILTER_RUN:		/* run program */
-        gtk_widget_set_sensitive (GTK_WIDGET (fe_disp_place),
-                                  TRUE);
-        gtk_widget_set_sensitive (GTK_WIDGET (fe_disp_continue),
-                                  TRUE);
-        break;
+		case FILTER_MOVE:	/* move to folder */
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+					     (fe_disp_stop), TRUE);
+		gtk_widget_set_sensitive(GTK_WIDGET(fe_disp_place), FALSE);
+		break;
 
-    default:
-        break;
-    }
-}                                /* end fe_action_selected() */
+		case FILTER_COPY:	/* copy to folder */
+		case FILTER_PRINT:	/* print on printer */
+		case FILTER_RUN:	/* run program */
+		gtk_widget_set_sensitive(GTK_WIDGET(fe_disp_place), TRUE);
+		gtk_widget_set_sensitive(GTK_WIDGET(fe_disp_continue),
+					 TRUE);
+		break;
 
-
+		default:break;
+	}}			/* end fe_action_selected() */
 /*
  * fe_add_pressed()
  *
  * Callback for the "Add" button for the regex type
- */
-void
-fe_add_pressed (GtkWidget * widget,
-                gpointer throwaway)
-{
-    gchar *text;
-    GList *list;
-    GtkWidget *list_item;
+ */ void
+	 fe_add_pressed(GtkWidget * widget, gpointer throwaway) {
+	    gchar *text;
+	    GList *list;
+	    GtkWidget *list_item;
 
-    list = NULL;
+	     list = NULL;
 
-    text = gtk_entry_get_text (GTK_ENTRY (fe_type_regex_entry));
+	     text = gtk_entry_get_text(GTK_ENTRY(fe_type_regex_entry));
 
-    if ((text == NULL) || (strlen (text) == 0))
-        return;
-    list_item = gtk_list_item_new_with_label (text);
-    gtk_widget_show (list_item);
-    list = g_list_append (list,
-                          list_item);
-    gtk_list_append_items (GTK_LIST (fe_type_regex_list),
-                           list);
-    gtk_entry_set_text (GTK_ENTRY (fe_type_regex_entry), "");
-}                                /* end fe_add_pressed() */
+	    if ((text == NULL) || (strlen(text) == 0))
+		 return;
 
-
+	     list_item = gtk_list_item_new_with_label(text);
+	     gtk_widget_show(list_item);
+	     list = g_list_append(list, list_item);
+	     gtk_list_append_items(GTK_LIST(fe_type_regex_list), list);
+	     gtk_entry_set_text(GTK_ENTRY(fe_type_regex_entry), "");
+	}			/* end fe_add_pressed() */
 /*
  * fe_remove_pressed()
  * 
  * Callback for the "remove" button of the regex type
- */
-void
-fe_remove_pressed (GtkWidget *widget,
-                   gpointer throwaway)
-{
-    GList *selected;
+ */ void
+	 fe_remove_pressed(GtkWidget * widget, gpointer throwaway) {
+	    GList *selected;
 
-    selected = (GList *)(GTK_LIST(fe_type_regex_list))->selection;
+	     selected = (GList *) (GTK_LIST(fe_type_regex_list))->selection;
 
-    if (!selected)
-        return;
+	    if (!selected)
+		 return;
 
-    gtk_list_remove_items (GTK_LIST(fe_type_regex_list),
-                           selected);
-}                                /* end fe_remove_pressed() */
-
-
+	     gtk_list_remove_items(GTK_LIST(fe_type_regex_list), selected);
+	}			/* end fe_remove_pressed() */
 /*
  * fe_type_simple_toggled()
  *
  * Callback for the checkbuttons in the "Simple" type
- */
-void
-fe_type_simple_toggled (GtkWidget * widget,
-                        gpointer data)
-{
-    if (GTK_TOGGLE_BUTTON (widget)->active)
-    {
-        switch (GPOINTER_TO_INT (data))
-        {
-        case 1:                /* ALL */
-            gtk_toggle_button_set_active (
-                GTK_TOGGLE_BUTTON (fe_type_simple_header),
-                FALSE);
-            gtk_widget_set_sensitive (
-                GTK_WIDGET (fe_type_simple_header),
-                FALSE);
-            gtk_toggle_button_set_active (
-                GTK_TOGGLE_BUTTON (fe_type_simple_body),
-                FALSE);
-            gtk_widget_set_sensitive (
-                GTK_WIDGET (fe_type_simple_body),
-                FALSE);
+ */ void
+	 fe_type_simple_toggled(GtkWidget * widget, gpointer data) {
+	    if (GTK_TOGGLE_BUTTON(widget)->active) {
+		switch (GPOINTER_TO_INT(data)) {
+		case 1:	/* ALL */
+		    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+						 (fe_type_simple_header),
+						 FALSE);
+		    gtk_widget_set_sensitive(GTK_WIDGET
+					     (fe_type_simple_header),
+					     FALSE);
+		    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+						 (fe_type_simple_body),
+						 FALSE);
+		    gtk_widget_set_sensitive(GTK_WIDGET
+					     (fe_type_simple_body), FALSE);
 
-        case 2:                /* header */
-            gtk_toggle_button_set_active (
-                GTK_TOGGLE_BUTTON (fe_type_simple_to),
-                FALSE);
-            gtk_widget_set_sensitive (
-                GTK_WIDGET (fe_type_simple_to),
-                FALSE);
-            gtk_toggle_button_set_active (
-                GTK_TOGGLE_BUTTON (fe_type_simple_from),
-                FALSE);
-            gtk_widget_set_sensitive (
-                GTK_WIDGET (fe_type_simple_from),
-                FALSE);
-            gtk_toggle_button_set_active (
-                GTK_TOGGLE_BUTTON (fe_type_simple_subject),
-                FALSE);
-            gtk_widget_set_sensitive (
-                GTK_WIDGET (fe_type_simple_subject),
-                FALSE);
+		    case 2:	/* header */
+		    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+						 (fe_type_simple_to),
+						 FALSE);
+		    gtk_widget_set_sensitive(GTK_WIDGET(fe_type_simple_to),
+					     FALSE);
+		    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+						 (fe_type_simple_from),
+						 FALSE);
+		    gtk_widget_set_sensitive(GTK_WIDGET
+					     (fe_type_simple_from), FALSE);
+		    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+						 (fe_type_simple_subject),
+						 FALSE);
+		    gtk_widget_set_sensitive(GTK_WIDGET
+					     (fe_type_simple_subject),
+					     FALSE);
 
-        default:
-            break;
-        }
-    }
-    else
-    {
-        switch (GPOINTER_TO_INT (data))
-        {
-        case 1:                /* ALL */
-            gtk_widget_set_sensitive (
-                GTK_WIDGET (fe_type_simple_header),
-                TRUE);
-            gtk_widget_set_sensitive (
-                GTK_WIDGET (fe_type_simple_body),
-                TRUE);
+		    default:break;
+	    }} else {
+		switch (GPOINTER_TO_INT(data)) {
+		case 1:	/* ALL */
+		    gtk_widget_set_sensitive(GTK_WIDGET
+					     (fe_type_simple_header),
+					     TRUE);
+		    gtk_widget_set_sensitive(GTK_WIDGET
+					     (fe_type_simple_body), TRUE);
 
-        case 2:                /* header */
-            gtk_widget_set_sensitive (
-                GTK_WIDGET (fe_type_simple_to),
-                TRUE);
-            gtk_widget_set_sensitive (
-                GTK_WIDGET (fe_type_simple_from),
-                TRUE);
-            gtk_widget_set_sensitive (
-                GTK_WIDGET (fe_type_simple_subject),
-                TRUE);
+		case 2:	/* header */
+		    gtk_widget_set_sensitive(GTK_WIDGET(fe_type_simple_to),
+					     TRUE);
+		    gtk_widget_set_sensitive(GTK_WIDGET
+					     (fe_type_simple_from), TRUE);
+		    gtk_widget_set_sensitive(GTK_WIDGET
+					     (fe_type_simple_subject),
+					     TRUE);
 
-        default:
-            break;
-        }
-    }
-}                                /* end fe_type_simple_toggled() */
+		default:
+		    break;
+		}
+	    }
+	}			/* end fe_type_simple_toggled() */
 
 
 
@@ -282,193 +251,152 @@ fe_type_simple_toggled (GtkWidget * widget,
  *
  * Callback for the "new" button
  */
-void
-fe_new_pressed (GtkWidget * widget,
-                gpointer data)
-{
-    GtkWidget *clist;
-    gint new_row;
-    GdkImlibImage *im;
-    GdkPixmap *pixmap;
-    GdkBitmap *mask;
-    gchar *new_item[] =
-    {
-        "", "New filter"
-    };
+	void
+	 fe_new_pressed(GtkWidget * widget, gpointer data) {
+	    GtkWidget *clist;
+	    gint new_row;
+	    GdkImlibImage *im;
+	    GdkPixmap *pixmap;
+	    GdkBitmap *mask;
+	    gchar *new_item[] = {
+		"", "New filter"
+	    };
 
-    g_return_if_fail(data != NULL);
-    g_return_if_fail(GTK_IS_CLIST(data));
-    clist = GTK_WIDGET(data);
+	     g_return_if_fail(data != NULL);
+	     g_return_if_fail(GTK_IS_CLIST(data));
+	     clist = GTK_WIDGET(data);
 
-    new_row = gtk_clist_append (GTK_CLIST (clist),
-                                new_item);
+	     new_row = gtk_clist_append(GTK_CLIST(clist), new_item);
 
-    /* now for the pixmap from gdk */
-    im = gdk_imlib_create_image_from_xpm_data (enabled_xpm);
-    gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-    pixmap = gdk_imlib_copy_image (im);
-    mask = gdk_imlib_copy_mask (im);
-    gdk_imlib_destroy_image (im);
+	    /* now for the pixmap from gdk */
+	     im = gdk_imlib_create_image_from_xpm_data(enabled_xpm);
+	     gdk_imlib_render(im, im->rgb_width, im->rgb_height);
+	     pixmap = gdk_imlib_copy_image(im);
+	     mask = gdk_imlib_copy_mask(im);
+	     gdk_imlib_destroy_image(im);
 
-    gtk_clist_set_pixmap (GTK_CLIST (clist),
-                          new_row,
-                          0,
-                          pixmap,
-                          mask);
+	     gtk_clist_set_pixmap(GTK_CLIST(clist),
+				  new_row, 0, pixmap, mask);
 
-    gdk_pixmap_unref (pixmap);
-    gdk_bitmap_unref (mask);
+	     gdk_pixmap_unref(pixmap);
+	     gdk_bitmap_unref(mask);
 
-    gtk_clist_select_row (GTK_CLIST (clist),
-                          new_row, 1);
-}                                /* end fe_new_pressed() */
-
-
+	     gtk_clist_select_row(GTK_CLIST(clist), new_row, 1);
+	}			/* end fe_new_pressed() */
 /*
  * fe_delete_pressed()
  *
  * Callback for the "Delete" button
- */
-void 
-fe_delete_pressed (GtkWidget * widget,
-                   gpointer data)
-{
-    GtkWidget *clist;
-    gint row;
-    filter *fil;
+ */ void
+	 fe_delete_pressed(GtkWidget * widget, gpointer data) {
+	    GtkWidget *clist;
+	    gint row;
+	    filter *fil;
 
-    g_return_if_fail(data != NULL);
-    g_return_if_fail(GTK_IS_CLIST(data));
-    clist = GTK_WIDGET(data);
+	     g_return_if_fail(data != NULL);
+	     g_return_if_fail(GTK_IS_CLIST(data));
+	     clist = GTK_WIDGET(data);
 
-    if (!(GTK_CLIST (clist)->selection))
-        return;
+	    if (!(GTK_CLIST(clist)->selection))
+		 return;
 
-    row = GPOINTER_TO_INT ((GTK_CLIST (clist)->selection)->data);
+	     row = GPOINTER_TO_INT((GTK_CLIST(clist)->selection)->data);
 
-    fil = (filter *) gtk_clist_get_row_data (GTK_CLIST (clist),
-                                             row);
+	     fil = (filter *) gtk_clist_get_row_data(GTK_CLIST(clist),
+						     row);
 
-    if (fil)
-        filter_free (fil, NULL);
+	    if (fil)
+		 filter_free(fil, NULL);
 
-    gtk_clist_remove (GTK_CLIST (clist),
-                      row);
-}                                /* end fe_delete_pressed() */
-
-
+	     gtk_clist_remove(GTK_CLIST(clist), row);
+	}			/* end fe_delete_pressed() */
 /*
  * fe_down_pressed()
  *
  * Callback for the "Down" button
- */
-void 
-fe_down_pressed (GtkWidget * widget,
-                 gpointer data)
-{
-    GtkWidget *clist;
-    gint row;
+ */ void
+	 fe_down_pressed(GtkWidget * widget, gpointer data) {
+	    GtkWidget *clist;
+	    gint row;
 
-    g_return_if_fail(data != NULL);
-    g_return_if_fail(GTK_IS_CLIST(data));
-    clist = GTK_WIDGET(data);
+	     g_return_if_fail(data != NULL);
+	     g_return_if_fail(GTK_IS_CLIST(data));
+	     clist = GTK_WIDGET(data);
 
-    if (!(GTK_CLIST (clist)->selection))
-        return;
+	    if (!(GTK_CLIST(clist)->selection))
+		 return;
 
-    row = GPOINTER_TO_INT ((GTK_CLIST (clist)->selection)->data);
-    gtk_clist_swap_rows (GTK_CLIST (clist), row, row + 1);
-}                                /* end fe_down_pressed */
-
-
+	     row = GPOINTER_TO_INT((GTK_CLIST(clist)->selection)->data);
+	     gtk_clist_swap_rows(GTK_CLIST(clist), row, row + 1);
+	}			/* end fe_down_pressed */
 /*
  * fe_up_pressed()
  *
  * Callback for the "Up" button
- */
-void 
-fe_up_pressed (GtkWidget * widget,
-               gpointer data)
-{
-    GtkWidget *clist;
-    gint row;
+ */ void
+	 fe_up_pressed(GtkWidget * widget, gpointer data) {
+	    GtkWidget *clist;
+	    gint row;
 
-    g_return_if_fail(data != NULL);
-    g_return_if_fail(GTK_IS_CLIST(data));
-    clist = GTK_WIDGET(data);
+	     g_return_if_fail(data != NULL);
+	     g_return_if_fail(GTK_IS_CLIST(data));
+	     clist = GTK_WIDGET(data);
 
-    if (!(GTK_CLIST (clist)->selection))
-        return;
+	    if (!(GTK_CLIST(clist)->selection))
+		 return;
 
-    row = GPOINTER_TO_INT ((GTK_CLIST (clist)->selection)->data);
-    gtk_clist_swap_rows (GTK_CLIST (clist), row - 1, row);
-}                                /* end fe_up_pressed */
-
-
+	     row = GPOINTER_TO_INT((GTK_CLIST(clist)->selection)->data);
+	     gtk_clist_swap_rows(GTK_CLIST(clist), row - 1, row);
+	}			/* end fe_up_pressed */
 /*
  * clist_button_event_press()
  *
  * Callback for when button is pressed.
- */
-void
-clist_button_event_press (GtkWidget * clist,
-                          GdkEventButton * bevent,
-                          gpointer data)
-{
-    gint row, column, res;
-    GdkImlibImage *im;
-    GdkPixmap *pixmap;
-    GdkBitmap *mask;
-    GtkCellType type;
+ */ void
+	
+	    clist_button_event_press(GtkWidget * clist,
+				     GdkEventButton * bevent,
+				     gpointer data) {
+	    gint row, column, res;
+	    GdkImlibImage *im;
+	    GdkPixmap *pixmap;
+	    GdkBitmap *mask;
+	    GtkCellType type;
 
-    res = gtk_clist_get_selection_info (GTK_CLIST (clist),
-                                        bevent->x,
-                                        bevent->y,
-                                        &row,
-                                        &column);
+	     res = gtk_clist_get_selection_info(GTK_CLIST(clist),
+						bevent->x,
+						bevent->y, &row, &column);
 
-    if ((bevent->button != 1) || (column != 0))
-        return;
+	    if ((bevent->button != 1) || (column != 0))
+		 return;
 
-    type = gtk_clist_get_cell_type (GTK_CLIST (clist),
-                                    row,
-                                    column);
+	     type = gtk_clist_get_cell_type(GTK_CLIST(clist), row, column);
 
-    if (type == GTK_CELL_PIXMAP)
-    {
-        gtk_clist_set_text (GTK_CLIST (clist),
-                            row,
-                            column,
-                            NULL);
+	    if (type == GTK_CELL_PIXMAP) {
+		gtk_clist_set_text(GTK_CLIST(clist), row, column, NULL);
+		gtk_clist_select_row(GTK_CLIST(clist), row, -1);
+	    } else {
+		/* now for the pixmap from gdk */
+		im = gdk_imlib_create_image_from_xpm_data(enabled_xpm);
+		gdk_imlib_render(im, im->rgb_width, im->rgb_height);
+		pixmap = gdk_imlib_copy_image(im);
+		mask = gdk_imlib_copy_mask(im);
+		gdk_imlib_destroy_image(im);
 
-        gtk_clist_select_row (GTK_CLIST (clist), row, -1);
-    }
-    else
-    {
-        /* now for the pixmap from gdk */
-        im = gdk_imlib_create_image_from_xpm_data (enabled_xpm);
-        gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-        pixmap = gdk_imlib_copy_image (im);
-        mask = gdk_imlib_copy_mask (im);
-        gdk_imlib_destroy_image (im);
+		gtk_clist_set_pixmap(GTK_CLIST(clist), row, 0, pixmap,
+				     mask);
 
-        gtk_clist_set_pixmap (GTK_CLIST (clist),
-                              row,
-                              0,
-                              pixmap,
-                              mask);
+		gtk_clist_select_row(GTK_CLIST(clist), row, -1);
 
-        gtk_clist_select_row (GTK_CLIST (clist), row, -1);
+		gdk_pixmap_unref(pixmap);
+		gdk_bitmap_unref(mask);
+	    }
 
-        gdk_pixmap_unref (pixmap);
-        gdk_bitmap_unref (mask);
-    }
-
-    gtk_signal_emit_stop_by_name (GTK_OBJECT (clist),
-                                  "button_press_event");
+	    gtk_signal_emit_stop_by_name(GTK_OBJECT(clist),
+					 "button_press_event");
 
 
-} /* end clist_button_event_press() */
+	}			/* end clist_button_event_press() */
 
 
 /*
@@ -477,51 +405,46 @@ clist_button_event_press (GtkWidget * clist,
  * Builds a new filter from the data provided, and sticks it where
  * the selection is in the clist
  */
-void fe_apply_pressed(GtkWidget *widget,
-                      gpointer data)
-{
-    filter *fil;
-    gchar *temp;
+	void fe_apply_pressed(GtkWidget * widget, gpointer data) {
+	    filter *fil;
+	    gchar *temp;
 
-    /* quick check before we malloc */
-    temp = gtk_entry_get_text(GTK_ENTRY(fe_name_entry));
-    if ((!temp) || (temp[0] == '\0') || (!unique_filter_name(data, temp)))
-    {
-        /* error_popup("Invalid filter name"); */
-        return;
-    }
+	    /* quick check before we malloc */
+	     temp = gtk_entry_get_text(GTK_ENTRY(fe_name_entry));
+	    if ((!temp) || (temp[0] == '\0')
+		|| (!unique_filter_name(data, temp)))
+		/* error_popup("Invalid filter name"); */
+		 return;
 
-    fil = filter_new();
-    fil->name = g_strdup(temp);
-    if (GTK_TOGGLE_BUTTON(fe_popup_button)->active)
-    {
-        static gchar defstring[19] = "Filter has matched";
-        gchar *tmpstr;
+	     fil = filter_new();
+	     fil->name = g_strdup(temp);
+	    if (GTK_TOGGLE_BUTTON(fe_popup_button)->active) {
+		static gchar defstring[19] = "Filter has matched";
+		gchar *tmpstr;
 
-        FILTER_SETFLAG(fil, FILTER_POPUP);
-        tmpstr = gtk_entry_get_text(GTK_ENTRY(fe_popup_entry));
-        
-        strncpy(fil->popup_text,
-                ((!tmpstr) || (tmpstr[0] == '\0')) ? defstring : tmpstr,
-                256);
-    }
+		 FILTER_SETFLAG(fil, FILTER_POPUP);
+		 tmpstr = gtk_entry_get_text(GTK_ENTRY(fe_popup_entry));
+
+		 strncpy(fil->popup_text,
+			 ((!tmpstr)
+			  || (tmpstr[0] == '\0')) ? defstring : tmpstr,
+			 256);
+	    }
 #ifdef HAVE_LIBESD
-    if (GTK_TOGGLE_BUTTON(fe_sound_button)->active)
-    {
-        gchar *tmpstr;
+	    if (GTK_TOGGLE_BUTTON(fe_sound_button)->active) {
+		gchar *tmpstr;
 
-        FILTER_SETFLAG(fil, FILTER_SOUND);
-        tmpstr = gtk_entry_get_text(GTK_ENTRY(fe_sound_entry));
-        if ((!tmpstr) || (tmpstr[0] == '\0'))
-        {
-            filter_free(fil, NULL);
-            /* error_dialog("You must provide a sound to play") */
-            return;
-        }
-        strncpy(fil->popup_entry, tmpstr, PATH_MAX);
-    }
+		FILTER_SETFLAG(fil, FILTER_SOUND);
+		tmpstr = gtk_entry_get_text(GTK_ENTRY(fe_sound_entry));
+		if ((!tmpstr) || (tmpstr[0] == '\0')) {
+		    filter_free(fil, NULL);
+		    /* error_dialog("You must provide a sound to play") */
+		    return;
+		}
+		strncpy(fil->popup_entry, tmpstr, PATH_MAX);
+	    }
 #endif
-} /* end fe_apply_pressed */
+	}			/* end fe_apply_pressed */
 
 
 /*
@@ -531,17 +454,17 @@ void fe_apply_pressed(GtkWidget *widget,
  * It really just select()s the row, letting the callback handle
  * things
  */
-void fe_revert_pressed(GtkWidget *widget,
-                       gpointer data)
-{
-    GtkWidget *clist;
+	void fe_revert_pressed(GtkWidget * widget, gpointer data) {
+	    GtkWidget *clist;
 
-    g_return_if_fail(data != NULL);
-    g_return_if_fail(GTK_IS_CLIST(data));
-    clist = GTK_WIDGET(data);
+	     g_return_if_fail(data != NULL);
+	     g_return_if_fail(GTK_IS_CLIST(data));
+	     clist = GTK_WIDGET(data);
 
-    gtk_clist_select_row(GTK_CLIST(clist),
-                         GPOINTER_TO_INT(
-                             ((GList *)(GTK_CLIST(clist)->selection))->data),
-                         -1);
-} /* end fe_revert_pressed() */
+	     gtk_clist_select_row(GTK_CLIST(clist),
+				  GPOINTER_TO_INT(
+						  ((GList
+						    *) (GTK_CLIST(clist)->
+							selection))->data),
+				  -1);
+	}			/* end fe_revert_pressed() */

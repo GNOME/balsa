@@ -1,5 +1,7 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
+
 #ifndef __BALSA_APP_H__
 #define __BALSA_APP_H__
 
@@ -84,39 +87,37 @@
 #define DEFAULT_CHECK_QUOTED FALSE
 
 
-enum
-{
-  WHILERETR,
-  UNTILCLOSED,
-  NEVER
+enum {
+    WHILERETR,
+    UNTILCLOSED,
+    NEVER
 };
 
 
 typedef struct stPrinting Printing_t;
-struct stPrinting{
-    gboolean  breakline;
-    gint  linesize;
+struct stPrinting {
+    gboolean breakline;
+    gint linesize;
     gchar *PrintCommand;
 };
 
 
 typedef enum _ShownHeaders ShownHeaders;
 enum _ShownHeaders {
-   HEADERS_NONE = 0,
-   HEADERS_SELECTED,
-   HEADERS_ALL 
+    HEADERS_NONE = 0,
+    HEADERS_SELECTED,
+    HEADERS_ALL
 };
 
 
 /* The different pspell modules available to the program. */
 #define NUM_PSPELL_MODULES 2
 typedef enum _SpellCheckModule SpellCheckModule;
-enum _SpellCheckModule
-{
-        SPELL_CHECK_MODULE_ISPELL,
-        SPELL_CHECK_MODULE_ASPELL
+enum _SpellCheckModule {
+    SPELL_CHECK_MODULE_ISPELL,
+    SPELL_CHECK_MODULE_ASPELL
 };
-const gchar** spell_check_modules_name;
+const gchar **spell_check_modules_name;
 
 
 /* The suggestion modes available to pspell.  If this is changed,
@@ -125,169 +126,167 @@ const gchar** spell_check_modules_name;
  * */
 #define NUM_SUGGEST_MODES 3
 typedef enum _SpellCheckSuggestMode SpellCheckSuggestMode;
-enum _SpellCheckSuggestMode
-{
-        SPELL_CHECK_SUGGEST_FAST,
-        SPELL_CHECK_SUGGEST_NORMAL,
-        SPELL_CHECK_SUGGEST_BAD_SPELLERS
+enum _SpellCheckSuggestMode {
+    SPELL_CHECK_SUGGEST_FAST,
+    SPELL_CHECK_SUGGEST_NORMAL,
+    SPELL_CHECK_SUGGEST_BAD_SPELLERS
 };
-const gchar** spell_check_suggest_mode_name;
+const gchar **spell_check_suggest_mode_name;
 
 
 /* global balsa application structure */
-extern struct BalsaApplication
-{
-  /* personal information */
-  LibBalsaAddress *address;
-  gchar *replyto;
-  gchar *domain;
-  gchar *bcc;
-  
-  gchar *local_mail_directory;
-  gchar *smtp_server;
+extern struct BalsaApplication {
+    /* personal information */
+    LibBalsaAddress *address;
+    gchar *replyto;
+    gchar *domain;
+    gchar *bcc;
 
-  /* signature stuff */
-  gboolean sig_sending;
-  gboolean sig_whenforward;
-  gboolean sig_whenreply;
-  gboolean sig_separator;
-  gchar *signature_path;
+    gchar *local_mail_directory;
+    gchar *smtp_server;
 
-  BalsaWindow* main_window;
-  BalsaMBList *mblist;
-  
-  LibBalsaMailbox *inbox;
-  GList *inbox_input;		/* mailboxes such as POP3, etc that will be appending into inbox */
-  LibBalsaMailbox *sentbox;
-  LibBalsaMailbox *draftbox;
-  LibBalsaMailbox *outbox;
-  LibBalsaMailbox *trash;
-  
-  GNode *mailbox_nodes;
-  
-  /* timer for mm_exists callback */
-  gint new_messages_timer;
-  gint new_messages;
-  
-  /* timer for checking mail every xx minutes */
-  gboolean check_mail_auto;
-  gint check_mail_timer;
-  gint check_mail_timer_id;
-  
-  /* GUI settings */
-  gint mw_width;
-  gint mw_height;
-  gint mblist_width;
+    /* signature stuff */
+    gboolean sig_sending;
+    gboolean sig_whenforward;
+    gboolean sig_whenreply;
+    gboolean sig_separator;
+    gchar *signature_path;
 
-  /* file paths */
-  gchar * attach_dir;
-  
-  /* Column width settings */
-  gint index_num_width;
-  gint index_status_width;
-  gint index_attachment_width;
-  gint index_from_width;
-  gint index_subject_width;
-  gint index_date_width;
-  
+    BalsaWindow *main_window;
+    BalsaMBList *mblist;
+
+    LibBalsaMailbox *inbox;
+    GList *inbox_input;		/* mailboxes such as POP3, etc that will be appending into inbox */
+    LibBalsaMailbox *sentbox;
+    LibBalsaMailbox *draftbox;
+    LibBalsaMailbox *outbox;
+    LibBalsaMailbox *trash;
+
+    GNode *mailbox_nodes;
+
+    /* timer for mm_exists callback */
+    gint new_messages_timer;
+    gint new_messages;
+
+    /* timer for checking mail every xx minutes */
+    gboolean check_mail_auto;
+    gint check_mail_timer;
+    gint check_mail_timer_id;
+
+    /* GUI settings */
+    gint mw_width;
+    gint mw_height;
+    gint mblist_width;
+
+    /* file paths */
+    gchar *attach_dir;
+
+    /* Column width settings */
+    gint index_num_width;
+    gint index_status_width;
+    gint index_attachment_width;
+    gint index_from_width;
+    gint index_subject_width;
+    gint index_date_width;
+
 /*gint mblist_height; PKGW: unused */
-  gint notebook_height; /* PKGW: used :-) */
+    gint notebook_height;	/* PKGW: used :-) */
 
-/* Column width settings for mailbox list window, not fully implemented yet */
-  gint mblist_name_width;
-  gboolean mblist_show_mb_content_info;
-  gint mblist_newmsg_width;
-  gint mblist_totalmsg_width;
+    /* Column width settings for mailbox list window, not fully implemented yet */
+    gint mblist_name_width;
+    gboolean mblist_show_mb_content_info;
+    gint mblist_newmsg_width;
+    gint mblist_totalmsg_width;
 
 
-  /* Colour of mailboxes with unread messages in mailbox list */
-        GdkVisual* visual;
-        GdkColormap* colormap;
-  GdkColor mblist_unread_color;
+    /* Colour of mailboxes with unread messages in mailbox list */
+    GdkVisual *visual;
+    GdkColormap *colormap;
+    GdkColor mblist_unread_color;
 
-  /* Colour of quoted text. */
-        gchar* quote_regex;
-  GdkColor quoted_color[MAX_QUOTED_COLOR];
-  
-  GtkToolbarStyle toolbar_style;
-  GnomeMDIMode mdi_style;
-  gint pwindow_option;
-  gboolean wordwrap;
-  gint wraplength;
-  gboolean browse_wrap;
-  ShownHeaders shown_headers;
-  gchar * selected_headers;
-  gboolean show_mblist;
-  gboolean show_notebook_tabs;
+    /* Colour of quoted text. */
+    gchar *quote_regex;
+    GdkColor quoted_color[MAX_QUOTED_COLOR];
 
-  gboolean empty_trash_on_exit;
-  gboolean previewpane;
-  gboolean debug;
-  gboolean smtp;
-  
-  /* arp --- string to prefix "replied to" messages. */
-  gchar *quote_str;
+    GtkToolbarStyle toolbar_style;
+    GnomeMDIMode mdi_style;
+    gint pwindow_option;
+    gboolean wordwrap;
+    gint wraplength;
+    gboolean browse_wrap;
+    ShownHeaders shown_headers;
+    gchar *selected_headers;
+    gboolean show_mblist;
+    gboolean show_notebook_tabs;
 
-  /* command line options */
+    gboolean empty_trash_on_exit;
+    gboolean previewpane;
+    gboolean debug;
+    gboolean smtp;
 
-  gint check_mail_upon_startup;
-  gint remember_open_mboxes;
-  gint open_unread_mailbox;
-  GList *open_mailbox_list; /* data is a pointer to the mailbox */     
-  gchar* compose_email;
+    /* arp --- string to prefix "replied to" messages. */
+    gchar *quote_str;
 
-  /* font used to display messages */
-  gchar *message_font;
+    /* command line options */
 
-  /* encoding stuff */
-  gint encoding_style;
-  gchar *charset;
-  gchar *date_string;
+    gint check_mail_upon_startup;
+    gint remember_open_mboxes;
+    gint open_unread_mailbox;
+    GList *open_mailbox_list;	/* data is a pointer to the mailbox */
+    gchar *compose_email;
+
+    /* font used to display messages */
+    gchar *message_font;
+
+    /* encoding stuff */
+    gint encoding_style;
+    gchar *charset;
+    gchar *date_string;
 
     //gint checkbox;
 
-  /* printing */
-  Printing_t PrintCommand;
+    /* printing */
+    Printing_t PrintCommand;
 
-  /* compose: shown headers */
-  gchar* compose_headers; 
+    /* compose: shown headers */
+    gchar *compose_headers;
 
-  /* appbar */
-  GnomeAppBar* appbar;
-  GtkWidget* notebook;
+    /* appbar */
+    GnomeAppBar *appbar;
+    GtkWidget *notebook;
 
-  /* address book */
-  GList *address_book_list;
-  LibBalsaAddressBook *default_address_book;
-	
-  gboolean ab_dist_list_mode;
+    /* address book */
+    GList *address_book_list;
+    LibBalsaAddressBook *default_address_book;
 
-  /* spell checking */
-  SpellCheckModule module;
-  SpellCheckSuggestMode suggestion_mode;
-  guint ignore_size;
-  gboolean check_sig;
-  gboolean check_quoted;
+    gboolean ab_dist_list_mode;
 
-  /* Information messages */
-  BalsaInformationShow information_message;
-  BalsaInformationShow warning_message;
-  BalsaInformationShow error_message;
-  BalsaInformationShow debug_message;
+    /* spell checking */
+    SpellCheckModule module;
+    SpellCheckSuggestMode suggestion_mode;
+    guint ignore_size;
+    gboolean check_sig;
+    gboolean check_quoted;
 
-  /* Tooltips */
-  GtkTooltips* tooltips;
-}
-balsa_app;
+    /* Information messages */
+    BalsaInformationShow information_message;
+    BalsaInformationShow warning_message;
+    BalsaInformationShow error_message;
+    BalsaInformationShow debug_message;
+
+    /* Tooltips */
+    GtkTooltips *tooltips;
+} balsa_app;
 
 
-void balsa_app_init (void);
-gboolean do_load_mailboxes (void);
-void update_timer( gboolean update, guint minutes );
+void balsa_app_init(void);
+gboolean do_load_mailboxes(void);
+void update_timer(gboolean update, guint minutes);
 
-gchar* ask_password(LibBalsaServer* server, LibBalsaMailbox *mbox);
-GtkWidget* gnome_stock_button_with_label (const char* icon, const char* label);
-LibBalsaMailbox *balsa_find_mbox_by_name (const gchar *name);
-gboolean open_mailboxes_idle_cb(gchar* names[]);
+gchar *ask_password(LibBalsaServer * server, LibBalsaMailbox * mbox);
+GtkWidget *gnome_stock_button_with_label(const char *icon,
+					 const char *label);
+LibBalsaMailbox *balsa_find_mbox_by_name(const gchar * name);
+gboolean open_mailboxes_idle_cb(gchar * names[]);
 
-#endif /* __BALSA_APP_H__ */
+#endif				/* __BALSA_APP_H__ */

@@ -1,5 +1,7 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1998 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
+
 #ifndef __BALSA_MBLIST_H__
 #define __BALSA_MBLIST_H__
 
@@ -27,38 +30,40 @@
 typedef struct _BalsaMBList BalsaMBList;
 typedef struct _BalsaMBListClass BalsaMBListClass;
 
-struct _BalsaMBList
-  {
-          GtkCTree ctree;
+struct _BalsaMBList {
+    GtkCTree ctree;
 
-          /* list of mailbox watched */
-          GList *watched_mailbox; 
-          /* store the style of unread mailboxes */
-          GtkStyle *unread_mailbox_style; 
-          /* shall the number of messages be displayed ? */
-          gboolean display_content_info; 
+    /* list of mailbox watched */
+    GList *watched_mailbox;
+    /* store the style of unread mailboxes */
+    GtkStyle *unread_mailbox_style;
+    /* shall the number of messages be displayed ? */
+    gboolean display_content_info;
 
 #ifdef BALSA_USE_THREADS
-          /* list of mailboxes for the updating thread */
-          GList* update_list;
+    /* list of mailboxes for the updating thread */
+    GList *update_list;
 #endif
-  };
+};
 
-struct _BalsaMBListClass
-  {
+struct _BalsaMBListClass {
     GtkCTreeClass parent_class;
 
     void (*select_mailbox) (BalsaMBList * bmblist,
-			    LibBalsaMailbox * mailbox,
-			    gint row,
+			    LibBalsaMailbox * mailbox, gint row,
 			    GdkEventButton *);
-  };
+};
 
-GtkWidget *balsa_mblist_new (void);
-void balsa_mblist_redraw (BalsaMBList * bmbl);
-guint balsa_mblist_get_type (void);
-void balsa_mblist_have_new (BalsaMBList * bmbl);
-void balsa_mblist_update_mailbox (BalsaMBList * mblist, LibBalsaMailbox * mailbox);
-gboolean balsa_mblist_focus_mailbox (BalsaMBList* bmbl, LibBalsaMailbox* mailbox);
+GtkType balsa_mblist_get_type(void);
+
+GtkWidget *balsa_mblist_new(void);
+
+void balsa_mblist_redraw(BalsaMBList * bmbl);
+
+void balsa_mblist_have_new(BalsaMBList * bmbl);
+void balsa_mblist_update_mailbox(BalsaMBList * mblist,
+				 LibBalsaMailbox * mailbox);
+gboolean balsa_mblist_focus_mailbox(BalsaMBList * bmbl,
+				    LibBalsaMailbox * mailbox);
 
 #endif

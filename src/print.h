@@ -1,5 +1,7 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,19 +18,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
+
 #ifndef __PRINT_H__
 #define __PRINT_H__
 
 #ifdef __cplusplus
 extern "C" {
-#endif /* __cplusplus */
+#endif				/* __cplusplus */
 
-extern void message_print_cb(GtkWidget *widget, gpointer cbdata);
-extern void message_print(LibBalsaMessage *msg);
+    void message_print_cb(GtkWidget * widget, gpointer cbdata);
+    void message_print(LibBalsaMessage * msg);
 
 #ifdef __cplusplus
 }
-#endif /* __cplusplus */
-
-#endif /* __PRINT_H__ */
-
+#endif				/* __cplusplus */
+#endif				/* __PRINT_H__ */

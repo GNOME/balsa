@@ -1,6 +1,7 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,19 +55,19 @@
 #include "threads.h"
 
 /* Globals for Thread creation, messaging, pipe I/O */
-pthread_t			get_mail_thread;
-pthread_t                       send_mail;
-pthread_mutex_t			mailbox_lock;
-pthread_mutex_t                 send_messages_lock;
-pthread_mutex_t                 appbar_lock;
-int				checking_mail;
-int                             sending_mail;
-int				mail_thread_pipes[2];
-int                             send_thread_pipes[2];
-GIOChannel 		*mail_thread_msg_send;
-GIOChannel 		*mail_thread_msg_receive;
-GIOChannel              *send_thread_msg_send;
-GIOChannel              *send_thread_msg_receive;
+pthread_t get_mail_thread;
+pthread_t send_mail;
+pthread_mutex_t mailbox_lock;
+pthread_mutex_t send_messages_lock;
+pthread_mutex_t appbar_lock;
+int checking_mail;
+int sending_mail;
+int mail_thread_pipes[2];
+int send_thread_pipes[2];
+GIOChannel *mail_thread_msg_send;
+GIOChannel *mail_thread_msg_receive;
+GIOChannel *send_thread_msg_send;
+GIOChannel *send_thread_msg_receive;
 
 /* Thread for updating mblist */
 pthread_t mblist_thread;
@@ -76,34 +77,41 @@ int updating_mblist;
 /* Semaphore to prevent dual use of appbar progressbar */
 int updating_progressbar;
 
-static void threads_init( gboolean init );
-#endif /* BALSA_USE_THREADS */
+static void threads_init(gboolean init);
+#endif				/* BALSA_USE_THREADS */
 
-static void balsa_init (int argc, char **argv);
-static void config_init (void);
-static void mailboxes_init (void);
-static void empty_trash (void);
-static gint balsa_kill_session (GnomeClient* client, gpointer client_data);
-static gint balsa_save_session (GnomeClient* client, gint phase, 
-                                GnomeSaveStyle save_style, gint is_shutdown, 
-                                GnomeInteractStyle interact_style, 
-                                gint is_fast, gpointer client_data);
-static gchar* cmd_line_open_mailboxes;
+static void balsa_init(int argc, char **argv);
+static void config_init(void);
+static void mailboxes_init(void);
+static void empty_trash(void);
+static gint balsa_kill_session(GnomeClient * client, gpointer client_data);
+static gint balsa_save_session(GnomeClient * client, gint phase,
+			       GnomeSaveStyle save_style, gint is_shutdown,
+			       GnomeInteractStyle interact_style,
+			       gint is_fast, gpointer client_data);
+static gchar *cmd_line_open_mailboxes;
 
 static void
-balsa_init (int argc, char **argv)
+balsa_init(int argc, char **argv)
 {
-  static struct poptOption options[] = {
-         {"checkmail", 'c', POPT_ARG_NONE, &(balsa_app.check_mail_upon_startup), 0, N_("Get new mail on startup"), NULL},
-         {"compose", 'm', POPT_ARG_STRING, &(balsa_app.compose_email), 
-	  0, N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
-         {"open-mailbox", 'o', POPT_ARG_STRING, &(cmd_line_open_mailboxes), 
-	  0, N_("Opens MAILBOXNAME"),N_("MAILBOXNAME")},
-         {"open-unread-mailbox", 'u', POPT_ARG_NONE, &(balsa_app.open_unread_mailbox), 0, N_("Opens first unread mailbox"), NULL},
-         {NULL, '\0', 0, NULL, 0} /* end the list */
-  };
+    static struct poptOption options[] = {
+	
+	    {"checkmail", 'c', POPT_ARG_NONE,
+	 &(balsa_app.check_mail_upon_startup), 0,
+	     N_("Get new mail on startup"), NULL},
+	{"compose", 'm', POPT_ARG_STRING, &(balsa_app.compose_email),
+	 0, N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
+	{"open-mailbox", 'o', POPT_ARG_STRING, &(cmd_line_open_mailboxes),
+	 0, N_("Opens MAILBOXNAME"), N_("MAILBOXNAME")},
+	
+	    {"open-unread-mailbox", 'u', POPT_ARG_NONE,
+	 &(balsa_app.open_unread_mailbox), 0,
+	     N_("Opens first unread mailbox"), NULL},
+	{NULL, '\0', 0, NULL, 0}	/* end the list */
+    };
 
-  gnome_init_with_popt_table (PACKAGE, VERSION, argc, argv, options, 0, NULL);
+    gnome_init_with_popt_table(PACKAGE, VERSION, argc, argv, options, 0,
+			       NULL);
 }
 
 /* check_special_mailboxes: 
@@ -111,238 +119,243 @@ balsa_init (int argc, char **argv)
    initialized yet.  
 */
 static gboolean
-check_special_mailboxes (void)
+check_special_mailboxes(void)
 {
-  gboolean bomb = FALSE;
+    gboolean bomb = FALSE;
 
-  if( balsa_app.inbox == NULL ) {
-    g_warning ( _("Balsa cannot open your \"%s\" mailbox."),  _("Inbox") );
-    bomb = TRUE;
-  }
-  
-  if( balsa_app.outbox == NULL ) {
-    g_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Outbox") );
-    bomb = TRUE;
-  } 
-  
-  if( balsa_app.sentbox == NULL ) {
-    g_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Sentbox") );
-    bomb = TRUE;
-  }
-  
-  if( balsa_app.draftbox == NULL ) {
-    g_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Draftbox") );
-    bomb = TRUE;
-  }
-  
-  if( balsa_app.trash == NULL ) {
-    g_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Trash") );
-    bomb = TRUE;
-  }
-  
-  return bomb;
+    if (balsa_app.inbox == NULL) {
+	g_warning(_("Balsa cannot open your \"%s\" mailbox."), _("Inbox"));
+	bomb = TRUE;
+    }
+
+    if (balsa_app.outbox == NULL) {
+	g_warning(_("Balsa cannot open your \"%s\" mailbox."),
+		  _("Outbox"));
+	bomb = TRUE;
+    }
+
+    if (balsa_app.sentbox == NULL) {
+	g_warning(_("Balsa cannot open your \"%s\" mailbox."),
+		  _("Sentbox"));
+	bomb = TRUE;
+    }
+
+    if (balsa_app.draftbox == NULL) {
+	g_warning(_("Balsa cannot open your \"%s\" mailbox."),
+		  _("Draftbox"));
+	bomb = TRUE;
+    }
+
+    if (balsa_app.trash == NULL) {
+	g_warning(_("Balsa cannot open your \"%s\" mailbox."), _("Trash"));
+	bomb = TRUE;
+    }
+
+    return bomb;
 }
 
 static void
-config_init (void)
+config_init(void)
 {
-  config_load ();
-  if (check_special_mailboxes())  {
-      g_warning("*** Could not load basic mailboxes!\n");
-      balsa_init_begin ();
-      /*return;*/
+    config_load();
+    if (check_special_mailboxes()) {
+	g_warning("*** Could not load basic mailboxes!\n");
+	balsa_init_begin();
+	/*return; */
     }
 }
 
 static void
-mailboxes_init (void)
+mailboxes_init(void)
 {
-  if ( !do_load_mailboxes () )
-    {
-      g_warning("*** error loading mailboxes\n");
-      balsa_init_begin ();
-      return;
+    if (!do_load_mailboxes()) {
+	g_warning("*** error loading mailboxes\n");
+	balsa_init_begin();
+	return;
     }
 }
 
 
 #ifdef BALSA_USE_THREADS
 void
-threads_init( gboolean init )
+threads_init(gboolean init)
 {
-  if( init )
-  {
-    g_thread_init( NULL );
-    pthread_mutex_init( &mailbox_lock, NULL );
-    pthread_mutex_init( &send_messages_lock, NULL );
-    pthread_mutex_init (&appbar_lock, NULL);
-    checking_mail = 0;
-    updating_mblist = 0;
-    sending_mail = 0;
-    updating_progressbar = 0;
-	if( pipe( mail_thread_pipes) < 0 )
-	{
-	   g_log ("BALSA Init", G_LOG_LEVEL_DEBUG, "Error opening pipes.\n" );
+    if (init) {
+	g_thread_init(NULL);
+	pthread_mutex_init(&mailbox_lock, NULL);
+	pthread_mutex_init(&send_messages_lock, NULL);
+	pthread_mutex_init(&appbar_lock, NULL);
+	checking_mail = 0;
+	updating_mblist = 0;
+	sending_mail = 0;
+	updating_progressbar = 0;
+	if (pipe(mail_thread_pipes) < 0) {
+	    g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
+		  "Error opening pipes.\n");
 	}
-	mail_thread_msg_send = g_io_channel_unix_new ( mail_thread_pipes[1] );
-	mail_thread_msg_receive = g_io_channel_unix_new ( mail_thread_pipes[0] );
-	g_io_add_watch ( mail_thread_msg_receive, G_IO_IN,
-					(GIOFunc) mail_progress_notify_cb,
-					NULL );
+	mail_thread_msg_send = g_io_channel_unix_new(mail_thread_pipes[1]);
+	mail_thread_msg_receive =
+	    g_io_channel_unix_new(mail_thread_pipes[0]);
+	g_io_add_watch(mail_thread_msg_receive, G_IO_IN,
+		       (GIOFunc) mail_progress_notify_cb, NULL);
 
-	if( pipe( send_thread_pipes) < 0 )
-	{
-	   g_log ("BALSA Init", G_LOG_LEVEL_DEBUG, "Error opening pipes.\n" );
+	if (pipe(send_thread_pipes) < 0) {
+	    g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
+		  "Error opening pipes.\n");
 	}
-	send_thread_msg_send = g_io_channel_unix_new ( send_thread_pipes[1] );
-	send_thread_msg_receive = g_io_channel_unix_new ( send_thread_pipes[0] );
-	g_io_add_watch ( send_thread_msg_receive, G_IO_IN,
-					(GIOFunc) send_progress_notify_cb,
-					NULL );
-  }
-  else
-  {
-    pthread_mutex_destroy( &mailbox_lock );
-    pthread_mutex_destroy( &send_messages_lock );
-    pthread_mutex_destroy (&appbar_lock);
-  }
+	send_thread_msg_send = g_io_channel_unix_new(send_thread_pipes[1]);
+	send_thread_msg_receive =
+	    g_io_channel_unix_new(send_thread_pipes[0]);
+	g_io_add_watch(send_thread_msg_receive, G_IO_IN,
+		       (GIOFunc) send_progress_notify_cb, NULL);
+    } else {
+	pthread_mutex_destroy(&mailbox_lock);
+	pthread_mutex_destroy(&send_messages_lock);
+	pthread_mutex_destroy(&appbar_lock);
+    }
 }
-#endif /* BALSA_USE_THREADS */
+#endif				/* BALSA_USE_THREADS */
 
 /* initial_open_mailboxes:
    open mailboxes on startup if requested so.
    This is an idle handler. Be sure to use gdk_threads_{enter/leave}
  */
 static gboolean
-initial_open_unread_mailboxes() {
-  GList * i, *gl = mblist_find_all_unread_mboxes();
-  
-  if(!gl) return FALSE;
-  
-  for( i=g_list_first(gl); i; i=g_list_next(i) ) {
-    printf("opening %s..\n", (LIBBALSA_MAILBOX(i->data))->name);
-    mblist_open_mailbox( LIBBALSA_MAILBOX (i->data) );
-  }
-  g_list_free(gl);
-  
-  return FALSE;
+initial_open_unread_mailboxes()
+{
+    GList *i, *gl = mblist_find_all_unread_mboxes();
+
+    if (!gl)
+	return FALSE;
+
+    for (i = g_list_first(gl); i; i = g_list_next(i)) {
+	printf("opening %s..\n", (LIBBALSA_MAILBOX(i->data))->name);
+	mblist_open_mailbox(LIBBALSA_MAILBOX(i->data));
+    }
+    g_list_free(gl);
+
+    return FALSE;
 }
 
 int
-main (int argc, char *argv[])
+main(int argc, char *argv[])
 {
-  GtkWidget *window;
-  GnomeClient* client;
-  gchar *default_icon;
+    GtkWidget *window;
+    GnomeClient *client;
+    gchar *default_icon;
 #ifdef GTKHTML_HAVE_GCONF
-  GConfError *gconf_error;
+    GConfError *gconf_error;
 #endif
 
-  /* Initialize the i18n stuff */
-  bindtextdomain (PACKAGE, GNOMELOCALEDIR);
-  textdomain (PACKAGE); 
+    /* Initialize the i18n stuff */
+    bindtextdomain(PACKAGE, GNOMELOCALEDIR);
+    textdomain(PACKAGE);
 
 #ifdef BALSA_USE_THREADS
-  /* initiate thread mutexs, variables */
-  threads_init( TRUE );
-#endif  
-
-  balsa_init (argc, argv);
-
-#ifdef GTKHTML_HAVE_GCONF
-  if (!gconf_init(argc, argv, &gconf_error))
-    gconf_error_destroy(gconf_error);
-  gconf_error = NULL;
+    /* initiate thread mutexs, variables */
+    threads_init(TRUE);
 #endif
 
-  balsa_app_init ();
+    balsa_init(argc, argv);
 
-  /* Initialize libbalsa */
-  libbalsa_init((LibBalsaInformationFunc)balsa_information);
+#ifdef GTKHTML_HAVE_GCONF
+    if (!gconf_init(argc, argv, &gconf_error))
+	gconf_error_destroy(gconf_error);
+    gconf_error = NULL;
+#endif
+
+    balsa_app_init();
+
+    /* Initialize libbalsa */
+    libbalsa_init((LibBalsaInformationFunc) balsa_information);
 
 #ifdef USE_PIXBUF
-  gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
-  gtk_widget_set_default_visual(gdk_rgb_get_visual());
+    gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
+    gtk_widget_set_default_visual(gdk_rgb_get_visual());
 #else
-  gtk_widget_set_default_colormap(gdk_imlib_get_colormap());
-  gtk_widget_set_default_visual(gdk_imlib_get_visual());
+    gtk_widget_set_default_colormap(gdk_imlib_get_colormap());
+    gtk_widget_set_default_visual(gdk_imlib_get_visual());
 #endif
-  
-  /* Allocate the best colormap we can get */
-  balsa_app.visual = gdk_visual_get_best ();
-  balsa_app.colormap = gdk_colormap_new (balsa_app.visual, TRUE);
 
-  /* checking for valid config files */
-  config_init ();
+    /* Allocate the best colormap we can get */
+    balsa_app.visual = gdk_visual_get_best();
+    balsa_app.colormap = gdk_colormap_new(balsa_app.visual, TRUE);
 
-  /* load mailboxes */
-  mailboxes_init ();
+    /* checking for valid config files */
+    config_init();
 
-  /* create all the pretty icons that balsa uses that
-   * arn't part of gnome-libs */
-  balsa_icons_init ();
+    /* load mailboxes */
+    mailboxes_init();
 
-  default_icon = balsa_pixmap_finder( "balsa/balsa_icon.png" );
+    /* create all the pretty icons that balsa uses that
+     * arn't part of gnome-libs */
+    balsa_icons_init();
+
+    default_icon = balsa_pixmap_finder("balsa/balsa_icon.png");
 #ifdef HAVE_LIBGNOMEUI_GNOME_WINDOW_ICON_H
-  gnome_window_icon_set_default_from_file ( default_icon );
+    gnome_window_icon_set_default_from_file(default_icon);
 #endif
-  g_free( default_icon );
+    g_free(default_icon);
 
-  gnome_triggers_do ("", "program", "balsa", "startup", NULL);
+    gnome_triggers_do("", "program", "balsa", "startup", NULL);
 
-  window = balsa_window_new();
-  balsa_app.main_window = BALSA_WINDOW (window);
+    window = balsa_window_new();
+    balsa_app.main_window = BALSA_WINDOW(window);
 
-  /* session management */
-  client = gnome_master_client ();
-  gtk_signal_connect (GTK_OBJECT (client), "save_yourself", GTK_SIGNAL_FUNC (balsa_save_session), argv[0]);
-  gtk_signal_connect (GTK_OBJECT (client), "die", GTK_SIGNAL_FUNC (balsa_kill_session), NULL);
+    /* session management */
+    client = gnome_master_client();
+    gtk_signal_connect(GTK_OBJECT(client), "save_yourself",
+		       GTK_SIGNAL_FUNC(balsa_save_session), argv[0]);
+    gtk_signal_connect(GTK_OBJECT(client), "die",
+		       GTK_SIGNAL_FUNC(balsa_kill_session), NULL);
 
-  gdk_rgb_init();
+    gdk_rgb_init();
 
-  if(balsa_app.compose_email)  {
-    BalsaSendmsg *snd;
-    snd=sendmsg_window_new(window,NULL,SEND_NORMAL);
-    if(strncmp(balsa_app.compose_email, "mailto:", 7) == 0) 
-      memmove(balsa_app.compose_email,balsa_app.compose_email+7,
-	      strlen(balsa_app.compose_email)-7+1); /* copy the NUL */
-    gtk_entry_set_text(GTK_ENTRY(snd->to[1]),balsa_app.compose_email);
-    gtk_widget_grab_focus(balsa_app.compose_email[0] 
-			  ? snd->subject[1] : snd->to[1]);
-  } else gtk_widget_show(window);
+    if (balsa_app.compose_email) {
+	BalsaSendmsg *snd;
+	snd = sendmsg_window_new(window, NULL, SEND_NORMAL);
+	if (strncmp(balsa_app.compose_email, "mailto:", 7) == 0)
+	    memmove(balsa_app.compose_email, balsa_app.compose_email + 7,
+		    strlen(balsa_app.compose_email) - 7 + 1);	/* copy the NUL */
+	gtk_entry_set_text(GTK_ENTRY(snd->to[1]), balsa_app.compose_email);
+	gtk_widget_grab_focus(balsa_app.compose_email[0]
+			      ? snd->subject[1] : snd->to[1]);
+    } else
+	gtk_widget_show(window);
 
-  
-  if (balsa_app.open_unread_mailbox)
-    gtk_idle_add((GtkFunction)initial_open_unread_mailboxes, NULL);
 
-  if (cmd_line_open_mailboxes) {
-    gchar** names= g_strsplit(cmd_line_open_mailboxes,";",20);
-    gtk_idle_add((GtkFunction)open_mailboxes_idle_cb, 
-		 names);
-  }
+    if (balsa_app.open_unread_mailbox)
+	gtk_idle_add((GtkFunction) initial_open_unread_mailboxes, NULL);
 
-  gdk_threads_enter();
-  gtk_main();
-  gdk_threads_leave();
-  
-  gdk_colormap_unref (balsa_app.colormap);
-  
+    if (cmd_line_open_mailboxes) {
+	gchar **names = g_strsplit(cmd_line_open_mailboxes, ";", 20);
+	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb, names);
+    }
+
+    gdk_threads_enter();
+    gtk_main();
+    gdk_threads_leave();
+
+    gdk_colormap_unref(balsa_app.colormap);
+
 #ifdef BALSA_USE_THREADS
-  threads_init( FALSE );
+    threads_init(FALSE);
 #endif
 
-  return 0;
+    return 0;
 }
 
 
 
 static void
-force_close_mailbox(LibBalsaMailbox *mailbox) {
-    if (!mailbox) return;
+force_close_mailbox(LibBalsaMailbox * mailbox)
+{
+    if (!mailbox)
+	return;
     if (balsa_app.debug)
-	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
+	g_print("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
     while (mailbox->open_ref > 0)
-      libbalsa_mailbox_close(mailbox);
+	libbalsa_mailbox_close(mailbox);
 }
 
 /* Word of comment: previous definition of this function used access()
@@ -351,50 +364,45 @@ speed gain is negligible or negative: the number of called system
 functions in present case is constant and equal to 1; the previous
 version called system function either once or twice per directory. */
 static gboolean
-close_all_mailboxes (GNode * node, gpointer data)
+close_all_mailboxes(GNode * node, gpointer data)
 {
     MailboxNode *mbnode = (MailboxNode *) node->data;
-    
-    if (mbnode)
-    {
-	if (mbnode->IsDir)
-	{
-	    gchar *tmpfile = g_strdup_printf ("%s/.expanded", mbnode->name);
+
+    if (mbnode) {
+	if (mbnode->IsDir) {
+	    gchar *tmpfile = g_strdup_printf("%s/.expanded", mbnode->name);
 	    if (mbnode->expanded)
-		creat (tmpfile, S_IRUSR | S_IWUSR);
+		creat(tmpfile, S_IRUSR | S_IWUSR);
 	    else
-		unlink (tmpfile);
-	    g_free (tmpfile);
+		unlink(tmpfile);
+	    g_free(tmpfile);
 	}
-	
+
 	force_close_mailbox(mbnode->mailbox);
     }
     return FALSE;
 }
 
 void
-balsa_exit (void)
+balsa_exit(void)
 {
-  g_node_traverse (balsa_app.mailbox_nodes,
-		   G_LEVEL_ORDER,
-		   G_TRAVERSE_ALL,
-		   10,
-		   close_all_mailboxes,
-		   NULL);
+    g_node_traverse(balsa_app.mailbox_nodes,
+		    G_LEVEL_ORDER,
+		    G_TRAVERSE_ALL, 10, close_all_mailboxes, NULL);
 
-  if (balsa_app.empty_trash_on_exit)
-	  empty_trash( );
+    if (balsa_app.empty_trash_on_exit)
+	empty_trash();
 
-  force_close_mailbox(balsa_app.inbox);
-  force_close_mailbox(balsa_app.outbox);
-  force_close_mailbox(balsa_app.sentbox);
-  force_close_mailbox(balsa_app.draftbox);
-  force_close_mailbox(balsa_app.trash);
+    force_close_mailbox(balsa_app.inbox);
+    force_close_mailbox(balsa_app.outbox);
+    force_close_mailbox(balsa_app.sentbox);
+    force_close_mailbox(balsa_app.draftbox);
+    force_close_mailbox(balsa_app.trash);
 
-  config_save();
+    config_save();
 
-  gnome_sound_shutdown ();
-  gtk_main_quit();
+    gnome_sound_shutdown();
+    gtk_main_quit();
 }
 
 /* balsa_window_destroy
@@ -403,85 +411,86 @@ balsa_exit (void)
    the notebook and so on.
 */
 static void
-empty_trash( void )
+empty_trash(void)
 {
-  BalsaIndexPage *page;
-  GList *message;
-  
-  libbalsa_mailbox_open (balsa_app.trash, FALSE);
-  
-  message = balsa_app.trash->message_list;
-  
-  while(message) {
-    libbalsa_message_delete(message->data);
-		message = message->next;
-  }
-  libbalsa_mailbox_commit_changes(balsa_app.trash);
-  
-  libbalsa_mailbox_close(balsa_app.trash);
-  
-  if ( balsa_app.notebook && 
-       (page=balsa_find_notebook_page(balsa_app.trash)))
-    balsa_index_page_reset( page );
+    BalsaIndexPage *page;
+    GList *message;
+
+    libbalsa_mailbox_open(balsa_app.trash, FALSE);
+
+    message = balsa_app.trash->message_list;
+
+    while (message) {
+	libbalsa_message_delete(message->data);
+	message = message->next;
+    }
+    libbalsa_mailbox_commit_changes(balsa_app.trash);
+
+    libbalsa_mailbox_close(balsa_app.trash);
+
+    if (balsa_app.notebook &&
+	(page = balsa_find_notebook_page(balsa_app.trash)))
+	    balsa_index_page_reset(page);
 }
 
 
 static gint
-balsa_kill_session (GnomeClient* client, gpointer client_data)
+balsa_kill_session(GnomeClient * client, gpointer client_data)
 {
-        balsa_exit ();
-        return TRUE;
+    balsa_exit();
+    return TRUE;
 }
-        
+
 
 static gint
-balsa_save_session (GnomeClient* client, gint phase, GnomeSaveStyle save_style,
-                    gint is_shutdown, GnomeInteractStyle interact_style, 
-                    gint is_fast, gpointer client_data)
+balsa_save_session(GnomeClient * client, gint phase,
+		   GnomeSaveStyle save_style, gint is_shutdown,
+		   GnomeInteractStyle interact_style, gint is_fast,
+		   gpointer client_data)
 {
-        gchar** argv;
-        guint argc;
-        
-        /* allocate 0-filled so it will be NULL terminated */
-        argv = g_malloc0 (sizeof (gchar*) * 7);
-        
-        argc = 1;
-        argv[0] = client_data;
-        
-        if (balsa_app.open_unread_mailbox) {
-                argv[argc] = g_strdup ("--open-unread-mailbox");
-                argc++;
-        }
-        
-        if (balsa_app.check_mail_upon_startup) {
-                argv[argc] = g_strdup ("--checkmail");
-                argc++;
-        }
+    gchar **argv;
+    guint argc;
 
-	/* FIXME: I don't think this is needed?
-	 * We already save the open mailboes in save-restore.c 
-	 * so we should just open them when loading prefs...
-	 */
+    /* allocate 0-filled so it will be NULL terminated */
+    argv = g_malloc0(sizeof(gchar *) * 7);
+
+    argc = 1;
+    argv[0] = client_data;
+
+    if (balsa_app.open_unread_mailbox) {
+	argv[argc] = g_strdup("--open-unread-mailbox");
+	argc++;
+    }
+
+    if (balsa_app.check_mail_upon_startup) {
+	argv[argc] = g_strdup("--checkmail");
+	argc++;
+    }
+
+    /* FIXME: I don't think this is needed?
+     * We already save the open mailboes in save-restore.c 
+     * so we should just open them when loading prefs...
+     */
 #if 0
-        if (balsa_app.open_mailbox) {
-                argv[argc] = g_strdup ("--open-mailbox");
-                argc++;
-                
-                argv[argc] = g_strconcat ("'", balsa_app.open_mailbox, "'", NULL);
-                argc++;
-        }
+    if (balsa_app.open_mailbox) {
+	argv[argc] = g_strdup("--open-mailbox");
+	argc++;
+
+	argv[argc] = g_strconcat("'", balsa_app.open_mailbox, "'", NULL);
+	argc++;
+    }
 #endif
 
-        if (balsa_app.compose_email) {
-                argv[argc] = g_strdup ("--compose");
-                argc++;
+    if (balsa_app.compose_email) {
+	argv[argc] = g_strdup("--compose");
+	argc++;
 
-                argv[argc] = g_strdup (balsa_app.compose_email);
-                argc++;
-        }
-                
-        gnome_client_set_clone_command (client, argc, argv);
-        gnome_client_set_restart_command (client, argc, argv);
+	argv[argc] = g_strdup(balsa_app.compose_email);
+	argc++;
+    }
 
-        return TRUE;
+    gnome_client_set_clone_command(client, argc, argv);
+    gnome_client_set_restart_command(client, argc, argv);
+
+    return TRUE;
 }

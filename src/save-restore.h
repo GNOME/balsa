@@ -1,21 +1,24 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1998 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
+
 #ifndef __SAVE_RESTORE_H__
 #define __SAVE_RESTORE_H__
 
@@ -40,21 +43,22 @@ typedef enum {
     SPECIAL_TRASH,
     SPECIAL_DRAFT,
     SPECIAL_OUTBOX
-}  specialType;
+} specialType;
 
-void config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which);
+void config_mailbox_set_as_special(LibBalsaMailbox * mailbox,
+				   specialType which);
 
-gint config_load (void);
-gint config_save (void);
+gint config_load(void);
+gint config_save(void);
 
-gchar* mailbox_get_pkey(const LibBalsaMailbox * mbox);
-gint config_mailbox_add (LibBalsaMailbox * mailbox, const char *key_arg);
-gint config_mailbox_delete (const LibBalsaMailbox *mailbox);
-gint config_mailbox_update (LibBalsaMailbox * mailbox);
+gchar *mailbox_get_pkey(const LibBalsaMailbox * mbox);
+gint config_mailbox_add(LibBalsaMailbox * mailbox, const char *key_arg);
+gint config_mailbox_delete(const LibBalsaMailbox * mailbox);
+gint config_mailbox_update(LibBalsaMailbox * mailbox);
 
-void config_address_book_save(LibBalsaAddressBook *ab);
-void config_address_book_delete(LibBalsaAddressBook *ab);
+void config_address_book_save(LibBalsaAddressBook * ab);
+void config_address_book_delete(LibBalsaAddressBook * ab);
 
-gint config_imapdir_add(ImapDir *dir);
+gint config_imapdir_add(ImapDir * dir);
 
-#endif /* __SAVE_RESTORE_H__ */
+#endif				/* __SAVE_RESTORE_H__ */

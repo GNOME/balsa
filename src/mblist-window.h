@@ -1,5 +1,7 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,16 +30,16 @@
 #include "main-window.h"
 
 
-void mblist_menu_add_cb (GtkWidget * widget, gpointer data);
-void mblist_menu_edit_cb (GtkWidget * widget, gpointer data);
-void mblist_menu_delete_cb (GtkWidget * widget, gpointer data);
-void mblist_menu_open_cb (GtkWidget * widget, gpointer data);
-void mblist_menu_close_cb (GtkWidget * widget, gpointer data);
+void mblist_menu_add_cb(GtkWidget * widget, gpointer data);
+void mblist_menu_edit_cb(GtkWidget * widget, gpointer data);
+void mblist_menu_delete_cb(GtkWidget * widget, gpointer data);
+void mblist_menu_open_cb(GtkWidget * widget, gpointer data);
+void mblist_menu_close_cb(GtkWidget * widget, gpointer data);
 
-GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window);
+GtkWidget *balsa_mailbox_list_window_new(BalsaWindow * window);
 
-LibBalsaMailbox *mblist_get_selected_mailbox (void);
-GList * mblist_find_all_unread_mboxes(void);
-void mblist_open_mailbox (LibBalsaMailbox * mailbox);
+LibBalsaMailbox *mblist_get_selected_mailbox(void);
+GList *mblist_find_all_unread_mboxes(void);
+void mblist_open_mailbox(LibBalsaMailbox * mailbox);
 
-#endif /* MBLIST_WINDOW_H */
+#endif				/* MBLIST_WINDOW_H */

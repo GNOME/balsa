@@ -1,5 +1,7 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * (c) 1997-2000 Stuart Parmenter and others, see AUTHORS for a list of people
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +23,7 @@
 #define __BALSA_QUOTECOLOR_H__
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif				/* __cplusplus */
 
 #ifdef HAVE_UNISTD_H
@@ -30,15 +31,12 @@ extern "C"
 #endif
 #include <regex.h>
 
-extern void make_gradient (GdkColor colors[], gint, gint);
-extern gint is_a_quote (const gchar *, const regex_t *rex);
-extern void allocate_quote_colors (GtkWidget *, GdkColor color[],
-      gint, gint);
+    extern void make_gradient(GdkColor colors[], gint, gint);
+    extern gint is_a_quote(const gchar *, const regex_t * rex);
+    extern void allocate_quote_colors(GtkWidget *, GdkColor color[], gint, gint);
 
- 
+
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */
-
-
 #endif				/* __BALSA_QUOTECOLOR_H__ */

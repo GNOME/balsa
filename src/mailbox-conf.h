@@ -1,6 +1,7 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +18,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-#ifndef __NEW_MAILBOX_H__
-#define __NEW_MAILBOX_H__
+
+#ifndef __MAILBOX_CONF_H__
+#define __MAILBOX_CONF_H__
 
 #include "libbalsa.h"
 
-void mailbox_conf_new (LibBalsaMailbox * mailbox, gint add_new_mailbox);
-void mailbox_conf_delete (LibBalsaMailbox * mailbox);
+void mailbox_conf_new(LibBalsaMailbox * mailbox, gint add_new_mailbox);
+void mailbox_conf_delete(LibBalsaMailbox * mailbox);
 
-#endif /* __NEW_MAILBOX_H__ */
+#endif				/* __MAILBOX_CONF_H__ */

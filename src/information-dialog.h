@@ -1,6 +1,5 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
@@ -25,11 +24,11 @@
 
 typedef enum _BalsaInformationShow BalsaInformationShow;
 enum _BalsaInformationShow {
-	BALSA_INFORMATION_SHOW_NONE = 0,
-	BALSA_INFORMATION_SHOW_DIALOG,
-	BALSA_INFORMATION_SHOW_LIST,
+    BALSA_INFORMATION_SHOW_NONE = 0,
+    BALSA_INFORMATION_SHOW_DIALOG,
+    BALSA_INFORMATION_SHOW_LIST,
 };
 
-void balsa_information (LibBalsaInformationType type, const char *fmt, ...);
+void balsa_information(LibBalsaInformationType type, const char *fmt, ...);
 
 #endif

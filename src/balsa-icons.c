@@ -1,5 +1,7 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1998-1999 Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,11 +45,10 @@
 #include "pixmaps/flagged.xpm"
 
 typedef struct _BalsaIcon BalsaIcon;
-struct _BalsaIcon
-  {
+struct _BalsaIcon {
     GdkPixmap *p;
     GdkBitmap *b;
-  };
+};
 
 static BalsaIcon inbox;
 static BalsaIcon outbox;
@@ -70,117 +71,112 @@ static BalsaIcon multipart;
 static BalsaIcon flagged;
 
 static void
-create_icon (gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
+create_icon(gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
 {
-  /* Is there any reason to use gdkpixbuf here? */
-  *pmap = gdk_pixmap_create_from_xpm_d (GDK_ROOT_PARENT (),
-					bmap,
-					0,
-					data);
+    /* Is there any reason to use gdkpixbuf here? */
+    *pmap = gdk_pixmap_create_from_xpm_d(GDK_ROOT_PARENT(), bmap, 0, data);
 }
 
 void
-balsa_icons_init (void)
+balsa_icons_init(void)
 {
-  create_icon (inbox_xpm, &inbox.p, &inbox.b);
-  create_icon (outbox_xpm, &outbox.p, &outbox.b);
-  create_icon (trash_xpm, &trash.p, &trash.b);
+    create_icon(inbox_xpm, &inbox.p, &inbox.b);
+    create_icon(outbox_xpm, &outbox.p, &outbox.b);
+    create_icon(trash_xpm, &trash.p, &trash.b);
 
-  create_icon (tray_empty_xpm, &tray_empty.p, &tray_empty.b);
-  create_icon (tray_full_xpm, &tray_full.p, &tray_full.b);
+    create_icon(tray_empty_xpm, &tray_empty.p, &tray_empty.b);
+    create_icon(tray_full_xpm, &tray_full.p, &tray_full.b);
 
-  create_icon (dir_closed_xpm, &dir_closed.p, &dir_closed.b);
-  create_icon (dir_open_xpm, &dir_open.p, &dir_open.b);
+    create_icon(dir_closed_xpm, &dir_closed.p, &dir_closed.b);
+    create_icon(dir_open_xpm, &dir_open.p, &dir_open.b);
 
-  create_icon (replied_xpm, &replied.p, &replied.b);
-  create_icon (forwarded_xpm, &forwarded.p, &forwarded.b);
+    create_icon(replied_xpm, &replied.p, &replied.b);
+    create_icon(forwarded_xpm, &forwarded.p, &forwarded.b);
 
-  create_icon (envelope_xpm, &envelope.p, &envelope.b);
+    create_icon(envelope_xpm, &envelope.p, &envelope.b);
 
-  create_icon (arrow_xpm, &arrow.p, &arrow.b);
-  create_icon (multipart_xpm, &multipart.p, &multipart.b);
+    create_icon(arrow_xpm, &arrow.p, &arrow.b);
+    create_icon(multipart_xpm, &multipart.p, &multipart.b);
 
-  create_icon (flagged_xpm, &flagged.p, &flagged.b);
+    create_icon(flagged_xpm, &flagged.p, &flagged.b);
 }
 
 GdkPixmap *
-balsa_icon_get_pixmap (BalsaIconName name)
+balsa_icon_get_pixmap(BalsaIconName name)
 {
-  switch (name)
-    {
+    switch (name) {
     case BALSA_ICON_INBOX:
-      return inbox.p;
+	return inbox.p;
     case BALSA_ICON_OUTBOX:
-      return outbox.p;
+	return outbox.p;
     case BALSA_ICON_TRASH:
-      return trash.p;
+	return trash.p;
 
     case BALSA_ICON_TRAY_EMPTY:
-      return tray_empty.p;
+	return tray_empty.p;
     case BALSA_ICON_TRAY_FULL:
-      return tray_full.p;
+	return tray_full.p;
 
     case BALSA_ICON_DIR_CLOSED:
-      return dir_closed.p;
+	return dir_closed.p;
     case BALSA_ICON_DIR_OPEN:
-      return dir_open.p;
+	return dir_open.p;
 
     case BALSA_ICON_REPLIED:
-      return replied.p;
+	return replied.p;
     case BALSA_ICON_FORWARDED:
-      return forwarded.p;
+	return forwarded.p;
 
     case BALSA_ICON_ENVELOPE:
-      return envelope.p;
+	return envelope.p;
 
     case BALSA_ICON_ARROW:
-      return arrow.p;
+	return arrow.p;
     case BALSA_ICON_MULTIPART:
-      return multipart.p;
+	return multipart.p;
 
     case BALSA_ICON_FLAGGED:
-      return flagged.p;
+	return flagged.p;
     }
-  return NULL;
+    return NULL;
 }
 
 GdkBitmap *
-balsa_icon_get_bitmap (BalsaIconName name)
+balsa_icon_get_bitmap(BalsaIconName name)
 {
-  switch (name)
-    {
+    switch (name) {
     case BALSA_ICON_INBOX:
-      return inbox.b;
+	return inbox.b;
     case BALSA_ICON_OUTBOX:
-      return outbox.b;
+	return outbox.b;
     case BALSA_ICON_TRASH:
-      return trash.b;
+	return trash.b;
 
     case BALSA_ICON_TRAY_EMPTY:
-      return tray_empty.b;
+	return tray_empty.b;
     case BALSA_ICON_TRAY_FULL:
-      return tray_full.b;
+	return tray_full.b;
 
     case BALSA_ICON_DIR_CLOSED:
-      return dir_closed.b;
+	return dir_closed.b;
     case BALSA_ICON_DIR_OPEN:
-      return dir_open.b;
+	return dir_open.b;
 
     case BALSA_ICON_REPLIED:
-      return replied.b;
+	return replied.b;
     case BALSA_ICON_FORWARDED:
-      return forwarded.b;
+	return forwarded.b;
 
     case BALSA_ICON_ENVELOPE:
-      return envelope.b;
+	return envelope.b;
 
     case BALSA_ICON_ARROW:
-      return arrow.b;
+	return arrow.b;
     case BALSA_ICON_MULTIPART:
-      return multipart.b;
+	return multipart.b;
 
     case BALSA_ICON_FLAGGED:
-      return flagged.b;
+	return flagged.b;
     }
-  return NULL;
+    return NULL;
 }

@@ -1,5 +1,7 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +19,8 @@
  * 02111-1307, USA.
  */
 
-#ifndef __main_window_h__
-#define __main_window_h__
+#ifndef __MAIN_WINDOW_H__
+#define __MAIN_WINDOW_H__
 
 #define BALSA_TYPE_WINDOW		       (balsa_window_get_type ())
 #define BALSA_WINDOW(obj)		       (GTK_CHECK_CAST (obj, BALSA_TYPE_WINDOW, BalsaWindow))
@@ -27,46 +29,41 @@
 #define BALSA_IS_WINDOW_CLASS(klass)	       (GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_WINDOW))
 
 
-typedef struct _BalsaWindow       BalsaWindow;
-typedef struct _BalsaWindowClass  BalsaWindowClass;
+typedef struct _BalsaWindow BalsaWindow;
+typedef struct _BalsaWindowClass BalsaWindowClass;
 
-struct _BalsaWindow
-{
-  GnomeApp window;
+struct _BalsaWindow {
+    GnomeApp window;
 
-  GtkWidget *progress_bar;
-  GtkWidget *mblist;
-  GtkWidget *notebook;
-  GtkWidget *preview; /* message is child */
+    GtkWidget *progress_bar;
+    GtkWidget *mblist;
+    GtkWidget *notebook;
+    GtkWidget *preview;		/* message is child */
 };
 
-struct _BalsaWindowClass
-{
-  GnomeAppClass parent_class;
+struct _BalsaWindowClass {
+    GnomeAppClass parent_class;
 
-  void (* open_mailbox)  (BalsaWindow *window,
-			  LibBalsaMailbox     *mailbox);
+    void (*open_mailbox) (BalsaWindow * window, LibBalsaMailbox * mailbox);
+    void (*close_mailbox) (BalsaWindow * window,
+			   LibBalsaMailbox * mailbox);
 
-  void (* close_mailbox) (BalsaWindow *window,
-			  LibBalsaMailbox     *mailbox);
-
-  void (* set_cursor)  (BalsaWindow *window,
-			GdkCursor   *cursor);
+    void (*set_cursor) (BalsaWindow * window, GdkCursor * cursor);
 
 };
 
-GtkType    balsa_window_get_type (void);
+GtkType balsa_window_get_type(void);
 GtkWidget *balsa_window_new(void);
-void       balsa_window_set_cursor(BalsaWindow *window, GdkCursor *cursor);
-GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
-void       balsa_window_refresh(BalsaWindow *window);
-void       balsa_window_open_mailbox();
-void       balsa_window_close_mailbox();
-void       balsa_window_enable_continue(void);
-gboolean   mail_progress_notify_cb(void);
-gboolean   send_progress_notify_cb(void);
-gint       check_new_messages_auto_cb( gpointer data );
-void       mblist_close_mailbox (LibBalsaMailbox * mailbox);
+void balsa_window_set_cursor(BalsaWindow * window, GdkCursor * cursor);
+GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
+void balsa_window_refresh(BalsaWindow * window);
+void balsa_window_open_mailbox();
+void balsa_window_close_mailbox();
+void balsa_window_enable_continue(void);
+gboolean mail_progress_notify_cb(void);
+gboolean send_progress_notify_cb(void);
+gint check_new_messages_auto_cb(gpointer data);
+void mblist_close_mailbox(LibBalsaMailbox * mailbox);
 
 
 #if defined(__FILE__) && defined(__LINE__)
@@ -79,6 +76,4 @@ void       mblist_close_mailbox (LibBalsaMailbox * mailbox);
 # endif
 #endif
 
-#endif /* __main_window_h__ */
-
-
+#endif				/* __MAIN_WINDOW_H__ */

@@ -1,5 +1,7 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1998 Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +22,7 @@
 #ifndef __BALSA_ICONS_H__
 #define __BALSA_ICONS_H__
 
-typedef enum
-  {
+typedef enum {
     BALSA_ICON_INBOX,
     BALSA_ICON_OUTBOX,
     BALSA_ICON_TRASH,
@@ -41,11 +42,10 @@ typedef enum
     BALSA_ICON_MULTIPART,
 
     BALSA_ICON_FLAGGED
-  }
-BalsaIconName;
+} BalsaIconName;
 
-void balsa_icons_init (void);
-GdkPixmap *balsa_icon_get_pixmap (BalsaIconName icon);
-GdkBitmap *balsa_icon_get_bitmap (BalsaIconName icon);
+void balsa_icons_init(void);
+GdkPixmap *balsa_icon_get_pixmap(BalsaIconName icon);
+GdkBitmap *balsa_icon_get_bitmap(BalsaIconName icon);
 
 #endif

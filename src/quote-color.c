@@ -1,6 +1,7 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * (c) 1997-2000 Stuart Parmenter and others, see AUTHORS for a list of people
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,20 +33,25 @@
  * Makes a gradient color on the array, from the first entry to the last.
  */
 void
-make_gradient (GdkColor colors[], gint first, gint last)
+make_gradient(GdkColor colors[], gint first, gint last)
 {
-   gint /*add,*/ i;
-   double dr, dg, db;
+    gint /*add, */ i;
+    double dr, dg, db;
 
-   dr = (double) (colors[last].red - colors[first].red) / (last - first + 1);
-   dg = (double) (colors[last].green - colors[first].green)/(last - first + 1);
-   db = (double) (colors[last].blue - colors[first].blue) / (last - first + 1);
-   for (i = (first + 1); i < last; i++)
-   {
-      colors[i].red = colors[i - 1].red + dr;
-      colors[i].blue = colors[i - 1].blue + db;
-      colors[i].green = colors[i - 1].green + dg;
-   }
+    dr =
+	(double) (colors[last].red - colors[first].red) / (last - first +
+							   1);
+    dg =
+	(double) (colors[last].green - colors[first].green) / (last -
+							       first + 1);
+    db =
+	(double) (colors[last].blue - colors[first].blue) / (last - first +
+							     1);
+    for (i = (first + 1); i < last; i++) {
+	colors[i].red = colors[i - 1].red + dr;
+	colors[i].blue = colors[i - 1].blue + db;
+	colors[i].green = colors[i - 1].green + dg;
+    }
 }
 
 /*
@@ -61,24 +67,23 @@ make_gradient (GdkColor colors[], gint first, gint last)
  * Output:
  *   an integer saying how many levels deep.  
  * */
-gint
-is_a_quote (const gchar *str, const regex_t *rex)
+gint is_a_quote(const gchar * str, const regex_t * rex)
 {
-   gint cnt = 0, off;
-   regmatch_t rm[1];
+    gint cnt = 0, off;
+    regmatch_t rm[1];
 
-   g_return_val_if_fail(rex != NULL, 0);
+    g_return_val_if_fail(rex != NULL, 0);
 
-   if (str == NULL)
-     return 0;
-   
-   off=0;
-   while (regexec(rex, str+off, 1, rm, 0) == 0) {
-     off += rm[0].rm_eo;
-     cnt++;
-   }
-      
-   return cnt;
+    if (str == NULL)
+	return 0;
+
+    off = 0;
+    while (regexec(rex, str + off, 1, rm, 0) == 0) {
+	off += rm[0].rm_eo;
+	cnt++;
+    }
+
+    return cnt;
 }
 
 
@@ -89,15 +94,14 @@ is_a_quote (const gchar *str, const regex_t *rex)
  * colormap.
  */
 void
-allocate_quote_colors (GtkWidget *widget, GdkColor color[],
-                       gint first, gint last)
+allocate_quote_colors(GtkWidget * widget, GdkColor color[],
+		      gint first, gint last)
 {
-   gint i;
+    gint i;
 
-   for (i = first; i <= last; i++)
-   {
-      if (!gdk_colormap_alloc_color (balsa_app.colormap, &color[i], FALSE, TRUE))
-	gdk_color_black (balsa_app.colormap, &color[i]);
-   }
+    for (i = first; i <= last; i++) {
+	if (!gdk_colormap_alloc_color
+	    (balsa_app.colormap, &color[i], FALSE,
+	     TRUE)) gdk_color_black(balsa_app.colormap, &color[i]);
+    }
 }
-

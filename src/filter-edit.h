@@ -1,4 +1,25 @@
-/* -*- C -*-
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* Balsa E-Mail Client
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option) 
+ * any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * GNU General Public License for more details.
+ *  
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * 02111-1307, USA.
+ */
+
+/*
  * filter-edit.h
  *
  * Variables and definitions for the filter edit dialog
@@ -17,41 +38,31 @@
  */
 
 
-typedef struct _option_list
-  {
+typedef struct _option_list {
     gchar *text;
     gint value;
     GtkWidget *widget;
-  }
-option_list;
+} option_list;
 
 /* and button callbacs */
-void fe_dialog_button_clicked (GtkWidget * widget,
-                               gint button,
-                               gpointer data);
+void fe_dialog_button_clicked(GtkWidget * widget, gint button,
+			      gpointer data);
 
 
 
 /*---------------- Left side of hbox ----------------*/
 
 /* clist callbacks */
-void fe_clist_select_row (GtkWidget * widget,
-                          gint row, gint column,
-                          GdkEventButton * bevent,
-                          gpointer data);
-void clist_button_event_press (GtkWidget * widget,
-                                  GdkEventButton * bevent,
-                                  gpointer data);
+void fe_clist_select_row(GtkWidget * widget, gint row, gint column,
+			 GdkEventButton * bevent, gpointer data);
+void clist_button_event_press(GtkWidget * widget, GdkEventButton * bevent,
+			      gpointer data);
 
 /* button callbacks */
-void fe_new_pressed (GtkWidget * widget,
-                     gpointer data);
-void fe_delete_pressed (GtkWidget * widget,
-                        gpointer data);
-void fe_up_pressed (GtkWidget * widget,
-                    gpointer data);
-void fe_down_pressed (GtkWidget * widget,
-                      gpointer data);
+void fe_new_pressed(GtkWidget * widget, gpointer data);
+void fe_delete_pressed(GtkWidget * widget, gpointer data);
+void fe_up_pressed(GtkWidget * widget, gpointer data);
+void fe_down_pressed(GtkWidget * widget, gpointer data);
 
 
 /*---------------- Right side of hbox ----------------*/
@@ -60,18 +71,15 @@ void fe_down_pressed (GtkWidget * widget,
 GtkWidget *fe_type_notebook;
 
 /* apply and revert callbacks */
-void fe_apply_pressed (GtkWidget * widget,
-                       gpointer data);
-void fe_revert_pressed (GtkWidget * widget,
-                        gpointer data);
+void fe_apply_pressed(GtkWidget * widget, gpointer data);
+void fe_revert_pressed(GtkWidget * widget, gpointer data);
 
 /* match page widgets */
 
 /* containers for radiobuttons */
 GtkWidget *fe_search_option_menu;
 /* search type callback */
-void fe_checkbutton_toggled (GtkWidget * widget,
-                             gpointer data);
+void fe_checkbutton_toggled(GtkWidget * widget, gpointer data);
 
 /* Name field */
 GtkWidget *fe_name_label;
@@ -93,17 +101,14 @@ GtkWidget *fe_type_simple_subject;
 GtkWidget *fe_type_simple_label;
 GtkWidget *fe_type_simple_entry;
 /* And callback */
-void fe_type_simple_toggled (GtkWidget * widget,
-                             gpointer data);
+void fe_type_simple_toggled(GtkWidget * widget, gpointer data);
 
 /* widgets for the type notebook regex page */
 GtkWidget *fe_type_regex_list;
 GtkWidget *fe_type_regex_entry;
 /* callbacks */
-void fe_add_pressed (GtkWidget * widget,
-                     gpointer data);
-void fe_remove_pressed (GtkWidget * widget,
-                        gpointer data);
+void fe_add_pressed(GtkWidget * widget, gpointer data);
+void fe_remove_pressed(GtkWidget * widget, gpointer data);
 
 /* Entry for the type notebook exec page */
 GtkWidget *fe_type_exec_label;
@@ -121,8 +126,7 @@ GtkWidget *fe_popup_entry;
 GtkWidget *fe_action_option_menu;
 GtkWidget *fe_action_entry;
 /* callback */
-void fe_action_selected (GtkWidget * widget,
-                         gpointer data);
+void fe_action_selected(GtkWidget * widget, gpointer data);
 
 
 /* disposition field */

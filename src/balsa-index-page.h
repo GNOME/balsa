@@ -1,5 +1,7 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1998-1999 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +18,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-#ifndef __INDEX_CHILD_H__
-#define __INDEX_CHILD_H__
+
+#ifndef __BALSA_INDEX_PAGE_H__
+#define __BALSA_INDEX_PAGE_H__
 
 #include "main-window.h"
 #include "libbalsa.h"
@@ -35,41 +38,40 @@ GtkType balsa_index_page_get_type(void);
 typedef struct _BalsaIndexPage BalsaIndexPage;
 typedef struct _BalsaIndexPageClass BalsaIndexPageClass;
 
-struct _BalsaIndexPage
-{
-  GtkObject object;
+struct _BalsaIndexPage {
+    GtkObject object;
 
-  LibBalsaMailbox *mailbox;
-  GTimeVal last_use;
-  GtkWidget *window; /* "real" BalsaWindow parent */
-  GtkWidget *sw;
-  GtkWidget *index;
+    LibBalsaMailbox *mailbox;
+    GTimeVal last_use;
+    GtkWidget *window;		/* "real" BalsaWindow parent */
+    GtkWidget *sw;
+    GtkWidget *index;
 };
 
-struct _BalsaIndexPageClass
-{
-  GtkObjectClass parent_class;
+struct _BalsaIndexPageClass {
+    GtkObjectClass parent_class;
 };
 
 GtkType balsa_index_page_get_type(void);
-GtkObject *balsa_index_page_new(BalsaWindow *window);
-gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, LibBalsaMailbox *mailbox);
-void balsa_index_page_close_and_destroy( GtkObject *obj );
+GtkObject *balsa_index_page_new(BalsaWindow * window);
+gboolean balsa_index_page_load_mailbox(BalsaIndexPage * page,
+				       LibBalsaMailbox * mailbox);
+void balsa_index_page_close_and_destroy(GtkObject * obj);
 
-void balsa_message_reply (GtkWidget * widget, gpointer index);
-void balsa_message_replytoall (GtkWidget * widget, gpointer index);
-void balsa_message_forward (GtkWidget * widget, gpointer index);
-void balsa_message_continue (GtkWidget * widget, gpointer index);
-void balsa_message_next (GtkWidget * widget, gpointer index);
-void balsa_message_next_unread (GtkWidget* widget, gpointer index);
-void balsa_message_previous (GtkWidget * widget, gpointer index);
-void balsa_message_delete (GtkWidget * widget, gpointer index);
-void balsa_message_undelete (GtkWidget * widget, gpointer index);
-void balsa_message_toggle_flagged (GtkWidget * widget, gpointer index);
+void balsa_message_reply(GtkWidget * widget, gpointer index);
+void balsa_message_replytoall(GtkWidget * widget, gpointer index);
+void balsa_message_forward(GtkWidget * widget, gpointer index);
+void balsa_message_continue(GtkWidget * widget, gpointer index);
+void balsa_message_next(GtkWidget * widget, gpointer index);
+void balsa_message_next_unread(GtkWidget * widget, gpointer index);
+void balsa_message_previous(GtkWidget * widget, gpointer index);
+void balsa_message_delete(GtkWidget * widget, gpointer index);
+void balsa_message_undelete(GtkWidget * widget, gpointer index);
+void balsa_message_toggle_flagged(GtkWidget * widget, gpointer index);
 
-void balsa_index_page_reset(BalsaIndexPage *page);
-gint balsa_find_notebook_page_num(LibBalsaMailbox *mailbox);
-BalsaIndexPage* balsa_find_notebook_page(LibBalsaMailbox *mailbox);
-void balsa_index_update_message (BalsaIndexPage *index_page);
+void balsa_index_page_reset(BalsaIndexPage * page);
+gint balsa_find_notebook_page_num(LibBalsaMailbox * mailbox);
+BalsaIndexPage *balsa_find_notebook_page(LibBalsaMailbox * mailbox);
+void balsa_index_update_message(BalsaIndexPage * index_page);
 
-#endif /* __INDEX_CHILD_H__ */
+#endif				/* __BALSA_INDEX_PAGE_H__ */

@@ -1007,8 +1007,7 @@ mail_progress_notify_cb( )
 	      }
 	    else 
               {
-	        gnome_appbar_clear_stack(balsa_app.appbar);
-		gnome_appbar_push(balsa_app.appbar,
+		gnome_appbar_set_status(balsa_app.appbar,
 				threadmessage->message_string);
 	      }
 	    break;
@@ -1021,8 +1020,7 @@ mail_progress_notify_cb( )
 	      }
 	    else 
 	      {
-	        gnome_appbar_clear_stack(balsa_app.appbar);
-		gnome_appbar_push(balsa_app.appbar,
+		gnome_appbar_set_status(balsa_app.appbar,
 				threadmessage->message_string);
 	      }
 	    break;
@@ -1067,8 +1065,7 @@ mail_progress_notify_cb( )
 	      }
 	    else
 	      {
-	        gnome_appbar_clear_stack(balsa_app.appbar);
-	        gnome_appbar_push(balsa_app.appbar,"Finished Checking.");
+		gnome_appbar_refresh(balsa_app.appbar);
 		gnome_appbar_set_progress(balsa_app.appbar,0.0);
 	      }
 	    break;

@@ -1,3 +1,13 @@
+2000-03-23  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/balsa-message.c: handling msgs w/o respective fonts
+	* src/main-window.c: forwarding/replying multiple msgs
+	* src/sendmsg-window.[hc]: handling multiple open compose wnds.
+	
+2000-03-22  Joaquim Fellmann  <joaquim@hrnet.fr>
+
+	* src/balsa-mblist.c: i18n and i12n update
+
 2000-03-22  Fellmann Joaquim <joaquim@hrnet.fr>
 
 	* src/balsa-mblist.c: make a string i18n comp. for mbox stats

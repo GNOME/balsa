@@ -203,6 +203,9 @@ static GnomeUIInfo view_menu[] =
   GNOMEUIINFO_END
 };
 
+#if MENU_TOGGLE_KEYWORDS_POS+1 != VIEW_MENU_LENGTH
+#error Inconsistency in defined lengths.
+#endif
 
 /* ISO-8859-1 MUST BE at the first position - see set_menus */
 static GnomeUIInfo iso_charset_menu[] = {
@@ -287,11 +290,12 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
 					      has no more than 19 characters */
 
    g_assert(bsm != NULL);
+   g_assert(ELEMENTS(headerDescs) == ELEMENTS(bsm->view_checkitems));
    
    newStr[0] = '\0';
 
-   for(i=0; i<sizeof(headerDescs)/sizeof(headerDescs[0]); i++)
-      if(GTK_CHECK_MENU_ITEM(view_menu[i].widget)->active) {
+   for(i=0; i<ELEMENTS(headerDescs); i++)
+      if(GTK_CHECK_MENU_ITEM(bsm->view_checkitems[i])->active) {
 	 strcat(newStr, headerDescs[i].name);
 	 strcat(newStr, " ");
       }
@@ -693,6 +697,7 @@ create_text_area (BalsaSendmsg * msg)
 /* continueBody ---------------------------------------------------------
    a short-circuit procedure for the 'Continue action'
    basically copies the text over to the entry field.
+   NOTE that rbdy == NULL if message has no text parts.
 */
 static void
 continueBody(BalsaSendmsg *msg, Message * message)
@@ -701,9 +706,11 @@ continueBody(BalsaSendmsg *msg, Message * message)
 
    message_body_ref (message);
    rbdy = content2reply (message, NULL); 
-   gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, 
-		    strlen (rbdy->str));
-   g_string_free (rbdy, TRUE);
+   if(rbdy) {
+      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, 
+		       strlen (rbdy->str));
+      g_string_free (rbdy, TRUE);
+   }
 
    if(!msg->charset) msg->charset = message_charset(message);
    message_body_unref (message);
@@ -742,12 +749,11 @@ quoteBody(BalsaSendmsg *msg, Message * message, SendType type)
    rbdy = content2reply (message, 
 			 (type == SEND_REPLY || type == SEND_REPLY_ALL) ?
 			 balsa_app.quote_str : NULL); 
-   
-   gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, 
-		    strlen (rbdy->str));
-   g_string_free (rbdy, TRUE);
-
-   gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
+   if(rbdy) {
+      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, 
+		       strlen (rbdy->str));
+      g_string_free (rbdy, TRUE);
+   }
 
    if(!msg->charset) msg->charset = message_charset(message);
    message_body_unref (message);
@@ -772,7 +778,7 @@ fillBody(BalsaSendmsg *msg, Message * message, SendType type)
 	   balsa_app.sig_whenreply) ||
 	  ( (type == SEND_FORWARD) && balsa_app.sig_whenforward) ||
 	  ( (type == SEND_NORMAL) && balsa_app.sig_sending) ) {
-	/* gtk_text_insert   (GTK_TEXT(msg->text), NULL, NULL, NULL, "\n", 1);*/
+	gtk_text_insert   (GTK_TEXT(msg->text), NULL, NULL, NULL, "\n", 1);
 
 	if( balsa_app.sig_separator && g_strncasecmp(signature, "--\n" ,3) && 
 	   g_strncasecmp(signature, "-- \n" ,4) )
@@ -1436,17 +1442,17 @@ check_readiness(GtkEditable *w, BalsaSendmsg *msg)
 /* toggle_entry auxiliary function for "header show/hide" toggle menu entries.
  */
 static gint 
-toggle_entry (GtkWidget *entry[], int pos, int cnt)
+toggle_entry (BalsaSendmsg * bmsg, GtkWidget *entry[], int pos, int cnt)
 {
    GtkWidget* parent;
-   if( GTK_CHECK_MENU_ITEM(view_menu[pos].widget)->active) {
+   if( GTK_CHECK_MENU_ITEM(bmsg->view_checkitems[pos])->active) {
       while(cnt--)
 	 gtk_widget_show( GTK_WIDGET(entry[cnt]) );
    } else {
       while(cnt--)
 	 gtk_widget_hide( GTK_WIDGET(entry[cnt]) );
       
-      /* force size recomutation if embedded in paned */
+      /* force size recomputation if embedded in paned */
       parent = GTK_WIDGET(GTK_WIDGET(entry[0])->parent)->parent;
       if(parent)
 	 gtk_paned_set_position(GTK_PANED(parent), -1);
@@ -1455,48 +1461,59 @@ toggle_entry (GtkWidget *entry[], int pos, int cnt)
 }
 
 static gint toggle_to_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
-{return toggle_entry(bsmsg->to, MENU_TOGGLE_TO_POS,3); }
+{return toggle_entry(bsmsg,bsmsg->to, MENU_TOGGLE_TO_POS,3); }
 
 static gint toggle_from_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
-{return toggle_entry(bsmsg->from, MENU_TOGGLE_FROM_POS,3); }
+{return toggle_entry(bsmsg, bsmsg->from, MENU_TOGGLE_FROM_POS,3); }
 
 static gint toggle_subject_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
-{return toggle_entry(bsmsg->subject, MENU_TOGGLE_SUBJECT_POS,2); }
+{return toggle_entry(bsmsg, bsmsg->subject, MENU_TOGGLE_SUBJECT_POS,2); }
 
 static gint toggle_cc_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
-{return toggle_entry(bsmsg->cc, MENU_TOGGLE_CC_POS,3); }
+{return toggle_entry(bsmsg, bsmsg->cc, MENU_TOGGLE_CC_POS,3); }
 
 static gint toggle_bcc_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
-{return toggle_entry(bsmsg->bcc,  MENU_TOGGLE_BCC_POS,3); }
+{return toggle_entry(bsmsg, bsmsg->bcc,  MENU_TOGGLE_BCC_POS,3); }
 static gint toggle_fcc_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
-{return toggle_entry(bsmsg->fcc, MENU_TOGGLE_FCC_POS,2); }
+{return toggle_entry(bsmsg, bsmsg->fcc, MENU_TOGGLE_FCC_POS,2); }
 static gint toggle_reply_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
-{return toggle_entry(bsmsg->reply_to, MENU_TOGGLE_REPLY_POS,3); }
+{return toggle_entry(bsmsg, bsmsg->reply_to, MENU_TOGGLE_REPLY_POS,3); }
 static gint toggle_attachments_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
 { 
-   return toggle_entry(bsmsg->attachments, MENU_TOGGLE_ATTACHMENTS_POS,4);
+   return toggle_entry(bsmsg, bsmsg->attachments, MENU_TOGGLE_ATTACHMENTS_POS,
+		       4);
 }
 
 static gint toggle_comments_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
-{return toggle_entry(bsmsg->comments, MENU_TOGGLE_COMMENTS_POS,2); }
+{return toggle_entry(bsmsg, bsmsg->comments, MENU_TOGGLE_COMMENTS_POS,2); }
 static gint toggle_keywords_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
-{return toggle_entry(bsmsg->keywords, MENU_TOGGLE_KEYWORDS_POS,2); }
+{return toggle_entry(bsmsg, bsmsg->keywords, MENU_TOGGLE_KEYWORDS_POS,2); }
 
-static void set_menus(BalsaSendmsg *msg)
+/* set_menus:
+   performs the initial menu setup: shown headers as well as correct
+   message charset. Copies also the the menu pointers for further usage
+   at the message close  - they would be overwritten if another compose
+   window was opened simultaneously.
+*/
+static void
+set_menus(BalsaSendmsg *msg)
 {
    unsigned i;
    const gchar * charset = NULL;
 
-   for(i=0; i<sizeof(headerDescs)/sizeof(headerDescs[0]); i++)
+   g_assert(ELEMENTS(headerDescs) == ELEMENTS(msg->view_checkitems));
+
+   for(i=0; i<ELEMENTS(headerDescs); i++) {
+      msg->view_checkitems[i] = view_menu[i].widget;
       if(find_word(headerDescs[i].name, balsa_app.compose_headers) ) {
 	 /* show... (well, it has already been shown). */
-	    gtk_check_menu_item_set_active(
+	 gtk_check_menu_item_set_active(
 	    GTK_CHECK_MENU_ITEM(view_menu[i].widget), TRUE );
       } else {
 	 /* or hide... */
 	 GTK_SIGNAL_FUNC(view_menu[i].moreinfo)(view_menu[i].widget,msg);
       }
-
+   }
    /* set the charset:
       read from the preferences set up. If not found, 
       set to the 0th set.

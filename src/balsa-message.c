@@ -483,19 +483,32 @@ balsa_message_set (BalsaMessage * bmessage,
 
 }
 
+/* balsa_message_text_item:
+   inserts text item testing, if requested font exists and falls back to
+   standard font otherwise. GnomeCanvas shows nothing if the requested
+   font does not exists.
+*/
+
 static GnomeCanvasItem *
 balsa_message_text_item (const gchar * text, GnomeCanvasGroup * group, 
 			 double x, double y, const gchar * font_name)
 {
 	GnomeCanvasItem *item;
-
+	if(font_name) {
+	   GdkFont *fnt = gdk_fontset_load(font_name);
+	   if(fnt) gdk_font_unref(fnt);
+	   else {
+	      font_name = balsa_app.message_font;
+	      fprintf(stderr,"message/text:: font not found: %s\n", font_name);
+	   }	      
+	} else font_name = balsa_app.message_font;
+		
 	item = gnome_canvas_item_new( group,
 				      GNOME_TYPE_CANVAS_TEXT,
 				      "x", x,
 				      "y", y,
 				      "anchor", GTK_ANCHOR_NW,
-				      "font",  font_name ? font_name : 
-				      balsa_app.message_font,
+				      "fontset",  font_name,
 				      "text", text, 
 				      NULL );
 	return item;

@@ -36,8 +36,9 @@ extern "C"
    SendType;
    
    
+#define VIEW_MENU_LENGTH 10
    typedef struct _BalsaSendmsg BalsaSendmsg;
-   
+
    struct _BalsaSendmsg
    {
 	 GtkWidget *window;
@@ -51,6 +52,7 @@ extern "C"
 	 SendType type;
 	 const gchar * charset;
 	 GtkWidget * ready_widgets[4];
+	 GtkWidget * view_checkitems[VIEW_MENU_LENGTH];
    };
 
   BalsaSendmsg * sendmsg_window_new (GtkWidget *, Message *, SendType);

@@ -296,6 +296,7 @@ struct SelectDialogInfo_ {
     gpointer data;
     GtkWidget *tree;
     GtkWidget *dialog;
+    GtkWindow *parent;
     guint idle_handler_id;
 };
 typedef struct SelectDialogInfo_ SelectDialogInfo;
@@ -323,6 +324,7 @@ enum {
 /* 
  * Public method: create and show the dialog.
  */
+#define LIBBALSA_IDENTITY_SELECT_DIALOG_KEY "libbalsa-identity-select-dialog"
 void
 libbalsa_identity_select_dialog(GtkWindow * parent,
                                 const gchar * prompt,
@@ -331,18 +333,24 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
                                 LibBalsaIdentityCallback update,
                                 gpointer data)
 {
-    static GtkWidget *dialog = NULL;
+    GtkWidget *dialog;
     GtkWidget *tree;
     SelectDialogInfo *sdi;
     GtkWidget *frame;
 
     /* Show only one dialog at a time. */
-    if (dialog) {
-        gdk_window_raise(dialog->window);
+    sdi = g_object_get_data(G_OBJECT(parent),
+                            LIBBALSA_IDENTITY_SELECT_DIALOG_KEY);
+    if (sdi) {
+        gdk_window_raise(sdi->dialog->window);
         return;
     }
 
     sdi = g_new(SelectDialogInfo, 1);
+    sdi->parent = parent;
+    g_object_set_data_full(G_OBJECT(parent),
+                           LIBBALSA_IDENTITY_SELECT_DIALOG_KEY,
+                           sdi, g_free);
     sdi->update = update;
     sdi->data = data;
     sdi->idle_handler_id = 0;
@@ -355,7 +363,6 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
     g_signal_connect(G_OBJECT(dialog), "response",
                      G_CALLBACK(sd_response_cb), sdi);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-    g_object_add_weak_pointer(G_OBJECT(dialog), (gpointer) & dialog);
 
     sdi->tree = tree =
         libbalsa_identity_tree(G_CALLBACK(sd_row_toggled_cb), sdi,
@@ -393,7 +400,14 @@ sd_response_cb(GtkWidget * dialog, gint response, SelectDialogInfo * sdi)
     }
 
     sd_idle_remove_response_ok(sdi);
-    g_free(sdi);
+
+    /* Clear the data set on the parent window, so we know that the
+     * dialog was destroyed. This will also trigger the GDestroyNotify,
+     * which g_frees sdi. */
+    g_object_set_data(G_OBJECT(sdi->parent),
+                      LIBBALSA_IDENTITY_SELECT_DIALOG_KEY,
+                      NULL);
+
     gtk_widget_destroy(dialog);
 }
 

@@ -10,8 +10,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-12-21 13:06+0100\n"
-"PO-Revision-Date: 2001-12-21 13:06+0100\n"
+"POT-Creation-Date: 2001-12-22 17:27+0100\n"
+"PO-Revision-Date: 2001-12-22 17:27+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -200,7 +200,7 @@ msgid "Fwd:"
 msgstr "Vb:"
 
 #: libbalsa/identity.c:450 libbalsa/identity.c:1059
-#: src/filter-edit-dialog.c:336
+#: src/filter-edit-dialog.c:357
 msgid "Edit"
 msgstr "Redigera"
 
@@ -295,8 +295,8 @@ msgstr "Kan inte ta bort standardprofil, skapa en annan standardprofil först."
 msgid "Do you really want to delete the selected identity?"
 msgstr "Vill du verkligen ta bort den valda identiteten?"
 
-#: libbalsa/identity.c:1058 src/filter-edit-callbacks.c:622
-#: src/filter-edit-dialog.c:244 src/filter-edit-dialog.c:340
+#: libbalsa/identity.c:1058 src/filter-edit-callbacks.c:632
+#: src/filter-edit-dialog.c:244 src/filter-edit-dialog.c:362
 #: src/mailbox-node.c:589 src/main-window.c:447
 msgid "New"
 msgstr "Ny"
@@ -1458,7 +1458,7 @@ msgstr "_Värdnamn"
 msgid "_Base Domain Name"
 msgstr "_Basdomännamn"
 
-#: src/address-book-config.c:652 src/filter-edit-callbacks.c:694
+#: src/address-book-config.c:652 src/filter-edit-callbacks.c:705
 #: src/mailbox-conf.c:379 src/pref-manager.c:1283 src/pref-manager.c:2221
 msgid "Add"
 msgstr "Lägg till"
@@ -1535,7 +1535,7 @@ msgstr "Brevlådelösenord för %s@%s:"
 msgid "From"
 msgstr "Från"
 
-#: src/balsa-index.c:303 src/filter-edit-callbacks.c:854
+#: src/balsa-index.c:303 src/filter-edit-callbacks.c:878
 #: src/main-window.c:2627
 msgid "Subject"
 msgstr "Ämne"
@@ -1601,7 +1601,7 @@ msgstr "Flytta till papperskorgen"
 msgid "Toggle"
 msgstr "Växla"
 
-#: src/balsa-index.c:2099 src/filter-edit-callbacks.c:622
+#: src/balsa-index.c:2099 src/filter-edit-callbacks.c:632
 #: src/main-window.c:440
 msgid "Flagged"
 msgstr "Flaggad"
@@ -1655,21 +1655,21 @@ msgid "Date:"
 msgstr "Datum:"
 
 #. From:
-#: src/balsa-message.c:730 src/filter-edit-callbacks.c:845
+#: src/balsa-message.c:730 src/filter-edit-callbacks.c:869
 #: src/main-window.c:2626 src/print.c:381 src/sendmsg-window.c:1458
 #: src/store-address.c:267
 msgid "From:"
 msgstr "Från:"
 
 #. To:
-#: src/balsa-message.c:734 src/filter-edit-callbacks.c:836
+#: src/balsa-message.c:734 src/filter-edit-callbacks.c:860
 #: src/main-window.c:2625 src/print.c:391 src/sendmsg-window.c:1464
 #: src/store-address.c:268
 msgid "To:"
 msgstr "Till:"
 
 #. cc:
-#: src/balsa-message.c:735 src/filter-edit-callbacks.c:863
+#: src/balsa-message.c:735 src/filter-edit-callbacks.c:887
 #: src/main-window.c:2628 src/print.c:392 src/sendmsg-window.c:1472
 #: src/store-address.c:269
 msgid "Cc:"
@@ -1867,202 +1867,197 @@ msgid "AND"
 msgstr "OCH"
 
 #. The name entry
-#: src/filter-edit-dialog.c:276
+#: src/filter-edit-dialog.c:297
 msgid "Filter name:"
 msgstr "Filternamn:"
 
 #. The filter op-code : "OR" or "AND" all the conditions
-#: src/filter-edit-dialog.c:289
+#: src/filter-edit-dialog.c:310
 msgid "Operation between conditions"
 msgstr "Åtgärd mellan villkor"
 
-#: src/filter-edit-callbacks.c:698 src/filter-edit-dialog.c:344
+#: src/filter-edit-callbacks.c:709 src/filter-edit-dialog.c:367
 #: src/sendmsg-window.c:919
 msgid "Remove"
 msgstr "Ta bort"
 
 #. The notification area
-#: src/filter-edit-dialog.c:370
+#: src/filter-edit-dialog.c:395
 msgid "Notification:"
 msgstr "Påkalla uppmärksamhet:"
 
 #. Notification buttons
-#: src/filter-edit-dialog.c:379
+#: src/filter-edit-dialog.c:404
 msgid "Play sound:"
 msgstr "Spela ljud:"
 
-#: src/filter-edit-dialog.c:385
+#: src/filter-edit-dialog.c:410
 msgid "Use Sound..."
 msgstr "Använd ljud..."
 
-#: src/filter-edit-dialog.c:389
+#: src/filter-edit-dialog.c:414
 msgid "Popup text:"
 msgstr "Visa textruta:"
 
 #. The action area
-#: src/filter-edit-dialog.c:401
+#: src/filter-edit-dialog.c:426
 msgid "Action to perform:"
 msgstr "Åtgärd som ska utföras:"
 
-#: src/filter-edit-dialog.c:444
+#: src/filter-edit-dialog.c:486
 msgid "Match"
 msgstr "Matcha"
 
-#: src/filter-edit-dialog.c:447
+#: src/filter-edit-dialog.c:489
 msgid "Action"
 msgstr "Händelse"
 
-#: src/filter-edit-dialog.c:460
+#: src/filter-edit-dialog.c:502
 msgid "Revert"
 msgstr "Återgå"
 
-#: src/filter-edit-dialog.c:488
-msgid ""
-"There are opened filter run dialogs, close them before you can modify filters"
+#: src/filter-edit-dialog.c:531
+msgid "A filter run dialog is open.Close it before you can modify filters."
 msgstr ""
-"Det finns öppnade filterkörningdialoger, stäng dem innan du kan ändra filter"
+"En filterkörningdialoger är öppen. Stäng den innan du kan ändra filter."
 
-#: src/filter-edit-dialog.c:500
+#: src/filter-edit-dialog.c:544
 msgid "Balsa Filters"
 msgstr "Balsa-filter"
 
-#: src/filter-edit-callbacks.c:229 src/filter-edit-callbacks.c:635
+#: src/filter-edit-callbacks.c:233 src/filter-edit-callbacks.c:645
 msgid "One of the specified fields contains:"
 msgstr "Ett av de angivna fäletn innehåller:"
 
-#: src/filter-edit-callbacks.c:230
+#: src/filter-edit-callbacks.c:234
 msgid "None of the specified fields contains:"
 msgstr "Inga av de angivna fälten innehåller:"
 
-#: src/filter-edit-callbacks.c:232 src/filter-edit-callbacks.c:662
+#: src/filter-edit-callbacks.c:236 src/filter-edit-callbacks.c:673
 msgid "One of the regular expressions matches"
 msgstr "Ett av de reguljära uttrycken matchar"
 
-#: src/filter-edit-callbacks.c:233
+#: src/filter-edit-callbacks.c:237
 msgid "None of the regular expressions matches"
 msgstr "Inget av de reguljära uttrycken matchar"
 
-#: src/filter-edit-callbacks.c:235 src/filter-edit-callbacks.c:719
+#: src/filter-edit-callbacks.c:239 src/filter-edit-callbacks.c:731
 msgid "Match when date is in the interval:"
 msgstr "Matcha då datumet är i intervallet:"
 
-#: src/filter-edit-callbacks.c:236
+#: src/filter-edit-callbacks.c:240
 msgid "Match when date is outside the interval:"
 msgstr "Matcha då datumet är utanför intervallet:"
 
-#: src/filter-edit-callbacks.c:238 src/filter-edit-callbacks.c:751
+#: src/filter-edit-callbacks.c:242 src/filter-edit-callbacks.c:766
 msgid "Match when one of these flags is set:"
 msgstr "Matcha då en av dessa flaggor är inställd:"
 
-#: src/filter-edit-callbacks.c:239
+#: src/filter-edit-callbacks.c:243
 msgid "Match when none of these flags is set:"
 msgstr "Matcha då ingen av dessa flaggor är inställd:"
 
-#. balsa_information(LIBBALSA_INFORMATION_ERROR,_("You must specify at least one field for matching"));
-#: src/filter-edit-callbacks.c:378
+#: src/filter-edit-callbacks.c:381
 msgid "You must specify at least one field for matching"
 msgstr "Du måste ange minst ett fält för matchning"
 
 #. balsa_information(LIBBALSA_INFORMATION_ERROR,_("You must provide a string"));
-#: src/filter-edit-callbacks.c:387
+#: src/filter-edit-callbacks.c:390
 msgid "You must provide a string"
 msgstr "Du måste ange en sträng"
 
 #. balsa_information(LIBBALSA_INFORMATION_ERROR,_("You must provide at least one regular expression"));
-#: src/filter-edit-callbacks.c:394
+#: src/filter-edit-callbacks.c:397
 msgid "You must provide at least one regular expression"
 msgstr "Du måste ange minst ett reguljärt uttryck"
 
 #. balsa_information(LIBBALSA_INFORMATION_ERROR,_("Low date is incorrect"));
-#: src/filter-edit-callbacks.c:405
+#: src/filter-edit-callbacks.c:408
 msgid "Low date is incorrect"
 msgstr "Undre datumet är felaktigt"
 
 #. balsa_information(LIBBALSA_INFORMATION_ERROR,_("High date is incorrect"));
-#: src/filter-edit-callbacks.c:416
+#: src/filter-edit-callbacks.c:419
 msgid "High date is incorrect"
 msgstr "Övre datumet är felaktigt"
 
 #. balsa_information(LIBBALSA_INFORMATION_ERROR,_("Low date is greater than high date"));
-#: src/filter-edit-callbacks.c:423
+#: src/filter-edit-callbacks.c:426
 msgid "Low date is greater than high date"
 msgstr "Undre datumet är större än övre datumet"
 
-#: src/filter-edit-callbacks.c:622
+#: src/filter-edit-callbacks.c:632
 msgid "Deleted"
 msgstr "Borttaget"
 
-#: src/filter-edit-callbacks.c:622
+#: src/filter-edit-callbacks.c:632
 msgid "Replied"
 msgstr "Besvarat"
 
-#: src/filter-edit-callbacks.c:648
+#: src/filter-edit-callbacks.c:659
 msgid "Contain/Does not contain"
 msgstr "Innehåller/Innehåller inte"
 
-#: src/filter-edit-callbacks.c:703
+#: src/filter-edit-callbacks.c:714
 msgid "One matches/None matches"
 msgstr "Ett matchar/Inget matchar"
 
-#: src/filter-edit-callbacks.c:739
+#: src/filter-edit-callbacks.c:753
 msgid "Inside/outside the date interval"
 msgstr "Inuti/Utanför datumintervallet"
 
-#: src/filter-edit-callbacks.c:779
+#: src/filter-edit-callbacks.c:796
 msgid "Match when one flag is set/when no flag is set"
 msgstr "Matcha då en flagga är inställd/då ingen flagga är inställd"
 
 #. builds the toggle buttons to specify fields concerned by the conditions of
 #. * the filter
-#: src/filter-edit-callbacks.c:797
+#: src/filter-edit-callbacks.c:814
 msgid "Match in:"
 msgstr "Matcha på:"
 
-#: src/filter-edit-callbacks.c:808
+#: src/filter-edit-callbacks.c:826
 msgid "All"
 msgstr "Alla"
 
-#: src/filter-edit-callbacks.c:814
+#: src/filter-edit-callbacks.c:834
 msgid "All headers"
 msgstr "Alla huvuden"
 
-#: src/filter-edit-callbacks.c:820
+#: src/filter-edit-callbacks.c:842
 msgid "Clear"
 msgstr "Töm"
 
-#: src/filter-edit-callbacks.c:827 src/main-window.c:2624
+#: src/filter-edit-callbacks.c:851 src/main-window.c:2624
 msgid "Body"
 msgstr "Meddelandetext"
 
-#: src/filter-edit-callbacks.c:873
+#: src/filter-edit-callbacks.c:897
 msgid "Selected condition search type:"
 msgstr "Vald villkorssökningstyp:"
 
-#: src/filter-edit-callbacks.c:930
-msgid "Error : not enough memory"
-msgstr "Fel: inte tillräckligt med minne"
-
-#: src/filter-edit-callbacks.c:941
+#: src/filter-edit-callbacks.c:960
 msgid "Edit condition for filter: "
 msgstr "Redigera villkor för filter: "
 
-#: src/filter-edit-callbacks.c:1285
+#: src/filter-edit-callbacks.c:1306
 msgid "New filter"
 msgstr "Nytt filter"
 
-#: src/filter-edit-callbacks.c:1398
-msgid "Invalid filter name\n"
-msgstr "Ogiltigt filternamn\n"
-
-#: src/filter-edit-callbacks.c:1412
-msgid "Invalid mailbox name\n"
-msgstr "Ogiltigt brevlådenamn\n"
-
 #: src/filter-edit-callbacks.c:1419
+msgid "No filter name specified."
+msgstr "Inget filternamn angavs."
+
+#: src/filter-edit-callbacks.c:1424
+#, c-format
+msgid "Filter %s already exists."
+msgstr "Filtret %s finns redan."
+
+#: src/filter-edit-callbacks.c:1443
 msgid "Your filter must have conditions\n"
 msgstr "Ditt filter måste ha villkor\n"
 
-#: src/filter-edit-callbacks.c:1475
+#: src/filter-edit-callbacks.c:1499
 msgid "Filter has matched"
 msgstr "Filtret har matchat"
 
@@ -4493,6 +4488,26 @@ msgstr "-"
 #: src/toolbar-prefs.c:821
 msgid "+"
 msgstr "+"
+
+#~ msgid "A filter run dialog is open. Close it before you can modify filters."
+#~ msgstr ""
+#~ "En filterkörningdialoger är öppen. Stäng den innan du kan ändra filter."
+
+#~ msgid ""
+#~ "There are opened filter run dialogs, close them before you can modify "
+#~ "filters"
+#~ msgstr ""
+#~ "Det finns öppnade filterkörningdialoger, stäng dem innan du kan ändra "
+#~ "filter"
+
+#~ msgid "Error : not enough memory"
+#~ msgstr "Fel: inte tillräckligt med minne"
+
+#~ msgid "Invalid filter name\n"
+#~ msgstr "Ogiltigt filternamn\n"
+
+#~ msgid "Invalid mailbox name\n"
+#~ msgstr "Ogiltigt brevlådenamn\n"
 
 #~ msgid "Could not load image. It is most likely corrupted."
 #~ msgstr "Kunde inte läsa in bilden. Den är antagligen trasig."

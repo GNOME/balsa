@@ -4,4 +4,4 @@ Makefile.in
 balsa-skels.c
 balsa-stubs.c
 balsa-common.c
-
+balsa.h

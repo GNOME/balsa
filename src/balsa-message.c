@@ -33,6 +33,7 @@
 #include "balsa-icons.h"
 #include "mime.h"
 #include "misc.h"
+#include "html.h"
 
 /*
 #include <libmutt/mutt.h>
@@ -40,10 +41,6 @@
 */
 
 #include <gdk-pixbuf/gdk-pixbuf.h>
-
-#ifdef HAVE_GTKHTML
-#include <libgtkhtml/gtkhtml.h>
-#endif
 
 #ifdef HAVE_PCRE
 #  include <pcreposix.h>
@@ -167,11 +164,7 @@ static void scroll_change(GtkAdjustment * adj, gint diff);
 static void balsa_gtk_html_size_request(GtkWidget * widget,
 					GtkRequisition * requisition,
 					gpointer data);
-static gboolean balsa_gtk_html_url_requested(GtkWidget *html, const gchar *url,
-					     HtmlStream* stream,
-					     LibBalsaMessage* msg);
-static void balsa_gtk_html_link_clicked(GObject * obj, 
-					const gchar *url);
+static void balsa_gtk_html_link_clicked(GObject * obj, const gchar * url);
 #endif
 static void balsa_gtk_html_on_url(GtkWidget *html, const gchar *url);
 
@@ -2016,26 +2009,48 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
     fclose(fp);
 }
 #ifdef HAVE_GTKHTML
+static void
+bm_zoom_in(BalsaMessage * bm)
+{
+    balsa_message_zoom(bm, 1);
+}
+
+static void
+bm_zoom_out(BalsaMessage * bm)
+{
+    balsa_message_zoom(bm, -1);
+}
+
+static void
+bm_zoom_reset(BalsaMessage * bm)
+{
+    balsa_message_zoom(bm, 0);
+}
+
 static gboolean
-balsa_gtk_html_popup(HtmlView * view)
+balsa_gtk_html_popup(BalsaMessage * bm)
 {
     GtkWidget *menu, *menuitem;
 
     menu = gtk_menu_new();
+
     menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
     g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
-			     G_CALLBACK(html_view_zoom_in), view);
+			     G_CALLBACK(bm_zoom_in), bm);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+
     menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
     g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
-			     G_CALLBACK(html_view_zoom_out), view);
+			     G_CALLBACK(bm_zoom_out), bm);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+
     menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
     g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
-			     G_CALLBACK(html_view_zoom_reset), view);
+			     G_CALLBACK(bm_zoom_reset), bm);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+
     g_signal_connect(G_OBJECT(menu), "selection-done",
                      G_CALLBACK(gtk_widget_destroy), NULL);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     gtk_widget_show_all(menu);
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
 	           0, gtk_get_current_event_time());
@@ -2043,42 +2058,31 @@ balsa_gtk_html_popup(HtmlView * view)
 }
 
 static gboolean
-balsa_gtk_html_button_press_cb(HtmlView * view, GdkEventButton * event,
+balsa_gtk_html_button_press_cb(GtkWidget * html, GdkEventButton * event,
 			       BalsaMessage * bm)
 {
     return ((event->type == GDK_BUTTON_PRESS && event->button == 3)
-	    ? balsa_gtk_html_popup(view) : FALSE);
+	    ? balsa_gtk_html_popup(bm) : FALSE);
 }
 
 static void
- part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
+part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
 		    size_t len)
 {
-    GtkWidget *html;
-    HtmlDocument *document;
+    GtkWidget *html =
+	libbalsa_html_new(ptr, len, NULL, bm->message,
+			  G_CALLBACK(balsa_gtk_html_link_clicked));
 
-    html = html_view_new();
-
-    document = html_document_new();
-    html_view_set_document(HTML_VIEW(html), document);
-
-    html_document_open_stream(document, "text/html");
-    g_signal_connect(G_OBJECT(document), "request_url",
-		     G_CALLBACK(balsa_gtk_html_url_requested), bm->message);
-    html_document_write_stream(document, ptr, len);
-    html_document_close_stream (document);
-
-    g_signal_connect(G_OBJECT(html), "size_request",
-		     G_CALLBACK(balsa_gtk_html_size_request),
-                     (gpointer) bm);
-    g_signal_connect(G_OBJECT(document), "link_clicked",
-		     G_CALLBACK(balsa_gtk_html_link_clicked), NULL);
-    g_signal_connect(G_OBJECT(html), "on_url",
+    g_signal_connect(G_OBJECT(html), "size-request",
+		     G_CALLBACK(balsa_gtk_html_size_request), bm);
+    g_signal_connect(G_OBJECT(html), "on-url",
 		     G_CALLBACK(balsa_gtk_html_on_url), bm);
-    g_signal_connect(G_OBJECT(html), "popup-menu",
-		     G_CALLBACK(balsa_gtk_html_popup), bm);
-    g_signal_connect(G_OBJECT(html), "button_press_event",
+    g_signal_connect(G_OBJECT(html), "button-press-event",
 		     G_CALLBACK(balsa_gtk_html_button_press_cb), bm);
+    g_signal_connect(G_OBJECT(html), "key_press_event",
+		     G_CALLBACK(balsa_message_key_press_event), bm);
+    g_signal_connect_swapped(G_OBJECT(html), "popup-menu",
+		     G_CALLBACK(balsa_gtk_html_popup), bm);
 
     gtk_widget_show(html);
 
@@ -3082,6 +3086,14 @@ balsa_message_key_press_event(GtkWidget * widget, GdkEventKey * event,
 	else
 	    return FALSE;
 	break;
+    case GDK_F10:
+	if (event->state & GDK_SHIFT_MASK && bm && bm->current_part
+	    && bm->current_part->focus_widget)
+	    g_signal_emit_by_name(bm->current_part->focus_widget,
+		                  "popup-menu");
+	else
+	    return FALSE;
+	break;
 
     default:
 	return FALSE;
@@ -3099,51 +3111,16 @@ balsa_gtk_html_size_request(GtkWidget * widget,
 			    GtkRequisition * requisition, gpointer data)
 {
     g_return_if_fail(widget != NULL);
-    g_return_if_fail(HTML_IS_VIEW(widget));
     g_return_if_fail(requisition != NULL);
-    
+
     requisition->width  = GTK_LAYOUT(widget)->hadjustment->upper;
     requisition->height = GTK_LAYOUT(widget)->vadjustment->upper;
-}
-
-static gboolean
-balsa_gtk_html_url_requested(GtkWidget *html, const gchar *url,
-			     HtmlStream* stream, LibBalsaMessage* msg)
-{
-    FILE* f;
-    int i;
-    char buf[4096];
-
-    if(strncmp(url,"cid:",4)) {
-	printf("non-local URL request ignored: %s\n", url);
-	return FALSE;
-    }
-    if( (f=libbalsa_message_get_part_by_id(msg,url+4)) == NULL) {
-	gchar *s = g_strconcat("<",url+4,">",NULL);
-	
-	if( s == NULL )
-	    return FALSE;
-
-	f = libbalsa_message_get_part_by_id(msg,s);
-	g_free(s);
-	if( f == NULL )
-	    return FALSE;
-    }
-
-    while ((i = fread (buf, 1, sizeof(buf), f)) != 0)
-	html_stream_write (stream, buf, i);
-    html_stream_close(stream);
-    fclose (f);
-    
-    return TRUE;
 }
 
 static void
 balsa_gtk_html_link_clicked(GObject *obj, const gchar *url)
 {
     GError *err = NULL;
-
-    g_return_if_fail(HTML_IS_DOCUMENT(obj));
 
     gnome_url_show(url, &err);
     if (err) {
@@ -3556,30 +3533,30 @@ prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list)
 gboolean
 balsa_message_can_zoom(BalsaMessage * bm)
 {
-    return (bm && bm->current_part
-	    && HTML_IS_VIEW(bm->current_part->widget));
+    return libbalsa_html_can_zoom(bm->current_part->widget);
 }
 
-/* Zoom an HtmlView item. */
+/* Zoom an html item. */
 void
 balsa_message_zoom(BalsaMessage * bm, gint in_out)
 {
+    gint zoom;
+
     if (!balsa_message_can_zoom(bm))
 	return;
 
-    switch (in_out) {
-    case +1:
-	html_view_zoom_in(HTML_VIEW(bm->current_part->widget));
-	break;
-    case -1:
-	html_view_zoom_out(HTML_VIEW(bm->current_part->widget));
-	break;
-    case 0:
-	html_view_zoom_reset(HTML_VIEW(bm->current_part->widget));
-	break;
-    default:
-	break;
-    }
+    zoom =
+       GPOINTER_TO_INT(g_object_get_data
+                       (G_OBJECT(bm->message), BALSA_MESSAGE_ZOOM_KEY));
+     if (in_out)
+       zoom += in_out;
+     else
+       zoom = 0;
+     g_object_set_data(G_OBJECT(bm->message), BALSA_MESSAGE_ZOOM_KEY,
+                     GINT_TO_POINTER(zoom));
+
+     libbalsa_html_zoom(bm->current_part->widget, in_out);
+
 }
 #endif /* HAVE_GTKHTML */
 

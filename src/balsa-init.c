@@ -52,6 +52,10 @@ struct _Prefs
     GtkWidget *real_name;
     GtkWidget *email;
     GtkWidget *smtp_server;
+
+    GtkWidget *inbox;
+    GtkWidget *outbox;
+    GtkWidget *trash;
   };
 static Prefs *prefs = NULL;
 
@@ -114,7 +118,7 @@ balsa_init_window_new ()
 
   iw->notebook = gtk_notebook_new ();
   gtk_container_border_width (GTK_CONTAINER (iw->notebook), 5);
-  gtk_box_pack_start (GTK_BOX (vbox), iw->notebook, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), iw->notebook, FALSE, FALSE, 0);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (iw->notebook), FALSE);
   gtk_notebook_set_show_border (GTK_NOTEBOOK (iw->notebook), FALSE);
   gtk_widget_show (iw->notebook);
@@ -229,7 +233,7 @@ create_general_page ()
 
 
   table = gtk_table_new (5, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
   gtk_widget_show (table);
 
   /* your name */
@@ -292,9 +296,44 @@ static GtkWidget *
 create_mailboxes_page ()
 {
   GtkWidget *vbox;
+  GtkWidget *table;
+  GtkWidget *label;
 
-  vbox = gtk_vbox_new (TRUE, 0);
+  vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
+
+  table = gtk_table_new (3, 2, FALSE);
+  gtk_widget_show (table);
+  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
+
+  label = gtk_label_new (_ ("Inbox Path:"));
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
+		    GTK_FILL, GTK_FILL, 10, 10);
+  prefs->inbox = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), prefs->inbox, 1, 2, 0, 1,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+  label = gtk_label_new (_ ("Outbox Path:"));
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
+		    GTK_FILL, GTK_FILL, 10, 10);
+  prefs->outbox = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), prefs->outbox, 1, 2, 1, 2,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+  label = gtk_label_new (_ ("Trash Path:"));
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
+		    GTK_FILL, GTK_FILL, 10, 10);
+  prefs->trash = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), prefs->trash, 1, 2, 2, 3,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+  label = gtk_label_new (_ ("If you wish to use IMAP for these\nplease change them inside Balsa\n"));
+  gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
+
+  gtk_widget_show_all (vbox);
 
   return vbox;
 }
@@ -306,7 +345,7 @@ create_finished_page ()
   GtkWidget *button;
   GtkWidget *label;
 
-  vbox = gtk_vbox_new (TRUE, 0);
+  vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
 
   label = gtk_label_new (_ ("Balsa is now ready to run.  Click finish to save your settings"));
@@ -358,6 +397,8 @@ static void
 complete_cb (GtkWidget * widget)
 {
   gchar *email, *c;
+  Mailbox *mailbox;
+  MailboxType type;
 
   g_free (balsa_app.real_name);
   balsa_app.real_name = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->real_name)));
@@ -388,11 +429,37 @@ complete_cb (GtkWidget * widget)
   g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->smtp_server)));
 
+  type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
+  mailbox = mailbox_new (type);
+  mailbox->name = g_strdup ("Inbox");
+  MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
+  add_mailbox_config (mailbox);
+  mailbox_free (mailbox);
+
+  type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
+  mailbox = mailbox_new (type);
+  mailbox->name = g_strdup ("Outbox");
+  MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->outbox)));
+  add_mailbox_config (mailbox);
+  mailbox_free (mailbox);
+
+  type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->trash)));
+  mailbox = mailbox_new (type);
+  mailbox->name = g_strdup ("Trash");
+  MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->trash)));
+  add_mailbox_config (mailbox);
+  mailbox_free (mailbox);
+
   save_global_settings ();
 
   gtk_widget_destroy (prefs->real_name);
   gtk_widget_destroy (prefs->email);
   gtk_widget_destroy (prefs->smtp_server);
+
+  gtk_widget_destroy (prefs->inbox);
+  gtk_widget_destroy (prefs->outbox);
+  gtk_widget_destroy (prefs->trash);
+
   g_free (prefs);
 
   gtk_widget_destroy (iw->next);

@@ -1,3 +1,7 @@
+2005-02-24  Pawel Salek
+
+	* src/pref-manager.c: compile with C89 (contributed by Jens Granseuer).
+
 2005-02-23  Pawel Salek
 
 	* NEWS: release 2.3.0

@@ -1962,8 +1962,7 @@ balsa_index_remove_duplicates(BalsaIndex * index)
             GtkTreePath *path;
 
             messages = g_list_prepend(messages, message);
-            if (!balsa_app.hide_deleted
-                && bndx_find_message(index, &path, NULL, message)) {
+            if (bndx_find_message(index, &path, NULL, message)) {
                 bndx_expand_to_row(index, path);
                 gtk_tree_path_free(path);
             }

@@ -693,6 +693,10 @@ config_global_load(void)
 
     {                             /* scope */
         guint type =
+            gnome_config_get_int_with_default("SortField", &def_used);
+        if (!def_used)
+            libbalsa_mailbox_set_sort_field(NULL, type);
+        type =
             gnome_config_get_int_with_default("ThreadingType", &def_used);
         if (!def_used)
             libbalsa_mailbox_set_threading_type(NULL, type);
@@ -780,9 +784,9 @@ config_global_load(void)
     balsa_app.pwindow_option = d_get_gint("ProgressWindow", WHILERETR);
 
     /* ... deleting messages: defaults enshrined here */
-    balsa_app.hide_deleted =
-        gnome_config_get_bool("HideDeleted=true");
-    libbalsa_mailbox_set_filter(NULL, balsa_app.hide_deleted ? 1 : 0);
+    libbalsa_mailbox_set_filter(NULL,
+                                gnome_config_get_bool("HideDeleted=true")
+				? 1 : 0);
     balsa_app.expunge_on_close =
         gnome_config_get_bool("ExpungeOnClose=true");
     balsa_app.expunge_auto = gnome_config_get_bool("AutoExpunge=true");
@@ -1120,6 +1124,8 @@ config_save(void)
     gnome_config_set_int("ShownHeaders", balsa_app.shown_headers);
     gnome_config_set_string("SelectedHeaders", balsa_app.selected_headers);
     gnome_config_set_bool("ExpandTree", balsa_app.expand_tree);
+    gnome_config_set_int("SortField",
+			 libbalsa_mailbox_get_sort_field(NULL));
     gnome_config_set_int("ThreadingType",
 			 libbalsa_mailbox_get_threading_type(NULL));
     gnome_config_set_string("QuoteRegex", balsa_app.quote_regex);
@@ -1163,7 +1169,7 @@ config_save(void)
     gnome_config_set_bool("FileFormatCheck", balsa_app.do_file_format_check);
     gnome_config_set_bool("ViewFilter",      balsa_app.enable_view_filter);
 #endif /* ENABLE_TOUCH_UI */
-    gnome_config_set_bool("HideDeleted", balsa_app.hide_deleted);
+    gnome_config_set_bool("HideDeleted", libbalsa_mailbox_get_filter(NULL) & 1);
     gnome_config_set_bool("ExpungeOnClose", balsa_app.expunge_on_close);
     gnome_config_set_bool("AutoExpunge", balsa_app.expunge_auto);
     gnome_config_set_int("AutoExpungeHours",

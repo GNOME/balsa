@@ -41,6 +41,8 @@
 #include <libesmtp.h>
 #endif
 
+#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
+
 #define NUM_ENCODING_MODES 3
 #define NUM_PWINDOW_MODES 3
 #define NUM_THREADING_STYLES 3
@@ -83,6 +85,7 @@ typedef struct _PropertyUI {
     GtkWidget *close_mailbox_auto;
     GtkWidget *close_mailbox_minutes;
     GtkWidget *hide_deleted;
+    gint filter;
     GtkWidget *expunge_on_close;
     GtkWidget *expunge_auto;
     GtkWidget *expunge_hours;
@@ -136,10 +139,12 @@ typedef struct _PropertyUI {
     GtkWidget *url_color;
     GtkWidget *bad_address_color;
 
-    /* threading prefs */
+    /* sorting and threading prefs */
     GtkWidget *tree_expand_check;
-    GtkWidget *default_threading_style;
-    gint threading_style_index;
+    GtkWidget *default_sort_field;
+    gint sort_field_index;
+    GtkWidget *default_threading_type;
+    gint threading_type_index;
 
     /* quote regex */
     GtkWidget *quote_pattern;
@@ -242,18 +247,17 @@ static GtkWidget *folder_scanning_group(GtkWidget * page);
 static GtkWidget *create_table(gint rows, gint cols, GtkWidget * page);
 static GtkWidget* add_pref_menu(const gchar* label, const gchar* names[], 
                                 gint size, gint* index, GtkBox* parent, 
-                                gint padding, GtkSignalFunc callback);
+                                gint padding, GtkWidget * page);
 static GtkWidget *attach_pref_menu(const gchar * label, gint row,
                                    GtkTable * table, const gchar * names[],
-                                   gint size, gint * index,
-                                   GCallback callback);
+                                   gint size, gint * index);
 static GtkWidget *attach_entry(const gchar * label, gint row,
                                GtkTable * table);
 static GtkWidget *attach_entry_full(const gchar * label, gint row,
                                     GtkTable * table, gint col_left,
                                     gint col_middle, gint col_right);
 static GtkWidget* create_pref_option_menu(const gchar* names[], gint size, 
-                                          gint* index, GtkSignalFunc callback);
+                                          gint* index);
 
 /* page and group object methods */
 static GtkWidget *pm_page_new(void);
@@ -303,13 +307,13 @@ static void browse_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 
-static void spelling_optionmenu_cb(GtkItem * menuitem, gpointer data);
-static void threading_optionmenu_cb(GtkItem* menuitem, gpointer data);
+static void option_menu_cb(GtkItem * menuitem, gpointer data);
 static void set_default_address_book_cb(GtkWidget * button, gpointer data);
 static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox);
 
 static void convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox);
 
+static void filter_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void expunge_on_close_cb(GtkWidget * widget, GtkWidget * pbox);
 static void expunge_auto_cb(GtkWidget * widget, GtkWidget * pbox);
 
@@ -343,7 +347,16 @@ const gchar *spell_check_suggest_mode_label[NUM_SUGGEST_MODES] = {
     N_("Bad Spellers")
 };
 
-const gchar* threading_style_label[NUM_THREADING_STYLES] = {
+/* These labels must match the LibBalsaMailboxSortFields enum. */
+const gchar *sort_field_label[] = {
+    N_("Message number"),
+    N_("Subject"),
+    N_("Date"),
+    N_("Size"),
+    N_("Sender")
+};
+
+const gchar* threading_type_label[NUM_THREADING_STYLES] = {
     N_("Flat"),
     N_("Simple"),
     N_("JWZ")
@@ -511,7 +524,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		     G_CALLBACK(mailbox_close_timer_modified_cb), property_box);
 
     g_signal_connect(G_OBJECT(pui->hide_deleted), "toggled",
-		     G_CALLBACK(properties_modified_cb), property_box);
+		     G_CALLBACK(filter_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->expunge_on_close), "toggled",
 		     G_CALLBACK(expunge_on_close_cb), property_box);
     g_signal_connect(G_OBJECT(pui->expunge_auto), "toggled",
@@ -586,7 +599,9 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     /* threading */
     g_signal_connect(G_OBJECT(pui->tree_expand_check), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->default_threading_style), "clicked",
+    g_signal_connect(G_OBJECT(pui->default_sort_field), "clicked",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->default_threading_type), "clicked",
                      G_CALLBACK(properties_modified_cb), property_box);
 
     /* spell checking */
@@ -666,6 +681,20 @@ destroy_pref_window_cb(void)
     already_open = FALSE;
 }
 
+/* GHFunc callback; update any view that is using the current default
+ * value to the new default value. */
+static void
+update_view_defaults(const gchar * url, LibBalsaMailboxView * view,
+                     gpointer data)
+{
+    if (view->filter == libbalsa_mailbox_get_filter(NULL))
+	view->filter = pui->filter;
+    if (view->sort_field == libbalsa_mailbox_get_sort_field(NULL))
+	view->sort_field = pui->sort_field_index;
+    if (view->threading_type == libbalsa_mailbox_get_threading_type(NULL))
+	view->threading_type = pui->threading_type_index;
+}
+
 static void
 apply_prefs(GtkDialog * pbox)
 {
@@ -675,6 +704,12 @@ apply_prefs(GtkDialog * pbox)
     GtkWidget *menu_item;
     const gchar* tmp;
 
+    /*
+     * Before changing the default mailbox view, update any current
+     * views that have default values.
+     */
+    g_hash_table_foreach(libbalsa_mailbox_view_table,
+                         (GHFunc) update_view_defaults, NULL);
     /*
      * identity page
      */
@@ -787,10 +822,7 @@ apply_prefs(GtkDialog * pbox)
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
 					 (pui->close_mailbox_minutes)) * 60;
 
-    balsa_app.hide_deleted =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                     (pui->hide_deleted));
-    libbalsa_mailbox_set_filter(NULL, balsa_app.hide_deleted ? 1 : 0);
+    libbalsa_mailbox_set_filter(NULL, pui->filter);
     balsa_app.expunge_on_close =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (pui->expunge_on_close));
@@ -896,9 +928,10 @@ apply_prefs(GtkDialog * pbox)
 			       &(balsa_app.bad_address_color.blue),
 			       0);			       
 
-    /* threading */
+    /* sorting and threading */
+    libbalsa_mailbox_set_sort_field(NULL, pui->sort_field_index);
+    libbalsa_mailbox_set_threading_type(NULL, pui->threading_type_index);
     balsa_app.expand_tree = GTK_TOGGLE_BUTTON(pui->tree_expand_check)->active;
-    libbalsa_mailbox_set_threading_type(NULL, pui->threading_style_index);
 
     /* Information dialogs */
     menu_item =
@@ -1035,11 +1068,10 @@ set_prefs(void)
 			     GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->
     		    	    active);
 
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-                                 (pui->hide_deleted),
-                                 balsa_app.hide_deleted);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-                                 (pui->expunge_on_close),
+    pui->filter = libbalsa_mailbox_get_filter(NULL);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->hide_deleted),
+                                 pui->filter & (1 << 0));
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->expunge_on_close),
                                  balsa_app.expunge_on_close);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->expunge_auto),
 				 balsa_app.expunge_auto);
@@ -1122,9 +1154,12 @@ set_prefs(void)
     /* threading */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->tree_expand_check), 
                                  balsa_app.expand_tree);
-    pui->threading_style_index = libbalsa_mailbox_get_threading_type(NULL);
-    gtk_option_menu_set_history(GTK_OPTION_MENU(pui->default_threading_style),
-                                pui->threading_style_index);
+    pui->sort_field_index = libbalsa_mailbox_get_sort_field(NULL);
+    gtk_option_menu_set_history(GTK_OPTION_MENU(pui->default_sort_field),
+                                pui->sort_field_index);
+    pui->threading_type_index = libbalsa_mailbox_get_threading_type(NULL);
+    gtk_option_menu_set_history(GTK_OPTION_MENU(pui->default_threading_type),
+                                pui->threading_type_index);
 
     /* spelling */
     pui->module_index = balsa_app.module;
@@ -1753,7 +1788,6 @@ alternative_group(GtkWidget * page)
 static GtkWidget *
 broken_8bit_codeset_group(GtkWidget * page)
 {
-    GtkSizeGroup *size_group = pm_page_get_size_group(page);
     GtkWidget *group;
     GtkWidget *table;
     GSList *radio_group = NULL;
@@ -1792,9 +1826,9 @@ broken_8bit_codeset_group(GtkWidget * page)
     gtk_option_menu_set_history(GTK_OPTION_MENU(pui->convert_unknown_8bit_codeset),
 				balsa_app.convert_unknown_8bit_codeset);
 
-    gtk_size_group_add_widget(size_group,
+    pm_page_add_to_size_group(page,
                               GTK_WIDGET(pui->convert_unknown_8bit[0]));
-    gtk_size_group_add_widget(size_group,
+    pm_page_add_to_size_group(page,
                               GTK_WIDGET(pui->convert_unknown_8bit[1]));
     
     return group;
@@ -1985,7 +2019,7 @@ create_display_page(gpointer data)
     gtk_notebook_append_page(GTK_NOTEBOOK(note), message_subpage(data),
                              gtk_label_new(_("Message")));
     gtk_notebook_append_page(GTK_NOTEBOOK(note), threading_subpage(data),
-                             gtk_label_new(_("Threading")));
+                             gtk_label_new(_("Sort and Thread")));
 
     return note;
 }
@@ -2280,33 +2314,37 @@ threading_group(GtkWidget * page)
     GtkWidget *group;
     GtkWidget *vbox;
 
-    group = pm_group_new(_("Threading"));
-
-    pui->tree_expand_check =
-        pm_group_add_check(group, _("Expand mailbox tree on open"));
+    group = pm_group_new(_("Sorting and Threading"));
     
     vbox = pm_group_get_vbox(group);
-    pui->default_threading_style = 
-        add_pref_menu(_("Default threading style"), threading_style_label, 
-                      NUM_THREADING_STYLES, &pui->threading_style_index, 
-                      GTK_BOX(vbox), 2 * HIG_PADDING, 
-                      G_CALLBACK(threading_optionmenu_cb));
+    pui->default_sort_field = 
+        add_pref_menu(_("Default sort column"), sort_field_label, 
+                      ELEMENTS(sort_field_label), &pui->sort_field_index, 
+                      GTK_BOX(vbox), 2 * HIG_PADDING, page);
+    pui->default_threading_type = 
+        add_pref_menu(_("Default threading style"), threading_type_label, 
+                      NUM_THREADING_STYLES, &pui->threading_type_index, 
+                      GTK_BOX(vbox), 2 * HIG_PADDING, page);
+
+    pui->tree_expand_check =
+        pm_group_add_check(group, _("Expand threads on open"));
     
     return group;
 }
 
 static GtkWidget*
 add_pref_menu(const gchar* label, const gchar *names[], gint size, 
-	       gint *index, GtkBox* parent, gint padding, 
-               GtkSignalFunc callback)
+	      gint *index, GtkBox* parent, gint padding, GtkWidget * page)
 {
     GtkWidget *omenu;
     GtkWidget *hbox, *lbw;
 
-    omenu = create_pref_option_menu(names, size, index, callback);
+    omenu = create_pref_option_menu(names, size, index);
 
     hbox = gtk_hbox_new(FALSE, padding);
     lbw = gtk_label_new(label);
+    gtk_misc_set_alignment(GTK_MISC(lbw), 0, 0.5);
+    pm_page_add_to_size_group(page, lbw);
     gtk_box_pack_start(GTK_BOX(hbox), lbw,   FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), omenu, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), gtk_hbox_new(FALSE, 0), TRUE, TRUE, 0);
@@ -2329,8 +2367,7 @@ create_table(gint rows, gint cols, GtkWidget * page)
 
 static GtkWidget *
 attach_pref_menu(const gchar * label, gint row, GtkTable * table,
-                 const gchar * names[], gint size, gint * index,
-                 GCallback callback)
+                 const gchar * names[], gint size, gint * index)
 {
     GtkWidget *w, *omenu;
 
@@ -2339,7 +2376,7 @@ attach_pref_menu(const gchar * label, gint row, GtkTable * table,
     gtk_table_attach(GTK_TABLE(table), w, 0, 1, row, row + 1,
                      GTK_FILL, 0, 0, 0);
 
-    omenu = create_pref_option_menu(names, size, index, callback);
+    omenu = create_pref_option_menu(names, size, index);
     gtk_table_attach(GTK_TABLE(table), omenu, 1, 2, row, row + 1,
                      GTK_EXPAND | GTK_FILL, 0, 0, 0);
 
@@ -2374,15 +2411,13 @@ pspell_settings_group(GtkWidget * page)
     pui->module =
         attach_pref_menu(_("Spell Check Module"), 0, GTK_TABLE(table),
                          spell_check_modules_name, NUM_PSPELL_MODULES,
-                         &pui->module_index,
-                         G_CALLBACK(spelling_optionmenu_cb));
+                         &pui->module_index);
 
     /* do the suggestion modes menu */
     pui->suggestion_mode =
         attach_pref_menu(_("Suggestion Level"), 1, GTK_TABLE(table),
                          spell_check_suggest_mode_label, NUM_SUGGEST_MODES,
-                         &pui->suggestion_mode_index,
-                         G_CALLBACK(spelling_optionmenu_cb));
+                         &pui->suggestion_mode_index);
 
     /* do the ignore length */
     label = gtk_label_new(_("Ignore words shorter than"));
@@ -2907,28 +2942,16 @@ pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 }
 
 static void
-spelling_optionmenu_cb(GtkItem * menuitem, gpointer data)
+option_menu_cb(GtkItem * menuitem, gpointer data)
 {
     /* update the index number */
     gint *index = (gint *) data;
     *index = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menuitem),
                                                "menu_index"));
-
 }
-
-
-static void
-threading_optionmenu_cb(GtkItem* menuitem, gpointer data)
-{
-    /* update the index number */
-    gint *index = (gint*) data;
-    *index = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menuitem),
-                                               "menu_index"));
-}
-
 
 static GtkWidget *
-create_pref_option_menu(const gchar * names[], gint size, gint * index, GtkSignalFunc callback)
+create_pref_option_menu(const gchar * names[], gint size, gint * index)
 {
     GtkWidget *omenu;
     GtkWidget *gmenu;
@@ -2943,7 +2966,7 @@ create_pref_option_menu(const gchar * names[], gint size, gint * index, GtkSigna
 	g_object_set_data(G_OBJECT(menuitem), "menu_index",
 			    GINT_TO_POINTER(i));
 	g_signal_connect(G_OBJECT(menuitem), "select",
-                         G_CALLBACK(callback), (gpointer) index);
+                         G_CALLBACK(option_menu_cb), (gpointer) index);
 	g_signal_connect(G_OBJECT(menuitem), "select",
 			 G_CALLBACK(properties_modified_cb), property_box);
 
@@ -3020,6 +3043,17 @@ mailbox_close_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->close_mailbox_minutes),
 			     newstate);
+
+    properties_modified_cb(widget, pbox);
+}
+
+static void
+filter_modified_cb(GtkWidget * widget, GtkWidget * pbox)
+{
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->hide_deleted)))
+	pui->filter |= (1 << 0);
+    else
+	pui->filter &= ~(1 << 0);
 
     properties_modified_cb(widget, pbox);
 }

@@ -390,7 +390,6 @@ extern struct BalsaApplication {
 
     GList *folder_mru;
     GList *fcc_mru;
-    gboolean hide_deleted;
     gboolean expunge_on_close;
 
     /* use as default email client for GNOME */

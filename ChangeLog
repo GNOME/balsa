@@ -1,5 +1,8 @@
-2004-10-27 06:31  PeterB
+2004-10-27 08:26  PeterB
 
+	* src/toolbar-factory.c: do not use deprecated parts of the
+	GtkToolbar api.
+	* src/toolbar-prefs.c: plug leak.
 	* src/store-address.c: migrate from deprecated GtkOptionMenu to
 	GtkComboBox.
 	* src/pref-manager.c: migrate from deprecated GnomeFontPicker,

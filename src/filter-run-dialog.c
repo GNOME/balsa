@@ -123,26 +123,28 @@ populate_selected_filters_list(GtkTreeView * filter_list,
     }
 }
 
-guint
-balsa_filter_run_dialog_get_type()
+GtkType
+balsa_filter_run_dialog_get_type(void)
 {
-    static guint balsa_filter_run_dialog_type = 0;
+    static GtkType balsa_filter_run_dialog_type = 0;
 
     if (!balsa_filter_run_dialog_type) {
-	GtkTypeInfo balsa_filter_run_dialog_info = {
-	    "BalsaFilterRunDialog",
-	    sizeof(BalsaFilterRunDialog),
+	GTypeInfo balsa_filter_run_dialog_info = {
 	    sizeof(BalsaFilterRunDialogClass),
-	    (GtkClassInitFunc) balsa_filter_run_dialog_class_init,
-	    (GtkObjectInitFunc) balsa_filter_run_dialog_init,
-	    (gpointer) NULL,
-	    (gpointer) NULL,
-	    (GtkClassInitFunc) NULL
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) balsa_filter_run_dialog_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(BalsaFilterRunDialog),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) balsa_filter_run_dialog_init
 	};
 
 	balsa_filter_run_dialog_type =
-	    gtk_type_unique(gtk_dialog_get_type(),
-                            &balsa_filter_run_dialog_info);
+	    g_type_register_static(GTK_TYPE_DIALOG,
+	                           "BalsaFilterRunDialog",
+                                   &balsa_filter_run_dialog_info, 0);
     }
 
     return balsa_filter_run_dialog_type;
@@ -157,12 +159,13 @@ balsa_filter_run_dialog_class_init(BalsaFilterRunDialogClass * klass)
     object_class = GTK_OBJECT_CLASS(klass);
 
     balsa_filter_run_dialog_signals[REFRESH] =
-	gtk_signal_new("refresh",
-		       GTK_RUN_FIRST,
-		       BALSA_TYPE_FILTER_RUN_DIALOG,
-		       GTK_SIGNAL_OFFSET(BalsaFilterRunDialogClass, refresh),
-		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
-                       GTK_TYPE_POINTER);
+	g_signal_new("refresh",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_FIRST,
+		     G_STRUCT_OFFSET(BalsaFilterRunDialogClass, refresh),
+                     NULL, NULL,
+		     g_cclosure_marshal_VOID__OBJECT,
+                     G_TYPE_NONE, 1, G_TYPE_OBJECT);
 
     parent_class = gtk_type_class(gtk_dialog_get_type());
 
@@ -175,7 +178,7 @@ balsa_filter_run_dialog_new(LibBalsaMailbox * mbox)
     BalsaFilterRunDialog *p;
     gchar * dialog_title;
 
-    p = gtk_type_new(balsa_filter_run_dialog_get_type());
+    p = g_object_new(BALSA_TYPE_FILTER_RUN_DIALOG, NULL);
     g_return_val_if_fail(p,NULL);
 
     /* We set the dialog title */
@@ -275,18 +278,15 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
                            GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
                            NULL);
 
-    gtk_signal_connect(GTK_OBJECT(p), "response",
-                       GTK_SIGNAL_FUNC(fr_dialog_response), NULL);
-    gtk_signal_connect(GTK_OBJECT(p), "destroy",
-                       GTK_SIGNAL_FUNC(fr_destroy_window_cb), NULL);
+    g_signal_connect(G_OBJECT(p), "response",
+                     G_CALLBACK(fr_dialog_response), NULL);
+    g_signal_connect(G_OBJECT(p), "destroy",
+                     G_CALLBACK(fr_destroy_window_cb), NULL);
 
     hbox = gtk_hbox_new(FALSE,2);
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(p)->vbox),
 		       hbox, TRUE, TRUE, 0);
-
-    gtk_widget_push_visual(gdk_rgb_get_visual());
-    gtk_widget_push_colormap(gdk_rgb_get_cmap());
 
     p->available_filters =
         libbalsa_filter_list_new(TRUE, _("Name"), GTK_SELECTION_MULTIPLE,
@@ -311,15 +311,13 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
        pixmaps, hope this one is correct*/
     /* Right/Add button */
     button = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD, _("Add"));
-    gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-                              GTK_SIGNAL_FUNC(fr_add_pressed), 
-                              GTK_OBJECT(p));
+    g_signal_connect_swapped(G_OBJECT(button), "clicked",
+                             G_CALLBACK(fr_add_pressed), G_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* Left/Remove button */
     button = balsa_stock_button_with_label(GTK_STOCK_GO_BACK, _("Remove"));
-    gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-                              GTK_SIGNAL_FUNC(fr_remove_pressed), 
-                              GTK_OBJECT(p));
+    g_signal_connect_swapped(G_OBJECT(button), "clicked",
+                             G_CALLBACK(fr_remove_pressed), G_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
     gtk_box_pack_start(GTK_BOX(hbox),bbox, FALSE, FALSE, 6);
@@ -350,17 +348,14 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
 
     /* up button */
     button = balsa_stock_button_with_label(GTK_STOCK_GO_UP, _("Up"));
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-		       GTK_SIGNAL_FUNC(fr_up_pressed), p);
+    g_signal_connect(G_OBJECT(button), "clicked",
+		     G_CALLBACK(fr_up_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* down button */
     button = balsa_stock_button_with_label(GTK_STOCK_GO_DOWN, _("Down"));
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-		       GTK_SIGNAL_FUNC(fr_down_pressed), p);
+    g_signal_connect(G_OBJECT(button), "clicked",
+		     G_CALLBACK(fr_down_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
-
-    gtk_widget_pop_colormap();
-    gtk_widget_pop_visual();
 
     p->filters_modified=FALSE;
 }

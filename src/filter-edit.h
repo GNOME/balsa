@@ -52,6 +52,10 @@ void fe_destroy_window_cb(GtkWidget *,gpointer);
 void fe_dialog_response(GtkWidget * widget, gint response,
 			      gpointer data);
 
+/* helper */
+GtkWidget *fe_build_option_menu(option_list options[], gint num,
+                                GCallback func);
+
 /*---------------- Left side of hbox ----------------*/
 
 /* list callbacks */

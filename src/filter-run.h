@@ -79,7 +79,7 @@ struct _BalsaFilterRunDialogClass {
 	void (*refresh) (BalsaFilterRunDialog * fr,GSList * filters_changing,gpointer throwaway);
 };
 
-guint balsa_filter_run_dialog_get_type(void);
+GtkType balsa_filter_run_dialog_get_type(void);
 
 GtkWidget *balsa_filter_run_dialog_new(LibBalsaMailbox * mbox);
 

@@ -108,10 +108,10 @@ filters_export_dialog(void)
         gtk_tree_selection_select_iter(selection, &iter);
     }
 
-    gtk_signal_connect(GTK_OBJECT(fex_window), "response",
-                       GTK_SIGNAL_FUNC(fex_dialog_response), list);
-    gtk_signal_connect(GTK_OBJECT(fex_window), "destroy",
-		       GTK_SIGNAL_FUNC(fex_destroy_window_cb), NULL);
+    g_signal_connect(G_OBJECT(fex_window), "response",
+                     G_CALLBACK(fex_dialog_response), list);
+    g_signal_connect(G_OBJECT(fex_window), "destroy",
+		     G_CALLBACK(fex_destroy_window_cb), NULL);
 
     gtk_widget_show_all(GTK_WIDGET(fex_window));
 }

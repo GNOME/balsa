@@ -1,3 +1,11 @@
+2002-09-08  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/filter-edit-{callbacks, dialog}.c, src/filter-edit.h, 
+	* src/filter-{run,export}-dialog.c, src/filter-run.h: 
+	remove/replace deprecated items; rename build_option_menu as
+	fe_build_option_menu, and declare it in src/filter-edit.h instead
+	of locally.
+
 2002-09-07  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/filter-funcs.[ch]: add a utility and a helper for

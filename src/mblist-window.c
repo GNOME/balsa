@@ -308,7 +308,7 @@ static void size_allocate_cb( GtkWidget *widget, GtkAllocation *alloc )
 {
 /*    printf( "size_allocate_cb()\n" ); */
   if (balsa_app.show_mblist)
-    balsa_app.mblist_width = alloc->width + 18;
+    balsa_app.mblist_width = widget->parent->allocation.width;
 }
 
 static void

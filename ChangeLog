@@ -1,3 +1,8 @@
+2000-04-12  Peter Williams  <peter@beta.newton.cx>
+
+	* src/mblist-window.c (size_allocate_cb): Fix size
+	  calculation ( + 18... yeah right ).
+
 2000-04-12 Pawel Salek <pawsa@theochem.kth.se>
 
 	* sounds/Makefile.am, balsa.spec.in: 

@@ -1,3 +1,7 @@
+2004-01-04  Pawel Salek
+
+	* src/balsa-message.[ch]: bug 127776 - nicer display of headers.
+	
 2003-12-31  Carlos Morgado  <chbm gnome.org>
 
 	* libbalsa/html.c (libbalsa_html_print_get_pages_num): 

@@ -27,7 +27,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif				/* __cplusplus */
+#endif                          /* __cplusplus */
 
 
 #define BALSA_TYPE_MESSAGE          (balsa_message_get_type ())
@@ -42,23 +42,25 @@ typedef struct _BalsaMessageClass BalsaMessageClass;
 typedef struct _BalsaPartInfo BalsaPartInfo;
 
 struct _BalsaMessage {
-	GtkViewport parent;
+        GtkViewport parent;
 
        /* The vbox widget */
        GtkWidget *vbox;
  
-	/* Widget to hold headers */
-	GtkWidget *header_text;
-	ShownHeaders shown_headers;
-	gboolean show_all_headers;
+        /* Widget to hold headers */
+        GtkWidget *header_box;
+        GtkWidget *header_text;
+        GtkWidget *header_container;
+        ShownHeaders shown_headers;
+        gboolean show_all_headers;
 
-	/* Notebook to hold content + structure */
+        /* Notebook to hold content + structure */
         GtkWidget *notebook;
 
-	/* Widgets to hold content */
+        /* Widgets to hold content */
         GtkWidget *cont_viewport;
-	GtkWidget *content;
-	gboolean content_has_focus;
+        GtkWidget *content;
+        gboolean content_has_focus;
 
         /* Widget to hold structure tree */
         GtkWidget *treeview;
@@ -66,31 +68,31 @@ struct _BalsaMessage {
         GList *save_all_list;
         GtkWidget *save_all_popup;
     
-	gboolean wrap_text;
+        gboolean wrap_text;
 
-	BalsaPartInfo *current_part;
+        BalsaPartInfo *current_part;
 
-	LibBalsaMessage *message;
+        LibBalsaMessage *message;
 };
 
 struct _BalsaMessageClass {
-	GtkViewportClass parent_class;
+        GtkViewportClass parent_class;
 
-	void (*select_part) (BalsaMessage * message);
+        void (*select_part) (BalsaMessage * message);
 };
 
 GtkType balsa_message_get_type(void);
 GtkWidget *balsa_message_new(void);
 
 gboolean balsa_message_set(BalsaMessage * bmessage,
-			   LibBalsaMessage * message);
+                           LibBalsaMessage * message);
 
 void balsa_message_next_part(BalsaMessage * bmessage);
 void balsa_message_previous_part(BalsaMessage * bmessage);
 void balsa_message_save_current_part(BalsaMessage * bmessage);
 
 void balsa_message_set_displayed_headers(BalsaMessage * bmessage,
-					     ShownHeaders sh);
+                                             ShownHeaders sh);
 void balsa_message_set_wrap(BalsaMessage * bmessage, gboolean wrap);
 
 gboolean balsa_message_can_select(BalsaMessage * bmessage);
@@ -101,9 +103,9 @@ void reflow_string(gchar * str, gint mode, gint * cur_pos, int width);
 #define BALSA_MESSAGE_ZOOM_KEY "balsa-message-zoom"
 gboolean balsa_message_can_zoom(BalsaMessage * bm);
 void balsa_message_zoom(BalsaMessage * bm, gint in_out);
-#endif				/* HAVE_GTKHTML */
+#endif                          /* HAVE_GTKHTML */
 
 #ifdef __cplusplus
 }
-#endif				/* __cplusplus */
-#endif				/* __BALSA_MESSAGE_H__ */
+#endif                          /* __cplusplus */
+#endif                          /* __BALSA_MESSAGE_H__ */

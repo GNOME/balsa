@@ -642,8 +642,6 @@ undelete_message_cb (GtkWidget * widget)
 static void
 mblist_window_cb (GtkWidget * widget)
 {
-  Mailbox *mailbox;
-
   mblist_open_window (mdi);
 }
 

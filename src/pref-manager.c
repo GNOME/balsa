@@ -96,7 +96,6 @@ void
 open_preferences_manager ()
 {
   GtkWidget *label;
-  GtkWidget *button;
   gint i;
 
   /* only one preferences manager window */
@@ -383,7 +382,6 @@ static GtkWidget *
 create_view_page ()
 {
   GtkWidget *vbox, *vbox1;
-  GtkWidget *table;
   GtkWidget *frame;
   GSList *group;
   gint i;

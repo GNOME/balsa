@@ -1,3 +1,7 @@
+2001-02-16  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/balsa-index.c: make compile with -Werror 
+
 2001-02-16  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox_imap.c: fix shameful locking issue.

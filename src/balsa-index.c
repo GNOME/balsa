@@ -524,6 +524,7 @@ moveto_handler(BalsaIndex * bindex)
    functional (and that's MOST important; think long before modyfying it)
    but perhaps we could write it nicer?
 */
+#if 0
 static gboolean is_opening =FALSE;
 static void *open_in_thread(void* mailbox)
 {
@@ -534,11 +535,11 @@ static void *open_in_thread(void* mailbox)
     is_opening = FALSE;
     return NULL;
 }
+#endif 
 
 gboolean
 balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
 {
-    void *data;
     GList *list;
     guint i = 0;
     LibBalsaMailbox* mailbox;

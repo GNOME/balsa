@@ -1,3 +1,10 @@
+2000-10-02  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* configure.in: Set gnomedatadir and gnomeconfdir to ${datadir}
+	and ${sysconfdir} when building with system install disabled,
+	rather than evaluating ${datadir} to get it's value. This allows
+	'make install prefix=xxx' to work properly.
+
 2000-10-01  Matthew Guenther  <guentherm@asme.org>
 
 	* help/C/Makefile.am: Change number of win-config redirects

@@ -290,8 +290,8 @@ if test x"$use_system_install" = xyes ; then
 	gnomeconfdir=`${GNOME_CONFIG} --sysconfdir`
 else
 	AC_MSG_RESULT([no])
-	gnomedatadir=`eval "echo ${datadir}"`
-	gnomeconfdir=`eval "echo ${sysconfdir}"`
+	gnomedatadir=\${datadir}
+	gnomeconfdir=\${sysconfdir}
 fi
 
 AC_SUBST(gnomedatadir)

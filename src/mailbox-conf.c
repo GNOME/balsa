@@ -1101,12 +1101,14 @@ BalsaMailboxConfView *
 mailbox_conf_view_new(LibBalsaMailbox * mailbox,
                       GtkWindow * window, GtkWidget * table, gint row)
 {
+    LibBalsaMailboxView *view;
     BalsaMailboxConfView *view_info;
     GtkWidget *box;
     GtkWidget *button;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
 
+    view = mailbox->view;
     view_info = g_new(BalsaMailboxConfView, 1);
     g_object_weak_ref(G_OBJECT(window),
                       (GWeakNotify) mailbox_conf_view_free, view_info);
@@ -1115,8 +1117,8 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
     create_label(_("Identity:"), table, row);
     box = gtk_hbox_new(FALSE, 12);
     view_info->identity_name = NULL;
-    view_info->identity_label = gtk_label_new(mailbox->identity_name
-                                              ? mailbox->identity_name
+    view_info->identity_label = gtk_label_new(view->identity_name
+                                              ? view->identity_name
                                               : _("(No identity set)"));
     gtk_box_pack_start(GTK_BOX(box), view_info->identity_label, TRUE, TRUE,
                        0);
@@ -1142,7 +1144,7 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
     gtk_table_attach(GTK_TABLE(table), box, 1, 2, row, row + 1,
                      GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 
-    button = (mailbox->show == LB_MAILBOX_SHOW_FROM
+    button = (view->show == LB_MAILBOX_SHOW_FROM
               ? view_info->show_from : view_info->show_to);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
 
@@ -1160,30 +1162,32 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
                         LibBalsaMailbox * mailbox)
 {
     gboolean changed;
+    LibBalsaMailboxView *view;
 
     g_return_if_fail(view_info != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     changed = FALSE;
+    view = mailbox->view;
 
     if (view_info->identity_name) {
-        changed = (!mailbox->identity_name
-                   || strcmp(mailbox->identity_name,
+        changed = (!view->identity_name
+                   || strcmp(view->identity_name,
                              view_info->identity_name));
-        g_free(mailbox->identity_name);
-        mailbox->identity_name = view_info->identity_name;
+        g_free(view->identity_name);
+        view->identity_name = view_info->identity_name;
         view_info->identity_name = NULL;
     }
 
     if (gtk_toggle_button_get_active
         (GTK_TOGGLE_BUTTON(view_info->show_from))) {
-        if (mailbox->show != LB_MAILBOX_SHOW_FROM) {
-            mailbox->show = LB_MAILBOX_SHOW_FROM;
+        if (view->show != LB_MAILBOX_SHOW_FROM) {
+            view->show = LB_MAILBOX_SHOW_FROM;
             changed = TRUE;
         }
     } else {
-        if (mailbox->show != LB_MAILBOX_SHOW_TO) {
-            mailbox->show = LB_MAILBOX_SHOW_TO;
+        if (view->show != LB_MAILBOX_SHOW_TO) {
+            view->show = LB_MAILBOX_SHOW_TO;
             changed = TRUE;
         }
     }
@@ -1191,6 +1195,5 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
     if (!changed)
         return;
 
-    config_views_save();
     balsa_mblist_close_mailbox(mailbox);
 }

@@ -2540,7 +2540,7 @@ set_identity_from_mailbox(BalsaSendmsg* bsmsg)
     GList *ilist;
 
     if( message && message->mailbox && balsa_app.identities) {
-        identity = message->mailbox->identity_name;
+        identity = message->mailbox->view->identity_name;
         if(!identity) return FALSE;
         for (ilist = balsa_app.identities;
              ilist != NULL;
@@ -4140,9 +4140,9 @@ set_list_post_address(BalsaSendmsg * bsmsg)
 {
     LibBalsaMessage *message = bsmsg->orig_message;
 
-    if (message->mailbox->mailing_list_address) {
+    if (message->mailbox->view->mailing_list_address) {
         gchar *tmp =
-            libbalsa_address_to_gchar(message->mailbox->
+            libbalsa_address_to_gchar(message->mailbox->view->
                                       mailing_list_address, 0);
  	libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
  			       balsa_app.convert_unknown_8bit_codeset, NULL);

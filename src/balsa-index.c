@@ -480,38 +480,38 @@ bndx_instance_init(BalsaIndex * index)
 static void
 bndx_column_click(GtkTreeViewColumn * column, gpointer data)
 {
-    LibBalsaMailbox *mailbox;
+    LibBalsaMailboxView *view;
     GtkTreeView *tree_view = GTK_TREE_VIEW(data);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
     BndxTreeColumnId col_id;
     GtkSortType gtk_sort;
 
-    mailbox = BALSA_INDEX(tree_view)->mailbox_node->mailbox;
+    view = BALSA_INDEX(tree_view)->mailbox_node->mailbox->view;
     gtk_tree_sortable_get_sort_column_id(GTK_TREE_SORTABLE(model),
                                          (gint *) &col_id, &gtk_sort);
 
     switch (col_id) {
     case BNDX_TREE_COLUMN_NO:
-        mailbox->sort_field = LB_MAILBOX_SORT_NO;
+        view->sort_field = LB_MAILBOX_SORT_NO;
         break;
     case BNDX_TREE_COLUMN_SENDER:
-        mailbox->sort_field = LB_MAILBOX_SORT_SENDER;
+        view->sort_field = LB_MAILBOX_SORT_SENDER;
         break;
     case BNDX_TREE_COLUMN_SUBJECT:
-        mailbox->sort_field = LB_MAILBOX_SORT_SUBJECT;
+        view->sort_field = LB_MAILBOX_SORT_SUBJECT;
         break;
     case BNDX_TREE_COLUMN_DATE:
-        mailbox->sort_field = LB_MAILBOX_SORT_DATE;
+        view->sort_field = LB_MAILBOX_SORT_DATE;
         break;
     case BNDX_TREE_COLUMN_SIZE:
-        mailbox->sort_field = LB_MAILBOX_SORT_SIZE;
+        view->sort_field = LB_MAILBOX_SORT_SIZE;
         break;
     default:
-        mailbox->sort_field = LB_MAILBOX_SORT_NATURAL;
+        view->sort_field = LB_MAILBOX_SORT_NATURAL;
         break;
     }
 
-    mailbox->sort_type =
+    view->sort_type =
         (gtk_sort == GTK_SORT_DESCENDING) ? LB_MAILBOX_SORT_TYPE_DESC
                                           : LB_MAILBOX_SORT_TYPE_ASC;
 
@@ -675,13 +675,12 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
     bndx_set_style(index, path, iter);
     /* ...and check the styles of its newly viewable children. */
     if (gtk_tree_model_iter_children(model, &child_iter, iter)) {
-        GtkTreePath *child_path = gtk_tree_path_copy(path);
-        gtk_tree_path_down(child_path);
+        gtk_tree_path_down(path);
         do {
-            bndx_set_style(index, child_path, &child_iter);
-            gtk_tree_path_next(child_path);
+            bndx_set_style(index, path, &child_iter);
+            gtk_tree_path_next(path);
         } while (gtk_tree_model_iter_next(model, &child_iter));
-        gtk_tree_path_free(child_path);
+        gtk_tree_path_up(path);
     }
     bndx_changed_find_row(index);
 }
@@ -840,7 +839,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
     /*
      * rename "from" column to "to" for outgoing mail
      */
-    if (mailbox->show == LB_MAILBOX_SHOW_TO) {
+    if (mailbox->view->show == LB_MAILBOX_SHOW_TO) {
         GtkTreeViewColumn *column = gtk_tree_view_get_column(tree_view, 3);
 
         gtk_tree_view_column_set_title(column, _("To"));
@@ -858,7 +857,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
 
     /* Set the tree store, load messages, and do threading. The ref
      * table will be populated during this threading. */
-    bndx_load_and_thread(index, mailbox->threading_type);
+    bndx_load_and_thread(index, mailbox->view->threading_type);
 
     bndx_moveto(index);
 
@@ -1474,7 +1473,7 @@ bndx_messages_add(BalsaIndex * bindex, GList *messages)
     for (list = messages; list; list = g_list_next(list))
 	bndx_add_message(bindex, (LibBalsaMessage *) list->data);
     balsa_index_threading(bindex, 
-			  bindex->mailbox_node->mailbox->threading_type);
+			  bindex->mailbox_node->mailbox->view->threading_type);
     for (list = messages; list; list = g_list_next(list)) {
         LibBalsaMessage *msg = (LibBalsaMessage *) list->data;
         GtkTreeIter iter;
@@ -2064,7 +2063,7 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
     g_return_if_fail(mailbox != NULL);
 
     if (thtype == LB_MAILBOX_THREADING_FLAT
-        && mailbox->threading_type != LB_MAILBOX_THREADING_FLAT)
+        && mailbox->view->threading_type != LB_MAILBOX_THREADING_FLAT)
         /* Changing to flat: it's faster to reload from scratch. */
         bndx_load_and_thread(index, thtype);
     else
@@ -2430,7 +2429,7 @@ bndx_add_message(BalsaIndex * index, LibBalsaMessage * message)
     num = g_strdup_printf("%ld", LIBBALSA_MESSAGE_GET_NO(message) + 1);
 
     append_dots = FALSE;
-    if (mailbox->show == LB_MAILBOX_SHOW_TO) {
+    if (mailbox->view->show == LB_MAILBOX_SHOW_TO) {
 	if (message->to_list) {
 	    list = g_list_first(message->to_list);
 	    addy = list->data;
@@ -2570,7 +2569,7 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
 
     /* rethread and select the next message */
     balsa_index_threading(index,
-                          index->mailbox_node->mailbox->threading_type);
+                          index->mailbox_node->mailbox->view->threading_type);
     if (next_message)
         bndx_select_message(index, next_message);
     g_get_current_time (&index->last_use);
@@ -2671,7 +2670,8 @@ bndx_load_and_thread(BalsaIndex * index, int thtype)
     for (list = mailbox->message_list; list; list = list->next)
         bndx_add_message(index, list->data);
     bndx_set_threading_type(index, thtype);
-    bndx_set_sort_order(index, mailbox->sort_field, mailbox->sort_type);
+    bndx_set_sort_order(index, mailbox->view->sort_field,
+                        mailbox->view->sort_type);
 }
 
 /* Set a tree store for the tree view, replacing the current one if
@@ -2795,8 +2795,8 @@ bndx_set_sort_order(BalsaIndex * index, LibBalsaMailboxSortFields field,
 		     order == LB_MAILBOX_SORT_TYPE_ASC);
 
     
-    index->mailbox_node->mailbox->sort_field = field;
-    index->mailbox_node->mailbox->sort_type  = order;
+    index->mailbox_node->mailbox->view->sort_field = field;
+    index->mailbox_node->mailbox->view->sort_type  = order;
     
     switch(field) {
     case LB_MAILBOX_SORT_NO:      col_id = BNDX_TREE_COLUMN_NO;      break;
@@ -2815,7 +2815,7 @@ bndx_set_sort_order(BalsaIndex * index, LibBalsaMailboxSortFields field,
 static void
 bndx_set_threading_type(BalsaIndex * index, int thtype)
 {
-    index->mailbox_node->mailbox->threading_type = thtype;
+    index->mailbox_node->mailbox->view->threading_type = thtype;
     balsa_index_threading(index, thtype);
 
     /* expand tree if specified in config */

@@ -1,3 +1,8 @@
+2003-12-01 05:56  PeterB
+
+	* libbalsa/body.c: Treat message_part->mime_part as inline if it's
+	a GMimePart.
+
 2003-11-29  Pawel Salek
 
 	* libbalsa/body.c: we can save msg body without mime_part.

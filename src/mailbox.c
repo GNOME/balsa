@@ -308,18 +308,23 @@ mailbox_open_ref (Mailbox * mailbox)
     }
 
 
-  UNLOCK_MAILBOX ();
-
   if (CLIENT_STREAM_OPEN (mailbox))
     {
       load_messages (mailbox);
 
       /* incriment the reference count */
       mailbox->open_ref++;
+
+      g_print ("Mailbox: Opening %s Refcount: %d\n", mailbox->name, mailbox->open_ref);
+
+      UNLOCK_MAILBOX ();
       return TRUE;
     }
   else
-    return FALSE;
+    {
+      UNLOCK_MAILBOX ();
+      return FALSE;
+    }
 }
 
 
@@ -335,12 +340,15 @@ mailbox_open_unref (Mailbox * mailbox)
 
   if (mailbox->open_ref == 0)
     {
-      if (CLIENT_STREAM_OPEN (mailbox))
-	/* now close the mail stream and expunge deleted
-	 * messages -- the expunge may not have to be done */
-	CLIENT_STREAM (mailbox) = mail_close_full (CLIENT_STREAM (mailbox), CL_EXPUNGE);
+      g_print ("Mailbox: Closing %s Refcount: %d\n", mailbox->name, mailbox->open_ref);
 
       free_messages (mailbox);
+      mailbox->messages = 0;
+
+      /* now close the mail stream and expunge deleted
+       * messages -- the expunge may not have to be done */
+      if (CLIENT_STREAM_OPEN (mailbox))
+	CLIENT_STREAM (mailbox) = mail_close_full (CLIENT_STREAM (mailbox), CL_EXPUNGE);
     }
 
   UNLOCK_MAILBOX ();
@@ -430,7 +438,8 @@ mailbox_watcher_remove (Mailbox * mailbox, guint id)
 
       if (id == watcher->id)
 	{
-	  g_list_remove_link (WATCHER_LIST (mailbox), list);
+	  g_free (watcher);
+	  WATCHER_LIST (mailbox) = g_list_remove_link (WATCHER_LIST (mailbox), list);
 	  break;
 	}
 
@@ -452,8 +461,8 @@ mailbox_watcher_remove_by_data (Mailbox * mailbox, gpointer data)
 
       if (data == watcher->data)
 	{
-	  g_list_remove_link (WATCHER_LIST (mailbox), list);
-	  break;
+	  g_free (watcher);
+	  WATCHER_LIST (mailbox) = g_list_remove_link (WATCHER_LIST (mailbox), list);
 	}
 
       list = list->next;
@@ -535,7 +544,10 @@ send_watcher_mark_read_message (Mailbox * mailbox, Message * message)
       list = list->next;
 
       if (watcher->mask & MESSAGE_MARK_READ_MASK)
-	(*watcher->func) (&mw_message);
+	{
+	  mw_message.data = watcher->data;
+	  (*watcher->func) (&mw_message);
+	}
     }
 }
 
@@ -557,7 +569,10 @@ send_watcher_mark_delete_message (Mailbox * mailbox, Message * message)
       list = list->next;
 
       if (watcher->mask & MESSAGE_MARK_DELETE_MASK)
-	(*watcher->func) (&mw_message);
+	{
+	  mw_message.data = watcher->data;
+	  (*watcher->func) (&mw_message);
+	}
     }
 }
 
@@ -580,7 +595,10 @@ send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message)
       list = list->next;
 
       if (watcher->mask & MESSAGE_MARK_UNDELETE_MASK)
-	(*watcher->func) (&mw_message);
+	{
+	  mw_message.data = watcher->data;
+	  (*watcher->func) (&mw_message);
+	}
     }
 }
 
@@ -631,7 +649,10 @@ send_watcher_delete_message (Mailbox * mailbox, Message * message)
       list = list->next;
 
       if (watcher->mask & MESSAGE_DELETE_MASK)
-	(*watcher->func) (&mw_message);
+	{
+	  mw_message.data = watcher->data;
+	  (*watcher->func) (&mw_message);
+	}
     }
 }
 

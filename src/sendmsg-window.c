@@ -544,7 +544,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   /* fill in that info: */
 
   /* To: */
-  if (type == SEND_REPLY)
+  if (type == SEND_REPLY || type == SEND_REPLY_ALL)
     {
       Address *addr = NULL;
       gchar *tmp;
@@ -585,7 +585,9 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
 	if (strlen (tmp) < 2)
 	  gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
-	else if (!(toupper (tmp[0]) == 'R' && toupper (tmp[1]) == 'E') && tmp[2] == ':')
+	else if (!(toupper (tmp[0]) == 'R' &&
+		   toupper (tmp[1]) == 'E') &&
+		 tmp[2] == ':')
 	  gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
 	g_free (tmp);
       }
@@ -624,7 +626,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
       gtk_entry_set_text (GTK_ENTRY (msg->cc), tmp);
       g_free (tmp);
 
-      if (messages->cc_list)
+      if (message->cc_list)
 	{
 	  gtk_entry_append_text (GTK_ENTRY (msg->cc), ", ");
 

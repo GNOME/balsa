@@ -323,7 +323,7 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox)
 {
     glong msgno;
     LibBalsaMessage *message;
-    GList *messages=NULL;
+    guint new_messages = 0;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
     if (MAILBOX_CLOSED(mailbox))
@@ -336,14 +336,11 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox)
 	libbalsa_message_headers_update(message);
 	libbalsa_mailbox_link_message(LIBBALSA_MAILBOX_LOCAL(mailbox),
                                       message);
-	messages=g_list_prepend(messages, message);
+	++new_messages;
     }
 
-    if(messages!=NULL){
-	messages = g_list_reverse(messages);
-	g_signal_emit_by_name(G_OBJECT(mailbox), "messages-added", messages);
-	g_list_free(messages);
-    }
+    if (new_messages)
+	g_signal_emit_by_name(G_OBJECT(mailbox), "changed");
 
     libbalsa_mailbox_set_unread_messages_flag(mailbox,
 					      mailbox->unread_messages > 0);

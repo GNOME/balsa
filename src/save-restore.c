@@ -713,6 +713,12 @@ config_global_load(void)
     balsa_app.display_alt_plain = 
 	gnome_config_get_bool("DisplayAlternativeAsPlain=false");
 
+    /* ... handling of broken mails with 8-bit chars */
+    balsa_app.convert_unknown_8bit = 
+	gnome_config_get_bool("ConvertUnknown8Bit=false");
+    balsa_app.convert_unknown_8bit_codeset =
+	gnome_config_get_int("ConvertUnknown8BitCodeset=" DEFAULT_BROKEN_CODESET);
+
     gnome_config_pop_prefix();
 
     /* Interface Options ... */
@@ -1071,6 +1077,11 @@ config_save(void)
     /* ... handling of Multipart/Alternative */
     gnome_config_set_bool("DisplayAlternativeAsPlain",
 			  balsa_app.display_alt_plain);
+
+    /* ... handling of broken mails with 8-bit chars */
+    gnome_config_set_bool("ConvertUnknown8Bit", balsa_app.convert_unknown_8bit);
+    gnome_config_set_int("ConvertUnknown8BitCodeset", 
+			    balsa_app.convert_unknown_8bit_codeset);
 
     gnome_config_pop_prefix();
 

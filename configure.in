@@ -37,49 +37,6 @@ AC_DEFINE_UNQUOTED(BALSA_VERSION, "$BALSA_VERSION",
                    [Define to the Balsa version])
 
 dnl ##########################################################################
-dnl Check for GPGME if available
-dnl (we don't use the std macros AM_PATH_GPGME and AM_PATH_XML2 here to avoid
-dnl dependencies...)
-dnl ##########################################################################
-AC_MSG_CHECKING(whether to build with gpgme/RFC3156 support)
-AC_ARG_ENABLE([gpgme],
-	[  --enable-gpgme          build with GPGME/RFC3156 support (experimental) [default=no]],
-	[ have_gpgme=$enableval ], [ have_gpgme=no ])
-if test x"$have_gpgme" = xyes ; then
-	AC_MSG_RESULT(yes)
-	AC_CHECK_PROG(have_gpgme_config, gpgme-config, yes, no)
-	if test x"$have_gpgme_config" = xyes ; then
-		AC_MSG_CHECKING([gpgme library version])
-		gpgme_version=`gpgme-config --version`
-		AC_MSG_RESULT([$gpgme_version])
-		gpgme_major=`echo $gpgme_version | sed 's/\..*$//'`
-		gpgme_minor=`echo $gpgme_version | sed 's/[[0-9]]*\.//' | sed 's/\..*$//'`
-		gpgme_micro=`echo $gpgme_version | sed 's/^.*\.//'`
-		if test "$gpgme_major" -eq "0" -a \
-			"$gpgme_minor" -eq "3" -a \
-			"$gpgme_micro" -ge "14" ; then
-			AC_DEFINE(HAVE_GPGME,1,[Defined when gpgme is available.])
-			CFLAGS="$CFLAGS `gpgme-config --cflags`"
-			LIBS="$LIBS `gpgme-config --libs`"
-			AC_CHECK_PROG(have_xml2_config, xml2-config, yes, no)
-			if test x"$have_xml2_config" = xyes ; then
-				AC_DEFINE(HAVE_XML2,1,[Defined when libxml2 is available.])
-				CFLAGS="$CFLAGS `xml2-config --cflags`"
-				LIBS="$LIBS `xml2-config --libs`"
-			fi
-		else
-			AC_MSG_WARN([sorry, you need gpgme version 0.3.x w/ x >= 14, but you have $gpgme_version])
-			have_gpgme=no
-		fi
-	else
-		AC_MSG_WARN([hmmm, did you install gpgme-config?])
-		have_gpgme=no
-	fi
-else
-	AC_MSG_RESULT(no)
-fi
-
-dnl ##########################################################################
 dnl Check for GtkHTML if available
 dnl ##########################################################################
 
@@ -128,6 +85,49 @@ fi
   
 BALSA_CFLAGS="$BALSA_CFLAGS $LGPRINT_CFLAGS"
 BALSA_LIBS="$BALSA_LIBS $LGPRINT_LIBS"
+
+dnl ##########################################################################
+dnl Check for GPGME if available
+dnl (we don't use the std macros AM_PATH_GPGME and AM_PATH_XML2 here to avoid
+dnl dependencies...)
+dnl ##########################################################################
+AC_MSG_CHECKING(whether to build with gpgme/RFC3156 support)
+AC_ARG_ENABLE([gpgme],
+	[  --enable-gpgme          build with GPGME/RFC3156 support (experimental) [default=no]],
+	[ have_gpgme=$enableval ], [ have_gpgme=no ])
+if test x"$have_gpgme" = xyes ; then
+	AC_MSG_RESULT(yes)
+	AC_CHECK_PROG(have_gpgme_config, gpgme-config, yes, no)
+	if test x"$have_gpgme_config" = xyes ; then
+		AC_MSG_CHECKING([gpgme library version])
+		gpgme_version=`gpgme-config --version`
+		AC_MSG_RESULT([$gpgme_version])
+		gpgme_major=`echo $gpgme_version | sed 's/\..*$//'`
+		gpgme_minor=`echo $gpgme_version | sed 's/[[0-9]]*\.//' | sed 's/\..*$//'`
+		gpgme_micro=`echo $gpgme_version | sed 's/^.*\.//'`
+		if test "$gpgme_major" -eq "0" -a \
+			"$gpgme_minor" -eq "3" -a \
+			"$gpgme_micro" -ge "14" ; then
+			AC_DEFINE(HAVE_GPGME,1,[Defined when gpgme is available.])
+			BALSA_CFLAGS="$BALSA_CFLAGS `gpgme-config --cflags`"
+			BALSA_LIBS="$BALSA_LIBS `gpgme-config --libs`"
+			AC_CHECK_PROG(have_xml2_config, xml2-config, yes, no)
+			if test x"$have_xml2_config" = xyes ; then
+				AC_DEFINE(HAVE_XML2,1,[Defined when libxml2 is available.])
+				BALSA_CFLAGS="$BALSA_CFLAGS `xml2-config --cflags`"
+				BALSA_LIBS="$BALSA_LIBS `xml2-config --libs`"
+			fi
+		else
+			AC_MSG_WARN([sorry, you need gpgme version 0.3.x w/ x >= 14, but you have $gpgme_version])
+			have_gpgme=no
+		fi
+	else
+		AC_MSG_WARN([hmmm, did you install gpgme-config?])
+		have_gpgme=no
+	fi
+else
+	AC_MSG_RESULT(no)
+fi
 
 dnl ###########################################################################
 dnl Check for documentation requirements

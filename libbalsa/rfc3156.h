@@ -64,6 +64,8 @@ LibBalsaMessageBody *libbalsa_body_decrypt(LibBalsaMessageBody *body,
 LibBalsaSignatureInfo *libbalsa_signature_info_destroy(LibBalsaSignatureInfo* info);
 const gchar *libbalsa_gpgme_sig_stat_to_gchar(GpgmeSigStat stat);
 const gchar *libbalsa_gpgme_validity_to_gchar(GpgmeValidity validity);
+gchar *libbalsa_signature_info_to_gchar(LibBalsaSignatureInfo * info, 
+					const gchar * date_string);
 
 #endif /* HAVE_GPGME */
 

@@ -36,6 +36,9 @@
 #include "libbalsa_private.h"
 #include "misc.h"
 
+static const gchar *libbalsa_get_codeset_name(const gchar *txt, 
+					      LibBalsaCodeset Codeset);
+
 
 /* libbalsa_lookup_mime_type:
    find out mime type of a file. Must work for both relative and absolute
@@ -1043,24 +1046,87 @@ libbalsa_contract_path(gchar *path)
 /* libbalsa_utf8_sanitize
  *
  * Validate utf-8 text, and if validation fails, replace each offending
- * byte with '?'.
+ * byte with either '?' or assume a reasonable codeset for conversion.
  *
- * Argument:
- *   text   The text to be sanitized; NULL is OK.
+ * Arguments:
+ *   text       The text to be sanitized; NULL is OK.
+ *   fallback   if TRUE and *text is not clean, convert using codeset
+ *   codeset    the codeset to use for fallback conversion
+ *   target     if not NULL filled with the name of the used codeset or NULL
+ *              or error/"?" conversion
  *
  * Return value:
- *   none
+ *   TRUE if *text was clean and FALSE otherwise
  *
- * NOTE:    The text is modified in place.
+ * NOTE:    The text is either modified in place or replaced and freed.
  */
-void
-libbalsa_utf8_sanitize(gchar * text)
+gboolean
+libbalsa_utf8_sanitize(gchar **text, gboolean fallback, LibBalsaCodeset codeset,
+		       gchar const **target)
 {
-    if (!text)
-        return;
+    if (target)
+	*target = NULL;
+    if (!*text)
+        return TRUE;
 
-    while (!g_utf8_validate(text, -1, (const gchar **) &text))
-        *text = '?';
+    if (g_utf8_validate(*text, -1, NULL))
+	return TRUE;
+    if (!fallback) {
+	gchar *p = *text;
+	while (!g_utf8_validate(p, -1, (const gchar **) &p))
+	    *p = '?';
+    } else {
+	/* */
+	gint b_written;
+	GError *conv_error = NULL;
+	const gchar *use_enc = libbalsa_get_codeset_name(*text, codeset);
+	gchar *p = g_convert(*text, strlen(*text), "utf-8", use_enc, NULL,
+			     &b_written, &conv_error);
+
+	if (p) {
+	    g_free(*text);
+	    *text = p;
+	    if (target)
+		*target = use_enc;
+	} else {
+	    gchar *p = *text;
+	    while (!g_utf8_validate(p, -1, (const gchar **) &p))
+		*p = '?';
+	    g_warning("conversion %s -> utf8 failed: %s", use_enc,
+		      conv_error->message);
+	    g_error_free(conv_error);
+	}
+    }
+    return FALSE;
+}
+
+static gchar *std_codesets[LIBBALSA_NUM_CODESETS] = 
+     { "iso-8859-1", "iso-8859-2", "iso-8859-3", "iso-8859-4", "iso-8859-5", 
+       "iso-8859-6", "iso-8859-7", "iso-8859-8", "iso-8859-9", "iso-8859-10",
+       "iso-8859-11", "iso-8859-13", "iso-8859-14", "iso-8859-15", "koi-8r",
+       "koi-8u", "euc-jp", "euc-kr" };
+
+static gchar *win_codesets[LIBBALSA_NUM_CODESETS] =
+    { "windows-1252", "windows-1250", NULL, NULL, "windows-1251", 
+      "windows-1256", "windows-1253", "windows-1255", "windows-1254", NULL,
+      NULL, "windows-1257", NULL, NULL, NULL,
+      NULL, NULL, NULL };
+
+/*
+ * Return the name of a codeset according to Codeset. If txt is not NULL, is
+ * is scanned for chars between 0x80 and 0x9f. If such a char is found, this
+ * usually means that txt contains windows (not iso) characters.
+ */
+static const gchar *
+libbalsa_get_codeset_name(const gchar *txt, LibBalsaCodeset Codeset)
+{
+  if (txt && win_codesets[Codeset])
+    while (*txt) {
+      if (*(unsigned char *)txt >= 0x80 && *(unsigned char *)txt < 0x9f)
+	return win_codesets[Codeset];
+      txt++;
+    }
+  return std_codesets[Codeset];
 }
 
 /* libbalsa_insert_with_url:

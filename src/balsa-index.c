@@ -2450,10 +2450,10 @@ bndx_add_message(BalsaIndex * index, LibBalsaMessage * message)
 
     from = append_dots ? g_strconcat(name_str, ",...", NULL)
                        : g_strdup(name_str);
-    libbalsa_utf8_sanitize(from);
+    libbalsa_utf8_sanitize(&from, FALSE, 0, NULL);
 
     subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
-    libbalsa_utf8_sanitize(subject);
+    libbalsa_utf8_sanitize(&subject, FALSE, 0, NULL);
 
     date = libbalsa_message_date_to_gchar(message, balsa_app.date_string);
     size = libbalsa_message_size_to_gchar(message, balsa_app.line_length);

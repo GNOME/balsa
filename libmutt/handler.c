@@ -1716,15 +1716,8 @@ void mutt_decode_attachment (BODY *b, STATE *s)
   if (istext && s->flags & M_CHARCONV)
   {
     char *charset = mutt_get_parameter ("charset", b->parameter);
-#ifdef LIBMUTT
-    /* a reasonable default for Charset! */
-    if (Charset)
-      cd = mutt_iconv_open (Charset, charset ? charset : "us-ascii",
-                            M_ICONV_HOOK_FROM);
-#else
     if (charset && Charset)
       cd = mutt_iconv_open (Charset, charset, M_ICONV_HOOK_FROM);
-#endif
   }
 
   fseek (s->fpin, b->offset, 0);

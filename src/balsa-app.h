@@ -31,6 +31,9 @@
 #include "main-window.h"
 #include "toolbar-factory.h"
 
+/* misc.h for LibBalsaCodeset */
+#include "misc.h"
+
 #if ENABLE_ESMTP
 #include <libesmtp.h>			/* part of libESMTP */
 #include <auth-client.h>		/* part of libESMTP */
@@ -102,6 +105,8 @@
 #define DEFAULT_PSPELL_IGNORE_SIZE 0
 #define DEFAULT_CHECK_SIG FALSE
 #define DEFAULT_CHECK_QUOTED FALSE
+
+#define DEFAULT_BROKEN_CODESET "0"   /* == west european */
 
 
 enum {
@@ -362,6 +367,10 @@ extern struct BalsaApplication {
 
     /* how to handle multipart/alternative */
     gboolean display_alt_plain;
+
+    /* how to handle broken mails with 8-bit chars */
+    gboolean convert_unknown_8bit;
+    LibBalsaCodeset convert_unknown_8bit_codeset;
 
     GList *folder_mru;
     GList *fcc_mru;

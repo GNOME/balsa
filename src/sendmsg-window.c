@@ -3304,21 +3304,6 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	{
 	case LIBBALSA_MESSAGE_SIGN_ERROR:
 	case LIBBALSA_MESSAGE_ENCRYPT_ERROR:
-	    {
-		const gchar *err_msg;
-		GtkWidget *msgbox;
-
-		err_msg = result == LIBBALSA_MESSAGE_SIGN_ERROR
-                    ? _("Signing the message failed") 
-                    : _("Encrypting the message failed.");
-		msgbox = gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
-						GTK_DIALOG_MODAL,
-						GTK_MESSAGE_ERROR,
-						GTK_BUTTONS_OK,
-						err_msg);
-		gtk_dialog_run(GTK_DIALOG(msgbox));
-		gtk_widget_destroy(msgbox);
-	    }
 	    return FALSE;
 	default:
 	    gtk_widget_destroy(bsmsg->window);

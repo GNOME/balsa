@@ -1,3 +1,22 @@
+2003-04-03  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+
+	* libbalsa/rfc3156.[hc]: fix EOL character conversion.  Implement
+	libbalsa_signature_info_to_gchar(). selecting a key from a list if
+	a signer or recipient has more than one suitable key in the key
+	ring.
+	* src/balsa-message.c: use libbalsa_signature_info_to_gchar().
+	* src/print.c: signature printing support.
+	* src/sendmsg-window.c: clean up.
+	* INSTALL: GPG description.
+	* configure.in: attempt to change the linking order.
+
+	* libbalsa/misc.[ch]: libbalsa_utf8_sanitize() with a charset
+	fallback instead of '?'
+	* src/balsa-app.h: default broken charset.
+	* src/balsa-{index,message}.c: use new _sanitize()
+	* src/pref-manager.c: configure the default fallback charset.
+	* src/save-restore.c: save and restore it.
+
 2003-04-02  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/misc.h: #include gtk.h is needed to build with gtk-2.2

@@ -32,9 +32,34 @@ pthread_t libbalsa_get_main_thread(void);
 #include <stdio.h>
 #include <gtk/gtk.h>
 
+#include "libbalsa.h"
 #if ENABLE_ESMTP
 #include <auth-client.h>
 #endif
+
+typedef enum _LibBalsaCodeset LibBalsaCodeset;
+
+enum _LibBalsaCodeset {
+    WEST_EUROPE,        /* iso-8859-1 or windows-1252 */
+    EAST_EUROPE,        /* iso-8859-2 or windows-1250 */
+    SOUTH_EUROPE,       /* iso-8859-3 */
+    NORTH_EUROPE,       /* iso-8859-4 */
+    CYRILLIC,           /* iso-8859-5 or windows-1251 */
+    ARABIC,             /* iso-8859-6 or windows-1256 */
+    GREEK,              /* iso-8859-7 or windows-1253 */
+    HEBREW,             /* iso-8859-8 or windows-1255 */
+    TURKISH,            /* iso-8859-9 or windows-1254 */
+    NORDIC,             /* iso-8859-10 */
+    THAI,               /* iso-8859-11 */
+    BALTIC,             /* iso-8859-13 or windows-1257 */
+    CELTIC,             /* iso-8859-14 */
+    WEST_EUROPE_EURO,   /* iso-8859-15 */
+    RUSSIAN,            /* koi-8r */
+    UKRAINE,            /* koi-8u */
+    JAPAN,              /* euc-jp */
+    KOREA               /* euc-kr */
+};
+#define LIBBALSA_NUM_CODESETS 18
 
 gchar *libbalsa_lookup_mime_type(const gchar * path);
 gchar *libbalsa_make_string_from_list(const GList *);
@@ -68,7 +93,8 @@ gchar *libbalsa_truncate_string(const gchar * str, gint length, gint dots);
 gchar *libbalsa_expand_path(const gchar *path);
 void libbalsa_contract_path(gchar *path);
 void libbalsa_mktemp(gchar * name);
-void libbalsa_utf8_sanitize(gchar * text);
+gboolean libbalsa_utf8_sanitize(gchar ** text, gboolean fallback,
+                                LibBalsaCodeset codeset, gchar const **target);
 void libbalsa_insert_with_url(GtkTextBuffer * buffer,
                               const char *chars,
                               GtkTextTag * tag,

@@ -45,6 +45,7 @@
 #define NUM_ENCODING_MODES 3
 #define NUM_PWINDOW_MODES 3
 #define NUM_THREADING_STYLES 3
+#define NUM_CONVERT_8BIT_MODES 2
 
 /* Spacing suggestions from
  * http://developer.gnome.org/projects/gup/hig/1.0/layout.html#window-layout-spacing
@@ -154,6 +155,10 @@ typedef struct _PropertyUI {
 
     /* how to display multipart/alternative */
     GtkWidget *display_alt_plain;
+
+    /* how to handle broken mails with 8-bit chars */
+    GtkRadioButton *convert_unknown_8bit[NUM_CONVERT_8BIT_MODES];
+    GtkWidget *convert_unknown_8bit_codeset;
 
     /* spell checking */
     GtkWidget *module;
@@ -274,6 +279,7 @@ static GtkWidget *create_mdn_reply_menu(void);
 static GtkWidget *create_tls_mode_menu(void);
 #endif
 static void balsa_help_pbox_display(gint page_num);
+static GtkWidget *create_codeset_menu(void);
 
 /* updaters */
 static void set_prefs(void);
@@ -307,6 +313,8 @@ static void spelling_optionmenu_cb(GtkItem * menuitem, gpointer data);
 static void threading_optionmenu_cb(GtkItem* menuitem, gpointer data);
 static void set_default_address_book_cb(GtkWidget * button, gpointer data);
 static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox);
+
+static void convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox);
 
 guint encoding_type[NUM_ENCODING_MODES] = {
     ENC7BIT,
@@ -344,6 +352,26 @@ const gchar* threading_style_label[NUM_THREADING_STYLES] = {
     N_("JWZ")
 };
 
+const gchar *codeset_label[LIBBALSA_NUM_CODESETS] = {
+    N_("west european (traditional)"),
+    N_("east european"),
+    N_("south european"),
+    N_("north european"),
+    N_("cyrillic (iso/windows)"),
+    N_("arabic"),
+    N_("greek"),
+    N_("hebrew"),
+    N_("turkish"),
+    N_("nordic"),
+    N_("thai"),
+    N_("baltic"),
+    N_("celtic"),
+    N_("west european (euro)"),
+    N_("russian (koi)"),
+    N_("ukranian (koi)"),
+    N_("japanese"),
+    N_("korean")
+};
 
 /* and now the important stuff: */
 void
@@ -609,6 +637,11 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(G_OBJECT(pui->bad_address_color), "released",
 		     G_CALLBACK(properties_modified_cb), property_box);
 
+    /* handling of message parts with 8-bit chars without codeset headers */
+    for (i = 0; i < NUM_CONVERT_8BIT_MODES; i++)
+	g_signal_connect(G_OBJECT(pui->convert_unknown_8bit[i]), "toggled",
+			 G_CALLBACK(convert_8bit_cb), property_box);
+	
     /* Gnome Property Box Signals */
     g_signal_connect(G_OBJECT(property_box), "response",
                      G_CALLBACK(response_cb), NULL);
@@ -921,6 +954,14 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.debug_message =
 	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item), "balsa-data"));
 
+    /* handling of 8-bit message parts without codeset header */
+    balsa_app.convert_unknown_8bit =
+	GTK_TOGGLE_BUTTON(pui->convert_unknown_8bit[1])->active;
+    menu_item =
+	gtk_menu_get_active(GTK_MENU(gtk_option_menu_get_menu(GTK_OPTION_MENU(pui->convert_unknown_8bit_codeset))));
+    balsa_app.convert_unknown_8bit_codeset = 
+	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item), "balsa-data"));
+
     /*
      * close window and free memory
      */
@@ -1191,6 +1232,11 @@ set_prefs(void)
     gtk_menu_set_active(GTK_MENU(pui->debug_message_menu),
 			balsa_app.debug_message);
 
+    /* handling of 8-bit message parts without codeset header */
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->convert_unknown_8bit[1]),
+				 balsa_app.convert_unknown_8bit);
+    gtk_widget_set_sensitive(pui->convert_unknown_8bit_codeset,
+			     balsa_app.convert_unknown_8bit);
 }
 
 enum {
@@ -1743,6 +1789,54 @@ alternative_group(GtkWidget * page)
 }
 
 static GtkWidget *
+broken_8bit_codeset_group(GtkWidget * page)
+{
+    GtkSizeGroup *size_group = pm_page_get_size_group(page);
+    GtkWidget *group;
+    GtkWidget *table;
+    GSList *radio_group = NULL;
+    GtkWidget *menu;
+    
+    /* treatment of messages with 8-bit chars, but without proper MIME encoding */
+
+    group = pm_group_new(_("National (8-bit) characters in broken messages without codeset header"));
+    table = create_table(2, 2, page);
+    pm_group_add(group, table);
+    
+    pui->convert_unknown_8bit[0] =
+	GTK_RADIO_BUTTON(gtk_radio_button_new_with_label(radio_group,
+							 _("display as \"?\"")));
+    gtk_table_attach(GTK_TABLE(table), GTK_WIDGET(pui->convert_unknown_8bit[0]),
+		     0, 2, 0, 1,
+		     (GtkAttachOptions) (GTK_FILL), (GtkAttachOptions) (0), 0, 0);
+    radio_group = 
+	gtk_radio_button_get_group(GTK_RADIO_BUTTON(pui->convert_unknown_8bit[0]));
+    
+    pui->convert_unknown_8bit[1] =
+	GTK_RADIO_BUTTON(gtk_radio_button_new_with_label(radio_group,
+							 _("display using codeset")));
+    gtk_table_attach(GTK_TABLE(table), GTK_WIDGET(pui->convert_unknown_8bit[1]),
+		     0, 1, 1, 2,
+		     (GtkAttachOptions) (GTK_FILL), (GtkAttachOptions) (0), 0, 0);
+    
+    pui->convert_unknown_8bit_codeset = gtk_option_menu_new ();
+    gtk_table_attach(GTK_TABLE(table), pui->convert_unknown_8bit_codeset,
+		     1, 2, 1, 2,
+		     (GtkAttachOptions) (0), (GtkAttachOptions) (0), 0, 0);
+    
+    menu = create_codeset_menu();
+    gtk_option_menu_set_menu(GTK_OPTION_MENU(pui->convert_unknown_8bit_codeset),
+			     menu);
+    gtk_option_menu_set_history(GTK_OPTION_MENU(pui->convert_unknown_8bit_codeset),
+				balsa_app.convert_unknown_8bit_codeset);
+
+    gtk_size_group_add_widget(size_group, table);
+    
+    return group;
+}
+
+
+static GtkWidget *
 mdn_group(GtkWidget * page)
 {
     GtkWidget *group;
@@ -2170,6 +2264,7 @@ message_subpage(gpointer data)
     pm_page_add(page, preview_font_group(page));
     pm_page_add(page, quoted_group(page));
     pm_page_add(page, alternative_group(page));
+    pm_page_add(page, broken_8bit_codeset_group(page));
 
     return page;
 }
@@ -2948,6 +3043,17 @@ create_mdn_reply_menu(void)
     return menu;
 }
 
+static GtkWidget *
+create_codeset_menu(void)
+{
+    LibBalsaCodeset n;
+    GtkWidget *menu = gtk_menu_new();
+    
+    for (n = WEST_EUROPE; n <= KOREA; n++)
+	add_show_menu(_(codeset_label[n]), n, menu);
+    return menu;
+}
+
 void
 mailbox_close_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
@@ -2983,6 +3089,15 @@ static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox)
 	    GTK_TOGGLE_BUTTON(pui->check_imap_inbox), FALSE);
 	gtk_widget_set_sensitive(GTK_WIDGET(pui->check_imap_inbox), FALSE);
     }
+}
+
+static void 
+convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox)
+{
+    properties_modified_cb(widget, pbox);
+
+    gtk_widget_set_sensitive(pui->convert_unknown_8bit_codeset,
+			     GTK_TOGGLE_BUTTON(pui->convert_unknown_8bit[1])->active);
 }
 
 #if ENABLE_ESMTP

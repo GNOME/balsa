@@ -77,6 +77,9 @@
 #define BALSA_PRINT_TYPE_PLAINTEXT  3
 #define BALSA_PRINT_TYPE_IMAGE      4
 #define BALSA_PRINT_TYPE_DEFAULT    5
+#ifdef HAVE_GPGME
+#define BALSA_PRINT_TYPE_GPG_SIGN   6
+#endif
 
 
 typedef struct _PrintInfo {
@@ -272,6 +275,9 @@ typedef struct _HeaderInfo {
     guint id_tag;
     float header_label_width;
     GList *headers;
+#ifdef HAVE_GPGME
+    gchar *sig_status;
+#endif
 } HeaderInfo;
 
 static void
@@ -413,6 +419,19 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
 	p = g_list_next(p);
     }
 
+#ifdef HAVE_GPGME
+    /* add the signature status info if available */
+    if (balsa_app.shown_headers != HEADERS_NONE &&
+	libbalsa_is_pgp_signed(body) && body->parts->next->sig_info) {
+	pdata->sig_status =
+	    g_strdup(libbalsa_gpgme_sig_stat_to_gchar(body->parts->next->sig_info->status));
+	lines += print_wrap_string(&pdata->sig_status, pi->header_font,
+				   pi->printable_width, pi->tab_width);
+    } else {
+	pdata->sig_status = NULL;
+    }
+#endif
+
     font_size = gnome_font_get_size(pi->header_font);
     if (pi->ypos - lines * font_size < pi->margin_bottom) {
 	lines -= (pi->ypos - pi->margin_bottom) / gnome_font_get_size(pi->header_font);
@@ -460,6 +479,7 @@ print_header(PrintInfo * pi, gpointer * data)
 {
     HeaderInfo *pdata = (HeaderInfo *)data;
     GList *p;
+    gdouble font_size = gnome_font_get_size(pi->header_font);
 
     g_return_if_fail(pdata->id_tag == BALSA_PRINT_TYPE_HEADER);
 
@@ -469,7 +489,6 @@ print_header(PrintInfo * pi, gpointer * data)
     p = g_list_first(pdata->headers);
     while (p) {
 	gchar **pair = p->data;
-        gdouble font_size = gnome_font_get_size(pi->header_font);
 
 	pi->ypos -= font_size;
 	if (pi->ypos < pi->margin_bottom)
@@ -481,6 +500,16 @@ print_header(PrintInfo * pi, gpointer * data)
 	g_strfreev(pair);
 	p = g_list_next(p);
     }
+#ifdef HAVE_GPGME
+    if (pdata->sig_status) {
+	pi->ypos -= font_size;
+	if (pi->ypos < pi->margin_bottom)
+	    start_new_page(pi);
+	print_header_val(pi, pi->margin_left, &pi->ypos, font_size,
+			 pdata->sig_status, pi->header_font);
+	g_free(pdata->sig_status);
+    }
+#endif
 }
 
 /*
@@ -935,6 +964,86 @@ print_image(PrintInfo * pi, gpointer * data)
     g_object_unref(pdata->pixbuf);
 }
 
+#ifdef HAVE_GPGME
+/*
+ * ~~~ print a gpg signature info (like plain text, but with header font) ~~~
+ */
+static void
+prepare_gpg_signature(PrintInfo * pi, LibBalsaMessageBody * body)
+{
+    PlainTextInfo *pdata;
+    gdouble font_size;
+    gchar *textbuf;
+    guint lines;
+
+    /* check if there is a sig_info and prepare as unknown if not */
+    if (!body->sig_info) {
+	prepare_default(pi, body);
+	return;
+    }
+
+    pdata = g_malloc(sizeof(PlainTextInfo));
+    pdata->id_tag = BALSA_PRINT_TYPE_GPG_SIGN;
+
+    /* create a buffer with the signature info */
+    textbuf =
+	libbalsa_signature_info_to_gchar(body->sig_info, balsa_app.date_string);
+
+    /* wrap lines (if necessary) */
+    pdata->textlines = 
+	print_wrap_body(textbuf, pi->header_font, pi->printable_width,
+			pi->tab_width);
+    g_free(textbuf);
+    lines = g_list_length(pdata->textlines);
+
+    /* calculate the y end position */
+    font_size = gnome_font_get_size(pi->body_font);
+    if (pi->ypos - lines * font_size < pi->margin_bottom) {
+	int lines_left = lines;
+
+	lines_left -= (pi->ypos - pi->margin_bottom) / font_size;
+	pi->pages++;
+	while (lines_left * font_size > pi->printable_height) {
+	    lines_left -= pi->printable_height / font_size;
+	    pi->pages++;
+	}
+	pi->ypos = pi->margin_bottom + pi->printable_height -
+	    lines_left * font_size;
+    } else
+	pi->ypos -= lines * font_size;
+
+    pi->print_parts = g_list_append (pi->print_parts, pdata);
+}
+
+static void
+print_gpg_signature(PrintInfo * pi, gpointer * data)
+{
+    PlainTextInfo *pdata = (PlainTextInfo *)data;
+    GList *l;
+
+    g_return_if_fail(pdata->id_tag == BALSA_PRINT_TYPE_GPG_SIGN);
+
+    gnome_print_setfont(pi->pc, pi->header_font);
+    l = pdata->textlines;
+    gnome_print_setrgbcolor (pi->pc, 0.0, 0.0, 0.0);
+    while (l) {
+ 	lineInfo_T *lineInfo = (lineInfo_T *)l->data;
+ 	
+ 	pi->ypos -= gnome_font_get_size(pi->header_font);
+	if (pi->ypos < pi->margin_bottom) {
+	    start_new_page(pi);
+	    gnome_print_setfont(pi->pc, pi->header_font);
+	}
+ 	gnome_print_moveto(pi->pc, pi->margin_left, pi->ypos);
+ 	gnome_print_show(pi->pc, lineInfo->lineData);
+ 	g_free(lineInfo->lineData);
+ 	g_free(l->data);
+ 	l = l->next;
+    }
+    g_list_free(pdata->textlines);
+}
+#endif
+
 /*
  * scan the body list and prepare print data according to the content type
  */
@@ -946,6 +1055,9 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
 	{"text/html", prepare_default},   /* don't print html source */
 	{"text", prepare_plaintext},
 	{"image", prepare_image},
+#ifdef HAVE_GPGME
+	{"application/pgp-signature", prepare_gpg_signature},
+#endif
 	{NULL, prepare_default}           /* anything else... */
     };
     mime_action_t *action;
@@ -1062,14 +1174,15 @@ print_info_new(CommonInfo * ci)
 
     pi->message = ci->message;
     pi->print_parts = NULL;
-    prepare_header(pi, NULL);
     
     /* now get the message contents... */
     if (!pi->message->mailbox 
         || libbalsa_message_body_ref(pi->message, TRUE)) {
+	prepare_header(pi, pi->message->body_list);
         scan_body(pi, pi->message->body_list);
         libbalsa_message_body_unref(pi->message);
-    }
+    } else
+	prepare_header(pi, NULL);
 
     return pi;
 }
@@ -1114,6 +1227,10 @@ print_message(PrintInfo * pi)
 	    break;
 	case BALSA_PRINT_TYPE_IMAGE:
 	    print_image(pi, print_task->data);
+#ifdef HAVE_GPGME
+	case BALSA_PRINT_TYPE_GPG_SIGN:
+	    print_gpg_signature(pi, print_task->data);
+#endif
 	default:
 	    break;
 	}

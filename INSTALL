@@ -44,6 +44,12 @@ Please make sure you have the following things:
 
 	http://people.redhat.com/dcm/software.html
 
+	Since version 2.0.10 balsa has EXPERIMENTAL support for gpg
+	signed and encrypted MIME messages according to RFC 3156.
+	Further information is available at
+
+	http://home.arcor.de/dralbrecht.dress/balsa/balsa2-gpg.html
+
 Build Instructions:
 
 	For more information and configuration options see 'README'.

@@ -42,6 +42,7 @@ typedef struct _PassphraseCB PassphraseCB;
 struct _MailDataMBox {
     FILE *mailboxFile;
     size_t bytes_left;
+    gboolean last_was_cr;
 };
 
 struct _PassphraseCB {
@@ -77,6 +78,48 @@ libbalsa_signature_info_destroy(LibBalsaSignatureInfo* info)
 	g_free(info->fingerprint);
     g_free(info);
     return NULL;
+}
+
+
+gchar *
+libbalsa_signature_info_to_gchar(LibBalsaSignatureInfo * info, 
+				 const gchar * date_string)
+{
+    GString *msg;
+    gchar *retval;
+
+    g_return_val_if_fail(info != NULL, NULL);
+    g_return_val_if_fail(date_string != NULL, NULL);
+
+    msg = g_string_new(libbalsa_gpgme_sig_stat_to_gchar(info->status));
+    if (info->sign_name || info->sign_email || info->fingerprint) {
+	if (info->sign_name) {
+	    g_string_append_printf(msg, _("\nSigned by: %s"), info->sign_name);
+	    if (info->sign_email)
+		g_string_append_printf(msg, " <%s>", info->sign_email);
+	} else if (info->sign_email)
+	    g_string_append_printf(msg, _("Mail address: %s"),
+				   info->sign_email);
+	g_string_append_printf(msg, _("\nValidity: %s"),
+			       libbalsa_gpgme_validity_to_gchar(info->validity));
+	if (info->fingerprint)
+	    g_string_append_printf(msg, _("\nKey fingerprint: %s"),
+				   info->fingerprint);
+	if (info->key_created) {
+	    gchar buf[128];
+	    strftime(buf, 127, date_string, localtime(&info->key_created));
+	    g_string_append_printf(msg, _("\nKey created on: %s"), buf);
+	}
+	if (info->sign_time) {
+	    gchar buf[128];
+	    strftime(buf, 127, date_string, localtime(&info->sign_time));
+	    g_string_append_printf(msg, _("\nSigned on: %s"), buf);
+	}
+    }
+
+    retval = msg->str;
+    g_string_free(msg, FALSE);
+    return retval;
 }
 
 
@@ -147,7 +190,8 @@ libbalsa_body_check_signature(LibBalsaMessageBody* body)
     GpgmeCtx ctx;
     GpgmeError err;
     GpgmeData sig, plain;
-    MailDataMBox sigStream, plainStream;
+    MailDataMBox plainStream;
+    FILE *sigStream;
     LibBalsaSignatureInfo *sig_status;
     BODY *msg_body, *sign_body;
     LibBalsaMessage *msg;
@@ -185,6 +229,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody* body)
     fseek(plainStream.mailboxFile, msg_body->hdr_offset, 0);
     plainStream.bytes_left = msg_body->offset - msg_body->hdr_offset +
 	msg_body->length;
+    plainStream.last_was_cr = FALSE;
     if ((err = gpgme_data_new_with_read_cb(&plain, read_cb_MailDataMBox, &plainStream)) !=
 	GPGME_No_Error) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -197,14 +242,14 @@ libbalsa_body_check_signature(LibBalsaMessageBody* body)
 
     /* create the signature data stream */
     if (body->next->decrypt_file)
-	sigStream.mailboxFile = safe_fopen(body->next->decrypt_file, "r");
+	sigStream = safe_fopen(body->next->decrypt_file, "r");
     else
-	sigStream.mailboxFile = 
+	sigStream = 
 	    libbalsa_mailbox_get_message_stream(msg->mailbox, msg);
     sign_body = body->next->mutt_body;
-    fseek(sigStream.mailboxFile, sign_body->offset, 0);
-    sigStream.bytes_left = sign_body->length;
-    if ((err = gpgme_data_new_with_read_cb(&sig, read_cb_MailDataMBox, &sigStream)) !=
+    if ((err = gpgme_data_new_from_filepart(&sig, NULL, sigStream,
+					    sign_body->offset,
+					    sign_body->length)) != 
 	GPGME_No_Error) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("gpgme could not get data from mailbox file: %s"), 
@@ -212,7 +257,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody* body)
 	gpgme_data_release(plain);
 	gpgme_release(ctx);
 	fclose(plainStream.mailboxFile);
-	fclose(sigStream.mailboxFile);
+	fclose(sigStream);
 	return FALSE;
     }
 
@@ -239,13 +284,14 @@ libbalsa_body_check_signature(LibBalsaMessageBody* body)
 	    g_strdup(gpgme_key_get_string_attr(key, GPGME_ATTR_EMAIL, NULL, 0));
 	sig_status->key_created =
 	    gpgme_key_get_ulong_attr(key, GPGME_ATTR_CREATED, NULL, 0);
+	gpgme_key_unref(key);
     }
 
     gpgme_data_release(sig);
     gpgme_data_release(plain);
     gpgme_release(ctx);
     fclose(plainStream.mailboxFile);
-    fclose(sigStream.mailboxFile);
+    fclose(sigStream);
 
     return TRUE;
 }
@@ -299,6 +345,7 @@ libbalsa_sign_mutt_body(MuttBody **sign_body, const gchar *rfc822_for,
     fflush(mailData.mailboxFile);
     rewind(mailData.mailboxFile);
     mailData.bytes_left = INT_MAX;   /* process complete file */
+    mailData.last_was_cr = FALSE;
     libbalsa_unlock_mutt();
 
     /* call gpgme to create the signature */
@@ -398,7 +445,6 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
     GpgmeCtx ctx;
     GpgmeError err;
     GpgmeData cipher, plain;
-    MailDataMBox cipherStream;
     PassphraseCB cb_data;
     BODY *cipher_body, *result;
     gchar fname[PATH_MAX];
@@ -430,12 +476,10 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
     gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
     
     /* create the cipher data stream */
-    cipherStream.mailboxFile = src;
     cipher_body = body->next->mutt_body;
-    fseek(cipherStream.mailboxFile, cipher_body->offset, 0);
-    cipherStream.bytes_left = cipher_body->length;
-    if ((err = gpgme_data_new_with_read_cb(&cipher, read_cb_MailDataMBox,
-					   &cipherStream)) != GPGME_No_Error) {
+    if ((err = gpgme_data_new_from_filepart(&cipher, NULL, src, 
+					    cipher_body->offset,
+					    cipher_body->length)) != GPGME_No_Error) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("gpgme could not get data from mailbox file: %s"), 
 			     gpgme_strerror(err));
@@ -544,6 +588,7 @@ libbalsa_encrypt_mutt_body(MuttBody **encrypt_body, GList *rfc822_for)
     fflush(mailData.mailboxFile);
     rewind(mailData.mailboxFile);
     mailData.bytes_left = INT_MAX;   /* process complete file */
+    mailData.last_was_cr = FALSE;
     libbalsa_unlock_mutt();
 
     /* call gpgme to encrypt */
@@ -647,6 +692,288 @@ libbalsa_gpgme_validity_to_gchar(GpgmeValidity validity)
 
 /* ==== local stuff ======================================================== */
 
+
+static const gchar *
+libbalsa_gpgme_validity_to_gchar_short(GpgmeValidity validity)
+{
+    switch (validity)
+	{
+	case GPGME_VALIDITY_UNKNOWN:
+	    return _("unknown");
+	case GPGME_VALIDITY_UNDEFINED:
+	    return _("undefined");
+	case GPGME_VALIDITY_NEVER:
+	    return _("never");
+	case GPGME_VALIDITY_MARGINAL:
+	    return _("marginal");
+	case GPGME_VALIDITY_FULL:
+	    return _("full");
+	case GPGME_VALIDITY_ULTIMATE:
+	    return _("ultimate");
+	default:
+	    return _("bad validity");
+	}
+}
+
+
+/* stuff to get a key fingerprint from a selection list */
+enum {
+    GPG_KEY_FP_COLUMN = 0,
+    GPG_KEY_ID_COLUMN,
+    GPG_KEY_VALIDITY_COLUMN,
+    GPG_KEY_LENGTH_COLUMN,
+    GPG_KEY_NUM_COLUMNS
+};
+
+static gchar *col_titles[] =
+    { N_("Fingerprint"), N_("Key ID"), N_("Trust"), N_("Length") };
+
+
+/* callback function if a new row is selected in the list */
+static void
+key_selection_changed_cb (GtkTreeSelection *selection, gchar **fp)
+{
+    GtkTreeIter iter;
+    GtkTreeModel *model;
+    
+    if (gtk_tree_selection_get_selected (selection, &model, &iter)) {
+	g_free(*fp);
+	gtk_tree_model_get (model, &iter, GPG_KEY_FP_COLUMN, fp, -1);
+    }
+}
+
+
+/*
+ * Select a key for the mail address for_address from the GpgmeKey's in keys
+ * and return either the selected fingerprint or NULL if the dialog was
+ * cancelled. secret_only controls the dialog message.
+ */
+static gchar *
+select_key_fp_from_list(int secret_only, const gchar *for_address, GList *keys,
+			GtkWindow *parent)
+{
+    GtkWidget *dialog;
+    GtkWidget *scrolled_window;
+    GtkWidget *tree_view;
+    GtkTreeStore *model;
+    GtkTreeSelection *selection;
+    GtkTreeIter iter;
+    gint i;
+    gchar *prompt;
+    gchar *use_fp = NULL;
+  
+    /* FIXME: create dialog according to the Gnome HIG */
+    dialog = gtk_dialog_new_with_buttons(_("Select key"),
+					 parent,
+					 GTK_DIALOG_DESTROY_WITH_PARENT,
+					 GTK_STOCK_OK, GTK_RESPONSE_OK,
+					 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+					 NULL);
+
+    if (secret_only)
+	prompt = g_strdup_printf(_("Select the private key for the signer %s"),
+				 for_address);
+    else
+	prompt = g_strdup_printf(_("Select the public key for the recipient %s"),
+				 for_address);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),
+		       gtk_label_new(prompt), FALSE, TRUE, 0);
+    g_free(prompt);
+
+    scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolled_window),
+					 GTK_SHADOW_ETCHED_IN);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
+				    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),
+		       scrolled_window, TRUE, TRUE, 0);
+
+    model = gtk_tree_store_new (GPG_KEY_NUM_COLUMNS, G_TYPE_STRING,
+				G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT);
+
+    tree_view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (model));
+    selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (tree_view));
+    gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
+    g_signal_connect (G_OBJECT (selection), "changed",
+		      G_CALLBACK (key_selection_changed_cb),
+		      &use_fp);
+
+    /* add the keys */
+    while (keys) {
+	GpgmeKey key = (GpgmeKey)keys->data;
+
+	gtk_tree_store_append (GTK_TREE_STORE (model), &iter, NULL);
+	gtk_tree_store_set (GTK_TREE_STORE (model), &iter,
+			    GPG_KEY_FP_COLUMN,
+			    gpgme_key_get_string_attr(key, GPGME_ATTR_FPR, NULL, 0),
+			    GPG_KEY_ID_COLUMN, 
+			    gpgme_key_get_string_attr(key, GPGME_ATTR_KEYID, NULL, 0),
+			    GPG_KEY_VALIDITY_COLUMN, 
+			    libbalsa_gpgme_validity_to_gchar_short(gpgme_key_get_ulong_attr(key, GPGME_ATTR_VALIDITY, NULL, 0)),
+			    GPG_KEY_LENGTH_COLUMN,
+			    gpgme_key_get_ulong_attr(key, GPGME_ATTR_LEN, NULL, 0),
+			    -1);
+
+	keys = g_list_next(keys);
+    }
+  
+    g_object_unref (G_OBJECT (model));
+
+    for (i = 0; i < GPG_KEY_NUM_COLUMNS; i++) {
+	GtkCellRenderer *renderer;
+	GtkTreeViewColumn *column;
+
+	renderer = gtk_cell_renderer_text_new ();
+	column = gtk_tree_view_column_new_with_attributes (col_titles[i],
+							   renderer,
+							   "text", i,
+							   NULL);
+	gtk_tree_view_append_column (GTK_TREE_VIEW (tree_view), column);
+	gtk_tree_view_column_set_resizable (column, TRUE);
+    }
+
+    gtk_container_add (GTK_CONTAINER (scrolled_window), tree_view);
+    gtk_window_set_default_size(GTK_WINDOW(dialog), 500, 300);
+    gtk_widget_show_all(GTK_DIALOG(dialog)->vbox);
+
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK) {
+	g_free(use_fp);
+	use_fp = NULL;
+    }
+    gtk_widget_destroy(dialog);
+
+    return use_fp;
+}
+
+
+/*
+ * Get a key finger print for name. If necessary, a dialog is shown to select
+ * a key from a list. Return NULL if something failed.
+ */
+static gchar *
+get_key_fingerprint(GpgmeCtx ctx, const gchar *name, int secret_only,
+		    GtkWindow *parent)
+{
+    GList *keys = NULL;
+    GpgmeKey key;
+    GpgmeError err;
+    gchar *fpr;
+
+    if ((err = gpgme_op_keylist_start(ctx, name, secret_only)) != GPGME_No_Error) {
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			     _("could not list keys for %s: %s"), name,
+			       gpgme_strerror(err));
+	return NULL;
+    }
+    while ((err = gpgme_op_keylist_next(ctx, &key)) == GPGME_No_Error)
+	keys = g_list_append(keys, key);
+    if (err != GPGME_EOF) {
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			     _("could not retrieve key for %s: %s"), name,
+			       gpgme_strerror(err));
+	gpgme_op_keylist_end(ctx);
+	return NULL;
+    }
+    gpgme_op_keylist_end(ctx);
+    
+    if (!keys) 
+	return NULL;
+
+    if (g_list_length (keys) > 1)
+	fpr = select_key_fp_from_list(secret_only, name, keys, parent);
+    else
+	fpr = g_strdup(gpgme_key_get_string_attr((GpgmeKey)(keys->data),
+						 GPGME_ATTR_FPR, NULL, 0));
+
+    /* unref all keys */
+    g_list_foreach(keys, (GFunc)gpgme_key_unref, NULL);
+    g_list_free(keys);
+
+    return fpr;
+} 
+
+
+/*
+ * Add signer to ctx's list of signers and return TRUE on success or FALSE
+ * on error.
+ */
+static gboolean
+gpgme_add_signer(GpgmeCtx ctx, const gchar *signer)
+{
+    GpgmeKey key = NULL;
+    gchar *fingerprint;
+
+    
+    if (!(fingerprint = get_key_fingerprint(ctx, signer, 1, NULL))) {
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			     _("could not get a private key for %s"), signer);
+	return FALSE;
+    }
+
+    /* set the key (the previous operation guaranteed that it exists...) */
+    gpgme_op_keylist_start(ctx, fingerprint, 1);
+    gpgme_op_keylist_next(ctx, &key);
+    gpgme_signers_add(ctx, key);
+    gpgme_key_unref(key);
+    gpgme_op_keylist_end(ctx);
+    g_free(fingerprint);
+
+    return TRUE;
+}
+
+
+/*
+ * Build rcpt from rcpt_list and return TRUE on success or FALSE on error.
+ */
+static gboolean
+gpgme_build_recipients(GpgmeRecipients *rcpt, GpgmeCtx ctx, GList *rcpt_list)
+{
+    GpgmeError err;
+
+    if ((err = gpgme_recipients_new(rcpt)) != GPGME_No_Error) {
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			     _("could not create gpgme recipients set: %s"),
+			     gpgme_strerror(err));
+        return FALSE;
+    }
+
+    /* try to find the public key for every recipient */
+    while (rcpt_list) {
+        gchar *name = (gchar *)rcpt_list->data;
+	gchar *fingerprint;
+
+        if (!(fingerprint = get_key_fingerprint(ctx, name, 0, NULL))) {
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("could not get a key for %s"), name);
+            gpgme_recipients_release(*rcpt);
+            return FALSE;
+        }
+
+        /* set the recipient */
+	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+			     "encrypt for %s with fpr %s", name, fingerprint);
+        if ((err = gpgme_recipients_add_name_with_validity(*rcpt, fingerprint, 
+                                                           GPGME_VALIDITY_FULL)) != 
+            GPGME_No_Error) {
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("could not add recipient %s: %s"), name, 
+				 gpgme_strerror(err));
+	    g_free(fingerprint);
+            gpgme_recipients_release(*rcpt);
+            return FALSE;
+        }
+	g_free(fingerprint);
+
+        rcpt_list = g_list_next(rcpt_list);
+    }
+    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+			 "encrypting for %d recipient(s)",
+			 gpgme_recipients_count(*rcpt));
+    
+    return TRUE;
+}
+
+
 /* 
  * Called by gpgme to get a new chunk of data. We read from the file in
  * hook (which is actually a MailDataMBox *) and convert every single '\n'
@@ -656,7 +983,7 @@ static int
 read_cb_MailDataMBox(void *hook, char *buffer, size_t count, size_t *nread)
 {
     MailDataMBox *inFile = (MailDataMBox *)hook;
-    
+
     *nread = 0;
     if (inFile->bytes_left == 0 || feof(inFile->mailboxFile))
 	return -1;
@@ -668,11 +995,12 @@ read_cb_MailDataMBox(void *hook, char *buffer, size_t count, size_t *nread)
 	inFile->bytes_left--;
 
 	if (c != EOF) {
-	    if (c == '\n' && (*nread == 0 || *(buffer - 1) != '\r')) {
+	    if (c == '\n' && !inFile->last_was_cr) {
 		*buffer++ = '\r';
 		*nread += 1;
 		count -= 1;
 	    }
+	    inFile->last_was_cr = c == '\r';
 	    *buffer++ = c;
 	    *nread += 1;
 	    count -= 1;
@@ -833,7 +1161,6 @@ gpgme_signature(MailDataMBox *mailData, const gchar *sign_for, gchar **micalg,
 {
     GpgmeCtx ctx;
     GpgmeError err;
-    GpgmeKey key;
     GpgmeData in, out;
     size_t datasize;
     gchar *signature_buffer, *signature_info;
@@ -852,24 +1179,11 @@ gpgme_signature(MailDataMBox *mailData, const gchar *sign_for, gchar **micalg,
     }
     
     /* find the secret key for the "sign_for" address */
-    if ((err = gpgme_op_keylist_start(ctx, sign_for, 1)) != GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not list keys for %s: %s"), sign_for,
-			     gpgme_strerror(err));
+    if (!gpgme_add_signer(ctx, sign_for)) {
 	gpgme_release(ctx);
 	return NULL;
     }
-    if ((err = gpgme_op_keylist_next(ctx, &key)) != GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not retrieve key for %s: %s"), sign_for,
-			     gpgme_strerror(err));
-	gpgme_op_keylist_end(ctx);
-	gpgme_release(ctx);
-	return NULL;
-    }
-    gpgme_signers_add(ctx, key);
-    gpgme_op_keylist_end(ctx);
-
+  
     /* let gpgme create the signature */
     gpgme_set_armor(ctx, 1);
     cb_data.ctx = ctx;
@@ -881,7 +1195,6 @@ gpgme_signature(MailDataMBox *mailData, const gchar *sign_for, gchar **micalg,
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("gpgme could not get data from file: %s"), 
 			     gpgme_strerror(err));
-	gpgme_key_release(key);
 	gpgme_release(ctx);
 	return NULL;
     }
@@ -890,7 +1203,6 @@ gpgme_signature(MailDataMBox *mailData, const gchar *sign_for, gchar **micalg,
 			     _("gpgme could not create new data: %s"),
 			     gpgme_strerror(err));
 	gpgme_data_release(in);
-	gpgme_key_release(key);
 	gpgme_release(ctx);
 	return NULL;
     }
@@ -901,7 +1213,6 @@ gpgme_signature(MailDataMBox *mailData, const gchar *sign_for, gchar **micalg,
 			     gpgme_strerror(err));
 	gpgme_data_release(out);
 	gpgme_data_release(in);
-	gpgme_key_release(key);
 	gpgme_release(ctx);
 	return NULL;
     }
@@ -914,7 +1225,6 @@ gpgme_signature(MailDataMBox *mailData, const gchar *sign_for, gchar **micalg,
     }
 
     gpgme_data_release(in);
-    gpgme_key_release(key);
     if (!(signature_buffer = gpgme_data_release_and_get_mem(out, &datasize))) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("could not get gpgme data: %s"),
@@ -944,10 +1254,8 @@ gpgme_encrypt_file(MailDataMBox *mailData, GList *encrypt_for)
 {
     GpgmeCtx ctx;
     GpgmeError err;
-    GpgmeKey key;
     GpgmeRecipients rcpt;
     GpgmeData in, out;
-    const gchar *fingerprint;
     gchar *databuf;
     size_t datasize;
     gchar fname[PATH_MAX];
@@ -960,71 +1268,12 @@ gpgme_encrypt_file(MailDataMBox *mailData, GList *encrypt_for)
 			     gpgme_strerror(err));
 	return NULL;
     }
-    if ((err = gpgme_recipients_new(&rcpt)) != GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not create gpgme recipients set: %s"),
-			     gpgme_strerror(err));
-	gpgme_release(ctx);
-	return NULL;
+
+    /* build the list of recipients */
+    if (!gpgme_build_recipients(&rcpt, ctx, encrypt_for)) {
+        gpgme_release(ctx);
+        return NULL;
     }
-
-    /* try to find the public key for every recipient */
-    while (encrypt_for) {
-	gchar *name = (gchar *)encrypt_for->data;
-
-	/* FIXME: select from a list if the rcpt has more than one key? */
-	if ((err = gpgme_op_keylist_start(ctx, name, 0)) != GPGME_No_Error) {
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("could not list keys for %s: %s"), name,
-				 gpgme_strerror(err));
-	    gpgme_recipients_release(rcpt);
-	    gpgme_release(ctx);
-	    return NULL;
-	}
-	if ((err = gpgme_op_keylist_next(ctx, &key)) != GPGME_No_Error) {
-	    if (err == GPGME_EOF)
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				     _("could not find a public key for %s"),
-				     name);
-	    else
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				     _("could not get the public key for %s: %s"),
-				     name, gpgme_strerror(err));
-	    gpgme_op_keylist_end(ctx);
-	    gpgme_recipients_release(rcpt);
-	    gpgme_release(ctx);
-	    return NULL;
-	}
-	gpgme_op_keylist_end(ctx);
-
-	if (!(fingerprint = gpgme_key_get_string_attr(key, GPGME_ATTR_FPR, NULL, 0))) {
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("could not retrieve key fingerprint for %s: %s"),
-				 name, gpgme_strerror(err));
-	    gpgme_key_release(key);
-	    gpgme_recipients_release(rcpt);
-	    gpgme_release(ctx);
-	    return NULL;
-	}
-
-	/* set the recipient */
-	g_message("encrypt for %s with fpr %s", name, fingerprint);
-	if ((err = gpgme_recipients_add_name_with_validity(rcpt, fingerprint, 
-							   GPGME_VALIDITY_FULL)) != 
-	    GPGME_No_Error) {
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("could not add recipient %s: %s"), name, 
-				 gpgme_strerror(err));
-	    gpgme_key_release(key);
-	    gpgme_recipients_release(rcpt);
-	    gpgme_release(ctx);
-	    return NULL;
-	}
-	gpgme_key_release(key);
-
-	encrypt_for = encrypt_for->next;
-    }
-    g_message("encrypting for %d recipient(s)", gpgme_recipients_count(rcpt));
     
     /* let gpgme encrypt the data */
     gpgme_set_armor(ctx, 1);
@@ -1088,5 +1337,6 @@ set_decrypt_file(LibBalsaMessageBody *body, const gchar *fname)
 	    set_decrypt_file(body->parts, fname);
     }
 }
+
 
 #endif /* HAVE_GPGME */

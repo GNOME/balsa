@@ -783,7 +783,7 @@ add_header_gchar(BalsaMessage * bm, const gchar * header,
         wrapped_value = g_strdup(value);
         libbalsa_wrap_string(wrapped_value,
                              balsa_app.wraplength - BALSA_INDENT_CHARS);
-        libbalsa_utf8_sanitize(wrapped_value);
+        libbalsa_utf8_sanitize(&wrapped_value, FALSE, 0, NULL);
         gtk_text_buffer_insert_with_tags(buffer, &insert,
                                          wrapped_value, -1,
                                          indent_tag, font_tag, NULL);
@@ -944,53 +944,26 @@ part_info_init_audio(BalsaMessage * bm, BalsaPartInfo * info)
 static void
 part_info_init_pgp_signature(BalsaMessage * bm, BalsaPartInfo * info)
 {
-    GString *msg;
+    gchar *infostr;
     GtkWidget *hbox;
-    LibBalsaSignatureInfo *sig_info = info->body->sig_info;
 
-    if (!sig_info) {
+    if (!info->body->sig_info) {
 	part_info_init_unknown(bm, info);
 	return;
     }
 
-    msg = g_string_new(libbalsa_gpgme_sig_stat_to_gchar(sig_info->status));
-    if (sig_info->sign_name || sig_info->sign_email || sig_info->fingerprint) {
-	if (sig_info->sign_name) {
-	    g_string_append_printf(msg, _("\nSigned by: %s"),
-				   sig_info->sign_name);
-	    if (sig_info->sign_email)
-		g_string_append_printf(msg, " <%s>",
-				       sig_info->sign_email);
-	} else if (sig_info->sign_email)
-	    g_string_append_printf(msg, _("Mail address: %s"),
-				       sig_info->sign_email);
-	g_string_append_printf(msg, _("\nValidity: %s"),
-			       libbalsa_gpgme_validity_to_gchar(sig_info->validity));
-	if (sig_info->fingerprint)
-	    g_string_append_printf(msg, _("\nKey fingerprint: %s"),
-				   sig_info->fingerprint);
-	if (sig_info->key_created) {
-	    gchar buf[128];
-	    strftime(buf, 127, balsa_app.date_string,
-		     localtime(&sig_info->key_created));
-	    g_string_append_printf(msg, _("\nKey created on: %s"), buf);
-	}
-	if (sig_info->sign_time) {
-	    gchar buf[128];
-	    strftime(buf, 127, balsa_app.date_string,
-		     localtime(&sig_info->sign_time));
-	    g_string_append_printf(msg, _("\nSigned on: %s"), buf);
-	}
-    }
+    infostr =
+	libbalsa_signature_info_to_gchar(info->body->sig_info,
+					 balsa_app.date_string);
     
     hbox = gtk_hbox_new(FALSE, 2);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 10);
-    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(msg->str), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(infostr), FALSE, FALSE, 0);
+    g_free(infostr);
     gtk_widget_show_all(hbox);
     info->widget = hbox;
     info->focus_widget = hbox;
     info->can_display = FALSE;
-    g_string_free(msg, TRUE);
 }
 #endif
 
@@ -1687,8 +1660,18 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         GtkTextBuffer *buffer;
         regex_t rex;
         GList *url_list = NULL;
+	const gchar *target_cs;
 
-        libbalsa_utf8_sanitize(ptr);
+        if (!libbalsa_utf8_sanitize(&ptr, balsa_app.convert_unknown_8bit,
+				    balsa_app.convert_unknown_8bit_codeset, &target_cs)) {
+	    gchar *from = libbalsa_address_to_gchar(bm->message->from, 0);
+	    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
+				 _("The message sent by %s with subject \"%s\" contains 8-bit characters, but no header describing the used codeset (converted to %s)"),
+				 from,
+				 LIBBALSA_MESSAGE_GET_SUBJECT(bm->message),
+				 target_cs ? target_cs : "\"?\"");
+	    g_free(from);
+	}
 
         if (libbalsa_message_body_is_flowed(info->body)) {
             /* Parse, but don't wrap. */

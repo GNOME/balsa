@@ -899,8 +899,6 @@ balsa_charset_from_message_font(void) {
 	s++;
     } while(i < 13); 
     
-    fprintf(stderr, "FONT: %s\n",s);
-    
     if(i<13)
 	return NULL;
     return s;

@@ -7,6 +7,9 @@
 	forward and reply prefixes on identity change. Search CC for
 	identity if necessary. (Steve Wall).
 
+	* src/main-window.c: disable menus on removing last message from index.
+	* src/toolbar-factory.[ch]: releated cleanup.
+	
 	* libbalsa/mailbox.[hc]: per-mailbox identity by
 	* src/sendmsg-window.c:  Brian Stafford <brian@stafford.uklinux.net>
 

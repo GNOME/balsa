@@ -2530,6 +2530,7 @@ set_identity_from_mailbox(BalsaSendmsg* msg)
 
     if( message && message->mailbox && balsa_app.identities) {
 	identity = message->mailbox->identity_name;
+        if(!identity) return FALSE;
 	for (ilist = balsa_app.identities;
 	     ilist != NULL;
 	     ilist = g_list_next(ilist)) {
@@ -2766,10 +2767,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->spell_check_disable_list = list;
 
     /* Set up the default identity */
-    set_identity_from_mailbox(msg);
-
-    /* Get the identity from the To: field of the original message */
-    guess_identity(msg);
+    if(!set_identity_from_mailbox(msg))
+        /* Get the identity from the To: field of the original message */
+        guess_identity(msg);
 
     /* create the top portion with the to, from, etc in it */
     gtk_paned_add1(GTK_PANED(paned), create_info_pane(msg, type));

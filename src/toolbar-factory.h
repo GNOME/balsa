@@ -47,11 +47,11 @@ void set_toolbar_button_callback(BalsaToolbarType toolbar, const char *id,
 				 void (*callback)(GtkWidget *, gpointer), 
 				 gpointer);
 void set_toolbar_button_sensitive(GtkWidget *window, BalsaToolbarType toolbar,
-				  char *id, int sensitive);
+				  const char *id, int sensitive);
 GtkToolbar *get_toolbar(GtkWidget *window, BalsaToolbarType toolbar);
 void release_toolbars(GtkWidget *window);
 GtkWidget *get_tool_widget(GtkWidget *window, BalsaToolbarType toolbar, 
-			   char *id);
+			   const char *id);
 void update_all_toolbars(void);
 char **get_legal_toolbar_buttons(int toolbar);
 void balsa_toolbar_remove_all(GtkToolbar *toolbar);

@@ -1030,70 +1030,58 @@ enable_mailbox_menus(BalsaMailboxNode * mbnode)
 static void
 enable_message_menus(LibBalsaMessage * message)
 {
-    gboolean enable;
-
-    enable = (message != NULL);
+    const static gchar* tools[] = { /* toolbar items */
+        BALSA_PIXMAP_REPLY,       BALSA_PIXMAP_REPLY_ALL,  
+        BALSA_PIXMAP_REPLY_GROUP, BALSA_PIXMAP_FORWARD, 
+        BALSA_PIXMAP_MARKED_NEW,  BALSA_PIXMAP_PRINT
+    };
+    const static GnomeUIInfo* mods[] = { /* menu items to modify message */
+        &message_menu[MENU_MESSAGE_DELETE_POS], 
+        &message_menu[MENU_MESSAGE_TRASH_POS],
+        &message_menu[MENU_MESSAGE_UNDEL_POS],
+        &message_menu[MENU_MESSAGE_TOGGLE_POS],
+        &message_toggle_menu[MENU_MESSAGE_TOGGLE_FLAGGED_POS],
+        &message_toggle_menu[MENU_MESSAGE_TOGGLE_NEW_POS]
+    };
+    /* menu items requiring a message */
+    const static GnomeUIInfo* std_menu[] = { 
+        &file_menu[MENU_FILE_PRINT_POS], 
+        &message_menu[MENU_MESSAGE_SAVE_PART_POS],
+        &message_menu[MENU_MESSAGE_SOURCE_POS],
+        &message_menu[MENU_MESSAGE_REPLY_POS],
+        &message_menu[MENU_MESSAGE_REPLY_ALL_POS],
+        &message_menu[MENU_MESSAGE_REPLY_GROUP_POS],
+        &message_menu[MENU_MESSAGE_FORWARD_ATTACH_POS],
+        &message_menu[MENU_MESSAGE_FORWARD_INLINE_POS],
+        &message_menu[MENU_MESSAGE_STORE_ADDRESS_POS]
+    };
+    gboolean enable, enable_mod, enable_multi;
+    guint i;
+    enable       = (message != NULL);
+    enable_mod   = (message && !message->mailbox->readonly);
+    enable_multi = (message && libbalsa_message_is_multipart(message));
 
     /* Handle menu items which require write access to mailbox */
-    if (message && message->mailbox->readonly) {
-        gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_DELETE_POS].widget, FALSE);
-        gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TRASH_POS].widget, FALSE);
-        gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_UNDEL_POS].widget, FALSE);
-        gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TOGGLE_POS].widget,
-                                 FALSE);
-        gtk_widget_set_sensitive(message_toggle_menu[MENU_MESSAGE_TOGGLE_FLAGGED_POS].widget,
-                                 FALSE);
-        gtk_widget_set_sensitive(message_toggle_menu[MENU_MESSAGE_TOGGLE_NEW_POS].widget,
-                                 FALSE);
-
-        set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                        0, BALSA_PIXMAP_TRASH, FALSE);
-    } else {
-        gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_DELETE_POS].widget, enable);
-        gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TRASH_POS].widget, enable);
-        gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_UNDEL_POS].widget, enable);
-        gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TOGGLE_POS].widget, enable);
-        gtk_widget_set_sensitive(message_toggle_menu[MENU_MESSAGE_TOGGLE_FLAGGED_POS].widget, enable);
-        gtk_widget_set_sensitive(message_toggle_menu[MENU_MESSAGE_TOGGLE_NEW_POS].widget, enable);
-
-        set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                        0, BALSA_PIXMAP_TRASH, enable);
-    }
+    for(i=0; i<ELEMENTS(mods); i++)
+        gtk_widget_set_sensitive(mods[i]->widget, enable_mod);
+    set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
+                                 0, BALSA_PIXMAP_TRASH, enable_mod);
 
     /* Handle items which require multiple parts to the mail */
-    if (message && !libbalsa_message_is_multipart(message)) {
-        gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_NEXT_PART_POS].widget, FALSE);
-        gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_PREVIOUS_PART_POS].widget, FALSE);
-    } else {
-        gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_NEXT_PART_POS].widget, enable);
-        gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_PREVIOUS_PART_POS].widget, enable);
-    }
+    gtk_widget_set_sensitive(message_menu
+                             [MENU_MESSAGE_NEXT_PART_POS].widget, 
+                             enable_multi);
+    gtk_widget_set_sensitive(message_menu
+                             [MENU_MESSAGE_PREVIOUS_PART_POS].widget, 
+                             enable_multi);
 
-
-    gtk_widget_set_sensitive(file_menu[MENU_FILE_PRINT_POS].widget, enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_SAVE_PART_POS].widget, enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_SOURCE_POS].widget, enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_REPLY_POS].widget, enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_REPLY_ALL_POS].widget, enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_REPLY_GROUP_POS].widget, enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_FORWARD_ATTACH_POS].widget, enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_FORWARD_INLINE_POS].widget, enable);
-
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_STORE_ADDRESS_POS].widget, enable);
+    for(i=0; i<ELEMENTS(std_menu); i++)
+        gtk_widget_set_sensitive(std_menu[i]->widget, enable);
 
     /* Toolbar */
+    for(i=0; i<ELEMENTS(tools); i++)
         set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                        0, BALSA_PIXMAP_REPLY, enable);
-        set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                        0, BALSA_PIXMAP_REPLY_ALL, enable);
-        set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                        0, BALSA_PIXMAP_REPLY_GROUP, enable);
-        set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                        0, BALSA_PIXMAP_FORWARD, enable);
-        set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                        0, BALSA_PIXMAP_MARKED_NEW, enable);
-        set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                        0, BALSA_PIXMAP_PRINT, enable);
+                        0, tools[i], enable);
 
     balsa_window_enable_continue();
 }
@@ -3028,8 +3016,11 @@ balsa_window_unselect_message_cb(GtkWidget * widget,
         BALSA_INDEX(balsa_window_find_current_index(balsa_app.main_window));
     g_return_if_fail(index);
     enable_mailbox_menus(index->mailbox_node);
-/*     enable_message_menus(NULL); */
-/*     enable_edit_menus(NULL); */
+    /* we need to disable menus in case there was no other message selected */
+    if(GTK_CLIST(index->ctree)->selection == NULL) {
+        enable_message_menus(NULL);
+        enable_edit_menus(NULL);
+    }
 }
 
 

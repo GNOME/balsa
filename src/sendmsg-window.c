@@ -237,7 +237,7 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
 
   pos = gnome_icon_list_append (iconlist,
 		   gnome_unconditional_pixmap_file ("balsa/attachment.png"),
-				filename);
+				g_basename (filename));
   gnome_icon_list_set_icon_data (iconlist, pos, filename);
 
   /* FIXME */
@@ -338,9 +338,19 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_table_attach (GTK_TABLE (table), msg->bcc, 1, 2, 4, 5,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
 
+  /* Attachment list */
+  label = gtk_label_new ("Attachments:");
+  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 5, 6,
+		    GTK_FILL, GTK_FILL, 0, 0);
+
   msg->attachments = gnome_icon_list_new ();
-  gtk_table_attach (GTK_TABLE (table), msg->attachments, 0, 2, 5, 6,
-		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
+  gtk_table_attach (GTK_TABLE (table), msg->attachments, 1, 2, 5, 6,
+		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 0, 0);
+  gnome_icon_list_set_policy (GNOME_ICON_LIST (msg->attachments),
+			      GTK_POLICY_AUTOMATIC,
+			      GTK_POLICY_AUTOMATIC);
+
 
   return table;
 }
@@ -422,7 +432,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 /* create the top portion with the to, from, etc in it */
   gtk_box_pack_start (GTK_BOX (vbox),
 		      create_info_pane (msg, type),
-		      FALSE, FALSE, 0);
+		      TRUE, TRUE, 0);
 
   /* fill in that info: */
 

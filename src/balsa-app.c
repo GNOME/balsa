@@ -121,7 +121,7 @@ init_balsa_app (int argc, char *argv[])
 
   gnome_sound_init("localhost");
 
-  gnome_sound_play (gnome_sound_file ("estart.wav"));
+  gnome_sound_play (gnome_sound_file ("balsa/startup.wav"));
 
   if (config_load (BALSA_CONFIG_FILE) == FALSE)
     {

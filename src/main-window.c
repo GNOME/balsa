@@ -1638,6 +1638,11 @@ balsa_window_destroy(GtkObject * object)
     window = BALSA_WINDOW(object);
 
     balsa_window_idle_remove(window);
+    if (window->current_message) {
+	g_print("balsa_window_destroy remove weak pointer\n");
+	g_object_remove_weak_pointer(G_OBJECT(window->current_message),
+				     (gpointer) &window->current_message);
+    }
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
         (*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
@@ -3163,7 +3168,13 @@ static void
 balsa_window_idle_replace(BalsaWindow * window, LibBalsaMessage * message)
 {
     if (!message || window->current_message != message) {
+	if (window->current_message)
+	    g_object_remove_weak_pointer(G_OBJECT(window->current_message),
+					 (gpointer) &window->current_message);
         window->current_message = message;
+	if (message)
+	    g_object_add_weak_pointer(G_OBJECT(message),
+				      (gpointer) &window->current_message);
         if (balsa_app.previewpane) {
             guint set_message_id;
 

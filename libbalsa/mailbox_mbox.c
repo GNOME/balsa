@@ -300,6 +300,7 @@ parse_mailbox(LibBalsaMailbox * mailbox)
     }
     g_object_unref(G_OBJECT(gmime_parser));
 
+    mailbox->total_messages = messages_info->len;
     mailbox->new_messages += new_messages;
 }
 
@@ -515,6 +516,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     gboolean save_failed;
     GMimeParser *gmime_parser;
     LibBalsaMailboxMbox *mbox;
+    GSList *l, *removed_list = NULL;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_MBOX(mailbox), FALSE);
 
@@ -587,8 +589,9 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	msg_info = &g_array_index(mbox->messages_info,
 		       struct message_info, i);
 	if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
-	    libbalsa_mailbox_msgno_removed(msg_info->message->mailbox,
-					   msg_info->message->msgno);
+	    removed_list =
+		g_slist_prepend(removed_list,
+			        GINT_TO_POINTER(msg_info->message->msgno));
 	else {
 	    j++;
 
@@ -749,8 +752,15 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	}
     }
     g_object_unref(G_OBJECT(gmime_parser));
-    mailbox->messages = j;
     g_mime_stream_unref(gmime_stream);
+
+    mailbox->messages = j;
+    mailbox->total_messages = mbox->messages_info->len;
+
+    for (l = removed_list; l; l = l->next)
+	libbalsa_mailbox_msgno_removed(mailbox, GPOINTER_TO_INT(l->data));
+    g_slist_free(removed_list);
+
     return TRUE;
 }
 

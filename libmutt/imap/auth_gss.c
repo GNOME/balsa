@@ -27,13 +27,21 @@
 
 #include <netinet/in.h>
 
-#ifdef HAVE_HEIMDAL
-#  include <gssapi.h>
-#  define gss_nt_service_name GSS_C_NT_HOSTBASED_SERVICE
-#else
-#  include <gssapi/gssapi.h>
+/*BALSA: this GSS mess is balsa's problem */
+#ifdef HAVE_GSSAPI_GSSAPI_H
+# include <gssapi/gssapi.h>
+# ifdef HAVE_GSSAPI_GSSAPI_GENERIC_H
 #  include <gssapi/gssapi_generic.h>
+# endif
+#else
+# ifdef HAVE_GSSAPI_H
+#  include <gssapi.h>
+# endif
 #endif
+#ifdef HAVE_GSS_C_NT_HOSTBASED_SERVICE
+# define gss_nt_service_name GSS_C_NT_HOSTBASED_SERVICE
+#endif
+/* BALSA: end of balsa GSS include */
 
 #define GSS_BUFSIZE 8192
 

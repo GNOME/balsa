@@ -797,7 +797,7 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
     cur = message->header;
     g_return_val_if_fail(cur != NULL, FALSE);
 
-    LOCK_MAILBOX(message->mailbox); /* checked that !=NULL here */
+    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE); 
     if (message->body_ref > 0) {
 	message->body_ref++;
         UNLOCK_MAILBOX(message->mailbox); 

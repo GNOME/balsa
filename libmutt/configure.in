@@ -235,34 +235,67 @@ AC_ARG_WITH(gss, [  --with-gss            Enable GSS [default=no]],
 
 AC_MSG_CHECKING([whether to build GSS support])
 if test "x$with_gss" != xno  ; then
-   if test -d $with_gss && test -f "$with_gss/include/gssapi/gssapi.h" ; then
-      gssdir=$with_gss
-   else
-        AC_TRY_COMPILE([#include <gssapi/gssapi.h>], ,
-			gssdir=default,
-			gssdir="")
-	if test "x$gssdir" = x ; then
-           for dir in /usr /usr/local /usr/lib /usr/kerberos; do
-               if test -f "$dir/include/gssapi/gssapi.h"; then
-                  gssdir=$dir
-               fi
-           done
+    AC_MSG_RESULT(yes)
+    if test x"$with_gss" != xyes ; then
+	dirs="$with_gss default /usr/local /usr/kerberos /usr/lib /usr"
+    else
+	dirs="default /usr/local /usr/kerberos /usr/lib /usr"
+    fi
+    gssdir=""
+    save_CPP="$CPP"
+    for dir in $dirs ; do
+	test x"$dir" != xdefault && CPP="$save_CPP -I$dir/include"
+	AC_CHECK_HEADERS(gssapi.h gssapi/gssapi.h,  break,
+        [ unset ac_cv_header_gssapi_gssapi_h ac_cv_header_gssapi_h ])
+        if test x"$ac_cv_header_gssapi_gssapi_h" = xyes -o \
+                x"$ac_cv_header_gssapi_h" = xyes; then
+           gssdir="$dir"; break
+        fi
+    done
+    # keep CPP set for subsequent CHECK_HEADERS
+    CFLAGS="$CFLAGS -I$dir/include"
+
+    if test -z "$gssdir"; then
+	AC_MSG_ERROR([GSS requested but no GSS headers found])
+    else
+	AC_CHECK_HEADERS(gssapi/gssapi_generic.h)
+	if test "x$gssdir" = xdefault ; then
+	    extra_libs=""
+	else
+	    extra_libs="-L$gssdir/lib"
 	fi
-   fi
-   if test -z "$gssdir"; then
-      AC_MSG_ERROR([GSS requested but no GSS headers found ,$gssdir,.])
-   else
-      AC_MSG_RESULT($gssdir)
-      AC_CHECK_LIB(gssapi, gss_init_sec_context, [
-	  LIBS="$LIBS -L$gssdir/lib -lgssapi -lkrb5"
-      ],[
-	  LIBS="$LIBS -L$gssdir/lib -lgssapi_krb5"
-      ], -lkrb5 -ldes -lasn1 -lroken -lcrypt -lcom_err -L$gssdir/lib)
-      CFLAGS="$CFLAGS -I$gssdir/include"
+	save_LIBS="$LIBS"
+	for lib in krb5 des asn1 roken crypt com_err ; do
+	    LIBS="$LIBS -l$lib"
+	    AC_CACHE_VAL(ac_cv_lib_$lib,
+		AC_TRY_LINK(, [main()], [eval av_cv_lib_$lib=yes
+		    extra_libs="$extra_libs -l$lib"], [eval av_cv_lib_$lib=no]))
+	    LIBS="$save_LIBS"
+	done
+
+	for lib in gssapi gssapi_krb5 gss ; do
+	    AC_CHECK_LIB($lib, gss_init_sec_context, [gsslib="$lib";break], , 
+                         $extra_libs)
+	done
+
+	if test x"$gsslib" = x ; then
+	    AC_MSG_ERROR([GSS requested but no GSS libraries found])
+	else
+	    LIBS="$LIBS -l$gsslib $extra_libs"
+	    test x"$gsslib" = xgssapi && x"$av_cv_lib_krb5" = xyes &&
+		LIBS="$LIBS -lkrb5"
+	    if test "$ac_cv_header_gssapi_h" = "yes"; then
+		AC_EGREP_HEADER(GSS_C_NT_HOSTBASED_SERVICE, gssapi.h,
+		    AC_DEFINE(HAVE_GSS_C_NT_HOSTBASED_SERVICE))
+	    else
+		AC_EGREP_HEADER(GSS_C_NT_HOSTBASED_SERVICE, gssapi/gssapi.h,
+		    AC_DEFINE(HAVE_GSS_C_NT_HOSTBASED_SERVICE))
+	    fi
+	fi
     fi
 else 
-   AC_MSG_RESULT(no)
-   gssdir=no
+    AC_MSG_RESULT(no)
+    gssdir=no
 fi
 AM_CONDITIONAL(USE_GSS, test x$gssdir != xno)
 

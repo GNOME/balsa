@@ -1,3 +1,8 @@
+2002-03-24  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/message.c: fix non-MT build.
+	* configure.in, acconfig.h: portably handle GSS. (Steve Wall).
+
 2002-03-23  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox_imap.c: fix a build without gdbm.h

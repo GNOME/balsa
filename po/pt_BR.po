@@ -447,7 +447,7 @@ msgstr "Alguns campos estão vazios."
 #: src/mailbox-conf.c:621
 #, c-format
 msgid "Cannot create mailbox '%s': %s\n"
-msgstr "Não foi poss;ivel criar caixa '%s': %s\n"
+msgstr "Não foi possível criar caixa '%s': %s\n"
 
 #. used to build a string: MAILBOXNAME " on " SERVERNAME
 #: src/mailbox-conf.c:685

@@ -32,9 +32,6 @@
 #include "pop3.h"
 #include "mailbox.h"
 
-#include "mailbox-filter.h"
-#include "filter-file.h"
-
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 
 
@@ -303,23 +300,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	return;
     }	
     libbalsa_mailbox_open(tmp_mailbox);
-    if( 0 && (m->inbox) && (tmp_mailbox->messages)) {
-	GSList * filters; 
-
-	 /* Load associated filters if needed */
-        if (!mailbox->filters)                                
-            config_mailbox_filters_load(mailbox);
-        filters = libbalsa_mailbox_filters_when(mailbox->filters,
-						FILTER_WHEN_INCOMING);
-	if (filters) {
-	    if (filters_prepare_to_run(filters)) {
-		libbalsa_filter_match(filters, tmp_mailbox->message_list,
-				      FALSE);
-		libbalsa_filter_apply(filters);
-	    }
-	    g_slist_free(filters);
-	}
-
+    if ((m->inbox) && (tmp_mailbox->messages)) {
 	if (!libbalsa_messages_move(tmp_mailbox->message_list, m->inbox)) {    
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 				 _("Error placing messages from %s on %s\n"

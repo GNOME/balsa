@@ -1,3 +1,8 @@
+2003-02-14  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/mailbox.c: initialize progress_notify.
+	* libbalsa/mailbox_pop3.c: remove unnecessary includes and wrong 0.
+
 2003-02-14  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* balsa.spec.in: update requirements.

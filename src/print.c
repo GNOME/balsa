@@ -146,20 +146,21 @@ print_wrap_string(gchar ** str, GnomeFont * font, gint width, gint tab_width)
     gchar *eol;
     gint lines = 1;
     GString *wrapped;
-    gdouble space_width = gnome_font_get_width_string_n(font, " ", 1);
-
+    gdouble space_width = gnome_font_get_width_string(font, " ");
+ 
     g_return_val_if_fail(*str, 0);
 
     g_strchomp(*str);
     wrapped = g_string_new("");
     while (line) {
+	gdouble line_width = 0.0;
+
 	eol = strchr(line, '\n');
 	if (eol)
 	    *eol = '\0';
 	ptr = line;
 	while (*ptr) {
 	    gint pos = 0;
-	    gdouble line_width = 0.0;
 	    gint last_space = 0;
 
 	    while (*ptr && (line_width <= width || !last_space)) {
@@ -178,15 +179,19 @@ print_wrap_string(gchar ** str, GnomeFont * font, gint width, gint tab_width)
 			line_width += space_width;
 		    } else {
 			wrapped = g_string_append_c(wrapped, *ptr);
-			line_width += gnome_font_get_width_string_n(font, ptr, 1);
+			line_width += 
+			    gnome_font_get_width_string_n(font, ptr, 1);
 		    }
 		    pos++;
 		}
 		ptr++;
 	    }
-	    if (*ptr) {
+	    if (*ptr && last_space) {
 		wrapped->str[last_space] = '\n';
 		lines++;
+		line_width = 
+		    gnome_font_get_width_string(font, 
+						&wrapped->str[last_space + 1]);
 	    }
 	}
 	line = eol;
@@ -300,55 +305,117 @@ start_new_page(PrintInfo * pi)
 typedef struct _HeaderInfo {
     guint id_tag;
     float header_label_width;
-    gchar **headers;		/* can be released with g_strfreev() */    
+    GList *headers;
 } HeaderInfo;
+
+static void
+print_header_string(GList **header_list, const gchar *field_id,
+		    const gchar *label, const gchar *value)
+{
+    gchar **hdr_pair;
+
+    if (!value ||
+	balsa_app.shown_headers == HEADERS_NONE ||
+	!(balsa_app.shown_headers == HEADERS_ALL || 
+	  libbalsa_find_word(field_id, balsa_app.selected_headers)))
+	return;
+
+    hdr_pair = g_new0(gchar *, 3);
+    hdr_pair[0] = g_strdup(label);
+    hdr_pair[1] = g_strdup(value);
+    *header_list = g_list_append(*header_list, hdr_pair);
+}
+
+static void
+print_header_list(GList **header_list, const gchar *field_id,
+		  const gchar *label, GList *values)
+{
+    gchar **hdr_pair;
+
+    if (!values ||
+	balsa_app.shown_headers == HEADERS_NONE ||
+	!(balsa_app.shown_headers == HEADERS_ALL || 
+	  libbalsa_find_word(field_id, balsa_app.selected_headers)))
+	return;
+
+    hdr_pair = g_new0(gchar *, 3);
+    hdr_pair[0] = g_strdup(label);
+    hdr_pair[1] = libbalsa_make_string_from_list(values);
+    *header_list = g_list_append(*header_list, hdr_pair);
+}
 
 static void
 prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
 {
-    const int MAX_HDRS = 4;	/* max number of printed headers */
-    int hdr = 0, i, width, lines;
+    gint i, lines;
     GnomeFont *font;
     HeaderInfo *pdata;
     GString *footer_string = NULL;
-    const gchar* subject;
+    const gchar *subject;
+    gchar *date;
+    GList *other_hdrs, *p;
 
     pdata = g_malloc(sizeof(HeaderInfo));
     pdata->id_tag = BALSA_PRINT_TYPE_HEADER;
-    pdata->headers = g_new0(gchar *, (MAX_HDRS + 1) * 2);
+    pdata->headers = NULL;
 
-    if (pi->message->from) {
-	pdata->headers[hdr++] = g_strdup(_("From:"));
-	pdata->headers[hdr++] = 
-	    libbalsa_address_to_gchar(pi->message->from, 0);
-	footer_string = g_string_new(pdata->headers[hdr - 1]);
-    }
-    if (pi->message->to_list) {
-	pdata->headers[hdr++] = g_strdup(_("To:"));
-	pdata->headers[hdr++] =
-	    libbalsa_make_string_from_list(pi->message->to_list);
-    }
     subject = LIBBALSA_MESSAGE_GET_SUBJECT(pi->message);
     if (subject) {
-	pdata->headers[hdr++] = g_strdup(_("Subject:"));
-	pdata->headers[hdr++] = g_strdup(subject);
-	if (footer_string) {
-	    footer_string = g_string_append(footer_string, " - ");
-	    footer_string = g_string_append(footer_string, 
-					    pdata->headers[hdr - 1]);
-	} else
-	    footer_string = g_string_new(pdata->headers[hdr - 1]);
+	print_header_string (&pdata->headers, "subject", _("Subject:"),
+			     subject);
+	footer_string = g_string_new(subject);
     }
-    pdata->headers[hdr++] = g_strdup(_("Date:"));
-    pdata->headers[hdr++] = 
-	libbalsa_message_date_to_gchar(pi->message, balsa_app.date_string);
 
+    date = libbalsa_message_date_to_gchar(pi->message, balsa_app.date_string);
+    print_header_string (&pdata->headers, "date", _("Date:"), date);
     if (footer_string) {
 	footer_string = g_string_append(footer_string, " - ");
-	footer_string = g_string_append(footer_string, 
-					pdata->headers[hdr - 1]);
-    } else
-	footer_string = g_string_new(pdata->headers[hdr - 1]);
+	footer_string = g_string_append(footer_string, date);
+    } else {
+	footer_string = g_string_new(date);
+    }
+    g_free(date);
+
+    if (pi->message->from) {
+	gchar *from = libbalsa_address_to_gchar(pi->message->from, 0);
+	print_header_string (&pdata->headers, "from", _("From:"), from);
+	if (footer_string) {
+	    footer_string = g_string_prepend(footer_string, " - ");
+	    footer_string = g_string_prepend(footer_string, from);
+	} else {
+	    footer_string = g_string_new(from);
+	}
+	g_free(from);
+    }
+
+    print_header_list(&pdata->headers, "to", _("To:"), pi->message->to_list);
+    print_header_list(&pdata->headers, "cc", _("Cc:"), pi->message->cc_list);
+    print_header_list(&pdata->headers, "bcc", _("Bcc:"), pi->message->bcc_list);
+    print_header_string (&pdata->headers, "fcc", _("Fcc:"),
+			 pi->message->fcc_mailbox);
+
+    if (pi->message->dispnotify_to) {
+	gchar *mdn_to = libbalsa_address_to_gchar(pi->message->dispnotify_to, 0);
+	print_header_string (&pdata->headers, "disposition-notification-to", 
+			     _("Disposition-Notification-To:"), mdn_to);
+	g_free(mdn_to);
+    }
+
+    /* and now for the remaining headers... */
+    other_hdrs = libbalsa_message_user_hdrs(pi->message);
+    p = g_list_first(other_hdrs);
+    while (p) {
+	gchar **pair, *curr_hdr;
+	pair = p->data;
+	curr_hdr = g_strconcat(pair[0], ":", NULL);
+	print_header_string (&pdata->headers, pair[0], curr_hdr, pair[1]);
+	g_free(curr_hdr);
+	g_strfreev(pair);
+	p = g_list_next(p);
+    }
+    g_list_free(other_hdrs);
+
+    /* wrap the footer if necessary */
     pi->footer = footer_string->str;
     g_string_free(footer_string, FALSE);
 
@@ -356,20 +423,32 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
     print_wrap_string(&pi->footer, font, pi->printable_width, pi->tab_width);
     gtk_object_unref(GTK_OBJECT(font));    
     
+    /* calculate the label width */
     pdata->header_label_width = 0;
     font = gnome_font_new(BALSA_PRINT_HEAD_FONT, BALSA_PRINT_HEAD_SIZE);
-    for (i = 0; i < hdr; i += 2) {
-	width = gnome_font_get_width_string(font, pdata->headers[i]);
+    p = g_list_first(pdata->headers);
+    while (p) {
+	gchar **strgs = p->data;
+	gint width;
+
+	width = gnome_font_get_width_string(font, strgs[0]);
 	if (width > pdata->header_label_width)
 	    pdata->header_label_width = width;
+	p = g_list_next(p);
     }
     pdata->header_label_width += 6;	/* pts */
 
+    /* wrap headers if necessary */
     lines = 0;
-    for (i = 1; i < hdr; i += 2)
-	lines += print_wrap_string(&pdata->headers[i], font,
-				   pi->printable_width -
-				   pdata->header_label_width, pi->tab_width);
+    p = g_list_first(pdata->headers);
+    while (p) {
+	gchar **strgs = p->data;
+	lines += 
+	    print_wrap_string(&strgs[1], font,
+			      pi->printable_width - pdata->header_label_width, 
+			      pi->tab_width);
+	p = g_list_next(p);
+    }
 
     if (pi->ypos - lines * BALSA_PRINT_HEAD_SIZE < pi->margin_bottom) {
 	lines -= (pi->ypos - pi->margin_bottom) / BALSA_PRINT_HEAD_SIZE;
@@ -389,7 +468,7 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
 
 static void
 print_header_val(PrintInfo * pi, gint x, float * y,
-		 gint line_height, gchar * val)
+		 gint line_height, gchar * val, GnomeFont *font)
 {
     gchar *ptr, *eol;
 
@@ -403,7 +482,13 @@ print_header_val(PrintInfo * pi, gint x, float * y,
 	ptr = eol;
 	if (eol)
 	    ptr++;
-      	*y -= line_height;
+	if (ptr) {
+	    *y -= line_height;
+	    if (*y < pi->margin_bottom) {
+		start_new_page(pi);
+		gnome_print_setfont(pi->pc, font);
+	    }
+	}
     }
 }
 
@@ -413,22 +498,27 @@ print_header(PrintInfo * pi, gpointer * data)
     HeaderInfo *pdata = (HeaderInfo *)data;
     GnomeFont *font;
     gint i;
+    GList *p;
 
     g_return_if_fail(pdata->id_tag == BALSA_PRINT_TYPE_HEADER);
 
     font = gnome_font_new(BALSA_PRINT_HEAD_FONT, BALSA_PRINT_HEAD_SIZE);
     gnome_print_setfont(pi->pc, font);
-    pi->ypos -= BALSA_PRINT_HEAD_SIZE;
-    for (i = 0; pdata->headers[i]; i += 2) {
+    p = g_list_first(pdata->headers);
+    while (p) {
+	gchar **pair = p->data;
+
+	pi->ypos -= BALSA_PRINT_HEAD_SIZE;
+	if (pi->ypos < pi->margin_bottom)
+	    start_new_page(pi);
 	gnome_print_moveto(pi->pc, pi->margin_left, pi->ypos);
-	gnome_print_show_with_charset(pi, pdata->headers[i]);
+	gnome_print_show_with_charset(pi, pair[0]);
 	print_header_val(pi, pi->margin_left + pdata->header_label_width,
-			 &pi->ypos, BALSA_PRINT_HEAD_SIZE, 
-			 pdata->headers[i + 1]);
+			 &pi->ypos, BALSA_PRINT_HEAD_SIZE, pair[1], font);
+	g_strfreev(pair);
+	p = g_list_next(p);
     }
-    pi->ypos += BALSA_PRINT_HEAD_SIZE;
     gtk_object_unref(GTK_OBJECT(font));
-    g_strfreev(pdata->headers);
 }
 
 /*
@@ -680,7 +770,8 @@ print_default(PrintInfo * pi, gpointer data)
 	gnome_print_moveto(pi->pc, offset, pi->ypos);
 	gnome_print_show_with_charset(pi, pdata->labels[i]);
 	print_header_val(pi, offset + pdata->label_width, &pi->ypos,
-			 BALSA_PRINT_HEAD_SIZE, pdata->labels[i + 1]);
+			 BALSA_PRINT_HEAD_SIZE, pdata->labels[i + 1], font);
+	pi->ypos -= BALSA_PRINT_HEAD_SIZE;
     }
     pi->ypos -= (pdata->part_height - pdata->text_height) / 2.0 -
 	BALSA_PRINT_HEAD_SIZE;

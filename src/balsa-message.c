@@ -33,6 +33,9 @@
 #include "mime.h"
 #include "misc.h"
 
+#include <libmutt/mutt.h>
+#include <libmutt/mime.h>
+
 #ifdef USE_PIXBUF
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #endif
@@ -108,6 +111,8 @@ static void save_part(BalsaPartInfo * info);
 
 static void select_icon_cb(GnomeIconList * ilist, gint num,
 			   GdkEventButton * event, BalsaMessage * bm);
+static BalsaPartInfo *add_part(BalsaMessage *bm, gint part);
+static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent);
 static void select_part(BalsaMessage * bm, gint part);
 static void part_context_menu_save(GtkWidget * menu_item,
 				   BalsaPartInfo * info);
@@ -157,6 +162,7 @@ static void part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info,
 #endif
 static GtkWidget* part_info_mime_button (BalsaPartInfo* info, const gchar* content_type, const gchar* key);
 static void part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info);
+static void part_context_menu_vfs_cb(GtkWidget * menu_item, BalsaPartInfo * info);
 static void part_create_menu (BalsaPartInfo* info);
 
 static GtkViewportClass *parent_class = NULL;
@@ -233,6 +239,13 @@ balsa_message_init(BalsaMessage * bm)
     gtk_container_add(GTK_CONTAINER(bm), bm->table);
     gtk_widget_show(bm->table);
 
+    bm->content = gtk_vbox_new(FALSE, 0);
+
+    gtk_table_attach(GTK_TABLE(bm->table), bm->content, 0, 1, 1,
+		     2, GTK_EXPAND | GTK_FILL,
+		     GTK_EXPAND | GTK_FILL, 0, 1);
+    gtk_widget_show(bm->content);
+
     bm->header_text = gtk_text_new(NULL, NULL);
     gtk_signal_connect(GTK_OBJECT(bm->header_text), "key_press_event",
 		       (GtkSignalFunc) balsa_message_key_press_event,
@@ -247,7 +260,7 @@ balsa_message_init(BalsaMessage * bm)
     bm->part_list = gnome_icon_list_new(100, NULL, FALSE);
 
     gnome_icon_list_set_selection_mode(GNOME_ICON_LIST(bm->part_list),
-				       GTK_SELECTION_SINGLE);
+				       GTK_SELECTION_MULTIPLE);
     gtk_signal_connect(GTK_OBJECT(bm->part_list), "select_icon",
 		       GTK_SIGNAL_FUNC(select_icon_cb), bm);
     gtk_signal_connect(GTK_OBJECT(bm->part_list), "size_request",
@@ -1774,7 +1787,6 @@ part_info_init(BalsaMessage * bm, BalsaPartInfo * info)
 	fprintf(stderr, "part end: multipart\n");
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
-	g_print("Got a TYPEMULTIPART in part2canvas!\n");
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
 	if (balsa_app.debug)
@@ -1805,25 +1817,21 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body)
 {
     BalsaPartInfo *info = NULL;
     gchar *pix = NULL;
-    gchar *content_type = NULL;
+    gchar *content_type = libbalsa_message_body_get_content_type(body);
     gchar *icon_title = NULL;
     gint pos;
+    gboolean is_multipart=libbalsa_message_body_is_multipart(body);
 
-
-    if (libbalsa_message_body_is_multipart(body)) {
-	if (balsa_app.debug)
-	    fprintf(stderr, "part: multipart\n");
-	display_multipart(bm, body);
-	if (balsa_app.debug)
-	    fprintf(stderr, "part end: multipart\n");
-	return;			/* we don't want a multipart icon */
-    }
-
+    if(!is_multipart ||
+       g_strcasecmp(content_type, "multipart/mixed")==0 ||
+       g_strcasecmp(content_type, "multipart/alternative")==0) {
     bm->part_count++;
     info = part_info_new(body, bm->message);
-    content_type = libbalsa_message_body_get_content_type(body);
 
-    if (body->filename)
+	if (is_multipart) {
+	    icon_title = g_strdup_printf("%s parts", strchr(content_type, '/')+1);
+	    *icon_title = toupper (*icon_title);
+	} else if (body->filename)
 	icon_title =
 	    g_strdup_printf("%s (%s)", body->filename, content_type);
     else
@@ -1838,9 +1846,17 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body)
     gnome_icon_list_set_icon_data_full(GNOME_ICON_LIST(bm->part_list), pos,
 				       info, (GtkDestroyNotify)part_info_free);
 
-    g_free(content_type);
     g_free(icon_title);
     g_free(pix);
+    }
+    if (is_multipart) {
+	if (balsa_app.debug)
+	    fprintf(stderr, "part: multipart\n");
+	display_multipart(bm, body);
+	if (balsa_app.debug)
+	    fprintf(stderr, "part end: multipart\n");
+    }
+    g_free(content_type);
 }
 
 static void
@@ -1875,7 +1891,11 @@ part_create_menu (BalsaPartInfo* info)
         key = list->data;
 
         if (key && g_strcasecmp (key, "icon-filename") 
-	    && g_strncasecmp (key, "fm-", 3)) {
+	    && g_strncasecmp (key, "fm-", 3)
+	    /* Get rid of additional GnomeVFS entries: */
+	    && (!strstr(key, "_") || strstr(key, "."))
+	    && g_strncasecmp(key, "description", 11)) {
+	    
             if ((cmd = gnome_mime_get_value (content_type, key)) != NULL) {
                 if (g_strcasecmp (key, "open") == 0 || 
                     g_strcasecmp (key, "view") == 0 || 
@@ -2045,6 +2065,155 @@ balsa_message_previous_part(BalsaMessage * bmessage)
     select_part(bmessage, index);
 }
 
+LibBalsaMessageBody *preferred_part(LibBalsaMessageBody *parts)
+{
+    /* TODO: Consult preferences and/or previous selections */
+
+    LibBalsaMessageBody *body;
+    gchar *content_type;
+
+#ifdef HAVE_GTKHTML
+    for(body=parts; body; body=body->next) {
+	content_type = libbalsa_message_body_get_content_type(body);
+
+	if(g_strcasecmp(content_type, "text/html")==0) {
+	    g_free(content_type);
+	    return body;
+	}
+	g_free(content_type);
+    }
+#endif /* HAVE_GTKHTML */
+
+    for(body=parts; body; body=body->next) {
+	content_type = libbalsa_message_body_get_content_type(body);
+
+	if(g_strcasecmp(content_type, "text/plain")==0) {
+	    g_free(content_type);
+	    return body;
+	}
+	g_free(content_type);
+    }
+
+
+    return parts;
+}
+
+
+
+static gint part_icon_no(BalsaMessage *bm, const LibBalsaMessageBody *body)
+{
+    const BalsaPartInfo *info;
+    int part;
+
+    for(part=0; part<bm->part_count; part++) {
+	info = (const BalsaPartInfo *) gnome_icon_list_get_icon_data
+	    (GNOME_ICON_LIST(bm->part_list), part);
+	if(info->body==body)
+	    return part;
+    }
+    return -1;
+}
+
+
+static void add_body(BalsaMessage *bm, 
+		     LibBalsaMessageBody *body)
+{
+    if(body) {
+	gint part=part_icon_no(bm, body);
+	
+	if(part>=0)
+	    add_part(bm, part);
+	else
+	    add_multipart(bm, body);
+    }
+}
+
+
+static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
+/* Remarks: *** The tests/assumptions made are NOT verified with the RFCs */
+{
+    if(parent->parts) {
+	gchar *content_type = 
+	    libbalsa_message_body_get_content_type(parent);
+	if(g_strcasecmp(content_type, "multipart/related")==0) {
+	    /* Add the first part */
+	    add_body(bm, parent->parts);
+	} else if(g_strcasecmp(content_type, "multipart/alternative")==0) {
+	    /* Add the most suitable part. */
+	    add_body(bm, preferred_part(parent->parts));
+	} else {
+	    /* Add first (main) part + anything else with 
+	       Content-Disposition: inline */
+	    LibBalsaMessageBody *body=parent->parts;
+	    
+	    if(body) {
+		add_body(bm, body);
+		for(body=body->next; body; body=body->next) {
+		    if(body->mutt_body && 
+		       body->mutt_body->disposition==DISPINLINE)
+			add_body(bm, body);
+		}
+	    }
+	}
+	g_free(content_type);
+    }
+}
+
+
+
+static BalsaPartInfo *add_part(BalsaMessage *bm, gint part)
+{
+    BalsaPartInfo *info=NULL;
+
+    if (part != -1) {
+	LibBalsaMessageBodyType type;
+	
+	info = (BalsaPartInfo *) gnome_icon_list_get_icon_data
+	    (GNOME_ICON_LIST(bm->part_list), part);
+
+	g_assert(info != NULL);
+
+	gnome_icon_list_select_icon(GNOME_ICON_LIST(bm->part_list), part);
+
+	if (info->widget == NULL)
+	    part_info_init(bm, info);
+
+	if (info->widget) {
+	    gtk_container_add(GTK_CONTAINER(bm->content), info->widget);
+	    gtk_widget_show(info->widget);
+	}
+	add_multipart(bm, info->body);
+    }
+    
+    return info;
+}
+
+static void hide_all_parts(BalsaMessage *bm)
+{
+    if(bm->current_part) {
+	gint part;
+
+	for(part=0; part<bm->part_count; part++) {
+	    BalsaPartInfo *current_part=(BalsaPartInfo *) gnome_icon_list_get_icon_data
+		(GNOME_ICON_LIST(bm->part_list), part);
+	    
+	    if(current_part && current_part->widget && 
+	       GTK_WIDGET_VISIBLE(current_part->widget)) {
+		if(GTK_IS_EDITABLE(current_part->widget) && 
+		   GTK_WIDGET_REALIZED(current_part->widget))
+		    gtk_editable_claim_selection(
+						 GTK_EDITABLE(current_part->widget), FALSE, 
+						 GDK_CURRENT_TIME);
+		gtk_widget_hide(current_part->widget);
+		gtk_container_remove(GTK_CONTAINER(bm->content),
+				     current_part->widget);
+	}
+	    gnome_icon_list_unselect_icon(GNOME_ICON_LIST(bm->part_list), part);
+    }
+    }
+}
+
+
 /* 
  * If part == -1 then change to no part
  * must release selection before hiding a text widget.
@@ -2052,52 +2221,13 @@ balsa_message_previous_part(BalsaMessage * bmessage)
 static void
 select_part(BalsaMessage * bm, gint part)
 {
-    BalsaPartInfo *info;
+    hide_all_parts(bm);
 
-    if (bm->current_part && bm->current_part->widget) {
-	if(GTK_IS_EDITABLE(bm->current_part->widget) && 
-	   GTK_WIDGET_REALIZED(bm->current_part->widget))
-	    gtk_editable_claim_selection(
-		GTK_EDITABLE(bm->current_part->widget), FALSE, 
-		GDK_CURRENT_TIME);
-	gtk_widget_hide(bm->current_part->widget);
-	gtk_container_remove(GTK_CONTAINER(bm->table),
-			     bm->current_part->widget);
-    }
+    bm->current_part = add_part(bm, part);
 
-    if (part != -1) {
-	info = (BalsaPartInfo *) gnome_icon_list_get_icon_data
-	    (GNOME_ICON_LIST(bm->part_list), part);
-
-	g_assert(info != NULL);
-
-	if (info->widget == NULL)
-	    part_info_init(bm, info);
-
-	if (info->widget) {
-	    gtk_widget_show(info->widget);
-	    gtk_table_attach(GTK_TABLE(bm->table), info->widget, 0, 1, 1,
-			     2, GTK_EXPAND | GTK_FILL,
-			     GTK_EXPAND | GTK_FILL, 0, 1);
-	} else {
-	    /* HACK! This is a spacer, so that the attachment icons
-	     * will stay at the bottom of the window.
-	     */
-	    GtkWidget *box;
-
-	    box = gtk_hbox_new(FALSE, FALSE);
-	    gtk_widget_show(box);
-	    gtk_table_attach(GTK_TABLE(bm->table), box, 0, 1, 1, 2,
-			     GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL,
-			     0, 0);
-	}
-	bm->current_part = info;
+    if(bm->current_part)
 	gtk_signal_emit(GTK_OBJECT(bm),
 			balsa_message_signals[SELECT_PART]);
-    } else {
-	bm->current_part = NULL;
-    }
-
 
     scroll_set(GTK_VIEWPORT(bm)->hadjustment, 0);
     scroll_set(GTK_VIEWPORT(bm)->vadjustment, 0);

@@ -1,3 +1,9 @@
+2001-09-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/print.c: print no/selected/all headers (Albrecht Dreﬂ).
+	* src/balsa-message.c: interpret mixed/alternative dispositions
+	(#59998, Toralf Lund).
+
 2001-09-19  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-index.c: propagate unread status to top parent,

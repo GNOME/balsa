@@ -58,13 +58,17 @@ typedef enum {
  * structures
  */
 typedef struct _LibBalsaMailboxClass LibBalsaMailboxClass;
+struct _CONTEXT;
 
 struct _LibBalsaMailbox {
     GtkObject object;
 
     gchar *config_prefix;	/* unique string identifying mailbox in the config file */
     gchar *name;
-    gpointer context;
+    /* context refers libmutt internal data.           * 
+     * AVOID ACCESSING ITS CONTENT SINCE THE STRUCTURE *
+     * DEFINITION MAY CHANGE WITHOUT WARNING.          */
+    struct _CONTEXT* context;
     guint open_ref;
 
     gboolean lock;

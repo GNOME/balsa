@@ -636,7 +636,9 @@ typedef struct pattern_t
   regex_t *rx;
 } pattern_t;
 
-typedef struct
+/* BALSA: make the structure non-anonymous so we can have pointers to it
+   without parsing this file for the struct definition. */
+struct _CONTEXT
 {
   char *path;
   FILE *fp;
@@ -675,7 +677,8 @@ typedef struct
   unsigned int revsort : 1;	/* mailbox sorted in reverse? */
   unsigned int collapsed : 1;   /* are all threads collapsed? */
   unsigned int closing : 1;	/* mailbox is being closed */
-} CONTEXT;
+};
+typedef struct _CONTEXT CONTEXT;
 
 typedef struct attachptr
 {

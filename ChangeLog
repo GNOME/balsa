@@ -1,3 +1,9 @@
+2001-04-17  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/libbalsa_private.h: CLIENT_CONTEXT() macro: type cast
+	is not a l-value in strict C. fix #53050.
+	* libbalsa/mailbox.h: change type of context fld to struct _CONTEXT*.
+	
 2001-04-16  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/server.c: (libbalsa_server_load_config) fix bug #52914

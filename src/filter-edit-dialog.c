@@ -17,13 +17,15 @@
  *
  * Arguments:
  *    option_list[] options - array of options
- *    gin num - number of options
+ *    gint num - number of options
+ *    GtkSignalFunc func - callback function (will get data of i)
  *
  * Returns:
  *    GtkOptionMenu - the menu created
  */
 GtkWidget *build_option_menu(option_list options[],
-		       gint num)
+		       gint num,
+		       GtkSignalFunc func)
 {
     GtkWidget *option_menu;
     GtkWidget *menu;
@@ -44,6 +46,13 @@ GtkWidget *build_option_menu(option_list options[],
 	group = gtk_radio_menu_item_group(
 	    GTK_RADIO_MENU_ITEM(options[i].widget));
 	gtk_menu_append(GTK_MENU(menu), options[i].widget);
+	if (func)
+	{
+	    gtk_signal_connect(GTK_OBJECT(options[i].widget),
+			       "toggled",
+			       func,
+			       (gpointer)i);
+	}
 	gtk_widget_show(options[i].widget);
     }
 
@@ -56,23 +65,12 @@ GtkWidget *build_option_menu(option_list options[],
 
 
 /*
- * filter_edit_dialog()
+ * build_base_dialog()
  *
- * Returns immediately, but fires off the filter edit dialog.
- *
- * Arguments:
- *   GList *filter_list - the list of filters
+ * Builds the framework of the dialog and nothing more
  */
-void filter_edit_dialog(GList *filter_list)
+void build_base_dialog()
 {
-    gint i;
-    static gchar *titles[] =
-    {
-	"Enabled",
-	"Name",
-    };
-
-
     fe_dialog = gtk_dialog_new();
     gtk_window_set_title(GTK_WINDOW(fe_dialog),
 			 "Edit Filters...");
@@ -117,10 +115,21 @@ void filter_edit_dialog(GList *filter_list)
 		       GTK_WIDGET(fe_table),
 		       TRUE, TRUE, 0);
     gtk_widget_show(fe_table);
+} /* end build_dialog() */
 
-    /*
-     * The left side
-     */
+
+/*
+ * build_left_side()
+ *
+ * Builds the left side of the dialog
+ */
+void build_left_side()
+{
+    static gchar *titles[] =
+    {
+	"Enabled",
+	"Name",
+    };
 
     fe_box_newdelete = gtk_hbox_new(TRUE, 2);
     fe_new = gtk_button_new_with_label("New");
@@ -187,185 +196,17 @@ void filter_edit_dialog(GList *filter_list)
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     10,10);
     gtk_widget_show(fe_clist);
-
-    /*
-     * The separator
-     */
-
-    fe_vseparator = gtk_vseparator_new();
-    gtk_table_attach(GTK_TABLE(fe_table),
-		     fe_vseparator,
-		     6, 7, 0, 20,
-		     GTK_FILL | GTK_SHRINK,
-		     GTK_FILL | GTK_SHRINK,
-		     0, 0);
-    gtk_widget_show(fe_vseparator);
-
-    /*
-     * The right side
-     */
-
-    fe_box_applyrevert = gtk_hbox_new(TRUE, 0);
-    gtk_table_attach(GTK_TABLE(fe_table),
-		     fe_box_applyrevert,
-		     8, 19, 19, 20,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-		     GTK_SHRINK,
-		     10, 10);
-    gtk_widget_show(fe_box_applyrevert);
-
-    fe_apply = gtk_button_new_with_label("Apply");
-    gtk_box_pack_start(GTK_BOX(fe_box_applyrevert),
-		       fe_apply,
-		       TRUE,
-		       TRUE,
-		       5);
-    gtk_widget_show(fe_apply);
-    fe_revert = gtk_button_new_with_label("Revert");
-    gtk_box_pack_start(GTK_BOX(fe_box_applyrevert),
-		       fe_revert,
-		       TRUE,
-		       TRUE,
-		       5);
-    gtk_widget_show(fe_revert);
-
-    fe_notebook = gtk_notebook_new();
-    gtk_notebook_set_tab_pos(GTK_NOTEBOOK(fe_notebook), GTK_POS_TOP);
-    gtk_table_attach(GTK_TABLE(fe_table),
-		     fe_notebook,
-		     7, 20, 0, 19,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-		     10, 10);
-    gtk_widget_show(fe_notebook);
-
-    /* The match notebook page */
-
-    fe_notebook_match_page = gtk_table_new(10, 10, FALSE);
-    fe_match_label = gtk_label_new("Match");
-    gtk_notebook_append_page(GTK_NOTEBOOK(fe_notebook),
-			     fe_notebook_match_page,
-			     fe_match_label);
-    gtk_widget_show(fe_notebook_match_page);
-    gtk_widget_show(fe_match_label);
-
-    /* The name entry */
-    
-    fe_name_label = gtk_label_new("Filter name:");
-    gtk_table_attach(GTK_TABLE(fe_notebook_match_page),
-		     fe_name_label,
-		     0, 2, 0, 1,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-		     GTK_SHRINK,
-		     5, 5);
-    gtk_widget_show(fe_name_label);
-    fe_name_entry = gtk_entry_new_with_max_length(256);
-    gtk_table_attach(GTK_TABLE(fe_notebook_match_page),
-		     fe_name_entry,
-		     2, 10, 0, 1,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-		     GTK_SHRINK,
-		     5, 5);
-    gtk_widget_show(fe_name_entry);
+} /* end build_left_side() */
 
 
-    /* The "Process when:" option menu */
-
-    fe_when_frame = gtk_frame_new("Process when:");
-    gtk_frame_set_label_align(GTK_FRAME(fe_when_frame),
-			      GTK_POS_LEFT,
-			      GTK_POS_TOP);
-    gtk_frame_set_shadow_type(GTK_FRAME(fe_when_frame),
-			      GTK_SHADOW_ETCHED_IN);
-    gtk_table_attach(GTK_TABLE(fe_notebook_match_page),
-		     fe_when_frame,
-		     5, 10, 1, 2,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-		     GTK_SHRINK,
-		     5, 5);
-    gtk_widget_show(fe_when_frame);
-    fe_when_box = gtk_vbox_new(TRUE, 5);
-    gtk_container_add(GTK_CONTAINER(fe_when_frame),
-		      fe_when_box);
-    gtk_widget_show(fe_when_box);
-
-    fe_when_option_menu = build_option_menu(fe_process_when, 3);
-    gtk_box_pack_start(GTK_BOX(fe_when_box),
-		       fe_when_option_menu,
-		       TRUE,
-		       FALSE,
-		       5);
-    gtk_widget_show(fe_when_option_menu);
-
-
-    /* The "Run on:" option menu */
-
-    fe_group_frame = gtk_frame_new("Run on:");
-    gtk_frame_set_label_align(GTK_FRAME(fe_group_frame),
-			      GTK_POS_LEFT,
-			      GTK_POS_TOP);
-    gtk_frame_set_shadow_type(GTK_FRAME(fe_group_frame),
-			      GTK_SHADOW_ETCHED_IN);
-    gtk_table_attach(GTK_TABLE(fe_notebook_match_page),
-		     fe_group_frame,
-		     0, 5, 1, 2,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-		     GTK_SHRINK,
-		     5, 5);
-    gtk_widget_show(fe_group_frame);
-    fe_group_box = gtk_vbox_new(TRUE, 5);
-    gtk_container_add(GTK_CONTAINER(fe_group_frame),
-		      fe_group_box);
-    gtk_widget_show(fe_group_box);
-
-    fe_group_option_menu = build_option_menu(fe_run_on, 4);
-    gtk_box_pack_start(GTK_BOX(fe_group_box),
- 		       fe_group_option_menu,
-		       TRUE,
-		       FALSE,
-		       5);
-    gtk_widget_show(fe_group_option_menu);
-
-    /* the type notebook's option menu */
-
-    fe_type_frame = gtk_frame_new("Search type:");
-    gtk_frame_set_label_align(GTK_FRAME(fe_type_frame),
-			      GTK_POS_LEFT,
-			      GTK_POS_TOP);
-    gtk_frame_set_shadow_type(GTK_FRAME(fe_type_frame),
-			      GTK_SHADOW_ETCHED_IN);
-    gtk_container_border_width(GTK_CONTAINER(fe_type_frame), 5);
-    gtk_table_attach(GTK_TABLE(fe_notebook_match_page),
-		     fe_type_frame,
-		     0, 10, 5, 6,
-		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-		     GTK_SHRINK,
-		     5, 5);
-    gtk_widget_show(fe_type_frame);
-    fe_type_box = gtk_hbox_new(FALSE, 5);
-    gtk_container_add(GTK_CONTAINER(fe_type_frame),
-		      fe_type_box);
-    gtk_widget_show(fe_type_box);
-
-    fe_search_option_menu = build_option_menu(fe_search_type, 3);
-    gtk_box_pack_start(GTK_BOX(fe_type_box),
-		       fe_search_option_menu,
-		       FALSE,
-		       FALSE,
-		       5);
-    gtk_widget_show(fe_search_option_menu);
-
-
-    for (i = 0; i < 3; i++)
-    {
-	gtk_signal_connect(GTK_OBJECT(fe_search_type[i].widget),
-			   "toggled",
-			   GTK_SIGNAL_FUNC(fe_checkbutton_toggled),
-			   (gpointer)i);
-    }
-
-
-    /* The type notebook */
+/*
+ * build_type_notebook()
+ *
+ * builds the "Searc Type" notebook on the "Action" page
+ */
+void build_type_notebook()
+{
+    /* The notebook */
 
     fe_type_notebook = gtk_notebook_new();
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(fe_type_notebook),
@@ -554,9 +395,150 @@ void filter_edit_dialog(GList *filter_list)
 		     GTK_SHRINK,
 		     5, 5);
     gtk_widget_show(fe_type_exec_entry);
-    
+} /* end build_type_notebook() */
 
-    /* The action notebook page */
+
+/*
+ * build_match_page()
+ *
+ * Builds the "Match" page of the main notebook
+ */
+void build_match_page()
+{
+    /* The notebook page */
+
+    fe_notebook_match_page = gtk_table_new(10, 10, FALSE);
+    fe_match_label = gtk_label_new("Match");
+    gtk_notebook_append_page(GTK_NOTEBOOK(fe_notebook),
+			     fe_notebook_match_page,
+			     fe_match_label);
+    gtk_widget_show(fe_notebook_match_page);
+    gtk_widget_show(fe_match_label);
+
+    /* The name entry */
+    
+    fe_name_label = gtk_label_new("Filter name:");
+    gtk_table_attach(GTK_TABLE(fe_notebook_match_page),
+		     fe_name_label,
+		     0, 2, 0, 1,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_name_label);
+    fe_name_entry = gtk_entry_new_with_max_length(256);
+    gtk_table_attach(GTK_TABLE(fe_notebook_match_page),
+		     fe_name_entry,
+		     2, 10, 0, 1,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_name_entry);
+
+
+    /* The "Process when:" option menu */
+
+    fe_when_frame = gtk_frame_new("Process when:");
+    gtk_frame_set_label_align(GTK_FRAME(fe_when_frame),
+			      GTK_POS_LEFT,
+			      GTK_POS_TOP);
+    gtk_frame_set_shadow_type(GTK_FRAME(fe_when_frame),
+			      GTK_SHADOW_ETCHED_IN);
+    gtk_table_attach(GTK_TABLE(fe_notebook_match_page),
+		     fe_when_frame,
+		     5, 10, 1, 2,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_when_frame);
+    fe_when_box = gtk_vbox_new(TRUE, 5);
+    gtk_container_add(GTK_CONTAINER(fe_when_frame),
+		      fe_when_box);
+    gtk_widget_show(fe_when_box);
+
+    fe_when_option_menu = build_option_menu(fe_process_when,
+					    3,
+					    NULL);
+    gtk_box_pack_start(GTK_BOX(fe_when_box),
+		       fe_when_option_menu,
+		       TRUE,
+		       FALSE,
+		       5);
+    gtk_widget_show(fe_when_option_menu);
+
+
+    /* The "Run on:" option menu */
+
+    fe_group_frame = gtk_frame_new("Run on:");
+    gtk_frame_set_label_align(GTK_FRAME(fe_group_frame),
+			      GTK_POS_LEFT,
+			      GTK_POS_TOP);
+    gtk_frame_set_shadow_type(GTK_FRAME(fe_group_frame),
+			      GTK_SHADOW_ETCHED_IN);
+    gtk_table_attach(GTK_TABLE(fe_notebook_match_page),
+		     fe_group_frame,
+		     0, 5, 1, 2,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_group_frame);
+    fe_group_box = gtk_vbox_new(TRUE, 5);
+    gtk_container_add(GTK_CONTAINER(fe_group_frame),
+		      fe_group_box);
+    gtk_widget_show(fe_group_box);
+
+    fe_group_option_menu = build_option_menu(fe_run_on,
+					     4,
+					     NULL);
+    gtk_box_pack_start(GTK_BOX(fe_group_box),
+ 		       fe_group_option_menu,
+		       TRUE,
+		       FALSE,
+		       5);
+    gtk_widget_show(fe_group_option_menu);
+
+    /* the type notebook's option menu */
+
+    fe_type_frame = gtk_frame_new("Search type:");
+    gtk_frame_set_label_align(GTK_FRAME(fe_type_frame),
+			      GTK_POS_LEFT,
+			      GTK_POS_TOP);
+    gtk_frame_set_shadow_type(GTK_FRAME(fe_type_frame),
+			      GTK_SHADOW_ETCHED_IN);
+    gtk_container_border_width(GTK_CONTAINER(fe_type_frame), 5);
+    gtk_table_attach(GTK_TABLE(fe_notebook_match_page),
+		     fe_type_frame,
+		     0, 10, 5, 6,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_type_frame);
+    fe_type_box = gtk_hbox_new(FALSE, 5);
+    gtk_container_add(GTK_CONTAINER(fe_type_frame),
+		      fe_type_box);
+    gtk_widget_show(fe_type_box);
+
+    fe_search_option_menu = build_option_menu(fe_search_type,
+					      3,
+					      GTK_SIGNAL_FUNC(fe_checkbutton_toggled));
+    gtk_box_pack_start(GTK_BOX(fe_type_box),
+		       fe_search_option_menu,
+		       FALSE,
+		       FALSE,
+		       5);
+    gtk_widget_show(fe_search_option_menu);
+
+    build_type_notebook();
+} /* end build_match_page() */
+
+
+/*
+ * build_action_page()
+ *
+ * Builds the "Action" page of the main notebook
+ */
+void build_action_page()
+{
+    /* The notebook page */
 
     fe_notebook_action_page = gtk_table_new(10, 10, FALSE);
     fe_action_label = gtk_label_new("Action");
@@ -733,7 +715,86 @@ void filter_edit_dialog(GList *filter_list)
 		       FALSE,
 		       2);
     gtk_widget_show(fe_disp_stop);
-    
+} /* end build_action_page() */
+
+
+/*
+ * build_right_side()
+ *
+ * Builds the right side of the dialog
+ */
+void build_right_side()
+{
+    /* The apply/revert buttons */
+    fe_box_applyrevert = gtk_hbox_new(TRUE, 0);
+    gtk_table_attach(GTK_TABLE(fe_table),
+		     fe_box_applyrevert,
+		     8, 19, 19, 20,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     10, 10);
+    gtk_widget_show(fe_box_applyrevert);
+
+    fe_apply = gtk_button_new_with_label("Apply");
+    gtk_box_pack_start(GTK_BOX(fe_box_applyrevert),
+		       fe_apply,
+		       TRUE,
+		       TRUE,
+		       5);
+    gtk_widget_show(fe_apply);
+    fe_revert = gtk_button_new_with_label("Revert");
+    gtk_box_pack_start(GTK_BOX(fe_box_applyrevert),
+		       fe_revert,
+		       TRUE,
+		       TRUE,
+		       5);
+    gtk_widget_show(fe_revert);
+
+    /* the main notebook */
+
+    fe_notebook = gtk_notebook_new();
+    gtk_notebook_set_tab_pos(GTK_NOTEBOOK(fe_notebook), GTK_POS_TOP);
+    gtk_table_attach(GTK_TABLE(fe_table),
+		     fe_notebook,
+		     7, 20, 0, 19,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     10, 10);
+    gtk_widget_show(fe_notebook);
+
+    build_match_page();
+
+    build_action_page();
+} /* end build_right_side() */
+
+
+/*
+ * filter_edit_dialog()
+ *
+ * Returns immediately, but fires off the filter edit dialog.
+ *
+ * Arguments:
+ *   GList *filter_list - the list of filters
+ */
+void filter_edit_dialog(GList *filter_list)
+{
+    build_base_dialog();
+
+    build_left_side();
+
+
+    /* The separator */
+ 
+    fe_vseparator = gtk_vseparator_new();
+    gtk_table_attach(GTK_TABLE(fe_table),
+		     fe_vseparator,
+		     6, 7, 0, 20,
+		     GTK_FILL | GTK_SHRINK,
+		     GTK_FILL | GTK_SHRINK,
+		     0, 0);
+    gtk_widget_show(fe_vseparator);
+
+    build_right_side();
 
     gtk_widget_show(fe_dialog);
 }

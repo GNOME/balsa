@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-12 11:02+0200\n"
-"PO-Revision-Date: 2004-09-12 14:27+0200\n"
+"POT-Creation-Date: 2004-09-16 10:59+0200\n"
+"PO-Revision-Date: 2004-09-16 17:19+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -381,7 +381,7 @@ msgid "S/MIME mode"
 msgstr "Režim S/MIME"
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:256
+#: libbalsa/imap-server.c:258
 #, c-format
 msgid ""
 "IMAP server %s alert:\n"
@@ -391,27 +391,27 @@ msgstr ""
 "%s"
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:260
+#: libbalsa/imap-server.c:262
 #, c-format
 msgid "IMAP server %s error: %s"
 msgstr "Chyba IMAP serveru %s: %s"
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:266
+#: libbalsa/imap-server.c:268
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: libbalsa/imap-server.c:504
+#: libbalsa/imap-server.c:506
 #, c-format
 msgid "Cannot connect to the server: %s"
 msgstr "Nemohu se připojit k serveru: %s"
 
-#: libbalsa/imap-server.c:508
+#: libbalsa/imap-server.c:510
 msgid "Cannot connect to the server"
 msgstr "Nemohu se připojit k serveru"
 
-#: libbalsa/imap-server.c:656
+#: libbalsa/imap-server.c:658
 #, c-format
 msgid "Exceeded the number of connections per server %s"
 msgstr "Překročen počet připojení k serveru %s"
@@ -500,28 +500,33 @@ msgstr "Nelze vytvořit poštovní schránku typu %s"
 #. ImapIssue macro handles reconnecting. We might issue a
 #. LIBBALSA_INFORMATION_MMESSAGE here but it would be overwritten by
 #. login information...
-#: libbalsa/mailbox_imap.c:498
+#: libbalsa/mailbox_imap.c:500
 msgid "IMAP connection has been severed. Reconnecting..."
 msgstr "Spojení IMAP bylo přerušeno. Připojuji se znovu..."
 
-#: libbalsa/mailbox_imap.c:501
+#: libbalsa/mailbox_imap.c:503
 #, c-format
 msgid "IMAP server has shut the connection: %s Reconnecting..."
 msgstr "Server IMAP uzavřel spojení: %s. Připojuji se znovu..."
 
-#: libbalsa/mailbox_imap.c:849
+#: libbalsa/mailbox_imap.c:851
 #, c-format
 msgid "IMAP SEARCH UNSEEN request failed for mailbox %s"
 msgstr "Požadavek IMAP SEARCH UNSEEN selhal pro poštovní schránku %s"
 
 # ???
-#: libbalsa/mailbox_imap.c:912 libbalsa/mailbox_maildir.c:480
+#: libbalsa/mailbox_imap.c:914 libbalsa/mailbox_maildir.c:480
 #: libbalsa/mailbox_mbox.c:461 libbalsa/mailbox_mh.c:502
 #, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: Otevírám %s Počet odkazů: %d\n"
 
-#: libbalsa/mailbox_imap.c:1339
+#: libbalsa/mailbox_imap.c:978 libbalsa/mailbox_imap.c:1991
+#, c-format
+msgid "Downloading %ld kB"
+msgstr "Stahuji %ld kB"
+
+#: libbalsa/mailbox_imap.c:1345
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -530,12 +535,17 @@ msgstr ""
 "Příkaz IMAP SEARCH selhal pro poštovní schránku %s\n"
 "Používám implicitní metodu vyhledávání"
 
-#: libbalsa/mailbox_imap.c:1399
+#: libbalsa/mailbox_imap.c:1405
 #, c-format
 msgid "No path found for mailbox \"%s\", using \"%s\""
 msgstr "Nenalezena cesta pro poštovní schránky \"%s\", používám \"%s\""
 
-#: libbalsa/mailbox_imap.c:2306
+#: libbalsa/mailbox_imap.c:2171
+#, c-format
+msgid "Uploading %ld kB"
+msgstr "Odesílám %ld kB"
+
+#: libbalsa/mailbox_imap.c:2321
 msgid "Server-side threading not supported."
 msgstr "Vlákna na straně serveru nejsou podporována."
 
@@ -602,29 +612,25 @@ msgstr "Nemohu otevřít poštovní schránku."
 msgid "Cannot lock mailbox."
 msgstr "Nemohu zamknout poštovní schránku."
 
-#: libbalsa/mailbox_mbox.c:1499
+#: libbalsa/mailbox_mbox.c:1500
 #, c-format
 msgid "%s: could not open %s."
 msgstr "%s: nemohu otevřít %s."
 
-#: libbalsa/mailbox_mbox.c:1507
+#: libbalsa/mailbox_mbox.c:1508
 #, c-format
 msgid "%s: could not get new mime stream."
 msgstr "%s: nemohu záskat nový proud mime."
 
-#: libbalsa/mailbox_mbox.c:1517
+#: libbalsa/mailbox_mbox.c:1518
 #, c-format
 msgid "%s: could not get message stream."
 msgstr "%s: nemohu získat proud zprávy."
 
-#: libbalsa/mailbox_mbox.c:1532
+#: libbalsa/mailbox_mbox.c:1533
 #, c-format
-msgid ""
-"Error copying message to mailbox %s!\n"
-"Mailbox might have been corrupted!"
-msgstr ""
-"Chyba při kopírování zprávy do poštovní schránky %s!\n"
-"Poštovní schránka možná byla poškozena!"
+msgid "Error copying message to mailbox %s!"
+msgstr "Chyba při kopírování zprávy do poštovní schránky %s!"
 
 #: libbalsa/mailbox_mh.c:172
 #, c-format
@@ -1228,7 +1234,9 @@ msgstr ""
 
 #: libbalsa/send.c:1162
 msgid "Message left in Outbox (try again later)"
-msgstr "Zpráva zůstala v poštovní schránce 'Pošta k odeslání' (zkuste to znovu později)"
+msgstr ""
+"Zpráva zůstala v poštovní schránce 'Pošta k odeslání' (zkuste to znovu "
+"později)"
 
 #: libbalsa/send.c:1166
 #, c-format
@@ -1380,15 +1388,20 @@ msgid ""
 "be, in the Email application in the 'Preferences' and 'Identities' commands "
 "on the 'Tools' menu)"
 msgstr ""
-"Jsou také potřeba následující nastavení (v případě potřeby je později můžete\n"
-"najít v aplikaci Email v příkazech 'Nastavení' a 'Identity' v menu 'Nástroje')"
+"Jsou také potřeba následující nastavení (v případě potřeby je později "
+"můžete\n"
+"najít v aplikaci Email v příkazech 'Nastavení' a 'Identity' v menu "
+"'Nástroje')"
 
 #: libinit_balsa/balsa-druid-page-user.c:56
 msgid ""
 " Whoever provides your email account should be able to give you the "
 "following information (if you have a Network Administrator, they may already "
 "have set this up for you):"
-msgstr " Ten, kdo vám poskytl váš e-mailový účet, by vám měl být schopen dát následující informace (pokud máte správce sítě, možná je pro vás již nastavil):"
+msgstr ""
+" Ten, kdo vám poskytl váš e-mailový účet, by vám měl být schopen dát "
+"následující informace (pokud máte správce sítě, možná je pro vás již "
+"nastavil):"
 
 #: libinit_balsa/balsa-druid-page-user.c:62
 msgid "Yes, remember it"
@@ -1469,9 +1482,12 @@ msgid ""
 msgstr ""
 "Než budete moci odesílat a přijímat poštu:\n"
 "\n"
-"-- buď byste již měli mít přístup k Internetu a poštovní účet od vašeho poskytovatele připojení a měli byste již počítačem být připojeni k internetu\n"
+"-- buď byste již měli mít přístup k Internetu a poštovní účet od vašeho "
+"poskytovatele připojení a měli byste již počítačem být připojeni k "
+"internetu\n"
 "\n"
-"-- nebo možná váš správce sítě ve vašem zaměstnání/škole/apod. nastavil váš počítač pro připojení k síti."
+"-- nebo možná váš správce sítě ve vašem zaměstnání/škole/apod. nastavil váš "
+"počítač pro připojení k síti."
 
 #: libinit_balsa/balsa-initdruid.c:79
 msgid ""
@@ -1852,7 +1868,7 @@ msgstr "_Jiné..."
 msgid "Choose destination folder"
 msgstr "Vyberte cílovou složku"
 
-#: src/balsa-mblist.c:2033
+#: src/balsa-mblist.c:2034
 #, c-format
 msgid "Shown mailbox: %s with %d message, "
 msgid_plural "Shown mailbox: %s with %d messages, "
@@ -1862,7 +1878,7 @@ msgstr[2] "Zobrazovaná poštovní schránka: %s s %d zprávami, "
 
 #. xgettext: this is the second part of the message
 #. * "Shown mailbox: %s with %d messages, %ld new".
-#: src/balsa-mblist.c:2039
+#: src/balsa-mblist.c:2040
 #, c-format
 msgid "%ld new"
 msgid_plural "%ld new"
@@ -2144,7 +2160,8 @@ msgid ""
 "than once.\n"
 "Please close the other instances of this message and try again."
 msgstr ""
-"Tuto operaci nelze provést, protože tato zpráva je zobrazována více než jednou.\n"
+"Tuto operaci nelze provést, protože tato zpráva je zobrazována více než "
+"jednou.\n"
 "Zavřete prosím ostatní instance této zprávy a zkuste to znovu."
 
 #: src/balsa-message.c:4606
@@ -5683,6 +5700,13 @@ msgstr "Nahoru"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Dolů"
+
+#~ msgid ""
+#~ "Error copying message to mailbox %s!\n"
+#~ "Mailbox might have been corrupted!"
+#~ msgstr ""
+#~ "Chyba při kopírování zprávy do poštovní schránky %s!\n"
+#~ "Poštovní schránka možná byla poškozena!"
 
 #~ msgid ""
 #~ "Error writing to temporary file %s.\n"

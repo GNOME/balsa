@@ -1,5 +1,11 @@
 2001-01-13  Gediminas Paulauskas  <menesis@delfi.lt>
 
+	* libbalsa/send.c: (smtp_answer) always NULL-terminate code[], as
+	reported by Olaf Fràczyk <olaf@cbk.poznan.pl>. Removed unused
+	variables: bytes and tmp.
+
+2001-01-13  Gediminas Paulauskas  <menesis@delfi.lt>
+
 	* src/sendmsg-window.c: with SEND_REPLY_GROUP messages act as with
 	other replies. Set the size not of the window, but just the text
 	widget. Use wraplength for size only when an option is on.

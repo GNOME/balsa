@@ -606,21 +606,17 @@ libbalsa_message_postpone(LibBalsaMessage * message,
  * send later. The error will be shown to the user from this funtion */
 
 static int smtp_answer(int fd) {
-    char *tmp, buffer[512];	/* Maximum allowed by RFC */
-    char code[4];		/* we use the 3 number code to check the answer */
-    int bytes = 0;
+    char buffer[512];	/* Maximum allowed by RFC */
+    char code[4];	/* we use the 3 number code to check the answer */
 
-    tmp = buffer;
-
-    bytes = (int) read(fd, tmp, sizeof(buffer));
+    read(fd, buffer, sizeof(buffer));
 
     /* now we check the posible answers */
-
+    code[3] = 0;
     strncpy(code, buffer, 3);
 
-
-/* I have to check all posible positive code in RFC. Maybe it can be use an 
- * if sentence */
+    /* I have to check all posible positive code in RFC. Maybe it can be use an
+     * if sentence */
 
     switch (atoi(code)) {
     case 354:
@@ -628,9 +624,12 @@ static int smtp_answer(int fd) {
     case 250:
     case 251:
 	return 1;
-    default:fprintf(stderr, "%s", buffer);
+    default:
+	fprintf(stderr, "%s", buffer);
 	return 0;
-    }}
+    }
+}
+
 /* This funtion recives as arguments the message (to use headers),
  * a file were the message is in MIME format (converted using libmutt)
  * and the server (so it will be easier to add support for multiple 

@@ -8,21 +8,178 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2000-03-16 13:22+0100\n"
-"PO-Revision-Date: 2000-03-16 13:30+0100\n"
+"POT-Creation-Date: 2000-03-26 15:22+0200\n"
+"PO-Revision-Date: 2000-03-24 17:27+0100\n"
 "Last-Translator: GNOME PL Team <gnomepl@pandora.info.bielsko.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-2\n"
 "Content-Transfer-Encoding: 8-bit\n"
 
-#: src/address-book.c:1
-msgid "Add New Address"
-msgstr "Dodaj nowy adres"
+#: libbalsa/mailbox.c:1
+#, c-format
+msgid "Mailbox: Opening %s Refcount: %d\n"
+msgstr "Skrzynka: Otwieranie %s Referencji: %d\n"
+
+#: libbalsa/mailbox.c:1
+#, c-format
+msgid "Mailbox: Closing %s Refcount: %d\n"
+msgstr "Skrzynka: Zamykanie %s Referencji: %d\n"
+
+#: balsa-druid-page-directory.gob:1
+#, c-format
+msgid ""
+"The pathname \"%s\" must be specified canonically -- it must start with a "
+"'/'."
+msgstr ""
+"¦cie¿ka %s musi byæ okre¶lona wzglêdem g³ównego katalogu (rozpoczynaæ siê od "
+"/)."
+
+#: balsa-druid-page-directory.gob:1
+#, c-format
+msgid "An error occurred when attempting to creat(2) the file \"%s\"."
+msgstr "Wyst±pi³ b³±d przy wywo³aniu funkcji creat(2) dla pliku \"%s\"."
+
+#: balsa-druid-page-directory.gob:1
+#, c-format
+msgid "The mailbox \"%s\" does not appear to be valid."
+msgstr "Skrzynka \"%s\" wydaje siê byæ niepoprawna."
+
+#: balsa-druid-page-directory.gob:1
+msgid ""
+"Please confirm the locations of your default mail files.\n"
+"These will be created if necessary."
+msgstr ""
+"Potwierd¼ po³o¿enia domy¶lnych plików z poczt±.\n"
+"W razie potrzeby zostan± one utworzone."
+
+#: balsa-druid-page-directory.gob:1
+msgid "Inbox:"
+msgstr "Poczta nadchodz±ca:"
+
+#: balsa-druid-page-directory.gob:1
+msgid "Outbox:"
+msgstr "Poczna wychodz±ca:"
+
+#: balsa-druid-page-directory.gob:1
+msgid "Sentbox:"
+msgstr "Poczta wys³ana:"
+
+#: balsa-druid-page-directory.gob:1
+msgid "Draftbox:"
+msgstr "Poczta robocza:"
+
+#: balsa-druid-page-directory.gob:1
+msgid "Trash:"
+msgstr "¦mietnik:"
+
+#: balsa-druid-page-directory.gob:1
+msgid "Mail Files"
+msgstr "Pliki z listami"
+
+#: balsa-druid-page-directory.gob:1
+msgid "Problem Creating Mailboxes"
+msgstr "Wyst±pi³ problem przy tworzeniu skrzynek"
+
+#: balsa-druid-page-finish.gob:1
+msgid ""
+"You've successfully set up Balsa. Have fun!\n"
+"   -- The Balsa development team"
+msgstr ""
+"Balsa zosta³a pomy¶lnie skonfigurowana. Dobrej zabawy!\n"
+"   -- Zespó³ twórców Balsy"
+
+#: balsa-druid-page-finish.gob:1
+msgid "All Done!"
+msgstr "Gotowe!"
+
+#: balsa-druid-page-user.gob:1
+msgid "Please enter information about yourself."
+msgstr "Wprowad¼ informacje o sobie."
 
 #: balsa-druid-page-user.gob:1 src/address-book.c:1 src/address-book.c:1
 msgid "Name:"
 msgstr "Imiê i nazwisko:"
+
+#: balsa-druid-page-user.gob:1
+msgid "Email address:"
+msgstr "Adres e-mail:"
+
+#: balsa-druid-page-user.gob:1
+msgid "SMTP Server:"
+msgstr "Serwer SMTP:"
+
+#: balsa-druid-page-user.gob:1
+msgid "Local Mail Directory:"
+msgstr "Katalog lokalnej poczty:"
+
+#: balsa-druid-page-user.gob:1
+msgid "User Settings"
+msgstr "Ustawienia u¿ytkownika"
+
+#: balsa-druid-page-user.gob:1
+msgid "Local Mail Problem"
+msgstr "Problem z lokaln± skrzynk±"
+
+#: balsa-druid-page-welcome.gob:1
+msgid "Welcome to Balsa!"
+msgstr "Witaj w Balsie!"
+
+#: balsa-druid-page-welcome.gob:1
+msgid ""
+"You seem to be running Balsa for the first time. The following\n"
+"steps will set up Balsa by asking a few simple questions. Once\n"
+"you have completed these steps, you can always change them later\n"
+"in Balsa's preferences. If any files or directories need to be created,\n"
+"it will be done so automatically. Please check the about box in Balsa's\n"
+"main window for more information about contacting the authors or\n"
+"reporting bugs."
+msgstr ""
+"Wygl±da na to, ¿e uruchomiono Balsê po raz pierwszy.\n"
+"Poprzez zadanie kilku pytañ zostanie teraz przeprowadzona konfiguracja "
+"Balsy.\n"
+"Wszystkie ustawienia mo¿na w pó¼niejszym czasie u¿ywaj±c menu Preferencji\n"
+"Balsy.\n"
+"Je¶li potrzebne bêd± nowe pliki lub katalogi, zostan± one utworzone\n"
+"automatycznie.\n"
+"Aby uzyskaæ wiêcej informacji o autorach lub o sposobie zg³aszaniu b³êdów, "
+"nale¿y\n"
+"wybraæ 'Informacje o...' z menu w oknie g³ównym programu."
+
+#: balsa-initdruid.gob:1
+msgid ""
+"This will exit Balsa. Do you\n"
+"really want to do this?"
+msgstr ""
+"Spowoduje do zakoñczenie Balsy.\n"
+"Czy na pewno chcesz to zrobiæ?"
+
+#: libinit_balsa/helper.c:1
+#, c-format
+msgid "The path %s must be relative to the filesystem root (start with /)."
+msgstr ""
+"¦cie¿ka %s musi byæ okre¶lona wzglêdem g³ównego katalogu (rozpoczynaæ siê od "
+"/)."
+
+#: libinit_balsa/helper.c:1 libinit_balsa/helper.c:1
+#, c-format
+msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
+msgstr ""
+"Nie mo¿na utworzyæ katalogu: funkcja mkdir() nie powiod³a siê przy nazwie "
+"\"%s\"."
+
+#: libinit_balsa/helper.c:1 libinit_balsa/helper.c:1
+#, c-format
+msgid "The file with pathname \"%s\" is not a directory."
+msgstr "Plik o nazwie \"%s\" nie jest katalogiem."
+
+#: libinit_balsa/init_balsa.c:1
+msgid "Configure Balsa"
+msgstr "Konfiguracja Balsy"
+
+#: src/address-book.c:1
+msgid "Add New Address"
+msgstr "Dodaj nowy adres"
 
 #: src/address-book.c:1
 msgid "E-Mail Address:"
@@ -111,17 +268,10 @@ msgstr "Odtwórz"
 msgid "Transfer"
 msgstr "Wy¶lij"
 
-#: src/balsa-index.c:1
-msgid "From"
-msgstr "Od"
-
-#: src/balsa-index.c:1 src/filter-edit-dialog.c:1
-msgid "Subject"
-msgstr "Temat"
-
-#: src/balsa-index.c:1
-msgid "Date"
-msgstr "Data"
+#: src/balsa-mblist.c:1
+#, c-format
+msgid "Shown mailbox: %s with %ld messages, %ld new"
+msgstr "Widoczna skrzynka: %s; %ld listów, %ld nowych"
 
 #: src/balsa-message.c:1 src/balsa-message.c:1
 msgid "Save MIME Part"
@@ -232,6 +382,10 @@ msgid "Body"
 msgstr "Tre¶æ"
 
 #: src/filter-edit-dialog.c:1
+msgid "Subject"
+msgstr "Temat"
+
+#: src/filter-edit-dialog.c:1
 msgid "Match string:"
 msgstr "Wyszukiwany napis:"
 
@@ -315,11 +469,6 @@ msgstr "Odwróæ"
 #: src/filter-edit-dialog.c:1
 msgid "Balsa Filters"
 msgstr "Zarz±dzanie filtrami"
-
-#: src/local-mailbox.c:1
-#, c-format
-msgid "Local Mailbox Loaded as: %s\n"
-msgstr "Wczytano lokaln± skrzynkê jako: %s\n"
 
 #: src/mailbox-conf.c:1
 msgid ""
@@ -488,6 +637,30 @@ msgstr "Wy_brane nag³ówki"
 msgid "All _headers"
 msgstr "W_szystkie nag³ówki"
 
+#: src/main-window.c:1 src/main-window.c:1
+msgid "Next"
+msgstr "Nastêpny"
+
+#: src/main-window.c:1
+msgid "Next Message"
+msgstr "Nastêpny list"
+
+#: src/main-window.c:1 src/main-window.c:1
+msgid "Previous"
+msgstr "Poprzedni"
+
+#: src/main-window.c:1
+msgid "Preivous Message"
+msgstr "Poprzedni list"
+
+#: src/main-window.c:1 src/main-window.c:1
+msgid "Next Unread"
+msgstr "Nastêpny nie przeczytany"
+
+#: src/main-window.c:1
+msgid "Next Unread Message"
+msgstr "Nastêpny nie przeczytany list"
+
 #: src/main-window.c:1
 msgid "_New"
 msgstr "_Nowy"
@@ -605,12 +778,20 @@ msgid "Manage filters"
 msgstr "Zarz±dzanie filtrami"
 
 #: src/main-window.c:1
+msgid "_Show mailbox tree"
+msgstr "_Drzewo skrzynek"
+
+#: src/main-window.c:1
+msgid "Show mailbox _tabs"
+msgstr "_Zak³adki skrzynek"
+
+#: src/main-window.c:1
 msgid "_Message"
 msgstr "_List"
 
 #: src/main-window.c:1
-msgid "Mail_boxes"
-msgstr "S_krzynki"
+msgid "Mail_box"
+msgstr "_Skrzynka"
 
 #: src/main-window.c:1
 msgid "Check Email"
@@ -633,20 +814,16 @@ msgid "Continue"
 msgstr "Kontynuuj"
 
 #: src/main-window.c:1
-msgid "Previous"
-msgstr "Poprzedni"
-
-#: src/main-window.c:1
 msgid "Open Previous message"
 msgstr "Otwiera poprzedni list"
 
 #: src/main-window.c:1
-msgid "Next"
-msgstr "Nastêpny"
-
-#: src/main-window.c:1
 msgid "Open Next message"
 msgstr "Otwiera nastêpny list"
+
+#: src/main-window.c:1
+msgid "Open Next Unread Message"
+msgstr "Otwiera nastêpny nie przeczytany list"
 
 #: src/main-window.c:1 src/print.c:1 src/sendmsg-window.c:1
 #: src/sendmsg-window.c:1
@@ -1007,6 +1184,14 @@ msgid "Preview pane"
 msgstr "Podgl±d listu"
 
 #: src/pref-manager.c:1
+msgid "Colours"
+msgstr "Kolory"
+
+#: src/pref-manager.c:1 src/pref-manager.c:1
+msgid "Mailbox with unread messages colour"
+msgstr "Kolor skrzynki z nie przeczytanymi listami"
+
+#: src/pref-manager.c:1
 msgid "Options"
 msgstr "Opcje"
 
@@ -1132,6 +1317,14 @@ msgid "_Attachments"
 msgstr "_Za³±czniki"
 
 #: src/sendmsg-window.c:1
+msgid "_Comments"
+msgstr "K_omentarze"
+
+#: src/sendmsg-window.c:1
+msgid "_Keywords"
+msgstr "_S³owa kluczowe"
+
+#: src/sendmsg-window.c:1
 msgid "_Western (ISO-8859-1)"
 msgstr "_Zachodni (ISO-8859-1)"
 
@@ -1214,6 +1407,14 @@ msgid "Attachments:"
 msgstr "Za³±czniki:"
 
 #: src/sendmsg-window.c:1
+msgid "Comments:"
+msgstr "Komentarze:"
+
+#: src/sendmsg-window.c:1
+msgid "Keywords:"
+msgstr "S³owa kluczowe:"
+
+#: src/sendmsg-window.c:1
 msgid "you"
 msgstr "ty"
 
@@ -1266,160 +1467,3 @@ msgstr "B³±d przy wykonywaniu lpr"
 #: src/spell-check.c:1
 msgid "Spell Check"
 msgstr "Sprawdzenie pisowni"
-
-#: libbalsa/mailbox.c:1
-#, c-format
-msgid "Mailbox: Opening %s Refcount: %d\n"
-msgstr "Skrzynka: Otwieranie %s Referencji: %d\n"
-
-#: libbalsa/mailbox.c:1
-#, c-format
-msgid "Mailbox: Closing %s Refcount: %d\n"
-msgstr "Skrzynka: Zamykanie %s Referencji: %d\n"
-
-#: libinit_balsa/helper.c:1
-#, c-format
-msgid "The path %s must be relative to the filesystem root (start with /)."
-msgstr ""
-"¦cie¿ka %s musi byæ okre¶lona wzglêdem g³ównego katalogu (rozpoczynaæ siê od "
-"/)."
-
-#: libinit_balsa/helper.c:1 libinit_balsa/helper.c:1
-#, c-format
-msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
-msgstr ""
-"Nie mo¿na utworzyæ katalogu: funkcja mkdir() nie powiod³a siê przy nazwie "
-"\"%s\"."
-
-#: libinit_balsa/helper.c:1 libinit_balsa/helper.c:1
-#, c-format
-msgid "The file with pathname \"%s\" is not a directory."
-msgstr "Plik o nazwie \"%s\" nie jest katalogiem."
-
-#: libinit_balsa/init_balsa.c:1
-msgid "Configure Balsa"
-msgstr "Konfiguracja Balsy"
-
-#: balsa-druid-page-directory.gob:1
-#, c-format
-msgid ""
-"The pathname \"%s\" must be specified canonically -- it must start with a "
-"'/'."
-msgstr ""
-"¦cie¿ka %s musi byæ okre¶lona wzglêdem g³ównego katalogu (rozpoczynaæ siê od "
-"/)."
-
-#: balsa-druid-page-directory.gob:1
-#, c-format
-msgid "An error occurred when attempting to creat(2) the file \"%s\"."
-msgstr "Wyst±pi³ b³±d przy wywo³aniu funkcji creat(2) dla pliku \"%s\"."
-
-#: balsa-druid-page-directory.gob:1
-#, c-format
-msgid "The mailbox \"%s\" does not appear to be valid."
-msgstr "Skrzynka \"%s\" wydaje siê byæ niepoprawna."
-
-#: balsa-druid-page-directory.gob:1
-msgid ""
-"Please confirm the locations of your default mail files.\n"
-"These will be created if necessary."
-msgstr ""
-"Potwierd¼ po³o¿enia domy¶lnych plików z poczt±.\n"
-"W razie potrzeby zostan± one utworzone."
-
-#: balsa-druid-page-directory.gob:1
-msgid "Inbox:"
-msgstr "Poczta nadchodz±ca:"
-
-#: balsa-druid-page-directory.gob:1
-msgid "Outbox:"
-msgstr "Poczna wychodz±ca:"
-
-#: balsa-druid-page-directory.gob:1
-msgid "Sentbox:"
-msgstr "Poczta wys³ana:"
-
-#: balsa-druid-page-directory.gob:1
-msgid "Draftbox:"
-msgstr "Poczta robocza:"
-
-#: balsa-druid-page-directory.gob:1
-msgid "Trash:"
-msgstr "¦mietnik:"
-
-#: balsa-druid-page-directory.gob:1
-msgid "Mail Files"
-msgstr "Pliki z listami"
-
-#: balsa-druid-page-directory.gob:1
-msgid "Problem Creating Mailboxes"
-msgstr "Wyst±pi³ problem przy tworzeniu skrzynek"
-
-#: balsa-druid-page-finish.gob:1
-msgid ""
-"You've successfully set up Balsa. Have fun!\n"
-"   -- The Balsa development team"
-msgstr ""
-"Balsa zosta³a pomy¶lnie skonfigurowana. Dobrej zabawy!\n"
-"   -- Zespó³ twórców Balsy"
-
-#: balsa-druid-page-finish.gob:1
-msgid "All Done!"
-msgstr "Gotowe!"
-
-#: balsa-druid-page-user.gob:1
-msgid "Please enter information about yourself."
-msgstr "Wprowad¼ informacje o sobie."
-
-#: balsa-druid-page-user.gob:1
-msgid "Email address:"
-msgstr "Adres e-mail:"
-
-#: balsa-druid-page-user.gob:1
-msgid "SMTP Server:"
-msgstr "Serwer SMTP:"
-
-#: balsa-druid-page-user.gob:1
-msgid "Local Mail Directory:"
-msgstr "Katalog lokalnej poczty:"
-
-#: balsa-druid-page-user.gob:1
-msgid "User Settings"
-msgstr "Ustawienia u¿ytkownika"
-
-#: balsa-druid-page-user.gob:1
-msgid "Local Mail Problem"
-msgstr "Problem z lokaln± skrzynk±"
-
-#: balsa-druid-page-welcome.gob:1
-msgid "Welcome to Balsa!"
-msgstr "Witaj w Balsie!"
-
-#: balsa-druid-page-welcome.gob:1
-msgid ""
-"You seem to be running Balsa for the first time. The following\n"
-"steps will set up Balsa by asking a few simple questions. Once\n"
-"you have completed these steps, you can always change them later\n"
-"in Balsa's preferences. If any files or directories need to be created,\n"
-"it will be done so automatically. Please check the about box in Balsa's\n"
-"main window for more information about contacting the authors or\n"
-"reporting bugs."
-msgstr ""
-"Wygl±da na to, ¿e uruchomiono Balsê po raz pierwszy.\n"
-"Poprzez zadanie kilku pytañ zostanie teraz przeprowadzona konfiguracja "
-"Balsy.\n"
-"Wszystkie ustawienia mo¿na w pó¼niejszym czasie u¿ywaj±c menu Preferencji\n"
-"Balsy.\n"
-"Je¶li potrzebne bêd± nowe pliki lub katalogi, zostan± one utworzone\n"
-"automatycznie.\n"
-"Aby uzyskaæ wiêcej informacji o autorach lub o sposobie zg³aszaniu b³êdów, "
-"nale¿y\n"
-"wybraæ 'Informacje o...' z menu w oknie g³ównym programu."
-
-#: balsa-initdruid.gob:1
-msgid ""
-"This will exit Balsa. Do you\n"
-"really want to do this?"
-msgstr ""
-"Spowoduje do zakoñczenie Balsy.\n"
-"Czy na pewno chcesz to zrobiæ?"

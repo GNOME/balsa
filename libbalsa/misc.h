@@ -81,6 +81,17 @@ struct _LibBalsaCodesetInfo {
     const gchar *std;
     const gchar *win;
 };
+
+typedef void (*libbalsa_url_cb_t) (GtkTextBuffer *, GtkTextIter *,
+				   const gchar *, gpointer);
+typedef struct _LibBalsaUrlInsertInfo LibBalsaUrlInsertInfo;
+struct _LibBalsaUrlInsertInfo {
+    libbalsa_url_cb_t callback;
+    gpointer callback_data;
+    gchar *ml_url;
+    GString *ml_url_buffer;
+};
+
 extern LibBalsaCodesetInfo libbalsa_codeset_info[];
 GtkWidget *libbalsa_charset_button_new(void);
 LibBalsaTextAttribute libbalsa_text_attr_string(const gchar * string);
@@ -123,14 +134,11 @@ LibBalsaCodeset libbalsa_set_fallback_codeset(LibBalsaCodeset codeset);
 gboolean libbalsa_utf8_sanitize(gchar ** text, gboolean fallback,
                                 gchar const **target);
 gboolean libbalsa_utf8_strstr(const gchar *s1,const gchar *s2);
-void libbalsa_insert_with_url(GtkTextBuffer * buffer,
-                              const char *chars,
-                              GtkTextTag * tag,
-                              void (*callback) (GtkTextBuffer *,
-                                                GtkTextIter *,
-                                                const gchar *,
-                                                gpointer),
-                              gpointer callback_data);
+gboolean libbalsa_insert_with_url(GtkTextBuffer * buffer,
+				  const char *chars,
+				  const char *all_chars,
+				  GtkTextTag * tag,
+				  LibBalsaUrlInsertInfo *url_info);
 void libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex);
 gboolean libbalsa_match_regex(const gchar * line, regex_t * rex,
 			      guint * count, guint * index);

@@ -2451,8 +2451,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
                 ("part_info_init_mimetext: quote regex compilation failed.");
             gtk_text_buffer_insert_at_cursor(buffer, ptr, -1);
         } else {
-            gchar **lines;
-            gchar **l = g_strsplit(ptr, "\n", -1);
+            gchar *line_start;
+	    LibBalsaUrlInsertInfo url_info;
 
             gtk_text_buffer_create_tag(buffer, "url",
                                        "foreground-gdk",
@@ -2461,21 +2461,38 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
                                        "foreground", "red",
                                        "underline", PANGO_UNDERLINE_SINGLE,
                                        NULL);
+	    url_info.callback = url_found_cb;
+	    url_info.callback_data = &url_list;
+	    url_info.ml_url = NULL;
+	    url_info.ml_url_buffer = NULL;
 
-            for (lines = l; *lines; ++lines) {
-                gint quote_level = is_a_quote(*lines, &rex);
-                GtkTextTag *tag = quote_tag(buffer, quote_level);
-                int len = strlen(*lines);
-                if(len>0 && (*lines)[len-1] == '\r')
-                    (*lines)[len-1] = '\0';
+            line_start = ptr;
+            while (line_start) {
+                gchar *newline, *this_line;
+                gint quote_level;
+                GtkTextTag *tag;
+                int len;
+
+                newline = strchr(line_start, '\n');
+                if (newline)
+		    this_line = g_strndup(line_start, newline - line_start);
+                else
+                    this_line = g_strdup(line_start);
+                quote_level = is_a_quote(this_line, &rex);
+                tag = quote_tag(buffer, quote_level);
+                len = strlen(this_line);
+                if (len > 0 && this_line[len - 1] == '\r')
+                    this_line[len - 1] = '\0';
                 /* tag is NULL if the line isn't quoted, but it causes
                  * no harm */
-                libbalsa_insert_with_url(buffer, *lines, tag,
-                                         url_found_cb, &url_list);
-                gtk_text_buffer_insert_at_cursor(buffer, "\n", 1);
+                if (!libbalsa_insert_with_url(buffer, this_line, line_start,
+					      tag, &url_info))
+		    gtk_text_buffer_insert_at_cursor(buffer, "\n", 1);
+
+                g_free(this_line);
+                line_start = newline ? newline + 1 : NULL;
             }
-            g_strfreev(l);
-            regfree(&rex);
+	    regfree(&rex);
         }
 
         if (libbalsa_message_body_is_flowed(info->body))

@@ -1519,63 +1519,148 @@ get_url_reg(void)
     return url_reg;
 }
 
-void
+static regex_t *
+get_ml_url_reg(void)
+{
+    static regex_t *url_reg = NULL;
+    
+    if (!url_reg) {
+        /* one-time compilation of a constant url_str expression */
+        static const char url_str[] =
+#ifdef HAVE_PCRE
+            "(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#\\w]|[ \\t]*[\\r\\n]+[ \\t]*)+>";
+#else
+	    "(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#[:alnum:]]|[ \t]*[\r\n]+[ \t]*)+>";
+#endif
+
+	url_reg = g_new(regex_t, 1);
+        if (regcomp(url_reg, url_str, REG_EXTENDED | REG_ICASE) != 0)
+            g_warning("libbalsa_insert_with_url: "
+                      "multiline url regex compilation failed.");
+    }
+    
+    return url_reg;
+}
+
+gboolean
 libbalsa_insert_with_url(GtkTextBuffer * buffer,
                          const char *chars,
+			 const char *all_chars,
                          GtkTextTag * tag,
-                         void (*callback) (GtkTextBuffer *,
-                                           GtkTextIter *,
-                                           const gchar *,
-                                           gpointer),
-                         gpointer callback_data)
+                         LibBalsaUrlInsertInfo *url_info)
 {
     gchar *p, *buf;
+    const gchar *all_p;
     GtkTextIter iter;
 
     buf = p = g_strdup(chars);
+    all_p = all_chars;
     gtk_text_buffer_get_iter_at_mark(buffer, &iter,
                                      gtk_text_buffer_get_insert(buffer));
 
-    if (prescanner(p)) {
-        GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
-        GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
-        gint offset = 0;
-        regex_t *url_reg = get_url_reg();
-        regmatch_t url_match;
-        gint match = regexec(url_reg, p, 1, &url_match, 0);
+    /* if there shouldn't be a callback for URL's we don't need to detect
+       them... */
+    if (url_info) {
+	GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
+	GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
 
-        while (!match) {
-            gchar *buf;
+	if (url_info->ml_url) {
+	    gchar *url_end = strchr(p, '>');
 
-            if (url_match.rm_so) {
-                buf = g_strndup(p, url_match.rm_so);
-                gtk_text_buffer_insert_with_tags(buffer, &iter,
-                                                 buf, -1, tag, NULL);
-                g_free(buf);
-            }
+	    if (url_end) {
+		url_info->ml_url_buffer =
+		    g_string_append_len(url_info->ml_url_buffer, p, url_end - p);
+		gtk_text_buffer_insert_with_tags(buffer, &iter,
+						 url_info->ml_url_buffer->str, -1,
+						 url_tag, tag, NULL);
+		if (url_info->callback)
+		    url_info->callback(buffer, &iter, url_info->ml_url, url_info->callback_data);
+		g_string_free(url_info->ml_url_buffer, TRUE);
+		g_free(url_info->ml_url);
+		url_info->ml_url_buffer = NULL;
+		url_info->ml_url = NULL;
+		p = url_end;
+	    } else {
+		url_info->ml_url_buffer =
+		    g_string_append(url_info->ml_url_buffer, p);
+		url_info->ml_url_buffer =
+		    g_string_append_c(url_info->ml_url_buffer, '\n');
+		return TRUE;
+	    }
+	}
 
-            buf = g_strndup(p + url_match.rm_so,
-                            url_match.rm_eo - url_match.rm_so);
-            gtk_text_buffer_insert_with_tags(buffer, &iter, buf, -1,
-                                             url_tag, tag, NULL);
+	if (prescanner(p)) {
+	    gint offset = 0;
+	    regex_t *url_reg = get_url_reg();
+	    regmatch_t url_match;
+	    gint match = regexec(url_reg, p, 1, &url_match, 0);
 
-            /* remember the URL and its position within the text */
-            if (callback)
-                callback(buffer, &iter, buf, callback_data);
-            g_free(buf);
+	    while (!match) {
+		gchar *buf;
 
-            p += url_match.rm_eo;
-            offset += url_match.rm_eo;
-            if (prescanner(p))
-                match = regexec(url_reg, p, 1, &url_match, 0);
-            else
-                match = -1;
-        }
+		if (url_match.rm_so) {
+		    /* check if we hit a multi-line URL... (see RFC 1738) */
+		    if (all_p && (p[url_match.rm_so - 1] == '<' ||
+				  (url_match.rm_so > 4 &&
+				   g_ascii_strcasecmp(p + url_match.rm_so - 5, "<URL:"))) &&
+			!strchr(p + url_match.rm_eo, '>')) {
+			regex_t *ml_url_reg = get_ml_url_reg();
+			regmatch_t ml_url_match;
+		    
+			if (!regexec(ml_url_reg,
+				     all_chars + offset + url_match.rm_eo, 1,
+				     &ml_url_match, 0) && ml_url_match.rm_so == 0) {
+			    GString *ml_url = g_string_new("");
+			    const gchar *ml_p = all_chars + offset + url_match.rm_so;
+			    gint ml_cnt =
+				url_match.rm_eo - url_match.rm_so + ml_url_match.rm_eo - 1;
+
+			    for (; ml_cnt; (ml_p++, ml_cnt--))
+				if (*ml_p > ' ')
+				    ml_url = g_string_append_c(ml_url, *ml_p);
+			    url_info->ml_url = ml_url->str;
+			    g_string_free(ml_url, FALSE);
+			}
+		    }
+
+		    buf = g_strndup(p, url_match.rm_so);
+		    gtk_text_buffer_insert_with_tags(buffer, &iter,
+						     buf, -1, tag, NULL);
+		    g_free(buf);
+		}
+
+		if (url_info->ml_url) {
+		    url_info->ml_url_buffer = g_string_new(p + url_match.rm_so);
+		    url_info->ml_url_buffer =
+			g_string_append_c(url_info->ml_url_buffer, '\n');
+		    return TRUE;
+		}
+
+		buf = g_strndup(p + url_match.rm_so,
+				url_match.rm_eo - url_match.rm_so);
+		gtk_text_buffer_insert_with_tags(buffer, &iter, buf, -1,
+						 url_tag, tag, NULL);
+
+		/* remember the URL and its position within the text */
+		if (url_info->callback)
+		    url_info->callback(buffer, &iter, buf, url_info->callback_data);
+		g_free(buf);
+
+		p += url_match.rm_eo;
+		offset += url_match.rm_eo;
+		if (prescanner(p))
+		    match = regexec(url_reg, p, 1, &url_match, 0);
+		else
+		    match = -1;
+	    }
+	}
     }
 
     if (*p)
         gtk_text_buffer_insert_with_tags(buffer, &iter, p, -1, tag, NULL);
     g_free(buf);
+
+    return FALSE;
 }
 
 void

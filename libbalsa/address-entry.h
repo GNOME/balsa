@@ -24,6 +24,8 @@
 #ifndef __LIBBALSA_ADDRESS_ENTRY_H__
 #define __LIBBALSA_ADDRESS_ENTRY_H__
 
+#include "address.h"
+
 #define FOCUS_LOST 0
 #define FOCUS_TAINTED 1
 #define FOCUS_CACHED 2

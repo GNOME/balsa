@@ -27,18 +27,11 @@
 #include "config.h"
 
 #include <gnome.h>
-#include <gdk/gdkkeysyms.h>
-#include <gdk/gdki18n.h>
-
-#include <stdio.h>
-#include <sys/stat.h>
-#include <ctype.h>
 #include <string.h>
 
 /*
  * LibBalsa includes.
  */
-#include "libbalsa.h"
 #include "address-entry.h"
 
 

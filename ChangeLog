@@ -1,3 +1,9 @@
+2002-08-26  Emmanuel <e.allaud@wanadoo.fr>
+
+	* src/filter-edit-{dialog,callbacks}.c: cleanup; forgotten
+	g_free's for complex structs, and potential buffer overflow when
+	mixing i18ned and un-i18ned strings at the same time.
+
 2002-08-24  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/filter-{error,file,func}.c, filter.c, mailbox-filter.c:

@@ -45,7 +45,7 @@ GnomeDialog * fe_window;
 
 GtkCList * fe_filters_list;
 
-gboolean fe_already_open=FALSE;
+gboolean fe_already_open = FALSE;
 
 /* containers for radiobuttons */
 GtkWidget *fe_op_codes_option_menu;
@@ -216,9 +216,9 @@ build_left_side(void)
     gtk_clist_set_selection_mode(fe_filters_list, GTK_SELECTION_BROWSE);
     gtk_clist_set_row_height(fe_filters_list, 0);
     gtk_clist_column_titles_passive(fe_filters_list);
-    gtk_clist_set_sort_column(fe_filters_list,0);
-    gtk_clist_set_sort_type(fe_filters_list,GTK_SORT_ASCENDING);
-    gtk_clist_set_auto_sort(fe_filters_list,TRUE);
+    gtk_clist_set_sort_column(fe_filters_list, 0);
+    gtk_clist_set_sort_type(fe_filters_list, GTK_SORT_ASCENDING);
+    gtk_clist_set_auto_sort(fe_filters_list, TRUE);
     gtk_signal_connect(GTK_OBJECT(fe_filters_list), "select_row",
 		       GTK_SIGNAL_FUNC(fe_clist_select_row), NULL);
     gtk_signal_connect(GTK_OBJECT(fe_filters_list), "unselect_row",
@@ -250,7 +250,7 @@ build_left_side(void)
     gtk_signal_connect(GTK_OBJECT(fe_delete_button), "clicked",
 		       GTK_SIGNAL_FUNC(fe_delete_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_delete_button);
-    gtk_widget_set_sensitive(fe_delete_button,FALSE);
+    gtk_widget_set_sensitive(fe_delete_button, FALSE);
 
     return vbox;
 }				/* end build_left_side() */
@@ -263,8 +263,8 @@ build_left_side(void)
 static GtkWidget *
 build_match_page()
 {
-    GtkWidget *page,*table,*button;
-    GtkWidget *frame,*label,*scroll;
+    GtkWidget *page, *button;
+    GtkWidget *label, *scroll;
     GtkWidget *box = NULL;
 
     /* The notebook page */
@@ -316,7 +316,7 @@ build_match_page()
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, 2, 2);
     fe_conditions_list = GTK_CLIST(gtk_clist_new(1));
 
-    gtk_clist_set_selection_mode(fe_conditions_list,GTK_SELECTION_BROWSE);
+    gtk_clist_set_selection_mode(fe_conditions_list, GTK_SELECTION_BROWSE);
     gtk_clist_set_row_height(fe_conditions_list, 0);
     gtk_clist_set_reorderable(fe_conditions_list, FALSE);
     gtk_clist_set_use_drag_icons(fe_conditions_list, FALSE);
@@ -344,7 +344,7 @@ build_match_page()
 		       "clicked", GTK_SIGNAL_FUNC(fe_edit_condition), 
                        GINT_TO_POINTER(1));
     fe_condition_delete_button = gtk_button_new_with_label(_("Remove"));
-    gtk_widget_set_sensitive(fe_condition_delete_button,FALSE);
+    gtk_widget_set_sensitive(fe_condition_delete_button, FALSE);
     gtk_box_pack_start(GTK_BOX(box), fe_condition_delete_button, TRUE, 
                        TRUE, 0);
     gtk_signal_connect(GTK_OBJECT(fe_condition_delete_button),
@@ -365,9 +365,6 @@ build_action_page(GtkWindow * window)
 {
     GtkWidget *page, *frame, *table;
     GtkWidget *box;
-    GtkWidget *menu,* item;
-    GtkCTreeNode * node;
-    gint i;
 
     page = gtk_vbox_new(TRUE, 5);
 
@@ -493,7 +490,6 @@ filters_edit_dialog(void)
 {
     GtkWidget *hbox;
     GtkWidget *piece;
-    GtkWidget *sep;
     gint row;
     LibBalsaFilter * cpfil,* fil;
     GSList * cnds,* filter_list;
@@ -522,39 +518,37 @@ filters_edit_dialog(void)
 		       "clicked", fe_dialog_button_clicked, NULL);
     gtk_signal_connect(GTK_OBJECT(fe_window), "destroy",
 		       GTK_SIGNAL_FUNC(fe_destroy_window_cb), NULL);
-
     gtk_window_set_policy (GTK_WINDOW (fe_window), TRUE, TRUE, FALSE);
 
     /* main hbox */
     hbox = gtk_hbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(fe_window->vbox),
 		       hbox, TRUE, TRUE, 0);
-
     gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE, 2);
-
-    sep = gtk_vseparator_new();
-    gtk_box_pack_start(GTK_BOX(hbox), sep, FALSE, FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(hbox), gtk_vseparator_new(),
+		       FALSE, FALSE, 2);
 
     fe_right_page = build_right_side(GTK_WINDOW(fe_window));
     gtk_widget_set_sensitive(fe_right_page, FALSE);
     gtk_box_pack_start(GTK_BOX(hbox), fe_right_page, TRUE, TRUE, 2);
 
-    fe_user_headers_list=NULL;
+    fe_user_headers_list = NULL;
+
     /* Populate the clist of filters */
+    for(filter_list = balsa_app.filters; 
+        filter_list; filter_list = g_slist_next(filter_list)) {
 
-    for(filter_list=balsa_app.filters; 
-        filter_list; filter_list=g_slist_next(filter_list)) {
-
-	fil=(LibBalsaFilter*)filter_list->data;
+	fil = (LibBalsaFilter*)filter_list->data;
 	/* Make a copy of the current filter */
-	cpfil=libbalsa_filter_new();
+	cpfil = libbalsa_filter_new();
 	
-	cpfil->name=g_strdup(fil->name);
-	cpfil->flags=fil->flags;
-	if (fil->sound) cpfil->sound=g_strdup(fil->sound);
-	if (fil->popup_text) cpfil->popup_text=g_strdup(fil->popup_text);
-	cpfil->conditions_op=fil->conditions_op;
-	cpfil->flags=fil->flags;
+	cpfil->name = g_strdup(fil->name);
+	cpfil->flags = fil->flags;
+	if (fil->sound) cpfil->sound = g_strdup(fil->sound);
+	if (fil->popup_text)
+	    cpfil->popup_text = g_strdup(fil->popup_text);
+	cpfil->conditions_op = fil->conditions_op;
+	cpfil->flags = fil->flags;
 
 	/* We have to unset the "compiled" flag, because we don't copy
 	 * the regex_t struc with copy condition (because I have no
@@ -565,29 +559,28 @@ filters_edit_dialog(void)
 	 * we'll recalculate all regex I guess we could be a bit
 	 * smarter without too much gymnastic. */
 
-	FILTER_CLRFLAG(cpfil,FILTER_COMPILED);
+	FILTER_CLRFLAG(cpfil, FILTER_COMPILED);
 	/* Copy conditions */
-      	for (cnds=fil->conditions; cnds; cnds=g_slist_next(cnds)) {
+      	for (cnds = fil->conditions; cnds; cnds = g_slist_next(cnds)) {
             LibBalsaCondition *c = (LibBalsaCondition*)cnds->data;
 	    cpfil->conditions = 
                 g_slist_prepend(cpfil->conditions,libbalsa_condition_clone(c));
 
 	    /* If this condition is a match on a user header,
 	       add the user header name to the combo list */
-	    if (CONDITION_CHKMATCH(c,CONDITION_MATCH_US_HEAD) &&
+	    if (CONDITION_CHKMATCH(c, CONDITION_MATCH_US_HEAD) &&
 		c->user_header && c->user_header[0])
 		fe_add_new_user_header(c->user_header);
         }
-	cpfil->conditions=g_slist_reverse(cpfil->conditions);
-
-	cpfil->action=fil->action;
+	cpfil->conditions = g_slist_reverse(cpfil->conditions);
+	cpfil->action = fil->action;
 	if (fil->action_string) 
-            cpfil->action_string=g_strdup(fil->action_string);	
+            cpfil->action_string = g_strdup(fil->action_string);
 
-	row=gtk_clist_append(fe_filters_list,&(cpfil->name));
+	row = gtk_clist_append(fe_filters_list, &(cpfil->name));
 	
 	/* We associate the data with the newly appended row */
-	gtk_clist_set_row_data(fe_filters_list,row,(gpointer)cpfil);
+	gtk_clist_set_row_data(fe_filters_list, row, (gpointer)cpfil);
     }
 
     /* To make sure we have at least one item in the combo list */
@@ -600,5 +593,5 @@ filters_edit_dialog(void)
 
     gtk_widget_show_all(GTK_WIDGET(fe_window));
     if (fe_filters_list->rows)
-	gtk_clist_select_row(fe_filters_list,0,-1);
+	gtk_clist_select_row(fe_filters_list, 0, -1);
 }

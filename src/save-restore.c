@@ -470,14 +470,6 @@ config_global_load(void)
     balsa_app.paper_size =
 	gnome_config_get_string("PaperSize=" DEFAULT_PAPER_SIZE);
 
-    g_free(balsa_app.PrintCommand.PrintCommand);
-    balsa_app.PrintCommand.PrintCommand =
-	gnome_config_get_string("PrintCommand=a2ps -d -q %s");
-    balsa_app.PrintCommand.linesize =
-	d_get_gint("PrintLinesize", DEFAULT_LINESIZE);
-    balsa_app.PrintCommand.breakline =
-	gnome_config_get_bool("PrintBreakline=false");
-
     gnome_config_pop_prefix();
 
     /* Spelling options ... */
@@ -668,16 +660,7 @@ gint config_save(void)
 
     /* Printing options ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Printing/");
-
-    /* ... Printing */
     gnome_config_set_string("PaperSize",balsa_app.paper_size);
-
-    gnome_config_set_string("PrintCommand",
-			    balsa_app.PrintCommand.PrintCommand);
-    gnome_config_set_int("PrintLinesize", balsa_app.PrintCommand.linesize);
-    gnome_config_set_bool("PrintBreakline",
-			  balsa_app.PrintCommand.breakline);
-
     gnome_config_pop_prefix();
 
     /* Spelling options ... */

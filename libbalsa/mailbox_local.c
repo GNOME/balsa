@@ -236,8 +236,9 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
 
-    LOCK_MAILBOX(mailbox);
+    gdk_threads_leave();
 
+    LOCK_MAILBOX(mailbox);
     local = LIBBALSA_MAILBOX_LOCAL(mailbox);
 
     if (CLIENT_CONTEXT_OPEN(mailbox)) {
@@ -249,18 +250,18 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
 	} else {
 	    /* incriment the reference count */
 	    mailbox->open_ref++;
-
 	    UNLOCK_MAILBOX(mailbox);
+	    gdk_threads_enter();
 	    return;
 	}
     }
 
     if (stat(local->path, &st) == -1) {
 	UNLOCK_MAILBOX(mailbox);
+	gdk_threads_enter();
 	return;
     }
-
-    gdk_threads_leave();
+    
     libbalsa_lock_mutt();
     if (append)
 	CLIENT_CONTEXT(mailbox) =
@@ -281,8 +282,8 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
     mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount;
     mailbox->open_ref++;
     UNLOCK_MAILBOX(mailbox);
-    gdk_threads_enter();
     libbalsa_mailbox_load_messages(mailbox);
+    gdk_threads_enter();
     
     /* increment the reference count */
 #ifdef DEBUG

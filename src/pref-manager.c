@@ -1060,6 +1060,25 @@ attach_check(const gchar* label,gint row, GtkTable *table)
 		     (GtkAttachOptions) (0), 0, 0);
     return res;
 }
+
+static GtkWidget*
+attach_information_menu(const gchar* label,gint row, GtkTable *table,
+			gint defval)
+{
+    GtkWidget* w, *option_menu, *menu;
+    w = gtk_label_new(label);
+    gtk_table_attach(GTK_TABLE(table), w, 0, 1, row, row+1,
+		     GTK_FILL, 0, 0, 0);
+
+    menu = create_information_message_menu();
+    option_menu = gtk_option_menu_new();
+    gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu), menu);
+    gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), defval);
+    gtk_table_attach(GTK_TABLE(table), option_menu, 1, 2, row, row+1,
+		     GTK_EXPAND | GTK_FILL, 0, 0, 0);
+    return menu;
+}
+
 static GtkWidget*
 box_start_check(const gchar* label, GtkWidget* box)
 {
@@ -1473,8 +1492,7 @@ create_display_page(gpointer data)
     GtkWidget *vbox2;
     GtkWidget *format_frame;
     GtkTable  *ftbl;
-    GtkWidget *information_frame, *information_table, *label;
-    GtkWidget *option_menu;
+    GtkWidget *information_frame, *information_table;
     GtkWidget *subnb;
     GtkWidget *vbox6;
     GtkWidget *vbox8;
@@ -1574,70 +1592,27 @@ create_display_page(gpointer data)
     /* gtk_table_set_row_spacings(GTK_TABLE(information_table), 1);
        gtk_table_set_col_spacings(GTK_TABLE(information_table), 5); */
 
-    label = gtk_label_new(_("Information Messages"));
-    gtk_table_attach(GTK_TABLE(information_table), label, 0, 1, 0, 1,
-		     GTK_FILL, 0, 0, 0);
-
-    option_menu = gtk_option_menu_new();
-    pui->information_message_menu = create_information_message_menu();
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu),
-			     pui->information_message_menu);
-    gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu),
+    
+    pui->information_message_menu = 
+	attach_information_menu(_("Information Messages"), 0, 
+				GTK_TABLE(information_table),
 				balsa_app.information_message);
-    gtk_table_attach(GTK_TABLE(information_table), option_menu, 1, 2, 0, 1,
-		     GTK_EXPAND | GTK_FILL, 0, 0, 0);
-
-    label = gtk_label_new(_("Warning Messages"));
-    gtk_table_attach(GTK_TABLE(information_table), label, 0, 1, 1, 2,
-		     GTK_FILL, 0, 0, 0);
-
-    option_menu = gtk_option_menu_new();
-    pui->warning_message_menu = create_information_message_menu();
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu),
-			     pui->warning_message_menu);
-    gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu),
+    pui->warning_message_menu =
+	attach_information_menu(_("Warning Messages"), 1,
+				GTK_TABLE(information_table),
 				balsa_app.warning_message);
-    gtk_table_attach(GTK_TABLE(information_table), option_menu, 1, 2, 1, 2,
-		     GTK_EXPAND | GTK_FILL, 0, 0, 0);
-
-    label = gtk_label_new(_("Error Messages"));
-    gtk_table_attach(GTK_TABLE(information_table), label, 0, 1, 2, 3,
-		     GTK_FILL, 0, 0, 0);
-
-    option_menu = gtk_option_menu_new();
-    pui->error_message_menu = create_information_message_menu();
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu),
-			     pui->error_message_menu);
-    gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu),
+    pui->error_message_menu = 
+	attach_information_menu(_("Error Messages"), 2,
+				GTK_TABLE(information_table),
 				balsa_app.error_message);
-    gtk_table_attach(GTK_TABLE(information_table), option_menu, 1, 2, 2, 3,
-		     GTK_EXPAND | GTK_FILL, 0, 0, 0);
-
-    label = gtk_label_new(_("Fatal Error Messages"));
-    gtk_table_attach(GTK_TABLE(information_table), label, 0, 1, 3, 4,
-		     GTK_FILL, 0, 0, 0);
-
-    option_menu = gtk_option_menu_new();
-    pui->fatal_message_menu = create_information_message_menu();
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu),
-			     pui->fatal_message_menu);
-    gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu),
+    pui->fatal_message_menu = 
+	attach_information_menu(_("Fatal Error Messages"), 3,
+				GTK_TABLE(information_table), 
 				balsa_app.fatal_message);
-    gtk_table_attach(GTK_TABLE(information_table), option_menu, 1, 2, 3, 4,
-		     GTK_EXPAND | GTK_FILL, 0, 0, 0);
-
-    label = gtk_label_new(_("Debug Messages"));
-    gtk_table_attach(GTK_TABLE(information_table), label, 0, 1, 4, 5,
-		     GTK_FILL, 0, 0, 0);
-
-    option_menu = gtk_option_menu_new();
-    pui->debug_message_menu = create_information_message_menu();
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu),
-			     pui->debug_message_menu);
-    gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu),
+    pui->debug_message_menu = 
+	attach_information_menu(_("Debug Messages"), 4,
+				GTK_TABLE(information_table),
 				balsa_app.debug_message);
-    gtk_table_attach(GTK_TABLE(information_table), option_menu, 1, 2, 4, 5,
-		     GTK_EXPAND | GTK_FILL, 0, 0, 0);
 
     /* Color Preferences Page */
     vbox8 = gtk_vbox_new(FALSE, 0);
@@ -2254,7 +2229,7 @@ create_spelling_option_menu(const gchar * names[], gint size, gint * index)
 
 
 static void
-add_show_menu(const char* label, BalsaInformationShow level, GtkWidget* menu)
+add_show_menu(const char* label, gint level, GtkWidget* menu)
 {
     GtkWidget *menu_item = gtk_menu_item_new_with_label(label);
     gtk_object_set_user_data(GTK_OBJECT(menu_item),  GINT_TO_POINTER(level));

@@ -1,3 +1,13 @@
+2001-03-21  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/save-restore.c: 
+	* src/balsa-app.[hc]: remove remainings of old printing code.
+	* src/pref-manager.c: clean up the code.
+	* libbalsa/address-book-vcard.c: fix the list merging bug.
+	* libbalsa/mailbox_local.c:
+	* libbalsa/mailbox.c: hopefully fix the deadlocking problem on 
+	SMP machines.
+	
 2001-03-18  Matthew Guenther  <guentherm@asme.org>
 
 	* libbalsa/mailbox_maildir.c (libbalsa_mailbox_maildir_create):

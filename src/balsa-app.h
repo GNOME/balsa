@@ -95,14 +95,6 @@ enum {
 };
 
 
-typedef struct stPrinting Printing_t;
-struct stPrinting {
-    gboolean breakline;
-    gint linesize;
-    gchar *PrintCommand;
-};
-
-
 typedef enum _ShownHeaders ShownHeaders;
 enum _ShownHeaders {
     HEADERS_NONE = 0,
@@ -252,10 +244,7 @@ extern struct BalsaApplication {
     gint encoding_style;
     gchar *date_string;
 
-    /* gint checkbox; */
-
     /* printing */
-    Printing_t PrintCommand;
     gchar* paper_size; /* A4 or Letter */
 
     /* compose: shown headers */

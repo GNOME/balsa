@@ -519,23 +519,22 @@ static GList *libbalsa_address_book_vcard_alias_complete(LibBalsaAddressBook * a
 
     /*
       Extract a list of addresses.
+      pick any of them if two addresses point to the same structure.
+      pick addr1 if it is available and there is no addr2 
+                    or it is smaller than addr1.
+      in other case, pick addr2 (one of addr1 or addr2 must be not-null).
     */
     while ( resa || resb ) {
-	if (resa)
-            addr1 = ((CompletionData*)resa->data)->address;
-	else
-	    addr1 = NULL;
-	if (resb)
-            addr2 = ((CompletionData*)resb->data)->address;
-	else
-	    addr2 = NULL;
+	addr1 = resa ? ((CompletionData*)resa->data)->address : NULL;
+	addr2 = resb ? ((CompletionData*)resb->data)->address : NULL;
 	
-	if ( addr1 == addr2 ) {
+	if (addr1 == addr2) {
 	    res = g_list_prepend(res, addr1);
 	    gtk_object_ref(GTK_OBJECT(addr1));
 	    resa = g_list_next(resa);
 	    resb = g_list_next(resb);
-	} else if ( resb == NULL || address_compare(addr1, addr2) > 0 ) {
+	} else if (resa != NULL && 
+		   (resb == NULL || address_compare(addr1, addr2) > 0) ) {
 	    res = g_list_prepend(res, addr1);
 	    gtk_object_ref(GTK_OBJECT(addr1));
 	    resa = g_list_next(resa);

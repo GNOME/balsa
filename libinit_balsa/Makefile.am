@@ -2,15 +2,6 @@ CFLAGS += -Wall -Wmissing-prototypes -Wpointer-arith
 
 noinst_LIBRARIES = libinit_balsa.a
 
-noinst_HEADERS = 				\
-	balsa-initdruid-private.h		\
-	balsa-druid-page-private.h		\
-	balsa-druid-page-error-private.h	\
-	balsa-druid-page-welcome-private.h	\
-	balsa-druid-page-user-private.h		\
-	balsa-druid-page-directory-private.h	\
-	balsa-druid-page-finish-private.h	
-
 libinit_balsa_a_SOURCES = 		\
 	$(BUILT_SOURCES)		\
 	$(noinst_HEADERS)		\

@@ -587,7 +587,7 @@ create_menu (BalsaIndex * bindex)
   
   menu = gtk_menu_new ();
   
-  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_NEW, _ ("New"));
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_NEW, _("New"));
   gtk_signal_connect (GTK_OBJECT (menuitem),
 		      "activate",
 		      (GtkSignalFunc) balsa_message_new,
@@ -595,7 +595,7 @@ create_menu (BalsaIndex * bindex)
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
-  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _ ("Reply"));
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _("Reply"));
   gtk_signal_connect (GTK_OBJECT (menuitem),
 		      "activate",
 		      (GtkSignalFunc) balsa_message_reply,
@@ -603,7 +603,7 @@ create_menu (BalsaIndex * bindex)
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
-  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _ ("Reply to all"));
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _("Reply to all"));
   gtk_signal_connect (GTK_OBJECT (menuitem),
 		      "activate",
 		      (GtkSignalFunc) balsa_message_replytoall,
@@ -611,7 +611,7 @@ create_menu (BalsaIndex * bindex)
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
-  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_FWD, _ ("Forward"));
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_FWD, _("Forward"));
   gtk_signal_connect (GTK_OBJECT (menuitem),
 		      "activate",
 		      (GtkSignalFunc) balsa_message_forward,
@@ -619,7 +619,7 @@ create_menu (BalsaIndex * bindex)
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
-  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_TRASH, _ ("Delete"));
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_TRASH, _("Delete"));
   gtk_signal_connect (GTK_OBJECT (menuitem),
 		      "activate",
 		      (GtkSignalFunc) balsa_message_delete,
@@ -627,7 +627,7 @@ create_menu (BalsaIndex * bindex)
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
-  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_UNDELETE, _ ("Undelete"));
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_UNDELETE, _("Undelete"));
   gtk_signal_connect (GTK_OBJECT (menuitem),
 		      "activate",
 		      (GtkSignalFunc) balsa_message_undelete,
@@ -635,7 +635,8 @@ create_menu (BalsaIndex * bindex)
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
-  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_BOOK_RED, _ ("Store Address"));
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_BOOK_RED, 
+				    _("Store Address"));
   gtk_signal_connect (GTK_OBJECT (menuitem),
 		      "activate",
 		      (GtkSignalFunc) balsa_message_store_address,
@@ -643,7 +644,7 @@ create_menu (BalsaIndex * bindex)
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
-  menuitem = gtk_menu_item_new_with_label (_ ("Transfer"));
+  menuitem = gtk_menu_item_new_with_label (_("Transfer"));
   submenu = gtk_menu_new ();
   smenuitem = gtk_menu_item_new ();
   bmbl = balsa_mblist_new ();
@@ -1023,20 +1024,16 @@ balsa_message_store_address (GtkWidget * widget, gpointer index)
   if(list->next)
   {
      GtkWidget *box;
-     char * msg  = g_strdup( _("You may only store one address at a time.\n") );
-     box = gnome_message_box_new(msg,
-                                 GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
+     box = gnome_message_box_new(
+	 _("You may only store one address at a time.\n"),
+	 GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
      gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
-     gnome_dialog_run( GNOME_DIALOG( box ) );
-     gtk_widget_destroy( GTK_WIDGET( box ) );
-     g_free(msg);
+     gnome_dialog_run_and_close( GNOME_DIALOG( box ) );
      return;
   }
     
-  message = gtk_clist_get_row_data(GTK_CLIST(index), GPOINTER_TO_INT(list->data));
-  
-  new_name = g_strdup( message->from->personal );
-  new_email = g_strdup( message->from->mailbox );
+  message = gtk_clist_get_row_data(GTK_CLIST(index), 
+				   GPOINTER_TO_INT(list->data));
   
   gc = fopen(gnome_util_prepend_user_home(".gnome/GnomeCard.gcrd"), "r+"); 
   if (!gc) 
@@ -1048,14 +1045,15 @@ balsa_message_store_address (GtkWidget * widget, gpointer index)
      box = gnome_message_box_new(msg,
                                  GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
      gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
-     gnome_dialog_run( GNOME_DIALOG( box ) );
-     gtk_widget_destroy( GTK_WIDGET( box ) );
-     g_free(new_name);
-     g_free(new_email);
+     gnome_dialog_run_and_close( GNOME_DIALOG( box ) );
      g_free(msg);
      return; 
   }
     
+  new_name = message->from->personal ? 
+      message->from->personal : message->from->mailbox;
+  new_email = message->from->mailbox;
+  
   while (fgets(string, sizeof(string), gc)) 
   { 
      if ( g_strncasecmp(string, "BEGIN:VCARD", 11) == 0 ) {
@@ -1074,35 +1072,26 @@ balsa_message_store_address (GtkWidget * widget, gpointer index)
      
      if ( g_strncasecmp(string, "FN:", 3) == 0 )
      {
-        gchar *id = g_strdup(string+3);
+        gchar *id = string+3;
         if( g_strcasecmp(id, new_name) == 0 )
         {
            GtkWidget *box;
            char * msg  =  g_strdup_printf(
               _("There is already an address book entry for %s.\nRun GnomeCard if you would like to edit your address book entries.\n"),
               new_name); 
-           box = gnome_message_box_new(msg,
-                                       GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
+           box = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_ERROR, 
+				       _("OK"), NULL );
            gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
-           gnome_dialog_run( GNOME_DIALOG( box ) );
-           gtk_widget_destroy( GTK_WIDGET( box ) );
-           g_free(new_name);
-           g_free(new_email);
+           gnome_dialog_run_and_close( GNOME_DIALOG( box ) );
            g_free(msg);
-           g_free(id);
            fclose(gc);
            return;
         }
-        g_free(id);
-        continue;
      }
   }
-  fprintf(gc, g_strdup_printf( _("\nBEGIN:VCARD\n")));
-  fprintf(gc, g_strdup_printf( _("FN:%s\n"), new_name));
-  fprintf(gc, g_strdup_printf( _("EMAIL;INTERNET:%s\n"), new_email));
-  fprintf(gc, g_strdup_printf( _("END:VCARD\n")));
-  g_free(new_name);
-  g_free(new_email);
+  fprintf(gc, "\nBEGIN:VCARD\n");
+  fprintf(gc, "FN:%s\n", new_name);
+  fprintf(gc, "EMAIL;INTERNET:%s\n", new_email);
+  fprintf(gc, "END:VCARD\n");
   fclose(gc);
-  return;
 }

@@ -1,3 +1,9 @@
+2004-06-13 09:29  PeterB
+
+	* src/: balsa-index.c, balsa-index.h, main-window.c: implement and
+	use balsa_index_expunge, to block the selection-changed handler
+	while expunging.
+
 2004-06-13  Carlos Morgado  <chbm gnome.org>
 
 	* libbalsa/message.c: make build with DEBUG

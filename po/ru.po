@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 2000-08-11 15:41+0000\n"
-"PO-Revision-Date: 2000-08-11 15:41+00:00\n"
+"POT-Creation-Date: 2000-08-12 16:17+0000\n"
+"PO-Revision-Date: 2000-08-12 16:18+00:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -199,7 +199,7 @@ msgid "E-Mail Address"
 msgstr "Электронный адрес"
 
 #. address book
-#: src/address-book.c:543 src/main-window.c:183 src/pref-manager.c:1503
+#: src/address-book.c:543 src/main-window.c:183 src/pref-manager.c:1581
 msgid "Address Book"
 msgstr "Адресная книга"
 
@@ -278,7 +278,7 @@ msgid "Forward"
 msgstr "Переслать"
 
 #: src/balsa-index-page.c:610 src/filter-edit-dialog.c:228
-#: src/main-window.c:410 src/pref-manager.c:930
+#: src/main-window.c:410 src/pref-manager.c:951
 msgid "Delete"
 msgstr "Удалить"
 
@@ -402,7 +402,7 @@ msgstr "Показан почтовый ящик: %s c %ld сообщениями, %ld новых"
 msgid "Save MIME Part"
 msgstr "Сохранить MIME-закодированную часть"
 
-#: src/balsa-message.c:241 src/balsa-message.c:1181
+#: src/balsa-message.c:241 src/balsa-message.c:1180
 msgid "Save"
 msgstr "Сохранить"
 
@@ -483,7 +483,7 @@ msgstr "Имя файла: %s"
 msgid "Save part"
 msgstr "Сохранить часть"
 
-#: src/balsa-message.c:1254
+#: src/balsa-message.c:1253
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "невозможно создать временный файл %s"
@@ -581,7 +581,7 @@ msgid "Match string:"
 msgstr "Строка для сравнения:"
 
 #: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1162
-#: src/pref-manager.c:917
+#: src/pref-manager.c:938
 msgid "Add"
 msgstr "Добавить"
 
@@ -1175,313 +1175,321 @@ msgstr "Ответить всем адресатам этого письма"
 msgid "Forward this message"
 msgstr "Переслать это письмо"
 
-#: src/pref-manager.c:129
+#: src/pref-manager.c:131
 msgid "Text"
 msgstr "Текст"
 
-#: src/pref-manager.c:130
+#: src/pref-manager.c:132
 msgid "Icons"
 msgstr "Пиктограммы"
 
-#: src/pref-manager.c:131
+#: src/pref-manager.c:133
 msgid "Both"
 msgstr "Оба"
 
-#: src/pref-manager.c:143
+#: src/pref-manager.c:145
 msgid "7bits"
 msgstr "7 бит"
 
-#: src/pref-manager.c:144
+#: src/pref-manager.c:146
 msgid "8bits"
 msgstr "8 бит"
 
-#: src/pref-manager.c:145
+#: src/pref-manager.c:147
 msgid "quoted"
 msgstr "quoted"
 
-#: src/pref-manager.c:157
+#: src/pref-manager.c:159
 msgid "While Retrieving Messages"
 msgstr "При получении сообщений"
 
-#: src/pref-manager.c:158
+#: src/pref-manager.c:160
 msgid "Until Closed"
 msgstr "До закрытия"
 
-#: src/pref-manager.c:159
+#: src/pref-manager.c:161
 msgid "Never"
 msgstr "Никогда"
 
-#: src/pref-manager.c:184
+#: src/pref-manager.c:186
 msgid "Balsa Preferences"
 msgstr "Настройка Balsa"
 
-#: src/pref-manager.c:192 src/pref-manager.c:685
+#: src/pref-manager.c:194 src/pref-manager.c:706
 msgid "Identity"
 msgstr "Идентификация"
 
-#: src/pref-manager.c:195 src/pref-manager.c:767 src/pref-manager.c:845
+#: src/pref-manager.c:197 src/pref-manager.c:788 src/pref-manager.c:866
 msgid "Signature"
 msgstr "Подпись"
 
-#: src/pref-manager.c:198
+#: src/pref-manager.c:200
 msgid "Mail Servers"
 msgstr "Mail-серверы"
 
-#: src/pref-manager.c:201
+#: src/pref-manager.c:203
 msgid "Mail Options"
 msgstr "Параметры почты"
 
-#: src/pref-manager.c:204 src/pref-manager.c:1254
+#: src/pref-manager.c:206 src/pref-manager.c:1276
 msgid "Display"
 msgstr "Дисплей"
 
-#: src/pref-manager.c:207 src/pref-manager.c:1279 src/pref-manager.c:1324
+#: src/pref-manager.c:209 src/pref-manager.c:1301 src/pref-manager.c:1346
 msgid "Printing"
 msgstr "Печать"
 
-#: src/pref-manager.c:210 src/pref-manager.c:1365 src/pref-manager.c:1383
+#: src/pref-manager.c:212 src/pref-manager.c:1387 src/pref-manager.c:1405
 msgid "Encoding"
 msgstr "Кодирование"
 
-#: src/pref-manager.c:213 src/pref-manager.c:1412
+#: src/pref-manager.c:215 src/pref-manager.c:1439
 msgid "Misc"
 msgstr "Разное"
 
-#: src/pref-manager.c:216
+#: src/pref-manager.c:218
 msgid "Startup"
 msgstr "Запуск"
 
-#: src/pref-manager.c:709
+#: src/pref-manager.c:730
 msgid "Your name:"
 msgstr "Ваше имя:"
 
-#: src/pref-manager.c:716
+#: src/pref-manager.c:737
 msgid "E-mail address:"
 msgstr "Электронный адрес:"
 
-#: src/pref-manager.c:722
+#: src/pref-manager.c:743
 msgid "Reply-to address:"
 msgstr "Обратный адрес:"
 
-#: src/pref-manager.c:734
+#: src/pref-manager.c:755
 msgid "Default domain:"
 msgstr "Домен по умолчанию:"
 
-#: src/pref-manager.c:779
+#: src/pref-manager.c:800
 msgid "Select your signature file"
 msgstr "Выберите ваш файл-подпись"
 
-#: src/pref-manager.c:789
+#: src/pref-manager.c:810
 msgid "sending mail"
 msgstr "отправлении писем"
 
-#: src/pref-manager.c:795
+#: src/pref-manager.c:816
 msgid "replying to mail"
 msgstr "ответе на письмо"
 
-#: src/pref-manager.c:801
+#: src/pref-manager.c:822
 msgid "forwarding mail"
 msgstr "пересылке писем"
 
-#: src/pref-manager.c:816
+#: src/pref-manager.c:837
 msgid ">"
 msgstr ">"
 
-#: src/pref-manager.c:818
+#: src/pref-manager.c:839
 msgid "Signature file:"
 msgstr "Файл подписи:"
 
-#: src/pref-manager.c:825
+#: src/pref-manager.c:846
 msgid "Reply prefix:"
 msgstr "Префикс для ответов:"
 
-#: src/pref-manager.c:832
+#: src/pref-manager.c:853
 msgid "Use signature file when:"
 msgstr "Использовать файл-подпись при:"
 
-#: src/pref-manager.c:839
+#: src/pref-manager.c:860
 msgid "enable signature separator"
 msgstr "включить разделитель подписи"
 
-#: src/pref-manager.c:876
+#: src/pref-manager.c:897
 msgid "Remote Mailbox Servers"
 msgstr "Удаленные серверы почтовых ящиков"
 
-#: src/pref-manager.c:901
+#: src/pref-manager.c:922
 msgid "Type"
 msgstr "Тип"
 
-#: src/pref-manager.c:905
+#: src/pref-manager.c:926
 msgid "Mailbox name"
 msgstr "Название почтового ящика"
 
-#: src/pref-manager.c:924
+#: src/pref-manager.c:945
 msgid "Modify"
 msgstr "Изменить"
 
-#: src/pref-manager.c:936
+#: src/pref-manager.c:957
 msgid "Local mail"
 msgstr "Местная почта"
 
-#: src/pref-manager.c:951
+#: src/pref-manager.c:972
 msgid "Select your local mail directory"
 msgstr "Выбор каталога местной почты"
 
-#: src/pref-manager.c:961
+#: src/pref-manager.c:982
 msgid "Outgoing mail"
 msgstr "Исходящая почта"
 
-#: src/pref-manager.c:980
+#: src/pref-manager.c:1001
 msgid "Remote SMTP Server"
 msgstr "Удаленный SMTP сервер"
 
-#: src/pref-manager.c:987
+#: src/pref-manager.c:1008
 msgid "Local mail user agent"
 msgstr "Местный почтовый клиент (MUA)"
 
-#: src/pref-manager.c:1016
+#: src/pref-manager.c:1037
 msgid "Incoming"
 msgstr "Полученная"
 
-#: src/pref-manager.c:1020
+#: src/pref-manager.c:1041
 msgid "Outgoing"
 msgstr "Отправленная"
 
-#: src/pref-manager.c:1039
+#: src/pref-manager.c:1060
 msgid "Checking"
 msgstr "Проверить"
 
-#: src/pref-manager.c:1049
+#: src/pref-manager.c:1070
 msgid "Minutes"
 msgstr "минут"
 
-#: src/pref-manager.c:1063
+#: src/pref-manager.c:1084
 msgid "Check mail automatically every:"
 msgstr "Проверять почту автоматически каждые:"
 
-#: src/pref-manager.c:1086
+#: src/pref-manager.c:1107
 msgid "Word Wrap"
 msgstr "Перевод строки"
 
-#: src/pref-manager.c:1097
+#: src/pref-manager.c:1118
 msgid "Wrap Outgoing Text at:"
 msgstr "Перенос выступающего текста по:"
 
-#: src/pref-manager.c:1112
+#: src/pref-manager.c:1133
 msgid "Characters"
 msgstr "Буквы"
 
-#: src/pref-manager.c:1118
+#: src/pref-manager.c:1139
 msgid "Other options"
 msgstr "Другие параметры"
 
-#: src/pref-manager.c:1129
+#: src/pref-manager.c:1150
 msgid "Default Bcc to:"
 msgstr "Bcc по умолчанию:"
 
-#: src/pref-manager.c:1166
+#: src/pref-manager.c:1188
 msgid "Main window"
 msgstr "Главное окно"
 
-#: src/pref-manager.c:1174
+#: src/pref-manager.c:1196
 msgid "use preview pane"
 msgstr "Использовать панель предпросмотра"
 
-#: src/pref-manager.c:1180
+#: src/pref-manager.c:1202
 msgid "Show mailbox statistics in left pane"
 msgstr "Показывать статистику почтового ящика на левой панели"
 
-#: src/pref-manager.c:1187
+#: src/pref-manager.c:1209
 msgid "Toolbars"
 msgstr "Панели инструментов"
 
-#: src/pref-manager.c:1204
+#: src/pref-manager.c:1226
 msgid "Display progress dialog"
 msgstr "Показывать диалог прогресса"
 
-#: src/pref-manager.c:1212
+#: src/pref-manager.c:1234
 msgid "Display Formats"
 msgstr "Показывать форматы"
 
-#: src/pref-manager.c:1219
+#: src/pref-manager.c:1241
 msgid "Date encoding (for strftime):"
 msgstr "Кодирование данных (для strftime):"
 
-#: src/pref-manager.c:1231
+#: src/pref-manager.c:1253
 msgid "Selected headers:"
 msgstr "Выбранные заголовки:"
 
-#: src/pref-manager.c:1307
+#: src/pref-manager.c:1329
 msgid "characters"
 msgstr "буквы"
 
-#: src/pref-manager.c:1311
+#: src/pref-manager.c:1333
 msgid "Print command:"
 msgstr "Команда печати:"
 
-#: src/pref-manager.c:1317
+#: src/pref-manager.c:1339
 msgid "Break line at:"
 msgstr "Перенос строки при:"
 
-#: src/pref-manager.c:1351
+#: src/pref-manager.c:1373
 msgid "Charset"
 msgstr "Набор символов:"
 
-#: src/pref-manager.c:1422
+#: src/pref-manager.c:1449
 msgid "Debug"
 msgstr "Отладка"
 
-#: src/pref-manager.c:1426
+#: src/pref-manager.c:1453
 msgid "Empty trash on exit"
 msgstr "Очистить мусорную корзину"
 
 #. font
-#: src/pref-manager.c:1432
+#: src/pref-manager.c:1459
 msgid "Font"
 msgstr "Шрифт:"
 
-#: src/pref-manager.c:1460
+#: src/pref-manager.c:1487
 msgid "Select a font to use"
 msgstr "Выбор шрфта"
 
-#: src/pref-manager.c:1464
+#: src/pref-manager.c:1491
 msgid "Browse..."
 msgstr "Просмотр..."
 
-#: src/pref-manager.c:1469
+#: src/pref-manager.c:1496
 msgid "Preview pane"
 msgstr "Панель предпросмотра"
 
 #. mblist unread colour
-#: src/pref-manager.c:1477
+#: src/pref-manager.c:1504
 msgid "Colours"
 msgstr "Цвета"
 
-#: src/pref-manager.c:1488 src/pref-manager.c:1495
+#: src/pref-manager.c:1519 src/pref-manager.c:1526
 msgid "Mailbox with unread messages colour"
 msgstr "Цвет почтового ящика с непрочитанными письмами"
 
-#: src/pref-manager.c:1516
+#: src/pref-manager.c:1542 src/pref-manager.c:1564
+msgid "Colour of quoted text"
+msgstr "Цвет цитируемого текста"
+
+#: src/pref-manager.c:1551 src/pref-manager.c:1573
+msgid "Quoted text colour"
+msgstr "Цвет цитируемого текста"
+
+#: src/pref-manager.c:1594
 msgid "Address book location"
 msgstr "Расположение адресной книги"
 
-#: src/pref-manager.c:1521
+#: src/pref-manager.c:1599
 msgid "Select your address book file"
 msgstr "Выберите ваш файл адресной книги"
 
-#: src/pref-manager.c:1531
+#: src/pref-manager.c:1609
 msgid "Expand aliases as you type"
 msgstr "Расширять псевдонимы при наборе"
 
-#: src/pref-manager.c:1549
+#: src/pref-manager.c:1627
 msgid "Options"
 msgstr "Параметры"
 
-#: src/pref-manager.c:1560
+#: src/pref-manager.c:1638
 msgid "Check mail upon startup"
 msgstr "Проверить почту при запуске"
 
-#: src/pref-manager.c:1565
+#: src/pref-manager.c:1643
 msgid "Remember open mailboxes between sessions"
 msgstr "Запоминать открытые почтовые ящики между сеансами"
 

@@ -81,9 +81,10 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
 	return;
     }
     
-    str = g_strdup(input);
 #ifdef CASE_INSENSITIVE_NAME
-    g_strup(str);
+    str = g_ascii_strup(input, -1);
+#else
+    str = g_strdup(input);
 #endif
     
     /*

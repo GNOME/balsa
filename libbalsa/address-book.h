@@ -23,15 +23,15 @@
 #ifndef __LIBBALSA_ADDRESS_BOOK_H__
 #define __LIBBALSA_ADDRESS_BOOK_H__
 
-#include <gtk/gtkobject.h>
+#include <glib-object.h>
 
 #include "address.h"
 
 #define LIBBALSA_TYPE_ADDRESS_BOOK			(libbalsa_address_book_get_type())
-#define LIBBALSA_ADDRESS_BOOK(obj)			(GTK_CHECK_CAST (obj, LIBBALSA_TYPE_ADDRESS_BOOK, LibBalsaAddressBook))
-#define LIBBALSA_ADDRESS_BOOK_CLASS(klass)		(GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS_BOOK, LibBalsaAddressBookClass))
-#define LIBBALSA_IS_ADDRESS_BOOK(obj)			(GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_ADDRESS_BOOK))
-#define LIBBALSA_IS_ADDRESS_BOOK_CLASS(klass)		(GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK))
+#define LIBBALSA_ADDRESS_BOOK(obj)			(G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_ADDRESS_BOOK, LibBalsaAddressBook))
+#define LIBBALSA_ADDRESS_BOOK_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS_BOOK, LibBalsaAddressBookClass))
+#define LIBBALSA_IS_ADDRESS_BOOK(obj)			(G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_ADDRESS_BOOK))
+#define LIBBALSA_IS_ADDRESS_BOOK_CLASS(klass)		(G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK))
 
 typedef struct _LibBalsaAddressBook LibBalsaAddressBook;
 typedef struct _LibBalsaAddressBookClass LibBalsaAddressBookClass;
@@ -39,7 +39,7 @@ typedef struct _LibBalsaAddressBookClass LibBalsaAddressBookClass;
 typedef void (*LibBalsaAddressBookLoadFunc)(LibBalsaAddressBook *ab, LibBalsaAddress *address, gpointer closure);
 
 struct _LibBalsaAddressBook {
-    GtkObject parent;
+    GObject parent;
 
     /* The gnome_config prefix where we save this address book */
     gchar *config_prefix;
@@ -52,7 +52,7 @@ struct _LibBalsaAddressBook {
 };
 
 struct _LibBalsaAddressBookClass {
-    GtkObjectClass parent;
+    GObjectClass parent;
 
     void (*load) (LibBalsaAddressBook * ab, LibBalsaAddressBookLoadFunc callback, gpointer closure);
 
@@ -65,7 +65,7 @@ struct _LibBalsaAddressBookClass {
     GList* (*alias_complete) (LibBalsaAddressBook * ab, const gchar *prefix, gchar ** new_prefix);
 };
 
-GtkType libbalsa_address_book_get_type(void);
+GType libbalsa_address_book_get_type(void);
 
 LibBalsaAddressBook *libbalsa_address_book_new_from_config(const gchar *
 							   prefix);

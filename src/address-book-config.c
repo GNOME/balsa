@@ -739,7 +739,6 @@ handle_close(AddressBookConfig * abc)
 static void
 abc_response_cb(GtkDialog* d, gint respo, AddressBookConfig * abc)
 {
-    printf("Response: %d\n", respo); 
     switch(respo) {
     case ABC_RESPONSE_FORWARD: next_button_cb(abc);   break;
     case ABC_RESPONSE_ADD:

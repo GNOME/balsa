@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <ctype.h>
+#include <string.h>
 
 #include "address-book.h"
 #include "abook-completion.h"
@@ -42,11 +43,11 @@
 /* FIXME: Make an option */
 #define CASE_INSENSITIVE_NAME
 
-static GtkObjectClass *parent_class = NULL;
+static LibBalsaAddressBookClass *parent_class = NULL;
 
 static void libbalsa_address_book_ldif_class_init(LibBalsaAddressBookLdifClass *klass);
 static void libbalsa_address_book_ldif_init(LibBalsaAddressBookLdif *ab);
-static void libbalsa_address_book_ldif_destroy(GtkObject * object);
+static void libbalsa_address_book_ldif_finalize(GObject * object);
 
 static void libbalsa_address_book_ldif_load(LibBalsaAddressBook * ab,
 					     LibBalsaAddressBookLoadFunc callback,
@@ -75,25 +76,27 @@ static void load_ldif_file(LibBalsaAddressBook *ab);
 static gboolean ldif_address_book_need_reload(LibBalsaAddressBookLdif *ab);
 
 
-GtkType libbalsa_address_book_ldif_get_type(void)
+GType libbalsa_address_book_ldif_get_type(void)
 {
-    static GtkType address_book_ldif_type = 0;
+    static GType address_book_ldif_type = 0;
 
     if (!address_book_ldif_type) {
-	static const GtkTypeInfo address_book_ldif_info = {
-	    "LibBalsaAddressBookLdif",
-	    sizeof(LibBalsaAddressBookLdif),
+	static const GTypeInfo address_book_ldif_info = {
 	    sizeof(LibBalsaAddressBookLdifClass),
-	    (GtkClassInitFunc) libbalsa_address_book_ldif_class_init,
-	    (GtkObjectInitFunc) libbalsa_address_book_ldif_init,
-	    /* reserved_1 */ NULL,
-	    /* reserved_2 */ NULL,
-	    (GtkClassInitFunc) NULL,
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) libbalsa_address_book_ldif_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(LibBalsaAddressBookLdif),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) libbalsa_address_book_ldif_init
 	};
 
 	address_book_ldif_type =
-	    gtk_type_unique(libbalsa_address_book_get_type(),
-			    &address_book_ldif_info);
+            g_type_register_static(LIBBALSA_TYPE_ADDRESS_BOOK,
+	                           "LibBalsaAddressBookLdif",
+			           &address_book_ldif_info, 0);
     }
 
     return address_book_ldif_type;
@@ -105,14 +108,14 @@ libbalsa_address_book_ldif_class_init(LibBalsaAddressBookLdifClass *
 				       klass)
 {
     LibBalsaAddressBookClass *address_book_class;
-    GtkObjectClass *object_class;
+    GObjectClass *object_class;
 
-    parent_class = gtk_type_class(LIBBALSA_TYPE_ADDRESS_BOOK);
+    parent_class = g_type_class_peek_parent(klass);
 
-    object_class = GTK_OBJECT_CLASS(klass);
+    object_class = G_OBJECT_CLASS(klass);
     address_book_class = LIBBALSA_ADDRESS_BOOK_CLASS(klass);
 
-    object_class->destroy = libbalsa_address_book_ldif_destroy;
+    object_class->finalize = libbalsa_address_book_ldif_finalize;
 
     address_book_class->load = libbalsa_address_book_ldif_load;
     address_book_class->store_address =
@@ -144,7 +147,7 @@ libbalsa_address_book_ldif_init(LibBalsaAddressBookLdif * ab)
 static void
 ab_ldif_clear(LibBalsaAddressBookLdif *addr_ldif)
 {
-    g_list_foreach(addr_ldif->address_list, (GFunc) gtk_object_unref, NULL);
+    g_list_foreach(addr_ldif->address_list, (GFunc) g_object_unref, NULL);
     g_list_free(addr_ldif->address_list);
     addr_ldif->address_list = NULL;
     
@@ -155,7 +158,7 @@ ab_ldif_clear(LibBalsaAddressBookLdif *addr_ldif)
 }
 
 static void
-libbalsa_address_book_ldif_destroy(GtkObject * object)
+libbalsa_address_book_ldif_finalize(GObject * object)
 {
     LibBalsaAddressBookLdif *addr_ldif;
 
@@ -170,9 +173,7 @@ libbalsa_address_book_ldif_destroy(GtkObject * object)
     g_completion_free(addr_ldif->alias_complete);
     addr_ldif->alias_complete = NULL;
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
-
+    G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
 LibBalsaAddressBook *
@@ -181,10 +182,13 @@ libbalsa_address_book_ldif_new(const gchar * name, const gchar * path)
     LibBalsaAddressBookLdif *abvc;
     LibBalsaAddressBook *ab;
 
-    abvc = gtk_type_new(LIBBALSA_TYPE_ADDRESS_BOOK_LDIF);
+    abvc =
+        LIBBALSA_ADDRESS_BOOK_LDIF(g_object_new
+                                   (LIBBALSA_TYPE_ADDRESS_BOOK_LDIF,
+                                    NULL));
     ab = LIBBALSA_ADDRESS_BOOK(abvc);
 
-    ab->name   = g_strdup(name);
+    ab->name = g_strdup(name);
     abvc->path = g_strdup(path);
 
     return ab;
@@ -286,7 +290,7 @@ static LibBalsaAddress *find_addr(GList *ab_list, const gchar *id)
 
 	g_strstrip(addr_id);
 
-	if(g_strcasecmp(cmpId, addr_id)==0) {
+	if(g_ascii_strcasecmp(cmpId, addr_id)==0) {
 	    g_free(addr_id);
 	    return addr_data;
 	}
@@ -310,7 +314,7 @@ static void expand_addr_list(LibBalsaAddress *address, GList *ab_list)
 
 	if(ref) {
 	    member_list=g_list_append(member_list, ref);
-	    gtk_object_ref(GTK_OBJECT(ref));
+	    g_object_ref(G_OBJECT(ref));
 	    g_free(member_data);
 	} else
             notfound = g_list_append(notfound, member_data);
@@ -365,7 +369,7 @@ load_ldif_file(LibBalsaAddressBook *ab)
 	/*
 	 * Check if it is a card.
 	 */
-	if (g_strncasecmp(line, "dn:", 3) == 0) {
+	if (g_ascii_strncasecmp(line, "dn:", 3) == 0) {
 	    in_ldif = TRUE;
 	    id = g_strdup(g_strchug(line + 3));
 	    if( id && *id == '\0' ) {
@@ -386,8 +390,6 @@ load_ldif_file(LibBalsaAddressBook *ab)
 		address = address_new_prefill(address_list, nickname, 
 					      givenname, surname, fullname,
 					      organization, id);
-                gtk_object_ref(GTK_OBJECT(address));
-                gtk_object_sink(GTK_OBJECT(address));
 		list = g_list_append(list, address);
 		address_list = NULL;
 	    } else {            /* record without e-mail address, ignore */
@@ -405,32 +407,32 @@ load_ldif_file(LibBalsaAddressBook *ab)
 	if (!in_ldif)
 	    continue;
 
-	if (g_strncasecmp(line, "cn:", 3) == 0) {
+	if (g_ascii_strncasecmp(line, "cn:", 3) == 0) {
 	    fullname = g_strdup(g_strchug(line + 3));
 	    continue;
 	}
 
-	if (g_strncasecmp(line, "sn:", 3) == 0) {
+	if (g_ascii_strncasecmp(line, "sn:", 3) == 0) {
 	    surname = g_strdup(g_strchug(line + 3));
 	    continue;
 	}
 
-	if (g_strncasecmp(line, "givenname:", 10) == 0) {
+	if (g_ascii_strncasecmp(line, "givenname:", 10) == 0) {
 	    givenname = g_strdup(g_strchug(line + 10));
 	    continue;
 	}
 
-	if (g_strncasecmp(line, "xmozillanickname:", 17) == 0) {
+	if (g_ascii_strncasecmp(line, "xmozillanickname:", 17) == 0) {
 	    nickname = g_strdup(g_strchug(line + 17));
 	    continue;
 	}
 
-	if (g_strncasecmp(line, "o:", 2) == 0) {
+	if (g_ascii_strncasecmp(line, "o:", 2) == 0) {
 	    organization = g_strdup(g_strchug(line + 2));
 	    continue;
 	}
 
-	if (g_strncasecmp(line, "member:", 7) == 0) {
+	if (g_ascii_strncasecmp(line, "member:", 7) == 0) {
 		address_list = g_list_append(address_list, 
 					 g_strdup(g_strchug(line+7)));
 	    continue;
@@ -439,7 +441,7 @@ load_ldif_file(LibBalsaAddressBook *ab)
 	/*
 	 * fetch all e-mail fields
 	 */
-	if (g_strncasecmp(line, "mail:", 5) == 0) {
+	if (g_ascii_strncasecmp(line, "mail:", 5) == 0) {
 	    address_list = g_list_append(address_list, 
 					 g_strdup(g_strchug(line + 5)));
 	}
@@ -507,12 +509,12 @@ build_name(gchar *id, gchar *givenname, gchar *surname)
     } else if(id && *id) {
 	/* Netscape LDIF files contain "cn=name,mail=email@address" for the id. */
 	/* Try to strip the name out. */
-	if (g_strncasecmp(id, "cn=", 3) == 0) {
+	if (g_ascii_strncasecmp(id, "cn=", 3) == 0) {
 	    id += 3;
 	    while (*id && isspace ((int)*id)) id++;
 	}
 	while ((end = strchr(id, ',')) != NULL) {
-	    if (g_strncasecmp(end, ",mail=", 6) == 0) {
+	    if (g_ascii_strncasecmp(end, ",mail=", 6) == 0) {
 		*end = '\0';
 		break;
 	    }
@@ -558,7 +560,7 @@ libbalsa_address_book_ldif_store_address(LibBalsaAddressBook * ab,
     while (list) {
 	address = LIBBALSA_ADDRESS(list->data);
 
-	if (g_strcasecmp(address->full_name, new_address->full_name) == 0) {
+	if (g_ascii_strcasecmp(address->full_name, new_address->full_name) == 0) {
 	    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
 				 _("%s is already in address book."),
 				 new_address->full_name);
@@ -685,17 +687,17 @@ libbalsa_address_book_ldif_alias_complete(LibBalsaAddressBook * ab,
 
 	if (addr1 == addr2) {
 	    res = g_list_prepend(res, addr1);
-	    gtk_object_ref(GTK_OBJECT(addr1));
+	    g_object_ref(G_OBJECT(addr1));
 	    resa = g_list_next(resa);
 	    resb = g_list_next(resb);
 	} else if (resa != NULL &&
 		   (resb == NULL || address_compare(addr1, addr2) > 0) ) {
 	    res = g_list_prepend(res, addr1);
-	    gtk_object_ref(GTK_OBJECT(addr1));
+	    g_object_ref(G_OBJECT(addr1));
 	    resa = g_list_next(resa);
 	} else {
 	    res = g_list_prepend(res, addr2);
-	    gtk_object_ref(GTK_OBJECT(addr2));
+	    g_object_ref(G_OBJECT(addr2));
 	    resb = g_list_next(resb);
 	}
     }

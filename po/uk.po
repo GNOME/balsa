@@ -712,14 +712,13 @@ msgid "SSL is unavailable."
 msgstr "SSL не доступний."
 
 #: libmutt/mutt_socket.c:239
-#, fuzzy
 msgid "Preconnect command failed."
-msgstr "Зб╕й виконання команди POP"
+msgstr "Зб╕й виконання команди перед з'╓днанням."
 
 #: libmutt/mutt_socket.c:328 libmutt/mutt_socket.c:368
-#, fuzzy, c-format
+#, c-format
 msgid "Looking up %s..."
-msgstr "Зчитування %s..."
+msgstr "Перегляд %s..."
 
 #: libmutt/mutt_socket.c:333 libmutt/mutt_socket.c:372
 #, c-format
@@ -1237,9 +1236,8 @@ msgid "Couldn't render image\n"
 msgstr "Неможливо в╕зуал╕зувати зображення\n"
 
 #: src/balsa-message.c:778
-#, fuzzy
 msgid "balsa/pixbuf: Could not load image. It is likely corrupted."
-msgstr "Не вдалося завантажити зображення. Напевно воно з╕псоване."
+msgstr "balsa/pixbuf: Не вдалося завантажити зображення. Напевно воно з╕псоване."
 
 #: src/balsa-message.c:827
 msgid "No open or view action defined in GNOME MIME for this content type"
@@ -1839,27 +1837,27 @@ msgstr "Показати вс╕ заголовки"
 
 #: src/main-window.c:334
 msgid "_Flat index"
-msgstr ""
+msgstr "Суц╕льний ╕ндекс"
 
 #: src/main-window.c:334
 msgid "No threading at all"
-msgstr ""
+msgstr "Не розбирати по темам"
 
 #: src/main-window.c:337
 msgid "S_imple threading"
-msgstr ""
+msgstr "Простий розб╕р по темам"
 
 #: src/main-window.c:338
 msgid "Simple threading algorithm"
-msgstr ""
+msgstr "Простий алгоритм розбору по темам"
 
 #: src/main-window.c:341
 msgid "_JWZ threading"
-msgstr ""
+msgstr "Розб╕р по темам _JWZ"
 
 #: src/main-window.c:342
 msgid "Elaborate JWZ threading"
-msgstr ""
+msgstr "Розвиток розбору по темам JWZ"
 
 #: src/main-window.c:349
 msgid "_Show Mailbox Tree"
@@ -1890,9 +1888,8 @@ msgid "Toggle flagged"
 msgstr "Встановити/зняти в╕дм╕тку"
 
 #: src/main-window.c:378
-#, fuzzy
 msgid "Toggle New"
-msgstr "Перемикнути"
+msgstr "Перемикнути новий"
 
 #: src/main-window.c:390 src/message-window.c:103
 msgid "_Reply..."
@@ -3174,88 +3171,3 @@ msgstr "Нема╓ вибрано╖ адресно╖ книги..."
 #: src/store-address.c:257
 msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr "Вибачте, в ╕мен╕ не можна мати крапку з комою!\n"
-
-#~ msgid "Sorry. Balsa doesn't (yet) know how to create a maildir mailbox"
-#~ msgstr "Вибачте. Balsa ще не вм╕╓ створювати поштов╕ скриньки Maildir."
-
-#~ msgid "Sorry. Balsa doesn't (yet) know how to create a mh mailbox"
-#~ msgstr "Вибачте. Balsa ще не вм╕╓ створювати поштов╕ скриньки MH."
-
-#~ msgid "Anonymous authentication not supported."
-#~ msgstr "Анон╕мна ╕дентиф╕кац╕я не п╕дтриму╓ться."
-
-#~ msgid "Skipping CRAM-MD5 authentication."
-#~ msgstr "Пропуск ╕дентиф╕кац╕╖ CRAM-MD5."
-
-#~ msgid "Local Mbox Mailbox..."
-#~ msgstr "Локальна скринька Mbox..."
-
-#~ msgid "Local Maildir Mailbox..."
-#~ msgstr "Локальна скринька Maildir..."
-
-#~ msgid "Local MH Mailbox..."
-#~ msgstr "Локальна скринька MH..."
-
-#~ msgid "_Toggle Flagged"
-#~ msgstr "Встановити/зняти в╕дм╕тку"
-
-#~ msgid "N_o headers"
-#~ msgstr "Без заголовк╕в"
-
-#~ msgid "_Selected headers"
-#~ msgstr "Вибран╕ заголовки"
-
-#~ msgid "All _headers"
-#~ msgstr "Вс╕ заголовки"
-
-#~ msgid "Reply to _all..."
-#~ msgstr "В╕дпов╕сти ус╕м..."
-
-#~ msgid "Printing"
-#~ msgstr "Друкування"
-
-#~ msgid "Informational Messages"
-#~ msgstr "╤нформац╕йн╕ пов╕домлення"
-
-#~ msgid "characters"
-#~ msgstr "символи"
-
-#~ msgid "Print command:"
-#~ msgstr "Команда друку:"
-
-#~ msgid "Break line at:"
-#~ msgstr "Розривати рядок на:"
-
-#~ msgid "Browse..."
-#~ msgstr "Перегляд..."
-
-#~ msgid "Quoted text primary colour"
-#~ msgstr "Первинний кол╕р цитат"
-
-#~ msgid ""
-#~ "Enter print command below\n"
-#~ "Remember to include '%s'"
-#~ msgstr ""
-#~ "Введ╕ть команду друку нижче\n"
-#~ "Не забутьте включити \"%s\""
-
-#~ msgid "Print Command:"
-#~ msgstr "Команда друку:"
-
-#~ msgid "Send the currently edited message"
-#~ msgstr "В╕д╕слати поточне пов╕домлення"
-
-#~ msgid "cc:"
-#~ msgstr "cc:"
-
-#~ msgid "bcc:"
-#~ msgstr "bcc:"
-
-#~ msgid "fcc:"
-#~ msgstr "fcc:"
-
-#~ msgid "Cannot execute print command."
-#~ msgstr "Неможливо виконати команду друку."
-
-#~ msgid "Error executing lpr"
-#~ msgstr "Помилка виконання lpr"

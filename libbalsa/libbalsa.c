@@ -167,7 +167,7 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 
     Charset = "UTF-8";
     /* more likely to least likely or something: order *is* relevant!  */
-    SendCharset = "us-ascii:iso-8859-1:iso-8859-15:iso-8859-2:iso-8859-9:iso-8859-13:KOI8-R:euc-kr:euc-jp:UTF-8";    
+    SendCharset = "us-ascii:iso-8859-1:iso-8859-15:iso-8859-2:iso-8859-9:iso-8859-13:KOI8-R:iso-8859-5:euc-kr:euc-jp:UTF-8";    
 
     libbalsa_notify_init();
 

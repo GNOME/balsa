@@ -347,7 +347,7 @@ struct SendLocales {
     {"da_DK", "ISO-8859-1",    N_("_Danish")},
     {"nl_NL", "ISO-8859-15",   N_("_Dutch")},
     {"en_US", "ISO-8859-1",    N_("_English (American)")}, 
-    {"en_UK", "ISO-8859-1",    N_("_English (British)")}, 
+    {"en_GB", "ISO-8859-1",    N_("_English (British)")}, 
     {"eo_XX", "UTF-8",         N_("_Esperanto")},
     {"et_EE", "ISO-8859-15",   N_("_Estonian")},
     {"fi_FI", "ISO-8859-15",   N_("_Finnish")},
@@ -367,6 +367,8 @@ struct SendLocales {
     {"ro_RO", "ISO-8859-2",    N_("_Romanian")},
     {"ru_SU", "ISO-8859-5",    N_("_Russian (ISO)")},
     {"ru_RU", "KOI8-R",        N_("_Russian (KOI)")},
+    {"sr_Cyrl", "ISO-8859-5",  N_("_Serbian")},
+    {"sr_Latn", "ISO-8859-2",  N_("_Serbian (Latin)")},
     {"sk_SK", "ISO-8859-2",    N_("_Slovak")},
     {"es_ES", "ISO-8859-15",   N_("_Spanish")},
     {"sv_SE", "ISO-8859-1",    N_("_Swedish")},
@@ -794,9 +796,10 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg)
         }
         gnome_vfs_mime_application_free (app);
     } else {
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("Gnome editor is not defined"
-                            " in your preferred applications."));
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_ERROR,
+                                   _("Gnome editor is not defined"
+                                     " in your preferred applications."));
         return;
     }
 
@@ -3441,10 +3444,13 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 
     g_free(res);
     if (err) {
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("The message cannot be encoded in charset %s.\n"
-                            "Please choose a language for this message."),
-                          bsmsg->charset);
+        balsa_information_parented
+            (GTK_WINDOW(bsmsg->window),
+             LIBBALSA_INFORMATION_ERROR,
+             _("The message cannot be encoded in charset %s.\n"
+               "Please choose a language for this message.\n"
+               "For multi-language messages, choose UTF-8."),
+             bsmsg->charset);
         g_error_free(err);
         return FALSE;
     }

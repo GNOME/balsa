@@ -250,7 +250,7 @@ msgstr ""
 #: libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
-msgstr "Не удалось создать каталог: mkdir() failed on pathname \\\"%s\\\"."
+msgstr "Не удалось создать каталог: mkdir() failed on pathname \"%s\"."
 
 #: libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
 #, c-format
@@ -422,7 +422,7 @@ msgstr "Невозможно записать письмо"
 
 #: libmutt/pop.c:136
 msgid "Unable to get APOP seed from server"
-msgstr "Не удаллось получить зерно APOP с сервера"
+msgstr "Не удалось получить зерно APOP с сервера"
 
 #: libmutt/imap/auth.c:110
 msgid "Authenticating (CRAM-MD5)..."
@@ -677,7 +677,7 @@ msgid ""
 "The address book file path '%s' is not correct.\n"
 "Do you want to correct the file name?"
 msgstr ""
-"Путь к файлу адресной книге \"%s\" не корректен.\n"
+"Путь к файлу адресной книги \"%s\" не корректен.\n"
 "Хотите исправить имя файла?"
 
 #: src/balsa-app.c:72
@@ -686,7 +686,7 @@ msgid ""
 "Opening remote mailbox %s.\n"
 "The password for %s@%s:"
 msgstr ""
-"Отрытие удаленного почтового ящика %s.\n"
+"Открытие удаленного почтового ящика %s.\n"
 "Пароль для %s@%s:"
 
 #: src/balsa-app.c:76
@@ -798,7 +798,7 @@ msgstr "Отменить"
 
 #: src/balsa-message.c:300
 msgid "Please choose a filename to save this part of the message as:"
-msgstr "Выберите имя файла для сохранения этой части изображения:"
+msgstr "Выберите имя файла для сохранения этой части сообщения:"
 
 #: src/balsa-message.c:331
 #, c-format
@@ -1205,7 +1205,7 @@ msgstr "Порт:"
 #. username
 #: src/mailbox-conf.c:899 src/mailbox-conf.c:957
 msgid "Username:"
-msgstr "Имя пользоватеся:"
+msgstr "Имя пользователя:"
 
 #. password field
 #: src/mailbox-conf.c:904 src/mailbox-conf.c:961
@@ -1408,7 +1408,7 @@ msgstr "Сохранить адрес отправителя в записной книжке"
 
 #: src/main-window.c:370
 msgid "Next Message"
-msgstr "Следущее письмо"
+msgstr "Следующее письмо"
 
 #: src/main-window.c:375
 msgid "Previous Message"
@@ -2039,7 +2039,7 @@ msgstr "Шрифт:"
 
 #: src/pref-manager.c:1991 src/pref-manager.c:2040
 msgid "Select a font to use"
-msgstr "Выбор шрфта"
+msgstr "Выбор шрифта"
 
 #: src/pref-manager.c:1995 src/pref-manager.c:2044
 msgid "Browse..."
@@ -2118,7 +2118,7 @@ msgid ""
 "Remember to include '%s'"
 msgstr ""
 "Введите команду печати\n"
-"незабудьте включить '%s'"
+"не забудьте включить '%s'"
 
 #: src/print.c:82
 msgid "Print Command:"
@@ -2280,7 +2280,7 @@ msgstr "Датский"
 
 #: src/sendmsg-window.c:284 src/sendmsg-window.c:370
 msgid "Dutch"
-msgstr "Голандский"
+msgstr "Голландский"
 
 #: src/sendmsg-window.c:285 src/sendmsg-window.c:372
 msgid "English"

@@ -1376,7 +1376,10 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		}
 		g_strfreev(mime_type);
 
-		g_mime_part_set_filename(mime_part, body->filename);
+		tmp = g_path_get_basename(body->filename);
+		g_mime_part_set_filename(mime_part, tmp);
+		g_free(tmp);
+
 		encoding = g_mime_part_get_encoding(mime_part);
 		fd = open(body->filename, O_RDONLY);
 		stream = g_mime_stream_fs_new(fd);

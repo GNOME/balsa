@@ -1,3 +1,10 @@
+1999-01-08  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	* src/balsa-mblist.c (balsa_mblist_redraw): start to add 
+	mailbox info in the mailbox list window (number of  messages, 
+	number of unread messages). This should be configurable cause
+	I guess not everybody likes this. 
+
 1999-01-08  Nat Friedman  <nat@nat.org>
 
 	* src/main-window.c (settings_menu): No separator before

@@ -132,10 +132,11 @@ balsa_mblist_class_init (BalsaMBListClass * klass)
 static void
 balsa_mblist_init (BalsaMBList * tree)
 {
+  char *titles[3]={"name", "unread", "total"};
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
-
-  gtk_ctree_construct (GTK_CTREE (tree), 1, 0, NULL);
+  
+  gtk_ctree_construct (GTK_CTREE (tree), 3, 0, titles);
 
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
@@ -149,6 +150,9 @@ balsa_mblist_init (BalsaMBList * tree)
   gtk_ctree_set_line_style (GTK_CTREE (tree), GTK_CTREE_LINES_DOTTED);
   gtk_ctree_set_expander_style (GTK_CTREE (tree), GTK_CTREE_EXPANDER_CIRCULAR);
   gtk_clist_set_row_height (GTK_CLIST (tree), 16);
+  gtk_clist_set_column_width (GTK_CLIST (tree), 0, 80);
+  gtk_clist_set_column_width (GTK_CLIST (tree), 1, 40);
+  gtk_clist_set_column_width (GTK_CLIST (tree), 2, 40);
 
   gtk_signal_connect (GTK_OBJECT (tree), "tree_select_row",
 		      GTK_SIGNAL_FUNC (select_mailbox),
@@ -166,7 +170,7 @@ void
 balsa_mblist_redraw (BalsaMBList * bmbl)
 {
   GtkCTreeNode *ctnode;
-  gchar *text[1];
+  gchar *text[3];
   GtkCTree *ctree;
 
   if (!BALSA_IS_MBLIST (bmbl))
@@ -178,8 +182,11 @@ balsa_mblist_redraw (BalsaMBList * bmbl)
 
   gtk_clist_freeze (GTK_CLIST (ctree));
 
+  text[1] = "";
+  text[2] = "";
   /* inbox */
   text[0] = "Inbox";
+  
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5,
 				  balsa_icon_get_pixmap (BALSA_ICON_INBOX),
 				  balsa_icon_get_bitmap (BALSA_ICON_INBOX),

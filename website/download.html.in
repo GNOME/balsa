@@ -49,8 +49,8 @@
 	<td colspan="2"><p>&nbsp;</p></td>
 </tr>
 <tr>
-	<td colspan="2"><p>We are looking for someone to help us make Debian packages or provide packages for more architectures. If you're interested, 
-		email <a href="mailto:balsa-maintainers@theochem.kth.se>the Balsa maintainers</a></p></td>
+	<td><p>We are looking for someone to help us make Debian packages or provide packages for more architectures. If you're interested, 
+		email <a href="mailto:balsa-maintainers@theochem.kth.se">the Balsa maintainers</a>.</p></td>
 </tr>
 <tr>
 	<td colspan="2"><hr></td>

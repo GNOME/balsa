@@ -1,5 +1,18 @@
 1999-11-12  Peter Williams  <peter@wgwill.ne.mediaone.net>
 
+	* src/main-window.c (balsa_window_real_close_mailbox): Implemented
+	real_close_mailbox().
+
+	* src/balsa-index-page.[ch] (balsa_index_page_close_and_destroy): 
+	Added a delete function for BalsaIndexPage. Hooks up to destroy
+	signal so you should call gtk_object_destroy() on it.
+
+	* src/mblist-window.c (mblist_open_mailbox): Prevent multiple 
+	windows of the same MB opened.
+
+	* src/main-window.c (file_menu): Add the 'Exit' menu item back, 
+	hooked to balsa_exit().
+
 	* src/balsa-app.c (read_signature): Fix off-by-one on .signature loading.
 
 1999-07-28 Tomasz K³oczko <kloczek@pld.org.pl>

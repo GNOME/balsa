@@ -115,8 +115,9 @@ static GnomeUIInfo file_menu[] =
 
   GNOMEUIINFO_SEPARATOR,
 
-  // XXX
-  //  GNOMEUIINFO_MENU_EXIT_ITEM(close_main_window, NULL), 
+  // XXX 
+  // GNOMEUIINFO_MENU_EXIT_ITEM(close_main_window, NULL), 
+  GNOMEUIINFO_MENU_EXIT_ITEM(balsa_exit, NULL),
 
   GNOMEUIINFO_END
 };
@@ -475,7 +476,9 @@ static void balsa_window_real_open_mailbox(BalsaWindow *window, Mailbox *mailbox
 {
   GtkObject *page;
   GtkWidget *label;
-  label = gtk_label_new("blah");
+
+/*  label = gtk_label_new("blah"); PKGW: dunno why this was here. */
+
   page = balsa_index_page_new(window);
   balsa_index_page_load_mailbox(BALSA_INDEX_PAGE(page), mailbox);
 
@@ -483,7 +486,6 @@ static void balsa_window_real_open_mailbox(BalsaWindow *window, Mailbox *mailbox
 
   /* store for easy access */
   gtk_object_set_data(GTK_OBJECT(BALSA_INDEX_PAGE(page)->sw), "indexpage", page);
-
   gtk_notebook_append_page(GTK_NOTEBOOK(window->notebook), GTK_WIDGET(BALSA_INDEX_PAGE(page)->sw), label);
 
   /* change the page to the newly selected notebook item */
@@ -493,7 +495,30 @@ static void balsa_window_real_open_mailbox(BalsaWindow *window, Mailbox *mailbox
 
 static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbox)
 {
-  printf("FIXME: Can't close mailboxes.\n");
+/*  printf("FIXME: Can't close mailboxes.\n"); 
+    Sadly, we don't get the IndexPage pointer given to us. Ah well. */
+    GtkWidget *page;
+    guint32 i;
+
+    /*Eeeew.... we'd better hope that the mailbox is actually opened, or 
+      you're asking for Bad Things to Happen (TM).*/
+    i = 0;
+    while( 1 ) {
+	/* This is the scrolled window. */
+	page = gtk_notebook_get_nth_page( GTK_NOTEBOOK( window->notebook ), i );
+	if( page == NULL ) {
+	    g_warning( "Can't find mailbox \"%s\" in notebook!", mailbox->name );
+	    return;
+	}
+	page = gtk_object_get_data( GTK_OBJECT( page ), "indexpage" );
+	if( (BALSA_INDEX_PAGE( page ))->mailbox == mailbox )
+	    break;
+	i++;
+    }
+
+    gtk_notebook_remove_page( GTK_NOTEBOOK( window->notebook ), i );
+    (BALSA_INDEX_PAGE( page ))->sw = NULL; /* This was just toasted */
+    gtk_object_destroy( GTK_OBJECT( page ) );
 }
 
 

@@ -153,6 +153,15 @@ mblist_open_mailbox (Mailbox * mailbox)
   if (!mblw)
     return;
 
+  /* PKGW: check if already open. Is this way of doing it ok?
+     Can open_ref be increased other than opening the MB in
+     a window?
+   */
+  if( mailbox->open_ref ) {
+      /*Don't bother with an error message.*/
+      return;
+  }
+
   balsa_window_open_mailbox(BALSA_WINDOW(mblw->window), mailbox);
   //  index_child = index_child_new (mblw->window, mailbox);
 

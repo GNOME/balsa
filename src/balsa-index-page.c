@@ -106,6 +106,8 @@ balsa_index_page_class_init(BalsaIndexPageClass *class)
   object_class = (GtkObjectClass *) class;
 
   //  object_class->destroy = index_child_destroy;
+  /*PKGW*/
+  object_class->destroy = balsa_index_page_close_and_destroy;
 
   parent_class = gtk_type_class(GTK_TYPE_OBJECT);
 }
@@ -242,6 +244,33 @@ void balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
   }
 
   balsa_index_set_mailbox(BALSA_INDEX(page->index), mailbox);
+}
+
+/* PKGW: you'd think this function would be a good idea. 
+We assume that we've been detached from the notebook.
+*/
+void balsa_index_page_close_and_destroy( BalsaIndexPage *page )
+{
+    g_return_if_fail( page );
+
+/*    printf( "Close and destroy!\n" );*/
+
+    if( page->index ) {
+	gtk_widget_destroy( GTK_WIDGET( page->index ) );
+	page->index = NULL;
+    }
+
+    if( page->sw ) {
+	gtk_widget_destroy( GTK_WIDGET( page->sw ) );
+	page->sw = NULL;
+    }
+
+    /*page->window references our owner*/
+
+    if( page->mailbox ) {
+	mailbox_open_unref( page->mailbox );
+	page->mailbox = NULL;
+    }
 }
 
 static gint handler = 0;

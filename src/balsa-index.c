@@ -640,7 +640,7 @@ bndx_drag_cb (GtkWidget* widget, GdkDragContext* drag_context,
                                 (message_array->len)*sizeof (gpointer));
         /* the selection data makes a copy of the data, we 
          * can free it now. */
-        g_ptr_array_free (message_array, FALSE);
+        g_ptr_array_free (message_array, TRUE);
     }
 }
 

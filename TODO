@@ -9,6 +9,9 @@ little things:
 
 later stuff:
 
+ * set cursor for window to GDK_WATCH when we are loading a mailbox so that we
+   let the user know we are busy.  use: gdk_cursor_new() and gdk_window_set_cursor()
+
  * inbox/outbox/trash should be able to be IMAP
     this can be done by editing ~/.balsarc
 

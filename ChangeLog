@@ -1,3 +1,7 @@
+2004-10-30 11:37  PeterB
+
+	* src/main.c: destroy balsa_threads_mutex on exit.
+
 2004-10-29 15:11  PeterB
 
 	* src/ab-main.c: restore address book radio button mnemonics.

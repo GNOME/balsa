@@ -22,13 +22,20 @@
 #include "copy.h"
 #include "rfc2047.h"
 #include "parse.h"
+#include "mime.h"
+
+#ifdef _PGPPATH
+#include "pgp.h"
+#endif
+
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <unistd.h> /* needed for SEEK_SET under SunOS 4.1.4 */
 
-static int copy_delete_attach(HEADER *h, HEADER *p, BODY *m, FILE *fpin,
-                              FILE *fpout, int flags);
+extern char MimeSpecials[];
+
+static int copy_delete_attach (BODY *b, FILE *fpin, FILE *fpout, char *date);
 
 /* Ok, the only reason for not merging this with mutt_copy_header()
  * below is to avoid creating a HEADER structure in message_handler().
@@ -53,7 +60,7 @@ mutt_copy_hdr (FILE *in, FILE *out, long off_start, long off_end, int flags,
   buf[0] = '\n';
   buf[1] = 0;
 
-  if ((flags & (CH_REORDER | CH_WEED | CH_MIME | CH_DECODE | CH_PREFIX)) == 0)
+  if ((flags & (CH_REORDER | CH_WEED | CH_MIME | CH_DECODE | CH_PREFIX | CH_WEED_DELIVERED)) == 0)
   {
     /* Without these flags to complicate things
      * we can do a more efficient line to line copying
@@ -69,7 +76,7 @@ mutt_copy_hdr (FILE *in, FILE *out, long off_start, long off_end, int flags,
       if (nl && buf[0] != ' ' && buf[0] != '\t')
       {
 	ignore = 1;
-	if (!from && strncmp ("From ", buf, 5) == 0)
+	if (!from && mutt_strncmp ("From ", buf, 5) == 0)
 	{
 	  if ((flags & CH_FROM) == 0)
 	    continue;
@@ -79,12 +86,12 @@ mutt_copy_hdr (FILE *in, FILE *out, long off_start, long off_end, int flags,
 	  break; /* end of header */
 
 	if ((flags & (CH_UPDATE | CH_XMIT | CH_NOSTATUS)) &&
-	    (strncasecmp ("Status:", buf, 7) == 0 ||
-	     strncasecmp ("X-Status:", buf, 9) == 0))
+	    (mutt_strncasecmp ("Status:", buf, 7) == 0 ||
+	     mutt_strncasecmp ("X-Status:", buf, 9) == 0))
 	  continue;
-	if ((flags & (CH_UPDATE_LEN | CH_XMIT)) &&
-	    (strncasecmp ("Content-Length:", buf, 15) == 0 ||
-	     strncasecmp ("Lines:", buf, 6) == 0))
+	if ((flags & (CH_UPDATE_LEN | CH_XMIT | CH_NOLEN)) &&
+	    (mutt_strncasecmp ("Content-Length:", buf, 15) == 0 ||
+	     mutt_strncasecmp ("Lines:", buf, 6) == 0))
 	  continue;
 	ignore = 0;
       }
@@ -129,7 +136,7 @@ mutt_copy_hdr (FILE *in, FILE *out, long off_start, long off_end, int flags,
     if (nl && buf[0] != ' ' && buf[0] != '\t')
     {
       ignore = 1;
-      if (!from && strncmp ("From ", buf, 5) == 0)
+      if (!from && mutt_strncmp ("From ", buf, 5) == 0)
       {
 	if ((flags & CH_FROM) == 0)
 	  continue;
@@ -142,19 +149,22 @@ mutt_copy_hdr (FILE *in, FILE *out, long off_start, long off_end, int flags,
 	  mutt_matches_ignore (buf, Ignore) &&
 	  !mutt_matches_ignore (buf, UnIgnore))
 	continue;
-      if ((flags & (CH_UPDATE | CH_XMIT | CH_NOSTATUS)) &&
-	  (strncasecmp ("Status:", buf, 7) == 0 ||
-	   strncasecmp ("X-Status:", buf, 9) == 0))
+      if ((flags & CH_WEED_DELIVERED) &&
+	  mutt_strncasecmp ("Delivered-To:", buf, 13) == 0)
 	continue;
-      if ((flags & (CH_UPDATE_LEN | CH_XMIT)) &&
-	  (strncasecmp ("Content-Length:", buf, 15) == 0 ||
-	   strncasecmp ("Lines:", buf, 6) == 0))
+      if ((flags & (CH_UPDATE | CH_XMIT | CH_NOSTATUS)) &&
+	  (mutt_strncasecmp ("Status:", buf, 7) == 0 ||
+	   mutt_strncasecmp ("X-Status:", buf, 9) == 0))
+	continue;
+      if ((flags & (CH_UPDATE_LEN | CH_XMIT | CH_NOLEN)) &&
+	  (mutt_strncasecmp ("Content-Length:", buf, 15) == 0 ||
+	   mutt_strncasecmp ("Lines:", buf, 6) == 0))
 	continue;
       if ((flags & CH_MIME) &&
-	  ((strncasecmp ("content-", buf, 8) == 0 &&
-	    (strncasecmp ("transfer-encoding:", buf + 8, 18) == 0 ||
-	     strncasecmp ("type:", buf + 8, 5) == 0)) ||
-	   strncasecmp ("mime-version:", buf, 13) == 0))
+	  ((mutt_strncasecmp ("content-", buf, 8) == 0 &&
+	    (mutt_strncasecmp ("transfer-encoding:", buf + 8, 18) == 0 ||
+	     mutt_strncasecmp ("type:", buf + 8, 5) == 0)) ||
+	   mutt_strncasecmp ("mime-version:", buf, 13) == 0))
 	continue;
 
       /* Find x -- the array entry where this header is to be saved */
@@ -162,10 +172,9 @@ mutt_copy_hdr (FILE *in, FILE *out, long off_start, long off_end, int flags,
       {
 	for (t = HeaderOrderList, x = 0 ; (t) ; t = t->next, x++)
 	{
-	  if (!strncasecmp (buf, t->data, strlen (t->data)))
+	  if (!mutt_strncasecmp (buf, t->data, mutt_strlen (t->data)))
 	  {
-	    dprint(2, (debugfile, "Reorder: %s matches %s\n", t->data, 
-		       headers[x]));
+	    dprint(2, (debugfile, "Reorder: %s matches %s", t->data, buf));
 	    break;
 	  }
 	}
@@ -182,7 +191,7 @@ mutt_copy_hdr (FILE *in, FILE *out, long off_start, long off_end, int flags,
       else
       {
 	safe_realloc ((void **) &headers[x],
-		      strlen (headers[x]) + strlen (buf) + sizeof (char));
+		      mutt_strlen (headers[x]) + mutt_strlen (buf) + sizeof (char));
 	strcat (headers[x], buf);
       }
     }
@@ -194,7 +203,7 @@ mutt_copy_hdr (FILE *in, FILE *out, long off_start, long off_end, int flags,
     if (headers[x])
     {
       if (flags & CH_DECODE)
-	rfc2047_decode (headers[x], headers[x], strlen (headers[x]));
+	rfc2047_decode (headers[x], headers[x], mutt_strlen (headers[x]) + 1);
 
       /* We couldn't do the prefixing when reading because RFC 2047
        * decoding may have concatenated lines.
@@ -254,11 +263,12 @@ mutt_copy_hdr (FILE *in, FILE *out, long off_start, long off_end, int flags,
  	CH_DECODE	RFC2047 header decoding
  	CH_FROM		retain the "From " message separator
  	CH_MIME		ignore MIME fields
+	CH_NOLEN	don't write Content-Length: and Lines:
  	CH_NONEWLINE	don't output a newline after the header
  	CH_NOSTATUS	ignore the Status: and X-Status:
  	CH_PREFIX	quote header with $indent_str
  	CH_REORDER	output header in order specified by `hdr_order'
-  	CH_TXTPLAIN	generate text/plain MIME headers
+  	CH_TXTPLAIN	generate text/plain MIME headers [hack alert.]
  	CH_UPDATE	write new Status: and X-Status:
  	CH_UPDATE_LEN	write new Content-Length: and Lines:
  	CH_XMIT		ignore Lines: and Content-Length:
@@ -271,16 +281,21 @@ mutt_copy_hdr (FILE *in, FILE *out, long off_start, long off_end, int flags,
 int
 mutt_copy_header (FILE *in, HEADER *h, FILE *out, int flags, const char *prefix)
 {
+  char buffer[SHORT_STRING];
+
   if (mutt_copy_hdr (in, out, h->offset, h->content->offset, flags, prefix) == -1)
     return (-1);
 
   if (flags & CH_TXTPLAIN)
   {
     fputs ("Mime-Version: 1.0\n", out);
-    fputs ("Content-Type: text/plain\n", out);
     fputs ("Content-Transfer-Encoding: 8bit\n", out);
+    fputs ("Content-Type: text/plain; charset=", out);
+    rfc822_cat(buffer, sizeof(buffer), Charset, MimeSpecials);
+    fputs(buffer, out);
+    fputc('\n', out);
   }
-  
+
   if (flags & CH_UPDATE)
   {
     if ((flags & CH_NOSTATUS) == 0)
@@ -328,7 +343,8 @@ mutt_copy_header (FILE *in, HEADER *h, FILE *out, int flags, const char *prefix)
     }
   }
 
-  if (flags & CH_UPDATE_LEN)
+  if (flags & CH_UPDATE_LEN &&
+      (flags & CH_NOLEN) == 0)
   {
     fprintf (out, "Content-Length: %ld\n", h->content->length);
     if (h->lines != 0 || h->content->length == 0)
@@ -337,11 +353,45 @@ mutt_copy_header (FILE *in, HEADER *h, FILE *out, int flags, const char *prefix)
 
   if ((flags & CH_NONEWLINE) == 0)
   {
+    if (flags & CH_PREFIX)
+      fputs(prefix, out);
     if (fputc ('\n', out) == EOF) /* add header terminator */
       return (-1);
   }
 
   return (0);
+}
+
+/* Count the number of lines and bytes to be deleted in this body*/
+static int count_delete_lines (FILE *fp, BODY *b, long *length, size_t datelen)
+{
+  int dellines = 0;
+  long l;
+  int ch;
+
+  if (b->deleted)
+  {
+    fseek (fp, b->offset, SEEK_SET);
+    for (l = b->length ; l ; l --)
+    {
+      ch = getc (fp);
+      if (ch == EOF)
+	break;
+      if (ch == '\n')
+	dellines ++;
+    }
+    dellines -= 3;
+    *length -= b->length - (84 + datelen);
+    /* Count the number of digits exceeding the first one to write the size */
+    for (l = 10 ; b->length >= l ; l *= 10)
+      (*length) ++;
+  }
+  else
+  {
+    for (b = b->parts ; b ; b = b->next)
+      dellines += count_delete_lines (fp, b, length, datelen);
+  }
+  return dellines;
 }
 
 /* make a copy of a message
@@ -356,6 +406,8 @@ mutt_copy_header (FILE *in, HEADER *h, FILE *out, int flags, const char *prefix)
  	M_CM_DECODE	decode message body to text/plain
  	M_CM_DISPLAY	displaying output to the user
 	M_CM_UPDATE	update structures in memory after syncing
+	M_CM_DECODE_PGP	used for decoding PGP messages
+        M_CM_CHARCONV	perform character set conversion
    chflags	flags to mutt_copy_header()
  */
 
@@ -365,27 +417,81 @@ _mutt_copy_message (FILE *fpout, FILE *fpin, HEADER *hdr, BODY *body,
 {
   char prefix[SHORT_STRING];
   STATE s;
+  long new_offset = -1;
+
 #ifndef LIBMUTT
   if (flags & M_CM_PREFIX)
     _mutt_make_string (prefix, sizeof (prefix), NONULL (Prefix), Context, hdr, 0);
 #endif
+
   if ((flags & M_CM_NOHEADER) == 0)
   {
     if (flags & M_CM_PREFIX)
       chflags |= CH_PREFIX;
 
-   /* eventually update Content-Length/Lines: count in HEADER,
-    * for now we punt (don't copy them in mutt_copy_header() */
-     if (hdr->attach_del)
-     {
-       dprint (1, (debugfile, "changing flags\n"));
-       chflags |= CH_XMIT;
-       chflags &= ~CH_UPDATE_LEN;
-     }
+    else if (hdr->attach_del && (chflags & CH_UPDATE_LEN))
+    {
+      int new_lines;
+      long new_length = body->length;
+      char date[SHORT_STRING];
+
+      mutt_make_date (date, sizeof (date));
+      date[5] = date[mutt_strlen (date) - 1] = '\"';
+
+      /* Count the number of lines and bytes to be deleted */
+      fseek (fpin, body->offset, SEEK_SET);
+      new_lines = hdr->lines -
+	count_delete_lines (fpin, body, &new_length, mutt_strlen (date));
+
+      /* Copy the headers */
+      if (mutt_copy_header (fpin, hdr, fpout,
+			    chflags | CH_NOLEN | CH_NONEWLINE, NULL))
+	return -1;
+      fprintf (fpout, "Content-Length: %ld\n", new_length);
+      if (new_lines <= 0)
+	new_lines = 0;
+      else
+	fprintf (fpout, "Lines: %d\n\n", new_lines);
+      if (ferror (fpout))
+	return -1;
+      new_offset = ftell (fpout);
+
+      /* Copy the body */
+      fseek (fpin, body->offset, SEEK_SET);
+      if (copy_delete_attach (body, fpin, fpout, date))
+	return -1;
+
+#ifdef DEBUG
+      {
+	long fail = ((ftell (fpout) - new_offset) - new_length);
+
+	if (fail)
+	{
+	  mutt_error ("The length calculation was wrong by %ld bytes", fail);
+	  new_length += fail;
+	  sleep (5);
+	}
+      }
+#endif
+
+      /* Update original message if we are sync'ing a mailfolder */ 
+      if (flags & M_CM_UPDATE)
+      {
+	hdr->attach_del = 0;
+	hdr->lines = new_lines;
+	body->offset = new_offset;
+	body->length = new_length;
+	mutt_free_body (&body->parts);
+      }
+
+      return 0;
+    }
 
     if (mutt_copy_header (fpin, hdr, fpout, chflags,
 			  (chflags & CH_PREFIX) ? prefix : NULL) == -1)
       return -1;
+
+    new_offset = ftell (fpout);
   }
 
   if (flags & M_CM_DECODE)
@@ -398,14 +504,42 @@ _mutt_copy_message (FILE *fpout, FILE *fpin, HEADER *hdr, BODY *body,
       s.prefix = prefix;
     if (flags & M_CM_DISPLAY)
       s.flags |= M_DISPLAY;
-
-
-
-
-
+    if (flags & M_CM_WEED)
+      s.flags |= M_WEED;
+    if (flags & M_CM_CHARCONV)
+      s.flags |= M_CHARCONV;
+    
+#ifdef _PGPPATH
+    if (flags & M_CM_VERIFY)
+      s.flags |= M_VERIFY;
+#endif
 
     mutt_body_handler (body, &s);
   }
+#ifdef _PGPPATH
+  else if ((flags & M_CM_DECODE_PGP) && (hdr->pgp & PGPENCRYPT) &&
+      hdr->content->type == TYPEMULTIPART)
+  {
+    BODY *cur;
+    FILE *fp;
+
+    if (pgp_decrypt_mime (fpin, &fp, hdr->content, &cur))
+      return (-1);
+    fputs ("Mime-Version: 1.0\n", fpout);
+    mutt_write_mime_header (cur, fpout);
+    fputc ('\n', fpout);
+
+    fseek (fp, cur->offset, 0);
+    if (mutt_copy_bytes (fp, fpout, cur->length) == -1)
+    {
+      fclose (fp);
+      mutt_free_body (&cur);
+      return (-1);
+    }
+    mutt_free_body (&cur);
+    fclose (fp);
+  }
+#endif
   else
   {
     fseek (fpin, body->offset, 0);
@@ -425,20 +559,17 @@ _mutt_copy_message (FILE *fpout, FILE *fpin, HEADER *hdr, BODY *body,
 	}
       } 
     }
-    else
-    {
-      if (hdr->attach_del)
-      {
-	if (copy_delete_attach (hdr, NULL, NULL, fpin, fpout, flags) == -1)
-	  return -1;
-      }
-      else 
-      {
-	if (mutt_copy_bytes (fpin, fpout, body->length) == -1)
-	  return -1;
-      }
-    }
+    else if (mutt_copy_bytes (fpin, fpout, body->length) == -1)
+      return -1;
   }
+
+  if ((flags & M_CM_UPDATE) && (flags & M_CM_NOHEADER) == 0 
+      && new_offset != -1)
+  {
+    body->offset = new_offset;
+    mutt_free_body (&body->parts);
+  }
+
   return 0;
 }
 
@@ -474,12 +605,15 @@ _mutt_append_message (CONTEXT *dest, FILE *fpin, CONTEXT *src, HEADER *hdr,
   MESSAGE *msg;
   int r;
 
-  if ((msg = mx_open_new_message (dest, hdr, (src->magic == M_MBOX || src->magic == M_MMDF) ? 0 : M_ADD_FROM)) == NULL)
+  if ((msg = mx_open_new_message (dest, hdr, (src->magic == M_MBOX || src->magic == M_MMDF || src->magic == M_KENDRA) ? 0 : M_ADD_FROM)) == NULL)
     return -1;
-  if (dest->magic == M_MBOX || dest->magic == M_MMDF)
+  if (dest->magic == M_MBOX || dest->magic == M_MMDF || dest->magic == M_KENDRA)
     chflags |= CH_FROM;
   chflags |= (dest->magic == M_MAILDIR ? CH_NOSTATUS : CH_UPDATE);
   r = _mutt_copy_message (msg->fp, fpin, hdr, body, flags, chflags);
+  if (mx_commit_message (msg, dest) != 0)
+    r = -1;
+
   mx_close_message (&msg);
   return r;
 }
@@ -499,130 +633,51 @@ mutt_append_message (CONTEXT *dest, CONTEXT *src, HEADER *hdr, int cmflags,
 }
 
 /*
- * copy_delete_attach()
+ * This function copies a message body, while deleting _in_the_copy_
+ * any attachments which are marked for deletion.
+ * Nothing is changed in the original message -- this is left to the caller.
  *
- * This function copies a message into an mbox folder and deletes 
- * any attachments which are marked for deletion
- *
- * A side effect of this is that any message copied using this function
- * will not have content-length: and lines: headers, but these will be updated 
- * on the next sync of this mailbox
- *
- * This function will return 0 on success, -1 on failure.
- */ 
-static int copy_delete_attach(HEADER *h, HEADER *p, BODY *m, FILE *fpin,
-                              FILE *fpout, int flags)
+ * The function will return 0 on success and -1 on failure.
+ */
+static int copy_delete_attach (BODY *b, FILE *fpin, FILE *fpout, char *date)
 {
-  long offset = 0;
-  BODY *b;
-  char buf[STRING];
-  long orig_length = 0;
-  long orig_offset = 0;
-  long new_length = 0;
-  long new_offset = 0;
-  int x;
+  BODY *part;
 
-  new_offset = ftell (fpout);
-  if (h == NULL)
+  for (part = b->parts ; part ; part = part->next)
   {
-    if (m == NULL)
+    if (part->deleted || part->parts)
     {
-      mutt_error ("Confused when attempting to delete attachment, h & m can't be NULL");
-      return -1;
-    }
-    b = m;
-  }
-  else
-  {
-    b = h->content;
-  }
-  orig_length = b->length;
-  orig_offset = b->offset;
-  dprint (1, (debugfile, "orig length: %ld  orig offset: %ld\n", orig_length, orig_offset));
-  /* Find first deleted attachment */
-  if (b->parts == NULL)
-  {
-    mutt_error ("Deleting non-multipart messages not yet supported");
-    return -1;
-  }
-  b = b->parts;
-  while (b != NULL)
-  {
-    while (b && !b->deleted && !b->parts) b = b->next;
+      /* Copy till start of this part */
+      if (mutt_copy_bytes (fpin, fpout, part->hdr_offset - ftell (fpin)))
+	return -1;
 
-    if (b)
-    {
-      /* Copy message from current to deleted attachment headers */
-      offset = ftell (fpin);
-      mutt_copy_bytes (fpin, fpout, b->hdr_offset - offset);
-      new_length += b->hdr_offset - offset;
-
-      if (!b->deleted && b->parts)
+      if (part->deleted)
       {
-	x = ftell (fpout);
-	if (mutt_copy_hdr (fpin, fpout, ftell (fpin), b->offset, 
-	    CH_UPDATE_LEN, NULL) == -1)
+	fprintf (fpout,
+		 "Content-Type: message/external-body; access-type=x-mutt-deleted;\n"
+		 "\texpiration=%s; length=%ld\n"
+		 "\n", date + 5, part->length);
+	if (ferror (fpout))
 	  return -1;
-	new_length += (ftell (fpout) - x);
-	x = fprintf (fpout, "\n");
-	if (x > 0)
-	  new_length += x;
 
-	if (copy_delete_attach(b->hdr, h, b, fpin, fpout, flags) == -1)
+	/* Copy the original mime headers */
+	if (mutt_copy_bytes (fpin, fpout, part->offset - ftell (fpin)))
 	  return -1;
-	new_length += b->parts->length;
+
+	/* Skip the deleted body */
+	fseek (fpin, part->offset + part->length, SEEK_SET);
       }
       else
       {
-	if (h) h->lines = 0;
-#ifndef LIBMUTT
-	mutt_make_string (buf, sizeof (buf), NONULL (DeleteFmt), NULL,
-			  (p) ? p : h);
-#endif
-	/* Go through deleted attachment headers, weed Content-Length,
-	 * Content-Type and Content-Transfer-Encoding 
-	 * Also, keep track of what we write to update the length */
-	x = ftell (fpout);
-	if (mutt_copy_hdr (fpin, fpout, ftell (fpin), b->offset, 
-	    CH_UPDATE_LEN | CH_MIME , NULL) == -1)
+	if (copy_delete_attach (part, fpin, fpout, date))
 	  return -1;
-	new_length += (ftell (fpout) - x);
-	x = fprintf (fpout, "\n%s\n", buf);
-	if (x > 0)
-	  new_length += x;
-	/* Skip the deleted body */
-	fseek (fpin, (b->offset + b->length), SEEK_SET);
-	if (flags & M_CM_UPDATE)
-	  b->deleted = 0;
       }
-      b = b->next;
     }
   }
-  /* Copy til end of message */
-  offset = ftell(fpin);
-  mutt_copy_bytes (fpin, fpout, (orig_offset+orig_length) - offset);
-  new_length +=  (orig_offset+orig_length) - offset;
 
-  /*
-   * Update the content-length and offset.  This offset will be wrong for
-   * mbox/mh type folders, but will be corrected in mbox_sync_mailbox()
-   *
-   */
-  if (flags & M_CM_UPDATE)
-  {
-    dprint (1, (debugfile, "new length: %ld  new offset: %ld\n", new_length, new_offset));
-    if (h)
-    {
-      h->content->length = new_length;
-      h->content->offset = new_offset;
-      h->attach_del = 0;
-    }
-    else if (m)
-    {
-      m->parts->length = new_length;
-      m->parts->offset = new_offset;
-    }
-  }
+  /* Copy the last parts */
+  if (mutt_copy_bytes (fpin, fpout, b->offset + b->length - ftell (fpin)))
+    return -1;
 
   return 0;
 }

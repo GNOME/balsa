@@ -25,7 +25,7 @@
 				probably autodetect this information.</li>
 			<li>How Balsa was set up: How was configure run? Is it an RPM or a source tarball?</li>
 			<li>What causes the bug. <b>Please please please</b> try to find a reliable way to reproduce your bug.
-				It can be difficult to do this, but a bug that can be reporoduced can usually be solved very
+				It can be difficult to do this, but a bug that can be reproduced can usually be solved very
 				quickly.</li>
 			</ul>
 

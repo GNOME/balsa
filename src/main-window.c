@@ -731,23 +731,30 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
   checking_mail = 1;
   pthread_mutex_unlock( &mailbox_lock );
 
-  progress_dialog = gnome_dialog_new("Checking Mail...", "Hide", NULL);
-  gtk_signal_connect (GTK_OBJECT (progress_dialog), "destroy",
-                      GTK_SIGNAL_FUNC (progress_dialog_destroy_cb), NULL);
+  if( balsa_app.pwindow_option == WHILERETR || 
+      balsa_app.pwindow_option == UNTILCLOSED )
+    {
+      if( progress_dialog && GTK_IS_WIDGET( progress_dialog ) )
+	gtk_widget_destroy( GTK_WIDGET(progress_dialog) );
 
-  gnome_dialog_set_close(GNOME_DIALOG(progress_dialog), TRUE);
+      progress_dialog = gnome_dialog_new("Checking Mail...", "Hide", NULL);
+      gtk_signal_connect (GTK_OBJECT (progress_dialog), "destroy",
+			  GTK_SIGNAL_FUNC (progress_dialog_destroy_cb), NULL);
 
-  progress_dialog_source = gtk_label_new("Checking Mail....");
-  gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox), 
-                        progress_dialog_source, 
-                            FALSE, FALSE, 0);
+      gnome_dialog_set_close(GNOME_DIALOG(progress_dialog), TRUE);
 
-  progress_dialog_message = gtk_label_new("");
-  gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox), 
-                        progress_dialog_message, 
-                            FALSE, FALSE, 0);
+      progress_dialog_source = gtk_label_new("Checking Mail....");
+      gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox), 
+			 progress_dialog_source, 
+			 FALSE, FALSE, 0);
 
-  gtk_widget_show_all( progress_dialog );
+      progress_dialog_message = gtk_label_new("");
+      gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox), 
+			 progress_dialog_message, 
+			 FALSE, FALSE, 0);
+
+      gtk_widget_show_all( progress_dialog );
+    }
 #endif BALSA_USE_THREADS
 
   if(data)
@@ -838,7 +845,10 @@ mail_progress_notify_cb( )
       {
 	threadmessage = *currentpos;
 
-	fprintf( stderr, "Message: %lu, %d, %s\n", (unsigned long) threadmessage, threadmessage->message_type, threadmessage->message_string );
+	if( balsa_app.debug )
+	  fprintf( stderr, "Message: %lu, %d, %s\n", 
+		   (unsigned long) threadmessage, threadmessage->message_type,
+		   threadmessage->message_string );
 	switch( threadmessage->message_type )  
 	  {
 	  case MSGMAILTHREAD_SOURCE:
@@ -861,20 +871,22 @@ mail_progress_notify_cb( )
 	  case MSGMAILTHREAD_UPDATECONFIG:
 	    config_mailbox_update( threadmessage->mailbox, 
 		      MAILBOX_POP3(threadmessage->mailbox)->mailbox.name ); 
-	    fprintf( stderr, " Update Config: %s\n", 
-		     MAILBOX_POP3(threadmessage->mailbox)->mailbox.name );
 	    break;
 	  case MSGMAILTHREAD_LOAD:
-	    fprintf( stderr, " Load Mail: %s \n", 
-		     threadmessage->message_string );
 	    LOCK_MAILBOX (balsa_app.inbox);
 	    load_messages (balsa_app.inbox, 1);
 	    UNLOCK_MAILBOX (balsa_app.inbox);
 	    break;
 	  case MSGMAILTHREAD_FINISHED:
-	    if( progress_dialog && GTK_IS_WIDGET( progress_dialog ))
-	      gtk_widget_destroy( progress_dialog );
-	    progress_dialog = NULL;
+	    if( balsa_app.pwindow_option != UNTILCLOSED )
+	      {
+		if( progress_dialog && GTK_IS_WIDGET( progress_dialog ))
+		  gtk_widget_destroy( progress_dialog );
+		progress_dialog = NULL;
+	      }
+	    else if( progress_dialog && GTK_IS_WIDGET( progress_dialog ))
+		gtk_label_set_text( GTK_LABEL(progress_dialog_source), 
+				  "Finished Checking." );
 	    break;
 	  default:
 	    fprintf ( stderr, " Unknown: %s \n", 

@@ -706,6 +706,12 @@ config_global_load (void)
   else
     balsa_app.toolbar_style = atoi (field);
 
+  /* Progress Window Dialog */
+  if ((field = pl_dict_get_str (globals, "PWindowOption")) == NULL)
+    balsa_app.pwindow_option = WHILERETR;
+  else
+    balsa_app.pwindow_option = atoi (field);
+
   /* use the preview pane */
   if ((field = pl_dict_get_str (globals, "UsePreviewPane")) == NULL)
     balsa_app.previewpane = TRUE;
@@ -850,6 +856,9 @@ config_global_save (void)
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.toolbar_style);
     pl_dict_add_str_str (globals, "ToolbarStyle", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.pwindow_option);
+    pl_dict_add_str_str (globals, "PWindowOption", tmp);
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.debug);
     pl_dict_add_str_str (globals, "Debug", tmp);

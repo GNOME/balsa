@@ -42,12 +42,12 @@ typedef struct _PropertyUI
 
     GtkWidget *pop3servers, *smtp_server, *mail_directory;
     GtkWidget *rb_local_mua, *rb_smtp_server;
-    GtkWidget *pwindow_display[NUM_PWINDOW_MODES];
     GtkWidget *check_mail_auto;
     GtkWidget *check_mail_minutes;
 
     GtkWidget *previewpane;
     GtkWidget *debug;		/* enable/disable debugging */
+    GtkRadioButton *pwindow_type[NUM_PWINDOW_MODES];
 
 #ifdef BALSA_SHOW_INFO
     GtkWidget *mblist_show_mb_content_info;
@@ -235,6 +235,12 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 			  properties_modified_cb, pui->pbox);
     }
 
+  for (i = 0; i < NUM_PWINDOW_MODES; i++)
+    {
+      gtk_signal_connect (GTK_OBJECT (pui->pwindow_type[i]), "clicked",
+			  properties_modified_cb, pui->pbox);
+    }
+
   gtk_signal_connect (GTK_OBJECT (pui->previewpane), "toggled",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
   gtk_signal_connect (GTK_OBJECT (pui->debug), "toggled",
@@ -371,6 +377,13 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
 	balsa_app.toolbar_style = toolbar_type[i];
 	break;
       }
+  for (i=0; i < NUM_PWINDOW_MODES; i++)
+    if(GTK_TOGGLE_BUTTON (pui->pwindow_type[i])->active)
+      {
+	balsa_app.pwindow_option = pwindow_type[i];
+	break;
+      }
+
   balsa_app.debug = GTK_TOGGLE_BUTTON (pui->debug)->active;
   balsa_app.previewpane = GTK_TOGGLE_BUTTON (pui->previewpane)->active;
   balsa_app.smtp = GTK_TOGGLE_BUTTON (pui->rb_smtp_server)->active;
@@ -443,6 +456,13 @@ set_prefs (void)
     if (balsa_app.toolbar_style == toolbar_type[i])
       {
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->toolbar_type[i]), TRUE);
+	break;
+      }
+
+  for (i = 0; i < NUM_PWINDOW_MODES; i++)
+    if( balsa_app.pwindow_option == pwindow_type[i])
+      {
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->pwindow_type[i]), TRUE);
 	break;
       }
 
@@ -650,7 +670,7 @@ create_mailservers_page ()
   GtkWidget *bbox;
   GtkWidget *button;
   GtkWidget *mail_dir;
-  GtkAdjustment *adj;
+  GtkObject *adj;
   GSList *rbgroup;
 
   vbox = gtk_vbox_new (FALSE, 0);
@@ -749,7 +769,7 @@ create_mailservers_page ()
 
   adj = gtk_adjustment_new( 1.0, 1.0, 99.0, 1.0, 5.0, 0.0);
   pui->check_mail_auto = gtk_check_button_new_with_label( "Check mail automatically every:" );
-  pui->check_mail_minutes = gtk_spin_button_new(adj, 0, 0);
+  pui->check_mail_minutes = gtk_spin_button_new(GTK_ADJUSTMENT(adj), 0, 0);
   gtk_box_pack_start( GTK_BOX(vbox), pui->check_mail_auto, FALSE, FALSE, 5);
 
   hbox2 = gtk_hbox_new( FALSE, 0 );
@@ -800,6 +820,23 @@ create_display_page ()
 
   pui->previewpane = gtk_check_button_new_with_label ( _("Use preview pane"));
   gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (pui->previewpane));
+
+/* Progress Dialog */
+  frame = gtk_frame_new (_ ("Display Progress Dialog"));
+  gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
+
+  vbox1 = gtk_vbox_new (FALSE, 0);
+  gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (vbox1));
+
+  group = NULL;
+  for (i = 0; i < NUM_PWINDOW_MODES; i++)
+    {
+      pui->pwindow_type[i] = GTK_RADIO_BUTTON (gtk_radio_button_new_with_label (group, _(pwindow_type_label[i])));
+      gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (pui->pwindow_type[i]), TRUE, TRUE, 2);
+      group = gtk_radio_button_group (pui->pwindow_type[i]);
+    }
+
+
 #ifdef BALSA_SHOW_INFO
   /* mailbox list window */
   frame = gtk_frame_new ("Mailbox list window");
@@ -1079,10 +1116,10 @@ pop3_del_cb (GtkWidget * widget, gpointer data)
 void timer_modified_cb( GtkWidget *widget, GnomePropertyBox *pbox)
 {
   if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->check_mail_auto)))
-      gtk_editable_set_editable( GTK_EDITABLE(pui->check_mail_minutes),
+      gtk_widget_set_sensitive( GTK_WIDGET(pui->check_mail_minutes),
 				 TRUE );
   else
-      gtk_editable_set_editable( GTK_EDITABLE(pui->check_mail_minutes),
+      gtk_widget_set_sensitive( GTK_WIDGET(pui->check_mail_minutes),
 				 FALSE );
 
   properties_modified_cb( widget, pbox );

@@ -1,3 +1,7 @@
+2005-01-28 08:44  Craig Routledge <webstuff at craigroutledge dot com>
+
+	* libbalsa/mailbox_local.c: fix bug #147380.
+
 2005-01-27  Pawel Salek
 
 	* libbalsa/address-book-ldap.c: fix InternerAddress regression.

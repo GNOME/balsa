@@ -265,8 +265,8 @@ balsa_index_class_init(BalsaIndexClass * klass)
 		       balsa_index_get_type(),
 		       GTK_SIGNAL_OFFSET(BalsaIndexClass,
 					 unselect_message),
-		       gtk_marshal_NONE__POINTER_POINTER, GTK_TYPE_NONE, 2,
-		       GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
+		       GTK_TYPE_POINTER);
     balsa_index_signals[UNSELECT_ALL_MESSAGES] = 
         gtk_signal_new ("unselect_all_messages",
                         GTK_RUN_FIRST,
@@ -1462,7 +1462,7 @@ select_message(GtkWidget * widget, GtkCTreeNode *row, gint column,
     if (message) {
 	gtk_signal_emit(GTK_OBJECT(bindex),
 			balsa_index_signals[SELECT_MESSAGE],
-			message, NULL);
+			message);
     }
 
     balsa_index_idle_add(bindex, message);
@@ -1484,7 +1484,7 @@ unselect_message(GtkWidget * widget, GtkCTreeNode *row, gint column,
     if (message)
 	gtk_signal_emit(GTK_OBJECT(bindex),
 			balsa_index_signals[UNSELECT_MESSAGE],
-			message, NULL);
+			message);
 
     if ((sel = GTK_CLIST(widget)->selection) && !g_list_next(sel)) {
         message =

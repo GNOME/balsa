@@ -1,3 +1,25 @@
+2002-03-20  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in, acconfig.h: isblank portability test (Steve Wall).
+	LibESMTP location parameter fixed.
+	* libbalsa/mailbox_imap.c: use GDBM only when available (Steve Wall).
+	* libbalsa/body.c: lock properly.
+	* libbalsa/misc.c: remove trash from the end of mail (unwrap)
+	* src/sendmsg-window.[hc]: choose properly sending charset.
+
+2002-03-19  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/mailbox.c: replace some more LIBBALSA_TYPE_MESSAGEs
+	with GTK_TYPE_POINTERs in gtk_signal_new().
+	* src/balsa-app.c: be more careful getting the index from a
+	mailbox.
+	* src/balsa-index.c: omit some more unused arguments.
+	* src/balsa-message.c: check for pending relayout in
+	balsa_gtk_html_size_request, and use a timer to wait for it to
+	complete; - simplify the size_request calculation.
+	* src/main-window.c: omit some more unused arguments; append a new
+	page in the notebook earlier, to avoid a race condition.
+
 2002-03-18  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/mailbox.c: LIBBALSA_TYPE_MESSAGE -> GTK_TYPE_POINTER

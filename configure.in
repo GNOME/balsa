@@ -131,6 +131,12 @@ dnl AC_CHECK_LIB(des, des_encrypt)
 dnl AC_CHECK_LIB(krb, krb_sendauth)
 dnl AC_CHECK_LIB(acap, acap_OpenConnection)
 
+AC_MSG_CHECKING([for isblank])
+AC_TRY_LINK( [#include <ctype.h>], [return isblank('a');],
+	     AC_MSG_RESULT(yes),
+	     [AC_MSG_RESULT(no)
+	      AC_DEFINE(isblank,isspace)] )
+
 dnl ###########################################################################
 dnl ORBit support
 dnl Use 'failure' instead of 'dontfail' to make us bomb if no orbit. 
@@ -218,27 +224,20 @@ AC_ARG_WITH(esmtp, [  --with-esmtp	        Enable libESMTP [default=yes]],[
 
 AC_MSG_CHECKING([whether to build ESMTP support])
 if test "x$with_esmtp" != xno  ; then
-AC_MSG_RESULT([yes])
-    AC_CHECK_LIB(esmtp, smtp_start_session, 
-        [ AC_DEFINE(ENABLE_ESMTP) ], [
-        AC_MSG_ERROR([*** You enabled ESMTP but esmtp library is not found.])],
-        -lpthread)
-    AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients,
-        [ AC_DEFINE(ENABLE_ESMTP) ], 
-        AC_MSG_ERROR([*** You enabled ESMTP but esmtp library doesn't support
-	'require_all_recipients'. Please get a Balsa aware
-	libESMTP from http://www.balsa.net/main.html or compile
-	libESMTP with './configure --enable-require-all-recipients'.]), 
-        -lpthread)
-        
-     test "$with_esmtp" != yes && BALSA_LIBS="$BALSA_LIBS -L$with_esmtp/lib"
+    AC_MSG_RESULT([yes])
+    test "$with_esmtp" != yes && LIBS="$LIBS -L$with_esmtp/lib"
+    AC_CHECK_LIB(esmtp, smtp_start_session, LIBS="$LIBS -lesmtp",
+	AC_MSG_ERROR([*** You enabled ESMTP but esmtp library is not found.]))
+    AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients, AC_DEFINE(ENABLE_ESMTP),
+	AC_MSG_ERROR([*** You enabled ESMTP but esmtp library doesn't support
+	    'require_all_recipients'. Please get a Balsa aware
+	    libESMTP from http://balsa.gnome.org/main.html or compile
+	    libESMTP with './configure --enable-require-all-recipients'.]))
+    AC_CHECK_LIB(esmtp, smtp_starttls_set_password_cb,
+	AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE))
 else
-     AC_MSG_RESULT([no])
-fi	  
-
-AC_CHECK_LIB(esmtp, smtp_starttls_set_password_cb,
-	     AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE), , -lesmtp)
-
+    AC_MSG_RESULT([no])
+fi
 
 dnl ##########################################################################
 dnl Enable SASL?

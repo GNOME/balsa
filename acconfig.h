@@ -56,3 +56,6 @@
 
 /* use pcre instead of `standard' rexexp's? */
 #undef HAVE_PCRE
+
+/* define to isspace if isblank is not available on your system */
+#undef isblank

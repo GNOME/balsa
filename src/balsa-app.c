@@ -774,7 +774,8 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
 	  gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
 	 i++) {
         
-	if (BALSA_INDEX(index)->mailbox_node->mailbox == mailbox)
+	if (BALSA_INDEX(index)->mailbox_node != NULL
+            && BALSA_INDEX(index)->mailbox_node->mailbox == mailbox)
 	    return BALSA_INDEX(index);
     }
 

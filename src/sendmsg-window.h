@@ -59,7 +59,6 @@ extern "C" {
 	GtkWidget *text;
 	GtkWidget *spell_checker;
 	GtkWidget *notebook;
-	GdkFont *font;
 	LibBalsaMessage *orig_message;
 	SendType type;
 	/* language selection related data */

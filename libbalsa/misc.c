@@ -474,7 +474,7 @@ dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
     lines = l = g_strsplit(par, "\n", -1);
 
     /* outer loop over paragraphs */
-    while (*lines) {
+    while (*lines && **lines) {
         gchar *str, *quote_string;
         size_t ql;
 

@@ -2713,12 +2713,20 @@ balsa_message_key_press_event(GtkWidget * widget, GdkEventKey * event,
 #ifdef HAVE_GTKHTML
 /* balsa_gtk_html_size_request:
    report the requested size of the HTML widget.
-
-   FIXME: this is not 100% right. The code includes an empirical
-   (hehe) term -1 (marked with EMP) which is NOT the right way to
-   go. The right solution requires some study of size_request signal
-   handling code.  
 */
+
+static gboolean
+html_size_request_timeout(GtkWidget * widget)
+{
+    if (HTML_VIEW(widget)->relayout_idle_id
+        || HTML_VIEW(widget)->relayout_timeout_id) {
+        /* still pending */
+        return TRUE;
+    }
+    gtk_widget_queue_resize(widget);
+    return FALSE;
+}
+
 static void
 balsa_gtk_html_size_request(GtkWidget * widget,
 			    GtkRequisition * requisition, gpointer data)
@@ -2727,12 +2735,19 @@ balsa_gtk_html_size_request(GtkWidget * widget,
     g_return_if_fail(HTML_IS_VIEW(widget));
     g_return_if_fail(requisition != NULL);
 
-    requisition->width  = -(widget->style->xthickness + 1) * 2;
-    requisition->height = -(widget->style->ythickness + 1) * 2;
+    requisition->width = GTK_LAYOUT(widget)->hadjustment->upper +
+        widget->style->xthickness * 2;
+    requisition->height = GTK_LAYOUT(widget)->vadjustment->upper +
+        widget->style->ythickness * 2;
 
-    requisition->width  += GTK_LAYOUT(widget)->hadjustment->upper -1 /*EMP*/;
-    requisition->height += GTK_LAYOUT(widget)->vadjustment->upper -1 /*EMP*/;
-
+    if (HTML_VIEW(widget)->relayout_idle_id
+        || HTML_VIEW(widget)->relayout_timeout_id) {
+        /* Relayout is pending; this layout is bogus, so we'll wait
+         * until the relayout is carried out, then queue another
+         * size_request. */
+        gtk_timeout_add(1000, (GtkFunction) html_size_request_timeout,
+                        widget);
+    }
 }
 
 static void

@@ -631,10 +631,6 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
     release_toolbars(bsm->window);
     gtk_widget_destroy(bsm->window);
     g_list_free(bsm->spell_check_disable_list);
-    if (bsm->font) {
-	gdk_font_unref(bsm->font);
-	bsm->font = NULL;
-    }
     if (bsm->bad_address_style)
         gtk_style_unref(bsm->bad_address_style);
 
@@ -2231,7 +2227,9 @@ static void
 fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 {
     GString *body = NULL;
-    gchar *signature;
+    gchar *signature, *tmp;
+    gsize bytes_read, bytes_written;
+    GError * err = NULL;
     gboolean reply_any = (type == SEND_REPLY || type == SEND_REPLY_ALL
                           || type == SEND_REPLY_GROUP);
     gboolean forwd_any = (type == SEND_FORWARD_ATTACH
@@ -2270,10 +2268,19 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	g_free(signature);
     }
 
-    gtk_text_buffer_set_text(buffer, body->str, body->len);
-    gtk_text_buffer_get_start_iter(buffer, &start);
-    gtk_text_buffer_place_cursor(buffer, &start);
+    tmp = g_convert(body->str, body->len, "utf-8", 
+                    msg->charset ? msg->charset : "us-ascii", 
+                    &bytes_read, &bytes_written, &err);
+    if(err) { 
+        g_warning("Error charset conversion on body quoting.\n"); 
+        g_error_free(err); 
+    } else {
+        gtk_text_buffer_set_text(buffer, tmp, bytes_written);
+        gtk_text_buffer_get_start_iter(buffer, &start);
+        gtk_text_buffer_place_cursor(buffer, &start);
+    }
     g_string_free(body, TRUE);
+    g_free(tmp);
 }
 
 static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *msg)
@@ -2519,7 +2526,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     gchar* tmp;
 
     msg = g_malloc(sizeof(BalsaSendmsg));
-    msg->font     = NULL;
     msg->charset  = NULL;
     msg->locale   = NULL;
     msg->ident = balsa_app.current_ident;
@@ -3015,6 +3021,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     LibBalsaMessageBody *body;
     GList *list;
     gchar *tmp;
+    gsize bytes_read, bytes_written;
+    GError * error = NULL;
     gchar recvtime[50];
     struct tm *footime;
     GtkTextBuffer *buffer =
@@ -3090,13 +3098,25 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
     body = libbalsa_message_body_new(message);
     gtk_text_buffer_get_bounds(buffer, &start, &end);
-    body->buffer = gtk_text_iter_get_text(&start, &end);
+    tmp = gtk_text_iter_get_text(&start, &end);
+    body->buffer = g_convert(tmp, -1, 
+                             bsmsg->charset ? bsmsg->charset : "us-ascii", 
+                             "utf-8", &bytes_read, &bytes_written, &error);
+    if(error) {
+        g_warning("Charset conversion error on sending. setting to UTF8\n");
+        g_error_free(error);
+        body->buffer = tmp; 
+        bsmsg->charset = "utf-8";
+    } else { g_free(tmp); }
+
     if (bsmsg->flow) {
         body->buffer =
             libbalsa_wrap_rfc2646(body->buffer, balsa_app.wraplength, TRUE,
                                   FALSE);
-    } else if (balsa_app.wordwrap)
+    } else if (balsa_app.wordwrap) {
         libbalsa_wrap_string(body->buffer, balsa_app.wraplength);
+    }
+    printf("body is '%s'\n", body->buffer);
     body->charset = g_strdup(bsmsg->charset);
     libbalsa_message_append_part(message, body);
 
@@ -3611,11 +3631,8 @@ init_menus(BalsaSendmsg * msg)
 static gint
 set_locale(GtkWidget * w, BalsaSendmsg * msg, gint idx)
 {
-    GtkStyle *style;
     gchar *tmp;
 
-    if (msg->font)
-	gdk_font_unref(msg->font);
     msg->charset = locales[idx].charset;
     msg->locale = locales[idx].locale;
     tmp = g_strdup_printf("%s (%s, %s)", _(locales[idx].lang_name),
@@ -3623,27 +3640,6 @@ set_locale(GtkWidget * w, BalsaSendmsg * msg, gint idx)
     gtk_label_set_text(GTK_LABEL
 		       (GTK_BIN(msg->current_language_menu)->child), tmp);
     g_free(tmp);
-    
-    msg->font = gdk_font_load("fixed"); /* FIXME */
-
-    if (msg->font) {
-	gdk_font_ref(msg->font);
-	/* Set the new message style */
-	style = gtk_style_copy(gtk_widget_get_style(msg->text));
-        gtk_style_set_font(style, msg->font);
-	gtk_widget_set_style (msg->text, style);
-	gtk_widget_set_style (msg->to[1], style);
-        gtk_widget_set_style (msg->from[1], style);
-	gtk_widget_set_style (msg->subject[1], style);
-        gtk_widget_set_style (msg->cc[1], style);
-        gtk_widget_set_style (msg->bcc[1], style);
-        gtk_widget_set_style (msg->fcc[1], style);
-        gtk_widget_set_style (msg->reply_to[1], style);
-        gtk_widget_set_style (msg->comments[1], style);
-        gtk_widget_set_style (msg->keywords[1], style);
-
-	gtk_style_unref(style);
-    }				/* endif: font found */
     return FALSE;
 }
 
@@ -3671,8 +3667,6 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
 				       spell_check_suggest_mode_name
 				       [balsa_app.suggestion_mode]);
     balsa_spell_check_set_ignore_length(sc, balsa_app.ignore_size);
-    if (msg->font)
-	balsa_spell_check_set_font(sc, msg->font);
     gtk_notebook_set_page(GTK_NOTEBOOK(msg->notebook), spell_check_page);
 
     /* disable menu and toolbar items so message can't be modified */

@@ -70,6 +70,7 @@ create_toolbar (BalsaSendmsg * bsmw)
 					   "Send", "Send", NULL,
 	     new_icon (p8_xpm, window), GTK_SIGNAL_FUNC (send_smtp_message),
 					   bsmw);
+  GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
@@ -77,6 +78,7 @@ create_toolbar (BalsaSendmsg * bsmw)
 					 "Spell Check", "Spell Check", NULL,
 					   new_icon (p13_xpm, window), NULL,
 					   "Spell Check");
+  GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
@@ -91,6 +93,7 @@ create_toolbar (BalsaSendmsg * bsmw)
 					   "Print", "Print", NULL,
 					   new_icon (p15_xpm, window), NULL,
 					   "Print");
+  GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
@@ -98,6 +101,7 @@ create_toolbar (BalsaSendmsg * bsmw)
 		   "Context Sensitive Help", "Context Sensitive Help", NULL,
 					   new_icon (p16_xpm, window), NULL,
 					   "Context Sensitive Help");
+  GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
 
   gtk_widget_show (toolbar);
   return toolbar;
@@ -203,9 +207,9 @@ create_menu (GtkWidget * window)
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
   menu_items[i] = NULL;
-
+/*
   g_print ("%d menu items\n", i);
-
+*/
   gtk_window_add_accelerator_table (GTK_WINDOW (window), accel);
   return menubar;
 }
@@ -257,6 +261,8 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
   gtk_widget_show (label);
   msg->from = gtk_entry_new ();
   gtk_table_attach_defaults (GTK_TABLE (table), msg->from, 1, 2, 1, 2);
+  GTK_WIDGET_UNSET_FLAGS(msg->from, GTK_CAN_FOCUS);
+  gtk_entry_set_editable(msg->from,FALSE);
 
   from = g_malloc (strlen (balsa_app.real_name) + 2 + strlen (balsa_app.username) + 1 + strlen (balsa_app.hostname) + 2);
   sprintf (from, "%s <%s@%s>\0",

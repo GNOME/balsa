@@ -486,8 +486,5 @@ gint
 current_mailbox_check ()
 {
   mail_ping (balsa_app.current_mailbox->stream);
-/*
- * system("cat sounds/yougotmail.wav>/dev/dsp &");
- */
   return TRUE;
 }

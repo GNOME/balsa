@@ -200,6 +200,7 @@ create_toolbar (MainWindow *mw)
 			     new_icon (p4_xpm, window),
 			     GTK_SIGNAL_FUNC (current_mailbox_check),
 			     "Check Email");
+  GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
@@ -211,7 +212,7 @@ create_toolbar (MainWindow *mw)
 			     new_icon (p1_xpm, window),
 			     NULL,
 			     mw);
-
+  GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
@@ -223,6 +224,7 @@ create_toolbar (MainWindow *mw)
 			     new_icon (p5_xpm, window), 
 			     GTK_SIGNAL_FUNC (sendmsg_window_new),
 			     "Compose Message");
+  GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
 
   toolbarbutton = 
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
@@ -232,6 +234,7 @@ create_toolbar (MainWindow *mw)
 			     new_icon (p6_xpm, window), 
 			     GTK_SIGNAL_FUNC (sendmsg_window_new),
 			     "Reply");
+  GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
 
   toolbarbutton = 
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
@@ -240,6 +243,7 @@ create_toolbar (MainWindow *mw)
 			     NULL,
 			     new_icon (p8_xpm, window), NULL,
 			     "Forward");
+  GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
   
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
@@ -251,6 +255,7 @@ create_toolbar (MainWindow *mw)
 			     new_icon (p10_xpm, window),
 			     GTK_SIGNAL_FUNC (index_previous_message),
 			     "Open Previous Message");
+  GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
@@ -260,6 +265,7 @@ create_toolbar (MainWindow *mw)
 			     new_icon (p11_xpm, window), 
 			     GTK_SIGNAL_FUNC (index_next_message),
 			     "Open Next Message");
+  GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
@@ -271,6 +277,7 @@ create_toolbar (MainWindow *mw)
 			     new_icon (p14_xpm, window),
 			     GTK_SIGNAL_FUNC (addressbook_window_new),
 			     "Address Book");
+  GTK_WIDGET_UNSET_FLAGS(toolbarbutton, GTK_CAN_FOCUS);
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 

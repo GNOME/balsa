@@ -513,12 +513,15 @@ make_list_from_string (gchar * the_str)
 
   if (!the_str)
     return NULL;
+  if (strlen(the_str) <3)
+	  return NULL;
 
   str = g_strdup (the_str);
   token = strtok (str, ",");
   while (token)
     {
       list = g_list_append (list, token);
+  g_print ("\"%s\"\n",token);
       token = strtok (NULL, ",");
     }
   g_free (str);
@@ -557,11 +560,9 @@ send_message (Message * message)
 			make_string_from_list (message->to_list),
 			message->from->host);
   if (message->cc_list)
-    {
       rfc822_parse_adrlist (&envelope->cc,
 			    make_string_from_list (message->cc_list),
 			    message->from->host);
-    }
   envelope->subject = g_strdup (message->subject);
   body->type = TYPETEXT;
 

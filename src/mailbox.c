@@ -762,6 +762,7 @@ message_new ()
 
   message = g_malloc (sizeof (Message));
 
+  message->msgno = 0;
   message->mailbox = NULL;
   message->remail = NULL;
   message->date = NULL;

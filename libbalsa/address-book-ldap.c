@@ -134,6 +134,7 @@ libbalsa_address_book_ldap_init(LibBalsaAddressBookLdap * ab)
     ab->host = NULL;
     ab->base_dn = NULL;
     ab->directory = NULL;
+    LIBBALSA_ADDRESS_BOOK(ab)->is_expensive = TRUE;
 }
 
 static void
@@ -425,7 +426,8 @@ libbalsa_address_book_ldap_load_config(LibBalsaAddressBook * ab,
  * NOTE: This function does not escape embedded NUL, as the input
  * function is NUL terminated.
  */
-static gchar *rfc_2254_escape(const gchar *raw)
+static gchar*
+rfc_2254_escape(const gchar *raw)
 {
     gchar *new;
     gchar *str;
@@ -468,9 +470,10 @@ static gchar *rfc_2254_escape(const gchar *raw)
 }
 
 
-static GList *libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
-							 const gchar * prefix, 
-							 gchar ** new_prefix)
+static GList *
+libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
+					  const gchar * prefix, 
+					  gchar ** new_prefix)
 {
     LibBalsaAddressBookLdap *ldap_ab;
     LibBalsaAddress *addr;

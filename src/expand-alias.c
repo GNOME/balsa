@@ -71,6 +71,7 @@ make_rfc822(gchar *full_name, gchar *address)
  * and enters it into the data structure.
  *
  * INPUT: emailData *data
+ *        fastp - look only in non-expensive address books.
  * OUTPUT: void
  * MODIFIES: data
  * 
@@ -79,7 +80,7 @@ make_rfc822(gchar *full_name, gchar *address)
  * CAVEAT: Its here because it depends on balsa_app.
  */
 void
-expand_alias_find_match(emailData *addy)
+expand_alias_find_match(emailData *addy, gboolean fastp)
 {
     gchar *prefix = NULL;	/* the longest common string. */
     GList *match = NULL;	/* A list of matches.         */
@@ -93,110 +94,100 @@ expand_alias_find_match(emailData *addy)
     gchar *str;
     gchar *input;
     gint tab;
+    LibBalsaAddressBook* ab;
 
     input = addy->user;
     tab = addy->tabs;
     g_free(addy->match);
     addy->match = NULL;
 
-    if (strlen(input) > 0) {
-
-	str = g_strdup(input);
+    if(strlen(input) == 0) {
+	addy->match = g_strdup("");
+	return;
+    }
+    
+    str = g_strdup(input);
 #ifdef CASE_INSENSITIVE_NAME
-	g_strup(str);
+    g_strup(str);
 #endif
-
-	/*
-	 * Look at all addressbooks for a match.
-	 */
-	ab_list = balsa_app.address_book_list;
-	while(ab_list) {
-	    if ( !LIBBALSA_ADDRESS_BOOK(ab_list->data)->expand_aliases ) {
-		ab_list = g_list_next(ab_list);
-		continue;
-	    }
-
-	    partial_res = libbalsa_address_book_alias_complete
-	        (LIBBALSA_ADDRESS_BOOK(ab_list->data), str, &partial_prefix);
+    
+    /*
+     * Look at all addressbooks for a match.
+     */
+    for(ab_list = balsa_app.address_book_list; ab_list; 
+	ab_list = ab_list->next) {
+	ab = LIBBALSA_ADDRESS_BOOK(ab_list->data);
+	if ( !ab->expand_aliases || (fastp && ab->is_expensive) )
+	    continue;
+	
+	partial_res = 
+	    libbalsa_address_book_alias_complete(ab, str, &partial_prefix);
+	
+	if ( partial_res != NULL ) {
+	    match = match ? g_list_concat(match, partial_res) : partial_res;
 	    
-	    if ( partial_res != NULL ) {
-		if ( match != NULL )
-		    match = g_list_concat(match, partial_res);
-		else 
-		    match = partial_res;
-		
-		if ( prefix == NULL ) {
-		    prefix = partial_prefix;
-		} else {
-		    gchar *new_pfix;
-		    gint len = 0;
-
-		    /* 
-		     * We have to find the longest common prefix of all options
-		     * Tedious.
-		     */
-		    if ( strlen(partial_prefix) < strlen(prefix) )
-			new_pfix = g_strdup(prefix);
-		    else
-			new_pfix = g_strdup(partial_prefix);
-
-		    while( TRUE ) {
-			if (*(prefix+len) == 0 || *(partial_prefix+len) == 0) {
-			    *(new_pfix+len) = '\0';
-			    break;
-			} else if ( *(prefix+len) != *(partial_prefix+len) ) {
-			    *(new_pfix+len) = '\0';
-			    break;
-			} else {
-			    *(new_pfix+len) = *(prefix+len);
-			    len++;
-			}
-		    }
-		    g_free(prefix); g_free(partial_prefix);
-		    prefix = new_pfix;
-		}
-	    }
-	    
-	    ab_list = g_list_next(ab_list);
-	}
-	g_free(str);
-
-	/*
-	 * Now look through all the matches the above code generated, and
-	 * find the one we want.
-	 */
-	if (match) {
-	    i = tab;
-	    if ((i == 0) && (strlen(prefix) > strlen(input))) {
-		addr = LIBBALSA_ADDRESS(match->data);
-
+	    if ( prefix == NULL ) {
+		prefix = partial_prefix;
 	    } else {
-		for (search = match; i > 0; i--) {
-		    search = g_list_next(search);
-		    if (!search) {
-			addy->tabs = i = 0;
-			search = match;
+		gchar *new_pfix;
+		gint len = 0;
+		
+		/* 
+		 * We have to find the longest common prefix of all options
+		 * Tedious.
+		 */
+		new_pfix = g_strdup(strlen(partial_prefix) < strlen(prefix) 
+				    ? prefix : partial_prefix);
+		
+		while( TRUE ) {
+		    if (prefix[len] == 0 || partial_prefix[len] == 0) {
+			new_pfix[len] = '\0';
+			break;
+		    } else if ( prefix[len] != partial_prefix[len] ) {
+			new_pfix[len] = '\0';
+			break;
+		    } else {
+			new_pfix[len] = prefix[len];
+			len++;
 		    }
 		}
-		addr = LIBBALSA_ADDRESS(search->data);
+		g_free(prefix); g_free(partial_prefix);
+		prefix = new_pfix;
 	    }
-	    output = make_rfc822(addr->full_name,
-				 (gchar *) addr->address_list->data);
-	    g_message("expand_alias_find_match(): Found [%s]", addr->full_name);
-	    g_list_foreach(match, (GFunc)gtk_object_unref, NULL);
+	}
+    }
+    g_free(str);
 
+    /*
+     * Now look through all the matches the above code generated, and
+     * find the one we want.
+     */
+    if (match) {
+	i = tab;
+	if ((i == 0) && (strlen(prefix) > strlen(input))) {
+	    addr = LIBBALSA_ADDRESS(match->data);
+	    
+	} else {
+	    for (search = match; i > 0; i--) {
+		search = g_list_next(search);
+		if (!search) {
+		    addy->tabs = i = 0;
+		    search = match;
+		}
+	    }
+	    addr = LIBBALSA_ADDRESS(search->data);
+	}
+	output = make_rfc822(addr->full_name,
+			     (gchar *) addr->address_list->data);
+	g_message("expand_alias_find_match(): Found [%s]", addr->full_name);
+	g_list_foreach(match, (GFunc)gtk_object_unref, NULL);
+	
 	/*
 	 * And now we handle the case of "No matches found."
 	 */
-	} else {
-	    output = NULL;
-	}
+    } 
+    if (prefix) g_free(prefix);
 
-	if (prefix) g_free(prefix);
-	prefix = NULL;
-    } else {
-	output = g_strdup("");
-    }
     addy->match = output;
     if (addy->match)
 	g_message("expand_alias_find_match(): Setting to [%s]", addy->match);

@@ -140,6 +140,7 @@ libbalsa_address_book_init(LibBalsaAddressBook * ab)
     ab->name = NULL;
     ab->expand_aliases = FALSE;
     ab->dist_list_mode = FALSE;
+    ab->is_expensive   = FALSE;
 }
 
 static void

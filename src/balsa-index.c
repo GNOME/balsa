@@ -667,10 +667,12 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
 {
     gchar buff1[32];
     gchar *text[7];
+    gchar* name_str;
     GtkCTreeNode *node;
     GList *list;
     LibBalsaAddress *addy = NULL;
     LibBalsaMailbox* mailbox;
+    gboolean append_dots;
     
 
     g_return_if_fail(bindex != NULL);
@@ -686,12 +688,14 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
     text[2] = NULL;		/* attachments */
 
 
+    append_dots = FALSE;
     if (mailbox == balsa_app.sentbox ||
 	mailbox == balsa_app.draftbox ||
 	mailbox == balsa_app.outbox) {
 	if (message->to_list) {
 	    list = g_list_first(message->to_list);
 	    addy = list->data;
+	    append_dots = list->next != NULL;
 	}
     } else {
 	if (message->from)
@@ -700,13 +704,16 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
 
     if (addy) {
 	if (addy->full_name)
-	    text[3] = addy->full_name;
+	    name_str = addy->full_name;
 	else if (addy->address_list)
-	    text[3] = addy->address_list->data;
+	    name_str = addy->address_list->data;
 	else
-	    text[3] = "";
+	    name_str = "";
     } else
-	text[3] = "";
+	name_str = "";
+
+    text[3] = append_dots ? g_strconcat(name_str, ",...", NULL)
+	: name_str; 
 
     text[4] = (gchar*)LIBBALSA_MESSAGE_GET_SUBJECT(message);
     text[5] =
@@ -717,6 +724,7 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
     node = gtk_ctree_insert_node(GTK_CTREE(bindex->ctree), NULL, NULL, 
                                  text, 2, NULL, NULL, NULL, NULL, 
                                  FALSE, TRUE);
+    if(append_dots) g_free(text[3]);
     g_free(text[5]);
     g_free(text[6]);
 
@@ -724,8 +732,6 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
                                  (gpointer) message);
 
     balsa_index_set_col_images(bindex, node, message);
-
-    DO_CLIST_WORKAROUND(GTK_CLIST(bindex->ctree));
 }
 
 /*

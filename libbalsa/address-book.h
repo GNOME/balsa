@@ -43,8 +43,9 @@ struct _LibBalsaAddressBook {
 
     /* The gnome_config prefix where we save this address book */
     gchar *config_prefix;
-
     gchar *name;
+    gboolean is_expensive; /* is lookup to the address book expensive? 
+			      e.g. LDAP address book */
     gboolean expand_aliases;
 
     gboolean dist_list_mode;

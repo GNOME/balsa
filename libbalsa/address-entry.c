@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -49,6 +49,12 @@
 #include <sys/stat.h>
 #include <ctype.h>
 
+/* pawsa: the update of cursor pos is completely reduntant with gtk+-1.2.9
+   and since the char_offsets happens to be shorter than computed cursor_pos,
+   the entry tends to move the alignment left and right.
+   I disable it.
+*/
+#define DISABLE_UPDATE_CUR_POS
 /*
  * LibBalsa includes.
  */
@@ -121,6 +127,7 @@ static void libbalsa_delete_forward_word	(LibBalsaAddressEntry *);
 static void libbalsa_delete_backward_word	(LibBalsaAddressEntry *);
 static void libbalsa_delete_line		(LibBalsaAddressEntry *);
 static void libbalsa_delete_to_line_end		(LibBalsaAddressEntry *);
+static void libbalsa_force_expand               (LibBalsaAddressEntry *);
 static void libbalsa_paste_clipboard		(LibBalsaAddressEntry *);
 static void libbalsa_cut_clipboard		(LibBalsaAddressEntry *);
 
@@ -146,7 +153,7 @@ static const GtkTextFunction control_keys[26] =
     NULL,						/* o */
     NULL,						/* p */
     NULL,						/* q */
-    NULL,						/* r */
+    (GtkTextFunction)libbalsa_force_expand,		/* r */
     NULL,						/* s */
     NULL,						/* t */
     (GtkTextFunction)libbalsa_delete_line,		/* u */
@@ -1612,7 +1619,7 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
        if (strlen(str) == 0)
 	   libbalsa_force_no_match(addy);
        else if (address_entry->find_match)
-	   (*address_entry->find_match) (addy);
+	   (*address_entry->find_match) (addy, TRUE);
     }
 }
 
@@ -2084,7 +2091,7 @@ libbalsa_keystroke_add_key(LibBalsaAddressEntry *address_entry, gchar *add)
     expand_alias_find_match(addy);
     */
     if (address_entry->find_match)
-	(*address_entry->find_match) (addy);
+	(*address_entry->find_match) (addy, TRUE);
 }
 
 
@@ -2136,7 +2143,7 @@ libbalsa_keystroke_cycle(LibBalsaAddressEntry *address_entry)
     expand_alias_find_match(addy);
     */
     if (address_entry->find_match)
-	(*address_entry->find_match) (addy);
+	(*address_entry->find_match) (addy, TRUE);
 }
 
 
@@ -2194,7 +2201,7 @@ libbalsa_find_list_entry(LibBalsaAddressEntry *address_entry, gint *cursor)
     return previous;
 }
 
-
+#ifndef DISABLE_UPDATE_CUR_POS
 /*************************************************************
  * libbalsa_address_entry_update_cursor_pos:
  *     Sets the cursor position without modifying the
@@ -2233,7 +2240,28 @@ libbalsa_address_entry_update_cursor_pos(LibBalsaAddressEntry *address_entry)
     }
     GTK_EDITABLE(address_entry)->current_pos = i;
 }
+#endif
+/*************************************************************
+ * libbalsa_force_expand:
+ *     force alias expansion.
+ *
+ *   arguments:
+ *     address_entry: the widget.
+ *
+ *   results:
+ *     modifies address_entry
+ *************************************************************/
+static void
+libbalsa_force_expand(LibBalsaAddressEntry *address_entry)
+{
+    emailData *addy;
+    inputData *input;
 
+    input = address_entry->input;
+    addy = input->active->data;
+    if (address_entry->find_match)
+	(*address_entry->find_match) (addy, FALSE);
+}
 
 /*************************************************************
  * libbalsa_paste_clipboard:
@@ -2574,7 +2602,9 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
 	break;
     }
 
+#ifndef DISABLE_UPDATE_CUR_POS
     libbalsa_address_entry_update_cursor_pos(address_entry);
+#endif
     
     /*
      * Since we emit signals from within the above code,

@@ -105,7 +105,7 @@ struct _LibBalsaAddressEntry {
     /*
      * Function to find matches.  User defined.
      */
-    void (* find_match)  (emailData *addy);
+    void (* find_match)  (emailData *addy, gboolean fast_check);
 };
 
 

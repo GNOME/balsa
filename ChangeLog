@@ -1,11 +1,24 @@
+2001-08-11  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/address-book.[hc]: distinguish fast and slow=expensive
+	address books.
+	* libbalsa/address-book-ldap.c: is_expensive = TRUE
+	* libbalsa/address-entry.[hc]: attemt to fix cursor jumping.
+	char_offset[] was read out of range (probably related to #52902)
+	Support for Ctrl-R to look up expensive address books.
+	* src/balsa-index.c: append dots when showing multiple recipents
+	in the msg index. Clean up.
+	* src/expand-alias.c: expand_alias_find_match() can do now fast or
+	expensive lookups.
+	
 2001-08-10  Pawel Salek  <pawsa@theochem.kth.se>
 
-	* configure.in: -with-iconv configure option (Brian Stafford)
+	* configure.in: --with-iconv configure option (Brian Stafford)
 	* src/balsa-index-threading.c: clean-up.
 	* src/balsa-index.c: fix #57659.
 	* src/balsa-message.c: add missing mailto: protocol handler.
 	* src/main.c: move URL parsing code to src/sendmsg-window.c
-	* src/sendmsg-window.[hc]: new location of URL parsing code.
+	* src/sendmsg-window.[hc] : new location of URL parsing code.
 	* src/main-window.c: set paned size when mblist is not shown
 	(Melanie Thielker).
 	

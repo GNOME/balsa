@@ -1,3 +1,9 @@
+2003-01-04  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/misc.[hc]: add libbalsa_{expand,contract}_path wrappers.
+	* src/sendmsg-window.c: add Czech language and ~ sig path support
+	(#102472, #102470).
+
 2003-01-03 PeterB
 
 	* libbalsa/identity.c: Avoid potential race when destroying `Select

@@ -19,21 +19,9 @@
  */
 
 /* FONT SELECTION DISCUSSION:
-   the current usage is limited to fonts, font sets cannot be used because:
-
-   - gdk caches font set based on their names and changing locale will
-     not help when using wildcards(!) for the charset (and explicitly
-     specified in XLFD charset is ignored anyway, as XCreateFontSet(3x)
-     says).
-
-   - the option would be to use setlocale to hit gdk_fontset_load()
-     but...  there is an yet unidentified problem that leads to a
-     nasty deferred setup-dependent crash with double free symptoms,
-     when the selected font set is unavailable on the machine (and
-     probably in other cases, too). I am tempted to write a test
-     program and send it over to GDK gurus.
-
-   Locale data is then used exclusively for the spelling checking.  */
+   We use pango now.
+   Locale data is then used exclusively for the spelling checking.
+*/
 
 
 #include "config.h"
@@ -326,68 +314,70 @@ static GnomeUIInfo view_menu[] = {
 struct {
     const gchar *locale, *charset, *lang_name;
 } locales[] = {
-#define LOC_BRAZILIAN_POS 0
+#define LOC_BRAZILIAN_POS   0
     {"pt_BR", "ISO-8859-1", N_("Brazilian")},
-#define LOC_CATALAN_POS   1
+#define LOC_CATALAN_POS     1
     {"ca_ES", "ISO-8859-15", N_("Catalan")},
 #define LOC_CHINESE_SIMPLIFIED_POS   2
     {"zh_CN.GB2312", "gb2312", N_("Chinese Simplified")},
 #define LOC_CHINESE_TRADITIONAL_POS   3
     {"zh_TW.Big5", "big5", N_("Chinese Traditional")},
-#define LOC_DANISH_POS    4
+#define LOC_CZECH_POS       4
+    {"cs_CS", "ISO-9959-2", N_("Czech")},
+#define LOC_DANISH_POS      5
     {"da_DK", "ISO-8859-1", N_("Danish")},
-#define LOC_GERMAN_POS    5
+#define LOC_GERMAN_POS      6
     {"de_DE", "ISO-8859-15", N_("German")},
-#define LOC_DUTCH_POS     6
+#define LOC_DUTCH_POS       7
     {"nl_NL", "ISO-8859-15", N_("Dutch")},
-#define LOC_ENGLISH_POS   7
+#define LOC_ENGLISH_POS     8
     /* English -> American English, argh... */
     {"en_US", "ISO-8859-1", N_("English")}, 
-#define LOC_ESTONIAN_POS  8
+#define LOC_ESTONIAN_POS    9
     {"et_EE", "ISO-8859-15", N_("Estonian")},
-#define LOC_FINNISH_POS   9
+#define LOC_FINNISH_POS     10
     {"fi_FI", "ISO-8859-15", N_("Finnish")},
-#define LOC_FRENCH_POS    10
+#define LOC_FRENCH_POS      11
     {"fr_FR", "ISO-8859-15", N_("French")},
-#define LOC_GREEK_POS     11 
+#define LOC_GREEK_POS       12 
     {"el_GR", "ISO-8859-7", N_("Greek")},
-#define LOC_HEBREW_POS    12
+#define LOC_HEBREW_POS      13
     {"he_IL", "UTF-8", N_("Hebrew")},
-#define LOC_HUNGARIAN_POS 13
+#define LOC_HUNGARIAN_POS   14
     {"hu_HU", "ISO-8859-2", N_("Hungarian")},
-#define LOC_ITALIAN_POS   14
+#define LOC_ITALIAN_POS     15
     {"it_IT", "ISO-8859-15", N_("Italian")},
-#define LOC_JAPANESE_POS  15
+#define LOC_JAPANESE_POS    16
     {"ja_JP", "euc-jp", N_("Japanese")},
-#define LOC_KOREAN_POS    16
+#define LOC_KOREAN_POS      17
     {"ko_KR", "euc-kr", N_("Korean")},
-#define LOC_LATVIAN_POS    17
+#define LOC_LATVIAN_POS     18
     {"lv_LV", "ISO-8859-13", N_("Latvian")},
-#define LOC_LITHUANIAN_POS    18
+#define LOC_LITHUANIAN_POS  19
     {"lt_LT", "ISO-8859-13", N_("Lithuanian")},
-#define LOC_NORWEGIAN_POS 19
+#define LOC_NORWEGIAN_POS   20
     {"no_NO", "ISO-8859-1", N_("Norwegian")},
-#define LOC_POLISH_POS    20
+#define LOC_POLISH_POS      21
     {"pl_PL", "ISO-8859-2", N_("Polish")},
-#define LOC_PORTUGESE_POS 21
+#define LOC_PORTUGESE_POS   22
     {"pt_PT", "ISO-8859-15", N_("Portugese")},
-#define LOC_ROMANIAN_POS 22
+#define LOC_ROMANIAN_POS    23
     {"ro_RO", "ISO-8859-2", N_("Romanian")},
-#define LOC_RUSSIAN_ISO_POS   23
+#define LOC_RUSSIAN_ISO_POS 24
     {"ru_SU", "ISO-8859-5", N_("Russian (ISO)")},
-#define LOC_RUSSIAN_KOI_POS   24
+#define LOC_RUSSIAN_KOI_POS 25
     {"ru_RU", "KOI8-R", N_("Russian (KOI)")},
-#define LOC_SLOVAK_POS    25
+#define LOC_SLOVAK_POS      26
     {"sk_SK", "ISO-8859-2", N_("Slovak")},
-#define LOC_SPANISH_POS   26
+#define LOC_SPANISH_POS     27
     {"es_ES", "ISO-8859-15", N_("Spanish")},
-#define LOC_SWEDISH_POS   27
+#define LOC_SWEDISH_POS     28
     {"sv_SE", "ISO-8859-1", N_("Swedish")},
-#define LOC_TURKISH_POS   28
+#define LOC_TURKISH_POS     29
     {"tr_TR", "ISO-8859-9", N_("Turkish")},
-#define LOC_UKRAINIAN_POS 29
+#define LOC_UKRAINIAN_POS   30
     {"uk_UK", "KOI8-U", N_("Ukrainian")},
-#define LOC_UTF8_POS 30
+#define LOC_UTF8_POS        31
     {"", "UTF-8", N_("Generic UTF-8")}
 };
 
@@ -402,8 +392,8 @@ static GnomeUIInfo locale_aj_menu[] = {
                           GINT_TO_POINTER(LOC_CHINESE_SIMPLIFIED_POS), NULL),
     GNOMEUIINFO_ITEM_DATA(N_("Chinese Traditional"), NULL, lang_set_cb,
                           GINT_TO_POINTER(LOC_CHINESE_TRADITIONAL_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Catalan"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_CATALAN_POS), NULL),
+    GNOMEUIINFO_ITEM_DATA(N_("Czech"), NULL, lang_set_cb,
+                          GINT_TO_POINTER(LOC_CZECH_POS), NULL),
     GNOMEUIINFO_ITEM_DATA(N_("Danish"), NULL, lang_set_cb,
                           GINT_TO_POINTER(LOC_DANISH_POS), NULL),
     GNOMEUIINFO_ITEM_DATA(N_("Dutch"), NULL, lang_set_cb,
@@ -2840,21 +2830,26 @@ read_signature(BalsaSendmsg *msg)
 {
     FILE *fp = NULL;
     size_t len = 0;
-    gchar *ret = NULL;
+    gchar *ret = NULL, *path;
 
     if (msg->ident->signature_path == NULL)
 	return NULL;
 
+    path = libbalsa_expand_path(msg->ident->signature_path);
     if(msg->ident->sig_executable){
         /* signature is executable */
-        if (!(fp = popen(msg->ident->signature_path,"r")))
+	fp = popen(path,"r");
+	g_free(path);
+        if (!fp)
             return NULL;
          len = libbalsa_readfile_nostat(fp, &ret);
          pclose(fp);    
 	}
      else{
          /* sign is normal file */
-         if (!(fp = fopen(msg->ident->signature_path, "r")))
+	 fp = fopen(path, "r");
+	 g_free(path);
+         if (!fp)
              return NULL;
          len = libbalsa_readfile_nostat(fp, &ret);
          fclose(fp);

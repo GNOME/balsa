@@ -1,3 +1,8 @@
+2001-12-08  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/pref-manager.c: patch from peter to fix the 
+	imap startup prefs box
+
 2001-12-06  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* configure.in: some ldap libraries refer -lresolv (PS).

@@ -2118,6 +2118,7 @@ create_startup_page(gpointer data)
     GtkWidget *vb1;
     GtkObject *scan_adj;
     GtkWidget *hbox;
+    GtkWidget *label;
     const guint padding = 5;
 
     vbox1 = gtk_vbox_new(FALSE, 0);
@@ -2148,21 +2149,16 @@ create_startup_page(gpointer data)
     gtk_box_pack_start(GTK_BOX(vbox1), frame, FALSE, FALSE, 0);
     vb1 = vbox_in_container(frame);
 
-    hbox = gtk_hbox_new(FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(vb1), hbox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox),
-                       gtk_label_new(_("Choose depth 1 for fast startup; "
-                                       "this defers scanning some folders.")),
-                       FALSE, FALSE, 0);
-    hbox = gtk_hbox_new(FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(vb1), hbox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox),
-                       gtk_label_new(_("To see more of the tree at startup, "
-                                       "choose a greater depth.")),
-                       FALSE, FALSE, 0);
+    label = gtk_label_new(_("Choose depth 1 for fast startup; "
+                            "this defers scanning some folders.\n"
+                            "To see more of the tree at startup, "
+                            "choose a greater depth."));
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
+    gtk_box_pack_start(GTK_BOX(vb1), label, FALSE, FALSE, padding);
 
     hbox = gtk_hbox_new(FALSE, padding);
-    gtk_box_pack_start(GTK_BOX(vb1), hbox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vb1), hbox, FALSE, FALSE, padding);
     gtk_box_pack_start(GTK_BOX(hbox),
                        gtk_label_new(_("Scan tree to depth")),
                        FALSE, FALSE, 0);

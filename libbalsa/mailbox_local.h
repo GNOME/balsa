@@ -53,6 +53,7 @@ struct _LibBalsaMailboxLocal {
     guint sync_cnt; /* we do not want to rely on the time of last sync since
                      * some sync can be faster than others. Instead, we
                      * average the syncing time for mailbox. */
+    GArray *threading_info;
 };
 
 struct _LibBalsaMailboxLocalClass {
@@ -71,8 +72,8 @@ gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 
 void libbalsa_mailbox_local_load_messages(LibBalsaMailbox * mailbox,
 					  guint last_msgno);
-LibBalsaMessage *libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox,
-                                                     guint msgno);
+void libbalsa_mailbox_local_msgno_removed(LibBalsaMailbox * mailbox,
+					  guint msgno);
 void libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox);
 
 /* Helpers for maildir and mh. */

@@ -484,7 +484,7 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 	}
     }
     g_return_val_if_fail(mailbox != NULL, FALSE);
-    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
+    libbalsa_lock_mailbox(mailbox);
     
     msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
     for(p=messages; p; 	p=g_list_next(p)) {
@@ -497,7 +497,7 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
     libbalsa_mailbox_unregister_msgnos(mailbox, msgnos);
     g_array_free(msgnos, TRUE);
 
-    UNLOCK_MAILBOX(mailbox);
+    libbalsa_unlock_mailbox(mailbox);
 
     libbalsa_mailbox_check(dest);
     return r;
@@ -547,7 +547,7 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
     g_return_val_if_fail(dest != NULL, FALSE);
 
     mailbox = LIBBALSA_MESSAGE(messages->data)->mailbox;
-    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
+    libbalsa_lock_mailbox(mailbox);
 
     msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
     for(p=messages; p; 	p=g_list_next(p)) {
@@ -560,7 +560,7 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
     libbalsa_mailbox_unregister_msgnos(mailbox, msgnos);
     g_array_free(msgnos, TRUE);
 
-    UNLOCK_MAILBOX(mailbox);
+    libbalsa_unlock_mailbox(mailbox);
 
     libbalsa_mailbox_check(dest);
 
@@ -650,11 +650,9 @@ void
 libbalsa_message_reply(LibBalsaMessage * message)
 {
     g_return_if_fail(message->mailbox);
-    LOCK_MAILBOX(message->mailbox);
-    RETURN_IF_MAILBOX_CLOSED(message->mailbox);
-
+    libbalsa_lock_mailbox(message->mailbox);
     libbalsa_message_set_flag(message, LIBBALSA_MESSAGE_FLAG_REPLIED, 0);
-    UNLOCK_MAILBOX(message->mailbox);
+    libbalsa_unlock_mailbox(message->mailbox);
 }
 
 /* Assume all messages come from the same mailbox */
@@ -690,7 +688,7 @@ libbalsa_messages_change_flag(GList * messages,
     libbalsa_mailbox_register_msgnos(message->mailbox, msgnos);
     
     if (msgnos->len > 0) {
-	LOCK_MAILBOX(mbox);
+	libbalsa_lock_mailbox(mbox);
 	/* RETURN_IF_MAILBOX_CLOSED(mbox); */
         /* set flags for entire set in one transaction */
         if(set)
@@ -699,7 +697,7 @@ libbalsa_messages_change_flag(GList * messages,
         else
             libbalsa_mailbox_messages_change_flags(mbox, msgnos,
 						   0, flag);
-	UNLOCK_MAILBOX(mbox);
+	libbalsa_unlock_mailbox(mbox);
     }
 
     libbalsa_mailbox_unregister_msgnos(message->mailbox, msgnos);
@@ -710,9 +708,11 @@ void
 libbalsa_message_clear_recent(LibBalsaMessage * message)
 {
     g_return_if_fail(message->mailbox);
-    RETURN_IF_MAILBOX_CLOSED(message->mailbox);
 
+    libbalsa_lock_mailbox(message->mailbox);
+    RETURN_IF_MAILBOX_CLOSED(message->mailbox);
     libbalsa_message_set_flag(message, 0, LIBBALSA_MESSAGE_FLAG_RECENT);
+    libbalsa_unlock_mailbox(message->mailbox);
 }
 
 #ifdef DEBUG
@@ -754,7 +754,7 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read,
     if (!message->mailbox) return FALSE;
     g_return_val_if_fail(MAILBOX_OPEN(message->mailbox), FALSE);
 
-    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
+    libbalsa_lock_mailbox(message->mailbox);
 
     if(fetch_all_headers && !message->has_all_headers)
         flags |=  LB_FETCH_RFC822_HEADERS;
@@ -767,7 +767,7 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read,
         libbalsa_mailbox_fetch_message_structure(message->mailbox, message,
                                                  flags);
     message->body_ref++;
-    UNLOCK_MAILBOX(message->mailbox);
+    libbalsa_unlock_mailbox(message->mailbox);
     
     return TRUE;
 }
@@ -799,7 +799,7 @@ libbalsa_message_body_unref(LibBalsaMessage * message)
     if (message->body_ref == 0)
 	return;
 
-   if(message->mailbox) { LOCK_MAILBOX(message->mailbox); }
+   if(message->mailbox) { libbalsa_lock_mailbox(message->mailbox); }
    if (--message->body_ref == 0) {
 #ifdef HAVE_GPGME
        /* find tmp files containing a decrypted body */
@@ -819,7 +819,7 @@ libbalsa_message_body_unref(LibBalsaMessage * message)
 	lb_message_headers_extra_destroy(message->headers);
 	message->has_all_headers = 0;
    }
-   if(message->mailbox) { UNLOCK_MAILBOX(message->mailbox); }
+   if(message->mailbox) { libbalsa_unlock_mailbox(message->mailbox); }
 }
 
 gboolean
@@ -1138,11 +1138,14 @@ libbalsa_message_init_from_gmime(LibBalsaMessage * message,
     lb_message_headers_basic_from_gmime(message->headers, mime_msg);
 }
 
-/* Create a newly allocated list of references for threading. */
+/* Create a newly allocated list of references for threading.
+ * This is a deep copy, with its own strings: deallocate with
+ * g_free and g_list_free. */
 GList *
 libbalsa_message_refs_for_threading(LibBalsaMessage * message)
 {
     GList *tmp;
+    GList *foo;
 
     g_return_val_if_fail(message != NULL, NULL);
 
@@ -1156,8 +1159,8 @@ libbalsa_message_refs_for_threading(LibBalsaMessage * message)
 	 * some apparently provide both but with the references in
 	 * the wrong order; we'll just make sure it's the last item
 	 * of this list */
-	GList *foo = g_list_find_custom(tmp, message->in_reply_to->data,
-					(GCompareFunc) strcmp);
+	foo = g_list_find_custom(tmp, message->in_reply_to->data,
+				 (GCompareFunc) strcmp);
 
 	if (foo) {
 	    tmp = g_list_remove_link(tmp, foo);
@@ -1165,6 +1168,9 @@ libbalsa_message_refs_for_threading(LibBalsaMessage * message)
 	}
 	tmp = g_list_append(tmp, message->in_reply_to->data);
     }
+
+    for (foo = tmp; foo; foo = foo->next)
+	foo->data = g_strdup((gchar *) foo->data);
 
     return tmp;
 }

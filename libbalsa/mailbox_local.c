@@ -242,7 +242,7 @@ libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox)
 
 static void libbalsa_mailbox_link_message(LibBalsaMailboxLocal * mailbox,
 					  LibBalsaMessage * msg);
-LibBalsaMessage *
+static LibBalsaMessage *
 libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMessage *message;
@@ -266,6 +266,20 @@ libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox, guint msgno)
     return message;
 }
 
+/* Threading info. */
+typedef struct {
+    gchar *message_id;
+    GList *refs_for_threading;
+} LibBalsaMailboxLocalInfo;
+
+static void
+lbm_local_free_info(LibBalsaMailboxLocalInfo *threading_info)
+{
+    g_free(threading_info->message_id);
+    g_list_foreach(threading_info->refs_for_threading, (GFunc) g_free, NULL);
+    g_list_free(threading_info->refs_for_threading);
+}
+    
 static void
 libbalsa_mailbox_local_finalize(GObject * object)
 {
@@ -278,6 +292,16 @@ libbalsa_mailbox_local_finalize(GObject * object)
     if(ml->sync_id) {
         g_source_remove(ml->sync_id);
         ml->sync_id = 0;
+    }
+
+    if (ml->threading_info) {
+	guint i;
+	for (i = 0; i < ml->threading_info->len; i++)
+	    lbm_local_free_info(&g_array_index(ml->threading_info,
+					       LibBalsaMailboxLocalInfo,
+					       i));
+	g_array_free(ml->threading_info, TRUE);
+	ml->threading_info = NULL;
     }
 
     if (G_OBJECT_CLASS(parent_class)->finalize)
@@ -343,8 +367,7 @@ libbalsa_mailbox_local_message_match(LibBalsaMailbox * mailbox,
 {
     LibBalsaMessage *message =
 	libbalsa_mailbox_get_message(mailbox, msgno);
-    gboolean res =
-	libbalsa_condition_matches(iter->condition, message, TRUE);
+    gboolean res = libbalsa_condition_matches(iter->condition, message);
     g_object_unref(message);
     return res;
 }
@@ -365,7 +388,7 @@ libbalsa_mailbox_link_message(LibBalsaMailboxLocal *mailbox,
 	&& !LIBBALSA_MESSAGE_IS_DELETED(msg))
         mbx->unread_messages++;
     if(!mbx->view_filter ||
-       libbalsa_condition_matches(mbx->view_filter, msg, TRUE))
+       libbalsa_condition_matches(mbx->view_filter, msg))
         libbalsa_mailbox_msgno_inserted(mbx, msg->msgno);
     if (libbalsa_message_is_partial(msg, &id)) {
 	libbalsa_mailbox_try_reassemble(mbx, id);
@@ -382,9 +405,11 @@ libbalsa_mailbox_link_message(LibBalsaMailboxLocal *mailbox,
 void
 libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox, guint msgno)
 {
+    LibBalsaMailboxLocal *local;
     guint new_messages = 0;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
+    local = (LibBalsaMailboxLocal *) mailbox;
     if (!mailbox->msg_tree)
 	/* Mailbox is closed, or no view has been created. */
 	return;
@@ -393,11 +418,31 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox, guint msgno)
     while (++msgno <= libbalsa_mailbox_total_messages(mailbox)) {
 	LibBalsaMessage *msg =
 	    libbalsa_mailbox_local_load_message(mailbox, msgno);
-	if (msg) {
-	    ++new_messages;
-	    g_object_unref(msg);
+
+	if (!msg)
+	    continue;
+
+	++new_messages;
+	if (local->threading_info) {
+	    LibBalsaMailboxLocalInfo threading_info = { 0 };
+	    LibBalsaMailboxLocalInfo *info;
+
+	    while (local->threading_info->len < msgno)
+		g_array_append_val(local->threading_info, threading_info);
+	    info = &g_array_index(local->threading_info,
+				  LibBalsaMailboxLocalInfo, msgno - 1);
+	    if (!info->message_id)
+		info->message_id = g_strdup(msg->message_id);
+	    if (!info->refs_for_threading)
+		info->refs_for_threading =
+		    libbalsa_message_refs_for_threading(msg);
+	    /* While we have the message, force mailbox to create
+	     * the index entry: */
+	    libbalsa_mailbox_msgno_get_subject(mailbox, msgno);
 	}
+	g_object_unref(msg);
     }
+
     if (new_messages) {
 	libbalsa_mailbox_set_unread_messages_flag(mailbox,
 						  mailbox->
@@ -421,6 +466,12 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
 				     LibBalsaMailboxThreadingType
 				     thread_type)
 {
+    LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
+
+    if (!local->threading_info)
+	local->threading_info =
+	    g_array_new(FALSE, FALSE, sizeof(LibBalsaMailboxLocalInfo));
+
     if(!mailbox->msg_tree) { /* first reference */
         mailbox->msg_tree = g_node_new(NULL);
         libbalsa_mailbox_local_load_messages(mailbox, 0);
@@ -429,6 +480,18 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
 	lbml_threading_jwz(mailbox, mailbox->msg_tree);
     else
 	lbml_threading_simple(mailbox, mailbox->msg_tree, thread_type);
+}
+
+void
+libbalsa_mailbox_local_msgno_removed(LibBalsaMailbox * mailbox,
+				     guint msgno)
+{
+    LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
+
+    if (local->threading_info)
+	g_array_remove_index(local->threading_info, msgno - 1);
+
+    libbalsa_mailbox_msgno_removed(mailbox, msgno);
 }
 
 static void
@@ -536,17 +599,16 @@ libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
 struct _ThreadingInfo {
     LibBalsaMailbox *mailbox;
     GNode *msg_tree;
-    LibBalsaMessage **msg_array;
-    guint msg_array_len;
     GHashTable *id_table;
     GHashTable *subject_table;
 };
 typedef struct _ThreadingInfo ThreadingInfo;
 
 static gboolean lbml_set_parent(GNode * node, ThreadingInfo * ti);
-static void lbml_insert_node(GNode * node, LibBalsaMessage * message,
+static void lbml_insert_node(GNode * node,
+			     LibBalsaMailboxLocalInfo * message,
 			     ThreadingInfo * ti);
-static GNode *lbml_find_parent(LibBalsaMessage * message,
+static GNode *lbml_find_parent(LibBalsaMailboxLocalInfo * message,
 			       ThreadingInfo * ti);
 static gboolean lbml_prune(GNode * node, ThreadingInfo * ti);
 static void lbml_subject_gather(GNode * node, ThreadingInfo * ti);
@@ -560,18 +622,8 @@ static void
 lbml_info_setup(LibBalsaMailbox * mailbox, GNode * msg_tree,
 		ThreadingInfo * ti)
 {
-    guint msgno;
-
     ti->mailbox = mailbox;
     ti->msg_tree = msg_tree;
-
-    ti->msg_array_len = libbalsa_mailbox_total_messages(mailbox);
-    ti->msg_array = g_new(LibBalsaMessage *, ti->msg_array_len);
-
-    for (msgno = 1; msgno <= ti->msg_array_len; msgno++)
-	ti->msg_array[msgno - 1] =
-	    libbalsa_mailbox_get_message(ti->mailbox, msgno);
-
     ti->id_table = g_hash_table_new(g_str_hash, g_str_equal);
     ti->subject_table = NULL;
 }
@@ -579,11 +631,7 @@ lbml_info_setup(LibBalsaMailbox * mailbox, GNode * msg_tree,
 static void
 lbml_info_free(ThreadingInfo * ti)
 {
-    unsigned i;
     g_hash_table_destroy(ti->id_table);
-    for(i=0; i<ti->msg_array_len; i++)
-	g_object_unref(G_OBJECT(ti->msg_array[i]));
-    g_free(ti->msg_array);
     if (ti->subject_table)
 	g_hash_table_destroy(ti->subject_table);
 }
@@ -593,8 +641,6 @@ lbml_threading_jwz(LibBalsaMailbox * mailbox, GNode * msg_tree)
 {
     ThreadingInfo ti;
 
-    /*FIXME - do the work */
-    return;
     lbml_info_setup(mailbox, msg_tree, &ti);
 
     g_node_traverse(msg_tree, G_POST_ORDER, G_TRAVERSE_ALL, -1,
@@ -615,19 +661,20 @@ lbml_threading_jwz(LibBalsaMailbox * mailbox, GNode * msg_tree)
     lbml_info_free(&ti);
 }
 
-static LibBalsaMessage *
+static LibBalsaMailboxLocalInfo *
 lbml_get_message(GNode * node, ThreadingInfo * ti)
 {
-    gint msgno;
-
-    msgno = GPOINTER_TO_INT(node->data);
-    return msgno <= 0 ? NULL : ti->msg_array[msgno - 1];
+    guint msgno = GPOINTER_TO_UINT(node->data);
+    LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(ti->mailbox);
+    return msgno > 0 && msgno <= local->threading_info->len ?
+	&g_array_index(local->threading_info,
+		       LibBalsaMailboxLocalInfo, msgno - 1) : NULL;
 }
 
 static gboolean
 lbml_set_parent(GNode * node, ThreadingInfo * ti)
 {
-    LibBalsaMessage *message;
+    LibBalsaMailboxLocalInfo *message;
     GNode *parent;
     GNode *child;
 
@@ -635,6 +682,9 @@ lbml_set_parent(GNode * node, ThreadingInfo * ti)
 	return FALSE;
 
     message = lbml_get_message(node, ti);
+
+    if (!message) /* FIXME assert this? */
+	return FALSE;
 
     if (message->message_id)
 	lbml_insert_node(node, message, ti);
@@ -690,7 +740,7 @@ lbml_set_parent(GNode * node, ThreadingInfo * ti)
 }
 
 static GNode *
-lbml_find_parent(LibBalsaMessage * message, ThreadingInfo * ti)
+lbml_find_parent(LibBalsaMailboxLocalInfo * message, ThreadingInfo * ti)
 {
     /*
      * For each element in the message's References field:
@@ -707,10 +757,10 @@ lbml_find_parent(LibBalsaMessage * message, ThreadingInfo * ti)
 
     /* The root of the mailbox tree is the default parent. */
     GNode *parent = ti->msg_tree;
-    GList *reference, *l;
+    GList *reference;
 
-    l = libbalsa_message_refs_for_threading(message);
-    for (reference = l; reference; reference = reference->next) {
+    for (reference = message->refs_for_threading; reference;
+	 reference = reference->next) {
 	gchar *id = reference->data;
 	GNode *foo = g_hash_table_lookup(ti->id_table, id);
 
@@ -726,12 +776,19 @@ lbml_find_parent(LibBalsaMessage * message, ThreadingInfo * ti)
 
 	parent = foo;
     }
-    g_list_free(l);
     return parent;
 }
 
+static gboolean
+lbml_is_replied(GNode * node, ThreadingInfo * ti)
+{
+    guint msgno = GPOINTER_TO_UINT(node->data);
+    return libbalsa_mailbox_msgno_get_status(ti->mailbox, msgno)
+	== LIBBALSA_MESSAGE_STATUS_REPLIED;
+}
+
 static void
-lbml_insert_node(GNode * node, LibBalsaMessage * message,
+lbml_insert_node(GNode * node, LibBalsaMailboxLocalInfo * message,
 		 ThreadingInfo * ti)
 {
     /*
@@ -748,15 +805,16 @@ lbml_insert_node(GNode * node, LibBalsaMessage * message,
     old_node = g_hash_table_lookup(ti->id_table, message->message_id);
 
     if (old_node) {
-	LibBalsaMessage *old_message;
+
+	LibBalsaMailboxLocalInfo *old_message;
 
 	old_message = lbml_get_message(old_node, ti);
-	if (old_message && LIBBALSA_MESSAGE_IS_REPLIED(old_message))
+	if (old_message && lbml_is_replied(old_node, ti))
 	    return;		/* ...without changing hash table entry. */
 
 	if (!old_message
 	    /* old_node is a place-holder... */
-	    || LIBBALSA_MESSAGE_IS_REPLIED(message)) {
+	    || lbml_is_replied(node, ti)) {
 	    /* ...or we want to thread off this instance */
 	    while (old_node->children)
 		libbalsa_mailbox_unlink_and_prepend(ti->mailbox, 
@@ -806,10 +864,17 @@ lbml_prune(GNode * node, ThreadingInfo * ti)
     return FALSE;
 }
 
+static const gchar *
+lbml_get_subject(GNode * node, ThreadingInfo * ti)
+{
+    guint msgno = GPOINTER_TO_UINT(node->data);
+    return libbalsa_mailbox_msgno_get_subject(ti->mailbox, msgno);
+}
+
 static void
 lbml_subject_gather(GNode * node, ThreadingInfo * ti)
 {
-    LibBalsaMessage *message, *old_message;
+    LibBalsaMailboxLocalInfo *message, *old_message;
     const gchar *subject = NULL, *old_subject;
     const gchar *chopped_subject = NULL;
     GNode *old;
@@ -889,7 +954,7 @@ lbml_subject_gather(GNode * node, ThreadingInfo * ti)
 #endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
     g_assert(message != NULL);
 
-    subject = LIBBALSA_MESSAGE_GET_SUBJECT(message);
+    subject = lbml_get_subject(node, ti);
     if (subject == NULL)
 	return;
     chopped_subject = lbml_chop_re(subject);
@@ -915,7 +980,7 @@ lbml_subject_gather(GNode * node, ThreadingInfo * ti)
 #endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
     g_assert(old_message != NULL);
 
-    old_subject = LIBBALSA_MESSAGE_GET_SUBJECT(old_message);
+    old_subject = lbml_get_subject(old, ti);
 
     if (old_subject != lbml_chop_re(old_subject)
 	&& subject == chopped_subject)
@@ -949,19 +1014,11 @@ lbml_swap(GNode * node1, GNode * node2, ThreadingInfo * ti)
 static void
 lbml_subject_merge(GNode * node, ThreadingInfo * ti)
 {
-    LibBalsaMessage *message, *message2;
     const gchar *subject, *subject2;
     const gchar *chopped_subject, *chopped_subject2;
     GNode *node2;
 
-    message = lbml_get_message(node, ti);
-#ifdef MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT
-    if (!message)
-	message = lbml_get_message(node->children, ti);
-#endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
-    g_assert(message != NULL);
-
-    subject = LIBBALSA_MESSAGE_GET_SUBJECT(message);
+    subject = lbml_get_subject(node, ti);
     if (subject == NULL)
 	return;
     chopped_subject = lbml_chop_re(subject);
@@ -993,8 +1050,7 @@ lbml_subject_merge(GNode * node, ThreadingInfo * ti)
     }
 #endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
 
-    message2 = lbml_get_message(node2, ti);
-    subject2 = LIBBALSA_MESSAGE_GET_SUBJECT(message2);
+    subject2 = lbml_get_subject(node2, ti);
     chopped_subject2 = lbml_chop_re(subject2);
 
     if ((subject2 == chopped_subject2) && subject != chopped_subject)
@@ -1075,8 +1131,6 @@ lbml_threading_simple(LibBalsaMailbox * mailbox,
 {
     ThreadingInfo ti;
 
-    /*FIXME: do the work */
-    return;
     lbml_info_setup(mailbox, msg_tree, &ti);
 
     if (type == LB_MAILBOX_THREADING_SIMPLE)
@@ -1096,7 +1150,7 @@ lbml_threading_simple(LibBalsaMailbox * mailbox,
 static gboolean
 lbml_insert_message(GNode * node, ThreadingInfo * ti)
 {
-    LibBalsaMessage *message;
+    LibBalsaMailboxLocalInfo *message;
 
     if (node == ti->msg_tree)
 	return FALSE;
@@ -1116,7 +1170,7 @@ lbml_insert_message(GNode * node, ThreadingInfo * ti)
 static gboolean
 lbml_thread_message(GNode * node, ThreadingInfo * ti)
 {
-    LibBalsaMessage *message;
+    LibBalsaMailboxLocalInfo *message;
     GList *refs;
     GNode *parent = NULL;
 
@@ -1131,11 +1185,10 @@ lbml_thread_message(GNode * node, ThreadingInfo * ti)
     g_assert(message != NULL);
 #endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
 
-    refs = libbalsa_message_refs_for_threading(message);
+    refs = message->refs_for_threading;
     if (refs)
 	parent = g_hash_table_lookup(ti->id_table,
 				     g_list_last(refs)->data);
-    g_list_free(refs);
     if (!parent)
 	parent = ti->msg_tree;
     if (parent != node->parent)
@@ -1204,7 +1257,7 @@ lbml_sync_real(LibBalsaMailboxLocal * local)
     time_t tstart;
 
     time(&tstart);
-    LOCK_MAILBOX(mailbox);
+    libbalsa_lock_mailbox(mailbox);
     if (local->sync_id &&                       /* request still pending */
         MAILBOX_OPEN(mailbox) &&                   /* mailbox still open */
         !libbalsa_mailbox_sync_storage(mailbox, FALSE))   /* cannot sync */
@@ -1214,7 +1267,7 @@ lbml_sync_real(LibBalsaMailboxLocal * local)
     local->sync_id = 0;
     local->sync_time += time(NULL)-tstart;
     local->sync_cnt++;
-    UNLOCK_MAILBOX(mailbox);
+    libbalsa_unlock_mailbox(mailbox);
     g_object_unref(local);
 }
 

@@ -47,8 +47,6 @@ extern "C"
       GtkWidget *table;
 
       /* Widget to hold headers */
-/*        GtkWidget *header_list; */
-/*        gint header_count; */
       GtkWidget *header_text;
       ShownHeaders shown_headers;
 
@@ -70,6 +68,8 @@ extern "C"
   struct _BalsaMessageClass
     {
       GtkViewportClass parent_class;
+
+      void (*select_part) (BalsaMessage *message);
     };
 
   guint balsa_message_get_type (void);
@@ -86,9 +86,9 @@ extern "C"
 					   ShownHeaders sh);
   void balsa_message_set_wrap(BalsaMessage *bmessage, gboolean wrap);
 
-  /* FIXME: Implement - and hook to menu items. */
-  /* void balsa_message_copy_clipboard(BalsaMessage *bmessage); */
-  /* void balsa_message_select_all(BalsaMessage *bmessage); */
+  gboolean balsa_message_can_select(BalsaMessage *bmessage);
+  void balsa_message_copy_clipboard(BalsaMessage *bmessage);
+  void balsa_message_select_all(BalsaMessage *bmessage);
 
   void reflow_string(gchar* str, gint mode, gint *cur_pos, int width);
 

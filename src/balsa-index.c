@@ -205,7 +205,7 @@ balsa_index_class_init (BalsaIndexClass * klass)
 
   balsa_index_signals[SELECT_MESSAGE] =
     gtk_signal_new ("select_message",
-		    GTK_RUN_LAST,
+		    GTK_RUN_FIRST,
 		    object_class->type,
 		    GTK_SIGNAL_OFFSET (BalsaIndexClass, select_message),
 		    gtk_marshal_NONE__POINTER_POINTER,
@@ -213,7 +213,7 @@ balsa_index_class_init (BalsaIndexClass * klass)
 		    GTK_TYPE_GDK_EVENT);
   balsa_index_signals[UNSELECT_MESSAGE] =
     gtk_signal_new ("unselect_message",
-		    GTK_RUN_LAST,
+		    GTK_RUN_FIRST,
 		    object_class->type,
 		    GTK_SIGNAL_OFFSET (BalsaIndexClass, unselect_message),
 		    gtk_marshal_NONE__POINTER_POINTER,

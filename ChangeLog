@@ -1,3 +1,11 @@
+2000-09-26  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-message.[ch]: New signal 'select_part', emitted when you
+	select a part (odd that). Implemented
+	balsa_message_{can_select,_select_all,_copy} to support menu
+	items.
+	* src/main-window.c: Connect the copy and select all menu items up.
+
 2000-09-25  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/balsa-index-page.c, src/mblist-window.c: Made context menu

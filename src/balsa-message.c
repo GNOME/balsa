@@ -43,6 +43,11 @@
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
+enum 
+{
+  SELECT_PART,
+  LAST_SIGNAL,
+};
 
 struct _BalsaPartInfo
   {
@@ -62,6 +67,7 @@ struct _BalsaPartInfo
     gboolean can_display;
   };
 
+static gint balsa_message_signals[LAST_SIGNAL];
 
 /* widget */
 static void balsa_message_class_init (BalsaMessageClass * klass);
@@ -154,9 +160,23 @@ balsa_message_class_init (BalsaMessageClass * klass)
 
   object_class = GTK_OBJECT_CLASS(klass);
 
-  object_class->destroy = balsa_message_destroy;
+  balsa_message_signals[SELECT_PART] = 
+    gtk_signal_new("select-part", 
+		   GTK_RUN_FIRST,
+		   object_class->type,
+		   GTK_SIGNAL_OFFSET(BalsaMessageClass, select_part),
+		   gtk_marshal_NONE__NONE,
+		   GTK_TYPE_NONE, 0);
+		   
+  gtk_object_class_add_signals(object_class, balsa_message_signals,
+				LAST_SIGNAL);
 
+  object_class->destroy = balsa_message_destroy;
+  
   parent_class = gtk_type_class (gtk_viewport_get_type ());
+
+  klass->select_part = NULL;
+
 }
 
 static void
@@ -1387,6 +1407,7 @@ select_part(BalsaMessage *bm, gint part)
 		       GTK_EXPAND|GTK_FILL, GTK_EXPAND|GTK_FILL, 0, 0);
     }
     bm->current_part = info;
+    gtk_signal_emit(GTK_OBJECT(bm), balsa_message_signals[SELECT_PART]);
   } else {
     bm->current_part = NULL;
   }
@@ -1396,7 +1417,7 @@ select_part(BalsaMessage *bm, gint part)
   scroll_set(GTK_VIEWPORT(bm)->vadjustment, 0);
 
   gtk_widget_queue_resize(GTK_WIDGET(bm));
-
+  
 }
 
 static void
@@ -1521,4 +1542,52 @@ balsa_icon_list_size_request (GtkWidget *widget, GtkRequisition *requisition, gp
   /* requisition->width = gil->hadj->upper; */
   requisition->height += gil->adj->upper;
   
+}
+
+/*
+ * This function informs the caller if the currently selected part 
+ * supports selection/copying etc. Currently only the GtkEditable derived 
+ * widgets are supported for this (GtkHTML could be, but I don't have a 
+ * working build right now)
+ */
+gboolean
+balsa_message_can_select(BalsaMessage *bmessage)
+{
+  g_return_val_if_fail(bmessage != NULL, FALSE);
+
+  if (bmessage->current_part == NULL)
+    return FALSE;
+  if (bmessage->current_part->focus_widget == NULL)
+    return FALSE;
+
+  if ( GTK_IS_EDITABLE(bmessage->current_part->focus_widget) )
+    return TRUE;
+  else
+    return FALSE;
+}
+
+void
+balsa_message_copy_clipboard(BalsaMessage *bmessage)
+{
+  g_return_if_fail(bmessage != NULL);
+  g_return_if_fail(bmessage->current_part != NULL);
+  g_return_if_fail(bmessage->current_part->focus_widget != NULL);
+
+  if ( ! GTK_IS_EDITABLE(bmessage->current_part->focus_widget) )
+    return;
+
+  gtk_editable_copy_clipboard(GTK_EDITABLE(bmessage->current_part->focus_widget));
+}
+
+void
+balsa_message_select_all(BalsaMessage *bmessage)
+{
+  g_return_if_fail(bmessage != NULL);
+  g_return_if_fail(bmessage->current_part != NULL);
+  g_return_if_fail(bmessage->current_part->focus_widget != NULL);
+
+  if ( ! GTK_IS_EDITABLE(bmessage->current_part->focus_widget) )
+    return;
+  
+  gtk_editable_select_region(GTK_EDITABLE(bmessage->current_part->focus_widget), 0, -1);
 }

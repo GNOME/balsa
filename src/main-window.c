@@ -108,6 +108,7 @@ static gint mailbox_check_func ( GNode *mbox, gpointer data );
 
 static void enable_mailbox_menus(LibBalsaMailbox *mailbox);
 static void enable_message_menus(LibBalsaMessage *message);
+static void enable_edit_menus(BalsaMessage *bm);
 
 static gint about_box_visible = FALSE;
 
@@ -141,6 +142,11 @@ static void wrap_message_cb (GtkWidget * widget, gpointer data);
 static void show_no_headers_cb(GtkWidget * widget, gpointer data);
 static void show_selected_cb(GtkWidget * widget, gpointer data);
 static void show_all_headers_cb(GtkWidget * widget, gpointer data);
+
+static void copy_cb(GtkWidget *widget, gpointer data);
+static void select_all_cb(GtkWidget *widget, gpointer);
+
+static void select_part_cb(BalsaMessage *bm, gpointer data);
 
 #ifdef BALSA_SHOW_ALL
 static void filter_dlg_cb (GtkWidget * widget, gpointer data);
@@ -238,13 +244,16 @@ static GnomeUIInfo edit_menu[] =
   /*  GNOMEUIINFO_MENU_UNDO_ITEM(NULL, NULL); */
   /*  GNOMEUIINFO_MENU_REDO_ITEM(NULL, NULL); */
   /*  GNOMEUIINFO_SEPARATOR, */
-  GNOMEUIINFO_MENU_COPY_ITEM(NULL, NULL),
-  GNOMEUIINFO_MENU_SELECT_ALL_ITEM(NULL, NULL),
-  /*  GNOMEUINFO_SEPARATOR, */
+#define MENU_EDIT_COPY_POS 0
+  GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
+#define MENU_EDIT_SELECT_ALL_POS 1
+  GNOMEUIINFO_MENU_SELECT_ALL_ITEM(select_all_cb, NULL),
+  /* GNOMEUINFO_SEPARATOR, */
   /*  GNOMEUIINFO_MENU_FIND_ITEM(NULL, NULL); */
   /*  GNOMEUIINFO_MENU_FIND_AGAIN_ITEM(NULL, NULL); */
   /*  GNOMEUIINFO_MENU_REPLACE_ITEM(NULL, NULL); */
   GNOMEUIINFO_SEPARATOR,
+#define MENU_EDIT_PREFERENCES_POS 3
   GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL),
 #ifdef BALSA_SHOW_ALL
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Filters..."), N_("Manage filters"),
@@ -576,6 +585,7 @@ balsa_window_new ()
   /* Disable menu items at start up */
   enable_mailbox_menus(NULL);
   enable_message_menus(NULL);
+  enable_edit_menus(NULL);
 
   /* we can only set icon after realization, as we have no windows before. */
   gtk_signal_connect (GTK_OBJECT (window), "realize",
@@ -608,6 +618,9 @@ balsa_window_new ()
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
   window->preview = balsa_message_new();
+
+  gtk_signal_connect(GTK_OBJECT(window->preview), "select-part",
+		     GTK_SIGNAL_FUNC(select_part_cb), window);
 
   gtk_container_add(GTK_CONTAINER(scroll), window->preview);
   gtk_widget_show(scroll);
@@ -688,7 +701,7 @@ enable_mailbox_menus(LibBalsaMailbox *mailbox)
   gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_NEXT_POS].widget, enable);
   gtk_widget_set_sensitive ( main_toolbar[TOOLBAR_NEXT_UNREAD_POS].widget, enable);
 
-  gtk_widget_set_sensitive ( main_toolbar[MENU_MAILBOX_DELETE_POS].widget, enable);
+  gtk_widget_set_sensitive ( mailbox_menu[MENU_MAILBOX_DELETE_POS].widget, enable);
 
   gtk_widget_set_sensitive ( mailbox_menu[MENU_MAILBOX_NEXT_POS].widget, enable );
   gtk_widget_set_sensitive ( mailbox_menu[MENU_MAILBOX_PREV_POS].widget, enable );
@@ -753,6 +766,23 @@ enable_message_menus(LibBalsaMessage *message)
 
 }
 
+/*
+ * Enable/disable the copy and select all buttons
+ */
+static void
+enable_edit_menus(BalsaMessage *bm)
+{
+  gboolean enable;
+  if ( bm && balsa_message_can_select(bm) )
+    enable = TRUE;
+  else
+    enable = FALSE;
+
+  gtk_widget_set_sensitive ( edit_menu[MENU_EDIT_COPY_POS].widget, enable);
+  gtk_widget_set_sensitive ( edit_menu[MENU_EDIT_SELECT_ALL_POS].widget, enable);
+}
+
+
 void
 balsa_window_set_cursor (BalsaWindow *window,
 			 GdkCursor *cursor)
@@ -806,9 +836,9 @@ static void balsa_window_real_open_mailbox(BalsaWindow *window, LibBalsaMailbox 
 	index = BALSA_INDEX(BALSA_INDEX_PAGE(page)->index);
 
 	gtk_signal_connect(GTK_OBJECT(index), "select_message",
-			   GTK_SIGNAL_FUNC(balsa_window_select_message_cb), NULL);
+			   GTK_SIGNAL_FUNC(balsa_window_select_message_cb), window);
 	gtk_signal_connect(GTK_OBJECT(index), "unselect_message",
-			   GTK_SIGNAL_FUNC(balsa_window_unselect_message_cb), NULL);
+			   GTK_SIGNAL_FUNC(balsa_window_unselect_message_cb), window);
 
 	if( balsa_index_page_load_mailbox(BALSA_INDEX_PAGE(page), mailbox) ) {
 		/* The function will display a dialog on error */
@@ -869,6 +899,7 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, LibBalsaMailbox
       /* Disable menus */
       enable_mailbox_menus(NULL);
       enable_message_menus(NULL);
+      enable_edit_menus(NULL);
     }
 
     balsa_app.open_mailbox_list = g_list_remove(balsa_app.open_mailbox_list, mailbox);
@@ -1563,7 +1594,10 @@ next_part_cb (GtkWidget *widget, gpointer data)
 
   bw = BALSA_WINDOW(data);
 
-  balsa_message_next_part(BALSA_MESSAGE(bw->preview));
+  if ( bw->preview ) {
+    balsa_message_next_part(BALSA_MESSAGE(bw->preview));
+    enable_edit_menus(BALSA_MESSAGE(bw->preview));
+  }
 }
 
 static void 
@@ -1571,8 +1605,31 @@ previous_part_cb (GtkWidget *widget, gpointer data)
 {
   BalsaWindow *bw;
   bw = BALSA_WINDOW(data);
-  if ( bw->preview )
+  if ( bw->preview ) {
     balsa_message_previous_part(BALSA_MESSAGE(bw->preview));
+    enable_edit_menus(BALSA_MESSAGE(bw->preview));
+  }
+}
+
+static void
+copy_cb(GtkWidget *widget, gpointer data)
+{
+  BalsaWindow *bw;
+
+  bw = BALSA_WINDOW(data);
+ 
+ if ( bw->preview )
+    balsa_message_copy_clipboard(BALSA_MESSAGE(bw->preview));
+}
+
+static void
+select_all_cb(GtkWidget *widget, gpointer data)
+{
+  BalsaWindow *bw;
+  bw = BALSA_WINDOW(data);
+
+  if ( bw->preview )
+    balsa_message_select_all(BALSA_MESSAGE(bw->preview));
 }
 
 static void 
@@ -1920,5 +1977,19 @@ balsa_window_unselect_message_cb (GtkWidget * widget, LibBalsaMessage * message,
 {
   enable_mailbox_menus(message->mailbox);
   enable_message_menus(NULL);
+  enable_edit_menus(NULL);
 }
 
+static void 
+select_part_cb(BalsaMessage *bm, gpointer data)
+{
+  BalsaWindow *bw;
+
+  bw = BALSA_WINDOW(data);
+
+  if ( bw->preview )
+    enable_edit_menus(BALSA_MESSAGE(bw->preview));
+  else
+    enable_edit_menus(NULL);
+
+}

@@ -1,3 +1,7 @@
+2003-10-27 00:54  PeterB
+
+	* libbalsa/mailbox_imap.c: Update message->msgno after expunge.
+
 2003-10-25 18:29  PeterB
 
 	* libbalsa/: mailbox_imap.c, mailbox_maildir.c, mailbox_mbox.c,

@@ -32,6 +32,9 @@
 
 #include "filter.h"
 
+#define MAILBOX_FILTERS_SECTION_PREFIX "filters-mailbox-"
+#define MAILBOX_FILTERS_URL_KEY "Mailbox-URL"
+
 /*
  * Defines for the when field of mailbox controlling when to automatically run associated filters of a mailbox
  * For now : on incoming mails, before closing a mailbox (to have something like a purge mechanism)
@@ -59,5 +62,10 @@ typedef struct _LibBalsaMailboxFilter {
 /* Returns a slist of filters having the corresponding when field */
 
 GSList * libbalsa_mailbox_filters_when(GSList * filters, gint when);
+
+/* Loads the filters associated to the mailbox */
+void config_mailbox_filters_load(LibBalsaMailbox * mbox);
+/* Saves the filters associated to the mailbox */
+gchar * mailbox_filters_section_lookup(const gchar * url);
 
 #endif				/* __MAILBOX_FILTER_H__ */

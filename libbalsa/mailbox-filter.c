@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,13 @@
  * Author : Emmanuel Allaud
  */
 
-
+#include "config.h"
+#include <gnome.h>
+#include "filter-file.h"
 #include "mailbox-filter.h"
+
+/* FIXME : double definition : first is in save-restore.c */
+#define BALSA_CONFIG_PREFIX "balsa/"
 
 /* Returns a slist of filters having the corresponding when field
  * There is no copy, the new list references object of the source list
@@ -46,4 +51,50 @@ libbalsa_mailbox_filters_when(GSList * filters, gint when)
     lst=g_slist_reverse(lst);
 
     return(lst);
+}
+
+/* Looks for a mailbox filters section with MBOX_URL field equals to mbox->url
+ * returns the section name or NULL if none found
+ * The returned string has to be freed by the caller
+ */
+
+gchar * mailbox_filters_section_lookup(const gchar * name)
+{
+    gint pref_len=strlen(MAILBOX_FILTERS_SECTION_PREFIX);
+    guint name_len;
+
+    gchar * tmp, *section;
+    void * iterator;
+    gboolean res;
+
+    g_return_val_if_fail(name && name[0],NULL);
+    name_len=strlen(name);
+    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    while ((iterator = gnome_config_iterator_next(iterator, &tmp, NULL))) {
+	if (strncmp(tmp, MAILBOX_FILTERS_SECTION_PREFIX, pref_len) == 0) {
+	    section = g_strconcat(BALSA_CONFIG_PREFIX, tmp, "/", NULL);
+	    g_free(tmp);
+	    gnome_config_push_prefix(section);
+	    tmp=gnome_config_get_string(MAILBOX_FILTERS_URL_KEY);
+	    gnome_config_pop_prefix();
+	    res=strncmp(tmp,name,name_len)==0;
+	    g_free(tmp);
+	    if (res) return section;
+	    g_free(section);
+	}
+    }
+    return NULL;
+}
+
+void config_mailbox_filters_load(LibBalsaMailbox * mbox)
+{
+    gchar * section;
+
+    section=mailbox_filters_section_lookup(mbox->url ? mbox->url : mbox->name);
+    if (section) {
+	gnome_config_push_prefix(section);
+	g_free(section);
+	libbalsa_mailbox_filters_load_config(mbox);
+	gnome_config_pop_prefix();
+    }
 }

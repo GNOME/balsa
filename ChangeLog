@@ -1,5 +1,15 @@
 2002-04-26  Pawel Salek <pawsa@theochem.kth.se>
 
+	Emmanuel Allaud's patch (+minor modifications) to fix filtering on
+	receiving
+	* libbalsa/mailbox-filter.[ch]: configuration reading code added.
+	* src/filter-edit-callbacks.c: correction for saving POP mailboxes.
+	* src/save-restore.[hc]: filter configuration reading code removed.
+	* libbalsa/mailbox_{local,pop3}.c: read fliter configuration when
+	needed.
+	
+2002-04-26  Pawel Salek <pawsa@theochem.kth.se>
+
 	* configure.in, {libbalsa,src}/Makefile.am, libbalsa/mailbox.[ch]:
 	* libbalsa/mailbox_{local,pop3}.c, libbalsa/message.c: 
 	* src/balsa-app.[hc], src/balsa-index.[hc], src/mailbox-node.c: 

@@ -115,7 +115,7 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox)
     LibBalsaMailboxRemote *remote;
     mailbox->check = FALSE;
     mailbox->delete_from_server = FALSE;
-	mailbox->inbox = NULL;
+    mailbox->inbox = NULL;
 
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server =
@@ -299,7 +299,10 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     if((m->inbox) && (tmp_mailbox->messages)) {
 	GSList * filters; 
 
-	filters = libbalsa_mailbox_filters_when(mailbox->filters,
+	 /* Load associated filters if needed */
+        if (!mailbox->filters)                                
+            libbalsa_mailbox_filters_load_config(mailbox);
+        filters = libbalsa_mailbox_filters_when(mailbox->filters,
 						FILTER_WHEN_INCOMING);
 	if (filters) {
 	    if (filters_prepare_to_run(filters))

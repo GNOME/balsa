@@ -3516,9 +3516,6 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     gboolean thereturn;
     LibBalsaMessage *message;
     
-    if (!is_ready_to_send(bsmsg)) 
-        return;
-
     message = bsmsg2message(bsmsg);
     gtk_object_ref(GTK_OBJECT(message));
 

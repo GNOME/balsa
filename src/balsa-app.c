@@ -226,6 +226,8 @@ balsa_app_init(void)
 
     balsa_app.debug = FALSE;
     balsa_app.previewpane = TRUE;
+    balsa_app.pgdownmod = FALSE;
+    balsa_app.pgdown_percent = 50;
 
     /* GUI settings */
     balsa_app.mblist = NULL;

@@ -1855,8 +1855,16 @@ balsa_message_key_press_event(GtkWidget * widget, GdkEventKey * event,
 			      BalsaMessage * bm)
 {
     GtkViewport *viewport;
+    int page_adjust;
 
     viewport = GTK_VIEWPORT(bm);
+
+    if (balsa_app.pgdownmod) {
+	    page_adjust = (viewport->vadjustment->page_size *
+		 balsa_app.pgdown_percent) / 100;
+    } else {
+	    page_adjust = viewport->vadjustment->page_increment;
+    }
 
     switch (event->keyval) {
     case GDK_Up:
@@ -1869,11 +1877,11 @@ balsa_message_key_press_event(GtkWidget * widget, GdkEventKey * event,
 	break;
     case GDK_Page_Up:
 	scroll_change(viewport->vadjustment,
-		      -viewport->vadjustment->page_increment);
+		      -page_adjust);
 	break;
     case GDK_Page_Down:
 	scroll_change(viewport->vadjustment,
-		      viewport->vadjustment->page_increment);
+		      page_adjust);
 	break;
     case GDK_Home:
 	if (event->state & GDK_CONTROL_MASK)

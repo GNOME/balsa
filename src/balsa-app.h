@@ -254,6 +254,8 @@ extern struct BalsaApplication {
     gboolean alternative_layout;
     gboolean view_message_on_open;
     gboolean line_length;
+    gboolean pgdownmod;
+    gint pgdown_percent;
 
     gboolean empty_trash_on_exit;
     gboolean previewpane;

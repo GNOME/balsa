@@ -535,6 +535,10 @@ config_global_load(void)
     balsa_app.alternative_layout = gnome_config_get_bool("AlternativeLayout=false");
     balsa_app.view_message_on_open = gnome_config_get_bool("ViewMessageOnOpen=true");
     balsa_app.line_length = gnome_config_get_bool("MsgSizeAsLines=true");
+    balsa_app.pgdownmod = gnome_config_get_bool("PageDownMod=false");
+    balsa_app.pgdown_percent = gnome_config_get_int("PageDownPercent=50");
+    if (balsa_app.pgdown_percent < 10)
+	balsa_app.pgdown_percent = 10;
 
     /* ... style */
     balsa_app.toolbar_style = d_get_gint("ToolbarStyle", GTK_TOOLBAR_BOTH);
@@ -791,6 +795,8 @@ gint config_save(void)
     gnome_config_set_bool("AlternativeLayout", balsa_app.alternative_layout);
     gnome_config_set_bool("ViewMessageOnOpen", balsa_app.view_message_on_open);
     gnome_config_set_bool("MsgSizeAsLines", balsa_app.line_length);
+    gnome_config_set_bool("PageDownMod", balsa_app.pgdownmod);
+    gnome_config_set_int("PageDownPercent", balsa_app.pgdown_percent);
 
     gnome_config_pop_prefix();
 

@@ -52,10 +52,20 @@ typedef struct _MessageQueueItem MessageQueueItem;
 struct _MessageQueueItem {
     LibBalsaMessage *orig;
     HEADER *message;
+#if !ENABLE_ESMTP
     MessageQueueItem *next_message;
+#endif
     gchar *fcc;
     char tempfile[_POSIX_PATH_MAX];
+#if !ENABLE_ESMTP
     enum {MQI_WAITING, MQI_FAILED,MQI_SENT} status;
+#else
+    long message_size;
+    long sent;
+    long acc;
+    long update;
+    int refcount;
+#endif
 };
 
 typedef struct _SendMessageInfo SendMessageInfo;
@@ -89,11 +99,14 @@ msg_queue_item_new(LibBalsaMessage * message)
     mqi = g_new(MessageQueueItem, 1);
     mqi->orig = message;
     mqi->message = mutt_new_header();
+#if !ENABLE_ESMTP
     mqi->next_message = NULL;
+#endif
     mqi->fcc = g_strdup(message->fcc_mailbox);
+#if !ENABLE_ESMTP
     mqi->status = MQI_WAITING;
+#endif
     mqi->tempfile[0] = '\0';
-
     return mqi;
 }
 
@@ -389,10 +402,9 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     smtp_session_t session;
     smtp_message_t message, bcc_message;
     smtp_recipient_t recipient;
-#if 0
-    const smtp_status_t *status;
-#endif
     const gchar *phrase, *mailbox, *subject;
+    struct stat st;
+    long estimate;
 #ifdef BALSA_USE_THREADS
     GtkWidget *send_dialog_source = NULL;
 
@@ -468,34 +480,19 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 		bcc_message = NULL;
 	    else
 		bcc_message = smtp_add_message (session);
+            new_message->refcount = bcc_recip ? 2 : 1;
 
 	    /* Add this after the Bcc: copy. */
 	    message = smtp_add_message (session);
 	    if (bcc_message)
 		smtp_set_header_option (message, "Bcc", Hdr_PROHIBIT);
 
-	    smtp_message_set_application_data (message, queu);
+	    smtp_message_set_application_data (message, new_message);
 	    smtp_set_messagecb (message, libbalsa_message_cb, new_message);
 	    if (bcc_message) {
-		/*smtp_message_set_application_data (bcc_message, queu);*/
-		smtp_set_messagecb (bcc_message, libbalsa_message_cb,
-			            new_message);
-	    }
-
-	    /* Estimate the size of the message.  This need not be exact
-	       but its better to err on the large side.  Some message
-	       headers may be altered during the transfer. */
-	    {
-		struct stat st;
-		long estimate;
-
-		if (stat (new_message->tempfile, &st) == 0) {
-		    estimate = st.st_size;
-		    estimate += 1024 - (estimate % 1024);
-		    smtp_size_set_estimate (message, estimate);
-		    if (bcc_message)
-			smtp_size_set_estimate (bcc_message, estimate);
-		}
+		smtp_message_set_application_data (bcc_message, new_message);
+		smtp_set_messagecb (bcc_message,
+				    libbalsa_message_cb, new_message);
 	    }
 
 #define LIBESMTP_ADDS_HEADERS
@@ -593,6 +590,35 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 #endif
 	    	bcc_recip = bcc_recip->next;
 	    }
+
+	    /* Estimate the size of the message.  This need not be exact
+	       but it's better to err on the large side since some message
+	       headers may be altered during the transfer. */
+	    new_message->message_size = 0;
+	    if (stat (new_message->tempfile, &st) == 0) {
+		new_message->message_size = st.st_size;
+	    }
+
+	    if (new_message->message_size > 0) {
+		estimate = new_message->message_size;
+		estimate += 1024 - (estimate % 1024);
+		smtp_size_set_estimate (message, estimate);
+		if (bcc_message)
+		    smtp_size_set_estimate (bcc_message, estimate);
+	    }
+
+	    /* Set up counters for the progress bar.  Update is the byte
+	       count when the progress bar should be updated.  This is
+	       capped around 5k so that the progress bar moves about once
+	       per second on a slow line.  On small messages it is smaller
+	       to allow smooth progress of the bar. */
+	    new_message->update = new_message->message_size / 20;
+	    if (new_message->update < 100)
+	        new_message->update = 100;
+	    else if (new_message->update > 5 * 1024)
+	        new_message->update = 5 * 1024;
+	    new_message->sent = 0;
+	    new_message->acc = 0;
 	}
 	lista = lista->next;
     }
@@ -607,6 +633,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     */
 
     send_message_info=send_message_info_new(outbox, session);
+
+
 #ifdef BALSA_USE_THREADS
     sending_mail = TRUE;
     pthread_create(&send_mail, NULL,
@@ -627,14 +655,21 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 static void
 handle_successful_send (smtp_message_t message, void *arg)
 {
-    LibBalsaMessage * msg;
+    MessageQueueItem *mqi;
     const smtp_status_t *status;
+
+    /* Get the app data and decrement the reference count.  Only delete
+       structures if refcount reaches zero */
+    mqi = smtp_message_get_application_data (message);
+    if (mqi != NULL)
+      mqi->refcount--;
 
     status = smtp_message_transfer_status (message);
     if (status->code / 100 == 2) {
-	msg = smtp_message_get_application_data (message);
-	if (msg != NULL)
-	    libbalsa_message_delete(msg);
+	if (mqi != NULL && mqi->orig != NULL && mqi->refcount <= 0) {
+	    if (mqi->orig->mailbox)
+		libbalsa_message_delete(mqi->orig);
+	}
     } else {
 	/* XXX - Show the poor user the status codes and message. */
 	libbalsa_information(
@@ -642,6 +677,9 @@ handle_successful_send (smtp_message_t message, void *arg)
 	    _("Message submission problem, placing it into your outbox.\n" 
 	      "System will attempt to resubmit the message until you delete it."));
     }
+
+    if (mqi != NULL && mqi->refcount <= 0)
+        msg_queue_item_destroy(mqi);
 }
 
 #ifdef BALSA_USE_THREADS
@@ -649,12 +687,15 @@ static void
 libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 {
     SendThreadMessage *threadmsg;
+    MessageQueueItem *mqi;
     char buf[1024];
     va_list ap;
     const char *mailbox;
     smtp_message_t message;
     smtp_recipient_t recipient;
     const smtp_status_t *status;
+    int len;
+    float percent;
 
     va_start (ap, arg);
     switch (event_no) {
@@ -686,7 +727,20 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
         break;
     case SMTP_EV_MESSAGEDATA:
-        /* XXX - update the progress bar here */
+        message = va_arg (ap, smtp_message_t);
+        len = va_arg (ap, int);
+        mqi = smtp_message_get_application_data (message);
+        if (mqi != NULL && mqi->message_size > 0) {
+	    mqi->acc += len;
+	    if (mqi->acc >= mqi->update) {
+		mqi->sent += mqi->acc;
+		mqi->acc = 0;
+
+		percent = (float) mqi->sent / (float) mqi->message_size;
+		MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, "", NULL, NULL,
+			      percent);
+	    }
+	}
         break;
     case SMTP_EV_MESSAGESENT:
         message = va_arg (ap, smtp_message_t);
@@ -695,14 +749,17 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 		  status->code, status->text);
 	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, buf, NULL, NULL, 0);
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
+        /* Reset 'mqi->sent' for the next message (i.e. bcc copy) */
+        mqi = smtp_message_get_application_data (message);
+        if (mqi != NULL) {
+	    mqi->sent = 0;
+	    mqi->acc = 0;
+        }
         break;
     case SMTP_EV_DISCONNECT:
 	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS,
 		      _("Disconnected"),
 		      NULL, NULL, 0);
-#ifdef BALSA_USE_THREADS
-	sending_mail = FALSE;
-#endif
         break;
     }
     va_end (ap);
@@ -865,11 +922,11 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
 
 #ifdef BALSA_USE_THREADS
     SendThreadMessage *threadmsg;
+#endif
 
     /* The event callback is used to write messages to the the progress
        dialog shown when transferring a message to the SMTP server. */
     smtp_set_eventcb (info->session, libbalsa_smtp_event_cb, NULL);
-#endif
 #ifdef DEBUG
     /* Add a protocol monitor when compiled with DEBUG.  This is somewhat
        unsatisfactory, it would be better handled at run time with an
@@ -882,6 +939,10 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
     /* Kick off the connection with the MTA.  When this returns, all
        messages with valid recipients have been sent. */
     smtp_start_session (info->session);
+
+#ifdef BALSA_USE_THREADS
+    sending_mail = FALSE;
+#endif
 	
 
     /* We give back all the resources used and delete the sent messages */

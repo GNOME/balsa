@@ -1,3 +1,14 @@
+2001-07-23  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/send.c: the send mail progress dialog (Brian Stafford
+	<brian@stafford.uklinux.net>). 
+
+	Configurable page scrolling step by Lynn Kerby <lfk@kerbit.net>
+	* src/balsa-app.[hc]: add pgdownmod and pgdown_percent fields.
+	* src/balsa-message.c: use them.
+	* src/pref-manager.c: and configure...
+	* src/save-restore.c: and save&restore.
+	
 2001-07-21  Carlos Morgado  <chbm@chbm.nu>
 
 	* configure.in: fix sasl reporting

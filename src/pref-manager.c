@@ -68,6 +68,8 @@ typedef struct _PropertyUI {
     GtkWidget *alternative_layout;
     GtkWidget *view_message_on_open;
     GtkWidget *line_length;
+    GtkWidget *pgdownmod;
+    GtkWidget *pgdown_percent;
     GtkWidget *view_allheaders;
     GtkWidget *debug;		/* enable/disable debugging */
     GtkWidget *empty_trash;
@@ -156,6 +158,7 @@ static void address_book_delete_cb(GtkWidget * widget, gpointer data);
 static void timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void mailbox_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox);
+static void pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void spelling_optionmenu_cb(GtkItem * menuitem, gpointer data);
 static void set_default_address_book_cb(GtkWidget * button, gpointer data);
 static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox);
@@ -284,6 +287,10 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect (GTK_OBJECT (pui->line_length), "toggled",
                         GTK_SIGNAL_FUNC (properties_modified_cb),
                         property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->pgdownmod), "toggled",
+		       GTK_SIGNAL_FUNC(pgdown_modified_cb), property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->pgdown_percent), "changed",
+		       GTK_SIGNAL_FUNC(pgdown_modified_cb), property_box);
     gtk_signal_connect(GTK_OBJECT(pui->debug), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
@@ -502,7 +509,10 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.alternative_layout = GTK_TOGGLE_BUTTON(pui->alternative_layout)->active;
     balsa_app.view_message_on_open = GTK_TOGGLE_BUTTON (pui->view_message_on_open)->active;
     balsa_app.line_length = GTK_TOGGLE_BUTTON (pui->line_length)->active;
-    
+    balsa_app.pgdownmod = GTK_TOGGLE_BUTTON(pui->pgdownmod)->active;
+    balsa_app.pgdown_percent =
+      gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->pgdown_percent));
+
     /* if (balsa_app.alt_layout_is_active != balsa_app.alternative_layout)  */
 	balsa_change_window_layout(balsa_app.main_window);
     
@@ -709,6 +719,12 @@ set_prefs(void)
                                  balsa_app.view_message_on_open);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->line_length),
                                  balsa_app.line_length);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->pgdownmod),
+				 balsa_app.pgdownmod);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->pgdown_percent),
+			      (float) balsa_app.pgdown_percent);
+    gtk_widget_set_sensitive(pui->pgdown_percent,
+			     GTK_TOGGLE_BUTTON(pui->pgdownmod)->active);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->debug),
 				 balsa_app.debug);
     for (i = 0; i < NUM_ENCODING_MODES; i++)
@@ -1387,7 +1403,7 @@ static GtkWidget *
 create_display_page(gpointer data)
 {
     /*
-     * finnished mail options, starting on display
+     * finished mail options, starting on display
      * PKGW: This naming scheme is, uh, unclear.
      */
     gint i;
@@ -1417,13 +1433,15 @@ create_display_page(gpointer data)
     GtkWidget *header_frame;
     GtkWidget *table1;
     GtkWidget *table2;
+    GtkWidget *table3;
     GtkWidget *label1;
     GtkWidget *label2;
     GtkWidget *label3;
     GtkWidget *label4;
+    GtkWidget *label5;
+    GtkObject *scroll_adj;
     GtkWidget *current_vbox;
 
-    
     vbox1 = gtk_vbox_new (FALSE, 0);
     subnb = gtk_notebook_new ();
     gtk_container_set_border_width (GTK_CONTAINER (subnb), 5);
@@ -1447,6 +1465,23 @@ create_display_page(gpointer data)
         _("Automatically view message when mailbox opened"), vbox7);
     pui->line_length = box_start_check(
 	_("Display message size as number of lines"), vbox7);
+
+    table3 = gtk_table_new(1, 3, FALSE);
+    gtk_box_pack_start(GTK_BOX(vbox7), table3, FALSE, FALSE, 0);
+    pui->pgdownmod = gtk_check_button_new_with_label(
+	_("PageUp/PageDown keys scroll message by:"));
+    gtk_table_attach(GTK_TABLE(table3), pui->pgdownmod, 0, 1, 0, 1,
+		     (GtkAttachOptions) (GTK_FILL),
+		     (GtkAttachOptions) (0), 0, 0);
+    scroll_adj = gtk_adjustment_new(50.0, 10.0, 100.0, 5.0, 10.0, 0.0);
+    pui->pgdown_percent =
+	 gtk_spin_button_new(GTK_ADJUSTMENT(scroll_adj), 1, 0);
+    gtk_widget_set_sensitive(pui->pgdown_percent, FALSE);
+    gtk_table_attach(GTK_TABLE(table3), pui->pgdown_percent, 1, 2, 0, 1,
+		     (GtkAttachOptions) (0), (GtkAttachOptions) (0), 0, 0);
+    label5 = gtk_label_new(_("percent"));
+    gtk_table_attach(GTK_TABLE(table3), label5, 2, 3, 0, 1,
+		     (GtkAttachOptions) (0), (GtkAttachOptions) (0), 0, 0);
 
     hbox4 = gtk_hbox_new(TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox2), hbox4, FALSE, FALSE, 0);
@@ -2043,6 +2078,16 @@ wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->wordwrap));
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->wraplength), newstate);
+    properties_modified_cb(widget, pbox);
+}
+
+static void
+pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox)
+{
+    gboolean newstate =
+	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->pgdownmod));
+
+    gtk_widget_set_sensitive(GTK_WIDGET(pui->pgdown_percent), newstate);
     properties_modified_cb(widget, pbox);
 }
 

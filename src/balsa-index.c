@@ -2491,26 +2491,29 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
 
-    /* Find the next message to display, if the current message is being
-     * removed. */
-    if (bndx_find_row(index, &iter, FALSE, 0, FILTER_NOOP, NULL,
-                           messages))
-        gtk_tree_model_get(model, &iter, BNDX_MESSAGE_COLUMN,
-                           &next_message, -1);
-    else {
-        g_signal_handler_block(selection, index->selection_changed_id);
-        gtk_tree_store_clear(GTK_TREE_STORE(model));
-        g_hash_table_foreach_remove(index->ref_table, (GHRFunc) gtk_true,
-                                    NULL);
-        g_signal_handler_unblock(selection, index->selection_changed_id);
-        g_signal_emit_by_name(selection, "changed");
-        return;
+    if (!(next_message = index->current_message)
+        || g_list_find(messages, next_message)) {
+        /* Current message is either NULL, or being removed. */
+        if (!bndx_find_row(index, &iter, FALSE, 0, FILTER_NOOP, NULL,
+                           messages)) {
+            /* All messages are being removed: just clear the index. */
+            g_signal_handler_block(selection, index->selection_changed_id);
+            gtk_tree_store_clear(GTK_TREE_STORE(model));
+            g_hash_table_foreach_remove(index->ref_table,
+                                        (GHRFunc) gtk_true, NULL);
+            g_signal_handler_unblock(selection,
+                                     index->selection_changed_id);
+            g_signal_emit_by_name(selection, "changed");
+            return;
+        }
+        if (next_message)
+            /* Current message is being removed: display the one we
+             * found. */
+            gtk_tree_model_get(model, &iter,
+                               BNDX_MESSAGE_COLUMN, &next_message, -1);
+        /* If no message is currently being displayed, we'll leave it
+         * that way; that is, next_message is NULL. */
     }
-
-    /* If there is no current message, don't select one; if there is,
-     * and it's not being removed, keep it. */
-    if (!g_list_find(messages, index->current_message))
-        next_message = index->current_message;
 
     /* check the list of messages to be removed */
     for (list = messages; list; list = g_list_next(list)) {

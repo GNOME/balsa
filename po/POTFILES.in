@@ -16,6 +16,7 @@ libbalsa/mailbox_pop3.c
 libbalsa/message.c
 libbalsa/pop3.c
 libbalsa/send.c
+libbalsa/source-viewer.c
 libinit_balsa/balsa-druid-page-directory.gob
 libinit_balsa/balsa-druid-page-finish.gob
 libinit_balsa/balsa-druid-page-user.gob

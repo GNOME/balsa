@@ -1,3 +1,8 @@
+2002-10-15  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-app.c, src/main.c: remove deprecated items; move 
+	g_object_unref(balsa_app.colormap) from main() to balsa_app_destroy().
+	
 2002-10-12  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/misc.[ch]: implement libbalsa_utf8_sanitize.

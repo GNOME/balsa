@@ -476,7 +476,9 @@ balsa_app_destroy(void)
     /* FIXME: stop switching notebook pages in a more elegant way.
        Probably, the cleanest solution is to call enable_menus_xxx
        functions from an idle function connected to balsa_message_set. */
-    gtk_signal_disconnect_by_data(GTK_OBJECT(balsa_app.notebook), NULL);
+    g_signal_handlers_disconnect_matched(balsa_app.notebook,
+                                         G_SIGNAL_MATCH_DATA,
+                                         0, 0, NULL, NULL, NULL);
 
     /* close all mailboxes */
     balsa_mailbox_nodes_lock(TRUE);
@@ -493,6 +495,7 @@ balsa_app_destroy(void)
     g_object_unref(G_OBJECT(balsa_app.trash));
     libbalsa_imap_close_all_connections();
     /* g_slist_free(opt_attach_list); */
+    g_object_unref(balsa_app.colormap);
     if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");
 }
 
@@ -957,9 +960,9 @@ create_entry(GtkDialog *mcw, GtkWidget * table,
     }
 
     gtk_label_set_mnemonic_widget(GTK_LABEL(hotlabel), entry);
-#if TO_BE_PORTED
-    gnome_dialog_editable_enters(mcw, GTK_EDITABLE(entry));
-#endif
+    g_signal_connect_swapped(G_OBJECT(entry), "activate",
+                             G_CALLBACK(gtk_window_activate_default),
+                             mcw);
     /* Watch for changes... */
     if(changed_func)
 	g_signal_connect(G_OBJECT(entry), "changed", 

@@ -144,7 +144,14 @@ balsa_init(int argc, char **argv)
 	}
     }
     /* Process remaining options,  */
-    gnome_init_with_popt_table(PACKAGE, VERSION, argc, argv, options, 0, NULL);
+    
+    gnome_program_init(PACKAGE, VERSION, LIBGNOMEUI_MODULE, argc, argv,
+                       GNOME_PARAM_POPT_TABLE, options,
+                       /* FIXME: should Makefile.am define PREFIX,
+                        * SYSCONFDIR, DATADIR and LIBDIR?
+                        * if it did, we'd use:
+                        * GNOME_PROGRAM_STANDARD_PROPERTIES, */
+                       NULL);
 }
 
 /* check_special_mailboxes: 
@@ -351,8 +358,7 @@ main(int argc, char *argv[])
     /* Initialize libbalsa */
     libbalsa_init((LibBalsaInformationFunc) balsa_information);
 
-    gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
-    gtk_widget_set_default_visual(gdk_rgb_get_visual());
+    gtk_widget_set_default_colormap(gdk_rgb_get_colormap());
 
     /* Allocate the best colormap we can get */
     balsa_app.visual = gdk_visual_get_best();
@@ -373,23 +379,22 @@ main(int argc, char *argv[])
 
     window = balsa_window_new();
     balsa_app.main_window = BALSA_WINDOW(window);
-    gtk_signal_connect(GTK_OBJECT(window), "destroy", balsa_cleanup, NULL);
+    g_signal_connect(G_OBJECT(window), "destroy",
+                     G_CALLBACK(balsa_cleanup), NULL);
 
     /* session management */
     client = gnome_master_client();
-    gtk_signal_connect(GTK_OBJECT(client), "save_yourself",
-		       GTK_SIGNAL_FUNC(balsa_save_session), argv[0]);
-    gtk_signal_connect(GTK_OBJECT(client), "die",
-		       GTK_SIGNAL_FUNC(balsa_kill_session), NULL);
-
-    gdk_rgb_init();
+    g_signal_connect(G_OBJECT(client), "save_yourself",
+		     G_CALLBACK(balsa_save_session), argv[0]);
+    g_signal_connect(G_OBJECT(client), "die",
+		     G_CALLBACK(balsa_kill_session), NULL);
 
     if (opt_compose_email || opt_attach_list) {
 	BalsaSendmsg *snd;
 	GSList *lst;
 	snd = sendmsg_window_new(window, NULL, SEND_NORMAL);
 	if(opt_compose_email) {
-	    if(strncmp(opt_compose_email, "mailto:", 7) == 0)
+	    if(g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) == 0)
 	        sendmsg_window_process_url(opt_compose_email+7, 
 		    	sendmsg_window_set_field, snd);
 	    else sendmsg_window_set_field(snd,"to", opt_compose_email);
@@ -421,8 +426,6 @@ main(int argc, char *argv[])
     gtk_main();
     gdk_threads_leave();
     
-    gdk_colormap_unref(balsa_app.colormap);
-
 #ifdef BALSA_USE_THREADS
     threads_destroy();
 #endif

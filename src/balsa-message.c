@@ -231,9 +231,14 @@ static double
 next_part_height (GnomeCanvasGroup * group)
 {
   double x1, x2, y1, y2;
+  double r;
 
   gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (group), &x1, &y1, &x2, &y2);
-  return (y2 - y1) + 50;
+
+  r = y2 - y1;
+  r += 50;
+
+  return r;
 }
 
 static double
@@ -388,19 +393,20 @@ audio2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
 {
   GnomeCanvasItem *item;
   item = balsa_message_text_item ("--AUDIO--", group, 0.0, next_part_height (group));
-  balsa_message_text_item_set_bg (item, group, "mediumseagreen");
+  balsa_message_text_item_set_bg (item, group, "LightSteelBlue1");
 }
 
 
 static void
 application2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
+  GnomeCanvasItem *item;
+  item = balsa_message_text_item ("--APPLICATION--", group, 0.0, next_part_height (group));
+  balsa_message_text_item_set_bg (item, group, "LightSteelBlue1");
+
 #if 0
   gchar link_bfr[128];
   PARAMETER *bdy_parameter = bdy->parameter;
-#endif
-  balsa_message_text_item ("--APPLICATION--", group, 0.0, next_part_height (group));
-#if 0
   obstack_append_string (canvas_bfr,
 			 "<tr><td bgcolor=\"#f0f0f0\"> "
 		       "You received an encoded file of type application/");
@@ -443,6 +449,8 @@ image2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
 				"height", (double) im->rgb_height,
 				"anchor", GTK_ANCHOR_NW,
 				NULL);
+
+  unlink (filename);
 }
 
 static void
@@ -450,7 +458,7 @@ message2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gro
 {
   GnomeCanvasItem *item;
   item = balsa_message_text_item ("--MESSAGE--", group, 0.0, next_part_height (group));
-  balsa_message_text_item_set_bg (item, group, "mediumseagreen");
+  balsa_message_text_item_set_bg (item, group, "LightSteelBlue1");
 }
 
 static void
@@ -470,7 +478,7 @@ video2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
 {
   GnomeCanvasItem *item;
   item = balsa_message_text_item ("--VIDEO--", group, 0.0, next_part_height (group));
-  balsa_message_text_item_set_bg (item, group, "mediumseagreen");
+  balsa_message_text_item_set_bg (item, group, "LightSteelBlue1");
 }
 
 static void
@@ -497,7 +505,7 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gr
 	{
 	  GnomeCanvasItem *item;
 	  item = balsa_message_text_item ("--HTML--", group, 0.0, next_part_height (group));
-	  balsa_message_text_item_set_bg (item, group, "mediumseagreen");
+	  balsa_message_text_item_set_bg (item, group, "LightSteelBlue1");
 	  goto END;
 	}
       /* add the text item to the canvas */

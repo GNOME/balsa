@@ -498,20 +498,20 @@ balsa_message_text_item (const gchar * text, GnomeCanvasGroup * group,
 {
 	GnomeCanvasItem *item;
 	if(font_name) {
-	   GdkFont *fnt = gdk_fontset_load(font_name);
+	   GdkFont *fnt = gdk_font_load(font_name);
 	   if(fnt) gdk_font_unref(fnt);
 	   else {
 	      font_name = balsa_app.message_font;
 	      fprintf(stderr,"message/text:: font not found: %s\n", font_name);
 	   }	      
 	} else font_name = balsa_app.message_font;
-		
+
 	item = gnome_canvas_item_new( group,
 				      GNOME_TYPE_CANVAS_TEXT,
 				      "x", x,
 				      "y", y,
 				      "anchor", GTK_ANCHOR_NW,
-				      "fontset",  font_name,
+				      "font",  font_name,
 				      "text", text, 
 				      NULL );
 	return item;

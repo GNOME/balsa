@@ -60,6 +60,10 @@ ab_cancel_cb(GtkWidget * widget, gpointer data)
 	GnomeDialog    *dialog = (GnomeDialog *) data;
 	
 	g_assert(dialog != NULL);
+
+	ab_clear_clist( GTK_CLIST(book_clist) );
+	ab_clear_clist( GTK_CLIST(add_clist) );
+
 	gtk_widget_destroy(GTK_WIDGET(dialog));
 
 	return FALSE;
@@ -184,67 +188,130 @@ ab_add_cb(GtkWidget * widget, gpointer data)
 }
 #endif
 
+
+static gchar * 
+extract_name(const gchar *string)
+/* Extract full name in order from <string> that has GnomeCard format
+   and returns the pointer to the allocated memory chunk.
+*/
+{
+   enum GCardFieldOrder { LAST=0, FIRST, MIDDLE, PREFIX, SUFFIX };
+   gint cpt, j;
+   gchar ** fld, **name_arr;
+   gchar * res = NULL;
+
+   fld = g_strsplit(string, ";",5);
+
+   cpt = 0;
+   while(fld[cpt] != NULL)
+      cpt++;
+
+   if(cpt==0) /* insane empty name */ return NULL;
+
+   name_arr = g_malloc((cpt+1)*sizeof(gchar*));
+
+   j = 0;
+   if(cpt>PREFIX && fld[PREFIX] != '\0')
+      name_arr[j++] = g_strdup(fld[PREFIX]);
+      
+   if(cpt>FIRST && fld[FIRST] != '\0')
+      name_arr[j++] = g_strdup(fld[FIRST]);
+
+   if(cpt>MIDDLE && fld[MIDDLE] != '\0')
+      name_arr[j++] = g_strdup(fld[MIDDLE]);
+
+   if(cpt>LAST && fld[LAST] != '\0')
+      name_arr[j++] = g_strdup(fld[LAST]);
+
+   if(cpt>SUFFIX && fld[SUFFIX] != '\0')
+      name_arr[j++] = g_strdup(fld[SUFFIX]);
+
+   name_arr[j] = NULL;
+
+   g_strfreev(fld);
+
+   /* collect the data to one string */
+   res = g_strjoinv(" ", name_arr);
+   while(j-- > 0)
+      g_free(name_arr[j]);
+   g_free(name_arr);
+
+   return res;
+}
+
+#define LINE_LEN 256
 static void 
 ab_load(GtkWidget * widget, gpointer data) 
 { 
-	FILE *gc; 
-	gchar name[256], 
-		email[256], 
-		string[256], 
-		*listdata[2]; 
-	gint got_name = FALSE; 
-	gint in_vcard = FALSE;
-	gint i = -1;
+   FILE *gc; 
+   gchar string[LINE_LEN];
+   gchar * name = NULL, *email = NULL, *listdata[2];
+   gint in_vcard = FALSE;
 
-	ab_clear_clist(GTK_CLIST(book_clist)); 
-	if (composing) 
-		ab_clear_clist(GTK_CLIST(add_clist)); 
+   ab_clear_clist(GTK_CLIST(book_clist)); 
+   if (composing) 
+      ab_clear_clist(GTK_CLIST(add_clist)); 
+   gc = fopen(gnome_util_prepend_user_home(".gnome/GnomeCard.gcrd"),"r"); 
+   if (!gc) 
+   { 
+      GtkWidget *box;
+      char * msg  = g_strdup_printf(
+	 N_("Unable to open ~/.gnome/GnomeCard.gcrd for read.\n - %s\n"), 
+	 g_unix_error_string(errno)); 
+      box = gnome_message_box_new(msg,
+				  GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
+      gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
+      gnome_dialog_run( GNOME_DIALOG( box ) );
+      gtk_widget_destroy( GTK_WIDGET( box ) );
+      g_free(msg);
+      return; 
+   } 
+   while ( fgets(string, sizeof(string), gc)) 
+   { 
+      if ( strncasecmp(string, "BEGIN:VCARD", 11) == 0 ) {
+	 in_vcard = TRUE;
+	 continue;
+      }
+
+      if ( strncasecmp(string, "END:VCARD", 9) == 0) {
+	 int rownum; 
+	 AddressData *data;
+	 if(email) {
+	    data = g_malloc( sizeof(AddressData) ); 
+	    data->name = name ? name : g_strdup( N_("No-Name") );
+	    data->addy = email;
+	    listdata[0] = name;
+	    listdata[1] = name;
+	    rownum = gtk_clist_append(GTK_CLIST(book_clist), listdata); 
+	    gtk_clist_set_row_data(GTK_CLIST( book_clist),
+				   rownum, (gpointer) data); 
+	    name  = NULL;
+	    email = NULL;
+	 } else g_free(name);
+
+	 in_vcard = FALSE;
+	 continue;
+      }
+
+      if (!in_vcard) continue;
+
+      if(strncasecmp(string, "N:", 2) == 0) {
+	 name = extract_name(string+2);
+	 /* printf("name : %s\n", name); */
+	 continue;
+      }
+
+      /* fetch only first internet e-mail field */
+      if(!email && strncasecmp(string, "EMAIL;INTERNET:",15) == 0)
+	 email = g_strdup(string+15);
+   }	 
+
+   gtk_clist_set_column_width(GTK_CLIST(book_clist), 0, 
+	  gtk_clist_optimal_column_width(GTK_CLIST(book_clist),0)); 
+   fclose(gc); 
+}
+
 	
-	gc = fopen(gnome_util_prepend_user_home(".gnome/GnomeCard.gcrd"), "r"); 
-	if (!gc) { 
-		g_print(N_("Unable to open ~/.gnome/GnomeCard.gcrd for read.\n - %s\n"), g_unix_error_string(errno)); 
-		return; 
-	} 
-
-	while ( fgets(string, 255, gc)) { 
-
-		if ( strncasecmp(string, "BEGIN:VCARD", strlen("BEGIN:VCARD")) == 0 ) {
-			in_vcard = TRUE;
-		}
-
-		if (in_vcard) {
-			if (string[0] == 'F' && string[1] == 'N' && string[2] == ':' && string[3] != '\0') { 
-				got_name = TRUE; 
-				while (string[++i] != '\n' && string[i] != '\0');
-				strncpy(name, &string[3], i-4);
-				name[i-4] = '\0';
-				i = -1;
-			} 
-
-			if (sscanf(string, N_("EMAIL;INTERNET:%s\n"), email)) { 
-				int rownum; 
-				AddressData *data = g_malloc(sizeof(AddressData)); 
-			
-				listdata[0] = got_name ? strdup(name) : strdup(N_("No-Name")); 
-				listdata[1] = strdup(email); 
-
-				data->name = listdata[0]; 
-				data->addy = listdata[1]; 
-				rownum = gtk_clist_append(GTK_CLIST(book_clist), listdata); 
-				gtk_clist_set_row_data(GTK_CLIST(book_clist), rownum, (gpointer) data); 
-			} 
-
-			if ( strncasecmp(string, "END:VCARD", strlen("END:VCARD")) == 0) {
-				in_vcard = got_name = FALSE;
-			}
-		}
-	} 
-
-	gtk_clist_set_column_width(GTK_CLIST(book_clist), 0, gtk_clist_optimal_column_width(GTK_CLIST(book_clist), 0)); 
-
-	fclose(gc); 
-} 
-
 static void 
 ab_find(GtkWidget * group_entry) 
 { 
@@ -286,7 +353,7 @@ address_book_cb(GtkWidget * widget, gpointer data)
 		*box2, 
 		*scrolled_window; 
 
-	gchar *titles[2] = {N_("Name"), N_("E-Mail Address")}; 
+	static gchar *titles[2] = {N_("Name"), N_("E-Mail Address")}; 
 	
 	dialog = gnome_dialog_new(N_("Address Book"), GNOME_STOCK_BUTTON_CANCEL, GNOME_STOCK_BUTTON_OK, NULL); 
 	gnome_dialog_button_connect(GNOME_DIALOG(dialog), 0, GTK_SIGNAL_FUNC(ab_cancel_cb), (gpointer) dialog); 
@@ -375,6 +442,15 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	ab_load(NULL, NULL); 
 	
 	gtk_widget_show_all(dialog); 
+
+	/* PS: I do not like modal dialog boxes but the only other option
+	   is to reference the connected field and  check if it is
+	   destroyed in ab_okay_cb before accessing it.
+	*/
+	if(composing) {
+	   gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
+	   gnome_dialog_run( GNOME_DIALOG( dialog ) );
+	}
 	
 	return FALSE; 
 } 

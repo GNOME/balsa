@@ -1,3 +1,8 @@
+2005-02-23  Pawel Salek
+
+	* NEWS: release 2.3.0
+	* libbalsa/mailbox_local.c: fix one of the problems with msg filtering.
+
 2005-02-22 19:53  PeterB
 
 	* src/main-window.c: remove ctrl+F accelerator from forward-inline.

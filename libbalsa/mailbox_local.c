@@ -414,7 +414,8 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
                 match = libbalsa_utf8_strstr(entry->from,
                                              cond->match.string.string);
             else {
-                g_return_val_if_fail(message, FALSE);
+                g_return_val_if_fail(!message, FALSE);
+                message = libbalsa_mailbox_get_message(mailbox, msgno);
                 str =
                     internet_address_list_to_string(message->headers->
                                                     to_list, FALSE);

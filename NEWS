@@ -1,3 +1,12 @@
+* Balsa-2.3.0 release. Release date 2005-02-23
+
+- require GTK+ >= 2.4.0
+- new address completion widget.
+- new themeable icon scheme.
+- new composer attachment handling widget.
+- migrate from GnomeFileEntry to GtkFileChooser.
+- IMAP IDLE support.
+
 * Balsa-2.2.6 release. Release date 2004-11-19
 
 - fixed MBOX driver over NFS problem.

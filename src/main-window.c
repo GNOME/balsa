@@ -24,11 +24,9 @@
 
 #include <string.h>
 #include <gnome.h>
-#include <gdk/gdkx.h>
-
-#ifdef USE_PIXBUF
+#include <gdk/gdkx.h> /* for XIconSize */
 #include <gdk-pixbuf/gdk-pixbuf.h>
-#endif
+
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
@@ -2895,12 +2893,7 @@ about_box_destroy_cb(void)
 static void
 set_icon(GnomeApp * app)
 {
-#ifdef USE_PIXBUF
     GdkPixbuf *pb = NULL;
-#else
-    GdkImlibImage *im = NULL;
-    GdkPixmap *pmap, *mask;
-#endif
     GdkWindow *ic_win, *w;
     GdkWindowAttr att;
     XIconSize *is;
@@ -2944,32 +2937,15 @@ set_icon(GnomeApp * app)
     att.window_type = GDK_WINDOW_TOPLEVEL;
     att.x = 0;
     att.y = 0;
-#ifdef USE_PIXBUF
     att.visual = gdk_rgb_get_visual();
     att.colormap = gdk_rgb_get_cmap();
-#else
-    att.visual = gdk_imlib_get_visual();
-    att.colormap = gdk_imlib_get_colormap();
-#endif
     ic_win = gdk_window_new(NULL, &att, GDK_WA_VISUAL | GDK_WA_COLORMAP);
     gdk_window_set_icon(w, ic_win, NULL, NULL);
 
     if( (filename = balsa_pixmap_finder("balsa/balsa_icon.png")) ) {
-#ifdef USE_PIXBUF
         pb = gdk_pixbuf_new_from_file(filename);
         gdk_window_clear(ic_win);
         gdk_pixbuf_unref(pb);
-#else
-        im = gdk_imlib_load_image(filename);
-        gdk_imlib_render(im, att.width, att.height);
-        pmap = gdk_imlib_move_image(im);
-        mask = gdk_imlib_move_mask(im);
-        gdk_window_set_back_pixmap(ic_win, pmap, FALSE);
-        gdk_window_clear(ic_win);
-        gdk_window_shape_combine_mask(ic_win, mask, 0, 0);
-        gdk_imlib_free_pixmap(pmap);
-        gdk_imlib_destroy_image(im);
-#endif
         g_free(filename);
     }
 }

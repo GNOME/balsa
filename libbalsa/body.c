@@ -228,3 +228,9 @@ libbalsa_message_body_is_multipart(LibBalsaMessageBody * body)
 {
     return is_multipart(body->mutt_body);
 }
+
+gboolean
+libbalsa_message_body_is_inline(LibBalsaMessageBody * body)
+{
+    return body->mutt_body && body->mutt_body->disposition==DISPINLINE;
+}

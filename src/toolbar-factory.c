@@ -23,11 +23,6 @@
 
 #include <string.h>
 #include <gnome.h>
-#include <gdk/gdkx.h>
-
-#ifdef USE_PIXBUF
-#include <gdk-pixbuf/gdk-pixbuf.h>
-#endif
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>

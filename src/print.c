@@ -657,9 +657,7 @@ typedef struct _DefaultInfo {
     guint id_tag;
     float label_width, image_width, image_height, text_height, part_height;
     gchar **labels;
-#ifdef USE_PIXBUF
     GdkPixbuf *pixbuf;
-#endif
 } DefaultInfo;
 
 static void
@@ -679,17 +677,12 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
 	conttype = 
 	    g_strdup(libbalsa_lookup_mime_type(body->filename));
 
-#ifdef USE_PIXBUF
     /* get a pixbuf according to the mime type */
     icon_name = libbalsa_icon_finder(conttype, NULL);
     pdata->pixbuf = gdk_pixbuf_new_from_file(icon_name);
     pdata->image_width = gdk_pixbuf_get_width (pdata->pixbuf);
     pdata->image_height = gdk_pixbuf_get_height (pdata->pixbuf);
     g_free(icon_name);
-#else
-    pdata->image_width = -10;  /* pts */
-    pdata->image_height = 0;
-#endif
 
     /* gather some info about this part */
     pdata->labels = g_new0(gchar *, 5); /* four fields, one terminator */
@@ -734,9 +727,7 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
 static void
 print_default(PrintInfo * pi, gpointer data)
 {
-#ifdef USE_PIXBUF
     double matrix[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-#endif
     DefaultInfo *pdata = (DefaultInfo *)data;
     GnomeFont *font;
     gint i, offset;
@@ -746,7 +737,6 @@ print_default(PrintInfo * pi, gpointer data)
     if (pi->ypos - pdata->part_height < pi->margin_bottom)
 	start_new_page(pi);
 
-#ifdef USE_PIXBUF
     /* print the icon */
     gnome_print_gsave(pi->pc);
     matrix[0] = pdata->image_width;
@@ -757,7 +747,6 @@ print_default(PrintInfo * pi, gpointer data)
     gnome_print_pixbuf (pi->pc, pdata->pixbuf);
     gnome_print_grestore (pi->pc);
     gdk_pixbuf_unref(pdata->pixbuf);
-#endif
     
     /* print the description */
     font = gnome_font_new(BALSA_PRINT_HEAD_FONT, BALSA_PRINT_HEAD_SIZE);
@@ -778,7 +767,6 @@ print_default(PrintInfo * pi, gpointer data)
     g_strfreev(pdata->labels);
 }
 
-#ifdef USE_PIXBUF
 /*
  * ~~~ stuff to print an image ~~~
  */
@@ -850,7 +838,6 @@ print_image(PrintInfo * pi, gpointer * data)
     pi->ypos -= pdata->print_height;
     gdk_pixbuf_unref(pdata->pixbuf);
 }
-#endif
 
 /*
  * scan the body list and prepare print data according to the content type
@@ -862,9 +849,7 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
 	{"multipart", NULL},              /* ignore `multipart' entries */
 	{"text/html", prepare_default},   /* don't print html source */
 	{"text", prepare_plaintext},
-#ifdef USE_PIXBUF
 	{"image", prepare_image},
-#endif
 	{NULL, prepare_default}           /* anything else... */
     };
     mime_action_t *action;

@@ -74,5 +74,6 @@ gchar *libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 gchar *libbalsa_message_body_get_content_type(LibBalsaMessageBody * body);
 
 gboolean libbalsa_message_body_is_multipart(LibBalsaMessageBody * body);
+gboolean libbalsa_message_body_is_inline(LibBalsaMessageBody* body);
 
 #endif				/* __LIBBALSA_BODY_H__ */

@@ -215,6 +215,18 @@ else
 fi
 
 dnl ##########################################################################
+dnl Check for GdkPixbuf if available
+dnl I guess we could safely assome everybody has got this one, couldn't we?
+dnl ##########################################################################
+AC_MSG_CHECKING(whether to GdkPixbuf is available)
+if gnome-config --libs gdk_pixbuf > /dev/null 2>&1; then
+	gnome_libs="$gnome_libs gdk_pixbuf"
+       	AC_MSG_RESULT(yes)
+else
+    AC_MSG_ERROR([gdk-pixbuf(-devel) library is needed to build balsa])
+fi
+
+dnl ##########################################################################
 dnl Check for GtkHTML if available
 dnl ##########################################################################
 
@@ -247,19 +259,6 @@ if test x"$check_gtkhtml" = xyes ; then
 else
 	have_gtkhtml=no
 	AC_MSG_RESULT(no)
-fi
-
-dnl ##########################################################################
-dnl Check for GdkPixbuf if available
-dnl I guess we could safely assome everybody has got this one, couldn't we?
-dnl ##########################################################################
-AC_MSG_CHECKING(whether to use GdkPixbuf)
-if gnome-config --libs gdk_pixbuf > /dev/null 2>&1; then
-	gnome_libs="$gnome_libs gdk_pixbuf"
-	AC_DEFINE(USE_PIXBUF)
-       	AC_MSG_RESULT(yes)
-else
-        AC_MSG_RESULT(not found)
 fi
 
 

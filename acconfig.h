@@ -32,7 +32,6 @@
 
 /* Shall we multithread? */
 #undef BALSA_USE_THREADS
-#undef USE_PIXBUF
 
 /* LDAP support? */
 #undef ENABLE_LDAP

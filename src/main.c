@@ -304,13 +304,8 @@ main(int argc, char *argv[])
     /* Initialize libbalsa */
     libbalsa_init((LibBalsaInformationFunc) balsa_information);
 
-#ifdef USE_PIXBUF
     gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
     gtk_widget_set_default_visual(gdk_rgb_get_visual());
-#else
-    gtk_widget_set_default_colormap(gdk_imlib_get_colormap());
-    gtk_widget_set_default_visual(gdk_imlib_get_visual());
-#endif
 
     /* Allocate the best colormap we can get */
     balsa_app.visual = gdk_visual_get_best();

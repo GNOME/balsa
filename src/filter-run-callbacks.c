@@ -34,17 +34,14 @@
 #include "filter-run.h"
 #include "balsa-app.h"
 #include "save-restore.h"
-#ifdef USE_PIXBUF
 #include <gdk-pixbuf/gdk-pixbuf.h>
-#endif
+
 #include "pixmaps/other_enabled.xpm"
 
 /* Global vars */
 
 extern GList * fr_dialogs_opened;
 
-#ifdef USE_PIXBUF
-#include <gdk-pixbuf/gdk-pixbuf.h>
 static void
 get_pixmap_and_mask_from_xpm(char* xpm[],
                              GdkPixmap **pixmap, GdkBitmap **mask)
@@ -53,21 +50,8 @@ get_pixmap_and_mask_from_xpm(char* xpm[],
     gdk_pixbuf_render_pixmap_and_mask(pb, pixmap, mask, 0);
     gdk_pixbuf_unref(pb);
 }
-#else
-static void
-get_pixmap_and_mask_from_xpm(char* xpm[],
-                             GdkPixmap **pixmap, GdkBitmap **mask)
-{
-    GdkImlibImage *im = gdk_imlib_create_image_from_xpm_data(xpm);
-    gdk_imlib_render(im, im->rgb_width, im->rgb_height);
-    *pixmap = gdk_imlib_copy_image(im);
-    *mask = gdk_imlib_copy_mask(im);
-    gdk_imlib_destroy_image(im);
-}
-#endif
 
 /* FIXME : we should single out invalid filters in the list (eg with colors) */
-
 /* FIXME : implement error reporting */
 
 void

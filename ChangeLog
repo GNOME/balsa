@@ -1,5 +1,15 @@
 2001-12-03  Pawel Salek  <pawsa@theochem.kth.se>
 
+	Require gdk-pixbuf.
+	* acconfig.h: remove USE_PIXBUF
+	* configure.in: require gdk-pixbuf
+	* libbalsa/body.[hc]: Add body_is_inline().
+	* src/balsa-message.c: remove libmutt dependency.
+	* src/filter-edit-dialog.c, src/filter-run-callbacks.c:
+	* src/filter-run-dialog.c, src/main-window.c, src/main.c:
+	* src/print.c: require pixbuf.
+	* src/toolbar-factory.c, src/toolbar-prefs.c: pixbuf was not used.
+
 	* libbalsa/filter.c: search for real names, too (Emmanuel).
 
 	Jelmer Vernooij <jelmer@lintux.cx>

@@ -200,13 +200,8 @@ build_left_side(void)
     vbox = gtk_vbox_new(FALSE, 2);
 
     /* the clist */
-#ifdef USE_PIXBUF
     gtk_widget_push_visual(gdk_rgb_get_visual());
     gtk_widget_push_colormap(gdk_rgb_get_cmap());
-#else
-    gtk_widget_push_visual(gdk_imlib_get_visual());
-    gtk_widget_push_colormap(gdk_imlib_get_colormap());
-#endif
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),

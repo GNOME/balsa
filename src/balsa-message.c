@@ -34,12 +34,12 @@
 #include "mime.h"
 #include "misc.h"
 
+/*
 #include <libmutt/mutt.h>
 #include <libmutt/mime.h>
+*/
 
-#ifdef USE_PIXBUF
 #include <gdk-pixbuf/gdk-pixbuf.h>
-#endif
 
 #ifdef HAVE_GTKHTML
 #include <gtkhtml/gtkhtml.h>
@@ -794,11 +794,7 @@ part_info_init_application(BalsaMessage * bm, BalsaPartInfo * info)
 static void
 part_info_init_image(BalsaMessage * bm, BalsaPartInfo * info)
 {
-#ifndef USE_PIXBUF
-    GdkImlibImage *im;
-#else
     GdkPixbuf *pb;
-#endif
 
     GdkPixmap *pixmap = NULL;
     GdkBitmap *mask = NULL;
@@ -807,19 +803,6 @@ part_info_init_image(BalsaMessage * bm, BalsaPartInfo * info)
 
     libbalsa_message_body_save_temporary(info->body, NULL);
 
-#ifndef USE_PIXBUF
-    if (!(im = gdk_imlib_load_image(info->body->temp_filename))) {
-	g_print(_("Could not load image. It is most likely corrupted."));
-	return;
-    }
-
-    if (!gdk_imlib_render(im, im->rgb_width, im->rgb_height))
-	g_print(_("Couldn't render image\n"));
-
-    pixmap = gdk_imlib_copy_image(im);
-    mask = gdk_imlib_copy_mask(im);
-    gdk_imlib_destroy_image(im);
-#else
     if( (pb = gdk_pixbuf_new_from_file(info->body->temp_filename)) ) {
 	gdk_pixbuf_render_pixmap_and_mask(pb, &pixmap, &mask, 0);
 	gdk_pixbuf_unref(pb);
@@ -828,7 +811,6 @@ part_info_init_image(BalsaMessage * bm, BalsaPartInfo * info)
 	    (_("balsa/pixbuf: Could not load image. It is likely corrupted."));
 	return;
     }
-#endif
 
     if (pixmap) {
 	image = gtk_pixmap_new(pixmap, mask);
@@ -1020,8 +1002,11 @@ part_info_init_message_extbody_mail(BalsaMessage * bm, BalsaPartInfo * info)
 static void
 part_info_init_message(BalsaMessage * bm, BalsaPartInfo * info)
 {
-    if (info->body && info->body->mutt_body && info->body->mutt_body->subtype &&
-	!g_strcasecmp("external-body", info->body->mutt_body->subtype)) {
+    gchar* body_type;
+    g_return_if_fail(info->body);
+
+    body_type = libbalsa_message_body_get_content_type(info->body);
+    if (!g_strcasecmp("message/external-body", body_type)) {
 	gchar *access_type;
 	rfc_extbody_id *extbody_type = rfc_extbodys;
 
@@ -1055,6 +1040,7 @@ part_info_init_message(BalsaMessage * bm, BalsaPartInfo * info)
 	g_print("TODO: part_info_init_message\n");
 	part_info_init_unknown(bm, info);
     }
+    g_free(body_type);
 }
 
 static void
@@ -2602,8 +2588,7 @@ static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent)
 	    if(body) {
 		add_body(bm, body);
 		for(body=body->next; body; body=body->next) {
-		    if(body->mutt_body && 
-		       body->mutt_body->disposition==DISPINLINE)
+                    if(libbalsa_message_body_is_inline(body))
 			add_body(bm, body);
 		}
 	    }

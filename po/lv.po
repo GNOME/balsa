@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-12-28 04:55+0100\n"
-"PO-Revision-Date: 2002-12-28 19:23+0200\n"
+"POT-Creation-Date: 2002-12-30 04:56+0100\n"
+"PO-Revision-Date: 2002-12-30 22:39+0200\n"
 "Last-Translator: Artis Trops <hornet@navigator.lv>\n"
 "Language-Team: Latvian <ll10nt@os.lv>\n"
 "MIME-Version: 1.0\n"
@@ -106,24 +106,24 @@ msgstr "Nespēju ielādēt vēstules rumpi, lai atbilstu filtram"
 
 #: libbalsa/filter.c:424
 #, c-format
-msgid "Invalid filter : %s"
-msgstr "Nederīgs filtrs : %s"
+msgid "Invalid filter: %s"
+msgstr "Nederīgs filtrs: %s"
 
-#: libbalsa/filter.c:506
-#: libbalsa/filter.c:525
+#: libbalsa/filter.c:507
+#: libbalsa/filter.c:526
 #, c-format
-msgid "Bad mailbox name for filter : %s"
-msgstr "Nepareizs pastkastītes nosaukums filtram : %s"
+msgid "Bad mailbox name for filter: %s"
+msgstr "Nepareizs pastkastītes nosaukums filtram: %s"
 
-#: libbalsa/filter.c:510
+#: libbalsa/filter.c:511
 msgid "Error when copying messages"
 msgstr "Kļūda kopējot vēstules"
 
-#: libbalsa/filter.c:518
+#: libbalsa/filter.c:519
 msgid "Error when trashing messages"
 msgstr "Kļūda dzēšot vēstules"
 
-#: libbalsa/filter.c:529
+#: libbalsa/filter.c:530
 msgid "Error when moving messages"
 msgstr "Klūda pārvietojot vēstules"
 
@@ -477,60 +477,60 @@ msgstr "Saņemu Vēstuli %d no %d"
 msgid "Received %d bytes of %d"
 msgstr "Saņemti %d baiti no %d"
 
-#: libbalsa/send.c:211
 #: libbalsa/send.c:218
+#: libbalsa/send.c:225
 msgid "Sending Mail..."
 msgstr "Sūtu Pastu..."
 
-#: libbalsa/send.c:214
+#: libbalsa/send.c:221
 #: src/main-window.c:1778
 msgid "_Hide"
 msgstr "_Slēpt"
 
-#: libbalsa/send.c:360
+#: libbalsa/send.c:369
 msgid "Unable to open sentbox - could not get IMAP server information"
 msgstr "Nevarēu atvērt nosūtītās - nevarēju saņemt IMAP servera informāciju"
 
-#: libbalsa/send.c:768
+#: libbalsa/send.c:777
 msgid "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
 msgstr "Vēstules sūtīšanas problēma, novietoju to jūsu izsūtnē.\n"
 "Sistēma mēģinās vēstuli sūtīt atkārtoti līdz jūs to izdzēsīsiet."
 
-#: libbalsa/send.c:795
+#: libbalsa/send.c:804
 msgid "Connected to MTA"
 msgstr "Pieslēdzies pie MTA"
 
-#: libbalsa/send.c:802
+#: libbalsa/send.c:811
 #, c-format
 msgid "From: %d <%s>"
 msgstr "No: %d <%s>"
 
-#: libbalsa/send.c:805
+#: libbalsa/send.c:814
 #, c-format
 msgid "From %s: %d %s"
 msgstr "No %s: %d %s"
 
-#: libbalsa/send.c:813
+#: libbalsa/send.c:822
 #, c-format
 msgid "To: %d <%s>"
 msgstr "Kam: %d <%s>"
 
-#: libbalsa/send.c:816
+#: libbalsa/send.c:825
 #, c-format
 msgid "To %s: %d %s"
 msgstr "Kam %s: %d %s"
 
-#: libbalsa/send.c:840
+#: libbalsa/send.c:849
 #, c-format
 msgid "%d %s"
 msgstr "%d %s"
 
-#: libbalsa/send.c:853
+#: libbalsa/send.c:862
 msgid "Disconnected"
 msgstr "Atlēdzies"
 
-#: libbalsa/send.c:1024
+#: libbalsa/send.c:1033
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -542,7 +542,7 @@ msgstr ""
 "Ja vēlaties sūtīt pastu, lietojot releja servisu (25), norādīt to īpaši kā: \"hostdators:smtp\".\n"
 "Vēstule atstāta izsūtnē."
 
-#: libbalsa/send.c:1034
+#: libbalsa/send.c:1043
 #, c-format
 msgid "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
@@ -2316,8 +2316,8 @@ msgstr "Turpmākā pastkastīte filtram \"%s\" ir \"%s\"\n"
 "Jūs nevarat asociēt to ar to pašu pastkastīti (tas izraisa rekursiju)."
 
 #: src/filter-run-dialog.c:187
-msgid "Balsa Filters of Mailbox : "
-msgstr "Balsa Filtri Pastkastītei : "
+msgid "Balsa Filters of Mailbox: "
+msgstr "Balsa Filtri Pastkastītei: "
 
 #: src/filter-run-dialog.c:228
 msgid "On reception"
@@ -3975,19 +3975,15 @@ msgid "Balsa: message print preview"
 msgstr "Balsa: vēstules drukas pirmsapskate"
 
 #: src/save-restore.c:553
-msgid "Error during filters loading : "
-msgstr "Kļūda ielādējot filtrus : "
+msgid "Error during filters loading: "
+msgstr "Kļūda ielādējot filtrus: "
 
 #: src/save-restore.c:555
 #, c-format
-msgid "Error during filters loading : %s\n"
+msgid "Error during filters loading: %s\n"
+"Filters may not be correct."
+msgstr "Kļūda ielādējot filtrus: %s\n"
 "%s"
-msgstr "Kļūda ielādējot filtrus : %s\n"
-"%s"
-
-#: src/save-restore.c:557
-msgid "Filters may not be correct"
-msgstr "Filtri var būt nepareizi"
 
 #: src/sendmsg-window.c:190
 msgid "_Include File..."
@@ -4471,22 +4467,29 @@ msgstr "Lādēju..."
 msgid "Include file"
 msgstr "Iekļaut failu"
 
-#: src/sendmsg-window.c:3818
+#: src/sendmsg-window.c:3163
+#, c-format
+msgid "The message cannot be encoded in charset %s.\n"
+"Please choose a language for this message."
+msgstr "Vēstule nevar tikt kodēta rakstzīmjkopā %s.\n"
+"Lūdzu izvēlaties valodu šai vēstulei."
+
+#: src/sendmsg-window.c:3849
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Atbildēt uz %s: %s"
 
-#: src/sendmsg-window.c:3823
+#: src/sendmsg-window.c:3854
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Pārsūtīt vēstuli uz %s: %s"
 
-#: src/sendmsg-window.c:3827
+#: src/sendmsg-window.c:3858
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Turpināt vēstuli uz  %s %s"
 
-#: src/sendmsg-window.c:3831
+#: src/sendmsg-window.c:3862
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Jauna vēstule uz %s: %s"

@@ -315,7 +315,6 @@ scan_mailboxes_idle_cb()
     g_node_traverse(balsa_app.mailbox_nodes, G_POST_ORDER, G_TRAVERSE_ALL, -1,
                     append_subtree_f, NULL);
     balsa_mailbox_nodes_unlock(FALSE);
-    balsa_mblist_repopulate(balsa_app.mblist_tree_store);
     gdk_threads_leave();
     return FALSE; 
 }
@@ -328,9 +327,6 @@ main(int argc, char *argv[])
     gchar *default_icon;
 #ifdef GTKHTML_HAVE_GCONF
     GError *gconf_error;
-#endif
-#ifdef BALSA_USE_THREADS
-    pthread_t scan_thread;
 #endif
 
 #ifdef ENABLE_NLS
@@ -428,14 +424,8 @@ main(int argc, char *argv[])
 	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb, urls);
     }
     signal( SIGPIPE, SIG_IGN );
-
-#ifdef BALSA_USE_THREADS
-    pthread_create(&scan_thread, NULL, 
-                   (void*(*)(void*))scan_mailboxes_idle_cb, NULL);
-    pthread_detach(scan_thread);
-#else
     gtk_idle_add((GtkFunction) scan_mailboxes_idle_cb, NULL);
-#endif
+
     gdk_threads_enter();
     gtk_main();
     gdk_threads_leave();

@@ -21,6 +21,12 @@
 
 #include "config.h"
 
+#ifdef BALSA_USE_THREADS
+#include <pthread.h>
+/* for sched_yield() prototype */
+#include <sched.h>
+#endif
+
 #include <unistd.h>
 #include "balsa-app.h"
 #include "folder-scanners.h"
@@ -49,13 +55,15 @@ static void balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn,
 static void balsa_mailbox_node_real_load_config(BalsaMailboxNode* mn,
 						const gchar * prefix);
 
+static GNode* imap_scan_create_mbnode(GNode*root, const char* fn, char delim, 
+				      gboolean scanned);
 static GNode* add_local_mailbox(GNode*root, const char*d_name, const char* fn);
 static GNode* add_local_folder(GNode*root, const char*d_name, const char* fn);
 
-static GNode *add_imap_mailbox(GNode * root, const char *fn, char delim,
-			       gboolean scanned);
-static GNode *add_imap_folder(GNode * root, const char *fn, char delim,
-			      gboolean scanned);
+static void add_imap_mailbox(const char *fn, char delim,
+			     gboolean scanned, gpointer data);
+static void add_imap_folder(const char *fn, char delim,
+			    gboolean scanned, gpointer data);
 
 enum {
     SAVE_CONFIG,
@@ -217,6 +225,8 @@ read_dir_cb(BalsaMailboxNode* mb, GNode* r)
 {
     libbalsa_scanner_local_dir(r, mb->name, 
 			       add_local_folder, add_local_mailbox);
+    /* FIXME: we should just redo local subtree starting from root, but... */
+    balsa_mblist_repopulate(balsa_app.mblist_tree_store);
 }
 
 static gboolean
@@ -232,22 +242,130 @@ register_mailbox(GNode* node, gpointer data)
 }
 
 static void
-imap_dir_cb(BalsaMailboxNode* mb, GNode* r)
+imap_scan_attach_mailbox(GNode* node, const gchar* fn)
 {
-    g_return_if_fail(mb->server);
-    gdk_threads_leave();
-    libbalsa_scanner_imap_dir(r, mb->server, mb->dir, mb->subscribed,
+    LibBalsaMailboxImap *m;
+    BalsaMailboxNode* mbnode = BALSA_MAILBOX_NODE(node->data);
+    if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
+        /* it already has a mailbox */
+        return;
+    gtk_signal_connect(GTK_OBJECT(mbnode), "show-prop-dialog",
+                       GTK_SIGNAL_FUNC(folder_conf_imap_sub_node), NULL);
+    m = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
+    libbalsa_mailbox_remote_set_server(
+        LIBBALSA_MAILBOX_REMOTE(m),
+        BALSA_MAILBOX_NODE(node->data)->server);
+    m->path = g_strdup(fn);
+    libbalsa_mailbox_imap_update_url(m);
+    if(balsa_app.debug)
+        printf("add_imap_mailbox: add mbox of name %s (full path %s)\n",
+               fn, LIBBALSA_MAILBOX(m)->url);
+    /* avoid allocating the name again: */
+    LIBBALSA_MAILBOX(m)->name = mbnode->name;
+    mbnode->name = NULL;
+    mbnode->mailbox = LIBBALSA_MAILBOX(m);
+    g_object_ref(G_OBJECT(m));
+    /*g_object_sink(G_OBJECT(m)); */
+}
+
+/* imap_dir_cb:
+   handles append-subtree signal for IMAP folder sets.
+   Scanning imap folders may be a time consuming operation and this
+   is why it should be done in a thread or in an idle function.
+   For that reason, scanning is split into two parts:
+   a. actual scanning that can be done in a thread.
+   b. GUI update.
+   extra care must be taken to avoid situations that the
+   mailbox tree is deleted after a is started and before b.
+   We do it by remembering url of the root and
+   by finding the root again when phase b. is about to start.
+*/
+typedef struct imap_scan_item_ {
+    gchar* fn;
+    gboolean scanned, selectable;
+    struct imap_scan_item_* next;
+} imap_scan_item;
+
+typedef struct {
+    imap_scan_item* list;
+    char delim;
+} imap_scan_tree;
+static void imap_scan_destroy_tree(imap_scan_tree* tree);
+
+static void*
+imap_dir_cb_real(void* r)
+{
+    GNode* n, *root=(GNode*)r;
+    imap_scan_item *item;
+    BalsaMailboxNode*mb = root->data;
+    imap_scan_tree imap_tree = { NULL, '.' };
+
+    g_return_val_if_fail(mb->server, NULL);
+
+    balsa_mailbox_nodes_lock(FALSE);
+    libbalsa_scanner_imap_dir(root, mb->server, mb->dir, mb->subscribed,
                               mb->list_inbox, 
                               balsa_app.imap_scan_depth,
-			      add_imap_folder, add_imap_mailbox);
+			      add_imap_folder, add_imap_mailbox,
+			      &imap_tree);
+    balsa_mailbox_nodes_unlock(FALSE);
+
+    /* phase b. */
     gdk_threads_enter();
+    balsa_mailbox_nodes_lock(FALSE);
+    for(item=imap_tree.list; item; item = item->next) {
+	n = imap_scan_create_mbnode(root, item->fn, 
+				    imap_tree.delim, item->scanned);
+	if(item->selectable)
+	    imap_scan_attach_mailbox(n, item->fn);
+    }
+
     /* register whole tree */
-    if(BALSA_MAILBOX_NODE(r->data)->name)
+    if(BALSA_MAILBOX_NODE(root->data)->name)
         printf("imap_dir_cb:  main mailbox node %s mailbox is %p\n", 
-               BALSA_MAILBOX_NODE(r->data)->name, 
-               BALSA_MAILBOX_NODE(r->data)->mailbox);
-    g_node_traverse(r, G_IN_ORDER, G_TRAVERSE_ALL, -1,
+               BALSA_MAILBOX_NODE(root->data)->name, 
+               BALSA_MAILBOX_NODE(root->data)->mailbox);
+    g_node_traverse(root, G_IN_ORDER, G_TRAVERSE_ALL, -1,
 		    (GNodeTraverseFunc) register_mailbox, NULL);
+    /* FIXME: we should just redo local subtree starting from root, but... */
+    balsa_mblist_repopulate(balsa_app.mblist_tree_store);
+    balsa_mailbox_nodes_unlock(FALSE);
+    gdk_threads_leave();
+    imap_scan_destroy_tree(&imap_tree);
+    gnome_appbar_pop(balsa_app.appbar);
+    printf("%d: Done\n", (int)time(NULL));
+    return NULL;
+}
+
+static void
+imap_dir_cb(BalsaMailboxNode* mb, GNode* r)
+{
+    gchar* msg;
+    BalsaMailboxNode* mroot=mb;
+
+    while(mroot->parent)
+	mroot = mroot->parent;
+    msg = g_strdup_printf(_("Scanning %s. Please wait..."), mroot->name);
+    gnome_appbar_push(balsa_app.appbar, msg);
+    printf("%d: %s\n", (int)time(NULL), msg);
+    g_free(msg);
+    /* process UI events */
+    while(gtk_events_pending()) 
+	gtk_main_iteration();
+    gdk_threads_leave();
+#ifdef BALSA_USE_THREADS
+    pthread_t scan_th_id;
+    pthread_create(&scan_th_id, NULL, imap_dir_cb_real, r);
+    pthread_detach(scan_th_id);
+    /* give the thread change to start and grab the lock 
+     * this is an imperfect way of doing it because it does not
+     *  guarantee that the thread will actually manage to grab the lock
+     *  but I cannot think of anything better right now. */
+    sched_yield();
+#else
+    imap_dir_cb_real(r);
+#endif
+    gdk_threads_enter();
 }
 
 BalsaMailboxNode *
@@ -444,16 +562,14 @@ balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
     balsa_mailbox_nodes_unlock(FALSE);
 
     if(gnode) {
-	/* the expanded state needs to be preserved; it would 
+	/* FIXME: the expanded state needs to be preserved; it would 
 	   be reset when all the children are removed */
 	gboolean expanded = mn->expanded;
-        balsa_mailbox_nodes_lock(TRUE);
+        //balsa_mailbox_nodes_lock(TRUE);
 	balsa_remove_children_mailbox_nodes(gnode);
-        balsa_mailbox_nodes_unlock(TRUE);
+        //balsa_mailbox_nodes_unlock(TRUE);
         balsa_mailbox_node_append_subtree(mn, gnode);
-	mn->expanded = expanded;
-	balsa_mblist_repopulate(balsa_app.mblist_tree_store);
-        if (expanded)
+	if (expanded)
             /* if this is an IMAP node, we must scan the children */
 	    balsa_mblist_scan_mailbox_node(mn);
     } else g_warning("folder node %s (%p) not found in hierarchy.\n",
@@ -572,9 +688,11 @@ mb_filter_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
     if (mbnode->mailbox) filters_run_dialog(mbnode->mailbox);
     else
-	/* FIXME : Perhaps should we be able to apply filters on folders (ie recurse on all mailboxes in it),
-	   but there are problems of infinite recursion (when one mailbox being filtered is also the destination
-	   of the filter action (eg a copy)). So let's see that later :) */
+	/* FIXME : Perhaps should we be able to apply filters on
+	   folders (ie recurse on all mailboxes in it), but there are
+	   problems of infinite recursion (when one mailbox being
+	   filtered is also the destination of the filter action (eg a
+	   copy)). So let's see that later :) */
 	g_print("You can apply filters only on mailbox\n");
 }
 
@@ -765,7 +883,8 @@ add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
     return node;
 }
 
-GNode* add_local_folder(GNode*root, const char*d_name, const char* path)
+GNode*
+add_local_folder(GNode*root, const char*d_name, const char* path)
 {
     GNode *node, *found;
 
@@ -802,12 +921,13 @@ get_parent_folder_name(const gchar* path, char delim)
 	: g_strdup("");
 }
 
-/* add_imap_entry:
+/* imap_scan_create_mbnode:
  * Returns a node for the path `fn'.
  * Finds the node if it exists, and creates one if it doesn't.
  */
 static GNode* 
-add_imap_entry(GNode*root, const char* fn, char delim, gboolean scanned)
+imap_scan_create_mbnode(GNode*root, const char* fn, char delim, 
+			gboolean scanned)
 { 
     GNode* node;
     gchar * parent_name;
@@ -860,62 +980,49 @@ add_imap_entry(GNode*root, const char* fn, char delim, gboolean scanned)
 
 /* add_imap_mailbox:
    add given mailbox unless its base name begins on dot.
-   It is called as a callback from libmutt so it has to take measures not
-   to call libmutt again. In particular, it CANNOT call
-   libbalsa_mailbox_imap_set_path because ut would call in turn 
-   mailbox_notify_register, which calls in turn libmutt code.
-
-   FIXME: this needs some cleanup. Moving existing node (as found by
-   remove_special_mailbox) to another branch of the tree should be
-   easier/cleaner. A function like: add_gnode_to_its_parent() would do 
-   the job.
-   
 */
-static GNode*
-add_imap_mailbox(GNode*root, const char* fn, char delim, gboolean scanned)
-{ 
-    LibBalsaMailboxImap* m;
-    const gchar *basename;
-    GNode *node;
-    BalsaMailboxNode* mbnode;
+static void
+add_imap_entry(const char* fn, char delim, gboolean scanned, 
+	       gboolean selectable, void* data)
+{
+    imap_scan_tree *tree = (imap_scan_tree*)data;
+    imap_scan_item* dt = g_new0(imap_scan_item,1);
+    dt->fn   = g_strdup(fn);
+    dt->scanned = scanned;
+    dt->selectable = selectable;
+    dt->next = tree->list;
+    tree->list = dt;
+    tree->delim = delim;
+}
+static void
+imap_scan_destroy_tree(imap_scan_tree* tree)
+{
+    while(tree->list) {
+	imap_scan_item* t = tree->list;
+	g_free(t->fn);
+	tree->list = t->next;
+	g_free(t);
+    }
+}
 
-    basename = strrchr(fn, delim);
+static void
+add_imap_mailbox(const char* fn, char delim, gboolean scanned, void* data)
+{ 
+    const gchar *basename = strrchr(fn, delim);
     if(!basename) basename = fn;
     else { 
 	if(*++basename == '.' && delim != '.') /* ignore mailboxes
 						  that begin with a dot */
-	    return NULL; 
+	    return; 
     }
-
-    node = add_imap_entry(root, fn, delim, scanned);
-    mbnode = BALSA_MAILBOX_NODE(node->data);
-    if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
-	/* it already has a mailbox */
-	return node;
-    gtk_signal_connect(GTK_OBJECT(mbnode), "show-prop-dialog",
-		       GTK_SIGNAL_FUNC(folder_conf_imap_sub_node), NULL);
-    m = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
-    libbalsa_mailbox_remote_set_server(
-	LIBBALSA_MAILBOX_REMOTE(m), 
-	BALSA_MAILBOX_NODE(root->data)->server);
-    m->path = g_strdup(fn);
-    libbalsa_mailbox_imap_update_url(m);
-    if(balsa_app.debug) 
-	printf("add_imap_mailbox: add mbox of name %s (full path %s)\n", 
-	       basename, fn);
-    /* avoid allocating the name again: */
-    LIBBALSA_MAILBOX(m)->name = mbnode->name;
-    mbnode->name = NULL;
-    mbnode->mailbox = LIBBALSA_MAILBOX(m);
-
-    return node;
+    add_imap_entry(fn, delim, scanned, TRUE, data);
 }
 
-static GNode*
-add_imap_folder(GNode*root, const char* fn, char delim, gboolean scanned)
+static void
+add_imap_folder(const char* fn, char delim, gboolean scanned, void* data)
 { 
     if(balsa_app.debug) 
 	printf("add_imap_folder: Adding folder of path %s\n", fn);
-    return add_imap_entry(root, fn, delim, scanned);
+    add_imap_entry(fn, delim, scanned, FALSE, data); 
 }
 

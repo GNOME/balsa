@@ -1,3 +1,14 @@
+2002-08-26  Pawel Salek <pawsa@theochem.kth.se>
+
+	serialize IMAP scanning and UI operations to avoid deep-nested
+	locking.
+	* libbalsa/folder-scanners.[hc]: reduce number of locks held
+	simultanenously.
+	* src/balsa-message.c: refresh status bar properly.
+	* src/mailbox-node.c: serialize scanning and UI.
+	* src/main.c: do not start scanning thread here, this is an
+	implementation detail.
+	
 2002-08-26  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/mailbox-conf.c: fix add mailbox (PB) 

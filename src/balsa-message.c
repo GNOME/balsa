@@ -1453,6 +1453,14 @@ check_call_url(GtkWidget * widget, GdkEventButton * event,
     return FALSE;
 }
 
+static gboolean
+status_bar_refresh(gpointer data)
+{
+    gnome_appbar_refresh(balsa_app.appbar);
+    return FALSE;
+}
+#define SCHEDULE_BAR_REFRESH()	gtk_timeout_add(5000, status_bar_refresh, NULL);
+
 static void
 handle_url(const message_url_t* url)
 {
@@ -1468,6 +1476,7 @@ handle_url(const message_url_t* url)
         GError *err = NULL;
 
         gnome_appbar_set_status(balsa_app.appbar, notice);
+	SCHEDULE_BAR_REFRESH();
         g_free(notice);
         gnome_url_show(url->url, &err);
         if (err) {
@@ -2500,23 +2509,11 @@ balsa_gtk_html_link_clicked(GObject *obj, const gchar *url)
 static void
 balsa_gtk_html_on_url(GtkWidget *html, const gchar *url)
 {
-    static int url_pushed = FALSE;
-
     if( url ) {
-	if (url_pushed) {
-	    gnome_appbar_set_status(balsa_app.appbar, url);
-	} else {
-	    gnome_appbar_push(balsa_app.appbar, url);
-	    url_pushed = TRUE;
-	}
-    } else {
-	if (url_pushed) {
-	    gnome_appbar_pop(balsa_app.appbar);
-	    url_pushed = FALSE;
-	} else {
-	    gnome_appbar_set_status(balsa_app.appbar, "");
-	}
-    }
+	gnome_appbar_set_status(balsa_app.appbar, url);
+	SCHEDULE_BAR_REFRESH();
+    } else 
+	gnome_appbar_refresh(balsa_app.appbar);
 }
 
 static void

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,18 +23,19 @@
 #define __FOLDER_SCANNERS_H__
 
 typedef GNode* (LocalHandler)(GNode*root, const char*d_name, const char* fn);
-typedef GNode *(ImapHandler) (GNode *root, const char *fn, char delim,
-			      gboolean scanned);
+typedef void (ImapHandler) (const char *fn, char delim,
+			    gboolean scanned, gpointer data);
 
 /* read_dir used by mailbox-node append-subtree callback */
 void libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix, 
 				LocalHandler folder_handler, 
 				LocalHandler mailbox_handler);
 
-void libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer* server, 
-			       const gchar* path, gboolean subscribed,
-                               gboolean list_inbox, int depth,
+void libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server, 
+			       const gchar* path, gboolean subscribed, 
+			       gboolean list_inbox, int depth,
 			       ImapHandler folder_handler, 
-			       ImapHandler mailbox_handler);
+			       ImapHandler mailbox_handler,
+			       gpointer cb_data);
 
 #endif				/* __FOLDER_SCANNERS_H__ */

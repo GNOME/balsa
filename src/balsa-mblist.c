@@ -1031,9 +1031,9 @@ balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
  */
 static gboolean
 bmbl_disconnect_mailbox_signals(GtkTreeModel *model,
-                                        GtkTreePath *path,
-                                        GtkTreeIter *iter,
-                                        gpointer data)
+				GtkTreePath *path,
+				GtkTreeIter *iter,
+				gpointer data)
 {
     BalsaMailboxNode *mbnode;
     

@@ -224,7 +224,9 @@ pop_get_stats(int s, gint *first_msg, gint *msgs, gint *tot_bytes,
     if (getLine (s, buffer, sizeof (buffer)) == -1) return POP_CONN_ERR;
     if (strncmp (buffer, "+OK", 3) != 0)            return POP_COMMAND_ERR;
     
-    sscanf (buffer, "+OK %d %d", msgs, &bytes);
+    if( sscanf (buffer, "+OK %d %d", msgs, &bytes) < 2 ) {
+	
+    }
     
     DM( "Stat retrieved" );
     *first_msg = 1;
@@ -521,7 +523,8 @@ fetch_pop_mail (const gchar *pop_host, const gchar *pop_user,
 	/* exit gracefully */
 	write (s, "quit\r\n", 6);
 	getLine (s, buffer, sizeof (buffer)); /* snarf the response */
-	strcpy(last_uid, uid);/* FIXME: overflow error on hideous reply? */
+	if(status == POP_OK)
+	    strcpy(last_uid, uid);/* FIXME: overflow error on hideous reply? */
     }
     close (s);
 

@@ -1,3 +1,11 @@
+2000-11-16  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/main.c (main): ignore SIGPIPE so we don't die when pop 
+	(and imap?) server disconect. there must be a better way of 
+	doing this - show me how.
+	* libbalsa/pop3.c (fetch_pop_mail): be saner about saving uids 
+	so we don't mess up last_uidl when weird stuff happens.
+	
 2000-11-16  Pawel Salek  <pawsa@theochem.kth.se>
         Atsuhiko Yamanaka's <ymnk@jcraft.com> speedup patch with minor
 	changes and updates.

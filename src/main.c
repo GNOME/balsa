@@ -33,6 +33,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <signal.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
@@ -396,6 +397,8 @@ main(int argc, char *argv[])
 	gchar **names = g_strsplit(cmd_line_open_mailboxes, ";", 20);
 	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb, names);
     }
+
+    signal( SIGPIPE, SIG_IGN );
 
     gdk_threads_enter();
     gtk_main();

@@ -2,7 +2,8 @@ SGML_FILES = \
 	balsa.sgml
 
 EXTRA_DIST = \
-	topic.dat
+	topic.dat \
+	$(SGML_FILES)
 
 if sys_install
 balsa_helpdir = $(gnomedatadir)/gnome/help/balsa/C
@@ -28,7 +29,7 @@ balsa/balsa.html: $(SGML_FILES)
 dist-hook:
 	mkdir $(distdir)/balsa
 	-cp $(srcdir)/balsa/*.html $(distdir)/balsa
-	-cp $(srcdir)/balsa.html $(distdir)
+	-cp $(srcdir)/balsa/balsa.html $(distdir)
 #	mkdir $(distdir)/images
 #	-cp $(srcdir)/images/*.gif $(srcdir)/images/*.jpg $(distdir)/images
 

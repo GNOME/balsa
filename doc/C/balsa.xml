@@ -125,7 +125,7 @@ This is version 2.718 of the Balsa manual.
 <sect1 id="introduction">
 <title>Introduction</title>
     
-<graphic fileref="figures/balsa_logo" format="PNG" srccredit="tigert"></graphic>
+<graphic fileref="figures/balsa_logo.png" format="PNG" srccredit="tigert"></graphic>
 
 <para>
   &Balsa; is a graphical mail client similar to Eudora on Windows. It
@@ -1658,7 +1658,7 @@ This is version 2.718 of the Balsa manual.
   <screenshot>
 	  <mediaobject> 
 	    <imageobject><imagedata
-		fileref="figures/newmsg-window-attachments" format="PNG"/> 
+		fileref="figures/newmsg-window-attachments.png" format="PNG"/> 
 	    </imageobject>
 	  </mediaobject>
   </screenshot>

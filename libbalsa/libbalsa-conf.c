@@ -57,21 +57,24 @@ libbalsa_conf_foreach_group(const gchar * prefix,
     }
 }
 
-void libbalsa_conf_push_group(const char *group)
+void
+libbalsa_conf_push_group(const char *group)
 {
     gchar *prefix = g_strconcat(BALSA_CONFIG_PREFIX, group, "/", NULL);
     gnome_config_push_prefix(prefix);
     g_free(prefix);
 }
 
-void libbalsa_conf_remove_group_(const char *group, gboolean priv)
+void
+libbalsa_conf_remove_group_(const char *group, gboolean priv)
 {
     gchar *prefix = g_strconcat(BALSA_CONFIG_PREFIX, group, "/", NULL);
     gnome_config_clean_section_(prefix, priv);
     g_free(prefix);
 }
 
-gboolean libbalsa_conf_has_group(const char *group)
+gboolean
+libbalsa_conf_has_group(const char *group)
 {
     gchar *prefix = g_strconcat(BALSA_CONFIG_PREFIX, group, "/", NULL);
     gboolean retval = gnome_config_has_section(prefix);
@@ -87,6 +90,7 @@ gboolean libbalsa_conf_has_group(const char *group)
 #include <unistd.h>
 #include <stdio.h>
 
+#include "libbalsa.h"
 #include "misc.h"
 
 static GKeyFile *lbc_key_file;
@@ -97,7 +101,7 @@ static gchar *lbc_key_file_priv_name;
 static guint lbc_key_file_priv_changes;
 static GSList *lbc_groups;
 
-#define BALSA_KEY_FILE "balsa-key-file"
+#define BALSA_KEY_FILE "config"
 
 static gchar *
 lbc_readfile(const gchar * filename)
@@ -118,6 +122,8 @@ lbc_readfile(const gchar * filename)
     return buf;
 }
 
+#define DEBUG TRUE
+
 static void
 lbc_init(void)
 {
@@ -125,49 +131,60 @@ lbc_init(void)
 
     lbc_key_file = g_key_file_new();
     g_key_file_set_list_separator(lbc_key_file, ' ');
-    if (!g_key_file_load_from_data_dirs
-        (lbc_key_file, BALSA_KEY_FILE, &lbc_key_file_name, G_KEY_FILE_NONE,
-         &error)) {
-        const gchar *home;
+    lbc_key_file_name =
+        g_build_filename(g_get_home_dir(), ".balsa", BALSA_KEY_FILE, NULL);
+    libbalsa_assure_balsa_dir();
+    if (!g_key_file_load_from_file
+        (lbc_key_file, lbc_key_file_name, G_KEY_FILE_NONE, &error)) {
         gchar *filename;
         gchar *buf;
 
-        g_message(error->message);
+#if DEBUG
+        g_message("Could not load config from \"%s\": %s",
+                  lbc_key_file_name, error->message);
+	g_message("Trying ~/.gnome2.");
+#endif /* DEBUG */
         g_error_free(error);
         error = NULL;
 
-        home = g_getenv("HOME");
-        filename = g_build_filename(home, ".gnome2", "balsa", NULL);
+        filename =
+            g_build_filename(g_get_home_dir(), ".gnome2", "balsa", NULL);
         buf = lbc_readfile(filename);
         g_key_file_load_from_data(lbc_key_file, buf, -1,
                                   G_KEY_FILE_NONE, &error);
         g_free(buf);
         if (error) {
+#if DEBUG
             g_message("Cannot load key file from file \"%s\": %s",
                       filename, error->message);
+#endif /* DEBUG */
             g_error_free(error);
             error = NULL;
         }
         g_free(filename);
-
-        lbc_key_file_name =
-            g_build_filename(g_get_user_data_dir(), BALSA_KEY_FILE, NULL);
     }
 
     lbc_key_file_priv = g_key_file_new();
     g_key_file_set_list_separator(lbc_key_file_priv, ' ');
-    if (!g_key_file_load_from_data_dirs
-        (lbc_key_file_priv, BALSA_KEY_FILE "-private",
-         &lbc_key_file_priv_name, G_KEY_FILE_NONE, &error)) {
+    lbc_key_file_priv_name =
+        g_build_filename(g_get_home_dir(), ".balsa",
+                         BALSA_KEY_FILE "-private", NULL);
+    if (!g_key_file_load_from_file
+        (lbc_key_file_priv, lbc_key_file_priv_name, G_KEY_FILE_NONE,
+         &error)) {
         gchar *filename;
         gchar *buf;
 
-        g_message(error->message);
+#if DEBUG
+        g_message("Could not load private config from \"%s\": %s",
+                  lbc_key_file_priv_name, error->message);
+	g_message("Trying ~/.gnome2_private.");
+#endif /* DEBUG */
         g_error_free(error);
         error = NULL;
 
         filename =
-            g_build_filename(g_getenv("HOME"), ".gnome2_private", "balsa",
+            g_build_filename(g_get_home_dir(), ".gnome2_private", "balsa",
                              NULL);
         buf = lbc_readfile(filename);
         lbc_key_file_priv = g_key_file_new();
@@ -176,14 +193,13 @@ lbc_init(void)
                                   G_KEY_FILE_NONE, &error);
         g_free(buf);
         if (error) {
+#if DEBUG
             g_message("Cannot load private key file from file \"%s\": %s",
                       filename, error->message);
+#endif /* DEBUG */
             g_error_free(error);
         }
         g_free(filename);
-        lbc_key_file_priv_name =
-            g_build_filename(g_get_user_data_dir(),
-                             BALSA_KEY_FILE "-private", NULL);
     }
 }
 
@@ -446,7 +462,9 @@ lbc_sync(GKeyFile * key_file, const gchar * filename)
 
     buf = g_key_file_to_data(key_file, &len, &error);
     if (error) {
+#if DEBUG
         g_message("Failed to sync key file: %s", error->message);
+#endif /* DEBUG */
         g_error_free(error);
         return;
     }
@@ -456,7 +474,9 @@ lbc_sync(GKeyFile * key_file, const gchar * filename)
         write(fd, buf, len);
         close(fd);
     } else
+#if DEBUG
         g_message("Failed to rewrite key file \"%s\".", filename);
+#endif /* DEBUG */
     g_free(buf);
 }
 

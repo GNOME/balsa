@@ -865,7 +865,7 @@ lbm_mbox_rewrite_in_place(struct message_info *msg_info,
 	g_mime_stream_seek(stream, msg_info->x_status, GMIME_STREAM_SEEK_SET);
 	g_mime_stream_write(stream, x_status_buf, sizeof(x_status_buf));
     }
-    msg_info->orig_flags = msg_info->flags;
+    msg_info->orig_flags = msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
     return TRUE;
 }
 
@@ -1008,7 +1008,8 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    break;
 	if (first < 0 && (msg_info->status < 0 || msg_info->x_status < 0))
 	    first = i;
-	if (msg_info->orig_flags != msg_info->flags) {
+        if ((msg_info->orig_flags ^ msg_info->flags)
+            & LIBBALSA_MESSAGE_FLAGS_REAL) {
 	    if (lbm_mbox_rewrite_in_place(msg_info, mbox_stream))
 		++j;
 	    else
@@ -1023,6 +1024,12 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    utimebuf.modtime = st.st_mtime;
 	    utime(path, &utimebuf);
 	}
+	if (g_mime_stream_flush(mbox_stream) == -1)
+	    g_warning("can't flush mailbox stream\n");
+	if (!stat(path, &st))
+	    mbox->mtime = st.st_mtime;
+	else
+	    g_warning("failed to stat \"%s\"", path);
 	mbox_unlock(mailbox, mbox_stream);
 	return TRUE;
     }

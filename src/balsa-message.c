@@ -482,11 +482,50 @@ bm_message_weak_ref_cb(BalsaMessage * bm, LibBalsaMessage * message)
 
    if message == NULL, clears the display and returns TRUE
 */
+
+/* Helpers:
+ */
+static gboolean
+bm_content_has_focus(BalsaMessage * bm)
+{
+    GList *children, *list;
+    gboolean has_focus = FALSE;
+
+    children = gtk_container_get_children(GTK_CONTAINER(bm->content));
+    for (list = children; list; list = g_list_next(list)) {
+        GtkWidget *child = list->data;
+        if (GTK_WIDGET_HAS_FOCUS(child)) {
+            has_focus = TRUE;
+            break;
+        }
+    }
+    g_list_free(children);
+
+    return has_focus;
+}
+
+static void
+bm_focus_on_first_child(BalsaMessage * bm)
+{
+    GList *children, *list;
+
+    children = gtk_container_get_children(GTK_CONTAINER(bm->content));
+    for (list = children; list; list = g_list_next(list)) {
+        GtkWidget *child = list->data;
+        if (GTK_WIDGET_CAN_FOCUS(child)) {
+            gtk_widget_grab_focus(child);
+            break;
+        }
+    }
+    g_list_free(children);
+}
+
 gboolean
 balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 {
     gboolean is_new;
     gint part_count;
+    gboolean has_focus;
 
     g_return_val_if_fail(bm != NULL, FALSE);
 
@@ -495,6 +534,8 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     /*    if (bm->message == message) */
     /*      return; */
 
+    /* find out whether the content has the keyboard focus */
+    has_focus = bm_content_has_focus(bm);
 
     select_part(bm, -1);
     if (bm->message != NULL) {
@@ -554,6 +595,10 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     }
 
     gnome_icon_list_select_icon(GNOME_ICON_LIST(bm->part_list), 0);
+
+    /* restore keyboard focus to the content, if it was there before */
+    if (has_focus)
+        bm_focus_on_first_child(bm);
 
     /* We show the part list if:
      *    there is > 1 part

@@ -568,7 +568,7 @@ next_message_cb (GtkWidget * widget)
 {
   g_return_if_fail (widget != NULL);
 
-  if (!balsa_app.current_index_childx)
+  if (!balsa_app.current_index_child)
     return;
 
   balsa_index_select_next (BALSA_INDEX (balsa_app.current_index_child->index));

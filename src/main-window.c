@@ -125,7 +125,7 @@ open_main_window (void)
   refresh_main_window ();
 }
 
-static void 
+static void
 app_created (GnomeMDI * mdi, GnomeApp * app)
 {
   set_icon (GTK_WIDGET (app)->window);
@@ -609,7 +609,14 @@ set_icon (GdkWindow * w)
     {
       i = 0;			/* use first icon size - not much point using the others */
       att.width = is[i].max_width;
-      att.height = 3 * att.width / 4;
+      att.height = is[i].max_height;
+      /*
+       * raster had:
+       * att.height = 3 * att.width / 4;
+       * but this didn't work  (it scaled the icons incorrectly
+       */
+
+      /* make sure the icon is inside the min and max sizes */
       if (att.height < is[i].min_height)
 	att.height = is[i].min_height;
       if (att.height > is[i].max_height)
@@ -632,6 +639,7 @@ set_icon (GdkWindow * w)
       att.width = 32;
       att.height = 24;
     }
+  g_print ("width:  %i\nheight: %i\n", att.width, att.height);
   att.wclass = GDK_INPUT_OUTPUT;
   att.window_type = GDK_WINDOW_TOPLEVEL;
   att.x = 0;

@@ -563,9 +563,15 @@ open_mailboxes_idle_cb(gchar ** urls)
 		    *tmp, mbox);
 	if (mbox)
 	    balsa_mblist_open_mailbox(mbox);
-        else
+        else {
+	    /* Do not try to open it next time. */
+	    LibBalsaMailboxView *view =
+		g_hash_table_lookup(libbalsa_mailbox_view_table, *tmp);
+	    view->open = FALSE;
+	    view->in_sync = FALSE;
             balsa_information(LIBBALSA_INFORMATION_WARNING,
                               _("Couldn't open mailbox \"%s\""), *tmp);
+	}
     }
     g_strfreev(urls);
 

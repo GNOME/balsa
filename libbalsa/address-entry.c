@@ -2266,23 +2266,6 @@ lbae_get_name_from_address(LibBalsaAddress * address, const gchar * prefix)
         g_object_unref(tmp_address);
     }
 
-    if (address_string) {
-        /* dequote */
-        gchar *p, *q;
-
-        for (p = q = address_string; *p;) {
-            if (*p == '\\') {
-                *q++ = *p++;
-                if (*p)
-                    *q++ = *p++;
-            } else if (*p == '"')
-                p++;
-            else
-                *q++ = *p++;
-        }
-        *q = '\0';
-    }
-
     return address_string;
 }
 
@@ -2432,7 +2415,13 @@ lbae_completion_match(GtkEntryCompletion * completion, const gchar * key,
 
     gtk_tree_model_get(gtk_entry_completion_get_model(completion), iter,
                        NAME_COL, &name, -1);
-    retval = lbae_utf8_name_has_prefix(name, prefix);
+
+    if (!name)
+        /* How can this happen? */
+        return FALSE;
+
+    retval =
+        lbae_utf8_name_has_prefix(*name == '"' ? name + 1 : name, prefix);
     g_free(name);
 
     return retval;

@@ -13,23 +13,29 @@ For 0.4.5 release:
 
  * inbox/outbox/trash should be able to be something other than mbox.  Need to
    add support for IMAP, mh or maildir ones.  (mh and/or maildir might work)
+ * finish balsa-init so that it will setup your mailboxes correctly.
+
      UPDATE: this is somewhat working.
-
- * fix it under solaris.  test under aix, hpux, and osf (digital unix i fink?)
-     UPDATE: solaris seems to be ok now.  need to test other platforms.
-
+             It has inbox, outbox, and trash paths in the balsa-init stuff.
+	     This format doesn't allow for IMAP which is something that needed
+	     to be done anyways, but I think that this is going to be too
+	     confusing (putting all the options in balsa-init).  mailbox-conf
+	     sucks right now, and should be updated to work correctly.
+     
  * fix checking for new mail inside mailboxes.
      we have a full mail tray and an empty one.  full should be used to show
      messages with new mail.  the mailbox name should also be in bold.
 
- * finish balsa-init so that it will setup your mailboxes correctly.
-
  * get pref-manager working with gnome-propertybox
-    UPDATE: almost done
+    UPDATE: this works.  setting the toolbar type doesn't save.. hmm
+
 
 
 
 later stuff:
+
+ * fix it under solaris.  test under aix, hpux, and osf (digital unix i fink?)
+     UPDATE: solaris seems to be ok now.  need to test other platforms.
 
  * digest/undigest mail.
 

@@ -9,8 +9,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: cs\n"
-"POT-Creation-Date: 2003-04-04 03:28+0200\n"
-"PO-Revision-Date: 2003-04-04 10:49+0200\n"
+"POT-Creation-Date: 2003-04-10 11:41+0200\n"
+"PO-Revision-Date: 2003-04-10 19:49+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -143,12 +143,12 @@ msgstr "Chyba při přesunování zpráv"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:88 src/balsa-index-threading.c:547
-#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2301
-#: src/sendmsg-window.c:2302
+#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2331
+#: src/sendmsg-window.c:2332
 msgid "Re:"
 msgstr "Re:"
 
-#: libbalsa/identity.c:89 src/sendmsg-window.c:2330 src/sendmsg-window.c:2331
+#: libbalsa/identity.c:89 src/sendmsg-window.c:2360 src/sendmsg-window.c:2361
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -516,7 +516,17 @@ msgstr "Získávají se zprávy (%d z %d)"
 msgid "Received %d bytes of %d"
 msgstr "Přijato %d bajtů z %d"
 
-#: libbalsa/rfc3156.c:97
+#: libbalsa/rfc3156.c:64
+msgid ""
+"\n"
+"--\n"
+"This is an OpenPGP signed message part:\n"
+msgstr ""
+"\n"
+"--\n"
+"Toto je část zprávy podepsaná pomocí OpenPGP:\n"
+
+#: libbalsa/rfc3156.c:115
 #, c-format
 msgid ""
 "\n"
@@ -525,12 +535,12 @@ msgstr ""
 "\n"
 "Podepsal: %s"
 
-#: libbalsa/rfc3156.c:101
+#: libbalsa/rfc3156.c:119
 #, c-format
 msgid "Mail address: %s"
 msgstr "Adresa elektronické pošty: %s"
 
-#: libbalsa/rfc3156.c:103
+#: libbalsa/rfc3156.c:121
 #, c-format
 msgid ""
 "\n"
@@ -539,7 +549,7 @@ msgstr ""
 "\n"
 "Platnost: %s"
 
-#: libbalsa/rfc3156.c:106
+#: libbalsa/rfc3156.c:124
 #, c-format
 msgid ""
 "\n"
@@ -548,7 +558,7 @@ msgstr ""
 "\n"
 "Otisk klíče: %s"
 
-#: libbalsa/rfc3156.c:111
+#: libbalsa/rfc3156.c:129
 #, c-format
 msgid ""
 "\n"
@@ -557,7 +567,7 @@ msgstr ""
 "\n"
 "Klíč vytvořen dne: %s"
 
-#: libbalsa/rfc3156.c:116
+#: libbalsa/rfc3156.c:134
 #, c-format
 msgid ""
 "\n"
@@ -566,191 +576,235 @@ msgstr ""
 "\n"
 "Podepsáno dne: %s"
 
-#: libbalsa/rfc3156.c:236 libbalsa/rfc3156.c:255 libbalsa/rfc3156.c:484
+#: libbalsa/rfc3156.c:275 libbalsa/rfc3156.c:294 libbalsa/rfc3156.c:506
 #, c-format
 msgid "gpgme could not get data from mailbox file: %s"
 msgstr "gpgme nemohlo získat data ze souboru schránky: %s"
 
-#: libbalsa/rfc3156.c:268
+#: libbalsa/rfc3156.c:307 libbalsa/rfc3156.c:899
 #, c-format
 msgid "gpgme signature verification failed: %s"
 msgstr "ověření podpisu gpgme selhalo: %s"
 
-#: libbalsa/rfc3156.c:469 libbalsa/rfc3156.c:1176 libbalsa/rfc3156.c:1267
+#: libbalsa/rfc3156.c:491 libbalsa/rfc3156.c:760 libbalsa/rfc3156.c:862
+#: libbalsa/rfc3156.c:982 libbalsa/rfc3156.c:1096 libbalsa/rfc3156.c:1748
+#: libbalsa/rfc3156.c:1839
 #, c-format
 msgid "could not create gpgme context: %s"
 msgstr "nelze vytvořit kontext gpgme: %s"
 
-#: libbalsa/rfc3156.c:475
+#: libbalsa/rfc3156.c:497
 msgid "Enter passphrase to decrypt message"
 msgstr "Pro rozšifrování zprávy zadejte heslo"
 
-#: libbalsa/rfc3156.c:494
+#: libbalsa/rfc3156.c:516 libbalsa/rfc3156.c:790 libbalsa/rfc3156.c:889
+#: libbalsa/rfc3156.c:1022 libbalsa/rfc3156.c:1114
 #, c-format
 msgid "gpgme could not create new data object: %s"
 msgstr "gpgme nemohlo vytvořit nový objekt dat: %s"
 
-#: libbalsa/rfc3156.c:505
+#: libbalsa/rfc3156.c:527
 #, c-format
 msgid "gpgme decryption failed: %s"
 msgstr "dešifrování gpgme selhalo: %s"
 
-#: libbalsa/rfc3156.c:519
+#: libbalsa/rfc3156.c:541
 #, c-format
 msgid "could not get gpgme decrypted data: %s"
 msgstr "nelze získat dešifrovaná data gpgme: %s"
 
-#: libbalsa/rfc3156.c:650
+#: libbalsa/rfc3156.c:672
 msgid "The signature is valid."
 msgstr "Podpis je platný."
 
-#: libbalsa/rfc3156.c:652
+#: libbalsa/rfc3156.c:674
 msgid "The signature is valid but expired."
 msgstr "Podpis je platný, ale vypršel."
 
-#: libbalsa/rfc3156.c:654
+#: libbalsa/rfc3156.c:676
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr "Podpis je platný, ale klíč použitý k ověření podpisu vypršel."
 
-#: libbalsa/rfc3156.c:656
+#: libbalsa/rfc3156.c:678
 msgid "The signature is invalid."
 msgstr "Podpis je platný."
 
-#: libbalsa/rfc3156.c:658
+#: libbalsa/rfc3156.c:680
 msgid "The signature could not be verified due to a missing key."
 msgstr "Podpis nemohl být ověřen kvůli chybějícímu klíči."
 
-#: libbalsa/rfc3156.c:660
+#: libbalsa/rfc3156.c:682
 msgid "This part is not a real PGP signature."
 msgstr "Tato část není opravdový podpis PGP."
 
-#: libbalsa/rfc3156.c:662
+#: libbalsa/rfc3156.c:684
 msgid "An error prevented the signature verification."
 msgstr "Ověření podpisu zabránila chyba."
 
-#: libbalsa/rfc3156.c:664
+#: libbalsa/rfc3156.c:686
 msgid "This part contains at least two signatures with different status."
 msgstr "Tato část obsahuje alespoň dva podpisy s různým stavem."
 
-#: libbalsa/rfc3156.c:667
+#: libbalsa/rfc3156.c:689
 msgid "bad status"
 msgstr "špatný stav"
 
-#: libbalsa/rfc3156.c:677
+#: libbalsa/rfc3156.c:699
 msgid "The user ID is of unknown validity."
 msgstr "ID uživatele má neznámou platnost."
 
-#: libbalsa/rfc3156.c:679
+#: libbalsa/rfc3156.c:701
 msgid "The validity of the user ID is undefined."
 msgstr "Platnost ID uživatele je nedefinovaná."
 
-#: libbalsa/rfc3156.c:681
+#: libbalsa/rfc3156.c:703
 msgid "The user ID is never valid."
 msgstr "ID uživatele není nikdy platné."
 
-#: libbalsa/rfc3156.c:683
+#: libbalsa/rfc3156.c:705
 msgid "The user ID is marginally valid."
 msgstr "ID uživatele je okrajově platné."
 
-#: libbalsa/rfc3156.c:685
+#: libbalsa/rfc3156.c:707
 msgid "The user ID is fully valid."
 msgstr "ID uživatele je plně platné."
 
-#: libbalsa/rfc3156.c:687
+#: libbalsa/rfc3156.c:709
 msgid "The user ID is ultimately valid."
 msgstr "ID uživatele je dokonale platné."
 
-#: libbalsa/rfc3156.c:689 libbalsa/rfc3156.c:714
+#: libbalsa/rfc3156.c:711 libbalsa/rfc3156.c:1218
 msgid "bad validity"
 msgstr "špatná platnost"
 
-#: libbalsa/rfc3156.c:702
+#
+#: libbalsa/rfc3156.c:775 libbalsa/rfc3156.c:1002
+msgid "Enter passsphrase to OpenPGP sign the first message part"
+msgstr "Pro podepsání první části zprávy pomocí OpenPGP zadejte heslo"
+
+#: libbalsa/rfc3156.c:783 libbalsa/rfc3156.c:879 libbalsa/rfc3156.c:1014
+#: libbalsa/rfc3156.c:1105
+#, c-format
+msgid "gpgme could not get data from buffer: %s"
+msgstr "gpgme nemohlo získat data z bufferu: %s"
+
+#: libbalsa/rfc3156.c:799 libbalsa/rfc3156.c:1784
+#, c-format
+msgid "gpgme signing failed: %s"
+msgstr "podepisování gpgme selhalo: %s"
+
+#: libbalsa/rfc3156.c:811 libbalsa/rfc3156.c:929 libbalsa/rfc3156.c:1054
+#: libbalsa/rfc3156.c:1155 libbalsa/rfc3156.c:1802 libbalsa/rfc3156.c:1886
+#, c-format
+msgid "could not get gpgme data: %s"
+msgstr "nelze získat data gpgme: %s"
+
+#: libbalsa/rfc3156.c:1036
+#, c-format
+msgid "gpgme signing and encryption failed: %s"
+msgstr "podepisování a šifrování gpgme selhalo: %s"
+
+#: libbalsa/rfc3156.c:1040 libbalsa/rfc3156.c:1872
+#, c-format
+msgid "gpgme encryption failed: %s"
+msgstr "šifrování gpgme selhalo: %s"
+
+#: libbalsa/rfc3156.c:1121
+msgid "Enter passsphrase to decrypt message part"
+msgstr "Pro rozšifrování části zprávy zadejte heslo"
+
+#: libbalsa/rfc3156.c:1127
+#, c-format
+msgid "gpgme decryption and signature verification failed: %s"
+msgstr "dešifrování a ověření podpisu gpgme selhalo: %s"
+
+#: libbalsa/rfc3156.c:1206
 msgid "unknown"
 msgstr "neznámý"
 
-#: libbalsa/rfc3156.c:704
+#: libbalsa/rfc3156.c:1208
 msgid "undefined"
 msgstr "nedefinovaná"
 
-#: libbalsa/rfc3156.c:706
+#: libbalsa/rfc3156.c:1210
 msgid "never"
 msgstr "nikdy"
 
-#: libbalsa/rfc3156.c:708
+#: libbalsa/rfc3156.c:1212
 msgid "marginal"
 msgstr "okrajová"
 
-#: libbalsa/rfc3156.c:710
+#: libbalsa/rfc3156.c:1214
 msgid "full"
 msgstr "plná"
 
-#: libbalsa/rfc3156.c:712
+#: libbalsa/rfc3156.c:1216
 msgid "ultimate"
 msgstr "dokonalá"
 
-#: libbalsa/rfc3156.c:729
+#: libbalsa/rfc3156.c:1257
 msgid "Fingerprint"
 msgstr "Otisk"
 
-#: libbalsa/rfc3156.c:729
+#: libbalsa/rfc3156.c:1257
 msgid "Key ID"
 msgstr "ID klíče"
 
-#: libbalsa/rfc3156.c:729
+#: libbalsa/rfc3156.c:1257
 msgid "Trust"
 msgstr "Důvěra"
 
-#: libbalsa/rfc3156.c:729
+#: libbalsa/rfc3156.c:1257
 msgid "Length"
 msgstr "Délka"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: libbalsa/rfc3156.c:766
+#: libbalsa/rfc3156.c:1294
 msgid "Select key"
 msgstr "Vybrerte text"
 
-#: libbalsa/rfc3156.c:774
+#: libbalsa/rfc3156.c:1302
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Vyberte soukromý klíč pro podepisujícího %s"
 
-#: libbalsa/rfc3156.c:777
+#: libbalsa/rfc3156.c:1305
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Vyberte veřejný klíč pro příjemce %s"
 
-#: libbalsa/rfc3156.c:864
+#: libbalsa/rfc3156.c:1392
 #, c-format
 msgid "could not list keys for %s: %s"
 msgstr "nelze vypsat klíče pro %s: %s"
 
-#: libbalsa/rfc3156.c:872
+#: libbalsa/rfc3156.c:1400
 #, c-format
 msgid "could not retrieve key for %s: %s"
 msgstr "nelze získat klíč pro %s: %s"
 
-#: libbalsa/rfc3156.c:909
+#: libbalsa/rfc3156.c:1437
 #, c-format
 msgid "could not get a private key for %s"
 msgstr "nelze získat soukromý klíč pro %s"
 
-#: libbalsa/rfc3156.c:935
+#: libbalsa/rfc3156.c:1463
 #, c-format
 msgid "could not create gpgme recipients set: %s"
 msgstr "nelze získat sadu příjemců gpgme: %s"
 
-#: libbalsa/rfc3156.c:947
+#: libbalsa/rfc3156.c:1475
 #, c-format
 msgid "could not get a key for %s"
 msgstr "nelze získat klíč pro %s"
 
-#: libbalsa/rfc3156.c:959
+#: libbalsa/rfc3156.c:1487
 #, c-format
 msgid "could not add recipient %s: %s"
 msgstr "nelze přidat příjemce %s: %s"
 
-#: libbalsa/rfc3156.c:1053
+#: libbalsa/rfc3156.c:1592
 #, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -761,7 +815,7 @@ msgstr ""
 "\n"
 "Klíč: %s"
 
-#: libbalsa/rfc3156.c:1057
+#: libbalsa/rfc3156.c:1596
 #, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -773,34 +827,19 @@ msgstr ""
 "Klíč: %s"
 
 #
-#: libbalsa/rfc3156.c:1191
+#: libbalsa/rfc3156.c:1763
 msgid "Enter passsphrase to sign message"
 msgstr "Pro podepsání zprávy zadejte heslo"
 
-#: libbalsa/rfc3156.c:1196 libbalsa/rfc3156.c:1283
+#: libbalsa/rfc3156.c:1768 libbalsa/rfc3156.c:1855
 #, c-format
 msgid "gpgme could not get data from file: %s"
 msgstr "gpgme nemohlo získat data ze souboru: %s"
 
-#: libbalsa/rfc3156.c:1203 libbalsa/rfc3156.c:1291
+#: libbalsa/rfc3156.c:1775 libbalsa/rfc3156.c:1863
 #, c-format
 msgid "gpgme could not create new data: %s"
 msgstr "gpgme nemohlo vytvořit nová data: %s"
-
-#: libbalsa/rfc3156.c:1212
-#, c-format
-msgid "gpgme signing failed: %s"
-msgstr "podepisování gpgme selhalo: %s"
-
-#: libbalsa/rfc3156.c:1230 libbalsa/rfc3156.c:1314
-#, c-format
-msgid "could not get gpgme data: %s"
-msgstr "nelze získat data gpgme: %s"
-
-#: libbalsa/rfc3156.c:1300
-#, c-format
-msgid "gpgme encryption failed: %s"
-msgstr "šifrování gpgme selhalo: %s"
 
 #: libbalsa/send.c:218 libbalsa/send.c:225
 msgid "Sending Mail..."
@@ -827,8 +866,8 @@ msgstr ""
 msgid "Connected to MTA"
 msgstr "Připojeno k MTA"
 
-#: libbalsa/send.c:851 src/balsa-message.c:876 src/print.c:353
-#: src/sendmsg-window.c:754 src/sendmsg-window.c:2132 src/store-address.c:322
+#: libbalsa/send.c:851 src/balsa-message.c:896 src/print.c:353
+#: src/sendmsg-window.c:777 src/sendmsg-window.c:2155 src/store-address.c:322
 msgid "From:"
 msgstr "Od:"
 
@@ -836,8 +875,8 @@ msgstr "Od:"
 msgid "From"
 msgstr "Od"
 
-#: libbalsa/send.c:862 src/balsa-message.c:885 src/print.c:363
-#: src/sendmsg-window.c:753 src/sendmsg-window.c:2138 src/store-address.c:323
+#: libbalsa/send.c:862 src/balsa-message.c:905 src/print.c:363
+#: src/sendmsg-window.c:776 src/sendmsg-window.c:2161 src/store-address.c:323
 msgid "To:"
 msgstr "Pro:"
 
@@ -872,7 +911,7 @@ msgstr ""
 "Problém se serverem SMTP (%d): %s\n"
 "Vaše zpráva zůstala v poštovní schránce 'Pošta k odeslání'"
 
-#: libbalsa/send.c:1645
+#: libbalsa/send.c:1513 libbalsa/send.c:1732
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "Tato zpráva nebude šifrována pro příjemce skrytých kopií."
 
@@ -1350,7 +1389,7 @@ msgstr "Ruší se odběr %s..."
 msgid "Unable to fetch headers from this IMAP server version."
 msgstr "Nelze získat hlavičky zpráv z této verze IMAP serveru."
 
-#: libmutt/imap/message.c:89 src/balsa-message.c:2205
+#: libmutt/imap/message.c:89 src/balsa-message.c:2269
 #, c-format
 msgid "Could not create temporary file %s"
 msgstr "Nelze vytvořit dočasný soubor %s"
@@ -2094,11 +2133,11 @@ msgstr "Nelze uložit %s: %s"
 msgid "Save MIME Part"
 msgstr "Uložit část MIME"
 
-#: src/balsa-message.c:535
+#: src/balsa-message.c:537 src/balsa-message.c:1720
 msgid "detected a good signature"
 msgstr "detekován dobrý podpis"
 
-#: src/balsa-message.c:539
+#: src/balsa-message.c:541 src/balsa-message.c:1726
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2108,7 +2147,7 @@ msgstr ""
 "Kontrola podpisu zprávy odeslané %s s předmětem \"%s\" vrátil:\n"
 "%s"
 
-#: src/balsa-message.c:546
+#: src/balsa-message.c:548
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -2116,131 +2155,150 @@ msgid ""
 msgstr ""
 "Kontrola podpisu zprávy odeslané %s s předmětem \"%s\" selhala s chybou!"
 
-#: src/balsa-message.c:867 src/print.c:336 src/sendmsg-window.c:759
-#: src/sendmsg-window.c:2128
+#: src/balsa-message.c:556
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a \"multipart/signed\" "
+"part, but it's structure is invalid. The signature, if there is any, can not "
+"be checked."
+msgstr ""
+"Zpráva odeslaná %s s předmětem \"%s\" obsahuje část \"multipart/signed\", "
+"ale její struktura je neplatná. Podpis, je-li nějaký, nemůže být ověřen."
+
+#: src/balsa-message.c:634
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a \"multipart/encrypted"
+"\" part, but it's structure is invalid."
+msgstr ""
+"Zpráva odeslaná %s s předmětem \"%s\" obsahuje část \"multipart/encrypted\", "
+"ale její struktura je neplatná."
+
+#: src/balsa-message.c:887 src/print.c:336 src/sendmsg-window.c:782
+#: src/sendmsg-window.c:2151
 msgid "Subject:"
 msgstr "Předmět:"
 
-#: src/balsa-message.c:871 src/print.c:342 src/sendmsg-window.c:2124
+#: src/balsa-message.c:891 src/print.c:342 src/sendmsg-window.c:2147
 msgid "Date:"
 msgstr "Datum:"
 
-#: src/balsa-message.c:882 src/sendmsg-window.c:755
+#: src/balsa-message.c:902 src/sendmsg-window.c:778
 msgid "Reply-To:"
 msgstr "Odpověď kam:"
 
 #. cc:
-#: src/balsa-message.c:886 src/print.c:364 src/sendmsg-window.c:757
-#: src/sendmsg-window.c:1872 src/sendmsg-window.c:2144 src/store-address.c:324
+#: src/balsa-message.c:906 src/print.c:364 src/sendmsg-window.c:780
+#: src/sendmsg-window.c:1895 src/sendmsg-window.c:2167 src/store-address.c:324
 msgid "Cc:"
 msgstr "Kopie:"
 
 #. bcc:
-#: src/balsa-message.c:887 src/print.c:365 src/sendmsg-window.c:756
-#: src/sendmsg-window.c:1877 src/store-address.c:325
+#: src/balsa-message.c:907 src/print.c:365 src/sendmsg-window.c:779
+#: src/sendmsg-window.c:1900 src/store-address.c:325
 msgid "Bcc:"
 msgstr "Skrytá kopie:"
 
-#: src/balsa-message.c:890 src/print.c:366
+#: src/balsa-message.c:910 src/print.c:366
 msgid "Fcc:"
 msgstr "Automatická kopie:"
 
-#: src/balsa-message.c:895 src/print.c:372
+#: src/balsa-message.c:915 src/print.c:372
 msgid "Disposition-Notification-To:"
 msgstr "Oznámení o doručení pro:"
 
-#: src/balsa-message.c:1044 src/balsa-message.c:1060 src/balsa-message.c:1090
-#: src/balsa-message.c:1143
+#: src/balsa-message.c:1064 src/balsa-message.c:1080 src/balsa-message.c:1110
+#: src/balsa-message.c:1163
 msgid "Content Type: external-body\n"
 msgstr "Typ obsahu: external-body\n"
 
-#: src/balsa-message.c:1045
+#: src/balsa-message.c:1065
 msgid "Access type: local-file\n"
 msgstr "Typ přístupu: local-file\n"
 
-#: src/balsa-message.c:1046 src/balsa-message.c:1097 src/balsa-message.c:1230
+#: src/balsa-message.c:1066 src/balsa-message.c:1117 src/balsa-message.c:1250
 #, c-format
 msgid "File name: %s"
 msgstr "Název souboru: %s"
 
-#: src/balsa-message.c:1061
+#: src/balsa-message.c:1081
 msgid "Access type: URL\n"
 msgstr "Typ přístupu: URL\n"
 
-#: src/balsa-message.c:1062
+#: src/balsa-message.c:1082
 #, c-format
 msgid "URL: %s"
 msgstr "URL: %s"
 
-#: src/balsa-message.c:1091
+#: src/balsa-message.c:1111
 #, c-format
 msgid "Access type: %s\n"
 msgstr "Typ přístupu: %s\n"
 
-#: src/balsa-message.c:1094
+#: src/balsa-message.c:1114
 #, c-format
 msgid "FTP site: %s\n"
 msgstr "FTP server: %s\n"
 
-#: src/balsa-message.c:1096
+#: src/balsa-message.c:1116
 #, c-format
 msgid "Directory: %s\n"
 msgstr "Adresář: %s\n"
 
-#: src/balsa-message.c:1144
+#: src/balsa-message.c:1164
 msgid "Access type: mail-server\n"
 msgstr "Typ přístupu: mail-server\n"
 
-#: src/balsa-message.c:1145
+#: src/balsa-message.c:1165
 #, c-format
 msgid "Mail server: %s\n"
 msgstr "Poštovní server: %s\n"
 
-#: src/balsa-message.c:1147
+#: src/balsa-message.c:1167
 #, c-format
 msgid "Subject: %s\n"
 msgstr "Předmět: %s\n"
 
-#: src/balsa-message.c:1158
+#: src/balsa-message.c:1178
 msgid "Send message to obtain this part"
 msgstr "Pro obdržení této části pošlete zprávu"
 
-#: src/balsa-message.c:1238
+#: src/balsa-message.c:1258
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Typ: %s (%s)"
 
-#: src/balsa-message.c:1241
+#: src/balsa-message.c:1261
 #, c-format
 msgid "Content Type: %s"
 msgstr "Typ obsahu: %s"
 
-#: src/balsa-message.c:1252
+#: src/balsa-message.c:1272
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
 "Pro tento typ obsahu není v GNOME MIME definovaná akce pro otevření či "
 "zobrazení"
 
-#: src/balsa-message.c:1258
+#: src/balsa-message.c:1278
 msgid "Save part"
 msgstr "Uložit část"
 
-#: src/balsa-message.c:1282 src/balsa-message.c:1307
+#: src/balsa-message.c:1302 src/balsa-message.c:1327
 #, c-format
 msgid "View part with %s"
 msgstr "Prohlédnout část pomocí %s"
 
-#: src/balsa-message.c:1596
+#: src/balsa-message.c:1616
 #, c-format
 msgid "Calling URL %s..."
 msgstr "Volá se URL %s..."
 
-#: src/balsa-message.c:1605 src/balsa-message.c:2124 src/balsa-message.c:2672
+#: src/balsa-message.c:1625 src/balsa-message.c:2188 src/balsa-message.c:2736
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Chyba při zobrazení %s: %s\n"
 
-#: src/balsa-message.c:1627
+#: src/balsa-message.c:1647
 #, c-format
 msgid ""
 "Error writing to temporary file %s.\n"
@@ -2249,12 +2307,12 @@ msgstr ""
 "Chyba při zápisu do dočasného souboru %s.\n"
 "Ověřte přístupová práva adresáře."
 
-#: src/balsa-message.c:1635
+#: src/balsa-message.c:1655
 #, c-format
 msgid "Cannot open temporary file %s."
 msgstr "Nelze otevřít dočasný soubor %s."
 
-#: src/balsa-message.c:1669
+#: src/balsa-message.c:1692
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
@@ -2263,21 +2321,21 @@ msgstr ""
 "Zpráva odeslaná %s s předmětem \"%s\" obsahuje osmibitové znaky, ale ne "
 "hlavičku popisující použitou znakovou sadu (zkonvertováno do %s)"
 
-#: src/balsa-message.c:1927
+#: src/balsa-message.c:1991
 #, c-format
 msgid "Open with %s"
 msgstr "Otevřít pomocí %s"
 
-#: src/balsa-message.c:2065
+#: src/balsa-message.c:2129
 msgid "Save..."
 msgstr "Uložit..."
 
-#: src/balsa-message.c:2250
+#: src/balsa-message.c:2314
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "nelze vytvořit dočasný soubor %s"
 
-#: src/balsa-message.c:2955
+#: src/balsa-message.c:3019
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2288,7 +2346,7 @@ msgstr ""
 "zaslání oznámení o doručení zprávy (MDN) na adresu `%s'.\n"
 "Chcete poslat toto oznámení?"
 
-#: src/balsa-message.c:2962
+#: src/balsa-message.c:3026
 msgid "Reply to MDN?"
 msgstr "Odpovědět na MDN?"
 
@@ -2421,7 +2479,7 @@ msgstr "_Těle"
 
 #. To:
 #: src/filter-edit-callbacks.c:993 src/main-window.c:2709
-#: src/sendmsg-window.c:1861
+#: src/sendmsg-window.c:1884
 msgid "_To:"
 msgstr "_Pro:"
 
@@ -2429,7 +2487,7 @@ msgstr "_Pro:"
 msgid "_From:"
 msgstr "_Od:"
 
-#: src/filter-edit-callbacks.c:1008 src/sendmsg-window.c:292
+#: src/filter-edit-callbacks.c:1008 src/sendmsg-window.c:293
 msgid "_Subject"
 msgstr "Pře_dmět"
 
@@ -2722,7 +2780,7 @@ msgstr "Použít SS_L (IMAPS)"
 msgid "Select parent folder"
 msgstr "Vybrat rodičovskou složku"
 
-#: src/folder-conf.c:530 src/mailbox-conf.c:407 src/sendmsg-window.c:897
+#: src/folder-conf.c:530 src/mailbox-conf.c:407 src/sendmsg-window.c:920
 msgid "Select Identity"
 msgstr "Vyberte identitu"
 
@@ -3275,7 +3333,7 @@ msgstr "Přepnout zobrazování záložek poštovních schránek"
 msgid "_Wrap"
 msgstr "_Zalomit text"
 
-#: src/main-window.c:402 src/sendmsg-window.c:240
+#: src/main-window.c:402 src/sendmsg-window.c:241
 msgid "Wrap message lines"
 msgstr "Zalomit text zprávy"
 
@@ -3615,7 +3673,7 @@ msgstr "Balsa: %s (jen pro čtení)"
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3175
+#: src/main-window.c:3182
 msgid "Cannot access the message's body\n"
 msgstr "Nelze přistupovat k tělu zprávy\n"
 
@@ -4182,7 +4240,7 @@ msgid "Invalid or incomplete address label color"
 msgstr "Barva neplatné nebo nekompletní adresy"
 
 #. create a 2nd notebook page for the fonts
-#: src/pref-manager.c:2279 src/print.c:1368
+#: src/pref-manager.c:2279 src/print.c:1372
 msgid "Fonts"
 msgstr "Písma"
 
@@ -4372,57 +4430,57 @@ msgstr "Strana: %i/%i"
 
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:786
+#: src/print.c:790
 msgid "Type:"
 msgstr "Typ:"
 
-#: src/print.c:789
+#: src/print.c:793
 msgid "File name:"
 msgstr "Název souboru:"
 
-#: src/print.c:1274
+#: src/print.c:1278
 msgid "Font available for printing"
 msgstr "Písma dostupná pro tisk"
 
-#: src/print.c:1280
+#: src/print.c:1284
 #, c-format
 msgid "Font <b>not</b> available for printing. Closest: %s"
 msgstr "Písmo <b>není</b> k dispozici pro tisk. Nejpodobnější: %s"
 
-#: src/print.c:1293
+#: src/print.c:1297
 msgid "Select Font"
 msgstr "Vyberte text"
 
-#: src/print.c:1326
+#: src/print.c:1330
 msgid "Change..."
 msgstr "Změnit..."
 
-#: src/print.c:1359
+#: src/print.c:1363
 msgid "Print message"
 msgstr "Tisk zpráv"
 
-#: src/print.c:1371
+#: src/print.c:1375
 msgid "Header font"
 msgstr "Písmo hlavičky"
 
-#: src/print.c:1373
+#: src/print.c:1377
 msgid "Body font"
 msgstr "Písmo těla"
 
-#: src/print.c:1375
+#: src/print.c:1379
 msgid "Footer font"
 msgstr "Písmo patičky"
 
 #. highlight cited stuff
-#: src/print.c:1379
+#: src/print.c:1383
 msgid "Highlight cited text"
 msgstr "Zvýraznit citovaný text"
 
-#: src/print.c:1383
+#: src/print.c:1387
 msgid "_Enable highlighting of cited text"
 msgstr "Povolit _zvýrazňování citovaného textu"
 
-#: src/print.c:1408
+#: src/print.c:1412
 #, c-format
 msgid ""
 "Balsa could not find font \"%s\".\n"
@@ -4431,7 +4489,7 @@ msgstr ""
 "Program Balsa nemohl nalézt písmo \"%s\".\n"
 "Použijte stránku \"Písma\" v dialogu \"Tisk zpráv\" a změňte jej."
 
-#: src/print.c:1496
+#: src/print.c:1500
 msgid "Balsa: message print preview"
 msgstr "Balsa: náhled před tiskem"
 
@@ -4464,143 +4522,143 @@ msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr "Volba požadovat MDN je nyní v menu Volby editačního okna."
 
-#: src/sendmsg-window.c:187
+#: src/sendmsg-window.c:188
 msgid "_Include File..."
 msgstr "Vlož_it soubor..."
 
-#: src/sendmsg-window.c:190
+#: src/sendmsg-window.c:191
 msgid "_Attach File..."
 msgstr "_Připojit soubor..."
 
-#: src/sendmsg-window.c:193
+#: src/sendmsg-window.c:194
 msgid "_Include Message(s)"
 msgstr "Vlož_it zprávu(y)"
 
 #
-#: src/sendmsg-window.c:196
+#: src/sendmsg-window.c:197
 msgid "Attach _Message(s)"
 msgstr "Připojit _zprávu(y)"
 
-#: src/sendmsg-window.c:202
+#: src/sendmsg-window.c:203
 msgid "_Send"
 msgstr "Po_slat"
 
 #
-#: src/sendmsg-window.c:203 src/toolbar-factory.c:121
+#: src/sendmsg-window.c:204 src/toolbar-factory.c:121
 msgid "Send this message"
 msgstr "Poslat tuto zprávu"
 
-#: src/sendmsg-window.c:207
+#: src/sendmsg-window.c:208
 msgid "_Queue"
 msgstr "_Zařadit"
 
 #
-#: src/sendmsg-window.c:208
+#: src/sendmsg-window.c:209
 msgid "Queue this message in Outbox for sending"
 msgstr "Zařadit tuto zprávu do schránky 'Pošta k odeslání'"
 
-#: src/sendmsg-window.c:212
+#: src/sendmsg-window.c:213
 msgid "_Postpone"
 msgstr "_Odložit"
 
-#: src/sendmsg-window.c:215
+#: src/sendmsg-window.c:216
 msgid "_Save"
 msgstr "_Uložit"
 
 #
-#: src/sendmsg-window.c:216
+#: src/sendmsg-window.c:217
 msgid "Save this message"
 msgstr "Uložit tuto zprávu"
 
-#: src/sendmsg-window.c:220
+#: src/sendmsg-window.c:221
 msgid "Print..."
 msgstr "Tisk..."
 
-#: src/sendmsg-window.c:220
+#: src/sendmsg-window.c:221
 msgid "Print the edited message"
 msgstr "Vytisknout tuto zprávu"
 
-#: src/sendmsg-window.c:240
+#: src/sendmsg-window.c:241
 msgid "_Wrap Body"
 msgstr "_Zalomit text"
 
-#: src/sendmsg-window.c:245
+#: src/sendmsg-window.c:246
 msgid "Insert Si_gnature"
 msgstr "V_ložit podpis"
 
-#: src/sendmsg-window.c:249
+#: src/sendmsg-window.c:250
 msgid "_Quote Message(s)"
 msgstr "_Citovat zprávu(y)"
 
-#: src/sendmsg-window.c:254
+#: src/sendmsg-window.c:255
 msgid "_Reflow Paragraph"
 msgstr "Přefo_rmátovat odstavec"
 
-#: src/sendmsg-window.c:258
+#: src/sendmsg-window.c:259
 msgid "R_eflow Message"
 msgstr "Př_eformátovat zprávu"
 
-#: src/sendmsg-window.c:263
+#: src/sendmsg-window.c:264
 msgid "C_heck Spelling"
 msgstr "_Kontrola pravopisu"
 
-#: src/sendmsg-window.c:264
+#: src/sendmsg-window.c:265
 msgid "Check the spelling of the message"
 msgstr "Kontrolovat pravopis v této zprávě"
 
-#: src/sendmsg-window.c:269
+#: src/sendmsg-window.c:270
 msgid "Select _Identity..."
 msgstr "Vybrat _identitu..."
 
-#: src/sendmsg-window.c:270
+#: src/sendmsg-window.c:271
 msgid "Select the Identity to use for the message"
 msgstr "Vybrat identitu pro tuto zprávu"
 
-#: src/sendmsg-window.c:275
+#: src/sendmsg-window.c:276
 msgid "_Edit with Gnome-Editor"
 msgstr "Upravit pomocí programu GNOME-_Editor"
 
-#: src/sendmsg-window.c:276
+#: src/sendmsg-window.c:277
 msgid "Edit the current message with the default Gnome editor"
 msgstr "Upravit tuto zprávu pomocí výchozího editoru prostředí GNOME"
 
-#: src/sendmsg-window.c:288
+#: src/sendmsg-window.c:289
 msgid "Fr_om"
 msgstr "_Od"
 
-#: src/sendmsg-window.c:290
+#: src/sendmsg-window.c:291
 msgid "_To"
 msgstr "_Pro"
 
-#: src/sendmsg-window.c:294
+#: src/sendmsg-window.c:295
 msgid "_Cc"
 msgstr "_Kopie"
 
-#: src/sendmsg-window.c:296
+#: src/sendmsg-window.c:297
 msgid "_Bcc"
 msgstr "_Skrytá kopie"
 
-#: src/sendmsg-window.c:298
+#: src/sendmsg-window.c:299
 msgid "_Fcc"
 msgstr "_Automatická kopie"
 
-#: src/sendmsg-window.c:300
+#: src/sendmsg-window.c:301
 msgid "_Reply To"
 msgstr "Odpověď p_ro"
 
-#: src/sendmsg-window.c:302
+#: src/sendmsg-window.c:303
 msgid "_Attachments"
 msgstr "Pří_lohy"
 
-#: src/sendmsg-window.c:305
+#: src/sendmsg-window.c:306
 msgid "_Comments"
 msgstr "Ko_mentáře"
 
-#: src/sendmsg-window.c:308
+#: src/sendmsg-window.c:309
 msgid "_Keywords"
 msgstr "Klíčo_vá slova"
 
-#: src/sendmsg-window.c:325 src/sendmsg-window.c:396
+#: src/sendmsg-window.c:326 src/sendmsg-window.c:397
 msgid "Brazilian"
 msgstr "brazilsky"
 
@@ -4608,177 +4666,193 @@ msgstr "brazilsky"
 # the beginning in Czech and hence doesn't belong to A-J (not to
 # mention the alphabetical order); the same for English ("Angličtina"
 # in czech) and other languages
-#: src/sendmsg-window.c:327 src/sendmsg-window.c:398
+#: src/sendmsg-window.c:328 src/sendmsg-window.c:399
 msgid "Catalan"
 msgstr "katalánsky"
 
-#: src/sendmsg-window.c:329 src/sendmsg-window.c:400
+#: src/sendmsg-window.c:330 src/sendmsg-window.c:401
 msgid "Chinese Simplified"
 msgstr "zjednodušená čínština"
 
-#: src/sendmsg-window.c:331 src/sendmsg-window.c:402
+#: src/sendmsg-window.c:332 src/sendmsg-window.c:403
 msgid "Chinese Traditional"
 msgstr "tradiční čínština"
 
-#: src/sendmsg-window.c:333 src/sendmsg-window.c:404
+#: src/sendmsg-window.c:334 src/sendmsg-window.c:405
 msgid "Czech"
 msgstr "česky"
 
-#: src/sendmsg-window.c:335 src/sendmsg-window.c:406
+#: src/sendmsg-window.c:336 src/sendmsg-window.c:407
 msgid "Danish"
 msgstr "dánsky"
 
-#: src/sendmsg-window.c:337 src/sendmsg-window.c:418
+#: src/sendmsg-window.c:338 src/sendmsg-window.c:419
 msgid "German"
 msgstr "německy"
 
-#: src/sendmsg-window.c:339 src/sendmsg-window.c:408
+#: src/sendmsg-window.c:340 src/sendmsg-window.c:409
 msgid "Dutch"
 msgstr "holandsky"
 
 #. English -> American English, argh...
-#: src/sendmsg-window.c:342 src/sendmsg-window.c:410
+#: src/sendmsg-window.c:343 src/sendmsg-window.c:411
 msgid "English"
 msgstr "anglicky"
 
-#: src/sendmsg-window.c:344 src/sendmsg-window.c:412
+#: src/sendmsg-window.c:345 src/sendmsg-window.c:413
 msgid "Esperanto"
 msgstr "esperanto"
 
-#: src/sendmsg-window.c:346
+#: src/sendmsg-window.c:347
 msgid "Estonian"
 msgstr "estonsky"
 
-#: src/sendmsg-window.c:348 src/sendmsg-window.c:414
+#: src/sendmsg-window.c:349 src/sendmsg-window.c:415
 msgid "Finnish"
 msgstr "finsky"
 
-#: src/sendmsg-window.c:350 src/sendmsg-window.c:416
+#: src/sendmsg-window.c:351 src/sendmsg-window.c:417
 msgid "French"
 msgstr "francouzsky"
 
-#: src/sendmsg-window.c:352 src/sendmsg-window.c:420
+#: src/sendmsg-window.c:353 src/sendmsg-window.c:421
 msgid "Greek"
 msgstr "řecky"
 
-#: src/sendmsg-window.c:354 src/sendmsg-window.c:422
+#: src/sendmsg-window.c:355 src/sendmsg-window.c:423
 msgid "Hebrew"
 msgstr "hebrejsky"
 
-#: src/sendmsg-window.c:356 src/sendmsg-window.c:424
+#: src/sendmsg-window.c:357 src/sendmsg-window.c:425
 msgid "Hungarian"
 msgstr "maďarsky"
 
-#: src/sendmsg-window.c:358 src/sendmsg-window.c:426
+#: src/sendmsg-window.c:359 src/sendmsg-window.c:427
 msgid "Italian"
 msgstr "italsky"
 
-#: src/sendmsg-window.c:360 src/sendmsg-window.c:428
+#: src/sendmsg-window.c:361 src/sendmsg-window.c:429
 msgid "Japanese"
 msgstr "japonsky"
 
-#: src/sendmsg-window.c:362 src/sendmsg-window.c:434
+#: src/sendmsg-window.c:363 src/sendmsg-window.c:435
 msgid "Korean"
 msgstr "korejsky"
 
-#: src/sendmsg-window.c:364 src/sendmsg-window.c:436
+#: src/sendmsg-window.c:365 src/sendmsg-window.c:437
 msgid "Latvian"
 msgstr "lotyšsky"
 
-#: src/sendmsg-window.c:366 src/sendmsg-window.c:438
+#: src/sendmsg-window.c:367 src/sendmsg-window.c:439
 msgid "Lithuanian"
 msgstr "litevsky"
 
-#: src/sendmsg-window.c:368 src/sendmsg-window.c:440
+#: src/sendmsg-window.c:369 src/sendmsg-window.c:441
 msgid "Norwegian"
 msgstr "norsky"
 
-#: src/sendmsg-window.c:370 src/sendmsg-window.c:442
+#: src/sendmsg-window.c:371 src/sendmsg-window.c:443
 msgid "Polish"
 msgstr "polsky"
 
-#: src/sendmsg-window.c:372 src/sendmsg-window.c:444
+#: src/sendmsg-window.c:373 src/sendmsg-window.c:445
 msgid "Portugese"
 msgstr "portugalsky"
 
-#: src/sendmsg-window.c:374 src/sendmsg-window.c:446
+#: src/sendmsg-window.c:375 src/sendmsg-window.c:447
 msgid "Romanian"
 msgstr "rumunsky"
 
-#: src/sendmsg-window.c:376 src/sendmsg-window.c:448
+#: src/sendmsg-window.c:377 src/sendmsg-window.c:449
 msgid "Russian (ISO)"
 msgstr "rusky (ISO)"
 
-#: src/sendmsg-window.c:378 src/sendmsg-window.c:450
+#: src/sendmsg-window.c:379 src/sendmsg-window.c:451
 msgid "Russian (KOI)"
 msgstr "rusky (KOI)"
 
-#: src/sendmsg-window.c:380 src/sendmsg-window.c:452
+#: src/sendmsg-window.c:381 src/sendmsg-window.c:453
 msgid "Slovak"
 msgstr "slovensky"
 
-#: src/sendmsg-window.c:382 src/sendmsg-window.c:454
+#: src/sendmsg-window.c:383 src/sendmsg-window.c:455
 msgid "Spanish"
 msgstr "španělsky"
 
-#: src/sendmsg-window.c:384 src/sendmsg-window.c:456
+#: src/sendmsg-window.c:385 src/sendmsg-window.c:457
 msgid "Swedish"
 msgstr "švédsky"
 
-#: src/sendmsg-window.c:386 src/sendmsg-window.c:458
+#: src/sendmsg-window.c:387 src/sendmsg-window.c:459
 msgid "Turkish"
 msgstr "turecky"
 
-#: src/sendmsg-window.c:388 src/sendmsg-window.c:460
+#: src/sendmsg-window.c:389 src/sendmsg-window.c:461
 msgid "Ukrainian"
 msgstr "ukrajinsky"
 
-#: src/sendmsg-window.c:390
+#: src/sendmsg-window.c:391
 msgid "Generic UTF-8"
 msgstr "obecné UTF-8"
 
-#: src/sendmsg-window.c:462
+#: src/sendmsg-window.c:463
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: src/sendmsg-window.c:470
+#: src/sendmsg-window.c:471
 msgid "_A-J"
 msgstr "_A-J"
 
-#: src/sendmsg-window.c:471
+#: src/sendmsg-window.c:472
 msgid "_K-Z"
 msgstr "_K-Z"
 
-#: src/sendmsg-window.c:480
+#: src/sendmsg-window.c:482
+msgid "_GnuPG uses MIME mode"
+msgstr "_GnuPG používá režim MIME"
+
+#: src/sendmsg-window.c:488
+msgid "_GnuPG uses old OpenPGP mode"
+msgstr "_GnuPG používá starý režim OpenPGP"
+
+#: src/sendmsg-window.c:499
 msgid "_Request Disposition Notification"
 msgstr "Vyžadovat oznámení o do_ručení"
 
-#: src/sendmsg-window.c:483
+#: src/sendmsg-window.c:502
 msgid "_Format = Flowed"
 msgstr "_Format = Flowed"
 
-#: src/sendmsg-window.c:487
+#: src/sendmsg-window.c:507
 msgid "_Sign Message"
 msgstr "_Podepsat zprávu"
 
-#: src/sendmsg-window.c:490
+#: src/sendmsg-window.c:508
+msgid "signs the message using GnuPG"
+msgstr "podepíše zprávu pomocí GnuPG"
+
+#: src/sendmsg-window.c:511
 msgid "_Encrypt Message"
 msgstr "Za_šifrovat zprávu"
 
-#: src/sendmsg-window.c:534
+#: src/sendmsg-window.c:512
+msgid "signs the message using GnuPG for all To: and CC: recipients"
+msgstr "podepíše zprávu pomocí GnuPG pro všechny příjemce Pro: nebo Kopie:"
+
+#: src/sendmsg-window.c:557
 msgid "_Show"
 msgstr "_Zobrazit"
 
-#: src/sendmsg-window.c:536
+#: src/sendmsg-window.c:559
 msgid "_Language"
 msgstr "_Jazyk"
 
 #
-#: src/sendmsg-window.c:538
+#: src/sendmsg-window.c:561
 msgid "_Options"
 msgstr "V_olby"
 
-#: src/sendmsg-window.c:621
+#: src/sendmsg-window.c:644
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -4788,11 +4862,11 @@ msgstr ""
 "Uložit zprávu do Rozepsané pošty?"
 
 #. Comments:
-#: src/sendmsg-window.c:758 src/sendmsg-window.c:1965
+#: src/sendmsg-window.c:781 src/sendmsg-window.c:1988
 msgid "Comments:"
 msgstr "Komentáře:"
 
-#: src/sendmsg-window.c:1197
+#: src/sendmsg-window.c:1220
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -4807,43 +4881,43 @@ msgstr ""
 "\n"
 "Opravdu chcete tento soubor připojit jako odkaz?"
 
-#: src/sendmsg-window.c:1208
+#: src/sendmsg-window.c:1231
 msgid "Attach as Reference?"
 msgstr "Připojit jako odkaz?"
 
-#: src/sendmsg-window.c:1299
+#: src/sendmsg-window.c:1322
 msgid "Remove"
 msgstr "Odstranit"
 
-#: src/sendmsg-window.c:1310
+#: src/sendmsg-window.c:1333
 msgid "attach as reference"
 msgstr "připojit jako odkaz"
 
-#: src/sendmsg-window.c:1316
+#: src/sendmsg-window.c:1339
 msgid "attach as file"
 msgstr "připojit jako soubor"
 
-#: src/sendmsg-window.c:1464
+#: src/sendmsg-window.c:1487
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Nelze získat informace o souboru '%s': %s"
 
-#: src/sendmsg-window.c:1469
+#: src/sendmsg-window.c:1492
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Příloha %s není obyčejný soubor."
 
-#: src/sendmsg-window.c:1472
+#: src/sendmsg-window.c:1495
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "Nelze přečíst soubor %s\n"
 
-#: src/sendmsg-window.c:1526
+#: src/sendmsg-window.c:1549
 msgid "Attach file"
 msgstr "Připojit soubor"
 
-#: src/sendmsg-window.c:1620 src/sendmsg-window.c:1657
-#: src/sendmsg-window.c:2745
+#: src/sendmsg-window.c:1643 src/sendmsg-window.c:1680
+#: src/sendmsg-window.c:2791
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -4852,69 +4926,69 @@ msgstr ""
 "Možný důvod: nedostatek místa pro dočasné soubory na disku"
 
 #. From:
-#: src/sendmsg-window.c:1856
+#: src/sendmsg-window.c:1879
 msgid "F_rom:"
 msgstr "_Od:"
 
 #. Subject:
-#: src/sendmsg-window.c:1868
+#: src/sendmsg-window.c:1891
 msgid "S_ubject:"
 msgstr "_Předmět:"
 
 #. fcc:
-#: src/sendmsg-window.c:1882
+#: src/sendmsg-window.c:1905
 msgid "F_cc:"
 msgstr "_Automatická kopie:"
 
 #. Reply To:
-#: src/sendmsg-window.c:1911
+#: src/sendmsg-window.c:1934
 msgid "_Reply To:"
 msgstr "Odpověď ka_m:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1918
+#: src/sendmsg-window.c:1941
 msgid "_Attachments:"
 msgstr "Příl_ohy:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1968
+#: src/sendmsg-window.c:1991
 msgid "Keywords:"
 msgstr "Klíčová slova:"
 
-#: src/sendmsg-window.c:2111
+#: src/sendmsg-window.c:2134
 msgid "you"
 msgstr "Vy"
 
-#: src/sendmsg-window.c:2118
+#: src/sendmsg-window.c:2141
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------přeposlaná zpráva od %s------\n"
 
 #
-#: src/sendmsg-window.c:2148
+#: src/sendmsg-window.c:2171
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "ID zprávy: %s\n"
 
-#: src/sendmsg-window.c:2154
+#: src/sendmsg-window.c:2177
 msgid "References:"
 msgstr "Odkazy:"
 
-#: src/sendmsg-window.c:2164
+#: src/sendmsg-window.c:2187
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Dne %s napsal %s:\n"
 
-#: src/sendmsg-window.c:2166
+#: src/sendmsg-window.c:2189
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s napsal:\n"
 
-#: src/sendmsg-window.c:2907
+#: src/sendmsg-window.c:2953
 msgid "Choose charset"
 msgstr "Vyberte znakovou sadu"
 
-#: src/sendmsg-window.c:2914
+#: src/sendmsg-window.c:2960
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
@@ -4922,16 +4996,16 @@ msgstr ""
 "Tento soubor není kódován v US-ASCII nebo UTF-8.\n"
 "Vyberte prosím znakovou sadu, ve které je soubor kódován."
 
-#: src/sendmsg-window.c:2980
+#: src/sendmsg-window.c:3026
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Nelze otevřít soubor %s.\n"
 
-#: src/sendmsg-window.c:3001
+#: src/sendmsg-window.c:3047
 msgid "Include file"
 msgstr "Vložit soubor"
 
-#: src/sendmsg-window.c:3257
+#: src/sendmsg-window.c:3303
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -4940,27 +5014,37 @@ msgstr ""
 "Tuto zprávu nelze kódovat ve znakové sadě %s.\n"
 "Vyberte prosím pro tuto zprávu jazyk."
 
-#: src/sendmsg-window.c:3269
+#: src/sendmsg-window.c:3322
+msgid ""
+"You selected OpenPGP mode for a message with attachments. In this mode, only "
+"the first part will be signed and/or encrypted. You should select MIME mode "
+"if the complete message shall be protected. Do you really want to proceed?"
+msgstr ""
+"Vybrali jste režim OpenPGP pro zprávu s přílohami. V tomto režimu bude "
+"podepsána a/nebo zašifrována jen první část. Pokud má být chráněna celá "
+"zpráva, měli byste zvolit režim MIME. Chcete opravdu pokračovat?"
+
+#: src/sendmsg-window.c:3335
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "odesílám zprávu s režimem gpg %d"
 
-#: src/sendmsg-window.c:4008
+#: src/sendmsg-window.c:4101
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Odpověď pro %s: %s"
 
-#: src/sendmsg-window.c:4013
+#: src/sendmsg-window.c:4106
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Přeposlat zprávu pro %s: %s"
 
-#: src/sendmsg-window.c:4017
+#: src/sendmsg-window.c:4110
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Pokračovat v psaní zprávy pro %s: %s"
 
-#: src/sendmsg-window.c:4021
+#: src/sendmsg-window.c:4114
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nová zpráva pro %s: %s"

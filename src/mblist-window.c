@@ -46,6 +46,7 @@ struct _MBListWindow
   {
     GtkWidget *window;
     GnomeMDI *mdi;
+    GtkWidget *sw;
     GtkCTree *ctree;
     GtkCTreeNode *parent;
   };
@@ -108,22 +109,32 @@ mblist_open_window (GnomeMDI * mdi)
 
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
-
+  
+  mblw->sw = gtk_scrolled_window_new(NULL, NULL);
   mblw->ctree = GTK_CTREE (balsa_mblist_new ());
   balsa_app.mblist = BALSA_MBLIST (mblw->ctree);
+  gtk_container_add(GTK_CONTAINER(mblw->sw), GTK_WIDGET(mblw->ctree));
 
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
 
   gtk_widget_set_usize (GTK_WIDGET (mblw->ctree), balsa_app.mblist_width, balsa_app.mblist_height);
-
-  gtk_ctree_show_stub (mblw->ctree, FALSE);
-  gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED);
 /*
-  gtk_clist_set_policy (GTK_CLIST (mblw->ctree), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_ctree_show_stub (mblw->ctree, FALSE);
 */
+  gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED);
+
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(mblw->sw),
+		  GTK_POLICY_AUTOMATIC,
+		  GTK_POLICY_AUTOMATIC);
+
   gtk_clist_set_row_height (GTK_CLIST (mblw->ctree), 16);
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->vbox), GTK_WIDGET (mblw->ctree), TRUE, TRUE, 0);
+/*  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->vbox), GTK_WIDGET (mblw->sw), TRUE, TRUE, 0);
+*/
+  gtk_container_add(GTK_CONTAINER(GTK_DIALOG(mblw->window)->vbox),
+			  GTK_WIDGET (mblw->sw));
+
+  gtk_widget_show (GTK_WIDGET (mblw->sw));
   gtk_widget_show (GTK_WIDGET (mblw->ctree));
 
   balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
@@ -131,11 +142,11 @@ mblist_open_window (GnomeMDI * mdi)
   height = GTK_CLIST (mblw->ctree)->rows * GTK_CLIST (mblw->ctree)->row_height;
 
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "select_mailbox",
-		      (GtkSignalFunc) mailbox_select_cb,
-		      (gpointer) NULL);
+		      GTK_SIGNAL_FUNC(mailbox_select_cb), NULL);
 
   bbox = gtk_hbutton_box_new ();
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->action_area), bbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->action_area),
+		  bbox, TRUE, TRUE, 0);
   gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 2);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
   gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
@@ -145,7 +156,8 @@ mblist_open_window (GnomeMDI * mdi)
 
   button = gtk_button_new_with_label ("Open box");
   gtk_container_add (GTK_CONTAINER (bbox), button);
-  gtk_signal_connect_object (GTK_OBJECT (button), "clicked", GTK_SIGNAL_FUNC (open_cb), NULL);
+  gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
+		  GTK_SIGNAL_FUNC (open_cb), NULL);
   gtk_widget_show (button);
 
   button = gtk_button_new_with_label ("Close box");

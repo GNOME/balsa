@@ -251,8 +251,8 @@ balsa_index_init (BalsaIndex * bindex)
  * priority
  * attachments
  */
-  GtkWidget *sw;
   GtkCList *clist;
+  GtkWidget *sw;
   static gchar *titles[] =
   {
     "#",

@@ -413,6 +413,7 @@ create_identity_page (void)
 static GtkWidget *
 create_mailservers_page ()
 {
+  GtkWidget *sw;
   GtkWidget *vbox;
   GtkWidget *label;
   GtkWidget *frame;
@@ -431,11 +432,15 @@ create_mailservers_page ()
   gtk_container_border_width (GTK_CONTAINER (hbox), 5);
   gtk_container_add (GTK_CONTAINER (frame), hbox);
 
+  sw = gtk_scrolled_window_new(NULL, NULL);
   pui->pop3servers = gtk_clist_new (1);
-/*
-  gtk_clist_set_policy (GTK_CLIST (pui->pop3servers), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-*/
-  gtk_box_pack_start (GTK_BOX (hbox), pui->pop3servers, TRUE, TRUE, 2);
+  gtk_container_add(GTK_CONTAINER(sw), pui->pop3servers);
+
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
+		  GTK_POLICY_AUTOMATIC,
+		  GTK_POLICY_AUTOMATIC);
+
+  gtk_box_pack_start (GTK_BOX (hbox), sw, TRUE, TRUE, 2);
 
   update_pop3_servers ();
 

@@ -72,7 +72,7 @@ fi
 rm -rf "$RPM_BUILD_ROOT"
 
 make DESTDIR="$RPM_BUILD_ROOT" install
-
+rm "$RPM_BUILD_ROOT%{_bindir}"/balsa-ab
 #desktop-file-install --vendor gnome --delete-original       \
 #  --dir $RPM_BUILD_ROOT%{_datadir}/applications             \
 #  $RPM_BUILD_ROOT%{_datadir}/applications/*

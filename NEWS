@@ -1,3 +1,11 @@
+* Balsa-2.0.6 release. Release date 2003-01-29
+
+- authenticated LDAP binding. Option to use TLS for LDAP.
+- persistent mailbox sorting and threading.
+- search improvements.
+- multiple UI fixes.
+- printing font and paper selection fixed.
+
 * Balsa-2.0.5 release. Release date 2003-01-05
 
 - IMAP message caching fixed.

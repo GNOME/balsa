@@ -1,3 +1,7 @@
+2003-01-29  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* NEWS, configure.in: release 2.0.6.
+
 2003-01-29  PeterB
 
 	* src/balsa-index.c: Use GtkTreeIter instead of GtkTreePath to

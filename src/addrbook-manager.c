@@ -30,18 +30,12 @@ static GtkWidget *menu_items[9];
 extern void close_window (GtkWidget *, gpointer);
 
 static update_addyb_window (GtkWidget *, gpointer);
+static void addyb_compose_update (addyb_item *);
+static void addyb_emaillist_update (addyb_item *);
 
 static GtkWidget *addyb_list;
 static GtkWidget *email_list;
 static GtkWidget *commentstext;
-
-typedef struct _addyb_item addyb_item;
-struct _addyb_item
-  {
-    gchar *name;
-    GList *email;
-    gchar *comments;
-  };
 
 static addyb_item *
 addyb_item_new (gchar * name, gchar * comments)
@@ -65,6 +59,11 @@ addyb_item_new (gchar * name, gchar * comments)
   return (addyb_item *) gtk_clist_get_row_data (GTK_CLIST (addyb_list), row);
 }
 
+
+/*
+ * email item stuff
+ */
+
 static void
 addyb_email_item_new (addyb_item * ai, gchar * addy)
 {
@@ -74,9 +73,30 @@ addyb_email_item_new (addyb_item * ai, gchar * addy)
 }
 
 static void
+addyb_email_item_rename (addyb_item * ai, gchar * addy, gchar *newaddy)
+{
+  ai->email =  g_list_find (ai->email, (gpointer) addy);
+  (gchar *)ai->email->data = newaddy;
+}
+
+static void
 addyb_email_item_delete (addyb_item * ai, gchar * addy)
 {
   ai->email = g_list_remove (ai->email, (gpointer) addy);
+}
+
+
+/*
+ * updates to window stuff
+ */
+
+static
+update_addyb_window (GtkWidget * widget, gpointer data)
+{
+  addyb_item *ai = (addyb_item *) gtk_clist_get_row_data (GTK_CLIST (widget), ((gint) GTK_CLIST (widget)->selection->data));
+
+  addyb_emaillist_update (ai);
+  addyb_compose_update (ai);
 }
 
 static void
@@ -109,6 +129,11 @@ addyb_emaillist_update (addyb_item * ai)
   gtk_clist_thaw (GTK_CLIST (email_list));
 }
 
+
+/*
+ * email_list stuff
+ */
+
 static
 addyb_emaillist_item_remove (GtkWidget * widget, gpointer data)
 {
@@ -117,14 +142,18 @@ addyb_emaillist_item_remove (GtkWidget * widget, gpointer data)
   addyb_emaillist_update (ai);
 }
 
+/*
 static
-update_addyb_window (GtkWidget * widget, gpointer data)
+addyb_emaillist_item_modify (GtkWidget * widget, gpointer data)
 {
-  addyb_item *ai = (addyb_item *) gtk_clist_get_row_data (GTK_CLIST (widget), ((gint) GTK_CLIST (widget)->selection->data));
-
+  addyb_item *ai = (addyb_item *) gtk_clist_get_row_data (GTK_CLIST (addyb_list), ((gint) GTK_CLIST (addyb_list)->selection->data));
+  addyb_email_item_delete(ai, (gchar *)gtk_clist_get_row_data (GTK_CLIST (email_list), ((gint) GTK_CLIST (email_list)->selection->data)));
   addyb_emaillist_update (ai);
-  addyb_compose_update (ai);
 }
+*/
+
+
+
 
 static GtkWidget *
 create_menu (GtkWidget * window)
@@ -307,7 +336,7 @@ addressbook_window_new (GtkWidget * widget, gpointer data)
   addyb_email_item_new (addybitem, "pavlov@pavlov.net");
   addyb_email_item_new (addybitem, "pavlov@alldolls.net");
 
-  addyb_email_item_delete (addybitem, "pavlov@alldolls.net");
+  addyb_email_item_rename (addybitem, "pavlov@alldolls.net","pavlov@pfnb.com");
 
   addybitem = addyb_item_new ("test1", "tests suck!");
   addyb_email_item_new (addybitem, "pavlov@innerx.net");

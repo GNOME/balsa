@@ -88,7 +88,12 @@ void balsa_window_increase_activity(BalsaWindow* window);
 void balsa_window_decrease_activity(BalsaWindow* window);
 gboolean balsa_window_setup_progress(BalsaWindow* window, gfloat upper_bound);
 void balsa_window_clear_progress(BalsaWindow* window);
+#ifdef BALSA_USE_THREADS
+/* the increment model was not designed for threading and does not work. */
+#define balsa_window_increment_progress(arg)
+#else
 void balsa_window_increment_progress(BalsaWindow* window);
+#endif
 
 #if defined(__FILE__) && defined(__LINE__)
 # ifdef __FUNCTION__

@@ -1,3 +1,13 @@
+2003-03-11 17:17  PeterB
+
+	* src/balsa-index.c: Don't clear the index when it's not empty.
+	* src/filter-edit-callbacks.c: Use a non-modal condition-edit
+	dialog, and desensitize the filter-edit dialog while the
+	condition-edit dialog is open.
+	* libbalsa/identity.c: Confirm deletion in a non-modal dialog.
+	* src/sendmsg-window.c: Make sure an identity has an address before
+	comparing it with another string.
+
 2003-03-10 20:08  PeterB
 
 	* src/: balsa-index.c, main-window.c, store-address.c,

@@ -10,6 +10,9 @@
 	* src/balsa-index.c: flag displaying code.
 	* src/main-window.c: main menu toggle flag entry
 
+	Ian Campbell's <ijc25@cam.ac.uk> new message window bug fix.
+	* src/message-window.c: adjusted to the new code.
+	
 2000-06-17  Pawel Salek  <pawsa@theochem.kth.se>
 
 	IMAP directory stuff, usable version. Terminology needs polishing.

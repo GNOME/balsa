@@ -135,6 +135,7 @@ void
 message_window_new (Message * message)
 {
   MessageWindow *mw;
+  GtkWidget *scroll;
 
   if (!message)
     return;
@@ -182,6 +183,9 @@ message_window_new (Message * message)
   gnome_app_create_menus_with_data (GNOME_APP (mw->window),
 		  main_menu, mw->window);
 
+  scroll = gtk_scrolled_window_new(NULL, NULL);
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
   mw->bmessage = balsa_message_create ();
 
   balsa_message_set (BALSA_MESSAGE (mw->bmessage), message);
@@ -194,8 +198,11 @@ message_window_new (Message * message)
   gtk_check_menu_item_set_active
     (GTK_CHECK_MENU_ITEM(message_menu[MENU_MESSAGE_WRAP_POS].widget), 
      balsa_app.browse_wrap);
-  
-  gnome_app_set_contents (GNOME_APP (mw->window), mw->bmessage);
+ 
+  gtk_container_add(GTK_CONTAINER(scroll), mw->bmessage);
+  gtk_widget_show(scroll);
+
+  gnome_app_set_contents (GNOME_APP (mw->window), scroll);
 
   /* FIXME: set it to the size of the canvas, unless it is
    * bigger than the desktop, in which case it should be at about a

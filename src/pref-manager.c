@@ -49,7 +49,10 @@ typedef struct _PropertyUI {
 
     GtkWidget *address_books;
 
-    GtkWidget *pop3servers, *smtp_server, *smtp_user, *smtp_passphrase;
+    GtkWidget *pop3servers;
+#if ENABLE_ESMTP
+    GtkWidget *smtp_server, *smtp_user, *smtp_passphrase;
+#endif
     GtkWidget *mail_directory;
     GtkRadioButton *encoding_type[NUM_ENCODING_MODES];
     GtkWidget *check_mail_auto;
@@ -333,6 +336,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
 
+#if ENABLE_SMTP
     gtk_signal_connect(GTK_OBJECT(pui->smtp_server), "changed",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
@@ -344,6 +348,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(pui->smtp_passphrase), "changed",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
+#endif
 
     for (i = 0; i < NUM_ENCODING_MODES; i++) {
 	gtk_signal_connect(GTK_OBJECT(pui->encoding_type[i]), "clicked",
@@ -510,6 +515,7 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.domain =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->domain)));
 
+#if ENABLE_ESMTP
     g_free(balsa_app.smtp_server);
     balsa_app.smtp_server =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->smtp_server)));
@@ -521,6 +527,7 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     g_free(balsa_app.smtp_passphrase);
     balsa_app.smtp_passphrase =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->smtp_passphrase)));
+#endif
 
     g_free(balsa_app.signature_path);
     balsa_app.signature_path =
@@ -766,6 +773,7 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->sig_prepend),
 				 balsa_app.sig_prepend);
 
+#if ENABLE_ESMTP
     if (balsa_app.smtp_server)
 	gtk_entry_set_text(GTK_ENTRY(pui->smtp_server),
 			   balsa_app.smtp_server);
@@ -777,6 +785,7 @@ set_prefs(void)
     if (balsa_app.smtp_passphrase)
 	gtk_entry_set_text(GTK_ENTRY(pui->smtp_passphrase),
 			   balsa_app.smtp_passphrase);
+#endif
 
     gtk_entry_set_text(GTK_ENTRY(pui->mail_directory),
 		       balsa_app.local_mail_directory);
@@ -1186,15 +1195,13 @@ create_mailserver_page(gpointer data)
     GtkWidget *scrolledwindow3;
     GtkWidget *label14;
     GtkWidget *label15;
-    GtkWidget *label16;
-    GtkWidget *label17;
-    GtkWidget *label18;
     GtkWidget *vbox1;
     GtkWidget *frame4;
     GtkWidget *box2;
     GtkWidget *fileentry2;
-    GtkWidget *frame5;
-    GtkWidget *table4;
+#if ENABLE_ESMTP
+    GtkWidget *frame5, *table4, *label16, *label17, *label18;
+#endif
 
     table3 = gtk_table_new(3, 1, FALSE);
 
@@ -1251,6 +1258,7 @@ create_mailserver_page(gpointer data)
     pui->mail_directory =
 	gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fileentry2));
 
+#if ENABLE_ESMTP
     frame5 = gtk_frame_new(_("Outgoing mail"));
     gtk_table_attach(GTK_TABLE(table3), frame5, 0, 1, 2, 3,
 		     (GtkAttachOptions) (GTK_FILL),
@@ -1291,7 +1299,7 @@ create_mailserver_page(gpointer data)
     gtk_table_attach(GTK_TABLE(table4), pui->smtp_passphrase, 3, 4, 1, 2,
 		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
 		     (GtkAttachOptions) (0), 0, 0);
-
+#endif
     /* fill in data */
     update_pop3_servers();
 

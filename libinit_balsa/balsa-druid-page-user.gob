@@ -86,10 +86,10 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 		preset = g_strconcat( g_get_user_name(), "@", hostbuf, NULL );
 		balsa_init_add_table_entry( table, 1, _("Email address:"), preset, &( self->_priv->ed1 ), GTK_WIDGET( self ), &( self->_priv->email ) );
 		g_free( preset );
-
-		preset = "localhost";
+#if ENABLE_ESMTP
+		preset = "localhost:25";
 		balsa_init_add_table_entry( table, 2, _("SMTP Server:"), preset, &( self->_priv->ed2 ), GTK_WIDGET( self ), &( self->_priv->smtp ) );
-
+#endif
 		preset = g_strconcat( g_get_home_dir(), "/mail", NULL );
 		balsa_init_add_table_entry( table, 3, _("Local Mail Directory:"), preset, &( self->_priv->ed3 ), GTK_WIDGET( self ), &( self->_priv->localmaildir ) );
 		g_free( preset );
@@ -142,10 +142,11 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 		balsa_app.address->address_list = g_list_append(balsa_app.address->address_list, 
 								g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->email ) ) ) );
 
+#if ENABLE_ESMTP
 		if( balsa_app.smtp_server );
 			g_free( balsa_app.smtp_server );
 		balsa_app.smtp_server = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->smtp ) ) );
-
+#endif
 		if( balsa_app.local_mail_directory );
 			g_free( balsa_app.local_mail_directory );
 		balsa_app.local_mail_directory = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->localmaildir ) ) );

@@ -137,7 +137,6 @@ dnl More checks
 dnl ######################################################################################
 
 AC_CHECK_LIB(crypt, crypt)
-AC_CHECK_LIB(esmtp, smtp_start_session)
 
 dnl these may be used later.
 dnl AC_CHECK_LIB(des, des_encrypt)
@@ -397,6 +396,26 @@ if test x"$BALSA_FROM_CVS" = xyes ; then
 fi
 
 dnl ##########################################################################
+dnl Have ESMTP ?
+dnl ##########################################################################
+
+AC_ARG_WITH(esmtp, [ --with-esmtp	        Enable libESMTP [default=yes]],[
+	with_esmtp=$withval
+],[
+	with_esmtp=yes
+])
+
+
+AC_MSG_CHECKING([whether to build ESMTP support])
+if test "x$with_esmtp" != xno  ; then
+	AC_MSG_RESULT([yes])
+	AC_CHECK_LIB(esmtp, smtp_start_session, AC_DEFINE(ENABLE_ESMTP) LIBS="$LIBS -lesmtp", AC_MSG_ERROR([*** You enabled ESMTP but esmtp library is not found.]), -lesmtp)
+	test "$with_esmtp" != yes && LIBS="$LIBS -L$with_esmtp/lib"
+else
+	AC_MSG_RESULT([no])
+fi	  
+
+dnl ##########################################################################
 dnl Enable GSS?
 dnl ##########################################################################
 
@@ -495,6 +514,7 @@ echo " Using incomplete features: $use_all"
 echo "Installing some files into  "
 echo "            Gnome's prefix: $use_system_install (may require root privileges)"
 echo "   Enable compile warnings: $set_more_warnings"
+echo "                Use ESMTP : $with_esmtp"
 echo "               Use GtkHTML: $have_gtkhtml"
 echo "                  Use LDAP: $use_ldap"
 echo "                   Use GSS: $with_gss"

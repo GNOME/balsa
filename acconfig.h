@@ -36,6 +36,9 @@
 /* LDAP support? */
 #undef ENABLE_LDAP
 
+/* ESMTP support? */
+#undef ENABLE_ESMTP
+
 #undef BALSA_STD_PREFIX
 #undef BALSA_DATA_PREFIX
 #undef GNOME_STD_PREFIX

@@ -231,6 +231,8 @@ libbalsa_address_get_name(const LibBalsaAddress * addr)
 	(addr->address_list ? addr->address_list->data : NULL);
 }
 
+#if ENABLE_ESMTP
+
 /* XXX - added by Brian Stafford <brian@stafford.uklinux.net> */
 
 /* libESMTP works with the RFC 821 mailbox and the RFC 822 phrase and 
@@ -260,3 +262,4 @@ libbalsa_address_get_mailbox(LibBalsaAddress * address, gint n)
     return (gchar*)nth_address->data;
 }
 
+#endif

@@ -37,11 +37,13 @@
 #include "threads.h"
 #endif
 
+#if ENABLE_ESMTP
 #include <stdarg.h>
 #include <libesmtp.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#endif
 
 typedef struct _MessageQueueItem MessageQueueItem;
 
@@ -58,15 +60,22 @@ typedef struct _SendMessageInfo SendMessageInfo;
 
 struct _SendMessageInfo{
     LibBalsaMailbox* outbox;
+#if ENABLE_ESMTP
     /* [BCS] - The smtp_session_t structure holds all the information
        needed to transfer the message to the SMTP server.  This structure
        is opaque to the application. */
     smtp_session_t session;
+#endif
 };
 
 /* Variables storing the state of the sending thread.
  * These variables are protected in MT by send_messages_lock mutex */
+#if ENABLE_ESMTP
+#else
+static MessageQueueItem *message_queue;
+#endif
 static int total_messages_left;
+
 /* end of state variables section */
 
 
@@ -98,6 +107,7 @@ msg_queue_item_destroy(MessageQueueItem * mqi)
     g_free(mqi);
 }
 
+#if ENABLE_ESMTP
 static SendMessageInfo *
 send_message_info_new(LibBalsaMailbox* outbox, smtp_session_t session)
 {
@@ -109,6 +119,18 @@ send_message_info_new(LibBalsaMailbox* outbox, smtp_session_t session)
 
     return smi;
 }
+#else
+static SendMessageInfo *
+send_message_info_new(LibBalsaMailbox* outbox)
+{
+    SendMessageInfo *smi;
+
+    smi=g_new(SendMessageInfo,1);
+    smi->outbox = outbox;
+
+    return smi;
+}
+#endif
 
 static void
 send_message_info_destroy(SendMessageInfo *smi)
@@ -231,16 +253,29 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
    send the given messsage (if any, it can be NULL) and all the messages
    in given outbox.
 */
+#if ENABLE_ESMTP
 gboolean
 libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
-		      LibBalsaMailbox* fccbox, gint encoding, 
+		      LibBalsaMailbox* fccbox, gint encoding,
 		      gchar* smtp_server, auth_context_t smtp_authctx)
 {
     if (message != NULL)
 	libbalsa_message_queue(message, outbox, fccbox, encoding);
     return libbalsa_process_queue(outbox, encoding, smtp_server, smtp_authctx);
 }
+#else
+gboolean
+libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
+		      LibBalsaMailbox* fccbox, gint encoding)
+{
+    if (message != NULL)
+	libbalsa_message_queue(message, outbox, fccbox, encoding);
+    return libbalsa_process_queue(outbox, encoding);
+}
+#endif
 
+
+#if ENABLE_ESMTP
 /* [BCS] - libESMTP uses a callback function to read the message from the
    application to the SMTP server.
  */
@@ -265,20 +300,6 @@ libbalsa_message_cb (char **buf, int *len, void *arg)
 	return NULL;
     }
 
-#if 0
-    /* If libmutt had terminated lines with CR-LF the following would have
-       been OK.  (GMime seems to have the same problem - using Unix line
-       terminations instead of RFC 822 CR-LF termination.) */
-    if (ctx->fp == NULL) {
-        octets = 0;
-    } else {
-	octets = fread (ctx->buf, 1, sizeof ctx->buf, ctx->fp);
-	if (octets == 0) {
-	    fclose (ctx->fp);
-	    ctx->fp = NULL;
-	}
-    }
-#else
     /* The message needs to be read a line at a time and the newlines
        converted to \r\n because libmutt foolishly terminates lines with
        the Unix \n despite RFC 822 calling for \r\n.  Furthermore RFC
@@ -306,7 +327,6 @@ libbalsa_message_cb (char **buf, int *len, void *arg)
 	}
 	octets = p - ctx->buf;
     }
-#endif
     *len = octets;
     return ctx->buf;
 }
@@ -520,6 +540,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     return TRUE;
 }
 
+
 static void
 handle_successful_send (smtp_message_t message, void *arg)
 {
@@ -600,6 +621,129 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 }
 #endif
 
+#else /* ESMTP */
+
+/* CHBM: non-esmtp version */
+
+/* libbalsa_process_queue:
+   treats given mailbox as a set of messages to send. Loads them up and
+   launches sending thread/routine.
+   NOTE that we do not close outbox after reading. send_real/thread message 
+   handler does that.
+*/
+gboolean 
+libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding)
+{
+    MessageQueueItem *mqi, *new_message;
+    SendMessageInfo *send_message_info;
+    GList *lista;
+    LibBalsaMessage *queu;
+    /* We do messages in queue now only if where are not sending them already */
+
+#ifdef BALSA_USE_THREADS
+    gboolean start_thread;
+    GtkWidget *send_dialog_source = NULL;
+
+    pthread_mutex_lock(&send_messages_lock);
+    if (sending_mail == FALSE) {
+	/* We create here the progress bar */
+	send_dialog = gnome_dialog_new(_("Sending Mail..."), _("Hide"), NULL);
+	gtk_window_set_wmclass(GTK_WINDOW(send_dialog), "send_dialog", "Balsa");
+	gnome_dialog_set_close(GNOME_DIALOG(send_dialog), TRUE);
+	send_dialog_source = gtk_label_new(_("Sending Mail..."));
+	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+			   send_dialog_source, FALSE, FALSE, 0);
+
+	send_progress_message = gtk_label_new("");
+	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+			   send_progress_message, FALSE, FALSE, 0);
+
+	send_dialog_bar = gtk_progress_bar_new();
+	gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(send_dialog)->vbox),
+			   send_dialog_bar, FALSE, FALSE, 0);
+
+	gtk_widget_show_all(send_dialog);
+	/* Progress bar done */
+#endif
+	libbalsa_mailbox_open(outbox, FALSE);
+	lista = outbox->message_list;
+	
+	mqi = message_queue;
+	while (lista != NULL) {
+	    queu = LIBBALSA_MESSAGE(lista->data);
+	    
+	    new_message = msg_queue_item_new(queu);
+	    if (!libbalsa_create_msg(queu, new_message->message,
+				     new_message->tempfile, encoding, 1)) {
+		msg_queue_item_destroy(new_message);
+	    } else {
+		if (mqi)
+		    mqi->next_message = new_message;
+		else
+		    message_queue = new_message;
+
+		mqi = new_message;
+		total_messages_left++;
+	    }
+	    lista = lista->next;
+	}
+#ifdef BALSA_USE_THREADS
+    }
+    
+    start_thread = !sending_mail;
+    sending_mail = TRUE;
+
+    if (start_thread) {
+
+	send_message_info=send_message_info_new(outbox);
+
+	pthread_create(&send_mail, NULL,
+		       (void *) &balsa_send_message_real, send_message_info);
+	/* Detach so we don't need to pthread_join
+	 * This means that all resources will be
+	 * reclaimed as soon as the thread exits
+	 */
+	pthread_detach(send_mail);
+    }
+    pthread_mutex_unlock(&send_messages_lock);
+#else				/*non-threaded code */
+    
+    send_message_info=send_message_info_new(outbox);
+    balsa_send_message_real(send_message_info);
+#endif
+    return TRUE;
+}
+
+static void
+handle_successful_send(MessageQueueItem *mqi)
+{
+    if (mqi->orig->mailbox)
+	libbalsa_message_delete(mqi->orig);
+    mqi->status = MQI_SENT;
+}
+
+/* get_msg2send: 
+   returns first waiting message on the message_queue.
+*/
+static MessageQueueItem* get_msg2send()
+{
+    MessageQueueItem* res = message_queue;
+#ifdef BALSA_USE_THREADS
+    pthread_mutex_lock(&send_messages_lock);
+#endif
+    while(res && res->status != MQI_WAITING)
+	res = res->next_message;
+
+#ifdef BALSA_USE_THREADS
+    pthread_mutex_unlock(&send_messages_lock);
+#endif
+    return res;
+}
+
+#endif /* ESMTP */
+
+#if ENABLE_ESMTP
+
 #ifdef DEBUG
 static void
 monitor_cb (const char *buf, int buflen, int writing, void *arg)
@@ -679,6 +823,83 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
     send_message_info_destroy(info);	
     return TRUE;
 }
+
+#else /* ESMTP */
+
+/* balsa_send_message_real:
+   does the acutal message sending. 
+   This function may be called as a thread and should therefore do
+   proper gdk_threads_{enter/leave} stuff around GTK,libbalsa or
+   libmutt calls. Also, structure info should be freed before exiting.
+*/
+
+static guint balsa_send_message_real(SendMessageInfo* info) {
+    MessageQueueItem *mqi, *next_message;
+    int i;
+#ifdef BALSA_USE_THREADS
+    SendThreadMessage *threadmsg;
+    pthread_mutex_lock(&send_messages_lock);
+    if (!message_queue) {
+	sending_mail = FALSE;
+	pthread_mutex_unlock(&send_messages_lock);
+	MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
+	send_message_info_destroy(info);	
+	return TRUE;
+    }
+    pthread_mutex_unlock(&send_messages_lock);
+#else
+    if(!message_queue){
+	send_message_info_destroy(info);	
+	return TRUE;
+    }	
+#endif
+
+    while ( (mqi = get_msg2send()) != NULL) {
+	libbalsa_lock_mutt();
+	i = mutt_invoke_sendmail(mqi->message->env->to,
+				 mqi->message->env->cc,
+				 mqi->message->env->bcc,
+				 mqi->tempfile,
+				 (mqi->message->content->encoding
+				  == ENC8BIT));
+	libbalsa_unlock_mutt();
+	mqi->status = (i==0?MQI_SENT : MQI_FAILED);
+	total_messages_left--; /* whatever the status is, one less to do*/
+    }
+
+    /* We give back all the resources used and delete the sent messages */
+    
+#ifdef BALSA_USE_THREADS
+    pthread_mutex_lock(&send_messages_lock);
+#endif
+    mqi = message_queue;
+    
+    while (mqi != NULL) {
+	if (mqi->status == MQI_SENT) 
+	    handle_successful_send(mqi);
+	next_message = mqi->next_message;
+	msg_queue_item_destroy(mqi);
+	mqi = next_message;
+    }
+    
+    gdk_threads_enter();
+    libbalsa_mailbox_close(info->outbox);
+    libbalsa_mailbox_commit_changes(info->outbox);
+    gdk_threads_leave();
+
+    message_queue = NULL;
+    total_messages_left = 0;
+#ifdef BALSA_USE_THREADS
+    sending_mail = FALSE;
+    pthread_mutex_unlock(&send_messages_lock);
+    MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
+#endif
+    send_message_info_destroy(info);	
+    return TRUE;
+}
+
+#endif /* ESMTP */
+
 
 static void
 message2HEADER(LibBalsaMessage * message, HEADER * hdr) {

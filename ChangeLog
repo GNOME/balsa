@@ -1,3 +1,23 @@
+2001-05-13  Carlos Morgado  <chbm@chbm.nu>
+
+	* libinit_balsa/balsa-druid-page-user.gob:
+	* src/sendmsg-window.c:
+	* src/save-restore.c: 
+	* src/pref-manager.c:
+	* src/main-window.c:
+	* src/balsa-message.c:
+	* src/balsa-app.h: 
+	* src/balsa-app.c: 
+	* libbalsa/send.c: 
+	* libbalsa/misc.h: 
+	* libbalsa/message.h: 
+	* libbalsa/address.h: 
+	* libbalsa/address.c: 
+	* acconfig.h: 
+	* configure.in: 
+	added --with-esmtp configure option. --with-esmtp=no totally
+	disables the (e)smtp capacities and uses local sendmail
+	
 2001-05-11  Pawel Salek  <pawsa@theochem.kth.se>
 
 	(bugfix from AD)

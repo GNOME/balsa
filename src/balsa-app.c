@@ -150,7 +150,7 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 	return password;
 }
 
-
+#if ENABLE_ESMTP
 static void
 authapi_exit (void)
 {
@@ -182,7 +182,7 @@ authinteract (auth_client_request_t request, char **result, int fields,
     }
     return 1;
 }
-
+#endif /* ESMTP */
 
 void
 balsa_app_init(void)
@@ -199,6 +199,7 @@ balsa_app_init(void)
     balsa_app.local_mail_directory = NULL;
     balsa_app.signature_path = NULL;
     balsa_app.sig_separator = TRUE;
+#if ENABLE_ESMTP
     balsa_app.smtp_server = NULL;
     balsa_app.smtp_user = NULL;
     balsa_app.smtp_passphrase = NULL;
@@ -210,6 +211,7 @@ balsa_app_init(void)
     balsa_app.smtp_authctx = auth_create_context ();
     auth_set_mechanism_flags (balsa_app.smtp_authctx, AUTH_PLUGIN_PLAIN, 0);
     auth_set_interact_cb (balsa_app.smtp_authctx, authinteract, NULL);
+#endif
 
     balsa_app.inbox = NULL;
     balsa_app.inbox_input = NULL;

@@ -29,7 +29,9 @@
 #include "main-window.h"
 #include "information-dialog.h"
 
+#if ENABLE_ESMTP
 #include <auth-client.h>		/* part of libESMTP */
+#endif
 
 /* Work around nonprivileged installs so we can find icons */
 #ifdef BALSA_LOCAL_INSTALL
@@ -153,10 +155,12 @@ extern struct BalsaApplication {
     gchar *forward_string;
 
     gchar *local_mail_directory;
+#if ENABLE_ESMTP
     gchar *smtp_server;
     gchar *smtp_user;
     gchar *smtp_passphrase;
     auth_context_t smtp_authctx;
+#endif
 
     /* signature stuff */
     gboolean sig_sending;

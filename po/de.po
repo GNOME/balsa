@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa\n"
-"POT-Creation-Date: 2000-07-16 00:28+0200\n"
+"POT-Creation-Date: 2000-07-27 17:53+0200\n"
 "PO-Revision-Date: 2000-07-15 00:45+02:00\n"
 "Last-Translator: Kai Lahmann <kl@linuxfaqs.de>\n"
 "Language-Team: german <de@li.org>\n"
@@ -371,7 +371,7 @@ msgstr "Datum"
 msgid "To"
 msgstr "An"
 
-#: src/balsa-mblist.c:225 src/mailbox-conf.c:1165
+#: src/balsa-mblist.c:225 src/mailbox-conf.c:1185
 msgid "Mailbox"
 msgstr "Postfach"
 
@@ -560,7 +560,7 @@ msgstr "Textkörper"
 msgid "Match string:"
 msgstr "Prüfen auf Zeichenkette:"
 
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:300 src/mailbox-conf.c:1130
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1150
 #: src/pref-manager.c:890
 msgid "Add"
 msgstr "Hinzufügen"
@@ -650,7 +650,7 @@ msgid "Balsa Filters"
 msgstr "Balsa-Filter"
 
 #. FIXME: Should prompt to remove file aswell
-#: src/mailbox-conf.c:180
+#: src/mailbox-conf.c:181
 #, c-format
 msgid ""
 "This will remove the mailbox %s and it's files permanently from your "
@@ -660,7 +660,7 @@ msgstr ""
 "Das Postfach und sein Inhalt werden unwiderbringlich gelöscht.\n"
 "Sind Sie sicher?"
 
-#: src/mailbox-conf.c:185
+#: src/mailbox-conf.c:186
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
@@ -671,126 +671,118 @@ msgstr ""
 "Sie können es später mit \"Postfach hinzufügen\" wieder hinzufügen\n"
 "Wollen Sie das Postfach wirklich entfernen?"
 
-#: src/mailbox-conf.c:213
+#: src/mailbox-conf.c:214
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Huch! Mailbox nicht in Knoten von balsa_app.mailbox gefunden?\n"
 
-#: src/mailbox-conf.c:255
+#: src/mailbox-conf.c:268
 msgid "Mailbox Configurator"
 msgstr "Mailfach-Einstellungen"
 
-#: src/mailbox-conf.c:310 src/mailbox-conf.c:1124
+#: src/mailbox-conf.c:330 src/mailbox-conf.c:1144
 msgid "Update"
 msgstr "Aktualisieren"
 
-#: src/mailbox-conf.c:442 src/mailbox-conf.c:448 src/mailbox-conf.c:472
+#: src/mailbox-conf.c:458 src/mailbox-conf.c:464 src/mailbox-conf.c:488
 msgid "You need to fill in the Mailbox Name field."
 msgstr "Sie müssen das Feld \"Postfachname\" ausfüllen."
 
-#: src/mailbox-conf.c:451
+#: src/mailbox-conf.c:467
 msgid "You need to fill in the folderpath field."
 msgstr "Sie müssen das Feld \"Ordnerpfad\" ausfüllen."
 
-#: src/mailbox-conf.c:453
+#: src/mailbox-conf.c:469
 msgid "You need to fill in the IMAP Server field"
 msgstr "Sie müssen das Feld \"IMAP-Server\" ausfüllen"
 
-#: src/mailbox-conf.c:455
+#: src/mailbox-conf.c:471
 msgid "You need to fill in the username field"
 msgstr "Sie müssen das Feld \"Benutzername\" ausfüllen"
 
-#: src/mailbox-conf.c:457
-msgid "You need to fill in the password field"
-msgstr "Sie müssen das Passwortfeld ausfüllen"
-
-#: src/mailbox-conf.c:459
+#: src/mailbox-conf.c:475
 msgid "You need to fill in the port field"
 msgstr "Sie müssen das Feld \"Port\" ausfüllen"
 
-#: src/mailbox-conf.c:476
+#: src/mailbox-conf.c:492
 msgid "You need to fill in the user field."
 msgstr "Sie müssen das Feld \"Benutzer\" ausfüllen."
 
-#: src/mailbox-conf.c:480
-msgid "You need to fill in the password field."
-msgstr "Sie müssen das Passwortfeld ausfüllen."
-
-#: src/mailbox-conf.c:484
+#: src/mailbox-conf.c:500
 msgid "You need to fill in the server field."
 msgstr "Sie müssen das Feld \"Server\" ausfüllen."
 
-#: src/mailbox-conf.c:488
+#: src/mailbox-conf.c:504
 msgid "You need to fill in the port field."
 msgstr "Sie müssen das Feld \"Port\" ausfüllen."
 
-#: src/mailbox-conf.c:492
+#: src/mailbox-conf.c:508
 msgid "Some of the fields are blank."
 msgstr "Einige Felder sind nicht ausgefüllt."
 
-#: src/mailbox-conf.c:626
+#: src/mailbox-conf.c:642
 #, c-format
 msgid "%s on %s"
 msgstr "%s auf %s"
 
-#: src/mailbox-conf.c:815
+#: src/mailbox-conf.c:835
 msgid "New mailbox type:"
 msgstr "Neuer Postfachtyp:"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:821
+#: src/mailbox-conf.c:841
 msgid "Local mailbox"
 msgstr "Lokales Postfach"
 
-#: src/mailbox-conf.c:831
+#: src/mailbox-conf.c:851
 msgid "Single IMAP folder"
 msgstr "Einfacher IMAP-Ordner"
 
-#: src/mailbox-conf.c:840
+#: src/mailbox-conf.c:860
 msgid "IMAP folder set"
 msgstr "IMAP-Server"
 
 #. mailbox name
-#: src/mailbox-conf.c:865 src/mailbox-conf.c:900 src/mailbox-conf.c:1017
+#: src/mailbox-conf.c:885 src/mailbox-conf.c:920 src/mailbox-conf.c:1037
 msgid "Mailbox Name:"
 msgstr "Postfachname:"
 
 #. path to file
-#: src/mailbox-conf.c:875
+#: src/mailbox-conf.c:895
 msgid "Mailbox path:"
 msgstr "Pfad zum Postfach:"
 
 #. pop server
-#: src/mailbox-conf.c:917 src/mailbox-conf.c:1027
+#: src/mailbox-conf.c:937 src/mailbox-conf.c:1047
 msgid "Server:"
 msgstr "Server:"
 
 #. pop port
-#: src/mailbox-conf.c:936 src/mailbox-conf.c:1041
+#: src/mailbox-conf.c:956 src/mailbox-conf.c:1061
 msgid "Port:"
 msgstr "Port:"
 
 #. username
-#: src/mailbox-conf.c:955 src/mailbox-conf.c:1056
+#: src/mailbox-conf.c:975 src/mailbox-conf.c:1076
 msgid "Username:"
 msgstr "Benutzername:"
 
 #. password field
-#: src/mailbox-conf.c:972 src/mailbox-conf.c:1071
+#: src/mailbox-conf.c:992 src/mailbox-conf.c:1091
 msgid "Password:"
 msgstr "Passwort:"
 
 #. toggle for check
-#: src/mailbox-conf.c:987 src/main-window.c:399
+#: src/mailbox-conf.c:1007 src/main-window.c:399
 msgid "Check"
 msgstr "Nachsehen"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:995
+#: src/mailbox-conf.c:1015
 msgid "Delete from server"
 msgstr "Löschen auf Server"
 
-#: src/mailbox-conf.c:1084
+#: src/mailbox-conf.c:1104
 msgid "Folder path:"
 msgstr "Ordnerpfad:"
 
@@ -1139,8 +1131,8 @@ msgstr "Als Papierkorb markieren"
 msgid "Mark as Draftbox"
 msgstr "Als Entwürfe markieren"
 
-#: src/mblist-window.c:449 src/mblist-window.c:465 src/mblist-window.c:484
-#: src/mblist-window.c:499
+#: src/mblist-window.c:446 src/mblist-window.c:462 src/mblist-window.c:481
+#: src/mblist-window.c:496
 msgid "No mailbox selected."
 msgstr "Kein Postfach ausgewählt."
 
@@ -1742,17 +1734,17 @@ msgstr "Kann Druckbefehl nicht ausführen."
 msgid "Error executing lpr"
 msgstr "Fehler beim Ausführen von 'lpr'"
 
-#: libbalsa/mailbox_imap.c:201
+#: libbalsa/mailbox_imap.c:202
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: öffne %s Zähler: %d\n"
 
-#: libbalsa/mailbox_local.c:215
+#: libbalsa/mailbox_local.c:218
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxLocal: öffne %s Zähler: %d\n"
 
-#: libbalsa/mailbox_pop3.c:173
+#: libbalsa/mailbox_pop3.c:179
 #, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: öffne %s Zähler: %d\n"
@@ -1815,7 +1807,7 @@ msgstr "Sperrzähler ausgelaufen, Sperre von %s entfernen?"
 #: libmutt/mx.c:131
 #, c-format
 msgid "Can't dotlock %s.\n"
-msgstr ""
+msgstr "Kann %s nicht sichern.\n"
 
 #: libmutt/mx.c:189
 msgid "Timeout exceeded while attempting fcntl lock!"

@@ -1,3 +1,7 @@
+2002-12-18  Artis Trops  <hornet@navigator.lv>
+
+	* configure.in: Added Latvian (lv) to ALL_LINGUAS.
+
 2002-12-15  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/mailbox_local.c: handle M_REOPENED correctly 

@@ -20,8 +20,11 @@
 #include "config.h"
 
 #include <gnome.h>
+#include <libgnorba/gnorba.h>
 #include <orb/orbit.h>
+
 #include "balsa-app.h"
+#include "balsa-init.h"
 #include "main-window.h"
 #include "mailbox.h"
 #include "misc.h"
@@ -30,6 +33,11 @@
 #include "main.h"
 
 #include "balsa-impl.c"
+
+
+static void balsa_init (int argc, char ***argv);
+static void config_init (void);
+static void mailboxes_init (void);
 
 void Exception (CORBA_Environment *);
 
@@ -52,12 +60,11 @@ Exception (CORBA_Environment * ev)
 }
 
 
-int
-main (int argc, char *argv[])
+static void
+balsa_init (int argc, char ***argv)
 {
   CORBA_ORB orb;
   CORBA_Environment ev;
-  PortableServer_ObjectId *oid;
   balsa_mail_send balsa_servant;
   PortableServer_POA root_poa;
   PortableServer_POAManager pm;
@@ -68,7 +75,8 @@ main (int argc, char *argv[])
   orb = gnome_CORBA_init ("balsa", NULL, &argc, argv, 0, NULL, &ev);
   Exception (&ev);
 
-  root_poa = (PortableServer_POA) CORBA_ORB_resolve_initial_references (orb, "RootPOA", &ev);
+  root_poa = (PortableServer_POA) CORBA_ORB_resolve_initial_references (orb,
+							    "RootPOA", &ev);
   Exception (&ev);
 
   balsa_servant = impl_balsa_mail_send__create (root_poa, &ev);
@@ -82,10 +90,81 @@ main (int argc, char *argv[])
 
   objref = CORBA_ORB_object_to_string (orb, balsa_servant, &ev);
 
-  printf ("%s\n", objref);
+  g_print ("%s\n", objref);
   fflush (stdout);
+}
 
-  init_balsa_app (argc, argv);
+static void
+config_init (void)
+{
+  if (config_load (BALSA_CONFIG_FILE) == FALSE)
+    {
+      fprintf (stderr, "*** Could not load config file %s!\n",
+	       BALSA_CONFIG_FILE);
+      initialize_balsa ();
+      return;
+    }
+
+  /* Load all the global settings.  If there's an error, then some crucial
+     piece of the global settings was not available, and we need to run
+     balsa-init. */
+  if (config_global_load () == FALSE)
+    {
+      fprintf (stderr, "*** config_global_load failed\n");
+      initialize_balsa ();
+      return;
+    }
+}
+
+static void
+mailboxes_init (void)
+{
+  /* initalize our mailbox access crap */
+  if (do_load_mailboxes () == FALSE)
+    {
+      fprintf (stderr, "*** error loading mailboxes\n");
+      initialize_balsa ();
+      return;
+    }
+
+  /* At this point, if inbox/outbox/trash are still null, then we
+     were not able to locate the settings for them anywhere in our
+     configuartion and should run balsa-init. */
+  if (balsa_app.inbox == NULL || balsa_app.outbox == NULL ||
+      balsa_app.trash == NULL)
+    {
+      fprintf (stderr, "*** One of inbox/outbox/trash is NULL\n");
+      initialize_balsa ();
+      return;
+    }
+}
+
+int
+main (int argc, char *argv[])
+{
+  balsa_init (argc, argv);
+
+  balsa_app_init ();
+
+  /* checking for valid config files */
+  config_init ();
+
+#if 0
+  gtk_main ();
+  
+  if (gtk_main_level() > 0)
+	  gtk_main_quit();
+#endif
+
+  /* DO NOT get here until after initialize_balsa has been finished */
+  
+/* load mailboxes */
+  mailboxes_init();
+
+  gnome_sound_init ("localhost");
+  gnome_sound_play (gnome_sound_file ("balsa/startup.wav"));
+
+  main_window_init ();
 
   gtk_main ();
   return 0;
@@ -151,11 +230,6 @@ balsa_exit (void)
       while (mailbox->open_ref > 0)
 	mailbox_open_unref (mailbox);
     }
-
-#if 0
-  gtk_timeout_remove (balsa_app.check_mail_timer);
-  gtk_timeout_remove (balsa_app.new_messages_timer);
-#endif
 
   if (balsa_app.proplist)
     config_global_save ();

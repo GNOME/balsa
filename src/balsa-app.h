@@ -87,7 +87,7 @@ extern struct BalsaApplication
 balsa_app;
 
 
-void init_balsa_app (int argc, char *argv[]);
+void balsa_app_init (void);
 gint do_load_mailboxes(void);
 
 #endif /* __BALSA_APP_H__ */

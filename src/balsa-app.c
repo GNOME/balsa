@@ -42,9 +42,9 @@ struct BalsaApplication balsa_app;
 
 
 /* prototypes */
-static int mailboxes_init (void);
 static void special_mailboxes (void);
 static gint read_signature (void);
+
 
 static void
 error_exit_cb (GtkWidget * widget, gpointer data)
@@ -79,9 +79,8 @@ balsa_error (char *fmt,...)
 
 
 void
-init_balsa_app (int argc, char *argv[])
+balsa_app_init (void)
 {
-
   /* 
    * initalize application structure before ALL ELSE 
    * to some reasonable defaults
@@ -115,58 +114,12 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.mw_height = MW_DEFAULT_HEIGHT;
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
   balsa_app.mdi_style = GNOME_MDI_DEFAULT_MODE;
-
-  gnome_sound_init ("localhost");
-
-  gnome_sound_play (gnome_sound_file ("balsa/startup.wav"));
-
-  if (config_load (BALSA_CONFIG_FILE) == FALSE)
-    {
-      fprintf (stderr, "*** Could not load config file %s!\n",
-	       BALSA_CONFIG_FILE);
-      initialize_balsa (argc, argv);
-      return;
-    }
-
-  /* Load all the global settings.  If there's an error, then some crucial
-     piece of the global settings was not available, and we need to run
-     balsa-init. */
-  if (config_global_load () == FALSE)
-    {
-      fprintf (stderr, "*** config_global_load failed\n");
-      initialize_balsa (argc, argv);
-      return;
-    }
-
-  /* initalize our mailbox access crap */
-  if (do_load_mailboxes () == FALSE)
-    {
-      fprintf (stderr, "*** error loading mailboxes\n");
-      initialize_balsa (argc, argv);
-      return;
-    }
-
-  /* At this point, if inbox/outbox/trash are still null, then we
-     were not able to locate the settings for them anywhere in our
-     configuartion and should run balsa-init. */
-  if (balsa_app.inbox == NULL || balsa_app.outbox == NULL ||
-      balsa_app.trash == NULL)
-    {
-      fprintf (stderr, "*** One of inbox/outbox/trash is NULL\n");
-      initialize_balsa (argc, argv);
-      return;
-    }
-
-  open_main_window ();
 }
 
 gint
 do_load_mailboxes (void)
 {
   read_signature ();
-
-  if (mailboxes_init () == FALSE)
-    return FALSE;
 
   switch (balsa_app.inbox->type)
     {
@@ -208,21 +161,6 @@ read_signature (void)
     balsa_app.signature[len - 1] = '\0';
   fclose (fp);
   return TRUE;
-}
-
-static gint
-mailboxes_init (void)
-{
-  gint retval;
-
-  retval = config_mailboxes_init ();
-
-  if (balsa_app.inbox == NULL ||
-      balsa_app.outbox == NULL ||
-      balsa_app.trash == NULL)
-    return FALSE;
-
-  return retval;
 }
 
 static void

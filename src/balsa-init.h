@@ -20,7 +20,7 @@
 #ifndef __BALSA_INIT_H__
 #define __BALSA_INIT_H__
 
-void initialize_balsa (int argc, char *argv[]);
+void initialize_balsa (void);
 void balsa_init_window_new (void);
 
 #endif /* __BALSA_INIT_H__ */

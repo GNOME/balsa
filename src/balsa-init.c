@@ -89,7 +89,7 @@ static void create_mailbox_if_not_present (gchar * filename);
  */
 
 void
-initialize_balsa (int argc, char *argv[])
+initialize_balsa (void)
 {
   balsa_init_window_new ();
 }
@@ -571,10 +571,4 @@ complete_cb (GtkWidget * widget, gpointer data)
   gtk_widget_destroy (iw->notebook);
   gtk_widget_destroy (iw->window);
   g_free (iw);
-
-#if 0
-  do_load_mailboxes ();
-  open_main_window ();
-#endif
-  init_balsa_app (0, NULL);
 }

@@ -110,7 +110,7 @@ destroy_window_cb (GnomeMDI * mdi, gpointer data)
 }
 
 void
-open_main_window (void)
+main_window_init (void)
 {
   /* main window */
   mdi = GNOME_MDI (gnome_mdi_new ("balsa", "Balsa"));

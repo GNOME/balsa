@@ -1,5 +1,7 @@
-2003-03-02 08:17  PeterB
+2003-03-02 18:02  PeterB
 
+	* src/: balsa-message.c, pref-manager.c: Separate wrapping from
+	recognizing `format=flowed' in incoming messages.
 	* doc/C/balsa.xml: Add documentation for Mailbox => Edit/Apply
 	Filters, Mailbox => Remove Duplicates.
 	* src/sendmsg-window.c: Make address book dialog non-modal.

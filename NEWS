@@ -1,3 +1,14 @@
+* Balsa-1.0.pre1 test release. Release date 2000-09-27.
+
+This is the first official pre-release. The list of changes since
+0.9.5 includes mostly bug fixes and interface changes.
+
+- new context-sensitive main window menu.
+- gnome-print-0.22 compatibility.
+- memory leaks.
+- spell check improvements and compose message language selection.
+- improved line wrapping.
+
 * Balsa-0.9.5 development release. Release date 2000-09-18.
 
 We are in a feature freeze state. The features implemented since 0.9.4

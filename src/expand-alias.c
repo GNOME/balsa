@@ -923,7 +923,12 @@ input_data_free (inputData *data)
     g_list_free (data->list);
     g_free (data->show);
     g_free (data->tabs);
-    g_free (data->typo);
+    /* FIXME: pawsa disabled since the memory handling is screwed up.
+       This g_free contreadicts the comment above.
+       use MALLOC_CHECK_ 1 for debugging.
+       I know leaving problem for others is not what the real men do...
+    g_free (data->typo); 
+    */
     g_free (data);
 }
 

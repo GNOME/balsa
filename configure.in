@@ -12,9 +12,9 @@ dnl   BALSA_SHORT_VERSION, which doesn't have the release appended. For RPM, whi
 dnl                        keeps the release as a separate field
 dnl ######################################################################################
 
-BALSA_MAJOR=0
-BALSA_REVISION=9
-BALSA_PATCHLEVEL=5
+BALSA_MAJOR=1
+BALSA_REVISION=0
+BALSA_PATCHLEVEL=pre1
 BALSA_RELEASE=1
 use_release=no
 

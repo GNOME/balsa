@@ -1,3 +1,7 @@
+2004-09-28 13:58  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	* src/balsa-message.c: fix one line dropped in commit.
+
 2004-09-28 10:54  PeterB
 
 	* libbalsa/mailbox_mbox.c: use g_mime_object_get_header to verify

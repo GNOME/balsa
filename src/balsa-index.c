@@ -838,6 +838,76 @@ static LibBalsaCondition cond_undeleted =
     }
 };
 
+/* Callback for the mailbox's "row-inserted" signal; queue an idle
+ * handler to expand the thread. */
+struct bndx_mailbox_row_inserted_info {
+    LibBalsaMailbox *mailbox;
+    guint msgno;
+    BalsaIndex *index;
+};
+
+static gboolean
+bndx_mailbox_row_inserted_idle(struct bndx_mailbox_row_inserted_info *info)
+{
+    GtkTreePath *path;
+    gdk_threads_enter();
+    if (libbalsa_mailbox_msgno_find(info->mailbox, info->msgno,
+                                    &path, NULL)) {
+        bndx_expand_to_row(info->index, path);
+        gtk_tree_path_free(path);
+    }
+    g_object_unref(info->mailbox);
+    g_object_unref(info->index);
+    g_free(info);
+    gdk_threads_leave();
+    return FALSE;
+}
+
+static void
+bndx_mailbox_row_inserted_cb(LibBalsaMailbox * mailbox, GtkTreePath * path,
+                             GtkTreeIter * iter, BalsaIndex * index)
+{
+    guint msgno;
+#ifdef BALSA_EXPAND_TO_NEW_UNREAD_MESSAGE
+    LibBalsaMessage *message;
+
+    if (mailbox->state != LB_MAILBOX_STATE_OPEN)
+        return;
+
+    gtk_tree_model_get(GTK_TREE_MODEL(mailbox), iter,
+	               LB_MBOX_MSGNO_COL,   &msgno,
+		       LB_MBOX_MESSAGE_COL, &message,
+		       -1);
+
+    if (balsa_app.expand_tree
+        || (balsa_app.expand_to_new_unread
+            && LIBBALSA_MESSAGE_IS_UNREAD(message)))
+#else  /* BALSA_EXPAND_TO_NEW_UNREAD_MESSAGE */
+    if (!balsa_app.expand_tree || mailbox->state != LB_MAILBOX_STATE_OPEN)
+        return;
+
+    gtk_tree_model_get(GTK_TREE_MODEL(mailbox), iter,
+	               LB_MBOX_MSGNO_COL, &msgno,
+		       -1);
+
+#endif /* BALSA_EXPAND_TO_NEW_UNREAD_MESSAGE */
+    {
+	struct bndx_mailbox_row_inserted_info *info =
+	    g_new(struct bndx_mailbox_row_inserted_info, 1);
+	info->mailbox = mailbox;
+	g_object_ref(mailbox);
+	info->index = index;
+	g_object_ref(index);
+	info->msgno = msgno;
+	g_idle_add_full(G_PRIORITY_LOW, /* to run after threading */
+		        (GSourceFunc) bndx_mailbox_row_inserted_idle,
+			info, NULL);
+    }
+#ifdef BALSA_EXPAND_TO_NEW_UNREAD_MESSAGE
+    g_object_unref(message);
+#endif /* BALSA_EXPAND_TO_NEW_UNREAD_MESSAGE */
+}
+
 /* balsa_index_load_mailbox_node:
    open mailbox_node, the opening is done in thread to keep UI alive.
    NOTES:
@@ -909,6 +979,8 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     g_signal_connect_swapped(G_OBJECT(mailbox), "changed",
 			     G_CALLBACK(bndx_mailbox_changed_cb),
 			     (gpointer) index);
+    g_signal_connect(mailbox, "row-inserted",
+	    	     G_CALLBACK(bndx_mailbox_row_inserted_cb), index);
 
     balsa_window_enable_mailbox_menus(balsa_app.main_window, index);
     /* libbalsa functions must be called with gdk unlocked

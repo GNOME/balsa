@@ -1,3 +1,9 @@
+2000-10-02  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/address-book-config.c: grab the focus to the name field.
+	* src/sendmsg-window.c: many people set language to C (for yet
+	unknown to me reason) when they mean English. Guess their intentions.
+	
 2000-10-02  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* configure.in: Set gnomedatadir and gnomeconfdir to ${datadir}

@@ -475,12 +475,16 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
 /* find_locale_index_by_locale:
    finds the longest fit so the one who has en_GB will gent en_US if en_GB
    is not defined.
+   NOTE: test for the 'C' locale would not be necessary if people set LANG
+   instead of LC_ALL. But it is simpler to set it here instead of answering
+   the questions (OTOH, I am afraid that people will start claiming "but
+   balsa can recognize my language!" on failures in other software.
 */
 static gint find_locale_index_by_locale(const gchar* locale)
 {
   int i, j, maxfit=-1, maxpos;
 
-  if(!locale) return LOC_ENGLISH_POS; 
+  if(!locale || strcmp(locale,"C")==0) return LOC_ENGLISH_POS; 
   for(i=0; i < ELEMENTS(locales); i++) {
     for(j=0; locale[j] && locales[i].locale[j] == locale[j]; j++)
       ;

@@ -158,6 +158,7 @@ balsa_address_book_config_new (LibBalsaAddressBook *address_book)
 	gtk_container_add (GTK_CONTAINER (bbox), button);
 
 	gtk_widget_show_all(abc->notebook);
+	if(address_book) gtk_widget_grab_focus(abc->name_entry);
 
 	gnome_dialog_run (GNOME_DIALOG(abc->window));
 
@@ -446,6 +447,7 @@ next_button_cb(GtkWidget *button, AddressBookConfig *abc)
 	
 	num = gtk_notebook_page_num ( GTK_NOTEBOOK(abc->notebook), page);
 	gtk_notebook_set_page ( GTK_NOTEBOOK(abc->notebook), num );
+	gtk_widget_grab_focus(abc->name_entry);
 }
 
 static void

@@ -1,3 +1,8 @@
+2000-04-05 Pawel Salek <pawsa@theochem.kth.se>
+
+	* libmutt/socket.c,src/mblist-window.c: trying to open
+	IMAP folder on non-existing server should not crash balsa any more.
+
 2000-04-04 Pawel Salek <pawsa@theochem.kth.se>
 
 	*  libmutt/imap.c,src/balsa-index-page.c:

@@ -508,7 +508,10 @@ mbox_by_name (gconstpointer a, gconstpointer b)
   MailboxNode *mbnode = (MailboxNode *) a;
   const gchar *name = (const gchar *) b;
   g_assert(mbnode != NULL);
-  g_assert(mbnode->mailbox != NULL);
+
+  /* two lines will execute if the mbox is not found */
+  if(mbnode->mailbox == NULL) 
+    return FALSE;
 
   return strcmp(mbnode->mailbox->name, name) != 0;
 }
@@ -526,7 +529,10 @@ mblist_find_mbox_by_name (const gchar *name) {
      MailboxNode * mbnode = 
       gtk_ctree_node_get_row_data(GTK_CTREE (mblw->ctree),node);
      return mbnode->mailbox;
-  } else return NULL;
+  } else {
+    fprintf(stderr,"Mailbox %s not found\n", name);
+    return NULL;
+  }
 }
 
 

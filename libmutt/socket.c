@@ -116,14 +116,14 @@ int mutt_socket_open_connection (CONNECTION *conn)
   sin.sin_family = AF_INET;
   if ((he = gethostbyname (conn->server)) == NULL)
   {
-    mutt_perror (conn->server);
+    /* mutt_perror (conn->server); */
     return (-1);
   }
   memcpy (&sin.sin_addr, he->h_addr_list[0], he->h_length);
 
   if ((conn->fd = socket (AF_INET, SOCK_STREAM, IPPROTO_IP)) < 0)
   {
-    mutt_perror ("socket");
+    /* mutt_perror ("socket"); */
     return (-1);
   }
 
@@ -131,7 +131,7 @@ int mutt_socket_open_connection (CONNECTION *conn)
 
   if (connect (conn->fd, (struct sockaddr *) &sin, sizeof (sin)) < 0)
   {
-    mutt_perror ("connect");
+    /* mutt_perror ("connect"); */
     close (conn->fd);
   }
 

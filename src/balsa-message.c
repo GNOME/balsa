@@ -2256,7 +2256,10 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         info->can_display = TRUE;
         /* size allocation may not be correct, so we'll check back later
          */
-        resize_idle_id = g_idle_add((GSourceFunc) resize_idle, item);
+	g_object_ref(item);
+	resize_idle_id = g_idle_add_full(G_PRIORITY_DEFAULT_IDLE,
+					 (GSourceFunc) resize_idle,
+					 item, g_object_unref);
     }
 
     fclose(fp);
@@ -3150,8 +3153,7 @@ resize_idle(GtkWidget * widget)
 {
     gdk_threads_enter();
     resize_idle_id = 0;
-    if (GTK_IS_WIDGET(widget))
-        gtk_widget_queue_resize(widget);
+    gtk_widget_queue_resize(widget);
     old_widget = new_widget;
     old_upper = new_upper;
     gdk_threads_leave();
@@ -3175,7 +3177,10 @@ vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
     new_upper = upper;
     if (resize_idle_id) 
         g_source_remove(resize_idle_id);
-    resize_idle_id = g_idle_add((GSourceFunc) resize_idle, widget);
+    g_object_ref(widget);
+    resize_idle_id = g_idle_add_full(G_PRIORITY_DEFAULT_IDLE,
+				     (GSourceFunc) resize_idle,
+				     widget, g_object_unref);
 }
 
 static BalsaPartInfo *add_part(BalsaMessage *bm, BalsaPartInfo *info)

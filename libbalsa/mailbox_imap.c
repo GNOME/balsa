@@ -1659,11 +1659,14 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     ImapMsgFlags imap_flags = IMAP_FLAGS_EMPTY;
     ImapResponse rc;
     GMimeStream *stream;
-    GMimeStream *outstream;
+    GMimeStream *tmpstream;
     GMimeFilter *crlffilter;
     ImapMboxHandle *handle;
-
-    g_object_ref ( G_OBJECT(message ) );
+    gint outfd;
+    gchar *outfile;
+    GMimeStream *outstream;
+    GError *error = NULL;
+    gssize len;
 
     if ( LIBBALSA_MESSAGE_IS_UNREAD(message) )
 	IMSG_FLAG_SET(imap_flags,IMSGF_SEEN);
@@ -1674,27 +1677,41 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     if ( LIBBALSA_MESSAGE_IS_REPLIED(message) )
 	IMSG_FLAG_SET(imap_flags,IMSGF_ANSWERED);
 
-    handle = libbalsa_mailbox_imap_get_handle(LIBBALSA_MAILBOX_IMAP(mailbox));
     stream = libbalsa_mailbox_get_message_stream(message->mailbox, message);
-
-    outstream = g_mime_stream_filter_new_with_stream(stream);
+    tmpstream = g_mime_stream_filter_new_with_stream(stream);
     g_mime_stream_unref(stream);
 
     crlffilter =
 	g_mime_filter_crlf_new(GMIME_FILTER_CRLF_ENCODE,
 			       GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
-    g_mime_stream_filter_add(GMIME_STREAM_FILTER(outstream), crlffilter);
+    g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
     g_object_unref(crlffilter);
 
+    outfd = g_file_open_tmp("balsa-tmp-file-XXXXXX", &outfile, &error);
+    if (outfd < 0) {
+	g_warning("Could not create temporary file: %s", error->message);
+	g_error_free(error);
+	g_mime_stream_unref(tmpstream);
+	return -1;
+    }
+
+    outstream = g_mime_stream_fs_new(outfd);
+    g_mime_stream_write_to_stream(tmpstream, outstream);
+    g_mime_stream_unref(tmpstream);
+
+    len = g_mime_stream_tell(outstream);
+    g_mime_stream_reset(outstream);
+
+    handle = libbalsa_mailbox_imap_get_handle(LIBBALSA_MAILBOX_IMAP(mailbox));
     rc = imap_mbox_append_stream(handle,
 				 LIBBALSA_MAILBOX_IMAP(mailbox)->path,
-				 imap_flags, outstream);
-    g_mime_stream_unref(outstream);
-
+				 imap_flags, outstream, len);
     libbalsa_mailbox_imap_release_handle(LIBBALSA_MAILBOX_IMAP(mailbox));
 
-    g_object_unref ( G_OBJECT(message ) );    
-    
+    g_mime_stream_unref(outstream);
+    unlink(outfile);
+    g_free(outfile);
+
     return rc == IMR_OK ? 1 : -1;
 }
 

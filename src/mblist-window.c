@@ -149,16 +149,25 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
 void
 mblist_open_mailbox (Mailbox * mailbox)
 {
-  int i;
+  GtkWidget *page;
+  int i, c;
 
   if (!mblw)
     return;
 
   if( mailbox->open_ref ) {
+    c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
+    page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c);
+    page = gtk_object_get_data(GTK_OBJECT(page),"indexpage");
+    g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use);
+
     i = balsa_find_notebook_page_num( mailbox );
     if( i != -1 )
       {
 	gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook),i);
+	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),i);
+	page = gtk_object_get_data(GTK_OBJECT(page),"indexpage");
+	g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use);
 	return;
       }
   }
@@ -231,7 +240,7 @@ mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_
       node = gtk_ctree_node_nth( ctree, row );
       
       
-      if (event->button == 1 && event->type == GDK_2BUTTON_PRESS)
+      if (event->button == 1) // && event->type == GDK_2BUTTON_PRESS)
 	
 	{
 	  /* double click with button left */

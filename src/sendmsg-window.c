@@ -1109,7 +1109,7 @@ send_body_wrap (Body *body, GtkText *text)
       if( line_len < minbreak && *last_break != '\n' )
 	{
 	  last_break = (char *)(current_line+wraplength);
-	  line_len = wraplength;
+	  line_len = wraplength+1;
 	}
       strncpy(buffer, current_line, line_len);
       if(buffer[line_len-1]=='\n')

@@ -127,6 +127,8 @@ static void undelete_message_cb (GtkWidget * widget, gpointer data);
 
 static void filter_dlg_cb (GtkWidget * widget, gpointer data);
 
+gboolean balsa_close_mailbox_on_timer(GtkWidget *widget, gpointer *data);
+
 static void mailbox_close_child (GtkWidget * widget, gpointer data);
 static void mailbox_commit_changes (GtkWidget * widget, gpointer data);
 static void mailbox_empty_trash(GtkWidget * widget, gpointer data);
@@ -246,11 +248,6 @@ static GnomeUIInfo mailbox_menu[] =
     NULL, GNOME_APP_PIXMAP_NONE, GNOME_STOCK_MENU_PROP, 'C', 0, NULL
   },
 #endif
-  GNOMEUIINFO_ITEM_STOCK (N_ ("_Open"), N_("Open the selected mailbox"),
-			  mblist_menu_open_cb, GNOME_STOCK_MENU_OPEN),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("_Close"), N_("Close the selected mailbox"),
-			  mblist_menu_close_cb, GNOME_STOCK_MENU_CLOSE),
-  GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Add"), N_("Add a new mailbox"),
 			  mblist_menu_add_cb, GNOME_STOCK_PIXMAP_ADD),
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Edit"), N_("Edit the selected mailbox"),
@@ -258,15 +255,10 @@ static GnomeUIInfo mailbox_menu[] =
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Delete"), N_("Delete the selected mailbox"),
 			  mblist_menu_delete_cb, GNOME_STOCK_PIXMAP_REMOVE),
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_ITEM_STOCK (N_ ("C_lose current"), N_("Close the currently opened mailbox"),
-			  mailbox_close_child, GNOME_STOCK_MENU_CLOSE),
   GNOMEUIINFO_ITEM_STOCK (N_ ("Co_mmit current"), N_("Commit the changes in the currently opened mailbox"),
 			  mailbox_commit_changes, GNOME_STOCK_MENU_REFRESH),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("Empty _Trash"), N_("Delete Messages from the trash mailbox"), mailbox_empty_trash, GNOME_STOCK_PIXMAP_REMOVE),
-  GNOMEUIINFO_SEPARATOR,
-
-  GNOMEUIINFO_SUBTREE (N_("O_pened"), open_mailboxes),
   GNOMEUIINFO_END
 };
 static GnomeUIInfo settings_menu[] =
@@ -416,6 +408,8 @@ balsa_window_class_init (BalsaWindowClass *klass)
   klass->open_mailbox = balsa_window_real_open_mailbox;
   klass->close_mailbox = balsa_window_real_close_mailbox;
 
+  gtk_timeout_add(30000, (GtkFunction) balsa_close_mailbox_on_timer, NULL);
+
   //  widget_class->draw = gtk_window_draw;
 }
 
@@ -469,6 +463,7 @@ balsa_window_new ()
   vpaned = gtk_vpaned_new();
   hpaned = gtk_hpaned_new();
   window->notebook = gtk_notebook_new();
+  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(window->notebook), FALSE);
   gtk_notebook_set_show_border(GTK_NOTEBOOK(window->notebook), FALSE);
   gtk_signal_connect( GTK_OBJECT(window->notebook), "size_allocate", 
 		      GTK_SIGNAL_FUNC(notebook_size_alloc_cb), NULL );
@@ -589,6 +584,36 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbo
       }
 }
 
+gboolean balsa_close_mailbox_on_timer(GtkWidget *widget, gpointer *data)
+{
+  GTimeVal current_time;
+  GtkWidget *page, *index_page;
+  int i,c,time;
+
+  g_get_current_time(&current_time);
+
+  c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
+
+  for( i = 0; 
+   (page=gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),i)); i++)
+  {
+    if( i == c)
+      continue;
+    index_page = gtk_object_get_data(GTK_OBJECT(page), "indexpage");
+    time = current_time.tv_sec - BALSA_INDEX_PAGE(index_page)->last_use.tv_sec;
+    if( time > 600 ) {
+      if(balsa_app.debug)
+	fprintf( stderr, "Closing Page %d, time: %d\n", i, time);
+      gtk_notebook_remove_page( GTK_NOTEBOOK( balsa_app.notebook ), i );
+      BALSA_INDEX_PAGE(index_page)->sw = NULL;
+      gtk_object_destroy( GTK_OBJECT( index_page ) );
+      if( i < c )
+	c--;
+      i--;
+    }
+  }
+  return TRUE;
+}
 
 
 static GtkWidget *balsa_window_create_preview_pane(BalsaWindow *window)

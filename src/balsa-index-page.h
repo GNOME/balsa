@@ -40,6 +40,7 @@ struct _BalsaIndexPage
   GtkObject object;
 
   Mailbox *mailbox;
+  GTimeVal last_use;
   GtkWidget *window; /* "real" BalsaWindow parent */
   GtkWidget *sw;
   GtkWidget *index;

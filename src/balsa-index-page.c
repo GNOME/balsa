@@ -141,6 +141,8 @@ GtkObject *balsa_index_page_new(BalsaWindow *window)
 
   bip->window = GTK_WIDGET( window );
 
+  g_get_current_time(&bip->last_use);
+
   return GTK_OBJECT(bip);
 }
 

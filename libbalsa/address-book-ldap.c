@@ -39,6 +39,14 @@
 static const int LDAP_CACHE_TIMEOUT=300;	/* Seconds */
 /* don't search when prefix has length shorter than LDAP_MIN_LEN */
 static const int LDAP_MIN_LEN=2;
+/* Which parameters do we want back? */
+char* attrs[] = {
+    "cn",
+    "mail",
+    "sn",
+    "givenname",
+    NULL
+};
 /* End of FIXME */
 
 static GtkObjectClass *parent_class = NULL;
@@ -411,22 +419,38 @@ static GList *libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab
     ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
 
     if (!ab->expand_aliases || strlen(prefix)<LDAP_MIN_LEN) return NULL;
-    *new_prefix = NULL;
+    if (ldap_ab->directory == NULL)
+        libbalsa_address_book_ldap_open_connection(ldap_ab);
+
     /*
      * Attempt to search for e-mail addresses.  It returns success
      * or failure, but not all the matches.
      */
+    *new_prefix = NULL;
     filter = g_strdup_printf("(&(mail=*)(cn=%s*))", prefix);
-    /* printf("filter:%s baseDN: %s\n", filter, ldap_ab->base_dn); */
     rc = ldap_search_s(ldap_ab->directory, ldap_ab->base_dn,
-		       LDAP_SCOPE_SUBTREE, filter, NULL, 0, &result);
+	   LDAP_SCOPE_SUBTREE, filter, attrs, 0, &result);
     g_free(filter);
     if (rc != LDAP_SUCCESS) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+        switch (rc) {
+	case LDAP_SIZELIMIT_EXCEEDED:
+	case LDAP_TIMELIMIT_EXCEEDED:
+	    /*
+	     * These are administrative limits, so don't warn about them.
+	     * Particularly SIZELIMIT can be nasty on big directories.
+	     */
+	    return NULL;
+	    
+	default:
+	    /*
+	     * Until we know for sure, complain about all other errors.
+	     */
+	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("Failed to do a search: %s"
 			       "Check that the base name is valid."),
 			     ldap_err2string(rc));
-	return NULL;
+	    return NULL;
+	}
     }
 
     /*

@@ -279,6 +279,7 @@ static void lang_lithuanian_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_norwegian_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_polish_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_portugese_cb(GtkWidget *, BalsaSendmsg *);
+static void lang_romanian_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_russian_iso_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_russian_koi_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_slovak_cb(GtkWidget *, BalsaSendmsg *);
@@ -311,6 +312,7 @@ static GnomeUIInfo locale_kz_menu[] = {
     GNOMEUIINFO_ITEM_NONE(N_("Norwegian"), NULL, lang_norwegian_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Polish"), NULL, lang_polish_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Portugese"), NULL, lang_portugese_cb),
+    GNOMEUIINFO_ITEM_NONE(N_("Romanian"), NULL, lang_romanian_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Russian (ISO)"), NULL, lang_russian_iso_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Russian (KOI)"), NULL, lang_russian_koi_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Slovak"), NULL, lang_slovak_cb),
@@ -406,19 +408,21 @@ struct {
     {"pl_PL", "ISO-8859-2", N_("Polish")},
 #define LOC_PORTUGESE_POS 18
     {"pt_PT", "ISO-8859-1", N_("Portugese")},
-#define LOC_RUSSIAN_ISO_POS   19
+#define LOC_ROMANIAN_POS 19
+    {"ro_RO", "ISO-8859-2", N_("Romanian")},
+#define LOC_RUSSIAN_ISO_POS   20
     {"ru_RU", "ISO-8859-5", N_("Russian (ISO)")},
-#define LOC_RUSSIAN_KOI_POS   20
+#define LOC_RUSSIAN_KOI_POS   21
     {"ru_RU", "KOI-8-R", N_("Russian (KOI)")},
-#define LOC_SLOVAK_POS    21
+#define LOC_SLOVAK_POS    22
     {"sk_SK", "ISO-8859-2", N_("Slovak")},
-#define LOC_SPANISH_POS   22
+#define LOC_SPANISH_POS   23
     {"es_ES", "ISO-8859-1", N_("Spanish")},
-#define LOC_SWEDISH_POS   23
+#define LOC_SWEDISH_POS   24
     {"sv_SE", "ISO-8859-1", N_("Swedish")},
-#define LOC_TURKISH_POS   24
+#define LOC_TURKISH_POS   25
     {"tr_TR", "ISO-8859-9", N_("Turkish")},
-#define LOC_UKRAINIAN_POS 25
+#define LOC_UKRAINIAN_POS 26
     {"uk_UK", "KOI-8-U", N_("Ukrainian")}
 };
 
@@ -2258,6 +2262,11 @@ static void
 lang_portugese_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
 {
     set_locale(w, bsmsg, LOC_PORTUGESE_POS);
+}
+static void
+lang_romanian_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
+{
+    set_locale(w, bsmsg, LOC_ROMANIAN_POS);
 }
 static void
 lang_russian_iso_cb(GtkWidget * w, BalsaSendmsg * bsmsg)

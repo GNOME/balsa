@@ -613,6 +613,9 @@ completion_data_extract(CompletionData * data)
 static gint
 address_compare(LibBalsaAddress *a, LibBalsaAddress *b)
 {
+    g_return_val_if_fail(a != NULL, -1);
+    g_return_val_if_fail(b != NULL, 1);
+
     return g_strcasecmp(a->full_name, b->full_name);
 }
 

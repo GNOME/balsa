@@ -1,3 +1,11 @@
+2000-12-11  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/sendmsg-window.c: Add support for sending in Romanian.
+	* libbalsa/address-book-vcard.c: Fix address_compare for NULL
+	parameters.
+	* libbalsa/address-book-ldap.c: Only request the attributes we are
+	interested in. Ignore some types of non-fatal errors.
+
 2000-12-11  Marius Andreiana  <mandreiana@yahoo.com>
 
 	* po/ro.po: Updated for 1.0 (thanks to Miºu Moldovan)

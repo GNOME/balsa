@@ -1,3 +1,8 @@
+2004-01-11 12:10  PeterB
+
+	* src/balsa-message.c: Allow 2-pixel motion tolerance when
+	activating a URL.
+
 2004-01-06 15:43  PeterB
 
 	* src/balsa-message.c: Show and hide the appropriate widgets.

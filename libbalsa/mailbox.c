@@ -28,6 +28,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <time.h>
+#include <pthread.h>
 
 #include "mailbackend.h"
 
@@ -35,6 +36,7 @@
 #include "libbalsa_private.h"
 
 #include "misc.h"
+#include "threads.h"
 
 #define BUFFER_SIZE 1024
 
@@ -65,7 +67,7 @@ static void balsa_mailbox_real_close_mailbox(Mailbox *mailbox);
 /* 
  * prototypes
  */
-static void load_messages (Mailbox * mailbox, gint emit);
+/* static void load_messages (Mailbox * mailbox, gint emit); */
 static void free_messages (Mailbox * mailbox);
 
 
@@ -142,6 +144,20 @@ set_imap_username (Mailbox * mb)
 void
 check_all_imap_hosts (Mailbox * to, GList *mailboxes)
 {
+/*  Only check if lock has been set */
+  pthread_mutex_lock( &mailbox_lock);
+  if( !checking_mail )
+  {
+    pthread_mutex_unlock( &mailbox_lock);
+    return;
+  }
+  pthread_mutex_unlock( &mailbox_lock );
+
+/*  put IMAP code here */
+
+
+  return;  
+
 }
 
 
@@ -150,7 +166,18 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
 {
   GList *list;
   Mailbox *mailbox;
-  char uid[80];
+  char uid[80], msgbuf[160];
+  MailThreadMessage *threadmsg;
+
+/*  Only check if lock has been set */
+  pthread_mutex_lock( &mailbox_lock);
+  if( !checking_mail )
+  {
+    pthread_mutex_unlock( &mailbox_lock);
+    return;
+  }
+  pthread_mutex_unlock( &mailbox_lock );
+
 
   list = g_list_first (mailboxes);
 
@@ -170,6 +197,9 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
       PopPass = g_strdup (MAILBOX_POP3(mailbox)->server->passwd);
       PopUser = g_strdup (MAILBOX_POP3(mailbox)->server->user);
 
+      sprintf( msgbuf, "POP3: %s", MAILBOX_POP3(mailbox)->mailbox.name );
+      MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_SOURCE, msgbuf );
+ 
       if( MAILBOX_POP3 (mailbox)->last_popped_uid == NULL)
         uid[0] = 0;
       else
@@ -197,11 +227,17 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
       {
         g_free ( MAILBOX_POP3 (mailbox)->last_popped_uid );
         MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
-        config_mailbox_update( mailbox, MAILBOX_POP3 (mailbox)->mailbox.name );
+
+	threadmsg = malloc( sizeof( MailThreadMessage ) );
+	threadmsg->message_type = MSGMAILTHREAD_UPDATECONFIG;
+	threadmsg->mailbox = mailbox;
+	/*  MAILBOX_POP3(mailbox)->mailbox.name */
+        write( mail_thread_pipes[1], (void *) &threadmsg, sizeof(void *) );
       }
     }
     list = list->next;
   }
+  return;
 }
 
 void
@@ -591,6 +627,16 @@ mailbox_check_new_messages (Mailbox * mailbox)
 {
   gint i = 0;
   gint index_hint;
+  MailThreadMessage *threadmsg;
+
+/*  Only run if lock has been set */
+  pthread_mutex_lock( &mailbox_lock);
+  if( !checking_mail )
+  {
+     pthread_mutex_unlock( &mailbox_lock);
+     return FALSE;
+  }
+  pthread_mutex_unlock( &mailbox_lock );
 
   if (!mailbox)
     return FALSE;
@@ -618,8 +664,14 @@ mailbox_check_new_messages (Mailbox * mailbox)
 	  /* TODO:the preceeding two lines should be put in load_messages 
 	     but I don't want to rely on the 'emit' flag to know if there is REALLY 
 	     new mail in the mailbox. -bertrand */
+
+          UNLOCK_MAILBOX (mailbox);
+	  MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_LOAD, mailbox->name );
+       
+/*
 	  load_messages (mailbox, 1);
 	  UNLOCK_MAILBOX (mailbox);
+*/
 	  return TRUE;
 	}
       else
@@ -735,7 +787,7 @@ mailbox_watcher_remove_by_data (Mailbox * mailbox, gpointer data)
 /*
  * private
  */
-static void
+void
 load_messages (Mailbox * mailbox, gint emit)
 {
   glong msgno;
@@ -779,14 +831,7 @@ load_messages (Mailbox * mailbox, gint emit)
       mailbox->new_messages--;
      
       if (emit)
-	{
-	  send_watcher_new_message (mailbox, message, mailbox->new_messages);
-	}
-      /* 
-       * give time to gtk so the GUI isn't blocked
-       * this is kinda a hack right now
-       */
-      update_gui_func();
+        send_watcher_new_message (mailbox, message, mailbox->new_messages);
     }
 }
 

@@ -26,9 +26,11 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <time.h>
+#include <pthread.h>
 
 #include "mailbackend.h"
 
+#include "threads.h"
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 

@@ -58,9 +58,3 @@ mutt_clear_error (void)
 {
 }
 
-void
-libmutt_set_gui_update_hook (int count, int total)
-{
-  while (gtk_events_pending ())
-    gtk_main_iteration ();
-}

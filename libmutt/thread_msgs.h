@@ -1,21 +1,13 @@
-#ifndef __THREADS_H__
-#define __THREADS_H__
+#ifndef __THREAD_MSGS_H__
+#define __THREAD_MSGS_H__
 
-/*
- * thread globals
- */
-
-extern pthread_mutex_t        mailbox_lock;
-extern int                    checking_mail;
-extern int                    mail_thread_pipes[2];
-extern GIOChannel             *mail_thread_msg_send;
-extern GIOChannel             *mail_thread_msg_receive;
+extern int    mail_thread_pipes[2];
 
 typedef struct
 {
   int message_type;
   char message_string[160];
-  int *mailbox; /*  Mailbox *  */
+  int *mailbox; /* Mailbox *   */
 } MailThreadMessage;
   
 #define  MSGMAILTHREAD( message, type, string) \
@@ -30,4 +22,4 @@ typedef struct
 #define	 MSGMAILTHREAD_ERROR            0x0004
 #define  MSGMAILTHREAD_LOAD             0x0005
 
-#endif /* __THREADS_H__ */
+#endif /* __THREAD_MSGS_H__ */

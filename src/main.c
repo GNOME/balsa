@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <pthread.h>
 
 
 #include "balsa-app.h"
@@ -37,13 +38,23 @@
 #include "save-restore.h"
 
 #include "main.h"
+#include "threads.h"
 
 #include "balsa-impl.c"
+
+/* Globals for Thread creation, messaging, pipe I/O */
+pthread_t			get_mail_thread;
+pthread_mutex_t			mailbox_lock;
+int				checking_mail;
+int				mail_thread_pipes[2];
+GIOChannel 		*mail_thread_msg_send;
+GIOChannel 		*mail_thread_msg_receive;
 
 
 static void balsa_init (int argc, char **argv);
 static void config_init (void);
 static void mailboxes_init (void);
+static void threads_init( gboolean init );
 
 void Exception (CORBA_Environment *);
 
@@ -152,6 +163,34 @@ mailboxes_init (void)
     }
 }
 
+void
+threads_init( gboolean init )
+{
+  if( init )
+  {
+    g_thread_init( NULL );
+    pthread_mutex_init( &mailbox_lock, NULL );
+    checking_mail = 0;
+	if( pipe( mail_thread_pipes) < 0 )
+	{
+	   g_log ("BALSA Init", G_LOG_LEVEL_DEBUG, "Error opening pipes.\n" );
+	}
+	mail_thread_msg_send = g_io_channel_unix_new ( mail_thread_pipes[1] );
+	mail_thread_msg_receive = g_io_channel_unix_new ( mail_thread_pipes[0] );
+	g_io_add_watch ( mail_thread_msg_receive, G_IO_IN,
+					mail_progress_notify_cb,
+					NULL );
+					
+  }
+  else
+  {
+    pthread_mutex_destroy( &mailbox_lock );
+  }
+}
+
+
+
+
 int
 main (int argc, char *argv[])
 {
@@ -172,6 +211,10 @@ main (int argc, char *argv[])
   config_mailboxes_init ();
   mailboxes_init ();
 
+  /* initiate thread mutexs, variables */
+  threads_init( TRUE );
+  
+
   /* create all the pretty icons that balsa uses that
    * arn't part of gnome-libs */
   balsa_icons_init ();
@@ -182,6 +225,9 @@ main (int argc, char *argv[])
   gtk_widget_show(window);
 
   gtk_main ();
+
+  threads_init( FALSE );
+
   return 0;
 }
 

@@ -22,8 +22,10 @@
 #include <gnome.h>
 #include <gdk/gdkx.h>
 #include <X11/Xutil.h>
+#include <pthread.h>
 
 #include "libbalsa.h"
+#include "libbalsa_private.h"
 
 #include "balsa-app.h"
 #include "balsa-icons.h"
@@ -34,14 +36,15 @@
 #include "balsa-index-page.h"
 #include "misc.h"
 #include "main.h"
-#include "main-window.h"
 #include "message-window.h"
 #include "pref-manager.h"
 #include "sendmsg-window.h"
 #include "mailbox-conf.h"
 #include "mblist-window.h"
+#include "main-window.h"
 #include "print.h"
 #include "address-book.h"
+#include "threads.h"
 
 #define MAILBOX_DATA "mailbox_data"
 
@@ -54,15 +57,24 @@ enum {
   LAST_SIGNAL
 };
 
+/* Define thread-related globals, including dialogs */
+  GtkWidget *progress_dialog;
+  GtkWidget *progress_dialog_source;
+  GtkWidget *progress_dialog_message;
+
+
+extern void load_messages (Mailbox * mailbox, gint emit);
+
+
 static void balsa_window_class_init(BalsaWindowClass *klass);
 static void balsa_window_init(BalsaWindow *window);
 static void balsa_window_real_set_cursor(BalsaWindow *window, GdkCursor *cursor);
 static void balsa_window_real_open_mailbox(BalsaWindow *window, Mailbox *mailbox);
 static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbox);
 static void balsa_window_destroy(GtkObject * object);
+void check_messages_thread( Mailbox *mbox );
 
 static GtkWidget *balsa_window_create_preview_pane(BalsaWindow *window);
-
 GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
 void       balsa_window_open_mailbox( BalsaWindow *window, Mailbox *mailbox );
 void       balsa_window_close_mailbox( BalsaWindow *window, Mailbox *mailbox );
@@ -75,6 +87,7 @@ static gint about_box_visible = FALSE;
 /* FIXME unused main window widget components
 static gint progress_timeout (gpointer data);
 */
+
 
 /* dialogs */
 static void show_about_box (void);
@@ -683,25 +696,154 @@ show_about_box (void)
 static void
 check_new_messages_cb (GtkWidget * widget, gpointer data)
 {
-  GtkWidget *dialog, *w;
+
   GtkWidget *index;
+  Mailbox *mbox;
 
-  dialog = gnome_dialog_new("Checking Mail...", GNOME_STOCK_BUTTON_OK, NULL);
-  gnome_dialog_set_close(GNOME_DIALOG(dialog), TRUE);
-
-  w = gtk_label_new("Checking Mail....");
-  gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(dialog)->vbox), w, FALSE, FALSE, 0);
-
-  gtk_widget_show_all(dialog);
-  check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input);
-  check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
+/*  Only Run once -- If already checking mail, return.  */
+  pthread_mutex_lock( &mailbox_lock );
+  if( checking_mail )
+  {
+    pthread_mutex_unlock( &mailbox_lock );
+    fprintf( stderr, "Already Checking Mail!  \n");
+    return;
+  }
+  checking_mail = 1;
+  pthread_mutex_unlock( &mailbox_lock );
 
   index = balsa_window_find_current_index(BALSA_WINDOW(data));
   if (index)
-    mailbox_check_new_messages(BALSA_INDEX(index)->mailbox);
+    mbox = BALSA_INDEX(index)->mailbox;
+  else
+    mbox = NULL;
 
-  gtk_label_set_text(GTK_LABEL(w), N_("Checked."));
-  //  gtk_widget_destroy(dialog);
+  if( GTK_IS_WIDGET( progress_dialog ) )
+    gtk_widget_destroy( progress_dialog);
+
+  progress_dialog = gnome_dialog_new("Checking Mail...", "Hide", NULL);
+
+  gnome_dialog_set_close(GNOME_DIALOG(progress_dialog), TRUE);
+
+  progress_dialog_source = gtk_label_new("Checking Mail....");
+  gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox), 
+                        progress_dialog_source, 
+                            FALSE, FALSE, 0);
+
+  progress_dialog_message = gtk_label_new("");
+  gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox), 
+                        progress_dialog_message, 
+                            FALSE, FALSE, 0);
+
+  gtk_widget_show_all( progress_dialog );
+
+/* initiate threads */
+  pthread_create( &get_mail_thread,
+  		NULL,
+  		(void *) &check_messages_thread,
+		mbox );
+
+}
+
+void
+check_messages_thread( Mailbox *mbox )
+{
+/*  
+ *  It is assumed that this will always be called as a pthread,
+ *  and that the calling procedure will check for an existing lock
+ *  and set checking_mail to true before calling.
+ */
+  MailThreadMessage *threadmessage;
+
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "POP3" );
+  check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input); 
+
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "IMAP" );
+  check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
+
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "Local Mail" );
+  mailbox_check_new_messages( mbox );
+
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "Finished Checking" );
+
+  pthread_mutex_lock( &mailbox_lock );
+  checking_mail = 0;
+  pthread_mutex_unlock( &mailbox_lock );
+
+  pthread_exit( 0 );
+
+}
+
+gboolean
+mail_progress_notify_cb( )
+{
+    MailThreadMessage *threadmessage;
+    MailThreadMessage **currentpos;
+    char *msgbuffer;
+    uint count;
+    char test[160];
+
+    msgbuffer = malloc( 2049 );
+
+    g_io_channel_read( mail_thread_msg_receive, msgbuffer, 
+          2048, &count );
+
+    if( count < sizeof( void *) )
+      {
+	free( msgbuffer );
+	return TRUE;
+      }
+
+    currentpos = msgbuffer;
+
+    while( count ) 
+      {
+	threadmessage = *currentpos;
+
+	fprintf( stderr, "Message: %lu, %d, %s\n", (unsigned long) threadmessage, threadmessage->message_type, threadmessage->message_string );
+	switch( threadmessage->message_type )  
+	  {
+	  case MSGMAILTHREAD_SOURCE:
+	    if( progress_dialog && GTK_IS_WIDGET( progress_dialog ) )
+	      {
+		gtk_label_set_text( GTK_LABEL(progress_dialog_source), 
+				  threadmessage->message_string );
+		gtk_label_set_text( GTK_LABEL(progress_dialog_message), "" );
+	        gtk_widget_show_all( progress_dialog );
+	      }
+	    break;
+	  case MSGMAILTHREAD_MSGINFO:
+	    if( progress_dialog && GTK_IS_WIDGET( progress_dialog ) )
+	      {
+		gtk_label_set_text( GTK_LABEL(progress_dialog_message), 
+				  threadmessage->message_string );
+		gtk_widget_show_all( progress_dialog );
+	      }
+	    break;
+	  case MSGMAILTHREAD_UPDATECONFIG:
+	    config_mailbox_update( threadmessage->mailbox, 
+		      MAILBOX_POP3(threadmessage->mailbox)->mailbox.name ); 
+	    fprintf( stderr, " Update Config: %s\n", 
+		     MAILBOX_POP3(threadmessage->mailbox)->mailbox.name );
+	    break;
+	  case MSGMAILTHREAD_LOAD:
+	    fprintf( stderr, " Load Mail: %s \n", 
+		     threadmessage->message_string );
+	    LOCK_MAILBOX (balsa_app.inbox);
+	    load_messages (balsa_app.inbox, 1);
+	    UNLOCK_MAILBOX (balsa_app.inbox);
+	    break;
+	  default:
+	    fprintf ( stderr, " Unknown: %s \n", 
+		      threadmessage->message_string );
+	    
+	  }
+	free( threadmessage );
+	currentpos++;
+	count -= sizeof(void *);
+      }
+    free( msgbuffer );
+	
+    return TRUE;
 }
 
 

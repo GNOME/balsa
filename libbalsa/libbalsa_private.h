@@ -2,29 +2,49 @@
 
 #define LOCK_MAILBOX(mailbox)\
 do {\
-  if (mailbox->lock)\
+  pthread_mutex_lock( &mailbox_lock );\
+    if ( !mailbox->lock )\
     {\
-      g_print (_("*** ERROR: Mailbox Lock Exists: %s ***\n"), __PRETTY_FUNCTION__);\
-      return;\
+	  fprintf( stderr, "Locking mailbox %s\n", mailbox->name );\
+      mailbox->lock = TRUE;\
+      pthread_mutex_unlock( &mailbox_lock );\
+      break;\
     }\
   else\
-    mailbox->lock = TRUE;\
-} while (0)
-
-
+    {\
+      fprintf( stderr, "... Mailbox lock collision ..." );\
+      pthread_mutex_unlock( &mailbox_lock );\
+      usleep( 250 );\
+    }\
+  } while ( 1 )
+  
 #define LOCK_MAILBOX_RETURN_VAL(mailbox, val)\
 do {\
-  if (mailbox->lock)\
+  pthread_mutex_lock( &mailbox_lock );\
+    if ( !mailbox->lock )\
     {\
-      g_print (_("*** ERROR: Mailbox Lock Exists: %s ***\n"), __PRETTY_FUNCTION__);\
-      return (val);\
+	  fprintf( stderr, "Locking mailbox \n" );\
+      mailbox->lock = TRUE;\
+      pthread_mutex_unlock( &mailbox_lock );\
+      break;\
     }\
   else\
-    mailbox->lock = TRUE;\
-} while (0)
+    {\
+      fprintf( stderr, "Mailbox lock collision \n" );\
+      pthread_mutex_unlock( &mailbox_lock );\
+      usleep( 250 );\
+    }\
+  } while ( 1 )
 
-#define UNLOCK_MAILBOX(mailbox)          mailbox->lock = FALSE;
-
+#define UNLOCK_MAILBOX(mailbox)\
+do {\
+  fprintf(stderr, "Unlocking mailbox \n" );\
+  pthread_mutex_lock( &mailbox_lock );\
+  mailbox->lock = FALSE;\
+  pthread_mutex_unlock( &mailbox_lock );\
+}  while( 0 )
+  
+  
 
 #define CLIENT_CONTEXT(mailbox)          (((MailboxPrivate *)((mailbox)->private))->context)
 #define CLIENT_CONTEXT_OPEN(mailbox)     (CLIENT_CONTEXT (mailbox) != NULL)

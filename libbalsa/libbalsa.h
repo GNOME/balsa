@@ -31,4 +31,6 @@ typedef struct _Server Server;
 #include "address.h"
 #include "body.h"
 
+void load_messages (Mailbox * mailbox, gint emit);
+
 #endif /* __LIBBALSA_H__ */

@@ -23,6 +23,7 @@
 #include "mutt.h"
 #include "mailbox.h"
 #include "mx.h"
+#include "thread_msgs.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -83,7 +84,9 @@ void mutt_fetchPopMail (void)
   char buffer[2048];
   char msgbuf[SHORT_STRING];
   char uid[80], last_uid[80];
-  int s, i, msgs, bytes, tmp, err = 0;
+  char threadbuf[160];
+  MailThreadMessage *threadmsg;
+  int s, i, msgs, bytes, tmp, total, err = 0;
   int first_msg;
   CONTEXT ctx;
   MESSAGE *msg = NULL;
@@ -201,7 +204,6 @@ void mutt_fetchPopMail (void)
  *  If Messages are left on the server, be sure that we don't retrieve
  *  them a second time.  Do this by checking Unique IDs backward from the
  *  last message, until a previously downloaded message is found.
- *    -- David (dsp@rci.rutgers.edu)
  */
  
  if ( !option (OPTPOPDELETE) )
@@ -218,7 +220,8 @@ void mutt_fetchPopMail (void)
   	{
   		mutt_remove_trailing_ws( buffer);
   		mutt_error (buffer);
-  		goto finish; // I'm following the convention of libmutt, not my coding style
+  		goto finish; 
+          /* I'm following the convention of libmutt, not my coding style */
   	}
   	sscanf( buffer, "+OK %d %s", &tmp, uid );
 
@@ -226,13 +229,13 @@ void mutt_fetchPopMail (void)
 	{
 	   strcpy( last_uid, uid ); // save uid of the last message for exit
 	   if( PopUID[0] == 0 )
-	   	  break;  // no previous UID set
+	     break;  /* no previous UID set */
 	 }
 
     if( *PopUID && strcmp( uid, PopUID ) == 0 )  
 	{
 	  /* 
-	   * this message seen, so start w/ next in queue 			*
+	   * this message seen, so start w/ next in queue           *
 	   * This will be larger than 'msgs' if no new messages     *
 	   * forcing the for loop below to skip retrieving messages *
 	   */
@@ -244,14 +247,18 @@ void mutt_fetchPopMail (void)
    }
   } 
     	 
-  snprintf (msgbuf, sizeof (msgbuf),
-	    "Reading %d new message%s (%d bytes)...", msgs - first_msg, msgs > 1 ? "s" : "", bytes);
-  mutt_message (msgbuf);
 
+  total = msgs - first_msg + 1; /* will be used for display later */
+  
   for (i = first_msg ; i <= msgs ; i++)
   {
     snprintf (buffer, sizeof(buffer), "retr %d\r\n", i);
     write (s, buffer, strlen (buffer));
+
+    sprintf( threadbuf, "Retrieving Message %d of %d", 
+	     i - first_msg + 1, total );
+    MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_MSGINFO, threadbuf );
+
 
     if (getLine (s, buffer, sizeof (buffer)) == -1)
     {
@@ -370,3 +377,13 @@ fail:
   mutt_error ("Server closed connection!");
   close (s);
 }
+
+
+
+
+
+
+
+
+
+

@@ -1,3 +1,8 @@
+2000-06-08  Pawel Salek < pawsa@theochem.kth.se>
+
+	* libmutt/mbox.c(mbox_sync_mailbox): first approach to fix the
+	silly mbox sync problem.
+	
 2000-06-05  Matthew Guenther <mguenthe@attcanada.ca>
 
 	Contributed by Alexey Kakunin <small@arcadia.spb.ru>:

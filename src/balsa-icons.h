@@ -98,6 +98,7 @@
 #endif
 
 void register_balsa_pixmaps(void);
+void register_balsa_pixbufs(GtkWidget * widget);
 void balsa_icon_create(const gchar ** data, GdkPixmap ** pmap,
                        GdkBitmap ** bmap);
 #endif

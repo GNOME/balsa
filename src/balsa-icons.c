@@ -25,6 +25,8 @@
 #include "config.h"
 
 #include "balsa-icons.h"
+#include "libbalsa.h"
+#include "mailbox.h"
 
 #include "pixmaps/balsa_attachment.xpm"
 #include "pixmaps/balsa_compose.xpm"
@@ -219,3 +221,33 @@ register_balsa_pixmaps(void)
                               factory);
 }
 
+void
+register_balsa_pixbufs(GtkWidget * widget)
+{
+    static struct {
+	void (*set_icon) (GdkPixbuf *);
+	const gchar *icon;
+    } icons[] = {
+	{
+	libbalsa_mailbox_set_unread_icon, BALSA_PIXMAP_INFO_NEW}, {
+	libbalsa_mailbox_set_trash_icon, BALSA_PIXMAP_TRASH}, {
+	libbalsa_mailbox_set_flagged_icon, BALSA_PIXMAP_INFO_FLAGGED}, {
+	libbalsa_mailbox_set_replied_icon, BALSA_PIXMAP_INFO_REPLIED}, {
+	libbalsa_mailbox_set_attach_icon, BALSA_PIXMAP_INFO_ATTACHMENT},
+#ifdef HAVE_GPGME
+	{
+	libbalsa_mailbox_set_good_icon, BALSA_PIXMAP_INFO_SIGN_GOOD}, {
+	libbalsa_mailbox_set_notrust_icon, BALSA_PIXMAP_INFO_SIGN_NOTRUST}, {
+	libbalsa_mailbox_set_bad_icon, BALSA_PIXMAP_INFO_SIGN_BAD}, {
+	libbalsa_mailbox_set_sign_icon, BALSA_PIXMAP_INFO_SIGN}, {
+	libbalsa_mailbox_set_encr_icon, BALSA_PIXMAP_INFO_ENCR},
+#endif
+    };
+    guint i;
+
+    for (i = 0; i < ELEMENTS(icons); i++)
+	icons[i].set_icon(gtk_widget_render_icon(widget,
+						 icons[i].icon,
+						 GTK_ICON_SIZE_MENU,
+						 NULL));
+}

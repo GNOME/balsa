@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8.0\n"
-"POT-Creation-Date: 2000-05-07 04:58+0200\n"
+"POT-Creation-Date: 2000-05-13 04:18+0200\n"
 "PO-Revision-Date: 1999-12-21 00:21+0100\n"
 "Last-Translator: Softcatala <linux@softcatala.org>\n"
 "Language-Team: \n"
@@ -104,8 +104,8 @@ msgstr "Això es tot!"
 msgid "Please enter information about yourself."
 msgstr "Siusplau entreu la vostre informació."
 
-#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:187
-#: src/address-book.c:422
+#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:205
+#: src/address-book.c:451
 msgid "Name:"
 msgstr "Nom:"
 
@@ -180,15 +180,15 @@ msgstr "El fitxer amb el nom del camí \"%s\" no és un directori."
 msgid "Configure Balsa"
 msgstr "Configura Balsa"
 
-#: src/address-book.c:175
+#: src/address-book.c:193
 msgid "Add New Address"
 msgstr "Afegeix l'adreça nova"
 
-#: src/address-book.c:194
+#: src/address-book.c:212
 msgid "E-Mail Address:"
 msgstr "Adreça de correu electrònica:"
 
-#: src/address-book.c:273
+#: src/address-book.c:291
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -197,39 +197,39 @@ msgstr ""
 "No es pot obrir per lectura ~/.gnome/GnomeCard.gcrd \n"
 " - %s\n"
 
-#: src/address-book.c:276 src/sendmsg-window.c:393
+#: src/address-book.c:294 src/sendmsg-window.c:393
 msgid "OK"
 msgstr "D'acord"
 
-#: src/address-book.c:295
+#: src/address-book.c:313
 msgid "No-Id"
 msgstr ""
 
-#: src/address-book.c:303
+#: src/address-book.c:321
 msgid "No-Name"
 msgstr "Sense nom"
 
-#: src/address-book.c:392 src/filter-edit-dialog.c:137
+#: src/address-book.c:416 src/filter-edit-dialog.c:135
 msgid "Name"
 msgstr "Nom"
 
-#: src/address-book.c:392
+#: src/address-book.c:416
 msgid "E-Mail Address"
 msgstr "Adreça de correu electrònica"
 
-#: src/address-book.c:394 src/address-book.c:432 src/main-window.c:173
+#: src/address-book.c:423 src/address-book.c:461 src/main-window.c:173
 msgid "Address Book"
 msgstr "Llibreta d'adreces"
 
-#: src/address-book.c:464
+#: src/address-book.c:493
 msgid "Send-To"
 msgstr "Envia-a"
 
-#: src/address-book.c:478
+#: src/address-book.c:507
 msgid "Run GnomeCard"
 msgstr "Executa GnomeCard"
 
-#: src/address-book.c:484
+#: src/address-book.c:513
 msgid "Re-Import"
 msgstr "Torna a importar"
 
@@ -278,7 +278,7 @@ msgid ""
 "Please check the mailbox settings."
 msgstr ""
 
-#: src/balsa-index-page.c:586 src/filter-edit-dialog.c:224
+#: src/balsa-index-page.c:586 src/filter-edit-dialog.c:222
 msgid "New"
 msgstr "Nou"
 
@@ -294,7 +294,7 @@ msgstr "Respon a tots"
 msgid "Forward"
 msgstr "Endavant"
 
-#: src/balsa-index-page.c:618 src/filter-edit-dialog.c:230
+#: src/balsa-index-page.c:618 src/filter-edit-dialog.c:228
 #: src/main-window.c:366 src/pref-manager.c:885
 msgid "Delete"
 msgstr "Suprimeix"
@@ -311,7 +311,7 @@ msgstr "Transfereix"
 msgid "From"
 msgstr "De"
 
-#: src/balsa-index.c:253 src/filter-edit-dialog.c:351
+#: src/balsa-index.c:253 src/filter-edit-dialog.c:349
 msgid "Subject"
 msgstr "Assumpte"
 
@@ -340,68 +340,68 @@ msgstr ""
 msgid "Save MIME Part"
 msgstr "Desa la part MIME"
 
-#: src/balsa-message.c:166 src/balsa-message.c:225
+#: src/balsa-message.c:166 src/balsa-message.c:226
 msgid "Save"
 msgstr "Desa"
 
-#: src/balsa-message.c:166 src/balsa-message.c:225 src/mailbox-conf.c:667
+#: src/balsa-message.c:166 src/balsa-message.c:226 src/mailbox-conf.c:667
 #: src/sendmsg-window.c:129 src/sendmsg-window.c:419 src/sendmsg-window.c:1085
 #: src/sendmsg-window.c:1391 src/sendmsg-window.c:1414
 msgid "Cancel"
 msgstr "Cancel·la"
 
-#: src/balsa-message.c:168 src/balsa-message.c:227
+#: src/balsa-message.c:168 src/balsa-message.c:228
 msgid "Please choose a filename to save this part of the message as:"
 msgstr ""
 "Siusplau escolliu un nom pel fitxer on guardar aquesta part del missatge com:"
 
-#: src/balsa-message.c:224 src/balsa-message.c:229
+#: src/balsa-message.c:225 src/balsa-message.c:230
 msgid "Save Text"
 msgstr "Desa el Text"
 
-#: src/balsa-message.c:300 src/balsa-message.c:315
+#: src/balsa-message.c:301 src/balsa-message.c:316
 #, c-format
 msgid " Open of %s failed:%s "
 msgstr " No s'ha pogut obrir %s:%s "
 
-#: src/balsa-message.c:301 src/balsa-message.c:316
+#: src/balsa-message.c:302 src/balsa-message.c:317
 msgid "Ok"
 msgstr "D'acord"
 
-#: src/balsa-message.c:642
+#: src/balsa-message.c:643
 msgid "Date:"
 msgstr "Data:"
 
 #. From:
-#: src/balsa-message.c:646 src/filter-edit-dialog.c:339
+#: src/balsa-message.c:647 src/filter-edit-dialog.c:337
 #: src/sendmsg-window.c:590
 msgid "From:"
 msgstr "De:"
 
 #. To:
-#: src/balsa-message.c:650 src/filter-edit-dialog.c:327
+#: src/balsa-message.c:651 src/filter-edit-dialog.c:325
 #: src/sendmsg-window.c:592
 msgid "To:"
 msgstr "A:"
 
-#: src/balsa-message.c:651
+#: src/balsa-message.c:652
 msgid "Cc:"
 msgstr "Cc"
 
-#: src/balsa-message.c:652
+#: src/balsa-message.c:653
 msgid "Bcc:"
 msgstr "Bcc"
 
-#: src/balsa-message.c:655
+#: src/balsa-message.c:656
 msgid "Fcc:"
 msgstr "Fcc"
 
 #. Subject:
-#: src/balsa-message.c:656 src/sendmsg-window.c:598
+#: src/balsa-message.c:657 src/sendmsg-window.c:598
 msgid "Subject:"
 msgstr "Assumpte:"
 
-#: src/balsa-message.c:765
+#: src/balsa-message.c:766
 msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
@@ -409,137 +409,203 @@ msgstr ""
 "<tr><td bgcolor=\"#f0f0f0\"> Heu rebut un fitxer codificat del "
 "tipusapplication/"
 
-#: src/balsa-message.c:769
+#: src/balsa-message.c:770
 msgid "<P>The parameters of this message are:<BR>"
 msgstr "<P>Els paràmetres d'aquest missatge són:<BR>"
 
-#: src/balsa-message.c:770
+#: src/balsa-message.c:771
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
 msgstr "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
 
-#: src/balsa-message.c:1165
+#: src/balsa-message.c:1166
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "No s'ha pogut obrir %s. Errno = %d, "
 
-#: src/filter-edit-dialog.c:136
+#: src/filter-edit-dialog.c:30
+#, fuzzy
+msgid "Inbound"
+msgstr "Bústia d'entrada:"
+
+#: src/filter-edit-dialog.c:31
+#, fuzzy
+msgid "Outbound"
+msgstr "Bústia de sortida:"
+
+#: src/filter-edit-dialog.c:32
+msgid "Pre-send"
+msgstr ""
+
+#: src/filter-edit-dialog.c:33
+#, fuzzy
+msgid "Demand"
+msgstr "Envia"
+
+#: src/filter-edit-dialog.c:38
+#, fuzzy
+msgid "Matches"
+msgstr "Coincidència"
+
+#: src/filter-edit-dialog.c:39
+msgid "Doesn't Match"
+msgstr ""
+
+#: src/filter-edit-dialog.c:40
+msgid "Always"
+msgstr ""
+
+#: src/filter-edit-dialog.c:45
+msgid "Simple"
+msgstr ""
+
+#: src/filter-edit-dialog.c:46
+msgid "Regular Expression"
+msgstr ""
+
+#: src/filter-edit-dialog.c:47
+#, fuzzy
+msgid "External Command"
+msgstr "Ordre d'imprimir:"
+
+#: src/filter-edit-dialog.c:52
+msgid "Copy to folder:"
+msgstr ""
+
+#: src/filter-edit-dialog.c:53
+msgid "Move to folder:"
+msgstr ""
+
+#: src/filter-edit-dialog.c:54
+msgid "Print on printer:"
+msgstr ""
+
+#: src/filter-edit-dialog.c:55
+#, fuzzy
+msgid "Run program:"
+msgstr "Executa a:"
+
+#: src/filter-edit-dialog.c:56
+msgid "Send to Trash"
+msgstr ""
+
+#: src/filter-edit-dialog.c:134
 msgid "On"
 msgstr "Obert"
 
-#: src/filter-edit-dialog.c:201
+#: src/filter-edit-dialog.c:199
 msgid "Up"
 msgstr "A dalt"
 
-#: src/filter-edit-dialog.c:207
+#: src/filter-edit-dialog.c:205
 msgid "Down"
 msgstr "Abaix"
 
-#: src/filter-edit-dialog.c:273
+#: src/filter-edit-dialog.c:271
 msgid "Match in:"
 msgstr "Coincideix a:"
 
-#: src/filter-edit-dialog.c:291
+#: src/filter-edit-dialog.c:289
 msgid "All"
 msgstr "Tot"
 
-#: src/filter-edit-dialog.c:303
+#: src/filter-edit-dialog.c:301
 msgid "Header"
 msgstr "Capçalera"
 
-#: src/filter-edit-dialog.c:315
+#: src/filter-edit-dialog.c:313
 msgid "Body"
 msgstr "Cos"
 
-#: src/filter-edit-dialog.c:364
+#: src/filter-edit-dialog.c:362
 msgid "Match string:"
 msgstr "Coincideix cadena:"
 
-#: src/filter-edit-dialog.c:416 src/mailbox-conf.c:282 src/mailbox-conf.c:1149
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:282 src/mailbox-conf.c:1149
 #: src/pref-manager.c:872
 msgid "Add"
 msgstr "Afegeix"
 
-#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:340
+#: src/filter-edit-dialog.c:425 src/sendmsg-window.c:340
 msgid "Remove"
 msgstr "Eliminar"
 
-#: src/filter-edit-dialog.c:456
+#: src/filter-edit-dialog.c:454
 msgid "Command:"
 msgstr "Ordre:"
 
 #. The name entry
-#: src/filter-edit-dialog.c:492
+#: src/filter-edit-dialog.c:490
 msgid "Filter name:"
 msgstr "Nom del filtre:"
 
 #. The "Process when:" option menu
-#: src/filter-edit-dialog.c:511
+#: src/filter-edit-dialog.c:509
 msgid "Process when:"
 msgstr "Procesa quan:"
 
 #. The "Run on:" option menu
-#: src/filter-edit-dialog.c:542
+#: src/filter-edit-dialog.c:540
 msgid "Run on:"
 msgstr "Executa a:"
 
 #. the type notebook's option menu
-#: src/filter-edit-dialog.c:572
+#: src/filter-edit-dialog.c:570
 msgid "Search type:"
 msgstr "Cerca de tipus:"
 
 #. The notification area
-#: src/filter-edit-dialog.c:628
+#: src/filter-edit-dialog.c:626
 msgid "Notification:"
 msgstr "Notificació:"
 
 #. Notification buttons
-#: src/filter-edit-dialog.c:637
+#: src/filter-edit-dialog.c:635
 msgid "Play sound:"
 msgstr "Reprodueix so:"
 
-#: src/filter-edit-dialog.c:645
+#: src/filter-edit-dialog.c:643
 msgid "Use Sound..."
 msgstr "Utilitza el so..."
 
-#: src/filter-edit-dialog.c:654
+#: src/filter-edit-dialog.c:652
 msgid "Popup text:"
 msgstr "Text desplegable:"
 
 #. The action area
-#: src/filter-edit-dialog.c:673
+#: src/filter-edit-dialog.c:671
 msgid "Action to perform:"
 msgstr "Acció a realitzar:"
 
 #. The disposition area
-#: src/filter-edit-dialog.c:694
+#: src/filter-edit-dialog.c:692
 msgid "Disposition:"
 msgstr "Disposició:"
 
-#: src/filter-edit-dialog.c:702
+#: src/filter-edit-dialog.c:700
 msgid "Place/leave in default folder"
 msgstr "Situa/deixa a la carpeta per defecte"
 
-#: src/filter-edit-dialog.c:707
+#: src/filter-edit-dialog.c:705
 msgid "Do not place/leave in default folder"
 msgstr "No situar/deixar a la carpeta per defecte"
 
-#: src/filter-edit-dialog.c:712
+#: src/filter-edit-dialog.c:710
 msgid "Stop filtering here"
 msgstr "Atura el filtratge aquí"
 
-#: src/filter-edit-dialog.c:740
+#: src/filter-edit-dialog.c:738
 msgid "Match"
 msgstr "Coincidència"
 
-#: src/filter-edit-dialog.c:743
+#: src/filter-edit-dialog.c:741
 msgid "Action"
 msgstr "Acció"
 
-#: src/filter-edit-dialog.c:757
+#: src/filter-edit-dialog.c:755
 msgid "Revert"
 msgstr "Revereix"
 
-#: src/filter-edit-dialog.c:785
+#: src/filter-edit-dialog.c:783
 msgid "Balsa Filters"
 msgstr "Filtres de Balsa"
 

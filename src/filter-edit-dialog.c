@@ -18,9 +18,7 @@
  */
 
 #include "config.h"
-
 #include <gnome.h>
-
 #include "balsa-app.h"
 #include "filter.h"
 #include "filter-edit.h"
@@ -29,33 +27,33 @@
 
 static option_list fe_run_on[] =
 {
-    { "Inbound", 1, NULL },
-    { "Outbound", 2, NULL },
-    { "Pre-send", 3, NULL },
-    { "Demand", 4, NULL }
+    { N_("Inbound"), 1, NULL },
+    { N_("Outbound"), 2, NULL },
+    { N_("Pre-send"), 3, NULL },
+    { N_("Demand"), 4, NULL }
 };
 
 static option_list fe_process_when[] =
 {
-    { "Matches", FILTER_MATCHES, NULL },
-    { "Doesn't Match", FILTER_NOMATCH, NULL },
-    { "Always", FILTER_ALWAYS, NULL }
+    { N_("Matches"), FILTER_MATCHES, NULL },
+    { N_("Doesn't Match"), FILTER_NOMATCH, NULL },
+    { N_("Always"), FILTER_ALWAYS, NULL }
 };
 
 static option_list fe_search_type[] =
 {
-    { "Simple", FILTER_SIMPLE, NULL },
-    { "Regular Expression", FILTER_REGEX, NULL },
-    { "External Command", FILTER_EXEC, NULL}
+    { N_("Simple"), FILTER_SIMPLE, NULL },
+    { N_("Regular Expression"), FILTER_REGEX, NULL },
+    { N_("External Command"), FILTER_EXEC, NULL}
 };
 
 static option_list fe_actions[] =
 {
-    { "Copy to folder:", FILTER_COPY, NULL },
-    { "Move to folder:", FILTER_MOVE, NULL },
-    { "Print on printer:", FILTER_PRINT, NULL },
-    { "Run program:", FILTER_RUN, NULL },
-    { "Send to Trash", FILTER_TRASH, NULL}
+    { N_("Copy to folder:"), FILTER_COPY, NULL },
+    { N_("Move to folder:"), FILTER_MOVE, NULL },
+    { N_("Print on printer:"), FILTER_PRINT, NULL },
+    { N_("Run program:"), FILTER_RUN, NULL },
+    { N_("Send to Trash"), FILTER_TRASH, NULL}
 };
 
 /* ******************************** */
@@ -95,7 +93,7 @@ build_option_menu (option_list options[],
 
     for (i = 0; i < num; i++)
     {
-        options[i].widget = gtk_radio_menu_item_new_with_label (group, options[i].text);
+        options[i].widget = gtk_radio_menu_item_new_with_label (group, _(options[i].text));
         gtk_object_set_data(GTK_OBJECT(options[i].widget),
                             "value",
                             GINT_TO_POINTER(options[i].value));

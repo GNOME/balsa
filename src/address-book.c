@@ -17,11 +17,12 @@
  * 02111-1307, USA.
  */
 
-
-#include <gtk/gtk.h>
+#include <config.h>
 #include <gnome.h>
+#include <gtk/gtk.h>
 #include <stdio.h>
 #include <errno.h>
+#include "balsa-app.h"
 #include "address-book.h"
 
 static GtkWidget *book_clist;
@@ -189,7 +190,7 @@ ab_add_cb(GtkWidget * widget, gpointer data)
 		*w,
 		*hbox;
 	
-	dialog = gnome_dialog_new( N_("Add New Address"), 
+	dialog = gnome_dialog_new( _("Add New Address"), 
 				   GNOME_STOCK_BUTTON_CANCEL, 
 				   GNOME_STOCK_BUTTON_OK, NULL);
         gnome_dialog_set_parent (dialog, GTK_WINDOW (balsa_app.main_window));
@@ -201,14 +202,14 @@ ab_add_cb(GtkWidget * widget, gpointer data)
 
 	hbox = gtk_hbox_new(FALSE, 5);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(N_("Name:")), FALSE, 
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Name:")), FALSE, 
 			   FALSE, 0);
 	w = gtk_entry_new();
 	gtk_box_pack_start(GTK_BOX(hbox), w, FALSE, FALSE, 0);
 
 	hbox = gtk_hbox_new(FALSE, 5);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(N_("E-Mail Address:")),
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("E-Mail Address:")),
 			   FALSE, FALSE, 0);
 	w = gtk_entry_new();
 	gtk_box_pack_start(GTK_BOX(hbox), w, FALSE, FALSE, 0);
@@ -287,7 +288,7 @@ ab_load(GtkWidget * widget, gpointer data)
    { 
       GtkWidget *box;
       char * msg  = g_strdup_printf(
-	 N_("Unable to open ~/.gnome/GnomeCard.gcrd for read.\n - %s\n"), 
+	 _("Unable to open ~/.gnome/GnomeCard.gcrd for read.\n - %s\n"), 
 	 g_unix_error_string(errno)); 
       box = gnome_message_box_new(msg,
 				  GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
@@ -309,7 +310,7 @@ ab_load(GtkWidget * widget, gpointer data)
 	 AddressData *data;
 	 if(email) {
 	    data = g_malloc( sizeof(AddressData) ); 
-	    data->id = id ? id : g_strdup(N_("No-Id"));
+	    data->id = id ? id : g_strdup(_("No-Id"));
 	    data->addy = email;
             
             if (name)
@@ -317,7 +318,7 @@ ab_load(GtkWidget * widget, gpointer data)
             else if (id) 
               data->name = g_strdup (id);
             else
-              g_strdup( N_("No-Name") );
+              g_strdup( _("No-Name") );
             
 	    listdata[0] = id;
 	    listdata[1] = email;
@@ -413,8 +414,13 @@ address_book_cb(GtkWidget * widget, gpointer data)
 		*scrolled_window; 
 
 	static gchar *titles[2] = {N_("Name"), N_("E-Mail Address")}; 
+
+#ifdef ENABLE_NLS
+	titles[0]=_(titles[0]);
+	titles[1]=_(titles[1]);
+#endif
 	
-	dialog = gnome_dialog_new(N_("Address Book"), GNOME_STOCK_BUTTON_CANCEL, GNOME_STOCK_BUTTON_OK, NULL); 
+	dialog = gnome_dialog_new(_("Address Book"), GNOME_STOCK_BUTTON_CANCEL, GNOME_STOCK_BUTTON_OK, NULL); 
 
         /* If we have something in the data, then the addressbook was opened
          * from a message window */
@@ -442,7 +448,7 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	find_entry = gtk_entry_new(); 
 	gtk_widget_show(find_entry); 
 	gtk_signal_connect(GTK_OBJECT(find_entry), "changed", GTK_SIGNAL_FUNC(ab_find), find_entry); 
-	find_label = gtk_label_new(N_("Name:")); 
+	find_label = gtk_label_new(_("Name:")); 
 	gtk_widget_show(find_label); 
 
 	composing = FALSE; 
@@ -452,7 +458,7 @@ address_book_cb(GtkWidget * widget, gpointer data)
 
 	box2 = gtk_vbox_new(FALSE, 0); 
 	gtk_box_pack_start(GTK_BOX(hbox), box2, FALSE, FALSE, 0); 
-	//gtk_box_pack_start(GTK_BOX(box2), gtk_label_new(N_("Address Book")), FALSE, FALSE, 0); 
+	//gtk_box_pack_start(GTK_BOX(box2), gtk_label_new(_("Address Book")), FALSE, FALSE, 0); 
 	gtk_box_pack_start(GTK_BOX(box2), find_label, FALSE, FALSE, 0); 
 	gtk_box_pack_start(GTK_BOX(box2), find_entry, FALSE, FALSE, 0); 
 	
@@ -484,7 +490,7 @@ address_book_cb(GtkWidget * widget, gpointer data)
 		
 		box2 = gtk_vbox_new(FALSE, 5); 
 		gtk_box_pack_start(GTK_BOX(hbox), box2, TRUE, TRUE, 0); 
-		gtk_box_pack_start(GTK_BOX(box2), gtk_label_new(N_("Send-To")), FALSE, FALSE, 0); 
+		gtk_box_pack_start(GTK_BOX(box2), gtk_label_new(_("Send-To")), FALSE, FALSE, 0); 
 		scrolled_window = gtk_scrolled_window_new(NULL, NULL); 
 		gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), 
 					       GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC); 
@@ -498,13 +504,13 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	hbox = gtk_hbutton_box_new(); 
 	gtk_hbutton_box_set_layout_default(GTK_BUTTONBOX_START); 
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0); 
-	w = gnome_pixmap_button(gnome_stock_pixmap_widget(dialog, GNOME_STOCK_PIXMAP_OPEN), N_("Run GnomeCard")); 
+	w = gnome_pixmap_button(gnome_stock_pixmap_widget(dialog, GNOME_STOCK_PIXMAP_OPEN), _("Run GnomeCard")); 
 
 	gtk_signal_connect(GTK_OBJECT(w), "clicked", GTK_SIGNAL_FUNC(ab_gnomecard_cb), NULL); 
 	gtk_container_add(GTK_CONTAINER(hbox), w); 
 	gtk_widget_ref (w);
 
-	w = gnome_pixmap_button(gnome_stock_pixmap_widget(dialog, GNOME_STOCK_PIXMAP_ADD), N_("Re-Import")); 
+	w = gnome_pixmap_button(gnome_stock_pixmap_widget(dialog, GNOME_STOCK_PIXMAP_ADD), _("Re-Import")); 
 	gtk_signal_connect(GTK_OBJECT(w), "clicked", GTK_SIGNAL_FUNC(ab_load), NULL); 
 	gtk_container_add(GTK_CONTAINER(hbox), w); 
 	

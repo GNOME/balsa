@@ -408,7 +408,8 @@ static void parse_mailbox(LibBalsaMailbox * mailbox, const gchar *subdir)
 	    msg_info->filename=g_strdup(filename);
 	    msg_info->orig_flags = flags;
 	    new_messages++;
-	}
+	} else
+	    g_free(key);
 	msg_info->subdir = subdir;
 	if (msg_info->orig_flags != flags) {
 	    g_warning("Message flags for (%s) changed\n", key);

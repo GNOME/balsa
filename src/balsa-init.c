@@ -21,6 +21,7 @@
 
 #include <gnome.h>
 #include "main.h"
+#include "misc.h"
 #include "balsa-app.h"
 #include "balsa-init.h"
 #include "balsa.xpm"
@@ -272,8 +273,8 @@ create_general_page (void)
 
   str = g_string_new (g_get_user_name ());
   g_string_append_c (str, '@');
-  /* FIXME */
-  g_string_append (str, balsa_app.hostname);
+
+  g_string_append (str, g_get_host_name());
   gtk_entry_set_text (GTK_ENTRY (prefs->email), str->str);
   g_string_free (str, TRUE);
 

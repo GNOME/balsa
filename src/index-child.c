@@ -1,4 +1,3 @@
-
 /* Balsa E-Mail Client
  * Copyright (C) 1998 Stuart Parmenter
  *
@@ -33,6 +32,18 @@ static GnomeMDIChildClass *parent_class = NULL;
 
 static void index_child_class_init (IndexChildClass *);
 static void index_child_init (IndexChild *);
+
+enum
+  {
+    TARGET_MESSAGE,
+  };
+
+static GtkTargetEntry drag_types[] =
+{
+  {"x-application-gnome/balsa", 0, TARGET_MESSAGE}
+};
+#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
+
 
 guint
 index_child_get_type (void)
@@ -142,7 +153,7 @@ index_child_new (GnomeMDI * mdi, Mailbox * mailbox)
 	gnome_dialog_button_connect (GNOME_DIALOG (dialog), 0, set_password, entry);
 	gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
 	gnome_dialog_run (GNOME_DIALOG (dialog));
-	gtk_widget_destroy(dialog);
+	gtk_widget_destroy (dialog);
 	dialog = NULL;
       }
   }
@@ -209,7 +220,7 @@ check_for_new_mail (GtkWidget * widget)
 static GtkWidget *
 index_child_create_view (GnomeMDIChild * child)
 {
-  GtkWidget *vpane;
+  GtkWidget *vpane = NULL;
   GtkWidget *table;
   GtkWidget *hscrollbar;
   GtkWidget *vscrollbar;
@@ -260,6 +271,20 @@ index_child_create_view (GnomeMDIChild * child)
 
   gtk_signal_connect (GTK_OBJECT (ic->index), "select_message",
 		      (GtkSignalFunc) index_select_cb, ic);
+
+  /* Make messages draggable */
+  gtk_drag_source_set (GTK_WIDGET (ic->index), GDK_BUTTON1_MASK,
+		       drag_types, ELEMENTS (drag_types),
+      GDK_ACTION_LINK | GDK_ACTION_MOVE | GDK_ACTION_COPY | GDK_ACTION_ASK);
+
+#if 0
+  /* FIXME */
+  /* Mouse is being moved over ourselves */
+  gtk_signal_connect (GTK_OBJECT (ic->index), "drag_motion",
+		      GTK_SIGNAL_FUNC (panel_tree_drag_motion), NULL);
+  gtk_signal_connect (GTK_OBJECT (ic->index), "drag_leave",
+		      GTK_SIGNAL_FUNC (panel_tree_drag_leave), NULL);
+#endif
 
   if (balsa_app.previewpane)
     return (vpane);
@@ -445,7 +470,7 @@ transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row,
   list = clist->selection;
   while (list)
     {
-      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT(list->data));
+      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT (list->data));
       message_move (message, mailbox);
       list = list->next;
     }
@@ -467,7 +492,7 @@ delete_message_cb (GtkWidget * widget, BalsaIndex * bindex)
   list = clist->selection;
   while (list)
     {
-      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT(list->data));
+      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT (list->data));
       message_delete (message);
       i++;
       list = list->next;
@@ -492,7 +517,7 @@ undelete_message_cb (GtkWidget * widget, BalsaIndex * bindex)
   list = clist->selection;
   while (list)
     {
-      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT(list->data));
+      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT (list->data));
       message_undelete (message);
       list = list->next;
     }

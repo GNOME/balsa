@@ -172,7 +172,7 @@ static GnomeUIInfo main_toolbar[] =
   GNOMEUIINFO_ITEM_STOCK (N_ ("Delete"), N_ ("Delete Message"), delete_message_cb, GNOME_STOCK_PIXMAP_TRASH),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("Compose"), N_ ("Compose Message"), new_message_cb, GNOME_STOCK_PIXMAP_MAIL_NEW),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Reply"), N_ ("Reply"), replyto_message_cb, GNOME_STOCK_PIXMAP_MAIL_RPL), 
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Reply"), N_ ("Reply"), replyto_message_cb, GNOME_STOCK_PIXMAP_MAIL_RPL),
   GNOMEUIINFO_ITEM_STOCK (N_ ("Reply to all"), N_ ("Reply to all"), replytoall_message_cb, GNOME_STOCK_PIXMAP_MAIL_RPL),
   GNOMEUIINFO_ITEM_STOCK (N_ ("Forward"), N_ ("Forward"), forward_message_cb, GNOME_STOCK_PIXMAP_MAIL_FWD),
   GNOMEUIINFO_SEPARATOR,
@@ -289,7 +289,7 @@ app_created (GnomeMDI * mdi, GnomeApp * app)
   gtk_window_set_policy (GTK_WINDOW (app), TRUE, TRUE, FALSE);
   gtk_widget_set_usize (GTK_WIDGET (app), balsa_app.mw_width, balsa_app.mw_height);
 
-  mblist_open_window(mdi);
+  mblist_open_window (mdi);
 
   refresh_main_window ();
 }
@@ -629,12 +629,26 @@ struct _MBListWindow
     GtkCTreeNode *parent;
   };
 
+enum
+  {
+    TARGET_MESSAGE,
+  };
+
+static GtkTargetEntry drag_types[] =
+{
+  {"x-application-gnome/balsa", 0, TARGET_MESSAGE}
+};
+#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
+
+
 static MBListWindow *mblw = NULL;
 
 /* callbacks */
 void mblist_close_mailbox (Mailbox * mailbox);
 static void mailbox_select_cb (BalsaMBList *, Mailbox *, GtkCTreeNode *, GdkEventButton *);
 static GtkWidget *mblist_create_menu (GtkCTree * ctree, Mailbox * mailbox);
+static void mblist_drag_data_received (GtkWidget * widget, GdkDragContext * context, gint x, gint y, GtkSelectionData * selection_data, guint info, guint32 time, gpointer data);
+
 
 static void mblist_open_cb (GtkWidget *, gpointer);
 static void mblist_close_cb (GtkWidget *, gpointer);
@@ -647,38 +661,38 @@ mblist_open_window (GnomeMDI * mdi)
   GtkWidget *button;
   gint height;
 
-  GnomeApp *app = GNOME_APP(mdi->active_window);
+  GnomeApp *app = GNOME_APP (mdi->active_window);
 
   mblw = g_malloc0 (sizeof (MBListWindow));
 
   mblw->mdi = mdi;
-  
+
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
 
   dock_item = gnome_dock_item_new (GNOME_DOCK_ITEM_BEH_NEVER_HORIZONTAL);
   gnome_dock_item_set_shadow_type (GNOME_DOCK_ITEM (dock_item), GTK_SHADOW_NONE);
 
-  
-  mblw->sw = gtk_scrolled_window_new(NULL, NULL);
+
+  mblw->sw = gtk_scrolled_window_new (NULL, NULL);
   mblw->ctree = GTK_CTREE (balsa_mblist_new ());
   balsa_app.mblist = BALSA_MBLIST (mblw->ctree);
-  gtk_container_add(GTK_CONTAINER(mblw->sw), GTK_WIDGET(mblw->ctree));
-  gtk_container_add(GTK_CONTAINER(dock_item), GTK_WIDGET(mblw->sw));
+  gtk_container_add (GTK_CONTAINER (mblw->sw), GTK_WIDGET (mblw->ctree));
+  gtk_container_add (GTK_CONTAINER (dock_item), GTK_WIDGET (mblw->sw));
 
-  gnome_dock_add_item (GNOME_DOCK(app->dock), dock_item, GNOME_DOCK_POS_LEFT, 0, 0, 0, TRUE);
+  gnome_dock_add_item (GNOME_DOCK (app->dock), dock_item, GNOME_DOCK_POS_LEFT, 0, 0, 0, TRUE);
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
 
   gtk_widget_set_usize (GTK_WIDGET (mblw->ctree), balsa_app.mblist_width, balsa_app.mblist_height);
 /*
-  gtk_ctree_show_stub (mblw->ctree, FALSE);
-*/
+   gtk_ctree_show_stub (mblw->ctree, FALSE);
+ */
   gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED);
 
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(mblw->sw),
-		  GTK_POLICY_AUTOMATIC,
-		  GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (mblw->sw),
+				  GTK_POLICY_AUTOMATIC,
+				  GTK_POLICY_AUTOMATIC);
 
   gtk_clist_set_row_height (GTK_CLIST (mblw->ctree), 16);
 
@@ -690,12 +704,22 @@ mblist_open_window (GnomeMDI * mdi)
 
   height = GTK_CLIST (mblw->ctree)->rows * GTK_CLIST (mblw->ctree)->row_height;
 
+  gtk_drag_dest_set (GTK_WIDGET (mblw->ctree), GTK_DEST_DEFAULT_ALL,
+		     drag_types, ELEMENTS (drag_types),
+		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
+
+
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "select_mailbox",
-		      GTK_SIGNAL_FUNC(mailbox_select_cb), NULL);
+		      GTK_SIGNAL_FUNC (mailbox_select_cb), NULL);
+
+
+
+  gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_data_received",
+		      GTK_SIGNAL_FUNC (mblist_drag_data_received), NULL);
 #if 0
   bbox = gtk_hbutton_box_new ();
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->action_area),
-		  bbox, TRUE, TRUE, 0);
+		      bbox, TRUE, TRUE, 0);
   gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 2);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
   gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
@@ -706,7 +730,7 @@ mblist_open_window (GnomeMDI * mdi)
   button = gtk_button_new_with_label ("Open box");
   gtk_container_add (GTK_CONTAINER (bbox), button);
   gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
-		  GTK_SIGNAL_FUNC (mblist_open_cb), NULL);
+			     GTK_SIGNAL_FUNC (mblist_open_cb), NULL);
   gtk_widget_show (button);
 
   button = gtk_button_new_with_label ("Close box");
@@ -772,6 +796,25 @@ mblist_close_mailbox (Mailbox * mailbox)
 	  gnome_mdi_remove_child (mblw->mdi, child, TRUE);
 	}
     }
+}
+
+static void
+mblist_drag_data_received (GtkWidget * widget,
+			   GdkDragContext * context,
+			   gint x,
+			   gint y,
+			   GtkSelectionData * selection_data,
+			   guint info,
+			   guint32 time,
+			   gpointer data)
+{
+  GtkCList *clist = GTK_CLIST (widget);
+  gint row;
+
+  if (!gtk_clist_get_selection_info (clist, x, y, &row, NULL))
+    return;
+
+  /* FIXME what now... ? */
 }
 
 static void

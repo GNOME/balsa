@@ -382,12 +382,7 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
    }
 #endif
   balsa_app.check_mail_auto = GTK_TOGGLE_BUTTON(pui->check_mail_auto)->active;
-  balsa_app.check_mail_timer = atoi( gtk_entry_get_text (GTK_ENTRY(pui->check_mail_minutes)));
-  if( balsa_app.check_mail_timer < 1)
-    {
-      balsa_app.check_mail_timer = 10;
-      gtk_entry_set_text( GTK_ENTRY(pui->check_mail_minutes), "10");
-    }
+  balsa_app.check_mail_timer = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->check_mail_minutes));
 
   if(balsa_app.check_mail_auto)
     update_timer( TRUE, balsa_app.check_mail_timer );
@@ -475,11 +470,10 @@ set_prefs (void)
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->mblist_show_mb_content_info), balsa_app.mblist_show_mb_content_info);
 #endif
 
-  sprintf( tmp, "%d", balsa_app.check_mail_timer );
-
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->check_mail_auto),
 				balsa_app.check_mail_auto);
-  gtk_entry_set_text (GTK_ENTRY (pui->check_mail_minutes), tmp );
+  gtk_spin_button_set_value (GTK_SPIN_BUTTON (pui->check_mail_minutes), 
+		(float) balsa_app.check_mail_timer );
 
   /* arp */
   gtk_entry_set_text (GTK_ENTRY (pui->quote_str), balsa_app.quote_str);
@@ -656,6 +650,7 @@ create_mailservers_page ()
   GtkWidget *bbox;
   GtkWidget *button;
   GtkWidget *mail_dir;
+  GtkAdjustment *adj;
   GSList *rbgroup;
 
   vbox = gtk_vbox_new (FALSE, 0);
@@ -752,9 +747,9 @@ create_mailservers_page ()
 		    (GtkAttachOptions) GTK_EXPAND | GTK_FILL, 0, 0);
   gtk_widget_set_sensitive (pui->smtp_server, balsa_app.smtp);
 
+  adj = gtk_adjustment_new( 1.0, 1.0, 99.0, 1.0, 5.0, 0.0);
   pui->check_mail_auto = gtk_check_button_new_with_label( "Check mail automatically every:" );
-  pui->check_mail_minutes = gtk_entry_new();
-  gtk_entry_set_max_length( GTK_ENTRY(pui->check_mail_minutes), 2);
+  pui->check_mail_minutes = gtk_spin_button_new(adj, 0, 0);
   gtk_box_pack_start( GTK_BOX(vbox), pui->check_mail_auto, FALSE, FALSE, 5);
 
   hbox2 = gtk_hbox_new( FALSE, 0 );

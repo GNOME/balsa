@@ -1,3 +1,19 @@
+2002-02-22  Pawel Salek <pawsa@theochem.kth.se>
+
+	*libbalsa/address-book-extern.c, libbalsa/address-book-ldif.c,
+	libbalsa/address-book.c, libbalsa/address.c, libbalsa/files.c,
+	libbalsa/filter-file.c, libbalsa/filter-funcs.c,
+	libbalsa/filter.c, libbalsa/folder-scanners, libbalsa/identity.c,
+	libbalsa/libbalsa.c, libbalsa/mailbox.c, libbalsa/mailbox_imap.c,
+	libbalsa/mailbox_local.c, libbalsa/message.c, libbalsa/mime.c,
+	libbalsa/misc.[ch], libbalsa/pop3.c, libbalsa/send.c,
+	libbalsa/server.c, libbalsa/libbalsa.h, src/pref-manager.c,
+	src/sendmsg-window.[ch]: GNOME-2 related cleanup: remove unused
+	variables, etc.
+
+	* sounds/Makefile.am: add DISTDIR in front.
+	* libbalsa/address-entry.c: rewritten to work both in 1.4/2.0 (PB)
+
 2002-02-20  Matthew Guenther  <guentherm@asme.org>
 
 	* src/sendmsg-window.c: handle situation of starting a message

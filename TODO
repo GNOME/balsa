@@ -27,3 +27,48 @@ later stuff:
 
  * add mutt keybindings
 
+Nat's ideas:
+ * Make it so that clicking on the name of a field in the folder view sorts
+   the folder by that field.
+
+ * It is possible to get a context menu off a notebook page/tab thing.
+   Make it so that right clicking on a folder tab gives you a context
+   menu which gives you the option of closing the folder.
+
+ * In the message composition window, hitting TAB will bring the cursor to
+   the next text entry box.  Make it so that hitting ENTER does the same thing.
+
+ * Add a "cancel mail" button to the message composition window.
+
+ * XmHTML doesn't seem to support cutting of text for pasting.  This
+   sucks.  Fix it.
+
+ * When you reply to a message, the message is quoted with the '>'
+   character.  Make automatic message quoting optional and make it
+   flexible enough to allow the user to select their quote
+   character(s).
+
+ * A "get new mail" button on the main toolbar would be nice.  It
+   should be smart enough to grab POP3 mail if appropriate.
+
+ * An important one: by default, for IMAP and POP mailboxes, Balsa stores the
+   user's password in the config file.  The file is mode 0600, however a lot
+   of people won't feel so good about this, myself included.  Add an option
+   which makes Balsa instead prompt for the password everytime it
+   needs to login to the IMAP server.
+
+ * The message display/composition font should be selectable,
+   including color.
+
+ * An addressbook fully integrated with the message display; i.e.
+   I should be able to click on someone's email address in the message
+   and have it pop up the correspondind address book entry, or prompt me
+   to create one.  Might want to use Active Tags for this. :-)~
+
+ * It would be nice if the mailboxes in the mailbox list were always
+   in some sort of consistent order.
+
+ * It would be nice if the mailbox list had a little more information about
+   the mailboxes; e.g. a full tray icon if there are unread messages in
+   the mailbox, and an empty tray icon otherwise.
+

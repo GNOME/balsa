@@ -301,8 +301,7 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_widget_set_parent (sw, GTK_WIDGET (bindex));
   
   /* create the clist */
-  GTK_BIN (bindex)->child = sw = gtk_scrolled_window_new(NULL,NULL);
-  gtk_widget_set_parent (sw, GTK_WIDGET (bindex));
+  GTK_BIN (bindex)->child = sw;
 
   bindex->clist = gtk_clist_new_with_titles (6, titles);
   clist = GTK_CLIST(bindex->clist);

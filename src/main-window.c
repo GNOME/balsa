@@ -301,7 +301,7 @@ create_toolbar (GnomeMDI * mdi, GnomeApp * app)
 
   toolbar = gtk_toolbar_new (GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_ICONS);
 
-  window = app;
+  window = GTK_WIDGET (app);
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),

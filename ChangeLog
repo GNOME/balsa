@@ -1,3 +1,10 @@
+1998-11-29  Herbert Valerio Riedel  <hvr@hvrlab.ml.org>
+
+	* src/balsa-index.c (balsa_index_init): fixed superflous re-allocation
+ 	of scrolled window
+
+	* src/main-window.c (create_toolbar): added GTK_WINDOW()-cast
+
 1998-11-28  Michael Lausch  <mla@gams.at>
 
 	* changed gtk_container_border_with to gtk_container_set_border_width

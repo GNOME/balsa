@@ -1111,9 +1111,7 @@ fill_mailbox_passwords(GList * mailbox_list)
 	if(LIBBALSA_IS_MAILBOX_POP3(mailbox) && 
 	   LIBBALSA_MAILBOX_POP3(mailbox)->check) {
 	    s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-	    if (!s->passwd || (strlen(s->passwd)==0)) {
-		if(s->passwd)
-		    g_free(s->passwd);
+	    if (!s->passwd) {
 		s->passwd = libbalsa_server_get_password(s, mailbox);
 	    }
 	}

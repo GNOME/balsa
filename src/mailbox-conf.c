@@ -193,7 +193,7 @@ mailbox->name);
 
     /* Close the mailbox, in case it was open */
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox))
-	mblist_close_mailbox(mailbox);
+	balsa_window_close_mailbox(balsa_app.main_window, mailbox);
 
     /* Delete local files */
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox))

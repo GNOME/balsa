@@ -269,7 +269,8 @@ static void lang_lithuanian_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_norwegian_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_polish_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_portugese_cb(GtkWidget *, BalsaSendmsg *);
-static void lang_russian_cb(GtkWidget *, BalsaSendmsg *);
+static void lang_russian_iso_cb(GtkWidget *, BalsaSendmsg *);
+static void lang_russian_koi_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_slovak_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_spanish_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_swedish_cb(GtkWidget *, BalsaSendmsg *);
@@ -300,7 +301,8 @@ static GnomeUIInfo locale_kz_menu[] = {
     GNOMEUIINFO_ITEM_NONE(N_("Norwegian"), NULL, lang_norwegian_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Polish"), NULL, lang_polish_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Portugese"), NULL, lang_portugese_cb),
-    GNOMEUIINFO_ITEM_NONE(N_("Russian"), NULL, lang_russian_cb),
+    GNOMEUIINFO_ITEM_NONE(N_("Russian (ISO)"), NULL, lang_russian_iso_cb),
+    GNOMEUIINFO_ITEM_NONE(N_("Russian (KOI)"), NULL, lang_russian_koi_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Slovak"), NULL, lang_slovak_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Spanish"), NULL, lang_spanish_cb),
     GNOMEUIINFO_ITEM_NONE(N_("Swedish"), NULL, lang_swedish_cb),
@@ -355,83 +357,59 @@ static GnomeUIInfo main_menu[] = {
 */
 struct {
     const gchar *locale, *charset, *lang_name;
-    gboolean use_fontset;
 } locales[] = {
 #define LOC_BRAZILIAN_POS 0
-    {
-    "pt_BR", "ISO-8859-1", N_("Brazilian"), FALSE},
+    {"pt_BR", "ISO-8859-1", N_("Brazilian")},
 #define LOC_CATALAN_POS   1
-    {
-    "ca_ES", "ISO-8859-1", N_("Catalan"), FALSE},
+    {"ca_ES", "ISO-8859-1", N_("Catalan")},
 #define LOC_DANISH_POS    2
-    {
-    "da_DK", "ISO-8859-1", N_("Danish"), FALSE},
+    {"da_DK", "ISO-8859-1", N_("Danish")},
 #define LOC_GERMAN_POS    3
-    {
-    "de_DE", "ISO-8859-1", N_("German"), FALSE},
+    {"de_DE", "ISO-8859-1", N_("German")},
 #define LOC_DUTCH_POS     4
-    {
-    "nl_NL", "ISO-8859-1", N_("Dutch"), FALSE},
+    {"nl_NL", "ISO-8859-1", N_("Dutch")},
 #define LOC_ENGLISH_POS   5
-    {
-    "en_GB", "ISO-8859-1", N_("English"), FALSE},
+    {"en_GB", "ISO-8859-1", N_("English")},
 #define LOC_ESTONIAN_POS  6
-    {
-    "et_EE", "ISO-8859-15", N_("Estonian"), FALSE},
+    {"et_EE", "ISO-8859-15", N_("Estonian")},
 #define LOC_FINNISH_POS   7
-    {
-    "fi_FI", "ISO-8859-15", N_("Finnish"), FALSE},
+    {"fi_FI", "ISO-8859-15", N_("Finnish")},
 #define LOC_FRENCH_POS    8
-    {
-    "fr_FR", "ISO-8859-1", N_("French"), FALSE},
+    {"fr_FR", "ISO-8859-1", N_("French")},
 #define LOC_GREEK_POS     9
-    {
-    "el_GR", "ISO-8859-7", N_("Greek"), FALSE},
+    {"el_GR", "ISO-8859-7", N_("Greek")},
 #define LOC_HUNGARIAN_POS 10
-    {
-    "hu_HU", "ISO-8859-2", N_("Hungarian"), FALSE},
+    {"hu_HU", "ISO-8859-2", N_("Hungarian")},
 #define LOC_ITALIAN_POS   11
-    {
-    "it_IT", "ISO-8859-1", N_("Italian"), FALSE},
+    {"it_IT", "ISO-8859-1", N_("Italian")},
 #define LOC_JAPANESE_POS  12
-    {
-    "ja_JP", "euc-jp", N_("Japanese"), TRUE},
+    {"ja_JP", "euc-jp", N_("Japanese")},
 #define LOC_KOREAN_POS    13
-    {
-    "ko_OK", "euc-kr", N_("Korean"), TRUE},
+    {"ko_KR", "euc-kr", N_("Korean")},
 #define LOC_LATVIAN_POS    14
-    {
-    "lv_LV", "ISO-8859-13", N_("Latvian"), FALSE},
+    {"lv_LV", "ISO-8859-13", N_("Latvian")},
 #define LOC_LITHUANIAN_POS    15
-    {
-    "lt_LT", "ISO-8859-13", N_("Lithuanian"), FALSE},
+    {"lt_LT", "ISO-8859-13", N_("Lithuanian")},
 #define LOC_NORWEGIAN_POS 16
-    {
-    "no_NO", "ISO-8859-1", N_("Norwegian"), FALSE},
+    {"no_NO", "ISO-8859-1", N_("Norwegian")},
 #define LOC_POLISH_POS    17
-    {
-    "pl_PL", "ISO-8859-2", N_("Polish"), FALSE},
+    {"pl_PL", "ISO-8859-2", N_("Polish")},
 #define LOC_PORTUGESE_POS 18
-    {
-    "pt_PT", "ISO-8859-1", N_("Portugese"), FALSE},
-#define LOC_RUSSIAN_POS   19
-    {
-    "ru_RU", "ISO-8859-5", N_("Russian"), FALSE},
-#define LOC_SLOVAK_POS    20
-    {
-    "sl_SI", "ISO-8859-2", N_("Slovak"), FALSE},
-#define LOC_SPANISH_POS   21
-    {
-    "es_ES", "ISO-8859-1", N_("Spanish"), FALSE},
-#define LOC_SWEDISH_POS   22
-    {
-    "sv_SE", "ISO-8859-1", N_("Swedish"), FALSE},
-#define LOC_TURKISH_POS   23
-    {
-    "tr_TR", "ISO-8859-9", N_("Turkish"), FALSE},
-#define LOC_UKRAINIAN_POS 24
-    {
-    "uk_UK", "KOI-8-U", N_("Ukrainian"), FALSE}
+    {"pt_PT", "ISO-8859-1", N_("Portugese")},
+#define LOC_RUSSIAN_ISO_POS   19
+    {"ru_RU", "ISO-8859-5", N_("Russian (ISO)")},
+#define LOC_RUSSIAN_KOI_POS   20
+    {"ru_RU", "KOI-8-R", N_("Russian (KOI)")},
+#define LOC_SLOVAK_POS    21
+    {"sl_SI", "ISO-8859-2", N_("Slovak")},
+#define LOC_SPANISH_POS   22
+    {"es_ES", "ISO-8859-1", N_("Spanish")},
+#define LOC_SWEDISH_POS   23
+    {"sv_SE", "ISO-8859-1", N_("Swedish")},
+#define LOC_TURKISH_POS   24
+    {"tr_TR", "ISO-8859-9", N_("Turkish")},
+#define LOC_UKRAINIAN_POS 25
+    {"uk_UK", "KOI-8-U", N_("Ukrainian")}
 };
 
 static gint mail_headers_page;
@@ -2015,6 +1993,7 @@ static gint
 set_locale(GtkWidget * w, BalsaSendmsg * msg, gint idx)
 {
     gchar *font_name, *tmp;
+    gboolean use_fontset;
 
     if (msg->font)
 	gdk_font_unref(msg->font);
@@ -2026,11 +2005,13 @@ set_locale(GtkWidget * w, BalsaSendmsg * msg, gint idx)
 		       (GTK_BIN(msg->current_language_menu)->child), tmp);
     g_free(tmp);
 
-    font_name = get_font_name(balsa_app.message_font, msg->charset);
-    msg->font = locales[idx].use_fontset ?
+    font_name = get_font_name(balsa_app.message_font, msg->charset, 
+			      &use_fontset);
+    msg->font = use_fontset ?
 	gdk_fontset_load(font_name) : gdk_font_load(font_name);
-    printf("find font: %s for locale %s (%d)\n", font_name, msg->locale,
-	   locales[idx].use_fontset);
+    if(balsa_app.debug)
+	printf("find font: %s for locale %s (%d)\n", font_name, msg->locale,
+	       use_fontset);
     if (!msg->font) {
 	printf("Cannot find font: %s for locale %s\n", font_name,
 	       msg->locale);
@@ -2241,9 +2222,14 @@ lang_portugese_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
     set_locale(w, bsmsg, LOC_PORTUGESE_POS);
 }
 static void
-lang_russian_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
+lang_russian_iso_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
 {
-    set_locale(w, bsmsg, LOC_RUSSIAN_POS);
+    set_locale(w, bsmsg, LOC_RUSSIAN_ISO_POS);
+}
+static void
+lang_russian_koi_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
+{
+    set_locale(w, bsmsg, LOC_RUSSIAN_KOI_POS);
 }
 static void
 lang_slovak_cb(GtkWidget * w, BalsaSendmsg * bsmsg)

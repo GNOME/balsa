@@ -75,7 +75,6 @@
 #define APPBAR_KEY "balsa_appbar"
 
 enum {
-    SET_CURSOR,
     OPEN_MAILBOX,
     CLOSE_MAILBOX,
     LAST_SIGNAL
@@ -100,8 +99,6 @@ static void check_messages_thread(gpointer data);
 
 static void balsa_window_class_init(BalsaWindowClass * klass);
 static void balsa_window_init(BalsaWindow * window);
-static void balsa_window_real_set_cursor(BalsaWindow * window,
-					 GdkCursor * cursor);
 static void balsa_window_real_open_mailbox(BalsaWindow * window,
 					   LibBalsaMailbox * mailbox);
 static void balsa_window_real_close_mailbox(BalsaWindow * window,
@@ -530,7 +527,7 @@ balsa_window_class_init(BalsaWindowClass * klass)
 
     parent_class = gtk_type_class(gnome_app_get_type());
 
-
+#if 0
     window_signals[SET_CURSOR] =
 	gtk_signal_new("set_cursor",
 		       GTK_RUN_LAST,
@@ -538,7 +535,7 @@ balsa_window_class_init(BalsaWindowClass * klass)
 		       GTK_SIGNAL_OFFSET(BalsaWindowClass, set_cursor),
 		       gtk_marshal_NONE__POINTER,
 		       GTK_TYPE_NONE, 1, GTK_TYPE_POINTER);
-
+#endif
     window_signals[OPEN_MAILBOX] =
 	gtk_signal_new("open_mailbox",
 		       GTK_RUN_LAST,
@@ -560,7 +557,6 @@ balsa_window_class_init(BalsaWindowClass * klass)
 
     object_class->destroy = balsa_window_destroy;
 
-    klass->set_cursor = balsa_window_real_set_cursor;
     klass->open_mailbox = balsa_window_real_open_mailbox;
     klass->close_mailbox = balsa_window_real_close_mailbox;
 
@@ -837,6 +833,7 @@ balsa_window_enable_continue(void)
     }
 }
 
+#if 0
 void
 balsa_window_set_cursor(BalsaWindow * window, GdkCursor * cursor)
 {
@@ -857,18 +854,21 @@ balsa_window_real_set_cursor(BalsaWindow * window, GdkCursor * cursor)
        gtk_progress_set_value (GTK_PROGRESS (pbar), 0.0); */
     gdk_window_set_cursor(GTK_WIDGET(window)->window, cursor);
 }
+#endif
 
+/* balsa_window_open_mailbox: 
+   opens mailbox, creates message index. mblist_open_mailbox() is what
+   you want most of the time because it can switch between pages if a
+   mailbox is already on one of them.
+*/
 void
 balsa_window_open_mailbox(BalsaWindow * window, LibBalsaMailbox * mailbox)
 {
     g_return_if_fail(window != NULL);
     g_return_if_fail(BALSA_IS_WINDOW(window));
 
-    if (mailbox->open_ref == 0)
-	gtk_signal_emit(GTK_OBJECT(window), window_signals[OPEN_MAILBOX],
-			mailbox);
-    else
-	mblist_open_mailbox(mailbox);
+    gtk_signal_emit(GTK_OBJECT(window), window_signals[OPEN_MAILBOX],
+		    mailbox);
 }
 
 void
@@ -928,7 +928,6 @@ balsa_window_real_open_mailbox(BalsaWindow * window,
 
     /* Enable relavent menu items... */
     enable_mailbox_menus(mailbox);
-
 }
 
 
@@ -1649,7 +1648,7 @@ continue_message_cb(GtkWidget * widget, gpointer data)
     if (index && BALSA_INDEX(index)->mailbox == balsa_app.draftbox)
 	balsa_message_continue(widget, BALSA_INDEX(index));
     else
-	balsa_window_open_mailbox(BALSA_WINDOW(data), balsa_app.draftbox);
+	mblist_open_mailbox(balsa_app.draftbox);
 }
 
 

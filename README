@@ -128,3 +128,12 @@ Known issues:
 	the mailbox file) balsa will open mailbox for reading only.
 	Verify that balsa can create dot file in the mailbox directory.
 	Recommended access privileges to /var/spool/mail are rwxrwxrwxt (01777)
+
+	Some versions of libgnome is known to have bugs that lead to 
+	balsa crash on startup. Read for details
+	http://mail.gnome.org/archives/balsa-list/2000-October/msg00101.html
+	and make sure you have at least /usr/lib/libgnome.so.32.3.11.
+
+	Experimental gcc 2.96 distributed with RedHat 7.0 has problems
+	to compile src/files.c. Use older compilers instead (or send
+	us a patch).

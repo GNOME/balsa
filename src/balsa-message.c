@@ -838,30 +838,37 @@ two_const_fields_to_end(const gchar * ptr)
    wildcard 'base' and given character set encoding.
    Algorithm: copy max first 12 fields, cutting additionally 
    at most two last, if they are constant.
+   FIXME: this data duplicates information in sendmsg-window.c
 */
 static struct {
     gchar *charset, *font_postfix;
+    gboolean use_fontset;
 } charset2font[] = {
-    {
-    "iso-8859-1", "iso8859-1"}, {
-    "iso-8859-2", "iso8859-2"}, {
-    "iso-8859-3", "iso8859-3"}, {
-    "iso-8859-4", "iso8859-4"}, {
-    "iso-8859-5", "iso8859-5"}, {
-    "iso-8859-7", "iso8859-7"}, {
-    "iso-8859-9", "iso8859-9"}, {
-    "iso-8859-13", "iso8859-13"}, {
-    "iso-8859-14", "iso8859-14"}, {
-    "iso-8859-15", "iso8859-15"}, {
-    "euc-jp", "jisx0208.1983-0"}, {
-    "euc-kr", "jisx0208.1983-0"}, {
-    "koi-8-r", "koi8-r"}, {
-    "koi-8-u", "koi8-u"}, {
-    "us-ascii", "iso8859-1"}
+    {"iso-8859-1", "iso8859-1", FALSE}, 
+    {"iso-8859-2", "iso8859-2", FALSE}, 
+    {"iso-8859-3", "iso8859-3", FALSE}, 
+    {"iso-8859-4", "iso8859-4", FALSE}, 
+    {"iso-8859-5", "iso8859-5", FALSE}, 
+    {"iso-8859-7", "iso8859-7", FALSE}, 
+    {"iso-8859-9", "iso8859-9", FALSE},
+    {"iso-8859-13", "iso8859-13", FALSE}, 
+    {"iso-8859-14", "iso8859-14", FALSE}, 
+    {"iso-8859-15", "iso8859-15", FALSE}, 
+    {"euc-jp", "jisx0208.1983-0", TRUE}, 
+    {"euc-kr", "ksc5601.1987-0", TRUE}, 
+    {"koi-8-r", "koi8-r", FALSE}, 
+    {"koi-8-u", "koi8-u", FALSE}, 
+    {"us-ascii", "iso8859-1", FALSE}
 };
 
+/* get_font_name:
+   returns a font name corresponding to given font and charset.
+   If use_fontset is provided, it will pass the information if fontset is
+   recommended.
+*/
 gchar *
-get_font_name(const gchar * base, const gchar * charset)
+get_font_name(const gchar * base, const gchar * charset, 
+	      gboolean * use_fontset)
 {
     gchar *res;
     const gchar *ptr = base, *postfix = NULL;
@@ -873,6 +880,7 @@ get_font_name(const gchar * base, const gchar * charset)
     for (i = ELEMENTS(charset2font) - 1; i >= 0; i--)
 	if (g_strcasecmp(charset, charset2font[i].charset) == 0) {
 	    postfix = charset2font[i].font_postfix;
+	    if(use_fontset) *use_fontset = charset2font[i].use_fontset;
 	    break;
 	}
     if (!postfix)
@@ -959,18 +967,17 @@ get_koi_font_name(const gchar * base, const gchar * code)
 }
 
 /* HELPER FUNCTIONS ----------------------------------------------- */
-static gchar *
-find_body_font(LibBalsaMessageBody * body)
+static void
+find_body_font(LibBalsaMessageBody * body, gchar **font_name, gboolean*fontset)
 {
-    gchar *font_name = NULL, *charset;
+    gchar *charset;
 
     charset = libbalsa_message_body_get_parameter(body, "charset");
 
+    *font_name = NULL;
     if (charset)
-	font_name = get_font_name(balsa_app.message_font, charset);
+	*font_name = get_font_name(balsa_app.message_font, charset, fontset);
     g_free(charset);
-
-    return font_name;
 }
 
 
@@ -1105,6 +1112,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 #endif
 	} else {
 	    gchar *font_name;
+	    gboolean use_fontset;
 	    regex_t rex;
 
 	    GtkWidget *item = NULL;
@@ -1113,12 +1121,13 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	    if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0)
 		g_warning
 		    ("part_info_init_mimetext: quote regex compilation failed.");
-	    font_name = find_body_font(info->body);
+	    find_body_font(info->body, &font_name, &use_fontset);
 	    if (bm->wrap_text)
 		libbalsa_wrap_string(ptr, balsa_app.wraplength);
 
 	    if (font_name) {
-		fnt = gdk_font_load(font_name);
+		fnt = use_fontset ? gdk_fontset_load(font_name) 
+		    : gdk_font_load(font_name);
 		if (!fnt)
 		    fprintf(stderr, "message/text:: font not found: %s\n",
 			    font_name);
@@ -1126,7 +1135,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	    }
 
 	    if (!fnt)
-		fnt = gdk_font_load(balsa_app.message_font);
+		fnt = gdk_fontset_load(balsa_app.message_font);
 
 	    item = gtk_text_new(NULL, NULL);
 

@@ -47,14 +47,10 @@ struct _BalsaWindowClass {
     void (*open_mailbox) (BalsaWindow * window, LibBalsaMailbox * mailbox);
     void (*close_mailbox) (BalsaWindow * window,
 			   LibBalsaMailbox * mailbox);
-
-    void (*set_cursor) (BalsaWindow * window, GdkCursor * cursor);
-
 };
 
 GtkType balsa_window_get_type(void);
 GtkWidget *balsa_window_new(void);
-void balsa_window_set_cursor(BalsaWindow * window, GdkCursor * cursor);
 GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
 void balsa_window_refresh(BalsaWindow * window);
 void balsa_window_open_mailbox();
@@ -63,8 +59,6 @@ void balsa_window_enable_continue(void);
 gboolean mail_progress_notify_cb(void);
 gboolean send_progress_notify_cb(void);
 gint check_new_messages_auto_cb(gpointer data);
-void mblist_close_mailbox(LibBalsaMailbox * mailbox);
-
 
 #if defined(__FILE__) && defined(__LINE__)
 # ifdef __FUNCTION__

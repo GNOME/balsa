@@ -1,3 +1,16 @@
+2000-10-23  Pawel Salek <pawsa@theochem.kth.se>
+
+	* balsa.spec.in: don't build rpm with GSS.
+	* src/mailbox-conf.c: do not depend on mblist-window.c
+	* src/main-window.[hc]: remove old set_cursor stuff, I haven't seen it
+	working. Clear up the mailbox/message referencing code.
+	* src/print.c: (int) conversion in isspace() - this function is
+	implemented as macro on Solaris and doesn't like char parameters.
+	* src/sendmsg-window.c: add Russian KOI support thrown away earlier 
+	by mistake.
+	* src/balsa-message.c: korean language support fixed.
+	* INSTALL, README: warn about the libgnome bug and RH 7.0 gcc issues.
+	
 2000-10-18  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/balsa-message.c: fix SECOND bug in right-button menu 

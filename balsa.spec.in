@@ -3,7 +3,7 @@
 %define rel      @BALSA_RELEASE@
 %define prefix   /usr
 
-%define config_opts --prefix=%{prefix} --sysconfdir=/etc --enable-threads --disable-system-install --disable-more-warnings --with-gss=/usr/kerberos
+%define config_opts --prefix=%{prefix} --sysconfdir=/etc --enable-threads --disable-system-install --disable-more-warnings
 
 Summary:   Balsa Mail Client
 Name:      balsa
@@ -16,7 +16,7 @@ URL:       http://www.balsa.net/
 BuildRoot: /tmp/balsa-%{PACKAGE_VERSION}-root
 Packager: Pawel Salek <pawsa@theochem.kth.se>
 Requires: gtk+ >= 1.2.0
-Requires: gnome-libs >= 1.2.0
+Requires: gnome-libs >= 1.2.7
 Provides: balsa
 Docdir: %{prefix}/doc
 
@@ -75,6 +75,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Oct 20 2000 Pawel Salek <pawsa@theochem.kth.se>
+
+- require gnome-libs >= 1.2.7, earlier versions are buggy. drop building GSS.
+
 * Mon Sep 18 2000 Pawel Salek <pawsa@theochem.kth.se>
 
 - include only translation files, not whole directories, to aviod

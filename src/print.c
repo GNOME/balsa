@@ -314,7 +314,7 @@ print_wrap_string(gchar * str, GnomeFont * font, gint width)
 	line_width = 0;
 	last_space = NULL;
 	while (*ptr && (line_width <= width || !last_space)) {
-	    if (isspace(*ptr)) {
+	    if (isspace((int)*ptr)) {
 		*ptr = ' ';
 		last_space = ptr;
 	    }

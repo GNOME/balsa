@@ -153,6 +153,7 @@ lsv_escape_cb(GtkWidget * widget, gpointer data)
 
     mem_stream = g_mime_stream_mem_new();
     g_mime_stream_write_to_stream(msg_stream, mem_stream);
+    g_mime_stream_write(mem_stream, "", 1); /* close string */
     raw_message = GMIME_STREAM_MEM(mem_stream)->buffer->data;
 
     *(lsvi->escape_specials) = GTK_CHECK_MENU_ITEM(widget)->active;

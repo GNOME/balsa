@@ -290,8 +290,6 @@ LibBalsaMessage *libbalsa_mailbox_load_message(LibBalsaMailbox * mailbox, guint 
 int libbalsa_mailbox_add_message_stream(LibBalsaMailbox * mailbox,
 					GMimeStream *stream,
 					LibBalsaMessageFlag flags);
-int libbalsa_mailbox_add_message(LibBalsaMailbox * mailbox, const gchar * data,
-				 LibBalsaMessageFlag flags);
 void libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox, guint msgno,
 					   LibBalsaMessageFlag set,
 					   LibBalsaMessageFlag clear);

@@ -1264,21 +1264,6 @@ int libbalsa_mailbox_add_message_stream(LibBalsaMailbox * mailbox,
     return retval;
 }
 
-int libbalsa_mailbox_add_message(LibBalsaMailbox * mailbox, const gchar *data,
-					     LibBalsaMessageFlag flags)
-{
-    int retval = -1;
-    GMimeStream *stream;
-    g_warning("obsolete, use libbalsa_mailbox_add_message_stream");
-    g_return_val_if_fail(mailbox != NULL, FALSE);
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
-
-    stream = g_mime_stream_mem_new_with_buffer(data, strlen(data));
-    retval = libbalsa_mailbox_add_message_stream(mailbox, stream, flags);
-    g_mime_stream_unref(stream);
-    return retval;
-}
-
 void libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox, guint msgno,
 					   LibBalsaMessageFlag set,
 					   LibBalsaMessageFlag clear)

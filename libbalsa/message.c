@@ -1020,7 +1020,7 @@ libbalsa_message_get_subject(LibBalsaMessage* msg)
     } else
 	ret = msg->subj;
 
-    return ret ? ret : _("(No sibject)");
+    return ret ? ret : _("(No subject)");
 }
 
 

@@ -1,3 +1,11 @@
+2003-09-06  Magick <magick@Linux-Fan.com>
+
+	*libbalsa/imap/Makefile.am: add imap_private.h
+	*libbalsa/source-viewer.c: close message string
+	*libbalsa/message.c: typo fix sibject->subject
+	*libbalsa/mailbox.h:
+	*libbalsa/mailbox.c: remove libbalsa_mailbox_add_message
+
 2003-09-06  Carlos Morgado  <chbm chbm.net>
 
 	* libbalsa/mailbox_mh.c (Repository): 

@@ -62,21 +62,6 @@ typedef struct {
 } emailData;
 
 
-/*
- * Structure to keep track of what the user is typing, and of
- * what we are displaying.  We need this, because GtkEntry
- * doesn't differentiate between input and output.
- *
- * list is a list of emailData structures.
- *
- * active points to the currently active entry.
- */
-typedef struct {
-    GList *list;
-    GList *active;
-} inputData;
-
-
 /*************************************************************************
  *                                                                       *
  * A subclass of gtkentry to allow alias completion.                     *
@@ -95,7 +80,9 @@ typedef struct _LibBalsaAddressEntryClass LibBalsaAddressEntryClass;
 struct _LibBalsaAddressEntry {
     GtkEntry parent;
 
-    inputData *input;		/* A GList of email addresses. */
+    GList *active;              /* A GList of email addresses.
+                                 * Caution! active may not
+                                 * point to the start of the list. */
     gint focus;			/* Used to keep track of the validity of
 				   the 'input' variable. */
     gchar *domain;		/* The domain to add if the user omits one. */

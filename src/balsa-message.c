@@ -1721,6 +1721,7 @@ check_over_url(GtkWidget *widget, GdkEvent *event, gpointer data)
     gint x, y;
     GdkModifierType mask;
     static gboolean was_over_url = FALSE;
+    static hotarea_t *current_url = NULL;
 
     if (!hotarea_list)
 	return FALSE;
@@ -1738,8 +1739,13 @@ check_over_url(GtkWidget *widget, GdkEvent *event, gpointer data)
 	    if (!was_over_url) {
 		gdk_window_set_cursor(GTK_TEXT(widget)->text_area, 
 				      url_cursor_over_url);
-		balsa_gtk_html_on_url(NULL, hotarea_data->url->url);
 		was_over_url = TRUE;
+	    }
+	    if (hotarea_data != current_url) {
+		if (current_url)
+		    balsa_gtk_html_on_url(NULL, NULL);
+		balsa_gtk_html_on_url(NULL, hotarea_data->url->url);
+		current_url = hotarea_data;
 	    }
 	    return FALSE;
 	}
@@ -1750,6 +1756,7 @@ check_over_url(GtkWidget *widget, GdkEvent *event, gpointer data)
 	gdk_window_set_cursor(GTK_TEXT(widget)->text_area, url_cursor_normal);
 	balsa_gtk_html_on_url(NULL, NULL);
 	was_over_url = FALSE;
+	current_url = NULL;
     }
 
     return FALSE;

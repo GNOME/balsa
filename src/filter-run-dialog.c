@@ -367,7 +367,8 @@ static void
 balsa_filter_run_dispose(GObject * object)
 {
     BalsaFilterRunDialog* bfrd = BALSA_FILTER_RUN_DIALOG(object);
-    if(bfrd->mbox) libbalsa_mailbox_close(bfrd->mbox); 
+    if (bfrd->mbox)
+        libbalsa_mailbox_close(bfrd->mbox, balsa_app.expunge_on_close);
     bfrd->mbox = NULL;
     G_OBJECT_CLASS(parent_class)->dispose(object);
 }

@@ -80,9 +80,8 @@ typedef struct _PropertyUI {
 
     GtkWidget *close_mailbox_auto;
     GtkWidget *close_mailbox_minutes;
-    GtkWidget *commit_mailbox_auto;
-    GtkWidget *commit_mailbox_minutes;
-    GtkWidget *delete_immediately;
+    GtkWidget *hide_deleted;
+    GtkWidget *expunge_on_close;
 
     GtkWidget *previewpane;
     GtkWidget *alternative_layout;
@@ -298,7 +297,6 @@ static void address_book_add_cb(GtkWidget * widget, gpointer data);
 static void address_book_delete_cb(GtkWidget * widget, gpointer data);
 static void timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void mailbox_close_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
-static void mailbox_commit_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void browse_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox);
@@ -506,17 +504,12 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     g_signal_connect(G_OBJECT(pui->close_mailbox_auto), "toggled",
 		     G_CALLBACK(mailbox_close_timer_modified_cb), property_box);
-
     g_signal_connect(G_OBJECT(pui->close_mailbox_minutes), "changed",
 		     G_CALLBACK(mailbox_close_timer_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->commit_mailbox_auto), "toggled",
-		     G_CALLBACK(mailbox_commit_timer_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->commit_mailbox_minutes), "changed",
-		     G_CALLBACK(mailbox_commit_timer_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->delete_immediately), "toggled",
+    g_signal_connect(G_OBJECT(pui->hide_deleted), "toggled",
+		     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->expunge_on_close), "toggled",
 		     G_CALLBACK(properties_modified_cb), property_box);
 
     g_signal_connect(G_OBJECT(pui->browse_wrap), "toggled",
@@ -790,14 +783,13 @@ apply_prefs(GtkDialog * pbox)
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
 					 (pui->close_mailbox_minutes)) * 60;
 
-    balsa_app.commit_mailbox_auto =
-	GTK_TOGGLE_BUTTON(pui->commit_mailbox_auto)->active;
-    balsa_app.commit_mailbox_timeout =
-	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
-					 (pui->commit_mailbox_minutes)) * 60;
-    balsa_app.delete_immediately =
+    balsa_app.hide_deleted =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                     (pui->delete_immediately));
+                                     (pui->hide_deleted));
+    libbalsa_mailbox_set_filter(NULL, balsa_app.hide_deleted ? 1 : 0);
+    balsa_app.expunge_on_close =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                     (pui->expunge_on_close));
 
     /* external editor */
     balsa_app.edit_headers = GTK_TOGGLE_BUTTON(pui->edit_headers)->active;
@@ -1038,21 +1030,16 @@ set_prefs(void)
 				 balsa_app.close_mailbox_auto);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->close_mailbox_minutes),
 			      (float) balsa_app.close_mailbox_timeout / 60);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->commit_mailbox_auto),
-				 balsa_app.commit_mailbox_auto);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->commit_mailbox_minutes),
-			      (float) balsa_app.commit_mailbox_timeout / 60);
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-                                 (pui->delete_immediately),
-                                 balsa_app.delete_immediately);
+                                 (pui->hide_deleted),
+                                 balsa_app.hide_deleted);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                 (pui->expunge_on_close),
+                                 balsa_app.expunge_on_close);
 
     gtk_widget_set_sensitive(pui->close_mailbox_minutes,
 			     GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->
-    		    	    active);
-
-    gtk_widget_set_sensitive(pui->commit_mailbox_minutes,
-			     GTK_TOGGLE_BUTTON(pui->commit_mailbox_auto)->
     		    	    active);
 
     gtk_widget_set_sensitive(pui->check_mail_minutes,
@@ -2437,23 +2424,22 @@ static GtkWidget *
 misc_group(GtkWidget * page)
 {
     GtkWidget *group;
-    GtkWidget *label1, *label2;
-    GtkWidget *hbox1,*hbox2;
+    GtkWidget *label;
+    GtkWidget *hbox;
     GtkObject *close_spinbutton_adj;
-    GtkObject *commit_spinbutton_adj;
 
     group = pm_group_new(_("Miscellaneous"));
 
     pui->debug = pm_group_add_check(group, _("Debug"));
     pui->empty_trash = pm_group_add_check(group, _("Empty Trash on exit"));
 
-    hbox1 = gtk_hbox_new(FALSE, COL_SPACING);
-    pm_group_add(group, hbox1);
+    hbox = gtk_hbox_new(FALSE, COL_SPACING);
+    pm_group_add(group, hbox);
 
     pui->close_mailbox_auto =
 	gtk_check_button_new_with_label(_("Automatically close mailbox "
                                           "if unused more than"));
-    gtk_box_pack_start(GTK_BOX(hbox1), pui->close_mailbox_auto,
+    gtk_box_pack_start(GTK_BOX(hbox), pui->close_mailbox_auto,
                        FALSE, FALSE, 0);
     pm_page_add_to_size_group(page, pui->close_mailbox_auto);
 
@@ -2462,32 +2448,11 @@ misc_group(GtkWidget * page)
 	gtk_spin_button_new(GTK_ADJUSTMENT(close_spinbutton_adj), 1, 0);
     gtk_widget_show(pui->close_mailbox_minutes);
     gtk_widget_set_sensitive(pui->close_mailbox_minutes, FALSE);
-    gtk_box_pack_start(GTK_BOX(hbox1), pui->close_mailbox_minutes,
+    gtk_box_pack_start(GTK_BOX(hbox), pui->close_mailbox_minutes,
                        FALSE, FALSE, 0);
 
-    label1 = gtk_label_new(_("minutes"));
-    gtk_box_pack_start(GTK_BOX(hbox1), label1, FALSE, TRUE, 0);
-
-
-    hbox2 = gtk_hbox_new(FALSE, COL_SPACING);
-    pm_group_add(group, hbox2);
-
-    pui->commit_mailbox_auto =
-	gtk_check_button_new_with_label(_("Automatically commit mailbox "
-                                          "if unused more than"));
-    gtk_box_pack_start(GTK_BOX(hbox2), pui->commit_mailbox_auto,
-                       FALSE, FALSE, 0);
-    pm_page_add_to_size_group(page, pui->commit_mailbox_auto);
-
-    commit_spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 10);
-    pui->commit_mailbox_minutes =
-	gtk_spin_button_new(GTK_ADJUSTMENT(commit_spinbutton_adj), 1, 0);
-    gtk_widget_show(pui->commit_mailbox_minutes);
-    gtk_widget_set_sensitive(pui->commit_mailbox_minutes, FALSE);
-    gtk_box_pack_start(GTK_BOX(hbox2), pui->commit_mailbox_minutes,
-                       FALSE, FALSE, 0);
-    label2 = gtk_label_new(_("minutes"));
-    gtk_box_pack_start(GTK_BOX(hbox2), label2, FALSE, TRUE, 0);
+    label = gtk_label_new(_("minutes"));
+    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 0);
 
     return group;
 }
@@ -2496,12 +2461,28 @@ static GtkWidget *
 deleting_messages_group(GtkWidget * page)
 {
     GtkWidget *group;
+    GtkWidget *label;
 
     group = pm_group_new(_("Deleting Messages"));
 
-    pui->delete_immediately =
-        pm_group_add_check(group, _("Delete immediately "
-                                    "and irretrievably"));
+    label = gtk_label_new(_("The following setting is global, "
+			    "but may be overridden "
+			    "for the selected mailbox\n"
+			    "using Mailbox -> Hide messages:"));
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
+    pm_group_add(group, label);
+    pui->hide_deleted =
+        pm_group_add_check(group, _("Hide messages marked as deleted"));
+
+    label = gtk_label_new(_("The following setting is global."));
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
+    pm_group_add(group, label);
+    pui->expunge_on_close =
+        pm_group_add_check(group, _("Expunge deleted messages "
+				    "when mailbox is closed"));
+
     return group;
 }
 
@@ -3008,18 +2989,6 @@ mailbox_close_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 	    pui->close_mailbox_auto));
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->close_mailbox_minutes),
-			     newstate);
-
-    properties_modified_cb(widget, pbox);
-}
-
-void
-mailbox_commit_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
-{
-    gboolean newstate =	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
-	    pui->commit_mailbox_auto));
-
-    gtk_widget_set_sensitive(GTK_WIDGET(pui->commit_mailbox_minutes),
 			     newstate);
 
     properties_modified_cb(widget, pbox);

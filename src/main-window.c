@@ -113,7 +113,7 @@ static void balsa_window_real_close_mbnode(BalsaWindow *window,
 					   BalsaMailboxNode *mbnode);
 static void balsa_window_destroy(GtkObject * object);
 
-static gboolean balsa_close_commit_mailbox_on_timer(GtkWidget * widget, 
+static gboolean balsa_close_mailbox_on_timer(GtkWidget * widget, 
 					     gpointer * data);
 
 static void balsa_window_index_changed_cb(GtkWidget * widget,
@@ -228,8 +228,7 @@ static void show_name_cb(GtkWidget * widget, gpointer data);
 static void show_patch_cb(GtkWidget * widget, gpointer data);
 #endif
 static void reset_filter_cb(GtkWidget * widget, gpointer data);
-static void mailbox_commit_changes(GtkWidget * widget, gpointer data);
-static void mailbox_commit_all(GtkWidget * widget, gpointer data);
+static void mailbox_expunge_cb(GtkWidget * widget, gpointer data);
 
 static void show_mbtree_cb(GtkWidget * widget, gpointer data);
 #if !defined(ENABLE_TOUCH_UI)
@@ -750,14 +749,15 @@ static GnomeUIInfo mailbox_menu[] = {
                            show_name_cb, GTK_STOCK_FIND),
     GNOMEUIINFO_ITEM_STOCK(N_("Show _Patches"),  "",
                            show_patch_cb, GTK_STOCK_FIND),
-#define FILTER_ENTRIES_CNT 5
+#define DEBUG_ENTRIES_CNT 2
 #else
-#define FILTER_ENTRIES_CNT 3
+#define DEBUG_ENTRIES_CNT 0
 #endif
+#define MENU_MAILBOX_RESET_POS (MENU_MAILBOX_HIDE_POS + DEBUG_ENTRIES_CNT + 1)
     GNOMEUIINFO_ITEM_STOCK(N_("Reset _Filter"),  "",
                            reset_filter_cb, GTK_STOCK_FIND),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_MARK_ALL_POS (MENU_MAILBOX_HIDE_POS+FILTER_ENTRIES_CNT)
+#define MENU_MAILBOX_MARK_ALL_POS (MENU_MAILBOX_RESET_POS + 2)
     {
         GNOME_APP_UI_ITEM, N_("Select all"),
         N_("Select all messages in current mailbox"),
@@ -777,16 +777,12 @@ static GnomeUIInfo mailbox_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_COMMIT_POS (MENU_MAILBOX_DELETE_POS+2)
     GNOMEUIINFO_ITEM_STOCK(
-        N_("Co_mmit Current"),
-        N_("Commit the changes in the currently opened mailbox"),
-        mailbox_commit_changes,
-        GTK_STOCK_REFRESH),
-    GNOMEUIINFO_ITEM_STOCK(
-        N_("Commit _All"),
-        N_("Commit the changes in all mailboxes"),
-        mailbox_commit_all,
-        GTK_STOCK_REFRESH),
-#define MENU_MAILBOX_CLOSE_POS (MENU_MAILBOX_COMMIT_POS+2)
+        N_("E_xpunge Deleted Messages"),
+        N_("Expunge messages marked as deleted "
+	   "in the currently opened mailbox"),
+        mailbox_expunge_cb,
+        GTK_STOCK_REMOVE),
+#define MENU_MAILBOX_CLOSE_POS (MENU_MAILBOX_COMMIT_POS+1)
     GNOMEUIINFO_ITEM_STOCK(N_("_Close"), N_("Close mailbox"),
                            mailbox_close_cb, GTK_STOCK_CLOSE),
     GNOMEUIINFO_SEPARATOR,
@@ -906,7 +902,7 @@ balsa_window_class_init(BalsaWindowClass * klass)
     /* Signals */
     klass->identities_changed = NULL;
 
-    g_timeout_add(30000, (GSourceFunc) balsa_close_commit_mailbox_on_timer, NULL);
+    g_timeout_add(30000, (GSourceFunc) balsa_close_mailbox_on_timer, NULL);
 
 }
 
@@ -1314,6 +1310,7 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
     const static int mailbox_menu_entries[] = {
      /* MENU_MAILBOX_NEXT_POS,        MENU_MAILBOX_PREV_POS,
         MENU_MAILBOX_NEXT_UNREAD_POS, */ MENU_MAILBOX_NEXT_FLAGGED_POS,
+        MENU_MAILBOX_HIDE_POS,        MENU_MAILBOX_RESET_POS,
         MENU_MAILBOX_MARK_ALL_POS,    MENU_MAILBOX_DELETE_POS,
         MENU_MAILBOX_EDIT_POS,     /* MENU_MAILBOX_COMMIT_POS, */
 	MENU_MAILBOX_CLOSE_POS,       MENU_MAILBOX_APPLY_FILTERS,
@@ -1954,7 +1951,7 @@ balsa_identities_changed(BalsaWindow *bw)
 }
 
 static gboolean
-balsa_close_commit_mailbox_on_timer(GtkWidget * widget, gpointer * data)
+balsa_close_mailbox_on_timer(GtkWidget * widget, gpointer * data)
 {
     time_t current_time;
     GtkWidget *page;
@@ -1962,7 +1959,7 @@ balsa_close_commit_mailbox_on_timer(GtkWidget * widget, gpointer * data)
 
     if (!balsa_app.notebook)
         return FALSE;
-    if (! (balsa_app.close_mailbox_auto || balsa_app.commit_mailbox_auto) )
+    if (!balsa_app.close_mailbox_auto)
         return TRUE;
 
     gdk_threads_enter();
@@ -1974,24 +1971,14 @@ balsa_close_commit_mailbox_on_timer(GtkWidget * widget, gpointer * data)
          (page =
           gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
          i++) {
-	BalsaIndex *index = BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
-        delta_time = current_time - index->mailbox_node->last_use;
-        if (balsa_app.commit_mailbox_auto &&
-            delta_time < 31+balsa_app.commit_mailbox_timeout &&
-            /* only do this once */
-            delta_time > balsa_app.commit_mailbox_timeout &&
-	    !BALSA_INDEX(index)->mailbox_node->mailbox->readonly) {
-            if (balsa_app.debug)
-                fprintf(stderr, "Commiting %s, time: %d\n",
-                        BALSA_INDEX(index)->mailbox_node->mailbox->url ,
-                        delta_time);
-            libbalsa_mailbox_sync_storage
-                (BALSA_INDEX(index)->mailbox_node->mailbox, FALSE);
-        }
-	if (i == c)
+        BalsaIndex *index = BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
+
+        if (i == c)
             continue;
+
         if (balsa_app.close_mailbox_auto &&
-	    delta_time > balsa_app.close_mailbox_timeout) {
+            (delta_time = current_time - index->mailbox_node->last_use) >
+            balsa_app.close_mailbox_timeout) {
             if (balsa_app.debug)
                 fprintf(stderr, "Closing Page %d unused for %d s\n",
                         i, delta_time);
@@ -3704,26 +3691,12 @@ reset_filter_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-mailbox_commit_changes(GtkWidget * widget, gpointer data)
+mailbox_expunge_cb(GtkWidget * widget, gpointer data)
 {
     GtkWidget *index;
 
     index = balsa_window_find_current_index(BALSA_WINDOW(data));
     balsa_index_expunge(BALSA_INDEX(index));
-}
-
-static void
-mailbox_commit_each(GtkWidget * page, gpointer data) 
-{
-    BalsaIndex *index = BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
-    balsa_index_expunge(index);
-}
-
-static void
-mailbox_commit_all(GtkWidget * widget, gpointer data)
-{
-    gtk_container_foreach(GTK_CONTAINER(BALSA_WINDOW(data)->notebook),
-			  mailbox_commit_each, NULL);
 }
 
 /* empty_trash:
@@ -3749,7 +3722,8 @@ empty_trash(BalsaWindow * window)
 				  TRUE);
     g_list_foreach(msg_list, (GFunc)g_object_unref, NULL);
     g_list_free(msg_list);
-    libbalsa_mailbox_close(balsa_app.trash);
+    /* We want to expunge deleted messages: */
+    libbalsa_mailbox_close(balsa_app.trash, TRUE);
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
 				balsa_app.trash);
     enable_empty_trash(window, TRASH_EMPTY);

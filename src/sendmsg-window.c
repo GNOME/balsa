@@ -613,7 +613,9 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 
     if (bsmsg->orig_message) {
 	if (bsmsg->orig_message->mailbox)
-	    libbalsa_mailbox_close(bsmsg->orig_message->mailbox);
+	    libbalsa_mailbox_close(bsmsg->orig_message->mailbox,
+		    /* Respect pref setting: */
+				   balsa_app.expunge_on_close);
 	g_object_unref(G_OBJECT(bsmsg->orig_message));
     }
 
@@ -3794,7 +3796,9 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
     if (bsmsg->orig_message) {
 	if (bsmsg->orig_message->mailbox)
-	    libbalsa_mailbox_close(bsmsg->orig_message->mailbox);
+	    libbalsa_mailbox_close(bsmsg->orig_message->mailbox,
+		    /* Respect pref setting: */
+				   balsa_app.expunge_on_close);
 	g_object_unref(G_OBJECT(bsmsg->orig_message));
     }
     bsmsg->type = SEND_CONTINUE;

@@ -676,6 +676,13 @@ config_global_load(void)
 
     balsa_app.expand_tree = gnome_config_get_bool("ExpandTree=false");
 
+    {                             /* scope */
+        guint type =
+            gnome_config_get_int_with_default("ThreadingType", &def_used);
+        if (!def_used)
+            libbalsa_mailbox_set_threading_type(NULL, type);
+    }
+
     /* ... Quote colouring */
     g_free(balsa_app.quote_regex);
     balsa_app.quote_regex =
@@ -752,10 +759,11 @@ config_global_load(void)
 
     /* ... Progress Window Dialog */
     balsa_app.pwindow_option = d_get_gint("ProgressWindow", WHILERETR);
-    balsa_app.delete_immediately =
-        gnome_config_get_bool("DeleteImmediately=false");
     balsa_app.hide_deleted =
         gnome_config_get_bool("HideDeleted=true");
+    libbalsa_mailbox_set_filter(NULL, balsa_app.hide_deleted ? 1 : 0);
+    balsa_app.expunge_on_close =
+        gnome_config_get_bool("ExpungeOnClose=true");
 
     gnome_config_pop_prefix();
 
@@ -992,8 +1000,6 @@ config_global_load(void)
     balsa_app.close_mailbox_auto = gnome_config_get_bool("AutoCloseMailbox=true");
     /* timeouts in minutes in config file for backwards compat */
     balsa_app.close_mailbox_timeout = gnome_config_get_int("AutoCloseMailboxTimeout=10") * 60;
-    balsa_app.commit_mailbox_auto = gnome_config_get_bool("AutoCommitMailbox=true");
-    balsa_app.commit_mailbox_timeout = gnome_config_get_int("AutoCommitMailboxTimeout=2") * 60;
     
     balsa_app.remember_open_mboxes =
 	gnome_config_get_bool("RememberOpenMailboxes=false");
@@ -1131,10 +1137,8 @@ config_save(void)
     gnome_config_set_bool("MsgSizeAsLines", balsa_app.line_length);
     gnome_config_set_bool("PageDownMod", balsa_app.pgdownmod);
     gnome_config_set_int("PageDownPercent", balsa_app.pgdown_percent);
-    gnome_config_set_bool("DeleteImmediately",
-                          balsa_app.delete_immediately);
-    gnome_config_set_bool("HideDeleted",
-                          balsa_app.hide_deleted);
+    gnome_config_set_bool("HideDeleted", balsa_app.hide_deleted);
+    gnome_config_set_bool("ExpungeOnClose", balsa_app.expunge_on_close);
 
     gnome_config_pop_prefix();
 
@@ -1276,8 +1280,6 @@ config_save(void)
 
     gnome_config_set_bool("AutoCloseMailbox", balsa_app.close_mailbox_auto);
     gnome_config_set_int("AutoCloseMailboxTimeout", balsa_app.close_mailbox_timeout/60);
-    gnome_config_set_bool("AutoCommitMailbox", balsa_app.commit_mailbox_auto);
-    gnome_config_set_int("AutoCommitMailboxTimeout", balsa_app.commit_mailbox_timeout/60);
 
     gnome_config_set_bool("RememberOpenMailboxes",
 			  balsa_app.remember_open_mboxes);
@@ -1588,13 +1590,6 @@ config_views_load_with_prefix(const gchar * prefix, gboolean compat)
 void
 config_views_load(void)
 {
-    gint type, def;
-
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MessageDisplay/");
-    type = gnome_config_get_int_with_default("ThreadingType", &def);
-    if (!def)
-	libbalsa_mailbox_set_threading_type(NULL, type);
-    gnome_config_pop_prefix();
     /* Load old-style config sections in compatibility mode. */
     config_views_load_with_prefix(VIEW_SECTION_PREFIX, TRUE);
     config_views_load_with_prefix(VIEW_BY_URL_SECTION_PREFIX, FALSE);

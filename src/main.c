@@ -482,11 +482,6 @@ main(int argc, char *argv[])
 #endif
 
     balsa_app_init();
-    libbalsa_mailbox_view_table =
-	g_hash_table_new_full(g_str_hash, g_str_equal,
-			      (GDestroyNotify) g_free,
-			      (GDestroyNotify) libbalsa_mailbox_view_free);
-    config_views_load();
 
     /* Initialize libbalsa */
     libbalsa_init((LibBalsaInformationFunc) balsa_information_real);
@@ -495,6 +490,11 @@ main(int argc, char *argv[])
     
     /* checking for valid config files */
     config_init();
+    libbalsa_mailbox_view_table =
+	g_hash_table_new_full(g_str_hash, g_str_equal,
+			      (GDestroyNotify) g_free,
+			      (GDestroyNotify) libbalsa_mailbox_view_free);
+    config_views_load();
 
     default_icon = balsa_pixmap_finder("balsa_icon.png");
     if(default_icon) { /* may be NULL for developer installations */

@@ -217,7 +217,7 @@ bndx_destroy(GtkObject * obj)
 						 G_SIGNAL_MATCH_DATA,
 						 0, 0, NULL, NULL, index);
 	    gtk_tree_view_set_model(GTK_TREE_VIEW(index), NULL);
-	    libbalsa_mailbox_close(mailbox);
+	    libbalsa_mailbox_close(mailbox, balsa_app.expunge_on_close);
 
 	    libbalsa_mailbox_search_iter_free(index->search_iter);
 	    index->search_iter = NULL;

@@ -275,13 +275,15 @@ typedef struct {
     GtkDialog *dialog;
     GtkWidget *parent_folder, *folder_name;
     gchar *old_folder, *old_parent;
-    BalsaMailboxNode *mbnode;
+    BalsaMailboxNode *parent; /* (new) parent of the mbnode.  */
+                              /* Used for renaming and creation */
+    BalsaMailboxNode *mbnode; /* edited mbnode          */
 } SubfolderDialogData;
 
 static void
 validate_sub_folder(GtkWidget * w, SubfolderDialogData * fcw)
 {
-    BalsaMailboxNode *mn = fcw->mbnode;
+    BalsaMailboxNode *mn = fcw->parent;
     /*
      * Allow typing in the parent_folder entry box only if we already
      * have the server information in mn:
@@ -317,6 +319,7 @@ browse_button_select_row_cb(GtkTreeSelection * selection, gpointer data)
             GtkTreeView *tree_view =
                 gtk_tree_selection_get_tree_view(selection);
             gchar *path = mbnode->dir;
+            fcw->parent = mbnode;
 
             if (path)
                 gtk_entry_set_text(GTK_ENTRY(fcw->parent_folder), path);
@@ -426,7 +429,7 @@ subfolder_conf_clicked_cb(gpointer data)
 	folder = 
             gtk_editable_get_chars(GTK_EDITABLE(fcw->folder_name), 0, -1);
         
-	if (fcw->old_folder) {
+	if (fcw->mbnode) {
 	    /* rename */
 	    if (strcmp(parent, fcw->old_parent) || 
                 strcmp(folder, fcw->old_folder)) {
@@ -496,13 +499,13 @@ subfolder_conf_clicked_cb(gpointer data)
 		}
 	    }
 	} else {
-	    /* create */
+	    /* create and subscribe, if parent was. */
 	    libbalsa_imap_new_subfolder(parent, folder,
-					fcw->mbnode->subscribed,
-					fcw->mbnode->server);
+					fcw->parent->subscribed,
+					fcw->parent->server);
 
 	    /* see it as server sees it: */
-	    balsa_mailbox_node_rescan(fcw->mbnode);
+	    balsa_mailbox_node_rescan(fcw->parent);
 	}
 	g_free(parent);
 	g_free(folder);
@@ -536,6 +539,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 	    return;
 	}
 	fcw.mbnode = mn;
+	fcw.parent = mn->parent;
 	fcw.old_folder = mn->mailbox->name;
     } else {
 	/* create */
@@ -546,7 +550,8 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 	    fcw.mbnode = mbnode;
 	else
 	    fcw.mbnode = NULL;
-	fcw.old_folder = NULL;
+        fcw.old_folder = NULL;
+        fcw.parent = NULL;
     }
     fcw.old_parent = fcw.mbnode ? fcw.mbnode->parent->dir : NULL;
 

@@ -94,6 +94,7 @@ struct _MailboxConfWindow {
     GtkWidget *pop_check;
     GtkWidget *pop_delete_from_server;
     GtkWidget *pop_use_apop;
+    GtkWidget *pop_filter;
 };
 
 static MailboxConfWindow *mcw;
@@ -349,9 +350,11 @@ mailbox_conf_set_values(LibBalsaMailbox * mailbox)
 				     pop3->use_apop);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->pop_check),
 				     pop3->check);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-				     (mcw->pop_delete_from_server),
-				     pop3->delete_from_server);
+	gtk_toggle_button_set_active(
+	    GTK_TOGGLE_BUTTON(mcw->pop_delete_from_server),
+	    pop3->delete_from_server);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->pop_filter),
+				     pop3->filter);
 	g_free(port);
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 	LibBalsaMailboxImap *imap;
@@ -514,9 +517,13 @@ update_pop_mailbox(LibBalsaMailboxPop3 * mailbox)
 				  (GTK_ENTRY(mcw->pop_port))));
     mailbox->check =
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->pop_check));
+    mailbox->use_apop =
+	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->pop_use_apop));
     mailbox->delete_from_server =
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
 				     (mcw->pop_delete_from_server));
+    mailbox->filter =
+	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->pop_filter));
 }
 
 static void
@@ -828,7 +835,7 @@ create_label(const gchar * label, GtkWidget * table, gint row)
     GtkWidget *w = gtk_label_new(label);
     gtk_misc_set_alignment(GTK_MISC(w), 1.0, 0.5);
     gtk_table_attach(GTK_TABLE(table), w, 0, 1, row, row + 1,
-		     GTK_FILL, GTK_FILL, 10, 10);
+		     GTK_FILL, GTK_FILL, 5, 5);
     gtk_widget_show(w);
     return w;
 }
@@ -838,7 +845,7 @@ create_entry(GtkWidget * table, gint row, const gchar * initval)
 {
     GtkWidget *entry = gtk_entry_new();
     gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
-		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
     if (initval)
 	gtk_entry_append_text(GTK_ENTRY(entry), initval);
     gtk_widget_show(entry);
@@ -880,8 +887,7 @@ create_pop_mailbox_page(void)
     GtkWidget *return_widget;
     GtkWidget *table;
 
-    return_widget = table = gtk_table_new(8, 2, FALSE);
-    gtk_widget_show(table);
+    return_widget = table = gtk_table_new(7, 2, FALSE);
 
     /* mailbox name */
     create_label(_("Mailbox Name:"), table, 0);
@@ -906,27 +912,27 @@ create_pop_mailbox_page(void)
     gtk_entry_set_visibility(GTK_ENTRY(mcw->pop_password), FALSE);
 
     /* toggle for apop */
-
-    mcw->pop_use_apop = gtk_check_button_new_with_label(_("Use APOP"));
-    gtk_table_attach(GTK_TABLE(table), mcw->pop_use_apop, 0, 2, 5, 6,
-		     GTK_FILL, GTK_FILL, 10, 10);
-    gtk_widget_show(mcw->pop_use_apop);
+    mcw->pop_use_apop = gtk_check_button_new_with_label(_("APOP"));
+    gtk_table_attach(GTK_TABLE(table), mcw->pop_use_apop, 0, 1, 5, 6,
+		     GTK_FILL, GTK_FILL, 2, 2);
 
     /* toggle for check */
-
     mcw->pop_check = gtk_check_button_new_with_label(_("Check"));
-    gtk_table_attach(GTK_TABLE(table), mcw->pop_check, 0, 2, 6, 7,
-		     GTK_FILL, GTK_FILL, 10, 10);
-    gtk_widget_show(mcw->pop_check);
+    gtk_table_attach(GTK_TABLE(table), mcw->pop_check, 0, 1, 6, 7,
+		     GTK_FILL, GTK_FILL, 2, 2);
 
     /* toggle for deletion from server */
-
     mcw->pop_delete_from_server =
 	gtk_check_button_new_with_label(_("Delete from server"));
-    gtk_table_attach(GTK_TABLE(table), mcw->pop_delete_from_server, 0, 2,
-		     7, 8, GTK_FILL, GTK_FILL, 10, 10);
-    gtk_widget_show(mcw->pop_delete_from_server);
+    gtk_table_attach(GTK_TABLE(table), mcw->pop_delete_from_server, 1, 2,
+		     5, 6, GTK_FILL, GTK_FILL, 2, 2);
 
+    mcw->pop_filter = 
+	gtk_check_button_new_with_label(_("Filter through procmail"));
+    gtk_table_attach(GTK_TABLE(table), mcw->pop_filter, 1, 2,
+		     6, 7, GTK_FILL, GTK_FILL, 2, 2);
+
+    gtk_widget_show_all(return_widget);
     return return_widget;
 }
 

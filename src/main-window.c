@@ -1263,8 +1263,7 @@ check_new_messages_cb(GtkWidget * widget, gpointer data)
 static void
 send_outbox_messages_cb(GtkWidget * widget, gpointer data)
 {
-    libbalsa_message_send(NULL, balsa_app.outbox,
-			  balsa_app.encoding_style);
+    libbalsa_process_queue(balsa_app.outbox, balsa_app.encoding_style);
 }
 
 /* this one is called only in the threaded code */

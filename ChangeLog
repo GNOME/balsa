@@ -1,3 +1,19 @@
+2000-11-13  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/Makefile.am: plug in new pop3.[hc] files
+	* libbalsa/mailbox_pop3.[hc]: use new POP3 code. add filtering
+	option.
+	* libbalsa/message.h: add prototype of libbalsa_message_queue()
+	* libbalsa/misc.h: add prototype of libbalsa_process_queue()
+	* libbalsa/send.c: split libbalsa_message_send to _send()
+	and process_queue()
+	* libbalsa/pop3.[ch]: added.
+	* libmutt/Makefile.am: remove old pop.c
+	* src/sendmsg-window.[hc]: add Queue=Send Later menu entry.
+	* src/main-window.c: use libbalsa_process_queue() for sending
+	queued mails.
+	* src/mailbox-conf.c: add filter to the configurable POP settings.
+	
 2000-11-13  Gediminas Paulauskas  <menesis@delfi.lt>
 
 	* intl, .cvsignore: removed this dir completely.

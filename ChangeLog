@@ -1,3 +1,8 @@
+2003-01-30  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_imap.c: remove misspelling in the message
+	* src/main-window.c: resolve shortcut conflict in Find dialog.
+
 2003-01-29  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: fix the openssl test (bug 104758, marcus@freebsd.org).

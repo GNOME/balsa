@@ -103,7 +103,7 @@ int imap_cmd_step (IMAP_DATA* idata)
    * line */
   do
   {
-    if (len == cmd->blen)
+    if (len+1 >= cmd->blen)
     {
       safe_realloc ((void**) &cmd->buf, cmd->blen + IMAP_CMD_BUFSIZE);
       cmd->blen = cmd->blen + IMAP_CMD_BUFSIZE;
@@ -124,7 +124,7 @@ int imap_cmd_step (IMAP_DATA* idata)
   /* if we've read all the way to the end of the buffer, we haven't read a
    * full line (mutt_socket_readln strips the \r, so we always have at least
    * one character free when we've read a full line) */
-  while (len == cmd->blen);
+  while (len+1 == cmd->blen);
 
   /* don't let one large string make cmd->buf hog memory forever */
   if ((cmd->blen > IMAP_CMD_BUFSIZE) && (len <= IMAP_CMD_BUFSIZE))

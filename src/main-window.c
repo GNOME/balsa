@@ -2708,7 +2708,7 @@ find_real(BalsaIndex * bindex,gboolean again)
 	matching_body    = add_check_button(table, _("_Body"),    0, 0);
 	matching_to      = add_check_button(table, _("_To:"),     1, 0);
 	matching_from    = add_check_button(table, _("_From:"),   1, 1);
-        matching_subject = add_check_button(table, _("_Subject"), 2, 0);
+        matching_subject = add_check_button(table, _("S_ubject"), 2, 0);
 	matching_cc      = add_check_button(table, _("_Cc:"),     2, 1);
 	gtk_box_pack_start(GTK_BOX(vbox), page, FALSE, FALSE, 2);
 

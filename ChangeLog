@@ -1,3 +1,12 @@
+2004-03-12 22:33  PeterB
+
+	* libbalsa/: mailbox.c, mailbox_imap.c, message.c: in imap mailbox,
+	apply filters in EXISTS response handler; clean up flags-handling.
+	* libbalsa/: body.c, mailbox_imap.c, mailbox_local.c:
+	get_message_part returns NULL if the part is not a GMimePart.
+	* libbalsa/mailbox_mbox.c: crlf-filter incoming message, not just
+	text parts.
+
 2004-03-12  Pawel Salek
 
 	* src/sendmsg-window.c: disentangle charset/attachment

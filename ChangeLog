@@ -2,6 +2,9 @@
 
 	* libbalsa/imap/imap-handle.c: return '\0' as the delimiter
 	when server responds NIL (exposed by UW-IMAP 2004a).
+	* src/mailbox-node.c: ditto.
+	* libinit_balsa/init_balsa.c: dismiss the wizard when main window
+	is ready.
 
 2004-11-08  Pawel Salek
 

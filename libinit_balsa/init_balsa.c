@@ -26,6 +26,13 @@
 #include "balsa-initdruid.h"
 #include "balsa-druid-page-welcome.h"
 
+static gboolean
+dismiss_the_wizard(GtkWidget *wizard)
+{
+    gtk_widget_destroy(wizard);
+    return FALSE;
+}
+
 void
 balsa_init_begin(void)
 {
@@ -43,5 +50,7 @@ balsa_init_begin(void)
     gtk_main();
     gdk_threads_leave();
 
-    gtk_widget_destroy(window);
+    /* we do not want to destroy wizard immediately to avoid confusing
+       delay between the wizard that left and balsa that entered. */
+    g_idle_add((GSourceFunc)dismiss_the_wizard, window);
 }

@@ -1213,7 +1213,8 @@ add_imap_entry(const char *fn, char delim, gboolean noscan,
     item->marked = marked;
 
     tree->list = g_slist_prepend(tree->list, item);
-    tree->delim = delim;
+    if(delim)  /* some servers may set delim to NIL for some mailboxes */
+        tree->delim = delim;
 }
 
 static void

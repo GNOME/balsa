@@ -58,9 +58,9 @@ enum {
 };
 
 /* Define thread-related globals, including dialogs */
-  GtkWidget *progress_dialog;
-  GtkWidget *progress_dialog_source;
-  GtkWidget *progress_dialog_message;
+  GtkWidget *progress_dialog = NULL;
+  GtkWidget *progress_dialog_source = NULL;
+  GtkWidget *progress_dialog_message = NULL;
 
 
 extern void load_messages (Mailbox * mailbox, gint emit);
@@ -94,6 +94,8 @@ static void show_about_box (void);
 
 /* callbacks */
 static void check_new_messages_cb (GtkWidget *, gpointer data);
+void progress_dialog_destroy_cb ( GtkWidget *, gpointer data);
+gboolean mail_progress_notify_cb( );
 
 static void new_message_cb (GtkWidget * widget, gpointer data);
 static void replyto_message_cb (GtkWidget * widget, gpointer data);
@@ -717,10 +719,9 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
   else
     mbox = NULL;
 
-  if( GTK_IS_WIDGET( progress_dialog ) )
-    gtk_widget_destroy( progress_dialog);
-
   progress_dialog = gnome_dialog_new("Checking Mail...", "Hide", NULL);
+  gtk_signal_connect (GTK_OBJECT (progress_dialog), "destroy",
+                      GTK_SIGNAL_FUNC (progress_dialog_destroy_cb), NULL);
 
   gnome_dialog_set_close(GNOME_DIALOG(progress_dialog), TRUE);
 
@@ -763,7 +764,7 @@ check_messages_thread( Mailbox *mbox )
   MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "Local Mail" );
   mailbox_check_new_messages( mbox );
 
-  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "Finished Checking" );
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_FINISHED, "Finished" );
 
   pthread_mutex_lock( &mailbox_lock );
   checking_mail = 0;
@@ -832,6 +833,11 @@ mail_progress_notify_cb( )
 	    load_messages (balsa_app.inbox, 1);
 	    UNLOCK_MAILBOX (balsa_app.inbox);
 	    break;
+	  case MSGMAILTHREAD_FINISHED:
+	    if( progress_dialog && GTK_IS_WIDGET( progress_dialog ))
+	      gtk_widget_destroy( progress_dialog );
+	    progress_dialog = NULL;
+	    break;
 	  default:
 	    fprintf ( stderr, " Unknown: %s \n", 
 		      threadmessage->message_string );
@@ -846,6 +852,11 @@ mail_progress_notify_cb( )
     return TRUE;
 }
 
+void progress_dialog_destroy_cb( GtkWidget *widget, gpointer data )
+{
+  gtk_widget_destroy( progress_dialog );
+  progress_dialog = NULL;
+}
 
 //static
 GtkWidget *balsa_window_find_current_index(BalsaWindow *window)

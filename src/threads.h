@@ -34,5 +34,7 @@ typedef struct
 #define  MSGMAILTHREAD_UPDATECONFIG     0x0003
 #define	 MSGMAILTHREAD_ERROR            0x0004
 #define  MSGMAILTHREAD_LOAD             0x0005
+#define  MSGMAILTHREAD_FINISHED         0x0006
 
 #endif /* __THREADS_H__ */
+

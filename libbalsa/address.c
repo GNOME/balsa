@@ -190,3 +190,10 @@ libbalsa_address_to_gchar (LibBalsaAddress * addr)
 
 	return retc;
 }
+
+const gchar*
+libbalsa_address_get_name (const LibBalsaAddress * addr)
+{
+	return addr->full_name ? addr->full_name :
+		(addr->address_list ? addr->address_list->data : NULL);
+}

@@ -9,6 +9,14 @@
 	* src/Makefile.am: removed linking against PropList
 	* Makefile.am: added idl/balsa.idl to EXTRA_DIST (dist test).
 	* src/balsa-mblist.c: fix get_bold_font() crash.
+	* libbalsa/address.[hc]: implement libbalsa_address_get_name()
+	that returns person's name if available, or his first email
+	otherwise.
+	* libbalsa/mime.[hc]: proper reply wrapping, pass wrapping length
+	to content2reply().
+	* libbalsa/misc.c(libbalsa_wrap_string): nice wrapping.
+	* src/print.c: change to new content2reply()
+	* src/sendmsg-window.c: the same.
 	
 2000-09-15  Ian Campbell  <ijc25@cam.ac.uk>
 

@@ -28,6 +28,6 @@
 #include "libbalsa.h"
 
 GString * content2reply (LibBalsaMessage * message,
-			 gchar *reply_prefix_str);  /* arp */
+			 gchar *reply_prefix_str, gint llen);  /* arp */
 
 #endif /* __LIBBALSA_MIME_H__ */

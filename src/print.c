@@ -243,30 +243,13 @@ void print_message(GtkWidget *widget, gpointer data)
 	fprintf(fp, "Subject: \t%s\n", message->subject);
 	fprintf(fp, "\n");
 	libbalsa_message_body_ref (message);
-	printtext = content2reply (message, NULL);
+	printtext = content2reply (message, NULL, 
+				   balsa_app.PrintCommand.breakline ? 
+				   balsa_app.PrintCommand.linesize : -1);
 	g_free(date);
-	if (balsa_app.PrintCommand.breakline == TRUE) {
-	    int i = 0 , j = 0;
-	    while (i <= balsa_app.PrintCommand.linesize && printtext->str[j++] != '\0') {
-		if ( printtext->str[j] == '\n') {
-		    printf("\n");
-		    fprintf(fp, "\n");
-		    i = 0;
-		    continue;
-		}
-		if ( i ==  balsa_app.PrintCommand.linesize && printtext->str[j] != '\0') {
-		    i = 0;
-		    fprintf(fp, "\n");
-		}
-		fprintf(fp, "%c", printtext->str[j]);
-		i++;
-	    }
-	}
-	else
-	    fprintf(fp, "%s\n",printtext->str);
+	fprintf(fp, "%s\n",printtext->str);
 
 	libbalsa_message_body_unref (message);
-	fflush(fp);
 	fclose (fp);
 
 	file_print_execute();

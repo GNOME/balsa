@@ -526,14 +526,14 @@ libbalsa_wrap_string(gchar* str, int width)
 	gint te = 0;
 
 	g_return_if_fail(str != NULL);
-	lnbeg= sppos = ptr = str;
+	lnbeg = sppos = ptr = str;
 
 	while(*ptr) {
 		if(*ptr=='\t') te += 7;
 		if(*ptr==' ') sppos = ptr;
 		if(ptr-lnbeg>width-te && sppos>=lnbeg+minl) {
 			*sppos = '\n';
-			lnbeg = ptr; te = 0;
+			lnbeg = sppos+1; te = 0;
 		}
 		if(*ptr=='\n') {
 			lnbeg = ptr; te = 0;

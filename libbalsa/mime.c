@@ -20,6 +20,7 @@
  * 02111-1307, USA.
  */
 
+#include <string.h>
 #include "config.h"
 
 #include "libbalsa.h"
@@ -27,18 +28,17 @@
 
 /* FIXME: The content of this file could go to message.c */
 
-/* FIXME: unnecesary global */
-GString *reply;
+static GString* process_mime_multipart (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar *reply_prefix_str, gint llen);
+static GString* process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar *reply_prefix_str, gint llen);
 
-static void process_mime_multipart (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar *reply_prefix_str);
-static void process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar *reply_prefix_str);
-
-static void
-process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar *reply_prefix_str)
+static GString*
+process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body, 
+		   gchar *reply_prefix_str, gint llen)
 {
 	FILE *part;
 	size_t alloced;
-	gchar *ptr = 0;
+	gchar *res = NULL;
+	GString *reply = NULL;
 
 	switch ( libbalsa_message_body_type (body) ) {
 	case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
@@ -50,46 +50,68 @@ process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar 
 	case LIBBALSA_MESSAGE_BODY_TYPE_VIDEO:
 		break;
 	case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
-		process_mime_multipart (message, body, reply_prefix_str);
+		reply = process_mime_multipart (message, body, 
+						reply_prefix_str, llen);
 		break;
 	case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
-		libbalsa_message_body_save_temporary(body, reply_prefix_str);
+		libbalsa_message_body_save_temporary(body, llen>0 ? NULL :
+			reply_prefix_str);
     
 		part = fopen (body->temp_filename, "r");
-		alloced = libbalsa_readfile (part, &ptr);
-    
-		if (reply) {
-			reply = g_string_append (reply, "\n");
-			reply = g_string_append (reply, ptr);
-		} else {
-			reply = g_string_new (ptr);
+		alloced = libbalsa_readfile (part, &res);
+		if(llen>0) {
+			gchar *str, *ptr;
+			libbalsa_wrap_string(res, 
+					     llen-strlen(reply_prefix_str));
+			/* prepend the prefix to all the lines */
+			reply = g_string_new("");
+			str = res;
+			do {
+				ptr = strchr(str, '\n');
+				if(ptr) *ptr = '\0';
+				reply = g_string_append(reply, 
+							reply_prefix_str);
+				reply = g_string_append(reply, str);
+				reply = g_string_append_c(reply, '\n');
+				str = ptr;
+			} while(str++);
 		}
-
+		g_free(res);
 		break;
 	}
+	return reply;
 }
 
-static void
-process_mime_multipart (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar *reply_prefix_str)
+static GString*
+process_mime_multipart (LibBalsaMessage * message, LibBalsaMessageBody * body,
+			gchar *reply_prefix_str, gint llen)
 {
 	LibBalsaMessageBody *part;
+	GString *res = NULL, *s;
 
 	for (part = body->parts; part; part = part->next) {
-		process_mime_part (message, part, reply_prefix_str);
+		s = process_mime_part (message, part, reply_prefix_str, llen);
+		if(res) {
+			res =  g_string_append(res, s->str);
+			g_string_free(s, TRUE);
+		} else res = s;
 	}
+	return res;
 }
 
 GString *
-content2reply (LibBalsaMessage * message, gchar *reply_prefix_str)
+content2reply (LibBalsaMessage * message, gchar *reply_prefix_str, gint llen)
 {
 	LibBalsaMessageBody *body;
-
-	reply = 0;
+	GString *reply = NULL, *res;
 
 	body = message->body_list;
-
 	while ( body ) {
-		process_mime_part (message, body, reply_prefix_str);
+		res = process_mime_part(message, body, reply_prefix_str, llen);
+		if(reply) {
+			reply =  g_string_append(reply, res->str);
+			g_string_free(res, TRUE);
+		} else reply = res;
 		body = body->next;
 	}    
 

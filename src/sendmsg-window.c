@@ -898,7 +898,7 @@ continueBody(BalsaSendmsg *msg, LibBalsaMessage * message)
    GString *rbdy;
 
    libbalsa_message_body_ref (message);
-   rbdy = content2reply (message, NULL); 
+   rbdy = content2reply (message, NULL, -1); 
    if(rbdy) {
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, 
 		       strlen (rbdy->str));
@@ -910,55 +910,42 @@ continueBody(BalsaSendmsg *msg, LibBalsaMessage * message)
 }
 
 /* quoteBody ------------------------------------------------------------
-   quotes properly the body of the message
+   quotes properly the body of the message.
+   Use GString to optimize memory usage.
 */
-static void 
+static GString *
 quoteBody(BalsaSendmsg *msg, LibBalsaMessage * message, SendType type)
 {
-   GString *rbdy;
-   gchar *str, *personStr;
-   gchar *date;
+  GString *body;
+  gchar *str, *date;
+  const gchar* personStr;
+  
+  libbalsa_message_body_ref (message);
+  
+  personStr = libbalsa_address_get_name(message->from);
+  if(!personStr) personStr = _("you");
+  
+  if(message->date) {
+    date = libbalsa_message_date_to_gchar (message, balsa_app.date_string);
+    str = g_strdup_printf (_("\nOn %s %s wrote:\n"), date, personStr);
+    g_free(date);
+  } else
+    str = g_strdup_printf (_("\n%s wrote:\n"), personStr); 
+  
+  body = content2reply (message, 
+			(type == SEND_REPLY || type == SEND_REPLY_ALL) ?
+			balsa_app.quote_str : NULL,
+			balsa_app.wordwrap ? balsa_app.wraplength : -1);
 
-   libbalsa_message_body_ref (message);
-   
-   personStr = (message->from && message->from->full_name) ?
-      message->from->full_name : "you"; /* don't translate "you" here */
-   
-      /* Should use instead something like:
-       * 	strftime( buf, sizeof(buf), _("On %A %B %d %Y etc"),
-       * 	                somedateparser(message-date)));
-       * 	tmp = g_strdup_printf (buf);
-       * so the date attribution can fully (and properly) translated.
-       */
-   if(message->date) {
-      date = libbalsa_message_date_to_gchar (message, balsa_app.date_string);
-      if(message->from && message->from->full_name)
-         str = g_strdup_printf (_("On %s %s wrote:\n"), date, personStr);
-      else
-         str = g_strdup_printf (_("On %s you wrote:\n"), date);
-      g_free(date);
-   } else
-      if(message->from && message->from->full_name)
-         str = g_strdup_printf (_("%s wrote:\n"), personStr); 
-      else
-         str = g_strdup_printf (_("You wrote:\n"));
+  if(body) 
+    body = g_string_prepend(body, str);
+  else
+    body = g_string_new(str);
+  g_free (str);
 
-
-   gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, 
-		    str, strlen (str));
-   g_free (str);
-
-   rbdy = content2reply (message, 
-			 (type == SEND_REPLY || type == SEND_REPLY_ALL) ?
-			 balsa_app.quote_str : NULL); 
-   if(rbdy) {
-      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, 
-		       strlen (rbdy->str));
-      g_string_free (rbdy, TRUE);
-   }
-
-   if(!msg->charset) msg->charset = libbalsa_message_charset(message);
-   libbalsa_message_body_unref (message);
+  if(!msg->charset) msg->charset = libbalsa_message_charset(message);
+  libbalsa_message_body_unref (message);
+  return body;
 }
 
 /* fillBody --------------------------------------------------------------
@@ -968,30 +955,33 @@ quoteBody(BalsaSendmsg *msg, LibBalsaMessage * message, SendType type)
 static void
 fillBody(BalsaSendmsg *msg, LibBalsaMessage * message, SendType type)
 {
-   gchar *signature;
-   gint pos = 0;
+  GString *body = NULL;
+  gchar *signature;
+  gint pos = 0;
 
-   gtk_editable_insert_text (GTK_EDITABLE(msg->text), "\n", 1, &pos);
    if (type != SEND_NORMAL && message) 
-      quoteBody(msg, message, type);
+     body = quoteBody(msg, message, type);
+   else 
+     body = g_string_new("");
    
   if ((signature = read_signature()) != NULL) {
      if ( ((type == SEND_REPLY || type == SEND_REPLY_ALL) && 
 	   balsa_app.sig_whenreply) ||
 	  ( (type == SEND_FORWARD) && balsa_app.sig_whenforward) ||
 	  ( (type == SEND_NORMAL) && balsa_app.sig_sending) ) {
-	gtk_text_insert   (GTK_TEXT(msg->text), NULL, NULL, NULL, "\n", 1);
-
-	if( balsa_app.sig_separator && g_strncasecmp(signature, "--\n" ,3) && 
+       body = g_string_append_c(body, '\n');
+       
+       if( balsa_app.sig_separator && g_strncasecmp(signature, "--\n" ,3) && 
 	   g_strncasecmp(signature, "-- \n" ,4) )
-	   gtk_text_insert   (GTK_TEXT(msg->text), NULL, NULL, NULL, 
-			      "-- \n", 4);
-	gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, 
-			 signature, strlen (signature));
+	 body = g_string_append(body, "-- \n");
+	 body = g_string_append(body, signature);
      }
      g_free (signature);
   }
+
+  gtk_editable_insert_text(GTK_EDITABLE(msg->text), body->str, body->len,&pos);
   gtk_editable_set_position( GTK_EDITABLE(msg->text), 0);
+  g_string_free(body, TRUE);
 }
 
 
@@ -1435,14 +1425,16 @@ bsmsg2message(BalsaSendmsg *bsmsg)
                                           g_strdup (bsmsg->orig_message->message_id));
     
     footime = localtime (&bsmsg->orig_message->date);
-    strftime (recvtime, sizeof (recvtime), 
-              "%a, %b %d, %Y at %H:%M:%S %z", footime);
-    message->in_reply_to = g_strconcat (bsmsg->orig_message->message_id, 
-                                        "; from ", 
-                                        (gchar*)bsmsg->orig_message->from->address_list->data, 
-                                        " on ", 
-                                        recvtime, 
-                                        NULL);
+    strftime (recvtime, sizeof (recvtime), "%a, %b %d, %Y at %H:%M:%S %z", 
+	      footime);
+
+    if(bsmsg->orig_message->message_id)
+      message->in_reply_to = g_strconcat (bsmsg->orig_message->message_id, 
+					  "; from ", 
+					  (gchar*)bsmsg->orig_message->from->address_list->data, 
+					  " on ", 
+					  recvtime, 
+					  NULL);
   }
   
   body = libbalsa_message_body_new (message);

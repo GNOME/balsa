@@ -89,4 +89,7 @@ GList *libbalsa_address_new_list_from_string (gchar *address);
 
 gchar *libbalsa_address_to_gchar (LibBalsaAddress * addr);
 
+/* get pointer to descriptive name (full name if available, or e-mail) */
+const gchar *libbalsa_address_get_name (const LibBalsaAddress * addr);
+
 #endif /* __LIBBALSA_ADDRESS_H__ */

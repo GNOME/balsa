@@ -459,7 +459,7 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox)
     path = libbalsa_mailbox_local_get_path(mailbox);
 
     if (stat(path, &st) == -1) {
-	UNLOCK_MAILBOX(mailbox);
+	return FALSE;
     }
 
     mh->mtime = st.st_mtime;

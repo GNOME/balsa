@@ -829,6 +829,7 @@ libbalsa_message_body_unref(LibBalsaMessage * message)
 
 	/* Free headers that we no longer need. */
 	lb_message_headers_extra_destroy(message->headers);
+	message->has_all_headers = 0;
    }
    if(message->mailbox) { UNLOCK_MAILBOX(message->mailbox); }
 }

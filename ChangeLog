@@ -1,6 +1,13 @@
-2005-02-28 08:52  PeterB
+2005-02-28 09:09  PeterB
 
-	* libbalsa/misc.c: fix test for "<URL:".
+	* libbalsa/libbalsa.c, libbalsa/libbalsa.h, libbalsa/mailbox.c,
+	src/main.c: move balsa_threads_{enter,leave} to
+	libbalsa/libbalsa.c; change libbalsa_lock_mailbox to reflect
+	recursive gdk lock and remove assumptions about
+	main-thread/sub-thread; hold mailbox lock before asking for gdk
+	lock.
+	* libbalsa/imap/imap-handle.c: downgrade warnings to messages.
+	* libbalsa/misc.c: fix test for "<URL:" [fixes Bug 168732].
 	* src/balsa-index.c: mysterious adjustment to width of icon
 	columns [fixes Bug 168733].
 

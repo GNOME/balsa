@@ -250,8 +250,8 @@ libbalsa_html_print_get_pages_num(GtkWidget * widget,
 				  gdouble header_height,
 				  gdouble footer_height)
 {
-    gtk_html_print_get_pages_num(GTK_HTML(widget), print_context,
-				 header_height, footer_height);
+    return gtk_html_print_get_pages_num(GTK_HTML(widget), print_context,
+					header_height, footer_height);
 }
 
 # else				/* HAVE_GTKHTML3 */

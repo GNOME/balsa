@@ -1,3 +1,8 @@
+2004-01-01  Carlos Morgado  <chbm gnome.org>
+
+	* libbalsa/html.c: 
+	fix build glitch
+
 2003-12-31 08:30  PeterB
 
 	* libbalsa/: html.c, html.h: Provide wrappers to insulate the rest

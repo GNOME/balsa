@@ -138,13 +138,6 @@ struct _LibBalsaMessageClass {
     /* Signal: */
     void (*status_changed) (LibBalsaMessage * message,
 			    LibBalsaMessageFlag flag, gboolean);
-
-    /* Virtual Functions: */
-    void (*clear_flags) (LibBalsaMessage * message);
-    void (*set_answered) (LibBalsaMessage * message, gboolean set);
-    void (*set_read) (LibBalsaMessage * message, gboolean set);
-    void (*set_deleted) (LibBalsaMessage * message, gboolean set);
-    void (*set_flagged) (LibBalsaMessage * message, gboolean set);
 };
 
 
@@ -159,27 +152,22 @@ gboolean libbalsa_message_copy(LibBalsaMessage * message,
 			       LibBalsaMailbox * dest);
 gboolean libbalsa_message_save(LibBalsaMessage * message,
 			       const gchar *filename);
-gboolean libbalsa_message_move(LibBalsaMessage * message,
-			       LibBalsaMailbox * mailbox);
 gboolean libbalsa_messages_move(GList * messages,
 				LibBalsaMailbox * dest);
 gboolean libbalsa_messages_copy(GList * messages,
                                 LibBalsaMailbox * dest);
-void libbalsa_message_clear_flags(LibBalsaMessage * message);
 
-void libbalsa_message_delete(LibBalsaMessage * message, gboolean del);
-void libbalsa_messages_delete(GList * messages);
+void libbalsa_messages_delete(GList * messages, gboolean del);
 
-void libbalsa_message_read(LibBalsaMessage * message, gboolean read);
-void libbalsa_message_flag(LibBalsaMessage * message, gboolean flag);
+void libbalsa_messages_read(GList * messages, gboolean read);
+void libbalsa_messages_flag(GList * messages, gboolean flag);
 
-void libbalsa_message_answer(LibBalsaMessage * message);
 void libbalsa_message_reply(LibBalsaMessage * message);
 
 void libbalsa_message_append_part(LibBalsaMessage * message,
 				  LibBalsaMessageBody * body);
 
-gboolean libbalsa_message_body_ref(LibBalsaMessage * message);
+gboolean libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read);
 void libbalsa_message_body_unref(LibBalsaMessage * message);
 
 gboolean balsa_send_message(LibBalsaMessage * message,

@@ -1051,7 +1051,7 @@ print_info_new(LibBalsaMessage * msg, BALSA_GNOME_PRINT_UI * master,
     prepare_header(pi, NULL);
     
     /* now get the message contents... */
-    libbalsa_message_body_ref(msg);
+    libbalsa_message_body_ref(msg, TRUE);
     scan_body(pi, msg->body_list);
     libbalsa_message_body_unref(msg);
 

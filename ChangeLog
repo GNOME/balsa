@@ -1,3 +1,12 @@
+2002-12-31  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/mailbox.c: update mailbox signal scheme (merge HEAD).
+	* libbalsa/message.[ch]: remove all messages signals, they were
+	redundant.
+	* libbalsa/filter.c, libbalsa/send.c: use new funcs.
+	* src/balsa-{index,mblist,message}.c : ditto.
+	* src/{sendmsg,main}-window.c,src/print.c: the same.
+
 2002-12-30 PeterB
 
 	* libbalsa/identity.c (general rewrite),

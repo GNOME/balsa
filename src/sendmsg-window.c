@@ -2044,7 +2044,7 @@ continueBody(BalsaSendmsg * msg, LibBalsaMessage * message)
 {
     LibBalsaMessageBody *body;
 
-    libbalsa_message_body_ref(message);
+    libbalsa_message_body_ref(message, TRUE);
     body = message->body_list;
     if (body) {
 	if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART)
@@ -2104,7 +2104,7 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
     gchar *str, *date = NULL;
     const gchar *personStr;
 
-    libbalsa_message_body_ref(message);
+    libbalsa_message_body_ref(message, TRUE);
 
     personStr = libbalsa_address_get_name(message->from);
     if (!personStr)
@@ -2874,11 +2874,85 @@ enum{
 };
 
 static void
+do_insert_string_select_ch(BalsaSendmsg* bsmsg, GtkTextBuffer *buffer,
+                           const gchar* string, size_t len)
+{
+    GError* err = NULL;
+    gsize bytes_read, bytes_written;
+    gchar* s;
+    guint i;
+    GtkCellRenderer *renderer;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    GtkTreeViewColumn *column;
+    GtkWidget * dialog =
+        gtk_dialog_new_with_buttons(_("Choose charset"),
+                                    GTK_WINDOW(bsmsg->window),
+                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_STOCK_OK, GTK_RESPONSE_OK,
+                                    GTK_STOCK_CANCEL, GTK_STOCK_CANCEL,
+                                    NULL);
+    GtkWidget* info = 
+        gtk_label_new(_("This file is not encoded in US-ASCII or UTF-8.\n"
+                        "Please choose the charset used to encode the file."));
+    GtkListStore* store = gtk_list_store_new(N_COLUMNS,
+                                             G_TYPE_STRING);
+    GtkWidget* tree = 
+        gtk_tree_view_new_with_model (GTK_TREE_MODEL(store));
+    g_object_unref(store);
+    
+    renderer = gtk_cell_renderer_text_new ();
+    column = gtk_tree_view_column_new_with_attributes("Name", renderer,
+                                                      "text", CHARSET_COLUMN,
+                                                      NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
+    
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), 
+                       info, FALSE, TRUE, 5);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), 
+                       tree, TRUE, TRUE, 5);
+    gtk_widget_show(info);
+    gtk_widget_show(tree);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog),
+                                    GTK_RESPONSE_OK);
+    
+    for(i=0; i<ELEMENTS(conv_charsets); i++) {
+        gtk_list_store_append(store, &iter);
+        gtk_list_store_set(store, &iter, CHARSET_COLUMN, conv_charsets[i], -1);
+    }
+    
+    do {
+        const gchar* charset = NULL;
+        GtkTreeSelection *select;
+        
+        if(gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK)
+            break;
+        select = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+        if (gtk_tree_selection_get_selected(select, &model, &iter))
+            gtk_tree_model_get(model, &iter, CHARSET_COLUMN, &charset, -1);
+        g_print("Trying charset: %s\n", charset);
+        s=g_convert(string, len, "UTF-8", charset,
+                    &bytes_read, &bytes_written, &err);
+        if(!err) {
+            gtk_text_buffer_insert_at_cursor(buffer, s, bytes_written);
+            g_free(s);
+            break;
+        }
+        g_free(s);
+        g_error_free(err);
+    } while(1);
+    
+    gtk_widget_destroy(dialog);
+}
+static void
 do_insert_file(GtkWidget * selector, GtkFileSelection * fs)
 {
     const gchar *fname;
     FILE *fl;
     BalsaSendmsg *bsmsg;
+    GtkTextBuffer *buffer;
+    gchar * string;
+    size_t len;
 
     bsmsg = (BalsaSendmsg *) g_object_get_data(G_OBJECT(fs), "balsa-data");
     fname = gtk_file_selection_get_filename(GTK_FILE_SELECTION(fs));
@@ -2889,89 +2963,15 @@ do_insert_file(GtkWidget * selector, GtkFileSelection * fs)
 	return;
     }
 
-    GtkTextBuffer *buffer =
-	gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-    gchar* string = NULL;
-    size_t len = libbalsa_readfile(fl, &string);
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+    string = NULL;
+    len = libbalsa_readfile(fl, &string);
     fclose(fl);
     
     if(g_utf8_validate(string, -1, NULL)) {
 	gtk_text_buffer_insert_at_cursor(buffer, string, len);
-	g_free(string);
-	gtk_widget_destroy(GTK_WIDGET(fs));
-	return;
-    }
-
-    /* the tough part */
-
-    GError* err = NULL;
-    gsize bytes_read, bytes_written;
-    gchar* s;
-    guint i;
-    /* const gchar* prev = "UTF-8"; */
-    GtkCellRenderer *renderer;
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-    GtkTreeViewColumn *column;
-    GtkWidget * dialog =
-	gtk_dialog_new_with_buttons(_("Choose charset"),
-				    GTK_WINDOW(bsmsg->window),
-				    GTK_DIALOG_DESTROY_WITH_PARENT,
-				    GTK_STOCK_OK, GTK_RESPONSE_OK,
-				    GTK_STOCK_CANCEL, GTK_STOCK_CANCEL,
-				    NULL);
-    GtkWidget* info = 
-	gtk_label_new(_("This file is not encoded in US-ASCII or UTF-8.\n"
-			"Please choose the charset used to encode the file."));
-    GtkListStore* store = gtk_list_store_new(N_COLUMNS,
-					     G_TYPE_STRING);
-    GtkWidget* tree = 
-	gtk_tree_view_new_with_model (GTK_TREE_MODEL(store));
-    g_object_unref(store);
-    
-    renderer = gtk_cell_renderer_text_new ();
-    column = gtk_tree_view_column_new_with_attributes("Name", renderer,
-						      "text", CHARSET_COLUMN,
-						      NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
-
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), 
-                       info, FALSE, TRUE, 5);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), 
-                       tree, TRUE, TRUE, 5);
-    gtk_widget_show(info);
-    gtk_widget_show(tree);
-    gtk_dialog_set_default_response(GTK_DIALOG(dialog),
-                                    GTK_RESPONSE_OK);
-
-    for(i=0; i<ELEMENTS(conv_charsets); i++) {
-	gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter, CHARSET_COLUMN, conv_charsets[i], -1);
-    }
-
-    do {
-	const gchar* charset = NULL;
-	if(gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK)
-	    break;
-	GtkTreeSelection *select =
-	    gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
-	if (gtk_tree_selection_get_selected(select, &model, &iter))
-	    gtk_tree_model_get(model, &iter, CHARSET_COLUMN, &charset, -1);
-	g_print("Trying charset: %s\n", charset);
-	s=g_convert(string, len, "UTF-8", charset,
-		    &bytes_read, &bytes_written, &err);
-	if(!err) {
-	    gtk_text_buffer_insert_at_cursor(buffer, s, bytes_written);
-	    g_free(s);
-	    break;
-	}
-	g_free(s);
-	g_error_free(err);
-    } while(1);
-
+    } else do_insert_string_select_ch(bsmsg, buffer, string, len);
     g_free(string);
-    gtk_widget_destroy(dialog);
-
     gtk_widget_destroy(GTK_WIDGET(fs));
 }
 
@@ -3272,7 +3272,10 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	    bsmsg->type == SEND_REPLY_GROUP) {
 	    libbalsa_message_reply(bsmsg->orig_message);
 	} else if (bsmsg->type == SEND_CONTINUE) {
-	    libbalsa_message_delete(bsmsg->orig_message, TRUE);
+	    GList * messages = g_list_prepend(NULL, bsmsg->orig_message);
+
+	    libbalsa_messages_delete(messages, TRUE);
+	    g_list_free(messages);
 	}
     }
 
@@ -3342,7 +3345,10 @@ message_postpone(BalsaSendmsg * bsmsg)
                                              bsmsg->flow);
     if(successp) {
 	if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message) {
-	    libbalsa_message_delete(bsmsg->orig_message, TRUE);
+	    GList * messages = g_list_prepend(NULL, bsmsg->orig_message);
+
+	    libbalsa_messages_delete(messages, TRUE);
+	    g_list_free(messages);
 	}
     }
     g_object_unref(G_OBJECT(message));

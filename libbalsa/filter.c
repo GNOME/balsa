@@ -158,25 +158,29 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 	    }
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
-	    gboolean is_new = (message->flags & LIBBALSA_MESSAGE_FLAG_NEW);
-
+	    gboolean is_refed;
+	    
 	    if (!message->mailbox)
 		return FALSE; /* We don't want to match if an error occured */
 	    if (mbox_locked)
 		UNLOCK_MAILBOX(message->mailbox);
-	    if (!libbalsa_message_body_ref(message)) {
+	    is_refed = libbalsa_message_body_ref(message, FALSE);
+ 	    if (mbox_locked)
+ 		LOCK_MAILBOX(message->mailbox);	    
+	    if (!is_refed) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _("Unable to load message body to "
                                        "match filter"));
                 return FALSE;  /* We don't want to match if an error occured */
 	    }
-	    body=content2reply(message,NULL,0,FALSE,FALSE);
-	    if(is_new) libbalsa_message_read(message, FALSE);
+	    body = content2reply(message,NULL,0,FALSE,FALSE);
+	    if (mbox_locked)
+		UNLOCK_MAILBOX(message->mailbox);
 	    libbalsa_message_body_unref(message);
 	    if (mbox_locked)
 		LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
 	    if (body) {
-		if (body->str) match=in_string(body->str,cond->match.string);
+		if (body->str) match = in_string(body->str,cond->match.string);
 		g_string_free(body,TRUE);
 	    }
 	}
@@ -230,24 +234,22 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 		}
 	    }
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
-                gboolean is_new = (message->flags & LIBBALSA_MESSAGE_FLAG_NEW);
-		gboolean bool;
+		gboolean is_refed;
 
 		if (!message->mailbox)
 		    return FALSE;
 		if (mbox_locked)
 		    UNLOCK_MAILBOX(message->mailbox);
-		bool = libbalsa_message_body_ref(message);
+		is_refed = libbalsa_message_body_ref(message, FALSE);
 		if (mbox_locked)
 		    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
-		if (!bool) {
+		if (!is_refed) {
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                          _("Unable to load message body "
                                            "to match filter"));
 		    return FALSE;
 		}
 		body=content2reply(message,NULL,0,FALSE,FALSE);
-                if(is_new) libbalsa_message_read(message, FALSE);
  		if (mbox_locked)
 		    UNLOCK_MAILBOX(message->mailbox);
 		libbalsa_message_body_unref(message);

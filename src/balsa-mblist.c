@@ -115,12 +115,17 @@ static void bmbl_column_click(GtkTreeViewColumn * column, gpointer data);
 static void bmbl_unread_messages_changed_cb(LibBalsaMailbox *
                                             mailbox, gboolean flag,
                                             GtkTreeStore * store);
-
+static void bmbl_messages_status_changed_cb(LibBalsaMailbox * mailbox,
+					    GList * messages,
+					    gint flag,
+					    GtkTreeStore * store);
 /* helpers */
 static gboolean bmbl_find_all_unread_mboxes_func(GtkTreeModel * model,
                                                  GtkTreePath * path,
                                                  GtkTreeIter * iter,
                                                  gpointer data);
+static void bmbl_real_disconnect_mbnode_signals(BalsaMailboxNode * mbnode,
+					      GtkTreeModel * model);
 static gboolean bmbl_disconnect_mailbox_signals(GtkTreeModel * model,
                                                 GtkTreePath * path,
                                                 GtkTreeIter * iter,
@@ -881,9 +886,26 @@ bmbl_column_click(GtkTreeViewColumn * column, gpointer data)
 }
 
 static void
+bmbl_messages_status_changed_cb(LibBalsaMailbox * mailbox,
+				GList * messages,
+				gint flag,
+				GtkTreeStore * store)
+{
+    g_return_if_fail(store);
+    g_return_if_fail(mailbox);
+    /* We update the mailbox infos only if the flag changed was the DELETED flag
+       or the NEW flag, because they are the only ones that change the numbers
+       displayed
+     */
+    if ((flag == LIBBALSA_MESSAGE_FLAG_DELETED) ||
+	(flag == LIBBALSA_MESSAGE_FLAG_NEW))
+	balsa_mblist_update_mailbox(store, mailbox);
+}
+
+static void
 bmbl_unread_messages_changed_cb(LibBalsaMailbox * mailbox,
-					gboolean flag,
-					GtkTreeStore * store)
+				gboolean flag,
+				GtkTreeStore * store)
 {
     g_return_if_fail(mailbox);
     g_return_if_fail(store);
@@ -1063,6 +1085,21 @@ balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
  *
  * Remove the signals we attached to the mailboxes.
  */
+static void
+bmbl_real_disconnect_mbnode_signals(BalsaMailboxNode * mbnode, GtkTreeModel * model)
+{
+    if (mbnode->mailbox) {
+        g_signal_handlers_disconnect_by_func(G_OBJECT(mbnode->mailbox),
+                                             G_CALLBACK
+                                             (bmbl_unread_messages_changed_cb),
+                                             model);
+        g_signal_handlers_disconnect_by_func(G_OBJECT(mbnode->mailbox),
+                                             G_CALLBACK
+                                             (bmbl_messages_status_changed_cb),
+                                             model);
+    }
+}
+
 static gboolean
 bmbl_disconnect_mailbox_signals(GtkTreeModel *model,
 				GtkTreePath *path,
@@ -1072,14 +1109,7 @@ bmbl_disconnect_mailbox_signals(GtkTreeModel *model,
     BalsaMailboxNode *mbnode;
     
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
-
-    if (mbnode->mailbox) {
-        g_signal_handlers_disconnect_by_func(G_OBJECT(mbnode->mailbox),
-                                             G_CALLBACK
-                                             (bmbl_unread_messages_changed_cb),
-                                             model);
-    }
-
+    bmbl_real_disconnect_mbnode_signals(mbnode, model);
     return FALSE;
 }
 
@@ -1172,6 +1202,10 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
 	g_signal_connect(G_OBJECT(mbnode->mailbox),
 			 "set-unread-messages-flag",
 			 G_CALLBACK(bmbl_unread_messages_changed_cb),
+			 store);
+	g_signal_connect(G_OBJECT(mbnode->mailbox),
+			 "messages-status-changed",
+			 G_CALLBACK(bmbl_messages_status_changed_cb),
 			 store);
     } else {
 	/* new directory, but not a mailbox */
@@ -1609,11 +1643,7 @@ balsa_mblist_remove_mailbox_node(GtkTreeStore * store,
 
     if (bmbl_prerecursive(GTK_TREE_MODEL(store), &iter,
                                   bmbl_find_data_func, mbnode)) {
-        if (mbnode->mailbox)
-            g_signal_handlers_disconnect_by_func(G_OBJECT(mbnode->mailbox),
-                                                 G_CALLBACK
-                                                 (bmbl_unread_messages_changed_cb),
-                                                 store);
+	bmbl_real_disconnect_mbnode_signals(mbnode, GTK_TREE_MODEL(store));
         gtk_tree_store_remove(store, &iter);
 
         return TRUE;

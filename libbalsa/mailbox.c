@@ -35,6 +35,8 @@
 #include "mailbox-filter.h"
 #include "libbalsa_private.h"
 
+#include "libbalsa-marshal.h"
+
 /* Class functions */
 static void libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass);
 static void libbalsa_mailbox_init(LibBalsaMailbox * mailbox);
@@ -55,22 +57,33 @@ static void libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
 
 /* Callbacks */
-static void message_status_changed_cb(LibBalsaMessage * message, gboolean set,
-				      LibBalsaMailbox * mb);
+static void messages_status_changed_cb(LibBalsaMailbox * mb,
+				       GList * messages,
+				       gint changed_flag);
 
 static void libbalsa_mailbox_sync_backend_real(LibBalsaMailbox * mailbox,
                                                gboolean delete);
 static LibBalsaMessage *translate_message(HEADER * cur);
 
+/* SIGNALS MEANINGS :
+   - OPEN_MAILBOX[_APPEND], CLOSE_MAILBOX, SAVE/LOAD_CONFIG, CHECK,
+   SET_UNREAD_MESSAGES_FLAG : tell the mailbox to change its properties.
+   - MESSAGES_STATUS_CHANGED : notification signal sent by messages of the
+   mailbox to tell that their status have changed.
+   - MESSAGES_ADDED, MESSAGES_REMOVED : notification signals sent by the mailbox
+   to allow the frontend to keep in sync. These signals are used when messages
+   are added or removed to the mailbox but not by the user. This is used when
+   eg the mailbox loads new messages (check new mails), or when the prefs
+   changed (eg "Hide Deleted Messages") and cause the deletion of messages.
+*/
+
 enum {
     OPEN_MAILBOX,
     OPEN_MAILBOX_APPEND,
     CLOSE_MAILBOX,
-    MESSAGE_STATUS_CHANGED,
-    MESSAGE_NEW,
-    MESSAGES_NEW,
-    MESSAGE_DELETE,
-    MESSAGES_DELETE,
+    MESSAGES_STATUS_CHANGED,
+    MESSAGES_ADDED,
+    MESSAGES_REMOVED,
     GET_MESSAGE_STREAM,
     PROGRESS_NOTIFY,
     CHECK,
@@ -117,15 +130,18 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 
     parent_class = g_type_class_peek_parent(klass);
 
-    libbalsa_mailbox_signals[MESSAGE_STATUS_CHANGED] =
-	g_signal_new("message-status-changed",
+    /* Notification signal thrown by a list of messages to indicate their
+       owning mailbox that they have changed its state.
+       The integer parameter indicates which flag has changed. */
+    libbalsa_mailbox_signals[MESSAGES_STATUS_CHANGED] =
+	g_signal_new("messages-status-changed",
                      G_TYPE_FROM_CLASS(object_class),
                      G_SIGNAL_RUN_FIRST,
                      G_STRUCT_OFFSET(LibBalsaMailboxClass,
-                                     message_status_changed),
+                                     messages_status_changed),
                      NULL, NULL,
-                     g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1,
-                     G_TYPE_OBJECT);
+                     libbalsa_VOID__POINTER_INT, G_TYPE_NONE, 2,
+                     G_TYPE_POINTER, G_TYPE_INT);
     
     libbalsa_mailbox_signals[OPEN_MAILBOX] =
 	g_signal_new("open-mailbox",
@@ -154,42 +170,32 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      NULL, NULL,
                      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
-    libbalsa_mailbox_signals[MESSAGE_NEW] =
-	g_signal_new("message-new",
+    /* This signal is emitted by the mailbox when new messages are
+       retrieved (check mail or opening of the mailbox). This is used
+       by GUI to sync on the mailbox content (see BalsaIndex)
+    */   
+    libbalsa_mailbox_signals[MESSAGES_ADDED] =
+	g_signal_new("messages-added",
                      G_TYPE_FROM_CLASS(object_class),
                      G_SIGNAL_RUN_FIRST,
                      G_STRUCT_OFFSET(LibBalsaMailboxClass,
-                                     message_new),
-                     NULL, NULL,
-                     g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1,
-                     G_TYPE_OBJECT);
-
-    libbalsa_mailbox_signals[MESSAGES_NEW] =
-	g_signal_new("messages-new",
-                     G_TYPE_FROM_CLASS(object_class),
-                     G_SIGNAL_RUN_FIRST,
-                     G_STRUCT_OFFSET(LibBalsaMailboxClass,
-                                     messages_new),
+                                     messages_added),
                      NULL, NULL,
                      g_cclosure_marshal_VOID__POINTER, G_TYPE_NONE, 1,
                      G_TYPE_POINTER);
 
-    libbalsa_mailbox_signals[MESSAGE_DELETE] =
-	g_signal_new("message-delete",
+    /* This signal is emitted by the mailbox when messages are removed
+       in order to sync with backend in general (this is different from
+       message deletion which is a user action).
+       GUI (see BalsaIndex) hooks on this signal to sync on the mailbox
+       content.
+    */ 
+    libbalsa_mailbox_signals[MESSAGES_REMOVED] =
+	g_signal_new("messages-removed",
                      G_TYPE_FROM_CLASS(object_class),
                      G_SIGNAL_RUN_FIRST,
                      G_STRUCT_OFFSET(LibBalsaMailboxClass,
-                                     message_delete),
-                     NULL, NULL,
-                     g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1,
-                     G_TYPE_OBJECT);
-
-    libbalsa_mailbox_signals[MESSAGES_DELETE] =
-	g_signal_new("messages-delete",
-                     G_TYPE_FROM_CLASS(object_class),
-                     G_SIGNAL_RUN_FIRST,
-                     G_STRUCT_OFFSET(LibBalsaMailboxClass,
-                                     messages_delete),
+                                     messages_removed),
                      NULL, NULL,
                      g_cclosure_marshal_VOID__POINTER, G_TYPE_NONE, 1,
                      G_TYPE_POINTER);
@@ -273,11 +279,9 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->set_unread_messages_flag =
 	libbalsa_mailbox_real_set_unread_messages_flag;
 
-    klass->message_status_changed = NULL;
-    klass->message_new = NULL;
-    klass->messages_new = NULL;
-    klass->message_delete = NULL;
-    klass->messages_delete = NULL;
+    klass->messages_added = NULL;
+    klass->messages_removed = NULL;
+    klass->messages_status_changed = messages_status_changed_cb;
 
     klass->get_message_stream = NULL;
     klass->check = NULL;
@@ -715,17 +719,6 @@ libbalsa_mailbox_link_message(LibBalsaMailbox * mailbox, LibBalsaMessage*msg)
 {
     msg->mailbox = mailbox;
     
-    g_signal_connect_after(G_OBJECT(msg), "clear-flags",
-                           G_CALLBACK(message_status_changed_cb), mailbox);
-    g_signal_connect_after(G_OBJECT(msg), "set-answered",
-                           G_CALLBACK(message_status_changed_cb), mailbox);
-    g_signal_connect_after(G_OBJECT(msg), "set-read",
-                           G_CALLBACK(message_status_changed_cb), mailbox);
-    g_signal_connect_after(G_OBJECT(msg), "set-deleted",
-                           G_CALLBACK(message_status_changed_cb), mailbox);
-    g_signal_connect_after(G_OBJECT(msg), "set-flagged",
-                           G_CALLBACK(message_status_changed_cb), mailbox);
-
     if (msg->flags & LIBBALSA_MESSAGE_FLAG_NEW)
         mailbox->unread_messages++;
     mailbox->message_list = g_list_prepend(mailbox->message_list, msg);
@@ -787,7 +780,7 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
     if(messages!=NULL){
 	messages = g_list_reverse(messages);
 	g_signal_emit(G_OBJECT(mailbox),
-		      libbalsa_mailbox_signals[MESSAGES_NEW], 0, messages);
+		      libbalsa_mailbox_signals[MESSAGES_ADDED], 0, messages);
 	g_list_free(messages);
     }
 
@@ -810,8 +803,8 @@ libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox)
     list = g_list_first(mailbox->message_list);
 
     if(list){
-      g_signal_emit(G_OBJECT(mailbox),
-		    libbalsa_mailbox_signals[MESSAGES_DELETE], 0, list);
+	g_signal_emit(G_OBJECT(mailbox),
+		      libbalsa_mailbox_signals[MESSAGES_REMOVED], 0, list);
     }
 
     while (list) {
@@ -931,10 +924,26 @@ libbalsa_mailbox_type_from_path(const gchar * path)
     return G_TYPE_OBJECT;
 }
 
+#if 0
+void
+libbalsa_mailbox_remove_messages(LibBalsaMailbox * mbox, GList * messages)
+{
+    LOCK_MAILBOX(mbox);
+    for (; messages; messages = g_list_next(messages)) {
+	LibBalsaMessage * message = LIBBALSA_MESSAGE(messages->data);
+
+	message->mailbox = NULL;
+	g_object_unref(G_OBJECT(message));
+	mbox->message_list =
+		g_list_remove(mbox->message_list, message);
+    }
+    UNLOCK_MAILBOX(mbox);
+}
+#endif
 /* libbalsa_mailbox_sync_backend_real
  * synchronize the frontend and libbalsa: build a list of messages
  * marked as deleted, and:
- * 1. emit the "messages-delete" signal, so the frontend can drop them
+ * 1. emit the "messages-removed" signal, so the frontend can drop them
  *    from the BalsaIndex;
  * 2. if delete == TRUE, delete them from the LibBalsaMailbox.
  */
@@ -958,10 +967,11 @@ libbalsa_mailbox_sync_backend_real(LibBalsaMailbox * mailbox,
 	}
     }
 
-    if(p){
+    if (p) {
+	UNLOCK_MAILBOX(mailbox);
 	g_signal_emit(G_OBJECT(mailbox),
-	              libbalsa_mailbox_signals[MESSAGES_DELETE],
-		      0, p);
+	              libbalsa_mailbox_signals[MESSAGES_REMOVED],0,p);
+	LOCK_MAILBOX(mailbox);
 	g_list_free(p);
     }
 
@@ -1032,10 +1042,71 @@ translate_message(HEADER * cur)
 }
 
 static void
-message_status_changed_cb(LibBalsaMessage * message, gboolean set,
-                          LibBalsaMailbox * mb)
+messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
+			   gint flag)
 {
-    g_signal_emit(G_OBJECT(message->mailbox),
-		  libbalsa_mailbox_signals[MESSAGE_STATUS_CHANGED],
-		  0, message);
+    gint new_in_list = 0;
+    gint nb_in_list = 0;
+    gboolean new_state;
+
+    if (!messages)
+	return;
+
+    switch (flag) {
+    case LIBBALSA_MESSAGE_FLAG_DELETED:
+	/* Deleted state has changed, update counts */
+	new_state = 
+	    LIBBALSA_MESSAGE(messages->data)->flags & LIBBALSA_MESSAGE_FLAG_DELETED;
+
+	for (;messages;messages = g_list_next(messages)) {
+	    nb_in_list++;
+	    if (LIBBALSA_MESSAGE(messages->data)->flags & LIBBALSA_MESSAGE_FLAG_NEW)
+		new_in_list++;
+	}
+
+	if (new_state) {
+	    /* messages have been deleted */
+	    mb->total_messages -= nb_in_list;
+	
+	    if (new_in_list) {
+		mb->unread_messages -= new_in_list;
+		if (mb->unread_messages <= 0)
+		    libbalsa_mailbox_set_unread_messages_flag(mb, FALSE);
+	    }
+	} else {
+	    /* message has been undeleted */
+	    mb->total_messages += nb_in_list;
+	    if (new_in_list) {
+		mb->unread_messages += new_in_list;
+		libbalsa_mailbox_set_unread_messages_flag(mb, TRUE);
+	    }
+	}
+	break;
+    case LIBBALSA_MESSAGE_FLAG_NEW:
+	if (LIBBALSA_MESSAGE(messages->data)->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
+	    gboolean unread_before = mb->unread_messages>0;
+	    
+	    mb->unread_messages += g_list_length(messages);
+	    if (!unread_before)
+		libbalsa_mailbox_set_unread_messages_flag(mb, TRUE);
+	} else {
+	    mb->unread_messages -= g_list_length(messages);
+	    if (mb->unread_messages<=0)
+		libbalsa_mailbox_set_unread_messages_flag(mb, FALSE);	    
+	}
+    case LIBBALSA_MESSAGE_FLAG_REPLIED:
+    case LIBBALSA_MESSAGE_FLAG_FLAGGED:
+	break;
+    }
+}
+
+void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
+					      GList * messages,
+					      gint flag)
+{
+    g_return_if_fail(mbox && messages);
+
+    g_signal_emit(G_OBJECT(mbox),
+		  libbalsa_mailbox_signals[MESSAGES_STATUS_CHANGED], 0,
+		  messages, flag);
 }

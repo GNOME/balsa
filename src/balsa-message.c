@@ -560,7 +560,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 		      (gpointer) bm);
 
     is_new = message->flags & LIBBALSA_MESSAGE_FLAG_NEW;
-    if(!libbalsa_message_body_ref(bm->message)) 
+    if(!libbalsa_message_body_ref(bm->message, TRUE)) 
 	return FALSE;
 
     display_headers(bm);

@@ -2887,7 +2887,7 @@ empty_trash(void)
 {
     if(!libbalsa_mailbox_open(balsa_app.trash)) return;
 
-    libbalsa_messages_delete(balsa_app.trash->message_list);
+    libbalsa_messages_delete(balsa_app.trash->message_list, TRUE);
     libbalsa_mailbox_close(balsa_app.trash);
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
                                 balsa_app.trash);

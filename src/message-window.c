@@ -60,6 +60,7 @@ static void show_all_headers_cb(GtkWidget * widget, gpointer data);
 static void show_all_headers_tool_cb(GtkWidget * widget, gpointer data);
 static void wrap_message_cb(GtkWidget * widget, gpointer data);
 static void size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
+static void mw_set_next_unread(MessageWindow * mw);
 
 static void copy_cb(GtkWidget * widget, MessageWindow * mw);
 static void select_all_cb(GtkWidget * widget, gpointer);
@@ -333,6 +334,7 @@ message_window_new(LibBalsaMessage * message)
     GtkWidget *toolbar;
     guint i;
     GtkWidget *move_menu, *submenu;
+    BalsaIndex *bindex;
 
     if (!message)
 	return;
@@ -382,6 +384,11 @@ message_window_new(LibBalsaMessage * message)
     g_signal_connect(G_OBJECT(mw->window), "size_allocate",
                      G_CALLBACK(size_alloc_cb), NULL);
     
+    bindex = balsa_find_index_by_mailbox(mw->message->mailbox);
+    g_signal_connect_swapped(G_OBJECT(bindex), "index-changed",
+			     G_CALLBACK(mw_set_next_unread), mw);
+    mw_set_next_unread(mw);
+
     gnome_app_create_menus_with_data(GNOME_APP(mw->window), main_menu, mw);
 
     submenu = balsa_mblist_mru_menu(GTK_WINDOW(mw->window),
@@ -423,6 +430,15 @@ message_window_new(LibBalsaMessage * message)
 static void
 destroy_message_window(GtkWidget * widget, MessageWindow * mw)
 {
+    if (mw->message && mw->message->mailbox) {
+	BalsaIndex *bindex =
+	    balsa_find_index_by_mailbox(mw->message->mailbox);
+	if (bindex)
+	    g_signal_handlers_disconnect_matched(G_OBJECT(bindex),
+						 G_SIGNAL_MATCH_DATA, 0, 0,
+						 NULL, NULL, mw);
+    }
+
     if (mw->idle_handler_id) {
         g_source_remove(mw->idle_handler_id);
         if (mw->message)
@@ -602,6 +618,18 @@ size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
 {
     balsa_app.message_window_height = alloc->height;
     balsa_app.message_window_width = alloc->width;
+}
+
+static void
+mw_set_next_unread(MessageWindow * mw)
+{
+    GtkWidget *toolbar =
+	balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
+    LibBalsaMailbox *mailbox = mw->message->mailbox;
+    gint other_unread =
+	mailbox->unread_messages - LIBBALSA_MESSAGE_IS_UNREAD(mw->message);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_UNREAD,
+				       other_unread > 0);
 }
 
 static void

@@ -58,6 +58,7 @@ struct _BalsaWindowClass
 GtkType balsa_window_get_type (void);
 GtkWidget *balsa_window_new(void);
 void balsa_window_set_cursor(BalsaWindow *window, GdkCursor *cursor);
+GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
 void balsa_window_refresh(BalsaWindow *window);
 void balsa_window_open_mailbox();
 void balsa_window_close_mailbox();
@@ -70,7 +71,7 @@ void close_main_window (void);
 void refresh_main_window (void);
 void main_window_set_mailbox (Mailbox * mailbox);
 void main_window_set_cursor (gint type);
-void mblist_close_mailbox (Mailbox * mailbox);
 */
+void mblist_close_mailbox (Mailbox * mailbox);
 
 #endif /* __main_window_h__ */

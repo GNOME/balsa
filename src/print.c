@@ -29,6 +29,7 @@
 #include <time.h>
 
 #include "libbalsa.h"
+#include "mime.h"
 
 #include "balsa-app.h"
 #include "balsa-icons.h"
@@ -46,6 +47,7 @@
 #include "mailbox-conf.h"
 #include "mblist-window.h"
 
+void file_print_cb(GtkWidget *widget, gpointer cbdata);
 
 static void print_destroy(GtkWidget *widget, gpointer data);
 static void file_print_execute(); //GtkWidget *w, gpointer cbdata);

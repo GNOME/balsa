@@ -28,17 +28,22 @@
 #include "misc.h"
 #include "balsa-index-page.h"
 
-
+/*#define SIGNALS_USED*/
+#ifdef SIGNALS_USED
 enum
 {
   LAST_SIGNAL
 };
+#endif
 
 /* DND declarations */
 enum
 {
   TARGET_MESSAGE,
 };
+
+/*#define DND_USED*/
+#ifdef DND_USED
 
 static GtkTargetEntry drag_types[] =
 {
@@ -47,6 +52,7 @@ static GtkTargetEntry drag_types[] =
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
 static void index_child_setup_dnd ( GnomeMDIChild * child );
+#endif
 
 /* -- end of DND declarations */
 
@@ -58,19 +64,26 @@ static void index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpo
 
 /* menu item callbacks */
 
+/*#define MSG_STATUS_USED*/
+#ifdef MSG_STATUS_USED
 static void message_status_set_new_cb (GtkWidget *, Message *);
 static void message_status_set_read_cb (GtkWidget *, Message *);
 static void message_status_set_answered_cb (GtkWidget *, Message *);
+#endif
+
 static void delete_message_cb (GtkWidget *, BalsaIndex *);
 static void undelete_message_cb (GtkWidget *, BalsaIndex *);
 static void transfer_messages_cb (BalsaMBList *, Mailbox *, GtkCTreeNode *, GdkEventButton *, BalsaIndex *);
 
 
 static GtkObjectClass *parent_class = NULL;
+#ifdef SIGNALS_USED
 static guint signals[LAST_SIGNAL] = { 0 };
+#endif
 
 static void balsa_index_page_class_init(BalsaIndexPageClass *class);
 static void balsa_index_page_init(BalsaIndexPage *page);
+void balsa_index_page_close_and_destroy( GtkObject *obj );
 
 GtkType
 balsa_index_page_get_type (void)
@@ -123,7 +136,7 @@ GtkObject *balsa_index_page_new(BalsaWindow *window)
   BalsaIndexPage *bip;
   GtkWidget *sw;
   GtkWidget *index;
-  GtkAdjustment *vadj, *hadj;
+  /*GtkAdjustment *vadj, *hadj;*/
 
   bip = gtk_type_new(BALSA_TYPE_INDEX_PAGE);
  
@@ -151,7 +164,7 @@ GtkObject *balsa_index_page_new(BalsaWindow *window)
   // XXX
   //  index_child_setup_dnd(child);
 
-  bip->window = window;
+  bip->window = GTK_WIDGET( window );
   bip->index = index;
   bip->sw = sw;
 
@@ -183,7 +196,7 @@ set_password (GtkWidget * widget, GtkWidget * entry)
 void balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
 {
   GtkWidget *messagebox;
-  GdkCursor *cursor;
+  /*GdkCursor *cursor;*/
 
   page->mailbox = mailbox;
 
@@ -249,28 +262,31 @@ void balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
 /* PKGW: you'd think this function would be a good idea. 
 We assume that we've been detached from the notebook.
 */
-void balsa_index_page_close_and_destroy( BalsaIndexPage *page )
+void balsa_index_page_close_and_destroy( GtkObject *obj )
 {
-    g_return_if_fail( page );
+	BalsaIndexPage *page;
+
+	g_return_if_fail( obj );
+	page = BALSA_INDEX_PAGE( obj );
 
 /*    printf( "Close and destroy!\n" );*/
 
-    if( page->index ) {
-	gtk_widget_destroy( GTK_WIDGET( page->index ) );
-	page->index = NULL;
-    }
+	if( page->index ) {
+		gtk_widget_destroy( GTK_WIDGET( page->index ) );
+		page->index = NULL;
+	}
 
-    if( page->sw ) {
-	gtk_widget_destroy( GTK_WIDGET( page->sw ) );
-	page->sw = NULL;
-    }
-
-    /*page->window references our owner*/
-
-    if( page->mailbox ) {
-	mailbox_open_unref( page->mailbox );
-	page->mailbox = NULL;
-    }
+	if( page->sw ) {
+		gtk_widget_destroy( GTK_WIDGET( page->sw ) );
+		page->sw = NULL;
+	}
+	
+	/*page->window references our owner*/
+	
+	if( page->mailbox ) {
+		mailbox_open_unref( page->mailbox );
+		page->mailbox = NULL;
+	}
 }
 
 static gint handler = 0;
@@ -438,7 +454,7 @@ create_menu (BalsaIndex * bindex)
   return menu;
 }
 
-
+#ifdef MSG_STATUS_USED
 static void
 message_status_set_new_cb (GtkWidget * widget, Message * message)
 {
@@ -465,6 +481,7 @@ message_status_set_answered_cb (GtkWidget * widget, Message * message)
 
   message_reply (message);
 }
+#endif
 
 static void
 transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event, BalsaIndex * bindex)
@@ -539,10 +556,13 @@ undelete_message_cb (GtkWidget * widget, BalsaIndex * bindex)
 
 /* DND features                                              */
 
+#ifdef DND_USED
+
 /*--*/
 /* forward declaration of the dnd callbacks */
 static void index_child_drag_data_get (GtkWidget *widget, GdkDragContext *context,
 			  GtkSelectionData *selection_data, guint info, guint32 time);
+
 /*--*/
 
 /* 
@@ -552,10 +572,10 @@ static void index_child_drag_data_get (GtkWidget *widget, GdkDragContext *contex
  *
  * @child: the message index window to set the dnd ability up
  */
+
 static void 
 index_child_setup_dnd ( GnomeMDIChild * child )
 {
-#if 0
   IndexChild *ic;
   GdkPixmap *drag_pixmap;
   GdkPixmap *drag_mask;
@@ -576,10 +596,7 @@ index_child_setup_dnd ( GnomeMDIChild * child )
   
   gdk_pixmap_unref (drag_pixmap);
   gdk_pixmap_unref (drag_mask);
-
-#endif
 }
-
 
 
 /**
@@ -628,3 +645,5 @@ index_child_drag_data_get (GtkWidget *widget, GdkDragContext *context,
   g_free( message_list );
   
 }
+
+#endif /*DND_USED*/

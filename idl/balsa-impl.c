@@ -77,6 +77,7 @@ static POA_balsa_mail_send__vepv impl_balsa_mail_send_vepv =
    &impl_balsa_mail_send_base_epv,
    &impl_balsa_mail_send_epv,
 };
+
 static POA_balsa_mailbox_info__vepv impl_balsa_mailbox_info_vepv =
 {
    &impl_balsa_mailbox_info_base_epv,
@@ -117,7 +118,7 @@ impl_balsa_mail_send_to(impl_POA_balsa_mail_send * servant,
 			CORBA_Environment * ev)
 {
    CORBA_boolean retval;
-
+   retval = FALSE;
    return retval;
 }
 
@@ -128,7 +129,7 @@ impl_balsa_mail_send_attachment(impl_POA_balsa_mail_send * servant,
 				CORBA_Environment * ev)
 {
    CORBA_boolean retval;
-
+   retval = FALSE;
    return retval;
 }
 
@@ -165,7 +166,7 @@ impl_balsa_mailbox_info_newmail(impl_POA_balsa_mailbox_info * servant,
 				CORBA_Environment * ev)
 {
    CORBA_boolean retval;
-
+   retval = FALSE;
    return retval;
 }
 
@@ -175,6 +176,6 @@ impl_balsa_mailbox_info_num_msgs(impl_POA_balsa_mailbox_info * servant,
 				 CORBA_Environment * ev)
 {
    CORBA_long retval;
-
+   retval = 0;
    return retval;
 }

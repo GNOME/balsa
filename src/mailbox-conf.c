@@ -707,6 +707,10 @@ conf_add_mailbox ()
       config_mailbox_add (mailbox, NULL);
       add_mailboxes_for_checking (mailbox);
       break;
+
+    case MC_PAGE_NEW:
+	    g_warning( "An unimportant can\'t-happen has occurred. mailbox-conf.c:712" );
+	    break;
     }
 
   return mailbox;

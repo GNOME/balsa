@@ -67,7 +67,7 @@ static GtkTargetEntry dnd_mb_target[] =
 void mblist_open_mailbox (Mailbox * mailbox);
 void mblist_close_mailbox (Mailbox * mailbox);
 static void mailbox_select_cb (BalsaMBList *, Mailbox *, GtkCTreeNode *, GdkEventButton *);
-static gint mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data);
+static gint mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 /*PKGW*/
 static void size_allocate_cb( GtkWidget *widget, GtkAllocation *alloc );
 
@@ -229,7 +229,7 @@ mblist_close_mailbox (Mailbox * mailbox)
  
 
 static gint
-mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
+mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
   BalsaMBList * bmbl;
   GtkCList * clist;

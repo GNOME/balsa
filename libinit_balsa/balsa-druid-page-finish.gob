@@ -26,6 +26,10 @@
 #include "balsa-druid-page.h"
 %}
 
+%{
+#include "save-restore.h"
+%}
+
 class Balsa:Druid:Page:Finish from Balsa:Druid:Page {
 	private GtkWidget *text;
 

@@ -49,6 +49,7 @@ static void libbalsa_message_real_clear_flags(Message *message);
 static void libbalsa_message_real_set_answered_flag(Message *message, gboolean set);
 static void libbalsa_message_real_set_read_flag(Message *message, gboolean set);
 static void libbalsa_message_real_set_deleted_flag(Message *message, gboolean set);
+char * mime_content_type2str (int contenttype);
 
 enum {
   CLEAR_FLAGS,

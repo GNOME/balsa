@@ -18,7 +18,6 @@
  */
 
 
-
 #include <gtk/gtk.h>
 #include <gnome.h>
 #include <stdio.h>
@@ -38,7 +37,10 @@ static gint ab_okay_cb(GtkWidget * widget, gpointer data);
 static void ab_clear_clist(GtkCList * clist);
 static gint ab_delete_compare(gconstpointer a, gconstpointer b);
 static gint ab_switch_cb(GtkWidget * widget, gpointer data);
+/*#define AB_ADD_CB_USED*/
+#ifdef AB_ADD_CB_USED
 static gint ab_add_cb(GtkWidget * widget, gpointer data);
+#endif
 static void ab_load(GtkWidget * widget, gpointer data);
 static void ab_find(GtkWidget * group_entry) ;
 
@@ -151,6 +153,7 @@ ab_switch_cb(GtkWidget * widget, gpointer data)
 	return FALSE;
 }
 
+#ifdef AB_ADD_CB_USED
 static gint
 ab_add_cb(GtkWidget * widget, gpointer data)
 {
@@ -179,7 +182,7 @@ ab_add_cb(GtkWidget * widget, gpointer data)
 
 	return FALSE;
 }
-
+#endif
 
 static void 
 ab_load(GtkWidget * widget, gpointer data) 

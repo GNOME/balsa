@@ -51,6 +51,6 @@ struct _BalsaIndexPageClass
 GtkType balsa_index_page_get_type(void);
 GtkObject *balsa_index_page_new(BalsaWindow *window);
 void balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox *mailbox);
-void balsa_index_page_close_and_destroy( BalsaIndexPage *page );
+void balsa_index_page_close_and_destroy( GtkObject *obj );
 
 #endif /* __INDEX_CHILD_H__ */

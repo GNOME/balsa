@@ -200,7 +200,7 @@ threads_init( gboolean init )
 	mail_thread_msg_send = g_io_channel_unix_new ( mail_thread_pipes[1] );
 	mail_thread_msg_receive = g_io_channel_unix_new ( mail_thread_pipes[0] );
 	g_io_add_watch ( mail_thread_msg_receive, G_IO_IN,
-					mail_progress_notify_cb,
+					(GIOFunc) mail_progress_notify_cb,
 					NULL );
 
 	if( pipe( send_thread_pipes) < 0 )
@@ -210,7 +210,7 @@ threads_init( gboolean init )
 	send_thread_msg_send = g_io_channel_unix_new ( send_thread_pipes[1] );
 	send_thread_msg_receive = g_io_channel_unix_new ( send_thread_pipes[0] );
 	g_io_add_watch ( send_thread_msg_receive, G_IO_IN,
-					send_progress_notify_cb,
+					(GIOFunc) send_progress_notify_cb,
 					NULL );
 					
   }
@@ -377,4 +377,17 @@ balsa_exit (void)
   gnome_sound_shutdown ();
 
   gtk_main_quit();
+}
+
+/* Eeew. But I'm tired of ifdefs. -- PGKW */
+/* Don't EVER EVER EVER call this even for a joke -- it recurses. */
+static void __lame_hack_to_avoid_unused_warnings( void );
+typedef void (*__lame_funcptr)( void );
+static void __lame_hack_to_avoid_unused_warnings( void ) 
+{
+	__lame_funcptr i_b_m_i__c = (__lame_funcptr) impl_balsa_mailbox_info__create;
+	__lame_funcptr self = (__lame_funcptr) __lame_hack_to_avoid_unused_warnings;
+
+	i_b_m_i__c();
+	self();
 }

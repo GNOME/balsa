@@ -46,7 +46,7 @@ static gint balsa_mblist_signals[LAST_SIGNAL] = {0};
 
 static void select_mailbox(GtkCTree * ctree, GtkCTreeNode * row, gint column);
 static void button_event_press_cb(GtkCTree * ctree, GdkEventButton * event,
-				  gpointer data);
+				  gpointer user_data);
 
 static BalsaMBListClass *parent_class = NULL;
 
@@ -418,7 +418,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 }
 
 static void
-button_event_press_cb (GtkCTree * ctree, GdkEventButton * event, gpointer data)
+button_event_press_cb (GtkCTree * ctree, GdkEventButton * event, gpointer user_data)
 {
   gint row, column;
   GtkObject *data;

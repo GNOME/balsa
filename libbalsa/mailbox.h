@@ -289,6 +289,12 @@ gboolean mailbox_gather_content_info( Mailbox *mailbox );
 void mailbox_commit_flagged_changes( Mailbox *mailbox );
 
 
+/*
+ * Servers
+ */
+
+Server *server_new(ServerType type);
+void server_free(Server *server);
 
 
 

@@ -22,6 +22,12 @@
 #include <string.h>
 #include <gnome.h>
 
+void mutt_message (const char *fmt,...);
+void mutt_exit (int code);
+int mutt_yesorno (const char *msg, int def);
+int mutt_any_key_to_continue (const char *s);
+void mutt_clear_error (void);
+
 void
 mutt_message (const char *fmt,...)
 {

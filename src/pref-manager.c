@@ -569,14 +569,14 @@ create_identity_page (void)
 {
 
   GtkWidget *vbox;
-  GtkWidget *hbox;
+  /*GtkWidget *hbox;*/x
   GtkWidget *frame;
   GtkWidget *table;
   GtkWidget *label;
   GtkWidget *signature;
 
   GtkWidget *frame1;
-  GtkWidget *vbox1;
+  /*GtkWidget *vbox1;*/
   GtkWidget *table1;
 
   vbox = gtk_vbox_new (FALSE, 0);

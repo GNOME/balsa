@@ -82,4 +82,5 @@ filter_load (GList * filter_list, gchar * filter_file)
 gint 
 filter_save (GList * filter_list, gchar * filter_file)
 {
+	return 0;
 }

@@ -854,7 +854,7 @@ mail_progress_notify_cb( )
 	return TRUE;
       }
 
-    currentpos = (MailThreadMessage *) msgbuffer;
+    currentpos = (MailThreadMessage **) msgbuffer;
 
     while( count ) 
       {
@@ -959,7 +959,7 @@ send_progress_notify_cb( )
 	return TRUE;
       }
 
-    currentpos = (SendThreadMessage *) msgbuffer;
+    currentpos = (SendThreadMessage **) msgbuffer;
 
     while( count ) 
       {

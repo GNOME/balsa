@@ -93,6 +93,9 @@ void send_watcher_append_message (Mailbox * mailbox, Message * message);
 static Message *translate_message (HEADER * cur);
 static Address *translate_address (ADDRESS * caddr);
 
+Server *server_new(ServerType type);
+void server_free(Server *server);
+
 /* We're gonna set Mutt global vars here */
 void
 mailbox_init (gchar * inbox_path,

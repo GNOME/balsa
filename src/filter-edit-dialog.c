@@ -25,6 +25,42 @@
 #include "filter.h"
 #include "filter-edit.h"
 
+/* ******************************** */
+
+static option_list fe_run_on[] =
+{
+    { "Inbound", 1, NULL },
+    { "Outbound", 2, NULL },
+    { "Pre-send", 3, NULL },
+    { "Demand", 4, NULL }
+};
+
+static option_list fe_process_when[] =
+{
+    { "Matches", FILTER_MATCHES, NULL },
+    { "Doesn't Match", FILTER_NOMATCH, NULL },
+    { "Always", FILTER_ALWAYS, NULL }
+};
+
+static option_list fe_search_type[] =
+{
+    { "Simple", FILTER_SIMPLE, NULL },
+    { "Regular Expression", FILTER_REGEX, NULL },
+    { "External Command", FILTER_EXEC, NULL}
+};
+
+static option_list fe_actions[] =
+{
+    { "Copy to folder:", FILTER_COPY, NULL },
+    { "Move to folder:", FILTER_MOVE, NULL },
+    { "Print on printer:", FILTER_PRINT, NULL },
+    { "Run program:", FILTER_RUN, NULL },
+    { "Send to Trash", FILTER_TRASH, NULL}
+};
+
+/* ******************************** */
+
+
 /*
  * build_option_menu()
  *

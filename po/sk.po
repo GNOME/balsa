@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-10-12 22:23+0200\n"
-"PO-Revision-Date: 2004-10-12 22:26+0200\n"
+"POT-Creation-Date: 2004-10-16 07:45+0200\n"
+"PO-Revision-Date: 2004-10-16 07:45+0200\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +66,7 @@ msgstr "Nemôžem vyhľadávať v adresári"
 msgid "Cannot add duplicate entry"
 msgstr "Nemôžem pridať duplikátnu položku"
 
-#: libbalsa/address-book.c:406 src/main-window.c:2196
+#: libbalsa/address-book.c:406 src/main-window.c:2204
 #: src/sendmsg-window.c:4135
 msgid "Unknown error"
 msgstr "Neznáma chyba"
@@ -1146,7 +1146,7 @@ msgstr "Skúste opäť neskôr."
 msgid "Sending Mail..."
 msgstr "Posielam správu..."
 
-#: libbalsa/send.c:240 src/main-window.c:2634
+#: libbalsa/send.c:240 src/main-window.c:2642
 msgid "_Hide"
 msgstr "_Skryť"
 
@@ -1905,7 +1905,7 @@ msgstr "Uložiť zvolené..."
 msgid "(No sender)"
 msgstr "(Bez odosielateľa)"
 
-#: src/balsa-message.c:1199 src/balsa-message.c:3699
+#: src/balsa-message.c:1199 src/balsa-message.c:3732
 #, c-format
 msgid "Could not access message; mailbox \"%s\" was changed."
 msgstr ""
@@ -2035,7 +2035,7 @@ msgstr "Pr_ezrieť časť pomocou %s"
 msgid "Calling URL %s..."
 msgstr "Spúšťam URL %s..."
 
-#: src/balsa-message.c:2295 src/balsa-message.c:3116 src/balsa-message.c:3834
+#: src/balsa-message.c:2295 src/balsa-message.c:3116 src/balsa-message.c:3867
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Chyba pri zobrazení %s: %s\n"
@@ -2116,7 +2116,7 @@ msgstr "Nemôžem vytvoriť dočasný súbor %s"
 msgid "could not create temporary file %s"
 msgstr "nemôžem vytvoriť dočasný súbor %s"
 
-#: src/balsa-message.c:4111
+#: src/balsa-message.c:4144
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2127,11 +2127,11 @@ msgstr ""
 "Oznámenie o doručení správy (MDN) na adresu `%s'.\n"
 "Chcete poslať takéto oznámenie?"
 
-#: src/balsa-message.c:4118
+#: src/balsa-message.c:4151
 msgid "Reply to MDN?"
 msgstr "Odpovedať na MDN?"
 
-#: src/balsa-message.c:4436
+#: src/balsa-message.c:4469
 #, c-format
 msgid ""
 "This is an inline OpenPGP signed %s message part:\n"
@@ -2140,11 +2140,11 @@ msgstr ""
 "Toto je vložená časť správy %s podpísaná pomocou OpenPGP:\n"
 "%s"
 
-#: src/balsa-message.c:4454
+#: src/balsa-message.c:4487
 msgid "_Run gpg to import this key"
 msgstr "_Spustiť gpg pre import tohoto kľúča"
 
-#: src/balsa-message.c:4570 src/balsa-message.c:4794
+#: src/balsa-message.c:4603 src/balsa-message.c:4827
 msgid ""
 "This operation can not be performed because this message is displayed more "
 "than once.\n"
@@ -2154,7 +2154,7 @@ msgstr ""
 "raz.\n"
 "Prosím, zatvorte ostatné inštancie tejto správy a skúste znova."
 
-#: src/balsa-message.c:4606
+#: src/balsa-message.c:4639
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
@@ -2163,7 +2163,7 @@ msgstr ""
 "Správa odoslaná od %s s predmetom \"%s\" obsahuje zašifrovanú časť, ale jej "
 "štruktúra je neplatná."
 
-#: src/balsa-message.c:4614
+#: src/balsa-message.c:4647
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
@@ -2172,7 +2172,7 @@ msgstr ""
 "Správa odoslaná od %s s predmetom \"%s\" obsahuje PGP zašifrovanú časť, ale "
 "tento šifrovací protokol nie je dostupný."
 
-#: src/balsa-message.c:4627
+#: src/balsa-message.c:4660
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
@@ -2181,7 +2181,7 @@ msgstr ""
 "Správa odoslaná od %s s predmetom \"%s\" obsahuje S/MIME zašifrovanú časť, "
 "ale tento šifrovací protokol nie je dostupný."
 
-#: src/balsa-message.c:4681
+#: src/balsa-message.c:4714
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but it's "
@@ -2190,7 +2190,7 @@ msgstr ""
 "Správa odoslaná od %s s predmetom \"%s\" obsahuje podpísanú časť, ale jej "
 "štruktúra je neplatná. Podpis, ak tam je nejaký, nemôže byť skontrolovaný."
 
-#: src/balsa-message.c:4694
+#: src/balsa-message.c:4727
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
@@ -2199,27 +2199,27 @@ msgstr ""
 "Správa odoslaná od %s s predmetom \"%s\" obsahuje podpísanú časť %s, ale "
 "tento šifrovací protokol nie je dostupný."
 
-#: src/balsa-message.c:4697
+#: src/balsa-message.c:4730
 msgid "PGP"
 msgstr "PGP"
 
-#: src/balsa-message.c:4697
+#: src/balsa-message.c:4730
 msgid "S/MIME"
 msgstr "S/MIME"
 
-#: src/balsa-message.c:4716 src/balsa-message.c:4821
+#: src/balsa-message.c:4749 src/balsa-message.c:4854
 msgid "Detected a good signature"
 msgstr "Zdetekovaný dobrý podpis"
 
-#: src/balsa-message.c:4722
+#: src/balsa-message.c:4755
 msgid "Detected a good signature with insufficient validity"
 msgstr "Zdetekovaný dobrý podpis s nedostatočnou platnosťou"
 
-#: src/balsa-message.c:4727 src/balsa-message.c:4825
+#: src/balsa-message.c:4760 src/balsa-message.c:4858
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr "Zdetekovaný dobrý podpis s nedostatočnou platnosťou/dôverou"
 
-#: src/balsa-message.c:4734 src/balsa-message.c:4831
+#: src/balsa-message.c:4767 src/balsa-message.c:4864
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2229,7 +2229,7 @@ msgstr ""
 "Kontrola podpisu správy, ktorú odoslal %s, s predmetom \"%s\" vrátila:\n"
 "%s"
 
-#: src/balsa-message.c:4746
+#: src/balsa-message.c:4779
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -2370,17 +2370,17 @@ msgstr "_Všetky"
 msgid "C_lear"
 msgstr "V_yčistiť"
 
-#: src/filter-edit-callbacks.c:1011 src/main-window.c:3760
+#: src/filter-edit-callbacks.c:1011 src/main-window.c:3770
 msgid "_Body"
 msgstr "_Telo"
 
 #. To:
-#: src/filter-edit-callbacks.c:1018 src/main-window.c:3761
+#: src/filter-edit-callbacks.c:1018 src/main-window.c:3771
 #: src/sendmsg-window.c:2200
 msgid "_To:"
 msgstr "_Pre:"
 
-#: src/filter-edit-callbacks.c:1025 src/main-window.c:3762
+#: src/filter-edit-callbacks.c:1025 src/main-window.c:3772
 msgid "_From:"
 msgstr "_Od:"
 
@@ -2388,7 +2388,7 @@ msgstr "_Od:"
 msgid "_Subject"
 msgstr "Pre_dmet"
 
-#: src/filter-edit-callbacks.c:1040 src/main-window.c:3764
+#: src/filter-edit-callbacks.c:1040 src/main-window.c:3774
 msgid "_Cc:"
 msgstr "Kó_pia:"
 
@@ -3446,17 +3446,17 @@ msgstr "Poslať ďalej _citované..."
 msgid "Forward the current message inline"
 msgstr "Poslať ďalej aktuálnu správu citovanú v tele správy"
 
-#: src/main-window.c:620 src/message-window.c:174
-msgid "Next Part"
-msgstr "Ďalšia časť"
+#: src/main-window.c:620
+msgid "_Next Part"
+msgstr "Ď_alšia časť"
 
 #: src/main-window.c:620 src/message-window.c:174
 msgid "Next part in message"
 msgstr "Ďalšia časť v správe"
 
-#: src/main-window.c:626 src/message-window.c:179
-msgid "Previous Part"
-msgstr "Predchádzajúca časť"
+#: src/main-window.c:626
+msgid "_Previous Part"
+msgstr "_Predchádzajúca časť"
 
 #: src/main-window.c:627 src/message-window.c:180
 msgid "Previous part in message"
@@ -3738,7 +3738,7 @@ msgstr ""
 msgid "Subject or Sender _Contains:"
 msgstr "Predmet alebo odosielateľ _obsahuje:"
 
-#: src/main-window.c:2195
+#: src/main-window.c:2203
 #, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
@@ -3747,11 +3747,11 @@ msgstr ""
 "Nepodarilo sa otvoriť poštovú schránku!\n"
 "%s."
 
-#: src/main-window.c:2512
+#: src/main-window.c:2520
 msgid "translator_credits"
 msgstr "Marcel Telka <marcel@telka.sk>"
 
-#: src/main-window.c:2528
+#: src/main-window.c:2536
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3764,24 +3764,24 @@ msgstr ""
 "Ak potrebujete oznámiť chyby v programe, urobte tak, prosím, na adrese "
 "http://bugzilla.gnome.org/"
 
-#: src/main-window.c:2631
+#: src/main-window.c:2639
 msgid "Checking Mail..."
 msgstr "Kontrolujem poštu..."
 
-#: src/main-window.c:2951
+#: src/main-window.c:2959
 msgid "Finished Checking."
 msgstr "Kontrola ukončená."
 
-#: src/main-window.c:3013
+#: src/main-window.c:3021
 #, c-format
 msgid "Sending error: %s"
 msgstr "Chyba pri posielaní: %s"
 
-#: src/main-window.c:3098
+#: src/main-window.c:3106
 msgid "Balsa: New mail"
 msgstr "Balsa: Nová pošta"
 
-#: src/main-window.c:3110
+#: src/main-window.c:3118
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
@@ -3789,61 +3789,61 @@ msgstr[0] "Prijali ste %d nových správ."
 msgstr[1] "Prijali ste %d novú správu."
 msgstr[2] "Prijali ste %d nové správy."
 
-#: src/main-window.c:3113
+#: src/main-window.c:3121
 msgid "You have new mail."
 msgstr "Máte novú poštu."
 
-#: src/main-window.c:3722
+#: src/main-window.c:3732
 msgid "Search mailbox"
 msgstr "Vyhľadať v poštovej schránke"
 
-#: src/main-window.c:3739
+#: src/main-window.c:3749
 msgid "_Search for:"
 msgstr "_Vyhľadať:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: src/main-window.c:3752
+#: src/main-window.c:3762
 msgid "In:"
 msgstr "V:"
 
-#: src/main-window.c:3763
+#: src/main-window.c:3773
 msgid "S_ubject"
 msgstr "_Predmet"
 
 #. Frame with Apply and Clear buttons
-#: src/main-window.c:3768
+#: src/main-window.c:3778
 msgid "Show only matching messages"
 msgstr "Zobraziť len zodpovedajúce správy"
 
 #. Frame with OK button
-#: src/main-window.c:3789
+#: src/main-window.c:3799
 msgid "Open next matching message"
 msgstr "Otvoriť ďalšiu zodpovedajúcu správu"
 
-#: src/main-window.c:3800
+#: src/main-window.c:3810
 msgid "_Reverse search"
 msgstr "_Spätné vyhľadávanie"
 
-#: src/main-window.c:3805
+#: src/main-window.c:3815
 msgid "_Wrap around"
 msgstr "_Prechádzať dookola"
 
-#: src/main-window.c:3881
+#: src/main-window.c:3891
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Chyba pri zobrazovaní pomocníka: %s\n"
 
-#: src/main-window.c:3966
+#: src/main-window.c:3976
 msgid "You can apply filters only on mailbox\n"
 msgstr "Môžete aplikovať filtre len na poštovú schránku\n"
 
-#: src/main-window.c:4283
+#: src/main-window.c:4292
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (len na čítanie)"
 
-#: src/main-window.c:4285
+#: src/main-window.c:4294
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
@@ -3949,6 +3949,14 @@ msgstr "Poslať ďalej citované..."
 msgid "Forward this message inline"
 msgstr "Poslať túto správu ďalej citovanú"
 
+#: src/message-window.c:174
+msgid "Next Part"
+msgstr "Ďalšia časť"
+
+#: src/message-window.c:179
+msgid "Previous Part"
+msgstr "Predchádzajúca časť"
+
 #: src/message-window.c:185
 msgid "Save current part in message"
 msgstr "Uložiť aktuálnu časť v správe"
@@ -3969,7 +3977,7 @@ msgstr "_Predchádzajúca správa"
 msgid "M_ove"
 msgstr "Pres_unúť"
 
-#: src/message-window.c:315
+#: src/message-window.c:340
 #, c-format
 msgid "Message from %s: %s"
 msgstr "Správa od %s: %s"
@@ -4733,11 +4741,11 @@ msgstr ""
 "Chyba pri načítavaní filtrov: %s\n"
 "Filtre nemusia byť správne."
 
-#: src/save-restore.c:716
+#: src/save-restore.c:717
 msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr "Voľba na nerozpoznávanie \"format=flowed\" textu bola odstránená."
 
-#: src/save-restore.c:975
+#: src/save-restore.c:976
 msgid ""
 "The option not to send \"format=flowed\" is now on the Options menu of the "
 "compose window."
@@ -4745,20 +4753,20 @@ msgstr ""
 "Voľba pre neodosielanie \"format=flowed\" je teraz v menu Voľby okna písania "
 "novej správy."
 
-#: src/save-restore.c:1007
+#: src/save-restore.c:1008
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr "Voľba na žiadost MDN je teraz v menu Voľby okna písania novej správy."
 
-#: src/save-restore.c:1753
+#: src/save-restore.c:1754
 msgid "Filter with no condition was ignored"
 msgstr "Filter bez podmienok bol ignorovaný."
 
-#: src/save-restore.c:1933
+#: src/save-restore.c:1934
 msgid "Error opening GConf database\n"
 msgstr "Chyba pri otváraní GConf databázy\n"
 
-#: src/save-restore.c:1941 src/save-restore.c:1952
+#: src/save-restore.c:1942 src/save-restore.c:1953
 #, c-format
 msgid "Error setting GConf field: %s\n"
 msgstr "Chyba pri nastavovaní GConf poľa: %s\n"

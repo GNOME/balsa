@@ -36,6 +36,7 @@ typedef struct _PropertyUI
 
     GtkWidget *real_name, *email, *replyto, *signature;
 
+    GtkWidget *pop3servers;
     GtkWidget *smtp_server, *mail_directory;
 
     GtkWidget *previewpane;
@@ -388,13 +389,15 @@ create_mailservers_page ()
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
 
   hbox = gtk_hbox_new (FALSE, 0);
+  gtk_container_border_width (GTK_CONTAINER (hbox), 5);
   gtk_container_add (GTK_CONTAINER (frame), hbox);
 
-  label = gtk_label_new ("clist goes here");
-  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 2);
+  pui->pop3servers = gtk_clist_new (1);
+  gtk_clist_set_policy (GTK_CLIST (pui->pop3servers), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_box_pack_start (GTK_BOX (hbox), pui->pop3servers, TRUE, TRUE, 2);
 
   bbox = gtk_vbutton_box_new ();
-  gtk_box_pack_start (GTK_BOX (hbox), bbox, FALSE, FALSE, 2);
+  gtk_box_pack_start (GTK_BOX (hbox), bbox, FALSE, TRUE, 2);
   gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 2);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
   gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox), 25, 15);

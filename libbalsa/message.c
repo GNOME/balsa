@@ -182,19 +182,6 @@ libbalsa_message_finalize(GObject * object)
 }
 
 static void
-libbalsa_message_find_charset(GMimeObject * mime_part,
-                              const gchar ** charset)
-{
-    const GMimeContentType *type;
-
-    if (*charset)
-        return;
-
-    type = g_mime_object_get_content_type(mime_part);
-    *charset = g_mime_content_type_get_parameter(type, "charset");
-}
-
-static void
 lb_message_headers_extra_destroy(LibBalsaMessageHeaders * headers)
 {
     FREE_HEADER_LIST(headers->user_hdrs);
@@ -256,30 +243,27 @@ libbalsa_message_headers_destroy(LibBalsaMessageHeaders * headers)
 const gchar *
 libbalsa_message_body_charset(LibBalsaMessageBody * body)
 {
-    const gchar *charset = NULL;
+    const gchar *charset;
+
+    if (!body)
+	return NULL;
 
     if (body->charset) /* This overrides all! Important for non
                         * us-ascii messages over IMAP. */
         return body->charset;
-    if (body->mime_part) {
-	if (GMIME_IS_MULTIPART(body->mime_part))
-	    g_mime_multipart_foreach(GMIME_MULTIPART(body->mime_part),
-				     (GMimePartFunc)
-				     libbalsa_message_find_charset, &charset);
-	else
-	    libbalsa_message_find_charset(body->mime_part, &charset);
-    } else {
-	do {
-	    if (body->charset) {
-		charset = body->charset;
-		break;
-	    }
-	    if (body->parts)
-		charset = libbalsa_message_body_charset(body->parts);
-	} while (!charset && (body = body->next));
+
+    if (GMIME_IS_PART(body->mime_part)) {
+        const GMimeContentType *type;
+
+        type = g_mime_object_get_content_type(body->mime_part);
+        return g_mime_content_type_get_parameter(type, "charset");
     }
 
-    return charset;
+    charset = libbalsa_message_body_charset(body->parts);
+    if (charset)
+        return charset;
+
+    return libbalsa_message_body_charset(body->next);
 }
 
 static void

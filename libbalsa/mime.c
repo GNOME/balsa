@@ -35,7 +35,8 @@ static GString *process_mime_multipart(LibBalsaMessage * message,
                                        LibBalsaMessageBody * body,
 				       gchar * reply_prefix_str,
 				       gint llen, gboolean ignore_html,
-                                       gboolean flow);
+                                       gboolean flow,
+				       const gchar ** charset);
 
 /* process_mime_part:
    returns string representation of given message part.
@@ -45,7 +46,7 @@ static GString *process_mime_multipart(LibBalsaMessage * message,
 GString *
 process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 		  gchar * reply_prefix_str, gint llen, gboolean ignore_html,
-                  gboolean flow)
+                  gboolean flow, const gchar ** charset)
 {
     gchar *res = NULL;
     size_t allocated;
@@ -64,7 +65,7 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
         reply = process_mime_multipart(message, body, reply_prefix_str,
-                                       llen, ignore_html, flow);
+                                       llen, ignore_html, flow, charset);
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
 	/* don't return text/html stuff... */
@@ -85,6 +86,9 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	    libbalsa_html_to_string(&res, allocated);
 	}
 #endif /* HAVE_GTKHTML */
+
+	if (charset)
+            *charset = libbalsa_message_body_charset(body);
 
 	if (llen > 0) {
             if (flow && libbalsa_message_body_is_flowed(body)) {
@@ -144,14 +148,15 @@ static GString *
 process_mime_multipart(LibBalsaMessage * message,
                        LibBalsaMessageBody * body,
 		       gchar * reply_prefix_str, gint llen,
-		       gboolean ignore_html, gboolean flow)
+		       gboolean ignore_html, gboolean flow,
+		       const gchar ** charset)
 {
     LibBalsaMessageBody *part;
     GString *res = NULL, *s;
 
     for (part = body->parts; part; part = part->next) {
 	s = process_mime_part(message, part, reply_prefix_str, llen,
-                          ignore_html, flow);
+                          ignore_html, flow, charset);
 	if (!s)
 	    continue;
 	if (res) {
@@ -168,7 +173,8 @@ process_mime_multipart(LibBalsaMessage * message,
 
 GString *
 content2reply(LibBalsaMessage * message, gchar * reply_prefix_str,
-	      gint llen, gboolean ignore_html, gboolean flow)
+	      gint llen, gboolean ignore_html, gboolean flow,
+	      const gchar ** charset)
 {
     LibBalsaMessageBody *body;
     GString *reply = NULL, *res;
@@ -177,7 +183,7 @@ content2reply(LibBalsaMessage * message, gchar * reply_prefix_str,
     body = message->body_list;
     for (body = message->body_list; body; body = body->next) {
 	res = process_mime_part(message, body, reply_prefix_str, llen,
-                                ignore_html, flow);
+                                ignore_html, flow, charset);
 	if (!res)
 	    continue;
 	if (reply) {

@@ -187,7 +187,7 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
 	    if (!message->mailbox)
 		return FALSE; /* We don't want to match if an error occured */
-	    body = content2reply(message,NULL,0,FALSE,FALSE);
+	    body = content2reply(message, NULL, 0, FALSE, FALSE, NULL);
 	    if (body) {
 		if (body->str)
                     match = libbalsa_utf8_strstr(body->str,

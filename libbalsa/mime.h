@@ -30,9 +30,11 @@
 GString *process_mime_part(LibBalsaMessage * message,
 			   LibBalsaMessageBody * body,
 			   gchar * reply_prefix_str, gint llen,
-			   gboolean ignore_html, gboolean flow);
+			   gboolean ignore_html, gboolean flow,
+			   const gchar ** charset);
 GString *content2reply(LibBalsaMessage * message,
 		       gchar * reply_prefix_str, gint llen,
-		       gboolean ignore_html, gboolean flow);	/* arp */
+		       gboolean ignore_html, gboolean flow,
+		       const gchar ** charset);	/* arp */
 
 #endif				/* __LIBBALSA_MIME_H__ */

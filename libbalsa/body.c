@@ -432,9 +432,32 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
 	&& strcmp(mime_type = libbalsa_message_body_get_mime_type(body),
 			                  "text/html") != 0
 	&& (charset = libbalsa_message_body_charset(body)) != NULL
-	&& g_ascii_strcasecmp(charset, "unknown-8bit") != 0
-	&& (filter = g_mime_filter_charset_new(charset, "UTF-8")) != NULL)
-	stream = libbalsa_message_body_stream_add_filter(stream, filter);
+	&& g_ascii_strcasecmp(charset, "unknown-8bit") != 0) {
+        GMimeStream *stream_null;
+        GMimeStream *stream_filter;
+
+        stream_null = g_mime_stream_null_new();
+        stream_filter = g_mime_stream_filter_new_with_stream(stream_null);
+        g_object_unref(stream_null);
+
+        filter = g_mime_filter_windows_new(charset);
+        g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream_filter),
+                                 filter);
+
+        g_mime_stream_reset(stream);
+        g_mime_stream_write_to_stream(stream, stream_filter);
+        g_object_unref(stream_filter);
+
+        charset = g_mime_filter_windows_real_charset(GMIME_FILTER_WINDOWS
+                                                     (filter));
+        g_object_unref(filter);
+
+        if ((filter = g_mime_filter_charset_new(charset, "UTF-8")) != NULL) {
+            stream = libbalsa_message_body_stream_add_filter(stream, filter);
+            g_free(body->charset);
+            body->charset = g_strdup(charset);
+        }
+    }
 
     g_free(mime_type);
 

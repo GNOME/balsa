@@ -91,7 +91,7 @@ open_main_window ()
 
   gnome_mdi_set_mode (mdi, balsa_app.mdi_style);
 
-  gtk_widget_set_usize (mdi->active_window, 670, 435);
+  gtk_widget_set_usize (GTK_WIDGET(mdi->active_window), 670, 435);
 
   refresh_main_window ();
 }

@@ -82,7 +82,7 @@ void build_base_dialog()
     gtk_signal_connect(GTK_OBJECT(fe_dialog_ok),
 		       "clicked",
 		       GTK_SIGNAL_FUNC(fe_dialog_button_clicked),
-		       (gpointer) 3);
+		       GINT_TO_POINTER(3));
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(fe_dialog)->action_area),
 		       fe_dialog_ok,
 		       FALSE, TRUE, 0);
@@ -91,7 +91,7 @@ void build_base_dialog()
     gtk_signal_connect(GTK_OBJECT(fe_dialog_cancel),
 		       "clicked",
 		       GTK_SIGNAL_FUNC(fe_dialog_button_clicked),
-		       (gpointer) 2);
+		       GINT_TO_POINTER(2));
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(fe_dialog)->action_area),
 		       fe_dialog_cancel,
 		       FALSE, TRUE, 0);
@@ -100,7 +100,7 @@ void build_base_dialog()
     gtk_signal_connect(GTK_OBJECT(fe_dialog_help),
 		       "clicked",
 		       GTK_SIGNAL_FUNC(fe_dialog_button_clicked),
-		       (gpointer) 1);
+		       GINT_TO_POINTER(1));
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(fe_dialog)->action_area),
 		       fe_dialog_help,
 		       FALSE, TRUE, 0);
@@ -149,6 +149,10 @@ void build_left_side()
 		       TRUE,
 		       TRUE,
 		       0);
+    gtk_signal_connect(GTK_OBJECT(fe_delete),
+		       "clicked",
+		       GTK_SIGNAL_FUNC(fe_delete_pressed),
+		       NULL);
     gtk_widget_show(fe_delete);
     gtk_table_attach(GTK_TABLE(fe_table),
 		     fe_box_newdelete,
@@ -172,6 +176,10 @@ void build_left_side()
 		       TRUE,
 		       TRUE,
 		       0);
+    gtk_signal_connect(GTK_OBJECT(fe_down),
+		       "clicked",
+		       GTK_SIGNAL_FUNC(fe_down_pressed),
+		       NULL);
     gtk_widget_show(fe_down);
     gtk_table_attach(GTK_TABLE(fe_table),
 		     fe_box_updown,
@@ -272,7 +280,7 @@ void build_type_notebook()
     gtk_signal_connect(GTK_OBJECT(fe_type_simple_all),
 		       "toggled",
 		       GTK_SIGNAL_FUNC(fe_type_simple_toggled),
-		       (gpointer)1);
+		       GINT_TO_POINTER(1));
     gtk_widget_show(fe_type_simple_all);
     fe_type_simple_header = gtk_check_button_new_with_label("Header");
     gtk_table_attach(GTK_TABLE(fe_type_simple_table),
@@ -284,7 +292,7 @@ void build_type_notebook()
     gtk_signal_connect(GTK_OBJECT(fe_type_simple_header),
 		       "toggled",
 		       GTK_SIGNAL_FUNC(fe_type_simple_toggled),
-		       (gpointer)2);
+		       GINT_TO_POINTER(2));
     gtk_widget_show(fe_type_simple_header);
     fe_type_simple_body = gtk_check_button_new_with_label("Body");
     gtk_table_attach(GTK_TABLE(fe_type_simple_table),
@@ -296,7 +304,7 @@ void build_type_notebook()
     gtk_signal_connect(GTK_OBJECT(fe_type_simple_body),
 		       "toggled",
 		       GTK_SIGNAL_FUNC(fe_type_simple_toggled),
-		       (gpointer)3);
+		       GINT_TO_POINTER(3));
     gtk_widget_show(fe_type_simple_body);
     fe_type_simple_to = gtk_check_button_new_with_label("To:");
     gtk_table_attach(GTK_TABLE(fe_type_simple_table),
@@ -308,7 +316,7 @@ void build_type_notebook()
     gtk_signal_connect(GTK_OBJECT(fe_type_simple_to),
 		       "toggled",
 		       GTK_SIGNAL_FUNC(fe_type_simple_toggled),
-		       (gpointer)4);
+		       GINT_TO_POINTER(4));
     gtk_widget_show(fe_type_simple_to);
     fe_type_simple_from = gtk_check_button_new_with_label("From:");
     gtk_table_attach(GTK_TABLE(fe_type_simple_table),
@@ -320,7 +328,7 @@ void build_type_notebook()
     gtk_signal_connect(GTK_OBJECT(fe_type_simple_from),
 		       "toggled",
 		       GTK_SIGNAL_FUNC(fe_type_simple_toggled),
-		       (gpointer)5);
+		       GINT_TO_POINTER(5));
     gtk_widget_show(fe_type_simple_from);
     fe_type_simple_subject = gtk_check_button_new_with_label("Subject");
     gtk_table_attach(GTK_TABLE(fe_type_simple_table),
@@ -332,7 +340,7 @@ void build_type_notebook()
     gtk_signal_connect(GTK_OBJECT(fe_type_simple_subject),
 		       "toggled",
 		       GTK_SIGNAL_FUNC(fe_type_simple_toggled),
-		       (gpointer)6);
+		       GINT_TO_POINTER(6));
     gtk_widget_show(fe_type_simple_subject);
 
     fe_type_simple_label = gtk_label_new("Match string:");

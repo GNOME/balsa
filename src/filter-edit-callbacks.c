@@ -24,7 +24,7 @@ void
 fe_dialog_button_clicked (GtkWidget * widget,
 			  gpointer data)
 {
-  switch ((int) data)
+  switch (GPOINTER_TO_INT(data))
     {
     case 2:			/* Cancel button */
       break;
@@ -59,7 +59,7 @@ fe_checkbutton_toggled (GtkWidget * widget,
   if (GTK_CHECK_MENU_ITEM (widget)->active)
     {
       gtk_notebook_set_page (GTK_NOTEBOOK (fe_type_notebook),
-			     (gint) data);
+			     GPOINTER_TO_INT(data));
     }
 }				/* end fe_checkbutton_toggled() */
 
@@ -125,7 +125,7 @@ fe_type_simple_toggled (GtkWidget * widget,
 {
   if (GTK_TOGGLE_BUTTON (widget)->active)
     {
-      switch ((gint) data)
+      switch (GPOINTER_TO_INT(data))
 	{
 	case 1:		/* ALL */
 	  gtk_toggle_button_set_state (
@@ -167,7 +167,7 @@ fe_type_simple_toggled (GtkWidget * widget,
     }
   else
     {
-      switch ((gint) data)
+      switch (GPOINTER_TO_INT(data))
 	{
 	case 1:		/* ALL */
 	  gtk_widget_set_sensitive (
@@ -284,6 +284,56 @@ fe_new_pressed (GtkWidget * widget,
   gtk_clist_select_row (GTK_CLIST (fe_clist),
 			new_row, 1);
 }				/* end fe_new_pressed() */
+
+
+/*
+ * fe_delete_pressed()
+ *
+ * Callback for the "Delete" button
+ */
+void fe_delete_pressed(GtkWidget *widget,
+		       gpointer throwaway)
+{
+    gint row;
+    filter *fil;
+
+    if (!(GTK_CLIST(fe_clist)->selection))
+	return;
+
+    row = GPOINTER_TO_INT((GTK_CLIST(fe_clist)->selection)->data);
+
+    fil = (filter *)gtk_clist_get_row_data(GTK_CLIST(fe_clist),
+					   row);
+
+    if (fil)
+	filter_free(fil, NULL);
+
+    gtk_clist_remove(GTK_CLIST(fe_clist),
+		     row);
+} /* end fe_delete_pressed() */
+
+
+/*
+ * fe_up_pressed()
+ *
+ * Callback for the "Up" button
+ */
+void fe_down_pressed(GtkWidget *widget,
+		     gpointer throwaway)
+{
+    gint row;
+
+    g_print("down\n");
+    if (!(GTK_CLIST(fe_clist)->selection))
+	return;
+
+    row = GPOINTER_TO_INT((GTK_CLIST(fe_clist)->selection)->data);
+    g_print("row %d of %d selected\n", row, GTK_CLIST(fe_clist)->rows - 1);
+/*    if (row == (GTK_CLIST(fe_clist)->rows - 1)) 
+      return; */
+
+    gtk_clist_swap_rows(GTK_CLIST(fe_clist), row, row + 1);
+} /* end fe_up_pressed */
 
 
 /*

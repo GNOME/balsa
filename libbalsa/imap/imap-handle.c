@@ -117,8 +117,6 @@ static void
 imap_mbox_handle_init(ImapMboxHandle *handle)
 {
   handle->host   = NULL;
-  handle->user   = NULL;
-  handle->passwd = NULL;
   handle->mbox   = NULL;
   handle->state  = IMHS_DISCONNECTED;
   handle->has_capabilities = FALSE;
@@ -198,11 +196,12 @@ imap_handle_set_infocb(ImapMboxHandle* h, ImapInfoCb cb, void *arg)
   h->info_cb  = cb;
   h->info_arg = arg;
 }
+
 void
-imap_handle_set_alertcb(ImapMboxHandle* h, ImapInfoCb cb, void *arg)
+imap_handle_set_usercb(ImapMboxHandle* h, ImapUserCb cb, void *arg)
 {
-  h->alert_cb  = cb;
-  h->alert_arg = arg;
+  h->user_cb  = cb;
+  h->user_arg = arg;
 }
 
 void
@@ -229,16 +228,13 @@ int imap_mbox_is_selected     (ImapMboxHandle *h)
 { return IMAP_MBOX_IS_SELECTED(h); }
 
 ImapResult
-imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host,
-                         const char* user, const char* passwd)
+imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host)
 {
   ImapResult rc;
 
   g_return_val_if_fail(imap_mbox_is_disconnected(ret), IMAP_CONNECT_FAILED);
 
   g_free(ret->host);   ret->host   = g_strdup(host);
-  g_free(ret->user);   ret->user   = g_strdup(user);
-  g_free(ret->passwd); ret->passwd = g_strdup(passwd);
 
   if( (rc=imap_mbox_connect(ret)) != IMAP_SUCCESS)
     return rc;
@@ -247,7 +243,7 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host,
   imap_handle_starttls(ret); /* one can always try! */
 #endif
 
-  rc = imap_authenticate(ret, user, passwd);
+  rc = imap_authenticate(ret);
 
   return rc;
 }
@@ -280,7 +276,7 @@ imap_mbox_handle_reconnect(ImapMboxHandle* h, gboolean *readonly)
   if( (rc=imap_mbox_connect(h)) != IMAP_SUCCESS)
     return rc;
 
-  if( (rc = imap_authenticate(h, h->user, h->passwd)) != IMAP_SUCCESS)
+  if( (rc = imap_authenticate(h)) != IMAP_SUCCESS)
     return rc;
 
   imap_mbox_resize_cache(h, 0); /* invalidate cache */
@@ -523,8 +519,6 @@ imap_mbox_handle_finalize(GObject* gobject)
   if(handle->sio) { sio_detach(handle->sio); handle->sio = NULL; }
   close(handle->sd);
   g_free(handle->host);    handle->host   = NULL;
-  g_free(handle->user);    handle->user   = NULL;
-  g_free(handle->passwd);  handle->passwd = NULL;
   g_free(handle->mbox);    handle->mbox   = NULL;
 
   g_hash_table_destroy(handle->cmd_queue); handle->cmd_queue = NULL;
@@ -1250,7 +1244,7 @@ ir_resp_text_code(ImapMboxHandle *h)
     if(g_ascii_strcasecmp(buf, resp_text_code[o]) == 0) break;
 
   switch(o) {
-  case 0: if(h->alert_cb) h->alert_cb("ALERT", h->alert_arg);/* FIXME*/break;
+  case 0: rc = IMR_ALERT;        break;
   case 1: ignore_bad_charset(h->sio, c); break;
   case 2: ir_capability_data(h); break;
   case 3: rc = IMR_PARSE;        break;
@@ -1287,9 +1281,10 @@ ir_ok(ImapMboxHandle *h)
   else if( (l=strlen(line))>0) { 
     line[l-2] = '\0'; 
     if(h->info_cb)
-      h->info_cb(line, h->info_arg);
+      h->info_cb(h, rc, line, h->info_arg);
     else
       printf("INFO : '%s'\n", line);
+    rc = IMR_OK; /* in case it was IMR_ALERT */
   }
   return IMR_OK;
 }
@@ -1303,7 +1298,7 @@ ir_no(ImapMboxHandle *h)
   /* look for information response codes here: section 7.1 of the draft */
   if( strlen(line)>2) {
     if(h->info_cb)
-      h->info_cb(line, h->info_arg);
+      h->info_cb(h, IMR_NO, line, h->info_arg);
     else
       printf("WARN : '%s'\n", line);
   }
@@ -1318,7 +1313,7 @@ ir_bad(ImapMboxHandle *h)
   /* look for information response codes here: section 7.1 of the draft */
   if( strlen(line)>2) {
     if(h->info_cb)
-      h->info_cb(line, h->info_arg);
+      h->info_cb(h, IMR_BAD, line, h->info_arg);
     else
       printf("ERROR: %s\n", line);
   }

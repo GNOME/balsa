@@ -1,3 +1,18 @@
+2004-01-25  Pawel Salek
+
+	Do not store authorization data in ImapMboxHandle.
+	* libbalsa/imap-server.c: make imap alerts work with balsa.
+	* libbalsa/mailbox.c: stick to C comment style.
+	* libbalsa/mailbox_imap.c: decode attachment names.
+
+	* libbalsa/imap/auth-cram.c: use user_cb to get whatever
+	authorization data is needed.
+	* libbalsa/imap/imap-auth.[hc]: same.	
+	* libbalsa/imap/imap{-handle.c,_private.h}: remove user/pass fields.
+	* libbalsa/imap/imap-tls.c: get user acceptance.
+	* src/information-dialog.[hc]: display messages in the status bar.
+	* src/pref-manager.c: configure this.
+	
 2004-01-25 10:14  PeterB
 
 	* src/: balsa-app.c, balsa-app.h, balsa-mblist.c, pref-manager.c,

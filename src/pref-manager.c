@@ -2927,6 +2927,7 @@ create_information_message_menu(void)
     add_show_menu(_("Show nothing"),     BALSA_INFORMATION_SHOW_NONE,   menu);
     add_show_menu(_("Show dialog"),      BALSA_INFORMATION_SHOW_DIALOG, menu);
     add_show_menu(_("Show in list"),     BALSA_INFORMATION_SHOW_LIST,   menu);
+    add_show_menu(_("Show in status bar"), BALSA_INFORMATION_SHOW_BAR,  menu);
     add_show_menu(_("Print to console"), BALSA_INFORMATION_SHOW_STDERR, menu);
     return menu;
 }

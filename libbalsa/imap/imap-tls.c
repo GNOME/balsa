@@ -1,6 +1,27 @@
 /*
  * STARTTLS Command
- * see RFC2595.
+ * see RFC2595, A. Appendix -- Compliance Checklist
+
+   Rules (for client)                                    Section
+   -----                                                 -------
+   Mandatory-to-implement Cipher Suite                      2.1   OK
+   SHOULD have mode where encryption required               2.2
+   client MUST check server identity                        2.4
+   client MUST use hostname used to open connection         2.4
+   client MUST NOT use hostname from insecure remote lookup 2.4   OK
+   client SHOULD support subjectAltName of dNSName type     2.4
+   client SHOULD ask for confirmation or terminate on fail  2.4
+   MUST check result of STARTTLS for acceptable privacy     2.5
+   client MUST NOT issue commands after STARTTLS
+      until server response and negotiation done        3.1,4,5.1 OK
+   client MUST discard cached information             3.1,4,5.1,9 OK
+   client SHOULD re-issue CAPABILITY/CAPA command       3.1,4     OK
+   IMAP client MUST NOT issue LOGIN if LOGINDISABLED        3.2   OK
+
+   client SHOULD warn when session privacy not active and/or
+     refuse to proceed without acceptable security level    9
+   SHOULD be configurable to refuse weak mechanisms or
+     cipher suites                                          9
  */
 
 #include "config.h"
@@ -46,25 +67,60 @@ create_ssl(void)
 
 
 static int
-verify_security(ImapMboxHandle *handle, SSL *ssl)
+check_server_identity(ImapMboxHandle *handle, SSL *ssl)
 {
-  X509 *cert;
   long vfy_result;
+  X509 *cert;
+  int ok;
 
   vfy_result = SSL_get_verify_result (ssl);
-  printf("vfy_result = %ld OK=%ld\n", vfy_result, (long)X509_V_OK);
-  /* Check server credentials stored in the certificate.
+  if(vfy_result == X509_V_OK)
+    return 1;
+  /* There was a problem with the verification, one has to leave it up to the
+   * application what to do with this.
    */
-  cert = SSL_get_peer_certificate (ssl);
-  if (cert != NULL)
-    {
-      printf("Could get the server certificate\n");
-      X509_free (cert);
-    } else {
-      printf("Could NOT get the server certificate\n");
-    }
-  return 1; /* trust the server */
+   ok = 0;
+   if(handle->user_cb)
+     handle->user_cb(handle, IME_TLS_VERIFY_ERROR, handle->user_arg, &ok, 
+                vfy_result, ssl);
+  if(!ok)
+    return ok;
+
+  /* Check whether the certificate matches the server. */
+  cert = SSL_get_peer_certificate(ssl);
+  if (cert == NULL) {
+    ok = 0;
+    if(handle->user_cb)
+      handle->user_cb(handle, IME_TLS_NO_PEER_CERT, handle->user_arg,
+                      &ok, ssl);
+    if(!ok)
+      return ok;
+  }
+#if 0
+  nm = X509_get_subject_name(cert);
+  lastpos = -1;
+  do {
+    lastpos = X509_NAME_get_index_by_NID(nm, NID_commonName, lastpos);
+  }
+#endif
+  X509_free (cert);
+  return 1;
 }
+
+static int
+check_cipher_strength(ImapMboxHandle *handle, SSL *ssl)
+{
+  int ok, bits = SSL_get_cipher_bits (ssl, NULL);
+
+  if (bits > 40) 
+    return 1;
+  ok = 0;
+  if (handle->user_cb != NULL)
+    handle->user_cb(handle, IME_TLS_WEAK_CIPHER, handle->user_arg,
+                    bits, &ok);
+  return ok;
+}
+ 
 
 ImapResponse
 imap_handle_starttls(ImapMboxHandle *handle)
@@ -89,11 +145,17 @@ imap_handle_starttls(ImapMboxHandle *handle)
     handle->using_tls = 1;
     /* forget capabilities. */
     handle->has_capabilities = 0;
-    if(!verify_security(handle, ssl)) {
-      printf("SSL setup not trusted! Abort!\n");
+    if(!check_server_identity(handle, ssl)) {
+      printf("Server identity not confirmed\n");
       /* close connection here is the best behavior */
       return IMR_NO;
     }
+    if(!check_cipher_strength(handle, ssl)) {
+      printf("Cipher too weak\n");
+      /* close connection here is the best behavior */
+      return IMR_NO;
+    }
+
   }
   return rc;
 }

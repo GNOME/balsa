@@ -230,37 +230,74 @@ monitor_cb(const char *buffer, int length, int direction, void *arg)
 }
 
 static void
-set_info(const gchar* str, void *arg)
+is_info_cb(ImapMboxHandle *h, ImapResponse rc, const gchar* str, void *arg)
 {
-  libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, str);
+    LibBalsaInformationType it;
+    LibBalsaServer *is = LIBBALSA_SERVER(arg);
+    const gchar *fmt;
+
+    switch(rc) {
+    case IMR_ALERT: 
+        fmt = _("IMAP server %s alert:\n%s");
+        it = LIBBALSA_INFORMATION_ERROR; 
+        break;
+    case IMR_BAD:   
+        fmt = _("IMAP server %s error: %s");
+        it = LIBBALSA_INFORMATION_ERROR;
+        break;
+    default:
+        fmt = _("%s: %s");
+        it = LIBBALSA_INFORMATION_MESSAGE; break;
+    }
+    libbalsa_information(it, fmt, is->host, str);
 }
 
 static void
-set_alert(const gchar* str, void *arg)
+is_user_cb(ImapMboxHandle *h, ImapUserEventType ue, void *arg, ...)
 {
-  libbalsa_information(LIBBALSA_INFORMATION_ERROR, str);
+    va_list alist;
+    int *ok;
+    LibBalsaServer *is = LIBBALSA_SERVER(arg);
+
+    va_start(alist, arg);
+    switch(ue) {
+    case IM_UE_GET_USER_PASS: {
+        gchar *method = va_arg(alist, gchar*);
+        gchar **user = va_arg(alist, gchar**);
+        gchar **pass = va_arg(alist, gchar**);
+        ok = va_arg(alist, int*);
+        *ok = 1; /* consider popping up a dialog window here */
+        g_free(*user); *user = g_strdup(is->user);
+        g_free(*pass); *pass = g_strdup(is->passwd);
+        libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, method);
+        break;
+    }
+    case IM_UE_GET_USER:  { /* for eg kerberos */
+        gchar **user = va_arg(alist, gchar**);
+        ok = va_arg(alist, int*);
+        *ok = 1; /* consider popping up a dialog window here */
+        g_free(*user); *user = g_strdup(is->user);
+        break;
+    }
+    case IME_TLS_VERIFY_ERROR:  {
+        ok = va_arg(alist, int*); *ok = 1;
+        g_warning("IMAP:TLS: continues despite failed cert verification.");
+        break;
+    }
+    case IME_TLS_NO_PEER_CERT: {
+        ok = va_arg(alist, int*); *ok = 1;
+        g_warning("IMAP:TLS: 'No peer cert' accepted.");
+        break;
+    }
+    case IME_TLS_WEAK_CIPHER: {
+        ok = va_arg(alist, int*); *ok = 1;
+        g_warning("IMAP:TLS: Weak cipher accepted.");
+        break;
+    }
+    default: g_warning("unhandled imap event type! Fix the code."); break;
+    }
+    va_end(alist);
 }
-
-static void
-flags_cb(unsigned seqno, void* h)
-{
-#if 0
-  char seq[12];
-#endif
-  ImapMessage *msg = imap_mbox_handle_get_msg((ImapMboxHandle*)h, seqno);
-  if(!msg) return;
-
-    /* update flags of given message! */
-#if 0
-  sprintf(seq, "%4d:%c%c%c%c%c", seqno, 
-  (IMSG_FLAG_ANSWERED(msg->flags) ? 'A' : '-'),
-  (IMSG_FLAG_FLAGGED(msg->flags)  ? 'F' : '-'),
-  (IMSG_FLAG_DELETED(msg->flags)  ? 'D' : '-'),
-  (IMSG_FLAG_SEEN(msg->flags)     ? '-' : 'N'),
-  (IMSG_FLAG_DRAFT(msg->flags)    ? 'u' : '-'));
-#endif
-}
-
 /* Create a struct handle_info with a new handle. */
 static struct handle_info *
 lb_imap_server_info_new(LibBalsaServer *server)
@@ -279,9 +316,8 @@ lb_imap_server_info_new(LibBalsaServer *server)
     info = g_new0(struct handle_info, 1);
     info->handle = handle;
     imap_handle_set_monitorcb(handle, monitor_cb, info);
-    imap_handle_set_infocb(handle,    set_info, NULL);
-    imap_handle_set_alertcb(handle,   set_alert, NULL);
-    imap_handle_set_flagscb(handle,   flags_cb, handle);
+    imap_handle_set_infocb(handle,    is_info_cb, server);
+    imap_handle_set_usercb(handle,    is_user_cb, server);
 
     g_signal_connect(G_OBJECT(handle), "expunge-notify",
 		     G_CALLBACK(libbalsa_imap_server_expunge_notify_cb),
@@ -512,8 +548,7 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server)
     }
     if (info) {
         if(imap_mbox_is_disconnected(info->handle)) {
-            rc=imap_mbox_handle_connect(info->handle, server->host,
-                                        server->user, server->passwd);
+            rc=imap_mbox_handle_connect(info->handle, server->host);
             if(rc != IMAP_SUCCESS) {
                 lb_imap_server_info_free(info);
                 g_mutex_unlock(imap_server->lock);
@@ -597,8 +632,7 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
 	    g_list_delete_link(imap_server->free_handles, conn);
     }
     if (info && imap_mbox_is_disconnected(info->handle)) {
-	rc=imap_mbox_handle_connect(info->handle, server->host,
-				    server->user, server->passwd);
+	rc=imap_mbox_handle_connect(info->handle, server->host);
 	if(rc != IMAP_SUCCESS) {
 	    lb_imap_server_info_free(info);
 	    g_mutex_unlock(imap_server->lock);

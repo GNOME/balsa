@@ -32,6 +32,9 @@
 #include "balsa-app.h"
 #include "information-dialog.h"
 
+static void balsa_information_bar(GtkWindow *parent,
+                                  LibBalsaInformationType type,
+                                  const char *msg);
 static void balsa_information_list(GtkWindow *parent,
                                    LibBalsaInformationType type,
 				   const char *msg);
@@ -88,6 +91,9 @@ balsa_information_real(GtkWindow *parent, LibBalsaInformationType type,
 	break;
     case BALSA_INFORMATION_SHOW_LIST:
 	balsa_information_list(parent, type, msg);
+	break;
+    case BALSA_INFORMATION_SHOW_BAR:
+	balsa_information_bar(parent, type, msg);
 	break;
     case BALSA_INFORMATION_SHOW_STDERR:
 	balsa_information_stderr(type, msg);
@@ -257,6 +263,27 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 
     if (balsa_app.appbar)
 	gnome_appbar_set_status(balsa_app.appbar, msg);
+}
+
+static guint bar_timeout_id = 0;
+static gboolean
+status_bar_refresh(gpointer data)
+{
+    gdk_threads_enter();
+    gnome_appbar_refresh(balsa_app.appbar);
+    gdk_threads_leave();
+    bar_timeout_id = 0; /* FIXME: thread locking here! */
+    return FALSE;
+}
+
+static void
+balsa_information_bar(GtkWindow *parent, LibBalsaInformationType type,
+                      const char *msg)
+{
+    gnome_appbar_set_status(balsa_app.appbar, msg);
+    if(bar_timeout_id)
+        g_source_remove(bar_timeout_id);
+    bar_timeout_id = g_timeout_add(4000, status_bar_refresh, NULL);
 }
 
 static void 

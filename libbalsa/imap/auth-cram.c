@@ -42,23 +42,25 @@ static void hmac_md5(const char* password, char* challenge,
 
 /* imap_auth_cram_md5: AUTH=CRAM-MD5 support. */
 ImapResult
-imap_auth_cram(ImapMboxHandle* handle, const char* user, const char* pass)
+imap_auth_cram(ImapMboxHandle* handle)
 {
   char ibuf[LONG_STRING*2], obuf[LONG_STRING];
   unsigned char hmac_response[MD5_DIGEST_LEN];
   unsigned cmdno;
-  int len;
-  int rc;
+  int len, rc, ok;
+  char *user, *pass;
 
   if (!imap_mbox_handle_can_do(handle, IMCAP_ACRAM_MD5))
     return IMAP_AUTH_UNAVAIL;
 
-  /* DEBUG ("Authenticating (CRAM-MD5)..."); */
-
-  /* get auth info */
-  if(user == NULL || pass == NULL)
+  ok = 0;
+  if(!ok && handle->user_cb)
+    handle->user_cb(handle, IM_UE_GET_USER_PASS, handle->user_arg, 
+                    "CRAM-MD5", &user, &pass, &ok);
+  if(!ok || user == NULL || pass == NULL)
     return IMAP_AUTH_FAILURE;
 
+  /* start the interaction */
   if(imap_cmd_start(handle, "AUTHENTICATE CRAM-MD5", &cmdno) <0)
     return IMAP_AUTH_FAILURE;
 
@@ -113,7 +115,7 @@ imap_auth_cram(ImapMboxHandle* handle, const char* user, const char* pass)
   strncat (ibuf, "\r\n", sizeof (ibuf));
   imap_handle_write(handle, ibuf, strlen(ibuf));
   imap_handle_flush(handle);
-
+  g_free(user); g_free(pass); /* FIXME: clean passwd first */
   do
     rc = imap_cmd_step (handle, cmdno);
   while (rc == IMR_UNTAGGED);

@@ -17,8 +17,6 @@ struct _ImapMboxHandle {
   int sd; /* socket descriptor */
   struct siobuf * sio;
   char *host;
-  char *user;
-  char *passwd;
   char* mbox; /* currently selected mailbox, if any */
 
   ImapMboxHandleState state;
@@ -43,15 +41,16 @@ struct _ImapMboxHandle {
   gboolean doing_logout;
   ImapInfoCb info_cb;
   void *info_arg;
-  ImapMonitorCb monitor_cb;
-  void *monitor_arg;
+  ImapUserCb user_cb; /* for user interaction, if really necessary */
+  void *user_arg;
+
   ImapFlagsCb flags_cb;
   void *flags_arg;
   ImapFetchBodyCb body_cb;
   void *body_arg;
 
-  ImapInfoCb alert_cb;
-  void *alert_arg;
+  ImapMonitorCb monitor_cb;
+  void *monitor_arg;
 
   ImapSearchCb search_cb;
   void *search_arg;

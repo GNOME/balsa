@@ -426,7 +426,7 @@ libbalsa_mailbox_is_open(LibBalsaMailbox *mailbox)
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     
 
-    return mailbox->open_ref>0; // this will break unlisted mailbox types
+    return mailbox->open_ref>0; /* this will break unlisted mailbox types */
 }
     
 void

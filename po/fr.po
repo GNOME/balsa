@@ -9,8 +9,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 1.1.1\n"
-"POT-Creation-Date: 2001-02-13 13:23+0100\n"
-"PO-Revision-Date: 2001-02-13 13:38+0100\n"
+"POT-Creation-Date: 2001-02-16 16:04+0100\n"
+"PO-Revision-Date: 2001-02-16 16:08+0100\n"
 "Last-Translator: Christophe Merlet (RedFox) <redfox@eikonex.org>\n"
 "Language-Team: GNOME French Team <gnomefr@gnomefr.traduc.org>\n"
 "MIME-Version: 1.0\n"
@@ -108,7 +108,7 @@ msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap : ouverture de %s Compteur de références : %d\n"
 
 # , c-format
-#: libbalsa/mailbox_local.c:265
+#: libbalsa/mailbox_local.c:272
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxLocal : ouverture de %s Compteur de références : %d\n"
@@ -797,19 +797,24 @@ msgid "Mailbox password for %s@%s:"
 msgstr "Mot de passe de la boîte à lettres pour %s@%s : "
 
 #. FIXME:
-#: src/balsa-index.c:266
+#: src/balsa-index.c:271
 msgid "From"
 msgstr "De"
 
-#: src/balsa-index.c:267 src/filter-edit-dialog.c:326
+#: src/balsa-index.c:272 src/filter-edit-dialog.c:326
 msgid "Subject"
 msgstr "Sujet"
 
-#: src/balsa-index.c:268
+#: src/balsa-index.c:273
 msgid "Date"
 msgstr "Date"
 
-#: src/balsa-index.c:546
+#: src/balsa-index.c:558
+#, c-format
+msgid "Opening mailbox %s. Please wait..."
+msgstr "Ouverture de la boîte à lettres %s. Veuillez patienter......"
+
+#: src/balsa-index.c:580
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -817,60 +822,60 @@ msgstr ""
 "Impossible d'ouvrir la boîte à lettres !\n"
 "Veuillez vérifiez les paramètres de la boîte à lettres."
 
-#: src/balsa-index.c:557
+#: src/balsa-index.c:606
 msgid "To"
 msgstr "À"
 
-#: src/balsa-index.c:1786
+#: src/balsa-index.c:1834
 msgid "Cannot access the message's body\n"
 msgstr "Ne peut accéder au corps du message\n"
 
-#: src/balsa-index.c:1823
+#: src/balsa-index.c:1871
 msgid "Reply..."
 msgstr "Répondre..."
 
-#: src/balsa-index.c:1827
+#: src/balsa-index.c:1875
 msgid "Reply To All..."
 msgstr "Répondre à tous..."
 
-#: src/balsa-index.c:1831
+#: src/balsa-index.c:1879
 msgid "Reply To Group..."
 msgstr "Répondre au groupe..."
 
-#: src/balsa-index.c:1835
+#: src/balsa-index.c:1883
 msgid "Forward..."
 msgstr "Faire suivre..."
 
-#: src/balsa-index.c:1840
+#: src/balsa-index.c:1888
 msgid "Undelete"
 msgstr "Récupérer"
 
-#: src/balsa-index.c:1843 src/filter-edit-dialog.c:224 src/mailbox-node.c:471
+#: src/balsa-index.c:1891 src/filter-edit-dialog.c:224 src/mailbox-node.c:471
 #: src/main-window.c:526 src/pref-manager.c:1235 src/pref-manager.c:2023
 msgid "Delete"
 msgstr "Supprimer"
 
-#: src/balsa-index.c:1847
+#: src/balsa-index.c:1895
 msgid "Move To Trash"
 msgstr "Déplacer dans la corbeille"
 
-#: src/balsa-index.c:1852
+#: src/balsa-index.c:1900
 msgid "Store Address..."
 msgstr "Enregistrer l'adresse..."
 
-#: src/balsa-index.c:1855
+#: src/balsa-index.c:1903
 msgid "Toggle"
 msgstr "Basculer"
 
-#: src/balsa-index.c:1858 src/main-window.c:347
+#: src/balsa-index.c:1906 src/main-window.c:347
 msgid "Flagged"
 msgstr "Marqué"
 
-#: src/balsa-index.c:1861 src/balsa-mblist.c:479
+#: src/balsa-index.c:1909 src/balsa-mblist.c:479
 msgid "Unread"
 msgstr "Non lu"
 
-#: src/balsa-index.c:1872
+#: src/balsa-index.c:1920
 msgid "Transfer"
 msgstr "Transférer"
 

@@ -5,52 +5,42 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.9.0\n"
-"POT-Creation-Date: 2000-06-12 14:37+0200\n"
-"PO-Revision-Date: 2000-06-12 14:39+0200\n"
+"POT-Creation-Date: 2000-07-20 19:51+0200\n"
+"PO-Revision-Date: 2000-07-20 21:08+0200\n"
 "Last-Translator: Fatih Demir <kabalak@gmx.net>\n"
 "Language-Team: Turkish <tr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-9\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: libbalsa/mailbox.c:196
+#: libbalsa/mailbox.c:75
 msgid "Error: "
 msgstr "Hata : "
-
-#: libbalsa/mailbox.c:646
-#, c-format
-msgid "Mailbox: Opening %s Refcount: %d\n"
-msgstr "ePosta kutusu : %s'yi açýyorum , %d referans\n"
-
-#: libbalsa/mailbox.c:666
-#, c-format
-msgid "Mailbox: Closing %s Refcount: %d\n"
-msgstr "ePosta kutusu : %s'yi kapatýyorum , %d referans\n"
 
 #.
 #. ISPRIME(9)
 #.
-#: libinit_balsa/balsa-druid-page-directory.gob:58
+#: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Inbox:"
 msgstr "Gelen:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:58
+#: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Outbox:"
 msgstr "Giden:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:58
+#: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Sentbox:"
 msgstr "Gönderilen:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:58
+#: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Draftbox:"
 msgstr "Tasarýlar:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:58
+#: libinit_balsa/balsa-druid-page-directory.gob:60
 msgid "Trash:"
 msgstr "Çöp:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:78
+#: libinit_balsa/balsa-druid-page-directory.gob:77
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
@@ -59,17 +49,12 @@ msgstr ""
 "\"%s\" dizini tamamen belirtilmek zorunda -- yani bir '/''le baþlamak "
 "zorunda ."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:96
-#, c-format
-msgid "An error occurred when attempting to creat(2) the file \"%s\"."
-msgstr "\"%s\" dosyasýný yaratýrken hata oldu ."
-
-#: libinit_balsa/balsa-druid-page-directory.gob:104
+#: libinit_balsa/balsa-druid-page-directory.gob:100
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "\"%s\" ePosta kutusu geçerli bir ePosta kutusuna benzemiyor ."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:159
+#: libinit_balsa/balsa-druid-page-directory.gob:152
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
@@ -77,11 +62,11 @@ msgstr ""
 "Lütfen ePosta dosyalarýnýn mekanlarýný belirt/doðrula .\n"
 "Bunlar yoksa ,yaratýlýnacaktýr ."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:202
+#: libinit_balsa/balsa-druid-page-directory.gob:195
 msgid "Mail Files"
 msgstr "ePosta dosyalarý"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:275
+#: libinit_balsa/balsa-druid-page-directory.gob:268
 msgid "Problem Creating Mailboxes"
 msgstr "ePosta kutularýný yaratýrken hata oldu ."
 
@@ -102,7 +87,7 @@ msgid "Please enter information about yourself."
 msgstr "Lütfen kendinle alakalý bilgilerini ver."
 
 #: libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:205
-#: src/address-book.c:450
+#: src/address-book.c:467
 msgid "Name:"
 msgstr "Isim:"
 
@@ -149,7 +134,7 @@ msgstr ""
 "iletiþime geçebilirsin ve hata raporlarýný gönderebilirsin .\n"
 " "
 
-#: libinit_balsa/balsa-initdruid.gob:91
+#: libinit_balsa/balsa-initdruid.gob:95
 msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"
@@ -186,88 +171,90 @@ msgstr "Yeni bir adres ekle"
 msgid "E-Mail Address:"
 msgstr "ePosta adresi:"
 
-#: src/address-book.c:291 src/balsa-index-page.c:1043
+#: src/address-book.c:291
 #, c-format
 msgid ""
-"Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
+"Unable to open address book %s for reading.\n"
 " - %s\n"
 msgstr ""
-"~/.gnome/GnomeCard.gcrd'yi okuyamadým .\n"
+"%s adres defterini okuyamak için açamadým .\n"
 " - %s\n"
 
-#: src/address-book.c:294 src/balsa-index-page.c:1029
-#: src/balsa-index-page.c:1046 src/balsa-index-page.c:1083
-#: src/sendmsg-window.c:403
+#: src/address-book.c:294 src/sendmsg-window.c:407
 msgid "OK"
 msgstr "Oldu"
 
-#: src/address-book.c:312
+#: src/address-book.c:314
 msgid "No-Id"
 msgstr "Id'siz"
 
-#: src/address-book.c:320
+#: src/address-book.c:322
 msgid "No-Name"
-msgstr "Isim'siz"
+msgstr "Isimsiz"
 
-#: src/address-book.c:415 src/filter-edit-dialog.c:135
+#: src/address-book.c:432 src/filter-edit-dialog.c:135
 msgid "Name"
 msgstr "Isim"
 
-#: src/address-book.c:415
+#: src/address-book.c:432
 msgid "E-Mail Address"
 msgstr "ePosta adresi"
 
-#: src/address-book.c:422 src/address-book.c:460 src/main-window.c:173
+#. address book
+#: src/address-book.c:439 src/main-window.c:176 src/pref-manager.c:1492
 msgid "Address Book"
 msgstr "Adres rehberi"
 
-#: src/address-book.c:492
+#: src/address-book.c:507
 msgid "Send-To"
 msgstr "Cevapla"
 
-#: src/address-book.c:506
+#: src/address-book.c:521
 msgid "Run GnomeCard"
 msgstr "GnomeCard'ý çalýþtýr"
 
-#: src/address-book.c:512
+#: src/address-book.c:527
 msgid "Re-Import"
 msgstr "Yeniden tara"
 
-#: src/balsa-app.c:218
+#: src/address-book.c:535
+msgid "Import first address only"
+msgstr "Sadece ilk ePosta adres"
+
+#: src/address-book.c:537
+msgid "Import all adresses"
+msgstr "Yekin ePosta adreslerini ithal et"
+
+#: src/balsa-app.c:215
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa \"%s\" ePosta kutunu açamadý ."
 
-#: src/balsa-app.c:231
+#: src/balsa-app.c:228
 msgid "Inbox"
 msgstr "Gelenler kutusu"
 
-#: src/balsa-app.c:236
+#: src/balsa-app.c:233
 msgid "Outbox"
 msgstr "Gidenler kutusu"
 
-#: src/balsa-app.c:241
+#: src/balsa-app.c:238
 msgid "Sentbox"
 msgstr "Gönderilenler kutusu"
 
-#: src/balsa-app.c:246
+#: src/balsa-app.c:243
 msgid "Draftbox"
 msgstr "Tasarýlar kutusu"
 
-#: src/balsa-app.c:251
+#: src/balsa-app.c:248
 msgid "Trash"
 msgstr "Çöp kutusu"
 
-#: src/balsa-index-page.c:290
+#: src/balsa-index-page.c:274
 msgid "Mailbox password:"
 msgstr "ePosta kutusu parolasý:"
 
-#. password field
-#: src/balsa-index-page.c:298 src/mailbox-conf.c:991 src/mailbox-conf.c:1090
-msgid "Password:"
-msgstr "Parola:"
-
-#: src/balsa-index-page.c:324
+#: src/balsa-index-page.c:297
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -275,44 +262,61 @@ msgstr ""
 "ePosta kutusunu açamadým !\n"
 "Lütfen ePosta kutusu ayarlarýný bir daha gözden geçir ."
 
-#: src/balsa-index-page.c:590 src/filter-edit-dialog.c:222
+#: src/balsa-index-page.c:579 src/filter-edit-dialog.c:222
 msgid "New"
 msgstr "Yeni"
 
-#: src/balsa-index-page.c:598 src/main-window.c:373
+#: src/balsa-index-page.c:582 src/main-window.c:410
 msgid "Reply"
 msgstr "Cevap"
 
-#: src/balsa-index-page.c:606 src/main-window.c:376
+#: src/balsa-index-page.c:585 src/main-window.c:413
 msgid "Reply to all"
 msgstr "Hepsine cevap ver"
 
-#: src/balsa-index-page.c:614 src/main-window.c:379
+#: src/balsa-index-page.c:588 src/main-window.c:416
 msgid "Forward"
 msgstr "Ilet"
 
-#: src/balsa-index-page.c:622 src/filter-edit-dialog.c:228
-#: src/main-window.c:366 src/pref-manager.c:886
+#: src/balsa-index-page.c:591 src/filter-edit-dialog.c:228
+#: src/main-window.c:403 src/pref-manager.c:903
 msgid "Delete"
 msgstr "Sil"
 
-#: src/balsa-index-page.c:630
+#: src/balsa-index-page.c:594
 msgid "Undelete"
 msgstr "Kurtar"
 
-#: src/balsa-index-page.c:639
+#: src/balsa-index-page.c:598 src/balsa-index-page.c:1207
 msgid "Store Address"
 msgstr "Adresi kaydet"
 
-#: src/balsa-index-page.c:647
+#: src/balsa-index-page.c:601 src/main-window.c:311
+msgid "Toggle flagged"
+msgstr "Iþaretke"
+
+#: src/balsa-index-page.c:609
 msgid "Transfer"
 msgstr "Taþý"
 
-#: src/balsa-index-page.c:1028
-msgid "You may only store one address at a time.\n"
-msgstr "Bir def'asýnda sadce bir adres kaydettirebilirsin.\n"
+#: src/balsa-index-page.c:812
+msgid "Sorry, no semicolons are allowed in the name!\n"
+msgstr "Maalessef isimde virgül-noktalar mümkün deðildir !\n"
 
-#: src/balsa-index-page.c:1080
+#: src/balsa-index-page.c:844
+#, c-format
+msgid ""
+"Unable to open %s for read.\n"
+" - %s\n"
+msgstr ""
+"%s adres defterini okumak için açamadým .\n"
+" - %s\n"
+
+#: src/balsa-index-page.c:849
+msgid "The Card Name field must be non-empty.\n"
+msgstr "Kart ismi boþ olamaz .\n"
+
+#: src/balsa-index-page.c:855
 #, c-format
 msgid ""
 "There is already an address book entry for %s.\n"
@@ -321,138 +325,152 @@ msgstr ""
 "%s için zaten bir adres yapraðý vardýr.\n"
 "Adres defterinin birimlerini deðiþtirmek istiyorsan, GnomeCard'ý çalýþtýr.\n"
 
-#: src/balsa-index.c:252
+#: src/balsa-index-page.c:1119
+msgid "Card Name:"
+msgstr "Kart ismi :"
+
+#: src/balsa-index-page.c:1119
+msgid "First Name:"
+msgstr "Ad :"
+
+#: src/balsa-index-page.c:1120
+msgid "Last Name:"
+msgstr "Soyad :"
+
+#: src/balsa-index-page.c:1120
+msgid "Organization:"
+msgstr "Örgüt :"
+
+#: src/balsa-index-page.c:1121
+msgid "Email Address:"
+msgstr "ePosta adresi :"
+
+#: src/balsa-index-page.c:1136
+msgid "In order to store an address, you must select a message.\n"
+msgstr "Bir adresi kaydetmek için bir iletiyi seçmen lazým .\n"
+
+#: src/balsa-index-page.c:1146
+msgid "You may only store one address at a time.\n"
+msgstr "Bir def'asýnda sadce bir adres kaydettirebilirsin.\n"
+
+#: src/balsa-index-page.c:1159
+msgid "This message doesn't contain an e-mail address.\n"
+msgstr "Bu ileti bir ePosta adresi içermiyor .\n"
+
+#: src/balsa-index-page.c:1210
+msgid "Contact Information"
+msgstr "Tanýk bilgileri"
+
+#: src/balsa-index.c:256
 msgid "From"
 msgstr "Yazan"
 
-#: src/balsa-index.c:253 src/filter-edit-dialog.c:349
+#: src/balsa-index.c:257 src/filter-edit-dialog.c:349
 msgid "Subject"
 msgstr "Konu"
 
-#: src/balsa-index.c:254
+#: src/balsa-index.c:258
 msgid "Date"
 msgstr "Tarih"
 
-#: src/balsa-index.c:362
+#: src/balsa-index.c:369
 msgid "To"
 msgstr "Gönderilen"
 
-#: src/balsa-mblist.c:221 src/mailbox-conf.c:1185
+#: src/balsa-mblist.c:225 src/mailbox-conf.c:1185
 msgid "Mailbox"
 msgstr "ePosta kutusu"
 
-#: src/balsa-mblist.c:221
+#: src/balsa-mblist.c:225
 msgid "Unread"
 msgstr "Okunmamýþ"
 
-#: src/balsa-mblist.c:221
+#: src/balsa-mblist.c:225
 msgid "Total"
 msgstr "Toplam"
 
-#: src/balsa-mblist.c:824
+#: src/balsa-mblist.c:822
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
-msgstr "Gösterilen ePosta kutusu : %s , %ld ileti , %ld'si yeni"
+msgstr "Gösterilen ePosta kutusu : %s , %ld ileti , %ld yeni ileti"
 
-#: src/balsa-message.c:165 src/balsa-message.c:170
+#: src/balsa-message.c:225 src/balsa-message.c:229
 msgid "Save MIME Part"
 msgstr "MIME bölümünü kaydet"
 
-#: src/balsa-message.c:166 src/balsa-message.c:226
+#: src/balsa-message.c:226 src/balsa-message.c:1122
 msgid "Save"
 msgstr "Kaydet"
 
-#: src/balsa-message.c:166 src/balsa-message.c:226 src/mailbox-conf.c:670
-#: src/sendmsg-window.c:130 src/sendmsg-window.c:429 src/sendmsg-window.c:1101
-#: src/sendmsg-window.c:1408 src/sendmsg-window.c:1431
+#: src/balsa-message.c:226 src/sendmsg-window.c:131 src/sendmsg-window.c:433
+#: src/sendmsg-window.c:1110 src/sendmsg-window.c:1398
+#: src/sendmsg-window.c:1421
 msgid "Cancel"
 msgstr "Iptal"
 
-#: src/balsa-message.c:168 src/balsa-message.c:228
+#: src/balsa-message.c:227
 msgid "Please choose a filename to save this part of the message as:"
 msgstr "Iletinin bu bölümnün kaydedileceði dosya adýný belirle :"
 
-#: src/balsa-message.c:225 src/balsa-message.c:230
-msgid "Save Text"
-msgstr "Metni kaydet"
-
-#: src/balsa-message.c:301 src/balsa-message.c:315
+#: src/balsa-message.c:258
 #, c-format
-msgid " Open of %s failed:%s "
-msgstr " %s'nin açýlmasý baþarýsýz oldu : %s"
+msgid " Could not save %s:%s "
+msgstr "%s:%s'yi kaydedemedim "
 
-#: src/balsa-message.c:302 src/balsa-message.c:317
-msgid "Ok"
-msgstr "Oldu"
-
-#: src/balsa-message.c:644
+#: src/balsa-message.c:526
 msgid "Date:"
 msgstr "Tarih:"
 
 #. From:
-#: src/balsa-message.c:648 src/filter-edit-dialog.c:337
-#: src/sendmsg-window.c:601
+#: src/balsa-message.c:531 src/filter-edit-dialog.c:337
+#: src/sendmsg-window.c:605
 msgid "From:"
 msgstr "Yazan:"
 
 #. To:
-#: src/balsa-message.c:652 src/filter-edit-dialog.c:325
-#: src/sendmsg-window.c:603
+#: src/balsa-message.c:535 src/filter-edit-dialog.c:325
+#: src/sendmsg-window.c:607
 msgid "To:"
 msgstr "Gönderilen:"
 
-#: src/balsa-message.c:653
+#: src/balsa-message.c:536
 msgid "Cc:"
 msgstr "Kopyala:"
 
-#: src/balsa-message.c:654
+#: src/balsa-message.c:537
 msgid "Bcc:"
 msgstr "Gizli Kopyala:"
 
-#: src/balsa-message.c:657
+#: src/balsa-message.c:540
 msgid "Fcc:"
 msgstr "Iletili Kopyala:"
 
 #. Subject:
-#: src/balsa-message.c:658 src/sendmsg-window.c:609
+#: src/balsa-message.c:542 src/sendmsg-window.c:613
 msgid "Subject:"
 msgstr "Konu:"
 
-#: src/balsa-message.c:734
+#: src/balsa-message.c:610
+msgid "Couldn't render image\n"
+msgstr "Resmi þekillendiremedim\n"
+
+#: src/balsa-message.c:658
+msgid "Balsa does not know how to display this message part"
+msgstr "Balsa bu ileti bölümünü nasýl göstereceðini bilemiyor"
+
+#: src/balsa-message.c:663
 #, c-format
-msgid "other part: error writing to temporary file %s: %s"
-msgstr "baþka bölüm : geçici dosya %s'yi yazarken hata oldu : %s"
+msgid "Content Type: %s"
+msgstr "Içerik tipi : %s"
 
-#: src/balsa-message.c:788
-msgid ""
-"<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
-"application/"
-msgstr ""
-"<tr><td bgcolor=\"#f0f0f0\"> Sen bu tipili þifrelenmiþ bir dosya aldýn "
-":application/"
-
-#: src/balsa-message.c:792
-msgid "<P>The parameters of this message are:<BR>"
-msgstr "<P>Bu iletinin özellikleri :<BR>"
-
-#: src/balsa-message.c:793
-msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
-msgstr "<table border=0><tr><th>Özellikler</th><th>Deðer</th></tr>\n"
-
-#: src/balsa-message.c:827
+#: src/balsa-message.c:672
 #, c-format
-msgid "image: error writing to temporary file: %s"
-msgstr "resim : geçici dosyayý yazarken hata oldu : %s"
+msgid "Filename: %s"
+msgstr "Dosya adý : %s"
 
-#: src/balsa-message.c:1106
-#, c-format
-msgid "text part: error writing to temporary file %s: %s"
-msgstr "metin bölümü : geçici dosya %s'yi yazarken hata oldu : %s"
-
-#: src/balsa-message.c:1251
-#, c-format
-msgid "Open of %s failed. Errno = %d, "
-msgstr "%s açlamadý . Hata numarasý = %d,"
+#: src/balsa-message.c:679
+msgid "Save part"
+msgstr "Bölümü kaydet"
 
 #: src/filter-edit-dialog.c:30
 msgid "Inbound"
@@ -463,8 +481,8 @@ msgid "Outbound"
 msgstr "Gidenler"
 
 #: src/filter-edit-dialog.c:32
-msgid "Pre-send"
-msgstr "Ön-gönderme"
+msgid "Before Sending"
+msgstr "Göndermeden önce"
 
 #: src/filter-edit-dialog.c:33
 msgid "Demand"
@@ -546,12 +564,12 @@ msgstr "Vücut"
 msgid "Match string:"
 msgstr "Aranacak metin:"
 
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:285 src/mailbox-conf.c:1150
-#: src/pref-manager.c:873
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1150
+#: src/pref-manager.c:890
 msgid "Add"
 msgstr "Ekle"
 
-#: src/filter-edit-dialog.c:425 src/sendmsg-window.c:350
+#: src/filter-edit-dialog.c:425 src/sendmsg-window.c:354
 msgid "Remove"
 msgstr "Sil"
 
@@ -635,7 +653,8 @@ msgstr "Geriye al"
 msgid "Balsa Filters"
 msgstr "Balsa filtralarý"
 
-#: src/mailbox-conf.c:162
+#. FIXME: Should prompt to remove file aswell
+#: src/mailbox-conf.c:181
 #, c-format
 msgid ""
 "This will remove the mailbox %s and it's files permanently from your "
@@ -645,7 +664,7 @@ msgstr ""
 "Bu ePosta kutusunu ve dosyalarýný sistem'den daima silecektir .\n"
 "Bu ePosta kutusunu silmekten emin misim ?"
 
-#: src/mailbox-conf.c:167
+#: src/mailbox-conf.c:186
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
@@ -657,359 +676,391 @@ msgstr ""
 "ekleyebilirsin\n"
 "Bu ePosta kutusunu buradan silmek istediðinden emin misin ?"
 
-#: src/mailbox-conf.c:196
+#: src/mailbox-conf.c:214
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Eh ! balsa_app.mailbox noktalarýnda ePosta kutusu bulunamadý ?!?\n"
 
-#: src/mailbox-conf.c:240
+#: src/mailbox-conf.c:268
 msgid "Mailbox Configurator"
 msgstr "ePosta kutusu ayarlayýcýsý"
 
-#: src/mailbox-conf.c:295 src/mailbox-conf.c:1144
+#: src/mailbox-conf.c:330 src/mailbox-conf.c:1144
 msgid "Update"
 msgstr "Yenileme"
 
-#: src/mailbox-conf.c:439 src/mailbox-conf.c:455 src/mailbox-conf.c:468
+#: src/mailbox-conf.c:458 src/mailbox-conf.c:464 src/mailbox-conf.c:488
 msgid "You need to fill in the Mailbox Name field."
 msgstr "ePosta kutusunun adýný belirlemek zorundasýn ."
 
-#: src/mailbox-conf.c:442
+#: src/mailbox-conf.c:467
 msgid "You need to fill in the folderpath field."
 msgstr "Dizinleme birimini boþ býrakamasýn ."
 
-#: src/mailbox-conf.c:444
+#: src/mailbox-conf.c:469
 msgid "You need to fill in the IMAP Server field"
 msgstr "IMAP sunucusu birimini boþ býrakamasýn"
 
-#: src/mailbox-conf.c:446
+#: src/mailbox-conf.c:471
 msgid "You need to fill in the username field"
 msgstr "Kullanýcý adýný belirlemek zorundasýn"
 
-#: src/mailbox-conf.c:448
-msgid "You need to fill in the password field"
-msgstr "Parolayý belirlemek zorundasýn"
-
-#: src/mailbox-conf.c:450
+#: src/mailbox-conf.c:475
 msgid "You need to fill in the port field"
 msgstr "Kapý numarasýný belirlemek zorundasýn"
 
-#: src/mailbox-conf.c:472
+#: src/mailbox-conf.c:492
 msgid "You need to fill in the user field."
 msgstr "Kullanýcý birimini doldurmak zorundasýn ."
 
-#: src/mailbox-conf.c:476
-msgid "You need to fill in the password field."
-msgstr "Parola birimini doldurmak zorundasýn ."
-
-#: src/mailbox-conf.c:480
+#: src/mailbox-conf.c:500
 msgid "You need to fill in the server field."
 msgstr "Sunucu birimini doldurmak zorundasýn ."
 
-#: src/mailbox-conf.c:484
+#: src/mailbox-conf.c:504
 msgid "You need to fill in the port field."
 msgstr "Kapý numarasý birimini doldurmak zorundasýn ."
 
-#: src/mailbox-conf.c:488
+#: src/mailbox-conf.c:508
 msgid "Some of the fields are blank."
 msgstr "Bazý birimleri boþ býrakýlmýþ ."
 
-#: src/mailbox-conf.c:669
+#: src/mailbox-conf.c:642
 #, c-format
-msgid "Cannot create mailbox '%s': %s\n"
-msgstr "`%s' ePosta kutusu yaratamadým : %s\n"
+msgid "%s on %s"
+msgstr "%s : %s'de "
 
-#. used to build a string: MAILBOXNAME " on " SERVERNAME
-#: src/mailbox-conf.c:734
-msgid " on "
-msgstr " -> "
-
-#: src/mailbox-conf.c:847
+#: src/mailbox-conf.c:835
 msgid "New mailbox type:"
 msgstr "Yeni ePosta kutusu tipi:"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:853
+#: src/mailbox-conf.c:841
 msgid "Local mailbox"
 msgstr "Yerel ePosta kutusu"
 
-#: src/mailbox-conf.c:861
-msgid "IMAP server"
-msgstr "IMAP sunucusu"
+#: src/mailbox-conf.c:851
+msgid "Single IMAP folder"
+msgstr "Tek bir IMAP dizini"
+
+#: src/mailbox-conf.c:860
+msgid "IMAP folder set"
+msgstr "IMAP dizin kitlesi"
 
 #. mailbox name
-#: src/mailbox-conf.c:884 src/mailbox-conf.c:919 src/mailbox-conf.c:1036
+#: src/mailbox-conf.c:885 src/mailbox-conf.c:920 src/mailbox-conf.c:1037
 msgid "Mailbox Name:"
 msgstr "ePosta kutusu adý:"
 
 #. path to file
-#: src/mailbox-conf.c:894
+#: src/mailbox-conf.c:895
 msgid "Mailbox path:"
 msgstr "ePosta kutusu dizinlemesi:"
 
 #. pop server
-#: src/mailbox-conf.c:936 src/mailbox-conf.c:1046
+#: src/mailbox-conf.c:937 src/mailbox-conf.c:1047
 msgid "Server:"
 msgstr "Sunucu:"
 
 #. pop port
-#: src/mailbox-conf.c:955 src/mailbox-conf.c:1060
+#: src/mailbox-conf.c:956 src/mailbox-conf.c:1061
 msgid "Port:"
 msgstr "Port:"
 
 #. username
-#: src/mailbox-conf.c:974 src/mailbox-conf.c:1075
+#: src/mailbox-conf.c:975 src/mailbox-conf.c:1076
 msgid "Username:"
 msgstr "Kullanýcý:"
 
+#. password field
+#: src/mailbox-conf.c:992 src/mailbox-conf.c:1091
+msgid "Password:"
+msgstr "Parola:"
+
 #. toggle for check
-#: src/mailbox-conf.c:1006 src/main-window.c:362
+#: src/mailbox-conf.c:1007 src/main-window.c:399
 msgid "Check"
 msgstr "Bak"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:1014
+#: src/mailbox-conf.c:1015
 msgid "Delete from server"
 msgstr "Sunucu'dan sil"
 
-#: src/mailbox-conf.c:1103
+#: src/mailbox-conf.c:1104
 msgid "Folder path:"
 msgstr "Dizin dizinlemesi:"
 
-#: src/main-window.c:167
+#: src/main-window.c:170
 msgid "_Get new mail"
 msgstr "_ePostama bak"
 
-#: src/main-window.c:167
+#: src/main-window.c:170
 msgid "Fetch new incoming mail"
 msgstr "Yeni gelen ePostalarý tara"
 
-#: src/main-window.c:173
+#: src/main-window.c:176
 msgid "Opens the address book"
 msgstr "Adres defterini açar"
 
-#: src/main-window.c:180
+#: src/main-window.c:183
 msgid "Pr_int"
 msgstr "Ya_zdýr"
 
-#: src/main-window.c:180
+#: src/main-window.c:183
 msgid "Print current mail"
 msgstr "Geçerli ePostayý yazdýr"
 
-#: src/main-window.c:205
+#: src/main-window.c:207 src/message-window.c:56
 msgid "N_o headers"
 msgstr "_Hiç bir baþl#_k gösterme"
 
-#: src/main-window.c:207
+#: src/main-window.c:209 src/message-window.c:58
 msgid "_Selected headers"
 msgstr "_Seçili baþlýklarý  göster"
 
-#: src/main-window.c:209
+#: src/main-window.c:211 src/message-window.c:60
 msgid "All _headers"
 msgstr "Ye_kin baþlýklarý göster"
 
-#: src/main-window.c:218 src/main-window.c:392
+#: src/main-window.c:220 src/main-window.c:429
 msgid "Next"
 msgstr "Ileri"
 
-#: src/main-window.c:218
+#: src/main-window.c:220
 msgid "Next Message"
 msgstr "Önümüzdeki ileti"
 
-#: src/main-window.c:224 src/main-window.c:387
+#: src/main-window.c:226 src/main-window.c:424
 msgid "Previous"
 msgstr "Geri"
 
-#: src/main-window.c:224
+#: src/main-window.c:226
 msgid "Preivous Message"
 msgstr "Önceki ileti"
 
-#: src/main-window.c:230 src/main-window.c:397
+#: src/main-window.c:232 src/main-window.c:434
 msgid "Next Unread"
 msgstr "Önümüzdeki okunmamýþ ileti"
 
-#: src/main-window.c:230
+#: src/main-window.c:232
 msgid "Next Unread Message"
 msgstr "Önümüzdeki okunmamýþ ileti"
 
-#: src/main-window.c:238
+#: src/main-window.c:239 src/message-window.c:95
+msgid "Next Part"
+msgstr "Bir bölüm ileri"
+
+#: src/main-window.c:239 src/message-window.c:95
+msgid "Next Part in Message"
+msgstr "Iletide bir birim ileri git"
+
+#: src/main-window.c:245 src/message-window.c:100
+msgid "Previous Part"
+msgstr "Bir bölüm geri"
+
+#: src/main-window.c:245 src/message-window.c:100
+msgid "Previous Part in Message"
+msgstr "Iletide bir birim geri git"
+
+#: src/main-window.c:251 src/message-window.c:105
+msgid "Save Current Part"
+msgstr "Geçerli bölümü kaydet"
+
+#: src/main-window.c:252 src/message-window.c:106
+msgid "Save Current Part in Message"
+msgstr "Iletideki geçerli bölümü kaydet"
+
+#: src/main-window.c:260
 msgid "_New"
 msgstr "Ye_ni"
 
-#: src/main-window.c:238
+#: src/main-window.c:260
 msgid "Compose a new message"
 msgstr "Yeni bir iletiyi yaz"
 
-#: src/main-window.c:245 src/message-window.c:54
+#: src/main-window.c:267 src/message-window.c:76
 msgid "_Reply"
 msgstr "_Cevap"
 
-#: src/main-window.c:245
+#: src/main-window.c:267
 msgid "Reply to the current message"
 msgstr "Geçerli iletiye cevap ver"
 
-#: src/main-window.c:252 src/message-window.c:60
+#: src/main-window.c:274 src/message-window.c:82
 msgid "Reply to _all"
 msgstr "Hepsine cev_apla"
 
-#: src/main-window.c:253
+#: src/main-window.c:275
 msgid "Reply to all recipients of the current message"
 msgstr "Seçili iletinin alýcýlarýna cevapla"
 
-#: src/main-window.c:260 src/message-window.c:67
+#: src/main-window.c:282 src/message-window.c:89
 msgid "_Forward"
 msgstr "_Ilet"
 
-#: src/main-window.c:260
+#: src/main-window.c:282
 msgid "Forward the current message"
 msgstr "Geçerli iletiyi ilet"
 
-#: src/main-window.c:267
+#: src/main-window.c:289
 msgid "_Continue"
 msgstr "_Devam et"
 
-#: src/main-window.c:267
+#: src/main-window.c:289
 msgid "Continue editing current message"
 msgstr "Geçerli iletiyi yeniden deðiþtir"
 
-#: src/main-window.c:275 src/main-window.c:313
+#: src/main-window.c:297 src/main-window.c:350
 msgid "_Delete"
 msgstr "_Sil"
 
-#: src/main-window.c:275
+#: src/main-window.c:297
 msgid "Delete the current message"
 msgstr "Geçerli iletiyi sil"
 
-#: src/main-window.c:282
+#: src/main-window.c:304
 msgid "_Undelete"
 msgstr "_Kurtar"
 
-#: src/main-window.c:282
+#: src/main-window.c:304
 msgid "Undelete the message"
 msgstr "Iletiyi kurtart"
 
-#: src/main-window.c:288
+#: src/main-window.c:311
+msgid "_Toggle flagged"
+msgstr "_Iþaretle"
+
+#: src/main-window.c:319
+msgid "_Store Address"
+msgstr "Adresi _kaydet"
+
+#: src/main-window.c:319
+msgid "Store address of sender in addressbook"
+msgstr "GÖnderenin ePosta adresini adres defterine ekle"
+
+#: src/main-window.c:325 src/message-window.c:112
 msgid "_Wrap"
 msgstr "_Kýr"
 
-#: src/main-window.c:305
+#: src/main-window.c:342
 msgid "List"
 msgstr "Liste"
 
-#: src/main-window.c:309
+#: src/main-window.c:346
 msgid "_Add"
 msgstr "_Ekle"
 
-#: src/main-window.c:309
+#: src/main-window.c:346
 msgid "Add a new mailbox"
 msgstr "Yeni bir ePosta kutusunu ekle"
 
-#: src/main-window.c:311
+#: src/main-window.c:348
 msgid "_Edit"
 msgstr "_Deðiþtir"
 
-#: src/main-window.c:311
+#: src/main-window.c:348
 msgid "Edit the selected mailbox"
 msgstr "Seçili ePosta kutusunu deðiþtir"
 
-#: src/main-window.c:313
+#: src/main-window.c:350
 msgid "Delete the selected mailbox"
 msgstr "Seçili ePosta kutusunu sil"
 
-#: src/main-window.c:316
+#: src/main-window.c:353
 msgid "Co_mmit current"
 msgstr "Geçerlisini _eþitle"
 
-#: src/main-window.c:316
+#: src/main-window.c:353
 msgid "Commit the changes in the currently opened mailbox"
 msgstr "Þu an açik olan ePosta kutusundaki deðiþlikleri eþitle/uygula"
 
-#: src/main-window.c:318
+#: src/main-window.c:355
 msgid "_Close"
 msgstr "_Kapat"
 
-#: src/main-window.c:318
+#: src/main-window.c:355
 msgid "Close mailbox"
 msgstr "ePosta kutusunu kapat"
 
-#: src/main-window.c:321
+#: src/main-window.c:358
 msgid "Empty _Trash"
 msgstr "Çöp kutusunu _boþalt"
 
-#: src/main-window.c:321
+#: src/main-window.c:358
 msgid "Delete Messages from the trash mailbox"
 msgstr "Çöp kutusundaki iletileri sil"
 
-#: src/main-window.c:327
+#: src/main-window.c:364
 msgid "_Filters..."
 msgstr "_Filtralar ..."
 
-#: src/main-window.c:327
+#: src/main-window.c:364
 msgid "Manage filters"
 msgstr "Filtralarla oyna"
 
-#: src/main-window.c:336
+#: src/main-window.c:373
 msgid "_Show mailbox tree"
 msgstr "ePosta kutusu _aðaçiný göster"
 
-#: src/main-window.c:339
+#: src/main-window.c:376
 msgid "Show mailbox _tabs"
 msgstr "ePosta kutusu _tablerini göster"
 
-#: src/main-window.c:353
+#: src/main-window.c:390
 msgid "_Message"
 msgstr "_Ileti"
 
-#: src/main-window.c:354
+#: src/main-window.c:391
 msgid "Mail_box"
 msgstr "_ePosta kutusu"
 
-#: src/main-window.c:362
+#: src/main-window.c:399
 msgid "Check Email"
 msgstr "ePostaya bak"
 
-#: src/main-window.c:366
+#: src/main-window.c:403
 msgid "Delete Message"
 msgstr "Iletiyi sil"
 
-#: src/main-window.c:370
+#: src/main-window.c:407
 msgid "Compose"
 msgstr "Yaz"
 
-#: src/main-window.c:370
+#: src/main-window.c:407
 msgid "Compose Message"
 msgstr "Ileti yaz"
 
-#: src/main-window.c:382
+#: src/main-window.c:419
 msgid "Continue"
 msgstr "Devam et"
 
-#: src/main-window.c:387
+#: src/main-window.c:424
 msgid "Open Previous message"
 msgstr "Bir ileti geri"
 
-#: src/main-window.c:392
+#: src/main-window.c:429
 msgid "Open Next message"
 msgstr "Bir ileti ileri"
 
-#: src/main-window.c:397
+#: src/main-window.c:434
 msgid "Open Next Unread Message"
 msgstr "Önümüzdeki okunmamýþ iletiyi aç"
 
-#: src/main-window.c:402 src/print.c:82 src/sendmsg-window.c:127
-#: src/sendmsg-window.c:155
+#: src/main-window.c:439 src/print.c:83 src/sendmsg-window.c:128
+#: src/sendmsg-window.c:156
 msgid "Print"
 msgstr "Yazdýr"
 
-#: src/main-window.c:402
+#: src/main-window.c:439
 msgid "Print current message"
 msgstr "Geçerli iletiyi yazdýr"
 
-#: src/main-window.c:888
+#: src/main-window.c:926
 msgid "Copyright (C) 1997-2000"
 msgstr "Tel'if hakký (C) 1997-2000"
 
-#: src/main-window.c:890
+#: src/main-window.c:928
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -1022,385 +1073,388 @@ msgstr ""
 "Hata raporlarý göndermek zorunda kalýrsan , lütfen "
 "\"http://bugs.gnome.org/\"'a git."
 
-#: src/main.c:78
+#: src/main-window.c:1480
+msgid ""
+"In order to store an address, you must open a mailbox and select a message.\n"
+msgstr ""
+"Bir adresi kaydetmek için, bir ePosta kutusunu açýp bir iletiyi seçmen lazým .\n"
+
+#: src/main.c:80
 msgid "Get new mail on startup"
 msgstr "Baþlarken yeni ePostayý al"
 
-#: src/main.c:80
-msgid "Compose a new email to kabalak@gmx.net"
-msgstr "kabalak@gmx.net'e yeni bir ePosta yaz"
-
 #: src/main.c:82
+msgid "Compose a new email to _kabalak@gmx.net"
+msgstr "_kabalak@gmx.net'e yeni bir ePosta yaz"
+
+#: src/main.c:84
 msgid "Opens MAILBOXNAME"
-msgstr "MAILBOXNAME'i açar"
+msgstr "MAILBOXNAME'i aç"
 
-#: src/main.c:82
+#: src/main.c:84
 msgid "MAILBOXNAME"
 msgstr "MAILBOXNAME"
 
-#: src/main.c:83
+#: src/main.c:85
 msgid "Opens first unread mailbox"
 msgstr "Ilk okunmamýþ içerik içeren ePosta kutusunu açar"
 
-#: src/mblist-window.c:412
+#: src/mblist-window.c:413
 msgid "Open Mailbox"
 msgstr "ePosta kutusunu aç"
 
-#: src/mblist-window.c:413
+#: src/mblist-window.c:414
 msgid "Close Mailbox"
 msgstr "ePosta kutusunu kapat"
 
-#: src/mblist-window.c:416
+#: src/mblist-window.c:417
 msgid "Add New Mailbox"
 msgstr "Yeni bir ePosta kutusunu ekle"
 
-#: src/mblist-window.c:420
+#: src/mblist-window.c:421
 msgid "Edit Mailbox Properties"
 msgstr "ePosta kutusu özelliklerini deðiþtir"
 
-#: src/mblist-window.c:421
+#: src/mblist-window.c:422
 msgid "Delete Mailbox"
 msgstr "ePosta kutusunu sil"
 
-#: src/mblist-window.c:422
+#: src/mblist-window.c:423
 msgid "Mark as Inbox"
 msgstr "Gelenler kutusu olarak iþaretle"
 
-#: src/mblist-window.c:423
+#: src/mblist-window.c:424
 msgid "Mark as Sentbox"
 msgstr "Gönderilenler kutusu olarak iþaretle"
 
-#: src/mblist-window.c:424
+#: src/mblist-window.c:425
 msgid "Mark as Trash"
 msgstr "Çöp kutusu olarak iþaretle"
 
-#: src/mblist-window.c:425
+#: src/mblist-window.c:426
 msgid "Mark as Draftbox"
 msgstr "Tasarýlar kutusu olarak iþaretle"
 
-#: src/mblist-window.c:448 src/mblist-window.c:464 src/mblist-window.c:482
-#: src/mblist-window.c:497
+#: src/mblist-window.c:446 src/mblist-window.c:462 src/mblist-window.c:481
+#: src/mblist-window.c:496
 msgid "No mailbox selected."
 msgstr "Hiç bir ePosta kutusu seçili deðil ."
 
-#: src/message-window.c:54
+#: src/message-window.c:76
 msgid "Reply to this message"
 msgstr "Bu iletiyi cevap ver"
 
-#: src/message-window.c:61
+#: src/message-window.c:83
 msgid "Reply to all recipients of this message"
 msgstr "Bu iletinin tüm alýcýlarýna cevap ver"
 
-#: src/message-window.c:67
+#: src/message-window.c:89
 msgid "Forward this message"
 msgstr "Bu iletiyi ilerlet"
 
-#: src/pref-manager.c:124
+#: src/pref-manager.c:128
 msgid "Text"
 msgstr "Metin"
 
-#: src/pref-manager.c:125
+#: src/pref-manager.c:129
 msgid "Icons"
 msgstr "Ikonalar"
 
-#: src/pref-manager.c:126
+#: src/pref-manager.c:130
 msgid "Both"
 msgstr "Ikisi de"
 
-#: src/pref-manager.c:138
+#: src/pref-manager.c:142
 msgid "7bits"
 msgstr "7 bit"
 
-#: src/pref-manager.c:139
+#: src/pref-manager.c:143
 msgid "8bits"
 msgstr "8 bit"
 
-#: src/pref-manager.c:140
+#: src/pref-manager.c:144
 msgid "quoted"
 msgstr "kotelenmiþ"
 
-#: src/pref-manager.c:152
+#: src/pref-manager.c:156
 msgid "While Retrieving Messages"
 msgstr "Iletileri alýrken"
 
-#: src/pref-manager.c:153
+#: src/pref-manager.c:157
 msgid "Until Closed"
 msgstr "Kapanýncaya kadar"
 
-#: src/pref-manager.c:154
+#: src/pref-manager.c:158
 msgid "Never"
 msgstr "Hiç bir zaman"
 
-#: src/pref-manager.c:179
+#: src/pref-manager.c:183
 msgid "Balsa Preferences"
 msgstr "Balsa ayarlarý"
 
-#: src/pref-manager.c:187 src/pref-manager.c:653
+#: src/pref-manager.c:191 src/pref-manager.c:670
 msgid "Identity"
 msgstr "Þahsiyet"
 
-#: src/pref-manager.c:190 src/pref-manager.c:723 src/pref-manager.c:801
+#: src/pref-manager.c:194 src/pref-manager.c:740 src/pref-manager.c:818
 msgid "Signature"
 msgstr "Imza"
 
-#: src/pref-manager.c:193
+#: src/pref-manager.c:197
 msgid "Mail Servers"
 msgstr "ePosta sunucularý"
 
-#: src/pref-manager.c:196
+#: src/pref-manager.c:200
 msgid "Mail Options"
 msgstr "ePosta ayarlarý"
 
-#: src/pref-manager.c:199 src/pref-manager.c:1223
+#: src/pref-manager.c:203 src/pref-manager.c:1227
 msgid "Display"
 msgstr "Göster"
 
-#: src/pref-manager.c:202 src/pref-manager.c:1248 src/pref-manager.c:1293
+#: src/pref-manager.c:206 src/pref-manager.c:1252 src/pref-manager.c:1297
 msgid "Printing"
 msgstr "Yazdýrýlýyor"
 
-#: src/pref-manager.c:205 src/pref-manager.c:1334 src/pref-manager.c:1352
+#: src/pref-manager.c:209 src/pref-manager.c:1338 src/pref-manager.c:1356
 msgid "Encoding"
 msgstr "Þekillendirme"
 
-#: src/pref-manager.c:208 src/pref-manager.c:1379
+#: src/pref-manager.c:212 src/pref-manager.c:1384
 msgid "Misc"
 msgstr "Karýþýk"
 
-#: src/pref-manager.c:211
+#: src/pref-manager.c:215
 msgid "Startup"
 msgstr "Baþlangýç"
 
-#: src/pref-manager.c:677
+#: src/pref-manager.c:694
 msgid "Your name:"
 msgstr "Adýn:"
 
-#: src/pref-manager.c:684
+#: src/pref-manager.c:701
 msgid "E-mail address:"
 msgstr "ePosta adresin:"
 
-#: src/pref-manager.c:690
+#: src/pref-manager.c:707
 msgid "Reply-to address:"
 msgstr "Cevap-verilecek adres:"
 
-#: src/pref-manager.c:735
+#: src/pref-manager.c:752
 msgid "Select your signature file"
 msgstr "Imza dosyaný seç"
 
-#: src/pref-manager.c:745
+#: src/pref-manager.c:762
 msgid "sending mail"
 msgstr "iletiyi gönderiyorum"
 
-#: src/pref-manager.c:751
+#: src/pref-manager.c:768
 msgid "replying to mail"
 msgstr "iletiye cevap veriyorum"
 
-#: src/pref-manager.c:757
+#: src/pref-manager.c:774
 msgid "forwarding mail"
 msgstr "iletiyi iletiyorum"
 
-#: src/pref-manager.c:772
+#: src/pref-manager.c:789
 msgid ">"
 msgstr ">"
 
-#: src/pref-manager.c:774
+#: src/pref-manager.c:791
 msgid "Signature file:"
 msgstr "Imza dosyasý:"
 
-#: src/pref-manager.c:781
+#: src/pref-manager.c:798
 msgid "Reply prefix:"
 msgstr "Cevaplama öneði:"
 
-#: src/pref-manager.c:788
+#: src/pref-manager.c:805
 msgid "Use signature file when:"
 msgstr "Imza dosyasýný bu þart altýnda kullan :"
 
-#: src/pref-manager.c:795
+#: src/pref-manager.c:812
 msgid "enable signature separator"
 msgstr "imza ayýrýcýsýný kullan"
 
-#: src/pref-manager.c:832
+#: src/pref-manager.c:849
 msgid "Remote Mailbox Servers"
 msgstr "Uzaktaki ePosta kutusu sunucularýný sil"
 
-#: src/pref-manager.c:857
+#: src/pref-manager.c:874
 msgid "Type"
 msgstr "Tür"
 
-#: src/pref-manager.c:861
+#: src/pref-manager.c:878
 msgid "Mailbox name"
 msgstr "ePosta kutusu adý"
 
-#: src/pref-manager.c:880
+#: src/pref-manager.c:897
 msgid "Modify"
 msgstr "Deðiþtir"
 
-#: src/pref-manager.c:892
+#: src/pref-manager.c:909
 msgid "Local mail"
 msgstr "Yerel ePosta"
 
-#: src/pref-manager.c:907
+#: src/pref-manager.c:924
 msgid "Select your local mail directory"
 msgstr "Yerel ePosta dizini"
 
-#: src/pref-manager.c:917
+#: src/pref-manager.c:934
 msgid "Outgoing mail"
 msgstr "Giden ePosta"
 
-#: src/pref-manager.c:936
+#: src/pref-manager.c:953
 msgid "Remote SMTP Server"
 msgstr "Uzaktaki bir SMTP sunucusu"
 
-#: src/pref-manager.c:943
+#: src/pref-manager.c:960
 msgid "Local mail user agent"
 msgstr "Yerel ePosta ajaný"
 
-#: src/pref-manager.c:972
+#: src/pref-manager.c:989
 msgid "Incoming"
 msgstr "Gelen"
 
-#: src/pref-manager.c:976
+#: src/pref-manager.c:993
 msgid "Outgoing"
 msgstr "Gidiþ"
 
-#: src/pref-manager.c:995
+#: src/pref-manager.c:1012
 msgid "Checking"
 msgstr "Kontrol"
 
-#: src/pref-manager.c:1005
+#: src/pref-manager.c:1022
 msgid "Minutes"
 msgstr "Dakika"
 
-#: src/pref-manager.c:1019
+#: src/pref-manager.c:1036
 msgid "Check mail automatically every:"
 msgstr "ePostaya otomatikman bak :"
 
-#: src/pref-manager.c:1042
+#: src/pref-manager.c:1059
 msgid "Word Wrap"
 msgstr "Kelime kýrmasý"
 
-#: src/pref-manager.c:1053
+#: src/pref-manager.c:1070
 msgid "Wrap Outgoing Text at:"
 msgstr "Giden iletilerin metnini kýr :"
 
-#: src/pref-manager.c:1068
+#: src/pref-manager.c:1085
 msgid "Characters"
 msgstr "harf"
 
-#: src/pref-manager.c:1074
+#: src/pref-manager.c:1091
 msgid "Other options"
 msgstr "Öbür seçenekler"
 
-#: src/pref-manager.c:1085
+#: src/pref-manager.c:1102
 msgid "Default Bcc to:"
 msgstr "Önayarlý Bcc:"
 
-#: src/pref-manager.c:1122
+#: src/pref-manager.c:1139
 msgid "Main window"
 msgstr "Ana pencere"
 
-#: src/pref-manager.c:1130
+#: src/pref-manager.c:1147
 msgid "use preview pane"
 msgstr "önizleme görüþünü kullan"
 
-#.
-#. * This is not ready, yet!
-#. *
-#. * -Ragnar-
-#. *
-#. * pawels: is replaced by the code connected to "selected headers" field
-#. * below. To be removed.
-#.
-#: src/pref-manager.c:1143
-msgid "View all headers"
-msgstr "Yekin baþlýklarý göster"
-
-#: src/pref-manager.c:1149
+#: src/pref-manager.c:1153
 msgid "Show mailbox statistics in left pane"
 msgstr "Sol panelde ePosta istatistiklerini göster"
 
-#: src/pref-manager.c:1156
+#: src/pref-manager.c:1160
 msgid "Toolbars"
 msgstr "Araç çubuklarý"
 
-#: src/pref-manager.c:1173
+#: src/pref-manager.c:1177
 msgid "Display progress dialog"
 msgstr "Ilerleme diyaloðunu göster"
 
-#: src/pref-manager.c:1181
+#: src/pref-manager.c:1185
 msgid "Display Formats"
 msgstr "Þekillendirmeleri göster"
 
-#: src/pref-manager.c:1188
+#: src/pref-manager.c:1192
 msgid "Date encoding (for strftime):"
 msgstr "Tarih þekillendirmesi ( strftime için ):"
 
-#: src/pref-manager.c:1200
+#: src/pref-manager.c:1204
 msgid "Selected headers:"
 msgstr "Seçili baþlýklar :"
 
-#: src/pref-manager.c:1276
+#: src/pref-manager.c:1280
 msgid "characters"
 msgstr "harfler'den sonra"
 
-#: src/pref-manager.c:1280
+#: src/pref-manager.c:1284
 msgid "Print command:"
 msgstr "Yazdýrma komutasý :"
 
-#: src/pref-manager.c:1286
+#: src/pref-manager.c:1290
 msgid "Break line at:"
 msgstr "Satrý kýr :"
 
-#: src/pref-manager.c:1320
+#: src/pref-manager.c:1324
 msgid "Charset"
 msgstr "Yazý tipi þekillendirilmesi"
 
-#: src/pref-manager.c:1389
+#: src/pref-manager.c:1394
 msgid "Debug"
 msgstr "Bilgilendir"
 
-#: src/pref-manager.c:1393
+#: src/pref-manager.c:1398
 msgid "Empty trash on exit"
 msgstr "Çýkýþ'ta çöp kutusunu boþalt"
 
-#: src/pref-manager.c:1397
+#: src/pref-manager.c:1406
+msgid "Address book location"
+msgstr "Adres rehberi mekaný"
+
+#: src/pref-manager.c:1411
+msgid "Select your address book file"
+msgstr "Adres defteri dosyasýný seç"
+
+#. font
+#: src/pref-manager.c:1421
 msgid "Font"
 msgstr "Yazý tipi"
 
-#: src/pref-manager.c:1425
+#: src/pref-manager.c:1449
 msgid "Select a font to use"
 msgstr "Kullanýlacak yazý tipini seç"
 
-#: src/pref-manager.c:1429
+#: src/pref-manager.c:1453
 msgid "Browse..."
 msgstr "Gez ..."
 
-#: src/pref-manager.c:1434
+#: src/pref-manager.c:1458
 msgid "Preview pane"
 msgstr "Önizleme köþesi"
 
 #. mblist unread colour
-#: src/pref-manager.c:1442
+#: src/pref-manager.c:1466
 msgid "Colours"
 msgstr "Renkler"
 
-#: src/pref-manager.c:1453 src/pref-manager.c:1460
+#: src/pref-manager.c:1477 src/pref-manager.c:1484
 msgid "Mailbox with unread messages colour"
 msgstr "Okunmamýþ iletileri içeren ePosta kutusunun rengi"
 
-#: src/pref-manager.c:1480
+#: src/pref-manager.c:1511
 msgid "Options"
 msgstr "Ayarlar"
 
-#: src/pref-manager.c:1491
+#: src/pref-manager.c:1522
 msgid "Check mail upon startup"
 msgstr "Baþlangýçta yeni ePosta için bak"
 
-#: src/pref-manager.c:1496
+#: src/pref-manager.c:1527
 msgid "Remember open mailboxes between sessions"
 msgstr "Oturumlar arasýnda açýk ePosta kutularýný aklýnda tut"
 
-#: src/print.c:95
+#: src/print.c:96
 #, c-format
 msgid ""
 "Enter print command below\n"
@@ -1409,175 +1463,175 @@ msgstr ""
 "Yazdýrma komutasýný altta belirt\n"
 "'%s''yi kullanmayý unutma !"
 
-#: src/print.c:103
+#: src/print.c:104
 msgid "Print Command:"
 msgstr "Yazdýrma komutasý :"
 
-#: src/sendmsg-window.c:111
+#: src/sendmsg-window.c:112
 msgid "Send"
 msgstr "Gönder"
 
-#: src/sendmsg-window.c:111
+#: src/sendmsg-window.c:112
 msgid "Send this mail"
 msgstr "Bu iletiyi gönder"
 
-#: src/sendmsg-window.c:115
+#: src/sendmsg-window.c:116
 msgid "Attach"
 msgstr "Ekle"
 
-#: src/sendmsg-window.c:115
+#: src/sendmsg-window.c:116
 msgid "Add attachments to this message"
 msgstr "Bu iletiye eklemler ekle"
 
-#: src/sendmsg-window.c:119
+#: src/sendmsg-window.c:120
 msgid "Postpone"
 msgstr "Sonraya býrak"
 
-#: src/sendmsg-window.c:119
+#: src/sendmsg-window.c:120
 msgid "Continue this message later"
 msgstr "Bu iletiye sonra devam et"
 
-#: src/sendmsg-window.c:123
+#: src/sendmsg-window.c:124
 msgid "Spelling"
 msgstr "Yazýlýþ"
 
-#: src/sendmsg-window.c:123
+#: src/sendmsg-window.c:124
 msgid "Check Spelling"
 msgstr "Yazýlýþý kontrol et"
 
-#: src/sendmsg-window.c:138
+#: src/sendmsg-window.c:139
 msgid "_Include File..."
 msgstr "Dosya _içer ..."
 
-#: src/sendmsg-window.c:142
+#: src/sendmsg-window.c:143
 msgid "_Attach file..."
 msgstr "Dosya _ekle ..."
 
-#: src/sendmsg-window.c:147
+#: src/sendmsg-window.c:148
 msgid "_Send"
 msgstr "Gö_nder"
 
-#: src/sendmsg-window.c:147
+#: src/sendmsg-window.c:148
 msgid "Send the currently edited message"
 msgstr "Pu an deðiþtirilen iletiyi gönder"
 
-#: src/sendmsg-window.c:151
+#: src/sendmsg-window.c:152
 msgid "_Postpone"
 msgstr "_Sonraya býrak"
 
-#: src/sendmsg-window.c:155
+#: src/sendmsg-window.c:156
 msgid "Print the edited message"
 msgstr "Pu an deðiþtirilen iletiyi yazdýr"
 
-#: src/sendmsg-window.c:173
+#: src/sendmsg-window.c:174
 msgid "_Wrap body"
 msgstr "Iletiyi ký_r"
 
-#: src/sendmsg-window.c:173
+#: src/sendmsg-window.c:174
 msgid "Wrap message lines"
 msgstr "Ileti satýrlarýný kýr"
 
-#: src/sendmsg-window.c:177
+#: src/sendmsg-window.c:178
 msgid "_Reflow paragraph"
 msgstr "Bö_lümü yeniden aktar"
 
-#: src/sendmsg-window.c:180
+#: src/sendmsg-window.c:181
 msgid "R_eflow message"
 msgstr "Iletiyi y_eniden aktar"
 
-#: src/sendmsg-window.c:189
+#: src/sendmsg-window.c:190
 msgid "Fr_om"
 msgstr "_Yazan"
 
-#: src/sendmsg-window.c:191
+#: src/sendmsg-window.c:192
 msgid "_To"
 msgstr "_Gönderilen"
 
-#: src/sendmsg-window.c:193
+#: src/sendmsg-window.c:194
 msgid "_Subject"
 msgstr "_Konu"
 
-#: src/sendmsg-window.c:195
+#: src/sendmsg-window.c:196
 msgid "_Cc"
 msgstr "_Cc"
 
-#: src/sendmsg-window.c:197
+#: src/sendmsg-window.c:198
 msgid "_Bcc"
 msgstr "_Bcc"
 
-#: src/sendmsg-window.c:199
+#: src/sendmsg-window.c:200
 msgid "_Fcc"
 msgstr "_Fcc"
 
-#: src/sendmsg-window.c:201
+#: src/sendmsg-window.c:202
 msgid "_Reply To"
 msgstr "_Cevapla"
 
-#: src/sendmsg-window.c:203
+#: src/sendmsg-window.c:204
 msgid "_Attachments"
 msgstr "_Eklemler"
 
-#: src/sendmsg-window.c:205
+#: src/sendmsg-window.c:206
 msgid "_Comments"
 msgstr "Yazýntý"
 
-#: src/sendmsg-window.c:207
+#: src/sendmsg-window.c:208
 msgid "_Keywords"
 msgstr "A_nahtar sözcükler"
 
-#: src/sendmsg-window.c:218
+#: src/sendmsg-window.c:219
 msgid "_Western (ISO-8859-1)"
 msgstr "_Batý avrupa (ISO-8859-1)"
 
-#: src/sendmsg-window.c:220
+#: src/sendmsg-window.c:221
 msgid "W_estern (ISO-8859-15)"
 msgstr "B_atý avrupa (ISO-8859-15)"
 
-#: src/sendmsg-window.c:222
+#: src/sendmsg-window.c:223
 msgid "_Central European (ISO-8859-2)"
 msgstr "_Orta avrupa (ISO-8859-2)"
 
-#: src/sendmsg-window.c:224
+#: src/sendmsg-window.c:225
 msgid "_South European (ISO-8859-3)"
 msgstr "_Güney avrupa (ISO-8859-3)"
 
-#: src/sendmsg-window.c:226
+#: src/sendmsg-window.c:227
 msgid "_Baltic (ISO-8859-13)"
 msgstr "_Baltýk (ISO-8859-13)"
 
-#: src/sendmsg-window.c:228
+#: src/sendmsg-window.c:229
 msgid "Cy_rillic (ISO-8859-5)"
 msgstr "_Kiril (ISO-8859-5)"
 
-#: src/sendmsg-window.c:230
+#: src/sendmsg-window.c:231
 msgid "_Hebrew (ISO-8859-8)"
 msgstr "_Ibrece (ISO-8859-8)"
 
-#: src/sendmsg-window.c:232
+#: src/sendmsg-window.c:233
 msgid "_Turkish (ISO-8859-9)"
 msgstr "_Türkçe (ISO-8859-9)"
 
-#: src/sendmsg-window.c:234
+#: src/sendmsg-window.c:235
 msgid "Ce_ltic (ISO-8859-14)"
 msgstr "K_eltik (ISO-8859-14)"
 
-#: src/sendmsg-window.c:236
+#: src/sendmsg-window.c:237
 msgid "Ru_ssian (KOI8-R)"
 msgstr "Ru_s (KOI8-R)"
 
-#: src/sendmsg-window.c:238
+#: src/sendmsg-window.c:239
 msgid "_Ukrainian (KOI8-U)"
 msgstr "_Ukrayna (KOI8-U)"
 
-#: src/sendmsg-window.c:278
+#: src/sendmsg-window.c:279
 msgid "_Show"
 msgstr "_Göster"
 
-#: src/sendmsg-window.c:279
+#: src/sendmsg-window.c:280
 msgid "_ISO Charset"
 msgstr "_ISO yazý tipi sýnýflandýrma"
 
-#: src/sendmsg-window.c:401
+#: src/sendmsg-window.c:405
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -1585,120 +1639,274 @@ msgstr ""
 "Eklemler resmi ( balsa/attachment.png ) bulunamadý .\n"
 "Hiç bir dosya ekleyemeceðin .\n"
 
-#: src/sendmsg-window.c:419
+#: src/sendmsg-window.c:423
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "`%s' dosyanýn bilgilerini alamadým: %s\n"
 
-#: src/sendmsg-window.c:423
+#: src/sendmsg-window.c:427
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "`%s' eklemi normal bir dosya deðildir\n"
 
-#: src/sendmsg-window.c:483
+#: src/sendmsg-window.c:487
 msgid "Attach file"
 msgstr "Dosya ekle"
 
 #. cc:
-#: src/sendmsg-window.c:612
+#: src/sendmsg-window.c:616
 msgid "cc:"
 msgstr "cc:"
 
 #. bcc:
-#: src/sendmsg-window.c:615
+#: src/sendmsg-window.c:619
 msgid "bcc:"
 msgstr "bcc:"
 
 #. fcc:
-#: src/sendmsg-window.c:618
+#: src/sendmsg-window.c:622
 msgid "fcc:"
 msgstr "fcc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:647
+#: src/sendmsg-window.c:651
 msgid "Reply To:"
 msgstr "Cevapla :"
 
 #. Attachment list
-#: src/sendmsg-window.c:651
+#: src/sendmsg-window.c:655
 msgid "Attachments:"
 msgstr "Eklemler :"
 
 #. Comments:
-#: src/sendmsg-window.c:694
+#: src/sendmsg-window.c:698
 msgid "Comments:"
 msgstr "Eklentiler :"
 
 #. Keywords:
-#: src/sendmsg-window.c:697
+#: src/sendmsg-window.c:701
 msgid "Keywords:"
 msgstr "Anahtar sözcükler :"
 
-#: src/sendmsg-window.c:774
+#: src/sendmsg-window.c:779
 msgid "you"
 msgstr "sen"
 
-#: src/sendmsg-window.c:783
+#: src/sendmsg-window.c:789
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "%s'de %s bunu yazmýþtýr :\n"
 
-#: src/sendmsg-window.c:785
+#: src/sendmsg-window.c:792
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s bunu yazmýþtýr\n"
 
-#: src/sendmsg-window.c:855
+#: src/sendmsg-window.c:862
 msgid "Reply to "
 msgstr "Cevapla"
 
-#: src/sendmsg-window.c:860
+#: src/sendmsg-window.c:867
 msgid "Forward message"
 msgstr "Iletiyi ilet"
 
-#: src/sendmsg-window.c:865
+#: src/sendmsg-window.c:872
 msgid "Continue message"
 msgstr "Iletiya devam et"
 
-#: src/sendmsg-window.c:870
+#: src/sendmsg-window.c:877
 msgid "New message"
 msgstr "Yeni ileti"
 
-#: src/sendmsg-window.c:1100
+#: src/sendmsg-window.c:1109
 msgid "Could not open the file.\n"
 msgstr "Dosyayý açamadým .\n"
 
-#: src/sendmsg-window.c:1106
+#: src/sendmsg-window.c:1115
 msgid "Loading..."
 msgstr "Yükleniyor ..."
 
-#: src/sendmsg-window.c:1131
+#: src/sendmsg-window.c:1140
 msgid "Include file"
 msgstr "Dosyayý içer"
 
-#: src/sendmsg-window.c:1406
+#: src/sendmsg-window.c:1396
 msgid "Cannot execute print command."
 msgstr "Yazdýrma komutasýný çalýþtýramadým ."
 
-#: src/sendmsg-window.c:1430
+#: src/sendmsg-window.c:1420
 msgid "Error executing lpr"
 msgstr "lpr'i çalýþtýrýrken hata oldu"
 
-#~ msgid "C_yrillic (KOi8-R)"
-#~ msgstr "_Kiril (KOi8-R)"
+#: libbalsa/mailbox_imap.c:202
+#, c-format
+msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxImap : %s'yi açýyorum , %d referans\n"
 
-#~ msgid ""
-#~ "\n"
-#~ "BEGIN:VCARD\n"
-#~ msgstr ""
-#~ "\n"
-#~ "BEGIN:VCARD\n"
+#: libbalsa/mailbox_local.c:218
+#, c-format
+msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxLocal : %s'yi açýyorum , %d referans\n"
 
-#~ msgid "FN:%s\n"
-#~ msgstr "FN:%s\n"
+#: libbalsa/mailbox_pop3.c:179
+#, c-format
+msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxPop3 : %s'yi açýyorum , %d referans\n"
 
-#~ msgid "EMAIL;INTERNET:%s\n"
-#~ msgstr "EMAIL;INTERNET:%s\n"
+#: libmutt/mbox.c:134 libmutt/mbox.c:292
+msgid "Reading %s... %d (%d%%)"
+msgstr "%s'yi okuyorum ... %d ( %%%d )"
 
-#~ msgid "END:VCARD\n"
-#~ msgstr "END:VCARD\n"
+#: libmutt/mbox.c:158 libmutt/mbox.c:217
+msgid "Mailbox is corrupt!"
+msgstr "ePosta kutusu bozuk !"
+
+#: libmutt/mbox.c:665
+msgid "Mailbox was corrupted!"
+msgstr "ePosta kutusu bozuldu !"
+
+#: libmutt/mbox.c:702 libmutt/mbox.c:977
+msgid "Fatal error!  Could not reopen mailbox!"
+msgstr "Aðýr hata ! ePosta kutusunu yeniden açamadým !"
+
+#: libmutt/mbox.c:711
+msgid "Unable to lock mailbox!"
+msgstr "ePosta kutusunu kitleyemedim !"
+
+#: libmutt/mbox.c:740
+msgid "Could not create temporary file!"
+msgstr "Geçiçi dosyayý yaratamadým !"
+
+#. this means ctx->changed or ctx->deleted was set, but no
+#. * messages were found to be changed or deleted.  This should
+#. * never happen, is we presume it is a bug in mutt.
+#.
+#: libmutt/mbox.c:757
+msgid "sync: mbox modified, but no modified messages! (report this bug)"
+msgstr "eþitleme : mbox deðiþtirilmiþ, fakat hiç bir ileti deðiþtirilmemiþ ! ( bu hatayý rapor et )"
+
+#: libmutt/mbox.c:787
+msgid "Writing messages... %d (%d%%)"
+msgstr "Iletileri yazýyorum ... %d ( %%%d )"
+
+#: libmutt/mbox.c:961
+#, c-format
+msgid "Write failed!  Saved partial mailbox to %s"
+msgstr "Yazma eylemi baþarasýz oldu ! Bölümsel ePosta kutusu %s'ye yazýldý"
+
+#: libmutt/mbox.c:1027
+msgid "Could not reopen mailbox!"
+msgstr "ePosta kutusunu yeniden açamadým !"
+
+#: libmutt/mbox.c:1065
+msgid "Reopening mailbox..."
+msgstr "ePosta kutusunu yeniden açýyorum ..."
+
+#: libmutt/mx.c:119
+#, c-format
+msgid "Lock count exceeded, remove lock for %s?"
+msgstr "Kilik sayýsý azami tabaný aþtý, %s için kilidi açayým mý ?"
+
+#: libmutt/mx.c:131
+#, c-format
+msgid "Can't dotlock %s.\n"
+msgstr "%s'yi kilitleyemedim .\n"
+
+#: libmutt/mx.c:189
+msgid "Timeout exceeded while attempting fcntl lock!"
+msgstr "fcntl ile kilitlemeyi denerken zaman aþýmýna uðradým !"
+
+#: libmutt/mx.c:195
+#, c-format
+msgid "Waiting for fcntl lock... %d"
+msgstr "fcntl kilidi için bekliyorum ... %d"
+
+#: libmutt/mx.c:223
+msgid "Timeout exceeded while attempting flock lock!"
+msgstr "flock ile kilitlemeyi denerken zaman aþýmýna uðradým !"
+
+#: libmutt/mx.c:230
+#, c-format
+msgid "Waiting for flock attempt... %d"
+msgstr "flock kilitleme deneyini bekliyorum ... %d"
+
+#: libmutt/mx.c:459 libmutt/mx.c:605
+#, c-format
+msgid "%s is not a mailbox."
+msgstr "%s bir ePosta kutusu deðildir ."
+
+#: libmutt/mx.c:542
+#, c-format
+msgid "Couldn't lock %s\n"
+msgstr "%s'yi kilitleyemedim\n"
+
+#: libmutt/mx.c:630
+#, c-format
+msgid "Reading %s..."
+msgstr "%s okunuyor ... "
+
+#: libmutt/mx.c:719
+#, c-format
+msgid "Writing %s..."
+msgstr "%s yazýlýyor ..."
+
+#: libmutt/mx.c:746
+#, c-format
+msgid "Could not synchronize mailbox %s!"
+msgstr "ePosta kutusu %s'yi eþitleyemedim !"
+
+#: libmutt/mx.c:848
+#, c-format
+msgid "Moving read messages to %s..."
+msgstr "Okunan iletileri %s'ye taþýyorum ..."
+
+#: libmutt/mx.c:899 libmutt/mx.c:1056
+msgid "Mailbox is unchanged."
+msgstr "ePosta kutusu deðiþmemiþ ."
+
+#: libmutt/mx.c:929
+#, c-format
+msgid "%d kept, %d moved, %d deleted."
+msgstr "%d tane daha var, %d tane taþýndý, %d tane silindi ."
+
+#: libmutt/mx.c:932 libmutt/mx.c:1098
+#, c-format
+msgid "%d kept, %d deleted."
+msgstr "%d tane daha var, %d tane silindi ."
+
+#: libmutt/mx.c:1040
+#, c-format
+msgid " Press '%s' to toggle write"
+msgstr " Yazýnabilirliði açmak için '%s''ye bas"
+
+#: libmutt/mx.c:1043
+msgid "Use 'toggle-write' to re-enable write!"
+msgstr "Yazýnabilirliði yeniden mümkün etmek için 'toggle-write' eylemini kullan !"
+
+#: libmutt/mx.c:1045
+#, c-format
+msgid "Mailbox is marked unwritable. %s"
+msgstr "ePosta kutusu yazýlabilinilmez olarak iþaretlenmiþ. %s"
+
+#: libmutt/mx.c:1050
+msgid "Mailbox is read-only."
+msgstr "ePosta kutusu sýrf-okunurdur ."
+
+#: libmutt/mx.c:1065
+#, c-format
+msgid "Purge %d deleted message?"
+msgstr "Silinen %d iletisi vallahi silinsin mi ?"
+
+#: libmutt/mx.c:1065
+#, c-format
+msgid "Purge %d deleted messages?"
+msgstr "Silinen %d iletilerini vallahi silinsin mi ?"
+
+#: libmutt/mx.c:1095
+#, c-format
+msgid "%d kept."
+msgstr "%d tane daha var ."
+
+#: libmutt/mx.c:1375
+msgid "Can't write message"
+msgstr "Iletiyi yazamadým"

@@ -1822,7 +1822,7 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
                        bsmsg, bsmsg->bcc,
                        &bsmsg->bcc_info, 0, -1);
 
-    /* fcc: */
+    /* fcc: mailbox folder where the message copy will be written to */
     bsmsg->fcc[0] = gtk_label_new_with_mnemonic(_("F_cc:"));
     gtk_misc_set_alignment(GTK_MISC(bsmsg->fcc[0]), 0.0, 0.5);
     gtk_misc_set_padding(GTK_MISC(bsmsg->fcc[0]), GNOME_PAD_SMALL,
@@ -2705,8 +2705,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->ready_widgets[1] = file_menu[MENU_FILE_QUEUE_POS].widget;
     bsmsg->ready_widgets[2] = file_menu[MENU_FILE_POSTPONE_POS].widget;
 
-    create_lang_menu(main_menu[MAIN_CHARSET_MENU].widget, bsmsg);
-
     /* set options */
     bsmsg->req_dispnotify = FALSE;
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
@@ -2812,10 +2810,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     /* ...but mark it as unmodified. */
     bsmsg->modified = FALSE;
 
-    /* set the menus  - and charset index - and display the window */
-    /* FIXME: this will also reset the font, copying the text back and 
-       forth which is sub-optimal.
-     */
+    /* set the menus - and language index */
     init_menus(bsmsg);
 
     /* set the initial window title */
@@ -3987,6 +3982,8 @@ init_menus(BalsaSendmsg * bsmsg)
 	    VIEW_MENU_FUNC(view_menu[i].moreinfo)(view_menu[i].widget, bsmsg);
 	}
     }
+
+    create_lang_menu(main_menu[MAIN_CHARSET_MENU].widget, bsmsg);
 
     /* gray 'send' and 'postpone' */
     check_readiness(bsmsg);

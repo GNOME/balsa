@@ -251,6 +251,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, gboolean append)
 	UNLOCK_MAILBOX(mailbox);
 	return;
     }
+    gdk_threads_leave();
     if (ImapUser)
 	safe_free((void **) &ImapUser);	/* because mutt does so */
     ImapUser = strdup(server->user);
@@ -269,6 +270,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, gboolean append)
 					      append ? M_APPEND : 0, NULL);
     libbalsa_unlock_mutt();
     g_free(tmp);
+    gdk_threads_leave();
 
 
     if (CLIENT_CONTEXT_OPEN(mailbox)) {

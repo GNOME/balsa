@@ -210,6 +210,11 @@ libbalsa_mailbox_local_destroy(GtkObject * object)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
 }
 
+/* libbalsa_mailbox_local_open:
+   THREADING: it is always called from a signal handler so the gdk lock
+   is held on entry. The lock is released on the time-consumin open
+   operation and taken back when job is finished.
+*/
 static void
 libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
 {
@@ -242,6 +247,7 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
 	return;
     }
 
+    gdk_threads_leave();
     libbalsa_lock_mutt();
     if (append)
 	CLIENT_CONTEXT(mailbox) =
@@ -249,6 +255,7 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
     else
 	CLIENT_CONTEXT(mailbox) = mx_open_mailbox(local->path, 0, NULL);
     libbalsa_unlock_mutt();
+    gdk_threads_enter();
 
     if (CLIENT_CONTEXT_OPEN(mailbox)) {
 	mailbox->readonly = CLIENT_CONTEXT(mailbox)->readonly;
@@ -268,7 +275,6 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
     }
 
     UNLOCK_MAILBOX(mailbox);
-
 }
 
 static void

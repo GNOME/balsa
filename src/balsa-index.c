@@ -527,7 +527,10 @@ moveto_handler(BalsaIndex * bindex)
 static gboolean is_opening =FALSE;
 static void *open_in_thread(void* mailbox)
 {
+    
+    gdk_threads_enter();
     libbalsa_mailbox_open(LIBBALSA_MAILBOX(mailbox), FALSE);
+    gdk_threads_leave();
     is_opening = FALSE;
     return NULL;
 }

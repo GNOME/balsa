@@ -1,3 +1,8 @@
+2001-02-14  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_{imap,local}.c:
+	* src/balsa-index.c: lock GDK more carefully.
+	
 2001-02-13  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-index.c: open mailboxes in a thread (as requested in

@@ -734,6 +734,7 @@ mw_set_selected(MessageWindow * mw)
     list = balsa_index_selected_list(mw->bindex);
     if (g_list_length(list) == 1)
 	mw_set_message(mw, LIBBALSA_MESSAGE(list->data));
+    g_list_foreach(list, (GFunc) g_object_unref, NULL);
     g_list_free(list);
 }
 

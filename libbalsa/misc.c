@@ -74,7 +74,7 @@ libbalsa_lookup_mime_type(const gchar * path)
     g_free(uri);
     mime_type = g_strdup(gnome_vfs_file_info_get_mime_type(vi));
     gnome_vfs_file_info_unref(vi);
-    return mime_type;
+    return mime_type ? mime_type : g_strdup("application/octet-stream");
 #else
     return g_strdup("application/octet-stream");
 #endif/* HAVE_GNOME */

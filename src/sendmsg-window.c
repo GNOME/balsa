@@ -1836,6 +1836,9 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
     pixbuf = 
 	libbalsa_icon_finder(forced_mime_type, filename, &content_type,
 			     GTK_ICON_SIZE_LARGE_TOOLBAR);
+    if (!content_type)
+	/* Last ditch. */
+	content_type = g_strdup("application/octet-stream");
 	
     /* create a new attachment info block */
     attach_data = balsa_attach_info_new(bsmsg);

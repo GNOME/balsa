@@ -40,13 +40,12 @@
 
 static void
 libbalsa_scanner_mh_dir(GNode *rnode,
-	       		const gchar * parent_prefix, const gchar * prefix, 
+	       		const gchar * prefix, 
 			LocalHandler folder_handler, 
 			LocalHandler mailbox_handler)
 {
     DIR *dpc;
     struct dirent *de;
-    gchar * name;
     char filename[PATH_MAX];
     struct stat st;
     GNode* parent_node = NULL;
@@ -54,7 +53,7 @@ libbalsa_scanner_mh_dir(GNode *rnode,
     dpc = opendir(prefix);
     if (!dpc)
 	return;
-
+    
     /*
      * if we don't find any subdirectories inside, we'll go
      * and ignore this one too...
@@ -63,30 +62,19 @@ libbalsa_scanner_mh_dir(GNode *rnode,
 	if (de->d_name[0] == '.')
 	    continue;
 	snprintf(filename, PATH_MAX, "%s/%s", prefix, de->d_name);
-
 	/* ignore file if it can't be read. */
 	if (stat(filename, &st) == -1 || access(filename, R_OK) == -1)
 	    continue;
 	
 	if (S_ISDIR(st.st_mode)) {
-	    if (!parent_node) {
-		/*
-		 * make the parent folder for our children. This is a touch
-		 * aggressive (i.e. we will get folders with no children, but
-		 * trying to exclude them would be painful.
-		 */
-		name = g_basename(parent_prefix);
-		parent_node = folder_handler(rnode, name, prefix);
-	    }
-	    libbalsa_scanner_mh_dir(parent_node, prefix, filename, 
-				    folder_handler, mailbox_handler);
 	    /*
 	     * if we think that this looks like a mailbox, include it as such.
 	     * otherwise we'll lose the mail in this folder
 	     */
-	    if (libbalsa_mailbox_type_from_path(filename)
-		== LIBBALSA_TYPE_MAILBOX_MH) {
-		mailbox_handler(parent_node, de->d_name, filename);
+	    if (libbalsa_mailbox_type_from_path(filename) == LIBBALSA_TYPE_MAILBOX_MH) {
+		parent_node = mailbox_handler(rnode, de->d_name, filename);
+		libbalsa_scanner_mh_dir(parent_node, filename, 
+					folder_handler, mailbox_handler);
 	    }
 	}
 	/* ignore regular files */
@@ -124,8 +112,8 @@ libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix,
 	    mailbox_type = libbalsa_mailbox_type_from_path(filename);
 
 	    if (mailbox_type == LIBBALSA_TYPE_MAILBOX_MH) {
-		mailbox_handler(rnode, de->d_name, filename);
-		libbalsa_scanner_mh_dir(rnode, prefix, filename, 
+		current_node = mailbox_handler(rnode, de->d_name, filename);
+		libbalsa_scanner_mh_dir(current_node, filename, 
 				        folder_handler, mailbox_handler);
 	    } else if (mailbox_type == LIBBALSA_TYPE_MAILBOX_MAILDIR) {
 		mailbox_handler(rnode, de->d_name, filename);

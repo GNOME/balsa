@@ -1,3 +1,10 @@
+2001-06-26  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/mailbox-node.c: don't segfault on root=NULL in 
+	add_local_mailbox and add_local_folder
+	* libbalsa/folder-scanners.c (libbalsa_scanner_local_dir): 
+	handle nested MH boxes better
+
 2001-06-24  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/mailbox-node.c (traverse_find_path): don't ignore

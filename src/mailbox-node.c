@@ -640,6 +640,9 @@ add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
     GNode *node;
     GtkType type;
 
+    if(!root)
+	return NULL;
+
     if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.inbox))
 	if (strcmp(path, LIBBALSA_MAILBOX_LOCAL(balsa_app.inbox)->path) ==
 	    0) return NULL;
@@ -700,6 +703,9 @@ add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
 GNode* add_local_folder(GNode*root, const char*d_name, const char* path)
 {
     GNode *node = g_node_new(balsa_mailbox_node_new_from_dir(path));
+
+    if(!root)
+	return NULL;
 
     /* don't add if the folder is already in the configuration */
     if (find_by_path(balsa_app.mailbox_nodes, G_LEVEL_ORDER, 

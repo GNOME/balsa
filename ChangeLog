@@ -1,5 +1,13 @@
 2000-06-29  Peter Williams  <peter@beta.newton.cx>
 
+	* Makefile.am: Use BALSA_SHORT_VERSION instead of VERSION
+	when grabbing the RPM's so that we actually find them.
+
+	* macros/offset-tool.sh.in: Fixes for when srcdir = ..
+	
+	* libbalsa/Makefile.am (libbalsa_a_SOURCES): Oops, forgot
+	a backslash.
+
 	* configure.in (BALSA_RELEASE): Change to balsa_config_1
 	so I can fool around with RPM's of this branch.
 

@@ -16,7 +16,7 @@ BALSA_MAJOR=0
 BALSA_REVISION=9
 BALSA_PATCHLEVEL=0
 BALSA_RELEASE=balsa_config_1
-use_release=no
+use_release=yes
 
 dnl BALSA_RELEASE must be specified (1 if nothing else), but
 dnl change use_release depending on whether we want it to be

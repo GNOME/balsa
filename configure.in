@@ -387,8 +387,12 @@ AC_ARG_WITH(gss, [  --with-gss            Enable GSS [default=no]],[
 AC_MSG_CHECKING([whether to build GSS support])
 if test "x$with_gss" != xno  ; then
 	AC_MSG_RESULT([yes])
+        AC_CHECK_LIB(gssapi, gss_init_sec_context, [
+	  LIBS="$LIBS -L$with_gss/lib -lgssapi -lkrb5"
+        ],[
+	  LIBS="$LIBS -L$with_gss/lib -lgssapi_krb5"
+        ], -lkrb5 -ldes -lasn1 -lroken -lcrypt -lcom_err -L$with_gss/lib)
 	CFLAGS="$CFLAGS -I$with_gss/include"
-	LIBS="$LIBS -L$with_gss/lib -lgssapi_krb5"
 else
 	AC_MSG_RESULT([no])
 fi

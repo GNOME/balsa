@@ -1,3 +1,7 @@
+2001-03-08  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: fix HEIMDAL build (Dmitry G. Mastrukov's patch).
+	
 2001-03-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/folder-conf.[hc]: IMAP folder deletion support.

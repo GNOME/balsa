@@ -52,7 +52,7 @@ text2html (gchar * buff, struct obstack *html_buff)
       if (buff[i] == '\r' && buff[i + 1] == '\n' &&
 	  buff[i + 2] == '\r' && buff[i + 3] == '\n')
 	{
-	  obstack_append_string (html_buff, "</tt></p><p><tt>\n");
+	  obstack_append_string (html_buff, "</tt></p>\n<p><tt>\n");
 	  i += 3;
 	}
       else if (buff[i] == '\r' && buff[i + 1] == '\n')
@@ -67,7 +67,7 @@ text2html (gchar * buff, struct obstack *html_buff)
 	}
       else if (buff[i] == '\n' && buff[i + 1] == '\n')
 	{
-	  obstack_append_string (html_buff, "</tt></p><p><tt>\n");
+	  obstack_append_string (html_buff, "</tt></p>\n<p><tt>\n");
 	  i++;
 	}
       else if (buff[i] == '\n')
@@ -339,15 +339,14 @@ mimetext2html (BODY * bdy, FILE * fp, struct obstack *bfr)
   if (ptr)
     {
       ptr[alloced - 1] = '\0';
-      if (strcmp (bdy->subtype, "html") == 0 ||
-	  strcmp (bdy->subtype, "enriched") == 0)
+      if (strcmp (bdy->subtype, "html") == 0)
 	{
 	  obstack_append_string (bfr, ptr);
 	  g_free (ptr);
 	  unlink (tmp_file_name);
 	  return;
 	}
-      obstack_append_string (bfr, "<tt>");
+      obstack_append_string (bfr, "<P><TT>");
       text2html (ptr, bfr);
       g_free (ptr);
     }
@@ -390,13 +389,62 @@ part2html (BODY * bdy, FILE * fp, struct obstack *html_bfr)
     }
 }
 
+void
+header2row (gchar * name, gchar * data, struct obstack *html_bfr)
+{
+  obstack_append_string (html_bfr, "<TR>");
+
+  obstack_append_string (html_bfr, "<TH ALIGN=LEFT WIDTH=\"10\%\">");
+  obstack_append_string (html_bfr, name);
+  obstack_append_string (html_bfr, "</TH>");
+  obstack_append_string (html_bfr, "<TD ALIGN=LEFT WIDTH=\"90\%\">");
+  text2html (data, html_bfr);
+  obstack_append_string (html_bfr, "</TD>");
+
+  obstack_append_string (html_bfr, "</TR>\n");
+}
+
+void
+headers2html (Message * message, struct obstack *html_bfr)
+{
+  gchar tbuff[1024];
+
+  obstack_append_string (html_bfr, "<DIV ALIGN=LEFT>\n");
+  obstack_append_string (html_bfr, "<TABLE BORDER=0 WIDTH=\"100\%\">\n");
+
+  if (message->date)
+    header2row ("Date:", message->date, html_bfr);
+
+  if (message->to_list)
+    header2row ("To:", make_string_from_list (message->to_list), html_bfr);
+
+  if (message->cc_list)
+    header2row ("cc:", make_string_from_list (message->cc_list), html_bfr);
+
+  if (message->from)
+    {
+      if (message->from->personal)
+	snprintf (tbuff, 1024, "%s <%s>",
+		  message->from->personal,
+		  message->from->mailbox);
+      else
+	snprintf (tbuff, 1024, "%s", message->from->mailbox);
+
+      header2row ("From:", tbuff, html_bfr);
+    }
+
+  if (message->subject)
+    header2row ("Subject:", message->subject, html_bfr);
+
+  obstack_append_string (html_bfr, "</TABLE>\n");
+  obstack_append_string (html_bfr, "</DIV>\n");
+}
 
 gchar *
 content2html (Message * message)
 {
   GList *body_list;
   Body *body;
-  gchar tbuff[1024];
   FILE *msg_stream;
   gchar msg_filename[PATH_MAX];
   static struct obstack *html_buffer = 0;
@@ -413,55 +461,11 @@ content2html (Message * message)
     }
 
 
-  obstack_append_string (html_buffer, "<html><body bgcolor=#ffffff><p>");
+  obstack_append_string (html_buffer, "<HTML>\n");
+  obstack_append_string (html_buffer, "<HEAD><TITLE>Message</TITLE></HEAD>\n");
+  obstack_append_string (html_buffer, "<BODY BGCOLOR=\"#FFFFFF\">\n");
 
-  if (message->date)
-    {
-      obstack_append_string (html_buffer, "<b>Date: </b>");
-      /* date */
-      text2html (message->date, html_buffer);
-    }
-
-  if (message->to_list)
-    {
-      obstack_append_string (html_buffer, "<br><b>To: </b>");
-
-      /* to */
-      text2html (make_string_from_list (message->to_list), html_buffer);
-    }
-
-  if (message->cc_list)
-    {
-      obstack_append_string (html_buffer, "<br><b>cc: </b>");
-
-      /* cc */
-      text2html (make_string_from_list (message->cc_list), html_buffer);
-    }
-
-  if (message->from)
-    {
-      obstack_append_string (html_buffer, "<br><b>From: </b>");
-
-      /* from */
-      if (message->from->personal)
-	snprintf (tbuff, 1024, "%s <%s>",
-		  message->from->personal,
-		  message->from->mailbox);
-      else
-	snprintf (tbuff, 1024, "%s", message->from->mailbox);
-
-      text2html (tbuff, html_buffer);
-    }
-
-  if (message->subject)
-    {
-      obstack_append_string (html_buffer, "<br><b>Subject: </b>");
-
-      /* subject */
-      text2html (message->subject, html_buffer);
-    }
-
-  obstack_append_string (html_buffer, "<br></p><p>");
+  headers2html (message, html_buffer);
 
   switch (message->mailbox->type)
     {
@@ -494,7 +498,7 @@ content2html (Message * message)
       part2html (body->mutt_body, msg_stream, html_buffer);
       body_list = g_list_next (body_list);
     }
-  obstack_append_string (html_buffer, "</p></body></html>");
+  obstack_append_string (html_buffer, "</TT></P>\n</BODY></HTML>");
   obstack_1grow (html_buffer, '\0');
   html_buffer_content = obstack_finish (html_buffer);
   return html_buffer_content;

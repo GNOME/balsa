@@ -200,6 +200,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     LibBalsaServer *server;
     gboolean remove_tmp = TRUE;
     gchar *msgbuf;
+    gchar *mhs;
     
     if (!m->check) return;
 
@@ -232,7 +233,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     close(tmp_file);
     unlink(tmp_path);
 
-    if( mkdir(tmp_path, 0600) < 0 ) {
+    if( mkdir(tmp_path, 0700) < 0 ) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("POP3 mailbox %s temp file error:\n%s"), 
 			     mailbox->name,
@@ -240,6 +241,11 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	g_free(tmp_path);
 	return;	
     }
+    
+    mhs = g_strdup_printf ( "%s/.mh_sequences", tmp_path );
+    creat( mhs, 0600);
+    /* we fake a real mh box - it's good enough */
+    
 
     status =  m->filter 
 	? libbalsa_fetch_pop_mail_filter (m, uid, m->filter_cmd,
@@ -293,10 +299,14 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	}
     }
     libbalsa_mailbox_close(tmp_mailbox);
+    
     g_object_unref(G_OBJECT(tmp_mailbox));	
-    if(remove_tmp) 
-	unlink(tmp_path);
+    if(remove_tmp) { 
+	unlink(mhs);
+	unlink(tmp_path); /* if there are messages left over this fails */
+    }
     g_free(tmp_path);
+    g_free(mhs);
 }
 
 

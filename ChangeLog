@@ -1,3 +1,8 @@
+2003-10-01  Pawel Salek <pawsa theochem.kth.se>
+
+	* libbalsa/mailbox_{mbox,mh,pop3}.c:
+	* libbalsa/pop3.c: merge HEAD.
+
 2003-10-01 15:16  PeterB
 
 	* libbalsa/mailbox.c: Avoid filters warning if there aren't any;

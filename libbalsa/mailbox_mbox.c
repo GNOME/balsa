@@ -872,7 +872,7 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     char date_string[27];
     const char *sender;
     gchar *address;
-    char *brack;
+    const gchar *brack;
     gchar *from = NULL;
     ssize_t flen;
     const char *path;
@@ -893,16 +893,16 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
 
     sender = g_mime_message_get_sender(msg);
     if ( (brack = strrchr( sender, '<' )) ) {
-        char * a = strrchr ( brack , '>' );
-        if (a) {
-            *a = '\0';
-            address = g_strdup (brack+1);
-        } else
-            address = "none";
+        const gchar * a = strrchr ( brack , '>' );
+        if (a)
+            address = g_strndup(brack + 1, a - brack - 1);
+        else
+            address = g_strdup("none");
     } else {
-        address = (gchar *)sender;
+        address = g_strdup(sender);
     }
     from = g_strdup_printf ("From %s %s", address, date_string );
+    g_free(address);
     
     path = libbalsa_mailbox_local_get_path(mailbox);
     /* open in read-write mode */
@@ -952,9 +952,9 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
  
  AMCLEANUP:
     g_mime_stream_unref ( GMIME_STREAM(orig) );
-    g_mime_stream_unref ( GMIME_STREAM(dest) );
     g_object_unref ( G_OBJECT(message ) );  
     mbox_unlock (mailbox, dest);
+    g_mime_stream_unref ( GMIME_STREAM(dest) );
     UNLOCK_MAILBOX(mailbox);
     g_free(from);
     return 1;

@@ -1,6 +1,10 @@
+2001-08-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* imap/browse.c: quoted namespaces fix.
+
 2001-08-03  Pawel Salek  <pawsa@theochem.kth.se>
 
-	* imap/command.c: quoted namespaces fix.
+	* imap/command.c: imap_next_word() fix for quoted strings.
 
 2001-07-31  Pawel Salek  <pawsa@theochem.kth.se>
 

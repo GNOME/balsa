@@ -499,6 +499,10 @@ static int browse_get_namespace (IMAP_DATA* idata, char* nsbuf, int nsblen,
 		ns[n++] = *s;
 		s++;
 	      }
+	      /* skip trailing ", if we found one, otherwise
+	       * imap_next_word will get confused */
+	      if (*s)
+		s++;
 	    }
 	    else
 	      while (*s && !ISSPACE (*s)) 

@@ -28,6 +28,13 @@
 #ifndef _FILTER_PRIVATE_H
 #define _FILTER_PRIVATE_H
 
+#ifdef HAVE_PCRE
+#  include <pcreposix.h>
+#else
+#  include <sys/types.h>
+#  include <regex.h>
+#endif
+
 /* regex options */
 #define FILTER_REGCOMP       (REG_NEWLINE | REG_NOSUB | REG_EXTENDED)
 #define FILTER_REGEXEC       0

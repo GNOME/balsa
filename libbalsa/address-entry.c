@@ -949,10 +949,10 @@ libbalsa_address_entry_draw(GtkWidget * widget, GdkRectangle * area)
     GtkEditable *editable = GTK_EDITABLE(widget);
     LibBalsaAddressEntry *address_entry = LIBBALSA_ADDRESS_ENTRY(widget);
     
-    if (editable->has_selection)
-        /* there's a real selection */
+    if (editable->has_selection || !GTK_WIDGET_HAS_FOCUS(widget))
         (*GTK_WIDGET_CLASS(parent_class)->draw) (widget, area);
     else {
+        /* highlight the expansion text by faking a selection */
         gint start = editable->selection_start_pos;
         gint end = editable->selection_end_pos;
         gint xoffset;

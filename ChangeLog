@@ -2,7 +2,7 @@
 
 	* help/C/balsa.sgml: add message window title doc.
 	* libbalsa/address-entry.[hc]: remove most of the code without
-	affecting functionality much. 
+	affecting functionality. (#70225)
 	* libbalsa/files.[hc]: do not print senseless warnings.
 	* libbalsa/message.[hc]: implement libbalsa_message_title().
 	* libbalsa/misc.[hc]: implement truncate_string()

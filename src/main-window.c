@@ -2595,12 +2595,21 @@ static void
 view_msg_source_cb(GtkWidget * widget, gpointer data)
 {
     BalsaWindow *bw;
+    GtkWidget *bindex;
+    GList *messages, *list;
     bw = BALSA_WINDOW(data);
-    if (bw->preview) {
-        LibBalsaMessage * msg = BALSA_MESSAGE(bw->preview)->message;
-        libbalsa_show_message_source(msg, balsa_app.message_font,
-                                     &balsa_app.source_escape_specials);
+
+    bindex = balsa_window_find_current_index(bw);
+    g_return_if_fail(bindex);
+    messages = balsa_index_selected_list(BALSA_INDEX(bindex));
+    for (list = messages; list; list = list->next) {
+	LibBalsaMessage *message = list->data;
+
+	libbalsa_show_message_source(message, balsa_app.message_font,
+				     &balsa_app.source_escape_specials);
     }
+
+    g_list_free(messages);
 }
 
 static void

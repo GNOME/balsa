@@ -439,6 +439,18 @@ libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
 
 #define LIBBALSA_MAILBOX_COUNT "libbalsa-mailbox-count"
 
+static gboolean
+lbm_rethread(LibBalsaMailbox*m)
+{
+    gdk_threads_enter();
+    LOCK_MAILBOX(m);
+    lbm_set_threading(m, m->view->threading_type);
+    UNLOCK_MAILBOX(m);
+    g_object_unref(G_OBJECT(m));
+    gdk_threads_leave();
+    return FALSE;
+}
+
 void
 libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 {
@@ -452,8 +464,10 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
     g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_COUNT, &added);
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->check(mailbox);
     g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_COUNT, NULL);
-    if (added)
-	lbm_set_threading(mailbox, mailbox->view->threading_type);
+    if (added) {
+        g_object_ref(G_OBJECT(mailbox));
+        g_idle_add((GSourceFunc)lbm_rethread, mailbox);
+    }
 
     UNLOCK_MAILBOX(mailbox);
 

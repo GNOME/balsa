@@ -525,15 +525,23 @@ pthread_mutex_t mailbox_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t mailbox_cond = PTHREAD_COND_INITIALIZER;
 
 /* Lock/unlock a mailbox; no argument checking--we'll assume the caller
- * took care of that. */
-
+ * took care of that. 
+ * We assume that this function is called for helper threads without gdk lock
+ * since they usually do not have it but WITH for the main lock - which 
+ * usually has it.
+ */
 void
 libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
 {
     pthread_t thread_id = pthread_self();
-    pthread_mutex_lock(&mailbox_lock);
-    while (mailbox->lock && mailbox->thread_id != thread_id)
+    gboolean is_main_thread =
+	(thread_id == libbalsa_get_main_thread());
+
+    while (mailbox->lock && mailbox->thread_id != thread_id) {
+        if(is_main_thread) gdk_threads_leave();
 	pthread_cond_wait(&mailbox_cond, &mailbox_lock);
+        if(is_main_thread) gdk_threads_enter();
+    }
     /* We'll assume that no-one would destroy a mailbox while we've been
      * trying to lock it. If they have, we have larger problems than
      * this reference! */

@@ -555,11 +555,27 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
 /* Forward reference. */
 static void lbm_imap_get_unseen(LibBalsaMailboxImap * mimap);
 
+static gboolean
+update_counters_and_filter(void *data)
+{
+    LibBalsaMailbox *mailbox= (LibBalsaMailbox*)data;
+
+    gdk_threads_enter();
+    LOCK_MAILBOX(mailbox);
+    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
+    lbm_imap_get_unseen(LIBBALSA_MAILBOX_IMAP(mailbox));
+    UNLOCK_MAILBOX(mailbox);
+    gdk_threads_leave();
+    g_object_unref(G_OBJECT(mailbox));
+    return FALSE;
+}
+
 static void
 imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
 {
     unsigned cnt = imap_mbox_handle_get_exists(mimap->handle);
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
+
     if(cnt<mimap->messages_info->len) { /* remove messages */
         printf("%s: expunge ignored?\n", __func__);
     } else if (cnt > mimap->messages_info->len) { /* new messages arrived */
@@ -567,11 +583,7 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
 	struct message_info a = {0};
 	gboolean locked;
 
-	/* EXISTS response may result from:
-	 * - mailbox check, in which case the mailbox is locked;
-	 * - mailbox expunge, in which case the mailbox is locked;
-	 * - server keepalive noop, in which case it isn't;
-	 * ...so we check. */
+	/* EXISTS response may result from any IMAP action. */
 	locked = HAVE_MAILBOX_LOCKED(mailbox);
 	if (!locked)
 	    LOCK_MAILBOX(mailbox);
@@ -582,10 +594,12 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
             libbalsa_mailbox_msgno_inserted(mailbox, i);
         } while (++i <= cnt);
 
-	/* iters have been invalidated by
-	 * libbalsa_mailbox_msgno_inserted(). */
-	libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
-	lbm_imap_get_unseen(mimap);
+        /* we run filters and get unseen messages in a idle callback:
+         * these things do not need to be done immediately and we do 
+         * not want to issue too many new overlapping IMAP requests.
+         */
+        g_object_ref(G_OBJECT(mailbox));
+        g_idle_add(update_counters_and_filter, mailbox);
 
 	if (!locked)
 	    UNLOCK_MAILBOX(mailbox);

@@ -560,9 +560,11 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 	    r = FALSE;
     }
 
-    if (d)
+    if (d) {
         libbalsa_messages_change_flag (d, LIBBALSA_MESSAGE_FLAG_DELETED,
                                        TRUE);
+	libbalsa_mailbox_set_threading(dest, dest->view->threading_type);
+    }
 
     libbalsa_mailbox_check(dest);
     return r;
@@ -604,6 +606,7 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
 {
     LibBalsaMessage *message;
     GList *p;
+    gboolean rethread = FALSE;
 
     g_return_val_if_fail(messages != NULL, FALSE);
     g_return_val_if_fail(dest != NULL, FALSE);
@@ -611,8 +614,12 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
     for(p=messages; p; 	p=g_list_next(p)) {
 	message=LIBBALSA_MESSAGE(p->data);
 	if(message->mailbox==NULL) continue;
-	libbalsa_mailbox_copy_message(message, dest);
+	if (libbalsa_mailbox_copy_message(message, dest))
+	    rethread = TRUE;
     }
+
+    if (rethread)
+	libbalsa_mailbox_set_threading(dest, dest->view->threading_type);
 
     libbalsa_mailbox_check(dest);
     return TRUE;

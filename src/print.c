@@ -1262,8 +1262,8 @@ print_dialog(CommonInfo * ci)
     frame = gtk_frame_new(_("Highlight cited text"));
     gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
     gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 3);    
-    chkbut = 
-	gtk_check_button_new_with_label ("enable highlighting of cited text");
+    chkbut = gtk_check_button_new_with_mnemonic
+	(_("_Enable highlighting of cited text"));
     g_signal_connect(G_OBJECT(chkbut), "toggled",
 		     G_CALLBACK(togglebut_changed), 
 		     &balsa_app.print_highlight_cited);    

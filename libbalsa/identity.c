@@ -19,9 +19,9 @@
  * 02111-1307, USA.
  */
 
-#include <gnome.h>
-
 #include "config.h"
+
+#include <gnome.h>
 #include "identity.h"
 #include "information.h"
 

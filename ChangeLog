@@ -1,3 +1,8 @@
+2003-03-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/print.c: mark a string for translation.
+	* libbalsa/identity.c: enable NLS.
+
 2003-03-11 17:17  PeterB
 
 	* src/balsa-index.c: Don't clear the index when it's not empty.

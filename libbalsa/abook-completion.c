@@ -112,6 +112,9 @@ strncmp_word(const gchar * s1, const gchar * s2, gsize n)
     const gchar *match;
     gint retval;
 
+    g_return_val_if_fail(s1 != NULL, -1);
+    g_return_val_if_fail(s2 != NULL, 1);
+
     match = s2;
     do {
 	if (!(retval = strncmp(s1, match, n)))

@@ -1,3 +1,8 @@
+2004-11-05  Carlos Morgado  <chbm gnome.org>
+
+	* libbalsa/abook-completion.c: fix segfault on strncmp_word
+	(glibc strncmp is sucking)
+
 2004-11-06 09:41  PeterB
 
 	* libbalsa/: abook-completion.c, abook-completion.h,

@@ -27,8 +27,10 @@ all: $(website_DATA)
 dist-hook:
 	mkdir $(distdir)/images
 	-cp $(srcdir)/images/*.jpg $(distdir)/images
+	-cp $(srcdir)/images/*.png $(distdir)/images
 	mkdir $(distdir)/screens
 	-cp $(srcdir)/screens/*.jpg $(distdir)/screens
+	-cp $(srcdir)/screens/*.png $(distdir)/screens
 
 install-data-local: $(website_DATA)
 	$(mkinstalldirs) $(DESTDIR)$(websitedir)/images
@@ -36,8 +38,16 @@ install-data-local: $(website_DATA)
 		basefile=`basename $$file`; \
 		$(INSTALL_DATA) $$file $(DESTDIR)$(websitedir)/images/$$basefile; \
 	done
+	-for file in $(srcdir)/images/*.png; do \
+		basefile=`basename $$file`; \
+		$(INSTALL_DATA) $$file $(DESTDIR)$(websitedir)/images/$$basefile; \
+	done
 	$(mkinstalldirs) $(DESTDIR)$(websitedir)/screens
 	-for file in $(srcdir)/screens/*.jpg; do \
+		basefile=`basename $$file`; \
+		$(INSTALL_DATA) $$file $(DESTDIR)$(websitedir)/screens/$$basefile; \
+	done
+	-for file in $(srcdir)/screens/*.png; do \
 		basefile=`basename $$file`; \
 		$(INSTALL_DATA) $$file $(DESTDIR)$(websitedir)/screens/$$basefile; \
 	done

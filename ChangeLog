@@ -1,3 +1,11 @@
+2001-07-13  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* README, NEWS, configure.in: release balsa-1.1.7
+	* src/sendmsg-window.[hc]: use identity data to select
+	signature (christophe barbe <christophe.barbe.ml@online.fr>).
+	* balsa.1.in: add information about recently added command line
+	options.
+
 2001-07-12  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/mailbox-node.c: Peter Bloomfield's <bloomfld@eos.ncsu.edu> 

@@ -75,7 +75,7 @@
 
 #define GNOME_MIME_BUG_WORKAROUND 1
 
-static gchar *read_signature(void);
+static gchar *read_signature(BalsaSendmsg *msg);
 static gint include_file_cb(GtkWidget *, BalsaSendmsg *);
 static gint send_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint send_message_toolbar_cb(GtkWidget *, BalsaSendmsg *);
@@ -647,6 +647,7 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
      * the signature if path changed */
 
     /* update the current messages identity */
+	msg->ident=ident;
 }
 
 
@@ -1294,7 +1295,7 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
     else
 	body = g_string_new("");
 
-    if ((signature = read_signature()) != NULL) {
+    if ((signature = read_signature(msg)) != NULL) {
 	if (((type == SEND_REPLY || type == SEND_REPLY_ALL || type == SEND_REPLY_GROUP) &&
 	     balsa_app.current_ident->sig_whenreply) ||
 	    (type == SEND_FORWARD && balsa_app.current_ident->sig_whenforward) ||
@@ -1330,7 +1331,7 @@ static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *msg)
     gchar *signature;
     gint pos=gtk_editable_get_position(GTK_EDITABLE(msg->text));
     
-    if ((signature = read_signature()) != NULL) {
+    if ((signature = read_signature(msg)) != NULL) {
 	if (balsa_app.current_ident->sig_separator
 	    && g_strncasecmp(signature, "--\n", 3)
 	    && g_strncasecmp(signature, "-- \n", 4)) {
@@ -1455,6 +1456,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->font     = NULL;
     msg->charset  = NULL;
     msg->locale   = NULL;
+    msg->ident = balsa_app.current_ident;
     msg->update_config = FALSE;
 
     switch (type) {
@@ -1706,17 +1708,17 @@ sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
 }
 
 static gchar *
-read_signature(void)
+read_signature(BalsaSendmsg *msg)
 {
     FILE *fp;
     size_t len;
     gint siglen;
     gchar *ret, *p, *sigpath;
 
-    if (balsa_app.current_ident->signature_path == NULL)
+    if (msg->ident->signature_path == NULL)
 	return NULL;
 
-    for (p = balsa_app.current_ident->signature_path; 
+    for (p = msg->ident->signature_path; 
 	 *p != '|' && *p != '\0'; p++);
     /* Signature is a path to a program */
     if (*p == '|') {
@@ -1736,7 +1738,7 @@ read_signature(void)
     }
     /* Signature is just a regular file. */
     else {
-	if (!(fp = fopen(balsa_app.current_ident->signature_path, "r")))
+	if (!(fp = fopen(msg->ident->signature_path, "r")))
 	    return NULL;
 	len = libbalsa_readfile_nostat(fp, &ret);
 	fclose(fp);

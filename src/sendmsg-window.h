@@ -55,7 +55,8 @@ extern "C" {
 	const gchar *charset;
 	const gchar *locale;
 	GtkWidget *current_language_menu;
-
+	/* identity related data */
+	LibBalsaIdentity* ident;
 	/* widgets to be disabled when the address is incorrect */
 	GtkWidget *ready_widgets[3];
 	GtkWidget *view_checkitems[VIEW_MENU_LENGTH];

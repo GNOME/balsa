@@ -80,14 +80,16 @@ Libraries:
 	Balsa uses libESMTP library available at 
 http://www.stafford.uklinux.net/libesmtp/
 The current version is available at
-http://www.stafford.uklinux.net/libesmtp/libesmtp-0.8.1.tar.bz2
+http://www.stafford.uklinux.net/libesmtp/libesmtp-0.8.3.tar.bz2
 or
-http://www.stafford.uklinux.net/libesmtp/libesmtp-0.8.1.tar.gz
-You can find links to binary rpm at balsa website.
+http://www.stafford.uklinux.net/libesmtp/libesmtp-0.8.3.tar.gz
 
 Note, that it the current version requires --enable-require-all-recipents
 option to the configure script. You can grab {i386,src}.rpm that has
-this option enabled from ftp://ftp.chbm.nu/pub/
+this option enabled from ftp://ftp.chbm.nu/pub/ (built on RH 6.2)
+or from
+http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.8.3-1.i386.rpm
+http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.8.3-1.src.rpm
 	
 	The binaries are compiled against gnome-libs-1.2.13, if you use
 older libraries, you will need to recompile balsa from the source.  Balsa 

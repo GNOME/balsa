@@ -11,11 +11,16 @@ Balsa - the GNOME email client.
 .RB [ \-m 
 .IR USER@HOST.TLD ] 
 .RB [ \-\^\-compose=\fIUSER@HOST.TLD\fP ] 
+.RB [ \-a 
+.IR FILENAME ] 
+.RB [ \-\^\-attach=\fIFILENAME\fP ] 
 .RB [ \-o 
 .IR MAILBOX ]  
 .RB [ \-\^\-open\-mailbox=\fIMAILBOX\fP ] 
 .RB [ \-u ] 
 .RB [ \-\^\-open\-unread\-mailbox ]
+.RB [ \-d ] 
+.RB [ \-\^\-debug\-pop ]
 
 
 .SH DESCRIPTION
@@ -37,12 +42,22 @@ protocol handler by setting the mailto protocol command to balsa -m
 "%s" in URL handlers section of GNOME control center.
 
 .TP
+.BI \-a " FILENAME" "\fR,\fP \-\^\-attach=" FILENAME
+When invoked with this option, balsa will open a new message with the
+specified file already attached to the message.
+
+.TP
 .BI \-o " MAILBOX" "\fR,\fP \-\^\-open-mailbox=" MAILBOX
 Balsa will open automatically at startup the mailbox or mailboxes specified on the command line with this option.  Multiple mailboxes are delimited by semicolons.
 
 .TP
 .BR \-u ", " \-\^\-open-unread-mailbox
 Open the first unread mailbox when balsa is launched.
+
+.TP
+.BR \-d ", " \-\^\-debug-pop
+Dumps the POP3 communication to stderr. Useful for debugging POP3 
+connections.
 
 .SH WEBSITE
 http://www.balsa.net/

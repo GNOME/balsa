@@ -1,3 +1,15 @@
+2002-06-05  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/filter.c:
+	* src/balsa-{app.[hc],index.c,mblist.[hc]}:
+	* src/mailbox-{conf,node}.c, main{,-window}.c
+	* src/{message,sendmsg}-window.c: 
+	* src/save-restore.c: (#84220) centralize Balsa's `find by ...'
+	functions in src/balsa-app.c, and replace `find by name' with
+	`find_by_url' where it was easy to do so. They also simplify the
+	`most recently used' code by using the new search functions.
+	* configure.in: with-esmtp accepts a parameter (#83592). (PS)
+
 2002-06-03  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox_imap.c: access cache in binary mode to preserve

@@ -2525,63 +2525,34 @@ show_all_headers_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-threading_flat_cb(GtkWidget * widget, gpointer data)
+set_threading_type(BalsaIndexThreadingType type)
 {
     GtkWidget *index;
-    GNode *gnode;
     
-    if(!GTK_CHECK_MENU_ITEM(widget)->active) return;
     index = balsa_window_find_current_index(balsa_app.main_window);
     g_return_if_fail(index);
-    balsa_mailbox_nodes_lock(FALSE);
-    gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, 
-                                    BALSA_INDEX(index)->mailbox_node->mailbox);
-    balsa_mailbox_nodes_unlock(FALSE);
-    g_return_if_fail(gnode);
-    BALSA_MAILBOX_NODE(gnode->data)->threading_type = 
-        BALSA_INDEX_THREADING_FLAT;
-    balsa_index_set_threading_type(BALSA_INDEX(index), 
-                                   BALSA_INDEX_THREADING_FLAT);
+    balsa_index_set_threading_type(BALSA_INDEX(index), type);
+}
+
+static void
+threading_flat_cb(GtkWidget * widget, gpointer data)
+{
+    if (GTK_CHECK_MENU_ITEM(widget)->active)
+        set_threading_type(BALSA_INDEX_THREADING_FLAT);
 }
 
 static void
 threading_simple_cb(GtkWidget * widget, gpointer data)
 {
-    GtkWidget *index;
-    GNode *gnode;
-
-    if(!GTK_CHECK_MENU_ITEM(widget)->active) return;
-    index = balsa_window_find_current_index(balsa_app.main_window);
-    g_return_if_fail(index);
-    balsa_mailbox_nodes_lock(FALSE);
-    gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, 
-                                    BALSA_INDEX(index)->mailbox_node->mailbox);
-    balsa_mailbox_nodes_unlock(FALSE);
-    g_return_if_fail(gnode);
-    BALSA_MAILBOX_NODE(gnode->data)->threading_type = 
-        BALSA_INDEX_THREADING_SIMPLE;
-   balsa_index_set_threading_type(BALSA_INDEX(index),
-                                   BALSA_INDEX_THREADING_SIMPLE);
+    if (GTK_CHECK_MENU_ITEM(widget)->active)
+        set_threading_type(BALSA_INDEX_THREADING_SIMPLE);
 }
 
 static void
 threading_jwz_cb(GtkWidget * widget, gpointer data)
 {
-    GtkWidget *index;
-    GNode *gnode;
-
-    if(!GTK_CHECK_MENU_ITEM(widget)->active) return;
-    index = balsa_window_find_current_index(balsa_app.main_window);
-    g_return_if_fail(index);
-    balsa_mailbox_nodes_lock(FALSE);
-    gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, 
-                                    BALSA_INDEX(index)->mailbox_node->mailbox);
-    balsa_mailbox_nodes_unlock(FALSE);
-    g_return_if_fail(gnode);
-    BALSA_MAILBOX_NODE(gnode->data)->threading_type = 
-        BALSA_INDEX_THREADING_JWZ;
-    balsa_index_set_threading_type(BALSA_INDEX(index),
-                                        BALSA_INDEX_THREADING_JWZ);
+    if (GTK_CHECK_MENU_ITEM(widget)->active)
+        set_threading_type(BALSA_INDEX_THREADING_JWZ);
 }
 
 static void

@@ -422,8 +422,8 @@ main(int argc, char *argv[])
 	gtk_idle_add((GtkFunction) initial_open_inbox, NULL);
 
     if (cmd_line_open_mailboxes) {
-	gchar **names = g_strsplit(cmd_line_open_mailboxes, ";", 20);
-	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb, names);
+	gchar **urls = g_strsplit(cmd_line_open_mailboxes, ";", 20);
+	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb, urls);
     }
     signal( SIGPIPE, SIG_IGN );
 

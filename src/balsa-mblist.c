@@ -127,10 +127,6 @@ static gboolean bmbl_find_all_unread_mboxes_func(GtkTreeModel * model,
                                                  GtkTreePath * path,
                                                  GtkTreeIter * iter,
                                                  gpointer data);
-static gboolean bmbl_find_mbox_by_name_func(GtkTreeModel * model,
-                                            GtkTreePath * path,
-                                            GtkTreeIter * iter,
-                                            gpointer data);
 static gboolean bmbl_disconnect_mailbox_signals(GtkTreeModel * model,
                                                 GtkTreePath * path,
                                                 GtkTreeIter * iter,
@@ -881,46 +877,6 @@ balsa_mblist_find_all_unread_mboxes(void)
     return res;
 }
 
-/* mblist_find_mbox_by_name:
-   search the mailboxes tree for given name.
-*/
-static gboolean
-bmbl_find_mbox_by_name_func(GtkTreeModel * model, GtkTreePath * path,
-                              GtkTreeIter * iter, gpointer data)
-{
-    BalsaMailboxNode *mbn = data, *mbnode;
-
-    gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
-    if (mbnode->mailbox && !strcmp(mbnode->mailbox->name, mbn->name)) {
-        mbn->mailbox = mbnode->mailbox;
-        return TRUE;
-    }
-
-    return FALSE;
-}
-
-LibBalsaMailbox *
-balsa_mblist_find_mbox_by_name(GtkTreeStore * store, const gchar * name)
-{
-    GtkTreeModel *model;
-    /* convenient structure to contain a name and a mailbox: */
-    BalsaMailboxNode mbnode;
-
-    g_return_val_if_fail(store, NULL);
-    g_return_val_if_fail(name, NULL);
-
-    model = GTK_TREE_MODEL(store);
-    mbnode.name = g_strdup(name);
-    mbnode.mailbox = NULL;
-    gtk_tree_model_foreach(model, bmbl_find_mbox_by_name_func, &mbnode);
-    if (!mbnode.mailbox)
-        g_print("mblist_find_mbox_by_name: Mailbox '%s' not found\n",
-                name);
-    g_free(mbnode.name);
-
-    return mbnode.mailbox;
-}
-
 /* mblist_open_mailbox
  * 
  * Description: This checks to see if the mailbox is already on a different
@@ -933,12 +889,21 @@ balsa_mblist_open_mailbox(LibBalsaMailbox * mailbox)
     GtkWidget *page = NULL;
     int i, c;
     GNode *gnode;
+    BalsaMailboxNode *mbnode;
 
+    gdk_threads_leave();
     balsa_mailbox_nodes_lock(FALSE);
-    gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
+    gnode = balsa_find_mailbox(balsa_app.mailbox_nodes, mailbox);
+    if (gnode)
+        mbnode = gnode->data;
+    else {
+        mbnode = NULL;
+        g_warning(_("Failed to find mailbox"));
+    }
     balsa_mailbox_nodes_unlock(FALSE);
-
-    g_return_if_fail(gnode);
+    gdk_threads_enter();
+    if (!gnode)
+        return;
 
     c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
 
@@ -982,8 +947,7 @@ balsa_mblist_open_mailbox(LibBalsaMailbox * mailbox)
 				   ((BALSA_INDEX(page)->ctree)),
 				   6, balsa_app.index_size_width);
     } else { /* page with mailbox not found, open it */
-	balsa_window_open_mbnode(balsa_app.main_window, 
-				 BALSA_MAILBOX_NODE(gnode->data));
+	balsa_window_open_mbnode(balsa_app.main_window, mbnode);
 
 	if (balsa_app.mblist->display_info)
 	    balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
@@ -997,13 +961,23 @@ void
 balsa_mblist_close_mailbox(LibBalsaMailbox * mailbox)
 {
     GNode *gnode;
+    BalsaMailboxNode *mbnode;
     
+    gdk_threads_leave();
     balsa_mailbox_nodes_lock(FALSE);
-    gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes,mailbox);
+    gnode = balsa_find_mailbox(balsa_app.mailbox_nodes,mailbox);
+    if (gnode)
+        mbnode = gnode->data;
+    else {
+        mbnode = NULL;
+        g_warning(_("Failed to find mailbox"));
+    }
     balsa_mailbox_nodes_unlock(FALSE);
-    g_return_if_fail(gnode);
-    balsa_window_close_mbnode(balsa_app.main_window, 
-			      BALSA_MAILBOX_NODE(gnode->data));
+    gdk_threads_enter();
+    if (!gnode)
+        return;
+
+    balsa_window_close_mbnode(balsa_app.main_window, mbnode);
 }
 
 /* balsa_mblist_default_signal_bindings:

@@ -38,12 +38,11 @@
 /* FOLDER_MRU_LENGTH: max length of the recently used mailbox list */
 const static guint FOLDER_MRU_LENGTH = 10;
 
+typedef struct _MessageWindow MessageWindow;
 struct BalsaMRUEntry
 {
     LibBalsaMailbox *mailbox;
-    gchar *url; /* FIXME: purpose (copied from mailbox?) */
-    char *name; /* FIXME: purpose (copied from mailbox?) */
-    gpointer mw; /* FIXME: purpose? more descriptive name? */
+    MessageWindow *mw;
 };
 
 /* callbacks */
@@ -78,7 +77,6 @@ static void next_flagged_cb(GtkWidget * widget, gpointer);
 static void print_cb(GtkWidget * widget, gpointer);
 static void trash_cb(GtkWidget * widget, gpointer);
 
-static gint find_url_cb(GNode *node, struct BalsaMRUEntry *data);
 static void mru_select_cb(GtkWidget *widget, struct BalsaMRUEntry *entry);
 
 /*
@@ -192,7 +190,6 @@ static GnomeUIInfo main_menu[] = {
     GNOMEUIINFO_END
 };
 
-typedef struct _MessageWindow MessageWindow;
 struct _MessageWindow {
     GtkWidget *window;
 
@@ -784,28 +781,6 @@ transfer_message_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column,
     close_message_window(NULL, (gpointer) mw);
 }
 
-static gint
-find_url_cb(GNode *gnode, struct BalsaMRUEntry *data)
-{
-    BalsaMailboxNode *node;
-    
-    node=gnode->data;
-    if(!node || !BALSA_IS_MAILBOX_NODE(node))
-	return(FALSE);
-    
-    if(!node->mailbox)
-	return(FALSE);
-    
-    if(!strcmp(LIBBALSA_MAILBOX(node->mailbox)->url, data->url)) {
-	data->url=LIBBALSA_MAILBOX(node->mailbox)->url;
-	data->name=LIBBALSA_MAILBOX(node->mailbox)->name;
-	data->mailbox=LIBBALSA_MAILBOX(node->mailbox);
-	return TRUE;
-    }
-	
-    return FALSE;
-}
-
 static void
 load_mru(MessageWindow * mw)
 {
@@ -817,25 +792,19 @@ load_mru(MessageWindow * mw)
     for(mru=balsa_app.folder_mru; mru; mru = g_list_next(mru)) {
 	mru_entry=g_malloc(sizeof(struct BalsaMRUEntry));
 	
-	mru_entry->url=mru->data;
-	mru_entry->mailbox=NULL;
+	mru_entry->mailbox = balsa_find_mailbox_by_url(mru->data);
 	mru_entry->mw=mw;
-        balsa_mailbox_nodes_lock(FALSE);
-	g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_ALL,
-			-1, (gint (*)(GNode *, gpointer))find_url_cb, 
-			mru_entry);
-        balsa_mailbox_nodes_unlock(FALSE);
 
 	if(mru_entry->mailbox == NULL) {
 	    /* could not find mailbox of given URL; *
-         * something changed since the MRUs     *
-         * were last saved; just skip it:       */
+             * something changed since the MRUs     *
+             * were last saved; just skip it:       */
 	    g_free(mru_entry);
-        continue;
+            continue;
 	}
 	
 	mw->mru_list = g_list_append(mw->mru_list, mru_entry);
-	item = gtk_menu_item_new_with_label(mru_entry->name);
+	item = gtk_menu_item_new_with_label(mru_entry->mailbox->name);
 	gtk_widget_show(item);
 	gtk_menu_append(GTK_MENU(GTK_MENU_ITEM(mw->move_menu)->submenu), item);
 	gtk_signal_connect(GTK_OBJECT(item), "activate",

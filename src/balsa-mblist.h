@@ -60,8 +60,6 @@ gboolean balsa_mblist_focus_mailbox(BalsaMBList * mblist,
                                     LibBalsaMailbox * mailbox);
 
 GList *balsa_mblist_find_all_unread_mboxes(void);
-LibBalsaMailbox *balsa_mblist_find_mbox_by_name(GtkTreeStore * store,
-                                                const char *name);
 void balsa_mblist_open_mailbox(LibBalsaMailbox * mailbox);
 void balsa_mblist_close_mailbox(LibBalsaMailbox * mailbox);
 BalsaMailboxNode *balsa_mblist_get_selected_node(BalsaMBList * mblist);

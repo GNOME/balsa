@@ -300,8 +300,10 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 	balsa_app.inbox_input = g_list_remove(balsa_app.inbox_input, 
 					      mbnode);
     } else {
+        /* FIXME: shouldn't we get an exclusive lock on the mailbox
+         * nodes, and hold it until after we've unlinked the gnode ? */
         balsa_mailbox_nodes_lock(FALSE);
-	gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
+	gnode = balsa_find_mailbox(balsa_app.mailbox_nodes, mailbox);
         balsa_mailbox_nodes_unlock(FALSE);
 	if (!gnode) {
 	    fprintf(stderr,
@@ -779,7 +781,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
         balsa_mailbox_nodes_lock(FALSE);
         for(dir = g_strdup(libbalsa_mailbox_local_get_path(mcw->mailbox));
             strlen(dir)>1 /* i.e dir != "/" */ &&
-                !(parent = balsa_app_find_by_dir(balsa_app.mailbox_nodes,dir));
+                !(parent = balsa_find_dir(balsa_app.mailbox_nodes,dir));
             ) {
             gchar* tmp =  g_dirname(dir); g_free(dir);
             dir = tmp;

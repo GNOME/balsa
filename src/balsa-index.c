@@ -59,10 +59,6 @@
 
 struct FolderMRUEntry
 {
-    gchar           *name;    /* FIXME: meaning? NOT NULL *
-			       * shortcut to mailbox->name (i.e not owned) */
-    gchar           *url;     /* FIXME: meaning? allowed values? *
-			       * shortcut to mailbox->url  (i.e not owned) */
     LibBalsaMailbox *mailbox; /* FIXME: meaning? allowed values? */
     BalsaIndex      *bindex;  /* FIXME: meaning? allowed values? */
 };
@@ -153,7 +149,6 @@ static void tree_collapse_cb(GtkCTree * ctree, GList * node,
 static void hide_deleted(BalsaIndex * bindex, gboolean hide);
 
 /* Callbacks */
-static gint mru_search_cb(GNode *node, struct FolderMRUEntry *entry);
 static void mru_select_cb(GtkWidget *widget, struct FolderMRUEntry *entry);
 static void show_bmbl(GtkMenuItem * menuitem, BalsaIndex * bindex);
 
@@ -684,8 +679,7 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
        override default mbost threading type with the global balsa
        default setting
     */
-    mbnode->threading_type = balsa_app.threading_type;
-    balsa_index_set_threading_type(bindex, mbnode->threading_type);
+    balsa_index_set_threading_type(bindex, balsa_app.threading_type);
     balsa_index_set_first_new_message(bindex);
 
     gtk_idle_add((GtkFunction) moveto_handler, bindex);
@@ -2329,6 +2323,7 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
 
     clist = GTK_CLIST(bindex->ctree);
     bindex->threading_type = thtype;
+    bindex->mailbox_node->threading_type = thtype;
     
     gtk_ctree_set_line_style (
             bindex->ctree,
@@ -2480,28 +2475,6 @@ balsa_index_refresh_date (GtkNotebook *notebook,
 				bindex->date_string);
 }
 
-static gint
-mru_search_cb(GNode *gnode, struct FolderMRUEntry *entry)
-{
-    BalsaMailboxNode *node;
-
-    node=gnode->data;
-    if(!node || !BALSA_IS_MAILBOX_NODE(node))
-        return FALSE;
-
-    if(!node->mailbox)
-        return FALSE;
-
-    if(!strcmp(LIBBALSA_MAILBOX(node->mailbox)->url, entry->url)) {
-        entry->url     = LIBBALSA_MAILBOX(node->mailbox)->url;
-        entry->name    = LIBBALSA_MAILBOX(node->mailbox)->name;
-        entry->mailbox = LIBBALSA_MAILBOX(node->mailbox);
-        return TRUE;
-    }
-
-    return FALSE;
-}
-
 static void
 populate_mru(GtkWidget * menu, BalsaIndex * bindex)
 {
@@ -2515,15 +2488,10 @@ populate_mru(GtkWidget * menu, BalsaIndex * bindex)
         if (!mru_entry)
             return;
 
-        mru_entry->url = mru->data;
-        mru_entry->mailbox = NULL;
         mru_entry->bindex = bindex;
-        balsa_mailbox_nodes_lock(FALSE);
-        g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER,
-                        G_TRAVERSE_ALL, -1,
-                        (gint(*)(GNode *, gpointer)) mru_search_cb,
-                        mru_entry);
-        balsa_mailbox_nodes_unlock(FALSE);
+        mru_entry->mailbox =
+            balsa_find_mailbox_by_url(mru->data);
+
         if (mru_entry->mailbox == NULL) {
             g_free(mru_entry);
             tmp = g_list_next(mru);
@@ -2533,7 +2501,7 @@ populate_mru(GtkWidget * menu, BalsaIndex * bindex)
             mru = tmp;
         } else {
             mru_list = g_list_append(mru_list, mru_entry);
-            item = gtk_menu_item_new_with_label(mru_entry->name);
+            item = gtk_menu_item_new_with_label(mru_entry->mailbox->name);
             gtk_widget_show(item);
             gtk_menu_append(GTK_MENU(menu), item);
             gtk_signal_connect(GTK_OBJECT(item), "activate",

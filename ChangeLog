@@ -1,3 +1,10 @@
+2001-02-11  Matthew Guenther  <guentherm@asme.org>
+
+	* src/balsa-index.c: Don't try and select a message if the last
+	one is deleted.
+	* src/pref-manager.c: Use util functions to create tables, more
+	appropriate name for sub-notebook tab.
+
 2001-02-09  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/address-book-vcard.c: KISS: print data directly to file.

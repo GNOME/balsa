@@ -1565,7 +1565,7 @@ create_display_page(gpointer data)
     /* Information messages frame... */
     vbox6 = gtk_vbox_new (FALSE, 0);
     gtk_notebook_append_page (GTK_NOTEBOOK (subnb), vbox6,
-                              gtk_label_new (_("Messages")));
+                              gtk_label_new (_("Status Messages")));
     information_frame = gtk_frame_new(_("Information Messages"));
     gtk_box_pack_start(GTK_BOX(vbox6), information_frame, FALSE, FALSE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(information_frame), 5);
@@ -1639,6 +1639,7 @@ create_display_page(gpointer data)
     gtk_table_attach(GTK_TABLE(information_table), option_menu, 1, 2, 4, 5,
 		     GTK_EXPAND | GTK_FILL, 0, 0, 0);
 
+    /* Color Preferences Page */
     vbox8 = gtk_vbox_new(FALSE, 0);
     gtk_notebook_append_page(GTK_NOTEBOOK(subnb), vbox8,
                              gtk_label_new(_("Colors")));
@@ -1660,7 +1661,8 @@ create_display_page(gpointer data)
 	GTK_BOX(vbox12), _("Quoted text primary color"));
     pui->quoted_color_end = color_box(
 	GTK_BOX(vbox12), _("Quoted text secondary color"));
-    
+
+    /* Fonts Preferences Page */
     vbox9 = gtk_vbox_new(FALSE, 0);
     gtk_notebook_append_page(GTK_NOTEBOOK(subnb), vbox9,
                              gtk_label_new(_("Fonts")));
@@ -1669,9 +1671,7 @@ create_display_page(gpointer data)
     gtk_container_set_border_width(GTK_CONTAINER(font_frame), 5);
     gtk_box_pack_start(GTK_BOX(vbox9), font_frame, FALSE, FALSE, 0);
 
-    table1 = gtk_table_new(10, 3, FALSE);
-    gtk_container_add(GTK_CONTAINER(font_frame), table1);
-    gtk_container_set_border_width(GTK_CONTAINER(table1), 5);
+    table1 = create_table(10, 3, GTK_CONTAINER(font_frame));
     pui->message_font = gtk_entry_new();
     gtk_table_attach(GTK_TABLE(table1), pui->message_font, 0, 1, 1, 2,
 		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -1705,9 +1705,7 @@ create_display_page(gpointer data)
     header_frame = gtk_frame_new(_("Subject Header Font"));
     gtk_container_set_border_width(GTK_CONTAINER(header_frame), 5);
     gtk_box_pack_start(GTK_BOX(vbox9), header_frame, FALSE, FALSE, 0);
-    table2 = gtk_table_new(10, 3, FALSE);
-    gtk_container_add(GTK_CONTAINER(header_frame), table2);
-    gtk_container_set_border_width(GTK_CONTAINER(table2), 5);
+    table2 = create_table(10, 3, GTK_CONTAINER(header_frame));
     pui->subject_font = gtk_entry_new();
     gtk_table_attach(GTK_TABLE(table2), pui->subject_font, 0, 1, 1, 2,
 		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),

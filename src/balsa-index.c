@@ -112,24 +112,17 @@ static GtkTargetEntry index_drag_types[] = {
 };
 
 static gint handler = 0;
+
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
 
 static gboolean idle_handler_cb(GtkWidget * widget);
-static void index_drag_cb (GtkWidget* widget,
-                           GdkDragContext* drag_context,
-                           GtkSelectionData* data,
-                           guint info,
-                           guint time,
-                           gpointer user_data);
-
-/* callbacks */
-/* static void index_select_cb(GtkWidget * widget, LibBalsaMessage * message, */
-/* 			    GdkEventButton *, gpointer data); */
-/* static void index_unselect_cb(GtkWidget * widget, */
-/* 			      LibBalsaMessage * message, GdkEventButton *, */
-/* 			      gpointer data); */
-
+static void balsa_index_drag_cb(GtkWidget* widget,
+                                GdkDragContext* drag_context,
+                                GtkSelectionData* data,
+                                guint info,
+                                guint time,
+                                gpointer user_data);
 static void replace_attached_data(GtkObject * obj, const gchar * key, 
                                   GtkObject * data);
 static GtkWidget* create_menu(BalsaIndex * bindex);
@@ -254,9 +247,9 @@ balsa_index_init(BalsaIndex * bindex)
     GtkObject* adj;
     GdkFont *font;
     int row_height;
+
     
-    /*
-     * status
+    /* status
      * priority
      * attachments
      */
@@ -317,6 +310,8 @@ balsa_index_init(BalsaIndex * bindex)
     gtk_clist_set_compare_func(clist, date_compare);
     gtk_clist_set_sort_type(clist, GTK_SORT_DESCENDING);
 
+    /* handle select row signals to display message in the window
+     * preview pane */
     gtk_signal_connect(GTK_OBJECT(bindex->ctree),
 		       "tree-select-row",
 		       (GtkSignalFunc) select_message, (gpointer) bindex);
@@ -330,7 +325,9 @@ balsa_index_init(BalsaIndex * bindex)
                         "unselect-all",
                         (GtkSignalFunc) unselect_all_messages, 
                         (gpointer) bindex);
-
+    
+    /* we want to handle button presses to pop up context menus if
+     * necessary */
     gtk_signal_connect(GTK_OBJECT(bindex->ctree),
 		       "button_press_event",
 		       (GtkSignalFunc) button_event_press_cb,
@@ -341,33 +338,18 @@ balsa_index_init(BalsaIndex * bindex)
 		       (GtkSignalFunc) button_event_release_cb,
 		       (gpointer) bindex);
 
-    /* FIXME: put the content of these signal handlers below into
-     * button_press_event handlers above, then remove these
-     * callbacks. */
-/*     gtk_signal_connect(GTK_OBJECT(bindex), "select_message", */
-/* 		       (GtkSignalFunc) index_select_cb, bindex); */
-
-/*     gtk_signal_connect(GTK_OBJECT(bindex), "unselect_message", */
-/* 		       (GtkSignalFunc) index_unselect_cb, bindex); */
-
-/*     gtk_signal_connect(GTK_OBJECT(bindex),  "button_press_event", */
-/* 		       (GtkSignalFunc) index_button_press_cb, bindex); */
-    /* /FIXME */
-
     /* We want to catch column resize attempts to store the new value */
     gtk_signal_connect(GTK_OBJECT(clist),
 		       "resize_column",
 		       GTK_SIGNAL_FUNC(resize_column_event_cb), NULL);
 
-    
-    gtk_drag_source_set (GTK_WIDGET (bindex->ctree), 
-                         GDK_BUTTON1_MASK | GDK_BUTTON2_MASK |
-                         GDK_SHIFT_MASK | GDK_CONTROL_MASK,
-                         index_drag_types, ELEMENTS(index_drag_types),
-                         GDK_ACTION_DEFAULT | GDK_ACTION_COPY | 
-                         GDK_ACTION_MOVE);
-    gtk_signal_connect (GTK_OBJECT (bindex->ctree), "drag-data-get",
-                        GTK_SIGNAL_FUNC (index_drag_cb), NULL);
+    gtk_drag_source_set(GTK_WIDGET (bindex->ctree), 
+                        GDK_BUTTON1_MASK | GDK_SHIFT_MASK | GDK_CONTROL_MASK,
+                        index_drag_types, ELEMENTS(index_drag_types),
+                        GDK_ACTION_DEFAULT | GDK_ACTION_COPY | 
+                        GDK_ACTION_MOVE);
+    gtk_signal_connect(GTK_OBJECT(bindex->ctree), "drag-data-get",
+                       GTK_SIGNAL_FUNC(balsa_index_drag_cb), NULL);
 
     g_get_current_time (&bindex->last_use);
     GTK_OBJECT_UNSET_FLAGS (bindex->ctree, GTK_CAN_FOCUS);
@@ -800,8 +782,9 @@ balsa_index_select_row(BalsaIndex * bindex, gint row)
 
 
 /* balsa_index_select_next:
-   selects next message or last message when no messages are selected.
-*/
+ * 
+ * selects next message or last message when no messages are selected.
+ * */
 void
 balsa_index_select_next(BalsaIndex * bindex)
 {
@@ -809,10 +792,9 @@ balsa_index_select_next(BalsaIndex * bindex)
     gint h;
 
     g_return_if_fail(bindex != NULL);
-
     clist = GTK_CLIST(bindex->ctree);
 
-    /* check this part, it might need to be h - 2 instead */
+    /* [MBG] check this part, it might need to be h - 2 instead */
     if ((h = bi_get_largest_selected(clist)) < 0 || h + 1 >= clist->rows)
 	h = clist->rows - 1;
 
@@ -821,9 +803,10 @@ balsa_index_select_next(BalsaIndex * bindex)
 
 
 /* balsa_index_select_next_unread:
-   search for the next unread in the current mailbox.
-   wraps over if the selected message was the last one.
-*/
+ * 
+ * search for the next unread in the current mailbox.
+ * wraps over if the selected message was the last one.
+ * */
 void
 balsa_index_select_next_unread(BalsaIndex * bindex)
 {
@@ -832,7 +815,6 @@ balsa_index_select_next_unread(BalsaIndex * bindex)
     gint h, start_row;
 
     g_return_if_fail(bindex != NULL);
-
     clist = GTK_CLIST(bindex->ctree);
 
     if ((h = bi_get_largest_selected(clist) + 1) <= 0)
@@ -869,8 +851,9 @@ balsa_index_select_next_unread(BalsaIndex * bindex)
 }
 
 /* balsa_index_select_previous:
-   selects previous message or first message when no messages are selected.
-*/
+ * 
+ * selects previous message or first message when no messages are selected.
+ * */
 void
 balsa_index_select_previous(BalsaIndex * bindex)
 {
@@ -880,7 +863,6 @@ balsa_index_select_previous(BalsaIndex * bindex)
     gint h = 0;
 
     g_return_if_fail(bindex != NULL);
-
     clist = GTK_CLIST(bindex->ctree);
 
     if (!clist->selection)
@@ -889,7 +871,8 @@ balsa_index_select_previous(BalsaIndex * bindex)
 	h = clist->rows;	/* set this to the max number of rows */
 
 	list = clist->selection;
-	while (list) {		/* look for the selected row with the lowest number */
+	while (list) {		
+            /* look for the selected row with the lowest number */
 	    i = gtk_clist_find_row_from_data(clist,
 					     LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(bindex->ctree, list->data)));
 	    if (i < h)
@@ -1003,7 +986,7 @@ button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
     BalsaIndex *bindex;
     GtkCList* clist;
 
-    if (!event /* || event->button != 3 */)
+    if (!event)
 	return;
     
     bindex = BALSA_INDEX(data);
@@ -1466,7 +1449,7 @@ balsa_message_delete(GtkWidget * widget, gpointer user_data)
     g_return_if_fail(widget != NULL);
     g_return_if_fail(user_data != NULL);
 
-    index = BALSA_INDEX (user_data);
+    index = BALSA_INDEX(user_data);
     list = GTK_CLIST(index->ctree)->selection;
 
     if (index->mailbox_node->mailbox == balsa_app.trash)
@@ -1475,8 +1458,8 @@ balsa_message_delete(GtkWidget * widget, gpointer user_data)
 	to_trash = TRUE;
 
     /* select the previous message if we're at the bottom of the index */
-    if (GTK_CLIST (index->ctree)->rows - 1 == 
-        bi_get_largest_selected (GTK_CLIST (index->ctree)))
+    if (GTK_CLIST(index->ctree)->rows - 1 == 
+        bi_get_largest_selected(GTK_CLIST(index->ctree)))
         select_next = FALSE;
 
     while (list) {
@@ -1493,10 +1476,17 @@ balsa_message_delete(GtkWidget * widget, gpointer user_data)
     }
     
     /* select another message depending on where we are in the list */
-    if (select_next)
-        balsa_index_select_next (index);
-    else
-        balsa_index_select_previous (index);
+    if (GTK_CLIST(index->ctree)->rows > 1) {
+        if (select_next) {
+            balsa_index_select_next(index);
+        } else {
+            balsa_index_select_previous(index);
+        }
+    } else {
+        /* Update the style and message counts in the mailbox list */
+        balsa_mblist_update_mailbox(balsa_app.mblist, 
+                                    index->mailbox_node->mailbox);
+    }
     
     libbalsa_mailbox_commit_changes(index->mailbox_node->mailbox);
 
@@ -1718,7 +1708,7 @@ balsa_index_update_message(BalsaIndex * index)
 }
 
 
-/* index_drag_cb 
+/* balsa_index_drag_cb 
  * 
  * This is the drag_data_get callback for the index widgets.  It
  * copies the list of selected messages to a pointer array, then sets
@@ -1726,7 +1716,7 @@ balsa_index_update_message(BalsaIndex * index)
  * application.
  *  */
 static void 
-index_drag_cb (GtkWidget* widget, GdkDragContext* drag_context, 
+balsa_index_drag_cb (GtkWidget* widget, GdkDragContext* drag_context, 
                GtkSelectionData* data, guint info, guint time, 
                gpointer user_data)
 { 

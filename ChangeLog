@@ -1,3 +1,7 @@
+2004-07-26 12:15  PeterB
+
+	* src/balsa-message.c: be careful with idle handler.
+
 2004-07-25  Pawel Salek
 
 	* libbalsa/mailbox.[hc], mailbox_imap.c: remove SORT_NATURAL and

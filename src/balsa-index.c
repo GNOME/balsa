@@ -25,14 +25,25 @@
 #include "balsa-app.h"
 #include "balsa-index.h"
 
-#include "pixmaps/mailbox.xpm"
+#include "pixmaps/envelope.xpm"
+#include "pixmaps/replied.xpm"
+#include "pixmaps/forwarded.xpm"
+#include "pixmaps/trash.xpm"
 
 /* constants */
 #define BUFFER_SIZE 1024
 
 
-GdkPixmap *mailboxpix;
-GdkBitmap *mailbox_mask;
+GdkPixmap *new_pix;
+GdkPixmap *replied_pix;
+GdkPixmap *forwarded_pix;
+GdkPixmap *deleted_pix;
+
+GdkBitmap *new_mask;
+GdkBitmap *replied_mask;
+GdkBitmap *forwarded_mask;
+GdkBitmap *deleted_mask;
+
 GdkColor *transparent = NULL;
 
 
@@ -44,7 +55,7 @@ static void balsa_index_size_allocate (GtkWidget * widget, GtkAllocation * alloc
 
 
 /* statics */
-static char *flag_str (MessageFlags flags);
+static void clist_set_col_img_from_flag (BalsaIndex *, gint, Message *);
 static void mailbox_listener (MailboxWatcherMessage * mw_message);
 
 
@@ -223,18 +234,15 @@ balsa_index_init (BalsaIndex * bindex)
 
   gtk_widget_show (GTK_WIDGET (clist));
   gtk_widget_ref (GTK_WIDGET (clist));
-/*
-   gtk_widget_realize(GTK_WIDGET(bindex));
-   gtk_widget_realize(GTK_WIDGET(clist));
- */
-  gdk_pixmap_colormap_create_from_xpm_d (NULL, gtk_widget_get_colormap (GTK_WIDGET (clist)),
-				   &mailbox_mask, transparent, mailbox_xpm);
-  /*
-     gtk_widget_get_visual (widget)->depth)
 
-     mailboxpix = gdk_pixmap_create_from_xpm_d (clist->clist_window,
-     &mailbox_mask, transparent, mailbox_xpm);
-   */
+  new_pix = gdk_pixmap_colormap_create_from_xpm_d (NULL, gtk_widget_get_colormap (GTK_WIDGET (clist)),
+				      &new_mask, transparent, envelope_xpm);
+  replied_pix = gdk_pixmap_colormap_create_from_xpm_d (NULL, gtk_widget_get_colormap (GTK_WIDGET (clist)),
+				   &replied_mask, transparent, replied_xpm);
+  forwarded_pix = gdk_pixmap_colormap_create_from_xpm_d (NULL, gtk_widget_get_colormap (GTK_WIDGET (clist)),
+			       &forwarded_mask, transparent, forwarded_xpm);
+  deleted_pix = gdk_pixmap_colormap_create_from_xpm_d (NULL, gtk_widget_get_colormap (GTK_WIDGET (clist)),
+				     &deleted_mask, transparent, trash_xpm);
 }
 
 
@@ -420,14 +428,7 @@ balsa_index_add (BalsaIndex * bindex,
 
   gtk_clist_set_row_data (GTK_CLIST (GTK_BIN (bindex)->child), row, (gpointer) message);
 
-  if (message->flags & MESSAGE_FLAG_DELETED)
-    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, mailboxpix, mailbox_mask);
-  if (message->flags & MESSAGE_FLAG_FLAGGED)
-    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, mailboxpix, mailbox_mask);
-  if (message->flags & MESSAGE_FLAG_REPLIED)
-    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, mailboxpix, mailbox_mask);
-  if (message->flags & MESSAGE_FLAG_NEW)
-    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, mailboxpix, mailbox_mask);
+  clist_set_col_img_from_flag (bindex, row, message);
 
   if (first_new_message == 0)
     if (message->flags & MESSAGE_FLAG_NEW)
@@ -491,26 +492,25 @@ balsa_index_update_flag (BalsaIndex * bindex, Message * message)
   if (row < 0)
     return;
 
-  gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, flag_str (message->flags));
+  clist_set_col_img_from_flag (bindex, row, message);
 }
 
 
-static char *
-flag_str (MessageFlags flags)
+static void
+clist_set_col_img_from_flag (BalsaIndex * bindex, gint row, Message * message)
 {
-  if (flags & MESSAGE_FLAG_DELETED)
-    return "D";
-
-  if (flags & MESSAGE_FLAG_FLAGGED)
-    return "F";
-
-  if (flags & MESSAGE_FLAG_REPLIED)
-    return "R";
-
-  if (flags & MESSAGE_FLAG_NEW)
-    return "N";
-
-  return NULL;
+  if (message->flags & MESSAGE_FLAG_DELETED)
+    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, deleted_pix, deleted_mask);
+/*
+   if (message->flags & MESSAGE_FLAG_FLAGGED)
+   gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, , mailbox_mask);
+ */
+  else if (message->flags & MESSAGE_FLAG_REPLIED)
+    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, replied_pix, replied_mask);
+  else if (message->flags & MESSAGE_FLAG_NEW)
+    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, new_pix, new_mask);
+  else
+    gtk_clist_set_text(GTK_CLIST(GTK_BIN(bindex)->child), row, 1, NULL);
 }
 
 

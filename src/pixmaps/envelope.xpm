@@ -1,5 +1,5 @@
 /* XPM */
-static char *mailbox_xpm[] = {
+static char *envelope_xpm[] = {
 /* columns rows colors chars-per-pixel */
 "16 16 35 1",
 "  c Gray0",

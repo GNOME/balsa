@@ -3,6 +3,7 @@
 	* libbalsa/imap/imap-{commands,search}.c:Debian report #266298.
 	* src/main-window.c: 
 	* src/sendmsg-window.c: fix misspellings pointed out by Kelemen Gábor.
+	* libbalsa/address-book-gpe.c: improve completion support.
 	
 2004-08-23 16:38  PeterB
 

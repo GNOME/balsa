@@ -474,7 +474,7 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
     sqlite_exec_printf (gc->db,
                         "select tag,value from contacts where urn=%d",
                         gpe_read_attr, a, NULL, uid);
-    /* a->full_name = create_name */
+    a->full_name = create_name(a->first_name, a->last_name);
     g_object_set_data(G_OBJECT(a), "urn", GUINT_TO_POINTER(uid));
     if(!*gc->new_prefix) 
         *gc->new_prefix = libbalsa_address_to_gchar(a, 0);
@@ -490,9 +490,9 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
 {
     static const char *query = 
         "select distinct urn from contacts where "
-        "(upper(tag)='FAMILY_NAME' and value LIKE '%q%%')"
-        " or "
-        "(upper(tag)='FIRST_NAME' and value LIKE '%q%%')";
+        "(upper(tag)='FAMILY_NAME' or upper(tag)='FIRST_NAME' or "
+        "upper(tag)='WORK_EMAIL' or upper(tag)='HOME_EMAIL') "
+        "and upper(value) LIKE '%q%%'";
     struct gpe_completion_closure gcc;
     LibBalsaAddressBookGpe *gpe_ab;
     char *err = NULL;
@@ -507,6 +507,7 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
         if( !libbalsa_address_book_gpe_open_db(gpe_ab))
 	    return NULL;
     }
+
     *new_prefix = NULL;
     gcc.db = gpe_ab->db;
     gcc.new_prefix = new_prefix;
@@ -514,9 +515,9 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
     if(prefix)
         r = sqlite_exec_printf(gpe_ab->db, query,
                                gpe_read_completion, &gcc, &err,
-                               prefix, prefix);
+                               prefix);
     else
-        r = sqlite_exec(gpe_ab->db, "select distinct urn",
+        r = sqlite_exec(gpe_ab->db, "select distinct urn from contacts_urn",
                         gpe_read_completion, &gcc, &err);
     if(err) {
         printf("r=%d err=%s\n", r, err);

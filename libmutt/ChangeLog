@@ -1,3 +1,8 @@
+2002-02-27  Carlos Morgado  <chbm@chbm.nu>
+
+	* imap/command.c (cmd_parse_capabilities): unbreak patch aplied 
+	twice on the last libmutt update
+
 2002-02-26  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* Makefile.am: mbyte.h is not in libmutt.

@@ -70,16 +70,12 @@ addyb_email_item_new (addyb_item * ai, gchar * addy)
 {
   gchar *list_item[1];
   list_item[0] = addy;
-  gtk_clist_set_row_data (GTK_CLIST (email_list),
-		       gtk_clist_append (GTK_CLIST (email_list), list_item),
-			  ai);
   ai->email = g_list_append (ai->email, addy);
 }
 
 static void
 addyb_email_item_delete (addyb_item * ai, gchar * addy)
 {
-  gtk_clist_remove (GTK_CLIST (email_list), gtk_clist_find_row_from_data (GTK_CLIST (email_list), (gpointer) addy));
   ai->email = g_list_remove (ai->email, (gpointer) addy);
 }
 
@@ -105,10 +101,20 @@ addyb_emaillist_update (addyb_item * ai)
   for (glist = g_list_first (ai->email); glist; glist = glist->next)
     {
       list_item[0] = (gchar *) glist->data;
-      gtk_clist_append (GTK_CLIST (email_list), list_item);
+      gtk_clist_set_row_data (GTK_CLIST (email_list),
+		       gtk_clist_append (GTK_CLIST (email_list), list_item),
+			      (gchar *) glist->data);
     }
 
   gtk_clist_thaw (GTK_CLIST (email_list));
+}
+
+static
+addyb_emaillist_item_remove (GtkWidget * widget, gpointer data)
+{
+  addyb_item *ai = (addyb_item *) gtk_clist_get_row_data (GTK_CLIST (addyb_list), ((gint) GTK_CLIST (addyb_list)->selection->data));
+  addyb_email_item_delete(ai, (gchar *)gtk_clist_get_row_data (GTK_CLIST (email_list), ((gint) GTK_CLIST (email_list)->selection->data)));
+  addyb_emaillist_update (ai);
 }
 
 static
@@ -268,6 +274,10 @@ addressbook_window_new (GtkWidget * widget, gpointer data)
   gtk_widget_set_usize (button, 60, 25);
   gtk_box_pack_start (GTK_BOX (hbox1), button, TRUE, FALSE, 0);
   gtk_widget_show (button);
+  gtk_signal_connect (GTK_OBJECT (button),
+                      "clicked",
+                      GTK_SIGNAL_FUNC (addyb_emaillist_item_remove),
+                      NULL);
 
   gtk_paned_add1 (GTK_PANED (vpane), vbox1);
 

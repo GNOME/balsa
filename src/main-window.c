@@ -569,7 +569,7 @@ static GnomeUIInfo mailbox_menu[] = {
 	GNOME_APP_UI_ITEM, N_("Mark all"),
         N_("Mark all messages in current mailbox"),
         mark_all_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-        BALSA_PIXMAP_MARK_ALL_MSGS, 'A',GDK_MOD1_MASK|GDK_CONTROL_MASK,NULL
+        BALSA_PIXMAP_MARK_ALL_MSGS_MENU, 'A',GDK_MOD1_MASK|GDK_CONTROL_MASK,NULL
     },	
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_EDIT_POS 7

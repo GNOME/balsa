@@ -31,24 +31,19 @@
 
 #include "pixmaps/identity.xpm"
 #include "pixmaps/identity_menu.xpm"
-
 #include "pixmaps/mark_all.xpm"
-
+#include "pixmaps/mark_all_menu.xpm"
 #include "pixmaps/next_unread.xpm"
 #include "pixmaps/next_unread_menu.xpm"
-
 #include "pixmaps/next_flagged.xpm"
 #include "pixmaps/next_flagged_menu.xpm"
-
 #include "pixmaps/reply_to_all.xpm"
 #include "pixmaps/reply_to_all_menu.xpm"
 #include "pixmaps/reply_to_group.xpm"
 #include "pixmaps/reply_to_group_menu.xpm"
 
 #include "pixmaps/close_mbox.xpm"
-
 #include "pixmaps/empty_trash.xpm"
-
 #include "pixmaps/preview.xpm"
 
 #include "pixmaps/draftbox.xpm"
@@ -67,6 +62,8 @@
 #include "pixmaps/forwarded.xpm"
 #include "pixmaps/envelope.xpm"
 #include "pixmaps/multipart.xpm"
+
+#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
 typedef struct _BalsaIcon BalsaIcon;
 struct _BalsaIcon {
@@ -169,16 +166,16 @@ balsa_icon_get_bitmap(BalsaIconName name)
     return NULL;
 }
 
-void
-register_balsa_pixmap(gchar * name, gchar ** data, guint xsize, guint ysize)
+static void
+register_balsa_pixmap(const gchar* name, char** data, guint xsize, guint ysize)
 {
     GnomeStockPixmapEntryData *entry;
     entry = g_malloc0(sizeof(*entry));
 
-    entry->type = GNOME_STOCK_PIXMAP_TYPE_DATA;
+    entry->type     = GNOME_STOCK_PIXMAP_TYPE_DATA;
     entry->xpm_data = data;
-    entry->width = xsize;
-    entry->height = ysize;
+    entry->width    = xsize;
+    entry->height   = ysize;
     gnome_stock_pixmap_register(name, GNOME_STOCK_PIXMAP_REGULAR,
 				(GnomeStockPixmapEntry *) entry);
 }
@@ -186,42 +183,37 @@ register_balsa_pixmap(gchar * name, gchar ** data, guint xsize, guint ysize)
 void
 register_balsa_pixmaps(void)
 {
-    register_balsa_pixmap(BALSA_PIXMAP_SHOW_ALL_HEADERS, all_headers_xpm,
-			  24, 24);
-    register_balsa_pixmap(BALSA_PIXMAP_SHOW_PREVIEW, preview_xpm,
-			  24, 24);
-    register_balsa_pixmap(BALSA_PIXMAP_SMALL_CLOSE, close_xpm,
-			  9, 9);
-    register_balsa_pixmap(BALSA_PIXMAP_ENVELOPE, envelope_xpm,
-			  16, 16);
-    register_balsa_pixmap(BALSA_PIXMAP_FLAG_UNREAD, flag_new_xpm,
-			  24, 24);
-    register_balsa_pixmap(BALSA_PIXMAP_FLAGGED, flagged_xpm,
-			  16, 16);
-    register_balsa_pixmap(BALSA_PIXMAP_IDENTITY, identity_xpm,
-			  24, 24);
-    register_balsa_pixmap(BALSA_PIXMAP_IDENTITY_MENU, identity_menu_xpm,
-			  16, 16);
-    register_balsa_pixmap(BALSA_PIXMAP_MARK_ALL_MSGS, mark_all_xpm,
-			  24, 24);
-    register_balsa_pixmap(BALSA_PIXMAP_NEXT_UNREAD, next_unread_xpm,
-			  24, 24);
-    register_balsa_pixmap(BALSA_PIXMAP_NEXT_UNREAD_MENU, next_unread_menu_xpm,
-			  16, 16);
-    register_balsa_pixmap(BALSA_PIXMAP_NEXT_FLAGGED, next_flagged_xpm, 
-			  24, 24);
-    register_balsa_pixmap(BALSA_PIXMAP_NEXT_FLAGGED_MENU, next_flagged_menu_xpm,
-			   16, 16);
-    register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL, reply_to_all_xpm,
-			  24, 24);
-    register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL_MENU, reply_to_all_menu_xpm,
-			  16, 16);
-    register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_GROUP, reply_to_group_xpm,
-			  24, 24);
-    register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_GROUP_MENU,
-			  reply_to_group_menu_xpm, 16, 15);
-    register_balsa_pixmap(BALSA_PIXMAP_MAIL_EMPTY_TRASH, empty_trash_xpm,
-			  24, 24);
-    register_balsa_pixmap(BALSA_PIXMAP_MAIL_CLOSE_MBOX, close_mbox_xpm,
-			  24, 24);
+    const struct {
+        const char* name;
+        char** xpm;
+        int w, h;
+    } icons[] = {
+        /* Toolbar icons */
+        { BALSA_PIXMAP_SHOW_ALL_HEADERS, all_headers_xpm,    24, 24 },
+        { BALSA_PIXMAP_SHOW_PREVIEW,     preview_xpm,        24, 24 },
+        { BALSA_PIXMAP_FLAG_UNREAD,      flag_new_xpm,       24, 24 },
+        { BALSA_PIXMAP_IDENTITY,         identity_xpm,       24, 24 },
+        { BALSA_PIXMAP_MARK_ALL_MSGS,    mark_all_xpm,       24, 24 },
+        { BALSA_PIXMAP_NEXT_UNREAD,      next_unread_xpm,    24, 24 },
+        { BALSA_PIXMAP_NEXT_FLAGGED,     next_flagged_xpm,   24, 24 },
+        { BALSA_PIXMAP_MAIL_RPL_GROUP,   reply_to_group_xpm, 24, 24 },
+        { BALSA_PIXMAP_MAIL_EMPTY_TRASH, empty_trash_xpm,    24, 24 },
+        { BALSA_PIXMAP_MAIL_RPL_ALL,     reply_to_all_xpm,   24, 24 },
+        { BALSA_PIXMAP_MAIL_CLOSE_MBOX,  close_mbox_xpm,     24, 24 },
+        /* Menu icons */
+        { BALSA_PIXMAP_ENVELOPE,            envelope_xpm,            16, 16 },
+        { BALSA_PIXMAP_FLAGGED,             flagged_xpm,             16, 16 },
+        { BALSA_PIXMAP_IDENTITY_MENU,       identity_menu_xpm,       16, 16 },
+        { BALSA_PIXMAP_MARK_ALL_MSGS_MENU,  mark_all_menu_xpm,       16, 16 },
+        { BALSA_PIXMAP_NEXT_UNREAD_MENU,    next_unread_menu_xpm,    16, 16 },
+        { BALSA_PIXMAP_NEXT_FLAGGED_MENU,   next_flagged_menu_xpm,   16, 16 },
+        { BALSA_PIXMAP_MAIL_RPL_ALL_MENU,   reply_to_all_menu_xpm,   16, 16 },
+        { BALSA_PIXMAP_MAIL_RPL_GROUP_MENU, reply_to_group_menu_xpm, 16, 16 },
+        /* Other icons */
+        { BALSA_PIXMAP_SMALL_CLOSE,      close_xpm,          9, 9 },
+    };
+    unsigned i;
+    for(i=0; i<ELEMENTS(icons); i++)
+        register_balsa_pixmap(icons[i].name, icons[i].xpm, 
+                              icons[i].w, icons[i].h);
 }

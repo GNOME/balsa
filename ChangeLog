@@ -1,4 +1,19 @@
-2001-10-08  Pawel Salek  <pawsa@theochem.kth.se>
+2001-10-10  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-icons.[hc]: cleanup icon registration code.
+
+	Ali Akcaagac <ali.akcaagac@stud.fh-wilhelmshaven.de> icon updates:
+	* src/main-window.c, src/sendmsg-window.c, src/toolbar-prefs.c:
+	* src/pixmaps/{,close_mbox.xpm, empty_trash.xpm, next_flagged.xpm,
+	next_flagged_menu.xpm, reply_to_group.xpm, reply_to_group_menu.xpm,
+	mark_all_menu.xpm}: updated icons.
+
+	* src/sendmsg-window.c: Toralf Lund + Peter Bloomfield extensive
+	D&D support.
+
+	* libbalsa/pop3.c: be even more defensive, II (Peter Bloomfield).
+
+2001-10-09  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/source-viewer.c: missing negation.
 	* configure.in: add explicit library list for pspell.

@@ -80,7 +80,7 @@ button_data toolbar_buttons[]={
      N_("Reply to the current message"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_MAIL_RPL_ALL, N_("Reply\nto all"),
      N_("Reply to all recipients"), TOOLBAR_BUTTON_TYPE_BUTTON},
-    {BALSA_PIXMAP_MAIL_RPL_GROUP, N_("Reply\nto list"),
+    {BALSA_PIXMAP_MAIL_RPL_GROUP, N_("Reply\nto group"),
      N_("Reply to mailing list"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {GNOME_STOCK_PIXMAP_MAIL_FWD, N_("Forward"), 
      N_("Forward the current message"), TOOLBAR_BUTTON_TYPE_BUTTON},

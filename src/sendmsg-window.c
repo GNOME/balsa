@@ -86,10 +86,13 @@ static gint postpone_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint save_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint print_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint attach_clicked(GtkWidget *, gpointer);
+static gboolean attach_message(BalsaSendmsg *msg, LibBalsaMessage *message);
+static gint insert_selected_messages(BalsaSendmsg *msg, SendType type);
+static gint attach_message_cb(GtkWidget *, BalsaSendmsg *);
+static gint include_message_cb(GtkWidget *, BalsaSendmsg *);
 static void close_window_cb(GtkWidget *, gpointer);
 static gchar* check_if_regular_file(const gchar *);
 static void balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm);
-
 static void check_readiness(GtkEditable * w, BalsaSendmsg * bsmsg);
 static void init_menus(BalsaSendmsg *);
 static gint toggle_from_cb(GtkWidget *, BalsaSendmsg *);
@@ -118,14 +121,18 @@ static void change_identity_dialog_cb(GtkWidget*, BalsaSendmsg*);
 static void update_msg_identity(BalsaSendmsg*, LibBalsaIdentity*);
 
 static void sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
+static GString *
+quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type);
 
 /* Standard DnD types */
 enum {
+    TARGET_MESSAGES,
     TARGET_URI_LIST,
     TARGET_EMAIL,
 };
 
 static GtkTargetEntry drop_types[] = {
+    {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES},
     {"text/uri-list", 0, TARGET_URI_LIST}
 };
 
@@ -143,41 +150,47 @@ static void wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void reflow_par_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void reflow_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static gint insert_signature_cb(GtkWidget *, BalsaSendmsg *);
+static gint quote_messages_cb(GtkWidget *, BalsaSendmsg *);
 
 static GnomeUIInfo file_menu[] = {
 #define MENU_FILE_INCLUDE_POS 0
     GNOMEUIINFO_ITEM_STOCK(N_("_Include File..."), NULL,
 			   include_file_cb, GNOME_STOCK_MENU_OPEN),
-
 #define MENU_FILE_ATTACH_POS 1
     GNOMEUIINFO_ITEM_STOCK(N_("_Attach File..."), NULL,
 			   attach_clicked, GNOME_STOCK_MENU_ATTACH),
-#define MENU_FILE_SEPARATOR1_POS 2
+#define MENU_MSG_INCLUDE_POS 2
+    GNOMEUIINFO_ITEM_STOCK(N_("_Include Message(s)"), NULL,
+			   include_message_cb, GNOME_STOCK_MENU_MAIL),
+#define MENU_FILE_ATTACH_MSG_POS 3
+    GNOMEUIINFO_ITEM_STOCK(N_("Attach _Message(s)"), NULL,
+			   attach_message_cb, GNOME_STOCK_MENU_MAIL_FWD),
+#define MENU_FILE_SEPARATOR1_POS 4
     GNOMEUIINFO_SEPARATOR,
 
-#define MENU_FILE_SEND_POS 3
+#define MENU_FILE_SEND_POS 5
     { GNOME_APP_UI_ITEM, N_("_Send"), 
       N_("Send this message"),
       send_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       GNOME_STOCK_MENU_MAIL_SND, 'S', GDK_CONTROL_MASK, NULL },
-#define MENU_FILE_QUEUE_POS 4
+#define MENU_FILE_QUEUE_POS 6
     { GNOME_APP_UI_ITEM, N_("_Queue"), 
       N_("Queue this message in Outbox for sending"),
       queue_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       GNOME_STOCK_MENU_MAIL_SND, 'Q', GDK_CONTROL_MASK, NULL },
-#define MENU_FILE_POSTPONE_POS 5
+#define MENU_FILE_POSTPONE_POS 7
     GNOMEUIINFO_ITEM_STOCK(N_("_Postpone"), NULL,
 			   postpone_message_cb, GNOME_STOCK_MENU_SAVE),
-#define MENU_FILE_SAVE_POS 6
+#define MENU_FILE_SAVE_POS 8
     GNOMEUIINFO_ITEM_STOCK(N_("_Save"), NULL,
 			   save_message_cb, GNOME_STOCK_MENU_SAVE),
-#define MENU_FILE_PRINT_POS 7
+#define MENU_FILE_PRINT_POS 9
     GNOMEUIINFO_ITEM_STOCK(N_("Print..."), N_("Print the edited message"),
 			   print_message_cb, GNOME_STOCK_MENU_PRINT),
-#define MENU_FILE_SEPARATOR2_POS 8
+#define MENU_FILE_SEPARATOR2_POS 10
     GNOMEUIINFO_SEPARATOR,
 
-#define MENU_FILE_CLOSE_POS 9
+#define MENU_FILE_CLOSE_POS 11
     GNOMEUIINFO_MENU_CLOSE_ITEM(close_window_cb, NULL),
 
     GNOMEUIINFO_END
@@ -202,23 +215,27 @@ static GnomeUIInfo edit_menu[] = {
     {GNOME_APP_UI_ITEM, N_("Insert _Signature"), NULL,
      (gpointer) insert_signature_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
      GDK_z, GDK_CONTROL_MASK, NULL},
+#define EDIT_MENU_QUOTE 8
+    {GNOME_APP_UI_ITEM, N_("_Quote Message(s)"), NULL,
+     (gpointer) quote_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
+     0, 0, NULL},
     GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_REFLOW_PARA 9
+#define EDIT_MENU_REFLOW_PARA 10
     {GNOME_APP_UI_ITEM, N_("_Reflow Paragraph"), NULL,
      (gpointer) reflow_par_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
      GDK_r, GDK_CONTROL_MASK, NULL},
-#define EDIT_MENU_REFLOW_MESSAGE 10
+#define EDIT_MENU_REFLOW_MESSAGE 11
     {GNOME_APP_UI_ITEM, N_("R_eflow Message"), NULL,
      (gpointer) reflow_body_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
      GDK_r, GDK_CONTROL_MASK | GDK_SHIFT_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_SPELL_CHECK 12
+#define EDIT_MENU_SPELL_CHECK 13
     GNOMEUIINFO_ITEM_STOCK(N_("_Check Spelling"), 
                            N_("Check the spelling of the message"),
                            spell_check_cb,
                            GNOME_STOCK_MENU_SPELLCHECK),
     GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_SELECT_IDENT 14
+#define EDIT_MENU_SELECT_IDENT 15
     GNOMEUIINFO_ITEM_STOCK(N_("Select _Identity..."), 
                            N_("Select the Identity to use for the message"),
                            change_identity_dialog_cb,
@@ -745,8 +762,8 @@ destroy_attachment (gpointer data)
    takes over the ownership of filename.
 */
 void
-add_attachment(GnomeIconList * iconlist, char *filename, gboolean is_a_temp_file,
-	       gchar *forced_mime_type)
+add_attachment(GnomeIconList * iconlist, char *filename, 
+               gboolean is_a_temp_file, gchar *forced_mime_type)
 {
     GtkWidget *msgbox;
     const gchar *content_type;
@@ -910,6 +927,107 @@ attach_clicked(GtkWidget * widget, gpointer data)
     return TRUE;
 }
 
+/* attach_message:
+   returns TRUE on success, FALSE on failure.
+*/
+static gboolean 
+attach_message(BalsaSendmsg *msg, LibBalsaMessage *message)
+{
+    gchar *name, tmp_file_name[PATH_MAX + 1];
+	
+    libbalsa_lock_mutt();
+    mutt_mktemp(tmp_file_name);
+    libbalsa_unlock_mutt();
+    mkdir(tmp_file_name, 0700);
+    name = g_strdup_printf("%s/forwarded-message", tmp_file_name);
+    if(!libbalsa_message_save(message, name)) {
+        g_free(name);
+        return FALSE;
+    }
+    add_attachment(GNOME_ICON_LIST(msg->attachments[1]), name,
+		   TRUE, "message/rfc822");
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
+	    msg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
+    return TRUE;
+}
+
+static gint
+insert_selected_messages(BalsaSendmsg *msg, SendType type)
+{
+    GtkWidget *index =
+	balsa_window_find_current_index(balsa_app.main_window);
+    gint pos=gtk_editable_get_position(GTK_EDITABLE(msg->text));
+    GString *text = g_string_new("");
+    
+    if (index) {
+	GList *node;
+	GList *mailbox;
+	GtkCTree *ctree = GTK_CTREE(BALSA_INDEX(index)->ctree);
+    
+	for (node = GTK_CLIST(ctree)->selection; node;
+	     node = g_list_next(node)) {
+	    LibBalsaMessage *message =
+		gtk_ctree_node_get_row_data(ctree, GTK_CTREE_NODE(node->data));
+	    GString *body = quoteBody(msg, message, type);
+	    
+	    g_string_append(text, body->str);
+	    g_string_free(body, TRUE);
+	}
+    }
+    
+    gtk_editable_insert_text(GTK_EDITABLE(msg->text), text->str,
+			     strlen(text->str), &pos);
+    g_string_free(text, TRUE);
+    
+    return TRUE;
+}
+
+static gint include_message_cb(GtkWidget *widget, BalsaSendmsg *msg)
+{
+    return insert_selected_messages(msg, SEND_FORWARD_INLINE);
+}
+
+
+static gint
+attach_message_cb(GtkWidget * widget, BalsaSendmsg *msg) 
+{
+    GtkWidget *index =
+	balsa_window_find_current_index(balsa_app.main_window);
+    gint pos=gtk_editable_get_position(GTK_EDITABLE(msg->text));
+    GString *text = g_string_new("");
+    
+    if (index) {
+	GList *node;
+	GList *mailbox;
+	GtkCTree *ctree = GTK_CTREE(BALSA_INDEX(index)->ctree);
+    
+	for (node = GTK_CLIST(ctree)->selection; node;
+	     node = g_list_next(node)) {
+	    LibBalsaMessage *message =
+		gtk_ctree_node_get_row_data(ctree, GTK_CTREE_NODE(node->data));
+
+	    if(!attach_message(msg, message)) {
+                libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                     _("Attaching message failed.\n"
+                                       "Possible reason: not enough temporary space"));
+                break;
+            }
+	}
+    }
+    
+    gtk_editable_insert_text(GTK_EDITABLE(msg->text), text->str,
+			     strlen(text->str), &pos);
+    g_string_free(text, TRUE);
+    
+    return TRUE;
+}
+
+
+static gint include_messages_cb(GtkWidget *widget, BalsaSendmsg *msg)
+{
+    return insert_selected_messages(msg, SEND_FORWARD_INLINE);
+}
+
 /* attachments_add - attachments field D&D callback */
 static void
 attachments_add(GtkWidget * widget,
@@ -919,6 +1037,19 @@ attachments_add(GtkWidget * widget,
 		GtkSelectionData * selection_data,
 		guint info, guint32 time, BalsaSendmsg * bsmsg)
 {
+    if (balsa_app.debug)
+        printf("attachments_add: info %d\n", info);
+    if (info == TARGET_MESSAGES) {
+        LibBalsaMessage **message_array =
+            (LibBalsaMessage **) selection_data->data;
+
+        while (*message_array) {
+            if(!attach_message(bsmsg, *message_array++))
+                libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                     _("Attaching message failed.\n"
+                                       "Possible reason: not enough temporary space"));
+        }
+    } else { /* ??? if (info == TARGET_URI_LIST) */
     GList *names, *l;
 
     names = gnome_uri_list_extract_filenames(selection_data->data);
@@ -934,6 +1065,7 @@ attachments_add(GtkWidget * widget,
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
 	bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
     bsmsg->update_config = TRUE;
+    }
 }
 
 /* to_add - e-mail (To, From, Cc, Bcc) field D&D callback */
@@ -1243,6 +1375,35 @@ insert_text_cb(GtkEditable * msg_text, gchar * new_text,
     }
 }
 
+/* drag_data_quote - text area D&D callback */
+static void
+drag_data_quote(GtkWidget * widget,
+                GdkDragContext * context,
+                gint x,
+                gint y,
+                GtkSelectionData * selection_data,
+                guint info, guint32 time, BalsaSendmsg * bsmsg)
+{
+    if (info == TARGET_MESSAGES) {
+        LibBalsaMessage **message_array =
+            (LibBalsaMessage **) selection_data->data;
+        GString *text = g_string_new(NULL);
+        gint pos = gtk_editable_get_position(GTK_EDITABLE(widget));
+        gint orig_pos = pos;
+
+        while (*message_array) {
+            GString *body = quoteBody(bsmsg, *message_array++, SEND_REPLY);
+
+            text = g_string_append(text, body->str);
+            g_string_free(body, TRUE);
+        }
+        gtk_editable_insert_text(GTK_EDITABLE(widget), text->str,
+                                 strlen(text->str), &pos);
+        gtk_editable_set_position(GTK_EDITABLE(widget), orig_pos);
+        g_string_free(text, TRUE);
+    }
+}
+
 /* create_text_area 
    Creates the text entry part of the compose window.
 */
@@ -1265,6 +1426,11 @@ create_text_area(BalsaSendmsg * msg)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(table),
     				   GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
     gtk_container_add(GTK_CONTAINER(table), msg->text);
+    gtk_signal_connect(GTK_OBJECT(msg->text), "drag_data_received",
+		       GTK_SIGNAL_FUNC(drag_data_quote), msg);
+    gtk_drag_dest_set(GTK_WIDGET(msg->text), GTK_DEST_DEFAULT_ALL,
+		      drop_types, ELEMENTS(drop_types),
+		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
     gtk_widget_show_all(GTK_WIDGET(table));
 
@@ -1511,6 +1677,13 @@ static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *msg)
     
     return TRUE;
 }
+
+
+static gint quote_messages_cb(GtkWidget *widget, BalsaSendmsg *msg)
+{
+    return insert_selected_messages(msg, SEND_REPLY);
+}
+
 
 /* set_entry_to_subject:
    set subject entry based on given replied/forwarded/continued message
@@ -1880,18 +2053,10 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	gtk_widget_grab_focus(msg->text);
 
     if (type == SEND_FORWARD_ATTACH) {
- 	gchar *name, tmp_file_name[PATH_MAX + 1];
-	
- 	libbalsa_lock_mutt();
- 	mutt_mktemp(tmp_file_name);
- 	libbalsa_unlock_mutt();
- 	mkdir(tmp_file_name, 0700);
- 	name = g_strdup_printf("%s/forwarded-message", tmp_file_name);
- 	libbalsa_message_save(message, name);
- 	add_attachment(GNOME_ICON_LIST(msg->attachments[1]), name,
- 		       TRUE, "message/rfc822");
- 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
-	    msg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
+	if(!attach_message(msg, message))
+                libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                     _("Attaching message failed.\n"
+                                       "Possible reason: not enough temporary space"));
     }
 
     if (type == SEND_CONTINUE && 

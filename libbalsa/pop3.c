@@ -137,22 +137,22 @@ getLine (int fd, char *s, int len)
 */
 
 static gboolean
-getApopStamp (char *buff, char *stamp) {
+getApopStamp(char *buff, char *stamp)
+{
     char *start;
     char *finish;
-    size_t len;
-    
+
     g_return_val_if_fail(buff, FALSE);
     g_return_val_if_fail(stamp, FALSE);
     start = strchr(buff, '<');
-    finish = strchr(start, '>');
-    
-    if(start && finish) {
-        len = strlen(start) - strlen(finish) + 1;
-        strncpy( stamp, start, len );
-        return TRUE;
-    }
-    else return FALSE;
+    if (start) {
+        finish = strchr(start, '>');
+        if (finish) {
+            strncpy(stamp, start, finish - start + 1);
+            return TRUE;
+        }
+    } 
+    return FALSE;
 }
 
 /* Compute the authentication hash to send to the server - kabir */

@@ -22,32 +22,28 @@
 #ifndef __BALSA_ICONS_H__
 #define __BALSA_ICONS_H__
 
-#define BALSA_PIXMAP_SHOW_ALL_HEADERS	"show_all_headers"
-#define BALSA_PIXMAP_SMALL_CLOSE	"small_close"
-#define BALSA_PIXMAP_ENVELOPE		"envelope"
-#define BALSA_PIXMAP_FLAG_UNREAD	"flag_unread"
-#define BALSA_PIXMAP_FLAGGED		"flagged"
+#define BALSA_PIXMAP_SHOW_ALL_HEADERS		"show_all_headers"
+#define BALSA_PIXMAP_SMALL_CLOSE		"small_close"
+#define BALSA_PIXMAP_ENVELOPE			"envelope"
+#define BALSA_PIXMAP_FLAG_UNREAD		"flag_unread"
+#define BALSA_PIXMAP_FLAGGED			"flagged"
 
-#define BALSA_PIXMAP_IDENTITY		"identity"
-#define BALSA_PIXMAP_IDENTITY_MENU	"identity_menu"
+#define BALSA_PIXMAP_IDENTITY			"identity"
+#define BALSA_PIXMAP_IDENTITY_MENU		"identity_menu"
+#define BALSA_PIXMAP_MARK_ALL_MSGS		"mark_all"
+#define BALSA_PIXMAP_MARK_ALL_MSGS_MENU		"mark_all_menu"
+#define BALSA_PIXMAP_NEXT_UNREAD		"next_unread"
+#define BALSA_PIXMAP_NEXT_UNREAD_MENU		"next_unread_menu"
+#define BALSA_PIXMAP_NEXT_FLAGGED		"next_flagged"
+#define BALSA_PIXMAP_NEXT_FLAGGED_MENU		"next_flagged_menu"
+#define BALSA_PIXMAP_MAIL_RPL_ALL		"reply_to_all"
+#define BALSA_PIXMAP_MAIL_RPL_ALL_MENU		"reply_to_all_menu"
+#define BALSA_PIXMAP_MAIL_RPL_GROUP		"reply_to_group"
+#define BALSA_PIXMAP_MAIL_RPL_GROUP_MENU	"reply_to_group_menu"
 
-#define BALSA_PIXMAP_MARK_ALL_MSGS	"mark_all"
-
-#define BALSA_PIXMAP_NEXT_UNREAD	"next_unread"
-#define BALSA_PIXMAP_NEXT_UNREAD_MENU	"next_unread_menu"
-#define BALSA_PIXMAP_NEXT_FLAGGED       "next_flagged"
-#define BALSA_PIXMAP_NEXT_FLAGGED_MENU  "next_flagged_menu"
-
-#define BALSA_PIXMAP_MAIL_RPL_ALL	"reply_to_all"
-#define BALSA_PIXMAP_MAIL_RPL_ALL_MENU	"reply_to_all_menu"
-#define BALSA_PIXMAP_MAIL_RPL_GROUP	"reply_to_group"
-#define BALSA_PIXMAP_MAIL_RPL_GROUP_MENU "reply_to_group_menu"
-
-#define BALSA_PIXMAP_MAIL_CLOSE_MBOX	"close_mbox"
-
-#define BALSA_PIXMAP_MAIL_EMPTY_TRASH	"empty_trash"
-
-#define BALSA_PIXMAP_SHOW_PREVIEW	"show_preview"
+#define BALSA_PIXMAP_MAIL_CLOSE_MBOX		"close_mbox"
+#define BALSA_PIXMAP_MAIL_EMPTY_TRASH		"empty_trash"
+#define BALSA_PIXMAP_SHOW_PREVIEW		"show_preview"
 
 typedef enum {
     BALSA_ICON_DRAFTBOX,
@@ -72,5 +68,5 @@ void balsa_icons_init(void);
 GdkPixmap *balsa_icon_get_pixmap(BalsaIconName icon);
 GdkBitmap *balsa_icon_get_bitmap(BalsaIconName icon);
 void register_balsa_pixmaps(void);
-void register_balsa_pixmap(gchar * name, gchar ** data, guint xsize, guint ysize);
+
 #endif

@@ -646,10 +646,11 @@ check_if_regular_file(const gchar * filename)
 	ptr = g_strdup_printf(_("Cannot get info on file '%s': %s\n"),
 			      filename, strerror(errno));
 	result = FALSE;
-    } else if (!S_ISREG(s.st_mode)) {
+    } else if (!S_ISREG(s.st_mode) || access(filename, R_OK) != 0) {
 	ptr =
-	    g_strdup_printf(_("Attachment is not a regular file: '%s'\n"),
-			    filename);
+	    g_strdup_printf(
+	      _("Attachment is not a regular file or cannot be read: '%s'\n"),
+	      filename);
 	result = FALSE;
     }
     if (ptr) {

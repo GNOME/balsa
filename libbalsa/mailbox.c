@@ -246,9 +246,8 @@ libbalsa_mailbox_destroy(GtkObject * object)
     if (!mailbox)
 	return;
 
-    if (CLIENT_CONTEXT(mailbox) != NULL)
-	while (mailbox->open_ref > 0)
-	    libbalsa_mailbox_close(mailbox);
+    while (mailbox->open_ref > 0)
+	libbalsa_mailbox_close(mailbox);
 
     g_free(mailbox->name);
     mailbox->name = NULL;
@@ -550,8 +549,12 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 	if (cur->replied)
 	    message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
 
+	/* take over the ownership */
 	mailbox->message_list =
 	    g_list_append(mailbox->message_list, message);
+	gtk_object_ref ( GTK_OBJECT(message) );
+	gtk_object_sink( GTK_OBJECT(message) );
+
 	mailbox->new_messages--;
 
 	gtk_signal_emit(GTK_OBJECT(mailbox),
@@ -564,7 +567,11 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 	libbalsa_mailbox_set_unread_messages_flag(mailbox, FALSE);
 }
 
-
+/* libbalsa_mailbox_free_messages:
+   removes all the messages from the mailbox.
+   Messages are unref'ed and not directly destroyed because they migt
+   be ref'ed from somewhere else.
+*/
 void
 libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox)
 {
@@ -579,7 +586,8 @@ libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox)
 
 	gtk_signal_emit(GTK_OBJECT(mailbox),
 			libbalsa_mailbox_signals[MESSAGE_DELETE], message);
-	gtk_object_destroy(GTK_OBJECT(message));
+	message->mailbox = NULL;
+	gtk_object_unref(GTK_OBJECT(message));
     }
 
     g_list_free(mailbox->message_list);
@@ -624,8 +632,7 @@ LibBalsaMailboxType libbalsa_mailbox_valid(gchar * filename)
    commits the changes to the file. note that the msg numbers are changed 
    after commit so one has to re-read messages from mutt structures.
    Actually, re-reading is a wrong approach because it slows down balsa
-   like hell. I know, I tried it (re-reading).
-*/
+   like hell. I know, I tried it (re-reading).  */
 gint
 libbalsa_mailbox_commit_changes(LibBalsaMailbox * mailbox)
 {
@@ -645,7 +652,8 @@ libbalsa_mailbox_commit_changes(LibBalsaMailbox * mailbox)
 	    gtk_signal_emit(GTK_OBJECT(mailbox),
 			    libbalsa_mailbox_signals[MESSAGE_DELETE],
 			    current_message);
-	    gtk_object_destroy(GTK_OBJECT(current_message));
+	    current_message->mailbox = NULL;
+	    gtk_object_unref(GTK_OBJECT(current_message));
 	    mailbox->message_list =
 		g_list_remove_link(mailbox->message_list, message_list);
 	}

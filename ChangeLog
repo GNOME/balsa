@@ -1,3 +1,11 @@
+2000-10-16  Pawel Salek <pawsa@theochem.kth.se>
+ 
+	* libbalsa/mailbox.c: allow ref'ing messages to make idle_handler
+	work properly.
+	* src/balsa-index-page.c,src/balsa-mblist.c: some extra tests
+	on function arguments.
+	* src/sendmsg-window.c: warn if the file to be attached is unreadable.
+
 2000-10-17  Gediminas Paulauskas <menesis@delfi.lt>
 
 	* src/pref-manager.c: marked two strings for translation.

@@ -269,8 +269,16 @@ balsa_index_page_load_mailbox(BalsaIndexPage * page,
     return FALSE;
 }
 
-/* PKGW: you'd think this function would be a good idea. 
+/* balsa_index_page_close_and_destroy:
+ * destroy method - closes the page/associated mailbox and destroys it.
  * We assume that we've been detached from the notebook.
+ * NOTE: there are some extreme situations (like index was created but 
+ * opening mailbox failed) when the index does not have  associated 
+ * mailbox mailbox and this is why we need to test before disconnecting 
+ * the signal.
+ * [FIXME] pawels wonders if it is possible that mailbox is destroyed first
+ * and the page is closed later: this would call this function with bogus
+ * pointer to the destroyed mailbox.
  */
 void
 balsa_index_page_close_and_destroy(GtkObject * obj)
@@ -283,8 +291,10 @@ balsa_index_page_close_and_destroy(GtkObject * obj)
     /*    printf( "Close and destroy!\n" ); */
 
     if (page->index) {
-	gtk_signal_disconnect_by_data((GTK_OBJECT(BALSA_INDEX(page->index)->mailbox)),
-				       BALSA_INDEX(page->index));
+	if(BALSA_INDEX(page->index)->mailbox)
+	    gtk_signal_disconnect_by_data((GTK_OBJECT(
+		BALSA_INDEX(page->index)->mailbox)), BALSA_INDEX(page->index));
+
 	gtk_widget_destroy(GTK_WIDGET(page->index));
 	page->index = NULL;
     }
@@ -304,7 +314,6 @@ balsa_index_page_close_and_destroy(GtkObject * obj)
 
     if (parent_class->destroy)
 	(*parent_class->destroy) (obj);
-
 }
 
 static gint handler = 0;

@@ -632,6 +632,8 @@ balsa_mblist_set_style(BalsaMBList * mblist)
     GdkFont *font;
     GtkStyle *style;
 
+    g_return_if_fail(mblist);
+
     /* Get the base style the user is using */
     style = gtk_style_copy(gtk_widget_get_style(GTK_WIDGET(mblist)));
 
@@ -674,7 +676,7 @@ balsa_mblist_set_style(BalsaMBList * mblist)
 void
 balsa_mblist_have_new(BalsaMBList * bmbl)
 {
-
+    g_return_if_fail(bmbl != NULL);
     balsa_mblist_set_style(bmbl);
 
     gtk_clist_freeze(GTK_CLIST(bmbl));

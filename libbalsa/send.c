@@ -1080,7 +1080,6 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
     libbalsa_lock_mutt();
     hdr->env->from = rfc822_parse_adrlist(hdr->env->from, tmp);
     libbalsa_unlock_mutt();
-
     g_free(tmp);
 
     if (message->reply_to) {

@@ -146,8 +146,10 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 	} else if (LIBBALSA_IS_ADDRESS_BOOK_LDAP(address_book)) {
 	    page = create_ldap_page(abc);
 #endif
-	} else
+	} else {
 	    g_assert_not_reached();
+	    page = NULL;
+	}
     }
 
     gtk_notebook_append_page(GTK_NOTEBOOK(abc->notebook), page, NULL);
@@ -472,8 +474,9 @@ next_button_cb(GtkWidget * button, AddressBookConfig * abc)
     else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP)
 	page = create_ldap_page(abc);
 #endif
-    else
-	g_assert_not_reached();
+    else {
+	g_assert_not_reached(); page = NULL;
+    }
 
     gtk_notebook_append_page(GTK_NOTEBOOK(abc->notebook), page, NULL);
 

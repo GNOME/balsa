@@ -1,3 +1,8 @@
+2001-07-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* .potignore: ignore libmutt/commands.c.
+	* POTFILES.in: add libmutt/mutt_tunnel.c.
+
 2001-07-22  Carlos Morgado  <chbm@chbm.nu>
 
 	* pt.po: updated

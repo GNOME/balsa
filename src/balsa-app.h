@@ -249,6 +249,7 @@ extern struct BalsaApplication {
     gboolean browse_wrap;
     ShownHeaders shown_headers;
     gchar *selected_headers;
+    BalsaIndexThreadingType threading_type;
     gboolean show_mblist;
     gboolean show_notebook_tabs;
     gboolean alternative_layout;

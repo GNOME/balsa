@@ -1,3 +1,4 @@
+libmutt/commands.c
 libinit_balsa/balsa-druid-page-directory.c
 libinit_balsa/balsa-druid-page-finish.c
 libinit_balsa/balsa-druid-page-user.c

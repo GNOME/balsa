@@ -133,6 +133,45 @@ static GtkToolbar *get_bar_instance(GtkWidget *window,
 				    BalsaToolbarType toolbar);
 static int get_position_value(BalsaToolbarType toolbar, char *id);
 
+#ifdef NEW_GTK
+#define mygtk_toolbar_remove_space(bar,j) gtk_toolbar_remove_space((bar),(j))
+#else
+/* this is boldly copied from current CVS */
+static void
+mygtk_toolbar_remove_space(GtkToolbar *toolbar, gint position)
+{
+    GList *children;
+    GtkToolbarChild *child;
+    gint i;
+    
+    g_return_if_fail (GTK_IS_TOOLBAR (toolbar));
+    
+    i = 0;
+    for (children = toolbar->children; children; children = children->next) {
+	child = children->data;
+	
+      if (i == position) {
+          if (child->type == GTK_TOOLBAR_CHILD_SPACE) {
+              toolbar->children = g_list_remove_link (toolbar->children, 
+						      children);
+              g_free (child);
+              g_list_free (children);
+              toolbar->num_children--;
+              
+              gtk_widget_queue_resize (GTK_WIDGET (toolbar));
+	      return;
+	  }
+          else {
+              g_warning ("Toolbar position %d is not a space", position);
+	      return;
+	  }
+      }
+      ++i;
+    }
+  g_warning ("Toolbar position %d doesn't exist", position);
+}
+#endif
+
 static int
 get_position_value(BalsaToolbarType toolbar, char *id)
 {
@@ -149,15 +188,23 @@ get_position_value(BalsaToolbarType toolbar, char *id)
 }
 
 /* get_tool_widget:
-   FIXME: comment needed.
+   Get the GtkWidget * to a button in a specific toolbar.
+
+   Parameters:
+   		window		The window the toolbar is attached to
+		toolbar		The type of the toolbar to search
+		id			The ID string of the button pixmap
+
+   Returns:
+   		GtkWidget *, or NULL if error / not found
 */
 GtkWidget *
 get_tool_widget(GtkWidget *window, BalsaToolbarType toolbar, char *id)
 {
     GtkToolbar *bar;
-    GList *lp;
+    GList *lp, *children;
     int position;
-    GtkToolbarChild *child;
+    GtkWidget *child;
 
     bar=get_bar_instance(window, toolbar);
     if(!bar)
@@ -167,22 +214,42 @@ get_tool_widget(GtkWidget *window, BalsaToolbarType toolbar, char *id)
     if(position == -1)
 	return NULL;
     
-    lp=g_list_first(bar->children);
-    while(position--)
-	lp=g_list_next(lp);
+    lp=children=gtk_container_children(GTK_CONTAINER(bar));
+	if(!children)
+	return(NULL);
 
-    if(!lp)
+    while(position-- && lp) {
+	lp=g_list_next(lp);
+	}
+
+    if(!lp) {
+		g_list_free(children);
 	return NULL;
+	}
 	
-    child=(GtkToolbarChild *)(lp->data);
+    child=(GtkWidget *)(lp->data);
+
+	if(children)
+	g_list_free(children);
+	
     if(!child)
 	return NULL;
 	
-    return child->widget;
+    return child;
 }
 
 /* get_bar_instance:
-   FIXME: comment needed.
+   Get a pointer to the toolbar for a given window
+
+   Parameters:
+   	window		Window the toolbar is attached to
+	toolbar		The type of the toolbar
+
+   Returns:
+   	GtkToolbar *, or NULL if error / not found
+
+   Notes:
+   	Uses the internal map tables, _not_ the GtkWidget "children" list
 */
 static GtkToolbar*
 get_bar_instance(GtkWidget *window, BalsaToolbarType toolbar)
@@ -248,7 +315,17 @@ populate_stock_toolbar(int bar, int id)
 }
 
 /* get_toolbar_index:
-   FIXME: comment needed.
+   Get the index of the given toolbar in the data read from config
+   
+   Toolbar numbering in the config file is dependent on the order in that
+   each toolbar was customized. Therefore, the toolbar ID is not the same
+   as the config index. This maps the toolbar id to the config index.
+
+   Parameters:
+   	id		ID of the desired toolbar
+
+   Returns:
+   	Toolbar index in config data, or -1 if error / not found
 */
 int
 get_toolbar_index(int id)
@@ -263,7 +340,16 @@ get_toolbar_index(int id)
 }
 
 /* create_stock_toolbar:
-   FIXME: comment needed.
+   Create a stock toolbar (uncustomized version) from the tables in this file
+   
+   This function is called to create a toolbar template when a toolbar has
+   never been customized.
+
+   Parameters:
+   	id			ID of the toolbar to create
+
+   Returns:
+	0 if OK, -1 if there are too many toolbars.
 */
 int
 create_stock_toolbar(int id)
@@ -290,14 +376,41 @@ create_stock_toolbar(int id)
 }
 
 /* get_toolbar:
-   FIXME: comment needed.
+   This is the main toolbar generating function
+
+   It will check if there is a toolbar for the given window/type combination
+   If one is found, it will empty and repopulate it, if none is found it
+   will create one, enter it into the local tables and fill it with the
+   buttons loaded from config or a default set of buttons.
+
+   The first time this function is called for a given window, thr caller
+   is responsible for attaching the newly created toolbar to it's window.
+   On subsequent calls for the same window / id combination this _must_ not
+   be done.
+   Once the toolbar is attached to a window, it will be updated in place. It
+   will never be destroyed for the lifetime of the window. Therefore, the
+   results of calling any of the toolbar add functions on the second and
+   further calls to this function will yield unsightly results and maybe
+   cause crashes.
+
+   Correct usage is:
+   	-	Call get_toolbar _once_ during window construction. Attach the
+		returned toolbar handle to the window.
+	-	When a toolbar needs to be refreshed, call get_toolbar again, but
+		_discard_ the return value
+	-	In a "destroy" handler for a window, call release_toolbars
+   
+   Parameters:
+	window		the GtkWindow for which a toolbar should be created
+	toolbar		the ID of the toolbar to create
+
+   Returns:
+    a GtkToolbar *, or NULL if error
 */
 GtkToolbar *
 get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
 {
     GtkToolbar *bar;
-    GtkToolbarChild *child;
-    GList *lp;
     int index;
     int i, j, button;
     int position;
@@ -307,6 +420,7 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
 
     memset((char *)&tmpdata, 0, sizeof(tmpdata));
 
+    g_print("get_toolbar called.\n");
     for(i=0; i<MAXTOOLBARITEMS; i++) {
 	tmpdata[i]=toolbar_data[toolbar][i];
 	tmpdata[i].widget=NULL;
@@ -318,42 +432,37 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
 	    break;
     }
     if(i == toolbar_map_entries) {
-	if(i >= 100)
+	if(i >= 100) /* FIXME: what is this magic number? */
 	    return NULL;
 	++toolbar_map_entries;
 	bar=GTK_TOOLBAR(gtk_toolbar_new(GTK_ORIENTATION_HORIZONTAL,
 					GTK_TOOLBAR_BOTH));
-    } else  {
-	bar=GTK_TOOLBAR(toolbar_map[i].toolbar);
 	
-	lp=bar->children;
-	if(lp) {
-	    do {
-		--bar->num_children;
-		bar->children=g_list_remove_link(bar->children, lp);
-
-		child=(GtkToolbarChild *)lp->data;
-		if(child->label)
-		    gtk_widget_destroy(GTK_WIDGET(child->label));
-		if(child->icon)
-		    gtk_widget_destroy(GTK_WIDGET(child->icon));
-		if(child->widget)
-		    gtk_widget_destroy(GTK_WIDGET(child->widget));
-		g_free(child); 
-		g_list_free(lp);
-		if(!bar->children)
-		    break;
-		lp=g_list_first(bar->children);
-	    } while(lp);
-	} else /* !lp */ {
-	    for(i=0; i<MAXTOOLBARITEMS; i++)
-		tmpdata[i].disabled=0;
+    } else {
+	bar=GTK_TOOLBAR(toolbar_map[i].toolbar);
+	index=get_toolbar_index(toolbar);
+	if(index == -1) {
+	    g_warning("toolbar map exists but toolbar index not.\n");
+	    return NULL;
 	}
-				
-	if(bar->children)
-	    g_list_free(bar->children);
-	bar->children=NULL;
+	/* remove all items from the existing bar. 
+	   First spaces by position, then widgets by pointer. */
+	position = 0;
+	for(j=0; balsa_app.toolbars[index][j]; j++) {
+	    button=get_toolbar_button_index(balsa_app.toolbars[index][j]);
+	    if(button == -1) continue;
+	    if(!*(balsa_app.toolbars[index][j])) {
+		mygtk_toolbar_remove_space(bar, j+position);
+		position--;
+	    }
+	}
+	for(j=0; j<MAXTOOLBARITEMS; j++) {
+	    if(toolbar_data[toolbar][j].widget)
+		gtk_container_remove(GTK_CONTAINER(bar), 
+				     toolbar_data[toolbar][j].widget);
+	}
     }
+
     toolbar_map[i].toolbar=GTK_WIDGET(bar);
     toolbar_map[i].window=window;
     toolbar_map[i].type=toolbar;
@@ -378,7 +487,6 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
 
 	if(!*(balsa_app.toolbars[index][j])) {
 	    gtk_toolbar_append_space(bar);
-	    ++position;
 	    continue;
 	}
 	for(i=0; i<MAXTOOLBARITEMS; i++) {
@@ -450,7 +558,23 @@ get_toolbar_button_slot(BalsaToolbarType toolbar, char *id)
 }
 
 /* set_toolbar_button_callback:
-   FIXME: comment needed.
+   This _must_ be called for each toolbar button to set a handler
+   _before_ get_toolbar is called. Failure to do so will keep the
+   buttons without handlers from appearing on the toolbar
+
+   Parameters:
+   	toolbar		ID of the toolbar to set callbacks for
+	id			Pixmap ID of the button to associate
+	callback	The callback function
+	data		User data to be passed to the callback
+
+   Returns:
+   	nothing
+
+   Notes:
+   	If data == NULL, the GtkWidget * of the toolbar's parent window will
+	be passed to the callback
+
 */
 void
 set_toolbar_button_callback(BalsaToolbarType toolbar, char *id, 
@@ -468,7 +592,21 @@ set_toolbar_button_callback(BalsaToolbarType toolbar, char *id,
 }
 
 /* set_toolbar_button_sensitive:
-   FIXME: comment needed.
+   Sensitize or desensitize a toolbar button
+
+   This should be used in preference to gtk_widget_set_sensitive because it
+   also sets internal flags. This way sensitivity will be preserved across
+   toolbar reconfiguration.
+
+   Parameters:
+   	window		Window * of the toolbar's parent window
+	toolbar		Type if the toolbar
+	id			Pixmap ID of the button to set
+	sensitive	1 sets sensitive, 0 desensitizes
+
+   Notes:
+   	This function may be called before the toolbar is instantiated using
+	get_toolbar.
 */
 void
 set_toolbar_button_sensitive(GtkWidget *window, BalsaToolbarType toolbar, 
@@ -489,7 +627,17 @@ set_toolbar_button_sensitive(GtkWidget *window, BalsaToolbarType toolbar,
 }
 
 /* release_toolbars:
-   FIXME: comment needed.
+   Another mainstay of the toolbar system. This function will release the
+   toolbar from the module internal data tables. These tables have a finite
+   (100) size and may overflow if toolbars are not released. The proper way
+   to do this is to call release_toolbars from a "destroy" handler for the
+   window using the toolbar.
+
+   Parameters:
+   	window		The window that is being destroyed
+
+   Returns:
+   	nothing
 */
 void
 release_toolbars(GtkWidget *window)
@@ -508,7 +656,10 @@ release_toolbars(GtkWidget *window)
 }
 
 /* update_all_toolbars:
-   FIXME: comment needed.
+   Update all toolbars in all windows displaying a toolbar
+
+   Called from toolbar-prefs.c after a change has been mada to a toolbar
+   layout.
 */
 void
 update_all_toolbars(void)
@@ -520,7 +671,11 @@ update_all_toolbars(void)
 }
 
 /* get_legal_toolbar_buttons:
-   FIXME: comment needed.
+   Returns a pointer to an array of char * listing the buttons that can
+   be placed on the given toolbar. A pointer to an empty string, if present,
+   _must_ be the first item and means that separators are legal to insert
+   in the given toolbar. If the first item is not a separator, the behavior
+   of the preferences dialog is undefined.
 */
 char**
 get_legal_toolbar_buttons(int toolbar)

@@ -89,6 +89,7 @@ balsa_information(LibBalsaInformationType type, const char *fmt, ...)
 	show = balsa_app.debug_message;
 	break;
     case LIBBALSA_INFORMATION_FATAL:
+    default:
 	show = balsa_app.fatal_message;
 	break;
     }

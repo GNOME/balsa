@@ -410,7 +410,7 @@ AC_MSG_CHECKING([whether to build ESMTP support])
 if test "x$with_esmtp" != xno  ; then
 AC_MSG_RESULT([yes])
 	AC_CHECK_LIB(esmtp, smtp_start_session, AC_DEFINE(ENABLE_ESMTP) LIBS="$LIBS -lesmtp", AC_MSG_ERROR([*** You enabled ESMTP but esmtp library is not found.]), -lesmtp)
-	AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients, AC_DEFINE(ENABLE_ESMTP) LIBS="$LIBS -lesmtp", AC_MSG_ERROR([*** You enabled ESMTP but esmtp library doesn't support
+	AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients, AC_DEFINE(ENABLE_ESMTP), AC_MSG_ERROR([*** You enabled ESMTP but esmtp library doesn't support
 	'require_all_recipients'. Please get a Balsa aware
 	libESMTP from http://www.balsa.net/main.html or compile
 	libESMTP with './configure --enable-require-all-recipients'.]), -lesmtp)
@@ -549,7 +549,7 @@ set_more_warnings="$enableval", set_more_warnings=yes)
 
 if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
         CFLAGS="$CFLAGS \
-        -Wall -Wno-uninitialized \
+        -Wall \
         -Wchar-subscripts -Wmissing-declarations -Wmissing-prototypes \
         -Wnested-externs -Wpointer-arith \
         -Wno-sign-compare -Wsign-promo \

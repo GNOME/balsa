@@ -167,7 +167,7 @@ gint
 libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 				const gchar * path)
 {
-    int i;
+    int i = 0;
 
     g_return_val_if_fail(mailbox, -1);
     g_return_val_if_fail(path, -1);

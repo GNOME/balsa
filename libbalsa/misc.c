@@ -331,6 +331,7 @@ libbalsa_set_charset(const gchar * charset)
     const char * old_charset = Charset;
     libbalsa_lock_mutt();
     mutt_set_charset((gchar *) charset);
+    SendCharset = (char*)charset;
     libbalsa_unlock_mutt();
     return old_charset;
 }

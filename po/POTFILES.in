@@ -39,6 +39,7 @@ libmutt/imap/util.c
 libmutt/mbox.c
 libmutt/mutt_socket.c
 libmutt/mutt_ssl.c
+libmutt/mutt_tunnel.c
 libmutt/mx.c
 src/address-book-config.c
 src/address-book.c

@@ -272,7 +272,7 @@ balsa_index_init(BalsaIndex * bindex)
     titles[6] = _("Size");
 
     bindex->mailbox_node = NULL;
-    bindex->threading_type=BALSA_INDEX_THREADING_JWZ;
+    bindex->threading_type= balsa_app.threading_type;
     adj = gtk_adjustment_new (0.0, 0.0, 10.0, 1.0, 1.0, 1.0);
     gtk_scrolled_window_set_hadjustment (GTK_SCROLLED_WINDOW (bindex), 
                                          GTK_ADJUSTMENT (adj));

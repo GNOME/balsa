@@ -541,7 +541,7 @@ balsa_sendmsg_destroy(BalsaSendmsg * bsm)
 static gint
 find_locale_index_by_locale(const gchar * locale)
 {
-    int i, j, maxfit = -1, maxpos;
+    int i, j, maxfit = -1, maxpos = 0;
 
     if (!locale || strcmp(locale, "C") == 0)
 	return LOC_ENGLISH_POS;

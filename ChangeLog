@@ -1,3 +1,28 @@
+2001-07-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/misc.c(libbalsa_set_charset): set SendCharset as well.
+	* libbalsa/identity.c: remove testing uninitialized variable.
+	* libbalsa/mailbox_local.c: squash unitialized variable warning.
+	* src/balsa-app.[hc]: persistent threading_type.
+	* src/balsa-index.c: use persistent threading type.
+	* src/save-restore.c: save and restore it.
+
+	* src/balsa-message.c: Albrecht Dress
+	<albrecht.dress@arcormail.de>: RE updates + #55548 fix. Emmanuel
+	<e.allaud@wanadoo.fr>: correct find_beg_and_end() in the corner
+	case when str+pos points on a \n.
+
+	* src/main-window.c: update threading_type to mirror menu settings.
+	* src/address-book-config.c: squash unitialized variable warnings.
+	* src/mailbox-node.c: same.
+	* src/sendmsg-window.c: same.
+
+	* src/toolbar-factory.c:  M . Thielker <balsa@t-data.com> + me:
+	do not make assumptions about GtkToolbar structure. Add more
+	comments.
+
+	* configure.in: do not include -lesmtp twice.
+	
 2001-07-23  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/send.c: the send mail progress dialog (Brian Stafford

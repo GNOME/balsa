@@ -963,10 +963,6 @@ delete_ident_cb(GtkWidget* button, gpointer user_data)
     GtkWindow* parent;
     GList* select = clist->selection;
     gint row;
-    GList *list;
-
-    /* should never be true with the _BROWSE selection mode */
-    g_return_if_fail (list);
     
     row = GPOINTER_TO_INT(select->data);
     ident = LIBBALSA_IDENTITY(gtk_clist_get_row_data(clist, row));

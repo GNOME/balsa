@@ -1,3 +1,7 @@
+2005-01-27  Pawel Salek
+
+	* libbalsa/address-book-ldap.c: fix InternerAddress regression.
+
 2005-01-22  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: do not loose content type paramters -

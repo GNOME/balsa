@@ -272,9 +272,9 @@ void libbalsa_messages_change_flag(GList * messages,
 
 void libbalsa_message_reply(LibBalsaMessage * message);
 void libbalsa_message_clear_recent(LibBalsaMessage * message);
-void libbalsa_message_set_msg_flags(LibBalsaMessage * message,
-				    LibBalsaMessageFlag set,
-				    LibBalsaMessageFlag clear);
+gboolean libbalsa_message_set_msg_flags(LibBalsaMessage * message,
+					LibBalsaMessageFlag set,
+					LibBalsaMessageFlag clear);
 
 void libbalsa_message_append_part(LibBalsaMessage * message,
 				  LibBalsaMessageBody * body);

@@ -622,14 +622,25 @@ libbalsa_message_set_attach_icons(LibBalsaMessage * message)
 }
 
 /* Helper for mailbox drivers. */
-void
+gboolean
 libbalsa_message_set_msg_flags(LibBalsaMessage * message,
 			       LibBalsaMessageFlag set,
 			       LibBalsaMessageFlag clear)
 {
-    message->flags |= set;
-    message->flags &= ~clear;
-    libbalsa_message_set_status_icons(message);
+    gboolean changed = FALSE;
+    
+    if (!(message->flags & set)) {
+	message->flags |= set;
+	changed = TRUE;
+    }
+    if (message->flags & clear) {
+	message->flags &= ~clear;
+	changed = TRUE;
+    }
+    if (changed)
+	libbalsa_message_set_status_icons(message);
+
+    return changed;
 }
 
 /* Tell the mailbox driver to change flags. */

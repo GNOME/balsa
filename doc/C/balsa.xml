@@ -755,6 +755,36 @@ This is version 2.718 of the Balsa manual.
 	  Delete all messages from the <symbol>Trash</symbol> mailbox.
 	</para>
       </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Edit/Apply Filters</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Pop up a dialog that allows you to control which filters are
+          applied to this mailbox, and optionally to apply them.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Remove Duplicates</guimenuitem>
+	  </menuchoice> &mdash; 
+
+          Remove messages with duplicate message-IDs. If one of the
+          duplicates is marked as `replied-to', that one will be
+          retained. 
+
+          No attempt is made to verify that the messages really are
+          duplicated. You could leave deleted messages visible, and
+          check individually that the correct ones have been deleted.
+	</para>
+      </listitem>
+
     </itemizedlist>
 
   </listitem>

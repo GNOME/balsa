@@ -264,8 +264,11 @@ static void cmd_handle_fatal (IMAP_DATA* idata)
 {
   if ((idata->state == IMAP_SELECTED) &&
       (idata->reopen & IMAP_REOPEN_ALLOW) &&
-      !idata->ctx->closing)
-    mx_fastclose_mailbox (idata->ctx);
+      !idata->ctx->closing) {
+      idata->status == IMAP_BYE;
+      mx_fastclose_mailbox (idata->ctx);
+      printf("cmd_handle_fatal: handling fatal connection error.\n");
+  }
 }
 
 /* cmd_handle_untagged: fallback parser for otherwise unhandled messages. */

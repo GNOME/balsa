@@ -1,3 +1,10 @@
+2001-02-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_imap.c: fix shameful locking issue.
+	* libbalsa/message.c: fix crash in libbalsa_message_has_attachment().
+	* src/information-dialog.c: use fputs instead of fprintf with 
+	format only.
+	
 2001-02-14  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox_{imap,local}.c:

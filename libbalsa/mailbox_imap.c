@@ -242,16 +242,14 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, gboolean append)
     imap = LIBBALSA_MAILBOX_IMAP(mailbox);
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
-    libbalsa_lock_mutt();
-
     /* try getting password, quit on cancel */
     if (!(server->passwd && *server->passwd) &&
 	!(server->passwd = libbalsa_server_get_password(server, mailbox))) {
-	libbalsa_unlock_mutt();
 	UNLOCK_MAILBOX(mailbox);
 	return;
     }
     gdk_threads_leave();
+    libbalsa_lock_mutt();
     if (ImapUser)
 	safe_free((void **) &ImapUser);	/* because mutt does so */
     ImapUser = strdup(server->user);
@@ -270,7 +268,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, gboolean append)
 					      append ? M_APPEND : 0, NULL);
     libbalsa_unlock_mutt();
     g_free(tmp);
-    gdk_threads_leave();
+    gdk_threads_enter();
 
 
     if (CLIENT_CONTEXT_OPEN(mailbox)) {

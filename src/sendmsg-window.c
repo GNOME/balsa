@@ -2577,7 +2577,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->fcc_url  = NULL;
     msg->ident = balsa_app.current_ident;
     msg->update_config = FALSE;
-    msg->modified = FALSE; 
     msg->quit_on_close = FALSE;
     msg->orig_message = message;
     msg->window = window = gnome_app_new("balsa", NULL);
@@ -2700,10 +2699,18 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     gtk_paned_set_position(GTK_PANED(paned), -1);
     gnome_app_set_contents(GNOME_APP(window), paned);
 
+    /* Connect to "text-changed" here, so that we catch the initial text
+     * and wrap it... */
+    msg->changed_sig_id =
+        g_signal_connect(G_OBJECT(gtk_text_view_get_buffer(GTK_TEXT_VIEW
+                                                           (msg->text))),
+                         "changed", G_CALLBACK(text_changed), msg);
     if (type == SEND_CONTINUE)
 	continueBody(msg, message);
     else
 	fillBody(msg, message, type);
+    /* ...but mark it as unmodified. */
+    msg->modified = FALSE;
 
     /* set the menus  - and charset index - and display the window */
     /* FIXME: this will also reset the font, copying the text back and 
@@ -2752,10 +2759,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->delete_sig_id = 
 	g_signal_connect(G_OBJECT(balsa_app.main_window), "delete-event",
 			 G_CALLBACK(delete_event_cb), msg);
-    msg->changed_sig_id =
-        g_signal_connect(G_OBJECT(gtk_text_view_get_buffer(GTK_TEXT_VIEW
-                                                           (msg->text))),
-                         "changed", G_CALLBACK(text_changed), msg);
     return msg;
 }
 
@@ -3851,6 +3854,8 @@ sendmsg_window_new_from_list(GtkWidget * w, GList * message_list,
             g_string_free(body, TRUE);
         }
     }
+
+    bsmsg->modified = FALSE;
 
     return bsmsg;
 }

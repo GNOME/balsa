@@ -152,6 +152,10 @@ static GnomeUIInfo mailbox_menu[] =
     NULL, GNOME_APP_PIXMAP_NONE, GNOME_STOCK_MENU_PROP, 'C', 0, NULL
   },
 #endif
+  GNOMEUIINFO_ITEM_STOCK (N_ ("_Open"), N_("Open the selected mailbox"),
+			  mblist_menu_open_cb, GNOME_STOCK_MENU_PROP),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("_Close"), N_("Close the selected mailbox"),
+			  mblist_menu_close_cb, GNOME_STOCK_MENU_PROP),
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Add"), N_("Add a new mailbox"),
 			  mblist_menu_add_cb, GNOME_STOCK_MENU_PROP),
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Edit"), N_("Edit the selected mailbox"),
@@ -159,10 +163,10 @@ static GnomeUIInfo mailbox_menu[] =
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Delete"), N_("Delete the selected mailbox"),
 			  mblist_menu_delete_cb, GNOME_STOCK_MENU_TRASH),
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_ITEM_STOCK (N_ ("_Close current"), N_("Close the currently opened mailbox"),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("C_lose current"), N_("Close the currently opened mailbox"),
 			  mailbox_close_child, GNOME_STOCK_MENU_CLOSE),
 
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Commit current"), N_("Commit the changes in the currently opened mailbox"),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Co_mmit current"), N_("Commit the changes in the currently opened mailbox"),
 			  mailbox_commit_changes, GNOME_STOCK_MENU_REFRESH),
 
   GNOMEUIINFO_SEPARATOR,

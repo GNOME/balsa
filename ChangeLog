@@ -1,4 +1,24 @@
+1999-01-14  bertrand <Bertrand.Guiheneuf@inria.fr>
+
+
+	* src/mblist-window.c (mblist_open_window): take the 
+	"MailboxListHeight" into account.
+	* src/save-restore.c (config_global_save): new property:
+	"MailboxListHeight"
+	(config_global_load): idem.
+	* src/balsa-app.h: new kember to store the mailbox list height.
+	(useful only when the window is floatting)
+
+	* src/mblist-window.c 
+	(mblist_menu_open_cb): 
+	(mblist_menu_close_cb): 
+	src/main-window.c (mailbox_menu): two new items to open/close 
+	a selected mailbox from the menubar.
+
 1999-01-14  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	* src/mblist-window.c (mb_close_cb): new func
+	(mblist_create_context_menu): new context menu item: close the mb.
 
 	* src/mblist-window.c (mblist_create_context_menu): 
 	s/mblist_create_menu/mblist_create_context_menu

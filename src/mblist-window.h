@@ -34,6 +34,8 @@
 extern void mblist_menu_add_cb (GtkWidget * widget, gpointer data);
 extern void mblist_menu_edit_cb (GtkWidget * widget, gpointer data);
 extern void mblist_menu_delete_cb (GtkWidget * widget, gpointer data);
+extern void mblist_menu_open_cb (GtkWidget * widget, gpointer data);
+extern void mblist_menu_close_cb (GtkWidget * widget, gpointer data);
 
 extern void mblist_open_window (GnomeMDI * mdi);
 extern Mailbox *mblist_get_selected_mailbox (void);

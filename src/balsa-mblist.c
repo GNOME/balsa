@@ -147,7 +147,7 @@ balsa_mblist_init (BalsaMBList * tree)
   gtk_signal_connect (GTK_OBJECT (tree), "tree_expand",
 		      GTK_SIGNAL_FUNC (mailbox_tree_expand), NULL);
   gtk_signal_connect (GTK_OBJECT (tree), "tree_collapse",
-		      GTK_SIGNAL_FUNC (mailbox_tree_collapse), NULL);
+  GTK_SIGNAL_FUNC (mailbox_tree_collapse), NULL);
 
   gtk_ctree_set_show_stub (GTK_CTREE (tree), FALSE);
   gtk_ctree_set_line_style (GTK_CTREE (tree), GTK_CTREE_LINES_DOTTED);
@@ -161,10 +161,10 @@ balsa_mblist_init (BalsaMBList * tree)
 		      GTK_SIGNAL_FUNC (select_mailbox),
 		      (gpointer) NULL);
 
-  /*gtk_signal_connect (GTK_OBJECT (tree),
+  gtk_signal_connect (GTK_OBJECT (tree),
 		      "button_press_event",
 		      (GtkSignalFunc) button_event_press_cb,
-		      (gpointer) NULL);*/
+		      (gpointer) NULL);
 
   balsa_mblist_redraw (tree);
 }
@@ -261,7 +261,7 @@ balsa_mblist_redraw (BalsaMBList * bmbl)
 				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.inbox);
   balsa_mblist_add_watched_mailbox(bmbl, balsa_app.inbox);
-
+ 
   /* outbox */
   text[0] = "Outbox";
   mailbox_gather_content_info( balsa_app.outbox );
@@ -410,26 +410,29 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
   gint row, column;
   Mailbox *mailbox;
   GtkCTreeNode *ctrow;
-  printf("bim bim\n");
+  
   if (event->window != clist->clist_window)
     return;
-
-  if (!event || event->button != 3)
+  
+  if (!event || event->button != 3 )
     return;
-
-  gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
-  mailbox = gtk_clist_get_row_data (clist, row);
-
-  gtk_clist_select_row (clist, row, -1);
-
-  ctrow = gtk_ctree_find_by_row_data (GTK_CTREE (clist), NULL, mailbox);
-
-  if (mailbox)
-    gtk_signal_emit (GTK_OBJECT (clist),
-		     balsa_mblist_signals[SELECT_MAILBOX],
-		     mailbox,
-		     ctrow,
-		     event);
+  if (event->button == 1 && event->type == GDK_2BUTTON_PRESS)
+    {
+      gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
+      mailbox = gtk_clist_get_row_data (clist, row);
+      
+      gtk_clist_select_row (clist, row, -1);
+      
+      ctrow = gtk_ctree_find_by_row_data (GTK_CTREE (clist), NULL, mailbox);
+      
+      if (mailbox)
+	gtk_signal_emit (GTK_OBJECT (clist),
+			 balsa_mblist_signals[SELECT_MAILBOX],
+			 mailbox,
+			 ctrow,
+			 event);
+    }
+  
 }
 
 
@@ -443,7 +446,7 @@ select_mailbox (GtkCTree * ctree, GtkCTreeNode * row, gint column)
   bmbl = BALSA_MBLIST (ctree);
 
   mailbox = gtk_ctree_node_get_row_data (ctree, row);
-
+ 
   if (bevent && bevent->button == 1)
     {
       if (mailbox)

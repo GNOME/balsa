@@ -177,9 +177,9 @@ mblist_open_mailbox (Mailbox * mailbox)
      it in comment until somebody tells me waht it  is useful 
      for.      -Bertrand 
   
-  if (!strcmp (mailbox->name, "Inbox") ||
-      !strcmp (mailbox->name, "Outbox") ||
-      !strcmp (mailbox->name, "Trash"))
+  if (!strcmp (mailbox->name, _("Inbox")) ||
+      !strcmp (mailbox->name, _("Outbox")) ||
+      !strcmp (mailbox->name, _("Trash")))
     return ;
   
     gtk_ctree_set_node_info (GTK_CTREE (bmbl),

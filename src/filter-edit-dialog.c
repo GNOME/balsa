@@ -124,6 +124,10 @@ build_left_side (GtkWidget **clist_ptr)
                                     GTK_POLICY_AUTOMATIC,
                                     GTK_POLICY_AUTOMATIC);
 
+#ifdef ENABLE_NLS
+    titles[0]=_(titles[0]);
+    titles[1]=_(titles[1]); 
+#endif
     clist = gtk_clist_new_with_titles (2, titles);
 
     gtk_widget_pop_colormap ();

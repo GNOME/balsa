@@ -134,17 +134,17 @@ balsa_init_window_new (void)
   gtk_notebook_set_show_border (GTK_NOTEBOOK (iw->notebook), FALSE);
   gtk_widget_show (iw->notebook);
 
-  label = gtk_label_new ("welcome");
+  label = gtk_label_new (_("welcome"));
   gtk_notebook_append_page (GTK_NOTEBOOK (iw->notebook),
 			    create_welcome_page (),
 			    label);
 
-  label = gtk_label_new ("general");
+  label = gtk_label_new (_("general"));
   gtk_notebook_append_page (GTK_NOTEBOOK (iw->notebook),
 			    create_general_page (),
 			    label);
 
-  label = gtk_label_new ("mailboxs");
+  label = gtk_label_new (_("mailboxs"));
   gtk_notebook_append_page (GTK_NOTEBOOK (iw->notebook),
 			    create_mailboxes_page (),
 			    label);
@@ -587,7 +587,7 @@ complete_cb (GtkWidget * widget, gpointer data)
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
   mailbox = mailbox_new (type);
-  mailbox->name = g_strdup ("Inbox");
+  mailbox->name = g_strdup (_("Inbox"));
   MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
   config_mailbox_add (mailbox, "Inbox");
   add_mailboxes_for_checking (mailbox);
@@ -595,7 +595,7 @@ complete_cb (GtkWidget * widget, gpointer data)
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
   mailbox = mailbox_new (type);
-  mailbox->name = g_strdup ("Outbox");
+  mailbox->name = g_strdup (_("Outbox"));
   MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->outbox)));
   config_mailbox_add (mailbox, "Outbox");
   add_mailboxes_for_checking (mailbox);
@@ -603,7 +603,7 @@ complete_cb (GtkWidget * widget, gpointer data)
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->trash)));
   mailbox = mailbox_new (type);
-  mailbox->name = g_strdup ("Trash");
+  mailbox->name = g_strdup (_("Trash"));
   MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->trash)));
   config_mailbox_add (mailbox, "Trash");
   add_mailboxes_for_checking (mailbox);

@@ -63,9 +63,9 @@ guint toolbar_type[NUM_TOOLBAR_MODES] =
 
 gchar *toolbar_type_label[NUM_TOOLBAR_MODES] =
 {
-  "Text",
-  "Icons",
-  "Both",
+  N_("Text"),
+  N_("Icons"),
+  N_("Both"),
 };
 
 /* notebook pages */
@@ -545,7 +545,7 @@ create_display_page ()
   for (i = 0; i < NUM_TOOLBAR_MODES; i++)
     {
       pui->toolbar_type[i] = GTK_RADIO_BUTTON (gtk_radio_button_new_with_label (group,
-						    toolbar_type_label[i]));
+						    _(toolbar_type_label[i])));
       gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (pui->toolbar_type[i]), TRUE, TRUE,
 			  2);
       group = gtk_radio_button_group (pui->toolbar_type[i]);

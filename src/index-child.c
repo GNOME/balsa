@@ -146,7 +146,7 @@ index_child_new (GnomeMDI * mdi, Mailbox * mailbox)
 	hbox = gtk_hbox_new (FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (dialog)->vbox), hbox, FALSE, FALSE, 10);
 
-	label = gtk_label_new ("Password:");
+	label = gtk_label_new (_("Password:"));
 	gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 10);
 
 	entry = gtk_entry_new ();
@@ -396,7 +396,7 @@ create_menu (BalsaIndex * bindex)
   GtkWidget *bmbl;
 
   menu = gtk_menu_new ();
-  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_JUMP_TO, _ ("Transfer"));
+  menuitem = gtk_menu_item_new_with_label (_ ("Transfer"));
 
   submenu = gtk_menu_new ();
   smenuitem = gtk_menu_item_new ();

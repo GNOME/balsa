@@ -453,14 +453,14 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
   if (message->date)
     {
       /* this is the first row, so we'll use 0.0 here */
-      item = balsa_message_text_item ("Date:", row[0], 0.0, 0.0);
+      item = balsa_message_text_item (_("Date:"), row[0], 0.0, 0.0);
       data = balsa_message_text_item (message->date, row[1], 0.0, 0.0);
     }
 
   if (message->to_list)
     {
       next_height = next_row_height (row);
-      item = balsa_message_text_item ("To:", row[0], 0.0, next_height);
+      item = balsa_message_text_item (_("To:"), row[0], 0.0, next_height);
       data = balsa_message_text_item (make_string_from_list (message->to_list),
 				      row[1], 0.0, next_height);
     }
@@ -468,7 +468,7 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
   if (message->cc_list)
     {
       next_height = next_row_height (row);
-      item = balsa_message_text_item ("Cc:", row[0], 0.0, next_height);
+      item = balsa_message_text_item (_("Cc:"), row[0], 0.0, next_height);
       data = balsa_message_text_item (make_string_from_list (message->cc_list),
 				      row[1], 0.0, next_height);
     }
@@ -478,7 +478,7 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
       gchar *from;
       next_height = next_row_height (row);
 
-      item = balsa_message_text_item ("From:", row[0], 0.0, next_height);
+      item = balsa_message_text_item (_("From:"), row[0], 0.0, next_height);
 
       if (message->from->personal)
 	from = g_strdup_printf ("%s <%s>", message->from->personal, message->from->mailbox);
@@ -492,7 +492,7 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
   if (message->subject)
     {
       next_height = next_row_height (row);
-      item = balsa_message_text_item ("Subject:", row[0], 0.0, next_height);
+      item = balsa_message_text_item (_("Subject:"), row[0], 0.0, next_height);
       data = balsa_message_text_item (message->subject, row[1], 0.0, next_height);
     }
 
@@ -584,12 +584,12 @@ application2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *
   gchar link_bfr[128];
   PARAMETER *bdy_parameter = bdy->parameter;
   obstack_append_string (canvas_bfr,
-			 "<tr><td bgcolor=\"#f0f0f0\"> "
-		       "You received an encoded file of type application/");
+			 _("<tr><td bgcolor=\"#f0f0f0\"> "
+		       "You received an encoded file of type application/"));
   obstack_append_string (canvas_bfr, bdy->subtype);
   obstack_append_string (canvas_bfr, "<BR>");
-  obstack_append_string (canvas_bfr, "<P>The parameters of this message are:<BR>");
-  obstack_append_string (canvas_bfr, "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n");
+  obstack_append_string (canvas_bfr, _("<P>The parameters of this message are:<BR>"));
+  obstack_append_string (canvas_bfr, _("<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"));
   while (bdy_parameter)
     {
       obstack_append_string (canvas_bfr, "<tr><td>");
@@ -781,7 +781,7 @@ content2canvas (Message * message, GnomeCanvasGroup * group)
 	msg_stream = fopen (msg_filename, "r");
 	if (!msg_stream || ferror (msg_stream))
 	  {
-	    fprintf (stderr, "Open of %s failed. Errno = %d, ",
+	    fprintf (stderr, _("Open of %s failed. Errno = %d, "),
 		     msg_filename, errno);
 	    perror (NULL);
 	    return FALSE;

@@ -285,7 +285,7 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_table_set_col_spacings (GTK_TABLE (table), 2);
 
   /* To: */
-  label = gtk_label_new ("To:");
+  label = gtk_label_new (_("To:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL, 0, 0);
@@ -294,7 +294,6 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_table_attach (GTK_TABLE (table), msg->to, 1, 2, 0, 1,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
 
-#ifdef BALSA_SHOW_ALL
   button = gtk_button_new ();
   gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
   GTK_WIDGET_UNSET_FLAGS (button, GTK_CAN_FOCUS);
@@ -302,10 +301,10 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 	       gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_RED));
   gtk_table_attach (GTK_TABLE (table), button, 2, 3, 0, 1,
 		    0, 0, 0, 0);
-#endif
+
 
   /* From: */
-  label = gtk_label_new ("From:");
+  label = gtk_label_new (_("From:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
 		    GTK_FILL, GTK_FILL, 0, 0);
@@ -316,7 +315,6 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   GTK_WIDGET_UNSET_FLAGS (msg->from, GTK_CAN_FOCUS);
   gtk_entry_set_editable (GTK_ENTRY (msg->from), FALSE);
 
-#ifdef BALSA_SHOW_ALL
   button = gtk_button_new ();
   gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
   GTK_WIDGET_UNSET_FLAGS (button, GTK_CAN_FOCUS);
@@ -324,10 +322,9 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 	      gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_BLUE));
   gtk_table_attach (GTK_TABLE (table), button, 2, 3, 1, 2,
 		    0, 0, 0, 0);
-#endif
-  
+
   /* Subject: */
-  label = gtk_label_new ("Subject:");
+  label = gtk_label_new (_("Subject:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
 		    GTK_FILL, GTK_FILL, 0, 0);
@@ -337,7 +334,7 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
 
   /* cc: */
-  label = gtk_label_new ("cc:");
+  label = gtk_label_new (_("cc:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
 		    GTK_FILL, GTK_FILL, 0, 0);
@@ -346,7 +343,6 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_table_attach (GTK_TABLE (table), msg->cc, 1, 2, 3, 4,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
 
-#ifdef BALSA_SHOW_ALL
   button = gtk_button_new ();
   gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
   GTK_WIDGET_UNSET_FLAGS (button, GTK_CAN_FOCUS);
@@ -354,10 +350,9 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 	    gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_YELLOW));
   gtk_table_attach (GTK_TABLE (table), button, 2, 3, 3, 4,
 		    0, 0, 0, 0);
-#endif
 
   /* bcc: */
-  label = gtk_label_new ("bcc:");
+  label = gtk_label_new (_("bcc:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 4, 5,
 		    GTK_FILL, GTK_FILL, 0, 0);
@@ -366,7 +361,6 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_table_attach (GTK_TABLE (table), msg->bcc, 1, 2, 4, 5,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
 
-#ifdef BALSA_SHOW_ALL
   button = gtk_button_new ();
   gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
   GTK_WIDGET_UNSET_FLAGS (button, GTK_CAN_FOCUS);
@@ -374,10 +368,9 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 	     gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_GREEN));
   gtk_table_attach (GTK_TABLE (table), button, 2, 3, 4, 5,
 		    0, 0, 0, 0);
-#endif
 
   /* Attachment list */
-  label = gtk_label_new ("Attachments:");
+  label = gtk_label_new (_("Attachments:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 5, 6,
 		    GTK_FILL, GTK_FILL, 0, 0);
@@ -639,7 +632,13 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
 	  if (message->date)
 	    {
-	      tmp = g_strdup_printf ("On %s ", message->date);
+              /* Should use instead something like:
+               * 	strftime( buf, sizeof(buf), _("On %A %B %d %Y etc"),
+               * 	                somedateparser(message-date)));
+               * 	tmp = g_strdup_printf (buf);
+               * so the date attribution can fully (and properly) translated.
+               */		
+	      tmp = g_strdup_printf (_("On %s "), message->date);
 	      str = g_string_append (str, tmp);
 	      g_free (tmp);
 	    }
@@ -649,12 +648,12 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 	      if (message->from->personal)
 		str = g_string_append (str, message->from->personal);
 	      else
-		str = g_string_append (str, "you");
+		str = g_string_append (str, _("you"));
 	    }
 	  else
-	    str = g_string_append (str, "you");
+	    str = g_string_append (str, _("you"));
 
-	  str = g_string_append (str, " wrote:\n");
+	  str = g_string_append (str, _(" wrote:\n"));
 
 
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, str->str, strlen (str->str));

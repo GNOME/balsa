@@ -63,18 +63,34 @@ static void
 balsa_druid_page_finish_finish(GnomeDruidPage * page, GnomeDruid * druid)
 {
     gchar *address_book;
+    LibBalsaAddressBook *ab = NULL;
 
     address_book = gnome_util_home_file("GnomeCard.gcrd");
-    if (g_file_test(address_book, G_FILE_TEST_EXISTS)) {
-        LibBalsaAddressBook *ab =
-            libbalsa_address_book_vcard_new(_("GnomeCard Address Book"),
-                                            address_book);
-
-        balsa_app.address_book_list =
-            g_list_prepend(balsa_app.address_book_list, ab);
-        balsa_app.default_address_book = ab;
-    }
+    if (g_file_test(address_book, G_FILE_TEST_EXISTS))
+        ab = libbalsa_address_book_vcard_new(_("GnomeCard Address Book"),
+                                             address_book);
     g_free(address_book);
+    if(!ab) {
+        address_book = g_strconcat(g_get_home_dir(), 
+                                   "/.addressbook.ldif", NULL);
+        if (g_file_test(address_book, G_FILE_TEST_EXISTS))
+            ab = libbalsa_address_book_ldif_new(_("Address Book"),
+                                                address_book);
+        g_free(address_book);
+    }
+    if(!ab) {
+        /* This will be the default address book and its location */
+        address_book = g_strconcat(g_get_home_dir(), 
+                                   "/.balsa/addressbook.ldif", NULL);
+        ab = libbalsa_address_book_ldif_new(_("Address Book"),
+                                            address_book); 
+        g_free(address_book);
+        libbalsa_assure_balsa_dir();
+   }
+
+    balsa_app.address_book_list =
+        g_list_prepend(balsa_app.address_book_list, ab);
+    balsa_app.default_address_book = ab;
 
     config_save();
     gtk_main_quit();

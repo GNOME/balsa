@@ -1,3 +1,10 @@
+2004-07-09  Pawel Salek
+
+	* libinit_balsa/balsa-druid-page-finish.c: assure there is a 
+	default address book available.
+	* src/save-restore.c: clean up the old lists before loading (145701).
+	* configure.in: bump the version number to test the release.
+
 2004-07-09  Carlos Morgado  <chbm gnome.org>
 
 	* src/mailbox-node.c: 

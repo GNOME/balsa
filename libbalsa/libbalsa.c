@@ -331,7 +331,7 @@ gboolean libbalsa_ldap_exists(const gchar *server)
 void
 libbalsa_assure_balsa_dir(void)
 {
-    gchar* dir   = gnome_util_prepend_user_home(".balsa");
+    gchar* dir = g_strconcat(g_get_home_dir(), "/.balsa", NULL);
     mkdir(dir, S_IRUSR|S_IWUSR|S_IXUSR);
     g_free(dir);
 }

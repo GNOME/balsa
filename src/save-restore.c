@@ -1378,6 +1378,13 @@ config_address_books_load(void)
     g_free(tmp);
     gnome_config_pop_prefix();
 
+    /* Free old data in case address books were set by eg. config druid. */
+    if(balsa_app.address_book_list) {
+        g_list_foreach(balsa_app.address_book_list,
+                       (GFunc)g_object_unref, NULL);
+        g_list_free(balsa_app.address_book_list);
+        balsa_app.address_book_list = NULL;
+    }
     iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
     while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
 
@@ -1424,6 +1431,12 @@ config_identities_load()
     gchar *key, *val, *tmp;
     int pref_len = strlen(IDENTITY_SECTION_PREFIX);
 
+    /* Free old data in case identities were set by eg. config druid. */
+    if(balsa_app.identities) {
+        g_list_foreach(balsa_app.identities, (GFunc)g_object_unref, NULL);
+        g_list_free(balsa_app.identities);
+        balsa_app.identities = NULL;
+    }
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "identity/");
     default_ident = gnome_config_get_string("CurrentIdentity");
     gnome_config_pop_prefix();

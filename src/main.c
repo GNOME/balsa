@@ -100,8 +100,10 @@ balsa_init (int argc, char **argv)
   PortableServer_POAManager pm;
   static struct poptOption options[] = {
          {"checkmail", 'c', POPT_ARG_NONE, &(balsa_app.check_mail_upon_startup), 0, N_("Get new mail on startup"), NULL},
-         {"compose", 'm', POPT_ARG_STRING, &(balsa_app.compose_email), 0, N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
-         {"open-mailbox", 'o', POPT_ARG_STRING, &(balsa_app.open_mailbox), 0, N_("Opens MAILBOXNAME"),N_("MAILBOXNAME")},
+         {"compose", 'm', POPT_ARG_STRING, &(balsa_app.compose_email), 
+	  0, N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
+         {"open-mailbox", 'o', POPT_ARG_STRING, &(balsa_app.open_mailbox), 
+	  0, N_("Opens MAILBOXNAME"),N_("MAILBOXNAME")},
          {"open-unread-mailbox", 'u', POPT_ARG_NONE, &(balsa_app.open_unread_mailbox), 0, N_("Opens first unread mailbox"), NULL},
          {NULL, '\0', 0, NULL, 0} /* end the list */
   };
@@ -290,8 +292,9 @@ main (int argc, char *argv[])
      gchar** names= g_strsplit(balsa_app.open_mailbox,";",20);
      while(names[i]) {
 	Mailbox *mbox = mblist_find_mbox_by_name(names[i]);
+	if(balsa_app.debug)
+	    fprintf(stderr,"opening %s => %p..\n", names[i], mbox);
 	if(mbox) {
-	   printf("opening %s..\n", mbox->name);
 	   mblist_open_mailbox(mbox);
 	}
 	i++;

@@ -181,8 +181,9 @@ extern struct BalsaApplication
   /* command line options */
 
   gint check_mail_upon_startup;
+  gint remember_open_mboxes;
   gint open_unread_mailbox;
-  gchar *open_mailbox;
+  gchar *open_mailbox; /* ';'-separated, from last session or command line */
   gchar* compose_email;
 
   /* font used to display messages */

@@ -511,8 +511,7 @@ mbox_by_name (gconstpointer a, gconstpointer b)
 
   /* two lines will execute if the mbox is not found */
   if(mbnode->mailbox == NULL) 
-    return FALSE;
-
+    return TRUE;
   return strcmp(mbnode->mailbox->name, name) != 0;
 }
 

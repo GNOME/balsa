@@ -1,3 +1,8 @@
+2000-04-24  Pawel Salek <pawsa@theochem.kth.se>
+	* src/balsa-app.h,src/save-restore.c,src/main.c: remembering
+	open mailboxes between sessions.
+	* src/mblist-window.c: open-mailbox CLO bug fix.
+	
 2000-04-24  Fatih Demir	<kabalak@gmx.net>
 
 	* sounds/balsa.soundlist & sounds/email.soundlist : 

@@ -601,6 +601,23 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 }				/* config_mailbox_init */
 
 
+static void cat_mbox_name(GtkWidget * w, gpointer data) {
+    GtkWidget * page = gtk_object_get_data(GTK_OBJECT(w),"indexpage");
+    if(*(char*)data) 
+	strncat((char*)data,";",MAX_PROPLIST_KEY_LEN);
+
+    strncat((char*)data,BALSA_INDEX_PAGE(page)->mailbox->name,
+	   MAX_PROPLIST_KEY_LEN);
+}
+
+static void
+get_open_mailboxes_string(char * tmp)
+{
+    *tmp = '\0';
+    gtk_container_foreach(GTK_CONTAINER(balsa_app.notebook), cat_mbox_name,
+			  tmp);
+}
+
 /* Load Balsa's global settings */
 gint
 config_global_load (void)
@@ -919,6 +936,21 @@ config_global_load (void)
   else
 	  balsa_app.check_mail_upon_startup = atoi(field);
 
+  if (( field = pl_dict_get_str (globals, "RememberOpenMailboxes")) == NULL )
+	  balsa_app.remember_open_mboxes = FALSE;
+  else
+	  balsa_app.remember_open_mboxes = atoi(field);
+
+  if ( balsa_app.remember_open_mboxes &&
+       ( field = pl_dict_get_str (globals, "OpenMailboxes")) != NULL &&
+      strlen(field)>0 ) {
+      if(balsa_app.open_mailbox) {
+	  gchar * str = g_strconcat(balsa_app.open_mailbox, ";", field,NULL);
+	  g_free(balsa_app.open_mailbox);
+	  balsa_app.open_mailbox = str;
+      } else balsa_app.open_mailbox = g_strdup(field);
+  }
+
   if (( field = pl_dict_get_str (globals, "EmptyTrash")) == NULL )
 	  balsa_app.empty_trash_on_exit = FALSE;
   else
@@ -1137,6 +1169,12 @@ config_global_save (void)
   
   snprintf (tmp, sizeof (tmp), "%d", balsa_app.check_mail_upon_startup);
   pl_dict_add_str_str (globals, "CheckMailUponStartup", tmp);
+
+  get_open_mailboxes_string(tmp);
+  pl_dict_add_str_str (globals, "OpenMailboxes", tmp);
+
+  snprintf (tmp, sizeof (tmp), "%d", balsa_app.remember_open_mboxes);
+  pl_dict_add_str_str (globals, "RememberOpenMailboxes", tmp);
 
   snprintf ( tmp, sizeof(tmp), "%d", balsa_app.empty_trash_on_exit);
   pl_dict_add_str_str (globals, "EmptyTrash", tmp);

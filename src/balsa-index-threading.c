@@ -61,6 +61,7 @@ struct ThreadingInfo {
     GHashTable *id_table;
     GHashTable *ref_table;
     GtkTreeModel *model;
+    GSList *message_list;
 };
 
 static void threading_jwz(BalsaIndex* index);
@@ -83,30 +84,18 @@ static void reparent(GNode* node, GNode* children);
 static void free_node(GNode* value);
 static const gchar* chop_re(const gchar* str);
 
-static void threading_simple(BalsaIndex* index);
+static void threading_simple(BalsaIndex * index,
+                             LibBalsaMailboxThreadingType th_type);
 static gboolean add_message(GtkTreeModel * model, GtkTreePath * path,
                             GtkTreeIter * iter, gpointer data);
-
-static void threading_flat(BalsaIndex * index);
-static gboolean make_move_list(GtkTreeModel * model, GtkTreePath * path,
-                               GtkTreeIter * iter, gpointer data);
 
 void
 balsa_index_threading(BalsaIndex* index, LibBalsaMailboxThreadingType th_type)
 {
-    switch (th_type) {
-    case LB_MAILBOX_THREADING_SIMPLE:
-	threading_simple(index);
-	break;
-    case LB_MAILBOX_THREADING_JWZ:
-	threading_jwz(index);
-	break;
-    case LB_MAILBOX_THREADING_FLAT:
-        threading_flat(index);
-	break;
-    default:
-	break;
-    }
+    if (th_type == LB_MAILBOX_THREADING_JWZ)
+        threading_jwz(index);
+    else
+        threading_simple(index, th_type);
 }
 
 static void
@@ -839,51 +828,39 @@ free_node(GNode* node)
 /* yet another message threading function */
 
 static void
-threading_simple(BalsaIndex * index)
+threading_simple(BalsaIndex * index, LibBalsaMailboxThreadingType type)
 {
-    GtkTreeIter iter;
-    GSList *root_children = NULL;
     GSList *p;
     struct ThreadingInfo ti;
     gint length = 0;
 
     ti.model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
-    if (!gtk_tree_model_get_iter_first(ti.model, &iter))
-        return;
 
     ti.id_table = g_hash_table_new(g_str_hash, g_str_equal);
     ti.ref_table =
         g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
-                              (GDestroyNotify) gtk_tree_row_reference_free);
+                              (GDestroyNotify)
+                              gtk_tree_row_reference_free);
+    ti.message_list = NULL;
     gtk_tree_model_foreach(ti.model, add_message, &ti);
 
-    do {
-        LibBalsaMessage *message = NULL;
-
-        gtk_tree_model_get(ti.model, &iter,
-                           BNDX_MESSAGE_COLUMN, &message,
-                           -1);
-        root_children = g_slist_prepend(root_children, message);
-        length++;
-    } while (gtk_tree_model_iter_next(ti.model, &iter));
-
     balsa_window_setup_progress(BALSA_WINDOW(index->window), length);
-    for (p = root_children; p; p = g_slist_next(p)) {
+    for (p = ti.message_list; p; p = g_slist_next(p)) {
         LibBalsaMessage *message = p->data;
+        LibBalsaMessage *parent = NULL;
 
-        if (message->references_for_threading != NULL) {
-            LibBalsaMessage *parent =
+        if (type == LB_MAILBOX_THREADING_SIMPLE
+            && message->references_for_threading != NULL)
+            parent =
                 g_hash_table_lookup(ti.id_table,
                                     g_list_last(message->
                                                 references_for_threading)->
                                     data);
-
-            check_parent(&ti, parent, message);
-        }
+        check_parent(&ti, parent, message);
         balsa_window_increment_progress(BALSA_WINDOW(index->window));
     }
     balsa_window_clear_progress(BALSA_WINDOW(index->window));
-    g_slist_free(root_children);
+    g_slist_free(ti.message_list);
     g_hash_table_destroy(ti.id_table);
     g_hash_table_destroy(ti.ref_table);
 }
@@ -901,59 +878,7 @@ add_message(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
     if (message->message_id
         && !g_hash_table_lookup(ti->id_table, message->message_id))
         g_hash_table_insert(ti->id_table, message->message_id, message);
-
-    return FALSE;
-}
-
-/* For a flat index, we just move any messages in threads to the top
- * level. */
-
-struct FlatInfo {
-    GSList *move_list;
-    GHashTable *ref_table;
-};
-
-static void
-threading_flat(BalsaIndex * index)
-{
-    GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
-    struct FlatInfo fi;
-    GSList *list;
-
-    fi.move_list = NULL;
-    fi.ref_table =
-        g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
-                              (GDestroyNotify)
-                              gtk_tree_row_reference_free);
-    gtk_tree_model_foreach(model, make_move_list, &fi);
-
-    for (list = fi.move_list; list; list = g_slist_next(list)) {
-        GtkTreeRowReference *reference =
-            g_hash_table_lookup(fi.ref_table, list->data);
-        GtkTreePath *path = gtk_tree_row_reference_get_path(reference);
-        balsa_index_move_subtree(model, path, NULL, fi.ref_table);
-        gtk_tree_path_free(path);
-    }
-
-    g_slist_free(fi.move_list);
-    g_hash_table_destroy(fi.ref_table);
-}
-
-static gboolean
-make_move_list(GtkTreeModel * model, GtkTreePath * path,
-               GtkTreeIter * iter, gpointer data)
-{
-    if (gtk_tree_path_get_depth(path) > 1) {
-        LibBalsaMessage *message = NULL;
-        gtk_tree_model_get(model, iter, BNDX_MESSAGE_COLUMN, &message, -1);
-        if (message) {
-            struct FlatInfo *fi = data;
-            GtkTreeRowReference *reference =
-                gtk_tree_row_reference_new(model, path);
-            fi->move_list = g_slist_prepend(fi->move_list, message);
-            g_hash_table_insert(fi->ref_table, message, reference);
-        }
-    }
+    ti->message_list = g_slist_prepend(ti->message_list, message);
 
     return FALSE;
 }

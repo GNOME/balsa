@@ -1,3 +1,7 @@
+2004-03-31 09:24  PeterB
+
+	* libbalsa/imap/imap-handle.c: declaration out of order.
+
 2004-03-30 15:39  PeterB
 
 	* libbalsa/: mailbox_local.c, mailbox_maildir.c, mailbox_mbox.c,

@@ -50,6 +50,8 @@ static void balsa_index_init (BalsaIndex * bindex);
 static void balsa_index_size_request (GtkWidget * widget, GtkRequisition * requisition);
 static void balsa_index_size_allocate (GtkWidget * widget, GtkAllocation * allocation);
 
+static void clist_click_column (GtkCList * clist, gint column, gpointer data);
+
 
 /* statics */
 static void clist_set_col_img_from_flag (BalsaIndex *, gint, Message *);
@@ -158,6 +160,21 @@ balsa_index_marshal_signal_1 (GtkObject * object,
 	    GTK_VALUE_BOXED (args[1]), func_data);
 }
 
+static void
+clist_click_column (GtkCList * clist, gint column, gpointer data)
+{
+  if (column == clist->sort_column)
+    {
+      if (clist->sort_type == GTK_SORT_ASCENDING)
+	clist->sort_type = GTK_SORT_DESCENDING;
+      else
+	clist->sort_type = GTK_SORT_ASCENDING;
+    }
+  else
+    gtk_clist_set_sort_column (clist, column);
+
+  gtk_clist_sort (clist);
+}
 
 static void
 balsa_index_init (BalsaIndex * bindex)
@@ -221,6 +238,10 @@ balsa_index_init (BalsaIndex * bindex)
 
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
+
+  gtk_signal_connect (GTK_OBJECT (clist), "click_column",
+		      GTK_SIGNAL_FUNC (clist_click_column),
+		      NULL);
 
   gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_EXTENDED);
@@ -341,10 +362,10 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (mailbox == NULL)
     return;
 
-  cursor = gdk_cursor_new(GDK_WATCH);
-  window = gtk_widget_get_parent_window(GTK_WIDGET(bindex));
-  gdk_window_set_cursor(window, cursor);
- 
+  cursor = gdk_cursor_new (GDK_WATCH);
+  window = gtk_widget_get_parent_window (GTK_WIDGET (bindex));
+  gdk_window_set_cursor (window, cursor);
+
   /*
    * release the old mailbox
    */
@@ -401,8 +422,8 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (bindex->first_new_message == 0)
     bindex->first_new_message = i;
 
-  gdk_cursor_destroy(cursor);
-  
+  gdk_cursor_destroy (cursor);
+
   gtk_idle_add ((GtkFunction) moveto_handler, bindex);
 }
 

@@ -46,7 +46,7 @@ struct _IndexChildClass
     GnomeMDIChildClass parent_class;
   };
 
-void create_new_index (Mailbox *);
+IndexChild *index_child_new (Mailbox *);
 void index_child_changed(GnomeMDI *, GnomeMDIChild *);
 IndexChild *index_child_get_active(GnomeMDI *);
 

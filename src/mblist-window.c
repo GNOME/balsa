@@ -139,7 +139,7 @@ destroy_mblist_window (GtkWidget * widget)
 static void
 mailbox_select_cb (GtkTree * tree)
 {
-  GtkWidget *index_child;
+  IndexChild *index_child;
   Mailbox *mailbox;
   GList *selected;
   GtkTreeItem *selected_item;

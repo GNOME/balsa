@@ -72,6 +72,8 @@ typedef struct _PropertyUI {
 
     GtkWidget *close_mailbox_auto;
     GtkWidget *close_mailbox_minutes;
+    GtkWidget *commit_mailbox_auto;
+    GtkWidget *commit_mailbox_minutes;
     GtkWidget *drag_default_is_move;
     GtkWidget *delete_immediately;
     GtkWidget *hide_deleted;
@@ -196,7 +198,8 @@ static void address_book_edit_cb(GtkWidget * widget, gpointer data);
 static void address_book_add_cb(GtkWidget * widget, gpointer data);
 static void address_book_delete_cb(GtkWidget * widget, gpointer data);
 static void timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
-static void mailbox_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
+static void mailbox_close_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
+static void mailbox_commit_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void browse_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox);
@@ -401,10 +404,14 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                        GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
 
     gtk_signal_connect(GTK_OBJECT(pui->close_mailbox_auto), "toggled",
-                       GTK_SIGNAL_FUNC(mailbox_timer_modified_cb), property_box);
+                       GTK_SIGNAL_FUNC(mailbox_close_timer_modified_cb), property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->commit_mailbox_auto), "toggled",
+                       GTK_SIGNAL_FUNC(mailbox_commit_timer_modified_cb), property_box);
 
     gtk_signal_connect(GTK_OBJECT(pui->close_mailbox_minutes), "changed",
-                       GTK_SIGNAL_FUNC(mailbox_timer_modified_cb), property_box);
+                       GTK_SIGNAL_FUNC(mailbox_close_timer_modified_cb), property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->commit_mailbox_minutes), "changed",
+                       GTK_SIGNAL_FUNC(mailbox_commit_timer_modified_cb), property_box);
 
     gtk_signal_connect(GTK_OBJECT(pui->drag_default_is_move), "toggled",
                        GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
@@ -697,7 +704,13 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
         GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->active;
     balsa_app.close_mailbox_timeout =
         gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
-                                         (pui->close_mailbox_minutes));
+                                         (pui->close_mailbox_minutes)) * 60;
+    balsa_app.commit_mailbox_auto =
+        GTK_TOGGLE_BUTTON(pui->commit_mailbox_auto)->active;
+    balsa_app.commit_mailbox_timeout =
+        gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
+                                         (pui->commit_mailbox_minutes)) * 60;
+
     balsa_app.drag_default_is_move =
         GTK_TOGGLE_BUTTON(pui->drag_default_is_move)->active;
     balsa_app.delete_immediately =
@@ -958,7 +971,11 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->close_mailbox_auto),
                                  balsa_app.close_mailbox_auto);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->close_mailbox_minutes),
-                              (float) balsa_app.close_mailbox_timeout);
+                              (float) balsa_app.close_mailbox_timeout / 60);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->commit_mailbox_auto),
+                                 balsa_app.commit_mailbox_auto);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->commit_mailbox_minutes),
+                              (float) balsa_app.commit_mailbox_timeout / 60);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->drag_default_is_move),
                                  balsa_app.drag_default_is_move);
 
@@ -971,6 +988,9 @@ set_prefs(void)
 
     gtk_widget_set_sensitive(pui->close_mailbox_minutes,
                              GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->
+                            active);
+    gtk_widget_set_sensitive(pui->commit_mailbox_minutes,
+                             GTK_TOGGLE_BUTTON(pui->commit_mailbox_auto)->
                             active);
 
     gtk_widget_set_sensitive(pui->check_mail_minutes,
@@ -2240,8 +2260,11 @@ create_misc_page(gpointer data)
     GtkWidget *frame13;
     GtkWidget *vbox10;
     GtkWidget *label33;
+    GtkWidget *label34;
     GtkWidget *hbox1;
     GtkObject *spinbutton4_adj;
+    GtkWidget *hbox2;
+    GtkObject *spinbutton5_adj;
 
     vbox9 = gtk_vbox_new(FALSE, 0);
 
@@ -2265,18 +2288,36 @@ create_misc_page(gpointer data)
     pui->close_mailbox_auto =
         gtk_check_button_new_with_label(_("Automatically close mailbox if unused more than"));
     gtk_widget_show(pui->close_mailbox_auto);
-    gtk_box_pack_start(GTK_BOX(hbox1), pui->close_mailbox_auto, FALSE, FALSE, 0);
-
+    gtk_box_pack_start(GTK_BOX(hbox1), pui->close_mailbox_auto, FALSE, FALSE, 0);    
     spinbutton4_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 10);
     pui->close_mailbox_minutes =
         gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton4_adj), 1, 0);
     gtk_widget_show(pui->close_mailbox_minutes);
     gtk_widget_set_sensitive(pui->close_mailbox_minutes, FALSE);
     gtk_box_pack_start(GTK_BOX(hbox1), pui->close_mailbox_minutes, FALSE, FALSE, 0);
-
+ 
     label33 = gtk_label_new(_("minutes"));
     gtk_widget_show(label33);
     gtk_box_pack_start(GTK_BOX(hbox1), label33, FALSE, TRUE, 0);
+
+    hbox2 = gtk_hbox_new(FALSE, 0);
+    gtk_widget_show(hbox2);
+    gtk_box_pack_start(GTK_BOX(vbox10), hbox2, FALSE, FALSE, 0);
+
+    pui->commit_mailbox_auto =
+        gtk_check_button_new_with_label(_("Automatically commit mailbox if unused more than"));
+    gtk_widget_show(pui->commit_mailbox_auto);
+    gtk_box_pack_start(GTK_BOX(hbox2), pui->commit_mailbox_auto, FALSE, FALSE, 0);
+    spinbutton5_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 10);
+    pui->commit_mailbox_minutes =
+        gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton5_adj), 1, 0);
+    gtk_widget_show(pui->commit_mailbox_minutes);
+    gtk_widget_set_sensitive(pui->commit_mailbox_minutes, FALSE);
+    gtk_box_pack_start(GTK_BOX(hbox2), pui->commit_mailbox_minutes, FALSE, FALSE, 0);
+
+    label34 = gtk_label_new(_("minutes"));
+    gtk_widget_show(label34);
+    gtk_box_pack_start(GTK_BOX(hbox2), label34, FALSE, TRUE, 0);
 
     pui->drag_default_is_move =
         gtk_check_button_new_with_label(_("Drag-and-drop moves messages by default"));
@@ -2744,12 +2785,24 @@ create_mdn_reply_menu(void)
 }
 
 void
-mailbox_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
+mailbox_close_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean newstate = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
             pui->close_mailbox_auto));
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->close_mailbox_minutes),
+                             newstate);
+
+    properties_modified_cb(widget, pbox);
+}
+
+void
+mailbox_commit_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
+{
+    gboolean newstate = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
+            pui->commit_mailbox_auto));
+
+    gtk_widget_set_sensitive(GTK_WIDGET(pui->commit_mailbox_minutes),
                              newstate);
 
     properties_modified_cb(widget, pbox);

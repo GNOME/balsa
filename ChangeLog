@@ -1,3 +1,12 @@
+2002-11-10  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/save-restore.c: 
+	* src/main-window.c: 
+	* src/balsa-app.h: 
+	* src/pref-manager.c: 
+	auto-commit, close-timeout and commit-timeout internally
+	in seconds
+
 2002-10-28  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/filter.c: message_read unlocked mailbox.

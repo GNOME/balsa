@@ -117,7 +117,7 @@ static void balsa_window_real_close_mbnode(BalsaWindow *window,
 static void balsa_window_destroy(GtkObject * object);
 
 GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
-static gboolean balsa_close_mailbox_on_timer(GtkWidget * widget, 
+static gboolean balsa_close_commit_mailbox_on_timer(GtkWidget * widget, 
 					     gpointer * data);
 
 static void balsa_window_select_message_cb(GtkWidget * widget,
@@ -732,7 +732,7 @@ balsa_window_class_init(BalsaWindowClass * klass)
     klass->open_mbnode = balsa_window_real_open_mbnode;
     klass->close_mbnode = balsa_window_real_close_mbnode;
 
-    gtk_timeout_add(30000, (GtkFunction) balsa_close_mailbox_on_timer,
+    gtk_timeout_add(30000, (GtkFunction) balsa_close_commit_mailbox_on_timer,
                     NULL);
 
 }
@@ -1405,13 +1405,13 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
 }
 
 static gboolean
-balsa_close_mailbox_on_timer(GtkWidget * widget, gpointer * data)
+balsa_close_commit_mailbox_on_timer(GtkWidget * widget, gpointer * data)
 {
     GTimeVal current_time;
     GtkWidget *index;
     int i, c, time;
 
-    if (! balsa_app.close_mailbox_auto)
+    if (! (balsa_app.close_mailbox_auto || balsa_app.commit_mailbox_auto) )
         return TRUE;
 
     g_get_current_time(&current_time);
@@ -1422,12 +1422,23 @@ balsa_close_mailbox_on_timer(GtkWidget * widget, gpointer * data)
          (index =
           gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
          i++) {
-        if (i == c)
-            continue;
         time =
             current_time.tv_sec -
             BALSA_INDEX(index)->last_use.tv_sec;
-        if (time > (balsa_app.close_mailbox_timeout * 60)) {
+	if (balsa_app.commit_mailbox_auto &&
+	    time < 31+balsa_app.commit_mailbox_timeout && 
+	    /* only do this once */
+	    time > balsa_app.commit_mailbox_timeout ) {
+            if (balsa_app.debug)
+                fprintf(stderr, "Commiting %s, time: %d\n",
+			BALSA_INDEX(index)->mailbox_node->mailbox->url , 
+			time);
+	    libbalsa_mailbox_commit(BALSA_INDEX(index)->mailbox_node->mailbox);
+	}
+        if (i == c)
+            continue;
+        if (balsa_app.close_mailbox_auto &&
+	    time > balsa_app.close_mailbox_timeout) {
             if (balsa_app.debug)
                 fprintf(stderr, "Closing Page %d, time: %d\n", i, time);
             gtk_notebook_remove_page(GTK_NOTEBOOK(balsa_app.notebook), i);
@@ -1436,7 +1447,7 @@ balsa_close_mailbox_on_timer(GtkWidget * widget, gpointer * data)
             if (i < c)
                 c--;
             i--;
-        }
+        };
     }
     return TRUE;
 }

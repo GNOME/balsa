@@ -1,3 +1,11 @@
+2004-08-03 11:47  PeterB
+
+	* libbalsa/Makefile.am, libbalsa/libbalsa.c, libbalsa/libbalsa.h,
+	libbalsa/mailbox_imap.c, libbalsa/mailbox_local.c,
+	libbalsa/mailbox_maildir.c, libbalsa/mailbox_mbox.c,
+	libbalsa/mailbox_mh.c, libbalsa/notify.c, libbalsa/notify.h,
+	src/mailbox-node.c: remove libbalsa/notify.[ch].
+
 2004-08-02  Pawel Salek
 
 	* configure.in: get the GSS bit right hopefully this time.

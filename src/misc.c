@@ -24,10 +24,10 @@
  * and adds it to the menu */
 GtkWidget *
 append_menuitem_connect (GtkMenu * menu,
-                         gchar * text,
-                         GtkSignalFunc func,
-                         gpointer data,
-                         gpointer user_data)
+			 gchar * text,
+			 GtkSignalFunc func,
+			 gpointer data,
+			 gpointer user_data)
 {
   GtkWidget *menuitem;
 
@@ -37,9 +37,9 @@ append_menuitem_connect (GtkMenu * menu,
   gtk_widget_show (menuitem);
 
   gtk_signal_connect (GTK_OBJECT (menuitem),
-                      "activate",
-                      (GtkSignalFunc) func,
-                      data);
+		      "activate",
+		      (GtkSignalFunc) func,
+		      data);
 
   if (user_data)
     gtk_object_set_user_data (GTK_OBJECT (menuitem), user_data);
@@ -106,7 +106,7 @@ new_icon (gchar ** xpm, GtkWidget * window)
 
 
 
-gint 
+gint
 g_list_index (GList * list, gpointer data)
 {
   gint index;
@@ -126,4 +126,51 @@ g_list_index (GList * list, gpointer data)
     }
 
   return -1;
+}
+
+gchar *
+make_string_from_list (GList * the_list)
+{
+  GList *list = NULL;
+  GString *gs;
+  gchar *str;
+
+  gs = g_string_new (NULL);
+
+  list = g_list_first (the_list);
+
+  while (list)
+    {
+      gs = g_string_append (gs, list->data);
+      list = list->next;
+      if (list)
+	gs = g_string_append (gs, ",");
+    }
+  str = g_strdup (gs->str);
+  g_string_free (gs, 1);
+  return str;
+}
+
+GList *
+make_list_from_string (gchar * the_str)
+{
+  GList *list = NULL;
+  gchar *str;
+  char *token;
+
+  if (!the_str)
+    return NULL;
+  if (strlen (the_str) < 3)
+    return NULL;
+
+  str = g_strdup (the_str);
+  token = strtok (str, ",");
+  while (token)
+    {
+      list = g_list_append (list, token);
+      g_print ("\"%s\"\n", token);
+      token = strtok (NULL, ",");
+    }
+  g_free (str);
+  return list;
 }

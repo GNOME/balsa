@@ -26,6 +26,7 @@
 #include "balsa-message.h"
 #include "balsa-index.h"
 #include "mailbox.h"
+#include "misc.h"
 #include "sendmsg-window.h"
 #include "mail.h"
 #include "smtp.h"
@@ -480,54 +481,6 @@ gtk_text_to_email (char *buff)
   return str;
 }
 
-
-static gchar *
-make_string_from_list (GList * the_list)
-{
-  GList *list = NULL;
-  GString *gs;
-  gchar *str;
-
-  gs = g_string_new (NULL);
-
-  list = g_list_first (the_list);
-
-  while (list)
-    {
-      gs = g_string_append (gs, (const gchar *) list->data);
-      list = list->next;
-      if (list)
-	gs = g_string_append (gs, ",");
-    }
-  str = g_strdup (gs->str);
-  g_string_free (gs, 1);
-  return str;
-}
-
-static GList *
-make_list_from_string (gchar * the_str)
-{
-  GList *list = NULL;
-  gchar *str;
-  char *token;
-
-  if (!the_str)
-    return NULL;
-  if (strlen(the_str) <3)
-	  return NULL;
-
-  str = g_strdup (the_str);
-  token = strtok (str, ",");
-  while (token)
-    {
-      list = g_list_append (list, token);
-  g_print ("\"%s\"\n",token);
-      token = strtok (NULL, ",");
-    }
-  g_free (str);
-  return list;
-}
-
 gboolean
 send_message (Message * message)
 {
@@ -551,7 +504,7 @@ send_message (Message * message)
   envelope->from = mail_newaddr ();
   envelope->from->personal = g_strdup (message->from->personal);
   envelope->from->mailbox = g_strdup (message->from->user);
-  envelope->from->host = g_strdup (message->from->user);
+  envelope->from->host = g_strdup (message->from->host);
   envelope->return_path = mail_newaddr ();
   envelope->return_path->mailbox = g_strdup (message->from->user);
   envelope->return_path->host = g_strdup (message->from->host);

@@ -36,4 +36,9 @@ GtkWidget * new_icon (gchar ** xpm, GtkWidget * window);
 
 gint g_list_index (GList * list, gpointer data);
 
+
+gchar *make_string_from_list (GList *);
+GList *make_list_from_string (gchar *);
+
+
 #endif /* __MISC_H__ */

@@ -120,22 +120,50 @@ delete_mailbox_config (gchar * name)
 
 
 void
-change_mailbox_config (gchar * name, gchar * setting, gchar * value)
+update_mailbox_config (Mailbox * mailbox)
 {
   GString *gstring;
+
+  GList *list = NULL;
+  Mailbox *mb;
+
+  gint i = 0;
 
   gstring = g_string_new (NULL);
 
   g_string_truncate (gstring, 0);
-  g_string_sprintf (gstring, "/balsa/%s/", name);
+  g_string_sprintf (gstring, "/balsa/%s/", mailbox->name);
   gnome_config_push_prefix (gstring->str);
-  gnome_config_set_string (setting, value);
+
+  switch (mailbox->type)
+    {
+    case MAILBOX_MBOX:
+    case MAILBOX_MH:
+    case MAILBOX_MAILDIR:
+      gnome_config_set_int ("Type", 0);
+      gnome_config_set_string ("Path", MAILBOX_LOCAL (mailbox)->path);
+      break;
+    case MAILBOX_POP3:
+      gnome_config_set_int ("Type", 1);
+      gnome_config_set_string ("username", MAILBOX_POP3 (mailbox)->user);
+      gnome_config_set_string ("password", MAILBOX_POP3 (mailbox)->passwd);
+      gnome_config_set_string ("server", MAILBOX_POP3 (mailbox)->server);
+      break;
+    case MAILBOX_IMAP:
+      gnome_config_set_int ("Type", 2);
+      gnome_config_set_string ("username", MAILBOX_IMAP (mailbox)->user);
+      gnome_config_set_string ("password", MAILBOX_IMAP (mailbox)->passwd);
+      gnome_config_set_string ("server", MAILBOX_IMAP (mailbox)->server);
+      gnome_config_set_int ("port", MAILBOX_IMAP (mailbox)->port);
+      gnome_config_set_string ("Path", MAILBOX_IMAP (mailbox)->path);
+      break;
+    }
+
   gnome_config_pop_prefix ();
 
   gnome_config_sync ();
-  g_string_free (gstring, 1);
+  g_string_free (gstring, TRUE);
 }
-
 
 gint
 load_mailboxes (gchar * name)
@@ -283,6 +311,10 @@ save_global_settings ()
   gnome_config_set_string ("host name", balsa_app.hostname);
   gnome_config_set_string ("organization", balsa_app.organization);
   gnome_config_set_string ("smtp server", balsa_app.smtp_server);
+
+  gnome_config_set_string ("inbox", balsa_app.inbox_path);
+  gnome_config_set_string ("outbox", balsa_app.trash_path);
+  gnome_config_set_string ("trash", balsa_app.trash_path);
   gnome_config_set_string ("local mail directory", balsa_app.local_mail_directory);
   gnome_config_set_int ("main window width", (gint) balsa_app.mw_width);
   gnome_config_set_int ("main window height", (gint) balsa_app.mw_height);

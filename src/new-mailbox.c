@@ -306,54 +306,109 @@ ok_new_mailbox (GtkWidget * widget)
   Mailbox *mailbox;
   GNode *node;
 
-  switch (nmw->next_page)
+  if (nmw->mailbox)
     {
-    case NM_PAGE_LOCAL:
-      menu = gtk_option_menu_get_menu (GTK_OPTION_MENU (nmw->local_type_menu));
-      menuitem = gtk_menu_get_active (GTK_MENU (menu));
+      mailbox = nmw->mailbox;
+      switch (mailbox->type)
+	{
+	case MAILBOX_MBOX:
+	case MAILBOX_MAILDIR:
+	case MAILBOX_MH:
+/* FIXME  -  need to reset mailbox type?
+   menu = gtk_option_menu_get_menu (GTK_OPTION_MENU (nmw->local_type_menu));
+   menuitem = gtk_menu_get_active (GTK_MENU (menu));
+ */
+	  g_free (mailbox->name);
+	  g_free (MAILBOX_LOCAL (mailbox)->path);
+	  mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_name)));
+	  MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_path)));
 
-      mailbox = mailbox_new ((MailboxType) gtk_object_get_user_data (GTK_OBJECT (menuitem)));
-      mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_name)));
-      MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_path)));
-      node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
-      g_node_append (balsa_app.mailbox_nodes, node);
+	  update_mailbox_config (mailbox);
+	  break;
 
-      add_mailbox_config (mailbox);
-      break;
+	case MAILBOX_POP3:
+	  g_free (mailbox->name);
+	  g_free (MAILBOX_POP3 (mailbox)->user);
+	  g_free (MAILBOX_POP3 (mailbox)->passwd);
+	  g_free (MAILBOX_POP3 (mailbox)->server);
 
-    case NM_PAGE_POP3:
+	  mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_mailbox_name)));
+	  MAILBOX_POP3 (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_username)));
+	  MAILBOX_POP3 (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_password)));
+	  MAILBOX_POP3 (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_server)));
 
-      menu = gtk_option_menu_get_menu (GTK_OPTION_MENU (nmw->local_type_menu));
-      menuitem = gtk_menu_get_active (GTK_MENU (menu));
-      mailbox = mailbox_new (MAILBOX_POP3);
-      mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_mailbox_name)));
-      MAILBOX_POP3 (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_username)));
-      MAILBOX_POP3 (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_password)));
-      MAILBOX_POP3 (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_server)));
-      balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
-      add_mailbox_config (mailbox);
-      break;
+	  update_mailbox_config (mailbox);
+	  break;
 
-    case NM_PAGE_IMAP:
+	case MAILBOX_IMAP:
+	  g_free (mailbox->name);
+	  g_free (MAILBOX_IMAP (mailbox)->user);
+	  g_free (MAILBOX_IMAP (mailbox)->passwd);
+	  g_free (MAILBOX_IMAP (mailbox)->path);
+	  g_free (MAILBOX_IMAP (mailbox)->server);
 
-      menu = gtk_option_menu_get_menu (GTK_OPTION_MENU (nmw->local_type_menu));
-      menuitem = gtk_menu_get_active (GTK_MENU (menu));
+	  mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_mailbox_name)));
+	  MAILBOX_IMAP (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_username)));
+	  MAILBOX_IMAP (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_password)));
+	  MAILBOX_IMAP (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_mailbox_path)));
+	  MAILBOX_IMAP (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_server)));
+	  MAILBOX_IMAP (mailbox)->port = strtol (gtk_entry_get_text (GTK_ENTRY (nmw->imap_port)), (char **) NULL, 10);
 
-      mailbox = mailbox_new (MAILBOX_IMAP);
-
-      mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_mailbox_name)));
-      MAILBOX_IMAP (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_username)));
-      MAILBOX_IMAP (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_password)));
-      MAILBOX_IMAP (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_mailbox_path)));
-      MAILBOX_IMAP (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_server)));
-      MAILBOX_IMAP (mailbox)->port = strtol (gtk_entry_get_text (GTK_ENTRY (nmw->imap_port)), (char **) NULL, 10);
-
-      node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
-      g_node_append (balsa_app.mailbox_nodes, node);
-      add_mailbox_config (mailbox);
-      break;
+	  update_mailbox_config (mailbox);
+	  break;
+	}
     }
+  else
+    {
 
+      switch (nmw->next_page)
+	{
+	case NM_PAGE_LOCAL:
+	  menu = gtk_option_menu_get_menu (GTK_OPTION_MENU (nmw->local_type_menu));
+	  menuitem = gtk_menu_get_active (GTK_MENU (menu));
+
+	  mailbox = mailbox_new ((MailboxType) gtk_object_get_user_data (GTK_OBJECT (menuitem)));
+	  mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_name)));
+	  MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_path)));
+	  node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
+	  g_node_append (balsa_app.mailbox_nodes, node);
+
+	  add_mailbox_config (mailbox);
+	  break;
+
+	case NM_PAGE_POP3:
+
+	  menu = gtk_option_menu_get_menu (GTK_OPTION_MENU (nmw->local_type_menu));
+	  menuitem = gtk_menu_get_active (GTK_MENU (menu));
+	  mailbox = mailbox_new (MAILBOX_POP3);
+	  mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_mailbox_name)));
+	  MAILBOX_POP3 (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_username)));
+	  MAILBOX_POP3 (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_password)));
+	  MAILBOX_POP3 (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->pop_server)));
+	  balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
+	  add_mailbox_config (mailbox);
+	  break;
+
+	case NM_PAGE_IMAP:
+
+	  menu = gtk_option_menu_get_menu (GTK_OPTION_MENU (nmw->local_type_menu));
+	  menuitem = gtk_menu_get_active (GTK_MENU (menu));
+
+	  mailbox = mailbox_new (MAILBOX_IMAP);
+
+	  mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_mailbox_name)));
+	  MAILBOX_IMAP (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_username)));
+	  MAILBOX_IMAP (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_password)));
+	  MAILBOX_IMAP (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_mailbox_path)));
+	  MAILBOX_IMAP (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->imap_server)));
+	  MAILBOX_IMAP (mailbox)->port = strtol (gtk_entry_get_text (GTK_ENTRY (nmw->imap_port)), (char **) NULL, 10);
+
+	  node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
+	  g_node_append (balsa_app.mailbox_nodes, node);
+	  add_mailbox_config (mailbox);
+	  break;
+	}
+    }
 
   /* close the new mailbox window */
   refresh_mailbox_manager ();

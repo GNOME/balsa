@@ -21,7 +21,7 @@
 
 void add_mailbox_config (Mailbox *);
 void delete_mailbox_config (gchar *);
-void update_mailbox_config (gchar *, gchar *, gchar *);
+void update_mailbox_config (Mailbox *);
 gint load_mailboxes (gchar *);
 void restore_global_settings ();
 void save_global_settings ();

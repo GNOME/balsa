@@ -253,6 +253,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	  else
 	    {
 	      /* normal mailbox */
+	      add_mailboxes_for_checking(mbnode->mailbox);
 	      if (mailbox_have_new_messages (MAILBOX_LOCAL (mbnode->mailbox)->path))
 		gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 					 NULL, NULL,

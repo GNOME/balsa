@@ -244,7 +244,6 @@ ok_preferences_manager ()
   /*
    * close window and free memory
    */
-  gtk_widget_destroy (pmw->window);
   save_global_settings ();
 }
 

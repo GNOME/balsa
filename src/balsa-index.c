@@ -365,11 +365,14 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 				GTK_SELECTION_BROWSE);
 
   if (first_new_message != 0)
+  {
+    g_print ("balsa-index.c: moving to row %i\n", first_new_message);
     gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), first_new_message, 0, 0.0, 0.0);
+  }
   else
     {
-      g_print ("%i\n", i);
-      gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), i - 1, 0, 0.0, 0.0);
+      g_print ("balsa-index.c: moving to row %i\n", i);
+      gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), i -2, 0, 1.0, 0.0);
     }
   first_new_message = 0;
 }

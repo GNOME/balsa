@@ -1,3 +1,8 @@
+2003-11-23 11:22  PeterB
+
+	* libbalsa/mailbox.c: Before removing a node from the msg_tree,
+	promote its children to be children of its parent.
+
 2003-11-21 Darko Obradovic <dobradovic gmx.de>
 
 	* src/balsa-app.h: set MAX_QUOTED_COLOR to 2.

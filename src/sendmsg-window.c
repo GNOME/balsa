@@ -2629,9 +2629,11 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->current_language_menu = lang_menu[LANG_CURRENT_POS].widget;
 
     /* set options */
+    msg->req_dispnotify = FALSE;
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                    (opts_menu[OPTS_MENU_DISPNOTIFY_POS].
                                     widget), FALSE);
+    msg->flow = balsa_app.wordwrap;
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                    (opts_menu[OPTS_MENU_FORMAT_POS].
                                     widget), balsa_app.wordwrap);

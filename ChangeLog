@@ -1,3 +1,7 @@
+2003-10-09 12:09  PeterB
+
+	* src/main-window.c: Add accelerators for zoom in/out.
+
 2003-10-08 23:00  PeterB
 
 	* libbalsa/: mailbox.c, mailbox.h: Add LB_MBOX_WEIGHT_COL, of type

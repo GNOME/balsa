@@ -1315,8 +1315,7 @@ libbalsa_message_load_envelope_from_file(LibBalsaMessage *message,
 	}
 	line->data[line->len-1]='\0'; /* terminate line by overwriting '\n' */
 	if (!lb_message_set_headers_from_string(message, line->data, FALSE)) {
-	    ret = FALSE;
-	    break;
+	    /* Ignore error return caused by malformed header. */
 	}
 	if (lookahead == '\n') {/* end of headers */
 	    ret = TRUE;

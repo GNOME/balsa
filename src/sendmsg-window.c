@@ -145,6 +145,8 @@ static void address_changed_cb(LibBalsaAddressEntry * address_entry,
                                BalsaSendmsgAddress *sma);
 static void set_ready(LibBalsaAddressEntry * address_entry,
                       BalsaSendmsgAddress *sma);
+static void set_entry_to_subject(GtkEntry *, LibBalsaMessage *,
+				 SendType, LibBalsaIdentity *);
 
 /* Standard DnD types */
 enum {
@@ -969,7 +971,9 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
     gchar* compare_str;
     gchar** message_split;
     gchar* tmpstr=libbalsa_address_to_gchar(ident->address, 0);
-    
+    gchar* subject;
+    gint replen, fwdlen;
+
     LibBalsaIdentity* old_ident;
 
     
@@ -988,13 +992,45 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
                                     (msg->bcc[1]), ident->bcc);
     
     /* change the subject to use the reply/forward strings */
+    subject = gtk_entry_get_text(GTK_ENTRY(msg->subject[1]));
+
+    /*
+     * If the subject begins with the old reply string
+     *    Then replace it with the new reply string.
+     * Else, if the subject begins with the old forward string
+     *    Then replace it with the new forward string.
+     * Else, if the old reply string was empty, and the message
+     *    is a reply, OR the old forward string was empty, and the
+     *    message is a forward
+     *    Then call set_entry_to_subject()
+     * Else assume the user hand edited the subject and does
+     *    not want it altered
+     */
+    old_ident = msg->ident;
+    if (((replen = strlen(old_ident->reply_string)) > 0) &&
+	(strncmp(subject, old_ident->reply_string, replen) == 0)) {
+	tmpstr = g_strconcat(ident->reply_string, &(subject[replen]), NULL);
+	gtk_entry_set_text(GTK_ENTRY(msg->subject[1]), tmpstr);
+	g_free(tmpstr);
+    } else if (((fwdlen = strlen(old_ident->forward_string)) > 0) &&
+	       (strncmp(subject, old_ident->forward_string, fwdlen) == 0)) {
+	tmpstr = g_strconcat(ident->forward_string, &(subject[fwdlen]), NULL);
+	gtk_entry_set_text(GTK_ENTRY(msg->subject[1]), tmpstr);
+	g_free(tmpstr);
+    } else if (((replen == 0) && (msg->type == SEND_REPLY ||
+				  msg->type == SEND_REPLY_ALL ||
+				  msg->type == SEND_REPLY_GROUP)) ||
+	       ((fwdlen == 0) && (msg->type == SEND_FORWARD_ATTACH ||
+				  msg->type == SEND_FORWARD_INLINE))) {
+	set_entry_to_subject(GTK_ENTRY(msg->subject[1]), msg->orig_message,
+			     msg->type, ident);
+    }
 
     /* -----------------------------------------------------------
      * remove/add the signature depending on the new settings, change
      * the signature if path changed */
 
     /* reconstruct the old signature to search with */
-    old_ident = msg->ident;
     old_sig = read_signature(msg);
 
     /* switch identities in msg here so we can use read_signature
@@ -1619,7 +1655,7 @@ insert_selected_messages(BalsaSendmsg *msg, SendType type)
 
 static gint include_message_cb(GtkWidget *widget, BalsaSendmsg *msg)
 {
-    return insert_selected_messages(msg, SEND_FORWARD_INLINE);
+    return insert_selected_messages(msg, SEND_INCLUDE_INLINE);
 }
 
 
@@ -1653,7 +1689,7 @@ attach_message_cb(GtkWidget * widget, BalsaSendmsg *msg)
 
 static gint include_messages_cb(GtkWidget *widget, BalsaSendmsg *msg)
 {
-    return insert_selected_messages(msg, SEND_FORWARD_INLINE);
+    return insert_selected_messages(msg, SEND_INCLUDE_INLINE);
 }
 
 /* attachments_add - attachments field D&D callback */
@@ -2182,7 +2218,7 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
     if (message->date)
 	date = libbalsa_message_date_to_gchar(message, balsa_app.date_string);
 
-    if (type == SEND_FORWARD_INLINE) {
+    if (type == SEND_FORWARD_INLINE || type == SEND_INCLUDE_INLINE) {
 	const gchar *subject;
 	GList *ref_list = message->references;
 
@@ -2190,7 +2226,11 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 			     balsa_app.wordwrap ? balsa_app.wraplength : -1,
 			     balsa_app.reply_strip_html, msg->flow);
 
-	str = g_strdup(_("----- End Included Message -----\n"));
+	if (type == SEND_FORWARD_INLINE) {
+	    str = g_strdup(_("----- End Forwarded Message -----\n"));
+	} else {
+	    str = g_strdup(_("----- End Included Message -----\n"));
+	}
 	g_string_append(body, str);
 	g_free(str);
 
@@ -2243,7 +2283,11 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	    g_free(str);
 	}
 
-	str = g_strdup(_("----- Begin Included Message -----\n"));
+	if (type == SEND_FORWARD_INLINE) {
+	    str = g_strdup(_("----- Begin Forwarded Message -----\n"));
+	} else {
+	    str = g_strdup(_("----- Begin Included Message -----\n"));
+	}
 	g_string_prepend(body, str);
 	g_free(str);
 
@@ -2471,6 +2515,36 @@ setup_headers_from_message(BalsaSendmsg* cw, LibBalsaMessage *message)
 
 
 /* 
+ * set_identity_from_mailbox
+ * 
+ * Attempt to determine the default identity from the mailbox containing
+ * the message.
+ **/
+static gboolean
+set_identity_from_mailbox(BalsaSendmsg* msg)
+{
+    gchar *identity;
+    LibBalsaMessage *message = msg->orig_message;
+    LibBalsaIdentity* ident;
+    GList *ilist;
+
+    if( message && message->mailbox && balsa_app.identities) {
+	identity = message->mailbox->identity_name;
+	for (ilist = balsa_app.identities;
+	     ilist != NULL;
+	     ilist = g_list_next(ilist)) {
+	    ident = LIBBALSA_IDENTITY(ilist->data);
+	    if (!g_strcasecmp(identity, ident->identity_name)) {
+		msg->ident = ident;
+		return TRUE;
+		}
+	    }
+        }
+
+    return FALSE; /* use default */
+}
+
+/* 
  * guess_identity
  * 
  * Attempt to determine if a message should be associated with a
@@ -2481,35 +2555,69 @@ static gboolean
 guess_identity(BalsaSendmsg* msg)
 {
     gboolean done = FALSE;
-    GList *alist;
+    GList *alist, *ilist;
     LibBalsaMessage *message = msg->orig_message;
-    if( !message || !message->to_list || !balsa_app.identities)
+    SendType type;
+    const gchar *address_string;
+    LibBalsaIdentity *ident;
+
+    if( !message || !balsa_app.identities)
         return FALSE; /* use default */
 
-    /*
-     * Loop through all the addresses in the message's To:
-     * field, and look for an identity that matches one of them.
-     */
-    for (alist = message->to_list;!done && alist;alist = alist->next) {
-        LibBalsaAddress *addy;
-        GList *nth_address, *ilist;
-        gchar *address_string;
-        
-        addy = alist->data;
-        nth_address = g_list_nth(addy->address_list, 0);
-        address_string = (gchar*)nth_address->data;
-        for (ilist = balsa_app.identities;
-             !done && ilist;
-             ilist = g_list_next(ilist)) {
-            LibBalsaIdentity* ident;
-            
-            ident = LIBBALSA_IDENTITY(ilist->data);
-            if (!g_strcasecmp(address_string,
-                              (gchar*)(ident->address->address_list->data))) {
-                msg->ident = ident;
-                done = TRUE;
+    type = msg->type;
+    if (type == SEND_CONTINUE) {
+	if (message->from) {
+	    /*
+	     * Look for an identity that matches the From: address.
+	     */
+	    address_string = libbalsa_address_get_mailbox(message->from, 0);
+	    for (ilist = balsa_app.identities; !done && ilist;
+		 ilist = g_list_next(ilist)) {
+		ident = LIBBALSA_IDENTITY(ilist->data);
+		if (!g_strcasecmp(address_string, (gchar*)
+				  (ident->address->address_list->data))) {
+		    msg->ident = ident;
+		    done = TRUE;
 		}
+	    }
+	}
+    } else if (type != SEND_NORMAL) {
+	/* type == SEND_REPLY || type == SEND_REPLY_ALL ||
+	 * type == SEND_REPLY_GROUP || type == SEND_FORWARD_ATTACH ||
+	 * type == SEND_FORWARD_INLINE */
+	/*
+	* Loop through all the addresses in the message's To:
+	* field, and look for an identity that matches one of them.
+	*/
+	for (alist = message->to_list; !done && alist;
+	     alist = g_list_next(alist)) {
+	    address_string = libbalsa_address_get_mailbox(alist->data, 0);
+	    for (ilist = balsa_app.identities; !done && ilist;
+		 ilist = g_list_next(ilist)) {
+		ident = LIBBALSA_IDENTITY(ilist->data);
+		if (!g_strcasecmp(address_string,
+			(gchar*)(ident->address->address_list->data))) {
+		    msg->ident = ident;
+		    done = TRUE;
+		}
+	    }
         }
+	if (!done) {
+	    /* No match in the to_list, try the cc_list */
+	    for (alist = message->cc_list; (!done && alist);
+		 alist = g_list_next(alist)) {
+		address_string = libbalsa_address_get_mailbox(alist->data, 0);
+		for (ilist = balsa_app.identities; !done && ilist;
+		     ilist = g_list_next(ilist)) {
+		    ident = LIBBALSA_IDENTITY(ilist->data);
+		    if (!g_strcasecmp(address_string,
+				(gchar*)(ident->address->address_list->data))) {
+			msg->ident = ident;
+			done = TRUE;
+		    }
+		}
+	    }
+	}
     }
     return done;
 }
@@ -2606,7 +2714,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     gtk_signal_connect(GTK_OBJECT(msg->window), "destroy",
 		       GTK_SIGNAL_FUNC(destroy_event_cb), msg);
 
-	 gtk_signal_connect(GTK_OBJECT(msg->window), "size_allocate",
+    gtk_signal_connect(GTK_OBJECT(msg->window), "size_allocate",
 		       GTK_SIGNAL_FUNC(sw_size_alloc_cb), msg);
 
     fill_language_menu();
@@ -2657,6 +2765,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	    list, get_tool_widget(window, 1, main_toolbar_spell_disable[i]));
     msg->spell_check_disable_list = list;
 
+    /* Set up the default identity */
+    set_identity_from_mailbox(msg);
+
     /* Get the identity from the To: field of the original message */
     guess_identity(msg);
 
@@ -2693,8 +2804,18 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     /* Subject: */
     set_entry_to_subject(GTK_ENTRY(msg->subject[1]), message, type, msg->ident);
 
-    if (type == SEND_CONTINUE)
+    if (type == SEND_CONTINUE) {
 	setup_headers_from_message(msg, message);
+
+	/* Replace "From" and "Reply-To" with values from the
+	 * continued messages - they may have been hand edited. */
+	if (message->from != NULL)
+	    gtk_entry_set_text(GTK_ENTRY(msg->from[1]),
+			       libbalsa_address_to_gchar(message->from, 0));
+	if (message->reply_to != NULL)
+	    gtk_entry_set_text(GTK_ENTRY(msg->reply_to[1]),
+			       libbalsa_address_to_gchar(message->reply_to, 0));
+    }
 
     if (type == SEND_REPLY_ALL) {
 	tmp = libbalsa_make_string_from_list(message->to_list);

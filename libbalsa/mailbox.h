@@ -100,6 +100,9 @@ struct _LibBalsaMailbox {
     /* Associated filters (struct mailbox_filter) */
     GSList * filters;
 #endif
+
+    /* Default identity associated with the mailbox */
+    gchar *identity_name;
 };
 
 struct _LibBalsaMailboxClass {

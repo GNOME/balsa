@@ -33,6 +33,7 @@ extern "C" {
 	SEND_REPLY_GROUP,       /* by Reply to Group      */
 	SEND_FORWARD_ATTACH,    /* by Forward attached    */
 	SEND_FORWARD_INLINE,    /* by Forward inline      */
+	SEND_INCLUDE_INLINE,	/* by Include message     */
 	SEND_CONTINUE		/* by Continue postponed  */
     } SendType;
 

@@ -1,3 +1,15 @@
+2002-04-14  Pawel Salek <pawsa@theochem.kth.se>
+
+	* balsa.spec.in: provide Mandrake support 
+	(Matt Van Gundy <matt@shekinahstudios.com>).
+	* sounds/Makefile.am: remove double $(DESTDIR) (automake-1.4p5)
+	* src/sendmsg-window.[hc]: proper Forward-inline support. Replace
+	forward and reply prefixes on identity change. Search CC for
+	identity if necessary. (Steve Wall).
+
+	* libbalsa/mailbox.[hc]: per-mailbox identity by
+	* src/sendmsg-window.c:  Brian Stafford <brian@stafford.uklinux.net>
+
 2002-04-12  Matthew Guenther <guentherm@asme.org>
 
 	* libbalsa/message.c: read In-Reply-To header into LibBalsaMessage

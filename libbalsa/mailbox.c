@@ -285,6 +285,8 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
 #ifdef BALSA_SHOW_ALL
     mailbox->filters=NULL;
 #endif
+
+    mailbox->identity_name=NULL;
 }
 
 /* libbalsa_mailbox_destroy:
@@ -315,6 +317,9 @@ libbalsa_mailbox_destroy(GtkObject * object)
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
+
+    g_free(mailbox->identity_name);
+    mailbox->identity_name = NULL;
 }
 
 /* Create a new mailbox by loading it from a config entry... */
@@ -590,6 +595,8 @@ libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
     }
     g_free(mailbox->config_prefix);
     mailbox->config_prefix = g_strdup(prefix);
+
+    gnome_config_set_string("Identity", mailbox->identity_name);
 }
 
 static void
@@ -616,6 +623,9 @@ libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
             libbalsa_address_new_from_string(address);
     }
     g_free(address);
+
+    g_free(mailbox->identity_name);
+    mailbox->identity_name = gnome_config_get_string("Identity=Default");
 }
 
 /* libbalsa_mailbox_link_message:

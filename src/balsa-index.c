@@ -695,9 +695,11 @@ balsa_index_scroll_on_open(BalsaIndex *index)
     unsigned msgno;
 
     balsa_index_update_tree(index, balsa_app.expand_tree);
-    msgno = mailbox->first_unread 
-        ? mailbox->first_unread 
-        : libbalsa_mailbox_total_messages(mailbox);
+    if (mailbox->first_unread) {
+	msgno = mailbox->first_unread;
+	mailbox->first_unread = 0;
+    } else
+	msgno = libbalsa_mailbox_total_messages(mailbox);
     if(msgno>0 &&
        libbalsa_mailbox_msgno_find(mailbox, msgno, &path, &iter)) {
         bndx_expand_to_row(index, path);
@@ -1107,13 +1109,34 @@ balsa_index_set_column_widths(BalsaIndex * index)
 static void
 bndx_mailbox_changed_func(BalsaIndex * bindex)
 {
+    LibBalsaMailbox *mailbox = bindex->mailbox_node->mailbox;
     GtkTreePath *path;
+
+    if (!GTK_WIDGET_REALIZED(GTK_WIDGET(bindex)))
+	return;
 
     if (bindex->current_message
 	&& LIBBALSA_MESSAGE_IS_DELETED(bindex->current_message))
 	bndx_select_next_threaded(bindex);
-    else if (bndx_find_message(bindex, &path, NULL, bindex->current_message)) {
+
+    if (mailbox->first_unread
+	&& libbalsa_mailbox_msgno_find(mailbox, mailbox->first_unread,
+				       &path, NULL)) {
 	bndx_expand_to_row(bindex, path);
+	gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(bindex), path, NULL,
+		FALSE, 0, 0);
+        gtk_tree_path_free(path);
+	mailbox->first_unread = 0;
+    }
+
+    if (bndx_find_message(bindex, &path, NULL, bindex->current_message)) {
+	GtkTreeSelection *selection =
+	    gtk_tree_view_get_selection(GTK_TREE_VIEW(bindex));
+	bndx_expand_to_row(bindex, path);
+	/* Selection is somehow lost when adding a message: fix it up
+	 * here. */
+	if (!gtk_tree_selection_path_is_selected(selection, path))
+	    bndx_select_row(bindex, path);
 	gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(bindex), path, NULL,
 				     FALSE, 0, 0);
         gtk_tree_path_free(path);

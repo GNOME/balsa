@@ -180,9 +180,14 @@ open_preferences_manager (void)
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
   gtk_signal_connect (GTK_OBJECT (pui->email), "changed",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+  gtk_signal_connect (GTK_OBJECT (pui->replyto), "changed",
+		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+
   gtk_signal_connect (GTK_OBJECT (pui->smtp_server), "changed",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
   gtk_signal_connect (GTK_OBJECT (pui->mail_directory), "changed",
+		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+  gtk_signal_connect (GTK_OBJECT (pui->signature), "changed",
 		      GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
   /* set data and show the whole thing */
 
@@ -218,6 +223,9 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
 
   g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->smtp_server)));
+
+  g_free (balsa_app.signature_path);
+  balsa_app.signature_path = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->signature)));
 
   g_free (balsa_app.local_mail_directory);
   balsa_app.local_mail_directory = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->mail_directory)));
@@ -274,8 +282,9 @@ set_prefs (void)
 
   gtk_entry_set_text (GTK_ENTRY (pui->email), balsa_app.email);
 
-  gtk_entry_set_text (GTK_ENTRY (pui->smtp_server), balsa_app.smtp_server);
-
+  gtk_entry_set_text (GTK_ENTRY (pui->signature), balsa_app.signature_path);
+  if (balsa_app.smtp_server)
+    gtk_entry_set_text (GTK_ENTRY (pui->smtp_server), balsa_app.smtp_server);
   gtk_entry_set_text (GTK_ENTRY (pui->mail_directory), balsa_app.local_mail_directory);
 
   gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->previewpane), balsa_app.previewpane);
@@ -293,12 +302,12 @@ create_identity_page (void)
   GtkWidget *vbox;
   GtkWidget *table;
   GtkWidget *label;
-  GtkWidget *button;
+  GtkWidget *signature;
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_border_width (GTK_CONTAINER (vbox), 10);
 
-  table = gtk_table_new (4, 3, FALSE);
+  table = gtk_table_new (4, 2, FALSE);
   gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 5);
 
   /* your name */
@@ -337,13 +346,11 @@ create_identity_page (void)
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
 		    GTK_FILL, GTK_FILL, 10, 10);
 
-  pui->signature = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), pui->signature, 1, 2, 3, 4,
+  signature = gnome_file_entry_new ("Signature", "Signature");
+  gtk_table_attach (GTK_TABLE (table), signature, 1, 2, 3, 4,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
-  button = gtk_button_new_with_label ("Browse");
-  gtk_table_attach (GTK_TABLE (table), button, 2, 3, 3, 4,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+  pui->signature = gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (signature));
 
   return vbox;
 }
@@ -360,6 +367,7 @@ create_mailservers_page ()
   GtkWidget *hbox;
   GtkWidget *bbox;
   GtkWidget *button;
+  GtkWidget *mail_dir;
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_border_width (GTK_CONTAINER (vbox), 10);
@@ -422,8 +430,9 @@ create_mailservers_page ()
 
   label = gtk_label_new (_ ("Local mail directory:"));
   gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 2);
-  pui->mail_directory = gtk_entry_new ();
-  gtk_box_pack_start (GTK_BOX (hbox), pui->mail_directory, TRUE, TRUE, 2);
+  mail_dir = gnome_file_entry_new ("LocalMailDir", "LocalMailDir");
+  pui->mail_directory = gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (mail_dir));
+  gtk_box_pack_start (GTK_BOX (hbox), mail_dir, TRUE, TRUE, 2);
 
   /* smtp server */
   frame = gtk_frame_new ("Sending Mail");

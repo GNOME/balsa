@@ -90,7 +90,9 @@ init_balsa_app (int argc, char *argv[])
    */
   balsa_app.real_name = NULL;
   balsa_app.email = NULL;
+
   balsa_app.local_mail_directory = NULL;
+  balsa_app.signature_path = NULL;
   balsa_app.smtp_server = NULL;
 
   balsa_app.inbox = NULL;

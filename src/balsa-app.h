@@ -48,6 +48,8 @@ extern struct BalsaApplication
   gchar *email;
   gchar *local_mail_directory;
   gchar *smtp_server;
+
+  gchar *signature_path;
   gchar *signature;
 
   IndexChild *current_index_child;

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-20 22:49+0100\n"
+"POT-Creation-Date: 2004-04-11 00:52+0100\n"
 "PO-Revision-Date: 2004-09-03 16:57+0200\n"
 "Last-Translator: Laurent Dhima <laurenti@alblinux.net>\n"
 "Language-Team: Albanian <gnome-albanian-perkthyesit@lists.sourceforge.net>\n"
@@ -41,32 +41,32 @@ msgstr "Pa Emër"
 msgid "TLS requested but not compiled in"
 msgstr "TLS kërkohet por nuk është kompiluar"
 
-#: libbalsa/address-book.c:399 libbalsa/filter-error.c:45
+#: libbalsa/address-book.c:400 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Asnjë gabim"
 
-#: libbalsa/address-book.c:400
+#: libbalsa/address-book.c:401
 msgid "Cannot read from address book"
 msgstr "I pamundur leximi nga rubrika"
 
-#: libbalsa/address-book.c:401
+#: libbalsa/address-book.c:402
 msgid "Cannot write to address book"
 msgstr "I pamundur shkrimi në rubrikë"
 
-#: libbalsa/address-book.c:402
+#: libbalsa/address-book.c:403
 msgid "Cannot connect to server"
 msgstr "E pamundur lidhja me serverin"
 
-#: libbalsa/address-book.c:403
+#: libbalsa/address-book.c:404
 msgid "Cannot search in the address book"
 msgstr "I pamundur kërkimi në rubrikë"
 
-#: libbalsa/address-book.c:405
+#: libbalsa/address-book.c:406
 msgid "Cannot add duplicate entry"
 msgstr "I pamundur shtimi i një zëri ekzistues"
 
-#: libbalsa/address-book.c:406 src/main-window.c:2158
-#: src/sendmsg-window.c:4047
+#: libbalsa/address-book.c:407 src/main-window.c:2204 src/main-window.c:4192
+#: src/sendmsg-window.c:4159
 msgid "Unknown error"
 msgstr "Gabim i panjohur"
 
@@ -78,27 +78,27 @@ msgstr "Emri i _Shfaqur:"
 msgid "_First Name:"
 msgstr "_Emri:"
 
-#: libbalsa/address.c:401
+#: libbalsa/address.c:402
 msgid "_Middle Name:"
 msgstr "Emri i _Mesëm:"
 
-#: libbalsa/address.c:402
+#: libbalsa/address.c:404
 msgid "_Last Name:"
 msgstr "_Mbiemri:"
 
-#: libbalsa/address.c:403
+#: libbalsa/address.c:405
 msgid "_Nickname:"
 msgstr "_Pseudonimi:"
 
-#: libbalsa/address.c:404
+#: libbalsa/address.c:406
 msgid "O_rganization:"
 msgstr "O:rganizata:"
 
-#: libbalsa/address.c:405
+#: libbalsa/address.c:407
 msgid "_Email Address:"
 msgstr "Adresa _Email:"
 
-#: libbalsa/body.c:115 libbalsa/mailbox_local.c:976 libbalsa/message.c:914
+#: libbalsa/body.c:115 libbalsa/mailbox_local.c:975 libbalsa/message.c:835
 msgid "(No subject)"
 msgstr "(Pa subjekt)"
 
@@ -119,7 +119,7 @@ msgstr "Gabim në sintaksën e shprehjes së rregullt"
 msgid "Attempt to apply an invalid filter"
 msgstr "apliko I pavlefshëm filtro"
 
-#: libbalsa/filter-file.c:139
+#: libbalsa/filter-file.c:141
 #, fuzzy, c-format
 msgid "Invalid filters %s for mailbox %s"
 msgstr "E pavlefshme për"
@@ -134,24 +134,32 @@ msgstr "ngarkoje mesazh trupi filtro"
 msgid "Invalid filter: %s"
 msgstr "Filtër i pavlefshëm: %s"
 
-#: libbalsa/filter.c:303 libbalsa/filter.c:324
+#: libbalsa/filter.c:303 libbalsa/filter.c:326
 #, fuzzy, c-format
 msgid "Bad mailbox name for filter: %s"
 msgstr "emri për filtro"
 
 #: libbalsa/filter.c:307
-msgid "Error when copying messages"
+#, fuzzy, c-format
+msgid "Error when copying messages: %s"
 msgstr "Gabim gjatë kopjimit të mesazheve"
 
-#: libbalsa/filter.c:316
-msgid "Error when trashing messages"
+#: libbalsa/filter.c:317
+#, fuzzy, c-format
+msgid "Error when trashing messages: %s"
 msgstr "Gabim gjatë flakjes së mesazheve"
 
-#: libbalsa/filter.c:328
-msgid "Error when moving messages"
+#: libbalsa/filter.c:330
+#, fuzzy, c-format
+msgid "Error when moving messages: %s"
 msgstr "Gabim gjatë lëvizjes së mesazheve"
 
-#: libbalsa/gmime-gpgme-context.c:287 libbalsa/rfc3156.c:1383
+#: libbalsa/gmime-application-pkcs7.c:246
+#: libbalsa/gmime-application-pkcs7.c:389
+msgid "Failed to decrypt MIME part: parse error"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:288 libbalsa/rfc3156.c:1501
 #, fuzzy, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -159,7 +167,7 @@ msgid ""
 "Key: %s"
 msgstr "për j"
 
-#: libbalsa/gmime-gpgme-context.c:292 libbalsa/rfc3156.c:1388
+#: libbalsa/gmime-gpgme-context.c:293 libbalsa/rfc3156.c:1506
 #, fuzzy, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -167,235 +175,235 @@ msgid ""
 "Key: %s"
 msgstr "shkruaj për j"
 
-#: libbalsa/gmime-gpgme-context.c:410 libbalsa/gmime-gpgme-context.c:492
-#: libbalsa/gmime-gpgme-context.c:503 libbalsa/gmime-gpgme-context.c:618
-#: libbalsa/gmime-gpgme-context.c:708
+#: libbalsa/gmime-gpgme-context.c:411 libbalsa/gmime-gpgme-context.c:493
+#: libbalsa/gmime-gpgme-context.c:504 libbalsa/gmime-gpgme-context.c:619
+#: libbalsa/gmime-gpgme-context.c:709
 #, fuzzy, c-format
 msgid "%s: could not get data from stream: %s"
 msgstr "nuk merr"
 
-#: libbalsa/gmime-gpgme-context.c:418 libbalsa/gmime-gpgme-context.c:627
-#: libbalsa/gmime-gpgme-context.c:716
+#: libbalsa/gmime-gpgme-context.c:419 libbalsa/gmime-gpgme-context.c:628
+#: libbalsa/gmime-gpgme-context.c:717
 #, fuzzy, c-format
 msgid "%s: could not create new data object: %s"
 msgstr "nuk i ri"
 
-#: libbalsa/gmime-gpgme-context.c:428
+#: libbalsa/gmime-gpgme-context.c:429
 #, c-format
 msgid "%s: signing failed: %s"
 msgstr ""
 
-#: libbalsa/gmime-gpgme-context.c:517
+#: libbalsa/gmime-gpgme-context.c:518
 #, c-format
 msgid "%s: signature verification failed: %s"
 msgstr ""
 
-#: libbalsa/gmime-gpgme-context.c:582
+#: libbalsa/gmime-gpgme-context.c:583
 #, fuzzy
 msgid "combined signing and encryption is only defined for RFC 2440"
 msgstr "dhe është për"
 
-#: libbalsa/gmime-gpgme-context.c:652
+#: libbalsa/gmime-gpgme-context.c:653
 #, fuzzy, c-format
 msgid "%s: signing and encryption failed: %s"
 msgstr "dhe"
 
-#: libbalsa/gmime-gpgme-context.c:656
+#: libbalsa/gmime-gpgme-context.c:657
 #, c-format
 msgid "%s: encryption failed: %s"
 msgstr ""
 
-#: libbalsa/gmime-gpgme-context.c:728
+#: libbalsa/gmime-gpgme-context.c:729
 #, c-format
 msgid "%s: decryption failed: %s"
 msgstr ""
 
-#: libbalsa/gmime-gpgme-context.c:763
+#: libbalsa/gmime-gpgme-context.c:764
 #, fuzzy, c-format
 msgid "%s: could not create context: %s"
 msgstr "nuk"
 
-#: libbalsa/gmime-gpgme-context.c:819
+#: libbalsa/gmime-gpgme-context.c:820
 #, fuzzy
 msgid "the crypto engine for protocol OpenPGP is not available"
 msgstr "për është nuk"
 
-#: libbalsa/gmime-gpgme-context.c:829
+#: libbalsa/gmime-gpgme-context.c:830
 #, fuzzy
 msgid "the crypto engine for protocol CMS is not available"
 msgstr "për është nuk"
 
-#: libbalsa/gmime-gpgme-context.c:836
+#: libbalsa/gmime-gpgme-context.c:837
 #, fuzzy, c-format
 msgid "invalid crypto engine %d"
 msgstr "I pavlefshëm"
 
-#: libbalsa/gmime-gpgme-context.c:865 libbalsa/gmime-gpgme-context.c:876
+#: libbalsa/gmime-gpgme-context.c:866 libbalsa/gmime-gpgme-context.c:877
 #, fuzzy, c-format
 msgid "%s: could not list keys for %s: %s"
 msgstr "nuk lista për"
 
-#: libbalsa/gmime-gpgme-context.c:888
+#: libbalsa/gmime-gpgme-context.c:889
 #, fuzzy, c-format
 msgid "%s: could not find a key for %s"
 msgstr "nuk gjej a për"
 
-#: libbalsa/gmime-gpgme-context.c:900
+#: libbalsa/gmime-gpgme-context.c:901
 #, fuzzy, c-format
 msgid "%s: multiple keys for %s"
 msgstr "për"
 
 #. should "re" be localized ?
-#: libbalsa/identity.c:91 libbalsa/mailbox_local.c:1112
-#: libbalsa/mailbox_local.c:1114 src/sendmsg-window.c:2637
-#: src/sendmsg-window.c:2638
+#: libbalsa/identity.c:92 libbalsa/mailbox_local.c:1111
+#: libbalsa/mailbox_local.c:1113 src/sendmsg-window.c:2709
+#: src/sendmsg-window.c:2710
 msgid "Re:"
 msgstr ""
 
-#: libbalsa/identity.c:92 src/sendmsg-window.c:2667 src/sendmsg-window.c:2668
+#: libbalsa/identity.c:93 src/sendmsg-window.c:2739 src/sendmsg-window.c:2740
 msgid "Fwd:"
 msgstr ""
 
-#: libbalsa/identity.c:138
+#: libbalsa/identity.c:139
 #, fuzzy
 msgid "New Identity"
 msgstr "E re"
 
-#: libbalsa/identity.c:374
+#: libbalsa/identity.c:375
 msgid "Current"
 msgstr "Aktual"
 
-#: libbalsa/identity.c:595
+#: libbalsa/identity.c:596
 msgid "Default"
 msgstr "E prezgjedhur"
 
-#: libbalsa/identity.c:783
+#: libbalsa/identity.c:784
 #, fuzzy
 msgid "_Identity Name:"
 msgstr "Emri:"
 
-#: libbalsa/identity.c:785
+#: libbalsa/identity.c:786
 msgid "_Full Name:"
 msgstr "Emri dhe _mbiemri:"
 
-#: libbalsa/identity.c:787
+#: libbalsa/identity.c:788
 #, fuzzy
 msgid "_Mailing Address:"
 msgstr "Adresa:"
 
-#: libbalsa/identity.c:789
+#: libbalsa/identity.c:790
 #, fuzzy
 msgid "Reply _To:"
 msgstr "Përgjigju Për:"
 
-#: libbalsa/identity.c:791
+#: libbalsa/identity.c:792
 msgid "_Domain:"
 msgstr "_Domain:"
 
-#: libbalsa/identity.c:793
+#: libbalsa/identity.c:794
 msgid "_Bcc:"
 msgstr ""
 
-#: libbalsa/identity.c:795
+#: libbalsa/identity.c:796
 #, fuzzy
 msgid "Reply _String:"
 msgstr "Përgjigju Stringë:"
 
-#: libbalsa/identity.c:797
+#: libbalsa/identity.c:798
 #, fuzzy
 msgid "F_orward String:"
 msgstr "F Stringë:"
 
-#: libbalsa/identity.c:799
+#: libbalsa/identity.c:800
 #, fuzzy
 msgid "Signature _Path:"
 msgstr "Firma Pozicioni:"
 
-#: libbalsa/identity.c:803
+#: libbalsa/identity.c:804
 #, fuzzy
 msgid "_Execute Signature"
 msgstr "Ekzekuto Firma"
 
-#: libbalsa/identity.c:806
+#: libbalsa/identity.c:807
 #, fuzzy
 msgid "Incl_ude Signature"
 msgstr "Firma"
 
-#: libbalsa/identity.c:809
+#: libbalsa/identity.c:810
 #, fuzzy
 msgid "Include Signature When For_warding"
 msgstr "Include Firma Kur"
 
-#: libbalsa/identity.c:812
+#: libbalsa/identity.c:813
 #, fuzzy
 msgid "Include Signature When Rep_lying"
 msgstr "Include Firma Kur"
 
-#: libbalsa/identity.c:815
+#: libbalsa/identity.c:816
 #, fuzzy
 msgid "_Add Signature Separator"
 msgstr "Shto Firma Ndarës"
 
-#: libbalsa/identity.c:818
+#: libbalsa/identity.c:819
 msgid "Prepend Si_gnature"
 msgstr ""
 
-#: libbalsa/identity.c:823
+#: libbalsa/identity.c:824
 #, fuzzy
 msgid "sign messages by default"
 msgstr "nga prezgjedhur"
 
-#: libbalsa/identity.c:829
+#: libbalsa/identity.c:830
 #, fuzzy
 msgid "encrypt messages by default"
 msgstr "nga prezgjedhur"
 
-#: libbalsa/identity.c:835
+#: libbalsa/identity.c:836
 #, fuzzy
 msgid "default crypto protocol"
 msgstr "prezgjedhur"
 
-#: libbalsa/identity.c:982
+#: libbalsa/identity.c:983
 #, fuzzy
 msgid "Error: The identity does not have a name"
 msgstr "Gabim identiteti nuk a emri"
 
-#: libbalsa/identity.c:992
+#: libbalsa/identity.c:993
 #, fuzzy
 msgid "Error: An identity with that name already exists"
 msgstr "Gabim identiteti me emri ekziston"
 
-#: libbalsa/identity.c:1153
+#: libbalsa/identity.c:1154
 #, fuzzy
 msgid "Do you really want to delete the selected identity?"
 msgstr "Bëje elemino identiteti?"
 
-#: libbalsa/identity.c:1186
+#: libbalsa/identity.c:1187
 #, fuzzy, c-format
 msgid "Error displaying help for identities: %s\n"
 msgstr "Gabim ndihmë për j"
 
-#: libbalsa/identity.c:1216
+#: libbalsa/identity.c:1217
 msgid "Manage Identities"
 msgstr ""
 
-#: libbalsa/identity.c:1521
+#: libbalsa/identity.c:1545 libbalsa/identity.c:1554
 #, fuzzy
 msgid "GnuPG using MIME mode"
 msgstr "modaliteti"
 
-#: libbalsa/identity.c:1522
+#: libbalsa/identity.c:1547 libbalsa/identity.c:1555
 #, fuzzy
 msgid "GnuPG using OpenPGP mode"
 msgstr "modaliteti"
 
-#: libbalsa/identity.c:1524
+#: libbalsa/identity.c:1550 libbalsa/identity.c:1557
 #, fuzzy
 msgid "S/MIME mode"
 msgstr "S modaliteti"
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:258
+#: libbalsa/imap-server.c:257
 #, fuzzy, c-format
 msgid ""
 "IMAP server %s alert:\n"
@@ -403,47 +411,47 @@ msgid ""
 msgstr "IMAP server alarm j"
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:262
+#: libbalsa/imap-server.c:261
 #, fuzzy, c-format
 msgid "IMAP server %s error: %s"
 msgstr "IMAP server gabim"
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:268
+#: libbalsa/imap-server.c:267
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: libbalsa/imap-server.c:506
+#: libbalsa/imap-server.c:505
 #, fuzzy, c-format
 msgid "Cannot connect to the server: %s"
 msgstr "server"
 
-#: libbalsa/imap-server.c:510
+#: libbalsa/imap-server.c:509
 #, fuzzy
 msgid "Cannot connect to the server"
 msgstr "server"
 
-#: libbalsa/imap-server.c:658
+#: libbalsa/imap-server.c:657
 #, fuzzy, c-format
 msgid "Exceeded the number of connections per server %s"
 msgstr "nga server"
 
-#: libbalsa/libbalsa.c:283
+#: libbalsa/libbalsa.c:285
 #, fuzzy, c-format
 msgid "LDAP Directory for %s"
 msgstr "LDAP Directory për"
 
-#: libbalsa/libbalsa.c:388
+#: libbalsa/libbalsa.c:390
 #, fuzzy
 msgid "Invalid date"
 msgstr "Filtër i pavlefshëm: %s"
 
-#: libbalsa/libbalsa.c:404 src/pref-manager.c:1262 src/pref-manager.c:1359
+#: libbalsa/libbalsa.c:406 src/pref-manager.c:1436 src/pref-manager.c:1533
 msgid "Unknown"
 msgstr "Nuk njihet"
 
-#: libbalsa/libbalsa.c:543
+#: libbalsa/libbalsa.c:545
 #, fuzzy, c-format
 msgid ""
 "Authenticity of this certificate could not be verified.\n"
@@ -454,7 +462,7 @@ msgstr ""
 "<b></b>\n"
 "<b></b> j"
 
-#: libbalsa/libbalsa.c:555
+#: libbalsa/libbalsa.c:557
 #, fuzzy
 msgid ""
 "\n"
@@ -463,7 +471,7 @@ msgstr ""
 "\n"
 "<b> nga</b> j"
 
-#: libbalsa/libbalsa.c:566
+#: libbalsa/libbalsa.c:568
 #, fuzzy, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -474,22 +482,22 @@ msgstr ""
 "<b> është</b>\n"
 "<b></b>"
 
-#: libbalsa/libbalsa.c:575
+#: libbalsa/libbalsa.c:577
 #, fuzzy
 msgid "SSL/TLS certificate"
 msgstr "TLS"
 
-#: libbalsa/libbalsa.c:577
+#: libbalsa/libbalsa.c:579
 #, fuzzy
 msgid "_Accept Once"
 msgstr "Prano"
 
-#: libbalsa/libbalsa.c:578
+#: libbalsa/libbalsa.c:580
 #, fuzzy
 msgid "Accept&_Save"
 msgstr "Prano Ruaj"
 
-#: libbalsa/libbalsa.c:579
+#: libbalsa/libbalsa.c:581
 #, fuzzy
 msgid "_Reject"
 msgstr "Refuzim"
@@ -515,52 +523,47 @@ msgid "Could not create a mailbox of type %s"
 msgstr "nuk a nga lloji"
 
 #. ImapIssue macro handles reconnecting. We might issue a
-#. LIBBALSA_INFORMATION_MMESSAGE here but it would be overwritten by
+#. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
 #. login information...
-#: libbalsa/mailbox_imap.c:500
+#: libbalsa/mailbox_imap.c:522
 #, fuzzy
 msgid "IMAP connection has been severed. Reconnecting..."
 msgstr "IMAP."
 
-#: libbalsa/mailbox_imap.c:503
+#: libbalsa/mailbox_imap.c:525
 #, fuzzy, c-format
 msgid "IMAP server has shut the connection: %s Reconnecting..."
 msgstr "IMAP server."
 
-#: libbalsa/mailbox_imap.c:851
-#, fuzzy, c-format
-msgid "IMAP SEARCH UNSEEN request failed for mailbox %s"
-msgstr "IMAP për"
-
-#: libbalsa/mailbox_imap.c:914 libbalsa/mailbox_maildir.c:480
-#: libbalsa/mailbox_mbox.c:461 libbalsa/mailbox_mh.c:502
+#: libbalsa/mailbox_imap.c:965 libbalsa/mailbox_maildir.c:488
+#: libbalsa/mailbox_mbox.c:502 libbalsa/mailbox_mh.c:510
 #, fuzzy, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "j"
 
-#: libbalsa/mailbox_imap.c:978 libbalsa/mailbox_imap.c:1991
+#: libbalsa/mailbox_imap.c:1031 libbalsa/mailbox_imap.c:2045
 #, c-format
 msgid "Downloading %ld kB"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:1345
+#: libbalsa/mailbox_imap.c:1398
 #, fuzzy, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
 "falling back to default searching method"
 msgstr "IMAP për mbrapa prezgjedhur"
 
-#: libbalsa/mailbox_imap.c:1405
+#: libbalsa/mailbox_imap.c:1458
 #, c-format
 msgid "No path found for mailbox \"%s\", using \"%s\""
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:2171
+#: libbalsa/mailbox_imap.c:2232
 #, c-format
 msgid "Uploading %ld kB"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:2321
+#: libbalsa/mailbox_imap.c:2419
 #, fuzzy
 msgid "Server-side threading not supported."
 msgstr "Serveri nuk."
@@ -575,167 +578,186 @@ msgstr "Hap nga "
 msgid "Failed to sync mailbox \"%s\""
 msgstr "Dështoi"
 
-#: libbalsa/mailbox_maildir.c:188
+#: libbalsa/mailbox_maildir.c:196
 #, fuzzy, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
 msgstr "nuk a."
 
-#: libbalsa/mailbox_maildir.c:197
+#: libbalsa/mailbox_maildir.c:205
 #, fuzzy, c-format
 msgid "Could not create a MailDir directory at %s (%s)"
 msgstr "nuk a"
 
-#: libbalsa/mailbox_maildir.c:204 libbalsa/mailbox_maildir.c:212
-#: libbalsa/mailbox_maildir.c:222
+#: libbalsa/mailbox_maildir.c:212 libbalsa/mailbox_maildir.c:220
+#: libbalsa/mailbox_maildir.c:230
 #, fuzzy, c-format
 msgid "Could not create a MailDir at %s (%s)"
 msgstr "nuk a"
 
-#: libbalsa/mailbox_maildir.c:323 libbalsa/mailbox_mh.c:266
+#: libbalsa/mailbox_maildir.c:331 libbalsa/mailbox_mh.c:274
 #, fuzzy, c-format
 msgid ""
 "Could not remove contents of %s:\n"
 "%s"
 msgstr "nuk hiq nga j"
 
-#: libbalsa/mailbox_maildir.c:329 libbalsa/mailbox_mbox.c:267
-#: libbalsa/mailbox_mh.c:272
+#: libbalsa/mailbox_maildir.c:337 libbalsa/mailbox_mbox.c:282
+#: libbalsa/mailbox_mh.c:280
 #, fuzzy, c-format
 msgid ""
 "Could not remove %s:\n"
 "%s"
 msgstr "nuk hiq j"
 
-#: libbalsa/mailbox_maildir.c:452 libbalsa/mailbox_mbox.c:425
-#: libbalsa/mailbox_mh.c:483
+#: libbalsa/mailbox_maildir.c:460 libbalsa/mailbox_mbox.c:457
+#: libbalsa/mailbox_mh.c:491
 #, fuzzy
 msgid "Mailbox does not exist."
 msgstr "nuk."
 
-#: libbalsa/mailbox_mbox.c:179
+#: libbalsa/mailbox_maildir.c:880
+#, fuzzy
+msgid "Cannot read message"
+msgstr "Hap në vazhdim mesazh"
+
+#: libbalsa/mailbox_maildir.c:900 libbalsa/mailbox_mbox.c:1603
+#: libbalsa/mailbox_mh.c:1095
+#, fuzzy
+msgid "Data copy error"
+msgstr "Asnjë gabim"
+
+#: libbalsa/mailbox_mbox.c:191
 #, fuzzy, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "nuk."
 
-#: libbalsa/mailbox_mbox.c:433
+#: libbalsa/mailbox_mbox.c:465
 #, fuzzy
 msgid "Cannot open mailbox."
 msgstr "hap."
 
-#: libbalsa/mailbox_mbox.c:441
+#: libbalsa/mailbox_mbox.c:475
+#, fuzzy
+msgid "Mailbox is not in mbox format."
+msgstr "nuk."
+
+#: libbalsa/mailbox_mbox.c:482
 msgid "Cannot lock mailbox."
 msgstr ""
 
-#: libbalsa/mailbox_mbox.c:1500
+#: libbalsa/mailbox_mbox.c:1557
 #, fuzzy, c-format
 msgid "%s: could not open %s."
 msgstr "nuk hap."
 
-#: libbalsa/mailbox_mbox.c:1508
+#: libbalsa/mailbox_mbox.c:1567
 #, fuzzy, c-format
 msgid "%s: could not get new mime stream."
 msgstr "nuk merr i ri."
 
-#: libbalsa/mailbox_mbox.c:1518
+#: libbalsa/mailbox_mbox.c:1575
+#, c-format
+msgid "%s: %s is not in mbox format."
+msgstr ""
+
+#: libbalsa/mailbox_mbox.c:1587
 #, fuzzy, c-format
 msgid "%s: could not get message stream."
 msgstr "nuk merr mesazh."
 
-#: libbalsa/mailbox_mbox.c:1533
-#, fuzzy, c-format
-msgid "Error copying message to mailbox %s!"
-msgstr "Dështoi kopjo mesazh."
-
-#: libbalsa/mailbox_mh.c:172
+#: libbalsa/mailbox_mh.c:181
 #, fuzzy, c-format
 msgid "Mailbox %s does not appear to be a Mh mailbox."
 msgstr "nuk a."
 
-#: libbalsa/mailbox_mh.c:182
+#: libbalsa/mailbox_mh.c:191
 #, fuzzy, c-format
 msgid "Could not create MH directory at %s (%s)"
 msgstr "nuk"
 
-#: libbalsa/mailbox_mh.c:189
+#: libbalsa/mailbox_mh.c:198
 #, fuzzy, c-format
 msgid "Could not create MH structure at %s (%s)"
 msgstr "nuk"
 
-#: libbalsa/mailbox_pop3.c:338
+#: libbalsa/mailbox_mh.c:1074
+#, fuzzy
+msgid "Cannot create message"
+msgstr "Printo mesazh"
+
+#: libbalsa/mailbox_mh.c:1120
+#, fuzzy
+msgid "Message rename error"
+msgstr "Mesazh Burimi"
+
+#: libbalsa/mailbox_pop3.c:202
+#, fuzzy, c-format
+msgid "Error setting flags on messages in mailbox %s"
+msgstr "Dështoi kopjo mesazh."
+
+#: libbalsa/mailbox_pop3.c:212
+#, fuzzy, c-format
+msgid "Error appending message %d from %s to %s: %s"
+msgstr "Gabim në majtas në j"
+
+#: libbalsa/mailbox_pop3.c:374
 #, fuzzy, c-format
 msgid "Retrieving Message %d of %d"
 msgstr "Mesazh nga"
 
-#: libbalsa/mailbox_pop3.c:361
+#: libbalsa/mailbox_pop3.c:397
 #, fuzzy, c-format
 msgid "Received %ld kB of %ld"
 msgstr "Marrë nga"
 
-#: libbalsa/mailbox_pop3.c:375
+#: libbalsa/mailbox_pop3.c:411
 #, fuzzy, c-format
 msgid "Saving POP message to %s failed."
 msgstr "Duke ruajtur POP mesazh."
 
-#: libbalsa/mailbox_pop3.c:385
+#: libbalsa/mailbox_pop3.c:421
 #, fuzzy, c-format
 msgid "Transfering POP message to %s failed."
 msgstr "POP mesazh."
 
-#: libbalsa/mailbox_pop3.c:463 libbalsa/mailbox_pop3.c:474
+#: libbalsa/mailbox_pop3.c:502 libbalsa/mailbox_pop3.c:513
 #, fuzzy, c-format
 msgid ""
 "POP3 mailbox %s temp file error:\n"
 "%s"
 msgstr "gabim j"
 
-#: libbalsa/mailbox_pop3.c:502
-#, fuzzy, c-format
-msgid "POP3 mailbox %s error: %s\n"
-msgstr "gabim j"
-
-#: libbalsa/mailbox_pop3.c:535
-#, fuzzy, c-format
-msgid "POP3 message %d oversized: %d kB - skipped."
-msgstr "mesazh."
-
-#: libbalsa/mailbox_pop3.c:546
-#, fuzzy, c-format
-msgid "POP3 error: cannot open %s for writing."
-msgstr "gabim hap për."
-
-#: libbalsa/mailbox_pop3.c:554
-#, fuzzy, c-format
-msgid "POP3 error: cannot close %s."
-msgstr "gabim mbylle."
-
-#: libbalsa/mailbox_pop3.c:580
-#, fuzzy, c-format
-msgid "POP3 error: %s."
-msgstr "gabim."
-
-#: libbalsa/mailbox_pop3.c:603
+#: libbalsa/mailbox_pop3.c:527
 #, fuzzy, c-format
 msgid "POP3 mailbox %s temp mailbox error:\n"
 msgstr "gabim j"
 
-#: libbalsa/mailbox_pop3.c:626
+#: libbalsa/mailbox_pop3.c:550
 #, fuzzy, c-format
-msgid ""
-"Error placing messages from %s on %s\n"
-"Messages are left in %s\n"
-msgstr "Gabim në majtas në j"
+msgid "POP3 mailbox %s error: %s\n"
+msgstr "gabim j"
 
-#: libbalsa/mailbox_pop3.c:645
+#: libbalsa/mailbox_pop3.c:583
 #, fuzzy, c-format
-msgid "POP3 temp mailbox %s was not removed (system error message: %s)"
-msgstr "nuk sistemi gabim mesazh"
+msgid "POP3 message %d oversized: %d kB - skipped."
+msgstr "mesazh."
 
-#: libbalsa/message.c:482
+#: libbalsa/mailbox_pop3.c:594
 #, fuzzy, c-format
-msgid "Source mailbox (%s) is readonly. Cannot move messages"
-msgstr "Burimi është"
+msgid "POP3 error: cannot open %s for writing."
+msgstr "gabim hap për."
 
-#: libbalsa/message.c:634 libbalsa/message.c:674
+#: libbalsa/mailbox_pop3.c:602
+#, fuzzy, c-format
+msgid "POP3 error: cannot close %s."
+msgstr "gabim mbylle."
+
+#: libbalsa/mailbox_pop3.c:631
+#, fuzzy, c-format
+msgid "POP3 error: %s."
+msgstr "gabim."
+
+#: libbalsa/message.c:555 libbalsa/message.c:595
 #, fuzzy, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr "është."
@@ -748,407 +770,414 @@ msgid ""
 "This is an OpenPGP signed message part:\n"
 msgstr "j është mesazh j"
 
-#: libbalsa/misc.c:1629
+#: libbalsa/misc.c:1628
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr ""
 
-#: libbalsa/misc.c:1636
+#: libbalsa/misc.c:1635
 #, fuzzy, c-format
 msgid "Waiting for fcntl lock... %d"
 msgstr "Në pritje për"
 
-#: libbalsa/misc.c:1664
+#: libbalsa/misc.c:1663
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr ""
 
-#: libbalsa/misc.c:1671
+#: libbalsa/misc.c:1670
 #, fuzzy, c-format
 msgid "Waiting for flock attempt... %d"
 msgstr "Në pritje për"
 
-#: libbalsa/rfc3156.c:76
+#: libbalsa/rfc3156.c:84
 #, fuzzy, c-format
 msgid "Gpgme has been compiled without support for protocol %s."
 msgstr "për."
 
-#: libbalsa/rfc3156.c:81
+#: libbalsa/rfc3156.c:89
 #, fuzzy, c-format
 msgid "Crypto engine %s is not installed properly."
 msgstr "Kriptografie është nuk instaluar."
 
-#: libbalsa/rfc3156.c:86
+#: libbalsa/rfc3156.c:94
 #, fuzzy, c-format
 msgid ""
 "Crypto engine %s version %s is installed, but at least version %s is "
 "required."
 msgstr "Kriptografie versioni është instaluar versioni është kërkohet."
 
-#: libbalsa/rfc3156.c:93
+#: libbalsa/rfc3156.c:101
 #, fuzzy, c-format
 msgid "Unknown problem with engine for protocol %s."
 msgstr "Nuk njihet me për."
 
-#: libbalsa/rfc3156.c:98
+#: libbalsa/rfc3156.c:106
 #, fuzzy, c-format
 msgid "%s: could not retreive crypto engine information: %s."
 msgstr "nuk."
 
-#: libbalsa/rfc3156.c:102
+#: libbalsa/rfc3156.c:110
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Disable support for protocol %s."
 msgstr "për."
 
-#: libbalsa/rfc3156.c:235 libbalsa/rfc3156.c:240 libbalsa/rfc3156.c:322
-#: libbalsa/rfc3156.c:327 libbalsa/rfc3156.c:461 libbalsa/rfc3156.c:466
-#: libbalsa/rfc3156.c:529 libbalsa/rfc3156.c:534 libbalsa/rfc3156.c:613
-#: libbalsa/rfc3156.c:618 libbalsa/rfc3156.c:723 libbalsa/rfc3156.c:728
-#: libbalsa/rfc3156.c:803 libbalsa/rfc3156.c:808
+#: libbalsa/rfc3156.c:252 libbalsa/rfc3156.c:257 libbalsa/rfc3156.c:343
+#: libbalsa/rfc3156.c:348 libbalsa/rfc3156.c:506 libbalsa/rfc3156.c:511
+#: libbalsa/rfc3156.c:612 libbalsa/rfc3156.c:617 libbalsa/rfc3156.c:723
+#: libbalsa/rfc3156.c:728 libbalsa/rfc3156.c:833 libbalsa/rfc3156.c:838
+#: libbalsa/rfc3156.c:913 libbalsa/rfc3156.c:918
 #, fuzzy
 msgid "creating a gpgme context failed"
 msgstr "a"
 
-#: libbalsa/rfc3156.c:253 libbalsa/rfc3156.c:631
+#: libbalsa/rfc3156.c:270 libbalsa/rfc3156.c:741
 #, fuzzy
 msgid "Enter passphrase to unlock the secret key for signing"
 msgstr "Shto për"
 
-#: libbalsa/rfc3156.c:274 libbalsa/rfc3156.c:278 libbalsa/rfc3156.c:660
+#: libbalsa/rfc3156.c:291 libbalsa/rfc3156.c:295 libbalsa/rfc3156.c:770
 msgid "signing failed"
 msgstr ""
 
-#: libbalsa/rfc3156.c:351 libbalsa/rfc3156.c:356 libbalsa/rfc3156.c:663
+#: libbalsa/rfc3156.c:394 libbalsa/rfc3156.c:399 libbalsa/rfc3156.c:773
 msgid "encryption failed"
 msgstr ""
 
-#: libbalsa/rfc3156.c:479 libbalsa/rfc3156.c:484 libbalsa/rfc3156.c:739
-#: libbalsa/rfc3156.c:745
+#: libbalsa/rfc3156.c:535 libbalsa/rfc3156.c:540 libbalsa/rfc3156.c:849
+#: libbalsa/rfc3156.c:855
 msgid "signature verification failed"
 msgstr ""
 
-#: libbalsa/rfc3156.c:546 libbalsa/rfc3156.c:819
+#: libbalsa/rfc3156.c:629 libbalsa/rfc3156.c:929
 #, fuzzy
 msgid "Enter passphrase to decrypt message"
 msgstr "Shto mesazh"
 
-#: libbalsa/rfc3156.c:558 libbalsa/rfc3156.c:563
+#: libbalsa/rfc3156.c:660 libbalsa/rfc3156.c:665
 msgid "decryption failed"
 msgstr ""
 
-#: libbalsa/rfc3156.c:656 libbalsa/rfc3156.c:670
+#: libbalsa/rfc3156.c:766 libbalsa/rfc3156.c:780
 #, fuzzy
 msgid "signing and encryption failed"
 msgstr "dhe"
 
-#: libbalsa/rfc3156.c:673
+#: libbalsa/rfc3156.c:783
 #, c-format
 msgid "signing failed: %s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:676
+#: libbalsa/rfc3156.c:786
 #, c-format
 msgid "encryption failed: %s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:828 libbalsa/rfc3156.c:835
+#: libbalsa/rfc3156.c:938 libbalsa/rfc3156.c:945
 #, fuzzy
 msgid "decryption and signature verification failed"
 msgstr "dhe"
 
-#: libbalsa/rfc3156.c:866
+#: libbalsa/rfc3156.c:976
 #, fuzzy
 msgid "The signature is valid."
 msgstr "është."
 
-#: libbalsa/rfc3156.c:868
+#: libbalsa/rfc3156.c:978
 #, fuzzy
 msgid "The signature is valid but expired."
 msgstr "është."
 
-#: libbalsa/rfc3156.c:871
+#: libbalsa/rfc3156.c:981
 #, fuzzy
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr "është."
 
-#: libbalsa/rfc3156.c:874
+#: libbalsa/rfc3156.c:984
 #, fuzzy
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
 msgstr "është."
 
-#: libbalsa/rfc3156.c:877
+#: libbalsa/rfc3156.c:987
 #, fuzzy
-msgid "The signature is invalid (Note: might be caused by gmime bug!)."
-msgstr "është I pavlefshëm Shënim nga difekt."
+msgid "The signature is invalid."
+msgstr "është."
 
-#: libbalsa/rfc3156.c:880
+#: libbalsa/rfc3156.c:990
 #, fuzzy
 msgid "The signature could not be verified due to a missing key."
 msgstr "nuk a."
 
-#: libbalsa/rfc3156.c:882
+#: libbalsa/rfc3156.c:992
 #, fuzzy
 msgid "This part is not a real PGP signature."
 msgstr "është nuk a PGP."
 
-#: libbalsa/rfc3156.c:885
+#: libbalsa/rfc3156.c:995
 #, fuzzy
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr "nuk I pavlefshëm."
 
-#: libbalsa/rfc3156.c:888 libbalsa/rfc3156.c:1543
+#: libbalsa/rfc3156.c:998 libbalsa/rfc3156.c:1661
 #, fuzzy
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
 msgstr "është Bankë të dhënash (databazë) dhe është."
 
-#: libbalsa/rfc3156.c:891
+#: libbalsa/rfc3156.c:1001
 #, fuzzy
 msgid "An error prevented the signature verification."
 msgstr "gabim."
 
-#: libbalsa/rfc3156.c:899
+#: libbalsa/rfc3156.c:1009
 #, fuzzy
 msgid "The user ID is of unknown validity."
 msgstr "përdorues ID është nga nuk njihet."
 
-#: libbalsa/rfc3156.c:901
+#: libbalsa/rfc3156.c:1011
 #, fuzzy
 msgid "The validity of the user ID is undefined."
 msgstr "nga përdorues ID është."
 
-#: libbalsa/rfc3156.c:903
+#: libbalsa/rfc3156.c:1013
 #, fuzzy
 msgid "The user ID is never valid."
 msgstr "përdorues ID është asnjëherë."
 
-#: libbalsa/rfc3156.c:905
+#: libbalsa/rfc3156.c:1015
 #, fuzzy
 msgid "The user ID is marginally valid."
 msgstr "përdorues ID është."
 
-#: libbalsa/rfc3156.c:907
+#: libbalsa/rfc3156.c:1017
 #, fuzzy
 msgid "The user ID is fully valid."
 msgstr "përdorues ID është."
 
-#: libbalsa/rfc3156.c:909
+#: libbalsa/rfc3156.c:1019
 #, fuzzy
 msgid "The user ID is ultimately valid."
 msgstr "përdorues ID është."
 
-#: libbalsa/rfc3156.c:911 libbalsa/rfc3156.c:1147
+#: libbalsa/rfc3156.c:1021 libbalsa/rfc3156.c:1265
 msgid "bad validity"
 msgstr ""
 
-#: libbalsa/rfc3156.c:919
+#: libbalsa/rfc3156.c:1029
 #, fuzzy
 msgid "PGP signature: "
 msgstr "PGP "
 
-#: libbalsa/rfc3156.c:921
+#: libbalsa/rfc3156.c:1031
 #, fuzzy
 msgid "S/MIME signature: "
 msgstr "S "
 
-#: libbalsa/rfc3156.c:923
+#: libbalsa/rfc3156.c:1033
 #, fuzzy
 msgid "(unknown protocol) "
 msgstr "nuk njihet "
 
-#: libbalsa/rfc3156.c:942
+#: libbalsa/rfc3156.c:1052
 #, fuzzy, c-format
 msgid ""
 "\n"
 "User ID: %s"
 msgstr "ID"
 
-#: libbalsa/rfc3156.c:945
+#: libbalsa/rfc3156.c:1055
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Signed by: %s"
 msgstr "nga"
 
-#: libbalsa/rfc3156.c:949
+#: libbalsa/rfc3156.c:1059
 #, c-format
 msgid ""
 "\n"
 "Mail address: %s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:954
+#: libbalsa/rfc3156.c:1064
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Signed on: %s"
 msgstr "në"
 
-#: libbalsa/rfc3156.c:956
+#: libbalsa/rfc3156.c:1066
 #, c-format
 msgid ""
 "\n"
 "Validity: %s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:960
+#: libbalsa/rfc3156.c:1070
 #, c-format
 msgid ""
 "\n"
 "Owner trust: %s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:964
+#: libbalsa/rfc3156.c:1074
 #, c-format
 msgid ""
 "\n"
 "Key fingerprint: %s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:969
+#: libbalsa/rfc3156.c:1079
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Key created on: %s"
 msgstr "në"
 
-#: libbalsa/rfc3156.c:978
+#: libbalsa/rfc3156.c:1084
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Key expires on: %s"
+msgstr "në"
+
+#: libbalsa/rfc3156.c:1093
 msgid " revoked"
 msgstr ""
 
-#: libbalsa/rfc3156.c:983
+#: libbalsa/rfc3156.c:1098
 msgid " expired"
 msgstr ""
 
-#: libbalsa/rfc3156.c:988
+#: libbalsa/rfc3156.c:1103
 #, fuzzy
 msgid " disabled"
 msgstr "jo aktiv"
 
-#: libbalsa/rfc3156.c:993
+#: libbalsa/rfc3156.c:1108
 #, fuzzy
 msgid " invalid"
 msgstr "I pavlefshëm"
 
-#: libbalsa/rfc3156.c:996
+#: libbalsa/rfc3156.c:1111
 #, c-format
 msgid ""
 "\n"
 "Key attributes:%s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:998
+#: libbalsa/rfc3156.c:1113
 #, c-format
 msgid ""
 "\n"
 "Key attribute:%s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:1002
+#: libbalsa/rfc3156.c:1119
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Issuer name: %s"
 msgstr "emri"
 
-#: libbalsa/rfc3156.c:1005
+#: libbalsa/rfc3156.c:1123
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Issuer serial number: %s"
 msgstr "seria"
 
-#: libbalsa/rfc3156.c:1008
+#: libbalsa/rfc3156.c:1126
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Chain ID: %s"
 msgstr "ID"
 
-#: libbalsa/rfc3156.c:1055
+#: libbalsa/rfc3156.c:1173
 #, fuzzy, c-format
 msgid "Could not launch %s to get the public key %s."
 msgstr "nuk merr."
 
-#: libbalsa/rfc3156.c:1104
+#: libbalsa/rfc3156.c:1222
 #, fuzzy, c-format
 msgid ""
 "Running gpg failed with return value %d:\n"
 "%s"
 msgstr "Në ekzekutim me j"
 
-#: libbalsa/rfc3156.c:1111
+#: libbalsa/rfc3156.c:1229
 #, fuzzy, c-format
 msgid ""
 "Running gpg successful:\n"
 "%s"
 msgstr "Në ekzekutim j"
 
-#: libbalsa/rfc3156.c:1135
+#: libbalsa/rfc3156.c:1253
 msgid "unknown"
 msgstr "nuk njihet"
 
-#: libbalsa/rfc3156.c:1137
+#: libbalsa/rfc3156.c:1255
 msgid "undefined"
 msgstr ""
 
-#: libbalsa/rfc3156.c:1139
+#: libbalsa/rfc3156.c:1257
 msgid "never"
 msgstr "asnjëherë"
 
-#: libbalsa/rfc3156.c:1141
+#: libbalsa/rfc3156.c:1259
 msgid "marginal"
 msgstr ""
 
-#: libbalsa/rfc3156.c:1143
+#: libbalsa/rfc3156.c:1261
 msgid "full"
 msgstr ""
 
-#: libbalsa/rfc3156.c:1145
+#: libbalsa/rfc3156.c:1263
 msgid "ultimate"
 msgstr ""
 
-#: libbalsa/rfc3156.c:1205
+#: libbalsa/rfc3156.c:1323
 msgid "User ID"
 msgstr "ID e përdoruesit"
 
-#: libbalsa/rfc3156.c:1205
+#: libbalsa/rfc3156.c:1323
 #, fuzzy
 msgid "Key ID"
 msgstr "Kyçi ID"
 
-#: libbalsa/rfc3156.c:1205
+#: libbalsa/rfc3156.c:1323
 msgid "Length"
 msgstr "Gjatësia"
 
-#: libbalsa/rfc3156.c:1205
+#: libbalsa/rfc3156.c:1323
 msgid "Validity"
 msgstr ""
 
-#: libbalsa/rfc3156.c:1206
+#: libbalsa/rfc3156.c:1324
 #, fuzzy
 msgid "Owner trust"
 msgstr "Pronari"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: libbalsa/rfc3156.c:1250
+#: libbalsa/rfc3156.c:1368
 #, fuzzy
 msgid "Select key"
 msgstr "Zgjidh"
 
-#: libbalsa/rfc3156.c:1261
+#: libbalsa/rfc3156.c:1379
 #, fuzzy, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Zgjidh për"
 
-#: libbalsa/rfc3156.c:1265
+#: libbalsa/rfc3156.c:1383
 #, fuzzy, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Zgjidh për"
 
-#: libbalsa/rfc3156.c:1544
+#: libbalsa/rfc3156.c:1662
 msgid "Try again later."
 msgstr ""
 
@@ -1157,11 +1186,11 @@ msgstr ""
 msgid "Sending Mail..."
 msgstr "Duke dërguar Posta."
 
-#: libbalsa/send.c:240 src/main-window.c:2595
+#: libbalsa/send.c:240 src/main-window.c:2642
 msgid "_Hide"
 msgstr "_Fshih"
 
-#: libbalsa/send.c:764
+#: libbalsa/send.c:787
 #, fuzzy, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -1169,7 +1198,12 @@ msgid ""
 "Message left in your outbox.\n"
 msgstr "nuk mesazh j majtas në j"
 
-#: libbalsa/send.c:818
+#: libbalsa/send.c:833
+#, fuzzy, c-format
+msgid "Saving sent message to %s failed: %s"
+msgstr "Duke ruajtur POP mesazh."
+
+#: libbalsa/send.c:852
 #, fuzzy, c-format
 msgid ""
 "Relaying refused:\n"
@@ -1177,105 +1211,128 @@ msgid ""
 "Message left in your outbox.\n"
 msgstr "j majtas në j"
 
-#: libbalsa/send.c:828
+#: libbalsa/send.c:862
 #, fuzzy
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
 msgstr "Mesazh mesazh deri më elemino."
 
-#: libbalsa/send.c:858
+#: libbalsa/send.c:892
 #, fuzzy
 msgid "Connected to MTA"
 msgstr "I lidhur"
 
-#: libbalsa/send.c:865 src/balsa-message.c:1462 src/print.c:369
-#: src/sendmsg-window.c:859 src/sendmsg-window.c:2464 src/store-address.c:303
+#: libbalsa/send.c:899 src/balsa-message.c:1462 src/print.c:370
+#: src/sendmsg-window.c:861 src/sendmsg-window.c:2536 src/store-address.c:329
 msgid "From:"
 msgstr "Nga:"
 
-#: libbalsa/send.c:868 src/balsa-index.c:338
+#: libbalsa/send.c:902 src/balsa-index.c:348
 msgid "From"
 msgstr "Nga"
 
-#: libbalsa/send.c:877 src/balsa-message.c:1471 src/print.c:373
-#: src/sendmsg-window.c:858 src/sendmsg-window.c:2471 src/store-address.c:304
+#: libbalsa/send.c:911 src/balsa-message.c:1471 src/print.c:374
+#: src/sendmsg-window.c:860 src/sendmsg-window.c:2543 src/store-address.c:330
 msgid "To:"
 msgstr "Për:"
 
-#: libbalsa/send.c:880 src/balsa-index.c:991
+#: libbalsa/send.c:914 src/balsa-index.c:1025
 msgid "To"
 msgstr "Për"
 
-#: libbalsa/send.c:918
+#: libbalsa/send.c:952
 msgid "Disconnected"
 msgstr "I shkëputur"
 
-#: libbalsa/send.c:1148
+#: libbalsa/send.c:1180
 #, fuzzy
 msgid ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
 msgstr "IMAP server."
 
-#: libbalsa/send.c:1153
+#: libbalsa/send.c:1185
 msgid ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
 msgstr ""
 
-#: libbalsa/send.c:1162
+#: libbalsa/send.c:1194
 msgid "Message left in Outbox (try again later)"
 msgstr ""
 
-#: libbalsa/send.c:1166
+#: libbalsa/send.c:1198
 #, fuzzy, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
 msgstr "SMTP server është majtas në."
 
-#: libbalsa/send.c:1514
+#: libbalsa/send.c:1541
 #, fuzzy, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr "për tekst lloji"
 
-#: libbalsa/send.c:1808 libbalsa/send.c:1884
+#: libbalsa/send.c:1847 libbalsa/send.c:1923
 #, fuzzy
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr "mesazh nuk për."
 
 #. host, authentication method
-#: libbalsa/server.c:377
+#: libbalsa/server.c:376
 #, fuzzy, c-format
 msgid "Logging in to %s using %s"
 msgstr "Hyrje në"
 
-#: libbalsa/source-viewer.c:52 src/main-window.c:647
+#. Items
+#: libbalsa/source-viewer.c:62 src/mailbox-node.c:961 src/main-window.c:742
+#: src/main-window.c:839
+msgid "_Close"
+msgstr "_Mbyll"
+
+#: libbalsa/source-viewer.c:63
+#, fuzzy
+msgid "Close the window"
+msgstr "Mbyll dritare"
+
+#: libbalsa/source-viewer.c:64
+#, fuzzy
+msgid "_Copy"
+msgstr "Trupi"
+
+#: libbalsa/source-viewer.c:65
+#, fuzzy
+msgid "Copy text"
+msgstr "tekst:"
+
+#: libbalsa/source-viewer.c:66 libbalsa/source-viewer.c:104
+#: src/main-window.c:650
 #, fuzzy
 msgid "_Select Text"
 msgstr "Zgjidh Teksti"
 
-#: libbalsa/source-viewer.c:53 src/main-window.c:648
+#: libbalsa/source-viewer.c:67 libbalsa/source-viewer.c:105
+#: src/main-window.c:651
 #, fuzzy
 msgid "Select entire mail"
 msgstr "Zgjidh mail"
 
-#: libbalsa/source-viewer.c:62
+#: libbalsa/source-viewer.c:72 libbalsa/source-viewer.c:114
 #, fuzzy
 msgid "_Escape Special Characters"
 msgstr "Speciale Simbolet"
 
-#: libbalsa/source-viewer.c:63
+#: libbalsa/source-viewer.c:73 libbalsa/source-viewer.c:115
 #, fuzzy
 msgid "Escape special and non-ASCII characters"
 msgstr "dhe ASCII"
 
-#: libbalsa/source-viewer.c:152
+#: libbalsa/source-viewer.c:221
 msgid "Mailbox closed"
 msgstr ""
 
-#: libbalsa/source-viewer.c:213
+#: libbalsa/source-viewer.c:338
 #, fuzzy
 msgid "Message Source"
 msgstr "Mesazh Burimi"
@@ -1372,7 +1429,7 @@ msgid "GnomeCard Address Book"
 msgstr "Adresa Libri"
 
 #: libinit_balsa/balsa-druid-page-finish.c:83
-#: libinit_balsa/balsa-druid-page-finish.c:91 src/ab-window.c:207
+#: libinit_balsa/balsa-druid-page-finish.c:91 src/ab-window.c:211
 msgid "Address Book"
 msgstr "Rubrika"
 
@@ -1524,13 +1581,13 @@ msgstr "E-mail"
 msgid "New mail notification"
 msgstr "E re mail"
 
-#: src/ab-main.c:338 src/ab-window.c:167 src/filter-edit-dialog.c:193
+#: src/ab-main.c:482 src/ab-window.c:167 src/filter-edit-dialog.c:251
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
 #: src/filter-run-dialog.c:292
 msgid "Name"
 msgstr "Emri"
 
-#: src/ab-main.c:458
+#: src/ab-main.c:602
 #, fuzzy
 msgid "F_ilter:"
 msgstr "F:"
@@ -1540,42 +1597,42 @@ msgid "E-Mail Address"
 msgstr "Adresa E-Mail"
 
 #. Entry widget for finding an address
-#: src/ab-window.c:264
+#: src/ab-window.c:291
 #, fuzzy
 msgid "_Search for Name:"
 msgstr "Kërko për Emri:"
 
-#: src/ab-window.c:324
+#: src/ab-window.c:351
 #, fuzzy
 msgid "Send-To"
 msgstr "Dërgo Për"
 
-#: src/ab-window.c:344
+#: src/ab-window.c:371
 #, fuzzy
 msgid "Run GnomeCard"
 msgstr "Ekzekuto"
 
-#: src/ab-window.c:352
+#: src/ab-window.c:379
 #, fuzzy
 msgid "_Re-Import"
 msgstr "Importo"
 
 #. mode switching stuff
-#: src/ab-window.c:362
+#: src/ab-window.c:389
 msgid "Treat multiple addresses as:"
 msgstr ""
 
-#: src/ab-window.c:366
+#: src/ab-window.c:393
 #, fuzzy
 msgid "alternative addresses for the same person"
 msgstr "për"
 
-#: src/ab-window.c:371
+#: src/ab-window.c:398
 #, fuzzy
 msgid "a distribution list"
 msgstr "a lista"
 
-#: src/ab-window.c:677
+#: src/ab-window.c:704
 #, fuzzy, c-format
 msgid ""
 "Error opening address book '%s':\n"
@@ -1706,8 +1763,8 @@ msgstr "Aktivo TLS"
 msgid "Error displaying %s: %s\n"
 msgstr "Gabim j"
 
-#: src/address-book-config.c:623 src/mailbox-conf.c:564
-#: src/pref-manager.c:1555 src/pref-manager.c:2699
+#: src/address-book-config.c:623 src/mailbox-conf.c:622
+#: src/pref-manager.c:1746 src/pref-manager.c:2974
 msgid "_Add"
 msgstr "_Shto"
 
@@ -1762,114 +1819,119 @@ msgstr "_Kujto fjalëkalimin"
 msgid "Couldn't open mailbox \"%s\""
 msgstr "hap"
 
-#: src/balsa-index.c:351 src/pref-manager.c:353
+#: src/balsa-index.c:361 src/pref-manager.c:373
 msgid "Subject"
 msgstr "Subjekti"
 
-#: src/balsa-index.c:365 src/pref-manager.c:354
+#: src/balsa-index.c:375 src/pref-manager.c:374
 msgid "Date"
 msgstr "Data"
 
-#: src/balsa-index.c:377 src/pref-manager.c:355
+#: src/balsa-index.c:387 src/pref-manager.c:375
 #, fuzzy
 msgid "Size"
 msgstr "Madhësia"
 
-#: src/balsa-index.c:955
+#: src/balsa-index.c:988
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr ""
 
+#: src/balsa-index.c:1610
+#, fuzzy, c-format
+msgid "Move to Trash failed: %s"
+msgstr "Lëvize Koshi"
+
 #. R
-#: src/balsa-index.c:1712 src/main-window.c:578 src/main-window.c:1024
-#: src/message-window.c:143
+#: src/balsa-index.c:1759 src/main-window.c:581 src/main-window.c:1029
+#: src/message-window.c:145
 #, fuzzy
 msgid "_Reply..."
 msgstr "Përgjigju."
 
-#: src/balsa-index.c:1714
+#: src/balsa-index.c:1761
 #, fuzzy
 msgid "Reply To _All..."
 msgstr "Përgjigju Për Gjithçka."
 
-#: src/balsa-index.c:1716
+#: src/balsa-index.c:1763
 #, fuzzy
 msgid "Reply To _Group..."
 msgstr "Përgjigju Për Grupi."
 
-#: src/balsa-index.c:1718
+#: src/balsa-index.c:1765
 #, fuzzy
 msgid "_Forward Attached..."
 msgstr "Vazhdo."
 
-#: src/balsa-index.c:1720
+#: src/balsa-index.c:1767
 #, fuzzy
 msgid "Forward _Inline..."
 msgstr "Vazhdo."
 
-#: src/balsa-index.c:1722 src/main-window.c:668 src/main-window.c:1008
+#: src/balsa-index.c:1769 src/main-window.c:671 src/main-window.c:1013
 #, fuzzy
 msgid "_Store Address..."
 msgstr "Adresa."
 
-#: src/balsa-index.c:1737 src/filter-edit-dialog.c:216 src/mailbox-node.c:965
-#: src/pref-manager.c:1557 src/pref-manager.c:2703
+#: src/balsa-index.c:1784 src/filter-edit-dialog.c:274 src/mailbox-node.c:970
+#: src/pref-manager.c:1748 src/pref-manager.c:2978
 msgid "_Delete"
 msgstr "_Elemino"
 
-#: src/balsa-index.c:1742
+#: src/balsa-index.c:1789
 msgid "_Undelete"
 msgstr "_Risill"
 
-#: src/balsa-index.c:1747
+#: src/balsa-index.c:1794
 #, fuzzy
 msgid "Move To _Trash"
 msgstr "Lëvize Për Koshi"
 
-#: src/balsa-index.c:1751
+#: src/balsa-index.c:1798
 #, fuzzy
 msgid "T_oggle"
 msgstr "T"
 
-#: src/balsa-index.c:1755 src/main-window.c:327 src/main-window.c:356
+#: src/balsa-index.c:1802 src/main-window.c:328 src/main-window.c:357
 msgid "_Flagged"
 msgstr ""
 
-#: src/balsa-index.c:1758
+#: src/balsa-index.c:1805
 msgid "_Unread"
 msgstr ""
 
-#: src/balsa-index.c:1766
+#: src/balsa-index.c:1813
 #, fuzzy
 msgid "_Move to"
 msgstr "Lëvize"
 
-#: src/balsa-index.c:1774
+#: src/balsa-index.c:1821
 #, fuzzy
 msgid "_View Source"
 msgstr "Paraqitja Burimi"
 
-#: src/balsa-index.c:2042
+#: src/balsa-index.c:2093
 #, fuzzy, c-format
-msgid "Failed to copy messages to mailbox \"%s\"."
+msgid "Failed to copy messages to mailbox \"%s\": %s"
 msgstr "Dështoi kopjo."
 
-#: src/balsa-index.c:2043
+#: src/balsa-index.c:2094
 #, fuzzy, c-format
-msgid "Failed to copy message to mailbox \"%s\"."
+msgid "Failed to copy message to mailbox \"%s\": %s"
 msgstr "Dështoi kopjo mesazh."
 
-#: src/balsa-index.c:2056
+#: src/balsa-index.c:2106
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr ""
 
-#: src/balsa-index.c:2057
+#: src/balsa-index.c:2107
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr ""
 
-#: src/balsa-index.c:2177
+#: src/balsa-index.c:2227
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr ""
@@ -1878,20 +1940,25 @@ msgstr ""
 msgid "Mailbox"
 msgstr ""
 
-#: src/balsa-mblist.c:1011 src/balsa-mblist.c:1047
+#: src/balsa-mblist.c:1000 src/balsa-mblist.c:1036
 #, fuzzy
 msgid "Failed to find mailbox"
 msgstr "Dështoi gjej"
 
-#: src/balsa-mblist.c:1630
+#: src/balsa-mblist.c:1619
 msgid "_Other..."
 msgstr "_Tjetër..."
 
-#: src/balsa-mblist.c:1698
+#: src/balsa-mblist.c:1687
 msgid "Choose destination folder"
 msgstr "Zgjidh kartelën e destinuar"
 
-#: src/balsa-mblist.c:2034
+#: src/balsa-mblist.c:1889
+#, fuzzy
+msgid "Other..."
+msgstr "_Tjetër..."
+
+#: src/balsa-mblist.c:2182
 #, fuzzy, c-format
 msgid "Shown mailbox: %s with %d message, "
 msgid_plural "Shown mailbox: %s with %d messages, "
@@ -1900,7 +1967,7 @@ msgstr[1] "me mesazh "
 
 #. xgettext: this is the second part of the message
 #. * "Shown mailbox: %s with %d messages, %ld new".
-#: src/balsa-mblist.c:2040
+#: src/balsa-mblist.c:2188
 #, fuzzy, c-format
 msgid "%ld new"
 msgid_plural "%ld new"
@@ -1941,225 +2008,225 @@ msgstr "Ruaj."
 msgid "(No sender)"
 msgstr "Jo"
 
-#: src/balsa-message.c:1199 src/balsa-message.c:3699
+#: src/balsa-message.c:1199 src/balsa-message.c:3734
 #, fuzzy, c-format
 msgid "Could not access message; mailbox \"%s\" was changed."
 msgstr "Dështoi kopjo mesazh."
 
-#: src/balsa-message.c:1453 src/print.c:358 src/sendmsg-window.c:863
-#: src/sendmsg-window.c:2459
+#: src/balsa-message.c:1453 src/print.c:359 src/sendmsg-window.c:865
+#: src/sendmsg-window.c:2531
 msgid "Subject:"
 msgstr "Subjekti:"
 
-#: src/balsa-message.c:1457 src/print.c:364 src/sendmsg-window.c:2453
+#: src/balsa-message.c:1457 src/print.c:365 src/sendmsg-window.c:2525
 msgid "Date:"
 msgstr "Data:"
 
-#: src/balsa-message.c:1468 src/sendmsg-window.c:860
+#: src/balsa-message.c:1468 src/sendmsg-window.c:862
 msgid "Reply-To:"
 msgstr "Përgjigju-Tek:"
 
 #. cc:
-#: src/balsa-message.c:1472 src/print.c:374 src/sendmsg-window.c:862
-#: src/sendmsg-window.c:2150 src/sendmsg-window.c:2478 src/store-address.c:305
+#: src/balsa-message.c:1472 src/print.c:375 src/sendmsg-window.c:864
+#: src/sendmsg-window.c:2222 src/sendmsg-window.c:2550 src/store-address.c:331
 msgid "Cc:"
 msgstr "Cc:"
 
 #. bcc:
-#: src/balsa-message.c:1473 src/print.c:375 src/sendmsg-window.c:861
-#: src/sendmsg-window.c:2155 src/store-address.c:306
+#: src/balsa-message.c:1473 src/print.c:376 src/sendmsg-window.c:863
+#: src/sendmsg-window.c:2227 src/store-address.c:332
 msgid "Bcc:"
 msgstr "Bcc:"
 
-#: src/balsa-message.c:1476 src/print.c:376
+#: src/balsa-message.c:1476 src/print.c:377
 msgid "Fcc:"
 msgstr ""
 
-#: src/balsa-message.c:1481 src/print.c:381
+#: src/balsa-message.c:1481 src/print.c:382
 #, fuzzy
 msgid "Disposition-Notification-To:"
 msgstr "Lajmërim Për:"
 
-#: src/balsa-message.c:1614 src/balsa-message.c:1645
+#: src/balsa-message.c:1615 src/balsa-message.c:1646
 #, fuzzy, c-format
 msgid "Error loading attached image: %s\n"
 msgstr "Gabim figurë j"
 
-#: src/balsa-message.c:1715 src/balsa-message.c:1731 src/balsa-message.c:1763
-#: src/balsa-message.c:1816
+#: src/balsa-message.c:1716 src/balsa-message.c:1732 src/balsa-message.c:1764
+#: src/balsa-message.c:1817
 #, fuzzy
 msgid "Content Type: external-body\n"
 msgstr "Përmbajtja Lloji i jashtëm trupi j"
 
-#: src/balsa-message.c:1716
+#: src/balsa-message.c:1717
 #, fuzzy
 msgid "Access type: local-file\n"
 msgstr "lloji lokal j"
 
-#: src/balsa-message.c:1717 src/balsa-message.c:1770 src/balsa-message.c:1929
+#: src/balsa-message.c:1718 src/balsa-message.c:1771 src/balsa-message.c:1930
 #, fuzzy, c-format
 msgid "File name: %s"
 msgstr "File emri"
 
-#: src/balsa-message.c:1732
+#: src/balsa-message.c:1733
 #, fuzzy
 msgid "Access type: URL\n"
 msgstr "lloji URL j"
 
-#: src/balsa-message.c:1733
+#: src/balsa-message.c:1734
 #, c-format
 msgid "URL: %s"
 msgstr "URL: %s"
 
-#: src/balsa-message.c:1764
+#: src/balsa-message.c:1765
 #, fuzzy, c-format
 msgid "Access type: %s\n"
 msgstr "lloji j"
 
-#: src/balsa-message.c:1767
+#: src/balsa-message.c:1768
 #, fuzzy, c-format
 msgid "FTP site: %s\n"
 msgstr "FTP siti j"
 
-#: src/balsa-message.c:1769
+#: src/balsa-message.c:1770
 #, fuzzy, c-format
 msgid "Directory: %s\n"
 msgstr "Directory j"
 
-#: src/balsa-message.c:1817
+#: src/balsa-message.c:1818
 #, fuzzy
 msgid "Access type: mail-server\n"
 msgstr "lloji mail server j"
 
-#: src/balsa-message.c:1818
+#: src/balsa-message.c:1819
 #, fuzzy, c-format
 msgid "Mail server: %s\n"
 msgstr "Posta server j"
 
-#: src/balsa-message.c:1820
+#: src/balsa-message.c:1821
 #, fuzzy, c-format
 msgid "Subject: %s\n"
 msgstr "Subjekti j"
 
-#: src/balsa-message.c:1832
+#: src/balsa-message.c:1833
 #, fuzzy
 msgid "Se_nd message to obtain this part"
 msgstr "mesazh"
 
-#: src/balsa-message.c:1937
+#: src/balsa-message.c:1938
 #, fuzzy, c-format
 msgid "Type: %s (%s)"
 msgstr "Lloji"
 
-#: src/balsa-message.c:1940
+#: src/balsa-message.c:1941
 #, fuzzy, c-format
 msgid "Content Type: %s"
 msgstr "Përmbajtja Lloji"
 
-#: src/balsa-message.c:1951
+#: src/balsa-message.c:1952
 #, fuzzy
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr "Jo hap shfaq akcion në GNOME për përmbajtja lloji"
 
-#: src/balsa-message.c:1957
+#: src/balsa-message.c:1958
 #, fuzzy
 msgid "S_ave part"
 msgstr "Ndarës"
 
-#: src/balsa-message.c:1981 src/balsa-message.c:2006
+#: src/balsa-message.c:1982 src/balsa-message.c:2007
 #, fuzzy, c-format
 msgid "View _part with %s"
 msgstr "Hape me %s"
 
-#: src/balsa-message.c:2285
+#: src/balsa-message.c:2286
 #, fuzzy, c-format
 msgid "Calling URL %s..."
 msgstr "URL."
 
-#: src/balsa-message.c:2295 src/balsa-message.c:3116 src/balsa-message.c:3834
+#: src/balsa-message.c:2296 src/balsa-message.c:3117 src/balsa-message.c:3869
 #, fuzzy, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Gabim j"
 
-#: src/balsa-message.c:2381
+#: src/balsa-message.c:2382
 #, fuzzy, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
 "header describing the used codeset (converted to %s)"
 msgstr "mesazh nga me përmban jo titull"
 
-#: src/balsa-message.c:2680
+#: src/balsa-message.c:2681
 msgid "mixed parts"
 msgstr ""
 
-#: src/balsa-message.c:2682
+#: src/balsa-message.c:2683
 msgid "alternative parts"
 msgstr ""
 
-#: src/balsa-message.c:2684
+#: src/balsa-message.c:2685
 msgid "signed parts"
 msgstr ""
 
-#: src/balsa-message.c:2686
+#: src/balsa-message.c:2687
 msgid "encrypted parts"
 msgstr ""
 
-#: src/balsa-message.c:2688
+#: src/balsa-message.c:2689
 #, fuzzy
 msgid "rfc822 message"
 msgstr "mesazh"
 
-#: src/balsa-message.c:2690
+#: src/balsa-message.c:2691
 #, c-format
 msgid "\"%s\" parts"
 msgstr ""
 
-#: src/balsa-message.c:2746
+#: src/balsa-message.c:2747
 #, fuzzy, c-format
 msgid "rfc822 message (from %s, subject \"%s\")"
 msgstr "mesazh"
 
-#: src/balsa-message.c:2753
+#: src/balsa-message.c:2754
 #, fuzzy
 msgid "complete message"
 msgstr "Nise këtë mesazh"
 
-#: src/balsa-message.c:2770
+#: src/balsa-message.c:2771
 #, c-format
 msgid "part %s: %s (file %s)"
 msgstr ""
 
-#: src/balsa-message.c:2781
+#: src/balsa-message.c:2782
 #, fuzzy, c-format
 msgid "part %s: %s"
 msgstr "%s: %s"
 
-#: src/balsa-message.c:2796
+#: src/balsa-message.c:2797
 #, fuzzy
 msgid "encrypted: "
 msgstr "Kriptimi"
 
-#: src/balsa-message.c:2878
+#: src/balsa-message.c:2879
 #, c-format
 msgid "Open with %s"
 msgstr "Hape me %s"
 
-#: src/balsa-message.c:3009
+#: src/balsa-message.c:3010
 #, fuzzy
 msgid "Save..."
 msgstr "Ruaj."
 
-#: src/balsa-message.c:3194
+#: src/balsa-message.c:3195
 #, fuzzy, c-format
 msgid "Could not create temporary file %s"
 msgstr "nuk"
 
-#: src/balsa-message.c:3239
+#: src/balsa-message.c:3240
 #, fuzzy, c-format
 msgid "could not create temporary file %s"
 msgstr "nuk"
 
-#: src/balsa-message.c:4111
+#: src/balsa-message.c:4146
 #, fuzzy, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2167,88 +2234,93 @@ msgid ""
 "Do you want to send this notification?"
 msgstr "nga mail Mesazh Lajmërim?"
 
-#: src/balsa-message.c:4118
+#: src/balsa-message.c:4153
 #, fuzzy
 msgid "Reply to MDN?"
 msgstr "Përgjigju?"
 
-#: src/balsa-message.c:4436
+#: src/balsa-message.c:4472
 #, fuzzy, c-format
 msgid ""
-"This is an inline OpenPGP signed %s message part:\n"
+"This is an inline %s signed %s message part:\n"
 "%s"
 msgstr "është mesazh j"
 
-#: src/balsa-message.c:4454
+#: src/balsa-message.c:4474 src/print.c:1303
+#, fuzzy
+msgid "OpenPGP"
+msgstr "_Hap"
+
+#: src/balsa-message.c:4474 src/balsa-message.c:4736 src/print.c:1303
+#, fuzzy
+msgid "S/MIME"
+msgstr "S"
+
+#: src/balsa-message.c:4492
 #, fuzzy
 msgid "_Run gpg to import this key"
 msgstr "Ekzekuto importo"
 
-#: src/balsa-message.c:4570 src/balsa-message.c:4793
+#: src/balsa-message.c:4609 src/balsa-message.c:4833
 msgid ""
 "This operation can not be performed because this message is displayed more "
 "than once.\n"
 "Please close the other instances of this message and try again."
 msgstr ""
 
-#: src/balsa-message.c:4606
+#: src/balsa-message.c:4645
 #, fuzzy, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
 "it's structure is invalid."
 msgstr "mesazh nga me përmban është I pavlefshëm."
 
-#: src/balsa-message.c:4614
+#: src/balsa-message.c:4653
 #, fuzzy, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
 "but this crypto protocol is not available."
 msgstr "mesazh nga me përmban a PGP është nuk."
 
-#: src/balsa-message.c:4627
+#: src/balsa-message.c:4666
 #, fuzzy, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
 "but this crypto protocol is not available."
 msgstr "mesazh nga me përmban a S është nuk."
 
-#: src/balsa-message.c:4681
+#: src/balsa-message.c:4720
 #, fuzzy, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but it's "
 "structure is invalid. The signature, if there is any, can not be checked."
 msgstr "mesazh nga me përmban a është I pavlefshëm është çdo nuk."
 
-#: src/balsa-message.c:4694
+#: src/balsa-message.c:4733
 #, fuzzy, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
 "this crypto protocol is not available."
 msgstr "mesazh nga me përmban a është nuk."
 
-#: src/balsa-message.c:4696
+#: src/balsa-message.c:4736
 msgid "PGP"
 msgstr "PGP"
 
-#: src/balsa-message.c:4696
-#, fuzzy
-msgid "S/MIME"
-msgstr "S"
-
-#: src/balsa-message.c:4715 src/balsa-message.c:4820
+#: src/balsa-message.c:4755 src/balsa-message.c:4860
 #, fuzzy
 msgid "Detected a good signature"
 msgstr "Ekzekuto Firma"
 
-#: src/balsa-message.c:4721
+#: src/balsa-message.c:4761
 msgid "Detected a good signature with insufficient validity"
 msgstr ""
 
-#: src/balsa-message.c:4726 src/balsa-message.c:4824
+#: src/balsa-message.c:4766 src/balsa-message.c:4864
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr ""
 
-#: src/balsa-message.c:4733 src/balsa-message.c:4830
+#: src/balsa-message.c:4773 src/balsa-message.c:4870
 #, fuzzy, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2256,120 +2328,120 @@ msgid ""
 "%s"
 msgstr "nga mesazh nga me j"
 
-#: src/balsa-message.c:4745
+#: src/balsa-message.c:4785
 #, fuzzy, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
 "with an error!"
 msgstr "nga mesazh nga me me gabim!"
 
-#: src/filter-edit-callbacks.c:286
+#: src/filter-edit-callbacks.c:313
 #, fuzzy
 msgid "One of the specified fields contains:"
 msgstr "Një nga përmban:"
 
-#: src/filter-edit-callbacks.c:287
+#: src/filter-edit-callbacks.c:314
 #, fuzzy
 msgid "None of the specified fields contains:"
 msgstr "Asnjë nga përmban:"
 
-#: src/filter-edit-callbacks.c:289
+#: src/filter-edit-callbacks.c:316
 #, fuzzy
 msgid "One of the regular expressions matches"
 msgstr "Një nga i rregullt"
 
-#: src/filter-edit-callbacks.c:290
+#: src/filter-edit-callbacks.c:317
 #, fuzzy
 msgid "None of the regular expressions matches"
 msgstr "Asnjë nga i rregullt"
 
-#: src/filter-edit-callbacks.c:292 src/filter-edit-callbacks.c:897
+#: src/filter-edit-callbacks.c:319 src/filter-edit-callbacks.c:1016
 #, fuzzy
 msgid "Match when date is in the interval:"
 msgstr "data është në:"
 
-#: src/filter-edit-callbacks.c:293
+#: src/filter-edit-callbacks.c:320
 #, fuzzy
 msgid "Match when date is outside the interval:"
 msgstr "data është:"
 
-#: src/filter-edit-callbacks.c:295 src/filter-edit-callbacks.c:935
+#: src/filter-edit-callbacks.c:322 src/filter-edit-callbacks.c:1054
 #, fuzzy
 msgid "Match when one of these flags is set:"
 msgstr "nga është:"
 
-#: src/filter-edit-callbacks.c:296
+#: src/filter-edit-callbacks.c:323
 #, fuzzy
 msgid "Match when none of these flags is set:"
 msgstr "asnjë nga është:"
 
-#: src/filter-edit-callbacks.c:449
+#: src/filter-edit-callbacks.c:535
 #, fuzzy
 msgid "You must specify the name of the user header to match on"
 msgstr "Ti emri nga përdorues titull në"
 
-#: src/filter-edit-callbacks.c:464
+#: src/filter-edit-callbacks.c:556
 #, fuzzy
 msgid "You must specify at least one field for matching"
 msgstr "Ti për"
 
-#: src/filter-edit-callbacks.c:474
+#: src/filter-edit-callbacks.c:566
 #, fuzzy
 msgid "You must provide a string"
 msgstr "Ti a"
 
-#: src/filter-edit-callbacks.c:481
+#: src/filter-edit-callbacks.c:573
 #, fuzzy
 msgid "You must provide at least one regular expression"
 msgstr "Ti i rregullt shprehje"
 
-#: src/filter-edit-callbacks.c:493
+#: src/filter-edit-callbacks.c:585
 #, fuzzy
 msgid "Low date is incorrect"
 msgstr "E ulët data është"
 
-#: src/filter-edit-callbacks.c:504
+#: src/filter-edit-callbacks.c:596
 #, fuzzy
 msgid "High date is incorrect"
 msgstr "E lartë data është"
 
-#: src/filter-edit-callbacks.c:512
+#: src/filter-edit-callbacks.c:604
 #, fuzzy
 msgid "Low date is greater than high date"
 msgstr "E ulët data është e lartë data"
 
-#: src/filter-edit-callbacks.c:782
+#: src/filter-edit-callbacks.c:901
 #, fuzzy, c-format
 msgid "Error displaying condition help: %s\n"
 msgstr "Gabim ndihmë j"
 
-#: src/filter-edit-callbacks.c:802
+#: src/filter-edit-callbacks.c:921
 msgid "Unread"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:802
+#: src/filter-edit-callbacks.c:921
 msgid "Deleted"
 msgstr "Eleminuar"
 
-#: src/filter-edit-callbacks.c:802
+#: src/filter-edit-callbacks.c:921
 msgid "Replied"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:802
+#: src/filter-edit-callbacks.c:921
 msgid "Flagged"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:816
+#: src/filter-edit-callbacks.c:935
 #, fuzzy
 msgid "One of the specified f_ields contains"
 msgstr "Një nga përmban"
 
-#: src/filter-edit-callbacks.c:831
+#: src/filter-edit-callbacks.c:950
 #, fuzzy
 msgid "Contain/Does _Not Contain"
 msgstr "Not"
 
-#: src/filter-edit-callbacks.c:845
+#: src/filter-edit-callbacks.c:964
 #, fuzzy
 msgid "_One of the regular expressions matches"
 msgstr "Një nga i rregullt"
@@ -2377,253 +2449,254 @@ msgstr "Një nga i rregullt"
 #. FIXME : I saw a lot of different ways to create button with
 #. pixmaps, hope this one is correct
 #. Right/Add button
-#: src/filter-edit-callbacks.c:872 src/filter-run-dialog.c:313
+#: src/filter-edit-callbacks.c:991 src/filter-run-dialog.c:313
 msgid "A_dd"
 msgstr "Sh_to"
 
 #. Left/Remove button
-#: src/filter-edit-callbacks.c:876 src/filter-edit-dialog.c:310
+#: src/filter-edit-callbacks.c:995 src/filter-edit-dialog.c:368
 #: src/filter-run-dialog.c:318
 msgid "_Remove"
 msgstr "_Hiq"
 
-#: src/filter-edit-callbacks.c:880
+#: src/filter-edit-callbacks.c:999
 #, fuzzy
 msgid "One _Matches/None Matches"
 msgstr "Një Asnjë"
 
-#: src/filter-edit-callbacks.c:917
+#: src/filter-edit-callbacks.c:1036
 #, fuzzy
 msgid "Inside/outside the date interval"
 msgstr "data"
 
-#: src/filter-edit-callbacks.c:964
+#: src/filter-edit-callbacks.c:1083
 #, fuzzy
 msgid "Match when one flag is set/when no flag is set"
 msgstr "është jo është"
 
 #. builds the toggle buttons to specify fields concerned by the conditions of
 #. * the filter
-#: src/filter-edit-callbacks.c:982
+#: src/filter-edit-callbacks.c:1104
 #, fuzzy
 msgid "Match In"
 msgstr "Zmadho"
 
-#: src/filter-edit-callbacks.c:994
+#: src/filter-edit-callbacks.c:1116
 msgid "_All"
 msgstr "_Gjithçka"
 
-#: src/filter-edit-callbacks.c:1002
+#: src/filter-edit-callbacks.c:1124
 msgid "C_lear"
 msgstr "P_astro"
 
-#: src/filter-edit-callbacks.c:1011 src/main-window.c:3715
+#: src/filter-edit-callbacks.c:1133 src/main-window.c:3789
 #, fuzzy
 msgid "_Body"
 msgstr "Trupi"
 
 #. To:
-#: src/filter-edit-callbacks.c:1018 src/main-window.c:3716
-#: src/sendmsg-window.c:2139
+#: src/filter-edit-callbacks.c:1140 src/main-window.c:3790
+#: src/sendmsg-window.c:2211
 msgid "_To:"
 msgstr "_Për:"
 
-#: src/filter-edit-callbacks.c:1025 src/main-window.c:3717
+#: src/filter-edit-callbacks.c:1147 src/main-window.c:3791
 msgid "_From:"
 msgstr "_Nga:"
 
-#: src/filter-edit-callbacks.c:1033
+#: src/filter-edit-callbacks.c:1155
 #, fuzzy
 msgid "_Subject"
 msgstr "Subjekti"
 
-#: src/filter-edit-callbacks.c:1040 src/main-window.c:3719
+#: src/filter-edit-callbacks.c:1162 src/main-window.c:3793
 msgid "_Cc:"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:1047
+#: src/filter-edit-callbacks.c:1169
 #, fuzzy
 msgid "_User header:"
 msgstr "Përdoruesi titull:"
 
-#: src/filter-edit-callbacks.c:1071
+#: src/filter-edit-callbacks.c:1206
 #, fuzzy
 msgid "Search T_ype:"
 msgstr "Kërko T:"
 
-#: src/filter-edit-callbacks.c:1145
+#: src/filter-edit-callbacks.c:1280
 #, fuzzy
 msgid "Edit condition for filter: "
 msgstr "Ndrysho për filtro "
 
-#: src/filter-edit-callbacks.c:1384
+#: src/filter-edit-callbacks.c:1520
 #, fuzzy, c-format
 msgid "Error displaying filter help: %s\n"
 msgstr "Gabim filtro ndihmë j"
 
-#: src/filter-edit-callbacks.c:1572
+#: src/filter-edit-callbacks.c:1715
 #, fuzzy
 msgid "New filter"
 msgstr "E re filtro"
 
-#: src/filter-edit-callbacks.c:1701
+#: src/filter-edit-callbacks.c:1846
 #, fuzzy
 msgid "No filter name specified."
 msgstr "Jo filtro emri."
 
-#: src/filter-edit-callbacks.c:1706
+#: src/filter-edit-callbacks.c:1851
 #, fuzzy, c-format
 msgid "Filter \"%s\" already exists."
 msgstr "Filtri ekziston."
 
-#: src/filter-edit-callbacks.c:1719
+#: src/filter-edit-callbacks.c:1870
 #, fuzzy
 msgid "Filter must have conditions."
 msgstr "Filtri."
 
-#: src/filter-edit-callbacks.c:1781
+#: src/filter-edit-callbacks.c:1939
 #, fuzzy
 msgid "Filter has matched"
 msgstr "Filtri"
 
-#: src/filter-edit-callbacks.c:1799
+#: src/filter-edit-callbacks.c:1957
 #, fuzzy
 msgid "You must provide a sound to play"
 msgstr "Ti a lexo"
 
-#: src/filter-edit-callbacks.c:1948
+#: src/filter-edit-callbacks.c:2114
 #, fuzzy, c-format
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr "Shembull Dhjetor"
 
-#: src/filter-edit-dialog.c:88 src/pref-manager.c:361
+#: src/filter-edit-dialog.c:89 src/filter-edit-dialog.c:109
+#: src/pref-manager.c:381
 msgid "Simple"
 msgstr "E thjeshtë"
 
-#: src/filter-edit-dialog.c:89
+#: src/filter-edit-dialog.c:90 src/filter-edit-dialog.c:110
 msgid "Regular Expression"
 msgstr "Shprehje të rregullta"
 
-#: src/filter-edit-dialog.c:90
+#: src/filter-edit-dialog.c:91 src/filter-edit-dialog.c:111
 #, fuzzy
 msgid "Date interval"
 msgstr "Data"
 
-#: src/filter-edit-dialog.c:91
+#: src/filter-edit-dialog.c:92 src/filter-edit-dialog.c:112
 #, fuzzy
 msgid "Flag condition"
 msgstr "Flamur"
 
-#: src/filter-edit-dialog.c:95
+#: src/filter-edit-dialog.c:96 src/filter-edit-dialog.c:116
 #, fuzzy
 msgid "Copy to folder:"
 msgstr "Kopjo kartelë:"
 
-#: src/filter-edit-dialog.c:96
+#: src/filter-edit-dialog.c:97 src/filter-edit-dialog.c:117
 #, fuzzy
 msgid "Move to folder:"
 msgstr "Lëvize kartelë:"
 
-#: src/filter-edit-dialog.c:97
+#: src/filter-edit-dialog.c:98 src/filter-edit-dialog.c:118
 #, fuzzy
 msgid "Print on printer:"
 msgstr "Printo në:"
 
-#: src/filter-edit-dialog.c:98
+#: src/filter-edit-dialog.c:99 src/filter-edit-dialog.c:119
 msgid "Run program:"
 msgstr "Ekzekuto programin:"
 
-#: src/filter-edit-dialog.c:99
+#: src/filter-edit-dialog.c:100 src/filter-edit-dialog.c:120
 #, fuzzy
 msgid "Send to Trash"
 msgstr "Dërgo Koshi"
 
-#: src/filter-edit-dialog.c:103
+#: src/filter-edit-dialog.c:104 src/filter-edit-dialog.c:124
 msgid "OR"
 msgstr ""
 
-#: src/filter-edit-dialog.c:104
+#: src/filter-edit-dialog.c:105 src/filter-edit-dialog.c:125
 #, fuzzy
 msgid "AND"
 msgstr "AND"
 
 #. new button
 #. #define MENU_FILE_NEW_POS 0
-#: src/filter-edit-dialog.c:210 src/mailbox-node.c:937 src/main-window.c:367
-#: src/main-window.c:426
+#: src/filter-edit-dialog.c:268 src/mailbox-node.c:942 src/main-window.c:368
+#: src/main-window.c:427
 msgid "_New"
 msgstr "_E re"
 
 #. The name entry
-#: src/filter-edit-dialog.c:242
+#: src/filter-edit-dialog.c:300
 #, fuzzy
 msgid "_Filter name:"
 msgstr "Filtri emri:"
 
 #. The filter op-code : "OR" or "AND" all the conditions
-#: src/filter-edit-dialog.c:258
+#: src/filter-edit-dialog.c:316
 #, fuzzy
 msgid "Operation between conditions"
 msgstr "Veprimi"
 
-#: src/filter-edit-dialog.c:301
+#: src/filter-edit-dialog.c:359
 msgid "_Edit"
 msgstr "_Ndrysho"
 
-#: src/filter-edit-dialog.c:306
+#: src/filter-edit-dialog.c:364
 msgid "Ne_w"
 msgstr ""
 
 #. The notification area
-#: src/filter-edit-dialog.c:336
+#: src/filter-edit-dialog.c:394
 #, fuzzy
 msgid "Notification:"
 msgstr "Lajmërim:"
 
 #. Notification buttons
-#: src/filter-edit-dialog.c:346
+#: src/filter-edit-dialog.c:404
 msgid "Play sound:"
 msgstr "Lësho tingullin:"
 
-#: src/filter-edit-dialog.c:352
+#: src/filter-edit-dialog.c:410
 #, fuzzy
 msgid "Use Sound..."
 msgstr "Zëri."
 
-#: src/filter-edit-dialog.c:365
+#: src/filter-edit-dialog.c:423
 #, fuzzy
 msgid "Popup text:"
 msgstr "tekst:"
 
 #. The action area
-#: src/filter-edit-dialog.c:386
+#: src/filter-edit-dialog.c:444
 #, fuzzy
 msgid "Action to perform:"
 msgstr "Veprimi:"
 
-#: src/filter-edit-dialog.c:437
+#: src/filter-edit-dialog.c:495
 msgid "Match"
 msgstr ""
 
-#: src/filter-edit-dialog.c:440
+#: src/filter-edit-dialog.c:498
 msgid "Action"
 msgstr "Veprimi"
 
-#: src/filter-edit-dialog.c:452
+#: src/filter-edit-dialog.c:510
 msgid "Revert"
 msgstr "Rikthe"
 
-#: src/filter-edit-dialog.c:481
+#: src/filter-edit-dialog.c:559
 #, fuzzy
 msgid "A filter run dialog is open.Close it before you can modify filters."
 msgstr "A filtro dialog është hap Mbyll përpara."
 
-#: src/filter-edit-dialog.c:494
+#: src/filter-edit-dialog.c:572
 #, fuzzy
 msgid "Balsa Filters"
 msgstr "Balsa Filtrat"
 
-#: src/filter-edit-dialog.c:560
+#: src/filter-edit-dialog.c:638
 #, fuzzy, c-format
 msgid "Filter \"%s\" has no condition."
 msgstr "Filtri jo."
@@ -2645,24 +2718,24 @@ msgstr "filtro mbylle përpara."
 msgid "Balsa Filters Export"
 msgstr "Balsa Filtrat Eksporto"
 
-#: src/filter-run-callbacks.c:173
+#: src/filter-run-callbacks.c:174
 #, fuzzy
 msgid "Error when applying filters"
 msgstr "Gabim"
 
-#: src/filter-run-callbacks.c:191
+#: src/filter-run-callbacks.c:192
 #, fuzzy, c-format
 msgid "Error displaying run filters help: %s\n"
 msgstr "Gabim ndihmë j"
 
-#: src/filter-run-callbacks.c:238
+#: src/filter-run-callbacks.c:239
 #, fuzzy, c-format
 msgid ""
 "The destination mailbox of the filter \"%s\" is \"%s\".\n"
 "You can't associate it with the same mailbox (that causes recursion)."
 msgstr "nga filtro është me."
 
-#: src/filter-run-callbacks.c:246
+#: src/filter-run-callbacks.c:247
 #, fuzzy, c-format
 msgid ""
 "The filter \"%s\" is not compatible with the mailbox type of \"%s\".\n"
@@ -2711,7 +2784,7 @@ msgid "Remote IMAP folder"
 msgstr "Në distancë IMAP kartelë"
 
 #. must NOT be modal
-#: src/folder-conf.c:272 src/folder-conf.c:704 src/mailbox-conf.c:575
+#: src/folder-conf.c:272 src/folder-conf.c:704 src/mailbox-conf.c:633
 msgid "_Update"
 msgstr "_Rifresko"
 
@@ -2719,7 +2792,7 @@ msgstr "_Rifresko"
 msgid "_Create"
 msgstr "_Krijo"
 
-#: src/folder-conf.c:294 src/mailbox-conf.c:1073 src/mailbox-conf.c:1164
+#: src/folder-conf.c:294 src/mailbox-conf.c:1131 src/mailbox-conf.c:1222
 #, fuzzy
 msgid "_Basic"
 msgstr "Bazë"
@@ -2729,16 +2802,16 @@ msgstr "Bazë"
 msgid "_Max number of connections"
 msgstr "nga"
 
-#: src/folder-conf.c:306 src/mailbox-conf.c:1234
+#: src/folder-conf.c:306 src/mailbox-conf.c:1292
 #, fuzzy
 msgid "Enable _persistent cache"
 msgstr "Aktivo"
 
-#: src/folder-conf.c:314 src/mailbox-conf.c:1238
+#: src/folder-conf.c:314 src/mailbox-conf.c:1296
 msgid "Enable _bug workarounds"
 msgstr ""
 
-#: src/folder-conf.c:320 src/mailbox-conf.c:1127 src/mailbox-conf.c:1240
+#: src/folder-conf.c:320 src/mailbox-conf.c:1185 src/mailbox-conf.c:1298
 msgid "_Advanced"
 msgstr "_Mjeshtër"
 
@@ -2750,12 +2823,12 @@ msgstr "Emri:"
 
 #. pop server
 #. imap server
-#: src/folder-conf.c:330 src/mailbox-conf.c:1081 src/mailbox-conf.c:1173
+#: src/folder-conf.c:330 src/mailbox-conf.c:1139 src/mailbox-conf.c:1231
 msgid "_Server:"
 msgstr "_Serveri:"
 
 #. username
-#: src/folder-conf.c:338 src/mailbox-conf.c:1089
+#: src/folder-conf.c:338 src/mailbox-conf.c:1147
 #, fuzzy
 msgid "Use_r name:"
 msgstr "emri:"
@@ -2880,34 +2953,36 @@ msgstr "GABIM:"
 msgid "FATAL: "
 msgstr ""
 
-#: src/mailbox-conf.c:178 src/mailbox-conf.c:1327 src/pref-manager.c:341
-#: src/pref-manager.c:3021 src/pref-manager.c:3111
+#: src/mailbox-conf.c:213 src/mailbox-conf.c:1385 src/pref-manager.c:361
+#: src/pref-manager.c:3350 src/pref-manager.c:3356 src/pref-manager.c:3456
+#: src/pref-manager.c:3462
 msgid "Never"
 msgstr "Asnjëherë"
 
-#: src/mailbox-conf.c:179 src/mailbox-conf.c:1328 src/pref-manager.c:3112
+#: src/mailbox-conf.c:214 src/mailbox-conf.c:1386 src/pref-manager.c:3457
+#: src/pref-manager.c:3463
 msgid "If Possible"
 msgstr ""
 
-#: src/mailbox-conf.c:180 src/pref-manager.c:3113
+#: src/mailbox-conf.c:215 src/pref-manager.c:3458 src/pref-manager.c:3464
 msgid "Required"
 msgstr "Kërkohet"
 
-#: src/mailbox-conf.c:188
+#: src/mailbox-conf.c:223
 msgid "Use _SSL"
 msgstr ""
 
-#: src/mailbox-conf.c:192
+#: src/mailbox-conf.c:227
 #, fuzzy
 msgid "Use _TLS"
 msgstr "TLS"
 
-#: src/mailbox-conf.c:329
+#: src/mailbox-conf.c:387
 #, fuzzy
 msgid "No mailbox selected."
 msgstr "Jo."
 
-#: src/mailbox-conf.c:356
+#: src/mailbox-conf.c:414
 #, fuzzy, c-format
 msgid ""
 "Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
@@ -2915,7 +2990,7 @@ msgid ""
 "to some other mailbox."
 msgstr "është nga Balsa dhe I hiq hiq tjetër."
 
-#: src/mailbox-conf.c:366
+#: src/mailbox-conf.c:424
 #, fuzzy, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
@@ -2925,17 +3000,17 @@ msgid ""
 "What would you like to do?"
 msgstr "hiq lista nga Ti elemino disk me nuk hiq në disk Shto hyrje?"
 
-#: src/mailbox-conf.c:378
+#: src/mailbox-conf.c:436
 #, fuzzy
 msgid "Remove from _list"
 msgstr "Hiq lista"
 
-#: src/mailbox-conf.c:379
+#: src/mailbox-conf.c:437
 #, fuzzy
 msgid "Remove from list and _disk"
 msgstr "Hiq lista dhe disk"
 
-#: src/mailbox-conf.c:387
+#: src/mailbox-conf.c:445
 #, fuzzy, c-format
 msgid ""
 "This will remove the mailbox \"%s\" and all its messages from your IMAP "
@@ -2946,12 +3021,12 @@ msgid ""
 msgstr ""
 "hiq dhe IMAP server a nyje në kartelë degëzimi E re IMAP shto a me emri?"
 
-#: src/mailbox-conf.c:400
+#: src/mailbox-conf.c:458
 #, fuzzy
 msgid "_Remove from server"
 msgstr "Hiq server"
 
-#: src/mailbox-conf.c:407
+#: src/mailbox-conf.c:465
 #, fuzzy, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
@@ -2959,27 +3034,27 @@ msgid ""
 "What would you like to do?"
 msgstr "hiq lista nga Shto hyrje?"
 
-#: src/mailbox-conf.c:416
+#: src/mailbox-conf.c:474
 #, fuzzy
 msgid "_Remove from list"
 msgstr "Hiq lista"
 
-#: src/mailbox-conf.c:504 src/sendmsg-window.c:1040
+#: src/mailbox-conf.c:562 src/sendmsg-window.c:1042
 #, fuzzy
 msgid "Select Identity"
 msgstr "Zgjidh"
 
-#: src/mailbox-conf.c:531
+#: src/mailbox-conf.c:589
 #, fuzzy
 msgid "Mailbox Configurator"
 msgstr "Konfigurues"
 
-#: src/mailbox-conf.c:726
+#: src/mailbox-conf.c:784
 #, c-format
 msgid "%s on %s"
 msgstr "%s në %s"
 
-#: src/mailbox-conf.c:864
+#: src/mailbox-conf.c:922
 #, fuzzy, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -2987,102 +3062,102 @@ msgid ""
 msgstr "Riemërto nga j"
 
 #. mailbox name
-#: src/mailbox-conf.c:1029 src/mailbox-conf.c:1076 src/mailbox-conf.c:1167
+#: src/mailbox-conf.c:1087 src/mailbox-conf.c:1134 src/mailbox-conf.c:1225
 #, fuzzy
 msgid "Mailbox _Name:"
 msgstr "Emri:"
 
 #. path to file
-#: src/mailbox-conf.c:1037
+#: src/mailbox-conf.c:1095
 #, fuzzy
 msgid "Mailbox _Path:"
 msgstr "Pozicioni:"
 
-#: src/mailbox-conf.c:1039
+#: src/mailbox-conf.c:1097
 #, fuzzy
 msgid "Mailbox Path"
 msgstr "Pozicioni"
 
 #. password field
-#: src/mailbox-conf.c:1095 src/mailbox-conf.c:1195
+#: src/mailbox-conf.c:1153 src/mailbox-conf.c:1253
 #, fuzzy
 msgid "Pass_word:"
 msgstr "Fjalë_kalimi:"
 
-#: src/mailbox-conf.c:1103
+#: src/mailbox-conf.c:1161
 #, fuzzy
 msgid "_Delete messages from server after download"
 msgstr "Elemino server mbas"
 
-#: src/mailbox-conf.c:1108
+#: src/mailbox-conf.c:1166
 #, fuzzy
 msgid "_Filter messages through procmail"
 msgstr "Filtri"
 
-#: src/mailbox-conf.c:1112
+#: src/mailbox-conf.c:1170
 #, fuzzy
 msgid "Fi_lter Command:"
 msgstr "Komanda:"
 
-#: src/mailbox-conf.c:1120
+#: src/mailbox-conf.c:1178
 #, fuzzy
 msgid "_Enable check for new mail"
 msgstr "Aktivo për i ri mail"
 
-#: src/mailbox-conf.c:1131
+#: src/mailbox-conf.c:1189
 #, fuzzy
 msgid "Disable _APOP"
 msgstr "Ç'aktivo"
 
 #. username
-#: src/mailbox-conf.c:1181
+#: src/mailbox-conf.c:1239
 msgid "_Username:"
 msgstr "_Përdoruesi:"
 
-#: src/mailbox-conf.c:1189
+#: src/mailbox-conf.c:1247
 #, fuzzy
 msgid "_Remember Password"
 msgstr "Kujto Fjalëkalimi"
 
-#: src/mailbox-conf.c:1200
+#: src/mailbox-conf.c:1258
 #, fuzzy
 msgid "F_older Path:"
 msgstr "F e(i) vjetër Pozicioni:"
 
-#: src/mailbox-conf.c:1288
+#: src/mailbox-conf.c:1346
 msgid "Identity:"
 msgstr ""
 
-#: src/mailbox-conf.c:1294
+#: src/mailbox-conf.c:1352
 #, fuzzy
 msgid "(No identity set)"
 msgstr "Jo identiteti"
 
-#: src/mailbox-conf.c:1298
+#: src/mailbox-conf.c:1356
 #, fuzzy
 msgid "C_hange..."
 msgstr "C."
 
-#: src/mailbox-conf.c:1305
+#: src/mailbox-conf.c:1363
 #, fuzzy
 msgid "Show address:"
 msgstr "Shfaq:"
 
-#: src/mailbox-conf.c:1308
+#: src/mailbox-conf.c:1366
 #, fuzzy
 msgid "_From"
 msgstr "Nga"
 
-#: src/mailbox-conf.c:1314
+#: src/mailbox-conf.c:1372
 #, fuzzy
 msgid "_To"
 msgstr "Për"
 
-#: src/mailbox-conf.c:1329 src/pref-manager.c:3023
+#: src/mailbox-conf.c:1387 src/pref-manager.c:3352 src/pref-manager.c:3358
 msgid "Always"
 msgstr "Gjithmonë"
 
-#: src/mailbox-conf.c:1333
+#: src/mailbox-conf.c:1393
 #, fuzzy
 msgid ""
 "decrypt and check\n"
@@ -3094,445 +3169,441 @@ msgstr "dhe"
 msgid "The folder edition to be written."
 msgstr "kartelë."
 
-#: src/mailbox-node.c:428
+#: src/mailbox-node.c:433
 #, fuzzy, c-format
 msgid ""
 "Scanning of %s failed: %s\n"
 "Check network connectivity."
 msgstr "nga."
 
-#: src/mailbox-node.c:430
+#: src/mailbox-node.c:435
 #, fuzzy, c-format
 msgid "Scanning of %s failed: %s"
 msgstr "nga"
 
-#: src/mailbox-node.c:479
+#: src/mailbox-node.c:484
 #, c-format
 msgid "Scanning %s. Please wait..."
 msgstr ""
 
-#: src/mailbox-node.c:922
+#: src/mailbox-node.c:927
 #, fuzzy
 msgid "Local _mbox mailbox..."
 msgstr "Lokale."
 
-#: src/mailbox-node.c:924
+#: src/mailbox-node.c:929
 #, fuzzy
 msgid "Local Mail_dir mailbox..."
 msgstr "Lokale Posta."
 
-#: src/mailbox-node.c:926
+#: src/mailbox-node.c:931
 #, fuzzy
 msgid "Local M_H mailbox..."
 msgstr "Lokale M H."
 
-#: src/mailbox-node.c:928
+#: src/mailbox-node.c:933
 #, fuzzy
 msgid "Remote _IMAP mailbox..."
 msgstr "Në distancë IMAP."
 
-#: src/mailbox-node.c:931
+#: src/mailbox-node.c:936
 #, fuzzy
 msgid "Remote IMAP _folder..."
 msgstr "Në distancë IMAP kartelë."
 
-#: src/mailbox-node.c:933
+#: src/mailbox-node.c:938
 #, fuzzy
 msgid "Remote IMAP _subfolder..."
 msgstr "Në distancë IMAP."
 
 #. clicked on the empty space
-#: src/mailbox-node.c:944 src/mailbox-node.c:970
+#: src/mailbox-node.c:949 src/mailbox-node.c:975
 msgid "_Rescan"
 msgstr ""
 
-#: src/mailbox-node.c:953
+#: src/mailbox-node.c:958
 msgid "_Open"
 msgstr "_Hap"
 
-#: src/mailbox-node.c:956 src/main-window.c:739 src/main-window.c:836
-msgid "_Close"
-msgstr "_Mbyll"
-
-#: src/mailbox-node.c:962
+#: src/mailbox-node.c:967
 msgid "_Properties..."
 msgstr "_Pronësitë...."
 
-#: src/mailbox-node.c:977
+#: src/mailbox-node.c:982
 msgid "_Subscribe"
 msgstr "_Abonohu"
 
-#: src/mailbox-node.c:979
+#: src/mailbox-node.c:984
 msgid "_Unsubscribe"
 msgstr "_Ç'regjistrohu"
 
-#: src/mailbox-node.c:984
+#: src/mailbox-node.c:989
 #, fuzzy
 msgid "Mark as _Inbox"
 msgstr "Inbox"
 
-#: src/mailbox-node.c:987
+#: src/mailbox-node.c:992
 msgid "_Mark as Sentbox"
 msgstr ""
 
-#: src/mailbox-node.c:990
+#: src/mailbox-node.c:995
 #, fuzzy
 msgid "Mark as _Trash"
 msgstr "Koshi"
 
-#: src/mailbox-node.c:993
+#: src/mailbox-node.c:998
 #, fuzzy
 msgid "Mark as D_raftbox"
 msgstr "D"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:996
+#: src/mailbox-node.c:1001
 #, fuzzy
 msgid "_Edit/Apply filters"
 msgstr "Ndrysho Apliko"
 
-#: src/mailbox-node.c:1077
+#: src/mailbox-node.c:1082
 #, fuzzy, c-format
 msgid "The path \"%s\" does not lead to a mailbox."
 msgstr "shtegu nuk a."
 
-#: src/mailbox-node.c:1090
+#: src/mailbox-node.c:1095
 #, fuzzy, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Lokale j"
 
-#: src/mailbox-node.c:1117
+#: src/mailbox-node.c:1122
 #, fuzzy, c-format
 msgid "Local folder %s\n"
 msgstr "Lokale kartelë j"
 
-#: src/main-window.c:276
+#: src/main-window.c:277
 #, fuzzy
 msgid "Balsa closes files and connections. Please wait..."
 msgstr "Balsa dhe."
 
-#: src/main-window.c:315 src/main-window.c:361
+#: src/main-window.c:316 src/main-window.c:362
 #, fuzzy
 msgid "_Deleted"
 msgstr "Eleminuar"
 
-#: src/main-window.c:318
+#: src/main-window.c:319
 #, fuzzy
 msgid "Un_Deleted"
 msgstr "Eleminuar"
 
-#: src/main-window.c:321
+#: src/main-window.c:322
 msgid "_Read"
 msgstr "_Lexim"
 
-#: src/main-window.c:324
+#: src/main-window.c:325
 msgid "Un_read"
 msgstr ""
 
-#: src/main-window.c:330
+#: src/main-window.c:331
 msgid "Un_flagged"
 msgstr ""
 
-#: src/main-window.c:333 src/main-window.c:373
+#: src/main-window.c:334 src/main-window.c:374
 msgid "_Answered"
 msgstr ""
 
-#: src/main-window.c:336
+#: src/main-window.c:337
 msgid "Un_answered"
 msgstr ""
 
-#: src/main-window.c:342
+#: src/main-window.c:343
 #, fuzzy
 msgid "_No Headers"
 msgstr "Jo Headers"
 
-#: src/main-window.c:342
+#: src/main-window.c:343
 #, fuzzy
 msgid "Display no headers"
 msgstr "Shfaq jo"
 
-#: src/main-window.c:344
+#: src/main-window.c:345
 #, fuzzy
 msgid "S_elected Headers"
 msgstr "S Headers"
 
-#: src/main-window.c:345
+#: src/main-window.c:346
 #, fuzzy
 msgid "Display selected headers"
 msgstr "Shfaq"
 
-#: src/main-window.c:347 src/message-window.c:85
+#: src/main-window.c:348 src/message-window.c:87
 #, fuzzy
 msgid "All _Headers"
 msgstr "Gjithçka Headers"
 
-#: src/main-window.c:347
+#: src/main-window.c:348
 #, fuzzy
 msgid "Display all headers"
 msgstr "Shfaq"
 
-#: src/main-window.c:356
+#: src/main-window.c:357
 #, fuzzy
 msgid "Toggle flagged"
 msgstr "Kavo"
 
-#: src/main-window.c:362
+#: src/main-window.c:363
 #, fuzzy
 msgid "Toggle deleted flag"
 msgstr "Kavo"
 
-#: src/main-window.c:367
+#: src/main-window.c:368
 #, fuzzy
 msgid "Toggle New"
 msgstr "Kavo E re"
 
-#: src/main-window.c:373
+#: src/main-window.c:374
 #, fuzzy
 msgid "Toggle Answered"
 msgstr "Kavo"
 
-#: src/main-window.c:388
+#: src/main-window.c:389
 #, fuzzy
 msgid "_Message..."
 msgstr "Mesazh."
 
-#: src/main-window.c:388 src/main-window.c:1018
+#: src/main-window.c:389 src/main-window.c:1023
 #, fuzzy
 msgid "Compose a new message"
 msgstr "Kompozo a i ri mesazh"
 
 #. We could use GNOMEUIINFO_INCLUDE but it appends the menu instead
 #. of including at specified position
-#: src/main-window.c:395
+#: src/main-window.c:396
 #, fuzzy
 msgid "Local mbox mailbox..."
 msgstr "Lokale."
 
-#: src/main-window.c:396 src/main-window.c:792
+#: src/main-window.c:397 src/main-window.c:795
 #, fuzzy
 msgid "Add a new mbox style mailbox"
 msgstr "Shto a i ri"
 
-#: src/main-window.c:399
+#: src/main-window.c:400
 #, fuzzy
 msgid "Local Maildir mailbox..."
 msgstr "Lokale."
 
-#: src/main-window.c:400 src/main-window.c:797
+#: src/main-window.c:401 src/main-window.c:800
 #, fuzzy
 msgid "Add a new Maildir style mailbox"
 msgstr "Shto a i ri"
 
-#: src/main-window.c:403
+#: src/main-window.c:404
 #, fuzzy
 msgid "Local MH mailbox..."
 msgstr "Lokale."
 
-#: src/main-window.c:404 src/main-window.c:801
+#: src/main-window.c:405 src/main-window.c:804
 #, fuzzy
 msgid "Add a new MH style mailbox"
 msgstr "Shto a i ri"
 
-#: src/main-window.c:407 src/main-window.c:804 src/pref-manager.c:2866
+#: src/main-window.c:408 src/main-window.c:807 src/pref-manager.c:3143
 #, fuzzy
 msgid "Remote IMAP mailbox..."
 msgstr "Në distancë IMAP."
 
-#: src/main-window.c:408 src/main-window.c:805
+#: src/main-window.c:409 src/main-window.c:808
 #, fuzzy
 msgid "Add a new IMAP mailbox"
 msgstr "Shto a i ri IMAP"
 
-#: src/main-window.c:412 src/main-window.c:809 src/pref-manager.c:2871
+#: src/main-window.c:413 src/main-window.c:812 src/pref-manager.c:3148
 #, fuzzy
 msgid "Remote IMAP folder..."
 msgstr "Në distancë IMAP kartelë."
 
-#: src/main-window.c:413 src/main-window.c:810
+#: src/main-window.c:414 src/main-window.c:813
 #, fuzzy
 msgid "Add a new IMAP folder"
 msgstr "Shto a i ri IMAP kartelë"
 
-#: src/main-window.c:416 src/main-window.c:813
+#: src/main-window.c:417 src/main-window.c:816
 #, fuzzy
 msgid "Remote IMAP subfolder..."
 msgstr "Në distancë IMAP."
 
-#: src/main-window.c:417 src/main-window.c:814
+#: src/main-window.c:418 src/main-window.c:817
 #, fuzzy
 msgid "Add a new IMAP subfolder"
 msgstr "Shto a i ri IMAP"
 
-#: src/main-window.c:430
+#: src/main-window.c:431
 msgid "_Continue"
 msgstr "_Vazhdo"
 
-#: src/main-window.c:431
+#: src/main-window.c:432
 #, fuzzy
 msgid "Continue editing current message"
 msgstr "Vazhdo mesazh"
 
 #. Ctrl-M
-#: src/main-window.c:438 src/main-window.c:856
+#: src/main-window.c:439 src/main-window.c:859
 #, fuzzy
 msgid "_Get New Mail"
 msgstr "E re Posta"
 
-#: src/main-window.c:438 src/main-window.c:856
+#: src/main-window.c:439 src/main-window.c:859
 #, fuzzy
 msgid "Fetch new incoming mail"
 msgstr "Merr i ri mail"
 
 #. Ctrl-S
-#: src/main-window.c:444 src/main-window.c:851
+#: src/main-window.c:445 src/main-window.c:854
 #, fuzzy
 msgid "_Send Queued Mail"
 msgstr "Dërgo Posta"
 
-#: src/main-window.c:445 src/main-window.c:852
+#: src/main-window.c:446 src/main-window.c:855
 #, fuzzy
 msgid "Send messages from the outbox"
 msgstr "Dërgo"
 
 #. Ctrl-B
-#: src/main-window.c:451 src/main-window.c:846
+#: src/main-window.c:452 src/main-window.c:849
 #, fuzzy
 msgid "Send and _Receive Mail"
 msgstr "Dërgo dhe Posta"
 
-#: src/main-window.c:452 src/main-window.c:847 src/toolbar-factory.c:123
+#: src/main-window.c:453 src/main-window.c:850 src/toolbar-factory.c:126
 #, fuzzy
 msgid "Send and Receive messages"
 msgstr "Dërgo dhe"
 
-#: src/main-window.c:457 src/main-window.c:861 src/sendmsg-window.c:339
+#: src/main-window.c:458 src/main-window.c:864 src/sendmsg-window.c:339
 #: src/sendmsg-window.c:500
 msgid "_Print..."
 msgstr "_Printim..."
 
-#: src/main-window.c:458 src/main-window.c:862 src/toolbar-factory.c:119
+#: src/main-window.c:459 src/main-window.c:865 src/toolbar-factory.c:122
 #, fuzzy
 msgid "Print current message"
 msgstr "Printo mesazh"
 
-#: src/main-window.c:464 src/main-window.c:1077
+#: src/main-window.c:465 src/main-window.c:1082
 #, fuzzy
 msgid "_Address Book..."
 msgstr "Adresa Libri."
 
-#: src/main-window.c:465 src/main-window.c:1078
+#: src/main-window.c:466 src/main-window.c:1083
 msgid "Open the address book"
 msgstr "Hap bllokun e adresave"
 
-#: src/main-window.c:489
+#: src/main-window.c:490
 #, fuzzy
 msgid "F_ilters..."
 msgstr "F."
 
-#: src/main-window.c:489 src/main-window.c:1064
+#: src/main-window.c:490 src/main-window.c:1069
 msgid "Manage filters"
 msgstr ""
 
-#: src/main-window.c:491 src/main-window.c:1070
+#: src/main-window.c:492 src/main-window.c:1075
 #, fuzzy
 msgid "_Export Filters"
 msgstr "Eksporto Filtrat"
 
-#: src/main-window.c:491 src/main-window.c:1071
+#: src/main-window.c:492 src/main-window.c:1076
 #, fuzzy
 msgid "Export filters as Sieve scripts"
 msgstr "Eksporto"
 
-#: src/main-window.c:499
+#: src/main-window.c:500
 #, fuzzy
 msgid "_Flat index"
 msgstr "treguesi"
 
-#: src/main-window.c:500
+#: src/main-window.c:501
 #, fuzzy
 msgid "No threading at all"
 msgstr "Jo"
 
-#: src/main-window.c:505
+#: src/main-window.c:506
 msgid "Si_mple threading"
 msgstr ""
 
-#: src/main-window.c:506
+#: src/main-window.c:507
 #, fuzzy
 msgid "Simple threading algorithm"
 msgstr "E thjeshtë"
 
-#: src/main-window.c:511
+#: src/main-window.c:512
 msgid "_JWZ threading"
 msgstr ""
 
-#: src/main-window.c:512
+#: src/main-window.c:513
 msgid "Elaborate JWZ threading"
 msgstr ""
 
-#: src/main-window.c:522
+#: src/main-window.c:523
 #, fuzzy
 msgid "_Show Mailbox Tree"
 msgstr "Shfaq Degëzimi"
 
-#: src/main-window.c:523
+#: src/main-window.c:524
 #, fuzzy
 msgid "Toggle display of mailbox and folder tree"
 msgstr "Kavo nga dhe kartelë degëzimi"
 
-#: src/main-window.c:527
+#: src/main-window.c:528
 #, fuzzy
 msgid "Show Mailbox _Tabs"
 msgstr "Shfaq Skedat"
 
-#: src/main-window.c:528
+#: src/main-window.c:529
 #, fuzzy
 msgid "Toggle display of mailbox notebook tabs"
 msgstr "Kavo nga"
 
-#: src/main-window.c:532 src/main-window.c:931 src/message-window.c:116
+#: src/main-window.c:533 src/main-window.c:934 src/message-window.c:118
 #, fuzzy
 msgid "_Wrap"
 msgstr "Mbështill"
 
-#: src/main-window.c:532 src/main-window.c:931 src/sendmsg-window.c:368
+#: src/main-window.c:533 src/main-window.c:934 src/sendmsg-window.c:368
 #: src/sendmsg-window.c:525
 #, fuzzy
 msgid "Wrap message lines"
 msgstr "Mbështill mesazh rreshta"
 
-#: src/main-window.c:541 src/main-window.c:937
+#: src/main-window.c:542 src/main-window.c:940
 #, fuzzy
 msgid "E_xpand All"
 msgstr "E Gjithçka"
 
-#: src/main-window.c:542 src/main-window.c:938
+#: src/main-window.c:543 src/main-window.c:941
 #, fuzzy
 msgid "Expand all threads"
 msgstr "Shpalos"
 
-#: src/main-window.c:546 src/main-window.c:942
+#: src/main-window.c:547 src/main-window.c:945
 msgid "_Collapse All"
 msgstr "_Ngjishi të gjithë"
 
-#: src/main-window.c:547 src/main-window.c:943
+#: src/main-window.c:548 src/main-window.c:946
 msgid "Collapse all expanded threads"
 msgstr ""
 
-#: src/main-window.c:553 src/main-window.c:971 src/message-window.c:122
+#: src/main-window.c:554 src/main-window.c:976 src/message-window.c:124
 msgid "Zoom _In"
 msgstr "Z_madho"
 
-#: src/main-window.c:553 src/main-window.c:971 src/message-window.c:122
+#: src/main-window.c:554 src/main-window.c:976 src/message-window.c:124
 #, fuzzy
 msgid "Increase magnification"
 msgstr "Rrit"
 
-#: src/main-window.c:557 src/main-window.c:975 src/message-window.c:126
+#: src/main-window.c:558 src/main-window.c:980 src/message-window.c:128
 msgid "Zoom _Out"
 msgstr "Z_vogëlo"
 
-#: src/main-window.c:557 src/main-window.c:975 src/message-window.c:126
+#: src/main-window.c:558 src/main-window.c:980 src/message-window.c:128
 #, fuzzy
 msgid "Decrease magnification"
 msgstr "Zvogëlo"
@@ -3540,414 +3611,419 @@ msgstr "Zvogëlo"
 #. To warn msgfmt that the % sign isn't a format specifier:
 #. To warn msgfmt that the % sign isn't a
 #. * format specifier:
-#: src/main-window.c:563 src/main-window.c:981 src/message-window.c:133
+#: src/main-window.c:564 src/main-window.c:986 src/message-window.c:135
 #, fuzzy, no-c-format
 msgid "Zoom _100%"
 msgstr "Shkalla e zmadhimit"
 
-#: src/main-window.c:563 src/main-window.c:981 src/message-window.c:133
+#: src/main-window.c:564 src/main-window.c:986 src/message-window.c:135
 #, fuzzy
 msgid "No magnification"
 msgstr "Jo"
 
-#: src/main-window.c:579 src/main-window.c:1025 src/toolbar-factory.c:99
+#: src/main-window.c:582 src/main-window.c:1030 src/toolbar-factory.c:98
 #, fuzzy
 msgid "Reply to the current message"
 msgstr "Përgjigju mesazh"
 
 #. A
-#: src/main-window.c:586 src/main-window.c:1031 src/message-window.c:148
+#: src/main-window.c:589 src/main-window.c:1036 src/message-window.c:150
 #, fuzzy
 msgid "Reply to _All..."
 msgstr "Përgjigju Gjithçka."
 
-#: src/main-window.c:587 src/main-window.c:1032
+#: src/main-window.c:590 src/main-window.c:1037
 #, fuzzy
 msgid "Reply to all recipients of the current message"
 msgstr "Përgjigju nga mesazh"
 
-#: src/main-window.c:594 src/message-window.c:154
+#: src/main-window.c:597 src/message-window.c:156
 #, fuzzy
 msgid "Reply to _Group..."
 msgstr "Përgjigju Grupi."
 
-#: src/main-window.c:595 src/message-window.c:155 src/toolbar-factory.c:103
+#: src/main-window.c:598 src/message-window.c:157 src/toolbar-factory.c:102
 #, fuzzy
 msgid "Reply to mailing list"
 msgstr "Përgjigju lista"
 
-#: src/main-window.c:602 src/message-window.c:160
+#: src/main-window.c:605 src/message-window.c:162
 #, fuzzy
 msgid "_Forward attached..."
 msgstr "Vazhdo."
 
-#: src/main-window.c:603
+#: src/main-window.c:606
 #, fuzzy
 msgid "Forward the current message as attachment"
 msgstr "Vazhdo mesazh bashkangjitur"
 
-#: src/main-window.c:609
+#: src/main-window.c:612
 #, fuzzy
 msgid "Forward _inline..."
 msgstr "Vazhdo."
 
-#: src/main-window.c:610
+#: src/main-window.c:613
 #, fuzzy
 msgid "Forward the current message inline"
 msgstr "Vazhdo mesazh"
 
-#: src/main-window.c:617 src/message-window.c:171
+#: src/main-window.c:620
 #, fuzzy
-msgid "Next Part"
+msgid "_Next Part"
 msgstr "Vazhdo Pjesa"
 
-#: src/main-window.c:617 src/message-window.c:171
+#: src/main-window.c:620 src/message-window.c:174
 #, fuzzy
 msgid "Next part in message"
 msgstr "Vazhdo në mesazh"
 
-#: src/main-window.c:623 src/message-window.c:175
+#: src/main-window.c:626
 #, fuzzy
-msgid "Previous Part"
+msgid "_Previous Part"
 msgstr "Paraardhëse Pjesa"
 
-#: src/main-window.c:624 src/message-window.c:176
+#: src/main-window.c:627 src/message-window.c:180
 #, fuzzy
 msgid "Previous part in message"
 msgstr "Paraardhëse në mesazh"
 
-#: src/main-window.c:630 src/main-window.c:1045 src/message-window.c:180
+#: src/main-window.c:633 src/main-window.c:1050 src/message-window.c:184
 #, fuzzy
 msgid "Save Current Part..."
 msgstr "Ruaj Aktual Pjesa."
 
-#: src/main-window.c:631 src/main-window.c:1046
+#: src/main-window.c:634 src/main-window.c:1051
 #, fuzzy
 msgid "Save currently displayed part of message"
 msgstr "Ruaj nga mesazh"
 
-#: src/main-window.c:637 src/main-window.c:998 src/message-window.c:185
+#: src/main-window.c:640 src/main-window.c:1003 src/message-window.c:189
 #, fuzzy
 msgid "_View Source..."
 msgstr "Paraqitja Burimi."
 
-#: src/main-window.c:638 src/main-window.c:999 src/message-window.c:186
+#: src/main-window.c:641 src/main-window.c:1004 src/message-window.c:190
 #, fuzzy
 msgid "View source form of the message"
 msgstr "Paraqitja nga mesazh"
 
-#: src/main-window.c:656
+#: src/main-window.c:659 src/message-window.c:225
 #, fuzzy
 msgid "_Move to Trash"
 msgstr "Lëvize Koshi"
 
-#: src/main-window.c:657 src/main-window.c:1053
+#: src/main-window.c:660 src/main-window.c:1058 src/message-window.c:226
 #, fuzzy
 msgid "Move the current message to Trash mailbox"
 msgstr "Lëvize mesazh Koshi"
 
 #. !
-#: src/main-window.c:663 src/main-window.c:1004
+#: src/main-window.c:666 src/main-window.c:1009
 #, fuzzy
 msgid "_Toggle flag"
 msgstr "Kavo"
 
-#: src/main-window.c:669 src/main-window.c:1009
+#: src/main-window.c:672 src/main-window.c:1014
 #, fuzzy
 msgid "Store address of sender in addressbook"
 msgstr "nga në"
 
-#: src/main-window.c:680 src/main-window.c:962
+#: src/main-window.c:683 src/main-window.c:967
 #, fuzzy
 msgid "Next Message"
 msgstr "Vazhdo Mesazh"
 
-#: src/main-window.c:686 src/main-window.c:966
+#: src/main-window.c:689 src/main-window.c:971 src/message-window.c:204
 #, fuzzy
 msgid "Previous Message"
 msgstr "Paraardhëse Mesazh"
 
-#: src/main-window.c:692 src/main-window.c:693 src/main-window.c:956
-#: src/main-window.c:957 src/message-window.c:192 src/message-window.c:193
+#: src/main-window.c:695 src/main-window.c:696 src/main-window.c:961
+#: src/main-window.c:962 src/message-window.c:210 src/message-window.c:211
 #, fuzzy
 msgid "Next Unread Message"
 msgstr "Vazhdo Mesazh"
 
-#: src/main-window.c:699 src/main-window.c:700 src/main-window.c:923
-#: src/main-window.c:924
+#: src/main-window.c:702 src/main-window.c:703 src/main-window.c:926
+#: src/main-window.c:927 src/message-window.c:217 src/message-window.c:218
 #, fuzzy
 msgid "Next Flagged Message"
 msgstr "Vazhdo Mesazh"
 
-#: src/main-window.c:707 src/main-window.c:934
+#: src/main-window.c:710
 #, fuzzy
 msgid "_Hide messages"
 msgstr "Fshih"
 
-#: src/main-window.c:710
+#: src/main-window.c:713
 #, fuzzy
 msgid "Reset _Filter"
 msgstr "Nga fillimi Filtri"
 
-#: src/main-window.c:715
+#: src/main-window.c:718
 msgid "Select all"
 msgstr "Zgjidh gjithçka"
 
-#: src/main-window.c:716
+#: src/main-window.c:719
 #, fuzzy
 msgid "Select all messages in current mailbox"
 msgstr "Zgjidh në"
 
-#: src/main-window.c:722 src/main-window.c:824
+#: src/main-window.c:725 src/main-window.c:827
 msgid "_Edit..."
 msgstr "_Ndrysho..."
 
-#: src/main-window.c:722 src/main-window.c:824
+#: src/main-window.c:725 src/main-window.c:827
 #, fuzzy
 msgid "Edit the selected mailbox"
 msgstr "Ndrysho"
 
-#: src/main-window.c:726 src/main-window.c:819
+#: src/main-window.c:729 src/main-window.c:822
 msgid "_Delete..."
 msgstr "_Fshi..."
 
-#: src/main-window.c:727 src/main-window.c:820
+#: src/main-window.c:730 src/main-window.c:823
 #, fuzzy
 msgid "Delete the selected mailbox"
 msgstr "Elemino"
 
-#: src/main-window.c:733
+#: src/main-window.c:736
 #, fuzzy
 msgid "E_xpunge Deleted Messages"
 msgstr "E Eleminuar"
 
-#: src/main-window.c:734 src/main-window.c:831
+#: src/main-window.c:737 src/main-window.c:834
 #, fuzzy
 msgid "Expunge messages marked as deleted in the currently opened mailbox"
 msgstr "në"
 
-#: src/main-window.c:739 src/main-window.c:837
+#: src/main-window.c:742 src/main-window.c:840
 #, fuzzy
 msgid "Close mailbox"
 msgstr "Mbyll"
 
-#: src/main-window.c:743 src/main-window.c:1082
+#: src/main-window.c:746 src/main-window.c:1087
 msgid "Empty _Trash"
 msgstr "Zbraz _Koshin"
 
-#: src/main-window.c:744 src/main-window.c:1083 src/toolbar-factory.c:141
+#: src/main-window.c:747 src/main-window.c:1088 src/toolbar-factory.c:144
 #, fuzzy
 msgid "Delete messages from the Trash mailbox"
 msgstr "Elemino Koshi"
 
-#: src/main-window.c:748
+#: src/main-window.c:751
 #, fuzzy
 msgid "Select _Filters"
 msgstr "Zgjidh gërmat"
 
-#: src/main-window.c:749 src/main-window.c:1068
+#: src/main-window.c:752 src/main-window.c:1073
 #, fuzzy
 msgid "Select filters to be applied automatically to current mailbox"
 msgstr "Zgjidh"
 
-#: src/main-window.c:762
+#: src/main-window.c:765
 #, fuzzy
 msgid "_Toolbars..."
 msgstr "Panelët e instrumentëve."
 
-#: src/main-window.c:763
+#: src/main-window.c:766
 msgid "Customize toolbars"
 msgstr "Personalizo panelët"
 
-#: src/main-window.c:766 src/main-window.c:1086
+#: src/main-window.c:769 src/main-window.c:1091
 msgid "_Identities..."
 msgstr ""
 
-#: src/main-window.c:767 src/main-window.c:1087
+#: src/main-window.c:770 src/main-window.c:1092
 #, fuzzy
 msgid "Create and set current identities"
 msgstr "Krijo dhe"
 
-#: src/main-window.c:778
+#: src/main-window.c:781
 #, fuzzy
 msgid "Mail_box"
 msgstr "Posta"
 
-#: src/main-window.c:779 src/main-window.c:1100 src/message-window.c:209
+#: src/main-window.c:782 src/main-window.c:1105 src/message-window.c:242
 #, fuzzy
 msgid "_Message"
 msgstr "Mesazh"
 
-#: src/main-window.c:791
+#: src/main-window.c:794
 #, fuzzy
 msgid "New mailbox..."
 msgstr "E re."
 
-#: src/main-window.c:796
+#: src/main-window.c:799
 #, fuzzy
 msgid "New \"Maildir\" mailbox..."
 msgstr "E re."
 
-#: src/main-window.c:800
+#: src/main-window.c:803
 #, fuzzy
 msgid "New \"MH\" mailbox..."
 msgstr "E re."
 
-#: src/main-window.c:830
+#: src/main-window.c:833
 msgid "_Compress Mailbox"
 msgstr ""
 
-#: src/main-window.c:860
+#: src/main-window.c:863
 #, fuzzy
 msgid "Mail_boxes"
 msgstr "Posta"
 
-#: src/main-window.c:885
+#: src/main-window.c:888
 msgid "By _Arrival"
 msgstr ""
 
-#: src/main-window.c:885
+#: src/main-window.c:888
 msgid "Arrival order"
 msgstr ""
 
-#: src/main-window.c:889
+#: src/main-window.c:892
 #, fuzzy
 msgid "By _Sender"
 msgstr "_Dërgo"
 
-#: src/main-window.c:889
+#: src/main-window.c:892
 #, fuzzy
 msgid "Sender order"
 msgstr "Dërguesi"
 
-#: src/main-window.c:893
+#: src/main-window.c:896
 #, fuzzy
 msgid "By S_ubject"
 msgstr "Subjekti:"
 
-#: src/main-window.c:893
+#: src/main-window.c:896
 #, fuzzy
 msgid "Subject order"
 msgstr "Subjekti:"
 
-#: src/main-window.c:897
+#: src/main-window.c:900
 msgid "By Si_ze"
 msgstr ""
 
-#: src/main-window.c:897
+#: src/main-window.c:900
 #, fuzzy
 msgid "By message size"
 msgstr "mesazh madhësia"
 
-#: src/main-window.c:901
+#: src/main-window.c:904
 #, fuzzy
 msgid "_Threaded"
 msgstr "_Krijo"
 
-#: src/main-window.c:901
+#: src/main-window.c:904
 #, fuzzy
 msgid "Use message threading"
 msgstr "mesazh"
 
-#: src/main-window.c:909
+#: src/main-window.c:912
 msgid "_Descending"
 msgstr ""
 
-#: src/main-window.c:909
+#: src/main-window.c:912
 msgid "Sort in a descending order"
 msgstr ""
 
-#: src/main-window.c:930
+#: src/main-window.c:933
 #, fuzzy
 msgid "_Headers"
 msgstr "_Fshih"
 
-#: src/main-window.c:933
+#: src/main-window.c:936
 #, fuzzy
 msgid "_Sort Mailbox"
 msgstr "Renditja"
 
-#: src/main-window.c:948
+#: src/main-window.c:937
+#, fuzzy
+msgid "H_ide messages"
+msgstr "Fshih"
+
+#: src/main-window.c:951
 #, fuzzy
 msgid "_View filter"
 msgstr "Paraqitja filtro"
 
-#: src/main-window.c:949
+#: src/main-window.c:952
 #, fuzzy
 msgid "Enable quick message index filter"
 msgstr "Aktivo mesazh treguesi filtro"
 
-#: src/main-window.c:985 src/main-window.c:1059 src/sendmsg-window.c:502
+#: src/main-window.c:990 src/main-window.c:1064 src/sendmsg-window.c:502
 #: src/sendmsg-window.c:560 src/sendmsg-window.c:620
 #, fuzzy
 msgid "_More"
 msgstr "_Akoma"
 
-#: src/main-window.c:1018
+#: src/main-window.c:1023
 msgid "_New..."
 msgstr "_I Ri..."
 
 #. F
-#: src/main-window.c:1038
+#: src/main-window.c:1043
 #, fuzzy
 msgid "_Forward..."
 msgstr "Vazhdo."
 
-#: src/main-window.c:1039 src/toolbar-factory.c:105
+#: src/main-window.c:1044 src/toolbar-factory.c:104
 #, fuzzy
 msgid "Forward the current message"
 msgstr "Vazhdo mesazh"
 
 #. D
-#: src/main-window.c:1052
+#: src/main-window.c:1057
 #, fuzzy
 msgid "_Delete to Trash"
 msgstr "_Elemino"
 
-#: src/main-window.c:1064
+#: src/main-window.c:1069
 #, fuzzy
 msgid "_Manage..."
 msgstr "Ndrysho..."
 
-#: src/main-window.c:1067
+#: src/main-window.c:1072
 #, fuzzy
 msgid "_Select Filters"
 msgstr "Zgjidh gërmat"
 
-#: src/main-window.c:1085
+#: src/main-window.c:1090
 #, fuzzy
 msgid "_Filters"
 msgstr "Filtrat"
 
-#: src/main-window.c:1101 src/sendmsg-window.c:636
+#: src/main-window.c:1106 src/sendmsg-window.c:636
 msgid "_Tools"
 msgstr "_Instrumentë"
 
-#: src/main-window.c:1205
+#: src/main-window.c:1210
 #, fuzzy
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
 msgstr "Balsa është a mail?"
 
-#: src/main-window.c:1375
+#: src/main-window.c:1380
 #, fuzzy
 msgid "Subject or Sender _Contains:"
 msgstr "Subjekti Dërguesi:"
 
-#: src/main-window.c:2157
+#: src/main-window.c:2203
 #, fuzzy, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
 "%s."
 msgstr "Hap j."
 
-#: src/main-window.c:2474
+#: src/main-window.c:2520
 #, fuzzy
 msgid "translator_credits"
 msgstr "Laurent Dhima <laurenti@alblinux.net>"
 
-#: src/main-window.c:2490
+#: src/main-window.c:2536
 #, fuzzy
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
@@ -3958,565 +4034,605 @@ msgstr ""
 "Balsa është nga GNOME Informacione në Balsahttp://balsa.gnome.org/ jhttp://"
 "bugzilla.gnome.org/"
 
-#: src/main-window.c:2592
+#: src/main-window.c:2639
 #, fuzzy
 msgid "Checking Mail..."
 msgstr "Posta."
 
-#: src/main-window.c:2906
+#: src/main-window.c:2838
+#, fuzzy, c-format
+msgid "IMAP Server %s: %s"
+msgstr "IMAP server gabim"
+
+#: src/main-window.c:2841
+#, fuzzy, c-format
+msgid "Local mailbox: %s"
+msgstr "Lokale."
+
+#: src/main-window.c:2978
 #, fuzzy
 msgid "Finished Checking."
 msgstr "Përfundoi."
 
-#: src/main-window.c:2968
+#: src/main-window.c:3040
 #, fuzzy, c-format
 msgid "Sending error: %s"
 msgstr "Duke dërguar gabim"
 
-#: src/main-window.c:3053
+#: src/main-window.c:3125
 #, fuzzy
 msgid "Balsa: New mail"
 msgstr "Balsa E re mail"
 
-#: src/main-window.c:3065
+#: src/main-window.c:3137
 #, fuzzy, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
 msgstr[0] "Ti i ri mesazh."
 msgstr[1] "Ti i ri mesazh."
 
-#: src/main-window.c:3068
+#: src/main-window.c:3140
 msgid "You have new mail."
 msgstr "Ke një mesazh të ri."
 
-#: src/main-window.c:3677
+#: src/main-window.c:3751
 #, fuzzy
 msgid "Search mailbox"
 msgstr "Kërko"
 
-#: src/main-window.c:3694
+#: src/main-window.c:3768
 msgid "_Search for:"
 msgstr "_Kërko për:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: src/main-window.c:3707
+#: src/main-window.c:3781
 #, fuzzy
 msgid "In:"
 msgstr "Brenda:"
 
-#: src/main-window.c:3718
+#: src/main-window.c:3792
 #, fuzzy
 msgid "S_ubject"
 msgstr "S"
 
 #. Frame with Apply and Clear buttons
-#: src/main-window.c:3723
+#: src/main-window.c:3797
 #, fuzzy
 msgid "Show only matching messages"
 msgstr "Shfaq"
 
 #. Frame with OK button
-#: src/main-window.c:3744
+#: src/main-window.c:3818
 #, fuzzy
 msgid "Open next matching message"
 msgstr "Hap në vazhdim mesazh"
 
-#: src/main-window.c:3755
+#: src/main-window.c:3829
 #, fuzzy
 msgid "_Reverse search"
 msgstr "kërko"
 
-#: src/main-window.c:3760
+#: src/main-window.c:3834
 msgid "_Wrap around"
 msgstr "_Rifillo nga fillimi"
 
-#: src/main-window.c:3836
+#: src/main-window.c:3910
 #, fuzzy, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Gabim ndihmë j"
 
-#: src/main-window.c:3921
+#: src/main-window.c:3995
 #, fuzzy
 msgid "You can apply filters only on mailbox\n"
 msgstr "Ti apliko në j"
 
-#: src/main-window.c:4239
+#: src/main-window.c:4191
+#, fuzzy, c-format
+msgid "Could not open trash: %s"
+msgstr "nuk hap"
+
+#: src/main-window.c:4318
 #, fuzzy, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa"
 
-#: src/main-window.c:4241
+#: src/main-window.c:4320
 #, fuzzy, c-format
 msgid "Balsa: %s"
 msgstr "Balsa"
 
-#: src/main.c:215
+#: src/main.c:217
 #, fuzzy
 msgid "Get new mail on startup"
 msgstr "i ri mail në"
 
-#: src/main.c:217
+#: src/main.c:219
 #, fuzzy
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Kompozo a i ri EMAIL ADRESA"
 
-#: src/main.c:219
+#: src/main.c:221
 #, fuzzy
 msgid "Attach file at PATH"
 msgstr "Bashkangjit"
 
-#: src/main.c:221
+#: src/main.c:223
 msgid "Opens MAILBOXNAME"
 msgstr ""
 
-#: src/main.c:221
+#: src/main.c:223
 msgid "MAILBOXNAME"
 msgstr ""
 
-#: src/main.c:224
+#: src/main.c:226
 #, fuzzy
 msgid "Opens first unread mailbox"
 msgstr "i pari"
 
-#: src/main.c:227
+#: src/main.c:229
 #, fuzzy
 msgid "Opens default Inbox on startup"
 msgstr "prezgjedhur Inbox në"
 
-#: src/main.c:230
+#: src/main.c:232
 #, fuzzy
 msgid "Prints number unread and unsent messages"
 msgstr "Printo mesazh"
 
-#: src/main.c:232
+#: src/main.c:234
 #, fuzzy
 msgid "Debug POP3 connection"
 msgstr "Gjetja dhe korrigjimi i gabimeve"
 
-#: src/main.c:234
+#: src/main.c:236
 #, fuzzy
 msgid "Debug IMAP connection"
 msgstr "Gjetja dhe korrigjimi i gabimeve IMAP"
 
-#: src/main.c:256
+#: src/main.c:258
 #, fuzzy
 msgid "The Balsa E-Mail Client"
 msgstr "Balsa E Posta"
 
-#: src/main.c:273 src/main.c:278 src/main.c:284 src/main.c:290 src/main.c:296
+#: src/main.c:275 src/main.c:280 src/main.c:286 src/main.c:292 src/main.c:298
 #, fuzzy, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa hap."
 
-#: src/main.c:273
+#: src/main.c:275
 msgid "Inbox"
 msgstr "Inbox"
 
-#: src/main.c:279
+#: src/main.c:281
 msgid "Outbox"
 msgstr "Nisur"
 
-#: src/main.c:285
+#: src/main.c:287
 msgid "Sentbox"
 msgstr ""
 
-#: src/main.c:291
+#: src/main.c:293
 msgid "Draftbox"
 msgstr ""
 
-#: src/main.c:296
+#: src/main.c:298
 msgid "Trash"
 msgstr "Koshi"
 
-#: src/main.c:511
+#: src/main.c:539
 #, fuzzy
 msgid "Compressing mail folders..."
 msgstr "mail."
 
-#: src/message-window.c:81
+#: src/message-window.c:83
 #, fuzzy
 msgid "N_o Headers"
 msgstr "N Headers"
 
-#: src/message-window.c:83
+#: src/message-window.c:85
 #, fuzzy
 msgid "_Selected Headers"
 msgstr "I zgjedhur Headers"
 
-#: src/message-window.c:143
+#: src/message-window.c:145
 #, fuzzy
 msgid "Reply to this message"
 msgstr "Përgjigju mesazh"
 
-#: src/message-window.c:149
+#: src/message-window.c:151
 #, fuzzy
 msgid "Reply to all recipients of this message"
 msgstr "Përgjigju nga mesazh"
 
-#: src/message-window.c:161
+#: src/message-window.c:163
 #, fuzzy
 msgid "Forward this message as attachment"
 msgstr "Vazhdo mesazh bashkangjitur"
 
-#: src/message-window.c:165
+#: src/message-window.c:167
 #, fuzzy
 msgid "Forward inline..."
 msgstr "Vazhdo."
 
-#: src/message-window.c:166
+#: src/message-window.c:168
 #, fuzzy
 msgid "Forward this message inline"
 msgstr "Vazhdo mesazh"
 
-#: src/message-window.c:181
+#: src/message-window.c:174
+#, fuzzy
+msgid "Next Part"
+msgstr "Vazhdo Pjesa"
+
+#: src/message-window.c:179
+#, fuzzy
+msgid "Previous Part"
+msgstr "Paraardhëse Pjesa"
+
+#: src/message-window.c:185
 #, fuzzy
 msgid "Save current part in message"
 msgstr "Ruaj në mesazh"
 
-#: src/message-window.c:208
+#: src/message-window.c:197
+#, fuzzy
+msgid "_Next Message"
+msgstr "Vazhdo Mesazh"
+
+#: src/message-window.c:197
+#, fuzzy
+msgid "Next message"
+msgstr "Vazhdo Mesazh"
+
+#: src/message-window.c:203
+#, fuzzy
+msgid "_Previous Message"
+msgstr "Paraardhëse Mesazh"
+
+#: src/message-window.c:241
 #, fuzzy
 msgid "M_ove"
 msgstr "M"
 
-#: src/message-window.c:280
+#: src/message-window.c:340
 #, fuzzy, c-format
 msgid "Message from %s: %s"
 msgstr "Mesazh"
 
-#: src/pref-manager.c:327
+#: src/pref-manager.c:347
 msgid "7 Bits"
 msgstr ""
 
-#: src/pref-manager.c:328
+#: src/pref-manager.c:348
 msgid "8 Bits"
 msgstr ""
 
-#: src/pref-manager.c:329
+#: src/pref-manager.c:349
 msgid "Quoted"
 msgstr ""
 
-#: src/pref-manager.c:339
+#: src/pref-manager.c:359
 msgid "While Retrieving Messages"
 msgstr ""
 
-#: src/pref-manager.c:340
+#: src/pref-manager.c:360
 msgid "Until Closed"
 msgstr ""
 
-#: src/pref-manager.c:345
+#: src/pref-manager.c:365
 msgid "Fast"
 msgstr "Shpejt"
 
-#: src/pref-manager.c:346
+#: src/pref-manager.c:366
 msgid "Normal"
 msgstr "Normal"
 
-#: src/pref-manager.c:347
+#: src/pref-manager.c:367
 msgid "Bad Spellers"
 msgstr ""
 
-#: src/pref-manager.c:352
+#: src/pref-manager.c:372
 #, fuzzy
 msgid "Message number"
 msgstr "Mesazh Burimi"
 
-#: src/pref-manager.c:356
+#: src/pref-manager.c:376
 #, fuzzy
 msgid "Sender"
 msgstr "Dërgo"
 
-#: src/pref-manager.c:360
+#: src/pref-manager.c:380
 msgid "Flat"
 msgstr ""
 
-#: src/pref-manager.c:362
+#: src/pref-manager.c:382
 msgid "JWZ"
 msgstr ""
 
-#: src/pref-manager.c:366
+#: src/pref-manager.c:386
 msgid "west european (traditional)"
 msgstr ""
 
-#: src/pref-manager.c:367
+#: src/pref-manager.c:387
 msgid "east european"
 msgstr ""
 
-#: src/pref-manager.c:368
+#: src/pref-manager.c:388
 msgid "south european"
 msgstr ""
 
-#: src/pref-manager.c:369
+#: src/pref-manager.c:389
 msgid "north european"
 msgstr ""
 
-#: src/pref-manager.c:370
+#: src/pref-manager.c:390
 #, fuzzy
 msgid "cyrillic (iso/windows)"
 msgstr "iso dritare"
 
-#: src/pref-manager.c:371
+#: src/pref-manager.c:391
 msgid "arabic"
 msgstr ""
 
-#: src/pref-manager.c:372
+#: src/pref-manager.c:392
 msgid "greek"
 msgstr ""
 
-#: src/pref-manager.c:373
+#: src/pref-manager.c:393
 msgid "hebrew"
 msgstr ""
 
-#: src/pref-manager.c:374
+#: src/pref-manager.c:394
 msgid "turkish"
 msgstr ""
 
-#: src/pref-manager.c:375
+#: src/pref-manager.c:395
 msgid "nordic"
 msgstr ""
 
-#: src/pref-manager.c:376
+#: src/pref-manager.c:396
 msgid "thai"
 msgstr ""
 
-#: src/pref-manager.c:377
+#: src/pref-manager.c:397
 msgid "baltic"
 msgstr ""
 
-#: src/pref-manager.c:378
+#: src/pref-manager.c:398
 msgid "celtic"
 msgstr ""
 
-#: src/pref-manager.c:379
+#: src/pref-manager.c:399
 msgid "west european (euro)"
 msgstr ""
 
-#: src/pref-manager.c:380
+#: src/pref-manager.c:400
 msgid "russian (koi)"
 msgstr ""
 
-#: src/pref-manager.c:381
+#: src/pref-manager.c:401
 msgid "ukranian (koi)"
 msgstr ""
 
-#: src/pref-manager.c:382
+#: src/pref-manager.c:402
 msgid "japanese"
 msgstr ""
 
-#: src/pref-manager.c:383
+#: src/pref-manager.c:403
 msgid "korean"
 msgstr ""
 
 #. must NOT be modal
-#: src/pref-manager.c:403
+#: src/pref-manager.c:423
 #, fuzzy
 msgid "Balsa Preferences"
 msgstr "Balsa Preferimet"
 
-#: src/pref-manager.c:429
+#: src/pref-manager.c:451
 #, fuzzy
 msgid "Mail Servers"
 msgstr "Posta Serverët"
 
-#: src/pref-manager.c:433 src/pref-manager.c:2649
+#: src/pref-manager.c:455 src/pref-manager.c:2924
 msgid "Address Books"
 msgstr "Rubrikat"
 
-#: src/pref-manager.c:437
+#: src/pref-manager.c:459
 #, fuzzy
 msgid "Mail Options"
 msgstr "Posta Mundësitë"
 
-#: src/pref-manager.c:441 src/pref-manager.c:2013
+#: src/pref-manager.c:463 src/pref-manager.c:2258
 #, fuzzy
 msgid "Display"
 msgstr "Shfaq"
 
-#: src/pref-manager.c:445 src/toolbar-factory.c:130
+#: src/pref-manager.c:467 src/toolbar-factory.c:133
 msgid "Spelling"
 msgstr ""
 
-#: src/pref-manager.c:449
+#: src/pref-manager.c:471
 msgid "Misc"
 msgstr "Të Ndryshme"
 
-#: src/pref-manager.c:453
+#: src/pref-manager.c:475
 msgid "Startup"
 msgstr ""
 
-#: src/pref-manager.c:1265
+#: src/pref-manager.c:1439
 #, fuzzy, c-format
 msgid "%s (default)"
 msgstr "prezgjedhur"
 
-#: src/pref-manager.c:1514
+#: src/pref-manager.c:1705
 #, fuzzy
 msgid "Remote Mailbox Servers"
 msgstr "Në distancë Serverët"
 
-#: src/pref-manager.c:1535 src/pref-manager.c:2670
+#: src/pref-manager.c:1726 src/pref-manager.c:2945
 msgid "Type"
 msgstr "Lloji"
 
-#: src/pref-manager.c:1543
+#: src/pref-manager.c:1734
 #, fuzzy
 msgid "Mailbox Name"
 msgstr "Emri"
 
-#: src/pref-manager.c:1556 src/pref-manager.c:2701
+#: src/pref-manager.c:1747 src/pref-manager.c:2976
 msgid "_Modify"
 msgstr "_Ndrysho"
 
-#: src/pref-manager.c:1571
+#: src/pref-manager.c:1762
 #, fuzzy
 msgid "Local Mail"
 msgstr "Lokale Posta"
 
-#: src/pref-manager.c:1573
+#: src/pref-manager.c:1764
 #, fuzzy
 msgid "Select your local mail directory"
 msgstr "Zgjidh lokal mail"
 
-#: src/pref-manager.c:1593
+#: src/pref-manager.c:1786
 #, fuzzy
 msgid "Outgoing Mail"
 msgstr "Posta"
 
-#: src/pref-manager.c:1598
+#: src/pref-manager.c:1791
 #, fuzzy
 msgid "Remote SMTP Server"
 msgstr "Në distancë SMTP Serveri"
 
-#: src/pref-manager.c:1600
+#: src/pref-manager.c:1793
 msgid "User"
 msgstr "Përdoruesi"
 
-#: src/pref-manager.c:1603
+#: src/pref-manager.c:1796
 msgid "Pass Phrase"
 msgstr ""
 
 #. STARTTLS
-#: src/pref-manager.c:1607
+#: src/pref-manager.c:1800
 #, fuzzy
 msgid "Use TLS"
 msgstr "TLS"
 
-#: src/pref-manager.c:1625
+#: src/pref-manager.c:1827
 #, fuzzy
 msgid "Certificate Pass Phrase"
 msgstr "Çertifikatë"
 
-#: src/pref-manager.c:1643
+#: src/pref-manager.c:1845
 #, fuzzy
 msgid "Incoming"
 msgstr "Në ardhje"
 
-#: src/pref-manager.c:1645
+#: src/pref-manager.c:1847
 msgid "Outgoing"
 msgstr ""
 
-#: src/pref-manager.c:1669
+#: src/pref-manager.c:1871
 msgid "Checking"
 msgstr ""
 
-#: src/pref-manager.c:1674
+#: src/pref-manager.c:1876
 #, fuzzy
 msgid "_Check mail automatically every:"
 msgstr "Kontrolli mail:"
 
-#: src/pref-manager.c:1685 src/pref-manager.c:2494 src/pref-manager.c:2545
+#: src/pref-manager.c:1887 src/pref-manager.c:2769 src/pref-manager.c:2820
 msgid "minutes"
 msgstr "minuta"
 
-#: src/pref-manager.c:1691
+#: src/pref-manager.c:1893
 #, fuzzy
 msgid "Check _IMAP mailboxes"
 msgstr "Kontrolli IMAP"
 
-#: src/pref-manager.c:1697
+#: src/pref-manager.c:1899
 #, fuzzy
 msgid "Check INBOX _only"
 msgstr "Kontrolli"
 
-#: src/pref-manager.c:1702
+#: src/pref-manager.c:1904
 #, fuzzy
 msgid "Display message if new mail has arrived in an open mailbox"
 msgstr "Shfaq mesazh i ri mail në hap"
 
-#: src/pref-manager.c:1707
+#: src/pref-manager.c:1909
 #, fuzzy
 msgid "Do background check quietly (no messages in status bar)"
 msgstr "Bëje jo në gjendja"
 
-#: src/pref-manager.c:1711
+#: src/pref-manager.c:1913
 #, fuzzy
 msgid "_POP message size limit:"
 msgstr "POP mesazh madhësia:"
 
-#: src/pref-manager.c:1718
+#: src/pref-manager.c:1920
 msgid "MB"
 msgstr "MB"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: src/pref-manager.c:1737
+#: src/pref-manager.c:1939
 #, fuzzy
 msgid "Quoted and Flowed Text"
 msgstr "dhe Teksti"
 
-#: src/pref-manager.c:1741 src/sendmsg-window.c:4231
+#: src/pref-manager.c:1943 src/sendmsg-window.c:4343
 #, fuzzy
 msgid "Quoted Text Regular Expression"
 msgstr "Teksti Shprehje"
 
-#: src/pref-manager.c:1752
+#: src/pref-manager.c:1958
 #, fuzzy
 msgid "Wrap Incoming Text at:"
 msgstr "Mbështill Teksti:"
 
-#: src/pref-manager.c:1763 src/pref-manager.c:1937
+#: src/pref-manager.c:1969 src/pref-manager.c:2174
 msgid "characters"
 msgstr ""
 
 #. handling of multipart/alternative
-#: src/pref-manager.c:1778
+#: src/pref-manager.c:1984
 #, fuzzy
 msgid "Display of Multipart/Alternative Parts"
 msgstr "Shfaq nga Alternativ"
 
-#: src/pref-manager.c:1781
+#: src/pref-manager.c:1987
 #, fuzzy
 msgid "prefer text/plain over html"
 msgstr "tekst"
 
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
-#: src/pref-manager.c:1798
+#: src/pref-manager.c:2006
 #, fuzzy
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr "në titull"
 
-#: src/pref-manager.c:1804
+#: src/pref-manager.c:2012
 msgid "display as \"?\""
 msgstr ""
 
-#: src/pref-manager.c:1813
+#: src/pref-manager.c:2021
 msgid "display using codeset"
 msgstr ""
 
 #. How to handle received MDN requests
-#: src/pref-manager.c:1848
+#: src/pref-manager.c:2069
 #, fuzzy
 msgid "Message Disposition Notification Requests"
 msgstr "Mesazh Lajmërim"
 
-#: src/pref-manager.c:1850
+#: src/pref-manager.c:2071
 #, fuzzy
 msgid ""
 "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
 msgstr "Kur I a mesazh dhe a Lajmërim në:"
 
-#: src/pref-manager.c:1861
+#: src/pref-manager.c:2082
 #, fuzzy
 msgid ""
 "The message header looks clean\n"
@@ -4524,412 +4640,412 @@ msgid ""
 "I am in the \"To:\" or \"Cc:\" list)."
 msgstr "mesazh titull j është e barabartë shtegu pd në Për lista."
 
-#: src/pref-manager.c:1879
+#: src/pref-manager.c:2108
 #, fuzzy
 msgid "The message header looks suspicious."
 msgstr "mesazh titull."
 
-#: src/pref-manager.c:1918
+#: src/pref-manager.c:2155
 msgid "Word Wrap"
 msgstr "Mbështill Fjalë"
 
-#: src/pref-manager.c:1923
+#: src/pref-manager.c:2160
 #, fuzzy
 msgid "Wrap Outgoing Text at:"
 msgstr "Mbështill Teksti:"
 
-#: src/pref-manager.c:1951
+#: src/pref-manager.c:2188
 #, fuzzy
 msgid "Other Options"
 msgstr "Tjetër Mundësitë"
 
-#: src/pref-manager.c:1956
+#: src/pref-manager.c:2193
 #, fuzzy
 msgid "Reply Prefix:"
 msgstr "Përgjigju:"
 
-#: src/pref-manager.c:1959
+#: src/pref-manager.c:2196
 #, fuzzy
 msgid "Edit headers in external editor"
 msgstr "Ndrysho në i jashtëm"
 
-#: src/pref-manager.c:1961
+#: src/pref-manager.c:2198
 msgid "Automatically quote original when replying"
 msgstr ""
 
-#: src/pref-manager.c:1964
+#: src/pref-manager.c:2201
 #, fuzzy
 msgid "Don't include HTML parts as text when replying or forwarding mail"
 msgstr "HTML tekst mail"
 
-#: src/pref-manager.c:1967
+#: src/pref-manager.c:2204
 #, fuzzy
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr "Vazhdo a mail bashkangjitur nga"
 
-#: src/pref-manager.c:1970
+#: src/pref-manager.c:2207
 #, fuzzy
 msgid "Send button always queues outgoing mail in outbox"
 msgstr "Dërgo gjithmonÃ« mail në"
 
-#: src/pref-manager.c:1973
+#: src/pref-manager.c:2210
 #, fuzzy
 msgid "Copy outgoing messages to sentbox"
 msgstr "Kopjo"
 
-#: src/pref-manager.c:1986 src/pref-manager.c:2108
+#: src/pref-manager.c:2225 src/pref-manager.c:2353
 msgid "Encoding"
 msgstr "Kodifikimi"
 
-#: src/pref-manager.c:2016
+#: src/pref-manager.c:2261
 #, fuzzy
 msgid "Status Messages"
 msgstr "Gjendja"
 
-#: src/pref-manager.c:2018
+#: src/pref-manager.c:2263
 msgid "Colors"
 msgstr "Ngjyrat"
 
-#: src/pref-manager.c:2020
+#: src/pref-manager.c:2265
 msgid "Message"
 msgstr "Mesazh"
 
-#: src/pref-manager.c:2022
+#: src/pref-manager.c:2267
 msgid "Sort and Thread"
 msgstr ""
 
-#: src/pref-manager.c:2047
+#: src/pref-manager.c:2292
 msgid "Main Window"
 msgstr "Ditarja Kryesore"
 
-#: src/pref-manager.c:2050
+#: src/pref-manager.c:2295
 #, fuzzy
 msgid "Use preview pane"
 msgstr "paneli"
 
-#: src/pref-manager.c:2052
+#: src/pref-manager.c:2297
 #, fuzzy
 msgid "Show mailbox statistics in left pane"
 msgstr "Shfaq statistikat në majtas paneli"
 
-#: src/pref-manager.c:2054
+#: src/pref-manager.c:2299
 #, fuzzy
 msgid "Use alternative main window layout"
 msgstr "dritare"
 
-#: src/pref-manager.c:2056
+#: src/pref-manager.c:2301
 #, fuzzy
 msgid "Automatically view message when mailbox opened"
 msgstr "shfaq mesazh"
 
-#: src/pref-manager.c:2062
+#: src/pref-manager.c:2307
 #, fuzzy
 msgid "PageUp/PageDown keys scroll message by:"
 msgstr "mesazh nga:"
 
-#: src/pref-manager.c:2073
+#: src/pref-manager.c:2318
 msgid "percent"
 msgstr ""
 
-#: src/pref-manager.c:2088
+#: src/pref-manager.c:2333
 #, fuzzy
 msgid "Display Progress Dialog"
 msgstr "Shfaq Progresi Dialogu"
 
-#: src/pref-manager.c:2113
+#: src/pref-manager.c:2358
 #, fuzzy
 msgid "Date encoding (for strftime):"
 msgstr "Data për:"
 
-#: src/pref-manager.c:2115
+#: src/pref-manager.c:2360
 #, fuzzy
 msgid "Selected headers:"
 msgstr "I zgjedhur:"
 
-#: src/pref-manager.c:2136 src/pref-manager.c:2141
+#: src/pref-manager.c:2381 src/pref-manager.c:2386
 #, fuzzy
 msgid "Information Messages"
 msgstr "Informacione"
 
-#: src/pref-manager.c:2145
+#: src/pref-manager.c:2390
 #, fuzzy
 msgid "Warning Messages"
 msgstr "Kujdes"
 
-#: src/pref-manager.c:2149
+#: src/pref-manager.c:2394
 #, fuzzy
 msgid "Error Messages"
 msgstr "Gabim"
 
-#: src/pref-manager.c:2153
+#: src/pref-manager.c:2398
 #, fuzzy
 msgid "Fatal Error Messages"
 msgstr "Gabim"
 
-#: src/pref-manager.c:2157
+#: src/pref-manager.c:2402
 #, fuzzy
 msgid "Debug Messages"
 msgstr "Gjetja dhe korrigjimi i gabimeve"
 
-#: src/pref-manager.c:2183
+#: src/pref-manager.c:2428
 #, fuzzy
 msgid "Message Colors"
 msgstr "Mesazh Ngjyrat"
 
-#: src/pref-manager.c:2188
+#: src/pref-manager.c:2433
 #, fuzzy, c-format
 msgid "Quote level %d color"
 msgstr "Thonjëz niveli"
 
-#: src/pref-manager.c:2201
+#: src/pref-manager.c:2446
 #, fuzzy
 msgid "Link Color"
 msgstr "Lidhje Ngjyra"
 
-#: src/pref-manager.c:2203
+#: src/pref-manager.c:2448
 msgid "Hyperlink color"
 msgstr ""
 
-#: src/pref-manager.c:2214
+#: src/pref-manager.c:2459
 #, fuzzy
 msgid "Composition Window"
 msgstr "Dritarja"
 
-#: src/pref-manager.c:2218
+#: src/pref-manager.c:2463
 #, fuzzy
 msgid "Invalid or incomplete address label color"
 msgstr "E pavlefshme etiketa"
 
-#: src/pref-manager.c:2243
+#: src/pref-manager.c:2488
 msgid "Fonts"
 msgstr "Gërmat"
 
-#: src/pref-manager.c:2258 src/pref-manager.c:2283
-#, fuzzy
-msgid "Select a font to use"
-msgstr "Zgjidh a gërmë"
-
-#: src/pref-manager.c:2261 src/pref-manager.c:2286
-msgid "Select..."
-msgstr "Zgjidh..."
-
-#: src/pref-manager.c:2268
+#: src/pref-manager.c:2497 src/pref-manager.c:2542
 #, fuzzy
 msgid "Message Font"
 msgstr "Mesazh Gërmat"
 
-#: src/pref-manager.c:2294
+#: src/pref-manager.c:2509 src/pref-manager.c:2568
 #, fuzzy
 msgid "Message Subject Font"
 msgstr "Mesazh Subjekti Gërmat"
 
-#: src/pref-manager.c:2317
+#: src/pref-manager.c:2532 src/pref-manager.c:2557
+#, fuzzy
+msgid "Select a font to use"
+msgstr "Zgjidh a gërmë"
+
+#: src/pref-manager.c:2535 src/pref-manager.c:2560
+msgid "Select..."
+msgstr "Zgjidh..."
+
+#: src/pref-manager.c:2592
 msgid "Sorting and Threading"
 msgstr ""
 
-#: src/pref-manager.c:2321
+#: src/pref-manager.c:2596
 #, fuzzy
 msgid "Default sort column"
 msgstr "prezgjedhur"
 
-#: src/pref-manager.c:2325
+#: src/pref-manager.c:2600
 #, fuzzy
 msgid "Default threading style"
 msgstr "E prezgjedhur"
 
-#: src/pref-manager.c:2330
+#: src/pref-manager.c:2605
 #, fuzzy
 msgid "Expand threads on open"
 msgstr "Shpalos degëzimi në hap"
 
-#: src/pref-manager.c:2406
+#: src/pref-manager.c:2681
 #, fuzzy
 msgid "Pspell Settings"
 msgstr "Rregullimet"
 
-#: src/pref-manager.c:2412
+#: src/pref-manager.c:2687
 #, fuzzy
 msgid "Spell Check Module"
 msgstr "Kontrolli Modulë"
 
-#: src/pref-manager.c:2418
+#: src/pref-manager.c:2693
 #, fuzzy
 msgid "Suggestion Level"
 msgstr "Etiketa"
 
 #. do the ignore length
-#: src/pref-manager.c:2423
+#: src/pref-manager.c:2698
 #, fuzzy
 msgid "Ignore words shorter than"
 msgstr "Shpërfill"
 
-#: src/pref-manager.c:2444
+#: src/pref-manager.c:2719
 #, fuzzy
 msgid "Miscellaneous Spelling Settings"
 msgstr "Të ndryshme Rregullimet"
 
-#: src/pref-manager.c:2446
+#: src/pref-manager.c:2721
 #, fuzzy
 msgid "Check signature"
 msgstr "Kontrolli"
 
-#: src/pref-manager.c:2447
+#: src/pref-manager.c:2722
 #, fuzzy
 msgid "Check quoted"
 msgstr "Kontrolli"
 
-#: src/pref-manager.c:2471
+#: src/pref-manager.c:2746
 msgid "Miscellaneous"
 msgstr "Të ndryshme"
 
-#: src/pref-manager.c:2473
+#: src/pref-manager.c:2748
 msgid "Debug"
 msgstr "Gjetja dhe korrigjimi i gabimeve"
 
-#: src/pref-manager.c:2474
+#: src/pref-manager.c:2749
 #, fuzzy
 msgid "Empty Trash on exit"
 msgstr "Bosh Koshi në"
 
-#: src/pref-manager.c:2480
+#: src/pref-manager.c:2755
 #, fuzzy
 msgid "Automatically close mailbox if unused more than"
 msgstr "mbylle tjetër"
 
-#: src/pref-manager.c:2508
+#: src/pref-manager.c:2783
 #, fuzzy
 msgid "Deleting Messages"
 msgstr "Duke eleminuar"
 
-#: src/pref-manager.c:2510
+#: src/pref-manager.c:2785
 #, fuzzy
 msgid ""
 "The following setting is global, but may be overridden\n"
 "for the selected mailbox using Mailbox -> Hide messages:"
 msgstr "është Fshih:"
 
-#: src/pref-manager.c:2518
+#: src/pref-manager.c:2793
 #, fuzzy
 msgid "Hide messages marked as deleted"
 msgstr "Fshih"
 
-#: src/pref-manager.c:2520
+#: src/pref-manager.c:2795
 #, fuzzy
 msgid "The following settings are global."
 msgstr "rregullimet."
 
-#: src/pref-manager.c:2525
+#: src/pref-manager.c:2800
 #, fuzzy
 msgid "Expunge deleted messages when mailbox is closed"
 msgstr "është"
 
-#: src/pref-manager.c:2532
+#: src/pref-manager.c:2807
 #, fuzzy
 msgid " ...and if mailbox is unused more than"
 msgstr "dhe është tjetër"
 
-#: src/pref-manager.c:2567
+#: src/pref-manager.c:2842
 msgid "Options"
 msgstr "Mundësitë"
 
-#: src/pref-manager.c:2570
+#: src/pref-manager.c:2845
 #, fuzzy
 msgid "Open Inbox upon startup"
 msgstr "Hap Inbox"
 
-#: src/pref-manager.c:2572
+#: src/pref-manager.c:2847
 #, fuzzy
 msgid "Check mail upon startup"
 msgstr "Kontrolli mail"
 
-#: src/pref-manager.c:2574
+#: src/pref-manager.c:2849
 #, fuzzy
 msgid "Remember open mailboxes between sessions"
 msgstr "Kujto hap"
 
-#: src/pref-manager.c:2588
+#: src/pref-manager.c:2863
 #, fuzzy
 msgid "Folder Scanning"
 msgstr "Kartelë"
 
-#: src/pref-manager.c:2590
+#: src/pref-manager.c:2865
 #, fuzzy
 msgid ""
 "Choose depth 1 for fast startup; this defers scanning some folders.\n"
 "To see more of the tree at startup, choose a greater depth."
 msgstr "për tjetër nga degëzimi a."
 
-#: src/pref-manager.c:2600
+#: src/pref-manager.c:2875
 #, fuzzy
 msgid "Scan local folders to depth"
 msgstr "Skanim lokal"
 
-#: src/pref-manager.c:2613
+#: src/pref-manager.c:2888
 #, fuzzy
 msgid "Scan IMAP folders to depth"
 msgstr "Skanim IMAP"
 
-#: src/pref-manager.c:2678
+#: src/pref-manager.c:2953
 #, fuzzy
 msgid "Address Book Name"
 msgstr "Adresa Libri Emri"
 
-#: src/pref-manager.c:2686
+#: src/pref-manager.c:2961
 #, fuzzy
 msgid "Expand aliases"
 msgstr "Shpalos"
 
-#: src/pref-manager.c:2705
+#: src/pref-manager.c:2980
 #, fuzzy
 msgid "_Set as default"
 msgstr "prezgjedhur"
 
-#: src/pref-manager.c:2861
+#: src/pref-manager.c:3138
 #, fuzzy
 msgid "Remote POP3 mailbox..."
 msgstr "Në distancë."
 
-#: src/pref-manager.c:2998
+#: src/pref-manager.c:3303 src/pref-manager.c:3317
 #, fuzzy
 msgid "Show nothing"
 msgstr "Shfaq asgjë"
 
-#: src/pref-manager.c:2999
+#: src/pref-manager.c:3305 src/pref-manager.c:3318
 #, fuzzy
 msgid "Show dialog"
 msgstr "Shfaq dialog"
 
-#: src/pref-manager.c:3000
+#: src/pref-manager.c:3307 src/pref-manager.c:3319
 #, fuzzy
 msgid "Show in list"
 msgstr "Shfaq në lista"
 
-#: src/pref-manager.c:3001
+#: src/pref-manager.c:3309 src/pref-manager.c:3320
 #, fuzzy
 msgid "Show in status bar"
 msgstr "Shfaq në gjendja"
 
-#: src/pref-manager.c:3002
+#: src/pref-manager.c:3311 src/pref-manager.c:3321
 #, fuzzy
 msgid "Print to console"
 msgstr "Printo"
 
-#: src/pref-manager.c:3022
+#: src/pref-manager.c:3351 src/pref-manager.c:3357
 #, fuzzy
 msgid "Ask me"
 msgstr "Pyet"
 
-#: src/pref-manager.c:3138
+#: src/pref-manager.c:3490
 #, fuzzy, c-format
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Gabim lidhje j"
 
-#: src/print.c:258 src/print.c:724
+#: src/print.c:259 src/print.c:725
 #, fuzzy, c-format
 msgid "Page: %i/%i"
 msgstr "Faqja"
 
-#: src/print.c:666
+#: src/print.c:667
 #, fuzzy
 msgid ""
 "Preparing an HTML part, which must start on a new page.\n"
@@ -4938,77 +5054,82 @@ msgstr "HTML nisje në a i ri faqe?"
 
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:981
+#: src/print.c:982
 msgid "Type:"
 msgstr "Lloji:"
 
-#: src/print.c:984
+#: src/print.c:985
 msgid "File name:"
 msgstr "Emri i file:"
 
-#: src/print.c:1526
+#: src/print.c:1301
+#, fuzzy, c-format
+msgid "This is an inline %s signed %s message part:"
+msgstr "është mesazh j"
+
+#: src/print.c:1548
 #, fuzzy
 msgid "Font available for printing"
 msgstr "Gërmat për"
 
-#: src/print.c:1532
+#: src/print.c:1554
 #, fuzzy, c-format
 msgid "Font <b>not</b> available for printing. Closest: %s"
 msgstr "Gërmat<b> nuk</b> për"
 
-#: src/print.c:1545
+#: src/print.c:1567
 msgid "Select Font"
 msgstr "Zgjidh gërmat"
 
-#: src/print.c:1578
+#: src/print.c:1600
 msgid "Change..."
 msgstr "Ndrysho..."
 
-#: src/print.c:1612
+#: src/print.c:1634
 #, fuzzy
 msgid "Print message"
 msgstr "Printo mesazh"
 
 #. create a 2nd notebook page for the fonts
-#: src/print.c:1623
+#: src/print.c:1645
 #, fuzzy
 msgid "_Fonts"
 msgstr "Gërmat"
 
-#: src/print.c:1626
+#: src/print.c:1648
 #, fuzzy
 msgid "Header font"
 msgstr "Kreu i faqes gërmë"
 
-#: src/print.c:1628
+#: src/print.c:1650
 #, fuzzy
 msgid "Body font"
 msgstr "Trupi gërmë"
 
-#: src/print.c:1630
+#: src/print.c:1652
 #, fuzzy
 msgid "Footer font"
 msgstr "Fund faqe gërmë"
 
 #. highlight cited stuff
-#: src/print.c:1634
+#: src/print.c:1656
 #, fuzzy
 msgid "Highlight cited text"
 msgstr "Vër në dukje tekst"
 
-#: src/print.c:1638
+#: src/print.c:1660
 #, fuzzy
 msgid "_Enable highlighting of cited text"
 msgstr "Aktivo nga tekst"
 
-#: src/print.c:1664
+#: src/print.c:1686
 #, fuzzy, c-format
 msgid ""
 "Balsa could not find font \"%s\".\n"
 "Use the \"Fonts\" page on the \"Print message\" dialog to change it."
 msgstr "Balsa nuk gjej gërmë Gërmat faqe në Printo mesazh dialog."
 
-#: src/print.c:1769
+#: src/print.c:1791
 #, fuzzy
 msgid "Balsa: message print preview"
 msgstr "Balsa mesazh printo"
@@ -5025,35 +5146,35 @@ msgid ""
 "Filters may not be correct."
 msgstr "Gabim nuk."
 
-#: src/save-restore.c:716
+#: src/save-restore.c:717
 #, fuzzy
 msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr "nuk tekst."
 
-#: src/save-restore.c:975
+#: src/save-restore.c:976
 #, fuzzy
 msgid ""
 "The option not to send \"format=flowed\" is now on the Options menu of the "
 "compose window."
 msgstr "nuk është në Mundësitë menuja nga dritare."
 
-#: src/save-restore.c:1007
+#: src/save-restore.c:1008
 #, fuzzy
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr "a është në Mundësitë menuja nga dritare."
 
-#: src/save-restore.c:1753
+#: src/save-restore.c:1754
 #, fuzzy
 msgid "Filter with no condition was ignored"
 msgstr "Filtri me jo"
 
-#: src/save-restore.c:1931
+#: src/save-restore.c:1934
 #, fuzzy
 msgid "Error opening GConf database\n"
 msgstr "Gabim Bankë të dhënash (databazë) j"
 
-#: src/save-restore.c:1939 src/save-restore.c:1950
+#: src/save-restore.c:1942 src/save-restore.c:1953
 #, fuzzy, c-format
 msgid "Error setting GConf field: %s\n"
 msgstr "Gabim j"
@@ -5276,7 +5397,7 @@ msgstr "Bashkangjit Mesazh"
 msgid "Sen_d"
 msgstr "Dërgo"
 
-#: src/sendmsg-window.c:322 src/sendmsg-window.c:509 src/toolbar-factory.c:121
+#: src/sendmsg-window.c:322 src/sendmsg-window.c:509 src/toolbar-factory.c:124
 msgid "Send this message"
 msgstr "Nise këtë mesazh"
 
@@ -5432,19 +5553,19 @@ msgstr "Sh dhe Mbyll"
 msgid "Send _Later"
 msgstr "Dërgo"
 
-#: src/sendmsg-window.c:735
+#: src/sendmsg-window.c:737
 #, fuzzy, c-format
 msgid ""
 "The message to '%s' is modified.\n"
 "Save message to Draftbox?"
 msgstr "mesazh është mesazh?"
 
-#: src/sendmsg-window.c:989
+#: src/sendmsg-window.c:991
 #, fuzzy
 msgid "Gnome editor is not defined in your preferred applications."
 msgstr "është nuk në."
 
-#: src/sendmsg-window.c:1438
+#: src/sendmsg-window.c:1456
 #, fuzzy, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -5455,121 +5576,120 @@ msgid ""
 msgstr ""
 "po nuk letra vetë a mesazh i jashtëm trupi Shënim të drejtat j bashkangjit?"
 
-#: src/sendmsg-window.c:1449
+#: src/sendmsg-window.c:1467
 #, fuzzy
 msgid "Attach as Reference?"
 msgstr "Bashkangjit Referime?"
 
-#: src/sendmsg-window.c:1539
+#: src/sendmsg-window.c:1557
 msgid "Remove"
 msgstr "Hiq"
 
-#: src/sendmsg-window.c:1550
+#: src/sendmsg-window.c:1568
 #, fuzzy
 msgid "attach as reference"
 msgstr "bashkangjit"
 
-#: src/sendmsg-window.c:1556
+#: src/sendmsg-window.c:1574
 #, fuzzy
 msgid "attach as file"
 msgstr "bashkangjit"
 
-#: src/sendmsg-window.c:1690
+#: src/sendmsg-window.c:1708
 #, fuzzy, c-format
 msgid "Error converting \"%s\" to UTF-8: %s\n"
 msgstr "Gabim j"
 
-#: src/sendmsg-window.c:1727
+#: src/sendmsg-window.c:1745
 #, fuzzy, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "merr në"
 
-#: src/sendmsg-window.c:1732
+#: src/sendmsg-window.c:1750
 #, fuzzy, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Bashkangjitur është nuk a i rregullt."
 
-#: src/sendmsg-window.c:1735
+#: src/sendmsg-window.c:1753
 #, fuzzy, c-format
 msgid "File %s cannot be read\n"
 msgstr "File j"
 
-#: src/sendmsg-window.c:1779
+#: src/sendmsg-window.c:1797
 #, fuzzy
 msgid "Attach file"
 msgstr "Bashkangjit"
 
-#: src/sendmsg-window.c:1876 src/sendmsg-window.c:1939
-#: src/sendmsg-window.c:3271
+#: src/sendmsg-window.c:1894 src/sendmsg-window.c:1957
+#: src/sendmsg-window.c:3355
 #, fuzzy
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
 msgstr "mesazh nuk hapësirë"
 
-#. From:
-#: src/sendmsg-window.c:2134
+#: src/sendmsg-window.c:2178 src/sendmsg-window.c:2203
 #, fuzzy
 msgid "F_rom:"
 msgstr "F:"
 
 #. Subject:
-#: src/sendmsg-window.c:2146
+#: src/sendmsg-window.c:2218
 #, fuzzy
 msgid "S_ubject:"
 msgstr "S:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: src/sendmsg-window.c:2160
+#: src/sendmsg-window.c:2232
 #, fuzzy
 msgid "F_cc:"
 msgstr "F:"
 
 #. Reply To:
-#: src/sendmsg-window.c:2191
+#: src/sendmsg-window.c:2263
 #, fuzzy
 msgid "_Reply To:"
 msgstr "Përgjigju Për:"
 
 #. Attachment list
-#: src/sendmsg-window.c:2196
+#: src/sendmsg-window.c:2268
 #, fuzzy
 msgid "_Attachments:"
 msgstr "Të bashkangjitur:"
 
-#: src/sendmsg-window.c:2438
+#: src/sendmsg-window.c:2510
 msgid "you"
 msgstr ""
 
-#: src/sendmsg-window.c:2447
+#: src/sendmsg-window.c:2519
 #, fuzzy, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "mesazh j"
 
-#: src/sendmsg-window.c:2482
+#: src/sendmsg-window.c:2554
 #, fuzzy, c-format
 msgid "Message-ID: %s\n"
 msgstr "Mesazh ID j"
 
-#: src/sendmsg-window.c:2488
+#: src/sendmsg-window.c:2560
 msgid "References:"
 msgstr ""
 
-#: src/sendmsg-window.c:2499
+#: src/sendmsg-window.c:2571
 #, fuzzy, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Në j"
 
-#: src/sendmsg-window.c:2501
+#: src/sendmsg-window.c:2573
 #, fuzzy, c-format
 msgid "%s wrote:\n"
 msgstr "j"
 
-#: src/sendmsg-window.c:3427
+#: src/sendmsg-window.c:3511
 msgid "Choose charset"
 msgstr ""
 
-#: src/sendmsg-window.c:3434
+#: src/sendmsg-window.c:3518
 #, fuzzy
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
@@ -5577,17 +5697,17 @@ msgid ""
 "(choose Generic UTF-8 if unsure)."
 msgstr "është nuk në ASCII j I përgjithshëm."
 
-#: src/sendmsg-window.c:3501
+#: src/sendmsg-window.c:3585
 #, fuzzy, c-format
 msgid "Could not open the file %s.\n"
 msgstr "nuk hap j"
 
-#: src/sendmsg-window.c:3523
+#: src/sendmsg-window.c:3607
 #, fuzzy
 msgid "Include file"
 msgstr "Include"
 
-#: src/sendmsg-window.c:3818
+#: src/sendmsg-window.c:3926
 #, fuzzy, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5595,7 +5715,7 @@ msgid ""
 "For multi-language messages, choose UTF-8."
 msgstr "mesazh në a për mesazh."
 
-#: src/sendmsg-window.c:3859
+#: src/sendmsg-window.c:3967
 #, fuzzy
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
@@ -5605,77 +5725,77 @@ msgstr ""
 "Ti modaliteti për a mesazh me Zmadho modaliteti i pari dhe Ti zgjidh "
 "modaliteti mesazh Bëje?"
 
-#: src/sendmsg-window.c:3875
+#: src/sendmsg-window.c:3983
 #, fuzzy, c-format
 msgid "sending message with gpg mode %d"
 msgstr "mesazh me modaliteti"
 
-#: src/sendmsg-window.c:3922
+#: src/sendmsg-window.c:4030
 #, fuzzy
 msgid "Message could not be created"
 msgstr "Mesazh nuk"
 
-#: src/sendmsg-window.c:3924
+#: src/sendmsg-window.c:4032
 #, fuzzy
 msgid "Message could not be queued in outbox"
 msgstr "Mesazh nuk në"
 
-#: src/sendmsg-window.c:3926
+#: src/sendmsg-window.c:4034
 #, fuzzy
 msgid "Message could not be saved in sentbox"
 msgstr "Mesazh nuk në"
 
-#: src/sendmsg-window.c:3928
+#: src/sendmsg-window.c:4036
 #, fuzzy
 msgid "Message could not be sent"
 msgstr "Mesazh nuk"
 
-#: src/sendmsg-window.c:3932
+#: src/sendmsg-window.c:4040
 #, fuzzy, c-format
 msgid "Send failed: %s"
 msgstr "Filtër i pavlefshëm: %s"
 
-#: src/sendmsg-window.c:4016
+#: src/sendmsg-window.c:4128
 #, fuzzy
 msgid "Could not postpone message."
 msgstr "nuk mesazh."
 
-#: src/sendmsg-window.c:4030
+#: src/sendmsg-window.c:4142
 #, fuzzy
 msgid "Message postponed."
 msgstr "Mesazh."
 
-#: src/sendmsg-window.c:4046
+#: src/sendmsg-window.c:4158
 #, fuzzy, c-format
 msgid "Could not open draftbox: %s"
 msgstr "nuk hap"
 
-#: src/sendmsg-window.c:4068
+#: src/sendmsg-window.c:4180
 #, fuzzy
 msgid "Message saved."
 msgstr "Mesazh"
 
-#: src/sendmsg-window.c:4230
+#: src/sendmsg-window.c:4342
 #, fuzzy, c-format
 msgid "Could not compile %s"
 msgstr "nuk"
 
-#: src/sendmsg-window.c:4718
+#: src/sendmsg-window.c:4836
 #, fuzzy, c-format
 msgid "Reply to %s: %s"
 msgstr "Përgjigju"
 
-#: src/sendmsg-window.c:4723
+#: src/sendmsg-window.c:4841
 #, fuzzy, c-format
 msgid "Forward message to %s: %s"
 msgstr "Vazhdo mesazh"
 
-#: src/sendmsg-window.c:4727
+#: src/sendmsg-window.c:4845
 #, fuzzy, c-format
 msgid "Continue message to %s: %s"
 msgstr "Vazhdo mesazh"
 
-#: src/sendmsg-window.c:4731
+#: src/sendmsg-window.c:4849
 #, fuzzy, c-format
 msgid "New message to %s: %s"
 msgstr "E re mesazh"
@@ -5729,310 +5849,334 @@ msgstr "jo"
 msgid "Store Address"
 msgstr "Adresa"
 
-#: src/store-address.c:193
+#: src/store-address.c:196
 #, fuzzy
 msgid "Save this address and close the dialog?"
 msgstr "Ruaj dhe mbylle dialog?"
 
-#: src/store-address.c:210
+#: src/store-address.c:214
 #, fuzzy
 msgid "No address book selected...."
 msgstr "Jo libri."
 
-#: src/store-address.c:223
+#: src/store-address.c:227
 #, fuzzy
 msgid "Address could not be written to this address book."
 msgstr "Adresa nuk libri."
 
-#: src/store-address.c:226
+#: src/store-address.c:230
 #, fuzzy
 msgid "Address book could not be accessed."
 msgstr "Adresa libri nuk."
 
-#: src/store-address.c:228
+#: src/store-address.c:232
 #, fuzzy
 msgid "This mail address is already in this address book."
 msgstr "mail është në libri."
 
-#: src/store-address.c:231
+#: src/store-address.c:235
 #, fuzzy
 msgid "Unexpected address book error. Report it."
 msgstr "libri gabim Raporti."
 
-#: src/store-address.c:247
+#: src/store-address.c:251
 #, fuzzy
 msgid "Choose Address Book"
 msgstr "Adresa Libri"
 
-#: src/store-address.c:290
+#: src/store-address.c:316
 #, fuzzy
 msgid "Choose Address"
 msgstr "Adresa"
 
-#: src/toolbar-factory.c:91
+#: src/toolbar-factory.c:90
 msgid "Separator"
 msgstr "Ndarës"
 
-#: src/toolbar-factory.c:92
+#: src/toolbar-factory.c:91
 msgid "Check"
 msgstr "Kontrolli"
 
-#: src/toolbar-factory.c:93
+#: src/toolbar-factory.c:92
 #, fuzzy
 msgid "Check for new email"
 msgstr "Kontrolli për i ri"
 
-#: src/toolbar-factory.c:94
+#: src/toolbar-factory.c:93
 msgid "Compose"
 msgstr "Kompozo"
 
-#: src/toolbar-factory.c:95
+#: src/toolbar-factory.c:94
 #, fuzzy
 msgid "Compose message"
 msgstr "Kompozo mesazh"
 
-#: src/toolbar-factory.c:96
+#: src/toolbar-factory.c:95
 msgid "Continue"
 msgstr "Vazhdo"
 
-#: src/toolbar-factory.c:97
+#: src/toolbar-factory.c:96
 #, fuzzy
 msgid "Continue message"
 msgstr "Vazhdo mesazh"
 
-#: src/toolbar-factory.c:98
+#: src/toolbar-factory.c:97
 msgid "Reply"
 msgstr "Përgjigju"
 
-#: src/toolbar-factory.c:100
+#: src/toolbar-factory.c:99
 #, fuzzy
 msgid ""
 "Reply\n"
 "to all"
 msgstr "Përgjigju"
 
-#: src/toolbar-factory.c:101
+#: src/toolbar-factory.c:100
 #, fuzzy
 msgid "Reply to all recipients"
 msgstr "Përgjigju"
 
-#: src/toolbar-factory.c:102
+#: src/toolbar-factory.c:101
 #, fuzzy
 msgid ""
 "Reply\n"
 "to group"
 msgstr "Përgjigju grupi"
 
-#: src/toolbar-factory.c:104
+#: src/toolbar-factory.c:103
 #, fuzzy
 msgid "Forward"
 msgstr "Vazhdo"
 
-#: src/toolbar-factory.c:106
+#: src/toolbar-factory.c:105
 msgid "Previous"
 msgstr "Paraardhëse"
 
-#: src/toolbar-factory.c:107
+#: src/toolbar-factory.c:106
 #, fuzzy
 msgid "Open previous"
 msgstr "Hap paraardhësja"
 
-#: src/toolbar-factory.c:108
+#: src/toolbar-factory.c:107
 msgid "Next"
 msgstr "Vazhdo"
 
-#: src/toolbar-factory.c:109
+#: src/toolbar-factory.c:108
 #, fuzzy
 msgid "Open next"
 msgstr "Hap në vazhdim"
 
-#: src/toolbar-factory.c:110
+#: src/toolbar-factory.c:109
 #, fuzzy
 msgid ""
 "Next\n"
 "unread"
 msgstr "Vazhdo"
 
-#: src/toolbar-factory.c:111
+#: src/toolbar-factory.c:110
 #, fuzzy
 msgid "Open next unread message"
 msgstr "Hap në vazhdim mesazh"
 
-#: src/toolbar-factory.c:112
+#: src/toolbar-factory.c:111
 #, fuzzy
 msgid ""
 "Next\n"
 "flagged"
 msgstr "Vazhdo"
 
-#: src/toolbar-factory.c:113
+#: src/toolbar-factory.c:112
 #, fuzzy
 msgid "Open next flagged message"
 msgstr "Hap në vazhdim mesazh"
 
+#: src/toolbar-factory.c:113
+#, fuzzy
+msgid ""
+"Previous\n"
+"part"
+msgstr "Paraardhëse Pjesa"
+
 #: src/toolbar-factory.c:114
+#, fuzzy
+msgid "View previous part of message"
+msgstr "Paraardhëse në mesazh"
+
+#: src/toolbar-factory.c:115
+#, fuzzy
+msgid ""
+"Next\n"
+"part"
+msgstr "Vazhdo Pjesa"
+
+#: src/toolbar-factory.c:116
+#, fuzzy
+msgid "View next part of message"
+msgstr "Vazhdo në mesazh"
+
+#: src/toolbar-factory.c:117
 #, fuzzy
 msgid ""
 "Trash /\n"
 "Delete"
 msgstr "Koshi"
 
-#: src/toolbar-factory.c:115
+#: src/toolbar-factory.c:118
 #, fuzzy
 msgid "Move the current message to trash"
 msgstr "Lëvize mesazh koshi"
 
-#: src/toolbar-factory.c:116
+#: src/toolbar-factory.c:119
 msgid "Postpone"
 msgstr ""
 
-#: src/toolbar-factory.c:117
+#: src/toolbar-factory.c:120
 #, fuzzy
 msgid "Postpone current message"
 msgstr "mesazh"
 
-#: src/toolbar-factory.c:118
+#: src/toolbar-factory.c:121
 msgid "Print"
 msgstr "Printo"
 
-#: src/toolbar-factory.c:120
+#: src/toolbar-factory.c:123
 msgid "Send"
 msgstr "Dërgo"
 
-#: src/toolbar-factory.c:122
+#: src/toolbar-factory.c:125
 msgid "Exchange"
 msgstr "Exchange"
 
-#: src/toolbar-factory.c:124
+#: src/toolbar-factory.c:127
 msgid "Attach"
 msgstr "Bashkangjit"
 
-#: src/toolbar-factory.c:125
+#: src/toolbar-factory.c:128
 #, fuzzy
 msgid "Add attachments to this message"
 msgstr "Shto mesazh"
 
-#: src/toolbar-factory.c:126
+#: src/toolbar-factory.c:129
 msgid "Save"
 msgstr "Ruaj"
 
-#: src/toolbar-factory.c:127
+#: src/toolbar-factory.c:130
 #, fuzzy
 msgid "Save the current item"
 msgstr "Ruaj element"
 
-#: src/toolbar-factory.c:128
+#: src/toolbar-factory.c:131
 msgid "Identity"
 msgstr ""
 
-#: src/toolbar-factory.c:129
+#: src/toolbar-factory.c:132
 #, fuzzy
 msgid "Set identity to use for this message"
 msgstr "identiteti për mesazh"
 
-#: src/toolbar-factory.c:131
+#: src/toolbar-factory.c:134
 #, fuzzy
 msgid "Run a spell check"
 msgstr "Ekzekuto a"
 
-#: src/toolbar-factory.c:132 src/toolbar-factory.c:142
+#: src/toolbar-factory.c:135 src/toolbar-factory.c:145
 msgid "Close"
 msgstr "Mbyll"
 
-#: src/toolbar-factory.c:133
+#: src/toolbar-factory.c:136
 #, fuzzy
 msgid "Close the compose window"
 msgstr "Mbyll dritare"
 
-#: src/toolbar-factory.c:134
+#: src/toolbar-factory.c:137
 #, fuzzy
 msgid ""
 "Toggle\n"
 "new"
 msgstr "Kavo"
 
-#: src/toolbar-factory.c:135
+#: src/toolbar-factory.c:138
 #, fuzzy
 msgid "Toggle new message flag"
 msgstr "Kavo i ri mesazh"
 
-#: src/toolbar-factory.c:136
+#: src/toolbar-factory.c:139
 msgid "Mark all"
 msgstr ""
 
-#: src/toolbar-factory.c:137
+#: src/toolbar-factory.c:140
 #, fuzzy
 msgid "Mark all messages in current mailbox"
 msgstr "në"
 
-#: src/toolbar-factory.c:138
+#: src/toolbar-factory.c:141
 #, fuzzy
 msgid ""
 "All\n"
 "headers"
 msgstr "Gjithçka"
 
-#: src/toolbar-factory.c:139
+#: src/toolbar-factory.c:142
 #, fuzzy
 msgid "Show all headers"
 msgstr "Shfaq"
 
-#: src/toolbar-factory.c:140
+#: src/toolbar-factory.c:143
 msgid "Empty Trash"
 msgstr "Zbraz Koshin"
 
-#: src/toolbar-factory.c:143
+#: src/toolbar-factory.c:146
 #, fuzzy
 msgid "Close current mailbox"
 msgstr "Mbyll"
 
-#: src/toolbar-factory.c:144
+#: src/toolbar-factory.c:147
 #, fuzzy
 msgid "Msg Preview"
 msgstr "Shikoje"
 
-#: src/toolbar-factory.c:145
+#: src/toolbar-factory.c:148
 #, fuzzy
 msgid "Show preview pane"
 msgstr "Shfaq paneli"
 
-#: src/toolbar-factory.c:147
+#: src/toolbar-factory.c:150
 msgid "Sign"
 msgstr "Sinj"
 
-#: src/toolbar-factory.c:148
+#: src/toolbar-factory.c:151
 #, fuzzy
 msgid "Sign message using GPG"
 msgstr "Sinj mesazh"
 
-#: src/toolbar-factory.c:149
+#: src/toolbar-factory.c:152
 msgid "Encrypt"
 msgstr "Kriptimi"
 
-#: src/toolbar-factory.c:150
+#: src/toolbar-factory.c:153
 #, fuzzy
 msgid "Encrypt message using GPG"
 msgstr "Kriptimi mesazh"
 
-#: src/toolbar-factory.c:152
+#: src/toolbar-factory.c:155
 msgid "Undo"
 msgstr "Anullo"
 
-#: src/toolbar-factory.c:153
+#: src/toolbar-factory.c:156
 #, fuzzy
 msgid "Undo most recent change"
 msgstr "Anullo"
 
-#: src/toolbar-factory.c:154
+#: src/toolbar-factory.c:157
 msgid "Redo"
 msgstr "Përsërite"
 
-#: src/toolbar-factory.c:155
+#: src/toolbar-factory.c:158
 #, fuzzy
 msgid "Redo most recent change"
 msgstr "Përsërite"
 
-#: src/toolbar-factory.c:237
+#: src/toolbar-factory.c:249
 #, fuzzy, c-format
 msgid "Unknown toolbar icon \"%s\""
 msgstr "Nuk njihet ikonë"
@@ -6073,32 +6217,48 @@ msgid "Error displaying toolbar help: %s\n"
 msgstr "Gabim ndihmë j"
 
 #. Preview display
-#: src/toolbar-prefs.c:412
+#: src/toolbar-prefs.c:413
 msgid "Preview"
 msgstr "Shikoje"
 
-#: src/toolbar-prefs.c:440
+#: src/toolbar-prefs.c:441
 #, fuzzy
 msgid "_Restore toolbar to standard buttons"
 msgstr "Riparo"
 
-#: src/toolbar-prefs.c:459
+#: src/toolbar-prefs.c:460
 #, fuzzy
 msgid "Available buttons"
 msgstr "Në dispozicion"
 
-#: src/toolbar-prefs.c:475
+#: src/toolbar-prefs.c:476
 #, fuzzy
 msgid "Current toolbar"
 msgstr "Aktual"
 
-#: src/toolbar-prefs.c:492
+#: src/toolbar-prefs.c:493
 msgid "Up"
 msgstr "Sipër"
 
-#: src/toolbar-prefs.c:508
+#: src/toolbar-prefs.c:509
 msgid "Down"
 msgstr "Poshtë"
+
+#, fuzzy
+#~ msgid "IMAP SEARCH UNSEEN request failed for mailbox %s"
+#~ msgstr "IMAP për"
+
+#, fuzzy
+#~ msgid "POP3 temp mailbox %s was not removed (system error message: %s)"
+#~ msgstr "nuk sistemi gabim mesazh"
+
+#, fuzzy
+#~ msgid "Source mailbox (%s) is readonly. Cannot move messages"
+#~ msgstr "Burimi është"
+
+#, fuzzy
+#~ msgid "The signature is invalid (Note: might be caused by gmime bug!)."
+#~ msgstr "është I pavlefshëm Shënim nga difekt."
 
 #, fuzzy
 #~ msgid ""

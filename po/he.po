@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD.he\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-20 22:49+0100\n"
+"POT-Creation-Date: 2004-04-11 00:52+0100\n"
 "PO-Revision-Date: 2003-06-26 00:38+0300\n"
 "Last-Translator: Gil 'Dolfin' Osher <dolfin@rpg.org.il>\n"
 "Language-Team: Hebrew <he@li.org>\n"
@@ -45,32 +45,32 @@ msgstr "אין שם"
 msgid "TLS requested but not compiled in"
 msgstr "בקשה ל-TLS, אולם תמיכה ב-TLS לא הודרה לגירסה זו."
 
-#: libbalsa/address-book.c:399 libbalsa/filter-error.c:45
+#: libbalsa/address-book.c:400 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "אין שגיאות"
 
-#: libbalsa/address-book.c:400
+#: libbalsa/address-book.c:401
 msgid "Cannot read from address book"
 msgstr "לא ניתן לטעון את ספר הכתובות"
 
-#: libbalsa/address-book.c:401
+#: libbalsa/address-book.c:402
 msgid "Cannot write to address book"
 msgstr "לא ניתן לכתוב בספר הכתובות"
 
-#: libbalsa/address-book.c:402
+#: libbalsa/address-book.c:403
 msgid "Cannot connect to server"
 msgstr "לא ניתן ליצור קשר עם השרת"
 
-#: libbalsa/address-book.c:403
+#: libbalsa/address-book.c:404
 msgid "Cannot search in the address book"
 msgstr "לא ניתן לחפש בספר הכתובות"
 
-#: libbalsa/address-book.c:405
+#: libbalsa/address-book.c:406
 msgid "Cannot add duplicate entry"
 msgstr "לא ניתן להוסיף רשומה קיימת"
 
-#: libbalsa/address-book.c:406 src/main-window.c:2158
-#: src/sendmsg-window.c:4047
+#: libbalsa/address-book.c:407 src/main-window.c:2204 src/main-window.c:4192
+#: src/sendmsg-window.c:4159
 msgid "Unknown error"
 msgstr "שגיאה לא ידועה"
 
@@ -82,27 +82,27 @@ msgstr "שם _מוצג׃"
 msgid "_First Name:"
 msgstr "שם _פרטי׃"
 
-#: libbalsa/address.c:401
+#: libbalsa/address.c:402
 msgid "_Middle Name:"
 msgstr "שם _אמצעי׃"
 
-#: libbalsa/address.c:402
+#: libbalsa/address.c:404
 msgid "_Last Name:"
 msgstr "שם מ_שפחה׃"
 
-#: libbalsa/address.c:403
+#: libbalsa/address.c:405
 msgid "_Nickname:"
 msgstr "_כינוי׃"
 
-#: libbalsa/address.c:404
+#: libbalsa/address.c:406
 msgid "O_rganization:"
 msgstr "א_רגון׃"
 
-#: libbalsa/address.c:405
+#: libbalsa/address.c:407
 msgid "_Email Address:"
 msgstr "כתובת _דוא\"ל׃"
 
-#: libbalsa/body.c:115 libbalsa/mailbox_local.c:976 libbalsa/message.c:914
+#: libbalsa/body.c:115 libbalsa/mailbox_local.c:975 libbalsa/message.c:835
 msgid "(No subject)"
 msgstr "(ללא נושא)"
 
@@ -122,7 +122,7 @@ msgstr "שגיאה בתחביר הביטוי הסדיר"
 msgid "Attempt to apply an invalid filter"
 msgstr "ניסיון להפעיל מסנן לא תקין"
 
-#: libbalsa/filter-file.c:139
+#: libbalsa/filter-file.c:141
 #, c-format
 msgid "Invalid filters %s for mailbox %s"
 msgstr "מסננים לא תקינים %s לתיבת דואר %s"
@@ -136,24 +136,32 @@ msgstr "לא מסוגל לטעון את גוף ההודעה כך שתתאים ל
 msgid "Invalid filter: %s"
 msgstr "מסנן לא תקין׃ %s"
 
-#: libbalsa/filter.c:303 libbalsa/filter.c:324
+#: libbalsa/filter.c:303 libbalsa/filter.c:326
 #, c-format
 msgid "Bad mailbox name for filter: %s"
 msgstr "שם תיבת הדואר עבור המסנן׃ %s אינו תקין"
 
 #: libbalsa/filter.c:307
-msgid "Error when copying messages"
+#, fuzzy, c-format
+msgid "Error when copying messages: %s"
 msgstr "שגיאה בהעתקת הודעות"
 
-#: libbalsa/filter.c:316
-msgid "Error when trashing messages"
+#: libbalsa/filter.c:317
+#, fuzzy, c-format
+msgid "Error when trashing messages: %s"
 msgstr "שגיאה בעת זריקת הודעות לאשפה"
 
-#: libbalsa/filter.c:328
-msgid "Error when moving messages"
+#: libbalsa/filter.c:330
+#, fuzzy, c-format
+msgid "Error when moving messages: %s"
 msgstr "שגיאה בעת העברת הודעות"
 
-#: libbalsa/gmime-gpgme-context.c:287 libbalsa/rfc3156.c:1383
+#: libbalsa/gmime-application-pkcs7.c:246
+#: libbalsa/gmime-application-pkcs7.c:389
+msgid "Failed to decrypt MIME part: parse error"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:288 libbalsa/rfc3156.c:1501
 #, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -164,7 +172,7 @@ msgstr ""
 "\n"
 "מפתח׃ %s"
 
-#: libbalsa/gmime-gpgme-context.c:292 libbalsa/rfc3156.c:1388
+#: libbalsa/gmime-gpgme-context.c:293 libbalsa/rfc3156.c:1506
 #, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -175,216 +183,216 @@ msgstr ""
 "\n"
 "מפתח׃ %s"
 
-#: libbalsa/gmime-gpgme-context.c:410 libbalsa/gmime-gpgme-context.c:492
-#: libbalsa/gmime-gpgme-context.c:503 libbalsa/gmime-gpgme-context.c:618
-#: libbalsa/gmime-gpgme-context.c:708
+#: libbalsa/gmime-gpgme-context.c:411 libbalsa/gmime-gpgme-context.c:493
+#: libbalsa/gmime-gpgme-context.c:504 libbalsa/gmime-gpgme-context.c:619
+#: libbalsa/gmime-gpgme-context.c:709
 #, fuzzy, c-format
 msgid "%s: could not get data from stream: %s"
 msgstr "gpgme אינו יכול לקבל נתונים מהקובץ׃ %s"
 
-#: libbalsa/gmime-gpgme-context.c:418 libbalsa/gmime-gpgme-context.c:627
-#: libbalsa/gmime-gpgme-context.c:716
+#: libbalsa/gmime-gpgme-context.c:419 libbalsa/gmime-gpgme-context.c:628
+#: libbalsa/gmime-gpgme-context.c:717
 #, fuzzy, c-format
 msgid "%s: could not create new data object: %s"
 msgstr "gpgme אינו יכול ליצור אובייקט נתונים׃ %s"
 
-#: libbalsa/gmime-gpgme-context.c:428
+#: libbalsa/gmime-gpgme-context.c:429
 #, fuzzy, c-format
 msgid "%s: signing failed: %s"
 msgstr "החתימה על-ידי gpgme נכשלה׃ %s"
 
-#: libbalsa/gmime-gpgme-context.c:517
+#: libbalsa/gmime-gpgme-context.c:518
 #, fuzzy, c-format
 msgid "%s: signature verification failed: %s"
 msgstr "וידוא החתימה על-ידי gpgme נכשל׃ %s"
 
-#: libbalsa/gmime-gpgme-context.c:582
+#: libbalsa/gmime-gpgme-context.c:583
 #, fuzzy
 msgid "combined signing and encryption is only defined for RFC 2440"
 msgstr "החתימה וההצפנה על-ידי gpgme נכשלו׃ %s"
 
-#: libbalsa/gmime-gpgme-context.c:652
+#: libbalsa/gmime-gpgme-context.c:653
 #, fuzzy, c-format
 msgid "%s: signing and encryption failed: %s"
 msgstr "החתימה וההצפנה על-ידי gpgme נכשלו׃ %s"
 
-#: libbalsa/gmime-gpgme-context.c:656
+#: libbalsa/gmime-gpgme-context.c:657
 #, fuzzy, c-format
 msgid "%s: encryption failed: %s"
 msgstr "חתימה על-ידי gpgme נכשלה׃ %s"
 
-#: libbalsa/gmime-gpgme-context.c:728
+#: libbalsa/gmime-gpgme-context.c:729
 #, fuzzy, c-format
 msgid "%s: decryption failed: %s"
 msgstr "פענוח gpgme נכשל׃ %s"
 
-#: libbalsa/gmime-gpgme-context.c:763
+#: libbalsa/gmime-gpgme-context.c:764
 #, fuzzy, c-format
 msgid "%s: could not create context: %s"
 msgstr "לא ניתן ליצור gpgme context׃ %s"
 
-#: libbalsa/gmime-gpgme-context.c:819
+#: libbalsa/gmime-gpgme-context.c:820
 msgid "the crypto engine for protocol OpenPGP is not available"
 msgstr ""
 
-#: libbalsa/gmime-gpgme-context.c:829
+#: libbalsa/gmime-gpgme-context.c:830
 msgid "the crypto engine for protocol CMS is not available"
 msgstr ""
 
-#: libbalsa/gmime-gpgme-context.c:836
+#: libbalsa/gmime-gpgme-context.c:837
 #, c-format
 msgid "invalid crypto engine %d"
 msgstr ""
 
-#: libbalsa/gmime-gpgme-context.c:865 libbalsa/gmime-gpgme-context.c:876
+#: libbalsa/gmime-gpgme-context.c:866 libbalsa/gmime-gpgme-context.c:877
 #, fuzzy, c-format
 msgid "%s: could not list keys for %s: %s"
 msgstr "לא ניתן להציג את רשמית המפתחות עבור %s׃ %s"
 
-#: libbalsa/gmime-gpgme-context.c:888
+#: libbalsa/gmime-gpgme-context.c:889
 #, fuzzy, c-format
 msgid "%s: could not find a key for %s"
 msgstr "לא ניתן לקבל מפתח עבור %s"
 
-#: libbalsa/gmime-gpgme-context.c:900
+#: libbalsa/gmime-gpgme-context.c:901
 #, fuzzy, c-format
 msgid "%s: multiple keys for %s"
 msgstr "לא ניתן לקבל מפתח עבור %s"
 
 #. should "re" be localized ?
-#: libbalsa/identity.c:91 libbalsa/mailbox_local.c:1112
-#: libbalsa/mailbox_local.c:1114 src/sendmsg-window.c:2637
-#: src/sendmsg-window.c:2638
+#: libbalsa/identity.c:92 libbalsa/mailbox_local.c:1111
+#: libbalsa/mailbox_local.c:1113 src/sendmsg-window.c:2709
+#: src/sendmsg-window.c:2710
 msgid "Re:"
 msgstr "תש׃"
 
-#: libbalsa/identity.c:92 src/sendmsg-window.c:2667 src/sendmsg-window.c:2668
+#: libbalsa/identity.c:93 src/sendmsg-window.c:2739 src/sendmsg-window.c:2740
 msgid "Fwd:"
 msgstr "הע׃"
 
-#: libbalsa/identity.c:138
+#: libbalsa/identity.c:139
 msgid "New Identity"
 msgstr "זהות חדשה"
 
-#: libbalsa/identity.c:374
+#: libbalsa/identity.c:375
 msgid "Current"
 msgstr "הנוכחי"
 
-#: libbalsa/identity.c:595
+#: libbalsa/identity.c:596
 msgid "Default"
 msgstr "ברירת המחדל"
 
-#: libbalsa/identity.c:783
+#: libbalsa/identity.c:784
 msgid "_Identity Name:"
 msgstr "שם _זיהוי׃"
 
-#: libbalsa/identity.c:785
+#: libbalsa/identity.c:786
 msgid "_Full Name:"
 msgstr "שם _מלא׃"
 
-#: libbalsa/identity.c:787
+#: libbalsa/identity.c:788
 msgid "_Mailing Address:"
 msgstr "כתובת _דואר׃"
 
-#: libbalsa/identity.c:789
+#: libbalsa/identity.c:790
 msgid "Reply _To:"
 msgstr "השב _אל׃"
 
-#: libbalsa/identity.c:791
+#: libbalsa/identity.c:792
 msgid "_Domain:"
 msgstr "_תחום:"
 
-#: libbalsa/identity.c:793
+#: libbalsa/identity.c:794
 msgid "_Bcc:"
 msgstr "העתק _סמוי׃"
 
-#: libbalsa/identity.c:795
+#: libbalsa/identity.c:796
 msgid "Reply _String:"
 msgstr "מחרוזת לסימון _תשובה׃"
 
-#: libbalsa/identity.c:797
+#: libbalsa/identity.c:798
 msgid "F_orward String:"
 msgstr "מחרוזת לסימון _העברה׃"
 
-#: libbalsa/identity.c:799
+#: libbalsa/identity.c:800
 msgid "Signature _Path:"
 msgstr "_נתיב קובץ החתימה׃"
 
-#: libbalsa/identity.c:803
+#: libbalsa/identity.c:804
 msgid "_Execute Signature"
 msgstr "_בצע את קובץ החתימה"
 
-#: libbalsa/identity.c:806
+#: libbalsa/identity.c:807
 msgid "Incl_ude Signature"
 msgstr "כ_לול את החתימה"
 
-#: libbalsa/identity.c:809
+#: libbalsa/identity.c:810
 msgid "Include Signature When For_warding"
 msgstr "כלול את החתימה בעת ביצוע _העברה"
 
-#: libbalsa/identity.c:812
+#: libbalsa/identity.c:813
 msgid "Include Signature When Rep_lying"
 msgstr "כלול את החתימה בתשובות"
 
-#: libbalsa/identity.c:815
+#: libbalsa/identity.c:816
 msgid "_Add Signature Separator"
 msgstr "הוסף _קו מפריד לחתימה"
 
-#: libbalsa/identity.c:818
+#: libbalsa/identity.c:819
 msgid "Prepend Si_gnature"
 msgstr "הוסף חתימה ב_תחילית"
 
-#: libbalsa/identity.c:823
+#: libbalsa/identity.c:824
 #, fuzzy
 msgid "sign messages by default"
 msgstr "גרירה וזריקה מעבירים את ההודעות כברירת המחדל"
 
-#: libbalsa/identity.c:829
+#: libbalsa/identity.c:830
 #, fuzzy
 msgid "encrypt messages by default"
 msgstr "הצפן על-ידי GPG כברירת מחדל"
 
-#: libbalsa/identity.c:835
+#: libbalsa/identity.c:836
 msgid "default crypto protocol"
 msgstr ""
 
-#: libbalsa/identity.c:982
+#: libbalsa/identity.c:983
 msgid "Error: The identity does not have a name"
 msgstr "שגיאה׃ לזהות אין שם"
 
-#: libbalsa/identity.c:992
+#: libbalsa/identity.c:993
 msgid "Error: An identity with that name already exists"
 msgstr "שגיאה׃ זהות בשם זה כבר קיימת"
 
-#: libbalsa/identity.c:1153
+#: libbalsa/identity.c:1154
 msgid "Do you really want to delete the selected identity?"
 msgstr "האם הינך באמת רוצה למחוק את הזהות שנבחרה?"
 
-#: libbalsa/identity.c:1186
+#: libbalsa/identity.c:1187
 #, c-format
 msgid "Error displaying help for identities: %s\n"
 msgstr "שגיאה בהצגת עזרה עבור הזהויות׃ %s\n"
 
-#: libbalsa/identity.c:1216
+#: libbalsa/identity.c:1217
 msgid "Manage Identities"
 msgstr "נהל זהויות"
 
-#: libbalsa/identity.c:1521
+#: libbalsa/identity.c:1545 libbalsa/identity.c:1554
 #, fuzzy
 msgid "GnuPG using MIME mode"
 msgstr "_GnuPG משתמש במצב MIME"
 
-#: libbalsa/identity.c:1522
+#: libbalsa/identity.c:1547 libbalsa/identity.c:1555
 #, fuzzy
 msgid "GnuPG using OpenPGP mode"
 msgstr "_GnuPG משתמש במצב OpenPGP"
 
-#: libbalsa/identity.c:1524
+#: libbalsa/identity.c:1550 libbalsa/identity.c:1557
 msgid "S/MIME mode"
 msgstr ""
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:258
+#: libbalsa/imap-server.c:257
 #, fuzzy, c-format
 msgid ""
 "IMAP server %s alert:\n"
@@ -392,47 +400,47 @@ msgid ""
 msgstr "שרת דואר׃ %s\n"
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:262
+#: libbalsa/imap-server.c:261
 #, fuzzy, c-format
 msgid "IMAP server %s error: %s"
 msgstr "תקלת המרה׃ %s\n"
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:268
+#: libbalsa/imap-server.c:267
 #, fuzzy, c-format
 msgid "%s: %s"
 msgstr "%d %s"
 
-#: libbalsa/imap-server.c:506
+#: libbalsa/imap-server.c:505
 #, fuzzy, c-format
 msgid "Cannot connect to the server: %s"
 msgstr "לא ניתן ליצור קשר עם השרת"
 
-#: libbalsa/imap-server.c:510
+#: libbalsa/imap-server.c:509
 #, fuzzy
 msgid "Cannot connect to the server"
 msgstr "לא ניתן ליצור קשר עם השרת"
 
-#: libbalsa/imap-server.c:658
+#: libbalsa/imap-server.c:657
 #, c-format
 msgid "Exceeded the number of connections per server %s"
 msgstr ""
 
-#: libbalsa/libbalsa.c:283
+#: libbalsa/libbalsa.c:285
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "ספריית LDAP עבור %s"
 
-#: libbalsa/libbalsa.c:388
+#: libbalsa/libbalsa.c:390
 #, fuzzy
 msgid "Invalid date"
 msgstr "[תאריך לא תקין]"
 
-#: libbalsa/libbalsa.c:404 src/pref-manager.c:1262 src/pref-manager.c:1359
+#: libbalsa/libbalsa.c:406 src/pref-manager.c:1436 src/pref-manager.c:1533
 msgid "Unknown"
 msgstr "לא ידוע"
 
-#: libbalsa/libbalsa.c:543
+#: libbalsa/libbalsa.c:545
 #, c-format
 msgid ""
 "Authenticity of this certificate could not be verified.\n"
@@ -440,7 +448,7 @@ msgid ""
 "<b>This certificate belongs to:</b>\n"
 msgstr ""
 
-#: libbalsa/libbalsa.c:555
+#: libbalsa/libbalsa.c:557
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
@@ -448,7 +456,7 @@ msgstr ""
 "\n"
 "<b>תעודה זאת הוצאה ע\"י׃</b>\n"
 
-#: libbalsa/libbalsa.c:566
+#: libbalsa/libbalsa.c:568
 #, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -461,20 +469,20 @@ msgstr ""
 "עד %s\n"
 "<b>טביעת אצבעות׃</b> %s"
 
-#: libbalsa/libbalsa.c:575
+#: libbalsa/libbalsa.c:577
 #, fuzzy
 msgid "SSL/TLS certificate"
 msgstr "תעודת IMAP TLS"
 
-#: libbalsa/libbalsa.c:577
+#: libbalsa/libbalsa.c:579
 msgid "_Accept Once"
 msgstr "_קבל באופן חד פעמי"
 
-#: libbalsa/libbalsa.c:578
+#: libbalsa/libbalsa.c:580
 msgid "Accept&_Save"
 msgstr "קבל ו_שמור"
 
-#: libbalsa/libbalsa.c:579
+#: libbalsa/libbalsa.c:581
 msgid "_Reject"
 msgstr "_דחה"
 
@@ -499,34 +507,29 @@ msgid "Could not create a mailbox of type %s"
 msgstr "לא ניתן ליצור תיבת דואר מסוג׃ %s"
 
 #. ImapIssue macro handles reconnecting. We might issue a
-#. LIBBALSA_INFORMATION_MMESSAGE here but it would be overwritten by
+#. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
 #. login information...
-#: libbalsa/mailbox_imap.c:500
+#: libbalsa/mailbox_imap.c:522
 msgid "IMAP connection has been severed. Reconnecting..."
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:503
+#: libbalsa/mailbox_imap.c:525
 #, c-format
 msgid "IMAP server has shut the connection: %s Reconnecting..."
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:851
-#, c-format
-msgid "IMAP SEARCH UNSEEN request failed for mailbox %s"
-msgstr ""
-
-#: libbalsa/mailbox_imap.c:914 libbalsa/mailbox_maildir.c:480
-#: libbalsa/mailbox_mbox.c:461 libbalsa/mailbox_mh.c:502
+#: libbalsa/mailbox_imap.c:965 libbalsa/mailbox_maildir.c:488
+#: libbalsa/mailbox_mbox.c:502 libbalsa/mailbox_mh.c:510
 #, fuzzy, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: פותח %s ספירת הפניות: %d\n"
 
-#: libbalsa/mailbox_imap.c:978 libbalsa/mailbox_imap.c:1991
+#: libbalsa/mailbox_imap.c:1031 libbalsa/mailbox_imap.c:2045
 #, c-format
 msgid "Downloading %ld kB"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:1345
+#: libbalsa/mailbox_imap.c:1398
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -535,17 +538,17 @@ msgstr ""
 "הפקודה IMAP SEARCH נכשלה בעבור תיבת הדואר %s\n"
 "חוזר לשיטת החיפוש ברירת המחדל"
 
-#: libbalsa/mailbox_imap.c:1405
+#: libbalsa/mailbox_imap.c:1458
 #, c-format
 msgid "No path found for mailbox \"%s\", using \"%s\""
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:2171
+#: libbalsa/mailbox_imap.c:2232
 #, c-format
 msgid "Uploading %ld kB"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:2321
+#: libbalsa/mailbox_imap.c:2419
 msgid "Server-side threading not supported."
 msgstr ""
 
@@ -559,23 +562,23 @@ msgstr "נכשלה פתיחת %s. שגיאה מס' = %d, "
 msgid "Failed to sync mailbox \"%s\""
 msgstr "לא מוצא את תיבת הדואר"
 
-#: libbalsa/mailbox_maildir.c:188
+#: libbalsa/mailbox_maildir.c:196
 #, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
 msgstr "תיבת הדואר %s אינה מסוג Maildir"
 
-#: libbalsa/mailbox_maildir.c:197
+#: libbalsa/mailbox_maildir.c:205
 #, c-format
 msgid "Could not create a MailDir directory at %s (%s)"
 msgstr "לא ניתן ליצור ספרייה מסוג Maildir ב-%s (%s)"
 
-#: libbalsa/mailbox_maildir.c:204 libbalsa/mailbox_maildir.c:212
-#: libbalsa/mailbox_maildir.c:222
+#: libbalsa/mailbox_maildir.c:212 libbalsa/mailbox_maildir.c:220
+#: libbalsa/mailbox_maildir.c:230
 #, c-format
 msgid "Could not create a MailDir at %s (%s)"
 msgstr "לא ניתן ליצור Maildir ב-%s (%s)"
 
-#: libbalsa/mailbox_maildir.c:323 libbalsa/mailbox_mh.c:266
+#: libbalsa/mailbox_maildir.c:331 libbalsa/mailbox_mh.c:274
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
@@ -584,8 +587,8 @@ msgstr ""
 "לא ניתן למחוק את התוכן של׃ %s\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:329 libbalsa/mailbox_mbox.c:267
-#: libbalsa/mailbox_mh.c:272
+#: libbalsa/mailbox_maildir.c:337 libbalsa/mailbox_mbox.c:282
+#: libbalsa/mailbox_mh.c:280
 #, c-format
 msgid ""
 "Could not remove %s:\n"
@@ -594,83 +597,119 @@ msgstr ""
 "לא ניתן למחוק את %s׃\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:452 libbalsa/mailbox_mbox.c:425
-#: libbalsa/mailbox_mh.c:483
+#: libbalsa/mailbox_maildir.c:460 libbalsa/mailbox_mbox.c:457
+#: libbalsa/mailbox_mh.c:491
 #, fuzzy
 msgid "Mailbox does not exist."
 msgstr "תיבת הדואר נוצרה."
 
-#: libbalsa/mailbox_mbox.c:179
+#: libbalsa/mailbox_maildir.c:880
+#, fuzzy
+msgid "Cannot read message"
+msgstr "לא ניתן לכתוב את ההודעה"
+
+#: libbalsa/mailbox_maildir.c:900 libbalsa/mailbox_mbox.c:1603
+#: libbalsa/mailbox_mh.c:1095
+#, fuzzy
+msgid "Data copy error"
+msgstr "אין שגיאות"
+
+#: libbalsa/mailbox_mbox.c:191
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "תיבת הדואר %s לא נראית כתיבה מסוג Mbox"
 
-#: libbalsa/mailbox_mbox.c:433
+#: libbalsa/mailbox_mbox.c:465
 #, fuzzy
 msgid "Cannot open mailbox."
 msgstr "לא ניתן לטעון את תיבת הדואר %s"
 
-#: libbalsa/mailbox_mbox.c:441
+#: libbalsa/mailbox_mbox.c:475
+#, fuzzy
+msgid "Mailbox is not in mbox format."
+msgstr "תיבת הדואר נוצרה."
+
+#: libbalsa/mailbox_mbox.c:482
 #, fuzzy
 msgid "Cannot lock mailbox."
 msgstr "לא ניתן לטעון את תיבת הדואר %s"
 
-#: libbalsa/mailbox_mbox.c:1500
+#: libbalsa/mailbox_mbox.c:1557
 #, fuzzy, c-format
 msgid "%s: could not open %s."
 msgstr "לא ניתן לפתוח את %s"
 
-#: libbalsa/mailbox_mbox.c:1508
+#: libbalsa/mailbox_mbox.c:1567
 #, fuzzy, c-format
 msgid "%s: could not get new mime stream."
 msgstr "לא ניתן לקבל מידע מ-gpgme׃ %s"
 
-#: libbalsa/mailbox_mbox.c:1518
+#: libbalsa/mailbox_mbox.c:1575
+#, fuzzy, c-format
+msgid "%s: %s is not in mbox format."
+msgstr "%s אינו תיבת דואר."
+
+#: libbalsa/mailbox_mbox.c:1587
 #, fuzzy, c-format
 msgid "%s: could not get message stream."
 msgstr "לא ניתן לכתוב את ההודעה"
 
-#: libbalsa/mailbox_mbox.c:1533
-#, fuzzy, c-format
-msgid "Error copying message to mailbox %s!"
-msgstr "לא ניתן לפתוח את תיבת הדואר \"%s\""
-
-#: libbalsa/mailbox_mh.c:172
+#: libbalsa/mailbox_mh.c:181
 #, c-format
 msgid "Mailbox %s does not appear to be a Mh mailbox."
 msgstr "תיבת הדואר %s לא נראית כתיבה מסוג Mh"
 
-#: libbalsa/mailbox_mh.c:182
+#: libbalsa/mailbox_mh.c:191
 #, c-format
 msgid "Could not create MH directory at %s (%s)"
 msgstr "לא ניתן ליצור ספריית MH ב-%s (%s)"
 
-#: libbalsa/mailbox_mh.c:189
+#: libbalsa/mailbox_mh.c:198
 #, c-format
 msgid "Could not create MH structure at %s (%s)"
 msgstr "לא ניתן ליצור מבנה MH ב-%s (%s)"
 
-#: libbalsa/mailbox_pop3.c:338
+#: libbalsa/mailbox_mh.c:1074
+#, fuzzy
+msgid "Cannot create message"
+msgstr "לא ניתן לכתוב את ההודעה"
+
+#: libbalsa/mailbox_mh.c:1120
+#, fuzzy
+msgid "Message rename error"
+msgstr "קוד המקור של ההודעה"
+
+#: libbalsa/mailbox_pop3.c:202
+#, fuzzy, c-format
+msgid "Error setting flags on messages in mailbox %s"
+msgstr "לא ניתן לפתוח את תיבת הדואר \"%s\""
+
+#: libbalsa/mailbox_pop3.c:212
+#, fuzzy, c-format
+msgid "Error appending message %d from %s to %s: %s"
+msgstr "שגיאה במשלוח ההודעה, תהליך הבן (child) %d יצא (%s)."
+
+#: libbalsa/mailbox_pop3.c:374
 #, c-format
 msgid "Retrieving Message %d of %d"
 msgstr "שולף הודעה %d מתוך %d"
 
-#: libbalsa/mailbox_pop3.c:361
+#: libbalsa/mailbox_pop3.c:397
 #, fuzzy, c-format
 msgid "Received %ld kB of %ld"
 msgstr "התקבלו %d בתים מתוך %d"
 
-#: libbalsa/mailbox_pop3.c:375
+#: libbalsa/mailbox_pop3.c:411
 #, fuzzy, c-format
 msgid "Saving POP message to %s failed."
 msgstr "מעביר את ההודעות שנקראו אל %s..."
 
-#: libbalsa/mailbox_pop3.c:385
+#: libbalsa/mailbox_pop3.c:421
 #, fuzzy, c-format
 msgid "Transfering POP message to %s failed."
 msgstr "הצפנת הה-דעה נכשלה."
 
-#: libbalsa/mailbox_pop3.c:463 libbalsa/mailbox_pop3.c:474
+#: libbalsa/mailbox_pop3.c:502 libbalsa/mailbox_pop3.c:513
 #, c-format
 msgid ""
 "POP3 mailbox %s temp file error:\n"
@@ -679,60 +718,39 @@ msgstr ""
 "שגיאה בקובץ הזמני של תיבת הדואר POP3 %s׃\n"
 "%s"
 
-#: libbalsa/mailbox_pop3.c:502
+#: libbalsa/mailbox_pop3.c:527
+#, c-format
+msgid "POP3 mailbox %s temp mailbox error:\n"
+msgstr "שגיאה בתיבת הדואר הזמנית של תיבת הדואר POP3׃ %s\n"
+
+#: libbalsa/mailbox_pop3.c:550
 #, fuzzy, c-format
 msgid "POP3 mailbox %s error: %s\n"
 msgstr ""
 "שגיאה בגישה לתיבת הדואר %s מסוג POP3\n"
 "%s"
 
-#: libbalsa/mailbox_pop3.c:535
+#: libbalsa/mailbox_pop3.c:583
 #, c-format
 msgid "POP3 message %d oversized: %d kB - skipped."
 msgstr ""
 
-#: libbalsa/mailbox_pop3.c:546
+#: libbalsa/mailbox_pop3.c:594
 #, c-format
 msgid "POP3 error: cannot open %s for writing."
 msgstr ""
 
-#: libbalsa/mailbox_pop3.c:554
+#: libbalsa/mailbox_pop3.c:602
 #, c-format
 msgid "POP3 error: cannot close %s."
 msgstr ""
 
-#: libbalsa/mailbox_pop3.c:580
+#: libbalsa/mailbox_pop3.c:631
 #, fuzzy, c-format
 msgid "POP3 error: %s."
 msgstr "שגיאה במשלוח ההודעה׃ %s"
 
-#: libbalsa/mailbox_pop3.c:603
-#, c-format
-msgid "POP3 mailbox %s temp mailbox error:\n"
-msgstr "שגיאה בתיבת הדואר הזמנית של תיבת הדואר POP3׃ %s\n"
-
-#: libbalsa/mailbox_pop3.c:626
-#, c-format
-msgid ""
-"Error placing messages from %s on %s\n"
-"Messages are left in %s\n"
-msgstr ""
-"שגיאה בהעברת הודעות מ-%s על %s\n"
-"ההודעות נשארות ב-%s\n"
-
-#: libbalsa/mailbox_pop3.c:645
-#, fuzzy, c-format
-msgid "POP3 temp mailbox %s was not removed (system error message: %s)"
-msgstr ""
-"שגיאה בקובץ הזמני של תיבת הדואר POP3 %s׃\n"
-"%s"
-
-#: libbalsa/message.c:482
-#, c-format
-msgid "Source mailbox (%s) is readonly. Cannot move messages"
-msgstr "תיבת הדואר המקורית (%s) היא לקריאה בלבד. לא ניתן להעביר את ההודעות."
-
-#: libbalsa/message.c:634 libbalsa/message.c:674
+#: libbalsa/message.c:555 libbalsa/message.c:595
 #, fuzzy, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr "תיבת הדואר המקורית (%s) היא לקריאה בלבד. לא ניתן להעביר את ההודעות."
@@ -747,213 +765,213 @@ msgstr ""
 "--\n"
 "זהו חלק הודעה חתום של OpenPGP:\n"
 
-#: libbalsa/misc.c:1629
+#: libbalsa/misc.c:1628
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "חריגה ממגבלת הזמן (timeout) בניסיון לבצע נעילת fcntl"
 
-#: libbalsa/misc.c:1636
+#: libbalsa/misc.c:1635
 #, c-format
 msgid "Waiting for fcntl lock... %d"
 msgstr "ממתין לנעילת fcntl... %d"
 
-#: libbalsa/misc.c:1664
+#: libbalsa/misc.c:1663
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "חריגה ממגבלת הזמן (timeout) בניסיון לבצע נעילת flock"
 
-#: libbalsa/misc.c:1671
+#: libbalsa/misc.c:1670
 #, c-format
 msgid "Waiting for flock attempt... %d"
 msgstr "ממתין לניסיון לבצע flock... %d"
 
-#: libbalsa/rfc3156.c:76
+#: libbalsa/rfc3156.c:84
 #, c-format
 msgid "Gpgme has been compiled without support for protocol %s."
 msgstr ""
 
-#: libbalsa/rfc3156.c:81
+#: libbalsa/rfc3156.c:89
 #, c-format
 msgid "Crypto engine %s is not installed properly."
 msgstr ""
 
-#: libbalsa/rfc3156.c:86
+#: libbalsa/rfc3156.c:94
 #, c-format
 msgid ""
 "Crypto engine %s version %s is installed, but at least version %s is "
 "required."
 msgstr ""
 
-#: libbalsa/rfc3156.c:93
+#: libbalsa/rfc3156.c:101
 #, c-format
 msgid "Unknown problem with engine for protocol %s."
 msgstr ""
 
-#: libbalsa/rfc3156.c:98
+#: libbalsa/rfc3156.c:106
 #, fuzzy, c-format
 msgid "%s: could not retreive crypto engine information: %s."
 msgstr "לא ניתן לשלוף את המפתח לטביעת האצבעות עבור %s׃ %s\n"
 
-#: libbalsa/rfc3156.c:102
+#: libbalsa/rfc3156.c:110
 #, c-format
 msgid ""
 "\n"
 "Disable support for protocol %s."
 msgstr ""
 
-#: libbalsa/rfc3156.c:235 libbalsa/rfc3156.c:240 libbalsa/rfc3156.c:322
-#: libbalsa/rfc3156.c:327 libbalsa/rfc3156.c:461 libbalsa/rfc3156.c:466
-#: libbalsa/rfc3156.c:529 libbalsa/rfc3156.c:534 libbalsa/rfc3156.c:613
-#: libbalsa/rfc3156.c:618 libbalsa/rfc3156.c:723 libbalsa/rfc3156.c:728
-#: libbalsa/rfc3156.c:803 libbalsa/rfc3156.c:808
+#: libbalsa/rfc3156.c:252 libbalsa/rfc3156.c:257 libbalsa/rfc3156.c:343
+#: libbalsa/rfc3156.c:348 libbalsa/rfc3156.c:506 libbalsa/rfc3156.c:511
+#: libbalsa/rfc3156.c:612 libbalsa/rfc3156.c:617 libbalsa/rfc3156.c:723
+#: libbalsa/rfc3156.c:728 libbalsa/rfc3156.c:833 libbalsa/rfc3156.c:838
+#: libbalsa/rfc3156.c:913 libbalsa/rfc3156.c:918
 #, fuzzy
 msgid "creating a gpgme context failed"
 msgstr "לא ניתן ליצור gpgme context׃ %s"
 
-#: libbalsa/rfc3156.c:253 libbalsa/rfc3156.c:631
+#: libbalsa/rfc3156.c:270 libbalsa/rfc3156.c:741
 #, fuzzy
 msgid "Enter passphrase to unlock the secret key for signing"
 msgstr "הקש סיסמה לפענוח ההודעה"
 
-#: libbalsa/rfc3156.c:274 libbalsa/rfc3156.c:278 libbalsa/rfc3156.c:660
+#: libbalsa/rfc3156.c:291 libbalsa/rfc3156.c:295 libbalsa/rfc3156.c:770
 #, fuzzy
 msgid "signing failed"
 msgstr "login נכשל."
 
-#: libbalsa/rfc3156.c:351 libbalsa/rfc3156.c:356 libbalsa/rfc3156.c:663
+#: libbalsa/rfc3156.c:394 libbalsa/rfc3156.c:399 libbalsa/rfc3156.c:773
 #, fuzzy
 msgid "encryption failed"
 msgstr "חתימה על-ידי gpgme נכשלה׃ %s"
 
-#: libbalsa/rfc3156.c:479 libbalsa/rfc3156.c:484 libbalsa/rfc3156.c:739
-#: libbalsa/rfc3156.c:745
+#: libbalsa/rfc3156.c:535 libbalsa/rfc3156.c:540 libbalsa/rfc3156.c:849
+#: libbalsa/rfc3156.c:855
 #, fuzzy
 msgid "signature verification failed"
 msgstr "וידוא החתימה על-ידי gpgme נכשל׃ %s"
 
-#: libbalsa/rfc3156.c:546 libbalsa/rfc3156.c:819
+#: libbalsa/rfc3156.c:629 libbalsa/rfc3156.c:929
 msgid "Enter passphrase to decrypt message"
 msgstr "הקש סיסמה לפענוח ההודעה"
 
-#: libbalsa/rfc3156.c:558 libbalsa/rfc3156.c:563
+#: libbalsa/rfc3156.c:660 libbalsa/rfc3156.c:665
 #, fuzzy
 msgid "decryption failed"
 msgstr "פענוח gpgme נכשל׃ %s"
 
-#: libbalsa/rfc3156.c:656 libbalsa/rfc3156.c:670
+#: libbalsa/rfc3156.c:766 libbalsa/rfc3156.c:780
 #, fuzzy
 msgid "signing and encryption failed"
 msgstr "החתימה וההצפנה על-ידי gpgme נכשלו׃ %s"
 
-#: libbalsa/rfc3156.c:673
+#: libbalsa/rfc3156.c:783
 #, fuzzy, c-format
 msgid "signing failed: %s"
 msgstr "החתימה על-ידי gpgme נכשלה׃ %s"
 
-#: libbalsa/rfc3156.c:676
+#: libbalsa/rfc3156.c:786
 #, fuzzy, c-format
 msgid "encryption failed: %s"
 msgstr "חתימה על-ידי gpgme נכשלה׃ %s"
 
-#: libbalsa/rfc3156.c:828 libbalsa/rfc3156.c:835
+#: libbalsa/rfc3156.c:938 libbalsa/rfc3156.c:945
 #, fuzzy
 msgid "decryption and signature verification failed"
 msgstr "פענוח ווידוא חתימה על-ידי gpgme נכשלו׃ %s"
 
-#: libbalsa/rfc3156.c:866
+#: libbalsa/rfc3156.c:976
 msgid "The signature is valid."
 msgstr "חתימה זו תקינה."
 
-#: libbalsa/rfc3156.c:868
+#: libbalsa/rfc3156.c:978
 msgid "The signature is valid but expired."
 msgstr "חתימה זו תקינה, אך תוקפה פג."
 
-#: libbalsa/rfc3156.c:871
+#: libbalsa/rfc3156.c:981
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr "חתימה זו תקינה, ואולם תוקף המפתח שמשמש לווידוא החתימה פג."
 
-#: libbalsa/rfc3156.c:874
+#: libbalsa/rfc3156.c:984
 #, fuzzy
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
 msgstr "חתימה זו תקינה, ואולם תוקף המפתח שמשמש לווידוא החתימה פג."
 
-#: libbalsa/rfc3156.c:877
-msgid "The signature is invalid (Note: might be caused by gmime bug!)."
-msgstr ""
+#: libbalsa/rfc3156.c:987
+msgid "The signature is invalid."
+msgstr "החתימה אינה תקינה."
 
-#: libbalsa/rfc3156.c:880
+#: libbalsa/rfc3156.c:990
 msgid "The signature could not be verified due to a missing key."
 msgstr "לא ניתן לוודא את תקינות החתימה מכיוון שחסר מפתח."
 
-#: libbalsa/rfc3156.c:882
+#: libbalsa/rfc3156.c:992
 msgid "This part is not a real PGP signature."
 msgstr "חלק זה אינו חתימה אמיתית של PGP."
 
-#: libbalsa/rfc3156.c:885
+#: libbalsa/rfc3156.c:995
 #, fuzzy
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr "לא ניתן לוודא את תקינות החתימה מכיוון שחסר מפתח."
 
-#: libbalsa/rfc3156.c:888 libbalsa/rfc3156.c:1543
+#: libbalsa/rfc3156.c:998 libbalsa/rfc3156.c:1661
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
 msgstr ""
 
-#: libbalsa/rfc3156.c:891
+#: libbalsa/rfc3156.c:1001
 msgid "An error prevented the signature verification."
 msgstr "שגיאה מנעה את וידוא החתימה."
 
-#: libbalsa/rfc3156.c:899
+#: libbalsa/rfc3156.c:1009
 msgid "The user ID is of unknown validity."
 msgstr "תקינות ת.ז. המשתמש (user ID) אינה ידועה."
 
-#: libbalsa/rfc3156.c:901
+#: libbalsa/rfc3156.c:1011
 msgid "The validity of the user ID is undefined."
 msgstr "תקינות ת.ז. המשתמש (user ID) אינה מוגדרת."
 
-#: libbalsa/rfc3156.c:903
+#: libbalsa/rfc3156.c:1013
 msgid "The user ID is never valid."
 msgstr "ת.ז. המשתמש (user ID) היא באופן מוחלט אינה תקינה."
 
-#: libbalsa/rfc3156.c:905
+#: libbalsa/rfc3156.c:1015
 msgid "The user ID is marginally valid."
 msgstr "ת.ז. המשתמש (user ID) תקינה באופן שולי."
 
-#: libbalsa/rfc3156.c:907
+#: libbalsa/rfc3156.c:1017
 msgid "The user ID is fully valid."
 msgstr "ת.ז. המשתמש (user ID) תקינה לחלוטין."
 
-#: libbalsa/rfc3156.c:909
+#: libbalsa/rfc3156.c:1019
 msgid "The user ID is ultimately valid."
 msgstr "בסה\"כ, ת.ז. המשתמש (user ID) תקינה."
 
-#: libbalsa/rfc3156.c:911 libbalsa/rfc3156.c:1147
+#: libbalsa/rfc3156.c:1021 libbalsa/rfc3156.c:1265
 msgid "bad validity"
 msgstr "תקינות שגויה"
 
-#: libbalsa/rfc3156.c:919
+#: libbalsa/rfc3156.c:1029
 #, fuzzy
 msgid "PGP signature: "
 msgstr "בדוק את החתימה"
 
-#: libbalsa/rfc3156.c:921
+#: libbalsa/rfc3156.c:1031
 #, fuzzy
 msgid "S/MIME signature: "
 msgstr "בדוק את החתימה"
 
-#: libbalsa/rfc3156.c:923
+#: libbalsa/rfc3156.c:1033
 #, fuzzy
 msgid "(unknown protocol) "
 msgstr "שגיאה לא ידועה"
 
-#: libbalsa/rfc3156.c:942
+#: libbalsa/rfc3156.c:1052
 #, c-format
 msgid ""
 "\n"
 "User ID: %s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:945
+#: libbalsa/rfc3156.c:1055
 #, c-format
 msgid ""
 "\n"
@@ -962,14 +980,14 @@ msgstr ""
 "\n"
 "נחתם על-ידי: %s"
 
-#: libbalsa/rfc3156.c:949
+#: libbalsa/rfc3156.c:1059
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Mail address: %s"
 msgstr "כתובת דואר׃ %s"
 
-#: libbalsa/rfc3156.c:954
+#: libbalsa/rfc3156.c:1064
 #, c-format
 msgid ""
 "\n"
@@ -978,7 +996,7 @@ msgstr ""
 "\n"
 "נחתם ב- %s"
 
-#: libbalsa/rfc3156.c:956
+#: libbalsa/rfc3156.c:1066
 #, c-format
 msgid ""
 "\n"
@@ -987,14 +1005,14 @@ msgstr ""
 "\n"
 "תקינות׃ %s"
 
-#: libbalsa/rfc3156.c:960
+#: libbalsa/rfc3156.c:1070
 #, c-format
 msgid ""
 "\n"
 "Owner trust: %s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:964
+#: libbalsa/rfc3156.c:1074
 #, c-format
 msgid ""
 "\n"
@@ -1003,7 +1021,7 @@ msgstr ""
 "\n"
 "מפתח טביעת אצבעות׃ %s"
 
-#: libbalsa/rfc3156.c:969
+#: libbalsa/rfc3156.c:1079
 #, c-format
 msgid ""
 "\n"
@@ -1012,32 +1030,41 @@ msgstr ""
 "\n"
 "המפתח נוצר ב- %s"
 
-#: libbalsa/rfc3156.c:978
+#: libbalsa/rfc3156.c:1084
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Key expires on: %s"
+msgstr ""
+"\n"
+"המפתח נוצר ב- %s"
+
+#: libbalsa/rfc3156.c:1093
 msgid " revoked"
 msgstr ""
 
-#: libbalsa/rfc3156.c:983
+#: libbalsa/rfc3156.c:1098
 #, fuzzy
 msgid " expired"
 msgstr "נענה"
 
-#: libbalsa/rfc3156.c:988
+#: libbalsa/rfc3156.c:1103
 msgid " disabled"
 msgstr ""
 
-#: libbalsa/rfc3156.c:993
+#: libbalsa/rfc3156.c:1108
 #, fuzzy
 msgid " invalid"
 msgstr "[תאריך לא תקין]"
 
-#: libbalsa/rfc3156.c:996
+#: libbalsa/rfc3156.c:1111
 #, c-format
 msgid ""
 "\n"
 "Key attributes:%s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:998
+#: libbalsa/rfc3156.c:1113
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -1046,33 +1073,33 @@ msgstr ""
 "\n"
 "המפתח נוצר ב- %s"
 
-#: libbalsa/rfc3156.c:1002
+#: libbalsa/rfc3156.c:1119
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Issuer name: %s"
 msgstr "שם קובץ׃ %s"
 
-#: libbalsa/rfc3156.c:1005
+#: libbalsa/rfc3156.c:1123
 #, c-format
 msgid ""
 "\n"
 "Issuer serial number: %s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:1008
+#: libbalsa/rfc3156.c:1126
 #, c-format
 msgid ""
 "\n"
 "Chain ID: %s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:1055
+#: libbalsa/rfc3156.c:1173
 #, c-format
 msgid "Could not launch %s to get the public key %s."
 msgstr "לא ניתן להפעיל את %s כדי לקבל את המפתח הציבורי %s."
 
-#: libbalsa/rfc3156.c:1104
+#: libbalsa/rfc3156.c:1222
 #, c-format
 msgid ""
 "Running gpg failed with return value %d:\n"
@@ -1081,7 +1108,7 @@ msgstr ""
 "הפעלת gpg נכשלה עם ערך מוחזר %d:\n"
 "%s"
 
-#: libbalsa/rfc3156.c:1111
+#: libbalsa/rfc3156.c:1229
 #, c-format
 msgid ""
 "Running gpg successful:\n"
@@ -1090,70 +1117,70 @@ msgstr ""
 "הפעלת gpg הצליחה:\n"
 "%s"
 
-#: libbalsa/rfc3156.c:1135
+#: libbalsa/rfc3156.c:1253
 msgid "unknown"
 msgstr "לא ידוע"
 
-#: libbalsa/rfc3156.c:1137
+#: libbalsa/rfc3156.c:1255
 msgid "undefined"
 msgstr "לא מוגדר"
 
-#: libbalsa/rfc3156.c:1139
+#: libbalsa/rfc3156.c:1257
 msgid "never"
 msgstr "לעולם לא"
 
-#: libbalsa/rfc3156.c:1141
+#: libbalsa/rfc3156.c:1259
 msgid "marginal"
 msgstr "שולי"
 
-#: libbalsa/rfc3156.c:1143
+#: libbalsa/rfc3156.c:1261
 msgid "full"
 msgstr "מלא"
 
-#: libbalsa/rfc3156.c:1145
+#: libbalsa/rfc3156.c:1263
 msgid "ultimate"
 msgstr "מרבי"
 
-#: libbalsa/rfc3156.c:1205
+#: libbalsa/rfc3156.c:1323
 #, fuzzy
 msgid "User ID"
 msgstr "שם משתמש"
 
-#: libbalsa/rfc3156.c:1205
+#: libbalsa/rfc3156.c:1323
 msgid "Key ID"
 msgstr "מפתח ת.ז."
 
-#: libbalsa/rfc3156.c:1205
+#: libbalsa/rfc3156.c:1323
 msgid "Length"
 msgstr "אורך"
 
-#: libbalsa/rfc3156.c:1205
+#: libbalsa/rfc3156.c:1323
 #, fuzzy
 msgid "Validity"
 msgstr ""
 "\n"
 "תקינות׃ %s"
 
-#: libbalsa/rfc3156.c:1206
+#: libbalsa/rfc3156.c:1324
 msgid "Owner trust"
 msgstr ""
 
 #. FIXME: create dialog according to the Gnome HIG
-#: libbalsa/rfc3156.c:1250
+#: libbalsa/rfc3156.c:1368
 msgid "Select key"
 msgstr "בחר מפתח"
 
-#: libbalsa/rfc3156.c:1261
+#: libbalsa/rfc3156.c:1379
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "בחר מפתח פרטי עבור החותם %s"
 
-#: libbalsa/rfc3156.c:1265
+#: libbalsa/rfc3156.c:1383
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "בחר את המפתח הציבורי של הנמען %s"
 
-#: libbalsa/rfc3156.c:1544
+#: libbalsa/rfc3156.c:1662
 msgid "Try again later."
 msgstr ""
 
@@ -1161,11 +1188,11 @@ msgstr ""
 msgid "Sending Mail..."
 msgstr "שולח את הדואר..."
 
-#: libbalsa/send.c:240 src/main-window.c:2595
+#: libbalsa/send.c:240 src/main-window.c:2642
 msgid "_Hide"
 msgstr "_הסתר"
 
-#: libbalsa/send.c:764
+#: libbalsa/send.c:787
 #, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -1176,7 +1203,12 @@ msgstr ""
 "%d: %s\n"
 "ההודעה נשארה בתיבת הדואר היוצא שלך.\n"
 
-#: libbalsa/send.c:818
+#: libbalsa/send.c:833
+#, fuzzy, c-format
+msgid "Saving sent message to %s failed: %s"
+msgstr "מעביר את ההודעות שנקראו אל %s..."
+
+#: libbalsa/send.c:852
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -1187,7 +1219,7 @@ msgstr ""
 "%d: %s\n"
 "ההודעה נשארת בתיבת הדואר היוצא.\n"
 
-#: libbalsa/send.c:828
+#: libbalsa/send.c:862
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -1195,49 +1227,49 @@ msgstr ""
 "בעיה בשליחת ההודעה; ההודעה תאוחסן בתיבת הדואר היוצא.\n"
 "המערכת תנסה לשלוח אותה מחדש עד שאת/ה תמחק/י אותה."
 
-#: libbalsa/send.c:858
+#: libbalsa/send.c:892
 msgid "Connected to MTA"
 msgstr "התחברתי ל-MTA"
 
-#: libbalsa/send.c:865 src/balsa-message.c:1462 src/print.c:369
-#: src/sendmsg-window.c:859 src/sendmsg-window.c:2464 src/store-address.c:303
+#: libbalsa/send.c:899 src/balsa-message.c:1462 src/print.c:370
+#: src/sendmsg-window.c:861 src/sendmsg-window.c:2536 src/store-address.c:329
 msgid "From:"
 msgstr "מאת׃"
 
-#: libbalsa/send.c:868 src/balsa-index.c:338
+#: libbalsa/send.c:902 src/balsa-index.c:348
 msgid "From"
 msgstr "השולח"
 
-#: libbalsa/send.c:877 src/balsa-message.c:1471 src/print.c:373
-#: src/sendmsg-window.c:858 src/sendmsg-window.c:2471 src/store-address.c:304
+#: libbalsa/send.c:911 src/balsa-message.c:1471 src/print.c:374
+#: src/sendmsg-window.c:860 src/sendmsg-window.c:2543 src/store-address.c:330
 msgid "To:"
 msgstr "אל׃"
 
-#: libbalsa/send.c:880 src/balsa-index.c:991
+#: libbalsa/send.c:914 src/balsa-index.c:1025
 msgid "To"
 msgstr "אל"
 
-#: libbalsa/send.c:918
+#: libbalsa/send.c:952
 msgid "Disconnected"
 msgstr "התנתק"
 
-#: libbalsa/send.c:1148
+#: libbalsa/send.c:1180
 msgid ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
 msgstr ""
 
-#: libbalsa/send.c:1153
+#: libbalsa/send.c:1185
 msgid ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
 msgstr ""
 
-#: libbalsa/send.c:1162
+#: libbalsa/send.c:1194
 msgid "Message left in Outbox (try again later)"
 msgstr ""
 
-#: libbalsa/send.c:1166
+#: libbalsa/send.c:1198
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1246,43 +1278,66 @@ msgstr ""
 "בעיה בשרת SMTP (%d(׃ %s\n"
 "ההודעה נשארת בתיבת הדואר היוצא."
 
-#: libbalsa/send.c:1514
+#: libbalsa/send.c:1541
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
 
-#: libbalsa/send.c:1808 libbalsa/send.c:1884
+#: libbalsa/send.c:1847 libbalsa/send.c:1923
 #, fuzzy
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr "הודעה זו לא תוצפן לנמען(י) ההעתק הסמוי."
 
 #. host, authentication method
-#: libbalsa/server.c:377
+#: libbalsa/server.c:376
 #, c-format
 msgid "Logging in to %s using %s"
 msgstr ""
 
-#: libbalsa/source-viewer.c:52 src/main-window.c:647
+#. Items
+#: libbalsa/source-viewer.c:62 src/mailbox-node.c:961 src/main-window.c:742
+#: src/main-window.c:839
+msgid "_Close"
+msgstr "_סגור"
+
+#: libbalsa/source-viewer.c:63
+#, fuzzy
+msgid "Close the window"
+msgstr "חלון יצירת דואר"
+
+#: libbalsa/source-viewer.c:64
+#, fuzzy
+msgid "_Copy"
+msgstr "_גוף"
+
+#: libbalsa/source-viewer.c:65
+#, fuzzy
+msgid "Copy text"
+msgstr "הקפץ חלון טקסט׃"
+
+#: libbalsa/source-viewer.c:66 libbalsa/source-viewer.c:104
+#: src/main-window.c:650
 msgid "_Select Text"
 msgstr "_בחר טקסט"
 
-#: libbalsa/source-viewer.c:53 src/main-window.c:648
+#: libbalsa/source-viewer.c:67 libbalsa/source-viewer.c:105
+#: src/main-window.c:651
 msgid "Select entire mail"
 msgstr "בחר את כל הדואר"
 
-#: libbalsa/source-viewer.c:62
+#: libbalsa/source-viewer.c:72 libbalsa/source-viewer.c:114
 msgid "_Escape Special Characters"
 msgstr "תווי _יציאה מיוחדים"
 
-#: libbalsa/source-viewer.c:63
+#: libbalsa/source-viewer.c:73 libbalsa/source-viewer.c:115
 msgid "Escape special and non-ASCII characters"
 msgstr "תווי יציאה מיוחדים ולא ASCII"
 
-#: libbalsa/source-viewer.c:152
+#: libbalsa/source-viewer.c:221
 msgid "Mailbox closed"
 msgstr "תיבת הדואר נסגרה."
 
-#: libbalsa/source-viewer.c:213
+#: libbalsa/source-viewer.c:338
 msgid "Message Source"
 msgstr "קוד המקור של ההודעה"
 
@@ -1376,7 +1431,7 @@ msgid "GnomeCard Address Book"
 msgstr "ספר הכתובות GnomeCard"
 
 #: libinit_balsa/balsa-druid-page-finish.c:83
-#: libinit_balsa/balsa-druid-page-finish.c:91 src/ab-window.c:207
+#: libinit_balsa/balsa-druid-page-finish.c:91 src/ab-window.c:211
 msgid "Address Book"
 msgstr "ספר כתובות"
 
@@ -1526,13 +1581,13 @@ msgstr ""
 msgid "New mail notification"
 msgstr "ללא קירוב"
 
-#: src/ab-main.c:338 src/ab-window.c:167 src/filter-edit-dialog.c:193
+#: src/ab-main.c:482 src/ab-window.c:167 src/filter-edit-dialog.c:251
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
 #: src/filter-run-dialog.c:292
 msgid "Name"
 msgstr "שם"
 
-#: src/ab-main.c:458
+#: src/ab-main.c:602
 #, fuzzy
 msgid "F_ilter:"
 msgstr "_מסננים..."
@@ -1542,37 +1597,37 @@ msgid "E-Mail Address"
 msgstr "כתובת דואר אלקטרוני"
 
 #. Entry widget for finding an address
-#: src/ab-window.c:264
+#: src/ab-window.c:291
 msgid "_Search for Name:"
 msgstr "_חפש שם׃"
 
-#: src/ab-window.c:324
+#: src/ab-window.c:351
 msgid "Send-To"
 msgstr "שלח-אל"
 
-#: src/ab-window.c:344
+#: src/ab-window.c:371
 msgid "Run GnomeCard"
 msgstr "הפעל את GnomeCard"
 
-#: src/ab-window.c:352
+#: src/ab-window.c:379
 #, fuzzy
 msgid "_Re-Import"
 msgstr "יבא מחדש"
 
 #. mode switching stuff
-#: src/ab-window.c:362
+#: src/ab-window.c:389
 msgid "Treat multiple addresses as:"
 msgstr "התייחס אל מספר כתובות כאל׃"
 
-#: src/ab-window.c:366
+#: src/ab-window.c:393
 msgid "alternative addresses for the same person"
 msgstr "כתובות אלטרנטיביות של אותו אדם"
 
-#: src/ab-window.c:371
+#: src/ab-window.c:398
 msgid "a distribution list"
 msgstr "רשימת תפוצה"
 
-#: src/ab-window.c:677
+#: src/ab-window.c:704
 #, fuzzy, c-format
 msgid ""
 "Error opening address book '%s':\n"
@@ -1684,8 +1739,8 @@ msgstr "_הפעל TLS"
 msgid "Error displaying %s: %s\n"
 msgstr "שגיאה בהצגת %s׃ %s\n"
 
-#: src/address-book-config.c:623 src/mailbox-conf.c:564
-#: src/pref-manager.c:1555 src/pref-manager.c:2699
+#: src/address-book-config.c:623 src/mailbox-conf.c:622
+#: src/pref-manager.c:1746 src/pref-manager.c:2974
 msgid "_Add"
 msgstr "_הוסף"
 
@@ -1740,103 +1795,108 @@ msgstr "_זכור סיסמה"
 msgid "Couldn't open mailbox \"%s\""
 msgstr "לא ניתן לפתוח את תיבת הדואר \"%s\""
 
-#: src/balsa-index.c:351 src/pref-manager.c:353
+#: src/balsa-index.c:361 src/pref-manager.c:373
 msgid "Subject"
 msgstr "נושא"
 
-#: src/balsa-index.c:365 src/pref-manager.c:354
+#: src/balsa-index.c:375 src/pref-manager.c:374
 msgid "Date"
 msgstr "תאריך"
 
-#: src/balsa-index.c:377 src/pref-manager.c:355
+#: src/balsa-index.c:387 src/pref-manager.c:375
 msgid "Size"
 msgstr "גודל"
 
-#: src/balsa-index.c:955
+#: src/balsa-index.c:988
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "פותח את תיבת הדואר %s. נא המתן ..."
 
+#: src/balsa-index.c:1610
+#, fuzzy, c-format
+msgid "Move to Trash failed: %s"
+msgstr "_זרוק לאשפה"
+
 #. R
-#: src/balsa-index.c:1712 src/main-window.c:578 src/main-window.c:1024
-#: src/message-window.c:143
+#: src/balsa-index.c:1759 src/main-window.c:581 src/main-window.c:1029
+#: src/message-window.c:145
 msgid "_Reply..."
 msgstr "_השב..."
 
-#: src/balsa-index.c:1714
+#: src/balsa-index.c:1761
 msgid "Reply To _All..."
 msgstr "השב ל_כולם..."
 
-#: src/balsa-index.c:1716
+#: src/balsa-index.c:1763
 msgid "Reply To _Group..."
 msgstr "השב ל_קבוצה..."
 
-#: src/balsa-index.c:1718
+#: src/balsa-index.c:1765
 msgid "_Forward Attached..."
 msgstr "העבר _חומר מצורף..."
 
-#: src/balsa-index.c:1720
+#: src/balsa-index.c:1767
 msgid "Forward _Inline..."
 msgstr "העבר ב_גוף ההודעה (inline)"
 
-#: src/balsa-index.c:1722 src/main-window.c:668 src/main-window.c:1008
+#: src/balsa-index.c:1769 src/main-window.c:671 src/main-window.c:1013
 msgid "_Store Address..."
 msgstr "_אחסן כתובת"
 
-#: src/balsa-index.c:1737 src/filter-edit-dialog.c:216 src/mailbox-node.c:965
-#: src/pref-manager.c:1557 src/pref-manager.c:2703
+#: src/balsa-index.c:1784 src/filter-edit-dialog.c:274 src/mailbox-node.c:970
+#: src/pref-manager.c:1748 src/pref-manager.c:2978
 msgid "_Delete"
 msgstr "מחק"
 
-#: src/balsa-index.c:1742
+#: src/balsa-index.c:1789
 msgid "_Undelete"
 msgstr "בטל מחיקה"
 
-#: src/balsa-index.c:1747
+#: src/balsa-index.c:1794
 msgid "Move To _Trash"
 msgstr "זרוק ל_אשפה"
 
-#: src/balsa-index.c:1751
+#: src/balsa-index.c:1798
 msgid "T_oggle"
 msgstr "_שנה מצב"
 
-#: src/balsa-index.c:1755 src/main-window.c:327 src/main-window.c:356
+#: src/balsa-index.c:1802 src/main-window.c:328 src/main-window.c:357
 msgid "_Flagged"
 msgstr "_דגל"
 
-#: src/balsa-index.c:1758
+#: src/balsa-index.c:1805
 msgid "_Unread"
 msgstr "לא נקרא"
 
-#: src/balsa-index.c:1766
+#: src/balsa-index.c:1813
 msgid "_Move to"
 msgstr "שמור בתיבת דואר"
 
-#: src/balsa-index.c:1774
+#: src/balsa-index.c:1821
 msgid "_View Source"
 msgstr "צפה במקור (source)"
 
-#: src/balsa-index.c:2042
+#: src/balsa-index.c:2093
 #, fuzzy, c-format
-msgid "Failed to copy messages to mailbox \"%s\"."
+msgid "Failed to copy messages to mailbox \"%s\": %s"
 msgstr "לא ניתן לפתוח את תיבת הדואר \"%s\""
 
-#: src/balsa-index.c:2043
+#: src/balsa-index.c:2094
 #, fuzzy, c-format
-msgid "Failed to copy message to mailbox \"%s\"."
+msgid "Failed to copy message to mailbox \"%s\": %s"
 msgstr "לא ניתן לפתוח את תיבת הדואר \"%s\""
 
-#: src/balsa-index.c:2056
+#: src/balsa-index.c:2106
 #, fuzzy, c-format
 msgid "Copied to \"%s\"."
 msgstr "מעתיק את הודעה %d אל %s..."
 
-#: src/balsa-index.c:2057
+#: src/balsa-index.c:2107
 #, fuzzy, c-format
 msgid "Moved to \"%s\"."
 msgstr "_זרוק לאשפה"
 
-#: src/balsa-index.c:2177
+#: src/balsa-index.c:2227
 #, fuzzy, c-format
 msgid "Committing mailbox %s failed."
 msgstr "עדכון תיבת דואר %s נכשל"
@@ -1845,19 +1905,24 @@ msgstr "עדכון תיבת דואר %s נכשל"
 msgid "Mailbox"
 msgstr "תיבת דואר"
 
-#: src/balsa-mblist.c:1011 src/balsa-mblist.c:1047
+#: src/balsa-mblist.c:1000 src/balsa-mblist.c:1036
 msgid "Failed to find mailbox"
 msgstr "לא מוצא את תיבת הדואר"
 
-#: src/balsa-mblist.c:1630
+#: src/balsa-mblist.c:1619
 msgid "_Other..."
 msgstr "_אחר..."
 
-#: src/balsa-mblist.c:1698
+#: src/balsa-mblist.c:1687
 msgid "Choose destination folder"
 msgstr "בחר את תיקיית היעד"
 
-#: src/balsa-mblist.c:2034
+#: src/balsa-mblist.c:1889
+#, fuzzy
+msgid "Other..."
+msgstr "_אחר..."
+
+#: src/balsa-mblist.c:2182
 #, fuzzy, c-format
 msgid "Shown mailbox: %s with %d message, "
 msgid_plural "Shown mailbox: %s with %d messages, "
@@ -1866,7 +1931,7 @@ msgstr[1] "תיבת הדואר %s מכילה %ld הודעות, מתוכן %ld ח
 
 #. xgettext: this is the second part of the message
 #. * "Shown mailbox: %s with %d messages, %ld new".
-#: src/balsa-mblist.c:2040
+#: src/balsa-mblist.c:2188
 #, c-format
 msgid "%ld new"
 msgid_plural "%ld new"
@@ -1903,141 +1968,141 @@ msgstr "שמור בחירה..."
 msgid "(No sender)"
 msgstr "(אין שולח)"
 
-#: src/balsa-message.c:1199 src/balsa-message.c:3699
+#: src/balsa-message.c:1199 src/balsa-message.c:3734
 #, fuzzy, c-format
 msgid "Could not access message; mailbox \"%s\" was changed."
 msgstr "לא ניתן לפתוח את תיבת הדואר \"%s\""
 
-#: src/balsa-message.c:1453 src/print.c:358 src/sendmsg-window.c:863
-#: src/sendmsg-window.c:2459
+#: src/balsa-message.c:1453 src/print.c:359 src/sendmsg-window.c:865
+#: src/sendmsg-window.c:2531
 msgid "Subject:"
 msgstr "נושא׃"
 
-#: src/balsa-message.c:1457 src/print.c:364 src/sendmsg-window.c:2453
+#: src/balsa-message.c:1457 src/print.c:365 src/sendmsg-window.c:2525
 msgid "Date:"
 msgstr "תאריך׃"
 
-#: src/balsa-message.c:1468 src/sendmsg-window.c:860
+#: src/balsa-message.c:1468 src/sendmsg-window.c:862
 msgid "Reply-To:"
 msgstr "השב אל׃"
 
 #. cc:
-#: src/balsa-message.c:1472 src/print.c:374 src/sendmsg-window.c:862
-#: src/sendmsg-window.c:2150 src/sendmsg-window.c:2478 src/store-address.c:305
+#: src/balsa-message.c:1472 src/print.c:375 src/sendmsg-window.c:864
+#: src/sendmsg-window.c:2222 src/sendmsg-window.c:2550 src/store-address.c:331
 msgid "Cc:"
 msgstr "העתק׃"
 
 #. bcc:
-#: src/balsa-message.c:1473 src/print.c:375 src/sendmsg-window.c:861
-#: src/sendmsg-window.c:2155 src/store-address.c:306
+#: src/balsa-message.c:1473 src/print.c:376 src/sendmsg-window.c:863
+#: src/sendmsg-window.c:2227 src/store-address.c:332
 msgid "Bcc:"
 msgstr "העתק סמוי׃"
 
-#: src/balsa-message.c:1476 src/print.c:376
+#: src/balsa-message.c:1476 src/print.c:377
 msgid "Fcc:"
 msgstr "העתק לקובץ׃"
 
-#: src/balsa-message.c:1481 src/print.c:381
+#: src/balsa-message.c:1481 src/print.c:382
 msgid "Disposition-Notification-To:"
 msgstr "לשלוח אישור על קריאת הדואר אל׃"
 
-#: src/balsa-message.c:1614 src/balsa-message.c:1645
+#: src/balsa-message.c:1615 src/balsa-message.c:1646
 #, fuzzy, c-format
 msgid "Error loading attached image: %s\n"
 msgstr "שגיאה בטעינת %s׃ %s\n"
 
-#: src/balsa-message.c:1715 src/balsa-message.c:1731 src/balsa-message.c:1763
-#: src/balsa-message.c:1816
+#: src/balsa-message.c:1716 src/balsa-message.c:1732 src/balsa-message.c:1764
+#: src/balsa-message.c:1817
 msgid "Content Type: external-body\n"
 msgstr "סוג התכולה׃ גוף חיצוני (external-body)\n"
 
-#: src/balsa-message.c:1716
+#: src/balsa-message.c:1717
 msgid "Access type: local-file\n"
 msgstr "סוג הגישה׃ קובץ מקומי\n"
 
-#: src/balsa-message.c:1717 src/balsa-message.c:1770 src/balsa-message.c:1929
+#: src/balsa-message.c:1718 src/balsa-message.c:1771 src/balsa-message.c:1930
 #, c-format
 msgid "File name: %s"
 msgstr "שם קובץ׃ %s"
 
-#: src/balsa-message.c:1732
+#: src/balsa-message.c:1733
 msgid "Access type: URL\n"
 msgstr "שיטת גישה׃ URL\n"
 
-#: src/balsa-message.c:1733
+#: src/balsa-message.c:1734
 #, c-format
 msgid "URL: %s"
 msgstr "URL: %s"
 
-#: src/balsa-message.c:1764
+#: src/balsa-message.c:1765
 #, c-format
 msgid "Access type: %s\n"
 msgstr "שיטת גישה׃ %s\n"
 
-#: src/balsa-message.c:1767
+#: src/balsa-message.c:1768
 #, c-format
 msgid "FTP site: %s\n"
 msgstr "אתר FTP׃ %s\n"
 
-#: src/balsa-message.c:1769
+#: src/balsa-message.c:1770
 #, c-format
 msgid "Directory: %s\n"
 msgstr "ספרייה׃ %s\n"
 
-#: src/balsa-message.c:1817
+#: src/balsa-message.c:1818
 msgid "Access type: mail-server\n"
 msgstr "שיטת גישה׃ שרת-דואר\n"
 
-#: src/balsa-message.c:1818
+#: src/balsa-message.c:1819
 #, c-format
 msgid "Mail server: %s\n"
 msgstr "שרת דואר׃ %s\n"
 
-#: src/balsa-message.c:1820
+#: src/balsa-message.c:1821
 #, c-format
 msgid "Subject: %s\n"
 msgstr "נושא׃ %s\n"
 
-#: src/balsa-message.c:1832
+#: src/balsa-message.c:1833
 #, fuzzy
 msgid "Se_nd message to obtain this part"
 msgstr "שלח את ההודעה בכדי לקבל חלק זה"
 
-#: src/balsa-message.c:1937
+#: src/balsa-message.c:1938
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "סוג׃ %s (%s("
 
-#: src/balsa-message.c:1940
+#: src/balsa-message.c:1941
 #, c-format
 msgid "Content Type: %s"
 msgstr "סוג התוכן׃ %s"
 
-#: src/balsa-message.c:1951
+#: src/balsa-message.c:1952
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr "לא מוגדרת פעולת פתיחה או צפייה ב-GNOME MIME לגבי סוג תכולה זה"
 
-#: src/balsa-message.c:1957
+#: src/balsa-message.c:1958
 #, fuzzy
 msgid "S_ave part"
 msgstr "שמור חלק"
 
-#: src/balsa-message.c:1981 src/balsa-message.c:2006
+#: src/balsa-message.c:1982 src/balsa-message.c:2007
 #, fuzzy, c-format
 msgid "View _part with %s"
 msgstr "צפה בחלק באמצעות %s"
 
-#: src/balsa-message.c:2285
+#: src/balsa-message.c:2286
 #, c-format
 msgid "Calling URL %s..."
 msgstr "מעלה את %s..."
 
-#: src/balsa-message.c:2295 src/balsa-message.c:3116 src/balsa-message.c:3834
+#: src/balsa-message.c:2296 src/balsa-message.c:3117 src/balsa-message.c:3869
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "שגיאה בהצגת %s׃ %s\n"
 
-#: src/balsa-message.c:2381
+#: src/balsa-message.c:2382
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
@@ -2046,77 +2111,77 @@ msgstr ""
 "ההודעה נשלחה על-ידי %s עם הכותרת \"%s\" מכילה תווים ב 8 סיביות, אך אין כותרת "
 "המתארת את הקידוד בשימוש (מומר ל %s)"
 
-#: src/balsa-message.c:2680
+#: src/balsa-message.c:2681
 msgid "mixed parts"
 msgstr "חלקים מעורבבים"
 
-#: src/balsa-message.c:2682
+#: src/balsa-message.c:2683
 msgid "alternative parts"
 msgstr "חלקים חלופיים"
 
-#: src/balsa-message.c:2684
+#: src/balsa-message.c:2685
 msgid "signed parts"
 msgstr "חלקים חתומים"
 
-#: src/balsa-message.c:2686
+#: src/balsa-message.c:2687
 msgid "encrypted parts"
 msgstr "חלקים מוצפנים"
 
-#: src/balsa-message.c:2688
+#: src/balsa-message.c:2689
 #, fuzzy
 msgid "rfc822 message"
 msgstr "הדפס הודעה"
 
-#: src/balsa-message.c:2690
+#: src/balsa-message.c:2691
 #, c-format
 msgid "\"%s\" parts"
 msgstr "חלקים \"%s\""
 
-#: src/balsa-message.c:2746
+#: src/balsa-message.c:2747
 #, c-format
 msgid "rfc822 message (from %s, subject \"%s\")"
 msgstr ""
 
-#: src/balsa-message.c:2753
+#: src/balsa-message.c:2754
 #, fuzzy
 msgid "complete message"
 msgstr "יצירת הודעה"
 
-#: src/balsa-message.c:2770
+#: src/balsa-message.c:2771
 #, c-format
 msgid "part %s: %s (file %s)"
 msgstr ""
 
-#: src/balsa-message.c:2781
+#: src/balsa-message.c:2782
 #, fuzzy, c-format
 msgid "part %s: %s"
 msgstr "השב אל %s׃ %s"
 
-#: src/balsa-message.c:2796
+#: src/balsa-message.c:2797
 #, fuzzy
 msgid "encrypted: "
 msgstr "חלקים מוצפנים"
 
-#: src/balsa-message.c:2878
+#: src/balsa-message.c:2879
 #, c-format
 msgid "Open with %s"
 msgstr "פתח באמצעות %s"
 
-#: src/balsa-message.c:3009
+#: src/balsa-message.c:3010
 msgid "Save..."
 msgstr "שמור..."
 
-#: src/balsa-message.c:3194
+#: src/balsa-message.c:3195
 #, c-format
 msgid "Could not create temporary file %s"
 msgstr "לא ניתן ליצור את הקובץ הזמני %s"
 
-#: src/balsa-message.c:3239
+#: src/balsa-message.c:3240
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "לא ניתן ליצור קובץ זמני %s"
 
-#: src/balsa-message.c:4111
+#: src/balsa-message.c:4146
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2126,32 +2191,41 @@ msgstr ""
 "שולח הודעה זו, %s, ביקש אישור מסירה (MDN),\n"
 "שיוחזר אל '%s`. האם ברצונך לשלוח אישור זה?"
 
-#: src/balsa-message.c:4118
+#: src/balsa-message.c:4153
 msgid "Reply to MDN?"
 msgstr "להשיב לבקשת אישור מסירה (MDN)?"
 
-#: src/balsa-message.c:4436
+#: src/balsa-message.c:4472
 #, fuzzy, c-format
 msgid ""
-"This is an inline OpenPGP signed %s message part:\n"
+"This is an inline %s signed %s message part:\n"
 "%s"
 msgstr ""
 "\n"
 "--\n"
 "זהו חלק הודעה חתום של OpenPGP:\n"
 
-#: src/balsa-message.c:4454
+#: src/balsa-message.c:4474 src/print.c:1303
+#, fuzzy
+msgid "OpenPGP"
+msgstr "_פתח"
+
+#: src/balsa-message.c:4474 src/balsa-message.c:4736 src/print.c:1303
+msgid "S/MIME"
+msgstr ""
+
+#: src/balsa-message.c:4492
 msgid "_Run gpg to import this key"
 msgstr ""
 
-#: src/balsa-message.c:4570 src/balsa-message.c:4793
+#: src/balsa-message.c:4609 src/balsa-message.c:4833
 msgid ""
 "This operation can not be performed because this message is displayed more "
 "than once.\n"
 "Please close the other instances of this message and try again."
 msgstr ""
 
-#: src/balsa-message.c:4606
+#: src/balsa-message.c:4645
 #, fuzzy, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
@@ -2160,7 +2234,7 @@ msgstr ""
 "ההודעה שנשלחה על-ידי %s בנושא \"%s\" מכילה מספר חלקים/חלק מוצפן(\"multipart/"
 "encrypted\"), אבל המבנה אינו תקין."
 
-#: src/balsa-message.c:4614
+#: src/balsa-message.c:4653
 #, fuzzy, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
@@ -2169,7 +2243,7 @@ msgstr ""
 "ההודעה שנשלחה על-ידי %s בנושא \"%s\" מכילה מספר חלקים/חלק מוצפן(\"multipart/"
 "encrypted\"), אבל המבנה אינו תקין."
 
-#: src/balsa-message.c:4627
+#: src/balsa-message.c:4666
 #, fuzzy, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
@@ -2178,7 +2252,7 @@ msgstr ""
 "ההודעה שנשלחה על-ידי %s בנושא \"%s\" מכילה מספר חלקים/חלק מוצפן(\"multipart/"
 "encrypted\"), אבל המבנה אינו תקין."
 
-#: src/balsa-message.c:4681
+#: src/balsa-message.c:4720
 #, fuzzy, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but it's "
@@ -2187,7 +2261,7 @@ msgstr ""
 "ההודעה שנשלחה על-ידי %s בנושא \"%s\" מכילה מספר חלקים/חלק חתום (\"multipart/"
 "signed part\")אבל המבנה אינו תקין.  החתימה, אם קיימת, אינה ניתנת לבדיקה."
 
-#: src/balsa-message.c:4694
+#: src/balsa-message.c:4733
 #, fuzzy, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
@@ -2196,29 +2270,25 @@ msgstr ""
 "ההודעה שנשלחה על-ידי %s בנושא \"%s\" מכילה מספר חלקים/חלק מוצפן(\"multipart/"
 "encrypted\"), אבל המבנה אינו תקין."
 
-#: src/balsa-message.c:4696
+#: src/balsa-message.c:4736
 msgid "PGP"
 msgstr ""
 
-#: src/balsa-message.c:4696
-msgid "S/MIME"
-msgstr ""
-
-#: src/balsa-message.c:4715 src/balsa-message.c:4820
+#: src/balsa-message.c:4755 src/balsa-message.c:4860
 #, fuzzy
 msgid "Detected a good signature"
 msgstr "התגלתה חתימה תקינה"
 
-#: src/balsa-message.c:4721
+#: src/balsa-message.c:4761
 #, fuzzy
 msgid "Detected a good signature with insufficient validity"
 msgstr "התגלתה חתימה תקינה"
 
-#: src/balsa-message.c:4726 src/balsa-message.c:4824
+#: src/balsa-message.c:4766 src/balsa-message.c:4864
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr ""
 
-#: src/balsa-message.c:4733 src/balsa-message.c:4830
+#: src/balsa-message.c:4773 src/balsa-message.c:4870
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2228,327 +2298,328 @@ msgstr ""
 "בדיקת חתימת-ההודעה שנשלחה על-ידי %s בנושא׃ \"%s\"החזירה׃\n"
 "%s"
 
-#: src/balsa-message.c:4745
+#: src/balsa-message.c:4785
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
 "with an error!"
 msgstr "בדיקת חתימת-ההודעה שנשלחה על-ידי %s בנושא׃ \"%s\" נכשלה בגלל שגיאה!"
 
-#: src/filter-edit-callbacks.c:286
+#: src/filter-edit-callbacks.c:313
 msgid "One of the specified fields contains:"
 msgstr "אחד מהשדות שצוינו מכיל׃"
 
-#: src/filter-edit-callbacks.c:287
+#: src/filter-edit-callbacks.c:314
 msgid "None of the specified fields contains:"
 msgstr "אף אחד מהשדות שצוינו אינו מכיל׃"
 
-#: src/filter-edit-callbacks.c:289
+#: src/filter-edit-callbacks.c:316
 msgid "One of the regular expressions matches"
 msgstr "אחד מהביטויים הסדירים מתאים"
 
-#: src/filter-edit-callbacks.c:290
+#: src/filter-edit-callbacks.c:317
 msgid "None of the regular expressions matches"
 msgstr "אף אחד מהביטויים הסדירים אינו מתאים"
 
-#: src/filter-edit-callbacks.c:292 src/filter-edit-callbacks.c:897
+#: src/filter-edit-callbacks.c:319 src/filter-edit-callbacks.c:1016
 msgid "Match when date is in the interval:"
 msgstr "התאם כאשר התאריך הוא בקטע הזמן׃"
 
-#: src/filter-edit-callbacks.c:293
+#: src/filter-edit-callbacks.c:320
 msgid "Match when date is outside the interval:"
 msgstr "התאם כאשר התאריך הוא מחוץ לקטע הזמן׃"
 
-#: src/filter-edit-callbacks.c:295 src/filter-edit-callbacks.c:935
+#: src/filter-edit-callbacks.c:322 src/filter-edit-callbacks.c:1054
 msgid "Match when one of these flags is set:"
 msgstr "התאם כאשר אחד מהדגלים הללו מודלק׃"
 
-#: src/filter-edit-callbacks.c:296
+#: src/filter-edit-callbacks.c:323
 msgid "Match when none of these flags is set:"
 msgstr "התאם כאשר אף לא אחד מהדגלים הללו מודלק׃"
 
-#: src/filter-edit-callbacks.c:449
+#: src/filter-edit-callbacks.c:535
 msgid "You must specify the name of the user header to match on"
 msgstr "עליך לציין את השם של כותרת המשתמש שאותה מנסים להתאים"
 
-#: src/filter-edit-callbacks.c:464
+#: src/filter-edit-callbacks.c:556
 msgid "You must specify at least one field for matching"
 msgstr "עליך לציין לפחות שדה אחד להתאמה"
 
-#: src/filter-edit-callbacks.c:474
+#: src/filter-edit-callbacks.c:566
 msgid "You must provide a string"
 msgstr "עליך לספק מחרוזת"
 
-#: src/filter-edit-callbacks.c:481
+#: src/filter-edit-callbacks.c:573
 msgid "You must provide at least one regular expression"
 msgstr "עליך לספק לפחות ביטוי סדיר אחד"
 
-#: src/filter-edit-callbacks.c:493
+#: src/filter-edit-callbacks.c:585
 msgid "Low date is incorrect"
 msgstr "התאריך המוקדם יותר אינו תקין"
 
-#: src/filter-edit-callbacks.c:504
+#: src/filter-edit-callbacks.c:596
 msgid "High date is incorrect"
 msgstr "התאריך המאוחר יותר אינו תקין"
 
-#: src/filter-edit-callbacks.c:512
+#: src/filter-edit-callbacks.c:604
 msgid "Low date is greater than high date"
 msgstr "התאריך המוקדם מאוחר מהתאריך המאוחר"
 
-#: src/filter-edit-callbacks.c:782
+#: src/filter-edit-callbacks.c:901
 #, fuzzy, c-format
 msgid "Error displaying condition help: %s\n"
 msgstr "שגיאה בהצגת עזרה על סרגל הכלים׃ %s\n"
 
-#: src/filter-edit-callbacks.c:802
+#: src/filter-edit-callbacks.c:921
 msgid "Unread"
 msgstr "לא נקרא"
 
-#: src/filter-edit-callbacks.c:802
+#: src/filter-edit-callbacks.c:921
 msgid "Deleted"
 msgstr "נמחק"
 
-#: src/filter-edit-callbacks.c:802
+#: src/filter-edit-callbacks.c:921
 msgid "Replied"
 msgstr "נענה"
 
-#: src/filter-edit-callbacks.c:802
+#: src/filter-edit-callbacks.c:921
 msgid "Flagged"
 msgstr "דגל"
 
-#: src/filter-edit-callbacks.c:816
+#: src/filter-edit-callbacks.c:935
 msgid "One of the specified f_ields contains"
 msgstr "אחד מה_שדות שצוינו מכיל׃"
 
-#: src/filter-edit-callbacks.c:831
+#: src/filter-edit-callbacks.c:950
 msgid "Contain/Does _Not Contain"
 msgstr "_מכיל/אינו מכיל"
 
-#: src/filter-edit-callbacks.c:845
+#: src/filter-edit-callbacks.c:964
 msgid "_One of the regular expressions matches"
 msgstr "_אחד מהביטויים הסדירים מתאים"
 
 #. FIXME : I saw a lot of different ways to create button with
 #. pixmaps, hope this one is correct
 #. Right/Add button
-#: src/filter-edit-callbacks.c:872 src/filter-run-dialog.c:313
+#: src/filter-edit-callbacks.c:991 src/filter-run-dialog.c:313
 msgid "A_dd"
 msgstr "_הוסף"
 
 #. Left/Remove button
-#: src/filter-edit-callbacks.c:876 src/filter-edit-dialog.c:310
+#: src/filter-edit-callbacks.c:995 src/filter-edit-dialog.c:368
 #: src/filter-run-dialog.c:318
 msgid "_Remove"
 msgstr "ה_סר"
 
-#: src/filter-edit-callbacks.c:880
+#: src/filter-edit-callbacks.c:999
 msgid "One _Matches/None Matches"
 msgstr "אחד _מתאים/אף אחד אינו מתאים"
 
-#: src/filter-edit-callbacks.c:917
+#: src/filter-edit-callbacks.c:1036
 msgid "Inside/outside the date interval"
 msgstr "בתוך/מחוץ לקטע הזמן"
 
-#: src/filter-edit-callbacks.c:964
+#: src/filter-edit-callbacks.c:1083
 msgid "Match when one flag is set/when no flag is set"
 msgstr "התאם כאשר דגל אחד מודלק/כאשר אף דגל אינו מודלק"
 
 #. builds the toggle buttons to specify fields concerned by the conditions of
 #. * the filter
-#: src/filter-edit-callbacks.c:982
+#: src/filter-edit-callbacks.c:1104
 msgid "Match In"
 msgstr "התאם ב"
 
-#: src/filter-edit-callbacks.c:994
+#: src/filter-edit-callbacks.c:1116
 msgid "_All"
 msgstr "_הכל"
 
-#: src/filter-edit-callbacks.c:1002
+#: src/filter-edit-callbacks.c:1124
 msgid "C_lear"
 msgstr "_נקה"
 
-#: src/filter-edit-callbacks.c:1011 src/main-window.c:3715
+#: src/filter-edit-callbacks.c:1133 src/main-window.c:3789
 msgid "_Body"
 msgstr "_גוף"
 
 #. To:
-#: src/filter-edit-callbacks.c:1018 src/main-window.c:3716
-#: src/sendmsg-window.c:2139
+#: src/filter-edit-callbacks.c:1140 src/main-window.c:3790
+#: src/sendmsg-window.c:2211
 msgid "_To:"
 msgstr "_אל׃"
 
-#: src/filter-edit-callbacks.c:1025 src/main-window.c:3717
+#: src/filter-edit-callbacks.c:1147 src/main-window.c:3791
 msgid "_From:"
 msgstr "_מאת׃"
 
-#: src/filter-edit-callbacks.c:1033
+#: src/filter-edit-callbacks.c:1155
 msgid "_Subject"
 msgstr "_נושא"
 
-#: src/filter-edit-callbacks.c:1040 src/main-window.c:3719
+#: src/filter-edit-callbacks.c:1162 src/main-window.c:3793
 msgid "_Cc:"
 msgstr "ה_עתק:"
 
-#: src/filter-edit-callbacks.c:1047
+#: src/filter-edit-callbacks.c:1169
 msgid "_User header:"
 msgstr "כותרת _משתמש׃"
 
-#: src/filter-edit-callbacks.c:1071
+#: src/filter-edit-callbacks.c:1206
 msgid "Search T_ype:"
 msgstr "_סוג חיפוש׃"
 
-#: src/filter-edit-callbacks.c:1145
+#: src/filter-edit-callbacks.c:1280
 msgid "Edit condition for filter: "
 msgstr "ערוך תנאי עבור המסנן׃ "
 
-#: src/filter-edit-callbacks.c:1384
+#: src/filter-edit-callbacks.c:1520
 #, fuzzy, c-format
 msgid "Error displaying filter help: %s\n"
 msgstr "שגיאה בהצגת עזרה על סרגל הכלים׃ %s\n"
 
-#: src/filter-edit-callbacks.c:1572
+#: src/filter-edit-callbacks.c:1715
 msgid "New filter"
 msgstr "מסנן חדש"
 
-#: src/filter-edit-callbacks.c:1701
+#: src/filter-edit-callbacks.c:1846
 msgid "No filter name specified."
 msgstr "לא ניתן שם למסנן."
 
-#: src/filter-edit-callbacks.c:1706
+#: src/filter-edit-callbacks.c:1851
 #, c-format
 msgid "Filter \"%s\" already exists."
 msgstr "המסנן \"%s\" כבר קיים."
 
-#: src/filter-edit-callbacks.c:1719
+#: src/filter-edit-callbacks.c:1870
 msgid "Filter must have conditions."
 msgstr "למסנן חייבים להיות תנאים."
 
-#: src/filter-edit-callbacks.c:1781
+#: src/filter-edit-callbacks.c:1939
 msgid "Filter has matched"
 msgstr "המסנן מצא התאמה"
 
-#: src/filter-edit-callbacks.c:1799
+#: src/filter-edit-callbacks.c:1957
 msgid "You must provide a sound to play"
 msgstr "עליך לספק מנגינה"
 
-#: src/filter-edit-callbacks.c:1948
+#: src/filter-edit-callbacks.c:2114
 #, c-format
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr "(לדוגמה: כתוב 31 בדצמבר 2000, כ %s)"
 
-#: src/filter-edit-dialog.c:88 src/pref-manager.c:361
+#: src/filter-edit-dialog.c:89 src/filter-edit-dialog.c:109
+#: src/pref-manager.c:381
 msgid "Simple"
 msgstr "פשוט"
 
-#: src/filter-edit-dialog.c:89
+#: src/filter-edit-dialog.c:90 src/filter-edit-dialog.c:110
 msgid "Regular Expression"
 msgstr "ביטוי סדיר"
 
-#: src/filter-edit-dialog.c:90
+#: src/filter-edit-dialog.c:91 src/filter-edit-dialog.c:111
 msgid "Date interval"
 msgstr "קטע זמן"
 
-#: src/filter-edit-dialog.c:91
+#: src/filter-edit-dialog.c:92 src/filter-edit-dialog.c:112
 msgid "Flag condition"
 msgstr "תנאי על דגלים"
 
-#: src/filter-edit-dialog.c:95
+#: src/filter-edit-dialog.c:96 src/filter-edit-dialog.c:116
 msgid "Copy to folder:"
 msgstr "העתק לתיקייה׃"
 
-#: src/filter-edit-dialog.c:96
+#: src/filter-edit-dialog.c:97 src/filter-edit-dialog.c:117
 msgid "Move to folder:"
 msgstr "העבר לתיקייה׃"
 
-#: src/filter-edit-dialog.c:97
+#: src/filter-edit-dialog.c:98 src/filter-edit-dialog.c:118
 msgid "Print on printer:"
 msgstr "הדפס במדפסת׃"
 
-#: src/filter-edit-dialog.c:98
+#: src/filter-edit-dialog.c:99 src/filter-edit-dialog.c:119
 msgid "Run program:"
 msgstr "הפעל תוכנית׃"
 
-#: src/filter-edit-dialog.c:99
+#: src/filter-edit-dialog.c:100 src/filter-edit-dialog.c:120
 msgid "Send to Trash"
 msgstr "שלח לאשפה"
 
-#: src/filter-edit-dialog.c:103
+#: src/filter-edit-dialog.c:104 src/filter-edit-dialog.c:124
 msgid "OR"
 msgstr "או"
 
-#: src/filter-edit-dialog.c:104
+#: src/filter-edit-dialog.c:105 src/filter-edit-dialog.c:125
 msgid "AND"
 msgstr "וגם"
 
 #. new button
 #. #define MENU_FILE_NEW_POS 0
-#: src/filter-edit-dialog.c:210 src/mailbox-node.c:937 src/main-window.c:367
-#: src/main-window.c:426
+#: src/filter-edit-dialog.c:268 src/mailbox-node.c:942 src/main-window.c:368
+#: src/main-window.c:427
 msgid "_New"
 msgstr "_חדש"
 
 #. The name entry
-#: src/filter-edit-dialog.c:242
+#: src/filter-edit-dialog.c:300
 msgid "_Filter name:"
 msgstr "שם ה_מסנן׃"
 
 #. The filter op-code : "OR" or "AND" all the conditions
-#: src/filter-edit-dialog.c:258
+#: src/filter-edit-dialog.c:316
 msgid "Operation between conditions"
 msgstr "פעולה בין התנאים"
 
-#: src/filter-edit-dialog.c:301
+#: src/filter-edit-dialog.c:359
 msgid "_Edit"
 msgstr "_עריכה"
 
-#: src/filter-edit-dialog.c:306
+#: src/filter-edit-dialog.c:364
 msgid "Ne_w"
 msgstr "_חדש"
 
 #. The notification area
-#: src/filter-edit-dialog.c:336
+#: src/filter-edit-dialog.c:394
 msgid "Notification:"
 msgstr "יידוע׃"
 
 #. Notification buttons
-#: src/filter-edit-dialog.c:346
+#: src/filter-edit-dialog.c:404
 msgid "Play sound:"
 msgstr "נגן צליל׃"
 
-#: src/filter-edit-dialog.c:352
+#: src/filter-edit-dialog.c:410
 msgid "Use Sound..."
 msgstr "השתמש בצליל..."
 
-#: src/filter-edit-dialog.c:365
+#: src/filter-edit-dialog.c:423
 msgid "Popup text:"
 msgstr "הקפץ חלון טקסט׃"
 
 #. The action area
-#: src/filter-edit-dialog.c:386
+#: src/filter-edit-dialog.c:444
 msgid "Action to perform:"
 msgstr "פעולה לביצוע׃"
 
-#: src/filter-edit-dialog.c:437
+#: src/filter-edit-dialog.c:495
 msgid "Match"
 msgstr "התאמה"
 
-#: src/filter-edit-dialog.c:440
+#: src/filter-edit-dialog.c:498
 msgid "Action"
 msgstr "פעולה"
 
-#: src/filter-edit-dialog.c:452
+#: src/filter-edit-dialog.c:510
 msgid "Revert"
 msgstr "החזר"
 
-#: src/filter-edit-dialog.c:481
+#: src/filter-edit-dialog.c:559
 msgid "A filter run dialog is open.Close it before you can modify filters."
 msgstr "חלון הפעלת מסנן פתוח. סגור אותו בטרם תוכל לשנות מסננים."
 
-#: src/filter-edit-dialog.c:494
+#: src/filter-edit-dialog.c:572
 msgid "Balsa Filters"
 msgstr "מסנני בלזה"
 
-#: src/filter-edit-dialog.c:560
+#: src/filter-edit-dialog.c:638
 #, fuzzy, c-format
 msgid "Filter \"%s\" has no condition."
 msgstr "למסנן חייבים להיות תנאים."
@@ -2568,16 +2639,16 @@ msgstr "ישנם חלונות פתוחים של הפעלת מסננים.  סגו
 msgid "Balsa Filters Export"
 msgstr "ייצוא מסננים של בלזה"
 
-#: src/filter-run-callbacks.c:173
+#: src/filter-run-callbacks.c:174
 msgid "Error when applying filters"
 msgstr "שגיאה בהפעלת מסננים"
 
-#: src/filter-run-callbacks.c:191
+#: src/filter-run-callbacks.c:192
 #, fuzzy, c-format
 msgid "Error displaying run filters help: %s\n"
 msgstr "שגיאה בהצגת עזרה על סרגל הכלים׃ %s\n"
 
-#: src/filter-run-callbacks.c:238
+#: src/filter-run-callbacks.c:239
 #, fuzzy, c-format
 msgid ""
 "The destination mailbox of the filter \"%s\" is \"%s\".\n"
@@ -2586,7 +2657,7 @@ msgstr ""
 "תיבת הדואר שהיא יעד המסנן \"%s\" היא \"%s\"\n"
 "(אינך יכול לשייך אותו עם אותה תיבת דואר (כי זה גורם לרקורסיה)."
 
-#: src/filter-run-callbacks.c:246
+#: src/filter-run-callbacks.c:247
 #, c-format
 msgid ""
 "The filter \"%s\" is not compatible with the mailbox type of \"%s\".\n"
@@ -2633,7 +2704,7 @@ msgid "Remote IMAP folder"
 msgstr "תיקיית IMAP מרוחקת"
 
 #. must NOT be modal
-#: src/folder-conf.c:272 src/folder-conf.c:704 src/mailbox-conf.c:575
+#: src/folder-conf.c:272 src/folder-conf.c:704 src/mailbox-conf.c:633
 msgid "_Update"
 msgstr "_עדכן"
 
@@ -2641,7 +2712,7 @@ msgstr "_עדכן"
 msgid "_Create"
 msgstr "_צור"
 
-#: src/folder-conf.c:294 src/mailbox-conf.c:1073 src/mailbox-conf.c:1164
+#: src/folder-conf.c:294 src/mailbox-conf.c:1131 src/mailbox-conf.c:1222
 #, fuzzy
 msgid "_Basic"
 msgstr "העתק _סמוי"
@@ -2650,15 +2721,15 @@ msgstr "העתק _סמוי"
 msgid "_Max number of connections"
 msgstr ""
 
-#: src/folder-conf.c:306 src/mailbox-conf.c:1234
+#: src/folder-conf.c:306 src/mailbox-conf.c:1292
 msgid "Enable _persistent cache"
 msgstr ""
 
-#: src/folder-conf.c:314 src/mailbox-conf.c:1238
+#: src/folder-conf.c:314 src/mailbox-conf.c:1296
 msgid "Enable _bug workarounds"
 msgstr ""
 
-#: src/folder-conf.c:320 src/mailbox-conf.c:1127 src/mailbox-conf.c:1240
+#: src/folder-conf.c:320 src/mailbox-conf.c:1185 src/mailbox-conf.c:1298
 #, fuzzy
 msgid "_Advanced"
 msgstr "בטל"
@@ -2670,12 +2741,12 @@ msgstr "_שם מתאר:"
 
 #. pop server
 #. imap server
-#: src/folder-conf.c:330 src/mailbox-conf.c:1081 src/mailbox-conf.c:1173
+#: src/folder-conf.c:330 src/mailbox-conf.c:1139 src/mailbox-conf.c:1231
 msgid "_Server:"
 msgstr "_שרת׃"
 
 #. username
-#: src/folder-conf.c:338 src/mailbox-conf.c:1089
+#: src/folder-conf.c:338 src/mailbox-conf.c:1147
 msgid "Use_r name:"
 msgstr "שם _משתמש׃"
 
@@ -2800,34 +2871,36 @@ msgstr "שגיאה׃ "
 msgid "FATAL: "
 msgstr "שגיאה חמורה׃ "
 
-#: src/mailbox-conf.c:178 src/mailbox-conf.c:1327 src/pref-manager.c:341
-#: src/pref-manager.c:3021 src/pref-manager.c:3111
+#: src/mailbox-conf.c:213 src/mailbox-conf.c:1385 src/pref-manager.c:361
+#: src/pref-manager.c:3350 src/pref-manager.c:3356 src/pref-manager.c:3456
+#: src/pref-manager.c:3462
 msgid "Never"
 msgstr "לעולם לא"
 
-#: src/mailbox-conf.c:179 src/mailbox-conf.c:1328 src/pref-manager.c:3112
+#: src/mailbox-conf.c:214 src/mailbox-conf.c:1386 src/pref-manager.c:3457
+#: src/pref-manager.c:3463
 msgid "If Possible"
 msgstr "אם אפשר"
 
-#: src/mailbox-conf.c:180 src/pref-manager.c:3113
+#: src/mailbox-conf.c:215 src/pref-manager.c:3458 src/pref-manager.c:3464
 msgid "Required"
 msgstr "נדרש"
 
-#: src/mailbox-conf.c:188
+#: src/mailbox-conf.c:223
 #, fuzzy
 msgid "Use _SSL"
 msgstr "השתמש ב-TLS"
 
-#: src/mailbox-conf.c:192
+#: src/mailbox-conf.c:227
 #, fuzzy
 msgid "Use _TLS"
 msgstr "השתמש ב-TLS"
 
-#: src/mailbox-conf.c:329
+#: src/mailbox-conf.c:387
 msgid "No mailbox selected."
 msgstr "לא נבחרה תיבת דואר."
 
-#: src/mailbox-conf.c:356
+#: src/mailbox-conf.c:414
 #, c-format
 msgid ""
 "Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
@@ -2837,7 +2910,7 @@ msgstr ""
 "תיבת הדואר %s משמשת את בלזה ולכן לא ניתן למחוק אותה.\n"
 "אם באמת ברצונך למחוק אותה, תן את התפקיד שלה לתיבת דואר אחרת."
 
-#: src/mailbox-conf.c:366
+#: src/mailbox-conf.c:424
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
@@ -2852,15 +2925,15 @@ msgstr ""
 "שוב לתיבת דואר זו.\n"
 "מה ברצונך לעשות?"
 
-#: src/mailbox-conf.c:378
+#: src/mailbox-conf.c:436
 msgid "Remove from _list"
 msgstr "מחק מה_רשימה"
 
-#: src/mailbox-conf.c:379
+#: src/mailbox-conf.c:437
 msgid "Remove from list and _disk"
 msgstr "מחק מהרשימה ומה_דיסק"
 
-#: src/mailbox-conf.c:387
+#: src/mailbox-conf.c:445
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" and all its messages from your IMAP "
@@ -2875,11 +2948,11 @@ msgstr ""
 "בשם זה.\n"
 "מה ברצונך לעשות?"
 
-#: src/mailbox-conf.c:400
+#: src/mailbox-conf.c:458
 msgid "_Remove from server"
 msgstr "ה_סר מהשרת"
 
-#: src/mailbox-conf.c:407
+#: src/mailbox-conf.c:465
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
@@ -2890,24 +2963,24 @@ msgstr ""
 "מאוחר יותר, תוכל להשתמש ב\"הוסף תיבת דואר\" על מנת לגשת שוב לתיבה זו.\n"
 "מה ברצונך לעשות?"
 
-#: src/mailbox-conf.c:416
+#: src/mailbox-conf.c:474
 msgid "_Remove from list"
 msgstr "ה_סר מהרשימה"
 
-#: src/mailbox-conf.c:504 src/sendmsg-window.c:1040
+#: src/mailbox-conf.c:562 src/sendmsg-window.c:1042
 msgid "Select Identity"
 msgstr "בחר זהות"
 
-#: src/mailbox-conf.c:531
+#: src/mailbox-conf.c:589
 msgid "Mailbox Configurator"
 msgstr "מגדיר תצורת תיבות הדואר"
 
-#: src/mailbox-conf.c:726
+#: src/mailbox-conf.c:784
 #, c-format
 msgid "%s on %s"
 msgstr "%s על %s"
 
-#: src/mailbox-conf.c:864
+#: src/mailbox-conf.c:922
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -2917,86 +2990,86 @@ msgstr ""
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:1029 src/mailbox-conf.c:1076 src/mailbox-conf.c:1167
+#: src/mailbox-conf.c:1087 src/mailbox-conf.c:1134 src/mailbox-conf.c:1225
 msgid "Mailbox _Name:"
 msgstr "_שם תיבת הדואר׃"
 
 #. path to file
-#: src/mailbox-conf.c:1037
+#: src/mailbox-conf.c:1095
 msgid "Mailbox _Path:"
 msgstr "ה_נתיב של תיבת הדואר׃"
 
-#: src/mailbox-conf.c:1039
+#: src/mailbox-conf.c:1097
 msgid "Mailbox Path"
 msgstr "הנתיב של תיבת הדואר"
 
 #. password field
-#: src/mailbox-conf.c:1095 src/mailbox-conf.c:1195
+#: src/mailbox-conf.c:1153 src/mailbox-conf.c:1253
 msgid "Pass_word:"
 msgstr "_סיסמה׃"
 
-#: src/mailbox-conf.c:1103
+#: src/mailbox-conf.c:1161
 msgid "_Delete messages from server after download"
 msgstr "_מחק הודעות מהשרת לאחר הורדתם"
 
-#: src/mailbox-conf.c:1108
+#: src/mailbox-conf.c:1166
 msgid "_Filter messages through procmail"
 msgstr "_סנן הודעות באמצעות procmail"
 
-#: src/mailbox-conf.c:1112
+#: src/mailbox-conf.c:1170
 msgid "Fi_lter Command:"
 msgstr "שם ה_מסנן׃"
 
-#: src/mailbox-conf.c:1120
+#: src/mailbox-conf.c:1178
 msgid "_Enable check for new mail"
 msgstr "_אפשר בדיקת דואר חדש"
 
-#: src/mailbox-conf.c:1131
+#: src/mailbox-conf.c:1189
 msgid "Disable _APOP"
 msgstr ""
 
 #. username
-#: src/mailbox-conf.c:1181
+#: src/mailbox-conf.c:1239
 msgid "_Username:"
 msgstr "_שם המשתמש׃"
 
-#: src/mailbox-conf.c:1189
+#: src/mailbox-conf.c:1247
 msgid "_Remember Password"
 msgstr "_זכור סיסמה"
 
-#: src/mailbox-conf.c:1200
+#: src/mailbox-conf.c:1258
 msgid "F_older Path:"
 msgstr "הנתיב של התי_קייה׃"
 
-#: src/mailbox-conf.c:1288
+#: src/mailbox-conf.c:1346
 msgid "Identity:"
 msgstr "זהות׃"
 
-#: src/mailbox-conf.c:1294
+#: src/mailbox-conf.c:1352
 msgid "(No identity set)"
 msgstr "(לא ניתנה זהות)"
 
-#: src/mailbox-conf.c:1298
+#: src/mailbox-conf.c:1356
 msgid "C_hange..."
 msgstr "_שנה..."
 
-#: src/mailbox-conf.c:1305
+#: src/mailbox-conf.c:1363
 msgid "Show address:"
 msgstr "הצג כתובת׃"
 
-#: src/mailbox-conf.c:1308
+#: src/mailbox-conf.c:1366
 msgid "_From"
 msgstr "_מאת"
 
-#: src/mailbox-conf.c:1314
+#: src/mailbox-conf.c:1372
 msgid "_To"
 msgstr "_אל"
 
-#: src/mailbox-conf.c:1329 src/pref-manager.c:3023
+#: src/mailbox-conf.c:1387 src/pref-manager.c:3352 src/pref-manager.c:3358
 msgid "Always"
 msgstr "תמיד"
 
-#: src/mailbox-conf.c:1333
+#: src/mailbox-conf.c:1393
 #, fuzzy
 msgid ""
 "decrypt and check\n"
@@ -3007,756 +3080,759 @@ msgstr "פענוח ווידוא חתימה על-ידי gpgme נכשלו׃ %s"
 msgid "The folder edition to be written."
 msgstr "המהדורה של התיקייה שתכתב."
 
-#: src/mailbox-node.c:428
+#: src/mailbox-node.c:433
 #, c-format
 msgid ""
 "Scanning of %s failed: %s\n"
 "Check network connectivity."
 msgstr ""
 
-#: src/mailbox-node.c:430
+#: src/mailbox-node.c:435
 #, fuzzy, c-format
 msgid "Scanning of %s failed: %s"
 msgstr ""
 "נכשל שינוי השם %s ל-%s׃\n"
 "%s"
 
-#: src/mailbox-node.c:479
+#: src/mailbox-node.c:484
 #, c-format
 msgid "Scanning %s. Please wait..."
 msgstr "סורק את %s. אנא המתן..."
 
-#: src/mailbox-node.c:922
+#: src/mailbox-node.c:927
 msgid "Local _mbox mailbox..."
 msgstr "תיבת דואר מקומית מסוג _mbox..."
 
-#: src/mailbox-node.c:924
+#: src/mailbox-node.c:929
 msgid "Local Mail_dir mailbox..."
 msgstr "תיבת דואר מקומית מסוג Mail_dir..."
 
-#: src/mailbox-node.c:926
+#: src/mailbox-node.c:931
 msgid "Local M_H mailbox..."
 msgstr "תיבת דואר מקומית מסוג M_H..."
 
-#: src/mailbox-node.c:928
+#: src/mailbox-node.c:933
 msgid "Remote _IMAP mailbox..."
 msgstr "תיבת דואר מרוחקת מסוג _IMAP"
 
-#: src/mailbox-node.c:931
+#: src/mailbox-node.c:936
 msgid "Remote IMAP _folder..."
 msgstr "תי_קיית IMAP מרוחקת..."
 
-#: src/mailbox-node.c:933
+#: src/mailbox-node.c:938
 msgid "Remote IMAP _subfolder..."
 msgstr "_תת-תיקיית IMAP מרוחקת..."
 
 #. clicked on the empty space
-#: src/mailbox-node.c:944 src/mailbox-node.c:970
+#: src/mailbox-node.c:949 src/mailbox-node.c:975
 msgid "_Rescan"
 msgstr "_סרוק מחדש"
 
-#: src/mailbox-node.c:953
+#: src/mailbox-node.c:958
 msgid "_Open"
 msgstr "_פתח"
 
-#: src/mailbox-node.c:956 src/main-window.c:739 src/main-window.c:836
-msgid "_Close"
-msgstr "_סגור"
-
-#: src/mailbox-node.c:962
+#: src/mailbox-node.c:967
 msgid "_Properties..."
 msgstr "_מאפיינים..."
 
-#: src/mailbox-node.c:977
+#: src/mailbox-node.c:982
 msgid "_Subscribe"
 msgstr "_רשום"
 
-#: src/mailbox-node.c:979
+#: src/mailbox-node.c:984
 msgid "_Unsubscribe"
 msgstr "_בטל רישום"
 
-#: src/mailbox-node.c:984
+#: src/mailbox-node.c:989
 msgid "Mark as _Inbox"
 msgstr "סמן כ\"דואר _נכנס\""
 
-#: src/mailbox-node.c:987
+#: src/mailbox-node.c:992
 msgid "_Mark as Sentbox"
 msgstr "_סמן כ\"דואר נשלח\""
 
-#: src/mailbox-node.c:990
+#: src/mailbox-node.c:995
 msgid "Mark as _Trash"
 msgstr "סמן כ_אשפה"
 
-#: src/mailbox-node.c:993
+#: src/mailbox-node.c:998
 msgid "Mark as D_raftbox"
 msgstr "סמן כ\"_טיוטות\""
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:996
+#: src/mailbox-node.c:1001
 msgid "_Edit/Apply filters"
 msgstr "_ערוך/הפעל מסננים"
 
-#: src/mailbox-node.c:1077
+#: src/mailbox-node.c:1082
 #, fuzzy, c-format
 msgid "The path \"%s\" does not lead to a mailbox."
 msgstr "תיבת הדואר \"%s\" לא נראית תקינה."
 
 # debug message
-#: src/mailbox-node.c:1090
+#: src/mailbox-node.c:1095
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Local mailbox %s loaded as: %s\n"
 
-#: src/mailbox-node.c:1117
+#: src/mailbox-node.c:1122
 #, c-format
 msgid "Local folder %s\n"
 msgstr "תיקייה מקומית %s\n"
 
-#: src/main-window.c:276
+#: src/main-window.c:277
 msgid "Balsa closes files and connections. Please wait..."
 msgstr ""
 
-#: src/main-window.c:315 src/main-window.c:361
+#: src/main-window.c:316 src/main-window.c:362
 #, fuzzy
 msgid "_Deleted"
 msgstr "מחק"
 
-#: src/main-window.c:318
+#: src/main-window.c:319
 #, fuzzy
 msgid "Un_Deleted"
 msgstr "נמחק"
 
-#: src/main-window.c:321
+#: src/main-window.c:322
 #, fuzzy
 msgid "_Read"
 msgstr "בצע שוב"
 
-#: src/main-window.c:324
+#: src/main-window.c:325
 #, fuzzy
 msgid "Un_read"
 msgstr "לא נקרא"
 
-#: src/main-window.c:330
+#: src/main-window.c:331
 #, fuzzy
 msgid "Un_flagged"
 msgstr "_דגל"
 
-#: src/main-window.c:333 src/main-window.c:373
+#: src/main-window.c:334 src/main-window.c:374
 #, fuzzy
 msgid "_Answered"
 msgstr "לא נקרא"
 
-#: src/main-window.c:336
+#: src/main-window.c:337
 #, fuzzy
 msgid "Un_answered"
 msgstr "_סיסמה׃"
 
-#: src/main-window.c:342
+#: src/main-window.c:343
 msgid "_No Headers"
 msgstr "_ללא כותרות"
 
-#: src/main-window.c:342
+#: src/main-window.c:343
 msgid "Display no headers"
 msgstr "הצג ללא כותרות"
 
-#: src/main-window.c:344
+#: src/main-window.c:345
 msgid "S_elected Headers"
 msgstr "כותרות _נבחרות"
 
-#: src/main-window.c:345
+#: src/main-window.c:346
 msgid "Display selected headers"
 msgstr "הצג כותרות נבחרות"
 
-#: src/main-window.c:347 src/message-window.c:85
+#: src/main-window.c:348 src/message-window.c:87
 msgid "All _Headers"
 msgstr "כל ה_כותרות"
 
-#: src/main-window.c:347
+#: src/main-window.c:348
 msgid "Display all headers"
 msgstr "הצג את כל הכותרות"
 
-#: src/main-window.c:356
+#: src/main-window.c:357
 msgid "Toggle flagged"
 msgstr "הרם/הורד דגל"
 
-#: src/main-window.c:362
+#: src/main-window.c:363
 #, fuzzy
 msgid "Toggle deleted flag"
 msgstr "שנה מצב סימון הודעה כחדשה"
 
-#: src/main-window.c:367
+#: src/main-window.c:368
 msgid "Toggle New"
 msgstr "שנה סימון \"חדש\""
 
-#: src/main-window.c:373
+#: src/main-window.c:374
 #, fuzzy
 msgid "Toggle Answered"
 msgstr "שנה סימון \"חדש\""
 
-#: src/main-window.c:388
+#: src/main-window.c:389
 msgid "_Message..."
 msgstr "_הודעה..."
 
-#: src/main-window.c:388 src/main-window.c:1018
+#: src/main-window.c:389 src/main-window.c:1023
 msgid "Compose a new message"
 msgstr "יצירת הודעה חדשה"
 
 #. We could use GNOMEUIINFO_INCLUDE but it appends the menu instead
 #. of including at specified position
-#: src/main-window.c:395
+#: src/main-window.c:396
 msgid "Local mbox mailbox..."
 msgstr "תיבת דואר מקומית מסוג mbox"
 
-#: src/main-window.c:396 src/main-window.c:792
+#: src/main-window.c:397 src/main-window.c:795
 msgid "Add a new mbox style mailbox"
 msgstr "הוסף תיבת דואר חדשה מסוג mbox"
 
-#: src/main-window.c:399
+#: src/main-window.c:400
 msgid "Local Maildir mailbox..."
 msgstr "תיבת דואר מקומית מסוג Maildir"
 
-#: src/main-window.c:400 src/main-window.c:797
+#: src/main-window.c:401 src/main-window.c:800
 msgid "Add a new Maildir style mailbox"
 msgstr "הוסף תיבת דואר חדשה מסוג Maildir"
 
-#: src/main-window.c:403
+#: src/main-window.c:404
 msgid "Local MH mailbox..."
 msgstr "תיבת דואר מקומית מסוג MH"
 
-#: src/main-window.c:404 src/main-window.c:801
+#: src/main-window.c:405 src/main-window.c:804
 msgid "Add a new MH style mailbox"
 msgstr "הוסף תיבת דואר חדשה מסוג MH"
 
-#: src/main-window.c:407 src/main-window.c:804 src/pref-manager.c:2866
+#: src/main-window.c:408 src/main-window.c:807 src/pref-manager.c:3143
 msgid "Remote IMAP mailbox..."
 msgstr "תיבת דואר מרוחקת מסוג IMAP"
 
-#: src/main-window.c:408 src/main-window.c:805
+#: src/main-window.c:409 src/main-window.c:808
 msgid "Add a new IMAP mailbox"
 msgstr "הוסף תיבת דואר חדשה מסוג IMAP"
 
-#: src/main-window.c:412 src/main-window.c:809 src/pref-manager.c:2871
+#: src/main-window.c:413 src/main-window.c:812 src/pref-manager.c:3148
 msgid "Remote IMAP folder..."
 msgstr "תיקיית IMAP מרוחקת..."
 
-#: src/main-window.c:413 src/main-window.c:810
+#: src/main-window.c:414 src/main-window.c:813
 msgid "Add a new IMAP folder"
 msgstr "הוסף תיקיית-IMAP חדשה"
 
-#: src/main-window.c:416 src/main-window.c:813
+#: src/main-window.c:417 src/main-window.c:816
 msgid "Remote IMAP subfolder..."
 msgstr "תת-תיקיית IMAP מרוחקת..."
 
-#: src/main-window.c:417 src/main-window.c:814
+#: src/main-window.c:418 src/main-window.c:817
 msgid "Add a new IMAP subfolder"
 msgstr "הוסף תת-תיקיית-IMAP חדשה"
 
-#: src/main-window.c:430
+#: src/main-window.c:431
 msgid "_Continue"
 msgstr "_המשך"
 
-#: src/main-window.c:431
+#: src/main-window.c:432
 msgid "Continue editing current message"
 msgstr "המשך לערוך את ההודעה הנוכחית"
 
 #. Ctrl-M
-#: src/main-window.c:438 src/main-window.c:856
+#: src/main-window.c:439 src/main-window.c:859
 msgid "_Get New Mail"
 msgstr "_קבל דואר חדש"
 
-#: src/main-window.c:438 src/main-window.c:856
+#: src/main-window.c:439 src/main-window.c:859
 msgid "Fetch new incoming mail"
 msgstr "הבא דואר נכנס חדש"
 
 #. Ctrl-S
-#: src/main-window.c:444 src/main-window.c:851
+#: src/main-window.c:445 src/main-window.c:854
 msgid "_Send Queued Mail"
 msgstr "_שלח דואר שממתין בתור"
 
-#: src/main-window.c:445 src/main-window.c:852
+#: src/main-window.c:446 src/main-window.c:855
 msgid "Send messages from the outbox"
 msgstr "שלח הודעות מתיבת הדואר היוצא"
 
 #. Ctrl-B
-#: src/main-window.c:451 src/main-window.c:846
+#: src/main-window.c:452 src/main-window.c:849
 msgid "Send and _Receive Mail"
 msgstr "שלח ו_קבל דואר"
 
-#: src/main-window.c:452 src/main-window.c:847 src/toolbar-factory.c:123
+#: src/main-window.c:453 src/main-window.c:850 src/toolbar-factory.c:126
 msgid "Send and Receive messages"
 msgstr "שלח וקבל הודעות"
 
-#: src/main-window.c:457 src/main-window.c:861 src/sendmsg-window.c:339
+#: src/main-window.c:458 src/main-window.c:864 src/sendmsg-window.c:339
 #: src/sendmsg-window.c:500
 msgid "_Print..."
 msgstr "_הדפס..."
 
-#: src/main-window.c:458 src/main-window.c:862 src/toolbar-factory.c:119
+#: src/main-window.c:459 src/main-window.c:865 src/toolbar-factory.c:122
 msgid "Print current message"
 msgstr "הדפס הודעה נוכחית"
 
-#: src/main-window.c:464 src/main-window.c:1077
+#: src/main-window.c:465 src/main-window.c:1082
 msgid "_Address Book..."
 msgstr "_ספר הכתובות..."
 
-#: src/main-window.c:465 src/main-window.c:1078
+#: src/main-window.c:466 src/main-window.c:1083
 msgid "Open the address book"
 msgstr "פתח את ספר הכתובות"
 
-#: src/main-window.c:489
+#: src/main-window.c:490
 msgid "F_ilters..."
 msgstr "_מסננים..."
 
-#: src/main-window.c:489 src/main-window.c:1064
+#: src/main-window.c:490 src/main-window.c:1069
 msgid "Manage filters"
 msgstr "נהל מסננים"
 
-#: src/main-window.c:491 src/main-window.c:1070
+#: src/main-window.c:492 src/main-window.c:1075
 msgid "_Export Filters"
 msgstr "_יצא מסננים"
 
-#: src/main-window.c:491 src/main-window.c:1071
+#: src/main-window.c:492 src/main-window.c:1076
 msgid "Export filters as Sieve scripts"
 msgstr "יצא מסננים כתסריטי Sieve"
 
-#: src/main-window.c:499
+#: src/main-window.c:500
 msgid "_Flat index"
 msgstr "אינדקס _שטוח"
 
-#: src/main-window.c:500
+#: src/main-window.c:501
 msgid "No threading at all"
 msgstr "ללא קיבוץ מסרים כלל"
 
-#: src/main-window.c:505
+#: src/main-window.c:506
 msgid "Si_mple threading"
 msgstr "קיבוץ מסרים _פשוט"
 
-#: src/main-window.c:506
+#: src/main-window.c:507
 msgid "Simple threading algorithm"
 msgstr "אלגוריתם מקבץ מסרים פשוט"
 
-#: src/main-window.c:511
+#: src/main-window.c:512
 msgid "_JWZ threading"
 msgstr "_קיבוץ מסרים JWZ"
 
-#: src/main-window.c:512
+#: src/main-window.c:513
 msgid "Elaborate JWZ threading"
 msgstr "עבד קיבוץ מסרים ב JWZ"
 
-#: src/main-window.c:522
+#: src/main-window.c:523
 msgid "_Show Mailbox Tree"
 msgstr "ה_צג את עץ תיבות הדואר"
 
-#: src/main-window.c:523
+#: src/main-window.c:524
 msgid "Toggle display of mailbox and folder tree"
 msgstr "החלף את תצוגת עצי תיבות הדואר והתיקיות"
 
-#: src/main-window.c:527
+#: src/main-window.c:528
 msgid "Show Mailbox _Tabs"
 msgstr "הצג את תיבות הדואר ב_כרטיסיות"
 
-#: src/main-window.c:528
+#: src/main-window.c:529
 msgid "Toggle display of mailbox notebook tabs"
 msgstr "שנה את מצב התצוגה של הכרטיסיות של תיבות הדואר"
 
-#: src/main-window.c:532 src/main-window.c:931 src/message-window.c:116
+#: src/main-window.c:533 src/main-window.c:934 src/message-window.c:118
 msgid "_Wrap"
 msgstr "_גלישה"
 
-#: src/main-window.c:532 src/main-window.c:931 src/sendmsg-window.c:368
+#: src/main-window.c:533 src/main-window.c:934 src/sendmsg-window.c:368
 #: src/sendmsg-window.c:525
 msgid "Wrap message lines"
 msgstr "גלישת שורות ההודעה"
 
-#: src/main-window.c:541 src/main-window.c:937
+#: src/main-window.c:542 src/main-window.c:940
 #, fuzzy
 msgid "E_xpand All"
 msgstr "ה_רחב הכל"
 
-#: src/main-window.c:542 src/main-window.c:938
+#: src/main-window.c:543 src/main-window.c:941
 msgid "Expand all threads"
 msgstr "הרחב את כל קבוצות המסרים"
 
-#: src/main-window.c:546 src/main-window.c:942
+#: src/main-window.c:547 src/main-window.c:945
 msgid "_Collapse All"
 msgstr "_צמצם הכל"
 
-#: src/main-window.c:547 src/main-window.c:943
+#: src/main-window.c:548 src/main-window.c:946
 msgid "Collapse all expanded threads"
 msgstr "צמצם את כל קבוצות המסרים המורחבות"
 
-#: src/main-window.c:553 src/main-window.c:971 src/message-window.c:122
+#: src/main-window.c:554 src/main-window.c:976 src/message-window.c:124
 msgid "Zoom _In"
 msgstr "הת_קרב"
 
-#: src/main-window.c:553 src/main-window.c:971 src/message-window.c:122
+#: src/main-window.c:554 src/main-window.c:976 src/message-window.c:124
 msgid "Increase magnification"
 msgstr "הגדל קירוב"
 
-#: src/main-window.c:557 src/main-window.c:975 src/message-window.c:126
+#: src/main-window.c:558 src/main-window.c:980 src/message-window.c:128
 msgid "Zoom _Out"
 msgstr "הת_רחק"
 
-#: src/main-window.c:557 src/main-window.c:975 src/message-window.c:126
+#: src/main-window.c:558 src/main-window.c:980 src/message-window.c:128
 msgid "Decrease magnification"
 msgstr "הקטן קירוב"
 
 #. To warn msgfmt that the % sign isn't a format specifier:
 #. To warn msgfmt that the % sign isn't a
 #. * format specifier:
-#: src/main-window.c:563 src/main-window.c:981 src/message-window.c:133
+#: src/main-window.c:564 src/main-window.c:986 src/message-window.c:135
 #, no-c-format
 msgid "Zoom _100%"
 msgstr "התקרב ל _100%"
 
-#: src/main-window.c:563 src/main-window.c:981 src/message-window.c:133
+#: src/main-window.c:564 src/main-window.c:986 src/message-window.c:135
 msgid "No magnification"
 msgstr "ללא קירוב"
 
-#: src/main-window.c:579 src/main-window.c:1025 src/toolbar-factory.c:99
+#: src/main-window.c:582 src/main-window.c:1030 src/toolbar-factory.c:98
 msgid "Reply to the current message"
 msgstr "השב להודעה הנוכחית"
 
 #. A
-#: src/main-window.c:586 src/main-window.c:1031 src/message-window.c:148
+#: src/main-window.c:589 src/main-window.c:1036 src/message-window.c:150
 msgid "Reply to _All..."
 msgstr "השב ל_כולם..."
 
-#: src/main-window.c:587 src/main-window.c:1032
+#: src/main-window.c:590 src/main-window.c:1037
 msgid "Reply to all recipients of the current message"
 msgstr "השב לכל הנמענים של ההודעה הנוכחית"
 
-#: src/main-window.c:594 src/message-window.c:154
+#: src/main-window.c:597 src/message-window.c:156
 msgid "Reply to _Group..."
 msgstr "השב ל_קבוצה..."
 
-#: src/main-window.c:595 src/message-window.c:155 src/toolbar-factory.c:103
+#: src/main-window.c:598 src/message-window.c:157 src/toolbar-factory.c:102
 msgid "Reply to mailing list"
 msgstr "השב לרשימת תפוצה"
 
-#: src/main-window.c:602 src/message-window.c:160
+#: src/main-window.c:605 src/message-window.c:162
 msgid "_Forward attached..."
 msgstr "ה_עבר תצריף..."
 
-#: src/main-window.c:603
+#: src/main-window.c:606
 msgid "Forward the current message as attachment"
 msgstr "העבר את ההודעה הנוכחית כחומר מצורף"
 
-#: src/main-window.c:609
+#: src/main-window.c:612
 msgid "Forward _inline..."
 msgstr "העבר ב_גוף ההודעה..."
 
-#: src/main-window.c:610
+#: src/main-window.c:613
 msgid "Forward the current message inline"
 msgstr "העבר את ההודעה הנוכחית בגוף ההודעה"
 
-#: src/main-window.c:617 src/message-window.c:171
-msgid "Next Part"
+#: src/main-window.c:620
+#, fuzzy
+msgid "_Next Part"
 msgstr "החלק הבא"
 
-#: src/main-window.c:617 src/message-window.c:171
+#: src/main-window.c:620 src/message-window.c:174
 msgid "Next part in message"
 msgstr "החלק הבא בהודעה"
 
-#: src/main-window.c:623 src/message-window.c:175
-msgid "Previous Part"
+#: src/main-window.c:626
+#, fuzzy
+msgid "_Previous Part"
 msgstr "החלק הקודם"
 
-#: src/main-window.c:624 src/message-window.c:176
+#: src/main-window.c:627 src/message-window.c:180
 msgid "Previous part in message"
 msgstr "החלק הקודם בהודעה"
 
-#: src/main-window.c:630 src/main-window.c:1045 src/message-window.c:180
+#: src/main-window.c:633 src/main-window.c:1050 src/message-window.c:184
 msgid "Save Current Part..."
 msgstr "שמור את החלק הנוכחי..."
 
-#: src/main-window.c:631 src/main-window.c:1046
+#: src/main-window.c:634 src/main-window.c:1051
 #, fuzzy
 msgid "Save currently displayed part of message"
 msgstr "שמור את החלק הנוכחי בהודעה"
 
-#: src/main-window.c:637 src/main-window.c:998 src/message-window.c:185
+#: src/main-window.c:640 src/main-window.c:1003 src/message-window.c:189
 msgid "_View Source..."
 msgstr "_צפה בקוד המקור..."
 
-#: src/main-window.c:638 src/main-window.c:999 src/message-window.c:186
+#: src/main-window.c:641 src/main-window.c:1004 src/message-window.c:190
 msgid "View source form of the message"
 msgstr "צפה בקוד המקור של ההודעה"
 
-#: src/main-window.c:656
+#: src/main-window.c:659 src/message-window.c:225
 msgid "_Move to Trash"
 msgstr "_זרוק לאשפה"
 
-#: src/main-window.c:657 src/main-window.c:1053
+#: src/main-window.c:660 src/main-window.c:1058 src/message-window.c:226
 msgid "Move the current message to Trash mailbox"
 msgstr "זרוק את ההודעה הנוכחית לאשפה"
 
 #. !
-#: src/main-window.c:663 src/main-window.c:1004
+#: src/main-window.c:666 src/main-window.c:1009
 #, fuzzy
 msgid "_Toggle flag"
 msgstr "הרם/הורד דגל"
 
-#: src/main-window.c:669 src/main-window.c:1009
+#: src/main-window.c:672 src/main-window.c:1014
 msgid "Store address of sender in addressbook"
 msgstr "שמור כתובת השולח בספר הכתובות"
 
-#: src/main-window.c:680 src/main-window.c:962
+#: src/main-window.c:683 src/main-window.c:967
 msgid "Next Message"
 msgstr "ההודעה הבאה"
 
-#: src/main-window.c:686 src/main-window.c:966
+#: src/main-window.c:689 src/main-window.c:971 src/message-window.c:204
 msgid "Previous Message"
 msgstr "ההודעה הקודמת"
 
-#: src/main-window.c:692 src/main-window.c:693 src/main-window.c:956
-#: src/main-window.c:957 src/message-window.c:192 src/message-window.c:193
+#: src/main-window.c:695 src/main-window.c:696 src/main-window.c:961
+#: src/main-window.c:962 src/message-window.c:210 src/message-window.c:211
 msgid "Next Unread Message"
 msgstr "ההודעה הבאה שלא נקראה"
 
-#: src/main-window.c:699 src/main-window.c:700 src/main-window.c:923
-#: src/main-window.c:924
+#: src/main-window.c:702 src/main-window.c:703 src/main-window.c:926
+#: src/main-window.c:927 src/message-window.c:217 src/message-window.c:218
 msgid "Next Flagged Message"
 msgstr "ההודעה המדוגלת הבאה"
 
-#: src/main-window.c:707 src/main-window.c:934
+#: src/main-window.c:710
 #, fuzzy
 msgid "_Hide messages"
 msgstr "הסתר הודעות מחוקות"
 
-#: src/main-window.c:710
+#: src/main-window.c:713
 #, fuzzy
 msgid "Reset _Filter"
 msgstr "מסנני בלזה"
 
-#: src/main-window.c:715
+#: src/main-window.c:718
 msgid "Select all"
 msgstr "בחר הכל"
 
-#: src/main-window.c:716
+#: src/main-window.c:719
 msgid "Select all messages in current mailbox"
 msgstr "בחר את כל ההודעות בתיבת הדואר הנוכחית"
 
-#: src/main-window.c:722 src/main-window.c:824
+#: src/main-window.c:725 src/main-window.c:827
 msgid "_Edit..."
 msgstr "_ערוך..."
 
-#: src/main-window.c:722 src/main-window.c:824
+#: src/main-window.c:725 src/main-window.c:827
 msgid "Edit the selected mailbox"
 msgstr "ערוך את תיבת הדואר שנבחרה"
 
-#: src/main-window.c:726 src/main-window.c:819
+#: src/main-window.c:729 src/main-window.c:822
 msgid "_Delete..."
 msgstr "_מחק..."
 
-#: src/main-window.c:727 src/main-window.c:820
+#: src/main-window.c:730 src/main-window.c:823
 msgid "Delete the selected mailbox"
 msgstr "מחק את תיבת הדואר שנבחרה"
 
-#: src/main-window.c:733
+#: src/main-window.c:736
 #, fuzzy
 msgid "E_xpunge Deleted Messages"
 msgstr "למחוק באופן מוחלט %d הודעות שסומנו למחיקה?"
 
-#: src/main-window.c:734 src/main-window.c:831
+#: src/main-window.c:737 src/main-window.c:834
 #, fuzzy
 msgid "Expunge messages marked as deleted in the currently opened mailbox"
 msgstr "עדכן את השינויים בתיבת הדואר הפתוחה כעת"
 
-#: src/main-window.c:739 src/main-window.c:837
+#: src/main-window.c:742 src/main-window.c:840
 msgid "Close mailbox"
 msgstr "סגור תיבת דואר"
 
-#: src/main-window.c:743 src/main-window.c:1082
+#: src/main-window.c:746 src/main-window.c:1087
 msgid "Empty _Trash"
 msgstr "רוקן _אשפה"
 
-#: src/main-window.c:744 src/main-window.c:1083 src/toolbar-factory.c:141
+#: src/main-window.c:747 src/main-window.c:1088 src/toolbar-factory.c:144
 msgid "Delete messages from the Trash mailbox"
 msgstr "מחק הודעות מהאשפה"
 
-#: src/main-window.c:748
+#: src/main-window.c:751
 #, fuzzy
 msgid "Select _Filters"
 msgstr "בחר גופן"
 
-#: src/main-window.c:749 src/main-window.c:1068
+#: src/main-window.c:752 src/main-window.c:1073
 #, fuzzy
 msgid "Select filters to be applied automatically to current mailbox"
 msgstr "בחר את כל ההודעות בתיבת הדואר הנוכחית"
 
-#: src/main-window.c:762
+#: src/main-window.c:765
 msgid "_Toolbars..."
 msgstr "_סרגלי כלים..."
 
-#: src/main-window.c:763
+#: src/main-window.c:766
 msgid "Customize toolbars"
 msgstr "התאם סרגלי כלים"
 
-#: src/main-window.c:766 src/main-window.c:1086
+#: src/main-window.c:769 src/main-window.c:1091
 msgid "_Identities..."
 msgstr "_זהויות..."
 
-#: src/main-window.c:767 src/main-window.c:1087
+#: src/main-window.c:770 src/main-window.c:1092
 msgid "Create and set current identities"
 msgstr "צור וקבע זהות נוכחית"
 
-#: src/main-window.c:778
+#: src/main-window.c:781
 msgid "Mail_box"
 msgstr "_תיבת דואר"
 
-#: src/main-window.c:779 src/main-window.c:1100 src/message-window.c:209
+#: src/main-window.c:782 src/main-window.c:1105 src/message-window.c:242
 msgid "_Message"
 msgstr "_הודעה"
 
-#: src/main-window.c:791
+#: src/main-window.c:794
 #, fuzzy
 msgid "New mailbox..."
 msgstr "פותח מחדש את תיבת הדואר..."
 
-#: src/main-window.c:796
+#: src/main-window.c:799
 #, fuzzy
 msgid "New \"Maildir\" mailbox..."
 msgstr "תיבת דואר מקומית מסוג Maildir"
 
-#: src/main-window.c:800
+#: src/main-window.c:803
 #, fuzzy
 msgid "New \"MH\" mailbox..."
 msgstr "תיבת דואר מקומית מסוג MH"
 
-#: src/main-window.c:830
+#: src/main-window.c:833
 #, fuzzy
 msgid "_Compress Mailbox"
 msgstr "סגור תיבת דואר"
 
-#: src/main-window.c:860
+#: src/main-window.c:863
 #, fuzzy
 msgid "Mail_boxes"
 msgstr "_תיבת דואר"
 
-#: src/main-window.c:885
+#: src/main-window.c:888
 msgid "By _Arrival"
 msgstr ""
 
-#: src/main-window.c:885
+#: src/main-window.c:888
 msgid "Arrival order"
 msgstr ""
 
-#: src/main-window.c:889
+#: src/main-window.c:892
 #, fuzzy
 msgid "By _Sender"
 msgstr "_שלח"
 
-#: src/main-window.c:889
+#: src/main-window.c:892
 msgid "Sender order"
 msgstr ""
 
-#: src/main-window.c:893
+#: src/main-window.c:896
 #, fuzzy
 msgid "By S_ubject"
 msgstr "_נושא"
 
-#: src/main-window.c:893
+#: src/main-window.c:896
 #, fuzzy
 msgid "Subject order"
 msgstr "נושא"
 
-#: src/main-window.c:897
+#: src/main-window.c:900
 #, fuzzy
 msgid "By Si_ze"
 msgstr "גודל"
 
-#: src/main-window.c:897
+#: src/main-window.c:900
 #, fuzzy
 msgid "By message size"
 msgstr "גלישת שורות ההודעה"
 
-#: src/main-window.c:901
+#: src/main-window.c:904
 #, fuzzy
 msgid "_Threaded"
 msgstr "קיבוץ מסרים"
 
-#: src/main-window.c:901
+#: src/main-window.c:904
 #, fuzzy
 msgid "Use message threading"
 msgstr "קיבוץ מסרים _פשוט"
 
-#: src/main-window.c:909
+#: src/main-window.c:912
 msgid "_Descending"
 msgstr ""
 
-#: src/main-window.c:909
+#: src/main-window.c:912
 msgid "Sort in a descending order"
 msgstr ""
 
-#: src/main-window.c:930
+#: src/main-window.c:933
 #, fuzzy
 msgid "_Headers"
 msgstr "_ללא כותרות"
 
-#: src/main-window.c:933
+#: src/main-window.c:936
 #, fuzzy
 msgid "_Sort Mailbox"
 msgstr "ה_צג את עץ תיבות הדואר"
 
-#: src/main-window.c:948
+#: src/main-window.c:937
+#, fuzzy
+msgid "H_ide messages"
+msgstr "הסתר הודעות מחוקות"
+
+#: src/main-window.c:951
 #, fuzzy
 msgid "_View filter"
 msgstr "מסנן חדש"
 
-#: src/main-window.c:949
+#: src/main-window.c:952
 #, fuzzy
 msgid "Enable quick message index filter"
 msgstr "לא מסוגל לטעון את גוף ההודעה כך שתתאים למסנן"
 
-#: src/main-window.c:985 src/main-window.c:1059 src/sendmsg-window.c:502
+#: src/main-window.c:990 src/main-window.c:1064 src/sendmsg-window.c:502
 #: src/sendmsg-window.c:560 src/sendmsg-window.c:620
 #, fuzzy
 msgid "_More"
 msgstr "שמור בתיבת דואר"
 
-#: src/main-window.c:1018
+#: src/main-window.c:1023
 #, fuzzy
 msgid "_New..."
 msgstr "_חדש"
 
 #. F
-#: src/main-window.c:1038
+#: src/main-window.c:1043
 #, fuzzy
 msgid "_Forward..."
 msgstr "העבר"
 
-#: src/main-window.c:1039 src/toolbar-factory.c:105
+#: src/main-window.c:1044 src/toolbar-factory.c:104
 msgid "Forward the current message"
 msgstr "העבר את ההודעה הנוכחית"
 
 #. D
-#: src/main-window.c:1052
+#: src/main-window.c:1057
 #, fuzzy
 msgid "_Delete to Trash"
 msgstr "_זרוק לאשפה"
 
-#: src/main-window.c:1064
+#: src/main-window.c:1069
 #, fuzzy
 msgid "_Manage..."
 msgstr "_שנה..."
 
-#: src/main-window.c:1067
+#: src/main-window.c:1072
 #, fuzzy
 msgid "_Select Filters"
 msgstr "בחר הכל"
 
-#: src/main-window.c:1085
+#: src/main-window.c:1090
 #, fuzzy
 msgid "_Filters"
 msgstr "_מסננים..."
 
-#: src/main-window.c:1101 src/sendmsg-window.c:636
+#: src/main-window.c:1106 src/sendmsg-window.c:636
 #, fuzzy
 msgid "_Tools"
 msgstr "_סרגלי כלים..."
 
-#: src/main-window.c:1205
+#: src/main-window.c:1210
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
@@ -3764,23 +3840,23 @@ msgstr ""
 "בלזה שולח דואר כרגע.\n"
 "האם להפסיק?"
 
-#: src/main-window.c:1375
+#: src/main-window.c:1380
 #, fuzzy
 msgid "Subject or Sender _Contains:"
 msgstr "גופן לכותרת \"הנושא\""
 
-#: src/main-window.c:2157
+#: src/main-window.c:2203
 #, fuzzy, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
 "%s."
 msgstr "לא ניתן לנעול את תיבת הדואר!"
 
-#: src/main-window.c:2474
+#: src/main-window.c:2520
 msgid "translator_credits"
 msgstr ""
 
-#: src/main-window.c:2490
+#: src/main-window.c:2536
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3792,515 +3868,553 @@ msgstr ""
 "\n"
 "אם מצאת באגים, אנא דווח עליהם ב-/http://bugzilla.gnome.org"
 
-#: src/main-window.c:2592
+#: src/main-window.c:2639
 msgid "Checking Mail..."
 msgstr "בודק דואר..."
 
-#: src/main-window.c:2906
+#: src/main-window.c:2838
+#, fuzzy, c-format
+msgid "IMAP Server %s: %s"
+msgstr "תקלת המרה׃ %s\n"
+
+#: src/main-window.c:2841
+#, fuzzy, c-format
+msgid "Local mailbox: %s"
+msgstr "תיבת דואר מקומית מסוג MH"
+
+#: src/main-window.c:2978
 msgid "Finished Checking."
 msgstr "הבדיקה הסתיימה."
 
-#: src/main-window.c:2968
+#: src/main-window.c:3040
 #, c-format
 msgid "Sending error: %s"
 msgstr "שגיאה במשלוח ההודעה׃ %s"
 
-#: src/main-window.c:3053
+#: src/main-window.c:3125
 msgid "Balsa: New mail"
 msgstr "בלזה: דואר חדש"
 
-#: src/main-window.c:3065
+#: src/main-window.c:3137
 #, fuzzy, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
 msgstr[0] "קיבלת %d הודעות חדשות."
 msgstr[1] "קיבלת %d הודעות חדשות."
 
-#: src/main-window.c:3068
+#: src/main-window.c:3140
 #, fuzzy
 msgid "You have new mail."
 msgstr "ממתין לך דואר חדש"
 
-#: src/main-window.c:3677
+#: src/main-window.c:3751
 msgid "Search mailbox"
 msgstr "חפש בתיבת דואר"
 
-#: src/main-window.c:3694
+#: src/main-window.c:3768
 msgid "_Search for:"
 msgstr "_חפש את׃"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: src/main-window.c:3707
+#: src/main-window.c:3781
 msgid "In:"
 msgstr "ב׃"
 
-#: src/main-window.c:3718
+#: src/main-window.c:3792
 msgid "S_ubject"
 msgstr "_נושא"
 
 #. Frame with Apply and Clear buttons
-#: src/main-window.c:3723
+#: src/main-window.c:3797
 #, fuzzy
 msgid "Show only matching messages"
 msgstr "שגיאה בעת זריקת הודעות לאשפה"
 
 #. Frame with OK button
-#: src/main-window.c:3744
+#: src/main-window.c:3818
 #, fuzzy
 msgid "Open next matching message"
 msgstr "פתח את ההודעה המדוגלת הבאה"
 
-#: src/main-window.c:3755
+#: src/main-window.c:3829
 msgid "_Reverse search"
 msgstr "חיפוש _הפוך"
 
-#: src/main-window.c:3760
+#: src/main-window.c:3834
 #, fuzzy
 msgid "_Wrap around"
 msgstr "_גלישת שורות בגוף ההודעה"
 
-#: src/main-window.c:3836
+#: src/main-window.c:3910
 #, fuzzy, c-format
 msgid "Error displaying help: %s\n"
 msgstr "שגיאה בהצגת %s׃ %s\n"
 
-#: src/main-window.c:3921
+#: src/main-window.c:3995
 msgid "You can apply filters only on mailbox\n"
 msgstr "ניתן להפעיל מסננים רק על תיבות דואר\n"
 
-#: src/main-window.c:4239
+#: src/main-window.c:4191
+#, fuzzy, c-format
+msgid "Could not open trash: %s"
+msgstr "לא ניתן לפתוח את %s"
+
+#: src/main-window.c:4318
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "בלזה׃ %s (לקריאה בלבד)"
 
-#: src/main-window.c:4241
+#: src/main-window.c:4320
 #, c-format
 msgid "Balsa: %s"
 msgstr "בלזה׃ %s"
 
-#: src/main.c:215
+#: src/main.c:217
 msgid "Get new mail on startup"
 msgstr "קבל דואר חדש מיד בהתחלת התוכנית"
 
-#: src/main.c:217
+#: src/main.c:219
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "שלח דואר חדש אל EMAIL@ADDRESS"
 
-#: src/main.c:219
+#: src/main.c:221
 msgid "Attach file at PATH"
 msgstr "צרף קובץ שנמצא בנתיב"
 
-#: src/main.c:221
+#: src/main.c:223
 msgid "Opens MAILBOXNAME"
 msgstr "פותח את MAILBOXNAME"
 
-#: src/main.c:221
+#: src/main.c:223
 msgid "MAILBOXNAME"
 msgstr "שם תיבת הדואר"
 
-#: src/main.c:224
+#: src/main.c:226
 msgid "Opens first unread mailbox"
 msgstr "פותח את תיבת הדואר הראשונה שעדיין לא נקראה"
 
-#: src/main.c:227
+#: src/main.c:229
 msgid "Opens default Inbox on startup"
 msgstr "פותח את תיבת הדואר הנכנס מיד באתחול"
 
-#: src/main.c:230
+#: src/main.c:232
 #, fuzzy
 msgid "Prints number unread and unsent messages"
 msgstr "הדפס את ההודעות שנבחרו"
 
-#: src/main.c:232
+#: src/main.c:234
 msgid "Debug POP3 connection"
 msgstr "נפה את הקשר POP3"
 
-#: src/main.c:234
+#: src/main.c:236
 #, fuzzy
 msgid "Debug IMAP connection"
 msgstr "נפה את הקשר POP3"
 
-#: src/main.c:256
+#: src/main.c:258
 msgid "The Balsa E-Mail Client"
 msgstr ""
 
-#: src/main.c:273 src/main.c:278 src/main.c:284 src/main.c:290 src/main.c:296
+#: src/main.c:275 src/main.c:280 src/main.c:286 src/main.c:292 src/main.c:298
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "בלזה אינו יכול לפתוח את תיבת הדואר׃ \"%s\""
 
-#: src/main.c:273
+#: src/main.c:275
 msgid "Inbox"
 msgstr "תיבת דואר נכנס"
 
-#: src/main.c:279
+#: src/main.c:281
 msgid "Outbox"
 msgstr "תיבת דואר יוצא"
 
-#: src/main.c:285
+#: src/main.c:287
 msgid "Sentbox"
 msgstr "תיבת דואר נשלח"
 
-#: src/main.c:291
+#: src/main.c:293
 msgid "Draftbox"
 msgstr "תיבת טיוטות"
 
-#: src/main.c:296
+#: src/main.c:298
 msgid "Trash"
 msgstr "אשפה"
 
-#: src/main.c:511
+#: src/main.c:539
 #, fuzzy
 msgid "Compressing mail folders..."
 msgstr "פותח מחדש את תיבת הדואר..."
 
-#: src/message-window.c:81
+#: src/message-window.c:83
 msgid "N_o Headers"
 msgstr "_ללא כותרות"
 
-#: src/message-window.c:83
+#: src/message-window.c:85
 msgid "_Selected Headers"
 msgstr "כותרות _נבחרות"
 
-#: src/message-window.c:143
+#: src/message-window.c:145
 msgid "Reply to this message"
 msgstr "השב להודעה זו"
 
-#: src/message-window.c:149
+#: src/message-window.c:151
 msgid "Reply to all recipients of this message"
 msgstr "השב לכל הנמענים של הודעה זו"
 
-#: src/message-window.c:161
+#: src/message-window.c:163
 msgid "Forward this message as attachment"
 msgstr "העבר הודעה זו כחומר מצורף"
 
-#: src/message-window.c:165
+#: src/message-window.c:167
 msgid "Forward inline..."
 msgstr "העבר בגוף ההודעה..."
 
-#: src/message-window.c:166
+#: src/message-window.c:168
 msgid "Forward this message inline"
 msgstr "העבר הודעה זו בגוף המכתב"
 
-#: src/message-window.c:181
+#: src/message-window.c:174
+msgid "Next Part"
+msgstr "החלק הבא"
+
+#: src/message-window.c:179
+msgid "Previous Part"
+msgstr "החלק הקודם"
+
+#: src/message-window.c:185
 msgid "Save current part in message"
 msgstr "שמור את החלק הנוכחי בהודעה"
 
-#: src/message-window.c:208
+#: src/message-window.c:197
+#, fuzzy
+msgid "_Next Message"
+msgstr "ההודעה הבאה"
+
+#: src/message-window.c:197
+#, fuzzy
+msgid "Next message"
+msgstr "ההודעה הבאה"
+
+#: src/message-window.c:203
+#, fuzzy
+msgid "_Previous Message"
+msgstr "ההודעה הקודמת"
+
+#: src/message-window.c:241
 msgid "M_ove"
 msgstr "ה_עבר"
 
-#: src/message-window.c:280
+#: src/message-window.c:340
 #, fuzzy, c-format
 msgid "Message from %s: %s"
 msgstr "דואר חדש אל %s׃ %s"
 
-#: src/pref-manager.c:327
+#: src/pref-manager.c:347
 msgid "7 Bits"
 msgstr "7 סיביות"
 
-#: src/pref-manager.c:328
+#: src/pref-manager.c:348
 msgid "8 Bits"
 msgstr "8 סיביות"
 
-#: src/pref-manager.c:329
+#: src/pref-manager.c:349
 msgid "Quoted"
 msgstr "מצוטט"
 
-#: src/pref-manager.c:339
+#: src/pref-manager.c:359
 msgid "While Retrieving Messages"
 msgstr "תוך כדי שליפת הודעות"
 
-#: src/pref-manager.c:340
+#: src/pref-manager.c:360
 msgid "Until Closed"
 msgstr "עד הסגירה"
 
-#: src/pref-manager.c:345
+#: src/pref-manager.c:365
 msgid "Fast"
 msgstr "מהר"
 
-#: src/pref-manager.c:346
+#: src/pref-manager.c:366
 msgid "Normal"
 msgstr "רגיל"
 
-#: src/pref-manager.c:347
+#: src/pref-manager.c:367
 msgid "Bad Spellers"
 msgstr "שגיאה בבודקי האיות"
 
-#: src/pref-manager.c:352
+#: src/pref-manager.c:372
 #, fuzzy
 msgid "Message number"
 msgstr "קוד המקור של ההודעה"
 
-#: src/pref-manager.c:356
+#: src/pref-manager.c:376
 #, fuzzy
 msgid "Sender"
 msgstr "שלח"
 
-#: src/pref-manager.c:360
+#: src/pref-manager.c:380
 msgid "Flat"
 msgstr "שטוח"
 
-#: src/pref-manager.c:362
+#: src/pref-manager.c:382
 msgid "JWZ"
 msgstr "JWZ"
 
-#: src/pref-manager.c:366
+#: src/pref-manager.c:386
 msgid "west european (traditional)"
 msgstr "מערב אירופאית (מסורתית) (West European (Traditional"
 
-#: src/pref-manager.c:367
+#: src/pref-manager.c:387
 msgid "east european"
 msgstr "מזרח אירופאית East European"
 
-#: src/pref-manager.c:368
+#: src/pref-manager.c:388
 msgid "south european"
 msgstr "דרום אירופאית South European"
 
-#: src/pref-manager.c:369
+#: src/pref-manager.c:389
 msgid "north european"
 msgstr "צפון אירופאית North European"
 
-#: src/pref-manager.c:370
+#: src/pref-manager.c:390
 msgid "cyrillic (iso/windows)"
 msgstr "קירילית Cyrillic (iso/windows)"
 
-#: src/pref-manager.c:371
+#: src/pref-manager.c:391
 msgid "arabic"
 msgstr "ערבית Arabic"
 
-#: src/pref-manager.c:372
+#: src/pref-manager.c:392
 msgid "greek"
 msgstr "יוונית Greek"
 
-#: src/pref-manager.c:373
+#: src/pref-manager.c:393
 msgid "hebrew"
 msgstr "עברית Hebrew"
 
-#: src/pref-manager.c:374
+#: src/pref-manager.c:394
 msgid "turkish"
 msgstr "טורקית Turkish"
 
-#: src/pref-manager.c:375
+#: src/pref-manager.c:395
 msgid "nordic"
 msgstr "נורדית Nordic"
 
-#: src/pref-manager.c:376
+#: src/pref-manager.c:396
 msgid "thai"
 msgstr "תאי Thai"
 
-#: src/pref-manager.c:377
+#: src/pref-manager.c:397
 msgid "baltic"
 msgstr "בלטית Baltic"
 
-#: src/pref-manager.c:378
+#: src/pref-manager.c:398
 msgid "celtic"
 msgstr "קלטית Celtic"
 
-#: src/pref-manager.c:379
+#: src/pref-manager.c:399
 msgid "west european (euro)"
 msgstr "מערב אירופאית West European (Euro)"
 
-#: src/pref-manager.c:380
+#: src/pref-manager.c:400
 msgid "russian (koi)"
 msgstr "רוסית (Russian (koi"
 
-#: src/pref-manager.c:381
+#: src/pref-manager.c:401
 msgid "ukranian (koi)"
 msgstr "אוקראינית Ukrainian"
 
-#: src/pref-manager.c:382
+#: src/pref-manager.c:402
 msgid "japanese"
 msgstr "יפנית Japanese"
 
-#: src/pref-manager.c:383
+#: src/pref-manager.c:403
 msgid "korean"
 msgstr "קוריאנית Korean"
 
 #. must NOT be modal
-#: src/pref-manager.c:403
+#: src/pref-manager.c:423
 msgid "Balsa Preferences"
 msgstr "העדפות בלזה"
 
-#: src/pref-manager.c:429
+#: src/pref-manager.c:451
 msgid "Mail Servers"
 msgstr "שרתי דואר"
 
-#: src/pref-manager.c:433 src/pref-manager.c:2649
+#: src/pref-manager.c:455 src/pref-manager.c:2924
 msgid "Address Books"
 msgstr "ספרי כתובות"
 
-#: src/pref-manager.c:437
+#: src/pref-manager.c:459
 msgid "Mail Options"
 msgstr "אפשרויות לגבי דואר"
 
-#: src/pref-manager.c:441 src/pref-manager.c:2013
+#: src/pref-manager.c:463 src/pref-manager.c:2258
 msgid "Display"
 msgstr "תצוגה"
 
-#: src/pref-manager.c:445 src/toolbar-factory.c:130
+#: src/pref-manager.c:467 src/toolbar-factory.c:133
 msgid "Spelling"
 msgstr "איות"
 
-#: src/pref-manager.c:449
+#: src/pref-manager.c:471
 msgid "Misc"
 msgstr "שונות"
 
-#: src/pref-manager.c:453
+#: src/pref-manager.c:475
 msgid "Startup"
 msgstr "איתחול"
 
-#: src/pref-manager.c:1265
+#: src/pref-manager.c:1439
 #, c-format
 msgid "%s (default)"
 msgstr "%s (ברירת מחדל)"
 
-#: src/pref-manager.c:1514
+#: src/pref-manager.c:1705
 msgid "Remote Mailbox Servers"
 msgstr "שרתי דואר מרוחקים"
 
-#: src/pref-manager.c:1535 src/pref-manager.c:2670
+#: src/pref-manager.c:1726 src/pref-manager.c:2945
 msgid "Type"
 msgstr "סוג"
 
-#: src/pref-manager.c:1543
+#: src/pref-manager.c:1734
 msgid "Mailbox Name"
 msgstr "שם תיבת הדואר"
 
-#: src/pref-manager.c:1556 src/pref-manager.c:2701
+#: src/pref-manager.c:1747 src/pref-manager.c:2976
 msgid "_Modify"
 msgstr "שנה"
 
-#: src/pref-manager.c:1571
+#: src/pref-manager.c:1762
 msgid "Local Mail"
 msgstr "דואר מקומי"
 
-#: src/pref-manager.c:1573
+#: src/pref-manager.c:1764
 msgid "Select your local mail directory"
 msgstr "בחר את ספריית הדואר המקומית"
 
-#: src/pref-manager.c:1593
+#: src/pref-manager.c:1786
 msgid "Outgoing Mail"
 msgstr "דואר יוצא"
 
-#: src/pref-manager.c:1598
+#: src/pref-manager.c:1791
 msgid "Remote SMTP Server"
 msgstr "שרת SMTP מרוחק"
 
-#: src/pref-manager.c:1600
+#: src/pref-manager.c:1793
 msgid "User"
 msgstr "שם משתמש"
 
-#: src/pref-manager.c:1603
+#: src/pref-manager.c:1796
 msgid "Pass Phrase"
 msgstr "סיסמה"
 
 #. STARTTLS
-#: src/pref-manager.c:1607
+#: src/pref-manager.c:1800
 msgid "Use TLS"
 msgstr "השתמש ב-TLS"
 
-#: src/pref-manager.c:1625
+#: src/pref-manager.c:1827
 msgid "Certificate Pass Phrase"
 msgstr "הסיסמה עבור תעודת יושר"
 
-#: src/pref-manager.c:1643
+#: src/pref-manager.c:1845
 msgid "Incoming"
 msgstr "דואר נכנס"
 
-#: src/pref-manager.c:1645
+#: src/pref-manager.c:1847
 msgid "Outgoing"
 msgstr "דואר יוצא"
 
-#: src/pref-manager.c:1669
+#: src/pref-manager.c:1871
 msgid "Checking"
 msgstr "בודק"
 
-#: src/pref-manager.c:1674
+#: src/pref-manager.c:1876
 msgid "_Check mail automatically every:"
 msgstr "בדוק דואר באופן אוטומטי כל"
 
-#: src/pref-manager.c:1685 src/pref-manager.c:2494 src/pref-manager.c:2545
+#: src/pref-manager.c:1887 src/pref-manager.c:2769 src/pref-manager.c:2820
 msgid "minutes"
 msgstr "דקות"
 
-#: src/pref-manager.c:1691
+#: src/pref-manager.c:1893
 msgid "Check _IMAP mailboxes"
 msgstr "בדוק תיבות דואר מסוג IMAP"
 
-#: src/pref-manager.c:1697
+#: src/pref-manager.c:1899
 msgid "Check INBOX _only"
 msgstr "בדוק תיבת \"דואר נכנס\" בלבד"
 
-#: src/pref-manager.c:1702
+#: src/pref-manager.c:1904
 msgid "Display message if new mail has arrived in an open mailbox"
 msgstr "הצג הודעה למשתמש כאשר מגיע דואר חדש בתיבת-דואר פתוחה"
 
-#: src/pref-manager.c:1707
+#: src/pref-manager.c:1909
 msgid "Do background check quietly (no messages in status bar)"
 msgstr "בצע בדיקה ברקע (בלי הודעות לסרגל המצב)"
 
-#: src/pref-manager.c:1711
+#: src/pref-manager.c:1913
 msgid "_POP message size limit:"
 msgstr ""
 
-#: src/pref-manager.c:1718
+#: src/pref-manager.c:1920
 msgid "MB"
 msgstr ""
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: src/pref-manager.c:1737
+#: src/pref-manager.c:1939
 msgid "Quoted and Flowed Text"
 msgstr "טקסט מצוטט ומוזרם"
 
-#: src/pref-manager.c:1741 src/sendmsg-window.c:4231
+#: src/pref-manager.c:1943 src/sendmsg-window.c:4343
 msgid "Quoted Text Regular Expression"
 msgstr "ביטוי סדיר לטקסט מצוטט"
 
-#: src/pref-manager.c:1752
+#: src/pref-manager.c:1958
 msgid "Wrap Incoming Text at:"
 msgstr "עטוף את הטקסט של הודעות נכנסות ב-"
 
-#: src/pref-manager.c:1763 src/pref-manager.c:1937
+#: src/pref-manager.c:1969 src/pref-manager.c:2174
 msgid "characters"
 msgstr "תווים"
 
 #. handling of multipart/alternative
-#: src/pref-manager.c:1778
+#: src/pref-manager.c:1984
 msgid "Display of Multipart/Alternative Parts"
 msgstr "הצג חלקים מרובים/חלופיים"
 
-#: src/pref-manager.c:1781
+#: src/pref-manager.c:1987
 msgid "prefer text/plain over html"
 msgstr "העדף טקסט/פשוט על פני html"
 
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
-#: src/pref-manager.c:1798
+#: src/pref-manager.c:2006
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr "תווים בין-לאומיים (8 סיביות) בהודעות שבורות ללא כותרת קידוד"
 
-#: src/pref-manager.c:1804
+#: src/pref-manager.c:2012
 msgid "display as \"?\""
 msgstr "הצג כ-\"?\""
 
-#: src/pref-manager.c:1813
+#: src/pref-manager.c:2021
 msgid "display using codeset"
 msgstr "הצג באמצעות קידוד"
 
 #. How to handle received MDN requests
-#: src/pref-manager.c:1848
+#: src/pref-manager.c:2069
 msgid "Message Disposition Notification Requests"
 msgstr "בקשות לאישור מסירה"
 
-#: src/pref-manager.c:1850
+#: src/pref-manager.c:2071
 msgid ""
 "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
 msgstr "כאשר אני מקבל הודעה והשולח מבקש אישור מסירה, שלח אותו במקרים הבאים׃"
 
-#: src/pref-manager.c:1861
+#: src/pref-manager.c:2082
 msgid ""
 "The message header looks clean\n"
 "(the notify-to address is equal to the return path,\n"
@@ -4309,290 +4423,290 @@ msgstr ""
 "הכותרת נראית בסדר (הכתובת אליה יגיע אישור המסירה זהה לכתובת אליה יש להשיב,\n"
 "ואני ברשימת הנמענים או ההעתקים של ההודעה)."
 
-#: src/pref-manager.c:1879
+#: src/pref-manager.c:2108
 msgid "The message header looks suspicious."
 msgstr "כותרת ההודעה נראית חשודה."
 
-#: src/pref-manager.c:1918
+#: src/pref-manager.c:2155
 msgid "Word Wrap"
 msgstr "עטיפת מילים (=עימוד באורך שורה קבוע)"
 
-#: src/pref-manager.c:1923
+#: src/pref-manager.c:2160
 msgid "Wrap Outgoing Text at:"
 msgstr "עטוף טקסט בהודעות יוצאות ב-"
 
-#: src/pref-manager.c:1951
+#: src/pref-manager.c:2188
 msgid "Other Options"
 msgstr "אפשרויות נוספות"
 
-#: src/pref-manager.c:1956
+#: src/pref-manager.c:2193
 msgid "Reply Prefix:"
 msgstr "תחילית שמסמנת תשובה להודעה׃"
 
-#: src/pref-manager.c:1959
+#: src/pref-manager.c:2196
 msgid "Edit headers in external editor"
 msgstr "ערוך כותרות בעורך חיצוני"
 
-#: src/pref-manager.c:1961
+#: src/pref-manager.c:2198
 msgid "Automatically quote original when replying"
 msgstr "צטט את המקור באופן אוטומטי בדואר תשובה"
 
-#: src/pref-manager.c:1964
+#: src/pref-manager.c:2201
 msgid "Don't include HTML parts as text when replying or forwarding mail"
 msgstr "אל תכלול חלקים שהם HTML בעת תשובה לדואר או העברה"
 
-#: src/pref-manager.c:1967
+#: src/pref-manager.c:2204
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr "העבר דואר כתצריף במקום לצטט אותו"
 
-#: src/pref-manager.c:1970
+#: src/pref-manager.c:2207
 msgid "Send button always queues outgoing mail in outbox"
 msgstr "כפתור \"שלח\" תמיד שם את הדואר היוצא בתיבת הדואר היוצא"
 
-#: src/pref-manager.c:1973
+#: src/pref-manager.c:2210
 msgid "Copy outgoing messages to sentbox"
 msgstr "העתק את ההודעות היוצאות לתיבת הדואר הנשלח"
 
-#: src/pref-manager.c:1986 src/pref-manager.c:2108
+#: src/pref-manager.c:2225 src/pref-manager.c:2353
 msgid "Encoding"
 msgstr "קידוד"
 
-#: src/pref-manager.c:2016
+#: src/pref-manager.c:2261
 msgid "Status Messages"
 msgstr "הודעות מצב"
 
-#: src/pref-manager.c:2018
+#: src/pref-manager.c:2263
 msgid "Colors"
 msgstr "צבעים"
 
-#: src/pref-manager.c:2020
+#: src/pref-manager.c:2265
 msgid "Message"
 msgstr "הודעה"
 
-#: src/pref-manager.c:2022
+#: src/pref-manager.c:2267
 msgid "Sort and Thread"
 msgstr ""
 
-#: src/pref-manager.c:2047
+#: src/pref-manager.c:2292
 msgid "Main Window"
 msgstr "החלון הראשי"
 
-#: src/pref-manager.c:2050
+#: src/pref-manager.c:2295
 msgid "Use preview pane"
 msgstr "השתמש בחלונית תצוגה מקדימה"
 
-#: src/pref-manager.c:2052
+#: src/pref-manager.c:2297
 msgid "Show mailbox statistics in left pane"
 msgstr "הצג סטטיסטיקות על תיבת הדואר בחלון השמאלי"
 
-#: src/pref-manager.c:2054
+#: src/pref-manager.c:2299
 msgid "Use alternative main window layout"
 msgstr "השתמש בסידור אלטרנטיבי של החלון הראשי"
 
-#: src/pref-manager.c:2056
+#: src/pref-manager.c:2301
 msgid "Automatically view message when mailbox opened"
 msgstr "צפה/י בהודעה באופן אוטומטי עם פתיחת תיבת הדואר"
 
-#: src/pref-manager.c:2062
+#: src/pref-manager.c:2307
 msgid "PageUp/PageDown keys scroll message by:"
 msgstr "מקשי PageUp/PageDown גוללים את ההודעה ב-"
 
-#: src/pref-manager.c:2073
+#: src/pref-manager.c:2318
 msgid "percent"
 msgstr "אחוזים"
 
-#: src/pref-manager.c:2088
+#: src/pref-manager.c:2333
 msgid "Display Progress Dialog"
 msgstr "הצג חלון שמראה את התקדמות התהליך"
 
-#: src/pref-manager.c:2113
+#: src/pref-manager.c:2358
 msgid "Date encoding (for strftime):"
 msgstr "קידוד זמן (עבור strftime)׃"
 
-#: src/pref-manager.c:2115
+#: src/pref-manager.c:2360
 msgid "Selected headers:"
 msgstr "כותרות נבחרות׃"
 
-#: src/pref-manager.c:2136 src/pref-manager.c:2141
+#: src/pref-manager.c:2381 src/pref-manager.c:2386
 msgid "Information Messages"
 msgstr "הודעות מידע"
 
-#: src/pref-manager.c:2145
+#: src/pref-manager.c:2390
 msgid "Warning Messages"
 msgstr "הודעות אזהרה"
 
-#: src/pref-manager.c:2149
+#: src/pref-manager.c:2394
 msgid "Error Messages"
 msgstr "הודעות שגיאה"
 
-#: src/pref-manager.c:2153
+#: src/pref-manager.c:2398
 msgid "Fatal Error Messages"
 msgstr "הודעות שגיאה חמורות"
 
-#: src/pref-manager.c:2157
+#: src/pref-manager.c:2402
 msgid "Debug Messages"
 msgstr "הודעות ניפוי"
 
-#: src/pref-manager.c:2183
+#: src/pref-manager.c:2428
 msgid "Message Colors"
 msgstr "צבעי הודעות"
 
-#: src/pref-manager.c:2188
+#: src/pref-manager.c:2433
 #, c-format
 msgid "Quote level %d color"
 msgstr "צבע של ציטוט ברמה %d"
 
-#: src/pref-manager.c:2201
+#: src/pref-manager.c:2446
 msgid "Link Color"
 msgstr "צבע קישור"
 
-#: src/pref-manager.c:2203
+#: src/pref-manager.c:2448
 msgid "Hyperlink color"
 msgstr "צבע של היפר-קישור"
 
-#: src/pref-manager.c:2214
+#: src/pref-manager.c:2459
 msgid "Composition Window"
 msgstr "חלון יצירה"
 
-#: src/pref-manager.c:2218
+#: src/pref-manager.c:2463
 msgid "Invalid or incomplete address label color"
 msgstr "צבע של כתובת לא חוקית או חלקית"
 
-#: src/pref-manager.c:2243
+#: src/pref-manager.c:2488
 msgid "Fonts"
 msgstr "גופנים"
 
-#: src/pref-manager.c:2258 src/pref-manager.c:2283
-msgid "Select a font to use"
-msgstr "בחר גופן"
-
-#: src/pref-manager.c:2261 src/pref-manager.c:2286
-msgid "Select..."
-msgstr "בחר..."
-
-#: src/pref-manager.c:2268
+#: src/pref-manager.c:2497 src/pref-manager.c:2542
 msgid "Message Font"
 msgstr "גופן ההודעה"
 
-#: src/pref-manager.c:2294
+#: src/pref-manager.c:2509 src/pref-manager.c:2568
 msgid "Message Subject Font"
 msgstr "גופן נושא ההודעה"
 
-#: src/pref-manager.c:2317
+#: src/pref-manager.c:2532 src/pref-manager.c:2557
+msgid "Select a font to use"
+msgstr "בחר גופן"
+
+#: src/pref-manager.c:2535 src/pref-manager.c:2560
+msgid "Select..."
+msgstr "בחר..."
+
+#: src/pref-manager.c:2592
 #, fuzzy
 msgid "Sorting and Threading"
 msgstr "קיבוץ מסרים"
 
-#: src/pref-manager.c:2321
+#: src/pref-manager.c:2596
 #, fuzzy
 msgid "Default sort column"
 msgstr "ברירת המחדל"
 
-#: src/pref-manager.c:2325
+#: src/pref-manager.c:2600
 msgid "Default threading style"
 msgstr "ברירת המחדל לסגנון קיבוץ מסרים"
 
-#: src/pref-manager.c:2330
+#: src/pref-manager.c:2605
 #, fuzzy
 msgid "Expand threads on open"
 msgstr "הרחב את עץ תיבות הדואר בפתיחת תיבה"
 
-#: src/pref-manager.c:2406
+#: src/pref-manager.c:2681
 msgid "Pspell Settings"
 msgstr "פרמטרים של Pspell"
 
-#: src/pref-manager.c:2412
+#: src/pref-manager.c:2687
 msgid "Spell Check Module"
 msgstr "מודול בדיקת איות"
 
-#: src/pref-manager.c:2418
+#: src/pref-manager.c:2693
 msgid "Suggestion Level"
 msgstr "רמת ההצעות"
 
 #. do the ignore length
-#: src/pref-manager.c:2423
+#: src/pref-manager.c:2698
 msgid "Ignore words shorter than"
 msgstr "התעלם ממילים שקצרות מ-"
 
-#: src/pref-manager.c:2444
+#: src/pref-manager.c:2719
 msgid "Miscellaneous Spelling Settings"
 msgstr "פרמטרים שונים של איות"
 
-#: src/pref-manager.c:2446
+#: src/pref-manager.c:2721
 msgid "Check signature"
 msgstr "בדוק את החתימה"
 
-#: src/pref-manager.c:2447
+#: src/pref-manager.c:2722
 msgid "Check quoted"
 msgstr "בדוק את הציטטות"
 
-#: src/pref-manager.c:2471
+#: src/pref-manager.c:2746
 msgid "Miscellaneous"
 msgstr "שונות"
 
-#: src/pref-manager.c:2473
+#: src/pref-manager.c:2748
 msgid "Debug"
 msgstr "Debug"
 
-#: src/pref-manager.c:2474
+#: src/pref-manager.c:2749
 msgid "Empty Trash on exit"
 msgstr "רוקן את האשפה בצאתך מהתוכנית"
 
-#: src/pref-manager.c:2480
+#: src/pref-manager.c:2755
 msgid "Automatically close mailbox if unused more than"
 msgstr "סגור תיבות דואר באופן אוטומטי אם אינן בשימוש יותר מ-"
 
-#: src/pref-manager.c:2508
+#: src/pref-manager.c:2783
 msgid "Deleting Messages"
 msgstr "מחיקת הודעות"
 
-#: src/pref-manager.c:2510
+#: src/pref-manager.c:2785
 msgid ""
 "The following setting is global, but may be overridden\n"
 "for the selected mailbox using Mailbox -> Hide messages:"
 msgstr ""
 
-#: src/pref-manager.c:2518
+#: src/pref-manager.c:2793
 #, fuzzy
 msgid "Hide messages marked as deleted"
 msgstr "מסמן %d הודעות למחיקה..."
 
-#: src/pref-manager.c:2520
+#: src/pref-manager.c:2795
 msgid "The following settings are global."
 msgstr ""
 
-#: src/pref-manager.c:2525
+#: src/pref-manager.c:2800
 #, fuzzy
 msgid "Expunge deleted messages when mailbox is closed"
 msgstr "צפה/י בהודעה באופן אוטומטי עם פתיחת תיבת הדואר"
 
-#: src/pref-manager.c:2532
+#: src/pref-manager.c:2807
 #, fuzzy
 msgid " ...and if mailbox is unused more than"
 msgstr "עדכן את תיבות-הדואר באופן אוטומטי, אם אינן בשימוש יותר מ-"
 
-#: src/pref-manager.c:2567
+#: src/pref-manager.c:2842
 msgid "Options"
 msgstr "אפשרויות"
 
-#: src/pref-manager.c:2570
+#: src/pref-manager.c:2845
 msgid "Open Inbox upon startup"
 msgstr "פתח תיבת דואר נכנס מיד באתחול"
 
-#: src/pref-manager.c:2572
+#: src/pref-manager.c:2847
 msgid "Check mail upon startup"
 msgstr "בדוק דואר מיד באתחול"
 
-#: src/pref-manager.c:2574
+#: src/pref-manager.c:2849
 msgid "Remember open mailboxes between sessions"
 msgstr "זכור אילו תיבות דואר פתוחות בין הריצות של בלזה"
 
-#: src/pref-manager.c:2588
+#: src/pref-manager.c:2863
 #, fuzzy
 msgid "Folder Scanning"
 msgstr "סריקת תיקיות IMAP"
 
-#: src/pref-manager.c:2590
+#: src/pref-manager.c:2865
 msgid ""
 "Choose depth 1 for fast startup; this defers scanning some folders.\n"
 "To see more of the tree at startup, choose a greater depth."
@@ -4600,68 +4714,68 @@ msgstr ""
 "בחר עומק 1 על מנת שהאתחול יהיה מהיר; זה יעכב את הסריקה של תיקיות מסוימות.\n"
 "על מנת לראות חלק גדול יותר מעץ התיקיות מיד באתחול, בחר עומק גדול יותר."
 
-#: src/pref-manager.c:2600
+#: src/pref-manager.c:2875
 #, fuzzy
 msgid "Scan local folders to depth"
 msgstr "סרוק את העץ עד לעומק של"
 
-#: src/pref-manager.c:2613
+#: src/pref-manager.c:2888
 #, fuzzy
 msgid "Scan IMAP folders to depth"
 msgstr "סרוק את העץ עד לעומק של"
 
-#: src/pref-manager.c:2678
+#: src/pref-manager.c:2953
 msgid "Address Book Name"
 msgstr "שם ספר הכתובות"
 
-#: src/pref-manager.c:2686
+#: src/pref-manager.c:2961
 msgid "Expand aliases"
 msgstr "הרחב aliases"
 
-#: src/pref-manager.c:2705
+#: src/pref-manager.c:2980
 msgid "_Set as default"
 msgstr "_קבע בתור ברירת מחדל"
 
-#: src/pref-manager.c:2861
+#: src/pref-manager.c:3138
 msgid "Remote POP3 mailbox..."
 msgstr "תיבת דואר מרוחקת מסוג POP3..."
 
-#: src/pref-manager.c:2998
+#: src/pref-manager.c:3303 src/pref-manager.c:3317
 msgid "Show nothing"
 msgstr "אל תציג דבר"
 
-#: src/pref-manager.c:2999
+#: src/pref-manager.c:3305 src/pref-manager.c:3318
 msgid "Show dialog"
 msgstr "הצג תיבת דו-שיח"
 
-#: src/pref-manager.c:3000
+#: src/pref-manager.c:3307 src/pref-manager.c:3319
 msgid "Show in list"
 msgstr "הצג ברשימה"
 
-#: src/pref-manager.c:3001
+#: src/pref-manager.c:3309 src/pref-manager.c:3320
 #, fuzzy
 msgid "Show in status bar"
 msgstr "הצג ברשימה"
 
-#: src/pref-manager.c:3002
+#: src/pref-manager.c:3311 src/pref-manager.c:3321
 msgid "Print to console"
 msgstr "הדפס למסוף"
 
-#: src/pref-manager.c:3022
+#: src/pref-manager.c:3351 src/pref-manager.c:3357
 msgid "Ask me"
 msgstr "שאל אותי"
 
-#: src/pref-manager.c:3138
+#: src/pref-manager.c:3490
 #, c-format
 msgid "Error displaying link_id %s: %s\n"
 msgstr "שגיאה בהצגת link_id %s׃ %s\n"
 
-#: src/print.c:258 src/print.c:724
+#: src/print.c:259 src/print.c:725
 #, c-format
 msgid "Page: %i/%i"
 msgstr "עמוד׃ %i מתוך %i"
 
-#: src/print.c:666
+#: src/print.c:667
 msgid ""
 "Preparing an HTML part, which must start on a new page.\n"
 "Print this part?"
@@ -4669,63 +4783,71 @@ msgstr ""
 
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:981
+#: src/print.c:982
 msgid "Type:"
 msgstr "סוג׃"
 
-#: src/print.c:984
+#: src/print.c:985
 msgid "File name:"
 msgstr "שם הקובץ׃"
 
-#: src/print.c:1526
+#: src/print.c:1301
+#, fuzzy, c-format
+msgid "This is an inline %s signed %s message part:"
+msgstr ""
+"\n"
+"--\n"
+"זהו חלק הודעה חתום של OpenPGP:\n"
+
+#: src/print.c:1548
 msgid "Font available for printing"
 msgstr "הגופן זמין להדפסה"
 
-#: src/print.c:1532
+#: src/print.c:1554
 #, c-format
 msgid "Font <b>not</b> available for printing. Closest: %s"
 msgstr "הגופן </b>אינו</b> זמין להדפסה.  הקרוב ביותר הוא׃ %s"
 
-#: src/print.c:1545
+#: src/print.c:1567
 msgid "Select Font"
 msgstr "בחר גופן"
 
-#: src/print.c:1578
+#: src/print.c:1600
 msgid "Change..."
 msgstr "שנה..."
 
-#: src/print.c:1612
+#: src/print.c:1634
 msgid "Print message"
 msgstr "הדפס הודעה"
 
 #. create a 2nd notebook page for the fonts
-#: src/print.c:1623
+#: src/print.c:1645
 #, fuzzy
 msgid "_Fonts"
 msgstr "גופנים"
 
-#: src/print.c:1626
+#: src/print.c:1648
 msgid "Header font"
 msgstr "גופן לכותרת"
 
-#: src/print.c:1628
+#: src/print.c:1650
 msgid "Body font"
 msgstr "גופן לגוף ההודעה"
 
-#: src/print.c:1630
+#: src/print.c:1652
 msgid "Footer font"
 msgstr "גופן לתחתית ההודעה"
 
 #. highlight cited stuff
-#: src/print.c:1634
+#: src/print.c:1656
 msgid "Highlight cited text"
 msgstr "הדגש ציטטות"
 
-#: src/print.c:1638
+#: src/print.c:1660
 msgid "_Enable highlighting of cited text"
 msgstr "אפשר _הדגשת ציטוטים"
 
-#: src/print.c:1664
+#: src/print.c:1686
 #, c-format
 msgid ""
 "Balsa could not find font \"%s\".\n"
@@ -4734,7 +4856,7 @@ msgstr ""
 "בלזה אינו מוצא את הגופן \"%s\".\n"
 "השתמש בדף ה\"גופנים\" בחלון \"הדפס הודעה\" על מנת לשנותו."
 
-#: src/print.c:1769
+#: src/print.c:1791
 msgid "Balsa: message print preview"
 msgstr "בלזה׃ צפייה מקדימה בהדפסת ההודעה"
 
@@ -4751,34 +4873,34 @@ msgstr ""
 "שגיאה בעת טעינת מסננים׃ %s\n"
 "המסננים עשויים להיות שגויים."
 
-#: src/save-restore.c:716
+#: src/save-restore.c:717
 msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr "האפשרות לא לזהות טקסט \"מבנה=זורם\" הוסרה."
 
-#: src/save-restore.c:975
+#: src/save-restore.c:976
 msgid ""
 "The option not to send \"format=flowed\" is now on the Options menu of the "
 "compose window."
 msgstr ""
 "האפשרות לא לשלוח \"מבנה=זורם\" נמצאת כעת בתפריט האפשרויות של חלון המחבר."
 
-#: src/save-restore.c:1007
+#: src/save-restore.c:1008
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 "האפשרות לבקשת אישור שליחה (MDN) נמצאת כעת בתפריט האפשרויות של חלון המחבר."
 
-#: src/save-restore.c:1753
+#: src/save-restore.c:1754
 #, fuzzy
 msgid "Filter with no condition was ignored"
 msgstr "למסנן חייבים להיות תנאים."
 
-#: src/save-restore.c:1931
+#: src/save-restore.c:1934
 #, fuzzy
 msgid "Error opening GConf database\n"
 msgstr "שגיאה בפתיחת תיבת הדואר"
 
-#: src/save-restore.c:1939 src/save-restore.c:1950
+#: src/save-restore.c:1942 src/save-restore.c:1953
 #, fuzzy, c-format
 msgid "Error setting GConf field: %s\n"
 msgstr "שגיאה בהצגת %s׃ %s\n"
@@ -4994,7 +5116,7 @@ msgstr "צרף הו_דעה/ות"
 msgid "Sen_d"
 msgstr "שלח"
 
-#: src/sendmsg-window.c:322 src/sendmsg-window.c:509 src/toolbar-factory.c:121
+#: src/sendmsg-window.c:322 src/sendmsg-window.c:509 src/toolbar-factory.c:124
 msgid "Send this message"
 msgstr "שלח הודעה זו"
 
@@ -5126,7 +5248,7 @@ msgstr ""
 msgid "Send _Later"
 msgstr ""
 
-#: src/sendmsg-window.c:735
+#: src/sendmsg-window.c:737
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -5135,11 +5257,11 @@ msgstr ""
 "ההודעה ל-%s השתנתה.\n"
 "לשמור הודעה בתיבת הטיוטות?"
 
-#: src/sendmsg-window.c:989
+#: src/sendmsg-window.c:991
 msgid "Gnome editor is not defined in your preferred applications."
 msgstr ""
 
-#: src/sendmsg-window.c:1438
+#: src/sendmsg-window.c:1456
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -5154,48 +5276,48 @@ msgstr ""
 "\n"
 "האם באמת ברצונך לצרף את הקובץ כהתייחסות?"
 
-#: src/sendmsg-window.c:1449
+#: src/sendmsg-window.c:1467
 msgid "Attach as Reference?"
 msgstr "לצרף כהתייחסות?"
 
-#: src/sendmsg-window.c:1539
+#: src/sendmsg-window.c:1557
 msgid "Remove"
 msgstr "מחק"
 
-#: src/sendmsg-window.c:1550
+#: src/sendmsg-window.c:1568
 msgid "attach as reference"
 msgstr "צרף בתור התייחסות"
 
-#: src/sendmsg-window.c:1556
+#: src/sendmsg-window.c:1574
 msgid "attach as file"
 msgstr "צרף בתור קובץ"
 
-#: src/sendmsg-window.c:1690
+#: src/sendmsg-window.c:1708
 #, fuzzy, c-format
 msgid "Error converting \"%s\" to UTF-8: %s\n"
 msgstr "שגיאה בטעינת %s׃ %s\n"
 
-#: src/sendmsg-window.c:1727
+#: src/sendmsg-window.c:1745
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "לא ניתן לקבל מידע על קובץ `%s'׃ %s"
 
-#: src/sendmsg-window.c:1732
+#: src/sendmsg-window.c:1750
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "התצריף %s אינו קובץ רגיל."
 
-#: src/sendmsg-window.c:1735
+#: src/sendmsg-window.c:1753
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "לא ניתן לקרוא את הקובץ %s\n"
 
-#: src/sendmsg-window.c:1779
+#: src/sendmsg-window.c:1797
 msgid "Attach file"
 msgstr "צרף קובץ"
 
-#: src/sendmsg-window.c:1876 src/sendmsg-window.c:1939
-#: src/sendmsg-window.c:3271
+#: src/sendmsg-window.c:1894 src/sendmsg-window.c:1957
+#: src/sendmsg-window.c:3355
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5203,64 +5325,63 @@ msgstr ""
 "נכשל צירוף ההודעה.\n"
 "סיבה אפשרית׃ אין מספיק מקום זמני פנוי"
 
-#. From:
-#: src/sendmsg-window.c:2134
+#: src/sendmsg-window.c:2178 src/sendmsg-window.c:2203
 msgid "F_rom:"
 msgstr "_מאת׃"
 
 #. Subject:
-#: src/sendmsg-window.c:2146
+#: src/sendmsg-window.c:2218
 msgid "S_ubject:"
 msgstr "_נושא׃"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: src/sendmsg-window.c:2160
+#: src/sendmsg-window.c:2232
 msgid "F_cc:"
 msgstr "העתק ל_קובץ׃"
 
 #. Reply To:
-#: src/sendmsg-window.c:2191
+#: src/sendmsg-window.c:2263
 msgid "_Reply To:"
 msgstr "השב _אל׃"
 
 #. Attachment list
-#: src/sendmsg-window.c:2196
+#: src/sendmsg-window.c:2268
 msgid "_Attachments:"
 msgstr "_צירופים:"
 
-#: src/sendmsg-window.c:2438
+#: src/sendmsg-window.c:2510
 msgid "you"
 msgstr "אתה"
 
-#: src/sendmsg-window.c:2447
+#: src/sendmsg-window.c:2519
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------ %s-דואר מועבר מ ------\n"
 
-#: src/sendmsg-window.c:2482
+#: src/sendmsg-window.c:2554
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "מזהה הודעה׃ %s\n"
 
-#: src/sendmsg-window.c:2488
+#: src/sendmsg-window.c:2560
 msgid "References:"
 msgstr "התייחסויות׃"
 
-#: src/sendmsg-window.c:2499
+#: src/sendmsg-window.c:2571
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "ב- %s, %s כתב/ה׃\n"
 
-#: src/sendmsg-window.c:2501
+#: src/sendmsg-window.c:2573
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s כתב/ה׃\n"
 
-#: src/sendmsg-window.c:3427
+#: src/sendmsg-window.c:3511
 msgid "Choose charset"
 msgstr "בחר מערך תווים"
 
-#: src/sendmsg-window.c:3434
+#: src/sendmsg-window.c:3518
 #, fuzzy
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
@@ -5270,16 +5391,16 @@ msgstr ""
 "קובץ זה לא מקודד ב US-ASCII או ב UTF-8.\n"
 "אנא בחר את הקידוד שבו מקודד קובץ זה."
 
-#: src/sendmsg-window.c:3501
+#: src/sendmsg-window.c:3585
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "לא ניתן לפתוח את הקובץ %s.\n"
 
-#: src/sendmsg-window.c:3523
+#: src/sendmsg-window.c:3607
 msgid "Include file"
 msgstr "הכנס קובץ"
 
-#: src/sendmsg-window.c:3818
+#: src/sendmsg-window.c:3926
 #, fuzzy, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5289,7 +5410,7 @@ msgstr ""
 "ההודעה לא יכלה להיות מקודדת בקידוד %s.\n"
 "אנא בחר שפה להודעה זו."
 
-#: src/sendmsg-window.c:3859
+#: src/sendmsg-window.c:3967
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5299,76 +5420,76 @@ msgstr ""
 "ו/או יוצפן. אתה צריך לבחור מצב MIME אם כל ההודעה צריכה להיות מוגנת. האם "
 "ברצונך באמת להמשיך?"
 
-#: src/sendmsg-window.c:3875
+#: src/sendmsg-window.c:3983
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "שולח הודעות עם מצב gpg %d"
 
-#: src/sendmsg-window.c:3922
+#: src/sendmsg-window.c:4030
 #, fuzzy
 msgid "Message could not be created"
 msgstr "gpgme אינו יכול ליצור נתונים חדשים׃ %s"
 
-#: src/sendmsg-window.c:3924
+#: src/sendmsg-window.c:4032
 msgid "Message could not be queued in outbox"
 msgstr ""
 
-#: src/sendmsg-window.c:3926
+#: src/sendmsg-window.c:4034
 #, fuzzy
 msgid "Message could not be saved in sentbox"
 msgstr "גופן נושא ההודעה"
 
-#: src/sendmsg-window.c:3928
+#: src/sendmsg-window.c:4036
 #, fuzzy
 msgid "Message could not be sent"
 msgstr "גופן נושא ההודעה"
 
-#: src/sendmsg-window.c:3932
+#: src/sendmsg-window.c:4040
 #, fuzzy, c-format
 msgid "Send failed: %s"
 msgstr "SSL נכשל׃ %s"
 
-#: src/sendmsg-window.c:4016
+#: src/sendmsg-window.c:4128
 #, fuzzy
 msgid "Could not postpone message."
 msgstr "לא ניתן לבצע append להודעה"
 
-#: src/sendmsg-window.c:4030
+#: src/sendmsg-window.c:4142
 #, fuzzy
 msgid "Message postponed."
 msgstr "גופן ההודעה"
 
-#: src/sendmsg-window.c:4046
+#: src/sendmsg-window.c:4158
 #, fuzzy, c-format
 msgid "Could not open draftbox: %s"
 msgstr "לא ניתן לפתוח את %s"
 
-#: src/sendmsg-window.c:4068
+#: src/sendmsg-window.c:4180
 #, fuzzy
 msgid "Message saved."
 msgstr "הודעה"
 
-#: src/sendmsg-window.c:4230
+#: src/sendmsg-window.c:4342
 #, c-format
 msgid "Could not compile %s"
 msgstr "לא ניתן להדר את %s"
 
-#: src/sendmsg-window.c:4718
+#: src/sendmsg-window.c:4836
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "השב אל %s׃ %s"
 
-#: src/sendmsg-window.c:4723
+#: src/sendmsg-window.c:4841
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "העבר דואר אל %s׃ %s"
 
-#: src/sendmsg-window.c:4727
+#: src/sendmsg-window.c:4845
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "המשך את ההודעה אל %s׃ %s"
 
-#: src/sendmsg-window.c:4731
+#: src/sendmsg-window.c:4849
 #, c-format
 msgid "New message to %s: %s"
 msgstr "דואר חדש אל %s׃ %s"
@@ -5413,73 +5534,73 @@ msgstr "שמירת כתובת׃ אין כתובות"
 msgid "Store Address"
 msgstr "שמור כתובת"
 
-#: src/store-address.c:193
+#: src/store-address.c:196
 msgid "Save this address and close the dialog?"
 msgstr "לשמור את הכתובת ולסגור את תיבת הדו-שיח?"
 
-#: src/store-address.c:210
+#: src/store-address.c:214
 msgid "No address book selected...."
 msgstr "לא בחרת ספר כתובות..."
 
-#: src/store-address.c:223
+#: src/store-address.c:227
 #, fuzzy
 msgid "Address could not be written to this address book."
 msgstr "לא ניתן לכתוב בספר הכתובות"
 
-#: src/store-address.c:226
+#: src/store-address.c:230
 msgid "Address book could not be accessed."
 msgstr ""
 
-#: src/store-address.c:228
+#: src/store-address.c:232
 #, fuzzy
 msgid "This mail address is already in this address book."
 msgstr "%s נמצא כבר בספר הטלפונים."
 
-#: src/store-address.c:231
+#: src/store-address.c:235
 msgid "Unexpected address book error. Report it."
 msgstr ""
 
-#: src/store-address.c:247
+#: src/store-address.c:251
 msgid "Choose Address Book"
 msgstr "בחר ספר כתובות"
 
-#: src/store-address.c:290
+#: src/store-address.c:316
 msgid "Choose Address"
 msgstr "בחר כתובת"
 
-#: src/toolbar-factory.c:91
+#: src/toolbar-factory.c:90
 msgid "Separator"
 msgstr "קו מפריד"
 
-#: src/toolbar-factory.c:92
+#: src/toolbar-factory.c:91
 msgid "Check"
 msgstr "בדוק"
 
-#: src/toolbar-factory.c:93
+#: src/toolbar-factory.c:92
 msgid "Check for new email"
 msgstr "בדוק אם הגיע דואר חדש"
 
-#: src/toolbar-factory.c:94
+#: src/toolbar-factory.c:93
 msgid "Compose"
 msgstr "יצירה"
 
-#: src/toolbar-factory.c:95
+#: src/toolbar-factory.c:94
 msgid "Compose message"
 msgstr "יצירת הודעה"
 
-#: src/toolbar-factory.c:96
+#: src/toolbar-factory.c:95
 msgid "Continue"
 msgstr "המשך"
 
-#: src/toolbar-factory.c:97
+#: src/toolbar-factory.c:96
 msgid "Continue message"
 msgstr "המשך דואר"
 
-#: src/toolbar-factory.c:98
+#: src/toolbar-factory.c:97
 msgid "Reply"
 msgstr "השב"
 
-#: src/toolbar-factory.c:100
+#: src/toolbar-factory.c:99
 msgid ""
 "Reply\n"
 "to all"
@@ -5487,11 +5608,11 @@ msgstr ""
 "השב\n"
 "לכולם"
 
-#: src/toolbar-factory.c:101
+#: src/toolbar-factory.c:100
 msgid "Reply to all recipients"
 msgstr "השב לכל הנמענים"
 
-#: src/toolbar-factory.c:102
+#: src/toolbar-factory.c:101
 msgid ""
 "Reply\n"
 "to group"
@@ -5499,27 +5620,27 @@ msgstr ""
 "השב\n"
 "לקבוצה"
 
-#: src/toolbar-factory.c:104
+#: src/toolbar-factory.c:103
 msgid "Forward"
 msgstr "העבר"
 
-#: src/toolbar-factory.c:106
+#: src/toolbar-factory.c:105
 msgid "Previous"
 msgstr "הקודם"
 
-#: src/toolbar-factory.c:107
+#: src/toolbar-factory.c:106
 msgid "Open previous"
 msgstr "פתח את הקודם"
 
-#: src/toolbar-factory.c:108
+#: src/toolbar-factory.c:107
 msgid "Next"
 msgstr "הבא"
 
-#: src/toolbar-factory.c:109
+#: src/toolbar-factory.c:108
 msgid "Open next"
 msgstr "פתח את הבא"
 
-#: src/toolbar-factory.c:110
+#: src/toolbar-factory.c:109
 msgid ""
 "Next\n"
 "unread"
@@ -5527,11 +5648,11 @@ msgstr ""
 "הבא\n"
 "שלא נקרא"
 
-#: src/toolbar-factory.c:111
+#: src/toolbar-factory.c:110
 msgid "Open next unread message"
 msgstr "פתח את ההודעה הבאה שלא נקראה"
 
-#: src/toolbar-factory.c:112
+#: src/toolbar-factory.c:111
 msgid ""
 "Next\n"
 "flagged"
@@ -5539,11 +5660,35 @@ msgstr ""
 "המדוגל\n"
 "הבא"
 
-#: src/toolbar-factory.c:113
+#: src/toolbar-factory.c:112
 msgid "Open next flagged message"
 msgstr "פתח את ההודעה המדוגלת הבאה"
 
+#: src/toolbar-factory.c:113
+#, fuzzy
+msgid ""
+"Previous\n"
+"part"
+msgstr "החלק הקודם"
+
 #: src/toolbar-factory.c:114
+#, fuzzy
+msgid "View previous part of message"
+msgstr "החלק הקודם בהודעה"
+
+#: src/toolbar-factory.c:115
+#, fuzzy
+msgid ""
+"Next\n"
+"part"
+msgstr "החלק הבא"
+
+#: src/toolbar-factory.c:116
+#, fuzzy
+msgid "View next part of message"
+msgstr "החלק הבא בהודעה"
+
+#: src/toolbar-factory.c:117
 msgid ""
 "Trash /\n"
 "Delete"
@@ -5551,68 +5696,68 @@ msgstr ""
 "אשפה/\n"
 "מחיקה"
 
-#: src/toolbar-factory.c:115
+#: src/toolbar-factory.c:118
 msgid "Move the current message to trash"
 msgstr "זרוק הודעה נוכחית לאשפה"
 
-#: src/toolbar-factory.c:116
+#: src/toolbar-factory.c:119
 msgid "Postpone"
 msgstr "דחה למועד מאוחר יותר"
 
-#: src/toolbar-factory.c:117
+#: src/toolbar-factory.c:120
 msgid "Postpone current message"
 msgstr "דחה הודעה נוכחית למועד מאוחר יותר"
 
-#: src/toolbar-factory.c:118
+#: src/toolbar-factory.c:121
 msgid "Print"
 msgstr "הדפס"
 
-#: src/toolbar-factory.c:120
+#: src/toolbar-factory.c:123
 msgid "Send"
 msgstr "שלח"
 
-#: src/toolbar-factory.c:122
+#: src/toolbar-factory.c:125
 msgid "Exchange"
 msgstr "החלף"
 
-#: src/toolbar-factory.c:124
+#: src/toolbar-factory.c:127
 msgid "Attach"
 msgstr "צרף"
 
-#: src/toolbar-factory.c:125
+#: src/toolbar-factory.c:128
 msgid "Add attachments to this message"
 msgstr "צרף חומר להודעה הנוכחית"
 
-#: src/toolbar-factory.c:126
+#: src/toolbar-factory.c:129
 msgid "Save"
 msgstr "שמור"
 
-#: src/toolbar-factory.c:127
+#: src/toolbar-factory.c:130
 msgid "Save the current item"
 msgstr "שמור את הפריט הנוכחי"
 
-#: src/toolbar-factory.c:128
+#: src/toolbar-factory.c:131
 msgid "Identity"
 msgstr "זהות"
 
-#: src/toolbar-factory.c:129
+#: src/toolbar-factory.c:132
 msgid "Set identity to use for this message"
 msgstr "קבע זהות עבור ההודעה הנוכחית"
 
-#: src/toolbar-factory.c:131
+#: src/toolbar-factory.c:134
 msgid "Run a spell check"
 msgstr "הפעל בודק איות"
 
-#: src/toolbar-factory.c:132 src/toolbar-factory.c:142
+#: src/toolbar-factory.c:135 src/toolbar-factory.c:145
 msgid "Close"
 msgstr "סגור"
 
-#: src/toolbar-factory.c:133
+#: src/toolbar-factory.c:136
 #, fuzzy
 msgid "Close the compose window"
 msgstr "חלון יצירת דואר"
 
-#: src/toolbar-factory.c:134
+#: src/toolbar-factory.c:137
 msgid ""
 "Toggle\n"
 "new"
@@ -5620,19 +5765,19 @@ msgstr ""
 "שנה סימון\n"
 "חדש"
 
-#: src/toolbar-factory.c:135
+#: src/toolbar-factory.c:138
 msgid "Toggle new message flag"
 msgstr "שנה מצב סימון הודעה כחדשה"
 
-#: src/toolbar-factory.c:136
+#: src/toolbar-factory.c:139
 msgid "Mark all"
 msgstr "סמן הכל"
 
-#: src/toolbar-factory.c:137
+#: src/toolbar-factory.c:140
 msgid "Mark all messages in current mailbox"
 msgstr "סמן את כל ההודעות בתיבת הדואר הנוכחית"
 
-#: src/toolbar-factory.c:138
+#: src/toolbar-factory.c:141
 msgid ""
 "All\n"
 "headers"
@@ -5640,59 +5785,59 @@ msgstr ""
 "כל\n"
 "הכותרות"
 
-#: src/toolbar-factory.c:139
+#: src/toolbar-factory.c:142
 msgid "Show all headers"
 msgstr "הצג את כל הכותרות"
 
-#: src/toolbar-factory.c:140
+#: src/toolbar-factory.c:143
 msgid "Empty Trash"
 msgstr "רוקן אשפה"
 
-#: src/toolbar-factory.c:143
+#: src/toolbar-factory.c:146
 msgid "Close current mailbox"
 msgstr "סגור תיבת דואר נוכחית"
 
-#: src/toolbar-factory.c:144
+#: src/toolbar-factory.c:147
 msgid "Msg Preview"
 msgstr "צפייה מוקדמת בהודעה"
 
-#: src/toolbar-factory.c:145
+#: src/toolbar-factory.c:148
 msgid "Show preview pane"
 msgstr "הצג חלון צפייה מוקדמת"
 
-#: src/toolbar-factory.c:147
+#: src/toolbar-factory.c:150
 msgid "Sign"
 msgstr "חתימה"
 
-#: src/toolbar-factory.c:148
+#: src/toolbar-factory.c:151
 msgid "Sign message using GPG"
 msgstr "חתום על ההודעה באמצעות GPG"
 
-#: src/toolbar-factory.c:149
+#: src/toolbar-factory.c:152
 msgid "Encrypt"
 msgstr "הצפן"
 
-#: src/toolbar-factory.c:150
+#: src/toolbar-factory.c:153
 msgid "Encrypt message using GPG"
 msgstr "הצפן את ההודעה באמצעות GPG"
 
-#: src/toolbar-factory.c:152
+#: src/toolbar-factory.c:155
 msgid "Undo"
 msgstr "בטל"
 
-#: src/toolbar-factory.c:153
+#: src/toolbar-factory.c:156
 msgid "Undo most recent change"
 msgstr "בטל את רב השינויים האחרונים"
 
-#: src/toolbar-factory.c:154
+#: src/toolbar-factory.c:157
 msgid "Redo"
 msgstr "בצע שוב"
 
-#: src/toolbar-factory.c:155
+#: src/toolbar-factory.c:158
 msgid "Redo most recent change"
 msgstr "בצע שוב את רב השינויים האחרונים"
 
-#: src/toolbar-factory.c:237
+#: src/toolbar-factory.c:249
 #, c-format
 msgid "Unknown toolbar icon \"%s\""
 msgstr "הצלמית של סרגל הכלים אינה ידועה \"%s\""
@@ -5727,29 +5872,45 @@ msgid "Error displaying toolbar help: %s\n"
 msgstr "שגיאה בהצגת עזרה על סרגל הכלים׃ %s\n"
 
 #. Preview display
-#: src/toolbar-prefs.c:412
+#: src/toolbar-prefs.c:413
 msgid "Preview"
 msgstr "תצוגה מקדימה"
 
-#: src/toolbar-prefs.c:440
+#: src/toolbar-prefs.c:441
 msgid "_Restore toolbar to standard buttons"
 msgstr "_שחזר את סרגל הכלים לכפתורים הרגילים"
 
-#: src/toolbar-prefs.c:459
+#: src/toolbar-prefs.c:460
 msgid "Available buttons"
 msgstr "כפתורים זמינים"
 
-#: src/toolbar-prefs.c:475
+#: src/toolbar-prefs.c:476
 msgid "Current toolbar"
 msgstr "סרגל כלים נוכחי"
 
-#: src/toolbar-prefs.c:492
+#: src/toolbar-prefs.c:493
 msgid "Up"
 msgstr "מעלה"
 
-#: src/toolbar-prefs.c:508
+#: src/toolbar-prefs.c:509
 msgid "Down"
 msgstr "מטה"
+
+#~ msgid ""
+#~ "Error placing messages from %s on %s\n"
+#~ "Messages are left in %s\n"
+#~ msgstr ""
+#~ "שגיאה בהעברת הודעות מ-%s על %s\n"
+#~ "ההודעות נשארות ב-%s\n"
+
+#, fuzzy
+#~ msgid "POP3 temp mailbox %s was not removed (system error message: %s)"
+#~ msgstr ""
+#~ "שגיאה בקובץ הזמני של תיבת הדואר POP3 %s׃\n"
+#~ "%s"
+
+#~ msgid "Source mailbox (%s) is readonly. Cannot move messages"
+#~ msgstr "תיבת הדואר המקורית (%s) היא לקריאה בלבד. לא ניתן להעביר את ההודעות."
 
 #~ msgid ""
 #~ "Error writing to temporary file %s.\n"
@@ -5890,9 +6051,6 @@ msgstr "מטה"
 
 #~ msgid "could not get gpgme decrypted data: %s"
 #~ msgstr "לא ניתן לקבל את הנתונים שהוצפנו על-ידי gpgme׃ %s"
-
-#~ msgid "The signature is invalid."
-#~ msgstr "החתימה אינה תקינה."
 
 #~ msgid "This part contains at least two signatures with different status."
 #~ msgstr "חלק זה מכיל לפחות שתי חתימות בעלות סטטוס שונה."
@@ -6310,9 +6468,6 @@ msgstr "מטה"
 #~ msgid "Can't dotlock %s.\n"
 #~ msgstr "לא ניתן לבצע dotlock עבור %s.\n"
 
-#~ msgid "%s is not a mailbox."
-#~ msgstr "%s אינו תיבת דואר."
-
 #~ msgid "Couldn't lock %s\n"
 #~ msgstr "לא ניתן לנעול את %s\n"
 
@@ -6352,9 +6507,6 @@ msgstr "מטה"
 #~ msgid "%d kept."
 #~ msgstr "%d נשמרו."
 
-#~ msgid "Can't write message"
-#~ msgstr "לא ניתן לכתוב את ההודעה"
-
 #~ msgid "multipart message has no boundary parameter!"
 #~ msgstr "להודעה רב-חלקית (multipart) חסר הפרמטר של הגבולות!"
 
@@ -6369,9 +6521,6 @@ msgstr "מטה"
 
 #~ msgid "%s isn't a regular file."
 #~ msgstr "%s אינו קובץ רגיל."
-
-#~ msgid "Error sending message, child exited %d (%s)."
-#~ msgstr "שגיאה במשלוח ההודעה, תהליך הבן (child) %d יצא (%s)."
 
 #~ msgid "Output of the delivery process"
 #~ msgstr "פלט תהליך ההעברה (delivery)"

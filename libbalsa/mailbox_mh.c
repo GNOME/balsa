@@ -49,7 +49,6 @@ static LibBalsaMailboxLocalClass *parent_class = NULL;
 
 static void libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass *klass);
 static void libbalsa_mailbox_mh_init(LibBalsaMailboxMh * mailbox);
-static void libbalsa_mailbox_mh_finalize(GObject * object);
 
 static GMimeStream *libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox *
 							   mailbox,
@@ -58,8 +57,8 @@ static GMimeStream *libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox *
 static void libbalsa_mailbox_mh_remove_files(LibBalsaMailboxLocal *mailbox);
 
 static gboolean libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox);
+static void libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox);
-static gboolean libbalsa_mailbox_mh_close_backend(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox,
                                          gboolean expunge);
 static struct message_info *message_info_from_msgno(
@@ -126,8 +125,6 @@ libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass * klass)
 
     parent_class = g_type_class_peek_parent(klass);
 
-    object_class->finalize = libbalsa_mailbox_mh_finalize;
-
     libbalsa_mailbox_class->get_message_stream =
 	libbalsa_mailbox_mh_get_message_stream;
 
@@ -135,7 +132,8 @@ libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass * klass)
     libbalsa_mailbox_class->check = libbalsa_mailbox_mh_check;
 
     libbalsa_mailbox_class->sync = libbalsa_mailbox_mh_sync;
-    libbalsa_mailbox_class->close_backend = libbalsa_mailbox_mh_close_backend;
+    libbalsa_mailbox_class->close_mailbox =
+	libbalsa_mailbox_mh_close_mailbox;
     libbalsa_mailbox_class->get_message = libbalsa_mailbox_mh_get_message;
     libbalsa_mailbox_class->fetch_message_structure =
 	libbalsa_mailbox_mh_fetch_message_structure;
@@ -216,22 +214,9 @@ libbalsa_mailbox_mh_new(const gchar * path, gboolean create)
 	return NULL;
     }
     
-    LIBBALSA_MAILBOX_MH(mailbox)->messages_info =
-	g_array_new(FALSE, TRUE, sizeof(struct message_info));
-
     libbalsa_notify_register_mailbox(mailbox);
     
     return G_OBJECT(mailbox);
-}
-
-static void
-libbalsa_mailbox_mh_finalize(GObject * object)
-{
-    free_messages_info(LIBBALSA_MAILBOX_MH(object)->messages_info);
-    g_array_free(LIBBALSA_MAILBOX_MH(object)->messages_info, TRUE);
-
-    if (G_OBJECT_CLASS(parent_class)->finalize)
-	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
 static GMimeStream *
@@ -297,7 +282,8 @@ libbalsa_mailbox_mh_remove_files(LibBalsaMailboxLocal *mailbox)
  * digits.  Deleted message get moved to a filename with a comma before
  * it.
  */
-static gboolean check_filename (const gchar *s)
+static gboolean
+lbm_mh_check_filename (const gchar *s)
 {
   for (; *s; s++)
   {
@@ -307,7 +293,8 @@ static gboolean check_filename (const gchar *s)
   return TRUE;
 }
 
-static void parse_mailbox(LibBalsaMailboxMh * mailbox)
+static void
+lbm_mh_parse_mailbox(LibBalsaMailboxMh * mailbox)
 {
     const gchar *path;
     GDir *dir;
@@ -323,7 +310,7 @@ static void parse_mailbox(LibBalsaMailboxMh * mailbox)
     while ((filename = g_dir_read_name(dir)) != NULL)
     {
 	struct message_info *msg_info;
-	if (check_filename(filename) == FALSE)
+	if (lbm_mh_check_filename(filename) == FALSE)
 	    continue;
 	sscanf(filename, "%d", &msgno);
 	if (msgno > mailbox->messages_info->len)
@@ -343,7 +330,9 @@ static void parse_mailbox(LibBalsaMailboxMh * mailbox)
 static const gchar *LibBalsaMailboxMhUnseen = "unseen:";
 static const gchar *LibBalsaMailboxMhFlagged = "flagged:";
 static const gchar *LibBalsaMailboxMhReplied = "replied:";
-static void handle_seq_line(LibBalsaMailboxMh * mailbox, gchar *line)
+
+static void
+lbm_mh_handle_seq_line(LibBalsaMailboxMh * mailbox, gchar *line)
 {
     LibBalsaMessageFlag flag;
     gchar **sequences, **seq;
@@ -397,7 +386,8 @@ static void handle_seq_line(LibBalsaMailboxMh * mailbox, gchar *line)
     g_strfreev(sequences);
 }
 
-static void read_mh_sequences(LibBalsaMailboxMh * mailbox)
+static void
+lbm_mh_parse_sequences(LibBalsaMailboxMh * mailbox)
 {
     struct stat st;
     gchar* sequences_filename;
@@ -422,11 +412,19 @@ static void read_mh_sequences(LibBalsaMailboxMh * mailbox)
 	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
 	g_byte_array_append(line, "", 1);
 
-	handle_seq_line(mailbox, line->data);
+	lbm_mh_handle_seq_line(mailbox, line->data);
 	line->len = 0;
     } while (!g_mime_stream_eos(gmime_stream_buffer));
     g_mime_stream_unref(gmime_stream_buffer);
     g_byte_array_free(line, TRUE);
+}
+
+static void
+lbm_mh_parse_both(LibBalsaMailboxMh * mh)
+{
+    lbm_mh_parse_sequences(mh);
+    lbm_mh_parse_mailbox(mh);
+    LIBBALSA_MAILBOX(mh)->total_messages = mh->messages_info->len;
 }
 
 static gboolean
@@ -458,6 +456,7 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox)
     mh->sequences_filename =
 	g_strdup_printf("%s/.mh_sequences", path);
 
+    mh->messages_info = g_array_new(FALSE, TRUE, sizeof(struct message_info));
     mh->msgno_2_index = g_array_new(FALSE, FALSE, sizeof(int));
     mh->last_msgno = 0;
     mh->last_index = 0;
@@ -467,9 +466,9 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox)
     mailbox->messages = 0;
     mailbox->total_messages = 0;
     mailbox->unread_messages = 0;
-    read_mh_sequences(mh);
-    parse_mailbox(mh);
+    lbm_mh_parse_both(mh);
     mailbox->new_messages = mh->messages_info->len;
+    /* increment the reference count */
     mailbox->open_ref++;
     UNLOCK_MAILBOX(mailbox);
     libbalsa_mailbox_local_load_messages(mailbox);
@@ -478,7 +477,6 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox)
        in the mailbox with another mechanism than Balsa */
     libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
 
-    /* increment the reference count */
 #ifdef DEBUG
     g_print(_("%s: Opening %s Refcount: %d\n"),
 	    "LibBalsaMailboxMh", mailbox->name, mailbox->open_ref);
@@ -488,7 +486,8 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox)
 
 static int libbalsa_mailbox_mh_open_temp (const gchar *dest_path,
 					  char **name_used);
-static void libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
+static void
+libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
 {
     if (mailbox->open_ref == 0) {
 	if (libbalsa_notify_check_mailbox(mailbox))
@@ -547,8 +546,7 @@ static void libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
 	mh->mtime = st.st_mtime;
 	mh->mtime_sequences = st_sequences.st_mtime;
 
-	read_mh_sequences(mh);
-	parse_mailbox(mh);
+	lbm_mh_parse_both(mh);
 
 	UNLOCK_MAILBOX(mailbox);
 	libbalsa_mailbox_local_load_messages(mailbox);
@@ -556,7 +554,8 @@ static void libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
     }
 }
 
-static void free_messages_info(GArray *messages_info)
+static void
+free_messages_info(GArray *messages_info)
 {
     struct message_info *msg_info;
     guint i;
@@ -573,20 +572,29 @@ static void free_messages_info(GArray *messages_info)
 	if (msg_info->message)
 	    g_object_unref(msg_info->message);
     }
-    messages_info->len=0;
 }
 
-static gboolean libbalsa_mailbox_mh_close_backend(LibBalsaMailbox * mailbox)
+static void
+libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox)
 {
-    g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox), FALSE);
-    g_array_free(LIBBALSA_MAILBOX_MH(mailbox)->msgno_2_index, TRUE);
-    LIBBALSA_MAILBOX_MH(mailbox)->msgno_2_index = NULL;
-    free_messages_info(LIBBALSA_MAILBOX_MH(mailbox)->messages_info);
+    LibBalsaMailboxMh *mh;
 
-    return TRUE;
+    g_return_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox));
+
+    libbalsa_mailbox_mh_sync(mailbox, TRUE);
+
+    mh = LIBBALSA_MAILBOX_MH(mailbox);
+    g_array_free(mh->msgno_2_index, TRUE);
+    mh->msgno_2_index = NULL;
+    free_messages_info(mh->messages_info);
+    g_array_free(mh->messages_info, TRUE);
+    mh->messages_info = NULL;
+
+    LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
 }
 
-static int libbalsa_mailbox_mh_open_temp (const gchar *dest_path,
+static int
+libbalsa_mailbox_mh_open_temp (const gchar *dest_path,
 					  char **name_used)
 {
     int fd;
@@ -608,8 +616,8 @@ static int libbalsa_mailbox_mh_open_temp (const gchar *dest_path,
     return fd;
 }
 
-static gboolean libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox,
-                                         gboolean expunge)
+static gboolean
+libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 {
     LibBalsaMailboxMh *mh;
     gint first_unseen, last_unseen;
@@ -894,8 +902,8 @@ static gboolean libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox,
     return TRUE;
 }
 
-static struct message_info *message_info_from_msgno( LibBalsaMailboxMh * mailbox,
-						     guint msgno)
+static struct message_info *
+message_info_from_msgno( LibBalsaMailboxMh * mailbox, guint msgno)
 {
     struct message_info *msg_info = NULL;
     guint index;
@@ -1017,7 +1025,8 @@ libbalsa_mailbox_mh_load_message(LibBalsaMailbox * mailbox, guint msgno)
     return message;
 }
 
-static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
+static int
+libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 					   LibBalsaMessage * message )
 {
     LibBalsaMailboxMh *mh;
@@ -1038,8 +1047,7 @@ static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
     LOCK_MAILBOX_RETURN_VAL(mailbox, -1);
     g_object_ref ( G_OBJECT(message ) );
 
-    read_mh_sequences(mh);
-    parse_mailbox(mh);
+    lbm_mh_parse_both(mh);
     /* open tempfile */
     path = libbalsa_mailbox_local_get_path(mailbox);
     fd = libbalsa_mailbox_mh_open_temp(path, &tmp);

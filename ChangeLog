@@ -1,5 +1,8 @@
-2003-04-26 05:24  PeterB
+2003-04-26 06:35  PeterB
 
+	* libbalsa/folder-scanners.c: When list_inbox is specified, add
+	INBOX to the list of folders but don't flag it for scanning as the
+	root of a tree.
 	* src/balsa-message.c: Always remember id returned by g_idle_add.
 
 2003-04-26  Kang Jeong-Hee  <Keizi@mail.co.kr>

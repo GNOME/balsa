@@ -1,3 +1,8 @@
+2002-04-24  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/Makefile.am: Fix distcheck.
+	* libbalsa/address.[hc], libbalsa/send.c: fix without-esmtp build.
+
 2002-04-24  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/filter-run-dialog.c: C99

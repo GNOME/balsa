@@ -24,6 +24,7 @@
 
 #include <glib.h>
 
+#include "address.h"
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 

@@ -1091,7 +1091,8 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
 
     while ( (mqi = get_msg2send()) != NULL) {
 	libbalsa_lock_mutt();
-	i = mutt_invoke_sendmail(mqi->message->env->to,
+	i = mutt_invoke_sendmail(mqi->message->env->from,
+                                 mqi->message->env->to,
 				 mqi->message->env->cc,
 				 mqi->message->env->bcc,
 				 mqi->tempfile,

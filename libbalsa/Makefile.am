@@ -78,6 +78,7 @@ libbalsa_a_SOURCES = 		\
 	pop3.c			\
 	pop3.h			\
 	send.c			\
+	send.h			\
 	server.c		\
 	server.h		\
 	source-viewer.c		\

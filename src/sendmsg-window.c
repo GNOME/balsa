@@ -1895,7 +1895,7 @@ set_locale(GtkWidget* w, BalsaSendmsg *msg, gint idx) {
      } else {
        
        /* Set the new message style */
-#if 1
+#if 0
        { GtkStyle *style;
        style = gtk_style_copy (gtk_widget_get_style (GTK_WIDGET (msg->text)));
        //gdk_font_unref(style->font);
@@ -1904,7 +1904,7 @@ set_locale(GtkWidget* w, BalsaSendmsg *msg, gint idx) {
        gtk_style_unref(style);
        }
 #else
-       { gchar *str; gint tst_len, point;
+       { gchar *str; gint txt_len, point;
        gtk_text_freeze( GTK_TEXT(msg->text) );
        point   = gtk_editable_get_position( GTK_EDITABLE(msg->text) ); 
        txt_len = gtk_text_get_length( GTK_TEXT(msg->text) );

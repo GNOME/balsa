@@ -409,8 +409,6 @@ balsa_message_set (BalsaMessage * bm,
     else
       gtk_widget_show(bm->part_list);
   } 
-  gtk_widget_show(bm->header_text);
-
 }
 
 void

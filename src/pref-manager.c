@@ -493,7 +493,7 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	for (i = 0; i < NUM_TOOLBAR_MODES; i++)
 		if (GTK_TOGGLE_BUTTON (pui->toolbar_type[i])->active) {
 			balsa_app.toolbar_style = toolbar_type[i];
-			balsa_window_refresh (NULL);
+			balsa_window_refresh (balsa_app.main_window);
 			break;
 		}
 	for (i=0; i < NUM_PWINDOW_MODES; i++)

@@ -1,3 +1,14 @@
+2000-09-25  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-message.c(message_set): show headers only when asked to.
+	* src/main-window.c (balsa_window_refresh): remove the deangerous 
+	black magic.
+	* src/pref-manager.c: don't call balsa_window_refresh(NULL)
+	* src/sendmsg-window.c: do the font change the old traditional
+	way. The new one via style change led to mysterious occasional
+	hangs in gtk_text code (although this way seems to be the Right
+	Way).
+	
 2000-09-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalse/send.c: anihillate as many balsa-app dependences 

@@ -922,17 +922,9 @@ balsa_window_refresh (BalsaWindow *window)
   BalsaMessage *bmsg;
   GtkWidget *paned;
   
-  static BalsaWindow *balsa_window = NULL;
-
-  if (window == NULL)
-    {
-      if (balsa_window == NULL)
-        return;
-    }
-  else
-    balsa_window = window;
+  g_return_if_fail(window);
   
-  index = balsa_window_find_current_index (balsa_window);
+  index = balsa_window_find_current_index (window);
   if (index) {
     paned = GTK_WIDGET (balsa_app.notebook)->parent;
 
@@ -940,7 +932,7 @@ balsa_window_refresh (BalsaWindow *window)
       balsa_index_redraw_current (BALSA_INDEX (index));
       gtk_paned_set_position (GTK_PANED (paned), balsa_app.notebook_height);
     } else {
-      bmsg = BALSA_MESSAGE (BALSA_WINDOW (balsa_window)->preview);
+      bmsg = BALSA_MESSAGE (BALSA_WINDOW (window)->preview);
       if (bmsg)
         balsa_message_clear (bmsg);
       /* Set the height to something really big (those new hi-res
@@ -948,23 +940,17 @@ balsa_window_refresh (BalsaWindow *window)
       gtk_paned_set_position (GTK_PANED (paned), G_MAXINT);
     }
   }
-  
-  index = balsa_window_find_current_index (balsa_window);
-  if (index)
-    balsa_index_redraw_current (BALSA_INDEX (index));
-
   /*
    * set the toolbar style
    */
-  item = gnome_app_get_dock_item_by_name (GNOME_APP(balsa_window),
+  item = gnome_app_get_dock_item_by_name (GNOME_APP(window),
                                           GNOME_APP_TOOLBAR_NAME);
   toolbar = gnome_dock_item_get_child (item);
-
   gtk_toolbar_set_style (GTK_TOOLBAR(toolbar), balsa_app.toolbar_style);
 
   /* I don't know if this is a bug of gtk or not but if this is not here
      it doesn't properly resize after a toolbar style change */
-  gtk_widget_queue_resize (GTK_WIDGET (balsa_window));
+  gtk_widget_queue_resize (GTK_WIDGET (window));
 }
 
 /*

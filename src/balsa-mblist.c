@@ -813,7 +813,7 @@ balsa_mblist_update_mailbox (BalsaMBList * mblist, Mailbox * mailbox)
 	gtk_ctree_node_moveto (&mblist->ctree,node, 0, 1.0, 0.0);
   }
   
-  desc = g_strdup_printf("Shown mailbox: %s with %ld messages, %ld new", 
+  desc = g_strdup_printf(_("Shown mailbox: %s with %ld messages, %ld new"), 
 			 mailbox->name, mailbox->total_messages,
 			 mailbox->unread_messages);
   gnome_appbar_set_default (balsa_app.appbar, desc);

@@ -1,3 +1,7 @@
+2000-03-22  Fellmann Joaquim <joaquim@hrnet.fr>
+
+	* src/balsa-mblist.c: make a string i18n comp. for mbox stats
+	
 2000-03-20 Pawel Salek <pawsa@theochem.kth.se>
 	
 	* libbalsa/libbalsa_private.h: less verbose threaded mbox locking

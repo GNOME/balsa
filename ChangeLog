@@ -1,3 +1,8 @@
+2005-01-07 09:27  PeterB
+
+	* src/balsa-mblist.c: restore separator in
+	balsa_mblist_mru_option_menu(); remove unused variable.
+
 2005-01-07  Pawel Salek
 
 	* libbalsa/libbalsa.h: add mailbox manipulation error codes.

@@ -54,7 +54,8 @@ struct _LibBalsaMailboxLocal {
 struct _LibBalsaMailboxLocalClass {
     LibBalsaMailboxClass klass;
 
-    LibBalsaMessage *(*load_message)(LibBalsaMailbox *mb, guint msgno);
+    LibBalsaMessage *(*load_message)(LibBalsaMailbox *mb, guint msgno,
+				     LibBalsaMessage *message);
     void (*remove_files)(LibBalsaMailboxLocal *mb);
 };
 
@@ -65,7 +66,8 @@ gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 #define libbalsa_mailbox_local_get_path(mbox) \
 	((const gchar *) (LIBBALSA_MAILBOX(mbox))->url+7)
 
-void libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox);
+void libbalsa_mailbox_local_load_messages(LibBalsaMailbox * mailbox,
+					  guint last_msgno);
 LibBalsaMessage *libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox,
                                                      guint msgno);
 void libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox);

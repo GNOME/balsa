@@ -245,7 +245,7 @@ message_copy (Message * message, Mailbox * dest)
   if (message->flags & MESSAGE_FLAG_NEW ) dest->unread_messages++;
 
   /*PKGW test: commented out why? */
-  send_watcher_append_message (dest, message);
+  //send_watcher_append_message (dest, message);
   mailbox_open_unref (dest);
 }
 
@@ -264,13 +264,13 @@ message_move (Message * message, Mailbox * dest)
 
   mutt_append_message (CLIENT_CONTEXT (dest),
 		       CLIENT_CONTEXT (message->mailbox),
-		       cur, 0, CH_UPDATE_LEN);
+		       cur, 0, 0);
   
   dest->total_messages++;
   if (message->flags & MESSAGE_FLAG_NEW ) dest->unread_messages++;
   
   /*PKGW test: commented out why? */
-  send_watcher_append_message (dest, message);
+  //  send_watcher_append_message (dest, message);
   
   mailbox_open_unref (dest);
   

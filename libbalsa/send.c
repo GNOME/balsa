@@ -225,6 +225,9 @@ balsa_send_message (Message * message)
 guint
 balsa_send_message_real(HEADER *msg, char *tempfile, Mailbox *fcc )
 {
+#ifdef BALSA_USE_THREADS
+  SendThreadMessage *threadmsg;
+#endif
   int i;
 
   if (balsa_app.smtp) 
@@ -238,7 +241,13 @@ balsa_send_message_real(HEADER *msg, char *tempfile, Mailbox *fcc )
     mutt_write_fcc (MAILBOX_LOCAL (balsa_app.outbox)->path, msg, NULL, 1);
 
     if (balsa_app.outbox->open_ref > 0)
-	mailbox_check_new_sent(balsa_app.outbox);
+      {
+	mailbox_check_new_messages(balsa_app.outbox);
+#ifdef BALSA_USE_THREADS
+	MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, "Load Sent/Outbox", 
+		      NULL, balsa_app.outbox );
+#endif
+      }
 
     mutt_free_header (&msg);
 
@@ -254,7 +263,14 @@ balsa_send_message_real(HEADER *msg, char *tempfile, Mailbox *fcc )
       mutt_write_fcc (MAILBOX_LOCAL (fcc)->path, msg, NULL, 0);
 
       if (fcc->open_ref > 0)
-	mailbox_check_new_sent( fcc );
+	{
+	  mailbox_check_new_messages( fcc );
+#ifdef BALSA_USE_THREADS
+	  MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, "Load Sent/Outbox", 
+			NULL, fcc );
+#endif
+	}
+
     }
   mutt_free_header (&msg);
 

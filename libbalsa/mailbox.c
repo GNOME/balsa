@@ -649,19 +649,6 @@ mailbox_check_new_messages (Mailbox * mailbox)
   gint i = 0;
   gint index_hint;
 
-#ifdef BALSA_USE_THREADS
-  MailThreadMessage *threadmsg;
-
-/*  Only run if lock has been set */
-  pthread_mutex_lock( &mailbox_lock);
-  if( !checking_mail )
-  {
-     pthread_mutex_unlock( &mailbox_lock);
-     return FALSE;
-  }
-  pthread_mutex_unlock( &mailbox_lock );
-#endif
-
   if (!mailbox)
     return FALSE;
 
@@ -689,13 +676,10 @@ mailbox_check_new_messages (Mailbox * mailbox)
 	     but I don't want to rely on the 'emit' flag to know if there is REALLY 
 	     new mail in the mailbox. -bertrand */
 
-#ifdef BALSA_USE_THREADS
-          UNLOCK_MAILBOX (mailbox);
-	  MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_LOAD, mailbox->name );
-#else
+#ifndef BALSA_USE_THREADS
 	  load_messages (mailbox, 1);
-	  UNLOCK_MAILBOX (mailbox);
 #endif
+	  UNLOCK_MAILBOX(mailbox);
 	  return TRUE;
 	}
       else
@@ -708,62 +692,6 @@ mailbox_check_new_messages (Mailbox * mailbox)
   return FALSE;
 }
 
-gint
-mailbox_check_new_sent (Mailbox * mailbox)
-{
-  gint i = 0;
-  gint index_hint;
-
-#ifdef BALSA_USE_THREADS
-  SendThreadMessage *threadmsg;
-#endif
-
-  if (!mailbox)
-    return FALSE;
-
-  LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
-  RETURN_VAL_IF_CONTEXT_CLOSED (mailbox, FALSE);
-
-  index_hint = CLIENT_CONTEXT (mailbox)->vcount;
-
-  if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint)) < 0)
-    {
-      UNLOCK_MAILBOX (mailbox);
-      // g_print ("error or something\n");
-    }
-  else if (i == M_NEW_MAIL || i == M_REOPENED)
-    {
-      // g_print ("got new mail! yippie!\n");
-      mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount - 
-	mailbox->messages;
-
-      if (mailbox->new_messages > 0)
-	{
-	  mailbox->unread_messages += mailbox->new_messages ;
-	  mailbox->total_messages += mailbox->new_messages ;
-	  /* TODO:the preceeding two lines should be put in load_messages 
-	     but I don't want to rely on the 'emit' flag to know if there is REALLY 
-	     new mail in the mailbox. -bertrand */
-
-#ifdef BALSA_USE_THREADS
-          UNLOCK_MAILBOX (mailbox);
-	  MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, "Load Sent/Outbox", 
-		      NULL, mailbox );
-#else
-	  load_messages (mailbox, 1);
-	  UNLOCK_MAILBOX (mailbox);
-#endif
-	  return TRUE;
-	}
-      else
-	{
-	  UNLOCK_MAILBOX (mailbox);
-	  return FALSE;
-	}
-    }
-  UNLOCK_MAILBOX (mailbox);
-  return FALSE;
-}
 
 guint
 mailbox_watcher_set (Mailbox * mailbox,

@@ -55,7 +55,7 @@ config_load(gchar * user_filename)
 
   /* Construct the filename by appending 'user_filename' to the user's
      home directory. */
-  filename = g_malloc(strlen(user_filename) + strlen(g_get_home_dir() + 2));
+  filename = g_malloc(strlen(user_filename) + strlen(g_get_home_dir() + 1));
   strcpy(filename, g_get_home_dir());
   strcat(filename, "/");
   strcat(filename, user_filename);
@@ -90,7 +90,7 @@ config_save(gchar * user_filename)
 
   /* Construct the filename by appending 'user_filename' to the user's
      home directory. */
-  filename = g_malloc(strlen(user_filename) + strlen(g_get_home_dir() + 2));
+  filename = g_malloc(strlen(user_filename) + strlen(g_get_home_dir() + 1));
   strcpy(filename, g_get_home_dir());
   strcat(filename, "/");
   strcat(filename, user_filename);

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-22 14:44-0400\n"
+"POT-Creation-Date: 1998-08-23 10:18-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,86 +26,86 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: src/balsa-init.c:101
+#: src/balsa-init.c:98
 msgid "Welcome To Balsa!"
 msgstr ""
 
-#: src/balsa-init.c:157
+#: src/balsa-init.c:154
 msgid "Previous..."
 msgstr ""
 
-#: src/balsa-init.c:168
+#: src/balsa-init.c:165
 msgid "Next..."
 msgstr ""
 
-#: src/balsa-init.c:194
+#: src/balsa-init.c:191
 msgid ""
 "Welcome to Balsa!\n"
 "\n"
 msgstr ""
 
-#: src/balsa-init.c:195
+#: src/balsa-init.c:192
 msgid "You seem to be running Balsa for the first time.\n"
 msgstr ""
 
-#: src/balsa-init.c:196
+#: src/balsa-init.c:193
 msgid "The following steps will setup Balsa by asking a few simple questions."
 msgstr ""
 
-#: src/balsa-init.c:197
+#: src/balsa-init.c:194
 msgid ""
 "Once you have completed these steps, you can always change them at a later "
 "time through Balsa's preferences."
 msgstr ""
 
-#: src/balsa-init.c:199
+#: src/balsa-init.c:196
 msgid ""
 "Please check the about box in Balsa's main window for more information on "
 "contacting the authors or reporting bugs."
 msgstr ""
 
 #. your name
-#: src/balsa-init.c:240 src/pref-manager.c:316
+#: src/balsa-init.c:237 src/pref-manager.c:316
 msgid "Your name:"
 msgstr ""
 
 #. email address
-#: src/balsa-init.c:254 src/pref-manager.c:326
+#: src/balsa-init.c:251 src/pref-manager.c:326
 msgid "E-Mail address:"
 msgstr ""
 
 #. smtp server
-#: src/balsa-init.c:269 src/pref-manager.c:336
+#: src/balsa-init.c:266 src/pref-manager.c:336
 msgid "SMTP server:"
 msgstr ""
 
-#: src/balsa-init.c:310
+#: src/balsa-init.c:307
 msgid "Inbox Path:"
 msgstr ""
 
-#: src/balsa-init.c:318
+#: src/balsa-init.c:315
 msgid "Outbox Path:"
 msgstr ""
 
-#: src/balsa-init.c:326
+#: src/balsa-init.c:323
 msgid "Trash Path:"
 msgstr ""
 
-#: src/balsa-init.c:334
+#: src/balsa-init.c:331
 msgid ""
 "If you wish to use IMAP for these\n"
 "please change them inside Balsa\n"
 msgstr ""
 
-#: src/balsa-init.c:352
+#: src/balsa-init.c:349
 msgid "Balsa is now ready to run.  Click finish to save your settings"
 msgstr ""
 
-#: src/balsa-init.c:356
+#: src/balsa-init.c:353
 msgid "Finish"
 msgstr ""
 
-#: src/balsa-init.c:408
+#: src/balsa-init.c:405
 msgid "Invalid Mailbox!"
 msgstr ""
 

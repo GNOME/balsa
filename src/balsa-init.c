@@ -296,6 +296,7 @@ create_mailboxes_page ()
   GtkWidget *vbox;
   GtkWidget *table;
   GtkWidget *label;
+  GString *gs;
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
@@ -309,25 +310,36 @@ create_mailboxes_page ()
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL, 10, 10);
   prefs->inbox = gtk_entry_new ();
+  gtk_entry_set_text(GTK_ENTRY(prefs->inbox), getenv("MAIL"));
   gtk_table_attach (GTK_TABLE (table), prefs->inbox, 1, 2, 0, 1,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+  gs = g_string_new(g_get_home_dir());
+  gs = g_string_append(gs, "/Mail/outbox");
 
   label = gtk_label_new (_ ("Outbox Path:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
 		    GTK_FILL, GTK_FILL, 10, 10);
   prefs->outbox = gtk_entry_new ();
+  gtk_entry_set_text(GTK_ENTRY(prefs->outbox), gs->str);
   gtk_table_attach (GTK_TABLE (table), prefs->outbox, 1, 2, 1, 2,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
+  gs = g_string_truncate(gs,0);
+  gs = g_string_append(gs, g_get_home_dir());
+  gs = g_string_append(gs, "/Mail/outbox");
   label = gtk_label_new (_ ("Trash Path:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
 		    GTK_FILL, GTK_FILL, 10, 10);
   prefs->trash = gtk_entry_new ();
+  gtk_entry_set_text(GTK_ENTRY(prefs->trash), gs->str);
   gtk_table_attach (GTK_TABLE (table), prefs->trash, 1, 2, 2, 3,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
+  g_string_free(gs, TRUE);
+  
   label = gtk_label_new (_ ("If you wish to use IMAP for these\nplease change them inside Balsa\n"));
   gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
 
@@ -425,6 +437,7 @@ static void
 complete_cb (GtkWidget * widget)
 {
   gchar *email, *c;
+  GString *gs;
   Mailbox *mailbox;
   MailboxType type;
 
@@ -457,9 +470,10 @@ complete_cb (GtkWidget * widget)
   g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->smtp_server)));
 
-  /* FIXME XXX This is just so the thing works */
-  balsa_app.local_mail_directory = g_strdup( "/var/spool/mail" );
-
+  gs = g_string_new(g_get_home_dir());
+  gs = g_string_append(gs, "/Mail");
+  balsa_app.local_mail_directory = g_strdup( gs->str );
+  g_string_free(gs,TRUE);
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
   mailbox = mailbox_new (type);

@@ -20,7 +20,7 @@
 #define __SAVE_RESTORE_H__
 
 /* FIXME XXX This should be a "configure" option.  Stuart? */
-#define BALSA_CONFIG_FILE "~/.balsarc"
+#define BALSA_CONFIG_FILE ".balsarc"
 
 gint config_load(gchar * user_filename);
 gint config_save(gchar * user_filename);

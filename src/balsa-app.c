@@ -149,7 +149,6 @@ do_load_mailboxes ()
   load_local_mailboxes ();
   read_signature ();
   special_mailboxes ();
-  fprintf(stderr, "foo\n");
 }
 
 static gint

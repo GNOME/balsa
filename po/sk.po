@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-03-10 15:45+0100\n"
-"PO-Revision-Date: 2001-03-10 15:45+0100\n"
+"POT-Creation-Date: 2001-03-15 16:06+0100\n"
+"PO-Revision-Date: 2001-03-15 08:17+0100\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@rak.isternet.sk>\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +30,7 @@ msgstr ""
 "Zlyhalo pripojenie k servru: %s\n"
 "Skontrolujte èi je správne meno servra."
 
-#: libbalsa/address-book-ldap.c:261 libbalsa/address-book-ldap.c:518
+#: libbalsa/address-book-ldap.c:261 libbalsa/address-book-ldap.c:517
 #, c-format
 msgid "Failed to do a search: %sCheck that the base name is valid."
 msgstr "Hµadanie zlyhalo: %sSkontrolujte správnos» základného mena."
@@ -108,17 +108,23 @@ msgstr "LibBalsaMailboxLocal: Otváram %s Poèet odkazov: %d\n"
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
 msgstr "Zdá sa, ¾e po¹tová schránka \"%s\" nie je typu Maildir."
 
-#: libbalsa/mailbox_maildir.c:120
-msgid "Sorry. Balsa doesn't (yet) know how to create a maildir mailbox"
-msgstr ""
-"Prepáète, ale Balsa zatiaµ nevie vytvára» po¹tové schránky typu maildir"
+#: libbalsa/mailbox_maildir.c:122
+#, c-format
+msgid "Could not create a MailDir directory at %s (%s)"
+msgstr "Nemô¾em vytvori» prieèinok typu Maildir v %s (%s)"
 
-#: libbalsa/mailbox_maildir.c:172 libbalsa/mailbox_mh.c:171
+#: libbalsa/mailbox_maildir.c:129 libbalsa/mailbox_maildir.c:137
+#: libbalsa/mailbox_maildir.c:147
+#, c-format
+msgid "Could not create a MailDir at %s (%s)"
+msgstr "Nemô¾em vytvori» Maildir v %s (%s)"
+
+#: libbalsa/mailbox_maildir.c:206 libbalsa/mailbox_mh.c:184
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Otváranie %s zlyhalo. Errno = %d, "
 
-#: libbalsa/mailbox_maildir.c:190 libbalsa/mailbox_mh.c:188
+#: libbalsa/mailbox_maildir.c:224 libbalsa/mailbox_mh.c:201
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
@@ -127,8 +133,8 @@ msgstr ""
 "Nemô¾em odstráni» obsah z %s:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:196 libbalsa/mailbox_mbox.c:180
-#: libbalsa/mailbox_mh.c:194
+#: libbalsa/mailbox_maildir.c:230 libbalsa/mailbox_mbox.c:180
+#: libbalsa/mailbox_mh.c:207
 #, c-format
 msgid ""
 "Could not remove %s:\n"
@@ -147,9 +153,15 @@ msgstr "Zdá sa, ¾e po¹tová schránka \"%s\" nie je typu Mbox."
 msgid "Mailbox %s does not appear to be a Mh mailbox."
 msgstr "Zdá sa, ¾e po¹tová schránka \"%s\" nie je typu Mh."
 
-#: libbalsa/mailbox_mh.c:119
-msgid "Sorry. Balsa doesn't (yet) know how to create a mh mailbox"
-msgstr "Prepáète, ale Balsa zatiaµ nevie vytvára» po¹tové schránky typu mh"
+#: libbalsa/mailbox_mh.c:122
+#, c-format
+msgid "Could not create MH directory at %s (%s)"
+msgstr "Nemô¾em vytvori» prieèinok typu MH v %s (%s)"
+
+#: libbalsa/mailbox_mh.c:129
+#, c-format
+msgid "Could not create MH structure at %s (%s)"
+msgstr "nemô¾em vytvori» ¹truktúru MH v %s (%s)"
 
 #: libbalsa/mailbox_pop3.c:200
 #, c-format
@@ -390,6 +402,264 @@ msgstr "Súbor s cestou \"%s\" nie je adresár."
 msgid "Configure Balsa"
 msgstr "Konfigurácia programu Balsa"
 
+#. didn't find anything that we could display!
+#: libmutt/handler.c:1028
+msgid "[-- Error:  Could not display any parts of Multipart/Alternative! --]\n"
+msgstr ""
+"[-- Chyba:  Nemô¾em zobrazi» ¾iadnu èas» z Multipart/Alternative! --]\n"
+
+#: libmutt/handler.c:1145
+#, c-format
+msgid "[-- Attachment #%d"
+msgstr "[-- Príloha è. %d"
+
+#: libmutt/handler.c:1156
+#, c-format
+msgid "[-- Type: %s/%s, Encoding: %s, Size: %s --]\n"
+msgstr "[-- Typ: %s/%s, Kódovanie: %s, Veµkos» %s --]\n"
+
+#: libmutt/handler.c:1215
+#, c-format
+msgid "[-- Autoview using %s --]\n"
+msgstr "[-- Automatické zobrazenie s %s --]\n"
+
+#: libmutt/handler.c:1216
+#, c-format
+msgid "Invoking autoview command: %s"
+msgstr "Spú¹»am príkaz automatického zobrazenia: %s"
+
+#: libmutt/handler.c:1253 libmutt/handler.c:1271
+#, c-format
+msgid "[-- Autoview stderr of %s --]\n"
+msgstr "[-- Chyba automatického zobrazenia %s --]\n"
+
+#: libmutt/handler.c:1303
+msgid "[-- Error: message/external-body has no access-type parameter --]\n"
+msgstr "[-- Chyba: message/external-body nemá parameter typ prístupu --]\n"
+
+#: libmutt/handler.c:1320
+#, c-format
+msgid "[-- This %s/%s attachment "
+msgstr "[-- Táto %s/%s príloha "
+
+#: libmutt/handler.c:1327
+#, c-format
+msgid "(size %s bytes) "
+msgstr "(veµkosti %s bajtov) "
+
+#: libmutt/handler.c:1329
+msgid "has been deleted --]\n"
+msgstr "bola vymazaná --]\n"
+
+#: libmutt/handler.c:1332
+#, c-format
+msgid "[-- on %s --]\n"
+msgstr "[-- na %s --]\n"
+
+#: libmutt/handler.c:1334
+#, c-format
+msgid "[-- name: %s --]\n"
+msgstr "[-- meno: %s --]\n"
+
+#: libmutt/handler.c:1345
+#, c-format
+msgid ""
+"[-- This %s/%s attachment is not included, --]\n"
+"[-- and the indicated external source has --]\n"
+"[-- expired. --]\n"
+msgstr ""
+"[-- Táto %s/%s príloha nie je vlo¾ená --]\n"
+"[-- a indikovanému externému zdroju --]\n"
+"[-- vypr¹ala platnos». --]\n"
+
+#: libmutt/handler.c:1359
+#, c-format
+msgid ""
+"[-- This %s/%s attachment is not included, --]\n"
+"[-- and the indicated access-type %s is unsupported --]\n"
+msgstr ""
+"[-- Táto %s/%s príloha nie je vlo¾ená, --]\n"
+"[-- a indikovaný typ prístupu %s nie je podporovaný --]\n"
+
+#: libmutt/handler.c:1469
+msgid "Error: multipart/signed has no protocol."
+msgstr "Chyba: multipart/signed nemá protokol."
+
+#: libmutt/handler.c:1482
+msgid "Error: multipart/encrypted has no protocol parameter!"
+msgstr "Chyba: multipart/encrypted nemá parameter protokolu!"
+
+#: libmutt/handler.c:1524
+msgid "Unable to open temporary file!"
+msgstr "Nemô¾em otvori» doèasný súbor!"
+
+#: libmutt/handler.c:1583
+#, c-format
+msgid "[-- %s/%s is unsupported "
+msgstr "[-- %s/%s je nepodporované "
+
+#: libmutt/imap/auth_anon.c:39
+msgid "Authenticating (anonymous)..."
+msgstr "Overovanie toto¾nosti (anonymné)..."
+
+#: libmutt/imap/auth_anon.c:69
+msgid "Anonymous authentication failed."
+msgstr "Anonymné overovanie toto¾nosti zlyhalo."
+
+#: libmutt/imap/auth_cram.c:44
+msgid "Authenticating (CRAM-MD5)..."
+msgstr "Overovanie toto¾nosti (CRAM-MD5)..."
+
+#: libmutt/imap/auth_cram.c:124
+msgid "CRAM-MD5 authentication failed."
+msgstr "Overovanie toto¾nosti CRAM-MD5 zlyhalo."
+
+#. now begin login
+#: libmutt/imap/auth_gss.c:87
+msgid "Authenticating (GSSAPI)..."
+msgstr "Overovanie toto¾nosti (GSSAPI)..."
+
+#: libmutt/imap/auth_gss.c:262
+msgid "GSSAPI authentication failed."
+msgstr "Overovanie toto¾nosti GSSAPI zlyhalo."
+
+#: libmutt/imap/auth_login.c:34
+msgid "LOGIN disabled on this server."
+msgstr "Konto je na tomto servri zablokované."
+
+#: libmutt/imap/auth_login.c:43
+msgid "Logging in..."
+msgstr "Prihlasujem sa..."
+
+#: libmutt/imap/auth_login.c:66
+msgid "Login failed."
+msgstr "Prihlásenie zlyhalo."
+
+#: libmutt/imap/auth_sasl.c:118
+msgid "Authenticating (SASL)..."
+msgstr "Overovanie toto¾nosti (SASL)..."
+
+#: libmutt/imap/auth_sasl.c:196
+msgid "SASL authentication failed."
+msgstr "Overovanie toto¾nosti SASL zlyhalo."
+
+#: libmutt/imap/browse.c:95
+msgid "Getting namespaces..."
+msgstr "Získavam priestor mien..."
+
+#: libmutt/imap/browse.c:104
+msgid "Getting folder list..."
+msgstr "Získavam zoznam prieèinkov..."
+
+#: libmutt/imap/browse.c:281
+msgid "Create mailbox: "
+msgstr "Vytvori» po¹tovú schránku: "
+
+#: libmutt/imap/browse.c:287
+msgid "Mailbox created."
+msgstr "Po¹tová schránka vytvorená."
+
+#. something is wrong because the server reported fewer messages
+#. * than we previously saw
+#.
+#: libmutt/imap/command.c:306
+msgid "Fatal error.  Message count is out of sync!"
+msgstr "Záva¾ná chyba. Poèet správ nie je zosynchronizovaný!"
+
+#: libmutt/imap/imap.c:89
+#, c-format
+msgid "Closing connection to %s..."
+msgstr "Zatváram spojenie s %s..."
+
+#: libmutt/imap/imap.c:295
+msgid "This IMAP server is ancient. Balsa does not work with it."
+msgstr "Tento server IMAP je veµmi starý. Balsa s ním nemô¾e spolupracova»."
+
+#: libmutt/imap/imap.c:498
+#, c-format
+msgid "Selecting %s..."
+msgstr "Vyberám %s..."
+
+#. STATUS not supported
+#: libmutt/imap/imap.c:668
+msgid "Unable to append to IMAP mailboxes at this server"
+msgstr "Nemô¾em prida» po¹tové schránky IMAP na tento server"
+
+#. command failed cause folder doesn't exist
+#: libmutt/imap/imap.c:677 libmutt/imap/message.c:577
+#, c-format
+msgid "Create %s?"
+msgstr "Vytvori» %s?"
+
+#: libmutt/imap/imap.c:714
+msgid "Closing connection to IMAP server..."
+msgstr "Ukonèujem spojenie so serverom IMAP..."
+
+#: libmutt/imap/imap.c:877
+#, c-format
+msgid "Marking %d messages deleted..."
+msgstr "Oznaèujem %d správ ako vymazané..."
+
+#: libmutt/imap/imap.c:896
+#, c-format
+msgid "Saving message status flags... [%d/%d]"
+msgstr "Ukladám príznaky stavu správy... [%d/%d]"
+
+#: libmutt/imap/imap.c:953
+msgid "Expunging messages from server..."
+msgstr "Vymazávam správy zo servra..."
+
+#: libmutt/imap/imap.c:1229
+#, c-format
+msgid "Subscribing to %s..."
+msgstr "Prihlasujem sa k %s..."
+
+#: libmutt/imap/imap.c:1231
+#, c-format
+msgid "Unsubscribing to %s..."
+msgstr "Odhlasujem sa od %s..."
+
+#. Unable to fetch headers for lower versions
+#: libmutt/imap/message.c:74
+msgid "Unable to fetch headers from this IMAP server version."
+msgstr "Nemô¾em získa» hlavièky z tejto verzie IMAP servra."
+
+#: libmutt/imap/message.c:92
+#, c-format
+msgid "Fetching message headers... [%d/%d]"
+msgstr "Kontrolujem hlavièky správ... [%d/%d]"
+
+#: libmutt/imap/message.c:237
+msgid "Fetching message..."
+msgstr "Získavam správu..."
+
+#: libmutt/imap/message.c:276
+msgid "The message index is incorrect. Try reopening the mailbox."
+msgstr "Index správ je nesprávny. Skúste znovu otvori» po¹tovú schránku."
+
+#: libmutt/imap/message.c:467
+msgid "Uploading message ..."
+msgstr "Nahrávam správu na server ..."
+
+#: libmutt/imap/message.c:555
+#, c-format
+msgid "Copying %d messages to %s..."
+msgstr "Kopírujem %d správ do %s..."
+
+#: libmutt/imap/message.c:559
+#, c-format
+msgid "Copying message %d to %s..."
+msgstr "Kopírujem správy %d do %s..."
+
+#: libmutt/imap/util.c:43
+msgid "Continue?"
+msgstr "Pokraèova»?"
+
+#: libmutt/imap/util.c:49
+#, c-format
+msgid "%s [%s]\n"
+msgstr "%s [%s]\n"
+
 #: libmutt/mbox.c:134 libmutt/mbox.c:292
 msgid "Reading %s... %d (%d%%)"
 msgstr "Naèítavam %s... %d (%d%%)"
@@ -439,6 +709,148 @@ msgstr "Nemô¾em znova otvori» po¹tovú schránku!"
 #: libmutt/mbox.c:1066
 msgid "Reopening mailbox..."
 msgstr "Znova otváram po¹tovú schránku..."
+
+#: libmutt/mutt_socket.c:204
+msgid "SSL is unavailable."
+msgstr "SSL je nedostupné."
+
+#: libmutt/mutt_socket.c:240
+msgid "Preconnect command failed."
+msgstr "Poèiatoèný príkaz na spojenie zlyhal."
+
+#: libmutt/mutt_socket.c:329 libmutt/mutt_socket.c:369
+#, c-format
+msgid "Looking up %s..."
+msgstr "Hµadám %s..."
+
+#: libmutt/mutt_socket.c:334 libmutt/mutt_socket.c:373
+#, c-format
+msgid "Could not find the host \"%s\""
+msgstr "Nemô¾em nájs» hostiteµa \"%s\""
+
+#: libmutt/mutt_socket.c:338 libmutt/mutt_socket.c:378
+#, c-format
+msgid "Connecting to %s..."
+msgstr "Pripájam sa k %s..."
+
+#: libmutt/mutt_socket.c:401
+#, c-format
+msgid "Could not connect to %s (%s)."
+msgstr "Nemô¾em sa spoji» s %s (%s)."
+
+#: libmutt/mutt_socket.c:402
+msgid "unknown error"
+msgstr "neznáma chyba"
+
+#: libmutt/mutt_ssl.c:105
+msgid "Failed to find enough entropy on your system"
+msgstr "Hµadanie potrebnej entrópie na va¹om systéme zlyhalo"
+
+#: libmutt/mutt_ssl.c:120
+#, c-format
+msgid "Filling entropy pool: %s...\n"
+msgstr "Plním priestor entrópie: %s...\n"
+
+#: libmutt/mutt_ssl.c:128
+#, c-format
+msgid "%s has insecure permissions!"
+msgstr "%s má nebezpeèné práva!"
+
+#: libmutt/mutt_ssl.c:147
+msgid "SSL disabled due the lack of entropy"
+msgstr "SSL je zablokované, kvôli nedostatoènej entrópii"
+
+#: libmutt/mutt_ssl.c:234
+msgid "Unable to get certificate from peer"
+msgstr "Nemô¾em získa» cetifikát od partnera"
+
+#: libmutt/mutt_ssl.c:245
+#, c-format
+msgid "SSL connection using %s (%s)"
+msgstr "SSL spojenie s pou¾itím %s (%s)"
+
+#: libmutt/mutt_ssl.c:275
+msgid "Unknown"
+msgstr "Neznámy"
+
+#: libmutt/mutt_ssl.c:300
+msgid "[unable to calculate]"
+msgstr "[nemô¾em vypoèíta»]"
+
+#: libmutt/mutt_ssl.c:318
+msgid "[invalid date]"
+msgstr "[neplatný dátum]"
+
+#: libmutt/mutt_ssl.c:393
+msgid "Server certificate is not yet valid"
+msgstr "Certefikát servra e¹te nie je platný"
+
+#: libmutt/mutt_ssl.c:400
+msgid "Server certificate has expired"
+msgstr "Platnos» certifikátu servra vypr¹ala"
+
+#: libmutt/mutt_ssl.c:476
+msgid "This certificate belongs to:"
+msgstr "Tento certifikát patrí:"
+
+#: libmutt/mutt_ssl.c:486
+msgid "This certificate was issued by:"
+msgstr "Tento certifikát bol vydaný:"
+
+#: libmutt/mutt_ssl.c:496
+msgid "This certificate is valid"
+msgstr "Tento certifikát je platný"
+
+#: libmutt/mutt_ssl.c:497
+#, c-format
+msgid "   from %s"
+msgstr "     od %s"
+
+#: libmutt/mutt_ssl.c:499
+#, c-format
+msgid "     to %s"
+msgstr "    pre %s"
+
+#: libmutt/mutt_ssl.c:505
+#, c-format
+msgid "Fingerprint: %s"
+msgstr "Odtlaèok prsta: %s"
+
+#: libmutt/mutt_ssl.c:507
+msgid "SSL Certificate check"
+msgstr "Kontrola SSL certifikátu"
+
+#: libmutt/mutt_ssl.c:510
+msgid "(r)eject, accept (o)nce, (a)ccept always"
+msgstr "(o)dmietnu», akceptova» (r)az, (a)kceptova» v¾dy"
+
+#: libmutt/mutt_ssl.c:511
+msgid "roa"
+msgstr "ora"
+
+#: libmutt/mutt_ssl.c:515
+msgid "(r)eject, accept (o)nce"
+msgstr "(o)dmietnu», akceptova» (r)az"
+
+#: libmutt/mutt_ssl.c:516
+msgid "ro"
+msgstr "or"
+
+#: libmutt/mutt_ssl.c:520
+msgid "Exit  "
+msgstr "Koniec"
+
+#: libmutt/mutt_ssl.c:522
+msgid "Help"
+msgstr "Pomocník"
+
+#: libmutt/mutt_ssl.c:545
+msgid "Warning: Couldn't save certificate"
+msgstr "Upozornenie: Nemô¾em ulo¾i» certifikát"
+
+#: libmutt/mutt_ssl.c:547
+msgid "Certificate saved"
+msgstr "Certifikát ulo¾ený"
 
 #: libmutt/mx.c:119
 #, c-format
@@ -549,167 +961,6 @@ msgstr "%d ponechaných."
 msgid "Can't write message"
 msgstr "Nemô¾em zapísa» správu"
 
-#. now begin login
-#: libmutt/imap/auth_gss.c:87
-msgid "Authenticating (GSSAPI)..."
-msgstr "Overovanie toto¾nosti (GSSAPI)..."
-
-#: libmutt/imap/auth_gss.c:262
-msgid "GSSAPI authentication failed."
-msgstr "Overovanie toto¾nosti GSSAPI zlyhalo."
-
-#: libmutt/imap/browse.c:95
-msgid "Getting namespaces..."
-msgstr "Získavam priestor mien..."
-
-#: libmutt/imap/browse.c:104
-msgid "Getting folder list..."
-msgstr "Získavam zoznam prieèinkov..."
-
-#: libmutt/imap/browse.c:281
-msgid "Create mailbox: "
-msgstr "Vytvori» po¹tovú schránku: "
-
-#: libmutt/imap/browse.c:287
-msgid "Mailbox created."
-msgstr "Po¹tová schránka vytvorená."
-
-#: libmutt/imap/imap.c:89
-#, c-format
-msgid "Closing connection to %s..."
-msgstr "Zatváram spojenie s %s..."
-
-#: libmutt/imap/imap.c:295
-msgid "This IMAP server is ancient. Balsa does not work with it."
-msgstr "Tento server IMAP je veµmi starý. Balsa s ním nemô¾e spolupracova»."
-
-#: libmutt/imap/imap.c:498
-#, c-format
-msgid "Selecting %s..."
-msgstr "Vyberám %s..."
-
-#. STATUS not supported
-#: libmutt/imap/imap.c:668
-msgid "Unable to append to IMAP mailboxes at this server"
-msgstr "Nemô¾em prida» po¹tové schránky IMAP na tento server"
-
-#. command failed cause folder doesn't exist
-#: libmutt/imap/imap.c:677 libmutt/imap/message.c:577
-#, c-format
-msgid "Create %s?"
-msgstr "Vytvori» %s?"
-
-#: libmutt/imap/imap.c:714
-msgid "Closing connection to IMAP server..."
-msgstr "Ukonèujem spojenie so serverom IMAP..."
-
-#: libmutt/imap/imap.c:877
-#, c-format
-msgid "Marking %d messages deleted..."
-msgstr "Oznaèujem %d správ ako vymazané..."
-
-#: libmutt/imap/imap.c:896
-#, c-format
-msgid "Saving message status flags... [%d/%d]"
-msgstr "Ukladám príznaky stavu správy... [%d/%d]"
-
-#: libmutt/imap/imap.c:953
-msgid "Expunging messages from server..."
-msgstr "Vymazávam správy zo servra..."
-
-#: libmutt/imap/imap.c:1229
-#, c-format
-msgid "Subscribing to %s..."
-msgstr "Prihlasujem sa k %s..."
-
-#: libmutt/imap/imap.c:1231
-#, c-format
-msgid "Unsubscribing to %s..."
-msgstr "Odhlasujem sa od %s..."
-
-#. Unable to fetch headers for lower versions
-#: libmutt/imap/message.c:74
-msgid "Unable to fetch headers from this IMAP server version."
-msgstr "Nemô¾em získa» hlavièky z tejto verzie IMAP servra."
-
-#: libmutt/imap/message.c:92
-#, c-format
-msgid "Fetching message headers... [%d/%d]"
-msgstr "Kontrolujem hlavièky správ... [%d/%d]"
-
-#: libmutt/imap/message.c:237
-msgid "Fetching message..."
-msgstr "Získavam správu..."
-
-#: libmutt/imap/message.c:276
-msgid "The message index is incorrect. Try reopening the mailbox."
-msgstr "Index správ je nesprávny. Skúste znovu otvori» po¹tovú schránku."
-
-#: libmutt/imap/message.c:467
-msgid "Uploading message ..."
-msgstr "Nahrávam správu na server ..."
-
-#: libmutt/imap/message.c:555
-#, c-format
-msgid "Copying %d messages to %s..."
-msgstr "Kopírujem %d správ do %s..."
-
-#: libmutt/imap/message.c:559
-#, c-format
-msgid "Copying message %d to %s..."
-msgstr "Kopírujem správy %d do %s..."
-
-#: libmutt/imap/util.c:43
-msgid "Continue?"
-msgstr "Pokraèova»?"
-
-#: libmutt/imap/util.c:49
-#, c-format
-msgid "%s [%s]\n"
-msgstr "%s [%s]\n"
-
-#: src/address-book.c:161 src/filter-edit-dialog.c:130
-msgid "Name"
-msgstr "Meno"
-
-#: src/address-book.c:161
-msgid "E-Mail Address"
-msgstr "Adresa elektronickej po¹ty"
-
-#: src/address-book.c:164
-msgid "Address Book"
-msgstr "Adresár"
-
-#. Entry widget for finding an address
-#: src/address-book.c:243
-msgid "Search for Name:"
-msgstr "Vyhµadáva» podµa mena:"
-
-#: src/address-book.c:311
-msgid "Send-To"
-msgstr "Príjemca"
-
-#: src/address-book.c:330
-msgid "Run GnomeCard"
-msgstr "Spusti» GnomeCard"
-
-#: src/address-book.c:338
-msgid "Re-Import"
-msgstr "Znova importova»"
-
-#. mode switching stuff
-#: src/address-book.c:347
-msgid "Treat multiple addresses as:"
-msgstr "Viacnásobné adresy pova¾ova» za:"
-
-#: src/address-book.c:351
-msgid "alternative addresses for the same person"
-msgstr "alternatívne adresy pre jednu osobu"
-
-#: src/address-book.c:356
-msgid "a distribution list"
-msgstr "distribuèný zoznam"
-
 #: src/address-book-config.c:100
 msgid "Address Book Configuration"
 msgstr "Konfigurácia adresára"
@@ -768,6 +1019,48 @@ msgid ""
 msgstr ""
 "Cesta k adresáru '%s' je nesprávna.\n"
 "Chcete opravi» meno súboru?"
+
+#: src/address-book.c:161 src/filter-edit-dialog.c:130
+msgid "Name"
+msgstr "Meno"
+
+#: src/address-book.c:161
+msgid "E-Mail Address"
+msgstr "Adresa elektronickej po¹ty"
+
+#: src/address-book.c:164
+msgid "Address Book"
+msgstr "Adresár"
+
+#. Entry widget for finding an address
+#: src/address-book.c:243
+msgid "Search for Name:"
+msgstr "Vyhµadáva» podµa mena:"
+
+#: src/address-book.c:311
+msgid "Send-To"
+msgstr "Príjemca"
+
+#: src/address-book.c:330
+msgid "Run GnomeCard"
+msgstr "Spusti» GnomeCard"
+
+#: src/address-book.c:338
+msgid "Re-Import"
+msgstr "Znova importova»"
+
+#. mode switching stuff
+#: src/address-book.c:347
+msgid "Treat multiple addresses as:"
+msgstr "Viacnásobné adresy pova¾ova» za:"
+
+#: src/address-book.c:351
+msgid "alternative addresses for the same person"
+msgstr "alternatívne adresy pre jednu osobu"
+
+#: src/address-book.c:356
+msgid "a distribution list"
+msgstr "distribuèný zoznam"
 
 #: src/balsa-app.c:73
 #, c-format
@@ -829,7 +1122,7 @@ msgstr "Posla» ïalej..."
 msgid "Undelete"
 msgstr "Obnovi» vymazané"
 
-#: src/balsa-index.c:1828 src/filter-edit-dialog.c:224 src/mailbox-node.c:516
+#: src/balsa-index.c:1828 src/filter-edit-dialog.c:224 src/mailbox-node.c:550
 #: src/main-window.c:551 src/pref-manager.c:1235 src/pref-manager.c:2023
 msgid "Delete"
 msgstr "Vymaza»"
@@ -850,7 +1143,7 @@ msgstr "Oznaèi»"
 msgid "Flagged"
 msgstr "Príznak"
 
-#: src/balsa-index.c:1846 src/balsa-mblist.c:477
+#: src/balsa-index.c:1846 src/balsa-mblist.c:483
 msgid "Unread"
 msgstr "Nepreèítané"
 
@@ -858,15 +1151,15 @@ msgstr "Nepreèítané"
 msgid "Transfer"
 msgstr "Prenies»"
 
-#: src/balsa-mblist.c:477 src/mailbox-conf.c:836
+#: src/balsa-mblist.c:483 src/mailbox-conf.c:836
 msgid "Mailbox"
 msgstr "Po¹tová schránka"
 
-#: src/balsa-mblist.c:477
+#: src/balsa-mblist.c:483
 msgid "Total"
 msgstr "Celkom"
 
-#: src/balsa-mblist.c:956
+#: src/balsa-mblist.c:962
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Zobrazená po¹tová schránka: %s, poèet správ: %ld, nových: %ld"
@@ -879,7 +1172,7 @@ msgstr "Ulo¾i» èas» MIME"
 msgid "Save"
 msgstr "Ulo¾i»"
 
-#: src/balsa-message.c:291 src/folder-conf.c:200 src/mailbox-conf.c:169
+#: src/balsa-message.c:291 src/folder-conf.c:191 src/mailbox-conf.c:169
 #: src/mailbox-conf.c:179 src/sendmsg-window.c:160 src/sendmsg-window.c:630
 msgid "Cancel"
 msgstr "Storno"
@@ -1051,7 +1344,7 @@ msgstr "Hore"
 msgid "Down"
 msgstr "Dole"
 
-#: src/filter-edit-dialog.c:218 src/mailbox-node.c:497 src/main-window.c:379
+#: src/filter-edit-dialog.c:218 src/mailbox-node.c:531 src/main-window.c:379
 msgid "New"
 msgstr "Nový"
 
@@ -1202,7 +1495,7 @@ msgstr "Len prihlá_sené prieèinky"
 msgid "_Prefix"
 msgstr "_Predpona"
 
-#: src/folder-conf.c:186
+#: src/folder-conf.c:177
 msgid ""
 "This folder is not stored in configuration.I do not yet know how to remove "
 "it from remote server."
@@ -1210,7 +1503,7 @@ msgstr ""
 "Tento prieèinok nie je ulo¾ený v konfigurácii. Neviem ako ho mám odstráni» "
 "zo vzdialeného servra."
 
-#: src/folder-conf.c:194
+#: src/folder-conf.c:185
 #, c-format
 msgid ""
 "This will remove the folder %s from the list.\n"
@@ -1222,7 +1515,7 @@ msgstr ""
 "pridanie.\n"
 "Èo chcete urobi»?"
 
-#: src/folder-conf.c:199 src/mailbox-conf.c:167 src/mailbox-conf.c:178
+#: src/folder-conf.c:190 src/mailbox-conf.c:167 src/mailbox-conf.c:178
 msgid "Remove from list"
 msgstr "Odstráni» zo zoznamu"
 
@@ -1354,63 +1647,67 @@ msgstr "Cesta k zl_o¾ke:"
 msgid "The folder edition to be written."
 msgstr "Úpravy prieèinka budú zapísané."
 
-#: src/mailbox-node.c:484 src/main-window.c:231
+#: src/mailbox-node.c:518 src/main-window.c:231
 msgid "Local mbox mailbox..."
 msgstr "Lokálna po¹tová schránka typu mbox..."
 
-#: src/mailbox-node.c:486 src/main-window.c:236
+#: src/mailbox-node.c:520 src/main-window.c:236
 msgid "Local Maildir mailbox..."
 msgstr "Lokálna po¹tová schránka typu Maildir..."
 
-#: src/mailbox-node.c:488 src/main-window.c:241
+#: src/mailbox-node.c:522 src/main-window.c:241
 msgid "Local MH mailbox..."
 msgstr "Lokálna po¹tová schránka typu MH..."
 
-#: src/mailbox-node.c:490 src/main-window.c:246
+#: src/mailbox-node.c:524 src/main-window.c:246
 msgid "Remote IMAP mailbox..."
 msgstr "Vzdialená po¹tová schránka typu IMAP..."
 
-#: src/mailbox-node.c:493 src/main-window.c:252
+#: src/mailbox-node.c:527 src/main-window.c:252
 msgid "Remote IMAP folder..."
 msgstr "Vzdialená po¹tová schránka typu IMAP..."
 
-#: src/mailbox-node.c:511
+#: src/mailbox-node.c:545
 msgid "Open"
 msgstr "Otvori»"
 
-#: src/mailbox-node.c:513
+#: src/mailbox-node.c:547
 msgid "Close"
 msgstr "Zatvori»"
 
-#: src/mailbox-node.c:515
+#: src/mailbox-node.c:549
 msgid "Properties..."
 msgstr "Vlastnosti..."
 
-#: src/mailbox-node.c:521
+#: src/mailbox-node.c:556
 msgid "Subscribe"
 msgstr "Prihlási»"
 
-#: src/mailbox-node.c:522
+#: src/mailbox-node.c:557
 msgid "Unsubscribe"
 msgstr "Odhlási»"
 
-#: src/mailbox-node.c:526
+#: src/mailbox-node.c:562
 msgid "Mark as Inbox"
 msgstr "Oznaèi» ako 'Doruèená po¹ta'"
 
-#: src/mailbox-node.c:528
+#: src/mailbox-node.c:564
 msgid "Mark as Sentbox"
 msgstr "Oznaèi» ako 'Odoslaná po¹ta'"
 
-#: src/mailbox-node.c:530
+#: src/mailbox-node.c:566
 msgid "Mark as Trash"
 msgstr "Oznaèi» ako 'Kô¹'"
 
-#: src/mailbox-node.c:532
+#: src/mailbox-node.c:568
 msgid "Mark as Draftbox"
 msgstr "Oznaèi» ako 'Nedokonèená po¹ta'"
 
-#: src/mailbox-node.c:637
+#: src/mailbox-node.c:570
+msgid "Rescan"
+msgstr "Skontrolova»"
+
+#: src/mailbox-node.c:676
 #, c-format
 msgid "Local mailbox loaded as: %s\n"
 msgstr "Lokálna po¹tová schránka naèítaná ako: %s\n"

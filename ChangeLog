@@ -1,3 +1,8 @@
+2002-08-22  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-mblist.c: fix #91445.
+
+
 2002-08-22  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/misc.c: format=flowed mistreated signatures. Fix it.

@@ -1873,7 +1873,7 @@ balsa_mblist_mru_option_menu(GtkWindow * window, GList ** url_list)
     gtk_object_set_data(GTK_OBJECT(option_menu), "mro", mro);
 
     /* initial setting */
-    mro->url = g_strdup((const gchar *) (*url_list)->data);
+    mro->url = *url_list ? g_strdup((const gchar *)(*url_list)->data) : NULL;
 
     return option_menu;
 }

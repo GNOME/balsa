@@ -516,6 +516,8 @@ libbalsa_message_body_get_mime_type(LibBalsaMessageBody * body)
 {
     gchar *res, *tmp;
 
+    g_return_val_if_fail(body != NULL, NULL);
+
     if (!body->content_type)
 	return g_strdup("text/plain");
 

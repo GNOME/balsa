@@ -362,6 +362,16 @@ close_all_mailboxes (GNode * node, gpointer data)
   return FALSE;
 }
 
+static void
+force_close_mailbox(Mailbox *mailbox) {
+    if (!mailbox) return;
+    if (balsa_app.debug)
+	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
+    while (mailbox->open_ref > 0)
+	mailbox_open_unref (mailbox);
+}
+
+
 void
 balsa_exit (void)
 {
@@ -377,51 +387,11 @@ balsa_exit (void)
   if (balsa_app.empty_trash_on_exit)
 	  empty_trash( );
 
-
-  mailbox = balsa_app.inbox;
-  if (mailbox)
-    {
-      if (balsa_app.debug)
-	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
-      while (mailbox->open_ref > 0)
-	mailbox_open_unref (mailbox);
-    }
-
-  mailbox = balsa_app.outbox;
-  if (mailbox)
-    {
-      if (balsa_app.debug)
-	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
-      while (mailbox->open_ref > 0)
-	mailbox_open_unref (mailbox);
-    }
-
-  mailbox = balsa_app.sentbox;
-  if (mailbox)
-    {
-      if (balsa_app.debug)
-	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
-      while (mailbox->open_ref > 0)
-	mailbox_open_unref (mailbox);
-    }
-
-  mailbox = balsa_app.draftbox;
-  if (mailbox)
-    {
-      if (balsa_app.debug)
-	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
-      while (mailbox->open_ref > 0)
-	mailbox_open_unref (mailbox);
-    }
-
-  mailbox = balsa_app.trash;
-  if (mailbox)
-    {
-      if (balsa_app.debug)
-	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
-      while (mailbox->open_ref > 0)
-	mailbox_open_unref (mailbox);
-    }
+  force_close_mailbox(balsa_app.inbox);
+  force_close_mailbox(balsa_app.outbox);
+  force_close_mailbox(balsa_app.sentbox);
+  force_close_mailbox(balsa_app.draftbox);
+  force_close_mailbox(balsa_app.trash);
 
   if (balsa_app.proplist)
     config_global_save ();

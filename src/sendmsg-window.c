@@ -363,8 +363,8 @@ add_attachment (GnomeIconList * iconlist, char *filename)
 {
    /* FIXME: the path to the file must not be hardcoded */ 
 	/* gchar *pix = gnome_pixmap_file ("balsa/attachment.png"); */
-	gchar *pix = balsa_pixmap_finder( "balsa/attachment.png" );
-   
+    gchar *pix = balsa_pixmap_finder( "balsa/attachment.png" );
+	
    if( !check_if_regular_file( filename ) ) {
       /*c_i_r_f() will pop up an error dialog for us, so we need do nothing.*/
       return;
@@ -440,10 +440,9 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
       filename = g_strconcat(dir, p, NULL);
       if(strcmp(filename, sel_file) != 0)
 	  add_attachment (iconlist, filename);
-      g_free(filename);
+      /* do not g_free(filename) - the add_attachment arg is not const */
+      /* g_free(filename); */
   }
-
-  /* do not g_free(filename) - the add_attachment arg is not const */
 
   gtk_widget_destroy (GTK_WIDGET (fs));
   g_free(dir);

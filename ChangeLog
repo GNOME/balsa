@@ -1,3 +1,7 @@
+2000-04-27  Pawel Salek <pawsa@theochem.kth.se>
+	* src/sendmsg-window.c: one g_free() too much.
+	* src/main.c: code cleanup.
+	
 2000-04-26  Kjartan Maraas  <kmaraas@online.no>
 
 	* libbalsa/mailbox.c: Use '_(' not '_ (' to make marked

@@ -902,15 +902,39 @@ bmbl_messages_status_changed_cb(LibBalsaMailbox * mailbox,
 	balsa_mblist_update_mailbox(store, mailbox);
 }
 
+struct store_mailbox_pair {
+    GtkTreeStore * store;
+    LibBalsaMailbox* mailbox;
+};
+
+/* bmbl_unread_messages_changed_cb:
+   update flags. Since it is a libbalsa signal handler, it can be called
+   from a thread. Therefore, show a due dilligence and do the actual UI
+   action from an idle handler.
+*/
+static gboolean
+balsa_mblist_update_mailbox_idle(struct store_mailbox_pair* arg)
+{
+  
+    gdk_threads_enter();
+    balsa_mblist_update_mailbox(arg->store, arg->mailbox);    
+    gdk_threads_leave();
+    g_object_unref(arg->store); g_object_unref(arg->mailbox);
+    g_free(arg);
+    return FALSE;
+}
 static void
 bmbl_unread_messages_changed_cb(LibBalsaMailbox * mailbox,
 				gboolean flag,
 				GtkTreeStore * store)
 {
+    struct store_mailbox_pair *arg;
     g_return_if_fail(mailbox);
     g_return_if_fail(store);
-
-    balsa_mblist_update_mailbox(store, mailbox);
+    arg = g_new(struct store_mailbox_pair, 1);
+    arg->store = store; arg->mailbox = mailbox;
+    g_object_ref(arg->store); g_object_ref(arg->mailbox);
+    g_idle_add((GSourceFunc)balsa_mblist_update_mailbox_idle, arg);
 }
 
 /* public methods */

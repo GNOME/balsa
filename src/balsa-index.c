@@ -1369,7 +1369,7 @@ balsa_index_set_column_widths(BalsaIndex * index)
    We must be *extremely* careful here - message might have changed 
    its status because the mailbox was forcibly closed and message
    became invalid. See for example #70807.
-
+   Some of the messages might have been expunged (mailbox==null).
 */
 static void
 mailbox_messages_changed_status(LibBalsaMailbox * mb,
@@ -1391,8 +1391,11 @@ mailbox_messages_changed_status(LibBalsaMailbox * mb,
         return;
     }
 
-    for (list = messages; list; list = g_list_next(list))
-        balsa_index_update_flag(bindex, LIBBALSA_MESSAGE(list->data));
+    for (list = messages; list; list = g_list_next(list)) {
+        LibBalsaMessage *msg = LIBBALSA_MESSAGE(list->data);
+        if(msg->mailbox)
+            balsa_index_update_flag(bindex, msg);
+    }
 
     if (flag == LIBBALSA_MESSAGE_FLAG_DELETED
         && LIBBALSA_MESSAGE_IS_DELETED(bindex->current_message)) {
@@ -1460,10 +1463,10 @@ bndx_messages_add(BalsaIndex * bindex, GList *messages)
     balsa_index_threading(bindex, 
 			  bindex->mailbox_node->mailbox->threading_type);
     for (list = messages; list; list = g_list_next(list)) {
+        LibBalsaMessage *msg = (LibBalsaMessage *) list->data;
         GtkTreeIter iter;
-
-        if (bndx_find_message(bindex, NULL, &iter,
-                              (LibBalsaMessage *) list->data))
+        if(!msg->mailbox) continue;
+        if (bndx_find_message(bindex, NULL, &iter, msg))
             bndx_set_parent_style(bindex, &iter);
     }
     bndx_select_message(bindex, bindex->current_message);

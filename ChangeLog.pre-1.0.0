@@ -2045,7 +2045,7 @@
 
 2000-05-02  Pawel Salek <pawsa@theochem.kth.se>
 	* src/balsa-message.c, src/sendmsg-window.c:
-	Martynas KunigÎlis <mkunigelis@alna.lt> patch for Baltic language
+	Martynas Kunigƒólis <mkunigelis@alna.lt> patch for Baltic language
 	support.
 
 2000-05-01  Matthew Guenther <mguenthe@attcanada.ca>
@@ -2500,7 +2500,7 @@
 	* src/save-restore.c, src/balsa-app.h, src/prefs-manager.c:
  	  Changes to support the new preference.
 
-2000-2-28  HÈctor GarcÌa ¡lvarez <hector@scouts-es.org>
+2000-2-28  H√©ctor Garc√≠a √Ålvarez <hector@scouts-es.org>
 	* Some changes in SMTP to make it work right with the queue
 
 2000-2-26  Peter Williams <peter@newton.cx>
@@ -2531,12 +2531,12 @@
 
 	* src/sendmsg-window.c: fixed spelling error: Cyrylic->Cyrillic
 
-2000-2-11   Tomasz K≥oczko <kloczek@pld.org.pl>
+2000-2-11   Tomasz K≈Çoczko <kloczek@pld.org.pl>
 
 	* balsa.desktop: moved desktop file from gnome-core,
 	* gnome-balsa2.png: moved icon file from gnome-core.
 
-2000-2-9    Tomasz K≥oczko <kloczek@pld.org.pl>
+2000-2-9    Tomasz K≈Çoczko <kloczek@pld.org.pl>
 
 	* balsa.desktop:
 	* Makefile.am: added desktop file for balsa.
@@ -2565,7 +2565,7 @@
 2000-1-3    Ragnar Henriksen <ragnar@juniks.org>
 	* src/pref-manager.c: Changed the helpfile location.	
 
-2000-1-1    HÈctor GarcÌa ¡lvarez  <hector@scouts-es.org>
+2000-1-1    H√©ctor Garc√≠a √Ålvarez  <hector@scouts-es.org>
         * libbalsa/send.c: Added deletion on sended queued messages. 
 	SMTP support should now work properly. No known bugs in STMP 
 	support yet.
@@ -2646,7 +2646,7 @@
 	* src/main.c - added the functionallity "empty trash".
 	* src/save-restore.c - save and restore of new features.
 
-1999-12-29  Martin Norb‰ck  <d95mback@dtek.chalmers.se>
+1999-12-29  Martin Norb√§ck  <d95mback@dtek.chalmers.se>
 
 	* configure.in: added "sv" to ALL_LINGUAS.
 
@@ -2683,7 +2683,7 @@
 
 	* configure.in: added "uk" to ALL_LINGUAS.
 
-1999-12-24  HÈctor GarcÌa ¡lvarez <hector@scouts-es.org>
+1999-12-24  H√©ctor Garc√≠a √Ålvarez <hector@scouts-es.org>
 	* libbalsa/send.c: Now Balsa send queued messages as it should.
  
 1999-12-21  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
@@ -2698,7 +2698,7 @@
 	* TODO, INSTALL, AUTHORS, configure.in: Add people to AUTHORS, etc
 	bump version to 0.6.0
 
-1999-12-21  HÈctor GarcÌa ¡lvarez <hector@scouts-es.org>
+1999-12-21  H√©ctor Garc√≠a √Ålvarez <hector@scouts-es.org>
 	* libbalsa/send.c: Made some changes to make balsa send queued 
 	messages. Still have the bug when trying to send queued messages 
 	from a Mailbox format outbox.
@@ -2821,7 +2821,7 @@
 	* src/balsa-init.c (balsa_init_window_new, druid_destroy_cb):
 	  Destroy the window owning the druid as well.
 
-1999-12-05  HÈctor GarcÌa ¡lvarez <hector@scouts-es.org>
+1999-12-05  H√©ctor Garc√≠a √Ålvarez <hector@scouts-es.org>
         * Rewrited send and SMTP funtions
 	* libbalsa/send.c: Added ofline message writing funcionality
 
@@ -2991,11 +2991,11 @@
 
 	* src/balsa-app.c (read_signature): Fix off-by-one on .signature loading.
 
-1999-07-28 Tomasz K≥oczko <kloczek@pld.org.pl>
+1999-07-28 Tomasz K≈Çoczko <kloczek@pld.org.pl>
 
 	* po/pl.po, configure.in
 	Sync with PLD cvs tree:
-	- added pl translation (translation by Pawe≥ DziekoÒski
+	- added pl translation (translation by Pawe≈Ç Dzieko≈Ñski
 	<dziekons@pld.org.pl> and fixes by Zbigniew Chyla <cyba@pld.org.pl>)
 
 1999-04-08 Jesse Sightler <jsight@pair.com>

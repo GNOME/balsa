@@ -5,7 +5,7 @@
 2003-01-10  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* parse.c: follow rfc2045 closer.
-	restore parsing dispnotify_to (Albrecht Dreﬂ).
+	restore parsing dispnotify_to (Albrecht Dre√ü).
 
 2003-01-03  Pawel Salek  <pawsa@theochem.kth.se>
 
@@ -472,7 +472,7 @@
 2001-07-18  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Perl Compatible Regular Expressions by 
-	Albrecht Dreﬂ <albrecht.dress@arcormail.de>:
+	Albrecht Dre√ü <albrecht.dress@arcormail.de>:
 	* acconfig.h: 
 	* configure.in: detect PCRE and set HAVE_PCRE.
 	* mutt_regex.h: this is only place where it is used.
@@ -537,7 +537,7 @@
 
 2001-03-22  Pawel Salek  <pawsa@theochem.kth.se>
 
-	* parse.c: Patch from Albrecht Dreﬂ <albrecht.dress@arcormail.de> 
+	* parse.c: Patch from Albrecht Dre√ü <albrecht.dress@arcormail.de> 
 	- support Disposition-notification-to: header.
 
 2001-02-24  Carlos Morgado  <chbm@chbm.nu>
@@ -1045,7 +1045,7 @@ Thu Aug 20 22:32:46 1998  Thomas Roessler  <roessler@guug.de>
 	fixes a bug in the allocation of space for new
 	pointers to the attachments, it would make mutt
 	seg-fault when attaching 5 or more messages at the
-	same time. (From: Jimmy M‰kel‰
+	same time. (From: Jimmy M√§kel√§
 	<jmy@flashback.net>)
 
 	* handler.c: [SECURITY] mutt_sanitize_filename()
@@ -1239,7 +1239,7 @@ Sat Aug  8 21:40:12 1998  Thomas Roessler  <roessler@guug.de>
 
 	* compose.c: If you press t to add a recipient in the compose menu,
 	then press tab, q, and aborts with ctrl-g, mutt won't
-	redraw the menu.  Noted by Jimmy M‰kel‰
+	redraw the menu.  Noted by Jimmy M√§kel√§
 	<jmy@flashback.net>.
 
 	* alias.c: Entering an un-parsable address when creating an alias
@@ -1249,7 +1249,7 @@ Sat Aug  8 21:40:12 1998  Thomas Roessler  <roessler@guug.de>
 	* browser.c: If you press tab in the file-browser to see the inboxes
 	and the current row is greater than the inbox-screens
 	max-rows then the screen gets garbled.
-	(From: Jimmy M‰kel‰ <jmy@flashback.net>)
+	(From: Jimmy M√§kel√§ <jmy@flashback.net>)
 
 	* doc/manual.txt, doc/manual.sgml: I made the manual more up to date:
 
@@ -1268,13 +1268,13 @@ Sat Aug  8 21:40:12 1998  Thomas Roessler  <roessler@guug.de>
 	* pattern.c: This patch makes pattern ranges more logical. Before '~m
 	<5' would show message 1-5, with this patch it shows 1-4.
 	Inclusive ranges is still avaible if you use '~m -5'.
-	(From: Jimmy M‰kel‰ <jmy@flashback.net>)
+	(From: Jimmy M√§kel√§ <jmy@flashback.net>)
 
 	* init.c: Various improvements to the mutt_command_complete
 	function.  From Stephen Hack <shack@rsn.hp.com>.
 
 	* browser.c: If you specify 'mailboxes ""' mutt will seg-fault. (From:
-	Jimmy M‰kel‰ <jmy@flashback.net>)
+	Jimmy M√§kel√§ <jmy@flashback.net>)
 
 	* color.c: Fixing a memory leak.  Thanks, Liviu.
 

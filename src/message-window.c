@@ -27,18 +27,21 @@
 
 static void close_message_window(GtkWidget * widget, gpointer data);
 
+/*
+ * The list of messages which are being displayed.
+ */
+static GHashTable * displayed_messages = NULL;
+
 static GnomeUIInfo file_menu[] =
 {
-  {
-    GNOME_APP_UI_ITEM, N_ ("_Close"), NULL, close_message_window, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_CLOSE, 'C', 0, NULL
-  },
+  GNOMEUIINFO_MENU_CLOSE_ITEM(close_message_window, NULL),
+
   GNOMEUIINFO_END
 };
 
 static GnomeUIInfo main_menu[] =
 {
-  GNOMEUIINFO_SUBTREE ("_File", file_menu),
+  GNOMEUIINFO_MENU_FILE_TREE(file_menu),
   GNOMEUIINFO_END
 };
 
@@ -48,6 +51,8 @@ struct _MessageWindow
     GtkWidget *window;
 
     GtkWidget *bmessage;
+
+    Message * message;
   };
 
 void message_window_new (Message * message);
@@ -64,7 +69,38 @@ message_window_new (Message * message)
   if (!message)
     return;
 
+  /*
+   * Check to see if this message is already displayed
+   */
+  if (displayed_messages != NULL)
+    {
+      mw = (MessageWindow *) g_hash_table_lookup(displayed_messages,
+						 message);
+      if (mw != NULL)
+	{
+	  /*
+	   * The message is already displayed in a window, so just use
+	   * that one.
+	   */
+	  gdk_window_raise(GTK_WIDGET(mw->window)->window);
+	  return;
+	}
+    }
+  else
+    {
+      /*
+       * We've never displayed a message before; initialize the hash
+       * table.
+       */
+      displayed_messages = g_hash_table_new(g_direct_hash, g_direct_equal);
+    }
+  
+
   mw = g_malloc0 (sizeof (MessageWindow));
+
+  g_hash_table_insert(displayed_messages, message, mw);
+
+  mw->message = message;
 
   mw->window = gnome_app_new ("balsa", "Message");
   gtk_object_set_data (GTK_OBJECT (mw->window), "msgwin", mw->window);
@@ -105,6 +141,8 @@ destroy_message_window (GtkWidget * widget, gpointer data)
 {
   MessageWindow *mw = data;
 
+  g_hash_table_remove(displayed_messages, mw->message);
+  
   gtk_widget_destroy (mw->window);
   gtk_widget_destroy (mw->bmessage);
 

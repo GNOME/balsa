@@ -1,5 +1,21 @@
 1999-01-07  Nat Friedman  <nat@nat.org>
 
+	* src/message-window.c: Updated the menu items for the message
+ 	window to reflect the standard.
+
+	Added the 'message' field to the MessageWindow structure.
+
+	Added the 'displayed_messages' hash table.
+
+	(message_window_new): Check to see if the specified message is
+ 	already displayed, and if so, gdk_window_raise() the window
+ 	containing it.  If not, add it to the hash table.
+	
+	(destroy_message_window): Remove the hash-table entry
+ 	corresponding to this message window.
+
+1999-01-07  Nat Friedman  <nat@nat.org>
+
 	* src/main-window.c (main_menu): Updated to use the SETTINGS
  	standard menu, and moved Preferences back to there.
 

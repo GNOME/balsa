@@ -567,36 +567,32 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
     return retval;
 }
 
-static void
-libbalsa_message_set_attach_icons(LibBalsaMessage * message)
+LibBalsaMessageAttach
+libbalsa_message_get_attach_icon(LibBalsaMessage * message)
 {
 #ifdef HAVE_GPGME
     if (libbalsa_message_is_pgp_encrypted(message))
-	message->attach_icon = LIBBALSA_MESSAGE_ATTACH_ENCR;
+	return LIBBALSA_MESSAGE_ATTACH_ENCR;
     else if (message->prot_state != LIBBALSA_MSG_PROTECT_NONE ||
 	libbalsa_message_is_pgp_signed(message)) {
 	switch (message->prot_state) {
 	case LIBBALSA_MSG_PROTECT_SIGN_GOOD:
-	    message->attach_icon = LIBBALSA_MESSAGE_ATTACH_GOOD;
-	    break;
+	    return LIBBALSA_MESSAGE_ATTACH_GOOD;
 	case LIBBALSA_MSG_PROTECT_SIGN_NOTRUST:
-	    message->attach_icon = LIBBALSA_MESSAGE_ATTACH_NOTRUST;
-	    break;
+	    return LIBBALSA_MESSAGE_ATTACH_NOTRUST;
 	case LIBBALSA_MSG_PROTECT_SIGN_BAD:
-	    message->attach_icon = LIBBALSA_MESSAGE_ATTACH_BAD;
-	    break;
+	    return LIBBALSA_MESSAGE_ATTACH_BAD;
 	case LIBBALSA_MSG_PROTECT_CRYPT:
-	    message->attach_icon = LIBBALSA_MESSAGE_ATTACH_ENCR;
-	    break;
+	    return LIBBALSA_MESSAGE_ATTACH_ENCR;
 	default:
-	    message->attach_icon = LIBBALSA_MESSAGE_ATTACH_SIGN;
+	    return LIBBALSA_MESSAGE_ATTACH_SIGN;
 	}
     } else
 #endif
     if (libbalsa_message_has_attachment(message))
-	message->attach_icon = LIBBALSA_MESSAGE_ATTACH_ATTACH;
+	return LIBBALSA_MESSAGE_ATTACH_ATTACH;
     else
-	message->attach_icon = LIBBALSA_MESSAGE_ATTACH_ICONS_NUM;
+	return LIBBALSA_MESSAGE_ATTACH_ICONS_NUM;
 }
 
 /* Helper for mailbox drivers. */
@@ -615,9 +611,6 @@ libbalsa_message_set_msg_flags(LibBalsaMessage * message,
 	message->flags &= ~clear;
 	changed = TRUE;
     }
-    if (changed)
-	message->status_icon = 
-	    libbalsa_get_icon_from_flags(message->flags);
 
     return changed;
 }
@@ -1425,17 +1418,4 @@ libbalsa_message_load_envelope_from_file(LibBalsaMessage *message,
     g_mime_stream_unref(gmime_stream_buffer);
     g_byte_array_free(line, TRUE);
     return ret;
-}
-
-void
-libbalsa_message_set_icons(LibBalsaMessage * message)
-{
-    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
-    g_return_if_fail(message->mailbox != NULL);
-
-    message->status_icon = 
-	libbalsa_get_icon_from_flags(message->flags);
-    libbalsa_message_set_attach_icons(message);
-    libbalsa_mailbox_msgno_update_icons(message->mailbox,
-					message->msgno, message);
 }

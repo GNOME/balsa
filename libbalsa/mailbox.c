@@ -334,8 +334,8 @@ libbalsa_mailbox_index_entry_new_from_msg(LibBalsaMessage *msg)
     entry->subject       = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(msg));
     entry->msg_date      = msg->headers->date;
     entry->internal_date = 0; /* FIXME */
-    entry->status_icon   = msg->status_icon;
-    entry->attach_icon   = msg->attach_icon;
+    entry->status_icon   = libbalsa_get_icon_from_flags(msg->flags);
+    entry->attach_icon   = libbalsa_message_get_attach_icon(msg);
     entry->size          = msg->length;
     entry->unseen        = LIBBALSA_MESSAGE_IS_UNREAD(msg);
 #if CACHE_UNSEEN_CHILD
@@ -3095,8 +3095,8 @@ libbalsa_mailbox_msgno_get_subject(LibBalsaMailbox * mailbox, guint msgno)
 
 /* Update icons, but only if entry has been allocated. */
 void
-libbalsa_mailbox_msgno_update_icons(LibBalsaMailbox * mailbox,
-				    guint msgno, LibBalsaMessage * message)
+libbalsa_mailbox_msgno_update_attach(LibBalsaMailbox * mailbox,
+				     guint msgno, LibBalsaMessage * message)
 {
     LibBalsaMailboxIndexEntry *entry;
 
@@ -3107,8 +3107,7 @@ libbalsa_mailbox_msgno_update_icons(LibBalsaMailbox * mailbox,
     if (!entry)
 	return;
 
-    entry->status_icon = message->status_icon;
-    entry->attach_icon = message->attach_icon;
+    entry->attach_icon = libbalsa_message_get_attach_icon(message);
 
     lbm_msgno_changed(mailbox, msgno);
 }

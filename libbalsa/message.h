@@ -237,9 +237,6 @@ struct _LibBalsaMessage {
 #define LIBBALSA_MESSAGE_GET_NO(m)  libbalsa_message_get_no(m)
 #endif
 
-    /* Indices into the arrays of rendered icons. FIXME: remove! */
-    LibBalsaMessageStatus status_icon;
-    LibBalsaMessageAttach attach_icon;
     unsigned has_all_headers:1;
 };
 
@@ -367,6 +364,8 @@ guint libbalsa_message_get_lines(LibBalsaMessage* msg);
 glong libbalsa_message_get_length(LibBalsaMessage* msg);
 #endif
 glong libbalsa_message_get_no(LibBalsaMessage* msg);
+LibBalsaMessageAttach libbalsa_message_get_attach_icon(LibBalsaMessage *
+						       message);
 #define libbalsa_message_date_to_gchar(m, f) libbalsa_date_to_gchar(&(m)->headers->date, (f))
 #define libbalsa_message_headers_date_to_gchar(h, f) libbalsa_date_to_gchar(&(h)->date, (f))
 
@@ -380,5 +379,4 @@ void libbalsa_message_set_references_from_string(LibBalsaMessage * message,
 						 const gchar *str);
 void libbalsa_message_set_in_reply_to_from_string(LibBalsaMessage * message,
 						  const gchar *str);
-void libbalsa_message_set_icons(LibBalsaMessage * message);
 #endif				/* __LIBBALSA_MESSAGE_H__ */

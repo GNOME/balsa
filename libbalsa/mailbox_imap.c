@@ -1550,7 +1550,6 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
         msg->mailbox = mailbox;
         if (libbalsa_mailbox_imap_load_envelope(mimap, msg)) {
 	    gchar *id;
-	    libbalsa_message_set_icons(msg);
             msg_info->message  = msg;
 	    if (libbalsa_message_is_partial(msg, &id)) {
 		libbalsa_mailbox_try_reassemble(mailbox, id);

@@ -472,9 +472,9 @@ LibBalsaMessageStatus libbalsa_mailbox_msgno_get_status(LibBalsaMailbox *
 							guint msgno);
 const gchar *libbalsa_mailbox_msgno_get_subject(LibBalsaMailbox * mailbox,
 						guint msgno);
-void libbalsa_mailbox_msgno_update_icons(LibBalsaMailbox * mailbox,
-					 guint msgno,
-					 LibBalsaMessage * message);
+void libbalsa_mailbox_msgno_update_attach(LibBalsaMailbox * mailbox,
+					  guint msgno,
+					  LibBalsaMessage * message);
 
 /* columns ids */
 typedef enum {

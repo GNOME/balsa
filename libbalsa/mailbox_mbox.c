@@ -327,7 +327,6 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
                 msg->length  = msg_info.end - msg_info.start; 
                 msg->mailbox = LIBBALSA_MAILBOX(mbox);
                 msg->msgno   = ++msgno;
-                libbalsa_message_set_icons(msg);
                 entry = libbalsa_mailbox_index_entry_new_from_msg(msg);
                 g_object_unref(msg);
 		g_ptr_array_add(LIBBALSA_MAILBOX(mbox)->mindex, entry);

@@ -3993,7 +3993,8 @@ balsa_message_set_crypto(LibBalsaMessage * message)
         balsa_message_scan_signatures(message->body_list, message);
     /* update the icon if necessary */
     if (message->prot_state != LIBBALSA_MSG_PROTECT_NONE)
-	libbalsa_message_set_icons(message);
+	libbalsa_mailbox_msgno_update_attach(message->mailbox,
+					     message->msgno, message);
 }
 
 
@@ -4194,7 +4195,9 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info)
     
     /* update the icon if necessary */
     if (bm->message->prot_state != LIBBALSA_MSG_PROTECT_NONE)
-	libbalsa_message_set_icons(bm->message);
+	libbalsa_mailbox_msgno_update_attach(bm->message->mailbox,
+					     bm->message->msgno,
+					     bm->message);
 
     return rfc2440_no_pubkey;
 }

@@ -946,7 +946,6 @@ libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox, guint msgno)
 	message->flags = msg_info->flags;
 	message->mailbox = mailbox;
 	message->msgno = msgno;
-	libbalsa_message_set_icons(message);
     }
 
     return msg_info->message;

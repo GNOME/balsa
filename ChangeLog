@@ -1,3 +1,7 @@
+2003-11-21 10:14  PeterB
+
+	* src/balsa-mblist.c: Fix bug 127422.
+
 2003-11-19 05:02  PeterB
 
 	* src/balsa-index.c: Unref mailbox_node even when it has no

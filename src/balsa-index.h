@@ -68,11 +68,7 @@ extern "C" {
     struct _BalsaIndexClass {
 	GtkTreeViewClass parent_class;
 
-	void (*select_message) (BalsaIndex * bindex,
-				LibBalsaMessage * message);
-	void (*unselect_message) (BalsaIndex * bindex,
-				  LibBalsaMessage * message);
-        void (*unselect_all_messages) (BalsaIndex* bindex);
+        void (*index_changed) (BalsaIndex* bindex);
     };
 
 /* tree model columns */
@@ -105,17 +101,14 @@ extern "C" {
     void balsa_index_redraw_current(BalsaIndex *);
 
 /* move or copy a list of messages */
-    void balsa_index_transfer(GList * messages,
-                              LibBalsaMailbox * from_mailbox,
-                              LibBalsaMailbox * to_mailbox,
-                              BalsaIndex * from_bindex, gboolean copy);
+    void balsa_index_transfer(BalsaIndex * index, GList * messages,
+                              LibBalsaMailbox * to_mailbox, gboolean copy);
 
 /* select up/down the index */
     void balsa_index_select_next(BalsaIndex *);
     void balsa_index_select_next_unread(BalsaIndex * bindex);
     void balsa_index_select_next_flagged(BalsaIndex * bindex);
     void balsa_index_select_previous(BalsaIndex *);
-    void balsa_index_select_row(BalsaIndex * bindex, gint row);
 
     void balsa_index_find(BalsaIndex * bindex,gint op,GSList * conditions,gboolean previous);
 
@@ -153,7 +146,6 @@ extern "C" {
     /* Change the display of all indexes when balsa_app.hide_deleted is
      * changed */
     void balsa_index_hide_deleted(gboolean hide);
-    void balsa_index_sync_backend(LibBalsaMailbox * mailbox);
 
     /* Threading Stuff, implementation is in balsa-index-threading.c */
     void balsa_index_threading(BalsaIndex* bindex);

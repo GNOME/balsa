@@ -692,18 +692,16 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
     LibBalsaMailbox *orig_mailbox;
     GList *messages = NULL;
     BalsaMailboxNode *mbnode;
-    gint i;
-    LibBalsaMessage **message_array;
+    LibBalsaMessage **message;
 
 
-    message_array = (LibBalsaMessage **) selection_data->data;
 
     /* convert pointer array to GList */
-    for (i = 0; message_array[i]; i++)
-        messages = g_list_prepend(messages, message_array[i]);
-
+    for (message = (LibBalsaMessage **) selection_data->data; *message;
+         message++)
+        messages = g_list_prepend(messages, *message);
     g_return_if_fail(messages);
-    messages = g_list_reverse(messages);
+
     orig_mailbox = ((LibBalsaMessage *) messages->data)->mailbox;
 
     /* find the node and mailbox */
@@ -720,8 +718,8 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
 
         /* cannot transfer to the originating mailbox */
         if (mailbox != NULL && mailbox != orig_mailbox)
-            balsa_index_transfer(messages, orig_mailbox, mailbox,
-                                 balsa_find_index_by_mailbox(orig_mailbox),
+            balsa_index_transfer(balsa_find_index_by_mailbox(orig_mailbox),
+                                 messages, mailbox,
                                  context->action != GDK_ACTION_MOVE);
         gtk_tree_path_free(path);
     }

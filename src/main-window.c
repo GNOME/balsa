@@ -120,14 +120,8 @@ GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
 static gboolean balsa_close_mailbox_on_timer(GtkWidget * widget, 
 					     gpointer * data);
 
-static void balsa_window_select_message_cb(GtkWidget * widget,
-					   LibBalsaMessage * message,
-					   gpointer data);
-static void balsa_window_unselect_message_cb(GtkWidget * widget,
-					     LibBalsaMessage * message,
-					     gpointer data);
-static void balsa_window_unselect_all_messages_cb (GtkWidget* widget, 
-                                                   gpointer data);
+static void balsa_window_index_changed_cb(GtkWidget * widget,
+                                          gpointer data);
 
 
 static void check_mailbox_list(GList * list);
@@ -987,6 +981,7 @@ enable_mailbox_menus(BalsaMailboxNode * mbnode)
 
     LibBalsaMailbox *mailbox = NULL;
     gboolean enable;
+    gboolean enable_move;
     unsigned i;
 
     enable =  (mbnode != NULL);
@@ -1000,14 +995,16 @@ enable_mailbox_menus(BalsaMailboxNode * mbnode)
     }
 
     /* Toolbar */
+    enable_move = (mailbox != NULL && mailbox->total_messages > 0);
     set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                                 0, BALSA_PIXMAP_PREVIOUS, enable);
+                                 0, BALSA_PIXMAP_PREVIOUS, enable_move);
     set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                                 0, BALSA_PIXMAP_NEXT, enable);
+                                 0, BALSA_PIXMAP_NEXT, enable_move);
     set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                                 0, BALSA_PIXMAP_NEXT_UNREAD, enable);
+                                 0, BALSA_PIXMAP_NEXT_UNREAD, 
+                                 mailbox && mailbox->unread_messages > 0);
     set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                                 0, BALSA_PIXMAP_NEXT_FLAGGED, enable);
+                                 0, BALSA_PIXMAP_NEXT_FLAGGED, enable_move);
     set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
                                  0, BALSA_PIXMAP_CLOSE_MBOX, enable);
     set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
@@ -1313,15 +1310,9 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
         return;
     }
 
-    gtk_signal_connect(GTK_OBJECT (index), "select_message",
-                       GTK_SIGNAL_FUNC (balsa_window_select_message_cb),
-                       balsa_app.main_window);
-    gtk_signal_connect(GTK_OBJECT (index), "unselect_message",
-                       GTK_SIGNAL_FUNC (balsa_window_unselect_message_cb),
-                       balsa_app.main_window);
-    gtk_signal_connect(GTK_OBJECT (index), "unselect_all_messages",
-                       GTK_SIGNAL_FUNC(balsa_window_unselect_all_messages_cb),
-                       balsa_app.main_window);
+    gtk_signal_connect(GTK_OBJECT (index), "index-changed",
+                       GTK_SIGNAL_FUNC (balsa_window_index_changed_cb),
+                       NULL);
 
     /* if(config_short_label) label = gtk_label_new(mbnode->mailbox->name);
        else */
@@ -2852,16 +2843,9 @@ mailbox_commit_all(GtkWidget * widget, gpointer data)
 void
 empty_trash(void)
 {
-    GList *message;
-
     if(!libbalsa_mailbox_open(balsa_app.trash)) return;
 
-    message = balsa_app.trash->message_list;
-
-    while (message) {
-        libbalsa_message_delete(message->data, TRUE);
-        message = message->next;
-    }
+    libbalsa_messages_delete(balsa_app.trash->message_list);
     libbalsa_mailbox_close(balsa_app.trash);
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
                                 balsa_app.trash);
@@ -3057,29 +3041,12 @@ notebook_switch_page_cb(GtkWidget * notebook,
 }
 
 static void
-balsa_window_select_message_cb(GtkWidget * widget,
-                               LibBalsaMessage * message,
-                               gpointer data)
-{
-    enable_message_menus(message);
-}
-
-static void
-balsa_window_unselect_message_cb(GtkWidget * widget,
-                                 LibBalsaMessage * message,
-                                 gpointer data)
+balsa_window_index_changed_cb(GtkWidget * widget, gpointer data)
 {
     BalsaIndex *index = BALSA_INDEX(widget);
     enable_mailbox_menus(index->mailbox_node);
-}
-
-static void
-balsa_window_unselect_all_messages_cb (GtkWidget* widget, gpointer data)
-{
-    BalsaIndex *index = BALSA_INDEX(widget);
-    /* we need to disable menus in case there was no other message selected */
+    enable_message_menus(index->current_message);
     if(index->current_message == NULL) {
-        enable_message_menus(NULL);
         enable_edit_menus(NULL);
     }
 }
@@ -3152,8 +3119,7 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
     LibBalsaMailbox* mailbox;
     LibBalsaMailbox* orig_mailbox;
     GList* messages = NULL;
-    LibBalsaMessage** message_array;
-    gint i = 0;
+    LibBalsaMessage **message;
 
 
     index = balsa_window_notebook_find_page (GTK_NOTEBOOK (widget), x, y);
@@ -3162,22 +3128,17 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
         return;
     
     mailbox = index->mailbox_node->mailbox;
-    message_array = (LibBalsaMessage**) selection_data->data;
 
-    if (message_array[i] != NULL) {
-        while (message_array[i] != NULL) {
-            messages = g_list_append (messages, message_array[i]);
-            ++i;
-        }
-    } else {
-        return;
-    }
+    for (message = (LibBalsaMessage **) selection_data->data; *message;
+         message++)
+        messages = g_list_append (messages, *message);
+    g_return_if_fail(messages != NULL);
         
     orig_mailbox = ((LibBalsaMessage*) messages->data)->mailbox;
     
     if (mailbox != NULL && mailbox != orig_mailbox)
-        balsa_index_transfer(messages, orig_mailbox, mailbox,
-                             balsa_find_index_by_mailbox(orig_mailbox),
+        balsa_index_transfer(balsa_find_index_by_mailbox(orig_mailbox),
+                             messages, mailbox,
                              context->action != GDK_ACTION_MOVE);
 
     g_list_free (messages);

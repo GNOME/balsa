@@ -79,7 +79,6 @@ enum {
     MESSAGES_NEW,
     MESSAGE_DELETE,
     MESSAGES_DELETE,
-    MESSAGES_DELETE_ALL,
     GET_MESSAGE_STREAM,
     CHECK,
     GET_MATCHING,
@@ -202,15 +201,6 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      g_cclosure_marshal_VOID__POINTER, G_TYPE_NONE, 1,
                      G_TYPE_POINTER);
 
-    libbalsa_mailbox_signals[MESSAGES_DELETE_ALL] =
-	g_signal_new("messages-delete-all",
-                     G_TYPE_FROM_CLASS(object_class),
-                     G_SIGNAL_RUN_FIRST,
-                     G_STRUCT_OFFSET(LibBalsaMailboxClass,
-                                     messages_delete_all),
-                     NULL, NULL,
-                     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
-
     libbalsa_mailbox_signals[SET_UNREAD_MESSAGES_FLAG] =
 	g_signal_new("set-unread-messages-flag",
                      G_TYPE_FROM_CLASS(object_class),
@@ -285,7 +275,6 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->messages_new = NULL;
     klass->message_delete = NULL;
     klass->messages_delete = NULL;
-    klass->messages_delete_all = NULL;
 
     klass->get_message_stream = NULL;
     klass->check = NULL;
@@ -804,7 +793,7 @@ libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox)
 
     if(list){
       g_signal_emit(G_OBJECT(mailbox),
-		    libbalsa_mailbox_signals[MESSAGES_DELETE_ALL], 0);
+		    libbalsa_mailbox_signals[MESSAGES_DELETE], 0, list);
     }
 
     while (list) {

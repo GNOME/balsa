@@ -1,3 +1,17 @@
+2002-09-09  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/mailbox.[ch]: remove misguided "messages-delete-all" signal.
+	* src/balsa-index.[ch]: change signal handlers for mailbox
+	signals, and signalling to main-window; make balsa_index_transfer
+	a BalsaIndex method; remove sync-backend as an exported method
+	(and a left-over, dead,balsa_index_select_row).
+	* src/balsa-mblist.c,src/message-window.c : use new api for
+	balsa_index_transfer.
+	* src/main-window.c: use simplified signals from BalsaIndex;
+	manage sensitivity of previous, next, and next unread buttons; use
+	new api for balsa_index_transfer.
+	* src/sendmsg-window.c: remove calls to balsa_index_sync_backend.
+
 2002-09-09  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/address-book-ldap.c: fix class struct size declaration.

@@ -214,7 +214,7 @@ mru_menu_cb(gchar * url, gpointer data)
 
     list = g_list_append(NULL, mw->message);
     bindex = balsa_find_index_by_mailbox(mw->message->mailbox);
-    balsa_index_transfer(list, mw->message->mailbox, mailbox, bindex, FALSE);
+    balsa_index_transfer(bindex, list, mailbox, FALSE);
     g_list_free_1(list);
     
     close_message_window(NULL, (gpointer) mw);

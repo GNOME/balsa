@@ -469,6 +469,7 @@ gboolean
 balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 {
     gboolean had_focus;
+    gboolean is_new;
 
     g_return_val_if_fail(bm != NULL, FALSE);
 
@@ -496,25 +497,27 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	return TRUE;
     }
 
-    /*
-     * At this point we check if (a) a message has the unread flag set and
-     * (b) a Disposition-Notification-To header line is present
-     */
-    if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW && message->dispnotify_to)
-	handle_mdn_request (message);
-
     bm->message = message;
 
     gtk_signal_connect(GTK_OBJECT(message), "destroy",
 		       GTK_SIGNAL_FUNC(message_destroyed_cb),
 		       (gpointer) bm);
 
-
+    is_new = message->flags & LIBBALSA_MESSAGE_FLAG_NEW;
     if(!libbalsa_message_body_ref(bm->message)) 
 	return FALSE;
 
     display_headers(bm);
     display_content(bm);
+
+    /*
+     * At this point we check if (a) a message was new (its not new
+     * any longer) and (b) a Disposition-Notification-To header line is
+     * present.
+     *
+     */
+    if (is_new && message->dispnotify_to)
+	handle_mdn_request (message);
 
     /*
      * FIXME: This is a workaround for what may or may not be a libmutt bug.
@@ -526,8 +529,10 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     if (bm->part_count == 0) {
 	gtk_widget_hide(bm->part_list);
 
-	/* This is really annoying if you are browsing, since you keep getting a dialog... */
-	/* balsa_information(LIBBALSA_INFORMATION_WARNING, _("Message contains no parts!")); */
+	/* This is really annoying if you are browsing, since you keep
+           getting a dialog... */
+	/* balsa_information(LIBBALSA_INFORMATION_WARNING, _("Message
+           contains no parts!")); */
 	return TRUE;
     }
 

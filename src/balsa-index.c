@@ -953,11 +953,20 @@ balsa_index_scan_node(GtkCTree * ctree, GtkCTreeNode * node,
          * by a search function, we want only viewable messages if we
          * are looking for flagged messages, we want those that match,
          * viewable or not */
-        if ((b->flag == 0 && !b->conditions && 
+	gboolean found = (b->flag & message->flags);
+#if BALSA_SHOW_ALL
+	/* FIXME: simplify this. It  is not clear what is the scanning
+           search  condition combinations  are  valid: matching  flag,
+           matching filter, or something else. This makes this chunk
+	   ambigous. */
+	found |= (b->flag == 0 && !b->conditions && 
              gtk_ctree_is_viewable(ctree, node))
-            || (b->flag & message->flags)
 	    || (b->conditions && 
-                match_conditions(b->conditions_op,b->conditions,message))) {
+                match_conditions(b->conditions_op,b->conditions,message));
+#else
+	found |= (b->flag == 0 && gtk_ctree_is_viewable(ctree, node));
+#endif
+        if (found) {
             if (b->first == NULL)
                 /* first matching message */
                 b->first = node;

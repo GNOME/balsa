@@ -402,8 +402,12 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
   if(pop->monitor_cb) 
     sio_set_monitorcb(pop->sio, pop->monitor_cb, pop->monitor_arg);
 
-  sio_gets(pop->sio, line, sizeof(line)); /* get initial greeting */
-  pop_get_capa(pop, err);
+  if(!sio_gets(pop->sio, line, sizeof(line))) { /* get initial greeting */
+      g_set_error(err, IMAP_ERROR, IMAP_POP_CONNECT_ERROR,
+                  "Did not get initial greeting.");
+      return FALSE;
+  }
+  pop_get_capa(pop, err); /* ignore error here */
 #ifdef USE_TLS
   if(pop_can_do(pop, POP_CAP_STLS)) {
     if(!pop_stls(pop, err))
@@ -469,7 +473,7 @@ pop_get_uid(PopHandle *pop, unsigned msgno, GError **err)
 
 gboolean
 pop_fetch_message(PopHandle *pop, unsigned msgno,
-                  void (*cb)(int len, char*buf, void *arg),
+                  int (*cb)(unsigned len, char*buf, void *arg),
                   void *cb_arg, GError **err)
 {
   gboolean resp;
@@ -485,7 +489,12 @@ pop_fetch_message(PopHandle *pop, unsigned msgno,
       unsigned len = strlen(arg);
       if(pop->filter_cr && len>=2 && arg[len-2] == '\r') 
         arg[(--len)-1] = '\n';
-      cb(len, arg, cb_arg);
+      if(resp) 
+        if(!cb(len, arg, cb_arg)) {
+          g_set_error(err, IMAP_ERROR, IMAP_POP_SAVE_ERROR,
+                      "Saving message failed.");
+          resp = FALSE;
+        }
     }
   }
   return resp;

@@ -4,18 +4,18 @@ noinst_LIBRARIES = libimap.a
 #libimap_la_SOURCES =  
 libimap_a_SOURCES = \
 	auth-cram.c	\
-	imap.h		\
 	imap-auth.c	\
 	imap-auth.h	\
-	imap-handle.c	\
-	imap-handle.h	\
 	imap-commands.c	\
 	imap-commands.h	\
+	imap-handle.c	\
+	imap-handle.h	\
 	imap-search.c	\
 	imap-tls.c	\
+	imap_private.h	\
 	libimap-marshal.c	\
 	libimap-marshal.h	\
-	imap_private.h	\
+	libimap.h	\
 	pop3.c		\
 	pop3.h		\
 	siobuf.c	\

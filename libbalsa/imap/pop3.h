@@ -46,7 +46,8 @@ enum {
   IMAP_POP_PROTOCOL_ERROR,
   IMAP_POP_CONNECT_ERROR,
   IMAP_POP_SEVERED_ERROR,
-  IMAP_POP_AUTH_ERROR
+  IMAP_POP_AUTH_ERROR,
+  IMAP_POP_SAVE_ERROR
 };
 
 typedef enum {
@@ -71,7 +72,7 @@ unsigned pop_get_exists    (PopHandle *pop, GError **err);
 const char* pop_get_uid    (PopHandle *pop, unsigned msgno, GError **err);
 
 gboolean pop_fetch_message (PopHandle *pop, unsigned msgno, 
-                            void (*cb)(int len, char*buf, void *arg),
+                            int (*cb)(unsigned len, char*buf, void *arg),
                             void *cb_arg, GError **err);
 gboolean pop_delete_message(PopHandle *pop, unsigned msgno, GError **err);
 gboolean pop_destroy(PopHandle *pop, GError **err);

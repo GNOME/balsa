@@ -254,11 +254,11 @@ mp_save_uids(GHashTable *old_uids, GHashTable *new_uids, const char *prefix)
     return;
 }
 
-static void
-dump_cb(int len, char *buf, void *arg)
+static int
+dump_cb(unsigned len, char *buf, void *arg)
 {
     /* FIXME: Bad things happen when messages are empty, . */
-    fwrite(buf, 1, len, (FILE*)arg);
+    return fwrite(buf, 1, len, (FILE*)arg) == len;
 }
 
 static gchar*
@@ -420,14 +420,32 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
                                          LIBBALSA_NTFY_PROGRESS, i, msgcnt,
                                          "next message");
         f = mode->open(msg_path);
-        if(pop_fetch_message(pop, i, dump_cb, f, &err)) {
-            if(m->delete_from_server)
-                pop_delete_message(pop, i, NULL);
-        } /* else report warning */
-        mode->close(f);
+        if(!f) {
+            libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			     _("POP3 error: cannot open %s for writing."), 
+			     msg_path);
+            break;
+        }
+        if(!pop_fetch_message(pop, i, dump_cb, f, &err)) 
+            break;
+        if(mode->close(f) != 0) {
+            libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			     _("POP3 error: cannot close %s."), 
+			     msg_path);
+            break;
+        }
+        if(m->delete_from_server)
+            pop_delete_message(pop, i, NULL);
         g_free(msg_path);
     }
     /* FIXME: replace old uids with current uids */
+    if(err) {
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("POP3 error: %s."), 
+			     err->message);
+        g_clear_error(&err);
+    }
+
     pop_destroy(pop, NULL);
     if(!m->delete_from_server) {
         mp_save_uids(uids, current_uids, uid_prefix);

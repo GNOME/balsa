@@ -8,19 +8,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
 "POT-Creation-Date: 2000-05-03 14:19+0200\n"
-"PO-Revision-Date: 2000-05-04 03:30+02:00\n"
+"PO-Revision-Date: 2000-05-04 23:30+02:00\n"
 "Last-Translator: Keld Simonsen <keld@dkuug.dk>\n"
 "Language-Team: Danish <dansk@klid.dk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: libbalsa/mailbox.c:596
+#: libbalsa/mailbox.c:196
+msgid "Error: "
+msgstr "Fejl: "
+
+#: libbalsa/mailbox.c:627
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr "Postkasse: Åbning af %s referencetal: %d\n"
 
-#: libbalsa/mailbox.c:616
+#: libbalsa/mailbox.c:647
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Postkasse: Lukker %s referencetal: %d\n"
@@ -226,28 +230,28 @@ msgstr "Kør GnomeCard"
 msgid "Re-Import"
 msgstr "Genimportér"
 
-#: src/balsa-app.c:217
+#: src/balsa-app.c:221
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa kan ikke åbne din '%s' postbakke."
 
-#: src/balsa-app.c:230
+#: src/balsa-app.c:234
 msgid "Inbox"
 msgstr "Indbakke"
 
-#: src/balsa-app.c:235
+#: src/balsa-app.c:239
 msgid "Outbox"
 msgstr "Udbakke"
 
-#: src/balsa-app.c:240
+#: src/balsa-app.c:244
 msgid "Sentbox"
 msgstr "Sendt_post"
 
-#: src/balsa-app.c:245
+#: src/balsa-app.c:249
 msgid "Draftbox"
 msgstr "Kladder"
 
-#: src/balsa-app.c:250
+#: src/balsa-app.c:254
 msgid "Trash"
 msgstr "Affald"
 
@@ -309,7 +313,7 @@ msgstr "Emne"
 msgid "Date"
 msgstr "Dato"
 
-#: src/balsa-mblist.c:813
+#: src/balsa-mblist.c:814
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Viste postkasse: %s med %ld breve, %ld nye"

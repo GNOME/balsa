@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-09-23 19:25+0200\n"
-"PO-Revision-Date: 2003-09-23 23:01+0200\n"
+"POT-Creation-Date: 2003-10-07 11:07+0200\n"
+"PO-Revision-Date: 2003-10-07 20:35+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -4205,7 +4205,7 @@ msgstr "Provádět zjišťování tiše na pozadí (žádné zprávy ve stavové
 msgid "Quoted and Flowed Text"
 msgstr "Citovaný a tekoucí text"
 
-#: src/pref-manager.c:1728 src/sendmsg-window.c:3797
+#: src/pref-manager.c:1728 src/sendmsg-window.c:3798
 msgid "Quoted Text Regular Expression"
 msgstr "Regulární výraz pro citovaný text"
 
@@ -5181,21 +5181,23 @@ msgstr "Vyberte znakovou sadu"
 #: src/sendmsg-window.c:3064
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
-"Please choose the charset used to encode the file."
+"Please choose the charset used to encode the file.\n"
+"(if unsure chose Generic UTF-8)"
 msgstr ""
 "Tento soubor není kódován v US-ASCII nebo UTF-8.\n"
-"Vyberte prosím znakovou sadu, ve které je soubor kódován."
+"Vyberte prosím znakovou sadu, ve které je soubor kódován.\n"
+"(pokud si nejste jisti, vyberte Obecné UTF-8)"
 
-#: src/sendmsg-window.c:3130
+#: src/sendmsg-window.c:3131
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Nelze otevřít soubor %s.\n"
 
-#: src/sendmsg-window.c:3152
+#: src/sendmsg-window.c:3153
 msgid "Include file"
 msgstr "Vložit soubor"
 
-#: src/sendmsg-window.c:3452
+#: src/sendmsg-window.c:3453
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5206,7 +5208,7 @@ msgstr ""
 "Vyberte prosím pro tuto zprávu jazyk.\n"
 "Pro vícejazyčné zprávy zvolte UTF-8."
 
-#: src/sendmsg-window.c:3472
+#: src/sendmsg-window.c:3473
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5216,32 +5218,32 @@ msgstr ""
 "podepsána a/nebo zašifrována jen první část. Pokud má být chráněna celá "
 "zpráva, měli byste zvolit režim MIME. Chcete opravdu pokračovat?"
 
-#: src/sendmsg-window.c:3485
+#: src/sendmsg-window.c:3486
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "odesílám zprávu s režimem gpg %d"
 
-#: src/sendmsg-window.c:3796
+#: src/sendmsg-window.c:3797
 #, c-format
 msgid "Could not compile %s"
 msgstr "Nemohu přeložit %s"
 
-#: src/sendmsg-window.c:4314
+#: src/sendmsg-window.c:4315
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Odpověď pro %s: %s"
 
-#: src/sendmsg-window.c:4319
+#: src/sendmsg-window.c:4320
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Přeposlat zprávu pro %s: %s"
 
-#: src/sendmsg-window.c:4323
+#: src/sendmsg-window.c:4324
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Pokračovat v psaní zprávy pro %s: %s"
 
-#: src/sendmsg-window.c:4327
+#: src/sendmsg-window.c:4328
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nová zpráva pro %s: %s"

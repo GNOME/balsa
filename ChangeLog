@@ -1,4 +1,9 @@
-2004-10-06 05:18  PeterB
+2004-10-06 15:20  PeterB
+
+	* src/: sendmsg-window.c, sendmsg-window.h: change "From:" address
+	widget from LibBalsaAddressEntry to GtkComboBox.
+
+2004-10-06 05:18  jensgr@gmx.net (Jens Granseuer)
 
 	* libbalsa/send.c: remove X-Balsa-Fcc header when using sendmail
 	backend.

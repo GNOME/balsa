@@ -5,15 +5,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.9.2\n"
-"POT-Creation-Date: 2000-08-30 19:22+0200\n"
-"PO-Revision-Date: 2000-08-30 19:26+02:00\n"
+"POT-Creation-Date: 2000-09-04 12:47+0200\n"
+"PO-Revision-Date: 2000-09-04 12:50+02:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian <no@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8-bit\n"
 
-#: libbalsa/mailbox_imap.c:233
+#: libbalsa/mailbox_imap.c:248
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: Åpner %s referansetall: %d\n"
@@ -28,12 +28,12 @@ msgstr "LibBalsaMailboxLocal: Åpner %s referansetall: %d\n"
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: Åpner %s referansetall: %d\n"
 
-#: libbalsa/send.c:787
+#: libbalsa/send.c:784
 #, c-format
 msgid "Could not find address for host %s."
 msgstr "Kunne ikke finne adresse for vert %s."
 
-#: libbalsa/send.c:790
+#: libbalsa/send.c:787
 #, c-format
 msgid "Error: Could not find address for host %s."
 msgstr "Feil: Kunne ikke finne adresse for vert %s."
@@ -342,8 +342,41 @@ msgstr "Kan ikke skrive melding"
 msgid "Unable to get APOP seed from server"
 msgstr "Kunne ikke hente APOP-seed fra tjener"
 
+#: libmutt/imap/auth.c:110
+msgid "Authenticating (CRAM-MD5)..."
+msgstr "Autentiserer (CRAM-MD5)..."
+
+#: libmutt/imap/auth.c:197
+msgid "Authenticating (anonymous)..."
+msgstr "Autentiserer (anonym)..."
+
+#: libmutt/imap/auth.c:283
+msgid "Anonymous authentication not supported."
+msgstr "Anonym autentisering er ikke støttet."
+
+#: libmutt/imap/auth.c:296
+msgid "GSSAPI authentication failed."
+msgstr "GSSAPI-autentisering feilet."
+
+#: libmutt/imap/auth.c:324
+msgid "CRAM-MD5 authentication failed."
+msgstr "CRAM-MD5-autentisering feilet."
+
+#: libmutt/imap/auth.c:339
+msgid "Skipping CRAM-MD5 authentication."
+msgstr "Hopper over CRAM-MD5-autentisering."
+
+#: libmutt/imap/auth.c:361
+msgid "Logging in..."
+msgstr "Logger inn..."
+
+#. Login failed, try again
+#: libmutt/imap/auth.c:373
+msgid "Login failed."
+msgstr "Innlogging feilet."
+
 #. now begin login
-#: libmutt/imap/auth_gss.c:83
+#: libmutt/imap/auth_gss.c:88
 msgid "Authenticating (GSSAPI)..."
 msgstr "Autentiserer (GSSAPI)..."
 
@@ -368,8 +401,9 @@ msgid "SSL disabled due the lack of entropy"
 msgstr ""
 
 #: libmutt/imap/imap_ssl.c:213
+#, fuzzy
 msgid "Unable to get certificate from peer"
-msgstr ""
+msgstr "Kunne ikke hente sertifikat"
 
 #: libmutt/imap/imap_ssl.c:224
 #, c-format
@@ -429,20 +463,19 @@ msgstr "Sjekk av SSL-sertifikat"
 
 #: libmutt/imap/imap_ssl.c:481
 msgid "(r)eject, accept (o)nce, (a)ccept always"
-msgstr ""
+msgstr "(a)vvis, aksepter en (g)ang, aksepter a(l)ltid"
 
 #: libmutt/imap/imap_ssl.c:482
 msgid "roa"
-msgstr ""
+msgstr "agl"
 
 #: libmutt/imap/imap_ssl.c:486
 msgid "(r)eject, accept (o)nce"
-msgstr ""
+msgstr "(a)vvis, aksepter en (g)ang"
 
 #: libmutt/imap/imap_ssl.c:487
-#, fuzzy
 msgid "ro"
-msgstr "Fra"
+msgstr "ag"
 
 #: libmutt/imap/imap_ssl.c:491
 msgid "Exit  "
@@ -526,41 +559,49 @@ msgstr "Importer kun første adresse"
 msgid "Import all adresses"
 msgstr "Importer alle adresser"
 
-#: src/balsa-app.c:119
+#: src/balsa-app.c:92
+#, c-format
+msgid ""
+"Opening remote mailbox %s.\n"
+"The password for %s@%s:"
+msgstr ""
+
+#: src/balsa-app.c:95
+#, c-format
+msgid "Mailbox password for %s@%s:"
+msgstr "Passord for postboks for %s@%s:"
+
+#: src/balsa-app.c:145
 msgid "Balsa Warning"
 msgstr "Balsa-advarsel"
 
-#: src/balsa-app.c:290 src/balsa-app.c:295 src/balsa-app.c:300
-#: src/balsa-app.c:305 src/balsa-app.c:310
+#: src/balsa-app.c:316 src/balsa-app.c:321 src/balsa-app.c:326
+#: src/balsa-app.c:331 src/balsa-app.c:336
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa kan ikke åpne din \"%s\" postboks."
 
-#: src/balsa-app.c:290
+#: src/balsa-app.c:316
 msgid "Inbox"
 msgstr "Innboks"
 
-#: src/balsa-app.c:295
+#: src/balsa-app.c:321
 msgid "Outbox"
 msgstr "Utboks"
 
-#: src/balsa-app.c:300
+#: src/balsa-app.c:326
 msgid "Sentbox"
 msgstr "Sendt"
 
-#: src/balsa-app.c:305
+#: src/balsa-app.c:331
 msgid "Draftbox"
 msgstr "Skisser"
 
-#: src/balsa-app.c:310
+#: src/balsa-app.c:336
 msgid "Trash"
 msgstr "Søppel"
 
-#: src/balsa-index-page.c:268
-msgid "Mailbox password:"
-msgstr "Passord for postboks:"
-
-#: src/balsa-index-page.c:291
+#: src/balsa-index-page.c:256
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -568,48 +609,48 @@ msgstr ""
 "Kunne ikke åpne postboks\n"
 "Vennligst sjekk innstillingene."
 
-#: src/balsa-index-page.c:531 src/filter-edit-dialog.c:222
+#: src/balsa-index-page.c:496 src/filter-edit-dialog.c:222
 msgid "New"
 msgstr "Ny"
 
-#: src/balsa-index-page.c:534 src/main-window.c:395
+#: src/balsa-index-page.c:499 src/main-window.c:395
 msgid "Reply"
 msgstr "Svar"
 
-#: src/balsa-index-page.c:537 src/main-window.c:398
+#: src/balsa-index-page.c:502 src/main-window.c:398
 msgid "Reply to all"
 msgstr "Svar til alle"
 
-#: src/balsa-index-page.c:540 src/main-window.c:401
+#: src/balsa-index-page.c:505 src/main-window.c:401
 msgid "Forward"
 msgstr "Send videre"
 
-#: src/balsa-index-page.c:543 src/filter-edit-dialog.c:228
+#: src/balsa-index-page.c:508 src/filter-edit-dialog.c:228
 #: src/main-window.c:388 src/pref-manager.c:947
 msgid "Delete"
 msgstr "Slett"
 
-#: src/balsa-index-page.c:545
+#: src/balsa-index-page.c:510
 msgid "Undelete"
 msgstr "Angre slett"
 
-#: src/balsa-index-page.c:549 src/balsa-index-page.c:1129
+#: src/balsa-index-page.c:514 src/balsa-index-page.c:1094
 msgid "Store Address"
 msgstr "Lagre adresse"
 
-#: src/balsa-index-page.c:552 src/main-window.c:311
+#: src/balsa-index-page.c:517 src/main-window.c:311
 msgid "Toggle flagged"
 msgstr "Slå på/av flaggede"
 
-#: src/balsa-index-page.c:560
+#: src/balsa-index-page.c:525
 msgid "Transfer"
 msgstr "Overfør"
 
-#: src/balsa-index-page.c:734
+#: src/balsa-index-page.c:699
 msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr "Beklager, semikolon er ikke tillatt i navnet!\n"
 
-#: src/balsa-index-page.c:766
+#: src/balsa-index-page.c:731
 #, c-format
 msgid ""
 "Unable to open %s for read.\n"
@@ -618,11 +659,11 @@ msgstr ""
 "Kunne ikke åpne %s for lesing.\n"
 " - %s\n"
 
-#: src/balsa-index-page.c:771
+#: src/balsa-index-page.c:736
 msgid "The Card Name field must be non-empty.\n"
 msgstr "Feltet med navn på kortet kan ikke være tomt.\n"
 
-#: src/balsa-index-page.c:777
+#: src/balsa-index-page.c:742
 #, c-format
 msgid ""
 "There is already an address book entry for %s.\n"
@@ -631,39 +672,39 @@ msgstr ""
 "Det finnes allerede en oppføring i adresseboken for %s.\n"
 "Kjør GnomeCard hvis du ønsker å redigere oppføringer i adresseboken.\n"
 
-#: src/balsa-index-page.c:1041
+#: src/balsa-index-page.c:1006
 msgid "Card Name:"
 msgstr "Navn på kort:"
 
-#: src/balsa-index-page.c:1041
+#: src/balsa-index-page.c:1006
 msgid "First Name:"
 msgstr "Fornavn:"
 
-#: src/balsa-index-page.c:1042
+#: src/balsa-index-page.c:1007
 msgid "Last Name:"
 msgstr "Etternavn:"
 
-#: src/balsa-index-page.c:1042
+#: src/balsa-index-page.c:1007
 msgid "Organization:"
 msgstr "Organisasjon:"
 
-#: src/balsa-index-page.c:1043
+#: src/balsa-index-page.c:1008
 msgid "Email Address:"
 msgstr "E-post adresse:"
 
-#: src/balsa-index-page.c:1058
+#: src/balsa-index-page.c:1023
 msgid "In order to store an address, you must select a message.\n"
 msgstr "For å lagre en adresse må du først velge den.\n"
 
-#: src/balsa-index-page.c:1068
+#: src/balsa-index-page.c:1033
 msgid "You may only store one address at a time.\n"
 msgstr "Du kan kun lagre en adresse om gangen.\n"
 
-#: src/balsa-index-page.c:1081
+#: src/balsa-index-page.c:1046
 msgid "This message doesn't contain an e-mail address.\n"
 msgstr "Denne meldingen inneholder ikke en e-post adresse.\n"
 
-#: src/balsa-index-page.c:1132
+#: src/balsa-index-page.c:1097
 msgid "Contact Information"
 msgstr "Kontaktinformasjon"
 
@@ -683,7 +724,7 @@ msgstr "Dato"
 msgid "To"
 msgstr "Til"
 
-#: src/balsa-mblist.c:218 src/mailbox-conf.c:1209
+#: src/balsa-mblist.c:218 src/mailbox-conf.c:1211
 msgid "Mailbox"
 msgstr "Postboks"
 
@@ -882,7 +923,7 @@ msgstr "Kropp"
 msgid "Match string:"
 msgstr "Finn streng:"
 
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1174
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1176
 #: src/pref-manager.c:934
 msgid "Add"
 msgstr "Legg til"
@@ -1001,7 +1042,7 @@ msgstr "Oooops! postboks ikke funnet i balsa_app.mailbox noder?\n"
 msgid "Mailbox Configurator"
 msgstr "Postbokskonfigurering"
 
-#: src/mailbox-conf.c:330 src/mailbox-conf.c:1168
+#: src/mailbox-conf.c:330 src/mailbox-conf.c:1170
 msgid "Update"
 msgstr "Oppdater"
 
@@ -1046,70 +1087,70 @@ msgstr "Noen av feltene er tomme."
 msgid "%s on %s"
 msgstr "%s på %s"
 
-#: src/mailbox-conf.c:851
+#: src/mailbox-conf.c:853
 msgid "New mailbox type:"
 msgstr "Ny postboks type:"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:857
+#: src/mailbox-conf.c:859
 msgid "Local mailbox"
 msgstr "Lokal postboks"
 
-#: src/mailbox-conf.c:867
+#: src/mailbox-conf.c:869
 msgid "Single IMAP folder"
 msgstr "Enkel IMAP-mappe"
 
-#: src/mailbox-conf.c:876
+#: src/mailbox-conf.c:878
 msgid "IMAP folder set"
 msgstr "IMAP mappesett"
 
 #. mailbox name
-#: src/mailbox-conf.c:901 src/mailbox-conf.c:936 src/mailbox-conf.c:1061
+#: src/mailbox-conf.c:903 src/mailbox-conf.c:938 src/mailbox-conf.c:1063
 msgid "Mailbox Name:"
 msgstr "Navn på postboks"
 
 #. path to file
-#: src/mailbox-conf.c:911
+#: src/mailbox-conf.c:913
 msgid "Mailbox path:"
 msgstr "Sti til postboks:"
 
 #. pop server
-#: src/mailbox-conf.c:953 src/mailbox-conf.c:1071
+#: src/mailbox-conf.c:955 src/mailbox-conf.c:1073
 msgid "Server:"
 msgstr "Tjener:"
 
 #. pop port
-#: src/mailbox-conf.c:972 src/mailbox-conf.c:1085
+#: src/mailbox-conf.c:974 src/mailbox-conf.c:1087
 msgid "Port:"
 msgstr "Port:"
 
 #. username
-#: src/mailbox-conf.c:991 src/mailbox-conf.c:1100
+#: src/mailbox-conf.c:993 src/mailbox-conf.c:1102
 msgid "Username:"
 msgstr "Brukernavn:"
 
 #. password field
-#: src/mailbox-conf.c:1008 src/mailbox-conf.c:1115
+#: src/mailbox-conf.c:1010 src/mailbox-conf.c:1117
 msgid "Password:"
 msgstr "Passord:"
 
 #. toggle for apop
-#: src/mailbox-conf.c:1023
+#: src/mailbox-conf.c:1025
 msgid "Use APOP"
 msgstr "Bruk APOP"
 
 #. toggle for check
-#: src/mailbox-conf.c:1031 src/main-window.c:384
+#: src/mailbox-conf.c:1033 src/main-window.c:384
 msgid "Check"
 msgstr "Sjekk"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:1039
+#: src/mailbox-conf.c:1041
 msgid "Delete from server"
 msgstr "Slett fra tjener"
 
-#: src/mailbox-conf.c:1128
+#: src/mailbox-conf.c:1130
 msgid "Folder path:"
 msgstr "Sti til mappe:"
 

@@ -1,2 +1,6 @@
-[events]
-new mail=newmail.wav
+[__section_info__]
+description=E-mail
+
+[newmail]
+file=newmail.wav
+description=New mail notification

@@ -1,2 +1,6 @@
-[events]
-startup=balsa/startup.wav
+[__section_info__]
+description=Balsa E-mail reader
+
+[startup]
+file=balsa/startup.wav
+description=Program startup

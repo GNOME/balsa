@@ -3,15 +3,13 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD.nl\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-07-23 03:16+0200\n"
-"PO-Revision-Date: 2003-07-23 10:31+0200\n"
+"POT-Creation-Date: 2003-07-30 03:18+0200\n"
+"PO-Revision-Date: 2003-07-30 14:50+0100\n"
 "Last-Translator: Vincent van Adrighem <V.vanAdrighem@dirck.mine.nu>\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.0.1\n"
 
 #. The externq database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:242 libbalsa/address-book-ldap.c:370
@@ -138,12 +136,12 @@ msgstr "Fout bij verplaatsen van berichten"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:88 src/balsa-index-threading.c:547
-#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2284
-#: src/sendmsg-window.c:2285
+#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2320
+#: src/sendmsg-window.c:2321
 msgid "Re:"
 msgstr "Re:"
 
-#: libbalsa/identity.c:89 src/sendmsg-window.c:2314 src/sendmsg-window.c:2315
+#: libbalsa/identity.c:89 src/sendmsg-window.c:2350 src/sendmsg-window.c:2351
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -891,8 +889,8 @@ msgstr ""
 msgid "remember passphrase for"
 msgstr "wachtwoord onthouden voor"
 
-#: libbalsa/rfc3156.c:2089 src/pref-manager.c:1700 src/pref-manager.c:2530
-#: src/pref-manager.c:2551
+#: libbalsa/rfc3156.c:2089 src/pref-manager.c:1691 src/pref-manager.c:2519
+#: src/pref-manager.c:2540
 msgid "minutes"
 msgstr "minuten of er post is"
 
@@ -914,17 +912,17 @@ msgstr "gpgme kan geen nieuwe informatie aanmaken: %s"
 msgid "Sending Mail..."
 msgstr "Versturen post..."
 
-#: libbalsa/send.c:221 src/main-window.c:1795
+#: libbalsa/send.c:221 src/main-window.c:1790
 msgid "_Hide"
 msgstr "_Verbergen"
 
-#: libbalsa/send.c:369
+#: libbalsa/send.c:371
 msgid "Unable to open sentbox - could not get IMAP server information"
 msgstr ""
 "Niet in staat Verzonden items te openen - kan geen informatie krijgen van "
 "IMAP server"
 
-#: libbalsa/send.c:797
+#: libbalsa/send.c:799
 #, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -935,7 +933,7 @@ msgstr ""
 "%d: %s\n"
 "Het bericht staat nog in de wachtrij.\n"
 
-#: libbalsa/send.c:839
+#: libbalsa/send.c:841
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -946,7 +944,7 @@ msgstr ""
 "%d: %s\n"
 "Uw bericht is in de wachtrij achtergebleven.\n"
 
-#: libbalsa/send.c:849
+#: libbalsa/send.c:851
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -954,33 +952,33 @@ msgstr ""
 "Fout tijdens versturen bericht, bericht wordt in de wachtrij geplaatst.\n"
 "Systeem zal bericht opnieuw proberen te versturen totdat u het verwijdert."
 
-#: libbalsa/send.c:879
+#: libbalsa/send.c:881
 msgid "Connected to MTA"
 msgstr "Verbinden met MTA"
 
-#: libbalsa/send.c:886 src/balsa-message.c:1230 src/print.c:349
-#: src/sendmsg-window.c:665 src/sendmsg-window.c:2102 src/store-address.c:323
+#: libbalsa/send.c:888 src/balsa-message.c:1230 src/print.c:349
+#: src/sendmsg-window.c:667 src/sendmsg-window.c:2138 src/store-address.c:323
 msgid "From:"
 msgstr "Van:"
 
-#: libbalsa/send.c:889 src/balsa-index.c:360
+#: libbalsa/send.c:891 src/balsa-index.c:360
 msgid "From"
 msgstr "Van"
 
-#: libbalsa/send.c:897 src/balsa-message.c:1239 src/print.c:353
-#: src/sendmsg-window.c:664 src/sendmsg-window.c:2109 src/store-address.c:324
+#: libbalsa/send.c:899 src/balsa-message.c:1239 src/print.c:353
+#: src/sendmsg-window.c:666 src/sendmsg-window.c:2145 src/store-address.c:324
 msgid "To:"
 msgstr "Aan:"
 
-#: libbalsa/send.c:900 src/balsa-index.c:845
+#: libbalsa/send.c:902 src/balsa-index.c:845
 msgid "To"
 msgstr "Aan"
 
-#: libbalsa/send.c:936
+#: libbalsa/send.c:938
 msgid "Disconnected"
 msgstr "Verbinding verbroken"
 
-#: libbalsa/send.c:1129
+#: libbalsa/send.c:1131
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -994,7 +992,7 @@ msgstr ""
 "dan expliciet aan via: \"host:smtp\".\n"
 "Het bericht wordt in de Wachtrij gelaten."
 
-#: libbalsa/send.c:1139
+#: libbalsa/send.c:1141
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1003,15 +1001,15 @@ msgstr ""
 "SMTP serverprobleem (%d): %s\n"
 "Uw bericht is in de wachtrij achtergebleven."
 
-#: libbalsa/send.c:1551 libbalsa/send.c:1775
+#: libbalsa/send.c:1553 libbalsa/send.c:1777
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "Dit bericht zal niet gecodeerd worden voor de BCC:-ontvanger(s)."
 
-#: libbalsa/source-viewer.c:52 src/main-window.c:531
+#: libbalsa/source-viewer.c:52 src/main-window.c:529
 msgid "_Select Text"
 msgstr "_Selecteer Tekst"
 
-#: libbalsa/source-viewer.c:53 src/main-window.c:532
+#: libbalsa/source-viewer.c:53 src/main-window.c:530
 msgid "Select entire mail"
 msgstr "Selecteer gehele e-mail"
 
@@ -1489,7 +1487,7 @@ msgstr "Uitschrijven van %s..."
 msgid "Unable to fetch headers from this IMAP server version."
 msgstr "Niet in staat kopregels op te vragen van deze IMAP server versie."
 
-#: libmutt/imap/message.c:89 src/balsa-message.c:2855
+#: libmutt/imap/message.c:89 src/balsa-message.c:2856
 #, c-format
 msgid "Could not create temporary file %s"
 msgstr "Kan geen tijdelijk bestand %s aanmaken"
@@ -1670,7 +1668,7 @@ msgstr "certificaat verkrijgen van peer is mislukt"
 msgid "SSL connection using %s (%s)"
 msgstr "SSL verbinding met %s_(%s)"
 
-#: libmutt/mutt_ssl.c:440 src/pref-manager.c:1276 src/pref-manager.c:1375
+#: libmutt/mutt_ssl.c:440 src/pref-manager.c:1267 src/pref-manager.c:1366
 msgid "Unknown"
 msgstr "Onbekend"
 
@@ -2006,7 +2004,7 @@ msgid "Error displaying %s: %s\n"
 msgstr "Fout bij weergave van %s: %s\n"
 
 #: src/address-book-config.c:573 src/mailbox-conf.c:466
-#: src/pref-manager.c:1570 src/pref-manager.c:2710
+#: src/pref-manager.c:1561 src/pref-manager.c:2699
 msgid "_Add"
 msgstr "_Toevoegen"
 
@@ -2139,7 +2137,7 @@ msgstr "Postbus %s wordt geopend. Even geduld a.u.b..."
 msgid "_View Source"
 msgstr "Brontekst _weergeven"
 
-#: src/balsa-index.c:1892 src/main-window.c:462 src/message-window.c:116
+#: src/balsa-index.c:1892 src/main-window.c:460 src/message-window.c:116
 msgid "_Reply..."
 msgstr "_Beantwoorden..."
 
@@ -2159,16 +2157,16 @@ msgstr "_Doorsturen als bijvoeging..."
 msgid "Forward _Inline..."
 msgstr "_Ingevoegd doorsturen..."
 
-#: src/balsa-index.c:1902 src/main-window.c:564
+#: src/balsa-index.c:1902 src/main-window.c:562
 msgid "_Store Address..."
 msgstr "Bewaar _adres..."
 
 #: src/balsa-index.c:1915 src/filter-edit-dialog.c:216 src/mailbox-node.c:952
-#: src/main-window.c:546 src/pref-manager.c:1572 src/pref-manager.c:2714
+#: src/main-window.c:544 src/pref-manager.c:1563 src/pref-manager.c:2703
 msgid "_Delete"
 msgstr "_Verwijderen"
 
-#: src/balsa-index.c:1920 src/main-window.c:553
+#: src/balsa-index.c:1920 src/main-window.c:551
 msgid "_Undelete"
 msgstr "_Terughalen"
 
@@ -2302,28 +2300,28 @@ msgstr ""
 "\"multipart/encrypted\" gecodeerd berichtdeel. De structuur is echter "
 "ongeldig."
 
-#: src/balsa-message.c:1222 src/print.c:338 src/sendmsg-window.c:670
-#: src/sendmsg-window.c:2097
+#: src/balsa-message.c:1222 src/print.c:338 src/sendmsg-window.c:672
+#: src/sendmsg-window.c:2133
 msgid "Subject:"
 msgstr "Onderwerp:"
 
-#: src/balsa-message.c:1225 src/print.c:344 src/sendmsg-window.c:2091
+#: src/balsa-message.c:1225 src/print.c:344 src/sendmsg-window.c:2127
 msgid "Date:"
 msgstr "Datum:"
 
-#: src/balsa-message.c:1236 src/sendmsg-window.c:666
+#: src/balsa-message.c:1236 src/sendmsg-window.c:668
 msgid "Reply-To:"
 msgstr "Antwoord naar:"
 
 #. cc:
-#: src/balsa-message.c:1240 src/print.c:354 src/sendmsg-window.c:668
-#: src/sendmsg-window.c:1816 src/sendmsg-window.c:2116 src/store-address.c:325
+#: src/balsa-message.c:1240 src/print.c:354 src/sendmsg-window.c:670
+#: src/sendmsg-window.c:1852 src/sendmsg-window.c:2152 src/store-address.c:325
 msgid "Cc:"
 msgstr "Cc:"
 
 #. bcc:
-#: src/balsa-message.c:1241 src/print.c:355 src/sendmsg-window.c:667
-#: src/sendmsg-window.c:1821 src/store-address.c:326
+#: src/balsa-message.c:1241 src/print.c:355 src/sendmsg-window.c:669
+#: src/sendmsg-window.c:1857 src/store-address.c:326
 msgid "Bcc:"
 msgstr "Bcc:"
 
@@ -2419,7 +2417,7 @@ msgstr "Deel weergeven met %s"
 msgid "Calling URL %s..."
 msgstr "Lezen URL %s...."
 
-#: src/balsa-message.c:1988 src/balsa-message.c:2774 src/balsa-message.c:3395
+#: src/balsa-message.c:1988 src/balsa-message.c:2775 src/balsa-message.c:3396
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Fout bij weergeven %s: %s\n"
@@ -2447,51 +2445,51 @@ msgstr ""
 "Het door %s verstuurde bericht met het onderwerp \"%s\" bevat 8-bit tekens, "
 "maar geen header waarin de tekenset beschreven wordt (geconverteerd naar %s)"
 
-#: src/balsa-message.c:2417
+#: src/balsa-message.c:2418
 msgid "mixed parts"
 msgstr "gemengde delen"
 
-#: src/balsa-message.c:2419
+#: src/balsa-message.c:2420
 msgid "alternative parts"
 msgstr "alternatieve delen"
 
-#: src/balsa-message.c:2421
+#: src/balsa-message.c:2422
 msgid "signed parts"
 msgstr "ondertekende delen"
 
-#: src/balsa-message.c:2423
+#: src/balsa-message.c:2424
 msgid "encrypted parts"
 msgstr "versleutelde delen"
 
-#: src/balsa-message.c:2425
+#: src/balsa-message.c:2426
 msgid "rfc822 message"
 msgstr "rfc822 bericht"
 
-#: src/balsa-message.c:2427
+#: src/balsa-message.c:2428
 #, c-format
 msgid "\"%s\" parts"
 msgstr "\"%s\" delen"
 
-#: src/balsa-message.c:2462
+#: src/balsa-message.c:2463
 #, c-format
 msgid "rfc822 message (from %s, subject \"%s\")"
 msgstr "rfc822 bericht (van %s, onderwerp \"%s\")"
 
-#: src/balsa-message.c:2548
+#: src/balsa-message.c:2549
 #, c-format
 msgid "Open with %s"
 msgstr "Openen met %s"
 
-#: src/balsa-message.c:2686
+#: src/balsa-message.c:2687
 msgid "Save..."
 msgstr "Bewaren..."
 
-#: src/balsa-message.c:2900
+#: src/balsa-message.c:2901
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "Kan geen tijdelijk bestand %s aanmaken!"
 
-#: src/balsa-message.c:3640
+#: src/balsa-message.c:3641
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2502,7 +2500,7 @@ msgstr ""
 "Bericht Afleveringsnotificatie (MDN) verzocht naar `%s'.\n"
 "Wilt u deze notificatie versturen?"
 
-#: src/balsa-message.c:3647
+#: src/balsa-message.c:3648
 msgid "Reply to MDN?"
 msgstr "MDN beantwoorden? "
 
@@ -2575,7 +2573,7 @@ msgstr "Verwijderd"
 msgid "Replied"
 msgstr "Beantwoord"
 
-#: src/filter-edit-callbacks.c:781 src/main-window.c:444
+#: src/filter-edit-callbacks.c:781 src/main-window.c:442
 msgid "Flagged"
 msgstr "Vlag"
 
@@ -2630,25 +2628,25 @@ msgstr "_alles"
 msgid "C_lear"
 msgstr "_Legen"
 
-#: src/filter-edit-callbacks.c:990 src/main-window.c:2724
+#: src/filter-edit-callbacks.c:990 src/main-window.c:2719
 msgid "_Body"
 msgstr "_Inhoud"
 
 #. To:
-#: src/filter-edit-callbacks.c:997 src/main-window.c:2725
-#: src/sendmsg-window.c:1805
+#: src/filter-edit-callbacks.c:997 src/main-window.c:2720
+#: src/sendmsg-window.c:1841
 msgid "_To:"
 msgstr "_Aan:"
 
-#: src/filter-edit-callbacks.c:1004 src/main-window.c:2726
+#: src/filter-edit-callbacks.c:1004 src/main-window.c:2721
 msgid "_From:"
 msgstr "_Van:"
 
-#: src/filter-edit-callbacks.c:1012 src/sendmsg-window.c:308
+#: src/filter-edit-callbacks.c:1012 src/sendmsg-window.c:310
 msgid "_Subject"
 msgstr "_Onderwerp"
 
-#: src/filter-edit-callbacks.c:1019 src/main-window.c:2728
+#: src/filter-edit-callbacks.c:1019 src/main-window.c:2723
 msgid "_Cc:"
 msgstr "_Cc:"
 
@@ -2694,7 +2692,7 @@ msgstr "U moet een geluid opgeven"
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr "(Voorbeeld: schrijf 31 December 2002, als %s)"
 
-#: src/filter-edit-dialog.c:88 src/pref-manager.c:351
+#: src/filter-edit-dialog.c:88 src/pref-manager.c:350
 msgid "Simple"
 msgstr "Eenvoudig"
 
@@ -2739,7 +2737,7 @@ msgid "AND"
 msgstr "EN"
 
 #. new button
-#: src/filter-edit-dialog.c:210 src/mailbox-node.c:924 src/main-window.c:287
+#: src/filter-edit-dialog.c:210 src/mailbox-node.c:924 src/main-window.c:285
 msgid "_New"
 msgstr "_Nieuw"
 
@@ -3107,7 +3105,7 @@ msgstr "_Verwijderen uit lijst"
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Oooop! postbus niet gevonden in balsa_app.mailbox nodes?\n"
 
-#: src/mailbox-conf.c:406 src/sendmsg-window.c:810
+#: src/mailbox-conf.c:406 src/sendmsg-window.c:846
 msgid "Select Identity"
 msgstr "Identiteit"
 
@@ -3205,7 +3203,7 @@ msgstr "Weergegeven naam:"
 msgid "_From"
 msgstr "_Van"
 
-#: src/mailbox-conf.c:1163 src/sendmsg-window.c:306
+#: src/mailbox-conf.c:1163 src/sendmsg-window.c:308
 msgid "_To"
 msgstr "_Aan"
 
@@ -3251,7 +3249,7 @@ msgstr "_Herlezen"
 msgid "_Open"
 msgstr "_Openen"
 
-#: src/mailbox-node.c:943 src/main-window.c:630
+#: src/mailbox-node.c:943 src/main-window.c:628
 msgid "_Close"
 msgstr "Sl_uiten"
 
@@ -3298,454 +3296,454 @@ msgstr "Lokaal postbus %s geladen als: %s\n"
 msgid "Local folder %s\n"
 msgstr "Lokale postbus %s\n"
 
-#: src/main-window.c:246
+#: src/main-window.c:244
 msgid "_Message..."
 msgstr "_Bericht..."
 
-#: src/main-window.c:246
+#: src/main-window.c:244
 msgid "Compose a new message"
 msgstr "Maak een nieuw bericht"
 
-#: src/main-window.c:252
+#: src/main-window.c:250
 msgid "Local mbox mailbox..."
 msgstr "Lokaal Mbox postbus..."
 
-#: src/main-window.c:253
+#: src/main-window.c:251
 msgid "Add a new mbox style mailbox"
 msgstr "Toevoegen nieuw mbox postbus"
 
-#: src/main-window.c:257
+#: src/main-window.c:255
 msgid "Local Maildir mailbox..."
 msgstr "Lokaal Maildir postbus..."
 
-#: src/main-window.c:258
+#: src/main-window.c:256
 msgid "Add a new Maildir style mailbox"
 msgstr "Toevoegen nieuw Maildir Postbus"
 
-#: src/main-window.c:262
+#: src/main-window.c:260
 msgid "Local MH mailbox..."
 msgstr "Lokaal MH postbus..."
 
-#: src/main-window.c:263
+#: src/main-window.c:261
 msgid "Add a new MH style mailbox"
 msgstr "Toevoegen nieuw MH postbus"
 
-#: src/main-window.c:267 src/pref-manager.c:2877
+#: src/main-window.c:265 src/pref-manager.c:2866
 msgid "Remote IMAP mailbox..."
 msgstr "IMAP postbus op afstand..."
 
-#: src/main-window.c:268
+#: src/main-window.c:266
 msgid "Add a new IMAP mailbox"
 msgstr "Toevoegen nieuw IMAP postbus"
 
-#: src/main-window.c:273 src/pref-manager.c:2882
+#: src/main-window.c:271 src/pref-manager.c:2871
 msgid "Remote IMAP folder..."
 msgstr "IMAP map op afstand..."
 
-#: src/main-window.c:274
+#: src/main-window.c:272
 msgid "Add a new IMAP folder"
 msgstr "Toevoegen nieuw IMAP map"
 
-#: src/main-window.c:278
+#: src/main-window.c:276
 msgid "Remote IMAP subfolder..."
 msgstr "Server IMAP submap..."
 
-#: src/main-window.c:279
+#: src/main-window.c:277
 msgid "Add a new IMAP subfolder"
 msgstr "Nieuwe IMAP submap toevoegen"
 
-#: src/main-window.c:291
+#: src/main-window.c:289
 msgid "_Continue"
 msgstr "_Doorgaan"
 
-#: src/main-window.c:292
+#: src/main-window.c:290
 msgid "Continue editing current message"
 msgstr "Doorgaan met het bewerken van het bericht"
 
-#: src/main-window.c:299
+#: src/main-window.c:297
 msgid "_Get New Mail"
 msgstr "_Nieuwe post ophalen"
 
-#: src/main-window.c:299
+#: src/main-window.c:297
 msgid "Fetch new incoming mail"
 msgstr "Haal nieuwe binnenkomende mail"
 
-#: src/main-window.c:305
+#: src/main-window.c:303
 msgid "_Send Queued Mail"
 msgstr "_Wachtende post versturen"
 
-#: src/main-window.c:306
+#: src/main-window.c:304
 msgid "Send messages from the outbox"
 msgstr "Verstuur berichten uit de wachtrij"
 
-#: src/main-window.c:312
+#: src/main-window.c:310
 msgid "Send and _Receive Mail"
 msgstr "_Wachtende post versturen en ophalen"
 
-#: src/main-window.c:313 src/toolbar-factory.c:123
+#: src/main-window.c:311 src/toolbar-factory.c:123
 msgid "Send and Receive messages"
 msgstr "Verstuur en ontvang berichten"
 
-#: src/main-window.c:318 src/sendmsg-window.c:232
+#: src/main-window.c:316 src/sendmsg-window.c:234
 msgid "_Print..."
 msgstr "Af_drukken..."
 
-#: src/main-window.c:319 src/toolbar-factory.c:119
+#: src/main-window.c:317 src/toolbar-factory.c:119
 msgid "Print current message"
 msgstr "Huidige bericht afdrukken"
 
-#: src/main-window.c:325
+#: src/main-window.c:323
 msgid "_Address Book..."
 msgstr "Adres_boek..."
 
-#: src/main-window.c:326
+#: src/main-window.c:324
 msgid "Open the address book"
 msgstr "Open het adresboek"
 
-#: src/main-window.c:353
+#: src/main-window.c:351
 msgid "F_ilters..."
 msgstr "F_ilters..."
 
-#: src/main-window.c:353
+#: src/main-window.c:351
 msgid "Manage filters"
 msgstr "Beheer van filters"
 
-#: src/main-window.c:355
+#: src/main-window.c:353
 msgid "_Export Filters"
 msgstr "Filters _exporteren"
 
-#: src/main-window.c:355
+#: src/main-window.c:353
 msgid "Export filters as Sieve scripts"
 msgstr "Exporteer filters als Sieve scripts"
 
-#: src/main-window.c:361
+#: src/main-window.c:359
 msgid "_No Headers"
 msgstr "_Geen kopregels"
 
-#: src/main-window.c:361
+#: src/main-window.c:359
 msgid "Display no headers"
 msgstr "Toon geen kopregels"
 
-#: src/main-window.c:363
+#: src/main-window.c:361
 msgid "S_elected Headers"
 msgstr "Ge_selecteerde kopregels"
 
-#: src/main-window.c:364
+#: src/main-window.c:362
 msgid "Display selected headers"
 msgstr "Toon geselecteerde kopregels"
 
-#: src/main-window.c:366 src/message-window.c:77
+#: src/main-window.c:364 src/message-window.c:77
 msgid "All _Headers"
 msgstr "Alle _kopregels"
 
-#: src/main-window.c:366
+#: src/main-window.c:364
 msgid "Display all headers"
 msgstr "Toon alle kopregels"
 
-#: src/main-window.c:373
+#: src/main-window.c:371
 msgid "_Flat index"
 msgstr "_Platte index"
 
-#: src/main-window.c:374
+#: src/main-window.c:372
 msgid "No threading at all"
 msgstr "Ongenest weergeven"
 
-#: src/main-window.c:379
+#: src/main-window.c:377
 msgid "Si_mple threading"
 msgstr "Si_mpel nesten"
 
-#: src/main-window.c:380
+#: src/main-window.c:378
 msgid "Simple threading algorithm"
 msgstr "Simpel nestings-algoritme"
 
-#: src/main-window.c:385
+#: src/main-window.c:383
 msgid "_JWZ threading"
 msgstr "_JWZ genest"
 
-#: src/main-window.c:386
+#: src/main-window.c:384
 msgid "Elaborate JWZ threading"
 msgstr "Uitgebreide JWZ-manier van nesten"
 
-#: src/main-window.c:396
+#: src/main-window.c:394
 msgid "_Show Mailbox Tree"
 msgstr "_Toon postbussenboom"
 
-#: src/main-window.c:397
+#: src/main-window.c:395
 msgid "Toggle display of mailbox and folder tree"
 msgstr "Schakel tussen postbus- en mapboom"
 
-#: src/main-window.c:400
+#: src/main-window.c:398
 msgid "Show Mailbox _Tabs"
 msgstr "Toon postbus _tabbladen"
 
-#: src/main-window.c:401
+#: src/main-window.c:399
 msgid "Toggle display of mailbox notebook tabs"
 msgstr "Schakelen postbus tabbladen"
 
-#: src/main-window.c:405 src/message-window.c:107
+#: src/main-window.c:403 src/message-window.c:107
 msgid "_Wrap"
 msgstr "_Afbreken"
 
-#: src/main-window.c:405 src/sendmsg-window.c:261
+#: src/main-window.c:403 src/sendmsg-window.c:263
 msgid "Wrap message lines"
 msgstr "Berichtregels afbreken"
 
-#: src/main-window.c:413
+#: src/main-window.c:411
 msgid "E_xpand All"
 msgstr "Alles ui_tklappen"
 
-#: src/main-window.c:414
+#: src/main-window.c:412
 msgid "Expand all threads"
 msgstr "Alle discussies uitklappen"
 
-#: src/main-window.c:418
+#: src/main-window.c:416
 msgid "_Collapse All"
 msgstr "_Klap alles in"
 
-#: src/main-window.c:419
+#: src/main-window.c:417
 msgid "Collapse all expanded threads"
 msgstr "Alle uitgeklapte discussies inklappen"
 
-#: src/main-window.c:424
+#: src/main-window.c:422
 msgid "Zoom _In"
 msgstr "_Inzoomen"
 
-#: src/main-window.c:424
+#: src/main-window.c:422
 msgid "Increase magnification"
 msgstr "Vergroten"
 
-#: src/main-window.c:428
+#: src/main-window.c:426
 msgid "Zoom _Out"
 msgstr "_Uitzoomen"
 
-#: src/main-window.c:428
+#: src/main-window.c:426
 msgid "Decrease magnification"
 msgstr "Verkleinen"
 
 #. To warn msgfmt that the % sign isn't a format specifier:
-#: src/main-window.c:434
+#: src/main-window.c:432
 #, no-c-format
 msgid "Zoom _100%"
 msgstr "_Originele grootte"
 
-#: src/main-window.c:434
+#: src/main-window.c:432
 msgid "No magnification"
 msgstr "Geen uitvergroting"
 
-#: src/main-window.c:444
+#: src/main-window.c:442
 msgid "Toggle flagged"
 msgstr "Vlag omschakelen"
 
-#: src/main-window.c:451
+#: src/main-window.c:449
 msgid "New"
 msgstr "Nieuw"
 
-#: src/main-window.c:451
+#: src/main-window.c:449
 msgid "Toggle New"
 msgstr "Schakelen nieuw"
 
-#: src/main-window.c:463 src/toolbar-factory.c:99
+#: src/main-window.c:461 src/toolbar-factory.c:99
 msgid "Reply to the current message"
 msgstr "Beantwoord huidig bericht"
 
-#: src/main-window.c:470 src/message-window.c:121
+#: src/main-window.c:468 src/message-window.c:121
 msgid "Reply to _All..."
 msgstr "_Iedereen beantwoorden..."
 
-#: src/main-window.c:471
+#: src/main-window.c:469
 msgid "Reply to all recipients of the current message"
 msgstr "Beantwoord alle ontvangers van het huidige bericht"
 
-#: src/main-window.c:478 src/message-window.c:127
+#: src/main-window.c:476 src/message-window.c:127
 msgid "Reply to _Group..."
 msgstr "Beantwoord _groep..."
 
-#: src/main-window.c:479 src/message-window.c:128 src/toolbar-factory.c:103
+#: src/main-window.c:477 src/message-window.c:128 src/toolbar-factory.c:103
 msgid "Reply to mailing list"
 msgstr "Mailing lijst beantwoorden"
 
-#: src/main-window.c:486 src/message-window.c:133
+#: src/main-window.c:484 src/message-window.c:133
 msgid "_Forward attached..."
 msgstr "_Stuur als bijvoeging door..."
 
-#: src/main-window.c:487
+#: src/main-window.c:485
 msgid "Forward the current message as attachment"
 msgstr "Het huidige bericht doorsturen als bijvoeging"
 
-#: src/main-window.c:493
+#: src/main-window.c:491
 msgid "Forward _inline..."
 msgstr "_Ingevoegd doorsturen..."
 
-#: src/main-window.c:494
+#: src/main-window.c:492
 msgid "Forward the current message inline"
 msgstr "Het huidige bericht ingevoegd doorsturen"
 
-#: src/main-window.c:501 src/message-window.c:144
+#: src/main-window.c:499 src/message-window.c:144
 msgid "Next Part"
 msgstr "Volgend deel"
 
-#: src/main-window.c:501 src/message-window.c:144
+#: src/main-window.c:499 src/message-window.c:144
 msgid "Next part in message"
 msgstr "Volgend deel in bericht"
 
-#: src/main-window.c:507 src/message-window.c:148
+#: src/main-window.c:505 src/message-window.c:148
 msgid "Previous Part"
 msgstr "Vorig deel"
 
-#: src/main-window.c:508 src/message-window.c:149
+#: src/main-window.c:506 src/message-window.c:149
 msgid "Previous part in message"
 msgstr "Vorig deel in bericht"
 
-#: src/main-window.c:514 src/message-window.c:153
+#: src/main-window.c:512 src/message-window.c:153
 msgid "Save Current Part..."
 msgstr "Huidig deel bewaren..."
 
-#: src/main-window.c:515 src/message-window.c:154
+#: src/main-window.c:513 src/message-window.c:154
 msgid "Save current part in message"
 msgstr "Huidige deel in bericht bewaren"
 
-#: src/main-window.c:521 src/message-window.c:158
+#: src/main-window.c:519 src/message-window.c:158
 msgid "_View Source..."
 msgstr "Brontekst _weergeven..."
 
-#: src/main-window.c:522 src/message-window.c:159
+#: src/main-window.c:520 src/message-window.c:159
 msgid "View source form of the message"
 msgstr "Brontekst van het bericht weergeven"
 
-#: src/main-window.c:540
+#: src/main-window.c:538
 msgid "_Move to Trash"
 msgstr "_Verplaats naar prullenbak"
 
-#: src/main-window.c:541
+#: src/main-window.c:539
 msgid "Move the current message to Trash mailbox"
 msgstr "Verplaats het huidige bericht naar de prullenbak"
 
-#: src/main-window.c:547
+#: src/main-window.c:545
 msgid "Delete the current message"
 msgstr "Verwijder het huidige bericht"
 
-#: src/main-window.c:553
+#: src/main-window.c:551
 msgid "Undelete the message"
 msgstr "Haal het bericht terug"
 
 #. !
-#: src/main-window.c:559
+#: src/main-window.c:557
 msgid "_Toggle"
 msgstr "_Schakelen"
 
-#: src/main-window.c:565
+#: src/main-window.c:563
 msgid "Store address of sender in addressbook"
 msgstr "Sla het adres van de zender op in het adresboek"
 
-#: src/main-window.c:575
+#: src/main-window.c:573
 msgid "Next Message"
 msgstr "Volgend bericht"
 
-#: src/main-window.c:581
+#: src/main-window.c:579
 msgid "Previous Message"
 msgstr "Vorig bericht"
 
-#: src/main-window.c:587 src/main-window.c:588
+#: src/main-window.c:585 src/main-window.c:586
 msgid "Next Unread Message"
 msgstr "Volgend ongelezen bericht"
 
-#: src/main-window.c:594 src/main-window.c:595
+#: src/main-window.c:592 src/main-window.c:593
 msgid "Next Flagged Message"
 msgstr "Volgend gevinkte bericht"
 
-#: src/main-window.c:602
+#: src/main-window.c:600
 msgid "Select all"
 msgstr "Alles Selecteren"
 
-#: src/main-window.c:603
+#: src/main-window.c:601
 msgid "Select all messages in current mailbox"
 msgstr "Selecteer alle berichten in het huidige postbus"
 
-#: src/main-window.c:609
+#: src/main-window.c:607
 msgid "_Edit..."
 msgstr "_Bewerken"
 
-#: src/main-window.c:609
+#: src/main-window.c:607
 msgid "Edit the selected mailbox"
 msgstr "Bewerk het geselecteerde postbus"
 
-#: src/main-window.c:613
+#: src/main-window.c:611
 msgid "_Delete..."
 msgstr "_Verwijderen"
 
-#: src/main-window.c:614
+#: src/main-window.c:612
 msgid "Delete the selected mailbox"
 msgstr "Verwijder het geselecteerde postbus"
 
-#: src/main-window.c:620
+#: src/main-window.c:618
 msgid "Co_mmit Current"
 msgstr "_Wijzigingen doorvoeren"
 
-#: src/main-window.c:621
+#: src/main-window.c:619
 msgid "Commit the changes in the currently opened mailbox"
 msgstr "Voer de wijziging door in het geopende postbus"
 
-#: src/main-window.c:625
+#: src/main-window.c:623
 msgid "Commit _All"
 msgstr "Voer _Alle wijzigingen door"
 
-#: src/main-window.c:626
+#: src/main-window.c:624
 msgid "Commit the changes in all mailboxes"
 msgstr "Voer de wijzigingen door in alle postbussen"
 
-#: src/main-window.c:630
+#: src/main-window.c:628
 msgid "Close mailbox"
 msgstr "Postbus sluiten"
 
-#: src/main-window.c:634
+#: src/main-window.c:632
 msgid "Empty _Trash"
 msgstr "_Leeg de prullenbak"
 
-#: src/main-window.c:635 src/toolbar-factory.c:141
+#: src/main-window.c:633 src/toolbar-factory.c:141
 msgid "Delete messages from the Trash mailbox"
 msgstr "Verwijder berichten uit de prullenbak"
 
-#: src/main-window.c:639
+#: src/main-window.c:637
 msgid "Edit/Apply _Filters"
 msgstr "_Filters bewerken/toepassen"
 
-#: src/main-window.c:640
+#: src/main-window.c:638
 msgid "Filter the content of the selected mailbox"
 msgstr "De inhoud van de geselecteerde postbus verwijderen"
 
-#: src/main-window.c:644
+#: src/main-window.c:642
 msgid "_Remove Duplicates"
 msgstr "Dub_bele berichten verwijderen"
 
-#: src/main-window.c:645
+#: src/main-window.c:643
 msgid "Remove duplicated messages from the selected mailbox"
 msgstr "Dubbele berichten verwijderen uit de geselecteerde postbus"
 
-#: src/main-window.c:654
+#: src/main-window.c:652
 msgid "_Toolbars..."
 msgstr "Wer_kbalken..."
 
-#: src/main-window.c:655
+#: src/main-window.c:653
 msgid "Customize toolbars"
 msgstr "Werkbalken aanpassen"
 
-#: src/main-window.c:658
+#: src/main-window.c:656
 msgid "_Identities..."
 msgstr "_Identiteiten..."
 
-#: src/main-window.c:659
+#: src/main-window.c:657
 msgid "Create and set current identities"
 msgstr "Maak en stel huidige identiteiten in"
 
-#: src/main-window.c:675 src/message-window.c:175
+#: src/main-window.c:673 src/message-window.c:175
 msgid "_Message"
 msgstr "_Bericht"
 
-#: src/main-window.c:676
+#: src/main-window.c:674
 msgid "Mail_box"
 msgstr "_Postbus"
 
-#: src/main-window.c:767
+#: src/main-window.c:765
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
@@ -3753,7 +3751,7 @@ msgstr ""
 "Balsa is een e-mail aan het versturen.\n"
 "Breek versturen af?"
 
-#: src/main-window.c:1396
+#: src/main-window.c:1391
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -3761,11 +3759,11 @@ msgstr ""
 "Kan uw Postbus niet openen!\n"
 "Controleer uw instellingen"
 
-#: src/main-window.c:1675
+#: src/main-window.c:1670
 msgid "translator_credits"
 msgstr "Vincent van Adrighem"
 
-#: src/main-window.c:1690
+#: src/main-window.c:1685
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3777,129 +3775,129 @@ msgstr ""
 "\n"
 "Voor bugreports: http://bugzilla.gnome.org/"
 
-#: src/main-window.c:1792
+#: src/main-window.c:1787
 msgid "Checking Mail..."
 msgstr "Controleren post..."
 
-#: src/main-window.c:2090
+#: src/main-window.c:2085
 msgid "Finished Checking."
 msgstr "Klaar met controleren."
 
-#: src/main-window.c:2154
+#: src/main-window.c:2149
 #, c-format
 msgid "Sending error: %s"
 msgstr "Stuur fout: %s"
 
-#: src/main-window.c:2250
+#: src/main-window.c:2245
 msgid "Balsa: New mail"
 msgstr "Balsa: Nieuwe e-mail"
 
-#: src/main-window.c:2262
+#: src/main-window.c:2257
 #, c-format
 msgid "You have received %d new messages."
 msgstr "U heeft %d nieuwe berichten."
 
-#: src/main-window.c:2263
+#: src/main-window.c:2258
 msgid "You have received 1 new message."
 msgstr "U heeft 1 nieuw bericht."
 
-#: src/main-window.c:2684
+#: src/main-window.c:2679
 msgid "Search mailbox"
 msgstr "Postbus doorzoeken"
 
-#: src/main-window.c:2697
+#: src/main-window.c:2692
 msgid "_Reverse search"
 msgstr "_Achterstevoren zoeken"
 
-#: src/main-window.c:2700
+#: src/main-window.c:2695
 msgid "_Search for:"
 msgstr "_Zoek naar:"
 
-#: src/main-window.c:2713
+#: src/main-window.c:2708
 msgid "In:"
 msgstr "In:"
 
-#: src/main-window.c:2727
+#: src/main-window.c:2722
 msgid "S_ubject"
 msgstr "_Onderwerp"
 
-#: src/main-window.c:2842
+#: src/main-window.c:2837
 msgid "You can apply filters only on mailbox\n"
 msgstr "U kunt alleen filters toepassen op postbussen\n"
 
-#: src/main-window.c:2886 src/main-window.c:2905
+#: src/main-window.c:2881 src/main-window.c:2900
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Vastleggen van postbus %s mislukt."
 
-#: src/main-window.c:3098
+#: src/main-window.c:3029
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (alleen lezen)."
 
-#: src/main-window.c:3100
+#: src/main-window.c:3031
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3198
+#: src/main-window.c:3129
 msgid "Cannot access the message's body\n"
 msgstr "Kan berichttekst niet benaderen\n"
 
-#: src/main.c:119
+#: src/main.c:117
 msgid "Get new mail on startup"
 msgstr "Verkrijg nieuwe post bij opstarten"
 
-#: src/main.c:121
+#: src/main.c:119
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Opstellen nieuw bericht aan E-MAIL@ADRES"
 
-#: src/main.c:123
+#: src/main.c:121
 msgid "Attach file at PATH"
 msgstr "Voeg bestand in PATH toe"
 
-#: src/main.c:125
+#: src/main.c:123
 msgid "Opens MAILBOXNAME"
 msgstr "Opent POSTBUSNAAM"
 
-#: src/main.c:125
+#: src/main.c:123
 msgid "MAILBOXNAME"
 msgstr "POSTBUSNAAM"
 
-#: src/main.c:128
+#: src/main.c:126
 msgid "Opens first unread mailbox"
 msgstr "Open de eerste ongelezen Postbus"
 
-#: src/main.c:131
+#: src/main.c:129
 msgid "Opens default Inbox on startup"
 msgstr "Open standaard Postbus In tijdens opstarten"
 
-#: src/main.c:133
+#: src/main.c:131
 msgid "Debug POP3 connection"
 msgstr "Debug POP3 verbinding"
 
-#: src/main.c:169 src/main.c:174 src/main.c:180 src/main.c:186 src/main.c:192
+#: src/main.c:167 src/main.c:172 src/main.c:178 src/main.c:184 src/main.c:190
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa kan uw postbus \"%s\" niet openen."
 
-#: src/main.c:169
+#: src/main.c:167
 msgid "Inbox"
 msgstr "In"
 
-#: src/main.c:175
+#: src/main.c:173
 msgid "Outbox"
 msgstr "Wachtrij"
 
-#: src/main.c:181
+#: src/main.c:179
 msgid "Sentbox"
 msgstr "Verzonden"
 
-#: src/main.c:187
+#: src/main.c:185
 msgid "Draftbox"
 msgstr "Concepten"
 
-#: src/main.c:192
+#: src/main.c:190
 msgid "Trash"
 msgstr "Prullenbak"
 
@@ -3935,290 +3933,290 @@ msgstr "Stuur dit bericht door"
 msgid "M_ove"
 msgstr "_Verplaatsen"
 
-#: src/pref-manager.c:326
+#: src/pref-manager.c:325
 msgid "7 Bits"
 msgstr "7 bits"
 
-#: src/pref-manager.c:327
+#: src/pref-manager.c:326
 msgid "8 Bits"
 msgstr "8 bits"
 
-#: src/pref-manager.c:328
+#: src/pref-manager.c:327
 msgid "Quoted"
 msgstr "Geciteerd"
 
-#: src/pref-manager.c:338
+#: src/pref-manager.c:337
 msgid "While Retrieving Messages"
 msgstr "Tijdens ophalen van e-mail"
 
-#: src/pref-manager.c:339
+#: src/pref-manager.c:338
 msgid "Until Closed"
 msgstr "Tot het gesloten wordt"
 
-#: src/pref-manager.c:340 src/pref-manager.c:3040 src/pref-manager.c:3108
+#: src/pref-manager.c:339 src/pref-manager.c:3029 src/pref-manager.c:3097
 msgid "Never"
 msgstr "Nooit"
 
-#: src/pref-manager.c:344
+#: src/pref-manager.c:343
 msgid "Fast"
 msgstr "Snel"
 
-#: src/pref-manager.c:345
+#: src/pref-manager.c:344
 msgid "Normal"
 msgstr "Normaal"
 
-#: src/pref-manager.c:346
+#: src/pref-manager.c:345
 msgid "Bad Spellers"
 msgstr "Slechte spellers"
 
-#: src/pref-manager.c:350
+#: src/pref-manager.c:349
 msgid "Flat"
 msgstr "Plat"
 
-#: src/pref-manager.c:352
+#: src/pref-manager.c:351
 msgid "JWZ"
 msgstr "JWZ"
 
-#: src/pref-manager.c:356
+#: src/pref-manager.c:355
 msgid "west european (traditional)"
 msgstr "westeuropees (traditioneel)"
 
-#: src/pref-manager.c:357
+#: src/pref-manager.c:356
 msgid "east european"
 msgstr "oosteuropees"
 
-#: src/pref-manager.c:358
+#: src/pref-manager.c:357
 msgid "south european"
 msgstr "zuideuropees"
 
-#: src/pref-manager.c:359
+#: src/pref-manager.c:358
 msgid "north european"
 msgstr "noordeuropees"
 
-#: src/pref-manager.c:360
+#: src/pref-manager.c:359
 msgid "cyrillic (iso/windows)"
 msgstr "cyrilisch (iso/windows)"
 
-#: src/pref-manager.c:361
+#: src/pref-manager.c:360
 msgid "arabic"
 msgstr "arabisch"
 
-#: src/pref-manager.c:362
+#: src/pref-manager.c:361
 msgid "greek"
 msgstr "grieks"
 
-#: src/pref-manager.c:363
+#: src/pref-manager.c:362
 msgid "hebrew"
 msgstr "hebreeuws"
 
-#: src/pref-manager.c:364
+#: src/pref-manager.c:363
 msgid "turkish"
 msgstr "turks"
 
-#: src/pref-manager.c:365
+#: src/pref-manager.c:364
 msgid "nordic"
 msgstr "noors"
 
-#: src/pref-manager.c:366
+#: src/pref-manager.c:365
 msgid "thai"
 msgstr "thais"
 
-#: src/pref-manager.c:367
+#: src/pref-manager.c:366
 msgid "baltic"
 msgstr "baltisch"
 
-#: src/pref-manager.c:368
+#: src/pref-manager.c:367
 msgid "celtic"
 msgstr "celtisch"
 
-#: src/pref-manager.c:369
+#: src/pref-manager.c:368
 msgid "west european (euro)"
 msgstr "westeuropees (euro)"
 
-#: src/pref-manager.c:370
+#: src/pref-manager.c:369
 msgid "russian (koi)"
 msgstr "russisch (koi)"
 
-#: src/pref-manager.c:371
+#: src/pref-manager.c:370
 msgid "ukranian (koi)"
 msgstr "Oekraïns (koi)"
 
-#: src/pref-manager.c:372
+#: src/pref-manager.c:371
 msgid "japanese"
 msgstr "japans"
 
-#: src/pref-manager.c:373
+#: src/pref-manager.c:372
 msgid "korean"
 msgstr "koreaans"
 
-#: src/pref-manager.c:397
+#: src/pref-manager.c:396
 msgid "Balsa Preferences"
 msgstr "Balsa Instellingen"
 
-#: src/pref-manager.c:423
+#: src/pref-manager.c:422
 msgid "Mail Servers"
 msgstr "Mail Servers"
 
-#: src/pref-manager.c:427 src/pref-manager.c:2660
+#: src/pref-manager.c:426 src/pref-manager.c:2649
 msgid "Address Books"
 msgstr "Adresboeken"
 
-#: src/pref-manager.c:431
+#: src/pref-manager.c:430
 msgid "Mail Options"
 msgstr "Post Opties"
 
-#: src/pref-manager.c:435 src/pref-manager.c:2016
+#: src/pref-manager.c:434 src/pref-manager.c:2005
 msgid "Display"
 msgstr "Weergave"
 
-#: src/pref-manager.c:439 src/toolbar-factory.c:130
+#: src/pref-manager.c:438 src/toolbar-factory.c:130
 msgid "Spelling"
 msgstr "Spelling"
 
-#: src/pref-manager.c:443
+#: src/pref-manager.c:442
 msgid "Misc"
 msgstr "Diversen"
 
-#: src/pref-manager.c:447
+#: src/pref-manager.c:446
 msgid "Startup"
 msgstr "Opstarten"
 
-#: src/pref-manager.c:1279
+#: src/pref-manager.c:1270
 #, c-format
 msgid "%s (default)"
 msgstr "%s (standaard)"
 
-#: src/pref-manager.c:1529
+#: src/pref-manager.c:1520
 msgid "Remote Mailbox Servers"
 msgstr "Postbussen op server"
 
-#: src/pref-manager.c:1550 src/pref-manager.c:2681
+#: src/pref-manager.c:1541 src/pref-manager.c:2670
 msgid "Type"
 msgstr "Type"
 
-#: src/pref-manager.c:1558
+#: src/pref-manager.c:1549
 msgid "Mailbox Name"
 msgstr "Naam van postbus"
 
-#: src/pref-manager.c:1571 src/pref-manager.c:2712
+#: src/pref-manager.c:1562 src/pref-manager.c:2701
 msgid "_Modify"
 msgstr "_Wijzigen"
 
-#: src/pref-manager.c:1586
+#: src/pref-manager.c:1577
 msgid "Local Mail"
 msgstr "Lokale post"
 
-#: src/pref-manager.c:1588
+#: src/pref-manager.c:1579
 msgid "Select your local mail directory"
 msgstr "Selecteer uw lokale post map"
 
-#: src/pref-manager.c:1608
+#: src/pref-manager.c:1599
 msgid "Outgoing Mail"
 msgstr "Uitgaande post"
 
-#: src/pref-manager.c:1613
+#: src/pref-manager.c:1604
 msgid "Remote SMTP Server"
 msgstr "SMTP Server"
 
-#: src/pref-manager.c:1615
+#: src/pref-manager.c:1606
 msgid "User"
 msgstr "Gebruiker"
 
-#: src/pref-manager.c:1618
+#: src/pref-manager.c:1609
 msgid "Pass Phrase"
 msgstr "Wachtwoord"
 
 #. STARTTLS
-#: src/pref-manager.c:1622
+#: src/pref-manager.c:1613
 msgid "Use TLS"
 msgstr "TLS gebruiken"
 
-#: src/pref-manager.c:1640
+#: src/pref-manager.c:1631
 msgid "Certificate Pass Phrase"
 msgstr "Certificaat wachtwoord"
 
-#: src/pref-manager.c:1658
+#: src/pref-manager.c:1649
 msgid "Incoming"
 msgstr "Inkomend"
 
-#: src/pref-manager.c:1660
+#: src/pref-manager.c:1651
 msgid "Outgoing"
 msgstr "Uitgaand"
 
-#: src/pref-manager.c:1684
+#: src/pref-manager.c:1675
 msgid "Checking"
 msgstr "Controleren"
 
-#: src/pref-manager.c:1689
+#: src/pref-manager.c:1680
 msgid "_Check mail automatically every:"
 msgstr "_Kijk automatisch elke:"
 
-#: src/pref-manager.c:1706
+#: src/pref-manager.c:1697
 msgid "Check _IMAP mailboxes"
 msgstr "Controleer _IMAP postbussen"
 
-#: src/pref-manager.c:1712
+#: src/pref-manager.c:1703
 msgid "Check INBOX _only"
 msgstr "Controleer _alleen INBOX"
 
-#: src/pref-manager.c:1717
+#: src/pref-manager.c:1708
 msgid "Display message if new mail has arrived in an open mailbox"
 msgstr ""
 "Bericht weergeven als er nieuwe e-mail binnenkomt in een geopende postbus"
 
-#: src/pref-manager.c:1722
+#: src/pref-manager.c:1713
 msgid "Do background check quietly (no messages in status bar)"
 msgstr ""
 "Doe een (stille) controle in de achtergrond (geen berichten in status balk)"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: src/pref-manager.c:1740
+#: src/pref-manager.c:1731
 msgid "Quoted and Flowed Text"
 msgstr "Aangehaalde tekst"
 
-#: src/pref-manager.c:1744 src/sendmsg-window.c:3731
+#: src/pref-manager.c:1735 src/sendmsg-window.c:3787
 msgid "Quoted Text Regular Expression"
 msgstr "Reguliere expressie van geciteerde text"
 
-#: src/pref-manager.c:1755
+#: src/pref-manager.c:1746
 msgid "Wrap Incoming Text at:"
 msgstr "Breek inkomende tekst af op:"
 
-#: src/pref-manager.c:1766 src/pref-manager.c:1938
+#: src/pref-manager.c:1757 src/pref-manager.c:1929
 msgid "characters"
 msgstr "tekens"
 
 #. handling of multipart/alternative
-#: src/pref-manager.c:1781
+#: src/pref-manager.c:1772
 msgid "Display of Multipart/Alternative Parts"
 msgstr "Weergave van berichten met meerdere delen"
 
-#: src/pref-manager.c:1784
+#: src/pref-manager.c:1775
 msgid "prefer text/plain over html"
 msgstr "liever tekst dan html"
 
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
-#: src/pref-manager.c:1802
+#: src/pref-manager.c:1793
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr ""
 "Eigen (8-bit) tekens in gebroken berichten zonder tekensetaanduiding in "
 "header"
 
-#: src/pref-manager.c:1808
+#: src/pref-manager.c:1799
 msgid "display as \"?\""
 msgstr "weergeven als \"?\""
 
-#: src/pref-manager.c:1817
+#: src/pref-manager.c:1808
 msgid "display using codeset"
 msgstr "weergeven via tekenset"
 
 #. How to handle received MDN requests
-#: src/pref-manager.c:1849
+#: src/pref-manager.c:1840
 msgid "Message Disposition Notification Requests"
 msgstr "Afleveringsnotificatieverzoeken"
 
-#: src/pref-manager.c:1851
+#: src/pref-manager.c:1842
 msgid ""
 "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
@@ -4226,7 +4224,7 @@ msgstr ""
 "Wanneer ik een bericht ontvang en de afzender heeft om afleverings-\n"
 "notificatie verzocht (MDN), stuur dat in de volgende gevallen:"
 
-#: src/pref-manager.c:1862
+#: src/pref-manager.c:1853
 msgid ""
 "The message header looks clean\n"
 "(the notify-to address is equal to the return path,\n"
@@ -4236,291 +4234,286 @@ msgstr ""
 "(het notify-to adres is gelijk aan het return pad,\n"
 "ik sta in de \"Aan:\" of \"Cc:\" lijst)"
 
-#: src/pref-manager.c:1880
+#: src/pref-manager.c:1871
 msgid "The message header looks suspicious."
 msgstr "De kopregels van dit bericht zien er verdacht uit."
 
-#: src/pref-manager.c:1919
+#: src/pref-manager.c:1910
 msgid "Word Wrap"
 msgstr "Woordafbreking"
 
-#: src/pref-manager.c:1924
+#: src/pref-manager.c:1915
 msgid "Wrap Outgoing Text at:"
 msgstr "Gebruik regelterugloop, bij:"
 
-#: src/pref-manager.c:1952
+#: src/pref-manager.c:1943
 msgid "Other Options"
 msgstr "Overige opties"
 
-#: src/pref-manager.c:1958
-msgid "External editor command:"
-msgstr "Opdracht externe tekstverwerker:"
-
-#: src/pref-manager.c:1959
+#: src/pref-manager.c:1948
 msgid "Reply Prefix:"
 msgstr "Antwoordvoorvoegsel:"
 
-#: src/pref-manager.c:1962
+#: src/pref-manager.c:1951
 msgid "Edit headers in external editor"
 msgstr "Headers bewerken in externe tekstverwerker"
 
-#: src/pref-manager.c:1964
+#: src/pref-manager.c:1953
 msgid "Automatically quote original when replying"
 msgstr "Citeer automatisch het origineel bij beantwoorden"
 
-#: src/pref-manager.c:1967
+#: src/pref-manager.c:1956
 msgid "Don't include HTML parts as text when replying or forwarding mail"
 msgstr ""
 "Sluit HTML delen niet in tijdens het beantwoorden of doorsturen van e-mail"
 
-#: src/pref-manager.c:1970
+#: src/pref-manager.c:1959
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr "Stuur een e-mail door als attachment in plaats van het te citeren"
 
-#: src/pref-manager.c:1973
+#: src/pref-manager.c:1962
 msgid "Send button always queues outgoing mail in outbox"
 msgstr "Verstuur knop plaatst uitgaande e-mail altijd in wachtrij"
 
-#: src/pref-manager.c:1976
+#: src/pref-manager.c:1965
 msgid "Copy outgoing messages to sentbox"
 msgstr "Kopieer uitgaande berichten naar Verzonden items"
 
-#: src/pref-manager.c:1989 src/pref-manager.c:2113
+#: src/pref-manager.c:1978 src/pref-manager.c:2102
 msgid "Encoding"
 msgstr "Codering"
 
-#: src/pref-manager.c:2019
+#: src/pref-manager.c:2008
 msgid "Status Messages"
 msgstr "Statusmeldingen"
 
-#: src/pref-manager.c:2021
+#: src/pref-manager.c:2010
 msgid "Colors"
 msgstr "Kleuren"
 
-#: src/pref-manager.c:2023
+#: src/pref-manager.c:2012
 msgid "Message"
 msgstr "Bericht"
 
-#: src/pref-manager.c:2025 src/pref-manager.c:2353
+#: src/pref-manager.c:2014 src/pref-manager.c:2342
 msgid "Threading"
 msgstr "Discussies"
 
-#: src/pref-manager.c:2050
+#: src/pref-manager.c:2039
 msgid "Main Window"
 msgstr "Hoofdvenster"
 
-#: src/pref-manager.c:2053
+#: src/pref-manager.c:2042
 msgid "Use preview pane"
 msgstr "Voorbeeldvensterdeel gebruiken"
 
-#: src/pref-manager.c:2055
+#: src/pref-manager.c:2044
 msgid "Show mailbox statistics in left pane"
 msgstr "Toon postbusstatistieken in het linkergedeelte"
 
-#: src/pref-manager.c:2057
+#: src/pref-manager.c:2046
 msgid "Use alternative main window layout"
 msgstr "Alternatieve hoofdvensterindeling"
 
-#: src/pref-manager.c:2059
+#: src/pref-manager.c:2048
 msgid "Automatically view message when mailbox opened"
 msgstr "Automatisch tonen bericht bij openen postbus"
 
-#: src/pref-manager.c:2062
+#: src/pref-manager.c:2051
 msgid "Display message size as number of lines"
 msgstr "Toon bericht grootte als aantal regels"
 
-#: src/pref-manager.c:2067
+#: src/pref-manager.c:2056
 msgid "PageUp/PageDown keys scroll message by:"
 msgstr "PageUp/PageDown toetsen verplaatsen bericht:"
 
-#: src/pref-manager.c:2078
+#: src/pref-manager.c:2067
 msgid "percent"
 msgstr "procent"
 
-#: src/pref-manager.c:2093
+#: src/pref-manager.c:2082
 msgid "Display Progress Dialog"
 msgstr "Voortgangsdialoog weergeven"
 
-#: src/pref-manager.c:2118
+#: src/pref-manager.c:2107
 msgid "Date encoding (for strftime):"
 msgstr "Datumcodering (voor strftime):"
 
-#: src/pref-manager.c:2120
+#: src/pref-manager.c:2109
 msgid "Selected headers:"
 msgstr "Selecteer kopregels:"
 
-#: src/pref-manager.c:2122
+#: src/pref-manager.c:2111
 msgid "Message window title format:"
 msgstr "Titelweergave van berichtvenster:"
 
-#: src/pref-manager.c:2143 src/pref-manager.c:2148
+#: src/pref-manager.c:2132 src/pref-manager.c:2137
 msgid "Information Messages"
 msgstr "Informatieberichten"
 
-#: src/pref-manager.c:2152
+#: src/pref-manager.c:2141
 msgid "Warning Messages"
 msgstr "Waarschuwingsberichten"
 
-#: src/pref-manager.c:2156
+#: src/pref-manager.c:2145
 msgid "Error Messages"
 msgstr "Foutmeldingen"
 
-#: src/pref-manager.c:2160
+#: src/pref-manager.c:2149
 msgid "Fatal Error Messages"
 msgstr "Fatale foutmeldingen"
 
-#: src/pref-manager.c:2164
+#: src/pref-manager.c:2153
 msgid "Debug Messages"
 msgstr "Debugmelding"
 
-#: src/pref-manager.c:2189
+#: src/pref-manager.c:2178
 msgid "Mailbox Colors"
 msgstr "Postbuskleuren"
 
-#: src/pref-manager.c:2192
+#: src/pref-manager.c:2181
 msgid "Mailbox with unread messages color"
 msgstr "Postbus met ongelezen berichten kleur"
 
-#: src/pref-manager.c:2206
+#: src/pref-manager.c:2195
 msgid "Message Colors"
 msgstr "Berichtkleuren"
 
-#: src/pref-manager.c:2217
+#: src/pref-manager.c:2206
 #, c-format
 msgid "Quote level %d color"
 msgstr "Aanhalingsniveau %d kleur"
 
-#: src/pref-manager.c:2237
+#: src/pref-manager.c:2226
 msgid "Link Color"
 msgstr "Link Kleur"
 
-#: src/pref-manager.c:2239
+#: src/pref-manager.c:2228
 msgid "Hyperlink color"
 msgstr "Hyperlink kleur"
 
-#: src/pref-manager.c:2250
+#: src/pref-manager.c:2239
 msgid "Composition Window"
 msgstr "Opstellen venster"
 
-#: src/pref-manager.c:2254
+#: src/pref-manager.c:2243
 msgid "Invalid or incomplete address label color"
 msgstr "Ongeldig of incomplete adreslabelkleur"
 
-#. create a 2nd notebook page for the fonts
-#: src/pref-manager.c:2279 src/print.c:1413
+#: src/pref-manager.c:2268
 msgid "Fonts"
 msgstr "Lettertypen"
 
-#: src/pref-manager.c:2294 src/pref-manager.c:2319
+#: src/pref-manager.c:2283 src/pref-manager.c:2308
 msgid "Select a font to use"
 msgstr "Selecteer een lettertype om te gebruiken"
 
-#: src/pref-manager.c:2297 src/pref-manager.c:2322
+#: src/pref-manager.c:2286 src/pref-manager.c:2311
 msgid "Select..."
 msgstr "Selecteren..."
 
-#: src/pref-manager.c:2304
+#: src/pref-manager.c:2293
 msgid "Message Font"
 msgstr "Berichtlettertype"
 
-#: src/pref-manager.c:2330
+#: src/pref-manager.c:2319
 msgid "Message Subject Font"
 msgstr "Onderwerpslettertype"
 
-#: src/pref-manager.c:2356
+#: src/pref-manager.c:2345
 msgid "Expand mailbox tree on open"
 msgstr "Boom uitklapen bij openen"
 
-#: src/pref-manager.c:2360
+#: src/pref-manager.c:2349
 msgid "Default threading style"
 msgstr "Standaard discussieweergave"
 
-#: src/pref-manager.c:2439
+#: src/pref-manager.c:2428
 msgid "Pspell Settings"
 msgstr "Pspell instellingen"
 
-#: src/pref-manager.c:2445
+#: src/pref-manager.c:2434
 msgid "Spell Check Module"
 msgstr "Spellingscontrole module"
 
-#: src/pref-manager.c:2452
+#: src/pref-manager.c:2441
 msgid "Suggestion Level"
 msgstr "Suggestieniveau"
 
 #. do the ignore length
-#: src/pref-manager.c:2458
+#: src/pref-manager.c:2447
 msgid "Ignore words shorter than"
 msgstr "Negeer woorden korter dan"
 
-#: src/pref-manager.c:2479
+#: src/pref-manager.c:2468
 msgid "Miscellaneous Spelling Settings"
 msgstr "Diverse spellingsinstellingen"
 
-#: src/pref-manager.c:2481
+#: src/pref-manager.c:2470
 msgid "Check signature"
 msgstr "Controleer ondertekening"
 
-#: src/pref-manager.c:2482
+#: src/pref-manager.c:2471
 msgid "Check quoted"
 msgstr "Controleer geciteerd"
 
-#: src/pref-manager.c:2507
+#: src/pref-manager.c:2496
 msgid "Miscellaneous"
 msgstr "Allerlei"
 
-#: src/pref-manager.c:2509
+#: src/pref-manager.c:2498
 msgid "Debug"
 msgstr "Debug"
 
-#: src/pref-manager.c:2510
+#: src/pref-manager.c:2499
 msgid "Empty Trash on exit"
 msgstr "Leeg de prullenbak bij verlaten"
 
-#: src/pref-manager.c:2516
+#: src/pref-manager.c:2505
 msgid "Automatically close mailbox if unused more than"
 msgstr "Postbus automatisch sluiten na ongebruikt voor"
 
-#: src/pref-manager.c:2538
+#: src/pref-manager.c:2527
 msgid "Automatically commit mailbox if unused more than"
 msgstr "Postbus automatisch verwerken na ongebruikt voor"
 
-#: src/pref-manager.c:2555
+#: src/pref-manager.c:2544
 msgid "Drag-and-drop moves messages by default"
 msgstr "Slepen van berichten verplaatst deze standaard"
 
-#: src/pref-manager.c:2566
+#: src/pref-manager.c:2555
 msgid "Deleting Messages"
 msgstr "Bezig met verwijderen berichten"
 
-#: src/pref-manager.c:2569
+#: src/pref-manager.c:2558
 msgid "Delete immediately and irretrievably"
 msgstr "Verwijder onmiddelijk en onherroepelijk"
 
-#: src/pref-manager.c:2572
+#: src/pref-manager.c:2561
 msgid "Hide deleted messages"
 msgstr "Verwijderde berichten niet weergeven"
 
-#: src/pref-manager.c:2593
+#: src/pref-manager.c:2582
 msgid "Options"
 msgstr "Opties"
 
-#: src/pref-manager.c:2596
+#: src/pref-manager.c:2585
 msgid "Open Inbox upon startup"
 msgstr "Controleer INBOX in bij opstarten"
 
-#: src/pref-manager.c:2598
+#: src/pref-manager.c:2587
 msgid "Check mail upon startup"
 msgstr "Post ophalen bij opstarten"
 
-#: src/pref-manager.c:2600
+#: src/pref-manager.c:2589
 msgid "Remember open mailboxes between sessions"
 msgstr "Onthoud open postbussen tussen sessies."
 
-#: src/pref-manager.c:2614
+#: src/pref-manager.c:2603
 msgid "IMAP Folder Scanning"
 msgstr "IMAP folder scan"
 
-#: src/pref-manager.c:2616
+#: src/pref-manager.c:2605
 msgid ""
 "Choose depth 1 for fast startup; this defers scanning some folders.\n"
 "To see more of the tree at startup, choose a greater depth."
@@ -4529,59 +4522,59 @@ msgstr ""
 "van bepaalde mappen uitgesteld. Om meer van de boom te zien\n"
 "moet je een groter getal kiezen."
 
-#: src/pref-manager.c:2627
+#: src/pref-manager.c:2616
 msgid "Scan tree to depth"
 msgstr "Boom scennen tot diepte"
 
-#: src/pref-manager.c:2689
+#: src/pref-manager.c:2678
 msgid "Address Book Name"
 msgstr "Adresboeknaam"
 
-#: src/pref-manager.c:2697
+#: src/pref-manager.c:2686
 msgid "Expand aliases"
 msgstr "Breid aliasen uit"
 
-#: src/pref-manager.c:2716
+#: src/pref-manager.c:2705
 msgid "_Set as default"
 msgstr "In_stellen als standaard"
 
-#: src/pref-manager.c:2872
+#: src/pref-manager.c:2861
 msgid "Remote POP3 mailbox..."
 msgstr "POP3 postbus op afstand..."
 
-#: src/pref-manager.c:3018
+#: src/pref-manager.c:3007
 msgid "Show nothing"
 msgstr "Toon niets"
 
-#: src/pref-manager.c:3019
+#: src/pref-manager.c:3008
 msgid "Show dialog"
 msgstr "Toon dialoog"
 
-#: src/pref-manager.c:3020
+#: src/pref-manager.c:3009
 msgid "Show in list"
 msgstr "Toon in lijst"
 
-#: src/pref-manager.c:3021
+#: src/pref-manager.c:3010
 msgid "Print to console"
 msgstr "Afdrukken op console"
 
-#: src/pref-manager.c:3041
+#: src/pref-manager.c:3030
 msgid "Ask me"
 msgstr "Vraag mij"
 
-#: src/pref-manager.c:3042
+#: src/pref-manager.c:3031
 msgid "Always"
 msgstr "Altijd"
 
-#: src/pref-manager.c:3109
+#: src/pref-manager.c:3098
 msgid "If Possible"
 msgstr "Als Mogelijk"
 
-#: src/pref-manager.c:3110
+#: src/pref-manager.c:3099
 msgid "Required"
 msgstr "Vereist"
 
-#: src/pref-manager.c:3134
+#: src/pref-manager.c:3123
 #, c-format
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Fout bij weergeven van %s: %s\n"
@@ -4622,6 +4615,11 @@ msgstr "Aanpassen...."
 #: src/print.c:1404
 msgid "Print message"
 msgstr "Druk bericht af"
+
+#. create a 2nd notebook page for the fonts
+#: src/print.c:1413
+msgid "_Fonts"
+msgstr "_Lettertypen"
 
 #: src/print.c:1416
 msgid "Header font"
@@ -4682,314 +4680,314 @@ msgstr ""
 "De optie om \"format=flowed\" niet te versturen bevindt zich nu in het "
 "Opties-menu van het venster 'Nieuw bericht'."
 
-#: src/save-restore.c:952
+#: src/save-restore.c:949
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 "De optie om een afleveringsnotificatie (MDN) aan te vragen bevindt zich nu "
 "in het Opties-menu van het venster 'Nieuw bericht'."
 
-#: src/sendmsg-window.c:199
+#: src/sendmsg-window.c:201
 msgid "_Include File..."
 msgstr "_Invoegen bestand..."
 
-#: src/sendmsg-window.c:202
+#: src/sendmsg-window.c:204
 msgid "_Attach File..."
 msgstr "_Bijvoegen bestand..."
 
-#: src/sendmsg-window.c:205
+#: src/sendmsg-window.c:207
 msgid "I_nclude Message(s)"
 msgstr "Bericht(en) i_nsluiten"
 
-#: src/sendmsg-window.c:208
+#: src/sendmsg-window.c:210
 msgid "Attach _Message(s)"
 msgstr "Voeg _Bericht(en) toe"
 
-#: src/sendmsg-window.c:214
+#: src/sendmsg-window.c:216
 msgid "_Send"
 msgstr "_Versturen"
 
-#: src/sendmsg-window.c:215 src/toolbar-factory.c:121
+#: src/sendmsg-window.c:217 src/toolbar-factory.c:121
 msgid "Send this message"
 msgstr "Dit bericht verzenden"
 
-#: src/sendmsg-window.c:219
+#: src/sendmsg-window.c:221
 msgid "_Queue"
 msgstr "_Plaats in wachtrij"
 
-#: src/sendmsg-window.c:220
+#: src/sendmsg-window.c:222
 msgid "Queue this message in Outbox for sending"
 msgstr "Plaats dit bericht in de wachtrij voor latere verzending"
 
-#: src/sendmsg-window.c:224
+#: src/sendmsg-window.c:226
 msgid "_Postpone"
 msgstr "_Uitstellen"
 
-#: src/sendmsg-window.c:227
+#: src/sendmsg-window.c:229
 msgid "Sa_ve"
 msgstr "_Opslaan"
 
-#: src/sendmsg-window.c:228
+#: src/sendmsg-window.c:230
 msgid "Save this message"
 msgstr "Dit bericht opslaan"
 
-#: src/sendmsg-window.c:232
+#: src/sendmsg-window.c:234
 msgid "Print the edited message"
 msgstr "Druk het bewerkte bericht af"
 
-#: src/sendmsg-window.c:261
+#: src/sendmsg-window.c:263
 msgid "_Wrap Body"
 msgstr "_Afbreken tekst"
 
-#: src/sendmsg-window.c:265
+#: src/sendmsg-window.c:267
 msgid "_Reflow Selected Text"
 msgstr "Geselecteerde tekst _hervloeien"
 
-#: src/sendmsg-window.c:270
+#: src/sendmsg-window.c:272
 msgid "Insert Si_gnature"
 msgstr "_Ondertekening invoegen"
 
-#: src/sendmsg-window.c:274
+#: src/sendmsg-window.c:276
 msgid "_Quote Message(s)"
 msgstr "_Citeer Bericht(en)"
 
-#: src/sendmsg-window.c:279
+#: src/sendmsg-window.c:281
 msgid "C_heck Spelling"
 msgstr "_Spellingscontrole"
 
-#: src/sendmsg-window.c:280
+#: src/sendmsg-window.c:282
 msgid "Check the spelling of the message"
 msgstr "Controleer de spelling van het bericht"
 
-#: src/sendmsg-window.c:285
+#: src/sendmsg-window.c:287
 msgid "Select _Identity..."
 msgstr "Selecteer _Identiteit..."
 
-#: src/sendmsg-window.c:286
+#: src/sendmsg-window.c:288
 msgid "Select the Identity to use for the message"
 msgstr "Selecteer de te gebruiken identiteit voor het bericht"
 
-#: src/sendmsg-window.c:291
+#: src/sendmsg-window.c:293
 msgid "_Edit with Gnome-Editor"
 msgstr "_Bewerken met Gnome-Tekstverwerker"
 
-#: src/sendmsg-window.c:292
+#: src/sendmsg-window.c:294
 msgid "Edit the current message with the default Gnome editor"
 msgstr "Bewerk het huidige e-mailtje met de standaard Gnome Tekstverwerker"
 
-#: src/sendmsg-window.c:304
+#: src/sendmsg-window.c:306
 msgid "Fr_om"
 msgstr "_Van"
 
-#: src/sendmsg-window.c:310
+#: src/sendmsg-window.c:312
 msgid "_Cc"
 msgstr "_Cc"
 
-#: src/sendmsg-window.c:312
+#: src/sendmsg-window.c:314
 msgid "_Bcc"
 msgstr "_Bcc"
 
-#: src/sendmsg-window.c:314
+#: src/sendmsg-window.c:316
 msgid "_Fcc"
 msgstr "_Fcc"
 
-#: src/sendmsg-window.c:316
+#: src/sendmsg-window.c:318
 msgid "_Reply To"
 msgstr "Beant_woorden Aan"
 
-#: src/sendmsg-window.c:318
+#: src/sendmsg-window.c:320
 msgid "_Attachments"
 msgstr "Bij_lagen"
 
-#: src/sendmsg-window.c:321
+#: src/sendmsg-window.c:323
 msgid "Co_mments"
 msgstr "Op_merkingen"
 
-#: src/sendmsg-window.c:324
+#: src/sendmsg-window.c:326
 msgid "_Keywords"
 msgstr "_Sleutelwoorden"
 
-#: src/sendmsg-window.c:340
+#: src/sendmsg-window.c:342
 msgid "_Brazilian"
 msgstr "_Braziliaans"
 
-#: src/sendmsg-window.c:341
+#: src/sendmsg-window.c:343
 msgid "_Catalan"
 msgstr "_Catalaans"
 
-#: src/sendmsg-window.c:342
+#: src/sendmsg-window.c:344
 msgid "_Chinese Simplified"
 msgstr "_Chinees (eenvoudig)"
 
-#: src/sendmsg-window.c:343
+#: src/sendmsg-window.c:345
 msgid "_Chinese Traditional"
 msgstr "_Chinees (traditioneel)"
 
-#: src/sendmsg-window.c:344
+#: src/sendmsg-window.c:346
 msgid "_Czech"
 msgstr "_Tsjechisch"
 
-#: src/sendmsg-window.c:345
+#: src/sendmsg-window.c:347
 msgid "_Danish"
 msgstr "_Deens"
 
-#: src/sendmsg-window.c:346
+#: src/sendmsg-window.c:348
 msgid "_Dutch"
 msgstr "Ne_derlands"
 
-#: src/sendmsg-window.c:347
+#: src/sendmsg-window.c:349
 msgid "_English (American)"
 msgstr "_Engels (Amerikaans)"
 
-#: src/sendmsg-window.c:348
+#: src/sendmsg-window.c:350
 msgid "_English (British)"
 msgstr "_Engels (Brits)"
 
-#: src/sendmsg-window.c:349
+#: src/sendmsg-window.c:351
 msgid "_Esperanto"
 msgstr "_Esperanto"
 
-#: src/sendmsg-window.c:350
+#: src/sendmsg-window.c:352
 msgid "_Estonian"
 msgstr "_Estonisch"
 
-#: src/sendmsg-window.c:351
+#: src/sendmsg-window.c:353
 msgid "_Finnish"
 msgstr "_Fins"
 
-#: src/sendmsg-window.c:352
+#: src/sendmsg-window.c:354
 msgid "_French"
 msgstr "_Frans"
 
-#: src/sendmsg-window.c:353
+#: src/sendmsg-window.c:355
 msgid "_German"
 msgstr "_Duits"
 
-#: src/sendmsg-window.c:354
+#: src/sendmsg-window.c:356
 msgid "_Greek"
 msgstr "_Grieks"
 
-#: src/sendmsg-window.c:355
+#: src/sendmsg-window.c:357
 msgid "_Hebrew"
 msgstr "_Hebreeuws"
 
-#: src/sendmsg-window.c:356
+#: src/sendmsg-window.c:358
 msgid "_Hungarian"
 msgstr "_Hongaars"
 
-#: src/sendmsg-window.c:357
+#: src/sendmsg-window.c:359
 msgid "_Italian"
 msgstr "_Italiaans"
 
-#: src/sendmsg-window.c:358
+#: src/sendmsg-window.c:360
 msgid "_Japanese"
 msgstr "_Japans"
 
-#: src/sendmsg-window.c:359
+#: src/sendmsg-window.c:361
 msgid "_Korean"
 msgstr "_Koreaans"
 
-#: src/sendmsg-window.c:360
+#: src/sendmsg-window.c:362
 msgid "_Latvian"
 msgstr "_Lets"
 
-#: src/sendmsg-window.c:361
+#: src/sendmsg-window.c:363
 msgid "_Lithuanian"
 msgstr "_Litouws"
 
-#: src/sendmsg-window.c:362
+#: src/sendmsg-window.c:364
 msgid "_Norwegian"
 msgstr "_Noors"
 
-#: src/sendmsg-window.c:363
+#: src/sendmsg-window.c:365
 msgid "_Polish"
 msgstr "_Pools"
 
-#: src/sendmsg-window.c:364
+#: src/sendmsg-window.c:366
 msgid "_Portugese"
 msgstr "_Portugees"
 
-#: src/sendmsg-window.c:365
+#: src/sendmsg-window.c:367
 msgid "_Romanian"
 msgstr "_Roemeens"
 
-#: src/sendmsg-window.c:366
+#: src/sendmsg-window.c:368
 msgid "_Russian (ISO)"
 msgstr "_Russsisch (ISO)"
 
-#: src/sendmsg-window.c:367
+#: src/sendmsg-window.c:369
 msgid "_Russian (KOI)"
 msgstr "_Russisch (KOI)"
 
-#: src/sendmsg-window.c:368
+#: src/sendmsg-window.c:370
 msgid "_Slovak"
 msgstr "_Slowaaks"
 
-#: src/sendmsg-window.c:369
+#: src/sendmsg-window.c:371
 msgid "_Spanish"
 msgstr "_Spaans"
 
-#: src/sendmsg-window.c:370
+#: src/sendmsg-window.c:372
 msgid "_Swedish"
 msgstr "_Zweeds"
 
-#: src/sendmsg-window.c:371
+#: src/sendmsg-window.c:373
 msgid "_Turkish"
 msgstr "_Turks"
 
-#: src/sendmsg-window.c:372
+#: src/sendmsg-window.c:374
 msgid "_Ukrainian"
 msgstr "_Oekraïns"
 
-#: src/sendmsg-window.c:373
+#: src/sendmsg-window.c:375
 msgid "_Generic UTF-8"
 msgstr "_Algemeen UTF-8"
 
-#: src/sendmsg-window.c:385
+#: src/sendmsg-window.c:387
 msgid "_GnuPG uses MIME mode"
 msgstr "_GnuPG gebruikt de MIME methode"
 
-#: src/sendmsg-window.c:391
+#: src/sendmsg-window.c:393
 msgid "_GnuPG uses old OpenPGP mode"
 msgstr "_GnuPG gebruikt de oude OpenPGP methode"
 
-#: src/sendmsg-window.c:402
+#: src/sendmsg-window.c:404
 msgid "_Request Disposition Notification"
 msgstr "_Verzoek afleveringsnotificatie"
 
-#: src/sendmsg-window.c:405
+#: src/sendmsg-window.c:407
 msgid "_Format = Flowed"
 msgstr "_Format = Flowed"
 
-#: src/sendmsg-window.c:410
+#: src/sendmsg-window.c:412
 msgid "_Sign Message"
 msgstr "_Bericht ondertekenen"
 
-#: src/sendmsg-window.c:411
+#: src/sendmsg-window.c:413
 msgid "signs the message using GnuPG"
 msgstr "ondertekent het bericht met GnuPG"
 
-#: src/sendmsg-window.c:414
+#: src/sendmsg-window.c:416
 msgid "_Encrypt Message"
 msgstr "Bericht _coderen"
 
-#: src/sendmsg-window.c:415
+#: src/sendmsg-window.c:417
 msgid "signs the message using GnuPG for all To: and CC: recipients"
 msgstr "ondertekent het bericht met GnuPG voor alle Aan: en CC: geadresseerden"
 
-#: src/sendmsg-window.c:460
+#: src/sendmsg-window.c:462
 msgid "_Show"
 msgstr "_Toon"
 
-#: src/sendmsg-window.c:462
+#: src/sendmsg-window.c:464
 msgid "_Language"
 msgstr "Taa_l"
 
-#: src/sendmsg-window.c:464
+#: src/sendmsg-window.c:466
 msgid "_Options"
 msgstr "_Opties"
 
-#: src/sendmsg-window.c:547
+#: src/sendmsg-window.c:549
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -4999,11 +4997,15 @@ msgstr ""
 "Bericht opslaan in de map concepten?"
 
 #. Comments:
-#: src/sendmsg-window.c:669 src/sendmsg-window.c:1910
+#: src/sendmsg-window.c:671 src/sendmsg-window.c:1946
 msgid "Comments:"
 msgstr "Commentaar:"
 
-#: src/sendmsg-window.c:1117
+#: src/sendmsg-window.c:797
+msgid "Gnome editor is not defined in your preferred applications."
+msgstr "De Gnome-editor is niet gedefinieerd in uw Standaardtoepassingen"
+
+#: src/sendmsg-window.c:1153
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -5018,43 +5020,43 @@ msgstr ""
 "\n"
 "Weet u zeker dat u het bestand toe wilt voegen als verwijzing?"
 
-#: src/sendmsg-window.c:1128
+#: src/sendmsg-window.c:1164
 msgid "Attach as Reference?"
 msgstr "Toevoegen als verwijzing?"
 
-#: src/sendmsg-window.c:1219
+#: src/sendmsg-window.c:1255
 msgid "Remove"
 msgstr "Verwijderen"
 
-#: src/sendmsg-window.c:1230
+#: src/sendmsg-window.c:1266
 msgid "attach as reference"
 msgstr "toevoegen als verwijzing"
 
-#: src/sendmsg-window.c:1236
+#: src/sendmsg-window.c:1272
 msgid "attach as file"
 msgstr "toevoegen als bestand"
 
-#: src/sendmsg-window.c:1384
+#: src/sendmsg-window.c:1420
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Info over bestand '%s' kan niet verkregen worden: %s"
 
-#: src/sendmsg-window.c:1389
+#: src/sendmsg-window.c:1425
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Bijlage '%s' is geen regulier bestand."
 
-#: src/sendmsg-window.c:1392
+#: src/sendmsg-window.c:1428
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "Bestand %s kan niet worden gelezen\n"
 
-#: src/sendmsg-window.c:1446
+#: src/sendmsg-window.c:1482
 msgid "Attach file"
 msgstr "Bestand als bijlage"
 
-#: src/sendmsg-window.c:1542 src/sendmsg-window.c:1604
-#: src/sendmsg-window.c:2840
+#: src/sendmsg-window.c:1578 src/sendmsg-window.c:1640
+#: src/sendmsg-window.c:2890
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5063,68 +5065,68 @@ msgstr ""
 "Mogelijke reden: niet genoeg tijdelijke ruimte"
 
 #. From:
-#: src/sendmsg-window.c:1800
+#: src/sendmsg-window.c:1836
 msgid "F_rom:"
 msgstr "Af_zender:"
 
 #. Subject:
-#: src/sendmsg-window.c:1812
+#: src/sendmsg-window.c:1848
 msgid "S_ubject:"
 msgstr "Onder_werp:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: src/sendmsg-window.c:1826
+#: src/sendmsg-window.c:1862
 msgid "F_cc:"
 msgstr "F_cc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:1856
+#: src/sendmsg-window.c:1892
 msgid "_Reply To:"
 msgstr "_Antwoord naar:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1863
+#: src/sendmsg-window.c:1899
 msgid "_Attachments:"
 msgstr "_Bijlagen:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1913
+#: src/sendmsg-window.c:1949
 msgid "Keywords:"
 msgstr "Sleutelwoorden:"
 
-#: src/sendmsg-window.c:2076
+#: src/sendmsg-window.c:2112
 msgid "you"
 msgstr "u"
 
-#: src/sendmsg-window.c:2085
+#: src/sendmsg-window.c:2121
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------ doorgestuurd bericht van %s ------\n"
 
-#: src/sendmsg-window.c:2120
+#: src/sendmsg-window.c:2156
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Bericht-ID: %s\n"
 
-#: src/sendmsg-window.c:2126
+#: src/sendmsg-window.c:2162
 msgid "References:"
 msgstr "Verwijzingen:"
 
-#: src/sendmsg-window.c:2136
+#: src/sendmsg-window.c:2172
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Op %s schreef %s:\n"
 
-#: src/sendmsg-window.c:2138
+#: src/sendmsg-window.c:2174
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s schreef:\n"
 
-#: src/sendmsg-window.c:3002
+#: src/sendmsg-window.c:3052
 msgid "Choose charset"
 msgstr "Kies tekenset"
 
-#: src/sendmsg-window.c:3009
+#: src/sendmsg-window.c:3059
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
@@ -5132,16 +5134,16 @@ msgstr ""
 "Dit bestand is niet in US-ASCII of UTF-8 formaat.\n"
 "Kies de te gebruiken tekenset voor het bericht."
 
-#: src/sendmsg-window.c:3075
+#: src/sendmsg-window.c:3125
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Kan bestand '%s' niet openen.\n"
 
-#: src/sendmsg-window.c:3097
+#: src/sendmsg-window.c:3147
 msgid "Include file"
 msgstr "Bestand invoegen"
 
-#: src/sendmsg-window.c:3355
+#: src/sendmsg-window.c:3443
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5150,7 +5152,7 @@ msgstr ""
 "Het bericht kan niet gecodeerd worden met de tekenset %s.\n"
 "Kies alstublieft een andere taal voor dit bericht."
 
-#: src/sendmsg-window.c:3374
+#: src/sendmsg-window.c:3462
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5161,32 +5163,32 @@ msgstr ""
 "methode moeten gebruiken om het hele bericht te beschermen. Wilt u doorgaan "
 "met de OpenPGP methode?"
 
-#: src/sendmsg-window.c:3387
+#: src/sendmsg-window.c:3475
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "bericht wordt verzonden met gpg-stand %d"
 
-#: src/sendmsg-window.c:3730
+#: src/sendmsg-window.c:3786
 #, c-format
 msgid "Could not compile %s"
 msgstr "Kan %s niet compileren"
 
-#: src/sendmsg-window.c:4250
+#: src/sendmsg-window.c:4304
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Antwoord naar %s: %s"
 
-#: src/sendmsg-window.c:4255
+#: src/sendmsg-window.c:4309
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Bericht doorsturen naar %s: %s"
 
-#: src/sendmsg-window.c:4259
+#: src/sendmsg-window.c:4313
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Verder gaan aan bericht naar %s: %s"
 
-#: src/sendmsg-window.c:4263
+#: src/sendmsg-window.c:4317
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nieuw bericht naar %s: %s"
@@ -5575,15 +5577,3 @@ msgstr "Omhoog"
 #: src/toolbar-prefs.c:506
 msgid "Down"
 msgstr "Omlaag"
-
-#~ msgid "Couldn't set protocol version to LDAPv3."
-#~ msgstr "Kan protocolversie niet instellen op LDAPv3."
-
-#~ msgid "_Save"
-#~ msgstr "Op_slaan"
-
-#~ msgid "Print..."
-#~ msgstr "Afdrukken..."
-
-#~ msgid "_Comments"
-#~ msgstr "_Commentaar"

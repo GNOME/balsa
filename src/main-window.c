@@ -3352,6 +3352,11 @@ hide_changed_cb(GtkWidget * widget, gpointer data)
 
     /* PART 2: do the job. */
     mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
+    /* Store the new filter mask in the mailbox view before we set the
+     * view filter; rethreading triggers balsa_window_set_filter_menu,
+     * which retrieves the mask from the mailbox view, and we want it to
+     * be the new one. */
+    libbalsa_mailbox_set_filter(mailbox, balsa_window_filter_to_int());
 
     filter = balsa_window_get_view_filter(bw);
     /* libbalsa_mailbox_set_view_filter() will take the ownership of
@@ -3360,8 +3365,6 @@ hide_changed_cb(GtkWidget * widget, gpointer data)
      * just steal old view filter for the time being to avoid copying
      * it - but we could just as well clone it. */
     libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
-    /* make it persistent */
-    libbalsa_mailbox_set_filter(mailbox, balsa_window_filter_to_int());
 }
 
 static void

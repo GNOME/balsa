@@ -483,7 +483,8 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
             g_assert(is_refed);
 	    if (!message->mailbox)
 		return FALSE; /* We don't want to match if an error occured */
-	    body = content2reply(message, NULL, 0, FALSE, FALSE, NULL);
+            body =
+                content2reply(message, NULL, 0, FALSE, FALSE, NULL, NULL);
 	    if (body) {
 		if (body->str)
                     match = libbalsa_utf8_strstr(body->str,

@@ -27,14 +27,18 @@
 
 #include "libbalsa.h"
 
+typedef void (*LibBalsaCharsetFunc) (const gchar * charset, gpointer data);
+
 GString *process_mime_part(LibBalsaMessage * message,
 			   LibBalsaMessageBody * body,
 			   gchar * reply_prefix_str, gint llen,
 			   gboolean ignore_html, gboolean flow,
-			   const gchar ** charset);
+			   LibBalsaCharsetFunc charset_cb,
+			   gpointer charset_cb_data);
 GString *content2reply(LibBalsaMessage * message,
 		       gchar * reply_prefix_str, gint llen,
 		       gboolean ignore_html, gboolean flow,
-		       const gchar ** charset);	/* arp */
+		       LibBalsaCharsetFunc charset_cb,
+		       gpointer charset_cb_data);
 
 #endif				/* __LIBBALSA_MIME_H__ */

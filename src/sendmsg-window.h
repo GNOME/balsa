@@ -68,6 +68,7 @@ extern "C" {
 	SendType type;
 	/* language selection related data */
 	gchar *charset;
+	GSList *charsets;
 	const gchar *locale;
 	GtkWidget *current_language_menu;
 	/* identity related data */

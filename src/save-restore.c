@@ -268,9 +268,6 @@ restore_global_settings ()
   /* hostname */
   balsa_app.hostname = get_string_set_default ("host name", "localhost");
 
-  /* organization */
-  balsa_app.organization = get_string_set_default ("organization", "None");
-
   /* directory */
   path = g_string_new (NULL);
   g_string_sprintf (path, "%s/Mail", g_get_home_dir ());
@@ -328,7 +325,6 @@ save_global_settings ()
   gnome_config_set_string ("real name", balsa_app.real_name);
   gnome_config_set_string ("user name", balsa_app.username);
   gnome_config_set_string ("host name", balsa_app.hostname);
-  gnome_config_set_string ("organization", balsa_app.organization);
   gnome_config_set_string ("smtp server", balsa_app.smtp_server);
 
   gnome_config_set_string ("inbox", balsa_app.inbox_path);

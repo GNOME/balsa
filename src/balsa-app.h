@@ -46,7 +46,6 @@ extern struct BalsaApplication
   gchar *username;
   gchar *hostname;
   gchar *email;
-  gchar *organization;
   gchar *local_mail_directory;
   gchar *smtp_server;
   gchar *signature;
@@ -75,9 +74,9 @@ extern struct BalsaApplication
   gint mw_height;
 
   GtkToolbarStyle toolbar_style;
-  guint mdi_style;
+  GnomeMDIMode mdi_style;
 
-  gint debug;
+  gboolean debug;
 }
 balsa_app;
 

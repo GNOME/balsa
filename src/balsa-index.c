@@ -437,7 +437,11 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     GtkTreeIter iter;
     GSList *list;
     GSList *next;
+    LibBalsaMailboxSearchIter *iter_view;
 
+    /* Search results may be cached in iter_view. */
+    iter_view =
+	libbalsa_mailbox_search_iter_view(index->mailbox_node->mailbox);
     /* Check currently selected messages. */
     for (list = index->selected; list; list = next) {
 	GtkTreePath *path;
@@ -457,11 +461,15 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 	     * thread; we'll notify the mailbox, so it can check whether
 	     * the message still matches the view filter. */
 	    index->selected = g_slist_delete_link(index->selected, list);
-	    libbalsa_mailbox_msgno_deselected(message->mailbox, 
-					      message->msgno);
+	    if (iter_view)
+		libbalsa_mailbox_msgno_deselected(message->mailbox,
+						  message->msgno, 
+						  iter_view);
 	}
 	gtk_tree_path_free(path);
     }
+    if (iter_view)
+	libbalsa_mailbox_search_iter_free(iter_view);
 
     sci.selected = &index->selected;
     sci.message = NULL;

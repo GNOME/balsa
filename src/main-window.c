@@ -227,159 +227,49 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   GtkWidget *w;
   GtkWidget *menu;
   GtkAccelGroup *accel;
+  static GnomeUIInfo file_menu[] = {
+    GNOMEUIINFO_ITEM_STOCK("_Get new mail", NULL, check_new_messages_cb, GNOME_STOCK_MENU_MAIL_RCV),
+    GNOMEUIINFO_ITEM_STOCK("E_xit", NULL, close_main_window, GNOME_STOCK_MENU_EXIT),
+    GNOMEUIINFO_END
+  };
+  static GnomeUIInfo message_menu[] = {
+    GNOMEUIINFO_ITEM_STOCK("_New", NULL, new_message_cb, GNOME_STOCK_MENU_MAIL),
+    GNOMEUIINFO_ITEM_STOCK("_Reply", NULL, replyto_message_cb, GNOME_STOCK_MENU_MAIL_RPL),
+    GNOMEUIINFO_ITEM_STOCK("Reply to _all", NULL, replytoall_message_cb, GNOME_STOCK_MENU_MAIL_RPL),
+    GNOMEUIINFO_ITEM_STOCK("_Forward", NULL, forward_message_cb, GNOME_STOCK_MENU_MAIL_FWD),
+    GNOMEUIINFO_SEPARATOR,
+    GNOMEUIINFO_ITEM_STOCK("_Delete", NULL, delete_message_cb, GNOME_STOCK_MENU_TRASH),
+    GNOMEUIINFO_ITEM_STOCK("_Undelete", NULL, undelete_message_cb, GNOME_STOCK_MENU_UNDELETE),
+    GNOMEUIINFO_END
+  };
+  static GnomeUIInfo mailbox_menu[] = {
+    GNOMEUIINFO_ITEM_STOCK("_List", NULL, mblist_window_cb, GNOME_STOCK_MENU_PROP),
+    GNOMEUIINFO_ITEM_STOCK("_Close", NULL, mailbox_close_child, GNOME_STOCK_MENU_CLOSE),
+    GNOMEUIINFO_SEPARATOR,
+    GNOMEUIINFO_END
+  };
+  static GnomeUIInfo settings_menu[] = {
+    GNOMEUIINFO_ITEM_STOCK("_Filters...", NULL, filter_dlg_cb, GNOME_STOCK_MENU_PROP),
+    GNOMEUIINFO_ITEM_STOCK("_Preferences...", NULL, open_preferences_manager, GNOME_STOCK_MENU_PROP),
+    GNOMEUIINFO_END
+  };
+  static GnomeUIInfo help_menu[] = {
+    GNOMEUIINFO_ITEM_STOCK("_About...", NULL, show_about_box, GNOME_STOCK_MENU_ABOUT),
+    GNOMEUIINFO_HELP("balsa"),
+    GNOMEUIINFO_END
+  };
+  static GnomeUIInfo main_menu[] = {
+    GNOMEUIINFO_SUBTREE("_File", file_menu),
+    GNOMEUIINFO_SUBTREE("_Message", message_menu),
+    GNOMEUIINFO_SUBTREE("Mail_boxes", mailbox_menu),
+    GNOMEUIINFO_SUBTREE("_Settings", settings_menu),
+    GNOMEUIINFO_SUBTREE("_Help", help_menu),
+    GNOMEUIINFO_END
+  };
 
-  accel = gtk_accel_group_get_default ();
-  menubar = gtk_menu_bar_new ();
+  gnome_app_create_menus(GNOME_APP(app), main_menu);
 
-  /* FILE Menu */
-  menu = gtk_menu_new ();
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RCV, _ ("_Get New Mail"));
-  gtk_widget_add_accelerator (w, "activate", accel, 'M', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-  gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) check_new_messages_cb, NULL);
-  gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gtk_menu_item_new ();
-  gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_EXIT, _ ("E_xit"));
-  gtk_widget_add_accelerator (w, "activate", accel, 'Q', 0, GTK_ACCEL_VISIBLE);
-  gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) close_main_window, NULL);
-  gtk_menu_append (GTK_MENU (menu), w);
-
-
-  w = gtk_menu_item_new_with_label (_ ("_File"));
-  gtk_widget_show (w);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
-  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
-
-
-
-  /* MESSAGE Menu */
-  menu = gtk_menu_new ();
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL, _ ("_New"));
-  gtk_widget_add_accelerator (w, "activate", accel, 'M', 0, GTK_ACCEL_VISIBLE);
-  gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) new_message_cb, NULL);
-  gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _ ("_Reply"));
-  gtk_widget_add_accelerator (w, "activate", accel, 'R', 0, GTK_ACCEL_VISIBLE);
-  gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) replyto_message_cb, NULL);
-  gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _ ("Reply to _all"));
-  gtk_widget_add_accelerator (w, "activate", accel, 'A', 0, GTK_ACCEL_VISIBLE);
-  gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) replytoall_message_cb, NULL);
-  gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_FWD, _ ("_Forward"));
-  gtk_widget_add_accelerator (w, "activate", accel, 'F', 0, GTK_ACCEL_VISIBLE);
-  gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) forward_message_cb, NULL);
-  gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gtk_menu_item_new ();
-  gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_TRASH, _ ("_Delete"));
-  gtk_widget_add_accelerator (w, "activate", accel, 'D', 0, GTK_ACCEL_VISIBLE);
-  gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) delete_message_cb, NULL);
-  gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_UNDELETE, _ ("_Undelete"));
-  gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) undelete_message_cb, NULL);
-  gtk_widget_add_accelerator (w, "activate", accel, 'U', 0, GTK_ACCEL_VISIBLE);
-  gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gtk_menu_item_new_with_label (_ ("_Message"));
-  gtk_widget_show (w);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
-  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
-
-
-
-/* Mailbox list */
-  menu = gtk_menu_new ();
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("_Mailbox List"));
-  gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) mblist_window_cb, NULL);
-  gtk_widget_add_accelerator (w, "activate", accel, 'C', 0, GTK_ACCEL_VISIBLE);
-  gtk_menu_append (GTK_MENU (menu), w);
-/* FIXME this needs to be updated if mailboxes and such are changed.... how?
- * :)
- */
-#if 0
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("_Open..."));
-  {
-    GtkWidget *submenu;
-    GtkWidget *smenuitem;
-    GtkWidget *bmbl;
-
-    submenu = gtk_menu_new ();
-    smenuitem = gtk_menu_item_new ();
-    bmbl = balsa_mblist_new ();
-    /*
-       gtk_signal_connect (GTK_OBJECT (bmbl), "select_mailbox",
-       (GtkSignalFunc) transfer_messages_cb,
-       (gpointer) bindex);
-     */
-    gtk_widget_set_usize (GTK_WIDGET (bmbl), balsa_app.mblist_width, balsa_app.mblist_height);
-    gtk_container_add (GTK_CONTAINER (smenuitem), bmbl);
-    gtk_menu_append (GTK_MENU (submenu), smenuitem);
-    gtk_widget_show (bmbl);
-    gtk_widget_show (smenuitem);
-
-    gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), submenu);
-  }
-  gtk_menu_append (GTK_MENU (menu), w);
-#endif
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_CLOSE, _ ("_Close"));
-  gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) mailbox_close_child, NULL);
-  gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gtk_menu_item_new ();
-  gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gtk_menu_item_new_with_label (_ ("_Mailboxes"));
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
-  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
-
-
-/* Settings Menu */
-  menu = gtk_menu_new ();
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("_Filters..."));
-  gtk_signal_connect (GTK_OBJECT (w), "activate", GTK_SIGNAL_FUNC (filter_dlg_cb), NULL);
-  gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("_Preferences..."));
-  gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) open_preferences_manager, NULL);
-  gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gtk_menu_item_new_with_label (_ ("_Settings"));
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
-  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
-
-
-/* Help Menu */
-  menu = gtk_menu_new ();
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_ABOUT, _ ("_About"));
-  gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) show_about_box, NULL);
-  gtk_menu_append (GTK_MENU (menu), w);
-
-
-  w = gtk_menu_item_new_with_label (_ ("_Help"));
-  gtk_widget_show (w);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
-  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
-
-  gtk_window_add_accel_group (GTK_WINDOW (app), accel);
-
-  gtk_widget_show_all (menubar);
-
-  return GTK_MENU_BAR (menubar);
+  return NULL;
 }
 
 

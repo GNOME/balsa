@@ -36,6 +36,11 @@
 #include <string.h>
 #include <gnome.h>
 #include <glib.h>
+
+#ifdef BALSA_USE_THREADS
+#include <pthread.h>
+#endif
+
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-index.h"
@@ -507,17 +512,71 @@ moveto_handler(BalsaIndex * bindex)
     return FALSE;
 }
 
+/* balsa_index_load_mailbox_node:
+   open mailbox_node, the opening is done in thread to keep UI alive.
+   NOTES:
+   it uses module-wide is_opening variable. This variable, as well as the
+   mutex should be a property of BalsaIndex but since we cannot open 
+   two indexes at once because of libmutt limits, we get away with this
+   solution. When the backend is changed, feel free to introduce these
+   changes.
+   Also, the waiting list is not a top hack. I mean it is perfectly 
+   functional (and that's MOST important; think long before modyfying it)
+   but perhaps we could write it nicer?
+*/
+static gboolean is_opening =FALSE;
+static void *open_in_thread(void* mailbox)
+{
+    libbalsa_mailbox_open(LIBBALSA_MAILBOX(mailbox), FALSE);
+    is_opening = FALSE;
+    return NULL;
+}
 
 gboolean
 balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
 {
+    void *data;
     GList *list;
     guint i = 0;
     LibBalsaMailbox* mailbox;
+    gchar *msg;
 
-
+#ifdef BALSA_USE_THREADS
+    static pthread_mutex_t open_lock = PTHREAD_MUTEX_INITIALIZER;
+    pthread_t open_thread;
+    if(pthread_mutex_trylock(&open_lock) != 0)  /* already opening */
+	return TRUE;
+#endif
     g_return_val_if_fail (bindex != NULL, TRUE);
     g_return_val_if_fail (mbnode != NULL, TRUE);
+    g_return_val_if_fail (mbnode->mailbox != NULL, TRUE);
+
+    mailbox = mbnode->mailbox;
+    msg = g_strdup_printf(_("Opening mailbox %s. Please wait..."),
+			  mbnode->mailbox->name);
+    gnome_appbar_push(balsa_app.appbar, msg);
+    g_free(msg);
+#ifdef BALSA_USE_THREADS
+    is_opening = TRUE;
+    pthread_create(&open_thread, NULL, open_in_thread, mailbox);
+    while(is_opening) {
+        while(is_opening && gtk_events_pending())
+	    gtk_main_iteration_do(FALSE);
+	usleep(500);
+    }
+    pthread_join(open_thread, &data);
+    pthread_mutex_unlock(&open_lock);
+#else
+    libbalsa_mailbox_open(mailbox, FALSE);
+#endif
+    gnome_appbar_pop(balsa_app.appbar);
+
+    if (mailbox->open_ref == 0) {
+	libbalsa_information(
+	    LIBBALSA_INFORMATION_ERROR,
+	    _("Unable to Open Mailbox!\nPlease check the mailbox settings."));
+	return TRUE;
+    }
 
     /*
      * release the old mailbox
@@ -527,27 +586,14 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
 
 	/* This will disconnect all of our signals */
 	gtk_signal_disconnect_by_data(GTK_OBJECT(mailbox), bindex);
-
 	libbalsa_mailbox_close(mailbox);
-
 	gtk_clist_clear(GTK_CLIST(bindex->ctree));
     }
 
     /*
      * set the new mailbox
      */
-    mailbox = mbnode->mailbox;
     bindex->mailbox_node = mbnode;
-    libbalsa_mailbox_open(mailbox, FALSE);
-
-    if (mailbox->open_ref == 0) {
-	libbalsa_information(
-	    LIBBALSA_INFORMATION_ERROR,
-	    _("Unable to Open Mailbox!\nPlease check the mailbox settings."));
-	bindex->mailbox_node = NULL;
-	return TRUE;
-    }
-
     /*
      * rename "from" column to "to" for outgoing mail
      */
@@ -556,7 +602,6 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
 
 	gtk_clist_set_column_title(GTK_CLIST(bindex->ctree), 3, _("To"));
     }
-    
 
     gtk_signal_connect(GTK_OBJECT(mailbox), "message-status-changed",
 		       GTK_SIGNAL_FUNC(mailbox_message_changed_status_cb),

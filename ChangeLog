@@ -1,3 +1,8 @@
+2001-02-13  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-index.c: open mailboxes in a thread (as requested in
+	one of the bug reports).
+
 2001-02-12  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/body.c:

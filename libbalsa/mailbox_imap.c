@@ -1523,33 +1523,11 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
 }
 
 gchar *
-libbalsa_imap_path(LibBalsaServer * server, const gchar * path)
-{
-    gchar *imap_path = path && *path
-        ? g_strdup_printf("imap%s://%s/%s/",
-#ifdef USE_SSL
-                                       server->use_ssl ? "s" : "",
-#else
-                                       "",
-#endif
-                                       server->host, path)
-        : g_strdup_printf("imap%s://%s/",
-#ifdef USE_SSL
-                                       server->use_ssl ? "s" : "",
-#else
-                                       "",
-#endif
-                                       server->host);
-
-    return imap_path;
-}
-
-gchar *
 libbalsa_imap_url(LibBalsaServer * server, const gchar * path)
 {
     gchar *enc = libbalsa_urlencode(server->user);
     gchar *url = g_strdup_printf("imap%s://%s@%s/%s",
-#ifdef USE_SSL
+#ifdef USE_SSL_TO_SET_IMAPS_IN_URL
                                  server->use_ssl ? "s" : "",
 #else
                                  "",

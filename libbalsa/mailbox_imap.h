@@ -71,7 +71,6 @@ gboolean libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* mbox,
 
 gboolean libbalsa_imap_delete_folder(LibBalsaMailboxImap * mailbox);
 
-gchar *libbalsa_imap_path(LibBalsaServer * server, const gchar * path);
 gchar *libbalsa_imap_url(LibBalsaServer * server, const gchar * path);
 
 void libbalsa_imap_set_cache_size(off_t cache_size);

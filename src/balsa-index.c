@@ -1470,8 +1470,11 @@ bndx_messages_add(BalsaIndex * bindex, GList *messages)
 {
     GList *list;
 
-    for (list = messages; list; list = g_list_next(list))
-	bndx_add_message(bindex, (LibBalsaMessage *) list->data);
+    for (list = messages; list; list = g_list_next(list)) {
+        LibBalsaMessage *msg = (LibBalsaMessage *) list->data;
+	if (msg->mailbox)
+	    bndx_add_message(bindex, msg);
+    }
     balsa_index_threading(bindex, 
 			  bindex->mailbox_node->mailbox->view->threading_type);
     for (list = messages; list; list = g_list_next(list)) {

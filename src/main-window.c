@@ -98,12 +98,18 @@ GtkWidget *send_dialog = NULL;
 GtkWidget *send_dialog_bar = NULL;
 /*  int total_messages_left;*/
 GSList *list = NULL;
-
-static int show_all_headers_save=-1;
+static gint new_mail_dialog_visible = FALSE;
+static int quiet_check=0;
 
 void progress_dialog_destroy_cb(GtkWidget *, gpointer data);
 static void check_messages_thread(gpointer data);
+static void count_unread_msgs_func(GtkCTree * ctree, GtkCTreeNode * node,
+				   gpointer data);
+static void display_new_mail_notification(int);
+
 #endif
+
+static int show_all_headers_save=-1;
 
 static void balsa_window_class_init(BalsaWindowClass * klass);
 static void balsa_window_init(BalsaWindow * window);
@@ -134,8 +140,6 @@ static void balsa_window_unselect_all_messages_cb (GtkWidget* widget,
 static void check_mailbox_list(GList * list);
 static void mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node,
 			       gpointer data);
-static void count_unread_msgs_func(GtkCTree * ctree, GtkCTreeNode * node,
-				   gpointer data);
 
 static void enable_mailbox_menus(BalsaMailboxNode * mbnode);
 static void enable_message_menus(LibBalsaMessage * message);
@@ -145,15 +149,9 @@ static void unregister_open_mailbox(LibBalsaMailbox *m);
 static gboolean is_open_mailbox(LibBalsaMailbox *m);
 
 static gint about_box_visible = FALSE;
-static gint new_mail_dialog_visible = FALSE;
 
 /* dialogs */
 static void show_about_box(void);
-static void display_new_mail_notification(int);
-static void new_mail_dialog_destroy_cb(GtkWidget *widget, gpointer data);
-static void new_mail_dialog_ok_button_cb(void *widget, gpointer data);
-
-static int quiet_background_check=0;
 
 /* callbacks */
 static void send_outbox_messages_cb(GtkWidget *, gpointer data);
@@ -1513,7 +1511,7 @@ check_new_messages_real(GtkWidget *widget, gpointer data, int type)
     }
     checking_mail = 1;
 
-    quiet_background_check = (type == TYPE_CALLBACK) 
+    quiet_check = (type == TYPE_CALLBACK) 
 	? 0 : balsa_app.quiet_background_check;
 
     pthread_mutex_unlock(&mailbox_lock);
@@ -1677,7 +1675,7 @@ mail_progress_notify_cb()
 
     currentpos = (MailThreadMessage **) msgbuffer;
 
-    if(quiet_background_check) {
+    if(quiet_check) {
 	/* Eat messages */
 	while (count) {
 	    threadmessage = *currentpos;
@@ -1894,6 +1892,72 @@ send_progress_notify_cb()
 
     return TRUE;
 }
+
+static void
+count_unread_msgs_func(GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
+{
+    int *val=(int *)data;
+
+    BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, node);
+    g_return_if_fail(mbnode);
+    
+    if(mbnode->mailbox)
+	*val+=LIBBALSA_MAILBOX(mbnode->mailbox)->unread_messages;
+}
+
+static void
+new_mail_dialog_destroy_cb(GtkWidget *widget, gpointer data)
+{
+    new_mail_dialog_visible = FALSE;
+}
+
+/* display_new_mail_notification:
+   num_new is the number of the recently arrived messsages.
+*/
+static void
+display_new_mail_notification(int num_new)
+{
+    GtkDialog *dlg;
+    GtkWidget *label, *ok_button, *vbox;
+    
+    if(num_new == 0)
+	return;
+    
+    if(balsa_app.notify_new_mail_dialog && new_mail_dialog_visible)
+	return;
+    
+    if(balsa_app.notify_new_mail_sound)
+	gnome_triggers_do("New mail has arrived", "email",
+			  "email", "newmail", NULL);
+    
+    if(!balsa_app.notify_new_mail_dialog)
+	return;
+    
+    new_mail_dialog_visible = TRUE;
+    
+    dlg=GTK_DIALOG(gtk_dialog_new());
+    gtk_window_set_wmclass(GTK_WINDOW(dlg), "new_mail_dialog", "Balsa");
+    
+    vbox=gtk_vbox_new(FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(dlg->vbox), vbox, TRUE, TRUE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 30);
+    
+    label=gtk_label_new(_("You have new mail waiting"));
+    gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
+    
+    ok_button=gtk_button_new_with_label(_("OK"));
+    gtk_box_pack_start(GTK_BOX(dlg->action_area), ok_button, FALSE, FALSE, 0);
+    gtk_widget_grab_default(ok_button);
+    
+    gtk_signal_connect_object(GTK_OBJECT(ok_button), "clicked",
+		       gtk_object_destroy, GTK_OBJECT(dlg));
+
+    gtk_signal_connect(GTK_OBJECT(dlg), "destroy",
+		       new_mail_dialog_destroy_cb, NULL);
+
+    gtk_widget_show_all(GTK_WIDGET(dlg));
+}
+ 
 #endif
 
 GtkWidget *
@@ -2951,75 +3015,6 @@ ident_manage_dialog_cb(GtkWidget* widget, gpointer user_data)
     }
 }
 
-/* display_new_mail_notification:
-   num_new is the number of the recently arrived messsages.
-*/
-static void
-display_new_mail_notification(int num_new)
-{
-    GtkDialog *dlg;
-    GtkWidget *label, *ok_button, *vbox;
-    
-    if(num_new == 0)
-	return;
-    
-    if(balsa_app.notify_new_mail_dialog && new_mail_dialog_visible)
-	return;
-    
-    if(balsa_app.notify_new_mail_sound)
-	gnome_triggers_do("New mail has arrived", "email",
-			  "email", "newmail", NULL);
-    
-    if(!balsa_app.notify_new_mail_dialog)
-	return;
-    
-    new_mail_dialog_visible = TRUE;
-    
-    dlg=GTK_DIALOG(gtk_dialog_new());
-    gtk_window_set_wmclass(GTK_WINDOW(dlg), "new_mail_dialog", "Balsa");
-    
-    vbox=gtk_vbox_new(FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(dlg->vbox), vbox, TRUE, TRUE, 0);
-    gtk_container_set_border_width(GTK_CONTAINER(vbox), 30);
-    
-    label=gtk_label_new(_("You have new mail waiting"));
-    gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
-    
-    ok_button=gtk_button_new_with_label(_("OK"));
-    gtk_box_pack_start(GTK_BOX(dlg->action_area), ok_button, FALSE, FALSE, 0);
-    
-    gtk_signal_connect(GTK_OBJECT(ok_button), "clicked",
-		       new_mail_dialog_ok_button_cb, (gpointer)dlg);
-
-    gtk_signal_connect(GTK_OBJECT(dlg), "destroy",
-		       new_mail_dialog_destroy_cb, NULL);
-
-    gtk_widget_show_all(GTK_WIDGET(dlg));
-}
- 
-static void
-new_mail_dialog_destroy_cb(GtkWidget *widget, gpointer data)
-{
-    new_mail_dialog_visible = FALSE;
-}
-
-static void
-new_mail_dialog_ok_button_cb(void *widget, gpointer data)
-{
-    gtk_widget_destroy(GTK_WIDGET(data));
-}
-
-static void
-count_unread_msgs_func(GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
-{
-    int *val=(int *)data;
-
-    BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, node);
-    g_return_if_fail(mbnode);
-    
-    if(mbnode->mailbox)
-	*val+=LIBBALSA_MAILBOX(mbnode->mailbox)->unread_messages;
-}
 
 static void
 mark_all_cb(GtkWidget * widget, gpointer data)

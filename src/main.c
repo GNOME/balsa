@@ -323,10 +323,12 @@ main(int argc, char *argv[])
     GConfError *gconf_error;
 #endif
 
+#ifdef ENABLE_NLS
     /* Initialize the i18n stuff */
     bindtextdomain(PACKAGE, GNOMELOCALEDIR);
     textdomain(PACKAGE);
     setlocale(LC_CTYPE, gnome_i18n_get_language());
+#endif
 
 #ifdef BALSA_USE_THREADS
     /* initiate thread mutexs, variables */

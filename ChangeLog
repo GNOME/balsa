@@ -1,3 +1,11 @@
+2001-07-27  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Make balsa compile with --disable-threads and --disable-nls
+	* configure.in: AM_GNU_GETTEXT -> AM_GNOME_GETTEXT
+	* libbalsa/send.c: fix non-MT build.
+	* src/main-window.c: fix non-MT build.
+	* src/main.c: fix non-NLS build.
+
 2001-07-25  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/pop3.c: use pclose() on popen()-ed FILE.

@@ -922,11 +922,14 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
 
 #ifdef BALSA_USE_THREADS
     SendThreadMessage *threadmsg;
-#endif
 
     /* The event callback is used to write messages to the the progress
-       dialog shown when transferring a message to the SMTP server. */
+       dialog shown when transferring a message to the SMTP server. 
+       This callback is only used in MT build, we do not show any
+       feedback in non-MT version.
+    */
     smtp_set_eventcb (info->session, libbalsa_smtp_event_cb, NULL);
+#endif
 #ifdef DEBUG
     /* Add a protocol monitor when compiled with DEBUG.  This is somewhat
        unsatisfactory, it would be better handled at run time with an

@@ -114,7 +114,7 @@ dnl ############################################################################
 
 ALL_LINGUAS="az ca cs da de en_GB el es et fi fr ga hu it ja ko lt nl no nn pl pt pt_BR ro ru sk sl sv tr uk wa zh_CN.GB2312"
 LINGUAS="$ALL_LINGUAS"
-AM_GNU_GETTEXT
+AM_GNOME_GETTEXT
 
 dnl ######################################################################################
 dnl Substitutions, defines, part I

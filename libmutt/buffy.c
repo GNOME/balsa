@@ -157,9 +157,41 @@ void mutt_update_mailbox (BUFFY * b)
 }
 #endif
 
+/* buffy_add_mailbox:
+   adds given mailbox to the mailboxes to be checked periodically,
+   user and passwd are relevant only for IMAP mailboxes.
+   IMAP path is of standard form '{server:port}path'
+*/
+BUFFY *
+buffy_add_mailbox(const char *path, const char *user, const char *passwd)
+{
+    BUFFY **tmp;
+    /* simple check to avoid duplicates */
+    for (tmp = &Incoming; *tmp; tmp = &((*tmp)->next))
+    {
+      if (mutt_strcmp (path, (*tmp)->path) == 0)
+	break;
+    }
+
+    if (!*tmp)
+    {
+      *tmp = (BUFFY *) safe_calloc (1, sizeof (BUFFY));
+      (*tmp)->path   = safe_strdup (path);
+      (*tmp)->user   = user   ? safe_strdup (user)   : NULL;
+      (*tmp)->passwd = passwd ? safe_strdup (passwd) : NULL;
+      (*tmp)->next = NULL;
+    }
+
+    (*tmp)->new = 0;
+    (*tmp)->notified = 1;
+    (*tmp)->newly_created = 0;
+
+    return *tmp;
+}
+
 int mutt_parse_mailboxes (BUFFER *path, BUFFER *s, unsigned long data, BUFFER *err)
 {
-  BUFFY **tmp;
+  BUFFY *tmp;
   char buf[_POSIX_PATH_MAX];
 #ifdef BUFFY_SIZE
   struct stat sb;
@@ -174,36 +206,20 @@ int mutt_parse_mailboxes (BUFFER *path, BUFFER *s, unsigned long data, BUFFER *e
     /* Skip empty tokens. */
     if(!*buf) continue;
 
-    /* simple check to avoid duplicates */
-    for (tmp = &Incoming; *tmp; tmp = &((*tmp)->next))
-    {
-      if (mutt_strcmp (buf, (*tmp)->path) == 0)
-	break;
-    }
-
-    if (!*tmp)
-    {
-      *tmp = (BUFFY *) safe_calloc (1, sizeof (BUFFY));
-      (*tmp)->path = safe_strdup (buf);
-      (*tmp)->next = NULL;
-    }
-
-    (*tmp)->new = 0;
-    (*tmp)->notified = 1;
-    (*tmp)->newly_created = 0;
+    tmp = buffy_add_mailbox(buf, NULL, NULL);
 
 #ifdef BUFFY_SIZE
     /* for buffy_size, it is important that if the folder is new (tested by
      * reading it), the size is set to 0 so that later when we check we see
      * that it increased .  without buffy_size we probably don't care.
      */
-    if (stat ((*tmp)->path, &sb) == 0 && !test_new_folder ((*tmp)->path))
+    if (stat (tmp->path, &sb) == 0 && !test_new_folder (tmp->path))
     {
       /* some systems out there don't have an off_t type */
-      (*tmp)->size = (long) sb.st_size;
+      tmp->size = (long) sb.st_size;
     }
     else
-      (*tmp)->size = 0;
+      tmp->size = 0;
 #endif /* BUFFY_SIZE */
   }
   return 0;
@@ -348,12 +364,17 @@ int mutt_buffy_check (int force)
         /* poll on do_imap_check, else return cached value */
         if (do_imap_check)
         {
+	  char * old_user = ImapUser, *old_passwd = ImapPass;
           tmp->new = 0;
+	  
+	  ImapUser = tmp->user;
+	  ImapPass = tmp->passwd;
           if (imap_buffy_check (tmp->path) > 0)
           {
             BuffyCount++;
             tmp->new = 1;
           }
+	  ImapUser = old_user, ImapPass = old_passwd;
         }
         else
           if (tmp->new)

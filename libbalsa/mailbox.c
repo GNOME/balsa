@@ -305,51 +305,63 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
 }
 
 void
-add_mailboxes_for_checking (Mailbox * mailbox)
+mailbox_add_for_checking (Mailbox * mailbox)
 {
-  BUFFY **tmp;
-  gchar *path;
+  BUFFY *tmp;
+  gchar *path, *user, *passwd;
 
-  if (!MAILBOX_IS_LOCAL(mailbox))
-    return;
+  g_return_if_fail(mailbox != NULL);
 
-  path = MAILBOX_LOCAL (mailbox)->path;
+  if (MAILBOX_IS_LOCAL(mailbox)) {
+      path = MAILBOX_LOCAL (mailbox)->path;
+      user = passwd = NULL;
+  }
+  else if (MAILBOX_IS_IMAP(mailbox)) {
+      path = g_strdup_printf("{%s:%i}%s", 
+			     MAILBOX_IMAP(mailbox)->server->host,
+			     MAILBOX_IMAP(mailbox)->server->port,
+			     MAILBOX_IMAP(mailbox)->path);
+      user   = MAILBOX_IMAP(mailbox)->server->user;
+      passwd = MAILBOX_IMAP(mailbox)->server->passwd;
+  } else 
+      return;
 
-  for (tmp = &Incoming; *tmp; tmp = &((*tmp)->next))
-    {
-      if (strcmp (path, (*tmp)->path) == 0)
-	return;
-    }
+  fprintf(stderr, "mailbox_add_for_checking, path=%s\n", path);
 
-  if (!*tmp)
-    {
-      *tmp = (BUFFY *) g_new0 (BUFFY, 1);
-      (*tmp)->path = g_strdup (path);
-      (*tmp)->next = NULL;
-    }
-
-  (*tmp)->new = 0;
-  (*tmp)->notified = 1;
-  (*tmp)->newly_created = 0;
-
-  return;
+  tmp = buffy_add_mailbox(path, user, passwd);
+  
+  if(MAILBOX_IS_IMAP(mailbox)) 
+      g_free(path);
 }
 
+/* mailbox_have_new_messages:
+   assumes that mutt_buffy_notify() has been called - this function
+   is expensive and should be called only once 
+*/
+
+
 gint
-mailbox_have_new_messages (gchar * path)
+mailbox_have_new_messages (Mailbox * mailbox)
 {
   BUFFY *tmp = NULL;
+  gchar * path;
 
-  mutt_buffy_notify ();
+  if(MAILBOX_IS_LOCAL(mailbox))
+      path = g_strdup(MAILBOX_LOCAL(mailbox)->path);
+  else if(MAILBOX_IS_IMAP(mailbox))
+      path = g_strdup_printf("{%s:%i}%s", 
+			     MAILBOX_IMAP(mailbox)->server->host,
+			     MAILBOX_IMAP(mailbox)->server->port,
+			     MAILBOX_IMAP(mailbox)->path);
+  else return FALSE;
 
   for (tmp = Incoming; tmp; tmp = tmp->next)
-    {
-      if (strcmp (tmp->path, path) == 0)
-	{
-	  if (tmp->new)
-	    return TRUE;
-	}
-    }
+  {
+      if (strcmp (tmp->path, path) == 0) {
+	  g_free(path);
+	  return tmp->new;
+      }
+  }
   return FALSE;
 }
 

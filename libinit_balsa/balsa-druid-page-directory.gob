@@ -111,7 +111,7 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 	box->name = g_strdup( gettext( prettyname ) );
 	(MAILBOX_LOCAL( box ))->path = dup;
 	config_mailbox_add( box, (char *) prettyname );
-	add_mailboxes_for_checking( box );
+	mailbox_add_for_checking( box );
 	gtk_object_destroy( GTK_OBJECT( box ) );
 }
 

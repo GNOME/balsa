@@ -466,7 +466,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 	  mailbox = BALSA_MAILBOX(mailbox_new (mailbox_type));
 	  mailbox->name = mailbox_name;
 	  MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
-          add_mailboxes_for_checking(mailbox);
+        mailbox_add_for_checking(mailbox);
 	}
       else
 	{
@@ -519,7 +519,6 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 	MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup (field);
 
 
-
       balsa_app.inbox_input =
 	g_list_append (balsa_app.inbox_input, mailbox);
     }
@@ -553,7 +552,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       if ((field = pl_dict_get_str (mbox, "Path")) == NULL)
 	return FALSE;
       MAILBOX_IMAP (mailbox)->path = g_strdup (field);
-
+      mailbox_add_for_checking(mailbox);
     }
   else
     {

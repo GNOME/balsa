@@ -86,9 +86,12 @@ balsa_mailbox_imap_destroy (GtkObject *object)
     (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
 }
 
+#if 0
 /* mailbox_imap_has_new_messages:
    returns non-zero when the IMAP mbox in question has new messages.
    should it load new messages, too?
+
+   REMARK: imap is now checked as ordinary file mailboxes, via Buffy system.
 */
 gint
 mailbox_imap_has_new_messages(MailboxIMAP *mailbox)
@@ -111,3 +114,4 @@ mailbox_imap_has_new_messages(MailboxIMAP *mailbox)
     /* if(res) MAILBOX(mailbox)->has_unread_messages = res; */
     return res;
 }
+#endif

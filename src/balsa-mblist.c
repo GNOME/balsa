@@ -424,6 +424,8 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
   if (!gnode || (!(mbnode = gnode->data)))
     return FALSE;
 
+  mutt_buffy_notify();
+
   if (mbnode->mailbox)
   {
     mbnode->IsDir = FALSE;
@@ -454,7 +456,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	gtk_ctree_node_set_row_data (ctree, cnode, mbnode);
       } else {
 	/* normal mailbox */
-	if (mailbox_have_new_messages (MAILBOX_LOCAL (mbnode->mailbox)->path))
+	if (mailbox_have_new_messages (mbnode->mailbox))
 	{
           mbnode->mailbox->has_unread_messages = TRUE;
 
@@ -707,6 +709,8 @@ balsa_mblist_set_style (BalsaMBList* mblist)
 void
 balsa_mblist_have_new (BalsaMBList * bmbl)
 {
+  mutt_buffy_notify();
+
   balsa_mblist_set_style (bmbl);
   gtk_clist_freeze (GTK_CLIST (&(bmbl->ctree)));
   gtk_ctree_post_recursive (GTK_CTREE (&(bmbl->ctree)), NULL, 
@@ -749,15 +753,11 @@ balsa_mblist_check_new (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
   /* If it's not local the mail-check function won't work, and if it's
    * already open we can get conflicting results since we're checking
    * the file on disk as opposed to the mailbox in memory */
-  if (BALSA_IS_MAILBOX_LOCAL (mailbox) && mailbox->open_ref == 0) {
-  /* Call the actual function to determine the presence of new unread
-   * messages */
-     mailbox->has_unread_messages = 
-             mailbox_have_new_messages (MAILBOX_LOCAL (mailbox)->path);
-  } else if ( MAILBOX_IS_IMAP(mailbox) && mailbox->open_ref > 0)
-      mailbox->has_unread_messages = 
-	  mailbox_imap_has_new_messages( MAILBOX_IMAP(mailbox) );
-  
+  if (mailbox->open_ref == 0)
+      mailbox_have_new_messages (mailbox);
+  else
+      mailbox_check_new_messages(mailbox); 
+
   balsa_mblist_mailbox_style (ctree, node, cnode_data
 #ifdef BALSA_SHOW_INFO
                               ,BALSA_MBLIST (ctree)->display_content_info

@@ -1,4 +1,17 @@
-2000-06-08  Pawel Salek < pawsa@theochem.kth.se>
+2000-06-10  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.[hc]: handling IMAP mboxes.
+	* libbalsa/mailbox_imap.[hc]: disabled deprecated 
+	mailbox_imap_has_new_messages.
+	* libinit_balsa/balsa-druid-page-directory.gob,
+	* libmutt/buffy.[hc]: handling IMAP mailboxes.
+	* src/balsa-mblist.c: call mutt_buffy_notify() less often (big win
+	for remote mailboxes). unify handling of non- and IMAP mailboxes.
+	* src/local-mailbox.c: code clean up.
+	* src/mailbox-conf.c,src/save-restore.c: code clean up, IMAP watching.
+	* src/main-window.c: simplify mailbox checking.
+	
+2000-06-08  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libmutt/mbox.c(mbox_sync_mailbox): first approach to fix the
 	silly mbox sync problem.

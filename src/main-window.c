@@ -985,10 +985,6 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
   check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input); 
   check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
 
-  /* if open, load up the messages */
-   if( mbox && CLIENT_CONTEXT_OPEN( mbox) )
-     mailbox_check_new_messages( mbox ); 
-
   balsa_mblist_have_new (balsa_app.mblist);
 #endif
 }

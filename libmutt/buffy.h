@@ -19,6 +19,8 @@
 typedef struct buffy_t
 {
   char *path;
+  char * user, *passwd; /* links to neceessary authorization data, 
+			   if relevant (IMAP) */
 #ifdef BUFFY_SIZE
   long size;
 #endif				/* BUFFY_SIZE */
@@ -35,7 +37,10 @@ WHERE short BuffyTimeout INITVAL (3);
 
 extern time_t BuffyDoneTime;	/* last time we knew for sure how much mail there was */
 
+BUFFY* buffy_add_mailbox(const char *path, const char *user, 
+			 const char *passwd);
 #ifdef BUFFY_SIZE
 BUFFY *mutt_find_mailbox (const char *path);
 void mutt_update_mailbox (BUFFY * b);
 #endif
+

@@ -687,8 +687,6 @@ conf_add_mailbox ()
 	node = g_node_new (mailbox_node_new (mailbox->name, mailbox,
 					     mailbox->type != MAILBOX_MBOX));
 	g_node_append (balsa_app.mailbox_nodes, node);
-	config_mailbox_add (mailbox, NULL);
-	add_mailboxes_for_checking (mailbox);
       }
       break;
 
@@ -714,8 +712,6 @@ conf_add_mailbox ()
       MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
 
       balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
-      config_mailbox_add (mailbox, NULL);
-      add_mailboxes_for_checking (mailbox);
       break;
 
 
@@ -752,8 +748,6 @@ conf_add_mailbox ()
       node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
       g_node_append (balsa_app.mailbox_nodes, node);
 
-      config_mailbox_add (mailbox, NULL);
-      add_mailboxes_for_checking (mailbox);
       break;
 
     case MC_PAGE_NEW:
@@ -761,6 +755,8 @@ conf_add_mailbox ()
 	    break;
     }
 
+  config_mailbox_add (mailbox, NULL);
+  mailbox_add_for_checking (mailbox);
   return mailbox;
 }
 

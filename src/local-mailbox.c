@@ -160,10 +160,6 @@ add_mailbox (const gchar * name, const gchar * path, MailboxType type,
 			    G_TRAVERSE_ALL, dirname);
       g_free(dirname);
 
-      if (rnode)
-	g_node_append (rnode, node);
-      else
-	g_node_append (balsa_app.mailbox_nodes, node);
     }
   else
     {
@@ -175,38 +171,27 @@ add_mailbox (const gchar * name, const gchar * path, MailboxType type,
 	{
 	  /*      g_strdup (g_basename (g_dirname (myfile))) */
 	  node = g_node_new (mailbox_node_new (path, mailbox, TRUE));
-	  rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, g_dirname (path));
-	  if (rnode)
-	    {
-	      add_mailboxes_for_checking (mailbox);
-	      g_node_append (rnode, node);
-	    }
-	  else
-	    {
-	      add_mailboxes_for_checking (mailbox);
-	      g_node_append (balsa_app.mailbox_nodes, node);
-	    }
+	  rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
+				G_TRAVERSE_ALL, g_dirname (path));
 	}
       else
 	{
 	  char *dirname = g_dirname (path);
 	  node = g_node_new (mailbox_node_new (path, mailbox, FALSE));
-	  rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, dirname);
+	  rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
+				G_TRAVERSE_ALL, dirname);
 	  g_free (dirname);
-	  if (rnode)
-	    {
-	      add_mailboxes_for_checking (mailbox);
-	      g_node_append (rnode, node);
-	    }
-	  else
-	    {
-	      add_mailboxes_for_checking (mailbox);
-	      g_node_append (balsa_app.mailbox_nodes, node);
-	    }
 	}
+
+      mailbox_add_for_checking (mailbox);
       if (balsa_app.debug)
-	g_print (_ ("Local Mailbox Loaded as: %s\n"), mailbox_type_description (mailbox->type));
+	g_print (_ ("Local Mailbox Loaded as: %s\n"), 
+		 mailbox_type_description (mailbox->type));
     }
+  if (rnode)
+      g_node_append (rnode, node);
+  else
+      g_node_append (balsa_app.mailbox_nodes, node);
 }
 
 static int

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-12-02 23:50-0500\n"
+"POT-Creation-Date: 2004-12-05 16:03+0000\n"
 "PO-Revision-Date: 2004-12-02 14:48-0400\n"
 "Last-Translator: Adam Weinberger <adamw@gnome.org>\n"
 "Language-Team: en_CA <adamw@FreeBSD.org>\n"
@@ -1870,91 +1870,91 @@ msgstr "Size"
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Opening mailbox %s. Please wait..."
 
-#: src/balsa-index.c:1628
+#: src/balsa-index.c:1639
 #, c-format
 msgid "Move to Trash failed: %s"
 msgstr "Move to Trash failed: %s"
 
 #. R
-#: src/balsa-index.c:1776 src/main-window.c:581 src/main-window.c:1028
+#: src/balsa-index.c:1787 src/main-window.c:581 src/main-window.c:1028
 #: src/message-window.c:145
 msgid "_Reply..."
 msgstr "_Reply..."
 
-#: src/balsa-index.c:1778
+#: src/balsa-index.c:1789
 msgid "Reply To _All..."
 msgstr "Reply To _All..."
 
-#: src/balsa-index.c:1780
+#: src/balsa-index.c:1791
 msgid "Reply To _Group..."
 msgstr "Reply To _Group..."
 
-#: src/balsa-index.c:1782
+#: src/balsa-index.c:1793
 msgid "_Forward Attached..."
 msgstr "_Forward Attached..."
 
-#: src/balsa-index.c:1784
+#: src/balsa-index.c:1795
 msgid "Forward _Inline..."
 msgstr "Forward _Inline..."
 
-#: src/balsa-index.c:1786 src/main-window.c:671 src/main-window.c:1012
+#: src/balsa-index.c:1797 src/main-window.c:671 src/main-window.c:1012
 msgid "_Store Address..."
 msgstr "_Store Address..."
 
-#: src/balsa-index.c:1801 src/filter-edit-dialog.c:274 src/mailbox-node.c:970
+#: src/balsa-index.c:1812 src/filter-edit-dialog.c:274 src/mailbox-node.c:970
 #: src/pref-manager.c:1734 src/pref-manager.c:2964
 msgid "_Delete"
 msgstr "_Delete"
 
-#: src/balsa-index.c:1806
+#: src/balsa-index.c:1817
 msgid "_Undelete"
 msgstr "_Undelete"
 
-#: src/balsa-index.c:1811
+#: src/balsa-index.c:1822
 msgid "Move To _Trash"
 msgstr "Move To _Trash"
 
-#: src/balsa-index.c:1815
+#: src/balsa-index.c:1826
 msgid "T_oggle"
 msgstr "T_oggle"
 
-#: src/balsa-index.c:1819 src/main-window.c:328 src/main-window.c:357
+#: src/balsa-index.c:1830 src/main-window.c:328 src/main-window.c:357
 msgid "_Flagged"
 msgstr "_Flagged"
 
-#: src/balsa-index.c:1822
+#: src/balsa-index.c:1833
 msgid "_Unread"
 msgstr "_Unread"
 
-#: src/balsa-index.c:1830
+#: src/balsa-index.c:1841
 msgid "_Move to"
 msgstr "_Move to"
 
-#: src/balsa-index.c:1838
+#: src/balsa-index.c:1849
 msgid "_View Source"
 msgstr "_View Source"
 
-#: src/balsa-index.c:2120
+#: src/balsa-index.c:2131
 #, c-format
 msgid "Failed to copy messages to mailbox \"%s\": %s"
 msgstr "Failed to copy messages to mailbox \"%s\": %s"
 
-#: src/balsa-index.c:2121
+#: src/balsa-index.c:2132
 #, c-format
 msgid "Failed to copy message to mailbox \"%s\": %s"
 msgstr "Failed to copy message to mailbox \"%s\": %s"
 
-#: src/balsa-index.c:2133
+#: src/balsa-index.c:2144
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr "Copied to \"%s\"."
 
-#: src/balsa-index.c:2134
+#: src/balsa-index.c:2145
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr "Moved to \"%s\"."
 
-#: src/balsa-index.c:2254
+#: src/balsa-index.c:2265
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Committing mailbox %s failed."

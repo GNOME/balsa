@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-11-27 10:36+0100\n"
+"POT-Creation-Date: 2004-12-05 16:03+0000\n"
 "PO-Revision-Date: 2004-11-27 12:47+0100\n"
 "Last-Translator: Gabor Kelemen <kelemeng@gnome.hu>\n"
 "Language-Team: Hungarian <gnome@gnome.hu>\n"
@@ -70,7 +70,7 @@ msgid "Cannot add duplicate entry"
 msgstr "Már létező bejegyzés nem adható hozzá"
 
 #: libbalsa/address-book.c:407 src/main-window.c:2203 src/main-window.c:4191
-#: src/sendmsg-window.c:4360
+#: src/sendmsg-window.c:4375
 msgid "Unknown error"
 msgstr "Ismeretlen hiba"
 
@@ -260,12 +260,12 @@ msgstr "%s: többszörös kulcs ehhez: %s"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:92 libbalsa/mailbox_local.c:1111
-#: libbalsa/mailbox_local.c:1113 src/sendmsg-window.c:2931
-#: src/sendmsg-window.c:2932
+#: libbalsa/mailbox_local.c:1113 src/sendmsg-window.c:2946
+#: src/sendmsg-window.c:2947
 msgid "Re:"
 msgstr "Re:"
 
-#: libbalsa/identity.c:93 src/sendmsg-window.c:2961 src/sendmsg-window.c:2962
+#: libbalsa/identity.c:93 src/sendmsg-window.c:2976 src/sendmsg-window.c:2977
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -521,7 +521,7 @@ msgstr "Az IMAP kiszolgáló leállította a kapcsolatot: %s. Újrakapcsolódás
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: %s megnyitása, hivatkozások száma: %d\n"
 
-#: libbalsa/mailbox_imap.c:1034 libbalsa/mailbox_imap.c:2060
+#: libbalsa/mailbox_imap.c:1034 libbalsa/mailbox_imap.c:2061
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "%ld kB letöltése"
@@ -540,12 +540,12 @@ msgstr ""
 msgid "No path found for mailbox \"%s\", using \"%s\""
 msgstr "Nem található útvonal \"%s\" postafiókhoz \"%s\" használatával"
 
-#: libbalsa/mailbox_imap.c:2252
+#: libbalsa/mailbox_imap.c:2253
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "%ld kB feltöltése"
 
-#: libbalsa/mailbox_imap.c:2439
+#: libbalsa/mailbox_imap.c:2440
 msgid "Server-side threading not supported."
 msgstr "A kiszolgálóoldali szálakra bontás nem támogatott."
 
@@ -827,20 +827,20 @@ msgstr "japán"
 msgid "korean"
 msgstr "koreai"
 
-#: libbalsa/misc.c:1817
+#: libbalsa/misc.c:1778
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "Időtúllépés. fcntl zárolás sikertelen!"
 
-#: libbalsa/misc.c:1824
+#: libbalsa/misc.c:1785
 #, c-format
 msgid "Waiting for fcntl lock... %d"
 msgstr "Várakozás fcntl zárolásra... %d"
 
-#: libbalsa/misc.c:1852
+#: libbalsa/misc.c:1813
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "Időtúllépés. flock zárolás sikertelen!"
 
-#: libbalsa/misc.c:1859
+#: libbalsa/misc.c:1820
 #, c-format
 msgid "Waiting for flock attempt... %d"
 msgstr "Próbálkozom az flock zárolással... %d"
@@ -1298,7 +1298,7 @@ msgid "Connected to MTA"
 msgstr "Kapcsolódva az MTA-hoz"
 
 #: libbalsa/send.c:896 src/balsa-message.c:1462 src/print.c:370
-#: src/sendmsg-window.c:862 src/sendmsg-window.c:2756 src/store-address.c:329
+#: src/sendmsg-window.c:862 src/sendmsg-window.c:2771 src/store-address.c:329
 msgid "From:"
 msgstr "Feladó:"
 
@@ -1307,7 +1307,7 @@ msgid "From"
 msgstr "Feladó"
 
 #: libbalsa/send.c:908 src/balsa-message.c:1471 src/print.c:374
-#: src/sendmsg-window.c:861 src/sendmsg-window.c:2763 src/store-address.c:330
+#: src/sendmsg-window.c:861 src/sendmsg-window.c:2778 src/store-address.c:330
 msgid "To:"
 msgstr "Címzett:"
 
@@ -1882,91 +1882,91 @@ msgstr "Méret"
 msgid "Opening mailbox %s. Please wait..."
 msgstr "%s postafiók megnyitása. Várj..."
 
-#: src/balsa-index.c:1628
+#: src/balsa-index.c:1639
 #, c-format
 msgid "Move to Trash failed: %s"
 msgstr "Áthelyezés a Kukába sikertelen: %s"
 
 #. R
-#: src/balsa-index.c:1776 src/main-window.c:581 src/main-window.c:1028
+#: src/balsa-index.c:1787 src/main-window.c:581 src/main-window.c:1028
 #: src/message-window.c:145
 msgid "_Reply..."
 msgstr "_Válasz..."
 
-#: src/balsa-index.c:1778
+#: src/balsa-index.c:1789
 msgid "Reply To _All..."
 msgstr "Válasz _mindenkinek..."
 
-#: src/balsa-index.c:1780
+#: src/balsa-index.c:1791
 msgid "Reply To _Group..."
 msgstr "Válasz _csoportnak..."
 
-#: src/balsa-index.c:1782
+#: src/balsa-index.c:1793
 msgid "_Forward Attached..."
 msgstr "_Továbbítás mellékletben..."
 
-#: src/balsa-index.c:1784
+#: src/balsa-index.c:1795
 msgid "Forward _Inline..."
 msgstr "Továbbítás _beágyazva..."
 
-#: src/balsa-index.c:1786 src/main-window.c:671 src/main-window.c:1012
+#: src/balsa-index.c:1797 src/main-window.c:671 src/main-window.c:1012
 msgid "_Store Address..."
 msgstr "_Cím mentése..."
 
-#: src/balsa-index.c:1801 src/filter-edit-dialog.c:274 src/mailbox-node.c:970
+#: src/balsa-index.c:1812 src/filter-edit-dialog.c:274 src/mailbox-node.c:970
 #: src/pref-manager.c:1734 src/pref-manager.c:2964
 msgid "_Delete"
 msgstr "_Törlés"
 
-#: src/balsa-index.c:1806
+#: src/balsa-index.c:1817
 msgid "_Undelete"
 msgstr "Tör_lés visszavonása"
 
-#: src/balsa-index.c:1811
+#: src/balsa-index.c:1822
 msgid "Move To _Trash"
 msgstr "Áthelyezés a _Kukába"
 
-#: src/balsa-index.c:1815
+#: src/balsa-index.c:1826
 msgid "T_oggle"
 msgstr "Át_vált"
 
-#: src/balsa-index.c:1819 src/main-window.c:328 src/main-window.c:357
+#: src/balsa-index.c:1830 src/main-window.c:328 src/main-window.c:357
 msgid "_Flagged"
 msgstr "_Megjelölt"
 
-#: src/balsa-index.c:1822
+#: src/balsa-index.c:1833
 msgid "_Unread"
 msgstr "_Olvasatlan"
 
-#: src/balsa-index.c:1830
+#: src/balsa-index.c:1841
 msgid "_Move to"
 msgstr "Á_thelyezés"
 
-#: src/balsa-index.c:1838
+#: src/balsa-index.c:1849
 msgid "_View Source"
 msgstr "_Forrás megtekintése"
 
-#: src/balsa-index.c:2116
+#: src/balsa-index.c:2131
 #, c-format
 msgid "Failed to copy messages to mailbox \"%s\": %s"
 msgstr "Üzenetek másolása \"%s\" postafiókba sikertelen: %s"
 
-#: src/balsa-index.c:2117
+#: src/balsa-index.c:2132
 #, c-format
 msgid "Failed to copy message to mailbox \"%s\": %s"
 msgstr "Üzenet másolása \"%s\" postafiókba sikertelen: %s"
 
-#: src/balsa-index.c:2129
+#: src/balsa-index.c:2144
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr "Másolva ide: \"%s\"."
 
-#: src/balsa-index.c:2130
+#: src/balsa-index.c:2145
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr "Áthelyezve ide: \"%s\"."
 
-#: src/balsa-index.c:2250
+#: src/balsa-index.c:2265
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "%s postafiók változásainak érvényesítése sikertelen."
@@ -2038,16 +2038,16 @@ msgid "(No sender)"
 msgstr "(Nincs feladó)"
 
 #: src/balsa-message.c:1199
-#, c-format
-msgid "Could not access message; mailbox \"%s\" was changed."
+#, fuzzy, c-format
+msgid "Could not access message %ld in mailbox \"%s\"."
 msgstr "Nem lehet az üzenethez hozzáférni, \"%s\" postafiók megváltozott."
 
 #: src/balsa-message.c:1453 src/print.c:359 src/sendmsg-window.c:866
-#: src/sendmsg-window.c:2751
+#: src/sendmsg-window.c:2766
 msgid "Subject:"
 msgstr "Tárgy:"
 
-#: src/balsa-message.c:1457 src/print.c:365 src/sendmsg-window.c:2745
+#: src/balsa-message.c:1457 src/print.c:365 src/sendmsg-window.c:2760
 msgid "Date:"
 msgstr "Dátum:"
 
@@ -2057,13 +2057,13 @@ msgstr "Válaszcím:"
 
 #. cc:
 #: src/balsa-message.c:1472 src/print.c:375 src/sendmsg-window.c:865
-#: src/sendmsg-window.c:2442 src/sendmsg-window.c:2770 src/store-address.c:331
+#: src/sendmsg-window.c:2447 src/sendmsg-window.c:2785 src/store-address.c:331
 msgid "Cc:"
 msgstr "Másolat:"
 
 #. bcc:
 #: src/balsa-message.c:1473 src/print.c:376 src/sendmsg-window.c:864
-#: src/sendmsg-window.c:2447 src/store-address.c:332
+#: src/sendmsg-window.c:2452 src/store-address.c:332
 msgid "Bcc:"
 msgstr "Titkos másolat:"
 
@@ -2075,103 +2075,103 @@ msgstr "Levél tárolása:"
 msgid "Disposition-Notification-To:"
 msgstr "Tértivevény:"
 
-#: src/balsa-message.c:1615 src/balsa-message.c:1646
+#: src/balsa-message.c:1618 src/balsa-message.c:1649
 #, c-format
 msgid "Error loading attached image: %s\n"
 msgstr "Hiba történt %s csatolt kép betöltése közben\n"
 
-#: src/balsa-message.c:1716 src/balsa-message.c:1732 src/balsa-message.c:1764
-#: src/balsa-message.c:1817
+#: src/balsa-message.c:1719 src/balsa-message.c:1735 src/balsa-message.c:1767
+#: src/balsa-message.c:1820
 msgid "Content Type: external-body\n"
 msgstr "Tartalom típusa: külső törzs\n"
 
-#: src/balsa-message.c:1717
+#: src/balsa-message.c:1720
 msgid "Access type: local-file\n"
 msgstr "Hozzáférés típusa: helyi fájl\n"
 
-#: src/balsa-message.c:1718 src/balsa-message.c:1771 src/balsa-message.c:1930
+#: src/balsa-message.c:1721 src/balsa-message.c:1774 src/balsa-message.c:1933
 #, c-format
 msgid "File name: %s"
 msgstr "Fájlnév: %s"
 
-#: src/balsa-message.c:1733
+#: src/balsa-message.c:1736
 msgid "Access type: URL\n"
 msgstr "Hozzáférés típusa: URL\n"
 
-#: src/balsa-message.c:1734
+#: src/balsa-message.c:1737
 #, c-format
 msgid "URL: %s"
 msgstr "URL: %s"
 
-#: src/balsa-message.c:1765
+#: src/balsa-message.c:1768
 #, c-format
 msgid "Access type: %s\n"
 msgstr "Hozzáférés típusa:%s\n"
 
-#: src/balsa-message.c:1768
+#: src/balsa-message.c:1771
 #, c-format
 msgid "FTP site: %s\n"
 msgstr "FTP hely: %s\n"
 
-#: src/balsa-message.c:1770
+#: src/balsa-message.c:1773
 #, c-format
 msgid "Directory: %s\n"
 msgstr "Könyvtár: %s\n"
 
-#: src/balsa-message.c:1818
+#: src/balsa-message.c:1821
 msgid "Access type: mail-server\n"
 msgstr "Hozzáférés típusa:levelező-kiszolgáló\n"
 
-#: src/balsa-message.c:1819
+#: src/balsa-message.c:1822
 #, c-format
 msgid "Mail server: %s\n"
 msgstr "Levelező-kiszolgáló: %s\n"
 
-#: src/balsa-message.c:1821
+#: src/balsa-message.c:1824
 #, c-format
 msgid "Subject: %s\n"
 msgstr "Tárgy: %s\n"
 
-#: src/balsa-message.c:1833
+#: src/balsa-message.c:1836
 msgid "Se_nd message to obtain this part"
 msgstr "Üzenet _küldése ezen rész megszerzéséért"
 
-#: src/balsa-message.c:1938
+#: src/balsa-message.c:1941
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Típus: %s (%s)"
 
-#: src/balsa-message.c:1941
+#: src/balsa-message.c:1944
 #, c-format
 msgid "Content Type: %s"
 msgstr "Tartalomtípus: %s"
 
-#: src/balsa-message.c:1952
+#: src/balsa-message.c:1955
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
 "Nincs megtekintési illetve megnyitási művelet definiálva a GNOME MIME-ban "
 "erre a tartalomtípusra"
 
-#: src/balsa-message.c:1958
+#: src/balsa-message.c:1961
 msgid "S_ave part"
 msgstr "_Rész mentése"
 
-#: src/balsa-message.c:1982 src/balsa-message.c:2007
+#: src/balsa-message.c:1985 src/balsa-message.c:2010
 #, c-format
 msgid "View _part with %s"
 msgstr "Rész meg_tekintése %s segítségével"
 
-#: src/balsa-message.c:2286
+#: src/balsa-message.c:2289
 #, c-format
 msgid "Calling URL %s..."
 msgstr "%s URL hívása..."
 
-#: src/balsa-message.c:2296 src/balsa-message.c:3137 src/balsa-message.c:3876
+#: src/balsa-message.c:2299 src/balsa-message.c:3140 src/balsa-message.c:3879
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Hiba történt %s mutatása közben: %s\n"
 
-#: src/balsa-message.c:2382
+#: src/balsa-message.c:2385
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
@@ -2181,74 +2181,74 @@ msgstr ""
 "karaktereket tartalmaz, a használt kódolást leíró fejléc nélkül. "
 "(konvertálva erre: %s)"
 
-#: src/balsa-message.c:2681
+#: src/balsa-message.c:2684
 msgid "mixed parts"
 msgstr "Vegyes részek"
 
-#: src/balsa-message.c:2683
+#: src/balsa-message.c:2686
 msgid "alternative parts"
 msgstr "Alternatív részek"
 
-#: src/balsa-message.c:2685
+#: src/balsa-message.c:2688
 msgid "signed parts"
 msgstr "aláírt részek"
 
-#: src/balsa-message.c:2687
+#: src/balsa-message.c:2690
 msgid "encrypted parts"
 msgstr "titkosított részek"
 
-#: src/balsa-message.c:2689
+#: src/balsa-message.c:2692
 msgid "rfc822 message"
 msgstr "rfc822 üzenet"
 
-#: src/balsa-message.c:2691
+#: src/balsa-message.c:2694
 #, c-format
 msgid "\"%s\" parts"
 msgstr "\"%s\" részek"
 
-#: src/balsa-message.c:2747
+#: src/balsa-message.c:2750
 #, c-format
 msgid "rfc822 message (from %s, subject \"%s\")"
 msgstr "rfc822 üzenet (feladó: %s, tárgy: \"%s\")"
 
-#: src/balsa-message.c:2754
+#: src/balsa-message.c:2757
 msgid "complete message"
 msgstr "teljes levél"
 
-#: src/balsa-message.c:2771
+#: src/balsa-message.c:2774
 #, c-format
 msgid "part %s: %s (file %s)"
 msgstr "%s rész: %s (fájl: %s)"
 
-#: src/balsa-message.c:2782
+#: src/balsa-message.c:2785
 #, c-format
 msgid "part %s: %s"
 msgstr "%s rész: %s"
 
-#: src/balsa-message.c:2797
+#: src/balsa-message.c:2800
 msgid "encrypted: "
 msgstr "titkosítva: "
 
-#: src/balsa-message.c:2879
+#: src/balsa-message.c:2882
 #, c-format
 msgid "Open with %s"
 msgstr "Megnyitás ezzel: %s"
 
-#: src/balsa-message.c:3028
+#: src/balsa-message.c:3031
 msgid "Save..."
 msgstr "Mentés..."
 
-#: src/balsa-message.c:3215
+#: src/balsa-message.c:3218
 #, c-format
 msgid "Could not create temporary file %s"
 msgstr "Nem lehet létrehozni %s átmeneti fájlt"
 
-#: src/balsa-message.c:3260
+#: src/balsa-message.c:3263
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "%s átmeneti fájl létrehozása nem sikerült"
 
-#: src/balsa-message.c:4153
+#: src/balsa-message.c:4156
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2259,11 +2259,11 @@ msgstr ""
 "visszaküldését kérte '%s' címre.\n"
 "El szeretné küldeni ezt az értesítést?"
 
-#: src/balsa-message.c:4160
+#: src/balsa-message.c:4163
 msgid "Reply to MDN?"
 msgstr "Visszaküldi a tértivevényt?"
 
-#: src/balsa-message.c:4479
+#: src/balsa-message.c:4482
 #, c-format
 msgid ""
 "This is an inline %s signed %s message part:\n"
@@ -2272,19 +2272,19 @@ msgstr ""
 "Ez egy beágyazott, ezzel: %s aláírt %s üzenetrész:\n"
 "%s"
 
-#: src/balsa-message.c:4481 src/print.c:1303
+#: src/balsa-message.c:4484 src/print.c:1303
 msgid "OpenPGP"
 msgstr "OpenPGP"
 
-#: src/balsa-message.c:4481 src/balsa-message.c:4743 src/print.c:1303
+#: src/balsa-message.c:4484 src/balsa-message.c:4746 src/print.c:1303
 msgid "S/MIME"
 msgstr "S/MIME"
 
-#: src/balsa-message.c:4499
+#: src/balsa-message.c:4502
 msgid "_Run gpg to import this key"
 msgstr "Gpg _futtatása ezen kulcs importálásához"
 
-#: src/balsa-message.c:4616 src/balsa-message.c:4840
+#: src/balsa-message.c:4619 src/balsa-message.c:4843
 msgid ""
 "This operation can not be performed because this message is displayed more "
 "than once.\n"
@@ -2294,7 +2294,7 @@ msgstr ""
 "van megjelenítve.\n"
 "Kérem zárja be ennek az üzenetnek a további példányait és próbálja újra."
 
-#: src/balsa-message.c:4652
+#: src/balsa-message.c:4655
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
@@ -2303,7 +2303,7 @@ msgstr ""
 "A következő feladótól: %s ezzel a tárggyal: \"%s\" érkezett levél "
 "titkosított részt tartalmaz, de ennek struktúrája érvénytelen."
 
-#: src/balsa-message.c:4660
+#: src/balsa-message.c:4663
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
@@ -2313,7 +2313,7 @@ msgstr ""
 "kódolású részt tartalmaz, de ez a titkosítási protokoll nem áll "
 "rendelkezésre."
 
-#: src/balsa-message.c:4673
+#: src/balsa-message.c:4676
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
@@ -2323,7 +2323,7 @@ msgstr ""
 "kódolású részt tartalmaz, de ez a titkosítási protokoll nem áll "
 "rendelkezésre."
 
-#: src/balsa-message.c:4727
+#: src/balsa-message.c:4730
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but it's "
@@ -2333,7 +2333,7 @@ msgstr ""
 "részt tartalmaz, de ennek struktúrája érvénytelen. Az aláírás, ha van, nem "
 "ellenőrizhető."
 
-#: src/balsa-message.c:4740
+#: src/balsa-message.c:4743
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
@@ -2343,24 +2343,24 @@ msgstr ""
 "következővel:%s titkosított részt tartalmaz, de ez a titkosítási protokoll "
 "nem áll rendelkezésre."
 
-#: src/balsa-message.c:4743
+#: src/balsa-message.c:4746
 msgid "PGP"
 msgstr "PGP"
 
-#: src/balsa-message.c:4762 src/balsa-message.c:4867
+#: src/balsa-message.c:4765 src/balsa-message.c:4870
 msgid "Detected a good signature"
 msgstr "Érvényes aláírást érzékeltem"
 
-#: src/balsa-message.c:4768
+#: src/balsa-message.c:4771
 msgid "Detected a good signature with insufficient validity"
 msgstr "Érvényes aláírást érzékeltem, elégtelen érvényességgel"
 
-#: src/balsa-message.c:4773 src/balsa-message.c:4871
+#: src/balsa-message.c:4776 src/balsa-message.c:4874
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr ""
 "Érvényes aláírást érzékeltem, elégtelen érvényességgel/megbízhatósággal"
 
-#: src/balsa-message.c:4780 src/balsa-message.c:4877
+#: src/balsa-message.c:4783 src/balsa-message.c:4880
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2371,7 +2371,7 @@ msgstr ""
 "ellenőrzésének eredménye:\n"
 "%s"
 
-#: src/balsa-message.c:4792
+#: src/balsa-message.c:4795
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -2518,7 +2518,7 @@ msgstr "_Levéltörzs"
 
 #. To:
 #: src/filter-edit-callbacks.c:1140 src/main-window.c:3789
-#: src/sendmsg-window.c:2431
+#: src/sendmsg-window.c:2436
 msgid "_To:"
 msgstr "_Címzett:"
 
@@ -4335,7 +4335,7 @@ msgstr "MB"
 msgid "Quoted and Flowed Text"
 msgstr "Idézett és folytonossá tett szöveg"
 
-#: src/pref-manager.c:1929 src/sendmsg-window.c:4554
+#: src/pref-manager.c:1929 src/sendmsg-window.c:4569
 msgid "Quoted Text Regular Expression"
 msgstr "Idézett szöveg reguláris kifejezés"
 
@@ -5281,8 +5281,8 @@ msgstr "%s fájl nem olvasható\n"
 msgid "Attach file"
 msgstr "Fájl csatolása"
 
-#: src/sendmsg-window.c:2114 src/sendmsg-window.c:2177
-#: src/sendmsg-window.c:3577
+#: src/sendmsg-window.c:2114 src/sendmsg-window.c:2181
+#: src/sendmsg-window.c:3592
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5290,92 +5290,92 @@ msgstr ""
 "Üzenet csatolása sikertelen.\n"
 "Lehetséges ok: nincs elég hely az átmeneti fájloknak"
 
-#: src/sendmsg-window.c:2398 src/sendmsg-window.c:2423
+#: src/sendmsg-window.c:2403 src/sendmsg-window.c:2428
 msgid "F_rom:"
 msgstr "F_eladó:"
 
 #. Subject:
-#: src/sendmsg-window.c:2438
+#: src/sendmsg-window.c:2443
 msgid "S_ubject:"
 msgstr "_Tárgy:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: src/sendmsg-window.c:2452
+#: src/sendmsg-window.c:2457
 msgid "F_cc:"
 msgstr "Levél _tárolása:"
 
 #. Reply To:
-#: src/sendmsg-window.c:2483
+#: src/sendmsg-window.c:2488
 msgid "_Reply To:"
 msgstr "_Válaszcím:"
 
 #. Attachment list
-#: src/sendmsg-window.c:2488
+#: src/sendmsg-window.c:2493
 msgid "_Attachments:"
 msgstr "_Mellékletek:"
 
-#: src/sendmsg-window.c:2730
+#: src/sendmsg-window.c:2745
 msgid "you"
 msgstr "te"
 
-#: src/sendmsg-window.c:2739
+#: src/sendmsg-window.c:2754
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------továbbított levél, eredeti feladó: %s------\n"
 
-#: src/sendmsg-window.c:2774
+#: src/sendmsg-window.c:2789
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Üzenetazonosító: %s\n"
 
-#: src/sendmsg-window.c:2780
+#: src/sendmsg-window.c:2795
 msgid "References:"
 msgstr "Hivatkozások:"
 
-#: src/sendmsg-window.c:2791
+#: src/sendmsg-window.c:2806
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "%s keltezéssel %s írta:\n"
 
-#: src/sendmsg-window.c:2793
+#: src/sendmsg-window.c:2808
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s írta: \n"
 
-#: src/sendmsg-window.c:2890
+#: src/sendmsg-window.c:2905
 msgid "No signature found!"
 msgstr "Nem találtam aláírást!"
 
-#: src/sendmsg-window.c:3695
+#: src/sendmsg-window.c:3710
 #, c-format
 msgid "Error executing signature generator %s"
 msgstr "Hiba %s aláírásgenerátor végrehajtása közben"
 
-#: src/sendmsg-window.c:3707
+#: src/sendmsg-window.c:3722
 #, c-format
 msgid "Cannot open signature file '%s' for reading"
 msgstr "%s aláírásfájl nem nyitható meg olvasásra"
 
-#: src/sendmsg-window.c:3717
+#: src/sendmsg-window.c:3732
 #, c-format
 msgid "Error reading signature from %s"
 msgstr "Hiba történt az aláírás betöltése közben ebből: %s"
 
-#: src/sendmsg-window.c:3721
+#: src/sendmsg-window.c:3736
 #, c-format
 msgid "Signature in %s is not a UTF-8 text."
 msgstr "A(z) %s aláírás nem UTF-8 szöveg."
 
-#: src/sendmsg-window.c:3783
+#: src/sendmsg-window.c:3798
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "A fájl megnyitása (%s) nem volt sikeres.\n"
 
-#: src/sendmsg-window.c:3805
+#: src/sendmsg-window.c:3820
 msgid "Include file"
 msgstr "Fájl beillesztése"
 
-#: src/sendmsg-window.c:4127
+#: src/sendmsg-window.c:4142
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5386,7 +5386,7 @@ msgstr ""
 "Kérem válassza ki az üzenet nyelvét.\n"
 "Többnyelvű üzenetekhez válassza az UTF-8-at."
 
-#: src/sendmsg-window.c:4168
+#: src/sendmsg-window.c:4183
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5396,70 +5396,70 @@ msgstr ""
 "módban csak az első rész lesz aláírva és/vagy titkosítva. Ha az egész "
 "üzenetet szeretné megvédeni, válassza a MIME-módot. Valóban folytatja?"
 
-#: src/sendmsg-window.c:4184
+#: src/sendmsg-window.c:4199
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "üzenet küldése %d. gpg móddal"
 
-#: src/sendmsg-window.c:4231
+#: src/sendmsg-window.c:4246
 msgid "Message could not be created"
 msgstr "Az üzenetet nem lehet létrehozni"
 
-#: src/sendmsg-window.c:4233
+#: src/sendmsg-window.c:4248
 msgid "Message could not be queued in outbox"
 msgstr "Az üzenet nem állítható sorba a kimenők közé"
 
-#: src/sendmsg-window.c:4235
+#: src/sendmsg-window.c:4250
 msgid "Message could not be saved in sentbox"
 msgstr "Az üzenetet nem lehet elmenteni az elküldöttek közé"
 
-#: src/sendmsg-window.c:4237
+#: src/sendmsg-window.c:4252
 msgid "Message could not be sent"
 msgstr "Az üzenetet nem lehet elküldeni"
 
-#: src/sendmsg-window.c:4241
+#: src/sendmsg-window.c:4256
 #, c-format
 msgid "Send failed: %s"
 msgstr "Küldés sikertelen: %s"
 
-#: src/sendmsg-window.c:4329
+#: src/sendmsg-window.c:4344
 msgid "Could not postpone message."
 msgstr "Nem lehet elhalasztani az üzenetet."
 
-#: src/sendmsg-window.c:4343
+#: src/sendmsg-window.c:4358
 msgid "Message postponed."
 msgstr "Üzenet elhalasztva."
 
-#: src/sendmsg-window.c:4359
+#: src/sendmsg-window.c:4374
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Nem lehet megnyitni a(z) \"%s\" piszkozatmappát"
 
-#: src/sendmsg-window.c:4381
+#: src/sendmsg-window.c:4396
 msgid "Message saved."
 msgstr "Üzenet elmentve."
 
-#: src/sendmsg-window.c:4553
+#: src/sendmsg-window.c:4568
 #, c-format
 msgid "Could not compile %s"
 msgstr "Nem lehet lefordítani ezt: %s"
 
-#: src/sendmsg-window.c:5065
+#: src/sendmsg-window.c:5080
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Válasz: %s: %s"
 
-#: src/sendmsg-window.c:5070
+#: src/sendmsg-window.c:5085
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Levél továbbítása: %s: %s"
 
-#: src/sendmsg-window.c:5074
+#: src/sendmsg-window.c:5089
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Levél folytatása: %s: %s"
 
-#: src/sendmsg-window.c:5078
+#: src/sendmsg-window.c:5093
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Új levél: %s: %s"

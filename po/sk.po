@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-12-02 18:42+0100\n"
+"POT-Creation-Date: 2004-12-05 16:03+0000\n"
 "PO-Revision-Date: 2004-12-02 18:43+0100\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
@@ -1873,91 +1873,91 @@ msgstr "Veľkosť"
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Otváram poštovú schránku %s. Prosím čakajte..."
 
-#: src/balsa-index.c:1628
+#: src/balsa-index.c:1639
 #, c-format
 msgid "Move to Trash failed: %s"
 msgstr "Presúvanie do Koša zlyhalo: %s"
 
 #. R
-#: src/balsa-index.c:1776 src/main-window.c:581 src/main-window.c:1028
+#: src/balsa-index.c:1787 src/main-window.c:581 src/main-window.c:1028
 #: src/message-window.c:145
 msgid "_Reply..."
 msgstr "_Odpovedať..."
 
-#: src/balsa-index.c:1778
+#: src/balsa-index.c:1789
 msgid "Reply To _All..."
 msgstr "Odpovedať _všetkým..."
 
-#: src/balsa-index.c:1780
+#: src/balsa-index.c:1791
 msgid "Reply To _Group..."
 msgstr "Odpovedať _skupine..."
 
-#: src/balsa-index.c:1782
+#: src/balsa-index.c:1793
 msgid "_Forward Attached..."
 msgstr "_Poslať ďalej ako prílohu..."
 
-#: src/balsa-index.c:1784
+#: src/balsa-index.c:1795
 msgid "Forward _Inline..."
 msgstr "Poslať ďalej _citované..."
 
-#: src/balsa-index.c:1786 src/main-window.c:671 src/main-window.c:1012
+#: src/balsa-index.c:1797 src/main-window.c:671 src/main-window.c:1012
 msgid "_Store Address..."
 msgstr "_Uložiť adresu..."
 
-#: src/balsa-index.c:1801 src/filter-edit-dialog.c:274 src/mailbox-node.c:970
+#: src/balsa-index.c:1812 src/filter-edit-dialog.c:274 src/mailbox-node.c:970
 #: src/pref-manager.c:1734 src/pref-manager.c:2964
 msgid "_Delete"
 msgstr "Vy_mazať"
 
-#: src/balsa-index.c:1806
+#: src/balsa-index.c:1817
 msgid "_Undelete"
 msgstr "O_bnoviť vymazanú"
 
-#: src/balsa-index.c:1811
+#: src/balsa-index.c:1822
 msgid "Move To _Trash"
 msgstr "Presunúť do _koša"
 
-#: src/balsa-index.c:1815
+#: src/balsa-index.c:1826
 msgid "T_oggle"
 msgstr "_Označiť"
 
-#: src/balsa-index.c:1819 src/main-window.c:328 src/main-window.c:357
+#: src/balsa-index.c:1830 src/main-window.c:328 src/main-window.c:357
 msgid "_Flagged"
 msgstr "O_značené"
 
-#: src/balsa-index.c:1822
+#: src/balsa-index.c:1833
 msgid "_Unread"
 msgstr "_Neprečítané"
 
-#: src/balsa-index.c:1830
+#: src/balsa-index.c:1841
 msgid "_Move to"
 msgstr "_Presunúť do"
 
-#: src/balsa-index.c:1838
+#: src/balsa-index.c:1849
 msgid "_View Source"
 msgstr "_Zobraziť zdroj"
 
-#: src/balsa-index.c:2120
+#: src/balsa-index.c:2131
 #, c-format
 msgid "Failed to copy messages to mailbox \"%s\": %s"
 msgstr "Nepodarilo sa skopírovať správy do poštovej schránky \"%s\": %s"
 
-#: src/balsa-index.c:2121
+#: src/balsa-index.c:2132
 #, c-format
 msgid "Failed to copy message to mailbox \"%s\": %s"
 msgstr "Nepodarilo sa skopírovať správu do poštovej schránky \"%s\": %s"
 
-#: src/balsa-index.c:2133
+#: src/balsa-index.c:2144
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr "Skopírované do \"%s\"."
 
-#: src/balsa-index.c:2134
+#: src/balsa-index.c:2145
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr "Presunuté do \"%s\"."
 
-#: src/balsa-index.c:2254
+#: src/balsa-index.c:2265
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Potvrdenie poštovej schránky %s zlyhalo."

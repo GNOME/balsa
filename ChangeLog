@@ -1,5 +1,10 @@
 2000-04-12  Peter Williams  <peter@beta.newton.cx>
 
+	* src/balsa-mblist.c (balsa_widget_get_bold_font): Change
+	  function behavior to reference font, and checking for
+	  NULL font again... hopefully this ensures a nonnull
+	  style->font (see bug #7356)
+
 	* src/mblist-window.c (size_allocate_cb): Fix size
 	  calculation ( + 18... yeah right ).
 

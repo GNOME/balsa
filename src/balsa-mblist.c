@@ -664,10 +664,9 @@ balsa_mblist_set_style (BalsaMBList* mblist)
   style = gtk_style_copy (gtk_widget_get_style (GTK_WIDGET (mblist)));
 
   /* Attempt to set the font to bold */
-  gdk_font_unref (style->font);
   font = balsa_widget_get_bold_font (GTK_WIDGET (mblist));
-  style->font = font;
-  gdk_font_ref (style->font);
+  gdk_font_unref (style->font);
+  style->font = font; /*Now refed in get_bold_font*/
 
   /* Get and attempt to allocate the colour */
   color = balsa_app.mblist_unread_color;
@@ -1078,8 +1077,8 @@ mblist_mbnode_compare (gconstpointer a, gconstpointer b)
  * 
  * Description: This function takes a widget and returns a bold
  * version of font that it is currently using.  If it fails, it simply
- * returns the default font of the widget.  This function does not
- * update the reference count of any fonts, so assume nothing 
+ * returns the default font of the widget.  ** This function references
+ * the fonts now (change of behavior) ** 
  * */
 GdkFont* 
 balsa_widget_get_bold_font (GtkWidget* widget)
@@ -1113,8 +1112,14 @@ balsa_widget_get_bold_font (GtkWidget* widget)
   font = gdk_font_load (new_xlfd);
   g_free (new_xlfd);
 
-  if (font == NULL)
+  if (font == NULL) {
     font = gdk_font_load (old_xlfd);
 
+    if (font == NULL) {
+	    font = style->font;
+    }
+  }
+
+  gdk_font_ref( font );
   return font;
 }

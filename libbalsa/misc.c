@@ -495,6 +495,8 @@ static void
 dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
                gboolean quote, GString * result)
 {
+    const gint max_width = to_screen ? G_MAXINT : MAX_WIDTH;
+
     /* outer loop over paragraphs */
     while (list) {
         rfc2646text *text = list->data;
@@ -541,11 +543,11 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
              * one word per inner loop
              * */
             while (*str) {
-                while (*str && !isspace((int)*str) && len < MAX_WIDTH) {
+                while (*str && !isspace((int)*str) && len < max_width) {
                     len++;
                     str++;
                 }
-                while (len < MAX_WIDTH && isspace((int)*str)) {
+                while (len < max_width && isspace((int)*str)) {
                     if (*str == '\t')
                         len += 8 - len % 8;
                     else
@@ -558,12 +560,12 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
                  * (we already passed any spaces, so just check for '>'
                  * and "From ")
                  * */
-                if (len < MAX_WIDTH && *str
+                if (len < max_width && *str
                     && (*str == QUOTE_STRING[0]
                         || !strncmp(str, "From ", 5)))
                     continue;
 
-                if (!*str || len > width) {
+                if (!*str || len > width || len >= max_width) {
                     /* allow an overlong first word, otherwise back up
                      * str */
                     if (len > width && !first_word)

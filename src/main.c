@@ -285,6 +285,9 @@ main (int argc, char *argv[])
   if(balsa_app.compose_email)  {
     BalsaSendmsg *snd;
     snd=sendmsg_window_new(window,NULL,SEND_NORMAL);
+    if(strncmp(balsa_app.compose_email, "mailto:", 7) == 0) 
+      memmove(balsa_app.compose_email,balsa_app.compose_email+7,
+	      strlen(balsa_app.compose_email)-7+1); /* copy the NUL */
     gtk_entry_set_text(GTK_ENTRY(snd->to[1]),balsa_app.compose_email);
     gtk_widget_grab_focus(balsa_app.compose_email[0] 
 			  ? snd->subject[1] : snd->to[1]);

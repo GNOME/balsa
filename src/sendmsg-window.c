@@ -40,12 +40,15 @@
 #include "balsa-message.h"
 #include "balsa-index.h"
 
+#ifdef BALSA_USE_THREADS
+#include <pthread.h>
+#include "threads.h"
+#endif
 #include "sendmsg-window.h"
 #include "address-book.h"
 #include "expand-alias.h"
 #include "main.h"
 #include "spell-check.h"
-
 
 static gchar *read_signature (void);
 static gint include_file_cb (GtkWidget *, BalsaSendmsg *);
@@ -372,7 +375,10 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
        gtk_object_unref( GTK_OBJECT(bsm->orig_message) );
    }
 
-#ifndef BALSA_USE_THREADS
+#ifdef BALSA_USE_THREADS
+   if(balsa_app.compose_email && !sending_mail)
+     balsa_exit(); 
+#else
    if(balsa_app.compose_email)
      balsa_exit(); 
 #endif

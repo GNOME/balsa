@@ -37,9 +37,32 @@
 /* Conditions */
 
 static gchar*
-get_quoted_string(gchar **str)
+get_quoted_string(gchar **pstr)
 {
-    return *str;
+    gchar *str = *pstr;
+    GString *res = g_string_new("");
+    if(*str == '"') {
+        while(*++str && *str != '"') {
+            if(*str == '\\') str++;
+            g_string_append_c(res, *str);
+        }
+    } else {
+        while(*++str && !isspace((int)*str))
+            g_string_append_c(res, *str);
+    }
+    *pstr = str;
+    return g_string_free(res, FALSE);
+}
+
+static void
+append_quoted_string(GString *res, const char *str)
+{
+    g_string_append_c(res, '"');
+    while(*str) {
+        if(*str == '"' || *str == '\\')
+            g_string_append_c(res, '\\');
+        g_string_append_c(res, *str++);
+    }
 }
 
 #ifndef FIXME
@@ -236,11 +259,6 @@ libbalsa_condition_new_from_string(gchar **string)
 }
 
 static void
-append_quoted_string(GString *res, const char *str)
-{
-}
-
-static void
 cond_to_string(LibBalsaCondition * cond, GString *res)
 {
     char str[80];
@@ -334,6 +352,8 @@ regexs_free(GSList * regexs)
 void 
 libbalsa_condition_free(LibBalsaCondition* cond)
 {
+    if(!cond) /* passing NULL is OK */
+        return;
     switch (cond->type) {
     case CONDITION_STRING:
 	g_free(cond->match.string.string);

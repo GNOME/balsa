@@ -231,6 +231,8 @@ struct _LibBalsaMailboxClass {
                                   LibBalsaMessageFlag clear);
     void (*set_threading) (LibBalsaMailbox * mailbox,
 			   LibBalsaMailboxThreadingType thread_type);
+    void (*update_view_filter) (LibBalsaMailbox * mailbox,
+                                LibBalsaCondition *view_filter);
     void (*sort) (LibBalsaMailbox * mailbox, GArray *sort_array);
     gboolean (*close_backend)(LibBalsaMailbox * mailbox);
 };
@@ -376,7 +378,8 @@ void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
  * Mailbox views-related functions.
  */
 void libbalsa_mailbox_set_view_filter(LibBalsaMailbox   *mailbox,
-                                      LibBalsaCondition *filter_condition);
+                                      LibBalsaCondition *filter_condition,
+                                      gboolean update_immediately);
 
 /** libbalsa_mailbox_set_threading() uses backend-optimized threading mode
     to produce a tree of messages. The tree is put in msg_tree and used

@@ -135,6 +135,8 @@ void libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 						LibBalsaMailboxThreadingType
 						thread_type);
+static void lbm_imap_update_view_filter(LibBalsaMailbox   *mailbox,
+                                        LibBalsaCondition *view_filter);
 static void libbalsa_mailbox_imap_sort(LibBalsaMailbox *mailbox,
                                        GArray *array);
 
@@ -236,6 +238,8 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
 	libbalsa_mailbox_imap_change_message_flags;
     libbalsa_mailbox_class->set_threading =
 	libbalsa_mailbox_imap_set_threading;
+    libbalsa_mailbox_class->update_view_filter =
+        lbm_imap_update_view_filter;
     libbalsa_mailbox_class->sort = libbalsa_mailbox_imap_sort;
 }
 
@@ -603,7 +607,8 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap)
 	return NULL;
     imap_server = LIBBALSA_IMAP_SERVER(server);
     if(!mimap->handle) {
-        mimap->handle = libbalsa_imap_server_get_handle(imap_server);
+        mimap->handle = libbalsa_imap_server_get_handle_with_user(imap_server,
+                                                                  mimap);
         if (!mimap->handle)
             return NULL;
     }
@@ -638,8 +643,6 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap)
 
 /* libbalsa_mailbox_imap_open:
    opens IMAP mailbox. On failure leaves the object in sane state.
-   FIXME:
-   should intelligently use auth_type field 
 */
 static gboolean
 libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
@@ -653,14 +656,15 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
-    mimap->opened = FALSE;
     mimap->handle = libbalsa_mailbox_imap_get_selected_handle(mimap);
     if (!mimap->handle) {
+        mimap->opened         = FALSE;
 	mailbox->disconnected = TRUE;
 	return FALSE;
     }
 
-    mimap->opened = TRUE;
+    mimap->opened         = TRUE;
+    mailbox->disconnected = FALSE;
     mailbox->messages = 0;
     mailbox->unread_messages = 0;
     mailbox->total_messages = imap_mbox_handle_get_exists(mimap->handle);
@@ -678,7 +682,6 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     g_print(_("%s: Opening %s Refcount: %d\n"),
 	    "LibBalsaMailboxImap", mailbox->name, mailbox->open_ref);
 #endif
-    mailbox->disconnected = FALSE;
     return TRUE;
 }
 
@@ -1818,9 +1821,21 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 	g_assert_not_reached();
 	new_tree = NULL;
     }
-
     if (new_tree)
 	libbalsa_mailbox_set_msg_tree(mailbox, new_tree);
+}
+
+static void
+lbm_imap_update_view_filter(LibBalsaMailbox   *mailbox,
+                            LibBalsaCondition *view_filter)
+{
+    if(mailbox->view_filter)
+        libbalsa_condition_free(mailbox->view_filter);
+    mailbox->view_filter = view_filter;
+    g_node_destroy(mailbox->msg_tree);
+    mailbox->msg_tree = g_node_new(NULL);
+    libbalsa_mailbox_imap_set_threading(mailbox,
+                                        mailbox->view->threading_type);
 }
 
 static gint

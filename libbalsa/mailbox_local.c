@@ -59,6 +59,8 @@ static void libbalsa_mailbox_local_real_mbox_match(LibBalsaMailbox *mbox,
 static void libbalsa_mailbox_local_set_threading(LibBalsaMailbox *mailbox,
 						 LibBalsaMailboxThreadingType
 						 thread_type);
+static void lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
+                                         LibBalsaCondition *view_filter);
 static void libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox);
 
 static void libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *mailbox, 
@@ -130,6 +132,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
         libbalsa_mailbox_local_real_mbox_match;
     libbalsa_mailbox_class->set_threading =
 	libbalsa_mailbox_local_set_threading;
+    libbalsa_mailbox_class->update_view_filter =
+        lbm_local_update_view_filter;
     libbalsa_mailbox_class->close_mailbox =
 	libbalsa_mailbox_local_close_mailbox;
     libbalsa_mailbox_class->prepare_threading =
@@ -312,7 +316,9 @@ libbalsa_mailbox_link_message(LibBalsaMailboxLocal *mailbox,
     if (LIBBALSA_MESSAGE_IS_UNREAD(msg)
 	&& !LIBBALSA_MESSAGE_IS_DELETED(msg))
         mbx->unread_messages++;
-    libbalsa_mailbox_msgno_inserted(mbx, msg->msgno);
+    if(!mbx->view_filter ||
+       match_condition(mbx->view_filter, msg, TRUE))
+        libbalsa_mailbox_msgno_inserted(mbx, msg->msgno);
 }
 
 /*
@@ -380,6 +386,34 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
 	lbml_threading_jwz(mailbox, mailbox->msg_tree);
     else
 	lbml_threading_simple(mailbox, mailbox->msg_tree, thread_type);
+}
+
+static void
+lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
+                             LibBalsaCondition *view_filter)
+{
+    glong msgno;
+    for (msgno=1; msgno<=mailbox->total_messages; msgno++) {
+        LibBalsaMessage *msg = 
+            libbalsa_mailbox_get_message(mailbox, msgno);
+        gboolean old_match = 
+            (!mailbox->view_filter || 
+             match_condition(mailbox->view_filter, msg, TRUE));
+        gboolean new_match = 
+            (!view_filter || match_condition(view_filter, msg, TRUE));
+        if(old_match && !new_match) {
+            printf("removing %ld (%ld) from view\n", msgno, msg->msgno);
+            libbalsa_mailbox_msgno_removed(mailbox, msgno);
+        }
+        if(!old_match && new_match) {
+            printf("adding %ld (%ld) to the view\n", msgno, msg->msgno);
+            libbalsa_mailbox_msgno_inserted(mailbox, msgno);
+        }
+    }
+    printf("%s finished\n", __func__);
+    if(mailbox->view_filter)
+        libbalsa_condition_free(mailbox->view_filter);
+    mailbox->view_filter = view_filter;
 }
 
 static void

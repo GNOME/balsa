@@ -778,7 +778,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
 			     (gpointer) index);
 
     /* Set the tree store, load messages, and do threading. */
-    libbalsa_mailbox_set_view_filter(mailbox, view_filter);
+    libbalsa_mailbox_set_view_filter(mailbox, view_filter, FALSE);
     bndx_load_and_thread(index, mailbox->view->threading_type);
 #if 0
     bndx_moveto(index);

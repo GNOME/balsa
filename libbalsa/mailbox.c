@@ -237,6 +237,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->get_message_stream = NULL;
     klass->change_message_flags = NULL;
     klass->set_threading = NULL;
+    klass->update_view_filter = NULL;
     klass->sort = libbalsa_mailbox_real_sort;
     klass->check = NULL;
     klass->message_match = NULL;
@@ -643,19 +644,6 @@ libbalsa_mailbox_real_sort(LibBalsaMailbox* mbox, GArray *sort_array)
     g_array_sort_with_data(sort_array,
 			   (GCompareDataFunc) mbox_compare_func, mbox);
 }
-
-#if 0
-/* Default handler : just call match_conditions
-   IMAP is the only mailbox type that implements its own way for that
- */
-static gboolean
-libbalsa_mailbox_real_message_match(LibBalsaMailbox* mailbox,
-				    LibBalsaMessage * message,
-				    int op, GSList* conditions)
-{
-    return match_conditions(op, conditions, message, FALSE);
-}
-#endif
 
 static void
 libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
@@ -1219,11 +1207,17 @@ libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox,
  */
 void
 libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
-                                 LibBalsaCondition *cond)
+                                 LibBalsaCondition *cond,
+                                 gboolean update_immediately)
 {
-    if(mailbox->view_filter)
-        libbalsa_condition_free(mailbox->view_filter);
-    mailbox->view_filter = cond;
+    if(update_immediately) {
+        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->update_view_filter(mailbox,
+                                                                cond);
+    } else {
+        if(mailbox->view_filter)
+            libbalsa_condition_free(mailbox->view_filter);
+        mailbox->view_filter = cond;
+    }
 }
 
 static void mbox_sort_helper(LibBalsaMailbox * mbox, GNode * parent);

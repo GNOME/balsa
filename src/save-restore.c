@@ -652,6 +652,7 @@ config_global_load(void)
         balsa_app.selected_headers = g_ascii_strdown(tmp, -1);
         g_free(tmp);
     }
+    balsa_app.view_filter = gnome_config_get_int("ViewFilter");
 
     /* ... Message window title format */
     g_free(balsa_app.message_title_format);
@@ -1074,6 +1075,7 @@ config_save(void)
     gnome_config_set_string("DateFormat", balsa_app.date_string);
     gnome_config_set_int("ShownHeaders", balsa_app.shown_headers);
     gnome_config_set_string("SelectedHeaders", balsa_app.selected_headers);
+    gnome_config_set_int("ViewFilter", balsa_window_filter_to_int());
     gnome_config_set_string("MessageTitleFormat",
                             balsa_app.message_title_format);
     gnome_config_set_bool("ExpandTree", balsa_app.expand_tree);

@@ -200,7 +200,10 @@ imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
     handle->state = IMHS_SELECTED;
     if(readonly_mbox)
       *readonly_mbox = handle->readonly_mbox;
-  } 
+  } else { /* remove even traces of untagged responses */
+    imap_mbox_resize_cache(handle, 0);
+    mbox_view_dispose(&handle->mbox_view);
+  }
   return rc;
 }
 
@@ -747,8 +750,9 @@ imap_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
   rc = imap_cmd_exec(handle, cmd);
   g_free(cmd);
 
-  for(i=0; i<cnt; i++)
-    msgno[i] = handle->mbox_view.arr[i];
+  if(rc == IMR_OK)
+    for(i=0; i<cnt; i++)
+      msgno[i] = handle->mbox_view.arr[i];
 
   return rc;
 }
@@ -776,13 +780,14 @@ imap_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
   rc = imap_cmd_exec(handle, cmd);
   g_free(cmd);
 
+  if(rc == IMR_OK) {
     if(handle->thread_root)
       g_node_destroy(handle->thread_root);
     handle->thread_root = g_node_new(NULL);
 
-  for(i=0; i<handle->mbox_view.entries; i++)
-    g_node_append_data(handle->thread_root,
-                       GUINT_TO_POINTER(handle->mbox_view.arr[i]));
-
+    for(i=0; i<handle->mbox_view.entries; i++)
+      g_node_append_data(handle->thread_root,
+                         GUINT_TO_POINTER(handle->mbox_view.arr[i]));
+  }
   return rc;
 }

@@ -2561,7 +2561,8 @@ ir_handle_response(ImapMboxHandle *h)
   int c;
   char atom[LONG_STRING];
   unsigned i, seqno;
-  ImapResponse rc;
+  ImapResponse rc = IMR_BAD; /* unknown response is really an error */
+
   c = imap_get_atom(h->sio, atom, sizeof(atom));
   if( isdigit(atom[0]) ) {
     if (c != ' ')
@@ -2589,7 +2590,7 @@ ir_handle_response(ImapMboxHandle *h)
     }
   }
   imap_handle_process_tasks(h);
-  return IMR_OK; /* FIXME: unknown response is really a failure */
+  return rc;
 }
 
 GNode*

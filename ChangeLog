@@ -1,3 +1,19 @@
+2004-01-03  Pawel Salek
+
+	* libbalsa/filter-funcs.c: implement {append,get}_quoted_string()
+	that were missing.
+	* libbalsa/filter.c: make nicer IMAP queries.
+	* libbalsa/imap-server.[hc]: fix connection caching for servers
+	without UNSELECT broken in last commit.
+	* libbalsa/mailbox.[ch]: add update_view_filter() method.
+	* libbalsa/mailbox_{imap,local}.c: implement it.
+	* libbalsa/imap/imap-commands.c: fix returning failure codes.
+	* libbalsa/imap/imap-handle.c: matching part.
+	* src/balsa-app.h, : add view_filter field.
+	* src/balsa-index.c: 
+	* src/main-window.[ch]: save view filters.
+	* src/save-restore.c: ditto.
+	
 2004-01-01  Pawel Salek
 
 	* libbalsa/filter-file.c: remove old LibBalsaCondition config IO.

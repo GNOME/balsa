@@ -22,7 +22,8 @@ LibBalsaImapServer* libbalsa_imap_server_new(const gchar *username,
 LibBalsaImapServer* libbalsa_imap_server_new_from_config(void);
 ImapMboxHandle* libbalsa_imap_server_get_handle(LibBalsaImapServer *server);
 ImapMboxHandle* libbalsa_imap_server_get_handle_with_user(
-				LibBalsaImapServer *imap_server, gpointer user);
+				LibBalsaImapServer *imap_server,
+                                gpointer user);
 void libbalsa_imap_server_release_handle(LibBalsaImapServer *server,
 					 ImapMboxHandle* handle);
 void libbalsa_imap_server_set_max_connections(LibBalsaImapServer *server,

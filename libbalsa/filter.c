@@ -347,8 +347,6 @@ build_imap_query(LibBalsaCondition* cond, GString *buffer)
     gchar *str;
 
     if(!cond) return;
-    if(cond->negate)
-        extend_query(buffer, "NOT");
 
     switch (cond->type) {
     case CONDITION_STRING:
@@ -391,6 +389,8 @@ build_imap_query(LibBalsaCondition* cond, GString *buffer)
         /* If no date has been put continue (this is not allowed normally
            but who knows */
         if (str) {
+            if(cond->negate)
+                extend_query(buffer, "NOT");
             g_string_append(buffer, str);
             g_free(str);
             if (buffer->str[0]=='(')
@@ -400,15 +400,17 @@ build_imap_query(LibBalsaCondition* cond, GString *buffer)
         break;
     case CONDITION_FLAG:
         if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
-            extend_query(buffer, "ANSWERED");
+            extend_query(buffer, cond->negate ? "ANSWERED" : "UNANSWERED");
         if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_NEW)
-            extend_query(buffer, "UNSEEN");
+            extend_query(buffer, cond->negate ? "SEEN" : "UNSEEN");
         if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_DELETED)
-            extend_query(buffer, "DELETED");
+            extend_query(buffer, cond->negate ? "UNDELETED" : "DELETED");
         if (cond->match.flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
-            extend_query(buffer, "FLAGGED");
+            extend_query(buffer, cond->negate ? "UNFLAGGED" : "FLAGGED");
         break;
     case CONDITION_AND:
+    if(cond->negate)
+        extend_query(buffer, "NOT");
     build_imap_query(cond->match.andor.left, buffer);
     build_imap_query(cond->match.andor.right, buffer);
         break;

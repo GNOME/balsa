@@ -535,7 +535,7 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server)
  * connects.  If there is no password set, the user is asked to supply
  * one.  This function first tries to find a handle last used by
  * @user, then a handle without a user and finally the least recently
- * used.
+ * used. @user is usually a pointer to LibBalsaMailbox.
  *
  * Return value: a handle to the server, or %NULL when there are no free
  * connections.
@@ -559,8 +559,7 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
 	    conn = g_list_find_custom(imap_server->free_handles, user,
 				      by_last_user);
 	if (!conn)
-	    conn = g_list_find_custom(imap_server->free_handles, NULL,
-				      by_last_user);
+	    conn = imap_server->free_handles;
 	if (conn) {
 	    info = (struct handle_info*)conn->data;
 	    imap_server->free_handles =

@@ -867,20 +867,36 @@ balsa_message_toggle_new(GtkWidget * widget, gpointer index)
 {
     GList *list;
     LibBalsaMessage *message;
+    int is_all_read = TRUE;
 
     g_return_if_fail(widget != NULL);
     g_return_if_fail(index != NULL);
 
     list = GTK_CLIST(index)->selection;
 
+    /* First see if we should mark as read or unread */
     while (list) {
 	message = gtk_ctree_node_get_row_data(GTK_CTREE(index),
 					      list->data);
 
 	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
-	    libbalsa_message_read(message);
-	} else {
+	    is_all_read = FALSE;
+	    break;
+	}
+	list = list->next;
+    }
+
+    /* if all read mark as new, otherwise mark as read */
+    list = GTK_CLIST(index)->selection;
+
+    while (list) {
+	message = gtk_ctree_node_get_row_data(GTK_CTREE(index),
+					      list->data);
+
+	if (is_all_read) {
 	    libbalsa_message_unread(message);
+	} else {
+	    libbalsa_message_read(message);
 	}
 
 	list = list->next;

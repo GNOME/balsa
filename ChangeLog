@@ -1,3 +1,8 @@
+2001-01-16  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/balsa-index-page.c: (balsa_message_toggle_new) changed
+	behaviour to similar to balsa_message_toggle_flagged
+
 2001-01-16   Pawel Salek  <pawsa@theochem.kth.se>
 
 	Jeff Horwitz <jhorwitz75@yahoo.com>'s patch (with minor changes)

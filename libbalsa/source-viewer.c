@@ -202,7 +202,7 @@ libbalsa_show_message_source(LibBalsaMessage * msg, const gchar * font,
     text = gtk_text_view_new();
     gtk_widget_modify_font(text, pango_font_description_from_string(font));
     gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
-    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD);
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD_CHAR);
 
     interior = gtk_scrolled_window_new(GTK_TEXT_VIEW(text)->hadjustment,
                                        GTK_TEXT_VIEW(text)->vadjustment);

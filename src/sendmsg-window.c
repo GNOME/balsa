@@ -2116,9 +2116,9 @@ check_if_regular_file(const gchar * filename)
 */
 static void
 attach_dialog_response(GtkWidget * dialog, gint response,
-	               GtkFileChooser * fc)
+	               BalsaSendmsg * bsmsg)
 {
-    BalsaSendmsg *bsmsg;
+    GtkFileChooser * fc;
     GSList *files, *list;
     int res = 0;
 
@@ -2127,8 +2127,7 @@ attach_dialog_response(GtkWidget * dialog, gint response,
 	return;
     }
 
-    bsmsg = g_object_get_data(G_OBJECT(fc), "balsa-data");
-
+    fc = GTK_FILE_CHOOSER(dialog);
     files = gtk_file_chooser_get_filenames(fc);
     for (list = files; list; list = list->next)
         if(!add_attachment(bsmsg, list->data, FALSE, NULL))
@@ -2141,7 +2140,7 @@ attach_dialog_response(GtkWidget * dialog, gint response,
     balsa_app.attach_dir = gtk_file_chooser_get_current_folder(fc);
 
     if (res == 0)
-        gtk_widget_destroy(GTK_WIDGET(fc));
+        gtk_widget_destroy(dialog);
 }
 
 /* attach_clicked - menu and toolbar callback */
@@ -2160,7 +2159,6 @@ attach_clicked(GtkWidget * widget, gpointer data)
                                     GTK_FILE_CHOOSER_ACTION_OPEN,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
-    g_object_set_data(G_OBJECT(fsw), "balsa-data", bsmsg);
 
     fc = GTK_FILE_CHOOSER(fsw);
     gtk_file_chooser_set_select_multiple(fc, TRUE);
@@ -2168,7 +2166,7 @@ attach_clicked(GtkWidget * widget, gpointer data)
 	gtk_file_chooser_set_current_folder(fc, balsa_app.attach_dir);
 
     g_signal_connect(G_OBJECT(fc), "response",
-		     G_CALLBACK(attach_dialog_response), fc);
+		     G_CALLBACK(attach_dialog_response), bsmsg);
 
     gtk_widget_show(fsw);
 }
@@ -4196,11 +4194,11 @@ do_insert_string_select_ch(BalsaSendmsg* bsmsg, GtkTextBuffer *buffer,
 
 static void
 insert_file_response(GtkWidget * selector, gint response,
-	             GtkFileChooser * fc)
+	             BalsaSendmsg * bsmsg)
 {
+    GtkFileChooser *fc;
     gchar *fname;
     FILE *fl;
-    BalsaSendmsg *bsmsg;
     GtkTextBuffer *buffer;
     gchar * string;
     size_t len;
@@ -4212,7 +4210,7 @@ insert_file_response(GtkWidget * selector, gint response,
 	return;
     }
 
-    bsmsg = (BalsaSendmsg *) g_object_get_data(G_OBJECT(fc), "balsa-data");
+    fc = GTK_FILE_CHOOSER(selector);
     fname = gtk_file_chooser_get_filename(fc);
 
     if ((fl = fopen(fname, "rt")) ==NULL) {
@@ -4248,7 +4246,12 @@ insert_file_response(GtkWidget * selector, gint response,
         g_free(s);
     }
     g_free(string);
-    gtk_widget_destroy(GTK_WIDGET(fc));
+
+    /* Use the same folder as for attachments. */
+    g_free(balsa_app.attach_dir);
+    balsa_app.attach_dir = gtk_file_chooser_get_current_folder(fc);
+
+    gtk_widget_destroy(selector);
 }
 
 static gint
@@ -4262,9 +4265,13 @@ include_file_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
                                     GTK_FILE_CHOOSER_ACTION_OPEN,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
-    g_object_set_data(G_OBJECT(file_selector), "balsa-data", bsmsg);
+    /* Use the same folder as for attachments. */
+    if (balsa_app.attach_dir)
+        gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER
+                                            (file_selector),
+                                            balsa_app.attach_dir);
     g_signal_connect(G_OBJECT(file_selector), "response",
-                     G_CALLBACK(insert_file_response), file_selector);
+                     G_CALLBACK(insert_file_response), bsmsg);
 
     /* Display that dialog */
     gtk_widget_show(file_selector);

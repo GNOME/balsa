@@ -1020,6 +1020,12 @@ send_body_wrap (Body *body, GtkText *text)
   tabspace = 0;
   
   length = gtk_text_get_length(GTK_TEXT(text));
+  if( length == 0 )
+    {
+      body->buffer = g_strdup("");
+      return;
+    }
+
   final_length = length;
   current_line = gtk_editable_get_chars (GTK_EDITABLE (text),0,length);
   last_break = current_line;

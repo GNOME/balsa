@@ -1,3 +1,7 @@
+2005-03-22 06:09  PeterB
+
+	* libbalsa/libbalsa-conf.c: organize key-file info into structures.
+
 2005-03-21 08:08  PeterB
 
 	* configure.in, src/balsa-message.c, src/sendmsg-window.c: check

@@ -1,3 +1,24 @@
+1999-01-08  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	* src/index-child.c (index_child_new): when the mailbox
+	already exists, set it as the active view. 
+
+1999-01-08  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	messages can be moved even when the destination is already 
+	opened :-))
+	
+	* libbalsa/mailbox.h: added a new mailbox watcher message 
+	to tell a watcher a message has been appended but that it is 
+	not a new message.
+
+	* libbalsa/mailbox.c (send_watcher_append_message): new function 
+	to send an APEND message.
+	(message_copy): send an append message to the dest mailbox
+	(message_move): idem.
+	(_mailbox_open_ref): when the mailbox was already opened but not
+	in append mode, close it first.
+
 1999-01-08  Nat Friedman  <nat@nat.org>
 
 	* src/message-window.c (forward_message_cb): Get the messagewindow

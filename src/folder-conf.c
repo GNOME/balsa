@@ -262,14 +262,6 @@ fix_ctree(GtkCTree * ctree, GtkCTreeNode * cnode, gpointer data)
     BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, cnode);
     if (mbnode) {
 	SubfolderDialogData *fcw = (SubfolderDialogData *) data;
-	if (mbnode->mailbox)
-	    /*
-	     * disconnect mailbox signal that passes this ctree as
-	     * `data', otherwise gtk_ctree code will segfault after the
-	     * node is destroyed, either here or later:
-	     * */
-	    gtk_signal_disconnect_by_data(GTK_OBJECT(mbnode->mailbox),
-					  (gpointer) ctree);
 	if (!mbnode->server || mbnode->server->type != LIBBALSA_SERVER_IMAP
 	    || (fcw->mbnode && fcw->mbnode->server != mbnode->server))
 	    gtk_ctree_remove_node(ctree, cnode);

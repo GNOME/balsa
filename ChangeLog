@@ -1,4 +1,9 @@
-2001-09-18  Pawel Salek  <pawsa@theochem.kth.se>
+2001-09-20  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/folder-conf.c: do not disconnect already disconnected data
+	(Peter Bloomfield).
+
+2001-09-19  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/print.c: print no/selected/all headers (Albrecht Dreﬂ).
 	* src/balsa-message.c: interpret mixed/alternative dispositions

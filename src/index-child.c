@@ -30,8 +30,6 @@ static GnomeMDIChildClass *parent_class = NULL;
 static void index_child_class_init (IndexChildClass *);
 static void index_child_init (IndexChild *);
 
-static GList *child_list = NULL;
-
 guint
 index_child_get_type ()
 {
@@ -74,51 +72,18 @@ static void delete_message_cb (GtkWidget *, Message *);
 static void undelete_message_cb (GtkWidget *, Message *);
 
 void 
-index_child_changed (GnomeMDI * mdi, GnomeMDIChild * gmdic)
+index_child_changed (GnomeMDI * mdi, GnomeMDIChild * mdi_child)
 {
-  IndexChild *child;
-  GList *list;
-
-  if (!mdi || !child_list || !gmdic)
-    return;
-
-  list = g_list_first (child_list);
-
-  for (; list != NULL; list = list->next)
-    {
-      child = (IndexChild *) list->data;
-      if (child)
-	if (!strcmp (child->mailbox->name, gmdic->name))
-	  {
-	    balsa_app.current_index_child = child;
-	    return;
-	  }
-    }
-  balsa_app.current_index_child = NULL;
+  if (mdi_child)
+    balsa_app.current_index_child = INDEX_CHILD(mdi_child);
+  else
+    balsa_app.current_index_child = NULL;
 }
 
 IndexChild *
 index_child_get_active (GnomeMDI * mdi)
 {
-  IndexChild *child;
-  GnomeMDIChild *gmdic;
-  GList *list;
-
-  if (!mdi || !child_list)
-    return NULL;
-
-  gmdic = gnome_mdi_active_child (mdi);
-
-  list = g_list_first (child_list);
-
-  for (; list != NULL; list = list->next)
-    {
-      child = (IndexChild *) list->data;
-      if (child)
-	if (!strcmp (child->mailbox->name, gmdic->name))
-	  return child;
-    }
-
+  return INDEX_CHILD(mdi->active_child);
 }
 
 IndexChild *
@@ -132,7 +97,6 @@ index_child_new (GnomeMDI *mdi, Mailbox * mailbox)
       child->mdi = mdi;
 
       GNOME_MDI_CHILD (child)->name = g_strdup (mailbox->name);
-      child_list = g_list_append (child_list, child);
     }
 
   return child;
@@ -145,8 +109,6 @@ index_child_destroy(GtkObject *obj)
 
   ic = INDEX_CHILD(obj);
 
-  child_list = g_list_remove(child_list,ic);
-  
   mailbox_open_unref (ic->mailbox);
   mailbox_watcher_remove(ic->mailbox,ic->watcher_id);
 

@@ -52,7 +52,7 @@ int rfc1524_expand_command (BODY *a, char *filename, char *type,
     char *command, int clen)
 {
   int x=0,y=0;
-  int needspipe = TRUE;
+  int needspipe = MUTT_TRUE;
   char buf[LONG_STRING];
 
   while (command[x] && x<clen && y<sizeof(buf)) {
@@ -84,7 +84,7 @@ int rfc1524_expand_command (BODY *a, char *filename, char *type,
 
 	while (*fn && y < sizeof (buf))
 	  buf[y++] = *fn++;
-	needspipe = FALSE;
+	needspipe = MUTT_FALSE;
       }
       else if (command[x] == 't')
       {
@@ -163,7 +163,7 @@ static int rfc1524_mailcap_parse (BODY *a,
   size_t buflen;
   char *ch;
   char *field;
-  int found = FALSE;
+  int found = MUTT_FALSE;
   int copiousoutput;
   int composecommand;
   int editcommand;
@@ -184,7 +184,7 @@ static int rfc1524_mailcap_parse (BODY *a,
 
   /* find length of basetype */
   if ((ch = strchr (type, '/')) == NULL)
-    return FALSE;
+    return MUTT_FALSE;
   btlen = ch - type;
 
   if ((fp = fopen (filename, "r")) != NULL)
@@ -211,11 +211,11 @@ static int rfc1524_mailcap_parse (BODY *a,
 	entry->command = safe_strdup (field);
 
       /* parse the optional fields */
-      found = TRUE;
-      copiousoutput = FALSE;
-      composecommand = FALSE;
-      editcommand = FALSE;
-      printcommand = FALSE;
+      found = MUTT_TRUE;
+      copiousoutput = MUTT_FALSE;
+      composecommand = MUTT_FALSE;
+      editcommand = MUTT_FALSE;
+      printcommand = MUTT_FALSE;
 
       while (ch)
       {
@@ -226,38 +226,38 @@ static int rfc1524_mailcap_parse (BODY *a,
 	if (!strcasecmp (field, "needsterminal"))
 	{
 	  if (entry)
-	    entry->needsterminal = TRUE;
+	    entry->needsterminal = MUTT_TRUE;
 	}
 	else if (!strcasecmp (field, "copiousoutput"))
 	{
-	  copiousoutput = TRUE;
+	  copiousoutput = MUTT_TRUE;
 	  if (entry)
-	    entry->copiousoutput = TRUE;
+	    entry->copiousoutput = MUTT_TRUE;
 	}
 	else if (!strncasecmp (field, "composetyped", 12))
 	{
 	  /* this compare most occur before compose to match correctly */
 	  if (get_field_text (field + 12, entry ? &entry->composetypecommand : NULL,
 			      type, filename, line))
-	    composecommand = TRUE;
+	    composecommand = MUTT_TRUE;
 	}
 	else if (!strncasecmp (field, "compose", 7))
 	{
 	  if (get_field_text (field + 7, entry ? &entry->composecommand : NULL,
 			      type, filename, line))
-	    composecommand = TRUE;
+	    composecommand = MUTT_TRUE;
 	}
 	else if (!strncasecmp (field, "print", 5))
 	{
 	  if (get_field_text (field + 5, entry ? &entry->printcommand : NULL,
 			      type, filename, line))
-	    printcommand = TRUE;
+	    printcommand = MUTT_TRUE;
 	}
 	else if (!strncasecmp (field, "edit", 4))
 	{
 	  if (get_field_text (field + 4, entry ? &entry->editcommand : NULL,
 			      type, filename, line))
-	    editcommand = TRUE;
+	    editcommand = MUTT_TRUE;
 	}
 	else if (!strncasecmp (field, "nametemplate", 12))
 	{
@@ -287,7 +287,7 @@ static int rfc1524_mailcap_parse (BODY *a,
 	    if (mutt_system (test_command))
 	    {
 	      /* a non-zero exit code means test failed */
-	      found = FALSE;
+	      found = MUTT_FALSE;
 	    }
 	    free (test_command);
 	  }
@@ -297,22 +297,22 @@ static int rfc1524_mailcap_parse (BODY *a,
       if (opt == M_AUTOVIEW)
       {
 	if (!copiousoutput)
-	  found = FALSE;
+	  found = MUTT_FALSE;
       }
       else if (opt == M_COMPOSE)
       {
 	if (!composecommand)
-	  found = FALSE;
+	  found = MUTT_FALSE;
       }
       else if (opt == M_EDIT)
       {
 	if (!editcommand)
-	  found = FALSE;
+	  found = MUTT_FALSE;
       }
       else if (opt == M_PRINT)
       {
 	if (!printcommand)
-	  found = FALSE;
+	  found = MUTT_FALSE;
       }
       
       if (!found)
@@ -372,7 +372,7 @@ int rfc1524_mailcap_lookup (BODY *a, char *type, rfc1524_entry *entry, int opt)
 {
   char path[_POSIX_PATH_MAX];
   int x;
-  int found = FALSE;
+  int found = MUTT_FALSE;
   char *curr = MailcapPath;
 
   /* rfc1524 specifies that a path of mailcap files should be searched.
@@ -466,8 +466,8 @@ int rfc1524_expand_filename (char *nametemplate,
 {
   int z = 0;
   int i = 0, j = 0;
-  int lmatch = TRUE;
-  int match = TRUE;
+  int lmatch = MUTT_TRUE;
+  int match = MUTT_TRUE;
   size_t len = 0;
   char *s;
 
@@ -517,14 +517,14 @@ int rfc1524_expand_filename (char *nametemplate,
     {
       if (oldfile[i] != nametemplate[i])
       {
-	lmatch=FALSE;
+	lmatch=MUTT_FALSE;
 	break;
       }
     }
 
     if (!lmatch)
     {
-      match = FALSE;
+      match = MUTT_FALSE;
       i = nflen - len;
       if (i > z)
 	i = z;
@@ -538,19 +538,19 @@ int rfc1524_expand_filename (char *nametemplate,
 	      nametemplate, oldfile, newfile));
 
     /* test post */
-    lmatch = TRUE;
+    lmatch = MUTT_TRUE;
 
     for (z += 2, i = strlen (oldfile) - 1, j = strlen (nametemplate) - 1; 
 	i && j > z; i--, j--)
       if (oldfile[i] != nametemplate[j])
       {
-	lmatch = FALSE;
+	lmatch = MUTT_FALSE;
 	break;
       }
 
     if (!lmatch)
     {
-      match = FALSE;
+      match = MUTT_FALSE;
       strfcpy (newfile + strlen (newfile),
 	      nametemplate + z, nflen - strlen (newfile));
     }

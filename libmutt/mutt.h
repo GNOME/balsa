@@ -36,8 +36,8 @@
 #define INITVAL(x) 
 #endif
 
-#define TRUE 1
-#define FALSE 0
+#define MUTT_TRUE 1
+#define MUTT_FALSE 0
 
 #define HUGE_STRING	5120
 #define LONG_STRING     1024

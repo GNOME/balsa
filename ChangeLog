@@ -1,3 +1,32 @@
+2004-01-07 18:39  PeterB
+
+	* src/balsa-mblist.c: new_messages member has gone away.
+	* src/balsa-index.c: Don't connect to column "clicked"; remove
+	callback and simplify helpers; use LibBalsaMailboxColumn enum.
+	* libbalsa/send.c: Rethread after copying to fccbox.
+	* libbalsa/message.c: Rethread destination after moving and copying
+	messages.
+	* libbalsa/mailbox_pop3.c: messages member has gone.
+	* libbalsa/mailbox_mh.c: messages and new_messages members have
+	gone; leave inserting message to the check method.
+	* libbalsa/mailbox_mbox.c: new_messages and messages members have
+	gone.
+	* libbalsa/mailbox_maildir.c: Add load_config method for setting
+	curdir and newdir members; messages and new_messages members have
+	been dropped; leave inserting a new message to the check method.
+	* libbalsa/mailbox_local.h: Change api for load_message class
+	method and libbalsa_mailbox_local_load_messages().
+	* libbalsa/mailbox_local.c: Move message init from
+	libbalsa_mailbox_local_load_messages() to
+	libbalsa_mailbox_local_load_message(); add msgno argument to
+	libbalsa_mailbox_local_load_message(); use
+	libbalsa_mailbox_msgno_filt_{in,out}.
+	* libbalsa/: mailbox.c, mailbox.h: Drop redundant sort_column_id
+	and order members, and use view->sort_field and view->sort_type
+	instead; drop messages and new_messages members;
+	libbalsa_mailbox_set_msg_tree() and lbm_update_msg_tree() must
+	handle a new tree with different messages from the current tree.
+
 2004-01-06  Pawel Salek
 
 	* libbalsa/mailbox.[ch]: add libbalsa_mailbox_change_msgs_flags()

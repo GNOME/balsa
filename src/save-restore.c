@@ -920,7 +920,8 @@ config_global_load(void)
         balsa_app.smtp_passphrase = 
             gnome_config_get_string("ESMTPPassphrase");
 #endif
-    balsa_app.smtp_tls_mode = gnome_config_get_int("ESMTPTLSMode=0");
+    /* default set to "Use TLS if possible" */
+    balsa_app.smtp_tls_mode = gnome_config_get_int("ESMTPTLSMode=1");
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     balsa_app.smtp_certificate_passphrase = 
         gnome_config_private_get_string("ESMTPCertificatePassphrase");

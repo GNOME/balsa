@@ -304,6 +304,9 @@ libbalsa_message_charset(LibBalsaMessage * message)
 static void
 canonize_header_value(gchar *value)
 {
+#if 0
+    /* there was some unclarity whether we should do it or not. So we
+       do not for now. */
     int src, dst;
 
     /* canonize value: replace multiple spaces, tabs by single space */
@@ -316,6 +319,7 @@ canonize_header_value(gchar *value)
             value[dst++] = value[src];
     }
     value[dst] = '\0';
+#endif
 }
 
 /* message_user_hdrs:

@@ -15,6 +15,8 @@ libbalsa/filter-file.c
 libbalsa/filter.c
 libbalsa/folder-scanners.c
 libbalsa/gmime-gpgme-context.c
+libbalsa/gmime-gpgme-signature.c
+libbalsa/gmime-part-rfc2440.c
 libbalsa/identity.c
 libbalsa/imap-server.c
 libbalsa/libbalsa.c
@@ -31,10 +33,8 @@ libbalsa/mime.c
 libbalsa/misc.c
 libbalsa/rfc3156.c
 libbalsa/send.c
+libbalsa/server.c
 libbalsa/source-viewer.c
-libbalsa/gmime-gpgme-context.c
-libbalsa/gmime-gpgme-signature.c
-libbalsa/gmime-part-rfc2440.c
 libinit_balsa/balsa-druid-page-defclient.c
 libinit_balsa/balsa-druid-page-directory.c
 libinit_balsa/balsa-druid-page-finish.c

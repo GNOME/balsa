@@ -1,4 +1,11 @@
-* Balsa-2.2.1 release. Release date 2004-07-06
+* Balsa-2.2.2 release. Release date 2004-08-08
+
+- configurable hiding of deleted messages.
+- keyboard navigation fixes.
+- message counting in some edge cases fixed.
+- GPG fixes.
+
+* Balsa-2.2.1 release. Release date 2004-07-30
 
 - IMAP mailboxes could be incorrectly marked as read-only.
 - message selection behaves more sanely.

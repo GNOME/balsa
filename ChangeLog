@@ -1,3 +1,9 @@
+2004-08-08  Pawel Salek
+
+	* NEWS, configure.in: release 2.2.2.
+	* src/save-restore.c: switch SMTP TLS on if available.
+	* src/main-window.c: menu item numbering fixes.
+
 2004-08-07  21:30 Pawel Salek
 
 	* libbalsa/message.c: canonize headers.

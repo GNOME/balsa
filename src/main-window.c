@@ -477,7 +477,9 @@ static GnomeUIInfo edit_menu[] = {
 #define MENU_EDIT_SELECT_ALL_POS 1
     GNOMEUIINFO_MENU_SELECT_ALL_ITEM(select_all_cb, NULL),
     GNOMEUIINFO_SEPARATOR,
+#define MENU_EDIT_FIND_POS 3
     GNOMEUIINFO_MENU_FIND_ITEM(find_cb, NULL),
+#define MENU_EDIT_FIND_AGAIN_POS 4
     GNOMEUIINFO_MENU_FIND_AGAIN_ITEM(find_again_cb, NULL),
 /* #define MENU_EDIT_PREFERENCES_POS 7 */
 /*     GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL), */
@@ -784,15 +786,16 @@ static GnomeUIInfo main_menu[] = {
  * =================================================================== */
 
 static GnomeUIInfo tu_mailbox_menu[] = {
-    GNOMEUIINFO_ITEM_STOCK(N_("Local mailbox..."), 
+    GNOMEUIINFO_ITEM_STOCK(N_("New mailbox..."), 
                            N_("Add a new mbox style mailbox"),
                            mailbox_conf_add_mbox_cb, 
                            GTK_STOCK_ADD),
-    GNOMEUIINFO_ITEM_STOCK(N_("Local \"Maildir\" mailbox..."), 
+    GNOMEUIINFO_SEPARATOR,
+    GNOMEUIINFO_ITEM_STOCK(N_("New \"Maildir\" mailbox..."), 
                            N_("Add a new Maildir style mailbox"),
                            mailbox_conf_add_maildir_cb, 
                            GTK_STOCK_ADD),
-    GNOMEUIINFO_ITEM_STOCK(N_("Local \"MH\" mailbox..."), 
+    GNOMEUIINFO_ITEM_STOCK(N_("New \"MH\" mailbox..."), 
                            N_("Add a new MH style mailbox"),
                            mailbox_conf_add_mh_cb, 
                            GTK_STOCK_ADD),
@@ -810,24 +813,24 @@ static GnomeUIInfo tu_mailbox_menu[] = {
                            folder_conf_add_imap_sub_cb, 
                            GTK_STOCK_ADD),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_DELETE_POS 2
+#define MENU_MAILBOX_DELETE_POS 9
     GNOMEUIINFO_ITEM_STOCK(N_("_Delete..."),
                            N_("Delete the selected mailbox"),
                            mailbox_conf_delete_cb,
                            GTK_STOCK_REMOVE),
-#define MENU_MAILBOX_EDIT_POS 3
+#define MENU_MAILBOX_EDIT_POS 10
     GNOMEUIINFO_ITEM_STOCK(N_("_Edit..."), N_("Edit the selected mailbox"),
                            mailbox_conf_edit_cb,
                            GTK_STOCK_PREFERENCES),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_EXPUNGE_POS 5
+#define MENU_MAILBOX_EXPUNGE_POS 12
     GNOMEUIINFO_ITEM_STOCK(
         N_("_Compress Mailbox"),
         N_("Expunge messages marked as deleted "
 	   "in the currently opened mailbox"),
         mailbox_expunge_cb,
         GTK_STOCK_REMOVE),
-#define MENU_MAILBOX_CLOSE_POS 6
+#define MENU_MAILBOX_CLOSE_POS 13
     { GNOME_APP_UI_ITEM, N_("_Close"),
       N_("Close mailbox"),
       mailbox_close_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
@@ -864,9 +867,12 @@ static GnomeUIInfo tu_file_menu[] = {
 
 static GnomeUIInfo tu_edit_menu[] = {
     GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
+#define MENU_EDIT_SELECT_ALL_POS 1
     GNOMEUIINFO_MENU_SELECT_ALL_ITEM(select_all_cb, NULL),
     GNOMEUIINFO_SEPARATOR,
+#define MENU_EDIT_FIND_POS 3
     GNOMEUIINFO_MENU_FIND_ITEM(find_cb, NULL),
+#define MENU_EDIT_FIND_AGAIN_POS 4
     GNOMEUIINFO_MENU_FIND_AGAIN_ITEM(find_again_cb, NULL),
     GNOMEUIINFO_END
 };
@@ -978,7 +984,7 @@ static GnomeUIInfo tu_view_menu[] = {
 };
 #define NEXT_MSG_WIDGET tu_view_menu[MENU_VIEW_NEXT_POS].widget
 #define PREV_MSG_WIDGET tu_view_menu[MENU_VIEW_PREV_POS].widget
-#define NEXT_UNREAD_WIDGET tu_view_more_menu[MENU_VIEW_NEXT_UNREAD_POS].widget
+#define NEXT_UNREAD_WIDGET tu_view_menu[MENU_VIEW_NEXT_UNREAD_POS].widget
 #define MENU_VIEW_ZOOM_IN_WIDGET  tu_view_menu[MENU_VIEW_ZOOM_IN_POS].widget
 #define MENU_VIEW_ZOOM_OUT_WIDGET tu_view_menu[MENU_VIEW_ZOOM_OUT_POS].widget
 #define MENU_VIEW_ZOOM_100_WIDGET tu_view_menu[MENU_VIEW_ZOOM_100_POS].widget
@@ -1046,6 +1052,7 @@ static GnomeUIInfo tu_message_menu[] = {
       GNOME_STOCK_TRASH, 'D', 0, NULL
     },
     GNOMEUIINFO_SEPARATOR,
+#define MENU_MESSAGE_MORE_POS 8
     GNOMEUIINFO_SUBTREE(N_("_More"), tu_message_more_menu),
     GNOMEUIINFO_END
 };
@@ -1620,14 +1627,15 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
 {
     const static GnomeUIInfo *menu_entries[] = {
 #if !defined(ENABLE_TOUCH_UI)
-     /* MENU_MAILBOX_NEXT_POS,        MENU_MAILBOX_PREV_POS,
-        MENU_MAILBOX_NEXT_UNREAD_POS, */ 
+        &edit_menu[MENU_EDIT_SELECT_ALL_POS],
+        &edit_menu[MENU_EDIT_FIND_POS],
+        &edit_menu[MENU_EDIT_FIND_AGAIN_POS],
         &mailbox_menu[MENU_MAILBOX_NEXT_FLAGGED_POS],
         &mailbox_menu[MENU_MAILBOX_HIDE_POS],
         &mailbox_menu[MENU_MAILBOX_RESET_POS],
         &mailbox_menu[MENU_MAILBOX_MARK_ALL_POS],
         &mailbox_menu[MENU_MAILBOX_DELETE_POS],
-        &mailbox_menu[MENU_MAILBOX_EDIT_POS],     /* MENU_MAILBOX_COMMIT_POS, */
+        &mailbox_menu[MENU_MAILBOX_EDIT_POS],
 	&mailbox_menu[MENU_MAILBOX_CLOSE_POS],
         &mailbox_menu[MENU_MAILBOX_APPLY_FILTERS],
         &threading_menu[MENU_THREADING_FLAT_POS],
@@ -1636,7 +1644,9 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
         &view_menu[MENU_VIEW_EXPAND_ALL_POS],
         &view_menu[MENU_VIEW_COLLAPSE_ALL_POS]
 #else /* ENABLE_TOUCH_UI */
-        &tu_view_more_menu[MENU_VIEW_NEXT_FLAGGED_POS],
+        &tu_edit_menu[MENU_EDIT_SELECT_ALL_POS],
+        &tu_edit_menu[MENU_EDIT_FIND_POS],
+        &tu_edit_menu[MENU_EDIT_FIND_AGAIN_POS],
         &tu_mailbox_menu[MENU_MAILBOX_DELETE_POS],
         &tu_mailbox_menu[MENU_MAILBOX_EDIT_POS],
         &tu_mailbox_menu[MENU_MAILBOX_EXPUNGE_POS],
@@ -1649,6 +1659,7 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
         &tu_sort_l_menu[VIEW_SORT_MSGNO_POS],
         &tu_sort_l_menu[VIEW_SORT_SIZE_POS],
         &tu_sort_l_menu[VIEW_SORT_THREAD_POS],
+        &tu_view_more_menu[MENU_VIEW_NEXT_FLAGGED_POS],
         &tu_view_more_menu[MENU_VIEW_EXPAND_ALL_POS],
         &tu_view_more_menu[MENU_VIEW_COLLAPSE_ALL_POS]
 #endif /* ENABLE_TOUCH_UI */
@@ -1693,10 +1704,6 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
     for(i=0; i < ELEMENTS(menu_entries); i++)
         gtk_widget_set_sensitive(menu_entries[i]->widget, enable);
 
-#if !defined(ENABLE_TOUCH_UI)
-    gtk_widget_set_sensitive(edit_menu[MENU_EDIT_SELECT_ALL_POS].widget,
-                             enable);
-#endif /* ENABLE_TOUCH_UI */
     gtk_widget_set_sensitive(NEXT_MSG_WIDGET, index && index->next_message);
     gtk_widget_set_sensitive(PREV_MSG_WIDGET, index && index->prev_message);
     gtk_widget_set_sensitive(NEXT_UNREAD_WIDGET, 
@@ -1759,10 +1766,11 @@ enable_message_menus(BalsaWindow * window, LibBalsaMessage * message)
         &message_menu[MENU_MESSAGE_STORE_ADDRESS_POS]
 #else /* ENABLE_TOUCH_UI */
         &tu_message_menu[MENU_MESSAGE_SAVE_PART_POS],
-        &tu_message_more_menu[MENU_MESSAGE_SOURCE_POS],
+        &tu_message_menu[MENU_MESSAGE_MORE_POS],
         &tu_message_menu[MENU_MESSAGE_REPLY_POS],
         &tu_message_menu[MENU_MESSAGE_REPLY_ALL_POS],
         &tu_message_menu[MENU_MESSAGE_FORWARD_POS],
+        &tu_message_more_menu[MENU_MESSAGE_SOURCE_POS],
         &tu_message_more_menu[MENU_MESSAGE_STORE_ADDRESS_POS]
 #endif
     };
@@ -1801,7 +1809,8 @@ enable_message_menus(BalsaWindow * window, LibBalsaMessage * message)
 }
 
 /*
- * Enable/disable the copy and select all buttons
+ * Called when the current part has changed: Enable/disable the copy
+ * and select all buttons
  */
 static void
 enable_edit_menus(BalsaMessage * bm)
@@ -1818,6 +1827,9 @@ enable_edit_menus(BalsaMessage * bm)
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_SELECT_ALL_POS].
                              widget, enable);
 #endif /* ENABLE_TOUCH_UI */
+#ifdef HAVE_GTKHTML
+    enable_view_menus(bm);
+#endif				/* HAVE_GTKHTML */
 }
 
 #ifdef HAVE_GTKHTML
@@ -4273,9 +4285,6 @@ static void
 select_part_cb(BalsaMessage * bm, gpointer data)
 {
     enable_edit_menus(bm);
-#ifdef HAVE_GTKHTML
-    enable_view_menus(bm);
-#endif				/* HAVE_GTKHTML */
 }
 
 static void

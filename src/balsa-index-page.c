@@ -34,23 +34,23 @@
 #include "balsa-index-page.h"
 #include "store-address.h"
 
-/* #define DND_USED */
-#ifdef DND_USED
-/* DND declarations */
+
 enum {
-    TARGET_MESSAGE,
+    TARGET_MESSAGES
 };
 
-static GtkTargetEntry drag_types[] = {
-    {"x-application-gnome/balsa", 0, TARGET_MESSAGE}
+static GtkTargetEntry index_drag_types[] = {
+    {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
 };
+
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
-static void index_child_setup_dnd(GnomeMDIChild * child);
-#endif
-
-/* -- end of DND declarations */
-
+static void index_drag_cb (GtkWidget* widget,
+                           GdkDragContext* drag_context,
+                           GtkSelectionData* data,
+                           guint info,
+                           guint time,
+                           gpointer user_data);
 
 /* callbacks */
 static void index_select_cb(GtkWidget * widget, LibBalsaMessage * message,
@@ -162,15 +162,17 @@ balsa_index_page_window_init(BalsaIndexPage * bip)
     gtk_signal_connect(GTK_OBJECT(index), "unselect_message",
 		       (GtkSignalFunc) index_unselect_cb, bip);
 
-    gtk_signal_connect(GTK_OBJECT(index), "button_press_event",
+    gtk_signal_connect(GTK_OBJECT(index),  "button_press_event",
 		       (GtkSignalFunc) index_button_press_cb, bip);
 
-    /* setup the dnd stuff for the messages */
-    /*   gtk_object_set(GTK_OBJECT(index), "use_drag_icons", FALSE, NULL); */
-    /*   gtk_object_set(GTK_OBJECT(index), "reorderable", FALSE, NULL); */
+    gtk_drag_source_set (index, 
+                         GDK_BUTTON1_MASK | GDK_SHIFT_MASK | GDK_CONTROL_MASK,
+                         index_drag_types, ELEMENTS(index_drag_types),
+                         GDK_ACTION_DEFAULT | GDK_ACTION_COPY | 
+                         GDK_ACTION_MOVE);
 
-    /* FIXME: DND support is broken */
-    /* index_child_setup_dnd(child); */
+    gtk_signal_connect (GTK_OBJECT (index), "drag-data-get",
+                        GTK_SIGNAL_FUNC (index_drag_cb), NULL);
 
     bip->index = index;
     bip->sw = sw;
@@ -656,107 +658,6 @@ transfer_messages_cb(BalsaMBList * bmbl, LibBalsaMailbox * mailbox,
     gtk_object_set_data(GTK_OBJECT(bindex), "transferredp", (gpointer) 1);
 }
 
-#ifdef DND_USED
-/* DND features */
-/*--*/
-/* forward declaration of the dnd callbacks */
-static void index_child_drag_data_get(GtkWidget * widget,
-				      GdkDragContext * context,
-				      GtkSelectionData * selection_data,
-				      guint info, guint32 time);
-
-/*--*/
-
-/* 
- * index_child_setup_dnd : 
- *
- * set the drag'n drop features up
- *
- * @child: the message index window to set the dnd ability up
- */
-
-static void
-index_child_setup_dnd(GnomeMDIChild * child)
-{
-    IndexChild *ic;
-    GdkPixmap *drag_pixmap;
-    GdkPixmap *drag_mask;
-    GdkColormap *cmap;
-
-    ic = INDEX_CHILD(child);
-
-    cmap = gtk_widget_get_colormap(GTK_WIDGET(ic->index));
-    gnome_stock_pixmap_gdk("Mail", "regular", &drag_pixmap, &drag_mask);
-
-    gtk_drag_source_set(GTK_WIDGET(ic->index),
-			GDK_BUTTON1_MASK | GDK_BUTTON3_MASK, drag_types,
-			ELEMENTS(drag_types),
-			GDK_ACTION_COPY | GDK_ACTION_MOVE |
-			GDK_ACTION_LINK);
-    gtk_drag_source_set_icon(GTK_WIDGET(ic->index), cmap, drag_pixmap,
-			     drag_mask);
-
-    gtk_signal_connect(GTK_OBJECT(ic->index), "drag_data_get",
-		       GTK_SIGNAL_FUNC(index_child_drag_data_get), NULL);
-
-    gdk_pixmap_unref(drag_pixmap);
-    gdk_pixmap_unref(drag_mask);
-}
-
-
-/**
- * index_child_drag_data_get:
- *
- * Invoked when the message list is required to provide the dragged messages
- * Finds the selected row in the index clist and create a list of selected message
- * This list is then passed to the X selection system to be retrievd by the drop
- * site.
- */
-static void
-index_child_drag_data_get(GtkWidget * widget, GdkDragContext * context,
-			  GtkSelectionData * selection_data, guint info,
-			  guint32 time)
-{
-    /*--*/
-    GtkCTreeNode **selected_rows;
-    guint nb_selected_rows;
-
-    GtkCList *clist;
-    BalsaIndex *bindex;
-
-    LibBalsaMessage **message_list;
-    LibBalsaMessage *current_message;
-    guint message_count;
-    /*--*/
-
-    clist = GTK_CLIST(widget);
-    bindex = BALSA_INDEX(widget);
-
-    /* retrieve the selected rows */
-    balsa_index_get_selected_rows(bindex, &selected_rows,
-				  &nb_selected_rows);
-
-    /* retrieve the corresponding messages */
-    message_list = (Message **) g_new(LibBalsaMessage, nb_selected_rows);
-    for (message_count = 0; message_count < nb_selected_rows;
-	 message_count++) {
-	current_message =
-	    LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data
-			     (GTK_CTREE(widget), selected_rows[message_count]));
-	message_list[message_count] = current_message;
-    }
-
-    /* pass the message list to the selection mechanism */
-    gtk_selection_data_set(selection_data,
-			   selection_data->target,
-			   8 * sizeof(LibBalsaMessage *),
-			   (gchar *) message_list,
-			   nb_selected_rows * sizeof(LibBalsaMessage *));
-
-    g_free(message_list);
-
-}
-#endif				/*DND_USED */
 
 void
 balsa_message_reply(GtkWidget * widget, gpointer index)
@@ -989,3 +890,46 @@ sendmsg_window_destroy_cb(GtkWidget * widget, gpointer data)
 {
     balsa_window_enable_continue();
 }
+
+
+/* index_drag_cb 
+ * 
+ * This is the drag_data_get callback for the index widgets.  It
+ * copies the list of selected messages to a pointer array, then sets
+ * them as the DND data. Currently only supports DND within the
+ * application.
+ *  */
+static void 
+index_drag_cb (GtkWidget* widget, GdkDragContext* drag_context, 
+               GtkSelectionData* data, guint info, guint time, 
+               gpointer user_data)
+{ 
+    LibBalsaMessage* message;
+    GPtrArray* message_array = NULL;
+    GList* list = NULL;
+    BalsaIndex* index;
+    GtkCList* clist;
+    
+    
+    index = BALSA_INDEX (widget);
+    clist = GTK_CLIST (index);
+    list = clist->selection;
+    message_array = g_ptr_array_new ();
+    
+    while (list) {
+        message = gtk_ctree_node_get_row_data (GTK_CTREE (index), list->data);
+        g_ptr_array_add (message_array, message);
+        list = list->next;
+    }
+    
+    if (message_array) {
+        g_ptr_array_add (message_array, NULL);
+        gtk_selection_data_set (data, data->target, 8, 
+                                (guchar*) message_array->pdata, 
+                                (message_array->len)*sizeof (gpointer));
+        /* the selection data makes a copy of the data, we 
+         * can free it now. */
+        g_ptr_array_free (message_array, FALSE);
+    }
+}
+

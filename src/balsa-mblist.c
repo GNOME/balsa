@@ -50,6 +50,15 @@ enum {
     ARG_SHOW_CONTENT_INFO
 };
 
+/* Drag and Drop stuff */
+enum {
+    TARGET_MESSAGES
+};
+
+static GtkTargetEntry mblist_drop_types[] = {
+    {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
+};
+
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
 static gint balsa_mblist_signals[LAST_SIGNAL] = { 0 };
@@ -97,6 +106,11 @@ static void balsa_mblist_set_style(BalsaMBList * mblist);
 static gint numeric_compare(GtkCList * clist, gconstpointer ptr1,
 			    gconstpointer ptr2);
 static gint mblist_mbnode_compare(gconstpointer a, gconstpointer b);
+static void mblist_drag_cb (GtkWidget* widget,
+                            GdkDragContext* context, gint x, gint y,
+                            GtkSelectionData* selection_data,
+                            guint info, guint32 time, gpointer data);
+
 
 guint
 balsa_mblist_get_type(void)
@@ -292,7 +306,7 @@ mb_close_cb(GtkWidget * widget, LibBalsaMailbox * mailbox)
 static void
 mb_conf_cb(GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
-    mailbox_conf_edit(mailbox);
+    mailbox_conf_edit (mailbox);
 }
 
 static void
@@ -671,6 +685,12 @@ balsa_mblist_init(BalsaMBList * tree)
 		       GTK_SIGNAL_FUNC(balsa_mblist_column_click),
 		       (gpointer) tree);
 
+    gtk_drag_dest_set (GTK_WIDGET (tree), GTK_DEST_DEFAULT_ALL,
+                       mblist_drop_types,
+                       ELEMENTS(mblist_drop_types),
+                       GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
+    gtk_signal_connect (GTK_OBJECT (tree),"drag-data-received",
+                        GTK_SIGNAL_FUNC (mblist_drag_cb), NULL);
     balsa_mblist_repopulate(tree);
 }
 
@@ -1504,4 +1524,80 @@ balsa_mblist_unread_messages_changed_cb(LibBalsaMailbox * mailbox,
 							   node));
     gtk_clist_thaw(GTK_CLIST(mblist));
 
+}
+
+
+/* mblist_drag_cb
+ * 
+ * Description: This is the drag_data_recieved signal handler for the
+ * BalsaMBList.  It retrieves a list of messages terminated by a NULL
+ * pointer, converts it to a GList, then transfers it to the selected
+ * mailbox.  Depending on what key is held down when the message(s)
+ * are dropped they are either copied or moved.  The default action is
+ * to copy.
+ * */
+static void
+mblist_drag_cb (GtkWidget* widget, GdkDragContext* context, 
+                gint x, gint y, GtkSelectionData* selection_data, 
+                guint info, guint32 time, gpointer data)
+{
+    BalsaMBList* bmbl;
+    GtkCTree* ctree;
+    GtkCTreeNode* node;
+    LibBalsaMailbox* mailbox;
+    LibBalsaMailbox* orig_mailbox;
+    GList* messages = NULL;
+    MailboxNode* mbnode;
+    gint row, column;
+    gint i = 0;
+    LibBalsaMessage** message_array;
+
+
+    bmbl = BALSA_MBLIST (widget);
+    ctree = &bmbl->ctree;
+    message_array = (LibBalsaMessage**) selection_data->data;
+
+    /* convert pointer array to GList */
+    while (message_array[i] != NULL) {
+        messages = g_list_append (messages, message_array[i]);
+        i++;
+    }
+    
+    orig_mailbox = ((LibBalsaMessage*) messages->data)->mailbox;
+
+    /* find the node and mailbox */
+    if (gtk_clist_get_selection_info (GTK_CLIST (ctree), x, y, 
+                                      &row, &column)) {
+        node = gtk_ctree_node_nth (ctree, row - 1);
+        mbnode = gtk_ctree_node_get_row_data (ctree, node);
+
+        /* cannot transfer to a directory */
+        if (!mbnode->IsDir) {
+            mailbox = mbnode->mailbox;
+        } else {
+            g_list_free (messages);
+            return;
+        }
+
+        /* cannot transfer to the originating mailbox */
+        if (mailbox != NULL && mailbox != orig_mailbox) {
+            switch (context->suggested_action) {
+            case GDK_ACTION_MOVE:
+                libbalsa_messages_move (messages, mailbox);
+                context->action = context->suggested_action;
+                break;
+
+            case GDK_ACTION_DEFAULT:
+            case GDK_ACTION_COPY:
+            default:
+                libbalsa_messages_copy (messages, mailbox);
+                context->action = context->suggested_action;
+                break;
+            }
+            
+            libbalsa_mailbox_commit_changes (orig_mailbox);
+        }
+    }
+
+    g_list_free (messages);
 }

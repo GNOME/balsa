@@ -450,7 +450,18 @@ libbalsa_message_move(LibBalsaMessage * message, LibBalsaMailbox * dest)
 }
 
 gboolean
-libbalsa_messages_move(GList * messages, LibBalsaMailbox * dest)
+libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
+{
+    if (libbalsa_messages_copy (messages, dest)) {
+        libbalsa_messages_delete (messages);
+        return TRUE;
+    } else {
+        return FALSE;
+    }
+}
+
+gboolean
+libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
 {
     HEADER *cur;
     LibBalsaMessage *message;
@@ -500,7 +511,7 @@ libbalsa_messages_move(GList * messages, LibBalsaMailbox * dest)
     libbalsa_unlock_mutt();
 
     libbalsa_mailbox_close(dest);
-    libbalsa_messages_delete(messages);
+    /* libbalsa_messages_delete(messages); */
     return TRUE;
 }
 

@@ -1,3 +1,10 @@
+2000-12-15  Matthew Guenther  <guentherm@asme.org>
+
+	* libbalsa/messages.[ch]: Add function libbalsa_messages_copy.
+	* src/balsa-index-page.c: Removed old DND cruft, implemented
+	drag-data-get signal handler.
+	* src/balsa-mblist.c: Add drag-data-received signal handler.
+	
 2000-12-15  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/balsa-message.c (save_part): If the file selected to save

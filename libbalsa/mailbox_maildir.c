@@ -666,7 +666,6 @@ libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox, guint msgno)
     struct message_info *msg_info;
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox), NULL);
-    g_return_val_if_fail (msgno > 0, NULL);
 
     msg_info = message_info_from_msgno(mailbox, msgno);
 
@@ -697,6 +696,7 @@ libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox, guint msgno)
     if (!msg_info->message)
 	msg_info->message =
 	    libbalsa_mailbox_maildir_load_message(mailbox, msgno);
+    msg_info->message->mime_msg = msg_info->mime_message;
     return msg_info->message;
 }
 

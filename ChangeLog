@@ -1,5 +1,6 @@
-2004-07-28 09:32  PeterB
+2004-07-28 15:09  PeterB
 
+	* libbalsa/mailbox_imap.c: plug leak.
 	* src/balsa-index.c: reselect current message only when we need to.
 	* src/main-window.c: new mail notification with --disable-threads.
 

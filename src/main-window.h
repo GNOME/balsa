@@ -80,7 +80,6 @@ void balsa_window_enable_continue(void);
 void balsa_change_window_layout(BalsaWindow *window);
 gboolean mail_progress_notify_cb(void);
 gboolean send_progress_notify_cb(void);
-gint check_new_messages_auto_cb(gpointer data);
 void check_new_messages_cb(GtkWidget *, gpointer data);
 void check_new_messages_real(GtkWidget *, gpointer data, int type);
 void empty_trash(void);

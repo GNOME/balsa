@@ -772,11 +772,6 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
     if (CLIENT_CONTEXT_CLOSED(mailbox))
 	return;
 
-#ifdef BALSA_USE_THREADS
-    /* drop the lock while we do the grunt work */
-    gdk_threads_leave();
-#endif
-
     LOCK_MAILBOX(mailbox);
     for (msgno = mailbox->messages; mailbox->new_messages > 0; msgno++) {
 	cur = CLIENT_CONTEXT(mailbox)->hdrs[msgno];
@@ -798,11 +793,6 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 	messages=g_list_prepend(messages, message);
     }
     UNLOCK_MAILBOX(mailbox);
-
-#ifdef BALSA_USE_THREADS
-    /* reaquire the lock, after releasing mailbox and before doing stuff */
-    gdk_threads_enter();
-#endif
 
     if(messages!=NULL){
 	messages = g_list_reverse(messages);

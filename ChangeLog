@@ -1,8 +1,18 @@
+2003-02-07  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.c: remove some references to GDK to reduce
+	interface locks.
+	* libbalsa/mailbox_imap.[hc]: same. 
+	Implement libbalsa_mailbox_imap_noop() to ping live connections.
+	* src/balsa-app.c: ping imap connections (move to libbalsa?).
+	* src/balsa-index.c: make libbalsa signal handlers thread-safe.
+	* src/main-window.[hc]: support SMTP after POP3.
+	
 2003-02-06  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/sendmsg-window.c: correct loc_utf8_pos
 
-2003-01-05  Pawel Salek  <pawsa@theochem.kth.se>
+2003-02-05  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox_pop3.[hc]: Add filter_cmd field.
 	* libbalsa/pop3.[ch]: configurable filter command.

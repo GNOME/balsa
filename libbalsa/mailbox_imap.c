@@ -757,9 +757,6 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
    Only open mailboxes are checked, although closed can be checked too
    with OPTIMAPPASIVE option set.
    NOTE: mx_check_mailbox can close mailbox(). Be cautious.
-   We have to set Timeout to 0 because mutt would not allow checking several
-   mailboxes in row.
-   LOCKING : assumes gdk lock HELD, and other (libmutt, mailbox) locks NOT HELD
 */
 static void
 libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
@@ -768,47 +765,8 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	if (libbalsa_notify_check_mailbox(mailbox) ) 
 	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE); 
     } else {
-	gint i = 0;
-	long newmsg, timeout;
-	gint index_hint;
 	g_return_if_fail(CLIENT_CONTEXT(mailbox));
-
-	/* Release the lock during the backend work */
-	gdk_threads_leave();
-	LOCK_MAILBOX(mailbox);
-	newmsg = CLIENT_CONTEXT(mailbox)->msgcount  
-	    - CLIENT_CONTEXT(mailbox)->deleted - mailbox->messages;
-	index_hint = CLIENT_CONTEXT(mailbox)->vcount;
-
-	libbalsa_lock_mutt();
-	imap_allow_reopen(CLIENT_CONTEXT(mailbox));
-	timeout = Timeout; Timeout = -1;
-	i = mx_check_mailbox(CLIENT_CONTEXT(mailbox), &index_hint, 0);
-	Timeout = timeout;
-	libbalsa_unlock_mutt();
-
-	if (i < 0) {
-	    g_print("mx_check_mailbox() failed on %s\n", mailbox->name);
-	    if(CLIENT_CONTEXT_CLOSED(mailbox)||
-	       !CLIENT_CONTEXT(mailbox)->id_hash)
-		libbalsa_mailbox_free_messages(mailbox);
-            /* send close signal as well? */
-	} 
-	if (newmsg || i == M_NEW_MAIL || i == M_REOPENED) {
-	    mailbox->new_messages =
-		CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
-	    
-	    UNLOCK_MAILBOX(mailbox);
-	    /* Reacquire the lock before leaving and calling
-	       libbalsa_mailbox_load_messages which assumes gdk lock held */
-	    gdk_threads_enter();
-	    libbalsa_mailbox_load_messages(mailbox);
-	} else {
-            /* update flags here */
-	    UNLOCK_MAILBOX(mailbox);
-	    /* Reacquire the lock before leaving */
-	    gdk_threads_enter();
-	}
+	libbalsa_mailbox_imap_noop(LIBBALSA_MAILBOX_IMAP(mailbox));
     }
 }
 typedef struct {
@@ -907,6 +865,54 @@ libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox,
     res = (imap_subscribe(LIBBALSA_MAILBOX(mailbox)->url, subscribe) == 0);
     libbalsa_unlock_mutt();
     return res;
+}
+
+/* libbalsa_mailbox_imap_noop:
+ * pings the connection with NOOP for an open IMAP mailbox.
+ * this keeps the connections alive.
+ *  We have to set Timeout to 0 because mutt would not allow checking several
+ *  mailboxes in row.
+ */
+
+void
+libbalsa_mailbox_imap_noop(LibBalsaMailboxImap* mbox)
+{
+    gint i = 0;
+    long newmsg, timeout;
+    gint index_hint;
+    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mbox);
+
+    if(CLIENT_CONTEXT_CLOSED(mailbox)) return;
+    /* Release the lock during the backend work */
+    LOCK_MAILBOX(mailbox);
+    newmsg = CLIENT_CONTEXT(mailbox)->msgcount  
+	- CLIENT_CONTEXT(mailbox)->deleted - mailbox->messages;
+    index_hint = CLIENT_CONTEXT(mailbox)->vcount;
+    
+    libbalsa_lock_mutt();
+    imap_allow_reopen(CLIENT_CONTEXT(mailbox));
+    timeout = Timeout; Timeout = -1;
+    i = mx_check_mailbox(CLIENT_CONTEXT(mailbox), &index_hint, 0);
+    Timeout = timeout;
+    libbalsa_unlock_mutt();
+    
+    if (i < 0) {
+	g_print("mx_check_mailbox() failed on %s\n", mailbox->name);
+	if(CLIENT_CONTEXT_CLOSED(mailbox)||
+	   !CLIENT_CONTEXT(mailbox)->id_hash)
+	    libbalsa_mailbox_free_messages(mailbox);
+	/* send close signal as well? */
+    } 
+    if (newmsg || i == M_NEW_MAIL || i == M_REOPENED) {
+	mailbox->new_messages = 
+	    CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
+	
+	UNLOCK_MAILBOX(mailbox);
+	libbalsa_mailbox_load_messages(mailbox);
+    } else {
+	/* update flags here */
+	UNLOCK_MAILBOX(mailbox);
+    }
 }
 
 /* imap_close_all_connections:

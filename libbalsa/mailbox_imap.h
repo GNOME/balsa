@@ -71,6 +71,8 @@ void libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap * mailbox,
 gboolean libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox, 
                                          gboolean subscribe);
 
+void libbalsa_mailbox_imap_noop(LibBalsaMailboxImap* mbox);
+
 void libbalsa_imap_close_all_connections(void);
 
 void libbalsa_imap_new_subfolder(const gchar * parent, const gchar * folder,

@@ -1806,18 +1806,6 @@ ensure_check_mail_dialog(void)
  * Callbacks
  */
 
-gint
-check_new_messages_auto_cb(gpointer data)
-{
-    check_new_messages_real((GtkWidget *) NULL, data, TYPE_BACKGROUND);
-
-    if (balsa_app.debug)
-        fprintf(stderr, "Auto-checked for new messages...\n");
-
-    /*  preserver timer */
-    return TRUE;
-}
-
 /* check_new_messages_cb:
    check new messages the data argument is the BalsaWindow pointer
    or NULL.
@@ -1868,9 +1856,13 @@ check_new_messages_real(GtkWidget *widget, gpointer data, int type)
 #endif
 }
 
+/* send_receive_messages_cb:
+   check messages first to satisfy those that use smtp-after-pop.
+*/
 static void
 send_receive_messages_cb(GtkWidget * widget, gpointer data)
 {
+    check_new_messages_real(widget, data, TYPE_CALLBACK);
 #if ENABLE_ESMTP
     libbalsa_process_queue(balsa_app.outbox, balsa_app.encoding_style,
                            balsa_app.smtp_server, balsa_app.smtp_authctx,
@@ -1880,7 +1872,6 @@ send_receive_messages_cb(GtkWidget * widget, gpointer data)
     libbalsa_process_queue(balsa_app.outbox, balsa_app.encoding_style,
                            balsa_app.send_rfc2646_format_flowed);
 #endif
-    check_new_messages_real(widget, data, TYPE_CALLBACK);
 }
 
 void

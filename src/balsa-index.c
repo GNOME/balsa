@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -123,12 +123,8 @@ static void mailbox_messages_changed_status_cb(LibBalsaMailbox * mb,
 					       GList * messages,
 					       gint flag,
 					       BalsaIndex * index);
-static void mailbox_messages_added(BalsaIndex * index,
-				   GList * messages);
-static void mailbox_messages_added_cb(BalsaIndex * index,
-				      GList * messages);
-static void mailbox_messages_removed(BalsaIndex * index, 
-				     GList  * messages);
+static void mailbox_messages_added_cb  (BalsaIndex * index, GList * messages);
+static void mailbox_messages_removed_cb(BalsaIndex * index, GList * messages);
 
 /* GtkTree* callbacks */
 static void bndx_selection_changed(GtkTreeSelection * selection,
@@ -860,7 +856,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
 			     G_CALLBACK(mailbox_messages_added_cb),
 			     (gpointer) index);
     g_signal_connect_swapped(G_OBJECT(mailbox), "messages-removed",
-			     G_CALLBACK(mailbox_messages_removed),
+			     G_CALLBACK(mailbox_messages_removed_cb),
 			     (gpointer) index);
 
     /* Set the tree store, load messages, and do threading. The ref
@@ -1369,17 +1365,17 @@ balsa_index_set_column_widths(BalsaIndex * index)
 }
 
 /* Mailbox Callbacks... */
-/* mailbox_messages_changed_status_cb:
+/* mailbox_messages_changed_status:
    We must be *extremely* careful here - message might have changed 
    its status because the mailbox was forcibly closed and message
    became invalid. See for example #70807.
 
 */
 static void
-mailbox_messages_changed_status_cb(LibBalsaMailbox * mb,
-				   GList * messages,
-				   gint flag,
-				   BalsaIndex * bindex)
+mailbox_messages_changed_status(LibBalsaMailbox * mb,
+				GList * messages,
+				gint flag,
+				BalsaIndex * bindex)
 {
     GList *list;
 
@@ -1411,13 +1407,51 @@ mailbox_messages_changed_status_cb(LibBalsaMailbox * mb,
     bndx_changed_find_row(bindex);
 }
 
+/* mailbox_messages_changed_status_cb: 
+ * it can be called from a * thread. Assure we do the actual work in
+ * the main thread.
+ */
+
+struct msg_changed_data {
+    LibBalsaMailbox * mb;
+    GList * messages;
+    gint flag;
+    BalsaIndex * bindex;
+};
+
+static gboolean
+mailbox_messages_changed_status_idle(struct msg_changed_data* arg)
+{
+    gdk_threads_enter();
+    mailbox_messages_changed_status(arg->mb, arg->messages, arg->flag,
+				    arg->bindex);
+    gdk_threads_leave();
+    g_list_foreach(arg->messages, (GFunc)g_object_unref, NULL);
+    g_list_free(arg->messages);
+    g_free(arg);
+    return FALSE;
+}
+    
+static void
+mailbox_messages_changed_status_cb(LibBalsaMailbox * mb,
+				   GList * messages,
+				   gint flag,
+				   BalsaIndex * bindex)
+{
+    struct msg_changed_data *arg = g_new(struct msg_changed_data,1);
+    arg->mb = mb;       arg->messages = g_list_copy(messages);
+    arg->flag = flag;   arg->bindex = bindex;
+    g_list_foreach(arg->messages, (GFunc)g_object_ref, NULL);
+    g_idle_add((GSourceFunc)mailbox_messages_changed_status_idle, arg);
+}
+
 /* mailbox_messages_added_cb : callback for sync with backend; the signal
    is emitted by the mailbox when new messages has been retrieved (either
    after opening the mailbox, or after "check new messages").
 */
 /* Helper of the callback (also used directly) */
 static void
-mailbox_messages_added(BalsaIndex * bindex, GList *messages)
+bndx_messages_add(BalsaIndex * bindex, GList *messages)
 {
     GList *list;
 
@@ -1439,10 +1473,38 @@ mailbox_messages_added(BalsaIndex * bindex, GList *messages)
     bndx_changed_find_row(bindex);
 }
 
+
+/* mailbox_messages_added_cb:
+   may be called from a thread. Use idle callback to update the view.
+   We must ref messages so they do not get destroyed between
+   filing the callback and actually calling it.
+*/
+struct index_list_pair {
+    void (*func)(BalsaIndex*, GList*);
+    BalsaIndex * bindex;
+    GList* messages;
+};
+
+static gboolean
+mailbox_messages_func_idle(struct index_list_pair* arg)
+{
+    gdk_threads_enter();
+    (arg->func)(arg->bindex, arg->messages);
+    gdk_threads_leave();
+    g_list_foreach(arg->messages, (GFunc)g_object_unref, NULL);
+    g_list_free(arg->messages);
+    g_free(arg);
+    return FALSE;
+}
+    
 static void
 mailbox_messages_added_cb(BalsaIndex * bindex, GList *messages)
 {
-    mailbox_messages_added(bindex, messages);
+    struct index_list_pair *arg = g_new(struct index_list_pair,1);
+    arg->func = bndx_messages_add; 
+    arg->bindex  = bindex; arg->messages = g_list_copy(messages);
+    g_list_foreach(arg->messages, (GFunc)g_object_ref, NULL);
+    g_idle_add((GSourceFunc)mailbox_messages_func_idle, arg);
 }
 
 /* mailbox_messages_remove_cb : callback to sync with backend; the signal is
@@ -1451,11 +1513,14 @@ mailbox_messages_added_cb(BalsaIndex * bindex, GList *messages)
    all mails flagged as deleted; the other case is when prefs about how to handle
    deletions are changed : "hide deleted messages/delete immediately")
  */
-/* Helper of the callback (also used directly) */
 static void
-mailbox_messages_removed(BalsaIndex * bindex, GList * messages)
+mailbox_messages_removed_cb(BalsaIndex * bindex, GList * messages)
 {
-    bndx_messages_remove(bindex, messages);
+    struct index_list_pair *arg = g_new(struct index_list_pair,1);
+    arg->func = bndx_messages_remove; 
+    arg->bindex  = bindex; arg->messages = g_list_copy(messages);
+    g_list_foreach(arg->messages, (GFunc)g_object_ref, NULL);
+    g_idle_add((GSourceFunc)mailbox_messages_func_idle, arg);
 }
 
 static void
@@ -2079,9 +2144,9 @@ bndx_hide_deleted(BalsaIndex * index, gboolean hide)
     }
 
     if (hide)
-        mailbox_messages_removed(index, messages);
+        bndx_messages_remove(index, messages);
     else
-        mailbox_messages_added(index, messages);
+        bndx_messages_add(index, messages);
 
     g_list_free(messages);
 }

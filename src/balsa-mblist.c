@@ -425,14 +425,10 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
 
     if (mbnode->mailbox) {
 	mbnode->IsDir = FALSE;
-
+	
 	if (LIBBALSA_IS_MAILBOX_POP3(mbnode->mailbox))
 	    return FALSE;
-	else if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
-	    gtk_ctree_set_node_info(ctree, cnode,
-				    mbnode->mailbox->name, 5,
-				    NULL, NULL, NULL, NULL, FALSE, FALSE);
-	else if (LIBBALSA_IS_MAILBOX_LOCAL(mbnode->mailbox)) {
+	else {
 	    BalsaIconName in = (mbnode->mailbox->new_messages > 0)
 		? BALSA_ICON_TRAY_FULL : BALSA_ICON_TRAY_EMPTY;
 	    gtk_ctree_set_node_info(ctree, cnode,
@@ -441,9 +437,8 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
 				    balsa_icon_get_bitmap(in),
 				    NULL, NULL,
 				    G_NODE_IS_LEAF(gnode), FALSE);
-	} else
-	    g_error("Unknown mailbox type\n");
-
+	}
+    
 	gtk_ctree_node_set_row_data(ctree, cnode, mbnode);
     }
 

@@ -436,7 +436,8 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     const struct PopDownloadMode *mode;
     unsigned long current_pos = 0, total_size;
     ImapTlsMode tls_mode;
-    
+    PopHandle *pop;
+ 
     if (!m->check) return;
 
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(m);
@@ -480,7 +481,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     if( (tmp_file=creat( mhs, 0600)) != -1) close(tmp_file);
     /* we fake a real mh box - it's good enough */
     
-    PopHandle * pop = pop_new();
+    pop = pop_new();
     pop_set_option(pop, IMAP_POP_OPT_FILTER_CR, TRUE);
     pop_set_option(pop, IMAP_POP_OPT_DISABLE_APOP, m->disable_apop);
     pop_set_tls_mode(pop, tls_mode);

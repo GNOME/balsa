@@ -1302,7 +1302,7 @@ ir_capability_data(ImapMboxHandle *handle)
     "IMAP4", "IMAP4rev1", "STATUS", "ACL", "NAMESPACE", "AUTH=CRAM-MD5", 
     "AUTH=GSSAPI", "AUTH=ANONYMOUS", "STARTTLS", "LOGINDISABLED", "SORT",
     "THREAD=ORDEREDSUBJECT", "THREAD=REFERENCES", "UNSELECT", "SCAN",
-    "CHILDREN", "LITERAL+"
+    "CHILDREN", "LITERAL+", "SASL-IR"
   };
   unsigned x;
   int c;

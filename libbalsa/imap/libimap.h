@@ -20,6 +20,7 @@
  */
 
 #include <time.h>
+#include <glib.h>
 
 /* connection states, as defined in rfc-2060, 3 */
 typedef enum {

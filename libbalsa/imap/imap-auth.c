@@ -31,6 +31,7 @@
 
 /* ordered from strongest to weakest */
 static ImapAuthenticator imap_authenticators_arr[] = {
+  imap_auth_gssapi,
   imap_auth_cram,
   imap_auth_login,
   NULL

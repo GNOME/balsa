@@ -26,5 +26,6 @@ typedef ImapResult (*ImapAuthenticator)(ImapMboxHandle* handle);
 ImapResult imap_authenticate(ImapMboxHandle* handle);
 ImapResult imap_auth_cram(ImapMboxHandle* handle);
 ImapResult imap_auth_login(ImapMboxHandle* handle);
+ImapResult imap_auth_gssapi(ImapMboxHandle* handle);
 
 #endif

@@ -1,3 +1,13 @@
+2004-07-08  Pawel Salek
+
+	* libbalsa/mailbox_pop3.c: patch from 143263.
+	* libbalsa/server.c: do not forget the method parameter.
+	* libbalsa/imap/Makefile.am: add auth-gssapi.c
+	* libbalsa/imap/imap-auth.[hc]: add gssapi to the authenticator list.
+	* libbalsa/imap/imap-handle.[hc]: recognize SASL-IR extension.
+	* libbalsa/imap/libimap.h: add missing include.
+	* libbalsa/imap/util.c (lit_conv_to_base64): fix char indexing.
+
 2004-07-07 23:16  PeterB
 
 	* src/print.c: compile with HAVE_GPGME && !HAVE_GTKHTML.

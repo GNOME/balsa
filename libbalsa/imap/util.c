@@ -158,9 +158,10 @@ static int Index_64[128] = {
 
 /* raw bytes to null-terminated base 64 string */
 void
-lit_conv_to_base64(char *out, const char *in, size_t len,
+lit_conv_to_base64(char *out, const char *sin, size_t len,
                    size_t olen)
 {
+  const unsigned char *in = sin;
   while (len >= 3 && olen > 10)
   {
     *out++ = B64Chars[in[0] >> 2];

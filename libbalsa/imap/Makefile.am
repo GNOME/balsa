@@ -4,6 +4,7 @@ noinst_LIBRARIES = libimap.a
 #libimap_la_SOURCES =  
 libimap_a_SOURCES = \
 	auth-cram.c	\
+	auth-gssapi.c	\
 	imap-auth.c	\
 	imap-auth.h	\
 	imap-commands.c	\

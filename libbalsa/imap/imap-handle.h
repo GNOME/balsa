@@ -73,6 +73,7 @@ typedef enum
   IMCAP_SCAN,                   /* FIXME: RFC? */
   IMCAP_CHILDREN,               /* RFC 3348 */
   IMCAP_LITERAL,                /* RFC 2088 */
+  IMCAP_SASLIR,                 /* imap-sasl-initial-response: SASL-IR */
   IMCAP_MAX
 } ImapCapability;
 

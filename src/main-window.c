@@ -1170,7 +1170,7 @@ balsa_window_enable_continue(void)
             || balsa_app.draftbox->total_messages;
 
         set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
-                        0, BALSA_PIXMAP_CONTINUE, n);
+				     0, BALSA_PIXMAP_CONTINUE, n);
         gtk_widget_set_sensitive(file_menu[MENU_FILE_CONTINUE_POS].widget, n);
 
 /*      libbalsa_mailbox_close(balsa_app.draftbox); */
@@ -1280,9 +1280,8 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
     balsa_window_decrease_activity(balsa_app.main_window);
 
     if(failurep) {
-        libbalsa_information(
-            LIBBALSA_INFORMATION_ERROR, NULL,
-            _("Unable to Open Mailbox!\nPlease check the mailbox settings."));
+        balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
+			  _("Unable to Open Mailbox!\nPlease check the mailbox settings."));
         gtk_object_destroy(GTK_OBJECT(index));
         gdk_threads_leave();
 #ifdef BALSA_USE_THREADS

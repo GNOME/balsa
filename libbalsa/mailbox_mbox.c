@@ -870,7 +870,7 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     char date_string[27];
     const char *sender;
     gchar *address;
-    char *brack;
+    const gchar *brack;
     gchar *from = NULL;
     ssize_t flen;
     const char *path;
@@ -891,7 +891,7 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
 
     sender = g_mime_message_get_sender(msg);
     if ( (brack = strrchr( sender, '<' )) ) {
-        char * a = strrchr ( brack , '>' );
+        const gchar * a = strrchr ( brack , '>' );
         if (a)
             address = g_strndup(brack + 1, a - brack - 1);
         else

@@ -581,7 +581,6 @@ balsa_message_init(BalsaMessage * bm)
     gtk_notebook_append_page(GTK_NOTEBOOK(bm), scroll, label);
     gtk_widget_show(scroll);
     bm->cont_viewport = gtk_viewport_new(NULL, NULL);
-    gtk_widget_show(bm->cont_viewport);
     gtk_container_add(GTK_CONTAINER(scroll), bm->cont_viewport);
     g_signal_connect_after(bm, "style-set",
 			   G_CALLBACK(bm_on_set_style), bm);
@@ -1139,6 +1138,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     /* find out whether the content has the keyboard focus */
     has_focus = bm_content_has_focus(bm);
 
+    gtk_widget_hide(bm->cont_viewport);
     select_part(bm, NULL);
     if (bm->message != NULL) {
         g_object_weak_unref(G_OBJECT(bm->message),
@@ -1150,12 +1150,10 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     balsa_message_clear_tree(bm);
 
     if (message == NULL) {
-        gtk_widget_hide(bm->cont_viewport);
         gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), FALSE);
         gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
         return TRUE;
     }
-    gtk_widget_show(bm->cont_viewport);
 
     bm->message = message;
 
@@ -1182,6 +1180,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 
     display_headers(bm);
     display_content(bm);
+    gtk_widget_show(bm->cont_viewport);
 
 #if defined(ENABLE_TOUCH_UI)
     /* hide tabs so that they do not confuse keyboard navigation.

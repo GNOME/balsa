@@ -90,6 +90,7 @@ extern "C" {
 	guint gpg_mode;
 	GtkWidget *gpg_radio[2];
 #endif
+        GtkWidget *header_table;
     };
 
     BalsaSendmsg *sendmsg_window_new(GtkWidget *, LibBalsaMessage *,

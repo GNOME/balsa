@@ -2752,7 +2752,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	    g_free(tmp);
 	}
     }
-    gtk_paned_set_position(GTK_PANED(paned), sw_header_height(msg));
+    gtk_paned_set_position(GTK_PANED(paned),
+                           sw_header_height(msg) +
+                           2 * paned->style->ythickness);
     gnome_app_set_contents(GNOME_APP(window), paned);
 
     /* Connect to "text-changed" here, so that we catch the initial text
@@ -3666,7 +3668,9 @@ toggle_entry(BalsaSendmsg * bmsg, GtkWidget * entry[], int pos, int cnt)
     /* force size recomputation if embedded in paned */
     parent = gtk_widget_get_ancestor(entry[0], GTK_TYPE_PANED);
     if (parent)
-        gtk_paned_set_position(GTK_PANED(parent), sw_header_height(bmsg));
+        gtk_paned_set_position(GTK_PANED(parent),
+                               sw_header_height(bmsg) +
+                               2 * parent->style->ythickness);
 
     if(bmsg->update_config) { /* then save the config */
 	str[0] = '\0';
@@ -4136,6 +4140,5 @@ sw_header_height(BalsaSendmsg * bsmsg)
 
     gtk_widget_size_request(bsmsg->header_table, &requisition);
 
-    /* FIXME is this magic number 2 a widget property? */
-    return requisition.height + 2;
+    return requisition.height;
 }

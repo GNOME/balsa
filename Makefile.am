@@ -5,7 +5,7 @@ man_MANS=balsa.1
 pixmapdir = $(datadir)/pixmaps
 pixmap_DATA = gnome-balsa2.png
 
-desktopdir = $(gnomedatadir)/gnome/apps/Networking/Mail
+desktopdir = $(gnomedatadir)/gnome/apps/Internet
 desktop_DATA = balsa.desktop
 
 EXTRA_DIST = \

@@ -317,23 +317,20 @@ ab_load(GtkWidget * widget, gpointer data)
             else if (id) 
               data->name = g_strdup (id);
             else
-              g_strdup( _("No-Name") );
+              data->name = g_strdup( _("No-Name") );
             
 	    listdata[0] = id;
 	    listdata[1] = email;
 	    rownum = gtk_clist_append(GTK_CLIST(book_clist), listdata); 
 	    gtk_clist_set_row_data(GTK_CLIST( book_clist),
 				   rownum, (gpointer) data); 
-	    name  = NULL;
-	    email = NULL;
-	    id = NULL;
-	 } else {
+	 } else { /* record without e-mail address, ignore */
 	    g_free (name);
-            name = NULL;
 	    g_free (id);
-            id = NULL;
 	 } 
-
+	 email = NULL;
+	 name = NULL;
+	 id = NULL;
 	 in_vcard = FALSE;
 	 continue;
       }
@@ -378,6 +375,7 @@ ab_find(GtkWidget * group_entry)
 	gint num; 
 
 	g_return_if_fail(book_clist); 
+	g_return_if_fail(group_entry);
 
 	entry_text = gtk_entry_get_text(GTK_ENTRY(group_entry)); 
 	if (strlen(entry_text) == 0)

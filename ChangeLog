@@ -1,5 +1,6 @@
-2004-03-06 10:49  PeterB
+2004-03-06 16:59  PeterB
 
+	* libbalsa/body.c: check for NULL GMime filter.
 	* libbalsa/: mailbox.c, message.c: lock source mailbox when copying
 	or moving messages.
 	* libbalsa/libbalsa_private.h: complete previous commit.

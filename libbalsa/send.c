@@ -273,7 +273,7 @@ ensure_send_progress_dialog()
 #endif
 
 
-static GMimePart *
+static GMimeObject *
 add_mime_body_plain(LibBalsaMessageBody *body, gint encoding_style, 
 		    gboolean flow)
 {
@@ -342,7 +342,7 @@ add_mime_body_plain(LibBalsaMessageBody *body, gint encoding_style,
     } else
 	g_mime_part_set_content(mime_part, body->buffer, strlen(body->buffer));
 
-    return mime_part;
+    return GMIME_OBJECT(mime_part);
 }
 
 #if 0
@@ -1452,41 +1452,57 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 	mime_root=GMIME_OBJECT(g_mime_multipart_new_with_subtype(message->subtype));
 
     while (body) {
-	GMimePart *mime_part;
+	GMimeObject *mime_part;
 	mime_part=NULL;
 
 	if (body->filename) {
+	    if (body->content_type) {
+		mime_type = parse_content_type(body->content_type);
+	    } else {
+		gchar* mt = libbalsa_lookup_mime_type(body->filename);
+		mime_type = g_strsplit(mt,"/", 2);
+		g_free(mt);
+	    }
+
 	    if (body->attach_as_extbody) {
-		GMimeObject *mime_obj;
-		mime_part=g_mime_part_new_with_type("message", "external-body");
-		g_mime_part_set_encoding(mime_part, GMIME_PART_ENCODING_7BIT);
-		mime_obj = GMIME_OBJECT(mime_part);
+		mime_part=g_mime_object_new_type("message", "external-body");
+		g_mime_part_set_encoding(GMIME_PART(mime_part),
+			                 GMIME_PART_ENCODING_7BIT);
 		if(!strncmp( body->filename, "URL", 3 )) {
-		    g_mime_object_set_content_type_parameter(mime_obj,
+		    g_mime_object_set_content_type_parameter(mime_part,
 					     "access-type", "URL");
-		    g_mime_object_set_content_type_parameter(mime_obj,
+		    g_mime_object_set_content_type_parameter(mime_part,
 					     "URL", body->filename + 4);
 		} else {
-		    g_mime_object_set_content_type_parameter(mime_obj,
+		    g_mime_object_set_content_type_parameter(mime_part,
 					     "access-type", "local-file");
-		    g_mime_object_set_content_type_parameter(mime_obj,
+		    g_mime_object_set_content_type_parameter(mime_part,
 					     "name", body->filename);
 		}
-		g_mime_part_set_content(mime_part,
+		g_mime_part_set_content(GMIME_PART(mime_part),
 					"Note: this is _not_ the real body!\n",
 					34);
+	    } else if (g_ascii_strcasecmp(mime_type[0], "message") == 0) {
+		int fd;
+		GMimeStream *stream;
+		GMimeParser *parser;
+		GMimeMessage *mime_message;
+
+		fd = open(body->filename, O_RDONLY);
+		stream = g_mime_stream_fs_new(fd);
+		parser = g_mime_parser_new_with_stream(stream);
+		g_object_unref(stream);
+		mime_message = g_mime_parser_construct_message(parser);
+		g_object_unref(parser);
+                mime_part =
+                    GMIME_OBJECT(g_mime_message_part_new_with_message
+                                 (mime_type[1], mime_message));
+		g_object_unref(mime_message);
 	    } else {
 		const gchar *charset = NULL;
 		GMimeStream *stream;
 		GMimeDataWrapper *content;
 		int fd;
-
-		if (!body->content_type) {
-		    gchar* mt = libbalsa_lookup_mime_type(body->filename);
-		    mime_type = g_strsplit(mt,"/", 2);
-		    g_free(mt);
-		} else
-		    mime_type = parse_content_type(body->content_type);
 
 		if (!strcasecmp(mime_type[0], "text")) {
 		    charset = lbs_file_get_charset(body->filename);
@@ -1506,26 +1522,24 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 
 		/* use BASE64 encoding for non-text mime types 
 		   use 8BIT for message */
-		mime_part=g_mime_part_new_with_type(mime_type[0], mime_type[1]);
-		g_mime_part_set_content_disposition(mime_part, GMIME_DISPOSITION_ATTACHMENT);
-		if(!strcasecmp(mime_type[0],"message") && 
-		   !strcasecmp(mime_type[1],"rfc822")) {
-		    g_mime_part_set_encoding(mime_part, GMIME_PART_ENCODING_8BIT);
-		    g_mime_part_set_content_disposition(mime_part, GMIME_DISPOSITION_INLINE);
-		} else if(strcasecmp(mime_type[0],"text") != 0)
+		mime_part =
+		    GMIME_OBJECT(g_mime_part_new_with_type(mime_type[0],
+				                           mime_type[1]));
+		g_mime_part_set_content_disposition(GMIME_PART(mime_part),
+			GMIME_DISPOSITION_ATTACHMENT);
+		if(strcasecmp(mime_type[0],"text") != 0)
 		{
-		    g_mime_part_set_encoding(mime_part, GMIME_PART_ENCODING_BASE64);
+		    g_mime_part_set_encoding(GMIME_PART(mime_part),
+			    GMIME_PART_ENCODING_BASE64);
 		} else {
 		    /* is text */
-		    g_mime_object_set_content_type_parameter(GMIME_OBJECT
-							     (mime_part),
+		    g_mime_object_set_content_type_parameter(mime_part,
 							     "charset",
 							     charset);
 		}
-		g_strfreev(mime_type);
 
 		tmp = g_path_get_basename(body->filename);
-		g_mime_part_set_filename(mime_part, tmp);
+		g_mime_part_set_filename(GMIME_PART(mime_part), tmp);
 		g_free(tmp);
 
 		fd = open(body->filename, O_RDONLY);
@@ -1533,9 +1547,11 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		content = g_mime_data_wrapper_new_with_stream(stream,
 			GMIME_PART_ENCODING_DEFAULT);
 		g_mime_stream_unref(stream);
-		g_mime_part_set_content_object(mime_part, content);
+		g_mime_part_set_content_object(GMIME_PART(mime_part),
+			                       content);
 		g_object_unref(content);
 	    }
+	    g_strfreev(mime_type);
 	} else if (body->buffer) {
 #ifdef HAVE_GPGME
 	    /* force quoted printable encoding if only signing is requested */
@@ -1549,7 +1565,8 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		message->gpg_mode > 0 &&
 		(message->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0) {
 		gint result = 
-		    libbalsa_create_rfc2440_buffer(body, mime_part);
+		    libbalsa_create_rfc2440_buffer(body,
+			                           GMIME_PART(mime_part));
 
 		if (result != LIBBALSA_MESSAGE_CREATE_OK) {
 		    g_object_unref(G_OBJECT(mime_part));
@@ -1567,7 +1584,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 				      GMIME_OBJECT(mime_part));
 	    g_object_unref(G_OBJECT(mime_part));
 	} else {
-	    mime_root = GMIME_OBJECT(mime_part);
+	    mime_root = mime_part;
 	}
 
 	body = body->next;

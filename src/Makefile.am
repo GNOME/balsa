@@ -35,7 +35,9 @@ balsa_SOURCES =	\
 	message-window.h	\
 	pref-manager.h		\
 	save-restore.h		\
-	sendmsg-window.h
+	sendmsg-window.h	\
+	mblist-window.c		\
+	mblist-window.h
 
 
 INCLUDES=-I. -I${top_srcdir}/libbalsa -I${top_srcdir} -I$(top_srcdir)/idl \

@@ -1,4 +1,9 @@
+
 1998-12-26  bertrand <bertrand.guiheneuf@inria.fr>
+
+	* src/mblist-window.[ch]: new files.
+	* src/main-windo.c: moved the mailbox list window
+	code to the new two above files.
 
 	* src/balsa-message.c (balsa_message_new): corrected the bug
 	that made some widget background white instead of their

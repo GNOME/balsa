@@ -111,8 +111,8 @@ GtkType libbalsa_message_get_type(void);
 /*
  * messages
  */
-Message *message_new (void);
-void message_free (Message * message);
+Message *message_new(void);
+void message_destroy(Message *message);
 
 void message_copy (Message * message, Mailbox * dest);
 void message_move (Message * message, Mailbox * mailbox);

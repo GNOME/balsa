@@ -37,7 +37,7 @@
 static void libbalsa_message_class_init (MessageClass *klass);
 static void libbalsa_message_init (Message *message);
 
-
+static void libbalsa_message_real_destroy(GtkObject *object);
 static void libbalsa_message_real_clear_flags(Message *message);
 static void libbalsa_message_real_set_answered_flag(Message *message, gboolean set);
 static void libbalsa_message_real_set_read_flag(Message *message, gboolean set);
@@ -147,6 +147,7 @@ libbalsa_message_class_init (MessageClass *klass)
 
   gtk_object_class_add_signals(object_class, message_signals, LAST_SIGNAL);
 
+  object_class->destroy = libbalsa_message_real_destroy;
 
   klass->clear_flags = libbalsa_message_real_clear_flags;
   klass->set_answered = libbalsa_message_real_set_answered_flag;
@@ -158,7 +159,7 @@ libbalsa_message_class_init (MessageClass *klass)
  * messages
  */
 Message *
-message_new (void)
+message_new(void)
 {
   Message *message;
 
@@ -167,11 +168,16 @@ message_new (void)
   return message;
 }
 
-
-void
-message_free (Message * message)
+static void
+libbalsa_message_real_destroy(GtkObject *object)
 {
   GList* list;
+  Message *message;
+
+  g_return_if_fail(object != NULL);
+  g_return_if_fail(LIBBALSA_IS_MESSAGE(object));
+
+  message = LIBBALSA_MESSAGE(object);
 
   g_free (message->remail);
   g_free (message->date);
@@ -193,10 +199,16 @@ message_free (Message * message)
   g_list_free (message->bcc_list);
 
   g_free (message->in_reply_to);
-  g_free (message->message_id);
+  g_free (message->message_id); 
+}
 
-  /* finally free the message */
-  g_free (message);
+void
+message_destroy(Message * message)
+{
+  g_return_if_fail(message != NULL);
+  g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
+
+  gtk_object_destroy((GtkObject*)message);
 }
 
 gchar *

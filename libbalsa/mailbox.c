@@ -709,7 +709,7 @@ free_messages (Mailbox * mailbox)
       list = list->next;
 
       send_watcher_delete_message (mailbox, message);
-      message_free (message);
+      message_destroy (message);
     }
   g_list_free (mailbox->message_list);
   mailbox->message_list = NULL;
@@ -1100,7 +1100,7 @@ void mailbox_commit_flagged_changes( Mailbox *mailbox )
       if ( current_message->flags & MESSAGE_FLAG_DELETED ) 
 	{
 	   send_watcher_delete_message (mailbox, current_message);
-	   message_free (current_message);
+	   message_destroy (current_message);
 	   mailbox->message_list = g_list_remove_link( mailbox->message_list, message_list);
 	}
       message_list = tmp_message_list;

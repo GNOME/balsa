@@ -902,7 +902,7 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   }
 
   g_list_free (message->body_list);
-  message_free (message);
+  message_destroy (message);
   balsa_sendmsg_destroy (bsmsg);
 
   return TRUE;
@@ -978,7 +978,7 @@ postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
       message_delete (bsmsg->orig_message);
 
   g_list_free (message->body_list);
-  message_free (message);
+  message_destroy (message);
   balsa_sendmsg_destroy (bsmsg);
 
   return TRUE;

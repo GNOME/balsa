@@ -53,6 +53,7 @@ static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 void send_body_wrap (Body *body, GtkText *text);
 
 
+static void check_readiness(GtkEditable *w, BalsaSendmsg *bsmsg);
 static void set_menus(BalsaSendmsg*);
 static gint toggle_from_cb (GtkWidget *, BalsaSendmsg *);
 static gint toggle_to_cb (GtkWidget *, BalsaSendmsg *);
@@ -94,12 +95,15 @@ static GtkTargetEntry email_field_drop_types[] =
 
 static GnomeUIInfo main_toolbar[] =
 {
+#define TOOL_SEND_POS 0
   GNOMEUIINFO_ITEM_STOCK (N_ ("Send"), N_ ("Send this mail"), send_message_cb,
 			  GNOME_STOCK_PIXMAP_MAIL_SND),
   GNOMEUIINFO_SEPARATOR,
+#define TOOL_ATTACH_POS 2
   GNOMEUIINFO_ITEM_STOCK (N_ ("Attach"),N_ ("Add attachments to this message"),
 			  attach_clicked, GNOME_STOCK_PIXMAP_ATTACH),
   GNOMEUIINFO_SEPARATOR,
+#define TOOL_POSTPONE_POS 4
   GNOMEUIINFO_ITEM_STOCK (N_ ("Postpone"), N_ ("Continue this message later"),
 			  postpone_message_cb, GNOME_STOCK_PIXMAP_SAVE),
   GNOMEUIINFO_SEPARATOR,
@@ -118,19 +122,24 @@ static GnomeUIInfo main_toolbar[] =
 
 static GnomeUIInfo file_menu[] =
 {
+#define MENU_FILE_INCLUDE_POS 0
   GNOMEUIINFO_ITEM_STOCK(N_ ("_Include File..."), NULL,
 			 include_file_cb, GNOME_STOCK_MENU_OPEN),
+#define MENU_FILE_ATTACH_POS 1
   GNOMEUIINFO_ITEM_STOCK(N_ ("_Attach file..."), NULL, 
 			 attach_clicked, GNOME_STOCK_MENU_ATTACH),
   GNOMEUIINFO_SEPARATOR,
+#define MENU_FILE_SEND_POS 3
   GNOMEUIINFO_ITEM_STOCK(N_ ("_Send"),N_ ("Send the currently edited message"),
 			 send_message_cb, GNOME_STOCK_MENU_MAIL_SND),
+#define MENU_FILE_POSTPONE_POS 4
   GNOMEUIINFO_ITEM_STOCK(N_ ("_Postpone"), NULL, 
 			 postpone_message_cb, GNOME_STOCK_MENU_SAVE),
+#define MENU_FILE_PRINT_POS 5
   GNOMEUIINFO_ITEM_STOCK(N_ ("Print"), N_ ("Print the edited message"), 
 			  print_message_cb, GNOME_STOCK_PIXMAP_PRINT),
   GNOMEUIINFO_SEPARATOR,
-
+#define MENU_FILE_PRINT_POS 7
   GNOMEUIINFO_MENU_CLOSE_ITEM(close_window, NULL),
 
   GNOMEUIINFO_END
@@ -496,7 +505,10 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   create_email_entry(table, _("From:"),0,GNOME_STOCK_MENU_BOOK_BLUE,msg->from);
   /* To: */
   create_email_entry(table, _("To:"), 1, GNOME_STOCK_MENU_BOOK_RED, msg->to );
+  gtk_signal_connect (GTK_OBJECT (msg->to[1]), "changed",
+		      GTK_SIGNAL_FUNC (check_readiness), msg);
 
+  
   /* Subject: */
   msg->subject[0] = gtk_label_new (_("Subject:"));
   gtk_misc_set_alignment (GTK_MISC (msg->subject[0]), 0.0, 0.5);
@@ -629,23 +641,23 @@ create_text_area (BalsaSendmsg * msg)
 
 /* continueBody ---------------------------------------------------------
    a short-circuit procedure for the 'Continue action'
+   basically copies the text over to the entry field.
 */
 static void
 continueBody(Message * message, BalsaSendmsg *msg)
 {
    GString *rbdy;
 
-   g_return_if_fail(message->body_list != NULL); /* FIXME: is it needed? */
-
+   message_body_ref (message);
    rbdy = content2reply (message, NULL); 
    gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, 
 		    strlen (rbdy->str));
    g_string_free (rbdy, TRUE);
+   message_body_unref (message);
 }
 
 /* quoteBody ------------------------------------------------------------
    quotes properly the body of the message
-   Continue basically copies the text over to the entry field.
 */
 static void 
 quoteBody(Message * message, BalsaSendmsg *msg, SendType type)
@@ -653,10 +665,8 @@ quoteBody(Message * message, BalsaSendmsg *msg, SendType type)
    GString *rbdy;
    gchar *str, *personStr;
 
-   message_body_ref (message); /* avoid unexpected object vanishing(?) */
+   message_body_ref (message);
    
-   //body = (Body *) message->body_list->data;
-
    personStr = (message->from && message->from->personal) ?
       message->from->personal : _("you");
    
@@ -1043,6 +1053,32 @@ static gint include_file_cb (GtkWidget *widget, BalsaSendmsg *bsmsg) {
 }
 
 
+static gint 
+is_ready_to_send(BalsaSendmsg * bsmsg) {
+   gchar *tmp;
+   size_t len;
+   
+   tmp = gtk_entry_get_text (GTK_ENTRY (bsmsg->to[1]));
+   len = strlen (tmp);
+   
+   if (len < 1)		/* empty */
+      return FALSE;
+   
+   if (tmp[len - 1] == '@')	/* this shouldn't happen */
+      return FALSE;
+   
+   if (len < 4)
+   {
+      if (strchr (tmp, '@'))	/* you won't have an @ in an
+				   address less than 4 characters */
+	 return FALSE;
+      
+      /* assume they are mailing it to someone in their local domain */
+   }
+   return TRUE;
+}
+
+
 static gint
 send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
@@ -1051,26 +1087,7 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   gchar *tmp;
   gchar *def_charset;
 
-  tmp = gtk_entry_get_text (GTK_ENTRY (bsmsg->to[1]));
-  {
-    size_t len;
-    len = strlen (tmp);
-
-    if (len < 1)		/* empty */
-      return FALSE;
-
-    if (tmp[len - 1] == '@')	/* this shouldn't happen */
-      return FALSE;
-
-    if (len < 4)
-      {
-	if (strchr (tmp, '@'))	/* you won't have an @ in an
-				   address less than 4 characters */
-	  return FALSE;
-
-	/* assume they are mailing it to someone in their local domain */
-      }
-  }
+  if(! is_ready_to_send(bsmsg)) return FALSE;
 
   message = message_new ();
 
@@ -1186,26 +1203,7 @@ postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   Body *body;
   gchar *tmp;
 
-  tmp = gtk_entry_get_text (GTK_ENTRY (bsmsg->to[1]));
-  {
-    size_t len;
-    len = strlen (tmp);
-
-    if (len < 1)		/* empty */
-      return FALSE;
-
-    if (tmp[len - 1] == '@')	/* this shouldn't happen */
-      return FALSE;
-
-    if (len < 4)
-      {
-	if (strchr (tmp, '@'))	/* you won't have an @ in an
-				   address less than 4 characters */
-	  return FALSE;
-
-	/* assume they are mailing it to someone in their local domain */
-      }
-  }
+  if(! is_ready_to_send(bsmsg) ) return FALSE;
 
   message = message_new ();
 
@@ -1225,7 +1223,6 @@ postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   if( (tmp = gtk_entry_get_text (GTK_ENTRY (bsmsg->reply_to[1]))) != NULL &&
       strlen(tmp)>0) 
      message->reply_to = make_address_from_string(tmp);
-
 
 
   body = body_new ();
@@ -1424,6 +1421,18 @@ send_body_wrap (Body *body, GtkText *text)
 
 }
 
+static void
+check_readiness(GtkEditable *w, BalsaSendmsg *bsmsg) 
+{
+   gint state = is_ready_to_send(bsmsg);
+
+   gtk_widget_set_sensitive(file_menu[MENU_FILE_SEND_POS    ].widget, state);
+   gtk_widget_set_sensitive(file_menu[MENU_FILE_POSTPONE_POS].widget, state);
+
+   gtk_widget_set_sensitive(main_toolbar[TOOL_SEND_POS    ].widget, state);
+   gtk_widget_set_sensitive(main_toolbar[TOOL_POSTPONE_POS].widget, state);
+}
+
 static gint 
 toggle_entry (GtkWidget *entry[], int pos, int cnt)
 {
@@ -1505,6 +1514,9 @@ static void set_menus(BalsaSendmsg *msg)
       gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
 	 iso_charset_menu[i].widget), TRUE);
    msg->charset_idx = i;
+
+   /* gray 'send' and 'postpone' */
+   check_readiness(GTK_EDITABLE(msg->to[1]), msg);
 }
 
 /* create_font_name returns iso8859 font name based on given font 

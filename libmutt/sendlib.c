@@ -1444,149 +1444,174 @@ static RETSIGTYPE alarm_handler (int sig)
 static int
 send_msg (const char *path, char **args, const char *msg, char **tempfile)
 {
-  sigset_t set;
-  int fd, st;
-  pid_t pid, ppid;
+	sigset_t set;
+	int fd, st;
+	pid_t pid, ppid;
+	
+	/* Set up signals to that we're not inopportunely stopped. */
+	mutt_block_signals_system ();
+	sigemptyset (&set);
+	sigaddset (&set, SIGTSTP); 	/* we also don't want to be stopped right now */
+	sigprocmask (SIG_BLOCK, &set, NULL);
 
-  mutt_block_signals_system ();
+	/* If we wait for sendmail, prepare a temp filename */
+	if (SendmailWait >= 0) {
+		char tmp[_POSIX_PATH_MAX];
+		
+		mutt_mktemp (tmp);
+		*tempfile = safe_strdup (tmp);
+	}
 
-  sigemptyset (&set);
-  /* we also don't want to be stopped right now */
-  sigaddset (&set, SIGTSTP);
-  sigprocmask (SIG_BLOCK, &set, NULL);
+	/* Fork the child sender */
+	if ((pid = fork ()) == 0) {
+		/* We're the sender! */
+		struct sigaction act, oldalrm;
+		
+		/* save parent's ID before setsid() */
+		ppid = getppid ();
 
-  if (SendmailWait >= 0)
-  {
-    char tmp[_POSIX_PATH_MAX];
-
-    mutt_mktemp (tmp);
-    *tempfile = safe_strdup (tmp);
-  }
-
-  if ((pid = fork ()) == 0)
-  {
-    struct sigaction act, oldalrm;
-
-    /* save parent's ID before setsid() */
-    ppid = getppid ();
-
-    /* we want the delivery to continue even after the main process dies,
-     * so we put ourselves into another session right away
-     */
-    setsid ();
+		/* we want the delivery to continue even after the main process dies,
+		 * so we put ourselves into another session right away
+		 */
+		setsid ();
   
-    /* next we close all open files */
+		/* next we close all open files */
 #if defined(OPEN_MAX)
-    for (fd = 0; fd < OPEN_MAX; fd++)
-      close (fd);
+		for (fd = 0; fd < OPEN_MAX; fd++)
+			close (fd);
 #elif defined(_POSIX_OPEN_MAX)
-    for (fd = 0; fd < _POSIX_OPEN_MAX; fd++)
-      close (fd);
+		for (fd = 0; fd < _POSIX_OPEN_MAX; fd++)
+			close (fd);
 #else
-    close (0);
-    close (1);
-    close (2);
+		close (0);
+		close (1);
+		close (2);
 #endif
 
-    /* now the second fork() */
-    if ((pid = fork ()) == 0)
-    {
-      /* "msg" will be opened as stdin */
-      if (open (msg, O_RDONLY, 0) < 0)
-      {
-	unlink (msg);
-	_exit (S_ERR);
-      }
-      unlink (msg);
+		/* now the second fork() */
+		if ((pid = fork ()) == 0) {
+			/* We're sendmail! */
+			/* "msg" will be opened as stdin */
+			if (open (msg, O_RDONLY, 0) < 0) {
+				unlink (msg);
+				fprintf( stderr, "Error opening message file %s as stdin for sendmail.", msg );
+				_exit (S_ERR);
+			}
+			unlink (msg);
 
-      if (SendmailWait >= 0)
-      {
-	/* *tempfile will be opened as stdout */
-	if (open (*tempfile, O_WRONLY | O_APPEND | O_CREAT | O_EXCL, 0600) < 0)
-	  _exit (S_ERR);
-	/* redirect stderr to *tempfile too */
-	if (dup (1) < 0)
-	  _exit (S_ERR);
-      }
+			/* If we wait, capture the output */
+			if (SendmailWait >= 0) {
+				/* *tempfile will be opened as stdout */
+				if (open (*tempfile, O_WRONLY | O_APPEND | O_CREAT | O_EXCL, 0600) < 0) {
+					fprintf( stderr, "Error opening outfile %s as stdout for sendmail.", (*tempfile) );
+					_exit (S_ERR);
+				}
 
-      execv (path, args);
-      _exit (S_ERR);
-    }
-    else if (pid == -1)
-    {
-      unlink (msg);
-      safe_free ((void **) tempfile);
-      _exit (S_ERR);
-    }
+				/* redirect stderr to *tempfile too */
+				if (dup (1) < 0) {
+					fprintf( stderr, "Error redirecting stderr for sendmail." );
+					_exit (S_ERR);
+				}
+			}
 
-    /* SendmailWait > 0: interrupt waitpid() after SendmailWait seconds
-     * SendmailWait = 0: wait forever
-     * SendmailWait < 0: don't wait
-     */
-    if (SendmailWait > 0)
-    {
-      SigAlrm = 0;
-      act.sa_handler = alarm_handler;
+			/* Engage! */
+			execv (path, args);
+
+			/* Notreached, hopefully */
+			fprintf( stderr, "Execve of sendmail failed! Zut!" );
+			_exit (S_ERR);
+		} else if (pid == -1) {
+			/* fork() bombed inside the sender proggie */
+			unlink (msg);
+			safe_free ((void **) tempfile);
+			fprintf( stderr, "fork failed inside sender process." );
+			_exit (S_ERR);
+		}
+
+		/* We're the sender proggie but not sendmail! */
+
+		/* Wait for sendmail if necessary.
+		 * SendmailWait > 0: interrupt waitpid() after SendmailWait seconds
+		 * SendmailWait = 0: wait forever
+		 * SendmailWait < 0: don't wait
+		 */
+		if (SendmailWait > 0) {
+			SigAlrm = 0;
+			act.sa_handler = alarm_handler;
 #ifdef SA_INTERRUPT
-      /* need to make sure waitpid() is interrupted on SIGALRM */
-      act.sa_flags = SA_INTERRUPT;
+			/* need to make sure waitpid() is interrupted on SIGALRM */
+			act.sa_flags = SA_INTERRUPT;
 #else
-      act.sa_flags = 0;
+			act.sa_flags = 0;
 #endif
-      sigemptyset (&act.sa_mask);
-      sigaction (SIGALRM, &act, &oldalrm);
-      alarm (SendmailWait);
-    }
-    else if (SendmailWait < 0)
-      _exit (0xff & EX_OK);
 
-    if (waitpid (pid, &st, 0) > 0)
-    {
-      st = WIFEXITED (st) ? WEXITSTATUS (st) : S_ERR;
-      if (SendmailWait && st == (0xff & EX_OK))
-      {
-	unlink (*tempfile); /* no longer needed */
-	safe_free ((void **) tempfile);
-      }
-    }
-    else
-    {
-      st = (SendmailWait > 0 && errno == EINTR && SigAlrm) ?
-	      S_BKG : S_ERR;
-      if (SendmailWait > 0)
-      {
-	unlink (*tempfile);
-	safe_free ((void **) tempfile);
-      }
-    }
+			sigemptyset (&act.sa_mask);
+			sigaction (SIGALRM, &act, &oldalrm);
+			alarm (SendmailWait);
+		} else if (SendmailWait < 0) {
+			/* Don't wait for sendmail, so leave now. */
+			_exit (0xff & EX_OK);
+		}
 
-    /* reset alarm; not really needed, but... */
-    alarm (0);
-    sigaction (SIGALRM, &oldalrm, NULL);
+		/* We didn't exit, so wait for sendmail */
+		if (waitpid (pid, &st, 0) > 0) {
+			st = WIFEXITED (st) ? WEXITSTATUS (st) : S_ERR;
+			if (SendmailWait && st == (0xff & EX_OK)) {
+				unlink (*tempfile); /* no longer needed */
+				safe_free ((void **) tempfile);
+			}
+		} else {
+			/* Aiee! waitpid didn't work! */
+			if (SendmailWait > 0 && errno == EINTR && SigAlrm) {
+				st = S_BKG;
+			} else {
+				fprintf( stderr, "Waitpid() on sendmail failed in helper process." );
+				st = S_ERR;
+			}
+
+			if (SendmailWait > 0) {
+				unlink (*tempfile);
+				safe_free ((void **) tempfile);
+			}
+		}
+
+		/* reset alarm; not really needed, but... */
+		alarm (0);
+		sigaction (SIGALRM, &oldalrm, NULL);
 #ifndef LIBMUTT
-    mutt_add_child_pid (pid);
+		mutt_add_child_pid (pid);
 #endif
 
-    if (kill (ppid, 0) == -1 && errno == ESRCH)
-    {
-      /* the parent is already dead */
-      unlink (*tempfile);
-      safe_free ((void **) tempfile);
-    }
+		/* die, sendmail, die die die! */
+		if (kill (ppid, 0) == -1 && errno == ESRCH) {
+			/* the parent is already dead */
+			unlink (*tempfile);
+			safe_free ((void **) tempfile);
+		}
 
-    _exit (st);
-  }
+		/* Exit now, after having waited for sendmail. */
+		_exit (st);
+	}
 
-  sigprocmask (SIG_UNBLOCK, &set, NULL);
+	/* We're balsa, not the sender! 
+	 * Unlock the signals and return to our regurlarly scheduled program.
+	 */
 
-  if (pid != -1 && waitpid (pid, &st, 0) > 0)
-    st = WIFEXITED (st) ? WEXITSTATUS (st) : S_ERR; /* return child status */
-  else
-    st = S_ERR;	/* error */
+	sigprocmask (SIG_UNBLOCK, &set, NULL);
+  
+	if (pid != -1 && waitpid (pid, &st, 0) > 0)
+		st = WIFEXITED (st) ? WEXITSTATUS (st) : S_ERR; /* return child status */
+	else {
+		fprintf( stderr, "fork() failed in main balsa or waitpid() failed" );
+		st = S_ERR;	/* error */
+	}
 
-  mutt_unblock_signals_system (1);
+	if( st == S_ERR )
+		fprintf( stderr, "It seems the helper program sendmail failed. DAMMIT." );
 
-  return (st);
+	mutt_unblock_signals_system (1);
+
+	return (st);
 }
 
 static char **
@@ -1669,93 +1694,92 @@ mutt_invoke_sendmail (ADDRESS *to, ADDRESS *cc, ADDRESS *bcc, /* recips */
 		 const char *msg, /* file containing message */
 		 int eightbit) /* message contains 8bit chars */
 {
-  char *ps = NULL, *path = NULL, *s = safe_strdup (Sendmail), *childout = NULL;
-  char **args = NULL;
-  size_t argslen = 0, argsmax = 0;
-  int i;
+	char *ps = NULL, *path = NULL, *s = safe_strdup (Sendmail), *childout = NULL;
+	char **args = NULL;
+	size_t argslen = 0, argsmax = 0;
+	int i;
 
-  ps = s;
-  i = 0;
-  while ((ps = strtok (ps, " ")))
-  {
-    if (argslen == argsmax)
-      safe_realloc ((void **) &args, sizeof (char *) * (argsmax += 5));
+	ps = s;
+	i = 0;
 
-    if (i)
-      args[argslen++] = ps;
-    else
-    {
-      path = safe_strdup (ps);
-      ps = strrchr (ps, '/');
-      if (ps)
-	ps++;
-      else
-	ps = path;
-      args[argslen++] = ps;
-    }
-    ps = NULL;
-    i++;
-  }
-  if (eightbit && option (OPTUSE8BITMIME))
-    args = add_option (args, &argslen, &argsmax, "-B8BITMIME");
-  if (DsnNotify)
-  {
-    args = add_option (args, &argslen, &argsmax, "-N");
-    args = add_option (args, &argslen, &argsmax, DsnNotify);
-  }
-  if (DsnReturn)
-  {
-    args = add_option (args, &argslen, &argsmax, "-R");
-    args = add_option (args, &argslen, &argsmax, DsnReturn);
-  }
-  args = add_option (args, &argslen, &argsmax, "--");
-  args = add_args (args, &argslen, &argsmax, to);
-  args = add_args (args, &argslen, &argsmax, cc);
-  args = add_args (args, &argslen, &argsmax, bcc);
+	while ((ps = strtok (ps, " "))) {
+		if (argslen == argsmax)
+			safe_realloc ((void **) &args, sizeof (char *) * (argsmax += 5));
 
-  if (argslen == argsmax)
-    safe_realloc ((void **) &args, sizeof (char *) * (++argsmax));
-  
-  args[argslen++] = NULL;
-#ifndef LIBMUTT
-  if (!option (OPTNOCURSES))
-    endwin ();
-#endif
+		if (i)
+			args[argslen++] = ps;
+		else {
+			path = safe_strdup (ps);
+			ps = strrchr (ps, '/');
+			if (ps)
+				ps++;
+			else
+				ps = path;
+			args[argslen++] = ps;
+		}
 
-  if ((i = send_msg (path, args, msg, &childout)) != (EX_OK & 0xff))
-  {
-    if (i != S_BKG)
-    {
-      const char *e = strsysexit (i);
+		ps = NULL;
+		i++;
+	}
 
-      e = strsysexit (i);
-      mutt_error ("Error sending message, child exited %d (%s).", i, NONULL (e));
-#ifndef LIBMUTT
-      if (childout)
-      {
-	struct stat st;
+	if (eightbit && option (OPTUSE8BITMIME))
+		args = add_option (args, &argslen, &argsmax, "-B8BITMIME");
+
+	if (DsnNotify) {
+		args = add_option (args, &argslen, &argsmax, "-N");
+		args = add_option (args, &argslen, &argsmax, DsnNotify);
+	}
+
+	if (DsnReturn) {
+		args = add_option (args, &argslen, &argsmax, "-R");
+		args = add_option (args, &argslen, &argsmax, DsnReturn);
+	}
+
+	args = add_option (args, &argslen, &argsmax, "--");
+	args = add_args (args, &argslen, &argsmax, to);
+	args = add_args (args, &argslen, &argsmax, cc);
+	args = add_args (args, &argslen, &argsmax, bcc);
 	
-	if (stat (childout, &st) == 0 && st.st_size > 0)
-	  mutt_do_pager ("Output of the delivery process", childout, 0, NULL);
-      }
+	if (argslen == argsmax)
+		safe_realloc ((void **) &args, sizeof (char *) * (++argsmax));
+  
+	args[argslen++] = NULL;
+
+#ifndef LIBMUTT
+	if (!option (OPTNOCURSES))
+		endwin ();
 #endif
-    }
-  }
-  else
-    unlink (childout);
 
-  FREE (&childout);
-  FREE (&path);
-  FREE (&s);
-  FREE (&args);
+	if ((i = send_msg (path, args, msg, &childout)) != (EX_OK & 0xff)) {
+		if (i != S_BKG) {
+			const char *e = strsysexit (i);
+			
+			e = strsysexit (i);
+			mutt_error ("Error sending message, child exited %d (%s).", i, NONULL (e));
+#ifndef LIBMUTT
+			if (childout) {
+				struct stat st;
+	
+				if (stat (childout, &st) == 0 && st.st_size > 0)
+					mutt_do_pager ("Output of the delivery process", childout, 0, NULL);
+			}
+#endif
+		}
+	} else
+		unlink (childout);
 
-  if (i == (EX_OK & 0xff))
-    i = 0;
-  else if (i == S_BKG)
-    i = 1;
-  else
-    i = -1;
-  return (i);
+	FREE (&childout);
+	FREE (&path);
+	FREE (&s);
+	FREE (&args);
+	
+	if (i == (EX_OK & 0xff))
+		i = 0;
+	else if (i == S_BKG)
+		i = 1;
+	else
+		i = -1;
+	return (i);
 }
 
 /* appends string 'b' to string 'a', and returns the pointer to the new

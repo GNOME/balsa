@@ -36,6 +36,7 @@ typedef GtkEntry LibBalsaAddressEntry;
 #define LIBBALSA_IS_ADDRESS_ENTRY(obj) GTK_IS_ENTRY(obj)
 void libbalsa_address_entry_set_address_book_list(GList *
                                                   address_book_list);
+gboolean libbalsa_address_entry_show_matches(GtkEntry * address_entry);
 #else /* NEW_ADDRESS_ENTRY_WIDGET */
 
 #define FOCUS_LOST 0

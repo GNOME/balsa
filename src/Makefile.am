@@ -7,12 +7,11 @@ balsa_SOURCES =	\
 	balsa-message.c		\
 	index-child.c		\
 	local-mailbox.c		\
-	mailbox-manager.c	\
+	mailbox-conf.c		\
 	main-window.c		\
 	main.c			\
 	mblist-window.c		\
 	message-window.c	\
-	new-mailbox.c		\
 	pref-manager.c		\
 	save-restore.c		\
 	sendmsg-window.c

@@ -328,7 +328,7 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
 
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
-
+/*
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Mailbox Manager..."));
   gtk_widget_show (w);
 
@@ -339,7 +339,7 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
 
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
-
+*/
 
   w = gtk_menu_item_new_with_label (_ ("Settings"));
   gtk_widget_show (w);

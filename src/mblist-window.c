@@ -25,7 +25,7 @@
 #include "balsa-index.h"
 #include "balsa-message.h"
 #include "index-child.h"
-#include "main-window.h"
+#include "mailbox-conf.h"
 #include "main-window.h"
 #include "mblist-window.h"
 #include "misc.h"
@@ -69,7 +69,8 @@ static MBListWindow *mblw = NULL;
 static void destroy_mblist_window (GtkWidget * widget);
 static void close_mblist_window (GtkWidget * widget);
 static void mailbox_select_cb (GtkCTree *, GtkCTreeNode *, gint);
-
+static void button_event_press_cb (GtkCList *, GdkEventButton *, gpointer);
+static GtkWidget * create_menu (GtkCTree * ctree, Mailbox * mailbox);
 
 static void open_cb (GtkWidget *, gpointer);
 static void close_cb (GtkWidget *, gpointer);
@@ -185,6 +186,13 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "tree_select_row",
 		      (GtkSignalFunc) mailbox_select_cb,
 		      (gpointer) NULL);
+
+  gtk_signal_connect (GTK_OBJECT (GTK_WIDGET (GTK_CLIST (mblw->ctree))),
+		      "button_press_event",
+		      (GtkSignalFunc) button_event_press_cb,
+		      (gpointer) NULL);
+
+
 
   bbox = gtk_hbutton_box_new ();
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->action_area), bbox, TRUE, TRUE, 0);
@@ -361,4 +369,49 @@ mailbox_select_cb (GtkCTree * ctree, GtkCTreeNode * row, gint column)
 	  gnome_mdi_add_view (mblw->mdi, GNOME_MDI_CHILD (index_child));
 	}
     }
+}
+
+static void
+button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
+{
+  gint row, column;
+  Mailbox *mailbox;
+
+  if (event->window != clist->clist_window)
+    return;
+
+  if (!event || event->button != 3)
+    return;
+
+  gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
+  mailbox = gtk_clist_get_row_data (clist, row);
+
+  gtk_clist_select_row (clist, row, -1);
+
+  gtk_menu_popup (GTK_MENU (create_menu (GTK_CTREE (clist), mailbox)), NULL, NULL, NULL, NULL, event->button, event->time);
+}
+
+static void
+mb_conf_cb (GtkWidget * widget, Mailbox * mailbox)
+{
+  mailbox_conf_new (mailbox);
+}
+
+static GtkWidget *
+create_menu (GtkCTree * ctree, Mailbox * mailbox)
+{
+  GtkWidget *menu, *menuitem;
+  menu = gtk_menu_new ();
+  menuitem = gtk_menu_item_new_with_label (_ ("Add Mailbox"));
+  gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+		      GTK_SIGNAL_FUNC (mb_conf_cb), NULL);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show(menuitem);
+  menuitem = gtk_menu_item_new_with_label (_ ("Edit Mailbox"));
+  gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+		      GTK_SIGNAL_FUNC (mb_conf_cb), mailbox);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show(menuitem);
+
+  return menu;
 }

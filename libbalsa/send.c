@@ -402,7 +402,9 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 		if (LIBBALSA_IS_MAILBOX_LOCAL(fccbox) ||
 		    LIBBALSA_IS_MAILBOX_IMAP(fccbox)) {
 		    libbalsa_mailbox_copy_message( message, fccbox );
-
+		    libbalsa_mailbox_set_threading(fccbox,
+						   fccbox->view->
+						   threading_type);
 		}
 		libbalsa_mailbox_check(fccbox);
 	}

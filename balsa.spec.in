@@ -125,7 +125,7 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
 %{_datadir}/balsa/hicolor/22x22
 %{_datadir}/balsa/pixmaps/*
 %{_datadir}/gnome/help/balsa/*
-%{_datadir}/icons/hicolor/48x48/mimetypes/*
+@HICOLOR_ICON_DIR@/*
 %{_datadir}/idl/Balsa.idl
 %{_datadir}/omf/balsa/*
 %{_datadir}/pixmaps/gnome-balsa2.png

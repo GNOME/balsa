@@ -1,3 +1,10 @@
+2005-04-03 Pawel Salek
+
+	* Makefile.am: s,m4,macros,g;
+	* balsa.spec.in: compile on suse.
+	* configure.in:
+	* libbalsa/imap/auth-gssapi.c: compile against heimdal.
+
 2005-04-01  Steve Murphy  <murf@e-tools.com>
 
         * configure.in: Added "rw" to ALL_LINGUAS.

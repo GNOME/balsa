@@ -69,4 +69,4 @@ bzdist: distdir
 	$(AMTAR) chojf $(distdir).tar.bz2 $(distdir)
 	-rm -rf $(distdir)
 
-ACLOCAL_AMFLAGS = -I m4  
+ACLOCAL_AMFLAGS = -I macros

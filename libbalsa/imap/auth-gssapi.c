@@ -28,8 +28,11 @@
 #include "imap-auth.h"
 
 #if defined(HAVE_GSSAPI)
+#if defined(HAVE_HEIMDAL)
+#include <gssapi.h>
+#else
 #include <gssapi/gssapi.h>
-
+#endif
 
 #include "imap_private.h"
 #include "siobuf.h"

@@ -227,9 +227,8 @@ message_window_idle_handler(MessageWindow* mw)
 
     balsa_message_set(msg, message);
 
-    if(msg && msg->part_list) {
-        GnomeIconList *gil = GNOME_ICON_LIST(msg->part_list);
-	if(gnome_icon_list_get_num_icons(gil) >= 2) {
+    if(msg && msg->treeview) {
+	if (msg->info_count > 1) {
             GtkWidget *toolbar =
                 balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
 	    balsa_toolbar_set_button_sensitive(toolbar,
@@ -326,7 +325,6 @@ message_window_new(LibBalsaMessage * message)
     BalsaToolbarModel *model;
     GtkWidget *toolbar;
     guint i;
-    GtkWidget *scroll;
     GtkWidget *move_menu, *submenu;
 
     if (!message)
@@ -388,19 +386,10 @@ message_window_new(LibBalsaMessage * message)
 	gtk_widget_set_sensitive(move_menu, FALSE);
     mw->bmessage = balsa_message_new();
     
-    scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
-				   GTK_POLICY_AUTOMATIC,
-				   GTK_POLICY_AUTOMATIC);
-
-
     g_signal_connect(G_OBJECT(mw->bmessage), "select-part",
 		     G_CALLBACK(select_part_cb), mw);
 
-    gtk_container_add(GTK_CONTAINER(scroll), mw->bmessage);
-    gtk_widget_show(scroll);
-
-    gnome_app_set_contents(GNOME_APP(mw->window), scroll);
+    gnome_app_set_contents(GNOME_APP(mw->window), mw->bmessage);
 
     if (balsa_app.shown_headers >= HEADERS_NONE &&
 	balsa_app.shown_headers <= HEADERS_ALL)

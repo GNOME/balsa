@@ -845,7 +845,6 @@ balsa_window_new()
     BalsaToolbarModel *model;
     GtkWidget *toolbar;
     GnomeAppBar *appbar;
-    GtkWidget *scroll;
     unsigned i;
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
@@ -902,18 +901,10 @@ balsa_window_new()
                      G_CALLBACK (notebook_drag_motion_cb), NULL);
    balsa_app.notebook = window->notebook;
 
-    scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
-                                   GTK_POLICY_AUTOMATIC,
-                                   GTK_POLICY_AUTOMATIC);
-
     window->preview = balsa_message_new();
 
     g_signal_connect(G_OBJECT(window->preview), "select-part",
                      G_CALLBACK(select_part_cb), window);
-
-    gtk_container_add(GTK_CONTAINER(scroll), window->preview);
-    gtk_widget_show(scroll);
 
     /* XXX */
     balsa_app.mblist =  BALSA_MBLIST(balsa_mblist_new());
@@ -932,7 +923,7 @@ balsa_window_new()
     gtk_widget_show_all(window->mblist);
 
     gtk_paned_pack1(GTK_PANED(window->hpaned), window->mblist, TRUE, TRUE);
-    gtk_paned_pack2(GTK_PANED(window->vpaned), scroll, TRUE, TRUE);
+    gtk_paned_pack2(GTK_PANED(window->vpaned), window->preview, TRUE, TRUE);
     if  (balsa_app.alternative_layout){
         gnome_app_set_contents(GNOME_APP(window), window->vpaned);
         gtk_paned_pack2(GTK_PANED(window->hpaned), window->notebook,TRUE,TRUE);

@@ -1,3 +1,11 @@
+2003-05-27  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+	
+	* src/message-window.c: 
+	* src/main-window.c: 
+	* src/balsa-message.c: 
+	* src/balsa-message.h: 
+	replace the message-part list with a tree 
+
 2003-05-27 09:15  PeterB
 
 	* libbalsa/: mailbox.c, mailbox.h: Move view info into a new
@@ -38,6 +46,7 @@
 	* sounds/balsa.soundlist: convert to UTF-8
 
 2003-05-11  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+
 	* configure.in:
         * libbalsa/rfc3156.c:
         * libbalsa/rfc3156.h:

@@ -52,21 +52,25 @@ struct _BalsaMessage {
 	ShownHeaders shown_headers;
 	gboolean show_all_headers;
 
-	/* Widget to hold content */
+	/* Notebook to hold content + structure */
+        GtkWidget *notebook;
+
+	/* Widgets to hold content */
+        GtkWidget *cont_viewport;
 	GtkWidget *content;
 	gboolean content_has_focus;
 
-	/* Widget to hold icons */
-	GtkWidget *part_list;
-
+        /* Widget to hold structure tree */
+        GtkWidget *treeview;
+        gint info_count;
+        GList *save_all_list;
+        GtkWidget *save_all_popup;
+    
 	gboolean wrap_text;
 
 	BalsaPartInfo *current_part;
 
 	LibBalsaMessage *message;
-
-        /* signal handler */
-        gulong select_icon_handler;
 };
 
 struct _BalsaMessageClass {

@@ -192,12 +192,12 @@ mblist_open_window (GnomeMDI * mdi)
 				 BALSA_BUTTON_HEIGHT / 2);
   gtk_widget_show (bbox);
 
-  button = gtk_button_new_with_label ("Open");
+  button = gtk_button_new_with_label ("Open box");
   gtk_container_add (GTK_CONTAINER (bbox), button);
   gtk_signal_connect_object (GTK_OBJECT (button), "clicked", GTK_SIGNAL_FUNC (open_cb), NULL);
   gtk_widget_show (button);
 
-  button = gtk_button_new_with_label ("Close");
+  button = gtk_button_new_with_label ("Close box");
   gtk_container_add (GTK_CONTAINER (bbox), button);
   gtk_signal_connect_object (GTK_OBJECT (button), "clicked", GTK_SIGNAL_FUNC (close_cb), NULL);
   gtk_widget_show (button);

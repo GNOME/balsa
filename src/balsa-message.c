@@ -206,7 +206,7 @@ static void fill_part_menu_by_content_type(BalsaPartInfo *info,
                                            GtkMenu * menu, 
 					   const gchar * content_type);
 
-static gboolean img_check_size(GtkImage *widget);
+static gboolean img_check_size(GtkImage **widget_p);
 
 static GtkNotebookClass *parent_class = NULL;
 
@@ -538,9 +538,12 @@ check_images_resize(GtkWidget * widget, gpointer user_data)
 	     g_object_get_data(G_OBJECT(widget), "orig-width") &&
 	     g_object_get_data(G_OBJECT(widget), "part-info") &&
 	     !g_object_get_data(G_OBJECT(widget), "check_size_sched")) {
+	GtkWidget **widget_p = g_new(GtkWidget *, 1);
 	g_object_set_data(G_OBJECT(widget), "check_size_sched",
 			  (gpointer)TRUE);
-	g_idle_add((GSourceFunc)img_check_size, widget);
+	*widget_p = widget;
+	g_object_add_weak_pointer(G_OBJECT(widget), (gpointer) widget_p);
+	g_idle_add((GSourceFunc)img_check_size, widget_p);
     }
 }
 
@@ -1508,15 +1511,26 @@ balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 }
 
 static gboolean
-img_check_size(GtkImage *widget)
+img_check_size(GtkImage ** widget_p)
 {
-    GtkWidget * viewport =
-	gtk_widget_get_ancestor(GTK_WIDGET(widget), GTK_TYPE_VIEWPORT);
-    gint orig_width = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
-                                                        "orig-width"));
-    BalsaPartInfo * info =
-	(BalsaPartInfo *)g_object_get_data(G_OBJECT(widget), "part-info");
+    GtkImage *widget;
+    GtkWidget *viewport;
+    gint orig_width;
+    BalsaPartInfo *info;
     gint curr_w, dst_w;
+
+    widget = *widget_p;
+    if (!widget) {
+	g_free(widget_p);
+	return FALSE;
+    }
+    g_object_remove_weak_pointer(G_OBJECT(widget), (gpointer) widget_p);
+    g_free(widget_p);
+
+    viewport = gtk_widget_get_ancestor(GTK_WIDGET(widget), GTK_TYPE_VIEWPORT);
+    orig_width = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
+                                                        "orig-width"));
+    info = (BalsaPartInfo *)g_object_get_data(G_OBJECT(widget), "part-info");
 
     g_object_set_data(G_OBJECT(widget), "check_size_sched", (gpointer)FALSE);
     g_return_val_if_fail(viewport && info && orig_width > 0, FALSE);

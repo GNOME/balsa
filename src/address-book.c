@@ -194,7 +194,8 @@ ab_load(GtkWidget * widget, gpointer data)
 		*listdata[2]; 
 	gint got_name = FALSE; 
 	gint in_vcard = FALSE;
-	
+	gint i = -1;
+
 	ab_clear_clist(GTK_CLIST(book_clist)); 
 	if (composing) 
 		ab_clear_clist(GTK_CLIST(add_clist)); 
@@ -205,7 +206,8 @@ ab_load(GtkWidget * widget, gpointer data)
 		return; 
 	} 
 
-	while (fgets(string, 255, gc)) { 
+	while ( fgets(string, 255, gc)) { 
+
 		if ( strncasecmp(string, "BEGIN:VCARD", strlen("BEGIN:VCARD")) == 0 ) {
 			in_vcard = TRUE;
 		}
@@ -213,7 +215,10 @@ ab_load(GtkWidget * widget, gpointer data)
 		if (in_vcard) {
 			if (string[0] == 'F' && string[1] == 'N' && string[2] == ':' && string[3] != '\0') { 
 				got_name = TRUE; 
-				strcpy(name, &string[3]); 
+				while (string[++i] != '\n' && string[i] != '\0');
+				strncpy(name, &string[3], i-4);
+				name[i-4] = '\0';
+				i = -1;
 			} 
 
 			if (sscanf(string, N_("EMAIL;INTERNET:%s\n"), email)) { 
@@ -225,7 +230,6 @@ ab_load(GtkWidget * widget, gpointer data)
 
 				data->name = listdata[0]; 
 				data->addy = listdata[1]; 
-
 				rownum = gtk_clist_append(GTK_CLIST(book_clist), listdata); 
 				gtk_clist_set_row_data(GTK_CLIST(book_clist), rownum, (gpointer) data); 
 			} 

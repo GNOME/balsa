@@ -1,3 +1,10 @@
+1999-01-18  bertrand <Bertrand.Guiheneuf@inria.fr>
+
+	* src/balsa-mblist.c (balsa_mblist_class_init): cntent
+	information disabled for the moment. 
+	New argument ("show_content_info") to th emblist 
+	object. Have to store it in the prop list. 
+
 1999-01-15 bertrand <Bertrand.Guiheneuf@inria.fr>
 
 	* src/index-child.c (index_button_press_cb): new function

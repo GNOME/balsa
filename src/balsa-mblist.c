@@ -27,11 +27,19 @@
 #include "balsa-mblist.h"
 #include "misc.h"
 
+
 enum
   {
     SELECT_MAILBOX,
     LAST_SIGNAL
   };
+
+/* object arguments */
+enum {
+  ARG_0,
+  ARG_SHOW_CONTENT_INFO
+};
+
 
 /* marshallers */
 typedef void (*BalsaMBListSignal1) (GtkObject * object,
@@ -55,6 +63,9 @@ static BalsaMBListClass *parent_class = NULL;
 static gboolean mailbox_nodes_to_ctree (GtkCTree *, guint, GNode *, GtkCTreeNode *, gpointer);
 static void balsa_mblist_class_init (BalsaMBListClass * class);
 static void balsa_mblist_init (BalsaMBList * tree);
+static void balsa_mblist_set_arg (GtkObject *object, GtkArg *arg, guint arg_id);
+static void balsa_mblist_get_arg (GtkObject *object, GtkArg *arg, guint arg_id);
+
 
 static void mailbox_tree_expand (GtkCTree *, GtkCTreeNode *, gpointer);
 static void mailbox_tree_collapse (GtkCTree *, GtkCTreeNode *, gpointer);
@@ -85,7 +96,7 @@ balsa_mblist_get_type (void)
 }
 
 GtkWidget *
-balsa_mblist_new (void)
+balsa_mblist_new ()
 {
   BalsaMBList *new;
 
@@ -128,9 +139,54 @@ balsa_mblist_class_init (BalsaMBListClass * klass)
 
   object_class->destroy = balsa_mblist_destroy;
   parent_class = gtk_type_class (gtk_ctree_get_type ());
+  object_class->set_arg = balsa_mblist_set_arg;
+  object_class->get_arg = balsa_mblist_get_arg;
 
+
+  gtk_object_add_arg_type ("BalsaMBList::show_content_info", GTK_TYPE_BOOL, GTK_ARG_READWRITE, ARG_SHOW_CONTENT_INFO);
   klass->select_mailbox = NULL;
 }
+
+
+static void
+balsa_mblist_set_arg (GtkObject *object, GtkArg *arg, guint arg_id)
+{
+  BalsaMBList *bmbl;
+  
+
+  bmbl = BALSA_MBLIST (object);
+
+  switch (arg_id) {
+  case ARG_SHOW_CONTENT_INFO:
+     bmbl->display_content_info = GTK_VALUE_BOOL (*arg);
+     balsa_mblist_redraw( bmbl );
+     
+     break;
+     
+  default:
+    break;
+  }
+}
+
+static void
+balsa_mblist_get_arg (GtkObject *object, GtkArg *arg, guint arg_id)
+{
+  BalsaMBList *bmbl;
+  
+  bmbl = BALSA_MBLIST (object);
+  
+  
+  switch (arg_id) {
+  case ARG_SHOW_CONTENT_INFO:
+    GTK_VALUE_BOOL (*arg) = bmbl->display_content_info;
+    break;
+    
+  default:
+    break;
+		
+  }
+}
+
 
 static void
 balsa_mblist_init (BalsaMBList * tree)
@@ -139,7 +195,10 @@ balsa_mblist_init (BalsaMBList * tree)
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
   
-  gtk_ctree_construct (GTK_CTREE (tree), 3, 0, titles);
+  if ( tree->display_content_info )
+    gtk_ctree_construct (GTK_CTREE (tree), 3, 0, titles);
+  else
+    gtk_ctree_construct (GTK_CTREE (tree), 3, 0, NULL);
 
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
@@ -247,51 +306,65 @@ balsa_mblist_redraw (BalsaMBList * bmbl)
 
   gtk_clist_freeze (GTK_CLIST (ctree));
 
-  text[1] = g_new(gchar, INFO_FIELD_LENGTH);
-  text[2] = g_new(gchar, INFO_FIELD_LENGTH);
+  text[1] = NULL;
+  text[2] = NULL;
   /* inbox */
   text[0] = "Inbox";
-  mailbox_gather_content_info( balsa_app.inbox );
-  g_snprintf( text[1], INFO_FIELD_LENGTH, "%ld",  (balsa_app.inbox)->unread_messages );
-  g_snprintf( text[2], INFO_FIELD_LENGTH, "%ld",  (balsa_app.inbox)->total_messages );
+  if (bmbl->display_content_info)
+    {
+      text[1] = g_new(gchar, INFO_FIELD_LENGTH);
+      text[2] = g_new(gchar, INFO_FIELD_LENGTH);
+      
+      mailbox_gather_content_info( balsa_app.inbox );
+      g_snprintf( text[1], INFO_FIELD_LENGTH, "%ld",  (balsa_app.inbox)->unread_messages );
+      g_snprintf( text[2], INFO_FIELD_LENGTH, "%ld",  (balsa_app.inbox)->total_messages );
+      balsa_mblist_add_watched_mailbox(bmbl, balsa_app.inbox);
+
+    }
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5,
 				  balsa_icon_get_pixmap (BALSA_ICON_INBOX),
 				  balsa_icon_get_bitmap (BALSA_ICON_INBOX),
 				  NULL, NULL,
 				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.inbox);
-  balsa_mblist_add_watched_mailbox(bmbl, balsa_app.inbox);
  
   /* outbox */
   text[0] = "Outbox";
-  mailbox_gather_content_info( balsa_app.outbox );
-  g_snprintf( text[1], INFO_FIELD_LENGTH, "%ld",  (balsa_app.outbox)->unread_messages );
-  g_snprintf( text[2], INFO_FIELD_LENGTH, "%ld",  (balsa_app.outbox)->total_messages );
+  if (bmbl->display_content_info)
+    {
+      mailbox_gather_content_info( balsa_app.outbox );
+      g_snprintf( text[1], INFO_FIELD_LENGTH, "%ld",  (balsa_app.outbox)->unread_messages );
+      g_snprintf( text[2], INFO_FIELD_LENGTH, "%ld",  (balsa_app.outbox)->total_messages );
+      balsa_mblist_add_watched_mailbox(bmbl, balsa_app.outbox);
+    }
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5,
 				  balsa_icon_get_pixmap (BALSA_ICON_OUTBOX),
 				  balsa_icon_get_bitmap (BALSA_ICON_OUTBOX),
 				  NULL, NULL,
 				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.outbox);
-  balsa_mblist_add_watched_mailbox(bmbl, balsa_app.outbox);
 
   /* trash */
   text[0] = "Trash";
-  mailbox_gather_content_info( balsa_app.trash );
-  g_snprintf( text[1], INFO_FIELD_LENGTH, "%ld",  (balsa_app.trash)->unread_messages );
-  g_snprintf( text[2], INFO_FIELD_LENGTH, "%ld",  (balsa_app.trash)->total_messages );
-  ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5,
+  if (bmbl->display_content_info)
+    {
+      mailbox_gather_content_info( balsa_app.trash );
+      g_snprintf( text[1], INFO_FIELD_LENGTH, "%ld",  (balsa_app.trash)->unread_messages );
+      g_snprintf( text[2], INFO_FIELD_LENGTH, "%ld",  (balsa_app.trash)->total_messages );
+      balsa_mblist_add_watched_mailbox(bmbl, balsa_app.trash);
+    }
+      ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5,
 				  balsa_icon_get_pixmap (BALSA_ICON_TRASH),
 				  balsa_icon_get_bitmap (BALSA_ICON_TRASH),
 				  NULL, NULL,
 				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.trash);
-  balsa_mblist_add_watched_mailbox(bmbl, balsa_app.trash);
 
-
-  g_free( text[1] );
-  g_free( text[2] );
-  
+  if (bmbl->display_content_info)
+    {
+      g_free( text[1] );
+      g_free( text[2] );
+    } 
   if (balsa_app.mailbox_nodes)
     {
       GNode *walk;
@@ -379,11 +452,15 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 					   FALSE);
 		}
 	      /* get and display the information fields for this mailbox */
-	      mailbox_gather_content_info(mbnode->mailbox);
-	      balsa_mblist_set_row_info_fields (BALSA_MBLIST(ctree), cnode, mbnode->mailbox);
-	      gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
-	      balsa_mblist_add_watched_mailbox(BALSA_MBLIST(ctree), mbnode->mailbox);
+	      if (BALSA_MBLIST(ctree)->display_content_info)
+		{
+		  mailbox_gather_content_info(mbnode->mailbox);
+		  balsa_mblist_set_row_info_fields (BALSA_MBLIST(ctree), cnode, mbnode->mailbox);
+		  balsa_mblist_add_watched_mailbox(BALSA_MBLIST(ctree), mbnode->mailbox);
+		}
 
+	      gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
+	
       
 	    }
 	}
@@ -507,7 +584,8 @@ mailbox_listener (MailboxWatcherMessage * mw_message)
     case MESSAGE_NEW:
     case MESSAGE_DELETE:
     case MESSAGE_APPEND:
-      balsa_mblist_set_row_info_fields (mbl, cnode, sender_mailbox);
+      if ( mbl->display_content_info )
+	balsa_mblist_set_row_info_fields (mbl, cnode, sender_mailbox);
 
       break;     
     default:

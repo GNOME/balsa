@@ -42,50 +42,51 @@
 
 /* global balsa application structure */
 extern struct BalsaApplication
-  {
-    proplist_t proplist;
-    /* personal information */
-    Address *address;
-    gchar *replyto;
+{
+  proplist_t proplist;
+  /* personal information */
+  Address *address;
+  gchar *replyto;
+  
+  gchar *local_mail_directory;
+  gchar *smtp_server;
+  
+  gchar *signature_path;
+  gchar *signature;
+  
+  BalsaMBList *mblist;
+  IndexChild *current_index_child;
+  
+  Mailbox *inbox;
+  GList *inbox_input;		/* mailboxes such as POP3, etc that will be appending into inbox */
+  Mailbox *outbox;
+  Mailbox *trash;
+  
+  GNode *mailbox_nodes;
+  
+  /* timer for mm_exists callback */
+  gint new_messages_timer;
+  gint new_messages;
+  
+  /* timer for checking mail every xx minutes */
+  gint check_mail_timer;
+  
+  /* GUI settings */
+  gint mw_width;
+  gint mw_height;
+  gint mblist_width;
+  gint mblist_height;
+  gboolean mblist_show_mb_content_info;
 
-    gchar *local_mail_directory;
-    gchar *smtp_server;
-
-    gchar *signature_path;
-    gchar *signature;
-
-    BalsaMBList *mblist;
-    IndexChild *current_index_child;
-
-    Mailbox *inbox;
-    GList *inbox_input;		/* mailboxes such as POP3, etc that will be appending into inbox */
-    Mailbox *outbox;
-    Mailbox *trash;
-
-    GNode *mailbox_nodes;
-
-    /* timer for mm_exists callback */
-    gint new_messages_timer;
-    gint new_messages;
-
-    /* timer for checking mail every xx minutes */
-    gint check_mail_timer;
-
-    /* GUI settings */
-    gint mw_width;
-    gint mw_height;
-    gint mblist_width;
-    gint mblist_height;
-
-    GtkToolbarStyle toolbar_style;
-    GnomeMDIMode mdi_style;
-
-    gboolean previewpane;
-    gboolean debug;
-
-    /* arp --- string to prefix "replied to" messages. */
-    gchar *quote_str;
-  }
+  GtkToolbarStyle toolbar_style;
+  GnomeMDIMode mdi_style;
+  
+  gboolean previewpane;
+  gboolean debug;
+  
+  /* arp --- string to prefix "replied to" messages. */
+  gchar *quote_str;
+}
 balsa_app;
 
 

@@ -130,6 +130,11 @@ balsa_app_init (void)
   balsa_app.encoding_style = 0;
   balsa_app.charset = NULL;
 
+  balsa_app.checkbox = 0;
+  balsa_app.PrintCommand.breakline = FALSE;
+  balsa_app.PrintCommand.linesize = 78;
+  balsa_app.PrintCommand.PrintCommand = NULL;
+
 }
 
 gint

@@ -42,6 +42,16 @@
 
 #define DEFAULT_CHARSET "ISO-8859-1"
 #define DEFAULT_ENCODING ENC8BIT
+#define DEFAULT_LINESIZE 78
+
+typedef struct stPrinting Printing_t;
+struct stPrinting{
+    gint  breakline;
+    gint  linesize;
+    gchar *PrintCommand;
+};
+
+
 
 /* global balsa application structure */
 extern struct BalsaApplication
@@ -104,6 +114,9 @@ extern struct BalsaApplication
   gint encoding_style;
   gchar *charset;
 
+  gint checkbox;
+  /* printing */
+  Printing_t PrintCommand;
       
 }
 balsa_app;

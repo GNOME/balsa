@@ -132,8 +132,8 @@ static gchar *completion_data_extract(CompletionData *data);
  * [ijc] it should now be possible to add the completions as
  * a per address book field (implemented in LibBalsaAddressBook)
  */
-static GList *address_name_data;
-static GList *address_alias_data;
+static GList *address_name_data = NULL;
+static GList *address_alias_data = NULL;
 static GCompletion* complete_name = NULL;
 static GCompletion* complete_alias = NULL;
 

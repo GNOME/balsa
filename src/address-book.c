@@ -452,14 +452,14 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	gtk_container_add(GTK_CONTAINER(scrolled_window), book_clist); 
 	gtk_widget_set_usize(scrolled_window, 300, 250);
 	
-	gtk_signal_connect(GTK_OBJECT(book_clist), "select_row", GTK_SIGNAL_FUNC(ab_select_row_event), (gpointer) book_clist);
-
 	/* 
 	 * Only display this part of * the window when we're adding to a composing 
 	 * message. 
 	 */ 
 	if( GTK_IS_ENTRY( (GtkEntry *) data ) ) {
 		composing = TRUE; 
+
+		gtk_signal_connect(GTK_OBJECT(book_clist), "select_row", GTK_SIGNAL_FUNC(ab_select_row_event), (gpointer) book_clist);
 		
 		box2 = gtk_vbox_new(FALSE, 5); 
 		gtk_box_pack_start(GTK_BOX(hbox), box2, FALSE, FALSE, 0); 

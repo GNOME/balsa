@@ -222,9 +222,9 @@ struct _LibBalsaMailboxClass {
     void (*close_mailbox) (LibBalsaMailbox * mailbox, gboolean expunge);
     LibBalsaMessage *(*get_message) (LibBalsaMailbox * mailbox, guint msgno);
     void (*prepare_threading)(LibBalsaMailbox *mailbox, guint lo, guint hi);
-    void (*fetch_message_structure)(LibBalsaMailbox *mailbox,
-                                    LibBalsaMessage * message,
-                                    LibBalsaFetchFlag flags);
+    gboolean (*fetch_message_structure)(LibBalsaMailbox *mailbox,
+                                        LibBalsaMessage * message,
+                                        LibBalsaFetchFlag flags);
     void (*fetch_headers)(LibBalsaMailbox *mailbox,
                           LibBalsaMessage * message);
     void (*release_message) (LibBalsaMailbox * mailbox,
@@ -307,9 +307,11 @@ void libbalsa_mailbox_prepare_threading(LibBalsaMailbox *mailbox,
     message structure for given message. It can also fetch all RFC822
     headers of the message.
 */
-void libbalsa_mailbox_fetch_message_structure(LibBalsaMailbox *mailbox,
-					      LibBalsaMessage *message,
-					      LibBalsaFetchFlag flags);
+gboolean libbalsa_mailbox_fetch_message_structure(LibBalsaMailbox *
+                                                  mailbox,
+                                                  LibBalsaMessage *
+                                                  message,
+                                                  LibBalsaFetchFlag flags);
 
 /** libbalsa_mailbox_release_message() is called when the message
     content and structure are no longer needed. It's passed to the

@@ -756,15 +756,17 @@ libbalsa_delete_directory_contents(const gchar *path)
 	stat(new_path, &sb);
 	if (S_ISDIR(sb.st_mode)) {
 	    if (!libbalsa_delete_directory_contents(new_path) ||
-		rmdir(new_path) == -1)
+		rmdir(new_path) == -1) {
 		g_free(new_path);
 		closedir(d);
 		return FALSE;
+	    }
 	} else {
-	    if (unlink( new_path ) == -1)
+	    if (unlink( new_path ) == -1) {
 		g_free(new_path);
 		closedir(d);
 		return FALSE;
+	    }
 	}
 	g_free(new_path);
 	new_path = 0;

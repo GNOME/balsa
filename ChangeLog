@@ -1,3 +1,10 @@
+2004-05-09  Albrecht Dreß
+
+	* libbalsa/body.[hc]: cleanup.
+	* libbalsa/mailbox.c: same here.
+	* libbalsa/message.c: same here.
+	* src/balsa-message.c: fetch signed part earlier.
+
 2004-05-09  Pawel Salek
 
 	* libbalsa/mailbox_imap.c, libbalsa/imap/pop3.c

@@ -50,7 +50,6 @@ libbalsa_message_body_new(LibBalsaMessage * message)
     body->charset = NULL;
 
 #ifdef HAVE_GPGME
-    body->decrypt_file = NULL;
     body->sig_info = NULL;
 #endif
 
@@ -81,7 +80,6 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
     g_free(body->charset);
 
 #ifdef HAVE_GPGME
-    g_free(body->decrypt_file);
     if (body->sig_info)
 	g_object_unref(G_OBJECT(body->sig_info));
 #endif

@@ -571,9 +571,10 @@ static void
 libbalsa_message_set_attach_icons(LibBalsaMessage * message)
 {
 #ifdef HAVE_GPGME
-    if (message->prot_state != LIBBALSA_MSG_PROTECT_NONE ||
-	libbalsa_message_is_pgp_signed(message) ||
-	libbalsa_message_is_pgp_encrypted(message)) {
+    if (libbalsa_message_is_pgp_encrypted(message))
+	message->attach_icon = LIBBALSA_MESSAGE_ATTACH_ENCR;
+    else if (message->prot_state != LIBBALSA_MSG_PROTECT_NONE ||
+	libbalsa_message_is_pgp_signed(message)) {
 	switch (message->prot_state) {
 	case LIBBALSA_MSG_PROTECT_SIGN_GOOD:
 	    message->attach_icon = LIBBALSA_MESSAGE_ATTACH_GOOD;
@@ -773,24 +774,6 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read,
 }
 
 
-#ifdef HAVE_GPGME
-static const gchar *
-scan_decrypt_file(LibBalsaMessageBody *body)
-{
-    for (; body; body = body->next) {
-	if (body->decrypt_file)
-	    return body->decrypt_file;
-	if (body->parts) {
-	    const gchar *res;
-	    if ((res = scan_decrypt_file(body->parts)))
-		return res;
-	}
-    }
-    return NULL;
-}
-#endif
-
-
 void
 libbalsa_message_body_unref(LibBalsaMessage * message)
 {
@@ -801,15 +784,6 @@ libbalsa_message_body_unref(LibBalsaMessage * message)
 
    if(message->mailbox) { libbalsa_lock_mailbox(message->mailbox); }
    if (--message->body_ref == 0) {
-#ifdef HAVE_GPGME
-       /* find tmp files containing a decrypted body */
-       const gchar *decrypt_file = scan_decrypt_file(message->body_list);
-       if (decrypt_file) {
-	   /* FIXME: maybe we should overwrite the tmp file containing the
-	      decrypted message parts to really wipe it? */
-	   unlink(decrypt_file);
-       }
-#endif
 	libbalsa_message_body_free(message->body_list);
 	message->body_list = NULL;
 	if (message->mailbox)

@@ -64,7 +64,6 @@ struct _LibBalsaMessageBody {
     GMimeObject *mime_part;	/* mime body */
 
 #ifdef HAVE_GPGME
-    gchar *decrypt_file;        /* temp file for a decrypted body */
     GMimeGpgmeSigstat* sig_info;  /* info about a pgp signature body */
 #endif
 

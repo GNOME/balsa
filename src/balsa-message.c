@@ -4106,6 +4106,25 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info)
     GdkPixbuf * content_icon;
     gboolean rfc2440_no_pubkey = FALSE;
 
+    g_return_val_if_fail(info->body, FALSE);
+
+    /* force loading the gmime body if necessary (aka imap hack) */
+    if (!info->body->mime_part) {
+	ssize_t dummy;
+	GMimeContentType * cont_type;
+
+	libbalsa_mailbox_get_message_part(info->body->message, info->body,
+					  &dummy);
+	
+	/* the crypto stuff needs to know the charset in the gmime world */
+	cont_type = 
+	    (GMimeContentType *)g_mime_part_get_content_type(GMIME_PART(info->body->mime_part));
+	if (info->body->charset && cont_type &&
+	    !g_mime_content_type_get_parameter (cont_type, "charset"))
+	    g_mime_content_type_set_parameter (cont_type, "charset",
+					       info->body->charset);
+    }
+
     /* check if this is a RFC2440 part */
     if (!GMIME_IS_PART(info->body->mime_part))
 	return FALSE;

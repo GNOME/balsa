@@ -1,5 +1,7 @@
 2003-01-29  PeterB
 
+	* src/balsa-index.c: Use GtkTreeIter instead of GtkTreePath to
+	iterate through the tree.
 	* src/print.c: Work around poor error handling in gnome_font_find.
 
 2002-12-28  Daniel Yacob  <yacob@geez.org>

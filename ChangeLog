@@ -1,5 +1,6 @@
-2003-04-24 05:57  PeterB
+2003-04-24 11:26  PeterB
 
+	* libbalsa/misc.c: Fix a corner case.
 	* src/sendmsg-window.c: Grab gdk lock in a timeout handler; scroll
 	to cursor after wrapping.
 	* libbalsa/misc.c: Mark URLs in a text buffer, so they don't get

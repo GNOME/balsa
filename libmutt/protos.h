@@ -33,6 +33,9 @@ void _mutt_make_string (char *, size_t, const char *, CONTEXT *,
 	HEADER *, format_flag);
 
 int mutt_extract_token (BUFFER *, BUFFER *, int);
+void mutt_buffer_add (BUFFER*, const char*, size_t);
+void mutt_buffer_addstr (BUFFER*, const char*);
+void mutt_buffer_addch (BUFFER*, char);
 
 int mutt_add_string (BUFFER *, const char *);
 int mutt_add_char (BUFFER *, char);

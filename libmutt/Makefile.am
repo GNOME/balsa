@@ -37,6 +37,7 @@ libmutt_a_SOURCES = \
 	mx.c 		\
 	mutt_socket.c	\
 	mutt_tunnel.c	\
+	muttlib.c	\
 	parse.c 	\
 	pattern.c 	\
 	rfc1524.c 	\

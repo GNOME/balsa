@@ -797,14 +797,15 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
     cur = message->header;
     g_return_val_if_fail(cur != NULL, FALSE);
 
+    LOCK_MAILBOX(message->mailbox); /* checked that !=NULL here */
     if (message->body_ref > 0) {
 	message->body_ref++;
+        UNLOCK_MAILBOX(message->mailbox); 
 	return TRUE;
     }
     /*
      * load message body
      */
-    LOCK_MAILBOX(message->mailbox); /* checked that !=NULL here */
     libbalsa_lock_mutt();
     msg = mx_open_message(CLIENT_CONTEXT(message->mailbox), cur->msgno);
     libbalsa_unlock_mutt();

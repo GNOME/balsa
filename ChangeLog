@@ -1,5 +1,11 @@
+2002-03-20  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/{message,body}.c: add missing MT-locks. Hopefully fix other.
+	(A thorough analysis is needed).
+
 2002-03-19 Steve Wall <hitched97@myrealbox.com>
 
+	* acconfig.h:
 	* configure.in: fix libesmtp test. make gdbm and gnome-vfs usage
 	optional. take care of non-portable isblank().
 

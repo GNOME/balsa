@@ -213,13 +213,14 @@ libbalsa_message_body_get_content_type(LibBalsaMessageBody * body)
 {
     gchar *res;
 
+    libbalsa_lock_mutt();
     if (body->mutt_body->subtype)
 	res =
 	    g_strdup_printf("%s/%s", TYPE(body->mutt_body),
 			    body->mutt_body->subtype);
     else
 	res = g_strdup(TYPE(body->mutt_body));
-
+    libbalsa_unlock_mutt();
     g_strdown(res);
     return res;
 }

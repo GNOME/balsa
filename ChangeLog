@@ -1,5 +1,8 @@
 2000-04-12  Peter Williams  <peter@beta.newton.cx>
 
+	* src/mailbox-conf.c (conf_update_mailbox): Address
+	  bug #8915 hopefully (check for NULL before g_frees)
+
 	* src/balsa-mblist.c (balsa_widget_get_bold_font): Change
 	  function behavior to reference font, and checking for
 	  NULL font again... hopefully this ensures a nonnull

@@ -570,27 +570,51 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
       else if(field_check == -2)
 	return 1;
 
-      g_free (mailbox->name);
-      g_free (MAILBOX_IMAP (mailbox)->server->user);
-      g_free (MAILBOX_IMAP (mailbox)->server->passwd);
-      g_free (MAILBOX_IMAP (mailbox)->path);
-      g_free (MAILBOX_IMAP (mailbox)->server->host);
+      if( mailbox->name ) {
+	      g_free (mailbox->name);
+	      mailbox->name = NULL;
+      }
+
+      if( MAILBOX_IMAP (mailbox)->server->user ) {
+	      g_free (MAILBOX_IMAP (mailbox)->server->user);
+	      MAILBOX_IMAP (mailbox)->server->user = NULL;
+      }
+
+      if( MAILBOX_IMAP (mailbox)->server->passwd ) {
+	      g_free (MAILBOX_IMAP (mailbox)->server->passwd);
+	      MAILBOX_IMAP (mailbox)->server->passwd = NULL;
+      }
+
+      if( MAILBOX_IMAP (mailbox)->path ) {
+	      g_free (MAILBOX_IMAP (mailbox)->path);
+	      MAILBOX_IMAP (mailbox)->path = NULL;
+      }
+
+      if( MAILBOX_IMAP (mailbox)->server->host ) {
+	      g_free (MAILBOX_IMAP (mailbox)->server->host);
+	      MAILBOX_IMAP (mailbox)->server->host = NULL;
+      }
 
       mailbox->name = g_strdup (gtk_entry_get_text (
 	  GTK_ENTRY (mcw->imap_mailbox_name)));
+
       MAILBOX_IMAP (mailbox)->server->user = g_strdup (
 	  gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)));
+
       MAILBOX_IMAP (mailbox)->server->passwd = g_strdup (
 	  gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)));
+
       MAILBOX_IMAP (mailbox)->path =  g_strdup ( gtk_entry_get_text (
 	  GTK_ENTRY(gnome_entry_gtk_entry(
 	      GNOME_ENTRY (mcw->imap_folderpath)))));
 	  
-      if (!MAILBOX_IMAP (mailbox)->path[0])
-	{
+      if ( MAILBOX_IMAP( mailbox )->path == NULL ) 
+	  MAILBOX_IMAP (mailbox)->path = g_strdup ("INBOX");
+      else if( MAILBOX_IMAP (mailbox)->path[0] == '\0' ) {
 	  g_free (MAILBOX_IMAP (mailbox)->path);
 	  MAILBOX_IMAP (mailbox)->path = g_strdup ("INBOX");
-	}
+      }
+
       MAILBOX_IMAP (mailbox)->server->host = g_strdup (
 	  gtk_entry_get_text (GTK_ENTRY (mcw->imap_server)));
       MAILBOX_IMAP (mailbox)->server->port = strtol (

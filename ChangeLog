@@ -1,3 +1,11 @@
+1998-12-16  Joel Becker  <jlbec@ocala.cs.miami.edu>
+
+	* libbalsa/filter-error.c, libbalsa/filter-file.c,
+        libbalsa/filter-funcs.c, libbalsa/filter-private.h,
+	src/filter-edit-callbacks.c, src/filter-edit-dialog.c:
+	Lots of little things, especially gui workings.  It's not perfect yet.
+	Nor is it working.  But it compiles clean, and should cause no harm.
+
 1998-12-15  Jeff Garzik  <jgarzik@pobox.com>
 
 	* src/pref-manager.c:

@@ -50,9 +50,9 @@ filter_load (GList * filter_list, gchar * filter_file)
       gchar filter_file_error[1024];
 
       g_snprintf (filter_file_error,
-		  1024,
-		  "Unable to load filter file %s",
-		  filter_file);
+                  1024,
+                  "Unable to load filter file %s",
+                  filter_file);
       perror (filter_file_error);
       filter_errno = FILTER_ENOREAD;
       return (-FILTER_ENOREAD);

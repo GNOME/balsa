@@ -38,7 +38,7 @@ filter_init (gchar * filter_file)
     filter_perror ("Error in filter initialization");
 
   return (list);
-}				/* end filter_init() */
+}                                /* end filter_init() */
 
 
 /*
@@ -52,7 +52,7 @@ filter_init (gchar * filter_file)
  */
 void 
 filter_delete_regex (filter_regex * filter_reg,
-		     gpointer throwaway)
+                     gpointer throwaway)
 {
   if (!filter_reg)
     return;
@@ -63,7 +63,7 @@ filter_delete_regex (filter_regex * filter_reg,
   regfree (filter_reg->compiled);
 
   return;
-}				/* end filter_delete_regex() */
+}                                /* end filter_delete_regex() */
 
 
 /*
@@ -77,7 +77,7 @@ filter_delete_regex (filter_regex * filter_reg,
  */
 void 
 filter_free (filter * fil,
-	     gpointer throwaway)
+             gpointer throwaway)
 {
   if (!fil)
     return;
@@ -88,13 +88,13 @@ filter_free (filter * fil,
   if (fil->regex)
     {
       g_list_foreach (fil->regex,
-		      (GFunc) filter_delete_regex,
-		      NULL);
+                      (GFunc) filter_delete_regex,
+                      NULL);
       g_list_free (fil->regex);
     }
 
   g_free (fil);
-}				/* end filter_delete_filter() */
+}                                /* end filter_delete_filter() */
 
 
 /*
@@ -115,12 +115,12 @@ filter_clear_filters (GList * filter_list)
     return (NULL);
 
   g_list_foreach (filter_list,
-		  (GFunc) filter_free,
-		  NULL);
+                  (GFunc) filter_free,
+                  NULL);
   g_list_free (filter_list);
 
   return (NULL);
-}				/* end filter_clear_filters() */
+}                                /* end filter_clear_filters() */
 
 
 /*
@@ -145,16 +145,18 @@ filter_new (void)
       return (NULL);
     }
 
-  newfil->type = FILTER_NONE;
-  newfil->flags = FILTER_EMPTY;
-  newfil->match_fields = FILTER_EMPTY;
-  newfil->match.string[0] = '\0';
-  newfil->sound[0] = '\0';
-  newfil->popup_text[0] = '\0';
-  newfil->regex = NULL;
+    newfil->type = FILTER_NONE;
+    newfil->flags = FILTER_EMPTY;
+    newfil->match_fields = FILTER_EMPTY;
+    newfil->match.string[0] = '\0';
+    newfil->sound[0] = '\0';
+    newfil->popup_text[0] = '\0';
+    newfil->action = FILTER_NOTHING;
+    newfil->action_string[0] = '\0';
+    newfil->regex = NULL;
 
   return (newfil);
-}				/* end filter_new() */
+}                                /* end filter_new() */
 
 
 /*
@@ -173,7 +175,7 @@ filter_new (void)
  */
 gint 
 filter_append_regex (filter * fil,
-		     gchar * reg)
+                     gchar * reg)
 {
   filter_regex *temp;
 
@@ -188,12 +190,12 @@ filter_append_regex (filter * fil,
   temp->compiled = NULL;
 
   fil->regex = g_list_append (fil->regex,
-			      temp);
+                              temp);
 
   FILTER_SETFLAG (fil, FILTER_MODIFIED);
 
   return (0);
-}				/* end filter_append_regex() */
+}                                /* end filter_append_regex() */
 
 
 /*
@@ -206,27 +208,27 @@ filter_append_regex (filter * fil,
  */
 void 
 filter_regcomp (filter_regex * fre,
-		gpointer throwaway)
+                gpointer throwaway)
 {
   gint rc;
 
   rc = regcomp (fre->compiled,
-		fre->string,
-		FILTER_REGCOMP);
+                fre->string,
+                FILTER_REGCOMP);
 
   if (rc != 0)
     {
       gchar errorstring[256];
 
       regerror (rc,
-		fre->compiled,
-		errorstring,
-		256);
+                fre->compiled,
+                errorstring,
+                256);
 
       filter_errno = FILTER_EREGSYN;
     }
 
-}				/* end filter_regcomp() */
+}                                /* end filter_regcomp() */
 
 
 /*
@@ -251,15 +253,15 @@ filter_compile_regexs (filter * fil)
 
   /* ASSERT: we were only called if there were filters */
   g_list_foreach (fil->regex,
-		  (GFunc) filter_regcomp,
-		  NULL);
+                  (GFunc) filter_regcomp,
+                  NULL);
   if (filter_errno != 0)
     {
       gchar errorstring[1024];
       g_snprintf (errorstring,
-		  1024,
-		  "Unable to compile filter %s",
-		  fil->name);
+                  1024,
+                  "Unable to compile filter %s",
+                  fil->name);
       filter_perror (errorstring);
       FILTER_CLRFLAG (fil, FILTER_ENABLED);
     }

@@ -8,10 +8,46 @@
 
 #include <gnome.h>
 
+#include <string.h>
 #include "filter.h"
 #include "filter-private.h"
 #include "filter-funcs.h"
 #include "filter-edit.h"
+
+
+/*
+ * unique_filter_name()
+ *
+ * Checks the name of a filter being added to see if it is unique.
+ * It returns a unique name, freshly allocated if necessary.
+ *
+ * Arguments:
+ *    gchar *name - the preferred choice for a name
+ * Returns:
+ *    gchar* - the unique name
+ */
+static gint unique_filter_name(gchar *name)
+{
+    gchar *row_text;
+    gint len, row = 0;
+   
+    if ((!name) || (name[0] == '\0'))
+        return(0);
+
+    len = strlen(name);
+
+    while (gtk_clist_get_text(GTK_CLIST(fe_clist),
+                              row,
+                              1,
+                              &row_text))
+    {
+        if ((len == strlen(row_text)) ||
+            (strncmp(name, row_text, len) == 0))
+            return(0);
+    } /* end while(gtk_clist_get_text()) */
+
+    return(1);
+} /* end unique_filter_name() */
 
 
 /*
@@ -22,18 +58,18 @@
  */
 void
 fe_dialog_button_clicked (GtkWidget * widget,
-			  gpointer data)
+                          gpointer data)
 {
   switch (GPOINTER_TO_INT (data))
     {
-    case 2:			/* Cancel button */
+    case 2:                        /* Cancel button */
       break;
 
-    case 1:			/* Help button */
+    case 1:                        /* Help button */
       /* something here */
       break;
 
-    case 3:			/* OK button */
+    case 3:                        /* OK button */
       /* more of something here */
 
     default:
@@ -43,7 +79,7 @@ fe_dialog_button_clicked (GtkWidget * widget,
   /* destroy the dialog */
   gtk_widget_destroy (fe_dialog);
   /* more destruction is needed.  But that is for later */
-}				/* end fe_dialog_button_clicked */
+}                                /* end fe_dialog_button_clicked */
 
 
 /*
@@ -54,14 +90,14 @@ fe_dialog_button_clicked (GtkWidget * widget,
  */
 void
 fe_checkbutton_toggled (GtkWidget * widget,
-			gpointer data)
+                        gpointer data)
 {
-  if (GTK_CHECK_MENU_ITEM (widget)->active)
+  if (GTK_CHECK_MENU_ITEM(widget)->active)
     {
-      gtk_notebook_set_page (GTK_NOTEBOOK (fe_type_notebook),
-			     GPOINTER_TO_INT (data));
+      gtk_notebook_set_page (GTK_NOTEBOOK(fe_type_notebook),
+                             GPOINTER_TO_INT (data) - 1);
     }
-}				/* end fe_checkbutton_toggled() */
+}                                /* end fe_checkbutton_toggled() */
 
 
 /*
@@ -71,35 +107,35 @@ fe_checkbutton_toggled (GtkWidget * widget,
  */
 void 
 fe_action_selected (GtkWidget * widget,
-		    gpointer data)
+                    gpointer data)
 {
   gtk_widget_set_sensitive (GTK_WIDGET (fe_action_entry),
-			    TRUE);
+                            TRUE);
   switch (GPOINTER_TO_INT (data))
     {
-    case 0:			/* copy to folder */
-    case 2:			/* print on printer */
-    case 3:			/* run program */
+    case 1:                        /* copy to folder */
+    case 3:                        /* print on printer */
+    case 4:                        /* run program */
       gtk_widget_set_sensitive (GTK_WIDGET (fe_disp_place),
-				TRUE);
+                                TRUE);
       break;
 
-    case 4:			/* send to trash */
+    case 5:                        /* send to trash */
       gtk_widget_set_sensitive (GTK_WIDGET (fe_action_entry),
-				FALSE);
+                                FALSE);
       /* fall through */
-    case 1:			/* move to folder */
+    case 2:                        /* move to folder */
       if (GTK_TOGGLE_BUTTON (fe_disp_place)->active)
-	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (fe_disp_continue),
-				     TRUE);
+        gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (fe_disp_continue),
+                                     TRUE);
       gtk_widget_set_sensitive (GTK_WIDGET (fe_disp_place),
-				FALSE);
+                                FALSE);
       break;
 
     default:
       break;
     }
-}				/* end fe_action_selected() */
+}                                /* end fe_action_selected() */
 
 
 /*
@@ -109,7 +145,7 @@ fe_action_selected (GtkWidget * widget,
  */
 void
 fe_add_pressed (GtkWidget * widget,
-		gpointer throwaway)
+                gpointer throwaway)
 {
   gchar *text;
   GList *list;
@@ -124,11 +160,11 @@ fe_add_pressed (GtkWidget * widget,
   list_item = gtk_list_item_new_with_label (text);
   gtk_widget_show (list_item);
   list = g_list_append (list,
-			list_item);
+                        list_item);
   gtk_list_append_items (GTK_LIST (fe_type_regex_list),
-			 list);
+                         list);
   gtk_entry_set_text (GTK_ENTRY (fe_type_regex_entry), "");
-}				/* end fe_add_pressed() */
+}                                /* end fe_add_pressed() */
 
 
 /*
@@ -137,19 +173,19 @@ fe_add_pressed (GtkWidget * widget,
  * Callback for the "remove" button of the regex type
  */
 void
-fe_remove_pressed (GtkWidget * widget,
-		   gpointer throwaway)
+fe_remove_pressed (GtkWidget *widget,
+                   gpointer throwaway)
 {
   GList *selected;
 
-  selected = (GList *) GTK_LIST (fe_type_regex_list)->selection;
+  selected = (GList *)(GTK_LIST(fe_type_regex_list))->selection;
 
   if (!selected)
     return;
 
-  gtk_list_remove_items (GTK_LIST (fe_type_regex_list),
-			 selected);
-}				/* end fe_remove_pressed() */
+  gtk_list_remove_items (GTK_LIST(fe_type_regex_list),
+                         selected);
+}                                /* end fe_remove_pressed() */
 
 
 /*
@@ -159,78 +195,78 @@ fe_remove_pressed (GtkWidget * widget,
  */
 void
 fe_type_simple_toggled (GtkWidget * widget,
-			gpointer data)
+                        gpointer data)
 {
   if (GTK_TOGGLE_BUTTON (widget)->active)
     {
       switch (GPOINTER_TO_INT (data))
-	{
-	case 1:		/* ALL */
-	  gtk_toggle_button_set_state (
-				  GTK_TOGGLE_BUTTON (fe_type_simple_header),
-					FALSE);
-	  gtk_widget_set_sensitive (
-				     GTK_WIDGET (fe_type_simple_header),
-				     FALSE);
-	  gtk_toggle_button_set_state (
-				    GTK_TOGGLE_BUTTON (fe_type_simple_body),
-					FALSE);
-	  gtk_widget_set_sensitive (
-				     GTK_WIDGET (fe_type_simple_body),
-				     FALSE);
+        {
+        case 1:                /* ALL */
+          gtk_toggle_button_set_state (
+                                  GTK_TOGGLE_BUTTON (fe_type_simple_header),
+                                        FALSE);
+          gtk_widget_set_sensitive (
+                                     GTK_WIDGET (fe_type_simple_header),
+                                     FALSE);
+          gtk_toggle_button_set_state (
+                                    GTK_TOGGLE_BUTTON (fe_type_simple_body),
+                                        FALSE);
+          gtk_widget_set_sensitive (
+                                     GTK_WIDGET (fe_type_simple_body),
+                                     FALSE);
 
-	case 2:		/* header */
-	  gtk_toggle_button_set_state (
-				      GTK_TOGGLE_BUTTON (fe_type_simple_to),
-					FALSE);
-	  gtk_widget_set_sensitive (
-				     GTK_WIDGET (fe_type_simple_to),
-				     FALSE);
-	  gtk_toggle_button_set_state (
-				    GTK_TOGGLE_BUTTON (fe_type_simple_from),
-					FALSE);
-	  gtk_widget_set_sensitive (
-				     GTK_WIDGET (fe_type_simple_from),
-				     FALSE);
-	  gtk_toggle_button_set_state (
-				 GTK_TOGGLE_BUTTON (fe_type_simple_subject),
-					FALSE);
-	  gtk_widget_set_sensitive (
-				     GTK_WIDGET (fe_type_simple_subject),
-				     FALSE);
+        case 2:                /* header */
+          gtk_toggle_button_set_state (
+                                      GTK_TOGGLE_BUTTON (fe_type_simple_to),
+                                        FALSE);
+          gtk_widget_set_sensitive (
+                                     GTK_WIDGET (fe_type_simple_to),
+                                     FALSE);
+          gtk_toggle_button_set_state (
+                                    GTK_TOGGLE_BUTTON (fe_type_simple_from),
+                                        FALSE);
+          gtk_widget_set_sensitive (
+                                     GTK_WIDGET (fe_type_simple_from),
+                                     FALSE);
+          gtk_toggle_button_set_state (
+                                 GTK_TOGGLE_BUTTON (fe_type_simple_subject),
+                                        FALSE);
+          gtk_widget_set_sensitive (
+                                     GTK_WIDGET (fe_type_simple_subject),
+                                     FALSE);
 
-	default:
-	  break;
-	}
+        default:
+          break;
+        }
     }
   else
     {
       switch (GPOINTER_TO_INT (data))
-	{
-	case 1:		/* ALL */
-	  gtk_widget_set_sensitive (
-				     GTK_WIDGET (fe_type_simple_header),
-				     TRUE);
-	  gtk_widget_set_sensitive (
-				     GTK_WIDGET (fe_type_simple_body),
-				     TRUE);
+        {
+        case 1:                /* ALL */
+          gtk_widget_set_sensitive (
+                                     GTK_WIDGET (fe_type_simple_header),
+                                     TRUE);
+          gtk_widget_set_sensitive (
+                                     GTK_WIDGET (fe_type_simple_body),
+                                     TRUE);
 
-	case 2:		/* header */
-	  gtk_widget_set_sensitive (
-				     GTK_WIDGET (fe_type_simple_to),
-				     TRUE);
-	  gtk_widget_set_sensitive (
-				     GTK_WIDGET (fe_type_simple_from),
-				     TRUE);
-	  gtk_widget_set_sensitive (
-				     GTK_WIDGET (fe_type_simple_subject),
-				     TRUE);
+        case 2:                /* header */
+          gtk_widget_set_sensitive (
+                                     GTK_WIDGET (fe_type_simple_to),
+                                     TRUE);
+          gtk_widget_set_sensitive (
+                                     GTK_WIDGET (fe_type_simple_from),
+                                     TRUE);
+          gtk_widget_set_sensitive (
+                                     GTK_WIDGET (fe_type_simple_subject),
+                                     TRUE);
 
-	default:
-	  break;
-	}
+        default:
+          break;
+        }
     }
-}				/* end fe_type_simple_toggled() */
+}                                /* end fe_type_simple_toggled() */
 
 /*
  * browse_fileselect_clicked()
@@ -240,13 +276,13 @@ fe_type_simple_toggled (GtkWidget * widget,
  */
 void
 browse_fileselect_clicked (GtkWidget * widget,
-			   gpointer data)
+                           gpointer data)
 {
   gtk_entry_set_text (GTK_ENTRY (fe_sound_entry),
-		      gtk_file_selection_get_filename (
-						GTK_FILE_SELECTION (data)));
+                      gtk_file_selection_get_filename (
+                                                GTK_FILE_SELECTION (data)));
   gtk_widget_destroy (GTK_WIDGET (data));
-}				/* end browse_fileselect_clicked */
+}                                /* end browse_fileselect_clicked */
 
 /*
  * fe_sound_browse_clicked()
@@ -255,7 +291,7 @@ browse_fileselect_clicked (GtkWidget * widget,
  */
 void
 fe_sound_browse_clicked (GtkWidget * widget,
-			 gpointer throwaway)
+                         gpointer throwaway)
 {
   GtkWidget *filesel;
   gchar *current;
@@ -265,19 +301,19 @@ fe_sound_browse_clicked (GtkWidget * widget,
   current = gtk_entry_get_text (GTK_ENTRY (fe_sound_entry));
   if ((current != NULL) && (strlen (current) != 0))
     gtk_file_selection_set_filename (GTK_FILE_SELECTION (filesel),
-				     current);
+                                     current);
 
   gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION (filesel)->ok_button),
-		      "clicked",
-		      GTK_SIGNAL_FUNC (browse_fileselect_clicked),
-		      GTK_OBJECT (filesel));
+                      "clicked",
+                      GTK_SIGNAL_FUNC (browse_fileselect_clicked),
+                      GTK_OBJECT (filesel));
   gtk_signal_connect_object (
-		   GTK_OBJECT (GTK_FILE_SELECTION (filesel)->cancel_button),
-			      "clicked",
-			      (GtkSignalFunc) gtk_widget_destroy,
-			      GTK_OBJECT (filesel));
+                   GTK_OBJECT (GTK_FILE_SELECTION (filesel)->cancel_button),
+                              "clicked",
+                              (GtkSignalFunc) gtk_widget_destroy,
+                              GTK_OBJECT (filesel));
   gtk_widget_show (filesel);
-}				/* end fe_sound_browse_clicked */
+}                                /* end fe_sound_browse_clicked */
 
 /*
  * fe_new_pressed()
@@ -286,7 +322,7 @@ fe_sound_browse_clicked (GtkWidget * widget,
  */
 void
 fe_new_pressed (GtkWidget * widget,
-		gpointer throwaway)
+                gpointer throwaway)
 {
   gint new_row;
   GdkImlibImage *im;
@@ -298,7 +334,7 @@ fe_new_pressed (GtkWidget * widget,
   };
 
   new_row = gtk_clist_append (GTK_CLIST (fe_clist),
-			      new_item);
+                              new_item);
 
   /* now for the pixmap from gdk */
   im = gdk_imlib_create_image_from_xpm_data (enabled_xpm);
@@ -308,17 +344,17 @@ fe_new_pressed (GtkWidget * widget,
   gdk_imlib_destroy_image (im);
 
   gtk_clist_set_pixmap (GTK_CLIST (fe_clist),
-			new_row,
-			0,
-			pixmap,
-			mask);
+                        new_row,
+                        0,
+                        pixmap,
+                        mask);
 
   gdk_pixmap_unref (pixmap);
   gdk_bitmap_unref (mask);
 
   gtk_clist_select_row (GTK_CLIST (fe_clist),
-			new_row, 1);
-}				/* end fe_new_pressed() */
+                        new_row, 1);
+}                                /* end fe_new_pressed() */
 
 
 /*
@@ -328,7 +364,7 @@ fe_new_pressed (GtkWidget * widget,
  */
 void 
 fe_delete_pressed (GtkWidget * widget,
-		   gpointer throwaway)
+                   gpointer throwaway)
 {
   gint row;
   filter *fil;
@@ -339,14 +375,14 @@ fe_delete_pressed (GtkWidget * widget,
   row = GPOINTER_TO_INT ((GTK_CLIST (fe_clist)->selection)->data);
 
   fil = (filter *) gtk_clist_get_row_data (GTK_CLIST (fe_clist),
-					   row);
+                                           row);
 
   if (fil)
     filter_free (fil, NULL);
 
   gtk_clist_remove (GTK_CLIST (fe_clist),
-		    row);
-}				/* end fe_delete_pressed() */
+                    row);
+}                                /* end fe_delete_pressed() */
 
 
 /*
@@ -356,7 +392,7 @@ fe_delete_pressed (GtkWidget * widget,
  */
 void 
 fe_down_pressed (GtkWidget * widget,
-		 gpointer throwaway)
+                 gpointer throwaway)
 {
   gint row;
 
@@ -365,7 +401,7 @@ fe_down_pressed (GtkWidget * widget,
 
   row = GPOINTER_TO_INT ((GTK_CLIST (fe_clist)->selection)->data);
   gtk_clist_swap_rows (GTK_CLIST (fe_clist), row, row + 1);
-}				/* end fe_down_pressed */
+}                                /* end fe_down_pressed */
 
 
 /*
@@ -375,7 +411,7 @@ fe_down_pressed (GtkWidget * widget,
  */
 void 
 fe_up_pressed (GtkWidget * widget,
-	       gpointer throwaway)
+               gpointer throwaway)
 {
   gint row;
 
@@ -384,7 +420,7 @@ fe_up_pressed (GtkWidget * widget,
 
   row = GPOINTER_TO_INT ((GTK_CLIST (fe_clist)->selection)->data);
   gtk_clist_swap_rows (GTK_CLIST (fe_clist), row - 1, row);
-}				/* end fe_up_pressed */
+}                                /* end fe_up_pressed */
 
 
 /*
@@ -394,8 +430,8 @@ fe_up_pressed (GtkWidget * widget,
  */
 void
 fe_clist_button_event_press (GtkWidget * widget,
-			     GdkEventButton * bevent,
-			     gpointer data)
+                             GdkEventButton * bevent,
+                             gpointer data)
 {
   gint row, column, res;
   GdkImlibImage *im;
@@ -405,24 +441,24 @@ fe_clist_button_event_press (GtkWidget * widget,
 
 
   res = gtk_clist_get_selection_info (GTK_CLIST (fe_clist),
-				      bevent->x,
-				      bevent->y,
-				      &row,
-				      &column);
+                                      bevent->x,
+                                      bevent->y,
+                                      &row,
+                                      &column);
 
   if ((bevent->button != 1) || (column != 0))
     return;
 
   type = gtk_clist_get_cell_type (GTK_CLIST (fe_clist),
-				  row,
-				  column);
+                                  row,
+                                  column);
 
   if (type == GTK_CELL_PIXMAP)
     {
       gtk_clist_set_text (GTK_CLIST (fe_clist),
-			  row,
-			  column,
-			  NULL);
+                          row,
+                          column,
+                          NULL);
 
       gtk_clist_select_row (GTK_CLIST (fe_clist), row, -1);
     }
@@ -436,10 +472,10 @@ fe_clist_button_event_press (GtkWidget * widget,
       gdk_imlib_destroy_image (im);
 
       gtk_clist_set_pixmap (GTK_CLIST (fe_clist),
-			    row,
-			    0,
-			    pixmap,
-			    mask);
+                            row,
+                            0,
+                            pixmap,
+                            mask);
 
       gtk_clist_select_row (GTK_CLIST (fe_clist), row, -1);
 
@@ -448,7 +484,77 @@ fe_clist_button_event_press (GtkWidget * widget,
     }
 
   gtk_signal_emit_stop_by_name (GTK_OBJECT (fe_clist),
-				"button_press_event");
+                                "button_press_event");
 
 
-}				/* end fe_clist_button_event_press() */
+} /* end fe_clist_button_event_press() */
+
+
+/*
+ * fe_apply_pressed()
+ *
+ * Builds a new filter from the data provided, and sticks it where
+ * the selection is in the clist
+ */
+void fe_apply_pressed(GtkWidget *widget,
+                      gpointer data)
+{
+    filter *fil;
+    gchar *temp;
+
+    /* quick check before we malloc */
+    temp = gtk_entry_get_text(GTK_ENTRY(fe_name_entry));
+    if ((!temp) || (temp[0] == '\0') || (!unique_filter_name(temp)))
+    {
+        /* error_popup("Invalid filter name"); */
+        return;
+    }
+
+    fil = filter_new();
+    fil->name = g_strdup(temp);
+    if (GTK_TOGGLE_BUTTON(fe_popup_button)->active)
+    {
+        static gchar defstring[19] = "Filter has matched";
+        gchar *tmpstr;
+
+        FILTER_SETFLAG(fil, FILTER_POPUP);
+        tmpstr = gtk_entry_get_text(GTK_ENTRY(fe_popup_entry));
+        
+        strncpy(fil->popup_text,
+                ((!tmpstr) || (tmpstr[0] == '\0')) ? defstring : tmpstr,
+                256);
+    }
+#ifdef HAVE_LIBESD
+    if (GTK_TOGGLE_BUTTON(fe_sound_button)->active)
+    {
+        gchar *tmpstr;
+
+        FILTER_SETFLAG(fil, FILTER_SOUND);
+        tmpstr = gtk_entry_get_text(GTK_ENTRY(fe_sound_entry));
+        if ((!tmpstr) || (tmpstr[0] == '\0'))
+        {
+            filter_free(fil, NULL);
+            /* error_dialog("You must provide a sound to play") */
+            return;
+        }
+        strncpy(fil->popup_entry, tmpstr, PATH_MAX);
+    }
+#endif
+} /* end fe_apply_pressed */
+
+
+/*
+ * fe_revert_pressed()
+ *
+ * Reverts the filter values to the ones stored.
+ * It really just select()s the row, letting the callback handle
+ * things
+ */
+void fe_revert_pressed(GtkWidget *widget,
+                       gpointer data)
+{
+    gtk_clist_select_row(GTK_CLIST(fe_clist),
+                         GPOINTER_TO_INT(
+                             ((GList *)(GTK_CLIST(fe_clist)->selection))->data),
+                         -1);
+} /* end fe_revert_pressed() */

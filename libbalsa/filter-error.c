@@ -42,7 +42,7 @@ gchar *
 filter_strerror (gint error)
 {
   return (filter_errlist[(error > 0) ? error : -error]);
-}				/* end filter_strerror() */
+}                                /* end filter_strerror() */
 
 
 /*
@@ -61,4 +61,4 @@ filter_perror (const gchar * s)
 
   error_string = filter_strerror (filter_errno);
   g_warning ("%s: %s\n", s, error_string);
-}				/* end filter_perror */
+}                                /* end filter_perror */

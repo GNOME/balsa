@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-09-24 02:58+0200\n"
-"PO-Revision-Date: 2003-09-24 03:00+0200\n"
+"POT-Creation-Date: 2003-09-27 12:13+0200\n"
+"PO-Revision-Date: 2003-09-27 12:08+0200\n"
 "Last-Translator: Страхиња Радић <mr99164@alas.matf.bg.ac.yu>\n"
 "Language-Team: Serbian (sr) <serbiangnome-lista@nongnu.org>\n"
 "MIME-Version: 1.0\n"
@@ -5125,12 +5125,12 @@ msgstr "Позивања:"
 #: src/sendmsg-window.c:2177
 #, c-format
 msgid "On %s, %s wrote:\n"
-msgstr "Дана %s, %s је написао:\n"
+msgstr "Дана %s, %s написа:\n"
 
 #: src/sendmsg-window.c:2179
 #, c-format
 msgid "%s wrote:\n"
-msgstr "%s је написао:\n"
+msgstr "%s написа:\n"
 
 #: src/sendmsg-window.c:3057
 msgid "Choose charset"

@@ -377,11 +377,41 @@ delete_init_window (GtkWidget * widget)
 static void
 next_cb (GtkWidget * widget)
 {
-  gtk_notebook_next_page (GTK_NOTEBOOK (iw->notebook));
-  if (gtk_notebook_current_page (GTK_NOTEBOOK (iw->notebook)) != IW_PAGE_WELCOME)
-    gtk_widget_set_sensitive (iw->prev, TRUE);
-  if (gtk_notebook_current_page (GTK_NOTEBOOK (iw->notebook)) == IW_PAGE_FINISHED)
-    gtk_widget_set_sensitive (iw->next, FALSE);
+  GtkWidget *messagebox;
+
+  switch (gtk_notebook_current_page (GTK_NOTEBOOK (iw->notebook)))
+    {
+    case IW_PAGE_FINISHED:
+      if (mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox))))
+	goto BADMAILBOX;
+      else if (mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->outbox))))
+	goto BADMAILBOX;
+      else if (mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->trash))))
+	goto BADMAILBOX;
+      else
+	{
+	  gtk_widget_set_sensitive (iw->next, FALSE);
+	  gtk_notebook_next_page (GTK_NOTEBOOK (iw->notebook));
+	}
+      break;
+
+    default:
+      gtk_widget_set_sensitive (iw->prev, TRUE);
+      gtk_notebook_next_page (GTK_NOTEBOOK (iw->notebook));
+      break;
+    }
+  return;
+
+
+BADMAILBOX:
+  messagebox = gnome_message_box_new (_ ("Invalid Mailbox!"),
+				      GNOME_MESSAGE_BOX_ERROR,
+				      GNOME_STOCK_BUTTON_OK,
+				      NULL);
+  gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
+  gtk_window_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
+  gtk_widget_show (messagebox);
+
 }
 
 static void

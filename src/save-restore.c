@@ -805,7 +805,8 @@ config_global_load(void)
 	gnome_config_get_bool("RememberOpenMailboxes=false");
     gnome_config_get_vector("OpenMailboxes", &open_mailbox_count,
 			    &open_mailbox_vector);
-    if (balsa_app.remember_open_mboxes && open_mailbox_count > 0) {
+    if (balsa_app.remember_open_mboxes && open_mailbox_count > 0
+        && **open_mailbox_vector) {
 	/* FIXME: Open the mailboxes.... */
 	printf("Opening %d mailboxes on startup.\n", open_mailbox_count);
 	gtk_idle_add((GtkFunction) open_mailboxes_idle_cb,
@@ -1289,7 +1290,7 @@ mailbox_list_to_vector(GList * mailbox_list)
 
     res[--i] = NULL;
     for(list = mailbox_list; list; list = g_list_next(list))
-	res[--i] = g_strdup(LIBBALSA_MAILBOX(list->data)->name);
+	res[--i] = g_strdup(LIBBALSA_MAILBOX(list->data)->url);
 
     return res;
 }

@@ -292,7 +292,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 	balsa_app.inbox_input = g_list_remove(balsa_app.inbox_input, 
 					      mbnode);
     } else {
-	gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
+	gnode = balsa_find_mailbox(balsa_app.mailbox_nodes, mailbox);
 	if (!gnode) {
 	    fprintf(stderr,
 		    _("Oooop! mailbox not found in balsa_app.mailbox "
@@ -763,7 +763,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
         GNode* parent = NULL;
         for(dir = g_strdup(libbalsa_mailbox_local_get_path(mcw->mailbox));
             strlen(dir)>1 /* i.e dir != "/" */ &&
-                !(parent = balsa_app_find_by_dir(balsa_app.mailbox_nodes,dir));
+                !(parent = balsa_find_dir(balsa_app.mailbox_nodes,dir));
             ) {
             gchar* tmp =  g_dirname(dir); g_free(dir);
             dir = tmp;

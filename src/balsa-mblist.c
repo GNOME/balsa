@@ -261,48 +261,6 @@ mblist_find_all_unread_mboxes(void)
     return res;
 }
 
-/* searching mailbox tree code, see balsa_find_mbox_by_name below */
-static gboolean
-mbox_by_name(gconstpointer a, gconstpointer b)
-{
-    BalsaMailboxNode *mbnode = (BalsaMailboxNode *) a;
-    const gchar *name = (const gchar *) b;
-    g_assert(mbnode != NULL);
-
-    if (mbnode->mailbox == NULL)
-	return TRUE;
-
-    return strcmp(mbnode->mailbox->name, name) != 0;
-}
-
-/* mblist_find_mbox_by_name:
-   search the mailboxes tree for given name.
-*/
-
-LibBalsaMailbox *
-mblist_find_mbox_by_name(BalsaMBList* mblist, const gchar * name)
-{
-    GtkCTreeNode *node;
-    BalsaMailboxNode *mbnode;
-    LibBalsaMailbox *res = NULL;
-
-    g_return_val_if_fail(mblist, NULL);
-    g_return_val_if_fail(name, NULL);
-
-    node = gtk_ctree_find_by_row_data_custom(GTK_CTREE (mblist),
-					     NULL, (gchar *) name,
-					     mbox_by_name);
-    if (node) {
-	mbnode = gtk_ctree_node_get_row_data(GTK_CTREE(mblist), node);
-	g_return_val_if_fail(mbnode, NULL);
-	res = mbnode->mailbox;
-    } else
-	g_print("mblist_find_mbox_by_name: Mailbox '%s' not found\n", name);
-    return res;
-}
-
-/* GUI METHODS -------------------------------------------------- */
-
 /* mblist_open_mailbox
  * 
  * Description: This checks to see if the mailbox is already on a different
@@ -314,7 +272,7 @@ mblist_open_mailbox(LibBalsaMailbox * mailbox)
 {
     GtkWidget *page = NULL;
     int i, c;
-    GNode *gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
+    GNode *gnode = balsa_find_mailbox(balsa_app.mailbox_nodes, mailbox);
 
     g_return_if_fail(gnode);
 
@@ -371,7 +329,7 @@ void
 mblist_close_mailbox(LibBalsaMailbox * mailbox)
 {
     GNode *gnode =
-	find_gnode_in_mbox_list(balsa_app.mailbox_nodes,mailbox);
+	balsa_find_mailbox(balsa_app.mailbox_nodes,mailbox);
     g_return_if_fail(gnode);
     balsa_window_close_mbnode(balsa_app.main_window, 
 			      BALSA_MAILBOX_NODE(gnode->data));

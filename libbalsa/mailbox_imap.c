@@ -735,6 +735,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 	FREE(&msg);
 	if(stream) { /* don't cache negatives */
             FILE * cache;
+            assure_balsa_dir();
             mkdir(cache_name, S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
             cache = fopen(msg_name,"wb");
             if(! (cache && mutt_copy_stream(stream, cache) ==0) ) 

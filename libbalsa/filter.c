@@ -373,7 +373,8 @@ libbalsa_filter_apply(GSList * filter_list)
 	if (filt->matching_messages) {
 	    switch (filt->action) {
 	    case FILTER_COPY:
-		mbox = mblist_find_mbox_by_name(balsa_app.mblist,filt->action_string);
+		mbox =
+                    balsa_find_mailbox_by_name(filt->action_string);
 		if (!mbox)
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Bad mailbox name for filter : %s"),filt->name);
 		else if (!libbalsa_messages_copy(filt->matching_messages,mbox))
@@ -386,7 +387,8 @@ libbalsa_filter_apply(GSList * filter_list)
 		else result=TRUE;
 		break;
 	    case FILTER_MOVE:
-		mbox = mblist_find_mbox_by_name(balsa_app.mblist,filt->action_string);
+		mbox =
+                    balsa_find_mailbox_by_name(filt->action_string);
 		if (!mbox)
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Bad mailbox name for filter : %s"),filt->name);
 		else if (!libbalsa_messages_move(filt->matching_messages,mbox))

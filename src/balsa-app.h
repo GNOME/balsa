@@ -368,9 +368,15 @@ GtkWidget *gnome_stock_button_with_label(const char *icon,
 					 const char *label);
 gboolean open_mailboxes_idle_cb(gchar * names[]);
 
-GNode *find_gnode_in_mbox_list(GNode * gnode_list, LibBalsaMailbox * mailbox);
-GNode *balsa_find_mbnode(GNode* gnode, BalsaMailboxNode* mbnode);
-GNode* balsa_app_find_by_dir(GNode* root, const gchar* path);
+/* Search functions */
+GNode *balsa_find_mailbox(GNode * root, LibBalsaMailbox * mailbox);
+GNode *balsa_find_mbnode(GNode * root, BalsaMailboxNode * mbnode);
+GNode *balsa_find_dir(GNode * root, const gchar * path);
+GNode *balsa_find_path(GNode * root, const gchar * path);
+GNode *balsa_find_url(GNode * root, const gchar * url);
+LibBalsaMailbox *balsa_find_mailbox_by_url(const gchar * url);
+LibBalsaMailbox *balsa_find_mailbox_by_name(const gchar * name);
+
 void  balsa_remove_children_mailbox_nodes(GNode* gnode);
 BalsaIndex* balsa_find_index_by_mailbox(LibBalsaMailbox* mailbox);
 

@@ -653,79 +653,10 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
    to the configuration).
 */
 
-static gboolean
-traverse_find_path(GNode * node, gpointer * d)
-{
-    const gchar *path;
-    LibBalsaMailbox * mailbox;
-    if(node->data == NULL) /* true for root node only */
-	return FALSE;
-    
-    mailbox = ((BalsaMailboxNode *) node->data)->mailbox;
-
-    if(LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) 
-	path = libbalsa_mailbox_local_get_path(mailbox);
-    else if(!mailbox)
-	path = ((BalsaMailboxNode *) node->data)->name;
-    else 
-	return FALSE;
-
-    if (strcmp(path, (gchar *) d[0]))
-	return FALSE;
-
-    d[1] = node;
-    return TRUE;
-}
-
-static GNode *
-find_by_path(GNode * root, GTraverseType order, GTraverseFlags flags,
-	     const gchar * path)
-{
-    gpointer d[2];
-
-    d[0] = (gchar *) path;
-    d[1] = NULL;
-    g_node_traverse(root, order, flags, -1,
-		    (GNodeTraverseFunc) traverse_find_path, d);
-
-    return d[1];
-}
-
-static gboolean
-traverse_find_url(GNode * node, gpointer * d)
-{
-    LibBalsaMailbox * mailbox;
-    if(node->data == NULL) /* true for root node only */
-	return FALSE;
-    
-    mailbox = ((BalsaMailboxNode *) node->data)->mailbox;
-    if (mailbox == NULL || strcmp(mailbox->url, (gchar *) d[0]))
-	return FALSE;
-
-    d[1] = node;
-    return TRUE;
-}
-
-static GNode *
-find_by_url(GNode * root, GTraverseType order, GTraverseFlags flags,
-	     const gchar * path)
-{
-    gpointer d[2];
-
-    d[0] = (gchar *) path;
-    d[1] = NULL;
-    g_node_traverse(root, order, flags, -1,
-		    (GNodeTraverseFunc) traverse_find_url, d);
-
-    return d[1];
-}
-
-
 static GNode*
 remove_mailbox_from_nodes(LibBalsaMailbox* mailbox)
 {
-    GNode* gnode = find_by_url(balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
-			       G_TRAVERSE_ALL, mailbox->url);
+    GNode* gnode = balsa_find_url(balsa_app.mailbox_nodes, mailbox->url);
     if (gnode)
 	g_node_unlink(gnode);
     else
@@ -803,8 +734,7 @@ GNode* add_local_folder(GNode*root, const char*d_name, const char* path)
 	return NULL;
 
     /* don't add if the folder is already in the configuration */
-    if (find_by_path(balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
-		     G_TRAVERSE_ALL, path))
+    if (balsa_find_path(balsa_app.mailbox_nodes, path))
 	return NULL;
 
     BALSA_MAILBOX_NODE(node->data)->parent = (BalsaMailboxNode*)root->data;
@@ -841,12 +771,12 @@ add_imap_entry(GNode*root, const char* fn, char delim, gboolean scanned)
     const gchar *basename;
     gchar* url;
 
-    node = balsa_app_find_by_dir(root, fn);
+    node = balsa_find_dir(root, fn);
     if (node && node != root)
 	return node;
 
     parent_name = get_parent_folder_name(fn, delim);
-    parent = balsa_app_find_by_dir(root, parent_name);
+    parent = balsa_find_dir(root, parent_name);
     if (parent == NULL)
         parent = root;
     g_free(parent_name);

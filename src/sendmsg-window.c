@@ -3308,7 +3308,7 @@ find_orig_type(BalsaSendmsg* bsmsg)
  * Find the original message of a reply and call
  * libbalsa_message_reply on it to mark it as replied.  This should
  * only be used on continued messages where we don't have the original
- * message directly, and will only work if the X-Balsa-OrigMailboxName
+ * message directly, and will only work if the X-Balsa-OrigMailboxURL
  * header has been set (i.e. postponed by Balsa not another MUA).
  */
 static void
@@ -3321,10 +3321,10 @@ reply_postponed_message(BalsaSendmsg* bsmsg)
     gchar* mbname;    
 
     list = libbalsa_message_find_user_hdr(bsmsg->orig_message, 
-                                          "X-Balsa-OrigMailboxName");
+                                          "X-Balsa-OrigMailboxURL");
     tmp = list->data;
     mbname = tmp[1];
-    orig_mailbox = mblist_find_mbox_by_name(balsa_app.mblist, mbname);
+    orig_mailbox = balsa_find_mailbox_by_url(mbname);
                     
     libbalsa_mailbox_open(orig_mailbox);
     replied_message = libbalsa_message_find_by_message_id(orig_mailbox, bsmsg->orig_message->in_reply_to);
@@ -3352,7 +3352,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 
     message = bsmsg2message(bsmsg);
     fcc = message->fcc_mailbox && *(message->fcc_mailbox)
-	? mblist_find_mbox_by_name(balsa_app.mblist, message->fcc_mailbox)
+	? balsa_find_mailbox_by_name(message->fcc_mailbox)
 	: NULL;
 
     if(queue_only)
@@ -3454,7 +3454,11 @@ message_postpone(BalsaSendmsg * bsmsg)
         tmp = g_malloc(sizeof(gchar)*2);
         snprintf(tmp, 2, "%i", bsmsg->type);
         message->user_headers = g_list_prepend(message->user_headers, libbalsa_create_hdr_pair("X-Balsa-SendType", tmp));
-        message->user_headers = g_list_prepend(message->user_headers, libbalsa_create_hdr_pair("X-Balsa-OrigMailboxName", g_strdup(bsmsg->orig_message->mailbox->name)));
+        message->user_headers =
+            g_list_prepend(message->user_headers,
+                           libbalsa_create_hdr_pair
+                           ("X-Balsa-OrigMailboxURL",
+                            g_strdup(bsmsg->orig_message->mailbox->url)));
     } else if (bsmsg->orig_message) {
         /* We want to copy these from the original message because
          * it's the postponed message we continued from 
@@ -3470,9 +3474,13 @@ message_postpone(BalsaSendmsg * bsmsg)
             message->user_headers = g_list_prepend(message->user_headers, libbalsa_create_hdr_pair("X-Balsa-SendType", g_strdup(usrhdr[1])));
 
             list = libbalsa_message_find_user_hdr(bsmsg->orig_message, 
-                                                  "X-Balsa-OrigMailboxName");
+                                                  "X-Balsa-OrigMailboxURL");
             usrhdr = list->data;
-            message->user_headers = g_list_prepend(message->user_headers, libbalsa_create_hdr_pair("X-Balsa-OrigMailboxName", g_strdup(usrhdr[1])));
+            message->user_headers =
+                g_list_prepend(message->user_headers,
+                               libbalsa_create_hdr_pair
+                               ("X-Balsa-OrigMailboxURL",
+                                g_strdup(usrhdr[1])));
         }
     }
     

@@ -2,7 +2,6 @@
 # Copyright (C) 1998 Free Software Foundation, Inc.
 # Kjartan Maraas <kmaraas@fib.hl.no>, 1998.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.4.7\n"
@@ -217,7 +216,7 @@ msgstr "Lokal postboks"
 
 #: src/mailbox-conf.c:632
 msgid "IMAP server"
-msgstr "IMAP server"
+msgstr "IMAP tjener"
 
 #: src/main-window.c:143
 msgid "Mailboxes/<Separator>"
@@ -475,7 +474,7 @@ msgstr "Innhold"
 
 #: src/sendmsg-window.c:312
 msgid "Attach file"
-msgstr "Legg ved til"
+msgstr "Legg ved fil"
 
 #: src/sendmsg-window.c:513
 msgid "Reply to "

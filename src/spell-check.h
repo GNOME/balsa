@@ -60,6 +60,7 @@ extern "C" {
 	/* restoration information */
 	gchar *original_text;
 	GtkTextMark *original_mark;
+        gint original_offset;
 
 	/* word selection */
 	GtkTextIter start_iter;

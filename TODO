@@ -13,6 +13,7 @@ Stuart
  * #mh/ requires a .mh_profile in ~ which looks something
    like:  "Path: Mail", telling it to get mh folders from
    ~/Mail
+ * clean up progress bar code
 
 sendmsg-window TODO:
  * free EVERYTHING in the sendmsg-window when it is closed.
@@ -23,8 +24,6 @@ sendmsg-window TODO:
 
 Jay
 ---------------------------------------------------------
- * do wonderful things that make people send millions
-   of dollars in donations to pav <g>
- * more stuff goes here...
  * clear xmhtml widget when changing mailboxes
+ * more stuff goes here...
 

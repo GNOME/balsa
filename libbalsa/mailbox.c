@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "libbalsa.h"
 #include "libbalsa-marshal.h"
@@ -784,8 +785,20 @@ libbalsa_mailbox_type_from_path(const gchar * path)
         if (access (tmp, F_OK) == 0)
             return LIBBALSA_TYPE_MAILBOX_MH;
 
+    } else {
+	/* Minimal check for an mbox */
+	gint fd;
+
+	if ((fd = open(path, O_RDONLY)) >= 0) {
+	    gchar buf[5];
+	    guint len = read(fd, buf, sizeof buf);
+	    close(fd);
+	    if (len == 0
+		|| (len == sizeof buf
+		    && strncmp(buf, "From ", sizeof buf) == 0))
+		return LIBBALSA_TYPE_MAILBOX_MBOX;
+	}
     }
-    else return LIBBALSA_TYPE_MAILBOX_MBOX;
 
     /* This is not a mailbox */
     return G_TYPE_OBJECT;
@@ -1101,6 +1114,8 @@ LibBalsaMailboxSearchIter *
 libbalsa_mailbox_search_iter_new(LibBalsaCondition * condition)
 {
     LibBalsaMailboxSearchIter *iter;
+
+    g_return_val_if_fail(condition != NULL, NULL);
 
     iter = g_new(LibBalsaMailboxSearchIter, 1);
     iter->mailbox = NULL;

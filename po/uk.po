@@ -608,14 +608,14 @@ msgid "Expunging messages from server..."
 msgstr "Перем╕щення прочитаних пов╕домлень у %s..."
 
 #: libmutt/imap/imap.c:1229
-#, fuzzy, c-format
+#, c-format
 msgid "Subscribing to %s..."
-msgstr "Запис %s..."
+msgstr "Передплата на %s..."
 
 #: libmutt/imap/imap.c:1231
-#, fuzzy, c-format
+#, c-format
 msgid "Unsubscribing to %s..."
-msgstr "Запис %s..."
+msgstr "В╕дм╕на передплати на %s..."
 
 #. Unable to fetch headers for lower versions
 #: libmutt/imap/message.c:74
@@ -634,31 +634,30 @@ msgstr "Отримання простору ╕мен..."
 
 #: libmutt/imap/message.c:276
 msgid "The message index is incorrect. Try reopening the mailbox."
-msgstr ""
+msgstr "╤ндекс пов╕домлення не коректний. Спробуйте перев╕дкрити поштову скриньку."
 
 #: libmutt/imap/message.c:467
-#, fuzzy
 msgid "Uploading message ..."
-msgstr "Перем╕щення прочитаних пов╕домлень у %s..."
+msgstr "Вивантаження пов╕домлення..."
 
 #: libmutt/imap/message.c:555
-#, fuzzy, c-format
+#, c-format
 msgid "Copying %d messages to %s..."
-msgstr "Перем╕щення прочитаних пов╕домлень у %s..."
+msgstr "Коп╕ювання %d пов╕домлень у %s..."
 
 #: libmutt/imap/message.c:559
-#, fuzzy, c-format
+#, c-format
 msgid "Copying message %d to %s..."
-msgstr "Перем╕щення прочитаних пов╕домлень у %s..."
+msgstr "Коп╕ювання пов╕домлення %d у %s..."
 
 #: libmutt/imap/util.c:43
 msgid "Continue?"
 msgstr "Продовжити?"
 
 #: libmutt/imap/util.c:49
-#, fuzzy, c-format
+#, c-format
 msgid "%s [%s]\n"
-msgstr "%s на %s"
+msgstr "%s [%s]\n"
 
 #: libmutt/mbox.c:134 libmutt/mbox.c:292
 msgid "Reading %s... %d (%d%%)"
@@ -1520,22 +1519,20 @@ msgid "_Port:"
 msgstr "Порт:"
 
 #: src/folder-conf.c:99
-#, fuzzy
 msgid "_User name:"
-msgstr "╤м'я користувача:"
+msgstr "Назва користувача:"
 
 #: src/folder-conf.c:104
-#, fuzzy
 msgid "_Password:"
 msgstr "Пароль:"
 
 #: src/folder-conf.c:111
 msgid "_Subscribed folders only"
-msgstr ""
+msgstr "Лише передплачен╕ теки"
 
 #: src/folder-conf.c:112
 msgid "_Prefix"
-msgstr ""
+msgstr "Преф╕кс"
 
 #: src/folder-conf.c:177
 msgid ""
@@ -1723,11 +1720,11 @@ msgstr "Властивост╕..."
 
 #: src/mailbox-node.c:566
 msgid "Subscribe"
-msgstr ""
+msgstr "Передплатити"
 
 #: src/mailbox-node.c:567
 msgid "Unsubscribe"
-msgstr ""
+msgstr "В╕дм╕нити передплату"
 
 #: src/mailbox-node.c:572
 msgid "Mark as Inbox"
@@ -1747,10 +1744,10 @@ msgstr "Вибрати для чернеток"
 
 #: src/mailbox-node.c:580
 msgid "Rescan"
-msgstr ""
+msgstr "Актуал╕зувати"
 
 #: src/mailbox-node.c:686
-#, fuzzy, c-format
+#, c-format
 msgid "Local mailbox loaded as: %s\n"
 msgstr "Локальну поштову скриньку завантажено як %s\n"
 
@@ -1767,9 +1764,8 @@ msgid "Add a new mbox style mailbox"
 msgstr "Додати нову поштову скриньку Mbox"
 
 #: src/main-window.c:236
-#, fuzzy
 msgid "Add a new Maildir style mailbox"
-msgstr "Додати нову поштову скриньку Maildir"
+msgstr "Додати нову поштову скриньку типу Maildir"
 
 #: src/main-window.c:241
 msgid "Add a new MH style mailbox"
@@ -1780,9 +1776,8 @@ msgid "Add a new IMAP mailbox"
 msgstr "Додати нову поштову скриньку IMAP"
 
 #: src/main-window.c:252
-#, fuzzy
 msgid "Add a new IMAP folder"
-msgstr "Додати нову поштову скриньку IMAP"
+msgstr "Додати нову теку IMAP"
 
 #: src/main-window.c:260
 msgid "_New"
@@ -1817,7 +1812,6 @@ msgid "_Address Book..."
 msgstr "Адресна книга..."
 
 #: src/main-window.c:288
-#, fuzzy
 msgid "Open the address book"
 msgstr "В╕дкрити адресну книгу"
 
@@ -1919,7 +1913,6 @@ msgid "Reply to the current message"
 msgstr "В╕дпов╕сти на поточне пов╕домлення"
 
 #: src/main-window.c:398 src/message-window.c:108
-#, fuzzy
 msgid "Reply to _All..."
 msgstr "В╕дпов╕сти ус╕м..."
 
@@ -1928,9 +1921,8 @@ msgid "Reply to all recipients of the current message"
 msgstr "В╕дпов╕сти вс╕м адресатам поточного пов╕домлення"
 
 #: src/main-window.c:406
-#, fuzzy
 msgid "Reply to _Group..."
-msgstr "В╕дпов╕сти у групу..."
+msgstr "В╕дпов╕сти груп╕..."
 
 #: src/main-window.c:407
 msgid "Reply to mailing list"
@@ -1949,7 +1941,6 @@ msgid "Next Part"
 msgstr "Наступна частина"
 
 #: src/main-window.c:422
-#, fuzzy
 msgid "Next part in message"
 msgstr "Наступна частина в пов╕домлен╕"
 
@@ -1958,7 +1949,6 @@ msgid "Previous Part"
 msgstr "Попередня частина"
 
 #: src/main-window.c:429
-#, fuzzy
 msgid "Previous part in message"
 msgstr "Попередня частина в пов╕домленн╕"
 
@@ -1967,7 +1957,6 @@ msgid "Save Current Part..."
 msgstr "Зберегти поточну частину..."
 
 #: src/main-window.c:436 src/message-window.c:129
-#, fuzzy
 msgid "Save current part in message"
 msgstr "Зберегти поточну частину в пов╕домлен╕"
 
@@ -1989,7 +1978,6 @@ msgstr "В╕дновити пов╕домлення"
 
 #. !
 #: src/main-window.c:458
-#, fuzzy
 msgid "_Toggle"
 msgstr "Перемикнути"
 
@@ -2050,7 +2038,6 @@ msgid "Empty _Trash"
 msgstr "Спорожнити см╕тник"
 
 #: src/main-window.c:514
-#, fuzzy
 msgid "Delete messages from the Trash mailbox"
 msgstr "Стерти пов╕домлення з см╕тниково╖ поштово╖ скриньки"
 
@@ -2068,10 +2055,9 @@ msgstr "Перев╕рити"
 
 #: src/main-window.c:545
 msgid "Check Email"
-msgstr "Перев╕рити ел.пошту"
+msgstr "Перев╕рити пошту"
 
 #: src/main-window.c:550
-#, fuzzy
 msgid "Delete message"
 msgstr "Стерти пов╕домлення"
 
@@ -2080,7 +2066,6 @@ msgid "Compose"
 msgstr "Скласти"
 
 #: src/main-window.c:555
-#, fuzzy
 msgid "Compose message"
 msgstr "Скласти пов╕домлення"
 
@@ -2093,7 +2078,6 @@ msgid "Reply"
 msgstr "В╕дпов╕сти"
 
 #: src/main-window.c:567
-#, fuzzy
 msgid ""
 "Reply\n"
 "to All"
@@ -2114,7 +2098,6 @@ msgid "Previous"
 msgstr "Попередн╓"
 
 #: src/main-window.c:577
-#, fuzzy
 msgid "Open previous message"
 msgstr "В╕дкрити попередн╓ пов╕домлення"
 
@@ -2123,7 +2106,6 @@ msgid "Next"
 msgstr "Наступне"
 
 #: src/main-window.c:582
-#, fuzzy
 msgid "Open next message"
 msgstr "В╕дкрити наступне пов╕домлення"
 
@@ -2136,7 +2118,6 @@ msgstr ""
 "непрочитане"
 
 #: src/main-window.c:586
-#, fuzzy
 msgid "Open next unread message"
 msgstr "В╕дкрити наступне непрочитане пов╕домлення"
 
@@ -2157,9 +2138,8 @@ msgstr ""
 "Перев╕рте установки поштово╖ скрин╕."
 
 #: src/main-window.c:1349
-#, fuzzy
 msgid "Copyright (C) 1997-2001"
-msgstr "Copyright © 1997-2000"
+msgstr "Copyright © 1997-2001"
 
 #: src/main-window.c:1352
 #, fuzzy
@@ -2240,7 +2220,6 @@ msgid "Trash"
 msgstr "См╕тник"
 
 #: src/message-window.c:63
-#, fuzzy
 msgid "_Selected Headers"
 msgstr "Вибран╕ заголовки"
 
@@ -2257,12 +2236,10 @@ msgid "Forward this message"
 msgstr "Переслати це пов╕домлення"
 
 #: src/message-window.c:119
-#, fuzzy
 msgid "Next part in Message"
 msgstr "Наступна частина в пов╕домлен╕"
 
 #: src/message-window.c:124
-#, fuzzy
 msgid "Previous part in Message"
 msgstr "Попередня частина в пов╕домленн╕"
 
@@ -2403,13 +2380,12 @@ msgid "Reply prefix:"
 msgstr "Преф╕кс в╕дпов╕д╕:"
 
 #: src/pref-manager.c:1172
-#, fuzzy
 msgid "Enable signature separator"
-msgstr "╓ розд╕лювач п╕дпису"
+msgstr "Ув╕мкнути розд╕лювач п╕дпису"
 
 #: src/pref-manager.c:1173
 msgid "Insert signature before quoted messages"
-msgstr ""
+msgstr "Вставляти п╕дпис перед цитованим пов╕домленням"
 
 #: src/pref-manager.c:1198
 msgid "Remote Mailbox Servers"
@@ -2444,12 +2420,10 @@ msgid "Port"
 msgstr "Порт"
 
 #: src/pref-manager.c:1280
-#, fuzzy
 msgid "Remote SMTP server"
 msgstr "В╕ддалений сервер SMTP"
 
 #: src/pref-manager.c:1289
-#, fuzzy
 msgid "Local mail transport agent"
 msgstr "Локальний поштовий посередник (MUA)"
 
@@ -2466,7 +2440,6 @@ msgid "Checking"
 msgstr "Перев╕рка"
 
 #: src/pref-manager.c:1351 src/pref-manager.c:1889
-#, fuzzy
 msgid "minutes"
 msgstr "хвилин"
 

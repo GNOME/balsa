@@ -219,6 +219,7 @@ libbalsa_message_body_get_content_type(LibBalsaMessageBody * body)
     else
 	res = g_strdup(TYPE(body->mutt_body));
 
+    g_strdown(res);
     return res;
 }
 

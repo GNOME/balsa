@@ -2190,7 +2190,9 @@ part_create_menu (BalsaPartInfo* info)
     
     content_type = libbalsa_message_body_get_content_type (info->body);
     key_list = list = gnome_mime_get_keys (content_type);
+    gdk_threads_leave(); /*FIXME: this hangs balsa */
     app_list = gnome_vfs_mime_get_short_list_applications(content_type);
+    gdk_threads_enter(); /* FIXME: this hangs balsa */
 
     if((def_app=gnome_vfs_mime_get_default_application(content_type))) {
 	add_vfs_menu_item(info, def_app);

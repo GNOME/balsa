@@ -4,7 +4,6 @@ dnl ###########################################################################
 
 AC_INIT(src/main.c)
 AM_CONFIG_HEADER(config.h)
-GNOME_VFS_REQUIRED=1.0.1
 
 dnl ###########################################################################
 dnl Versioning
@@ -64,10 +63,10 @@ dnl ###########################################################################
 dnl Check for a recent enough version of gnome-libs.
 dnl ###########################################################################
 
-AC_MSG_CHECKING([for gnome-libs version >= 1.2.1])
+AC_MSG_CHECKING([for gnome-libs version >= 1.2.13])
 vers=`gnome-config --version gnome-libs | sed 's/^gnome-libs //'`
 case $vers in
-	1.0.*|1.2.0)
+	1.0.*|1.2.[0-9])
 		AC_MSG_RESULT([no])
 		AC_MSG_ERROR([Balsa requires a version of gnome-libs newer than 1.2.1] )
 		;;
@@ -76,18 +75,6 @@ case $vers in
 		;;
 esac
 gnome_libs="glib gtk gnome gnomeui"
-
-dnl ###########################################################################
-dnl Test whether jw is installed
-dnl ###########################################################################
-AC_PATH_PROG(JW,jw,no)
-if test x$JW = xno; then
-  HAVE_JW="no"
-else
-  HAVE_JW="yes"
-fi
-AM_CONDITIONAL(HAVE_JW, test "x$HAVE_JW" = "xyes")
-AC_SUBST(HAVE_JW)
 
 dnl ###########################################################################
 dnl Check for gnome-window-icon stuff.
@@ -107,16 +94,6 @@ AM_PATH_GNOME_PRINT([0.25.0], [
    printing_support="no (gnome-print >= 0.25 required)"
 ])
 
-dnl ###########################################################################
-dnl Check for gnome-vfs
-dnl ###########################################################################
-AC_MSG_CHECKING(whether to Gnome-VFS is available)
-if gnome-config --libs vfs > /dev/null 2>&1; then
-       	AC_MSG_RESULT(yes)
-	gnome_libs="$gnome_libs vfs"
-else
-        AC_MSG_ERROR([Gnome-VFS library is needed to build balsa])
-fi
 
 dnl ###########################################################################
 dnl All the linguas, all the time.
@@ -198,24 +175,42 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-dnl #########################################################################
-dnl  Check for LDAP if available.
-dnl  For now, only look for OpenLDAP?
-dnl #########################################################################
+dnl ###########################################################################
+dnl Use threading?
+dnl ###########################################################################
 
-AC_ARG_ENABLE([ldap], [  --enable-ldap Use OpenLDAP if available (experimental) [default=no]],[
-	use_ldap=$enableval
+AC_ARG_ENABLE(threads, [  --enable-threads        Use threading for mail retrieval [default=yes]],[
+	use_threads=$enableval
 ],[
-	use_ldap=no
+	use_threads=yes
 ])
-AC_MSG_CHECKING(whether to use LDAP)
-if test x"$use_ldap" = xyes ; then
+
+AC_MSG_CHECKING([whether to use threads])
+if test x"$use_threads" = xyes ; then
 	AC_MSG_RESULT([yes])
-	AC_CHECK_LIB(ldap, ldap_search, AC_DEFINE(ENABLE_LDAP) LIBS="-lldap -llber $LIBS", AC_MSG_ERROR([*** You enabled LDAP but ldap library is not found.]), -llber)
+	if test ! -z `$GLIB_CONFIG --help 2>&1 |grep 'gthread'` ; then
+		THREAD_CFLAGS=`$GLIB_CONFIG --cflags gthread`
+		THREAD_LIBS=`$GLIB_CONFIG --libs gthread`
+		CFLAGS="$CFLAGS $THREAD_CFLAGS"
+		LIBS="$LIBS $THREAD_LIBS"
+		AC_DEFINE(BALSA_USE_THREADS,1)
+	else
+		AC_MSG_ERROR([Balsa requires GThread from GLib to use threading.])
+	fi
 else
 	AC_MSG_RESULT([no])
 fi
 
+dnl ###########################################################################
+dnl Check for gnome-vfs
+dnl ###########################################################################
+AC_MSG_CHECKING(whether to Gnome-VFS is available)
+if gnome-config --libs vfs > /dev/null 2>&1; then
+    AC_MSG_RESULT(yes)
+    gnome_libs="$gnome_libs vfs"
+else
+    AC_MSG_ERROR([Gnome-VFS(-devel) library is needed to build balsa])
+fi
 
 dnl ##########################################################################
 dnl Check for GtkHTML if available
@@ -325,6 +320,24 @@ AC_DEFINE_UNQUOTED( GNOME_LIB_PREFIX, "$GNOME_LIB_PREFIX" )
 AC_DEFINE_UNQUOTED( GNOME_DATA_PREFIX, "$GNOME_DATA_PREFIX" )
 AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES` ) 
 dnl bleah
+
+dnl #########################################################################
+dnl  Check for LDAP if available.
+dnl  For now, only look for OpenLDAP?
+dnl #########################################################################
+
+AC_ARG_ENABLE([ldap], [  --enable-ldap Use OpenLDAP if available (experimental) [default=no]],[
+	use_ldap=$enableval
+],[
+	use_ldap=no
+])
+AC_MSG_CHECKING(whether to use LDAP)
+if test x"$use_ldap" = xyes ; then
+	AC_MSG_RESULT([yes])
+	AC_CHECK_LIB(ldap, ldap_search, AC_DEFINE(ENABLE_LDAP) LIBS="-lldap -llber $LIBS", AC_MSG_ERROR([*** You enabled LDAP but ldap library is not found.]), -llber)
+else
+	AC_MSG_RESULT([no])
+fi
 
 dnl ##########################################################################
 dnl Have ESMTP ?
@@ -476,17 +489,18 @@ if test "x$with_ssl" != xno  ; then
            done
 	fi
    fi
-   if test -z "$ssldir"; then
-      AC_MSG_ERROR([SSL requested but no SSL headers found.])
-   else
-      AC_MSG_RESULT(yes)
-      LIBS="$LIBS -lssl -lcrypto"
-      if test "x$ssldir" != xdefault ; then
-         CPPFLAGS="-I${ssldir}/include $CPPFLAGS"
-      fi
-      ac_cv_path_openssl=$ssldir
-      AC_DEFINE(USE_SSL)
-   fi
+fi
+
+if test "x$with_ssl" != xno && test -z "$ssldir"; then
+   AC_MSG_ERROR([SSL requested but no SSL headers found.])
+else
+        AC_MSG_RESULT(yes)
+        LIBS="$LIBS -lssl -lcrypto"
+	if test "x$ssldir" != xdefault ; then
+		CPPFLAGS="-I${ssldir}/include $CPPFLAGS"
+	fi
+	ac_cv_path_openssl=$ssldir
+	AC_DEFINE(USE_SSL)
 fi
 
 dnl ##########################################################################
@@ -530,31 +544,16 @@ fi
 AM_CONDITIONAL(USE_GSS, test x$gssdir != xno)
 
 dnl ###########################################################################
-dnl Use threading?
-dnl thread libraries always go at the end.
+dnl Test whether jw is installed
 dnl ###########################################################################
-
-AC_ARG_ENABLE(threads, [  --enable-threads        Use threading for mail retrieval [default=yes]],[
-	use_threads=$enableval
-],[
-	use_threads=yes
-])
-
-AC_MSG_CHECKING([whether to use threads])
-if test x"$use_threads" = xyes ; then
-	AC_MSG_RESULT([yes])
-	if test ! -z `$GLIB_CONFIG --help 2>&1 |grep 'gthread'` ; then
-		THREAD_CFLAGS=`$GLIB_CONFIG --cflags gthread`
-		THREAD_LIBS=`$GLIB_CONFIG --libs gthread`
-		CFLAGS="$CFLAGS $THREAD_CFLAGS"
-		LIBS="$LIBS $THREAD_LIBS"
-		AC_DEFINE(BALSA_USE_THREADS,1)
-	else
-		AC_MSG_ERROR([Balsa requires GThread from GLib to use threading.])
-	fi
+AC_PATH_PROG(JW,jw,no)
+if test x$JW = xno; then
+  HAVE_JW="no"
 else
-	AC_MSG_RESULT([no])
+  HAVE_JW="yes"
 fi
+AM_CONDITIONAL(HAVE_JW, test "x$HAVE_JW" = "xyes")
+AC_SUBST(HAVE_JW)
 
 dnl ###########################################################################
 dnl turn warnings into errors to enforce clean code
@@ -584,12 +583,11 @@ if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
 fi
 
 dnl ###########################################################################
-dnl Check for CVS nature, GOB, warnings + extra program checks
+dnl Check for CVS nature, for warnings + extra program checks
 dnl have it at the end so configure tests do not die on warnings.
 dnl ###########################################################################
 
 if test -d "${srcdir}/CVS" ; then
-	GOB_CHECK(0.93.4)
 	BALSA_FROM_CVS=yes
 	CFLAGS="$CFLAGS -Werror"
 else
@@ -598,6 +596,15 @@ fi
 
 AC_MSG_CHECKING([for CVS information])
 AC_MSG_RESULT($BALSA_FROM_CVS)
+
+dnl ##########################################################################
+dnl Things needed by CVS user
+dnl ##########################################################################
+
+if test x"$BALSA_FROM_CVS" = xyes ; then
+	GOB_CHECK(0.93.4)
+        AC_SUBST(GOB)
+fi
 
 dnl ##########################################################################
 dnl Create files.

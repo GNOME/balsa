@@ -72,7 +72,8 @@ balsa_LDADD = \
 	-lpspell \
 	-lltdl \
 	$(INTLLIBS) \
-	$(PCRE_LIBS)
+	$(PCRE_LIBS) \
+	$(PTHREAD_LIB)
 
 dist-hook:
 	mkdir $(distdir)/pixmaps

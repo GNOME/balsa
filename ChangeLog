@@ -1,3 +1,7 @@
+2001-01-22  Gediminas Paulauskas  <menesis@delfi.lt>
+	
+	* libbalsa/send.c: marked "Sending mail" for translating.
+		
 2001-01-22  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Implement threading configuration.

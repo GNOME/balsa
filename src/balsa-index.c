@@ -369,11 +369,8 @@ balsa_index_add (BalsaIndex * bindex,
     return;
 
   text[0] = buff1;
-
   text[1] = flag_str (message->flags);
-
   text[2] = NULL;		/* attachments */
-
   text[3] = buff2;
 
   if (message->from)

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2000-07-17 00:55+0200\n"
+"POT-Creation-Date: 2000-07-28 01:31+0200\n"
 "PO-Revision-Date: 2000-07-07 12:30+0200\n"
 "Last-Translator: Andraz Tori <andraz.tori1@guest.arnes.si>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
@@ -373,7 +373,7 @@ msgstr "Datum"
 msgid "To"
 msgstr "Za"
 
-#: src/balsa-mblist.c:225 src/mailbox-conf.c:1165
+#: src/balsa-mblist.c:225 src/mailbox-conf.c:1197
 msgid "Mailbox"
 msgstr "Po¹tni predal"
 
@@ -560,7 +560,7 @@ msgstr "Telesu sporoèila"
 msgid "Match string:"
 msgstr "Najdi niz:"
 
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:300 src/mailbox-conf.c:1130
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1162
 #: src/pref-manager.c:890
 msgid "Add"
 msgstr "Dodaj"
@@ -650,7 +650,7 @@ msgid "Balsa Filters"
 msgstr "Balsini Filtri"
 
 #. FIXME: Should prompt to remove file aswell
-#: src/mailbox-conf.c:180
+#: src/mailbox-conf.c:181
 #, c-format
 msgid ""
 "This will remove the mailbox %s and it's files permanently from your "
@@ -661,7 +661,7 @@ msgstr ""
 "sistema.\n"
 "Ste preprièani, da ¾elite odstraniti ta predal?"
 
-#: src/mailbox-conf.c:185
+#: src/mailbox-conf.c:186
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
@@ -672,126 +672,118 @@ msgstr ""
 "Kasneje lahko uporabite \"Dodaj predal\" za dostop do tega predala\n"
 "Ste preprièani, da ¾elite odstraniti ta predal?"
 
-#: src/mailbox-conf.c:213
+#: src/mailbox-conf.c:214
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Oopa! po¹tni predal ni bil najden v balsa_app.mailbox vozli¹èih?\n"
 
-#: src/mailbox-conf.c:255
+#: src/mailbox-conf.c:268
 msgid "Mailbox Configurator"
 msgstr "Nastavitev Po¹tnega Predala"
 
-#: src/mailbox-conf.c:310 src/mailbox-conf.c:1124
+#: src/mailbox-conf.c:330 src/mailbox-conf.c:1156
 msgid "Update"
 msgstr "Posodobi"
 
-#: src/mailbox-conf.c:442 src/mailbox-conf.c:448 src/mailbox-conf.c:472
+#: src/mailbox-conf.c:462 src/mailbox-conf.c:468 src/mailbox-conf.c:492
 msgid "You need to fill in the Mailbox Name field."
 msgstr "Vpisati morate Ime predala."
 
-#: src/mailbox-conf.c:451
+#: src/mailbox-conf.c:471
 msgid "You need to fill in the folderpath field."
 msgstr "Vpisati morate Imenik mape."
 
-#: src/mailbox-conf.c:453
+#: src/mailbox-conf.c:473
 msgid "You need to fill in the IMAP Server field"
 msgstr "Vpisati morate IMAP Stre¾nik"
 
-#: src/mailbox-conf.c:455
+#: src/mailbox-conf.c:475
 msgid "You need to fill in the username field"
 msgstr "Vpisati morate uporabni¹ko ime"
 
-#: src/mailbox-conf.c:457
-msgid "You need to fill in the password field"
-msgstr "Vpisati morate geslo"
-
-#: src/mailbox-conf.c:459
+#: src/mailbox-conf.c:479
 msgid "You need to fill in the port field"
 msgstr "Vpisati morate vrata"
 
-#: src/mailbox-conf.c:476
+#: src/mailbox-conf.c:496
 msgid "You need to fill in the user field."
 msgstr "Vpisati morate polje uporabnik."
 
-#: src/mailbox-conf.c:480
-msgid "You need to fill in the password field."
-msgstr "Vpisati morate geslo."
-
-#: src/mailbox-conf.c:484
+#: src/mailbox-conf.c:504
 msgid "You need to fill in the server field."
 msgstr "Vpisati morate stre¾nik."
 
-#: src/mailbox-conf.c:488
+#: src/mailbox-conf.c:508
 msgid "You need to fill in the port field."
 msgstr "Vpisati morate vrata."
 
-#: src/mailbox-conf.c:492
+#: src/mailbox-conf.c:512
 msgid "Some of the fields are blank."
 msgstr "Nekatera polja so prazna."
 
-#: src/mailbox-conf.c:626
+#: src/mailbox-conf.c:647
 #, c-format
 msgid "%s on %s"
 msgstr "%s na %s"
 
-#: src/mailbox-conf.c:815
+#: src/mailbox-conf.c:847
 msgid "New mailbox type:"
 msgstr "Tip novega predala:"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:821
+#: src/mailbox-conf.c:853
 msgid "Local mailbox"
 msgstr "Lokalni po¹tni predal"
 
-#: src/mailbox-conf.c:831
+#: src/mailbox-conf.c:863
 msgid "Single IMAP folder"
 msgstr "Ena sama mapa IMAP"
 
-#: src/mailbox-conf.c:840
+#: src/mailbox-conf.c:872
 msgid "IMAP folder set"
 msgstr "Mno¾ica map IMAP"
 
 #. mailbox name
-#: src/mailbox-conf.c:865 src/mailbox-conf.c:900 src/mailbox-conf.c:1017
+#: src/mailbox-conf.c:897 src/mailbox-conf.c:932 src/mailbox-conf.c:1049
 msgid "Mailbox Name:"
 msgstr "Ime Predala:"
 
 #. path to file
-#: src/mailbox-conf.c:875
+#: src/mailbox-conf.c:907
 msgid "Mailbox path:"
 msgstr "Pot predala:"
 
 #. pop server
-#: src/mailbox-conf.c:917 src/mailbox-conf.c:1027
+#: src/mailbox-conf.c:949 src/mailbox-conf.c:1059
 msgid "Server:"
 msgstr "Stre¾nik:"
 
 #. pop port
-#: src/mailbox-conf.c:936 src/mailbox-conf.c:1041
+#: src/mailbox-conf.c:968 src/mailbox-conf.c:1073
 msgid "Port:"
 msgstr "Vrata:"
 
 #. username
-#: src/mailbox-conf.c:955 src/mailbox-conf.c:1056
+#: src/mailbox-conf.c:987 src/mailbox-conf.c:1088
 msgid "Username:"
 msgstr "Uporabni¹ko ime:"
 
 #. password field
-#: src/mailbox-conf.c:972 src/mailbox-conf.c:1071
+#: src/mailbox-conf.c:1004 src/mailbox-conf.c:1103
 msgid "Password:"
 msgstr "Geslo:"
 
 #. toggle for check
-#: src/mailbox-conf.c:987 src/main-window.c:399
+#: src/mailbox-conf.c:1019 src/main-window.c:399
 msgid "Check"
 msgstr "Preveri"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:995
+#: src/mailbox-conf.c:1027
 msgid "Delete from server"
 msgstr "Zbri¹i s sre¾nika"
 
-#: src/mailbox-conf.c:1084
+#: src/mailbox-conf.c:1116
 msgid "Folder path:"
 msgstr "Pot mape:"
 
@@ -1138,8 +1130,8 @@ msgstr "Oznaèi kot smeti"
 msgid "Mark as Draftbox"
 msgstr "Oznaèi kot osnutek"
 
-#: src/mblist-window.c:449 src/mblist-window.c:465 src/mblist-window.c:484
-#: src/mblist-window.c:499
+#: src/mblist-window.c:446 src/mblist-window.c:462 src/mblist-window.c:481
+#: src/mblist-window.c:496
 msgid "No mailbox selected."
 msgstr "Noben po¹tni predal ni izbran."
 
@@ -1741,17 +1733,17 @@ msgstr "Ne morem izvr¹iti ukaza za tiskanje."
 msgid "Error executing lpr"
 msgstr "Napaka ob izvajanju lpr (programa za tiskanje)"
 
-#: libbalsa/mailbox_imap.c:201
+#: libbalsa/mailbox_imap.c:195
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: Odpiram %s, ©tevec referenc: %d\n"
 
-#: libbalsa/mailbox_local.c:215
+#: libbalsa/mailbox_local.c:218
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxLocal: Odpiram %s, ©tevec referenc: %d\n"
 
-#: libbalsa/mailbox_pop3.c:173
+#: libbalsa/mailbox_pop3.c:168
 #, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: Odpiram %s, ©tevec referenc: %d\n"
@@ -1786,7 +1778,8 @@ msgstr "Nisem mogel ustvariti zaèasne datoteke!"
 #.
 #: libmutt/mbox.c:757
 msgid "sync: mbox modified, but no modified messages! (report this bug)"
-msgstr "sync: mbox spremenjen, a ni spremenjenih sporoèil! (sporoèite tega hro¹èa)"
+msgstr ""
+"sync: mbox spremenjen, a ni spremenjenih sporoèil! (sporoèite tega hro¹èa)"
 
 #: libmutt/mbox.c:787
 msgid "Writing messages... %d (%d%%)"
@@ -1913,6 +1906,12 @@ msgstr "%d ohranjenih."
 #: libmutt/mx.c:1375
 msgid "Can't write message"
 msgstr "Ne mroem pisati sporoèila"
+
+#~ msgid "You need to fill in the password field"
+#~ msgstr "Vpisati morate geslo"
+
+#~ msgid "You need to fill in the password field."
+#~ msgstr "Vpisati morate geslo."
 
 #~ msgid "An error occurred when attempting to creat(2) the file \"%s\"."
 #~ msgstr "Zgodila se je napaka ob poskusu ukaza creat(2) na datoteki \"%s\"."

@@ -1,4 +1,4 @@
-SUBDIRS = po intl support src macros
+SUBDIRS = po intl src macros
 
 ## to automatically rebuild aclocal.m4 if any of the macros in
 ## `macros/' change

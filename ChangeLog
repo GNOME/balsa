@@ -1,3 +1,9 @@
+Mon Mar  9 19:31:23 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* Makefile.am (SUBDIRS): Don't build in support directory.
+	* configure.in: Don't call GNOME_SUPPORT_CHECKS.  Don't create
+	support/Makefile.
+
 1998-02-19  Federico Mena Quintero  <federico@nuclecu.unam.mx>
 
 	* src/main.c (main): Added app_id "balsa".

@@ -17,7 +17,6 @@ AM_ACLOCAL_INCLUDE(macros)
 
 
 GNOME_INIT
-GNOME_SUPPORT_CHECKS
 
 
 AC_ISC_POSIX
@@ -59,7 +58,6 @@ AC_OUTPUT([
 Makefile 
 po/Makefile.in
 macros/Makefile
-support/Makefile
 intl/Makefile
 src/Makefile
 ],[sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])

@@ -1244,13 +1244,11 @@ static void
 messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
 			   gint flag)
 {
-    GList *lst;
-
     if(!HAVE_MAILBOX_LOCKED(mb))
 	g_warning("messages changed but mailbox not locked!");
 
-    for (lst = messages; lst; lst = lst->next) {
-	LibBalsaMessage *msg = LIBBALSA_MESSAGE(lst->data);
+    for (; messages; messages = messages->next) {
+	LibBalsaMessage *msg = LIBBALSA_MESSAGE(messages->data);
 
 	if (flag == LIBBALSA_MESSAGE_FLAG_DELETED
 	    && LIBBALSA_MESSAGE_IS_UNREAD(msg)) {
@@ -1265,7 +1263,6 @@ messages_status_changed_cb(LibBalsaMailbox * mb, GList * messages,
 	    else
 		--mb->unread_messages;
 	}
-	libbalsa_message_set_icons(msg);
 	libbalsa_mailbox_msgno_changed(mb, msg->msgno);
     }
 
@@ -1459,6 +1456,7 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
 {
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_assert(HAVE_MAILBOX_LOCKED(mailbox));
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->
 	messages_change_flags(mailbox, msgcnt, msgnos, set, clear);

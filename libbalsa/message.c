@@ -512,11 +512,7 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
     if (d) {
         libbalsa_messages_change_flag (d, LIBBALSA_MESSAGE_FLAG_DELETED,
                                        TRUE);
-        /* threading here is pointless: dest might not have discovered
-         * yet added headers. Check later will do that, and threading
-         * as well.
-         libbalsa_mailbox_set_threading(dest, dest->view->threading_type);
-        */
+	g_list_free(d);
     }
 
     libbalsa_mailbox_check(dest);
@@ -664,7 +660,6 @@ libbalsa_messages_change_flag(GList * messages,
                               LibBalsaMessageFlag flag,
                               gboolean set)
 {
-    GList *list;
     GArray *msgnos;
     LibBalsaMessage * message;
     LibBalsaMailbox *mbox;
@@ -675,8 +670,8 @@ libbalsa_messages_change_flag(GList * messages,
 
     /* Construct the list of messages that actually change state */
     msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
-    for (list = messages; list; list = list->next) {
-	message = LIBBALSA_MESSAGE(list->data);
+    for (; messages; messages = messages->next) {
+	message = LIBBALSA_MESSAGE(messages->data);
  	if ( (set && !(message->flags & flag)) ||
              (!set && (message->flags & flag)) )
 	    g_array_append_val(msgnos, message->msgno);

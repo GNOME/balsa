@@ -115,10 +115,13 @@ static const gchar* libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 static int libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
 					     LibBalsaMessage * message );
 
-void libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
-						guint msgno,
-						LibBalsaMessageFlag set,
-						LibBalsaMessageFlag clear);
+static void libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox *
+						       mailbox,
+						       guint msgno,
+						       LibBalsaMessageFlag
+						       set,
+						       LibBalsaMessageFlag
+						       clear);
 static gboolean lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox,
                                               unsigned msgcnt,
                                               unsigned *seqno,
@@ -512,23 +515,26 @@ imap_flags_cb(unsigned seqno, LibBalsaMailboxImap *mimap)
     ImapMessage *imsg  = imap_mbox_handle_get_msg(mimap->handle, seqno);
     if(msg_info->message) {
 	LibBalsaMessageFlag old_flags = msg_info->message->flags;
+	LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
 
         lbimap_update_flags(msg_info->message, imsg);
         libbalsa_message_set_icons(msg_info->message);
-        libbalsa_mailbox_msgno_changed(LIBBALSA_MAILBOX(mimap), seqno);
+        libbalsa_mailbox_msgno_changed(mailbox, seqno);
 
 	if ((old_flags ^ msg_info->message->flags) &
 	    LIBBALSA_MESSAGE_FLAG_NEW) {
 	    GList *list = g_list_prepend(NULL, msg_info->message);
-	    g_assert(HAVE_MAILBOX_LOCKED(LIBBALSA_MAILBOX(mimap)));
-	    libbalsa_mailbox_messages_status_changed(LIBBALSA_MAILBOX
-						     (mimap), list,
+	    g_assert(HAVE_MAILBOX_LOCKED(mailbox));
+	    libbalsa_mailbox_messages_status_changed(mailbox, list,
 						     LIBBALSA_MESSAGE_FLAG_NEW);
 	    g_list_free_1(list);
 	}
-	libbalsa_mailbox_invalidate_iters(LIBBALSA_MAILBOX(mimap));
+	libbalsa_mailbox_invalidate_iters(mailbox);
     }
 }
+
+/* Forward reference. */
+static void lbm_imap_get_unseen(LibBalsaMailboxImap * mimap);
 
 static void
 imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
@@ -537,15 +543,17 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     if(cnt<mimap->messages_info->len) { /* remove messages */
         printf("%s: expunge ignored?\n", __func__);
-    } else { /* new messages arrived */
+    } else if (cnt > mimap->messages_info->len) { /* new messages arrived */
         unsigned i;
-        for(i=mimap->messages_info->len+1; i<=cnt; i++) {
-            struct message_info a = {0};
+	struct message_info a = {0};
+	i=mimap->messages_info->len+1;
+        do {
             g_array_append_val(mimap->messages_info, a);
             libbalsa_mailbox_msgno_inserted(mailbox, i);
-        }
-	/* invalidate iters*/
-	LIBBALSA_MAILBOX(mimap)->stamp++;
+        } while (++i <= cnt);
+	libbalsa_mailbox_invalidate_iters(mailbox);
+	libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
+	lbm_imap_get_unseen(mimap);
     }
 }
 
@@ -809,11 +817,9 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	return;
     }
 
-    if (LIBBALSA_MAILBOX_IMAP(mailbox)->handle) {
+    if (LIBBALSA_MAILBOX_IMAP(mailbox)->handle)
 	libbalsa_mailbox_imap_noop(LIBBALSA_MAILBOX_IMAP(mailbox));
-	libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
-	lbm_imap_get_unseen(LIBBALSA_MAILBOX_IMAP(mailbox));
-    } else
+    else
 	g_warning("mailbox has open_ref>0 but no handle!\n");
 }
 
@@ -1445,6 +1451,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     }
 
     g_return_val_if_fail(imsg, FALSE);
+    g_return_val_if_fail(imsg->envelope, FALSE);
     lbimap_update_flags(message, imsg);
 
     lb_set_headers(message->headers, imsg->envelope, FALSE);
@@ -1853,12 +1860,13 @@ transform_flags(LibBalsaMessageFlag set, LibBalsaMessageFlag clr,
 	*flg_clr |= IMSGF_DELETED;
 }
 
-void
+static void
 libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
                                            guint msgno,
 					   LibBalsaMessageFlag set,
 					   LibBalsaMessageFlag clear)
 {
+#if 0
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     ImapMboxHandle *handle = mimap->handle;
     ImapMsgFlag flag_set, flag_clr;
@@ -1868,6 +1876,9 @@ libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
         imap_mbox_store_flag(handle, 1, &msgno, flag_set, 1);
     if(flag_clr)
         imap_mbox_store_flag(handle, 1, &msgno, flag_clr, 0);
+#else
+    g_assert_not_reached();
+#endif
 }
 
 static gboolean

@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-01-17 02:55+0100\n"
-"PO-Revision-Date: 2003-01-17 10:49+0200\n"
+"POT-Creation-Date: 2003-01-21 11:01+0100\n"
+"PO-Revision-Date: 2003-01-21 15:59+0200\n"
 "Last-Translator: Artis Trops <hornet@navigator.lv>\n"
 "Language-Team: Latvian <ll10nt@os.lv>\n"
 "MIME-Version: 1.0\n"
@@ -145,14 +145,14 @@ msgstr "Klūda pārvietojot vēstules"
 #: libbalsa/identity.c:87
 #: src/balsa-index-threading.c:804
 #: src/balsa-index-threading.c:806
-#: src/sendmsg-window.c:2310
-#: src/sendmsg-window.c:2311
+#: src/sendmsg-window.c:2312
+#: src/sendmsg-window.c:2313
 msgid "Re:"
 msgstr "Re:"
 
 #: libbalsa/identity.c:88
-#: src/sendmsg-window.c:2339
-#: src/sendmsg-window.c:2340
+#: src/sendmsg-window.c:2341
+#: src/sendmsg-window.c:2342
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -1291,17 +1291,6 @@ msgstr "Iziet"
 msgid "Help"
 msgstr "Palīdzība"
 
-#: libmutt/mutt_tunnel.c:73
-#, c-format
-msgid "Connecting with \"%s\"..."
-msgstr "Savienojos ar \"%s\"..."
-
-#: libmutt/mutt_tunnel.c:150
-#: libmutt/mutt_tunnel.c:166
-#, c-format
-msgid "Tunnel error talking to %s: %s"
-msgstr "Tuneļa kļūda sazinoties ar %s: %s"
-
 #: libmutt/mh.c:608
 #, c-format
 msgid "Reading %s... %d"
@@ -1561,8 +1550,8 @@ msgid "Enable _TLS"
 msgstr "Aktivizēt _TLS"
 
 #: src/address-book-config.c:553
-#: src/folder-conf.c:167
-#: src/folder-conf.c:419
+#: src/folder-conf.c:183
+#: src/folder-conf.c:472
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "Kļūda parādot %s: %s\n"
@@ -1736,7 +1725,7 @@ msgstr "_Noglabāt Adresi..."
 
 #: src/balsa-index.c:2040
 #: src/filter-edit-dialog.c:216
-#: src/mailbox-node.c:839
+#: src/mailbox-node.c:864
 #: src/main-window.c:528
 #: src/pref-manager.c:1525
 #: src/pref-manager.c:2618
@@ -1841,7 +1830,7 @@ msgstr "Kam:"
 #. cc:
 #: src/balsa-message.c:786
 #: src/print.c:355
-#: src/sendmsg-window.c:1830
+#: src/sendmsg-window.c:1831
 #: src/store-address.c:277
 msgid "Cc:"
 msgstr "Cc:"
@@ -1849,7 +1838,7 @@ msgstr "Cc:"
 #. bcc:
 #: src/balsa-message.c:787
 #: src/print.c:356
-#: src/sendmsg-window.c:1835
+#: src/sendmsg-window.c:1836
 #: src/store-address.c:278
 msgid "Bcc:"
 msgstr "Bcc:"
@@ -1915,7 +1904,7 @@ msgid "Mail server: %s\n"
 msgstr "Pasta serveris: %s\n"
 
 #: src/balsa-message.c:1003
-#: src/sendmsg-window.c:2121
+#: src/sendmsg-window.c:2122
 #, c-format
 msgid "Subject: %s\n"
 msgstr "Temats: %s\n"
@@ -2143,7 +2132,7 @@ msgstr "_Rumpis"
 #. To:
 #: src/filter-edit-callbacks.c:999
 #: src/main-window.c:2709
-#: src/sendmsg-window.c:1819
+#: src/sendmsg-window.c:1820
 msgid "_To:"
 msgstr "_Kam:"
 
@@ -2252,7 +2241,7 @@ msgstr "UN"
 
 #. new button
 #: src/filter-edit-dialog.c:210
-#: src/mailbox-node.c:811
+#: src/mailbox-node.c:836
 #: src/main-window.c:284
 msgid "_New"
 msgstr "_Jauns"
@@ -2368,72 +2357,72 @@ msgstr "_Lejup"
 msgid "The filters dialog is opened, close it before you can run filters on any mailbox"
 msgstr "Filtru dialogs ir atvērts, aizveriet to pirms varat palaist filtrus uz jebkuras no pastkastītēm"
 
-#: src/folder-conf.c:191
+#: src/folder-conf.c:237
 msgid "Remote IMAP folder"
 msgstr "Attālināta IMAP mape"
 
-#: src/folder-conf.c:194
-#: src/folder-conf.c:573
+#: src/folder-conf.c:240
+#: src/folder-conf.c:626
 #: src/mailbox-conf.c:446
 msgid "_Update"
 msgstr "_Atjaunināt"
 
-#: src/folder-conf.c:194
-#: src/folder-conf.c:573
+#: src/folder-conf.c:240
+#: src/folder-conf.c:626
 msgid "_Create"
 msgstr "_Izveidot"
 
-#: src/folder-conf.c:201
+#: src/folder-conf.c:255
 msgid "Remote IMAP folder set"
 msgstr "Attālinātas IMAP mapes iestatīšana"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:208
+#: src/folder-conf.c:262
 msgid "Descriptive _Name:"
 msgstr "Aprakstošais _Nosaukums:"
 
 #. pop server
-#: src/folder-conf.c:214
+#: src/folder-conf.c:268
 #: src/mailbox-conf.c:895
 #: src/mailbox-conf.c:983
 msgid "_Server:"
 msgstr "_Serveris:"
 
 #. username
-#: src/folder-conf.c:220
+#: src/folder-conf.c:274
 #: src/mailbox-conf.c:902
 msgid "Use_r name:"
 msgstr "Lietotāj_a vārds:"
 
-#: src/folder-conf.c:226
+#: src/folder-conf.c:280
 msgid "_Remember password"
 msgstr "_Atcerēties paroli"
 
-#: src/folder-conf.c:231
+#: src/folder-conf.c:285
 msgid "_Password:"
 msgstr "_Parole"
 
-#: src/folder-conf.c:236
+#: src/folder-conf.c:290
 msgid "Subscribed _folders only"
 msgstr "Pierakstītās _mapes tikai"
 
-#: src/folder-conf.c:238
+#: src/folder-conf.c:292
 msgid "_Always show INBOX"
 msgstr "_Vienmēr parādīt INBOX"
 
-#: src/folder-conf.c:241
+#: src/folder-conf.c:295
 msgid "_Prefix"
 msgstr "_Priedēklis"
 
-#: src/folder-conf.c:247
+#: src/folder-conf.c:301
 msgid "Use SS_L (IMAPS)"
 msgstr "Lietot SS_L (IMAPS)"
 
-#: src/folder-conf.c:367
+#: src/folder-conf.c:420
 msgid "Select parent folder"
 msgstr "Izvēlieties senča mapi"
 
-#: src/folder-conf.c:444
+#: src/folder-conf.c:497
 #, c-format
 msgid ""
 "Renaming INBOX is special!\n"
@@ -2448,68 +2437,68 @@ msgstr ""
 "INBOX un tās apakšmapes paliks.\n"
 "Ko jūs vēlētos darīt?"
 
-#: src/folder-conf.c:451
+#: src/folder-conf.c:504
 msgid "Question"
 msgstr "Jautājums"
 
-#: src/folder-conf.c:454
+#: src/folder-conf.c:507
 msgid "Rename INBOX"
 msgstr "Pārsaukt INBOX"
 
-#: src/folder-conf.c:455
+#: src/folder-conf.c:508
 #: src/toolbar-factory.c:132
 msgid "Cancel"
 msgstr "Atsaukt"
 
-#: src/folder-conf.c:546
+#: src/folder-conf.c:599
 msgid "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
 msgstr "IMAP mape, kas nav pastkastīte\n"
 "nav rekvizītu, kas var tikt mainīti."
 
-#: src/folder-conf.c:570
+#: src/folder-conf.c:623
 msgid "Remote IMAP subfolder"
 msgstr "Pārsaukt IMAP apakšmapi"
 
-#: src/folder-conf.c:582
+#: src/folder-conf.c:635
 msgid "Rename or move subfolder"
 msgstr "Pārsaukt vai pārvietot apakšmapi"
 
-#: src/folder-conf.c:583
+#: src/folder-conf.c:636
 msgid "Create subfolder"
 msgstr "Izveidot apakšmapi"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:590
+#: src/folder-conf.c:643
 msgid "_Folder name:"
 msgstr "_Mapes nosaukums:"
 
-#: src/folder-conf.c:596
+#: src/folder-conf.c:649
 msgid "_Subfolder of:"
 msgstr "_Apakšmape:"
 
-#: src/folder-conf.c:601
+#: src/folder-conf.c:654
 msgid "Browse..."
 msgstr "Lūkoties..."
 
-#: src/folder-conf.c:609
+#: src/folder-conf.c:662
 #: src/mailbox-conf.c:872
 #: src/mailbox-conf.c:1037
 msgid "_Identity:"
 msgstr "_Identitāte:"
 
-#: src/folder-conf.c:635
+#: src/folder-conf.c:690
 msgid "This folder is not stored in configuration.I do not yet know how to remove it from remote server."
 msgstr "Šī mape nav noglabāta konfigurācijā. Es vēl nezinu, kā to izņemt no attālinātā servera."
 
-#: src/folder-conf.c:645
+#: src/folder-conf.c:700
 #, c-format
 msgid "This will remove the folder \"%s\" from the list.\n"
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
 msgstr "Šis izņems mapi \"%s\" no saraksta.\n"
 "Jūs vēlāk variet lietot \"Jauna IMAP Mape\", lai pievienotu šo mapi atkal.\n"
 
-#: src/folder-conf.c:650
+#: src/folder-conf.c:705
 msgid "Confirm"
 msgstr "Apstiprināt"
 
@@ -2687,85 +2676,85 @@ msgstr "Mapes rediģējums, kas jāraksta"
 msgid "Scanning %s. Please wait..."
 msgstr "Skanēju %s. Lūdzu uzgaidiet..."
 
-#: src/mailbox-node.c:796
+#: src/mailbox-node.c:821
 msgid "Local _mbox mailbox..."
 msgstr "Lokālā _mbox pastkastīte..."
 
-#: src/mailbox-node.c:798
+#: src/mailbox-node.c:823
 msgid "Local Mail_dir mailbox..."
 msgstr "Lokālā Mail_dir pastkastīte..."
 
-#: src/mailbox-node.c:800
+#: src/mailbox-node.c:825
 msgid "Local M_H mailbox..."
 msgstr "Lokālā M_H pastkastīte..."
 
-#: src/mailbox-node.c:802
+#: src/mailbox-node.c:827
 msgid "Remote _IMAP mailbox..."
 msgstr "Attālinātā _IMAP pastkastīte..."
 
-#: src/mailbox-node.c:805
+#: src/mailbox-node.c:830
 msgid "Remote IMAP _folder..."
 msgstr "Attālinātā IMAP _mape..."
 
-#: src/mailbox-node.c:807
+#: src/mailbox-node.c:832
 msgid "Remote IMAP _subfolder..."
 msgstr "Attālinātā IMAP _apakšmape..."
 
 #. clicked on the empty space
-#: src/mailbox-node.c:818
-#: src/mailbox-node.c:850
-#: src/mailbox-node.c:871
+#: src/mailbox-node.c:843
+#: src/mailbox-node.c:875
+#: src/mailbox-node.c:896
 msgid "_Rescan"
 msgstr "_Pārskanēt"
 
-#: src/mailbox-node.c:827
+#: src/mailbox-node.c:852
 msgid "_Open"
 msgstr "_Atvērt"
 
-#: src/mailbox-node.c:830
+#: src/mailbox-node.c:855
 #: src/main-window.c:612
 msgid "_Close"
 msgstr "_Aizvērt"
 
-#: src/mailbox-node.c:836
+#: src/mailbox-node.c:861
 msgid "_Properties..."
 msgstr "_Rekvizīti..."
 
-#: src/mailbox-node.c:846
+#: src/mailbox-node.c:871
 msgid "_Subscribe"
 msgstr "_Pierakstīties"
 
-#: src/mailbox-node.c:848
+#: src/mailbox-node.c:873
 msgid "_Unsubscribe"
 msgstr "_Atrakstīties"
 
-#: src/mailbox-node.c:856
+#: src/mailbox-node.c:881
 msgid "Mark as _Inbox"
 msgstr "Marķēt kā _Iesūtni"
 
-#: src/mailbox-node.c:859
+#: src/mailbox-node.c:884
 msgid "_Mark as Sentbox"
 msgstr "_Marķēt kā Nosūtītās"
 
-#: src/mailbox-node.c:862
+#: src/mailbox-node.c:887
 msgid "Mark as _Trash"
 msgstr "Marķēt kā _Atkritumkasti"
 
-#: src/mailbox-node.c:865
+#: src/mailbox-node.c:890
 msgid "Mark as D_raftbox"
 msgstr "Marķēt kā Sa_gataves"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:868
+#: src/mailbox-node.c:893
 msgid "_Edit/Apply filters"
 msgstr "_Rediģēt/Pielietot filtrus"
 
-#: src/mailbox-node.c:965
+#: src/mailbox-node.c:990
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Lokālā pastkastīte %s ielādēta kā: %s\n"
 
-#: src/mailbox-node.c:990
+#: src/mailbox-node.c:1015
 #, c-format
 msgid "Local folder %s\n"
 msgstr "Lokālā mape %s\n"
@@ -4166,209 +4155,213 @@ msgid "_Keywords"
 msgstr "_Atslēgvārdi"
 
 #: src/sendmsg-window.c:318
-#: src/sendmsg-window.c:387
+#: src/sendmsg-window.c:389
 msgid "Brazilian"
 msgstr "Brazīļu"
 
 #: src/sendmsg-window.c:320
-#: src/sendmsg-window.c:389
+#: src/sendmsg-window.c:391
 msgid "Catalan"
 msgstr "Katalīniešu"
 
 #: src/sendmsg-window.c:322
-#: src/sendmsg-window.c:391
+#: src/sendmsg-window.c:393
 msgid "Chinese Simplified"
 msgstr "Ķīniešu Vienkāršotā"
 
 #: src/sendmsg-window.c:324
-#: src/sendmsg-window.c:393
+#: src/sendmsg-window.c:395
 msgid "Chinese Traditional"
 msgstr "Ķīniešu Tradicionālā"
 
 #: src/sendmsg-window.c:326
-#: src/sendmsg-window.c:395
+#: src/sendmsg-window.c:397
 msgid "Czech"
 msgstr "Čehu"
 
 #: src/sendmsg-window.c:328
-#: src/sendmsg-window.c:397
+#: src/sendmsg-window.c:399
 msgid "Danish"
 msgstr "Dāņu"
 
 #: src/sendmsg-window.c:330
-#: src/sendmsg-window.c:409
+#: src/sendmsg-window.c:411
 msgid "German"
 msgstr "Vācu"
 
 #: src/sendmsg-window.c:332
-#: src/sendmsg-window.c:399
+#: src/sendmsg-window.c:401
 msgid "Dutch"
 msgstr "Holandiešu"
 
 #. English -> American English, argh...
 #: src/sendmsg-window.c:335
-#: src/sendmsg-window.c:401
+#: src/sendmsg-window.c:403
 msgid "English"
 msgstr "Angļu"
 
 #: src/sendmsg-window.c:337
-#: src/sendmsg-window.c:403
+#: src/sendmsg-window.c:405
+msgid "Esperanto"
+msgstr "Esperanto"
+
+#: src/sendmsg-window.c:339
 msgid "Estonian"
 msgstr "Igauņu"
 
-#: src/sendmsg-window.c:339
-#: src/sendmsg-window.c:405
+#: src/sendmsg-window.c:341
+#: src/sendmsg-window.c:407
 msgid "Finnish"
 msgstr "Somu"
 
-#: src/sendmsg-window.c:341
-#: src/sendmsg-window.c:407
+#: src/sendmsg-window.c:343
+#: src/sendmsg-window.c:409
 msgid "French"
 msgstr "Franču"
 
-#: src/sendmsg-window.c:343
-#: src/sendmsg-window.c:411
+#: src/sendmsg-window.c:345
+#: src/sendmsg-window.c:413
 msgid "Greek"
 msgstr "Grieķu"
 
-#: src/sendmsg-window.c:345
-#: src/sendmsg-window.c:413
+#: src/sendmsg-window.c:347
+#: src/sendmsg-window.c:415
 msgid "Hebrew"
 msgstr "Ebreju"
 
-#: src/sendmsg-window.c:347
-#: src/sendmsg-window.c:415
+#: src/sendmsg-window.c:349
+#: src/sendmsg-window.c:417
 msgid "Hungarian"
 msgstr "Ungāru"
 
-#: src/sendmsg-window.c:349
-#: src/sendmsg-window.c:417
+#: src/sendmsg-window.c:351
+#: src/sendmsg-window.c:419
 msgid "Italian"
 msgstr "Itāļu"
 
-#: src/sendmsg-window.c:351
-#: src/sendmsg-window.c:419
+#: src/sendmsg-window.c:353
+#: src/sendmsg-window.c:421
 msgid "Japanese"
 msgstr "Japāņu"
 
-#: src/sendmsg-window.c:353
-#: src/sendmsg-window.c:425
+#: src/sendmsg-window.c:355
+#: src/sendmsg-window.c:427
 msgid "Korean"
 msgstr "Korejiešu"
 
-#: src/sendmsg-window.c:355
-#: src/sendmsg-window.c:427
+#: src/sendmsg-window.c:357
+#: src/sendmsg-window.c:429
 msgid "Latvian"
 msgstr "Latviešu"
 
-#: src/sendmsg-window.c:357
-#: src/sendmsg-window.c:429
+#: src/sendmsg-window.c:359
+#: src/sendmsg-window.c:431
 msgid "Lithuanian"
 msgstr "Lietuviešu"
 
-#: src/sendmsg-window.c:359
-#: src/sendmsg-window.c:431
+#: src/sendmsg-window.c:361
+#: src/sendmsg-window.c:433
 msgid "Norwegian"
 msgstr "Norvēģu"
 
-#: src/sendmsg-window.c:361
-#: src/sendmsg-window.c:433
+#: src/sendmsg-window.c:363
+#: src/sendmsg-window.c:435
 msgid "Polish"
 msgstr "Poļu"
 
-#: src/sendmsg-window.c:363
-#: src/sendmsg-window.c:435
+#: src/sendmsg-window.c:365
+#: src/sendmsg-window.c:437
 msgid "Portugese"
 msgstr "Portugāļu"
 
-#: src/sendmsg-window.c:365
-#: src/sendmsg-window.c:437
+#: src/sendmsg-window.c:367
+#: src/sendmsg-window.c:439
 msgid "Romanian"
 msgstr "Pumāņu"
 
-#: src/sendmsg-window.c:367
-#: src/sendmsg-window.c:439
+#: src/sendmsg-window.c:369
+#: src/sendmsg-window.c:441
 msgid "Russian (ISO)"
 msgstr "Krievu (ISO)"
 
-#: src/sendmsg-window.c:369
-#: src/sendmsg-window.c:441
+#: src/sendmsg-window.c:371
+#: src/sendmsg-window.c:443
 msgid "Russian (KOI)"
 msgstr "Krievu (KOI)"
 
-#: src/sendmsg-window.c:371
-#: src/sendmsg-window.c:443
+#: src/sendmsg-window.c:373
+#: src/sendmsg-window.c:445
 msgid "Slovak"
 msgstr "Slovāku"
 
-#: src/sendmsg-window.c:373
-#: src/sendmsg-window.c:445
+#: src/sendmsg-window.c:375
+#: src/sendmsg-window.c:447
 msgid "Spanish"
 msgstr "Spāņu"
 
-#: src/sendmsg-window.c:375
-#: src/sendmsg-window.c:447
+#: src/sendmsg-window.c:377
+#: src/sendmsg-window.c:449
 msgid "Swedish"
 msgstr "Zviedru"
 
-#: src/sendmsg-window.c:377
-#: src/sendmsg-window.c:449
+#: src/sendmsg-window.c:379
+#: src/sendmsg-window.c:451
 msgid "Turkish"
 msgstr "Turku"
 
-#: src/sendmsg-window.c:379
-#: src/sendmsg-window.c:451
+#: src/sendmsg-window.c:381
+#: src/sendmsg-window.c:453
 msgid "Ukrainian"
 msgstr "Ukraiņu"
 
-#: src/sendmsg-window.c:381
+#: src/sendmsg-window.c:383
 msgid "Generic UTF-8"
 msgstr "Vispārējs UTF-8"
 
-#: src/sendmsg-window.c:453
+#: src/sendmsg-window.c:455
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: src/sendmsg-window.c:461
+#: src/sendmsg-window.c:463
 msgid "_A-J"
 msgstr "_A-J"
 
-#: src/sendmsg-window.c:462
+#: src/sendmsg-window.c:464
 msgid "_K-Z"
 msgstr "_K-Z"
 
-#: src/sendmsg-window.c:473
+#: src/sendmsg-window.c:475
 msgid "_Request Disposition Notification"
 msgstr "_Pieprasīt Rīcības Paziņojumu"
 
-#: src/sendmsg-window.c:475
+#: src/sendmsg-window.c:477
 msgid "_Always Queue Sent Mail"
 msgstr "_Vienmēr Sarindot Sūtāmo Pastu"
 
-#: src/sendmsg-window.c:518
+#: src/sendmsg-window.c:520
 msgid "_Show"
 msgstr "_Parādīt"
 
-#: src/sendmsg-window.c:520
+#: src/sendmsg-window.c:522
 msgid "_Language"
 msgstr "_Valoda"
 
-#: src/sendmsg-window.c:522
+#: src/sendmsg-window.c:524
 msgid "_Options"
 msgstr "_Opcijas"
 
-#: src/sendmsg-window.c:580
+#: src/sendmsg-window.c:582
 #, c-format
 msgid "The message to '%s' is modified.\n"
 "Save message to Draftbox?"
 msgstr "Vēstule, ko '%s' ir modificēta.\n"
 "Saglabāt vēstuli Sagatavēs?"
 
-#: src/sendmsg-window.c:847
+#: src/sendmsg-window.c:849
 msgid "Select Identity"
 msgstr "Izvēlieties Identitāti"
 
-#: src/sendmsg-window.c:1147
+#: src/sendmsg-window.c:1148
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/external-body reference.  Note that the recipient must have proper permissions to see the `real' file.\n"
@@ -4379,175 +4372,175 @@ msgstr ""
 "\n"
 "Vai patiesi vēlaties piesaistīt šo failu kā atsauci?"
 
-#: src/sendmsg-window.c:1158
+#: src/sendmsg-window.c:1159
 msgid "Attach as Reference?"
 msgstr "Piesaistīt kā Atsauci?"
 
-#: src/sendmsg-window.c:1249
+#: src/sendmsg-window.c:1250
 msgid "Remove"
 msgstr "Izņemt"
 
-#: src/sendmsg-window.c:1260
+#: src/sendmsg-window.c:1261
 msgid "attach as reference"
 msgstr "piesaistīt kā atsauci"
 
-#: src/sendmsg-window.c:1266
+#: src/sendmsg-window.c:1267
 msgid "attach as file"
 msgstr "piesaistīt kā failu"
 
-#: src/sendmsg-window.c:1421
+#: src/sendmsg-window.c:1422
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Nevaru saņemt info par failu '%s': %s"
 
-#: src/sendmsg-window.c:1426
+#: src/sendmsg-window.c:1427
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Piesaiste %s nav parasts fails."
 
-#: src/sendmsg-window.c:1429
+#: src/sendmsg-window.c:1430
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "Fails %s nevar tikt nolasīts\n"
 
-#: src/sendmsg-window.c:1483
+#: src/sendmsg-window.c:1484
 msgid "Attach file"
 msgstr "Piesaistīt failu"
 
-#: src/sendmsg-window.c:1577
-#: src/sendmsg-window.c:1614
-#: src/sendmsg-window.c:2719
+#: src/sendmsg-window.c:1578
+#: src/sendmsg-window.c:1615
+#: src/sendmsg-window.c:2721
 msgid "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
 msgstr "Piesaistišana ziņai neizdevās.\n"
 "Iespējamais iemesls: nepietiek pagaidu vietas"
 
 #. From:
-#: src/sendmsg-window.c:1814
+#: src/sendmsg-window.c:1815
 msgid "F_rom:"
 msgstr "N_o:"
 
 #. Subject:
-#: src/sendmsg-window.c:1826
+#: src/sendmsg-window.c:1827
 msgid "S_ubject:"
 msgstr "T_emats:"
 
 #. fcc:
-#: src/sendmsg-window.c:1840
+#: src/sendmsg-window.c:1841
 msgid "F_cc:"
 msgstr "F_cc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:1869
+#: src/sendmsg-window.c:1870
 msgid "_Reply To:"
 msgstr "_Atbildēt Uz:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1876
+#: src/sendmsg-window.c:1877
 msgid "_Attachments:"
 msgstr "_Piesaistes:"
 
 #. Comments:
-#: src/sendmsg-window.c:1923
+#: src/sendmsg-window.c:1924
 msgid "Comments:"
 msgstr "Komentāri:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1926
+#: src/sendmsg-window.c:1927
 msgid "Keywords:"
 msgstr "Atslēgvārdi:"
 
-#: src/sendmsg-window.c:2101
+#: src/sendmsg-window.c:2102
 msgid "you"
 msgstr "tu"
 
-#: src/sendmsg-window.c:2108
+#: src/sendmsg-window.c:2109
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------pārsūtīta vēstule no %s------\n"
 
-#: src/sendmsg-window.c:2114
+#: src/sendmsg-window.c:2115
 #, c-format
 msgid "Date: %s\n"
 msgstr "Datums: %s\n"
 
-#: src/sendmsg-window.c:2128
+#: src/sendmsg-window.c:2129
 #, c-format
 msgid "From: %s\n"
 msgstr "No: %s\n"
 
-#: src/sendmsg-window.c:2136
+#: src/sendmsg-window.c:2137
 #, c-format
 msgid "To: %s\n"
 msgstr "To: %s\n"
 
-#: src/sendmsg-window.c:2144
+#: src/sendmsg-window.c:2145
 #, c-format
 msgid "CC: %s\n"
 msgstr "CC: %s\n"
 
-#: src/sendmsg-window.c:2150
+#: src/sendmsg-window.c:2151
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Vēstules-ID: %s\n"
 
-#: src/sendmsg-window.c:2157
+#: src/sendmsg-window.c:2158
 #, c-format
 msgid "References: %s"
 msgstr "Atsauces: %s"
 
-#: src/sendmsg-window.c:2174
+#: src/sendmsg-window.c:2175
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "%s %s rakstīja:\n"
 
-#: src/sendmsg-window.c:2176
+#: src/sendmsg-window.c:2177
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s rakstīja:\n"
 
-#: src/sendmsg-window.c:2884
+#: src/sendmsg-window.c:2886
 msgid "Choose charset"
 msgstr "Izvēlieties rakstzīmjkopu"
 
-#: src/sendmsg-window.c:2891
+#: src/sendmsg-window.c:2893
 msgid "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
 msgstr "Šis fails nav kodēts US-ASCII vai UTF-8.\n"
 "Lūdzu izvēlaties rakstzīmjkopu, ar kuru kodēt šo failu."
 
-#: src/sendmsg-window.c:2957
+#: src/sendmsg-window.c:2959
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Nevarēju atvērt failu %s.\n"
 
-#: src/sendmsg-window.c:2978
+#: src/sendmsg-window.c:2980
 msgid "Include file"
 msgstr "Iekļaut failu"
 
-#: src/sendmsg-window.c:3231
+#: src/sendmsg-window.c:3233
 #, c-format
 msgid "The message cannot be encoded in charset %s.\n"
 "Please choose a language for this message."
 msgstr "Vēstule nevar tikt kodēta rakstzīmjkopā %s.\n"
 "Lūdzu izvēlaties valodu šai vēstulei."
 
-#: src/sendmsg-window.c:3922
+#: src/sendmsg-window.c:3924
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Atbildēt uz %s: %s"
 
-#: src/sendmsg-window.c:3927
+#: src/sendmsg-window.c:3929
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Pārsūtīt vēstuli uz %s: %s"
 
-#: src/sendmsg-window.c:3931
+#: src/sendmsg-window.c:3933
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Turpināt vēstuli uz  %s %s"
 
-#: src/sendmsg-window.c:3935
+#: src/sendmsg-window.c:3937
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Jauna vēstule uz %s: %s"

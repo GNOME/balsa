@@ -1289,7 +1289,7 @@ msgid ""
 "a Message Disposition Notification (MDN) to be returned to `%s'.\n"
 "Do you want to send this notification?"
 msgstr ""
-"Po¹iljatelj tega sporoèila, %s, je zahteval, da\n
+"Po¹iljatelj tega sporoèila, %s, je zahteval, da\n"
 "se po¹lje obvestilo o sprejetju (MDN) na naslov '%s'.\n"
 "®elite poslati to obvestilo?"
 
@@ -2449,7 +2449,7 @@ msgid ""
 "Message Disposition Notification (MDN), send it in the following cases:"
 msgstr ""
 "Ko sprejemem sporoèilo, katerga po¹iljatelj je zahteval \n"
-"obvestilo o sprejemu (MDN), ga po¹lji v sledeèih primerih:
+"obvestilo o sprejemu (MDN), ga po¹lji v sledeèih primerih:"
 
 #: src/pref-manager.c:1449
 msgid ""
@@ -2458,7 +2458,7 @@ msgid ""
 "list)"
 msgstr ""
 "glava sporoèila izgleda v redu\n"
-"(naslovnik obvestila je isti kot povratna pot, sam pa sem na seznamu Za ali cc)
+"(naslovnik obvestila je isti kot povratna pot, sam pa sem na seznamu Za ali cc)"
 
 #: src/pref-manager.c:1464
 msgid "the message header looks suspicious"

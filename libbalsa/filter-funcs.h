@@ -45,6 +45,7 @@ LibBalsaCondition* libbalsa_condition_clone(LibBalsaCondition* cnd);
 void libbalsa_condition_regex_free(LibBalsaConditionRegex *, gpointer);
 void regexs_free(GSList *);
 void libbalsa_condition_compile_regexs(LibBalsaCondition* cond);
+gboolean libbalsa_conditions_compare(GSList * cnd1,GSList * cnd2);
 /* Filters */
 /* Free a filter
  * free_condition is a gint into a gpointer : if <>0 the function frees filter conditions also

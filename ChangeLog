@@ -1,3 +1,10 @@
+2002-10-01  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/filter.c: rewrite extend_query().
+	* libbalsa/mailbox_imap.[hc]: rewrite imap_uid_search.
+	* src/balsa-index.c: mailbox specific filtering code moved to libbalsa.
+	* libbalsa/filter-funcs.[hc]: move here.
+
 2002-09-29  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/filter.[hc]: try to implement incremental search.

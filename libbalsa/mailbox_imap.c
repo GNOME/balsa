@@ -796,6 +796,28 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	}
     }
 }
+
+typedef void(*ImapSearchFunc)(unsigned, void*);
+
+int imap_uid_search(CONTEXT* ctx, const char* query, ImapSearchFunc, void*,int);
+
+static void
+imap_add_matching_seq_num(unsigned seq_num, GList ** lst)
+{
+    *lst = g_list_prepend(*lst, GINT_TO_POINTER(seq_num));
+}
+
+/* Be careful : for speed reason the list is in reverse order
+   it's up to the caller to reorder it or not */
+void libbalsa_mailbox_imap_search(LibBalsaMailboxImap* mbox,
+				  const gchar * query,
+				  GList ** seq_nums)
+{
+    imap_uid_search(CLIENT_CONTEXT(LIBBALSA_MAILBOX(mbox)), query,
+		    (ImapSearchFunc)imap_add_matching_seq_num, seq_nums, FALSE);
+}
+
+/*
 typedef struct {
     GHashTable * uids;
     GHashTable * res;
@@ -811,7 +833,7 @@ imap_matched(unsigned uid, ImapSearchData* data)
     else
         printf("Could not find UID: %ud in message list\n", uid);
 }
-
+*/
 static void
 libbalsa_mailbox_imap_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix)

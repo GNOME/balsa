@@ -77,4 +77,8 @@ void libbalsa_imap_delete_folder(LibBalsaMailboxImap * mailbox);
 
 void reset_mutt_passwords(LibBalsaServer *);
 
+void libbalsa_mailbox_imap_search(LibBalsaMailboxImap* mbox,
+				  const gchar * query,
+				  GList ** seq_nums);
+
 #endif				/* __LIBBALSA_MAILBOX_IMAP_H__ */

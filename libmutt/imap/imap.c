@@ -1525,8 +1525,9 @@ static int uid_search_parse_response(IMAP_DATA* idata,
 /* imap_uid_search:
    ...
 */
-int imap_uid_search(CONTEXT* ctx, const char* query, 
-                    void(*cb)(unsigned, void*), void* cbdata)
+int imap_uid_search(CONTEXT* ctx, const char* query,
+                    void(*cb)(unsigned, void*), void* cbdata,
+		    int uid)
 { 
   IMAP_DATA* idata;
   int cnt, rc;
@@ -1534,7 +1535,7 @@ int imap_uid_search(CONTEXT* ctx, const char* query,
   char num[11];
 
   memset (&cmd, 0, sizeof (cmd));
-  mutt_buffer_addstr (&cmd, "UID SEARCH ");
+  mutt_buffer_addstr (&cmd, uid ? "UID SEARCH " : "SEARCH ");
   mutt_buffer_addstr (&cmd, query);
   idata = ctx->data;
   imap_cmd_start (idata, cmd.data);

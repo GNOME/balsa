@@ -24,8 +24,6 @@
  * 
  * The mail filtering porting of balsa
  *
- * Mostly skeletonic
- *
  * Author:  Emmanuel ALLAUD
  */
 
@@ -267,44 +265,70 @@ match_conditions(FilterOpType op, GSList * cond, LibBalsaMessage * message,
    returns an IMAP compatible query (RFC-2060)
    coresponding to given list of conditions.
 */
-static GString*
-extend_query(GString* query, const char* imap_str, const char* str,
-             FilterOpType op)
+
+static void
+extend_query(GString ** query, const gchar * imap_str, gchar * string)
 {
-    const char* prepstr =
-        (op==FILTER_OP_OR && query->str[0]!='\0') ? "OR ": NULL;
-    if(query->str[0]!='\0')
-        g_string_prepend_c(query, ' ');
-    g_string_prepend_c(query, '"');
-    g_string_prepend(query, str);
-    g_string_prepend(query, " \"");
-    g_string_prepend(query, imap_str);
-    if(prepstr) 
-        g_string_prepend(query, prepstr);
-    return query;
+    if ((*query)->str[0]!='\0')
+	*query = g_string_append_c(*query, ' ');
+    *query = g_string_append(*query, "NOT ");    
+    *query = g_string_append(*query, imap_str);
+    *query = g_string_append(*query, " \"");
+    *query = g_string_append(*query, string);
+    *query = g_string_append_c(*query, '"');
 }
 
+/* Stupid problem : the IMAP SEARCH command considers AND its default
+   logical operator, but balsa filters uses OR. Moreover the OR syntax
+   of IMAP SEARCH is rather broken (IMHO), so I have to translate our
+   P OR Q to a NOT(NOT P NOT Q) in the SEARCH syntax.
+ */
 gchar*
 libbalsa_filter_build_imap_query(FilterOpType op, GSList* condlist)
 {
     GString* query = g_string_new("");
     gchar* str;
-    
-    for (;condlist; condlist=g_slist_next(condlist)) {
-        LibBalsaCondition* cond = (LibBalsaCondition*)condlist->data;
-        if (cond->type!=CONDITION_SIMPLE) continue;
+    gboolean first = TRUE;
 
+    for (;condlist;condlist = g_slist_next(condlist)) {
+        LibBalsaCondition* cond = (LibBalsaCondition*)condlist->data;
+	GString * buffer = g_string_new("");
+
+        if (cond->type!=CONDITION_SIMPLE) continue;
+	
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO))
-            query = extend_query(query, "TO", cond->match.string, op);
+            extend_query(&buffer, "TO", cond->match.string);
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM))
-            query = extend_query(query, "FROM", cond->match.string, op);
-	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT))
-            query = extend_query(query, "SUBJECT", cond->match.string, op);
+            extend_query(&buffer, "FROM", cond->match.string);
+ 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT))
+            extend_query(&buffer, "SUBJECT", cond->match.string);
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC))
-            query = extend_query(query, "CC", cond->match.string, op);
+            extend_query(&buffer, "CC", cond->match.string);
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY))
-            query = extend_query(query, "TEXT", cond->match.string, op);
-	/* FIXME : extend that for user headers matching */
+            extend_query(&buffer, "TEXT", cond->match.string);
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
+	    gchar * tmp = g_strdup_printf("HEADER %s", cond->user_header);
+	    extend_query(&buffer, tmp, cond->match.string);
+	    g_free(tmp);
+	}
+
+	if (!first)
+	    query = g_string_append_c(query, ' ');
+	else first = FALSE;
+	/* See remark above */
+	if ((op == FILTER_OP_AND && !cond->condition_not)
+	    || (op == FILTER_OP_OR && cond->condition_not)) {
+	    query = g_string_append(query, "NOT (");
+	    buffer = g_string_append_c(buffer, ')');
+	}
+	query = g_string_append(query, buffer->str);
+	g_string_free(buffer, TRUE);
+    }
+
+    /* See remark above */
+    if (op == FILTER_OP_OR) {
+	query = g_string_prepend(query, "NOT (");
+	query = g_string_append_c(query, ')');
     }
     str = query->str;
     g_string_free(query, FALSE);

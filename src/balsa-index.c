@@ -926,100 +926,6 @@ balsa_index_check_visibility(GtkCList *clist, GtkCTreeNode * node,
  *   like balsa_index_select_next_unread
  */
 
-/* Helper to compare regexs */
-
-static gboolean
-compare_regexs(GSList * c1,GSList * c2)
-{
-    GSList * l1, *l2;
-    LibBalsaConditionRegex * r1,* r2;
-
-    for (;c1;c1 = g_slist_next(c1)) {
-	r1 = c1->data;
-	for (l2 = c2;l2 ;l2 = g_slist_next(l2)) {
-	    r2 = l2->data;
-	    if (strcmp(r1->string,r2->string)==0)
-		break;
-	}
-	if (!l2) return FALSE;
-    }
-    return TRUE;
-}
-
-/* Helper to compare conditions, a bit obscure at first glance
-   but we have to compare complex structure, so we must check
-   all fields.
-*/
-static gboolean
-compare_conditions(GSList * cnd1,GSList * cnd2)
-{
-    GSList * l1 = cnd1,* l2 = g_slist_copy(cnd2),* tmp;
-    gboolean OK;
-
-    for (;l1 && l2;l1 = g_slist_next(l1)) {
-	LibBalsaCondition * c1 = l1->data;
-	LibBalsaCondition * c2 = NULL;
-
-	OK = FALSE;
-	for (tmp = l2;tmp && !OK;tmp = g_slist_next(tmp)) {
-	    c2 = tmp->data;
-	    switch (c1->type) {
-	    case CONDITION_SIMPLE:
-		if ((c2->type == CONDITION_SIMPLE) 
-		    && (g_strcasecmp(c1->match.string,c2->match.string) == 0))
-		    OK = TRUE;
-		break;
-	    
-	    case CONDITION_REGEX:
-		if ((c2->type == CONDITION_REGEX) &&
-		    compare_regexs(c1->match.regexs,c2->match.regexs))
-		    OK = TRUE;
-		break;
-	    case CONDITION_DATE:
-		if ((c2->type == CONDITION_DATE) &&
-		    (c1->match.interval.date_low == c2->match.interval.date_low) &&
-		    (c1->match.interval.date_high == c2->match.interval.date_high))
-		    OK = TRUE;
-		break;
-		
-	    case CONDITION_FLAG:
-		if ((c2->type == CONDITION_FLAG) &&
-		    (c1->match.flags == c2->match.flags))
-		    OK = TRUE;
-		break;
-	    }
-	    /* If OK == TRUE conditions are equal until now, let's see if the
-	       equality is complete, comparing the match fields */
-	    OK = OK
-		&& !(CONDITION_CHKMATCH(c1, CONDITION_MATCH_FROM)
-		     ^ CONDITION_CHKMATCH(c2, CONDITION_MATCH_FROM))
-		&& !(CONDITION_CHKMATCH(c1, CONDITION_MATCH_TO)
-		     ^ CONDITION_CHKMATCH(c2, CONDITION_MATCH_TO))
-		&& !(CONDITION_CHKMATCH(c1, CONDITION_MATCH_CC)
-		     ^ CONDITION_CHKMATCH(c2, CONDITION_MATCH_CC))
-		&& !(CONDITION_CHKMATCH(c1, CONDITION_MATCH_SUBJECT)
-		     ^ CONDITION_CHKMATCH(c2, CONDITION_MATCH_SUBJECT))
-		&& !(CONDITION_CHKMATCH(c1, CONDITION_MATCH_BODY)
-		     ^ CONDITION_CHKMATCH(c2, CONDITION_MATCH_BODY));
-	    /* Special case for user headers */
-	    if (OK && CONDITION_CHKMATCH(c1, CONDITION_MATCH_US_HEAD))
-		OK = CONDITION_CHKMATCH(c2, CONDITION_MATCH_US_HEAD)
-		    && c1->user_header && c2->user_header
-		    && g_strcasecmp(c1->user_header,c2->user_header)==0;
-	}
-	/* We found the current condition of l1, remove it from l2 */
-	if (OK)
-	    l2 = g_slist_remove(l2,c2);
-	/* Else the conditions list differ, stop the process */
-	else break;
-    }
-    /* There is equality only when l1 = l2 = NULL */
-    if (!l2 && !l1)
-	return TRUE;
-    g_slist_free(l2);
-    return FALSE;
-}
-
 /* This function retrieve the list of all messages matching the conditions
    stored in the match struct. There are put in the matching_messages list.
    It does the search only for the following and preceding NB_MESSAGES_FORWARD
@@ -1060,12 +966,8 @@ bndx_in_messages_list(BalsaIndex * index, gint msgno)
 				 new_end!=-1 ? new_end : match->msgno_beg-1,
 				 imap_query);
 	g_free(imap_query);
-#ifdef SEARCHING_FINALLY_FIXED_
 	libbalsa_mailbox_imap_search(LIBBALSA_MAILBOX_IMAP(index->mailbox_node->mailbox),
 				     buffer, &new);
-#else
-	g_print("FIXME: urgently, or revoke.\n");
-#endif
 	/* Now new is the list of new messages matching the request, we must
 	   concatenate it with the previous matches (keeping the order, this is
 	   done by appending it or prepending, depending on which sense we are
@@ -1122,7 +1024,7 @@ bndx_match_message(BalsaIndex * index, LibBalsaMessage * message, gint op,
 	/* See if the conditions have changed since the last search
 	   if yes just forget what we have done before, else keep it */
 	if ((op != index->match_struct->op) ||
-	    !compare_conditions(index->match_struct->conditions,conditions)) {
+	    !libbalsa_conditions_compare(index->match_struct->conditions,conditions)) {
 	    GSList * cnd;
 	    /* We make a copy of the conditions list, and first drop the
 	       preceding ones */

@@ -400,7 +400,7 @@ balsa_mblist_get_store(void)
 {
     if (balsa_app.mblist_tree_store)
 	g_object_ref(balsa_app.mblist_tree_store);
-    else
+    else {
         balsa_app.mblist_tree_store =
             gtk_tree_store_new(N_COLUMNS,
                                G_TYPE_OBJECT,     /* MBNODE_COLUMN */
@@ -411,6 +411,10 @@ balsa_mblist_get_store(void)
                                G_TYPE_STRING,     /* UNREAD_COLUMN */
                                G_TYPE_STRING      /* TOTAL_COLUMN  */
             );
+        g_object_add_weak_pointer(G_OBJECT(balsa_app.mblist_tree_store),
+                                  (gpointer) & balsa_app.
+                                  mblist_tree_store);
+    }
 
     return balsa_app.mblist_tree_store;
 }

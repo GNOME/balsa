@@ -1,3 +1,9 @@
+2000-05-06  Peter Williams  <peter@beta.newton.cx>
+
+	* src/balsa-mblist.c (balsa_mblist_redraw): Check for
+	NULL return value from gtk_ctree_insert_node (caused 
+	warnings with POP3 mailboxes)
+
 2000-05-06 Pawel Salek <pawsa@theochem.kth.se>
 	* libbalsa/mailbox.c, src/save-restore.c:
 	Carlos Morgado's <chbm@chbm.nu> fix for storing the POP port number.

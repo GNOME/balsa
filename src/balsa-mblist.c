@@ -310,7 +310,8 @@ balsa_mblist_insert_mailbox (BalsaMBList * mblist,
   gchar* text[1];
 #endif /* BALSA_SHOW_INFO */
   
-  g_assert(mailbox!=NULL);
+  g_return_if_fail( mailbox != NULL );
+
   text[0] = mailbox->name;
 #ifdef BALSA_SHOW_INFO
   text[1] = "";
@@ -386,9 +387,12 @@ void balsa_mblist_redraw (BalsaMBList * bmbl)
     while (walk)
     {
       node = gtk_ctree_insert_gnode (ctree, NULL, NULL, walk, mailbox_nodes_to_ctree, NULL);
-      
-      gtk_ctree_node_set_text (ctree, node, 1, "");
-      gtk_ctree_node_set_text (ctree, node, 2, "");
+
+      if( node ) {
+	      gtk_ctree_node_set_text (ctree, node, 1, "");
+	      gtk_ctree_node_set_text (ctree, node, 2, "");
+      }
+
       walk = walk->prev;
     }
   }

@@ -120,39 +120,30 @@ balsa_message_init (BalsaMessage * bmessage)
 static gint
 item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data)
 {
-  Message *message;
-  BODY *body;
+  struct balsa_save_to_file_info *info;
 
   GtkWidget *save_dialog;
   GtkWidget *file_entry;
-  struct balsa_save_to_file_info info;
 
-  message = gtk_object_get_data (GTK_OBJECT (item), "message");
-  body = gtk_object_get_data (GTK_OBJECT (item), "body");
+  info = data;
 
   switch (event->type)
     {
     case GDK_BUTTON_PRESS:
-
-      g_return_if_fail (message != NULL);
-      g_return_if_fail (body != NULL);
-
       save_dialog = gnome_dialog_new (_ ("Save MIME Part"),
 				      _ ("Save"), _ ("Cancel"), NULL);
       file_entry = gnome_file_entry_new ("Balsa_MIME_Saver",
 					 _ ("Save MIME Part"));
-      info.file_entry = file_entry;
-      info.msg = message;
-      info.body = body;
+      info->file_entry = file_entry;
 
-      if (body->filename)
+      if (info->body->filename)
 	{
-	  gtk_entry_set_text (GTK_ENTRY (gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (file_entry))), body->filename);
+	  gtk_entry_set_text (GTK_ENTRY (gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (file_entry))), info->body->filename);
 	}
 
       gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (save_dialog)->vbox), file_entry, FALSE, FALSE, 10);
       gtk_widget_show (file_entry);
-      gnome_dialog_button_connect (GNOME_DIALOG (save_dialog), 0, save_MIME_part, &info);
+      gnome_dialog_button_connect (GNOME_DIALOG (save_dialog), 0, save_MIME_part, info);
       gnome_dialog_set_modal (GNOME_DIALOG (save_dialog));
       gnome_dialog_run_and_hide (GNOME_DIALOG (save_dialog));
       gtk_widget_destroy (save_dialog);
@@ -162,8 +153,6 @@ item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data)
     default:
       break;
     }
-  gtk_object_remove_data (GTK_OBJECT (item), "message");
-  gtk_object_remove_data (GTK_OBJECT (item), "body");
 }
 
 static void
@@ -508,11 +497,13 @@ static void
 audio2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
   GnomeCanvasItem *item;
+  struct balsa_save_to_file_info info;
+
   item = balsa_message_text_item ("--AUDIO--", group, 0.0, next_part_height (group));
   balsa_message_text_item_set_bg (item, group, "LightSteelBlue1");
-  gtk_object_set_data (GTK_OBJECT (item), "message", message);
-  gtk_object_set_data (GTK_OBJECT (item), "body", bdy);
-  gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), NULL);
+  info.msg = message;
+  info.body = bdy;
+  gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), &info);
 
 }
 
@@ -521,11 +512,13 @@ static void
 application2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
   GnomeCanvasItem *item;
+  struct balsa_save_to_file_info info;
+
   item = balsa_message_text_item ("--APPLICATION--", group, 0.0, next_part_height (group));
   balsa_message_text_item_set_bg (item, group, "LightSteelBlue1");
-  gtk_object_set_data (GTK_OBJECT (item), "message", message);
-  gtk_object_set_data (GTK_OBJECT (item), "body", bdy);
-  gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), NULL);
+  info.msg = message;
+  info.body = bdy;
+  gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), &info);
 #if 0
   gchar link_bfr[128];
   PARAMETER *bdy_parameter = bdy->parameter;
@@ -557,6 +550,8 @@ static void
 image2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
   GnomeCanvasItem *item;
+  struct balsa_save_to_file_info info;
+
   GdkImlibImage *im;
   gchar *filename;
 
@@ -571,9 +566,9 @@ image2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
 				"height", (double) im->rgb_height,
 				"anchor", GTK_ANCHOR_NW,
 				NULL);
-  gtk_object_set_data (GTK_OBJECT (item), "message", message);
-  gtk_object_set_data (GTK_OBJECT (item), "body", bdy);
-  gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), NULL);
+  info.msg = message;
+  info.body = bdy;
+  gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), &info);
 
   unlink (filename);
 }
@@ -582,11 +577,13 @@ static void
 message2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
   GnomeCanvasItem *item;
+  struct balsa_save_to_file_info info;
+
   item = balsa_message_text_item ("--MESSAGE--", group, 0.0, next_part_height (group));
   balsa_message_text_item_set_bg (item, group, "LightSteelBlue1");
-  gtk_object_set_data (GTK_OBJECT (item), "message", message);
-  gtk_object_set_data (GTK_OBJECT (item), "body", bdy);
-  gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), NULL);
+  info.msg = message;
+  info.body = bdy;
+  gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), &info);
 }
 
 static void
@@ -605,11 +602,13 @@ static void
 video2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
   GnomeCanvasItem *item;
+  struct balsa_save_to_file_info info;
+
   item = balsa_message_text_item ("--VIDEO--", group, 0.0, next_part_height (group));
   balsa_message_text_item_set_bg (item, group, "LightSteelBlue1");
-  gtk_object_set_data (GTK_OBJECT (item), "message", message);
-  gtk_object_set_data (GTK_OBJECT (item), "body", bdy);
-  gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), NULL);
+  info.msg = message;
+  info.body = bdy;
+  gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), &info);
 }
 
 static void

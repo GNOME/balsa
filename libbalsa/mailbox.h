@@ -143,6 +143,7 @@ struct _MailboxIMAP
     gchar *server;
     gchar *path;
     gint port;
+    gchar *tmp_file_path;
   };
 
 

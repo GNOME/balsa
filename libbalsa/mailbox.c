@@ -1167,7 +1167,7 @@ message_body_ref (Message * message)
     }
   if (msg != NULL)
     {
-      GString *mbuf = g_string_new ("");
+      GString *mbuf = g_string_new (NULL);
       BODY *bdy = cur->content;
 
       if (balsa_app.debug)
@@ -1212,6 +1212,14 @@ message_body_ref (Message * message)
     {
       message->flags &= !MESSAGE_FLAG_NEW;
       send_watcher_mark_read_message (message->mailbox, message);
+    }
+
+  if (message->mailbox->type == MAILBOX_IMAP)
+    {
+      if (MAILBOX_IMAP (message->mailbox)->tmp_file_path)
+	g_free (MAILBOX_IMAP (message->mailbox)->tmp_file_path);
+      MAILBOX_IMAP (message->mailbox)->tmp_file_path =
+	      g_strdup (cur->content->filename);
     }
 }
 

@@ -467,6 +467,9 @@ content2html (Message * message)
 	}
 	break;
       }
+    case MAILBOX_IMAP:
+      msg_stream = fopen(MAILBOX_IMAP(message->mailbox)->tmp_file_path, "r");
+      break;
     default:
       msg_stream = fopen(MAILBOX_LOCAL (message->mailbox)->path, "r");
       break;

@@ -889,6 +889,9 @@ int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno)
 	mutt_perror (cache->path);
 	return (-1);
       }
+#ifdef LIBMUTT
+      ctx->hdrs[msgno]->content->filename = safe_strdup(cache->path);
+#endif
       return 0;
     }
     else
@@ -904,6 +907,9 @@ int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno)
   cache->index = ctx->hdrs[msgno]->index;
   mutt_mktemp (path);
   cache->path = safe_strdup (path);
+#ifdef LIBMUTT
+  ctx->hdrs[msgno]->content->filename = safe_strdup(cache->path);
+#endif
   if (!(msg->fp = safe_fopen (path, "w+")))
   {
     safe_free ((void **) &cache->path);

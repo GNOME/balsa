@@ -17,6 +17,8 @@
  *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */ 
 
+#ifdef USE_DOTLOCK
+
 #ifndef _DOTLOCK_H
 #define _DOTLOCK_H
 
@@ -38,6 +40,8 @@
 
 #ifndef DL_STANDALONE
 int dotlock_invoke(const char *, int, int);
+#endif
+
 #endif
 
 #endif

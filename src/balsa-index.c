@@ -31,6 +31,7 @@
 /* constants */
 #define BUFFER_SIZE 1024
 
+static int first_new_mesgno;
 
 /* gtk widget */
 static void balsa_index_class_init (BalsaIndexClass * klass);
@@ -449,6 +450,7 @@ append_messages (BalsaIndex * bindex,
   text[4] = g_malloc (BUFFER_SIZE);
   text[5] = g_malloc (BUFFER_SIZE);
 
+  first_new_mesgno = 0;
 
   gtk_clist_freeze (GTK_CLIST (GTK_BIN (bindex)->child));
 
@@ -474,6 +476,7 @@ append_messages (BalsaIndex * bindex,
 
   gtk_clist_thaw (GTK_CLIST (GTK_BIN (bindex)->child));
 
+  gtk_clist_select_row (GTK_CLIST (GTK_BIN (bindex)->child), first_new_mesgno - 1, -1);
   /* re-set the progress bar to 0.0 */
   if (bindex->progress_bar)
     gtk_progress_bar_update (bindex->progress_bar, 0.0);
@@ -494,10 +497,14 @@ update_new_message_pixmap (BalsaIndex * bindex,
   elt = mail_elt (bindex->stream, mesgno);
 
   if (!elt->seen)
-    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child),
-			  mesgno - 1, 0,
-			  bindex->new_xpm,
-			  bindex->new_xpm_mask);
+    {
+      gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child),
+			    mesgno - 1, 0,
+			    bindex->new_xpm,
+			    bindex->new_xpm_mask);
+      if (first_new_mesgno == 0)
+	first_new_mesgno = mesgno;
+    }
   else
     gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child),
 			mesgno - 1, 0,

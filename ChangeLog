@@ -1,3 +1,10 @@
+2004-01-25 10:14  PeterB
+
+	* src/: balsa-app.c, balsa-app.h, balsa-mblist.c, pref-manager.c,
+	save-restore.c: use bold and oblique names to indicate mailboxes
+	with unread mail and folders containing such mailboxes,
+	respectively; remove all support for balsa_app.mblist_unread_color.
+
 2004-01-24 13:01  PeterB
 
 	* src/: balsa-message.c, balsa-message.h: BalsaMessage can subclass

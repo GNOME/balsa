@@ -1,5 +1,5 @@
 # Slovenian translation file for Balsa.
-# Copyright (C) YEAR Free Software Foundation, Inc.
+# Copyright (C) 2000 Free Software Foundation, Inc.
 # Andraz Tori <andraz.tori1@guest.arnes.si> 2000
 #
 
@@ -598,7 +598,7 @@ msgstr "Ime filtra:"
 #. The "Process when:" option menu
 #: src/filter-edit-dialog.c:509
 msgid "Process when:"
-msgstr "Procesiraj ko:"
+msgstr "Obdelaj ko:"
 
 #. The "Run on:" option menu
 #: src/filter-edit-dialog.c:540

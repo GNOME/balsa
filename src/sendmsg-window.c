@@ -1860,63 +1860,21 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     return TRUE;
 }
 
+static gint
+print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
 #ifndef HAVE_GNOME_PRINT
-/* very harsh print handler. Prints headers and the body only, as raw text
-*/
-static gint
-print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
-{
-    gchar *str;
-    gchar *dest;
-    FILE *lpr;
-
-    dest = g_strdup_printf(balsa_app.PrintCommand.PrintCommand, "-");
-    lpr = popen(dest, "w");
-    g_free(dest);
-
-    if (!lpr) {
-	GtkWidget *msgbox =
-	    gnome_message_box_new(_("Cannot execute print command."),
-				  GNOME_MESSAGE_BOX_ERROR,
-				  GNOME_STOCK_BUTTON_CANCEL, NULL);
-	gtk_window_set_modal(GTK_WINDOW(msgbox), TRUE);
-	gnome_dialog_run(GNOME_DIALOG(msgbox));
-    }
-
-    str = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->from[1]), 0, -1);
-    fprintf(lpr, "From   : %s\n", str);
-    g_free(str);
-    str = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->to[1]), 0, -1);
-    fprintf(lpr, "To     : %s\n", str);
-    g_free(str);
-    str = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->subject[1]), 0, -1);
-    fprintf(lpr, "Subject: %s\n", str);
-    g_free(str);
-
-    str = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->text), 0, -1);
-    fputs(str, lpr);
-    g_free(str);
-    fputs("\n\f", lpr);
-
-    if (pclose(lpr) != 0) {
-	GtkWidget *msgbox = gnome_message_box_new(_("Error executing lpr"),
-						  GNOME_MESSAGE_BOX_ERROR,
-						  GNOME_STOCK_BUTTON_CANCEL, NULL);
-	gtk_window_set_modal(GTK_WINDOW(msgbox), TRUE);
-	gnome_dialog_run(GNOME_DIALOG(msgbox));
-    }
-    return TRUE;
-}
+    balsa_information(
+	LIBBALSA_INFORMATION_ERROR,
+	_("Balsa has been compiled without gnome-print support.\n"
+	  "Printing is not possible."));
 #else
-static gint
-print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
-{
     LibBalsaMessage *msg = bsmsg2message(bsmsg);
     message_print(msg);
     gtk_object_destroy(GTK_OBJECT(msg));
+#endif
     return TRUE;
 }
-#endif
 
 static void
 cut_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)

@@ -94,12 +94,6 @@ typedef struct _PropertyUI {
 
     GtkWidget *selected_headers;
 
-#ifndef HAVE_GNOME_PRINT
-    /* printing */
-    GtkWidget *PrintCommand;
-    GtkWidget *PrintBreakline;
-    GtkWidget *PrintLinesize;
-#endif
     /* colours */
     GtkWidget *unread_color;
     GtkWidget *quoted_color_start;
@@ -162,11 +156,6 @@ static void mailbox_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void spelling_optionmenu_cb(GtkItem * menuitem, gpointer data);
 static void set_default_address_book_cb(GtkWidget * button, gpointer data);
-
-#ifndef HAVE_GNOME_PRINT
-static GtkWidget *create_printing_page(gpointer);
-static void print_modified_cb(GtkWidget * widget, GtkWidget * pbox);
-#endif
 
 guint toolbar_type[NUM_TOOLBAR_MODES] = {
     GTK_TOOLBAR_TEXT,
@@ -264,11 +253,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 				   create_display_page(property_box),
 				   gtk_label_new(_("Display")));
 
-#ifndef HAVE_GNOME_PRINT
-    gnome_property_box_append_page(GNOME_PROPERTY_BOX(property_box),
-				   create_printing_page(property_box),
-				   gtk_label_new(_("Printing")));
-#endif
     gnome_property_box_append_page(GNOME_PROPERTY_BOX(property_box),
 				   create_spelling_page(property_box),
 				   gtk_label_new(_("Spelling")));
@@ -411,16 +395,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(pui->font_picker2), "font_set",
 		       GTK_SIGNAL_FUNC(font_changed), property_box);
 
-
-#ifndef HAVE_GNOME_PRINT
-    /* printing */
-    gtk_signal_connect(GTK_OBJECT(pui->PrintCommand), "changed",
-		       GTK_SIGNAL_FUNC(print_modified_cb), property_box);
-    gtk_signal_connect(GTK_OBJECT(pui->PrintBreakline), "toggled",
-		       GTK_SIGNAL_FUNC(print_modified_cb), property_box);
-    gtk_signal_connect(GTK_OBJECT(pui->PrintLinesize), "changed",
-		       GTK_SIGNAL_FUNC(print_modified_cb), property_box);
-#endif
 
     gtk_signal_connect(GTK_OBJECT(pui->check_mail_upon_startup), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
@@ -646,18 +620,6 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     entry_widget = gnome_entry_gtk_entry(GNOME_ENTRY(pui->quote_pattern));
     tmp = gtk_entry_get_text(GTK_ENTRY(entry_widget));
     balsa_app.quote_regex = libbalsa_deescape_specials(tmp);
-
-#ifndef HAVE_GNOME_PRINT
-    /* printing */
-    g_free(balsa_app.PrintCommand.PrintCommand);
-    balsa_app.PrintCommand.PrintCommand =
-	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->PrintCommand)));
-
-    balsa_app.PrintCommand.linesize =
-	atoi(gtk_entry_get_text(GTK_ENTRY(pui->PrintLinesize)));
-    balsa_app.PrintCommand.breakline =
-	GTK_TOGGLE_BUTTON(pui->PrintBreakline)->active;
-#endif
 
     balsa_app.check_mail_upon_startup =
 	GTK_TOGGLE_BUTTON(pui->check_mail_upon_startup)->active;
@@ -885,20 +847,6 @@ set_prefs(void)
     gtk_entry_set_text(GTK_ENTRY(pui->subject_font),
 		       balsa_app.subject_font);
     gtk_entry_set_position(GTK_ENTRY(pui->subject_font), 0);
-
-#ifndef HAVE_GNOME_PRINT
-    /*printing */
-    {
-	gchar tmp[10];
-	gtk_entry_set_text(GTK_ENTRY(pui->PrintCommand),
-			   balsa_app.PrintCommand.PrintCommand);
-	sprintf(tmp, "%d", balsa_app.PrintCommand.linesize);
-	gtk_entry_set_text(GTK_ENTRY(pui->PrintLinesize), tmp);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-				     (pui->PrintBreakline),
-				     balsa_app.PrintCommand.breakline);
-    }
-#endif
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
 				 (pui->check_mail_upon_startup),
@@ -1794,71 +1742,6 @@ create_display_page(gpointer data)
     return vbox1;
 }
 
-#ifndef HAVE_GNOME_PRINT
-static GtkWidget *
-create_printing_page(gpointer data)
-{
-    /*
-     * done display, starting printing
-     */
-
-    GtkWidget *vbox1;
-    GtkWidget *frame10;
-    GtkWidget *table5;
-    GtkObject *spinbutton2_adj;
-    GtkWidget *label25;
-    GtkWidget *label24;
-    GtkWidget *label19;
-    GtkWidget *hbox5;
-
-    vbox1 = gtk_vbox_new(FALSE, 0);
-
-    frame10 = gtk_frame_new(_("Printing"));
-    gtk_container_set_border_width(GTK_CONTAINER(frame10), 5);
-    gtk_box_pack_start(GTK_BOX(vbox1), frame10, FALSE, FALSE, 0);
-
-    table5 = gtk_table_new(2, 3, FALSE);
-    gtk_container_add(GTK_CONTAINER(frame10), table5);
-    gtk_container_set_border_width(GTK_CONTAINER(table5), 5);
-
-    pui->PrintCommand = gtk_entry_new();
-    gtk_table_attach(GTK_TABLE(table5), pui->PrintCommand, 1, 2, 0, 1,
-		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-		     (GtkAttachOptions) (0), 0, 0);
-
-    hbox5 = gtk_hbox_new(FALSE, 0);
-    gtk_table_attach(GTK_TABLE(table5), hbox5, 1, 2, 1, 2,
-		     (GtkAttachOptions) (GTK_FILL),
-		     (GtkAttachOptions) (GTK_FILL), 0, 0);
-
-    spinbutton2_adj = gtk_adjustment_new(78, 50, 200, 1, 10, 10);
-    pui->PrintLinesize =
-	gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton2_adj), 1, 0);
-    gtk_box_pack_start(GTK_BOX(hbox5), pui->PrintLinesize, FALSE, FALSE,
-		       0);
-    gtk_widget_set_sensitive(pui->PrintLinesize, FALSE);
-
-    label25 = gtk_label_new(_("characters"));
-    gtk_box_pack_start(GTK_BOX(hbox5), label25, FALSE, TRUE, 0);
-
-    label24 = gtk_label_new(_("Print command:"));
-    gtk_table_attach(GTK_TABLE(table5), label24, 0, 1, 0, 1,
-		     (GtkAttachOptions) (GTK_FILL),
-		     (GtkAttachOptions) (0), 0, 0);
-
-    pui->PrintBreakline =
-	gtk_check_button_new_with_label(_("Break line at:"));
-    gtk_table_attach(GTK_TABLE(table5), pui->PrintBreakline, 0, 1, 1, 2,
-		     (GtkAttachOptions) (GTK_FILL),
-		     (GtkAttachOptions) (0), 0, 5);
-    gtk_container_set_border_width(GTK_CONTAINER(pui->PrintBreakline), 2);
-
-    label19 = gtk_label_new(_("Printing"));
-
-    return vbox1;
-
-}
-#endif
 
 static GtkWidget*
 add_spell_menu(const gchar* label, const gchar *names[], gint size, 
@@ -2254,18 +2137,6 @@ wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox)
     gtk_widget_set_sensitive(GTK_WIDGET(pui->wraplength), newstate);
     properties_modified_cb(widget, pbox);
 }
-
-#ifndef HAVE_GNOME_PRINT
-static void
-print_modified_cb(GtkWidget * widget, GtkWidget * pbox)
-{
-    gboolean newstate =
-	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->PrintBreakline));
-
-    gtk_widget_set_sensitive(GTK_WIDGET(pui->PrintLinesize), newstate);
-    properties_modified_cb(widget, pbox);
-}
-#endif
 
 static void
 spelling_optionmenu_cb(GtkItem * menuitem, gpointer data)

@@ -26,9 +26,7 @@ libmutt/imap/auth.c
 libmutt/imap/auth_gss.c
 libmutt/imap/browse.c
 libmutt/imap/imap.c
-libmutt/imap/imap_ssl.c
 libmutt/imap/message.c
-libmutt/imap/socket.c
 libmutt/imap/util.c
 src/address-book.c
 src/address-book-config.c

@@ -1,3 +1,7 @@
+2001-02-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* POTFILES.in: remove deprecated files.
+
 2001-01-12  Kjartan Maraas  <kmaraas@gnome.org>
 
 	* no.po: Updated Norwegian (bokmål) translation.

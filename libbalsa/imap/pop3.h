@@ -53,7 +53,8 @@ enum {
 typedef enum {
   IMAP_POP_OPT_DISABLE_APOP,
   IMAP_POP_OPT_FILTER_CR,
-  IMAP_POP_OPT_OVER_SSL
+  IMAP_POP_OPT_OVER_SSL,
+  IMAP_POP_OPT_PIPELINE /* disable pipelines for buggy servers */
 } PopOption;
 
 
@@ -64,6 +65,7 @@ typedef void (*PopMonitorCb)(const char *buffer, int length, int direction,
 
 PopHandle *pop_new         (void);
 void     pop_set_option    (PopHandle *pop, PopOption opt, gboolean state);
+void     pop_set_timeout   (PopHandle *pop, int milliseconds);
 void     pop_set_monitorcb (PopHandle *pop, PopMonitorCb cb, void*);
 void     pop_set_usercb    (PopHandle *pop, ImapUserCb user_cb, void *arg_cb);
 void     pop_set_infocb    (PopHandle *pop, PopUserCb user_cb, void *arg_cb);
@@ -71,10 +73,37 @@ gboolean pop_connect       (PopHandle *pop, const char *host, GError **err);
 unsigned pop_get_exists    (PopHandle *pop, GError **err);
 const char* pop_get_uid    (PopHandle *pop, unsigned msgno, GError **err);
 
-gboolean pop_fetch_message (PopHandle *pop, unsigned msgno, 
-                            int (*cb)(unsigned len, char*buf, void *arg),
-                            void *cb_arg, GError **err);
-gboolean pop_delete_message(PopHandle *pop, unsigned msgno, GError **err);
+gboolean pop_fetch_message_s(PopHandle *pop, unsigned msgno, 
+			     int (*cb)(unsigned len, char*buf, void *arg),
+			     void *cb_arg, GError **err);
+gboolean pop_delete_message_s(PopHandle *pop, unsigned msgno, GError **err);
 gboolean pop_destroy(PopHandle *pop, GError **err);
+
+/* asynchronous interface's purpose is to enable pipelining usage
+   whenever possible. The requests are queued with respective response
+   handlers and the request queue is flushed now and then - or on a
+   explicit request of obviously, before the destroy
+   request. Generally, asynchronous request should not be interleaved
+   with synchronous ones. The callback may be called several times for
+   fetch request. The first one is always one of OK or ERR. If the
+   first response if err, the callback should not hope any more. If
+   the first response is OK, and the request is fetch, subsequent
+   multiple calls with codes DATA and eveventally last one with DONE
+   will follow.
+*/
+typedef enum {
+  POP_REQ_OK,
+  POP_REQ_ERR,
+  POP_REQ_DATA,
+  POP_REQ_DONE
+}  PopReqCode;
+
+typedef void (*PopAsyncCb)(PopReqCode prc, void *arg, ...);
+
+void pop_fetch_message(PopHandle *pop, unsigned msgno, 
+		       PopAsyncCb cb, void *cb_arg, GDestroyNotify dn);
+void pop_delete_message(PopHandle *pop, unsigned msgno, 
+		       PopAsyncCb cb, void *cb_arg, GDestroyNotify dn);
+void pop_complete_pending_requests(PopHandle *pop);
 
 #endif /* __POP_HANDLE_H__ */

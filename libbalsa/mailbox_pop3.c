@@ -250,17 +250,21 @@ mp_save_uids(GHashTable *old_uids, GHashTable *new_uids, const char *prefix)
         lck.l_type = F_UNLCK;
         fcntl(fileno(f), F_SETLK, &lck);
         fclose(f);
-    } /* else COUDL NOT SAVE UIDS! SHOUT! */
+    } /* else COULD NOT SAVE UIDS! SHOUT! */
     return;
 }
 
+#ifdef POP_SYNC
 static int
 dump_cb(unsigned len, char *buf, void *arg)
 {
-    /* FIXME: Bad things happen when messages are empty, . */
+    /* FIXME: Bad things happen in the mh driver when messages are empty. */
     return fwrite(buf, 1, len, (FILE*)arg) == len;
 }
-
+#endif /* POP_SYNC */
+/* ===================================================================
+   Functions for direct or filtered saving to the output mailbox.
+*/
 static gchar*
 pop_direct_get_path(const char *pattern, unsigned msgno)
 {
@@ -297,6 +301,81 @@ struct PopDownloadMode {
     pop_filter_open,
     pclose
 };
+
+/* ===================================================================
+   Functions supporting asynchronous retrival of messages.
+*/
+struct fetch_data {
+    PopHandle *pop;
+    FILE      *f;
+    GError   **err;
+    gchar     *msg_name;
+    const struct PopDownloadMode *dm;
+    unsigned   msgno;
+    unsigned   error_occured:1;
+    unsigned   delete_on_server:1;
+};
+
+/* GError arguments - if any - are for one way communication from
+   libimap to the callback.
+   All errors are communicated to UI through fetch_data::err.
+ */
+static void
+fetch_async_cb(PopReqCode prc, void *arg, ...)
+{
+    struct fetch_data *fd = (struct fetch_data*)arg;
+    va_list alist;
+    
+    va_start(alist, arg);
+    switch(prc) {
+    case POP_REQ_OK: 
+	{/* GError **err = va_arg(alist, GError**); */
+	fd->f  = fd->dm->open(fd->msg_name);
+	if(fd->f == NULL)
+	    printf("fopen failed for %s\n", fd->msg_name);
+	}
+	break;
+    case POP_REQ_ERR:
+	{GError **err = va_arg(alist, GError**);
+	if(!*fd->err) {
+	    *fd->err  = *err;
+	    *err = NULL;
+	}
+	}
+	break;
+    case POP_REQ_DATA:
+	{unsigned len = va_arg(alist, unsigned);
+	char    *buf = va_arg(alist, char*);
+	if(fd->f)
+	    if(fwrite(buf, 1, len, fd->f) != len) {
+                if(!*fd->err)
+                    g_set_error(fd->err, IMAP_ERROR, IMAP_POP_SAVE_ERROR,
+                                _("Saving POP message to %s failed."),
+                                fd->msg_name);
+                fd->error_occured = 1;
+            }
+	}
+	break;
+    case POP_REQ_DONE:
+	if(fd->dm->close(fd->f) != 0) {
+                if(!*fd->err)
+                    g_set_error(fd->err, IMAP_ERROR, IMAP_POP_SAVE_ERROR,
+                                _("Transfering POP message to %s failed."),
+                                fd->msg_name);
+	} else if(fd->delete_on_server && !fd->error_occured)
+	    pop_delete_message(fd->pop, fd->msgno, NULL, NULL, NULL);
+	fd->f = NULL;
+	break;
+    }
+    va_end(alist);
+}
+
+static void
+async_notify(struct fetch_data *fd)
+{
+    g_free(fd->msg_name);
+    g_free(fd);
+}
 
 /* libbalsa_mailbox_pop3_check:
    checks=downloads POP3 mail.
@@ -374,6 +453,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     
     PopHandle * pop = pop_new();
     pop_set_option(pop, IMAP_POP_OPT_FILTER_CR, TRUE);
+    pop_set_timeout(pop, 5000); /* wait 1.5 minute for packets */
     pop_set_usercb(pop, libbalsa_server_user_cb, server);
     pop_set_monitorcb(pop, monitor_cb, NULL);
 #ifdef FIXME
@@ -407,8 +487,9 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     }
     for(i=1; i<=msgcnt; i++) {
         char *msg_path = mode->get_path(dest_path, i);
+#if POP_SYNC
         FILE *f;
-
+#endif
         if(!m->delete_from_server) {
             const char *uid = pop_get_uid(pop, i, NULL);
             char *full_uid = g_strconcat(uid_prefix, " ", uid, NULL);
@@ -419,6 +500,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
         libbalsa_mailbox_progress_notify(mailbox,
                                          LIBBALSA_NTFY_PROGRESS, i, msgcnt,
                                          "next message");
+#if POP_SYNC
         f = mode->open(msg_path);
         if(!f) {
             libbalsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -426,7 +508,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 			     msg_path);
             break;
         }
-        if(!pop_fetch_message(pop, i, dump_cb, f, &err)) 
+        if(!pop_fetch_message_s(pop, i, dump_cb, f, &err)) 
             break;
         if(mode->close(f) != 0) {
             libbalsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -435,8 +517,20 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
             break;
         }
         if(m->delete_from_server)
-            pop_delete_message(pop, i, NULL);
+            pop_delete_message_s(pop, i, NULL);
         g_free(msg_path);
+#else 
+	{struct fetch_data *fd = g_new0(struct fetch_data, 1);
+	fd->pop = pop; 
+	fd->err = &err;
+	fd->msg_name = msg_path;
+	fd->msgno = i;
+	fd->dm = mode;
+	fd->delete_on_server = m->delete_from_server;
+        pop_fetch_message(pop, i, fetch_async_cb, fd, 
+			  (GDestroyNotify)async_notify);
+	}
+#endif
     }
     if(err) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,

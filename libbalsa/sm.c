@@ -25,6 +25,8 @@
 #include "cfg-backend.h"
 #include "sm.h"
 
+#include "main.h" /* temporary, for exit triggers */
+
 #ifdef G_LOG_DOMAIN
 #undef G_LOG_DOMAIN
 #endif
@@ -99,34 +101,11 @@ gboolean balsa_sm_init( int argc, char **argv )
 	balsa_sm_global_root = cfg_location_from_gnome_prefix( global_pfx );
 
 	DM( "Prefixes: global \"%s\", local \"%s\"", global_pfx, local_pfx );
-
-	if( g_strcasecmp( local_pfx, global_pfx ) ) {
-		gchar *discard_args[] = { "rm", "-r", NULL };
-
-		DM( "Treating as continued session" );
-		really_connected = TRUE;
-		
-		/* get_cfg_prefix gives us an evil leading slash that concat_dir_and_file (implicitly called in
-		 * get_real_path) can't handle. 
-		 */
-		
-		discard_args[2] = gnome_config_get_real_path( &(local_pfx[1]) );
-		gnome_client_set_discard_command( master_client, 3, discard_args );
-	} else {
-		DM( "Treating as new session" );
-		really_connected = FALSE;
-
-		/* Don't toast our real configuration! */
-		gnome_client_set_discard_command( master_client, 0, NULL );
-	}
-
 	reset_cfg_prefix( master_client );
-
-	gnome_client_set_shutdown_command( master_client, 0, NULL );
 
 	clone_args[0] = argv[0];
 	gnome_client_set_restart_command( master_client, 1, clone_args );
-
+	gnome_client_set_shutdown_command( master_client, 0, NULL );
 	gnome_client_set_priority( master_client, 70 );
 	gnome_client_set_restart_style( master_client, GNOME_RESTART_ANYWAY );
 
@@ -222,6 +201,10 @@ gboolean balsa_sm_save( void )
 {
 	DM( "balsa_sm_save" );
 
+	gnome_client_request_save( master_client, GNOME_SAVE_BOTH, FALSE,
+				   GNOME_INTERACT_ANY, FALSE, FALSE );
+
+#if 0
 	if( balsa_sm_save_global() )
 		return TRUE;
 	if( balsa_sm_save_local() )
@@ -232,45 +215,71 @@ gboolean balsa_sm_save( void )
 		cfg_location_discard( balsa_sm_local_root );
 	}
 
-	DM( "syncing" );
+	DM( "balsa_sm_save: syncing" );
 	cfg_sync();
-
+#endif
 	return FALSE;
 }
 
 gboolean balsa_sm_save_local( void )
 {
 	DM( "save: only local" );
-	trigger_funcs( local_pairs, balsa_sm_local_root, TRUE );
+
+	gnome_client_request_save( master_client, GNOME_SAVE_LOCAL, FALSE,
+				   GNOME_INTERACT_ANY, FALSE, FALSE );
 	return FALSE;
 }
 
 gboolean balsa_sm_save_global( void )
 {
 	DM( "save: only global" );
-	trigger_funcs( global_pairs, balsa_sm_global_root, TRUE );
+	gnome_client_request_save( master_client, GNOME_SAVE_GLOBAL, FALSE,
+				   GNOME_INTERACT_ANY, FALSE, FALSE );
 	return FALSE;
 }
 
 gboolean balsa_sm_save_local_event( sm_func_saver saver, gpointer user_data )
 {
 	DM( "local save event: %p %p", saver, user_data );
-	return saver( balsa_sm_local_root, user_data );
+
+	if( saver( balsa_sm_local_root, user_data ) )
+		return TRUE;
+
+	/* Don't sync unless we really should. this is used for mailbox
+	 * changes et al, which need the config prefix, but they don't
+	 * deserve a whole save-session and sync.
+	 * gnome_client_request_save( master_client, GNOME_SAVE_LOCAL, FALSE,
+	 * GNOME_INTERACT_ANY, FALSE, FALSE );
+	 */
+
+	return FALSE;
 }
 
 gboolean balsa_sm_save_global_event( sm_func_saver saver, gpointer user_data )
 {
 	DM( "global save event: %p %p", saver, user_data );
-	return saver( balsa_sm_global_root, user_data );
+
+	if( saver( balsa_sm_global_root, user_data ) )
+		return TRUE;
+
+	/* Don't sync unless we really should. We shouldn't. 
+	 * gnome_client_request_save( master_client, GNOME_SAVE_GLOBAL, FALSE,
+	 * GNOME_INTERACT_ANY, FALSE, FALSE );
+	 */
+
+	return FALSE;
 }
 
 gboolean balsa_sm_load( void )
 {
-	DM( "balsa_sm_load" );
 
+	cfg_location_t *down;
+
+	DM( "balsa_sm_load" );
+#if 0
 	if( GNOME_CLIENT_CONNECTED( master_client ) ) {
 		if( (gnome_client_get_flags( master_client ) & GNOME_CLIENT_RESTORED) == 0 ) {
-			DM( "Restored, check for local root key" );
+			DM( "Not restored, check for local root key" );
 			if( cfg_location_exists( balsa_sm_local_root ) == 0 )
 				balsa_init_begin();
 		}
@@ -285,7 +294,21 @@ gboolean balsa_sm_load( void )
 		balsa_sm_load_global();
 		balsa_sm_load_local();
 	}
+#else
+	down = cfg_location_godown( balsa_sm_global_root, "Mailboxes" );
+	if( cfg_location_exists( down ) == 0 )
+		balsa_init_begin();
+	cfg_location_free( down );
 
+	balsa_sm_load_global();
+
+	down = cfg_location_godown( balsa_sm_local_root, "UISettings" );
+	if( cfg_location_exists( down ) == 0 )
+		/* default ui prefs */ { ; }
+	cfg_location_free( down );
+
+	balsa_sm_load_local();
+#endif
 	return FALSE;
 }
 
@@ -319,20 +342,28 @@ gboolean balsa_sm_exit( void )
 {
 	DM( "exit ordered" );
 
+	exit_ordered = TRUE;
 #if 0
 	{
-		exit_ordered = TRUE;
+
 		gnome_client_request_save( master_client, GNOME_SAVE_GLOBAL, TRUE,
 					   GNOME_INTERACT_ANY, FALSE, FALSE );
 		return FALSE;
 	}
 #else
 	{
-		sm_exit_trigger_results_t *res;
+		sm_exit_trigger_results_t res;
 
 		balsa_maybe_save( &res, NULL );
 		balsa_close_mailboxes( &res, NULL );
-		kill_session( NULL, NULL );
+
+		if( really_connected == FALSE ) {
+			balsa_sm_save();
+		} else {
+			kill_session( NULL, NULL );
+		}
+
+		return FALSE;
 	}
 #endif
 }
@@ -413,7 +444,7 @@ static void reset_cfg_prefix( GnomeClient *client )
 	if( balsa_sm_local_root )
 		cfg_location_free( balsa_sm_local_root );
 
-	prefix = gnome_client_get_config_prefix( master_client );
+	prefix = gnome_client_get_config_prefix( client );
 	DM( "reset_cfg_prefix: new prefix %s", prefix );
 	balsa_sm_local_root = cfg_location_from_gnome_prefix( prefix );
 
@@ -423,6 +454,24 @@ static void reset_cfg_prefix( GnomeClient *client )
 		tmp = cfg_location_godown( balsa_sm_local_root, "DefaultSession" );
 		cfg_location_free( balsa_sm_local_root );
 		balsa_sm_local_root = tmp;
+
+		DM( "reset_cfg_prefix: Treating as new session" );
+		really_connected = FALSE;
+
+		/* Don't toast our real configuration! */
+		gnome_client_set_discard_command( client, 0, NULL );
+	} else {
+		gchar *discard_args[] = { "rm", "-r", NULL };
+
+		DM( "reset_cfg_prefix: Treating as continued session" );
+		really_connected = TRUE;
+		
+		/* get_cfg_prefix gives us an evil leading slash that concat_dir_and_file (implicitly called in
+		 * get_real_path) can't handle. 
+		 */
+		
+		discard_args[2] = gnome_config_get_real_path( &(prefix[1]) );
+		gnome_client_set_discard_command( client, 3, discard_args );
 	}
 }
 	
@@ -497,22 +546,45 @@ static gint save_session( GnomeClient *client, gint phase, GnomeSaveStyle save_s
 	DM( "save_session signaled" );
 
 	active_client = client;
-	reset_cfg_prefix( client );
+
+	/* "Huh," you say? Well, as explained below we sometime need to
+	 * trigger a save_session upon exit, if we're not running 
+	 * session-managed (=with config_prefix != global_config_prefix).
+	 * But then we would get a new config prefix, set here, instead
+	 * of /balsa/DefaultSession/. So if we're doing the save-on-exit
+	 * thing, screw it. 
+	 */
+
+	if( exit_ordered == FALSE )
+		reset_cfg_prefix( client );
 
 	switch( save_style ) {
 	case GNOME_SAVE_BOTH:
-		balsa_sm_save_local();
-		balsa_sm_save_global();
+		DM( "save_session: both" );
+		trigger_funcs( global_pairs, balsa_sm_global_root, TRUE );
+		trigger_funcs( local_pairs, balsa_sm_local_root, TRUE );
 		break;
 	case GNOME_SAVE_GLOBAL:
-		balsa_sm_save_global();
+		DM( "save_session: global" );
+		trigger_funcs( global_pairs, balsa_sm_global_root, TRUE );
 		break;
 	case GNOME_SAVE_LOCAL:
-		balsa_sm_save_local();
+		DM( "save_session: local" );
+		trigger_funcs( local_pairs, balsa_sm_local_root, TRUE );
+		break;
 	}
 
 	DM( "save_session: Help me, I'm syncing!" );
 	cfg_sync();
+
+	/* If we're not really using SM, balsa_sm_exit() must ask for the 
+	 * save session signal, and we can't exit until it actually happens,
+	 * so we must wait until we get here to exit. exit_ordered lets
+	 * us know when that happens.
+	 */
+
+	if( exit_ordered )
+		kill_session( NULL, NULL );
 
 	active_client = NULL;
         return TRUE;

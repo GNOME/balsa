@@ -1,3 +1,13 @@
+2000-09-15  Peter Williams <peter@newton.cx>
+	Another new era: big bad session management
+
+	libbalsa/sm.{c,h}, src/sm-balsa.{c,h}: New files,
+	the libbalsa ones being a more generic backend and
+	the ones in src being specific to our app.
+	
+	Changes to oodles of other files. Yes, I know, I'm
+	quite thorough :-)
+	
 2000-06-15  Pawel Salek <pawsa@theochem.kth.se>
 
 	New era approaching: large patch from Ian Campbell <ijc25@cam.ac.uk>

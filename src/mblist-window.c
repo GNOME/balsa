@@ -143,6 +143,7 @@ void
 mblist_open_mailbox (Mailbox * mailbox)
 {
 	GtkWidget *page = NULL;
+	gboolean was_open = FALSE;
 	int i, c;
 
 	if (!mblw)
@@ -152,6 +153,8 @@ mblist_open_mailbox (Mailbox * mailbox)
 
 	/* If we currently have a page open, update the time last visited */
 	if (c != -1) { 
+		was_open = TRUE;
+
 		page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c); 
 		page = gtk_object_get_data(GTK_OBJECT(page),"indexpage"); 
 
@@ -192,10 +195,12 @@ mblist_open_mailbox (Mailbox * mailbox)
 	
 	balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
 
-	c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
-	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c); 
-	page = gtk_object_get_data(GTK_OBJECT(page),"indexpage"); 
-	cfg_memory_clist_restore( GTK_WIDGET(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)) );
+	if( was_open ) {
+		c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
+		page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c); 
+		page = gtk_object_get_data(GTK_OBJECT(page),"indexpage"); 
+		cfg_memory_clist_restore( GTK_WIDGET(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)) );
+	}
 }
 
 

@@ -66,8 +66,7 @@ make prefix=$RPM_BUILD_ROOT%{_prefix} \
 
 
 %clean
-make clean
-rm -rf "$RPM_BUILD_ROOT"
+[ -n "$RPM_BUILD_DIR" ] && rm -rf "$RPM_BUILD_DIR"
 
 %files -f %{name}.lang
 %defattr(-, root, root)

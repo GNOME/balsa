@@ -74,6 +74,11 @@ function is sometimes troublesome over NFS but is POSIX compatible.
 	This enables GSSAPI Kerberos based authentication scheme. 
 Specify the kerberos directory as the argument.
 
+--with-sasl
+	Use Cyrus SASL library for POP/IMAP authentication instead of
+mutt's native code (in the future, the native code will most likely be
+phased out in favour of SASL library).
+
 
 Libraries:
 ---------

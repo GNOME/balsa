@@ -1,5 +1,9 @@
 2001-08-23  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* configure.in, NEWS, README: release 1.2.pre2
+
+2001-08-23  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* src/balsa-index.c: do not crash when there is an index without 
 	associated mailbox_node (Peter Bloomfield).
 	* src/main.c, src/threads.h: remove not used appbar_lock mutex.
@@ -11,7 +15,7 @@
 	* libbalsa/message.[hc]: remove libbalsa_message_get_text_content().
 	* libbalsa/mime.[hc]: improve process_mime_part() instead.
 	* src/balsa-app.h: add support for stripping HTML.
-	* src/pref-manager.c: modification in preferencess...
+	* src/pref-manager.c: modification in preferences...
 	* src/save-restore.c: ... and saving and restoring.
 	* src/sendmsg-window.c: strip HTML if requested.
 
@@ -139,7 +143,7 @@
 	* libbalsa/address-book.[hc]: distinguish fast and slow=expensive
 	address books.
 	* libbalsa/address-book-ldap.c: is_expensive = TRUE
-	* libbalsa/address-entry.[hc]: attemt to fix cursor jumping.
+	* libbalsa/address-entry.[hc]: attempt to fix cursor jumping.
 	char_offset[] was read out of range (probably related to #52902)
 	Support for Ctrl-R to look up expensive address books.
 	* src/balsa-index.c: append dots when showing multiple recipents

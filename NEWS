@@ -1,6 +1,19 @@
+* Balsa-1.2.pre2 release. Release date 2001-08-23
+
+- download pop3 mail to arbirary box.
+- numerous memory leaks plugged.
+- SSL roughly functional.
+- new nice icons.
+- paper selection implemented.
+- LDIF address book format added (this is the recommended format).
+- LDAP address book functional for large LDAP servers.
+- numerous bugs fixed, including: #52384, #55416, #55437, #58473, 
+  #59326, #59331 and 34 other less interesting (duplicated, packaging errors,
+  older versions).
+
 * Balsa-1.2.pre1 release. Release date 2001-08-08
 
--
+- bug fixes.
 
 * Balsa-1.1.7 pre-release. Release date 2001-07-13
 

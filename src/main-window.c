@@ -20,6 +20,8 @@
 
 #include <string.h>
 #include <gnome.h>
+#include <gdk/gdkx.h>
+#include <X11/Xutil.h>
 
 #include "balsa-app.h"
 #include "balsa-index.h"
@@ -73,6 +75,7 @@ static void about_box_destroy_cb (void);
 
 static void destroy_window_cb (GnomeMDI * mdi, gpointer data);
 
+static void set_icon (void);
 
 void
 main_window_set_cursor (gint type)
@@ -81,12 +84,12 @@ main_window_set_cursor (gint type)
 
   if (type == -1)
     {
-      gdk_window_set_cursor (GTK_WIDGET(mdi->active_window)->window, NULL);
+      gdk_window_set_cursor (GDK_ROOT_PARENT (), NULL);
       return;
     }
 
   cursor = gdk_cursor_new (type);
-  gdk_window_set_cursor (GTK_WIDGET(mdi->active_window)->window, cursor);
+  gdk_window_set_cursor (GDK_ROOT_PARENT (), cursor);
   gdk_cursor_destroy (cursor);
 }
 
@@ -119,6 +122,8 @@ open_main_window (void)
 
   gtk_window_set_policy (GTK_WINDOW (mdi->active_window), TRUE, TRUE, FALSE);
   gtk_widget_set_usize (GTK_WIDGET (mdi->active_window), balsa_app.mw_width, balsa_app.mw_height);
+
+  set_icon ();
 
   refresh_main_window ();
 }
@@ -583,4 +588,47 @@ static void
 about_box_destroy_cb (void)
 {
   about_box_visible = FALSE;
+}
+
+static void
+set_icon (void)
+{
+  GdkImlibImage *im;
+  GdkPixmap *pixmap;
+  GdkBitmap *mask;
+
+  XIconSize *xis = NULL;
+  gint count;
+  gint i, maxw = 0, maxh = 0;
+
+  XGetIconSizes (GDK_DISPLAY (),
+		 GDK_ROOT_WINDOW (),
+		 &xis, &count);
+
+  for (i = 0; i < count; i++)
+    {
+      g_print ("min: %ih x %iw\nmax: %ih x %iw\n",
+	       xis[i].min_height,
+	       xis[i].min_width,
+	       xis[i].max_width,
+	       xis[i].max_height);
+
+      if (xis[i].max_width > maxw)
+	{
+	  maxw = xis[i].max_width;
+	  maxh = xis[i].max_height;
+	}
+    }
+
+  g_print("icon height: %i\nicon width:  %i\n", maxh, maxw);
+
+  im = gdk_imlib_load_image (gnome_unconditional_pixmap_file ("balsa_icon.png"));
+
+  gdk_imlib_render (im, maxw, maxh);
+
+  pixmap = gdk_imlib_copy_image (im);
+  mask = gdk_imlib_copy_mask (im);
+  gdk_imlib_destroy_image (im);
+
+  gdk_window_set_icon (GDK_ROOT_PARENT (), NULL, pixmap, mask);
 }

@@ -1,6 +1,6 @@
 SUBDIRS = macros po intl libmutt libbalsa src
 
-balsa_BITMAPS = balsa_logo.png
+balsa_BITMAPS = balsa_logo.png balsa_icon.png
 
 balsa_MANS=balsa.1
 

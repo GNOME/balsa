@@ -1,6 +1,8 @@
 2001-05-15  Pawel Salek  <pawsa@theochem.kth.se>
 
+	Daniel Foster <daniel-l@34SP.com>:
 	* libbalsa/address-entry.c: more natural address pasting.
+	* src/sendmsg-window.c: menu entry for signature insertion.
 	
 2001-05-13  Carlos Morgado  <chbm@chbm.nu>
 

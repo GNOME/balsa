@@ -129,6 +129,7 @@ static void select_all_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void reflow_par_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void reflow_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
+static gint insert_signature_cb(GtkWidget *, BalsaSendmsg *);
 
 
 static GnomeUIInfo main_toolbar[] = {
@@ -212,6 +213,11 @@ static GnomeUIInfo edit_menu[] = {
 #define EDIT_MENU_WRAP_BODY 5
     {GNOME_APP_UI_ITEM, N_("_Wrap Body"), N_("Wrap message lines"),
      (gpointer) wrap_body_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
+     GDK_z, GDK_CONTROL_MASK, NULL},
+    GNOMEUIINFO_SEPARATOR,
+#define EDIT_MENU_ADD_SIGNATURE 6
+    {GNOME_APP_UI_ITEM, N_("Insert _Signature"), NULL,
+     (gpointer) insert_signature_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
      GDK_z, GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_REFLOW_PARA 7
@@ -1212,6 +1218,28 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
     g_string_free(body, TRUE);
 }
 
+static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *msg)
+{
+	gchar *signature;
+	gint pos=gtk_editable_get_position(GTK_EDITABLE(msg->text));
+	
+	if ((signature = read_signature()) != NULL) {
+	    if (balsa_app.sig_separator
+		&& g_strncasecmp(signature, "--\n", 3)
+		&& g_strncasecmp(signature, "-- \n", 4)) {
+		gchar * tmp = g_strconcat("-- \n", signature, NULL);
+		g_free(signature);
+		signature = tmp;
+	    }
+
+		gtk_editable_insert_text(GTK_EDITABLE(msg->text), signature, strlen(signature),
+				     &pos);
+
+		g_free(signature);
+    }
+    
+    return TRUE;
+}
 
 BalsaSendmsg *
 sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,

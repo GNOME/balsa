@@ -244,7 +244,7 @@ typedef struct {
       guint length; 
 } headerMenuDesc;
 
-headerMenuDesc headerDescs[] = { {"to", 3}, {"from", 3}, {"subject",2},
+headerMenuDesc headerDescs[] = { {"from", 3}, {"to", 3}, {"subject",2},
 				 {"cc", 3}, {"bcc",  3}, {"fcc",    2},
 				 {"replyto", 3}, {"attachments", 4},
 				 {"comments", 2}, {"keywords",2}};

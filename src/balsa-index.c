@@ -1202,28 +1202,17 @@ bndx_mailbox_changed_cb(BalsaIndex * bindex)
 static void
 bndx_view_source(GtkWidget * widget, gpointer data)
 {
-    GtkTreeSelection *selection;
-    GtkTreeModel *model;
-    GList *rows;
+    GList *messages = balsa_index_selected_list(BALSA_INDEX(data));
     GList *list;
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(data));
-    rows = gtk_tree_selection_get_selected_rows(selection, &model);
+    for (list = messages; list; list = list->next) {
+	LibBalsaMessage *message = list->data;
 
-    for (list = rows; list; list = list->next) {
-	GtkTreePath *path;
-	GtkTreeIter iter;
-	LibBalsaMessage *message;
-
-	path = list->data;
-	gtk_tree_model_get_iter(model, &iter, path);
-	gtk_tree_model_get(model, &iter, LB_MBOX_MESSAGE_COL, &message, -1);
 	libbalsa_show_message_source(message, balsa_app.message_font,
 				     &balsa_app.source_escape_specials);
-	gtk_tree_path_free(path);
     }
 
-    g_list_free(rows);
+    g_list_free(messages);
 }
 
 static void

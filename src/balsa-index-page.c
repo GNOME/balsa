@@ -358,6 +358,14 @@ idle_handler_cb(GtkWidget * widget)
   return FALSE;
 }
 
+/* replace_attached_data: 
+   ref messages so the don't get destroyed in meantime.  
+   QUESTION: is it possible that the idle is scheduled but
+   then entire balsa-index object is destroyed before the idle
+   function is executed? One can first try to handle all pending
+   messages before closing...
+*/
+
 static void
 replace_attached_data(GtkObject *obj,const gchar *key, GtkObject* data)
 {
@@ -372,29 +380,21 @@ replace_attached_data(GtkObject *obj,const gchar *key, GtkObject* data)
 void
 balsa_index_update_message (BalsaIndexPage *index_page)
 {
-    GtkObject *message;
-    BalsaIndex *index;
-    GtkCList *list;
-    
-    index = BALSA_INDEX (index_page->index);
-    list = GTK_CLIST (index);
-    if (g_list_find (list->selection, (gpointer) list->focus_row) == NULL)
-        message = NULL;
-    else
-        message = GTK_OBJECT (gtk_clist_get_row_data (list, list->focus_row));
-
-    replace_attached_data (GTK_OBJECT (index), "message", message);
-    replace_attached_data (GTK_OBJECT (index), "data", GTK_OBJECT(index_page));
-
-    /* this way we only display one message, not lots and lots, and
-       we also avoid flicker due to consecutive unselect/select */
-    /* [MBG] FIXME: Commented this out to solve problem with
-     * multi-threaded mailbox updating.  Doesn't seem to have an
-     * adverse affect as described above
-     * ref messages so the don't get destroyed in meantime.
-     * */
-    /* if (!handler) */
-    handler = gtk_idle_add ((GtkFunction) idle_handler_cb, index);
+  GtkObject *message;
+  BalsaIndex *index;
+  GtkCList *list;
+  
+  index = BALSA_INDEX (index_page->index);
+  list = GTK_CLIST (index);
+  if (g_list_find (list->selection, (gpointer) list->focus_row) == NULL)
+    message = NULL;
+  else
+    message = GTK_OBJECT (gtk_clist_get_row_data (list, list->focus_row));
+  
+  replace_attached_data (GTK_OBJECT (index), "message", message);
+  replace_attached_data (GTK_OBJECT (index), "data", GTK_OBJECT(index_page));
+  
+  handler = gtk_idle_add ((GtkFunction) idle_handler_cb, index);
 }
 
 static void
@@ -408,9 +408,10 @@ index_select_cb (GtkWidget * widget,
   g_return_if_fail (message != NULL);
   
   if (bevent && bevent->button == 3) {
+    gtk_idle_remove(handler);
     gtk_menu_popup (GTK_MENU(create_menu(BALSA_INDEX(widget))),
-                    NULL, NULL, NULL, NULL,
-                    bevent->button, bevent->time);
+		    NULL, NULL, NULL, NULL,
+		    bevent->button, bevent->time);
   } else {
     replace_attached_data (GTK_OBJECT (widget), "message",GTK_OBJECT(message));
     replace_attached_data (GTK_OBJECT (widget), "data", GTK_OBJECT(data));
@@ -433,6 +434,7 @@ index_unselect_cb (GtkWidget * widget,
     return;
   
   if (bevent && bevent->button == 3) {
+    gtk_idle_remove(handler);
     gtk_menu_popup (GTK_MENU(create_menu(BALSA_INDEX(widget))),
                     NULL, NULL, NULL, NULL,
                     bevent->button, bevent->time);

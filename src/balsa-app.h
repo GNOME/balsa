@@ -218,6 +218,12 @@ extern struct BalsaApplication
   /* printing */
   Printing_t PrintCommand;
 
+#ifdef ENABLE_LDAP
+	/* LDAP (only one) */
+	gchar *ldap_host;
+	gchar *ldap_base_dn;
+#endif /* ENABLE_LDAP */
+  
   /* compose: shown headers */
   gchar* compose_headers; 
 

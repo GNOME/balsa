@@ -214,8 +214,28 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+
+dnl #########################################################################
+dnl  Check for LDAP if available.
+dnl  For now, only look for OpenLDAP?
+dnl ########################################################################
+
+AC_ARG_ENABLE([ldap], [  --enable-ldap Use OpenLDAP if available (experimental) [default=no]],[
+	use_ldap=$enableval
+],[
+	use_ldap=no
+])
+AC_MSG_CHECKING(whether to use LDAP)
+if test x"$use_ldap" = xyes ; then
+	AC_MSG_RESULT([yes])
+	AC_CHECK_LIB(ldap, ldap_search, AC_DEFINE(ENABLE_LDAP) LIBS="-lldap -llber $LIBS", use_ldap=no, -llber)
+else
+	AC_MSG_RESULT([no])
+fi
+
+
 dnl ######################################################################################
-dnl Check from GtkHTML if available
+dnl Check for GtkHTML if available
 dnl ######################################################################################
 
 AC_ARG_ENABLE([gtkhtml], [  --enable-gtkhtml Use GtkHTML if available (experimental) [default=no]],[
@@ -396,6 +416,7 @@ echo "Installing some files into  "
 echo "            Gnome's prefix: $use_system_install (may require root privileges)"
 echo "   Enable compile warnings: $set_more_warnings"
 echo "               Use GtkHTML: $have_gtkhtml"
+echo "                  Use LDAP: $use_ldap"
 echo ""
 
 if test x"$BALSA_FROM_CVS" = xyes ; then

@@ -50,6 +50,10 @@
 
 #include "libinit_balsa/init_balsa.h"
 
+#ifdef ENABLE_LDAP
+#include "ldap-addressbook.h"
+#endif /* ENABLE_LDAP */
+
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
 
@@ -358,6 +362,9 @@ close_all_mailboxes (GNode * node, gpointer data)
 void
 balsa_exit (void)
 {
+#ifdef ENABLE_LDAP
+  ldap_quit ();
+#endif /* ENABLE_LDAP */
   g_node_traverse (balsa_app.mailbox_nodes,
 		   G_LEVEL_ORDER,
 		   G_TRAVERSE_ALL,

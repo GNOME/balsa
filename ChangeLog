@@ -1,3 +1,15 @@
+2000-09-07  Berend De Schouwer  <bds@jhb.ucs.co.za>
+	LDAP directory lookup.
+	* acconfig.h: add ENABLE_LDAP
+	* configure.in: add --enable-ldap configuration option.
+	* src/Makefile.am: ldap-addressbook.[hc] added to the source list.
+	* src/address-book.[hc]: Restructure and generalize the code.
+	* src/balsa-app.[hc]: declare initialize LDAP variables.
+	* src/expand-alias.c: move AdressData code to address-book.c
+	* src/main.c: close LDAP on exit.
+	* src/pref-manager.c: add LDAP page.
+	* src/save-restore.c: save and read LDAP data.
+	
 2000-09-07  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/mailbox-conf.c: Make sure that the path has ben filled in for
@@ -9,7 +21,7 @@
 2000-09-07  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-index-page.c: bug fix for the idle_handler_cb() crashes.
-	
+
 2000-09-06  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/threads.h: Sync the definition of MailThreadMessage to

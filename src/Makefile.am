@@ -42,9 +42,11 @@ balsa_SOURCES =	\
 	save-restore.h		\
 	sendmsg-window.c	\
 	sendmsg-window.h	\
-	quote-color.c	\
-	quote-color.h	\
-	threads.h
+	quote-color.c		\
+	quote-color.h		\
+	threads.h		\
+	ldap-addressbook.c	\
+	ldap-addressbook.h 
 #	index-child.h		\
 #	spell-check.c		\
 #	spell-check.h		\

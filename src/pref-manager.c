@@ -29,6 +29,10 @@
 /* FIXME: Mutt dependency */
 #include "../libmutt/mime.h"
 
+#ifdef ENABLE_LDAP
+#include <ldap-addressbook.h>
+#endif /* ENABLE_LDAP */
+
 #define NUM_TOOLBAR_MODES 3
 #define NUM_MDI_MODES 4
 #define NUM_ENCODING_MODES 3
@@ -90,6 +94,12 @@ typedef struct _PropertyUI {
 	/* address book */
 	GtkWidget *ab_location;
 	GtkWidget *alias_find_flag;
+
+#ifdef ENABLE_LDAP
+	/* ldap */
+	GtkWidget *ldap_host;
+	GtkWidget *base_dn;
+#endif /* ENABLE_LDAP */
 	  
 } PropertyUI;
 
@@ -107,6 +117,9 @@ static GtkWidget *create_printing_page ( void );
 static GtkWidget *create_encondig_page ( void );
 static GtkWidget *create_misc_page ( void );
 static GtkWidget *create_startup_page ( void );
+#ifdef ENABLE_LDAP
+static GtkWidget *create_ldap_page (void);
+#endif
 
 static GtkWidget *create_information_message_menu (void);
 
@@ -224,6 +237,12 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 	page = create_startup_page ();
         gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Startup")) );
 
+#ifdef ENABLE_LDAP
+        page = create_ldap_page ();
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("LDAP")) );
+#endif /* ENABLE_LDAP */
+
+
 	set_prefs ();
 
         for (i = 0; i < NUM_TOOLBAR_MODES; i++) {
@@ -326,6 +345,15 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 
 	gtk_signal_connect (GTK_OBJECT (pui->empty_trash), "toggled",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
+
+#ifdef ENABLE_LDAP
+        gtk_signal_connect (GTK_OBJECT (pui->ldap_host), "changed",
+                            GTK_SIGNAL_FUNC (properties_modified_cb),
+                            property_box);
+        gtk_signal_connect (GTK_OBJECT (pui->base_dn), "changed",
+                            GTK_SIGNAL_FUNC (properties_modified_cb),
+                            property_box);
+#endif /* ENABLE_LDAP */
 
 	/* Date format */
 	gtk_signal_connect (GTK_OBJECT (pui->date_format), "changed",
@@ -492,6 +520,11 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	balsa_app.remember_open_mboxes = GTK_TOGGLE_BUTTON(pui->remember_open_mboxes)->active;
 	balsa_app.empty_trash_on_exit = GTK_TOGGLE_BUTTON(pui->empty_trash)->active;
 
+#ifdef ENABLE_LDAP
+        balsa_app.ldap_host = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->ldap_host)));
+        balsa_app.ldap_base_dn = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->base_dn)));
+#endif /* ENABLE_LDAP */
+
 	/* date format */
 	g_free (balsa_app.date_string);
 	balsa_app.date_string = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->date_format)));
@@ -643,6 +676,14 @@ set_prefs (void)
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
 	    pui->empty_trash), balsa_app.empty_trash_on_exit);
 
+
+#ifdef ENABLE_LDAP
+        if (balsa_app.ldap_host)
+            gtk_entry_set_text (GTK_ENTRY(pui->ldap_host), balsa_app.ldap_host);
+        if (balsa_app.ldap_base_dn)
+            gtk_entry_set_text (GTK_ENTRY(pui->base_dn),balsa_app.ldap_base_dn);
+#endif /* ENABLE_LDAP */
+	
 	/* date format */
 	if(balsa_app.date_string) 
 	   gtk_entry_set_text (GTK_ENTRY (pui->date_format),
@@ -1726,6 +1767,106 @@ create_startup_page ( )
 	return vbox1;
 
 }
+
+
+#ifdef ENABLE_LDAP
+static void
+ldap_changed_cb(GtkWidget* widget, gpointer button)
+{
+  gchar * host, *dn;
+  gint nstate;
+  host = gtk_editable_get_chars(GTK_EDITABLE(pui->ldap_host), 0, -1);
+  g_strstrip(host);
+  dn   = gtk_editable_get_chars(GTK_EDITABLE(pui->base_dn), 0, -1);
+  g_strstrip(dn);
+  nstate = *host && *dn;
+  if(!!GTK_WIDGET_IS_SENSITIVE(GTK_WIDGET(button)) != !!nstate)
+     gtk_widget_set_sensitive(GTK_WIDGET(button), nstate);
+  g_free(dn);
+  g_free(host);
+}
+
+static void
+ldap_test_wrapper_cb(GtkWidget* widget, gpointer data)
+{
+  gchar * host, *dn;
+  host = gtk_editable_get_chars(GTK_EDITABLE(pui->ldap_host), 0, -1);
+  g_strstrip(host);
+  dn   = gtk_editable_get_chars(GTK_EDITABLE(pui->base_dn), 0, -1);
+  g_strstrip(dn);
+
+  ldap_test(host, dn);
+  g_free(host);
+  g_free(dn);
+}
+
+static GtkWidget *
+create_ldap_page()
+{
+	GtkWidget *label;
+	GtkWidget *vbox1;
+	GtkWidget *frame;
+	GtkWidget *table;
+	GtkWidget *button;
+
+	vbox1 = gtk_vbox_new ( FALSE, 0);
+	gtk_widget_show(vbox1);
+
+	frame = gtk_frame_new (_("LDAP Configuration"));
+	gtk_widget_show (frame);
+	gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+	gtk_box_pack_start( GTK_BOX(vbox1), frame, FALSE, FALSE, 0);
+
+	table = gtk_table_new (3, 2, FALSE);
+	gtk_widget_show (table);
+	gtk_container_add (GTK_CONTAINER (frame), table);
+	gtk_container_set_border_width (GTK_CONTAINER (table), 10);
+	gtk_table_set_row_spacings (GTK_TABLE (table), 10);
+	gtk_table_set_col_spacings (GTK_TABLE (table), 10);
+
+	label = gtk_label_new (_("LDAP Server:"));
+	gtk_widget_show (label);
+	gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
+	                  (GtkAttachOptions) (GTK_FILL),
+	                  (GtkAttachOptions) (0), 0, 0);
+	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_RIGHT);
+
+	pui->ldap_host = gtk_entry_new ();
+	gtk_widget_show (pui->ldap_host);
+	gtk_table_attach (GTK_TABLE (table), pui->ldap_host, 1, 2, 0, 1,
+	                  (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+	                  (GtkAttachOptions) (0), 0, 0);
+
+	label = gtk_label_new (_("Base DN:"));
+	gtk_widget_show (label);
+	gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
+	                  (GtkAttachOptions) (GTK_FILL),
+	                  (GtkAttachOptions) (0), 0, 0);
+	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_RIGHT);
+
+	pui->base_dn = gtk_entry_new ();
+	gtk_widget_show (pui->base_dn);
+	gtk_table_attach (GTK_TABLE (table), pui->base_dn, 1, 2, 1, 2,
+	                  (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+	                  (GtkAttachOptions) (0), 0, 0);
+
+	button = gtk_button_new_with_label (_("Test"));
+	gtk_widget_show (button);
+	gtk_table_attach (GTK_TABLE (table), button, 1, 2, 2, 3,
+	                  (GtkAttachOptions) (GTK_FILL),
+			  (GtkAttachOptions) (0), 0, 0);
+	gtk_signal_connect (GTK_OBJECT (button), "clicked",
+	                    ldap_test_wrapper_cb, NULL);
+	gtk_signal_connect(GTK_OBJECT(pui->ldap_host), "changed",
+				      ldap_changed_cb, button);
+	gtk_signal_connect(GTK_OBJECT(pui->base_dn), "changed",
+				      ldap_changed_cb, button);
+	
+	ldap_changed_cb(pui->ldap_host, button);
+	return vbox1;
+}
+#endif /* ENABLE_LDAP */
+ 
 
 /*
  * callbacks

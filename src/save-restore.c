@@ -857,7 +857,6 @@ config_global_load (void)
       balsa_app.PrintCommand.PrintCommand = g_strdup("a2ps -d -q %s");
   else 
       balsa_app.PrintCommand.PrintCommand = g_strdup(field);
-
   balsa_app.PrintCommand.linesize = 
     d_get_gint (globals, "PrintLinesize",DEFAULT_LINESIZE);
   balsa_app.PrintCommand.breakline = 
@@ -918,6 +917,21 @@ config_global_load (void)
     balsa_app.date_string = g_strdup (field);
   }
 
+#ifdef ENABLE_LDAP
+  /*
+   * LDAP can set a host, and a base Domain name.
+   */
+  g_free (balsa_app.ldap_host);
+  balsa_app.ldap_host = NULL;
+  if ((field = pl_dict_get_str (globals, "LDAPHost")) != NULL)
+     balsa_app.ldap_host = g_strdup (field);
+
+  g_free (balsa_app.ldap_base_dn);
+  balsa_app.ldap_base_dn = NULL;
+  if ((field = pl_dict_get_str (globals, "BaseDN")) != NULL)
+     balsa_app.ldap_base_dn = g_strdup (field);
+#endif /* ENABLE_LDAP */
+  
  return TRUE;
 }				/* config_global_load */
 
@@ -1081,6 +1095,14 @@ config_global_save (void)
 
   if( balsa_app.date_string )
 	  pl_dict_add_str_str (globals, "DateFormat", balsa_app.date_string );
+
+#ifdef ENABLE_LDAP
+  if (balsa_app.ldap_host != NULL)
+     pl_dict_add_str_str (globals, "LDAPHost", balsa_app.ldap_host);
+  if (balsa_app.ldap_base_dn != NULL)
+     pl_dict_add_str_str(globals, "BaseDN", balsa_app.ldap_base_dn);
+#endif /* ENABLE_LDAP */
+
 
   /* Add it to configuration file */
   temp_str = PLMakeString ("Globals");

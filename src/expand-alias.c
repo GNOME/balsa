@@ -105,7 +105,6 @@ static inputData* process_keystroke (inputData* input, GtkWidget *widget,
 	GdkEventKey *event);
 static void show_input (inputData *input, GtkWidget *widget);
 static void input_data_free (inputData *data);
-static void address_data_free (AddressData * address, gpointer ignore);
 
 
 /*
@@ -958,26 +957,6 @@ destroy_cb(GtkWidget *widget,
    if (data) input_data_free (data);
    data = NULL;
    gtk_object_set_data (GTK_OBJECT (widget), "old_input", (gpointer) data);
-}
-
-
-/*
- * address_data_free ()
- *
- * Input: None.
- * Input: None.
- *
- * Frees a single AddressData structure.
- * Move to src/address-book.c?
- */
-static void
-address_data_free (AddressData * address, gpointer ignore)
-{
-    g_free (address->name);
-    g_free (address->addy);
-    g_free (address->upper);
-    g_free (address->id);
-    g_free (address);
 }
 
 

@@ -178,6 +178,10 @@ balsa_app_init (void)
   balsa_app.error_message = 0;
   balsa_app.debug_message = 0;
 
+#ifdef ENABLE_LDAP
+  balsa_app.ldap_host = NULL;
+  balsa_app.ldap_base_dn = NULL;
+#endif /* ENABLE_LDAP */
 }
 
 gboolean

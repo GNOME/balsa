@@ -1349,12 +1349,11 @@ msgstr "Transmitir el mensaje"
 
 #: src/sendmsg-window.c:172
 msgid "_Reflow paragraph"
-msgstr ""
+msgstr "Reformatear el _párrafo"
 
 #: src/sendmsg-window.c:175
-#, fuzzy
 msgid "R_eflow message"
-msgstr "Nuevo mensaje"
+msgstr "Reformatear el _mensaje"
 
 #: src/sendmsg-window.c:184
 msgid "Fr_om"

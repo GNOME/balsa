@@ -195,12 +195,10 @@ msgid "OK"
 msgstr "OK"
 
 #: src/address-book.c:295
-#, fuzzy
 msgid "No-Id"
 msgstr "Sin-Id"
 
 #: src/address-book.c:303
-#, fuzzy
 msgid "No-Name"
 msgstr "Sin-Nombre"
 
@@ -250,9 +248,8 @@ msgid "Draftbox"
 msgstr "Borrador"
 
 #: src/balsa-app.c:250
-#, fuzzy
 msgid "Trash"
-msgstr "Papelera:"
+msgstr "Papelera"
 
 #: src/balsa-index-page.c:287
 msgid "Mailbox password:"
@@ -318,7 +315,6 @@ msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Buzón actual: %s con %ld mensajes, %ld nuevos"
 
 #: src/balsa-message.c:165 src/balsa-message.c:170
-#, fuzzy
 msgid "Save MIME Part"
 msgstr "Guardar parte MIME"
 
@@ -1095,7 +1091,6 @@ msgid "enable signature separator"
 msgstr "activar el separador de firma"
 
 #: src/pref-manager.c:831
-#, fuzzy
 msgid "Remote Mailbox Servers"
 msgstr "Servidores de Correo Remotos"
 
@@ -1356,12 +1351,10 @@ msgid "Wrap message lines"
 msgstr "Lineas con retorno de carro"
 
 #: src/sendmsg-window.c:172
-#, fuzzy
 msgid "_Reflow paragraph"
 msgstr "Reformatear el _párafo"
 
 #: src/sendmsg-window.c:175
-#, fuzzy
 msgid "R_eflow message"
 msgstr "Reformatear el _mensaje"
 
@@ -1438,7 +1431,6 @@ msgid "_Show"
 msgstr "_Mostrar"
 
 #: src/sendmsg-window.c:263
-#, fuzzy
 msgid "_ISO Charset"
 msgstr "Codificación _ISO"
 

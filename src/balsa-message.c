@@ -251,6 +251,7 @@ balsa_message_init(BalsaMessage * bm)
     gtk_text_view_set_editable(GTK_TEXT_VIEW(bm->header_text), FALSE);
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(bm->header_text), 2);
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(bm->header_text), 2);
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(bm->header_text), GTK_WRAP_WORD);
     g_signal_connect(G_OBJECT(bm->header_text), "key_press_event",
 		     G_CALLBACK(balsa_message_key_press_event),
 		     (gpointer) bm);
@@ -658,71 +659,68 @@ balsa_message_set_wrap(BalsaMessage * bm, gboolean wrap)
     }
 }
 
-/* This function should split \n into separate lines. */
+/* Indents in pixels: */
+#define BALSA_ONE_CHAR     7
+#define BALSA_INDENT_CHARS 15
+#define BALSA_TAB1         (BALSA_ONE_CHAR * BALSA_INDENT_CHARS)
+#define BALSA_TAB2         (BALSA_TAB1 + BALSA_ONE_CHAR)
+
 static void
-add_header_gchar(BalsaMessage * bm, const gchar *header, const gchar *label,
-		 const gchar *value)
+add_header_gchar(BalsaMessage * bm, const gchar * header,
+                 const gchar * label, const gchar * value)
 {
-    GtkTextBuffer *buffer =
-        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bm->header_text));
+    PangoTabArray *tab;
+    GtkTextBuffer *buffer;
+    GtkTextTag *font_tag;
     GtkTextIter insert;
-    GtkTextTag *tag = NULL;
-    gchar pad[] = "                ";
-    gchar cr[] = "\n";
-    gchar *line_start, *line_end;
-    gchar *wrapped_value;
-    if (!(bm->shown_headers == HEADERS_ALL || 
-          libbalsa_find_word(header, balsa_app.selected_headers))) 
-	return;
+
+    if (!(bm->shown_headers == HEADERS_ALL ||
+          libbalsa_find_word(header, balsa_app.selected_headers)))
+        return;
+
+    tab = pango_tab_array_new_with_positions(2, TRUE,
+                                             PANGO_TAB_LEFT, BALSA_TAB1,
+                                             PANGO_TAB_LEFT, BALSA_TAB2);
+    gtk_text_view_set_tabs(GTK_TEXT_VIEW(bm->header_text), tab);
+    pango_tab_array_free(tab);
 
     /* always display the label in the predefined font */
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bm->header_text));
+    font_tag = NULL;
     if (strcmp(header, "subject") == 0)
-        tag = gtk_text_buffer_create_tag(buffer, NULL,
-                                         "font", balsa_app.subject_font,
-                                         NULL);
+        font_tag =
+            gtk_text_buffer_create_tag(buffer, NULL,
+                                       "font", balsa_app.subject_font,
+                                       NULL);
 
-    gtk_text_buffer_get_iter_at_mark(buffer, &insert, 
+    gtk_text_buffer_get_iter_at_mark(buffer, &insert,
                                      gtk_text_buffer_get_insert(buffer));
+    if (gtk_text_buffer_get_char_count(buffer))
+        gtk_text_buffer_insert(buffer, &insert, "\n", 1);
     gtk_text_buffer_insert_with_tags(buffer, &insert,
-                                     label, -1, 
-                                     tag, NULL);
-    
+                                     label, -1, font_tag, NULL);
+
     if (value && *value != '\0') {
-        gint pad_chars = 15 - strlen(label);
+        GtkTextTagTable *table;
+        GtkTextTag *indent_tag;
+        gchar *wrapped_value;
 
-        gtk_text_buffer_insert_with_tags(buffer, &insert,
-                                         pad, MAX(1, pad_chars),
-                                         tag, NULL);
+        table = gtk_text_buffer_get_tag_table(buffer);
+        indent_tag = gtk_text_tag_table_lookup(table, "indent");
+        if (!indent_tag)
+            indent_tag =
+                gtk_text_buffer_create_tag(buffer, "indent",
+                                           "indent", BALSA_TAB1, NULL);
 
-	wrapped_value = g_strdup(value);
-	libbalsa_wrap_string(wrapped_value, balsa_app.wraplength - 15);
+        gtk_text_buffer_insert(buffer, &insert, "\t", 1);
+        wrapped_value = g_strdup(value);
+        libbalsa_wrap_string(wrapped_value,
+                             balsa_app.wraplength - BALSA_INDENT_CHARS);
         libbalsa_utf8_sanitize(wrapped_value);
-
-	/* We must insert the first line. Each subsequent line must be indented 
-	   by 15 spaces. So we need to rewrap lines 2+
-	 */
-	line_end = wrapped_value;
-	while (*line_end != '\0') {
-	    line_start = line_end;
-	    line_end++;
-	    while (*line_end != '\0' && *line_end != '\n')
-		line_end++;
-
-	    if (line_start != wrapped_value)
-                gtk_text_buffer_insert_with_tags(buffer, &insert,
-                                                 pad, 15,
-                                                 tag, NULL);
-            gtk_text_buffer_insert_with_tags(buffer, &insert, 
-                                             line_start,
-                                             line_end - line_start, 
-                                             tag, NULL);
-            gtk_text_buffer_insert(buffer, &insert, cr, 1);
-	    if (*line_end != '\0')
-		line_end++;
-	}
-	g_free(wrapped_value);
-    } else {
-        gtk_text_buffer_insert(buffer, &insert, cr, 1);
+        gtk_text_buffer_insert_with_tags(buffer, &insert,
+                                         wrapped_value, -1,
+                                         indent_tag, font_tag, NULL);
+        g_free(wrapped_value);
     }
 }
 
@@ -1641,10 +1639,10 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         }
 
         item = gtk_text_view_new();
-        buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(item));
-
+        gtk_text_view_set_editable(GTK_TEXT_VIEW(item), FALSE);
         gtk_text_view_set_left_margin(GTK_TEXT_VIEW(item), 2);
         gtk_text_view_set_right_margin(GTK_TEXT_VIEW(item), 2);
+        gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(item), GTK_WRAP_WORD);
 
         /* set the message font */
         gtk_widget_modify_font(item,
@@ -1660,6 +1658,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         g_signal_connect(G_OBJECT(item), "focus_out_event",
                          G_CALLBACK(balsa_message_focus_out_part),
                            (gpointer) bm);
+
+        buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(item));
         allocate_quote_colors(GTK_WIDGET(bm), balsa_app.quoted_color,
                               0, MAX_QUOTED_COLOR - 1);
         if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0) {
@@ -1701,8 +1701,6 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         }
 
         g_free(ptr);
-
-        gtk_text_view_set_editable(GTK_TEXT_VIEW(item), FALSE);
 
         gtk_widget_show(item);
         info->focus_widget = item;

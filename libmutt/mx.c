@@ -307,8 +307,9 @@ static int is_mh_message (char * str)
   len = strlen (str);
 
   /* check for ,[0-9]+ deleted messages */
-  if (len && *str == ',' && is_mh_message (&str[1]))
-    return 1;
+  if (len && *str == ',')
+    if (is_mh_message (&str[1]))
+      return 1;
 
   for (i = 0; i < len; i++)
     {
@@ -340,8 +341,12 @@ static int mx_is_mh(const char* p)
   while ((de = readdir(dirp)) != NULL)
   {
     if (is_mh_message(de->d_name))
+    {
+      closedir(dirp);
       return 1;
+    }
   }
+  closedir(dirp);
   return 0;
 }
   

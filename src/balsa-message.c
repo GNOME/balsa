@@ -1162,9 +1162,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
                       (gpointer) bm);
 
     is_new = LIBBALSA_MESSAGE_IS_UNREAD(message);
-    if(!libbalsa_message_body_ref(bm->message, TRUE, 
-                                  bm->show_all_headers||
-                                  bm->shown_headers == HEADERS_ALL)) 
+    if(!libbalsa_message_body_ref(bm->message, TRUE, TRUE))
         return FALSE;
 
 #ifdef HAVE_GPGME

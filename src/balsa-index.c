@@ -40,7 +40,6 @@
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-index.h"
-#include "balsa-index-threading.h"
 #include "balsa-mblist.h"
 #include "balsa-message.h"
 #include "main-window.h"
@@ -62,8 +61,9 @@ static gint size_compare(LibBalsaMessage * m1, LibBalsaMessage * m2);
 static void bndx_column_click(GtkTreeViewColumn * column, gpointer data);
 
 /* statics */
-static void bndx_set_sort_order(BalsaIndex * index, int col_id, 
-				GtkSortType order);
+static void bndx_set_sort_order(BalsaIndex * index,
+				LibBalsaMailboxSortFields field,
+				LibBalsaMailboxSortType order);
 /* adds a new message */
 static void balsa_index_add(BalsaIndex * index, LibBalsaMessage * message);
 /* retrieve the selection */
@@ -427,8 +427,7 @@ static gint
 date_compare(LibBalsaMessage * m1, LibBalsaMessage * m2)
 {
     g_return_val_if_fail(m1 && m2, 0);
-
-    return m2->date - m1->date;
+    return m1->date - m2->date;
 }
 
 
@@ -442,7 +441,7 @@ numeric_compare(LibBalsaMessage * m1, LibBalsaMessage * m2)
     t1 = LIBBALSA_MESSAGE_GET_NO(m1);
     t2 = LIBBALSA_MESSAGE_GET_NO(m2);
 
-    return t2-t1;
+    return t1-t2;
 }
 
 static gint
@@ -460,38 +459,44 @@ size_compare(LibBalsaMessage * m1, LibBalsaMessage * m2)
         t2 = LIBBALSA_MESSAGE_GET_LENGTH(m2);
     }
 
-    return t2-t1;
+    return t1-t2;
 }
 
 static void
 bndx_column_click(GtkTreeViewColumn * column, gpointer data)
 {
-    GtkSortType order = GTK_SORT_ASCENDING;
+    GtkSortType gtk_sort = GTK_SORT_ASCENDING;
     GtkTreeView *tree_view = GTK_TREE_VIEW(data);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
     GtkTreeSortable *sortable = GTK_TREE_SORTABLE(model);
     GList *columns = gtk_tree_view_get_columns(tree_view);
     gint col_id = g_list_index(columns, column);
     gint current_col_id;
+    LibBalsaMailboxSortFields field;
+    LibBalsaMailboxSortType   order;
 
     g_list_free(columns);
     if (gtk_tree_sortable_get_sort_column_id(sortable,
-                                             &current_col_id, &order)) {
+                                             &current_col_id, &gtk_sort)) {
         GtkTreeViewColumn *current_column =
             gtk_tree_view_get_column(tree_view, current_col_id);
 
         gtk_tree_view_column_set_sort_indicator(current_column, FALSE);
         if (current_col_id == col_id)
-            order = (order == GTK_SORT_DESCENDING ?
-                    GTK_SORT_ASCENDING : GTK_SORT_DESCENDING);
+            gtk_sort = (gtk_sort == GTK_SORT_DESCENDING ?
+			GTK_SORT_ASCENDING : GTK_SORT_DESCENDING);
     }
 
-    BALSA_INDEX(tree_view)->mailbox_node->sort_field = col_id;
-    BALSA_INDEX(tree_view)->mailbox_node->sort_type  = order;
+    switch(col_id) {
+    case 0: field = LB_MAILBOX_SORT_NO;       break;
+    case 5: field = LB_MAILBOX_SORT_DATE;     break;
+    case 6: field = LB_MAILBOX_SORT_SIZE;     break;
+    default: field = LB_MAILBOX_SORT_NATURAL; break;
+    }
+    order = (gtk_sort == GTK_SORT_DESCENDING)
+	? LB_MAILBOX_SORT_TYPE_DESC : LB_MAILBOX_SORT_TYPE_ASC;
 
-    gtk_tree_sortable_set_sort_column_id(sortable, col_id, order);
-    gtk_tree_view_column_set_sort_indicator(column, TRUE);
-    gtk_tree_view_column_set_sort_order(column, order);
+    bndx_set_sort_order(BALSA_INDEX(tree_view), field, order);
     bndx_changed_find_row(BALSA_INDEX(tree_view));
     bndx_check_visibility(BALSA_INDEX(tree_view));
 }
@@ -621,12 +626,8 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
 			     (gpointer) index);
 
     /* do threading */
-    bndx_set_sort_order(index, mbnode->sort_field, mbnode->sort_type);
-    /* FIXME: this is an ugly way of doing it:
-       override default mbost threading type with the global balsa
-       default setting
-    */
-    balsa_index_set_threading_type(index, balsa_app.threading_type);
+    bndx_set_sort_order(index, mailbox->sort_field, mailbox->sort_type);
+    balsa_index_set_threading_type(index, mailbox->threading_type);
 
     bndx_moveto(index);
 
@@ -1553,7 +1554,8 @@ mailbox_messages_added(BalsaIndex * bindex, GList *messages)
 	balsa_index_add(bindex, message);
 	messages = g_list_next(messages);
     }
-    balsa_index_threading(bindex);
+    balsa_index_threading(bindex, 
+			  bindex->mailbox_node->mailbox->threading_type);
 
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store, 
 				bindex->mailbox_node->mailbox);
@@ -2177,8 +2179,7 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
     g_return_if_fail (index->mailbox_node != NULL);
     g_return_if_fail (index->mailbox_node->mailbox != NULL);
 
-    index->threading_type = thtype;
-    index->mailbox_node->threading_type = thtype;
+    index->mailbox_node->mailbox->threading_type = thtype;
     
     gtk_tree_store_clear(GTK_TREE_STORE
                          (gtk_tree_view_get_model(GTK_TREE_VIEW(index))));
@@ -2187,7 +2188,7 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
     for (list = mailbox->message_list; list; list = list->next)
 	balsa_index_add(index, list->data);
     /* do threading */
-    balsa_index_threading(index);
+    balsa_index_threading(index, thtype);
     /* expand tree if specified in config */
     balsa_index_update_tree(index, balsa_app.expand_tree);
 
@@ -2196,25 +2197,37 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
 }
 
 static void
-bndx_set_sort_order(BalsaIndex * index, int col_id, GtkSortType order)
+bndx_set_sort_order(BalsaIndex * index, LibBalsaMailboxSortFields field, 
+		    LibBalsaMailboxSortType order)
 {
+    int col_id;
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     GtkTreeSortable *sortable =
         GTK_TREE_SORTABLE(gtk_tree_view_get_model(tree_view));
-    GtkTreeViewColumn *column =
-        gtk_tree_view_get_column(tree_view, col_id);
+    GtkTreeViewColumn *column;
+    GtkSortType gtk_sort;
 
     g_return_if_fail(index->mailbox_node);
-    g_return_if_fail(col_id >= 0 && col_id <= 6);
-    g_return_if_fail(order == GTK_SORT_DESCENDING || 
-		     order == GTK_SORT_ASCENDING);
+    g_return_if_fail(order == LB_MAILBOX_SORT_TYPE_DESC || 
+		     order == LB_MAILBOX_SORT_TYPE_ASC);
 
-    index->mailbox_node->sort_field = col_id;
-    index->mailbox_node->sort_type  = order;
+    
+    index->mailbox_node->mailbox->sort_field = field;
+    index->mailbox_node->mailbox->sort_type  = order;
+    
+    switch(field) {
+    case LB_MAILBOX_SORT_NO:   col_id = 0;     break;
+    case LB_MAILBOX_SORT_SIZE: col_id = 6;     break;
+    default: 
+    case LB_MAILBOX_SORT_DATE: col_id = 5;     break;
+    }
+    gtk_sort = (order == LB_MAILBOX_SORT_TYPE_ASC) 
+	? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
 
-    gtk_tree_sortable_set_sort_column_id(sortable, col_id, order);
+    column = gtk_tree_view_get_column(tree_view, col_id);
+    gtk_tree_sortable_set_sort_column_id(sortable, col_id, gtk_sort);
     gtk_tree_view_column_set_sort_indicator(column, TRUE);
-    gtk_tree_view_column_set_sort_order(column, order);
+    gtk_tree_view_column_set_sort_order(column, gtk_sort);
 }
 
 static gboolean

@@ -61,7 +61,6 @@ extern "C" {
         gboolean prev_message;
         gboolean next_message;
 
-        int threading_type;
         GTimeVal last_use;
 
 	gchar *date_string;
@@ -158,7 +157,8 @@ extern "C" {
     void balsa_index_hide_deleted(gboolean hide);
 
     /* Threading Stuff, implementation is in balsa-index-threading.c */
-    void balsa_index_threading(BalsaIndex* bindex);
+    void balsa_index_threading(BalsaIndex* bindex,
+			       LibBalsaMailboxThreadingType th_type);
 
 #ifdef __cplusplus
 }

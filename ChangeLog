@@ -6,6 +6,8 @@
 	* src/balsa-index-threading.c: ditto.
 	* src/save-restore.[hc]: same+view saving code.
 	* src/mailbox-node.[hc]: move view data from MailboxNode to Mailbox.
+	* src/balsa-index.[hc]: use new sorting.
+	* src/{mailbox,folder}-conf.c: edit identity assigned to mailbox.
 
 2003-01-05  Pawel Salek  <pawsa@theochem.kth.se>
 

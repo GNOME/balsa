@@ -273,7 +273,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 /* data to pass around: */
 typedef struct {
     GtkDialog *dialog;
-    GtkWidget *parent_folder, *folder_name;
+    GtkWidget *parent_folder, *folder_name, *identity;
     gchar *old_folder, *old_parent;
     BalsaMailboxNode *parent; /* (new) parent of the mbnode.  */
                               /* Used for renaming and creation */
@@ -400,7 +400,7 @@ subfolder_conf_clicked_cb(gpointer data)
 {
     SubfolderDialogData *fcw = (SubfolderDialogData*)data;
     gint response;
-    gchar* parent, *folder;
+    gchar* parent, *folder, *identity;
 
 
     while ((response = gtk_dialog_run(fcw->dialog)) == GTK_RESPONSE_HELP) {
@@ -430,11 +430,14 @@ subfolder_conf_clicked_cb(gpointer data)
             gtk_editable_get_chars(GTK_EDITABLE(fcw->folder_name), 0, -1);
         g_print("fcw->old_parent=%s\n",fcw->old_parent);
         g_print("fcw->old_folder=%s\n",fcw->old_folder);
+	identity = 
+            gtk_editable_get_chars(GTK_EDITABLE(fcw->identity), 0, -1);
+
 	if (fcw->mbnode) {
 	    /* rename */
 	    if ((fcw->old_parent && strcmp(parent, fcw->old_parent)) || 
                  (fcw->old_folder &&strcmp(folder, fcw->old_folder))) {
-		gint button = 0;
+		gint button = GTK_RESPONSE_OK;
 		if (fcw->old_folder && !strcmp(fcw->old_folder, "INBOX") &&
 		    (!fcw->old_parent || !*fcw->old_parent)) {
 		    gchar *msg = g_strdup_printf(
@@ -457,7 +460,7 @@ subfolder_conf_clicked_cb(gpointer data)
 		    button = gtk_dialog_run(GTK_DIALOG(ask));
                     gtk_widget_destroy(ask);
 		}
-		if (button == 0) {
+		if (button == GTK_RESPONSE_OK) {
 		    /* Close the mailbox before renaming,
 		     * otherwise the rescan will try to close it
 		     * under its old name.
@@ -497,7 +500,12 @@ subfolder_conf_clicked_cb(gpointer data)
 			balsa_mailbox_node_rescan(mb);
 			balsa_mailbox_node_rescan(fcw->mbnode);
 		    }
-		}
+		} 
+	    } else { 
+		LibBalsaMailbox* mbx = fcw->mbnode->mailbox;
+		g_free(mbx->identity_name);
+		mbx->identity_name = identity;
+		config_views_save();
 	    }
 	} else {
 	    /* create and subscribe, if parent was. */
@@ -507,6 +515,7 @@ subfolder_conf_clicked_cb(gpointer data)
 
 	    /* see it as server sees it: */
 	    balsa_mailbox_node_rescan(fcw->parent);
+	    g_free(identity); /* OOPS NOT USED */
 	}
 	g_free(parent);
 	g_free(folder);
@@ -574,7 +583,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 			       _("Create subfolder"));
     gtk_box_pack_start(GTK_BOX(fcw.dialog->vbox),
                        frame, TRUE, TRUE, 0);
-    table = gtk_table_new(2, 2, FALSE);
+    table = gtk_table_new(3, 2, FALSE);
     gtk_container_add(GTK_CONTAINER(frame), table);
  
     /* INPUT FIELD CREATION */
@@ -596,6 +605,11 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 	GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
     gtk_table_attach(GTK_TABLE(table), subtable, 1, 2, 1, 2,
 	GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
+
+    label= create_label(_("_Identity:"), table, 2);
+    fcw.identity = create_entry(fcw.dialog, table,
+				NULL,
+				&fcw, 2, mn->mailbox->identity_name, label);
 
     gtk_widget_show_all(GTK_WIDGET(fcw.dialog));
 

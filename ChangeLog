@@ -1,3 +1,11 @@
+2003-04-11 16:43  PeterB
+
+	* libbalsa/address.c: Check argument in libbalsa_address_get_name.
+	* libbalsa/: message.c, message.h: Return "(No subject)" instead of
+	a NULL pointer when there's no subject (see
+	http://mail.gnome.org/archives/balsa-list/2003-April/msg00053.html
+	and followups).
+
 2003-04-10 16:25  PeterB
 
 	* libbalsa/mailbox_local.c: Make sure

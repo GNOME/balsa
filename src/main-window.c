@@ -24,6 +24,7 @@
 #include <X11/Xutil.h>
 
 #include "balsa-app.h"
+#include "balsa-icons.h"
 #include "balsa-index.h"
 #include "balsa-mblist.h"
 #include "balsa-message.h"
@@ -840,7 +841,7 @@ mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, Gd
 	}
 
       main_window_set_cursor (-1);
-#if 0
+
       if (!strcmp (mailbox->name, "Inbox") ||
 	  !strcmp (mailbox->name, "Outbox") ||
 	  !strcmp (mailbox->name, "Trash"))
@@ -850,9 +851,10 @@ mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, Gd
 			       row,
 			       mailbox->name, 5,
 			       NULL, NULL,
-			       tray_empty, tray_empty_mask,
+			       balsa_icon_get_pixmap (BALSA_ICON_TRAY_EMPTY),
+			       balsa_icon_get_bitmap (BALSA_ICON_TRAY_EMPTY),
 			       FALSE, TRUE);
-#endif
+
       gtk_ctree_node_set_row_style (GTK_CTREE (bmbl), row, NULL);
     }
 

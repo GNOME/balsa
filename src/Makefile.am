@@ -11,7 +11,6 @@ balsa_SOURCES =	\
 	main.c			\
 	mblist-window.c		\
 	message-window.c	\
-	misc.c			\
 	new-mailbox.c		\
 	pref-manager.c		\
 	save-restore.c		\
@@ -20,7 +19,7 @@ balsa_SOURCES =	\
 	addrbook-manager.c	\
 	balsa-init.c
 
-INCLUDES=-I. -I../libbalsa -I$(srcdir)/../c-client $(GNOME_INCLUDEDIR)
+INCLUDES=-I. -I../libbalsa $(GNOME_INCLUDEDIR)
 
 balsa_LDADD = $(top_builddir)/libbalsa/libbalsa.a \
 	$(top_builddir)/c-client/libc-client.a \

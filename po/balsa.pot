@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-07-09 18:02-0400\n"
+"POT-Creation-Date: 1998-07-11 12:47-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,43 +14,43 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: ENCODING\n"
 
-#: src/sendmsg-window.c:138
+#: src/sendmsg-window.c:136
 msgid "Send"
 msgstr ""
 
-#: src/sendmsg-window.c:149
+#: src/sendmsg-window.c:147
 msgid "Attach File"
 msgstr ""
 
-#: src/addrbook-manager.c:180 src/sendmsg-window.c:160
+#: src/addrbook-manager.c:180 src/sendmsg-window.c:158
 msgid "Close"
 msgstr ""
 
-#: src/main-window.c:300 src/sendmsg-window.c:168
+#: src/main-window.c:300 src/sendmsg-window.c:166
 msgid "Message"
 msgstr ""
 
-#: src/sendmsg-window.c:175
+#: src/sendmsg-window.c:173
 msgid "Cut"
 msgstr ""
 
-#: src/sendmsg-window.c:182
+#: src/sendmsg-window.c:180
 msgid "Copy"
 msgstr ""
 
-#: src/sendmsg-window.c:189
+#: src/sendmsg-window.c:187
 msgid "Paste"
 msgstr ""
 
-#: src/sendmsg-window.c:196
+#: src/sendmsg-window.c:194
 msgid "Edit"
 msgstr ""
 
-#: src/addrbook-manager.c:195 src/sendmsg-window.c:204
+#: src/addrbook-manager.c:195 src/sendmsg-window.c:202
 msgid "Contents"
 msgstr ""
 
-#: src/addrbook-manager.c:200 src/main-window.c:382 src/sendmsg-window.c:209
+#: src/addrbook-manager.c:200 src/main-window.c:382 src/sendmsg-window.c:207
 msgid "Help"
 msgstr ""
 

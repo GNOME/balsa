@@ -30,8 +30,6 @@
 #include "sendmsg-window.h"
 #include "mailbox.h"
 
-#include "mailbackend.h"
-
 gint delete_event (GtkWidget *, gpointer);
 
 extern GtkWidget *new_icon (gchar **, GtkWidget *);
@@ -485,104 +483,6 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_text_thaw (GTK_TEXT (msg->text));
 }
 
-
-
-
-/*
- * C-client stuff below! LOOK OUT! :)
- */
-
-static gchar *
-gtk_text_to_email (char *buff)
-{
-  int i = 0, len = strlen (buff);
-  GString *gs = g_string_new (NULL);
-  gchar *str;
-
-  for (i = 0; i < len; i++)
-    {
-      switch (buff[i])
-	{
-	case '\n':
-	  gs = g_string_append (gs, "\015\012");
-	  break;
-	default:
-	  gs = g_string_append_c (gs, buff[i]);
-	  break;
-	}
-    }
-  str = g_strdup (gs->str);
-  g_string_free (gs, 1);
-  return str;
-}
-
-gboolean
-send_message (Message * message)
-{
-  long debug = balsa_app.debug;
-  char line[MAILTMPLEN];
-
-  SENDSTREAM *stream = NIL;
-  ENVELOPE *envelope = mail_newenvelope ();
-  BODY *body = mail_newbody ();
-
-  gchar *text;
-
-  char *hostlist[] =
-  {				/* SMTP server host list */
-    NULL,
-    "localhost",
-    NIL
-  };
-  hostlist[0] = balsa_app.smtp_server;
-
-  envelope->from = mail_newaddr ();
-  envelope->from->personal = g_strdup (message->from->personal);
-  envelope->from->mailbox = g_strdup (message->from->user);
-  envelope->from->host = g_strdup (message->from->host);
-  envelope->return_path = mail_newaddr ();
-  envelope->return_path->mailbox = g_strdup (message->from->user);
-  envelope->return_path->host = g_strdup (message->from->host);
-
-  rfc822_parse_adrlist (&envelope->to,
-			make_string_from_list (message->to_list),
-			message->from->host);
-  if (message->cc_list)
-    rfc822_parse_adrlist (&envelope->cc,
-			  make_string_from_list (message->cc_list),
-			  message->from->host);
-  envelope->subject = g_strdup (message->subject);
-  body->type = TYPETEXT;
-
-  text = ((Body *) (g_list_first (message->body_list)->data))->buffer;
-
-  text = gtk_text_to_email (text);
-
-  body->contents.text.data = g_strdup (text);
-  body->contents.text.size = strlen (body->contents.text.data);
-
-  rfc822_date (line);
-  envelope->date = (char *) fs_get (1 + strlen (line));
-  strcpy (envelope->date, line);
-  if (envelope->to)
-    {
-      fprintf (stderr, "Sending...\n");
-      if (stream = smtp_open (hostlist, debug))
-	{
-	  if (smtp_mail (stream, "MAIL", envelope, body))
-	    fprintf (stderr, "[Ok]\n");
-	  else
-	    fprintf (stderr, "[Failed - %s]\n", stream->reply);
-	}
-    }
-  if (stream)
-    smtp_close (stream);
-  else
-    fprintf (stderr, "[Can't open connection to any server]\n");
-  mail_free_envelope (&envelope);
-  mail_free_body (&body);
-}
-
 static void
 send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
@@ -607,13 +507,37 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   message->body_list = g_list_append (message->body_list, body);
 
-  send_message (message);
+  send_message (message, balsa_app.smtp_server, balsa_app.debug);
 
   body_free (body);
   message->body_list->data = NULL;
   g_list_free (message->body_list);
   message_free (message);
   balsa_sendmsg_destroy (bsmsg);
+}
+
+static gchar *
+gtk_text_to_email (char *buff)
+{
+  int i = 0, len = strlen (buff);
+  GString *gs = g_string_new (NULL);
+  gchar *str;
+
+  for (i = 0; i < len; i++)
+    {
+      switch (buff[i])
+	{
+	case '\n':
+	  gs = g_string_append (gs, "\015\012");
+	  break;
+	default:
+	  gs = g_string_append_c (gs, buff[i]);
+	  break;
+	}
+    }
+  str = g_strdup (gs->str);
+  g_string_free (gs, 1);
+  return str;
 }
 
 static gchar *

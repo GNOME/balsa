@@ -51,6 +51,7 @@ struct _MainWindow
 
   /* non-widgets */
   Mailbox *mailbox;
+  guint watcher_id;
 };
 static MainWindow *mw = NULL;
 
@@ -90,6 +91,7 @@ static void mailbox_select_cb (GtkWidget * widget);
 
 static void about_box_destroy_cb ();
 
+static void mailbox_listener (MailboxWatcherMessage *mw_message);
 
 
 void
@@ -817,6 +819,7 @@ mailbox_select_cb (GtkWidget * widget)
   MainWindow *mainwindow;
   Mailbox *mailbox;
   GtkWidget *messagebox;
+  guint watcher_id;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail (GTK_IS_MENU_ITEM (widget));
@@ -834,6 +837,10 @@ mailbox_select_cb (GtkWidget * widget)
   if (mailbox == mainwindow->mailbox)
     return;
 
+  watcher_id = mailbox_watcher_set (mailbox, 
+				    (MailboxWatcherFunc) mailbox_listener, 
+				    MESSAGE_NEW_MASK, 
+				    (gpointer)mainwindow);
 
   /* try to open the new mailbox */
   if (mailbox_open_ref (mailbox))
@@ -841,13 +848,19 @@ mailbox_select_cb (GtkWidget * widget)
       balsa_index_set_mailbox (BALSA_INDEX (mainwindow->index), mailbox);
 
       if (mainwindow->mailbox)
-	mailbox_open_unref (mainwindow->mailbox);
+	{
+	  mailbox_open_unref (mainwindow->mailbox);
+	  mailbox_watcher_remove (mainwindow->mailbox, watcher_id);
+	}
 
       mainwindow->mailbox = mailbox;
+      mainwindow->watcher_id = watcher_id;
       balsa_app.current_index = mainwindow->index;
     }
   else
     {
+      mailbox_watcher_remove (mailbox, watcher_id);
+
       messagebox = gnome_message_box_new ("Unable to Open Mailbox!",
 					  GNOME_MESSAGE_BOX_ERROR,
 					  GNOME_STOCK_BUTTON_OK,
@@ -867,4 +880,12 @@ static void
 about_box_destroy_cb ()
 {
   about_box_visible = FALSE;
+}
+
+
+
+static void 
+mailbox_listener (MailboxWatcherMessage *mw_message)
+{
+  g_print ("I heard it!\n");
 }

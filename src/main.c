@@ -48,18 +48,17 @@ balsa_exit ()
   GList *list;
   Mailbox *mailbox;
 
-
-#if 0
   list = balsa_app.mailbox_list;
   while (list)
     {
       mailbox = list->data;
       list = list->next;
 
-      if (mailbox->stream != NIL)
-	mailbox_close (mailbox);
+      while (mailbox->open_ref > 0)
+	mailbox_open_unref (mailbox);
     }
 
+#if 0
   gtk_timeout_remove(balsa_app.check_mail_timer);
   gtk_timeout_remove(balsa_app.new_messages_timer);
 #endif

@@ -58,8 +58,6 @@ do {\
 #define CLIENT_STREAM(mailbox)          (((MailboxPrivate *)((mailbox)->private))->stream)
 #define CLIENT_STREAM_OPEN(mailbox)     (CLIENT_STREAM (mailbox) != NIL)
 #define CLIENT_STREAM_CLOSED(mailbox)   (CLIENT_STREAM (mailbox) == NIL)
-
-
 #define RETURN_IF_CLIENT_STRAM_CLOSED(mailbox)\
 do {\
   if (CLIENT_STREAM_CLOSED (mailbox))\
@@ -69,7 +67,6 @@ do {\
       return;\
     }\
 } while (0)
-
 #define RETURN_VAL_IF_CLIENT_STRAM_CLOSED(mailbox, val)\
 do {\
   if (CLIENT_STREAM_CLOSED (mailbox))\
@@ -81,21 +78,51 @@ do {\
 } while (0)
 
 
+#define WATCHER_LIST(mailbox) (((MailboxPrivate *)((mailbox)->private))->watcher_list)
+
+
+/*
+ * watcher information
+ */
+typedef struct
+{
+  guint id;
+  guint16 mask;
+  MailboxWatcherFunc func;
+  gpointer data;
+} MailboxWatcher;
 
 
 /* 
- * macro returns the c-client mailstream from a 
- * mailbox structure
+ * private mailbox data
  */
 typedef struct
 {
   MAILSTREAM *stream;
+  GList *watcher_list;
 } MailboxPrivate;
 
 
-/* the mailbox to be referenced by any of the c-client
- * callbacks for authorization, new messages, etc... */
+/* 
+ * the mailbox to be referenced by any of the c-client
+ * callbacks for authorization, new messages, etc... 
+ */
 static Mailbox *client_mailbox = NULL;
+
+
+/* 
+ * prototypes
+ */
+static void load_messages (Mailbox * mailbox);
+static void free_messages (Mailbox * mailbox);
+
+static void send_watcher_new_message (Mailbox * mailbox, Message * message);
+
+static Message * translate_message (ENVELOPE *cenv);
+static Address * translate_address (ADDRESS *caddr);
+
+
+
 
 
 /*
@@ -159,6 +186,7 @@ mailbox_new (MailboxType type)
   mailbox->name = NULL;
   mailbox->private = (void *) g_malloc (sizeof (MailboxPrivate));
   CLIENT_STREAM (mailbox) = NIL;
+  WATCHER_LIST (mailbox) = NULL;
   mailbox->new_messages = 0;
 
   return mailbox;
@@ -172,7 +200,8 @@ mailbox_free (Mailbox * mailbox)
     return;
 
   if (CLIENT_STREAM (mailbox) != NIL)
-    mailbox_close (mailbox);
+    while (mailbox->open_ref > 0)
+      mailbox_open_unref (mailbox);
 
   g_free (mailbox->name);
   g_free (mailbox->private);
@@ -269,6 +298,8 @@ mailbox_open_ref (Mailbox * mailbox)
 
   if (CLIENT_STREAM_OPEN (mailbox))
     {
+      load_messages (mailbox);
+
       /* incriment the reference count */
       mailbox->open_ref++;
       return TRUE;
@@ -281,25 +312,22 @@ mailbox_open_ref (Mailbox * mailbox)
 void
 mailbox_open_unref (Mailbox * mailbox)
 {
+  LOCK_MAILBOX (mailbox);
+
   if (mailbox->open_ref == 0)
     return;
 
   mailbox->open_ref--;
 
   if (mailbox->open_ref == 0)
-    mailbox_close (mailbox);
-}
+    {
+      if (CLIENT_STREAM_OPEN (mailbox))
+	/* now close the mail stream and expunge deleted
+	 * messages -- the expunge may not have to be done */
+	CLIENT_STREAM (mailbox) = mail_close_full (CLIENT_STREAM (mailbox), CL_EXPUNGE);
 
-
-void
-mailbox_close (Mailbox * mailbox)
-{
-  LOCK_MAILBOX (mailbox);
-
-  if (CLIENT_STREAM_OPEN (mailbox))
-    /* now close the mail stream and expunge deleted
-     * messages -- the expunge may not have to be done */
-    CLIENT_STREAM (mailbox) = mail_close_full (CLIENT_STREAM (mailbox), CL_EXPUNGE);
+      free_messages (mailbox);
+    }
 
   UNLOCK_MAILBOX ();
 }
@@ -322,60 +350,179 @@ mailbox_check_new_messages (Mailbox * mailbox)
 }
 
 
-void
-mailbox_message_delete (Mailbox * mailbox, glong msgno)
+guint 
+mailbox_watcher_set (Mailbox * mailbox, 
+		     MailboxWatcherFunc func,
+		     guint16 mask,
+		     gpointer data)
 {
-  char tmp[BUFFER_SIZE];
+  GList *list;
+  MailboxWatcher *watcher;
+  guint id;
+  gint bumped;
 
-  LOCK_MAILBOX (mailbox);
-  RETURN_IF_CLIENT_STRAM_CLOSED (mailbox);
 
-  sprintf (tmp, "%ld", msgno);
-  mail_setflag (CLIENT_STREAM (mailbox), tmp, "\\DELETED");
+  /* find a unique id */
+  id = 0;
+  bumped = TRUE;
+  while (1)
+    {
+      list = WATCHER_LIST (mailbox);
+      while (list)
+	{
+	  watcher = list->data;
+	  list = list->next;
 
-  UNLOCK_MAILBOX ();
+	  if (watcher->id == id)
+	    {
+	      id++;
+	      bumped = TRUE;
+	      break;
+	    }
+	}
+
+      if (!bumped)
+	break;
+
+      bumped = FALSE;
+    }
+
+  
+  /* allocate the new watcher */
+  watcher = g_malloc (sizeof (MailboxWatcher));
+  watcher->id = id;
+  watcher->mask = mask;
+  watcher->func = func;
+  watcher->data = data;
+
+
+  /* add it */
+  WATCHER_LIST (mailbox) = g_list_append (WATCHER_LIST (mailbox), watcher);
+
+  return id;
 }
 
 
 void
-mailbox_message_undelete (Mailbox * mailbox, glong msgno)
+mailbox_watcher_remove (Mailbox * mailbox, guint id)
 {
-  char tmp[BUFFER_SIZE];
+  GList *list;
+  MailboxWatcher *watcher;
 
-  LOCK_MAILBOX (mailbox);
-  RETURN_IF_CLIENT_STRAM_CLOSED (mailbox);
+  list = WATCHER_LIST (mailbox);
+  while (list)
+    {
+      watcher = list->data;
 
-  sprintf (tmp, "%ld", msgno);
-  mail_clearflag (CLIENT_STREAM (mailbox), tmp, "\\DELETED");
+      if (id == watcher->id)
+	{
+	  g_list_remove_link (WATCHER_LIST (mailbox), list);
+	  break;
+	}
 
-  UNLOCK_MAILBOX ();
+      list = list->next;
+    }
 }
 
 
-MessageHeader *
-mailbox_message_header (Mailbox * mailbox, glong msgno, gint allocate)
+void
+mailbox_watcher_remove_by_data (Mailbox * mailbox, gpointer data)
 {
-  static MessageHeader header = {NULL, NULL, NULL};
+  GList *list;
+  MailboxWatcher *watcher;
+
+  list = WATCHER_LIST (mailbox);
+  while (list)
+    {
+      watcher = list->data;
+
+      if (data == watcher->data)
+	{
+	  g_list_remove_link (WATCHER_LIST (mailbox), list);
+	  break;
+	}
+
+      list = list->next;
+    }
+
+}
+
+
+
+/*
+ * private
+ */
+static void
+load_messages (Mailbox * mailbox)
+{
+  glong msgno;
+  Message *message;
   ENVELOPE *envelope;
 
-  LOCK_MAILBOX_RETURN_VAL (mailbox, NULL);
-  RETURN_VAL_IF_CLIENT_STRAM_CLOSED (mailbox, NULL);
+  g_print ("Loading Messages %d\n", mailbox->messages);
 
-  g_free (header.from);
-  g_free (header.subject);
-  g_free (header.date);
-  header.from = NULL;
-  header.subject = NULL;
-  header.date = NULL;
+  for (msgno = mailbox->messages + 1; msgno <= CLIENT_STREAM (mailbox)->nmsgs; msgno++)
+    {
+      envelope = mail_fetchenvelope (CLIENT_STREAM (mailbox), msgno);
+      message = translate_message (envelope);
+      message->mailbox = mailbox;
+      message->msgno = msgno;
 
-  envelope = mail_fetchenvelope (CLIENT_STREAM (mailbox), msgno);
+      mailbox->message_list = g_list_append (mailbox->message_list, message);
+      send_watcher_new_message (mailbox, message);
 
-  header.from = g_strdup (envelope->from->personal);
-  header.subject = g_strdup (envelope->subject);
-  header.date = g_strdup (envelope->date);
+      /* 
+       * give time to gtk so the GUI isn't blocked
+       * this is kinda a hack right now
+       */
+      while (gtk_events_pending ())
+	gtk_main_iteration ();
+    }
+}
 
-  UNLOCK_MAILBOX ();
-  return &header;
+static void
+free_messages (Mailbox * mailbox)
+{
+  GList *list;
+  Message *message;
+  
+  list = mailbox->message_list;
+  while (list)
+    {
+      message = list->data;
+      list = list->next;
+
+      message_free (message);
+    }
+  g_list_free (mailbox->message_list);
+  mailbox->message_list = NULL;
+}
+  
+
+static void
+send_watcher_new_message (Mailbox * mailbox, Message * message)
+{
+  GList *list;
+  MailboxWatcherMessage mw_message;
+  MailboxWatcher *watcher;
+
+  mw_message.type = MESSAGE_NEW;
+  mw_message.mailbox = mailbox;
+  mw_message.message = message;
+
+  g_print ("Sending new message\n");
+
+  list = WATCHER_LIST (mailbox);
+  while (list)
+    {
+      watcher = list->data;
+      list = list->next;
+
+      (*watcher->func) (&mw_message);
+
+      if (watcher->mask & MESSAGE_NEW_MASK)
+	(*watcher->func) (&mw_message);
+    }
 }
 
 
@@ -493,6 +640,202 @@ mailbox_valid (gchar * filename)
   else
     return MAILBOX_UNKNOWN;
 }
+
+
+/*
+ * messages
+ */
+Message *
+message_new ()
+{
+  Message *message;
+
+  message = g_malloc (sizeof (Message));
+
+  message->mailbox = NULL;
+  message->remail = NULL;
+  message->date = NULL;
+  message->from = NULL;
+  message->sender = NULL;
+  message->reply_to = NULL;
+  message->subject = NULL;
+  message->to_list = NULL;
+  message->cc_list = NULL;
+  message->bcc_list = NULL;
+  message->in_reply_to = NULL;
+  message->message_id = NULL;
+  message->newsgroups = NULL;
+  message->followup_to = NULL;
+  message->references = NULL;
+  message->body_ref = 0;
+  message->body_list = NULL;
+
+  return message;
+}
+
+
+void
+message_free (Message * message)
+{
+  g_free (message->remail);
+  g_free (message->date);
+  address_free (message->from);
+  address_free (message->sender);
+  address_free (message->reply_to);
+  g_free (message->subject);
+
+  g_free (message->in_reply_to);
+  g_free (message->message_id);
+  g_free (message->newsgroups);
+  g_free (message->followup_to);
+  g_free (message->references);
+
+
+  /* finally free the message */
+  g_free (message);
+}
+
+
+void
+message_move (Message * message, Mailbox * mailbox)
+{
+  LOCK_MAILBOX (message->mailbox);
+  RETURN_IF_CLIENT_STRAM_CLOSED (message->mailbox);
+  UNLOCK_MAILBOX ();
+}
+
+
+void
+message_delete (Message * message)
+{
+  char tmp[BUFFER_SIZE];
+
+  LOCK_MAILBOX (message->mailbox);
+  RETURN_IF_CLIENT_STRAM_CLOSED (message->mailbox);
+
+  sprintf (tmp, "%ld", message->msgno);
+  mail_setflag (CLIENT_STREAM (message->mailbox), tmp, "\\DELETED");
+
+  UNLOCK_MAILBOX ();
+}
+
+
+void
+message_undelete (Message * message)
+{
+  char tmp[BUFFER_SIZE];
+
+  LOCK_MAILBOX (message->mailbox);
+  RETURN_IF_CLIENT_STRAM_CLOSED (message->mailbox);
+
+  sprintf (tmp, "%ld", message->msgno);
+  mail_clearflag (CLIENT_STREAM (message->mailbox), tmp, "\\DELETED");
+
+  UNLOCK_MAILBOX ();
+}
+
+
+/* internal c-client translation */
+static Message *
+translate_message (ENVELOPE *cenv)
+{
+  Message *message;
+
+  message = message_new ();
+
+  message->remail = g_strdup (cenv->remail);
+  message->date = g_strdup (cenv->date);
+
+  message->from = translate_address (cenv->from);
+  message->sender = translate_address (cenv->sender);
+  message->reply_to = translate_address (cenv->reply_to);
+  
+  message->subject = g_strdup (cenv->subject);
+
+  /* more! */
+
+
+  return message;
+}
+
+
+
+
+/*
+ * addresses
+ */
+Address *
+address_new ()
+{
+  Address *address;
+
+  address = g_malloc (sizeof (Address));
+
+  address->personal = NULL;
+  address->user = NULL;
+  address->host = NULL;
+
+  return address;
+}
+
+
+void
+address_free (Address * address)
+{
+  g_free (address->personal);
+  g_free (address->user);
+  g_free (address->host);
+
+  g_free (address);
+}
+
+
+
+/* internal c-client translation */
+static Address *
+translate_address (ADDRESS *caddr)
+{
+  Address *address;
+
+  address = address_new ();
+  address->personal = g_strdup (caddr->personal);
+  address->user = g_strdup (caddr->mailbox);
+  address->host = g_strdup (caddr->host);
+
+  return address;
+}
+
+
+
+/*
+ * body
+ */
+Body *
+body_new ()
+{
+  Body *body;
+
+  body = g_malloc (sizeof (Body));
+  body->buffer = NULL;
+  return body;
+}
+
+
+void
+body_free (Body * body)
+{
+  g_free (body->buffer);
+  g_free (body);
+}
+
+
+
+
+
+
+
+
+
 
 
 /*

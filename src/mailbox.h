@@ -20,9 +20,18 @@
 #ifndef __MAILBOX_H__
 #define __MAILBOX_H__
 
+/*
+ * public macros
+ */
+#define MAILBOX(mailbox)        ((Mailbox *)(mailbox))
+#define MAILBOX_LOCAL(mailbox)  ((MailboxLocal *)(mailbox))
+#define MAILBOX_POP3(mailbox)   ((MailboxPOP3 *)(mailbox))
+#define MAILBOX_IMAP(mailbox)   ((MailboxIMAP *)(mailbox))
+#define MAILBOX_NNTP(mailbox)   ((MailboxNNTP *)(mailbox))
+
 
 /*
- * supported mailbox types
+ * enumes
  */
 typedef enum
 {
@@ -40,25 +49,41 @@ typedef enum
 } MailboxType;
 
 
+typedef enum
+{
+  MESSAGE_MARK_READ,        /* message has changed from new to read */
+  MESSAGE_MARK_DELETE,      /* message has been marked deleted */
+  MESSAGE_MARK_UNDELETE,    /* message has been marked undeleted */
+  MESSAGE_DELETE,           /* message has been deleted */
+  MESSAGE_NEW,              /* message is new to the mailbox */
+} MailboxWatcherMessageType;
+
+
+typedef enum
+{
+  MESSAGE_MARK_READ_MASK      = 1 << 1,
+  MESSAGE_MARK_DELETE_MASK    = 1 << 2,
+  MESSAGE_MARK_UNDELETE_MASK  = 1 << 3,
+  MESSAGE_DELETE_MASK         = 1 << 4,
+  MESSAGE_NEW_MASK            = 1 << 5,
+} MailboxWatcherMessageMask;
+
+
 
 /*
- * macros for casting mailbox structures
+ * strucutres
  */
-#define MAILBOX(mailbox)        ((Mailbox *)(mailbox))
-#define MAILBOX_LOCAL(mailbox)  ((MailboxLocal *)(mailbox))
-#define MAILBOX_POP3(mailbox)   ((MailboxPOP3 *)(mailbox))
-#define MAILBOX_IMAP(mailbox)   ((MailboxIMAP *)(mailbox))
-#define MAILBOX_NNTP(mailbox)   ((MailboxNNTP *)(mailbox))
-
-
-
 typedef struct _Mailbox Mailbox;
 typedef struct _MailboxLocal MailboxLocal;
 typedef struct _MailboxPOP3 MailboxPOP3;
 typedef struct _MailboxIMAP MailboxIMAP;
 typedef struct _MailboxNNTP MailboxNNTP;
 
-typedef struct _MessageHeader MessageHeader;
+typedef struct _MailboxWatcherMessage MailboxWatcherMessage;
+
+typedef struct _Message Message;
+typedef struct _Address Address;
+typedef struct _Body Body;
 
 
 struct _Mailbox
@@ -69,14 +94,16 @@ struct _Mailbox
   guint open_ref;
 
   glong messages;
-  glong new_messages;
+  GList *message_list;
 };
+
 
 struct _MailboxLocal
 {
   Mailbox mailbox;
   gchar *path;
 };
+
 
 struct _MailboxPOP3
 {
@@ -86,6 +113,7 @@ struct _MailboxPOP3
   gchar *server;
 };
 
+
 struct _MailboxIMAP
 {
   Mailbox mailbox;
@@ -94,6 +122,7 @@ struct _MailboxIMAP
   gchar *server;
   gchar *path;
 };
+
 
 struct _MailboxNNTP
 {
@@ -105,15 +134,80 @@ struct _MailboxNNTP
 };
 
 
-/*
- * message structures
- */
-struct _MessageHeader
+struct _MailboxWatcherMessage
 {
-  gchar *from;
-  gchar *subject;
-  gchar *date;
+  MailboxWatcherMessageType type;
+  Mailbox *mailbox;
+  Message *message;
 };
+
+
+struct _Message
+{
+  /* the mailbox this message belongs to */
+  Mailbox *mailbox;
+
+  /* the ordered numberic index of this message in 
+   * the mailbox beginning from 1, not 0 */
+  glong msgno;
+
+  /* remail header if any */
+  gchar *remail;
+
+  /* message composition date string */
+  gchar *date;
+
+  /* from, sender, and reply addresses */
+  Address *from;
+  Address *sender;
+  Address *reply_to;
+
+  /* subject line */
+  gchar *subject;
+
+  /* primary, secondary, and blind recipent lists */
+  GList *to_list;
+  GList *cc_list;
+  GList *bcc_list;
+
+  /* replied message ID */
+  gchar *in_reply_to;
+
+  /* message ID */
+  gchar *message_id;
+
+  /* USENET */
+  gchar *newsgroups;
+  gchar *followup_to;
+  gchar *references;
+
+
+  /* message body */
+  guint body_ref;
+  GList *body_list;
+};
+
+
+struct _Address
+{
+  gchar *personal;            /* full text name */
+  gchar *user;                /* user name (mailbox name) on remote system */
+  gchar *host;                /* remote host */
+};
+
+
+struct _Body
+{
+  gchar *mime;
+  gchar *buffer;
+};
+
+
+/*
+ * function typedefs
+ */
+typedef void (*MailboxWatcherFunc) (MailboxWatcherMessage * arg1);
+
 
 
 
@@ -124,29 +218,53 @@ void mailbox_init ();
 
 
 /* 
- * open and close a mailbox -- but don't use mailbox_close
- * directly unless you know what you're doing, the mailbox
- * is normally closed when it has a open_ref == 0
+ * open and close a mailbox 
  */
 int mailbox_open_ref (Mailbox * mailbox);
 void mailbox_open_unref (Mailbox * mailbox);
-void mailbox_close (Mailbox * mailbox);
 
 
 /*
- * create and destroy a mailbox
+ * create and destroy a mailbox structure
  */
 Mailbox *mailbox_new (MailboxType type);
 void mailbox_free (Mailbox * mailbox);
 gint mailbox_check_new_messages (Mailbox * mailbox);
 
 
-/* 
- * mailboxes & messages
+/*
+ * watchers
  */
-void mailbox_message_delete (Mailbox * mailbox, glong msgno);
-void mailbox_message_undelete (Mailbox * mailbox, glong msgno);
-MessageHeader * mailbox_message_header (Mailbox * mailbox, glong msgno, gint allocate);
+guint mailbox_watcher_set (Mailbox * mailbox, MailboxWatcherFunc func, guint16 mask, gpointer data);
+void mailbox_watcher_remove (Mailbox * mailbox, guint id);
+void mailbox_watcher_remove_by_data (Mailbox * mailbox, gpointer data);
+
+
+/*
+ * messages
+ */
+Message *message_new ();
+void message_free (Message * message);
+
+void message_move (Message * message, Mailbox * mailbox);
+void message_delete (Message * message);
+void message_undelete (Message * message);
+
+
+
+/*
+ * addresses
+ */
+Address *address_new ();
+void address_free (Address * address);
+
+
+/*
+ * body
+ */
+Body *body_new ();
+void body_free (Body * body);
+
 
 
 

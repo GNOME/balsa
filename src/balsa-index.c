@@ -434,7 +434,9 @@ balsa_index_delete_message (BalsaIndex * bindex)
   row = (glong) clist->selection->data;
 
   update_message_flag (bindex, row + 1, "D");
+#if 0
   mailbox_message_delete (bindex->mailbox, row + 1);
+#endif
 }
 
 void
@@ -451,7 +453,9 @@ balsa_index_undelete_message (BalsaIndex * bindex)
   row = (glong) clist->selection->data;
 
   update_message_flag (bindex, row + 1, " ");
+#if 0
   mailbox_message_undelete (bindex->mailbox, row + 1);
+#endif
 }
 
 
@@ -460,6 +464,7 @@ append_messages (BalsaIndex * bindex,
 		 glong first,
 		 glong last)
 {
+#if 0
   glong i;
   MessageHeader *header;
   gchar message[BUFFER_SIZE];
@@ -502,6 +507,7 @@ append_messages (BalsaIndex * bindex,
   /* re-set the progress bar to 0.0 */
   if (bindex->progress_bar)
     gtk_progress_bar_update (bindex->progress_bar, 0.0);
+#endif
 }
 
 

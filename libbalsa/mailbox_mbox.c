@@ -95,7 +95,7 @@ gint
 libbalsa_mailbox_mbox_create(const gchar * path, gboolean create)
 {
     gint exists; 
-    gint magic_type;
+    GtkType magic_type;
     gint fd;
     
     g_return_val_if_fail( path != NULL, -1);
@@ -104,11 +104,8 @@ libbalsa_mailbox_mbox_create(const gchar * path, gboolean create)
     if ( exists == 0 ) {
 	/* File exists. Check if it is an mbox... */
 	
-	libbalsa_lock_mutt();
-	magic_type = mx_get_magic(path);
-	libbalsa_unlock_mutt();
-	
-	if ( magic_type != M_MBOX ) {
+	magic_type = libbalsa_mailbox_type_from_path(path);
+	if ( magic_type != LIBBALSA_TYPE_MAILBOX_MBOX ) {
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
 				 _("Mailbox %s does not appear to be an Mbox mailbox."), path);
 	    return(-1);

@@ -847,41 +847,60 @@ libbalsa_mailbox_commit(LibBalsaMailbox* mailbox)
     return rc ==0;
 }
 
-GtkType libbalsa_mailbox_type_from_path(const gchar * filename)
+GtkType
+libbalsa_mailbox_type_from_path(const gchar * path)
+/* libbalsa_get_mailbox_storage_type:
+   returns one of LIBBALSA_TYPE_MAILBOX_IMAP,
+   LIBBALSA_TYPE_MAILBOX_MAILDIR, LIBBALSA_TYPE_MAILBOX_MH,
+   LIBBALSA_TYPE_MAILBOX_MBOX.  GTK_TYPE_OBJECT on error or a directory.
+ */
 {
     struct stat st;
-    GtkType ret = 0;
+    char tmp[_POSIX_PATH_MAX];
 
-    /*
-     * FIXME: Needed? if the file doesn't exist won't
-     * we get some unknown value from mx_get_magic 
-     */
-    if (stat(filename, &st) == -1)
-	return 0;
+    if(strncmp(path, "imap://", 7) == 0)
+        return LIBBALSA_TYPE_MAILBOX_IMAP;
 
-    libbalsa_lock_mutt();
-    switch (mx_get_magic(filename)) {
-    case M_MBOX:
-	ret = LIBBALSA_TYPE_MAILBOX_MBOX;
-	break;
-    case M_MMDF:
-	ret = LIBBALSA_TYPE_MAILBOX_MBOX;
-	break;
-    case M_MH:
-	ret = LIBBALSA_TYPE_MAILBOX_MH;
-	break;
-    case M_MAILDIR:
-	ret = LIBBALSA_TYPE_MAILBOX_MAILDIR;
-	break;
-    case M_IMAP:
-	ret = LIBBALSA_TYPE_MAILBOX_IMAP;
-	break;
-    case M_KENDRA: /* We don't support KENDRA */
-	break;
+    if (stat (path, &st) == -1)
+        return GTK_TYPE_OBJECT;
+    
+    if (S_ISDIR (st.st_mode)) {
+        /* check for maildir-style mailbox */
+        snprintf (tmp, sizeof (tmp), "%s/cur", path);
+        if (stat (tmp, &st) == 0 && S_ISDIR (st.st_mode))
+            return LIBBALSA_TYPE_MAILBOX_MAILDIR;
+    
+        /* check for mh-style mailbox */
+        snprintf (tmp, sizeof (tmp), "%s/.mh_sequences", path);
+        if (access (tmp, F_OK) == 0)
+            return LIBBALSA_TYPE_MAILBOX_MH;
+
+        snprintf (tmp, sizeof (tmp), "%s/.xmhcache", path);
+        if (access (tmp, F_OK) == 0)
+            return LIBBALSA_TYPE_MAILBOX_MH;
+    
+        snprintf (tmp, sizeof (tmp), "%s/.mew_cache", path);
+        if (access (tmp, F_OK) == 0)
+            return LIBBALSA_TYPE_MAILBOX_MH;
+
+        snprintf (tmp, sizeof (tmp), "%s/.mew-cache", path);
+        if (access (tmp, F_OK) == 0)
+            return LIBBALSA_TYPE_MAILBOX_MH;
+
+        /* 
+         * ok, this isn't an mh folder, but mh mode can be used to read
+         * Usenet news from the spool. ;-) 
+         */
+
+        snprintf (tmp, sizeof (tmp), "%s/.overview", path);
+        if (access (tmp, F_OK) == 0)
+            return LIBBALSA_TYPE_MAILBOX_MH;
+
     }
-    libbalsa_unlock_mutt();
+    else return LIBBALSA_TYPE_MAILBOX_MBOX;
 
-    return ret;
+    /* This is not a mailbox */
+    return GTK_TYPE_OBJECT;
 }
 
 /* libbalsa_mailbox_sync_backend_real

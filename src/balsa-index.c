@@ -2267,3 +2267,38 @@ balsa_index_expunge(BalsaIndex * index)
     g_signal_handler_unblock(selection, index->selection_changed_id);
     g_signal_emit_by_name(G_OBJECT(selection), "changed");
 }
+
+/* Message window */
+static guint
+bndx_next_msgno(BalsaIndex * index, guint current_msgno,
+                LibBalsaMailboxSearchIter * search_iter,
+                BndxSearchDirection direction)
+{
+    LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
+    GtkTreeModel *model = GTK_TREE_MODEL(mailbox);
+    GtkTreeIter iter;
+    guint msgno = 0;
+
+    if (!libbalsa_mailbox_msgno_find(mailbox, current_msgno, NULL, &iter))
+        return msgno;
+
+    if (bndx_search_iter(index, search_iter, &iter, direction,
+                         BNDX_SEARCH_VIEWABLE_ONLY, 0))
+        gtk_tree_model_get(model, &iter, LB_MBOX_MSGNO_COL, &msgno, -1);
+
+    return msgno;
+}
+
+guint
+balsa_index_next_msgno(BalsaIndex * index, guint current_msgno)
+{
+    return bndx_next_msgno(index, current_msgno, index->search_iter,
+                           BNDX_SEARCH_DIRECTION_NEXT);
+}
+
+guint
+balsa_index_previous_msgno(BalsaIndex * index, guint current_msgno)
+{
+    return bndx_next_msgno(index, current_msgno, index->search_iter,
+                           BNDX_SEARCH_DIRECTION_PREV);
+}

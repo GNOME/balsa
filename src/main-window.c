@@ -756,7 +756,10 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, LibBalsaMailbox
     balsa_app.open_mailbox = get_open_mailboxes_string();
   }
   
-  index = BALSA_INDEX (balsa_window_find_current_index (window));
+  /* we use (BalsaIndex*) instead of BALSA_INDEX because we don't want
+     ugly conversion warning when balsa_window_find_current_index
+     returns NULL. */
+  index = (BalsaIndex*) balsa_window_find_current_index (window);
   if (index)
     balsa_mblist_focus_mailbox (balsa_app.mblist, index->mailbox);
 }

@@ -288,8 +288,10 @@ libbalsa_mailbox_real_close(LibBalsaMailbox *mailbox)
 #endif
   LOCK_MAILBOX (mailbox);
 
-  if (mailbox->open_ref == 0)
+  if (mailbox->open_ref == 0) {
+    UNLOCK_MAILBOX (mailbox);
     return;
+  }
 
   mailbox->open_ref--;
 

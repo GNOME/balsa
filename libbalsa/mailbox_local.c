@@ -224,8 +224,6 @@ libbalsa_mailbox_local_open(LibBalsaMailbox *mailbox, gboolean append)
 #ifdef DEBUG
       g_print (_("LibBalsaMailboxLocal: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 #endif
-
-      UNLOCK_MAILBOX (mailbox);
     }
   
   UNLOCK_MAILBOX (mailbox);
@@ -288,7 +286,7 @@ static void libbalsa_mailbox_local_check (LibBalsaMailbox *mailbox)
 
     if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint, 0)) < 0)
     {
-      g_print ("error or something\n");
+      g_print ("mx_check_mailbox() failed on %s\n", mailbox->name);
     }
     else if (i == M_NEW_MAIL || i == M_REOPENED)
     {

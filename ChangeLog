@@ -1,3 +1,11 @@
+2000-08-16  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.c, libbalsa/mailbox_local.c: fixed mailbox
+	mutex locking.  
+	* src/main-window.c: we use (BalsaIndex*) instead
+	of BALSA_INDEX because we don't want ugly conversion warning
+	when balsa_window_find_current_index() returns NULL.
+	
 2000-08-15  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/Makefile.am: Add notify.[ch]. A wrapper for the mutt

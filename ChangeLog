@@ -1,3 +1,17 @@
+2003-10-08 23:00  PeterB
+
+	* libbalsa/: mailbox.c, mailbox.h: Add LB_MBOX_WEIGHT_COL, of type
+	G_TYPE_UINT, to the mbox-tree-model.
+	* src/balsa-index.c: Connect cell column renderers to
+	LB_MBOX_WEIGHT_COL.
+	* libbalsa/message.c: Call libbalsa_messages_read() on change of
+	flag.
+	* libbalsa/mailbox_mh.c: Don't check msgno--it was checked by the
+	caller; store mime_message in LibBalsaMessage object; plug memory
+	leak in _add_message.
+	* libbalsa/mailbox_maildir.c: Don't check msgno--it was checked by
+	the caller; store mime_message in LibBalsaMessage object.
+
 2003-10-07 10:03  PeterB
 
 	* src/balsa-index.c: Fix source viewer.

@@ -40,6 +40,7 @@ libmutt_a_SOURCES = \
 	functions.h	\
 	globals.h	\
 	hash.h		\
+	history.h	\
 	imap.h		\
 	init.h		\
 	keymap.h	\
@@ -50,6 +51,7 @@ libmutt_a_SOURCES = \
 	mutt_curses.h	\
 	mutt_menu.h	\
 	mutt_regex.h	\
+	mutt_socket.h	\
 	muttconfig.h	\
 	mx.h		\
 	pager.h		\

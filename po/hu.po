@@ -1,31 +1,32 @@
 # Hungarian translation of balsa.
-# Copyright (C) 2000-2004 Free Software Foundation, Inc.
-# Sebi <jaques@freemail.hu>, 2000.
+# Copyright (C) 2000, 2001, 2003, 2004 Free Software Foundation, Inc.
+# This file is distributed under the same license as the balsa package.
 # Gab <h9gab@freemail.hu>, 2000.
-# Andras Timar <timar@gnome.hu>, 2001.
-# Gabor Kelemen <kg0021@stud.unideb.hu>, 2004.
+# Sebi <jaques@freemail.hu>, 2000.
+# Andras Timar <timar@gnome.hu>, 2001, 2003.
 # Laszlo Dvornik <dvornik@gnome.hu>, 2004.
+# Gabor Kelemen <kelemeng@gnome.hu>, 2004.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-08-19 00:02+0100\n"
-"PO-Revision-Date: 2004-07-08 19:33+0200\n"
-"Last-Translator: Laszlo Dvornik <dvornik@gnome.hu>\n"
+"PO-Revision-Date: 2004-08-25 00:03+0200\n"
+"Last-Translator: Gabor Kelemen <kelemeng@gnome.hu>\n"
 "Language-Team: Hungarian <gnome@gnome.hu>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: balsa.desktop.in.h:1
-#, fuzzy
 msgid "Balsa"
-msgstr "Balsa: %s"
+msgstr "Balsa"
 
 #: balsa.desktop.in.h:2
 msgid "E-Mail utility"
-msgstr ""
+msgstr "Levelezőprogram"
 
 #. The externq database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:256 libbalsa/address-book-ldap.c:408
@@ -42,7 +43,7 @@ msgstr "Nincs név"
 
 #: libbalsa/address-book-ldap.c:261
 msgid "TLS requested but not compiled in"
-msgstr ""
+msgstr "TLS támogatása szükséges, de az nincs befordítva"
 
 #: libbalsa/address-book.c:399 libbalsa/filter-error.c:45
 msgid "No error"
@@ -177,78 +178,77 @@ msgstr ""
 #: libbalsa/gmime-gpgme-context.c:410 libbalsa/gmime-gpgme-context.c:492
 #: libbalsa/gmime-gpgme-context.c:503 libbalsa/gmime-gpgme-context.c:618
 #: libbalsa/gmime-gpgme-context.c:708
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not get data from stream: %s"
-msgstr "gpgme nem tudott adatot kinyerni a pufferből: %s"
+msgstr "%s: nem lehet adatot kinyerni az adatfolyamból: %s"
 
 #: libbalsa/gmime-gpgme-context.c:418 libbalsa/gmime-gpgme-context.c:627
 #: libbalsa/gmime-gpgme-context.c:716
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not create new data object: %s"
-msgstr "A gpgme nem tudott új adatobjektumot létrehozni: %s"
+msgstr "%s: nem lehet új adatobjektumot létrehozni: %s"
 
 #: libbalsa/gmime-gpgme-context.c:428
-#, fuzzy, c-format
+#, c-format
 msgid "%s: signing failed: %s"
-msgstr "gpgme aláírás sikertelen: %s"
+msgstr "%s: aláírás nem sikerült: %s"
 
 #: libbalsa/gmime-gpgme-context.c:517
-#, fuzzy, c-format
+#, c-format
 msgid "%s: signature verification failed: %s"
-msgstr "gpgme aláírás-ellenőrzés sikertelen: %s"
+msgstr "%s: aláírás ellenőrzése sikertelen: %s"
 
 #: libbalsa/gmime-gpgme-context.c:582
-#, fuzzy
 msgid "combined signing and encryption is only defined for RFC 2440"
-msgstr "gpgme aláírás és titkosítás sikertelen: %s"
+msgstr "Kombinált aláírás és titkosítás csak az RFC 2440-hez van definiálva"
 
 #: libbalsa/gmime-gpgme-context.c:652
-#, fuzzy, c-format
+#, c-format
 msgid "%s: signing and encryption failed: %s"
-msgstr "gpgme aláírás és titkosítás sikertelen: %s"
+msgstr "%s: aláírás és titkosítás sikertelen: %s"
 
 #: libbalsa/gmime-gpgme-context.c:656
-#, fuzzy, c-format
+#, c-format
 msgid "%s: encryption failed: %s"
-msgstr "gpgme titkosítás sikertelen: %s"
+msgstr "%s: titkosítás sikertelen: %s"
 
 #: libbalsa/gmime-gpgme-context.c:728
-#, fuzzy, c-format
+#, c-format
 msgid "%s: decryption failed: %s"
-msgstr "gpgme titkosítás sikertelen: %s"
+msgstr "%s: visszafejtés sikertelen: %s"
 
 #: libbalsa/gmime-gpgme-context.c:763
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not create context: %s"
-msgstr "Nem lehet létrehozni gpgme kontextust: %s"
+msgstr "%s: nem lehet létrehozni kontextust: %s"
 
 #: libbalsa/gmime-gpgme-context.c:819
 msgid "the crypto engine for protocol OpenPGP is not available"
-msgstr ""
+msgstr "az OpenPGP protokollhoz való titkosítómotor nem áll rendelkezésre"
 
 #: libbalsa/gmime-gpgme-context.c:829
 msgid "the crypto engine for protocol CMS is not available"
-msgstr ""
+msgstr "a CMS protokollhoz való titkosítómotor nem áll rendelkezésre"
 
 #: libbalsa/gmime-gpgme-context.c:836
 #, c-format
 msgid "invalid crypto engine %d"
-msgstr ""
+msgstr "érvénytelen titkosítómotor: %d"
 
 #: libbalsa/gmime-gpgme-context.c:865 libbalsa/gmime-gpgme-context.c:876
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not list keys for %s: %s"
-msgstr "Nem lehet listázni a kulcsokat ehhez: %s : %s"
+msgstr "%s: nem lehet listázni a kulcsokat ehhez: %s : %s"
 
 #: libbalsa/gmime-gpgme-context.c:888
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not find a key for %s"
-msgstr "Nem sikerült kulcsot szerezni ehhez: %s"
+msgstr "%s: nem sikerült kulcsot találni ehhez: %s"
 
 #: libbalsa/gmime-gpgme-context.c:900
-#, fuzzy, c-format
+#, c-format
 msgid "%s: multiple keys for %s"
-msgstr "Nem sikerült kulcsot szerezni ehhez: %s"
+msgstr "%s: többszörös kulcs ehhez: %s"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:91 libbalsa/mailbox_local.c:1122
@@ -334,18 +334,16 @@ msgid "Prepend Si_gnature"
 msgstr "Aláírá_s az idézet elé"
 
 #: libbalsa/identity.c:823
-#, fuzzy
 msgid "sign messages by default"
-msgstr "GPG-aláírás alapértelmezettként"
+msgstr "üzenetek aláírása alapértelmezettként"
 
 #: libbalsa/identity.c:829
-#, fuzzy
 msgid "encrypt messages by default"
-msgstr "GPG-titkosítás alapértelmezettként"
+msgstr "üzenetek titkosítása alapértelmezettként"
 
 #: libbalsa/identity.c:835
 msgid "default crypto protocol"
-msgstr ""
+msgstr "alapértelmezett titkosítóprotokoll"
 
 #: libbalsa/identity.c:982
 msgid "Error: The identity does not have a name"
@@ -370,48 +368,48 @@ msgid "Manage Identities"
 msgstr "Személyazonosságok kezelése"
 
 #: libbalsa/identity.c:1521
-#, fuzzy
 msgid "GnuPG using MIME mode"
-msgstr "A GnuPG _MIME módot használ"
+msgstr "GnuPG MIME mód használatával"
 
 #: libbalsa/identity.c:1522
-#, fuzzy
 msgid "GnuPG using OpenPGP mode"
-msgstr "A _GnuPG régi OpenPGP módot használ"
+msgstr "GnuPG OpenPGP mód használatával"
 
 #: libbalsa/identity.c:1524
 msgid "S/MIME mode"
-msgstr ""
+msgstr "S/MIME mód"
 
 #. IMAP host name + message
 #: libbalsa/imap-server.c:255
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "IMAP server %s alert:\n"
 "%s"
-msgstr "Levelező-kiszolgáló: %s\n"
+msgstr ""
+"%s IMAP levelező-kiszolgáló riasztás:\n"
+"%s"
 
 #. IMAP host name + message
 #: libbalsa/imap-server.c:259
-#, fuzzy, c-format
+#, c-format
 msgid "IMAP server %s error: %s"
-msgstr "Levelező-kiszolgáló: %s\n"
+msgstr "%s IMAP levelező-kiszolgáló hiba: %s"
 
 #. IMAP host name + message
 #: libbalsa/imap-server.c:265
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s"
-msgstr "%s %s-n"
+msgstr "%s: %s"
 
 #: libbalsa/imap-server.c:550 libbalsa/imap-server.c:653
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot connect to the server: %s"
-msgstr "Nem lehet kapcsolódni a kiszolgálóhoz"
+msgstr "Nem lehet kapcsolódni a kiszolgálóhoz: %s"
 
 #: libbalsa/imap-server.c:638
 #, c-format
 msgid "Exceeded the number of connections per server %s"
-msgstr ""
+msgstr "A(z) %s kiszolgálóval való maximális kapcsolatok száma túllépve"
 
 #: libbalsa/libbalsa.c:279
 #, c-format
@@ -419,9 +417,8 @@ msgid "LDAP Directory for %s"
 msgstr "LDAP könyvtár ehhez: %s"
 
 #: libbalsa/libbalsa.c:384
-#, fuzzy
 msgid "Invalid date"
-msgstr "Érvénytelen szűrő: %s"
+msgstr "Érvénytelen dátum"
 
 #: libbalsa/libbalsa.c:400 src/pref-manager.c:1226 src/pref-manager.c:1323
 msgid "Unknown"
@@ -459,9 +456,8 @@ msgstr ""
 "<b>Ujjlenyomat:</b> %s"
 
 #: libbalsa/libbalsa.c:571
-#, fuzzy
 msgid "SSL/TLS certificate"
-msgstr "IMAP TLS-tanúsítvány"
+msgstr "SSL/TLS-tanúsítvány"
 
 #: libbalsa/libbalsa.c:573
 msgid "_Accept Once"
@@ -500,12 +496,12 @@ msgstr "%s típusú postafiók létrehozása sikertelen"
 #. login information...
 #: libbalsa/mailbox_imap.c:481
 msgid "IMAP connection has been severed. Reconnecting..."
-msgstr ""
+msgstr "Az IMAP kapcsolat megszűnt. Újrakapcsolódás..."
 
 #: libbalsa/mailbox_imap.c:484
 #, c-format
 msgid "IMAP server has shut the connection: %s Reconnecting..."
-msgstr ""
+msgstr "Az IMAP kiszolgáló leállította a kapcsolatot: %s. Újrakapcsolódás..."
 
 #: libbalsa/mailbox_imap.c:825
 #, c-format
@@ -529,7 +525,7 @@ msgstr ""
 
 #: libbalsa/mailbox_imap.c:2186
 msgid "Server-side threading not supported."
-msgstr ""
+msgstr "A kiszolgálóoldali szálakra bontás nem támogatott."
 
 #: libbalsa/mailbox_local.c:1267
 #, c-format
@@ -579,7 +575,7 @@ msgstr ""
 #: libbalsa/mailbox_maildir.c:454 libbalsa/mailbox_mbox.c:399
 #: libbalsa/mailbox_mh.c:483
 msgid "Mailbox does not exist."
-msgstr ""
+msgstr "A postafiók nem létezik."
 
 #: libbalsa/mailbox_mbox.c:181
 #, c-format
@@ -587,14 +583,12 @@ msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "A %s postafiók nem Mbox postafiók."
 
 #: libbalsa/mailbox_mbox.c:407
-#, fuzzy
 msgid "Cannot open mailbox."
-msgstr "Postafiók betöltése sikertelen: %s"
+msgstr "Nem sikerült megnyitni a postafiókot."
 
 #: libbalsa/mailbox_mbox.c:415
-#, fuzzy
 msgid "Cannot lock mailbox."
-msgstr "Postafiók betöltése sikertelen: %s"
+msgstr "Nem lehet zárolni a postafiókot."
 
 #: libbalsa/mailbox_mbox.c:1488
 #, c-format
@@ -672,7 +666,7 @@ msgstr "%s POP3 postafiók hiba: %s\n"
 #: libbalsa/mailbox_pop3.c:535
 #, c-format
 msgid "POP3 message %d oversized: %d kB - skipped."
-msgstr ""
+msgstr "%d. POP+ üzenet túlméretezett: %d kB - átlépve."
 
 #: libbalsa/mailbox_pop3.c:546
 #, c-format
@@ -766,12 +760,12 @@ msgstr "Próbálkozom az flock zárolással... %d"
 #: libbalsa/rfc3156.c:76
 #, c-format
 msgid "Gpgme has been compiled without support for protocol %s."
-msgstr ""
+msgstr "A gpgme a(z) %s protokoll támogatása nélkül lett lefordítva."
 
 #: libbalsa/rfc3156.c:81
 #, c-format
 msgid "Crypto engine %s is not installed properly."
-msgstr ""
+msgstr "A(z) %s titkosítómotor nincs megfelelően telepítve."
 
 #: libbalsa/rfc3156.c:86
 #, c-format
@@ -779,16 +773,18 @@ msgid ""
 "Crypto engine %s version %s is installed, but at least version %s is "
 "required."
 msgstr ""
+"A(z) %s titkosítómotor %s verziója telepítve van, de legalább a(z) %s verzió "
+"szükséges."
 
 #: libbalsa/rfc3156.c:93
 #, c-format
 msgid "Unknown problem with engine for protocol %s."
-msgstr ""
+msgstr "Ismeretlen probléma a(z) %s protokollhoz tartozó motorral."
 
 #: libbalsa/rfc3156.c:98
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not retreive crypto engine information: %s."
-msgstr "Nem lehet elhozni a kulcsot ehhez: %s: %s"
+msgstr "%s: nem lehet elérni a titkosítómotor-információt ehhez: %s."
 
 #: libbalsa/rfc3156.c:102
 #, c-format
@@ -796,65 +792,59 @@ msgid ""
 "\n"
 "Disable support for protocol %s."
 msgstr ""
+"\n"
+"%s protokoll támogatásának kikapcsolása."
 
 #: libbalsa/rfc3156.c:235 libbalsa/rfc3156.c:240 libbalsa/rfc3156.c:322
 #: libbalsa/rfc3156.c:327 libbalsa/rfc3156.c:461 libbalsa/rfc3156.c:466
 #: libbalsa/rfc3156.c:529 libbalsa/rfc3156.c:534 libbalsa/rfc3156.c:613
 #: libbalsa/rfc3156.c:618 libbalsa/rfc3156.c:723 libbalsa/rfc3156.c:728
 #: libbalsa/rfc3156.c:803 libbalsa/rfc3156.c:808
-#, fuzzy
 msgid "creating a gpgme context failed"
-msgstr "Nem lehet létrehozni gpgme kontextust: %s"
+msgstr "gpgme kontextus létrehozása sikertelen"
 
 #: libbalsa/rfc3156.c:253 libbalsa/rfc3156.c:631
-#, fuzzy
 msgid "Enter passphrase to unlock the secret key for signing"
-msgstr "Adja meg a jelszót az üzenet visszafejtéséhez"
+msgstr "Adja meg a jelszót a titkos kulcs feloldásához az aláíráshoz"
 
 #: libbalsa/rfc3156.c:274 libbalsa/rfc3156.c:278 libbalsa/rfc3156.c:660
-#, fuzzy
 msgid "signing failed"
-msgstr "gpgme aláírás sikertelen: %s"
+msgstr "aláírás sikertelen"
 
 #: libbalsa/rfc3156.c:351 libbalsa/rfc3156.c:356 libbalsa/rfc3156.c:663
-#, fuzzy
 msgid "encryption failed"
-msgstr "gpgme titkosítás sikertelen: %s"
+msgstr "titkosítás sikertelen"
 
 #: libbalsa/rfc3156.c:479 libbalsa/rfc3156.c:484 libbalsa/rfc3156.c:739
 #: libbalsa/rfc3156.c:745
-#, fuzzy
 msgid "signature verification failed"
-msgstr "gpgme aláírás-ellenőrzés sikertelen: %s"
+msgstr "aláírás ellenőrzése sikertelen"
 
 #: libbalsa/rfc3156.c:546 libbalsa/rfc3156.c:819
 msgid "Enter passphrase to decrypt message"
 msgstr "Adja meg a jelszót az üzenet visszafejtéséhez"
 
 #: libbalsa/rfc3156.c:558 libbalsa/rfc3156.c:563
-#, fuzzy
 msgid "decryption failed"
-msgstr "gpgme titkosítás sikertelen: %s"
+msgstr "visszafejtés sikertelen"
 
 #: libbalsa/rfc3156.c:656 libbalsa/rfc3156.c:670
-#, fuzzy
 msgid "signing and encryption failed"
-msgstr "gpgme aláírás és titkosítás sikertelen: %s"
+msgstr "aláírás és titkosítás sikertelen"
 
 #: libbalsa/rfc3156.c:673
-#, fuzzy, c-format
+#, c-format
 msgid "signing failed: %s"
-msgstr "gpgme aláírás sikertelen: %s"
+msgstr "aláírás sikertelen: %s"
 
 #: libbalsa/rfc3156.c:676
-#, fuzzy, c-format
+#, c-format
 msgid "encryption failed: %s"
-msgstr "gpgme titkosítás sikertelen: %s"
+msgstr "titkosítás sikertelen: %s"
 
 #: libbalsa/rfc3156.c:828 libbalsa/rfc3156.c:835
-#, fuzzy
 msgid "decryption and signature verification failed"
-msgstr "gpgme visszafejtés és aláírás-ellenőrzés sikertelen: %s"
+msgstr "visszafejtés és az aláírás ellenőrzése sikertelen"
 
 #: libbalsa/rfc3156.c:866
 msgid "The signature is valid."
@@ -871,16 +861,16 @@ msgstr ""
 "Az aláírás érvényes, de az aláírás ellenőrzéséhez használt kulcs lejárt."
 
 #: libbalsa/rfc3156.c:874
-#, fuzzy
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
 msgstr ""
-"Az aláírás érvényes, de az aláírás ellenőrzéséhez használt kulcs lejárt."
+"Az aláírás érvényes, de az aláírás ellenőrzéséhez használt kulcsot "
+"visszavonták."
 
 #: libbalsa/rfc3156.c:877
 msgid "The signature is invalid (Note: might be caused by gmime bug!)."
-msgstr ""
+msgstr "Az aláírás érvénytelen (Megjegyzés: ezt egy gmime hiba is okozhatja!)."
 
 #: libbalsa/rfc3156.c:880
 msgid "The signature could not be verified due to a missing key."
@@ -891,13 +881,13 @@ msgid "This part is not a real PGP signature."
 msgstr "Ez a rész nem valódi PGP aláírás."
 
 #: libbalsa/rfc3156.c:885
-#, fuzzy
 msgid "The signature could not be verified due to an invalid crypto engine."
-msgstr "Az aláírás nem ellenőrizhető, mert hiányzik a kulcs."
+msgstr "Az aláírás nem ellenőrizhető, mert a titkosítómotor érvénytelen."
 
 #: libbalsa/rfc3156.c:888 libbalsa/rfc3156.c:1543
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
 msgstr ""
+"A GnuPG újraépíti a megbízhatósági adatbázist és jelenleg nem érhető el."
 
 #: libbalsa/rfc3156.c:891
 msgid "An error prevented the signature verification."
@@ -932,18 +922,16 @@ msgid "bad validity"
 msgstr "rossz érvényesség"
 
 #: libbalsa/rfc3156.c:919
-#, fuzzy
 msgid "PGP signature: "
-msgstr "Aláírás ellenőrzése"
+msgstr "PGP aláírás: "
 
 #: libbalsa/rfc3156.c:921
-#, fuzzy
 msgid "S/MIME signature: "
-msgstr "Aláírás ellenőrzése"
+msgstr "S/MIME-aláírás: "
 
 #: libbalsa/rfc3156.c:923
 msgid "(unknown protocol) "
-msgstr ""
+msgstr "(ismeretlen protokoll) "
 
 #: libbalsa/rfc3156.c:942
 #, c-format
@@ -951,6 +939,8 @@ msgid ""
 "\n"
 "User ID: %s"
 msgstr ""
+"\n"
+"Felhasználóazonosító: %s"
 
 #: libbalsa/rfc3156.c:945
 #, c-format
@@ -962,11 +952,13 @@ msgstr ""
 "Aláírta: %s"
 
 #: libbalsa/rfc3156.c:949
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Mail address: %s"
-msgstr "Levélcím: %s"
+msgstr ""
+"\n"
+"Levélcím: %s"
 
 #: libbalsa/rfc3156.c:954
 #, c-format
@@ -1015,21 +1007,19 @@ msgstr ""
 
 #: libbalsa/rfc3156.c:978
 msgid " revoked"
-msgstr ""
+msgstr " visszavonva"
 
 #: libbalsa/rfc3156.c:983
-#, fuzzy
 msgid " expired"
-msgstr "Megválaszolt"
+msgstr " lejárt"
 
 #: libbalsa/rfc3156.c:988
 msgid " disabled"
-msgstr ""
+msgstr " letiltva"
 
 #: libbalsa/rfc3156.c:993
-#, fuzzy
 msgid " invalid"
-msgstr "rossz érvényesség"
+msgstr " érvénytelen"
 
 #: libbalsa/rfc3156.c:996
 #, c-format
@@ -1037,22 +1027,26 @@ msgid ""
 "\n"
 "Key attributes:%s"
 msgstr ""
+"\n"
+"Kulcs tulajdonságai: %s"
 
 #: libbalsa/rfc3156.c:998
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Key attribute:%s"
 msgstr ""
 "\n"
-"Kulcs létrehozva: %s"
+"Kulcs tulajdonsága: %s"
 
 #: libbalsa/rfc3156.c:1002
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Issuer name: %s"
-msgstr "Fájlnév: %s"
+msgstr ""
+"\n"
+"Kibocsátó neve: %s"
 
 #: libbalsa/rfc3156.c:1005
 #, c-format
@@ -1060,6 +1054,8 @@ msgid ""
 "\n"
 "Issuer serial number: %s"
 msgstr ""
+"\n"
+"Kibocsátó sorozatszáma: %s"
 
 #: libbalsa/rfc3156.c:1008
 #, c-format
@@ -1067,6 +1063,8 @@ msgid ""
 "\n"
 "Chain ID: %s"
 msgstr ""
+"\n"
+"Lánc azonosító: %s"
 
 #: libbalsa/rfc3156.c:1055
 #, c-format
@@ -1116,9 +1114,8 @@ msgid "ultimate"
 msgstr "végsőkig"
 
 #: libbalsa/rfc3156.c:1205
-#, fuzzy
 msgid "User ID"
-msgstr "Felhasználó"
+msgstr "Felhasználóazonosító"
 
 #: libbalsa/rfc3156.c:1205
 msgid "Key ID"
@@ -1153,7 +1150,7 @@ msgstr "Válassza ki a nyilvános kulcsot %s címzettnek"
 
 #: libbalsa/rfc3156.c:1544
 msgid "Try again later."
-msgstr ""
+msgstr "Próbálja újra később."
 
 #: libbalsa/send.c:233 libbalsa/send.c:240
 msgid "Sending Mail..."
@@ -1259,7 +1256,7 @@ msgstr "Az üzenet nem lesz titkosítva a rejtett másolatot kapó címzett(ek)n
 #: libbalsa/server.c:370
 #, c-format
 msgid "Logging in to %s using %s"
-msgstr ""
+msgstr "Bejelentkezés %s kiszolgálóra %s használatával"
 
 #: libbalsa/source-viewer.c:52 src/main-window.c:645
 msgid "_Select Text"
@@ -1278,9 +1275,8 @@ msgid "Escape special and non-ASCII characters"
 msgstr "különleges és nem-ASCII karakterek megjelenítése escape-szekvenciaként"
 
 #: libbalsa/source-viewer.c:152
-#, fuzzy
 msgid "Mailbox closed"
-msgstr "Postafiók neve"
+msgstr "Postafiók zárva"
 
 #: libbalsa/source-viewer.c:213
 msgid "Message Source"
@@ -1462,22 +1458,20 @@ msgid "Configure Balsa"
 msgstr "A Balsa beállítása"
 
 #: sounds/balsa.soundlist.in.h:1
-#, fuzzy
 msgid "Balsa E-mail reader"
-msgstr "Balsa szűrők"
+msgstr "Balsa e-mail olvasó"
 
 #: sounds/balsa.soundlist.in.h:2
 msgid "Program startup"
-msgstr ""
+msgstr "Program indulása"
 
 #: sounds/email.soundlist.in.h:1
 msgid "E-mail"
-msgstr ""
+msgstr "E-mail"
 
 #: sounds/email.soundlist.in.h:2
-#, fuzzy
 msgid "New mail notification"
-msgstr "Eredeti méret"
+msgstr "Értesítés új levélről"
 
 #: src/ab-main.c:337 src/ab-window.c:167 src/filter-edit-dialog.c:193
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
@@ -1491,7 +1485,7 @@ msgstr "S_zűrő:"
 
 #: src/ab-window.c:175
 msgid "E-Mail Address"
-msgstr "Elektronikus levélcím"
+msgstr "E-mail cím"
 
 #. Entry widget for finding an address
 #: src/ab-window.c:264
@@ -1773,17 +1767,17 @@ msgstr "Üzenet másolása \"%s\" postafiókba sikertelen."
 #: src/balsa-index.c:1956
 #, c-format
 msgid "Copied to \"%s\"."
-msgstr ""
+msgstr "Másolva ide: \"%s\"."
 
 #: src/balsa-index.c:1957
-#, fuzzy, c-format
+#, c-format
 msgid "Moved to \"%s\"."
-msgstr "Á_thelyezés a Kukába"
+msgstr "Áthelyezve ide: \"%s\"."
 
 #: src/balsa-index.c:2073
-#, fuzzy, c-format
+#, c-format
 msgid "Committing mailbox %s failed."
-msgstr "%s postafiók változásait nem sikerült elmenteni."
+msgstr "%s postafiók változásainak érvényesítése sikertelen."
 
 #: src/balsa-mblist.c:278
 msgid "Mailbox"
@@ -1810,11 +1804,11 @@ msgid "Choose destination folder"
 msgstr "Célmappa választása"
 
 #: src/balsa-mblist.c:2033
-#, fuzzy, c-format
+#, c-format
 msgid "Shown mailbox: %s with %d message, "
 msgid_plural "Shown mailbox: %s with %d messages, "
-msgstr[0] "%s postafiók tartalma: %d levél, %ld új"
-msgstr[1] "%s postafiók tartalma: %d levél, %ld új"
+msgstr[0] "%s postafiók tartalma: %d levél, "
+msgstr[1] "%s postafiók tartalma: %d levél, "
 
 #. xgettext: this is the second part of the message
 #. * "Shown mailbox: %s with %d messages, %ld new".
@@ -1822,8 +1816,8 @@ msgstr[1] "%s postafiók tartalma: %d levél, %ld új"
 #, c-format
 msgid "%ld new"
 msgid_plural "%ld new"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%ld új"
+msgstr[1] "%ld új"
 
 #: src/balsa-message.c:578
 msgid "Content"
@@ -1889,9 +1883,9 @@ msgid "Disposition-Notification-To:"
 msgstr "Tértivevény:"
 
 #: src/balsa-message.c:1591
-#, fuzzy, c-format
+#, c-format
 msgid "Error loading attached image: %s\n"
-msgstr "Hiba történt %s betöltése közben: %s\n"
+msgstr "Hiba történt %s csatolt kép betöltése közben\n"
 
 #: src/balsa-message.c:1661 src/balsa-message.c:1677 src/balsa-message.c:1709
 #: src/balsa-message.c:1762
@@ -1946,9 +1940,8 @@ msgid "Subject: %s\n"
 msgstr "Tárgy: %s\n"
 
 #: src/balsa-message.c:1778
-#, fuzzy
 msgid "Se_nd message to obtain this part"
-msgstr "Üzenet küldése ezen rész megszerzéséért"
+msgstr "Üzenet _küldése ezen rész megszerzéséért"
 
 #: src/balsa-message.c:1883
 #, c-format
@@ -1967,14 +1960,13 @@ msgstr ""
 "erre a tartalomtípusra"
 
 #: src/balsa-message.c:1903
-#, fuzzy
 msgid "S_ave part"
-msgstr "Részlet mentése"
+msgstr "_Rész mentése"
 
 #: src/balsa-message.c:1927 src/balsa-message.c:1952
-#, fuzzy, c-format
+#, c-format
 msgid "View _part with %s"
-msgstr "Részlet megtekintése %s segítségével"
+msgstr "Rész meg_tekintése %s segítségével"
 
 #: src/balsa-message.c:2231
 #, c-format
@@ -1997,12 +1989,8 @@ msgstr ""
 "(konvertálva erre: %s)"
 
 #: src/balsa-message.c:2444
-#, fuzzy
 msgid "This is an OpenPGP signed message part:\n"
-msgstr ""
-"\n"
-"--\n"
-"Ez egy OpenPGP-vel aláírt üzenetrész:\n"
+msgstr "Ez egy OpenPGP-vel aláírt üzenetrész:\n"
 
 #: src/balsa-message.c:2664
 msgid "mixed parts"
@@ -2035,19 +2023,18 @@ msgid "rfc822 message (from %s, subject \"%s\")"
 msgstr "rfc822 üzenet (feladó: %s, tárgy: \"%s\")"
 
 #: src/balsa-message.c:2737
-#, fuzzy
 msgid "complete message"
-msgstr "Új levél írása"
+msgstr "teljes levél"
 
 #: src/balsa-message.c:2754
 #, c-format
 msgid "part %s: %s (file %s)"
-msgstr ""
+msgstr "%s rész: %s (fájl: %s)"
 
 #: src/balsa-message.c:2765
-#, fuzzy, c-format
+#, c-format
 msgid "part %s: %s"
-msgstr "Válasz: %s: %s"
+msgstr "%s rész: %s"
 
 #: src/balsa-message.c:2855
 #, c-format
@@ -2084,21 +2071,22 @@ msgid "Reply to MDN?"
 msgstr "Visszaküldi a tértivevényt?"
 
 #: src/balsa-message.c:4260
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
 "this crypto protocol is not available."
 msgstr ""
-"A következő feladótól: %s ezzel a tárggyal: \"%s\" érkezett levél "
-"\"többrészes/titkosított\" részt tartalmaz, de ennek struktúrája érvénytelen."
+"A következő feladótól: %s ezzel a tárggyal: \"%s\" érkezett levél a "
+"következővel:%s titkosított részt tartalmaz, de ez a titkosítási protokoll "
+"nem áll rendelkezésre."
 
 #: src/balsa-message.c:4263
 msgid "PGP"
-msgstr ""
+msgstr "PGP"
 
 #: src/balsa-message.c:4263
 msgid "S/MIME"
-msgstr ""
+msgstr "S/MIME"
 
 #: src/balsa-message.c:4298 src/balsa-message.c:4615
 #, c-format
@@ -2121,45 +2109,47 @@ msgstr ""
 "ellenőrzése sikertelen!"
 
 #: src/balsa-message.c:4337
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but it's "
 "structure is invalid. The signature, if there is any, can not be checked."
 msgstr ""
-"A következő feladótól: %s ezzel a tárggyal: \"%s\" érkezett levél"
-"\"többrészes/aláírt\" részt tartalmaz, de ennek struktúrája érvénytelen.Az "
-"aláírás, ha van, nem ellenőrizhető."
+"A következő feladótól: %s ezzel a tárggyal: \"%s\" érkezett levél aláírt "
+"részt tartalmaz, de ennek struktúrája érvénytelen. Az aláírás, ha van, nem "
+"ellenőrizhető."
 
 #: src/balsa-message.c:4401
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
 "it's structure is invalid."
 msgstr ""
 "A következő feladótól: %s ezzel a tárggyal: \"%s\" érkezett levél "
-"\"többrészes/titkosított\" részt tartalmaz, de ennek struktúrája érvénytelen."
+"titkosított részt tartalmaz, de ennek struktúrája érvénytelen."
 
 #: src/balsa-message.c:4408
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
 "but this crypto protocol is not available."
 msgstr ""
-"A következő feladótól: %s ezzel a tárggyal: \"%s\" érkezett levél "
-"\"többrészes/titkosított\" részt tartalmaz, de ennek struktúrája érvénytelen."
+"A következő feladótól: %s ezzel a tárggyal: \"%s\" érkezett levél PGP "
+"kódolású részt tartalmaz, de ez a titkosítási protokoll nem áll "
+"rendelkezésre."
 
 #: src/balsa-message.c:4420
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
 "but this crypto protocol is not available."
 msgstr ""
-"A következő feladótól: %s ezzel a tárggyal: \"%s\" érkezett levél "
-"\"többrészes/titkosított\" részt tartalmaz, de ennek struktúrája érvénytelen."
+"A következő feladótól: %s ezzel a tárggyal: \"%s\" érkezett levél S/MIME "
+"kódolású részt tartalmaz, de ez a titkosítási protokoll nem áll "
+"rendelkezésre."
 
 #: src/balsa-message.c:4513 src/balsa-message.c:4730
 msgid "_Run gpg to import this key"
-msgstr ""
+msgstr "Gpg _futtatása ezen kulcs importálásához"
 
 #: src/filter-edit-callbacks.c:286
 msgid "One of the specified fields contains:"
@@ -2392,7 +2382,7 @@ msgstr "Program futtatása:"
 
 #: src/filter-edit-dialog.c:99
 msgid "Send to Trash"
-msgstr "Áthelyez a kukába"
+msgstr "Áthelyezés a kukába"
 
 #: src/filter-edit-dialog.c:103
 msgid "OR"
@@ -2569,22 +2559,20 @@ msgid "_Create"
 msgstr "_Létrehozás"
 
 #: src/folder-conf.c:282 src/mailbox-conf.c:1042 src/mailbox-conf.c:1132
-#, fuzzy
 msgid "_Basic"
-msgstr "Titkos m_ásolat"
+msgstr "_Alap"
 
 #: src/folder-conf.c:287
 msgid "_Max number of connections"
-msgstr ""
+msgstr "_Kapcsolatok maximális száma"
 
 #: src/folder-conf.c:294 src/mailbox-conf.c:1201
 msgid "Enable _persistent cache"
-msgstr ""
+msgstr "Á_llandó gyorsítótár bekapcsolása"
 
 #: src/folder-conf.c:301 src/mailbox-conf.c:1095 src/mailbox-conf.c:1204
-#, fuzzy
 msgid "_Advanced"
-msgstr "_Hozzáadás"
+msgstr "_Haladó"
 
 #. INPUT FIELD CREATION
 #: src/folder-conf.c:304
@@ -2611,7 +2599,6 @@ msgid "Subscribed _folders only"
 msgstr "Csak azon mappák,amikre _feliratkozott"
 
 #: src/folder-conf.c:336
-#, fuzzy
 msgid "Always show _INBOX"
 msgstr "_Mindig mutassa az Érkezett mappát"
 
@@ -2737,14 +2724,12 @@ msgid "Required"
 msgstr "Szükséges"
 
 #: src/mailbox-conf.c:174
-#, fuzzy
 msgid "Use _SSL"
-msgstr "TLS használata"
+msgstr "_SSL használata"
 
 #: src/mailbox-conf.c:178
-#, fuzzy
 msgid "Use _TLS"
-msgstr "TLS használata"
+msgstr "_TLS használata"
 
 #: src/mailbox-conf.c:315
 msgid "No mailbox selected."
@@ -2878,7 +2863,7 @@ msgstr "Új levél _keresésének engedélyezése"
 
 #: src/mailbox-conf.c:1099
 msgid "Disable _APOP"
-msgstr ""
+msgstr "_APOP kikapcsolása"
 
 #. username
 #: src/mailbox-conf.c:1148
@@ -2922,11 +2907,13 @@ msgid "The folder edition to be written."
 msgstr "A mappa szerkesztése elmentendő."
 
 #: src/mailbox-node.c:420
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Scanning of %s failed: %s\n"
 "Check network connectivity."
-msgstr "%s feldolgozása sikertelen: %s"
+msgstr ""
+"%s beolvasása sikertelen: %s\n"
+"Ellenőrizze a hálózati kapcsolatot."
 
 #: src/mailbox-node.c:422
 #, c-format
@@ -3025,7 +3012,7 @@ msgstr "Helyi %s mappa\n"
 
 #: src/main-window.c:274
 msgid "Balsa closes files and connections. Please wait..."
-msgstr ""
+msgstr "A Balsa bezárja a fájlokat és bontja a kapcsolatokat. Kérem várjon..."
 
 #: src/main-window.c:313 src/main-window.c:359
 msgid "_Deleted"
@@ -3372,9 +3359,8 @@ msgid "Save Current Part..."
 msgstr "Aktuális rész mentése..."
 
 #: src/main-window.c:629 src/main-window.c:1043
-#, fuzzy
 msgid "Save currently displayed part of message"
-msgstr "Az üzenet aktuális részének mentése"
+msgstr "Az üzenet jelenleg mutatott részének mentése"
 
 #: src/main-window.c:635 src/main-window.c:995 src/message-window.c:185
 msgid "_View Source..."
@@ -3421,7 +3407,7 @@ msgstr "Következő megjelölt levél"
 
 #: src/main-window.c:705 src/main-window.c:931
 msgid "_Hide messages"
-msgstr "Levél el_rejtése"
+msgstr "Levelek el_rejtése"
 
 #: src/main-window.c:708
 msgid "Reset _Filter"
@@ -3452,14 +3438,14 @@ msgid "Delete the selected mailbox"
 msgstr "A kiválasztott postafiók törlése"
 
 #: src/main-window.c:731
-#, fuzzy
 msgid "E_xpunge Deleted Messages"
-msgstr "Üzenetek törlése"
+msgstr "Törölt üzenetek _eltávolítása"
 
 #: src/main-window.c:732 src/main-window.c:829
-#, fuzzy
 msgid "Expunge messages marked as deleted in the currently opened mailbox"
-msgstr "A megnyitott postafiók változásainak elfogadása"
+msgstr ""
+"Töröltként megjelölt  üzenetek eltávolítása a jelenleg megnyitott "
+"postafiókból"
 
 #: src/main-window.c:737 src/main-window.c:835
 msgid "Close mailbox"
@@ -3474,14 +3460,12 @@ msgid "Delete messages from the Trash mailbox"
 msgstr "A kuka tartalmának törlése"
 
 #: src/main-window.c:746
-#, fuzzy
 msgid "Select _Filters"
-msgstr "Szűrő _visszaállítása"
+msgstr "Szűrő _kijelölése"
 
 #: src/main-window.c:747 src/main-window.c:1065
-#, fuzzy
 msgid "Select filters to be applied automatically to current mailbox"
-msgstr "Minden levél kijelölése a jelenlegi postafiókban"
+msgstr "A jelenlegi postafiókon automatikusan alkalmazandó szűrők kijelölése"
 
 #: src/main-window.c:760
 msgid "_Toolbars..."
@@ -3508,122 +3492,102 @@ msgid "_Message"
 msgstr "_Levél"
 
 #: src/main-window.c:789
-#, fuzzy
 msgid "New mailbox..."
-msgstr "Távoli POP3-postafiók..."
+msgstr "Új postafiók..."
 
 #: src/main-window.c:794
-#, fuzzy
 msgid "New \"Maildir\" mailbox..."
-msgstr "Helyi Maildir postafiók..."
+msgstr "Új \"Maildir\" postafiók..."
 
 #: src/main-window.c:798
-#, fuzzy
 msgid "New \"MH\" mailbox..."
-msgstr "Helyi MH postafiók..."
+msgstr "Új \"MH\" postafiók..."
 
 #: src/main-window.c:828
-#, fuzzy
 msgid "_Compress Mailbox"
-msgstr "A postafiók bezárása"
+msgstr "A postafiók _tömörítése"
 
 #: src/main-window.c:858
-#, fuzzy
 msgid "Mail_boxes"
-msgstr "_Postafiók"
+msgstr "_Postafiókok"
 
 #: src/main-window.c:883
 msgid "By _Arrival"
-msgstr ""
+msgstr "É_rkezés szerint"
 
 #: src/main-window.c:883
 msgid "Arrival order"
-msgstr ""
+msgstr "Érkezési sorrend"
 
 #: src/main-window.c:887
-#, fuzzy
 msgid "By _Sender"
-msgstr "_Küldés"
+msgstr "_Feladó szerint"
 
 #: src/main-window.c:887
 msgid "Sender order"
-msgstr ""
+msgstr "Feladó szerinti sorrend"
 
 #: src/main-window.c:891
-#, fuzzy
 msgid "By S_ubject"
-msgstr "_Tárgy"
+msgstr "_Tárgy szerint"
 
 #: src/main-window.c:891
-#, fuzzy
 msgid "Subject order"
-msgstr "Tárgy"
+msgstr "Tárgy szerinti sorrend"
 
 #: src/main-window.c:895
-#, fuzzy
 msgid "By _Date"
-msgstr "Dátum"
+msgstr "_Dátum szerint"
 
 #: src/main-window.c:895
 msgid "By sending date"
-msgstr ""
+msgstr "Feladás dátuma szerint"
 
 #: src/main-window.c:899
-#, fuzzy
 msgid "By Si_ze"
-msgstr "Méret"
+msgstr "_Méret szerint"
 
 #: src/main-window.c:899
-#, fuzzy
 msgid "By message size"
-msgstr "Sor törése"
+msgstr "Üzenet mérete szerint"
 
 #: src/main-window.c:903
-#, fuzzy
 msgid "_Threaded"
-msgstr "Szálakra bontás"
+msgstr "Szálakra _bontott"
 
 #: src/main-window.c:903
-#, fuzzy
 msgid "Use message threading"
-msgstr "_Egyszerű szálakra bontás"
+msgstr "Szálakra bontás használata"
 
 #: src/main-window.c:927
-#, fuzzy
 msgid "_Headers"
-msgstr "_Nincs fejléc"
+msgstr "_Fejlécek"
 
 #: src/main-window.c:930
-#, fuzzy
 msgid "_Sort Mailbox"
-msgstr "_Fanézet használata"
+msgstr "_Postafiók rendezése"
 
 #: src/main-window.c:945
-#, fuzzy
 msgid "_View filter"
-msgstr "Új szűrő"
+msgstr "_Szűrő megtekintése"
 
 #: src/main-window.c:946
-#, fuzzy
 msgid "Enable quick message index filter"
-msgstr "Nem lehet betölteni a levél törzsét a szűréshez"
+msgstr "Gyors levélindexelő szűrő engedélyezése"
 
 #: src/main-window.c:982 src/main-window.c:1056 src/sendmsg-window.c:501
 #: src/sendmsg-window.c:559 src/sendmsg-window.c:619
-#, fuzzy
 msgid "_More"
-msgstr "_Koreai"
+msgstr "_Több"
 
 #: src/main-window.c:1015
-#, fuzzy
 msgid "_New..."
-msgstr "_Új"
+msgstr "Ú_j..."
 
 #. F
 #: src/main-window.c:1035
-#, fuzzy
 msgid "_Forward..."
-msgstr "Továbbítás"
+msgstr "_Továbbítás..."
 
 #: src/main-window.c:1036 src/toolbar-factory.c:105
 msgid "Forward the current message"
@@ -3631,29 +3595,24 @@ msgstr "Az aktuális levél továbbítása"
 
 #. D
 #: src/main-window.c:1049
-#, fuzzy
 msgid "_Delete to Trash"
-msgstr "Á_thelyezés a Kukába"
+msgstr "_Kidobás a Kukába"
 
 #: src/main-window.c:1061
-#, fuzzy
 msgid "_Manage..."
-msgstr "_Változtatás..."
+msgstr "Ke_zelés..."
 
 #: src/main-window.c:1064
-#, fuzzy
 msgid "_Select _Filters"
-msgstr "Szűrő _visszaállítása"
+msgstr "Szűrő k_ijelölése"
 
 #: src/main-window.c:1082
-#, fuzzy
 msgid "_Filters"
-msgstr "S_zűrő"
+msgstr "_Szűrők"
 
 #: src/main-window.c:1098 src/sendmsg-window.c:635
-#, fuzzy
 msgid "_Tools"
-msgstr "_Eszköztárak..."
+msgstr "_Eszközök"
 
 #: src/main-window.c:1202
 msgid ""
@@ -3665,19 +3624,24 @@ msgstr ""
 
 #: src/main-window.c:1372
 msgid "Subject or Sender _Contains:"
-msgstr ""
+msgstr "Tárgy vagy feladó t_artalmazza:"
 
 #: src/main-window.c:2154
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
 "%s."
-msgstr "%s postafiók szinkronizálása sikertelen"
+msgstr ""
+"Nem lehet megnyitni a postafiókot!\n"
+"%s."
 
 #: src/main-window.c:2470
 msgid "translator_credits"
 msgstr ""
-"Kelemen Gábor <kg0021@stud.unideb.hu>\n"
+"Dvornik László <dvornik@gnome.hu>\n"
+"Gab <h9gab@freemail.hu>\n"
+"Kelemen Gábor <kelemeng@gnome.hu>\n"
+"Sebi <jaques@freemail.hu>\n"
 "Tímár András <timar@gnome.hu>"
 
 #: src/main-window.c:2486
@@ -3710,16 +3674,15 @@ msgid "Balsa: New mail"
 msgstr "Balsa: Új levél"
 
 #: src/main-window.c:3056
-#, fuzzy, c-format
+#, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
 msgstr[0] "%d új levele érkezett."
 msgstr[1] "%d új levele érkezett."
 
 #: src/main-window.c:3059
-#, fuzzy
 msgid "You have new mail."
-msgstr "1 új levele érkezett."
+msgstr "Új levele jött."
 
 #: src/main-window.c:3609
 msgid "Search mailbox"
@@ -3741,29 +3704,26 @@ msgstr "_Tárgy"
 
 #. Frame with Apply and Clear buttons
 #: src/main-window.c:3655
-#, fuzzy
 msgid "Show only matching messages"
-msgstr "Hiba lépett fel a levelek kidobása közben"
+msgstr "Csak az illeszkedő üzenetek mutatása"
 
 #. Frame with OK button
 #: src/main-window.c:3676
-#, fuzzy
 msgid "Open next matching message"
-msgstr "Következő megjelölt levél megnyitása"
+msgstr "Következő illeszkedő levél megnyitása"
 
 #: src/main-window.c:3687
 msgid "_Reverse search"
 msgstr "Keresés _hátrafelé"
 
 #: src/main-window.c:3692
-#, fuzzy
 msgid "_Wrap around"
-msgstr "Tartalo_m törése"
+msgstr "_Körbe"
 
 #: src/main-window.c:3768
-#, fuzzy, c-format
+#, c-format
 msgid "Error displaying help: %s\n"
-msgstr "Hiba a szűrőhöz tartozó súgó megjelenítése közben: %s\n"
+msgstr "Hiba a súgó megjelenítése közben: %s\n"
 
 #: src/main-window.c:3853
 msgid "You can apply filters only on mailbox\n"
@@ -3850,7 +3810,7 @@ msgstr "Kuka"
 
 #: src/main.c:470
 msgid "Compressing mail folders..."
-msgstr ""
+msgstr "Levélmappák tömörítése..."
 
 #: src/message-window.c:81
 msgid "N_o Headers"
@@ -3889,9 +3849,9 @@ msgid "M_ove"
 msgstr "Á_thelyezés"
 
 #: src/message-window.c:274
-#, fuzzy, c-format
+#, c-format
 msgid "Message from %s: %s"
-msgstr "Új levél: %s: %s"
+msgstr "Új levél %s feladótól: %s"
 
 # src/pref-manager.c:184
 #: src/pref-manager.c:321
@@ -4121,7 +4081,7 @@ msgstr "_IMAP postafiókok lekérdezése"
 
 #: src/pref-manager.c:1661
 msgid "Check INBOX _only"
-msgstr "Csak az INBOX lekérdezése"
+msgstr "Csak az INBOX _lekérdezése"
 
 #: src/pref-manager.c:1666
 msgid "Display message if new mail has arrived in an open mailbox"
@@ -4133,11 +4093,11 @@ msgstr "Háttérben ellenőrzés csendben (nem ír üzeneteket az állapotsorba)
 
 #: src/pref-manager.c:1675
 msgid "_POP message size limit:"
-msgstr ""
+msgstr "_POP üzenetek mérethatára:"
 
 #: src/pref-manager.c:1682
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
@@ -4439,28 +4399,28 @@ msgid ""
 "The following setting is global, but may be overridden\n"
 "for the selected mailbox using Mailbox -> Hide messages:"
 msgstr ""
+"A következő beállítás globális, de felülbírálható a kiválasztott\n"
+"postafiókhoz a Postafiók -> Levelek elrejtése segítségével:"
 
 #: src/pref-manager.c:2484
 msgid "Hide messages marked as deleted"
-msgstr ""
+msgstr "Törlésre megjelölt levelek elrejtése"
 
 #: src/pref-manager.c:2486
 msgid "The following settings are global."
-msgstr ""
+msgstr "A következő beállítások globálisak."
 
 #: src/pref-manager.c:2491
-#, fuzzy
 msgid "Expunge deleted messages when mailbox is closed"
-msgstr "Üzenet megnyitása automatikusan postafiók megnyitásakor"
+msgstr "Törölt üzenetek eltávolítása a postafiók bezárásakor"
 
 #: src/pref-manager.c:2498
-#, fuzzy
 msgid " ...and if mailbox is unused more than"
-msgstr "Automatikusan zárja be a postafiókot, ha ennél több ideje használatlan"
+msgstr " ... és ha a postafiók ennél több ideje nincs használva"
 
 #: src/pref-manager.c:2511
 msgid "hours"
-msgstr ""
+msgstr "óra"
 
 #: src/pref-manager.c:2533
 msgid "Options"
@@ -4479,9 +4439,8 @@ msgid "Remember open mailboxes between sessions"
 msgstr "Használat során nyitva hagyott postafiók megjegyzése"
 
 #: src/pref-manager.c:2554
-#, fuzzy
 msgid "Folder Scanning"
-msgstr "IMAP mappa feldolgozása"
+msgstr "Mappa feldolgozása"
 
 #: src/pref-manager.c:2556
 msgid ""
@@ -4493,14 +4452,12 @@ msgstr ""
 " Válasszon nagyobb mélységet, ha indításkor többet szeretne látni a fából."
 
 #: src/pref-manager.c:2566
-#, fuzzy
 msgid "Scan local folders to depth"
-msgstr "Fa feldolgozása eddig a mélységig:"
+msgstr "Helyi mappák feldolgozása eddig a mélységig:"
 
 #: src/pref-manager.c:2579
-#, fuzzy
 msgid "Scan IMAP folders to depth"
-msgstr "Fa feldolgozása eddig a mélységig:"
+msgstr "IMAP mappák feldolgozása eddig a mélységig:"
 
 #: src/pref-manager.c:2644
 msgid "Address Book Name"
@@ -4668,9 +4625,8 @@ msgstr ""
 "A tértivevény kérése lehetőség a szerkesztőablak Beállítások menüjében van."
 
 #: src/save-restore.c:1724
-#, fuzzy
 msgid "Filter with no condition was ignored"
-msgstr "A(z) %s szűrőnek nincsenek feltételei."
+msgstr "A feltételek nélküli szűrő mellőzve lett"
 
 #: src/save-restore.c:1902
 msgid "Error opening GConf database\n"
@@ -4835,7 +4791,7 @@ msgstr "A _GnuPG régi OpenPGP módot használ"
 
 #: src/sendmsg-window.c:290
 msgid "_S/MIME mode (GpgSM)"
-msgstr ""
+msgstr "_S/MIME mód (GpgSM)"
 
 #: src/sendmsg-window.c:305 src/sendmsg-window.c:477
 msgid "_Include File..."
@@ -4847,16 +4803,15 @@ msgstr "Fájl _csatolása..."
 
 #: src/sendmsg-window.c:311 src/sendmsg-window.c:479
 msgid "I_nclude Message(s)"
-msgstr "Üzenet(ek) beillesztése"
+msgstr "Üzenet(ek) be_illesztése"
 
 #: src/sendmsg-window.c:314 src/sendmsg-window.c:482
 msgid "Attach _Message(s)"
 msgstr "Üzenet(ek) _csatolása"
 
 #: src/sendmsg-window.c:320 src/sendmsg-window.c:507
-#, fuzzy
 msgid "Sen_d"
-msgstr "Küldés"
+msgstr "_Küldés"
 
 #: src/sendmsg-window.c:321 src/sendmsg-window.c:508 src/toolbar-factory.c:121
 msgid "Send this message"
@@ -4875,9 +4830,8 @@ msgid "_Postpone"
 msgstr "Elhalasz_tás"
 
 #: src/sendmsg-window.c:333 src/sendmsg-window.c:494
-#, fuzzy
 msgid "_Save"
-msgstr "Mentés"
+msgstr "M_entés"
 
 #: src/sendmsg-window.c:334 src/sendmsg-window.c:495
 msgid "Save this message"
@@ -4941,7 +4895,7 @@ msgstr "Titkos m_ásolat"
 
 #: src/sendmsg-window.c:416 src/sendmsg-window.c:575
 msgid "_Fcc"
-msgstr "Levél tárolása"
+msgstr "Levél _tárolása"
 
 #: src/sendmsg-window.c:418
 msgid "_Reply To"
@@ -4985,12 +4939,11 @@ msgstr "_Beállítások"
 
 #: src/sendmsg-window.c:503
 msgid "Sa_ve and Close"
-msgstr ""
+msgstr "Men_tés és bezárás"
 
 #: src/sendmsg-window.c:512
-#, fuzzy
 msgid "Send _Later"
-msgstr "Küldés sikertelen"
+msgstr "Küldés ké_sőbb"
 
 #: src/sendmsg-window.c:733
 #, c-format
@@ -5128,7 +5081,6 @@ msgid "Choose charset"
 msgstr "Karakterkészlet választása"
 
 #: src/sendmsg-window.c:3427
-#, fuzzy
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file.\n"
@@ -5136,7 +5088,7 @@ msgid ""
 msgstr ""
 "Ez a fájl nem US-ASCII vagy UTF-8 kódolást használ.\n"
 "Kérem válassza ki a fájl kódolásához használt karakterkészletet.\n"
-"(Ha bizonytalan, válassza az Általános UTF-8-at)"
+"(Ha bizonytalan, válassza az Általános-UTF-8-at)"
 
 #: src/sendmsg-window.c:3494
 #, c-format
@@ -5174,47 +5126,42 @@ msgid "sending message with gpg mode %d"
 msgstr "üzenet küldése %d. gpg móddal"
 
 #: src/sendmsg-window.c:3913
-#, fuzzy
 msgid "Message could not be created"
-msgstr "A címjegyzék nem érhető el."
+msgstr "Az üzenetet nem lehet létrehozni"
 
 #: src/sendmsg-window.c:3915
 msgid "Message could not be queued in outbox"
-msgstr ""
+msgstr "Az üzenet nem állítható sorba a kimenők közé"
 
 #: src/sendmsg-window.c:3917
 msgid "Message could not be saved in senbox"
-msgstr ""
+msgstr "Az üzenetet nem lehet elmenteni a kimenők közé"
 
 #: src/sendmsg-window.c:3919
-#, fuzzy
 msgid "Message could not be sent"
-msgstr "%s: A fájlt nem lehet megnyitni (%s)."
+msgstr "Az üzenetet nem lehet elküldeni"
 
 #: src/sendmsg-window.c:3923
-#, fuzzy, c-format
+#, c-format
 msgid "Send failed: %s"
-msgstr "Küldés sikertelen"
+msgstr "Küldés sikertelen: %s"
 
 #: src/sendmsg-window.c:4007
-#, fuzzy
 msgid "Could not postpone message."
-msgstr "Nem lehet menteni a levelet."
+msgstr "Nem lehet elhalasztani az üzenetet."
 
 #: src/sendmsg-window.c:4021
-#, fuzzy
 msgid "Message postponed."
-msgstr "Üzenet betűkészlete"
+msgstr "Üzenet elhalasztva."
 
 #: src/sendmsg-window.c:4037
-#, fuzzy, c-format
+#, c-format
 msgid "Could not open draftbox: %s"
-msgstr "Nem lehet megnyitni a(z) \"%s\" postafiókot"
+msgstr "Nem lehet megnyitni a(z) \"%s\" piszkozatmappát"
 
 #: src/sendmsg-window.c:4059
-#, fuzzy
 msgid "Message saved."
-msgstr "Üzenet"
+msgstr "Üzenet elmentve."
 
 #: src/sendmsg-window.c:4221
 #, c-format
@@ -5476,9 +5423,8 @@ msgid "Close"
 msgstr "Bezárás"
 
 #: src/toolbar-factory.c:133
-#, fuzzy
 msgid "Close the compose window"
-msgstr "Szerkesztőablak"
+msgstr "Szerkesztőablak bezárása"
 
 #: src/toolbar-factory.c:134
 msgid ""
@@ -5505,7 +5451,7 @@ msgid ""
 "All\n"
 "headers"
 msgstr ""
-"_Teljes\n"
+"Minden\n"
 "fejléc"
 
 #: src/toolbar-factory.c:139
@@ -5620,231 +5566,3 @@ msgstr "Fel"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Le"
-
-#~ msgid "Cannot sign message: could not create gpgme context: %s"
-#~ msgstr ""
-#~ "Nem lehet aláírni az üzenetet: nem lehet létrehozni gpgme kontextust: %s"
-
-#~ msgid "Cannot sign message: could not get gpgme data from istream: %s"
-#~ msgstr ""
-#~ "Nem lehet aláírni az üzenetet: nem lehet gpgme adatot kinyerni az "
-#~ "adatfolyamból: %s"
-
-#~ msgid "Cannot sign message: gpgme could not create new data: %s"
-#~ msgstr ""
-#~ "Nem lehet aláírni az üzenetet: a gpgme nem tudott létrehozni új adatot: %s"
-
-#~ msgid "Cannot sign message: gpgme signing failed: %s"
-#~ msgstr "Nem lehet aláírni az üzenetet: gpgme aláírás sikertelen: %s"
-
-#~ msgid "Cannot sign message: could not get gpgme data: %s"
-#~ msgstr "Nem lehet aláírni az üzenetet: nem lehet gpgme adatot kinyerni: %s"
-
-#~ msgid ""
-#~ "Cannot verify message signature: could not get gpgme data from istream: %s"
-#~ msgstr ""
-#~ "Nem lehet ellenőrizni az üzenet aláírását: nem lehet gpgme adatot "
-#~ "kinyerni az adatfolyamból: %s"
-
-#~ msgid ""
-#~ "Cannot verify message signature: could not get gpgme data from sigstream: "
-#~ "%s"
-#~ msgstr ""
-#~ "Nem lehet ellenőrizni az üzenet aláírását: nem lehet gpgme adatot "
-#~ "kinyerni az aláírás-folyamból: %s"
-
-#~ msgid "Cannot encrypt message: could not create gpgme recipients set: %s"
-#~ msgstr ""
-#~ "Nem lehet titkosítani az üzenetet: nem lehet létrehozni gpgme "
-#~ "címzetthalmazt: %s"
-
-#~ msgid "Cannot encrypt message: could not get gpgme data from istream: %s"
-#~ msgstr ""
-#~ "Nem lehet titkosítani az üzenetet: nem lehet gpgme adatot kinyerni az "
-#~ "adatfolyamból: %s"
-
-#~ msgid "Cannot encrypt message: gpgme could not create new data: %s"
-#~ msgstr ""
-#~ "Nem lehet titkosítani az üzenetet: gpgme nem tudott létrehozni új adatot: "
-#~ "%s"
-
-#~ msgid "Cannot encrypt message: gpgme encryption failed: %s"
-#~ msgstr "Nem lehet titkosítani az üzenetet: gpgme titkosítás sikertelen: %s"
-
-#~ msgid "Cannot encrypt message: could not get gpgme data: %s"
-#~ msgstr ""
-#~ "Nem lehet titkosítani az üzenetet: nem lehet gpgme adatot kinyerni: %s"
-
-#~ msgid "Cannot decrypt message: could not get gpgme data from istream: %s"
-#~ msgstr ""
-#~ "Nem lehet visszafejteni az üzenetet: nem lehet gpgme adatot kinyerni az "
-#~ "adatfolyamból: %s"
-
-#~ msgid "Cannot decrypt message: gpgme could not create new data: %s"
-#~ msgstr ""
-#~ "Nem lehet visszafejteni az üzenetet: gpgme nem tudott létrehozni új "
-#~ "adatot: %s"
-
-#~ msgid "Cannot decrypt message: gpgme decrypting failed: %s"
-#~ msgstr ""
-#~ "Nem lehet visszafejteni az üzenetet: gpgme visszafejtés sikertelen: %s"
-
-#~ msgid "Cannot decrypt message: could not get gpgme data: %s"
-#~ msgstr ""
-#~ "Nem lehet visszafejteni az üzenetet: nem lehet gpgme adatot nyerni: %s"
-
-#~ msgid "Failed to execute gpgme: %s"
-#~ msgstr "gpgme végrehajtása sikertelen: %s"
-
-#~ msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
-#~ msgstr "*** HIBA: A postafiók zárolófájlja létezik: %s***\n"
-
-#~ msgid "GMimeGPG signature verification failed: %s"
-#~ msgstr "GMimeGPG aláírás-ellenőrzés sikertelen: %s"
-
-#~ msgid "The signature is invalid."
-#~ msgstr "Az aláírás érvénytelen."
-
-#~ msgid "This part contains at least two signatures with different status."
-#~ msgstr "Ez a rész legalább két különböző állapotú aláírást tartalmaz."
-
-#~ msgid "bad status"
-#~ msgstr "rossz állapot"
-
-#~ msgid "Enter passsphrase to OpenPGP sign the first message part"
-#~ msgstr "Adja meg a jelszót hogy az OpenPGP aláírhassa az üzenet elő részét"
-
-#~ msgid "could not get gpgme data: %s"
-#~ msgstr "Nem lehet elérni gpgme adatot: %s"
-
-#~ msgid "Enter passsphrase to decrypt message part"
-#~ msgstr "Adja meg a jelszót az üzenetrész visszafejtéséhez"
-
-#~ msgid ""
-#~ "The OpenPGP encrypted message part contains 8-bit characters, but no "
-#~ "header describing the used codeset (converted to %s)"
-#~ msgstr ""
-#~ "Az OpenPGP-vel titkosított üzenetrész 8 bites karaktereket tartalmaz, de "
-#~ "nincs a használt kódolást leíró fejléce (konvertálva erre: %s)"
-
-#~ msgid ""
-#~ "%s\n"
-#~ "Do you want to run gpg to import the public key with fingerprint %s?"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Szeretné futtatni a gpg-t a(z) %s ujjlenyomattal rendelkező nyilvános "
-#~ "kulcs importálásához?"
-
-#~ msgid "Fingerprint"
-#~ msgstr "Ujjlenyomat"
-
-#~ msgid "could not get a private key for %s"
-#~ msgstr "nem lehet letölteni a személyes kulcsot %s számára"
-
-#~ msgid "could not create gpgme recipients set: %s"
-#~ msgstr "Nem lehet gpgme címzetthalmazt létrehozni: %s"
-
-#~ msgid "could not add recipient %s: %s"
-#~ msgstr "Nem lehet hozzáadni %s címzettet: %s"
-
-#~ msgid "remember passphrase for"
-#~ msgstr "jelszó megjegyzése"
-
-#~ msgid "Enter passsphrase to sign message"
-#~ msgstr "Írja be a jelszót az üzenet aláírásához"
-
-#~ msgid ""
-#~ "The mailbox \"%s\" does not appear to be valid.\n"
-#~ "Your system does not allow for creation of mailboxes\n"
-#~ "in /var/spool/mail. Balsa wouldn't function properly\n"
-#~ "until the system created the mailboxes. Please change\n"
-#~ "the mailbox path or check your system configuration."
-#~ msgstr ""
-#~ "A(z) \"%s\" postafiók érvénytelennek tűnik.\n"
-#~ "A rendszere nem teszi lehetővé postafiókok\n"
-#~ "létrehozását a /var/spool/mail alá. A Balsa nem\n"
-#~ "fog megfelelően működni amíg a postafiókok nem\n"
-#~ "jönnek létre.Kérem változtassa meg a postafiókok\n"
-#~ "útvonalát vagy ellenőrizze a rendszerbeállításokat."
-
-#~ msgid "detected a good signature"
-#~ msgstr "az aláírás jó"
-
-#~ msgid "detected a good signature with insufficient validity/trust"
-#~ msgstr "Jó aláírás elégtelen érvényességgel/megbízhatósággal felismerve"
-
-#~ msgid "Remote IMAP folder set"
-#~ msgstr "Távoli IMAP mappák"
-
-#~ msgid "Use SS_L (IMAPS)"
-#~ msgstr "_SSL használata (IMAPS)"
-
-#~ msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-#~ msgstr "Hoppá! A balsa_app.mailbox csomóban nem található ez a postafiók?\n"
-
-#~ msgid "Use _APOP Authentication"
-#~ msgstr "_APOP hitelesítés használata"
-
-#~ msgid "Use SS_L (pop3s)"
-#~ msgstr "SS_L használata (POP3S)"
-
-#~ msgid "Show from _name"
-#~ msgstr "_Névtől kezdve mutassa"
-
-#~ msgid "Show _Patches"
-#~ msgstr "_Foltok mutatása"
-
-#~ msgid "Co_mmit Current"
-#~ msgstr "_Változások mentése"
-
-#~ msgid "Commit _All"
-#~ msgstr "_Minden változás mentése"
-
-#~ msgid "Commit the changes in all mailboxes"
-#~ msgstr "Az összes postafiók változásainak elfogadása"
-
-#~ msgid "Edit/Apply _Filters"
-#~ msgstr "Szűrők szerkesztése vagy alkalmazása"
-
-#~ msgid "Filter the content of the selected mailbox"
-#~ msgstr "A kiválasztott postafiók tartalmának szűrése"
-
-#~ msgid "_Remove Duplicates"
-#~ msgstr "_Azonosak eltávolítása"
-
-#~ msgid "Remove duplicated messages from the selected mailbox"
-#~ msgstr "Az azonos levelek törlése a kijelölt postafiókból"
-
-#~ msgid ""
-#~ "Unable to Open Mailbox!\n"
-#~ "Please check the mailbox settings."
-#~ msgstr ""
-#~ "Nem tudom megnyitni a postafiókot!\n"
-#~ "Kérem ellenőrizze a postafiók beállításait."
-
-#~ msgid "Message window title format:"
-#~ msgstr "Üzenetablak címének formátuma:"
-
-#~ msgid "Delete immediately and irretrievably"
-#~ msgstr "Azonnali és visszavonhatatlan törlés"
-
-#~ msgid "Sa_ve"
-#~ msgstr "Me_ntés"
-
-#~ msgid "_Attachments"
-#~ msgstr "_Mellékletek"
-
-#~ msgid "Co_mments"
-#~ msgstr "Meg_jegyzések"
-
-#~ msgid "_Keywords"
-#~ msgstr "_Kulcsszavak"
-
-#~ msgid "Comments:"
-#~ msgstr "Megjegyzések:"
-
-#~ msgid "Keywords:"
-#~ msgstr "Kulcsszavak:"
-
-#~ msgid "Cancel this message"
-#~ msgstr "Levél megválaszolása"

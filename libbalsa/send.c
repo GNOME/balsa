@@ -1531,6 +1531,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		GMimeStream *stream;
 		GMimeDataWrapper *content;
 		int fd;
+		gchar *utf8name;
 
 		if (!strcasecmp(mime_type[0], "text")
 		    && !(charset = body->charset)) {
@@ -1572,8 +1573,10 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		}
 
 		tmp = g_path_get_basename(body->filename);
-		g_mime_part_set_filename(GMIME_PART(mime_part), tmp);
+		utf8name = g_filename_to_utf8(tmp, -1, NULL, NULL, NULL);
 		g_free(tmp);
+		g_mime_part_set_filename(GMIME_PART(mime_part), utf8name);
+		g_free(utf8name);
 
 		fd = open(body->filename, O_RDONLY);
 		stream = g_mime_stream_fs_new(fd);

@@ -1,3 +1,8 @@
+2002-05-12  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/filter.c (match_condition): don't mark searched 
+	messages as read
+
 2002-05-10  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/files.[hc] (libbalsa_icon_finder): return icon mime

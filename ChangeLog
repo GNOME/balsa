@@ -1,5 +1,7 @@
-2004-10-23 04:57  PeterB
+2004-10-23 12:13  PeterB
 
+	* src/balsa-mblist.c: migrate BalsaMBListMRUOPtionMenu from
+	deprecated GtkOPtionMenu to GtkComboBox.
 	* libbalsa/: filter-file.c, mailbox_imap.c, mailbox_mbox.c: compile
 	without threads.
 

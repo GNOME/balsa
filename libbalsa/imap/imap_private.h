@@ -21,6 +21,8 @@
 
 #include <glib-object.h>
 
+#include <config.h>
+
 #include "imap-commands.h"
 
 struct _MboxView {

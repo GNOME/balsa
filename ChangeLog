@@ -3,8 +3,13 @@
 	* src/main-window.c (destroy_window_cb): only save window size.
 	attached to destroy signal of each app in app_create().
 	(destroy_mdi_cb): call balsa_exit(). attached to mdi destroy signal.
-	this was necessary, as mdi might not have an active_window on
-	destruction!
+	savin window size here makes no sense as mdi might not have an
+	active_window on destruction!
+	(app_created): set the pointer to pbar as data to each GnomeApp with
+	key PROCESSBAR_KEY.
+	(main_window_set_cursor): use the pbar set as data to the GnomeApp.
+	using a global static var won't work if someone drags a page out
+	to create multiple notebooks.
 
 1998-12-26  bertrand <bertrand.guiheneuf@inria.fr>
 

@@ -42,8 +42,9 @@
 
 #define MAILBOX_DATA "mailbox_data"
 
+#define PROCESSBAR_KEY "balsa_window_pbar"
+
 GnomeMDI *mdi = NULL;
-static GtkWidget *pbar;
 static guint pbar_timeout;
 
 static gint about_box_visible = FALSE;
@@ -193,7 +194,7 @@ void
 main_window_set_cursor (gint type)
 {
   GList *list;
-  GtkWidget *widget;
+  GtkWidget *widget, *pbar;
   GdkCursor *cursor;
 
   if (mdi->windows == NULL)
@@ -203,6 +204,7 @@ main_window_set_cursor (gint type)
   for (list = mdi->windows; list; list = list->next)
     {
       widget = GTK_WIDGET (GNOME_APP (list->data));
+      pbar = GTK_WIDGET (gtk_object_get_data (widget, PROCESSBAR_KEY));
       if (type == -1)
 	{
 	  gtk_widget_set_sensitive (pbar, FALSE);
@@ -282,6 +284,7 @@ static void
 app_created (GnomeMDI * mdi, GnomeApp * app)
 {
   GtkWidget *statusbar;
+  GtkWidget *pbar;
 
   /* we can only set icon after realization, as we have no windows before. */
   gtk_signal_connect (GTK_OBJECT (app), "realize",
@@ -307,6 +310,8 @@ app_created (GnomeMDI * mdi, GnomeApp * app)
   gtk_widget_set_usize (GTK_WIDGET (app), balsa_app.mw_width, balsa_app.mw_height);
 
   mblist_open_window (mdi);
+
+  gtk_object_set_data (GTK_OBJECT (app), PROCESSBAR_KEY, pbar);
 
   refresh_main_window ();
 }

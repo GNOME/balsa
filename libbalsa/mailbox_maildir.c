@@ -598,49 +598,45 @@ maildir_sync(gchar *key, struct message_info *msg_info, struct sync_info *si)
 	return;
     }
      
-    maildir_sync_add(msg_info, si->path);
+    if (strcmp(msg_info->subdir, "cur") != 0
+	|| msg_info->flags != msg_info->orig_flags)
+	maildir_sync_add(msg_info, si->path);
 }
 
 static void
 maildir_sync_add(struct message_info *msg_info, const gchar * path)
 {
-    gboolean move = FALSE;
+    gchar new_flags[10];
+    int len;
+    gchar *new;
+    gchar *orig;
 
-    if (strcmp(msg_info->subdir, "cur")!=0)
-	move = TRUE;
-    if (msg_info->flags != msg_info->orig_flags)
-	move = TRUE;
+    len = 0;
 
-    if (move) {
-	gchar new_flags[10];
-	int len=0;
-	gchar *new;
-	gchar *orig;
+    if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED) != 0)
+	new_flags[len++] = 'F';
+    if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_NEW) == 0)
+	new_flags[len++] = 'S';
+    if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_REPLIED) != 0)
+	new_flags[len++] = 'R';
+    if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED) != 0)
+	new_flags[len++] = 'T';
 
-	if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED) != 0)
-	    new_flags[len++] = 'F';
-	if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_NEW) == 0)
-	    new_flags[len++] = 'S';
-	if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_REPLIED) != 0)
-	    new_flags[len++] = 'R';
-	if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED) != 0)
-	    new_flags[len++] = 'T';
+    new_flags[len] = '\0';
 
-	new_flags[len] = '\0';
-
-	new = g_strdup_printf("%s/cur/%s%s%s", path, msg_info->key,
-			      (len?":2,":""), new_flags);
-	orig = g_strdup_printf("%s/%s/%s", path, msg_info->subdir, 
-			       msg_info->filename);
-	rename(orig, new); /* FIXME: change to safe_rename??? */
-	g_free(orig);
-	g_free(new);
-	new = g_strdup_printf("%s%s%s", msg_info->key, (len?":2,":""), new_flags);
-	g_free(msg_info->filename);
-	msg_info->subdir = "cur";
-	msg_info->filename = new;
-	msg_info->orig_flags = msg_info->flags;
-    }
+    new = g_strdup_printf("%s/cur/%s%s%s", path, msg_info->key,
+			  (len ? ":2," : ""), new_flags);
+    orig = g_strdup_printf("%s/%s/%s", path, msg_info->subdir,
+			   msg_info->filename);
+    rename(orig, new);		/* FIXME: change to safe_rename??? */
+    g_free(orig);
+    g_free(new);
+    new = g_strdup_printf("%s%s%s", msg_info->key, (len ? ":2," : ""),
+			  new_flags);
+    g_free(msg_info->filename);
+    msg_info->subdir = "cur";
+    msg_info->filename = new;
+    msg_info->orig_flags = msg_info->flags;
 }
 
 static void
@@ -856,7 +852,8 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
 	    g_hash_table_insert(mdir->messages_info, msg_info->key, msg_info);
 	    g_ptr_array_add(mdir->msgno_2_msg_info, msg_info);
 	    mailbox->new_messages++;
-    }
+    } else
+	free_message_info(msg_info);
     g_free(tmp);
 
     g_object_unref ( G_OBJECT(message ) );  

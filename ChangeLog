@@ -1,3 +1,8 @@
+2003-07-04  Pawel Salek <pawsa theochem.kth.se>
+
+	* src/sendmsg-window.c: sort also translated language names.
+	* libbalsa/body.c: _() declaration needed.
+
 2003-07-03  Carlos Morgado  <chbm chbm.nu>
 
 	* libbalsa/send.c: send text attachs as unknown-8bit

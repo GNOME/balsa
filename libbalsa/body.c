@@ -25,6 +25,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <glib.h>
+/* gnome-i18n.h needed for _() */
+#include <libgnome/gnome-i18n.h>
 
 #include "libbalsa.h"
 #include "mailbackend.h"

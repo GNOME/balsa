@@ -334,160 +334,49 @@ static GnomeUIInfo view_menu[] = {
    type information.  
    if you add a new encoding here add to SendCharset in libbalsa.c 
 */
-struct {
+struct SendLocales {
     const gchar *locale, *charset, *lang_name;
 } locales[] = {
-#define LOC_BRAZILIAN_POS   0
-    {"pt_BR", "ISO-8859-1", N_("Brazilian")},
-#define LOC_CATALAN_POS     1
-    {"ca_ES", "ISO-8859-15", N_("Catalan")},
-#define LOC_CHINESE_SIMPLIFIED_POS   2
-    {"zh_CN.GB2312", "gb2312", N_("Chinese Simplified")},
-#define LOC_CHINESE_TRADITIONAL_POS   3
-    {"zh_TW.Big5", "big5", N_("Chinese Traditional")},
-#define LOC_CZECH_POS       4
-    {"cs_CZ", "ISO-8859-2", N_("Czech")},
-#define LOC_DANISH_POS      5
-    {"da_DK", "ISO-8859-1", N_("Danish")},
-#define LOC_GERMAN_POS      6
-    {"de_DE", "ISO-8859-15", N_("German")},
-#define LOC_DUTCH_POS       7
-    {"nl_NL", "ISO-8859-15", N_("Dutch")},
-#define LOC_ENGLISH_POS     8
-    /* English -> American English, argh... */
-    {"en_US", "ISO-8859-1", N_("English")}, 
-#define LOC_ESPERANTO_POS   9
-    {"eo_XX", "UTF-8",      N_("Esperanto")},
-#define LOC_ESTONIAN_POS    10
-    {"et_EE", "ISO-8859-15", N_("Estonian")},
-#define LOC_FINNISH_POS     11
-    {"fi_FI", "ISO-8859-15", N_("Finnish")},
-#define LOC_FRENCH_POS      12
-    {"fr_FR", "ISO-8859-15", N_("French")},
-#define LOC_GREEK_POS       13 
-    {"el_GR", "ISO-8859-7", N_("Greek")},
-#define LOC_HEBREW_POS      14
-    {"he_IL", "UTF-8", N_("Hebrew")},
-#define LOC_HUNGARIAN_POS   15
-    {"hu_HU", "ISO-8859-2", N_("Hungarian")},
-#define LOC_ITALIAN_POS     16
-    {"it_IT", "ISO-8859-15", N_("Italian")},
-#define LOC_JAPANESE_POS    17
-    {"ja_JP", "euc-jp", N_("Japanese")},
-#define LOC_KOREAN_POS      18
-    {"ko_KR", "euc-kr", N_("Korean")},
-#define LOC_LATVIAN_POS     19
-    {"lv_LV", "ISO-8859-13", N_("Latvian")},
-#define LOC_LITHUANIAN_POS  20
-    {"lt_LT", "ISO-8859-13", N_("Lithuanian")},
-#define LOC_NORWEGIAN_POS   21
-    {"no_NO", "ISO-8859-1", N_("Norwegian")},
-#define LOC_POLISH_POS      22
-    {"pl_PL", "ISO-8859-2", N_("Polish")},
-#define LOC_PORTUGESE_POS   23
-    {"pt_PT", "ISO-8859-15", N_("Portugese")},
-#define LOC_ROMANIAN_POS    24
-    {"ro_RO", "ISO-8859-2", N_("Romanian")},
-#define LOC_RUSSIAN_ISO_POS 25
-    {"ru_SU", "ISO-8859-5", N_("Russian (ISO)")},
-#define LOC_RUSSIAN_KOI_POS 26
-    {"ru_RU", "KOI8-R", N_("Russian (KOI)")},
-#define LOC_SLOVAK_POS      27
-    {"sk_SK", "ISO-8859-2", N_("Slovak")},
-#define LOC_SPANISH_POS     28
-    {"es_ES", "ISO-8859-15", N_("Spanish")},
-#define LOC_SWEDISH_POS     29
-    {"sv_SE", "ISO-8859-1", N_("Swedish")},
-#define LOC_TURKISH_POS     30
-    {"tr_TR", "ISO-8859-9", N_("Turkish")},
-#define LOC_UKRAINIAN_POS   31
-    {"uk_UK", "KOI8-U", N_("Ukrainian")},
-#define LOC_UTF8_POS        32
-    {"", "UTF-8", N_("Generic UTF-8")}
+    {"pt_BR", "ISO-8859-1",    N_("_Brazilian")},
+    {"ca_ES", "ISO-8859-15",   N_("_Catalan")},
+    {"zh_CN.GB2312", "gb2312", N_("_Chinese Simplified")},
+    {"zh_TW.Big5", "big5",     N_("_Chinese Traditional")},
+    {"cs_CZ", "ISO-8859-2",    N_("_Czech")},
+    {"da_DK", "ISO-8859-1",    N_("_Danish")},
+    {"nl_NL", "ISO-8859-15",   N_("_Dutch")},
+#define LOC_AM_ENGLISH_POS 7
+    {"en_US", "ISO-8859-1",    N_("_English (American)")}, 
+    {"en_UK", "ISO-8859-1",    N_("_English (British)")}, 
+    {"eo_XX", "UTF-8",         N_("_Esperanto")},
+    {"et_EE", "ISO-8859-15",   N_("_Estonian")},
+    {"fi_FI", "ISO-8859-15",   N_("_Finnish")},
+    {"fr_FR", "ISO-8859-15",   N_("_French")},
+    {"de_DE", "ISO-8859-15",   N_("_German")},
+    {"el_GR", "ISO-8859-7",    N_("_Greek")},
+    {"he_IL", "UTF-8",         N_("_Hebrew")},
+    {"hu_HU", "ISO-8859-2",    N_("_Hungarian")},
+    {"it_IT", "ISO-8859-15",   N_("_Italian")},
+    {"ja_JP", "euc-jp",        N_("_Japanese")},
+    {"ko_KR", "euc-kr",        N_("_Korean")},
+    {"lv_LV", "ISO-8859-13",   N_("_Latvian")},
+    {"lt_LT", "ISO-8859-13",   N_("_Lithuanian")},
+    {"no_NO", "ISO-8859-1",    N_("_Norwegian")},
+    {"pl_PL", "ISO-8859-2",    N_("_Polish")},
+    {"pt_PT", "ISO-8859-15",   N_("_Portugese")},
+    {"ro_RO", "ISO-8859-2",    N_("_Romanian")},
+    {"ru_SU", "ISO-8859-5",    N_("_Russian (ISO)")},
+    {"ru_RU", "KOI8-R",        N_("_Russian (KOI)")},
+    {"sk_SK", "ISO-8859-2",    N_("_Slovak")},
+    {"es_ES", "ISO-8859-15",   N_("_Spanish")},
+    {"sv_SE", "ISO-8859-1",    N_("_Swedish")},
+    {"tr_TR", "ISO-8859-9",    N_("_Turkish")},
+    {"uk_UK", "KOI8-U",        N_("_Ukrainian")},
+    {"", "UTF-8",              N_("_Generic UTF-8")}
 };
 
 static void lang_set_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
 
-static GnomeUIInfo locale_aj_menu[] = {
-    GNOMEUIINFO_ITEM_DATA(N_("Brazilian"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_BRAZILIAN_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Catalan"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_CATALAN_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Chinese Simplified"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_CHINESE_SIMPLIFIED_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Chinese Traditional"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_CHINESE_TRADITIONAL_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Czech"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_CZECH_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Danish"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_DANISH_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Dutch"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_DUTCH_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("English"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_ENGLISH_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Esperanto"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_ESPERANTO_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Finnish"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_FINNISH_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("French"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_FRENCH_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("German"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_GERMAN_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Greek"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_GREEK_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Hebrew"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_HEBREW_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Hungarian"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_HUNGARIAN_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Italian"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_ITALIAN_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Japanese"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_JAPANESE_POS), NULL),
-    GNOMEUIINFO_END
-};
-
-static GnomeUIInfo locale_kz_menu[] = {
-    GNOMEUIINFO_ITEM_DATA(N_("Korean"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_KOREAN_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Latvian"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_LATVIAN_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Lithuanian"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_LITHUANIAN_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Norwegian"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_NORWEGIAN_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Polish"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_POLISH_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Portugese"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_PORTUGESE_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Romanian"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_ROMANIAN_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Russian (ISO)"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_RUSSIAN_ISO_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Russian (KOI)"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_RUSSIAN_KOI_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Slovak"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_SLOVAK_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Spanish"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_SPANISH_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Swedish"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_SWEDISH_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Turkish"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_TURKISH_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("Ukrainian"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_UKRAINIAN_POS), NULL),
-    GNOMEUIINFO_ITEM_DATA(N_("UTF-8"), NULL, lang_set_cb,
-                          GINT_TO_POINTER(LOC_UTF8_POS), NULL),
-    GNOMEUIINFO_END
-};
-
-/* two sections plus one place-holder for the current language.
-*/
 static GnomeUIInfo lang_menu[] = {
-    GNOMEUIINFO_SUBTREE(N_("_A-J"), locale_aj_menu),
-    GNOMEUIINFO_SUBTREE(N_("_K-Z"), locale_kz_menu),
-    GNOMEUIINFO_SEPARATOR,
-#define LANG_CURRENT_POS 3
-    GNOMEUIINFO_ITEM_NONE(NULL, NULL, NULL),
     GNOMEUIINFO_END
 };
 
@@ -758,7 +647,7 @@ find_locale_index_by_locale(const gchar * locale)
     unsigned i, j, maxfit = 0, maxpos = 0;
 
     if (!locale || strcmp(locale, "C") == 0)
-	return LOC_ENGLISH_POS;
+	return LOC_AM_ENGLISH_POS;
     for (i = 0; i < ELEMENTS(locales); i++) {
 	for (j = 0; locale[j] && locales[i].locale[j] == locale[j]; j++);
 	if (j > maxfit) {
@@ -767,20 +656,6 @@ find_locale_index_by_locale(const gchar * locale)
 	}
     }
     return maxpos;
-}
-
-/* fill_language_menu:
-   fills in the system language.
-*/
-static void
-fill_language_menu()
-{
-    int idxsys;
-    idxsys = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
-    if (balsa_app.debug)
-	printf("idxsys: %d %s for %s\n", idxsys, locales[idxsys].lang_name,
-	       setlocale(LC_CTYPE, NULL));
-    lang_menu[LANG_CURRENT_POS].label = (char *) locales[idxsys].lang_name;
 }
 
 static struct {
@@ -2629,6 +2504,44 @@ setup_headers_from_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity *ident)
 	gtk_entry_set_text(GTK_ENTRY(bsmsg->bcc[1]), ident->bcc);
 }
 
+static int
+comp_send_locales(const void* a, const void* b)
+{
+    return g_utf8_collate(((struct SendLocales*)a)->lang_name,
+                          ((struct SendLocales*)b)->lang_name);
+}
+
+/* create_lang_menu:
+   create language menu for the compose window. The order cannot be
+   hardcoded because it depends on the current locale.
+*/
+static void
+create_lang_menu(GtkWidget* parent, BalsaSendmsg *bsmsg)
+{
+    unsigned i;
+    GtkWidget* langs = gtk_menu_item_get_submenu(GTK_MENU_ITEM(parent));
+    static gboolean locales_sorted = FALSE;
+
+    if(!locales_sorted) {
+        for(i=0; i<ELEMENTS(locales); i++)
+            locales[i].lang_name = _(locales[i].lang_name);
+        qsort(locales, ELEMENTS(locales), sizeof(struct SendLocales),
+              comp_send_locales);
+        locales_sorted = TRUE;
+    }
+    for(i=0; i<ELEMENTS(locales); i++) {
+        GtkWidget *w = 
+            gtk_check_menu_item_new_with_mnemonic(locales[i].lang_name);
+        g_signal_connect(G_OBJECT(w), "activate", 
+                         G_CALLBACK(lang_set_cb), bsmsg);
+        g_object_set_data(G_OBJECT(w), GNOMEUIINFO_KEY_UIDATA, 
+                          GINT_TO_POINTER(i));
+        gtk_widget_show(w);
+        gtk_menu_shell_append(GTK_MENU_SHELL(langs), w);
+    }                         
+}
+        
+
 /* Toolbar buttons and their callbacks. */
 static const struct callback_item {
     const char *icon_id;
@@ -2747,8 +2660,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     g_signal_connect(G_OBJECT(bsmsg->window), "size_allocate",
 		     G_CALLBACK(sw_size_alloc_cb), bsmsg);
 
-    fill_language_menu();
-
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, bsmsg);
     /* Save the widgets that we need to toggle--they'll be overwritten
      * if another compose window is opened. */
@@ -2772,7 +2683,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS].widget;
     bsmsg->ready_widgets[1] = file_menu[MENU_FILE_QUEUE_POS].widget;
     bsmsg->ready_widgets[2] = file_menu[MENU_FILE_POSTPONE_POS].widget;
-    bsmsg->current_language_menu = lang_menu[LANG_CURRENT_POS].widget;
+
+    create_lang_menu(main_menu[MAIN_CHARSET_MENU].widget, bsmsg);
 
     /* set options */
     bsmsg->req_dispnotify = FALSE;
@@ -4066,7 +3978,7 @@ init_menus(BalsaSendmsg * bsmsg)
 	    ;
     }
     if (i == ELEMENTS(locales))
-	i = LOC_ENGLISH_POS;
+	i = LOC_AM_ENGLISH_POS;
     
     set_locale(NULL, bsmsg, i);
 
@@ -4084,16 +3996,9 @@ init_menus(BalsaSendmsg * bsmsg)
 static gint
 set_locale(GtkWidget * w, BalsaSendmsg * bsmsg, gint idx)
 {
-    gchar *tmp;
-
     g_free(bsmsg->charset);
     bsmsg->charset = g_strdup(locales[idx].charset);
     bsmsg->locale = locales[idx].locale;
-    tmp = g_strdup_printf("%s (%s, %s)", _(locales[idx].lang_name),
-			  locales[idx].locale, locales[idx].charset);
-    gtk_label_set_text(GTK_LABEL
-		       (GTK_BIN(bsmsg->current_language_menu)->child), tmp);
-    g_free(tmp);
     return FALSE;
 }
 

@@ -1,9 +1,11 @@
 2000-06-05  Matthew Guenther <mguenthe@attcanada.ca>
 
+	Contributed by Alexey Kakunin <small@arcadia.spb.ru>:
 	* src/balsa-message.[hc]: add get_koi_font_name to use alternate
 	(non ISO) Cyrillic character set.  
 	* src/sendmsg-window.c: add KOi8-R to character set menu,
 	set_koi8_charset function.
+	
 
 2000-06-05  Pawel Salek <pawsa@theochem.kth.se>
 	* libbalsa/send.c,src/main-window.c: don't delete loose messages

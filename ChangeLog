@@ -1,3 +1,9 @@
+2004-08-02 01:27  PeterB
+
+	* src/: balsa-mblist.c, mailbox-node.c, mailbox-node.h: use
+	g_signal_has_handler_pending to detect when we need to connect to
+	the mailbox's "changed" signal, instead of GObject data.
+
 2004-08-01 00:31  PeterB
 
 	* libbalsa/mailbox_mh.c: check file descriptors for error.

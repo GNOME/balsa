@@ -16,6 +16,7 @@ ltmain.sh
 missing
 mkinstalldirs
 stamp-h
+stamp-h.in
 stamp.h
 version.h
 gnomeConf.sh

@@ -16,6 +16,10 @@ Stuart
  * if the MAIL env isn't set, the first time balsa is ran
    with a clean ~/.gnome/balsa, the "Default" mailbox isn't
    there, but every time after it is.. look into.
+ * lockfile so that Balsa can only be run once.  c-client
+   doesn't like like two programms accessing the same
+   mailboxes at the same time.
+
 
 sendmsg-window TODO:
  * free EVERYTHING in the sendmsg-window when it is closed.

@@ -74,20 +74,25 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
   balsa_app.mdi_style = GNOME_MDI_NOTEBOOK;
 
-  /* Check to see if this is the first time we've run balsa */
-  if (!gnome_config_get_string ("/balsa/Global/Accounts"))
-    initialize_balsa(argc, argv);
-
   /* initalize our mailbox access crap */
   mailbox_init ();
 
   read_signature();
 
   restore_global_settings ();
-  mailboxes_init ();
-  load_local_mailboxes ();
-  my_special_mailbox ();
+
+  /* Check to see if this is the first time we've run balsa */
 /*
+ * if (!gnome_config_get_string ("/balsa/Global/Accounts"))
+*/
+  /*
+  initialize_balsa(argc, argv);
+  return;
+*/
+  do_load_mailboxes();
+
+  open_main_window ();
+  /*
   addressbook_read_pine("/home/pavlov/.addressbook");
 */
   /* start timers */
@@ -97,6 +102,12 @@ init_balsa_app (int argc, char *argv[])
 #endif
 }
 
+void do_load_mailboxes()
+{
+  mailboxes_init ();
+  load_local_mailboxes ();
+  my_special_mailbox ();
+}
 
 static gint
 read_signature ()

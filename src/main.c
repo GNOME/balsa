@@ -33,8 +33,6 @@ main (int argc, char *argv[])
   gnome_init ("balsa", NULL, argc, argv, 0, NULL);
   init_balsa_app (argc, argv);
 
-  open_main_window ();
-
   gtk_main ();
   return 0;
 }

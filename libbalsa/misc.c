@@ -31,6 +31,7 @@
 
 #include <libgnomevfs/gnome-vfs-file-info.h>
 #include <libgnomevfs/gnome-vfs-ops.h>
+#include <libgnome/gnome-i18n.h>
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -994,3 +995,25 @@ libbalsa_truncate_string(const gchar *str, gint length, gint dots)
     return res;
 }
 
+/* libbalsa_utf8_sanitize
+ *
+ * Validate utf-8 text, and if validation fails, replace each offending
+ * byte with '?'.
+ *
+ * Argument:
+ *   text   The text to be sanitized; NULL is OK.
+ *
+ * Return value:
+ *   none
+ *
+ * NOTE:    The text is modified in place.
+ */
+void
+libbalsa_utf8_sanitize(gchar * text)
+{
+    if (!text)
+        return;
+
+    while (!g_utf8_validate(text, -1, (const gchar **) &text))
+        *text = '?';
+}

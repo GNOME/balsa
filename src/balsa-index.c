@@ -50,6 +50,8 @@
 
 #include "filter.h"
 
+#include "libbalsa/misc.h"
+
 /* gtk widget */
 static void balsa_index_class_init(BalsaIndexClass * klass);
 static void balsa_index_init(BalsaIndex * index);
@@ -690,7 +692,9 @@ balsa_index_add(BalsaIndex * index, LibBalsaMessage * message)
 	name_str = "";
 
     text[3] = append_dots ? g_strconcat(name_str, ",...", NULL) : name_str;
+    libbalsa_utf8_sanitize(text[3]);
     text[4] = (gchar*)LIBBALSA_MESSAGE_GET_SUBJECT(message);
+    libbalsa_utf8_sanitize(text[4]);
     text[5] =
 	libbalsa_message_date_to_gchar(message, balsa_app.date_string);
     text[6] =

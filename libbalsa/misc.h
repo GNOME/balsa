@@ -114,6 +114,7 @@ void libbalsa_marshal_VOID__POINTER_POINTER (GClosure     *closure,
 gboolean libbalsa_delete_directory_contents(const gchar *path);
 gchar *libbalsa_truncate_string(const gchar * str, gint length, gint dots);
 void libbalsa_mktemp(gchar * name);
+void libbalsa_utf8_sanitize(gchar * text);
 
 
 #endif				/* __LIBBALSA_MISC_H__ */

@@ -116,17 +116,11 @@ libbalsa_show_file(FILE* f, long length)
 					* not likely to be used */
     while(length>0 && fgets(buf, sizeof(buf), f)) {
 	gint linelen = strlen(buf);
-        GError * error = NULL;
-        gchar *tmp =
-            g_convert_with_fallback(buf,
-                                    length > linelen ? linelen : length,
-                                    "US-ASCII", "ISO-8859-1", NULL, NULL,
-                                    NULL, &error);
+        gchar *tmp;
 
-        if (error) {
-            g_print(_("Conversion error: %s\n"), error->message);
-            g_error_free(error);
-        }
+        if (linelen > length)
+            buf[length] = '\0';
+        tmp = g_strescape(buf, "\n\"");
         if (tmp) {
 	    gtk_text_buffer_insert_at_cursor(buffer, tmp, -1);
             g_free(tmp);

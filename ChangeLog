@@ -1,3 +1,10 @@
+2002-10-12  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/misc.[ch]: implement libbalsa_utf8_sanitize.
+	* src/balsa-index.c, src/balsa-message.c: use it.
+	* libbalsa/source-viewer.c: use g_strescape to ascii-ize text, even if 
+	it does use octal escapes!
+
 2002-10-09  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-app.[ch]: define default print fonts.

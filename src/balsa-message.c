@@ -658,6 +658,7 @@ add_header_gchar(BalsaMessage * bm, const gchar *header, const gchar *label,
 
 	wrapped_value = g_strdup(value);
 	libbalsa_wrap_string(wrapped_value, balsa_app.wraplength - 15);
+        libbalsa_utf8_sanitize(wrapped_value);
 
 	/* We must insert the first line. Each subsequent line must be indented 
 	   by 15 spaces. So we need to rewrap lines 2+
@@ -1576,6 +1577,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         GtkTextBuffer *buffer;
         regex_t rex;
         GList *url_list = NULL;
+
+        libbalsa_utf8_sanitize(ptr);
 
         if (bm->wrap_text) {
             if (balsa_app.recognize_rfc2646_format_flowed

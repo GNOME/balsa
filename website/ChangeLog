@@ -1,3 +1,7 @@
+2000-08-28  Pawel Salek <pawsa@theochem.kth.se>
+
+	* main.html, download.html.in: 0.9.4 announcement.
+
 2000-08-31  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* main.html, index.html: Don't generate these html files. Use

@@ -60,7 +60,7 @@ static void show_all_headers_cb(GtkWidget * widget, gpointer data);
 static void show_all_headers_tool_cb(GtkWidget * widget, gpointer data);
 static void wrap_message_cb(GtkWidget * widget, gpointer data);
 static void size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
-static void mw_set_next_unread(MessageWindow * mw);
+static void mw_set_buttons_sensitive(MessageWindow * mw);
 
 static void copy_cb(GtkWidget * widget, MessageWindow * mw);
 static void select_all_cb(GtkWidget * widget, gpointer);
@@ -326,7 +326,7 @@ static void
 mw_set_message(MessageWindow *mw, LibBalsaMessage * message)
 {
     mw->message = message;
-    mw_set_next_unread(mw);
+    mw_set_buttons_sensitive(mw);
     g_object_set_data(G_OBJECT(message), BALSA_MESSAGE_WINDOW_KEY, mw);
     g_object_weak_ref(G_OBJECT(message),
 		      (GWeakNotify) mw_message_weak_notify, mw);
@@ -393,7 +393,7 @@ message_window_new(LibBalsaMessage * message)
     mw->bindex = balsa_find_index_by_mailbox(message->mailbox);
     g_object_add_weak_pointer(G_OBJECT(mw->bindex), (gpointer) &mw->bindex);
     g_signal_connect_swapped(G_OBJECT(mw->bindex), "index-changed",
-			     G_CALLBACK(mw_set_next_unread), mw);
+			     G_CALLBACK(mw_set_buttons_sensitive), mw);
 
     gnome_app_create_menus_with_data(GNOME_APP(mw->window), main_menu, mw);
 
@@ -638,14 +638,18 @@ size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
 }
 
 static void
-mw_set_next_unread(MessageWindow * mw)
+mw_set_buttons_sensitive(MessageWindow * mw)
 {
     GtkWidget *toolbar =
 	balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
     LibBalsaMailbox *mailbox = mw->message->mailbox;
+
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_UNREAD,
 				       mailbox
 				       && mailbox->unread_messages > 0);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_FLAGGED,
+				       mailbox
+				       && mailbox->total_messages > 0);
 }
 
 static void

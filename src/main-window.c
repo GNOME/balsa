@@ -40,6 +40,7 @@
 #include "sendmsg-window.h"
 #include "mailbox-conf.h"
 #include "mblist-window.h"
+#include "print.h"
 #define MAILBOX_DATA "mailbox_data"
 
 #define APPBAR_KEY "balsa_appbar"
@@ -61,7 +62,7 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbo
 static void balsa_window_destroy(GtkObject * object);
 
 static GtkWidget *balsa_window_create_preview_pane(BalsaWindow *window);
-static GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
+GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
 
 
 
@@ -112,7 +113,13 @@ static GnomeUIInfo file_menu[] =
  check_new_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
  GNOME_STOCK_MENU_MAIL_RCV, 'M', GDK_CONTROL_MASK, NULL
   },
-
+  GNOMEUIINFO_SEPARATOR,
+  /* Ctrl-I */
+  {
+    GNOME_APP_UI_ITEM, N_ ("Pr_int"), N_("Print current mail"),
+    file_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_MAIL_RCV, 'I', GDK_CONTROL_MASK, NULL
+  },
 
   GNOMEUIINFO_SEPARATOR,
 
@@ -277,10 +284,9 @@ static GnomeUIInfo main_toolbar[] =
     next_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_PIXMAP_FORWARD, 'N', 0, NULL
   },
-#ifdef BALSA_SHOW_ALL
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Print"), N_ ("Print current message"), NULL, GNOME_STOCK_PIXMAP_PRINT),
-#endif
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Print"), N_ ("Print current message"), file_print_cb, GNOME_STOCK_PIXMAP_PRINT),
+
   GNOMEUIINFO_END
 };
 
@@ -695,7 +701,7 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
 }
 
 
-static
+//static
 GtkWidget *balsa_window_find_current_index(BalsaWindow *window)
 {
   GtkWidget *page;

@@ -1,3 +1,8 @@
+2003-09-10 08:15  PeterB
+
+	* libbalsa/message.c: Restore "<>" around references; add `const'
+	qualifier to suppress whining.
+
 2003-09-10  Carlos Morgado  <chbm chbm.net>
 
 	* configure.in (BALSA_PATCHLEVEL): bump version 2.1.0

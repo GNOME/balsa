@@ -63,7 +63,13 @@ int mutt_socket_close (CONNECTION* conn)
     rc = conn->close (conn);
 
   conn->fd = -1;
-
+#ifdef LIBMUTT
+  /* reset methods so the connection structure can be reused */
+  conn->read = raw_socket_read;
+  conn->write = raw_socket_write;
+  conn->open = raw_socket_open;
+  conn->close = raw_socket_close;
+#endif
   return rc;
 }
 

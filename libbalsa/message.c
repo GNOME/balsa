@@ -813,7 +813,12 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
     msg = mx_open_message(CLIENT_CONTEXT(message->mailbox), cur->msgno);
     libbalsa_unlock_mutt();
 
-    if (!msg) return FALSE;
+    if (!msg) { /*FIXME: crude but necessary error handling */
+        if(CLIENT_CONTEXT_CLOSED(message->mailbox) ||
+           CLIENT_CONTEXT(message->mailbox)->hdrs == NULL) 
+            libbalsa_mailbox_close(message->mailbox);
+        return FALSE;
+    } 
 
     fseek(msg->fp, cur->content->offset, 0);
 
@@ -1003,7 +1008,7 @@ libbalsa_message_set_dispnotify(LibBalsaMessage *message,
 const gchar*
 libbalsa_message_get_subject(LibBalsaMessage* msg)
 {
-    if(msg->header) { /* a message in a mailbox... */
+    if(msg->header && msg->mailbox) { /* a message in a mailbox... */
         g_return_val_if_fail(CLIENT_CONTEXT_OPEN(msg->mailbox), NULL);
 	/* g_print("Returning libmutt's pointer\n"); */
 	return msg->header->env->subject;

@@ -1,3 +1,7 @@
+2001-10-15  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* mutt_socket.c: reset io methods on close.
+	
 2001-10-22  Carlos Morgado  <chbm@chbm.nu>
 
 	* imap/imap_private.h: remove sleep define (unused, causing

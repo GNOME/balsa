@@ -1,5 +1,9 @@
 2001-10-27  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* libbalsa/message.c: react on libmutt errors.
+
+2001-10-27  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* libbalsa/send.c: attachments have disposition: attach (Toralf).
 	* src/spell-check.c: compute string length once (Emmanuel).
 	

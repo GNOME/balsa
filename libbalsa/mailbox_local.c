@@ -219,9 +219,8 @@ libbalsa_mailbox_local_open(LibBalsaMailbox *mailbox, gboolean append)
 		CLIENT_CONTEXT (mailbox) = mx_open_mailbox (local->path, 0, NULL);
 	libbalsa_unlock_mutt();
 
-	mailbox->readonly = CLIENT_CONTEXT(mailbox)->readonly;
-
 	if (CLIENT_CONTEXT_OPEN (mailbox)) {
+		mailbox->readonly = CLIENT_CONTEXT(mailbox)->readonly;
 		mailbox->messages = 0;
 		mailbox->total_messages = 0;
 		mailbox->unread_messages = 0;

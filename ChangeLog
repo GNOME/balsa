@@ -2,6 +2,9 @@
 
 	* src/main.c, src/sendmsg-window.c: quit when -m option launch
 	was cancelled. Strip mailto: if present.
+	* libbalsa/{mailbox_imap.c,mailbox_local.c}: don't access
+	CONTEXT->readonly before checking that the mailbox open was really
+	successful.
 	
 2000-09-18  Pawel Salek  <pawsa@theochem.kth.se>
 

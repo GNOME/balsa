@@ -161,6 +161,7 @@ server_settings_changed(LibBalsaServer *server, LibBalsaMailbox *mailbox)
 
 void libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap *mailbox, gchar *path)
 {
+	g_return_if_fail(mailbox);
 	g_free(mailbox->path);
 	mailbox->path = g_strdup(path);
 
@@ -229,7 +230,8 @@ libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
 		UNLOCK_MAILBOX (mailbox);
 		return;
 	}
-	ImapUser = server->user;
+	if(ImapUser) safe_free((void**)&ImapUser); /* because mutt does so */
+	ImapUser = strdup(server->user);
 	
 	if(ImapPass) safe_free((void**)&ImapPass); /* because mutt does so */
 	ImapPass = strdup(server->passwd);
@@ -243,9 +245,9 @@ libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
 	libbalsa_unlock_mutt();
 	g_free (tmp);
 
-	mailbox->readonly = CLIENT_CONTEXT(mailbox)->readonly;
 
 	if (CLIENT_CONTEXT_OPEN (mailbox)) {
+		mailbox->readonly = CLIENT_CONTEXT(mailbox)->readonly;
 		mailbox->messages = 0;
 		mailbox->total_messages = 0;
 		mailbox->unread_messages = 0;

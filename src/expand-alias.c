@@ -35,6 +35,9 @@
 #include "sendmsg-window.h"
 #include "address-book.h"
 #include "address-entry.h"
+
+#if !NEW_ADDRESS_ENTRY_WIDGET
+
 #include "expand-alias.h"
 
 #define CASE_INSENSITIVE_NAME
@@ -180,3 +183,4 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
     addy->match = output;
 }
 
+#endif /* !NEW_ADDRESS_ENTRY_WIDGET */

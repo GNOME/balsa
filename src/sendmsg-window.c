@@ -716,7 +716,9 @@ address_book_response(GtkWidget * ab, gint response,
     g_object_set_data(G_OBJECT(parent), BALSA_SENDMSG_ADDRESS_BOOK_KEY,
                       NULL);
     gtk_widget_set_sensitive(GTK_WIDGET(address_entry), TRUE);
+#if !NEW_ADDRESS_ENTRY_WIDGET
     libbalsa_address_entry_fill_input(address_entry);
+#endif /* NEW_ADDRESS_ENTRY_WIDGET */
 }
 
 static gint
@@ -1322,6 +1324,13 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     g_free(old_sig);
     g_free(new_sig);
     g_free(message_text);
+
+    libbalsa_address_entry_set_domain(LIBBALSA_ADDRESS_ENTRY(bsmsg->to[1]),
+                                      ident->domain);
+    libbalsa_address_entry_set_domain(LIBBALSA_ADDRESS_ENTRY(bsmsg->cc[1]),
+                                      ident->domain);
+    libbalsa_address_entry_set_domain(LIBBALSA_ADDRESS_ENTRY(bsmsg->bcc[1]),
+                                      ident->domain);
 }
 
 
@@ -2084,8 +2093,10 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
 		      ELEMENTS(email_field_drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
+#if !NEW_ADDRESS_ENTRY_WIDGET
     libbalsa_address_entry_set_find_match(LIBBALSA_ADDRESS_ENTRY(arr[1]),
 		       expand_alias_find_match);
+#endif /* NEW_ADDRESS_ENTRY_WIDGET */
     libbalsa_address_entry_set_domain(LIBBALSA_ADDRESS_ENTRY(arr[1]),
 		       bsmsg->ident->domain);
     g_signal_connect(G_OBJECT(arr[1]), "changed",
@@ -3643,10 +3654,15 @@ static void
 address_changed_cb(LibBalsaAddressEntry * address_entry,
                    BalsaSendmsgAddress * sma)
 {
+#if NEW_ADDRESS_ENTRY_WIDGET
+    set_ready(address_entry, sma);
+    check_readiness(sma->bsmsg);
+#else /* NEW_ADDRESS_ENTRY_WIDGET */
     if (!libbalsa_address_entry_matching(address_entry)) {
         set_ready(address_entry, sma);
         check_readiness(sma->bsmsg);
     }
+#endif /* NEW_ADDRESS_ENTRY_WIDGET */
 }
 
 static void
@@ -4034,12 +4050,14 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 static void
 send_message_toolbar_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
+#if !NEW_ADDRESS_ENTRY_WIDGET
     libbalsa_address_entry_clear_to_send(LIBBALSA_ADDRESS_ENTRY
                                          (bsmsg->to[1]));
     libbalsa_address_entry_clear_to_send(LIBBALSA_ADDRESS_ENTRY
                                          (bsmsg->cc[1]));
     libbalsa_address_entry_clear_to_send(LIBBALSA_ADDRESS_ENTRY
                                          (bsmsg->bcc[1]));
+#endif /* NEW_ADDRESS_ENTRY_WIDGET */
     send_message_handler(bsmsg, balsa_app.always_queue_sent_mail);
 }
 
@@ -4048,6 +4066,7 @@ send_message_toolbar_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static gint
 send_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
+#if !NEW_ADDRESS_ENTRY_WIDGET
     /*
      * First, check if aliasing is on, and get it to nullify the
      * match.  Otherwise we send mail to "John (John Doe <jdoe@public.com>)"
@@ -4058,6 +4077,7 @@ send_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
                                          (bsmsg->cc[1]));
     libbalsa_address_entry_clear_to_send(LIBBALSA_ADDRESS_ENTRY
                                          (bsmsg->bcc[1]));
+#endif /* NEW_ADDRESS_ENTRY_WIDGET */
     return send_message_handler(bsmsg, FALSE);
 }
 
@@ -4804,8 +4824,10 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
     gchar *title_format;
     gchar *title;
 
+#if !NEW_ADDRESS_ENTRY_WIDGET
     if (libbalsa_address_entry_matching(LIBBALSA_ADDRESS_ENTRY(bsmsg->to[1])))
         return;
+#endif /* NEW_ADDRESS_ENTRY_WIDGET */
 
     switch (bsmsg->type) {
     case SEND_REPLY:

@@ -26,6 +26,18 @@
 
 #include "address.h"
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+#define NEW_ADDRESS_ENTRY_WIDGET TRUE
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
+
+#if NEW_ADDRESS_ENTRY_WIDGET
+typedef GtkEntry LibBalsaAddressEntry;
+#define LIBBALSA_ADDRESS_ENTRY(obj) GTK_ENTRY(obj)
+#define LIBBALSA_IS_ADDRESS_ENTRY(obj) GTK_IS_ENTRY(obj)
+void libbalsa_address_entry_set_address_book_list(GList *
+                                                  address_book_list);
+#else /* NEW_ADDRESS_ENTRY_WIDGET */
+
 #define FOCUS_LOST 0
 #define FOCUS_TAINTED 1
 #define FOCUS_CACHED 2
@@ -99,14 +111,15 @@ struct _LibBalsaAddressEntryClass {
  *************************************************************************/
 
 GtkType libbalsa_address_entry_get_type(void);
-GtkWidget *libbalsa_address_entry_new(void);
 void libbalsa_address_entry_set_find_match(LibBalsaAddressEntry *, void *);
-void libbalsa_address_entry_set_domain(LibBalsaAddressEntry *, void *);
 void libbalsa_address_entry_clear_to_send(LibBalsaAddressEntry *
                                           address_entry);
 void libbalsa_address_entry_fill_input(LibBalsaAddressEntry *address_entry);
 gboolean libbalsa_address_entry_matching(LibBalsaAddressEntry *
                                          address_entry);
 
+#endif /* NEW_ADDRESS_ENTRY_WIDGET */
+GtkWidget *libbalsa_address_entry_new(void);
+void libbalsa_address_entry_set_domain(LibBalsaAddressEntry *, void *);
 GList *libbalsa_address_entry_get_list(LibBalsaAddressEntry *address_entry);
 #endif

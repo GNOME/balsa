@@ -21,6 +21,7 @@
 
 #ifndef __BALSA_EXPAND_ALIAS_H__
 #define __BALSA_EXPAND_ALIAS_H__
+#if !NEW_ADDRESS_ENTRY_WIDGET
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,4 +32,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */
+#endif				/* !NEW_ADDRESS_ENTRY_WIDGET */
 #endif				/* __BALSA_EXPAND_ALIAS_H__ */

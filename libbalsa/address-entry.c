@@ -20,13 +20,9 @@
  * 02111-1307, USA.
  */
 
-/*
- * A subclass of gtkentry to support alias completion.
- */
 
 #include "config.h"
 
-#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 #include <string.h>
 
@@ -35,6 +31,12 @@
  */
 #include "address-entry.h"
 
+#if !NEW_ADDRESS_ENTRY_WIDGET
+/*
+ * A subclass of gtkentry to support alias completion.
+ */
+
+#include <gdk/gdkkeysyms.h>
 
 /* LibBalsaAddressEntry is typedef'd in address-entry.h, but the
  * structure is declared here to keep it opaque */
@@ -2114,3 +2116,496 @@ libbalsa_address_entry_get_list(LibBalsaAddressEntry *address_entry)
     }
     return res;
 }
+#else /* NEW_ADDRESS_ENTRY_WIDGET */
+/*************************************************************
+ *     Address entry widget based on GtkEntryCompletion.
+ *************************************************************/
+
+#include "config.h"
+#include <stdio.h>
+#include <gtk/gtk.h>
+
+#include "address-book.h"
+
+/*************************************************************
+ *     Static data.
+ *************************************************************/
+
+static GList *lbae_address_book_list;
+enum {
+    NAME_COL,
+    ADDRESS_COL
+};
+
+/*************************************************************
+ *     Data structure attached to the GtkCompletion.
+ *************************************************************/
+typedef struct {
+    GSList *list;
+    GSList *active;
+    gchar *domain;
+} LibBalsaAddressEntryInfo;
+
+#define LIBBALSA_ADDRESS_ENTRY_INFO "libbalsa-address-entry-info"
+
+/*************************************************************
+ *     Allocate and initialize LibBalsaAddressEntryInfo.
+ *************************************************************/
+static LibBalsaAddressEntryInfo *
+lbae_info_new(void)
+{
+    LibBalsaAddressEntryInfo *info;
+
+    info = g_new(LibBalsaAddressEntryInfo, 1);
+    info->list = NULL;
+    info->active = NULL;
+    info->domain = NULL;
+
+    return info;
+}
+
+/*************************************************************
+ *     Deallocate LibBalsaAddressEntryInfo.
+ *************************************************************/
+static void
+lbae_info_free(LibBalsaAddressEntryInfo * info)
+{
+    g_slist_foreach(info->list, (GFunc) g_free, NULL);
+    g_slist_free(info->list);
+    g_free(info->domain);
+    g_free(info);
+}
+
+/* Helpers. */
+
+/*************************************************************
+ *     Does the UTF-8 string begin with the prefix?
+ *************************************************************/
+static gboolean
+lbae_utf8_name_has_prefix(const gchar * name, const gchar * prefix)
+{
+    gchar *name_n, *name_f, *prefix_n, *prefix_f;
+    gboolean retval;
+
+    if (!name || !prefix)
+        return FALSE;
+
+    name_n = g_utf8_normalize(name, -1, G_NORMALIZE_DEFAULT);
+    name_f = g_utf8_casefold(name_n, -1);
+    g_free(name_n);
+    prefix_n = g_utf8_normalize(prefix, -1, G_NORMALIZE_DEFAULT);
+    prefix_f = g_utf8_casefold(prefix_n, -1);
+    g_free(prefix_n);
+    retval = g_str_has_prefix(name_f, prefix_f);
+    g_free(name_f);
+    g_free(prefix_f);
+
+    return retval;
+}
+
+/*************************************************************
+ *     Is the name in a row of the model?  If so, return the
+ *     corresponding address, if requested.
+ *************************************************************/
+static gboolean
+lbae_name_in_model(const gchar * name, GtkTreeModel * model,
+                   LibBalsaAddress ** address)
+{
+    GtkTreeIter iter;
+    gboolean valid;
+
+    if (!name)
+        return FALSE;
+
+    for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
+         valid = gtk_tree_model_iter_next(model, &iter)) {
+        gchar *this_name;
+        LibBalsaAddress *this_address;
+
+        gtk_tree_model_get(model, &iter,
+                           NAME_COL, &this_name,
+                           ADDRESS_COL, &this_address, -1);
+        if (strcmp(name, this_name) == 0) {
+            if (address)
+                *address = this_address;
+            else if (this_address)
+                g_object_unref(this_address);
+            g_free(this_name);
+            return TRUE;
+        }
+        g_free(this_name);
+        if (this_address)
+            g_object_unref(this_address);
+    }
+
+    return FALSE;
+}
+
+/*************************************************************
+ *     Create an address string with either the addressee's
+ *     full name or nick name, depending on which we matched;
+ *     returns a newly allocated string, which must be
+ *     deallocated with g_free.
+ *************************************************************/
+static gchar *
+lbae_get_name_from_address(LibBalsaAddress * address, const gchar * prefix)
+{
+    gchar *address_string;
+
+    if (lbae_utf8_name_has_prefix(address->full_name, prefix))
+        address_string = libbalsa_address_to_gchar(address, 0);
+    else {
+        LibBalsaAddress *tmp_address;
+
+        tmp_address = libbalsa_address_new();
+        libbalsa_address_set_copy(address, tmp_address);
+        g_free(tmp_address->full_name);
+        tmp_address->full_name = g_strdup(tmp_address->nick_name);
+
+        address_string = libbalsa_address_to_gchar(tmp_address, 0);
+        g_object_unref(tmp_address);
+    }
+
+    if (address_string) {
+        /* dequote */
+        gchar *p, *q;
+
+        for (p = q = address_string; *p;) {
+            if (*p == '\\') {
+                *q++ = *p++;
+                if (*p)
+                    *q++ = *p++;
+            } else if (*p == '"')
+                p++;
+            else
+                *q++ = *p++;
+        }
+        *q = '\0';
+    }
+
+    return address_string;
+}
+
+/*************************************************************
+ *     Parse the entry's text and populate the
+ *     LibBalsaAddressEntryInfo.
+ *************************************************************/
+static void
+lbae_parse_entry(GtkEntry * entry, LibBalsaAddressEntryInfo * info)
+{
+    const gchar *string, *p;
+    gint position;
+    gboolean quoted;
+
+    g_slist_foreach(info->list, (GFunc) g_free, NULL);
+    g_slist_free(info->list);
+    info->list = NULL;
+
+    p = string = gtk_entry_get_text(entry);
+    position = gtk_editable_get_position(GTK_EDITABLE(entry));
+
+    info->active = NULL;
+    quoted = FALSE;
+    while (*p) {
+        gunichar c;
+        const gchar *q;
+
+        c = g_utf8_get_char(p);
+        q = g_utf8_next_char(p);
+        --position;
+        /* position is the number of characters between c and the cursor. */
+        if (c == '"')
+            quoted = !quoted;
+        else if (!quoted && c == ',') {
+            info->list =
+                g_slist_prepend(info->list,
+                                g_strstrip(g_strndup(string, p - string)));
+            if (position < 0 && !info->active)
+                /* The cursor was in the string we just saved. */
+                info->active = info->list;
+            string = q;
+        }
+        p = q;
+    }
+    info->list =
+        g_slist_prepend(info->list,
+                        g_strstrip(g_strndup(string, p - string)));
+    if (!info->active)
+        info->active = info->list;
+    info->list = g_slist_reverse(info->list);
+}
+
+/*************************************************************
+ *     Create a GList of addresses matching the prefix.
+ *************************************************************/
+static GList *
+lbae_get_matching_addresses(const gchar * prefix)
+{
+    GList *match = NULL, *list;
+    gchar *prefix_up;
+
+    prefix_up = g_utf8_strup(prefix, -1);
+    for (list = lbae_address_book_list; list; list = list->next) {
+        LibBalsaAddressBook *ab;
+        gchar *new_prefix;
+
+        ab = LIBBALSA_ADDRESS_BOOK(list->data);
+        if (!ab->expand_aliases || ab->is_expensive)
+            continue;
+
+        match =
+            g_list_concat(match,
+                          libbalsa_address_book_alias_complete(ab,
+                                                               prefix_up,
+                                                               &new_prefix));
+        g_free(new_prefix);
+    }
+    g_free(prefix_up);
+
+    return match;
+}
+
+/*************************************************************
+ *     Update the GtkEntryCompletion's GtkTreeModel with
+ *     the list of addresses.
+ *************************************************************/
+static void
+lbae_append_addresses(GtkEntryCompletion * completion, GList * match,
+                      const gchar * prefix)
+{
+    LibBalsaAddressEntryInfo *info;
+    GtkTreeModel *model;
+    GtkListStore *store;
+    GtkTreeIter iter;
+#if WE_CAN_REMOVE_ROWS
+    gboolean valid;
+#endif                          /* WE_CAN_REMOVE_ROWS */
+
+    info = g_object_get_data(G_OBJECT(completion),
+                             LIBBALSA_ADDRESS_ENTRY_INFO);
+    model = gtk_entry_completion_get_model(completion);
+    store = GTK_LIST_STORE(model);
+
+#if WE_CAN_REMOVE_ROWS
+    /* Remove any previous autocompletion row; it has a NULL address. */
+    for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;) {
+        LibBalsaAddress *address;
+
+        gtk_tree_model_get(model, &iter, ADDRESS_COL, &address, -1);
+        valid = address ? gtk_tree_model_iter_next(model, &iter) :
+            gtk_list_store_remove(store, &iter);
+    }
+
+#endif                          /* WE_CAN_REMOVE_ROWS */
+    for (; match; match = match->next) {
+        gchar *name;
+
+        name = match->data ?
+            lbae_get_name_from_address(match->data, prefix) :
+            g_strconcat(prefix, "@", info->domain, NULL);
+        if (!lbae_name_in_model(name, model, NULL)) {
+            gtk_list_store_append(store, &iter);
+            gtk_list_store_set(store, &iter, NAME_COL, name,
+                               ADDRESS_COL, match->data, -1);
+        }
+        g_free(name);
+    }
+}
+
+/* Callbacks. */
+
+/*************************************************************
+ *     The completion's GtkEntryCompletionMatchFunc.
+ *************************************************************/
+static gboolean
+lbae_completion_match(GtkEntryCompletion * completion, const gchar * key,
+                      GtkTreeIter * iter, gpointer user_data)
+{
+    LibBalsaAddressEntryInfo *info;
+    const gchar *prefix;
+    gchar *name;
+    gboolean retval;
+
+    info = g_object_get_data(G_OBJECT(completion),
+                             LIBBALSA_ADDRESS_ENTRY_INFO);
+    prefix = info->active->data;
+    if (!*prefix)
+        return FALSE;
+
+    gtk_tree_model_get(gtk_entry_completion_get_model(completion), iter,
+                       NAME_COL, &name, -1);
+    retval = lbae_utf8_name_has_prefix(name, prefix);
+    g_free(name);
+
+    return retval;
+}
+
+/*************************************************************
+ *     Callback for the entry's "changed" signal
+ *************************************************************/
+static void
+lbae_entry_changed(GtkEntry * entry, gpointer data)
+{
+    GtkEntryCompletion *completion;
+    LibBalsaAddressEntryInfo *info;
+    const gchar *prefix;
+    GList *match;
+
+    completion = gtk_entry_get_completion(entry);
+    info = g_object_get_data(G_OBJECT(completion),
+                             LIBBALSA_ADDRESS_ENTRY_INFO);
+    lbae_parse_entry(entry, info);
+    prefix = info->active->data;
+    if (!*prefix)
+        return;
+
+    match = lbae_get_matching_addresses(prefix);
+    if (info->domain && *info->domain && !strpbrk(prefix, "@%!"))
+        /* No domain in the user's entry, and the current identity has a
+         * default domain, so we'll add user@domain as a possible
+         * autocompletion; lbae_append_addresses treats a NULL address
+         * as a request for that option. */
+        match = g_list_append(match, NULL);
+    lbae_append_addresses(completion, match, prefix);
+    match = g_list_remove(match, NULL);
+    g_list_foreach(match, (GFunc) g_object_unref, NULL);
+    g_list_free(match);
+}
+
+/*************************************************************
+ *     Callback for the completion's "match-selected" signal
+ *************************************************************/
+static gboolean
+lbae_completion_match_selected(GtkEntryCompletion * completion,
+                               GtkTreeModel * model, GtkTreeIter * iter,
+                               gpointer user_data)
+{
+    LibBalsaAddressEntryInfo *info;
+    GSList *list;
+    gchar *name;
+    GtkEditable *editable;
+    gint position, cursor;
+
+    info = g_object_get_data(G_OBJECT(completion),
+                             LIBBALSA_ADDRESS_ENTRY_INFO);
+
+    /* Replace the partial address with the selected one. */
+    gtk_tree_model_get(model, iter, NAME_COL, &name, -1);
+    g_free(info->active->data);
+    info->active->data = name;
+
+    /* Rewrite the entry. */
+    editable = GTK_EDITABLE(gtk_entry_completion_get_entry(completion));
+    g_signal_handlers_block_by_func(editable, lbae_entry_changed, NULL);
+    gtk_editable_delete_text(editable, 0, -1);
+    cursor = position = 0;
+    for (list = info->list; list; list = list->next) {
+        gtk_editable_insert_text(editable, list->data, -1, &position);
+        if (list == info->active)
+            cursor = position;
+        if (list->next)
+            gtk_editable_insert_text(editable, ", ", -1, &position);
+    }
+    gtk_editable_set_position(editable, cursor);
+    g_signal_handlers_unblock_by_func(editable, lbae_entry_changed, NULL);
+
+    return TRUE;
+}
+
+/* Public API. */
+
+/*************************************************************
+ *     Allocate a new LibBalsaAddressEntry for use.
+ *************************************************************/
+GtkWidget *
+libbalsa_address_entry_new()
+{
+    GtkWidget *entry;
+    GtkEntryCompletion *completion;
+    GtkListStore *store;
+    LibBalsaAddressEntryInfo *info;
+
+    store = gtk_list_store_new(2, G_TYPE_STRING, LIBBALSA_TYPE_ADDRESS);
+
+    completion = gtk_entry_completion_new();
+    gtk_entry_completion_set_model(completion, GTK_TREE_MODEL(store));
+    g_object_unref(store);
+    gtk_entry_completion_set_match_func(completion,
+                                        (GtkEntryCompletionMatchFunc)
+                                        lbae_completion_match, NULL, NULL);
+    gtk_entry_completion_set_text_column(completion, NAME_COL);
+    g_signal_connect(completion, "match-selected",
+                     G_CALLBACK(lbae_completion_match_selected), NULL);
+
+    info = lbae_info_new();
+    g_object_set_data_full(G_OBJECT(completion),
+                           LIBBALSA_ADDRESS_ENTRY_INFO, info,
+                           (GDestroyNotify) lbae_info_free);
+
+    entry = gtk_entry_new();
+    g_signal_connect(entry, "changed", G_CALLBACK(lbae_entry_changed),
+                     NULL);
+    gtk_entry_set_completion(GTK_ENTRY(entry), completion);
+    g_object_unref(completion);
+
+    return entry;
+}
+
+/*************************************************************
+ *     Must be called before using the widget.
+ *************************************************************/
+void
+libbalsa_address_entry_set_address_book_list(GList * list)
+{
+    lbae_address_book_list = list;
+}
+
+/*************************************************************
+ *     Create list of LibBalsaAddress objects corresponding to the entry
+ *     content. If possible, references objects from the address books.
+ *     if not, creates new ones.  The objects must be dereferenced later
+ *     and the list disposed, eg.  g_list_foreach(l, g_object_unref,
+ *     NULL); g_list_free(l);
+ *************************************************************/
+GList *
+libbalsa_address_entry_get_list(GtkEntry * address_entry)
+{
+    GtkEntryCompletion *completion;
+    LibBalsaAddressEntryInfo *info;
+    GtkTreeModel *model;
+    GSList *list;
+    GList *res = NULL;
+
+    completion = gtk_entry_get_completion(address_entry);
+    info = g_object_get_data(G_OBJECT(completion),
+                             LIBBALSA_ADDRESS_ENTRY_INFO);
+    model = gtk_entry_completion_get_model(completion);
+
+    for (list = info->list; list; list = list->next) {
+        LibBalsaAddress *address;
+
+        if (!lbae_name_in_model(list->data, model, &address) || !address)
+            address = libbalsa_address_new_from_string(list->data);
+        if (address)
+            res = g_list_prepend(res, address);
+    }
+
+    return g_list_reverse(res);
+}
+
+void
+libbalsa_address_entry_set_domain(GtkEntry * address_entry, void *domain)
+{
+    GtkEntryCompletion *completion;
+    LibBalsaAddressEntryInfo *info;
+
+    g_return_if_fail(address_entry != NULL);
+    g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
+
+    completion = gtk_entry_get_completion(address_entry);
+    info = g_object_get_data(G_OBJECT(completion),
+                             LIBBALSA_ADDRESS_ENTRY_INFO);
+    g_free(info->domain);
+    info->domain = g_strdup(domain);
+}
+#endif /* NEW_ADDRESS_ENTRY_WIDGET */

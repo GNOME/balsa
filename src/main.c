@@ -39,6 +39,8 @@
 #include <locale.h>
 #endif
 
+#include "address-entry.h"
+
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-index.h"
@@ -602,6 +604,10 @@ main(int argc, char *argv[])
     
     /* checking for valid config files */
     config_init(cmd_get_stats);
+#if NEW_ADDRESS_ENTRY_WIDGET
+    libbalsa_address_entry_set_address_book_list(balsa_app.
+                                                 address_book_list);
+#endif /* NEW_ADDRESS_ENTRY_WIDGET */
 
     libbalsa_mailbox_view_table =
 	g_hash_table_new_full(g_str_hash, g_str_equal,

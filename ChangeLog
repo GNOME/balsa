@@ -1,3 +1,9 @@
+2004-08-16  Pawel Salek
+
+	* libbalsa/address-book.c: expand aliases by default.
+	* libbalsa/mailbox_imap.c: handle better corner cases of
+	concurrent mailbox access.
+
 2004-08-16 13:20  PeterB
 
 	* libbalsa/mailbox_maildir.c: plug file descriptor leak; test for

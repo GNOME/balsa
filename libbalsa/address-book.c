@@ -177,7 +177,7 @@ libbalsa_address_book_init(LibBalsaAddressBook * ab)
     ab->config_prefix = NULL;
 
     ab->name = NULL;
-    ab->expand_aliases = FALSE;
+    ab->expand_aliases = TRUE;
     ab->dist_list_mode = FALSE;
     ab->is_expensive   = FALSE;
 }

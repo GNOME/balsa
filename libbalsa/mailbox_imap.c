@@ -566,8 +566,11 @@ mi_get_imsg(LibBalsaMailboxImap *mimap, unsigned msgno)
     struct collect_seq_data csd;
     ImapResponse rc;
 
+    /* This test too weak: I can imagine unsolicited ENVELOPE
+     * responses sent from server that wil create the ImapMessage
+     * structure but message size or UID etc will not be available. */
     if( (imsg = imap_mbox_handle_get_msg(mimap->handle, msgno)) 
-        != NULL) return imsg;
+        != NULL && imsg->envelope) return imsg;
     csd.needed_msgno = msgno;
     csd.msgno_arr    = g_malloc(MAX_CHUNK_LENGTH*sizeof(csd.msgno_arr[0]));
     csd.cnt          = 0;
@@ -620,12 +623,15 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
         struct message_info *msg_info = 
             message_info_from_msgno(mimap, seqno[i]);
         if(msg_info->message) {
-            /* we still should make sure the info is there since the 
-             * libimap connection might have been severed. */
-            ImapMessage *imsg  = mi_get_imsg(mimap, seqno[i]);
+            /* since we are talking here about updating just received,
+               usually unsolicited flags from the server, we do not
+               need to go to great lengths to assure that the
+               connection is up. */
+            ImapMessage *imsg = 
+                imap_mbox_handle_get_msg(mimap->handle, seqno[i]);
             LibBalsaMessageFlag old_flags = msg_info->message->flags;
             GList *list;
-            
+            if(!imsg) continue;
             lbimap_update_flags(msg_info->message, imsg);
 	    libbalsa_mailbox_index_set_flags(mailbox, seqno[i],
 					     msg_info->message->flags);

@@ -1737,6 +1737,7 @@ mailbox_messages_changed_status_cb(LibBalsaMailbox * mb,
     else 
 	for(;messages;messages = g_list_next(messages))
 	    balsa_index_update_flag(bindex, LIBBALSA_MESSAGE(messages->data));
+    g_get_current_time (&bindex->last_use);
 }
 
 /* mailbox_messages_added_cb : callback for sync with backend; the signal
@@ -1763,6 +1764,7 @@ mailbox_messages_added(BalsaIndex * bindex, GList *messages)
 
     balsa_mblist_update_mailbox(balsa_app.mblist, 
 				bindex->mailbox_node->mailbox);
+    g_get_current_time (&bindex->last_use);
 }
 
 static void
@@ -1792,6 +1794,7 @@ mailbox_messages_removed(BalsaIndex * bindex, GList * messages)
 
     balsa_index_check_visibility(GTK_CLIST(bindex->ctree), NULL, 0.5);
     gtk_clist_thaw(GTK_CLIST(bindex->ctree));
+    g_get_current_time (&bindex->last_use);
 }
 static void
 mailbox_messages_removed_cb(BalsaIndex * bindex, GList * messages)

@@ -1,3 +1,7 @@
+2003-02-19  Carlos Morgado  <chbm chbm.nu>
+
+	* src/balsa-index.c: actually update last_use so that autocommit and autoclose work. we're a little too liberal updating it
+
 2003-02-08  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/misc.[hc]: implement libbalsa_urlencode() as in bug #105605.

@@ -445,7 +445,6 @@ guint
 libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text, guint len)
 {
     guint retval = len;
-#ifdef HAVE_GMIME21
     GMimeStream *stream;
     GByteArray *array;
     GMimeStream *filter_stream;
@@ -483,7 +482,6 @@ libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text, guint len)
     retval = array->len;
     g_free(*text);
     *text = g_byte_array_free(array, FALSE);
-#endif			/* HAVE_GMIME21 */
     return retval;
 }
 
@@ -492,12 +490,10 @@ libbalsa_html_type(const gchar * mime_type)
 {
     if (!strcmp(mime_type, "text/html"))
 	return LIBBALSA_HTML_TYPE_HTML;
-#ifdef HAVE_GMIME21
     if (!strcmp(mime_type, "text/enriched"))
 	return LIBBALSA_HTML_TYPE_ENRICHED;
     if (!strcmp(mime_type, "text/richtext"))
 	return LIBBALSA_HTML_TYPE_RICHTEXT;
-#endif				/* HAVE_GMIME21 */
     return LIBBALSA_HTML_TYPE_NONE;
 }
 

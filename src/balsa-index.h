@@ -121,7 +121,7 @@ extern "C" {
 
     void balsa_index_find(BalsaIndex * bindex,
 			  LibBalsaMailboxSearchIter * search_iter,
-                          gboolean previous);
+                          gboolean previous, gboolean wrap);
 
 /* balsa index page stuff */
     void balsa_message_reply(GtkWidget * widget, gpointer user_data);

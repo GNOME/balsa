@@ -1018,16 +1018,19 @@ balsa_index_select_previous(BalsaIndex * index)
 void
 balsa_index_find(BalsaIndex * index,
 		 LibBalsaMailboxSearchIter * search_iter,
-		 gboolean previous)
+		 gboolean previous, gboolean wrap)
 {
     g_return_if_fail(BALSA_IS_INDEX(index));
 
     bndx_search_iter_and_select(index, search_iter,
-				(previous ? BNDX_SEARCH_DIRECTION_PREV :
+				(previous ?
+				 BNDX_SEARCH_DIRECTION_PREV :
 				 BNDX_SEARCH_DIRECTION_NEXT),
 				BNDX_SEARCH_VIEWABLE_ANY,
 				BNDX_SEARCH_START_ANY,
-				BNDX_SEARCH_WRAP_NO);
+				(wrap ?
+				 BNDX_SEARCH_WRAP_YES :
+				 BNDX_SEARCH_WRAP_NO));
 }
 
 static void

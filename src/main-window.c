@@ -1194,7 +1194,7 @@ check_mailbox_list(GList * mailbox_list)
 
     list = g_list_first(mailbox_list);
     while (list) {
-	mailbox = LIBBALSA_MAILBOX(list->data);
+	mailbox = BALSA_MAILBOX_NODE(list->data)->mailbox;
 
 	gdk_threads_enter();
 	libbalsa_mailbox_check(mailbox);

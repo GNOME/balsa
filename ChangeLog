@@ -1,3 +1,8 @@
+2001-01-09  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/main-window.c: treat balsa_app.input_inbox elements as 
+	MailboxNodes. This patch hopefully concludes the transormation.
+	
 2001-01-08  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/Makefile.am: add libbalsa/folder-scanners.[hc]

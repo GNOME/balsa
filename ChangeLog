@@ -1,3 +1,7 @@
+2004-02-24 11:00  PeterB
+
+	* src/balsa-message.c: fix bug #134173.
+
 2004-02-24  Albrecht Dreß
 
 	* libbalsa/rfc3156.c: 

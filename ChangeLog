@@ -1,3 +1,9 @@
+2004-10-19 18:26  PeterB
+
+	* src/main-window.c: more accurate and informative progress dialog
+	label.
+	* src/balsa-app.c: remove assertion.
+
 2004-10-17 15:37  PeterB
 
 	* src/balsa-index.c: unref the message when clearing/changing

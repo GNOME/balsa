@@ -290,6 +290,7 @@ socket_open(const char* host, const char *def_port)
   /* --- IPv4/6 --- */
   /* "65536\0" */
   const char *port;
+  char *hostname;
   struct addrinfo hints;
   struct addrinfo* res;
   struct addrinfo* cur;
@@ -301,12 +302,15 @@ socket_open(const char* host, const char *def_port)
   hints.ai_socktype = SOCK_STREAM;
 
   port = strrchr(host, ':');
-  if (port)
-    *port++ = '\0';
-  else 
+  if (port) {
+    hostname = g_strndup(host, port-host);
+    port ++;
+  } else {
     port = def_port;
-
-  rc = getaddrinfo(host, port, &hints, &res);
+    hostname = g_strdup(host);
+  }
+  rc = getaddrinfo(hostname, port, &hints, &res);
+  g_free(hostname);
   if(rc)
     return -1;
   

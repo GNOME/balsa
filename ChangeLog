@@ -12,6 +12,8 @@
 	* libbalsa/imap/imap-handle.c: fix case when no port is specified
 	after ':'.
 	* libbalsa/mailbox_imap.c: adjust to changed API.
+	* libbalsa/folder-scanners.c: do not look for children of
+	\NoInferiors mailboxes.
 
 2003-09-19 07:16  PeterB
 

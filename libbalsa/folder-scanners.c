@@ -149,7 +149,7 @@ struct browser_state
 
 static void
 libbalsa_imap_add_folder (ImapMboxHandle* handle,
-                          int delim, ImapMboxFlags flags, char *folder,
+                          int delim, ImapMboxFlags *flags, char *folder,
                           struct browser_state *state)
 {
     int isFolder = 0;
@@ -160,7 +160,7 @@ libbalsa_imap_add_folder (ImapMboxHandle* handle,
 	return;
 
     state->delim = delim;
-    if(!IMAP_MBOX_HAS_FLAG(flags,IMLIST_NOSELECT)) {
+    if(!IMAP_MBOX_HAS_FLAG(*flags,IMLIST_NOSELECT)) {
 	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                              "ADDING MAILBOX %s\n", folder);
 	++isMailbox;
@@ -169,13 +169,13 @@ libbalsa_imap_add_folder (ImapMboxHandle* handle,
     /* this extra check is needed for subscribed folder handling. 
      * Read RFC when in doubt. */
     if(!g_list_find_custom(state->subfolders, folder,
-			   (GCompareFunc)strcmp)) {
+			   (GCompareFunc)strcmp) && 
+       !IMAP_MBOX_HAS_FLAG(*flags,IMLIST_NOINFERIORS)) {
 	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-                             "ADDING FOLDER  %s\n", folder);
+                             "ADDING FOLDER  %s %x\n", folder, *flags);
 	    
-	if (!IMAP_MBOX_HAS_FLAG(flags,IMLIST_NOINFERIORS))
-	    state->subfolders = g_list_append(state->subfolders,
-					      g_strdup(folder));
+        state->subfolders = g_list_append(state->subfolders,
+                                          g_strdup(folder));
 	++isFolder;
     }
 
@@ -184,7 +184,7 @@ libbalsa_imap_add_folder (ImapMboxHandle* handle,
     else if (isFolder)
 	state->folder_handler(folder, delim, state->cb_data);
 
-    if ( IMAP_MBOX_HAS_FLAG(flags,IMLIST_NOINFERIORS))
+    if ( IMAP_MBOX_HAS_FLAG(*flags,IMLIST_NOINFERIORS))
         state->mark_imap_path(folder, state->cb_data);
 }
 

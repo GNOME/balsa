@@ -22,7 +22,7 @@
             manual
         </type>
         <format mime="text/xml" dtd="-//OASIS//DTD DocBook XML V4.1.2//EN"/>
-        <identifier url="balsa-manual.xml"/>
+        <identifier url="balsa.xml"/>
         <language code="C"/>
 	<relation seriesid="4f1da026-c99e-11d6-95f0-ae2166108028"/>
 	<rights type="GNU FDL" license.version="1.1" holder="Balsa Team"/>

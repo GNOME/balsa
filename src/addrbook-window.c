@@ -43,38 +43,37 @@ static struct _addyb_item
     gchar *comments;
   };
 
-static void
-addyb_item_new (gchar * name, gchar * comments)
+static addyb_item *addyb_item_new (gchar * name, gchar * comments)
 {
   addyb_item *new_item = g_malloc (sizeof (addyb_item));
   gchar *list_item[1];
+  gint row;
   new_item->name = list_item[0] = name;
   new_item->comments = comments;
   new_item->email = NULL;
-  gtk_clist_set_row_data (GTK_CLIST (addyb_list),
-		       gtk_clist_append (GTK_CLIST (addyb_list), list_item),
-			  new_item);
+
+  row = gtk_clist_append (GTK_CLIST (addyb_list), list_item),
+
+  gtk_clist_set_row_data (GTK_CLIST (addyb_list), row, new_item);
+/* should we free the pointer? */
   gtk_signal_connect (GTK_OBJECT (addyb_list),
 		      "select_row",
 		      GTK_SIGNAL_FUNC (update_addyb_window),
 		      NULL);
   g_list_append (balsa_app.addressbook_list, new_item);
+
+  return (addyb_item *)gtk_clist_get_row_data(GTK_CLIST(addyb_list), row);
 }
 
 static void
 addyb_email_item_new (addyb_item * ai, gchar * addy)
 {
   gchar *list_item[1];
-  ai->email = NULL;
   list_item[0] = addy;
-  gtk_clist_set_row_data (GTK_CLIST (addyb_list),
+  gtk_clist_set_row_data (GTK_CLIST (email_list),
 		       gtk_clist_append (GTK_CLIST (email_list), list_item),
 			  ai);
-  gtk_signal_connect (GTK_OBJECT (email_list),
-		      "select_row",
-		      NULL,
-		      NULL);
-  g_list_append (ai->email, addy);
+  ai->email = g_list_append (ai->email, addy);
 }
 
 static void
@@ -165,6 +164,7 @@ create_menu (GtkWidget * window)
 void
 addressbook_window_new (GtkWidget * widget, gpointer data)
 {
+  addyb_item *addybitem;
   GtkWidget *window;
   GtkWidget *hbox;
   GtkWidget *vbox1;
@@ -288,7 +288,9 @@ addressbook_window_new (GtkWidget * widget, gpointer data)
 
 /* other stuff... */
 
-  addyb_item_new ("test", "tests are fun");
+  addybitem = addyb_item_new ("Pavlov", "tests are fun");
+  addyb_email_item_new(addybitem,"pavlov@innerx.net");
+  addyb_email_item_new(addybitem,"pavlov@pavlov.net");
   addyb_item_new ("test1", "tests suck!");
   addyb_item_new ("test2", "i like tests damnit!");
   addyb_item_new ("test3", "weeee");

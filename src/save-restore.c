@@ -1046,11 +1046,20 @@ config_global_load (void)
     balsa_app.mblist_unread_color.blue = atoi (field);
 
 
+  /* address book location */
+  if ((field = pl_dict_get_str (globals, "AddressBookDistMode")) != NULL)
+    balsa_app.ab_dist_list_mode = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "AddressBookLocation")) != NULL) {
+    g_free (balsa_app.ab_location);
+    balsa_app.ab_location = g_strdup (field);
+  }
+
   /* How we format dates */
-  if ((field = pl_dict_get_str (globals, "DateFormat")) == NULL)
-    balsa_app.date_string = g_strdup(DEFAULT_DATE_FORMAT);
-  else
+  if ((field = pl_dict_get_str (globals, "DateFormat")) != NULL) {
+    g_free (balsa_app.date_string);
     balsa_app.date_string = g_strdup (field);
+  }
 
  return TRUE;
 }				/* config_global_load */
@@ -1260,10 +1269,17 @@ config_global_save (void)
   snprintf (tmp, sizeof (tmp), "%hd", balsa_app.mblist_unread_color.blue);
   pl_dict_add_str_str (globals, "MBListUnreadColorBlue", tmp);
 
+  /* address book */
+  snprintf (tmp, sizeof (tmp), "%d", balsa_app.ab_dist_list_mode);
+  pl_dict_add_str_str (globals, "AddressBookDistMode", tmp);
+
+  if (balsa_app.signature_path != NULL)
+    pl_dict_add_str_str (globals, "AddressBookLocation", 
+			 balsa_app.ab_location);
+
   if( balsa_app.date_string )
 	  pl_dict_add_str_str (globals, "DateFormat", balsa_app.date_string );
-  else
-       	  pl_dict_add_str_str (globals, "DateFormat", DEFAULT_DATE_FORMAT );
+
   /* Add it to configuration file */
   temp_str = PLMakeString ("Globals");
   PLInsertDictionaryEntry (balsa_app.proplist, temp_str, globals);

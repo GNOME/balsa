@@ -1568,16 +1568,17 @@ void contact_list_free(GList * contact_list)
 }
 
 gint
-contact_store(Contact *contact)
+contact_store(Contact *contact, const gchar *fname)
 {
     FILE *gc; 
     gchar string[256];
     gint in_vcard = FALSE;
 
+    g_return_val_if_fail(fname, CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE);
     if(strlen(contact->card_name) == 0)
         return CONTACT_CARD_NAME_FIELD_EMPTY;
 
-    gc = fopen(gnome_util_prepend_user_home(".gnome/GnomeCard.gcrd"), "r+");
+    gc = fopen(fname, "r+");
     
     if (!gc) 
         return CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE; 

@@ -175,7 +175,12 @@ balsa_app_init (void)
   balsa_app.PrintCommand.PrintCommand = NULL;
 
   /* date format */
-  balsa_app.date_string = NULL;
+  balsa_app.date_string = g_strdup(DEFAULT_DATE_FORMAT);
+
+  /* address book */
+  balsa_app.ab_dist_list_mode = FALSE;
+  balsa_app.ab_location = 
+      gnome_util_prepend_user_home(DEFAULT_ADDRESS_BOOK_PATH);
 }
 
 gint

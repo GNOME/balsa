@@ -71,7 +71,7 @@
 #define DEFAULT_CHARSET "ISO-8859-1"
 #define DEFAULT_ENCODING ENC8BIT
 #define DEFAULT_LINESIZE 78
-
+#define DEFAULT_ADDRESS_BOOK_PATH ".gnome/GnomeCard.gcrd"
 enum
 {
   WHILERETR,
@@ -193,7 +193,7 @@ extern struct BalsaApplication
   /* encoding stuff */
   gint encoding_style;
   gchar *charset;
-	gchar *date_string;
+  gchar *date_string;
 
   gint checkbox;
 
@@ -207,7 +207,9 @@ extern struct BalsaApplication
   GnomeAppBar* appbar;
   GtkWidget* notebook;
 
-  
+  /* address book */
+  gboolean ab_dist_list_mode;
+  gchar * ab_location;
 }
 balsa_app;
 

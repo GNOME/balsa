@@ -862,13 +862,13 @@ store_address_dialog_button_clicked_cb(GtkWidget *widget, gint which, GtkWidget 
         card->email_address = g_strstrip(gtk_editable_get_chars(
 	    GTK_EDITABLE(entries[EMAIL_ADDRESS]), 0, -1));
 
-        error_check = contact_store(card);
+        error_check = contact_store(card, balsa_app.ab_location);
 
         if(error_check == CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE)
         {
             msg  = g_strdup_printf(
-                _("Unable to open ~/.gnome/GnomeCard.gcrd for read.\n - %s\n"),
-                g_unix_error_string(errno)); 
+                _("Unable to open %s for read.\n - %s\n"),
+		balsa_app.ab_location, g_unix_error_string(errno)); 
         }
         else if(error_check == CONTACT_CARD_NAME_FIELD_EMPTY)
         {

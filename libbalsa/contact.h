@@ -53,6 +53,6 @@ struct _Contact
 Contact *contact_new(void);
 void contact_free(Contact *contact);
 void contact_list_free(GList *contact_list);
-gint contact_store(Contact *contact);
+gint contact_store(Contact *contact, const gchar *fname);
 
 #endif /* __CONTACT_H__ */

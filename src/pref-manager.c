@@ -78,6 +78,9 @@ typedef struct _PropertyUI {
 
         /* colours */
         GtkWidget *unread_color;
+
+	/* address book */
+	GtkWidget *ab_location;
 	  
 } PropertyUI;
 
@@ -319,6 +322,9 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
         gtk_signal_connect (GTK_OBJECT (pui->unread_color), "released",
                             GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
+	/* address book */
+	gtk_signal_connect (GTK_OBJECT (pui->ab_location), "changed",
+			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 
         /* Gnome Property Box Signals */
         gtk_signal_connect (GTK_OBJECT (property_box), "destroy",
@@ -475,6 +481,10 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
         gdk_colormap_free_colors (gdk_colormap_get_system (), &balsa_app.mblist_unread_color, 1);
         gnome_color_picker_get_i16 (GNOME_COLOR_PICKER(pui->unread_color), &(balsa_app.mblist_unread_color.red), &(balsa_app.mblist_unread_color.green), &(balsa_app.mblist_unread_color.blue), 0);
 
+	/* address book */
+	g_free (balsa_app.ab_location);
+	balsa_app.ab_location = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->ab_location)));
+
 	// XXX
 	//  refresh_main_window ();
 	
@@ -594,6 +604,11 @@ set_prefs (void)
 			       balsa_app.selected_headers);
 
         gnome_color_picker_set_i16 (GNOME_COLOR_PICKER(pui->unread_color), balsa_app.mblist_unread_color.red, balsa_app.mblist_unread_color.green, balsa_app.mblist_unread_color.blue, 0);
+
+	/* address book */
+	gtk_entry_set_text (GTK_ENTRY (pui->ab_location), 
+			    balsa_app.ab_location);
+
 }
 
 void
@@ -1131,19 +1146,6 @@ create_display_page ( )
 	gtk_widget_show (pui->previewpane);
 	gtk_box_pack_start (GTK_BOX (vbox7), pui->previewpane, FALSE, TRUE, 0);
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->previewpane), TRUE);
-#if 0
-/* 
- * This is not ready, yet!
- *
- * -Ragnar-
- *
- * pawels: is replaced by the code connected to "selected headers" field 
- * below. To be removed.
- */
-	pui->view_allheaders = gtk_check_button_new_with_label (_("View all headers"));
-	gtk_widget_show (pui->view_allheaders);
-	gtk_box_pack_start (GTK_BOX (vbox7), pui->view_allheaders, FALSE, TRUE, 0);
-#endif
 	
 #ifdef BALSA_SHOW_INFO
 	pui->mblist_show_mb_content_info = gtk_check_button_new_with_label (_("Show mailbox statistics in left pane"));
@@ -1372,6 +1374,7 @@ create_misc_page ( )
         GtkWidget *color_frame;
         GtkWidget *unread_color_box;
         GtkWidget *unread_color_label;
+        GtkWidget *ab_frame, *ab_box, *fileentry1;
 
 	vbox9 = gtk_vbox_new (FALSE, 0);
 	gtk_widget_show (vbox9);
@@ -1394,6 +1397,25 @@ create_misc_page ( )
 	gtk_widget_show(pui->empty_trash);
 	gtk_box_pack_start (GTK_BOX (vbox10), pui->empty_trash, FALSE, FALSE, 0);
 	
+	/* address book */
+        ab_box = gtk_hbox_new (FALSE, 0);
+	gtk_box_pack_start_defaults (GTK_BOX (vbox10), ab_box);
+        gtk_widget_show (ab_box);
+        label = gtk_label_new (_("Address book location"));
+        gtk_widget_show (label);
+        gtk_box_pack_start (GTK_BOX (ab_box), label, FALSE, FALSE, 5);
+
+	fileentry1 = gnome_file_entry_new ("ADDRESS-BOOK-FILE", 
+					   _("Select your address book file"));
+	gtk_widget_show (fileentry1);
+	gnome_file_entry_set_modal (GNOME_FILE_ENTRY (fileentry1), TRUE);
+        gtk_box_pack_start (GTK_BOX (ab_box), fileentry1, 
+                            TRUE, TRUE, 5);
+	
+	pui->ab_location = 
+		gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (fileentry1));
+
+	/* font */
 	frame14 = gtk_frame_new (_("Font"));
 	gtk_widget_show (frame14);
 	gtk_box_pack_start (GTK_BOX (vbox9), frame14, FALSE, FALSE, 0);
@@ -1463,6 +1485,13 @@ create_misc_page ( )
                             FALSE, FALSE, 5);
         gtk_label_set_justify (GTK_LABEL (unread_color_label), 
                                GTK_JUSTIFY_LEFT);
+
+	/* address book */
+        ab_frame = gtk_frame_new (_("Address Book"));
+        gtk_widget_show (GTK_WIDGET (ab_frame));
+        gtk_container_set_border_width (GTK_CONTAINER (ab_frame), 5);
+	gtk_box_pack_start (GTK_BOX (vbox9), ab_frame, FALSE, FALSE, 0);
+
 
 	return vbox9;
 }

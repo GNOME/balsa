@@ -283,13 +283,13 @@ ab_load(GtkWidget * widget, gpointer data)
    ab_clear_clist(GTK_CLIST(book_clist)); 
    if (composing) 
       ab_clear_clist(GTK_CLIST(add_clist)); 
-   gc = fopen(gnome_util_prepend_user_home(".gnome/GnomeCard.gcrd"),"r"); 
+   gc = fopen(balsa_app.ab_location,"r"); 
    if (!gc) 
    { 
       GtkWidget *box;
       char * msg  = g_strdup_printf(
-	 _("Unable to open ~/.gnome/GnomeCard.gcrd for read.\n - %s\n"), 
-	 g_unix_error_string(errno)); 
+	 _("Unable to open address book %s for reading.\n - %s\n"), 
+	 balsa_app.ab_location, g_unix_error_string(errno)); 
       box = gnome_message_box_new(msg,
 				  GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
       gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
@@ -297,6 +297,8 @@ ab_load(GtkWidget * widget, gpointer data)
       g_free(msg);
       return; 
    } 
+
+   gtk_clist_freeze(GTK_CLIST(book_clist)); 
    while ( fgets(string, sizeof(string), gc)) 
    { 
       if ( g_strncasecmp(string, "BEGIN:VCARD", 11) == 0 ) {
@@ -354,9 +356,11 @@ ab_load(GtkWidget * widget, gpointer data)
 	  gchar * ptr = strchr(string,':');
 	  if(ptr) {
 	      if(email) {
-		  gchar * new = g_strconcat(email,", ", ptr+1, NULL);
-		  g_free(email); 
-		  email = new;
+		  if(balsa_app.ab_dist_list_mode) {
+		      gchar * new = g_strconcat(email,", ", ptr+1, NULL);
+		      g_free(email); 
+		      email = new;
+		  } /* else ignore other addresses */
 	      } else 
 		  email = g_strdup(ptr+1);
 	  }
@@ -365,6 +369,7 @@ ab_load(GtkWidget * widget, gpointer data)
 
    gtk_clist_set_column_width(GTK_CLIST(book_clist), 0, 
 	  gtk_clist_optimal_column_width(GTK_CLIST(book_clist),0)); 
+   gtk_clist_thaw(GTK_CLIST(book_clist)); 
    fclose(gc); 
 }
 
@@ -401,6 +406,16 @@ ab_find(GtkWidget * group_entry)
 	return;
 } 
 
+static void 
+mode_toggled(GtkWidget *w, gpointer data) {
+    if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(data))) {
+	balsa_app.ab_dist_list_mode = FALSE;
+    } else {
+	balsa_app.ab_dist_list_mode = TRUE;
+    }
+	ab_load(NULL, NULL); 
+}
+
 gint 
 address_book_cb(GtkWidget * widget, gpointer data) 
 { 
@@ -411,7 +426,8 @@ address_book_cb(GtkWidget * widget, gpointer data)
 		*w, 
 		*hbox, 
 		*box2, 
-		*scrolled_window; 
+		*scrolled_window,
+	        *radio1, *radio2; 
 
 	static gchar *titles[2] = {N_("Name"), N_("E-Mail Address")}; 
 
@@ -450,7 +466,6 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	gtk_signal_connect(GTK_OBJECT(find_entry), "changed", GTK_SIGNAL_FUNC(ab_find), find_entry); 
 	find_label = gtk_label_new(_("Name:")); 
 	gtk_widget_show(find_label); 
-
 	composing = FALSE; 
 
 	hbox = gtk_hbox_new(FALSE, 0); 
@@ -467,13 +482,12 @@ address_book_cb(GtkWidget * widget, gpointer data)
 				       GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC); 
 	gtk_box_pack_start(GTK_BOX(box2), scrolled_window, TRUE, TRUE, 0); 
 	gtk_container_add(GTK_CONTAINER(scrolled_window), book_clist); 
-	gtk_widget_set_usize(scrolled_window, 250, 200); 
+	gtk_widget_set_usize(scrolled_window, 300, 250);
 	
 	/* 
 	 * Only display this part of * the window when we're adding to a composing 
 	 * message. 
 	 */ 
-	/*if (!GNOME_IS_MDI((GnomeMDI *) data)) { */
 	if( GTK_IS_ENTRY( (GtkEntry *) data ) ) {
 		composing = TRUE; 
 		
@@ -498,7 +512,7 @@ address_book_cb(GtkWidget * widget, gpointer data)
 		gtk_container_add(GTK_CONTAINER(scrolled_window), add_clist); 
 		gtk_clist_set_selection_mode(GTK_CLIST(add_clist), GTK_SELECTION_MULTIPLE); 
 		gtk_clist_column_titles_passive(GTK_CLIST(add_clist)); 
-		gtk_widget_set_usize(scrolled_window, 250, 200); 
+		gtk_widget_set_usize(scrolled_window, 300, 250); 
 	} 
 
 	hbox = gtk_hbutton_box_new(); 
@@ -515,8 +529,24 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	gtk_container_add(GTK_CONTAINER(hbox), w); 
 	
 	ab_load(NULL, NULL); 
-	
-	gtk_widget_show_all(dialog); 
+
+	/* mode switching stuff */
+	radio1 = gtk_radio_button_new_with_label(
+	    NULL, _("Import first address only"));
+	radio2 = gtk_radio_button_new_with_label_from_widget (
+	    GTK_RADIO_BUTTON(radio1), _("Import all adresses"));
+	gtk_signal_connect(GTK_OBJECT(radio1), "toggled", 
+			   GTK_SIGNAL_FUNC(mode_toggled), radio1); 
+     
+
+	/* Pack them into a box, then show all the widgets */
+	gtk_box_pack_start (GTK_BOX (vbox), radio1, TRUE, TRUE, 1);
+	gtk_box_pack_start (GTK_BOX (vbox), radio2, TRUE, TRUE, 1);
+	gtk_widget_show_all(dialog);
+   
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio2), 
+				     balsa_app.ab_dist_list_mode);
+	gtk_widget_grab_focus(find_entry);
 
 	/* PS: I do not like modal dialog boxes but the only other option
 	   is to reference the connected field and  check if it is

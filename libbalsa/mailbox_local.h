@@ -48,6 +48,7 @@ struct _LibBalsaMailboxLocal {
     LibBalsaMailbox mailbox;
 
     GList *msg_list;
+    guint sync_id;
 };
 
 struct _LibBalsaMailboxLocalClass {
@@ -78,5 +79,8 @@ GMimeStream *_libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox *
 							mailbox,
 							const gchar * name1,
 							const gchar * name2);
+
+/* Queued sync. */
+void libbalsa_mailbox_local_queue_sync(LibBalsaMailboxLocal * local);
 
 #endif				/* __LIBBALSA_MAILBOX_LOCAL_H__ */

@@ -1693,6 +1693,9 @@ create_address_entry(GtkWidget * table, const gchar * label, int y_pos,
 		     GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
     arr[1] = libbalsa_address_entry_new();
+    gtk_widget_modify_font(arr[1],
+                           pango_font_description_from_string
+                           (balsa_app.message_font));
     gtk_table_attach(GTK_TABLE(table), arr[1], 1, 2, y_pos, y_pos + 1,
 		     GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
 }
@@ -2028,6 +2031,10 @@ create_text_area(BalsaSendmsg * msg)
     GtkWidget *table;
 
     msg->text = gtk_text_view_new();
+    /* set the message font */
+    gtk_widget_modify_font(msg->text,
+                           pango_font_description_from_string
+                           (balsa_app.message_font));
     if (msg->flow)
         gtk_signal_connect(GTK_OBJECT(msg->text), "insert-at-cursor",
                            GTK_SIGNAL_FUNC(insert_text_cb), NULL);

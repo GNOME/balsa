@@ -1,3 +1,7 @@
+2002-03-26  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/sendmsg-window.c: font selection in compose window.
+	
 2002-03-24  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-message.c: fix remaining font issues.

@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- * Copyright (C) 1997-98 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -156,6 +156,7 @@ struct _MailboxPOP3
     gchar *passwd;
     gchar *server;
     gboolean check;
+    gboolean delete_from_server;
   };
 
 

@@ -31,7 +31,9 @@ struct _BalsaMBList
   {
     GtkCTree ctree;
     GList *watched_mailbox; /* list of mailbox watched */
+#ifdef SHOW_INFO
     gboolean display_content_info; /* shall the number of messages be displayed ? */
+#endif
   };
 
 struct _BalsaMBListClass

@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- * Copyright (C) 1997-98 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -78,6 +78,7 @@ struct _MailboxConfWindow
     GtkWidget *pop_username;
     GtkWidget *pop_password;
     GtkWidget *pop_check;
+    GtkWidget *pop_delete_from_server;
 
   };
 
@@ -357,6 +358,7 @@ mailbox_conf_set_values (Mailbox * mailbox)
 	  gtk_entry_set_text (GTK_ENTRY (mcw->pop_username), MAILBOX_POP3 (mailbox)->user);
 	  gtk_entry_set_text (GTK_ENTRY (mcw->pop_password), MAILBOX_POP3 (mailbox)->passwd);
 	  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_check), MAILBOX_POP3 (mailbox)->check);
+	  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server), MAILBOX_POP3 (mailbox)->delete_from_server);
 	}
       gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_POP3);
       break;
@@ -415,6 +417,7 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
       MAILBOX_POP3 (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)));
       MAILBOX_POP3 (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)));
       MAILBOX_POP3 (mailbox)->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
+      MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
 
       config_mailbox_update (mailbox, old_mbox_name);
       break;
@@ -442,6 +445,7 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
       config_mailbox_update (mailbox, old_mbox_name);
 #endif
       break;
+
     case MAILBOX_UNKNOWN:
       /* Do nothing for now */
       break;
@@ -507,6 +511,7 @@ conf_add_mailbox ()
       MAILBOX_POP3 (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)));
       MAILBOX_POP3 (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)));
       MAILBOX_POP3 (mailbox)->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
+      MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
       balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
       config_mailbox_add (mailbox, NULL);
       add_mailboxes_for_checking (mailbox);
@@ -689,7 +694,7 @@ create_pop_mailbox_page (void)
   GtkWidget *table;
   GtkWidget *label;
 
-  return_widget = table = gtk_table_new (5, 2, FALSE);
+  return_widget = table = gtk_table_new (6, 2, FALSE);
   gtk_widget_show (table);
 
   /* mailbox name */
@@ -760,11 +765,21 @@ create_pop_mailbox_page (void)
   gtk_entry_set_visibility (GTK_ENTRY (mcw->pop_password), FALSE);
   gtk_widget_show (mcw->pop_password);
 
+  /* toggle for check */
+
   mcw->pop_check = gtk_check_button_new_with_label ("Check");
   gtk_table_attach (GTK_TABLE (table), mcw->pop_check, 0, 2, 4, 5,
 		    GTK_FILL, GTK_FILL,
 		    10, 10);
   gtk_widget_show (mcw->pop_check);
+
+  /* toggle for deletion from server */
+
+  mcw->pop_delete_from_server = gtk_check_button_new_with_label ("Delete from server");
+  gtk_table_attach (GTK_TABLE (table), mcw->pop_delete_from_server, 0, 2, 5, 6,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (mcw->pop_delete_from_server);
 
   return return_widget;
 }
@@ -942,3 +957,6 @@ mailbox_conf_edit_imap_server (GtkWidget * widget, gpointer data)
       return;
     }
 }
+
+
+

@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- * Copyright (C) 1997-98 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,7 +76,9 @@ extern struct BalsaApplication
   gint mw_height;
   gint mblist_width;
   gint mblist_height;
+#ifdef SHOW_INFO
   gboolean mblist_show_mb_content_info;
+#endif
 
   GtkToolbarStyle toolbar_style;
   GnomeMDIMode mdi_style;

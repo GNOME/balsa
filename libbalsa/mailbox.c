@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- * Copyright (C) 1997-98 Stuart Parmenter and Jay Painter
+ * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -220,6 +220,17 @@ check_all_pop3_hosts (Mailbox * to, GList *mailboxes)
 	  PopPort = 110;
 	  PopPass = g_strdup (MAILBOX_POP3 (mailbox)->passwd);
 	  PopUser = g_strdup (MAILBOX_POP3 (mailbox)->user);
+
+	  /* Delete it if necessary */
+	  if (MAILBOX_POP3 (mailbox)->delete_from_server)
+	    {
+	      set_option(OPTPOPDELETE);
+	    }
+	  else
+	    {
+	      unset_option(OPTPOPDELETE);
+	    }
+
 	  mutt_fetchPopMail ();
 	  g_free (PopHost);
 	  g_free (PopPass);
@@ -303,6 +314,7 @@ mailbox_new (MailboxType type)
       MAILBOX_POP3 (mailbox)->passwd = NULL;
       MAILBOX_POP3 (mailbox)->server = NULL;
       MAILBOX_POP3 (mailbox)->check = FALSE;
+      MAILBOX_POP3 (mailbox)->delete_from_server = FALSE;
       break;
 
     case MAILBOX_IMAP:
@@ -1070,11 +1082,13 @@ mailbox_valid (gchar * filename)
  * Return value: if the mailbox could be scanned, returns true. 
  **/
 gboolean
-mailbox_gather_content_info( Mailbox *mailbox )
+mailbox_gather_content_info(Mailbox *mailbox)
 {
+	/* this code is far too slow, and mut does not provide a good way to
+	 * do this.  we will not use it for now */
+#if 0
   GList *message_list;
   Message *current_message;
-
 
   mailbox_open_ref (mailbox);
 
@@ -1093,6 +1107,7 @@ mailbox_gather_content_info( Mailbox *mailbox )
 
   mailbox_open_unref (mailbox);
   return TRUE;
+#endif
 }
 
 

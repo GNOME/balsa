@@ -3,7 +3,7 @@
  * This file handles Balsa's interaction with libPropList, which stores
  * Balsa's configuration information.
  *
- * This file is Copyright (C) 1998 Nat Friedman
+ * This file is Copyright (C) 1998-1999 Nat Friedman
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -194,6 +194,8 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
          Username = ...;
          Password = ...;
          Server = ...;
+	 Check = 0 | 1;
+	 Delete =  0 | 1;
        */
       mbox_dict = pl_dict_add_str_str (NULL, "Type", "POP3");
       pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
@@ -213,8 +215,12 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
 			   MAILBOX_POP3 (mailbox)->server);
       {
 	char tmp[32];
+
 	snprintf (tmp, sizeof (tmp), "%d", MAILBOX_POP3 (mailbox)->check);
 	pl_dict_add_str_str (mbox_dict, "Check", tmp);
+
+	snprintf (tmp, sizeof (tmp), "%d", MAILBOX_POP3 (mailbox)->delete_from_server);
+	pl_dict_add_str_str (mbox_dict, "Delete", tmp);
       }
 
       break;
@@ -494,6 +500,11 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       else
 	MAILBOX_POP3 (mailbox)->check = atol (field);
 
+      if ((field = pl_dict_get_str (mbox, "Delete")) == NULL)
+	MAILBOX_POP3 (mailbox)->delete_from_server = FALSE;
+      else
+	MAILBOX_POP3 (mailbox)->delete_from_server = atol (field);
+
       balsa_app.inbox_input =
 	g_list_append (balsa_app.inbox_input, mailbox);
     }
@@ -627,13 +638,13 @@ config_global_load (void)
     balsa_app.previewpane = TRUE;
   else
     balsa_app.previewpane = atoi (field);
-
+#ifdef SHOW_INFO
   /* show mailbox content info */
   if ((field = pl_dict_get_str (globals, "ShowMailboxContentInfo")) == NULL)
     balsa_app.mblist_show_mb_content_info = TRUE;
   else
     balsa_app.mblist_show_mb_content_info = atoi (field);
-
+#endif
   /* debugging enabled */
   if ((field = pl_dict_get_str (globals, "Debug")) == NULL)
     balsa_app.debug = FALSE;
@@ -722,10 +733,10 @@ config_global_save (void)
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.previewpane);
     pl_dict_add_str_str (globals, "UsePreviewPane", tmp);
-
+#ifdef SHOW_INFO
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_show_mb_content_info);
     pl_dict_add_str_str (globals, "ShowMailboxContentInfo", tmp);
-
+#endif
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mw_width);
     pl_dict_add_str_str (globals, "MainWindowWidth", tmp);
 

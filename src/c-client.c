@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-
 #include <stdio.h>
+#include <string.h>
 #include "c-client.h"
 #include "balsa-app.h"
 #include "balsa-index.h"
@@ -98,7 +98,31 @@ mm_dlog (char *string)
 void
 mm_login (NETMBX * mb, char *user, char *pwd, long trial)
 {
+  MailboxPOP3 *pop3;
+  MailboxIMAP *imap;
+
+  if (!balsa_app.auth_mailbox)
+    return;
+
+  switch (balsa_app.auth_mailbox->type)
+    {
+    case MAILBOX_POP3:
+      pop3 = (MailboxPOP3 *) balsa_app.auth_mailbox;
+      strcpy (user, pop3->user);
+      strcpy (pwd, pop3->passwd);
+      break;
+
+    case MAILBOX_IMAP:
+      imap = (MailboxIMAP *) balsa_app.auth_mailbox;
+      strcpy (user, imap->user);
+      strcpy (pwd, imap->passwd);
+      break;
+
+    default:
+      break;
+    }
 }
+
 
 
 void

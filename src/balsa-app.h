@@ -35,6 +35,7 @@ struct
 
     gchar *smtp_server;
 
+    Mailbox *auth_mailbox;
     Mailbox *current_mailbox;
     GList *mailbox_list;
 

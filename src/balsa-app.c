@@ -43,6 +43,7 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.user_name = NULL;
   balsa_app.local_mail_directory = NULL;
   balsa_app.smtp_server = NULL;
+  balsa_app.auth_mailbox = NULL;
   balsa_app.current_mailbox = NULL;
   balsa_app.mailbox_list = NULL;
   balsa_app.main_window = NULL;

@@ -21,6 +21,7 @@
 
 #include "balsa-app.h"
 #include "index.h"
+#include "c-client.h"
 #include "mailbox.h"
 #include "../config.h"
 
@@ -48,6 +49,19 @@ main (int argc, char *argv[])
 void
 balsa_exit ()
 {
+  GList *list;
+  Mailbox *mailbox;
+
+  list = balsa_app.mailbox_list;
+  while (list)
+    {
+      mailbox = list->data;
+      list = list->next;
+
+      if (mailbox->stream != NIL)
+	mailbox_close (mailbox);
+    }
+
   gnome_config_sync ();
   gtk_exit (0);
 }

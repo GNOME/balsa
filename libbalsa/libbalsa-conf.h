@@ -25,7 +25,7 @@
 
 #include "config.h"
 
-#include <glib.h>
+#include <gtk/gtk.h>
 
 void libbalsa_conf_push_group(const char *group);
 void libbalsa_conf_remove_group_(const char *group, gboolean priv);
@@ -44,7 +44,7 @@ void libbalsa_conf_foreach_group(const gchar * prefix,
                                  LibBalsaConfForeachFunc func,
                                  gpointer data);
 
-#if !defined(HAVE_GNOME) || defined(GNOME_DISABLE_DEPRECATED)
+#if GTK_CHECK_VERSION(2, 6, 0) && (!defined(HAVE_GNOME) || defined(GNOME_DISABLE_DEPRECATED))
 # define BALSA_USE_G_KEY_FILE TRUE
 #else
 # undef BALSA_USE_G_KEY_FILE

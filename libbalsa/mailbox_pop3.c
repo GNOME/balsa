@@ -245,7 +245,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("POP3 mailbox %s temp file error:\n%s"), 
 			     mailbox->name,
-			     sys_errlist[errno]);
+			     g_strerror(errno));
 	g_free(tmp_path);
 	return;
     }

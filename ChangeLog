@@ -5,13 +5,14 @@
 	* libbalsa/address-book-ldap.c:
 	* libbalsa/address-entry.[hc]:
 	* libbalsa/misc.c: 
+	* libbalsa/pop3.c:
 	* src/balsa-app.h: 
 	* src/balsa-mblist.c:
 	* src/balsa-message.c:
 	* src/pref-manager.c:
-	* src/sendmsg-window.c:
+	* src/sendmsg-window.c: fix signed-unsigned comparisions.
 
-	* libbalsa/pop3.c: use g_strerror() instead of sys_errlist[]
+	* libbalsa/mailbox_pop3.c:  use g_strerror() instead of sys_errlist[]
 
 2001-08-23  Carlos Morgado  <chbm@chbm.nu>
 

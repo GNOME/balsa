@@ -414,7 +414,7 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
     /* Now read the actual message. */
     while(1) {
 	char *p;
-	int chunk;
+	size_t chunk;
 	
 	if ((chunk = getLine (s, buffer, sizeof (buffer))) == -1) 
 	    return POP_CONN_ERR;

@@ -188,6 +188,7 @@ static gchar *rfc2822_mailbox(const gchar *full_name, gchar *address)
 	new_str = g_strdup_printf("%s <%s>", full_name, address);
     else
 	new_str = g_strdup(address);
+    return new_str;
 }
 
 

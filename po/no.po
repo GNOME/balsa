@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.4.9\n"
-"POT-Creation-Date: 1999-08-05 11:37+0200\n"
+"POT-Creation-Date: 1999-09-08 11:04+0200\n"
 "PO-Revision-Date: 1999-08-05 11:44+02:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@online.no>\n"
 "Language-Team: Norwegian <no@li.org>\n"
@@ -38,7 +38,7 @@ msgid "general"
 msgstr "generelt"
 
 #: src/balsa-init.c:149
-msgid "mailboxs"
+msgid "mailboxes"
 msgstr "postbokser"
 
 #: src/balsa-init.c:195

@@ -819,10 +819,14 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
     file = gnome_file_entry_new("Mailbox Path", "Mailbox Path");
     mcw->mb_data.local.path =
 	gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(file));
+
     gtk_widget_add_accelerator(mcw->mb_data.local.path, 
 			       "grab_focus",
 			       mcw->window->accelerators,
 			       keyval, GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
+    gnome_file_entry_set_default_path(GNOME_FILE_ENTRY(file),
+                                      balsa_app.local_mail_directory);
+
     gnome_dialog_editable_enters(mcw->window,
 				 GTK_EDITABLE(mcw->mb_data.local.path));
 

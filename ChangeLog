@@ -9,7 +9,7 @@
 	* src/folder-conf.c: use "clicked" signal instead of silly loop
 	over events.
 	* src/mailbox-conf.c: make "mailbox configurator" dialog non-modal.
-	rescan local dirs (fix #54889).
+	rescan local dirs (fix #54889). set default path.
 	* src/mailbox-node.c: set  BalsaMailboxNode:dir field for local dirs.
 	* src/main.c: add -i - open mailbox on startup (Toralf Lund).
 	* balsa.1.in: add -i description.

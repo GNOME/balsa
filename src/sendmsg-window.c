@@ -457,8 +457,6 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gnome_icon_list_set_selection_mode (GNOME_ICON_LIST (msg->attachments), GTK_SELECTION_MULTIPLE);
   GTK_WIDGET_SET_FLAGS (GNOME_ICON_LIST (msg->attachments), GTK_CAN_FOCUS);
 
-  gnome_icon_list_thaw (GNOME_ICON_LIST (msg->attachments));
-
   return table;
 }
 

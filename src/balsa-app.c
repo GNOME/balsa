@@ -171,20 +171,19 @@ setup_local_mailboxes ()
 static void
 my_special_mailbox ()
 {
-
+#if 0
   MailboxNNTP *nntp;
 
   nntp = (MailboxNNTP *) mailbox_new (MAILBOX_NNTP);
   nntp->name = g_strdup ("COLA");
   nntp->user = g_strdup ("");
   nntp->passwd = g_strdup ("");
-  nntp->server = g_strdup ("news.serv.net");
+  nntp->server = g_strdup ("news.innerx.net");
   nntp->newsgroup = g_strdup ("comp.os.linux.announce");
 
   balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, nntp);
 
 
-#if 0
 
    MailboxPOP3 *pop3;
    MailboxMBX *mbx;

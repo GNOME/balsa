@@ -765,6 +765,7 @@ previous_message_cb (GtkWidget * widget)
 static void
 delete_message_cb (GtkWidget * widget)
 {
+/*
   MainWindow *mainwindow;
 
   g_return_if_fail (widget != NULL);
@@ -772,12 +773,15 @@ delete_message_cb (GtkWidget * widget)
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
 
   balsa_index_delete_message (BALSA_INDEX (mainwindow->index));
+*/
+  balsa_index_delete_message(BALSA_INDEX(mw->index));
 }
 
 
 static void
 undelete_message_cb (GtkWidget * widget)
 {
+/*
   MainWindow *mainwindow;
 
   g_return_if_fail (widget != NULL);
@@ -785,6 +789,8 @@ undelete_message_cb (GtkWidget * widget)
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
 
   balsa_index_undelete_message (BALSA_INDEX (mainwindow->index));
+*/
+  balsa_index_undelete_message(BALSA_INDEX(mw->index));
 }
 
 

@@ -22,7 +22,7 @@
 #ifndef __MAILBOX_CONF_H__
 #define __MAILBOX_CONF_H__
 
-#include "libbalsa.h"
+#include "mailbox-node.h"
 
 void mailbox_conf_new(GtkType mailbox_type);
 void mailbox_conf_edit(BalsaMailboxNode * mbnode);

@@ -1,5 +1,8 @@
 2001-01-19  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* src/mailbox-conf.h: replace "libbalsa.h" with "mailbox-node.h"
+	to make the code compile with threads disabled.
+	
 	Patch from Albrecht Dreﬂ <albrecht.dress@arcormail.de> for sending
 	Disposition-Notification requests.
 	* libbalsa/message.[hc]: add dispnotify_to field and handle it.

@@ -9,6 +9,7 @@ balsa-?.?.?
 balsa-?.?.?.tar.bz2
 balsa-?.?.?.tar.gz
 balsa.1
+balsa.desktop
 balsa.spec
 config.cache
 config.guess

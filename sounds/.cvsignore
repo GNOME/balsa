@@ -1,3 +1,5 @@
 Makefile
 Makefile.in
 .deps
+balsa.soundlist
+email.soundlist

@@ -20,6 +20,7 @@
 #include "pref-manager.h"
 #include "balsa-app.h"
 #include "save-restore.h"
+#include "main-window.h"
 
 
 
@@ -32,18 +33,18 @@ struct _PreferencesManagerWindow
   GtkWidget *real_name;
   GtkWidget *email;
   GtkWidget *organization;
-  
-
-  /* local */
   GtkWidget *mail_directory;
-
-  
-  /* servers */
   GtkWidget *smtp_server;
 
 
+  /* view */
+  GtkWidget *toolbar_text;
+  GtkWidget *toolbar_icons;
+  GtkWidget *toolbar_both;
 
 
+  /* non-widgets */
+  GtkToolbarStyle toolbar_style;
 };
 static PreferencesManagerWindow *pmw = NULL;
 
@@ -51,11 +52,14 @@ static PreferencesManagerWindow *pmw = NULL;
 
 /* notebook pages */
 static GtkWidget *create_identity_page ();
+static GtkWidget *create_view_page ();
 
 
 /* callbacks */
 static void ok_preferences_manager ();
 static void cancel_preferences_manager ();
+
+static void set_toolbar_style_cb (GtkWidget * widget, gpointer data);
 
 
 
@@ -118,6 +122,12 @@ open_preferences_manager ()
 			    create_identity_page (),
 			    label);
 
+  /* view page */
+  label = gtk_label_new ("View");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+			    create_view_page (),
+			    label);
+
 
   /* ok/cancel buttons (bottom dialog) */
   bbox = gtk_hbutton_box_new ();
@@ -175,9 +185,11 @@ ok_preferences_manager ()
   gchar *email, *c;
 
 
+  /*
+   * identity page
+   */
   g_free (balsa_app.real_name);
   balsa_app.real_name = g_strdup(gtk_entry_get_text (GTK_ENTRY (pmw->real_name)));
-
 
   /* parse username/hostname from the email entry */
   email = c = g_strdup (gtk_entry_get_text (GTK_ENTRY (pmw->email)));
@@ -195,10 +207,6 @@ ok_preferences_manager ()
       *c = '\0';
       c++;
 
-      g_print ("email: %s\n", email);
-      g_print ("c: %s\n", c);
-
-      
       g_free (balsa_app.username);
       balsa_app.username = g_strdup (email);
 
@@ -217,6 +225,20 @@ ok_preferences_manager ()
   g_free (balsa_app.local_mail_directory);
   balsa_app.local_mail_directory = g_strdup (gtk_entry_get_text (GTK_ENTRY (pmw->mail_directory)));
 
+
+  /*
+   * view page 
+   */
+  if (balsa_app.toolbar_style != pmw->toolbar_style)
+    {
+      balsa_app.toolbar_style = pmw->toolbar_style;
+      refresh_main_window ();
+    }
+
+
+  /*
+   * close window and free memory
+   */
   gtk_widget_destroy (pmw->window);
   save_global_settings ();
 }
@@ -231,10 +253,12 @@ refresh_preferences_manager ()
   GString *str;
 
 
+
+  /*
+   * identity page
+   */
   gtk_entry_set_text (GTK_ENTRY (pmw->real_name), balsa_app.real_name);
 
-  /* we're gonna display this as  USERNAME @ HOSTNAME 
-   * for the From: header */
   str = g_string_new (balsa_app.username);
   g_string_append_c (str, '@');
   g_string_append (str, balsa_app.hostname);
@@ -244,6 +268,29 @@ refresh_preferences_manager ()
   gtk_entry_set_text (GTK_ENTRY (pmw->organization), balsa_app.organization);
   gtk_entry_set_text (GTK_ENTRY (pmw->smtp_server), balsa_app.smtp_server);
   gtk_entry_set_text (GTK_ENTRY (pmw->mail_directory), balsa_app.local_mail_directory);
+
+
+
+  /*
+   * view page
+   */
+  pmw->toolbar_style = balsa_app.toolbar_style;
+  switch (pmw->toolbar_style)
+    {
+    case GTK_TOOLBAR_TEXT:
+      gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pmw->toolbar_text), TRUE);
+      break;
+
+    case GTK_TOOLBAR_ICONS:
+      gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pmw->toolbar_icons), TRUE);
+      break;
+
+    case GTK_TOOLBAR_BOTH:
+      gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pmw->toolbar_both), TRUE);
+      break;
+    }
+
+
 }
 
 
@@ -352,4 +399,101 @@ create_identity_page ()
 
 
   return vbox;
+}
+
+
+/*
+ * view notebook page
+ */
+static GtkWidget *
+create_view_page ()
+{
+  GtkWidget *vbox;
+  GtkWidget *table;
+  GtkWidget *label;
+  GtkWidget *button;
+  GtkWidget *frame;
+
+
+  vbox = gtk_vbox_new (FALSE, 0);
+  gtk_container_border_width (GTK_CONTAINER (vbox), 10);
+  gtk_widget_show (vbox);
+
+
+  frame = gtk_frame_new ("Toolbars");
+  gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
+  gtk_widget_show (frame);
+
+
+  table = gtk_table_new (2, 3, FALSE);
+  gtk_container_border_width (GTK_CONTAINER (table), 5);
+  gtk_container_add (GTK_CONTAINER (frame), table);
+  gtk_widget_show (table);
+
+
+  pmw->toolbar_text = gtk_radio_button_new_with_label (NULL, "Show as Text");
+  gtk_table_attach (GTK_TABLE (table), pmw->toolbar_text, 0, 1, 0, 1,
+		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
+		    0, 0);
+
+  gtk_object_set_user_data (GTK_OBJECT (pmw->toolbar_text), (gpointer) pmw);
+
+  gtk_signal_connect (GTK_OBJECT (pmw->toolbar_text),
+		      "clicked",
+		      (GtkSignalFunc) set_toolbar_style_cb,
+		      (gpointer) GTK_TOOLBAR_TEXT);
+
+  gtk_widget_show (pmw->toolbar_text);
+  
+
+  pmw->toolbar_icons = gtk_radio_button_new_with_label 
+    (gtk_radio_button_group (GTK_RADIO_BUTTON (pmw->toolbar_text)), "Show as Images");
+  gtk_table_attach (GTK_TABLE (table), pmw->toolbar_icons, 0, 1, 1, 2,
+		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
+		    0, 0);
+
+  gtk_object_set_user_data (GTK_OBJECT (pmw->toolbar_icons), (gpointer) pmw);
+
+  gtk_signal_connect (GTK_OBJECT (pmw->toolbar_icons),
+		      "clicked",
+		      (GtkSignalFunc) set_toolbar_style_cb,
+		      (gpointer) GTK_TOOLBAR_ICONS);
+
+  gtk_widget_show (pmw->toolbar_icons);
+
+
+  pmw->toolbar_both = gtk_radio_button_new_with_label 
+    (gtk_radio_button_group (GTK_RADIO_BUTTON (pmw->toolbar_text)), "Show as Text and Images");
+  gtk_table_attach (GTK_TABLE (table), pmw->toolbar_both, 0, 1, 2, 3,
+		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
+		    0, 0);
+
+  gtk_object_set_user_data (GTK_OBJECT (pmw->toolbar_both), (gpointer) pmw);
+
+  gtk_signal_connect (GTK_OBJECT (pmw->toolbar_both),
+		      "clicked",
+		      (GtkSignalFunc) set_toolbar_style_cb,
+		      (gpointer) GTK_TOOLBAR_BOTH);
+
+  gtk_widget_show (pmw->toolbar_both);
+
+
+  return vbox;
+}
+
+
+
+/*
+ * callbacks
+ */
+static void
+set_toolbar_style_cb (GtkWidget * widget, gpointer data)
+{
+  PreferencesManagerWindow *pref;
+
+  g_return_if_fail (widget != NULL);
+  
+  pref = (PreferencesManagerWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+
+  pref->toolbar_style = (GtkToolbarStyle) data;
 }

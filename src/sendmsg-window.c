@@ -2342,7 +2342,8 @@ create_text_area(BalsaSendmsg * bsmsg)
     gtk_container_add(GTK_CONTAINER(table), bsmsg->text);
     g_signal_connect(G_OBJECT(bsmsg->text), "drag_data_received",
 		     G_CALLBACK(drag_data_quote), bsmsg);
-    gtk_drag_dest_set(GTK_WIDGET(bsmsg->text), GTK_DEST_DEFAULT_ALL,
+    /* GTK_DEST_DEFAULT_ALL in drag_set would trigger bug 150141 */
+    gtk_drag_dest_set(GTK_WIDGET(bsmsg->text), 0,
 		      drop_types, ELEMENTS(drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 

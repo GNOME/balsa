@@ -27,6 +27,8 @@
 #ifndef __LIBBALSA_ADDRESS_BOOK_GPE_H__
 #define __LIBBALSA_ADDRESS_BOOK_GPE_H__
 
+#ifdef HAVE_SQLITE
+
 #include <sqlite.h>
 
 #include "address-book.h"
@@ -53,4 +55,5 @@ GType libbalsa_address_book_gpe_get_type(void);
 
 LibBalsaAddressBook *libbalsa_address_book_gpe_new(const gchar *name);
 
+#endif /* HAVE_SQLITE */
 #endif				/* __LIBBALSA_ADDRESS_BOOK_GPE_H__ */

@@ -1,6 +1,8 @@
 2004-08-23  Pawel Salek
 
 	* src/address-book-config.c: fix my sloppy code in GPE config.
+	* libbalsa/address-book-gpe.h: respect HAVE_SQLITE.
+	* src/sendmsg-window.c: work around #150141.
 
 2004-08-22  Pawel Salek
 

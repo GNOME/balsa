@@ -1,3 +1,15 @@
+2004-09-05 17:13  PeterB
+
+	* libbalsa/: body.c, body.h: new methods
+	libbalsa_message_body_get_{stream,content,pixbuf} avoid using
+	temporary file.
+	* libbalsa/: message.c, message.h: new api for
+	libbalsa_message_get_part_by_id, returns a GMimeStream instead of a
+	FILE handle.
+	* libbalsa/html.c, libbalsa/mime.c, src/balsa-message.c,
+	src/print.c: use new and modified methods.
+	* libbalsa/misc.c: downgrade warning to message.
+
 2004-09-04  Pawel Salek
 
 	* libbalsa/imap-server.c: set timeout to 30s.

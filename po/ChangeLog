@@ -1,3 +1,7 @@
+2002-03-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* POTFILES.in: mispelled keymaps_def.h -> keymap_defs.h
+
 2002-03-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* POTFILES.in: add missing libmutt/attach.c

@@ -2,7 +2,7 @@
 # flags.c: one string used by the mutt's threading code.
 libmutt/flags.c
 # keymaps_def.h: mutt key help.
-libmutt/keymaps_def.h
+libmutt/keymap_defs.h
 # libmutt/muttlib.c: no strings compiled into balsa.
 libmutt/muttlib.c
 #libmutt/pattern.c: only pattern_free used. No strings to translate there.

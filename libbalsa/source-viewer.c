@@ -32,6 +32,7 @@
 static void close_cb(GtkWidget* w, gpointer data);
 static void copy_cb(GtkWidget * w, gpointer data);
 static void select_all_cb(GtkWidget* w, gpointer data);
+static void escape_cb(GtkWidget * widget, gpointer data);
 
 static GnomeUIInfo file_menu[] = {
 #define MENU_FILE_INCLUDE_POS 1
@@ -51,10 +52,19 @@ static GnomeUIInfo edit_menu[] = {
     GNOMEUIINFO_END
 };
 
+static GnomeUIInfo view_menu[] = {
+#define MENU_VIEW_ESCAPE_POS 0
+    GNOMEUIINFO_TOGGLEITEM(N_("_Escape Special Characters"),
+                           N_("Escape special and non-ASCII characters"),
+                           escape_cb, NULL),
+    GNOMEUIINFO_END
+};
+
 static GnomeUIInfo main_menu[] = {
 #define SOURCE_FILE_MENU 2
     GNOMEUIINFO_MENU_FILE_TREE(file_menu),
     GNOMEUIINFO_MENU_EDIT_TREE(edit_menu),
+    GNOMEUIINFO_MENU_VIEW_TREE(view_menu),
     GNOMEUIINFO_END
 };
 
@@ -87,93 +97,133 @@ close_cb(GtkWidget* w, gpointer data)
     gtk_widget_destroy(GTK_WIDGET(data));
 }
 
+struct _LibBalsaSourceViewerInfo {
+    LibBalsaMessage *msg;
+    GtkWidget *text;
+};
+
+typedef struct _LibBalsaSourceViewerInfo LibBalsaSourceViewerInfo;
 
 static void
-libbalsa_show_file(FILE* f, long length)
+libbalsa_show_file(FILE * f, long length, LibBalsaSourceViewerInfo * lsvi,
+                   gboolean escape)
 {
-    GtkWidget*window, *interior;
-    GtkWidget* text;
-    GtkTextBuffer* buffer;
+    GtkTextBuffer *buffer;
     char buf[1024];
     GtkTextIter start;
 
-    window = gnome_app_new("balsa", _("Message Source"));
-    gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
-    buffer = gtk_text_buffer_new (NULL);
-    text   = gtk_text_view_new_with_buffer(buffer);
-    g_object_set_data(G_OBJECT(window), "text", text);
-    gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
-    
-    gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
-    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD);
-    interior = gtk_scrolled_window_new(GTK_TEXT_VIEW(text)->hadjustment,
-				       GTK_TEXT_VIEW(text)->vadjustment);
-    gtk_container_add(GTK_CONTAINER(interior), GTK_WIDGET(text));
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(lsvi->text));
+    gtk_text_buffer_set_text(buffer, "", 0);
 
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(interior),
-                                   GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-    gnome_app_set_contents(GNOME_APP(window), interior);
-
-    if(length<0) length = 5*1024*1024; /* random limit for the file size
-					* not likely to be used */
-    while(length>0 && fgets(buf, sizeof(buf), f)) {
-	gint linelen = strlen(buf);
+    if (length < 0)
+        length = 5 * 1024 * 1024;       /* random limit for the file size
+                                         * not likely to be used */
+    while (length > 0 && fgets(buf, sizeof(buf), f)) {
+        gint linelen = strlen(buf);
         gchar *tmp;
 
         if (linelen > length)
             buf[length] = '\0';
-        tmp = g_strescape(buf, "\n\"");
+        if (escape)
+            tmp = g_strescape(buf, "\n\"");
+        else {
+            tmp = g_strdup(buf);
+            libbalsa_utf8_sanitize(&tmp, FALSE, (LibBalsaCodeset) 0, NULL);
+        }
         if (tmp) {
-	    gtk_text_buffer_insert_at_cursor(buffer, tmp, -1);
+            gtk_text_buffer_insert_at_cursor(buffer, tmp, -1);
             g_free(tmp);
         }
-	length -= linelen;
+        length -= linelen;
     }
 
-    gtk_window_set_default_size(GTK_WINDOW(window), 500, 400);
     gtk_text_buffer_get_start_iter(buffer, &start);
     gtk_text_buffer_place_cursor(buffer, &start);
-    gtk_widget_show_all(window);
+}
+
+static void
+escape_cb(GtkWidget * widget, gpointer data)
+{
+    LibBalsaSourceViewerInfo *lsvi =
+        g_object_get_data(G_OBJECT(data), "lsvi");
+    LibBalsaMessage *msg = lsvi->msg;
+    HEADER *hdr;
+    FILE *f;
+    long length;
+
+    hdr = msg->header;
+    f = libbalsa_mailbox_get_message_stream(msg->mailbox, msg);
+    fseek(f, hdr->offset, 0);
+    length = (hdr->content->offset - hdr->offset) + hdr->content->length;
+    libbalsa_show_file(f, length, lsvi,
+                       GTK_CHECK_MENU_ITEM(widget)->active);
+    fclose(f);
 }
 
 /* libbalsa_show_message_source:
    pops up a window containing the source of the message msg.
 */
 void
-libbalsa_show_message_source(LibBalsaMessage* msg)
+libbalsa_show_message_source(LibBalsaMessage * msg, const gchar * font)
 {
-    FILE *f;
-    HEADER* hdr;
-    long length;
+    GtkWidget *text;
+    GtkWidget *interior;
+    GtkWidget *window;
+    LibBalsaSourceViewerInfo *lsvi;
+
     g_return_if_fail(msg);
     g_return_if_fail(!CLIENT_CONTEXT_CLOSED(msg->mailbox));
     g_return_if_fail(msg->header);
 
-    hdr = msg->header;
-    f = libbalsa_mailbox_get_message_stream(msg->mailbox, msg);
-    fseek(f, hdr->offset, 0);
-    length = (hdr->content->offset- hdr->offset) + hdr->content->length;
-    libbalsa_show_file(f, length);
-    fclose(f);
+    text = gtk_text_view_new();
+    gtk_widget_modify_font(text, pango_font_description_from_string(font));
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD);
+
+    interior = gtk_scrolled_window_new(GTK_TEXT_VIEW(text)->hadjustment,
+                                       GTK_TEXT_VIEW(text)->vadjustment);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(interior),
+                                   GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+    gtk_container_add(GTK_CONTAINER(interior), GTK_WIDGET(text));
+
+    window = gnome_app_new("balsa", _("Message Source"));
+    gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
+    gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
+    gtk_window_set_default_size(GTK_WINDOW(window), 500, 400);
+    gnome_app_set_contents(GNOME_APP(window), interior);
+
+    lsvi = g_new(LibBalsaSourceViewerInfo, 1);
+    lsvi->msg = msg;
+    lsvi->text = text;
+    g_object_set_data_full(G_OBJECT(window), "lsvi", lsvi, g_free);
+
+    gtk_widget_show_all(window);
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
+                                   (view_menu[MENU_VIEW_ESCAPE_POS].
+                                    widget), TRUE);
 }
+
 
 #if 0
 /* testing program */
-int main(int argc, char* argv[])
+int
+main(int argc, char *argv[])
 {
     int i, shown = 0;
     gtk_init(&argc, &argv);
 
-    for(i=1; i<argc; i++) {
-	FILE* f = fopen(argv[i], "r");
-	if(f) {
-	    show_file(f);
-	    fclose(f);
-	    shown = 1;
-	}
+    for (i = 1; i < argc; i++) {
+        FILE *f = fopen(argv[i], "r");
+        if (f) {
+            show_file(f);
+            fclose(f);
+            shown = 1;
+        }
     }
-    if(shown) gtk_main();
-    else fprintf(stderr, "No sensible args passed.\n");
+    if (shown)
+        gtk_main();
+    else
+        fprintf(stderr, "No sensible args passed.\n");
 
     return !shown;
 }

@@ -70,7 +70,8 @@ typedef struct header MuttHeader;
 void libbalsa_init(LibBalsaInformationFunc information_callback);
 void libbalsa_set_spool(gchar * spool);
 
-void libbalsa_show_message_source(LibBalsaMessage* msg);
+void libbalsa_show_message_source(LibBalsaMessage * msg,
+                                  const gchar * font);
 gchar *libbalsa_rot(const gchar * pass);
 
 gchar *libbalsa_guess_email_address(void);

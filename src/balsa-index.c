@@ -474,14 +474,14 @@ append_messages (BalsaIndex * bindex,
 		 glong last)
 {
   glong i;
-  gchar *text[6];
+  gchar *text[5];
   MESSAGECACHE *cache;
 
   text[0] = NULL;
-  text[1] = g_malloc (BUFFER_SIZE);
-  text[2] = g_malloc (BUFFER_SIZE);
-  text[3] = g_malloc (BUFFER_SIZE);
-  text[4] = g_malloc (BUFFER_SIZE);
+  text[1] = g_malloc0 (BUFFER_SIZE);
+  text[2] = g_malloc0 (BUFFER_SIZE);
+  text[3] = g_malloc0 (BUFFER_SIZE);
+  text[4] = g_malloc0 (BUFFER_SIZE);
 
   first_new_mesgno = 0;
 

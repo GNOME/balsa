@@ -1000,7 +1000,8 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
 static void
 make_msgno_table(ImapMboxHandle*handle, unsigned seqno, GHashTable *msgnos)
 {
-  g_hash_table_insert(msgnos, (void *) seqno, (void *) seqno);
+  g_hash_table_insert(msgnos, GUINT_TO_POINTER(seqno),
+                      GUINT_TO_POINTER(seqno));
 }
 
 ImapResponse

@@ -1457,7 +1457,8 @@ img_check_size(GtkImage *widget)
 {
     GtkWidget * viewport =
 	gtk_widget_get_ancestor(GTK_WIDGET(widget), GTK_TYPE_VIEWPORT);
-    gint orig_width = (gint)g_object_get_data(G_OBJECT(widget), "orig-width");
+    gint orig_width = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
+                                                        "orig-width"));
     BalsaPartInfo * info =
 	(BalsaPartInfo *)g_object_get_data(G_OBJECT(widget), "part-info");
     gint curr_w, dst_w;
@@ -1517,9 +1518,10 @@ part_info_init_image(BalsaMessage * bm, BalsaPartInfo * info)
 	return;
     }
     evbox = gtk_event_box_new();
-    image = gtk_image_new_from_stock(GTK_STOCK_MISSING_IMAGE, GTK_ICON_SIZE_BUTTON);
+    image = gtk_image_new_from_stock(GTK_STOCK_MISSING_IMAGE,
+                                     GTK_ICON_SIZE_BUTTON);
     g_object_set_data(G_OBJECT(image), "orig-width",
-		      (gpointer)gdk_pixbuf_get_width(pixbuf));
+		      GINT_TO_POINTER(gdk_pixbuf_get_width(pixbuf)));
     g_object_set_data(G_OBJECT(image), "part-info", info);
     g_object_unref(pixbuf);
     gtk_widget_show(image);

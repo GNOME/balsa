@@ -1,3 +1,9 @@
+2004-07-15  Pawel Salek
+
+	* balsa.spec.in: fix dependencies.
+	* libbalsa/imap/imap-commands.c: property type casts.
+	* src/balsa-message.c: ditto. All of it pointed by John Dennis.
+
 2004-07-14 23:43  PeterB
 
 	* src/main-window.c: store view filter mask before setting the view

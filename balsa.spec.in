@@ -19,12 +19,11 @@ Source0:   %{name}-%{version}.tar.bz2
 Source1:   gmime-%{gmimever}.tar.bz2
 URL:       http://balsa.gnome.org/
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
-Packager: Pawel Salek <pawsa@theochem.kth.se>
 Requires: libesmtp >= 1.0.3
-Requires: pspell
+Requires: aspell
 Provides: balsa
 
-BuildRequires:  libesmtp >= 1.0.3
+BuildRequires:  libesmtp-devel >= 1.0.3
 %if %redhat
 Requires: gtk2 >= 2.0.0
 Requires: libgnome >= 2.0.0
@@ -34,7 +33,7 @@ BuildRequires:  gtk2-devel >= 2.0.0
 BuildRequires:  libgnome-devel >= 2.0.0
 BuildRequires:  libgnomeui-devel >= 2.0.0
 BuildRequires:  gnome-vfs2-devel >= 2.0.0
-BuildRequires:  pspell-devel
+BuildRequires:  aspell-devel
 %endif
 %if %mdk
 Requires: gtk+2.0

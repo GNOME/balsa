@@ -1,3 +1,10 @@
+2004-03-27 15:56  PeterB
+
+	* src/mailbox-node.c: don't die on invalid local mailbox type.
+	* libbalsa/mailbox.c: check that a file is empty or begins with
+	"From " before deciding it's a LibBalsaMailboxMbox; check for NULL
+	condition.
+
 2004-03-27  Pawel Salek
 
 	* libbalsa/Makefile.am: remove old POP3 support.

@@ -642,11 +642,23 @@ imap_mbox_store_flag_m(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
   ImapResponse res;
   gchar* cmd, *seq, *str;
   struct msg_set csd;
+  unsigned i;
 
   csd.msgcnt = msgcnt; csd.seqno = seqno;
   if(msgcnt == 0) return IMR_OK;
   str = enum_flag_to_str(flg);
   seq = coalesce_seq_range(1, msgcnt, (CoalesceFunc)cf_set, &csd);
+  for(i=0; i<msgcnt; i++) {
+    ImapMessage *msg = imap_mbox_handle_get_msg(h, seqno[i]);
+    if(msg) {
+      if(state)
+        msg->flags |= flg;
+      else
+        msg->flags &= ~flg;
+    }
+    /* should we emit signals here on flag change?
+     * What if Store fails below? The flags won't be set. */
+  }
   cmd = g_strdup_printf("Store %s %cFlags.Silent (%s)", seq,
                         state ? '+' : '-', str);
   g_free(str);

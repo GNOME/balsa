@@ -1,3 +1,19 @@
+2004-01-22  Pawel Salek
+
+	* configure.in: add USE_TLS flag for compatibilty with libesmtp.
+	* libbalsa/libbalsa.c: compile --with-ssl
+	* libbalsa/mailbox.c: remove false warnings.
+	* libbalsa/imap/Makefile.am: add imap-tls.c
+
+	* libbalsa/imap/imap-commands.c: update manually flags when doing
+	Flags.Silent.
+	* libbalsa/imap/imap-commands.h: add imap_handle_starttls().
+	* libbalsa/imap/imap-handle.c: use TLS when available.
+	* libbalsa/imap/siobuf.[hc]: merge updates from libesmtp.
+	* src/balsa-app.[hc]: cleanup libmutt remainings.
+	* src/main.c: ditto.
+	* src/main-window.c: remove debugging output.
+	
 2004-01-22 06:14  PeterB
 
 	* libbalsa/message.c: Make sure subject is valid utf-8.

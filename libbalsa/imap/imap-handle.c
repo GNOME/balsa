@@ -21,6 +21,10 @@
 #include <unistd.h>
 #include <gmime/gmime-utils.h>
 
+#if defined(USE_TLS)
+#include <openssl/ssl.h>
+#endif
+
 #include "libimap-marshal.h"
 #include "imap-auth.h"
 #include "imap-handle.h"
@@ -238,6 +242,10 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host,
 
   if( (rc=imap_mbox_connect(ret)) != IMAP_SUCCESS)
     return rc;
+
+#if defined(USE_TLS)
+  imap_handle_starttls(ret); /* one can always try! */
+#endif
 
   rc = imap_authenticate(ret, user, passwd);
 
@@ -1360,7 +1368,6 @@ static ImapResponse
 ir_capability(ImapMboxHandle *handle)
 {
   int c = ir_capability_data(handle);
-  printf("ir_capability, c='%c'[%d]\n", c, c);
   return ir_check_crlf(handle, c);
 }
 /* follow mailbox-list syntax (See rfc) */

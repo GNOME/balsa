@@ -395,7 +395,6 @@ extern struct BalsaApplication {
 
 void balsa_app_init(void);
 void balsa_app_destroy(void);
-gboolean do_load_mailboxes(void);
 void update_timer(gboolean update, guint minutes);
 
 gchar *ask_password(LibBalsaServer * server, LibBalsaMailbox * mbox);

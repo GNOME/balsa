@@ -442,6 +442,7 @@ if test "x$with_ssl" != xno  ; then
       BALSA_CFLAGS="`pkg-config --cflags-only-I openssl` $BALSA_CFLAGS"
       AC_MSG_RESULT(yes)
       AC_DEFINE(USE_SSL,1,[Defined when SSL support is to be compiled.])
+      AC_DEFINE(USE_TLS,USE_SSL,[Defined when TLS is to be enabled.])
    else
       if test -d $with_ssl && test -f "$with_ssl/include/openssl/ssl.h" ; then
          ssldir=$with_ssl
@@ -469,6 +470,7 @@ if test "x$with_ssl" != xno  ; then
 	  fi
 	  ac_cv_path_openssl=$ssldir
 	  AC_DEFINE(USE_SSL,1,[Defined when SSL support is to be compiled.])
+          AC_DEFINE(USE_TLS,USE_SSL,[Defined when TLS is to be enabled.])
        fi
    fi
 else

@@ -522,21 +522,6 @@ balsa_app_destroy(void)
     if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");
 }
 
-gboolean
-do_load_mailboxes(void)
-{
-    if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.inbox)) {
-	libbalsa_set_spool(libbalsa_mailbox_local_get_path(balsa_app.inbox));
-    } else if (LIBBALSA_IS_MAILBOX_IMAP(balsa_app.inbox)
-	       || LIBBALSA_IS_MAILBOX_POP3(balsa_app.inbox)) {
-	/* Do nothing */
-    } else {
-	fprintf(stderr, "do_load_mailboxes: Unknown inbox mailbox type\n");
-	return FALSE;
-    }
-    return TRUE;
-}
-
 static gint
 check_new_messages_auto_cb(gpointer data)
 {

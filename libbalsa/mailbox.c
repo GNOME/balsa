@@ -905,7 +905,7 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
                     decrease_post, &dt);
     if (!dt.node) {
-	g_warning("msgno %d not found", seqno);
+        /* It's ok, apparently the view did not include this message */
 	lbm_threads_leave(unlock);
 	return;
     }
@@ -973,7 +973,7 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     node = g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, 
                        GUINT_TO_POINTER(seqno));
     if (!node) {
-	g_warning("msgno %d not found", seqno);
+	g_warning("filt_out: msgno %d not found", seqno);
 	lbm_threads_leave(unlock);
 	return;
     }

@@ -3034,11 +3034,6 @@ bw_get_view_filter(BalsaWindow *window)
         else
             filter = lbc;
     }
-    if(filter) {
-        gchar *str = libbalsa_condition_to_string(filter);
-        printf("%s: Filter is: %s\n", __func__, str);
-        g_free(str);
-    }
     return filter;
 }
 

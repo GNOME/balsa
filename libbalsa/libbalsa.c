@@ -47,7 +47,6 @@ static pthread_t main_thread_id;
 
 
 static gchar *qualified_hostname(const char *name);
-static char *Spoolfile; // libmutt leftover
 
 void
 libbalsa_message(const char *fmt, ...)
@@ -96,19 +95,6 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     LIBBALSA_TYPE_ADDRESS_BOOK_LDAP;
 #endif
 }
-
-void
-libbalsa_set_spool(const gchar * spool)
-{
-    if (Spoolfile)
-	g_free(Spoolfile);
-
-    if (spool)
-	Spoolfile = g_strdup(spool);
-    else
-	Spoolfile = libbalsa_guess_mail_spool();
-}
-
 
 
 /* libbalsa_rot:
@@ -348,7 +334,7 @@ libbalsa_assure_balsa_dir(void)
 }
 
 
-#ifdef USE_SSL
+#if defined(USE_SSL) && defined(ask_cert_real_fixed)
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 #include <openssl/err.h>
@@ -366,13 +352,13 @@ void x509_fingerprint (char *s, int l, X509 * cert);
 static int
 ask_cert_real(X509 *cert)
 {
+
     char *part[] =
         {"/CN=", "/Email=", "/O=", "/OU=", "/L=", "/ST=", "/C="};
     char buf[SHORT_STRING];
     char *name = NULL, *c, *valid_from;
     GtkWidget* dialog, *label;
     unsigned i;
-    int ret;
 
     GString* str = g_string_new(_("<b>This certificate belongs to:</b>\n"));
 
@@ -417,13 +403,13 @@ ask_cert_real(X509 *cert)
     gtk_widget_show(label);
 
     switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
-    case 0: ret = OP_MAX; break;
-    case 1: ret = OP_SAVE; libbalsa_assure_balsa_dir(); break;
+    case 0: /* FIXME: OK  */; break;
+    case 1: /* FIXME: SAVE; libbalsa_assure_balsa_dir(); */ break;
     case GTK_RESPONSE_CANCEL:
-    default: ret = OP_EXIT; break;
+    default: /* FIXME: cancel;*/ break;
     }
     gtk_widget_destroy(dialog);
-    return ret;
+    return 0 /* FIXME: some response */;
 }
 
 #ifdef BALSA_USE_THREADS
@@ -450,6 +436,7 @@ ask_cert_idle(gpointer data)
    executed with GDK UNLOCKED. see mailbox_imap_open() and
    imap_dir_cb()/imap_folder_imap_dir().
 */
+int libmutt_ask_for_cert_acceptance(X509 *cert);
 int
 libmutt_ask_for_cert_acceptance(X509 *cert)
 {
@@ -463,9 +450,7 @@ libmutt_ask_for_cert_acceptance(X509 *cert)
     pthread_cond_init(&acd.cond, NULL);
     acd.cert = cert;
     g_idle_add(ask_cert_idle, &acd);
-    libbalsa_unlock_mutt(); 
     pthread_cond_wait(&acd.cond, &ask_cert_lock);
-    libbalsa_lock_mutt();
     
     pthread_cond_destroy(&acd.cond);
     pthread_mutex_unlock(&ask_cert_lock);

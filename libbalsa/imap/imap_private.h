@@ -56,6 +56,9 @@ struct _ImapMboxHandle {
   ImapSearchCb search_cb;
   void *search_arg;
   unsigned readonly_mbox:1;
+#ifdef USE_TLS
+  unsigned using_tls:1;
+#endif
 };
 
 extern const char* msg_flags[6];

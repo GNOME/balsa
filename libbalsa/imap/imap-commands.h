@@ -2,6 +2,7 @@
 #define __IMAP_COMMANDS_H__ 1
 
 #include <gmime/gmime.h>
+#include "imap-handle.h"
 
 /* Any-State */
 int imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap);
@@ -68,6 +69,7 @@ ImapResponse imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
                                          void *arg);
 
 /* Experimental/Expansion */
+ImapResponse imap_handle_starttls(ImapMboxHandle *handle);
 ImapResult imap_mbox_scan(ImapMboxHandle *r, const char*what, const char*str);
 ImapResponse imap_mbox_unselect(ImapMboxHandle *h);
 ImapResult imap_mbox_thread(ImapMboxHandle *h, const char *how,

@@ -293,7 +293,7 @@ config_init(void)
 static void
 mailboxes_init(void)
 {
-    if (!do_load_mailboxes()) {
+    if (!balsa_app.inbox) {
 	g_warning("*** error loading mailboxes\n");
 	balsa_init_begin();
 	return;

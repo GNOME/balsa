@@ -1,3 +1,8 @@
+2000-06-15  Peter Williams  <peter@beta.newton.cx>
+
+	* faq.html.in: Add a FAQ about nesting mailboxes
+	as per http://www.linuxworld.com/linuxworld/lw-2000-06/lw-06-vcontrol_2.html.
+
 2000-06-06  Peter Williams  <peter@newton.cx>
 	* main.hmtl.in: Announce packages on downloads page,
 	reorg to have table setup like other pages.

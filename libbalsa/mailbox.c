@@ -721,7 +721,7 @@ libbalsa_mailbox_link_message(LibBalsaMailbox * mailbox, LibBalsaMessage*msg)
 
     if (msg->flags & LIBBALSA_MESSAGE_FLAG_NEW)
         mailbox->unread_messages++;
-    mailbox->message_list = g_list_append(mailbox->message_list, msg);
+    mailbox->message_list = g_list_prepend(mailbox->message_list, msg);
     mailbox->total_messages++;
 }
 
@@ -768,7 +768,7 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 
 	message = translate_message(cur);
         libbalsa_mailbox_link_message(mailbox, message);
-	messages=g_list_append(messages, message);
+	messages=g_list_prepend(messages, message);
     }
     UNLOCK_MAILBOX(mailbox);
 
@@ -778,9 +778,10 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 #endif
 
     if(messages!=NULL){
-      g_signal_emit(G_OBJECT(mailbox),
-	            libbalsa_mailbox_signals[MESSAGES_NEW], 0, messages);
-      g_list_free(messages);
+	messages = g_list_reverse(messages);
+	g_signal_emit(G_OBJECT(mailbox),
+		      libbalsa_mailbox_signals[MESSAGES_NEW], 0, messages);
+	g_list_free(messages);
     }
 
     libbalsa_mailbox_set_unread_messages_flag(mailbox,
@@ -945,7 +946,7 @@ libbalsa_mailbox_sync_backend_real(LibBalsaMailbox * mailbox,
          message_list = g_list_next(message_list)) {
 	current_message = LIBBALSA_MESSAGE(message_list->data);
 	if (current_message->flags & LIBBALSA_MESSAGE_FLAG_DELETED) {
-	    p=g_list_append(p, current_message);
+	    p=g_list_prepend(p, current_message);
             if (delete)
                 q = g_list_prepend(q, message_list);
 	}

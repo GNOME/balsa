@@ -705,9 +705,10 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
 
     /* convert pointer array to GList */
     for (i = 0; message_array[i]; i++)
-        messages = g_list_append(messages, message_array[i]);
+        messages = g_list_prepend(messages, message_array[i]);
 
     g_return_if_fail(messages);
+    messages = g_list_reverse(messages);
     orig_mailbox = ((LibBalsaMessage *) messages->data)->mailbox;
 
     /* find the node and mailbox */
@@ -1612,7 +1613,7 @@ balsa_mblist_scan_mailbox_node(BalsaMailboxNode * mbnode)
                  || (!mbnode->mailbox && mbnode->server
                      && mbnode->server->type == LIBBALSA_SERVER_IMAP))
                 && !mbnode->scanned) {
-                list = g_list_append(list, mbnode);
+                list = g_list_prepend(list, mbnode);
             }
     } else
         g_print("mblist_scan_mailbox_node: didn't find mbnode.\n");

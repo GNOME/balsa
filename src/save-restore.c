@@ -1235,7 +1235,7 @@ config_identities_load()
 	g_free(val);
     }
 
-    if (g_list_length(balsa_app.identities) == 0)
+    if (!balsa_app.identities)
         balsa_app.identities = 
 	    g_list_append(balsa_app.identities,
 			  libbalsa_identity_new_config(BALSA_CONFIG_PREFIX

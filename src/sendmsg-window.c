@@ -3052,9 +3052,10 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	    for (list = bsmsg->orig_message->references; list;
 		 list = list->next) {
 		message->references =
-		    g_list_append(message->references,
+		    g_list_prepend(message->references,
 				  g_strdup(list->data));
 	    }
+	    message->references = g_list_reverse(message->references);
 	}
 	footime = localtime(&bsmsg->orig_message->date);
 	strftime(recvtime, sizeof(recvtime),

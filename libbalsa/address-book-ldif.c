@@ -313,15 +313,15 @@ static void expand_addr_list(LibBalsaAddress *address, GList *ab_list)
 	LibBalsaAddress *ref=find_addr(ab_list, member_data);
 
 	if(ref) {
-	    member_list=g_list_append(member_list, ref);
+	    member_list=g_list_prepend(member_list, ref);
 	    g_object_ref(ref);
 	    g_free(member_data);
 	} else
-            notfound = g_list_append(notfound, member_data);
+            notfound = g_list_prepend(notfound, member_data);
     }
     g_list_free(address->address_list);
-    address->address_list = notfound;
-    address->member_list=member_list;
+    address->address_list = g_list_reverse(notfound);
+    address->member_list=g_list_reverse(member_list);
 }
 
 static void expand_ldif_addr(GList *ab_list)
@@ -387,10 +387,11 @@ load_ldif_file(LibBalsaAddressBook *ab)
 	if (line[0] == '\0') {
 	    LibBalsaAddress *address;
 	    if (address_list) {
-		address = address_new_prefill(address_list, nickname, 
+		address = address_new_prefill(g_list_reverse(address_list),
+					      nickname, 
 					      givenname, surname, fullname,
 					      organization, id);
-		list = g_list_append(list, address);
+		list = g_list_prepend(list, address);
 		address_list = NULL;
 	    } else {            /* record without e-mail address, ignore */
 		g_free(id);
@@ -433,8 +434,8 @@ load_ldif_file(LibBalsaAddressBook *ab)
 	}
 
 	if (g_ascii_strncasecmp(line, "member:", 7) == 0) {
-		address_list = g_list_append(address_list, 
-					 g_strdup(g_strchug(line+7)));
+		address_list = g_list_prepend(address_list, 
+					      g_strdup(g_strchug(line+7)));
 	    continue;
 	}
 
@@ -442,8 +443,8 @@ load_ldif_file(LibBalsaAddressBook *ab)
 	 * fetch all e-mail fields
 	 */
 	if (g_ascii_strncasecmp(line, "mail:", 5) == 0) {
-	    address_list = g_list_append(address_list, 
-					 g_strdup(g_strchug(line + 5)));
+	    address_list = g_list_prepend(address_list, 
+					  g_strdup(g_strchug(line + 5)));
 	}
     }
     fclose(gc);
@@ -457,7 +458,7 @@ load_ldif_file(LibBalsaAddressBook *ab)
 
 	    /* FIXME: Split into Firstname and Lastname... */
 
-	    list = g_list_append(list, address);
+	    list = g_list_prepend(list, address);
 	} else {                /* record without e-mail address, ignore */
 	    g_free(id);
 	    g_free(nickname);

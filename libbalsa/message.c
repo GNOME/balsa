@@ -517,7 +517,7 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 	if(!mutt_append_message(handle->context,
 				CLIENT_CONTEXT(message->mailbox), cur, 
 				0,0))
-	    d = g_list_append(d, message);
+	    d = g_list_prepend(d, message);
 	else
 	    r = FALSE;
     }
@@ -525,6 +525,8 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 
     /* it would be faster to inline real_set_deleted_flag but this is
        cleaner */
+    /* FIXME : once more is order relevant here ? */
+    d = g_list_reverse(d);
     libbalsa_messages_delete(d);
     g_list_free(d);
 
@@ -1221,8 +1223,9 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
             LibBalsaAddress *addr =
                 libbalsa_address_new_from_libmutt(addy);
             if (addr)
-                message->to_list = g_list_append(message->to_list, addr);
+                message->to_list = g_list_prepend(message->to_list, addr);
         }
+	message->to_list = g_list_reverse(message->to_list);
     }
 
     if (!message->cc_list) {
@@ -1231,8 +1234,9 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
             LibBalsaAddress *addr =
                 libbalsa_address_new_from_libmutt(addy);
             if (addr)
-                message->cc_list = g_list_append(message->cc_list, addr);
+                message->cc_list = g_list_prepend(message->cc_list, addr);
         }
+	message->cc_list = g_list_reverse(message->cc_list);
     }
 
     if (!message->bcc_list) {
@@ -1241,8 +1245,9 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
             LibBalsaAddress *addr =
                 libbalsa_address_new_from_libmutt(addy);
             if (addr)
-                message->bcc_list = g_list_append(message->bcc_list, addr);
+                message->bcc_list = g_list_prepend(message->bcc_list, addr);
         }
+	message->bcc_list = g_list_reverse(message->bcc_list);
     }
 
     if (!message->in_reply_to && cenv->in_reply_to) {
@@ -1284,12 +1289,13 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
     if (!message->message_id)
         message->message_id = g_strdup(cenv->message_id);
 
-    if (!message->references)
+    if (!message->references) {
         for (tmp = cenv->references; tmp != NULL; tmp = tmp->next) {
-            message->references = g_list_append(message->references,
-                                                g_strdup(tmp->data));
+            message->references = g_list_prepend(message->references,
+						 g_strdup(tmp->data));
         }
-
+	message->references = g_list_reverse(message->references);	
+    }
     /* more! */
     /* FIXME: message->references_for_threading is just the reverse of
      * message->references; is there any reason to clutter up the

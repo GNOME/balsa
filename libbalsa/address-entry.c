@@ -505,14 +505,14 @@ libbalsa_strsplit(const gchar *str, gchar delimiter)
 	if (*current == '"') quoted = !quoted;
 	else if ( (!quoted) && (*current == delimiter) ) {
             glist =
-                g_list_append(glist,
+                g_list_prepend(glist,
                               libbalsa_emailData_new(old, current - old));
 	    old=current+1;
 	}
     }
     glist =
-        g_list_append(glist, libbalsa_emailData_new(old, current - old));
-    return glist;
+        g_list_prepend(glist, libbalsa_emailData_new(old, current - old));
+    return g_list_reverse(glist);
 }
 
 

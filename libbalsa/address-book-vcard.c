@@ -269,7 +269,7 @@ static void load_vcard_file(LibBalsaAddressBook *ab)
 
 		address->id = id ? id : g_strdup(_("No-Id"));
 
-		address->address_list = address_list;
+		address->address_list = g_list_reverse(address_list);
 
 		if (name) {
                     gint bread, bwritten;
@@ -324,7 +324,7 @@ static void load_vcard_file(LibBalsaAddressBook *ab)
 	    gchar *ptr = strchr(string+6, ':');
 	    if (ptr) {
 		address_list =
-		    g_list_append(address_list, g_strdup(ptr + 1));
+		    g_list_prepend(address_list, g_strdup(ptr + 1));
 	    }
 	}
     }

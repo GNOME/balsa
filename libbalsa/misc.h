@@ -37,7 +37,6 @@ gint g_list_index (GList * list, gpointer data);
 
 gchar *address_to_gchar(Address *addr);
 gchar *make_string_from_list (GList *);
-GList *make_list_from_string (gchar *);
 
 size_t readfile (FILE * fp, char **buf);
 

@@ -1211,7 +1211,6 @@ address_free (Address * address)
 
 
 
-/* internal c-client translation */
 static Address *
 translate_address (ADDRESS * caddr)
 {
@@ -1224,6 +1223,24 @@ translate_address (ADDRESS * caddr)
   address->mailbox = g_strdup (caddr->mailbox);
 
   return address;
+}
+
+
+GList *
+make_list_from_string (gchar * the_str)
+{
+  ADDRESS *address = NULL;
+  Address *addr = NULL;
+  GList *list = NULL;
+  address = rfc822_parse_adrlist (address, the_str);
+
+  while (address)
+    {
+      addr = translate_address (address);
+      list = g_list_append (list, addr);
+      address = address->next;
+    }
+  return list;
 }
 
 

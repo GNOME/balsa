@@ -26,6 +26,7 @@
 #include <fcntl.h>
 
 #include <gnome.h>
+
 #include "mailbox.h"
 #include "misc.h"
 
@@ -144,7 +145,7 @@ make_string_from_list (GList * the_list)
   while (list)
     {
       addy = list->data;
-      gs = g_string_append(gs,address_to_gchar(addy));
+      gs = g_string_append (gs, address_to_gchar (addy));
 
       if (list->next)
 	gs = g_string_append (gs, ", ");
@@ -154,12 +155,6 @@ make_string_from_list (GList * the_list)
   retc = g_strdup (gs->str);
   g_string_free (gs, 1);
   return retc;
-}
-
-GList *
-make_list_from_string (gchar * the_str)
-{
-  return NULL;
 }
 
 size_t

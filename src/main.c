@@ -29,23 +29,23 @@
 
 #include "main.h"
 
-#include "balsa-simple-srv.c"
+#include "balsa-impl.c"
 
-void Exception(CORBA_Environment*);
+void Exception (CORBA_Environment *);
 
 void
-Exception(CORBA_Environment* ev)
+Exception (CORBA_Environment * ev)
 {
-    switch( ev->_major )
+  switch (ev->_major)
     {
     case CORBA_SYSTEM_EXCEPTION:
-      g_log("BALSA Server", G_LOG_LEVEL_DEBUG, "CORBA system exception %s.\n",
-	       CORBA_exception_id(ev));
-      exit ( 1 );
+      g_log ("BALSA Server", G_LOG_LEVEL_DEBUG, "CORBA system exception %s.\n",
+	     CORBA_exception_id (ev));
+      exit (1);
     case CORBA_USER_EXCEPTION:
-      g_log("BALSA Server", G_LOG_LEVEL_DEBUG, "CORBA user exception: %s.\n",
-	       CORBA_exception_id( ev ) );
-      exit ( 1 );
+      g_log ("BALSA Server", G_LOG_LEVEL_DEBUG, "CORBA user exception: %s.\n",
+	     CORBA_exception_id (ev));
+      exit (1);
     default:
       break;
     }
@@ -55,38 +55,38 @@ Exception(CORBA_Environment* ev)
 int
 main (int argc, char *argv[])
 {
-  CORBA_ORB                 orb;
-  CORBA_Environment         ev;
-  PortableServer_ObjectId*  oid;
-  balsa_simple_send         balsa_servant;
-  PortableServer_POA        root_poa;
+  CORBA_ORB orb;
+  CORBA_Environment ev;
+  PortableServer_ObjectId *oid;
+  balsa_mail_send balsa_servant;
+  PortableServer_POA root_poa;
   PortableServer_POAManager pm;
-  CORBA_char*               objref;
+  CORBA_char *objref;
 
-  
-  CORBA_exception_init(&ev);
-  orb = gnome_CORBA_init("balsa", NULL, &argc, argv, 0, NULL, &ev);
-  Exception(&ev);
 
-  root_poa = (PortableServer_POA)CORBA_ORB_resolve_initial_references(orb, "RootPOA", &ev);
-  Exception(&ev);
-  
-  balsa_servant = impl_balsa_simple_send__create(root_poa, &ev);
-  Exception(&ev);
+  CORBA_exception_init (&ev);
+  orb = gnome_CORBA_init ("balsa", NULL, &argc, argv, 0, NULL, &ev);
+  Exception (&ev);
 
-  pm = PortableServer_POA__get_the_POAManager(root_poa, &ev);
-  Exception(&ev);
-  
-  PortableServer_POAManager_activate(pm, &ev);
-  Exception(&ev);
-  
-  objref = CORBA_ORB_object_to_string(orb, balsa_servant, &ev);
+  root_poa = (PortableServer_POA) CORBA_ORB_resolve_initial_references (orb, "RootPOA", &ev);
+  Exception (&ev);
 
-  printf("%s\n", objref);
-  fflush(stdout);
+  balsa_servant = impl_balsa_mail_send__create (root_poa, &ev);
+  Exception (&ev);
+
+  pm = PortableServer_POA__get_the_POAManager (root_poa, &ev);
+  Exception (&ev);
+
+  PortableServer_POAManager_activate (pm, &ev);
+  Exception (&ev);
+
+  objref = CORBA_ORB_object_to_string (orb, balsa_servant, &ev);
+
+  printf ("%s\n", objref);
+  fflush (stdout);
 
   init_balsa_app (argc, argv);
-  
+
   gtk_main ();
   return 0;
 }
@@ -160,7 +160,7 @@ balsa_exit (void)
   if (balsa_app.proplist)
     config_global_save ();
 
-  gnome_sound_shutdown();
+  gnome_sound_shutdown ();
 
   gtk_exit (0);
 }

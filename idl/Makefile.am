@@ -14,7 +14,7 @@ BUILT_SOURCES = balsa-skels.c \
 libbalsasrv_a_SOURCES = \
 	balsa-skels.c \
 	balsa-common.c     \
-	balsa-simple-srv.c \
+	balsa-impl.c \
 	balsa.h
 
 $(BUILT_SOURCES): balsa.idl

@@ -22,6 +22,6 @@
 #ifndef __STORE_ADDRESS_DIALOG_H__
 #define __STORE_ADDRESS_DIALOG_H__
 
-void balsa_store_address(GtkWidget * widget, gpointer index);
+void balsa_store_address(GList * messages);
 
 #endif

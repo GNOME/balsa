@@ -2499,12 +2499,14 @@ undelete_message_cb(GtkWidget * widget, gpointer data)
 static void
 store_address_cb(GtkWidget * widget, gpointer data)
 {
-    g_return_if_fail(balsa_window_find_current_index(BALSA_WINDOW(data)) !=
-                     NULL);
+    GtkWidget *index = balsa_window_find_current_index(BALSA_WINDOW(data));
+    GList *messages;
 
-    balsa_store_address(widget,
-                        balsa_window_find_current_index(BALSA_WINDOW
-                                                        (data)));
+    g_assert(index != NULL);
+
+    messages = balsa_index_selected_list(BALSA_INDEX(index));
+    balsa_store_address(messages);
+    g_list_free(messages);
 }
 
 static void

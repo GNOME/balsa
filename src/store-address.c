@@ -25,93 +25,160 @@
 #include <string.h>
 
 #include "balsa-app.h"
-#include "balsa-index.h"
 #include "store-address.h"
 
 #include "libbalsa.h"
 
 /* global data */
-struct store_address_info {
+typedef struct _StoreAddressInfo StoreAddressInfo;
+struct _StoreAddressInfo {
     LibBalsaAddressBook *address_book;
     LibBalsaAddressBook *current_address_book;
+    GList *message_list;
     GList *entries_list;
     GtkWidget *notebook;
-    BalsaIndex *index;
+    GtkWidget *dialog;
 };
 enum StoreAddressResponse {
     SA_RESPONSE_SAVE = 1,
 };
 
 /* statics */
-GtkWidget *store_address_dialog(struct store_address_info * info);
-static void store_address_from_entries(struct store_address_info * info,
+GtkWidget *store_address_dialog(StoreAddressInfo * info);
+static void store_address_weak_notify(StoreAddressInfo * info,
+                                      gpointer message);
+static void store_address_response(GtkWidget * dialog, gint response,
+                                   StoreAddressInfo *info);
+static void store_address_free(StoreAddressInfo * info);
+static void store_address_from_entries(StoreAddressInfo * info,
                                        GtkWidget ** entries);
-static GtkWidget *store_address_book_frame(struct store_address_info * info);
-static GtkWidget *store_address_note_frame(struct store_address_info * info);
+static GtkWidget *store_address_book_frame(StoreAddressInfo * info);
+static GtkWidget *store_address_note_frame(StoreAddressInfo * info);
 static void store_address_book_menu_cb(GtkWidget * widget, 
-                                       struct store_address_info * info);
-static void store_address_add_address(struct store_address_info * info,
+                                       StoreAddressInfo * info);
+static void store_address_add_address(StoreAddressInfo * info,
                                       const gchar * label,
                                       LibBalsaAddress * address);
-static void store_address_add_glist(struct store_address_info * info,
+static void store_address_add_glist(StoreAddressInfo * info,
                                     const gchar * label, GList * list);
 
 /* 
  * public interface: balsa_store_address
  */
+#define BALSA_STORE_ADDRESS_KEY "balsa-store-address"
 void
-balsa_store_address(GtkWidget * widget, gpointer user_data)
+balsa_store_address(GList * messages)
 {
-    GtkWidget *dialog;
-    struct store_address_info *info;
+    StoreAddressInfo *info = NULL;
+    GList *message_list = NULL;
+    GList *list;
 
-    g_return_if_fail(widget != NULL);
-    g_return_if_fail(user_data != NULL);
+    for (list = messages; list; list = g_list_next(list)) {
+        gpointer data = g_object_get_data(G_OBJECT(list->data),
+                                          BALSA_STORE_ADDRESS_KEY);
 
+        if (data)
+            info = data;
+        else
+            message_list = g_list_prepend(message_list, list->data);
+    }
 
-    info = g_new(struct store_address_info, 1);
-    info->index = BALSA_INDEX(user_data);
-    info->entries_list = NULL;
+    if (!message_list) {
+        /* All messages are already showing. */
+        if (info)
+            gdk_window_raise(info->dialog->window);
+        return;
+    }
+
+    info = g_new(StoreAddressInfo, 1);
     info->current_address_book = NULL;
-    dialog = store_address_dialog(info);
+    info->message_list = message_list;
+    info->entries_list = NULL;
+    info->dialog = store_address_dialog(info);
 
-    if (info->entries_list) {
-        GtkNotebook *notebook = GTK_NOTEBOOK(info->notebook);
-        gint response;
-
-        /* response ==  0 => OK
-         * response ==  1 => save
-         * response ==  2 => close
-         * response == -1    if user closed dialog using the window
-         *                   decorations */
-        while ((response = gtk_dialog_run(GTK_DIALOG(dialog))) 
-               == GTK_RESPONSE_OK || response == SA_RESPONSE_SAVE) {
-            gint page = gtk_notebook_get_current_page(notebook);
-            GList *list = g_list_nth(info->entries_list, page);
-            store_address_from_entries(info, list->data);
-            if (response == GTK_RESPONSE_OK)
-                break;
-        }
-        g_list_foreach(info->entries_list, (GFunc) g_free, NULL);
-        g_list_free(info->entries_list);
-    } else
+    if (!info->entries_list) {
         gnome_appbar_set_status(balsa_app.appbar,
                                 _("Store address: no addresses"));
-    gtk_widget_destroy(dialog);
+        store_address_free(info);
+        return;
+    }
+
+    for (list = message_list; list; list = g_list_next(list)) {
+        g_object_set_data(G_OBJECT(list->data),
+                          BALSA_STORE_ADDRESS_KEY, info);
+        g_object_weak_ref(G_OBJECT(list->data),
+                          (GWeakNotify) store_address_weak_notify, info);
+    }
+
+    g_signal_connect(G_OBJECT(info->dialog), "response",
+                     G_CALLBACK(store_address_response), info);
+    gtk_widget_show_all(GTK_WIDGET(info->dialog));
+}
+
+/* Weak notify that a message was deleted; remove it from our list. */
+static void
+store_address_weak_notify(StoreAddressInfo * info, gpointer message)
+{
+    info->message_list = g_list_remove(info->message_list, message);
+    if (!info->message_list)
+        gtk_dialog_response(GTK_DIALOG(info->dialog), GTK_RESPONSE_NONE);
+}
+
+/* Response signal handler for the dialog. */
+static void
+store_address_response(GtkWidget * dialog, gint response,
+                       StoreAddressInfo * info)
+{
+    GtkNotebook *notebook = GTK_NOTEBOOK(info->notebook);
+    GList *list;
+
+    /* response ==  0 => OK
+     * response ==  1 => save
+     * response ==  2 => close
+     * response == -1    if user closed dialog using the window
+     *                   decorations */
+    if (response == GTK_RESPONSE_OK || response == SA_RESPONSE_SAVE) {
+        /* Save the current address. */
+        gint page = gtk_notebook_get_current_page(notebook);
+        GList *list = g_list_nth(info->entries_list, page);
+        store_address_from_entries(info, list->data);
+        if (response == SA_RESPONSE_SAVE)
+            /* Keep the dialog open. */
+            return;
+    }
+
+    /* Let go of remaining messages. */
+    for (list = info->message_list; list; list = g_list_next(list)) {
+        g_object_set_data(G_OBJECT(list->data), BALSA_STORE_ADDRESS_KEY,
+                          NULL);
+        g_object_weak_unref(G_OBJECT(list->data),
+                            (GWeakNotify) store_address_weak_notify, info);
+    }
+    g_list_foreach(info->entries_list, (GFunc) g_free, NULL);
+    g_list_free(info->entries_list);
+    store_address_free(info);
+}
+
+/* Clean up when we're done, or if there's nothing to do. */
+static void
+store_address_free(StoreAddressInfo * info)
+{
+    g_list_free(info->message_list);
+    gtk_widget_destroy(info->dialog);
     g_free(info);
 }
 
 /* store_address_dialog:
  * create the main dialog */
 GtkWidget *
-store_address_dialog(struct store_address_info * info)
+store_address_dialog(StoreAddressInfo * info)
 {
     GtkWidget *dialog =
         gtk_dialog_new_with_buttons(_("Store Address"),
                                     GTK_WINDOW(balsa_app.main_window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK,
-                                    _("_Save"),  SA_RESPONSE_SAVE,
+                                    GTK_STOCK_SAVE,  SA_RESPONSE_SAVE,
                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                     NULL);
     GtkWidget *vbox = GTK_DIALOG(dialog)->vbox;
@@ -125,14 +192,13 @@ store_address_dialog(struct store_address_info * info)
                        gtk_label_new(_("Save this address "
                                        "and close the dialog?")),
                        TRUE, TRUE, 0);
-    gtk_widget_show_all(dialog);
     return dialog;
 }
 
 /* store_address_from_entries:
  * make the actual address book entry */
 static void
-store_address_from_entries(struct store_address_info * info,
+store_address_from_entries(StoreAddressInfo * info,
                            GtkWidget ** entries)
 {
     LibBalsaAddress *address;
@@ -197,7 +263,7 @@ store_address_from_entries(struct store_address_info * info,
 /* store_address_book_frame:
  * create the frame containing the address book menu */
 static GtkWidget *
-store_address_book_frame(struct store_address_info * info)
+store_address_book_frame(StoreAddressInfo * info)
 {
     GList *ab_list;
     GtkWidget *frame = gtk_frame_new(_("Choose Address Book"));
@@ -216,7 +282,6 @@ store_address_book_frame(struct store_address_info * info)
 		info->current_address_book = address_book;
 
 	    menu_item = gtk_menu_item_new_with_label(address_book->name);
-	    gtk_widget_show(menu_item);
 	    gtk_menu_shell_append(GTK_MENU_SHELL(ab_menu), menu_item);
 
             info->address_book = address_book;
@@ -230,11 +295,9 @@ store_address_book_frame(struct store_address_info * info)
 
 	    ab_list = g_list_next(ab_list);
 	}
-	gtk_widget_show(ab_menu);
     }
     ab_option = gtk_option_menu_new();
     gtk_option_menu_set_menu(GTK_OPTION_MENU(ab_option), ab_menu);
-    gtk_widget_show(ab_option);
     gtk_container_add(GTK_CONTAINER(frame), ab_option);
     return frame;
 }
@@ -242,26 +305,26 @@ store_address_book_frame(struct store_address_info * info)
 /* store_address_note_frame:
  * create the frame containing the notebook with address information */
 static GtkWidget *
-store_address_note_frame(struct store_address_info *info)
+store_address_note_frame(StoreAddressInfo *info)
 {
     GtkWidget *frame = gtk_frame_new(_("Choose Address"));
     LibBalsaMessage *message;
-    GList *list, *l = balsa_index_selected_list(info->index);
+    GList *list;
 
     info->notebook = gtk_notebook_new();
     gtk_notebook_set_scrollable(GTK_NOTEBOOK(info->notebook), TRUE);
     gtk_container_set_border_width(GTK_CONTAINER(info->notebook), 5);
     gtk_container_add(GTK_CONTAINER(frame), info->notebook);
 
-    for (list = g_list_last(l); list; list = g_list_previous(list)) {
-        message = list->data;
+    for (list = info->message_list; list; list = g_list_next(list)) {
+        message = LIBBALSA_MESSAGE(list->data);
         if (message->from)
             store_address_add_address(info, _("From:"), message->from);
         store_address_add_glist(info, _("To:"), message->to_list);
         store_address_add_glist(info, _("Cc:"), message->cc_list);
         store_address_add_glist(info, _("Bcc:"), message->bcc_list);
     }
-    g_list_free(l);
+
     return frame;
 }
 
@@ -269,7 +332,7 @@ store_address_note_frame(struct store_address_info *info)
  * callback for the address book menu */
 static void
 store_address_book_menu_cb(GtkWidget * widget, 
-                           struct store_address_info * info)
+                           StoreAddressInfo * info)
 {
     info->current_address_book = info->address_book;
 }
@@ -277,7 +340,7 @@ store_address_book_menu_cb(GtkWidget * widget,
 /* store_address_add_address:
  * make a new page in the notebook */
 static void
-store_address_add_address(struct store_address_info * info,
+store_address_add_address(StoreAddressInfo * info,
                           const gchar * lab, LibBalsaAddress * address)
 {
     gchar *text;
@@ -430,7 +493,7 @@ store_address_add_address(struct store_address_info * info,
  * take a GList of addresses and pass them one at a time to
  * store_address_add_address */
 static void
-store_address_add_glist(struct store_address_info * info,
+store_address_add_glist(StoreAddressInfo * info,
                         const gchar * label, GList * list)
 {
     while (list) {

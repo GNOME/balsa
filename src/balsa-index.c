@@ -209,6 +209,9 @@ static GNode *bndx_make_tree(BalsaIndex * index, GtkTreeIter * iter,
 static void bndx_copy_tree(BalsaIndex * index, GNode * node,
                            GtkTreeIter * parent_iter);
 
+/* Other callbacks. */
+static void bndx_store_address(GtkWidget * widget, gpointer data);
+
 static GtkTreeViewClass *parent_class = NULL;
 
 /* Class type. */
@@ -1558,6 +1561,14 @@ bndx_view_source(GtkWidget * widget, gpointer data)
                                         NULL);
 }
 
+static void
+bndx_store_address(GtkWidget * widget, gpointer data)
+{
+    GList *messages = balsa_index_selected_list(BALSA_INDEX(data));
+
+    balsa_store_address(messages);
+    g_list_free(messages);
+}
 
 static void
 balsa_index_selected_list_func(GtkTreeModel * model, GtkTreePath * path,
@@ -1864,7 +1875,7 @@ bndx_popup_menu_create(BalsaIndex * index)
         BALSA_PIXMAP_MENU_FORWARD, N_("Forward _Inline..."),
                 GTK_SIGNAL_FUNC(balsa_message_forward_inline)}, {
         GNOME_STOCK_BOOK_RED, N_("_Store Address..."),
-                GTK_SIGNAL_FUNC(balsa_store_address)}};
+                GTK_SIGNAL_FUNC(bndx_store_address)}};
     GtkWidget *menu, *menuitem, *submenu;
     unsigned i;
 

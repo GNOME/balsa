@@ -1,3 +1,8 @@
+2003-12-02 05:17  PeterB
+
+	* src/balsa-message.c: Display message/rfc822 (Pawel); simplify
+	display-part recursion.
+
 2003-12-01 20:42  PeterB
 
 	* libbalsa/body.c: Store the content of a message/rfc822 message

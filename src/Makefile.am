@@ -21,8 +21,8 @@ balsa_SOURCES =	\
 
 INCLUDES=-I. -I../libbalsa $(GNOME_INCLUDEDIR)
 
-balsa_LDADD = $(top_builddir)/libbalsa/libbalsa.a \
-	$(top_builddir)/libmutt/libmutt.a \
+balsa_LDADD = $(top_builddir)/libmutt/libmutt.a \
+	$(top_builddir)/libbalsa/libbalsa.a \
 	$(GNOME_LIBDIR) \
 	$(GNOMEUI_LIBS) \
 	$(GTKXMHTML_LIBS) \

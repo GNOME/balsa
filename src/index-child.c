@@ -304,7 +304,7 @@ message_status_set_answered_cb (GtkWidget * widget, Message * message)
 {
   g_return_if_fail (widget != NULL);
 
-  message_answer (message);
+  message_reply (message);
 }
 
 

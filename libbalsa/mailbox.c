@@ -325,7 +325,7 @@ gint
 mailbox_check_new_messages (Mailbox * mailbox)
 {
   LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
-  RETURN_VAL_IF_CLIENT_CONTEXT_CLOSED (mailbox, FALSE);
+  RETURN_VAL_IF_CONTEXT_CLOSED (mailbox, FALSE);
 
   mx_check_mailbox (CLIENT_CONTEXT (mailbox), NULL);
 

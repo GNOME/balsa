@@ -22,4 +22,10 @@
 #include <string.h>
 #include <gnome.h>
 
+void mutt_message (const char *fmt, ...)
+{
+}
 
+void mutt_exit (int code)
+{
+}

@@ -133,10 +133,12 @@ static GnomeUIInfo message_menu[] =
 static GnomeUIInfo mailbox_menu[] =
 {
     /* C */
+#if 0
   {
     GNOME_APP_UI_ITEM, N_ ("List"), NULL, mblist_window_cb, NULL,
     NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_PROP, 'C', 0, NULL
   },
+#endif
   GNOMEUIINFO_ITEM_STOCK ("Close", NULL, mailbox_close_child, GNOME_STOCK_MENU_CLOSE),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_END

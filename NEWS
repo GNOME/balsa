@@ -1,3 +1,10 @@
+* Balsa-1.4.2 release. Release date 2002-12-22
+
+- fix crash on concurrent access to local mailboxes.
+- spell checking fixes.
+- numerous message filtering fixes.
+- incremental search fixes.
+
 * Balsa-1.4.1 release. Release date 2002-09-14
 
 - several filter-related bugs fixed.

@@ -41,6 +41,27 @@ static proplist_t config_mailbox_get_by_name (gchar * name);
 static proplist_t config_mailbox_get_key (proplist_t mailbox);
 static gint config_mailbox_init (proplist_t mbox, gchar * key);
 static gint config_mailbox_get_highest_number (proplist_t accounts);
+static gchar *rot (gchar * pass);
+
+static gchar *
+rot (gchar * pass)
+{
+  gchar *buff;
+  gint len = 0, i = 0;
+  len = strlen (pass);
+  buff = g_strdup (pass);
+
+  for (i = 0; i < len; i++)
+    {
+      if ((buff[i] <= 'M' && buff[i] >= 'A')
+	  || (buff[i] <= 'm' && buff[i] >= 'a'))
+	buff[i] += 13;
+      else if ((buff[i] <= 'Z' && buff[i] >= 'N')
+	       || (buff[i] <= 'z' && buff[i] >= 'n'))
+	buff[i] -= 13;
+    }
+  return buff;
+}
 
 /* Load the configuration from the specified file. The filename is
    taken to be relative to the user's home directory, as if "~/" had
@@ -179,9 +200,14 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
 			   MAILBOX_POP3 (mailbox)->user);
       /* Do not save the password if the field is NULL.  This is here
          so that asving the password to the balsarc file can be optional */
-      if (MAILBOX_POP3 (mailbox)->passwd != NULL)
-	pl_dict_add_str_str (mbox_dict, "Password",
-			     MAILBOX_POP3 (mailbox)->passwd);
+      if (MAILBOX_POP3 (mailbox)->passwd)
+	{
+	  gchar *buff;
+	  buff = rot (MAILBOX_POP3 (mailbox)->passwd);
+	  pl_dict_add_str_str (mbox_dict, "Password",
+			       buff);
+	  g_free (buff);
+	}
       pl_dict_add_str_str (mbox_dict, "Server",
 			   MAILBOX_POP3 (mailbox)->server);
 
@@ -213,9 +239,13 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
       pl_dict_add_str_str (mbox_dict, "Username",
 			   MAILBOX_IMAP (mailbox)->user);
       if (MAILBOX_IMAP (mailbox)->passwd != NULL)
-	pl_dict_add_str_str (mbox_dict, "Password",
-			     MAILBOX_IMAP (mailbox)->passwd);
-
+	{
+	  gchar *buff;
+	  buff = rot (MAILBOX_IMAP (mailbox)->passwd);
+	  pl_dict_add_str_str (mbox_dict, "Password",
+			       buff);
+	  g_free (buff);
+	}
       break;
 
     default:
@@ -433,7 +463,12 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       MAILBOX_POP3 (mailbox)->user = g_strdup (field);
 
       if ((field = pl_dict_get_str (mbox, "Password")) != NULL)
-	MAILBOX_POP3 (mailbox)->passwd = g_strdup (field);
+	{
+	  gchar *buff;
+	  buff = rot (field);
+	  MAILBOX_POP3 (mailbox)->passwd = g_strdup (buff);
+	  g_free (buff);
+	}
       else
 	MAILBOX_POP3 (mailbox)->passwd = NULL;
 
@@ -454,7 +489,12 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       MAILBOX_IMAP (mailbox)->user = g_strdup (field);
 
       if ((field = pl_dict_get_str (mbox, "Password")) != NULL)
-	MAILBOX_IMAP (mailbox)->passwd = g_strdup (field);
+	{
+	  gchar *buff;
+	  buff = rot (field);
+	  MAILBOX_IMAP (mailbox)->passwd = g_strdup (buff);
+	  g_free (buff);
+	}
       else
 	MAILBOX_IMAP (mailbox)->passwd = NULL;
 
@@ -464,7 +504,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 
       if ((field = pl_dict_get_str (mbox, "Port")) == NULL)
 	return FALSE;
-      MAILBOX_IMAP (mailbox)->port = atoi (field);
+      MAILBOX_IMAP (mailbox)->port = atol (field);
 
       if ((field = pl_dict_get_str (mbox, "Path")) == NULL)
 	return FALSE;

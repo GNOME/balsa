@@ -418,7 +418,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
         }
         libbalsa_mailbox_progress_notify(mailbox,
                                          LIBBALSA_NTFY_PROGRESS, i, msgcnt,
-                                         NULL);
+                                         "next message");
         f = mode->open(msg_path);
         if(pop_fetch_message(pop, i, dump_cb, f, &err)) {
             if(m->delete_from_server)

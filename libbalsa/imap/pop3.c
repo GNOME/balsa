@@ -80,6 +80,7 @@ struct PopHandle_ {
   /* various options */
   unsigned disable_apop:1;
   unsigned filter_cr:1;
+  unsigned over_ssl:1;
 };
 #define pop_can_do(pop, cap) ((pop)->capabilities[cap])
 
@@ -95,6 +96,7 @@ pop_set_option(PopHandle *pop, PopOption opt, gboolean state)
   switch(opt) {
   case IMAP_POP_OPT_DISABLE_APOP: pop->disable_apop = state; break;
   case IMAP_POP_OPT_FILTER_CR   : pop->filter_cr    = state; break;
+  case IMAP_POP_OPT_OVER_SSL    : pop->over_ssl     = state; break;
   }
 }
 
@@ -360,8 +362,13 @@ gboolean
 pop_connect(PopHandle *pop, const char *host, GError **err)
 {
   static const int SIO_BUFSZ=8192;
-  static const char service[] = "pop3";
+  static const char *service = "pop3";
   char line[POP_LINE_LEN];
+
+#ifdef USE_TLS
+  if(pop->over_ssl) service = "pop3s";
+#endif
+
   g_free(pop->host);
   pop->host = g_strdup(host);
 
@@ -379,6 +386,19 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
                 "Could not connect to %s", host); /* FIXME: translate */
     return FALSE;
   }
+#ifdef USE_TLS
+  if(pop->over_ssl) {
+    SSL *ssl = imap_create_ssl();
+    if(!ssl || !imap_setup_ssl(pop->sio, pop->host, ssl,
+                               pop->user_cb, pop->user_arg)) {
+      sio_detach(pop->sio); pop->sio = NULL; close(pop->sd);
+      pop->state = IMHS_DISCONNECTED;
+      g_set_error(err, IMAP_ERROR, IMAP_POP_CONNECT_ERROR,
+                  "Could not set up SSL");
+      return IMAP_UNSECURE;
+    }
+  }
+#endif
   if(pop->monitor_cb) 
     sio_set_monitorcb(pop->sio, pop->monitor_cb, pop->monitor_arg);
 

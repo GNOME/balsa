@@ -51,7 +51,8 @@ enum {
 
 typedef enum {
   IMAP_POP_OPT_DISABLE_APOP,
-  IMAP_POP_OPT_FILTER_CR
+  IMAP_POP_OPT_FILTER_CR,
+  IMAP_POP_OPT_OVER_SSL
 } PopOption;
 
 

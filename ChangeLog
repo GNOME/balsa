@@ -14,6 +14,7 @@
 	* src/ab-window.c: revoke libbalsa_option_menu() patch of 2004-03-07:
 	it was a bad idea.
 	* src/store-address.c, etc: ditto.
+	* libbalsa/imap/pop3.[hc]: implement pop3s for the sake of completness.
 
 2004-03-26 17:05  PeterB
 

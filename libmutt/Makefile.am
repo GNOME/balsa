@@ -24,7 +24,6 @@ libmutt_a_SOURCES = \
 	buffy.c 	\
 	charset.c 	\
 	copy.c 		\
-	curs_lib.c	\
 	date.c 		\
 	dotlock.c	\
 	flags.c 	\

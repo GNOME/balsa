@@ -301,12 +301,16 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     if((m->inbox) && (tmp_mailbox->messages)) {
 
 #ifdef BALSA_SHOW_ALL
-       GSList * filters= 
-           libbalsa_mailbox_filters_when(LIBBALSA_MAILBOX(m)->filters,
-                                         FILTER_WHEN_INCOMING);
+	GSList * filters; 
 
-       /* We apply filter if needed */
-       filters_run_on_messages(filters, tmp_mailbox->message_list);
+	/* Load associated filters if needed */
+	if (!mailbox->filters)
+	    libbalsa_mailbox_filters_load_config(mailbox);
+ 
+	filters = libbalsa_mailbox_filters_when(mailbox->filters,
+					      FILTER_WHEN_INCOMING);
+	filters_run_on_messages(filters, tmp_mailbox->message_list);
+	g_slist_free(filters);
 #endif /*BALSA_SHOW_ALL*/
 
 	if (!libbalsa_messages_move(tmp_mailbox->message_list, m->inbox)) {    

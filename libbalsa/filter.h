@@ -182,8 +182,14 @@ gint filters_prepare_to_run(GSList * filters);
 
 gboolean filters_run_on_messages(GSList * filter_list, GList * messages);
 
+/* libalsa_extract_new_messages : returns a sublist of the messages list containing all
+   "new" messages, ie just retrieved mails
+*/
+
+GList * libbalsa_extract_new_messages(GList * messages);
+
 /*
- * libbalsa_filter_by_name()
+ * libbalsa_filter_get_by_name()
  * search in the filter list the filter of name fname or NULL if unfound
  */
 

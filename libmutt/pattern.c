@@ -113,6 +113,7 @@ static char LastSearchExpn[LONG_STRING] = { 0 }; /* expanded version of
 #define M_PDR_ERROR	0x0100
 #define M_PDR_ERRORDONE	(M_PDR_ERROR | M_PDR_DONE)
 
+#ifndef LIBMUTT
 
 int mutt_getvaluebychar (char ch, struct mapping_t *table)
 {
@@ -139,7 +140,6 @@ int mutt_which_case (const char *s)
   return REG_ICASE; /* case-insensitive */
 }
 
-#ifndef LIBMUTT
 static int
 msg_search (CONTEXT *ctx, regex_t *rx, char *buf, size_t blen, int op, int msgno)
 {
@@ -1224,9 +1224,7 @@ int mutt_pattern_func (int op, char *prompt)
   mutt_pattern_free (&pat);
   return 0;
 }
-#endif /* LIBMUTT */
 
-#ifndef LIBMUTT
 int mutt_search_command (int cur, int op)
 {
   int i, j;
@@ -1341,4 +1339,4 @@ int mutt_search_command (int cur, int op)
   mutt_error _("Not found.");
   return (-1);
 }
-#endif
+#endif  /* LIBMUTT */

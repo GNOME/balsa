@@ -36,7 +36,6 @@
 #include <stdlib.h>
 
 #ifdef LIBMUTT
-#define _(a) (a)
 #define sleep(a) 
 #endif
 

@@ -39,6 +39,10 @@
 #include "threads.h"
 #endif
 
+#ifdef BALSA_SHOW_ALL
+#include "mailbox-filter.h"
+#endif /*BALSA_SHOW_ALL*/
+
 enum {
     REMOVE_FILES,
     LAST_SIGNAL
@@ -60,6 +64,11 @@ static void libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
 static void libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
+
+#ifdef BALSA_SHOW_ALL
+static void
+run_filters_on_reception(LibBalsaMailbox * mailbox);
+#endif /* BALSA_SHOW_ALL */
 
 GtkType libbalsa_mailbox_local_get_type(void)
 {
@@ -222,6 +231,31 @@ libbalsa_mailbox_local_destroy(GtkObject * object)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
 }
 
+/* Helper function to run the "on reception" filters on a mailbox */
+
+#ifdef BALSA_SHOW_ALL
+static void
+run_filters_on_reception(LibBalsaMailbox * mailbox)
+{
+    GSList * filters;
+    GList * new_messages;
+
+    /* Load associated filters if needed */
+    if (!mailbox->filters)
+	config_mailbox_filters_load(LIBBALSA_MAILBOX(mailbox));
+
+    filters = libbalsa_mailbox_filters_when(LIBBALSA_MAILBOX(mailbox)->filters,FILTER_WHEN_INCOMING);
+    
+    g_print("Filters to run on mailbox %s ? %d\n",mailbox->name,filters!=NULL);
+    /* We apply filter if needed */
+
+    new_messages=libbalsa_extract_new_messages(mailbox->message_list);
+    filters_run_on_messages(filters, new_messages);
+    g_list_free(new_messages);
+    g_slist_free(filters);
+}
+#endif /*BALSA_SHOW_ALL*/    
+
 /* libbalsa_mailbox_local_open:
    THREADING: it is always called from a signal handler so the gdk lock
    is held on entry. The lock is released on the time-consuming open
@@ -276,6 +310,10 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
     gdk_threads_enter();
     libbalsa_mailbox_load_messages(mailbox);
     
+#ifdef BALSA_SHOW_ALL
+    run_filters_on_reception(mailbox);
+#endif /*BALSA_SHOW_ALL*/    
+
     /* increment the reference count */
 #ifdef DEBUG
     g_print(_("LibBalsaMailboxLocal: Opening %s Refcount: %d\n"),
@@ -334,6 +372,10 @@ libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
 		CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
 	    UNLOCK_MAILBOX(mailbox);
 	    libbalsa_mailbox_load_messages(mailbox);
+#ifdef BALSA_SHOW_ALL
+	    run_filters_on_reception(mailbox);
+#endif /*BALSA_SHOW_ALL*/    
+
 	} else {
 	    UNLOCK_MAILBOX(mailbox);
 	}

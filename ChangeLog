@@ -1,3 +1,10 @@
+2002-03-04  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/filter.[hc], libbalsa/mailbox_{local,pop3}.c: filter
+	incoming (emmanuel)
+
+	* libbalsa/libbalsa.c: have own mutt_perror()
+
 2002-03-01  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/sendmsg-window.c: attach->disposition, tag attachs

@@ -22,6 +22,7 @@
 
 #include "config.h"
 
+#include <errno.h>
 #include <glib.h>
 #include <gnome.h>
 
@@ -70,6 +71,16 @@ mutt_message(const char *fmt, ...)
 void
 mutt_exit(int code)
 {
+}
+
+void
+mutt_perror (const char *s)
+{
+  char *p = strerror (errno);
+
+  dprint (1, (debugfile, "%s: %s (errno = %d)\n", s, 
+      p ? p : "unknown error", errno));
+  mutt_error ("%s: %s (errno = %d)", s, p ? p : _("unknown error"), errno);
 }
 
 int
@@ -140,6 +151,11 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 #ifdef USE_SSL
     set_option(OPTSSLSYSTEMCERTS);
 #endif /* USE_SSL */
+    /* FIXME : I want libmutt to keep track of "new" messages 
+       We use this to know which messages have been just appended
+       to the mailbox, this way we can do automatic filtering
+       on incoming mails only */
+    set_option(OPTMARKOLD);
 
     FileMask.rx = (regex_t *) safe_malloc (sizeof (regex_t));
     REGCOMP(FileMask.rx,"!^\\.[^.]",0);

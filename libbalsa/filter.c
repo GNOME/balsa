@@ -248,12 +248,10 @@ filters_run_on_messages(GSList * filter_list, GList * messages)
     GSList * lst;
     GList * lst_messages;
     LibBalsaFilter * filt=NULL;
-    LibBalsaMailbox * source_mbox;
     gboolean result=FALSE;
 
     if (!filter_list || ! messages) return FALSE;
 
-    source_mbox=LIBBALSA_MESSAGE(messages->data)->mailbox;
     for (;messages;messages=g_list_next(messages)) {
 
 	match=0;
@@ -288,6 +286,7 @@ filters_run_on_messages(GSList * filter_list, GList * messages)
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Bad mailbox name for filter : %s"),filt->name);
 		else if (!libbalsa_messages_copy(filt->matching_messages,mbox))
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Error when copying messages"));
+		else if (mbox==balsa_app.trash) result=TRUE;
 		break;
 	    case FILTER_TRASH:
 		if (!balsa_app.trash || !libbalsa_messages_move(filt->matching_messages,balsa_app.trash))
@@ -300,6 +299,7 @@ filters_run_on_messages(GSList * filter_list, GList * messages)
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Bad mailbox name for filter : %s"),filt->name);
 		else if (!libbalsa_messages_move(filt->matching_messages,mbox))
 		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Error when moving messages"));
+		else if (mbox==balsa_app.trash) result=TRUE;
 		break;
 	    case FILTER_PRINT:
 		/* FIXME : to be implemented */
@@ -319,6 +319,20 @@ filters_run_on_messages(GSList * filter_list, GList * messages)
 	}
     }
     return result;
+}
+
+/* libbalsa_extract_new_messages : returns a sublist of the messages list containing all
+   "new" messages, ie just retrieved mails
+*/
+
+GList * libbalsa_extract_new_messages(GList * messages)
+{
+    GList * extracted=NULL;
+
+    for (;messages;messages=g_list_next(messages))
+	if (!LIBBALSA_MESSAGE(messages->data)->header->old)
+	    extracted = g_list_prepend(extracted,messages->data);
+    return extracted;
 }
 
 /*--------- End of Filtering functions -------------------------------*/

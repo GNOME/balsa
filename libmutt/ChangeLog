@@ -1,3 +1,9 @@
+2002-03-04  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* Makefile.am: remove curs_lib.c.
+	* parse.c: translate translatable strings.
+	* pattern.c: do not compile unused functions.
+	
 2002-02-28  Carlos Morgado  <chbm@chbm.nu>
 
 	* sendlib.c (mutt_write_mime_header): re-enable disposition: 

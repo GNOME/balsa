@@ -72,3 +72,18 @@ Nat's ideas:
  * It would be nice if the mailboxes in the mailbox list were always
    in some sort of consistent order.
 
+
+Jeff's ideas:
+ * Scan local folders periodically for new mail delivered and sorted
+   by procmail
+
+ * Auto-enable procmail features if a procmailrc is present
+
+ * Export filter rules in procmail format
+
+ * Various modes for folder update:  local sync with remote, local only,
+   remote only (with caching).
+
+ * Auto-download and use of IMAP "folder map" instead of manually
+   creating and binding each Balsa mailbox obj to a remote box
+

@@ -1,5 +1,12 @@
-2004-03-19 15:18  PeterB
+2004-03-19 21:51  PeterB
 
+	* src/: balsa-index.c, balsa-index.h: maintain list of selected
+	messages; check a message that leaves the list against the current
+	view-filter; keep multiple selections.
+	* libbalsa/mailbox_local.c: check the msg_tree when changing
+	view-filter.
+	* libbalsa/: mailbox.c, mailbox.h: implement
+	libbalsa_mailbox_msgno_deselected.
 	* libbalsa/: mailbox_maildir.c, mailbox_mh.c: be more careful
 	dereferencing message info array.
 

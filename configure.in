@@ -246,6 +246,7 @@ if test "x$with_esmtp" != xno  ; then
 	AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE,1,
 	         [Defined when libESMTP has TLS support.]))
     test "$with_esmtp" != yes && CPPFLAGS="$CPPFLAGS -I$with_esmtp/include"
+    LIBS="$LIBS -lesmtp"
 else
     AC_MSG_RESULT([no])
 fi

@@ -1,3 +1,9 @@
+2002-08-22  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/Makefile.am: 
+	* configure.in: 
+	fix build without esmtp
+
 2002-08-22  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/misc.c: format=flowed mistreated signatures. Fix it.

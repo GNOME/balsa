@@ -40,6 +40,27 @@
 #include "libbalsa.h"
 #include "address-entry.h"
 
+
+/* LibBalsaAddressEntry is typedef'd in address-entry.h, but the
+ * structure is declared here to keep it opaque */
+struct _LibBalsaAddressEntry {
+    GtkEntry parent;
+
+    GList *active;              /* A GList of email addresses.
+                                 * Caution! active may not
+                                 * point to the start of the list. */
+    gint focus;			/* Used to keep track of the validity of
+				   the 'input' variable. */
+    gchar *domain;		/* The domain to add if the user omits one. */
+    gint alias_start_pos,       /* Used with selection_start/stop_pos to */
+         alias_end_pos;         /* colorise text */
+
+    /*
+     * Function to find matches.  User defined.
+     */
+    void (* find_match)  (emailData *addy, gboolean fast_check);
+};
+
 /*
  * Global variable.  We need this for access to parent methods.
  */
@@ -262,16 +283,14 @@ libbalsa_address_entry_destroy(GtkObject * object)
     entry = GTK_ENTRY(object);
     address_entry = LIBBALSA_ADDRESS_ENTRY(object);
 
-    /*
-     * Remove known data references set by gtk_object_set_data()
-     */
-    gtk_object_remove_data(GTK_OBJECT(object), "next_in_line");
-
+    /* FIXME: the timer is removed by gtk_entry's finalize method--do we
+     * need to do it as well? 
+     * pawsa: no. They are not ours. */
     /*
      * Remove timers.
-     */
-    if (entry->timer) gtk_timeout_remove (entry->timer);
-    entry->timer = 0;
+     if (entry->timer) gtk_timeout_remove (entry->timer);
+     entry->timer = 0;
+    */
 
     /*
      * Free the address list.
@@ -702,18 +721,26 @@ libbalsa_delete_forward_word(LibBalsaAddressEntry *address_entry)
      * Delete the current entry.
      */
     } else {
+        /* except as noted below, cursor will be in the entry to the
+         * left of the current one, so we'll put the cursor at the
+         * end */
+        gboolean cursor_at_start = FALSE;
         GList *prev;
 
 	list = address_entry->active;
         if ((prev = g_list_previous(list)))
             address_entry->active = prev;
+        else
+            /* cursor will be in the entry to the right of the
+             * current one, so we'll put the cursor at the start */
+            cursor_at_start = TRUE;
 	libbalsa_emailData_free(list->data);
         address_entry->active =
             libbalsa_delete_link(address_entry->active, list);
 	if (address_entry->active) {
 	    addy = address_entry->active->data;
 	    g_assert(addy != NULL);
-	    addy->cursor = 0;
+	    addy->cursor = cursor_at_start ? 0 : strlen(addy->user);
 	} else {
 	    gtk_entry_set_text(GTK_ENTRY(address_entry), "");
 	    libbalsa_fill_input(address_entry);
@@ -763,16 +790,25 @@ libbalsa_delete_backward_word(LibBalsaAddressEntry *address_entry)
      * Delete the current entry.
      */
     } else {
+        /* except as noted below, cursor will be in the entry to the
+         * right of the current one, so we'll put the cursor at the
+         * start */
+        gboolean cursor_at_end = FALSE;
+
 	list = address_entry->active;
-	if (!g_list_next(list))
+	if (!g_list_next(list)) {
+            /* cursor will be in the entry to the left of the
+             * current one, so we'll put the cursor at the end */
 	    address_entry->active = g_list_previous(list);
+            cursor_at_end = TRUE;
+        }
 	libbalsa_emailData_free(list->data);
         address_entry->active =
             libbalsa_delete_link(address_entry->active, list);
 	if (address_entry->active) {
 	    addy = address_entry->active->data;
 	    g_assert(addy != NULL);
-	    addy->cursor = strlen(addy->user);
+	    addy->cursor = cursor_at_end ? strlen(addy->user) : 0;
 	} else {
 	    gtk_entry_set_text(GTK_ENTRY(address_entry), "");
 	    libbalsa_fill_input(address_entry);
@@ -840,7 +876,6 @@ libbalsa_delete_to_line_end(LibBalsaAddressEntry *address_entry)
  *   results:
  *     None?  Changes the appearance of the widget.
  *************************************************************/
-#define INNER_BORDER     2
 static void
 libbalsa_address_entry_draw(GtkWidget * widget, GdkRectangle * area)
 {
@@ -2064,18 +2099,13 @@ libbalsa_address_entry_set_domain(LibBalsaAddressEntry *address_entry,
  *     Modifies the text in the widget.
  *************************************************************/
 void
-libbalsa_address_entry_clear_to_send(GtkWidget *widget)
+libbalsa_address_entry_clear_to_send(LibBalsaAddressEntry * address_entry)
 {
-    LibBalsaAddressEntry *address_entry;
     emailData *addy;
-
-    g_return_if_fail(widget != NULL);
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(widget));
 
     /*
      * Grab the input.
      */
-    address_entry = LIBBALSA_ADDRESS_ENTRY(widget);
     if (!address_entry->active)
         return;
 
@@ -2088,6 +2118,53 @@ libbalsa_address_entry_clear_to_send(GtkWidget *widget)
     /*
      * Show the input, so that we fill the GtkEntry box.
      */
-    libbalsa_address_entry_show(LIBBALSA_ADDRESS_ENTRY(widget));
+    libbalsa_address_entry_show(address_entry);
 }
 
+/*************************************************************
+ * libbalsa_address_entry_get_chars_all:
+ *     Wrapper for GtkEditable method.
+ *************************************************************/
+gchar *
+libbalsa_address_entry_get_chars_all(LibBalsaAddressEntry * address_entry)
+{
+    return gtk_editable_get_chars(GTK_EDITABLE(address_entry), 0, -1);
+}
+
+/*************************************************************
+ * libbalsa_address_entry_set_text:
+ *     Wrapper for GtkEntry method.
+ *************************************************************/
+void
+libbalsa_address_entry_set_text(LibBalsaAddressEntry * address_entry,
+                                const gchar *text)
+{
+    gtk_entry_set_text(GTK_ENTRY(address_entry), text);
+}
+
+/*************************************************************
+ * libbalsa_address_entry_append_text:
+ *     Wrapper for GtkEntry method.
+ *************************************************************/
+void
+libbalsa_address_entry_append_text(LibBalsaAddressEntry * address_entry,
+                                const gchar *text)
+{
+    gtk_entry_append_text(GTK_ENTRY(address_entry), text);
+}
+
+/*************************************************************
+ * libbalsa_address_entry_matching:
+ *     Is the widget showing a match? 
+ *************************************************************/
+gboolean 
+libbalsa_address_entry_matching(LibBalsaAddressEntry * address_entry)
+{
+    if (address_entry->active) {
+        emailData *addy = address_entry->active->data;
+
+        if (addy->match)
+            return TRUE;
+    }
+    return FALSE;
+}

@@ -74,26 +74,10 @@ typedef struct {
 #define LIBBALSA_IS_ADDRESS_ENTRY(obj)		(GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_ADDRESS_ENTRY))
 #define LIBBALSA_IS_ADDRESS_ENTRY_CLASS(klass)	(GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_ENTRY))
 
+/* LibBalsaAddressEntry is typedef'd here, but the structure is declared
+ * in address-entry.c to keep it opaque */
 typedef struct _LibBalsaAddressEntry LibBalsaAddressEntry;
 typedef struct _LibBalsaAddressEntryClass LibBalsaAddressEntryClass;
-
-struct _LibBalsaAddressEntry {
-    GtkEntry parent;
-
-    GList *active;              /* A GList of email addresses.
-                                 * Caution! active may not
-                                 * point to the start of the list. */
-    gint focus;			/* Used to keep track of the validity of
-				   the 'input' variable. */
-    gchar *domain;		/* The domain to add if the user omits one. */
-    gint alias_start_pos,       /* Used with selection_start/stop_pos to */
-         alias_end_pos;         /* colorise text */
-
-    /*
-     * Function to find matches.  User defined.
-     */
-    void (* find_match)  (emailData *addy, gboolean fast_check);
-};
 
 
 struct _LibBalsaAddressEntryClass {
@@ -112,6 +96,15 @@ GtkType libbalsa_address_entry_get_type(void);
 GtkWidget *libbalsa_address_entry_new(void);
 void libbalsa_address_entry_set_find_match(LibBalsaAddressEntry *, void *);
 void libbalsa_address_entry_set_domain(LibBalsaAddressEntry *, void *);
-void libbalsa_address_entry_clear_to_send(GtkWidget *);
+void libbalsa_address_entry_clear_to_send(LibBalsaAddressEntry *
+                                          address_entry);
+gchar *libbalsa_address_entry_get_chars_all(LibBalsaAddressEntry *
+                                            address_entry);
+void libbalsa_address_entry_set_text(LibBalsaAddressEntry * address_entry,
+                                     const gchar * text);
+void libbalsa_address_entry_append_text(LibBalsaAddressEntry *
+                                        address_entry, const gchar * text);
+gboolean libbalsa_address_entry_matching(LibBalsaAddressEntry *
+                                         address_entry);
 
 #endif

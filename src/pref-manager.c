@@ -336,7 +336,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
 
-#if ENABLE_SMTP
+#if ENABLE_ESMTP
     gtk_signal_connect(GTK_OBJECT(pui->smtp_server), "changed",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);

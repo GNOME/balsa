@@ -1,3 +1,7 @@
+2001-05-15  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/pref-manager.c (open_preferences_manager): fix typo in ifdef
+
 2001-05-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Daniel Foster <daniel-l@34SP.com>:

@@ -1,3 +1,11 @@
+2003-03-13  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/filter-funcs.[hc]: new functions to compare conditions.
+	* libbalsa/mailbox.[hc]: replace get_matching message by message_match.
+	* libbalsa/mailbox_imap.[hc]: optimized handler.
+	* libbalsa/libbalsa-marshal.list: add BOOLEAN:POINTER,INT,POINTER
+	* src/balsa-index.c: use the new functions.
+
 2003-03-13  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/{ab-window.c,address-book-config.c}: enable NLS again.

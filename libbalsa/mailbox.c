@@ -47,9 +47,10 @@ static void libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox
 							   * mailbox,
 							   gboolean flag);
-static GHashTable* libbalsa_mailbox_real_get_matching(LibBalsaMailbox* mailbox,
-                                                      int op, 
-                                                      GSList* conditions);
+static gboolean libbalsa_mailbox_real_message_match(LibBalsaMailbox* mailbox,
+						     LibBalsaMessage * message,
+						     int op,
+						     GSList* conditions);
 
 static void libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
@@ -87,7 +88,7 @@ enum {
     GET_MESSAGE_STREAM,
     PROGRESS_NOTIFY,
     CHECK,
-    GET_MATCHING,
+    MESSAGE_MATCH,
     SET_UNREAD_MESSAGES_FLAG,
     SAVE_CONFIG,
     LOAD_CONFIG,
@@ -241,15 +242,16 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      NULL, NULL,
                      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
-    libbalsa_mailbox_signals[GET_MATCHING] =
-	g_signal_new("get-matching",
+    libbalsa_mailbox_signals[MESSAGE_MATCH] =
+	g_signal_new("message-match",
                      G_TYPE_FROM_CLASS(object_class),
                      G_SIGNAL_RUN_LAST,
                      G_STRUCT_OFFSET(LibBalsaMailboxClass,
-                                     get_matching),
+                                     message_match),
                      NULL, NULL,
-                     libbalsa_POINTER__INT_POINTER, 
-                     G_TYPE_POINTER, 2, G_TYPE_INT, G_TYPE_POINTER);
+                     libbalsa_BOOLEAN__POINTER_INT_POINTER,
+                     G_TYPE_BOOLEAN, 3, G_TYPE_POINTER, G_TYPE_INT,
+		     G_TYPE_POINTER);
 
     libbalsa_mailbox_signals[SAVE_CONFIG] =
 	g_signal_new("save-config",
@@ -286,7 +288,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 
     klass->get_message_stream = NULL;
     klass->check = NULL;
-    klass->get_matching = libbalsa_mailbox_real_get_matching;
+    klass->message_match = libbalsa_mailbox_real_message_match;
     klass->save_config  = libbalsa_mailbox_real_save_config;
     klass->load_config  = libbalsa_mailbox_real_load_config;
 }
@@ -517,20 +519,23 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 #endif
 }
 
-/* libbalsa_mailbox_get_matching:
- * get a hash table of messages matching given set of conditions.
+/* libbalsa_mailbox_message_match:
+   Tests if the given message matches the conditions : this is used
+   by the search code. It is a "virtual method", indeed IMAP has a
+   special way to implement it for speed/bandwidth reasons
  */
-GHashTable*
-libbalsa_mailbox_get_matching(LibBalsaMailbox* mailbox, int op, 
-                              GSList* conditions)
+gboolean
+libbalsa_mailbox_message_match(LibBalsaMailbox* mailbox,
+			       LibBalsaMessage * message,
+			       int op, GSList* conditions)
 {
-    GHashTable* retval = NULL;
+    gboolean retval = FALSE;
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
     g_signal_emit(G_OBJECT(mailbox),
-		  libbalsa_mailbox_signals[GET_MATCHING], 0,
-                  op, conditions, &retval);
+		  libbalsa_mailbox_signals[MESSAGE_MATCH], 0,
+                  message, op, conditions, &retval);
     return retval;
 }
 
@@ -697,19 +702,15 @@ libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox * mailbox,
     mailbox->has_unread_messages = flag;
 }
 
-static GHashTable*
-libbalsa_mailbox_real_get_matching(LibBalsaMailbox* mailbox, 
-                                   int op, GSList* conditions)
+/* Default handler : just call match_conditions
+   IMAP is the only mailbox type that implements its own way for that
+ */
+static gboolean
+libbalsa_mailbox_real_message_match(LibBalsaMailbox* mailbox,
+				    LibBalsaMessage * message,
+				    int op, GSList* conditions)
 {
-    GHashTable * ret = g_hash_table_new(NULL,NULL);
-    GList* msgs;
-    printf("real op=%d list=%p\n", op, conditions);
-    for(msgs = mailbox->message_list; msgs; msgs = msgs->next) {
-        LibBalsaMessage* msg = LIBBALSA_MESSAGE(msgs->data);
-        if(match_conditions(op, conditions, msg, FALSE))
-            g_hash_table_insert(ret, msg, msg);
-    }
-    return ret;
+    return match_conditions(op, conditions, message, FALSE);
 }
 
 

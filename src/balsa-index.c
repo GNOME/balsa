@@ -98,7 +98,6 @@ static gboolean bndx_find_row(BalsaIndex * index,
                               GList * exclude);
 static gboolean bndx_find_row_func(LibBalsaMessage * message,
                                    LibBalsaMessageFlag flag,
-                                   GHashTable * matching,
                                    GSList * conditions, FilterOpType op,
                                    GList * exclude, gboolean viewable);
 static gboolean bndx_find_next(GtkTreeView * tree_view, GtkTreePath * path,
@@ -998,7 +997,6 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
     gboolean first_time = TRUE;
     gboolean found;
     gboolean wrap = (flag != (LibBalsaMessageFlag) 0);
-    GHashTable *matching;       /* matching messages (IMAP search) */
 
     g_return_val_if_fail(index != NULL, FALSE);
 
@@ -1028,14 +1026,6 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
         path = gtk_tree_model_get_path(model, &iter);
     }
 
-    if (LIBBALSA_IS_MAILBOX_IMAP(index->mailbox_node->mailbox)
-        && conditions)
-        matching =
-            libbalsa_mailbox_get_matching(index->mailbox_node->mailbox, op,
-                                          conditions);
-    else
-        matching = NULL;
-
     found = FALSE;
     do {
         LibBalsaMessage *message;
@@ -1048,16 +1038,13 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
             else
                 break;
         } else
-            found = bndx_find_row_func(message, flag, matching, conditions,
-                                       op, exclude,
+            found = bndx_find_row_func(message, flag, conditions, op, exclude,
                                        bndx_row_is_viewable(index, path));
     } while (!found &&
              (reverse_search ? bndx_find_prev(tree_view, path, &iter)
               : bndx_find_next(tree_view, path, &iter, wrap)));
 
     gtk_tree_path_free(path);
-    if (matching)
-        g_hash_table_destroy(matching);
 
     if (found) {
         if (pos)
@@ -1073,7 +1060,6 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
 static gboolean
 bndx_find_row_func(LibBalsaMessage * message,
                    LibBalsaMessageFlag flag,
-                   GHashTable * matching,
                    GSList * conditions,
                    FilterOpType op,
                    GList * exclude,
@@ -1086,14 +1072,11 @@ bndx_find_row_func(LibBalsaMessage * message,
         /* looking for flagged messages */
         if (!LIBBALSA_MESSAGE_HAS_FLAG(message, flag))
             return FALSE;
-    } else if (matching) {
-        /* looking for messages that match some conditions */
-        if (!g_hash_table_lookup(matching, message))
-            return FALSE;
     } else if (conditions) {
-	if (!match_conditions(op, conditions, message, FALSE))
+	if (!libbalsa_mailbox_message_match(message->mailbox, message,
+					    op, conditions))
 	    return FALSE;
-    } else if (exclude) {
+   } else if (exclude) {
         /* looking for messages not in the excluded list */
         if (g_list_find(exclude, message))
             return FALSE;

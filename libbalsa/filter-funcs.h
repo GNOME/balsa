@@ -77,6 +77,7 @@ LibBalsaCondition* libbalsa_condition_clone(LibBalsaCondition* cnd);
 void libbalsa_condition_regex_free(LibBalsaConditionRegex *, gpointer);
 void regexs_free(GSList *);
 void libbalsa_condition_compile_regexs(LibBalsaCondition* cond);
+gboolean libbalsa_conditions_compare(GSList * cnds1,GSList *cnds2);
 
 /* Filters */
 /* Free a filter

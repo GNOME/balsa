@@ -56,6 +56,12 @@ struct _LibBalsaMailboxImap {
     gchar *path;		/* Imap local path (third part of URL) */
     ImapAuthType auth_type;	/* accepted authentication type */
     ImapUID      uid_validity;
+
+    /* Hash table containing the messages matching the conditions
+     */
+    GHashTable * matching_messages;
+    int op;
+    GSList * conditions;
 };
 
 struct _LibBalsaMailboxImapClass {

@@ -35,6 +35,7 @@
 
 #include <gnome.h> /* for gnome-i18n.h, gnome-config and gnome-util */
 
+#include "filter-funcs.h"
 #include "filter.h"
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -64,9 +65,10 @@ static FILE *libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox *
 						      LibBalsaMessage *
 						      message);
 static void libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox);
-static GHashTable* libbalsa_mailbox_imap_get_matching(LibBalsaMailbox* mailbox,
-                                                      int op,
-                                                      GSList* conditions);
+static gboolean libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox,
+						    LibBalsaMessage * msg,
+						    int op,
+						    GSList* conditions);
 
 static void libbalsa_mailbox_imap_save_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
@@ -133,7 +135,7 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
 	libbalsa_mailbox_imap_get_message_stream;
 
     libbalsa_mailbox_class->check = libbalsa_mailbox_imap_check;
-    libbalsa_mailbox_class->get_matching = libbalsa_mailbox_imap_get_matching;
+    libbalsa_mailbox_class->message_match = libbalsa_mailbox_imap_message_match;
 
     libbalsa_mailbox_class->save_config =
 	libbalsa_mailbox_imap_save_config;
@@ -149,6 +151,9 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox)
     LibBalsaMailboxRemote *remote;
     mailbox->path = NULL;
     mailbox->auth_type = AuthCram;	/* reasonable default */
+    mailbox->matching_messages = NULL;
+    mailbox->op = FILTER_NOOP;
+    mailbox->conditions = NULL;
 
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server =
@@ -693,8 +698,20 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox)
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
 	(*LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox) 
 	    (LIBBALSA_MAILBOX(mailbox));
-    if(mailbox->open_ref == 0)
-	libbalsa_notify_register_mailbox(LIBBALSA_MAILBOX(mailbox));
+    if(mailbox->open_ref == 0) {
+	LibBalsaMailboxImap * mbox = LIBBALSA_MAILBOX_IMAP(mailbox);
+
+	libbalsa_notify_register_mailbox(mailbox);
+	if (mbox->matching_messages) {
+	    g_hash_table_destroy(mbox->matching_messages);
+	    mbox->matching_messages = NULL;
+	}
+	if (mbox->conditions) {
+	    libbalsa_conditions_free(mbox->conditions);
+	    mbox->conditions = NULL;
+	    mbox->op = FILTER_NOOP;
+	}
+    }
 }
 
 
@@ -759,8 +776,8 @@ static void
 libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 {
     if(mailbox->open_ref == 0) {
-	if (libbalsa_notify_check_mailbox(mailbox) ) 
-	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE); 
+	if (libbalsa_notify_check_mailbox(mailbox) )
+	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
     } else {
 	g_return_if_fail(CLIENT_CONTEXT(mailbox));
 	libbalsa_mailbox_imap_noop(LIBBALSA_MAILBOX_IMAP(mailbox));
@@ -784,31 +801,53 @@ imap_matched(unsigned uid, ImapSearchData* data)
 
 int imap_uid_search(CONTEXT* ctx, const char* query, 
                     void(*cb)(unsigned, ImapSearchData*), void*);
-static GHashTable*
-libbalsa_mailbox_imap_get_matching(LibBalsaMailbox* mailbox, 
-                                  int op, GSList* conditions)
-{
-    gchar* query;
-    gboolean match;
-    ImapSearchData cbdata;
-    GList* msgs;
 
-    cbdata.uids = g_hash_table_new(NULL, NULL);
-    cbdata.res  = g_hash_table_new(NULL, NULL);
-    query = libbalsa_filter_build_imap_query(op, conditions);
-    if(query) {
-        for(msgs= mailbox->message_list; msgs; msgs = msgs->next){
-            LibBalsaMessage *m = LIBBALSA_MESSAGE(msgs->data);
-            unsigned uid = ((IMAP_HEADER_DATA*)m->header->data)->uid;
-            g_hash_table_insert(cbdata.uids, GUINT_TO_POINTER(uid), m);
-        }
-        
-        match = imap_uid_search(CLIENT_CONTEXT(mailbox), query,
-                                imap_matched, &cbdata);
-        g_free(query);
+static gboolean
+libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mbox,
+				    LibBalsaMessage * message,
+				    int op, GSList* conditions)
+{
+    LibBalsaMailboxImap * mailbox = LIBBALSA_MAILBOX_IMAP(mbox);
+
+    if (!mailbox->matching_messages || op!=mailbox->op
+	|| !conditions
+	|| !libbalsa_conditions_compare(conditions, mailbox->conditions)) {
+	/* New search, build the matching messages hash table */
+	gchar* query;
+	gboolean match;
+	ImapSearchData cbdata;
+	GList* msgs;
+	GSList * cnds;
+	
+	if (mailbox->matching_messages)
+	    g_hash_table_destroy(mailbox->matching_messages);
+	mailbox->op = op;
+	libbalsa_conditions_free(mailbox->conditions);
+	mailbox->conditions = NULL;
+	/* We copy the conditions */
+	for (cnds = conditions;cnds;cnds = g_slist_next(cnds))
+	    mailbox->conditions =
+		g_slist_prepend(mailbox->conditions,
+				libbalsa_condition_clone(cnds->data));
+
+	cbdata.uids = g_hash_table_new(NULL, NULL); 
+	cbdata.res  = g_hash_table_new(NULL, NULL);
+	query = libbalsa_filter_build_imap_query(op, conditions);
+	if (query) {
+	    for(msgs= mbox->message_list; msgs; msgs = msgs->next){
+		LibBalsaMessage *m = LIBBALSA_MESSAGE(msgs->data);
+		unsigned uid = ((IMAP_HEADER_DATA*)m->header->data)->uid;
+		g_hash_table_insert(cbdata.uids, GUINT_TO_POINTER(uid), m);
+	    }
+	    
+	    match = imap_uid_search(CLIENT_CONTEXT(mbox), query,
+				    imap_matched, &cbdata);
+	    g_free(query);
+	}
+	g_hash_table_destroy(cbdata.uids);
+	mailbox->matching_messages = cbdata.res;
     }
-    g_hash_table_destroy(cbdata.uids);
-    return cbdata.res;
+    return g_hash_table_lookup(mailbox->matching_messages, message)!=NULL;
 }
 
 static void
@@ -904,6 +943,16 @@ libbalsa_mailbox_imap_noop(LibBalsaMailboxImap* mbox)
 	mailbox->new_messages = 
 	    CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
 	
+	if (mbox->matching_messages) {
+	    g_hash_table_destroy(mbox->matching_messages);
+	    mbox->matching_messages = NULL;
+	}
+	if (mbox->conditions) {
+	    libbalsa_conditions_free(mbox->conditions);
+	    mbox->conditions = NULL;
+	    mbox->op = FILTER_NOOP;
+	}
+
 	UNLOCK_MAILBOX(mailbox);
 	libbalsa_mailbox_load_messages(mailbox);
     } else {

@@ -174,8 +174,9 @@ struct _LibBalsaMailboxClass {
     FILE *(*get_message_stream) (LibBalsaMailbox * mailbox,
 				 LibBalsaMessage * message);
     void (*check) (LibBalsaMailbox * mailbox);
-    GHashTable* (*get_matching)(LibBalsaMailbox * mailbox,
-                                int op, GSList* conditions);
+    gboolean (*message_match)(LibBalsaMailbox * mailbox,
+			      LibBalsaMessage * message,
+			      int op, GSList* conditions);
     void (*save_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     void (*load_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
 };
@@ -213,8 +214,9 @@ gint libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete);
 
 void libbalsa_mailbox_check(LibBalsaMailbox * mailbox);
 
-GHashTable*libbalsa_mailbox_get_matching(LibBalsaMailbox * mailbox,
-                                         int op, GSList* conditions);
+gboolean libbalsa_mailbox_message_match(LibBalsaMailbox * mailbox,
+					LibBalsaMessage * message,
+					int op, GSList* conditions);
 
 void libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);

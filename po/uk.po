@@ -602,9 +602,8 @@ msgid "Saving message status flags... [%d/%d]"
 msgstr "Збереження ╕ндикатор╕в стану пов╕домлень... [%d/%d]"
 
 #: libmutt/imap/imap.c:953
-#, fuzzy
 msgid "Expunging messages from server..."
-msgstr "Перем╕щення прочитаних пов╕домлень у %s..."
+msgstr "Викреслювання пов╕домлень з сервера..."
 
 #: libmutt/imap/imap.c:1229
 #, c-format
@@ -619,17 +618,16 @@ msgstr "В╕дм╕на передплати на %s..."
 #. Unable to fetch headers for lower versions
 #: libmutt/imap/message.c:74
 msgid "Unable to fetch headers from this IMAP server version."
-msgstr ""
+msgstr "Неможливо отримати заголовки з ц╕╓╖ верс╕╖ сервера IMAP."
 
 #: libmutt/imap/message.c:92
-#, fuzzy, c-format
+#, c-format
 msgid "Fetching message headers... [%d/%d]"
-msgstr "Запис пов╕домлень... %d (%d%%)"
+msgstr "Отримання заголовк╕в пов╕домлень... [%d/%d]"
 
 #: libmutt/imap/message.c:237
-#, fuzzy
 msgid "Fetching message..."
-msgstr "Отримання простору ╕мен..."
+msgstr "Отримання пов╕домлення..."
 
 #: libmutt/imap/message.c:276
 msgid "The message index is incorrect. Try reopening the mailbox."
@@ -724,9 +722,9 @@ msgid "Looking up %s..."
 msgstr "Зчитування %s..."
 
 #: libmutt/mutt_socket.c:333 libmutt/mutt_socket.c:372
-#, fuzzy, c-format
+#, c-format
 msgid "Could not find the host \"%s\""
-msgstr "Помилка: Не вдалось знайти адресу для машини %s."
+msgstr "Не вдалось знайти хост \"%s\""
 
 #: libmutt/mutt_socket.c:337 libmutt/mutt_socket.c:377
 #, c-format
@@ -734,11 +732,9 @@ msgid "Connecting to %s..."
 msgstr "З'╓днання з %s..."
 
 #: libmutt/mutt_socket.c:400
-#, fuzzy, c-format
+#, c-format
 msgid "Could not connect to %s (%s)."
-msgstr ""
-"Неможливо видалити вм╕ст %s:\n"
-"%s"
+msgstr "Не вдалося з'╓днатись з %s (%s)."
 
 #: libmutt/mutt_socket.c:401
 msgid "unknown error"
@@ -749,9 +745,9 @@ msgid "Failed to find enough entropy on your system"
 msgstr "Не вдалось виявити достатньо╖ ентроп╕╖ у ваш╕й систем╕"
 
 #: libmutt/mutt_ssl.c:120
-#, fuzzy, c-format
+#, c-format
 msgid "Filling entropy pool: %s...\n"
-msgstr "Заповнення накопичувача ентроп╕╖"
+msgstr "Заповнення накопичувача ентроп╕╖: %s...\n"
 
 #: libmutt/mutt_ssl.c:128
 #, c-format
@@ -1101,9 +1097,8 @@ msgid "To"
 msgstr "До"
 
 #: src/balsa-index.c:1806
-#, fuzzy
 msgid "Cannot access the message's body\n"
-msgstr "Неможливо записати пов╕домлення"
+msgstr "Неможливо отримати доступ до т╕ла пов╕домлення\n"
 
 #: src/balsa-index.c:1843
 msgid "Reply..."
@@ -1230,9 +1225,8 @@ msgid "Fcc:"
 msgstr "Fcc:"
 
 #: src/balsa-message.c:694
-#, fuzzy
 msgid "Disposition-Notification-To:"
-msgstr "Зв╕стка:"
+msgstr "Спов╕щення про розм╕щення:"
 
 #: src/balsa-message.c:762
 msgid "Could not load image. It is most likely corrupted."
@@ -1278,6 +1272,8 @@ msgid ""
 "Error writing to temporary file %s.\n"
 "Check the directory permissions."
 msgstr ""
+"Помилка запису в тимчасовий файл %s.\n"
+"Перев╕рте режим доступу каталогу."
 
 #: src/balsa-message.c:1154
 #, c-format
@@ -1294,9 +1290,8 @@ msgid "could not create temporary file %s"
 msgstr "неможливо створити тимчасовий файл %s"
 
 #: src/balsa-message.c:2031
-#, fuzzy
 msgid "reply to MDN?"
-msgstr "В╕дпв╕сти "
+msgstr "в╕дпв╕сти СРП?"
 
 #: src/balsa-message.c:2043
 #, c-format
@@ -1305,6 +1300,9 @@ msgid ""
 "a Message Disposition Notification (MDN) to be returned to `%s'.\n"
 "Do you want to send this notification?"
 msgstr ""
+"В╕дправник цього пов╕домлення, %s, зробив запит на повернення\n"
+"Спов╕щення про Розм╕щення Пов╕домлення (СРП) на \"%s\".\n"
+"Чи хочете ви в╕д╕слати це спов╕щення?"
 
 #: src/filter-edit-dialog.c:31
 msgid "Inbound"
@@ -2451,7 +2449,7 @@ msgstr "Ре╜улярний вираз тексту цитати"
 #. How to handle received MDN requests
 #: src/pref-manager.c:1385
 msgid "Message Disposition Notification requests"
-msgstr ""
+msgstr "Запити на спов╕щення про розм╕щення пов╕домлення"
 
 #: src/pref-manager.c:1393
 msgid ""

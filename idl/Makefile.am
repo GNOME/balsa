@@ -4,8 +4,10 @@ EXTRA_DIST	= $(balsa_GNORBA)
 balsagnorbadir	= $(sysconfdir)/CORBA/servers
 balsagnorba_DATA = $(balsa_GNORBA)
 
+idldir = $(datadir)/idl
+idl_DATA = balsa.idl
 
-lib_LIBRARIES = libbalsasrv.a
+noinst_LIBRARIES = libbalsasrv.a
 
 BUILT_SOURCES = balsa-skels.c \
 		balsa-common.c \

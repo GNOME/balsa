@@ -1,3 +1,17 @@
+1999-11-28  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
+
+	* idl/Makefile.am: The auxiliary library libbalsasrv.a was
+	installed on the system instead of the balsa.idl file. When you
+	change the ORBit version this could break and with the balsa.idl
+	that doesn't happen.
+
+	* .cvsignore:
+	* ABOUT-NLS:
+	* acinclude.m4:
+	* configure.in:
+	* po/.cvsignore: To remove the intl module from being checked out
+	when you check out balsa I had to change a couple of things.
+
 1999-11-25   Ragnar Henriksen <ragnar@juniks.org>
 	
 	Added config parameter: 

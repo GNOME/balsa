@@ -1,5 +1,7 @@
-2003-03-12 10:03  PeterB
+2003-03-12 16:44  PeterB
 
+	* src/balsa-index.c: Don't clear the index when there's one message
+	left.
 	* src/pref-manager.c: Implement pm_page_add_to_size_group to
 	simplify alignment.
 	* src/sendmsg-window.c: Add `format-flowed' to message options

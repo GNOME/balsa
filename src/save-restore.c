@@ -167,6 +167,7 @@ load_toolbars(void)
         list = toolbars[i].current;
         for (j = 0;; j++) {
             gchar *item;
+	    const gchar *real_item;
 
             key = g_strdup_printf("Item%d", j);
             item = libbalsa_conf_get_string(key);
@@ -174,8 +175,11 @@ load_toolbars(void)
 
             if (!item)
                 break;
-            *list = g_slist_append(*list, item);
-            items++;
+	    if ((real_item = balsa_toolbar_sanitize_id(item))) {
+		*list = g_slist_append(*list, g_strdup(real_item));
+		items++;
+	    }
+	    g_free(item);
         }
         libbalsa_conf_pop_prefix();
     }
@@ -202,10 +206,13 @@ load_toolbars(void)
         list = toolbars[type].current;
         for (j = 0; j < items; j++) {
             gchar *item;
+	    const gchar *real_item;
 
             sprintf(tmpkey, "Toolbar%dItem%d", i, j);
             item = libbalsa_conf_get_string(tmpkey);
-            *list = g_slist_append(*list, item);
+ 	    if ((real_item = balsa_toolbar_sanitize_id(item)))
+ 		*list = g_slist_append(*list, g_strdup(real_item));
+ 	    g_free(item);
         }
     }
     libbalsa_conf_pop_prefix();

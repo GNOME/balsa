@@ -149,6 +149,16 @@ const int toolbar_button_count =
     sizeof(toolbar_buttons) / sizeof(button_data);
 
 /* Public methods. */
+const gchar *
+balsa_toolbar_sanitize_id(const gchar *id)
+{
+    gint button = get_toolbar_button_index(id);
+
+    if (button >= 0)
+	return toolbar_buttons[button].pixmap_id;
+    else
+	return NULL;
+}
 
 /* this should go to GTK because it modifies its internal structures. */
 void
@@ -214,9 +224,11 @@ void
 balsa_toolbar_model_insert_icon(BalsaToolbarModel * model, gchar * icon,
                                 gint position)
 {
-    if (get_toolbar_button_index(icon) >= 0)
+    const gchar* real_button = balsa_toolbar_sanitize_id(icon);
+
+    if (real_button)
         *model->current =
-            g_slist_insert(*model->current, g_strdup(icon), position);
+            g_slist_insert(*model->current, g_strdup(real_button), position);
     else
         g_warning(_("Unknown toolbar icon \"%s\""), icon);
 }

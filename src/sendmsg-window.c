@@ -597,7 +597,7 @@ change_msg_identity_cb(GtkWidget* widget, BalsaSendmsg* msg)
     ident = balsa_identity_select_dialog(_("Select Identity"));
 
     if (ident == NULL) {
-        msg->quituid = gtk_quit_add(0, autopostpone_message, msg);
+        msg->quituid = gtk_quit_add( 1, autopostpone_message, msg);
         return;
     }
         
@@ -619,7 +619,7 @@ change_msg_identity_cb(GtkWidget* widget, BalsaSendmsg* msg)
 
     /* update the current messages identity */
 
-    msg->quituid = gtk_quit_add(0, autopostpone_message, msg);
+    msg->quituid = gtk_quit_add( 1, autopostpone_message, msg);
 }
 
 
@@ -1622,7 +1622,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     else
 	gtk_widget_grab_focus(msg->text);
 
-    msg->quituid = gtk_quit_add( 0, autopostpone_message, msg );
+    msg->quituid = gtk_quit_add( 1, autopostpone_message, msg );
 
     msg->update_config = TRUE;
     return msg;

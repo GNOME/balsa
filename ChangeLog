@@ -1,3 +1,8 @@
+2001-06-18  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/sendmsg-window.c: change the quit_add levels from 0 to 1
+	as they should be.
+
 2001-06-18  Matthew Guenther  <guentherm@asme.org>
 
 	* libinit_balsa/balsa-druid-page-user.gob: Change initialization

@@ -1,3 +1,7 @@
+2000-11-28  Carlos Morgado <chbm@chbm.nu>
+
+	* POTFILES.in: removed src/mblist-window.c
+
 2000-11-28  Stanislav Visnovsky  <visnovsky@nenya.ms.mff.cuni.cz>
  
         * sk.po: updated Slovak translation from Marcel Telka <marcel@telka.sk>.

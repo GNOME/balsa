@@ -38,7 +38,6 @@ src/local-mailbox.c
 src/mailbox-conf.c
 src/main-window.c
 src/main.c
-src/mblist-window.c
 src/message-window.c
 # src/orbit-glue.c : disabled because it is excluded from the dist file
 src/pref-manager.c

@@ -411,6 +411,8 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
       gtk_text_thaw (GTK_TEXT (msg->text));
+
+      gtk_text_set_point (GTK_TEXT (msg->text), 0);
     }
 
 

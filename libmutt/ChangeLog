@@ -1,3 +1,9 @@
+2001-11-07  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: change GSS detection to balsa style. Frankly, I think
+	this file should go away: one configure per program is enough.
+	Or perhaps not.
+
 2001-10-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* mutt_socket.c: reset io methods on close.

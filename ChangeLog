@@ -1,3 +1,12 @@
+2001-11-07  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: reorder GSS linking order (as hinted by RH).
+	look for GSS and SSL librares in few places (is this TheRightThing?)
+	* src/balsa-app.c: fix recently broken rescan (Peter Bloomfield).
+	* src/mailbox-conf.c:
+	* src/mailbox-node.c: 
+
+	
 2001-11-05  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* NEWS, libinit_balsa/Makefile.am, configure.in: release 1.2.3

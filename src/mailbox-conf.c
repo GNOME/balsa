@@ -764,7 +764,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
         GNode* parent = NULL;
         for(dir = g_strdup(libbalsa_mailbox_local_get_path(mcw->mailbox));
             strlen(dir)>1 /* i.e dir != "/" */ &&
-                (parent = balsa_app_find_by_dir(balsa_app.mailbox_nodes,dir));
+                !(parent = balsa_app_find_by_dir(balsa_app.mailbox_nodes,dir));
             ) {
             gchar* tmp =  g_dirname(dir); g_free(dir);
             dir = tmp;

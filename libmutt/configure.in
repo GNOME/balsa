@@ -225,68 +225,42 @@ LIBIMAPDEPS="\$(top_srcdir)/imap/imap.h imap/libimap.a"
 AM_CONDITIONAL(BUILD_IMAP, test x$need_imap = xyes)
 LIBOBJS="$LIBOBJS account.o mutt_socket.o"
 
-AC_ARG_WITH(gss,    [    --with-gss[=DIR]         Compile in GSSAPI authentication for IMAP],
-	[
-	if test "$need_imap" != "yes"
-        then
-          AC_MSG_ERROR([GSS support is only for IMAP, but IMAP is not enabled])
-        fi
+dnl ##########################################################################
+dnl Enable GSS?
+dnl ##########################################################################
 
-	if test "$with_gss" != "no"
-	then
-	  if test "$with_gss" != "yes"
-	  then
-	    CPPFLAGS="$CPPFLAGS -I$with_gss/include"
-	    LDFLAGS="$LDFLAGS -L$with_gss/lib"
-	  fi
+AC_ARG_WITH(gss, [  --with-gss            Enable GSS [default=no]],
+    [with_gss=$withval],[with_gss=no])
 
-  	  saved_LIBS="$LIBS"
-          gss_type="none"
-
-          dnl New MIT kerberos V support
-          AC_CHECK_LIB(gssapi_krb5, gss_init_sec_context, [
-            gss_type="MIT",
-            MUTTLIBS="$MUTTLIBS -lgssapi_krb5 -lkrb5 -lk5crypto -lcom_err"
-            ],, -lkrb5 -lk5crypto -lcom_err)
-
-          dnl Heimdal kerberos V support
-          if test x$gss_type = xnone
-          then
-            AC_CHECK_LIB(gssapi, gss_init_sec_context, [
-              gss_type="Heimdal",
-              MUTTLIBS="$MUTTLIBS -lgssapi -lkrb5 -ldes -lasn1 -lroken"
-              MUTTLIBS="$MUTTLIBS -lcrypt -lcom_err"
-              AC_DEFINE(HAVE_HEIMDAL)
-              ],, -lkrb5 -ldes -lasn1 -lroken -lcrypt -lcom_err)
-          fi
-
-	  dnl Old MIT Kerberos V
-	  dnl Note: older krb5 distributions use -lcrypto instead of
-	  dnl -lk5crypto, which collides with OpenSSL.  One way of dealing
-	  dnl with that is to extract all objects from krb5's libcrypto
-	  dnl and from openssl's libcrypto into the same directory, then
-	  dnl to create a new libcrypto from these.
-          if test x$gss_type = xnone
-          then
-            AC_CHECK_LIB(gssapi_krb5, g_order_init, [
-              gss_type="OldMIT",
-              MUTTLIBS="$MUTTLIBS -lgssapi_krb5 -lkrb5 -lcrypto -lcom_err"
-              ],, -lkrb5 -lcrypto -lcom_err)
-          fi
-
-          if test x$gss_type = xnone
-          then
-            AC_CACHE_SAVE
-            AC_MSG_ERROR([GSSAPI support not found])
-          fi
-
-  	  LIBS="$saved_LIBS"
-  	  AC_DEFINE(USE_GSS)
-            need_gss="yes"
-  	fi
-
-])
-AM_CONDITIONAL(USE_GSS, test x$need_gss = xyes)
+AC_MSG_CHECKING([whether to build GSS support])
+if test "x$with_gss" != xno  ; then
+   if test -d $with_gss && test -f "$with_gss/include/gssapi/gssapi.h" ; then
+      gssdir=$with_gss
+   else
+        AC_TRY_COMPILE([#include <gssapi/gssapi.h>], ,
+			gssdir=default,
+			gssdir="")
+	if test "x$gssdir" = x ; then
+           for dir in /usr /usr/local /usr/lib /usr/kerberos; do
+               if test -f "$dir/include/gssapi/gssapi.h"; then
+                  gssdir=$dir
+               fi
+           done
+	fi
+   fi
+   if -z "$gssdir"; then
+      AC_MSG_ERROR([GSS requested but no GSS headers found ,$gssdir,.])
+   else
+      AC_MSG_RESULT(yes)
+      AC_CHECK_LIB(gssapi, gss_init_sec_context, [
+	  LIBS="$LIBS -L$gssdir/lib -lgssapi -lkrb5"
+      ],[
+	  LIBS="$LIBS -L$gssdir/lib -lgssapi_krb5"
+      ], -lkrb5 -ldes -lasn1 -lroken -lcrypt -lcom_err -L$gssdir/lib)
+      CFLAGS="$CFLAGS -I$gssdir/include"
+   fi
+fi
+AM_CONDITIONAL(USE_GSS, test x$gssdir != xno)
 
 AC_ARG_WITH(ssl, [    --with-ssl[=PFX]         Compile in SSL socket support for IMAP],
 [	if test "$with_ssl" != "no"

@@ -529,6 +529,7 @@ traverse_find_dir(GNode * node, gpointer * d)
 }
 /* balsa_app_find_by_dir:
    looks for a mailbox node with dir equal to path.
+   returns NULL on failure
 */
 GNode*
 balsa_app_find_by_dir(GNode* root, const gchar* path)
@@ -539,7 +540,7 @@ balsa_app_find_by_dir(GNode* root, const gchar* path)
     d[1] = NULL;
     g_node_traverse(root, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1,
 		    (GNodeTraverseFunc) traverse_find_dir, d);
-    return d[1] ? d[1] : root;
+    return d[1];
 }
 
 

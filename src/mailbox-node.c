@@ -816,11 +816,13 @@ add_imap_entry(GNode*root, const char* fn, char delim)
     gchar* url;
 
     node = balsa_app_find_by_dir(root, fn);
-    if (node != root)
+    if (node && node != root)
 	return node;
 
     parent_name = get_parent_folder_name(fn, delim);
     parent = balsa_app_find_by_dir(root, parent_name);
+    if (parent == NULL)
+        parent = root;
     g_free(parent_name);
 
     g_return_val_if_fail(parent, NULL);

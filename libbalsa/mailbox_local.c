@@ -498,8 +498,13 @@ libbalsa_mailbox_local_msgno_removed(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
 
-    if (local->threading_info)
+    /* local might not have a threading-info array, and even if it does,
+     * it might not be populated; we check both. */
+    if (local->threading_info && local->threading_info->len) {
+	lbm_local_free_info(&g_array_index(local->threading_info,
+			    LibBalsaMailboxLocalInfo, msgno - 1));
 	g_array_remove_index(local->threading_info, msgno - 1);
+    }
 
     libbalsa_mailbox_msgno_removed(mailbox, msgno);
 }

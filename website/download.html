@@ -27,11 +27,77 @@
 <br>
 <!-- begin page -->
 
-<h2 class="heading">Download</h2>
+<a name="gnome2"></a>
+<h2 class="heading">Download GNOME 2 version</h2>
 
 <dl>
+<dt>GNOME2 release - 2.0.7 - released on 2003.02.09</dt>
+<dd><p>This release a number of bug fixes:</p>
+<ul>
+<li>infinite loops that could occur in message threading fixed.
+<li>linking against aspell finally tested (#105763).
+<li>Mailbox panel can be resized again (#105871).
+<li>Imap user names can contain special characters (#105605)
+</ul>
+<p>Download:</p>
+<ul>
+<li>
+<a href="http://balsa.gnome.org/balsa-2.0.8.tar.bz2">balsa-2.0.8.tar.bz2</a>
+</li>
+<li>
+<a href="http://balsa.gnome.org/balsa-2.0.8-1.i386.rpm">balsa-2.0.8-1.i386.rpm</a> built on RH 8.0</li>
+<li>
+<a href="http://balsa.gnome.org/balsa-2.0.8-1.src.rpm">balsa-2.0.8-1.src.rpm</a></li>
+</dd>
+</dl>
 
-<dt>Current stable source.</dt>
+<p>Balsa-2.0.8 is a quite mature GNOME2 port of balsa and has been
+used daily by many people. You may want to recompile balsa on your
+computer if you use different distribution. Try</p>
+
+ <pre>rpmbuild --recompile balsa-2.0.?-1.src.rpm</pre>
+
+<p><b>Please note</b> also that pspell distributed with RH8.0 makes balsa
+hang on <tt>fork()</tt> call, i.e. when any external program is to be forked
+from balsa. The solution is to remove <tt>-lc</tt> from dependency_libs 
+in <tt>/usr/lib/libpspell.la</tt>.
+</p>
+<dl>
+<dt>Independent Packages</dt>
+<dd><a href="http://packages.debian.org/unstable/mail/balsa.html">official
+ Debian</a> packages (<a href="http://ftp.debian.org/debian/pool/main/b/balsa/">download area</a>).
+</dd>
+</dl>
+
+
+<p>For Balsa versions later than 1.1.5, you will need the 
+<a href="http://www.stafford.uklinux.net/libesmtp/">libESMTP</a> library. 
+Get the sources from the home page or grab the RPM built on Redhat 7.3:</p>
+
+<dl>
+<dt>libESMTP packages</dt>
+<dd>
+<a href="http://balsa.gnome.org/libesmtp-1.0-1.i386.rpm">libesmtp-1.0-1.i386.rpm</a> (89kB)
+<br>
+<a href="http://balsa.gnome.org/libesmtp-1.0-1.src.rpm">libesmtp-1.0-1.src.rpm</a> (228kB)
+</dd>
+</dl>
+
+<dl>
+<dt>Independent Packages</dt>
+<dd>
+<a href="http://www.linuxmafia.org/pcentral/sview.php3?name=balsa">Slackware</a>
+<br>
+<a href="http://packages.debian.org/unstable/mail/balsa.html">official Debian</a> packages (<a href="http://ftp.debian.org/debian/pool/main/b/balsa/">download area</a>).
+</dd>
+</dl>
+
+<br>
+
+<a name="gnome14"></a>
+<h2 class="heading">Download GNOME-1.4 version</h2>
+<dl>
+<dt>Code that uses GNOME-1.4 libraries.</dt>
 <dd>
 
  It will work both with GNOME-1.4 and GNOME-2 but balsa-2.0.x is the
@@ -66,69 +132,6 @@ href="http://fw.t-data.com/balsa/">http://fw.t-data.com/balsa/</a>.
 -->
 
 </p>
-
-<p>For Balsa versions later than 1.1.5, you will need the 
-<a href="http://www.stafford.uklinux.net/libesmtp/">libESMTP</a> library. 
-Get the sources from the home page or grab the RPM built on Redhat 7.3:</p>
-
-<dl>
-<dt>libESMTP packages</dt>
-<dd>
-<a href="http://balsa.gnome.org/libesmtp-1.0-1.i386.rpm">libesmtp-1.0-1.i386.rpm</a> (89kB)
-<br>
-<a href="http://balsa.gnome.org/libesmtp-1.0-1.src.rpm">libesmtp-1.0-1.src.rpm</a> (228kB)
-</dd>
-</dl>
-
-<dl>
-<dt>Independent Packages</dt>
-<dd>
-<a href="http://www.linuxmafia.org/pcentral/sview.php3?name=balsa">Slackware</a>
-<br>
-<a href="http://packages.debian.org/unstable/mail/balsa.html">official Debian</a> packages (<a href="http://ftp.debian.org/debian/pool/main/b/balsa/">download area</a>).
-</dd>
-</dl>
-
-<br>
-
-<a name="gnome2"></a>
-<dl>
-<dt>GNOME2 release - 2.0.7 - released on 2003.02.09</dt>
-<dd><p>This release specifically includes:</p>
-<ul>
-<li>message threading improvements.
-<li>IMAP connections pinged to prevent timeouts.
-<li>configurable procmail commands used for POP filtering.
-</ul>
-<p>Download:</p>
-<ul>
-<li>
-<a href="http://balsa.gnome.org/balsa-2.0.7.tar.bz2">balsa-2.0.7.tar.bz2</a>
-</li>
-<li>
-<a href="http://balsa.gnome.org/balsa-2.0.7-1.i386.rpm">balsa-2.0.7-1.i386.rpm</a> built on RH 8.0</li>
-<li>
-<a href="http://balsa.gnome.org/balsa-2.0.7-1.src.rpm">balsa-2.0.7-1.src.rpm</a></li>
-</dd>
-</dl>
-
-<p>Balsa-2.0.7 is a quite mature GNOME2 port of balsa and has been
-used daily by many people. You may want to recompile balsa on your
-computer if you use different distribution. Try</p>
-
- <pre>rpmbuild --recompile balsa-2.0.?-1.src.rpm</pre>
-
-<p><b>Please note</b> also that pspell distributed with RH8.0 makes balsa
-hang on <tt>fork()</tt> call, i.e. when any external program is to be forked
-from balsa. The solution is to remove <tt>-lc</tt> from dependency_libs 
-in <tt>/usr/lib/libpspell.la</tt>.
-</p>
-<dl>
-<dt>Independent Packages</dt>
-<dd><a href="http://packages.debian.org/unstable/mail/balsa.html">official
- Debian</a> packages (<a href="http://ftp.debian.org/debian/pool/main/b/balsa/">download area</a>).
-</dd>
-</dl>
 
 <a name="req"></a>
 <h2 class="heading">Requirements</h2>

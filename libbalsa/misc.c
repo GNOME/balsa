@@ -1,4 +1,3 @@
-
 /* Balsa E-Mail Library
  * Copyright (C) 1998 Stuart Parmenter
  *

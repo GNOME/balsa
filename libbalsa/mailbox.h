@@ -100,7 +100,6 @@ typedef struct _Message Message;
 typedef struct _Address Address;
 typedef struct _Body Body;
 
-
 struct _Mailbox
 {
   MailboxType type;
@@ -111,6 +110,10 @@ struct _Mailbox
   glong messages;
   glong new_messages;
   GList *message_list;
+
+  FILE *fd;
+  time_t mtime;
+  off_t size;
 };
 
 
@@ -217,6 +220,9 @@ struct _Message
   /* message body */
   guint body_ref;
   GList *body_list;
+
+  /* offset in file */
+  glong offset;
 };
 
 

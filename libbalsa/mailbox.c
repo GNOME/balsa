@@ -197,7 +197,9 @@ mailbox_new (MailboxType type)
   mailbox->messages = 0;
   mailbox->new_messages = 0;
   mailbox->message_list = NULL;
-
+  mailbox->fd = NULL;
+  mailbox->mtime = 0;
+  mailbox->size = 0;
   return mailbox;
 }
 
@@ -246,6 +248,8 @@ mailbox_free (Mailbox * mailbox)
       break;
     }
 
+  if (mailbox->fd)
+     fclose(mailbox->fd);
 
   g_free (mailbox);
 }

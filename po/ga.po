@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: balsa branch-2-0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2000-06-01 20:26-0400\n"
-"PO-Revision-Date: 2004-01-22 07:10+0000\n"
+"PO-Revision-Date: 2004-02-02 07:10+0000\n"
 "Last-Translator: Alastair McKinstry <mckinstry@computer.org> \n"
 "Language-Team: Gaeilge <gaeilge-a@listserv.heanet.ie>\n"
 "MIME-Version: 1.0\n"
@@ -946,7 +946,7 @@ msgstr ""
 
 #: src/main-window.c:353
 msgid "_Message"
-msgstr "_Teachtaireacht"
+msgstr "_Scéal"
 
 #: src/main-window.c:354
 msgid "Mail_box"
@@ -958,7 +958,7 @@ msgstr "Coisc R-phoist"
 
 #: src/main-window.c:366
 msgid "Delete Message"
-msgstr "Dealaigh an Teachtaireacht"
+msgstr "Dealaigh an Scéal"
 
 #: src/main-window.c:370
 msgid "Compose"
@@ -966,7 +966,7 @@ msgstr ""
 
 #: src/main-window.c:370
 msgid "Compose Message"
-msgstr "Teachtaireacht nua"
+msgstr "Scríobh Scéal nua"
 
 #: src/main-window.c:382
 msgid "Continue"
@@ -978,11 +978,11 @@ msgstr ""
 
 #: src/main-window.c:392
 msgid "Open Next message"
-msgstr "Oscáil an cheád teachtaireacht eile"
+msgstr "Oscáil an cheád scéal eile"
 
 #: src/main-window.c:397
 msgid "Open Next Unread Message"
-msgstr "Oscáil an cheád teachtaireacht eile"
+msgstr "Oscáil an cheád scéal eile"
 
 #: src/main-window.c:402 src/print.c:82 src/sendmsg-window.c:125
 #: src/sendmsg-window.c:153
@@ -1060,7 +1060,7 @@ msgstr ""
 
 #: src/message-window.c:67
 msgid "Forward this message"
-msgstr "Freagrair an teachtaireacht seo"
+msgstr "Freagrair an scéal seo"
 
 #: src/pref-manager.c:124
 msgid "Text"
@@ -1617,7 +1617,7 @@ msgstr ""
 
 #: src/sendmsg-window.c:860
 msgid "New message"
-msgstr "Teachtaireach nua"
+msgstr "Scéal nua"
 
 #: src/sendmsg-window.c:1087
 msgid "Could not open the file.\n"
@@ -1784,7 +1784,7 @@ msgid "Subject: %s\n"
 msgstr "Ábair: %s\n"
 
 msgid "rfc822 message"
-msgstr "Teachtaireacht rfc822"
+msgstr "Scéal rfc822"
 
 msgid "Save..."
 msgstr "Sábháil..."
@@ -1874,7 +1874,7 @@ msgid "Mark as D_raftbox"
 msgstr ""
 
 msgid "_Message..."
-msgstr "_Teachtaireaht..."
+msgstr "_Scéal..."
 
 msgid "Local mbox mailbox..."
 msgstr ""
@@ -2051,10 +2051,10 @@ msgid "Mailbox Colors"
 msgstr "Dathanna Boscaphost"
 
 msgid "Message Colors"
-msgstr "Dathanna Teachtaireacht"
+msgstr "Dathanna Scéal"
 
 msgid "Message Font"
-msgstr "Cló. Teachtaireacht"
+msgstr "Cló. Scéal"
 
 msgid "Pspell Settings"
 msgstr "Roghnachais Pspell"
@@ -2087,7 +2087,7 @@ msgid "Sa_ve"
 msgstr "_Sábháil"
 
 msgid "Save this message"
-msgstr "Sábháil teachtaireacht seo"
+msgstr "Sábháil scéal seo"
 
 msgid "Insert Si_gnature"
 msgstr ""
@@ -2132,7 +2132,7 @@ msgid "F_cc:"
 msgstr ""
 
 msgid "Message-ID: %s\n"
-msgstr ""
+msgstr "Scéal-ID: %s\n"
 
 msgid "References:"
 msgstr "Roghnachais:"
@@ -2141,7 +2141,7 @@ msgid "Reply to %s: %s"
 msgstr "Freagrair do %s: %s"
 
 msgid "New message to %s: %s"
-msgstr "Teachtaireacht nua do %s: %s"
+msgstr "Scéal nua do %s: %s"
 
 msgid "Choose Address Book"
 msgstr "Roghnaigh Leabhar Sheoladh"
@@ -2161,7 +2161,7 @@ msgid "Open previous"
 msgstr "Oscáil an teachaireacht roimhe"
 
 msgid "Open next"
-msgstr "Oscáil an cheád teachtaireacht eile"
+msgstr "Oscáil an cheád scéal eile"
 
 msgid "Open next flagged message"
 msgstr ""
@@ -2196,7 +2196,7 @@ msgid "Customize Toolbars"
 msgstr ""
 
 msgid "Message window"
-msgstr "Fhuinneog teachtaireacht"
+msgstr "Fhuinneog Scéala"
 
 msgid "Toolbar options"
 msgstr "Roghnachais Uirlischláir"

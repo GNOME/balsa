@@ -40,6 +40,7 @@ mailbox_node_new (gchar * name, Mailbox * mb, gint i)
   mbn->name = g_strdup (name);
   mbn->mailbox = mb;
   mbn->IsDir = i;
+  mbn->expanded = FALSE;
   return mbn;
 }
 

@@ -234,7 +234,8 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 				   NULL, NULL,
 				   NULL, NULL,
-				   G_NODE_IS_LEAF (gnode), TRUE);
+				   G_NODE_IS_LEAF (gnode),
+				   mbnode->expanded);
 	  gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
 	}
       else if (mbnode->mailbox && mbnode->name)
@@ -245,7 +246,8 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 				       NULL, NULL,
 				       NULL, NULL,
-				       G_NODE_IS_LEAF (gnode), TRUE);
+				       G_NODE_IS_LEAF (gnode),
+				       mbnode->expanded);
 	      gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
 	    }
 	  else
@@ -264,18 +266,20 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 		  gtk_ctree_node_set_row_style (ctree, cnode, style);
 
 		  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
-					   NULL, NULL,
 			       balsa_icon_get_pixmap (BALSA_ICON_TRAY_FULL),
 			       balsa_icon_get_bitmap (BALSA_ICON_TRAY_FULL),
-					   FALSE, TRUE);
+					   NULL, NULL,
+					   FALSE,
+					   FALSE);
 		}
 	      else
 		{
 		  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
-					   NULL, NULL,
 			      balsa_icon_get_pixmap (BALSA_ICON_TRAY_EMPTY),
 			      balsa_icon_get_bitmap (BALSA_ICON_TRAY_EMPTY),
-					   FALSE, TRUE);
+					   NULL, NULL,
+					   FALSE,
+					   FALSE);
 		}
 
 	      gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
@@ -290,7 +294,8 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 			       balsa_icon_get_bitmap (BALSA_ICON_DIR_CLOSED),
 			       balsa_icon_get_pixmap (BALSA_ICON_DIR_OPEN),
 			       balsa_icon_get_bitmap (BALSA_ICON_DIR_OPEN),
-			       G_NODE_IS_LEAF (gnode), TRUE);
+			       G_NODE_IS_LEAF (gnode),
+			       mbnode->expanded);
     }
   return TRUE;
 }

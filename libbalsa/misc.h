@@ -32,6 +32,7 @@ struct _MailboxNode
     gchar *name;
     Mailbox *mailbox;
     gint IsDir;
+    gint expanded;
   };
 
 MailboxNode *mailbox_node_new (gchar * name, Mailbox * mb, gint i);

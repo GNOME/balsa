@@ -77,7 +77,7 @@ static void mblist_menu_add_cb (GtkWidget * widget, gpointer data);
 static void mblist_menu_edit_cb (GtkWidget * widget, gpointer data);
 static void mblist_menu_delete_cb (GtkWidget * widget, gpointer data);
 static void mblist_window_cb (GtkWidget * widget, gpointer data);
-static Mailbox *mblist_get_selected_mailbox(void);
+static Mailbox *mblist_get_selected_mailbox (void);
 static void mailbox_close_child (GtkWidget * widget, gpointer data);
 
 static void about_box_destroy_cb (void);
@@ -145,21 +145,9 @@ static GnomeUIInfo mailbox_menu[] =
     NULL, GNOME_APP_PIXMAP_NONE, GNOME_STOCK_MENU_PROP, 'C', 0, NULL
   },
 #endif
-  {
-    GNOME_APP_UI_ITEM, N_ ("Add"), NULL, mblist_menu_add_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_NONE, GNOME_STOCK_MENU_PROP, 'A', 0, NULL
-  },
-#if 0
-  {
-    GNOME_APP_UI_ITEM, N_ ("Edit"), NULL, mblist_menu_edit_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_NONE, GNOME_STOCK_MENU_PROP, 'E', 0, NULL
-  },
-#endif
-  {
-    GNOME_APP_UI_ITEM, N_ ("Delete"), NULL, mblist_menu_delete_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
-  },
-  GNOMEUIINFO_ITEM_STOCK ("Close", NULL, mailbox_close_child, GNOME_STOCK_MENU_CLOSE),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Add"), NULL, mblist_menu_add_cb, GNOME_STOCK_MENU_PROP),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Edit"), NULL, mblist_menu_edit_cb, GNOME_STOCK_MENU_PROP),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Delete"), NULL, mblist_menu_delete_cb, GNOME_STOCK_MENU_TRASH),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_END
 };
@@ -259,7 +247,7 @@ main_window_init (void)
   /* meubar and toolbar */
   gtk_signal_connect (GTK_OBJECT (mdi), "child_changed", GTK_SIGNAL_FUNC (index_child_changed), NULL);
   gtk_signal_connect (GTK_OBJECT (mdi), "app_created", GTK_SIGNAL_FUNC (app_created), NULL);
-  gnome_mdi_set_child_list_path (mdi, _ ("Mailboxes/<Separator>"));
+  gnome_mdi_set_child_list_path (mdi, _ ("Mail_boxes/<Separator>"));
 
   gnome_mdi_set_menubar_template (mdi, main_menu);
   gnome_mdi_set_toolbar_template (mdi, main_toolbar);
@@ -343,7 +331,7 @@ refresh_main_window (void)
    * set the toolbar style
    */
   item = gnome_app_get_dock_item_by_name (GNOME_APP (mdi->active_window),
-                                          GNOME_APP_TOOLBAR_NAME);
+					  GNOME_APP_TOOLBAR_NAME);
   toolbar = gnome_dock_item_get_child (item);
 
   gtk_toolbar_set_style (GTK_TOOLBAR (toolbar), balsa_app.toolbar_style);
@@ -702,8 +690,8 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
 
   dock_item = gnome_dock_item_new ("MailboxList",
-                                   GNOME_DOCK_ITEM_BEH_NEVER_HORIZONTAL
-                                   | GNOME_DOCK_ITEM_BEH_EXCLUSIVE);
+				   GNOME_DOCK_ITEM_BEH_NEVER_HORIZONTAL
+				   | GNOME_DOCK_ITEM_BEH_EXCLUSIVE);
   gnome_dock_item_set_shadow_type (GNOME_DOCK_ITEM (dock_item), GTK_SHADOW_NONE);
 
   mblw->sw = gtk_scrolled_window_new (NULL, NULL);
@@ -713,9 +701,9 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_container_add (GTK_CONTAINER (dock_item), GTK_WIDGET (mblw->sw));
 
   gnome_app_add_dock_item (app,
-                           GNOME_DOCK_ITEM (dock_item),
-                           GNOME_DOCK_LEFT,
-                           0, 0, 0);
+			   GNOME_DOCK_ITEM (dock_item),
+			   GNOME_DOCK_LEFT,
+			   0, 0, 0);
 
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
@@ -947,7 +935,7 @@ mblist_create_menu (GtkCTree * ctree, Mailbox * mailbox)
 static void
 mblist_menu_add_cb (GtkWidget * widget, gpointer data)
 {
-  Mailbox *mailbox = mblist_get_selected_mailbox();
+  Mailbox *mailbox = mblist_get_selected_mailbox ();
 
   mailbox_conf_new (mailbox, TRUE, MAILBOX_UNKNOWN);
 }
@@ -956,13 +944,14 @@ mblist_menu_add_cb (GtkWidget * widget, gpointer data)
 static void
 mblist_menu_edit_cb (GtkWidget * widget, gpointer data)
 {
-  Mailbox *mailbox = mblist_get_selected_mailbox();
+  Mailbox *mailbox = mblist_get_selected_mailbox ();
 
-  if (mailbox == NULL) {
-    GtkWidget* err_dialog = gnome_error_dialog(_("No mailbox selected."));
-    gnome_dialog_run(GNOME_DIALOG(err_dialog));
-    return;
-  }
+  if (mailbox == NULL)
+    {
+      GtkWidget *err_dialog = gnome_error_dialog (_ ("No mailbox selected."));
+      gnome_dialog_run (GNOME_DIALOG (err_dialog));
+      return;
+    }
 
   mailbox_conf_new (mailbox, FALSE, MAILBOX_UNKNOWN);
 }
@@ -971,13 +960,14 @@ mblist_menu_edit_cb (GtkWidget * widget, gpointer data)
 static void
 mblist_menu_delete_cb (GtkWidget * widget, gpointer data)
 {
-  Mailbox *mailbox = mblist_get_selected_mailbox();
+  Mailbox *mailbox = mblist_get_selected_mailbox ();
 
-  if (mailbox == NULL) {
-    GtkWidget* err_dialog = gnome_error_dialog(_("No mailbox selected."));
-    gnome_dialog_run(GNOME_DIALOG(err_dialog));
-    return;
-  }
+  if (mailbox == NULL)
+    {
+      GtkWidget *err_dialog = gnome_error_dialog (_ ("No mailbox selected."));
+      gnome_dialog_run (GNOME_DIALOG (err_dialog));
+      return;
+    }
 
   if (mailbox->type == MAILBOX_UNKNOWN)
     return;
@@ -986,18 +976,17 @@ mblist_menu_delete_cb (GtkWidget * widget, gpointer data)
 
 
 static Mailbox *
-mblist_get_selected_mailbox(void)
+mblist_get_selected_mailbox (void)
 {
-    GtkCTreeNode *node;
+  GtkCTreeNode *node;
 
-    g_assert(mblw != NULL);
-    g_assert(mblw->ctree != NULL);
+  g_assert (mblw != NULL);
+  g_assert (mblw->ctree != NULL);
 
-    if (! GTK_CLIST(mblw->ctree)->selection)
-        return NULL;
+  if (!GTK_CLIST (mblw->ctree)->selection)
+    return NULL;
 
-    node = GTK_CTREE_NODE(GTK_CLIST(mblw->ctree)->selection->data);
+  node = GTK_CTREE_NODE (GTK_CLIST (mblw->ctree)->selection->data);
 
-    return gtk_ctree_node_get_row_data(GTK_CTREE (mblw->ctree), node);
+  return gtk_ctree_node_get_row_data (GTK_CTREE (mblw->ctree), node);
 }
-

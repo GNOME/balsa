@@ -1,3 +1,14 @@
+2001-03-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Patch from rached ben mustapha <rbenmustapha@cvf.fr>:
+	* src/balsa-index.h: fix indentation.
+	* src/balsa-mblist.[ch]: add& use currently_selected_ctree_node;
+	mark tabs with unread messages.
+	* src/main-window.c: add missing balsa_mblist_focus_mailbox() call.
+	Patch from Berend De Schouwer <bds@jhb.ucs.co.za>: 
+	* libbalsa/address-entry.c: fix focus bug; cleanup code.
+	* libbalsa/address-book-ldap.c: remove debugging output.
+
 2001-03-08  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: fix HEIMDAL build (Dmitry G. Mastrukov's patch).

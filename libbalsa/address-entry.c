@@ -705,9 +705,6 @@ libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
     gint cursor = 0, size = 0, prev = 0;
     gchar *str = NULL;
     gchar *typed = NULL;
-    /*
-    gchar **str_array = NULL, **el = NULL;
-    */
     GList *el, *current;
     GList *list = NULL;
     emailData *addy;
@@ -752,9 +749,6 @@ libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
 	    addy->user = g_strdup((gchar *)current->data);
 	    input->list = g_list_append(input->list, addy);
 	}
-	/*
-	g_strfreev(str_array);
-	*/
 	g_list_foreach(el, (GFunc)g_free, NULL);
     } else {
        addy = libbalsa_new_emailData();
@@ -786,13 +780,13 @@ libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
 	addy->cursor = addy->cursor - 1; /* Compensate for the ',' */
     if (addy->cursor < 0) addy->cursor = 0;
     if (addy->cursor > strlen(addy->user)) addy->cursor = strlen(addy->user);
-    
+
     return input;
 }
 
 
 /*************************************************************
- * libbalsa_fill_input:
+ * libbalsa_address_entry_set_text:
  *     Sets the text string of a LibBalsaAddressEntry without
  *     drawing the text.
  *
@@ -833,7 +827,7 @@ libbalsa_address_entry_set_text(LibBalsaAddressEntry *address,
 
 
 /*************************************************************
- * libbalsa_fill_input:
+ * libbalsa_delete_line:
  *     Deletes the text string of a LibBalsaAddressEntry.
  *     Clears the whole line.
  *
@@ -1492,6 +1486,17 @@ libbalsa_address_entry_button_press(GtkWidget * widget, GdkEventButton * event)
     entry = GTK_ENTRY(widget);
     editable = GTK_EDITABLE(widget);
 
+    /*
+     * Defaults from gtkentry.
+     */
+    if (entry->button && (event->button != entry->button))
+	return FALSE;
+    if (!GTK_WIDGET_HAS_FOCUS (widget))
+	gtk_widget_grab_focus (widget);
+
+    /*
+     * We need to mark the widget as tainted.
+     */
     address_entry->focus = FOCUS_TAINTED;
 
     /*
@@ -1503,6 +1508,19 @@ libbalsa_address_entry_button_press(GtkWidget * widget, GdkEventButton * event)
      */
     klass = gtk_type_class(LIBBALSA_TYPE_ADDRESS_ENTRY);
     return_val = klass->gtk_entry_button_press(widget, event);
+
+    /*
+     * Check if it is mouse button 2 (paste text)
+     */
+    if ( (event->button == 2) && (event->type != GDK_BUTTON_PRESS) &&
+	 editable->editable )
+    {
+	if (address_entry->input != NULL)
+	    libbalsa_free_inputData(address_entry->input);
+	address_entry->input = libbalsa_fill_input(address_entry);
+	address_entry->focus = FOCUS_CACHED;
+	libbalsa_address_entry_show(address_entry);
+    }
 
     /* libbalsa_sanitize(address_entry); */
     return return_val;
@@ -2406,7 +2424,7 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
      * Grab the old information from the widget - this way the user
      * can switch back and forth between To: and Cc:
      */
-    if (!address_entry->input) 
+    if (!address_entry->input)
 	address_entry->input = libbalsa_new_inputData();
 
     /*
@@ -3104,5 +3122,4 @@ libbalsa_address_entry_clear_to_send(GtkWidget *widget)
      */
     libbalsa_address_entry_show(LIBBALSA_ADDRESS_ENTRY(widget));
 }
-    
 

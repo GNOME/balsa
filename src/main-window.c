@@ -2384,6 +2384,8 @@ notebook_switch_page_cb(GtkWidget * notebook,
     }
 
     enable_mailbox_menus(BALSA_INDEX(index)->mailbox_node);
+
+    balsa_mblist_focus_mailbox(balsa_app.mblist, mailbox);
 }
 
 static void

@@ -436,7 +436,6 @@ static gchar *rfc_2254_escape(const gchar *raw)
     for (step = (gchar *)raw;
          step[0] != '\0';
          step++) {
-        g_message("rfc_2254_escape: Found a [%c]", step[0]);
         switch (step[0]) {
             case '*':
                 str[0] = '\\'; str++;

@@ -112,6 +112,8 @@ static gboolean mblist_drag_motion_cb (GtkWidget* mblist,
                                        gint x, gint y, guint time, 
                                        gpointer user_data);
 
+/* helpers */
+static void __mbnode_set_tab_style(BalsaMailboxNode *mbnode, GtkStyle *style, gint unread);
 
 guint
 balsa_mblist_get_type(void)
@@ -417,8 +419,12 @@ mblist_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 	mbnode = gtk_ctree_node_get_row_data(ctree, node);
 
 	switch(event->button) {
-	case 1:
-	    if(mbnode->mailbox) mblist_open_mailbox(mbnode->mailbox);
+        case 1:
+	    
+	    balsa_app.mblist->currently_selected_ctree_node = node; 
+	    if(mbnode->mailbox)
+	        mblist_open_mailbox(mbnode->mailbox);
+	    
 	    break;
 	case 3:
 	    gtk_ctree_select(ctree, node);
@@ -961,6 +967,39 @@ balsa_mblist_update_mailbox(BalsaMBList * mblist,
     g_free(desc);
 }
 
+static void
+__mbnode_set_tab_style(BalsaMailboxNode *mbnode, GtkStyle *style, gint unread)
+{
+   BalsaIndex *index;
+   GtkWidget *label;
+   GList *l;
+
+   index = balsa_find_index(mbnode->mailbox);
+   if (index == NULL)
+      return;
+   
+   label = gtk_notebook_get_tab_label(
+      GTK_NOTEBOOK(balsa_app.main_window->notebook), GTK_WIDGET(index));
+   
+   l = gtk_container_children(GTK_CONTAINER (label));
+    
+    for ( ; l ; l = l->next) {
+       /* skip anything that isn't a text label */
+       if (!(GTK_IS_LABEL(l->data)))
+          continue;
+
+       if (unread)
+          gtk_widget_set_style(GTK_WIDGET(l->data), style);
+       else
+          gtk_widget_set_rc_style(GTK_WIDGET(l->data));
+          
+       break;
+    }
+
+    return;
+}
+
+
 /* balsa_mblist_update_node_style [MBG]
  * 
  * ctree:  The ctree containing the mailbox
@@ -986,99 +1025,106 @@ balsa_mblist_update_node_style(GtkCTree * ctree, GtkCTreeNode * node,
     gchar *text;
 
     if (node == NULL)
-	return;
+        return;
 
     mblist = BALSA_MBLIST(ctree);
     mailbox = mbnode->mailbox;
 
     if (mailbox == balsa_app.sentbox || mailbox == balsa_app.outbox ||
-	mailbox == balsa_app.draftbox || mailbox == balsa_app.trash)
-	return;
+        mailbox == balsa_app.draftbox || mailbox == balsa_app.trash)
+            return;
 
     if (mailbox->has_unread_messages) {
 
-	/* set the style of the unread maibox list, even if it's already 
-	 * set... in case the user has changed the colour or font since the
-	 * last style update */
-	gtk_ctree_node_set_row_style(ctree, node,
-				     mblist->unread_mailbox_style);
+        /* set the style of the unread maibox list, even if it's already 
+         * set... in case the user has changed the colour or font since the
+         * last style update */
+        gtk_ctree_node_set_row_style(ctree, node,
+           mblist->unread_mailbox_style);
 
-	tmp_is_leaf = GTK_CTREE_ROW(node)->is_leaf;
-	tmp_expanded = GTK_CTREE_ROW(node)->expanded;
+        /* update the notebook label */
+        __mbnode_set_tab_style(mbnode, mblist->unread_mailbox_style, 1);
+        
+        
+        tmp_is_leaf = GTK_CTREE_ROW(node)->is_leaf;
+        tmp_expanded = GTK_CTREE_ROW(node)->expanded;
 
-	icon = (mailbox == balsa_app.trash) 
-	    ? BALSA_ICON_TRASH : BALSA_ICON_TRAY_FULL;
+        icon = (mailbox == balsa_app.trash) 
+            ? BALSA_ICON_TRASH : BALSA_ICON_TRAY_FULL;
 
-	gtk_ctree_set_node_info(ctree, node, mailbox->name, 5,
-				balsa_icon_get_pixmap(icon),
-				balsa_icon_get_bitmap(icon),
-				NULL, NULL, tmp_is_leaf, tmp_expanded);
-	mbnode->style |= MBNODE_STYLE_NEW_MAIL;
+        gtk_ctree_set_node_info(ctree, node, mailbox->name, 5,
+                    balsa_icon_get_pixmap(icon),
+                    balsa_icon_get_bitmap(icon),
+                    NULL, NULL, tmp_is_leaf, tmp_expanded);
+        mbnode->style |= MBNODE_STYLE_NEW_MAIL;
 
-	/* If we have a count of the unread messages, and we are showing
-	 * columns, put the number in the unread column */
-	if (mblist->display_info && mailbox->has_unread_messages
-	    && mailbox->unread_messages > 0) {
-	    text = g_strdup_printf("%ld", mailbox->unread_messages);
-	    gtk_ctree_node_set_text(ctree, node, 1, text);
-	    g_free(text);
+        /* If we have a count of the unread messages, and we are showing
+         * columns, put the number in the unread column */
+        if (mblist->display_info && mailbox->has_unread_messages
+            && mailbox->unread_messages > 0) {
+                text = g_strdup_printf("%ld", mailbox->unread_messages);
+                gtk_ctree_node_set_text(ctree, node, 1, text);
+                g_free(text);
 
-	    mbnode->style |= MBNODE_STYLE_UNREAD_MESSAGES;
-	} else
-	    gtk_ctree_node_set_text(ctree, node, 1, "");
+            mbnode->style |= MBNODE_STYLE_UNREAD_MESSAGES;
+        } else
+            gtk_ctree_node_set_text(ctree, node, 1, "");
     } else {
-	/* If the clist entry currently has the unread messages icon, set
-	 * it back, otherwise we can ignore this. */
-	if (mbnode->style & MBNODE_STYLE_NEW_MAIL) {
-	    style = gtk_widget_get_style(GTK_WIDGET(ctree));
-	    gtk_ctree_node_set_row_style(ctree, node, style);
-	    /* this unref is not needed, since the style is unref'd in */
-	    /* gtk_ctree_node_set_row_style, and we have made no additional */
-	    /* ref's of our own */
-	    /*  gtk_style_unref (style); */
+        /* If the clist entry currently has the unread messages icon, set
+         * it back, otherwise we can ignore this. */
+        if (mbnode->style & MBNODE_STYLE_NEW_MAIL) {
+            style = gtk_widget_get_style(GTK_WIDGET(ctree));
+            gtk_ctree_node_set_row_style(ctree, node, style);
+            __mbnode_set_tab_style(mbnode, mblist->unread_mailbox_style, 0);
 
-	    tmp_is_leaf = GTK_CTREE_ROW(node)->is_leaf;
-	    tmp_expanded = GTK_CTREE_ROW(node)->expanded;
+            
+            /* this unref is not needed, since the style is unref'd in */
+            /* gtk_ctree_node_set_row_style, and we have made no additional */
+            /* ref's of our own */
+            /*  gtk_style_unref (style); */
 
-	    if (mailbox == balsa_app.inbox)
-		icon = BALSA_ICON_INBOX;
-	    else if (mailbox == balsa_app.outbox)
-		icon = BALSA_ICON_OUTBOX;
-	    else if (mailbox == balsa_app.trash)
-		icon = BALSA_ICON_TRASH;
-	     else
-		icon = BALSA_ICON_TRAY_EMPTY;
+            tmp_is_leaf = GTK_CTREE_ROW(node)->is_leaf;
+            tmp_expanded = GTK_CTREE_ROW(node)->expanded;
 
-	    gtk_ctree_set_node_info(ctree, node, mailbox->name, 5,
-				    balsa_icon_get_pixmap(icon),
-				    balsa_icon_get_bitmap(icon),
-				    NULL, NULL, tmp_is_leaf, tmp_expanded);
+            if (mailbox == balsa_app.inbox)
+                icon = BALSA_ICON_INBOX;
+            else if (mailbox == balsa_app.outbox)
+                icon = BALSA_ICON_OUTBOX;
+            else if (mailbox == balsa_app.trash)
+                icon = BALSA_ICON_TRASH;
+            else
+                icon = BALSA_ICON_TRAY_EMPTY;
 
-	    mbnode->style &= ~MBNODE_STYLE_NEW_MAIL;
-	}
+            gtk_ctree_set_node_info(ctree, node, mailbox->name, 5,
+                        balsa_icon_get_pixmap(icon),
+                        balsa_icon_get_bitmap(icon),
+                        NULL, NULL, tmp_is_leaf, tmp_expanded);
 
-	/* If we're showing unread column info, get rid of whatever's
-	 * there Also set the flag */
-	if (mblist->display_info) {
-	    gtk_ctree_node_set_text(ctree, node, 1, "0");
-	    mbnode->style &= ~MBNODE_STYLE_UNREAD_MESSAGES;
-	}
+            mbnode->style &= ~MBNODE_STYLE_NEW_MAIL;
+        }
+
+        /* If we're showing unread column info, get rid of whatever's
+         * there Also set the flag */
+        if (mblist->display_info) {
+            gtk_ctree_node_set_text(ctree, node, 1, "0");
+            mbnode->style &= ~MBNODE_STYLE_UNREAD_MESSAGES;
+        }
     }
 
     /* We only want to do this if the mailbox is open, otherwise leave
      * the message numbers untouched in the display */
     if (mblist->display_info && mailbox->open_ref
-	&& mailbox->total_messages >= 0) {
-	if (mailbox->total_messages > 0) {
-	    text = g_strdup_printf("%ld", mailbox->total_messages);
-	    gtk_ctree_node_set_text(ctree, node, 2, text);
-	    g_free(text);
+        && mailbox->total_messages >= 0) {
+            if (mailbox->total_messages > 0) {
+                text = g_strdup_printf("%ld", mailbox->total_messages);
+                gtk_ctree_node_set_text(ctree, node, 2, text);
+                g_free(text);
 
-	    mbnode->style |= MBNODE_STYLE_TOTAL_MESSAGES;
-	} else {
-	    gtk_ctree_node_set_text(ctree, node, 2, "0");
-	    mbnode->style &= ~MBNODE_STYLE_TOTAL_MESSAGES;
-	}
+                mbnode->style |= MBNODE_STYLE_TOTAL_MESSAGES;
+            } else {
+                gtk_ctree_node_set_text(ctree, node, 2, "0");
+                mbnode->style &= ~MBNODE_STYLE_TOTAL_MESSAGES;
+            }
     }
 }
 
@@ -1105,38 +1151,38 @@ balsa_mblist_folder_style(GtkCTree * ctree, GtkCTreeNode * node,
 
     /* If we're on a leaf, just see if it's displayed as unread */
     if (GTK_CTREE_ROW(node)->is_leaf) {
-	/* mailbox or an empty folder */
-	if (mbnode->style & MBNODE_STYLE_NEW_MAIL)
-	    has_unread |= 1 << (GTK_CTREE_ROW(node)->level);
-	return;
+        /* mailbox or an empty folder */
+        if (mbnode->style & MBNODE_STYLE_NEW_MAIL)
+                has_unread |= 1 << (GTK_CTREE_ROW(node)->level);
+        return;
 
     } else {
-	g_return_if_fail(mbnode->mailbox == NULL);
-	/* We're on a _non-empty_ folder here, see if any of the leaves 
-	   were displayed as having unread messages, change the style
-	   accordingly */
-	if (has_unread & (1 << (GTK_CTREE_ROW(node)->level + 1))) {
+        g_return_if_fail(mbnode->mailbox == NULL);
+        /* We're on a _non-empty_ folder here, see if any of the leaves 
+           were displayed as having unread messages, change the style
+           accordingly */
+        if (has_unread & (1 << (GTK_CTREE_ROW(node)->level + 1))) {
 
-	    gtk_ctree_node_set_row_style(ctree, node,
-					 mblist->unread_mailbox_style);
+            gtk_ctree_node_set_row_style(ctree, node,
+                         mblist->unread_mailbox_style);
 
-	    mbnode->style |= MBNODE_STYLE_NEW_MAIL;
+            mbnode->style |= MBNODE_STYLE_NEW_MAIL;
 
-	    /* If we've reached the top of the tree, reset the counter for
-	     * the next branch */
-	    if (GTK_CTREE_ROW(node)->parent == NULL) {
-		has_unread = 0;
-	    } else {
-		has_unread |= (1 << (GTK_CTREE_ROW(node)->level));
-		has_unread &= ~(1 << (GTK_CTREE_ROW(node)->level + 1));
-	    }
+            /* If we've reached the top of the tree, reset the counter for
+             * the next branch */
+            if (GTK_CTREE_ROW(node)->parent == NULL) {
+                has_unread = 0;
+            } else {
+            has_unread |= (1 << (GTK_CTREE_ROW(node)->level));
+            has_unread &= ~(1 << (GTK_CTREE_ROW(node)->level + 1));
+            }
 
-	} else if (mbnode->style & MBNODE_STYLE_NEW_MAIL) {
-	    /* This folder's style needs to be reset to the vanilla style */
-	    style = gtk_widget_get_style(GTK_WIDGET(ctree));
-	    gtk_ctree_node_set_row_style(ctree, node, style);
-	    mbnode->style &= ~MBNODE_STYLE_NEW_MAIL;
-	}
+        } else if (mbnode->style & MBNODE_STYLE_NEW_MAIL) {
+            /* This folder's style needs to be reset to the vanilla style */
+            style = gtk_widget_get_style(GTK_WIDGET(ctree));
+            gtk_ctree_node_set_row_style(ctree, node, style);
+            mbnode->style &= ~MBNODE_STYLE_NEW_MAIL;
+        }
     }
 }
 
@@ -1278,9 +1324,9 @@ balsa_mblist_focus_mailbox(BalsaMBList * bmbl, LibBalsaMailbox * mailbox)
     node = gtk_ctree_find_by_row_data_custom(GTK_CTREE(&bmbl->ctree), NULL,
 					     mailbox,
 					     mblist_mbnode_compare);
-    if (node != NULL) {
+    if ((node != NULL) && (node != bmbl->currently_selected_ctree_node)) {
 	gtk_ctree_select(GTK_CTREE(&bmbl->ctree), node);
-
+	bmbl->currently_selected_ctree_node = node;
 	/* moving selection to the respective mailbox.
 	   this is neccessary when the previous mailbox was closed and
 	   redundant if the mailboxes were switched (notebook_switch_page)

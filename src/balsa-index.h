@@ -45,11 +45,11 @@ extern "C" {
     struct _BalsaIndex {
         GtkScrolledWindow sw;    
         
-	GtkCTree* ctree;
+        GtkCTree* ctree;
         GtkWidget* window;       
 
         BalsaMailboxNode* mailbox_node;
-	LibBalsaMessage* first_new_message;
+        LibBalsaMessage* first_new_message;
 
         int threading_type;
         GTimeVal last_use;

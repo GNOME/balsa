@@ -1,3 +1,13 @@
+2004-11-15 21:32  PeterB
+
+	* libbalsa/misc.c, libbalsa/misc.h, libbalsa/send.c,
+	src/pref-manager.c, src/sendmsg-window.c: organize character sets
+	in libbalsa_codeset_info[]; implement and use LibBalsaTextAttribute
+	enum and libbalsa_text_attr_{file,string}; implement and use
+	libbalsa_charset_button_new(); check file character set at attach
+	time instead of send time.
+	* libbalsa/mailbox.c: check when opening an already open mailbox.
+
 2004-11-11 07:29  PeterB/Pawel
 
 	* src/balsa-message.c: deprecation cleanup.

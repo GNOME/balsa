@@ -63,7 +63,9 @@ enum
 
 /* marshallers */
 typedef void (*BalsaIndexSignal1) (GtkObject * object,
-				   Message * arg1,
+				   gint row,
+				   gint column,
+				   GdkEventButton * bevent,
 				   gpointer data);
 
 static void balsa_index_marshal_signal_1 (GtkObject * object,
@@ -121,7 +123,8 @@ balsa_index_class_init (BalsaIndexClass * klass)
 		    object_class->type,
 		    GTK_SIGNAL_OFFSET (BalsaIndexClass, select_message),
 		    balsa_index_marshal_signal_1,
-		    GTK_TYPE_NONE, 2, GTK_TYPE_POINTER, GTK_TYPE_LONG);
+		    GTK_TYPE_NONE, 3, GTK_TYPE_INT, GTK_TYPE_INT,
+		    GTK_TYPE_GDK_EVENT);
   gtk_object_class_add_signals (object_class, balsa_index_signals, LAST_SIGNAL);
 
   widget_class->size_request = balsa_index_size_request;
@@ -140,7 +143,8 @@ balsa_index_marshal_signal_1 (GtkObject * object,
   BalsaIndexSignal1 rfunc;
 
   rfunc = (BalsaIndexSignal1) func;
-  (*rfunc) (object, GTK_VALUE_POINTER (args[0]), func_data);
+  (*rfunc) (object, GTK_VALUE_INT (args[0]), GTK_VALUE_INT (args[1]),
+	    GTK_VALUE_BOXED (args[2]), func_data);
 }
 
 

@@ -85,17 +85,6 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	}
 #endif /* HAVE_GTKHTML */
 
-#ifdef HAVE_GPGME
-	/* if this is a RFC 2440 signed part, strip the signature status */
-	if (body->sig_info) {
-	    gchar *p = 
-		g_strrstr(res, _("\n--\nThis is an OpenPGP signed message part:\n"));
-	    
-	    if (p)
-		*p = '\0';
-	}
-#endif
-
 	if (llen > 0) {
             if (flow && libbalsa_message_body_is_flowed(body)) {
                 /* we're making a `format=flowed' message, and the

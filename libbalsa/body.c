@@ -382,7 +382,8 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
 
         wrapper =
             g_mime_part_get_content_object(GMIME_PART(body->mime_part));
-        stream = g_mime_data_wrapper_get_stream(wrapper);
+	stream = g_mime_stream_mem_new();
+	g_mime_data_wrapper_write_to_stream(wrapper, stream);
 
         filter = NULL;
         switch (g_mime_data_wrapper_get_encoding(wrapper)) {

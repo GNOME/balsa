@@ -109,6 +109,22 @@ typedef enum { IMBENC_UNUSED,
   IMBENC_7BIT, IMBENC_8BIT, IMBENC_BINARY, IMBENC_BASE64, 
   IMBENC_QUOTED, IMBENC_OTHER } ImapBodyEncoding;
 
+struct ImapBodyExt1Part_ {
+    char *md5;
+};
+typedef struct ImapBodyExt1Part_ ImapBodyExt1Part;
+
+typedef enum {
+    IMBDISP_INLINE,
+    IMBDISP_ATTACHMENT,
+    IMBDISP_OTHER
+} ImapBodyDisposition;
+struct ImapBodyExtMPart_ {
+  GHashTable         *params;
+  GSList	     *lang;
+};
+typedef struct ImapBodyExtMPart_ ImapBodyExtMPart;
+
 struct ImapBody_ {
   ImapBodyEncoding encoding;
   ImapMediaBasic media_basic;
@@ -119,6 +135,15 @@ struct ImapBody_ {
   unsigned lines;
   char *desc;
   ImapEnvelope *envelope;/* used only if media/basic == MESSAGE */
+  ImapBodyDisposition content_dsp;
+  GHashTable *dsp_params;
+  char *content_dsp_other;
+
+  union {
+    ImapBodyExt1Part onepart;
+    ImapBodyExtMPart mpart;
+  } ext;
+
   ImapBody *child; /* not null for eg. message/rfc822 */
   ImapBody *next;
 };

@@ -711,12 +711,26 @@ imap_body_new(void)
   return body;
 }
 
+static void
+imap_body_ext_mpart_free (ImapBodyExtMPart * mpart)
+{
+  if (mpart->params)
+    g_hash_table_destroy (mpart->params);
+  g_slist_foreach (mpart->lang, (GFunc) g_free, NULL);
+  g_slist_free (mpart->lang);
+}
+
 void
 imap_body_free(ImapBody* body)
 {
+  if(body->media_basic == IMBMEDIA_MULTIPART)
+    imap_body_ext_mpart_free(&body->ext.mpart);
+  if (body->dsp_params)
+    g_hash_table_destroy (body->dsp_params);
   g_free(body->media_basic_name);
   g_free(body->media_subtype);
   g_free(body->desc);
+  g_free(body->content_dsp_other);
   g_hash_table_destroy(body->params);
   if(body->envelope) imap_envelope_free(body->envelope);
   if(body->child) imap_body_free(body->child);
@@ -769,7 +783,7 @@ get_body_from_section(ImapBody *body, const char *section)
   char * dot;
   int no = atoi(section);
   if(body && body->media_basic == IMBMEDIA_MULTIPART)
-    body = body->next;
+    body = body->child;
   while(--no && body)
     body = body->next;
 
@@ -1024,6 +1038,13 @@ static char*
 imap_get_string(struct siobuf* sio)
 {
   return imap_get_string_with_lookahead(sio, sio_getc(sio));
+}
+
+static gboolean
+imap_is_nil (struct siobuf *sio, int c)
+{
+  return g_ascii_toupper (c) == 'N' && g_ascii_toupper (sio_getc (sio)) == 'I'
+    && g_ascii_toupper (sio_getc (sio)) == 'L';
 }
 
 /* see the spec for the definition of nstring */
@@ -1623,8 +1644,9 @@ ir_media(struct siobuf* sio, ImapMediaBasic *imb, ImapBody *body)
   } else g_free(subtype);
   return IMR_OK;
 }
+
 static ImapResponse
-ir_body_fld_param(struct siobuf* sio, ImapBody *body)
+ir_body_fld_param_hash(struct siobuf* sio, GHashTable * params)
 {
   int c;
   gchar *key, *val;
@@ -1633,8 +1655,8 @@ ir_body_fld_param(struct siobuf* sio, ImapBody *body)
       key = imap_get_string(sio);
       if(sio_getc(sio) != ' ') { g_free(key); return IMR_PROTOCOL; }
       val = imap_get_string(sio);
-      if(body) 
-        imap_body_add_param(body, key, val);
+      if(params) 
+        g_hash_table_insert(params, key, val);
       else {
         g_free(key); g_free(val);
       }
@@ -1642,6 +1664,12 @@ ir_body_fld_param(struct siobuf* sio, ImapBody *body)
   } else if(toupper(c) != 'N' || toupper(sio_getc(sio)) != 'I' ||
             toupper(sio_getc(sio)) != 'L') return IMR_PROTOCOL;
   return IMR_OK;
+}
+
+static ImapResponse
+ir_body_fld_param(struct siobuf* sio, ImapBody *body)
+{
+  return ir_body_fld_param_hash(sio, body ? body->params : NULL);
 }
 
 static ImapResponse
@@ -1730,10 +1758,207 @@ ir_body_fld_lines(struct siobuf* sio, ImapBody* body)
   return IMR_OK;
 }
 
+/* body_fld_dsp ::= "(" string SPACE body_fld_param ")" / nil */
 static ImapResponse
-ir_body_ext_1part(struct siobuf *sio, ImapBody *body)
+ir_body_fld_dsp (struct siobuf *sio, ImapBody * body)
 {
-  printf("NOT IMPLEMENTED YET!\n");
+  ImapResponse rc;
+  int c;
+  char *str;
+
+  if ((c = sio_getc (sio)) == '(')
+    {
+      /* "(" string */
+      str = imap_get_string (sio);
+      if (body)
+	{
+	  if (!g_ascii_strcasecmp (str, "inline"))
+	    body->content_dsp = IMBDISP_INLINE;
+	  else if (!g_ascii_strcasecmp (str, "attachment"))
+	    body->content_dsp = IMBDISP_ATTACHMENT;
+	  else
+	    {
+	      body->content_dsp = IMBDISP_OTHER;
+	      body->content_dsp_other = g_strdup (str);
+	    }
+	}
+      g_free (str);
+      /* SPACE body_fld_param ")" */
+      if (sio_getc (sio) != ' ')
+	return IMR_PROTOCOL;
+      if (body)
+	body->dsp_params =
+	  g_hash_table_new_full (g_str_hash, imap_str_case_equal, g_free,
+				 g_free);
+      rc = ir_body_fld_param_hash (sio, body ? body->dsp_params : NULL);
+      if (rc != IMR_OK)
+	return rc;
+      if (sio_getc (sio) != ')')
+	return IMR_PROTOCOL;
+    }
+  else
+    {
+      /* nil */
+      if (!imap_is_nil (sio, c))
+	return IMR_PROTOCOL;
+    }
+  return IMR_OK;
+}
+
+/* body_fld_lang ::= nstring / "(" 1#string ")" */
+static ImapResponse
+ir_body_fld_lang (struct siobuf *sio, ImapBody * body)
+{
+  int c;
+  c = sio_getc (sio);
+  if (c == '(')
+    {
+      /* 1#string ")" */
+      do
+	{
+	  char *str = imap_get_string (sio);
+	  if (body)
+	    body->ext.mpart.lang = g_slist_append (body->ext.mpart.lang, str);
+	  else
+	    g_free (str);
+	  c = sio_getc (sio);
+	  if (c != ' ' && c != ')')
+	    return IMR_PROTOCOL;
+	}
+      while (c != ')');
+    }
+  else
+    {
+      /* nstring */
+      char *str;
+      sio_ungetc (sio);
+      str = imap_get_nstring (sio);
+      if (str && body)
+	body->ext.mpart.lang = g_slist_append (NULL, str);
+      else
+	g_free (str);
+    }
+
+  return IMR_OK;
+}
+
+/* body_extension  ::= nstring / number / "(" 1#body_extension ")" */
+static ImapResponse
+ir_body_extension (struct siobuf *sio, ImapBody * body)
+{
+  ImapResponse rc;
+  int c;
+
+  c = sio_getc (sio);
+  if (c == '(')
+    {
+      /* 1#body_extension ")" */
+      do
+	{
+	  rc = ir_body_extension (sio, body);
+	  if (rc != IMR_OK)
+	    return rc;
+	  c = sio_getc (sio);
+	  if (c != ' ' && c != ')')
+	    return IMR_PROTOCOL;
+	}
+      while (c != ')');
+    }
+  else if (isdigit (c))
+    {
+      /* number */
+      while (isdigit (sio_getc (sio)))
+	;
+      sio_ungetc (sio);
+    }
+  else
+    /* nstring */
+    imap_get_nstring (sio);
+
+  return IMR_OK;
+}
+
+/* body_ext_mpart  ::= body_fld_param
+ *                     [SPACE body_fld_dsp SPACE body_fld_lang
+ *                     [SPACE 1#body_extension]] */
+static ImapResponse
+ir_body_ext_mpart (struct siobuf *sio, ImapBody * body)
+{
+  ImapResponse rc;
+  int c;
+
+  /* body_fld_param */
+  if (body)
+    body->ext.mpart.params =
+      g_hash_table_new_full (g_str_hash, imap_str_case_equal, g_free, g_free);
+  rc = ir_body_fld_param_hash (sio, body ? body->ext.mpart.params : NULL);
+  if (rc != IMR_OK)
+    return rc;
+  /* [SPACE */
+  if (sio_getc (sio) == ' ')
+    {
+      /* body_fld_dsp */
+      rc = ir_body_fld_dsp (sio, body);
+      if (rc != IMR_OK)
+	return rc;
+      /* SPACE body_fld_lang */
+      if (sio_getc (sio) != ' ')
+	return IMR_PROTOCOL;
+      ir_body_fld_lang (sio, body);
+      /* [SPACE 1#body_extension]] */
+      if ((c = sio_getc (sio)) == ' ')
+	do
+	  {
+	    rc = ir_body_extension (sio, body);
+	    if (rc != IMR_OK)
+	      return rc;
+	  }
+	while (sio_getc (sio) != ')');
+    }
+  return IMR_OK;
+}
+
+/* body_ext_1part ::= body_fld_md5 [SPACE body_fld_dsp
+ *                    [SPACE body_fld_lang
+ *                    [SPACE 1#body_extension]]]*/
+static ImapResponse
+ir_body_ext_1part (struct siobuf *sio, ImapBody * body)
+{
+  ImapResponse rc;
+  char *str;
+
+  /* body_fld_md5    ::= nstring */
+  str = imap_get_nstring (sio);
+  if (body && str)
+    body->ext.onepart.md5 = str;
+  else
+    g_free (str);
+  /* [SPACE body_fld_dsp */
+  if (sio_getc (sio) == ' ')
+    {
+      rc = ir_body_fld_dsp (sio, body);
+      if (rc != IMR_OK)
+	return rc;
+      /* [SPACE body_fld_lang */
+      if (sio_getc (sio) == ' ')
+	{
+	  rc = ir_body_fld_lang (sio, body);
+	  if (rc != IMR_OK)
+	    return rc;
+	  /* [SPACE 1#body_extension]]] */
+	  if (sio_getc (sio) == ' ')
+	    {
+	      do
+		{
+		  rc = ir_body_extension (sio, body);
+		  if (rc != IMR_OK)
+		    return rc;
+		}
+	      while (sio_getc (sio) == ' ');
+	      sio_ungetc (sio);
+	    }
+	}
+    }
   return IMR_OK;
 }
 
@@ -1756,7 +1981,7 @@ ir_body(struct siobuf *sio, int c, ImapBody *body)
       do {
         b =  body ? imap_body_new() : NULL;
         rc = ir_body(sio, c, b);
-        if(body) imap_body_append_part(body, b);
+        if(body) imap_body_append_child(body, b);
         if(rc !=IMR_OK) return rc;
       } while((c=sio_getc(sio)) == '(');
       if(c != ' ') return IMR_PROTOCOL;
@@ -1765,8 +1990,11 @@ ir_body(struct siobuf *sio, int c, ImapBody *body)
         g_assert(body->media_subtype == NULL);
         body->media_subtype = str;
       } else g_free(str);
+      c = sio_getc(sio);
+      if(c==' ')
+        ir_body_ext_mpart(sio, body);
+      sio_ungetc(sio);
     } while ((c=sio_getc(sio)) == ' ' && (c=sio_getc(sio)) == '(');
-    sio_ungetc(sio);
   } else { /* body_type_1part */
     ImapMediaBasic media_type;
     sio_ungetc(sio);
@@ -1803,11 +2031,12 @@ ir_body(struct siobuf *sio, int c, ImapBody *body)
       if( (rc=ir_body_fld_lines(sio, body))   != IMR_OK) return rc;
       /* printf("Lines: %d\n", body->lines); */
     }
+    c = sio_getc(sio);
+    if(c==' ')
+      return ir_body_ext_1part(sio, body);
   }
-  c = sio_getc(sio);
-  if(c==' ')
-    return ir_body_ext_1part(sio, body);
-  else return IMR_OK;
+
+  return IMR_OK;
 }
 
 /* read [section] and following string. FIXME: other kinds of body. */ 
@@ -1847,7 +2076,13 @@ ir_msg_att_body(ImapMboxHandle *h, int c, unsigned seqno)
 static ImapResponse
 ir_msg_att_bodystructure(ImapMboxHandle *h, int c, unsigned seqno)
 {
-  return IMR_OK;
+  ImapMessage *msg = h->msg_cache[seqno-1];
+
+  if (c != ' ')
+    return IMR_PROTOCOL;
+
+  return ir_body(h->sio, sio_getc(h->sio),
+	         msg->body ? NULL : (msg->body = imap_body_new()));;
 }
 
 static ImapResponse
@@ -1909,6 +2144,7 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
   if(h->msg_cache[seqno-1] == NULL)
     h->msg_cache[seqno-1] = imap_message_new();
   do {
+    /* FIXME Can we ever match "BODY[" or "BODY[HEADER.FIELDS"? */
     for(i=0; (c = sio_getc(h->sio)) != -1; i++) {
       c = toupper(c);
       if( !( (c >='A' && c<='Z') || (c >='0' && c<='9') || c == '.') ) break;
@@ -2045,6 +2281,7 @@ static const struct {
   { "SORT",       4, 0, ir_sort   },
   { "THREAD",     6, 0, ir_thread },
   { "FLAGS",      5, 1, ir_flags  },
+  /* FIXME Is there an unnumbered FETCH response? */
   { "FETCH",      5, 1, ir_fetch  }
 };
 static const struct {

@@ -2095,7 +2095,6 @@ continueBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 {
     LibBalsaMessageBody *body;
 
-    libbalsa_message_body_ref(message, TRUE);
     body = message->body_list;
     if (body) {
 	if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART)
@@ -2140,8 +2139,6 @@ continueBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 	    body = body->next;
 	}
     }
-
-    libbalsa_message_body_unref(message);
 }
 
 /* quoteBody ------------------------------------------------------------
@@ -2156,7 +2153,6 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
     gchar *personStr;
     const gchar *orig_address;
 
-    libbalsa_message_body_ref(message, TRUE);
     g_return_val_if_fail(message->headers, NULL);
 
     if (message->headers->from && 
@@ -2253,7 +2249,6 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
     g_free(date);
     g_free(personStr);
 
-    libbalsa_message_body_unref(message);
     return body;
 }
 
@@ -2953,6 +2948,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
                            2 * paned->style->ythickness);
     gnome_app_set_contents(GNOME_APP(window), paned);
 
+    if (message)
+	libbalsa_message_body_ref(message, TRUE);
     /* set the menus - and language index */
     if (message && !bsmsg->charset)
 	bsmsg->charset = libbalsa_message_charset(message);
@@ -2966,6 +2963,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	continueBody(bsmsg, message);
     else
 	fillBody(bsmsg, message, type);
+    if (message)
+	libbalsa_message_body_unref(message);
     /* ...but mark it as unmodified. */
     bsmsg->modified = FALSE;
     /* Save the initial state, so that `undo' will restore it. */
@@ -3706,23 +3705,28 @@ static void
 save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     if (!message_postpone(bsmsg))
-        return;
+	return;
+
+    if (!libbalsa_mailbox_open(balsa_app.draftbox)) {
+	balsa_information_parented(GTK_WINDOW(bsmsg->window),
+				   LIBBALSA_INFORMATION_WARNING,
+				   _("Could not save message."));
+	return;
+    }
 
     if (bsmsg->orig_message) {
-        if (bsmsg->orig_message->mailbox)
-            libbalsa_mailbox_close(bsmsg->orig_message->mailbox);
-        g_object_unref(G_OBJECT(bsmsg->orig_message));
+	if (bsmsg->orig_message->mailbox)
+	    libbalsa_mailbox_close(bsmsg->orig_message->mailbox);
+	g_object_unref(G_OBJECT(bsmsg->orig_message));
     }
     bsmsg->type = SEND_CONTINUE;
     bsmsg->modified = FALSE;
 
-#if 1
-    g_warning("save_message_cb disabled due to lack of error checking");
-#else
-    libbalsa_mailbox_open(balsa_app.draftbox); /* Error checking here? */
-    bsmsg->orig_message = balsa_app.draftbox->message_list->data;
+    bsmsg->orig_message =
+	libbalsa_mailbox_get_message(balsa_app.draftbox,
+				     libbalsa_mailbox_total_messages
+				     (balsa_app.draftbox));
     g_object_ref(G_OBJECT(bsmsg->orig_message));
-#endif
 }
 
 static void

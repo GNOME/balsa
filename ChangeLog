@@ -1,3 +1,16 @@
+1999-11-18  Stuart Parmenter  <pavlov@netscape.com>
+
+	* libbalsa/mailbox.[ch]  Changed mailbox code to act as GtkObjects
+	* libbalsa/mailbox_local.[ch]
+	  libbalsa/mailbox_pop3.[ch]
+	  libbalsa/mailbox_imap.[ch] added new files
+
+	* libbalsa/mailbox.c (mailbox_new): now returns a GtkObject instead of a Mailbox
+                             (mailbox_free) removed.
+
+	* src/* wrap mailbox_new in BALSA_MESSAGE()
+          src/* change mailbox_free to gtk_object_destroy()
+
 1999-11-15  Peter Williams  <peter@wgwill.ne.mediaone.net>
 
 	* src/balsa-index-page.c (create_menu): Fixed size

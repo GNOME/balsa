@@ -122,7 +122,7 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
     }
   else
     {
-      mailbox = mailbox_new (type);
+      mailbox = BALSA_MAILBOX(mailbox_new(type));
       mailbox->name = g_strdup (name);
       MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
 

@@ -26,14 +26,11 @@
 #include "libmutt/mutt.h"
 
 
-/*
- * public macros
- */
-#define MAILBOX(mailbox)        ((Mailbox *)(mailbox))
-#define MAILBOX_LOCAL(mailbox)  ((MailboxLocal *)(mailbox))
-#define MAILBOX_POP3(mailbox)   ((MailboxPOP3 *)(mailbox))
-#define MAILBOX_IMAP(mailbox)   ((MailboxIMAP *)(mailbox))
-
+#define BALSA_TYPE_MAILBOX			(balsa_mailbox_get_type())
+#define BALSA_MAILBOX(obj)			(GTK_CHECK_CAST (obj, BALSA_TYPE_MAILBOX, Mailbox))
+#define BALSA_MAILBOX_CLASS(klass)		(GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_MAILBOX, MailboxClass))
+#define BALSA_IS_MAILBOX(obj)			(GTK_CHECK_TYPE (obj, BALSA_TYPE_MAILBOX))
+#define BALSA_IS_MAILBOX_CLASS(klass)		(GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_MAILBOX))
 
 /*
  * enumes
@@ -56,12 +53,6 @@ typedef enum
 }
 ServerType;
 
-
-#define MAILBOX_IS_LOCAL(mailbox) ((mailbox->type == MAILBOX_MBOX) || \
-				   (mailbox->type == MAILBOX_MH) ||   \
-				   (mailbox->type == MAILBOX_MAILDIR))
-#define MAILBOX_IS_POP3(mailbox)  (mailbox->type == MAILBOX_POP3)
-#define MAILBOX_IS_IMAP(mailbox)  (mailbox->type == MAILBOX_IMAP)
 
 typedef enum
 {
@@ -116,16 +107,16 @@ typedef enum
 /*
  * strucutres
  */
-typedef struct _Server Server;
-
-typedef struct _MailboxLocal MailboxLocal;
+typedef struct _MailboxClass MailboxClass;
+typedef struct _ServerClass ServerClass;
 typedef struct _MailboxRemote MailboxRemote;
-typedef struct _MailboxPOP3 MailboxPOP3;
-typedef struct _MailboxIMAP MailboxIMAP;
+
 
 
 typedef struct _MailboxWatcherMessage MailboxWatcherMessage;
 typedef struct _MailboxWatcherMessageNew MailboxWatcherMessageNew;
+
+GtkType balsa_mailbox_get_type (void);
 
 struct _Mailbox
 {
@@ -153,6 +144,9 @@ struct _MailboxClass
 {
   GtkObjectClass parent_class;
 
+  void (* open_mailbox)    (Mailbox *mailbox);
+  void (* close_mailbox)   (Mailbox *mailbox);
+
   void (* message_new)     (Mailbox *mailbox,
 			    Message *message);
 
@@ -168,15 +162,10 @@ struct _MailboxClass
 
 };
 
-struct _MailboxLocal
-{
-  Mailbox mailbox;
-  gchar *path;
-};
-
 struct _Server
 {
-  //  GtkObject object;
+  GtkObject object;
+
   ServerType type;
   gchar *name;
 
@@ -187,28 +176,24 @@ struct _Server
   gchar *passwd;
 };
 
-struct _MailboxPOP3
+struct _ServerClass
 {
-  Mailbox mailbox;
+  GtkObjectClass parent_class;
 
-  Server *server;
+  void (* message_new)     (Mailbox *mailbox,
+			    Message *message);
 
-  gboolean check;
-  gboolean delete_from_server;
-  gchar *last_popped_uid;
+  void (* message_delete)  (Mailbox *mailbox,
+			    Message *message);
+
+  void (* message_append)  (Mailbox *mailbox,
+			    Message *message);
+
+  /* message's flags changed */
+  void (* message_flagged) (Mailbox *mailbox,
+			    Message *message);
+
 };
-
-
-struct _MailboxIMAP
-{
-  Mailbox mailbox;
-
-  Server *server;
-
-  gchar *path;
-  gchar *tmp_file_path;
-};
-
 
 struct _MailboxWatcherMessage
 {
@@ -255,6 +240,10 @@ GList *make_list_from_string (gchar *);
 /* 
  * open and close a mailbox 
  */
+/* XXX these need to return a value if they failed */
+void balsa_mailbox_open(Mailbox *mailbox);
+void balsa_mailbox_close(Mailbox *mailbox);
+
 int mailbox_open_ref (Mailbox * mailbox);
 int mailbox_open_append (Mailbox * mailbox);
 void mailbox_open_unref (Mailbox * mailbox);
@@ -267,7 +256,7 @@ void mailbox_sort (Mailbox * mailbox, MailboxSort sort);
 /*
  * create and destroy a mailbox structure
  */
-Mailbox *mailbox_new (MailboxType type);
+GtkObject *mailbox_new (MailboxType type);
 void mailbox_free (Mailbox * mailbox);
 gint mailbox_check_new_messages (Mailbox * mailbox);
 
@@ -288,5 +277,26 @@ gchar *mailbox_type_description (MailboxType type);
 MailboxType mailbox_valid (gchar * filename);
 gboolean mailbox_gather_content_info( Mailbox *mailbox );
 void mailbox_commit_flagged_changes( Mailbox *mailbox );
+
+
+
+
+
+#include "mailbox_local.h"
+#include "mailbox_pop3.h"
+#include "mailbox_imap.h"
+
+/*
+ * public macros
+ */
+#define MAILBOX(mailbox)        BALSA_MAILBOX(mailbox)
+#define MAILBOX_LOCAL(mailbox)  BALSA_MAILBOX_LOCAL(mailbox)
+#define MAILBOX_POP3(mailbox)   BALSA_MAILBOX_POP3(mailbox)
+#define MAILBOX_IMAP(mailbox)   BALSA_MAILBOX_IMAP(mailbox)
+
+#define MAILBOX_IS_LOCAL(mailbox) BALSA_IS_MAILBOX_LOCAL(mailbox)
+#define MAILBOX_IS_POP3(mailbox)  BALSA_IS_MAILBOX_POP3(mailbox)
+#define MAILBOX_IS_IMAP(mailbox)  BALSA_IS_MAILBOX_IMAP(mailbox)
+
 
 #endif /* __MAILBOX_H__ */

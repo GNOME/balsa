@@ -467,7 +467,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       mailbox_type = mailbox_valid (path);
       if (mailbox_type != MAILBOX_UNKNOWN)
 	{
-	  mailbox = mailbox_new (mailbox_type);
+	  mailbox = BALSA_MAILBOX(mailbox_new (mailbox_type));
 	  mailbox->name = mailbox_name;
 	  MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
 	}
@@ -480,7 +480,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
     }
   else if (!strcasecmp (type, "POP3"))	/* POP3 mailbox */
     {
-      mailbox = mailbox_new (MAILBOX_POP3);
+      mailbox = BALSA_MAILBOX(mailbox_new (MAILBOX_POP3));
       mailbox->name = mailbox_name;
 
       if ((field = pl_dict_get_str (mbox, "Username")) == NULL)
@@ -523,7 +523,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
     }
   else if (!strcasecmp (type, "IMAP"))	/* IMAP Mailbox */
     {
-      mailbox = mailbox_new (MAILBOX_IMAP);
+      mailbox = BALSA_MAILBOX(mailbox_new (MAILBOX_IMAP));
       mailbox->name = mailbox_name;
 
       if ((field = pl_dict_get_str (mbox, "Username")) == NULL)

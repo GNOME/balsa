@@ -55,6 +55,11 @@ typedef struct
   }
 MailboxWatcher;
 
+static void balsa_mailbox_class_init (MailboxClass *klass);
+static void balsa_mailbox_init(Mailbox *mailbox);
+static void balsa_mailbox_destroy (GtkObject *object);
+static void balsa_mailbox_real_open_mailbox(Mailbox *mailbox);
+static void balsa_mailbox_real_close_mailbox(Mailbox *mailbox);
 
 
 /* 
@@ -250,6 +255,135 @@ mailbox_have_new_messages (gchar * path)
 }
 
 
+
+enum {
+  OPEN_MAILBOX,
+  CLOSE_MAILBOX,
+  LAST_SIGNAL
+};
+
+static GtkObjectClass *parent_class = NULL;
+static guint mailbox_signals[LAST_SIGNAL] = { 0 };
+
+GtkType
+balsa_mailbox_get_type (void)
+{
+  static GtkType mailbox_type = 0;
+
+  if (!mailbox_type)
+    {
+      static const GtkTypeInfo mailbox_info =
+      {
+	"Mailbox",
+	sizeof (Mailbox),
+	sizeof (MailboxClass),
+	(GtkClassInitFunc) balsa_mailbox_class_init,
+	(GtkObjectInitFunc) balsa_mailbox_init,
+        /* reserved_1 */ NULL,
+	/* reserved_2 */ NULL,
+	(GtkClassInitFunc) NULL,
+      };
+
+      mailbox_type = gtk_type_unique (gtk_object_get_type(), &mailbox_info);
+    }
+
+  return mailbox_type;
+}
+
+static void
+balsa_mailbox_class_init (MailboxClass *klass)
+{
+  GtkObjectClass *object_class;
+
+  object_class = (GtkObjectClass*) klass;
+
+  parent_class = gtk_type_class(gtk_object_get_type());
+
+  mailbox_signals[OPEN_MAILBOX] =
+    gtk_signal_new ("open_mailbox",
+                    GTK_RUN_FIRST,
+                    object_class->type,
+                    GTK_SIGNAL_OFFSET (MailboxClass, open_mailbox),
+		    gtk_marshal_NONE__NONE,
+		    GTK_TYPE_NONE, 0);
+
+  mailbox_signals[CLOSE_MAILBOX] =
+    gtk_signal_new ("close_mailbox",
+                    GTK_RUN_LAST,
+                    object_class->type,
+                    GTK_SIGNAL_OFFSET (MailboxClass, close_mailbox),
+		    gtk_marshal_NONE__NONE,
+		    GTK_TYPE_NONE, 0);
+
+  gtk_object_class_add_signals (object_class, mailbox_signals, LAST_SIGNAL);
+
+  object_class->destroy = balsa_mailbox_destroy;
+
+  klass->open_mailbox = balsa_mailbox_real_open_mailbox;
+  klass->close_mailbox = balsa_mailbox_real_close_mailbox;
+}
+
+static void
+balsa_mailbox_init(Mailbox *mailbox)
+{
+  mailbox->ismbnode = FALSE;
+  mailbox->lock = FALSE;
+  mailbox->name = NULL;
+  mailbox->private = (void *) g_malloc (sizeof (MailboxPrivate));
+  CLIENT_CONTEXT (mailbox) = NULL;
+  WATCHER_LIST (mailbox) = NULL;
+  mailbox->open_ref = 0;
+  mailbox->messages = 0;
+  mailbox->new_messages = 0;
+  mailbox->message_list = NULL;
+}
+
+GtkObject*
+mailbox_new(MailboxType type)
+{
+  Mailbox *mailbox;
+
+  switch (type)
+    {
+    case MAILBOX_MBOX:
+    case MAILBOX_MH:
+    case MAILBOX_MAILDIR:
+      mailbox = gtk_type_new(BALSA_TYPE_MAILBOX_LOCAL);
+      break;
+
+    case MAILBOX_POP3:
+      mailbox = gtk_type_new(BALSA_TYPE_MAILBOX_POP3);
+      break;
+
+    case MAILBOX_IMAP:
+      mailbox = gtk_type_new(BALSA_TYPE_MAILBOX_IMAP);
+      break;
+
+    default:
+      return NULL;
+    }
+  
+  return GTK_OBJECT(mailbox);
+}
+
+static void balsa_mailbox_destroy (GtkObject *object)
+{
+  Mailbox *mailbox = BALSA_MAILBOX(object);
+
+  if (!mailbox)
+    return;
+
+  if (CLIENT_CONTEXT (mailbox) != NULL)
+    while (mailbox->open_ref > 0)
+      mailbox_open_unref (mailbox);
+
+  g_free(mailbox->name);
+  g_free(mailbox->private);
+
+  if (GTK_OBJECT_CLASS(parent_class)->destroy)
+    (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
+}
+
 Server *
 server_new(ServerType type)
 {
@@ -273,94 +407,25 @@ server_free(Server *server)
   g_free(server->host);
 }
 
-/*
- * allocate a new mailbox
- */
-Mailbox *
-mailbox_new (MailboxType type)
+
+
+void balsa_mailbox_open(Mailbox *mailbox)
 {
-  Mailbox *mailbox;
+  g_return_if_fail(mailbox != NULL);
+  g_return_if_fail(BALSA_IS_MAILBOX(mailbox));
 
-  switch (type)
-    {
-    case MAILBOX_MBOX:
-    case MAILBOX_MH:
-    case MAILBOX_MAILDIR:
-      mailbox = (Mailbox *) g_malloc (sizeof (MailboxLocal));
-      MAILBOX_LOCAL (mailbox)->path = NULL;
-      break;
+  gtk_signal_emit(GTK_OBJECT(mailbox), mailbox_signals[OPEN_MAILBOX], NULL);
+}
 
-    case MAILBOX_POP3:
-      mailbox = (Mailbox *) g_malloc (sizeof (MailboxPOP3));
-      MAILBOX_POP3(mailbox)->server = server_new(SERVER_POP3);
-      MAILBOX_POP3 (mailbox)->check = FALSE;
-      MAILBOX_POP3 (mailbox)->delete_from_server = FALSE;
-	  MAILBOX_POP3 (mailbox)->last_popped_uid = NULL;
-      break;
+void balsa_mailbox_close(Mailbox *mailbox)
+{
+  g_return_if_fail(mailbox != NULL);
+  g_return_if_fail(BALSA_IS_MAILBOX(mailbox));
 
-    case MAILBOX_IMAP:
-      mailbox = (Mailbox *) g_malloc (sizeof (MailboxIMAP));
-      MAILBOX_IMAP(mailbox)->server = server_new(SERVER_IMAP);
-      MAILBOX_IMAP (mailbox)->path = NULL;
-      MAILBOX_IMAP (mailbox)->tmp_file_path = NULL;
-      break;
-
-    default:
-      return NULL;
-    }
-
-  mailbox->ismbnode = FALSE;
-  mailbox->lock = FALSE;
-  mailbox->type = type;
-  mailbox->name = NULL;
-  mailbox->private = (void *) g_malloc (sizeof (MailboxPrivate));
-  CLIENT_CONTEXT (mailbox) = NULL;
-  WATCHER_LIST (mailbox) = NULL;
-  mailbox->open_ref = 0;
-  mailbox->messages = 0;
-  mailbox->new_messages = 0;
-  mailbox->message_list = NULL;
-  return mailbox;
+  gtk_signal_emit(GTK_OBJECT(mailbox), mailbox_signals[CLOSE_MAILBOX], NULL);
 }
 
 
-void
-mailbox_free (Mailbox * mailbox)
-{
-  if (!mailbox)
-    return;
-
-  if (CLIENT_CONTEXT (mailbox) != NULL)
-    while (mailbox->open_ref > 0)
-      mailbox_open_unref (mailbox);
-
-  g_free (mailbox->name);
-  g_free (mailbox->private);
-
-  switch (mailbox->type)
-    {
-    case MAILBOX_MBOX:
-    case MAILBOX_MH:
-    case MAILBOX_MAILDIR:
-      g_free (MAILBOX_LOCAL (mailbox)->path);
-      break;
-
-    case MAILBOX_POP3:
-      server_free(MAILBOX_POP3(mailbox)->server);
-      g_free (MAILBOX_POP3 (mailbox)->last_popped_uid);
-      break;
-
-    case MAILBOX_IMAP:
-      server_free(MAILBOX_POP3(mailbox)->server);
-      g_free (MAILBOX_IMAP (mailbox)->path);
-      break;
-
-    case MAILBOX_UNKNOWN:
-      break;
-    }
-
-  g_free (mailbox);
-}
 
 gint
 mailbox_open_ref (Mailbox * mailbox)
@@ -372,6 +437,18 @@ gint
 mailbox_open_append (Mailbox * mailbox)
 {
   return _mailbox_open_ref (mailbox, M_APPEND);
+}
+
+
+
+static void balsa_mailbox_real_open_mailbox(Mailbox *mailbox)
+{
+  return _mailbox_open_ref(mailbox, 0);
+}
+
+static void balsa_mailbox_real_close_mailbox(Mailbox *mailbox)
+{
+  mailbox_open_unref(mailbox);
 }
 
 static gint

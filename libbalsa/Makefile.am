@@ -22,6 +22,9 @@ libbalsa_a_SOURCES = 		\
 	misc.c			\
 	mime.c			\
 	mailbox.c		\
+	mailbox_local.c		\
+	mailbox_pop3.c		\
+	mailbox_imap.c		\
 	send.c
 
 libbalsa_a_LIBADD = @LIBOBJS@

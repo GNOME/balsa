@@ -629,7 +629,7 @@ conf_add_mailbox ()
 	    close (fd);
 	    type = MAILBOX_MBOX;
 	  }
-	mailbox = mailbox_new (type);
+	mailbox = BALSA_MAILBOX(mailbox_new (type));
 
 	field_check = check_for_blank_fields(mailbox);
 	if(field_check == -2)
@@ -649,7 +649,7 @@ conf_add_mailbox ()
 
 /* POP3 Mailboxes */
     case MC_PAGE_POP3:
-      mailbox = mailbox_new (MAILBOX_POP3);
+      mailbox = BALSA_MAILBOX(mailbox_new (MAILBOX_POP3));
 
       field_check = check_for_blank_fields(mailbox);
       if(field_check == -2)
@@ -672,7 +672,7 @@ conf_add_mailbox ()
 
 /* IMAP Mailboxes */
     case MC_PAGE_IMAP:
-      mailbox = mailbox_new (MAILBOX_IMAP);
+      mailbox = BALSA_MAILBOX(mailbox_new (MAILBOX_IMAP));
 
       field_check = check_for_blank_fields(mailbox);
       if(field_check == -2)

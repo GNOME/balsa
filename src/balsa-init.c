@@ -634,44 +634,45 @@ complete_cb (GtkWidget * widget, gpointer data)
   g_string_free (gs, TRUE);
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
-  mailbox = mailbox_new (type);
+
+  mailbox = BALSA_MAILBOX(mailbox_new(type));
   mailbox->name = g_strdup (_("Inbox"));
   MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
   config_mailbox_add (mailbox, "Inbox");
   add_mailboxes_for_checking (mailbox);
-  mailbox_free (mailbox);
+  gtk_object_destroy(GTK_OBJECT(mailbox));
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
-  mailbox = mailbox_new (type);
+  mailbox = BALSA_MAILBOX(mailbox_new(type));
   mailbox->name = g_strdup (_("Outbox"));
   MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->outbox)));
   config_mailbox_add (mailbox, "Outbox");
   add_mailboxes_for_checking (mailbox);
-  mailbox_free (mailbox);
+  gtk_object_destroy(GTK_OBJECT(mailbox));
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->sentbox)));
-  mailbox = mailbox_new (type);
+  mailbox = BALSA_MAILBOX(mailbox_new(type));
   mailbox->name = g_strdup (_("Sentbox"));
   MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->sentbox)));
   config_mailbox_add (mailbox, "Sentbox");
   add_mailboxes_for_checking (mailbox);
-  mailbox_free (mailbox);
+  gtk_object_destroy(GTK_OBJECT(mailbox));
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->draftbox)));
-  mailbox = mailbox_new (type);
+  mailbox = BALSA_MAILBOX(mailbox_new(type));
   mailbox->name = g_strdup (_("Draftbox"));
   MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->draftbox)));
   config_mailbox_add (mailbox, "Draftbox");
   add_mailboxes_for_checking (mailbox);
-  mailbox_free (mailbox);
+  gtk_object_destroy(GTK_OBJECT(mailbox));
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->trash)));
-  mailbox = mailbox_new (type);
+  mailbox = BALSA_MAILBOX(mailbox_new(type));
   mailbox->name = g_strdup (_("Trash"));
   MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->trash)));
   config_mailbox_add (mailbox, "Trash");
   add_mailboxes_for_checking (mailbox);
-  mailbox_free (mailbox);
+  gtk_object_destroy(GTK_OBJECT(mailbox));
 
   config_global_save ();
 

@@ -727,6 +727,9 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
 #if 0
     bndx_moveto(index);
 #endif
+
+    balsa_index_update_tree(index, balsa_app.expand_tree);
+
     return FALSE;
 }
 

@@ -13,6 +13,8 @@ TODO LIST:
    needs to be possible to set a default folder for external
    sources to be delivered into as well.
 
+ * digest/undigest mail.
+
 Balsa Library (libbalsa):
 
  * sending mail

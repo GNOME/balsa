@@ -214,7 +214,7 @@ create_menu (BalsaIndex * bindex, Message * message)
 
   menu = gtk_menu_new ();
   menuitem = gtk_menu_item_new_with_label ("Transfer");
-
+#if 0 /* FIXME */
   list = g_list_first (balsa_app.mailbox_list);
   submenu = gtk_menu_new ();
   while (list)
@@ -229,6 +229,7 @@ create_menu (BalsaIndex * bindex, Message * message)
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
+#endif
 
   menuitem = gtk_menu_item_new_with_label ("Change Status");
 

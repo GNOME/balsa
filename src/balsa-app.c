@@ -38,7 +38,7 @@ struct BalsaApplication balsa_app;
 
 /* prototypes */
 static int mailboxes_init ();
-static void my_special_mailbox ();
+static void special_mailboxes ();
 static gint read_signature ();
 #if 0
 static gint check_for_new_messages ();
@@ -59,7 +59,14 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.local_mail_directory = NULL;
   balsa_app.smtp_server = NULL;
 
-  balsa_app.mailbox_list = NULL;
+  balsa_app.inbox = NULL;
+  balsa_app.inbox_path = NULL;
+  balsa_app.outbox = NULL;
+  balsa_app.outbox_path = NULL;
+  balsa_app.trash = NULL;
+  balsa_app.trash_path = NULL;
+
+  balsa_app.node = NULL;
   balsa_app.current_index_child = NULL;
   balsa_app.addressbook_list = NULL;
 
@@ -75,7 +82,9 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.mdi_style = GNOME_MDI_NOTEBOOK;
 
   /* initalize our mailbox access crap */
-  mailbox_init ();
+  restore_global_settings ();
+
+  mailbox_init(balsa_app.inbox_path);
 
   read_signature ();
 
@@ -105,7 +114,7 @@ do_load_mailboxes ()
 {
   mailboxes_init ();
   load_local_mailboxes ();
-  my_special_mailbox ();
+  special_mailboxes ();
 }
 
 static gint
@@ -182,15 +191,17 @@ mailboxes_init (void)
 
 
 static void
-my_special_mailbox ()
+special_mailboxes ()
 {
-#if 0
-  Mailbox *mailbox;
+  balsa_app.inbox = mailbox_new (MAILBOX_MBOX);
+  balsa_app.inbox->name = g_strdup ("Inbox");
+  MAILBOX_LOCAL (balsa_app.inbox)->path = balsa_app.inbox_path;
 
-  mailbox = mailbox_new (MAILBOX_NNTP);
-  mailbox->name = g_strdup ("COLA");
-  MAILBOX_NNTP (mailbox)->server = g_strdup ("news.serv.net");
-  MAILBOX_NNTP (mailbox)->newsgroup = g_strdup ("comp.os.linux.announce");
-  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
-#endif
+  balsa_app.outbox = mailbox_new (MAILBOX_MBOX);
+  balsa_app.outbox->name = g_strdup ("Outbox");
+  MAILBOX_LOCAL (balsa_app.outbox)->path = balsa_app.outbox_path;
+
+  balsa_app.trash = mailbox_new (MAILBOX_MBOX);
+  balsa_app.trash->name = g_strdup ("Trash");
+  MAILBOX_LOCAL (balsa_app.trash)->path = balsa_app.trash_path;
 }

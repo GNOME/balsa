@@ -53,7 +53,14 @@ extern struct BalsaApplication
 
   IndexChild *current_index_child;
 
-  GList *mailbox_list;
+  Mailbox *inbox;
+  gchar *inbox_path;
+  Mailbox *outbox;
+  gchar *outbox_path;
+  Mailbox *trash;
+  gchar *trash_path;
+  
+  GNode *mailbox_nodes;
   GList *addressbook_list;
 
 

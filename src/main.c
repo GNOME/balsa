@@ -37,21 +37,56 @@ main (int argc, char *argv[])
   return 0;
 }
 
+static gboolean 
+close_all_mailboxes (GNode * node, gpointer data)
+{
+  Mailbox *mailbox;
+
+  if (node->data)
+    {
+      mailbox = node->data;
+
+      if (balsa_app.debug)
+	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
+
+      while (mailbox->open_ref > 0)
+	mailbox_open_unref (mailbox);
+    }
+  return TRUE;
+}
 
 void
 balsa_exit ()
 {
-  GList *list;
   Mailbox *mailbox;
 
-  list = balsa_app.mailbox_list;
-  while (list)
+  g_node_traverse (balsa_app.mailbox_nodes,
+		   G_LEVEL_ORDER,
+		   G_TRAVERSE_ALL,
+		   10,
+		   close_all_mailboxes,
+		   NULL);
+
+  mailbox = balsa_app.inbox;
+  if (balsa_app.debug)
+    g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
+  while (mailbox->open_ref > 0)
+    mailbox_open_unref (mailbox);
+
+  mailbox = balsa_app.outbox;
+  if (mailbox)
     {
-      mailbox = list->data;
-      list = list->next;
       if (balsa_app.debug)
 	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
+      while (mailbox->open_ref > 0)
+	mailbox_open_unref (mailbox);
+    }
 
+  mailbox = balsa_app.trash;
+  if (mailbox)
+    {
+      if (balsa_app.debug)
+	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
       while (mailbox->open_ref > 0)
 	mailbox_open_unref (mailbox);
     }

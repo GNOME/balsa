@@ -238,7 +238,7 @@ typedef void (*MailboxWatcherFunc) (MailboxWatcherMessage * arg1);
 /*
  * call before using any mailbox functions
  */
-void mailbox_init ();
+void mailbox_init (gchar *inbox);
 
 gint set_imap_username(Mailbox *mb);
 

@@ -47,8 +47,8 @@ extern void balsa_exit ();
 
 
 /* main window widget components */
-static GtkMenuBar *create_menu (GnomeMDI *, GtkWidget *app);
-static GtkToolbar *create_toolbar (GnomeMDI *, GtkWidget *app);
+static GtkMenuBar *create_menu (GnomeMDI *, GtkWidget * app);
+static GtkToolbar *create_toolbar (GnomeMDI *, GtkWidget * app);
 
 
 /* dialogs */
@@ -67,7 +67,7 @@ static void delete_message_cb (GtkWidget * widget);
 static void undelete_message_cb (GtkWidget * widget);
 
 static void mblist_window_cb (GtkWidget * widget);
-static void mailbox_close_child(GtkWidget *widget);
+static void mailbox_close_child (GtkWidget * widget);
 
 static void about_box_destroy_cb ();
 
@@ -85,8 +85,8 @@ open_main_window ()
   /* meubar and toolbar */
   gtk_signal_connect (GTK_OBJECT (mdi), "create_menus", GTK_SIGNAL_FUNC (create_menu), NULL);
   gtk_signal_connect (GTK_OBJECT (mdi), "create_toolbar", GTK_SIGNAL_FUNC (create_toolbar), NULL);
-  gtk_signal_connect (GTK_OBJECT(mdi), "child_changed", GTK_SIGNAL_FUNC(index_child_changed), NULL);
-  gnome_mdi_set_child_list_path(mdi, _("Mailboxes/<Separator>"));
+  gtk_signal_connect (GTK_OBJECT (mdi), "child_changed", GTK_SIGNAL_FUNC (index_child_changed), NULL);
+  gnome_mdi_set_child_list_path (mdi, _ ("Mailboxes/<Separator>"));
 
   gnome_mdi_set_mode (mdi, balsa_app.mdi_style);
 
@@ -103,7 +103,7 @@ close_main_window ()
 {
   if (gnome_mdi_remove_all (mdi, FALSE))
     gtk_object_destroy (GTK_OBJECT (mdi));
-  mdi=NULL;
+  mdi = NULL;
 }
 
 
@@ -117,15 +117,16 @@ refresh_main_window ()
   /*
    * set the toolbar style
    */
-  gtk_toolbar_set_style (GTK_TOOLBAR(GNOME_APP(mdi->active_window)->toolbar), balsa_app.toolbar_style);
-  gnome_mdi_set_mode(mdi,balsa_app.mdi_style);
+  gtk_toolbar_set_style (GTK_TOOLBAR (GNOME_APP (mdi->active_window)->toolbar), balsa_app.toolbar_style);
+  gnome_mdi_set_mode (mdi, balsa_app.mdi_style);
 }
 
 /*
  * the menubar for the main window
  */
 
-static GtkMenuBar *create_menu (GnomeMDI * mdi, GtkWidget *app)
+static GtkMenuBar *
+create_menu (GnomeMDI * mdi, GtkWidget * app)
 {
   gint i = 0;
   GtkWidget *menubar;
@@ -364,7 +365,8 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi, GtkWidget *app)
 /*
  * the toolbar for the main window
  */
-static GtkToolbar *create_toolbar (GnomeMDI *mdi, GtkWidget *app)
+static GtkToolbar *
+create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 {
   GtkWidget *window;
   GtkWidget *toolbar;
@@ -380,7 +382,7 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi, GtkWidget *app)
 			     "Check Email",
 			     NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RCV),
-	/*		     (GtkSignalFunc) check_new_messages_cb, */
+  /*                   (GtkSignalFunc) check_new_messages_cb, */
 			     (GtkSignalFunc) NULL,
 			     "Check Email");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
@@ -460,7 +462,7 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi, GtkWidget *app)
 			     "Open Next Message");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
-  return GTK_TOOLBAR(toolbar);
+  return GTK_TOOLBAR (toolbar);
 }
 
 
@@ -596,29 +598,42 @@ undelete_message_cb (GtkWidget * widget)
   balsa_index_select_next (BALSA_INDEX (balsa_app.current_index_child->index));
 }
 
+static gboolean 
+mblist_add_mailbox_traverse_nodes (GNode * node, gpointer data)
+{
+  Mailbox *mailbox;
+  if (node->data)
+    {
+      mailbox = node->data;
+      mblist_add_mailbox (mailbox);
+    }
+  return TRUE;
+}
 
 static void
 mblist_window_cb (GtkWidget * widget)
 {
-  GList *list;
   Mailbox *mailbox;
 
   mblist_open_window (mdi);
 
-  list = balsa_app.mailbox_list;
-  while (list)
-    {
-      mailbox = list->data;
-      list = list->next;
+  mblist_add_mailbox (balsa_app.inbox);
+  mblist_add_mailbox (balsa_app.outbox);
+  mblist_add_mailbox (balsa_app.trash);
 
-      mblist_add_mailbox (mailbox);
-    }
+
+  g_node_traverse (balsa_app.mailbox_nodes,
+		   G_LEVEL_ORDER,
+		   G_TRAVERSE_ALL,
+		   10,
+		   mblist_add_mailbox_traverse_nodes,
+		   NULL);
 }
 
 static void
-mailbox_close_child(GtkWidget *widget)
+mailbox_close_child (GtkWidget * widget)
 {
-  gtk_object_destroy(GTK_OBJECT(balsa_app.current_index_child));
+  gtk_object_destroy (GTK_OBJECT (balsa_app.current_index_child));
 }
 
 static void

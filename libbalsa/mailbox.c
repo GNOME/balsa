@@ -135,11 +135,12 @@ static Address *translate_address (ADDRESS * caddr);
 
 /* We're gonna set Mutt global vars here */
 void
-mailbox_init ()
+mailbox_init (gchar *inbox_path)
 {
   struct utsname utsname;
   char *p;
 
+  Spoolfile = inbox_path;
 
   uname (&utsname);
 

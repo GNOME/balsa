@@ -128,9 +128,9 @@ load_mailboxes (gchar * name)
   gint type;
   GString *gstring;
   gchar *path;
-  gchar mh[PATH_MAX + 1];
   gstring = g_string_new (NULL);
-
+  GNode *node;
+  
 
   g_string_truncate (gstring, 0);
   g_string_sprintf (gstring, "/balsa/%s", name);
@@ -159,19 +159,8 @@ load_mailboxes (gchar * name)
 	  mailbox = mailbox_new (mailbox_type);
 	  mailbox->name = g_strdup (name);
 	  MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
-	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
-	}
-      else
-	{
-	  sprintf (mh, "#mh/%s", path);
-	  mailbox_type = mailbox_valid (mh);
-	  if (mailbox_type == MAILBOX_MH)
-	    {
-	      mailbox = mailbox_new (mailbox_type);
-	      mailbox->name = g_strdup (name);
-	      MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
-	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
-	    }
+      node = g_node_new(mailbox);
+      g_node_append(balsa_app.mailbox_nodes, node);
 	}
       break;
 
@@ -182,7 +171,8 @@ load_mailboxes (gchar * name)
       MAILBOX_POP3 (mailbox)->user = gnome_config_get_string ("username");
       MAILBOX_POP3 (mailbox)->passwd = gnome_config_get_string ("password");
       MAILBOX_POP3 (mailbox)->server = gnome_config_get_string ("server");
-      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
+      node = g_node_new(mailbox);
+      g_node_append(balsa_app.mailbox_nodes, node);
       break;
 
       /*  IMAP  */
@@ -194,6 +184,8 @@ load_mailboxes (gchar * name)
       MAILBOX_IMAP (mailbox)->server = gnome_config_get_string ("server");
       MAILBOX_IMAP (mailbox)->path = gnome_config_get_string ("Path");
       balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
+      node = g_node_new(mailbox);
+      g_node_append(balsa_app.mailbox_nodes, node);
       break;
     }
 
@@ -229,6 +221,11 @@ restore_global_settings ()
 
   /* organization */
   balsa_app.organization = get_string_set_default ("organization", "None");
+
+  /* important mailboxes */
+  balsa_app.inbox_path = get_string_set_default("inbox", NULL);
+  balsa_app.outbox_path = get_string_set_default("outbox", NULL);
+  balsa_app.trash_path = get_string_set_default("trash", NULL);
 
   /* directory */
   path = g_string_new (NULL);

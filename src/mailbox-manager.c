@@ -26,10 +26,10 @@
 
 typedef struct _MailboxManagerWindow MailboxManagerWindow;
 struct _MailboxManagerWindow
-{
-  GtkWidget *window;
-  GtkWidget *list;
-};
+  {
+    GtkWidget *window;
+    GtkWidget *list;
+  };
 
 static MailboxManagerWindow *mmw = NULL;
 
@@ -92,7 +92,7 @@ open_mailbox_manager ()
 		      NULL);
 
 
-  
+
   hbox = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mmw->window)->vbox), hbox, TRUE, TRUE, 5);
   gtk_widget_show (hbox);
@@ -173,7 +173,7 @@ open_mailbox_manager ()
   bbox = gtk_hbutton_box_new ();
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mmw->window)->action_area), bbox, TRUE, TRUE, 0);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_END);
-  gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
+  gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 5);
   gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
 				 BALSA_BUTTON_WIDTH,
 				 BALSA_BUTTON_HEIGHT);
@@ -216,6 +216,37 @@ close_mailbox_manager ()
   gtk_widget_destroy (mmw->window);
 }
 
+static gboolean 
+mmw_add_mb_to_clist_traverse_nodes (GNode * node, gpointer data)
+{
+  Mailbox *mailbox;
+  gchar *list_items[3];
+
+  if (node->data)
+    mailbox = node->data;
+  list_items[0] = mailbox->name;
+  list_items[1] = mailbox_type_description (mailbox->type);
+
+  switch (mailbox->type)
+    {
+    case MAILBOX_POP3:
+      list_items[2] = ((MailboxPOP3 *) mailbox)->server;
+      break;
+
+    case MAILBOX_IMAP:
+      list_items[2] = ((MailboxIMAP *) mailbox)->server;
+      break;
+
+    default:
+      list_items[2] = NULL;
+      break;
+    }
+
+  gtk_clist_set_row_data (GTK_CLIST (mmw->list),
+		       gtk_clist_append (GTK_CLIST (mmw->list), list_items),
+			  mailbox);
+  return TRUE;
+}
 
 /* sets the list of mailboxes in the mailbox manager window */
 void
@@ -223,39 +254,17 @@ refresh_mailbox_manager ()
 {
   GList *list;
   Mailbox *mailbox;
-  gchar *list_items[3];
 
   gtk_clist_freeze (GTK_CLIST (mmw->list));
   gtk_clist_clear (GTK_CLIST (mmw->list));
 
-  list = g_list_first (balsa_app.mailbox_list);
-  while (list)
-    {
-      mailbox = list->data;
+  g_node_traverse (balsa_app.mailbox_nodes,
+		   G_LEVEL_ORDER,
+		   G_TRAVERSE_ALL,
+		   10,
+		   mmw_add_mb_to_clist_traverse_nodes,
+		   NULL);
 
-      list_items[0] = mailbox->name;
-      list_items[1] = mailbox_type_description (mailbox->type);
-
-      switch (mailbox->type)
-	{
-	case MAILBOX_POP3:
-	  list_items[2] = ((MailboxPOP3 *) mailbox)->server;
-	  break;
-	  
-	case MAILBOX_IMAP:
-	  list_items[2] = ((MailboxIMAP *) mailbox)->server;
-	  break;
-	  
-	default:
-	  list_items[2] = NULL;
-	  break;
-	}
-      
-      gtk_clist_set_row_data (GTK_CLIST (mmw->list),
-			      gtk_clist_append (GTK_CLIST (mmw->list), list_items),
-			      mailbox);
-      list = list->next;
-    }
 
   gtk_clist_thaw (GTK_CLIST (mmw->list));
 }
@@ -268,8 +277,8 @@ refresh_mailbox_manager ()
 static void
 select_row_cb (GtkWidget * widget, gint row, gint column, GdkEventButton * bevent)
 {
-  if (bevent)             
-    if (bevent->type == GDK_2BUTTON_PRESS)                    
+  if (bevent)
+    if (bevent->type == GDK_2BUTTON_PRESS)
       open_new_mailbox ((Mailbox *) gtk_clist_get_row_data (GTK_CLIST (mmw->list), row));
 }
 
@@ -286,7 +295,7 @@ edit_cb ()
 {
   gint row;
   Mailbox *mailbox;
-  
+
   row = (gint) GTK_CLIST (mmw->list)->selection->data;
   mailbox = (Mailbox *) gtk_clist_get_row_data (GTK_CLIST (mmw->list), row);
 
@@ -299,7 +308,7 @@ delete_cb ()
 {
   gint row;
   Mailbox *mailbox;
-  
+
   row = (gint) GTK_CLIST (mmw->list)->selection->data;
   mailbox = (Mailbox *) gtk_clist_get_row_data (GTK_CLIST (mmw->list), row);
 }

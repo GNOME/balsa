@@ -661,11 +661,6 @@ load_messages (Mailbox * mailbox, gint emit)
   for (msgno = mailbox->messages;
        mailbox->new_messages > 0;
        msgno++)
-#if 0
-    for (msgno = mailbox->messages - mailbox->new_messages;
-	 msgno <= mailbox->messages - 1;
-	 msgno++)
-#endif
       {
 	cur = CLIENT_CONTEXT (mailbox)->hdrs[msgno];
 
@@ -1392,7 +1387,6 @@ message_body_ref (Message * message)
 		}
 	      body = body_new ();
 	      body->mutt_body = bdy;
-	      fprintf (stderr, "message_body_ref: message->body = %p -> %p\n", body, bdy);
 	      message->body_list = g_list_append (message->body_list, body);
 	      bdy = bdy->next;
 
@@ -1449,7 +1443,6 @@ message_body_unref (Message * message)
       message->body_list = NULL;
     }
 }
-
 
 /*
  * addresses

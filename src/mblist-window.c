@@ -140,28 +140,28 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->vbox), GTK_WIDGET (mblw->ctree), TRUE, TRUE, 0);
   gtk_widget_show (GTK_WIDGET (mblw->ctree));
 
-  mblw->parent = gtk_ctree_insert (mblw->ctree, NULL, NULL, text, 0, NULL,
-				   NULL, NULL, NULL, FALSE, TRUE);
+  mblw->parent = gtk_ctree_insert_node (mblw->ctree, NULL, NULL, text, 0, NULL,
+					NULL, NULL, NULL, FALSE, TRUE);
 
   gtk_clist_freeze (GTK_CLIST (mblw->ctree));
 
   /* inbox */
   text[0] = "Inbox";
-  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 5, inboxpix,
+  ctnode = gtk_ctree_insert_node (mblw->ctree, mblw->parent, NULL, text, 5, inboxpix,
 			     inbox_mask, inboxpix, inbox_mask, FALSE, TRUE);
-  gtk_ctree_set_row_data (mblw->ctree, ctnode, balsa_app.inbox);
+  gtk_ctree_node_set_row_data (mblw->ctree, ctnode, balsa_app.inbox);
 
   /* outbox */
   text[0] = "Outbox";
-  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 5, outboxpix,
+  ctnode = gtk_ctree_insert_node (mblw->ctree, mblw->parent, NULL, text, 5, outboxpix,
 			  outbox_mask, outboxpix, outbox_mask, FALSE, TRUE);
-  gtk_ctree_set_row_data (mblw->ctree, ctnode, balsa_app.outbox);
+  gtk_ctree_node_set_row_data (mblw->ctree, ctnode, balsa_app.outbox);
 
   /* inbox */
   text[0] = "Trash";
-  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 5, trashpix,
+  ctnode = gtk_ctree_insert_node (mblw->ctree, mblw->parent, NULL, text, 5, trashpix,
 			     trash_mask, trashpix, trash_mask, FALSE, TRUE);
-  gtk_ctree_set_row_data (mblw->ctree, ctnode, balsa_app.trash);
+  gtk_ctree_node_set_row_data (mblw->ctree, ctnode, balsa_app.trash);
 
   if (balsa_app.mailbox_nodes)
     {
@@ -237,7 +237,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 				   NULL, NULL,
 				   NULL, NULL,
 				   G_NODE_IS_LEAF (gnode), TRUE);
-	  gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
+	  gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
 	}
       else if (mbnode->mailbox && mbnode->name)
 	{
@@ -248,7 +248,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 				       NULL, NULL,
 				       NULL, NULL,
 				       G_NODE_IS_LEAF (gnode), TRUE);
-	      gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
+	      gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
 	    }
 	  else
 	    {
@@ -265,7 +265,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 					 tray_empty, tray_empty_mask,
 					 FALSE, TRUE);
 
-	      gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
+	      gtk_ctree_node_set_row_data (ctree, cnode, mbnode->mailbox);
 	    }
 	}
     }
@@ -292,7 +292,7 @@ open_cb (GtkWidget * widget, gpointer data)
     return;
 
   ctnode = GTK_CLIST (mblw->ctree)->selection->data;
-  mailbox = gtk_ctree_get_row_data (mblw->ctree, ctnode);
+  mailbox = gtk_ctree_node_get_row_data (mblw->ctree, ctnode);
 
   if (!mailbox)
     return;
@@ -316,7 +316,7 @@ close_cb (GtkWidget * widget, gpointer data)
     return;
 
   ctnode = GTK_CLIST (mblw->ctree)->selection->data;
-  mailbox = gtk_ctree_get_row_data (mblw->ctree, ctnode);
+  mailbox = gtk_ctree_node_get_row_data (mblw->ctree, ctnode);
 
   if (mailbox)
     {
@@ -356,7 +356,7 @@ mailbox_select_cb (GtkCTree * ctree, GtkCTreeNode * row, gint column)
 
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     {
-      mailbox = gtk_ctree_get_row_data (ctree, row);
+      mailbox = gtk_ctree_node_get_row_data (ctree, row);
 
       /* bail now if the we've been called without a valid
        * mailbox */

@@ -34,7 +34,8 @@ extern "C"
       GtkWidget *text;
       GtkWidget *window;
       gint type;
-    };
+      Message*  orig_message;
+  };
 
   void sendmsg_window_new (GtkWidget *, BalsaIndex *, gint);
 

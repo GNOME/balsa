@@ -248,6 +248,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
     {
     case 0:
       msg->window = gnome_app_new ("balsa", _ ("New message"));
+      msg->orig_message = 0;
       break;
     case 1:
       clist = GTK_CLIST (GTK_BIN (bindex)->child);
@@ -258,7 +259,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       row = (gint) clist->selection->data;
 
       message = (Message *) gtk_clist_get_row_data (clist, row);
-
+      msg->orig_message = message;
       msg->window = gnome_app_new ("balsa", _ ("Reply to "));
       msg->type = 1;
       break;
@@ -271,7 +272,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       row = (gint) clist->selection->data;
 
       message = (Message *) gtk_clist_get_row_data (clist, row);
-
+      msg->orig_message = message;
       msg->window = gnome_app_new ("balsa", _ ("Forward message"));
       break;
     }
@@ -524,7 +525,8 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   if (send_message (message, balsa_app.smtp_server, balsa_app.debug))
     if (bsmsg->type == 1)
       {
-	message_reply (message);
+	if (bsmsg->orig_message)
+	  message_reply (bsmsg->orig_message);
       }
 
   body_free (body);

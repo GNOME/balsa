@@ -184,7 +184,6 @@ create_welcome_page ()
   GtkWidget *text;
   GtkWidget *label;
 
-#if 0
   gchar *buf;
 
   buf = g_new (gchar, 2048);
@@ -198,23 +197,23 @@ create_welcome_page ()
 	    _ ("Once you have completed these steps, you can always change them at a later time through Balsa's preferences."),
 	    "  ",
 	    _ ("Please check the about box in Balsa's main window for more information on contacting the authors or reporting bugs."));
-  gtk_text_freeze (GTK_TEXT (text));
   text = gtk_text_new (NULL, NULL);
   gtk_box_pack_start (GTK_BOX (vbox), text, FALSE, FALSE, 5);
   gtk_widget_show (text);
+  gtk_text_freeze (GTK_TEXT (text));
   gtk_text_set_editable (GTK_TEXT (text), TRUE);
   gtk_text_set_word_wrap (GTK_TEXT (text), TRUE);
   gtk_text_insert (GTK_TEXT (text), NULL, NULL, NULL, buf, 2048);
   g_free (buf);
   gtk_text_thaw (text);
-#endif
+  /*
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
 
   label = gtk_label_new (_ ("Welcome to Balsa!  The following steps will help you get setup to use Balsa."));
   gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 5);
   gtk_widget_show (label);
-
+*/
   return vbox;
 }
 

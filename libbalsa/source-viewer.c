@@ -211,6 +211,7 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
     gtk_container_add(GTK_CONTAINER(interior), GTK_WIDGET(text));
 
     window = gnome_app_new("balsa", _("Message Source"));
+    g_object_set_data(G_OBJECT(window), "text", text);
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
     gtk_window_set_default_size(GTK_WINDOW(window), 500, 400);

@@ -516,20 +516,28 @@ imap_flags_cb(unsigned seqno, LibBalsaMailboxImap *mimap)
     if(msg_info->message) {
 	LibBalsaMessageFlag old_flags = msg_info->message->flags;
 	LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
+	gboolean locked;
+	GList *list;
+
+	/* We don't know if the mailbox is locked,
+	 * ...so we check. */
+	locked = HAVE_MAILBOX_LOCKED(mailbox);
+	if (!locked)
+	    LOCK_MAILBOX(mailbox);
 
         lbimap_update_flags(msg_info->message, imsg);
         libbalsa_message_set_icons(msg_info->message);
         libbalsa_mailbox_msgno_changed(mailbox, seqno);
 
-	if ((old_flags ^ msg_info->message->flags) &
-	    LIBBALSA_MESSAGE_FLAG_NEW) {
-	    GList *list = g_list_prepend(NULL, msg_info->message);
-	    g_assert(HAVE_MAILBOX_LOCKED(mailbox));
-	    libbalsa_mailbox_messages_status_changed(mailbox, list,
-						     LIBBALSA_MESSAGE_FLAG_NEW);
-	    g_list_free_1(list);
-	}
+	list = g_list_prepend(NULL, msg_info->message);
+	libbalsa_mailbox_messages_status_changed(mailbox, list,
+						 (old_flags ^
+						  msg_info->message->flags));
+	g_list_free_1(list);
 	libbalsa_mailbox_invalidate_iters(mailbox);
+
+	if (!locked)
+	    UNLOCK_MAILBOX(mailbox);
     }
 }
 
@@ -546,14 +554,30 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
     } else if (cnt > mimap->messages_info->len) { /* new messages arrived */
         unsigned i;
 	struct message_info a = {0};
+	gboolean locked;
+
+	/* EXISTS response may result from:
+	 * - mailbox check, in which case the mailbox is locked;
+	 * - mailbox expunge, in which case the mailbox is locked;
+	 * - server keepalive noop, in which case it isn't;
+	 * ...so we check. */
+	locked = HAVE_MAILBOX_LOCKED(mailbox);
+	if (!locked)
+	    LOCK_MAILBOX(mailbox);
+
 	i=mimap->messages_info->len+1;
         do {
             g_array_append_val(mimap->messages_info, a);
             libbalsa_mailbox_msgno_inserted(mailbox, i);
         } while (++i <= cnt);
-	libbalsa_mailbox_invalidate_iters(mailbox);
+
+	/* iters have been invalidated by
+	 * libbalsa_mailbox_msgno_inserted(). */
 	libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
 	lbm_imap_get_unseen(mimap);
+
+	if (!locked)
+	    UNLOCK_MAILBOX(mailbox);
     }
 }
 
@@ -838,8 +862,9 @@ libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox, guint msgno,
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     msg_info = message_info_from_msgno(mimap, msgno);
 
-    if (!msg_info->message && 
-	imap_mbox_handle_get_msg(mimap->handle, msgno)) 
+    if (!msg_info->message
+	&& imap_mbox_handle_get_msg(mimap->handle, msgno)
+	&& imap_mbox_handle_get_msg(mimap->handle, msgno)->envelope) 
 	libbalsa_mailbox_imap_get_message(mailbox, msgno);
 
     if (libbalsa_condition_can_match(search_iter->condition,
@@ -2085,6 +2110,7 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 	g_return_val_if_fail(handle, FALSE);
 
 	/* User server-side copy. */
+	qsort(msgnos, msgcnt, sizeof(msgnos[0]), cmp_msgno);
 	return imap_mbox_handle_copy(handle, msgcnt, msgnos,
 				     LIBBALSA_MAILBOX_IMAP(dest)->path)
 	    == IMR_OK;

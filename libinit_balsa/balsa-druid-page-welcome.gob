@@ -1,0 +1,110 @@
+%h{
+/*
+ * Balsa E-Mail Client
+ * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option) 
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * 02111-1307, USA.
+ */
+
+#include "config.h"
+#include <gnome.h>
+#include "helper.h"
+#include "balsa-initdruid.h"
+#include "balsa-druid-page.h"
+%}
+
+/* We do not inherit from BalsaDruidPage because the start
+   page has all the stuff with the canvas. */
+class Balsa:Druid:Page:Welcome from Gnome:Druid:Page:Start {
+	public GtkWidget *next;
+
+	public Gtk:Object *new( void ) { GtkObject *me; me = GTK_OBJECT( GET_NEW ); return me; }
+	
+	init( self ) {
+		(GNOME_DRUID_PAGE_START( self ))->title = 
+			g_strdup( _("Welcome to Balsa!") );
+		(GNOME_DRUID_PAGE_START( self ))->text = 
+			g_strdup( _(
+	 		"You seem to be running Balsa for the first time. The following\n"
+			"steps will set up Balsa by asking a few simple questions. Once\n"
+			"you have completed these steps, you can always change them later\n"
+			"in Balsa's preferences. Please check the about box in Balsa's\n"
+			"main window for more information about contacting the authors or\n"
+			"reporting bugs."
+			) );
+		(GNOME_DRUID_PAGE_START( self ))->logo_image = 
+			NULL;
+		(GNOME_DRUID_PAGE_START( self ))->watermark_image = 
+			balsa_init_get_png( "balsa-watermark.png" );
+
+		balsa_druid_page_welcome_custom_construct( self );
+	}
+	
+	private void
+	custom_construct( self ) {
+		GnomeDruidPageStart *start = GNOME_DRUID_PAGE_START( self );
+
+		start->background_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( start->canvas ) ), GNOME_TYPE_CANVAS_RECT, NULL );
+		start->textbox_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( start->canvas ) ), GNOME_TYPE_CANVAS_RECT, NULL );
+		start->logoframe_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( start->canvas ) ), GNOME_TYPE_CANVAS_RECT, NULL );
+		start->logo_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( start->canvas ) ), GNOME_TYPE_CANVAS_IMAGE,
+			"image", start->logo_image, NULL );
+		start->watermark_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( start->canvas ) ), GNOME_TYPE_CANVAS_IMAGE, 
+			"image", start->watermark_image, NULL );
+		start->title_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( start->canvas ) ), GNOME_TYPE_CANVAS_TEXT,
+			"text", start->title,
+			"font", "-adobe-helvetica-bold-r-normal-*-*-180-*-*-p-*-iso8859-1", NULL );
+		start->text_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( start->canvas ) ), GNOME_TYPE_CANVAS_TEXT,
+			"text", start->text,
+			"justification", GTK_JUSTIFY_LEFT,
+			"font", "-adobe-helvetica-medium-r-normal-*-*-120-*-*-p-*-iso8859-1", NULL );
+	}
+
+	/*The weird selves are to remove pointer compatibilty warnings. Sigh*/
+	override (Gnome:Druid:Page) void
+	prepare( Gnome:Druid:Page *_self, Gtk:Widget *druid (check null type) ) {		
+		BalsaDruidPageWelcome *self = BALSA_DRUID_PAGE_WELCOME( _self );
+
+		(GNOME_DRUID_PAGE_START( self ))->logo_image = (BALSA_INITDRUID( druid ))->default_logo;
+
+		gnome_canvas_item_set( (GNOME_DRUID_PAGE_START( self ))->logo_item, "image", 
+			(GNOME_DRUID_PAGE_START( self ))->logo_image, NULL );
+
+		gnome_druid_set_buttons_sensitive( GNOME_DRUID( druid ), FALSE, TRUE, TRUE );
+		gnome_druid_set_show_finish( GNOME_DRUID( druid ), FALSE );
+	}
+
+	override (Gnome:Druid:Page) gboolean 
+	next( Gnome:Druid:Page *_self, Gtk:Widget *druid (check null type) ) {
+		BalsaDruidPageWelcome *self = BALSA_DRUID_PAGE_WELCOME( _self );
+
+		g_return_val_if_fail( self->next != NULL, FALSE );
+
+		if( BALSA_IS_DRUID_PAGE( self->next ) ) {
+			(BALSA_DRUID_PAGE(self->next))->prev = GNOME_DRUID_PAGE( self );
+		}
+
+		gnome_druid_set_page( GNOME_DRUID( druid ), GNOME_DRUID_PAGE( self->next ) );
+		return TRUE;
+	}
+
+	override (Gnome:Druid:Page) gboolean 
+	back( Gnome:Druid:Page *_self, Gtk:Widget *druid (check null type) ) {
+		g_warning( "Trying to go back from start page... prev button should "
+			   "be disabled!" );
+		return TRUE;
+	}
+}

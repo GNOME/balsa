@@ -29,3 +29,7 @@
 
 /* Shall we multithread? */
 #undef BALSA_USE_THREADS
+/* Try new init druid based on GOB */
+#undef BALSA_USE_EXPERIMENTAL_INIT
+/* Use GOB */
+#undef BALSA_HAVE_GOB

@@ -52,6 +52,10 @@
 #include "threads.h"
 #endif
 
+#ifdef BALSA_USE_EXPERIMENTAL_INIT
+#include "libinit_balsa/init_balsa.h"
+#endif
+
 #define MAILBOX_DATA "mailbox_data"
 
 #define APPBAR_KEY "balsa_appbar"
@@ -137,14 +141,23 @@ static GnomeUIInfo file_menu[] =
  GNOME_STOCK_MENU_MAIL_RCV, 'M', GDK_CONTROL_MASK, NULL
   },
   GNOMEUIINFO_SEPARATOR,
+
   /* Ctrl-I */
   {
     GNOME_APP_UI_ITEM, N_ ("Pr_int"), N_("Print current mail"),
     file_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_RCV, 'I', GDK_CONTROL_MASK, NULL
   },
-
   GNOMEUIINFO_SEPARATOR,
+
+  #ifdef BALSA_USE_EXPERIMENTAL_INIT
+  {
+      GNOME_APP_UI_ITEM, "Test new init", "Test the new initialization druid",
+      balsa_init_funky_new_init_is_much_cooler, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+      GNOME_STOCK_MENU_MAIL_RCV, '\0', GDK_CONTROL_MASK, NULL
+  },  
+  GNOMEUIINFO_SEPARATOR,
+  #endif
 
   // XXX 
   // GNOMEUIINFO_MENU_EXIT_ITEM(close_main_window, NULL), 

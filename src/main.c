@@ -56,6 +56,13 @@ GIOChannel 		*mail_thread_msg_receive;
 static void threads_init( gboolean init );
 #endif
 
+#ifdef BALSA_USE_EXPERIMENTAL_INIT
+#if 0  /*Don't use it for real init until it is "finished"*/
+#include "libinit_balsa/init_balsa.h"
+#define initialize_balsa balsa_init_funky_new_init_is_much_cooler
+#endif
+#endif /*BALSA_USE_EXINIT*/
+
 static void balsa_init (int argc, char **argv);
 static void config_init (void);
 static void mailboxes_init (void);

@@ -55,16 +55,23 @@ INCLUDES=						\
 	 $(GNOME_INCLUDEDIR)
 	    
 
+#libbalsa appearing twice is not a bug -- it is mutually dependent with libmutt
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a \
 	$(top_builddir)/libmutt/libmutt.a \
 	$(top_builddir)/libbalsa/libbalsa.a \
+	@LIBINIT_BALSA_LIB@ \
 	-lPropList	\
 	@LIBESD_LIB@	\
 	$(GNOME_LIBDIR) \
 	$(top_builddir)/idl/libbalsasrv.a \
 	$(GNOMEGNORBA_LIBS)  \
 	$(INTLLIBS)
+
+balsa_DEPENDENCIES = \
+	$(top_builddir)/libbalsa/libbalsa.a \
+	$(top_builddir)/libmutt/libmutt.a \
+	@LIBINIT_BALSA_LIB@
 
 dist-hook:
 	mkdir $(distdir)/pixmaps

@@ -283,7 +283,6 @@ load_mailboxes (gchar * name)
 
 
   gnome_config_pop_prefix ();
-  gnome_config_pop_prefix ();
   gnome_config_sync ();
   g_string_free (gstring, 1);
   g_free (path);

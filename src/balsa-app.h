@@ -20,6 +20,7 @@
 #define __BALSA_APP_H__
 
 #include <gnome.h>
+#include <proplist.h>
 #include "mailbox.h"
 #include "index-child.h"
 
@@ -41,6 +42,7 @@
 /* global balsa application structure */
 extern struct BalsaApplication
 {
+  proplist_t proplist;
   /* personal information */
   gchar *real_name;
   gchar *username;

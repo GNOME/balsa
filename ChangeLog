@@ -1,5 +1,7 @@
 2003-01-27  PeterB
 
+	* src/main-window.c: Grab focus to the mailbox index when opening
+	mailbox, even if not displaying a message.
 	* src/balsa-index.c: Sort index after populating and initially
 	threading it.
 

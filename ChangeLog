@@ -1,3 +1,13 @@
+2002-03-23  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/misc.[hc]: libbalsa_lookup_mime_type must allocate the
+	space for its result.
+	* libbalsa/files.c:
+	* libbalsa/send.c: 
+	* src/print.c: free the string returned by libbalsa_lookup_mime_type.
+	* src/sendmsg-window.c: use the new GtkFileSelection api.
+	* src/pref-manager.c: fix broken font change callback.
+
 2002-03-21  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/server.c: make types in gtk_signal_new consistent with

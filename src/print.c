@@ -696,8 +696,7 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
     if (body->mutt_body)
 	conttype = libbalsa_message_body_get_content_type(body);
     else
-	conttype = 
-	    g_strdup(libbalsa_lookup_mime_type(body->filename));
+	conttype = libbalsa_lookup_mime_type(body->filename);
 
     /* get a pixbuf according to the mime type */
     icon_name = libbalsa_icon_finder(conttype, NULL);

@@ -108,16 +108,17 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
 gchar *
 libbalsa_icon_finder(const char *mime_type, const char *filename)
 {
-    const char *content_type, *icon_file;
+    char *content_type;
+    const char *icon_file;
     gchar *icon = NULL;
     
-    if(mime_type)
-        content_type = mime_type;
-    else {
-        if(!filename)
-            return balsa_pixmap_finder ("balsa/attachment.png");
-        content_type = libbalsa_lookup_mime_type(mime_type);
-    }
+    if (mime_type)
+        content_type = g_strdup(mime_type);
+    else if(filename)
+        content_type = libbalsa_lookup_mime_type(filename);
+    else
+        return balsa_pixmap_finder ("balsa/attachment.png");
+
     /* FIXME:
        or icon_file = gnome_desktop_item_find_icon(GVMGI(content_Type)?) */
     icon_file = gnome_vfs_mime_get_icon(content_type);
@@ -144,6 +145,8 @@ libbalsa_icon_finder(const char *mime_type, const char *filename)
 	
 	g_free (gnome_icon);
     }
+
+    g_free(content_type);
 
     return (icon);
 }

@@ -38,15 +38,18 @@
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
-const gchar*
+gchar*
 libbalsa_lookup_mime_type(const gchar * path)
 {
     GnomeVFSFileInfo* vi = gnome_vfs_file_info_new();
-    const gchar* res;
+    gchar* res;
+
+    g_return_val_if_fail(path != NULL, NULL);
+
     gnome_vfs_get_file_info (path, vi,
                              GNOME_VFS_FILE_INFO_GET_MIME_TYPE
                              | GNOME_VFS_FILE_INFO_FOLLOW_LINKS);
-    res = gnome_vfs_file_info_get_mime_type (vi);
+    res = g_strdup(gnome_vfs_file_info_get_mime_type(vi));
     gnome_vfs_file_info_unref(vi);
     return res;
 }

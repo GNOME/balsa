@@ -2463,6 +2463,10 @@ font_changed(GtkWidget * widget, GtkWidget * pbox)
 	gtk_entry_set_text(GTK_ENTRY(peer), font);
     } else {
 	font = gtk_entry_get_text(GTK_ENTRY(widget));
+        /* called once on deleting the text, and again on inserting the
+         * new text--we must just return the first time */
+        if (font[0] == '\0')
+            return;
 	peer = gtk_object_get_user_data(GTK_OBJECT(widget));
 	gnome_font_picker_set_font_name(GNOME_FONT_PICKER(peer), font);
 	properties_modified_cb(widget, pbox);

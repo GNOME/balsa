@@ -134,19 +134,22 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_clist_freeze (GTK_CLIST (mblw->ctree));
 
   /* inbox */
-  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, "Inbox", 0, inboxpix,
+  text[0] = "Inbox";
+  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 0, inboxpix,
 		                                        inbox_mask, inboxpix, inbox_mask, FALSE, TRUE);
-  gtk_ctree_set_row_data (mblw->ctree, sibling, balsa_app.inbox);
+  gtk_ctree_set_row_data (mblw->ctree, ctnode, balsa_app.inbox);
 
   /* outbox */
-  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, "Outbox", 0, outboxpix,
+  text[0] = "Outbox";
+  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 0, outboxpix,
 		                                        outbox_mask, outboxpix, outbox_mask, FALSE, TRUE);
-  gtk_ctree_set_row_data (mblw->ctree, sibling, balsa_app.outbox);
+  gtk_ctree_set_row_data (mblw->ctree, ctnode, balsa_app.outbox);
 
   /* inbox */
-  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, "Trash", 0, trashpix,
+  text[0] = "Trash";
+  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 0, trashpix,
 		                                        trash_mask, trashpix, trash_mask, FALSE, TRUE);
-  gtk_ctree_set_row_data (mblw->ctree, sibling, balsa_app.trash);
+  gtk_ctree_set_row_data (mblw->ctree, ctnode, balsa_app.trash);
 
   if (balsa_app.mailbox_nodes)
     {

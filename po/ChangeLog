@@ -1,3 +1,9 @@
+2002-05-12  Carlos Morgado  <chbm@chbm.nu>
+
+	* pt.po: updated portuguese translation
+
+	* POTFILES.in: removed libmutt/attach.c
+
 2002-05-12  Takeshi Aihana <aihana@gnome.gr.jp>
 
 	* ja.po: Updated Japanese translation.

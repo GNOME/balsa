@@ -32,7 +32,6 @@ libinit_balsa/balsa-initdruid.c
 libinit_balsa/helper.c
 libinit_balsa/init_balsa.c
 libmutt/account.c
-libmutt/attach.c
 libmutt/handler.c
 libmutt/imap/auth.c
 libmutt/imap/auth_anon.c

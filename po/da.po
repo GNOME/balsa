@@ -967,7 +967,7 @@ msgstr "Gennemse..."
 
 #: src/pref-manager.c:1486
 msgid "Preview pane"
-msgstr "Forhåndsvisning"
+msgstr "Eksempel"
 
 #: src/pref-manager.c:1506
 msgid "Options"

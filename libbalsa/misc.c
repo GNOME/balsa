@@ -384,3 +384,12 @@ gchar *libbalsa_guess_mail_spool( void )
 	return gnome_util_prepend_user_home( "mailbox" );
 }
 
+
+/* libbalsa_set_charset:
+   is a thin wrapper around mutt_set_charset() to get rid of mutt dependices
+   in balsa.
+*/
+void libbalsa_set_charset(const gchar* charset)
+{
+  mutt_set_charset((gchar*)charset);
+}

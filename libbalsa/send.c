@@ -106,7 +106,7 @@ encode_descriptions (BODY * b)
 
 
 static BODY *
-add_mutt_body_plain (void)
+add_mutt_body_plain (const gchar* charset)
 {
   BODY *body;
   gchar buffer[PATH_MAX];
@@ -121,7 +121,7 @@ add_mutt_body_plain (void)
   body->encoding = balsa_app.encoding_style;
   body->parameter = mutt_new_parameter();
   body->parameter->attribute = g_strdup("charset");
-  body->parameter->value = g_strdup(balsa_app.charset);
+  body->parameter->value = g_strdup(charset ? charset : balsa_app.charset);
   body->parameter->next = NULL;
 
   mutt_mktemp (buffer);
@@ -275,7 +275,9 @@ balsa_send_message_real(MessageQueueItem *first_message)
   int i;
 
   if( !first_message ) {
+#ifdef BALSA_USE_THREADS
     sending_mail = FALSE;
+#endif
     return TRUE;
   }
 
@@ -502,7 +504,7 @@ libbalsa_message_postpone (LibBalsaMessage * message,
       	newbdy = mutt_make_file_attach (body->filename);
       else if (body->buffer)
 	{
-	  newbdy = add_mutt_body_plain ();
+	  newbdy = add_mutt_body_plain (body->charset);
 	  tempfp = safe_fopen (newbdy->filename, "w+");
 	  fputs (body->buffer, tempfp);
 	  fclose (tempfp);
@@ -948,7 +950,7 @@ balsa_create_msg (LibBalsaMessage *message, HEADER *msg, char *tmpfile, int queu
 
       else if (body->buffer)
 	{
-	  newbdy = add_mutt_body_plain ();
+	  newbdy = add_mutt_body_plain (body->charset);
 	  tempfp = safe_fopen (newbdy->filename, "w+");
 	  fputs (body->buffer, tempfp);
 	  fclose (tempfp);

@@ -1373,9 +1373,11 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
   LibBalsaMessage *message;
   gchar *tmp;
-  gchar *def_charset;
-
   if(! is_ready_to_send(bsmsg)) return FALSE;
+
+  libbalsa_set_charset(bsmsg->charset);
+  if(balsa_app.debug) 
+     fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
 
   message = bsmsg2message (bsmsg);
 
@@ -1385,11 +1387,6 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   else
     message->fcc_mailbox = NULL;
 
-  /* not a really nice way of setting and restoring charset..  */
-  def_charset =  balsa_app.charset;
-  if(bsmsg->charset) balsa_app.charset = (gchar*)bsmsg->charset;
-  if(balsa_app.debug) 
-     fprintf(stderr, "sending with charset: %s\n", balsa_app.charset);
 
   if (libbalsa_message_send (message)) {
     if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL)
@@ -1404,16 +1401,8 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
             libbalsa_message_delete (bsmsg->orig_message);
             libbalsa_mailbox_commit_changes (bsmsg->orig_message->mailbox);
           }
-        if (message->in_reply_to)
-          {
-            /* TODO: Find message to be marked as being answered with message
-             * ID, mailbox type and mailbox name. */
-            /* [MBG] Isn't this already done with the reply? */
-          }
       }
   }
-
-  if(bsmsg->charset) balsa_app.charset = def_charset;
 
   gtk_object_destroy (GTK_OBJECT(message));
   balsa_sendmsg_destroy (bsmsg);

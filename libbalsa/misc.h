@@ -71,4 +71,6 @@ gboolean libbalsa_find_word(const gchar * word, const gchar* str);
 void libbalsa_wrap_string(gchar* str, int width);
 gchar *libbalsa_guess_mail_spool( void );
 
+void libbalsa_set_charset(const gchar* charset);
+
 #endif /* __MISC_H__ */

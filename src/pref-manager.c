@@ -845,7 +845,7 @@ apply_prefs(GtkDialog * pbox)
     g_free(balsa_app.quote_regex);
     entry_widget = gnome_entry_gtk_entry(GNOME_ENTRY(pui->quote_pattern));
     tmp = gtk_entry_get_text(GTK_ENTRY(entry_widget));
-    balsa_app.quote_regex = libbalsa_deescape_specials(tmp);
+    balsa_app.quote_regex = g_strcompress(tmp);
 
     balsa_app.browse_wrap = GTK_TOGGLE_BUTTON(pui->browse_wrap)->active;
     /* main window view menu can also toggle balsa_app.browse_wrap
@@ -1123,7 +1123,7 @@ set_prefs(void)
     /* arp */
     gtk_entry_set_text(GTK_ENTRY(pui->quote_str), balsa_app.quote_str);
     entry_widget = gnome_entry_gtk_entry(GNOME_ENTRY(pui->quote_pattern));
-    tmp = libbalsa_escape_specials(balsa_app.quote_regex);
+    tmp = g_strescape(balsa_app.quote_regex, NULL);
     gtk_entry_set_text(GTK_ENTRY(entry_widget), tmp);
     g_free(tmp);
 

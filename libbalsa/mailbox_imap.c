@@ -1384,17 +1384,26 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
     libbalsa_mailbox_imap_update_url(mimap);
 }
 
+/* libbalsa_mailbox_imap_subscribe:
+   change subscribed status for a mailbox.
+   Can be called for a closed mailbox.
+ */
 gboolean
 libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox, 
 				     gboolean subscribe)
 {
     ImapResult rc;
+    ImapMboxHandle* handle;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), FALSE);
 
-    II(rc,mailbox->handle,
-       imap_mbox_subscribe(mailbox->handle, mailbox->path, subscribe));
+    handle = libbalsa_mailbox_imap_get_handle(mailbox, NULL);
+    if (!handle)
+	return FALSE;
 
+    II(rc, handle, imap_mbox_subscribe(handle, mailbox->path, subscribe));
+
+    libbalsa_mailbox_imap_release_handle(mailbox);
     return rc == IMR_OK;
 }
 

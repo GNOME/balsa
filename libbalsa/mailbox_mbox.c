@@ -944,7 +944,6 @@ lbm_mbox_write_x_status_hdr(GMimeStream * stream, LibBalsaMessageFlag flags)
     return retval;
 }
 
-static void lbm_mbox_armor_part(GMimeObject ** part);
 static void update_message_status_headers(GMimeMessage *message,
 					  LibBalsaMessageFlag flags);
 static gboolean
@@ -1374,14 +1373,65 @@ static void update_message_status_headers(GMimeMessage *message,
     g_string_free(new_header, TRUE);
 }
 
-/* Crlf-filter the stream, and return a clean stream-mem (the filtered
- * stream is apparently misparsed, but the stream-mem isn't). */
-static GMimeStream *
-lbm_mbox_crlf_filter(GMimeStream * stream)
+/*
+ * Encode text parts as quoted-printable.
+ */
+static void
+lbm_mbox_prepare_object(GMimeObject * mime_part)
 {
+    g_mime_object_remove_header(mime_part, "Content-Length");
+
+    if (GMIME_IS_MULTIPART(mime_part)) {
+        if (GMIME_IS_MULTIPART_SIGNED(mime_part)
+            || GMIME_IS_MULTIPART_ENCRYPTED(mime_part))
+            /* Do not break crypto. */
+            return;
+
+        g_mime_multipart_foreach((GMimeMultipart *) mime_part,
+                                 (GMimePartFunc) lbm_mbox_prepare_object,
+                                 NULL);
+    } else if (GMIME_IS_MESSAGE_PART(mime_part))
+        lbm_mbox_prepare_object(GMIME_OBJECT
+                                (((GMimeMessagePart *) mime_part)->
+                                 message));
+    else if (GMIME_IS_MESSAGE(mime_part))
+        lbm_mbox_prepare_object(((GMimeMessage *) mime_part)->mime_part);
+    else {
+        GMimePartEncodingType encoding;
+        const GMimeContentType *mime_type;
+
+        encoding = g_mime_part_get_encoding(GMIME_PART(mime_part));
+        if (encoding == GMIME_PART_ENCODING_BASE64)
+            return;
+
+        mime_type = g_mime_object_get_content_type(mime_part);
+        if (g_mime_content_type_is_type(mime_type, "text", "plain")) {
+            const gchar *format =
+                g_mime_content_type_get_parameter(mime_type, "format");
+            if (format && !g_ascii_strcasecmp(format, "flowed"))
+                /* Format=Flowed text cannot contain From_ lines. */
+                return;
+        }
+
+        g_mime_part_set_encoding(GMIME_PART(mime_part),
+                                 GMIME_PART_ENCODING_QUOTEDPRINTABLE);
+    }
+}
+
+static GMimeStream *
+lbm_mbox_armor_stream(GMimeStream * stream, LibBalsaMessageFlag flags)
+{
+    GMimeParser *parser;
+    GMimeMessage *message;
     GMimeStream *fstream;
     GMimeFilter *filter;
 
+    parser = g_mime_parser_new_with_stream(stream);
+    message = g_mime_parser_construct_message(parser);
+    g_object_unref(parser);
+    lbm_mbox_prepare_object(GMIME_OBJECT(message));
+
+    stream = g_mime_stream_mem_new();
     fstream = g_mime_stream_filter_new_with_stream(stream);
     g_object_unref(stream);
 
@@ -1390,136 +1440,19 @@ lbm_mbox_crlf_filter(GMimeStream * stream)
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
     g_object_unref(filter);
 
-    stream = g_mime_stream_mem_new(); /* Could be a scratch file. */
-    g_mime_stream_write_to_stream(fstream, stream);
-    g_object_unref(fstream);
-
-    g_mime_stream_reset(stream);
-    return stream;
-}
-
-/* Encode text parts as quoted-printable, and armor any "From " lines.
- */
-
-/* The preface and postface of a multipart may contain From_ lines;
- * we'll just space-stuff them. */
-static gchar *
-lbm_mbox_armor_face(const gchar * face)
-{
-    gchar **lines;
-    gchar *new_face;
-
-    lines = g_strsplit(face, "\nFrom ", 0);
-    new_face = g_strjoinv("\n From ", lines);
-    g_strfreev(lines);
-
-    return new_face;
-}
-
-static void
-lbm_mbox_armor_part(GMimeObject ** part)
-{
-    const GMimeContentType *mime_type;
-    GMimePart *mime_part;
-    GMimeStream *mem;
-    GMimeStream *fstream;
-    GMimeFilter *filter;
-    GMimeParser *parser;
-
-    /* Content length will change, and we no longer need the header. */
-    g_mime_object_remove_header(GMIME_OBJECT(*part), "Content-Length");
-
-    while (GMIME_IS_MESSAGE_PART(*part)) {
-	GMimeMessage *message =
-	    g_mime_message_part_get_message(GMIME_MESSAGE_PART(*part));
-	part = &message->mime_part;
-	g_object_unref(message);
-	g_mime_object_remove_header(GMIME_OBJECT(*part), "Content-Length");
-    }
-
-    if (GMIME_IS_MULTIPART(*part)) {
-	const gchar *face;
-	const GMimeContentType *content_type =
-	    g_mime_object_get_content_type(*part);
-	GList *subpart;
-
-	face = g_mime_multipart_get_preface(GMIME_MULTIPART(*part));
-	if (face) {
-	    gchar *new_face = lbm_mbox_armor_face(face);
-	    g_mime_multipart_set_preface(GMIME_MULTIPART(*part), new_face);
-	    g_free(new_face);
-	}
-
-	face = g_mime_multipart_get_postface(GMIME_MULTIPART(*part));
-	if (face) {
-	    gchar *new_face = lbm_mbox_armor_face(face);
-	    g_mime_multipart_set_postface(GMIME_MULTIPART(*part), new_face);
-	    g_free(new_face);
-	}
-
-	if (g_mime_content_type_is_type(content_type, "multipart", "signed"))
-	    /* Don't change the coding of its parts. */
-	    return;
-
-	for (subpart = GMIME_MULTIPART(*part)->subparts; subpart;
-	     subpart = subpart->next)
-	    lbm_mbox_armor_part((GMimeObject **) &subpart->data);
-
-	return;
-    }
-
-    if (!GMIME_IS_PART(*part))
-	return;
-
-    mime_part = GMIME_PART(*part);
-    mime_type = g_mime_part_get_content_type(mime_part);
-    if (!g_mime_content_type_is_type(mime_type, "text", "*"))
-	return;
-
-    g_mime_part_set_encoding(mime_part, GMIME_PART_ENCODING_QUOTEDPRINTABLE);
-
-    mem = g_mime_stream_mem_new();
-    g_mime_object_write_to_stream(GMIME_OBJECT(mime_part), mem);
-    g_object_unref(mime_part);
-
-    g_mime_stream_reset(mem);
-    fstream = g_mime_stream_filter_new_with_stream(mem);
-    g_object_unref(mem);
-
     filter = g_mime_filter_from_new(GMIME_FILTER_FROM_MODE_ARMOR);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
     g_object_unref(filter);
 
-    parser = g_mime_parser_new_with_stream(fstream);
-    g_object_unref(fstream);
-
-    *part = g_mime_parser_construct_part(parser);
-    g_object_unref(parser);
-}
-
-static GMimeStream *
-lbm_mbox_armor_stream(GMimeStream * stream, LibBalsaMessageFlag flags)
-{
-    GMimeParser *parser;
-    GMimeMessage *message;
-    GMimeStream *mem;
-
-    parser = g_mime_parser_new_with_stream(stream);
-    g_object_unref(stream);
-    message = g_mime_parser_construct_message(parser);
-    g_object_unref(parser);
-
-    lbm_mbox_armor_part(&message->mime_part);
-
-    mem = g_mime_stream_mem_new();
     /* Make sure we have "Status" and "X-Status" headers, so we can
      * update them in place later, if necessary. */
     update_message_status_headers(message, flags);
-    g_mime_object_write_to_stream(GMIME_OBJECT(message), mem);
-    g_object_unref(message);
 
-    g_mime_stream_reset(mem);
-    return mem;
+    g_mime_object_write_to_stream(GMIME_OBJECT(message), fstream);
+    g_object_unref(message);
+    g_mime_stream_reset(fstream);
+
+    return fstream;
 }
 
 /* Called with mailbox locked. */
@@ -1535,6 +1468,7 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     const char *path;
     int fd;
     GMimeStream *orig;
+    GMimeStream *armored_stream;
     GMimeStream *dest;
     gint retval = 1;
     off_t orig_length;
@@ -1601,13 +1535,15 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
 	return -1;
     }
 
-    orig = lbm_mbox_crlf_filter(orig);
-    orig = lbm_mbox_armor_stream(orig, (message->flags |
-					LIBBALSA_MESSAGE_FLAG_RECENT));
+    /* From_ armor */
+    armored_stream =
+        lbm_mbox_armor_stream(orig, (message->flags |
+                                     LIBBALSA_MESSAGE_FLAG_RECENT));
+    g_object_unref(orig);
 
     g_mime_stream_seek(dest, 0, GMIME_STREAM_SEEK_END);
     if (g_mime_stream_write_string(dest, from) < (gint) strlen(from)
-	|| g_mime_stream_write_to_stream (orig, dest) < 0) {
+	|| g_mime_stream_write_to_stream (armored_stream, dest) < 0) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR, _("Data copy error"));
 	retval = -1;
@@ -1616,7 +1552,7 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     if (retval > 0)
 	retval = lbm_mbox_newline(dest);
  
-    g_object_unref(orig);
+    g_object_unref(armored_stream);
     if(retval<0)
         truncate(path, orig_length);
     mbox_unlock (mailbox, dest);

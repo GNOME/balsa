@@ -819,9 +819,8 @@ key_pressed_cb(GtkWidget *widget,
    /*
     * We cannot use GDK_MODIFIER_MASK because that would trap SHIFT.
     */
-   if (event->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK | GDK_MOD2_MASK
-                       | GDK_MOD3_MASK | GDK_MOD4_MASK | GDK_MOD5_MASK))
-      return FALSE;
+   if (event->state & GDK_CONTROL_MASK)
+       return FALSE;
    
    /*
     * Check if GCompletion is valid - we reload the addressbook

@@ -103,6 +103,9 @@ static GtkTargetEntry email_field_drop_types[] =
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
+static void cut_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
+static void copy_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
+static void paste_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 static void wrap_body_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 static void reflow_par_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 static void reflow_body_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
@@ -169,9 +172,9 @@ static GnomeUIInfo file_menu[] =
    anyway */
 static GnomeUIInfo edit_menu[] = 
 {
-   GNOMEUIINFO_MENU_CUT_ITEM(NULL, NULL),
-   GNOMEUIINFO_MENU_COPY_ITEM(NULL, NULL),
-   GNOMEUIINFO_MENU_PASTE_ITEM(NULL, NULL),
+   GNOMEUIINFO_MENU_CUT_ITEM(cut_cb, NULL),
+   GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
+   GNOMEUIINFO_MENU_PASTE_ITEM(paste_cb, NULL),
    GNOMEUIINFO_SEPARATOR,
    { GNOME_APP_UI_ITEM, N_ ("_Wrap body") ,N_ ("Wrap message lines"),
      (gpointer)wrap_body_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
@@ -1523,6 +1526,23 @@ print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
    }
 #endif
    return TRUE;
+}
+
+static void
+cut_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
+{
+  gtk_editable_cut_clipboard(GTK_EDITABLE(bsmsg->text));
+}
+
+static void
+copy_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
+{
+  gtk_editable_copy_clipboard(GTK_EDITABLE(bsmsg->text));
+}
+static void
+paste_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
+{
+  gtk_editable_paste_clipboard(GTK_EDITABLE(bsmsg->text));
 }
 
 static void

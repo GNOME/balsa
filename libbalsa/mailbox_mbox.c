@@ -893,7 +893,7 @@ lbm_mbox_armor_part(GMimeObject ** part)
 	    g_mime_object_get_content_type(*part);
 	GList *subpart;
 
-	if (g_mime_content_type_is_type(content_type, "*", "signed"))
+	if (g_mime_content_type_is_type(content_type, "multipart", "signed"))
 	    /* Don't change the coding of its parts. */
 	    return;
 

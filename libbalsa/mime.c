@@ -57,7 +57,7 @@ text2html (gchar * buff, struct obstack *html_buff)
       if (buff[i] == '\r' && buff[i + 1] == '\n' &&
 	  buff[i + 2] == '\r' && buff[i + 3] == '\n')
 	{
-	  obstack_append_string (html_buff, "</tt></p>\n<p><tt>\n");
+	  obstack_append_string (html_buff, "<p>\n");
 	  i += 3;
 	}
       else if (buff[i] == '\r' && buff[i + 1] == '\n')
@@ -72,7 +72,7 @@ text2html (gchar * buff, struct obstack *html_buff)
 	}
       else if (buff[i] == '\n' && buff[i + 1] == '\n')
 	{
-	  obstack_append_string (html_buff, "</tt></p>\n<p><tt>\n");
+	  obstack_append_string (html_buff, "<p>\n");
 	  i++;
 	}
       else if (buff[i] == '\n')
@@ -249,12 +249,13 @@ text2html (gchar * buff, struct obstack *html_buff)
 
 
 void
-other2html (BODY * bdy, FILE * fp, struct obstack *bfr)
+other2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
   STATE s;
   gchar *ptr;
   size_t alloced;
 
+  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#eeffee\">");
   fseek (fp, bdy->offset, 0);
   s.fpin = fp;
   mutt_mktemp (tmp_file_name);
@@ -266,74 +267,94 @@ other2html (BODY * bdy, FILE * fp, struct obstack *bfr)
   alloced = readfile (s.fpout, &ptr);
   if (ptr)
     ptr[alloced - 1] = '\0';
-  text2html (ptr, bfr);
+  text2html (ptr, html_bfr);
   g_free (ptr);
   fclose (s.fpout);
   unlink (tmp_file_name);
+  obstack_append_string(html_bfr,"</td></tr>");
 }
 
 void
-audio2html (BODY * bdy, FILE * fp, struct obstack *bfr)
+audio2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
-  obstack_append_string (bfr, "<font size=+1>AUDIO<font size=-1>");
+  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#eeffee\">");
+  obstack_append_string (html_bfr, "<font size=+1>AUDIO<font size=-1>");
+  obstack_append_string(html_bfr,"</tr></td>");
 }
 
 
 void
-application2html (Message * message, BODY * bdy, FILE * fp, struct obstack *bfr)
+application2html (Message * message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
   gchar link_bfr[128];
   PARAMETER *bdy_parameter = bdy->parameter;
 
-  obstack_append_string (bfr, "<table boundary=\"0\"> <tr><td bgcolor=#dddddd> You received an encoded file of type <tt>application/");
-  obstack_append_string (bfr, bdy->subtype);
-  obstack_append_string (bfr, "</tt><BR>");
-  obstack_append_string (bfr, "<P>The parameters of this message are:<BR>");
+  obstack_append_string (html_bfr,
+			 "<tr><td bgcolor=\"#dddddd\"> "
+			 "You received an encoded file of type application/");
+  obstack_append_string (html_bfr, bdy->subtype);
+  obstack_append_string (html_bfr, "<BR>");
+  obstack_append_string (html_bfr, "<P>The parameters of this message are:<BR>");
 
   while (bdy_parameter)
     {
-      obstack_append_string (bfr, bdy_parameter->attribute);
-      obstack_append_string (bfr, "=>");
-      obstack_append_string (bfr, bdy_parameter->value);
-      obstack_append_string (bfr, "<BR>");
+      obstack_append_string (html_bfr, bdy_parameter->attribute);
+      obstack_append_string (html_bfr, "=>");
+      obstack_append_string (html_bfr, bdy_parameter->value);
+      obstack_append_string (html_bfr, "<BR>");
       bdy_parameter = bdy_parameter->next;
     }
-  snprintf (link_bfr, 128, "<A HREF=memory://%p:%p BODY> APPLICATION</A></td></tr></table>", message, bdy);
-  obstack_append_string (bfr, link_bfr);
+  snprintf (link_bfr, 128,
+	    "<A HREF=\"memory://%p:%p BODY\"> APPLICATION</A>"
+	    "</td></tr>", message, bdy);
+  obstack_append_string (html_bfr, link_bfr);
 }
 
 void
-image2html (BODY * bdy, FILE * fp, struct obstack *bfr)
+image2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
-  obstack_append_string (bfr, "<font size+1>IMAGE<font size=-1>");
+  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#eeffee\">");
+  obstack_append_string (html_bfr, "<font size+1>IMAGE<font size=-1>");
+  obstack_append_string(html_bfr,"</td></tr>");
 }
 
 void
-message2html (BODY * bdy, FILE * fp, struct obstack *bfr)
+message2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
-  obstack_append_string (bfr, "<font size=+1>MESSAGE<font size=-1>");
+  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#eeffee\">");
+  obstack_append_string (html_bfr, "<font size=+1>MESSAGE<font size=-1>");
+  obstack_append_string(html_bfr,"</td></tr>");
 }
 
 void
-multipart2html (BODY * bdy, FILE * fp, struct obstack *bfr)
+multipart2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
-  obstack_append_string (bfr, "<font size=+1>MULTIPART<font size=-1>");
+  BODY* p;
+  
+  for (p = bdy->parts; p; p = p->next)
+    {
+      part2html(message, p, fp, html_bfr);
+    }
 }
 
 
 void
-video2html (BODY * bdy, FILE * fp, struct obstack *bfr)
+video2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
-  obstack_append_string (bfr, "<font size=+1>VIDEO<font size=-1>");
+  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#eeffee\">");
+  obstack_append_string (html_bfr, "<font size=+1>VIDEO<font size=-1>");
+  obstack_append_string(html_bfr,"</td></tr>");
 }
 
 void
-mimetext2html (BODY * bdy, FILE * fp, struct obstack *bfr)
+mimetext2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
   STATE s;
   gchar *ptr = 0;
   size_t alloced;
 
+  
+  obstack_append_string(html_bfr,"<tr><td bgcolor=\"#eeffee\">");
   fseek (fp, bdy->offset, 0);
   s.fpin = fp;
   s.prefix = '\0';
@@ -348,17 +369,18 @@ mimetext2html (BODY * bdy, FILE * fp, struct obstack *bfr)
       ptr[alloced - 1] = '\0';
       if (strcmp (bdy->subtype, "html") == 0)
 	{
-	  obstack_append_string (bfr, ptr);
+	  obstack_append_string (html_bfr, ptr);
 	  g_free (ptr);
 	  unlink (tmp_file_name);
 	  return;
 	}
-      obstack_append_string (bfr, "<P><TT>");
-      text2html (ptr, bfr);
+      obstack_append_string (html_bfr, "<P>");
+      text2html (ptr, html_bfr);
       g_free (ptr);
     }
   fclose (s.fpout);
   unlink (tmp_file_name);
+  obstack_append_string(html_bfr,"</td></tr>");
   return;
 }
 
@@ -370,30 +392,31 @@ part2html (Message * message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
   switch (bdy->type)
     {
     case TYPEOTHER:
-      other2html (bdy, fp, html_bfr);
+      other2html (message, bdy, fp, html_bfr);
       break;
     case TYPEAUDIO:
-      audio2html (bdy, fp, html_bfr);
+      audio2html (message, bdy, fp, html_bfr);
       break;
     case TYPEAPPLICATION:
       application2html (message, bdy, fp, html_bfr);
       break;
     case TYPEIMAGE:
-      image2html (bdy, fp, html_bfr);
+      image2html (message, bdy, fp, html_bfr);
       break;
     case TYPEMESSAGE:
-      message2html (bdy, fp, html_bfr);
+      message2html (message, bdy, fp, html_bfr);
       break;
     case TYPEMULTIPART:
-      multipart2html (bdy, fp, html_bfr);
+      multipart2html (message, bdy, fp, html_bfr);
       break;
     case TYPETEXT:
-      mimetext2html (bdy, fp, html_bfr);
+      mimetext2html (message, bdy, fp, html_bfr);
       break;
     case TYPEVIDEO:
-      video2html (bdy, fp, html_bfr);
+      video2html (message, bdy, fp, html_bfr);
       break;
     }
+
 }
 
 void
@@ -417,7 +440,7 @@ headers2html (Message * message, struct obstack *html_bfr)
   gchar tbuff[1024];
 
   obstack_append_string (html_bfr, "<DIV ALIGN=LEFT>\n");
-  obstack_append_string (html_bfr, "<TABLE BORDER=0 WIDTH=\"100\%\">\n");
+  obstack_append_string (html_bfr, "<TABLE BORDER=0 WIDTH=\"100%\">\n");
 
   if (message->date)
     header2row ("Date:", message->date, html_bfr);
@@ -470,10 +493,13 @@ content2html (Message * message)
 
   obstack_append_string (html_buffer, "<HTML>\n");
   obstack_append_string (html_buffer, "<HEAD><TITLE>Message</TITLE></HEAD>\n");
-  obstack_append_string (html_buffer, "<BODY BGCOLOR=\"#FFFFFF\">\n");
+  obstack_append_string (html_buffer, "<BODY BGCOLOR=\"#ffffff\">\n");
 
   headers2html (message, html_buffer);
 
+  obstack_append_string(html_buffer, "\n<BR><table border=\"0\" width=\"100%\" cellspacing=\"7\">");
+  
+  
   switch (message->mailbox->type)
     {
     case MAILBOX_MH:
@@ -505,7 +531,7 @@ content2html (Message * message)
       part2html (message, body->mutt_body, msg_stream, html_buffer);
       body_list = g_list_next (body_list);
     }
-  obstack_append_string (html_buffer, "</TT></P>\n</BODY></HTML>");
+  obstack_append_string (html_buffer, "</table>\n</BODY></HTML>");
   obstack_1grow (html_buffer, '\0');
   html_buffer_content = obstack_finish (html_buffer);
   return html_buffer_content;

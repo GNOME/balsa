@@ -1,3 +1,10 @@
+1998-09-23  Michael Lausch  <mla@gams.at>
+
+	*  libbalse/mime.c (Mailbox): reorganized the translation of MIME 
+	messages into HTML. Some things in gtkXmHTML aren't working, so i
+	use a table approach now. Better multipart handling which is
+	necessary for PGP support.
+
 1998-09-15  Robert Wilhelm  <robert@alpha.physiol.med.tu-muenchen.de>
 
 	* src/balsa-index.c (numeric_compare): new function to

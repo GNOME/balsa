@@ -43,7 +43,8 @@ struct _addyb_item
     gchar *comments;
   };
 
-static addyb_item *addyb_item_new (gchar * name, gchar * comments)
+static addyb_item *
+addyb_item_new (gchar * name, gchar * comments)
 {
   addyb_item *new_item = g_malloc (sizeof (addyb_item));
   gchar *list_item[1];
@@ -52,8 +53,7 @@ static addyb_item *addyb_item_new (gchar * name, gchar * comments)
   new_item->comments = comments;
   new_item->email = NULL;
 
-  row = gtk_clist_append (GTK_CLIST (addyb_list), list_item),
-
+  row = gtk_clist_append (GTK_CLIST (addyb_list), list_item);
   gtk_clist_set_row_data (GTK_CLIST (addyb_list), row, new_item);
 /* should we free the pointer? */
   gtk_signal_connect (GTK_OBJECT (addyb_list),
@@ -62,7 +62,7 @@ static addyb_item *addyb_item_new (gchar * name, gchar * comments)
 		      NULL);
   balsa_app.addressbook_list = g_list_append (balsa_app.addressbook_list, new_item);
 
-  return (addyb_item *)gtk_clist_get_row_data(GTK_CLIST(addyb_list), row);
+  return (addyb_item *) gtk_clist_get_row_data (GTK_CLIST (addyb_list), row);
 }
 
 static void
@@ -79,8 +79,8 @@ addyb_email_item_new (addyb_item * ai, gchar * addy)
 static void
 addyb_email_item_delete (addyb_item * ai, gchar * addy)
 {
-  gtk_clist_remove(GTK_CLIST(email_list),gtk_clist_find_row_from_data(GTK_CLIST(email_list),(gpointer)addy));
-  ai->email = g_list_remove(ai->email, (gpointer)addy);
+  gtk_clist_remove (GTK_CLIST (email_list), gtk_clist_find_row_from_data (GTK_CLIST (email_list), (gpointer) addy));
+  ai->email = g_list_remove (ai->email, (gpointer) addy);
 }
 
 static void
@@ -111,7 +111,7 @@ addyb_emaillist_update (addyb_item * ai)
   gtk_clist_thaw (GTK_CLIST (email_list));
 }
 
-static 
+static
 update_addyb_window (GtkWidget * widget, gpointer data)
 {
   addyb_item *ai = (addyb_item *) gtk_clist_get_row_data (GTK_CLIST (widget), ((gint) GTK_CLIST (widget)->selection->data));
@@ -283,7 +283,7 @@ addressbook_window_new (GtkWidget * widget, gpointer data)
   commentstext = gtk_text_new (NULL, NULL);
   gtk_box_pack_start (GTK_BOX (vbox1), commentstext, TRUE, TRUE, 3);
   gtk_widget_show (commentstext);
-  gtk_text_set_editable(GTK_TEXT(commentstext),1);
+  gtk_text_set_editable (GTK_TEXT (commentstext), 1);
 
   gtk_paned_add2 (GTK_PANED (vpane), vbox1);
 
@@ -293,36 +293,36 @@ addressbook_window_new (GtkWidget * widget, gpointer data)
 /* other stuff... */
 
   addybitem = addyb_item_new ("Pavlov", "tests are fun");
-  addyb_email_item_new(addybitem,"pavlov@innerx.net");
-  addyb_email_item_new(addybitem,"pavlov@pavlov.net");
-  addyb_email_item_new(addybitem,"pavlov@alldolls.net");
+  addyb_email_item_new (addybitem, "pavlov@innerx.net");
+  addyb_email_item_new (addybitem, "pavlov@pavlov.net");
+  addyb_email_item_new (addybitem, "pavlov@alldolls.net");
 
-  addyb_email_item_delete(addybitem,"pavlov@alldolls.net");
+  addyb_email_item_delete (addybitem, "pavlov@alldolls.net");
 
   addybitem = addyb_item_new ("test1", "tests suck!");
-  addyb_email_item_new(addybitem,"pavlov@innerx.net");
-  addyb_email_item_new(addybitem,"pavlov@pavlov.net");
-  addyb_email_item_new(addybitem,"pavlov@alldolls.net");
+  addyb_email_item_new (addybitem, "pavlov@innerx.net");
+  addyb_email_item_new (addybitem, "pavlov@pavlov.net");
+  addyb_email_item_new (addybitem, "pavlov@alldolls.net");
 
   addybitem = addyb_item_new ("test2", "i like tests damnit!");
-  addyb_email_item_new(addybitem,"pavlov@innerx.net");
-  addyb_email_item_new(addybitem,"pavlov@pavlov.net");
-  addyb_email_item_new(addybitem,"pavlov@alldolls.net");
+  addyb_email_item_new (addybitem, "pavlov@innerx.net");
+  addyb_email_item_new (addybitem, "pavlov@pavlov.net");
+  addyb_email_item_new (addybitem, "pavlov@alldolls.net");
 
   addybitem = addyb_item_new ("test3", "weeee");
-  addyb_email_item_new(addybitem,"pavlov@innerx.net");
-  addyb_email_item_new(addybitem,"pavlov@pavlov.net");
-  addyb_email_item_new(addybitem,"pavlov@alldolls.net");
+  addyb_email_item_new (addybitem, "pavlov@innerx.net");
+  addyb_email_item_new (addybitem, "pavlov@pavlov.net");
+  addyb_email_item_new (addybitem, "pavlov@alldolls.net");
 
   addybitem = addyb_item_new ("test4", "i must be bored");
-  addyb_email_item_new(addybitem,"pavlov@innerx.net");
-  addyb_email_item_new(addybitem,"pavlov@pavlov.net");
-  addyb_email_item_new(addybitem,"pavlov@alldolls.net");
+  addyb_email_item_new (addybitem, "pavlov@innerx.net");
+  addyb_email_item_new (addybitem, "pavlov@pavlov.net");
+  addyb_email_item_new (addybitem, "pavlov@alldolls.net");
 
   addybitem = addyb_item_new ("test5", "jay painter knows what he is doing much more than pav does...");
-  addyb_email_item_new(addybitem,"pavlov@innerx.net");
-  addyb_email_item_new(addybitem,"pavlov@pavlov.net");
-  addyb_email_item_new(addybitem,"pavlov@alldolls.net");
+  addyb_email_item_new (addybitem, "pavlov@innerx.net");
+  addyb_email_item_new (addybitem, "pavlov@pavlov.net");
+  addyb_email_item_new (addybitem, "pavlov@alldolls.net");
 
   gnome_app_set_contents (GNOME_APP (window), hpane);
 

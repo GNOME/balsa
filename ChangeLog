@@ -1,3 +1,11 @@
+2003-01-08  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/mailbox-filter.c: correct errors.
+	* libbalsa/mailbox_local.c: run_filters_on_reception().
+	* src/filter-run-dialog.c: set dialog's default size.
+	* src/save-restore.c: make the debugging message null-terminated.
+	* src/sendmsg-window.c: gtk2-ify attachment dialog (PS).
+
 2002-01-07  Naba Kumar  <naba@gnome.org>
 
 	* configure.in: Added hi (hindi) in ALL_LINGUAS

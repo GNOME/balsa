@@ -454,6 +454,7 @@ pop3_config_updated(LibBalsaMailboxPop3* mailbox)
     threadmsg = g_new(MailThreadMessage, 1);
     threadmsg->message_type = LIBBALSA_NTFY_UPDATECONFIG;
     threadmsg->mailbox = (void *) mailbox;
+    threadmsg->message_string[0] = '\0';
     write(mail_thread_pipes[1], (void *) &threadmsg,
           sizeof(void *));
 #else

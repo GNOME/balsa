@@ -30,6 +30,7 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "mailbackend.h"
+#include "mailbox-filter.h"
 
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 
@@ -55,6 +56,7 @@ static void libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
 static void libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
+static void run_filters_on_reception(LibBalsaMailbox * mailbox);
 
 GType
 libbalsa_mailbox_local_get_type(void)
@@ -307,6 +309,37 @@ libbalsa_mailbox_local_append(LibBalsaMailbox * mailbox)
     return res;
 }
 
+/* Helper function to run the "on reception" filters on a mailbox */
+
+static void
+run_filters_on_reception(LibBalsaMailbox * mailbox)
+{
+    GSList * filters;
+    GList * new_messages;
+
+    if (!mailbox->filters)                                
+        config_mailbox_filters_load(mailbox);
+
+    filters = libbalsa_mailbox_filters_when(mailbox->filters,
+                                            FILTER_WHEN_INCOMING);
+    /* We apply filter if needed */
+    if (filters) {
+	LOCK_MAILBOX(mailbox);
+	new_messages = libbalsa_extract_new_messages(mailbox->message_list);
+	if (new_messages) {
+	    if (filters_prepare_to_run(filters)) {
+		libbalsa_filter_match(filters, new_messages, TRUE);
+		UNLOCK_MAILBOX(mailbox);
+		libbalsa_filter_apply(filters);
+	    }
+	    else UNLOCK_MAILBOX(mailbox);
+	    g_list_free(new_messages);
+	}
+	else UNLOCK_MAILBOX(mailbox);
+	g_slist_free(filters);
+    }
+}
+
 /* As all check functions, this one assumes gdk lock HELD
    and other locks NOT HELD.
 */
@@ -348,6 +381,7 @@ libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
 	       libbalsa_mailbox_load_messages which assumes gdk lock held */
 	    gdk_threads_enter();
 	    libbalsa_mailbox_load_messages(mailbox);
+	    run_filters_on_reception(mailbox);
 	} else {
 	    UNLOCK_MAILBOX(mailbox);
 	    /* Reacquire the lock before leaving */

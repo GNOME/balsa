@@ -43,15 +43,13 @@
 GSList* 
 libbalsa_mailbox_filters_when(GSList * filters, gint when)
 {
-    GSList * lst=NULL;
+    GSList * lst = NULL;
+    for (; filters; filters = g_slist_next(filters))
+	if (FILTER_WHEN_CHKFLAG((LibBalsaMailboxFilter*)filters->data,when))
+	    lst = g_slist_prepend(lst,((LibBalsaMailboxFilter*)filters->data)->actual_filter);
+    lst = g_slist_reverse(lst);
 
-    for (; filters; filters=g_slist_next(filters))
-	if (((LibBalsaMailboxFilter*)filters->data)->when==when) {
-	    lst=g_slist_prepend(lst,((LibBalsaMailboxFilter*)filters->data)->actual_filter);
-	}
-    lst=g_slist_reverse(lst);
-
-    return(lst);
+    return lst;
 }
 
 /* Looks for a mailbox filters section with MBOX_URL field equals to mbox->url
@@ -93,7 +91,7 @@ config_mailbox_filters_load(LibBalsaMailbox * mbox)
 {
     gchar * section;
 
-    section=mailbox_filters_section_lookup(mbox->url ? mbox->url : mbox->name);
+    section = mailbox_filters_section_lookup(mbox->url ? mbox->url : mbox->name);
     if (section) {
 	gnome_config_push_prefix(section);
 	g_free(section);

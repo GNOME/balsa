@@ -410,9 +410,10 @@ filters_run_dialog(LibBalsaMailbox *mbox)
 	return;
     }
 
-    p=balsa_filter_run_dialog_new(mbox);
+    p = balsa_filter_run_dialog_new(mbox);
     if (!p) return;
 
+    gtk_window_set_default_size(GTK_WINDOW(p),500,250);
     fr_dialogs_opened=g_list_prepend(fr_dialogs_opened,p);
 
     gtk_widget_show_all(p);

@@ -1443,6 +1443,7 @@ attach_dialog_ok(GtkWidget * widget, gpointer data)
     BalsaSendmsg *bsmsg;
     gchar **files;
     gchar **tmp;
+    int res = 0;
 
     fs = GTK_FILE_SELECTION(data);
     bsmsg = g_object_get_data(G_OBJECT(fs), "balsa-data");
@@ -1450,7 +1451,8 @@ attach_dialog_ok(GtkWidget * widget, gpointer data)
     iconlist = GNOME_ICON_LIST(bsmsg->attachments[1]);
     files = gtk_file_selection_get_selections(fs);
     for (tmp = files; *tmp; ++tmp)
-        add_attachment(iconlist, g_strdup(*tmp), FALSE, NULL);
+        if(!add_attachment(iconlist, g_strdup(*tmp), FALSE, NULL)) res++;
+
     g_strfreev(files);
     
     bsmsg->update_config = FALSE;
@@ -1458,13 +1460,11 @@ attach_dialog_ok(GtkWidget * widget, gpointer data)
 	bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
     bsmsg->update_config = TRUE;
 
-    if (balsa_app.attach_dir)
-	g_free(balsa_app.attach_dir);
+    g_free(balsa_app.attach_dir);
     balsa_app.attach_dir =
-        g_strdup(gtk_file_selection_get_filename(fs));
+        g_path_get_dirname(gtk_file_selection_get_filename(fs));
 
-    gtk_widget_destroy(GTK_WIDGET(fs));
-    /* FIXME: show attachment list */
+    if(res==0) gtk_widget_destroy(GTK_WIDGET(fs));
 }
 
 /* attach_clicked - menu and toolbar callback */
@@ -1493,9 +1493,11 @@ attach_clicked(GtkWidget * widget, gpointer data)
 
     fs = GTK_FILE_SELECTION(fsw);
     gtk_file_selection_set_select_multiple(fs, TRUE);
-    if (balsa_app.attach_dir)
-	gtk_file_selection_set_filename(fs, balsa_app.attach_dir);
-
+    if (balsa_app.attach_dir) {
+        gchar* tmp = g_strconcat(balsa_app.attach_dir, "/", NULL);
+	gtk_file_selection_set_filename(fs, tmp);
+        g_free(tmp);
+    }
 
     g_signal_connect(G_OBJECT(fs->ok_button), "clicked",
 		     G_CALLBACK(attach_dialog_ok), fs);

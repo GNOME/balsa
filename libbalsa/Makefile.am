@@ -3,7 +3,6 @@ SUBDIRS = imap
 noinst_LIBRARIES = libbalsa.a
 
 
-if BUILD_WITH_GPGME
 libbalsa_gpgme_extra = 		\
 	gmime-gpgme-context.h	\
 	gmime-gpgme-context.c	\
@@ -12,16 +11,6 @@ libbalsa_gpgme_extra = 		\
 	gmime-gpgme-signature.h	\
 	gmime-gpgme-signature.c
 
-# the gpgme extension needs gtk_menu for the identity :-/
-xDEFS = -DG_DISABLE_DEPRECATED   \
-       -DGNOME_DISABLE_DEPRECATED
-else
-libbalsa_gpgme_extra=
-
-xDEFS = -DG_DISABLE_DEPRECATED   \
-       -DGTK_DISABLE_DEPRECATED \
-       -DGNOME_DISABLE_DEPRECATED
-endif
 
 
 libbalsa_a_SOURCES = 		\
@@ -115,7 +104,7 @@ INCLUDES= -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	-I${top_srcdir}/libbalsa/imap \
 	$(BALSA_CFLAGS)
 
-DEFS=${xDEFS}
+DEFS= 
 
 
 #Signal marshallers

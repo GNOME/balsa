@@ -1,3 +1,8 @@
+2002-12-21  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/mailbox_local.c: fix the M_REOPENED fix, 
+	it broke maildir for Peter
+
 2002-12-21 06:22  PeterB
 
 	* src/mailbox-node.c (imap_dir_cb_real, add_imap_entry,

@@ -1514,17 +1514,17 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, HEADER * msg,
 	cbuf = g_strdup(body->buffer);
     g_return_val_if_fail(cbuf != NULL, LIBBALSA_MESSAGE_SIGN_ERROR);
     
-    switch (mode & ~LIBBALSA_GPG_RFC2440)
+    switch (mode & LIBBALSA_PROTECT_MODE)
 	{
-	case LIBBALSA_GPG_SIGN:   /* sign only */
+	case LIBBALSA_PROTECT_SIGN:   /* sign only */
 	    rbuf = libbalsa_rfc2440_sign_buffer(cbuf, msg->env->from->mailbox,
 						NULL);
 	    g_free(cbuf);
 	    if (!rbuf)
 		return LIBBALSA_MESSAGE_SIGN_ERROR;
 	    break;
-	case LIBBALSA_GPG_ENCRYPT:
-	case LIBBALSA_GPG_ENCRYPT | LIBBALSA_GPG_SIGN:
+	case LIBBALSA_PROTECT_ENCRYPT:
+	case LIBBALSA_PROTECT_SIGN | LIBBALSA_PROTECT_ENCRYPT:
 	    {
 		GList *encrypt_for = NULL;
 			    
@@ -1541,7 +1541,7 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, HEADER * msg,
 		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 					 _("This message will not be encrpyted for the BCC: recipient(s)."));
 
-		if (mode & LIBBALSA_GPG_SIGN)
+		if (mode & LIBBALSA_PROTECT_SIGN)
 		    rbuf = libbalsa_rfc2440_encrypt_buffer(cbuf, 
 							   msg->env->from->mailbox,
 							   encrypt_for,
@@ -1657,7 +1657,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	    /* force quoted printable encoding if only signing is requested */
 	    newbdy =
 		add_mutt_body_plain(body->charset,
-				    ((message->gpg_mode & (LIBBALSA_GPG_SIGN | LIBBALSA_GPG_ENCRYPT)) == LIBBALSA_GPG_SIGN) ?
+				    ((message->gpg_mode & LIBBALSA_PROTECT_MODE) == LIBBALSA_PROTECT_SIGN) ?
 				    ENCQUOTEDPRINTABLE : encoding, flow);
 #else
 	    newbdy =
@@ -1681,7 +1681,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 #ifdef HAVE_GPGME
 	    /* in '2440 mode, touch *only* the first body! */
 	    if (body == message->body_list && message->gpg_mode > 0 &&
-		(message->gpg_mode & LIBBALSA_GPG_RFC2440) != 0) {
+		(message->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0) {
 		gint result = 
 		    libbalsa_create_rfc2440_buffer(body, msg,
 						   message->gpg_mode);
@@ -1715,11 +1715,12 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
     }
     
 #ifdef HAVE_GPGME
-    if (can_create_rfc3156 && message->gpg_mode > 0 &&
-	(message->gpg_mode & LIBBALSA_GPG_RFC2440) == 0) {
-	switch (message->gpg_mode)
+    if (can_create_rfc3156 &&
+	(message->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 &&
+	(message->gpg_mode & LIBBALSA_PROTECT_RFC3156) != 0) {
+	switch (message->gpg_mode & LIBBALSA_PROTECT_MODE)
 	    {
-	    case LIBBALSA_GPG_SIGN:   /* sign message */
+	    case LIBBALSA_PROTECT_SIGN:   /* sign message */
 		{
 		    gchar *micalg;
 		    if (libbalsa_sign_mutt_body(&msg->content,
@@ -1748,8 +1749,8 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 		    }
 		    break;
 		}
-	    case LIBBALSA_GPG_ENCRYPT:
-	    case LIBBALSA_GPG_ENCRYPT | LIBBALSA_GPG_SIGN:
+	    case LIBBALSA_PROTECT_ENCRYPT:
+	    case LIBBALSA_PROTECT_ENCRYPT | LIBBALSA_PROTECT_SIGN:
 		{
 		    GList *encrypt_for = NULL;
 		    gboolean success;
@@ -1765,7 +1766,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 			libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 					     _("This message will not be encrpyted for the BCC: recipient(s)."));
 
-		    if (message->gpg_mode & LIBBALSA_GPG_SIGN)
+		    if (message->gpg_mode & LIBBALSA_PROTECT_SIGN)
 			success = 
 			    libbalsa_sign_encrypt_mutt_body(&msg->content,
 							    msg->env->from->mailbox, 

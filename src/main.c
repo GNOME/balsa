@@ -404,6 +404,11 @@ main(int argc, char *argv[])
     g_signal_connect(G_OBJECT(client), "die",
 		     G_CALLBACK(balsa_kill_session), NULL);
 
+#ifdef HAVE_GPGME
+    balsa_app.has_openpgp = 
+	libbalsa_check_crypto_engine(GPGME_PROTOCOL_OpenPGP);
+#endif
+
     if (opt_compose_email || opt_attach_list) {
 	BalsaSendmsg *snd;
 	GSList *lst;

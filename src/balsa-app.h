@@ -381,6 +381,11 @@ extern struct BalsaApplication {
     gboolean convert_unknown_8bit;
     LibBalsaCodeset convert_unknown_8bit_codeset;
 
+#ifdef HAVE_GPGME
+    /* gpgme stuff */
+    gboolean has_openpgp;
+#endif
+
     GList *folder_mru;
     GList *fcc_mru;
     gboolean delete_immediately;

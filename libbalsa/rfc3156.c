@@ -31,10 +31,6 @@
 
 #include <gpgme.h>
 
-#ifdef HAVE_XML2
-#  include <libxml/xmlmemory.h>
-#  include <libxml/parser.h>
-#endif
 #ifdef BALSA_USE_THREADS
 #  include <pthread.h>
 #  include "misc.h"
@@ -56,7 +52,7 @@ struct _MailDataBuffer {
 };
 
 struct _PassphraseCB {
-    GpgmeCtx ctx;
+    gpgme_ctx_t ctx;
     gchar *title;
     GtkWindow *parent;
 };
@@ -115,24 +111,70 @@ static void (*segvhandler)(int);
 
 
 /* local prototypes */
-static const gchar *libbalsa_gpgme_validity_to_gchar_short(GpgmeValidity validity);
-static const gchar *get_passphrase_cb(void *opaque, const char *desc,
-				      void **r_hd);
+static gboolean gpgme_check_set_protocol(gpgme_ctx_t ctx, gpgme_protocol_t proto);
+static const gchar *libbalsa_gpgme_validity_to_gchar_short(gpgme_validity_t validity);
+static gpgme_error_t get_passphrase_cb(void *opaque, const char *uid_hint,
+				       const char *passph_info, int prev_wasbad,
+				       int fd);
 static gchar *gpgme_signature(MailDataMBox *mailData, const gchar *sign_for,
 			      gchar **micalg, GtkWindow *parent);
 static gchar *gpgme_encrypt_file(MailDataMBox *mailData, GList *encrypt_for);
-static int read_cb_MailDataMBox(void *hook, char *buffer, size_t count,
-				size_t *nread);
-static int read_cb_MailDataBuffer(void *hook, char *buffer, size_t count,
-				  size_t *nread);
+static ssize_t read_cb_MailDataMBox(void *hook, char *buffer, size_t count);
+static ssize_t read_cb_MailDataBuffer(void *hook, char *buffer, size_t count);
 static void set_decrypt_file(LibBalsaMessageBody *body, const gchar *fname);
-static gboolean gpgme_add_signer(GpgmeCtx ctx, const gchar *signer);
-static gboolean gpgme_build_recipients(GpgmeRecipients *rcpt, GpgmeCtx ctx,
-				       GList *rcpt_list);
-static void get_sig_info_from_ctx(LibBalsaSignatureInfo* info, GpgmeCtx ctx);
+static gboolean gpgme_add_signer(gpgme_ctx_t ctx, const gchar *signer);
+static gpgme_key_t *gpgme_build_recipients(gpgme_ctx_t ctx, GList *rcpt_list);
+static void get_sig_info_from_ctx(LibBalsaSignatureInfo* info, gpgme_ctx_t ctx);
+static void release_keylist(gpgme_key_t *keylist);
+static void cb_data_release(void * handle);
 
 
 /* ==== public functions =================================================== */
+
+gboolean
+libbalsa_check_crypto_engine(gpgme_protocol_t protocol)
+{
+    gpgme_error_t err;
+    
+    err = gpgme_engine_check_version(protocol);
+    if (gpgme_err_code(err) != GPG_ERR_NO_ERROR) {
+	gpgme_engine_info_t info;
+	GString * message = g_string_new("");
+	
+	err = gpgme_get_engine_info(&info);
+	if (err == GPG_ERR_NO_ERROR) {
+	    while (info && info->protocol != protocol)
+		info = info->next;
+	    if (!info)
+		g_string_append_printf(message, 
+				       _("Gpgme has been compiled without support for protocol %s."),
+				       gpgme_get_protocol_name(protocol));
+	    else if (info->file_name && !info->version)
+		g_string_append_printf(message,
+				       _("Crypto engine %s is not installed properly."),
+				       info->file_name);
+	    else if (info->file_name && info->version && info->req_version)
+		g_string_append_printf(message,
+				       _("Crypto engine %s version %s is installed, but at least version %s is required."),
+				       info->file_name, info->version, info->req_version);
+	    else
+		g_string_append_printf(message,
+				       _("Unknown problem with engine for protocol %s."),
+				       gpgme_get_protocol_name(protocol));
+	} else
+	    g_string_append_printf(message,
+				   _("%s: could not retreive crypto engine information: %s."),
+				   gpgme_strsource(err), gpgme_strerror(err));
+	g_string_append_printf(message,
+			       _("\nDisable support for protocol %s."),
+			       gpgme_get_protocol_name(protocol));
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR, message->str);
+	g_string_free(message, TRUE);
+	return FALSE;
+    } else
+	return TRUE;
+}
+
 
 LibBalsaSignatureInfo *
 libbalsa_signature_info_destroy(LibBalsaSignatureInfo* info)
@@ -196,83 +238,83 @@ libbalsa_signature_info_to_gchar(LibBalsaSignatureInfo * info,
 
 
 /*
- * Return value: >0 body has a correct multipart/signed structure
- *               <0 body is multipart/signed, but not conforming to RFC3156
- *               =0 unsigned
+ * Check if body (and eventually its subparts) are RFC 2633 or RFC 3156 signed
+ * or encrypted.
  */
 gint
-libbalsa_is_pgp_signed(LibBalsaMessageBody *body)
+libbalsa_message_body_protection(LibBalsaMessageBody *body)
 {
-    BODY *mb_body, *mb_sig;
-    const gchar *micalg;
-    const gchar *protocol;
-    gint result;
+    gint result = 0;
+    BODY *mb_body;
 
     g_return_val_if_fail(body != NULL, 0);
     g_return_val_if_fail(body->mutt_body != NULL, 0);
-    if (!body->parts || !body->parts->next || !body->parts->next->mutt_body)
-	return 0;
 
     libbalsa_lock_mutt();
     mb_body = body->mutt_body;
-    mb_sig = body->parts->next->mutt_body;
 
-    micalg = mutt_get_parameter("micalg", mb_body->parameter);
-    protocol = mutt_get_parameter("protocol", mb_body->parameter);
+    if (mb_body->type == TYPEMULTIPART) {
+	const gchar *protocol;
 
-    result = mb_body->type == TYPEMULTIPART && 
-	!g_ascii_strcasecmp("signed", mb_body->subtype);
+	protocol = mutt_get_parameter("protocol", mb_body->parameter);
+	if (!g_ascii_strcasecmp("signed", mb_body->subtype)) {
+	    result = LIBBALSA_PROTECT_SIGN;
+	    if (protocol && body->parts && body->parts->mutt_body &&
+		body->parts->next && body->parts->next->mutt_body) {
+		const gchar *micalg;
+		BODY *mb_sig;
+		    
+		micalg = mutt_get_parameter("micalg", mb_body->parameter);
+		mb_sig = body->parts->next->mutt_body;
+		if (!g_ascii_strcasecmp("application/pgp-signature", protocol)) {
+		    result |= LIBBALSA_PROTECT_RFC3156;
+		    if (!micalg || g_ascii_strncasecmp("pgp-", micalg, 4) ||
+			mb_sig->type != TYPEAPPLICATION ||
+			g_ascii_strcasecmp("pgp-signature", mb_sig->subtype))
+			result |= LIBBALSA_PROTECT_ERROR;
+		} else if (!g_ascii_strcasecmp("application/pkcs7-signature", protocol)) {
+		    result |= LIBBALSA_PROTECT_SMIMEV3;
+		    if (!micalg || mb_sig->type != TYPEAPPLICATION ||
+			g_ascii_strcasecmp("pkcs7-signature", mb_sig->subtype))
+			result |= LIBBALSA_PROTECT_ERROR;
+		} else
+		    result |= LIBBALSA_PROTECT_ERROR;
+	    } else
+		result |= LIBBALSA_PROTECT_ERROR;
+	} else if (!g_ascii_strcasecmp("encrypted", mb_body->subtype)) {
+	    result = LIBBALSA_PROTECT_ENCRYPT | LIBBALSA_PROTECT_RFC3156;
+	    if (protocol && 
+		!g_ascii_strcasecmp("application/pgp-encrypted", protocol) &&
+		body->parts && body->parts->mutt_body &&
+		body->parts->next && body->parts->next->mutt_body &&
+		!body->parts->next->next) {
+		BODY *mb_enc1, *mb_enc2;
 
-    if (result) {
-	if (!(micalg && !g_ascii_strncasecmp("pgp-", micalg, 4) &&
-	      protocol && !g_ascii_strcasecmp("application/pgp-signature", protocol) &&
-	      mb_sig->type == TYPEAPPLICATION &&
-	      !g_ascii_strcasecmp("pgp-signature", mb_sig->subtype)))
-	    result = -1;  /* bad multipart/signed stuff... */
+		mb_enc1 = body->parts->mutt_body;
+		mb_enc2 = body->parts->next->mutt_body;
+		if (mb_enc1->type != TYPEAPPLICATION ||
+		    g_ascii_strcasecmp("pgp-encrypted", mb_enc1->subtype) ||
+		    mb_enc2->type != TYPEAPPLICATION ||
+		    g_ascii_strcasecmp("octet-stream", mb_enc2->subtype))
+		    result |= LIBBALSA_PROTECT_ERROR;
+	    } else
+		result |= LIBBALSA_PROTECT_ERROR;
+	}
+    } else if (mb_body->type == TYPEAPPLICATION &&
+	       !g_ascii_strcasecmp("pkcs7-mime", mb_body->subtype)) {
+	const gchar *smimetype;
+
+	result |= LIBBALSA_PROTECT_SMIMEV3;
+	smimetype = mutt_get_parameter("smime-type", mb_body->parameter);
+	if (!g_ascii_strcasecmp("enveloped-data", smimetype))
+	    result |= LIBBALSA_PROTECT_ENCRYPT;
+	else if (!g_ascii_strcasecmp("signed-data", smimetype))
+	    result |= LIBBALSA_PROTECT_SIGN;
+	else
+	    result |= LIBBALSA_PROTECT_ERROR;
     }
 
     libbalsa_unlock_mutt();
-    
-    return result;
-}
-
-
-/*
- * Return value: >0 body has a correct multipart/encrypted structure
- *               <0 body is multipart/encrypted, but not conforming to RFC3156
- *               =0 unsigned
- */
-gint
-libbalsa_is_pgp_encrypted(LibBalsaMessageBody *body)
-{
-    const gchar *protocol;
-    LibBalsaMessageBody *cparts;
-    gint result;
-
-    g_return_val_if_fail(body != NULL, 0);
-    g_return_val_if_fail(body->mutt_body != NULL, 0);
-
-    libbalsa_lock_mutt();
-    protocol = mutt_get_parameter("protocol", body->mutt_body->parameter);
-    cparts = body->parts;
-
-    /* FIXME: verify that body contains "Version: 1" */
-    result = body->mutt_body->type == TYPEMULTIPART &&
-	!g_ascii_strcasecmp("encrypted", body->mutt_body->subtype);
-
-    if (result) {
-	if (!(protocol &&
-	      !g_ascii_strcasecmp("application/pgp-encrypted", protocol) &&
-	      cparts && cparts->next && !cparts->next->next &&
-	      cparts->mutt_body->type == TYPEAPPLICATION && 
-	      !g_ascii_strcasecmp("pgp-encrypted", cparts->mutt_body->subtype) &&
-	      cparts->next->mutt_body->type == TYPEAPPLICATION &&
-	      !g_ascii_strcasecmp("octet-stream", cparts->next->mutt_body->subtype)))
-	    result = -1;  /* bad multipart/encrypted... */
-    }
-
-    libbalsa_unlock_mutt();
-    
     return result;
 }
 
@@ -280,14 +322,19 @@ libbalsa_is_pgp_encrypted(LibBalsaMessageBody *body)
 gboolean
 libbalsa_body_check_signature(LibBalsaMessageBody* body)
 {
-    GpgmeCtx ctx;
-    GpgmeError err;
-    GpgmeData sig, plain;
+    gpgme_ctx_t ctx;
+    gpgme_error_t err;
+    gpgme_data_t sig, plain;
     MailDataMBox plainStream;
     FILE *sigStream;
     LibBalsaSignatureInfo *sig_status;
     BODY *msg_body, *sign_body;
     LibBalsaMessage *msg;
+    struct gpgme_data_cbs cbs = 
+	{ (gpgme_data_read_cb_t)read_cb_MailDataMBox, /* read method */
+	  NULL,                                       /* write method */
+	  NULL,                                       /* seek method */
+	  cb_data_release };                          /* release method */
 
     g_return_val_if_fail(body, FALSE);
     g_return_val_if_fail(body->next, FALSE);
@@ -303,14 +350,22 @@ libbalsa_body_check_signature(LibBalsaMessageBody* body)
 
     libbalsa_signature_info_destroy(body->next->sig_info);
     body->next->sig_info = sig_status = g_new0(LibBalsaSignatureInfo, 1);
-    sig_status->status = GPGME_SIG_STAT_ERROR;
+    sig_status->status = GPG_ERR_GENERAL;
     
 
     /* try to create a gpgme context */
-    if ((err = gpgme_new(&ctx)) != GPGME_No_Error) {
-	g_warning("could not create gpgme context: %s", gpgme_strerror(err));
+    if ((err = gpgme_new(&ctx)) != GPG_ERR_NO_ERROR) {
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			     _("%s: could not create context: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	return FALSE;
     }
+    if (!gpgme_check_set_protocol(ctx, GPGME_PROTOCOL_OpenPGP)) {
+	gpgme_release(ctx);
+	sig_status->status = GPG_ERR_INV_ENGINE;
+	return FALSE;
+    }
+	
     
     /* create the body data stream */
     if (body->decrypt_file)
@@ -323,11 +378,11 @@ libbalsa_body_check_signature(LibBalsaMessageBody* body)
     plainStream.bytes_left = msg_body->offset - msg_body->hdr_offset +
 	msg_body->length;
     plainStream.last_was_cr = FALSE;
-    if ((err = gpgme_data_new_with_read_cb(&plain, read_cb_MailDataMBox, &plainStream)) !=
-	GPGME_No_Error) {
+    if ((err = gpgme_data_new_from_cbs(&plain, &cbs, &plainStream)) !=
+	GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not get data from mailbox file: %s"), 
-			     gpgme_strerror(err));
+			     _("%s: could not get data from mailbox file: %s"), 
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_release(ctx);
 	fclose(plainStream.mailboxFile);
 	return FALSE;
@@ -343,10 +398,10 @@ libbalsa_body_check_signature(LibBalsaMessageBody* body)
     if ((err = gpgme_data_new_from_filepart(&sig, NULL, sigStream,
 					    sign_body->offset,
 					    sign_body->length)) != 
-	GPGME_No_Error) {
+	GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not get data from mailbox file: %s"), 
-			     gpgme_strerror(err));
+			     _("%s: could not get data from mailbox file: %s"), 
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_data_release(plain);
 	gpgme_release(ctx);
 	fclose(plainStream.mailboxFile);
@@ -355,12 +410,12 @@ libbalsa_body_check_signature(LibBalsaMessageBody* body)
     }
 
     /* verify the signature */
-    if ((err = gpgme_op_verify(ctx, sig, plain, &sig_status->status))
-	!= GPGME_No_Error) {
+    if ((err = gpgme_op_verify(ctx, sig, plain, NULL))
+	!= GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme signature verification failed: %s"),
-			     gpgme_strerror(err));
-	sig_status->status = GPGME_SIG_STAT_ERROR;
+			     _("%s: signature verification failed: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
+	sig_status->status = err;
     } else
 	get_sig_info_from_ctx(sig_status, ctx);
 
@@ -518,9 +573,9 @@ LibBalsaMessageBody *
 libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
 {
     LibBalsaMessage *message;
-    GpgmeCtx ctx;
-    GpgmeError err;
-    GpgmeData cipher, plain;
+    gpgme_ctx_t ctx;
+    gpgme_error_t err;
+    gpgme_data_t cipher, plain;
     PassphraseCB cb_data;
     BODY *cipher_body, *result;
     gchar fname[PATH_MAX];
@@ -540,10 +595,14 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
 	src = libbalsa_mailbox_get_message_stream(message->mailbox, message);
     
     /* try to create a gpgme context */
-    if ((err = gpgme_new(&ctx)) != GPGME_No_Error) {
+    if ((err = gpgme_new(&ctx)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not create gpgme context: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not create context: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
+	return body;
+    }
+    if (!gpgme_check_set_protocol(ctx, GPGME_PROTOCOL_OpenPGP)) {
+	gpgme_release(ctx);
 	return body;
     }
     cb_data.ctx = ctx;
@@ -555,20 +614,20 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
     cipher_body = body->next->mutt_body;
     if ((err = gpgme_data_new_from_filepart(&cipher, NULL, src, 
 					    cipher_body->offset,
-					    cipher_body->length)) != GPGME_No_Error) {
+					    cipher_body->length)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not get data from mailbox file: %s"), 
-			     gpgme_strerror(err));
+			     _("%s: could not get data from mailbox file: %s"), 
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_release(ctx);
 	fclose(src);
 	return body;
     }
 
     /* create the plain data stream */
-    if ((err = gpgme_data_new(&plain)) != GPGME_No_Error) {
+    if ((err = gpgme_data_new(&plain)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not create new data object: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not create new data object: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_data_release(cipher);
 	gpgme_release(ctx);
 	fclose(src);
@@ -576,10 +635,11 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
     }
 
     /* try to decrypt */
-    if ((err = gpgme_op_decrypt(ctx, cipher, plain)) != GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme decryption failed: %s"),
-			     gpgme_strerror(err));
+    if ((err = gpgme_op_decrypt(ctx, cipher, plain)) != GPG_ERR_NO_ERROR) {
+	if (err != GPG_ERR_CANCELED)
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("%s: decryption failed: %s"),
+				 gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_data_release(plain);
 	gpgme_data_release(cipher);
 	gpgme_release(ctx);
@@ -592,8 +652,8 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
     /* save the decrypted data to a file */
     if (!(plainData = gpgme_data_release_and_get_mem(plain, &plainSize))) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not get gpgme decrypted data: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not get decrypted data: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_release(ctx);
 	return body;
     }
@@ -718,34 +778,31 @@ libbalsa_encrypt_mutt_body(MuttBody **encrypt_body, GList *rfc822_for)
 
 
 const gchar *
-libbalsa_gpgme_sig_stat_to_gchar(GpgmeSigStat stat)
+libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)
 {
     switch (stat)
 	{
-	case GPGME_SIG_STAT_GOOD:
+	case GPG_ERR_NO_ERROR:
 	    return _("The signature is valid.");
-	case GPGME_SIG_STAT_GOOD_EXP:
+	case GPG_ERR_SIG_EXPIRED:
 	    return _("The signature is valid but expired.");
-	case GPGME_SIG_STAT_GOOD_EXPKEY:
+	case GPG_ERR_KEY_EXPIRED:
 	    return _("The signature is valid but the key used to verify the signature has expired.");
-	case GPGME_SIG_STAT_BAD:
+	case GPG_ERR_BAD_SIGNATURE:
 	    return _("The signature is invalid.");
-	case GPGME_SIG_STAT_NOKEY:
+	case GPG_ERR_NO_PUBKEY:
 	    return _("The signature could not be verified due to a missing key.");
-	case GPGME_SIG_STAT_NOSIG:
+	case GPG_ERR_NO_DATA:
 	    return _("This part is not a real PGP signature.");
-	case GPGME_SIG_STAT_ERROR:
-	    return _("An error prevented the signature verification.");
-	case GPGME_SIG_STAT_DIFF:
-	    return _("This part contains at least two signatures with different status.");
-	case GPGME_SIG_STAT_NONE:
+	case GPG_ERR_INV_ENGINE:
+	    return _("The signature could not be verified due to an invalid crypto engine");
 	default:
-	    return _("bad status");
+	    return _("An error prevented the signature verification.");
 	}
 }
 
 const gchar *
-libbalsa_gpgme_validity_to_gchar(GpgmeValidity validity)
+libbalsa_gpgme_validity_to_gchar(gpgme_validity_t validity)
 {
     switch (validity)
 	{
@@ -771,20 +828,20 @@ libbalsa_gpgme_validity_to_gchar(GpgmeValidity validity)
 /*
  * Checks if buffer appears to be signed or encrypted according to RFC2440
  */
-LibBalsaMessageBodyRFC2440Mode 
+gint
 libbalsa_rfc2440_check_buffer(const gchar *buffer)
 {
-    g_return_val_if_fail(buffer != NULL, LIBBALSA_BODY_RFC2440_NONE);
+    g_return_val_if_fail(buffer != NULL, 0);
 
     if (!strncmp(buffer, "-----BEGIN PGP MESSAGE-----", 27) &&
 	strstr(buffer, "-----END PGP MESSAGE-----"))
-	return LIBBALSA_BODY_RFC2440_ENCRYPTED;
+	return LIBBALSA_PROTECT_OPENPGP | LIBBALSA_PROTECT_ENCRYPT;
     else if (!strncmp(buffer, "-----BEGIN PGP SIGNED MESSAGE-----", 34) &&
 	     strstr(buffer, "-----BEGIN PGP SIGNATURE-----") &&
 	     strstr(buffer, "-----END PGP SIGNATURE-----"))
-	return LIBBALSA_BODY_RFC2440_SIGNED;
+	return LIBBALSA_PROTECT_OPENPGP | LIBBALSA_PROTECT_SIGN;
     else
-	return LIBBALSA_BODY_RFC2440_NONE;    
+	return 0;    
 }
 
 
@@ -796,23 +853,32 @@ gchar *
 libbalsa_rfc2440_sign_buffer(const gchar *buffer, const gchar *sign_for,
 			     GtkWindow *parent)
 {
-    GpgmeCtx ctx;
-    GpgmeError err;
-    GpgmeData in, out;
+    gpgme_ctx_t ctx;
+    gpgme_error_t err;
+    gpgme_data_t in, out;
     MailDataBuffer inbuf;
     PassphraseCB cb_data;
     gchar *signed_buffer, *result, *inp, *outp;
     size_t datasize;
+    struct gpgme_data_cbs cbs = 
+	{ (gpgme_data_read_cb_t)read_cb_MailDataBuffer, /* read method */
+	  NULL,                                         /* write method */
+	  NULL,                                         /* seek method */
+	  cb_data_release };                            /* release method */
 
     /* paranoia checks */
     g_return_val_if_fail(sign_for != NULL, NULL);
     g_return_val_if_fail(buffer != NULL, NULL);
 
     /* try to create a gpgme context */
-    if ((err = gpgme_new(&ctx)) != GPGME_No_Error) {
+    if ((err = gpgme_new(&ctx)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not create gpgme context: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not create context: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
+	return NULL;
+    }
+    if (!gpgme_check_set_protocol(ctx, GPGME_PROTOCOL_OpenPGP)) {
+	gpgme_release(ctx);
 	return NULL;
     }
     
@@ -831,27 +897,26 @@ libbalsa_rfc2440_sign_buffer(const gchar *buffer, const gchar *sign_for,
     gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
     inbuf.ptr = (gchar *)buffer;
     inbuf.last_was_cr = FALSE;
-    if ((err = gpgme_data_new_with_read_cb(&in, read_cb_MailDataBuffer,
-    					   &inbuf)) != GPGME_No_Error) {
+    if ((err = gpgme_data_new_from_cbs(&in, &cbs, &inbuf)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not get data from buffer: %s"), 
-			     gpgme_strerror(err));
+			     _("%s: could not get data from buffer: %s"), 
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_release(ctx);
 	return NULL;
     }
-    if ((err = gpgme_data_new(&out)) != GPGME_No_Error) {
+    if ((err = gpgme_data_new(&out)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not create new data object: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not create new data object: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_data_release(in);
 	gpgme_release(ctx);
 	return NULL;
     }
     if ((err = gpgme_op_sign(ctx, in, out, GPGME_SIG_MODE_CLEAR)) != 
-	GPGME_No_Error) {
+	GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme signing failed: %s"),
-			     gpgme_strerror(err));
+			     _("%s: signing failed: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_data_release(out);
 	gpgme_data_release(in);
 	gpgme_release(ctx);
@@ -862,8 +927,8 @@ libbalsa_rfc2440_sign_buffer(const gchar *buffer, const gchar *sign_for,
     gpgme_data_release(in);
     if (!(signed_buffer = gpgme_data_release_and_get_mem(out, &datasize))) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not get gpgme data: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not get data: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_release(ctx);
 	return NULL;
     }
@@ -889,33 +954,37 @@ libbalsa_rfc2440_sign_buffer(const gchar *buffer, const gchar *sign_for,
  * return the siganture's status. If append_info is TRUE, append information
  * about the signature to buffer. If sig_info id not NULL, a new structure
  * is allocated and filled with data. If some error occurs, the buffer is not
- * touched and the routine returns GPGME_SIG_STAT_ERROR. If charset is not
+ * touched and the routine returns GPG_ERR_GENERAL. If charset is not
  * NULL and not `utf-8', the routine converts *buffer from utf-8 to charset
  * before checking and back afterwards.
  */
-GpgmeSigStat
+gpgme_error_t
 libbalsa_rfc2440_check_signature(gchar **buffer, const gchar *charset,
 				 gboolean append_info,
 				 LibBalsaSignatureInfo **sig_info,
 				 const gchar *date_string)
 {
-    GpgmeCtx ctx;
-    GpgmeError err;
-    GpgmeData in, out;
-    GpgmeSigStat status;
+    gpgme_ctx_t ctx;
+    gpgme_error_t err, retval;
+    gpgme_data_t in, out;
     gchar *checkbuf, *plain_buffer, *info, *result;
     size_t datasize;
+    LibBalsaSignatureInfo *tmp_siginfo;
 
     /* paranoia checks */
-    g_return_val_if_fail(buffer != NULL, GPGME_SIG_STAT_ERROR);
-    g_return_val_if_fail(*buffer != NULL, GPGME_SIG_STAT_ERROR);
+    g_return_val_if_fail(buffer != NULL, GPG_ERR_GENERAL);
+    g_return_val_if_fail(*buffer != NULL, GPG_ERR_GENERAL);
 
     /* try to create a gpgme context */
-    if ((err = gpgme_new(&ctx)) != GPGME_No_Error) {
+    if ((err = gpgme_new(&ctx)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not create gpgme context: %s"),
-			     gpgme_strerror(err));
-	return GPGME_SIG_STAT_ERROR;
+			     _("%s: could not create context: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
+	return GPG_ERR_GENERAL;
+    }
+    if (!gpgme_check_set_protocol(ctx, GPGME_PROTOCOL_OpenPGP)) {
+	gpgme_release(ctx);
+	return GPG_ERR_INV_ENGINE;
     }
     
     /* if necessary, convert the buffer 2b checked to charset */
@@ -928,63 +997,60 @@ libbalsa_rfc2440_check_signature(gchar **buffer, const gchar *charset,
 
     /* create the body data stream */
     if ((err = gpgme_data_new_from_mem(&in, checkbuf, strlen(*buffer), 0)) !=
-	GPGME_No_Error) {
+	GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not get data from buffer: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not get data from buffer: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	g_free(checkbuf);
 	gpgme_release(ctx);
-	return GPGME_SIG_STAT_ERROR;
+	return GPG_ERR_GENERAL;
     }
 
     /* verify the signature */
-    if ((err = gpgme_data_new(&out)) != GPGME_No_Error) {
+    if ((err = gpgme_data_new(&out)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not create new data object: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not create new data object: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	g_free(checkbuf);
 	gpgme_data_release(in);
 	gpgme_release(ctx);
-	return GPGME_SIG_STAT_ERROR;
+	return GPG_ERR_GENERAL;
     }
-    if ((err = gpgme_op_verify(ctx, in, out, &status))
-	!= GPGME_No_Error) {
+    if ((err = gpgme_op_verify(ctx, in, NULL, out))
+	!= GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme signature verification failed: %s"),
-			     gpgme_strerror(err));
+			     _("%s: signature verification failed: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_data_release(out);
 	gpgme_data_release(in);
 	g_free(checkbuf);
 	gpgme_release(ctx);
-	return GPGME_SIG_STAT_ERROR;
+	return GPG_ERR_GENERAL;
     }
     gpgme_data_release(in);
     g_free(checkbuf);
 
     /* get some information about the signature if requested... */
-	info = NULL;
-    if (append_info || sig_info) {
-	LibBalsaSignatureInfo *tmp_siginfo =
-	    g_new0(LibBalsaSignatureInfo, 1);
+    info = NULL;
+    tmp_siginfo = g_new0(LibBalsaSignatureInfo, 1);
 	
-	tmp_siginfo->status = status;
-	get_sig_info_from_ctx(tmp_siginfo, ctx);
-	if (append_info)
-	    info = libbalsa_signature_info_to_gchar(tmp_siginfo, date_string);
-	if (sig_info) {
-	    libbalsa_signature_info_destroy(*sig_info);
-	    *sig_info = tmp_siginfo;
-	} else
-	    libbalsa_signature_info_destroy(tmp_siginfo);
-    }
+    get_sig_info_from_ctx(tmp_siginfo, ctx);
+    retval = tmp_siginfo->status;
+    if (append_info)
+	info = libbalsa_signature_info_to_gchar(tmp_siginfo, date_string);
+    if (sig_info) {
+	libbalsa_signature_info_destroy(*sig_info);
+	*sig_info = tmp_siginfo;
+    } else
+	libbalsa_signature_info_destroy(tmp_siginfo);
 
     if (!(plain_buffer = gpgme_data_release_and_get_mem(out, &datasize))) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not get gpgme data: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not get data: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	g_free(info);
         gpgme_release(ctx);
-        return GPGME_SIG_STAT_ERROR;
+        return GPG_ERR_GENERAL;
     }
 
     /* convert the result back to utf-8 if necessary */
@@ -1005,7 +1071,7 @@ libbalsa_rfc2440_check_signature(gchar **buffer, const gchar *charset,
     } else
 	*buffer = result;
   
-    return status;
+    return retval;
 }
 
 
@@ -1018,10 +1084,10 @@ gchar *
 libbalsa_rfc2440_encrypt_buffer(const gchar *buffer, const gchar *sign_for,
 				GList *encrypt_for, GtkWindow *parent)
 {
-    GpgmeCtx ctx;
-    GpgmeError err;
-    GpgmeRecipients rcpt;
-    GpgmeData in, out;
+    gpgme_ctx_t ctx;
+    gpgme_error_t err;
+    gpgme_key_t *rcpt;
+    gpgme_data_t in, out;
     PassphraseCB cb_data;
     gchar *databuf, *result;
     size_t datasize;
@@ -1031,15 +1097,19 @@ libbalsa_rfc2440_encrypt_buffer(const gchar *buffer, const gchar *sign_for,
     g_return_val_if_fail(encrypt_for != NULL, NULL);
 
     /* try to create a gpgme context */
-    if ((err = gpgme_new(&ctx)) != GPGME_No_Error) {
+    if ((err = gpgme_new(&ctx)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not create gpgme context: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not create context: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
         return NULL;
+    }
+    if (!gpgme_check_set_protocol(ctx, GPGME_PROTOCOL_OpenPGP)) {
+	gpgme_release(ctx);
+	return NULL;
     }
 
     /* build the list of recipients */
-    if (!gpgme_build_recipients(&rcpt, ctx, encrypt_for)) {
+    if (!(rcpt = gpgme_build_recipients(ctx, encrypt_for))) {
         gpgme_release(ctx);
         return NULL;
     }
@@ -1047,7 +1117,7 @@ libbalsa_rfc2440_encrypt_buffer(const gchar *buffer, const gchar *sign_for,
     /* add the signer and a passphrase callback if necessary */
     if (sign_for) {
 	if (!gpgme_add_signer(ctx, sign_for)) {
-	    gpgme_recipients_release(rcpt);
+	    release_keylist(rcpt);
 	    gpgme_release(ctx);
 	    return NULL;
 	}
@@ -1063,50 +1133,50 @@ libbalsa_rfc2440_encrypt_buffer(const gchar *buffer, const gchar *sign_for,
     gpgme_set_armor(ctx, 1);
     gpgme_set_textmode(ctx, 1);
     if ((err = gpgme_data_new_from_mem(&in, buffer, strlen(buffer), 0))
-	!= GPGME_No_Error) {
+	!= GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not get data from buffer: %s"), 
-			     gpgme_strerror(err));
-        gpgme_recipients_release(rcpt);
+			     _("%s: could not get data from buffer: %s"), 
+			     gpgme_strsource(err), gpgme_strerror(err));
+        release_keylist(rcpt);
 	gpgme_release(ctx);
 	return NULL;
     }
-    if ((err = gpgme_data_new(&out)) != GPGME_No_Error) {
+    if ((err = gpgme_data_new(&out)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not create new data object: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not create new data object: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
         gpgme_data_release(in);
-        gpgme_recipients_release(rcpt);
+        release_keylist(rcpt);
         gpgme_release(ctx);
         return NULL;
     }    
     if (sign_for)
-	err = gpgme_op_encrypt_sign(ctx, rcpt, in, out);
+	err = gpgme_op_encrypt_sign(ctx, rcpt, GPGME_ENCRYPT_ALWAYS_TRUST, in, out);
     else
-	err = gpgme_op_encrypt(ctx, rcpt, in, out);
-    if (err != GPGME_No_Error) {
+	err = gpgme_op_encrypt(ctx, rcpt, GPGME_ENCRYPT_ALWAYS_TRUST, in, out);
+    if (err != GPG_ERR_NO_ERROR) {
 	if (sign_for)
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("gpgme signing and encryption failed: %s"),
-				 gpgme_strerror(err));
+				 _("%s: signing and encryption failed: %s"),
+				 gpgme_strsource(err), gpgme_strerror(err));
 	else
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("gpgme encryption failed: %s"),
-				 gpgme_strerror(err));
+				 _("%s: encryption failed: %s"),
+				 gpgme_strsource(err), gpgme_strerror(err));
         gpgme_data_release(out);
         gpgme_data_release(in);
-        gpgme_recipients_release(rcpt);
+        release_keylist(rcpt);
         gpgme_release(ctx);
         return NULL;
     }
 
     /* get the result */
     gpgme_data_release(in);
-    gpgme_recipients_release(rcpt);
+    release_keylist(rcpt);
     if (!(databuf = gpgme_data_release_and_get_mem(out, &datasize))) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not get gpgme data: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not get data: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_release(ctx);
 	return NULL;
     }
@@ -1124,94 +1194,100 @@ libbalsa_rfc2440_encrypt_buffer(const gchar *buffer, const gchar *sign_for,
  * the signature's status. If append_info is TRUE, append information about
  * the signature (if available) to buffer. If sig_info id not NULL, a new 
  * structure is allocated and filled. If some error occurs, the buffer
- * is not touched and the routine returns GPGME_SIG_STAT_ERROR.
+ * is not touched and the routine returns GPG_ERR_GENERAL.
  */
-GpgmeSigStat
+gpgme_error_t
 libbalsa_rfc2440_decrypt_buffer(gchar **buffer, const gchar *charset,
 				gboolean fallback, LibBalsaCodeset codeset,
 				gboolean append_info, 
 				LibBalsaSignatureInfo **sig_info,
 				const gchar *date_string, GtkWindow *parent)
 {
-    GpgmeCtx ctx;
-    GpgmeError err;
-    GpgmeData in, out;
+    gpgme_ctx_t ctx;
+    gpgme_error_t err, retval;
+    gpgme_data_t in, out;
     PassphraseCB cb_data;
-    GpgmeSigStat status;
     gchar *plain_buffer, *info, *result;
     size_t datasize;
+    LibBalsaSignatureInfo *tmp_siginfo;
 
     /* paranoia checks */
-    g_return_val_if_fail(buffer != NULL, GPGME_SIG_STAT_ERROR);
-    g_return_val_if_fail(*buffer != NULL, GPGME_SIG_STAT_ERROR);
+    g_return_val_if_fail(buffer != NULL, GPG_ERR_GENERAL);
+    g_return_val_if_fail(*buffer != NULL, GPG_ERR_GENERAL);
 
     /* try to create a gpgme context */
-    if ((err = gpgme_new(&ctx)) != GPGME_No_Error) {
+    if ((err = gpgme_new(&ctx)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not create gpgme context: %s"),
-			     gpgme_strerror(err));
-	return GPGME_SIG_STAT_ERROR;
+			     _("%s: could not create context: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
+	return GPG_ERR_GENERAL;
+    }
+    if (!gpgme_check_set_protocol(ctx, GPGME_PROTOCOL_OpenPGP)) {
+	gpgme_release(ctx);
+	return GPG_ERR_INV_ENGINE;
     }
     
     /* create the body data stream */
     if ((err = gpgme_data_new_from_mem(&in, *buffer, strlen(*buffer), 0)) !=
-	GPGME_No_Error) {
+	GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not get data from buffer: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not get data from buffer: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_release(ctx);
-	return GPGME_SIG_STAT_ERROR;
+	return GPG_ERR_GENERAL;
     }
 
     /* decrypt and (if possible) verify the signature */
-    if ((err = gpgme_data_new(&out)) != GPGME_No_Error) {
+    if ((err = gpgme_data_new(&out)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not create new data object: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not create new data object: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_data_release(in);
 	gpgme_release(ctx);
-	return GPGME_SIG_STAT_ERROR;
+	return GPG_ERR_GENERAL;
     }
     cb_data.ctx = ctx;
     cb_data.title = _("Enter passsphrase to decrypt message part");
     cb_data.parent = parent;
     gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
-    if ((err = gpgme_op_decrypt_verify(ctx, in, out, &status))
-	!= GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme decryption and signature verification failed: %s"),
-			     gpgme_strerror(err));
+    if ((err = gpgme_op_decrypt_verify(ctx, in, out))
+	!= GPG_ERR_NO_ERROR) {
+	if (err != GPG_ERR_CANCELED)
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("%s: decryption and signature verification failed: %s"),
+				 gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_data_release(out);
 	gpgme_data_release(in);
 	gpgme_release(ctx);
-	return GPGME_SIG_STAT_NONE;
+	return err;
     }
     gpgme_data_release(in);
 
     /* get some information about the signature if requested... */
-	info = NULL;
-    if (status != GPGME_SIG_STAT_NONE && (append_info || sig_info)) {
-	LibBalsaSignatureInfo *tmp_siginfo =
-	    g_new0(LibBalsaSignatureInfo, 1);
+    info = NULL;
+    tmp_siginfo = g_new0(LibBalsaSignatureInfo, 1);
 	
-	tmp_siginfo->status = status;
-	get_sig_info_from_ctx(tmp_siginfo, ctx);
-	if (append_info)
-	    info = libbalsa_signature_info_to_gchar(tmp_siginfo, date_string);
-	if (sig_info) {
-	    libbalsa_signature_info_destroy(*sig_info);
-	    *sig_info = tmp_siginfo;
-	} else
-	    libbalsa_signature_info_destroy(tmp_siginfo);
+    get_sig_info_from_ctx(tmp_siginfo, ctx);
+    retval = tmp_siginfo->status;
+    if (tmp_siginfo->status == GPG_ERR_USER_16) {
+	libbalsa_signature_info_destroy(tmp_siginfo);
+	tmp_siginfo = NULL;
     }
+    if (tmp_siginfo && append_info)
+	info = libbalsa_signature_info_to_gchar(tmp_siginfo, date_string);
+    if (sig_info) {
+	libbalsa_signature_info_destroy(*sig_info);
+	*sig_info = tmp_siginfo;
+    } else
+	libbalsa_signature_info_destroy(tmp_siginfo);
 
     if (!(plain_buffer = gpgme_data_release_and_get_mem(out, &datasize))) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not get gpgme data: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not get data: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	g_free(info);
         gpgme_release(ctx);
-        return GPGME_SIG_STAT_ERROR;
+        return GPG_ERR_GENERAL;
     }
     gpgme_release(ctx);
 
@@ -1255,7 +1331,7 @@ libbalsa_rfc2440_decrypt_buffer(gchar **buffer, const gchar *charset,
     } else
 	*buffer = result;
   
-    return status;
+    return retval;
 }
 
 
@@ -1275,27 +1351,11 @@ typedef struct _spawned_gpg_T {
 static gboolean check_gpg_child(gpointer data);
 
 gboolean
-gpg_ask_import_key(const gchar *message, GtkWindow *parent, 
-		   const gchar *fingerprint)
+gpg_run_import_key(const gchar *fingerprint, GtkWindow *parent)
 {
-    gboolean spawnres;
-    GtkWidget *dialog;
-    gint dialog_res;
     gchar **argv;
     spawned_gpg_T *spawned_gpg;
-
-    /* display a dialog, asking the user if (s)he wants to import the key */
-    dialog =
-	gtk_message_dialog_new (parent,
-				GTK_DIALOG_DESTROY_WITH_PARENT,
-				GTK_MESSAGE_QUESTION,
-				GTK_BUTTONS_YES_NO,
-				_("%s\nDo you want to run gpg to import the public key with fingerprint %s?"),
-				message, fingerprint);
-    dialog_res = gtk_dialog_run (GTK_DIALOG (dialog));
-    gtk_widget_destroy (dialog);
-    if (dialog_res != GTK_RESPONSE_YES)
-	return FALSE;
+    gboolean spawnres;
 
     /* launch gpg... */
     argv = g_new(gchar *, 5);
@@ -1325,7 +1385,7 @@ gpg_ask_import_key(const gchar *message, GtkWindow *parent,
     fcntl(spawned_gpg->standard_error, F_SETFL, O_NONBLOCK);
     spawned_gpg->stderr_buf = g_string_new("");
     spawned_gpg->parent = parent;
-    g_idle_add(check_gpg_child, spawned_gpg);
+    g_timeout_add(250, check_gpg_child, spawned_gpg);
 
     return TRUE;
 }
@@ -1389,8 +1449,39 @@ check_gpg_child(gpointer data)
 /* ==== local stuff ======================================================== */
 
 
+/* 
+ * helper: check & remember if protocol proto is available. If it's available,
+ * set it and return TRUE, and FALSE otherwise
+ */
+static gboolean
+gpgme_check_set_protocol(gpgme_ctx_t ctx, gpgme_protocol_t proto)
+{
+    static gint has_proto_openpgp = -1;
+    static gint has_proto_cms = -1;
+
+    switch (proto) {
+    case GPGME_PROTOCOL_OpenPGP:
+	if (has_proto_openpgp < 0)
+	    has_proto_openpgp = 
+		(gpgme_engine_check_version(proto) == GPG_ERR_NO_ERROR) ? TRUE : FALSE;
+	if (has_proto_openpgp)
+	    gpgme_set_protocol(ctx, proto);
+	return has_proto_openpgp;
+    case GPGME_PROTOCOL_CMS:
+	if (has_proto_cms < 0)
+	    has_proto_cms = 
+		(gpgme_engine_check_version(proto) == GPG_ERR_NO_ERROR) ? TRUE : FALSE;
+	if (has_proto_cms)
+	    gpgme_set_protocol(ctx, proto);
+	return has_proto_cms;
+    default:
+	return FALSE;
+    }
+}
+
+
 static const gchar *
-libbalsa_gpgme_validity_to_gchar_short(GpgmeValidity validity)
+libbalsa_gpgme_validity_to_gchar_short(gpgme_validity_t validity)
 {
     switch (validity)
 	{
@@ -1416,24 +1507,30 @@ libbalsa_gpgme_validity_to_gchar_short(GpgmeValidity validity)
  * extract the signature info fields from ctx
  */
 static void
-get_sig_info_from_ctx(LibBalsaSignatureInfo* info, GpgmeCtx ctx)
+get_sig_info_from_ctx(LibBalsaSignatureInfo* info, gpgme_ctx_t ctx)
 {
-    GpgmeSigStat stat;
-    GpgmeKey key;
+    gpgme_verify_result_t result;
+    gpgme_key_t key;
 	
-    info->fingerprint =
-	g_strdup(gpgme_get_sig_status(ctx, 0, &stat, &info->sign_time));
-    gpgme_get_sig_key(ctx, 0, &key);
-    info->validity =
-	gpgme_key_get_ulong_attr(key, GPGME_ATTR_VALIDITY, NULL, 0);
-    info->trust =
-	gpgme_key_get_ulong_attr(key, GPGME_ATTR_OTRUST, NULL, 0);
-    info->sign_name =
-	g_strdup(gpgme_key_get_string_attr(key, GPGME_ATTR_NAME, NULL, 0));
-    info->sign_email =
-	g_strdup(gpgme_key_get_string_attr(key, GPGME_ATTR_EMAIL, NULL, 0));
-    info->key_created =
-	gpgme_key_get_ulong_attr(key, GPGME_ATTR_CREATED, NULL, 0);
+    info->status = GPG_ERR_USER_16; /* no signature available */
+
+    if (!(result = gpgme_op_verify_result(ctx)) || result->signatures == NULL)
+	return;
+    info->fingerprint = g_strdup(result->signatures->fpr);
+    info->sign_time = result->signatures->timestamp;
+    info->status = gpgme_err_code(result->signatures->status);
+
+    gpgme_get_key(ctx, info->fingerprint, &key, 0);
+    if (key == NULL)
+	return;
+    info->trust = key->owner_trust;
+    if (key->uids) {
+	info->validity = key->uids->validity;
+	info->sign_name = g_strdup(key->uids->name);
+	info->sign_email = g_strdup(key->uids->email);
+    }
+    if (key->subkeys)
+	info->key_created = key->subkeys->timestamp;
     gpgme_key_unref(key);
 }
 
@@ -1445,6 +1542,7 @@ enum {
     GPG_KEY_VALIDITY_COLUMN,
     GPG_KEY_TRUST_COLUMN,
     GPG_KEY_LENGTH_COLUMN,
+    GPG_KEY_PTR_COLUMN,
     GPG_KEY_NUM_COLUMNS
 };
 
@@ -1455,26 +1553,24 @@ static gchar *col_titles[] =
 
 /* callback function if a new row is selected in the list */
 static void
-key_selection_changed_cb (GtkTreeSelection *selection, gchar **fp)
+key_selection_changed_cb (GtkTreeSelection *selection, gpgme_key_t *key)
 {
     GtkTreeIter iter;
     GtkTreeModel *model;
     
-    if (gtk_tree_selection_get_selected (selection, &model, &iter)) {
-	g_free(*fp);
-	gtk_tree_model_get (model, &iter, GPG_KEY_FP_COLUMN, fp, -1);
-    }
+    if (gtk_tree_selection_get_selected (selection, &model, &iter))
+	gtk_tree_model_get (model, &iter, GPG_KEY_PTR_COLUMN, key, -1);
 }
 
 
 /*
- * Select a key for the mail address for_address from the GpgmeKey's in keys
- * and return either the selected fingerprint or NULL if the dialog was
- * cancelled. secret_only controls the dialog message.
+ * Select a key for the mail address for_address from the gpgme_key_t's in keys
+ * and return either the selected key or NULL if the dialog was cancelled.
+ * secret_only controls the dialog message.
  */
-static gchar *
-select_key_fp_from_list(int secret_only, const gchar *for_address, GList *keys,
-			GtkWindow *parent)
+static gpgme_key_t
+select_key_from_list(int secret_only, const gchar *for_address, GList *keys,
+		     GtkWindow *parent)
 {
     GtkWidget *dialog;
     GtkWidget *scrolled_window;
@@ -1484,8 +1580,8 @@ select_key_fp_from_list(int secret_only, const gchar *for_address, GList *keys,
     GtkTreeIter iter;
     gint i;
     gchar *prompt;
-    gchar *use_fp = NULL;
-  
+    gpgme_key_t use_key = NULL;
+
     /* FIXME: create dialog according to the Gnome HIG */
     dialog = gtk_dialog_new_with_buttons(_("Select key"),
 					 parent,
@@ -1514,31 +1610,33 @@ select_key_fp_from_list(int secret_only, const gchar *for_address, GList *keys,
 
     model = gtk_tree_store_new (GPG_KEY_NUM_COLUMNS, G_TYPE_STRING,
 				G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
-				G_TYPE_INT);
+				G_TYPE_INT, G_TYPE_POINTER);
 
     tree_view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (model));
     selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (tree_view));
     gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
     g_signal_connect (G_OBJECT (selection), "changed",
 		      G_CALLBACK (key_selection_changed_cb),
-		      &use_fp);
+		      &use_key);
 
     /* add the keys */
     while (keys) {
-	GpgmeKey key = (GpgmeKey)keys->data;
+	gpgme_key_t key = (gpgme_key_t)keys->data;
 
 	gtk_tree_store_append (GTK_TREE_STORE (model), &iter, NULL);
 	gtk_tree_store_set (GTK_TREE_STORE (model), &iter,
 			    GPG_KEY_FP_COLUMN,
-			    gpgme_key_get_string_attr(key, GPGME_ATTR_FPR, NULL, 0),
-			    GPG_KEY_ID_COLUMN, 
-			    gpgme_key_get_string_attr(key, GPGME_ATTR_KEYID, NULL, 0),
+			    key->subkeys->fpr ? key->subkeys->fpr : "",
+			    GPG_KEY_ID_COLUMN,
+			    key->subkeys->keyid,
 			    GPG_KEY_VALIDITY_COLUMN, 
-			    libbalsa_gpgme_validity_to_gchar_short(gpgme_key_get_ulong_attr(key, GPGME_ATTR_VALIDITY, NULL, 0)),
+			    libbalsa_gpgme_validity_to_gchar_short(key->uids->validity),
 			    GPG_KEY_TRUST_COLUMN, 
-			    libbalsa_gpgme_validity_to_gchar_short(gpgme_key_get_ulong_attr(key, GPGME_ATTR_OTRUST, NULL, 0)),
+			    libbalsa_gpgme_validity_to_gchar_short(key->owner_trust),
 			    GPG_KEY_LENGTH_COLUMN,
-			    gpgme_key_get_ulong_attr(key, GPGME_ATTR_LEN, NULL, 0),
+			    key->subkeys->length,
+			    GPG_KEY_PTR_COLUMN,
+			    key,
 			    -1);
 
 	keys = g_list_next(keys);
@@ -1546,7 +1644,7 @@ select_key_fp_from_list(int secret_only, const gchar *for_address, GList *keys,
   
     g_object_unref (G_OBJECT (model));
 
-    for (i = 0; i < GPG_KEY_NUM_COLUMNS; i++) {
+    for (i = 0; i < GPG_KEY_PTR_COLUMN; i++) {
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *column;
 
@@ -1563,42 +1661,41 @@ select_key_fp_from_list(int secret_only, const gchar *for_address, GList *keys,
     gtk_window_set_default_size(GTK_WINDOW(dialog), 500, 300);
     gtk_widget_show_all(GTK_DIALOG(dialog)->vbox);
 
-    if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK) {
-	g_free(use_fp);
-	use_fp = NULL;
-    }
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK)
+	use_key = NULL;
     gtk_widget_destroy(dialog);
 
-    return use_fp;
+    return use_key;
 }
 
 
 /*
- * Get a key finger print for name. If necessary, a dialog is shown to select
+ * Get a key for name. If necessary, a dialog is shown to select
  * a key from a list. Return NULL if something failed.
  */
-static gchar *
-get_key_fingerprint(GpgmeCtx ctx, const gchar *name, int secret_only,
-		    GtkWindow *parent)
+static gpgme_key_t
+get_key_from_name(gpgme_ctx_t ctx, const gchar *name, int secret_only,
+		  GtkWindow *parent)
 {
     GList *keys = NULL;
-    GpgmeKey key;
-    GpgmeError err;
-    gchar *fpr;
+    gpgme_key_t key;
+    gpgme_error_t err;
 
-    if ((err = gpgme_op_keylist_start(ctx, name, secret_only)) != GPGME_No_Error) {
+    if ((err = gpgme_op_keylist_start(ctx, name, secret_only)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not list keys for %s: %s"), name,
-			       gpgme_strerror(err));
+			     _("%s: could not list keys for %s: %s"),
+			     gpgme_strsource(err), name, gpgme_strerror(err));
 	return NULL;
     }
-    while ((err = gpgme_op_keylist_next(ctx, &key)) == GPGME_No_Error)
+    while ((err = gpgme_op_keylist_next(ctx, &key)) == GPG_ERR_NO_ERROR)
 	keys = g_list_append(keys, key);
-    if (err != GPGME_EOF) {
+    if (gpg_err_code(err) != GPG_ERR_EOF) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not retrieve key for %s: %s"), name,
-			       gpgme_strerror(err));
+			     _("%s: could not retrieve key for %s: %s"),
+			     gpgme_strsource(err), name, gpgme_strerror(err));
 	gpgme_op_keylist_end(ctx);
+	g_list_foreach(keys, (GFunc)gpgme_key_unref, NULL);
+	g_list_free(keys);
 	return NULL;
     }
     gpgme_op_keylist_end(ctx);
@@ -1606,17 +1703,16 @@ get_key_fingerprint(GpgmeCtx ctx, const gchar *name, int secret_only,
     if (!keys) 
 	return NULL;
 
-    if (g_list_length (keys) > 1)
-	fpr = select_key_fp_from_list(secret_only, name, keys, parent);
-    else
-	fpr = g_strdup(gpgme_key_get_string_attr((GpgmeKey)(keys->data),
-						 GPGME_ATTR_FPR, NULL, 0));
+    if (g_list_length (keys) > 1) {
+	key = select_key_from_list(secret_only, name, keys, parent);
+	if (key)
+	    gpgme_key_ref(key);
+	g_list_foreach(keys, (GFunc)gpgme_key_unref, NULL);
+    } else
+	key = (gpgme_key_t)keys->data;
 
-    /* unref all keys */
-    g_list_foreach(keys, (GFunc)gpgme_key_unref, NULL);
     g_list_free(keys);
-
-    return fpr;
+    return key;
 } 
 
 
@@ -1625,79 +1721,59 @@ get_key_fingerprint(GpgmeCtx ctx, const gchar *name, int secret_only,
  * on error.
  */
 static gboolean
-gpgme_add_signer(GpgmeCtx ctx, const gchar *signer)
+gpgme_add_signer(gpgme_ctx_t ctx, const gchar *signer)
 {
-    GpgmeKey key = NULL;
-    gchar *fingerprint;
-
+    gpgme_key_t key = NULL;
     
-    if (!(fingerprint = get_key_fingerprint(ctx, signer, 1, NULL))) {
+    if (!(key = get_key_from_name(ctx, signer, 1, NULL))) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("could not get a private key for %s"), signer);
 	return FALSE;
     }
 
     /* set the key (the previous operation guaranteed that it exists...) */
-    gpgme_op_keylist_start(ctx, fingerprint, 1);
-    gpgme_op_keylist_next(ctx, &key);
     gpgme_signers_add(ctx, key);
     gpgme_key_unref(key);
-    gpgme_op_keylist_end(ctx);
-    g_free(fingerprint);
 
     return TRUE;
 }
 
 
 /*
- * Build rcpt from rcpt_list and return TRUE on success or FALSE on error.
+ * Build a NULL-terminated array of keys for all recipients in rcpt_list and
+ * return it. The caller has to take care that it's released. If something
+ * goes wrong, NULL is returned.
  */
-static gboolean
-gpgme_build_recipients(GpgmeRecipients *rcpt, GpgmeCtx ctx, GList *rcpt_list)
+static gpgme_key_t *
+gpgme_build_recipients(gpgme_ctx_t ctx, GList *rcpt_list)
 {
-    GpgmeError err;
-
-    if ((err = gpgme_recipients_new(rcpt)) != GPGME_No_Error) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not create gpgme recipients set: %s"),
-			     gpgme_strerror(err));
-        return FALSE;
-    }
+    gpgme_key_t *rcpt = g_new0(gpgme_key_t, g_list_length(rcpt_list) + 1);
+    gint num_rcpts = 0;
 
     /* try to find the public key for every recipient */
     while (rcpt_list) {
         gchar *name = (gchar *)rcpt_list->data;
-	gchar *fingerprint;
+	gpgme_key_t key;
 
-        if (!(fingerprint = get_key_fingerprint(ctx, name, 0, NULL))) {
+        if (!(key = get_key_from_name(ctx, name, 0, NULL))) {
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("could not get a key for %s"), name);
-            gpgme_recipients_release(*rcpt);
-            return FALSE;
+				 _("could not get a public key for %s"), name);
+            release_keylist(rcpt);
+            return NULL;
         }
 
         /* set the recipient */
+	rcpt[num_rcpts++] = key;
 	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-			     "encrypt for %s with fpr %s", name, fingerprint);
-        if ((err = gpgme_recipients_add_name_with_validity(*rcpt, fingerprint, 
-                                                           GPGME_VALIDITY_FULL)) != 
-            GPGME_No_Error) {
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("could not add recipient %s: %s"), name, 
-				 gpgme_strerror(err));
-	    g_free(fingerprint);
-            gpgme_recipients_release(*rcpt);
-            return FALSE;
-        }
-	g_free(fingerprint);
+			     "encrypt for %s with fpr %s", name, 
+			     key->subkeys->fpr);
 
         rcpt_list = g_list_next(rcpt_list);
     }
     libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-			 "encrypting for %d recipient(s)",
-			 gpgme_recipients_count(*rcpt));
+			 "encrypting for %d recipient(s)", num_rcpts);
     
-    return TRUE;
+    return rcpt;
 }
 
 
@@ -1706,14 +1782,14 @@ gpgme_build_recipients(GpgmeRecipients *rcpt, GpgmeCtx ctx, GList *rcpt_list)
  * hook (which is actually a MailDataMBox *) and convert every single '\n'
  * into a '\r\n' sequence as requested by rfc3156.
  */
-static int
-read_cb_MailDataMBox(void *hook, char *buffer, size_t count, size_t *nread)
+static ssize_t
+read_cb_MailDataMBox(void *hook, char *buffer, size_t count)
 {
     MailDataMBox *inFile = (MailDataMBox *)hook;
+    ssize_t nread = 0;
 
-    *nread = 0;
     if (inFile->bytes_left == 0 || feof(inFile->mailboxFile))
-	return -1;
+	return 0;
 
     /* try to fill buffer */
     while (count > 1 && inFile->bytes_left > 0 && !feof(inFile->mailboxFile) &&
@@ -1724,17 +1800,17 @@ read_cb_MailDataMBox(void *hook, char *buffer, size_t count, size_t *nread)
 	if (c != EOF) {
 	    if (c == '\n' && !inFile->last_was_cr) {
 		*buffer++ = '\r';
-		*nread += 1;
+		nread += 1;
 		count -= 1;
 	    }
 	    inFile->last_was_cr = (c == '\r');
 	    *buffer++ = c;
-	    *nread += 1;
+	    nread += 1;
 	    count -= 1;
 	}
     }
 
-    return ferror(inFile->mailboxFile) ? -1 : 0;
+    return ferror(inFile->mailboxFile) ? -1 : nread;
 }
 
 
@@ -1742,29 +1818,29 @@ read_cb_MailDataMBox(void *hook, char *buffer, size_t count, size_t *nread)
  * Called by gpgme to get a new chunk of data. We read from the gchar ** in
  * hook and convert every single '\n' into a '\r\n' sequence.
  */
-static int
-read_cb_MailDataBuffer(void *hook, char *buffer, size_t count, size_t *nread)
+static ssize_t
+read_cb_MailDataBuffer(void *hook, char *buffer, size_t count)
 {
     MailDataBuffer *inbuf = (MailDataBuffer *)hook;
-    
-    *nread = 0;
+    ssize_t nread = 0;
+
     if (*(inbuf->ptr) == '\0')
-        return -1;
+        return 0;
 
     /* try to fill buffer */
     while (count > 1 && *(inbuf->ptr) != '\0') {
 	if (*(inbuf->ptr) == '\n' && !inbuf->last_was_cr) {
 	    *buffer++ = '\r';
-	    *nread += 1;
+	    nread += 1;
 	    count -= 1;
 	}
 	inbuf->last_was_cr = (*(inbuf->ptr) == '\r');
 	*buffer++ = *(inbuf->ptr);
 	inbuf->ptr += 1;
-	*nread += 1;
+	nread += 1;
 	count -= 1;
     }
-    return 0;
+    return nread;
 }
 
 
@@ -1892,16 +1968,14 @@ pcache_timeout(pcache_T *cache)
 
 
 /*
- * Check if the passphrase requested for desc is already in cache. If it is
- * there and gpgme complained about a bad passphrase, erase it and return
+ * Check if the passphrase requested for uid_hint is already in cache. If it
+ * is there and gpgme complained about a bad passphrase, erase it and return
  * NULL, otherwise return the passphrase. If it is not in the cache, the
  * routine also returns NULL.
  */
 static gchar *
-check_cache(pcache_T *cache, const gchar *desc)
+check_cache(pcache_T *cache, const gchar *uid_hint, int prev_was_bad)
 {
-    gchar *p;
-    gchar **desc_parts;
     unsigned char tofind[MD5_DIGEST_LENGTH];
     GList *list;
 
@@ -1909,23 +1983,15 @@ check_cache(pcache_T *cache, const gchar *desc)
     if (!cache->enable || !cache->cache)
 	return NULL;
 
-    /* try to find the name in the cache */
-    desc_parts = g_strsplit(desc, "\n", 3);
-    p = strchr(desc_parts[1], ' ');   /* skip the fingerprint */
-    if (!p) {
-	g_strfreev(desc_parts);
-	return NULL;
-    }
-    MD5(p, strlen(p), tofind);
-    g_strfreev(desc_parts);
-
+    /* try to find the passphrase in the cache */
+    MD5(uid_hint, strlen(uid_hint), tofind);
     list = cache->cache;
     while (list) {
 	pcache_elem_T *elem = (pcache_elem_T *)list->data;
 
 	if (!memcmp(tofind, elem->name, MD5_DIGEST_LENGTH)) {
 	    /* check if the last entry was bad */
-	    if (!strncmp(desc, "TRY_AGAIN", 9)) {
+	    if (prev_was_bad) {
 		elem->passphrase = bf_destroy(elem->passphrase);
 		g_free(elem);
 		cache->cache = g_list_delete_link(cache->cache, list);
@@ -2038,20 +2104,19 @@ activate_mins(GtkToggleButton *btn, GtkWidget *target)
  */
 static gchar *
 #ifdef ENABLE_PCACHE
-get_passphrase_real(PassphraseCB *cb_data, const gchar *desc, pcache_T *pcache)
+get_passphrase_real(PassphraseCB *cb_data, const gchar *uid_hint,
+		    int prev_was_bad, pcache_T *pcache)
 #else
-get_passphrase_real(PassphraseCB *cb_data, const gchar *desc)
+get_passphrase_real(PassphraseCB *cb_data, const gchar *uid_hint,
+		    int prev_was_bad)
 #endif
 {
-    gchar **desc_parts;
     GtkWidget *dialog, *entry;
     gchar *prompt, *passwd;
 #ifdef ENABLE_PCACHE
     GtkWidget *cache_but = NULL, *cache_min = NULL;
 #endif
     
-    desc_parts = g_strsplit(desc, "\n", 3);
-
     /* FIXME: create dialog according to the Gnome HIG */
     dialog = gtk_dialog_new_with_buttons(cb_data->title,
                                          cb_data->parent,
@@ -2060,14 +2125,14 @@ get_passphrase_real(PassphraseCB *cb_data, const gchar *desc)
                                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                          NULL);
     gtk_box_set_spacing(GTK_BOX(GTK_DIALOG(dialog)->vbox), 12);
-    if (!strcmp(desc_parts[0], "TRY_AGAIN"))
+    if (prev_was_bad)
 	prompt = 
 	    g_strdup_printf(_("The passphrase for this key was bad, please try again!\n\nKey: %s"),
-			    desc_parts[1]);
+			    uid_hint);
     else
 	prompt = 
 	    g_strdup_printf(_("Please enter the passphrase for the secret key!\n\nKey: %s"),
-			    desc_parts[1]);
+			    uid_hint);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
                       gtk_label_new(prompt));
     g_free(prompt);
@@ -2109,22 +2174,17 @@ get_passphrase_real(PassphraseCB *cb_data, const gchar *desc)
 #ifdef ENABLE_PCACHE
     if (pcache->enable) {
 	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(cache_but))) {
-	    gchar *p = strchr(desc_parts[1], ' ');
-	    
-	    if (p) {
-		pcache_elem_T *elem = g_new(pcache_elem_T, 1);
+	    pcache_elem_T *elem = g_new(pcache_elem_T, 1);
 
-		MD5(p, strlen(p), elem->name);
-		elem->passphrase = bf_encrypt(passwd, &pcache->bf_key);
-		elem->expires = time(NULL) + 
-		    60 * gtk_spin_button_get_value(GTK_SPIN_BUTTON(cache_min));
-		pcache->cache = g_list_append(pcache->cache, elem);
-	    }
+	    MD5(uid_hint, strlen(uid_hint), elem->name);
+	    elem->passphrase = bf_encrypt(passwd, &pcache->bf_key);
+	    elem->expires = time(NULL) + 
+		60 * gtk_spin_button_get_value(GTK_SPIN_BUTTON(cache_min));
+	    pcache->cache = g_list_append(pcache->cache, elem);
 	}
     }
 #endif
 
-    g_strfreev(desc_parts);
     gtk_widget_destroy(dialog);
 
     return passwd;
@@ -2137,6 +2197,7 @@ typedef struct {
     pthread_cond_t cond;
     PassphraseCB *cb_data;
     const gchar *desc;
+    gint was_bad;
 #ifdef ENABLE_PCACHE
     pcache_T *pcache;
 #endif
@@ -2153,9 +2214,10 @@ get_passphrase_idle(gpointer data)
 
     gdk_threads_enter();
 #ifdef ENABLE_PCACHE
-    apd->res = get_passphrase_real(apd->cb_data, apd->desc, apd->pcache);
+    apd->res = get_passphrase_real(apd->cb_data, apd->desc, apd->was_bad,
+				   apd->pcache);
 #else
-    apd->res = get_passphrase_real(apd->cb_data, apd->desc);
+    apd->res = get_passphrase_real(apd->cb_data, apd->desc, apd->was_bad);
 #endif
     gdk_threads_leave();
     pthread_cond_signal(&apd->cond);
@@ -2165,27 +2227,29 @@ get_passphrase_idle(gpointer data)
 
 
 /*
+ * Helper function: overwrite a sting in memory with random data
+ */
+static inline void
+wipe_string(gchar *password)
+{
+    while (*password)
+	*password++ = random();
+}
+
+
+/*
  * Called by gpgme to get the passphrase for a key.
  */
-static const gchar *
-get_passphrase_cb(void *opaque, const char *desc, void **r_hd)
+static gpgme_error_t
+get_passphrase_cb(void *opaque, const char *uid_hint, const char *passph_info,
+		  int prev_was_bad, int fd)
 {
     PassphraseCB *cb_data = (PassphraseCB *)opaque;
     gchar *passwd = NULL;
 
-    g_return_val_if_fail(cb_data != NULL, NULL);
-    g_return_val_if_fail(cb_data->ctx != NULL, NULL);
-
-    if (!desc) {
-	if (*r_hd) {
-	    /* paranoia: wipe passphrase from memory */
-	    gchar *p = *r_hd;
-	    while (*p)
-		*p++ = random();
-	    g_free(*r_hd);
-	    *r_hd = NULL;
-	}
-        return NULL;
+    if (cb_data == NULL || cb_data->ctx == NULL) {
+	write(fd, "\n", 1);
+	return GPG_ERR_USER_1;
     }
     
 #ifdef ENABLE_PCACHE    
@@ -2193,18 +2257,21 @@ get_passphrase_cb(void *opaque, const char *desc, void **r_hd)
 	pcache = init_pcache();
 
     /* check if we have the passphrase already cached... */
-    if ((passwd = check_cache(pcache, desc))) {
-	*r_hd = passwd;
-	return passwd;
+    if ((passwd = check_cache(pcache, uid_hint, prev_was_bad))) {
+	write(fd, passwd, strlen(passwd));
+	write(fd, "\n", 1);
+	wipe_string(passwd);
+	g_free(passwd);
+	return GPG_ERR_NO_ERROR;
     }
 #endif
 
 #ifdef BALSA_USE_THREADS
     if (pthread_self() == libbalsa_get_main_thread())
 #ifdef ENABLE_PCACHE
-	passwd = get_passphrase_real(cb_data, desc, pcache);
+	passwd = get_passphrase_real(cb_data, uid_hint, prev_was_bad, pcache);
 #else
-	passwd = get_passphrase_real(cb_data, desc);
+	passwd = get_passphrase_real(cb_data, uid_hint, prev_was_bad);
 #endif
     else {
 	static pthread_mutex_t get_passphrase_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -2213,7 +2280,8 @@ get_passphrase_cb(void *opaque, const char *desc, void **r_hd)
 	pthread_mutex_lock(&get_passphrase_lock);
 	pthread_cond_init(&apd.cond, NULL);
 	apd.cb_data = cb_data;
-	apd.desc = desc;
+	apd.desc = uid_hint;
+	apd.was_bad = prev_was_bad;
 #ifdef ENABLE_PCACHE
 	apd.pcache = pcache;
 #endif
@@ -2227,39 +2295,23 @@ get_passphrase_cb(void *opaque, const char *desc, void **r_hd)
     }
 #else
 #ifdef ENABLE_PCACHE
-    passwd = get_passphrase_real(cb_data, desc, pcache);
+    passwd = get_passphrase_real(cb_data, uid_hint, prev_was_bad, pcache);
 #else
-    passwd = get_passphrase_real(cb_data, desc);
+    passwd = get_passphrase_real(cb_data, uid_hint, prev_was_bad);
 #endif /* ENABLE_PCACHE */
 #endif /* BALSA_USE_THREADS */
 
-    if (!passwd)
-	gpgme_cancel(cb_data->ctx);
+    if (!passwd) {
+	write(fd, "\n", 1);
+	return GPG_ERR_CANCELED;
+    }
 
-    *r_hd = passwd;
-    return passwd;
-}
-
-
-/*
- * Parse the XML output gpgme_op_info generated by gpgme_get_op_info for
- * element in GnupgOperationInfo->signature and return it. If the result
- * is not NULL, it has to be freed.
- */
-static gchar *
-get_gpgme_parameter(const gchar *gpgme_op_info, const gchar *element)
-{
-    gchar *p, *q;
-
-    if (!(p = strstr(gpgme_op_info, element)))
-	return NULL;
-    p += strlen(element) + 1;
-    q = p + 1;
-
-    while (*q && *q != '<')
-	q++;
-    *q = '\0';
-    return g_strdup(p);
+    /* send the passphrase and erase the string */
+    write(fd, passwd, strlen(passwd));
+    wipe_string(passwd);
+    g_free(passwd);
+    write(fd, "\n", 1);
+    return GPG_ERR_NO_ERROR;
 }
 
 
@@ -2272,22 +2324,32 @@ static gchar *
 gpgme_signature(MailDataMBox *mailData, const gchar *sign_for, gchar **micalg,
 		GtkWindow *parent)
 {
-    GpgmeCtx ctx;
-    GpgmeError err;
-    GpgmeData in, out;
+    gpgme_ctx_t ctx;
+    gpgme_error_t err;
+    gpgme_data_t in, out;
     size_t datasize;
-    gchar *signature_buffer, *signature_info;
+    gchar *signature_buffer;
+    gpgme_sign_result_t sign_result;
     PassphraseCB cb_data;
     gchar fname[PATH_MAX];
     FILE *tempfp;
+    struct gpgme_data_cbs cbs = 
+	{ (gpgme_data_read_cb_t)read_cb_MailDataMBox, /* read method */
+	  NULL,                                       /* write method */
+	  NULL,                                       /* seek method */
+	  cb_data_release };                          /* release method */
 
     *micalg = NULL;
 
     /* try to create a gpgme context */
-    if ((err = gpgme_new(&ctx)) != GPGME_No_Error) {
+    if ((err = gpgme_new(&ctx)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not create gpgme context: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not create context: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
+	return NULL;
+    }
+    if (!gpgme_check_set_protocol(ctx, GPGME_PROTOCOL_OpenPGP)) {
+	gpgme_release(ctx);
 	return NULL;
     }
     
@@ -2303,27 +2365,26 @@ gpgme_signature(MailDataMBox *mailData, const gchar *sign_for, gchar **micalg,
     cb_data.parent = parent;
     cb_data.title = _("Enter passsphrase to sign message");
     gpgme_set_passphrase_cb(ctx, get_passphrase_cb, &cb_data);
-    if ((err = gpgme_data_new_with_read_cb(&in, read_cb_MailDataMBox,
-					   mailData)) != GPGME_No_Error) {
+    if ((err = gpgme_data_new_from_cbs(&in, &cbs, mailData)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not get data from file: %s"), 
-			     gpgme_strerror(err));
+			     _("%s: could not get data from file: %s"), 
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_release(ctx);
 	return NULL;
     }
-    if ((err = gpgme_data_new(&out)) != GPGME_No_Error) {
+    if ((err = gpgme_data_new(&out)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not create new data: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not create new data: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_data_release(in);
 	gpgme_release(ctx);
 	return NULL;
     }
     if ((err = gpgme_op_sign(ctx, in, out, GPGME_SIG_MODE_DETACH)) != 
-	GPGME_No_Error) {
+	GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme signing failed: %s"),
-			     gpgme_strerror(err));
+			     _("%s: signing failed: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_data_release(out);
 	gpgme_data_release(in);
 	gpgme_release(ctx);
@@ -2331,17 +2392,16 @@ gpgme_signature(MailDataMBox *mailData, const gchar *sign_for, gchar **micalg,
     }
 
     /* get the info about the used hash algorithm */
-    signature_info = gpgme_get_op_info(ctx, 0);
-    if (signature_info) {
-	*micalg = get_gpgme_parameter(signature_info, "micalg");
-	g_free(signature_info);
-    }
+    sign_result = gpgme_op_sign_result(ctx);
+    g_free(*micalg);
+    *micalg = 
+	g_strdup_printf("PGP-%s", gpgme_hash_algo_name(sign_result->signatures->hash_algo));
 
     gpgme_data_release(in);
     if (!(signature_buffer = gpgme_data_release_and_get_mem(out, &datasize))) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not get gpgme data: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not get data: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_release(ctx);
 	return NULL;
     }
@@ -2365,67 +2425,76 @@ gpgme_signature(MailDataMBox *mailData, const gchar *sign_for, gchar **micalg,
 static gchar *
 gpgme_encrypt_file(MailDataMBox *mailData, GList *encrypt_for)
 {
-    GpgmeCtx ctx;
-    GpgmeError err;
-    GpgmeRecipients rcpt;
-    GpgmeData in, out;
+    gpgme_ctx_t ctx;
+    gpgme_error_t err;
+    gpgme_key_t *rcpt;
+    gpgme_data_t in, out;
     gchar *databuf;
     size_t datasize;
     gchar fname[PATH_MAX];
     FILE *outFile;
+    struct gpgme_data_cbs cbs = 
+	{ (gpgme_data_read_cb_t)read_cb_MailDataMBox, /* read method */
+	  NULL,                                       /* write method */
+	  NULL,                                       /* seek method */
+	  cb_data_release };                          /* release method */
 
     /* try to create a gpgme context */
-    if ((err = gpgme_new(&ctx)) != GPGME_No_Error) {
+    if ((err = gpgme_new(&ctx)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not create gpgme context: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not create context: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
+	return NULL;
+    }
+    if (!gpgme_check_set_protocol(ctx, GPGME_PROTOCOL_OpenPGP)) {
+	gpgme_release(ctx);
 	return NULL;
     }
 
     /* build the list of recipients */
-    if (!gpgme_build_recipients(&rcpt, ctx, encrypt_for)) {
+    if (!(rcpt = gpgme_build_recipients(ctx, encrypt_for))) {
         gpgme_release(ctx);
         return NULL;
     }
     
     /* let gpgme encrypt the data */
     gpgme_set_armor(ctx, 1);
-    if ((err = gpgme_data_new_with_read_cb(&in, read_cb_MailDataMBox,
-					   mailData)) != GPGME_No_Error) {
+    if ((err = gpgme_data_new_from_cbs(&in, &cbs, mailData)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not get data from file: %s"), 
-			     gpgme_strerror(err));
-	gpgme_recipients_release(rcpt);
+			     _("%s: could not get data from file: %s"), 
+			     gpgme_strsource(err), gpgme_strerror(err));
+	release_keylist(rcpt);
 	gpgme_release(ctx);
 	return NULL;
     }
-    if ((err = gpgme_data_new(&out)) != GPGME_No_Error) {
+    if ((err = gpgme_data_new(&out)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme could not create new data: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not create new data: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_data_release(in);
-	gpgme_recipients_release(rcpt);
+	release_keylist(rcpt);
 	gpgme_release(ctx);
 	return NULL;
     }
-    if ((err = gpgme_op_encrypt(ctx, rcpt, in, out)) != GPGME_No_Error) {
+    if ((err = gpgme_op_encrypt(ctx, rcpt, GPGME_ENCRYPT_ALWAYS_TRUST, in, out))
+	!= GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("gpgme encryption failed: %s"),
-			     gpgme_strerror(err));
+			     _("%s: encryption failed: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_data_release(out);
 	gpgme_data_release(in);
-	gpgme_recipients_release(rcpt);
+	release_keylist(rcpt);
 	gpgme_release(ctx);
 	return NULL;
     }
 
     /* save the result to a file and return its name */
     gpgme_data_release(in);
-    gpgme_recipients_release(rcpt);
+    release_keylist(rcpt);
     if (!(databuf = gpgme_data_release_and_get_mem(out, &datasize))) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("could not get gpgme data: %s"),
-			     gpgme_strerror(err));
+			     _("%s: could not get data: %s"),
+			     gpgme_strsource(err), gpgme_strerror(err));
 	gpgme_release(ctx);
 	return NULL;
     }
@@ -2449,6 +2518,33 @@ set_decrypt_file(LibBalsaMessageBody *body, const gchar *fname)
 	if (body->parts)
 	    set_decrypt_file(body->parts, fname);
     }
+}
+
+
+/*
+ * helper function: unref all keys in the NULL-terminated array keylist
+ * and finally release the array itself
+ */
+static void
+release_keylist(gpgme_key_t *keylist)
+{
+    gpgme_key_t *key = keylist;
+    
+    while (*key) {
+	gpgme_key_unref(*key);
+	key++;
+    }
+    g_free(keylist);
+}
+
+
+/*
+ * dummy function for callback based gpgme data objects
+ */
+static void
+cb_data_release(void * handle)
+{
+    /* must just be present... */
 }
 
 

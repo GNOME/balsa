@@ -1,3 +1,16 @@
+2003-12-01  Albrecht Dreß
+
+	patch 3 of report no. 124905.
+	* libbalsa/rfc3156.[hc]: update to gpgme-0.4.3
+	* libbalsa/send.c: ditto.
+	* src/sendmsg-window.c: ditto.
+	* src/balsa-app.[hc], src/main.c: support for runtime gpg check.
+	* src/balsa-message.c: 0.4.3 changes + cleanup.
+	* src/print.c: ditto.
+	* configure.in: update the GPGME test.
+
+	* src/sendmsg-window.c: do not double-free on attachment remove (PS).
+
 2003-11-21 Darko Obradovic <dobradovic gmx.de>
 
 	* src/balsa-app.h: set MAX_QUOTED_COLOR to 2.

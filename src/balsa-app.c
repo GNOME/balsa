@@ -446,6 +446,11 @@ balsa_app_init(void)
     balsa_app.folder_mru=NULL;
     balsa_app.fcc_mru=NULL;
 
+#ifdef HAVE_GPGME
+    /* gpgme stuff */
+    balsa_app.has_openpgp = FALSE;
+#endif
+
     /* Mailbox views */
     balsa_app.mailbox_views =
         g_hash_table_new_full(g_str_hash, g_str_equal,

@@ -221,6 +221,29 @@ static gboolean resize_idle(GtkWidget * widget);
 static void prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list);
 
 
+#ifdef HAVE_GPGME
+static gint balsa_message_scan_signatures(LibBalsaMessageBody *body,
+					  LibBalsaMessage * message);
+static void balsa_message_set_crypto(LibBalsaMessage * message);
+static void add_header_sigstate(BalsaMessage * bm, GtkTextView *view,
+				LibBalsaSignatureInfo *siginfo);
+static void part_info_init_pgp_signature(BalsaMessage * bm,
+					 BalsaPartInfo * info);
+static gboolean part_info_init_mimetext_rfc2440(BalsaMessage * bm,
+						BalsaPartInfo * info,
+						gchar * ptr, FILE * fp);
+static GdkPixbuf * check_crypto_content(LibBalsaMessageBody * body,
+					gchar ** icon_title);
+
+#ifdef HAVE_GPG
+static void on_import_gpg_key_button(GtkButton * button,
+				     const gchar * fingerprint);
+static GtkWidget * create_import_pubkey_button(GtkWidget * mime_part,
+					       const gchar * fingerprint);
+#endif /* HAVE_GPG */
+#endif /* HAVE_GPGME */
+
+
 static void
 balsa_part_info_class_init(BalsaPartInfoClass *klass)
 {
@@ -800,92 +823,6 @@ bm_sender_to_gchar(LibBalsaAddress * address, gint which)
 	    : g_strdup(_("(No sender)")));
 }
 
-#ifdef HAVE_GPGME
-static gint
-balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * message)
-{
-    gint result = LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN;
-    gchar *sender;
-    gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
-
-    g_return_val_if_fail(message->headers != NULL, result);
-
-    sender = bm_sender_to_gchar(message->headers->from, -1);
-
-    for (; body; body = body->next) {
-	gint signres = libbalsa_is_pgp_signed(body);
-	
-	libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
-			       balsa_app.convert_unknown_8bit_codeset, NULL);
-
-	if (signres > 0) {
-	    LibBalsaSignatureInfo *checkResult;
-	    if (!body->parts->next->sig_info)
-		libbalsa_body_check_signature(body->parts);
-	    checkResult = body->parts->next->sig_info;
-
-	    if (checkResult) {
-		if (checkResult->status == GPGME_SIG_STAT_GOOD) {
-		    /* check if we trust this signature at least marginally */
-		    if (checkResult->validity >= GPGME_VALIDITY_MARGINAL &&
-			checkResult->trust >= GPGME_VALIDITY_MARGINAL) {
-			if (result <= LIBBALSA_MESSAGE_SIGNATURE_GOOD)
-			    result = LIBBALSA_MESSAGE_SIGNATURE_GOOD;
-			libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-					     _("detected a good signature"));
-		    } else {
-			if (result <= LIBBALSA_MESSAGE_SIGNATURE_NOTRUST)
-			    result = LIBBALSA_MESSAGE_SIGNATURE_NOTRUST;
-			libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-					     _("detected a good signature with insufficient validity/trust"));
-		    }
-		} else {
-		    result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
-
-#ifdef HAVE_GPG
-		    if (checkResult->status == GPGME_SIG_STAT_NOKEY) {
-			gchar *msg = 
-			    g_strdup_printf(_("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
-					    sender, subject,
-					    libbalsa_gpgme_sig_stat_to_gchar(checkResult->status));
-			gpg_ask_import_key(msg, GTK_WINDOW(balsa_app.main_window), 
-					   checkResult->fingerprint);
-			g_free(msg);
-		    } else
-#endif
-		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-					 _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
-					 sender, subject,
-					 libbalsa_gpgme_sig_stat_to_gchar(checkResult->status));
-		}
-	    } else {
-		result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				     _("Checking the signature of the message sent by %s with subject \"%s\" failed with an error!"),
-				     sender, subject);
-	    }
-	} else if (signres < 0) {
-	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-				 _("The message sent by %s with subject \"%s\" contains a \"multipart/signed\" part, but it's structure is invalid. The signature, if there is any, can not be checked."),
-				 sender, subject);
-	}	    
-
-	/* scan embedded messages */
-	if (body->parts) {
-	    gint sub_result =
-		balsa_message_scan_signatures(body->parts, message);
-	    if (sub_result >= result)
-		result = sub_result;
-	}
-    }
-
-    g_free(subject);
-    g_free(sender);
-
-    return result;
-}
-#endif
-
 static void
 balsa_message_clear_tree(BalsaMessage * bm)
 {
@@ -944,43 +881,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	return FALSE;
 
 #ifdef HAVE_GPGME
-    /* FIXME: not checking for body_ref == 1 leads to a crash if we have both
-     * the encrypted and the unencrypted version open as the body chain of the
-     * first one will be unref'd. */
-    if (message->body_ref == 1) {
-	gint encrres = 	libbalsa_is_pgp_encrypted(message->body_list);
-
-	if (encrres > 0)
-	    /* try to decrypt the message... */
-	    message->body_list->parts =
-		libbalsa_body_decrypt(message->body_list->parts, NULL);
-	else if (encrres < 0) {
-	    gchar *sender = bm_sender_to_gchar(message->headers->from, -1);
-	    gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
-	
-	    libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
-				   balsa_app.convert_unknown_8bit_codeset, NULL);
-	    
-	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-				 _("The message sent by %s with subject \"%s\" contains a \"multipart/encrypted\" part, but it's structure is invalid."),
-				 sender, subject);
-	    g_free(subject);
-	    g_free(sender);
-	}
-    }
-    
-    /* scan the message for signatures */
-    message->sig_state = 
- 	balsa_message_scan_signatures(message->body_list, message);
-    if (message->sig_state != LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN) {
- 	GList *notify = NULL;
- 	notify = g_list_append(notify, message);
- 	/* send the message the signal to update the signature status icon.
- 	   The flag value must not match anything in src/balsa-index.c,
- 	   mailbox_messages_changed_status().  */
- 	g_signal_emit_by_name(G_OBJECT(message->mailbox), 
- 			      "messages-status-changed", notify, 42);
-    }
+    balsa_message_set_crypto(message);
 #endif
 
     display_headers(bm);
@@ -1166,41 +1067,6 @@ add_header_glist(BalsaMessage * bm, GtkTextView * view, gchar * header,
     g_free(value);
 }
 
-#ifdef HAVE_GPGME
-static void
-add_header_sigstate(BalsaMessage * bm, GtkTextView *view,
-		    LibBalsaSignatureInfo *siginfo)
-{
-    GtkTextBuffer *buffer;
-    GtkTextIter insert;
-    GtkTextTag *color_tag;
-    GdkColor sigStateCol;
-    
-    buffer = gtk_text_view_get_buffer(view);
-    gtk_text_buffer_get_iter_at_mark(buffer, &insert,
-                                     gtk_text_buffer_get_insert(buffer));
-    if (gtk_text_buffer_get_char_count(buffer))
-        gtk_text_buffer_insert(buffer, &insert, "\n", 1);
-    /* FIXME: do we want to have these colors selectable by the user? */
-    if (siginfo->status == GPGME_SIG_STAT_GOOD) {
-	sigStateCol.red = 0x0;
-	sigStateCol.green = 0x8000;
-	sigStateCol.blue = 0x0;
-    } else {
-	sigStateCol.red = 0xf000;
-	sigStateCol.green = 0x0;
-	sigStateCol.blue = 0x0;
-    }
-    color_tag = gtk_text_buffer_create_tag(buffer, NULL,
-					   "foreground-gdk", 
-					   &sigStateCol,
-					   NULL);
-    gtk_text_buffer_insert_with_tags(buffer, &insert,
-                                     libbalsa_gpgme_sig_stat_to_gchar(siginfo->status),
-				     -1, color_tag, NULL);
-}
-#endif
-
 static void
 display_headers_real(BalsaMessage * bm, LibBalsaMessageHeaders * headers,
 		     LibBalsaMessageBody * sig_body, const gchar * subject,
@@ -1262,7 +1128,9 @@ display_headers_real(BalsaMessage * bm, LibBalsaMessageHeaders * headers,
     }
 
 #ifdef HAVE_GPGME
-    if (sig_body && libbalsa_is_pgp_signed(sig_body) > 0) {
+    if (sig_body && 
+	libbalsa_message_body_protection(sig_body) == 
+	(LIBBALSA_PROTECT_SIGN | LIBBALSA_PROTECT_RFC3156)) {
 	if (sig_body->parts->next->sig_info)
 	    add_header_sigstate(bm, view, sig_body->parts->next->sig_info);
     }
@@ -1300,33 +1168,6 @@ part_info_init_audio(BalsaMessage * bm, BalsaPartInfo * info)
     g_print("TODO: part_info_init_audio\n");
     part_info_init_unknown(bm, info);
 }
-
-#ifdef HAVE_GPGME
-static void
-part_info_init_pgp_signature(BalsaMessage * bm, BalsaPartInfo * info)
-{
-    gchar *infostr;
-    GtkWidget *hbox;
-
-    if (!info->body->sig_info) {
-	part_info_init_unknown(bm, info);
-	return;
-    }
-
-    infostr =
-	libbalsa_signature_info_to_gchar(info->body->sig_info,
-					 balsa_app.date_string);
-    
-    hbox = gtk_hbox_new(FALSE, 2);
-    gtk_container_set_border_width(GTK_CONTAINER(hbox), 10);
-    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(infostr), FALSE, FALSE, 0);
-    g_free(infostr);
-    gtk_widget_show_all(hbox);
-    info->widget = hbox;
-    info->focus_widget = hbox;
-    info->can_display = TRUE;
-}
-#endif
 
 static void
 part_info_init_application(BalsaMessage * bm, BalsaPartInfo * info)
@@ -2006,6 +1847,9 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
     gchar *content_type;
     gchar *ptr = NULL;
     size_t alloced;
+#ifdef HAVE_GPGME
+    gboolean show_get_pubkey_but;
+#endif
 
     /* proper code */
     if (!libbalsa_message_body_save_temporary(info->body, NULL)) {
@@ -2048,9 +1892,6 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         regex_t rex;
         GList *url_list = NULL;
 	const gchar *target_cs;
-#ifdef HAVE_GPGME
-	LibBalsaMessageBodyRFC2440Mode rfc2440mode;
-#endif
 
         if (!libbalsa_utf8_sanitize(&ptr, balsa_app.convert_unknown_8bit,
 				    balsa_app.convert_unknown_8bit_codeset, &target_cs)) {
@@ -2068,99 +1909,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	}
 
 #ifdef HAVE_GPGME
-	/* check if this is a RFC2440 part */
-	rfc2440mode = libbalsa_rfc2440_check_buffer(ptr);
-	if (rfc2440mode != LIBBALSA_BODY_RFC2440_NONE) {
-	    gchar *charset = 
-		libbalsa_message_body_get_parameter(info->body, "charset");
-	    GpgmeSigStat sig_res;
-	    GdkPixbuf * content_icon;
-	    
-	    /* do the rfc2440 stuff */
-	    if (rfc2440mode == LIBBALSA_BODY_RFC2440_SIGNED)
-		sig_res = 
-		    libbalsa_rfc2440_check_signature(&ptr, charset, 
-						     TRUE, &info->body->sig_info,
-						     balsa_app.date_string);
-	    else
-		sig_res = 
-		    libbalsa_rfc2440_decrypt_buffer(&ptr, charset, 
-						    balsa_app.convert_unknown_8bit,
-						    balsa_app.convert_unknown_8bit_codeset,
-						    TRUE, &info->body->sig_info,
-						    balsa_app.date_string, NULL);
-
-	    if (sig_res == GPGME_SIG_STAT_GOOD) {
-		if (info->body->sig_info->validity >= GPGME_VALIDITY_MARGINAL &&
-		    info->body->sig_info->trust >= GPGME_VALIDITY_MARGINAL) {
-		    content_icon =
-			gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-					       BALSA_PIXMAP_INFO_SIGN_GOOD,
-					       GTK_ICON_SIZE_MENU, NULL);
-			libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-					     _("detected a good signature"));
-		} else {
-		    content_icon =
-			gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-					       BALSA_PIXMAP_INFO_SIGN_NOTRUST,
-					       GTK_ICON_SIZE_MENU, NULL);
-			libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-					     _("detected a good signature with insufficient validity/trust"));
-		}
-	    } else if (sig_res != GPGME_SIG_STAT_NONE) {
-		gchar *sender = bm_sender_to_gchar(bm->message->headers->from, -1);
-		gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
-	
-		libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
-				       balsa_app.convert_unknown_8bit_codeset, NULL);
-		
-#ifdef HAVE_GPG
-		if (sig_res == GPGME_SIG_STAT_NOKEY) {
-		    gchar *msg = 
-			g_strdup_printf(_("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
-					sender, subject,
-					libbalsa_gpgme_sig_stat_to_gchar(sig_res));
-		    gpg_ask_import_key(msg, GTK_WINDOW(balsa_app.main_window), 
-				       info->body->sig_info->fingerprint);
-		    g_free(msg);
-		} else
-#endif
-		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-				     _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
-				     sender, subject,
-				     libbalsa_gpgme_sig_stat_to_gchar(sig_res));
-		g_free(subject);
-		g_free(sender);
-		content_icon =
-		    gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-					   BALSA_PIXMAP_INFO_SIGN_BAD,
-					   GTK_ICON_SIZE_MENU, NULL);
-	    } else if (rfc2440mode == LIBBALSA_BODY_RFC2440_ENCRYPTED)
-		content_icon =
-		    gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-					   BALSA_PIXMAP_INFO_ENCR,
-					   GTK_ICON_SIZE_MENU, NULL);
-	    else
-		content_icon = NULL;
-
-	    if (content_icon) {
-		GtkTreeModel * model;
-		GtkTreeIter iter;
-
-		model = 
-		    gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview));
-		if (gtk_tree_model_get_iter (model, &iter, info->path))
-		    gtk_tree_store_set (GTK_TREE_STORE(model), &iter, 
-					MIME_ICON_COLUMN, content_icon, -1);
-		g_object_unref(content_icon);
-	    }
-
-	    /* overwrite the tmp buffer */
-	    fp = freopen(info->body->temp_filename, "w+", fp);
-	    fwrite(ptr, strlen(ptr), 1, fp);
-	    fflush(fp);
-	    g_free(charset);
-	}
+	/* check and handle RFC2440 message parts */
+	show_get_pubkey_but = part_info_init_mimetext_rfc2440(bm, info, ptr, fp);
 #endif
 
         if (libbalsa_message_body_is_flowed(info->body)) {
@@ -2246,6 +1996,15 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         g_free(ptr);
 
         gtk_widget_show(item);
+
+#ifdef HAVE_GPG
+	/* show a button to retreive a missing public key */
+	if (show_get_pubkey_but)
+	    item = 
+		create_import_pubkey_button(item,
+					    info->body->sig_info->fingerprint);
+#endif
+
         info->focus_widget = item;
         info->widget = item;
         info->can_display = TRUE;
@@ -2438,7 +2197,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
     gboolean is_multipart=libbalsa_message_body_is_multipart(body);
     GtkTreeModel * model;
     GtkTreeIter iter;
-    GdkPixbuf *content_icon;
+    GdkPixbuf *content_icon = NULL;
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview));
     gtk_tree_store_append (GTK_TREE_STORE(model), &iter, parent_iter);
@@ -2478,31 +2237,9 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 
 	/* add to the tree view */
 #ifdef HAVE_GPGME
-	if (libbalsa_is_pgp_encrypted(body))
-	    content_icon =
-		gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-				       BALSA_PIXMAP_INFO_ENCR,
-				       GTK_ICON_SIZE_MENU, NULL);
-	else if (body->sig_info) {
-	    if (body->sig_info->status == GPGME_SIG_STAT_GOOD) {
-		if (body->sig_info->validity >= GPGME_VALIDITY_MARGINAL &&
-		    body->sig_info->trust >= GPGME_VALIDITY_MARGINAL)
-		    content_icon =
-			gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-					       BALSA_PIXMAP_INFO_SIGN_GOOD,
-					       GTK_ICON_SIZE_MENU, NULL);
-		else
-		    content_icon =
-			gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-					       BALSA_PIXMAP_INFO_SIGN_NOTRUST,
-					       GTK_ICON_SIZE_MENU, NULL);
-	    } else
-		content_icon =
-		    gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-					   BALSA_PIXMAP_INFO_SIGN_BAD,
-					   GTK_ICON_SIZE_MENU, NULL);
-	} else
+	content_icon = check_crypto_content (body, &icon_title);
 #endif
+	if (!content_icon)
 	    content_icon =
 		gdk_pixbuf_new_from_file_scaled(pix, 16, 16, GDK_INTERP_BILINEAR, NULL);
 	gtk_tree_store_set (GTK_TREE_STORE(model), &iter, 
@@ -2685,6 +2422,17 @@ part_create_menu (BalsaPartInfo* info)
     }
     gnome_vfs_mime_application_free(def_app);
     
+#ifdef HAVE_GPG
+    /* add a item to retreive the key for signatures w/o pubkey */
+    if (!g_ascii_strcasecmp(content_type, "application/pgp-signature") &&
+	info->body->sig_info && info->body->sig_info->status == GPG_ERR_NO_PUBKEY) {
+	menu_item = gtk_menu_item_new_with_label (_("run gpg to import key"));
+	g_signal_connect (G_OBJECT (menu_item), "activate",
+			  G_CALLBACK (on_import_gpg_key_button),
+			  (gpointer)info->body->sig_info->fingerprint);
+	gtk_menu_shell_append (GTK_MENU_SHELL (info->popup_menu), menu_item);
+    }
+#endif
 
     menu_item = gtk_menu_item_new_with_label (_("Save..."));
     g_signal_connect (G_OBJECT (menu_item), "activate",
@@ -3834,3 +3582,412 @@ balsa_message_zoom(BalsaMessage * bm, gint in_out)
     }
 }
 #endif /* HAVE_GTKHTML */
+
+
+#ifdef HAVE_GPGME
+/*
+ * collected GPG(ME) helper stuff to make the source more readable
+ */
+
+
+/*
+ * Scan all bodies for RFC3156 signed and/or encrypted parts and return the
+ * combined result of the check.
+ */
+static gint
+balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * message)
+{
+    gint result = LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN;
+    gchar *sender;
+    gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
+
+    g_return_val_if_fail(message->headers != NULL, result);
+
+    sender = bm_sender_to_gchar(message->headers->from, -1);
+
+    for (; body; body = body->next) {
+	gint signres = libbalsa_message_body_protection(body);
+	
+	libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
+			       balsa_app.convert_unknown_8bit_codeset, NULL);
+
+	if (signres & LIBBALSA_PROTECT_SIGN) {
+	    if (signres & LIBBALSA_PROTECT_ERROR)
+		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				     _("The message sent by %s with subject \"%s\" contains a signed part, but it's structure is invalid. The signature, if there is any, can not be checked."),
+				     sender, subject);
+	    else if (signres & LIBBALSA_PROTECT_RFC3156) {
+		LibBalsaSignatureInfo *checkResult;
+		if (!body->parts->next->sig_info)
+		    libbalsa_body_check_signature(body->parts);
+		checkResult = body->parts->next->sig_info;
+		
+		if (checkResult) {
+		    if (checkResult->status == GPG_ERR_NO_ERROR) {
+			/* check if we trust this signature at least marginally */
+			if (checkResult->validity >= GPGME_VALIDITY_MARGINAL &&
+			    checkResult->trust >= GPGME_VALIDITY_MARGINAL) {
+			    if (result <= LIBBALSA_MESSAGE_SIGNATURE_GOOD)
+				result = LIBBALSA_MESSAGE_SIGNATURE_GOOD;
+			    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+						 _("detected a good signature"));
+			} else {
+			    if (result <= LIBBALSA_MESSAGE_SIGNATURE_NOTRUST)
+				result = LIBBALSA_MESSAGE_SIGNATURE_NOTRUST;
+			    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+						 _("detected a good signature with insufficient validity/trust"));
+			}
+		    } else {
+			result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
+			libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+					     _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
+					     sender, subject,
+					     libbalsa_gpgme_sig_stat_to_gchar(checkResult->status));
+		    }
+		} else {
+		    result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
+		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+					 _("Checking the signature of the message sent by %s with subject \"%s\" failed with an error!"),
+					 sender, subject);
+		}
+	    } else if (signres & LIBBALSA_PROTECT_SMIMEV3)
+		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				     _("The message sent by %s with subject \"%s\" contains a S/MIME signed part, but balsa is not (yet) able to handle this format."),
+				     sender, subject);
+	}
+
+	/* scan embedded messages */
+	if (body->parts) {
+	    gint sub_result =
+		balsa_message_scan_signatures(body->parts, message);
+	    if (sub_result >= result)
+		result = sub_result;
+	}
+    }
+
+    g_free(subject);
+    g_free(sender);
+
+    return result;
+}
+
+
+/*
+ * Check for RFC3156 encrypted stuff when setting a message.
+ */
+static void
+balsa_message_set_crypto(LibBalsaMessage * message)
+{
+    /* FIXME: not checking for body_ref == 1 leads to a crash if we have both
+     * the encrypted and the unencrypted version open as the body chain of the
+     * first one will be unref'd. */
+    if (message->body_ref == 1) {
+	gint encrres = 	libbalsa_message_body_protection(message->body_list);
+
+	if (encrres & LIBBALSA_PROTECT_ENCRYPT) {
+	    gchar *sender = bm_sender_to_gchar(message->headers->from, -1);
+	    gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
+	
+	    libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
+				   balsa_app.convert_unknown_8bit_codeset, NULL);
+
+ 	    if (encrres & LIBBALSA_PROTECT_ERROR) {
+ 		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+ 				     _("The message sent by %s with subject \"%s\" contains an encrypted part, but it's structure is invalid."),
+ 				     sender, subject);
+ 	    } else if (encrres & LIBBALSA_PROTECT_RFC3156) {
+ 		/* try to decrypt the message... */
+ 		message->body_list->parts =
+ 		    libbalsa_body_decrypt(message->body_list->parts, NULL);
+ 	    } else if (encrres & LIBBALSA_PROTECT_SMIMEV3) {
+ 		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+ 				     _("The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, but balsa can not (yet) handle this format."),
+ 				     sender, subject);
+ 	    }
+	    g_free(subject);
+	    g_free(sender);
+	}
+    }
+    
+    /* scan the message for signatures */
+    message->sig_state = 
+ 	balsa_message_scan_signatures(message->body_list, message);
+    if (message->sig_state != LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN) {
+ 	GList *notify = NULL;
+ 	notify = g_list_append(notify, message);
+ 	/* send the message the signal to update the signature status icon.
+ 	   The flag value must not match anything in src/balsa-index.c,
+ 	   mailbox_messages_changed_status(). */
+ 	g_signal_emit_by_name(G_OBJECT(message->mailbox), 
+ 			      "messages-status-changed", notify, 42);
+    }
+}
+
+
+/*
+ * Add the short status of a RFC3156 signature to the message headers.
+ */
+static void
+add_header_sigstate(BalsaMessage * bm, GtkTextView *view,
+		    LibBalsaSignatureInfo *siginfo)
+{
+    GtkTextBuffer *buffer;
+    GtkTextIter insert;
+    GtkTextTag *color_tag;
+    GdkColor sigStateCol;
+    
+    buffer = gtk_text_view_get_buffer(view);
+    gtk_text_buffer_get_iter_at_mark(buffer, &insert,
+                                     gtk_text_buffer_get_insert(buffer));
+    if (gtk_text_buffer_get_char_count(buffer))
+        gtk_text_buffer_insert(buffer, &insert, "\n", 1);
+    /* FIXME: do we want to have these colors selectable by the user? */
+    if (siginfo->status == GPG_ERR_NO_ERROR) {
+	sigStateCol.red = 0x0;
+	sigStateCol.green = 0x8000;
+	sigStateCol.blue = 0x0;
+    } else {
+	sigStateCol.red = 0xf000;
+	sigStateCol.green = 0x0;
+	sigStateCol.blue = 0x0;
+    }
+    color_tag = gtk_text_buffer_create_tag(buffer, NULL,
+					   "foreground-gdk", 
+					   &sigStateCol,
+					   NULL);
+    gtk_text_buffer_insert_with_tags(buffer, &insert,
+                                     libbalsa_gpgme_sig_stat_to_gchar(siginfo->status),
+				     -1, color_tag, NULL);
+}
+
+
+/*
+ * Create the display item for a RFC3156 signature
+ */
+static void
+part_info_init_pgp_signature(BalsaMessage * bm, BalsaPartInfo * info)
+{
+    gchar *infostr;
+    GtkWidget *vbox, *label;
+
+    if (!info->body->sig_info) {
+	part_info_init_unknown(bm, info);
+	return;
+    }
+
+    infostr =
+	libbalsa_signature_info_to_gchar(info->body->sig_info,
+					 balsa_app.date_string);
+    
+    vbox = gtk_vbox_new(FALSE, 2);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 10);
+    label = gtk_label_new(infostr);
+    gtk_label_set_selectable(GTK_LABEL(label), TRUE);
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+    g_free(infostr);
+#ifdef HAVE_GPG
+    if (info->body->sig_info->status == GPG_ERR_NO_PUBKEY) {
+	GtkWidget *button = gtk_button_new_with_label(_("run gpg to import this key"));
+
+	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+	g_signal_connect(G_OBJECT(button), "clicked",
+			 G_CALLBACK(on_import_gpg_key_button),
+			 (gpointer)info->body->sig_info->fingerprint);
+    }
+#endif /* HAVE_GPG */
+    gtk_widget_show_all(vbox);
+    info->widget = vbox;
+    info->focus_widget = vbox;
+    info->can_display = TRUE;
+}
+
+
+/* 
+ * Return TRUE if we should show a button to retreive a missing public key
+ */
+static gboolean
+part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info,
+				gchar * ptr, FILE * fp)
+{
+    gint rfc2440mode;
+    gchar *charset;
+    gpgme_error_t sig_res;
+    GdkPixbuf * content_icon;
+    gboolean rfc2440_no_pubkey = FALSE;
+
+    /* check if this is a RFC2440 part */
+    rfc2440mode = libbalsa_rfc2440_check_buffer(ptr);
+    if ((rfc2440mode & LIBBALSA_PROTECT_OPENPGP) == 0)
+	return FALSE;
+
+    /* handle a RFC2440 signed/encrypted part */
+    charset =  libbalsa_message_body_get_parameter(info->body, "charset");
+    rfc2440mode &= LIBBALSA_PROTECT_MODE;
+	
+    /* do the rfc2440 stuff */
+    if (rfc2440mode == LIBBALSA_PROTECT_SIGN)
+	sig_res = 
+	    libbalsa_rfc2440_check_signature(&ptr, charset, 
+					     TRUE, &info->body->sig_info,
+					     balsa_app.date_string);
+    else
+	sig_res = 
+	    libbalsa_rfc2440_decrypt_buffer(&ptr, charset, 
+					    balsa_app.convert_unknown_8bit,
+					    balsa_app.convert_unknown_8bit_codeset,
+					    TRUE, &info->body->sig_info,
+					    balsa_app.date_string, NULL);
+	
+    if (sig_res == GPG_ERR_NO_ERROR) {
+	if (info->body->sig_info->validity >= GPGME_VALIDITY_MARGINAL &&
+	    info->body->sig_info->trust >= GPGME_VALIDITY_MARGINAL) {
+	    content_icon =
+		gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+				       BALSA_PIXMAP_INFO_SIGN_GOOD,
+				       GTK_ICON_SIZE_MENU, NULL);
+	    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+				 _("detected a good signature"));
+	} else {
+	    content_icon =
+		gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+				       BALSA_PIXMAP_INFO_SIGN_NOTRUST,
+				       GTK_ICON_SIZE_MENU, NULL);
+	    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+				 _("detected a good signature with insufficient validity/trust"));
+	}
+    } else if (sig_res != GPG_ERR_USER_16 && sig_res != GPG_ERR_CANCELED) {
+	gchar *sender = bm_sender_to_gchar(bm->message->headers->from, -1);
+	gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
+	
+	libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
+			       balsa_app.convert_unknown_8bit_codeset, NULL);
+	
+#ifdef HAVE_GPG
+	rfc2440_no_pubkey = (sig_res == GPG_ERR_NO_PUBKEY);
+#endif
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
+			     sender, subject,
+			     libbalsa_gpgme_sig_stat_to_gchar(sig_res));
+	g_free(subject);
+	g_free(sender);
+	content_icon =
+	    gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+				   BALSA_PIXMAP_INFO_SIGN_BAD,
+				   GTK_ICON_SIZE_MENU, NULL);
+    } else if (rfc2440mode == LIBBALSA_PROTECT_ENCRYPT)
+	content_icon =
+	    gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+				   BALSA_PIXMAP_INFO_ENCR,
+				   GTK_ICON_SIZE_MENU, NULL);
+    else
+	content_icon = NULL;
+    
+    if (content_icon) {
+	GtkTreeModel * model;
+	GtkTreeIter iter;
+	
+	model = 
+	    gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview));
+	if (gtk_tree_model_get_iter (model, &iter, info->path))
+	    gtk_tree_store_set (GTK_TREE_STORE(model), &iter, 
+				MIME_ICON_COLUMN, content_icon, -1);
+	g_object_unref(content_icon);
+    }
+    
+    /* overwrite the tmp buffer */
+    fp = freopen(info->body->temp_filename, "w+", fp);
+    fwrite(ptr, strlen(ptr), 1, fp);
+    fflush(fp);
+    g_free(charset);
+
+    return rfc2440_no_pubkey;
+}
+
+
+/*
+ * Check if body is signed and/or encrypted and return the proper icon in this
+ * case, and NULL otherwise. If the part is signed, replace *icon-title by the
+ * signature status.
+ */
+static GdkPixbuf *
+check_crypto_content(LibBalsaMessageBody * body, gchar ** icon_title)
+{
+    if ((libbalsa_message_body_protection(body) &
+	 (LIBBALSA_PROTECT_ENCRYPT | LIBBALSA_PROTECT_ERROR)) ==
+	LIBBALSA_PROTECT_ENCRYPT)
+	return gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+				      BALSA_PIXMAP_INFO_ENCR,
+				      GTK_ICON_SIZE_MENU, NULL);
+
+    if (body->sig_info) {
+	GdkPixbuf * icon;
+
+	if (body->sig_info->status == GPG_ERR_NO_ERROR) {
+	    if (body->sig_info->validity >= GPGME_VALIDITY_MARGINAL &&
+		body->sig_info->trust >= GPGME_VALIDITY_MARGINAL)
+		icon =
+		    gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+					   BALSA_PIXMAP_INFO_SIGN_GOOD,
+					   GTK_ICON_SIZE_MENU, NULL);
+	    else
+		icon =
+		    gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+					   BALSA_PIXMAP_INFO_SIGN_NOTRUST,
+					   GTK_ICON_SIZE_MENU, NULL);
+	} else
+	    icon =
+		gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+				       BALSA_PIXMAP_INFO_SIGN_BAD,
+				       GTK_ICON_SIZE_MENU, NULL);
+	g_free(*icon_title);
+	*icon_title = g_strdup_printf(_("PGP signature: %s"), 
+				      libbalsa_gpgme_sig_stat_to_gchar(body->sig_info->status));
+	return icon;
+    }
+
+    return NULL;
+}
+
+
+#ifdef HAVE_GPG
+/*
+ * We need gnupg to retreive a key from a key server...
+ */
+
+/* Callback: run gpg to import a public key */
+static void
+on_import_gpg_key_button(GtkButton * button, const gchar * fingerprint)
+{
+    gpg_run_import_key(fingerprint, GTK_WINDOW(balsa_app.main_window));
+}
+
+
+/*
+ * Create a vbox, add mime_part and a button to retreive the key with
+ * fingerprint, and return the vbox.
+ */
+static GtkWidget *
+create_import_pubkey_button(GtkWidget * mime_part, const gchar * fingerprint)
+{
+    GtkWidget * vbox, * button;
+	    
+    vbox = gtk_vbox_new(FALSE, 2);
+    gtk_widget_show(vbox);
+    gtk_box_pack_start(GTK_BOX(vbox), mime_part, FALSE, FALSE, 0);
+
+    button = gtk_button_new_with_label(_("run gpg to import this key"));
+    gtk_widget_show(button);
+    gtk_container_set_border_width(GTK_CONTAINER(button), 10);
+    gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+    g_signal_connect(G_OBJECT(button), "clicked",
+		     G_CALLBACK(on_import_gpg_key_button),
+		     (gpointer)fingerprint);
+
+    return vbox;
+}
+#endif /* HAVE_GPG */
+
+
+#endif  /* HAVE_GPGME */

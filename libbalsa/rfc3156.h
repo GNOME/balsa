@@ -31,17 +31,28 @@
 #include "libbalsa.h"
 #include "misc.h"
 
-#define LIBBALSA_GPG_SIGN      (1 << 0)
-#define LIBBALSA_GPG_ENCRYPT   (1 << 1)
-#define LIBBALSA_GPG_RFC2440   (1 << 2)
+
+/* bits to define the protection mode: signed or encrypted */
+#define LIBBALSA_PROTECT_SIGN      (1 << 0)
+#define LIBBALSA_PROTECT_ENCRYPT   (1 << 1)
+#define LIBBALSA_PROTECT_MODE      (3 << 0)
+
+/* bits to define the protection method */
+#define LIBBALSA_PROTECT_OPENPGP   (1 << 2)     /* RFC 2440 (OpenPGP) */
+#define LIBBALSA_PROTECT_SMIMEV3   (1 << 3)     /* RFC 2633 (S/MIME v3) */
+#define LIBBALSA_PROTECT_RFC3156   (1 << 4)     /* RFC 3156 (PGP/MIME) */
+#define LIBBALSA_PROTECT_PROTOCOL  (7 << 2)
+
+/* indicate broken structure */
+#define LIBBALSA_PROTECT_ERROR     (1 << 5)
+
 
 typedef struct _LibBalsaSignatureInfo LibBalsaSignatureInfo;
-typedef enum _LibBalsaMessageBodyRFC2440Mode LibBalsaMessageBodyRFC2440Mode;
 
 struct _LibBalsaSignatureInfo {
-    GpgmeSigStat status;
-    GpgmeValidity validity;
-    GpgmeValidity trust;
+    gpgme_error_t status;
+    gpgme_validity_t validity;
+    gpgme_validity_t trust;
     gchar *sign_name;
     gchar *sign_email;
     gchar *fingerprint;
@@ -49,15 +60,10 @@ struct _LibBalsaSignatureInfo {
     time_t sign_time;
 };
 
-enum _LibBalsaMessageBodyRFC2440Mode {
-    LIBBALSA_BODY_RFC2440_NONE = 0,
-    LIBBALSA_BODY_RFC2440_SIGNED,
-    LIBBALSA_BODY_RFC2440_ENCRYPTED
-};
 
+gboolean libbalsa_check_crypto_engine(gpgme_protocol_t protocol);
 
-gint libbalsa_is_pgp_signed(LibBalsaMessageBody *body);
-gint libbalsa_is_pgp_encrypted(LibBalsaMessageBody *body);
+gint libbalsa_message_body_protection(LibBalsaMessageBody *body);
 
 gboolean libbalsa_sign_mutt_body(MuttBody **sign_body, const gchar *rfc822_for,
 				 gchar **micalg, GtkWindow *parent);
@@ -72,37 +78,36 @@ gboolean libbalsa_body_check_signature(LibBalsaMessageBody *body);
 LibBalsaMessageBody *libbalsa_body_decrypt(LibBalsaMessageBody *body,
 					   GtkWindow *parent);
 
-LibBalsaMessageBodyRFC2440Mode libbalsa_rfc2440_check_buffer(const gchar *buffer);
+gint libbalsa_rfc2440_check_buffer(const gchar *buffer);
 gchar *libbalsa_rfc2440_sign_buffer(const gchar *buffer,
 				    const gchar *sign_for,
 				    GtkWindow *parent);
-GpgmeSigStat libbalsa_rfc2440_check_signature(gchar **buffer,
-					      const gchar *charset,
-					      gboolean append_info,
-					      LibBalsaSignatureInfo **sig_info,
-					      const gchar * date_string);
+gpgme_error_t libbalsa_rfc2440_check_signature(gchar **buffer,
+					       const gchar *charset,
+					       gboolean append_info,
+					       LibBalsaSignatureInfo **sig_info,
+					       const gchar * date_string);
 gchar *libbalsa_rfc2440_encrypt_buffer(const gchar *buffer,
 				       const gchar *sign_for,
 				       GList *encrypt_for,
 				       GtkWindow *parent);
-GpgmeSigStat libbalsa_rfc2440_decrypt_buffer(gchar **buffer,
-					     const gchar *charset,
-					     gboolean fallback,
-					     LibBalsaCodeset codeset,
-					     gboolean append_info,
-					     LibBalsaSignatureInfo **sig_info,
-					     const gchar *date_string,
-					     GtkWindow *parent);
+gpgme_error_t libbalsa_rfc2440_decrypt_buffer(gchar **buffer,
+					      const gchar *charset,
+					      gboolean fallback,
+					      LibBalsaCodeset codeset,
+					      gboolean append_info,
+					      LibBalsaSignatureInfo **sig_info,
+					      const gchar *date_string,
+					      GtkWindow *parent);
 
 LibBalsaSignatureInfo *libbalsa_signature_info_destroy(LibBalsaSignatureInfo* info);
-const gchar *libbalsa_gpgme_sig_stat_to_gchar(GpgmeSigStat stat);
-const gchar *libbalsa_gpgme_validity_to_gchar(GpgmeValidity validity);
+const gchar *libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat);
+const gchar *libbalsa_gpgme_validity_to_gchar(gpgme_validity_t validity);
 gchar *libbalsa_signature_info_to_gchar(LibBalsaSignatureInfo * info, 
 					const gchar * date_string);
 
 #ifdef HAVE_GPG
-gboolean gpg_ask_import_key(const gchar *message, GtkWindow *parent,
-			    const gchar *fingerprint);
+gboolean gpg_run_import_key(const gchar *fingerprint, GtkWindow *parent);
 #endif
 
 #endif /* HAVE_GPGME */

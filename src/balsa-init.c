@@ -128,7 +128,7 @@ balsa_init_window_new (void)
   gtk_widget_show (pixmap);
 
   iw->notebook = gtk_notebook_new ();
-  gtk_container_border_width (GTK_CONTAINER (iw->notebook), 5);
+  gtk_container_set_border_width (GTK_CONTAINER (iw->notebook), 5);
   gtk_box_pack_start (GTK_BOX (vbox), iw->notebook, FALSE, FALSE, 0);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (iw->notebook), FALSE);
   gtk_notebook_set_show_border (GTK_NOTEBOOK (iw->notebook), FALSE);
@@ -235,7 +235,7 @@ create_general_page (void)
   char *name;
 
   vbox = gtk_vbox_new (FALSE, 0);
-  gtk_container_border_width (GTK_CONTAINER (vbox), 10);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
   gtk_widget_show (vbox);
 
 

@@ -357,7 +357,7 @@ create_identity_page (void)
   GtkWidget *signature;
 
   vbox = gtk_vbox_new (FALSE, 0);
-  gtk_container_border_width (GTK_CONTAINER (vbox), 10);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
 
   table = gtk_table_new (4, 2, FALSE);
   gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 5);
@@ -423,13 +423,13 @@ create_mailservers_page ()
   GtkWidget *mail_dir;
 
   vbox = gtk_vbox_new (FALSE, 0);
-  gtk_container_border_width (GTK_CONTAINER (vbox), 10);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
 
   frame = gtk_frame_new ("POP3 Servers");
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
 
   hbox = gtk_hbox_new (FALSE, 0);
-  gtk_container_border_width (GTK_CONTAINER (hbox), 5);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox), 5);
   gtk_container_add (GTK_CONTAINER (frame), hbox);
 
   sw = gtk_scrolled_window_new(NULL, NULL);
@@ -503,7 +503,7 @@ create_display_page ()
   gint i;
 
   vbox = gtk_vbox_new (FALSE, 0);
-  gtk_container_border_width (GTK_CONTAINER (vbox), 10);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
 
   /* Toolbars */
   frame = gtk_frame_new (_ ("Toolbars"));
@@ -562,7 +562,7 @@ create_misc_page ()
 
 
   vbox = gtk_vbox_new (FALSE, 0);
-  gtk_container_border_width (GTK_CONTAINER (vbox), 10);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
 
   /* Misc */
   frame = gtk_frame_new ("Misc");

@@ -244,7 +244,7 @@ mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
 
   /* notbook for action area of dialog */
   mcw->notebook = gtk_notebook_new ();
-  gtk_container_border_width (GTK_CONTAINER (mcw->notebook), 5);
+  gtk_container_set_border_width (GTK_CONTAINER (mcw->notebook), 5);
   gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (mcw->window)->vbox), mcw->notebook, TRUE, TRUE, 0);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (mcw->notebook), FALSE);
   gtk_notebook_set_show_border (GTK_NOTEBOOK (mcw->notebook), FALSE);

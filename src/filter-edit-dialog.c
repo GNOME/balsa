@@ -570,7 +570,7 @@ build_match_page ()
 			     GTK_POS_TOP);
   gtk_frame_set_shadow_type (GTK_FRAME (fe_type_frame),
 			     GTK_SHADOW_ETCHED_IN);
-  gtk_container_border_width (GTK_CONTAINER (fe_type_frame), 5);
+  gtk_container_set_border_width (GTK_CONTAINER (fe_type_frame), 5);
   gtk_table_attach (GTK_TABLE (fe_notebook_match_page),
 		    fe_type_frame,
 		    0, 10, 5, 6,

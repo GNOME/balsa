@@ -1,3 +1,7 @@
+1998-11-28  Michael Lausch  <mla@gams.at>
+
+	* changed gtk_container_border_with to gtk_container_set_border_width
+
 1998-11-25  Herbert Valerio Riedel  <hvr@hvrlab.ml.org>
 
 	* src/sendmsg-window.c: add #include <ctype.h> and cast-macros

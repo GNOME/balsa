@@ -534,7 +534,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 		      GTK_SIGNAL_FUNC (gtk_false), NULL);
 
   vbox = gtk_vbox_new (FALSE, 1);
-  gtk_container_border_width (GTK_CONTAINER (vbox), 2);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 2);
   gtk_widget_show (vbox);
 
 /* create the top portion with the to, from, etc in it */

@@ -57,7 +57,6 @@ struct _MailboxConfWindow
 
     /* for local mailboxes */
     GtkWidget *local_mailbox_name;
-    GtkWidget *local_type_menu;
     GtkWidget *local_mailbox_path;
 
     /* for imap mailboxes */
@@ -164,6 +163,16 @@ mailbox_conf_new (Mailbox * mailbox)
 			  (GtkSignalFunc) mailbox_conf_close, TRUE);
     }
 
+  else
+    /* for new mailbox */
+    {
+      mcw->ok = gtk_button_new_with_label ("Continue");
+      gtk_container_add (GTK_CONTAINER (mcw->bbox), mcw->ok);
+      gtk_signal_connect (GTK_OBJECT (mcw->ok), "clicked",
+			  GTK_SIGNAL_FUNC (next_cb), NULL);
+    }
+
+
   /* cancel button */
   mcw->cancel = gnome_stock_button (GNOME_STOCK_BUTTON_CANCEL);
   gtk_container_add (GTK_CONTAINER (mcw->bbox), mcw->cancel);
@@ -184,6 +193,8 @@ mailbox_conf_set_values (Mailbox * mailbox)
 
   switch (mailbox->type)
     {
+    case MAILBOX_MH:
+    case MAILBOX_MAILDIR:
     case MAILBOX_MBOX:
       gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_LOCAL);
       if (mailbox)
@@ -225,14 +236,10 @@ conf_update_mailbox (Mailbox * mailbox)
 
   switch (mailbox->type)
     {
-    case MAILBOX_MBOX:
-    case MAILBOX_MAILDIR:
     case MAILBOX_MH:
+    case MAILBOX_MAILDIR:
+    case MAILBOX_MBOX:
 
-/* FIXME  -  need to reset mailbox type?
-   menu = gtk_option_menu_get_menu (GTK_OPTION_MENU (mcw->local_type_menu));
-   menuitem = gtk_menu_get_active (GTK_MENU (menu));
- */
       g_free (mailbox->name);
       g_free (MAILBOX_LOCAL (mailbox)->path);
       mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)));
@@ -277,10 +284,8 @@ conf_update_mailbox (Mailbox * mailbox)
 static void
 mailbox_conf_close (GtkWidget * widget, gboolean save)
 {
-  GtkWidget *menu;
-  GtkWidget *menuitem;
-
   Mailbox *mailbox;
+  MailboxType type;
   GNode *node;
 
   mailbox = mcw->mailbox;
@@ -297,10 +302,10 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
       {
 
       case MC_PAGE_LOCAL:
-	menu = gtk_option_menu_get_menu (GTK_OPTION_MENU (mcw->local_type_menu));
-	menuitem = gtk_menu_get_active (GTK_MENU (menu));
-
-	mailbox = mailbox_new ((MailboxType) gtk_object_get_user_data (GTK_OBJECT (menuitem)));
+	type = mailbox_valid(gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_path)));
+	if (type == MAILBOX_UNKNOWN)
+	  break;
+	mailbox = mailbox_new (type);
 	mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)));
 	MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_path)));
 	node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
@@ -310,9 +315,6 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	break;
 
       case MC_PAGE_POP3:
-
-	menu = gtk_option_menu_get_menu (GTK_OPTION_MENU (mcw->local_type_menu));
-	menuitem = gtk_menu_get_active (GTK_MENU (menu));
 	mailbox = mailbox_new (MAILBOX_POP3);
 	mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_mailbox_name)));
 	MAILBOX_POP3 (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)));
@@ -323,11 +325,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	break;
 
       case MC_PAGE_IMAP:
-	menu = gtk_option_menu_get_menu (GTK_OPTION_MENU (mcw->local_type_menu));
-	menuitem = gtk_menu_get_active (GTK_MENU (menu));
-
 	mailbox = mailbox_new (MAILBOX_IMAP);
-
 	mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_mailbox_name)));
 	MAILBOX_IMAP (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)));
 	MAILBOX_IMAP (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)));
@@ -362,7 +360,6 @@ create_new_page ()
 {
   GtkWidget *vbox;
   GtkWidget *bbox;
-  GtkWidget *button;
   GtkWidget *radio_button;
 
   vbox = gtk_vbox_new (FALSE, 0);
@@ -398,12 +395,6 @@ create_new_page ()
   gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox), BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
   gtk_widget_show (bbox);
 
-  /* ok button */
-  button = gnome_stock_button (GNOME_STOCK_BUTTON_OK);
-  gtk_container_add (GTK_CONTAINER (bbox), button);
-  gtk_signal_connect (GTK_OBJECT (button), "clicked", GTK_SIGNAL_FUNC (next_cb), NULL);
-  gtk_widget_show (button);
-
   return vbox;
 }
 
@@ -433,7 +424,6 @@ create_local_mailbox_page ()
 		    10, 10);
   gtk_widget_show (label);
 
-
   mcw->local_mailbox_name = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), mcw->local_mailbox_name, 1, 2, 0, 1,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
@@ -448,95 +438,20 @@ create_local_mailbox_page ()
   gtk_widget_show (mcw->local_mailbox_name);
 
 
-  /* mailbox type */
-  label = gtk_label_new ("Mailbox Type:");
+  label = gtk_label_new ("Mailbox path:");
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
 		    GTK_FILL, GTK_FILL,
 		    10, 10);
   gtk_widget_show (label);
 
-  menu = gtk_menu_new ();
-
-  menuitem =
-    append_menuitem_connect (GTK_MENU (menu),
-			     mailbox_type_description (MAILBOX_MBOX),
-			     NULL,
-			     NULL,
-			     (gpointer) MAILBOX_MBOX);
-
-  menuitem =
-    append_menuitem_connect (GTK_MENU (menu),
-			     mailbox_type_description (MAILBOX_MH),
-			     NULL,
-			     NULL,
-			     (gpointer) MAILBOX_MH);
-
-  menuitem =
-    append_menuitem_connect (GTK_MENU (menu),
-			     mailbox_type_description (MAILBOX_MAILDIR),
-			     NULL,
-			     NULL,
-			     (gpointer) MAILBOX_MAILDIR);
-
-  mcw->local_type_menu = gtk_option_menu_new ();
-  gtk_widget_set_usize (mcw->local_type_menu, 0, BALSA_BUTTON_HEIGHT);
-  gtk_option_menu_set_menu (GTK_OPTION_MENU (mcw->local_type_menu), menu);
-  gtk_table_attach (GTK_TABLE (table), mcw->local_type_menu, 1, 2, 1, 2,
-		    GTK_FILL | GTK_EXPAND, GTK_FILL,
-		    0, 10);
-  gtk_widget_show (mcw->local_type_menu);
-
-
-
-  /* mailbox path */
-  frame = gtk_frame_new ("Mailbox Path");
-  gtk_table_attach (GTK_TABLE (table), frame, 0, 2, 2, 3,
-		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND,
-		    0, 10);
-  gtk_widget_show (frame);
-
-  table = gtk_table_new (2, 2, FALSE);
-  gtk_container_border_width (GTK_CONTAINER (table), 5);
-  gtk_container_add (GTK_CONTAINER (frame), table);
-  gtk_widget_show (table);
-
-
-  radio_button = gtk_radio_button_new_with_label (NULL, "Standard Mailbox Path");
-  gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (radio_button), TRUE);
-  gtk_table_attach (GTK_TABLE (table), radio_button, 0, 1, 0, 1,
-		    GTK_FILL, GTK_FILL | GTK_EXPAND,
-		    0, 0);
-/*
-   gtk_signal_connect (GTK_OBJECT (radio_button),
-   "clicked",
-   (GtkSignalFunc) local_mailbox_standard_path_cb,
-   NULL);
- */
-  gtk_widget_show (radio_button);
-
-
-  radio_button = gtk_radio_button_new_with_label
-    (gtk_radio_button_group (GTK_RADIO_BUTTON (radio_button)), "Fixed Path");
-  gtk_table_attach (GTK_TABLE (table), radio_button, 0, 1, 1, 2,
-		    GTK_FILL, GTK_FILL | GTK_EXPAND,
-		    0, 0);
-/*
-   gtk_signal_connect (GTK_OBJECT (radio_button),
-   "clicked",
-   (GtkSignalFunc) local_mailbox_fixed_path_cb,
-   NULL);
- */
-  gtk_widget_show (radio_button);
-
   mcw->local_mailbox_path = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), mcw->local_mailbox_path, 1, 2, 1, 2,
-		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND,
-		    0, 0);
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (label);
 
   gtk_widget_show (mcw->local_mailbox_path);
-  gtk_widget_set_sensitive (mcw->local_mailbox_path, FALSE);
-
 
   return return_widget;
 }
@@ -786,7 +701,6 @@ create_imap_mailbox_page ()
 		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND,
 		    0, 0);
   gtk_widget_show (mcw->imap_mailbox_path);
-  gtk_widget_set_sensitive (mcw->imap_mailbox_path, FALSE);
 
   return return_widget;
 }

@@ -1,4 +1,8 @@
-2000-04-24 Pawel Salek <pawsa@theochem.kth.se>
+2000-04-25 Pawel Salek <pawsa@theochem.kth.se>
+	* src/save-restore.c: bug fix for remembering open mboxes
+	between sessions.
+	
+2000-04-25 Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/sendmsg-window.c: pasting texts containing \n to subject 
 	field lead to wrong mail headers.

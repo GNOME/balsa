@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-04-26 03:03+0200\n"
-"PO-Revision-Date: 2004-04-26 14:55+0200\n"
+"POT-Creation-Date: 2004-04-28 03:00+0200\n"
+"PO-Revision-Date: 2004-04-28 12:12+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -4282,11 +4282,11 @@ msgstr ""
 msgid "Balsa: message print preview"
 msgstr "Balsa: náhled před tiskem"
 
-#: src/save-restore.c:564
+#: src/save-restore.c:563
 msgid "Error during filters loading: "
 msgstr "Chyba při načítání filtrů: "
 
-#: src/save-restore.c:566
+#: src/save-restore.c:565
 #, c-format
 msgid ""
 "Error during filters loading: %s\n"
@@ -4295,27 +4295,31 @@ msgstr ""
 "Chyba při načítání filtrů: %s\n"
 "Filtry nemusejí být správně."
 
-#: src/save-restore.c:677
+#: src/save-restore.c:676
 msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr "Volba nerozpoznávat text \"format=flowed\" byla odstraněna."
 
-#: src/save-restore.c:915
+#: src/save-restore.c:914
 msgid ""
 "The option not to send \"format=flowed\" is now on the Options menu of the "
 "compose window."
 msgstr ""
 "Volba neodesílat \"format=flowed\" je nyní v menu Volby editačního okna."
 
-#: src/save-restore.c:947
+#: src/save-restore.c:946
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr "Volba požadovat MDN je nyní v menu Volby editačního okna."
 
-#: src/save-restore.c:1811
+#: src/save-restore.c:1649
+msgid "Filter with no condition was ignored"
+msgstr "Filtr bez podmínky byl ignorován"
+
+#: src/save-restore.c:1827
 msgid "Error opening GConf database\n"
 msgstr "Chyba při otevírání databáze GConf\n"
 
-#: src/save-restore.c:1819 src/save-restore.c:1830
+#: src/save-restore.c:1835 src/save-restore.c:1846
 #, c-format
 msgid "Error setting GConf field: %s\n"
 msgstr "Chyba při nastavování pole GConf: %s\n"

@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 2000-12-13 15:39+0300\n"
-"PO-Revision-Date: 2000-12-13 15:46+03:00\n"
+"POT-Creation-Date: 2000-12-14 15:42+0300\n"
+"PO-Revision-Date: 2000-12-14 15:45+03:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -102,6 +102,34 @@ msgstr "LibBalsaMailboxImap: Открыто %s Число ссылок: %d\n"
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxLocal: Открыто %s Число ссылок: %d\n"
+
+#: libbalsa/mailbox_maildir.c:114
+#, c-format
+msgid "Mailbox %s does not appear to be a Maildir mailbox."
+msgstr "Вероятно почтовый ящик \"%s\" не является ящиком Maildir."
+
+#: libbalsa/mailbox_maildir.c:123
+msgid "Sorry. Balsa doesn't (yet) know how to create a maildir mailbox"
+msgstr "Извините. Balsa пока не умеет создавать почтовые ящики maildir"
+
+#: libbalsa/mailbox_maildir.c:155 libbalsa/mailbox_mh.c:155
+#, c-format
+msgid "Open of %s failed. Errno = %d, "
+msgstr "Сбой открытия %s. Номер ошибки - %d, "
+
+#: libbalsa/mailbox_mbox.c:115
+#, c-format
+msgid "Mailbox %s does not appear to be an Mbox mailbox."
+msgstr "Вероятно почтовый ящик \"%s\" не в формате Mbox."
+
+#: libbalsa/mailbox_mh.c:114
+#, c-format
+msgid "Mailbox %s does not appear to be a Mh mailbox."
+msgstr "Вероятно почтовый ящик \"%s\" не в формате MH."
+
+#: libbalsa/mailbox_mh.c:123
+msgid "Sorry. Balsa doesn't (yet) know how to create a mh mailbox"
+msgstr "Извините. Balsa еще не умеет создавать почтовые ящики MH."
 
 #: libbalsa/mailbox_pop3.c:199
 #, c-format

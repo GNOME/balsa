@@ -31,6 +31,8 @@ static GnomeMDIChildClass *parent_class = NULL;
 static void index_child_class_init (IndexChildClass *);
 static void index_child_init (IndexChild *);
 
+static GList *child_list = NULL;
+
 guint
 index_child_get_type ()
 {
@@ -56,8 +58,6 @@ index_child_get_type ()
 }
 
 /* callbacks */
-static gint destroy_index_window (GtkWidget * widget);
-static void close_index_window (GtkWidget * widget);
 static void refresh_index_window (IndexChild * iw);
 static void mailbox_listener (MailboxWatcherMessage * iw_message);
 static void index_select_cb (GtkWidget * widget, Message * message, GdkEventButton *);
@@ -72,10 +72,35 @@ static void next_message_cb (GtkWidget * widget);
 static void previous_message_cb (GtkWidget * widget);
 
 /* menu item callbacks */
-static void delete_message_cb (GtkWidget * widget, Message * message);
-static void undelete_message_cb (GtkWidget * widget, Message * message);
+static void message_status_set_new_cb (GtkWidget *, Message *);
+static void message_status_set_read_cb (GtkWidget *, Message *);
+static void message_status_set_answered_cb (GtkWidget *, Message *);
+static void delete_message_cb (GtkWidget *, Message *);
+static void undelete_message_cb (GtkWidget *, Message *);
 
+IndexChild *
+index_child_get_active (GnomeMDI * mdi)
+{
+  IndexChild *child;
+  GnomeMDIChild *gmdic;
+  GList *list;
 
+  if (!mdi || !child_list)
+    return NULL;
+
+  gmdic = gnome_mdi_active_child (mdi);
+
+  list = g_list_first(child_list);
+
+  for (; list != NULL; list = list->next)
+    {
+      child = (IndexChild *) list->data;
+      if (child)
+	if (!strcmp (child->mailbox->name, gmdic->name))
+	  return child;
+    }
+
+}
 
 IndexChild *
 index_child_new (Mailbox * mailbox)
@@ -87,19 +112,21 @@ index_child_new (Mailbox * mailbox)
       child->mailbox = mailbox;
 
       GNOME_MDI_CHILD (child)->name = g_strdup (mailbox->name);
+      child_list = g_list_append (child_list, child);
     }
 
   return child;
 }
 
-static GtkWidget *index_child_create_view(GnomeMDIChild *child)
+static GtkWidget *
+index_child_create_view (GnomeMDIChild * child)
 {
   GList *list;
   GtkWidget *messagebox;
   GtkWidget *vbox;
   IndexChild *iw;
 
-  iw = INDEX_CHILD(child);
+  iw = INDEX_CHILD (child);
 
   vbox = gtk_vbox_new (TRUE, 0);
   gtk_widget_show (vbox);
@@ -133,7 +160,7 @@ static GtkWidget *index_child_create_view(GnomeMDIChild *child)
       gtk_widget_show (messagebox);
     }
 
-  return(vbox);
+  return (vbox);
 }
 
 /*
@@ -152,34 +179,6 @@ static IndexChild *
 get_index_window_data (GtkObject * object)
 {
   return gtk_object_get_data (object, "index_window_data");
-}
-
-
-static void
-close_index_window (GtkWidget * widget)
-{
-  IndexChild *iw = get_index_window_data (GTK_OBJECT (widget));
-  gtk_widget_destroy (iw->index);
-}
-
-static gint
-destroy_index_window (GtkWidget * widget)
-{
-  IndexChild *iw = get_index_window_data (GTK_OBJECT (widget));
-
-#if 0
-  /* remove the mailbox from the open mailbox list */
-  open_mailbox_list = g_list_remove (open_mailbox_list, nmw);
-
-#endif
-
-  mailbox_open_unref (iw->mailbox);
-  mailbox_watcher_remove (iw->mailbox, iw->watcher_id);
-
-  close_index_window (widget);
-
-  g_free (iw);
-  return TRUE;
 }
 
 
@@ -245,14 +244,23 @@ create_menu (BalsaIndex * bindex, Message * message)
 
   submenu = gtk_menu_new ();
   smenuitem = gtk_menu_item_new_with_label ("Unread");
+  gtk_signal_connect (GTK_OBJECT (menuitem), "activate", 
+		  (GtkSignalFunc) message_status_set_new_cb, message);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
+
   smenuitem = gtk_menu_item_new_with_label ("Read");
+  gtk_signal_connect (GTK_OBJECT (menuitem), "activate", 
+		  (GtkSignalFunc) message_status_set_read_cb, message);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
+
   smenuitem = gtk_menu_item_new_with_label ("Replied");
+  gtk_signal_connect (GTK_OBJECT (menuitem), "activate", 
+		  (GtkSignalFunc) message_status_set_answered_cb, message);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
+  
   smenuitem = gtk_menu_item_new_with_label ("Forwarded");
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
@@ -282,6 +290,36 @@ create_menu (BalsaIndex * bindex, Message * message)
 
   return menu;
 }
+
+static void
+message_status_set_new_cb (GtkWidget * widget, Message * message)
+{
+  g_return_if_fail (widget != NULL);
+#if 0
+  message_new (message);
+#endif
+  /* balsa_index_select_next (BALSA_INDEX (mainwindow->index)); */
+}
+
+static void
+message_status_set_read_cb (GtkWidget * widget, Message * message)
+{
+  g_return_if_fail (widget != NULL);
+#if 0
+  message_read (message);
+#endif
+  /* balsa_index_select_next (BALSA_INDEX (mainwindow->index)); */
+}
+
+static void
+message_status_set_answered_cb (GtkWidget * widget, Message * message)
+{
+  g_return_if_fail (widget != NULL);
+
+  message_answer (message);
+  /* balsa_index_select_next (BALSA_INDEX (mainwindow->index)); */
+}
+
 
 static void
 delete_message_cb (GtkWidget * widget, Message * message)
@@ -331,8 +369,8 @@ index_child_class_init (IndexChildClass * class)
   parent_class = gtk_type_class (gnome_mdi_child_get_type ());
 }
 
-static void index_child_init (IndexChild *child)
+static void 
+index_child_init (IndexChild * child)
 {
 
 }
-

@@ -888,7 +888,7 @@ message_answer (Message * message)
   sprintf (tmp, "%ld", message->msgno);
   mail_setflag (CLIENT_STREAM (message->mailbox), tmp, "\\ANSWERED");
 
-  message->flags |= MESSAGE_FLAG_DELETED;
+  message->flags |= MESSAGE_FLAG_ANSWERED;
   send_watcher_mark_delete_message (message->mailbox, message);
 
   UNLOCK_MAILBOX ();

@@ -25,7 +25,7 @@
 #include "balsa-app.h"
 #include "balsa-index.h"
 #include "balsa-message.h"
-#include "index-window.h"
+#include "index-child.h"
 #include "mailbox.h"
 #include "mailbox-manager.h"
 #include "main-window.h"
@@ -113,9 +113,9 @@ open_main_window ()
   gtk_signal_connect (GTK_OBJECT (mw->mdi), "create_menus", GTK_SIGNAL_FUNC (create_menu), NULL);
   gtk_signal_connect (GTK_OBJECT (mw->mdi), "create_toolbar", GTK_SIGNAL_FUNC (create_toolbar), NULL);
 
-  gnome_mdi_set_child_menu_path(mw->mdi, _("Mailboxes"));
-/*  gnome_mdi_set_child_list_path(mw->mdi, _("MDI"));
-*/
+  gnome_mdi_set_child_menu_path(mw->mdi, _("Mailboxes/Mailbox List"));
+  gnome_mdi_set_child_list_path(mw->mdi, _("MDI"));
+
   gnome_mdi_set_child_menu_label(mw->mdi, _("Mailboxes"));
   
   gnome_mdi_set_mode (mw->mdi, balsa_app.mdi_style);
@@ -240,6 +240,8 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi)
   gtk_widget_show (w);
   gtk_widget_add_accelerator (w, "activate", accel, 'R', GDK_CONTROL_MASK, 0);
 
+  gtk_object_set_user_data (GTK_OBJECT (w), (gpointer) mw);
+
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
 		      (GtkSignalFunc) replyto_message_cb,
@@ -251,6 +253,8 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi)
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_FWD, _ ("Foward"));
   gtk_widget_show (w);
+
+  gtk_object_set_user_data (GTK_OBJECT (w), (gpointer) mw);
 
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
@@ -299,13 +303,14 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi)
   w = gtk_menu_item_new_with_label (_ ("Message"));
   gtk_widget_show (w);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
- /* gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
-*/  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
+  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
+  w = gtk_menu_item_new_with_label (_ ("MDI"));
+  gtk_widget_show (w);
+  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
-  /* Settings Menu */
+/* Mailbox list */
   menu = gtk_menu_new ();
-
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Mailbox List"));
   gtk_widget_show (w);
@@ -319,6 +324,15 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi)
 
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
+
+  w = gtk_menu_item_new_with_label (_ ("Mailboxes"));
+  gtk_widget_show (w);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
+  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
+
+
+  /* Settings Menu */
+  menu = gtk_menu_new ();
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Preferences..."));
   gtk_widget_show (w);
@@ -346,7 +360,6 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi)
   w = gtk_menu_item_new_with_label (_ ("Settings"));
   gtk_widget_show (w);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
-  gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
   /* HELP Menu */
@@ -449,6 +462,7 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi)
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RPL),
 			     (GtkSignalFunc) replyto_message_cb,
 			     "Reply");
+  gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
@@ -460,6 +474,7 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi)
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_FWD),
 			     (GtkSignalFunc) forward_message_cb,
 			     "Forward");
+  gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
@@ -547,22 +562,36 @@ new_message_cb (GtkWidget * widget)
 static void
 replyto_message_cb (GtkWidget * widget)
 {
+  MainWindow *mainwindow;
+  IndexChild *ic;
   g_return_if_fail (widget != NULL);
-
+/*
   if (!balsa_app.current_index)
     return;
-  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 1);
+*/
+  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+  ic = index_child_get_active(mainwindow->mdi);
+  if (!ic) return;
+/* sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 1); */
+  sendmsg_window_new (widget, BALSA_INDEX (ic->index), 1);
 }
 
 
 static void
 forward_message_cb (GtkWidget * widget)
 {
+  MainWindow *mainwindow;
+  IndexChild *ic;
   g_return_if_fail (widget != NULL);
-
+/*
   if (!balsa_app.current_index)
     return;
-  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 2);
+*/
+  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+  ic = index_child_get_active(mainwindow->mdi);
+  if (!ic) return;
+/*  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 2); */
+  sendmsg_window_new (widget, BALSA_INDEX (ic->index), 2);
 }
 
 
@@ -570,13 +599,14 @@ static void
 next_message_cb (GtkWidget * widget)
 {
   MainWindow *mainwindow;
+  IndexChild *ic;
 
   g_return_if_fail (widget != NULL);
 
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-#if 0
-  balsa_index_select_next (BALSA_INDEX (mainwindow->index));
-#endif
+  ic = index_child_get_active(mainwindow->mdi);
+  if (!ic) return;
+  balsa_index_select_next (BALSA_INDEX (ic->index));
 }
 
 
@@ -584,26 +614,29 @@ static void
 previous_message_cb (GtkWidget * widget)
 {
   MainWindow *mainwindow;
+  IndexChild *ic;
 
   g_return_if_fail (widget != NULL);
-#if 0
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-  balsa_index_select_previous (BALSA_INDEX (mainwindow->index));
-#endif
+  ic = index_child_get_active(mainwindow->mdi);
+  if (!ic) return;
+  balsa_index_select_previous (BALSA_INDEX (ic->index));
 }
 
 
 static void
 delete_message_cb (GtkWidget * widget)
 {
-#if 0
   GList *list;
+  IndexChild *ic;
   MainWindow *mainwindow;
 
   g_return_if_fail (widget != NULL);
 
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-
+  ic = index_child_get_active(mainwindow->mdi);
+  if (!ic) return;
+/*
   list = BALSA_INDEX (mainwindow->index)->selection;
   while (list)
     {
@@ -612,7 +645,15 @@ delete_message_cb (GtkWidget * widget)
     }
 
   balsa_index_select_next (BALSA_INDEX (mainwindow->index));
-#endif
+*/
+  list = BALSA_INDEX (ic->index)->selection;
+  while (list)
+    {
+      message_delete ((Message *) list->data);
+      list = list->next;
+    }
+
+  balsa_index_select_next (BALSA_INDEX (ic->index));
 }
 
 

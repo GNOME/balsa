@@ -4,45 +4,23 @@ For 0.4.5 release:
 
  * mutt_error - message box
  
- * fix it so you can add more than one mailbox
-     this appears to be caused by the fact that it is currently adding them
-     with the key "generic" which would then be duplicated, and/or overwritten
-     when adding a new mailbox.  this should be fixed shortly.
+ * inbox/outbox/trash should be able to be IMAP
 
- * mailbox-conf - (is run from right clicking on the mailbox list).  This
-   may need to use multiple windows, but I don't really want to do this.
-   Adding mailboxes under a folder, should add them to that tree limb, and
-   should create the mailbox as a 0 len file if it doesn't already exist.
-
- * inbox/outbox/trash should be able to be something other than mbox.  Need to
-   add support for IMAP, mh or maildir ones.  (mh and/or maildir might work)
- * finish balsa-init so that it will setup your mailboxes correctly.
-
-     UPDATE: this is somewhat working.
-             It has inbox, outbox, and trash paths in the balsa-init stuff.
-	     This format doesn't allow for IMAP which is something that needed
-	     to be done anyways, but I think that this is going to be too
-	     confusing (putting all the options in balsa-init).  mailbox-conf
-	     sucks right now, and should be updated to work correctly.
-     
- * fix checking for new mail inside mailboxes.
-     we have a full mail tray and an empty one.  full should be used to show
-     messages with new mail.  the mailbox name should also be in bold.
+ * fix balsa-init's text box thing
 
 
-  ****************
-  Pretty much done:
-  ****************
 
-    * get pref-manager working with gnome-propertybox
-        UPDATE: this works.  setting the toolbar type doesn't save.. hmm
+little things:
+ * pref manager doesn't save the toolbar type or mdi type
+ * make mailbox-conf pretty
 
-    * get reply/forward working
-        UPDATE: this works.  may need a few cosmetic changes, but it for the most
-                part works great.
 
 
 later stuff:
+
+ * fix checking for new mail inside mailboxes.
+     we have a full mail tray and an empty one.  full should be used to show
+     messages with new mail.  the mailbox name should also be in bold.
 
  * fix it under solaris.  test under aix, hpux, and osf (digital unix i fink?)
      UPDATE: solaris seems to be ok now.  need to test other platforms.

@@ -1,4 +1,4 @@
-Balsa E-Mail Client 0.8.0
+Balsa E-Mail Client 0.9.0 BALSA-CONFIG
 
 Copyright (C) 1997-2000 Jay Painter, Stuart Parmenter and others
 See 'COPYING' for licence information.
@@ -42,6 +42,15 @@ have the permissions to install into /usr or /usr/local or
 wherever Gnome lives. Balsa will be able to find all the files
 that it needs, but Gnome may not be able to locate certain
 resources such as balsa.desktop, balsa.soundlist, etc.
+
+--disable-flock
+	Some OSes (like Solaris) are known to be not full
+BSD-compatible.  You may want in such a case to disable flock mailbox
+locking and use fcntl/lockf functions instead.
+
+--enable-fcntl
+	This enables alternative fcntl file locking scheme. This
+function is sometimes troublesome over NFS but is POSIX compatible.
 
 Website:
 	Balsa CVS source comes with the Balsa website in the

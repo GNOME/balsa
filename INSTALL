@@ -1,4 +1,4 @@
-Balsa E-Mail Client 0.8.0
+Balsa E-Mail Client 0.9.0 BALSA-CONFIG
 
 Copyright (C) 1997-2000 Jay Painter, Stuart Parmenter, and others
 See 'COPYING' for license information.
@@ -18,7 +18,7 @@ Please make sure you have the following things:
 
 Build Instructions:
 
-	For more information see 'README'.
+	For more information and configuration options see 'README'.
 
 	# ./configure
 	# make

@@ -2,7 +2,7 @@ SUBDIRS = macros po intl sounds images help libmutt libbalsa libinit_balsa src
 
 man_MANS=balsa.1
 
-pixmapdir = $(datadir)/pixmaps
+pixmapdir = $(gnomedatadir)/pixmaps
 pixmap_DATA = gnome-balsa2.png
 
 desktopdir = $(gnomedatadir)/gnome/apps/Internet
@@ -33,7 +33,7 @@ dist-hook: balsa.spec
 @MAINT@			test -f $$f && cp -f $$f . ; \
 @MAINT@		fi ; \
 @MAINT@	done
-  
+
 @MAINT@snapshot:
 @MAINT@	$(MAKE) distdir=$(PACKAGE)-`date +"%y%m%d"` dist
 

@@ -382,16 +382,28 @@ int mx_get_magic (const char *path)
   }
   else if ((f = fopen (path, "r")) != NULL)
   {
+	  int i;
 #ifndef BUFFY_SIZE
     struct utimbuf times;
 #endif
 
-    fgets (tmp, sizeof (tmp), f);
-    if (mutt_strncmp ("From ", tmp, 5) == 0)
-      magic = M_MBOX;
-    else if (mutt_strcmp (MMDF_SEP, tmp) == 0)
-      magic = M_MMDF;
+    /* Scroll down to the first line with real
+     * text in it */
+    while( !ferror( f ) && !feof( f ) ) {
+	    fgets (tmp, sizeof (tmp), f);
+
+	    if (mutt_strcmp (MMDF_SEP, tmp) == 0)
+		    magic = M_MMDF;
+
+	    if( isalpha( tmp[0] ) ) {
+		    if (mutt_strncmp ("From ", tmp, 5) == 0)
+			    magic = M_MBOX;
+		    break;
+	    }
+    }
+
     fclose (f);
+
 #ifndef BUFFY_SIZE
     /* need to restore the times here, the file was not really accessed,
      * only the type was accessed.  This is important, because detection

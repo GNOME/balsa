@@ -310,7 +310,8 @@ app_created (GnomeMDI * mdi, GnomeApp * app)
   gtk_signal_connect (GTK_OBJECT (app), "destroy",
 		      GTK_SIGNAL_FUNC (destroy_window_cb), NULL);
 
-  statusbar = gtk_statusbar_new ();
+  statusbar = GNOME_APPBAR(gnome_appbar_new(TRUE, TRUE,
+					    GNOME_PREFERENCES_USER));
   pbar = gtk_progress_bar_new ();
   gtk_progress_bar_set_activity_step (GTK_PROGRESS_BAR (pbar), 5);
   gtk_progress_bar_set_activity_blocks (GTK_PROGRESS_BAR (pbar), 5);

@@ -1,5 +1,10 @@
 1999-01-07  Nat Friedman  <nat@nat.org>
 
+	* src/main-window.c (app_created): Use the GnomeAppBar instead of
+ 	the GtkStatusBar.
+
+1999-01-07  Nat Friedman  <nat@nat.org>
+
 	* src/main-window.c (file_menu): Use GNOMEUIINFO_MENU_PREFERENCES_ITEM.
 	(mailbox_menu): Added menu hints to the custom menu items.
 

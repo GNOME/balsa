@@ -92,7 +92,6 @@ index_child_changed (GnomeMDI * mdi, GnomeMDIChild * mdi_child)
     balsa_app.current_index_child = INDEX_CHILD (mdi->active_child);
   else
     balsa_app.current_index_child = NULL;
-
 }
 
 IndexChild *

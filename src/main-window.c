@@ -688,7 +688,7 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
 
-  gtk_widget_set_usize (GTK_WIDGET (mblw->ctree), balsa_app.mblist_width, balsa_app.mblist_height);
+  gtk_widget_set_usize (GTK_WIDGET (mblw->ctree), balsa_app.mblist_width, -1);
 /*
    gtk_ctree_show_stub (mblw->ctree, FALSE);
  */

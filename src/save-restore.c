@@ -663,11 +663,6 @@ config_global_load (void)
   else
     balsa_app.mblist_width = atoi (field);
 
-  if ((field = pl_dict_get_str (globals, "MailboxListHeight")) == NULL)
-    balsa_app.mblist_height = 300;
-  else
-    balsa_app.mblist_height = atoi (field);
-
   /* arp --- LeadinStr for "reply to" leadin. */
   if ((field = pl_dict_get_str (globals, "LeadinStr")) == NULL)
     balsa_app.quote_str = g_strdup ("> ");
@@ -734,9 +729,6 @@ config_global_save (void)
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_width);
     pl_dict_add_str_str (globals, "MailboxListWidth", tmp);
-
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_height);
-    pl_dict_add_str_str (globals, "MailboxListHeight", tmp);
   }
 
 

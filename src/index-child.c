@@ -273,8 +273,9 @@ index_child_create_view (GnomeMDIChild * child)
 		      (GtkSignalFunc) index_select_cb, ic);
 
   /* Make messages draggable */
-  gtk_drag_source_set (GTK_WIDGET (ic->index), GDK_BUTTON1_MASK,
-		       drag_types, ELEMENTS (drag_types),
+  /* we want to grab the clist and not the scrolled window */
+  gtk_drag_source_set (GTK_WIDGET (BALSA_INDEX (ic->index)->clist),
+		       GDK_BUTTON1_MASK, drag_types, ELEMENTS (drag_types),
       GDK_ACTION_LINK | GDK_ACTION_MOVE | GDK_ACTION_COPY | GDK_ACTION_ASK);
 
 #if 0
@@ -369,7 +370,7 @@ create_menu (BalsaIndex * bindex)
 		      (GtkSignalFunc) transfer_messages_cb,
 		      (gpointer) bindex);
 
-  gtk_widget_set_usize (GTK_WIDGET (bmbl), balsa_app.mblist_width, balsa_app.mblist_height);
+  gtk_widget_set_usize (GTK_WIDGET (bmbl), balsa_app.mblist_width, -1);
   gtk_container_add (GTK_CONTAINER (smenuitem), bmbl);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (bmbl);

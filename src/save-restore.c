@@ -403,11 +403,6 @@ config_global_load(void)
     balsa_app.date_string =
 	gnome_config_get_string("DateFormat=" DEFAULT_DATE_FORMAT);
 
-    /* ... Printing */
-    g_free(balsa_app.paper_size);
-    balsa_app.paper_size =
-	gnome_config_get_string("PaperSize=" DEFAULT_PAPER_SIZE);
-
     /* ... Headers to show */
     balsa_app.shown_headers = d_get_gint("ShownHeaders", HEADERS_SELECTED);
 
@@ -460,6 +455,11 @@ config_global_load(void)
 
     /* Printing options ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Printing/");
+
+    /* ... Printing */
+    g_free(balsa_app.paper_size);
+    balsa_app.paper_size =
+	gnome_config_get_string("PaperSize=" DEFAULT_PAPER_SIZE);
 
     g_free(balsa_app.PrintCommand.PrintCommand);
     balsa_app.PrintCommand.PrintCommand =
@@ -655,6 +655,9 @@ gint config_save(void)
 
     /* Printing options ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Printing/");
+
+    /* ... Printing */
+    gnome_config_set_string("PaperSize",balsa_app.paper_size);
 
     gnome_config_set_string("PrintCommand",
 			    balsa_app.PrintCommand.PrintCommand);

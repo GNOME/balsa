@@ -1147,6 +1147,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     BODY *last, *newbdy;
     gchar *tmp;
     LibBalsaMessageBody *body;
+    LibBalsaServer *server;
 
     libbalsa_lock_mutt();
     msg = mutt_new_header();
@@ -1224,8 +1225,40 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     else
 	tmp = NULL;
 
-    mutt_write_fcc(libbalsa_mailbox_local_get_path(draftbox),
-		   msg, tmp, 1, fcc);
+    if (LIBBALSA_IS_MAILBOX_LOCAL(draftbox)) {
+	mutt_write_fcc(libbalsa_mailbox_local_get_path(draftbox),
+		       msg, tmp, 1, fcc);
+    } else if (LIBBALSA_IS_MAILBOX_IMAP(draftbox)) {
+	server = LIBBALSA_MAILBOX_REMOTE(draftbox)->server;
+	if(!CLIENT_CONTEXT_OPEN(draftbox)) /* Has not been opened */
+	{
+	    /* We cannot use LIBBALSA_REMOTE_MAILBOX_SERVER() here because */
+	    /* it will lock up when NO IMAP mailbox has been accessed since */
+	    /* balsa was started. This should be safe because we have already */
+	    /* established that draftbox is in fact an IMAP mailbox */
+	    if(server == (LibBalsaServer *)0) {
+		libbalsa_information(LIBBALSA_INFORMATION_ERROR, "Unable to open draftbox - could not get server information");
+		g_free(tmp);
+		mutt_free_header(&msg);
+		libbalsa_unlock_mutt();
+		return FALSE;
+	    }
+	    if (!(server->passwd && *server->passwd) &&
+		!(server->passwd = libbalsa_server_get_password(server, draftbox))) {
+		libbalsa_information(LIBBALSA_INFORMATION_ERROR, "Unable to open draftbox - could not get passwords for server");
+		g_free(tmp);
+		mutt_free_header(&msg);
+		libbalsa_unlock_mutt();
+		return FALSE;
+	    }
+	    reset_mutt_passwords(server);
+	}
+
+	/* Passwords are guaranteed to be set now */
+
+	mutt_write_fcc(LIBBALSA_MAILBOX(draftbox)->url,
+ 		       msg, tmp, 1, fcc);
+    }
     g_free(tmp);
     mutt_free_header(&msg);
     libbalsa_unlock_mutt();

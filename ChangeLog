@@ -1,5 +1,8 @@
 2001-09-05  Carlos Morgado  <chbm@chbm.nu>
 
+	* libbalsa/send.c: patch from Anders Larsen <bulk@alarsen.net> 
+	to permit draftbox on imap. same juju as imap on ...
+
 	* src/main-window.c: MENU_FILE_PRINT_POS was defined twice. eek.
 
 2001-09-04  Carlos Morgado  <chbm@chbm.nu>

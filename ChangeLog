@@ -1,3 +1,12 @@
+2000-09-06  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/threads.h: Sync the definition of MailThreadMessage to
+	the one in src/threads.h (really there should only be one of
+	these...)
+	* libbalsa/mailbox_pop3.c: Define a callback for
+	mutt_fetchPopMail. Unlock the mutt_lock while writing to the
+	message pipe. Prevents lockups.
+
 2000-09-06  Carlos Morgado  <chbm@chbm.nu>
 
 	* idl/balsa.idl: added new idl

@@ -63,8 +63,7 @@ libmutt_a_SOURCES = \
 	rfc1524.h	\
 	rfc2047.h	\
 	rfc822.h	\
-	sort.h		\
-	thread_msgs.h
+	sort.h
 
 SUBDIRS = imap
 

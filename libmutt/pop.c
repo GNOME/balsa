@@ -26,10 +26,6 @@
 #include "mx.h"
 #include "md5.h"
 
-#ifdef BALSA_USE_THREADS
-#include "thread_msgs.h"
-#endif
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -44,7 +40,7 @@
 #endif
 
 /* XXXXX */
-#define BALSA_TEST_POP3 1
+/* #define BALSA_TEST_POP3 1 */
 
 static int getLine (int fd, char *s, int len)
 {
@@ -169,7 +165,7 @@ static void computeAuthHash( char *stamp, char *hash ) {
 }
 
 
-void mutt_fetchPopMail (void)
+void mutt_fetchPopMail (muttProgressCallback prog_cb)
 {
   struct sockaddr_in sin;
 #if SIZEOF_LONG == 4
@@ -183,7 +179,6 @@ void mutt_fetchPopMail (void)
   char stamp[2048];
   char authHash[BUFSIZ];
 #ifdef BALSA_USE_THREADS
-  MailThreadMessage *threadmsg;
   char threadbuf[160];
 #endif
   char uid[80], last_uid[80];
@@ -447,7 +442,7 @@ void mutt_fetchPopMail (void)
 #ifdef BALSA_USE_THREADS
     sprintf( threadbuf, "Retrieving Message %d of %d", 
 	     i - first_msg + 1, total );
-    MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_MSGINFO, threadbuf,0,0 );
+    prog_cb ( threadbuf, 0, 0);
 #endif
 
     if (getLine (s, buffer, sizeof (buffer)) == -1)
@@ -489,7 +484,7 @@ void mutt_fetchPopMail (void)
       
 #ifdef BALSA_USE_THREADS
       sprintf( threadbuf,"Received %d bytes of %d",num_bytes,tot_bytes);
-      MSGMAILTHREAD(threadmsg, MSGMAILTHREAD_PROGRESS, threadbuf, num_bytes,tot_bytes); 
+      prog_cb ( threadbuf, num_bytes, tot_bytes );
 #endif
 
       /* check to see if we got a full line */

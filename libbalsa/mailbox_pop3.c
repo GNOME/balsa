@@ -46,6 +46,8 @@ static void libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 *mailbox);
 static void libbalsa_mailbox_pop3_open (LibBalsaMailbox *mailbox, gboolean append);
 static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox);
 
+static void progress_cb ( char *msg, int prog, int tot );
+
 GtkType
 libbalsa_mailbox_pop3_get_type (void)
 {
@@ -231,7 +233,7 @@ static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox)
 			unset_option(OPTPOPAPOP);
 		}
     
-		mutt_fetchPopMail ();
+		mutt_fetchPopMail (progress_cb);
 		g_free (PopHost);
 		g_free (PopPass);
 		g_free (PopUser);
@@ -259,4 +261,28 @@ static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox)
 		gdk_threads_enter();
 	}
 
+}
+
+static void progress_cb ( char *msg, int prog, int tot )
+{
+	MailThreadMessage *message;
+
+	message = g_new(MailThreadMessage,1);
+	if ( prog == 0 && tot == 0 )
+		message->message_type = MSGMAILTHREAD_MSGINFO;
+	else
+		message->message_type = MSGMAILTHREAD_PROGRESS;
+	memcpy ( message->message_string, msg, strlen(msg)+1 );
+	message->num_bytes = prog;
+	message->tot_bytes = tot;
+
+	/* FIXME: There is potential for a timeout with 
+	 * the server here, if we don't get the lock back
+	 * soon enough.. But it prevents the main thread from
+	 * blocking on the mutt_lock, andthe pipe filling up.
+	 * This would give us a deadlock.
+	 */
+	libbalsa_unlock_mutt();
+	write(mail_thread_pipes[1], (void*)&message, sizeof(void*));
+	libbalsa_lock_mutt();
 }

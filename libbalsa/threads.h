@@ -45,12 +45,12 @@ extern GtkWidget              *send_progress_message;
 extern GtkWidget              *send_dialog ;
 extern GtkWidget              *send_dialog_bar ;
 
-
 typedef struct
 {
-	int message_type;
-	char message_string[160];
-	void *mailbox; /*  Mailbox *  */
+  int message_type;
+  char message_string[160];
+  int *mailbox; /* Mailbox *   */
+  int num_bytes, tot_bytes;
 } MailThreadMessage;
   
 #define  MSGMAILTHREAD( message, type, string) \

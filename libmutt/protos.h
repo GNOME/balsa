@@ -61,6 +61,9 @@ int _mutt_traverse_thread (CONTEXT *ctx, HEADER *hdr, int flag);
 
 typedef const char * format_t (char *, size_t, char, const char *, const char *, const char *, const char *, unsigned long, format_flag);
 
+/* BALSA: Added this for use with mutt_fetchPopMail */
+typedef void (*muttProgressCallback)(char *msg, int prog, int tot);
+
 void mutt_FormatString (char *, size_t, const char *, format_t *, unsigned long, format_flag);
 void mutt_parse_content_type (char *, BODY *);
 void mutt_update_encoding (BODY *a);
@@ -148,7 +151,9 @@ void mutt_exit (int);
 void mutt_expand_file_fmt (char *, size_t, const char *, const char *);
 void mutt_expand_fmt (char *, size_t, const char *, const char *);
 void mutt_expand_link (char *, const char *, const char *);
-void mutt_fetchPopMail (void);
+
+/* BALSA: Added the callback paramter */
+void mutt_fetchPopMail (muttProgressCallback prog_cb);
 void mutt_folder_hook (char *);
 void mutt_free_alias (ALIAS **);
 void mutt_free_body (BODY **);

@@ -1,3 +1,9 @@
+2000-09-06  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* pop.c, protos.h: Added a porgress callback to
+	mutt_fetchPopMail. Use it in preference to the msgmail stuff.
+	* Makefile.am: Remove thread_msgs.h
+	
 2000-08-29  Pawel Salek  <pawsa@theochem.kth.se>
 
         Imported IMAP support from mutt-1.2.5. Compiles but is not plugged in.

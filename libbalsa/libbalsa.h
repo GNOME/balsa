@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -62,6 +62,7 @@ typedef struct header MuttHeader;
 #include "mailbox_mh.h"
 #include "mailbox_maildir.h"
 
+#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 /*
  * Initialize the library
  */
@@ -93,5 +94,6 @@ void libbalsa_lock_mutt(void);
 void libbalsa_unlock_mutt(void);
 
 void libbalsa_mktemp (char *);
+void libbalsa_assure_balsa_dir(void);
 
 #endif				/* __LIBBALSA_H__ */

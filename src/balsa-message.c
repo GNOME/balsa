@@ -59,8 +59,6 @@
 # include <libgnomevfs/gnome-vfs-mime-handlers.h>
 #endif
 
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
-
 enum {
     SELECT_PART,
     LAST_SIGNAL,

@@ -157,7 +157,7 @@ balsa_information_list(LibBalsaInformationType type, GtkWindow* parent,
 	GtkWidget *scrolled_window;
 
 	information_dialog =
-	    gnome_dialog_new(_("Balsa Information"), "Clear",
+	    gnome_dialog_new(_("Balsa Information"), _("Clear"),
 			     GNOME_STOCK_BUTTON_CLOSE, NULL);
 	/* Default is to close */
 	gnome_dialog_set_default(GNOME_DIALOG(information_dialog), 1);

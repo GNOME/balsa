@@ -124,8 +124,6 @@ build_option_menu(option_list options[], gint num, GtkSignalFunc func);
  *    GtkOptionMenu - the menu created
  */
 
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
-
 GtkWidget *
 build_option_menu(option_list options[], gint num, GtkSignalFunc func)
 {

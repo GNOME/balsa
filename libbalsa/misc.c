@@ -41,8 +41,6 @@
 #include "misc.h"
 #include "libbalsa_private.h"
 
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
-
 /* libbalsa_lookup_mime_type:
    returns an allocated mime-type.
    gnome_vfs_file_info_get_mime_type() theoretically returns a const value,

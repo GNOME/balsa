@@ -139,6 +139,7 @@ libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix,
  * --------------------------------------------------------------------- */
 void imap_add_folder (char delim, char *folder, int noselect, int noinferiors,
 		      struct browser_state *state, short isparent);
+/* executed with GDK lock OFF */
 void
 libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server, 
 			  const gchar* path, gboolean subscribed, 
@@ -168,9 +169,13 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
        }
     }
     /* try getting password, quit on cancel */
-    if (!server->passwd &&
-	!(server->passwd = libbalsa_server_get_password(server, NULL)))
-	return;
+    if (!server->passwd) {
+        gdk_threads_enter();
+        server->passwd = libbalsa_server_get_password(server, NULL);
+        gdk_threads_leave();
+        if(!server->passwd)
+            return;
+    }
 	
     libbalsa_lock_mutt();
     safe_free((void **)&ImapUser);   ImapUser = safe_strdup(server->user);
@@ -223,10 +228,10 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     g_list_free((GList*)state.subfolders);
     state_free (&state);
     libbalsa_unlock_mutt();
-    
 }
 
-/* this function ovverrides mutt's one. */
+/* this function ovverrides mutt's one.
+ * called with GDK unlocked. */
 void imap_add_folder (char delim, char *folder, int noselect,
   int noinferiors, struct browser_state *state, short isparent)
 {
@@ -238,6 +243,7 @@ void imap_add_folder (char delim, char *folder, int noselect,
 	   "noinferiors: %d, isparent: %d\n", delim, folder, noselect,
 	   noinferiors, isparent);  */
     if(isparent) return;
+    gdk_threads_enter();
     if(!noselect) {
 	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                              "ADDING MAILBOX %s\n", folder);
@@ -258,4 +264,5 @@ void imap_add_folder (char delim, char *folder, int noselect,
 	state->mailbox_handler(state->rnode, folder, delim, state->scanned);
     else if (isFolder)
 	state->folder_handler(state->rnode, folder, delim, state->scanned);
+    gdk_threads_leave();
 }

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -53,8 +53,6 @@ enum {
 static GtkTargetEntry mblist_drop_types[] = {
     {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
 };
-
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
 #if 0
 static gint balsa_mblist_signals[LAST_SIGNAL] = { 0 };

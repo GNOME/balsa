@@ -1,5 +1,14 @@
 2002-06-23  Pawel Salek <pawsa@theochem.kth.se>
 
+	* libbalsa/folder-scanners.c: do not lock GDK when scanning imap.
+	* src/mailbox-node.c: adjust accordingly.
+	* libbalsa/libbalsa.[hc]: set certificates file. GUI for cert
+	acceptance.
+	* libbalsa/mailbox_imap.c: assure_balsa_dir() moved to libbalsa.c
+	* src/information-dialog.c: missing i18n string.
+	
+2002-06-23  Pawel Salek <pawsa@theochem.kth.se>
+
 	* configure.in: make clear gnome-print-devel package neede for
 	compilation. Check for libesmtp headers.
 	* libbalsa/mailbox_pop3.c, pop3.c: do not update GUI more

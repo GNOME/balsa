@@ -84,8 +84,6 @@ enum {
     TARGET_MESSAGES
 };
 
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
-
 #define NUM_DROP_TYPES 1
 static GtkTargetEntry notebook_drop_types[NUM_DROP_TYPES] = {
     {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}

@@ -177,8 +177,6 @@ static GtkTargetEntry email_field_drop_types[] = {
     {"x-application/x-email", 0, TARGET_EMAIL}
 };
 
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
-
 static void cut_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void copy_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void paste_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);

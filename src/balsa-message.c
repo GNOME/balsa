@@ -563,18 +563,19 @@ static void
 check_images_resize(GtkWidget * widget, gpointer user_data)
 {
     if (GTK_IS_CONTAINER(widget))
-	gtk_container_foreach (GTK_CONTAINER(widget), check_images_resize,
-			       NULL);
+        gtk_container_foreach(GTK_CONTAINER(widget), check_images_resize,
+                              NULL);
     else if (GTK_IS_IMAGE(widget) &&
-	     g_object_get_data(G_OBJECT(widget), "orig-width") &&
-	     g_object_get_data(G_OBJECT(widget), "part-info") &&
-	     !g_object_get_data(G_OBJECT(widget), "check_size_sched")) {
-	GtkWidget **widget_p = g_new(GtkWidget *, 1);
-	g_object_set_data(G_OBJECT(widget), "check_size_sched",
-			  (gpointer)TRUE);
-	*widget_p = widget;
-	g_object_add_weak_pointer(G_OBJECT(widget), (gpointer) widget_p);
-	g_idle_add((GSourceFunc)img_check_size, widget_p);
+             g_object_get_data(G_OBJECT(widget), "orig-width") &&
+             g_object_get_data(G_OBJECT(widget), "part-info") &&
+             !GPOINTER_TO_INT(g_object_get_data
+                              (G_OBJECT(widget), "check_size_sched"))) {
+        GtkWidget **widget_p = g_new(GtkWidget *, 1);
+        g_object_set_data(G_OBJECT(widget), "check_size_sched",
+                          GINT_TO_POINTER(TRUE));
+        *widget_p = widget;
+        g_object_add_weak_pointer(G_OBJECT(widget), (gpointer) widget_p);
+        g_idle_add((GSourceFunc) img_check_size, widget_p);
     }
 }
 
@@ -1605,7 +1606,8 @@ img_check_size(GtkImage ** widget_p)
                                                         "orig-width"));
     info = (BalsaPartInfo *)g_object_get_data(G_OBJECT(widget), "part-info");
 
-    g_object_set_data(G_OBJECT(widget), "check_size_sched", (gpointer)FALSE);
+    g_object_set_data(G_OBJECT(widget), "check_size_sched",
+                      GINT_TO_POINTER(FALSE));
     g_return_val_if_fail(viewport && info && orig_width > 0, FALSE);
 
     if (gtk_image_get_storage_type(widget) == GTK_IMAGE_PIXBUF)

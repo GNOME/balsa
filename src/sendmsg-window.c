@@ -1509,19 +1509,22 @@ remove_attachment(GtkWidget * menu_item, BalsaAttachInfo *info)
 }
 
 static void
-set_attach_menu_sensitivity(GtkWidget *widget, gpointer data)
+set_attach_menu_sensitivity(GtkWidget * widget, gpointer data)
 {
-    gint mode = (gint)g_object_get_data(G_OBJECT(widget), "new-mode");
+    gint mode =
+        GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), "new-mode"));
 
     if (mode)
-	gtk_widget_set_sensitive(widget, mode != (gint)data);
+        gtk_widget_set_sensitive(widget, mode != GPOINTER_TO_INT(data));
 }
 
 /* change attachment mode - right mouse button callback */
 static void
 change_attach_mode(GtkWidget * menu_item, BalsaAttachInfo *info)
 {
-    gint new_mode = (gint)g_object_get_data(G_OBJECT(menu_item), "new-mode");
+    gint new_mode =
+        GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item),
+                                          "new-mode"));
     GtkTreeIter iter;
     GtkTreeModel *model;
     GtkTreeSelection *selection;
@@ -1584,7 +1587,8 @@ change_attach_mode(GtkWidget * menu_item, BalsaAttachInfo *info)
 
     /* set the menu's sensitivities */
     gtk_container_forall(GTK_CONTAINER(gtk_widget_get_parent(menu_item)),
-			 set_attach_menu_sensitivity, (gpointer)info->mode);
+			 set_attach_menu_sensitivity,
+                         GINT_TO_POINTER(info->mode));
 }
 
 
@@ -1940,7 +1944,7 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
 	menu_item = 
 	    gtk_menu_item_new_with_label(attach_modes[LIBBALSA_ATTACH_AS_INLINE]);
 	g_object_set_data(G_OBJECT(menu_item), "new-mode",
-			  (gpointer)LIBBALSA_ATTACH_AS_INLINE);
+			  GINT_TO_POINTER(LIBBALSA_ATTACH_AS_INLINE));
 	g_signal_connect(G_OBJECT(menu_item), "activate",
 			 GTK_SIGNAL_FUNC(change_attach_mode),
 			 (gpointer)attach_data);
@@ -1954,7 +1958,7 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
 	    gtk_menu_item_new_with_label(attach_modes[LIBBALSA_ATTACH_AS_ATTACHMENT]);
 	gtk_widget_set_sensitive(menu_item, FALSE);
 	g_object_set_data(G_OBJECT(menu_item), "new-mode",
-			  (gpointer)LIBBALSA_ATTACH_AS_ATTACHMENT);
+			  GINT_TO_POINTER(LIBBALSA_ATTACH_AS_ATTACHMENT));
 	g_signal_connect(G_OBJECT(menu_item), "activate",
 			 GTK_SIGNAL_FUNC(change_attach_mode),
 			 (gpointer)attach_data);
@@ -1967,7 +1971,7 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
 	menu_item = 
 	    gtk_menu_item_new_with_label(attach_modes[LIBBALSA_ATTACH_AS_EXTBODY]);
 	g_object_set_data(G_OBJECT(menu_item), "new-mode",
-			  (gpointer)LIBBALSA_ATTACH_AS_EXTBODY);
+			  GINT_TO_POINTER(LIBBALSA_ATTACH_AS_EXTBODY));
 	g_signal_connect(G_OBJECT(menu_item), "activate",
 			 GTK_SIGNAL_FUNC(change_attach_mode),
 			 (gpointer)attach_data);

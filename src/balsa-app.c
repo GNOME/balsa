@@ -334,7 +334,7 @@ balsa_app_init(void)
     balsa_app.browse_wrap_length = 79;
     balsa_app.shown_headers = HEADERS_SELECTED;
     balsa_app.selected_headers = g_strdup(DEFAULT_SELECTED_HDRS);
-    balsa_app.threading_type = BALSA_INDEX_THREADING_JWZ;
+    balsa_app.threading_type = LB_MAILBOX_THREADING_JWZ;
     balsa_app.expand_tree = FALSE;
     balsa_app.show_mblist = TRUE;
     balsa_app.show_notebook_tabs = FALSE;
@@ -466,6 +466,7 @@ destroy_mbnode(GNode * node, gpointer data)
 void
 balsa_app_destroy(void)
 {
+    config_views_save();
     if (balsa_app.empty_trash_on_exit)
 	empty_trash();
 
@@ -480,7 +481,7 @@ balsa_app_destroy(void)
     balsa_mailbox_nodes_lock(TRUE);
     g_node_traverse(balsa_app.mailbox_nodes,
 		    G_LEVEL_ORDER,
-		    G_TRAVERSE_ALL, 10, destroy_mbnode, NULL);
+		    G_TRAVERSE_ALL, -1, destroy_mbnode, NULL);
     g_node_destroy(balsa_app.mailbox_nodes);
     balsa_app.mailbox_nodes = NULL;
     balsa_mailbox_nodes_unlock(TRUE);
@@ -993,6 +994,7 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
     /* didn't find a matching mailbox */
     return NULL;
 }
+
 #ifdef BALSA_USE_THREADS
 /* balsa_mailbox_nodes_(un)lock:
    locks/unlocks balsa_app.mailbox_nodes structure so we can modify it

@@ -165,9 +165,6 @@ balsa_mailbox_node_init(BalsaMailboxNode * mn)
     mn->name = NULL;
     mn->dir = NULL;
     mn->config_prefix = NULL;
-    mn->threading_type = BALSA_INDEX_THREADING_SIMPLE;
-    mn->sort_type = GTK_SORT_DESCENDING;
-    mn->sort_field = BALSA_SORT_DATE;
     mn->subscribed = FALSE;
     mn->scanned = FALSE;
 }
@@ -200,9 +197,6 @@ balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * prefix)
     gnome_config_set_string("Directory", mn->dir);
     gnome_config_set_bool("Subscribed",  mn->subscribed);
     gnome_config_set_bool("ListInbox",   mn->list_inbox);
-    gnome_config_set_int("Threading",    mn->threading_type);
-    gnome_config_set_int("SortType",     mn->sort_type);
-    gnome_config_set_int("SortField",    mn->sort_field);
     
     g_free(mn->config_prefix);
     mn->config_prefix = g_strdup(prefix);
@@ -216,7 +210,6 @@ balsa_mailbox_node_real_load_config(BalsaMailboxNode* mn, const gchar * prefix)
     g_free(mn->name);
     mn->name = gnome_config_get_string("Name");
 }
-
 
 BalsaMailboxNode *
 balsa_mailbox_node_new(void)
@@ -428,7 +421,6 @@ balsa_mailbox_node_new_from_dir(const gchar* dir)
 BalsaMailboxNode*
 balsa_mailbox_node_new_from_config(const gchar* prefix)
 {
-    gint def;
     BalsaMailboxNode * folder = balsa_mailbox_node_new();
     gnome_config_push_prefix(prefix);
 
@@ -455,12 +447,6 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
 	gnome_config_get_bool("Subscribed"); 
     folder->list_inbox =
 	gnome_config_get_bool("ListInbox=true"); 
-    folder->threading_type = gnome_config_get_int_with_default("Threading", &def);
-    if(def) folder->threading_type = BALSA_INDEX_THREADING_SIMPLE;
-    folder->sort_type = gnome_config_get_int_with_default("SortType", &def);
-    if(def) folder->sort_type = GTK_SORT_ASCENDING;
-    folder->sort_field = gnome_config_get_int_with_default("SortField", &def);
-    if(def) folder->sort_field = BALSA_SORT_DATE;
     gnome_config_pop_prefix();
 
     return folder;
@@ -592,6 +578,7 @@ balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
 	if (expanded)
             /* if this is an IMAP node, we must scan the children */
 	    balsa_mblist_scan_mailbox_node(mn);
+	config_views_load();
     } else g_warning("folder node %s (%p) not found in hierarchy.\n",
 		     mn->name, mn);
 }

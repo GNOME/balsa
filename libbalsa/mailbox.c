@@ -315,6 +315,9 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
 
     mailbox->filters=NULL;
     mailbox->identity_name=NULL;
+    mailbox->threading_type = LB_MAILBOX_THREADING_JWZ;
+    mailbox->sort_type =  LB_MAILBOX_SORT_TYPE_ASC;
+    mailbox->sort_field = LB_MAILBOX_SORT_DATE;
 }
 
 /*
@@ -564,6 +567,56 @@ libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
     gnome_config_pop_prefix();
 }
 
+/* libbalsa_mailbox_load_view:
+   load view related data from current config context. Works also for
+   nameless, scanned mailboxes.
+*/
+void
+libbalsa_mailbox_load_view(LibBalsaMailbox * mbx)
+{
+    int def;
+    gchar *address;
+
+    if (mbx->mailing_list_address) 
+	g_object_unref(mbx->mailing_list_address);
+    address = gnome_config_get_string_with_default("MailingListAddress", &def);
+    mbx->mailing_list_address = 
+	def ? NULL : libbalsa_address_new_from_string(address);
+    g_free(address);
+
+    g_free(mbx->identity_name);
+    mbx->identity_name = gnome_config_get_string("Identity=Default");
+
+    mbx->threading_type = gnome_config_get_int_with_default("Threading", &def);
+    if(def) mbx->threading_type = LB_MAILBOX_THREADING_SIMPLE;
+    mbx->sort_type = gnome_config_get_int_with_default("SortType", &def);
+    if(def) mbx->sort_type = LB_MAILBOX_SORT_TYPE_ASC;
+    mbx->sort_field = gnome_config_get_int_with_default("SortField", &def);
+    if(def) mbx->sort_field = LB_MAILBOX_SORT_DATE;
+}
+
+/* libbalsa_mailbox_save_view:
+   save view related data from current config context. Works also for
+   nameless, scanned mailboxes.
+*/
+void
+libbalsa_mailbox_save_view(LibBalsaMailbox * mbx)
+{
+    if (mbx->mailing_list_address) {
+	gchar* tmp = libbalsa_address_to_gchar(mbx->mailing_list_address, 0);
+	gnome_config_set_string("MailingListAddress", tmp);
+	g_free(tmp);
+    } else {
+	gnome_config_clean_key("MailingListAddress");
+    }
+    if(mbx->identity_name)
+	gnome_config_set_string("Identity", mbx->identity_name);
+    else gnome_config_clean_key("Identity");
+    gnome_config_set_int("Threading",   mbx->threading_type);
+    gnome_config_set_int("SortType",    mbx->sort_type);
+    gnome_config_set_int("SortField",   mbx->sort_field);
+}
+
 FILE *
 libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
 				    LibBalsaMessage * message)
@@ -661,33 +714,17 @@ static void
 libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix)
 {
-    gchar *tmp;
-
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     gnome_config_set_string("Type",
 			    g_type_name(G_OBJECT_TYPE(mailbox)));
     gnome_config_set_string("Name", mailbox->name);
-
-    if ( mailbox->mailing_list_address ) {
-	tmp = libbalsa_address_to_gchar(mailbox->mailing_list_address, 0);
-	gnome_config_set_string("MailingListAddress", tmp);
-	g_free(tmp);
-    } else {
-	gnome_config_clean_key("MailingListAddress");
-    }
-    g_free(mailbox->config_prefix);
-    mailbox->config_prefix = g_strdup(prefix);
-
-    gnome_config_set_string("Identity", mailbox->identity_name);
 }
 
 static void
 libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix)
 {
-    gboolean def;
-    gchar *address;
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     g_free(mailbox->config_prefix);
@@ -695,20 +732,6 @@ libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
 
     g_free(mailbox->name);
     mailbox->name = gnome_config_get_string("Name=Mailbox");
-
-    if ( mailbox->mailing_list_address ) 
-	g_object_unref(mailbox->mailing_list_address);
-    address = gnome_config_get_string_with_default("MailingListAddress", &def);
-    if ( def == TRUE ) {
-	mailbox->mailing_list_address = NULL;
-    } else {
-	mailbox->mailing_list_address = 
-            libbalsa_address_new_from_string(address);
-    }
-    g_free(address);
-
-    g_free(mailbox->identity_name);
-    mailbox->identity_name = gnome_config_get_string("Identity=Default");
 }
 
 /* libbalsa_mailbox_link_message:

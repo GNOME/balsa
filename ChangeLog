@@ -1,5 +1,14 @@
 2003-01-05  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* libbalsa/mailbox.[hc]: initial attempt to make mailboxes serve
+	different views (future application: server side sorting/threading).
+	* src/balsa-app.[hc], main-window.c: use new sort constants.
+	* src/balsa-index-threading.c: ditto.
+	* src/save-restore.[hc]: same+view saving code.
+	* src/mailbox-node.[hc]: move view data from MailboxNode to Mailbox.
+
+2003-01-05  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* configure.in, NEWS: release 2.0.5
 	
 2003-01-04  Pawel Salek  <pawsa@theochem.kth.se>

@@ -365,7 +365,8 @@ add_addrspec (RFC822Address **top, RFC822Address **last, const char *phrase,
 {
     RFC822Address *cur = g_new0(RFC822Address,1);
   
-    if (parse_addr_spec(phrase, comment, cur, err) == NULL) {
+    if (parse_addr_spec(phrase, comment, cur, err) == NULL || 
+	cur->mailbox ==NULL) {
         rfc822_address_free(cur);
         return;
     }
@@ -512,7 +513,7 @@ libbalsa_address_new_from_string(const gchar * str)
     LibBalsaAddress* addr;
 
     list = rfc822_parse_adrlist(top, str, &err);
-    if(!list) return NULL;
+    if(!list || err != RFC822_OK) return NULL;
     addr = libbalsa_address_new();
     addr->full_name = g_strdup(list->comment);
     addr->address_list = g_list_append(addr->address_list, 
@@ -530,12 +531,15 @@ libbalsa_address_new_list_from_string(const gchar * str)
     GList* lst = NULL;
 
     list = rfc822_parse_adrlist(top, str, &err);
-    while(list) {
-        addr = libbalsa_address_new();
-        addr->full_name = g_strdup(list->comment);
-        addr->address_list = g_list_append(addr->address_list, 
-                                           g_strdup(list->mailbox));
-        list = list->next;
+    if(err == RFC822_OK) {
+	while(list) {
+	    addr = libbalsa_address_new();
+	    addr->full_name = g_strdup(list->comment);
+	    addr->address_list   = g_list_append(addr->address_list,
+						 g_strdup(list->mailbox));
+	    lst = g_list_append(lst, addr);
+	    list = list->next;
+	}
     }
     rfc822_address_free(top);
     return lst;

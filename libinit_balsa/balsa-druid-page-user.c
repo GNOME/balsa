@@ -71,24 +71,24 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
                      GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 8, 4);
 
     preset = g_strdup(g_get_real_name());
-    balsa_init_add_table_entry(table, 0, _("Name:"), preset,
+    balsa_init_add_table_entry(table, 0, _("_Name:"), preset,
                                &(user->ed0), druid, &(user->name));
     g_free(preset);
 
     preset = libbalsa_guess_email_address();
-    balsa_init_add_table_entry(table, 1, _("Email address:"), preset,
+    balsa_init_add_table_entry(table, 1, _("_Email address:"), preset,
                                &(user->ed1), druid, &(user->email));
     g_free(preset);
 
     preset = g_strconcat(g_get_home_dir(), "/mail", NULL);
-    balsa_init_add_table_entry(table, 2, _("Local Mail Directory:"),
+    balsa_init_add_table_entry(table, 2, _("_Local Mail Directory:"),
                                preset, &(user->ed2),
                                druid, &(user->localmaildir));
     g_free(preset);
 
 #if ENABLE_ESMTP
     preset = "localhost:25";
-    balsa_init_add_table_entry(table, 3, _("SMTP Server:"), preset,
+    balsa_init_add_table_entry(table, 3, _("_SMTP Server:"), preset,
                                &(user->ed3), druid, &(user->smtp));
 #endif
 

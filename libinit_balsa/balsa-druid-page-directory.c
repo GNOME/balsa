@@ -35,8 +35,8 @@
 #include <errno.h>
 
 static gchar *init_mbnames[NUM_EDs] =
-    { N_("Inbox:"), N_("Outbox:"), N_("Sentbox:"), N_("Draftbox:"),
-    N_("Trash:")
+    { N_("_Inbox:"), N_("_Outbox:"), N_("_Sentbox:"), N_("_Draftbox:"),
+    N_("_Trash:")
 };
 
 static void unconditional_mailbox(const gchar * path,

@@ -1,3 +1,10 @@
+2002-12-26  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/address.c: fix an address parsing bug introduced yesterday.
+	* libbalsa/filter.c: port incremental imap queries from HEAD (Emmanuel)
+	* libinit_balsa/balsa-druid-page-{directory,user}.c:
+	* libinit_balsa/helper.c: add missing shortcuts.
+	
 2002-12-25  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: find out glib-genmarshal location (Emmanuel).

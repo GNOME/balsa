@@ -1,3 +1,14 @@
+2004-08-07  Pawel Salek
+
+	* libbalsa/imap-server.c: only IMAP_CONNECT_FAILED is a network error.
+	* libbalsa/libbalsa.c: display more info about certificates.
+	* libbalsa/mailbox.h: use ::state to determine whether mailbox is open.
+	* src/balsa-mblist.c: update only msg count for open mailboxes.
+	* src/balsa-message.c: set libesmtp auth context only if smtp_user
+	present.
+	* src/sendmsg-window.c: ditto.
+	* src/main-window.c: change button sensitivity in SoS search.
+
 2004-08-06  Pawel Salek
 
 	* libbalsa/imap-server.c: 

@@ -3833,12 +3833,13 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 					bsmsg->flow);
     else 
 #if ENABLE_ESMTP
-	result = libbalsa_message_send(message, balsa_app.outbox, fcc,
-				       balsa_app.encoding_style,  
-				       balsa_app.smtp_server,
-				       balsa_app.smtp_authctx,
-				       balsa_app.smtp_tls_mode,
-				       bsmsg->flow, balsa_app.debug);
+	result = libbalsa_message_send
+            (message, balsa_app.outbox, fcc,
+             balsa_app.encoding_style, balsa_app.smtp_server,
+             (balsa_app.smtp_user && *balsa_app.smtp_user)
+             ? balsa_app.smtp_authctx : NULL,
+             balsa_app.smtp_tls_mode,
+             bsmsg->flow, balsa_app.debug);
 #else
         result = libbalsa_message_send(message, balsa_app.outbox, fcc,
 				       balsa_app.encoding_style,

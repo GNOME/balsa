@@ -270,8 +270,11 @@ balsa_quit_nicely(GtkWidget * widget, gpointer data)
 {
     GdkEventAny e = { GDK_DELETE, NULL, 0 };
     e.window = GTK_WIDGET(data)->window;
+    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                         _("Balsa closes files and connections. Please wait..."));
+    while(gtk_events_pending())
+        gtk_main_iteration_do(FALSE);
     gdk_event_put((GdkEvent*)&e);
-    printf("Quitting initiated...\n");
 }
 
 /* ===================================================================
@@ -1324,15 +1327,23 @@ bw_disable_filter(GtkWidget *widget, GdkEventFocus *event, gpointer data)
 }
 
 static void
-bw_filter_entry_activate(GtkWidget *entry)
+bw_filter_entry_activate(GtkWidget *entry, GtkWidget *button)
 {
     BalsaWindow *bw = balsa_app.main_window;
     GtkWidget *bindex = balsa_window_find_current_index(bw);
 
-    if(bindex)
+    if(bindex) {
         balsa_index_set_sos_filter(BALSA_INDEX(bindex),
                                    gtk_entry_get_text(GTK_ENTRY(entry)),
                                    balsa_window_get_view_filter(bw));
+        gtk_widget_set_sensitive(button, FALSE);
+    }
+}
+
+static void
+bw_filter_entry_changed(GtkWidget *entry, GtkWidget *button)
+{
+    gtk_widget_set_sensitive(button, TRUE);
 }
 
 static GtkWidget*
@@ -1351,9 +1362,6 @@ bw_create_index_widget(BalsaWindow *bw)
                      G_CALLBACK(bw_enable_filter), bw);
     g_signal_connect(G_OBJECT(bw->sos_entry), "focus_out_event",
                      G_CALLBACK(bw_disable_filter), bw);
-    g_signal_connect_swapped(G_OBJECT(bw->sos_entry), "activate",
-                             G_CALLBACK(bw_filter_entry_activate),
-                             bw->sos_entry);
     gtk_box_pack_start(GTK_BOX(hbox), bw->sos_entry, TRUE, TRUE, 0);
     gtk_widget_show(bw->sos_entry);
     gtk_box_pack_start(GTK_BOX(hbox),
@@ -1362,9 +1370,15 @@ bw_create_index_widget(BalsaWindow *bw)
     gtk_container_add(GTK_CONTAINER(button),
                       gtk_image_new_from_stock(GTK_STOCK_OK,
                                                GTK_ICON_SIZE_BUTTON));
+    g_signal_connect(G_OBJECT(bw->sos_entry), "activate",
+                     G_CALLBACK(bw_filter_entry_activate),
+                     button);
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(bw_filter_entry_activate),
                              bw->sos_entry);
+    g_signal_connect(G_OBJECT(bw->sos_entry), "changed",
+                             G_CALLBACK(bw_filter_entry_changed),
+                             button);
     gtk_widget_show_all(button);
     vbox = gtk_vbox_new(FALSE, 0);
 #if defined(ENABLE_TOUCH_UI)
@@ -1377,6 +1391,7 @@ bw_create_index_widget(BalsaWindow *bw)
     gtk_box_pack_start(GTK_BOX(vbox), bw->notebook, TRUE, TRUE, 0);
     gtk_container_set_focus_chain(GTK_CONTAINER(vbox),
                                   g_list_append(NULL, bw->notebook));
+    gtk_widget_set_sensitive(button, FALSE);
     gtk_widget_show(vbox);
     return vbox;
 }
@@ -4022,8 +4037,6 @@ empty_trash(BalsaWindow * window)
     g_list_free(msg_list);
     /* We want to expunge deleted messages: */
     libbalsa_mailbox_close(balsa_app.trash, TRUE);
-    balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
-				balsa_app.trash);
     enable_empty_trash(window, TRASH_EMPTY);
 }
 

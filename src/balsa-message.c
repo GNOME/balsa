@@ -3143,7 +3143,8 @@ part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info)
     libbalsa_message_send(message, balsa_app.outbox, NULL,
                           balsa_app.encoding_style,  
                           balsa_app.smtp_server,
-                          balsa_app.smtp_authctx,
+                          (balsa_app.smtp_user && *balsa_app.smtp_user)
+                          ? balsa_app.smtp_authctx : NULL,
                           balsa_app.smtp_tls_mode,
                           FALSE, balsa_app.debug);
 #else
@@ -3944,7 +3945,8 @@ handle_mdn_request(LibBalsaMessage *message)
         libbalsa_message_send(mdn, balsa_app.outbox, NULL,
                               balsa_app.encoding_style,  
                               balsa_app.smtp_server,
-                              balsa_app.smtp_authctx,
+                              (balsa_app.smtp_user && *balsa_app.smtp_user)
+                              ? balsa_app.smtp_authctx : NULL,
                               balsa_app.smtp_tls_mode, TRUE, balsa_app.debug);
 #else
         libbalsa_message_send(mdn, balsa_app.outbox, NULL,
@@ -4053,7 +4055,8 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
         libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
                               balsa_app.encoding_style,
                               balsa_app.smtp_server,
-                              balsa_app.smtp_authctx,
+                              (balsa_app.smtp_user && *balsa_app.smtp_user)
+                              ? balsa_app.smtp_authctx : NULL,
                               balsa_app.smtp_tls_mode, TRUE, balsa_app.debug);
 #else
         libbalsa_message_send(send_msg, balsa_app.outbox, NULL,

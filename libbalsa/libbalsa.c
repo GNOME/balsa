@@ -378,7 +378,17 @@ static int libbalsa_ask_for_cert_acceptance(X509 *cert,
 static char*
 asn1time_to_string(ASN1_UTCTIME *tm)
 {
-    return g_strdup("FIXME");
+    char buf[64];
+    int cnt;
+    BIO *bio  = BIO_new(BIO_s_mem());
+    strncpy(buf, _("Invalid date"), sizeof(buf)); buf[sizeof(buf)-1]='\0';
+
+    if(ASN1_TIME_print(bio, tm)) {
+        cnt = BIO_read(bio, buf, sizeof(buf)-1);
+        buf[cnt] = '\0';
+    }
+    BIO_free(bio);
+    return g_strdup(buf);
 }
 
 static char*
@@ -387,7 +397,7 @@ x509_get_part (char *line, const char *ndx)
     static char ret[256];
     char *c, *c2;
     
-    strncpy (ret, _("Unknown"), sizeof (ret));
+    strncpy (ret, _("Unknown"), sizeof (ret)); ret[sizeof(ret)-1]='\0';
     
     c = strstr(line, ndx);
     if (c) {
@@ -403,9 +413,20 @@ x509_get_part (char *line, const char *ndx)
     return ret;
 }
 static void
-x509_fingerprint (char *s, int l, X509 * cert)
+x509_fingerprint (char *s, unsigned len, X509 * cert)
 {
-    s[0] = '\0';
+    unsigned j, i, n, c;
+    char md[EVP_MAX_MD_SIZE];
+
+
+    X509_digest(cert, EVP_md5(), md, &n);
+    if(len<3*n) n = len/3;
+    for (j=i=0; j<n; j++) {
+        c = (md[j] >>4) & 0xF; s[i++] = c<10 ? c + '0' : c+'A'-10;
+        c = md[j] & 0xF;       s[i++] = c<10 ? c + '0' : c+'A'-10;
+        if(j<n-1) s[i++] = ':';
+    }
+    s[i] = '\0';
 }
 
 static GList *accepted_certs = NULL; /* certs accepted for this session */
@@ -508,8 +529,8 @@ ask_cert_real(X509 *cert, const char *explanation)
 
     char *part[] =
         {"/CN=", "/Email=", "/O=", "/OU=", "/L=", "/ST=", "/C="};
-    char buf[256];
-    char *name = NULL, *c, *valid_from;
+    char buf[256]; /* fingerprint requires EVP_MAX_MD_SIZE*3 */
+    char *name = NULL, *c, *valid_from, *valid_until;
     GtkWidget* dialog, *label;
     unsigned i;
 
@@ -536,16 +557,16 @@ ask_cert_real(X509 *cert, const char *explanation)
 
     buf[0] = '\0';
     x509_fingerprint (buf, sizeof (buf), cert);
-    valid_from = asn1time_to_string(X509_get_notBefore(cert));
+    valid_from  = asn1time_to_string(X509_get_notBefore(cert));
+    valid_until = asn1time_to_string(X509_get_notAfter(cert)),
     c = g_strdup_printf(_("<b>This certificate is valid</b>\n"
                           "from %s\n"
                           "to %s\n"
                           "<b>Fingerprint:</b> %s"),
-                        valid_from,
-                        asn1time_to_string(X509_get_notAfter(cert)),
+                        valid_from, valid_until,
                         buf);
     g_string_append(str, c); g_free(c);
-    g_free(valid_from);
+    g_free(valid_from); g_free(valid_until);
 
     dialog = gtk_dialog_new_with_buttons(_("SSL/TLS certificate"), NULL,
                                          GTK_DIALOG_MODAL,

@@ -541,7 +541,7 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server, GError **err)
                 if(rc == IMAP_AUTH_FAILURE)
                     libbalsa_server_set_password(server, NULL);
                 g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                            rc == IMAP_AUTH_FAILURE
+                            rc != IMAP_CONNECT_FAILED
                             ? LIBBALSA_MAILBOX_AUTH_ERROR :
                             LIBBALSA_MAILBOX_NETWORK_ERROR,
                             _("Cannot connect to the server: %s"), msg);

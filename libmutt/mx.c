@@ -374,6 +374,50 @@ static int mx_is_imap(const char *p)
 
 #endif
 
+static int is_mh_message (char * str)
+{
+  int i, len;
+  len = strlen (str);
+
+  /* check for ,[0-9]+ deleted messages */
+  if (len && *str == ',' && is_mh_message (&str[1]))
+    return 0;
+
+  for (i = 0; i < len; i++)
+    {
+      if (!isdigit (str[i]))
+        {
+          return 0;
+        }
+    }
+  return 1;
+}
+
+static int mx_is_mh(const char* p)
+{
+  struct stat st;
+  DIR* dirp;
+  struct dirent* de;
+
+  /* here we now it's a directory and there's no `cur' subdir in this
+     directory. Because no other mailing system is using directories
+     as folders it should be a MH folder.
+     
+     Problem: subdirs with a name of the form [0-9]+ are not
+     reckognized.
+  */
+
+  if (!(dirp = opendir(p)))
+    return 0;
+
+  while ((de = readdir(dirp)) != NULL)
+  {
+    if (is_mh_message(de->d_name))
+      return 1;
+  }
+  return 0;
+}
+  
 int mx_get_magic (const char *path)
 {
   struct stat st;
@@ -403,9 +447,7 @@ int mx_get_magic (const char *path)
       return (M_MAILDIR);
 
     /* check for mh-style mailbox */
-
-    snprintf (tmp, sizeof (tmp), "%s/.mh_sequences", path);
-    if (access (tmp, F_OK) == 0)
+    if (mx_is_mh(path))
       return (M_MH);
 
   }

@@ -993,7 +993,7 @@ static GnomeUIInfo tu_message_more_menu[] = {
 
 static GnomeUIInfo tu_message_menu[] = {
     {
-        GNOME_APP_UI_ITEM, N_("_Message..."), N_("Compose a new message"),
+        GNOME_APP_UI_ITEM, N_("_New..."), N_("Compose a new message"),
         new_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         BALSA_PIXMAP_MENU_COMPOSE, 'M', 0, NULL
     },

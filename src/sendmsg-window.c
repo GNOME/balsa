@@ -1602,9 +1602,7 @@ attachment_menu_vfs_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
 #endif /* HAVE_GNOME_VFS29 */
         if (app) {
 #if HAVE_GNOME_VFS29
-            gboolean tmp = gnome_vfs_mime_application_supports_uris(app);
-            gchar *uri = tmp ? g_strconcat("file://", info->filename, NULL)
-                             : g_strdup(info->filename);
+            gchar *uri = g_strconcat("file://", info->filename, NULL);
             GList *uris = g_list_prepend(NULL, uri);
             gnome_vfs_mime_application_launch(app, uris);
             g_free(uri);

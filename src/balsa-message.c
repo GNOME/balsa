@@ -3147,12 +3147,9 @@ part_context_menu_vfs_cb(GtkWidget * menu_item, BalsaPartInfo * info)
         if(app) {
             if (libbalsa_message_body_save_temporary(info->body)) {
 #if HAVE_GNOME_VFS29
-                gboolean tmp =
-                    gnome_vfs_mime_application_supports_uris(app);
-                gchar *uri = tmp ?
+                gchar *uri =
                     g_strconcat("file://", info->body->temp_filename,
-                                NULL) :
-                    g_strdup(info->body->temp_filename);
+                                NULL);
 		GList *uris = g_list_prepend(NULL, uri);
 		gnome_vfs_mime_application_launch(app, uris);
 		g_free(uri);

@@ -1,3 +1,8 @@
+2003-02-11 17:33  PeterB
+
+	* src/balsa-index-threading.c: Really try to avoid loops in the
+	thread tree.
+
 2003-02-11  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: aspell-0.50 library is called libaspell (bug 105763).

@@ -1,3 +1,9 @@
+2003-01-09  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/Makefile.am: remove removed balsa-index-threading.h
+	* libbalsa/address-entry.[hc]: handle UTF-8 characters in
+	address_entry better (bug 102958).
+
 2003-01-08  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/mailbox-filter.c: correct errors.

@@ -991,10 +991,11 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
      * Normal character needs deleting.
      */
     } else {
-        gchar *p;
-        for (p = addy->user + addy->cursor - 1; *p; ++p)
-            *p = *(p + 1);
-	addy->cursor--;
+        gchar *src= addy->user + addy->cursor, *dest = g_utf8_prev_char(src);
+	int chlen = dest-src;
+        while( (*dest++ = *src++) )
+	    ;
+	addy->cursor += chlen;
 	if (*addy->user == '\0')
 	    libbalsa_force_no_match(addy);
 	else if (address_entry->find_match)
@@ -1067,9 +1068,9 @@ libbalsa_delete_forward_character(LibBalsaAddressEntry *address_entry)
      * Normal character needs deleting.
      */
     } else {
-        gchar *p;
-        for (p = addy->user + addy->cursor; *p; ++p)
-            *p = *(p + 1);
+        gchar *dest= addy->user + addy->cursor, *src = g_utf8_next_char(dest);
+        while( (*dest++ = *src++) )
+	    ;
     }
 }
 
@@ -1224,7 +1225,7 @@ libbalsa_move_backward_character(LibBalsaAddressEntry *address_entry)
 
     addy = address_entry->active->data;
     if (addy->cursor > 0) {
-	addy->cursor--;
+	addy->cursor = g_utf8_prev_char(addy->user + addy->cursor)-addy->user;
 	libbalsa_force_no_match(addy);
     } else if (g_list_previous(address_entry->active)) {
 	address_entry->active = g_list_previous(address_entry->active);
@@ -1253,7 +1254,7 @@ libbalsa_move_forward_character(LibBalsaAddressEntry *address_entry)
 
     addy = address_entry->active->data;
     if (addy->user[addy->cursor]) {
-	addy->cursor++;
+	addy->cursor = g_utf8_next_char(addy->user + addy->cursor)-addy->user;
 	libbalsa_force_no_match(addy);
     } else if ((list = g_list_next(address_entry->active))) {
 	address_entry->active = list;
@@ -1423,7 +1424,7 @@ libbalsa_keystroke_add_key(LibBalsaAddressEntry *address_entry, gchar *add)
      */
     libbalsa_emailData_set_user(addy, g_strconcat(left, add, right, NULL));
     g_free(left);
-    addy->cursor++;
+    addy->cursor += strlen(add);
 
     /*
      * Now search for (any) match.
@@ -1779,9 +1780,14 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
 	 list = g_list_next(list)) {
 	addy = (emailData *)list->data;
 	g_assert(addy != NULL);
-        if (list == address_entry->active)
-            cursor = end = show->len + addy->cursor;
-        g_string_append(show, addy->user);
+        if (list == address_entry->active) {
+	    int curbyte = show->len + addy->cursor;
+	    g_string_append(show, addy->user);
+            cursor = end = 
+		g_utf8_pointer_to_offset(show->str,
+					 show->str + curbyte);
+	} else g_string_append(show, addy->user);
+
 	if (addy->match) {
 	    g_string_append(show, " (");
 	    g_string_append(show, addy->match);

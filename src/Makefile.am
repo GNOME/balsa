@@ -10,7 +10,6 @@ balsa_BASE_SRCLIST =	\
 	balsa-icons.c		\
 	balsa-icons.h		\
 	balsa-index-threading.c	\
-	balsa-index-threading.h	\
 	balsa-index.c		\
 	balsa-index.h		\
 	balsa-mblist.c		\

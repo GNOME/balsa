@@ -862,6 +862,7 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 	message->body_ref++;
     }
     UNLOCK_MAILBOX(message->mailbox);
+#endif /* OLD_CODE */
     
     /*
      * emit read message
@@ -872,7 +873,6 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 	libbalsa_messages_read(messages, TRUE);
 	g_list_free(messages);
     }
-#endif /* OLD_CODE */
     return TRUE;
 }
 

@@ -87,7 +87,7 @@ struct _MailboxConfWindow
     GtkWidget *pop_password;
     GtkWidget *pop_check;
     GtkWidget *pop_delete_from_server;
-    GtkWidget *pop_apop;
+    GtkWidget *pop_use_apop;
   };
 
 static MailboxConfWindow *mcw;
@@ -398,6 +398,8 @@ mailbox_conf_set_values (LibBalsaMailbox * mailbox)
     if ( server->passwd )
       gtk_entry_set_text (GTK_ENTRY (mcw->pop_password), server->passwd);
 
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_use_apop), 
+				  pop3->use_apop);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_check), 
 				  pop3->check);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server), 
@@ -584,6 +586,7 @@ conf_update_mailbox (LibBalsaMailbox * mailbox, gchar * old_mbox_pkey)
 			     gtk_entry_get_text(GTK_ENTRY(mcw->pop_server)),
 			     atoi(gtk_entry_get_text(GTK_ENTRY(mcw->pop_port))));
 
+    mb_pop3->use_apop = GTK_TOGGLE_BUTTON (mcw->pop_use_apop)->active;
     mb_pop3->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
     mb_pop3->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
     
@@ -925,7 +928,7 @@ create_pop_mailbox_page (void)
   GtkWidget *table;
   GtkWidget *label;
 
-  return_widget = table = gtk_table_new (7, 2, FALSE);
+  return_widget = table = gtk_table_new (8, 2, FALSE);
   gtk_widget_show (table);
 
   /* mailbox name */
@@ -1015,10 +1018,18 @@ create_pop_mailbox_page (void)
   gtk_entry_set_visibility (GTK_ENTRY (mcw->pop_password), FALSE);
   gtk_widget_show (mcw->pop_password);
 
+  /* toggle for apop */
+
+  mcw->pop_use_apop = gtk_check_button_new_with_label (_("Use APOP"));
+  gtk_table_attach (GTK_TABLE (table), mcw->pop_use_apop, 0, 2, 5, 6,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (mcw->pop_use_apop);
+
   /* toggle for check */
 
   mcw->pop_check = gtk_check_button_new_with_label (_("Check"));
-  gtk_table_attach (GTK_TABLE (table), mcw->pop_check, 0, 2, 5, 6,
+  gtk_table_attach (GTK_TABLE (table), mcw->pop_check, 0, 2, 6, 7,
 		    GTK_FILL, GTK_FILL,
 		    10, 10);
   gtk_widget_show (mcw->pop_check);
@@ -1026,7 +1037,7 @@ create_pop_mailbox_page (void)
   /* toggle for deletion from server */
 
   mcw->pop_delete_from_server = gtk_check_button_new_with_label (_("Delete from server"));
-  gtk_table_attach (GTK_TABLE (table), mcw->pop_delete_from_server, 0, 2, 6, 7,
+  gtk_table_attach (GTK_TABLE (table), mcw->pop_delete_from_server, 0, 2, 7, 8,
 		    GTK_FILL, GTK_FILL,
 		    10, 10);
   gtk_widget_show (mcw->pop_delete_from_server);

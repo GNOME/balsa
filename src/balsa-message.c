@@ -320,6 +320,8 @@ balsa_message_set (BalsaMessage * bmessage,
       gtk_object_destroy (GTK_OBJECT (bmessage->body));
     }
 
+  gnome_canvas_scroll_to (GNOME_CANVAS (bmessage), 0, 0);
+
   headers2canvas (bmessage, message);
   body2canvas (bmessage, message);
   bm_group = GNOME_CANVAS_GROUP (GNOME_CANVAS (bmessage)->root);

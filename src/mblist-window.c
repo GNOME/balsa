@@ -151,10 +151,10 @@ balsa_mailbox_list_window_new(BalsaWindow * window)
 
 /* mblist_open_mailbox
  * 
- * Description: This checks to see if the mailbox is already open and
- * just on a different mailbox page, or if a new page needs to be
- * created and the mailbox parsed.
- * */
+ * Description: This checks to see if the mailbox is already on a different
+ * mailbox page, or if a new page needs to be created and the mailbox
+ * parsed.
+ */
 void
 mblist_open_mailbox(LibBalsaMailbox * mailbox)
 {
@@ -174,54 +174,46 @@ mblist_open_mailbox(LibBalsaMailbox * mailbox)
 	g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use);
     }
 
-    if (mailbox->open_ref) {
-	i = balsa_find_notebook_page_num(mailbox);
-	if (i != -1) {
-	    gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook), i);
-	    page =
-		gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),
-					  i);
-	    page = gtk_object_get_data(GTK_OBJECT(page), "indexpage");
-	    g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use);
-
+    i = balsa_find_notebook_page_num(mailbox);
+    if (i != -1) {
+	gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook), i);
+	page =
+	    gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),
+				      i);
+	page = gtk_object_get_data(GTK_OBJECT(page), "indexpage");
+	g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use);
+	
 /* This nasty looking piece of code is for the column resizing patch, it needs
    to change the size of the columns before they get displayed.  To do this we
    need to get the reference to the index page, which gives us a reference to
    the index, which gives us the clist, which we then reference.  Looks ugly
    but works well. */
-	    gtk_clist_set_column_width(GTK_CLIST
-				       ((BALSA_INDEX_PAGE(page)->index)),
-				       0, balsa_app.index_num_width);
-	    gtk_clist_set_column_width(GTK_CLIST
-				       ((BALSA_INDEX_PAGE(page)->index)),
-				       1, balsa_app.index_status_width);
-	    gtk_clist_set_column_width(GTK_CLIST
-				       ((BALSA_INDEX_PAGE(page)->index)),
-				       2,
-				       balsa_app.index_attachment_width);
-	    gtk_clist_set_column_width(GTK_CLIST
-				       ((BALSA_INDEX_PAGE(page)->index)),
-				       3, balsa_app.index_from_width);
-	    gtk_clist_set_column_width(GTK_CLIST
-				       ((BALSA_INDEX_PAGE(page)->index)),
-				       4, balsa_app.index_subject_width);
-	    gtk_clist_set_column_width(GTK_CLIST
-				       ((BALSA_INDEX_PAGE(page)->index)),
-				       5, balsa_app.index_date_width);
+	gtk_clist_set_column_width(GTK_CLIST
+				   ((BALSA_INDEX_PAGE(page)->index)),
+				   0, balsa_app.index_num_width);
+	gtk_clist_set_column_width(GTK_CLIST
+				   ((BALSA_INDEX_PAGE(page)->index)),
+				   1, balsa_app.index_status_width);
+	gtk_clist_set_column_width(GTK_CLIST
+				   ((BALSA_INDEX_PAGE(page)->index)),
+				   2,
+				   balsa_app.index_attachment_width);
+	gtk_clist_set_column_width(GTK_CLIST
+				   ((BALSA_INDEX_PAGE(page)->index)),
+				   3, balsa_app.index_from_width);
+	gtk_clist_set_column_width(GTK_CLIST
+				   ((BALSA_INDEX_PAGE(page)->index)),
+				   4, balsa_app.index_subject_width);
+	gtk_clist_set_column_width(GTK_CLIST
+				   ((BALSA_INDEX_PAGE(page)->index)),
+				   5, balsa_app.index_date_width);
+    } else { /* page with mailbox not found, open it */
+	balsa_window_open_mailbox(BALSA_WINDOW(mblw->window), mailbox);
 
-	    balsa_mblist_have_new(BALSA_MBLIST(mblw->ctree));
-	    return;
-	}
+	if (balsa_app.mblist->display_content_info)
+	    balsa_mblist_update_mailbox(balsa_app.mblist, mailbox);
     }
-
-    balsa_window_open_mailbox(BALSA_WINDOW(mblw->window), mailbox);
-
-    balsa_window_set_cursor(BALSA_WINDOW(mblw->window), NULL);
-
-    if (balsa_app.mblist->display_content_info) {
-	balsa_mblist_update_mailbox(balsa_app.mblist, mailbox);
-    }
-
+    
     balsa_mblist_have_new(BALSA_MBLIST(mblw->ctree));
 }
 

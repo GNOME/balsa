@@ -8,8 +8,9 @@
 	implemented as macro on Solaris and doesn't like char parameters.
 	* src/sendmsg-window.c: add Russian KOI support thrown away earlier 
 	by mistake.
-	* src/balsa-message.c: korean language support fixed.
+	* src/balsa-message.[hc]: korean language support fixed.
 	* INSTALL, README: warn about the libgnome bug and RH 7.0 gcc issues.
+	* src/mblist-window.c: mailbox reference cleaning.
 	
 2000-10-18  Pawel Salek <pawsa@theochem.kth.se>
 

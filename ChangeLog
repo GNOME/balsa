@@ -1,3 +1,12 @@
+2001-05-27  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Phase out imlib and replace it with gdk-pixbuf. The only
+	dependency is now gnome-druid code in libinit_balsa.
+	* src/filter-edit-callbacks.c:
+	* src/filter-edit-dialog.c: provide gdk-pixbuf alternative to
+	imlib functions.
+	* src/main-window.c: clean up imlib/gdk-pixbuf code.
+
 2001-05-26  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-message.c: clean BalsaPartInfo (de)allocation.

@@ -2322,20 +2322,18 @@ set_icon(GnomeApp * app)
     if( (filename = balsa_pixmap_finder("balsa/balsa_icon.png")) ) {
 #ifdef USE_PIXBUF
 	pb = gdk_pixbuf_new_from_file(filename);
+        gdk_window_clear(ic_win);
+	gdk_pixbuf_unref(pb);
 #else
 	im = gdk_imlib_load_image(filename);
 	gdk_imlib_render(im, att.width, att.height);
 	pmap = gdk_imlib_move_image(im);
 	mask = gdk_imlib_move_mask(im);
 	gdk_window_set_back_pixmap(ic_win, pmap, FALSE);
-#endif
         gdk_window_clear(ic_win);
-#ifndef USE_PIXBUF
 	gdk_window_shape_combine_mask(ic_win, mask, 0, 0);
 	gdk_imlib_free_pixmap(pmap);
 	gdk_imlib_destroy_image(im);
-#else
-	gdk_pixbuf_unref(pb);
 #endif
 	g_free(filename);
     }

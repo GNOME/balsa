@@ -21,6 +21,9 @@
 
 #include "config.h"
 #include <gnome.h>
+#ifdef USE_PIXBUF
+#include <gdk-pixbuf/gdk-pixbuf.h>
+#endif
 #include "balsa-app.h"
 #include "filter.h"
 #include "filter-edit.h"
@@ -145,8 +148,13 @@ build_left_side(GtkWidget ** clist_ptr)
     vbox = gtk_vbox_new(FALSE, 2);
 
     /* the clist */
+#ifdef USE_PIXBUF
+    gtk_widget_push_visual(gdk_rgb_get_visual());
+    gtk_widget_push_colormap(gdk_rgb_get_cmap());
+#else
     gtk_widget_push_visual(gdk_imlib_get_visual());
     gtk_widget_push_colormap(gdk_imlib_get_colormap());
+#endif
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),

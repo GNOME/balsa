@@ -164,10 +164,13 @@ balsa_information_dialog(GtkWindow *parent, LibBalsaInformationType type,
         break;
     }
 
+    /* Use explicit format so that message_dialog does not try to interpret
+     * the message string. */
     messagebox =
         gtk_message_dialog_new(GTK_WINDOW(parent),
                                GTK_DIALOG_DESTROY_WITH_PARENT,
-                               message_type, GTK_BUTTONS_CLOSE, msg);
+                               message_type, GTK_BUTTONS_CLOSE,
+                               "%s", msg);
 
     gtk_dialog_run(GTK_DIALOG(messagebox));
     gtk_widget_destroy(messagebox);

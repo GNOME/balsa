@@ -2446,7 +2446,7 @@ display_new_mail_notification(int num_new)
                                             * Balsa's main window */
                                      (GtkDialogFlags) 0,
                                      GTK_MESSAGE_INFO,
-                                     GTK_BUTTONS_OK, msg);
+                                     GTK_BUTTONS_OK, "%s", msg);
         gtk_window_set_title(GTK_WINDOW(dlg), _("Balsa: New mail"));
         gtk_window_set_wmclass(GTK_WINDOW(dlg), "new_mail_dialog",
                                "Balsa");

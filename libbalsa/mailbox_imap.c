@@ -676,7 +676,7 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap,
     if (rc != IMR_OK) {
 	gchar *msg = imap_mbox_handle_get_last_msg(mimap->handle);
 	g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_OPEN_ERROR,
-		    msg);
+		    "%s", msg);
 	g_free(msg);
 	RELEASE_HANDLE(mimap, mimap->handle);
         mimap->handle = NULL;

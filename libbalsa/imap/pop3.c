@@ -186,7 +186,7 @@ pop_check_status(PopHandle *pop, GError **err)
 
   if(!res) {
     buf[POP_LINE_LEN-1] = '\0';
-    g_set_error(err, IMAP_ERROR, IMAP_POP_PROTOCOL_ERROR, buf);
+    g_set_error(err, IMAP_ERROR, IMAP_POP_PROTOCOL_ERROR, "%s", buf);
   }
 
   return res;

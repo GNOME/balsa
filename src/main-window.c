@@ -1439,9 +1439,8 @@ balsa_close_mailbox_on_timer(GtkWidget * widget, gpointer * data)
         if (time > (balsa_app.close_mailbox_timeout * 60)) {
             if (balsa_app.debug)
                 fprintf(stderr, "Closing Page %d, time: %d\n", i, time);
-            gtk_notebook_remove_page(GTK_NOTEBOOK(balsa_app.notebook), i);
             unregister_open_mailbox(index->mailbox_node->mailbox);
-            gtk_object_destroy(GTK_OBJECT(page));
+            gtk_notebook_remove_page(GTK_NOTEBOOK(balsa_app.notebook), i);
             if (i < c)
                 c--;
             i--;

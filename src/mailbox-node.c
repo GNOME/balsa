@@ -154,7 +154,7 @@ balsa_mailbox_node_destroy(GtkObject * object)
 
     mn->parent  = NULL; 
     if(mn->mailbox) {
-	gtk_object_unref(GTK_OBJECT(mn->mailbox)); mn->mailbox = NULL;
+	g_object_unref(G_OBJECT(mn->mailbox)); mn->mailbox = NULL;
     }
     g_free(mn->name);          mn->name = NULL;
     g_free(mn->dir);           mn->dir = NULL;
@@ -256,8 +256,6 @@ balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox * mb)
     BalsaMailboxNode *mbn;
     mbn = BALSA_MAILBOX_NODE(balsa_mailbox_node_new());
     mbn->mailbox = mb;
-    gtk_object_ref(GTK_OBJECT(mb));
-    gtk_object_sink(GTK_OBJECT(mb));
     gtk_signal_connect(GTK_OBJECT(mbn), "show-prop-dialog", 
 		       GTK_SIGNAL_FUNC(mailbox_conf_edit), NULL);
     return mbn;
@@ -356,7 +354,7 @@ balsa_mailbox_node_new_imap(LibBalsaServer* s, const char*p)
     g_assert(s);
 
     folder->mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
-    gtk_object_ref(GTK_OBJECT(folder->mailbox));
+    g_object_ref(G_OBJECT(folder->mailbox));
     libbalsa_mailbox_remote_set_server(
 	LIBBALSA_MAILBOX_REMOTE(folder->mailbox), s);
     libbalsa_mailbox_imap_set_path(LIBBALSA_MAILBOX_IMAP(folder->mailbox), p);
@@ -764,7 +762,7 @@ add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
 	if (balsa_app.debug)
 	    g_print(_("Local mailbox %s loaded as: %s\n"),
 		    mailbox->name,
-		    gtk_type_name(GTK_OBJECT_TYPE(mailbox)));
+		    g_type_name(G_OBJECT_TYPE(mailbox)));
     }
     g_free(url);
     /* no type checking, parent is NULL for root */
@@ -915,8 +913,6 @@ add_imap_mailbox(GNode*root, const char* fn, char delim, gboolean scanned)
     LIBBALSA_MAILBOX(m)->name = mbnode->name;
     mbnode->name = NULL;
     mbnode->mailbox = LIBBALSA_MAILBOX(m);
-    gtk_object_ref(GTK_OBJECT(m));
-    gtk_object_sink(GTK_OBJECT(m));
 
     return node;
 }

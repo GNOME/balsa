@@ -402,20 +402,17 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 	libbalsa_lock_mutt();
 	mutt_write_fcc(libbalsa_mailbox_local_get_path(outbox),
 		       mqi->message, NULL, 0, NULL);
-	libbalsa_unlock_mutt();
-	if (fccbox && (LIBBALSA_IS_MAILBOX_LOCAL(fccbox)
-		|| LIBBALSA_IS_MAILBOX_IMAP(fccbox))) {
-	    libbalsa_lock_mutt();
+	if (fccbox) {
 	    if (LIBBALSA_IS_MAILBOX_LOCAL(fccbox))
-	    mutt_write_fcc(libbalsa_mailbox_local_get_path(fccbox),
-			   mqi->message, NULL, 0, NULL);
+	        mutt_write_fcc(libbalsa_mailbox_local_get_path(fccbox),
+			       mqi->message, NULL, 0, NULL);
 	    else if (LIBBALSA_IS_MAILBOX_IMAP(fccbox))
                 write_remote_fcc(fccbox, mqi->message);
-
-	    libbalsa_unlock_mutt();
-	    libbalsa_mailbox_check(fccbox);
 	}
+	libbalsa_unlock_mutt();
 	libbalsa_mailbox_check(outbox);
+        if (fccbox)
+	    libbalsa_mailbox_check(fccbox);
     } 
     unset_option(OPTWRITEBCC);
     msg_queue_item_destroy(mqi);

@@ -608,7 +608,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
 	    libbalsa_mailbox_close(bsm->orig_message->mailbox);
         /* check again! */
 	if (bsm->orig_message->mailbox)
-	    gtk_object_unref(GTK_OBJECT(bsm->orig_message->mailbox));
+	    g_object_unref(G_OBJECT(bsm->orig_message->mailbox));
 	gtk_object_unref(GTK_OBJECT(bsm->orig_message));
     }
 
@@ -2554,7 +2554,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	*/
 	if (message->mailbox) {
 	    libbalsa_mailbox_open(message->mailbox);
-            gtk_object_ref(GTK_OBJECT(message->mailbox));
+            g_object_ref(G_OBJECT(message->mailbox));
         }
     }
     msg->window = window;
@@ -3136,16 +3136,13 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 					   balsa_app.encoding_style,
 					   bsmsg->flow); 
 #endif
-    if (successful) {
+    if (successful && bsmsg->orig_message) {
 	if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
 	    bsmsg->type == SEND_REPLY_GROUP) {
-	    if (bsmsg->orig_message)
-		libbalsa_message_reply(bsmsg->orig_message);
+	    libbalsa_message_reply(bsmsg->orig_message);
 	} else if (bsmsg->type == SEND_CONTINUE) {
-	    if (bsmsg->orig_message) {
-		libbalsa_message_delete(bsmsg->orig_message, TRUE);
-		balsa_index_sync_backend(bsmsg->orig_message->mailbox);
-	    }
+	    libbalsa_message_delete(bsmsg->orig_message, TRUE);
+	    balsa_index_sync_backend(bsmsg->orig_message->mailbox);
 	}
     }
 
@@ -3252,7 +3249,7 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 		libbalsa_mailbox_close(bsmsg->orig_message->mailbox);
             /* check again! */
 	    if(bsmsg->orig_message->mailbox)
-	        gtk_object_unref(GTK_OBJECT(bsmsg->orig_message->mailbox));
+	        g_object_unref(G_OBJECT(bsmsg->orig_message->mailbox));
 	    gtk_object_unref(GTK_OBJECT(bsmsg->orig_message));
 	}
 	bsmsg->type=SEND_CONTINUE;

@@ -223,7 +223,7 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
     config_mailbox_add(mailbox, specialNames[which]);
 
     *special = mailbox;
-    gtk_object_ref(GTK_OBJECT(mailbox));
+    g_object_ref(G_OBJECT(mailbox));
     if(do_rescan_for) balsa_mailbox_local_rescan_parent(do_rescan_for);
 }
 
@@ -428,7 +428,7 @@ config_mailbox_init(const gchar * prefix)
             special = FALSE;
 
 	if (special)
-            gtk_object_ref(GTK_OBJECT(mailbox));
+            g_object_ref(G_OBJECT(mailbox));
     }
     return TRUE;
 }				/* config_mailbox_init */

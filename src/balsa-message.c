@@ -240,6 +240,7 @@ balsa_message_init(BalsaMessage * bm)
 
     /* Widget to hold headers */
     bm->header_text = gtk_text_view_new();
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(bm->header_text), FALSE);
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(bm->header_text), 2);
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(bm->header_text), 2);
     gtk_signal_connect(GTK_OBJECT(bm->header_text), "key_press_event",

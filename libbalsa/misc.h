@@ -63,6 +63,12 @@ gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 				gboolean rfc2646);
 #endif
+void libbalsa_marshal_BOOLEAN__VOID(GClosure *closure,
+                                    GValue *return_value,
+                                    guint n_param_values,
+                                    const GValue *param_values,
+                                    gpointer invocation_hint,
+                                    gpointer marshal_data);
 void libbalsa_marshal_POINTER__VOID(GClosure *closure,
                                     GValue *return_value,
                                     guint n_param_values,

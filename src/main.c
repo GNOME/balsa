@@ -510,11 +510,11 @@ balsa_cleanup(void)
     g_node_destroy(balsa_app.mailbox_nodes);
     balsa_app.mailbox_nodes = NULL;
     balsa_mailbox_nodes_unlock(TRUE);
-    gtk_object_unref(GTK_OBJECT(balsa_app.inbox));
-    gtk_object_unref(GTK_OBJECT(balsa_app.outbox));
-    gtk_object_unref(GTK_OBJECT(balsa_app.sentbox));
-    gtk_object_unref(GTK_OBJECT(balsa_app.draftbox));
-    gtk_object_unref(GTK_OBJECT(balsa_app.trash));
+    g_object_unref(G_OBJECT(balsa_app.inbox));
+    g_object_unref(G_OBJECT(balsa_app.outbox));
+    g_object_unref(G_OBJECT(balsa_app.sentbox));
+    g_object_unref(G_OBJECT(balsa_app.draftbox));
+    g_object_unref(G_OBJECT(balsa_app.trash));
     gnome_sound_shutdown();
     libbalsa_imap_close_all_connections();
     /* g_slist_free(opt_attach_list); */

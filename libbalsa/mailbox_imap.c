@@ -55,7 +55,7 @@
 
 static LibBalsaMailboxClass *parent_class = NULL;
 
-static void libbalsa_mailbox_imap_destroy(GtkObject * object);
+static void libbalsa_mailbox_imap_finalize(GObject * object);
 static void libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass *
 					     klass);
 static void libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox);
@@ -90,25 +90,28 @@ static void server_host_settings_changed_cb(LibBalsaServer * server,
 					    LibBalsaMailbox * mailbox);
 
 
-GtkType libbalsa_mailbox_imap_get_type(void)
+GType
+libbalsa_mailbox_imap_get_type(void)
 {
-    static GtkType mailbox_type = 0;
+    static GType mailbox_type = 0;
 
     if (!mailbox_type) {
-	static const GtkTypeInfo mailbox_info = {
-	    "LibBalsaMailboxImap",
-	    sizeof(LibBalsaMailboxImap),
+	static const GTypeInfo mailbox_info = {
 	    sizeof(LibBalsaMailboxImapClass),
-	    (GtkClassInitFunc) libbalsa_mailbox_imap_class_init,
-	    (GtkObjectInitFunc) libbalsa_mailbox_imap_init,
-	    /* reserved_1 */ NULL,
-	    /* reserved_2 */ NULL,
-	    (GtkClassInitFunc) NULL,
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) libbalsa_mailbox_imap_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(LibBalsaMailboxImap),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) libbalsa_mailbox_imap_init
 	};
 
 	mailbox_type =
-	    gtk_type_unique(libbalsa_mailbox_remote_get_type(),
-			    &mailbox_info);
+	    g_type_register_static(LIBBALSA_TYPE_MAILBOX_REMOTE,
+	                           "LibBalsaMailboxImap",
+			           &mailbox_info, 0);
     }
 
     return mailbox_type;
@@ -117,15 +120,15 @@ GtkType libbalsa_mailbox_imap_get_type(void)
 static void
 libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
 {
-    GtkObjectClass *object_class;
+    GObjectClass *object_class;
     LibBalsaMailboxClass *libbalsa_mailbox_class;
 
-    object_class = GTK_OBJECT_CLASS(klass);
+    object_class = G_OBJECT_CLASS(klass);
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
 
-    parent_class = gtk_type_class(libbalsa_mailbox_remote_get_type());
+    parent_class = g_type_class_peek_parent(klass);
 
-    object_class->destroy = libbalsa_mailbox_imap_destroy;
+    object_class->finalize = libbalsa_mailbox_imap_finalize;
 
     libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_imap_open;
     libbalsa_mailbox_class->open_mailbox_append = libbalsa_mailbox_imap_append;
@@ -154,27 +157,27 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox)
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server =
 	LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_IMAP));
-    gtk_object_ref(GTK_OBJECT(remote->server));
+    g_object_ref(G_OBJECT(remote->server));
     gtk_object_sink(GTK_OBJECT(remote->server));
 
-    gtk_signal_connect(GTK_OBJECT(remote->server), "set-username",
-		       GTK_SIGNAL_FUNC(server_user_settings_changed_cb),
-		       (gpointer) mailbox);
-    gtk_signal_connect(GTK_OBJECT(remote->server), "set-password",
-		       GTK_SIGNAL_FUNC(server_user_settings_changed_cb),
-		       (gpointer) mailbox);
-    gtk_signal_connect(GTK_OBJECT(remote->server), "set-host",
-		       GTK_SIGNAL_FUNC(server_host_settings_changed_cb),
-		       (gpointer) mailbox);
+    g_signal_connect(G_OBJECT(remote->server), "set-username",
+		     G_CALLBACK(server_user_settings_changed_cb),
+		     (gpointer) mailbox);
+    g_signal_connect(G_OBJECT(remote->server), "set-password",
+		     G_CALLBACK(server_user_settings_changed_cb),
+		     (gpointer) mailbox);
+    g_signal_connect(G_OBJECT(remote->server), "set-host",
+		     G_CALLBACK(server_host_settings_changed_cb),
+		     (gpointer) mailbox);
 }
 
-/* libbalsa_mailbox_imap_destroy:
+/* libbalsa_mailbox_imap_finalize:
    NOTE: we have to close mailbox ourselves without waiting for
-   LibBalsaMailbox::destroy because we want to destroy server as well,
+   LibBalsaMailbox::finalize because we want to destroy server as well,
    and close requires server for proper operation.  
 */
 static void
-libbalsa_mailbox_imap_destroy(GtkObject * object)
+libbalsa_mailbox_imap_finalize(GObject * object)
 {
     LibBalsaMailboxImap *mailbox;
     LibBalsaMailboxRemote *remote;
@@ -192,21 +195,21 @@ libbalsa_mailbox_imap_destroy(GtkObject * object)
     g_free(mailbox->path); mailbox->path = NULL;
 
     if(remote->server) {
-	gtk_object_unref(GTK_OBJECT(remote->server));
+	g_object_unref(G_OBJECT(remote->server));
 	remote->server = NULL;
     }
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
+    if (G_OBJECT_CLASS(parent_class)->finalize)
+	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
-GtkObject *
+GObject *
 libbalsa_mailbox_imap_new(void)
 {
     LibBalsaMailbox *mailbox;
-    mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_IMAP);
+    mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_IMAP, NULL);
 
-    return GTK_OBJECT(mailbox);
+    return G_OBJECT(mailbox);
 }
 
 /* libbalsa_mailbox_imap_update_url:

@@ -530,6 +530,7 @@ ask_cert_real(X509 *cert)
                                          _("Accept&_Save"), 1,
                                          _("_Reject"), GTK_RESPONSE_CANCEL, 
                                          NULL);
+    gtk_window_set_wmclass(GTK_WINDOW(dialog), "tls_cert_dialog", "Balsa");
     label = gtk_label_new(str->str);
     g_string_free(str, TRUE);
     gtk_label_set_use_markup(GTK_LABEL(label), TRUE);

@@ -23,13 +23,20 @@
 #ifndef __LIBBALSA_MAILBOX_POP3_H__
 #define __LIBBALSA_MAILBOX_POP3_H__
 
-#define LIBBALSA_TYPE_MAILBOX_POP3			(libbalsa_mailbox_pop3_get_type())
-#define LIBBALSA_MAILBOX_POP3(obj)			(GTK_CHECK_CAST (obj, LIBBALSA_TYPE_MAILBOX_POP3, LibBalsaMailboxPop3))
-#define LIBBALSA_MAILBOX_POP3_CLASS(klass)		(GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_MAILBOX_POP3, LibBalsaMailboxPop3Class))
-#define LIBBALSA_IS_MAILBOX_POP3(obj)		        (GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_MAILBOX_POP3))
-#define LIBBALSA_IS_MAILBOX_POP3_CLASS(klass)	        (GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_MAILBOX_POP3))
+#define LIBBALSA_TYPE_MAILBOX_POP3 \
+    (libbalsa_mailbox_pop3_get_type())
+#define LIBBALSA_MAILBOX_POP3(obj) \
+    (G_TYPE_CHECK_INSTANCE_CAST ((obj), LIBBALSA_TYPE_MAILBOX_POP3, \
+                                 LibBalsaMailboxPop3))
+#define LIBBALSA_MAILBOX_POP3_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX_POP3, \
+                              LibBalsaMailboxPop3Class))
+#define LIBBALSA_IS_MAILBOX_POP3(obj) \
+    (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_POP3))
+#define LIBBALSA_IS_MAILBOX_POP3_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_POP3))
 
-GtkType libbalsa_mailbox_pop3_get_type(void);
+GType libbalsa_mailbox_pop3_get_type(void);
 
 typedef struct _LibBalsaMailboxPop3 LibBalsaMailboxPop3;
 typedef struct _LibBalsaMailboxPop3Class LibBalsaMailboxPop3Class;
@@ -49,7 +56,7 @@ struct _LibBalsaMailboxPop3Class {
     LibBalsaMailboxRemoteClass klass;
 };
 
-GtkObject *libbalsa_mailbox_pop3_new(void);
+GObject *libbalsa_mailbox_pop3_new(void);
 void libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox, LibBalsaMailbox *inbox);
 
 #endif				/* __LIBBALSA_MAILBOX_POP3_H__ */

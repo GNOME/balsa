@@ -52,7 +52,7 @@ static LibBalsaMailboxClass *parent_class = NULL;
 
 static void libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass *klass);
 static void libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox);
-static void libbalsa_mailbox_local_destroy(GtkObject * object);
+static void libbalsa_mailbox_local_finalize(GObject * object);
 
 static gboolean libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox);
 static LibBalsaMailboxAppendHandle*
@@ -64,24 +64,28 @@ static void libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
 
-GtkType libbalsa_mailbox_local_get_type(void)
+GType
+libbalsa_mailbox_local_get_type(void)
 {
-    static GtkType mailbox_type = 0;
+    static GType mailbox_type = 0;
 
     if (!mailbox_type) {
-	static const GtkTypeInfo mailbox_info = {
-	    "LibBalsaMailboxLocal",
-	    sizeof(LibBalsaMailboxLocal),
+	static const GTypeInfo mailbox_info = {
 	    sizeof(LibBalsaMailboxLocalClass),
-	    (GtkClassInitFunc) libbalsa_mailbox_local_class_init,
-	    (GtkObjectInitFunc) libbalsa_mailbox_local_init,
-	    /* reserved_1 */ NULL,
-	    /* reserved_2 */ NULL,
-	    (GtkClassInitFunc) NULL,
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+	    (GClassInitFunc) libbalsa_mailbox_local_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+	    sizeof(LibBalsaMailboxLocal),
+            0,                  /* n_preallocs */
+	    (GInstanceInitFunc) libbalsa_mailbox_local_init
 	};
 
 	mailbox_type =
-	    gtk_type_unique(libbalsa_mailbox_get_type(), &mailbox_info);
+	    g_type_register_static(LIBBALSA_TYPE_MAILBOX,
+	                           "LibBalsaMailboxLocal",
+                                   &mailbox_info, 0);
     }
 
     return mailbox_type;
@@ -90,23 +94,24 @@ GtkType libbalsa_mailbox_local_get_type(void)
 static void
 libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 {
-    GtkObjectClass *object_class;
+    GObjectClass *object_class;
     LibBalsaMailboxClass *libbalsa_mailbox_class;
 
-    object_class = GTK_OBJECT_CLASS(klass);
+    object_class = G_OBJECT_CLASS(klass);
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
 
-    parent_class = gtk_type_class(libbalsa_mailbox_get_type());
+    parent_class = g_type_class_peek_parent(klass);
 
     libbalsa_mailbox_local_signals[REMOVE_FILES] =
-	gtk_signal_new("remove-files",
-		       GTK_RUN_LAST,
-		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaMailboxLocalClass,
-					 remove_files),
-		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
+	g_signal_new("remove-files",
+                     G_TYPE_FROM_CLASS(object_class),
+		     G_SIGNAL_RUN_LAST,
+		     G_STRUCT_OFFSET(LibBalsaMailboxLocalClass,
+				     remove_files),
+                     NULL, NULL,
+		     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
-    object_class->destroy = libbalsa_mailbox_local_destroy;
+    object_class->finalize = libbalsa_mailbox_local_finalize;
 
     libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_local_open;
     libbalsa_mailbox_class->open_mailbox_append 
@@ -126,10 +131,10 @@ libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox)
 {
 }
 
-GtkObject *
+GObject *
 libbalsa_mailbox_local_new(const gchar * path, gboolean create)
 {
-    GtkType magic_type = libbalsa_mailbox_type_from_path(path);
+    GType magic_type = libbalsa_mailbox_type_from_path(path);
 
     if(magic_type == LIBBALSA_TYPE_MAILBOX_MBOX)
 	return libbalsa_mailbox_mbox_new(path, create);
@@ -166,7 +171,7 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 
     if ( LIBBALSA_MAILBOX(mailbox)->url != NULL ) {
 	const gchar* cur_path = libbalsa_mailbox_local_get_path(mailbox);
-	if (g_strcasecmp(path, cur_path) == 0)
+	if (g_ascii_strcasecmp(path, cur_path) == 0)
 	    return 0;
 	else 
 	    i = rename(cur_path, path);
@@ -195,13 +200,13 @@ libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox)
 {
     g_return_if_fail (LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
 
-    gtk_signal_emit(GTK_OBJECT(mailbox),
-		    libbalsa_mailbox_local_signals[REMOVE_FILES]);
+    g_signal_emit(G_OBJECT(mailbox),
+		  libbalsa_mailbox_local_signals[REMOVE_FILES], 0);
 
 }
 
 static void
-libbalsa_mailbox_local_destroy(GtkObject * object)
+libbalsa_mailbox_local_finalize(GObject * object)
 {
     LibBalsaMailbox *mailbox;
 
@@ -210,8 +215,8 @@ libbalsa_mailbox_local_destroy(GtkObject * object)
     mailbox = LIBBALSA_MAILBOX(object);
     libbalsa_notify_unregister_mailbox(mailbox);
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
+    if (G_OBJECT_CLASS(parent_class)->finalize)
+	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
 /* libbalsa_mailbox_local_open:

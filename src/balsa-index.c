@@ -581,7 +581,9 @@ moveto_handler(BalsaIndex * index)
         GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
 
         bndx_expand_to_path(tree_view, path);
-        gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
+        /* We'd like to scroll just far enough to make the row visible,
+         * but that's not yet implemented in GtkTreeView. */
+        gtk_tree_view_scroll_to_cell(tree_view, path, NULL, TRUE, 0.5, 0);
         gtk_tree_path_free(path);
     }
     
@@ -633,7 +635,10 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
         mailbox = index->mailbox_node->mailbox;
 
 	/* This will disconnect all of our signals */
-	gtk_signal_disconnect_by_data(GTK_OBJECT(mailbox), index);
+        g_signal_handlers_disconnect_matched(G_OBJECT(mailbox),
+                                             G_SIGNAL_MATCH_DATA,
+                                             0, 0, NULL, NULL,
+                                             index);
 	libbalsa_mailbox_close(mailbox);
 	gtk_tree_store_clear(GTK_TREE_STORE(model));
     }
@@ -652,23 +657,23 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
         gtk_tree_view_column_set_title(column, _("To"));
     }
 
-    gtk_signal_connect(GTK_OBJECT(mailbox), "message-status-changed",
-		       GTK_SIGNAL_FUNC(mailbox_message_changed_status_cb),
+    g_signal_connect(G_OBJECT(mailbox), "message-status-changed",
+		     G_CALLBACK(mailbox_message_changed_status_cb),
+		     (gpointer) index);
+    g_signal_connect_swapped(G_OBJECT(mailbox), "message-new",
+		       G_CALLBACK(mailbox_message_new_cb),
 		       (gpointer) index);
-    gtk_signal_connect_object(GTK_OBJECT(mailbox), "message-new",
-		       GTK_SIGNAL_FUNC(mailbox_message_new_cb),
+    g_signal_connect_swapped(G_OBJECT(mailbox), "messages-new",
+		       G_CALLBACK(mailbox_messages_new_cb),
 		       (gpointer) index);
-    gtk_signal_connect_object(GTK_OBJECT(mailbox), "messages-new",
-		       GTK_SIGNAL_FUNC(mailbox_messages_new_cb),
+    g_signal_connect_swapped(G_OBJECT(mailbox), "message-delete",
+		       G_CALLBACK(mailbox_message_delete_cb),
 		       (gpointer) index);
-    gtk_signal_connect_object(GTK_OBJECT(mailbox), "message-delete",
-		       GTK_SIGNAL_FUNC(mailbox_message_delete_cb),
+    g_signal_connect_swapped(G_OBJECT(mailbox), "messages-delete",
+		       G_CALLBACK(mailbox_messages_delete_cb),
 		       (gpointer) index);
-    gtk_signal_connect_object(GTK_OBJECT(mailbox), "messages-delete",
-		       GTK_SIGNAL_FUNC(mailbox_messages_delete_cb),
-		       (gpointer) index);
-    gtk_signal_connect_object(GTK_OBJECT(mailbox), "messages-delete-all",
-		       GTK_SIGNAL_FUNC(mailbox_messages_delete_all_cb),
+    g_signal_connect_swapped(G_OBJECT(mailbox), "messages-delete-all",
+		       G_CALLBACK(mailbox_messages_delete_all_cb),
 		       (gpointer) index);
 
     /* do threading */
@@ -907,7 +912,9 @@ bndx_select_path(BalsaIndex * index, GtkTreePath * path)
     gtk_tree_selection_unselect_all(selection);
     gtk_tree_selection_select_path(selection, path);
 
-    gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
+    /* We'd like to scroll just far enough to make the row visible,
+     * but that's not yet implemented in GtkTreeView. */
+    gtk_tree_view_scroll_to_cell(tree_view, path, NULL, TRUE, 0.5, 0);
 }
 
 static void
@@ -930,7 +937,9 @@ bndx_check_visibility(BalsaIndex * index, GtkTreePath * path)
             return;
     }
 
-    gtk_tree_view_scroll_to_cell(tree_view, tmp, NULL, FALSE, 0, 0);
+    /* We'd like to scroll just far enough to make the row visible,
+     * but that's not yet implemented in GtkTreeView. */
+    gtk_tree_view_scroll_to_cell(tree_view, tmp, NULL, TRUE, 0.5, 0);
     gtk_tree_path_free(tmp);
 }
 
@@ -1636,7 +1645,10 @@ balsa_index_close_and_destroy(GtkObject * obj)
 
     /*page->window references our owner */
     if (index->mailbox_node && (mailbox = index->mailbox_node->mailbox) ) {
-        gtk_signal_disconnect_by_data (GTK_OBJECT (mailbox), index);
+        g_signal_handlers_disconnect_matched(G_OBJECT(mailbox),
+                                             G_SIGNAL_MATCH_DATA,
+                                             0, 0, NULL, NULL,
+                                             index);
 	libbalsa_mailbox_close(mailbox);
 	index->mailbox_node = NULL;
     }
@@ -2482,12 +2494,15 @@ balsa_index_hide_deleted(gboolean hide)
 {
     gint i;
     GtkWidget *page;
+    GtkWidget *index;
 
     for (i = 0; (page =
                  gtk_notebook_get_nth_page(GTK_NOTEBOOK
                                            (balsa_app.notebook),
-                                           i)) != NULL; ++i)
-        hide_deleted(BALSA_INDEX(page), hide);
+                                           i)) != NULL; ++i) {
+        index = gtk_bin_get_child(GTK_BIN(page));
+        hide_deleted(BALSA_INDEX(index), hide);
+    }
 }
 
 /* hide_deleted:

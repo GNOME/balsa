@@ -696,6 +696,44 @@ libbalsa_set_send_charset(const gchar * charset)
     return old_charset;
 }
 
+/* libbalsa_marshal_BOOLEAN__VOID:
+   Marshalling function
+*/
+/* BOOLEAN:NONE (/dev/stdin:1) */
+void
+libbalsa_marshal_BOOLEAN__VOID (GClosure     *closure,
+                                GValue       *return_value,
+                                guint         n_param_values,
+                                const GValue *param_values,
+                                gpointer      invocation_hint,
+                                gpointer      marshal_data)
+{
+    typedef gboolean (*GMarshalFunc_BOOLEAN__VOID) (gpointer     data1,
+                                                    gpointer     data2);
+    register GMarshalFunc_BOOLEAN__VOID callback;
+    register GCClosure *cc = (GCClosure*) closure;
+    register gpointer data1, data2;
+    gboolean v_return;
+
+    g_return_if_fail (return_value != NULL);
+    g_return_if_fail (n_param_values == 1);
+    
+    if (G_CCLOSURE_SWAP_DATA (closure)) {
+        data1 = closure->data;
+        data2 = g_value_peek_pointer (param_values + 0);
+    }
+    else {
+        data1 = g_value_peek_pointer (param_values + 0);
+        data2 = closure->data;
+    }
+    callback = (GMarshalFunc_BOOLEAN__VOID) 
+        (marshal_data ? marshal_data : cc->callback);
+    
+    v_return = callback (data1, data2);
+    
+    g_value_set_boolean (return_value, v_return);
+}
+
 /* libbalsa_marshal_POINTER__VOID:
    Marshalling function
 */

@@ -425,7 +425,7 @@ void
 mailbox_conf_edit(BalsaMailboxNode *mbnode)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
-    run_mailbox_conf(mbnode, GTK_OBJECT_TYPE(GTK_OBJECT(mbnode->mailbox)),
+    run_mailbox_conf(mbnode, G_OBJECT_TYPE(G_OBJECT(mbnode->mailbox)),
 		     mailbox_conf_update, _("_Update"),
 		     GNOME_STOCK_PIXMAP_SAVE);
 }
@@ -734,7 +734,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	path = gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.local.path));
 	if(libbalsa_mailbox_local_set_path(
 					   LIBBALSA_MAILBOX_LOCAL(mcw->mailbox), path) != 0) {
-	    gtk_object_destroy(GTK_OBJECT(mcw->mailbox));
+	    g_object_unref(G_OBJECT(mcw->mailbox));
 	    mcw->mailbox = NULL;
 	    return;
 	}

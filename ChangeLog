@@ -1,3 +1,25 @@
+2002-07-31  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/libbalsa.c: set the wmclass for the TLS certificate dialog.
+	* libbalsa/mailbox.[ch], libbalsa/mailbox_imap.[ch], 
+	  libbalsa/mailbox_local.[ch], libbalsa/mailbox_maildir.[ch], 
+	  libbalsa/mailbox_mbox.[ch], libbalsa/mailbox_mh.[ch], 
+	  libbalsa/mailbox_pop3.[ch], libbalsa/mailbox_remote.[ch]: port 
+	  LibBalsaMailbox* from GtkObject to GObject.
+
+	* libbalsa/misc.[ch]: impl. libbalsa_marshal_BOOLEAN__VOID.
+	* libbalsa/send.c: cleanup of fcc code.
+
+	* src/balsa-index.c: don't use an unimplemented GtkTreeView feature; 
+	LibBalsaMailbox is now a GObject.
+
+	* src/balsa-mblist.c, src/mailbox-conf.c, src/mailbox-node.c,
+	src/main.c, src/save-restore.c, src/sendmsg-window.c:
+	LibBalsaMailbox is now a GObject.
+
+	* src/balsa-message.c: headers should not be editable.
+	* src/main-window.c: gtk_notebook_remove_page() unrefs the page.
+
 2002-07-28 Steve Wall <hitched97@myrealbox.com>
 
 	* src/balsa-message.c: fix #85728.

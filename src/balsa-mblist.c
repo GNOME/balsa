@@ -1031,10 +1031,10 @@ bmbl_disconnect_mailbox_signals(GtkTreeModel *model,
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
 
     if (mbnode->mailbox) {
-	gtk_signal_disconnect_by_func(GTK_OBJECT(mbnode->mailbox),
-				      GTK_SIGNAL_FUNC
-                                      (bmbl_unread_messages_changed_cb),
-				      model);
+        g_signal_handlers_disconnect_by_func(G_OBJECT(mbnode->mailbox),
+                                             G_CALLBACK
+                                             (bmbl_unread_messages_changed_cb),
+                                             model);
     }
 
     return FALSE;
@@ -1126,11 +1126,10 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
 
             name = g_strdup(mbnode->mailbox->name);
 	}
-	gtk_signal_connect(GTK_OBJECT(mbnode->mailbox),
-			   "set-unread-messages-flag",
-			   GTK_SIGNAL_FUNC
-			   (bmbl_unread_messages_changed_cb),
-			   store);
+	g_signal_connect(G_OBJECT(mbnode->mailbox),
+			 "set-unread-messages-flag",
+			 G_CALLBACK(bmbl_unread_messages_changed_cb),
+			 store);
     } else {
 	/* new directory, but not a mailbox */
         in = mbnode->expanded ? BALSA_PIXMAP_MBOX_DIR_OPEN :
@@ -1566,10 +1565,10 @@ balsa_mblist_remove_mailbox_node(GtkTreeStore * store,
     if (bmbl_prerecursive(GTK_TREE_MODEL(store), &iter,
                                   bmbl_find_data_func, mbnode)) {
         if (mbnode->mailbox)
-            gtk_signal_disconnect_by_func(GTK_OBJECT(mbnode->mailbox),
-                                          GTK_SIGNAL_FUNC
-                                          (bmbl_unread_messages_changed_cb),
-                                          store);
+            g_signal_handlers_disconnect_by_func(G_OBJECT(mbnode->mailbox),
+                                                 G_CALLBACK
+                                                 (bmbl_unread_messages_changed_cb),
+                                                 store);
         gtk_tree_store_remove(store, &iter);
 
         return TRUE;

@@ -8,12 +8,14 @@ pixmapdir = $(datadir)/pixmaps
 pixmap_DATA = gnome-balsa2.png
 
 desktopdir = $(datadir)/applications
+desktop_in_files = balsa.desktop.in
 desktop_DATA = balsa.desktop
+@INTLTOOL_DESKTOP_RULE@
 
 EXTRA_DIST = \
 	balsa.1.in \
 	balsa.spec.in \
-	balsa.desktop \
+	balsa.desktop.in \
 	gnome-balsa2.png \
 	HACKING			\
 	docs/mh-mail-HOWTO	\

@@ -1,3 +1,7 @@
+2004-07-04  Pawel Salek
+
+	* Makefile.am, balsa.desktop.in: port patches from 142769.
+
 2004-05-28 14:21  PeterB
 
 	* libbalsa/source-viewer.c, src/sendmsg-window.c: allow GtkTextView

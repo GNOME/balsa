@@ -118,7 +118,7 @@ msgstr "Nelze vytvoøit MailDir adresáø na %s (%s)"
 # ???
 #: libbalsa/mailbox_maildir.c:130 libbalsa/mailbox_maildir.c:138
 #: libbalsa/mailbox_maildir.c:148
-#, c-format
+#, fuzzy, c-format
 msgid "Could not create a MailDir at %s (%s)"
 msgstr "Nelze vytvoøit MailDir na %s"
 
@@ -443,7 +443,7 @@ msgid "[-- Attachment #%d"
 msgstr "[-- Pøíloha #%d"
 
 #: libmutt/handler.c:1156
-#, c-format
+#, fuzzy, c-format
 msgid "[-- Type: %s/%s, Encoding: %s, Size: %s --]\n"
 msgstr "[-- Typ: %s/%s, Kódování: %d, Velikost: %s --]\n"
 

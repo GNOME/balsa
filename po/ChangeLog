@@ -1,3 +1,7 @@
+2001-07-27  Abel Cheung <maddog@linux.org.hk>
+
+	* cs.po: Mark line 122 and 447 as fuzzy, gettext complains.
+
 2001-07-25  Stanislav Visnovsky  <visnovsky@nenya.ms.mff.cuni.cz>
 
 	* sk.po: Updated Slovak translation from Marcel Telka <marcel@telka.sk>. 

@@ -331,10 +331,12 @@ fe_match_fields_buttons_cb(GtkWidget * widget, gpointer data)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_cc),active);
 }                       /* end fe_match_fields_buttons_cb */
 
-/* FIXME : to insure consistency and keep it simple I use a modal dialog box for condition edition/creation
- * but I have to avoid libbalsa_information (this is not modal and does not get the focus because mine is modal
- * so you end up with the small info box floating around and insensitive), so I use this function
- * This should be corrected
+/* FIXME : to insure consistency and keep it simple I use a modal
+ * dialog box for condition edition/creation but I have to avoid
+ * libbalsa_information (this is not modal and does not get the focus
+ * because mine is modal so you end up with the small info box
+ * floating around and insensitive), so I use this function. This
+ * should be corrected.
  */
 static void
 condition_error(const gchar * str)
@@ -495,7 +497,7 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     struct tm * date;
     gint row,col;
     gboolean andmask;
-    static const gchar xformat[] = "%x"; /* to suppress error in strftime */
+    static gchar xformat[] = "%x"; /* to suppress error in strftime */
     
     condition_not=cnd->condition_not;
     /* Clear all widgets */

@@ -1,3 +1,15 @@
+2002-08-06  Pawel Salek <pawsa@theochem.kth.se>
+
+	Compile with updated auto*build tools.
+	* autogen.sh: work also for distributions with "native" gnome2.
+	* Makefile.am: remove acconfig.h regeneration.
+	* configure.in: add missing templates to AC_DEFINE
+	* help/xmldocs.make: auto* tools get confused over leading -. Remove.
+	* libbalsa/filter-funcs.c: prevent gcc3 warnings.
+	* src/address-book.c, src/balsa-app.c,src/filter-edit-callbacks.c:
+	ditto.	
+	* src/balsa-index.c: collapse fixes (Peter B).
+
 2002-08-06  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-index.c: fix message selection change on msg delete.

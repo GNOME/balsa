@@ -987,8 +987,7 @@ balsa_mailbox_nodes_unlock(gboolean exclusive)
             if (nli->exclusive == exclusive)
                 break;
             else
-                g_warning("Unlocking an incorrectly nested mailbox_nodes 
-lock");
+                g_warning("Unlocking an incorrectly nested mailbox_nodes lock");
         }
     }
 

@@ -887,9 +887,11 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
             gtk_tree_store_remove(GTK_TREE_STORE(model), &iter);
 
     /* if last message is removed, clear the preview */
-    if (!gtk_tree_model_get_iter_first(model, &iter))
+    if (!gtk_tree_model_get_iter_first(model, &iter)) {
         bndx_set_current_message(index, NULL);
-    else
+        gtk_signal_emit(GTK_OBJECT(index),
+                        balsa_index_signals[UNSELECT_ALL_MESSAGES], NULL);
+    } else
         /* restore the selection */
         for (list = selected; list; list = g_list_next(list))
             if (bndx_find_message(index, &path, NULL, list->data)) {
@@ -1424,14 +1426,13 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     /* in case a message was unselected: */
     gtk_signal_emit(GTK_OBJECT(index),
                     balsa_index_signals[UNSELECT_MESSAGE], NULL);
-    if (message)
+    if (message) {
         gtk_signal_emit(GTK_OBJECT(index),
                         balsa_index_signals[SELECT_MESSAGE], message);
-    else if (gtk_tree_model_get_iter_first(model, &iter))
+        bndx_set_current_message(index, message);
+    } else if (gtk_tree_model_get_iter_first(model, &iter))
         gtk_signal_emit(GTK_OBJECT(index),
                         balsa_index_signals[UNSELECT_ALL_MESSAGES], NULL);
-
-    bndx_set_current_message(index, message);
 }
 
 static gboolean
@@ -1505,6 +1506,28 @@ static void
 bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
                     GtkTreePath * path, gpointer user_data)
 {
+    BalsaIndex *index = BALSA_INDEX(tree_view);
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
+    GtkTreePath *current_path;
+
+    /* if current message has become viewable, reselect it */
+    if (bndx_find_message(index, &current_path, NULL,
+                          index->current_message)) {
+        if (!gtk_tree_selection_path_is_selected(selection, current_path)
+            && bndx_row_is_viewable(tree_view, current_path)) {
+            g_signal_handlers_block_by_func(selection,
+                                            G_CALLBACK
+                                            (bndx_selection_changed),
+                                            index);
+            gtk_tree_selection_select_path(selection, current_path);
+            g_signal_handlers_unblock_by_func(selection,
+                                              G_CALLBACK
+                                              (bndx_selection_changed),
+                                              index);
+        }
+        gtk_tree_path_free(current_path);
+    }
+
     bndx_set_style(BALSA_INDEX(tree_view), path);
 }
 

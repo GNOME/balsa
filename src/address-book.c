@@ -793,6 +793,7 @@ balsa_address_book_response_cb(BalsaAddressBook *ab, gint response)
             gtk_widget_destroy(GTK_WIDGET(ab));
         break;
     default: /* nothing */
+	break;
     }
 }
 

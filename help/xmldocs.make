@@ -53,7 +53,7 @@ omf_timestamp: $(omffile)
 	touch omf_timestamp
 
 $(docname).xml: $(entities)
-        -ourdir=`pwd`;  \
+        ourdir=`pwd`;  \
         cd $(srcdir);   \
         cp $(entities) $$ourdir
 

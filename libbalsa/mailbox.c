@@ -34,8 +34,7 @@
 #include "message.h"
 #include "misc.h"
 
-#include <libgnome/gnome-config.h> 
-#include <libgnome/gnome-i18n.h> 
+#include <libgnome/libgnome.h> 
 
 #include "mailbox-filter.h"
 #include "libbalsa_private.h"

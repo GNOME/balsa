@@ -13,8 +13,7 @@
 #include "imap-server.h"
 #include "imap-commands.h"
 
-#include <libgnome/gnome-config.h>
-#include <libgnome/gnome-i18n.h> 
+#include <libgnome/libgnome.h> 
 
 #ifdef USE_TLS
 #define REQ_SSL(s) (LIBBALSA_SERVER(s)->use_ssl)

@@ -29,7 +29,7 @@
 
 #include "config.h"
 #include <string.h>
-#include <libgnome/gnome-config.h> 
+#include <libgnome/libgnome.h> 
 
 #include "filter-file.h"
 #include "mailbox-filter.h"

@@ -28,8 +28,8 @@
 #include <string.h>
 #include <glib.h>
 #include <fcntl.h>
-/* gnome-i18n.h needed for _() */
-#include <libgnome/gnome-i18n.h>
+/* libgnome.h needed for _() */
+#include <libgnome/libgnome.h>
 
 #include "libbalsa.h"
 #include "misc.h"

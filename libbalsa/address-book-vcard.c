@@ -34,8 +34,7 @@
 #include <sys/stat.h>
 #include <string.h>
 
-#include <libgnome/gnome-i18n.h>
-#include <libgnome/gnome-config.h>
+#include <libgnome/libgnome.h>
 
 #include "address-book.h"
 #include "address-book-vcard.h"

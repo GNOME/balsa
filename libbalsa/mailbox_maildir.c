@@ -24,8 +24,7 @@
 
 #define _XOPEN_SOURCE          500
 #define _XOPEN_SOURCE_EXTENDED 1
-#include <libgnome/gnome-config.h>
-#include <libgnome/gnome-i18n.h>
+#include <libgnome/libgnome.h>
 
 #include <unistd.h>
 #include <fcntl.h>

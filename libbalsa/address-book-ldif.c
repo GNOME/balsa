@@ -31,8 +31,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#include <libgnome/gnome-i18n.h>
-#include <libgnome/gnome-config.h>
+#include <libgnome/libgnome.h>
 
 #include "address-book.h"
 #include "abook-completion.h"

@@ -33,8 +33,7 @@
 #include "mailbox-filter.h"
 #include "misc.h"
 
-#include <libgnome/gnome-config.h> 
-#include <libgnome/gnome-i18n.h> 
+#include <libgnome/libgnome.h> 
 
 enum {
     REMOVE_FILES,

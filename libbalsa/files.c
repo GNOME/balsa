@@ -23,7 +23,7 @@
 #include "config.h"
 #include <string.h>
 #include <libgnomevfs/gnome-vfs-mime-handlers.h>
-#include <libgnomevfs/gnome-vfs-utils.h>
+#include <libgnomevfs/gnome-vfs.h>
 
 #include "misc.h"
 #include "files.h"

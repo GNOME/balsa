@@ -44,8 +44,7 @@
 #include <pthread.h>
 #endif
 
-#include <libgnome/gnome-i18n.h>
-#include <libgnome/gnome-config.h>
+#include <libgnome/libgnome.h>
 
 #include "libimap.h"
 #include "filter-funcs.h"

@@ -24,7 +24,7 @@
 
 #define _XOPEN_SOURCE 500
 
-#include <libgnome/gnome-i18n.h>
+#include <libgnome/libgnome.h>
 #include <gmime/gmime-stream-fs.h>
 
 #include <stdlib.h>

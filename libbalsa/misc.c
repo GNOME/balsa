@@ -32,9 +32,8 @@
 #include <dirent.h>
 #include <sys/file.h>
 
-#include <libgnomevfs/gnome-vfs-file-info.h>
-#include <libgnomevfs/gnome-vfs-ops.h>
-#include <libgnome/gnome-i18n.h>
+#include <libgnomevfs/gnome-vfs.h>
+#include <libgnome/libgnome.h>
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"

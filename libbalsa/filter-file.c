@@ -42,8 +42,7 @@
 #include <string.h>
 #include <time.h>
 
-#include <libgnome/gnome-i18n.h>
-#include <libgnome/gnome-config.h>
+#include <libgnome/libgnome.h>
 
 #include <sys/types.h>
 #include "filter-file.h"

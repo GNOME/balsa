@@ -38,7 +38,7 @@
 #include <fcntl.h>
 
 #include <glib.h>
-#include <libgnome/gnome-i18n.h> 
+#include <libgnome/libgnome.h> 
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"

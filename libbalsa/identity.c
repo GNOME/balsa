@@ -21,9 +21,7 @@
 
 #include "config.h"
 
-#include <libgnome/gnome-i18n.h>
-#include <libgnome/gnome-config.h>
-#include <libgnome/gnome-help.h>
+#include <libgnome/libgnome.h>
 
 #ifdef HAVE_GPGME
 #  include "rfc3156.h"

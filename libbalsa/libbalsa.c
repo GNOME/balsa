@@ -33,8 +33,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 
-#include <libgnome/gnome-util.h>
-#include <libgnome/gnome-i18n.h>
+#include <libgnome/libgnome.h>
 
 #if ENABLE_LDAP
 #include <ldap.h>

@@ -34,6 +34,7 @@ src/balsa-mblist.c
 src/balsa-message.c
 src/filter-edit-dialog.c
 src/information-dialog.c
+src/local-mailbox.c
 src/mailbox-conf.c
 src/main-window.c
 src/main.c

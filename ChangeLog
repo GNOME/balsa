@@ -1,3 +1,7 @@
+2000-10-17  Gediminas Paulauskas <menesis@delfi.lt>
+
+	* src/pref-manager.c: marked two strings for translation.
+
 2000-10-15  Matthew Guenther  <guentherm@asme.org>
 
 	* src/balsa-message.c: Changed attachment handling routine to

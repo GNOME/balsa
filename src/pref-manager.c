@@ -1835,11 +1835,11 @@ create_spelling_page(void)
     gtk_container_set_border_width(GTK_CONTAINER(vbox2), padding);
     gtk_container_add(GTK_CONTAINER(frame1), vbox2);
 
-    sig_check_toggle = gtk_check_button_new_with_label("Check signature");
+    sig_check_toggle = gtk_check_button_new_with_label(_("Check signature"));
     gtk_box_pack_start(GTK_BOX(vbox2), sig_check_toggle, FALSE, FALSE, 0);
     pui->spell_check_sig = sig_check_toggle;
 
-    check_quoted_toggle = gtk_check_button_new_with_label("Check quoted");
+    check_quoted_toggle = gtk_check_button_new_with_label(_("Check quoted"));
     gtk_box_pack_start(GTK_BOX(vbox2), check_quoted_toggle,
 		       FALSE, FALSE, 0);
     pui->spell_check_quoted = check_quoted_toggle;

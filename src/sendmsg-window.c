@@ -596,10 +596,15 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
 
     /* change entries to reflect new identity */
 
-    tmpstr = g_strdup_printf("%s <%s>", ident->address->full_name, 
-                           (gchar*)ident->address->address_list->data);
-    gtk_entry_set_text(GTK_ENTRY(msg->from[1]), tmpstr);
-    g_free(tmpstr);
+    if (strlen(ident->address->full_name) && 
+        strlen(ident->address->address_list->data)) {
+        tmpstr = g_strdup_printf("%s <%s>", ident->address->full_name, 
+                                 (gchar*)ident->address->address_list->data);
+        gtk_entry_set_text(GTK_ENTRY(msg->from[1]), tmpstr);
+        g_free(tmpstr);
+    } else {
+        gtk_entry_set_text(GTK_ENTRY(msg->from[1]), ident->address->full_name);
+    }
 
     gtk_entry_set_text(GTK_ENTRY(msg->reply_to[1]), ident->replyto);
     
@@ -1025,6 +1030,8 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     /* From: */
     create_email_entry(table, _("From:"), 0, GNOME_STOCK_MENU_BOOK_BLUE,
                        msg, msg->from);
+    gtk_signal_connect(GTK_OBJECT(msg->from[1]), "changed",
+                       GTK_SIGNAL_FUNC(check_readiness), msg);
 
     /* To: */
     create_email_entry(table, _("To:"), 1, GNOME_STOCK_MENU_BOOK_RED,
@@ -1494,8 +1501,11 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 
     msg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS].widget;
     msg->ready_widgets[1] = file_menu[MENU_FILE_QUEUE_POS].widget;
-    msg->ready_widgets[2] = get_tool_widget(window, 1,
-			GNOME_STOCK_PIXMAP_MAIL_SND);
+    msg->ready_widgets[2] = file_menu[MENU_FILE_POSTPONE_POS].widget;
+    msg->ready_widgets[3] = get_tool_widget(window, TOOLBAR_COMPOSE,
+                                            GNOME_STOCK_PIXMAP_MAIL_SND);
+    msg->ready_widgets[4] = get_tool_widget(window, TOOLBAR_COMPOSE,
+                                            GNOME_STOCK_PIXMAP_SAVE);
     msg->current_language_menu = lang_menu[LANG_CURRENT_POS].widget;
 
     /* set options - just the Disposition Notification request for now */
@@ -1864,30 +1874,48 @@ include_file_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
 
 /* is_ready_to_send returns TRUE if the message is ready to send or 
-   postpone. It tests currently only the "To" field
+   postpone. It tests currently only the "To" and "From" fields
 */
 static gboolean
 is_ready_to_send(BalsaSendmsg * bsmsg)
 {
+    GList* list = NULL;
     gchar *tmp;
     size_t len;
 
-    tmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->to[1]));
-    len = strlen(tmp);
+    list = g_list_append(list, gtk_entry_get_text(GTK_ENTRY(bsmsg->to[1])));
+    list = g_list_append(list, gtk_entry_get_text(GTK_ENTRY(bsmsg->from[1])));
 
-    if (len < 1)		/* empty */
-	return FALSE;
+    while (list) {
+        tmp = (gchar*) list->data;
+        len = strlen(tmp);
+        
+        if (len < 1) {		/* empty */
+            g_list_free(list);
+            return FALSE;
+        }
+        
 
-    if (tmp[len - 1] == '@')	/* this shouldn't happen */
-	return FALSE;
+        if (tmp[len - 1] == '@') {	/* this shouldn't happen */
+            g_list_free(list);
+            return FALSE;
+        }
+        
+        if (len < 4) {
+            if (strchr(tmp, '@')) {	
+                /* you won't have an @ in an address less than 4
+                   characters */
+                g_list_free(list);
+                return FALSE;
+            }
+            
+            /* assume they are mailing it to someone in their local domain */
+        }
 
-    if (len < 4) {
-	if (strchr(tmp, '@'))	/* you won't have an @ in an
-				   address less than 4 characters */
-	    return FALSE;
-
-	/* assume they are mailing it to someone in their local domain */
+        list = g_list_next(list);
     }
+    
+    g_list_free(list);
     return TRUE;
 }
 
@@ -2112,6 +2140,9 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     LibBalsaMessage *message;
 
+    if (!is_ready_to_send(bsmsg)) 
+        return FALSE;
+
     message = bsmsg2message(bsmsg, FALSE);
 
     if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
@@ -2121,7 +2152,8 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 				  message->fcc_mailbox,
 				  balsa_app.encoding_style);
     else
-	libbalsa_message_postpone(message, balsa_app.draftbox, NULL,
+	libbalsa_message_postpone(message, balsa_app.draftbox, 
+                                  NULL,
 				  message->fcc_mailbox,
 				  balsa_app.encoding_style);
 

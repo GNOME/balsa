@@ -1,3 +1,11 @@
+2001-08-28  Matthew Guenther  <guentherm@asme.org>
+
+	* src/sendmsg-window.h: make read_widget array bigger for postpone
+	menu/toolbar items.
+	* src/sendmsg-window.c: return check for send sanity to include
+	postponement, check from field in addition to to field to
+	determine sendability.
+
 2001-08-28  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/mailbox_pop3.c: fix descriptor leak

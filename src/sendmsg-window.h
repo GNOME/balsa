@@ -58,7 +58,7 @@ extern "C" {
 	/* identity related data */
 	LibBalsaIdentity* ident;
 	/* widgets to be disabled when the address is incorrect */
-	GtkWidget *ready_widgets[3];
+	GtkWidget *ready_widgets[5];
 	GtkWidget *view_checkitems[VIEW_MENU_LENGTH];
 	GList *spell_check_disable_list;
 	gboolean update_config; /* is the window being set up or in normal  */

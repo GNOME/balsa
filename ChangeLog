@@ -1,3 +1,27 @@
+2005-03-19 22:05  PeterB
+
+	* libbalsa/Makefile.am, libbalsa/address-book-ldif.c,
+	libbalsa/address-book.c, libbalsa/body.c, libbalsa/files.c,
+	libbalsa/filter-file.c, libbalsa/filter.h,
+	libbalsa/folder-scanners.c, libbalsa/gmime-part-rfc2440.c,
+	libbalsa/html.c, libbalsa/identity.c, libbalsa/libbalsa-conf.c,
+	libbalsa/libbalsa-conf.h, libbalsa/libbalsa.c,
+	libbalsa/mailbox-filter.c, libbalsa/mailbox.c, libbalsa/mailbox.h,
+	libbalsa/mailbox_imap.c, libbalsa/mailbox_mbox.c,
+	libbalsa/mailbox_mh.c, libbalsa/message.c, libbalsa/misc.c,
+	libbalsa/rfc3156.c, libbalsa/send.c, libbalsa/source-viewer.c,
+	libbalsa/imap/imap-commands.c, libbalsa/imap/imap-commands.h,
+	libbalsa/imap/md5-utils.c, libbalsa/imap/md5-utils.h,
+	libbalsa/imap/util.c, libbalsa/imap/util.h,
+	libinit_balsa/Makefile.am, src/Makefile.am, src/ab-main.c,
+	src/balsa-message.c, src/filter-edit-callbacks.c,
+	src/mailbox-node.c, src/print.c, src/quote-color.c,
+	src/quote-color.h, src/save-restore.c, src/sendmsg-window.c: more
+	Gnome deprecation cleanup, including a GKeyFile replacement for
+	GnomeConfig; fix some nit-picking from gcc 4; restore the
+	*_DISABLE_DEPRECATED defs.
+	* src/sendmsg-window.c: check whether CP125x charset is ok.
+
 2005-03-18 16:29  PeterB
 
 	* src/main.c: get mbnode before checking it.

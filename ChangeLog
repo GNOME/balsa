@@ -1,5 +1,9 @@
-2004-02-12 18:58  PeterB
+2004-02-12 21:44  PeterB
 
+	* libbalsa/mailbox_local.c, libbalsa/mailbox_local.h,
+	libbalsa/mailbox_maildir.c, libbalsa/mailbox_mbox.c,
+	libbalsa/mailbox_mh.c, src/main-window.c: remove
+	LibBalsaMailboxLocal::msg_list.
 	* libbalsa/mailbox_mbox.c: set message->msgno and message->mailbox
 	when creating msg_info.message.
 

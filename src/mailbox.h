@@ -20,104 +20,124 @@
 #ifndef __MAILBOX_H__
 #define __MAILBOX_H__
 
-#include "c-client.h"
 
+/*
+ * supported mailbox types
+ */
 typedef enum
-  {
-    MAILBOX_MBX,		/* fastest preformance */
-    MAILBOX_MTX,		/* good  (pine default mailbox format) */
-    MAILBOX_TENEX,		/* good */
-    MAILBOX_MBOX,		/* fair */
-    MAILBOX_MMDF,		/* fair */
-    MAILBOX_UNIX,		/* fair */
-    MAILBOX_MH,			/* very poor */
-    MAILBOX_POP3,
-    MAILBOX_IMAP,
-    MAILBOX_NNTP,
+{
+  MAILBOX_MBX,		/* fastest preformance */
+  MAILBOX_MTX,		/* good  (pine default mailbox format) */
+  MAILBOX_TENEX,	/* good */
+  MAILBOX_MBOX,		/* fair */
+  MAILBOX_MMDF,		/* fair */
+  MAILBOX_UNIX,		/* fair */
+  MAILBOX_MH,		/* very poor */
+  MAILBOX_POP3,
+  MAILBOX_IMAP,
+  MAILBOX_NNTP,
+  MAILBOX_UNKNOWN
+} MailboxType;
 
-    MAILBOX_UNKNOWN
-  }
-MailboxType;
+
+
+/*
+ * macros for casting mailbox structures
+ */
+#define MAILBOX(mailbox)        ((Mailbox *)(mailbox))
+#define MAILBOX_LOCAL(mailbox)  ((MailboxLocal *)(mailbox))
+#define MAILBOX_POP3(mailbox)   ((MailboxPOP3 *)(mailbox))
+#define MAILBOX_IMAP(mailbox)   ((MailboxIMAP *)(mailbox))
+#define MAILBOX_NNTP(mailbox)   ((MailboxNNTP *)(mailbox))
+
 
 
 typedef struct _Mailbox Mailbox;
+typedef struct _MailboxLocal MailboxLocal;
+typedef struct _MailboxPOP3 MailboxPOP3;
+typedef struct _MailboxIMAP MailboxIMAP;
+typedef struct _MailboxNNTP MailboxNNTP;
+
+typedef struct _Message Message;
+
+
+
 struct _Mailbox
 {
   MailboxType type;
   gchar *name;
-  MAILSTREAM *stream;
+  void *private;
+
+  glong messages;
+  glong new_messages;
 };
 
-typedef struct _MailboxLocal MailboxLocal;
 struct _MailboxLocal
 {
-  MailboxType type;
-  gchar *name;
-  MAILSTREAM *stream;
-  
+  Mailbox mailbox;
   gchar *path;
 };
 
-typedef struct _MailboxPOP3 MailboxPOP3;
 struct _MailboxPOP3
 {
-  MailboxType type;
-  gchar *name;
-  MAILSTREAM *stream;
-  
+  Mailbox mailbox;
   gchar *user;
   gchar *passwd;
   gchar *server;
 };
 
-typedef struct _MailboxIMAP MailboxIMAP;
 struct _MailboxIMAP
 {
-  MailboxType type;
-  gchar *name;
-  MAILSTREAM *stream;
-  
+  Mailbox mailbox;
   gchar *user;
   gchar *passwd;
   gchar *server;
   gchar *path;
 };
 
-typedef struct _MailboxNNTP MailboxNNTP;
 struct _MailboxNNTP
 {
-  MailboxType type;
-  gchar *name;
-  MAILSTREAM *stream;
-  
+  Mailbox mailbox;
   gchar *user;
   gchar *passwd;
   gchar *server;
   gchar *newsgroup;
 };
 
-typedef union _MailboxUnion MailboxUnion;
-union _MailboxUnion
-{
-  MailboxType type;
-  Mailbox mailbox;
-  MailboxLocal local;
-  MailboxPOP3 pop3;
-  MailboxIMAP imap;
-  MailboxNNTP nntp;
-};
 
 
-MailboxType mailbox_type_from_description (gchar * description);
-gchar * mailbox_type_description (MailboxType type);
 
+/*
+ * call before using any mailbox functions
+ */
+void mailbox_init ();
+
+
+/*
+ * create and destroy a mailbox
+ */
 Mailbox *mailbox_new (MailboxType type);
 void mailbox_free (Mailbox * mailbox);
-
 int mailbox_open (Mailbox * mailbox);
-
 void mailbox_close (Mailbox * mailbox);
+gint mailbox_check_new_messages (Mailbox * mailbox);
 
-gint current_mailbox_check ();
+
+/* 
+ * mailboxes & messages
+ */
+void mailbox_message_delete (Mailbox * mailbox, glong msgno);
+void mailbox_message_undelete (Mailbox * mailbox, glong msgno);
+gchar * mailbox_message_from (Mailbox * mailbox, glong msgno);
+gchar * mailbox_message_subject (Mailbox * mailbox, glong msgno);
+
+
+/*
+ * misc mailbox releated functions
+ */
+MailboxType mailbox_type_from_description (gchar * description);
+gchar * mailbox_type_description (MailboxType type);
+MailboxType mailbox_valid (gchar * filename);
+
 
 #endif /* __MAILBOX_H__ */

@@ -20,7 +20,6 @@
 #define __BALSA_APP_H__
 
 #include <gnome.h>
-#include "c-client.h"
 #include "mailbox.h"
 
 
@@ -35,10 +34,10 @@
 #define MAILBOX_MANAGER_HEIGHT 400
 
 
+
 /* global balsa application structure */
 extern struct BalsaApplication
 {
-
   /* personal information */
   gchar *real_name;
   gchar *username;
@@ -46,27 +45,23 @@ extern struct BalsaApplication
   gchar *email;
   gchar *organization;
   gchar *local_mail_directory;
-
-
   gchar *smtp_server;
+  gchar *signature;
 
-
-  Mailbox *auth_mailbox;
-  Mailbox *current_mailbox;
-  
   GtkWidget *current_index;
 
-  gchar *signature;
-  
   GList *mailbox_list;
   GList *addressbook_list;
+
 
   /* timer for mm_exists callback */
   gint new_messages_timer;
   gint new_messages;
 
+
   /* timer for checking mail every xx minutes */
   gint check_mail_timer;
+
 
   /* GUI settings */
   gint mw_width;

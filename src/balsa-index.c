@@ -31,7 +31,7 @@
 /* constants */
 #define BUFFER_SIZE 1024
 
-static int first_new_mesgno;
+static int first_new_msgno;
 
 /* gtk widget */
 static void balsa_index_class_init (BalsaIndexClass * klass);
@@ -48,15 +48,13 @@ static void append_messages (BalsaIndex * bindex,
 			     glong last);
 /*
    static void update_new_message_pixmap (BalsaIndex * bindex,
-   glong mesgno);
+   glong msgno);
  */
 static void update_message_flag (BalsaIndex * bindex,
-				 glong mesgno, gchar * flag);
+				 glong msgno, gchar * flag);
 
 
 /* clist callbacks */
-static void realize_clist (GtkWidget * widget,
-			   gpointer * data);
 static void select_message (GtkWidget * widget,
 			    gint row,
 			    gint column,
@@ -70,16 +68,17 @@ static void unselect_message (GtkWidget * widget,
 
 
 
-
 /* signals */
 enum
-  {
-    SELECT_MESSAGE,
-    LAST_SIGNAL
-  };
+{
+  SELECT_MESSAGE,
+  LAST_SIGNAL
+};
 
+
+/* marshallers */
 typedef void (*BalsaIndexSignal1) (GtkObject * object,
-				   MAILSTREAM * arg1,
+				   Mailbox * arg1,
 				   glong arg2,
 				   gpointer data);
 
@@ -89,9 +88,10 @@ static void balsa_index_marshal_signal_1 (GtkObject * object,
 					  GtkArg * args);
 
 
-static gint balsa_index_signals[LAST_SIGNAL] =
-{0};
+static gint balsa_index_signals[LAST_SIGNAL] = {0};
 static GtkBinClass *parent_class = NULL;
+
+
 
 guint
 balsa_index_get_type ()
@@ -116,6 +116,7 @@ balsa_index_get_type ()
 
   return balsa_index_type;
 }
+
 
 static void
 balsa_index_class_init (BalsaIndexClass * klass)
@@ -149,6 +150,7 @@ balsa_index_class_init (BalsaIndexClass * klass)
   klass->select_message = NULL;
 }
 
+
 static void
 balsa_index_marshal_signal_1 (GtkObject * object,
 			      GtkSignalFunc func,
@@ -165,6 +167,7 @@ balsa_index_marshal_signal_1 (GtkObject * object,
 	    func_data);
 }
 
+
 static void
 balsa_index_init (BalsaIndex * bindex)
 {
@@ -180,7 +183,7 @@ balsa_index_init (BalsaIndex * bindex)
 
 
   GTK_WIDGET_SET_FLAGS (bindex, GTK_NO_WINDOW);
-  bindex->stream = NIL;
+  bindex->mailbox = NULL;
   bindex->last_message = 0;
   bindex->new_xpm = NULL;
   bindex->new_xpm_mask = NULL;
@@ -201,12 +204,6 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_clist_set_column_width (clist, 3, 250);
   gtk_clist_set_column_width (clist, 4, 100);
 
-
-  gtk_signal_connect_after (GTK_OBJECT (clist),
-			    "realize",
-			    (GtkSignalFunc) realize_clist,
-			    (gpointer) bindex);
-
   gtk_signal_connect (GTK_OBJECT (clist),
 		      "select_row",
 		      (GtkSignalFunc) select_message,
@@ -217,9 +214,66 @@ balsa_index_init (BalsaIndex * bindex)
 		      (GtkSignalFunc) unselect_message,
 		      (gpointer) bindex);
 
-
   gtk_widget_show (GTK_WIDGET (clist));
   gtk_widget_ref (GTK_WIDGET (clist));
+}
+
+
+static void
+balsa_index_size_request (GtkWidget * widget,
+			  GtkRequisition * requisition)
+{
+  GtkWidget *child;
+
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail (BALSA_IS_INDEX (widget));
+  g_return_if_fail (requisition != NULL);
+
+  child = GTK_BIN (widget)->child;
+
+  requisition->width = 0;
+  requisition->height = 0;
+
+  if (GTK_WIDGET_VISIBLE (child))
+    {
+      gtk_widget_size_request (child, &child->requisition);
+      requisition->width = child->requisition.width;
+      requisition->height = child->requisition.height;
+    }
+}
+
+
+static void
+balsa_index_size_allocate (GtkWidget * widget,
+			   GtkAllocation * allocation)
+{
+  GtkBin *bin;
+  GtkWidget *child;
+  GtkAllocation child_allocation;
+
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail (BALSA_IS_INDEX (widget));
+  g_return_if_fail (allocation != NULL);
+
+  bin = GTK_BIN (widget);
+  widget->allocation = *allocation;
+
+  child = bin->child;
+
+  if (GTK_WIDGET_REALIZED (widget))
+    {
+      if (!GTK_WIDGET_VISIBLE (child))
+	gtk_widget_show (child);
+
+      child_allocation.x = allocation->x + GTK_CONTAINER (widget)->border_width;
+      child_allocation.y = allocation->y + GTK_CONTAINER (widget)->border_width;
+      child_allocation.width = allocation->width -
+	2 * GTK_CONTAINER (widget)->border_width;
+      child_allocation.height = allocation->height -
+	2 * GTK_CONTAINER (widget)->border_width;
+
+      gtk_widget_size_allocate (child, &child_allocation);
+    }
 }
 
 
@@ -233,20 +287,21 @@ balsa_index_new ()
 
 
 void
-balsa_index_set_stream (BalsaIndex * bindex,
-			MAILSTREAM * stream)
+balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 {
   g_return_if_fail (bindex != NULL);
-  g_return_if_fail (stream != NULL);
 
-  if (bindex->stream == stream)
+
+  if (bindex->mailbox == mailbox)
     return;
 
-  bindex->stream = stream;
-  bindex->last_message = stream->nmsgs;
-
-  /* clear list and append messages */
   gtk_clist_clear (GTK_CLIST (GTK_BIN (bindex)->child));
+
+  bindex->mailbox = mailbox;
+  if (bindex->mailbox == NULL)
+    return;
+
+  bindex->last_message = mailbox->new_messages;
 
 
   /* here we play a little trick on clist; in GTK_SELECTION_BROWSE mode
@@ -263,10 +318,10 @@ balsa_index_set_stream (BalsaIndex * bindex,
 
   if (GTK_CLIST (GTK_BIN (bindex)->child)->rows > 0)
     {
-      if (first_new_mesgno != 0)
+      if (first_new_msgno != 0)
 	{
-	  gtk_clist_select_row (GTK_CLIST (GTK_BIN (bindex)->child), first_new_mesgno - 1, -1);
-	  gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), first_new_mesgno - 1, 0, 0.0, 0.0);
+	  gtk_clist_select_row (GTK_CLIST (GTK_BIN (bindex)->child), first_new_msgno - 1, -1);
+	  gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), first_new_msgno - 1, 0, 0.0, 0.0);
 	}
       else
 	{
@@ -274,8 +329,7 @@ balsa_index_set_stream (BalsaIndex * bindex,
 	  gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), bindex->last_message - 1, 0, 1.0, 1.0);
 	}
     }
-  gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child),
-				GTK_SELECTION_BROWSE);
+  gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child), GTK_SELECTION_BROWSE);
 }
 
 
@@ -286,13 +340,13 @@ balsa_index_append_new_messages (BalsaIndex * bindex)
 
   g_return_if_fail (bindex != NULL);
 
-  if (bindex->stream == NIL)
+  if (bindex->mailbox == NULL)
     return;
 
-  if (bindex->stream->nmsgs > bindex->last_message)
+  if (bindex->mailbox->messages > bindex->last_message)
     {
       first = bindex->last_message + 1;
-      bindex->last_message = bindex->stream->nmsgs;
+      bindex->last_message = bindex->mailbox->messages;
       append_messages (bindex, first, bindex->last_message);
     }
 }
@@ -366,70 +420,11 @@ balsa_index_get_progress_bar (BalsaIndex * bindex)
 }
 
 
-static void
-balsa_index_size_request (GtkWidget * widget,
-			  GtkRequisition * requisition)
-{
-  GtkWidget *child;
-
-  g_return_if_fail (widget != NULL);
-  g_return_if_fail (BALSA_IS_INDEX (widget));
-  g_return_if_fail (requisition != NULL);
-
-  child = GTK_BIN (widget)->child;
-
-  requisition->width = 0;
-  requisition->height = 0;
-
-  if (GTK_WIDGET_VISIBLE (child))
-    {
-      gtk_widget_size_request (child, &child->requisition);
-      requisition->width = child->requisition.width;
-      requisition->height = child->requisition.height;
-    }
-}
-
-
-static void
-balsa_index_size_allocate (GtkWidget * widget,
-			   GtkAllocation * allocation)
-{
-  GtkBin *bin;
-  GtkWidget *child;
-  GtkAllocation child_allocation;
-
-  g_return_if_fail (widget != NULL);
-  g_return_if_fail (BALSA_IS_INDEX (widget));
-  g_return_if_fail (allocation != NULL);
-
-  bin = GTK_BIN (widget);
-  widget->allocation = *allocation;
-
-  child = bin->child;
-
-  if (GTK_WIDGET_REALIZED (widget))
-    {
-      if (!GTK_WIDGET_VISIBLE (child))
-	gtk_widget_show (child);
-
-      child_allocation.x = allocation->x + GTK_CONTAINER (widget)->border_width;
-      child_allocation.y = allocation->y + GTK_CONTAINER (widget)->border_width;
-      child_allocation.width = allocation->width -
-	2 * GTK_CONTAINER (widget)->border_width;
-      child_allocation.height = allocation->height -
-	2 * GTK_CONTAINER (widget)->border_width;
-
-      gtk_widget_size_allocate (child, &child_allocation);
-    }
-}
-
-
 void
 balsa_index_delete_message (BalsaIndex * bindex)
 {
   GtkCList *clist;
   glong row;
-  char tmp[10];
 
   clist = GTK_CLIST (GTK_BIN (bindex)->child);
 
@@ -439,9 +434,7 @@ balsa_index_delete_message (BalsaIndex * bindex)
   row = (glong) clist->selection->data;
 
   update_message_flag (bindex, row + 1, "D");
-
-  sprintf (tmp, "%ld", row + 1);
-  mail_setflag (bindex->stream, tmp, "\\DELETED");
+  mailbox_message_delete (bindex->mailbox, row + 1);
 }
 
 void
@@ -449,7 +442,6 @@ balsa_index_undelete_message (BalsaIndex * bindex)
 {
   GtkCList *clist;
   glong row;
-  char tmp[10];
 
   clist = GTK_CLIST (GTK_BIN (bindex)->child);
 
@@ -459,10 +451,9 @@ balsa_index_undelete_message (BalsaIndex * bindex)
   row = (glong) clist->selection->data;
 
   update_message_flag (bindex, row + 1, " ");
-
-  sprintf (tmp, "%ld", row + 1);
-  mail_clearflag (bindex->stream, tmp, "\\DELETED");
+  mailbox_message_undelete (bindex->mailbox, row + 1);
 }
+
 
 static void
 append_messages (BalsaIndex * bindex,
@@ -470,132 +461,73 @@ append_messages (BalsaIndex * bindex,
 		 glong last)
 {
   glong i;
+  gchar message[BUFFER_SIZE];
   gchar *text[5];
-  MESSAGECACHE *cache;
+
+  first_new_msgno = 0;
+
 
   text[0] = NULL;
-  text[1] = g_malloc0 (BUFFER_SIZE);
-  text[2] = g_malloc0 (BUFFER_SIZE);
-  text[3] = g_malloc0 (BUFFER_SIZE);
-  text[4] = g_malloc0 (BUFFER_SIZE);
-
-  first_new_mesgno = 0;
+  text[1] = message;
+  text[4] = NULL;
 
   gtk_clist_freeze (GTK_CLIST (GTK_BIN (bindex)->child));
-
   for (i = first; i <= last; i++)
     {
       sprintf (text[1], "%d", i);
-      mail_fetchfrom (text[2], bindex->stream, i, (long) BUFFER_SIZE);
-      mail_fetchsubject (text[3], bindex->stream, i, (long) BUFFER_SIZE);
+      text[2] = mailbox_message_from (bindex->mailbox, i);
+      text[3] = mailbox_message_subject (bindex->mailbox, i);
 
+      gtk_clist_append (GTK_CLIST (GTK_BIN (bindex)->child), text);
+      update_message_flag (bindex, i, "N");
+
+
+      /* update progress bar */
       if (bindex->progress_bar)
 	{
 	  gtk_progress_bar_update (bindex->progress_bar, (gfloat) i / last);
 	  gtk_widget_draw (GTK_WIDGET (bindex->progress_bar), NULL);
 	}
 
-      mail_fetchstructure (bindex->stream, i, NIL);
-      cache = mail_elt (bindex->stream, i);
-      mail_date (text[4], cache);
-
-      gtk_clist_append (GTK_CLIST (GTK_BIN (bindex)->child), text);
-      update_message_flag (bindex, i, "N");
-
       /* give time to gtk so the GUI isn't blocked */
       while (gtk_events_pending ())
 	gtk_main_iteration ();
     }
-
   gtk_clist_thaw (GTK_CLIST (GTK_BIN (bindex)->child));
+
 
   /* re-set the progress bar to 0.0 */
   if (bindex->progress_bar)
     gtk_progress_bar_update (bindex->progress_bar, 0.0);
-
-  g_free (text[1]);
-  g_free (text[2]);
-  g_free (text[3]);
-  g_free (text[4]);
 }
 
 
-#if 0
 static void
-update_new_message_pixmap (BalsaIndex * bindex,
-			   glong mesgno)
+update_message_flag (BalsaIndex * bindex, glong msgno, gchar * flag)
 {
-  MESSAGECACHE *elt;
-
-  elt = mail_elt (bindex->stream, mesgno);
-
-  if (!elt->seen)
-    {
-      gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child),
-			    mesgno - 1, 0,
-			    bindex->new_xpm,
-			    bindex->new_xpm_mask);
-      if (first_new_mesgno == 0)
-	first_new_mesgno = mesgno;
-    }
-  else
-    gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child),
-			mesgno - 1, 0,
-			NULL);
-}
-#endif
-
-
-static void
-update_message_flag (BalsaIndex * bindex,
-		     glong mesgno, gchar * flag)
-{
-  MESSAGECACHE *elt;
   switch (*flag)
     {
     case 'N':
-      elt = mail_elt (bindex->stream, mesgno);
-      if (!elt->seen)
-	{
-	  gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), mesgno - 1, 0, flag);
-	  if (first_new_mesgno == 0)
-	    first_new_mesgno = mesgno;
-	}
+      gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), msgno - 1, 0, flag);
       break;
+
     case 'D':
-      gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), mesgno - 1, 0, flag);
+      gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), msgno - 1, 0, flag);
       break;
-    case ' ':
-      gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), mesgno - 1, 0, NULL);
+ 
+   case ' ':
+      gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), msgno - 1, 0, NULL);
       break;
     }
 }
-
 
 
 
 /*
  * CLIST Callbacks
  */
-static void
-realize_clist (GtkWidget * widget,
-	       gpointer * data)
-{
-  BalsaIndex *bindex;
-
-  bindex = BALSA_INDEX (data);
-
-  if (!bindex->new_xpm)
-    bindex->new_xpm =
-      gdk_pixmap_create_from_xpm_d (GTK_CLIST (widget)->clist_window,
-				    &bindex->new_xpm_mask,
-				    &widget->style->white,
-				    gball_xpm);
-}
-
-
 static GtkWidget *
-create_menu (BalsaIndex * bindex, glong mesgno)
+create_menu (BalsaIndex * bindex, glong msgno)
 {
   GtkWidget *menu, *menuitem, *submenu, *smenuitem;
   Mailbox *mailbox;
@@ -678,29 +610,26 @@ select_message (GtkWidget * widget,
 		gpointer * data)
 {
   BalsaIndex *bindex;
-  glong mesgno;
+  glong msgno;
 
   bindex = BALSA_INDEX (data);
 
   /* the message number is going to be one more
    * than the row selected -- until the message list
    * starts getting sorted! */
-  mesgno = row + 1;
+  msgno = row + 1;
 
   gtk_signal_emit (GTK_OBJECT (bindex),
 		   balsa_index_signals[SELECT_MESSAGE],
-		   bindex->stream,
-		   mesgno,
+		   bindex->mailbox,
+		   msgno,
 		   NULL);
 
   if (bevent)
-    {
-      if (bevent->button == 3)
-	{
-	  gtk_menu_popup (GTK_MENU (create_menu (bindex, mesgno)), NULL, NULL, NULL, NULL, 3, bevent->time);
-	}
-    }
+    if (bevent->button == 3)
+      gtk_menu_popup (GTK_MENU (create_menu (bindex, msgno)), NULL, NULL, NULL, NULL, 3, bevent->time);
 }
+
 
 static void
 unselect_message (GtkWidget * widget,
@@ -710,22 +639,26 @@ unselect_message (GtkWidget * widget,
 		  gpointer * data)
 {
   BalsaIndex *bindex;
-  glong mesgno;
+  glong msgno;
   gchar *foo = g_malloc (sizeof (char *) * 2);
 
   bindex = BALSA_INDEX (data);
 
-  /* the message number is going to be one more
+  /* 
+   * the message number is going to be one more
    * than the row selected -- until the message list
-   * starts getting sorted! */
-  mesgno = row + 1;
+   * starts getting sorted! 
+   */
+  msgno = row + 1;
 
-  /* update the index to show any changes in the message
-   * state */
+  /* 
+   * update the index to show any changes in the message
+   * state 
+   */
   gtk_clist_get_text (GTK_CLIST (GTK_BIN (bindex)->child), row, 0, &foo);
   if (foo)
     {
       if (*foo != 'D')
-	update_message_flag (bindex, mesgno, " ");
+	update_message_flag (bindex, msgno, " ");
     }
 }

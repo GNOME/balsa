@@ -21,7 +21,7 @@
 #define __BALSA_INDEX_H__
 
 #include <gtk/gtk.h>
-#include "c-client.h"
+#include "mailbox.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -41,7 +41,7 @@ struct _BalsaIndex
 {
   GtkBin bin;
   
-  MAILSTREAM *stream;
+  Mailbox *mailbox;
   glong last_message;
   
   /* pixmap and icon for new messages */
@@ -58,7 +58,7 @@ struct _BalsaIndexClass
   GtkBinClass parent_class;
   
   void (*select_message) (BalsaIndex *bindex,
-			  MAILSTREAM *stream,
+			  Mailbox *stream,
 			  glong mesgno);
 };
 
@@ -71,8 +71,7 @@ GtkWidget * balsa_index_new ();
 
 /* sets the mail stream; if it's a new stream, then it's 
  * contents is loaded into the index */
-void balsa_index_set_stream (BalsaIndex * bindex,
-			     MAILSTREAM * stream);
+void balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox);
 
 
 /* appends any new messages in the stream to the index, 
@@ -92,8 +91,7 @@ void balsa_index_undelete_message (BalsaIndex * bindex);
 
 /* set the pointer to the progress bar that's used to show
  * progress loading images */
-void balsa_index_set_progress_bar (BalsaIndex * bindex,
-				   GtkProgressBar * progress_bar);
+void balsa_index_set_progress_bar (BalsaIndex * bindex, GtkProgressBar * progress_bar);
 GtkProgressBar * balsa_index_get_progress_bar (BalsaIndex * bindex);
 
 

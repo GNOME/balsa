@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
-
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 #include "balsa-app.h"
@@ -47,22 +48,18 @@ static gint check_for_new_messages ();
 void
 init_balsa_app (int argc, char *argv[])
 {
-  /* include linkage for the c-client library */
-#include "linkage.c"
-
 
   /* 
    * initalize application structure before ALL ELSE 
    * to some reasonable defaults
    */
   balsa_app.real_name = NULL;
-  balsa_app.username = NIL;
-  balsa_app.hostname = NIL;
+  balsa_app.username = NULL;
+  balsa_app.hostname = NULL;
   balsa_app.organization = NULL;
   balsa_app.local_mail_directory = NULL;
   balsa_app.smtp_server = NULL;
-  balsa_app.auth_mailbox = NULL;
-  balsa_app.current_mailbox = NULL;
+
   balsa_app.mailbox_list = NULL;
   balsa_app.current_index = NULL;
   balsa_app.addressbook_list = NULL;
@@ -78,16 +75,22 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
 
 
+
+  /* initalize our mailbox access crap */
+  mailbox_init ();
+
   restore_global_settings ();
   mailboxes_init ();
   load_local_mailboxes ();
-  my_special_mailbox ();
-  read_signature ();
+
 
   /* start timers */
+#if 0
   balsa_app.new_messages_timer = gtk_timeout_add (5, check_for_new_messages, NULL);
   balsa_app.check_mail_timer = gtk_timeout_add (5 * 60 * 1000, current_mailbox_check, NULL);
+#endif
 }
+
 
 static gint
 read_signature ()
@@ -117,7 +120,7 @@ read_signature ()
   return TRUE;
 }
 
-
+#if 0
 static gint
 check_for_new_messages ()
 {
@@ -137,6 +140,8 @@ check_for_new_messages ()
 
   return TRUE;
 }
+#endif
+
 
 
 static gint
@@ -157,56 +162,4 @@ mailboxes_init (void)
     }
 
   return 1;
-}
-
-
-/* This is where you can hard-code your own
- * mailbox for testing!
- */
-static void
-my_special_mailbox ()
-{
-#if 0
-  MailboxNNTP *nntp;
-  MailboxPOP3 *pop3;
-  MailboxMBX *mbx;
-  MailboxMH *mh;
-
-
-  nntp = (MailboxNNTP *) mailbox_new (MAILBOX_NNTP);
-  nntp->name = g_strdup ("COLA");
-  nntp->user = g_strdup ("");
-  nntp->passwd = g_strdup ("");
-  nntp->server = g_strdup ("news.serv.net");
-  nntp->newsgroup = g_strdup ("comp.os.linux.announce");
-  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, nntp);
-
-  pop3 = (MailboxPOP3 *) mailbox_new (MAILBOX_POP3);
-  pop3->name = g_strdup ("MyPOP Box");
-  pop3->user = g_strdup ("pavlov");
-  pop3->passwd = g_strdup ("");
-  pop3->server = g_strdup ("venus");
-  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
-
-  mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
-  mh->name = g_strdup ("gnome-list");
-  mh->path = g_strdup ("gnome");
-  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
-
-  mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
-  mbx->name = g_strdup ("gnome-list-mbx");
-  mbx->path = g_strdup ("/home/pavlov/gnomecvs.mbx");
-  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
-
-  mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
-  mh->name = g_strdup ("Gnome CVS");
-  mh->path = g_strdup ("gnomecvs");
-  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
-
-  mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
-  mh->name = g_strdup ("gtk-list");
-  mh->path = g_strdup ("gtk+");
-  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
-
-#endif
 }

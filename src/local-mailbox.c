@@ -25,7 +25,6 @@
 #include <pwd.h>
 
 #include "balsa-app.h"
-#include "c-client.h"
 #include "local-mailbox.h"
 #include "mailbox.h"
 
@@ -38,10 +37,8 @@ load_local_mailboxes ()
   struct dirent *d;
   struct stat st;
   char filename[PATH_MAX + 1];
-  DRIVER *drv = NIL;
   MailboxType mailbox_type;
-  MailboxLocal *local;
-  gint i = 0;
+  Mailbox *mailbox;
 
 
   dp = opendir (balsa_app.local_mail_directory);
@@ -52,35 +49,23 @@ load_local_mailboxes ()
   while ((d = readdir (dp)) != NULL)
     {
       sprintf (filename, "%s/%s", balsa_app.local_mail_directory, d->d_name);
-      drv = NIL;
       
       if (lstat (filename, &st) < 0)
 	continue;
  
       if (!S_ISREG (st.st_mode))
 	continue;
-          
-      if (drv = mail_valid (NIL, g_strdup (filename), "error, cannot load. darn"))
-	{
-	  if (balsa_app.debug)
-	    g_print ("%s - %s\n", d->d_name, drv->name);
-	  
-	  /*
-	   * create and add the mailbox to the mailbox list
-	   * XXX: does this need to do more cheking???
-	   */
-	  mailbox_type = mailbox_type_from_description (drv->name);
-	  
-	  if (mailbox_type != MAILBOX_UNKNOWN)
-	    {
-	      local = (MailboxLocal *) mailbox_new (mailbox_type);
-	      local->name = g_strdup (d->d_name);
-	      local->path = g_strdup (filename);
-	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, local);
 
-	      if (balsa_app.debug)
-		g_print ("Local Mailbox Loaded as: %s\n", mailbox_type_description (local->type));
-	    }
+      mailbox_type = mailbox_valid (filename);
+      if (mailbox_type != MAILBOX_UNKNOWN)
+	{
+	  mailbox = mailbox_new (mailbox_type);
+	  mailbox->name = g_strdup (d->d_name);
+	  MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
+	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
+	  
+	  if (balsa_app.debug)
+	    g_print ("Local Mailbox Loaded as: %s\n", mailbox_type_description (mailbox->type));
 	}
     }
 }

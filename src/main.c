@@ -16,13 +16,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-
 #include "config.h"
+
 #include <gnome.h>
+
 #include "balsa-app.h"
-#include "c-client.h"
 #include "mailbox.h"
 #include "save-restore.h"
+
 
 
 int
@@ -36,7 +37,6 @@ main (int argc, char *argv[])
   if (balsa_app.mailbox_list)
     main_window_set_mailbox ((Mailbox *) balsa_app.mailbox_list->data);
 
-
   gtk_main ();
   return 0;
 }
@@ -49,6 +49,7 @@ balsa_exit ()
   Mailbox *mailbox;
 
 
+#if 0
   list = balsa_app.mailbox_list;
   while (list)
     {
@@ -61,6 +62,8 @@ balsa_exit ()
 
   gtk_timeout_remove(balsa_app.check_mail_timer);
   gtk_timeout_remove(balsa_app.new_messages_timer);
+#endif
+
   save_global_settings ();
   gtk_exit (0);
 }

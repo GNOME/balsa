@@ -17,11 +17,361 @@
  * 02111-1307, USA.
  */
 #include <stdio.h>
-#include <gtk/gtk.h>
-#include "mailbox.h"
+#include <gnome.h>
+
 #include "balsa-app.h"
+#include "mailbox.h"
+
+/* c-client shit includes */
+#include "c-client.h"
 
 
+#define BUFFER_SIZE 1024
+
+
+#define LOCK_MAILBOX(mailbox)\
+do {\
+  if (client_mailbox)\
+    {\
+      g_print ("*** ERROR: Mailbox Lock Failed: %s ***\n", __PRETTY_FUNCTION__);\
+      return;\
+    }\
+  else\
+    client_mailbox = (mailbox);\
+} while (0)
+
+
+#define LOCK_MAILBOX_RETURN_VAL(mailbox, val)\
+do {\
+  if (client_mailbox)\
+    {\
+      g_print ("*** ERROR: Mailbox Lock Failed: %s ***\n", __PRETTY_FUNCTION__);\
+      return (val);\
+    }\
+  else\
+    client_mailbox = (mailbox);\
+} while (0)
+
+#define UNLOCK_MAILBOX()                (client_mailbox = NULL)
+
+
+#define CLIENT_STREAM(mailbox)          (((MailboxPrivate *)((mailbox)->private))->stream)
+#define CLIENT_STREAM_OPEN(mailbox)     (CLIENT_STREAM (mailbox) != NIL)
+#define CLIENT_STREAM_CLOSED(mailbox)   (CLIENT_STREAM (mailbox) == NIL)
+
+
+#define RETURN_IF_CLIENT_STRAM_CLOSED(mailbox)\
+do {\
+  if (CLIENT_STREAM_CLOSED (mailbox))\
+    {\
+      g_print ("*** ERROR: Mailbox Stream Closed: %s ***\n", __PRETTY_FUNCTION__);\
+      UNLOCK_MAILBOX ();\
+      return;\
+    }\
+} while (0)
+
+#define RETURN_VAL_IF_CLIENT_STRAM_CLOSED(mailbox, val)\
+do {\
+  if (CLIENT_STREAM_CLOSED (mailbox))\
+    {\
+      g_print ("*** ERROR: Mailbox Stream Closed: %s ***\n", __PRETTY_FUNCTION__);\
+      UNLOCK_MAILBOX ();\
+      return (val);\
+    }\
+} while (0)
+
+
+
+
+/* 
+ * macro returns the c-client mailstream from a 
+ * mailbox structure
+ */
+typedef struct
+{
+  MAILSTREAM *stream;
+} MailboxPrivate;
+
+
+
+
+
+
+
+
+/* the mailbox to be referenced by any of the c-client
+ * callbacks for authorization, new messages, etc... */
+static Mailbox *client_mailbox = NULL;
+
+
+
+/*
+ * necessary for initalizing the fucking c-client library
+ */
+void
+mailbox_init ()
+{
+#include "linkage.c"
+}
+
+
+
+/*
+ * allocate a new mailbox
+ */
+Mailbox *
+mailbox_new (MailboxType type)
+{
+  Mailbox *mailbox;
+
+
+  mailbox = (Mailbox *) g_malloc (sizeof (MailboxLocal));
+  mailbox->type = type;
+  mailbox->name = NULL;
+  mailbox->private = (void *) g_malloc (sizeof (MailboxPrivate));
+  CLIENT_STREAM (mailbox) = NIL;
+  mailbox->new_messages = 0;
+
+
+  switch (type)
+    {
+    case MAILBOX_MBX:
+    case MAILBOX_MTX:
+    case MAILBOX_TENEX:
+    case MAILBOX_MBOX:
+    case MAILBOX_MMDF:
+    case MAILBOX_UNIX:
+    case MAILBOX_MH:
+      MAILBOX_LOCAL (mailbox)->path = NULL;
+      break;
+
+    case MAILBOX_POP3:
+      MAILBOX_POP3 (mailbox)->user = NULL;
+      MAILBOX_POP3 (mailbox)->passwd = NULL;
+      MAILBOX_POP3 (mailbox)->server = NULL;
+      break;
+
+    case MAILBOX_IMAP:
+      MAILBOX_IMAP (mailbox)->user = NULL;
+      MAILBOX_IMAP (mailbox)->passwd = NULL;
+      MAILBOX_IMAP (mailbox)->server = NULL;
+      MAILBOX_IMAP (mailbox)->path = NULL;
+      break;
+
+    case MAILBOX_NNTP:
+      MAILBOX_NNTP (mailbox)->server = NULL;
+      MAILBOX_NNTP (mailbox)->newsgroup = NULL;
+      break;
+    }
+
+
+  return mailbox;
+}
+
+
+void
+mailbox_free (Mailbox * mailbox)
+{
+  if (!mailbox)
+    return;
+
+  if (CLIENT_STREAM (mailbox) != NIL)
+    mailbox_close (mailbox);
+
+  g_free (mailbox->name);
+  g_free (mailbox->private);
+
+  switch (mailbox->type)
+    {
+    case MAILBOX_MBX:
+    case MAILBOX_MTX:
+    case MAILBOX_TENEX:
+    case MAILBOX_MBOX:
+    case MAILBOX_MMDF:
+    case MAILBOX_UNIX:
+    case MAILBOX_MH:
+      g_free (MAILBOX_LOCAL (mailbox)->path);
+      break;
+
+    case MAILBOX_POP3:
+      g_free (MAILBOX_POP3 (mailbox)->user);
+      g_free (MAILBOX_POP3 (mailbox)->passwd);
+      g_free (MAILBOX_POP3 (mailbox)->server);
+      break;
+
+    case MAILBOX_IMAP:
+      g_free (MAILBOX_IMAP (mailbox)->user);
+      g_free (MAILBOX_IMAP (mailbox)->passwd);
+      g_free (MAILBOX_IMAP (mailbox)->server);
+      g_free (MAILBOX_IMAP (mailbox)->path);
+      break;
+
+    case MAILBOX_NNTP:
+      g_free (MAILBOX_NNTP (mailbox)->server);
+      g_free (MAILBOX_NNTP (mailbox)->newsgroup);
+      break;
+    }
+
+
+  g_free (mailbox);
+}
+
+
+gint
+mailbox_open (Mailbox * mailbox)
+{
+  gchar buffer[MAILTMPLEN];
+  Mailbox *old_mailbox;
+
+
+  LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
+
+  /* don't open a mailbox if it's already open 
+   * -- runtime sanity */
+  if (CLIENT_STREAM_OPEN (mailbox))
+    {
+      UNLOCK_MAILBOX ();
+      return FALSE;
+    }
+
+
+  switch (mailbox->type)
+    {
+    case MAILBOX_MBX:
+    case MAILBOX_MTX:
+    case MAILBOX_TENEX:
+    case MAILBOX_MBOX:
+    case MAILBOX_MMDF:
+    case MAILBOX_UNIX:
+      CLIENT_STREAM (mailbox) = mail_open (NIL, MAILBOX_LOCAL (mailbox)->path, NIL);
+      break;
+
+    case MAILBOX_MH:
+      sprintf (buffer, "#mh/%s", MAILBOX_LOCAL (mailbox)->path);
+      CLIENT_STREAM (mailbox) = mail_open (NIL, buffer, NIL);
+      break;
+
+    case MAILBOX_POP3:
+      sprintf (buffer, "{%s/pop3}INBOX", MAILBOX_POP3 (mailbox)->server);
+      CLIENT_STREAM (mailbox) = mail_open (NIL, buffer, NIL);
+      break;
+
+    case MAILBOX_IMAP:
+      sprintf (buffer, "{%s/imap}%s", MAILBOX_IMAP (mailbox)->server, MAILBOX_IMAP (mailbox)->path);
+      CLIENT_STREAM (mailbox) = mail_open (NIL, buffer, NIL);
+      break;
+
+    case MAILBOX_NNTP:
+      sprintf (buffer, "{%s/nntp}%s", MAILBOX_NNTP (mailbox)->server, MAILBOX_NNTP (mailbox)->newsgroup);
+      CLIENT_STREAM (mailbox) = mail_open (NIL, buffer, NIL);
+      break;
+    }
+
+
+  UNLOCK_MAILBOX ();
+
+  if (CLIENT_STREAM_OPEN (mailbox))
+    return TRUE;
+  else
+    return FALSE;
+}
+
+
+void
+mailbox_close (Mailbox * mailbox)
+{
+  LOCK_MAILBOX (mailbox);
+
+  if (CLIENT_STREAM_OPEN (mailbox))
+    /* now close the mail stream and expunge deleted
+     * messages -- the expunge may not have to be done */
+    CLIENT_STREAM (mailbox) = mail_close_full (CLIENT_STREAM (mailbox), CL_EXPUNGE);
+
+  UNLOCK_MAILBOX ();
+}
+
+
+gint
+mailbox_check_new_messages (Mailbox * mailbox)
+{
+  LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
+  RETURN_VAL_IF_CLIENT_STRAM_CLOSED (mailbox, FALSE);
+
+  mail_ping (CLIENT_STREAM (mailbox));
+
+  UNLOCK_MAILBOX ();
+
+  if (mailbox->new_messages)
+    return TRUE;
+  else
+    return FALSE;
+}
+
+
+void
+mailbox_message_delete (Mailbox * mailbox, glong msgno)
+{
+  char tmp[BUFFER_SIZE];
+
+  LOCK_MAILBOX (mailbox);
+  RETURN_IF_CLIENT_STRAM_CLOSED (mailbox);
+
+  sprintf (tmp, "%ld", msgno);
+  mail_setflag (CLIENT_STREAM (mailbox), tmp, "\\DELETED");
+
+  UNLOCK_MAILBOX ();
+}
+
+
+void
+mailbox_message_undelete (Mailbox * mailbox, glong msgno)
+{
+  char tmp[BUFFER_SIZE];
+
+  LOCK_MAILBOX (mailbox);
+  RETURN_IF_CLIENT_STRAM_CLOSED (mailbox);
+
+  sprintf (tmp, "%ld", msgno);
+  mail_clearflag (CLIENT_STREAM (mailbox), tmp, "\\DELETED");
+
+  UNLOCK_MAILBOX ();
+}
+
+
+gchar *
+mailbox_message_from (Mailbox * mailbox, glong msgno)
+{
+  static gchar from[BUFFER_SIZE];
+
+  LOCK_MAILBOX_RETURN_VAL (mailbox, NULL);
+  RETURN_VAL_IF_CLIENT_STRAM_CLOSED (mailbox, NULL);
+
+  mail_fetchfrom (from, CLIENT_STREAM (mailbox), msgno, (long) BUFFER_SIZE - 1);
+
+  UNLOCK_MAILBOX ();
+  return from;
+}
+
+
+gchar *
+mailbox_message_subject (Mailbox * mailbox, glong msgno)
+{
+  static gchar subject[BUFFER_SIZE];
+
+  LOCK_MAILBOX_RETURN_VAL (mailbox, NULL);
+  RETURN_VAL_IF_CLIENT_STRAM_CLOSED (mailbox, NULL);
+
+  mail_fetchsubject (subject, CLIENT_STREAM (mailbox), msgno, (long) BUFFER_SIZE - 1);
+
+  UNLOCK_MAILBOX ();
+  return subject;
+}
+
+
+
+/*
+ * MISC
+ */
 MailboxType
 mailbox_type_from_description (gchar * description)
 {
@@ -111,259 +461,201 @@ mailbox_type_description (MailboxType type)
 }
 
 
-Mailbox *
-mailbox_new (MailboxType type)
+MailboxType
+mailbox_valid (gchar * filename)
 {
-  Mailbox *mailbox;
-  MailboxLocal *local;
-  MailboxPOP3 *pop3;
-  MailboxIMAP *imap;
-  MailboxNNTP *nntp;
+  DRIVER *drv = NIL;
 
-  mailbox = g_malloc (sizeof (MailboxUnion));
+  drv = mail_valid (NIL, filename, NIL);
 
-  switch (type)
+  if (balsa_app.debug)
     {
-    case MAILBOX_MBX:
-    case MAILBOX_MTX:
-    case MAILBOX_TENEX:
-    case MAILBOX_MBOX:
-    case MAILBOX_MMDF:
-    case MAILBOX_UNIX:
-    case MAILBOX_MH:
-      local = (MailboxLocal *) mailbox;
-      local->type = type;
-      local->name = NULL;
-      local->stream = NIL;
-      local->path = NULL;
-      break;
-
-    case MAILBOX_POP3:
-      pop3 = (MailboxPOP3 *) mailbox;
-      pop3->type = MAILBOX_POP3;
-      pop3->name = NULL;
-      pop3->stream = NIL;
-      pop3->user = NULL;
-      pop3->passwd = NULL;
-      pop3->server = NULL;
-      break;
-
-    case MAILBOX_IMAP:
-      imap = (MailboxIMAP *) mailbox;
-      imap->type = MAILBOX_IMAP;
-      imap->name = NULL;
-      imap->stream = NIL;
-      imap->user = NULL;
-      imap->passwd = NULL;
-      imap->server = NULL;
-      imap->path = NULL;
-      break;
-
-    case MAILBOX_NNTP:
-      nntp = (MailboxNNTP *) mailbox;
-      nntp->type = MAILBOX_NNTP;
-      nntp->name = NULL;
-      nntp->stream = NIL;
-      nntp->user = NULL;
-      nntp->passwd = NULL;
-      nntp->server = NULL;
-      nntp->newsgroup = NULL;
-      break;
+      if (drv)
+	g_print ("mailbox_vaild: %s type %s\n", filename, drv->name);
+      else
+	g_print ("mailbox_valid: %s invalid mailbox\n", filename);
     }
 
-  return mailbox;
+
+  if (drv)
+    return mailbox_type_from_description (drv->name);
+  else
+    return MAILBOX_UNKNOWN;
+}
+
+
+/*
+ * c-client callback fucking shit
+ */
+void
+mm_searched (MAILSTREAM * stream, unsigned long number)
+{
+}
+
+
+/* 
+ * this is the callback function which returns the number of new mail
+ * messages in a mail box
+ */
+void
+mm_exists (MAILSTREAM * stream, unsigned long number)
+{
+  if (!client_mailbox)
+    {
+      g_print ("mm_exists: ** why are we here? **\n");
+      return;
+    }
+
+  /* 
+   * set the number of messages and the number of new
+   * messages
+   */
+  client_mailbox->messages = stream->nmsgs;
+  client_mailbox->new_messages += number;
+
+  if (balsa_app.debug)
+    {
+      g_print ("mm_exists: %s %d messages %d new_messages\n", 
+	       client_mailbox->name,
+	       client_mailbox->messages,
+	       client_mailbox->new_messages);
+    }
 }
 
 
 void
-mailbox_free (Mailbox * mailbox)
+mm_expunged (MAILSTREAM * stream, unsigned long number)
 {
-  MailboxLocal *local;
-  MailboxPOP3 *pop3;
-  MailboxIMAP *imap;
-  MailboxNNTP *nntp;
+  if (!client_mailbox)
+    return;
+}
 
-  if (!mailbox)
+
+void
+mm_flags (MAILSTREAM * stream, unsigned long number)
+{
+  if (!client_mailbox)
     return;
 
-  if (mailbox->stream)
-    mailbox_close (mailbox);
-
-  if (mailbox->name)
-    g_free (mailbox->name);
-
-
-  switch (mailbox->type)
-    {
-    case MAILBOX_MBX:
-    case MAILBOX_MTX:
-    case MAILBOX_TENEX:
-    case MAILBOX_MBOX:
-    case MAILBOX_MMDF:
-    case MAILBOX_UNIX:
-    case MAILBOX_MH:
-      local = (MailboxLocal *) mailbox;
-      g_free (local->path);
-      break;
-
-    case MAILBOX_POP3:
-      pop3 = (MailboxPOP3 *) mailbox;
-      g_free (pop3->user);
-      g_free (pop3->passwd);
-      g_free (pop3->server);
-      break;
-
-    case MAILBOX_IMAP:
-      imap = (MailboxIMAP *) mailbox;
-      g_free (imap->user);
-      g_free (imap->passwd);
-      g_free (imap->server);
-      g_free (imap->path);
-      break;
-
-    case MAILBOX_NNTP:
-      nntp = (MailboxNNTP *) mailbox;
-      g_free (nntp->user);
-      g_free (nntp->passwd);
-      g_free (nntp->server);
-      g_free (nntp->newsgroup);
-      break;
-    }
-
-  g_free (mailbox);
-}
-
-
-int
-mailbox_open (Mailbox * mailbox)
-{
-  gchar buffer[MAILTMPLEN];
-  Mailbox *old_mailbox;
-  MailboxLocal *local;
-  MailboxPOP3 *pop3;
-  MailboxIMAP *imap;
-  MailboxNNTP *nntp;
-
-
-  /* don't open a mailbox if it's already open 
-   * -- runtime sanity */
-  if (balsa_app.current_mailbox == mailbox)
-    return TRUE;
-
-  /* only one mailbox open at a time */
-  old_mailbox = balsa_app.current_mailbox;
-  balsa_app.current_mailbox = mailbox;
-
-  /* try to open the mailbox -- return
-   * FALSE on failure */
-  switch (mailbox->type)
-    {
-    case MAILBOX_MBX:
-    case MAILBOX_MTX:
-    case MAILBOX_TENEX:
-    case MAILBOX_MBOX:
-    case MAILBOX_MMDF:
-    case MAILBOX_UNIX:
-      local = (MailboxLocal *) mailbox;
-
-      local->stream = mail_open (NIL, local->path, NIL);
-      if (local->stream == NIL)
-        {
-          balsa_app.current_mailbox = old_mailbox;
-          return FALSE;
-        }
-      break;
-
-    case MAILBOX_MH:
-      local = (MailboxLocal *) mailbox;
-
-      sprintf (buffer, "#mh/%s", local->path);
-
-      local->stream = mail_open (NIL, buffer, NIL);
-      if (local->stream == NIL)
-	{
-	  balsa_app.current_mailbox = old_mailbox;
-	  return FALSE;
-	}
-      break;
-
-    case MAILBOX_POP3:
-      pop3 = (MailboxPOP3 *) mailbox;
-      balsa_app.auth_mailbox = mailbox;
-
-      sprintf (buffer, "{%s/pop3}INBOX", pop3->server);
-
-      pop3->stream = mail_open (NIL, buffer, NIL);
-      if (pop3->stream == NIL)
-	{
-	  balsa_app.current_mailbox = old_mailbox;
-	  return FALSE;
-	}
-      break;
-
-
-    case MAILBOX_IMAP:
-      imap = (MailboxIMAP *) mailbox;
-      balsa_app.auth_mailbox = mailbox;
-
-      sprintf (buffer, "{%s/imap}%s", imap->server, imap->path);
-
-      imap->stream = mail_open (NIL, buffer, NIL);
-      if (imap->stream == NIL)
-	{
-	  balsa_app.current_mailbox = old_mailbox;
-	  return FALSE;
-	}
-      break;
-
-
-    case MAILBOX_NNTP:
-      nntp = (MailboxNNTP *) mailbox;
-      balsa_app.auth_mailbox = mailbox;
-
-      sprintf (buffer, "{%s/nntp}%s", nntp->server, nntp->newsgroup);
-
-      nntp->stream = mail_open (NIL, buffer, NIL);
-      if (nntp->stream == NIL)
-	{
-	  balsa_app.current_mailbox = old_mailbox;
-	  return FALSE;
-	}
-      break;
-
-
-    default:
-      balsa_app.current_mailbox = old_mailbox;
-      return FALSE;
-      break;
-    }
-
-
-  /* close the old open mailbox */
-  if (old_mailbox != NIL)
-    mailbox_close (old_mailbox);
-
-
-  return TRUE;
+  if (balsa_app.debug)
+    g_print ("Message %d in mailbox %s changed.\n", number, stream->mailbox);
 }
 
 
 void
-mailbox_close (Mailbox * mailbox)
+mm_notify (MAILSTREAM * stream, char *string, long errflg)
 {
-  /* now close the mail stream and expunge deleted
-   * messages -- the expunge may not have to be done */
+  if (!client_mailbox)
+    return;
 
-  mailbox->stream = mail_close_full (mailbox->stream, CL_EXPUNGE);
+  if (balsa_app.debug)
+    g_print ("%s\n", string);
 }
 
 
-/* this is lame -- we need to replace this with a good
- * mailbox checking mechanism */
-gint
-current_mailbox_check ()
+void
+mm_list (MAILSTREAM * stream, int delimiter, char *mailbox, long attributes)
 {
-  if (balsa_app.current_mailbox)
-    mail_ping (balsa_app.current_mailbox->stream);
-  return TRUE;
+  if (!client_mailbox)
+    return;
+}
+
+
+void
+mm_lsub (MAILSTREAM * stream, int delimiter, char *mailbox, long attributes)
+{
+  if (!client_mailbox)
+    return;
+}
+
+
+void
+mm_status (MAILSTREAM * stream, char *mailbox, MAILSTATUS * status)
+{
+  if (!client_mailbox)
+    return;
+}
+
+
+void
+mm_log (char *string, long errflg)
+{
+  if (!client_mailbox)
+    return;
+}
+
+
+void
+mm_dlog (char *string)
+{
+  if (!client_mailbox)
+    return;
+
+  if (balsa_app.debug)
+    g_print ("%s\n", string);
+}
+
+
+void
+mm_login (NETMBX * mb, char *user, char *pwd, long trial)
+{
+  if (!client_mailbox)
+    return;
+
+
+  switch (client_mailbox->type)
+    {
+    case MAILBOX_POP3:
+      strcpy (user, MAILBOX_POP3 (client_mailbox)->user);
+      strcpy (pwd, MAILBOX_POP3 (client_mailbox)->passwd);
+      break;
+
+    case MAILBOX_IMAP:
+      strcpy (user, MAILBOX_IMAP (client_mailbox)->user);
+      strcpy (pwd, MAILBOX_IMAP (client_mailbox)->passwd);
+      break;
+
+    default:
+      break;
+    }
+}
+
+
+void
+mm_critical (MAILSTREAM * stream)
+{
+  if (!client_mailbox)
+    return;
+
+  if (balsa_app.debug)
+    g_print ("Mailbox: %s - entering critical mode.\n", stream->mailbox);
+}
+
+
+void
+mm_nocritical (MAILSTREAM * stream)
+{
+  if (!client_mailbox)
+    return;
+
+  if (balsa_app.debug)
+    g_print ("Mailbox: %s - exiting critical mode.\n", stream->mailbox);
+}
+
+
+long
+mm_diskerror (MAILSTREAM * stream, long errcode, long serious)
+{
+  if (balsa_app.debug)
+    g_print ("*** C-Client Disk Error ***\n");
+
+  return NIL;
+}
+
+
+void
+mm_fatal (char *string)
+{
+  if (balsa_app.debug)
+    g_print ("*** C-Client Fatel Error: %s ***\n", string);
 }

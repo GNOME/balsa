@@ -248,7 +248,7 @@ ok_new_mailbox (GtkWidget * widget)
   GtkWidget *menu;
   GtkWidget *menuitem;
   MailboxType mailbox_type;
-  MailboxLocal *local;
+  Mailbox *mailbox;
 
 
   switch (nmw->next_page)
@@ -258,11 +258,11 @@ ok_new_mailbox (GtkWidget * widget)
       menuitem = gtk_menu_get_active (GTK_MENU (menu));
       mailbox_type = (MailboxType) gtk_object_get_user_data (GTK_OBJECT (menuitem));
       
-      local = (MailboxLocal *) mailbox_new (mailbox_type);
-      local->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_name)));
-      local->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_path)));
-      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, local);
-      add_mailbox_config(local->name,local->path,0);
+      mailbox =  mailbox_new (mailbox_type);
+      mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_name)));
+      MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_path)));
+      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
+      add_mailbox_config (mailbox->name, MAILBOX_LOCAL (mailbox)->path, 0);
       break;
       
     case NM_PAGE_POP3:
@@ -277,6 +277,7 @@ ok_new_mailbox (GtkWidget * widget)
 
 
   /* close the new mailbox window */
+  refresh_mailbox_manager ();
   refresh_main_window ();
   gtk_widget_destroy (nmw->window);
 }

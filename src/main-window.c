@@ -16,18 +16,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
+#include "config.h"
+
 #include <string.h>
 #include <gnome.h>
-#include "config.h"
-#include "main-window.h"
-#include "balsa-app.h"
-#include "balsa-message.h"
-#include "balsa-index.h"
-#include "sendmsg-window.h"
-#include "pref-manager.h"
-#include "mailbox-manager.h"
+
 #include "addrbook-manager.h"
+#include "balsa-app.h"
+#include "balsa-index.h"
+#include "balsa-message.h"
+#include "mailbox.h"
+#include "mailbox-manager.h"
+#include "main-window.h"
 #include "misc.h"
+#include "pref-manager.h"
+#include "sendmsg-window.h"
 
 
 #define MAILBOX_DATA "mailbox_data"
@@ -35,26 +38,25 @@
 
 typedef struct _MainWindow MainWindow;
 struct _MainWindow
-  {
-    GtkWidget *window;
-
-    GtkWidget *menubar;
-
-    GtkWidget *toolbar;
-    GtkWidget *mailbox_option_menu;
-    GtkWidget *mailbox_menu;
-    GtkWidget *move_menu;
-
-    GtkWidget *index;
-
-    GtkWidget *message_area;
-
-    GtkWidget *status_bar;
-  };
-
+{
+  GtkWidget *window;
+  
+  GtkWidget *menubar;
+  
+  GtkWidget *toolbar;
+  GtkWidget *mailbox_option_menu;
+  GtkWidget *mailbox_menu;
+  GtkWidget *move_menu;
+  
+  GtkWidget *index;
+  
+  GtkWidget *message_area;
+  
+  GtkWidget *status_bar;
+};
 static MainWindow *mw = NULL;
-static gint about_box_visible = FALSE;
 
+static gint about_box_visible = FALSE;
 
 
 
@@ -74,7 +76,8 @@ static void show_about_box ();
 /* callbacks */
 static void move_resize_cb ();
 
-static void index_select_cb (GtkWidget * widget, MAILSTREAM * stream, glong mesgno);
+static void check_new_messages_cb (GtkWidget * widget);
+static void index_select_cb (GtkWidget * widget, Mailbox * mailbox, glong msgno);
 static void next_message_cb (GtkWidget * widget);
 static void previous_message_cb (GtkWidget * widget);
 
@@ -335,7 +338,7 @@ create_menu ()
 
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
-		      (GtkSignalFunc) current_mailbox_check,
+		      (GtkSignalFunc) check_new_messages_cb,
 		      NULL);
 
   gtk_widget_show (w);
@@ -558,7 +561,7 @@ create_toolbar ()
 			     "Check Email",
 			     NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RCV),
-			     (GtkSignalFunc) current_mailbox_check,
+			     (GtkSignalFunc) check_new_messages_cb,
 			     "Check Email");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
@@ -697,9 +700,17 @@ move_resize_cb ()
 
 
 static void
+check_new_messages_cb (GtkWidget * widget)
+{
+
+
+}
+
+
+static void
 index_select_cb (GtkWidget * widget,
-		 MAILSTREAM * stream,
-		 glong mesgno)
+		 Mailbox * mailbox,
+		 glong msgno)
 {
   MainWindow *mainwindow;
 
@@ -708,33 +719,40 @@ index_select_cb (GtkWidget * widget,
 
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
 
-  balsa_message_set (BALSA_MESSAGE (mainwindow->message_area), stream, mesgno);
+  balsa_message_set (BALSA_MESSAGE (mainwindow->message_area), mailbox, msgno);
 }
+
 
 static void
 new_message_cb (GtkWidget * widget)
 {
   g_return_if_fail (widget != NULL);
+
   sendmsg_window_new (widget, NULL, 0);
 }
+
 
 static void
 replyto_message_cb (GtkWidget * widget)
 {
   g_return_if_fail (widget != NULL);
+
   if (!balsa_app.current_index)
     return;
   sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 1);
 }
 
+
 static void
 forward_message_cb (GtkWidget * widget)
 {
   g_return_if_fail (widget != NULL);
+
   if (!balsa_app.current_index)
     return;
   sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 2);
 }
+
 
 static void
 next_message_cb (GtkWidget * widget)
@@ -806,13 +824,10 @@ mailbox_select_cb (GtkWidget * widget)
 
 
   /* return if the mailbox is already the currently open mailbox */
-  if (balsa_app.current_mailbox == mailbox)
-    return;
-
 
   if (mailbox_open (mailbox))
     {
-      balsa_index_set_stream (BALSA_INDEX (mainwindow->index), mailbox->stream);
+      balsa_index_set_mailbox (BALSA_INDEX (mainwindow->index), mailbox);
       balsa_app.current_index = mainwindow->index;
     }
 }

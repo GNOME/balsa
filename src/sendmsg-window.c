@@ -16,18 +16,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
+#include "config.h"
 
 #include <stdio.h>
 #include <string.h>
-#include <gtk/gtk.h>
-#include "config.h"
 #include <gnome.h>
-#include "c-client.h"
+
 #include "balsa-app.h"
 #include "balsa-message.h"
 #include "balsa-index.h"
-#include "sendmsg-window.h"
 #include "mailbox.h"
+#include "sendmsg-window.h"
+
+/* c-client shit back for now */
+#include "c-client.h"
+
+
 
 gint delete_event (GtkWidget *, gpointer);
 
@@ -51,6 +55,7 @@ close_window (GtkWidget * widget, gpointer data)
   gtk_widget_destroy (GTK_WIDGET (data));
 }
 
+
 static GtkWidget *
 create_toolbar (BalsaSendmsg * bsmw)
 {
@@ -71,7 +76,8 @@ create_toolbar (BalsaSendmsg * bsmw)
 					GTK_SIGNAL_FUNC (send_smtp_message),
 					   bsmw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-/*
+
+#if 0
    gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
    toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
@@ -94,10 +100,13 @@ create_toolbar (BalsaSendmsg * bsmw)
    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_PRINT),
    NULL, "Print");
    GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
- */
+#endif
+
+
   gtk_widget_show (toolbar);
   return toolbar;
 }
+
 
 void
 balsa_sendmsg_destroy (BalsaSendmsg * bsm)
@@ -111,6 +120,7 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
   g_free (bsm);
   bsm = NULL;
 }
+
 
 static GtkWidget *
 create_menu (BalsaSendmsg * bmsg)
@@ -135,12 +145,15 @@ create_menu (BalsaSendmsg * bmsg)
 		      GTK_SIGNAL_FUNC (send_smtp_message),
 		      bmsg);
 
-/*
+
+#if 0
    w = gnome_stock_menu_item (GNOME_STOCK_MENU_OPEN, _ ("Attach File"));
    gtk_widget_show (w);
    gtk_menu_append (GTK_MENU (menu), w);
    menu_items[i++] = w;
- */
+#endif
+
+
   w = gtk_menu_item_new ();
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
@@ -200,13 +213,12 @@ create_menu (BalsaSendmsg * bmsg)
   gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
+
   menu_items[i] = NULL;
-/*
-   g_print ("%d menu items\n", i);
- */
   gtk_window_add_accelerator_table (GTK_WINDOW (window), accel);
   return menubar;
 }
+
 
 void
 sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
@@ -277,10 +289,17 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   msg->to = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->to, 1, 2, 0, 1,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
+
+
+  /* XXX: This stuff is out for now because I'm abstracting out the
+   * c-client */
+#if 0
   if (type == 1)
     {
       gtk_entry_set_text (GTK_ENTRY (msg->to), get_header_replyto (bindex->stream, row));
     }
+#endif
+
   gtk_widget_show (msg->to);
 
 
@@ -311,9 +330,10 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 		    GTK_FILL, GTK_FILL, 0, 0);
   gtk_widget_show (label);
   msg->subject = gtk_entry_new ();
+
   if (type != 0)
     {
-      tmp = g_strdup (get_header ("subject", bindex->stream, row));
+      tmp = g_strdup ("GET HEADER USE TO BE HERE");
       gtk_entry_set_text (GTK_ENTRY (msg->subject), tmp);
       if (type == 1)
 	{
@@ -402,7 +422,9 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
     {
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
 
-      c = get_header ("from", bindex->stream, row);
+#if 0
+      c = get_header ("GET HEADER USE TO BE HERE");
+
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
 
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " on ", 4);
@@ -419,6 +441,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
 
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
+#endif
     }
   if (balsa_app.signature)
     gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, balsa_app.signature, strlen (balsa_app.signature));

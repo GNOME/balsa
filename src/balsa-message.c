@@ -35,18 +35,14 @@ static GString *text2html (char *buff);
 /* widget */
 static void balsa_message_class_init (BalsaMessageClass * klass);
 static void balsa_message_init (BalsaMessage * bmessage);
-static void balsa_message_size_request (GtkWidget * widget,
-					GtkRequisition * requisition);
-static void balsa_message_size_allocate (GtkWidget * widget,
-					 GtkAllocation * allocation);
-
-
-/* debugging */
-static void debug_mime_content (BODY * body);
+static void balsa_message_size_request (GtkWidget * widget, GtkRequisition * requisition);
+static void balsa_message_size_allocate (GtkWidget * widget, GtkAllocation * allocation);
 
 
 
 static GtkBinClass *parent_class = NULL;
+
+
 
 guint
 balsa_message_get_type ()
@@ -72,6 +68,7 @@ balsa_message_get_type ()
   return balsa_message_type;
 }
 
+
 static void
 balsa_message_class_init (BalsaMessageClass * klass)
 {
@@ -87,21 +84,19 @@ balsa_message_class_init (BalsaMessageClass * klass)
 
   widget_class->size_request = balsa_message_size_request;
   widget_class->size_allocate = balsa_message_size_allocate;
-
-  container_class->add = NULL;
-  container_class->remove = NULL;
 }
+
 
 static void
 balsa_message_init (BalsaMessage * bmessage)
 {
   GTK_WIDGET_SET_FLAGS (bmessage, GTK_NO_WINDOW);
 
-  bmessage->current_stream = NULL;
-  bmessage->current_mesgno = 0;
+  bmessage->current_mailbox = NULL;
+  bmessage->current_msgno = 0;
 
-  /* bring HTML widget to life with a little message for
-   * now */
+
+  /* create the HTML widget to render the message */
   GTK_BIN (bmessage)->child = gtk_xmhtml_new ();
   gtk_widget_set_parent (GTK_BIN (bmessage)->child, GTK_WIDGET (bmessage));
   gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), "");
@@ -109,165 +104,6 @@ balsa_message_init (BalsaMessage * bmessage)
   gtk_widget_ref (GTK_BIN (bmessage)->child);
 }
 
-GtkWidget *
-balsa_message_new ()
-{
-  BalsaMessage *bmessage;
-  bmessage = gtk_type_new (balsa_message_get_type ());
-  return GTK_WIDGET (bmessage);
-}
-
-void
-balsa_message_clear (BalsaMessage * bmessage)
-{
-  g_return_if_fail (bmessage != NULL);
-
-  bmessage->current_stream = NULL;
-  bmessage->current_mesgno = 0;
-  gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), "");
-}
-
-void
-balsa_message_set (BalsaMessage * bmessage,
-		   MAILSTREAM * stream,
-		   glong mesgno)
-{
-  BODY *body;
-  STRINGLIST *lines, *cur;
-  gchar *c, *buff, *d;
-  GString *gs;
-
-  g_return_if_fail (bmessage != NULL);
-  g_return_if_fail (stream != NIL);
-
-  bmessage->current_stream = stream;
-  bmessage->current_mesgno = mesgno;
-
-  lines = mail_newstringlist ();
-  cur = lines;
-
-  /* look into the parts of the message */
-  mail_fetchstructure (stream, mesgno, &body);
-
-  /* HTML header */
-  buff = g_malloc (strlen (HTML_HEAD) + 1);
-  strcpy (buff, HTML_HEAD);
-
-  /* mail message header */
-  cur->text.size = strlen (cur->text.data = (unsigned char *) cpystr ("Date"));
-  cur = cur->next = mail_newstringlist ();
-  cur->text.size = strlen (cur->text.data = (unsigned char *) cpystr ("From"));
-  cur = cur->next = mail_newstringlist ();
-  cur->text.size = strlen (cur->text.data = (unsigned char *) cpystr (">From"));
-  cur = cur->next = mail_newstringlist ();
-  cur->text.size = strlen (cur->text.data = (unsigned char *) cpystr ("Subject"));
-  cur = cur->next = mail_newstringlist ();
-  cur->text.size = strlen (cur->text.data = (unsigned char *) cpystr ("To"));
-  cur = cur->next = mail_newstringlist ();
-  cur->text.size = strlen (cur->text.data = (unsigned char *) cpystr ("cc"));
-  cur = cur->next = mail_newstringlist ();
-  cur->text.size = strlen (cur->text.data = (unsigned char *) cpystr ("Newsgroups"));
-
-#if 0
-  buff = g_realloc (buff, strlen (buff) + strlen ("<table>\n") + 1);
-  strcat (buff, "<table>\n");
-
-  /* date */
-  buff = g_realloc (buff, strlen (buff) + strlen ("<tr><td>Date:</td><td>") + 1);
-  strcat (buff, "<tr><td>Date:</td><td>");
-  d = get_header ("date", stream, mesgno);
-  gs = text2html (d);
-  buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
-  strcat (buff, gs->str);
-  buff = g_realloc (buff, strlen (buff) + strlen ("</td></tr>\n") + 1);
-  strcat (buff, "</td></tr>\n");
-
-  /* from */
-  buff = g_realloc (buff, strlen (buff) + strlen ("<tr><td>From:</td><td>") + 1);
-  strcat (buff, "<tr><td>From:</td><td>");
-  d = get_header_from (stream, mesgno);
-  gs = text2html (d);
-  buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
-  strcat (buff, gs->str);
-  buff = g_realloc (buff, strlen (buff) + strlen ("</td></tr>\n") + 1);
-  strcat (buff, "</td></tr>\n");
-
-  /* subject */
-  buff = g_realloc (buff, strlen (buff) + strlen ("<tr><td>Subject:</td><td>") + 1);
-  strcat (buff, "<tr><td>Subject:</td><td>");
-  d = get_header ("subject", stream, mesgno);
-  gs = text2html (d);
-  buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
-  strcat (buff, gs->str);
-  buff = g_realloc (buff, strlen (buff) + strlen ("</td></tr>\n") + 1);
-  strcat (buff, "</td></tr>\n");
-
-  /* To */
-  buff = g_realloc (buff, strlen (buff) + strlen ("<tr><td>To:</td><td>") + 1);
-  strcat (buff, "<tr><td>To:</td><td>");
-  d = get_header ("to", stream, mesgno);
-  gs = text2html (d);
-  buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
-  strcat (buff, gs->str);
-  buff = g_realloc (buff, strlen (buff) + strlen ("</td></tr>\n") + 1);
-  strcat (buff, "</td></tr>\n");
-
-  /* cc */
-  d = get_header ("cc", stream, mesgno);
-  if (strlen (d) > 3)
-    {
-      buff = g_realloc (buff, strlen (buff) + strlen ("<tr><td>cc:</td><td>") + 1);
-      strcat (buff, "<tr><td>cc:</td><td>");
-      gs = text2html (d);
-      buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
-      strcat (buff, gs->str);
-      buff = g_realloc (buff, strlen (buff) + strlen ("</td></tr>\n") + 1);
-      strcat (buff, "</td></tr>\n");
-    }
-
-  buff = g_realloc (buff, strlen (buff) + strlen ("</table>\n") + 1);
-  strcat (buff, "</table>\n");
-#endif
-
-  /* message headers */
-  c = mail_fetchheader_full (stream, mesgno, lines, NIL, NIL);
-  gs = text2html (c);
-  buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
-  strcat (buff, gs->str);
-  g_string_free (gs, 1);
-
-  mail_free_stringlist (&lines);
-
-  /* separate the headers from the body */
-  buff = g_realloc (buff, strlen (buff) + strlen ("</tt></p><p><tt>\n") + 1);
-  strcat (buff, "</tt></p><p><tt>\n");
-
-
-  /* message body */
-  c = mail_fetchtext (stream, mesgno);
-
-  gs = text2html (c);
-  buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
-
-  /* buff = g_realloc (buff, strlen (buff) + strlen (c) + 1);
-     strcat (buff, c); */
-
-  strcat (buff, gs->str);
-  g_string_free (gs, 1);
-
-
-  /* HTML footer */
-  buff = g_realloc (buff, strlen (buff) + strlen (HTML_FOOT) + 1);
-  strcat (buff, HTML_FOOT);
-
-#ifdef DEBUG
-  fprintf (stderr, buff);
-#endif
-
-  /* set message contents */
-  gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), buff);
-  g_free (buff);
-}
 
 static void
 balsa_message_size_request (GtkWidget * widget,
@@ -291,6 +127,7 @@ balsa_message_size_request (GtkWidget * widget,
       requisition->height = child->requisition.height;
     }
 }
+
 
 static void
 balsa_message_size_allocate (GtkWidget * widget,
@@ -325,65 +162,49 @@ balsa_message_size_allocate (GtkWidget * widget,
     }
 }
 
-/* debug */
-void
-debug_mime_content (BODY * body)
+
+GtkWidget *
+balsa_message_new ()
 {
-  gint i;
-  char tmp[MAILTMPLEN];
-  char *s = tmp;
-  PARAMETER *par;
-  PART *part;
-
-  if (body->type == TYPEMULTIPART)
-    {
-      for (i = 0, part = body->nested.part; part; i++, part = part->next)
-	{
-	  debug_mime_content (&part->body);
-	}
-    }
-  else
-    {
-      sprintf (s, "%s", body_types[body->type]);
-
-      /* non-multipart, output one line descriptor */
-      if (body->subtype)
-	sprintf (s += strlen (s), "/%s", body->subtype);
-
-      if (body->description)
-	sprintf (s += strlen (s), " (%s)", body->description);
-
-      if (par = body->parameter)
-	do
-	  sprintf (s += strlen (s), ";%s=%s", par->attribute, par->value);
-	while (par = par->next);
-
-      if (body->id)
-	sprintf (s += strlen (s), ", id = %s", body->id);
-
-      /* bytes or lines depending upon body type */
-      switch (body->type)
-	{
-	case TYPEMESSAGE:	/* encapsulated message */
-	case TYPETEXT:		/* plain text */
-	  sprintf (s += strlen (s), " (%ld lines)", body->size.lines);
-	  break;
-
-	default:
-	  sprintf (s += strlen (s), " (%ld bytes)", body->size.bytes);
-	  break;
-	}
-
-      /* output this line */
-      g_print ("%s\n", tmp);
-    }
+  BalsaMessage *bmessage;
+  bmessage = gtk_type_new (balsa_message_get_type ());
+  return GTK_WIDGET (bmessage);
 }
+
+
+void
+balsa_message_clear (BalsaMessage * bmessage)
+{
+  g_return_if_fail (bmessage != NULL);
+
+  bmessage->current_mailbox = NULL;
+  bmessage->current_msgno = 0;
+  gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), "");
+}
+
+
+void
+balsa_message_set (BalsaMessage * bmessage,
+		   Mailbox * mailbox,
+		   glong msgno)
+{
+  g_return_if_fail (bmessage != NULL);
+
+  bmessage->current_mailbox = mailbox;
+  bmessage->current_msgno = msgno;
+
+  /* set message contents */
+  gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), "Message Dude");
+}
+
+
 
 static GString *
 text2html (char *buff)
 {
   int i = 0, len = strlen (buff);
   GString *gs = g_string_new (NULL);
+
 
   for (i = 0; i < len; i++)
     {
@@ -567,5 +388,7 @@ text2html (char *buff)
 	    break;
 	  }
     }
+
+
   return gs;
 }

@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-06-25 19:20+0200\n"
-"PO-Revision-Date: 2002-06-25 19:24+0200\n"
+"POT-Creation-Date: 2002-06-27 11:37+0200\n"
+"PO-Revision-Date: 2002-06-27 11:38+0200\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -260,7 +260,7 @@ msgid "Do you really want to delete the selected identity?"
 msgstr "Vill du verkligen ta bort den valda identiteten?"
 
 #: libbalsa/identity.c:974 src/address-book-config.c:627 src/folder-conf.c:166
-#: src/folder-conf.c:419 src/pref-manager.c:2832
+#: src/folder-conf.c:419 src/pref-manager.c:2836
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "Fel vid visning: %s: %s\n"
@@ -1494,7 +1494,7 @@ msgstr "Fel vid sändning av meddelande, processen avslutades %d (%s)."
 msgid "Output of the delivery process"
 msgstr "Resultat av leveransprocessen"
 
-#: src/address-book-config.c:111
+#: src/address-book-config.c:112
 msgid "Address Book Configuration"
 msgstr "Adressbokskonfiguration"
 
@@ -1578,7 +1578,6 @@ msgid "_Base Domain Name"
 msgstr "_Basdomännamn"
 
 #: src/address-book-config.c:645 src/filter-edit-callbacks.c:712
-#: src/pref-manager.c:1422 src/pref-manager.c:2434
 msgid "Add"
 msgstr "Lägg till"
 
@@ -1591,17 +1590,17 @@ msgstr ""
 "Filsökvägen \"%s\" till adressboken är inte korrekt.\n"
 "Vill du rätta till filnamnet?"
 
-#: src/address-book.c:161 src/filter-edit-dialog.c:200
+#: src/address-book.c:162 src/filter-edit-dialog.c:200
 #: src/filter-export-dialog.c:53 src/filter-run-dialog.c:217
 #: src/filter-run-dialog.c:218
 msgid "Name"
 msgstr "Namn"
 
-#: src/address-book.c:161
+#: src/address-book.c:162
 msgid "E-Mail Address"
 msgstr "E-postadress"
 
-#: src/address-book.c:164
+#: src/address-book.c:165
 msgid "Address Book"
 msgstr "Adressbok"
 
@@ -1610,28 +1609,28 @@ msgstr "Adressbok"
 msgid "Search for Name:"
 msgstr "Sök efter namn:"
 
-#: src/address-book.c:305
+#: src/address-book.c:306
 msgid "Send-To"
 msgstr "Skicka till"
 
-#: src/address-book.c:325
+#: src/address-book.c:326
 msgid "Run GnomeCard"
 msgstr "Kör GnomeCard"
 
-#: src/address-book.c:333
+#: src/address-book.c:334
 msgid "Re-Import"
 msgstr "Läs om"
 
 #. mode switching stuff
-#: src/address-book.c:343
+#: src/address-book.c:344
 msgid "Treat multiple addresses as:"
 msgstr "Betrakta flera adresser som:"
 
-#: src/address-book.c:347
+#: src/address-book.c:348
 msgid "alternative addresses for the same person"
 msgstr "alternativa adresser för samma person"
 
-#: src/address-book.c:352
+#: src/address-book.c:353
 msgid "a distribution list"
 msgstr "en distributionslista"
 
@@ -1717,7 +1716,6 @@ msgid "Store Address..."
 msgstr "Lagra adress..."
 
 #: src/balsa-index.c:2040 src/filter-edit-dialog.c:266 src/mailbox-node.c:647
-#: src/pref-manager.c:1424 src/pref-manager.c:2438
 msgid "Delete"
 msgstr "Ta bort"
 
@@ -1754,22 +1752,22 @@ msgstr "Brevlåda"
 msgid "Total"
 msgstr "Totalt"
 
-#: src/balsa-mblist.c:917 src/balsa-mblist.c:989
+#: src/balsa-mblist.c:917 src/balsa-mblist.c:990
 msgid "Failed to find mailbox"
 msgstr "Misslyckades med att hitta brevlådan"
 
-#: src/balsa-mblist.c:1357
-#, c-format
-msgid "Shown mailbox: %s with %ld messages, %ld new"
-msgstr "Visad brevlåda: %s med %ld meddelanden, %ld nya"
-
-#: src/balsa-mblist.c:1758
+#: src/balsa-mblist.c:1766
 msgid "Other..."
 msgstr "Annan..."
 
-#: src/balsa-mblist.c:1837
+#: src/balsa-mblist.c:1845
 msgid "Choose destination folder"
 msgstr "Välj destinationsmapp"
+
+#: src/balsa-mblist.c:2105
+#, c-format
+msgid "Shown mailbox: %s with %ld messages, %ld new"
+msgstr "Visad brevlåda: %s med %ld meddelanden, %ld nya"
 
 #: src/balsa-message.c:336
 msgid "File already exists. Overwrite?"
@@ -2503,7 +2501,7 @@ msgstr "Hoppsan! brevlådan inte funnen i balsa_app.mailbox-noder?\n"
 msgid "Mailbox Configurator"
 msgstr "Brevlådekonfigurerare"
 
-#: src/mailbox-conf.c:418
+#: src/mailbox-conf.c:418 src/pref-manager.c:1422 src/pref-manager.c:2434
 msgid "_Add"
 msgstr "_Lägg till"
 
@@ -2593,11 +2591,11 @@ msgstr "Lokal Maildir-brevlåda..."
 msgid "Local MH mailbox..."
 msgstr "Lokal MH-brevlåda..."
 
-#: src/mailbox-node.c:610 src/main-window.c:279 src/pref-manager.c:2599
+#: src/mailbox-node.c:610 src/main-window.c:279 src/pref-manager.c:2603
 msgid "Remote IMAP mailbox..."
 msgstr "IMAP-fjärrbrevlåda..."
 
-#: src/mailbox-node.c:613 src/main-window.c:285 src/pref-manager.c:2605
+#: src/mailbox-node.c:613 src/main-window.c:285 src/pref-manager.c:2609
 msgid "Remote IMAP folder..."
 msgstr "IMAP-fjärrmapp..."
 
@@ -2937,7 +2935,7 @@ msgstr "_Flytta till papperskorgen"
 msgid "Move the current message to Trash mailbox"
 msgstr "Flytta det aktuella meddelandet till papperskorgen"
 
-#: src/main-window.c:536
+#: src/main-window.c:536 src/pref-manager.c:1424 src/pref-manager.c:2438
 msgid "_Delete"
 msgstr "_Ta bort"
 
@@ -3283,7 +3281,7 @@ msgstr "När meddelanden hämtas"
 msgid "Until Closed"
 msgstr "Fram till stängning"
 
-#: src/pref-manager.c:250 src/pref-manager.c:2768 src/pref-manager.c:2804
+#: src/pref-manager.c:250 src/pref-manager.c:2772 src/pref-manager.c:2808
 msgid "Never"
 msgstr "Aldrig"
 
@@ -3356,8 +3354,8 @@ msgid "Mailbox Name"
 msgstr "Brevlådenamn"
 
 #: src/pref-manager.c:1423 src/pref-manager.c:2436
-msgid "Modify"
-msgstr "Modifera"
+msgid "_Modify"
+msgstr "_Modifera"
 
 #: src/pref-manager.c:1426
 msgid "Local mail"
@@ -3409,16 +3407,16 @@ msgid "minutes"
 msgstr "minut"
 
 #: src/pref-manager.c:1583
-msgid "Check mail automatically every:"
-msgstr "Kontrollera posten automatiskt var:"
+msgid "_Check mail automatically every:"
+msgstr "_Kontrollera posten automatiskt var:"
 
 #: src/pref-manager.c:1592
-msgid "Check IMAP mailboxes"
-msgstr "IMAP-fjärrbrevlådor"
+msgid "Check _IMAP mailboxes"
+msgstr "Kontrollera _IMAP-brevlådor"
 
 #: src/pref-manager.c:1597
-msgid "Check INBOX only"
-msgstr "Kontrollera endast INBOX"
+msgid "Check INBOX _only"
+msgstr "Kontrollera _endast INBOX"
 
 #: src/pref-manager.c:1602
 msgid "Display message if new mail has arrived"
@@ -3786,42 +3784,42 @@ msgid "Expand aliases"
 msgstr "Expandera alias"
 
 #: src/pref-manager.c:2440
-msgid "Set as default"
-msgstr "Sätt som standard"
+msgid "_Set as default"
+msgstr "_Sätt som standard"
 
-#: src/pref-manager.c:2593
+#: src/pref-manager.c:2597
 msgid "Remote POP3 mailbox..."
 msgstr "POP3-fjärrbrevlåda..."
 
-#: src/pref-manager.c:2746
+#: src/pref-manager.c:2750
 msgid "Show nothing"
 msgstr "Visa ingenting"
 
-#: src/pref-manager.c:2747
+#: src/pref-manager.c:2751
 msgid "Show dialog"
 msgstr "Visa dialogfönster"
 
-#: src/pref-manager.c:2748
+#: src/pref-manager.c:2752
 msgid "Show in list"
 msgstr "Visa i listan"
 
-#: src/pref-manager.c:2749
+#: src/pref-manager.c:2753
 msgid "Print to console"
 msgstr "Skriv ut på konsoll"
 
-#: src/pref-manager.c:2769
+#: src/pref-manager.c:2773
 msgid "Ask me"
 msgstr "Fråga mig"
 
-#: src/pref-manager.c:2770
+#: src/pref-manager.c:2774
 msgid "Always"
 msgstr "Alltid"
 
-#: src/pref-manager.c:2805
+#: src/pref-manager.c:2809
 msgid "If Possible"
 msgstr "Om möjligt"
 
-#: src/pref-manager.c:2806
+#: src/pref-manager.c:2810
 msgid "Required"
 msgstr "Krävs"
 
@@ -4669,6 +4667,9 @@ msgstr "Tillgängliga knappar"
 #: src/toolbar-prefs.c:772
 msgid "Current toolbar"
 msgstr "Anpassa verktygsrad"
+
+#~ msgid "Modify"
+#~ msgstr "Modifera"
 
 #~ msgid "This certificate belongs to:\n"
 #~ msgstr "Detta certifikat tillhör:\n"

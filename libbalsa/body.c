@@ -182,6 +182,7 @@ libbalsa_message_body_save(LibBalsaMessageBody * body, gchar * prefix,
 {
     FILE *stream;
     STATE s;
+    char *enc;
 
     stream =
 	libbalsa_mailbox_get_message_stream(body->message->mailbox,
@@ -190,13 +191,18 @@ libbalsa_message_body_save(LibBalsaMessageBody * body, gchar * prefix,
     g_return_val_if_fail(stream != NULL, FALSE);
 
     fseek(stream, body->mutt_body->offset, 0);
-
     s.fpin = stream;
 
     s.prefix = prefix;
     s.fpout = safe_fopen(filename, "w");
     if (!s.fpout)
 	return FALSE;
+
+    enc = mutt_get_parameter ("charset", body->mutt_body->parameter);
+    if(!g_strcasecmp(enc,"utf-8"))
+	s.flags = M_CHARCONV;
+    else
+	s.flags = 0;
 
     libbalsa_lock_mutt();
     mutt_decode_attachment(body->mutt_body, &s);

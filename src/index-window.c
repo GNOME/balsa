@@ -46,10 +46,12 @@ static void destroy_index_window (GtkWidget * widget);
 static void close_index_window (GtkWidget * widget);
 static void refresh_index_window (IndexWindow * iw);
 static void mailbox_listener (MailboxWatcherMessage * iw_message);
-static void index_select_cb (GtkWidget * widget, Message * message);
+static void index_select_cb (GtkWidget * widget, Message * message, GdkEventButton *);
 
 static void set_index_window_data (GtkObject * object, IndexWindow * iw);
 static IndexWindow * get_index_window_data (GtkObject * object);
+
+static GtkWidget * create_menu(BalsaIndex * bindex, Message *message);
 
 void
 create_new_index (Mailbox * mailbox)
@@ -180,11 +182,91 @@ mailbox_listener (MailboxWatcherMessage * iw_message)
 
 static void
 index_select_cb (GtkWidget * widget,
-		 Message * message)
+		 Message * message,
+		 GdkEventButton *bevent)
 {
   g_return_if_fail (widget != NULL);
   g_return_if_fail (BALSA_IS_INDEX (widget));
   g_return_if_fail (message != NULL);
+  if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
+    message_window_new (message);
+  else if (bevent && bevent->button == 1)
+	  create_menu(BALSA_INDEX(widget), message);
+}
+/*
+ * CLIST Callbacks
+ */
+static GtkWidget *
+create_menu (BalsaIndex * bindex, Message *message)
+{
+  GtkWidget *menu, *menuitem, *submenu, *smenuitem;
+  Mailbox *mailbox;
+  GList *list;
 
-  message_window_new (message);
+  menu = gtk_menu_new ();
+  menuitem = gtk_menu_item_new_with_label ("Transfer");
+
+  list = g_list_first (balsa_app.mailbox_list);
+  submenu = gtk_menu_new ();
+  while (list)
+    {
+      mailbox = list->data;
+      smenuitem = gtk_menu_item_new_with_label (mailbox->name);
+      gtk_menu_append (GTK_MENU (submenu), smenuitem);
+      gtk_widget_show (smenuitem);
+      list = list->next;
+    }
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem);
+
+  menuitem = gtk_menu_item_new_with_label ("Change Status");
+
+  submenu = gtk_menu_new ();
+  smenuitem = gtk_menu_item_new_with_label ("Unread");
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
+  gtk_widget_show (smenuitem);
+  smenuitem = gtk_menu_item_new_with_label ("Read");
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
+  gtk_widget_show (smenuitem);
+  smenuitem = gtk_menu_item_new_with_label ("Replied");
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
+  gtk_widget_show (smenuitem);
+  smenuitem = gtk_menu_item_new_with_label ("Forwarded");
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
+  gtk_widget_show (smenuitem);
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem);
+
+  menuitem = gtk_menu_item_new_with_label ("Change Priority");
+
+  submenu = gtk_menu_new ();
+  smenuitem = gtk_menu_item_new_with_label ("Highest");
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
+  gtk_widget_show (smenuitem);
+  smenuitem = gtk_menu_item_new_with_label ("High");
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
+  gtk_widget_show (smenuitem);
+  smenuitem = gtk_menu_item_new_with_label ("Normal");
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
+  gtk_widget_show (smenuitem);
+  smenuitem = gtk_menu_item_new_with_label ("Low");
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
+  gtk_widget_show (smenuitem);
+  smenuitem = gtk_menu_item_new_with_label ("Lowest");
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
+  gtk_widget_show (smenuitem);
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem);
+
+  menuitem = gtk_menu_item_new_with_label ("Delete");
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem);
+
+  return menu;
 }

@@ -79,5 +79,8 @@ libbalsa_a_SOURCES = 		\
 INCLUDES=-I. -I${top_srcdir} -I${top_builddir}/libmutt \
 	$(BALSA_CFLAGS)
 
-DEFS = -DLIBMUTT
+DEFS = -DLIBMUTT                \
+       -DG_DISABLE_DEPRECATED   \
+       -DGTK_DISABLE_DEPRECATED \
+       -DGNOME_DISABLE_DEPRECATED
 

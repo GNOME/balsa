@@ -116,7 +116,7 @@ GETTEXT_PACKAGE=balsa
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
                    [The gettext package.])
-AM_GLIB_GNU_GETTEXT
+AM_GNU_GETTEXT
 # AM_GNOME_GETTEXT above substs $DATADIRNAME
 # this is the directory where the *.{mo,gmo} files are installed
 gnomelocaledir='${prefix}/${DATADIRNAME}/locale'
@@ -476,7 +476,6 @@ AC_MSG_RESULT($BALSA_FROM_CVS)
 dnl ##########################################################################
 dnl Create files.
 dnl ##########################################################################
-AM_PO_SUBDIRS(po)
 
 AC_OUTPUT([
 Makefile

@@ -157,8 +157,6 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox)
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server =
 	LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_IMAP));
-    g_object_ref(G_OBJECT(remote->server));
-    gtk_object_sink(GTK_OBJECT(remote->server));
 
     g_signal_connect(G_OBJECT(remote->server), "set-username",
 		     G_CALLBACK(server_user_settings_changed_cb),

@@ -56,7 +56,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
         return;
 
     dup = g_strdup(path);
-    index = (gchar *) g_basename(dup);
+    index = strrchr(dup, G_DIR_SEPARATOR);
 
     if (index == NULL) {
         (*error) =
@@ -68,7 +68,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
         return;
     }
 
-    index[-1] = '\0';           /*Split off the dirs from the file. */
+    *index = '\0';           /*Split off the dirs from the file. */
 
     if (balsa_init_create_to_directory(dup, error)) {
         /*TRUE->error */
@@ -76,7 +76,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
         return;
     }
 
-    index[-1] = '/';
+    *index = G_DIR_SEPARATOR;
 
     url_parse_ciss(&url, dup);
 

@@ -310,7 +310,7 @@ gboolean libbalsa_find_word(const gchar * word, const gchar * str)
     int len = strlen(word);
 
     while (*ptr) {
-	if (g_strncasecmp(word, ptr, len) == 0)
+	if (g_ascii_strncasecmp(word, ptr, len) == 0)
 	    return TRUE;
 	/* skip one word */
 	while (*ptr && !isspace((int)*ptr))
@@ -658,11 +658,11 @@ libbalsa_flowed_rfc2646(LibBalsaMessageBody * body)
     gboolean flowed;
 
     content_type = libbalsa_message_body_get_content_type(body);
-    if (g_strcasecmp(content_type, "text/plain"))
+    if (g_ascii_strcasecmp(content_type, "text/plain"))
         flowed = FALSE;
     else {
         format = libbalsa_message_body_get_parameter(body, "format");
-        flowed = format && (g_strcasecmp(format, "flowed") == 0);
+        flowed = format && (g_ascii_strcasecmp(format, "flowed") == 0);
         g_free(format);
     }
     g_free(content_type);
@@ -893,6 +893,45 @@ libbalsa_marshal_POINTER__INT_POINTER (GClosure     *closure,
   g_value_set_pointer (return_value, v_return);
 }
 
+/* libbalsa_marshall_VOID__POINTER_INT:
+   Marshalling function
+*/
+void
+libbalsa_marshal_VOID__POINTER_INT (GClosure     *closure,
+                                    GValue       *return_value,
+                                    guint         n_param_values,
+                                    const GValue *param_values,
+                                    gpointer      invocation_hint,
+                                    gpointer      marshal_data)
+{
+  typedef void (*GMarshalFunc_VOID__POINTER_INT) (gpointer     data1,
+                                                  gpointer     arg_1,
+                                                  gint         arg_2,
+                                                  gpointer     data2);
+  register GMarshalFunc_VOID__POINTER_INT callback;
+  register GCClosure *cc = (GCClosure*) closure;
+  register gpointer data1, data2;
+
+  g_return_if_fail (n_param_values == 3);
+
+  if (G_CCLOSURE_SWAP_DATA (closure))
+    {
+      data1 = closure->data;
+      data2 = g_value_peek_pointer (param_values + 0);
+    }
+  else
+    {
+      data1 = g_value_peek_pointer (param_values + 0);
+      data2 = closure->data;
+    }
+  callback = (GMarshalFunc_VOID__POINTER_INT) (marshal_data ? marshal_data : cc->callback);
+
+  callback (data1,
+            g_value_get_pointer (param_values + 1),
+            g_value_get_int     (param_values + 2),
+            data2);
+}
+
 /* libbalsa_marshall_VOID__POINTER_POINTER:
    Marshalling function
 */
@@ -948,8 +987,8 @@ libbalsa_delete_directory_contents(const gchar *path)
     g_return_val_if_fail(d, FALSE);
 
     for (de = readdir(d); de; de = readdir(d)) {
-	if (g_strcasecmp(de->d_name, ".") == 0 ||
-	    g_strcasecmp(de->d_name, "..") == 0)
+	if (strcmp(de->d_name, ".") == 0 ||
+	    strcmp(de->d_name, "..") == 0)
 	    continue;
 	new_path = g_strdup_printf("%s/%s", path, de->d_name);
 

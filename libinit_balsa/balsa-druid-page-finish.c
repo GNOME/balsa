@@ -95,7 +95,7 @@ balsa_druid_page_finish_finish(GnomeDruidPage * page, GnomeDruid * druid)
     gchar *address_book;
 
     address_book = gnome_util_home_file("GnomeCard.gcrd");
-    if (g_file_exists(address_book)) {
+    if (g_file_test(address_book, G_FILE_TEST_EXISTS)) {
         LibBalsaAddressBook *ab =
             libbalsa_address_book_vcard_new(_("GnomeCard Address Book"),
                                             address_book);

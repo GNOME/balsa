@@ -28,18 +28,11 @@
 
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 
-#include <gtk/gtk.h>
 
-
-/* GTK_CLASS_TYPE for 1.2<->1.3/2.0 GTK+ compatibility */
-#ifndef GTK_CLASS_TYPE
-#define GTK_CLASS_TYPE(x) (GTK_OBJECT_CLASS(x)->type)
-#endif /* GTK_CLASS_TYPE */
-
-static GtkObjectClass *parent_class = NULL;
+static GObjectClass *parent_class = NULL;
 static void libbalsa_server_class_init(LibBalsaServerClass * klass);
 static void libbalsa_server_init(LibBalsaServer * server);
-static void libbalsa_server_destroy(GtkObject * object);
+static void libbalsa_server_finalize(GObject * object);
 
 static void libbalsa_server_real_set_username(LibBalsaServer * server,
 					      const gchar * username);
@@ -63,23 +56,27 @@ enum {
 
 static guint libbalsa_server_signals[LAST_SIGNAL];
 
-GtkType libbalsa_server_get_type(void)
+GType
+libbalsa_server_get_type(void)
 {
-    static GtkType server_type = 0;
+    static GType server_type = 0;
 
     if (!server_type) {
-	static const GtkTypeInfo server_info = {
-	    "LibBalsaServer",
-	    sizeof(LibBalsaServer),
-	    sizeof(LibBalsaServerClass),
-	    (GtkClassInitFunc) libbalsa_server_class_init,
-	    (GtkObjectInitFunc) libbalsa_server_init,
-	    /* reserved_1 */ NULL,
-	    /* reserved_2 */ NULL,
-	    (GtkClassInitFunc) NULL,
-	};
+        static const GTypeInfo server_info = {
+            sizeof(LibBalsaServerClass),
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+            (GClassInitFunc) libbalsa_server_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+            sizeof(LibBalsaServer),
+            0,                  /* n_preallocs */
+            (GInstanceInitFunc) libbalsa_server_init
+        };
 
-	server_type = gtk_type_unique(gtk_object_get_type(), &server_info);
+        server_type =
+            g_type_register_static(G_TYPE_OBJECT, "LibBalsaServer",
+                                   &server_info, 0);
     }
 
     return server_type;
@@ -88,50 +85,63 @@ GtkType libbalsa_server_get_type(void)
 static void
 libbalsa_server_class_init(LibBalsaServerClass * klass)
 {
-    GtkObjectClass *object_class;
+    GObjectClass *object_class;
 
-    object_class = GTK_OBJECT_CLASS(klass);
+    object_class = G_OBJECT_CLASS(klass);
 
-    parent_class = gtk_type_class(gtk_object_get_type());
+    parent_class = g_type_class_peek_parent(klass);
 
-    object_class->destroy = libbalsa_server_destroy;
+    object_class->finalize = libbalsa_server_finalize;
 
     libbalsa_server_signals[SET_USERNAME] =
-	gtk_signal_new("set-username",
-		       GTK_RUN_FIRST,
-		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaServerClass,
-					 set_username),
-		       gtk_marshal_NONE__STRING, GTK_TYPE_NONE, 1,
-		       GTK_TYPE_STRING);
+	g_signal_new("set-username",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_FIRST,
+		     G_STRUCT_OFFSET(LibBalsaServerClass,
+				     set_username),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__STRING,
+                     G_TYPE_NONE, 1,
+		     G_TYPE_STRING);
     libbalsa_server_signals[SET_PASSWORD] =
-	gtk_signal_new("set-password", GTK_RUN_FIRST,
-                       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaServerClass,
-					 set_password),
-		       gtk_marshal_NONE__STRING, GTK_TYPE_NONE, 1,
-		       GTK_TYPE_STRING);
+	g_signal_new("set-password",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_FIRST,
+		     G_STRUCT_OFFSET(LibBalsaServerClass,
+				     set_password),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__STRING,
+                     G_TYPE_NONE, 1,
+		     G_TYPE_STRING);
     libbalsa_server_signals[SET_HOST] =
-	gtk_signal_new("set-host", GTK_RUN_FIRST,
-                       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaServerClass, set_host),
+	g_signal_new("set-host",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_FIRST,
+		     G_STRUCT_OFFSET(LibBalsaServerClass,
+                                     set_host),
+                     NULL, NULL,
 #ifdef USE_SSL
-		       gtk_marshal_NONE__POINTER_INT, GTK_TYPE_NONE, 2,
-		       GTK_TYPE_POINTER, GTK_TYPE_INT);
+                     libbalsa_marshal_VOID__POINTER_INT,
+                     G_TYPE_NONE, 2,
+                     G_TYPE_POINTER, G_TYPE_INT
 #else
-                       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
-	               GTK_TYPE_POINTER);
+                     g_cclosure_marshal_VOID__POINTER,
+                     G_TYPE_NONE, 1,
+                     G_TYPE_POINTER
 #endif
+                     );
 
 
     libbalsa_server_signals[GET_PASSWORD] =
-	gtk_signal_new("get-password",
-		       GTK_RUN_LAST,
-		       GTK_CLASS_TYPE(object_class),
-		       GTK_SIGNAL_OFFSET(LibBalsaServerClass,
-					 get_password),
-		       libbalsa_marshal_POINTER__OBJECT, GTK_TYPE_POINTER,
-		       1, LIBBALSA_TYPE_MAILBOX);
+	g_signal_new("get-password",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_LAST,
+		     G_STRUCT_OFFSET(LibBalsaServerClass,
+			             get_password),
+                     NULL, NULL,
+		     libbalsa_marshal_POINTER__OBJECT,
+                     G_TYPE_POINTER, 1,
+                     LIBBALSA_TYPE_MAILBOX);
 
     klass->set_username = libbalsa_server_real_set_username;
     klass->set_password = libbalsa_server_real_set_password;
@@ -153,7 +163,7 @@ libbalsa_server_init(LibBalsaServer * server)
 
 /* leave object in sane state (NULLified fields) */
 static void
-libbalsa_server_destroy(GtkObject * object)
+libbalsa_server_finalize(GObject * object)
 {
     LibBalsaServer *server;
 
@@ -165,18 +175,17 @@ libbalsa_server_destroy(GtkObject * object)
     g_free(server->user);   server->user = NULL;
     g_free(server->passwd); server->passwd = NULL;
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
+    G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
-GtkObject *
+GObject *
 libbalsa_server_new(LibBalsaServerType type)
 {
     LibBalsaServer *server;
-    server = gtk_type_new(LIBBALSA_TYPE_SERVER);
+    server = g_object_new(LIBBALSA_TYPE_SERVER, NULL);
     server->type = type;
 
-    return GTK_OBJECT(server);
+    return G_OBJECT(server);
 }
 
 void
@@ -186,8 +195,8 @@ libbalsa_server_set_username(LibBalsaServer * server,
     g_return_if_fail(server != NULL);
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-    gtk_signal_emit(GTK_OBJECT(server),
-		    libbalsa_server_signals[SET_USERNAME], username);
+    g_signal_emit(G_OBJECT(server),
+		  libbalsa_server_signals[SET_USERNAME], 0, username);
 }
 
 void
@@ -196,8 +205,8 @@ libbalsa_server_set_password(LibBalsaServer * server, const gchar * passwd)
     g_return_if_fail(server != NULL);
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-    gtk_signal_emit(GTK_OBJECT(server),
-		    libbalsa_server_signals[SET_PASSWORD], passwd);
+    g_signal_emit(G_OBJECT(server),
+		  libbalsa_server_signals[SET_PASSWORD], 0, passwd);
 }
 
 void
@@ -210,12 +219,12 @@ libbalsa_server_set_host(LibBalsaServer * server, const gchar * host
     g_return_if_fail(server != NULL);
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-    gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_HOST],
-		    host
+    g_signal_emit(G_OBJECT(server), libbalsa_server_signals[SET_HOST],
+		  0, host
 #ifdef USE_SSL
-		    , use_ssl
+		  , use_ssl
 #endif
-		    );
+		  );
 
 }
 
@@ -228,8 +237,8 @@ libbalsa_server_get_password(LibBalsaServer * server,
     g_return_val_if_fail(server != NULL, NULL);
     g_return_val_if_fail(LIBBALSA_IS_SERVER(server), NULL);
 
-    gtk_signal_emit(GTK_OBJECT(server),
-		    libbalsa_server_signals[GET_PASSWORD], mbox, &retval);
+    g_signal_emit(G_OBJECT(server), libbalsa_server_signals[GET_PASSWORD],
+                  0, mbox, &retval);
     return retval;
 }
 

@@ -93,6 +93,12 @@ void libbalsa_marshal_POINTER__INT_POINTER (GClosure     *closure,
                                             const GValue *param_values,
                                             gpointer      invocation_hint,
                                             gpointer      marshal_data);
+void libbalsa_marshal_VOID__POINTER_INT     (GClosure     *closure,
+                                             GValue       *return_value,
+                                             guint         n_param_values,
+                                             const GValue *param_values,
+                                             gpointer      invocation_hint,
+                                             gpointer      marshal_data);
 void libbalsa_marshal_VOID__POINTER_POINTER (GClosure     *closure,
                                              GValue       *return_value,
                                              guint         n_param_values,

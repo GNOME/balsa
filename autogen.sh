@@ -48,8 +48,8 @@ sleep 3
 # Do the things the usual way.
 
 # GNOME's autogen.sh does not pass --intl option to gettextize,
-# let's call gettextize ourselves
-gettextize --force --copy --intl
+function gettextize { `which gettextize` --intl $*; }
+
 
 # call GNOME's autogen.sh.
 . $srcdir/macros/autogen.sh

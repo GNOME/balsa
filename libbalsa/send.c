@@ -234,8 +234,8 @@ ensure_send_progress_dialog()
 		       send_dialog_bar, FALSE, FALSE, 0);
 
     gtk_widget_show_all(send_dialog);
-    gtk_signal_connect(GTK_OBJECT(send_dialog), "destroy", 
-		       GTK_SIGNAL_FUNC(send_dialog_destroy_cb), NULL);
+    g_signal_connect(G_OBJECT(send_dialog), "destroy", 
+		     G_CALLBACK(send_dialog_destroy_cb), NULL);
     /* Progress bar done */
 }
 
@@ -1355,6 +1355,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 
     { /* scope */
 	gchar *cset = g_strdup(libbalsa_message_charset(message));
+        gchar *save_charset = Charset;
 	
 	libbalsa_lock_mutt();
 	mutt_set_charset(cset);
@@ -1364,7 +1365,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	}
 	mutt_prepare_envelope(msg->env, FALSE);
 	encode_descriptions(msg->content);
-	mutt_set_charset(NULL);
+	mutt_set_charset(save_charset);
 	g_free(cset);
 	libbalsa_unlock_mutt();
     } 
@@ -1518,6 +1519,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
     
     { /* scope */
 	gchar *cset = g_strdup(libbalsa_message_charset(message));
+        gchar *save_charset = Charset;
 	
 	libbalsa_lock_mutt();
 	mutt_set_charset(cset);
@@ -1525,7 +1527,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	    msg->content = mutt_make_multipart(msg->content);
 	mutt_prepare_envelope(msg->env, TRUE);
 	encode_descriptions(msg->content);
-	mutt_set_charset(NULL);
+	mutt_set_charset(save_charset);
 	g_free(cset);
 	libbalsa_unlock_mutt();
     }

@@ -398,10 +398,9 @@ config_mailbox_init(const gchar * prefix)
     if (mailbox == NULL)
 	return FALSE;
     if (LIBBALSA_IS_MAILBOX_REMOTE(mailbox))
-	gtk_signal_connect(GTK_OBJECT
-			   (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)),
-			   "get-password", GTK_SIGNAL_FUNC(ask_password),
-			   mailbox);
+        g_signal_connect(G_OBJECT(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)),
+                         "get-password", G_CALLBACK(ask_password),
+                         mailbox);
 
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	balsa_app.inbox_input =

@@ -1,5 +1,5 @@
 #intl dir needed for tarball --disable-nls build.
-SUBDIRS = po sounds images help libmutt libbalsa libinit_balsa src
+SUBDIRS = intl po sounds images help libmutt libbalsa libinit_balsa src
 
 man_MANS=balsa.1
 
@@ -51,3 +51,5 @@ bzdist: distdir
 	-chmod -R a+r $(distdir)
 	$(TAR) chojf $(distdir).tar.bz2 $(distdir)
 	-rm -rf $(distdir)
+
+ACLOCAL_AMFLAGS = -I m4  

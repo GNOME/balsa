@@ -651,9 +651,8 @@ update_imap_mailbox(MailboxConfWindow *mcw)
 #endif
 );
 
-    gtk_signal_connect(GTK_OBJECT(server),
-		       "get-password", GTK_SIGNAL_FUNC(ask_password),
-		       mailbox);
+    g_signal_connect(G_OBJECT(server), "get-password",
+                     G_CALLBACK(ask_password), mailbox);
 
     libbalsa_mailbox_imap_set_path(mailbox,
 				   (path == NULL || path[0] == '\0') 

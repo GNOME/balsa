@@ -60,17 +60,25 @@ static GnomeUIInfo main_menu[] = {
 
 
 static void 
-select_all_cb(GtkWidget* w, gpointer data)
+select_all_cb(GtkWidget * w, gpointer data)
 {
-    GtkEditable * editable = gtk_object_get_data(GTK_OBJECT(data), "text");
-    gtk_editable_select_region(editable, 0, -1);
+    GtkTextView *text = g_object_get_data(G_OBJECT(data), "text");
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(text);
+    GtkTextIter start, end;
+
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
+    gtk_text_buffer_move_mark_by_name(buffer, "insert", &start);
+    gtk_text_buffer_move_mark_by_name(buffer, "selection_bound", &end);
 }
 
 static void
 copy_cb(GtkWidget * w, gpointer data)
 {
-    GtkEditable * editable = gtk_object_get_data(GTK_OBJECT(data), "text");
-    gtk_editable_copy_clipboard(editable);
+    GtkTextView *text = g_object_get_data(G_OBJECT(data), "text");
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(text);
+    GtkClipboard *clipboard = gtk_clipboard_get(GDK_NONE);
+
+    gtk_text_buffer_copy_clipboard(buffer, clipboard);
 }
 
 static void
@@ -93,7 +101,7 @@ libbalsa_show_file(FILE* f, long length)
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
     buffer = gtk_text_buffer_new (NULL);
     text   = gtk_text_view_new_with_buffer(buffer);
-    gtk_object_set_data(GTK_OBJECT(window), "text", text);
+    g_object_set_data(G_OBJECT(window), "text", text);
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
     
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD);

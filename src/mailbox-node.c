@@ -295,9 +295,6 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
 
     folder->server = LIBBALSA_SERVER(
 	libbalsa_server_new(LIBBALSA_SERVER_IMAP));
-    /* take over the ownership */
-    gtk_object_ref(GTK_OBJECT(folder->server)); 
-    gtk_object_sink(GTK_OBJECT(folder->server)); 
     libbalsa_server_load_config(folder->server);
 
 #ifdef USE_SSL  
@@ -310,9 +307,8 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
 		       GTK_SIGNAL_FUNC(folder_conf_imap_node), NULL);
     gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 
 		       GTK_SIGNAL_FUNC(imap_dir_cb), NULL);
-    gtk_signal_connect(GTK_OBJECT(folder->server),
-                       "get-password", GTK_SIGNAL_FUNC(ask_password),
-                       NULL);
+    g_signal_connect(G_OBJECT(folder->server), "get-password",
+                     G_CALLBACK(ask_password), NULL);
     balsa_mailbox_node_load_config(folder, prefix);
 
     folder->dir = gnome_config_get_string("Directory");
@@ -338,8 +334,6 @@ balsa_mailbox_node_new_imap_node(LibBalsaServer* s, const char*p)
     g_assert(s);
 
     folder->server = s;
-    gtk_object_ref(GTK_OBJECT(s));
-    gtk_object_sink(GTK_OBJECT(s));
     folder->dir = g_strdup(p);
     gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 
 		       GTK_SIGNAL_FUNC(imap_dir_cb), NULL);

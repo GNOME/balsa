@@ -1,5 +1,7 @@
-2004-01-24 10:07  PeterB
+2004-01-24 12:39  PeterB
 
+	* src/balsa-message.c: connect only to widget signals, so they are
+	disconnected automatically when widget is destroyed.
 	* libbalsa/mailbox.c, libbalsa/mailbox.h, src/balsa-index.c: New
 	mailbox column LB_MBOX_STYLE_COL, which is PANGO_STYLE_OBLIQUE for
 	a message with unread children.

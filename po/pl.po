@@ -12,13 +12,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-04-20 12:51+0200\n"
+"POT-Creation-Date: 2004-04-23 14:56+0200\n"
 "PO-Revision-Date: 2003-07-27 23:38+0100\n"
 "Last-Translator: Gnome PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
 
 #. The externq database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:255 libbalsa/address-book-ldap.c:401
@@ -522,8 +524,11 @@ msgstr "Pobieranie listu %d z %d"
 
 #: libbalsa/pop3.c:433
 #, c-format
-msgid "Received %d bytes of %d"
-msgstr "Pobrano %d bajtów z %d"
+msgid "Received %d byte of %d"
+msgid_plural "Received %d bytes of %d"
+msgstr[0] "Otrzymano %d bajt z %d"
+msgstr[1] "Otrzymano %d bajty z %d"
+msgstr[2] "Otrzymano %d bajtów z %d"
 
 #: libbalsa/rfc3156.c:158
 #, c-format
@@ -2311,10 +2316,23 @@ msgstr "_Inny..."
 msgid "Choose destination folder"
 msgstr "Wybór folderu docelowego"
 
-#: src/balsa-mblist.c:2185
+#: src/balsa-mblist.c:2186
 #, c-format
-msgid "Shown mailbox: %s with %ld messages, %ld new"
-msgstr "Widoczna skrzynka: %s; %ld listów, %ld nowych"
+msgid "Shown mailbox: %s with %ld message, "
+msgid_plural "Shown mailbox: %s with %ld messages, "
+msgstr[0] "Widoczna skrzynka: %s z %ld listem, "
+msgstr[1] "Widoczna skrzynka: %s z %ld listami, "
+msgstr[2] "Widoczna skrzynka: %s z %ld listami, "
+
+#. xgettext: this is the second part of the message
+#. * "Shown mailbox: %s with %ld messages, %ld new".
+#: src/balsa-mblist.c:2192
+#, c-format
+msgid "%ld new"
+msgid_plural "%ld new"
+msgstr[0] "%ld nowy"
+msgstr[1] "%ld nowe"
+msgstr[2] "%ld nowych"
 
 #: src/balsa-message.c:461
 msgid "Content"
@@ -2757,17 +2775,17 @@ msgstr "_Wszystkie"
 msgid "C_lear"
 msgstr "Wyc_zyść"
 
-#: src/filter-edit-callbacks.c:999 src/main-window.c:2762
+#: src/filter-edit-callbacks.c:999 src/main-window.c:2761
 msgid "_Body"
 msgstr "Tr_eść"
 
 #. To:
-#: src/filter-edit-callbacks.c:1006 src/main-window.c:2763
+#: src/filter-edit-callbacks.c:1006 src/main-window.c:2762
 #: src/sendmsg-window.c:1931
 msgid "_To:"
 msgstr "D_la:"
 
-#: src/filter-edit-callbacks.c:1013 src/main-window.c:2764
+#: src/filter-edit-callbacks.c:1013 src/main-window.c:2763
 msgid "_From:"
 msgstr "O_d:"
 
@@ -2775,7 +2793,7 @@ msgstr "O_d:"
 msgid "_Subject"
 msgstr "_Temat"
 
-#: src/filter-edit-callbacks.c:1028 src/main-window.c:2766
+#: src/filter-edit-callbacks.c:1028 src/main-window.c:2765
 msgid "_Cc:"
 msgstr "_Cc:"
 
@@ -3960,55 +3978,54 @@ msgstr "Błąd przy wysyłaniu: %s"
 msgid "Balsa: New mail"
 msgstr "Balsa: Nowa poczta"
 
-#: src/main-window.c:2294
+#: src/main-window.c:2293
 #, c-format
-msgid "You have received %d new messages."
-msgstr "Odebrano %d nowych listów."
+msgid "You have received %d new message."
+msgid_plural "You have received %d new messages."
+msgstr[0] "Odebrano %d nowy list."
+msgstr[1] "Odebrano %d nowe listy."
+msgstr[2] "Odebrano %d nowych listów."
 
-#: src/main-window.c:2295
-msgid "You have received 1 new message."
-msgstr "Odebrano jeden nowy list."
-
-#: src/main-window.c:2722
+#: src/main-window.c:2721
 msgid "Search mailbox"
 msgstr "Przeszukiwanie skrzynki"
 
-#: src/main-window.c:2735
+#: src/main-window.c:2734
 msgid "_Reverse search"
 msgstr "Przeszukiwanie od _tyłu"
 
-#: src/main-window.c:2738
+#: src/main-window.c:2737
 msgid "_Search for:"
 msgstr "Wyszukiwany _napis:"
 
-#: src/main-window.c:2751
+#: src/main-window.c:2750
 msgid "In:"
 msgstr "Zakres:"
 
-#: src/main-window.c:2765
+#: src/main-window.c:2764
 msgid "S_ubject"
 msgstr "T_emat:"
 
-#: src/main-window.c:2880
+#: src/main-window.c:2879
 msgid "You can apply filters only on mailbox\n"
 msgstr "Można stosować filtry tylko na skrzynkach\n"
 
-#: src/main-window.c:2924 src/main-window.c:2943
+#: src/main-window.c:2923 src/main-window.c:2942
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Zapisanie zmian w skrzynce %s nie powiodło się."
 
-#: src/main-window.c:3072
+#: src/main-window.c:3071
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (tylko do odczytu)"
 
-#: src/main-window.c:3074
+#: src/main-window.c:3073
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3172
+#: src/main-window.c:3171
 msgid "Cannot access the message's body\n"
 msgstr "Nie można uzyskać dostępu do treści listu\n"
 
@@ -5779,6 +5796,9 @@ msgstr "Góra"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Dół"
+
+#~ msgid "You have received 1 new message."
+#~ msgstr "Odebrano jeden nowy list."
 
 #~ msgid "This part contains at least two signatures with different status."
 #~ msgstr "Ten element zawiera przynajmniej dwa podpisy z różnymi stanami."

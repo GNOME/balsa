@@ -269,6 +269,12 @@ message_window_idle_handler(MessageWindow* mw)
 
     mw->idle_handler_id = 0;
 
+    if (!message->mailbox) {
+	gtk_widget_destroy(mw->window);
+	gdk_threads_leave();
+	return FALSE;
+    }
+
     /* set window title */
     from = libbalsa_address_to_gchar(message->headers->from, 0);
     title = g_strdup_printf(_("Message from %s: %s"), from,
@@ -278,6 +284,14 @@ message_window_idle_handler(MessageWindow* mw)
     g_free(title);
 
     balsa_message_set(msg, message);
+    /* We may have triggered a mailbox-check, so we need to verify that
+     * the message is still good. */
+    if (!message->mailbox) {
+	gtk_widget_destroy(mw->window);
+	gdk_threads_leave();
+	return FALSE;
+    }
+
     balsa_message_set_close(msg, TRUE);
 
     if(msg && msg->treeview) {
@@ -695,9 +709,13 @@ mw_set_buttons_sensitive(MessageWindow * mw)
     GtkWidget *toolbar =
 	balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
     LibBalsaMailbox *mailbox = mw->message->mailbox;
-    gint other_unread =
-	mailbox->unread_messages - LIBBALSA_MESSAGE_IS_UNREAD(mw->message);
+    gint other_unread;
 
+    if (!mailbox)
+	gtk_widget_destroy(mw->window);
+
+    other_unread =
+	mailbox->unread_messages - LIBBALSA_MESSAGE_IS_UNREAD(mw->message);
     gtk_widget_set_sensitive(mw->next_unread, other_unread > 0);
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_UNREAD,
 				       other_unread > 0);

@@ -2951,6 +2951,7 @@ find_real(BalsaIndex * bindex, gboolean again)
         vbox = GTK_DIALOG(dia)->vbox;
 
 	page=gtk_table_new(2, 1, FALSE);
+	gtk_container_set_border_width(GTK_CONTAINER(page), 6);
 	w = gtk_label_new_with_mnemonic(_("_Search for:"));
 	gtk_table_attach(GTK_TABLE(page),w,0, 1, 0, 1,
 			 GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);

@@ -175,6 +175,9 @@ void mutt_fetchPopMail (void)
   if (connect (s, (struct sockaddr *) &sin, sizeof (struct sockaddr_in)) == -1)
   {
     mutt_perror ("connect");
+
+    /* BALSA: This is needed to prevent deadlocks when failing */
+    /* to connect to a POP server */
     mx_fastclose_mailbox (&ctx);
     return;
   }

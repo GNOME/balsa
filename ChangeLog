@@ -1,3 +1,10 @@
+2000-08-15  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/main.c: Patch from Timothy Alan Chandler
+	<fusion@heavywater.net> to initialize GConf if needed for the
+	experimental GtkHTML support.
+	* configure.in: Mark GtkHTML support as experimental.
+
 2000-08-15  Pablo Saratxaga <pablo@mandrakesoft.com>
 
 	* configure.in,po/wa.po: added Walloon file

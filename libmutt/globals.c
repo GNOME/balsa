@@ -21,3 +21,6 @@
 #include "mutt_curses.h"
 #include "keymap.h"
 #include "mailbox.h"
+#ifdef _PGPPATH
+#include "pgp.h"
+#endif

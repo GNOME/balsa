@@ -1,3 +1,7 @@
+2004-12-12 12:23  PeterB
+
+	* libbalsa/mailbox_imap.c: check for NULL handle.
+
 2004-12-09 15:45  PeterB
 
 	* libbalsa/address-entry.c, libbalsa/address-entry.h,

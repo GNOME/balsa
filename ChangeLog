@@ -1,3 +1,15 @@
+2004-10-21 19:51  PeterB
+
+	* src/main.c: implement recursive gdk_threads_{enter,leave}.
+	* libbalsa/: Makefile.am, abook-completion.c,
+	address-book-extern.c, address-book-extern.h, address-book-ldif.c,
+	address-book-ldif.h, address-book-vcard.c, address-book-vcard.h,
+	address-book.c, body.c, files.c, filter-file.c, filter.c, html.c,
+	identity.c, information.c, libbalsa.c, mailbox.c, mailbox_imap.c,
+	mailbox_mbox.c, mailbox_mh.c, message.c, rfc3156.c, rfc3156.h,
+	send.c, source-viewer.c: deprecation cleanup.
+	* src/ab-window.c: ditto.
+
 2004-10-21 Albrecht Dreß <albrecht.dress@arcor.de>
 
 	* libbalsa/Makefile.am, libbalsa/gmime-application-pkcs7.c,

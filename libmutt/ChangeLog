@@ -1,5 +1,11 @@
 2001-07-18  Carlos Morgado  <chbm@chbm.nu>
 
+	* configure.in (Repository): 
+	* acconfig.h (Repository): 
+	fix ICONV detecion on newer distros
+
+2001-07-18  Carlos Morgado  <chbm@chbm.nu>
+
 	* mutt_ssl.c:  
 	* imap/util.c (Repository): 
 	* imap/utf7.c (Repository): 

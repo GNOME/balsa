@@ -106,3 +106,12 @@
 
 /* BALSA: use pcre instead of `standard' rexexp's? */
 #undef HAVE_PCRE
+
+/* Define if you have iconv(). */
+#define HAVE_ICONV 1
+
+/* Define as 1 if iconv() only converts exactly and we should treat
+ * all return values other than (size_t)(-1) as equivalent. */
+ #define ICONV_NONTRANS 0
+ 
+ 

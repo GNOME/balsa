@@ -78,7 +78,6 @@ static void show_about_box ();
 /* callbacks */
 static void move_resize_cb ();
 
-static void check_new_messages_cb (GtkWidget * widget);
 static void index_select_cb (GtkWidget * widget, Message * message);
 static void next_message_cb (GtkWidget * widget);
 static void previous_message_cb (GtkWidget * widget);
@@ -123,9 +122,6 @@ open_main_window ()
   /* main window */
   mw->window = gnome_app_new ("balsa", "Balsa");
   gtk_window_set_wmclass (GTK_WINDOW (mw->window), "balsa_app", "Balsa");
-#if 0
-  gtk_widget_set_usize (mw->window, balsa_app.mw_width, balsa_app.mw_height);
-#endif
 
   gtk_signal_connect (GTK_OBJECT (mw->window),
 		      "destroy",
@@ -151,9 +147,7 @@ open_main_window ()
 
   /* contents widget */
   vbox = gtk_vbox_new (FALSE, 0);
-#if 0
-  gnome_app_set_contents (GNOME_APP (mw->window), vbox);
-#endif
+
   gtk_widget_show (vbox);
 
 
@@ -246,79 +240,11 @@ refresh_main_window ()
   GtkWidget *menuitem;
   Mailbox *mailbox;
 
-
-
   /*
    * set the toolbar style
    */
   gtk_toolbar_set_style (GTK_TOOLBAR (mw->toolbar), balsa_app.toolbar_style);
-
-
-
-
-  /*
-   * remove old menu from the mailbox-selection option menu,
-   * and replace it with a new current one 
-   */
-#if 0
-  gtk_option_menu_remove_menu (GTK_OPTION_MENU (mw->mailbox_option_menu));
-  mw->mailbox_menu = gtk_menu_new ();
-
-  /* create the new menu */
-  list = balsa_app.mailbox_list;
-  while (list)
-    {
-      mailbox = list->data;
-      list = list->next;
-
-      menuitem = gtk_menu_item_new_with_label (mailbox->name);
-
-      gtk_object_set_user_data (GTK_OBJECT (menuitem), (gpointer) mw);
-      gtk_object_set_data (GTK_OBJECT (menuitem), MAILBOX_DATA, mailbox);
-
-      gtk_signal_connect (GTK_OBJECT (menuitem),
-			  "activate",
-			  (GtkSignalFunc) mailbox_select_cb,
-			  mailbox);
-
-      gtk_menu_append (GTK_MENU (mw->mailbox_menu), menuitem);
-      gtk_widget_show (menuitem);
-
-    }
-  gtk_option_menu_set_menu (GTK_OPTION_MENU (mw->mailbox_option_menu), mw->mailbox_menu);
-#endif
-  /* now set the mailbox-menu back to it's previous state */
-  if (mw->mailbox)
-    main_window_set_mailbox (mw->mailbox);
 }
-
-
-void
-main_window_set_mailbox (Mailbox * mailbox)
-{
-#if 0
-  gint i;
-  GtkWidget *menuitem;
-  GList *children;
-
-  children = GTK_MENU_SHELL (mw->mailbox_menu)->children;
-  while (children)
-    {
-      menuitem = children->data;
-      children = children->next;
-
-      if (gtk_object_get_data (GTK_OBJECT (menuitem), MAILBOX_DATA) == mailbox)
-	{
-	  gtk_option_menu_set_history
-	    (GTK_OPTION_MENU (mw->mailbox_option_menu),
-	     g_list_index (GTK_MENU_SHELL (mw->mailbox_menu)->children, menuitem));
-	  gtk_menu_item_activate (GTK_MENU_ITEM (menuitem));
-	  break;
-	}
-    }
-#endif
-}
-
 
 /*
  * the menubar for the main window
@@ -343,7 +269,7 @@ create_menu ()
 
   /* FILE Menu */
   menu = gtk_menu_new ();
-
+#if 0
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RCV, _ ("Get New Mail"));
   gtk_menu_append (GTK_MENU (menu), w);
   gtk_widget_add_accelerator (w, "activate", accel, 'M', GDK_CONTROL_MASK, 0);
@@ -360,7 +286,7 @@ create_menu ()
   w = gtk_menu_item_new ();
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
-
+#endif
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_EXIT, _ ("Exit"));
   gtk_widget_show (w);
@@ -556,28 +482,7 @@ create_toolbar ()
   mw->toolbar = toolbar = gtk_toolbar_new (GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_ICONS);
   gnome_app_set_toolbar (GNOME_APP (mw->window), GTK_TOOLBAR (toolbar));
   gtk_widget_show (toolbar);
-
 #if 0
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
-
-
-  label = gtk_label_new ("Mailbox:");
-  gtk_toolbar_append_widget (GTK_TOOLBAR (toolbar), label, NULL, NULL);
-  gtk_widget_show (label);
-
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
-
-
-  mw->mailbox_option_menu = gtk_option_menu_new ();
-  gtk_widget_set_usize (mw->mailbox_option_menu, 150, BALSA_BUTTON_HEIGHT);
-  gtk_toolbar_append_widget (GTK_TOOLBAR (toolbar), mw->mailbox_option_menu, NULL, NULL);
-  gtk_widget_show (mw->mailbox_option_menu);
-
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
-#endif
-
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
 			     "Check",
@@ -592,7 +497,8 @@ create_toolbar ()
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
-
+#endif
+  
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
 			     "Delete",
@@ -722,22 +628,6 @@ move_resize_cb ()
 			   NULL);
 }
 
-
-static void
-check_new_messages_cb (GtkWidget * widget)
-{
-#if 0
-  MainWindow *mainwindow;
-
-  g_return_if_fail (widget != NULL);
-
-  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-
-  if (mainwindow->mailbox)
-    mailbox_check_new_messages (mainwindow->mailbox);
-#endif
-}
-
 static void
 index_select_cb (GtkWidget * widget,
 		 Message * message)
@@ -858,17 +748,6 @@ mblist_window_cb (GtkWidget * widget)
 
       mblist_add_mailbox (mailbox);
     }
-
-#if 0
-  list = BALSA_INDEX (mainwindow->index)->selection;
-  while (list)
-    {
-      message_undelete ((Message *) list->data);
-      list = list->next;
-    }
-
-  balsa_index_select_next (BALSA_INDEX (mainwindow->index));
-#endif
 }
 
 static void
@@ -893,51 +772,6 @@ mailbox_select_cb (GtkWidget * widget)
     return;
 
   create_new_index (mailbox);
-#if 0
-
-  /* 
-   * let's not open a currently-open mailbox
-   */
-  if (mailbox == mainwindow->mailbox)
-    return;
-
-  watcher_id = mailbox_watcher_set (mailbox,
-				    (MailboxWatcherFunc) mailbox_listener,
-				    MESSAGE_NEW_MASK,
-				    (gpointer) mainwindow);
-
-  balsa_index_set_mailbox (BALSA_INDEX (mainwindow->index), mailbox);
-
-  /* try to open the new mailbox */
-  if (mailbox_open_ref (mailbox))
-    {
-      if (mainwindow->mailbox)
-	{
-	  mailbox_open_unref (mainwindow->mailbox);
-	  mailbox_watcher_remove (mainwindow->mailbox, watcher_id);
-	}
-
-      mainwindow->mailbox = mailbox;
-      mainwindow->watcher_id = watcher_id;
-      balsa_app.current_index = mainwindow->index;
-    }
-  else
-    {
-      mailbox_watcher_remove (mailbox, watcher_id);
-
-      messagebox = gnome_message_box_new ("Unable to Open Mailbox!",
-					  GNOME_MESSAGE_BOX_ERROR,
-					  GNOME_STOCK_BUTTON_OK,
-					  NULL);
-      gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
-      gtk_window_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
-      gtk_widget_show (messagebox);
-
-      /* reset the old mailbox */
-      if (mainwindow->mailbox)
-	main_window_set_mailbox (mainwindow->mailbox);
-    }
-#endif
 }
 
 

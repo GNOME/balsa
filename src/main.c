@@ -32,10 +32,7 @@ main (int argc, char *argv[])
   gnome_init ("balsa", NULL, argc, argv, 0, NULL);
   init_balsa_app (argc, argv);
 
-
   open_main_window ();
-  if (balsa_app.mailbox_list)
-    main_window_set_mailbox ((Mailbox *) balsa_app.mailbox_list->data);
 
   gtk_main ();
   return 0;

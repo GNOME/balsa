@@ -48,6 +48,9 @@ static void refresh_index_window (IndexWindow * iw);
 static void mailbox_listener (MailboxWatcherMessage * iw_message);
 static void index_select_cb (GtkWidget * widget, Message * message);
 
+static void set_index_window_data (GtkObject * object, IndexWindow * iw);
+static IndexWindow * get_index_window_data (GtkObject * object);
+
 void
 create_new_index (Mailbox * mailbox)
 {

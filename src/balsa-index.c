@@ -557,7 +557,7 @@ select_message (GtkWidget * widget,
     gtk_signal_emit (GTK_OBJECT (bindex),
 		     balsa_index_signals[SELECT_MESSAGE],
 		     message,
-		     NULL);
+		     bevent);
 }
 
 

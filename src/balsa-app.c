@@ -837,8 +837,8 @@ ba_remove_children_mailbox_nodes(GtkTreeModel * model, GtkTreeIter * parent,
 		|| mailbox == balsa_app.sentbox
 		|| mailbox == balsa_app.draftbox
 		|| mailbox == balsa_app.trash) {
-		g_object_ref(mbnode);
-		*specials = g_slist_prepend(*specials, mbnode);
+		g_object_ref(mailbox);
+		*specials = g_slist_prepend(*specials, mailbox);
 	    }
 	    ba_remove_children_mailbox_nodes(model, &iter, specials);
 	    valid =
@@ -871,7 +871,9 @@ balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode)
     ba_remove_children_mailbox_nodes(model, iter, &specials);
 
     for (l = specials; l; l = l->next)
-	balsa_mblist_mailbox_node_append(NULL, l->data);
+        balsa_mblist_mailbox_node_append(NULL,
+                                         balsa_mailbox_node_new_from_mailbox
+                                         (l->data));
     g_slist_free(specials);
 }
 

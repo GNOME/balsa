@@ -1265,7 +1265,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     lbimap_update_flags(message, imsg);
 
     envelope = imsg->envelope;
-    message->subj = g_mime_utils_8bit_header_decode(envelope->subject);
+    message->subj = g_mime_utils_header_decode_text(envelope->subject);
     message->headers->date = envelope->date;
     message->length        = imsg->rfc822size;
     message->headers->from =

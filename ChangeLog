@@ -13,6 +13,8 @@
 	way. The new one via style change led to mysterious occasional
 	hangs in gtk_text code (although this way seems to be the Right
 	Way).
+	* src/mime.c: add the prefix only once when message body wrapping 
+	is disabled.
 	
 2000-09-24  Pawel Salek  <pawsa@theochem.kth.se>
 

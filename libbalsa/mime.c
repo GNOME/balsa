@@ -54,8 +54,7 @@ process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body,
 						reply_prefix_str, llen);
 		break;
 	case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
-		libbalsa_message_body_save_temporary(body, llen>0 ? NULL :
-			reply_prefix_str);
+		libbalsa_message_body_save_temporary(body, NULL);
     
 		part = fopen (body->temp_filename, "r");
 		alloced = libbalsa_readfile (part, &res);

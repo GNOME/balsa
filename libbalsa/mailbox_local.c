@@ -614,6 +614,7 @@ struct _ThreadingInfo {
     GNode *msg_tree;
     GHashTable *id_table;
     GHashTable *subject_table;
+    GSList *unthreaded;
 };
 typedef struct _ThreadingInfo ThreadingInfo;
 
@@ -639,6 +640,8 @@ lbml_info_setup(LibBalsaMailbox * mailbox, GNode * msg_tree,
     ti->msg_tree = msg_tree;
     ti->id_table = g_hash_table_new(g_str_hash, g_str_equal);
     ti->subject_table = NULL;
+    ti->unthreaded =
+        g_object_get_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_UNTHREADED);
 }
 
 static void
@@ -701,6 +704,30 @@ lbml_set_parent(GNode * node, ThreadingInfo * ti)
 
     if (message->message_id)
 	lbml_insert_node(node, message, ti);
+
+    if (ti->unthreaded && !g_slist_find(ti->unthreaded, node->data)) {
+        /* Rethreading after adding or moving messages.  If this message
+         * was already threaded and doesn't list an unthreaded message
+         * as an ancestor, skip adding nodes for all its ancestors. */
+        GSList *list;
+        GArray *threading_info =
+            LIBBALSA_MAILBOX_LOCAL(ti->mailbox)->threading_info;
+        GList *refs = message->refs_for_threading;
+
+        for (list = ti->unthreaded; list; list = list->next) {
+            guint msgno = GPOINTER_TO_UINT(list->data);
+            LibBalsaMailboxLocalInfo *info =
+                &g_array_index(threading_info, LibBalsaMailboxLocalInfo,
+                               msgno - 1);
+
+            if (g_list_find_custom(refs, info->message_id,
+                                   (GCompareFunc) strcmp))
+                break;
+        }
+        if (!list)
+            /* No unthreaded ancestor. */
+            return FALSE;
+    }
 
     /*
      * Set the parent of this message to be the last element in References.

@@ -71,6 +71,7 @@ do {\
     }\
 } while (0)
 
+#define LIBBALSA_MAILBOX_UNTHREADED "libbalsa-mailbox-unthreaded"
 
 
 typedef enum {

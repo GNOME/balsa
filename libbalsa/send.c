@@ -269,7 +269,7 @@ balsa_send_message (Message * message)
 /* balsa_send_message_real:
    does the acutal message sending. Suffers from severe memory leaks.
    One of them: local MDA mode, more than one messages to send (some of
-   them loaded from outbox). Only first one will be send and memory released.
+   them loaded from outbox). Only first one will be sent and memory released.
    FIXME ...
 */
 guint
@@ -668,7 +668,7 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
 
 #ifdef BALSA_USE_THREADS
   
-  sprintf (send_message, "Messages to be send: %d ", total_messages_left);
+  sprintf (send_message, "Messages to be sent: %d ", total_messages_left);
   MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS, send_message,
 	                      NULL, NULL, 0);
 #endif

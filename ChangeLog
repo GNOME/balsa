@@ -1,3 +1,8 @@
+2004-01-22 16:43  PeterB
+
+	* libbalsa/mailbox_mbox.c: check for new messages before syncing;
+	escape "From " lines when rewriting mailbox.
+
 2004-01-22  Pawel Salek
 
 	* configure.in: add USE_TLS flag for compatibilty with libesmtp.

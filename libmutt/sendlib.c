@@ -1838,7 +1838,7 @@ int mutt_write_fcc (const char *path, HEADER *hdr, const char *msgid, int post)
    */
   if (post && msgid)
     fprintf (msg->fp, "X-Mutt-References: %s\n", msgid);
-  fprintf (msg->fp, "Status: RO\n");
+  fprintf (msg->fp, "Status:\n");
 
 
 

@@ -1531,3 +1531,8 @@ void mutt_init (int skip_sys_rc, LIST *commands)
   set_option (OPTWEED); /* turn weeding on by default */
 }
 #endif
+
+void mutt_set_charset (char *charset)
+{
+  Charset = charset;
+}

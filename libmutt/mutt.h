@@ -606,6 +606,8 @@ typedef struct
 
 
 
+void mutt_set_charset (char *);
+
 
 
 

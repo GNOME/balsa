@@ -1,3 +1,11 @@
+2003-06-24 02:06  PeterB
+
+	* src/balsa-message.c: Don't leak memory when using popup menu.
+	* src/main-window.c: Add zoom controls to the main window's View
+	menu.
+	* src/: balsa-message.c, balsa-message.h: Add zoom methods to the
+	API; add a popup menu for HTML items with zoom controls.
+
 2003-06-19 11:07  PeterB
 
 	* src/: main-window.c, message-window.c, sendmsg-window.c: Use

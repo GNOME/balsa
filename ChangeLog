@@ -1,26 +1,3 @@
-2000-04-24  Peter Williams  <peter@beta.newton.cx>
-
-	* libbalsa/cfg-{backend,engine}.{c,h}, src/cfg-balsa.{c,h}:
-	  New files for the new config system. The C files are documented
-	  in what I consider a fairly complete manner.
-	* libbalsa/mailbox.{c,h}: New member, cfgloc, to remember
-	  where a mailbox was saved, so that it can properly rename
-	  itself without being duplicated in the config
-	* src/balsa-app.h: No more proplist! New BalsaFudgeColor for
-	  saving GdkColors.
-	* macros/offset-tool.sh.in: New file for generating structure
-	  offsets as static data, which they are, although they cannot
-	  be calculated statically by any means I know.
-	* macros/balsa-offset-tool.m4: File for configuring the offset
-	  tool
-	* configure.in: Updated for the offset tool, and removed
-	  PropList check
-	* src/Makefile.am: No more proplist; new files into balsa_SOURCES
-	* libbalsa/Makefile.am: new files into libbalsa_la_SOURCES
-	* src/balsa-app.c, src/main.c, src/mailbox-conf.c, 
-	  src/pref-manager.c, src/main-window.c: Updated to new config
-	  function names, removed <save-restore.h> dependencies.
-	
 2000-04-24  Pawel Salek <pawsa@theochem.kth.se>
 	* src/balsa-app.h,src/save-restore.c,src/main.c: remembering
 	open mailboxes between sessions.

@@ -1,3 +1,7 @@
+2000-09-26  Carlos Morgado  <chbm@chbm.nu>
+
+	* pt.po: updated portuguese translation
+
 2000-09-25  Kjartan Maraas  <kmaraas@gnome.org>
 
 	* POTFILES.in: I did not remove ldap-addressbook.c

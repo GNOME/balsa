@@ -2,6 +2,7 @@
 
 	* libbalsa/address-entry.c: do not set up completions before widget
 	is realized.
+	* libbalsa/address-entry.c: ...but do parse the entry text.
 
 2004-11-23 20:31  PeterB
 

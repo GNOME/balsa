@@ -57,9 +57,6 @@
 #endif
 
 #define mutt_is_spool(s)  (strcmp (NONULL(Spoolfile), s) == 0)
-#define mutt_is_special_mailbox (strcmp (NONULL(Spoolfile), s) == 0 \
-				 strcmp (NONULL(Trashfile), s) == 0 \
-				 strcmp (NONULL(Outboxfile), s) == 0 )
 #ifdef USE_DOTLOCK
 /* parameters: 
  * path - file to lock
@@ -872,12 +869,13 @@ int mx_close_mailbox (CONTEXT *ctx)
   else
     mutt_message ("%d kept, %d deleted.",
 		  ctx->msgcount - ctx->deleted, ctx->deleted);
-
+  /* we do not want mutt to delete our mailboxes */
+#if 0
   if (ctx->msgcount == ctx->deleted &&
       (ctx->magic == M_MMDF || ctx->magic == M_MBOX) &&
       !mutt_is_spool(ctx->path) && !option (OPTSAVEEMPTY))
     unlink (ctx->path);
-
+#endif
   mx_fastclose_mailbox (ctx);
 
   return 0;

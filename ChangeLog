@@ -1,5 +1,7 @@
-2003-03-02 07:48  PeterB
+2003-03-02 08:17  PeterB
 
+	* doc/C/balsa.xml: Add documentation for Mailbox => Edit/Apply
+	Filters, Mailbox => Remove Duplicates.
 	* src/sendmsg-window.c: Make address book dialog non-modal.
 	* src/ab-window.c: Fix packing options.
 

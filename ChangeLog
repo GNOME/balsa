@@ -1,3 +1,7 @@
+2003-11-12 09:15  PeterB
+
+	* libbalsa/imap/imap-handle.c: Use correct error code.
+
 2003-11-11 12:45  PeterB
 
 	* libbalsa/: mailbox.c, mailbox_imap.c, mailbox_maildir.c,

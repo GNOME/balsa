@@ -1,5 +1,6 @@
-2003-11-10 05:36  PeterB
+2003-11-10 08:19  PeterB
 
+	* libbalsa/mailbox_imap.c: Ping mailbox only if it's connected.
 	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c:
 	Really close only when open_ref == 0.
 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1999-12-21 11:14-0800\n"
+"POT-Creation-Date: 1999-12-21 16:45-0500\n"
 "PO-Revision-Date: 1999-12-09 19:4+0100\n"
 "Last-Translator: Gianluca Montecchi <gianluca@pluto.linux.it>\n"
 "Language-Team: Gianluca Montecchi <gianluca@pluto.linux.it>>\n"
@@ -611,11 +611,11 @@ msgstr "Stampa"
 msgid "Print current message"
 msgstr "Stampa il messaggio corrente"
 
-#: src/main-window.c:713
+#: src/main-window.c:717
 msgid "Copyright (C) 1997-1999"
 msgstr "Copyright (C) 1997-1999"
 
-#: src/main-window.c:715
+#: src/main-window.c:719
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"

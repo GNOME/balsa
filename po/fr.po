@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
-"POT-Creation-Date: 1999-12-21 11:14-0800\n"
+"POT-Creation-Date: 1999-12-21 16:45-0500\n"
 "PO-Revision-Date: 1999-09-09 11:12+02:00\n"
 "Last-Translator: Vincent Renardias <vincent@ldsol.com>\n"
 "Language-Team: GNOME French Team <gnomefr@gnomefr.traduc.org>\n"
@@ -613,11 +613,11 @@ msgstr "Imprimer"
 msgid "Print current message"
 msgstr "Imprimer le message courant"
 
-#: src/main-window.c:713
+#: src/main-window.c:717
 msgid "Copyright (C) 1997-1999"
 msgstr "Copyright (C) 1997-1999"
 
-#: src/main-window.c:715
+#: src/main-window.c:719
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"

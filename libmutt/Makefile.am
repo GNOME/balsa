@@ -1,4 +1,4 @@
-EXTRA_DIST = configure
+EXTRA_DIST = configure muttconfig.h.in
 
 noinst_LIBRARIES = libmutt.a
 
@@ -56,7 +56,6 @@ libmutt_a_SOURCES = \
 	mutt_menu.h	\
 	mutt_regex.h	\
 	mutt_socket.h	\
-	muttconfig.h	\
 	mx.h		\
 	pager.h		\
 	parse.h		\

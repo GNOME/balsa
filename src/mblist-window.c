@@ -20,7 +20,7 @@
 #include "balsa-app.h"
 #include "balsa-index.h"
 #include "balsa-message.h"
-#include "index-window.h"
+#include "index-child.h"
 #include "main-window.h"
 #include "misc.h"
 
@@ -28,7 +28,7 @@ typedef struct _MBListWindow MBListWindow;
 struct _MBListWindow
   {
     GtkWidget *window;
-    GtkWidget *mdi;
+    GnomeMDI *mdi;
     GtkWidget *tree;
   };
 
@@ -61,6 +61,7 @@ mblist_open_window (GnomeMDI *mdi)
 
   mblw->window = gnome_app_new ("balsa", "Mailboxes");
 
+  mblw->mdi = mdi;
   gtk_signal_connect (GTK_OBJECT (mblw->window),
 		      "destroy",
 		      (GtkSignalFunc) destroy_mblist_window,
@@ -138,6 +139,7 @@ destroy_mblist_window (GtkWidget * widget)
 static void
 mailbox_select_cb (GtkTree * tree)
 {
+  GtkWidget *index_child;
   Mailbox *mailbox;
   GList *selected;
   GtkTreeItem *selected_item;
@@ -159,5 +161,8 @@ mailbox_select_cb (GtkTree * tree)
   if (!mailbox)
     return;
 
-  create_new_index (mailbox);
+  index_child = index_child_new(mailbox);
+  gnome_mdi_add_child(mblw->mdi, GNOME_MDI_CHILD(index_child));
+  gnome_mdi_add_view(mblw->mdi, GNOME_MDI_CHILD(index_child));
+
 }

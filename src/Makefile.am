@@ -4,7 +4,7 @@ balsa_SOURCES =	\
 	balsa-app.c		\
 	balsa-index.c		\
 	balsa-message.c		\
-	index-window.c		\
+	index-child.c		\
 	local-mailbox.c		\
 	mailbox.c		\
 	mailbox-manager.c	\

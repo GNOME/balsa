@@ -899,7 +899,7 @@ msgstr "Zapiram povezavo s stre¾nikom IMAP..."
 #: libmutt/imap/imap.c:938
 #, c-format
 msgid "Marking %d messages deleted..."
-msgstr "Oznaèujem %d sporoèil kot izbrisana..."
+msgstr "Oznaèujem %d sporoèil kot zbrisana..."
 
 #: libmutt/imap/imap.c:947
 msgid "Expunge failed"

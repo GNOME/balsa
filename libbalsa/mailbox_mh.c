@@ -920,8 +920,6 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 
     mh = LIBBALSA_MAILBOX_MH(mailbox);
 
-    g_object_ref ( G_OBJECT(message ) );
-
     lbm_mh_parse_both(mh);
     /* open tempfile */
     path = libbalsa_mailbox_local_get_path(mailbox);
@@ -989,8 +987,6 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 	mailbox->new_messages++;
 	lbm_mh_parse_both(mh);
     }
-
-    g_object_unref ( G_OBJECT(message ) );    
 
     return 1;
 }

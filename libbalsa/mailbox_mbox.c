@@ -898,8 +898,6 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     GMimeStream *dest = NULL;
     GMimeFilter* crlffilter;
 
-    g_object_ref ( G_OBJECT(message ) );
-
     ctime_r(&(message->headers->date), date_string);
 
     sender = message->headers->from ?
@@ -958,7 +956,6 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
  
  AMCLEANUP:
     g_mime_stream_unref ( GMIME_STREAM(orig) );
-    g_object_unref ( G_OBJECT(message ) );  
     mbox_unlock (mailbox, dest);
     g_mime_stream_unref ( GMIME_STREAM(dest) );
     g_free(from);

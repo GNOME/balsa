@@ -809,8 +809,6 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     struct message_info *msg_info;
     GMimeStream *in_stream;
 
-    g_object_ref ( G_OBJECT(message ) );
-
     /* open tempfile */
     path = libbalsa_mailbox_local_get_path(mailbox);
     fd = libbalsa_mailbox_maildir_open_temp(path, &tmp);
@@ -855,8 +853,6 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     } else
 	free_message_info(msg_info);
     g_free(tmp);
-
-    g_object_unref ( G_OBJECT(message ) );  
 
     return 1;
 }

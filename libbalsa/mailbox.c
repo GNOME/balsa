@@ -981,12 +981,14 @@ libbalsa_mailbox_copy_message(LibBalsaMessage * message,
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(dest), -1);
 
     LOCK_MAILBOX_RETURN_VAL(dest, -1);
+    g_object_ref(message);	/* Should we also lock its mailbox? */
 
     retval = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message(dest, message);
     if (retval > 0 && !LIBBALSA_MESSAGE_IS_DELETED(message)
 	&& LIBBALSA_MESSAGE_IS_UNREAD(message))
 	dest->has_unread_messages = TRUE;
 
+    g_object_unref(message);
     UNLOCK_MAILBOX(dest);
 
     return retval;

@@ -481,8 +481,8 @@ message_print_cb(GtkWidget * widget, gpointer cbdata)
 	return;
 
     msg =
-	LIBBALSA_MESSAGE(gtk_clist_get_row_data
-			 (GTK_CLIST(index), GPOINTER_TO_INT(list->data)));
+	LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(
+	    GTK_CTREE(index), list->data));
     /* print only first selected message */
 
     message_print(msg);

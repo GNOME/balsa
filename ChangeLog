@@ -1,4 +1,11 @@
+2000-11-26  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/print.c: adapt to new threaded message view.
+	* src/main-window.c: don't crash on configuration change when
+	toolbar disappears. (fix #31997 and some other)
+	
 2000-11-25  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* src/main-window.c: remove deprecated code and translate texts in
 	menus.
 	* libbalsa/mailbox_imap.c: handle error on IMAP mailbox checking.

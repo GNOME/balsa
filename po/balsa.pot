@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-08 14:15-0400\n"
+"POT-Creation-Date: 1998-08-08 20:18-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,17 +44,17 @@ msgid ""
 msgstr ""
 
 #. your name
-#: src/balsa-init.c:209 src/pref-manager.c:377
+#: src/balsa-init.c:209 src/pref-manager.c:349
 msgid "Your name:"
 msgstr ""
 
 #. email address
-#: src/balsa-init.c:223 src/pref-manager.c:394
+#: src/balsa-init.c:223 src/pref-manager.c:366
 msgid "E-Mail address:"
 msgstr ""
 
 #. smtp server
-#: src/balsa-init.c:238 src/pref-manager.c:426
+#: src/balsa-init.c:238 src/pref-manager.c:398
 msgid "SMTP server:"
 msgstr ""
 
@@ -174,12 +174,12 @@ msgstr ""
 msgid "Forward"
 msgstr ""
 
-#: src/main-window.c:274 src/sendmsg-window.c:165
+#: src/main-window.c:274 src/sendmsg-window.c:163
 msgid "Message"
 msgstr ""
 
 #. MDI page
-#: src/main-window.c:279 src/pref-manager.c:162 src/pref-manager.c:649
+#: src/main-window.c:279 src/pref-manager.c:141 src/pref-manager.c:621
 msgid "MDI"
 msgstr ""
 
@@ -187,12 +187,12 @@ msgstr ""
 msgid "Mailbox List"
 msgstr ""
 
-#: src/main-window.c:297 src/sendmsg-window.c:157
+#: src/main-window.c:297 src/sendmsg-window.c:155
 msgid "Close"
 msgstr ""
 
 #. mailboxes page
-#: src/main-window.c:312 src/pref-manager.c:150
+#: src/main-window.c:312 src/pref-manager.c:129
 msgid "Mailboxes"
 msgstr ""
 
@@ -212,7 +212,7 @@ msgstr ""
 msgid "About"
 msgstr ""
 
-#: src/main-window.c:365 src/sendmsg-window.c:206
+#: src/main-window.c:365 src/sendmsg-window.c:204
 msgid "Help"
 msgstr ""
 
@@ -252,114 +252,110 @@ msgstr ""
 msgid "Balsa is a E-Mail Client"
 msgstr ""
 
-#: src/pref-manager.c:111
-msgid "Preferences"
-msgstr ""
-
 #. identity page
-#: src/pref-manager.c:144
+#: src/pref-manager.c:123
 msgid "Identity"
 msgstr ""
 
 #. view page
-#: src/pref-manager.c:156
+#: src/pref-manager.c:135
 msgid "View"
 msgstr ""
 
 #. organization
-#: src/pref-manager.c:410
+#: src/pref-manager.c:382
 msgid "Organization:"
 msgstr ""
 
-#: src/pref-manager.c:464
+#: src/pref-manager.c:436
 msgid "Local mail directory:"
 msgstr ""
 
 #. inbox path
-#: src/pref-manager.c:480
+#: src/pref-manager.c:452
 msgid "Inbox Path:"
 msgstr ""
 
 #. outbox path
-#: src/pref-manager.c:497
+#: src/pref-manager.c:469
 msgid "Outbox Path:"
 msgstr ""
 
 #. trash path
-#: src/pref-manager.c:513
+#: src/pref-manager.c:485
 msgid "Trash Path:"
 msgstr ""
 
 #. Toolbars
-#: src/pref-manager.c:548
+#: src/pref-manager.c:520
 msgid "Toolbars"
 msgstr ""
 
-#: src/pref-manager.c:559
+#: src/pref-manager.c:531
 msgid "Show as Text"
 msgstr ""
 
-#: src/pref-manager.c:575
+#: src/pref-manager.c:547
 msgid "Show as Images"
 msgstr ""
 
-#: src/pref-manager.c:591
+#: src/pref-manager.c:563
 msgid "Show as Text and Images"
 msgstr ""
 
-#: src/pref-manager.c:618
+#: src/pref-manager.c:590
 msgid "Debug"
 msgstr ""
 
-#: src/pref-manager.c:660
+#: src/pref-manager.c:632
 msgid "Notebook"
 msgstr ""
 
-#: src/pref-manager.c:676
+#: src/pref-manager.c:648
 msgid "Toplevel"
 msgstr ""
 
-#: src/pref-manager.c:692
+#: src/pref-manager.c:664
 msgid "Modal"
 msgstr ""
 
-#: src/sendmsg-window.c:70 src/sendmsg-window.c:135
+#: src/sendmsg-window.c:68 src/sendmsg-window.c:133
 msgid "Send"
 msgstr ""
 
-#: src/sendmsg-window.c:146
+#: src/sendmsg-window.c:144
 msgid "Attach File"
 msgstr ""
 
-#: src/sendmsg-window.c:172
+#: src/sendmsg-window.c:170
 msgid "Cut"
 msgstr ""
 
-#: src/sendmsg-window.c:179
+#: src/sendmsg-window.c:177
 msgid "Copy"
 msgstr ""
 
-#: src/sendmsg-window.c:186
+#: src/sendmsg-window.c:184
 msgid "Paste"
 msgstr ""
 
-#: src/sendmsg-window.c:193
+#: src/sendmsg-window.c:191
 msgid "Edit"
 msgstr ""
 
-#: src/sendmsg-window.c:201
+#: src/sendmsg-window.c:199
 msgid "Contents"
 msgstr ""
 
-#: src/sendmsg-window.c:244
+#: src/sendmsg-window.c:249
 msgid "New message"
 msgstr ""
 
-#: src/sendmsg-window.c:256
+#: src/sendmsg-window.c:261
 msgid "Reply to "
 msgstr ""
 
-#: src/sendmsg-window.c:269
+#: src/sendmsg-window.c:274
 msgid "Forward message"
 msgstr ""
 
@@ -373,7 +369,7 @@ msgstr ""
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:1174
+#: libbalsa/mailbox.c:1180
 #, c-format
 msgid "Loading message: %s/%s\n"
 msgstr ""

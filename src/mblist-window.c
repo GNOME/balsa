@@ -125,6 +125,7 @@ mblist_open_window (GnomeMDI * mdi)
 
   gtk_clist_thaw (GTK_CLIST (mblw->ctree));
 
+  gtk_widget_set_usize(GTK_WIDGET(mblw->ctree), -1, GTK_CLIST(mblw->ctree)->rows*GTK_CLIST(mblw->ctree)->row_height);
 
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "tree_select_row",
 		      (GtkSignalFunc) mailbox_select_cb,

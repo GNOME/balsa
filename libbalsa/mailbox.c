@@ -157,9 +157,9 @@ mailbox_init (gchar * inbox_path)
   /* some systems report the FQDN instead of just the hostname */
   if ((p = strchr (utsname.nodename, '.')))
     {
-    Hostname = mutt_substrdup (utsname.nodename, p);
-    p++;
-    strfcpy (buffer, p, sizeof (buffer)); /* save the domain for below */
+      Hostname = mutt_substrdup (utsname.nodename, p);
+      p++;
+      strfcpy (buffer, p, sizeof (buffer));	/* save the domain for below */
     }
   else
     Hostname = g_strdup (utsname.nodename);
@@ -170,14 +170,14 @@ mailbox_init (gchar * inbox_path)
     Fqdn = safe_strdup ("@");
   else
 #endif /* DOMAIN */
-  {
-# ifdef HIDDEN_HOST
-    Fqdn = safe_strdup (DOMAIN);
-# else
-    Fqdn = safe_malloc (strlen (DOMAIN) + strlen (Hostname) + 2);
-    sprintf (Fqdn, "%s.%s", Hostname, DOMAIN);
-# endif /* HIDDEN_HOST */
-  }
+    {
+#ifdef HIDDEN_HOST
+      Fqdn = safe_strdup (DOMAIN);
+#else
+      Fqdn = safe_malloc (strlen (DOMAIN) + strlen (Hostname) + 2);
+      sprintf (Fqdn, "%s.%s", Hostname, DOMAIN);
+#endif /* HIDDEN_HOST */
+    }
 
   Sendmail = SENDMAIL;
 
@@ -573,8 +573,8 @@ load_messages (Mailbox * mailbox, gint emit)
   Message *message;
   HEADER *cur = 0;
 
-  for (msgno = mailbox->messages - mailbox->new_messages + 1;
-       msgno <= mailbox->messages;
+  for (msgno = mailbox->messages - mailbox->new_messages;
+       msgno <= mailbox->messages - 1;
        msgno++)
     {
       cur = CLIENT_CONTEXT (mailbox)->hdrs[msgno];
@@ -955,10 +955,10 @@ message_free (Message * message)
   g_free (message);
 }
 
-gchar*
-message_pathname(Message * message)
+gchar *
+message_pathname (Message * message)
 {
-  return  CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno]->path;
+  return CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno]->path;
 }
 
 
@@ -1098,8 +1098,8 @@ translate_message (HEADER * cur)
 
 
 
-char*
-mime_content_type2str(int contenttype)
+char *
+mime_content_type2str (int contenttype)
 {
   switch (contenttype)
     {
@@ -1120,7 +1120,7 @@ mime_content_type2str(int contenttype)
     }
 }
 
-      
+
 
 
 
@@ -1152,14 +1152,14 @@ message_body_ref (Message * message)
   /*
    * load message body
    */
-  msg = mx_open_message(CLIENT_CONTEXT(message->mailbox), cur->msgno);
-  fseek(msg->fp, cur->content->offset, 0);
+  msg = mx_open_message (CLIENT_CONTEXT (message->mailbox), cur->msgno);
+  fseek (msg->fp, cur->content->offset, 0);
   if (cur->content->type == TYPEMULTIPART)
     {
-      cur->content->parts = mutt_parse_multipart(msg->fp,
-						 mutt_get_parameter ("boundary", cur->content->parameter),
-						 cur->content->offset + cur->content->length,
-						 strcasecmp("digest", cur->content->subtype) == 0);
+      cur->content->parts = mutt_parse_multipart (msg->fp,
+		   mutt_get_parameter ("boundary", cur->content->parameter),
+				cur->content->offset + cur->content->length,
+			 strcasecmp ("digest", cur->content->subtype) == 0);
     }
   else
     {
@@ -1167,22 +1167,22 @@ message_body_ref (Message * message)
     }
   if (msg != NULL)
     {
-      GString* mbuf = g_string_new("");
-      BODY* bdy = cur->content;
-      
+      GString *mbuf = g_string_new ("");
+      BODY *bdy = cur->content;
+
       if (balsa_app.debug)
 	g_print (_ ("Loading message: %s/%s\n"), TYPE (b->type), b->subtype);
       b = cur->content;
       if (balsa_app.debug)
 	{
-	  fprintf(stderr,"After loading message\n");
-	  fprintf(stderr,"header->mime    = %d\n", cur->mime);
-	  fprintf(stderr,"header->offset  = %d\n", cur->offset);
-	  fprintf(stderr,"header->content = %p\n", cur->content);
-	  fprintf(stderr," \n\nDumping Message\n");
-	  fprintf(stderr,"Dumping a %s[%d] message\n",
-		  mime_content_type2str(cur->content->type),
-		  cur->content->type);
+	  fprintf (stderr, "After loading message\n");
+	  fprintf (stderr, "header->mime    = %d\n", cur->mime);
+	  fprintf (stderr, "header->offset  = %d\n", cur->offset);
+	  fprintf (stderr, "header->content = %p\n", cur->content);
+	  fprintf (stderr, " \n\nDumping Message\n");
+	  fprintf (stderr, "Dumping a %s[%d] message\n",
+		   mime_content_type2str (cur->content->type),
+		   cur->content->type);
 	}
       bdy = cur->content->parts;
       while (bdy)
@@ -1190,18 +1190,18 @@ message_body_ref (Message * message)
 
 	  if (balsa_app.debug)
 	    {
-	      fprintf(stderr,"h->c->type      = %s[%d]\n",mime_content_type2str(bdy->type), bdy->type);
-	      fprintf(stderr,"h->c->subtype   = %s\n", bdy->subtype);
-	      fprintf(stderr,"======\n");
+	      fprintf (stderr, "h->c->type      = %s[%d]\n", mime_content_type2str (bdy->type), bdy->type);
+	      fprintf (stderr, "h->c->subtype   = %s\n", bdy->subtype);
+	      fprintf (stderr, "======\n");
 	    }
 	  body = body_new ();
 	  body->mutt_body = bdy;
-	  fprintf(stderr, "message_body_ref: message->body = %p -> %p\n", body, bdy);
+	  fprintf (stderr, "message_body_ref: message->body = %p -> %p\n", body, bdy);
 	  message->body_list = g_list_append (message->body_list, body);
 	  bdy = bdy->next;
-	  
+
 	}
-      
+
       message->body_ref++;
       mx_close_message (&msg);
     }

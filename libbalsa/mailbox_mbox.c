@@ -596,10 +596,6 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
     libbalsa_mailbox_local_load_messages(mailbox, last_msgno);
 }
 
-static gboolean lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
-				   gboolean expunge,
-				   gboolean closing);
-
 static void
 libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox)
 {
@@ -609,7 +605,7 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox)
 	guint len;
 
 	len = mbox->messages_info->len;
-	lbm_mbox_sync_real(mailbox, TRUE, TRUE);
+	libbalsa_mailbox_mbox_sync(mailbox, TRUE);
 	if (mbox->messages_info->len != len)
 	    g_signal_emit_by_name(mailbox, "changed");
 	free_messages_info(mbox->messages_info);
@@ -876,9 +872,7 @@ static void lbm_mbox_armor_part(GMimeObject ** part);
 static void update_message_status_headers(GMimeMessage *message,
 					  LibBalsaMessageFlag flags);
 static gboolean
-lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
-		   gboolean expunge,
-		   gboolean closing)
+libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 {
     const gchar *path;
     struct stat st;
@@ -933,7 +927,7 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
     {
 	msg_info = &g_array_index(mbox->messages_info,
 		       struct message_info, i);
-	if (closing)
+	if (mailbox->state == LB_MAILBOX_STATE_CLOSING)
 	    msg_info->flags &= ~LIBBALSA_MESSAGE_FLAG_RECENT;
 	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
 	    break;
@@ -1111,7 +1105,7 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
     unlink(tempfile); /* remove partial copy of the mailbox */
     g_free(tempfile);
 
-    if (closing) {
+    if (mailbox->state == LB_MAILBOX_STATE_CLOSING) {
 	/* Just shorten the msg_info array. */
 	for (j = first; j < mbox->messages_info->len; ) {
 	    msg_info = &g_array_index(mbox->messages_info,
@@ -1180,14 +1174,6 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
     g_object_unref(G_OBJECT(gmime_parser));
 
     return TRUE;
-}
-
-static gboolean
-libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
-{
-    g_assert(LIBBALSA_IS_MAILBOX_MBOX(mailbox));
-
-    return lbm_mbox_sync_real(mailbox, expunge, FALSE);
 }
 
 static LibBalsaMessage*

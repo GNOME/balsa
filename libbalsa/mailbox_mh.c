@@ -626,10 +626,6 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
     libbalsa_mailbox_local_load_messages(mailbox, last_msgno);
 }
 
-static gboolean libbalsa_mailbox_mh_sync_real(LibBalsaMailbox * mailbox,
-					      gboolean expunge,
-					      gboolean closing);
-
 static void
 libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox)
 {
@@ -638,7 +634,7 @@ libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox)
 
     if (mh->msgno_2_msg_info)
 	len = mh->msgno_2_msg_info->len;
-    libbalsa_mailbox_mh_sync_real(mailbox, TRUE, TRUE);
+    libbalsa_mailbox_mh_sync(mailbox, TRUE);
 
     if (mh->messages_info) {
 	g_hash_table_destroy(mh->messages_info);
@@ -728,8 +724,7 @@ lbm_mh_finish_line(struct line_info *li, GMimeStream * temp_stream,
 }
 
 static gboolean
-libbalsa_mailbox_mh_sync_real(LibBalsaMailbox * mailbox, gboolean expunge,
-			      gboolean closing)
+libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 {
     LibBalsaMailboxMh *mh;
     struct line_info unseen, flagged, replied, recent;
@@ -777,7 +772,7 @@ libbalsa_mailbox_mh_sync_real(LibBalsaMailbox * mailbox, gboolean expunge,
 	msg_info = lbm_mh_message_info_from_msgno(mh, msgno);
 	if (msg_info->flags == INVALID_FLAG)
 	    msg_info->flags = msg_info->orig_flags;
-	if (closing)
+	if (mailbox->state == LB_MAILBOX_STATE_CLOSING)
 	    msg_info->flags &= ~LIBBALSA_MESSAGE_FLAG_RECENT;
 
 	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
@@ -914,12 +909,6 @@ libbalsa_mailbox_mh_sync_real(LibBalsaMailbox * mailbox, gboolean expunge,
 
     libbalsa_unlock_file(sequences_filename, sequences_fd, 1);
     return retval;
-}
-
-static gboolean
-libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
-{
-    return libbalsa_mailbox_mh_sync_real(mailbox, expunge, FALSE);
 }
 
 static struct message_info *

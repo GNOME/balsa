@@ -574,9 +574,6 @@ free_message_info(struct message_info *msg_info)
     g_free(msg_info);
 }
 
-static gboolean lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir,
-				      gboolean expunge, gboolean closing);
-
 static void
 libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox)
 {
@@ -589,7 +586,7 @@ libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox)
 
     if (mdir->msgno_2_msg_info)
 	len = mdir->msgno_2_msg_info->len;
-    lbm_maildir_sync_real(mdir, TRUE, TRUE);
+    libbalsa_mailbox_maildir_sync(mailbox, TRUE);
 
     if (mdir->messages_info) {
 	g_hash_table_destroy(mdir->messages_info);
@@ -720,8 +717,7 @@ maildir_renumber(gchar * key, struct message_info *msg_info,
 }
 
 static gboolean
-lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir, gboolean expunge,
-		      gboolean closing)
+libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 {
     /*
      * foreach message_info
@@ -730,14 +726,14 @@ lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir, gboolean expunge,
      *  move/rename and record change if mark_move
      * record mtime of dirs
      */
+    LibBalsaMailboxMaildir *mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
     struct sync_info si;
     GSList *l;
 
-    si.path =
-	g_strdup(libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX(mdir)));
+    si.path = g_strdup(libbalsa_mailbox_local_get_path(mailbox));
     si.removed_list = NULL;
     si.expunge = expunge;
-    si.closing = closing;
+    si.closing = mailbox->state == LB_MAILBOX_STATE_CLOSING;
     si.ok = TRUE;
     g_hash_table_foreach(mdir->messages_info, (GHFunc) maildir_sync, &si);
     g_free(si.path);
@@ -765,15 +761,6 @@ lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir, gboolean expunge,
     mdir->mtime = mdir->mtime_cur = mdir->mtime_new = time(NULL);
 
     return TRUE;
-}
-
-static gboolean
-libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox, gboolean expunge)
-{
-    g_assert(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
-
-    return lbm_maildir_sync_real(LIBBALSA_MAILBOX_MAILDIR(mailbox),
-				 expunge, FALSE);
 }
 
 static struct message_info *message_info_from_msgno(

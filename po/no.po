@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 1.0.0\n"
-"POT-Creation-Date: 2001-02-12 11:06+0100\n"
-"PO-Revision-Date: 2001-02-12 11:14+01:00\n"
+"POT-Creation-Date: 2001-02-14 15:16+0100\n"
+"PO-Revision-Date: 2001-02-14 15:22+01:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian <no@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -546,159 +546,124 @@ msgstr "%d beholdt."
 msgid "Can't write message"
 msgstr "Kan ikke skrive melding"
 
-#: libmutt/imap/auth.c:110
-msgid "Authenticating (CRAM-MD5)..."
-msgstr "Autentiserer (CRAM-MD5)..."
-
-#: libmutt/imap/auth.c:202
-msgid "Authenticating (anonymous)..."
-msgstr "Autentiserer (anonym)..."
-
-#: libmutt/imap/auth.c:288
-msgid "Anonymous authentication not supported."
-msgstr "Anonym autentisering er ikke støttet."
-
-#: libmutt/imap/auth.c:301
-msgid "GSSAPI authentication failed."
-msgstr "GSSAPI-autentisering feilet."
-
-#: libmutt/imap/auth.c:329
-msgid "CRAM-MD5 authentication failed."
-msgstr "CRAM-MD5-autentisering feilet."
-
-#: libmutt/imap/auth.c:344
-msgid "Skipping CRAM-MD5 authentication."
-msgstr "Hopper over CRAM-MD5-autentisering."
-
-#: libmutt/imap/auth.c:366
-msgid "Logging in..."
-msgstr "Logger inn..."
-
-#. Login failed, try again
-#: libmutt/imap/auth.c:378
-msgid "Login failed."
-msgstr "Innlogging feilet."
-
 #. now begin login
-#: libmutt/imap/auth_gss.c:88
+#: libmutt/imap/auth_gss.c:87
 msgid "Authenticating (GSSAPI)..."
 msgstr "Autentiserer (GSSAPI)..."
 
-#: libmutt/imap/browse.c:108
+#: libmutt/imap/auth_gss.c:262
+msgid "GSSAPI authentication failed."
+msgstr "GSSAPI-autentisering feilet."
+
+#: libmutt/imap/browse.c:95
 msgid "Getting namespaces..."
 msgstr "Henter navneområder..."
 
-#: libmutt/imap/browse.c:135
+#: libmutt/imap/browse.c:104
 msgid "Getting folder list..."
 msgstr "Henter mappeliste..."
 
-#: libmutt/imap/imap_ssl.c:92
-msgid "Filling entropy pool"
-msgstr "Fyller \"entropy pool\""
+#: libmutt/imap/browse.c:281
+msgid "Create mailbox: "
+msgstr "Opprett postboks: "
 
-#: libmutt/imap/imap_ssl.c:124
-msgid "Failed to find enough entropy on your system"
-msgstr "Fikk ikke nok \"entropy\" på ditt system"
+#: libmutt/imap/browse.c:287
+msgid "Mailbox created."
+msgstr "Postboks opprettet."
 
-#: libmutt/imap/imap_ssl.c:139
-msgid "SSL disabled due the lack of entropy"
-msgstr "SSL slått av pga manglende \"entropy\""
-
-#: libmutt/imap/imap_ssl.c:219
-msgid "Unable to get certificate from peer"
-msgstr "Kunne ikke hente sertifikat fra \"peer\""
-
-#: libmutt/imap/imap_ssl.c:230
+#: libmutt/imap/imap.c:89
 #, c-format
-msgid "SSL connection using %s"
-msgstr "SSL-forbindelse bruker %s"
+msgid "Closing connection to %s..."
+msgstr "Lukker forbindelse til %s..."
 
-#: libmutt/imap/imap_ssl.c:255
-msgid "Unknown"
-msgstr "Ukjent"
+#: libmutt/imap/imap.c:295
+msgid "This IMAP server is ancient. Mutt does not work with it."
+msgstr "Denne IMAP-tjeneren er utgammel. Mutt virker ikke med den."
 
-#: libmutt/imap/imap_ssl.c:280
-msgid "[unable to calculate]"
-msgstr "[kunne ikke beregne]"
-
-#: libmutt/imap/imap_ssl.c:298
-msgid "[invalid date]"
-msgstr "[ugyldig dato]"
-
-#: libmutt/imap/imap_ssl.c:373
-msgid "Server certificate is not yet valid"
-msgstr "Tjenersertifikat er ikke gyldig ennå"
-
-#: libmutt/imap/imap_ssl.c:380
-msgid "Server certificate has expired"
-msgstr "Tjenersertifikat har gått ut"
-
-#: libmutt/imap/imap_ssl.c:454
-msgid "This certificate belongs to:"
-msgstr "Dette sertifikatet tilhører:"
-
-#: libmutt/imap/imap_ssl.c:464
-msgid "This certificate was issued by:"
-msgstr "Dette sertifikatet ble utstedt av:"
-
-#: libmutt/imap/imap_ssl.c:474
-msgid "This certificate is valid"
-msgstr "Dette sertifikatet er gyldig"
-
-#: libmutt/imap/imap_ssl.c:475
+#: libmutt/imap/imap.c:497
 #, c-format
-msgid "   from %s"
-msgstr "   fra %s"
+msgid "Selecting %s..."
+msgstr "Velger %s..."
 
-#: libmutt/imap/imap_ssl.c:477
+#. STATUS not supported
+#: libmutt/imap/imap.c:667
+msgid "Unable to append to IMAP mailboxes at this server"
+msgstr "Kunne ikke legge til i IMAP-postbokser på denne tjeneren"
+
+#. command failed cause folder doesn't exist
+#: libmutt/imap/imap.c:676 libmutt/imap/message.c:577
 #, c-format
-msgid "     to %s"
-msgstr "     til %s"
+msgid "Create %s?"
+msgstr "Opprett %s?"
 
-#: libmutt/imap/imap_ssl.c:483
+#: libmutt/imap/imap.c:712
+msgid "Closing connection to IMAP server..."
+msgstr "Lukker forbindelse til IMAP-tjener..."
+
+#: libmutt/imap/imap.c:875
 #, c-format
-msgid "Fingerprint: %s"
-msgstr "Fingeravtrykk: %s"
+msgid "Marking %d messages deleted..."
+msgstr "Merker %d meldinger som slettet..."
 
-#: libmutt/imap/imap_ssl.c:485
-msgid "SSL Certificate check"
-msgstr "Sjekk av SSL-sertifikat"
+#: libmutt/imap/imap.c:894
+#, c-format
+msgid "Saving message status flags... [%d/%d]"
+msgstr "Lagrer flagg for meldingsstatus... [%d/%d]"
 
-#: libmutt/imap/imap_ssl.c:488
-msgid "(r)eject, accept (o)nce, (a)ccept always"
-msgstr "(a)vvis, aksepter en (g)ang, aksepter a(l)ltid"
+#: libmutt/imap/imap.c:951
+msgid "Expunging messages from server..."
+msgstr "Tømmer meldinger fra tjeneren..."
 
-#: libmutt/imap/imap_ssl.c:489
-msgid "roa"
-msgstr "agl"
+#: libmutt/imap/imap.c:1227
+#, c-format
+msgid "Subscribing to %s..."
+msgstr "Abonnerer på %s..."
 
-#: libmutt/imap/imap_ssl.c:493
-msgid "(r)eject, accept (o)nce"
-msgstr "(a)vvis, aksepter en (g)ang"
+#: libmutt/imap/imap.c:1229
+#, c-format
+msgid "Unsubscribing to %s..."
+msgstr "Fjerner abonnement på %s..."
 
-#: libmutt/imap/imap_ssl.c:494
-msgid "ro"
-msgstr "ag"
+#. Unable to fetch headers for lower versions
+#: libmutt/imap/message.c:74
+msgid "Unable to fetch headers from this IMAP server version."
+msgstr "Kan ikke hente headere fra IMAP-tjener av denne versjon."
 
-#: libmutt/imap/imap_ssl.c:498
-msgid "Exit  "
-msgstr "Avslutt"
+#: libmutt/imap/message.c:92
+#, c-format
+msgid "Fetching message headers... [%d/%d]"
+msgstr "Henter meldingsheadere... [%d/%d]"
 
-#: libmutt/imap/imap_ssl.c:500
-msgid "Help"
-msgstr "Hjelp"
+#: libmutt/imap/message.c:237
+msgid "Fetching message..."
+msgstr "Henter meldinger..."
 
-#: libmutt/imap/imap_ssl.c:523
-msgid "Warning: Couldn't save certificate"
-msgstr "Advarsel: Kunne ikke lagre sertifikat"
+#: libmutt/imap/message.c:276
+msgid "The message index is incorrect. Try reopening the mailbox."
+msgstr "Meldingsindeksen er ugyldig. Prøv å åpne postboksen på nytt."
 
-#: libmutt/imap/imap_ssl.c:525
-msgid "Certificate saved"
-msgstr "Sertifikat lagret"
+#: libmutt/imap/message.c:467
+msgid "Uploading message ..."
+msgstr "Laster opp melding ..."
+
+#: libmutt/imap/message.c:555
+#, c-format
+msgid "Copying %d messages to %s..."
+msgstr "Kopierer %d meldinger til %s..."
+
+#: libmutt/imap/message.c:559
+#, c-format
+msgid "Copying message %d to %s..."
+msgstr "Kopierer melding %d til %s..."
 
 #: libmutt/imap/util.c:43
 msgid "Continue?"
 msgstr "Fortsett?"
+
+#: libmutt/imap/util.c:49
+#, c-format
+msgid "%s [%s]\n"
+msgstr "%s [%s]\n"
 
 #: src/address-book.c:161 src/filter-edit-dialog.c:130
 msgid "Name"
@@ -816,19 +781,24 @@ msgid "Mailbox password for %s@%s:"
 msgstr "Passord for postboks for %s@%s:"
 
 #. FIXME:
-#: src/balsa-index.c:266
+#: src/balsa-index.c:271
 msgid "From"
 msgstr "Fra"
 
-#: src/balsa-index.c:267 src/filter-edit-dialog.c:326
+#: src/balsa-index.c:272 src/filter-edit-dialog.c:326
 msgid "Subject"
 msgstr "Emne"
 
-#: src/balsa-index.c:268
+#: src/balsa-index.c:273
 msgid "Date"
 msgstr "Dato"
 
-#: src/balsa-index.c:546
+#: src/balsa-index.c:555
+#, c-format
+msgid "Opening mailbox %s. Please wait..."
+msgstr "Åpner postboks %s. Vennligst vent..."
+
+#: src/balsa-index.c:577
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -836,60 +806,60 @@ msgstr ""
 "Kunne ikke åpne postboks\n"
 "Vennligst sjekk innstillingene."
 
-#: src/balsa-index.c:557
+#: src/balsa-index.c:603
 msgid "To"
 msgstr "Til"
 
-#: src/balsa-index.c:1786
+#: src/balsa-index.c:1831
 msgid "Cannot access the message's body\n"
 msgstr "Kan ikke aksessere meldingskroppen\n"
 
-#: src/balsa-index.c:1823
+#: src/balsa-index.c:1868
 msgid "Reply..."
 msgstr "Svar..."
 
-#: src/balsa-index.c:1827
+#: src/balsa-index.c:1872
 msgid "Reply To All..."
 msgstr "Svar til alle..."
 
-#: src/balsa-index.c:1831
+#: src/balsa-index.c:1876
 msgid "Reply To Group..."
 msgstr "Svar til gruppen..."
 
-#: src/balsa-index.c:1835
+#: src/balsa-index.c:1880
 msgid "Forward..."
 msgstr "Videresend..."
 
-#: src/balsa-index.c:1840
+#: src/balsa-index.c:1885
 msgid "Undelete"
 msgstr "Angre slett"
 
-#: src/balsa-index.c:1843 src/filter-edit-dialog.c:224 src/mailbox-node.c:471
+#: src/balsa-index.c:1888 src/filter-edit-dialog.c:224 src/mailbox-node.c:471
 #: src/main-window.c:526 src/pref-manager.c:1235 src/pref-manager.c:2023
 msgid "Delete"
 msgstr "Slett"
 
-#: src/balsa-index.c:1847
+#: src/balsa-index.c:1892
 msgid "Move To Trash"
 msgstr "Flytt til søppel"
 
-#: src/balsa-index.c:1852
+#: src/balsa-index.c:1897
 msgid "Store Address..."
 msgstr "Lagre adresse..."
 
-#: src/balsa-index.c:1855
+#: src/balsa-index.c:1900
 msgid "Toggle"
 msgstr "Slå av/på"
 
-#: src/balsa-index.c:1858 src/main-window.c:347
+#: src/balsa-index.c:1903 src/main-window.c:347
 msgid "Flagged"
 msgstr "Flaggede"
 
-#: src/balsa-index.c:1861 src/balsa-mblist.c:479
+#: src/balsa-index.c:1906 src/balsa-mblist.c:479
 msgid "Unread"
 msgstr "Uleste"
 
-#: src/balsa-index.c:1872
+#: src/balsa-index.c:1917
 msgid "Transfer"
 msgstr "Overfør"
 
@@ -2805,6 +2775,102 @@ msgstr "Ingen addressebok valgt..."
 #: src/store-address.c:257
 msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr "Beklager, semikolon er ikke tillatt i navnet!\n"
+
+#~ msgid "Authenticating (CRAM-MD5)..."
+#~ msgstr "Autentiserer (CRAM-MD5)..."
+
+#~ msgid "Authenticating (anonymous)..."
+#~ msgstr "Autentiserer (anonym)..."
+
+#~ msgid "Anonymous authentication not supported."
+#~ msgstr "Anonym autentisering er ikke støttet."
+
+#~ msgid "CRAM-MD5 authentication failed."
+#~ msgstr "CRAM-MD5-autentisering feilet."
+
+#~ msgid "Skipping CRAM-MD5 authentication."
+#~ msgstr "Hopper over CRAM-MD5-autentisering."
+
+#~ msgid "Logging in..."
+#~ msgstr "Logger inn..."
+
+#~ msgid "Login failed."
+#~ msgstr "Innlogging feilet."
+
+#~ msgid "Filling entropy pool"
+#~ msgstr "Fyller \"entropy pool\""
+
+#~ msgid "Failed to find enough entropy on your system"
+#~ msgstr "Fikk ikke nok \"entropy\" på ditt system"
+
+#~ msgid "SSL disabled due the lack of entropy"
+#~ msgstr "SSL slått av pga manglende \"entropy\""
+
+#~ msgid "Unable to get certificate from peer"
+#~ msgstr "Kunne ikke hente sertifikat fra \"peer\""
+
+#~ msgid "SSL connection using %s"
+#~ msgstr "SSL-forbindelse bruker %s"
+
+#~ msgid "Unknown"
+#~ msgstr "Ukjent"
+
+#~ msgid "[unable to calculate]"
+#~ msgstr "[kunne ikke beregne]"
+
+#~ msgid "[invalid date]"
+#~ msgstr "[ugyldig dato]"
+
+#~ msgid "Server certificate is not yet valid"
+#~ msgstr "Tjenersertifikat er ikke gyldig ennå"
+
+#~ msgid "Server certificate has expired"
+#~ msgstr "Tjenersertifikat har gått ut"
+
+#~ msgid "This certificate belongs to:"
+#~ msgstr "Dette sertifikatet tilhører:"
+
+#~ msgid "This certificate was issued by:"
+#~ msgstr "Dette sertifikatet ble utstedt av:"
+
+#~ msgid "This certificate is valid"
+#~ msgstr "Dette sertifikatet er gyldig"
+
+#~ msgid "   from %s"
+#~ msgstr "   fra %s"
+
+#~ msgid "     to %s"
+#~ msgstr "     til %s"
+
+#~ msgid "Fingerprint: %s"
+#~ msgstr "Fingeravtrykk: %s"
+
+#~ msgid "SSL Certificate check"
+#~ msgstr "Sjekk av SSL-sertifikat"
+
+#~ msgid "(r)eject, accept (o)nce, (a)ccept always"
+#~ msgstr "(a)vvis, aksepter en (g)ang, aksepter a(l)ltid"
+
+#~ msgid "roa"
+#~ msgstr "agl"
+
+#~ msgid "(r)eject, accept (o)nce"
+#~ msgstr "(a)vvis, aksepter en (g)ang"
+
+#~ msgid "ro"
+#~ msgstr "ag"
+
+#~ msgid "Exit  "
+#~ msgstr "Avslutt"
+
+#~ msgid "Help"
+#~ msgstr "Hjelp"
+
+#~ msgid "Warning: Couldn't save certificate"
+#~ msgstr "Advarsel: Kunne ikke lagre sertifikat"
+
+#~ msgid "Certificate saved"
+#~ msgstr "Sertifikat lagret"
 
 #~ msgid ""
 #~ "Enter print command below\n"

@@ -8,29 +8,47 @@ ImapResult imap_mbox_handle_noop(ImapMboxHandle *r);
 /* Non-Authenticated State */
 
 /* Authenticated State */
-ImapResult imap_mbox_select(ImapMboxHandle* handle, const char* mbox,
-			    gboolean *readonly_mbox);
-ImapResult imap_mbox_examine(ImapMboxHandle* handle, const char* mbox);
-ImapResult imap_mbox_create(ImapMboxHandle* handle, const char* new_mbox);
-ImapResult imap_mbox_delete(ImapMboxHandle* handle, const char* mbox);
-ImapResult imap_mbox_rename(ImapMboxHandle* handle,
+ImapResponse imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
+                              gboolean *readonly_mbox);
+ImapResponse imap_mbox_examine(ImapMboxHandle* handle, const char* mbox);
+ImapResponse imap_mbox_create(ImapMboxHandle* handle, const char* new_mbox);
+ImapResponse imap_mbox_delete(ImapMboxHandle* handle, const char* mbox);
+ImapResponse imap_mbox_rename(ImapMboxHandle* handle,
 			    const char* old_mbox,
 			    const char* new_mbox);
-ImapResult imap_mbox_subscribe(ImapMboxHandle* handle,
-			       const char* mbox, gboolean subscribe);
-ImapResult imap_mbox_list(ImapMboxHandle *r, const char*what, const char*how);
-ImapResult imap_mbox_lsub(ImapMboxHandle *r, const char*what, const char*how);
-ImapResult imap_mbox_append(ImapMboxHandle *handle, const char* mbox,
-			    ImapMsgFlags flags,
-			    size_t len, const char *msgtext);
+ImapResponse imap_mbox_subscribe(ImapMboxHandle* handle,
+                                 const char* mbox, gboolean subscribe);
+ImapResponse imap_mbox_list(ImapMboxHandle *r, const char*what);
+ImapResponse imap_mbox_lsub(ImapMboxHandle *r, const char*what);
+typedef size_t (*ImapAppendFunc)(char*, size_t, void*);
+ImapResponse imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
+                              ImapMsgFlags flags, size_t sz, 
+                              ImapAppendFunc dump_cb,  void* arg);
+ImapResponse imap_mbox_append_str(ImapMboxHandle *handle, const char *mbox,
+                              ImapMsgFlags flags, size_t sz, char *txt);
 
 /* Selected State */
 ImapResult imap_mbox_search(ImapMboxHandle *h, const char* query);
-ImapResult imap_mbox_uid_search(ImapMboxHandle *h, const char* query);
-ImapResult imap_mbox_store_flag(ImapMboxHandle *r, int seq,
-                                ImapMsgFlag flg, gboolean state);
+ImapResponse imap_mbox_noop(ImapMboxHandle *r);
+ImapResponse imap_mbox_expunge(ImapMboxHandle* h);
+
+ImapResponse imap_mbox_store_flag(ImapMboxHandle *r, unsigned seq,
+                                  ImapMsgFlag flg, gboolean state);
+ImapResponse imap_mbox_store_flag_m(ImapMboxHandle* h, unsigned msgcnt,
+                                    unsigned *seqno, ImapMsgFlag flg, 
+                                    gboolean state);
+
+ImapResponse imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
+                                           unsigned seqno, FILE *fl);
+ImapResponse imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle,
+                                               unsigned uid, FILE *fl);
 
 /* Experimental/Expansion */
 ImapResult imap_mbox_scan(ImapMboxHandle *r, const char*what, const char*str);
 ImapResult imap_mbox_thread(ImapMboxHandle *h, const char *how);
+
+ImapResponse imap_mbox_uid_search(ImapMboxHandle *handle, const char *query, 
+                                  void (*cb)(unsigned uid, void *),
+                                  void *cb_data);
+
 #endif /* __IMAP_COMMANDS_H__ */

@@ -1,3 +1,9 @@
+2003-09-14  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/imap/*: merge updates from libimap.
+	* libbalsa/mailbox_imap.c: adapt to modified api, reduce mem usage.
+	* libbalsa/folder-scanners.c: same.
+
 2003-09-12  Magick  <magick Linux-Fan.com>
 
 	* configure.in: implement search for sendmail.

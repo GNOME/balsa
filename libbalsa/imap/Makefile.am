@@ -11,8 +11,6 @@ libimap_a_SOURCES = \
 	imap-handle.h	\
 	imap-commands.c	\
 	imap-commands.h	\
-	imap-fetch.c	\
-	imap-fetch.h	\
 	libimap-marshal.c	\
 	libimap-marshal.h	\
 	imap_private.h	\

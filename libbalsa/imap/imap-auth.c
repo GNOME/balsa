@@ -44,7 +44,7 @@ imap_auth_login(ImapMboxHandle* handle, const char* user, const char* pass)
 {
   char q_user[SHORT_STRING], q_pass[SHORT_STRING];
   char buf[2*SHORT_STRING+7];
-  int rc;
+  ImapResponse rc;
   
   if (imap_mbox_handle_can_do(handle, IMCAP_LOGINDISABLED))
     return IMAP_AUTH_UNAVAIL;

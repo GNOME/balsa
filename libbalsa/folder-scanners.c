@@ -35,6 +35,7 @@
 #include "folder-scanners.h"
 #include "imap.h"
 #include "imap-handle.h"
+#include "imap-commands.h"
 
 static void
 libbalsa_scanner_mdir(GNode *rnode,
@@ -142,21 +143,24 @@ struct browser_state
   ImapMark* mark_imap_path;
   GList* subfolders;
   gboolean subscribed;
+  int delim;
   void* cb_data;       /* data passed to {mailbox,folder}_handlers */
 };
 
-static
-void libbalsa_imap_add_folder (ImapMboxHandle* handle,
-			       int flags, char delim, char *folder,
-			       struct browser_state *state)
+static void
+libbalsa_imap_add_folder (ImapMboxHandle* handle,
+                          int delim, ImapMboxFlags flags, char *folder,
+                          struct browser_state *state)
 {
     int isFolder = 0;
     int isMailbox = 0;
 
+    printf("delim: %c folder: %s \n", delim, folder);
     if (folder[strlen(folder)-1] == delim)
 	return;
 
-    if(!(flags & IMLIST_NOSELECT)) {
+    state->delim = delim;
+    if(!IMAP_MBOX_HAS_FLAG(flags,IMLIST_NOSELECT)) {
 	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                              "ADDING MAILBOX %s\n", folder);
 	++isMailbox;
@@ -169,7 +173,7 @@ void libbalsa_imap_add_folder (ImapMboxHandle* handle,
 	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                              "ADDING FOLDER  %s\n", folder);
 	    
-	if (!(flags & IMLIST_NOINFERIORS))
+	if (!IMAP_MBOX_HAS_FLAG(flags,IMLIST_NOINFERIORS))
 	    state->subfolders = g_list_append(state->subfolders,
 					      g_strdup(folder));
 	++isFolder;
@@ -180,7 +184,7 @@ void libbalsa_imap_add_folder (ImapMboxHandle* handle,
     else if (isFolder)
 	state->folder_handler(folder, delim, state->cb_data);
 
-    if (flags & IMLIST_NOINFERIORS)
+    if ( IMAP_MBOX_HAS_FLAG(flags,IMLIST_NOINFERIORS))
         state->mark_imap_path(folder, state->cb_data);
 }
 
@@ -209,11 +213,11 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
 
     state->subfolders = NULL;
 
-    imap_path = libbalsa_imap_path(server, path);
+    imap_path = g_strdup_printf("%s%c", path, state->delim);
     if (state->subscribed) 
-	imap_mbox_lsub(handle, /*imap_*/path, "%");
+	imap_mbox_lsub(handle, imap_path);
     else
-	imap_mbox_list(handle, /*imap_*/path, "%");
+	imap_mbox_list(handle, imap_path);
     g_free(imap_path);
 
     list = state->subfolders;
@@ -228,6 +232,7 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
         for (el = list; el; el = g_list_next(el))
             libbalsa_imap_browse(el->data, state, handle, server,
 				 check_imap_path, depth);
+
     --*depth;
 
     g_list_foreach(list, (GFunc) g_free, NULL);
@@ -256,25 +261,20 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
             return;
     }
 
+    handle = libbalsa_mailbox_imap_get_handle(NULL, server);
+    if (!handle)
+	return;
+
     state.mailbox_handler = mailbox_handler;
     state.folder_handler  = folder_handler;
     state.mark_imap_path  = mark_imap_path;
     state.cb_data         = cb_data;
     state.subscribed      = subscribed;
+    state.delim           = imap_mbox_handle_get_delim(handle, path);
 
-    handle = libbalsa_mailbox_imap_get_handle(NULL, server);
-    if (!handle) {
-	return;
-    }
-    if (subscribed) {
-	handler_id = g_signal_connect(G_OBJECT(handle), "lsub-response",
-				      G_CALLBACK(libbalsa_imap_add_folder),
-				      (gpointer) &state);
-    } else {
-	handler_id = g_signal_connect(G_OBJECT(handle), "list-response",
-				      G_CALLBACK(libbalsa_imap_add_folder),
-				      (gpointer) &state);
-    }
+    handler_id = g_signal_connect(G_OBJECT(handle), "list-response",
+                                  G_CALLBACK(libbalsa_imap_add_folder),
+                                  (gpointer) &state);
 
     if (list_inbox) {
         /* force INBOX into the mailbox list

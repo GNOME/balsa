@@ -3,6 +3,12 @@
 
 #include <glib-object.h>
 
+struct _MboxView {
+  unsigned *arr;
+  unsigned allocated, entries;
+  char * filter_str;
+};
+
 struct _ImapMboxHandle {
   GObject object;
 
@@ -22,25 +28,32 @@ struct _ImapMboxHandle {
   unsigned unseen;
   ImapUID  uidnext;
   ImapUID  uidval;
-  gboolean readonly_mbox;
 
   ImapMessage **msg_cache;
+  MboxView mbox_view;
+  GNode *thread_root; /* deprecated! */
+
   /* BYE handling depends on the state */
   gboolean doing_logout;
-
   ImapInfoCb info_cb;
   void *info_arg;
-
   ImapMonitorCb monitor_cb;
   void *monitor_arg;
-
   ImapFlagsCb flags_cb;
   void *flags_arg;
+  ImapFetchBodyCb body_cb;
+  void *body_arg;
 
   ImapInfoCb alert_cb;
   void *alert_arg;
-  GNode *thread_root;
+
+  ImapSearchCb search_cb;
+  void *search_arg;
+  unsigned readonly_mbox:1;
 };
 
 extern const char* msg_flags[];
+
+void imap_mbox_resize_cache(ImapMboxHandle *h, unsigned new_size);
+
 #endif /* __IMAP_PRIVATE_H__ */

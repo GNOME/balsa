@@ -6,7 +6,7 @@ void imap_unquote_string(char *s);
 char* imap_next_word(char *s);
 char* imap_skip_atom(char *s);
 
-void lit_conv_to_base64(unsigned char *out, const unsigned char *in, 
+void lit_conv_to_base64(char *out, const char *in, 
                         size_t len, size_t olen);
 int lit_conv_from_base64(char *out, const char *in);
 

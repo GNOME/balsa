@@ -44,7 +44,6 @@ ImapResult
 imap_auth_cram(ImapMboxHandle* handle, const char* user, const char* pass)
 {
   char ibuf[LONG_STRING*2], obuf[LONG_STRING];
-  char *p;
   unsigned char hmac_response[MD5_DIGEST_LEN];
   ImapCmdTag tag;
   int len;
@@ -68,6 +67,7 @@ imap_auth_cram(ImapMboxHandle* handle, const char* user, const char* pass)
    * primary host name of the server. The syntax of the unencoded form must
    * correspond to that of an RFC 822 'msg-id' [RFC822] as described in [POP3].
    */
+  imap_handle_flush(handle);
   do
     rc = imap_cmd_step(handle, tag);
   while(rc == IMR_UNTAGGED);
@@ -77,12 +77,9 @@ imap_auth_cram(ImapMboxHandle* handle, const char* user, const char* pass)
     return IMAP_AUTH_FAILURE;
   }
   imap_mbox_gets(handle, ibuf, sizeof(ibuf)); /* check error */
-  p = ibuf;
-  while (*p && *p!='\r' && *p!='\n')
-	  p++;
-  *p='\0';
-  if ((len = lit_conv_from_base64(obuf, ibuf)) == -1) {
-    g_warning("Error decoding base64 response.\n");
+  if ((len = lit_conv_from_base64(obuf, ibuf)) <0) {
+    g_warning("Error decoding base64 response(%s), digit=%d:%d[%c]).\n", 
+	      ibuf, len, ibuf[-len-1],ibuf[-len-1]);
     return IMAP_AUTH_FAILURE;
   }
 
@@ -111,18 +108,17 @@ imap_auth_cram(ImapMboxHandle* handle, const char* user, const char* pass)
    * plus the additional debris
    */
   
-  lit_conv_to_base64((unsigned char *)ibuf, 
-		     (unsigned char *)obuf, strlen (obuf), sizeof(ibuf)-2);
+  lit_conv_to_base64(ibuf, obuf, strlen (obuf), sizeof(ibuf)-2);
   strncat (ibuf, "\r\n", sizeof (ibuf));
   imap_handle_write(handle, ibuf, strlen(ibuf));
+  imap_handle_flush(handle);
 
   do
     rc = imap_cmd_step (handle, tag);
   while (rc == IMR_UNTAGGED);
 
-  printf("CRAMD-MD5: here rc=%d, expected %d\n", rc, IMR_OK);
   if (rc != IMR_OK) {
-    fprintf(stderr, "Error receiving server response.\n");
+    fprintf(stderr, "Error receiving server response on CRAM-MD5.\n");
     return IMAP_AUTH_FAILURE;
   } else return IMAP_SUCCESS;
 }

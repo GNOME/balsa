@@ -922,7 +922,7 @@ remove_mailbox_from_nodes(LibBalsaMailbox* mailbox)
     GNode* gnode;
 
     balsa_mailbox_nodes_lock(TRUE);
-    gnode = balsa_find_url(balsa_app.mailbox_nodes, mailbox->url);
+    gnode = balsa_find_mailbox(balsa_app.mailbox_nodes, mailbox);
     if (gnode)
 	g_node_unlink(gnode);
     else

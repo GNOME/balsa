@@ -3344,7 +3344,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
 	if (bsmsg->orig_message->message_id) {
 	    message->references =
-		g_list_prepend(message->references,
+		g_list_append(message->references,
 			       g_strdup(bsmsg->orig_message->message_id));
 	    message->in_reply_to =
 		g_list_prepend(NULL,

@@ -747,8 +747,10 @@ libbalsa_message_clear_recent(LibBalsaMessage * message)
 
     messages = g_list_prepend(NULL, message);
     libbalsa_mailbox_messages_status_changed(message->mailbox, messages,
+	    /*FIXME: should this flag be LIBBALSA_MESSAGE_FLAG_RECENT?
+	     * If not, we need to document why not! */
 					     LIBBALSA_MESSAGE_FLAG_REPLIED);
-    g_list_free(messages);
+    g_list_free_1(messages);
 }
 
 #ifdef DEBUG
@@ -1271,16 +1273,18 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
     }	/* if (message->mime_msg) */
 
     /* more! */
-    if (!message->references_for_threading
-	&& (!message->in_reply_to || !message->in_reply_to->next)) {
+    if (message->in_reply_to && message->in_reply_to->next) {
+	/* Reply to more than one message, so we can't thread it. */
+	g_list_free(message->references_for_threading);
+	message->references_for_threading = NULL;
+    } else if (!message->references_for_threading) {
         GList *tmp = g_list_copy(message->references);
 
         if (message->in_reply_to) {
             /* some mailers provide in_reply_to but no references, and
              * some apparently provide both but with the references in
-             * the wrong order; we'll just make sure it's the first item
-             * of this list (which will be the last after reversing it,
-             * below) */
+             * the wrong order; we'll just make sure it's the last item
+             * of this list */
             GList *foo =
                 g_list_find_custom(tmp, message->in_reply_to->data,
                                    (GCompareFunc) strcmp);
@@ -1289,10 +1293,10 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
                 tmp = g_list_remove_link(tmp, foo);
                 g_list_free_1(foo);
             }
-            tmp = g_list_prepend(tmp, message->in_reply_to->data);
+            tmp = g_list_append(tmp, message->in_reply_to->data);
         }
 
-        message->references_for_threading = g_list_reverse(tmp);
+        message->references_for_threading = tmp;
     }
 }
 

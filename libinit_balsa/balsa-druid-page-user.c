@@ -161,31 +161,26 @@ balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
 
     if (balsa_app.identities == NULL) {
         ident = LIBBALSA_IDENTITY(libbalsa_identity_new());
-        balsa_app.identities = g_list_append(balsa_app.identities, ident);
+        balsa_app.identities = g_list_append(NULL, ident);
     } else {
         ident = balsa_app.current_ident;
     }
-    if (ident->address->full_name)
-        g_free(ident->address->full_name);
+    g_free(ident->address->full_name);
     ident->address->full_name =
         gtk_editable_get_chars(GTK_EDITABLE(user->name), 0, -1);
 
-    if (ident->address->address_list) {
-        g_list_foreach(ident->address->address_list, (GFunc) g_free, NULL);
-        g_list_free(ident->address->address_list);
-        ident->address->address_list = NULL;
-    }
+    g_list_foreach(ident->address->address_list, (GFunc) g_free, NULL);
+    g_list_free(ident->address->address_list);
     ident->address->address_list =
-        g_list_append(ident->address->address_list,
-                      gtk_editable_get_chars(GTK_EDITABLE(user->email), 0,
-                                             -1));
+        g_list_prepend(NULL,
+                       gtk_editable_get_chars(GTK_EDITABLE(user->email), 0,
+                                              -1));
 
 #if ENABLE_ESMTP
     g_free(balsa_app.smtp_server);
     balsa_app.smtp_server =
         gtk_editable_get_chars(GTK_EDITABLE(user->smtp), 0, -1);
 #endif
-    if (balsa_app.local_mail_directory);
     g_free(balsa_app.local_mail_directory);
     balsa_app.local_mail_directory =
         gtk_editable_get_chars(GTK_EDITABLE(user->localmaildir), 0, -1);

@@ -1,3 +1,7 @@
+2004-07-07 23:16  PeterB
+
+	* src/print.c: compile with HAVE_GPGME && !HAVE_GTKHTML.
+
 2004-07-08  Albrecht Dreß
 
 	* configure.in: require gmime-2.1.7.

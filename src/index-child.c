@@ -466,7 +466,7 @@ transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row,
   g_return_if_fail (bmbl != NULL);
   g_return_if_fail (bindex != NULL);
 
-  clist = GTK_CLIST (GTK_BIN (bindex)->child);
+  clist = GTK_CLIST (bindex->clist);
   list = clist->selection;
   while (list)
     {
@@ -488,7 +488,7 @@ delete_message_cb (GtkWidget * widget, BalsaIndex * bindex)
   g_return_if_fail (widget != NULL);
   g_return_if_fail (bindex != NULL);
 
-  clist = GTK_CLIST (GTK_BIN (bindex)->child);
+  clist = GTK_CLIST (bindex->clist);
   list = clist->selection;
   while (list)
     {
@@ -513,7 +513,7 @@ undelete_message_cb (GtkWidget * widget, BalsaIndex * bindex)
   g_return_if_fail (widget != NULL);
   g_return_if_fail (bindex != NULL);
 
-  clist = GTK_CLIST (GTK_BIN (bindex)->child);
+  clist = GTK_CLIST (bindex->clist);
   list = clist->selection;
   while (list)
     {

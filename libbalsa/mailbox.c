@@ -1775,7 +1775,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 		     GValue *value)
 {
     LibBalsaMailbox* lmm = LIBBALSA_MAILBOX(tree_model);
-    LibBalsaMessage* msg;
+    LibBalsaMessage* msg = NULL;
     guint msgno;
     gchar *tmp;
     
@@ -1783,6 +1783,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
     g_return_if_fail(column >= 0 &&
 		     column < (int) ELEMENTS(mbox_model_col_type));
  
+    g_value_init (value, mbox_model_col_type[column]);
     msgno = GPOINTER_TO_UINT( ((GNode*)iter->user_data)->data );
     /* gtk2-2.3.5 can in principle do it  but we want to be sure.
      */
@@ -1792,31 +1793,29 @@ mbox_model_get_value(GtkTreeModel *tree_model,
     { GdkRectangle a, b, c, d; 
     /* assumed that only one view is showing the mailbox */
     GtkTreeView *tree = g_object_get_data(G_OBJECT(tree_model), "tree-view");
-    GtkTreePath *path;
-    GtkTreeViewColumn *col;
 
-    if (!GTK_WIDGET_REALIZED(GTK_WIDGET(tree)))
-	return;
+    if (GTK_WIDGET_REALIZED(GTK_WIDGET(tree))) {
+	GtkTreePath *path;
+	GtkTreeViewColumn *col;
 
-    path = gtk_tree_model_get_path(tree_model, iter);
-    col = gtk_tree_view_get_column(tree, ((column == LB_MBOX_WEIGHT_COL
-					   || column == LB_MBOX_STYLE_COL)
-					  ? LB_MBOX_FROM_COL : column));
-    gtk_tree_view_get_visible_rect(tree, &a);
-    gtk_tree_view_get_cell_area(tree, path, col, &b);
-    gtk_tree_view_widget_to_tree_coords(tree, b.x, b.y, &c.x, &c.y);
-    gtk_tree_view_widget_to_tree_coords(tree, b.x+b.width, b.y+b.height, 
-					&c.width, &c.height);
-    c.width -= c.x; c.height -= c.y;
-    if(gdk_rectangle_intersect(&a, &c, &d) || column == LB_MBOX_MESSAGE_COL) 
-	msg = libbalsa_mailbox_get_message(lmm, msgno);
-    else { 
-	msg = NULL; 
+	path = gtk_tree_model_get_path(tree_model, iter);
+	col = gtk_tree_view_get_column(tree, ((column == LB_MBOX_WEIGHT_COL
+					       || column == LB_MBOX_STYLE_COL)
+					      ? LB_MBOX_FROM_COL : column));
+	gtk_tree_view_get_visible_rect(tree, &a);
+	gtk_tree_view_get_cell_area(tree, path, col, &b);
+	gtk_tree_view_widget_to_tree_coords(tree, b.x, b.y, &c.x, &c.y);
+	gtk_tree_view_widget_to_tree_coords(tree, b.x + b.width,
+					    b.y + b.height,
+					    &c.width, &c.height);
+	c.width -= c.x; c.height -= c.y;
+	if (gdk_rectangle_intersect(&a, &c, &d)
+	    || column == LB_MBOX_MESSAGE_COL)
+	    msg = libbalsa_mailbox_get_message(lmm, msgno);
+	gtk_tree_path_free(path);
     }
-    gtk_tree_path_free(path);
     }
 #endif
-    g_value_init (value, mbox_model_col_type[column]);
     switch(column) {
     case LB_MBOX_MSGNO_COL:
 	g_value_set_uint(value, msgno);  break;

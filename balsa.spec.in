@@ -12,7 +12,6 @@ Release:   %rel
 Copyright: GPL
 Group:     Applications/Internet
 Source0:   balsa-%{PACKAGE_VERSION}.tar.gz
-Patch1:	   @srcdir@/rpm-po.patch
 URL:       http://www.balsa.net/
 BuildRoot: /tmp/balsa-%{PACKAGE_VERSION}-root
 Packager: Pawel Salek <pawsa@theochem.kth.se>
@@ -28,7 +27,6 @@ IMAP.
  
 %prep
 %setup
-%patch1
 
 %build
 # Needed for snapshot releases.
@@ -46,6 +44,7 @@ else
 %endif
 fi
 
+patch -p0 < rpm-po.patch
 if [ "$SMP" != "" ]; then
   (make "MAKE=make -k -j $SMP"; exit 0)
   make

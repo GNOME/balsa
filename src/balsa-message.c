@@ -263,9 +263,7 @@ message2html (Message * message)
       if (body)
 	if (body->buffer)
 	  {
-	    g_print (body->buffer);
 	    buff = text2html (body->buffer);
-	    g_print (buff);
 	    g_string_append (mbuff, buff);
 	    g_free (buff);
 	  }
@@ -303,7 +301,7 @@ text2html (char *buff)
 	  gs = g_string_append (gs, "<br>\n");
 	  i++;
 	}
-      else if (buff[i] == '\n' && buff[i+1] == '\n')
+      else if (buff[i] == '\n' && buff[i + 1] == '\n')
 	{
 	  gs = g_string_append (gs, "</tt></p><p><tt>\n");
 	  i++;
@@ -316,10 +314,10 @@ text2html (char *buff)
 	{
 	  gs = g_string_append (gs, "<br>\n");
 	}
-      else if (buff[i] == ' ' && buff[i + 1] == ' ' && buff[i + 2] == ' ' && buff[i+3] == ' ')
+      else if (buff[i] == ' ' && buff[i + 1] == ' ' && buff[i + 2] == ' ' && buff[i + 3] == ' ')
 	{
 	  gs = g_string_append (gs, "&nbsp; &nbsp; ");
-	  i += 2;
+	  i += 3;
 	}
       else if (buff[i] == ' ' && buff[i + 1] == ' ' && buff[i + 2] == ' ')
 	{

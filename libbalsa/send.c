@@ -23,6 +23,7 @@
 #include "config.h"
 
 #include <fcntl.h>
+#include <errno.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
@@ -752,7 +753,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 
 
 static void
-handle_successful_send (smtp_message_t message, void *arg)
+handle_successful_send (smtp_message_t message, void *be_verbose)
 {
     MessageQueueItem *mqi;
     const smtp_status_t *status;
@@ -773,7 +774,8 @@ handle_successful_send (smtp_message_t message, void *arg)
     } else {
         libbalsa_message_flag(mqi->orig, FALSE);
 	/* XXX - Show the poor user the status codes and message. */
-	libbalsa_information(
+        if(*(gboolean*)be_verbose)
+            libbalsa_information(
 	    LIBBALSA_INFORMATION_WARNING, 
 	    _("Message submission problem, placing it into your outbox.\n" 
 	      "System will attempt to resubmit the message until you delete it."));
@@ -1000,8 +1002,9 @@ monitor_cb (const char *buf, int buflen, int writing, void *arg)
 
 /* [BCS] radically different since it uses the libESMTP interface.
  */
-static guint balsa_send_message_real(SendMessageInfo* info) {
-
+static guint
+balsa_send_message_real(SendMessageInfo* info) {
+    gboolean session_started;
 #ifdef BALSA_USE_THREADS
     SendThreadMessage *threadmsg;
 
@@ -1023,23 +1026,38 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
 
     /* Kick off the connection with the MTA.  When this returns, all
        messages with valid recipients have been sent. */
-    if (!smtp_start_session (info->session))
-      {
+    if ( !(session_started = smtp_start_session (info->session)) ){
         char buf[256];
-	libbalsa_information (LIBBALSA_INFORMATION_ERROR,
-	                      _("SMTP server problem: %s"),
-	                      smtp_strerror (smtp_errno (), buf, sizeof buf));
-      }
-
-
+        int smtp_err = smtp_errno();
+        switch(smtp_err) {
+        case -ECONNREFUSED:
+            libbalsa_information
+                (LIBBALSA_INFORMATION_ERROR,
+                 _("SMTP server refused connection.\n"
+                   "Balsa by default uses submission service (587).\n"
+                   "If you want to submit mail using relay service (25),"
+                   "specify it explicitly via: \"host:smtp\".\n"
+                   "Message is left in outbox."));
+            break;
+            /* case SMTP_ERR_NOTHING_TO_DO: silence this one?
+               break; */
+        default:
+            libbalsa_information (LIBBALSA_INFORMATION_ERROR,
+                                  _("SMTP server problem (%d): %s\n"
+                                    "Message is left in outbox."),
+                                  smtp_errno(),
+                                  smtp_strerror (smtp_errno (), 
+                                                 buf, sizeof buf));
+        }
+    } 
     /* We give back all the resources used and delete the sent messages */
-    
     /* Quite a bit of status info has been gathered about messages and
        their recipients.  The following will do a libbalsa_message_delete()
        on the messages with a 2xx status recorded against them.  However
        its possible for individual recipients to fail too.  Need a way to
        report it all.  */
-    smtp_enumerate_messages (info->session, handle_successful_send, NULL);
+    smtp_enumerate_messages (info->session, handle_successful_send, 
+                             &session_started);
 
     gdk_threads_enter();
     libbalsa_mailbox_close(info->outbox);
@@ -1051,6 +1069,7 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
     MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
     sending_threads--;
 #endif
+        
     send_unlock();
     smtp_destroy_session (info->session);
     send_message_info_destroy(info);	

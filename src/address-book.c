@@ -83,7 +83,9 @@ ab_okay_cb(GtkWidget * widget, gpointer data)
 
 		while ((row = gtk_clist_get_row_data(GTK_CLIST(add_clist), 0))) {
 			AddressData    *addy = (AddressData *) row;
-			sprintf(new, "%s%s %s <%s>", new, ((*new != '\0') ? ", " : ""), addy->name, addy->addy);
+			sprintf(new, "%s%s%s <%s>", new, 
+				((*new != '\0') ? ", " : ""), 
+				addy->name, addy->addy);
 			free(addy->name);
 			free(addy->addy);
 			g_free(addy);

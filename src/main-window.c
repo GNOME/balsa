@@ -192,6 +192,7 @@ static void find_again_cb(GtkWidget * widget, gpointer data);
 static void filter_dlg_cb(GtkWidget * widget, gpointer data);
 static void filter_export_cb(GtkWidget * widget, gpointer data);
 static void filter_run_cb(GtkWidget * widget, gpointer data);
+static void remove_duplicates_cb(GtkWidget * widget, gpointer data);
 
 static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
@@ -622,6 +623,12 @@ static GnomeUIInfo mailbox_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("Edit/Apply _Filters"),
                            N_("Filter the content of the selected mailbox"),
                            filter_run_cb, GTK_STOCK_PROPERTIES),
+    GNOMEUIINFO_SEPARATOR,
+#define MENU_MAILBOX_REMOVE_DUPLICATES 18
+    GNOMEUIINFO_ITEM_STOCK(N_("_Remove Duplicates"),
+                           N_("Remove duplicated messages "
+                              "from the selected mailbox"),
+                           remove_duplicates_cb, GTK_STOCK_REMOVE),
     GNOMEUIINFO_END
 };
 
@@ -2831,6 +2838,15 @@ filter_run_cb(GtkWidget * widget, gpointer data)
 	   of the filter action (eg a copy)). So let's see that later :) */
 	balsa_information(LIBBALSA_INFORMATION_WARNING, 
                           _("You can apply filters only on mailbox\n"));
+}
+
+static void
+remove_duplicates_cb(GtkWidget * widget, gpointer data)
+{                          
+    GtkWidget *index = balsa_window_find_current_index(BALSA_WINDOW(data));
+
+    if (index)
+        balsa_index_remove_duplicates(BALSA_INDEX(index));
 }
 
 /* closes the mailbox on the notebook's active page */

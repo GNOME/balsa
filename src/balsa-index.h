@@ -159,6 +159,9 @@ extern "C" {
     void balsa_index_threading(BalsaIndex* bindex,
 			       LibBalsaMailboxThreadingType th_type);
 
+    /* Remove duplicate messages. */
+    void balsa_index_remove_duplicates(BalsaIndex * index);
+
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

@@ -2043,6 +2043,60 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
         bndx_set_threading_type(index, thtype);
 }
 
+/* Find messages with the same ID, and remove all but one of them; if
+ * any has the `replied' flag set, make sure the one we keep is one of
+ * them.
+ *
+ * NOTE: assumes that index != NULL. */
+void
+balsa_index_remove_duplicates(BalsaIndex * index)
+{
+    LibBalsaMailbox *mailbox;
+    GHashTable *table;
+    GList *list;
+    GList *messages = NULL;
+
+    mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
+    table = g_hash_table_new(g_str_hash, g_str_equal);
+    for (list = mailbox->message_list; list; list = g_list_next(list)) {
+        LibBalsaMessage *message = list->data;
+        LibBalsaMessage *master;
+
+        if (!message->message_id)
+            continue;
+
+        master =g_hash_table_lookup(table, message->message_id);
+        if (!master || LIBBALSA_MESSAGE_IS_REPLIED(message)) {
+            g_hash_table_insert(table, message->message_id, message);
+            message = master;
+        }
+
+        if (message) {
+            GtkTreePath *path;
+
+            messages = g_list_prepend(messages, message);
+            if (!balsa_app.hide_deleted
+                && bndx_find_message(index, &path, NULL, message)) {
+                bndx_expand_to_row(index, path);
+                gtk_tree_path_free(path);
+            }
+        }
+    }
+
+    if (messages) {
+	if (mailbox != balsa_app.trash) {
+	    libbalsa_messages_move(messages, balsa_app.trash);
+	    enable_empty_trash(TRASH_FULL);
+	} else {
+	    libbalsa_messages_delete(messages, TRUE);
+            enable_empty_trash(TRASH_CHECK);
+	}
+	g_list_free(messages);
+    }
+
+    g_hash_table_destroy(table);
+}
+
 /* Public method. */
 void
 balsa_index_refresh_size(BalsaIndex * index)

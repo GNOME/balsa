@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
  * 
  *     This program is free software; you can redistribute it and/or modify
@@ -94,6 +94,7 @@ void mutt_fetchPopMail (void)
 #endif
   int s, i, msgs, bytes, tmp, total, err = 0;
   int first_msg;
+  int tot_bytes, num_bytes;
   CONTEXT ctx;
   MESSAGE *msg = NULL;
 
@@ -116,6 +117,7 @@ void mutt_fetchPopMail (void)
   memset ((char *) &sin, 0, sizeof(sin));
   sin.sin_family = AF_INET;
   sin.sin_port = htons (PopPort);
+
 
   if ((n = inet_addr (NONULL(PopHost))) == -1)
   {
@@ -255,7 +257,30 @@ void mutt_fetchPopMail (void)
     	 
 
   total = msgs - first_msg + 1; /* will be used for display later */
-  
+ 
+
+  /*  Check for the total amount of bytes mail to be recieved */
+  tot_bytes=0;
+  for (i = first_msg ; i <= msgs ; i++)
+  {
+    snprintf(buffer, sizeof(buffer), "list %d\r\n", i);
+    write (s, buffer, strlen(buffer));
+    if ( getLine (s, buffer, sizeof(buffer)) == -1) 
+    {
+      mx_fastclose_mailbox (&ctx);
+      goto fail;
+    }
+    
+    if (sscanf (buffer,"+OK %d %d",&i,&num_bytes) != 2) 
+    {
+      tot_bytes=-1;
+      break;
+    }
+    tot_bytes += num_bytes;
+  }
+
+
+  num_bytes=0;  
   for (i = first_msg ; i <= msgs ; i++)
   {
     snprintf (buffer, sizeof(buffer), "retr %d\r\n", i);
@@ -264,7 +289,7 @@ void mutt_fetchPopMail (void)
     sprintf( threadbuf, "Retrieving Message %d of %d", 
 	     i - first_msg + 1, total );
 #ifdef BALSA_USE_THREADS
-    MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_MSGINFO, threadbuf );
+    MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_MSGINFO, threadbuf,0,0 );
 #endif
 
     if (getLine (s, buffer, sizeof (buffer)) == -1)
@@ -298,7 +323,11 @@ void mutt_fetchPopMail (void)
 	err = 1;
 	break;
       }
-
+      
+      sprintf( threadbuf,"Recieved %d bytes of %d",num_bytes,tot_bytes);
+#ifdef BALSA_USE_THREADS
+      MSGMAILTHREAD(threadmsg, MSGMAILTHREAD_PROGRESS, threadbuf, num_bytes,tot_bytes); 
+#endif
       /* check to see if we got a full line */
       if (buffer[chunk-2] == '\r' && buffer[chunk-1] == '\n')
       {
@@ -307,6 +336,8 @@ void mutt_fetchPopMail (void)
 	  /* end of message */
 	  break;
 	}
+
+	num_bytes += chunk;
 
 	/* change CRLF to just LF */
 	buffer[chunk-2] = '\n';
@@ -324,7 +355,8 @@ void mutt_fetchPopMail (void)
       }
       else
 	p = buffer;
-      
+     
+
       fwrite (p, 1, chunk, msg->fp);
     }
 

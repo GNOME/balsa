@@ -21,6 +21,8 @@
 
 #include "main-window.h"
 #include "libbalsa.h"
+#include "balsa-index.h"
+#include "sendmsg-window.h"
 
 GtkType balsa_index_page_get_type(void);
 
@@ -52,5 +54,15 @@ GtkType balsa_index_page_get_type(void);
 GtkObject *balsa_index_page_new(BalsaWindow *window);
 void balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox *mailbox);
 void balsa_index_page_close_and_destroy( GtkObject *obj );
+
+void balsa_message_new (GtkWidget * widget);
+void balsa_message_reply (GtkWidget * widget, gpointer index);
+void balsa_message_replytoall (GtkWidget * widget, gpointer index);
+void balsa_message_forward (GtkWidget * widget, gpointer index);
+void balsa_message_continue (GtkWidget * widget, gpointer index);
+void balsa_message_next (GtkWidget * widget, gpointer index);
+void balsa_message_previous (GtkWidget * widget, gpointer index);
+void balsa_message_delete (GtkWidget * widget, gpointer index);
+void balsa_message_undelete (GtkWidget * widget, gpointer index);
 
 #endif /* __INDEX_CHILD_H__ */

@@ -255,7 +255,7 @@ save_MIME_part (GtkObject * o, BalsaSaveFileInfo * info)
 }
 
 GtkWidget *
-balsa_message_new (void)
+balsa_message_create (void)
 {
   BalsaMessage *bmessage;
   

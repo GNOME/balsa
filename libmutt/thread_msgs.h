@@ -27,12 +27,15 @@ typedef struct
   int message_type;
   char message_string[160];
   int *mailbox; /* Mailbox *   */
+  int num_bytes, tot_bytes;
 } MailThreadMessage;
   
-#define  MSGMAILTHREAD( message, type, string) \
+#define  MSGMAILTHREAD( message, type, string, num, tot) \
   message = malloc( sizeof( MailThreadMessage )); \
   message->message_type = type; \
   memcpy( message->message_string, string, strlen(string) + 1 ); \
+  message->num_bytes=num;\
+  message->tot_bytes=tot;\
   write( mail_thread_pipes[1], (void *) &message, sizeof(void *) );
 
 enum {
@@ -41,7 +44,8 @@ enum {
   MSGMAILTHREAD_UPDATECONFIG,
   MSGMAILTHREAD_ERROR,
   MSGMAILTHREAD_LOAD,
-  MSGMAILTHREAD_FINISHED
+  MSGMAILTHREAD_FINISHED,
+  MSGMAILTHREAD_PROGRESS
 };
 
 #endif /* __THREAD_MSGS_H__ */

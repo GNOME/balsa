@@ -5,7 +5,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *  
+ *    
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of 
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
@@ -70,6 +70,7 @@ enum {
   GtkWidget *progress_dialog = NULL;
   GtkWidget *progress_dialog_source = NULL;
   GtkWidget *progress_dialog_message = NULL;
+  GtkWidget *progress_dialog_bar = NULL;
 
 extern void load_messages (Mailbox * mailbox, gint emit);
 extern void config_mailbox_update(Mailbox * mailbox, char * name);
@@ -106,6 +107,7 @@ static void show_about_box (void);
 /* callbacks */
 static void check_new_messages_cb (GtkWidget *, gpointer data);
 
+
 static void new_message_cb (GtkWidget * widget, gpointer data);
 static void replyto_message_cb (GtkWidget * widget, gpointer data);
 static void replytoall_message_cb (GtkWidget * widget, gpointer data);
@@ -117,6 +119,7 @@ static void previous_message_cb (GtkWidget * widget, gpointer data);
 
 static void delete_message_cb (GtkWidget * widget, gpointer data);
 static void undelete_message_cb (GtkWidget * widget, gpointer data);
+
 
 static void filter_dlg_cb (GtkWidget * widget, gpointer data);
 
@@ -428,6 +431,9 @@ balsa_window_new ()
   gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
   gnome_app_create_toolbar_with_data(GNOME_APP(window), main_toolbar, window);
 
+
+
+
   /* set the toolbar style */
   balsa_window_refresh(window);
 
@@ -587,7 +593,7 @@ static GtkWidget *balsa_window_create_preview_pane(BalsaWindow *window)
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (sw),
 				 GTK_POLICY_AUTOMATIC,
 				 GTK_POLICY_AUTOMATIC);
-  message = balsa_message_new();
+  message = balsa_message_create();
   gtk_widget_set_usize(message, -1, 250);
   gtk_widget_show(message);
   gtk_container_add(GTK_CONTAINER(sw), message);
@@ -746,7 +752,8 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
   pthread_mutex_unlock( &mailbox_lock );
 
   if( balsa_app.pwindow_option == WHILERETR || 
-      balsa_app.pwindow_option == UNTILCLOSED )
+      (balsa_app.pwindow_option == UNTILCLOSED && 
+       !(progress_dialog && GTK_IS_WIDGET( progress_dialog))))
     {
       if( progress_dialog && GTK_IS_WIDGET( progress_dialog ) )
 	gtk_widget_destroy( GTK_WIDGET(progress_dialog) );
@@ -766,6 +773,12 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
       gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox), 
 			 progress_dialog_message, 
 			 FALSE, FALSE, 0);
+
+      progress_dialog_bar=gtk_progress_bar_new();
+      gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(progress_dialog)->vbox),
+			 progress_dialog_bar,
+			 FALSE, FALSE, 0);
+      
 
       gtk_widget_show_all( progress_dialog );
     }
@@ -805,16 +818,17 @@ check_messages_thread( Mailbox *mbox )
  */
   MailThreadMessage *threadmessage;
 
-  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "POP3" );
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "POP3",0,0 );
   check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input); 
 
-  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "IMAP" );
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "IMAP",0,0 );
   check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
 
-  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "Local Mail" );
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "Local Mail",0,0 );
   mailbox_check_new_messages( mbox );
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_LOAD, mbox->name,0,0 );
 
-  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_FINISHED, "Finished" );
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_FINISHED, "Finished",0,0 );
 
   pthread_mutex_lock( &mailbox_lock );
   checking_mail = 0;
@@ -903,7 +917,18 @@ mail_progress_notify_cb( )
 	    load_messages (balsa_app.inbox, 1);
 	    UNLOCK_MAILBOX (balsa_app.inbox);
 	    break;
+	  case MSGMAILTHREAD_PROGRESS:
+	    if (progress_dialog && GTK_IS_WIDGET ( progress_dialog ) ) 
+	      gtk_progress_bar_update(GTK_PROGRESS_BAR(progress_dialog_bar),
+				      (gfloat)threadmessage->num_bytes/
+				      (gfloat)threadmessage->tot_bytes);
+	    else 
+	      gnome_appbar_set_progress(balsa_app.appbar,
+					(gfloat)threadmessage->num_bytes/
+					(gfloat)threadmessage->tot_bytes);
+	    break;
 	  case MSGMAILTHREAD_FINISHED:
+	    
 	    if( balsa_app.pwindow_option == WHILERETR && progress_dialog
 			    && GTK_IS_WIDGET ( progress_dialog ))
 	      {
@@ -911,12 +936,16 @@ mail_progress_notify_cb( )
 		progress_dialog = NULL;
 	      }
 	    else if( progress_dialog && GTK_IS_WIDGET( progress_dialog ))
+	      {	
 		gtk_label_set_text( GTK_LABEL(progress_dialog_source), 
-				  "Finished Checking." );
+				    "Finished Checking." );
+		gtk_progress_bar_update(GTK_PROGRESS_BAR(progress_dialog_bar),0);
+	      }
 	    else
 	      {
 	        gnome_appbar_clear_stack(balsa_app.appbar);
 	        gnome_appbar_push(balsa_app.appbar,"Finished Checking.");
+		gnome_appbar_set_progress(balsa_app.appbar,0);
 	      }
 	    break;
 	  default:
@@ -996,7 +1025,7 @@ send_progress_notify_cb( )
 }
 #endif USE_BALSA_THREADS
 
-//static
+
 GtkWidget *balsa_window_find_current_index(BalsaWindow *window)
 {
   GtkWidget *page;
@@ -1022,179 +1051,61 @@ GtkWidget *balsa_window_find_current_index(BalsaWindow *window)
 static void
 new_message_cb (GtkWidget * widget, gpointer data)
 {
-  g_return_if_fail (widget != NULL);
-
-  sendmsg_window_new (widget, NULL, SEND_NORMAL);
+  balsa_message_new (widget);
 }
 
 
 static void
 replyto_message_cb (GtkWidget * widget, gpointer data)
 {
-  GtkWidget *index;
-  GList *list;
-  Message *message;
-
-  g_return_if_fail (widget != NULL);
-
-  index = balsa_window_find_current_index(BALSA_WINDOW(data));
-
-  g_return_if_fail(index != NULL);
-
-  list = GTK_CLIST(index)->selection;
-  while (list)
-  {
-    message = gtk_clist_get_row_data(GTK_CLIST(index), GPOINTER_TO_INT(list->data));
-    sendmsg_window_new (widget, message, SEND_REPLY);
-    list = list->next;
-  }
+  balsa_message_reply (widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
 }
 
 static void
 replytoall_message_cb (GtkWidget * widget, gpointer data)
 {
-  GtkWidget *index;
-  GList *list;
-  Message *message;
-
-  g_return_if_fail (widget != NULL);
-
-  index = balsa_window_find_current_index(BALSA_WINDOW(data));
-
-  g_return_if_fail(index != NULL);
-
-  list = GTK_CLIST(index)->selection;
-  while (list)
-  {
-    message = gtk_clist_get_row_data(GTK_CLIST(index), GPOINTER_TO_INT(list->data));
-    sendmsg_window_new (widget, message, SEND_REPLY_ALL);
-    list = list->next;
-  }
+  balsa_message_replytoall (widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
 }
 
 static void
 forward_message_cb (GtkWidget * widget, gpointer data)
 {
-  GtkWidget *index;
-  GList *list;
-  Message *message;
-
-  g_return_if_fail (widget != NULL);
-
-  index = balsa_window_find_current_index(BALSA_WINDOW(data));
-
-  g_return_if_fail(index != NULL);
-
-  list = GTK_CLIST(index)->selection;
-  while (list)
-  {
-    message = gtk_clist_get_row_data(GTK_CLIST(index), GPOINTER_TO_INT(list->data));
-    sendmsg_window_new (widget, message, SEND_FORWARD);
-    list = list->next;
-  }
+  balsa_message_forward (widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
 }
 
 
 static void
 continue_message_cb (GtkWidget * widget, gpointer data)
 {
-  GtkWidget *index;
-  GList *list;
-  Message *message;
-
-  g_return_if_fail (widget != NULL);
-
-  index = balsa_window_find_current_index(BALSA_WINDOW(data));
-
-  g_return_if_fail(index != NULL);
-
-  list = GTK_CLIST(index)->selection;
-  while (list)
-  {
-    message = gtk_clist_get_row_data(GTK_CLIST(index), GPOINTER_TO_INT(list->data));
-    sendmsg_window_new (widget, message, SEND_CONTINUE);
-    list = list->next;
-  }
+  balsa_message_continue (widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
 }
 
 
 static void
 next_message_cb (GtkWidget * widget, gpointer data)
 {
-  GtkWidget *index;
-
-  g_return_if_fail (widget != NULL);
-
-  index = balsa_window_find_current_index(BALSA_WINDOW(data));
-
-  g_return_if_fail(index != NULL);
-
-  balsa_index_select_next(BALSA_INDEX(index));
+  balsa_message_next (widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
 }
 
 
 static void
 previous_message_cb (GtkWidget * widget, gpointer data)
 {
-  GtkWidget *index;
-
-  g_return_if_fail (widget != NULL);
-
-  index = balsa_window_find_current_index(BALSA_WINDOW(data));
-
-  g_return_if_fail(index != NULL);
-
-  balsa_index_select_previous(BALSA_INDEX(index));
+  balsa_message_previous (widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
 }
 
 
 static void
 delete_message_cb (GtkWidget * widget, gpointer data)
 {
-  GtkWidget *index;
-  GList *list;
-  Message *message;
-
-  g_return_if_fail (widget != NULL);
-
-  index = balsa_window_find_current_index(BALSA_WINDOW(data));
-
-  g_return_if_fail(index != NULL);
-
-  list = GTK_CLIST(index)->selection;
-  while (list)
-  {
-    message = gtk_clist_get_row_data(GTK_CLIST(index), GPOINTER_TO_INT(list->data));
-    message_delete(message);
-    list = list->next;
-  }
-
-  balsa_index_select_next(BALSA_INDEX(index));
+  balsa_message_delete (widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
 }
 
 
 static void
 undelete_message_cb (GtkWidget * widget, gpointer data)
 {
-  GtkWidget *index;
-  GList *list;
-  Message *message;
-
-  g_return_if_fail (widget != NULL);
-
-  index = balsa_window_find_current_index(BALSA_WINDOW(data));
-
-  g_return_if_fail(index != NULL);
-
-  list = GTK_CLIST(index)->selection;
-  while (list)
-  {
-    message = gtk_clist_get_row_data(GTK_CLIST(index), GPOINTER_TO_INT(list->data));
-    message_undelete(message);
-    list = list->next;
-  }
-
-  balsa_index_select_next(BALSA_INDEX(index));
+  balsa_message_undelete (widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
 }
 
 static void
@@ -1326,3 +1237,4 @@ static void mw_size_alloc_cb( GtkWidget *window, GtkAllocation *alloc )
     balsa_app.mw_height = alloc->height;
     balsa_app.mw_width = alloc->width;
 }
+

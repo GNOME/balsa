@@ -147,7 +147,7 @@ message_window_new (Message * message)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
-  mw->bmessage = balsa_message_new ();
+  mw->bmessage = balsa_message_create ();
   gtk_container_add(GTK_CONTAINER(sw), mw->bmessage);
 
   balsa_message_set (BALSA_MESSAGE (mw->bmessage), message);

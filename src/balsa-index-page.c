@@ -71,8 +71,6 @@ static void message_status_set_read_cb (GtkWidget *, Message *);
 static void message_status_set_answered_cb (GtkWidget *, Message *);
 #endif
 
-static void delete_message_cb (GtkWidget *, BalsaIndex *);
-static void undelete_message_cb (GtkWidget *, BalsaIndex *);
 static void transfer_messages_cb (BalsaMBList *, Mailbox *, GtkCTreeNode *, GdkEventButton *, BalsaIndex *);
 
 
@@ -374,71 +372,113 @@ index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
   }
 }
 
+
 /*
  * CLIST Callbacks
  */
+static void
+message_status_set_new_cb (GtkWidget * widget, BalsaIndex *bindex)
+{
+  GList *list;
+  Message *message;
+
+  g_return_if_fail (widget != NULL);
+ 
+  list = GTK_CLIST (bindex)->selection;
+
+  while (list)
+    {
+      message = gtk_clist_get_row_data (GTK_CLIST (bindex), 
+      					GPOINTER_TO_INT (list->data));
+      message_unread (message);
+      list = list->next;
+    }    	   
+}
+
+static void
+message_status_set_read_cb (GtkWidget * widget, BalsaIndex *bindex)
+{
+  GList *list;
+  Message *message;
+
+  g_return_if_fail (widget != NULL);
+ 
+  list = GTK_CLIST (bindex)->selection;
+
+  while (list)
+    {
+      message = gtk_clist_get_row_data (GTK_CLIST (bindex), 
+      					GPOINTER_TO_INT (list->data));
+      message_read (message);
+      list = list->next;
+    }
+}
+
+static void
+message_status_set_answered_cb (GtkWidget * widget, BalsaIndex *bindex)
+{
+  GList *list;
+  Message *message;
+
+  g_return_if_fail (widget != NULL);
+ 
+  list = GTK_CLIST (bindex)->selection;
+
+  while (list)
+    {
+      message = gtk_clist_get_row_data (GTK_CLIST (bindex), 
+      					GPOINTER_TO_INT (list->data));
+      message_reply (message);
+      list = list->next;
+    }
+}
+
 static GtkWidget *
 create_menu (BalsaIndex * bindex)
 {
   GtkWidget *menu, *menuitem, *submenu, *smenuitem;
   GtkWidget *bmbl;
 
-  menu = gtk_menu_new ();
-  menuitem = gtk_menu_item_new_with_label (_ ("Transfer"));
-
-  submenu = gtk_menu_new ();
-  smenuitem = gtk_menu_item_new ();
-  bmbl = balsa_mblist_new ();
-  gtk_signal_connect (GTK_OBJECT (bmbl), "select_mailbox",
-		      (GtkSignalFunc) transfer_messages_cb,
-		      (gpointer) bindex);
-
-  gtk_widget_set_usize (GTK_WIDGET (bmbl), balsa_app.mblist_width, -1);
+  BALSA_DEBUG ();
   
-  gtk_container_add (GTK_CONTAINER (smenuitem), bmbl);
-  gtk_menu_append (GTK_MENU (submenu), smenuitem);
-  gtk_widget_show (bmbl);
-  gtk_widget_show (smenuitem);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
+  menu = gtk_menu_new ();
+  
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_NEW, _ ("New"));
+  gtk_signal_connect (GTK_OBJECT (menuitem),
+		      "activate",
+		      (GtkSignalFunc) balsa_message_new,
+		      NULL);
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
-#if 0				/* FIXME */
-  menuitem = gtk_menu_item_new_with_label (_ ("Change Status"));
-
-  submenu = gtk_menu_new ();
-  smenuitem = gtk_menu_item_new_with_label (_ ("Unread"));
-  gtk_signal_connect (GTK_OBJECT (smenuitem), "activate",
-		      (GtkSignalFunc) message_status_set_new_cb, message);
-  gtk_menu_append (GTK_MENU (submenu), smenuitem);
-  gtk_widget_show (smenuitem);
-
-  smenuitem = gtk_menu_item_new_with_label (_ ("Read"));
-  gtk_signal_connect (GTK_OBJECT (smenuitem), "activate",
-		      (GtkSignalFunc) message_status_set_read_cb, message);
-  gtk_menu_append (GTK_MENU (submenu), smenuitem);
-  gtk_widget_show (smenuitem);
-
-  smenuitem = gtk_menu_item_new_with_label (_ ("Replied"));
-  gtk_signal_connect (GTK_OBJECT (smenuitem), "activate",
-		   (GtkSignalFunc) message_status_set_answered_cb, message);
-  gtk_menu_append (GTK_MENU (submenu), smenuitem);
-  gtk_widget_show (smenuitem);
-
-  smenuitem = gtk_menu_item_new_with_label (_ ("Forwarded"));
-  gtk_menu_append (GTK_MENU (submenu), smenuitem);
-  gtk_widget_show (smenuitem);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _ ("Reply"));
+  gtk_signal_connect (GTK_OBJECT (menuitem),
+		      "activate",
+		      (GtkSignalFunc) balsa_message_reply,
+		      bindex);
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
-#endif
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _ ("Reply to all"));
+  gtk_signal_connect (GTK_OBJECT (menuitem),
+		      "activate",
+		      (GtkSignalFunc) balsa_message_replytoall,
+		      bindex);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem);
+
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_FWD, _ ("Forward"));
+  gtk_signal_connect (GTK_OBJECT (menuitem),
+		      "activate",
+		      (GtkSignalFunc) balsa_message_forward,
+		      bindex);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem);
+
   menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_TRASH, _ ("Delete"));
   gtk_signal_connect (GTK_OBJECT (menuitem),
 		      "activate",
-		      (GtkSignalFunc) delete_message_cb,
+		      (GtkSignalFunc) balsa_message_delete,
 		      bindex);
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
@@ -446,42 +486,60 @@ create_menu (BalsaIndex * bindex)
   menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_UNDELETE, _ ("Undelete"));
   gtk_signal_connect (GTK_OBJECT (menuitem),
 		      "activate",
-		      (GtkSignalFunc) undelete_message_cb,
+		      (GtkSignalFunc) balsa_message_undelete,
 		      bindex);
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
+  menuitem = gtk_menu_item_new_with_label (_ ("Transfer"));
+  submenu = gtk_menu_new ();
+  smenuitem = gtk_menu_item_new ();
+  bmbl = balsa_mblist_new ();
+  gtk_signal_connect (GTK_OBJECT (bmbl), "select_mailbox",
+		      (GtkSignalFunc) transfer_messages_cb,
+		      (gpointer) bindex); 
+ 
+  gtk_widget_set_usize (GTK_WIDGET (bmbl), balsa_app.mblist_width, -1);
+  gtk_container_add (GTK_CONTAINER (smenuitem), bmbl);
+  gtk_menu_append (GTK_MENU (submenu), smenuitem);
+  gtk_widget_show (bmbl);
+  gtk_widget_show (smenuitem);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem);
+
+/* FIXME: Still does not work? Find out why. -Knut <knut.neumann@uni-duesseldorf.de> */
+/*    menuitem = gtk_menu_item_new_with_label (_ ("Change Status")); */
+/*    submenu = gtk_menu_new (); */
+  
+/*    smenuitem = gtk_menu_item_new_with_label (_ ("Unread")); */
+/*    gtk_signal_connect (GTK_OBJECT (smenuitem), "activate", */
+/*  		      (GtkSignalFunc) message_status_set_new_cb,  */
+/*  		      (gpointer) bindex); */
+/*    gtk_menu_append (GTK_MENU (submenu), smenuitem); */
+/*    gtk_widget_show (smenuitem); */
+
+/*    smenuitem = gtk_menu_item_new_with_label (_ ("Read")); */
+/*    gtk_signal_connect (GTK_OBJECT (smenuitem), "activate", */
+/*  		      (GtkSignalFunc) message_status_set_read_cb,  */
+/*  		      (gpointer) bindex); */
+/*    gtk_menu_append (GTK_MENU (submenu), smenuitem); */
+/*    gtk_widget_show (smenuitem); */
+
+/*    smenuitem = gtk_menu_item_new_with_label (_ ("Replied")); */
+/*    gtk_signal_connect (GTK_OBJECT (smenuitem), "activate", */
+/*  		      (GtkSignalFunc) message_status_set_answered_cb,  */
+/*  		      (gpointer) bindex); */
+/*    gtk_menu_append (GTK_MENU (submenu), smenuitem); */
+/*    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu); */
+/*    gtk_menu_append (GTK_MENU (menu), menuitem); */
+/*    gtk_widget_show (smenuitem); */
+
+/*    gtk_widget_show (menuitem); */
+
   return menu;
 }
 
-#ifdef MSG_STATUS_USED
-static void
-message_status_set_new_cb (GtkWidget * widget, Message * message)
-{
-  g_return_if_fail (widget != NULL);
-
-  message_unread (message);
-  /* balsa_index_select_next (BALSA_INDEX (mainwindow->index)); */
-}
-
-static void
-message_status_set_read_cb (GtkWidget * widget, Message * message)
-{
-  g_return_if_fail (widget != NULL);
-
-  message_read (message);
-
-  /* balsa_index_select_next (BALSA_INDEX (mainwindow->index)); */
-}
-
-static void
-message_status_set_answered_cb (GtkWidget * widget, Message * message)
-{
-  g_return_if_fail (widget != NULL);
-
-  message_reply (message);
-}
-#endif
 
 static void
 transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event, BalsaIndex * bindex)
@@ -502,58 +560,6 @@ transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row,
       list = list->next;
     }
 }
-
-
-static void
-delete_message_cb (GtkWidget * widget, BalsaIndex * bindex)
-{
-  GtkCList *clist;
-  GList *list;
-  Message *message;
-  gint i = 0;
-
-  g_return_if_fail (widget != NULL);
-  g_return_if_fail (bindex != NULL);
-
-  clist = GTK_CLIST (bindex);
-  list = clist->selection;
-  while (list)
-    {
-      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT (list->data));
-      message_delete (message);
-      i++;
-      list = list->next;
-    }
-
-  if (i == 1)
-    balsa_index_select_next (bindex);
-}
-
-static void
-undelete_message_cb (GtkWidget * widget, BalsaIndex * bindex)
-{
-  GtkCList *clist;
-  GList *list;
-  Message *message;
-  gint i = 0;
-
-  g_return_if_fail (widget != NULL);
-  g_return_if_fail (bindex != NULL);
-
-  clist = GTK_CLIST (bindex);
-  list = clist->selection;
-  while (list)
-    {
-      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT (list->data));
-      message_undelete (message);
-      list = list->next;
-    }
-
-  if (i == 1)
-    balsa_index_select_next (bindex);
-}
-
-
 /* DND features                                              */
 
 #ifdef DND_USED
@@ -645,5 +651,151 @@ index_child_drag_data_get (GtkWidget *widget, GdkDragContext *context,
   g_free( message_list );
   
 }
-
 #endif /*DND_USED*/
+
+/* New Stuff */
+
+void
+balsa_message_new (GtkWidget * widget)
+{
+  g_return_if_fail (widget != NULL);
+  sendmsg_window_new (widget, NULL, SEND_NORMAL);
+}
+
+
+void
+balsa_message_reply (GtkWidget * widget, gpointer index)
+{
+  GList     *list;
+  Message   *message;
+
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail(index != NULL);
+
+  list = GTK_CLIST (index)->selection;
+  while (list)
+  {
+    message = gtk_clist_get_row_data(GTK_CLIST (index), GPOINTER_TO_INT(list->data));
+    sendmsg_window_new (widget, message, SEND_REPLY);
+    list = list->next;
+  }
+}
+
+void
+balsa_message_replytoall (GtkWidget * widget, gpointer index)
+{
+  GList     *list;
+  Message   *message;
+
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail(index != NULL);
+
+  list = GTK_CLIST (index)->selection;
+  while (list)
+  {
+    message = gtk_clist_get_row_data(GTK_CLIST (index), GPOINTER_TO_INT(list->data));
+    sendmsg_window_new (widget, message, SEND_REPLY_ALL);
+    list = list->next;
+  }
+}
+
+void
+balsa_message_forward (GtkWidget * widget, gpointer index)
+{
+  GList     *list;
+  Message   *message;
+
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail(index != NULL);
+
+  list = GTK_CLIST (index)->selection;
+  while (list)
+  {
+    message = gtk_clist_get_row_data(GTK_CLIST (index), GPOINTER_TO_INT(list->data));
+    sendmsg_window_new (widget, message, SEND_FORWARD);
+    list = list->next;
+  }
+}
+
+
+void
+balsa_message_continue (GtkWidget * widget, gpointer index)
+{
+  GList   *list;
+  Message *message;
+
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail(index != NULL);
+
+  list = GTK_CLIST(index)->selection;
+  while (list)
+  {
+    message = gtk_clist_get_row_data(GTK_CLIST(index), GPOINTER_TO_INT(list->data));
+    sendmsg_window_new (widget, message, SEND_CONTINUE);
+    list = list->next;
+  } 
+}
+
+
+void
+balsa_message_next (GtkWidget * widget, gpointer index)
+{
+  g_return_if_fail(index != NULL);
+  balsa_index_select_next (index);
+}
+
+
+void
+balsa_message_previous (GtkWidget * widget, gpointer index)
+{
+  g_return_if_fail(index != NULL);
+  balsa_index_select_previous (index);
+}
+
+
+void
+balsa_message_delete (GtkWidget * widget, gpointer index)
+{
+  GList   *list;
+  Message *message;
+
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail(index != NULL);
+
+  list = GTK_CLIST(index)->selection;
+  while (list)
+  {
+    message = gtk_clist_get_row_data(GTK_CLIST(index), GPOINTER_TO_INT(list->data));
+    message_delete(message);
+    list = list->next;
+  }
+  balsa_index_select_next (index);
+}
+
+
+void
+balsa_message_undelete (GtkWidget * widget, gpointer index)
+{
+  GList   *list;
+  Message *message;
+
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail(index != NULL);
+
+  list = GTK_CLIST(index)->selection;
+  while (list)
+  {
+    message = gtk_clist_get_row_data(GTK_CLIST(index), GPOINTER_TO_INT(list->data));
+    message_undelete(message);
+    list = list->next;
+  }
+  balsa_index_select_next (index);
+}
+
+
+
+
+
+
+
+

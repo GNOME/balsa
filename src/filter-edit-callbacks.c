@@ -1912,7 +1912,9 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
 
     /* Populate the conditions list */
     filter_errno=FILTER_NOERR;
-    fill_condition_list(model, fil->condition, fil->condition->type);
+    fill_condition_list(model, fil->condition,
+			fil->condition ?
+			fil->condition->type : CONDITION_OR);
     if (filter_errno!=FILTER_NOERR)
         gtk_widget_destroy(fe_window);
 

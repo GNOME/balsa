@@ -3,7 +3,7 @@ AC_INIT(mutt.h)
 
 MUTT_MAJOR=0
 MUTT_REVISION=93
-MUTT_PATCHLEVEL=1
+MUTT_PATCHLEVEL=2
 MUTT_VERSION="$MUTT_MAJOR.$MUTT_REVISION.$MUTT_PATCHLEVEL"
 VERSION=$MUTT_VERSION
 
@@ -198,19 +198,21 @@ AC_ARG_WITH(domain, [  --with-domain=DOMAIN       Specify your DNS domain name ]
 
 AC_ARG_ENABLE(hidden-host, [  --enable-hidden-host       Only use the domain name for local addresses], AC_DEFINE(HIDDEN_HOST))
 
-AC_ARG_ENABLE(pop, [  --enable-pop               Enable POP3 support],
-[	AC_DEFINE(USE_POP)
-	AC_CHECK_LIB(socket, socket)
-	AC_CHECK_LIB(nsl, gethostbyname)
-	LIBOBJS="$LIBOBJS pop.o"
-])
+dnl AC_ARG_ENABLE(pop, [  --enable-pop               Enable POP3 support],
+dnl [
+AC_DEFINE(USE_POP)
+dnl	AC_CHECK_LIB(socket, socket)
+dnl	AC_CHECK_LIB(nsl, gethostbyname)
+dnl	LIBOBJS="$LIBOBJS pop.o"
+dnl ])
 
-AC_ARG_ENABLE(imap, [  --enable-imap              Enable IMAP support],
-[	AC_DEFINE(USE_IMAP)
-	AC_CHECK_LIB(socket, socket)
-	AC_CHECK_LIB(nsl, gethostbyname)
-	LIBOBJS="$LIBOBJS imap.o"
-])
+dnl AC_ARG_ENABLE(imap, [  --enable-imap              Enable IMAP support],
+dnl [
+AC_DEFINE(USE_IMAP)
+dnl	AC_CHECK_LIB(socket, socket)
+dnl	AC_CHECK_LIB(nsl, gethostbyname)
+dnl	LIBOBJS="$LIBOBJS imap.o"
+dnl ])
 
 AC_ARG_ENABLE(flock, [  --enable-flock             Use flock() to lock files],
 	[if test $enableval = yes; then

@@ -603,28 +603,36 @@ static int imap_open_connection (CONTEXT *ctx, CONNECTION *conn)
   char seq[16];
 
   if (!ImapUser)
+#ifndef LIBMUTT
   {
     strfcpy (user, Username, sizeof (user));
     if (mutt_get_field ("IMAP Username: ", user, sizeof (user), 0) != 0 ||
         !user[0])
     {
       user[0] = 0;
+#endif
       return (-1);
+#ifndef LIBMUTT
     }
   }
+#endif
   else
     strfcpy (user, ImapUser, sizeof (user));
 
   if (!ImapPass)
+#ifndef LIBMUTT
   {
     pass[0]=0;
     snprintf (buf, sizeof (buf), "Password for %s@%s: ", user, conn->server);
     if (mutt_get_field (buf, pass, sizeof (pass), M_PASS) != 0 ||
         !pass[0])
     {
+#endif
       return (-1);
+#ifndef LIBMUTT
     }
   }
+#endif
   else
     strfcpy (pass, ImapPass, sizeof (pass));
 

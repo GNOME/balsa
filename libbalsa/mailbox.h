@@ -240,6 +240,7 @@ typedef void (*MailboxWatcherFunc) (MailboxWatcherMessage * arg1);
  */
 void mailbox_init ();
 
+gint set_imap_username(Mailbox *mb);
 
 /* 
  * open and close a mailbox 

@@ -195,6 +195,8 @@ index_select_cb (GtkWidget * widget,
   g_return_if_fail (BALSA_IS_INDEX (widget));
   g_return_if_fail (message != NULL);
 
+  set_imap_username(message->mailbox);
+
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     message_window_new (message);
   else if (bevent && bevent->button == 3)

@@ -1,4 +1,16 @@
-Thu Jul 30 17:21:32 EDT 1998 Stuart Parmenter <pavlov@innerx.net
+Thu Jul 30 21:26:22 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
+
+	* libmutt/configure.in, mx.c, parse.c, pop.c, send.c
+
+	Updated to mutt v0.93.2
+	
+	* libbalsa/mailbox.c, src/index-child.c
+
+	Initial work on IMAP and POP3 support with mutt.  It doesn't seem to
+	work very well right now.  I am still working on this.
+
+
+Thu Jul 30 17:21:32 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
 
 	* libbalsa/mailbox.c, src/local-mailbox.c
 

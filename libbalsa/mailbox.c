@@ -159,7 +159,17 @@ mailbox_init ()
   Tempdir = g_get_tmp_dir ();
 }
 
+gint
+set_imap_username (Mailbox * mb)
+{
+  if (mb->type != MAILBOX_IMAP)
+    return 0;
 
+  ImapUser = MAILBOX_IMAP (mb)->user;
+  ImapPass = MAILBOX_IMAP (mb)->passwd;
+
+  return 1;
+}
 /*
  * allocate a new mailbox
  */
@@ -256,6 +266,7 @@ mailbox_free (Mailbox * mailbox)
 gint
 mailbox_open_ref (Mailbox * mailbox)
 {
+  GString *tmp;
   LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
 
 
@@ -285,14 +296,20 @@ mailbox_open_ref (Mailbox * mailbox)
       break;
 
     case MAILBOX_IMAP:
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_IMAP (mailbox)->server, M_QUIET, NULL);
+      tmp = g_string_new (NULL);
+      g_string_append_c (tmp, '{');
+      g_string_append (tmp, MAILBOX_IMAP (mailbox)->server);
+      g_string_append_c (tmp, '}');
+      g_string_append (tmp, MAILBOX_IMAP (mailbox)->path);
+      set_imap_username(mailbox);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp->str, 0, NULL);
+      g_string_free (tmp, TRUE);
       break;
     }
 
-  mailbox->messages = mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
-
   if (CLIENT_CONTEXT_OPEN (mailbox))
     {
+      mailbox->messages = mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
       load_messages (mailbox, 0);
 
       /* incriment the reference count */

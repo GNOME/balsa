@@ -76,6 +76,7 @@ mblist_open_window (GnomeMDI * mdi)
 
   mblw->ctree = GTK_CTREE (gtk_ctree_new (1, 0));
   gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED);
+  gtk_clist_set_policy(GTK_CLIST(mblw->ctree),GTK_POLICY_AUTOMATIC,GTK_POLICY_AUTOMATIC);
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (mblw->ctree), TRUE, TRUE, 0);
   gtk_widget_show (GTK_WIDGET (mblw->ctree));
 

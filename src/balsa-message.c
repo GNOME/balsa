@@ -480,7 +480,8 @@ balsa_message_set (BalsaMessage * bmessage,
 }
 
 static GnomeCanvasItem *
-balsa_message_text_item (gchar * text, GnomeCanvasGroup * group, double x, double y)
+balsa_message_text_item (const gchar * text, GnomeCanvasGroup * group, 
+			 double x, double y, const gchar * font_name)
 {
 	GnomeCanvasItem *item;
 
@@ -489,7 +490,8 @@ balsa_message_text_item (gchar * text, GnomeCanvasGroup * group, double x, doubl
 				      "x", x,
 				      "y", y,
 				      "anchor", GTK_ANCHOR_NW,
-				      "font",  balsa_app.message_font,
+				      "font",  font_name ? font_name : 
+				      balsa_app.message_font,
 				      "text", text, 
 				      NULL );
 	return item;
@@ -549,6 +551,23 @@ next_row_height (GnomeCanvasGroup * row[])
 }
 
 static void
+optional_list_header(GList * list, double *next_height, 
+		     GnomeCanvasGroup *row[], const gchar* label) 
+{
+  GnomeCanvasItem *item;
+  GnomeCanvasItem *data;
+  gchar * val;
+  if (list) {
+     *next_height = next_row_height (row);
+     item = balsa_message_text_item (label, row[0], 0.0, *next_height, 
+				     NULL);
+     val = make_string_from_list (list);
+     data = balsa_message_text_item (val, row[1], 0.0, *next_height, NULL);
+     g_free(val);
+  }
+}
+
+static void
 headers2canvas (BalsaMessage * bmessage, Message * message)
 {
   double next_height = 0;
@@ -582,8 +601,8 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
   if (message->date)
     {
       /* this is the first row, so we'll use 0.0 here */
-      item = balsa_message_text_item (_("Date:"), row[0], 0.0, 0.0);
-      data = balsa_message_text_item (message->date, row[1], 0.0, 0.0);
+      item = balsa_message_text_item (_("Date:"), row[0], 0.0, 0.0, NULL);
+      data = balsa_message_text_item (message->date, row[1], 0.0, 0.0, NULL);
     }
 
   if (message->from)
@@ -591,54 +610,39 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
       gchar *from;
       next_height = next_row_height (row);
 
-      item = balsa_message_text_item (_("From:"), row[0], 0.0, next_height);
+      item = balsa_message_text_item (_("From:"), row[0], 0.0, next_height, 
+				      NULL);
 
       if (message->from->personal)
 	from = g_strdup_printf ("%s <%s>", message->from->personal, message->from->mailbox);
       else
 	from = g_strdup (message->from->mailbox);
 
-      data = balsa_message_text_item (from, row[1], 0.0, next_height);
+      data = balsa_message_text_item (from, row[1], 0.0, next_height, NULL);
       g_free (from);
     }
 
-  if (message->to_list)
-    {
-      next_height = next_row_height (row);
-      item = balsa_message_text_item (_("To:"), row[0], 0.0, next_height);
-      data = balsa_message_text_item (make_string_from_list (message->to_list),
-				      row[1], 0.0, next_height);
-    }
 
-  if (message->cc_list)
-    {
-      next_height = next_row_height (row);
-      item = balsa_message_text_item (_("Cc:"), row[0], 0.0, next_height);
-      data = balsa_message_text_item (make_string_from_list (message->cc_list),
-				      row[1], 0.0, next_height);
-    }
-
-  if (message->bcc_list)
-    {
-      next_height = next_row_height (row);
-      item = balsa_message_text_item (_("Bcc:"), row[0], 0.0, next_height);
-      data = balsa_message_text_item (make_string_from_list (message->bcc_list),
-				      row[1], 0.0, next_height);
-    }
+  optional_list_header(message->to_list,  &next_height, row, _("To:"));
+  optional_list_header(message->cc_list,  &next_height, row, _("Cc:"));
+  optional_list_header(message->bcc_list, &next_height, row, _("Bcc:"));
 
   if (message->fcc_mailbox)
     {
       next_height = next_row_height (row);
-      item = balsa_message_text_item (_("Fcc:"), row[0], 0.0, next_height);
+      item = balsa_message_text_item (_("Fcc:"), row[0], 0.0, next_height, 
+				      NULL);
       data = balsa_message_text_item (message->fcc_mailbox->name, row[1], 0.0,
-                                      next_height);
+                                      next_height, NULL);
     }
 
   if (message->subject)
     {
       next_height = next_row_height (row);
-      item = balsa_message_text_item (_("Subject:"), row[0], 0.0, next_height);
-      data = balsa_message_text_item (message->subject, row[1], 0.0, next_height);
+      item = balsa_message_text_item (_("Subject:"), row[0], 0.0, next_height,
+				      NULL);
+      data = balsa_message_text_item (message->subject, row[1], 0.0, 
+				      next_height, NULL);
     }
 
   gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (row[0]), &x1, &y1, &x2, &y2);
@@ -687,7 +691,7 @@ other2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
   if (text)
     text[alloced - 1] = '\0';
 
-  balsa_message_text_item (text, group, 0.0, next_part_height (group));
+  balsa_message_text_item (text, group, 0.0, next_part_height (group), NULL);
 
   g_free (text);
   fclose (s.fpout);
@@ -700,7 +704,8 @@ audio2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
   GnomeCanvasItem *item;
   BalsaSaveFileInfo *info;
 
-  item = balsa_message_text_item ("--AUDIO--", group, 0.0, next_part_height (group));
+  item = balsa_message_text_item ("--AUDIO--", group, 0.0, 
+				  next_part_height (group), NULL);
   balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
   info = balsa_save_file_info_new (NULL, message, bdy);
   gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), info);
@@ -716,7 +721,7 @@ application2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *
 
   /* create text */
   item = balsa_message_text_item ("--APPLICATION--", group, 0.0,
-				  next_part_height (group));
+				  next_part_height (group), NULL);
   /* create item's background under text as created above */
   balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
 
@@ -802,7 +807,8 @@ message2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gro
   GnomeCanvasItem *item;
   BalsaSaveFileInfo *info;
 
-  item = balsa_message_text_item ("--MESSAGE--", group, 0.0, next_part_height (group));
+  item = balsa_message_text_item ("--MESSAGE--", group, 0.0, 
+				  next_part_height (group), NULL);
   balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
   info = balsa_save_file_info_new (NULL, message, bdy);
   gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), info);
@@ -826,11 +832,180 @@ video2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
   GnomeCanvasItem *item;
   BalsaSaveFileInfo *info;
 
-  item = balsa_message_text_item ("--VIDEO--", group, 0.0, next_part_height (group));
+  item = balsa_message_text_item ("--VIDEO--", group, 0.0, 
+				  next_part_height (group), NULL);
   balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
   info = balsa_save_file_info_new (NULL, message, bdy);
   gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), info);
 }
+
+/* get_font_name returns iso8859 font name based on given font 
+   wildcard 'base' and given character set encoding.
+   Algorithm: copy max first 12 fields, cutting additionally 
+   at most two last, if they are constant.
+*/
+/* the name should really be one_or_two_const_fields_to_end */
+static gint 
+two_const_fields_to_end(const gchar* ptr) {
+   int cnt = 0;
+   while(*ptr && cnt<3) {
+      if(*ptr   == '*') return 0;
+      if(*ptr++ == '-') cnt++;
+   }
+   return cnt<3;
+}
+
+gchar* 
+get_font_name(const gchar* base, int code) {
+   static gchar type[] ="iso8859";
+   gchar *res;
+   const gchar* ptr = base;
+   int dash_cnt = 0, len;
+
+   g_return_val_if_fail(base != NULL, NULL);
+   g_return_val_if_fail(code >= 0,    NULL);
+
+   while(*ptr && dash_cnt<13) {
+      if(*ptr == '-') dash_cnt++;
+      
+      if(two_const_fields_to_end(ptr)) break;
+      ptr++;
+   }
+
+   /* defense against a patologically short base font wildcard implemented
+    * in the chunk below
+    * extra space for dwo dashes and '\0' */
+   len = ptr-base;
+   if(dash_cnt>12) len--;
+   if(len<1) len = 1;
+   res = (gchar*)g_malloc(len+sizeof(type)+3+(code>9?2:1));
+   if(balsa_app.debug)
+      fprintf(stderr,"base font name: %s and code :%d\n"
+	      "mallocating %d bytes\n", base, code,
+	      len+sizeof(type)+2+(code>9?2:1) );
+
+   if(len>1) strncpy(res, base, len);
+   else { strncpy(res, "*", 1); len = 1; } 
+
+   sprintf(res+len,"-%s-%d", type, code);
+   return res;
+}   
+
+/* HELPER FUNCTIONS ----------------------------------------------- */
+static gchar*
+find_body_font(BODY * bdy) 
+{
+   gchar * font_name = NULL, *charset;
+
+   if ((charset=mutt_get_parameter("charset", bdy->parameter)))
+   {
+      if(g_strncasecmp(charset,"iso-8859-",9) != 0 ) return NULL;
+      font_name = get_font_name(balsa_app.message_font, atoi(charset+9));
+   } 
+   return font_name;
+}
+
+/* wrap_string
+   wraps given string replacing spaces with '\n'.  do changes in place.
+   KISSed by pawsa.
+   lnbeg - line beginning position, sppos - space position, 
+   te - tab's extra space.
+*/
+void
+wrap_string(gchar* str, int width)
+{
+   const int minl = width/2;
+   gchar *lnbeg, *sppos, *ptr;
+   gint te = 0;
+
+   g_assert(str != NULL);
+   lnbeg= sppos = ptr = str;
+
+   while(*ptr) {
+      if(*ptr=='\t') te += 7;
+      if(*ptr==' ') sppos = ptr;
+      if(ptr-lnbeg>width-te && sppos>=lnbeg+minl) {
+	 *sppos = '\n';
+	 lnbeg = ptr;te = 0;
+      }
+      if(*ptr=='\n') {
+	 lnbeg = ptr; te = 0;
+      }
+      ptr++;
+   }
+}
+
+/* reflows a paragraph in given string. The paragraph to reflow is
+determined by the cursor position. If mode is <0, whole string is
+reflowed. Replace tabs with single spaces, squeeze neighboring spaces. 
+Single '\n' replaced with spaces, double - retained. 
+HQ piece of code, modify only after thorough testing.
+*/
+/* find_beg_and_end - finds beginning and end of a paragraph;
+ *l will store the pointer to the first character of the paragraph,
+ *u - to the '\0' or first '\n' character delimiting the paragraph.
+ */
+static
+void find_beg_and_end(gchar *str, gint pos, gchar **l, gchar **u) 
+{
+   gint ln;
+
+   *l = str + pos;
+
+   while(*l>str && !(**l == '\n' && *(*l-1) == '\n') )
+      (*l)--;
+   if(*l+1<=str+pos && **l == '\n') (*l)++;
+
+   *u = str + pos;
+   ln = 0;
+   while(**u && !(ln && **u == '\n') )
+      ln = *(*u)++ == '\n';
+   if(ln) (*u)--;
+}
+
+/* lspace - last was space, iidx - insertion index.  */
+void 
+reflow_string(gchar* str, gint mode, gint *cur_pos, int width) 
+{
+   gchar *l, *u, *sppos, *lnbeg, *iidx;
+   gint lnl = 0, lspace = 0; // 1 -> skip leading spaces
+
+   if(mode<0) {
+      l = str; u = str + strlen(str);
+   }
+   else find_beg_and_end(str, *cur_pos, &l, &u);
+
+   lnbeg = sppos = iidx = l;
+
+   while(l<u) {
+      if(lnl && *l == '\n') {
+	 *(iidx-1) = '\n';
+	 *iidx++ = '\n';
+	 lspace = 1;
+	 lnbeg = sppos = iidx;
+      } else if(isspace(*l)) {
+	 lnl = *l == '\n';
+	 if(!lspace) {
+	    sppos = iidx; 
+	    *iidx++= ' ';
+	 } else if(iidx-str<*cur_pos) (*cur_pos)--;
+	 lspace = 1;
+      } else {
+	 lspace = 0; lnl = 0;
+	 if(iidx-lnbeg>=width && lnbeg < sppos){
+	    *sppos='\n';
+	    lnbeg=sppos+1;
+	 }
+	 *iidx++ = *l;
+      }
+      l++;
+   }
+   /* job is done, shrink remainings */
+   while( (*iidx++ =*u++) )
+      ;
+}
+
+/* END OF HELPER FUNCTIONS ----------------------------------------------- */
 
 static void
 mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
@@ -869,35 +1044,44 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gr
 		}
 
 		if( bdy->filename == NULL )
-			bdy->filename = g_strdup( "textfile" );
+		   bdy->filename = g_strdup( "textfile" );
 
 		info = balsa_save_file_info_new( NULL, message, bdy );
-
+		
 		/* create text and info, set them up */
 		if( showlink ) {
-			GnomeCanvasItem *link;
-
-			link = balsa_message_text_item( linktext, group, 0.0,
-							next_part_height( group ) );
-			balsa_message_text_item_set_bg( link, group, BGLINKCOLOR );
-			gtk_signal_connect( GTK_OBJECT( link ), "event", GTK_SIGNAL_FUNC( item_event ), info );
+		   GnomeCanvasItem *link;
+		   
+		   link = balsa_message_text_item( 
+		      linktext, group, 0.0, next_part_height( group ), 
+		      NULL);
+		   balsa_message_text_item_set_bg( link, group, BGLINKCOLOR );
+		   gtk_signal_connect( GTK_OBJECT( link ), "event", 
+				       GTK_SIGNAL_FUNC( item_event ), info );
 		}
-
+		
 		/* conditionally add the text item to the canvas */
 		if( showtext ) {
-			GnomeCanvasItem *text;
+		   GnomeCanvasItem *text;
+		   gchar *font_name;
+		   
+		   font_name = find_body_font(bdy);
+		   if(balsa_app.wordwrap) 
+		      wrap_string(ptr, balsa_app.wraplength);
+		   text = balsa_message_text_item( 
+		      ptr, group, 0.0, next_part_height (group), font_name );
+		   if(font_name) g_free(font_name);
 
-			text = balsa_message_text_item( ptr, group, 0.0, next_part_height (group) );
-
-			if( showlink == FALSE ) {
-				gtk_signal_connect( GTK_OBJECT( text ), "event", 
-						    GTK_SIGNAL_FUNC( text_event ), info );
-			}
+		   if( showlink == FALSE ) {
+		      gtk_signal_connect( GTK_OBJECT( text ), "event", 
+					  GTK_SIGNAL_FUNC( text_event ), 
+					  info );
+		   }
 		}
-
+		   
 		g_free( ptr );
-	}
-
+	}		
+	
 	fclose( s.fpout );
 	unlink( tmp_file_name );
 }

@@ -157,6 +157,8 @@ balsa_app_init (void)
   balsa_app.PrintCommand.linesize = 78;
   balsa_app.PrintCommand.PrintCommand = NULL;
 
+  /* date format */
+  balsa_app.date_string = NULL;
 }
 
 gint

@@ -48,11 +48,11 @@ extern "C"
 	 GdkFont   *font;
 	 Message *orig_message;
 	 SendType type;
-	 guint charset_idx;
+	 const gchar * charset;
    };
 
   BalsaSendmsg * sendmsg_window_new (GtkWidget *, Message *, SendType);
-   
+
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

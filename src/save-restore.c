@@ -893,7 +893,7 @@ config_global_load (void)
 
   /* How we format dates */
   if ((field = pl_dict_get_str (globals, "DateFormat")) == NULL)
-    balsa_app.date_string = DEFAULT_DATE_FORMAT;
+    balsa_app.date_string = g_strdup(DEFAULT_DATE_FORMAT);
   else
     balsa_app.date_string = g_strdup (field);
 

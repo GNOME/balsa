@@ -50,7 +50,6 @@ static gint attach_clicked (GtkWidget *, gpointer);
 static gint close_window (GtkWidget *, gpointer);
 static gint check_if_regular_file (const gchar *);
 static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
-void send_body_wrap (Body *body, GtkText *text);
 
 static void wrap_body_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 static void reflow_par_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
@@ -67,7 +66,7 @@ static gint toggle_fcc_cb (GtkWidget *, BalsaSendmsg *);
 static gint toggle_reply_cb (GtkWidget *, BalsaSendmsg *);
 static gint toggle_attachments_cb (GtkWidget *, BalsaSendmsg *);
 
-static gint iso_font_set(BalsaSendmsg*, gint , gint );
+static gint set_iso_charset(BalsaSendmsg*, gint , gint );
 static gint iso_1_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_15_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_2_cb(GtkWidget* , BalsaSendmsg *);
@@ -95,6 +94,9 @@ static GtkTargetEntry email_field_drop_types[] =
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
+static void wrap_body_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
+static void reflow_par_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
+static void reflow_body_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 
 static GnomeUIInfo main_toolbar[] =
 {
@@ -672,7 +674,7 @@ create_text_area (BalsaSendmsg * msg)
    basically copies the text over to the entry field.
 */
 static void
-continueBody(Message * message, BalsaSendmsg *msg)
+continueBody(BalsaSendmsg *msg, Message * message)
 {
    GString *rbdy;
 
@@ -681,6 +683,8 @@ continueBody(Message * message, BalsaSendmsg *msg)
    gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, 
 		    strlen (rbdy->str));
    g_string_free (rbdy, TRUE);
+
+   if(!msg->charset) msg->charset = message_charset(message);
    message_body_unref (message);
 }
 
@@ -688,7 +692,7 @@ continueBody(Message * message, BalsaSendmsg *msg)
    quotes properly the body of the message
 */
 static void 
-quoteBody(Message * message, BalsaSendmsg *msg, SendType type)
+quoteBody(BalsaSendmsg *msg, Message * message, SendType type)
 {
    GString *rbdy;
    gchar *str, *personStr;
@@ -724,6 +728,8 @@ quoteBody(Message * message, BalsaSendmsg *msg, SendType type)
    g_string_free (rbdy, TRUE);
 
    gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
+
+   if(!msg->charset) msg->charset = message_charset(message);
    message_body_unref (message);
 }
 
@@ -732,12 +738,14 @@ quoteBody(Message * message, BalsaSendmsg *msg, SendType type)
    First quotes the original one and then adds the signature
 */
 static void
-fillBody(Message * message, BalsaSendmsg *msg, SendType type)
+fillBody(BalsaSendmsg *msg, Message * message, SendType type)
 {
    gchar *signature;
-   
+   gint pos = 0;
+
+   gtk_editable_insert_text (GTK_EDITABLE(msg->text), "\n", 1, &pos);
    if (type != SEND_NORMAL && message) 
-      quoteBody(message, msg, type);
+      quoteBody(msg, message, type);
    
   if ((signature = read_signature()) != NULL) {
      if ( ((type == SEND_REPLY || type == SEND_REPLY_ALL) && 
@@ -750,8 +758,6 @@ fillBody(Message * message, BalsaSendmsg *msg, SendType type)
      }
      g_free (signature);
   }
-  /* FIXME: workaround for buggy GtkText, is it needed? */
-  gtk_text_set_point( GTK_TEXT(msg->text), 0); 
   gtk_editable_set_position( GTK_EDITABLE(msg->text), 0);
 }
 
@@ -765,6 +771,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
   msg = g_malloc (sizeof (BalsaSendmsg));
   msg->font = NULL;
+  msg->charset = NULL;
 
   switch (type)
     {
@@ -956,9 +963,9 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   gnome_app_set_contents (GNOME_APP (window), paned);
 
   if(type==SEND_CONTINUE) 
-     continueBody(message,msg);
+     continueBody(msg, message);
   else
-     fillBody(message, msg, type);
+     fillBody(msg, message, type);
 
   /* set the toolbar so we are consistant with the rest of balsa */
   {
@@ -1165,11 +1172,9 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   body = body_new ();
 
+  body->buffer = gtk_editable_get_chars ( GTK_EDITABLE (bsmsg->text), 0, -1);
   if(balsa_app.wordwrap)
-    send_body_wrap (body, GTK_TEXT(bsmsg->text));
-  else
-    body->buffer = gtk_editable_get_chars (GTK_EDITABLE (bsmsg->text), 0,
-			      gtk_text_get_length (GTK_TEXT (bsmsg->text)));
+    wrap_string (body->buffer, balsa_app.wraplength);
 
   message->body_list = g_list_append (message->body_list, body);
   
@@ -1190,9 +1195,9 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   }
 
 
-  /* not really a nice way of doing it, is it? */
+  /* not a really nice way of setting and restoring charset..  */
   def_charset =  balsa_app.charset;
-  balsa_app.charset = iso_charset_names[bsmsg->charset_idx];
+  if(bsmsg->charset) balsa_app.charset = (gchar*)bsmsg->charset;
   if(balsa_app.debug) 
      fprintf(stderr, "sending with charset: %s\n", balsa_app.charset);
 
@@ -1217,7 +1222,7 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
       }
   }
 
-  balsa_app.charset = def_charset;
+  if(bsmsg->charset) balsa_app.charset = def_charset;
 
   g_list_free (message->body_list);
   message_destroy (message);
@@ -1363,118 +1368,6 @@ print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
    return TRUE;
 }
 
-// HELPER FUNCTIONS -----------------------------------------------
-/* wrap_string
-   wraps given string replacing spaces with '\n'.  do changes in place.
-   KISSed by pawsa.
-   lnbeg - line beginning position, sppos - space position, 
-   te - tab's extra space.
-*/
-static void
-wrap_string(gchar* str, int width)
-{
-   const int minl = width/2;
-   gchar *lnbeg, *sppos, *ptr;
-   gint te = 0;
-
-   g_assert(str != NULL);
-   lnbeg= sppos = ptr = str;
-
-   while(*ptr) {
-      if(*ptr=='\t') te += 7;
-      if(*ptr==' ') sppos = ptr;
-      if(ptr-lnbeg>width-te && sppos>=lnbeg+minl) {
-	 *sppos = '\n';
-	 lnbeg = ptr;te = 0;
-      }
-      if(*ptr=='\n') {
-	 lnbeg = ptr; te = 0;
-      }
-      ptr++;
-   }
-}
-
-/* reflows a paragraph in given string. The paragraph to reflow is
-determined by the cursor position. If mode is <0, whole string is
-reflowed. Replace tabs with single spaces, squeeze neighboring spaces. 
-Single '\n' replaced with spaces, double - retained. 
-HQ piece of code, modify only after thorough testing.
-*/
-/* find_beg_and_end - finds beginning and end of a paragraph;
- *l will store the pointer to the first character of the paragraph,
- *u - to the '\0' or first '\n' character delimiting the paragraph.
- */
-static
-void find_beg_and_end(gchar *str, gint pos, gchar **l, gchar **u) 
-{
-   gint ln;
-
-   *l = str + pos;
-
-   while(*l>str && !(**l == '\n' && *(*l-1) == '\n') )
-      (*l)--;
-   if(*l+1<=str+pos && **l == '\n') (*l)++;
-
-   *u = str + pos;
-   ln = 0;
-   while(**u && !(ln && **u == '\n') )
-      ln = *(*u)++ == '\n';
-   if(ln) (*u)--;
-}
-
-/* lspace - last was space, iidx - insertion index.  */
-static void 
-reflow_string(gchar* str, gint mode, gint *cur_pos, int width) 
-{
-   gchar *l, *u, *sppos, *lnbeg, *iidx;
-   gint lnl = 0, lspace = 0; // 1 -> skip leading spaces
-
-   if(mode<0) {
-      l = str; u = str + strlen(str);
-   }
-   else find_beg_and_end(str, *cur_pos, &l, &u);
-
-   lnbeg = sppos = iidx = l;
-
-   while(l<u) {
-      if(lnl && *l == '\n') {
-	 *(iidx-1) = '\n';
-	 *iidx++ = '\n';
-	 lspace = 1;
-	 lnbeg = sppos = iidx;
-      } else if(isspace(*l)) {
-	 lnl = *l == '\n';
-	 if(!lspace) {
-	    sppos = iidx; 
-	    *iidx++= ' ';
-	 } else if(iidx-str<*cur_pos) (*cur_pos)--;
-	 lspace = 1;
-      } else {
-	 lspace = 0; lnl = 0;
-	 if(iidx-lnbeg>=width && lnbeg < sppos){
-	    *sppos='\n';
-	    lnbeg=sppos+1;
-	 }
-	 *iidx++ = *l;
-      }
-      l++;
-   }
-   /* job is done, shrink remainings */
-   while( (*iidx++ =*u++) )
-      ;
-}
-
-// END OF HELPER FUNCTIONS -----------------------------------------------
-
-void
-send_body_wrap (Body *body, GtkText *text)
-{
-   body->buffer = gtk_editable_get_chars (GTK_EDITABLE (text),0,-1);
-   
-   wrap_string(body->buffer, balsa_app.wraplength);
-}
-
-
 static void
 wrap_body_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
 {
@@ -1594,6 +1487,7 @@ findWord(const gchar * word, const gchar* str) {
 static void set_menus(BalsaSendmsg *msg)
 {
    unsigned i;
+   const gchar * charset = NULL;
 
    for(i=0; i<sizeof(headerDescs)/sizeof(headerDescs[0]); i++)
       if(findWord(headerDescs[i].name, balsa_app.compose_headers) ) {
@@ -1609,73 +1503,23 @@ static void set_menus(BalsaSendmsg *msg)
       read from the preferences set up. If not found, 
       set to the 0th set.
    */
+   charset = msg->charset ? msg->charset : balsa_app.charset;
    i = sizeof(iso_charset_names)/sizeof(iso_charset_names[0])-1;
-   while( i>0 && g_strcasecmp (iso_charset_names[i],balsa_app.charset) !=0)
+   while( i>0 && g_strcasecmp (iso_charset_names[i], charset) !=0)
       i--;
 
+   if(balsa_app.debug)
+      printf("set_menus: Charset: %s idx %d\n", charset, i);
+    
    if(i==0) 
-      iso_font_set(msg, 1, 0);
+      set_iso_charset(msg, 1, 0);
    else
       gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
 	 iso_charset_menu[i].widget), TRUE);
-   msg->charset_idx = i;
 
    /* gray 'send' and 'postpone' */
    check_readiness(GTK_EDITABLE(msg->to[1]), msg);
 }
-
-/* create_font_name returns iso8859 font name based on given font 
-   wildcard 'base' and given character set encoding.
-   Algorithm: copy max first 12 fields, cutting additionally 
-   at most two last, if they are constant.
-*/
-/* the name should really be one_or_two_const_fields_to_end */
-static gint 
-two_const_fields_to_end(const gchar* ptr) {
-   int cnt = 0;
-   while(*ptr && cnt<3) {
-      if(*ptr   == '*') return 0;
-      if(*ptr++ == '-') cnt++;
-   }
-   return cnt<3;
-}
-
-static gchar* 
-get_font_name(const gchar* base, int code) {
-   static gchar type[] ="iso8859";
-   gchar *res;
-   const gchar* ptr = base;
-   int dash_cnt = 0, len;
-
-   g_return_val_if_fail(base != NULL, NULL);
-   g_return_val_if_fail(code >= 0,    NULL);
-
-   while(*ptr && dash_cnt<13) {
-      if(*ptr == '-') dash_cnt++;
-      
-      if(two_const_fields_to_end(ptr)) break;
-      ptr++;
-   }
-
-   /* defense against a patologically short base font wildcard implemented
-    * in the chunk below
-    * extra space for dwo dashes and '\0' */
-   len = ptr-base;
-   if(dash_cnt>12) len--;
-   if(len<1) len = 1;
-   res = (gchar*)g_malloc(len+sizeof(type)+3+(code>9?2:1));
-   if(balsa_app.debug)
-      fprintf(stderr,"base font name: %s and code :%d\n"
-	      "mallocating %d bytes\n", base, code,
-	      len+sizeof(type)+2+(code>9?2:1) );
-
-   if(len>1) strncpy(res, base, len);
-   else { strncpy(res, "*", 1); len = 1; } 
-
-   sprintf(res+len,"-%s-%d", type, code);
-   return res;
-}   
-
 
 /* hardcoded charset set :
    text is the GtkText message edit widget, code is the iso-8859 character 
@@ -1687,15 +1531,12 @@ get_font_name(const gchar* base, int code) {
 
 
 static gint 
-iso_font_set(BalsaSendmsg *msg, gint code, gint idx) {
+set_iso_charset(BalsaSendmsg *msg, gint code, gint idx) {
    guint point, txt_len;
    gchar* str, *font_name;
    
-   msg->charset_idx = idx;
-
    if( ! GTK_CHECK_MENU_ITEM(iso_charset_menu[idx].widget)->active)
       return TRUE;
-   
    
    font_name = get_font_name(balsa_app.message_font, code);
    if(msg->font) gdk_font_unref(msg->font);
@@ -1727,16 +1568,16 @@ iso_font_set(BalsaSendmsg *msg, gint code, gint idx) {
 }
 
 static gint iso_1_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return iso_font_set(bsmsg,  1, ISO_CHARSET_1_POS); }
+{return set_iso_charset(bsmsg,  1, ISO_CHARSET_1_POS); }
 static gint iso_15_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return iso_font_set(bsmsg, 15, ISO_CHARSET_15_POS); }
+{return set_iso_charset(bsmsg, 15, ISO_CHARSET_15_POS); }
 static gint iso_2_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return iso_font_set(bsmsg,  2, ISO_CHARSET_2_POS); }
+{return set_iso_charset(bsmsg,  2, ISO_CHARSET_2_POS); }
 static gint iso_3_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return iso_font_set(bsmsg,  3, ISO_CHARSET_3_POS); }
+{return set_iso_charset(bsmsg,  3, ISO_CHARSET_3_POS); }
 static gint iso_5_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return iso_font_set(bsmsg,  5, ISO_CHARSET_5_POS); }
+{return set_iso_charset(bsmsg,  5, ISO_CHARSET_5_POS); }
 static gint iso_8_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return iso_font_set(bsmsg,  8, ISO_CHARSET_8_POS); }
+{return set_iso_charset(bsmsg,  8, ISO_CHARSET_8_POS); }
 static gint iso_9_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return iso_font_set(bsmsg,  9, ISO_CHARSET_9_POS); }
+{return set_iso_charset(bsmsg,  9, ISO_CHARSET_9_POS); }

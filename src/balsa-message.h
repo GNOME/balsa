@@ -56,6 +56,11 @@ extern "C"
   void balsa_message_clear (BalsaMessage * bmessage);
   void balsa_message_set (BalsaMessage * bmessage, Message * message);
 
+   /* a helper functions; FIXME: find more proper location for them.  */
+   gchar* get_font_name(const gchar* base, int code);
+
+   void wrap_string(gchar* str, int width);
+   void reflow_string(gchar* str, gint mode, gint *cur_pos, int width);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

@@ -134,5 +134,6 @@ void message_body_unref (Message * message);
  * misc message releated functions
  */
 gchar *message_pathname (Message * message);
+gchar *message_charset  (Message *message);
 
 #endif /* __MESSAGE_H__ */

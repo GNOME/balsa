@@ -179,7 +179,6 @@ message_new(void)
 static void
 libbalsa_message_real_destroy(GtkObject *object)
 {
-	GList *list;
 	Message *message;
 
 	g_return_if_fail(object != NULL);
@@ -213,6 +212,23 @@ gchar *
 message_pathname (Message * message)
 {
   return CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno]->path;
+}
+
+gchar *
+message_charset (Message *message)
+{
+   gchar * charset = NULL;
+
+   GList * body_list = message->body_list;
+   while( body_list ) {
+      Body * bd = (Body*)body_list->data;
+      g_assert(bd != NULL && bd->mutt_body);
+      if( (charset = mutt_get_parameter("charset", bd->mutt_body->parameter) ))
+	 break;
+      body_list = g_list_next (body_list);
+   }
+
+   return charset;
 }
 
 /* TODO and/or FIXME look at the flags for mutt_append_message */

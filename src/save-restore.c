@@ -589,7 +589,7 @@ config_global_load(void)
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "InformationMessages/");
 
     balsa_app.information_message =
-	d_get_gint("ShowInformationMessages", BALSA_INFORMATION_SHOW_NONE);
+	d_get_gint("ShowInformationMessages", BALSA_INFORMATION_SHOW_BAR);
     balsa_app.warning_message =
 	d_get_gint("ShowWarningMessages", BALSA_INFORMATION_SHOW_LIST);
     balsa_app.error_message =

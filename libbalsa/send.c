@@ -282,11 +282,13 @@ add_mime_body_plain(LibBalsaMessageBody *body, gint encoding_style,
 
     g_return_val_if_fail(charset, NULL);
 
-    if (body->mime_type) {
+    if (body->content_type) {
         /* Use the suplied mime type */
         gchar *type, *subtype;
 
-        type = g_strdup (body->mime_type);
+        /* FIXME: test sending with different mime types */
+        g_message("path active");
+        type = g_strdup (body->content_type);
         if ((subtype = strchr (type, '/'))) {
             *subtype++ = 0;
             mime_part = g_mime_part_new_with_type(type, subtype);
@@ -1423,12 +1425,12 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		GMimeDataWrapper *content;
 		int fd;
 
-		if (!body->mime_type) {
+		if (!body->content_type) {
 		    gchar* mt = libbalsa_lookup_mime_type(body->filename);
 		    mime_type = g_strsplit(mt,"/", 2);
 		    g_free(mt);
 		} else
-		    mime_type = g_strsplit(body->mime_type, "/", 2);
+		    mime_type = g_strsplit_set(body->content_type, "/;", 3);
 
 		if (!strcasecmp(mime_type[0], "text")) {
 		    charset = lbs_file_get_charset(body->filename);

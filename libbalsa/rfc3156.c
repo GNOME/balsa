@@ -121,7 +121,7 @@ body_is_type(LibBalsaMessageBody * body, const gchar * type,
 	retval = g_mime_content_type_is_type(content_type, type, sub_type);
     } else {
 	GMimeContentType *content_type =
-	    g_mime_content_type_new_from_string(body->mime_type);
+	    g_mime_content_type_new_from_string(body->content_type);
 	retval = g_mime_content_type_is_type(content_type, type, sub_type);
 	g_mime_content_type_destroy(content_type);
     }
@@ -140,8 +140,7 @@ libbalsa_message_body_protection(LibBalsaMessageBody * body)
     gint result = 0;
 
     g_return_val_if_fail(body != NULL, 0);
-    g_return_val_if_fail(body->mime_part != NULL, 0);
-    g_return_val_if_fail(body->mime_type != NULL, 0);
+    g_return_val_if_fail(body->content_type != NULL, 0);
 
     if (body_is_type(body, "multipart", "signed")) {
 	gchar *protocol =
@@ -417,8 +416,13 @@ libbalsa_sign_encrypt_mime_object(GMimeObject ** content,
 
 
 /*
- * Check the signature of body (which must be a multipart/signed). On success,
- * set the sig_info field of the signature part.
+ * Check the signature of body (which must be a multipart/signed). On
+ * success, set the sig_info field of the signature part. It succeeds
+ * if all the data needed to verify the signature (gpg database, the
+ * complete signed part itself) were available and the verification
+ * was attempted. Please observe that failure means in this context a
+ * temporary one. Information about failed signature verifications are
+ * passed through LibBalsaBody::sig_info.
  */
 gboolean
 libbalsa_body_check_signature(LibBalsaMessageBody * body,

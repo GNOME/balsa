@@ -1,3 +1,17 @@
+2004-07-18  Pawel Salek
+
+	* libbalsa/body.[hc]: rename ::mime_type to ::content_type
+	and store complete content-type header value there.
+	* libbalsa/{mailbox_imap,rfc3156,send}.c: associated changes.
+	* libbalsa/imap-server.c: lift the number of connections per
+	server to 40.
+	* libbalsa/imap/imap-handle.[ch]:
+	implement imap_body_get_content_type()
+	* src/balsa-message.c: again, mime_type->content_type. 
+	Failed sig verification messages are made just infos.
+	* src/save-restore.c: show information messages in the status bar.
+	* src/sendmsg-window.c: mime_type->content_type.
+
 2004-07-16 23:03  PeterB
 
 	* src/balsa-message.c: plug leaks.

@@ -44,7 +44,7 @@ libbalsa_message_body_new(LibBalsaMessage * message)
     body->message = message;
     body->buffer = NULL;
     body->embhdrs = NULL;
-    body->mime_type = NULL;
+    body->content_type = NULL;
     body->filename = NULL;
     body->temp_filename = NULL;
     body->charset = NULL;
@@ -70,7 +70,7 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
 
     g_free(body->buffer);
     libbalsa_message_headers_destroy(body->embhdrs);
-    g_free(body->mime_type);
+    g_free(body->content_type);
     g_free(body->filename);
 
     if (body->temp_filename)
@@ -158,8 +158,8 @@ libbalsa_message_body_set_types(LibBalsaMessageBody * body)
 	body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_VIDEO;
     else body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_OTHER;
 
-    g_free(body->mime_type);
-    body->mime_type = g_mime_content_type_to_string(type);
+    g_free(body->content_type);
+    body->content_type = g_mime_content_type_to_string(type);
 }
 
 static LibBalsaMessageBody **
@@ -267,7 +267,7 @@ libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 	res = g_strdup(g_mime_content_type_get_parameter(type, param));
     } else {
 	GMimeContentType *type =
-	    g_mime_content_type_new_from_string(body->mime_type);
+	    g_mime_content_type_new_from_string(body->content_type);
 	res = g_strdup(g_mime_content_type_get_parameter(type, param));
 	g_mime_content_type_destroy(type);
     }
@@ -415,7 +415,7 @@ libbalsa_message_body_get_content_type(LibBalsaMessageBody * body)
     res = g_ascii_strdown(tmp, -1);
     g_free(tmp);
 #else
-    res = g_ascii_strdown(body->mime_type, -1);
+    res = g_ascii_strdown(body->content_type, -1);
 #endif
     return res;
 }

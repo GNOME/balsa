@@ -55,7 +55,9 @@ struct _LibBalsaMessageBody {
     ssize_t buflen;             /* size of the block */
     LibBalsaMessageHeaders *embhdrs;  /* headers of a message/rfc822 part */
     LibBalsaMessageBodyType body_type;
-    gchar *mime_type;           /* the mime type/subtype of buffer, or NULL, if plain */
+    gchar *content_type;        /* value of the Content-Type header of
+                                 * the body including mime type with
+                                 * optional parameters. NULL, if text/plain. */
     const gchar *content_dsp;	/* content-disposition */ 
     gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
     gboolean attach_as_extbody; /* if an attachment shall be appended as external-body (sending) */

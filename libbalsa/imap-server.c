@@ -152,7 +152,7 @@ libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
     server->type = LIBBALSA_SERVER_IMAP;
     imap_server->key = NULL;
     imap_server->lock = g_mutex_new();
-    imap_server->max_connections = 10;
+    imap_server->max_connections = 40;
     imap_server->used_connections = 0;
     imap_server->used_handles = NULL;
     imap_server->free_handles = NULL;

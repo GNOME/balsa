@@ -3383,7 +3383,7 @@ add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body)
         for (body = body->next; body; body = body->next) {
 #ifdef HAVE_GPGME
 	    GMimeContentType *type =
-		g_mime_content_type_new_from_string(body->mime_type);
+		g_mime_content_type_new_from_string(body->content_type);
 
             if (libbalsa_message_body_is_inline(body) ||
                 libbalsa_message_body_is_multipart(body) ||
@@ -3413,7 +3413,7 @@ add_multipart(BalsaMessage *bm, LibBalsaMessageBody *body)
     if (!body->parts)
 	return body;
 
-    type=g_mime_content_type_new_from_string(body->mime_type);
+    type=g_mime_content_type_new_from_string(body->content_type);
     if (g_mime_content_type_is_type(type, "multipart", "related")) {
         /* FIXME: more processing required see RFC1872 */
         /* Add the first part */
@@ -3936,7 +3936,7 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
                                    manual ? "manual" : "automatic",
                                    manual ? "manual" : "automatical");
     g_free (dummy);
-    body->mime_type = g_strdup ("message/disposition-notification");
+    body->content_type = g_strdup("message/disposition-notification");
     body->charset = g_strdup ("US-ASCII");
     libbalsa_message_append_part(message, body);
     return message;
@@ -4171,7 +4171,8 @@ process_signature(LibBalsaMessageBody *body, const gchar * sender,
 
     /* if necessary, create the protection info */
     if (!body->parts->next->sig_info)
-        libbalsa_body_check_signature(body, protocol);
+        if(!libbalsa_body_check_signature(body, protocol)) 
+            return LIBBALSA_MSG_PROTECT_SIGN_UNKNOWN; /* temp. failure */
     checkResult = body->parts->next->sig_info;
                 
     /* evaluate the result */
@@ -4198,7 +4199,7 @@ process_signature(LibBalsaMessageBody *body, const gchar * sender,
             }
         } else {
             result = LIBBALSA_MSG_PROTECT_SIGN_BAD;
-            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
                                  _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
                                  sender, subject,
                                  libbalsa_gpgme_sig_stat_to_gchar(checkResult->status));

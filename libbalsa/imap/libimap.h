@@ -160,7 +160,7 @@ typedef enum {
     IMBDISP_OTHER
 } ImapBodyDisposition;
 struct ImapBodyExtMPart_ {
-  GHashTable         *params;
+  /* GHashTable         *params; not used: we put everything in ImapBody */
   GSList	     *lang;
 };
 typedef struct ImapBodyExtMPart_ ImapBodyExtMPart;

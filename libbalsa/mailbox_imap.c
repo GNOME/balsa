@@ -34,7 +34,6 @@
 
 #include <dirent.h>
 #include <string.h>
-#include <ctype.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
@@ -1579,7 +1578,6 @@ libbalsa_mailbox_imap_prepare_threading(LibBalsaMailbox *mailbox,
 static void
 lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
 {
-    int i;
     const char *str;
     g_return_if_fail(lbbody);
     g_return_if_fail(imap_body);
@@ -1611,9 +1609,7 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     case IMBDISP_OTHER:
 	lbbody->content_dsp = imap_body->content_dsp_other; break;
     }
-    lbbody->mime_type = imap_body_get_mime_type(imap_body);
-    for(i=0; lbbody->mime_type[i]; i++)
-        lbbody->mime_type[i] = tolower(lbbody->mime_type[i]);
+    lbbody->content_type = imap_body_get_content_type(imap_body);
     /* get the name in the same way as g_mime_part_get_filename() does */
     str = imap_body_get_dsp_param(imap_body, "filename");
     if(!str) str = imap_body_get_param(imap_body, "name");

@@ -820,8 +820,7 @@ imap_body_new(void)
 static void
 imap_body_ext_mpart_free (ImapBodyExtMPart * mpart)
 {
-  if (mpart->params)
-    g_hash_table_destroy (mpart->params);
+  /* if (mpart->params) g_hash_table_destroy (mpart->params); */
   g_slist_foreach (mpart->lang, (GFunc) g_free, NULL);
   g_slist_free (mpart->lang);
 }
@@ -877,7 +876,8 @@ gchar*
 imap_body_get_mime_type(ImapBody *body)
 {
   const gchar* type = NULL;
-
+  gchar *res;
+  int i;
   /* chbm: why not just return media_basic_name always here ? cause we 
      canonize the common names ... */
   switch(body->media_basic) {
@@ -888,9 +888,37 @@ imap_body_get_mime_type(ImapBody *body)
   case IMBMEDIA_MESSAGE_RFC822: return g_strdup("message/rfc822"); break;
   case IMBMEDIA_MESSAGE_OTHER:  type = "message_other"; break;
   case IMBMEDIA_TEXT:           type = "text"; break;
-  case IMBMEDIA_OTHER:          return g_strdup(body->media_basic_name);break;
+  case IMBMEDIA_OTHER:          type = body->media_basic_name; break;
   }
-  return g_strconcat(type, "/", body->media_subtype, NULL);
+  res = g_strconcat(type, "/", body->media_subtype, NULL);
+  for(i=0; res[i]; i++)
+        res[i] = tolower(res[i]);
+  return res;
+}
+
+/* imap_body_get_content_type returns entire content-type line
+ * available at the time. Observe that since the information is returned in
+ * a transformed, canonical form since it is constructed
+ * from the FETCH ENVELOPE response. */
+static void
+append_body_param(gpointer key, gpointer value, gpointer user_data)
+{
+  GString *r = (GString*)user_data;
+  g_string_append(r, "; ");
+  g_string_append(r, (char*)key);
+  g_string_append(r, "=\"");
+  g_string_append(r, (char*)value); /* FIXME: quote differently? */
+  g_string_append_c(r, '"');
+}
+
+gchar*
+imap_body_get_content_type(ImapBody *body)
+{
+  gchar *mime_type = imap_body_get_mime_type(body);
+  GString *res = g_string_new(mime_type);
+  g_free(mime_type);
+  g_hash_table_foreach(body->params, append_body_param, res);
+  return g_string_free(res, FALSE);
 }
 
 static void
@@ -2140,10 +2168,10 @@ ir_body_ext_mpart (struct siobuf *sio, ImapBody * body,
   /* body_fld_param */
   if (body)
     {
-      body->ext.mpart.params =
+      /* body->ext.mpart.params =
 	g_hash_table_new_full (g_str_hash, g_str_equal, g_free,
-			       g_free);
-      rc = ir_body_fld_param_hash (sio, body->ext.mpart.params);
+        g_free); */
+      rc = ir_body_fld_param_hash (sio, body->params);
     }
   else
     rc = ir_body_fld_param_hash (sio, NULL);
@@ -2398,7 +2426,6 @@ ir_body_type_1part (struct siobuf *sio, ImapBody * body,
 	return IMR_PROTOCOL;
       if ((rc = ir_body_fld_lines (sio, body)) != IMR_OK)
 	return rc;
-      /* printf("Lines: %d\n", body->lines); */
     }
 
   /* [SP */

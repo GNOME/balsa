@@ -3586,7 +3586,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 							      (bsmsg->attachments[1]), i);
 	    body->filename = g_strdup(attach->filename);
 	    if (attach->force_mime_type)
-		body->mime_type = g_strdup(attach->force_mime_type);
+		body->content_type = g_strdup(attach->force_mime_type);
 	    body->attach_as_extbody = attach->as_extbody;
 	    libbalsa_message_append_part(message, body);
 	}

@@ -171,6 +171,8 @@ GNode *imap_mbox_handle_get_thread_root(ImapMboxHandle* handle);
 const gchar *imap_body_get_param(ImapBody *body, const gchar *param);
 const gchar *imap_body_get_dsp_param(ImapBody *body, const gchar *key);
 gchar *imap_body_get_mime_type(ImapBody *body);
+gchar *imap_body_get_content_type(ImapBody *body);
+
 ImapBody *imap_message_get_body_from_section(ImapMessage *msg,
                                              const char *section);
 

@@ -1,3 +1,7 @@
+2005-04-01  Steve Murphy  <murf@e-tools.com>
+
+        * configure.in: Added "rw" to ALL_LINGUAS.
+
 2005-04-01 18:46  PeterB
 
 	* src/sendmsg-window.c: omit all identity addresses from cc header.

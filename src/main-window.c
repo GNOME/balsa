@@ -44,6 +44,7 @@ static GnomeMDI *mdi = NULL;
 static gint about_box_visible = FALSE;
 
 /* main window widget components */
+static void app_created (GnomeMDI *, GnomeApp * app);
 static GtkMenuBar *create_menu (GnomeMDI *, GtkWidget * app);
 static GtkToolbar *create_toolbar (GnomeMDI *, GtkWidget * app);
 
@@ -75,7 +76,7 @@ static void about_box_destroy_cb (void);
 
 static void destroy_window_cb (GnomeMDI * mdi, gpointer data);
 
-static void set_icon (void);
+static void set_icon (GdkWindow * window);
 
 void
 main_window_set_cursor (gint type)
@@ -106,7 +107,6 @@ open_main_window (void)
 {
   /* main window */
   mdi = GNOME_MDI (gnome_mdi_new ("balsa", "Balsa"));
-  set_icon ();
 
   gtk_signal_connect (GTK_OBJECT (mdi),
 		      "destroy",
@@ -117,17 +117,21 @@ open_main_window (void)
   gtk_signal_connect (GTK_OBJECT (mdi), "create_menus", GTK_SIGNAL_FUNC (create_menu), NULL);
   gtk_signal_connect (GTK_OBJECT (mdi), "create_toolbar", GTK_SIGNAL_FUNC (create_toolbar), NULL);
   gtk_signal_connect (GTK_OBJECT (mdi), "child_changed", GTK_SIGNAL_FUNC (index_child_changed), NULL);
+  gtk_signal_connect (GTK_OBJECT (mdi), "app_created", GTK_SIGNAL_FUNC (app_created), NULL);
   gnome_mdi_set_child_list_path (mdi, _ ("Mailboxes/<Separator>"));
 
   gnome_mdi_set_mode (mdi, balsa_app.mdi_style);
 
-  gtk_window_set_policy (GTK_WINDOW (mdi->active_window), TRUE, TRUE, FALSE);
-  gtk_widget_set_usize (GTK_WIDGET (mdi->active_window), balsa_app.mw_width, balsa_app.mw_height);
-
   refresh_main_window ();
 }
 
-
+static void 
+app_created (GnomeMDI * mdi, GnomeApp * app)
+{
+  set_icon (GTK_WIDGET (app)->window);
+  gtk_window_set_policy (GTK_WINDOW (app), TRUE, TRUE, FALSE);
+  gtk_widget_set_usize (GTK_WIDGET (app), balsa_app.mw_width, balsa_app.mw_height);
+}
 
 /*
  * close the main window 
@@ -590,58 +594,59 @@ about_box_destroy_cb (void)
 }
 
 static void
-set_icon (void)
+set_icon (GdkWindow * w)
 {
-  GdkImlibImage *im;
-  GdkPixmap *pixmap;
-  GdkBitmap *mask;
+  GdkImlibImage *im = NULL;
+  GdkWindow *ic_win;
+  GdkWindowAttr att;
+  XIconSize *is;
+  gint i, count, j;
+  GdkPixmap *pmap, *mask;
 
-  GdkWindow *gdkwin;
 
-  XIconSize *xis = NULL;
-  gint count;
-  gint i, maxw = 0, maxh = 0;
-
-  XGetIconSizes (GDK_DISPLAY (),
-		 GDK_ROOT_WINDOW (),
-		 &xis, &count);
-
-  if (!xis)
-    return;
-
-  gdkwin = GDK_ROOT_PARENT ();
-  if (!gdkwin)
-    return;
-
-  g_print ("XIconSize's found: %i\n", count);
-
-  for (i = 0; i < count; i++)
+  if ((XGetIconSizes (GDK_DISPLAY (), GDK_ROOT_WINDOW (), &is, &count)) &&
+      (count > 0))
     {
-      g_print ("min: %ih x %iw\nmax: %ih x %iw\n",
-	       xis[i].min_height,
-	       xis[i].min_width,
-	       xis[i].max_width,
-	       xis[i].max_height);
-
-      if (xis[i].max_width > maxw)
+      i = 0;			/* use first icon size - not much point using the others */
+      att.width = is[i].max_width;
+      att.height = 3 * att.width / 4;
+      if (att.height < is[i].min_height)
+	att.height = is[i].min_height;
+      if (att.height > is[i].max_height)
+	att.height = is[i].max_height;
+      if (is[i].width_inc > 0)
 	{
-	  maxw = xis[i].max_width;
-	  maxh = xis[i].max_height;
+	  j = ((att.width - is[i].min_width) / is[i].width_inc);
+	  att.width = is[i].min_width + (j * is[i].width_inc);
 	}
+      if (is[i].height_inc > 0)
+	{
+	  j = ((att.height - is[i].min_height) / is[i].height_inc);
+	  att.height = is[i].min_height + (j * is[i].height_inc);
+	}
+      XFree (is);
     }
-
-  g_print ("icon height: %i\nicon width:  %i\n", maxh, maxw);
-
+  else
+    /* no icon size hints at all? ok - invent our own size */
+    {
+      att.width = 32;
+      att.height = 24;
+    }
+  att.wclass = GDK_INPUT_OUTPUT;
+  att.window_type = GDK_WINDOW_TOPLEVEL;
+  att.x = 0;
+  att.y = 0;
+  att.visual = gdk_imlib_get_visual ();
+  att.colormap = gdk_imlib_get_colormap ();
+  ic_win = gdk_window_new (NULL, &att, GDK_WA_VISUAL | GDK_WA_COLORMAP);
   im = gdk_imlib_load_image (gnome_unconditional_pixmap_file ("balsa_icon.png"));
-
-  gdk_imlib_render (im, maxw, maxh);
-
-  pixmap = gdk_imlib_copy_image (im);
-  mask = gdk_imlib_copy_mask (im);
+  gdk_window_set_icon (w, ic_win, NULL, NULL);
+  gdk_imlib_render (im, att.width, att.height);
+  pmap = gdk_imlib_move_image (im);
+  mask = gdk_imlib_move_mask (im);
+  gdk_window_set_back_pixmap (ic_win, pmap, FALSE);
+  gdk_window_clear (ic_win);
+  gdk_window_shape_combine_mask (ic_win, mask, 0, 0);
+  gdk_imlib_free_pixmap (pmap);
   gdk_imlib_destroy_image (im);
-  gdk_window_set_icon (gdkwin, NULL, pixmap, mask);
-  gdk_window_set_icon_name (gdkwin, "Balsa");
-
-  gdk_pixmap_unref (pixmap);
-  gdk_bitmap_unref (mask);
 }

@@ -1,3 +1,8 @@
+2005-03-15 13:03  PeterB
+
+	* libbalsa/mailbox_imap.c: use delim to build path when renaming;
+	use g_build_path() for IMAP paths.
+
 2005-03-14 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* libbalsa/message.h, libbalsa/send.c, libbalsa/send.h,

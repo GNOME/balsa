@@ -1,8 +1,12 @@
+2004-04-24  Pawel Salek
+
+	* libbalsa/message.c: do not release too many headers on body_unref().
+
 2004-04-23 08:14  PeterB
 
 	* src/balsa-mblist.c: split message (bug #116604).
 
-2004-04-20  Pawel Salek
+2004-04-22  Pawel Salek
 
 	* libbalsa/libbalsa.c: no-SSL build fixes.
 	* libbalsa/send.c: libesmtp-1.0.3 release delayed.

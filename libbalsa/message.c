@@ -195,24 +195,6 @@ static void libbalsa_message_find_charset(GMimeObject *mime_part, gpointer data)
 static void
 lb_message_headers_extra_destroy(LibBalsaMessageHeaders * headers)
 {
-    g_list_foreach(headers->cc_list, (GFunc) g_object_unref, NULL);
-    g_list_free(headers->cc_list);
-    headers->cc_list = NULL;
-
-    g_list_foreach(headers->bcc_list, (GFunc) g_object_unref, NULL);
-    g_list_free(headers->bcc_list);
-    headers->bcc_list = NULL;
-    
-    if (headers->reply_to) {
-	g_object_unref(headers->reply_to);
-	headers->reply_to = NULL;
-    }
-
-    if(headers->dispnotify_to) {
-	g_object_unref(headers->dispnotify_to);
-	headers->dispnotify_to = NULL;
-    }
-
     FREE_HEADER_LIST(headers->user_hdrs);
     headers->user_hdrs = NULL;
 
@@ -241,6 +223,24 @@ libbalsa_message_headers_destroy(LibBalsaMessageHeaders * headers)
     if (headers->content_type) {
 	g_mime_content_type_destroy(headers->content_type);
 	headers->content_type = NULL;
+    }
+
+    g_list_foreach(headers->cc_list, (GFunc) g_object_unref, NULL);
+    g_list_free(headers->cc_list);
+    headers->cc_list = NULL;
+
+    g_list_foreach(headers->bcc_list, (GFunc) g_object_unref, NULL);
+    g_list_free(headers->bcc_list);
+    headers->bcc_list = NULL;
+    
+    if (headers->reply_to) {
+	g_object_unref(headers->reply_to);
+	headers->reply_to = NULL;
+    }
+
+    if(headers->dispnotify_to) {
+	g_object_unref(headers->dispnotify_to);
+	headers->dispnotify_to = NULL;
     }
 
     lb_message_headers_extra_destroy(headers);
@@ -1117,8 +1117,7 @@ lb_message_headers_extra_from_gmime(LibBalsaMessageHeaders *headers,
 	    addr->address_list =
 		g_list_append(addr->address_list,
 			      g_strdup(addy->address->value.addr));
-	    if (addr)
-		headers->cc_list = g_list_prepend(headers->cc_list, addr);
+            headers->cc_list = g_list_prepend(headers->cc_list, addr);
 	}
 	headers->cc_list = g_list_reverse(headers->cc_list);
     }

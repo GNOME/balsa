@@ -1,5 +1,7 @@
-2003-10-22 18:30  PeterB
+2003-10-22 19:49  PeterB
 
+	* libbalsa/: mailbox.c, mailbox_maildir.c, mailbox_mbox.c,
+	mailbox_mh.c: Let the tree-model know when a message is deleted.
 	* libbalsa/: mailbox_imap.c, imap/Makefile.am,
 	imap/imap-commands.c, imap/imap-commands.h: Use GMimeStream to
 	append a message.

@@ -392,7 +392,9 @@ main(int argc, char *argv[])
     if (opt_compose_email || opt_attach_list) {
 	BalsaSendmsg *snd;
 	GSList *lst;
+        gdk_threads_enter();
 	snd = sendmsg_window_new(window, NULL, SEND_NORMAL);
+        gdk_threads_leave();
 	if(opt_compose_email) {
 	    if(g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) == 0)
 	        sendmsg_window_process_url(opt_compose_email+7, 

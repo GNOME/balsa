@@ -1,3 +1,7 @@
+2002-10-30  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/main.c: do not hang when called with -m (#97168).
+
 2002-10-28  Pawel Salek <pawsa@theochem.kth.se>
 
 	* NEWS, configure.in: release balsa-2.0.3

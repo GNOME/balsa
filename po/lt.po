@@ -5,17 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8.0\n"
-"POT-Creation-Date: 2000-05-07 04:58+0200\n"
-"PO-Revision-Date: 2000-05-02 11:14+0100\n"
+"POT-Creation-Date: 2000-05-10 14:43+0200\n"
+"PO-Revision-Date: 2000-05-08 01:53+0100\n"
 "Last-Translator: Gediminas Paulauskas <menesis@delfi.lt>\n"
-"Language-Team: Lithuanian\n"
+"Language-Team: Lithuanian <komp_lt@konferencijos.lt>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-13\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: libbalsa/mailbox.c:196
 msgid "Error: "
-msgstr ""
+msgstr "Klaida: "
 
 #: libbalsa/mailbox.c:631
 #, c-format
@@ -101,8 +101,8 @@ msgstr "Viskas atlikta!"
 msgid "Please enter information about yourself."
 msgstr "Praðau, ávesk informacija apie save."
 
-#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:187
-#: src/address-book.c:422
+#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:204
+#: src/address-book.c:445
 msgid "Name:"
 msgstr "Vardas:"
 
@@ -175,15 +175,15 @@ msgstr "Kelias ¥%s´ nëra katalogas."
 msgid "Configure Balsa"
 msgstr "Sutvarkyti Balsa"
 
-#: src/address-book.c:175
+#: src/address-book.c:192
 msgid "Add New Address"
 msgstr "Pridëti naujà adresà"
 
-#: src/address-book.c:194
+#: src/address-book.c:211
 msgid "E-Mail Address:"
 msgstr "El. paðto adresas:"
 
-#: src/address-book.c:273
+#: src/address-book.c:290
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -192,39 +192,39 @@ msgstr ""
 "Negaliu atidaryti ~/.gnome/GnomeCard.gcrd skaitymui.\n"
 " - %s\n"
 
-#: src/address-book.c:276 src/sendmsg-window.c:393
+#: src/address-book.c:293 src/sendmsg-window.c:393
 msgid "OK"
 msgstr "Gerai"
 
-#: src/address-book.c:295
+#: src/address-book.c:312
 msgid "No-Id"
 msgstr "Nëra ID"
 
-#: src/address-book.c:303
+#: src/address-book.c:320
 msgid "No-Name"
 msgstr "Bevardis"
 
-#: src/address-book.c:392 src/filter-edit-dialog.c:137
+#: src/address-book.c:415 src/filter-edit-dialog.c:137
 msgid "Name"
 msgstr "Vardas"
 
-#: src/address-book.c:392
+#: src/address-book.c:415
 msgid "E-Mail Address"
 msgstr "El. paðto adresas"
 
-#: src/address-book.c:394 src/address-book.c:432 src/main-window.c:173
+#: src/address-book.c:417 src/address-book.c:455 src/main-window.c:173
 msgid "Address Book"
 msgstr "Adresø knygelë"
 
-#: src/address-book.c:464
+#: src/address-book.c:487
 msgid "Send-To"
 msgstr "Siøsti kam"
 
-#: src/address-book.c:478
+#: src/address-book.c:501
 msgid "Run GnomeCard"
 msgstr "Paleisti GnomeCard"
 
-#: src/address-book.c:484
+#: src/address-book.c:507
 msgid "Re-Import"
 msgstr "Vël importuoti"
 
@@ -535,23 +535,23 @@ msgid "Balsa Filters"
 msgstr "Balsa filtrai"
 
 #: src/mailbox-conf.c:159
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This will remove the mailbox %s and it's files permanently from your "
 "system.\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
-"Tai iðtrins ðià paðto dëþutæ ir visas jos bylas ið sistemos visam laikui.\n"
+"Tai iðtrins paðto dëþutæ %s ir visas jos bylas ið sistemos visam laikui.\n"
 "Ar esi ásitikinæs, kad nori iðtrinti ðià dëþutæ?"
 
 #: src/mailbox-conf.c:164
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
 "You may use \"Add Mailbox\" later to access this mailbox again\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
-"Tai paðalins paðto dëþutæ ið matomø dëþuèiø sàraðo.\n"
+"Tai paðalins paðto dëþutæ %s ið matomø dëþuèiø sàraðo.\n"
 "Tu gali ¥Pridëti dëþutæ´ vëliau, kad vël pasiektum ðià dëþutæ.\n"
 "Ar tikrai nori paðalinti ðià dëþutæ?"
 
@@ -1439,9 +1439,8 @@ msgid "_Turkish (ISO-8859-9)"
 msgstr "_Turkish (ISO-8859-9)"
 
 #: src/sendmsg-window.c:233
-#, fuzzy
 msgid "_Celtic (ISO-8859-14)"
-msgstr "_Baltic (ISO-8859-13)"
+msgstr "_Celtic (ISO-8859-14)"
 
 #: src/sendmsg-window.c:271
 msgid "_Show"

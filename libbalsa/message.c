@@ -650,17 +650,20 @@ message_body_unref (Message * message)
 }
 
 
-gint message_is_multipart (Message* message)
+gint message_has_attachment (Message* message)
 {
   gint tmp;
   HEADER* msg_header;
   
   msg_header = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
-  if (msg_header->content->type == TYPEMULTIPART)
+  if (msg_header->content->type != TYPETEXT)
   {
     tmp = 1;
   } else {
-    tmp = 0;
+    if (g_strcasecmp ("plain", msg_header->content->subtype) == 0)
+      tmp = 0;
+    else
+      tmp = 1;
   }
 
   return tmp;

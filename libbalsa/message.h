@@ -138,7 +138,7 @@ void message_body_unref (Message * message);
  */
 const gchar *message_pathname (Message * message);
 const gchar *message_charset  (Message *message);
-gint message_is_multipart (Message* message);
+gint message_has_attachment (Message* message);
 
 GList *message_user_hdrs(Message *message);
 #endif /* __MESSAGE_H__ */

@@ -646,7 +646,7 @@ clist_set_col_img_from_flag (BalsaIndex * bindex, gint row, Message * message)
   else
     gtk_clist_set_text (GTK_CLIST (bindex), row, 1, NULL);
 
-  tmp = message_is_multipart (message);
+  tmp = message_has_attachment (message);
   
   if ( tmp ) {
           gtk_clist_set_pixmap (GTK_CLIST (bindex), row, 2,

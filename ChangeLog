@@ -23,13 +23,18 @@
 	* src/Makefile.am (INCLUDES): Include $(top_builddir)/idl
 	  for the generated headers (when srcdir != builddir)
 
+2000-04-21  Matthew Guenther <mguenther@netcom.ca>
+	* libbalsa/message.c (message_is_multipart): changed to 
+	message_has_attachment and modified to a better way to determine
+	message attachment status.
+	
 2000-04-20  Matthew Guenther <mguenther@netcom.ca>
 	* libbalsa/message.c: added function message_is_multipart
 	* src/balsa-index.c (balsa_index_add): 
 	add icon to attachment column when message is multipart.
+
 	* src/address-book.c: parented gnome dialogs to main and send-message
 	windows.
-	
 	* src/balsa-app.h: added main_window to BalsaApplication.
 	* src/balsa-index-page.c: 
 	* src/balsa-message.c: 

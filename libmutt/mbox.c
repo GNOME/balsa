@@ -293,6 +293,9 @@ int mbox_parse_mailbox (CONTEXT *ctx)
   time_t t, tz;
   int count = 0, lines = 0;
   long loc;
+#ifdef LIBMUTT
+  int i = 0;
+#endif
 #ifdef NFS_ATTRIBUTE_HACK
   struct utimbuf newtime;
 #endif
@@ -344,6 +347,14 @@ int mbox_parse_mailbox (CONTEXT *ctx)
       }
 
       count++;
+#ifdef LIBMUTT
+      if (count > i)
+      {
+        libmutt_set_gui_update_hook(count,
+			ftell (ctx->fp) / (ctx->size / 100 + 1));
+        i+=50;
+      }
+#endif
 
       if (!ctx->quiet && ReadInc && ((count % ReadInc == 0) || count == 1))
 	mutt_message ("Reading %s... %d (%d%%)", ctx->path, count,

@@ -23,7 +23,7 @@
 #include <gnome.h>
 #include "balsa-app.h"
 
-void 
+void
 mutt_message (const char *fmt,...)
 {
   if (balsa_app.debug)
@@ -38,24 +38,31 @@ mutt_message (const char *fmt,...)
     }
 }
 
-void 
+void
 mutt_exit (int code)
 {
 }
 
-int 
+int
 mutt_yesorno (const char *msg, int def)
 {
   return 1;
 }
 
-int 
+int
 mutt_any_key_to_continue (const char *s)
 {
   return 1;
 }
 
-void 
+void
 mutt_clear_error (void)
 {
+}
+
+void 
+libmutt_set_gui_update_hook (int count, int total)
+{
+  while (gtk_events_pending ())
+    gtk_main_iteration ();
 }

@@ -346,6 +346,9 @@ int mh_read_dir (CONTEXT *ctx, const char *subdir)
   int count = 0;
   struct stat st;
   int has_mh_sequences = 0;
+#ifdef LIBMUTT
+  int i = 0;
+#endif
 
   if (subdir)
   {
@@ -384,6 +387,13 @@ int mh_read_dir (CONTEXT *ctx, const char *subdir)
       continue;
     }
 
+#ifdef LIBMUTT
+    if (count > i)
+    {
+      libmutt_set_gui_update_hook(count, 0);
+      i+=50;
+    }
+#endif
     mh_parse_message (ctx, subdir, de->d_name, &count, isOld);
   }
   {

@@ -1,3 +1,7 @@
+2001-07-16  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/toolbar-prefs.c: fix make with pedantic options
+
 2001-07-16  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Peter Bloomfield's <bloomfld@eos.ncsu.edu> IMAP mailbox rename

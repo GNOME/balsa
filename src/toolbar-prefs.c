@@ -61,7 +61,9 @@
 #include "toolbar-prefs.h"
 #include "toolbar-factory.h"
 
+#ifndef MAX
 #define MAX(a, b) (a > b ? a : b)
+#endif
 
 static int customize_open=0;
 GtkWidget *customize_widget;

@@ -1,3 +1,8 @@
+2000-04-12 Pawel Salek <pawsa@theochem.kth.se>
+
+	* sounds/Makefile.am, balsa.spec.in: 
+	packaging on RedHat failed.
+	
 2000-04-11  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/message.c: handle 'references' header properly

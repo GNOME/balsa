@@ -8,7 +8,7 @@ Name:      balsa
 Version:   %ver
 Release:   %rel
 Copyright: GPL
-Group:     Shells
+Group:     Applications/Internet
 Source0:   balsa-%{PACKAGE_VERSION}.tar.gz
 URL:       http://www.balsa.net/
 BuildRoot: /tmp/balsa-%{PACKAGE_VERSION}-root
@@ -47,13 +47,16 @@ if [ "$SMP" != "" ]; then
   (make "MAKE=make -k -j $SMP"; exit 0)
   make
 else
-  make
+  make CFLAGS="$RPM_OPT_FLAGS"
 fi
 
 %install
-rm -rf $RPM_BUILD_ROOT
+rm -rf "$RPM_BUILD_ROOT"
 
-make prefix=$RPM_BUILD_ROOT%{prefix} sysconfdir=$RPM_BUILD_ROOT/etc install
+make prefix=$RPM_BUILD_ROOT%{prefix} sysconfdir=$RPM_BUILD_ROOT/etc\
+     DESTDIR="$RPM_BUILD_ROOT" install
+
+make sysconfdir=/etc  DESTDIR="$RPM_BUILD_ROOT" install
 
 %clean
 rm -rf $RPM_BUILD_ROOT

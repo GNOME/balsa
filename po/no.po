@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: balsa 0.9.5\n"
-"POT-Creation-Date: 2000-11-03 23:53+0100\n"
-"PO-Revision-Date: 2000-11-03 23:51+01:00\n"
+"Project-Id-Version: balsa 1.0.0\n"
+"POT-Creation-Date: 2000-11-05 12:13+0100\n"
+"PO-Revision-Date: 2000-11-05 23:51+01:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian <no@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -870,11 +870,11 @@ msgstr "Lagre del"
 msgid "View part with %s"
 msgstr "Vis del med %s"
 
-#: src/balsa-message.c:1414
+#: src/balsa-message.c:1417
 msgid "Save..."
 msgstr "Lagre..."
 
-#: src/balsa-message.c:1471
+#: src/balsa-message.c:1474
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "Kunne ikke opprette midlertidig fil %s"

@@ -231,38 +231,38 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
         
         /* Create the pages */
 	page = create_identity_page();
-        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Identity")) );
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_("Identity")) );
 
 	page = create_signature_page ();
-        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Signature")) );
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_("Signature")) );
 
 	page = create_mailserver_page ();
-        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Mail Servers")) );
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_("Mail Servers")) );
 
 	page = create_address_book_page ();
-	gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Address Books")) );
+	gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_("Address Books")) );
 
 	page = create_mailoptions_page ();
-        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Mail Options")) );
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_("Mail Options")) );
 
 	page = create_display_page ();
-        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Display")) );
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_("Display")) );
 
 #ifndef HAVE_GNOME_PRINT
 	page = create_printing_page ();
-        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Printing")) );
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_("Printing")) );
 #endif
         page = create_spelling_page ();
-        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Spelling")));
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_("Spelling")));
 
 	page = create_encondig_page();
-        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Encoding")) );
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_("Encoding")) );
 
 	page = create_misc_page ();
-        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Misc")) );
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_("Misc")) );
 
 	page = create_startup_page ();
-        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Startup")) );
+        gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_("Startup")) );
 
 
 	set_prefs ();
@@ -1253,7 +1253,7 @@ incoming_page()
 			  (GtkAttachOptions) (0), 0, 0);
 
         /* Quoted text regular expression */
-        regex_frame = gtk_frame_new (_ ("Quoted Text"));
+        regex_frame = gtk_frame_new (_("Quoted Text"));
         gtk_container_set_border_width (GTK_CONTAINER (regex_frame), 2);
         gtk_box_pack_start (GTK_BOX (vbox1), regex_frame, FALSE, FALSE, 0);
         
@@ -1261,7 +1261,7 @@ incoming_page()
         gtk_container_add (GTK_CONTAINER (regex_frame), regex_hbox);
         gtk_container_set_border_width (GTK_CONTAINER (regex_hbox), 5);
         
-        regex_label = gtk_label_new (_ ("Quoted Text Regular Expression"));
+        regex_label = gtk_label_new (_("Quoted Text Regular Expression"));
         gtk_box_pack_start(GTK_BOX (regex_hbox), regex_label, FALSE, FALSE, 5);
         
         regex_entry = gnome_entry_new ("quote-regex-history");
@@ -1664,7 +1664,7 @@ static GtkWidget* create_spelling_page (void)
 
 
         /* ignore signature check box */
-        frame1 = gtk_frame_new (_ ("Misc Spelling Settings"));
+        frame1 = gtk_frame_new (_("Misc Spelling Settings"));
         gtk_box_pack_start (GTK_BOX (vbox0), frame1, FALSE, FALSE, 0);
         gtk_container_set_border_width (GTK_CONTAINER (frame1), padding);
         vbox2 = gtk_vbox_new (FALSE, padding);

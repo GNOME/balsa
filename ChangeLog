@@ -1,3 +1,10 @@
+2000-09-29  Christophe Merlet  <christophe@merlet.net>
+
+	* src/balsa-message.c,src/local-mailbox.c,src/main-window.c,
+	src/mblist-window.c,src/message-window.c,src/pref-manager.c,
+	src/sendmsg-window.c: Fixed marking of strings. Use _( not _ (
+	to mark strings for translation.
+
 2000-09-28  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/address-book.c: Don't swap the message between clists if we are in

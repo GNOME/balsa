@@ -126,27 +126,27 @@ static void reflow_body_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 static GnomeUIInfo main_toolbar[] =
 {
 #define TOOL_SEND_POS 0
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Send"), N_ ("Send this mail"), send_message_cb,
+  GNOMEUIINFO_ITEM_STOCK (N_("Send"), N_("Send this mail"), send_message_cb,
 			  GNOME_STOCK_PIXMAP_MAIL_SND),
   GNOMEUIINFO_SEPARATOR,
 #define TOOL_ATTACH_POS 2
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Attach"),N_ ("Add attachments to this message"),
+  GNOMEUIINFO_ITEM_STOCK (N_("Attach"),N_("Add attachments to this message"),
 			  attach_clicked, GNOME_STOCK_PIXMAP_ATTACH),
   GNOMEUIINFO_SEPARATOR,
 #define TOOL_POSTPONE_POS 4
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Postpone"), N_ ("Continue this message later"),
+  GNOMEUIINFO_ITEM_STOCK (N_("Postpone"), N_("Continue this message later"),
 			  postpone_message_cb, GNOME_STOCK_PIXMAP_SAVE),
   GNOMEUIINFO_SEPARATOR,
 #define TOOL_SPELLING_POS 6
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Check Spelling"), 
-                          N_ ("Run a spelling check on the current message"), 
+  GNOMEUIINFO_ITEM_STOCK (N_("Check Spelling"), 
+                          N_("Run a spelling check on the current message"), 
 			  spell_check_cb, GNOME_STOCK_PIXMAP_SPELLCHECK),
   GNOMEUIINFO_SEPARATOR,
 #define TOOL_PRINT_POS 8
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Print"), N_ ("Print"), 
+  GNOMEUIINFO_ITEM_STOCK (N_("Print"), N_("Print"), 
 			  print_message_cb, GNOME_STOCK_PIXMAP_PRINT),
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Cancel"), N_ ("Cancel"), 
+  GNOMEUIINFO_ITEM_STOCK (N_("Cancel"), N_("Cancel"), 
 			  close_window, GNOME_STOCK_PIXMAP_CLOSE),
   GNOMEUIINFO_END
 };
@@ -154,24 +154,24 @@ static GnomeUIInfo main_toolbar[] =
 static GnomeUIInfo file_menu[] =
 {
 #define MENU_FILE_INCLUDE_POS 0
-  GNOMEUIINFO_ITEM_STOCK(N_ ("_Include File..."), NULL,
+  GNOMEUIINFO_ITEM_STOCK(N_("_Include File..."), NULL,
 			 include_file_cb, GNOME_STOCK_MENU_OPEN),
 
 #define MENU_FILE_ATTACH_POS 1
-  GNOMEUIINFO_ITEM_STOCK(N_ ("_Attach file..."), NULL, 
+  GNOMEUIINFO_ITEM_STOCK(N_("_Attach file..."), NULL, 
 			 attach_clicked, GNOME_STOCK_MENU_ATTACH),
   GNOMEUIINFO_SEPARATOR,
 
 #define MENU_FILE_SEND_POS 3
-  GNOMEUIINFO_ITEM_STOCK(N_ ("_Send"),N_ ("Send the currently edited message"),
+  GNOMEUIINFO_ITEM_STOCK(N_("_Send"),N_("Send the currently edited message"),
 			 send_message_cb, GNOME_STOCK_MENU_MAIL_SND),
 
 #define MENU_FILE_POSTPONE_POS 4
-  GNOMEUIINFO_ITEM_STOCK(N_ ("_Postpone"), NULL, 
+  GNOMEUIINFO_ITEM_STOCK(N_("_Postpone"), NULL, 
 			 postpone_message_cb, GNOME_STOCK_MENU_SAVE),
 
 #define MENU_FILE_PRINT_POS 5
-  GNOMEUIINFO_ITEM_STOCK(N_ ("Print..."), N_ ("Print the edited message"), 
+  GNOMEUIINFO_ITEM_STOCK(N_("Print..."), N_("Print the edited message"), 
 			  print_message_cb, GNOME_STOCK_PIXMAP_PRINT),
   GNOMEUIINFO_SEPARATOR,
 
@@ -188,21 +188,21 @@ static GnomeUIInfo edit_menu[] =
    GNOMEUIINFO_MENU_CUT_ITEM(cut_cb, NULL),
    GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
    GNOMEUIINFO_MENU_PASTE_ITEM(paste_cb, NULL),
-   { GNOME_APP_UI_ITEM, N_ ("Select all"), NULL,
+   { GNOME_APP_UI_ITEM, N_("Select all"), NULL,
      (gpointer) select_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
      NULL, 'A', GDK_CONTROL_MASK, NULL },
    GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_WRAP_BODY 5
-   { GNOME_APP_UI_ITEM, N_ ("_Wrap body") ,N_ ("Wrap message lines"),
+   { GNOME_APP_UI_ITEM, N_("_Wrap body") ,N_("Wrap message lines"),
      (gpointer)wrap_body_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
      GDK_z, GDK_CONTROL_MASK, NULL },
    GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_REFLOW_PARA 7
-   { GNOME_APP_UI_ITEM, N_ ("_Reflow paragraph") , NULL,
+   { GNOME_APP_UI_ITEM, N_("_Reflow paragraph") , NULL,
      (gpointer)reflow_par_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
      GDK_r, GDK_CONTROL_MASK, NULL },
 #define EDIT_MENU_REFLOW_MESSAGE 8
-   { GNOME_APP_UI_ITEM, N_ ("R_eflow message") , NULL,
+   { GNOME_APP_UI_ITEM, N_("R_eflow message") , NULL,
      (gpointer)reflow_body_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
      GDK_r, GDK_CONTROL_MASK | GDK_SHIFT_MASK, NULL },
    GNOMEUIINFO_SEPARATOR,
@@ -217,25 +217,25 @@ static GnomeUIInfo edit_menu[] =
 static GnomeUIInfo view_menu[] =
 {
 #define MENU_TOGGLE_FROM_POS 0
-  GNOMEUIINFO_TOGGLEITEM( N_ ("Fr_om"), NULL, toggle_from_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_("Fr_om"), NULL, toggle_from_cb, NULL),
 #define MENU_TOGGLE_TO_POS 1
-  GNOMEUIINFO_TOGGLEITEM( N_ ("_To"), NULL, toggle_to_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_("_To"), NULL, toggle_to_cb, NULL),
 #define MENU_TOGGLE_SUBJECT_POS 2
-  GNOMEUIINFO_TOGGLEITEM( N_ ("_Subject"), NULL, toggle_subject_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_("_Subject"), NULL, toggle_subject_cb, NULL),
 #define MENU_TOGGLE_CC_POS 3
-  GNOMEUIINFO_TOGGLEITEM( N_ ("_Cc"), NULL, toggle_cc_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_("_Cc"), NULL, toggle_cc_cb, NULL),
 #define MENU_TOGGLE_BCC_POS 4
-  GNOMEUIINFO_TOGGLEITEM( N_ ("_Bcc"), NULL, toggle_bcc_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_("_Bcc"), NULL, toggle_bcc_cb, NULL),
 #define MENU_TOGGLE_FCC_POS 5
-  GNOMEUIINFO_TOGGLEITEM( N_ ("_Fcc"), NULL, toggle_fcc_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_("_Fcc"), NULL, toggle_fcc_cb, NULL),
 #define MENU_TOGGLE_REPLY_POS 6
-  GNOMEUIINFO_TOGGLEITEM( N_ ("_Reply To"), NULL, toggle_reply_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_("_Reply To"), NULL, toggle_reply_cb, NULL),
 #define MENU_TOGGLE_ATTACHMENTS_POS 7
-  GNOMEUIINFO_TOGGLEITEM( N_ ("_Attachments"),NULL,toggle_attachments_cb,NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_("_Attachments"),NULL,toggle_attachments_cb,NULL),
 #define MENU_TOGGLE_COMMENTS_POS 8
-  GNOMEUIINFO_TOGGLEITEM( N_ ("_Comments"), NULL, toggle_comments_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_("_Comments"), NULL, toggle_comments_cb, NULL),
 #define MENU_TOGGLE_KEYWORDS_POS 9
-  GNOMEUIINFO_TOGGLEITEM( N_ ("_Keywords"), NULL, toggle_keywords_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_("_Keywords"), NULL, toggle_keywords_cb, NULL),
   GNOMEUIINFO_END
 };
 
@@ -511,7 +511,7 @@ create_popup_menu (GnomeIconList * ilist, gint num)
 {
   GtkWidget *menu, *menuitem;
   menu = gtk_menu_new ();
-  menuitem = gtk_menu_item_new_with_label (_ ("Remove"));
+  menuitem = gtk_menu_item_new_with_label (_("Remove"));
   gtk_object_set_data (GTK_OBJECT (ilist), "selectednumbertoremove", 
 		       GINT_TO_POINTER (num));
   gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
@@ -586,17 +586,17 @@ check_if_regular_file (const gchar *filename)
   gint result = TRUE;
 
   if (stat (filename, &s)) {
-     ptr = g_strdup_printf (_ ("Cannot get info on file '%s': %s\n"), 
+     ptr = g_strdup_printf (_("Cannot get info on file '%s': %s\n"), 
 			    filename, strerror (errno));
     result = FALSE;
   } else if (!S_ISREG (s.st_mode)) {
-     ptr = g_strdup_printf (_ ("Attachment is not a regular file: '%s'\n"), 
+     ptr = g_strdup_printf (_("Attachment is not a regular file: '%s'\n"), 
 			   filename);
     result = FALSE;
   }
   if (ptr) {
     msgbox = gnome_message_box_new (ptr, GNOME_MESSAGE_BOX_ERROR, 
-				    _ ("Cancel"), NULL);
+				    _("Cancel"), NULL);
     g_free (ptr);
     gtk_window_set_modal (GTK_WINDOW (msgbox), TRUE);
     gnome_dialog_run (GNOME_DIALOG (msgbox));
@@ -655,7 +655,7 @@ attach_clicked (GtkWidget * widget, gpointer data)
 
   iconlist = GNOME_ICON_LIST (bsm->attachments[1]);
 
-  fsw = gtk_file_selection_new (_ ("Attach file"));
+  fsw = gtk_file_selection_new (_("Attach file"));
   gtk_object_set_user_data (GTK_OBJECT (fsw), iconlist);
 
   fs = GTK_FILE_SELECTION (fsw);
@@ -1126,22 +1126,22 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
     {
     case SEND_REPLY:
     case SEND_REPLY_ALL:
-      window = gnome_app_new ("balsa", _ ("Reply to "));
+      window = gnome_app_new ("balsa", _("Reply to "));
       msg->orig_message = message;
       break;
 
     case SEND_FORWARD:
-      window = gnome_app_new ("balsa", _ ("Forward message"));
+      window = gnome_app_new ("balsa", _("Forward message"));
       msg->orig_message = message;
       break;
       
     case SEND_CONTINUE:
-      window = gnome_app_new ("balsa", _ ("Continue message"));
+      window = gnome_app_new ("balsa", _("Continue message"));
       msg->orig_message = message;
       break;
 
     default:
-      window = gnome_app_new ("balsa", _ ("New message"));
+      window = gnome_app_new ("balsa", _("New message"));
       msg->orig_message = NULL;
       break;
     }

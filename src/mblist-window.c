@@ -395,12 +395,12 @@ mb_draftbox_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 
 /* FIXME make these use gnome_popup_menu stuff
 static GnomeUIInfo mailbox_menu[] =
-  GNOMEUIINFO_ITEM_STOCK (_ ("_Open Mailbox"), N_("Open the selected mailbox"),
+  GNOMEUIINFO_ITEM_STOCK (_("_Open Mailbox"), N_("Open the selected mailbox"),
                           mb_open_cb, GNOME_STOCK_MENU_OPEN),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("_Close"), N_("Close the selected mailbox"),
+  GNOMEUIINFO_ITEM_STOCK (N_("_Close"), N_("Close the selected mailbox"),
                           mblist_menu_close_cb, GNOME_STOCK_MENU_CLOSE),
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_ITEM_STOCK (N_ ("_Add"), N_("Add a new mailbox"),
+  GNOMEUIINFO_ITEM_STOCK (N_("_Add"), N_("Add a new mailbox"),
                           mblist_menu_add_cb, GNOME_STOCK_PIXMAP_ADD),
   GNOMEUIINFO_END
 };
@@ -475,7 +475,7 @@ mblist_menu_edit_cb (GtkWidget * widget, gpointer data)
 
   if (mailbox == NULL)
     {
-      GtkWidget *err_dialog = gnome_error_dialog (_ ("No mailbox selected."));
+      GtkWidget *err_dialog = gnome_error_dialog (_("No mailbox selected."));
       gnome_dialog_run (GNOME_DIALOG (err_dialog));
       return;
     }
@@ -491,7 +491,7 @@ mblist_menu_delete_cb (GtkWidget * widget, gpointer data)
 
   if (mailbox == NULL)
     {
-      GtkWidget *err_dialog = gnome_error_dialog (_ ("No mailbox selected."));
+      GtkWidget *err_dialog = gnome_error_dialog (_("No mailbox selected."));
       gnome_dialog_run (GNOME_DIALOG (err_dialog));
       gtk_widget_destroy ( GTK_WIDGET (err_dialog) );
       return;
@@ -510,7 +510,7 @@ mblist_menu_open_cb (GtkWidget * widget, gpointer data)
 
   if (mailbox == NULL)
     {
-      GtkWidget *err_dialog = gnome_error_dialog (_ ("No mailbox selected."));
+      GtkWidget *err_dialog = gnome_error_dialog (_("No mailbox selected."));
       gnome_dialog_run (GNOME_DIALOG (err_dialog));
       return;
     }
@@ -525,7 +525,7 @@ mblist_menu_close_cb (GtkWidget * widget, gpointer data)
 
   if (mailbox == NULL)
     {
-      GtkWidget *err_dialog = gnome_error_dialog (_ ("No mailbox selected."));
+      GtkWidget *err_dialog = gnome_error_dialog (_("No mailbox selected."));
       gnome_dialog_run (GNOME_DIALOG (err_dialog));
       return;
     }

@@ -260,10 +260,10 @@ save_part (BalsaPartInfo *info)
 
   g_return_if_fail(info != 0);
 
-  save_dialog = gnome_dialog_new (_ ("Save MIME Part"),
-				  _ ("Save"), _ ("Cancel"), NULL);
+  save_dialog = gnome_dialog_new (_("Save MIME Part"),
+				  _("Save"), _("Cancel"), NULL);
   file_entry = gnome_file_entry_new ("Balsa_MIME_Saver",
-				     _ ("Save MIME Part"));
+				     _("Save MIME Part"));
 
   if (info->body->filename) {
     gtk_entry_set_text (GTK_ENTRY (gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (file_entry))), info->body->filename);
@@ -298,7 +298,7 @@ save_part (BalsaPartInfo *info)
       gchar *msg;
       GtkWidget *msgbox;
       
-      msg = g_strdup_printf ( _ (" Could not save %s:%s "), filename, strerror (errno));
+      msg = g_strdup_printf ( _(" Could not save %s:%s "), filename, strerror (errno));
       
       msgbox = gnome_error_dialog_parented (msg, GTK_WINDOW(balsa_app.main_window));
 

@@ -191,7 +191,7 @@ add_mailbox (const gchar * name, const gchar * path, LibBalsaMailboxType type,
 	}
 
       if (balsa_app.debug)
-	g_print (_ ("Local Mailbox Loaded as: %s\n"), 
+	g_print (_("Local Mailbox Loaded as: %s\n"), 
 		 gtk_type_name (GTK_OBJECT_TYPE(mailbox)));
     }
   if (rnode)

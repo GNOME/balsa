@@ -58,11 +58,11 @@ static GHashTable * displayed_messages = NULL;
 
 static GnomeUIInfo shown_hdrs_menu[] =
 {
-   GNOMEUIINFO_RADIOITEM( N_ ("N_o headers"), NULL, 
+   GNOMEUIINFO_RADIOITEM( N_("N_o headers"), NULL, 
 			  show_no_headers_cb, NULL),
-   GNOMEUIINFO_RADIOITEM( N_ ("_Selected headers"),NULL,
+   GNOMEUIINFO_RADIOITEM( N_("_Selected headers"),NULL,
 			  show_selected_cb, NULL),
-   GNOMEUIINFO_RADIOITEM( N_ ("All _headers"), NULL, 
+   GNOMEUIINFO_RADIOITEM( N_("All _headers"), NULL, 
 			  show_all_headers_cb, NULL),
    GNOMEUIINFO_END
 };
@@ -94,7 +94,7 @@ static GnomeUIInfo edit_menu[] =
 static GnomeUIInfo view_menu[] =
 {
 #define MENU_VIEW_WRAP_POS 0
-  GNOMEUIINFO_TOGGLEITEM( N_ ("_Wrap"), NULL, wrap_message_cb, NULL),
+  GNOMEUIINFO_TOGGLEITEM( N_("_Wrap"), NULL, wrap_message_cb, NULL),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_RADIOLIST(shown_hdrs_menu),
   GNOMEUIINFO_END
@@ -104,37 +104,37 @@ static GnomeUIInfo message_menu[] =
 {
     /* R */
   {
-    GNOME_APP_UI_ITEM, N_ ("_Reply..."), N_("Reply to this message"),
+    GNOME_APP_UI_ITEM, N_("_Reply..."), N_("Reply to this message"),
     replyto_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_RPL, 'R', 0, NULL
   },
     /* A */
   {
-    GNOME_APP_UI_ITEM, N_ ("Reply to _all..."),
+    GNOME_APP_UI_ITEM, N_("Reply to _all..."),
     N_("Reply to all recipients of this message"),
     replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_RPL, 'A', 0, NULL
   },
     /* F */
   {
-    GNOME_APP_UI_ITEM, N_ ("_Forward..."), N_("Forward this message"),
+    GNOME_APP_UI_ITEM, N_("_Forward..."), N_("Forward this message"),
     forward_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
   {
-    GNOME_APP_UI_ITEM, N_ ("Next Part"), N_ ("Next Part in Message"),
+    GNOME_APP_UI_ITEM, N_("Next Part"), N_("Next Part in Message"),
     next_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_FORWARD, '.', GDK_CONTROL_MASK, NULL
   },
   {
-    GNOME_APP_UI_ITEM, N_ ("Previous Part"), N_ ("Previous Part in Message"),
+    GNOME_APP_UI_ITEM, N_("Previous Part"), N_("Previous Part in Message"),
     previous_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_BACK, ',', GDK_CONTROL_MASK, NULL
   },
   {
-    GNOME_APP_UI_ITEM, N_ ("Save Current Part..."), 
-    N_ ("Save Current Part in Message"),
+    GNOME_APP_UI_ITEM, N_("Save Current Part..."), 
+    N_("Save Current Part in Message"),
     save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL
   },

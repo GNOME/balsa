@@ -73,17 +73,17 @@ AC_SUBST(BALSA_CFLAGS)
 AC_SUBST(BALSA_LIBS)
 AC_SUBST(PTHREAD_LIB)
 
-if $PKG_CONFIG --exists libgnomeprint-2.0 ; then
-  PKG_CHECK_MODULES(LGPRINT, [
-  libgnomeprint-2.0 >= 1.106.0
-  libgnomeprintui-2.0 >= 1.106.0
-  ])
-else
+if $PKG_CONFIG --exists libgnomeprint-2.2 ; then
   PKG_CHECK_MODULES(LGPRINT, [
   libgnomeprint-2.2 >= 2.1.4
   libgnomeprintui-2.2 >= 2.1.4
   ])
   AC_DEFINE(HAVE_LGPRINT22,1,[If defined, build using libgnomeprint-2.2 specific API])
+else
+  PKG_CHECK_MODULES(LGPRINT, [
+  libgnomeprint-2.0 >= 1.106.0
+  libgnomeprintui-2.0 >= 1.106.0
+  ])
 fi
   
 BALSA_CFLAGS="$BALSA_CFLAGS $LGPRINT_CFLAGS"

@@ -819,8 +819,8 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
 	    if (mqi->orig->mailbox && fccurl) {
                 LibBalsaMailbox *fccbox = mqi->finder(fccurl[1]);
                 GError *err = NULL;
-		lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW);
-		lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_FLAGGED);
+                lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW |
+                                 LIBBALSA_MESSAGE_FLAG_FLAGGED);
 		libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
                 remove =
                     libbalsa_mailbox_copy_message(mqi->orig, fccbox, &err)>=0;
@@ -1081,8 +1081,8 @@ handle_successful_send(MessageQueueItem *mqi, LibBalsaFccboxFinder finder)
             libbalsa_message_find_user_hdr(mqi->orig, "X-Balsa-Fcc");
         const gchar **fccurl = fcclist ? fcclist->data : NULL;
 
-	lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_FLAGGED);
-	lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW);
+        lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW |
+                         LIBBALSA_MESSAGE_FLAG_FLAGGED);
 	libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
 
         if (mqi->orig->mailbox && fccurl) {

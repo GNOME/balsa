@@ -373,9 +373,6 @@ balsa_app_init(void)
     /* quote regex */
     balsa_app.quote_regex = g_strdup(DEFAULT_QUOTE_REGEX);
 
-    /* command line options */
-    balsa_app.open_mailbox_vector = NULL;
-
     /* font */
     balsa_app.message_font = NULL;
     balsa_app.subject_font = NULL;
@@ -434,6 +431,13 @@ balsa_app_init(void)
     balsa_app.folder_mru=NULL;
     balsa_app.fcc_mru=NULL;
     balsa_app.drag_default_is_move=TRUE;
+
+    /* Mailbox views */
+    balsa_app.mailbox_views =
+        g_hash_table_new_full(g_str_hash, g_str_equal,
+                              (GDestroyNotify) g_free,
+                              (GDestroyNotify) libbalsa_mailbox_view_free);
+    config_views_load();
 }
 
 /* Word of comment: previous definition of this function used access()
@@ -473,6 +477,8 @@ void
 balsa_app_destroy(void)
 {
     config_views_save();
+    g_hash_table_destroy(balsa_app.mailbox_views);
+    balsa_app.mailbox_views = NULL;
     if (balsa_app.empty_trash_on_exit)
 	empty_trash();
 
@@ -580,7 +586,17 @@ update_timer(gboolean update, guint minutes)
    This is an idle handler. Be sure to use gdk_threads_{enter/leave}
    Release the passed argument when done.
  */
-static gboolean balsa_app_descend(const gchar * url);
+
+static void
+open_mailboxes_idle_func(const gchar * url, LibBalsaMailboxView * view,
+                         GString * str)
+{
+    if (view->open) {
+        if (str->len)
+            g_string_append_c(str, ';');
+        g_string_append(str, url);
+    }
+}
 
 gboolean
 open_mailboxes_idle_cb(gchar ** urls)
@@ -588,14 +604,25 @@ open_mailboxes_idle_cb(gchar ** urls)
     gchar **tmp;
     LibBalsaMailbox *mbox;
 
-    g_return_val_if_fail(urls, FALSE);
-
     gdk_threads_enter();
 
+    if (!urls) {
+        GString *str;
+
+        if (!balsa_app.mailbox_views) {
+            gdk_threads_leave();
+            return FALSE;
+        }
+
+        str = g_string_new(NULL);
+        g_hash_table_foreach(balsa_app.mailbox_views,
+                             (GHFunc) open_mailboxes_idle_func, str);
+        urls = g_strsplit(str->str, ";", 0);
+        g_string_free(str, TRUE);
+    }
+
     for (tmp = urls; *tmp; ++tmp) {
-        while (!(mbox = balsa_find_mailbox_by_url(*tmp)))
-            if (!balsa_app_descend(*tmp))
-                break;
+        mbox = balsa_find_mailbox_by_url(*tmp);
 	if (balsa_app.debug)
 	    fprintf(stderr, "open_mailboxes_idle_cb: opening %s => %p..\n",
 		    *tmp, mbox);
@@ -804,6 +831,8 @@ destroy_mailbox_node(GNode* node, GNode* root)
     g_return_val_if_fail(mbnode, FALSE);
 		     
     if (mbnode->mailbox) {
+        /* Clear the view member, so that the view info is preserved. */
+        mbnode->mailbox->view = NULL;
 	balsa_window_close_mbnode(balsa_app.main_window, mbnode);
         mbnode->mailbox = NULL;
     }
@@ -1036,56 +1065,3 @@ balsa_mailbox_nodes_lock(gboolean exclusive) {}
 void
 balsa_mailbox_nodes_unlock(gboolean exclusive) {}
 #endif
-
-/* Find the nearest ancestor of url in the mailbox nodes, and expand it.
- */
-struct _BalsaAppDescendInfo {
-    guint len;
-    const gchar *url;
-    BalsaMailboxNode *mbnode;
-};
-typedef struct _BalsaAppDescendInfo BalsaAppDescendInfo;
-
-static gboolean
-balsa_app_descend_func(GNode * node, BalsaAppDescendInfo * badi)
-{
-    BalsaMailboxNode *mbnode;
-    LibBalsaMailbox *mailbox;
-    gchar *url;
-    guint len;
-
-    if (   !(mbnode = node->data)
-        || !(mailbox = mbnode->mailbox)
-        || !(url = mailbox->url))
-        return FALSE;
-
-    len = strlen(url);
-    if (len > badi->len && !strncmp(url, badi->url, len)) {
-        badi->len = len;
-        badi->mbnode = mbnode;
-    }
-
-    return FALSE;
-}
-
-static gboolean
-balsa_app_descend(const gchar * url)
-{
-    BalsaAppDescendInfo badi;
-
-    badi.len = 0;
-    badi.url = url;
-    badi.mbnode = NULL;
-
-    balsa_mailbox_nodes_lock(FALSE);
-    g_node_traverse(balsa_app.mailbox_nodes, G_PRE_ORDER, G_TRAVERSE_LEAFS,
-                    -1, (GNodeTraverseFunc) balsa_app_descend_func, &badi);
-    balsa_mailbox_nodes_unlock(FALSE);
-
-    if (!badi.mbnode || badi.mbnode->scanned)
-        return FALSE;
-
-    balsa_mailbox_node_rescan(badi.mbnode);
-
-    return TRUE;
-}

@@ -312,7 +312,6 @@ extern struct BalsaApplication {
     gint open_inbox_upon_startup;
     gint check_mail_upon_startup;
     gint remember_open_mboxes;
-    gchar** open_mailbox_vector;
     gint open_unread_mailbox;
 
     /* list of currently open mailboxes */
@@ -379,6 +378,8 @@ extern struct BalsaApplication {
     gint drag_default_is_move;
     gboolean delete_immediately;
     gboolean hide_deleted;
+
+    GHashTable *mailbox_views;
 
 } balsa_app;
 

@@ -128,6 +128,8 @@ struct _Mailbox
     void *private;
     guint open_ref;
 
+    gboolean lock;
+
     glong messages;
     glong new_messages;
     GList *message_list;
@@ -254,10 +256,12 @@ typedef void (*MailboxWatcherFunc) (MailboxWatcherMessage * arg1);
 /*
  * call before using any mailbox functions
  */
-void mailbox_init (gchar * inbox, void (*error_func) (const char *fmt,...));
+void mailbox_init (gchar * inbox_path,
+		   void (*error_func) (const char *fmt,...),
+		   void (*gui_func) (void));
 
 gint set_imap_username (Mailbox * mb);
-void check_all_pop3_hosts (Mailbox *);
+void check_all_pop3_hosts (Mailbox *, GList *);
 void add_mailboxes_for_checking (Mailbox *);
 gint mailbox_have_new_messages (gchar * path);
 GList *make_list_from_string (gchar *);

@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- * Copyright (C) 1997-98 Jay Painter and Stuart Parmenter
+ * Copyright (C) 1997-98 Stuart Parmenter and Jay Painter
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,17 +20,17 @@
 #include "config.h"
 #include <glib.h>
 #include <stdarg.h>
+/* this should be removed.  it is only used for _() for internationalzation */
+#include <gnome.h>
 
 #include <stdio.h>
 #include <sys/utsname.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <time.h>
-#include <gnome.h>
 
 #include "mailbackend.h"
 
-#include "balsa-app.h"
 #include "mailbox.h"
 #include "misc.h"
 
@@ -39,28 +39,28 @@
 
 #define LOCK_MAILBOX(mailbox)\
 do {\
-  if (client_mailbox)\
+  if (mailbox->lock)\
     {\
-      g_print (_("*** ERROR: Mailbox Lock Failed: %s ***\n"), __PRETTY_FUNCTION__);\
+      g_print (_("*** ERROR: Mailbox Lock Exists: %s ***\n"), __PRETTY_FUNCTION__);\
       return;\
     }\
   else\
-    client_mailbox = (mailbox);\
+    mailbox->lock = TRUE;\
 } while (0)
 
 
 #define LOCK_MAILBOX_RETURN_VAL(mailbox, val)\
 do {\
-  if (client_mailbox)\
+  if (mailbox->lock)\
     {\
-      g_print (_("*** ERROR: Mailbox Lock Failed: %s ***\n"), __PRETTY_FUNCTION__);\
+      g_print (_("*** ERROR: Mailbox Lock Exists: %s ***\n"), __PRETTY_FUNCTION__);\
       return (val);\
     }\
   else\
-    client_mailbox = (mailbox);\
+    mailbox->lock = TRUE;\
 } while (0)
 
-#define UNLOCK_MAILBOX()                (client_mailbox = NULL)
+#define UNLOCK_MAILBOX(mailbox)          mailbox->lock = FALSE;
 
 
 #define CLIENT_CONTEXT(mailbox)          (((MailboxPrivate *)((mailbox)->private))->context)
@@ -71,7 +71,7 @@ do {\
   if (CLIENT_CONTEXT_CLOSED (mailbox))\
     {\
       g_print (_("*** ERROR: Mailbox Stream Closed: %s ***\n"), __PRETTY_FUNCTION__);\
-      UNLOCK_MAILBOX ();\
+      UNLOCK_MAILBOX (mailbox);\
       return;\
     }\
 } while (0)
@@ -80,7 +80,7 @@ do {\
   if (CLIENT_CONTEXT_CLOSED (mailbox))\
     {\
       g_print (_("*** ERROR: Mailbox Stream Closed: %s ***\n"), __PRETTY_FUNCTION__);\
-      UNLOCK_MAILBOX ();\
+      UNLOCK_MAILBOX (mailbox);\
       return (val);\
     }\
 } while (0)
@@ -88,7 +88,9 @@ do {\
 
 #define WATCHER_LIST(mailbox) (((MailboxPrivate *)((mailbox)->private))->watcher_list)
 
-
+/* update the gui (during loading messages, etc */
+void (*update_gui_func) (void);
+	
 /*
  * watcher information
  */
@@ -114,13 +116,6 @@ MailboxPrivate;
 
 
 /* 
- * the mailbox to be referenced by any of the c-client
- * callbacks for authorization, new messages, etc... 
- */
-static Mailbox *client_mailbox = NULL;
-
-
-/* 
  * prototypes
  */
 static void load_messages (Mailbox * mailbox, gint emit);
@@ -143,12 +138,16 @@ static Address *translate_address (ADDRESS * caddr);
 
 /* We're gonna set Mutt global vars here */
 void
-mailbox_init (gchar * inbox_path, void (*error_func) (const char *fmt,...))
+mailbox_init (gchar * inbox_path,
+		void (*error_func) (const char *fmt,...),
+		void (*gui_func) (void))
 {
   struct utsname utsname;
   char *p;
   gchar *tmp;
 
+  update_gui_func = gui_func;
+  
   Spoolfile = inbox_path;
 
   uname (&utsname);
@@ -192,12 +191,12 @@ set_imap_username (Mailbox * mb)
 }
 
 void
-check_all_pop3_hosts (Mailbox * to)
+check_all_pop3_hosts (Mailbox * to, GList *mailboxes)
 {
   GList *list;
   Mailbox *mailbox;
 
-  list = g_list_first (balsa_app.inbox_input);
+  list = g_list_first (mailboxes);
 
   if (to->type != MAILBOX_MBOX)
     return;
@@ -393,7 +392,7 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
       /* incriment the reference count */
       mailbox->open_ref++;
 
-      UNLOCK_MAILBOX ();
+      UNLOCK_MAILBOX (mailbox);
       return TRUE;
     }
 
@@ -401,7 +400,7 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
     {
       if (stat (MAILBOX_LOCAL (mailbox)->path, &st) == -1)
 	{
-	  UNLOCK_MAILBOX ();
+	  UNLOCK_MAILBOX (mailbox);
 	  return FALSE;
 	}
     }
@@ -444,19 +443,18 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
       /* incriment the reference count */
       mailbox->open_ref++;
 
-      if (balsa_app.debug)
-	g_print (_ ("Mailbox: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+#ifdef DEBUG
+      g_print (_ ("Mailbox: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+#endif
 
       /* FIXME */
-/*
-   mailbox_sort(mailbox, MAILBOX_SORT_DATE);
- */
-      UNLOCK_MAILBOX ();
+/* mailbox_sort(mailbox, MAILBOX_SORT_DATE); */
+      UNLOCK_MAILBOX (mailbox);
       return TRUE;
     }
   else
     {
-      UNLOCK_MAILBOX ();
+      UNLOCK_MAILBOX (mailbox);
       return FALSE;
     }
 }
@@ -474,9 +472,9 @@ mailbox_open_unref (Mailbox * mailbox)
 
   if (mailbox->open_ref == 0)
     {
-      if (balsa_app.debug)
-	g_print (_ ("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
-
+#ifdef DEBUG
+      g_print (_ ("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+#endif
       free_messages (mailbox);
       mailbox->messages = 0;
 
@@ -492,7 +490,7 @@ mailbox_open_unref (Mailbox * mailbox)
 	}
     }
 
-  UNLOCK_MAILBOX ();
+  UNLOCK_MAILBOX (mailbox);
 }
 
 void
@@ -517,7 +515,7 @@ mailbox_check_new_messages (Mailbox * mailbox)
 
   if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint)) < 0)
     {
-      UNLOCK_MAILBOX ();
+      UNLOCK_MAILBOX (mailbox);
       g_print ("error or something\n");
     }
   else if (i == M_NEW_MAIL || i == M_REOPENED)
@@ -528,16 +526,16 @@ mailbox_check_new_messages (Mailbox * mailbox)
       if (mailbox->new_messages > 0)
 	{
 	  load_messages (mailbox, 1);
-	  UNLOCK_MAILBOX ();
+	  UNLOCK_MAILBOX (mailbox);
 	  return TRUE;
 	}
       else
 	{
-	  UNLOCK_MAILBOX ();
+	  UNLOCK_MAILBOX (mailbox);
 	  return FALSE;
 	}
     }
-  UNLOCK_MAILBOX ();
+  UNLOCK_MAILBOX (mailbox);
   return FALSE;
 }
 
@@ -687,8 +685,7 @@ load_messages (Mailbox * mailbox, gint emit)
        * give time to gtk so the GUI isn't blocked
        * this is kinda a hack right now
        */
-      while (gtk_events_pending ())
-	gtk_main_iteration ();
+      update_gui_func();
     }
 }
 
@@ -1127,7 +1124,7 @@ message_reply (Message * message)
   message->flags |= MESSAGE_FLAG_REPLIED;
   send_watcher_mark_answer_message (message->mailbox, message);
 
-  UNLOCK_MAILBOX ();
+  UNLOCK_MAILBOX (message->mailbox);
 }
 
 void
@@ -1147,7 +1144,7 @@ message_clear_flags (Message * message)
   message->flags = 0;
   send_watcher_mark_clear_message (message->mailbox, message);
 
-  UNLOCK_MAILBOX ();
+  UNLOCK_MAILBOX (mailbox);
 #endif
 }
 
@@ -1166,7 +1163,7 @@ message_read (Message * message)
   message->flags &= ~MESSAGE_FLAG_NEW;
   send_watcher_mark_read_message (message->mailbox, message);
 
-  UNLOCK_MAILBOX ();
+  UNLOCK_MAILBOX (message->mailbox);
 }
 
 void
@@ -1182,7 +1179,7 @@ message_unread (Message * message)
   message->flags |= MESSAGE_FLAG_NEW;
   send_watcher_mark_unread_message (message->mailbox, message);
 
-  UNLOCK_MAILBOX ();
+  UNLOCK_MAILBOX (message->mailbox);
 }
 
 void
@@ -1198,7 +1195,7 @@ message_delete (Message * message)
   message->flags |= MESSAGE_FLAG_DELETED;
   send_watcher_mark_delete_message (message->mailbox, message);
 
-  UNLOCK_MAILBOX ();
+  UNLOCK_MAILBOX (message->mailbox);
 }
 
 
@@ -1215,7 +1212,7 @@ message_undelete (Message * message)
   message->flags &= ~MESSAGE_FLAG_DELETED;
   send_watcher_mark_undelete_message (message->mailbox, message);
 
-  UNLOCK_MAILBOX ();
+  UNLOCK_MAILBOX (message->mailbox);
 }
 
 
@@ -1343,17 +1340,16 @@ message_body_ref (Message * message)
 #if 0
       BODY *bdy = cur->content;
 #endif
-      if (balsa_app.debug)
-	{
-	  fprintf (stderr, "After loading message\n");
-	  fprintf (stderr, "header->mime    = %d\n", cur->mime);
-	  fprintf (stderr, "header->offset  = %ld\n", cur->offset);
-	  fprintf (stderr, "header->content = %p\n", cur->content);
-	  fprintf (stderr, " \n\nDumping Message\n");
-	  fprintf (stderr, "Dumping a %s[%d] message\n",
-		   mime_content_type2str (cur->content->type),
-		   cur->content->type);
-	}
+#ifdef DEBUG
+      fprintf (stderr, "After loading message\n");
+      fprintf (stderr, "header->mime    = %d\n", cur->mime);
+      fprintf (stderr, "header->offset  = %ld\n", cur->offset);
+      fprintf (stderr, "header->content = %p\n", cur->content);
+      fprintf (stderr, " \n\nDumping Message\n");
+      fprintf (stderr, "Dumping a %s[%d] message\n",
+	       mime_content_type2str (cur->content->type),
+	       cur->content->type);
+#endif
       body = body_new ();
       body->mutt_body = cur->content;
       message->body_list = g_list_append (message->body_list, body);
@@ -1363,13 +1359,11 @@ message_body_ref (Message * message)
 	  bdy = cur->content->parts;
 	  while (bdy)
 	    {
-
-	      if (balsa_app.debug)
-		{
-		  fprintf (stderr, "h->c->type      = %s[%d]\n", mime_content_type2str (bdy->type), bdy->type);
-		  fprintf (stderr, "h->c->subtype   = %s\n", bdy->subtype);
-		  fprintf (stderr, "======\n");
-		}
+#ifdef DEBUG
+	      fprintf (stderr, "h->c->type      = %s[%d]\n", mime_content_type2str (bdy->type), bdy->type);
+	      fprintf (stderr, "h->c->subtype   = %s\n", bdy->subtype);
+	      fprintf (stderr, "======\n");
+#endif
 	      body = body_new ();
 	      body->mutt_body = bdy;
 	      message->body_list = g_list_append (message->body_list, body);

@@ -371,7 +371,7 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
   if (!balsa_app.current_index_child)
     return;
 
-  check_all_pop3_hosts (balsa_app.inbox);
+  check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input);
 
   mailbox_check_new_messages (BALSA_INDEX (balsa_app.current_index_child->index)->mailbox);
 }

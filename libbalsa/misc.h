@@ -21,14 +21,6 @@
 #define __MISC_H__
 
 
-GtkWidget *append_menuitem_connect (GtkMenu * menu,
-				    gchar * text,
-				    GtkSignalFunc func,
-				    gpointer data,
-				    gpointer user_data);
-
-gint g_list_index (GList * list, gpointer data);
-
 gchar *address_to_gchar (Address * addr);
 gchar *make_string_from_list (GList *);
 

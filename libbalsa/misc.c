@@ -32,33 +32,6 @@
 #include "mailbox.h"
 #include "misc.h"
 
-/* creates one label (text) menuitem, connects the callback,
- * and adds it to the menu */
-GtkWidget *
-append_menuitem_connect (GtkMenu * menu,
-			 gchar * text,
-			 GtkSignalFunc func,
-			 gpointer data,
-			 gpointer user_data)
-{
-  GtkWidget *menuitem;
-
-
-  menuitem = gtk_menu_item_new_with_label (text);
-  gtk_menu_append (menu, menuitem);
-  gtk_widget_show (menuitem);
-
-  gtk_signal_connect (GTK_OBJECT (menuitem),
-		      "activate",
-		      (GtkSignalFunc) func,
-		      data);
-
-  if (user_data)
-    gtk_object_set_user_data (GTK_OBJECT (menuitem), user_data);
-
-  return menuitem;
-}
-
 MailboxNode *
 mailbox_node_new (gchar * name, Mailbox * mb, gint i)
 {

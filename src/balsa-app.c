@@ -53,6 +53,12 @@ error_exit_cb (GtkWidget * widget, gpointer data)
 }
 
 static void
+update_gui(void)
+{
+    while (gtk_events_pending ())
+         gtk_main_iteration ();
+}
+static void
 balsa_error (const char *fmt,...)
 {
   GtkWidget *messagebox;
@@ -133,7 +139,9 @@ do_load_mailboxes (void)
     case MAILBOX_MAILDIR:
     case MAILBOX_MBOX:
     case MAILBOX_MH:
-      mailbox_init (MAILBOX_LOCAL (balsa_app.inbox)->path, balsa_error);
+      mailbox_init (MAILBOX_LOCAL (balsa_app.inbox)->path,
+		      balsa_error,
+		      update_gui);
       break;
 
     case MAILBOX_IMAP:

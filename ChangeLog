@@ -1,3 +1,9 @@
+2004-04-13 21:34  PeterB
+
+	* libbalsa/: imap-server.c, mailbox_imap.c, mailbox_imap.h: lock
+	the mailbox in "expunge-notify" handler; remove unnecessary handler
+	in imap-server and unused hook in mailbox-imap.
+
 2004-04-12  Pawel Salek
 
 	* libbalsa/misc.c: fix fcntl() locking.

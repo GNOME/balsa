@@ -222,13 +222,15 @@ size_t libbalsa_readfile(FILE * fp, char **buf)
     offset = 0;
     while ((size_t)offset < size) {
 	r = read(fd, *buf + offset, size - offset);
-	if (r == 0)
+	if (r == 0) { /* proper EOF */
+            (*buf)[offset] = '\0';
 	    return offset;
-
+        }
 	if (r > 0) {
 	    offset += r;
 	} else if ((errno != EAGAIN) && (errno != EINTR)) {
 	    perror("Error reading file:");
+            (*buf)[offset] = '\0';
 	    return -1;
 	}
     }

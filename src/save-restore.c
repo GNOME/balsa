@@ -316,6 +316,7 @@ gint config_mailbox_update(LibBalsaMailbox * mailbox)
     res = gnome_config_has_section(key);
     gnome_config_push_prefix(key);
     libbalsa_mailbox_save_config(mailbox, key);
+    g_free(key);
     gnome_config_pop_prefix();
     gnome_config_sync();
     return res;
@@ -331,6 +332,7 @@ gint config_folder_update(BalsaMailboxNode * mbnode)
     res = gnome_config_has_section(key);
     gnome_config_push_prefix(key);
     balsa_mailbox_node_save_config(mbnode, key);
+    g_free(key);
     gnome_config_pop_prefix();
     gnome_config_sync();
     return res;

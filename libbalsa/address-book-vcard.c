@@ -316,7 +316,7 @@ static void load_vcard_file(LibBalsaAddressBook *ab)
 	 * fetch all e-mail fields
 	 */
 	if (g_strncasecmp(string, "EMAIL;", 6) == 0) {
-	    gchar *ptr = strchr(string, ':');
+	    gchar *ptr = strchr(string+6, ':');
 	    if (ptr) {
 		address_list =
 		    g_list_append(address_list, g_strdup(ptr + 1));

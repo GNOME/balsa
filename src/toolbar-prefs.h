@@ -37,7 +37,6 @@ typedef struct t_button_data {
 } button_data;
 
 extern button_data toolbar_buttons[];
-extern int toolbar_button_count;
 int get_toolbar_button_index(char *id);
 
 void customize_dialog_cb(GtkWidget *, gpointer);

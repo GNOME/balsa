@@ -1841,18 +1841,21 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
     GString *body = NULL;
     gchar *signature;
     gint pos = 0;
+    gboolean reply_any = (type == SEND_REPLY || type == SEND_REPLY_ALL
+                          || type == SEND_REPLY_GROUP);
+    gboolean forwd_any = (type == SEND_FORWARD_ATTACH
+                          || type == SEND_FORWARD_INLINE);
 
-    if (type != SEND_NORMAL && message && balsa_app.autoquote)
-	body = quoteBody(msg, message, type);
+    if (message && ((balsa_app.autoquote && reply_any)
+                    || type == SEND_FORWARD_INLINE))
+        body = quoteBody(msg, message, type);
     else
 	body = g_string_new("");
 
     if ((signature = read_signature(msg)) != NULL) {
-	if (((type == SEND_REPLY || type == SEND_REPLY_ALL || type == SEND_REPLY_GROUP) &&
-	     balsa_app.current_ident->sig_whenreply) ||
-	    ((type == SEND_FORWARD_ATTACH || type == SEND_FORWARD_INLINE) && 
-	     balsa_app.current_ident->sig_whenforward) ||
-	    (type == SEND_NORMAL && balsa_app.current_ident->sig_sending)) {
+	if ((reply_any && balsa_app.current_ident->sig_whenreply)
+       || (forwd_any && balsa_app.current_ident->sig_whenforward)
+       || (type == SEND_NORMAL && balsa_app.current_ident->sig_sending)) {
 
 	    if (balsa_app.current_ident->sig_separator
 		&& g_strncasecmp(signature, "--\n", 3)

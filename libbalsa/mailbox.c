@@ -385,7 +385,9 @@ libbalsa_mailbox_close_append(LibBalsaMailboxAppendHandle* handle)
     int ret;
     g_return_val_if_fail(handle != NULL, -1);
 
+    libbalsa_lock_mutt();
     ret = mx_close_mailbox(handle->context, NULL);
+    libbalsa_unlock_mutt();
     g_free(handle);
     return ret;
 }
@@ -844,7 +846,7 @@ libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox)
 
 
 /* internal c-client translation:
- * mutt lists can cantain null adresses for address strings like
+ * mutt lists can contain null adresses for address strings like
  * "To: Dear Friends,". We do remove them.
  */
 static LibBalsaMessage *

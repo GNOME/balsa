@@ -1,3 +1,15 @@
+2001-10-17  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/address-book-ldif.c: strcpy+strcat->g_strconcat
+	* balsa/libbalsa/address-book-vcard.c: add known offset.
+	* libbalsa/mailbox.c: forgotten libbalsa_lock_mutt().
+	* libbalsa/message.c: extra armour.
+	* libbalsa/misc.c (libbalsa_readfile): always append '\0'.
+	* src/balsa-message.c: gtktext calculation reverted.
+	* src/save-restore.c: plug memory leak.
+	* src/sendmsg-window.c: autoreply fix (Peter Bloomfield).
+	* src/toolbar-prefs.[hc]: toolbar backward compatibility (Steve Wall).
+	
 2001-10-17  Yanko Kaneti  <yaneti@declera.com>
 
 	* configure.in (ALL_LINGUAS): add "bg" to the translations list.

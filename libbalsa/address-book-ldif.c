@@ -334,9 +334,6 @@ static void expand_ldif_addr(GList *ab_list)
     }
 }
     
-/* FIXME: Could stat the file to see if it has changed since last time 
-   we read it 
-*/
 static void
 load_ldif_file(LibBalsaAddressBook *ab)
 {
@@ -507,10 +504,7 @@ build_name(gchar *id, gchar *givenname, gchar *surname)
     gchar *name = NULL, *end = NULL;
 
     if(givenname && *givenname && surname && *surname) {
-	name = g_new (gchar, strlen(givenname) + strlen(surname) + 2);
-	strcpy(name, givenname);
-	strcat(name, " ");
-	strcat(name, surname);
+	name = g_strconcat (givenname," ",surname,NULL);
     } else if(givenname && *givenname) {
 	name = g_strdup(givenname);
     } else if(surname && *surname) {

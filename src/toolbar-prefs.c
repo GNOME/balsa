@@ -64,6 +64,8 @@
 #define MAX(a, b) (a > b ? a : b)
 #endif
 
+#define OLD_BALSA_COMPATIBILITY_TRANSLATION
+
 static int customize_open=0;
 GtkWidget *customize_widget;
 static int word_wrap;
@@ -122,7 +124,7 @@ button_data toolbar_buttons[]={
      N_("Show preview pane"), TOOLBAR_BUTTON_TYPE_TOGGLE}
 };
 
-int toolbar_button_count=sizeof(toolbar_buttons)/sizeof(button_data);
+const int toolbar_button_count=sizeof(toolbar_buttons)/sizeof(button_data);
 
 struct toolbar_item {
     GtkWidget *widget;
@@ -223,12 +225,59 @@ apply_toolbar_prefs(GtkWidget *widget, gpointer data)
 int
 get_toolbar_button_index(char *id)
 {
+#ifdef OLD_BALSA_COMPATIBILITY_TRANSLATION
+    const struct {
+        gchar *new;
+        gchar *old;
+    } button_converter[] = {
+        { BALSA_PIXMAP_ATTACHMENT,   GNOME_STOCK_PIXMAP_ATTACH },
+        { BALSA_PIXMAP_NEW,          GNOME_STOCK_PIXMAP_MAIL_NEW },
+        { BALSA_PIXMAP_CONTINUE,     GNOME_STOCK_PIXMAP_MAIL },
+        { BALSA_PIXMAP_RECEIVE,      GNOME_STOCK_PIXMAP_MAIL_RCV },
+        { BALSA_PIXMAP_REPLY,        GNOME_STOCK_PIXMAP_MAIL_RPL },
+        { BALSA_PIXMAP_REPLY_ALL,    "reply_to_all" },
+        { BALSA_PIXMAP_REPLY_GROUP,  "reply_to_group" },
+        { BALSA_PIXMAP_FORWARD,      GNOME_STOCK_PIXMAP_MAIL_FWD },
+        { BALSA_PIXMAP_NEXT,         GNOME_STOCK_PIXMAP_FORWARD },
+        { BALSA_PIXMAP_PREVIOUS,     GNOME_STOCK_PIXMAP_BACK },
+        { BALSA_PIXMAP_PRINT,        GNOME_STOCK_PIXMAP_PRINT },
+        { BALSA_PIXMAP_SAVE,         GNOME_STOCK_PIXMAP_SAVE },
+        { BALSA_PIXMAP_SEND,         GNOME_STOCK_PIXMAP_MAIL_SND },
+        { BALSA_PIXMAP_TRASH,        GNOME_STOCK_PIXMAP_TRASH },
+        { BALSA_PIXMAP_TRASH_EMPTY,  "empty_trash" },
+        { BALSA_PIXMAP_NEXT_UNREAD,  "next_unread" },
+        { BALSA_PIXMAP_NEXT_FLAGGED, "next_flagged" },
+        { BALSA_PIXMAP_SHOW_HEADERS, "show_all_headers" },
+        { BALSA_PIXMAP_SHOW_PREVIEW, "show_preview" },
+        { BALSA_PIXMAP_MARKED_NEW,   "flag_unread" },
+        { BALSA_PIXMAP_MARKED_ALL,   "mark_all" },
+        { BALSA_PIXMAP_IDENTITY,     "identity" },
+        { BALSA_PIXMAP_CLOSE_MBOX,   GNOME_STOCK_PIXMAP_CLOSE },
+        { BALSA_PIXMAP_OTHER_CLOSE,  "close_mbox" },
+        { NULL, NULL }
+    };
+#endif
     int i;
     
     for(i=0; i<toolbar_button_count; i++) {
 	if(!strcmp(id, toolbar_buttons[i].pixmap_id))
 	    return i;
     }
+#ifdef OLD_BALSA_COMPATIBILITY_TRANSLATION
+    /* you have got a second chance.... */
+    
+    for(i=0; button_converter[i].new; i++) {
+        if(!strcmp(id, button_converter[i].old)) {
+            int j;
+            for(j=0; j<toolbar_button_count; j++) {
+                if(!strcmp(button_converter[i].new,
+                           toolbar_buttons[j].pixmap_id))
+                    return j;
+            }
+            return -1;
+        }
+    }
+#endif
     return -1;
 }
 

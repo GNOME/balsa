@@ -2614,8 +2614,8 @@ balsa_gtk_text_size_request(GtkWidget * widget,
 
     text = GTK_TEXT(widget);
 
-    requisition->width = -(widget->style->klass->xthickness + 1) * 2;
-    requisition->height = -(widget->style->klass->ythickness + 1) * 2;
+    requisition->width = (widget->style->klass->xthickness + 1) * 2;
+    requisition->height = (widget->style->klass->ythickness + 1) * 2;
 
     requisition->width += text->hadj->upper;
     requisition->height += text->vadj->upper;

@@ -290,6 +290,8 @@ libbalsa_message_destroy(GtkObject * object)
 const gchar *
 libbalsa_message_pathname(LibBalsaMessage * message)
 {
+    g_return_val_if_fail(CLIENT_CONTEXT_OPEN(message->mailbox), NULL);
+    g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, NULL);
     g_return_val_if_fail(message->header, NULL);
     return message->header->path;
 }
@@ -473,6 +475,7 @@ libbalsa_message_copy(LibBalsaMessage * message, LibBalsaMailbox * dest)
     }
 
     libbalsa_lock_mutt();
+    mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox), cur);
     mutt_append_message(handle->context,
 			CLIENT_CONTEXT(message->mailbox), cur, 0, 0);
     libbalsa_unlock_mutt();
@@ -534,7 +537,7 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
 	message=(LibBalsaMessage *)(p->data);
 	if(CLIENT_CONTEXT_CLOSED(message->mailbox)) continue;
 	cur = message->header;
-	mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox), cur);
+	mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox), cur); 
 	mutt_append_message(handle->context,
 			    CLIENT_CONTEXT(message->mailbox), cur, 0, 0);
     }
@@ -824,14 +827,14 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
     g_return_val_if_fail(message, FALSE);
     if (!message->mailbox) return FALSE;
 
-    if (message->body_ref > 0) {
-	message->body_ref++;
-	return TRUE;
-    }
     g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, FALSE);
     cur = message->header;
     g_return_val_if_fail(cur != NULL, FALSE);
 
+    if (message->body_ref > 0) {
+	message->body_ref++;
+	return TRUE;
+    }
     /*
      * load message body
      */
@@ -839,27 +842,20 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
     msg = mx_open_message(CLIENT_CONTEXT(message->mailbox), cur->msgno);
     libbalsa_unlock_mutt();
 
-    if (!msg) {
-	message->body_ref--;
-	return FALSE;
-    }
+    if (!msg) return FALSE;
 
     fseek(msg->fp, cur->content->offset, 0);
 
     if (cur->content->type == TYPEMULTIPART) {
 	libbalsa_lock_mutt();
-	cur->content->parts = mutt_parse_multipart(msg->fp,
-						   mutt_get_parameter
-						   ("boundary",
-						    cur->content->
-						    parameter),
-						   cur->content->offset +
-						   cur->content->length,
-						   strcasecmp("digest",
-							      cur->
-							      content->
-							      subtype) ==
-						   0);
+	cur->content->parts = 
+            mutt_parse_multipart(msg->fp,
+                                 mutt_get_parameter
+                                 ("boundary",
+                                  cur->content->parameter),
+                                 cur->content->offset + cur->content->length,
+                                 strcasecmp("digest",cur->content->subtype) 
+                                 == 0);
 	libbalsa_unlock_mutt();
     } else
 	if (mutt_is_message_type
@@ -926,14 +922,10 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
 
     msg_header = message->header;	
 
-    /* FIXME: Can be simplified into 1 if */
     if (msg_header->content->type != TYPETEXT) {
 	ret = TRUE;
     } else {
-	if (g_strcasecmp("plain", msg_header->content->subtype) == 0)
-	    ret = FALSE;
-	else
-	    ret = TRUE;
+	ret = g_strcasecmp("plain", msg_header->content->subtype) != 0;
     }
 
     return ret;
@@ -1041,6 +1033,7 @@ const gchar*
 libbalsa_message_get_subject(LibBalsaMessage* msg)
 {
     if(msg->header) { /* a message in a mailbox... */
+        g_return_val_if_fail(CLIENT_CONTEXT_OPEN(msg->mailbox), NULL);
 	/* g_print("Returning libmutt's pointer\n"); */
 	return msg->header->env->subject;
     } else

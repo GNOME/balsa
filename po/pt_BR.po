@@ -61,7 +61,7 @@ msgstr "Não pode carregar livro de endereço %s"
 #: libbalsa/address-book.c:177
 #, c-format
 msgid "No such address book type: %s"
-msgstr "Sem tal tipo de livro de endereçoo: %s"
+msgstr "Sem tal tipo de livro de endereço: %s"
 
 #: libbalsa/address-book.c:186
 #, c-format
@@ -77,7 +77,7 @@ msgstr "Não pode carregar caixa de mensagem %s"
 #: libbalsa/mailbox.c:282
 #, c-format
 msgid "No such mailbox type: %s"
-msgstr "Sem tal tipo de caixa de mensagme: %s"
+msgstr "Sem tal tipo de caixa de mensagem: %s"
 
 # 11
 #: libbalsa/mailbox.c:290
@@ -270,7 +270,7 @@ msgstr "Caixa de mensagem foi corrompida!"
 
 #: libmutt/mbox.c:703 libmutt/mbox.c:978
 msgid "Fatal error!  Could not reopen mailbox!"
-msgstr "Erro fatal! Não pôde reabrir caixa de mensaggem!"
+msgstr "Erro fatal! Não pôde reabrir caixa de mensagem!"
 
 # 12
 #: libmutt/mbox.c:712
@@ -288,7 +288,7 @@ msgstr "Não pôde criar arquivo temporário!"
 #: libmutt/mbox.c:758
 msgid "sync: mbox modified, but no modified messages! (report this bug)"
 msgstr ""
-"syc: caixa de mensagnes modificada, mas não as mensagens! (informar este bug)"
+"syc: caixa de mensagens modificada, mas não as mensagens! (informar este bug)"
 
 #: libmutt/mbox.c:788
 msgid "Writing messages... %d (%d%%)"
@@ -490,7 +490,7 @@ msgstr "Comexão SSL usando %s"
 
 #: libmutt/imap/imap_ssl.c:254
 msgid "Unknown"
-msgstr "Desconhcecido"
+msgstr "Desconhecido"
 
 #: libmutt/imap/imap_ssl.c:279
 msgid "[unable to calculate]"
@@ -502,7 +502,7 @@ msgstr "[data inválida]"
 
 #: libmutt/imap/imap_ssl.c:372
 msgid "Server certificate is not yet valid"
-msgstr "Certificado do seridor ainda não está validado"
+msgstr "Certificado do servidor ainda não está validado"
 
 #: libmutt/imap/imap_ssl.c:379
 msgid "Server certificate has expired"
@@ -838,7 +838,7 @@ msgstr "Não pôde apresentar imagem\n"
 
 #: src/balsa-message.c:750
 msgid "No open or view action defined in GNOME MIME for this content type"
-msgstr "Sem abertura ou ação definida no GNOME MIME para este tipo deconteúdo"
+msgstr "Sem abertura ou ação definida no GNOME MIME para este tipo de conteúdo"
 
 #: src/balsa-message.c:754
 #, c-format
@@ -2397,7 +2397,7 @@ msgstr "Impossível receber informações de '%s' : %s\n"
 #: src/sendmsg-window.c:630
 #, c-format
 msgid "Attachment is not a regular file or cannot be read: '%s'\n"
-msgstr "Anexo não é um arquivo normal ou não pode ser liddo: '%s'\n"
+msgstr "Anexo não é um arquivo normal ou não pode ser lido: '%s'\n"
 
 #: src/sendmsg-window.c:695
 msgid "Attach file"
@@ -2628,8 +2628,8 @@ msgstr "A_diciona"
 msgid ""
 "In order to store an address, you must open a mailbox and select a message.\n"
 msgstr ""
-"Para armazenar um endereço, a caixa de mensagens dever ser aberta "
-"eselecionar a mensagem.\n"
+"Para armazenar um endereço, a caixa de mensagens dever ser aberta e "
+"selecionar a mensagem.\n"
 
 msgid "Close Mailbox"
 msgstr "Fechar caixa de mensagens"

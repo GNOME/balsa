@@ -40,7 +40,7 @@ msgstr ""
 
 #: src/balsa-init.c:195
 msgid "You seem to be running Balsa for the first time.\n"
-msgstr "Es sieht so aus, als würdest du Balsa zum ersten mal benutzen"
+msgstr "Es sieht so aus, als würdest du Balsa zum ersten mal benutzen\n"
 
 #: src/balsa-init.c:196
 msgid ""
@@ -97,7 +97,7 @@ msgid ""
 "please change them inside Balsa\n"
 msgstr ""
 "Wenn Du IMAP benutzen willst, bitte installiere es über"
-"rechtsklick auf die Mailboxliste."
+"rechtsklick auf die Mailboxliste.\n"
 
 #: src/balsa-init.c:533
 msgid "Finish"

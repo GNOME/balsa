@@ -918,7 +918,7 @@ gchar **libbalsa_lookup_mime_type(const gchar * path) {
 
 	
     mime_type =
-	gnome_mime_type_or_default(path, "application/octet-stream");
+	gnome_mime_type_or_default_of_file(path, "application/octet-stream");
     tmp = g_strsplit(mime_type, "/", 2);
 
     return tmp;

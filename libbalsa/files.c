@@ -101,7 +101,9 @@ libbalsa_icon_finder(const char *mime_type, const char *filename)
     const char *content_type, *icon_file;
     gchar *icon = NULL;
     
-    content_type = (!mime_type) ? gnome_mime_type (filename) : mime_type;
+    content_type = (!mime_type) ? 
+	gnome_mime_type_or_default_of_file(filename, "application/octet-stream") : 
+	mime_type;
 
     icon_file = gnome_mime_get_value (content_type, "icon-filename");
 

@@ -1,3 +1,14 @@
+2001-05-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	A set of patches from Albrecht Dreﬂ <albrecht.dress@arcormail.de>
+	* src/print.c: rewritten: multipart printing, including icons,
+	images etc.
+	* src/sendmsg-window.c: don't double free a string. guess the file
+	type properly.
+	* libbalsa/send.c:
+	* libbalsa/files.c: try harder guessing the file type.
+	* libbalsa/message.c: fix the message part charset recognition.
+
 2001-04-30  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/print.c: handle cases when conversion to utf-8 fails.

@@ -620,7 +620,7 @@ add_attachment(GnomeIconList * iconlist, char *filename)
     gchar *pix, *err_msg;
 
     /* FIXME: What is the default type? */
-    content_type = gnome_mime_type_or_default ( filename, "application/octet-stream" );
+    content_type = gnome_mime_type_or_default_of_file(filename, "application/octet-stream");
     pix = libbalsa_icon_finder(content_type, filename);
 
     if (balsa_app.debug)
@@ -1686,7 +1686,7 @@ strip_chars(gchar * str, const gchar * char2strip)
    (consider moving this code to mutt part).
 */
 static LibBalsaMessage *
-bsmsg2message(BalsaSendmsg * bsmsg)
+bsmsg2message(BalsaSendmsg * bsmsg, gboolean dup_filenames)
 {
     LibBalsaMessage *message;
     LibBalsaMessageBody *body;
@@ -1763,10 +1763,19 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	for (i = 0; i < GNOME_ICON_LIST(bsmsg->attachments[1])->icons; i++) {
 	    body = libbalsa_message_body_new(message);
 	    /* PKGW: This used to be g_strdup'ed. However, the original pointer 
-	       was strduped and never freed, so we'll take it. */
-	    body->filename = (gchar *)
-		gnome_icon_list_get_icon_data(GNOME_ICON_LIST
-					      (bsmsg->attachments[1]), i);
+	       was strduped and never freed, so we'll take it. 
+	       A. Dreß, 2001/May/05: However, when printing a message from the
+	       composer, this will lead to a crash upon send as the resulting
+	       message will be unref'd after printing. */
+	    if (dup_filenames)
+		body->filename = 
+		    g_strdup((gchar *)
+			     gnome_icon_list_get_icon_data(GNOME_ICON_LIST
+							   (bsmsg->attachments[1]), i));
+		else
+		    body->filename = (gchar *)
+			gnome_icon_list_get_icon_data(GNOME_ICON_LIST
+						      (bsmsg->attachments[1]), i);
 
 	    libbalsa_message_append_part(message, body);
 	}
@@ -1796,7 +1805,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     if (balsa_app.debug)
 	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
 
-    message = bsmsg2message(bsmsg);
+    message = bsmsg2message(bsmsg, FALSE);
     fcc = message->fcc_mailbox 
 	? mblist_find_mbox_by_name(balsa_app.mblist, message->fcc_mailbox)
 	: NULL;
@@ -1857,7 +1866,7 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     LibBalsaMessage *message;
 
-    message = bsmsg2message(bsmsg);
+    message = bsmsg2message(bsmsg, FALSE);
 
     if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
         bsmsg->type == SEND_REPLY_GROUP))
@@ -1890,7 +1899,7 @@ print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 	_("Balsa has been compiled without gnome-print support.\n"
 	  "Printing is not possible."));
 #else
-    LibBalsaMessage *msg = bsmsg2message(bsmsg);
+    LibBalsaMessage *msg = bsmsg2message(bsmsg, TRUE);
     message_print(msg);
     gtk_object_destroy(GTK_OBJECT(msg));
 #endif

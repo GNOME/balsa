@@ -281,22 +281,44 @@ libbalsa_message_pathname(LibBalsaMessage * message)
     return CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno]->path;
 }
 
-const gchar *
-libbalsa_message_charset(LibBalsaMessage * message)
+static const gchar *
+libbalsa_message_body_charset(LibBalsaMessageBody * body)
 {
     gchar *charset = NULL;
 
-    LibBalsaMessageBody *body = message->body_list;
     while (body) {
-	charset = libbalsa_message_body_get_parameter(body, "charset");
+	libbalsa_lock_mutt();
+	charset = mutt_get_parameter("charset", body->mutt_body->parameter);
+	libbalsa_unlock_mutt();
+
+	if (charset)
+	    break;
+	
+	if (body->parts)
+	    charset = (gchar *)libbalsa_message_body_charset(body->parts);
 
 	if (charset)
 	    break;
 
 	body = body->next;
     }
-
     return charset;
+}
+
+const gchar *
+libbalsa_message_charset(LibBalsaMessage * message)
+{
+    LibBalsaMessageBody *body;
+
+    g_return_val_if_fail(message != NULL, NULL);
+    body = message->body_list;
+    g_return_val_if_fail(body != NULL, NULL);
+
+    if (body->charset) {
+	return g_strdup(body->charset);
+    } else {
+	return libbalsa_message_body_charset(body);
+    }
 }
 
 /* message_user_hdrs:
@@ -901,6 +923,7 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
     HEADER *msg_header;
 
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
+    g_return_val_if_fail(message->mailbox, FALSE);
     g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, FALSE);
 
     msg_header = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];

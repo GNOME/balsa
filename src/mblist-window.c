@@ -94,7 +94,7 @@ mblist_open_window (GnomeMDI * mdi)
       return;
     }
 
-  mblw = g_malloc (sizeof (MBListWindow));
+  mblw = g_malloc0 (sizeof (MBListWindow));
 
   mblw->window = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (mblw->window), "Mailboxes");
@@ -181,7 +181,7 @@ mblist_open_window (GnomeMDI * mdi)
 
 }
 
-void 
+void
 mblist_redraw ()
 {
   GtkCTreeNode *ctnode;
@@ -190,12 +190,13 @@ mblist_redraw ()
   if (!GTK_IS_CTREE (mblw->ctree))
     return;
 
-  gtk_ctree_remove (mblw->ctree, mblw->parent);
+  if (mblw->parent)
+    gtk_ctree_remove (mblw->ctree, mblw->parent);
 
   gtk_clist_freeze (GTK_CLIST (mblw->ctree));
 #ifndef GTK_HAVE_FEATURES_1_1_2
   mblw->parent = gtk_ctree_insert (mblw->ctree, NULL, NULL, text, 0, NULL,
-					NULL, NULL, NULL, FALSE, TRUE);
+				   NULL, NULL, NULL, FALSE, TRUE);
 #else
   mblw->parent = gtk_ctree_insert_node (mblw->ctree, NULL, NULL, text, 0, NULL,
 					NULL, NULL, NULL, FALSE, TRUE);

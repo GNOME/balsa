@@ -17,12 +17,11 @@ AM_INIT_AUTOMAKE(balsa, [$VERSION])
 
 AM_MAINTAINER_MODE
 AM_ACLOCAL_INCLUDE(macros)
+AC_ISC_POSIX
 
-
+AM_PATH_GLIB([1.2.0],,AC_MSG_ERROR([You need GLib installed -- GNOME requires this as well.]),gthread)
 GNOME_INIT
 
-
-AC_ISC_POSIX
 AC_PROG_CC
 AC_STDC_HEADERS
 AC_ARG_PROGRAM
@@ -107,6 +106,29 @@ AC_DEFINE(BALSA_SHOW_ALL),)
 dnl Enable information in the mailbox list
 AC_ARG_ENABLE(info, [  --enable-info           Enable mailbox info (broken) [default=no]],
 AC_DEFINE(BALSA_SHOW_INFO),)
+
+dnl Use threading
+AC_ARG_ENABLE(threads, [  --enable-threads        Use threading for mail retrieval (unstable) [default=no]],[
+	use_threads=$enableval
+],[
+	use_threads=no
+])
+
+AC_MSG_CHECKING([whether to use threads])
+if test x"$use_threads" = xyes ; then
+	AC_MSG_RESULT([yes])
+	if test ! -z `$GLIB_CONFIG --help 2>&1 |grep 'gthread'` ; then
+		THREAD_CFLAGS=`$GLIB_CONFIG --cflags gthread`
+		THREAD_LIBS=`$GLIB_CONFIG --libs gthread`
+		CFLAGS="$CFLAGS $THREAD_CFLAGS"
+		LIBS="$LIBS $THREAD_LIBS"
+		AC_DEFINE(BALSA_USE_THREADS,1)
+	else
+		AC_MSG_ERROR([Balsa requires GThread from GLib to use threading.])
+	fi
+else
+	AC_MSG_RESULT([no])
+fi
 
 dnl Create files.
 AC_OUTPUT([

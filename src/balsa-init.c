@@ -618,6 +618,12 @@ static void entry_changed_cb( GtkEntry *entry )
 
     gtk_object_set_data( GTK_OBJECT( page ), "mask", GINT_TO_POINTER( pagemask ) );
 
+    /* This cb can happen at odd times, and occasionally set the 
+       buttons to be sensitive at the wrong times: when this
+       page is not displayed. */
+    if( !GTK_WIDGET_VISIBLE( GTK_WIDGET( entry ) ) )
+	return;
+
     page = gtk_object_get_data( GTK_OBJECT( entry ), "druid" ); /*page is now the druid*/
     if( (pagemask & SET_ALL_DONE) == SET_ALL_DONE ) {
 	gnome_druid_set_buttons_sensitive( GNOME_DRUID( page ),

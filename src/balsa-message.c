@@ -3930,6 +3930,24 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
     return result;
 }
 
+/* Update the icon if necessary. */
+static void
+bm_set_icon(LibBalsaMessage * message)
+{
+    if (message->prot_state != LIBBALSA_MSG_PROTECT_NONE) {
+	GtkTreeIter iter;
+	GtkTreePath *path;
+
+	libbalsa_message_set_icons(message);
+	if (message->mailbox
+	    && libbalsa_mailbox_msgno_find(message->mailbox,
+					   message->msgno, &path, &iter)) {
+	    gtk_tree_model_row_changed(GTK_TREE_MODEL(message->mailbox),
+				       path, &iter);
+	    gtk_tree_path_free(path);
+	}
+    }
+}
 
 /*
  * Check for RFC3156 encrypted stuff when setting a message.
@@ -3987,9 +4005,8 @@ balsa_message_set_crypto(LibBalsaMessage * message)
     /* scan the message for signatures */
     message->prot_state = 
         balsa_message_scan_signatures(message->body_list, message);
-    if (message->prot_state != LIBBALSA_MSG_PROTECT_NONE)
-	libbalsa_message_set_icons(message);
-    /* FIXME: how can we speed up the refresh at this point? */
+    /* update the icon if necessary */
+    bm_set_icon(message);
 }
 
 
@@ -4168,9 +4185,7 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info)
     }
     
     /* update the icon if necessary */
-    if (bm->message->prot_state != LIBBALSA_MSG_PROTECT_NONE)
-	libbalsa_message_set_icons(bm->message);
-    /* FIXME: how can we speed up the refresh at this point? */
+    bm_set_icon(bm->message);
 
     return rfc2440_no_pubkey;
 }

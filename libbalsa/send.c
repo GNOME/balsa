@@ -283,9 +283,7 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 		       LibBalsaMailbox * fccbox, gint encoding)
 {
     MessageQueueItem *mqi;
-    LibBalsaMailboxImap *imapfccbox;
     LibBalsaServer *server;
-    char imappath[_POSIX_PATH_MAX];
 
 
     g_return_if_fail(message);
@@ -305,7 +303,6 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 	    mutt_write_fcc(libbalsa_mailbox_local_get_path(fccbox),
 			   mqi->message, NULL, 0, NULL);
 	    } else if (LIBBALSA_IS_MAILBOX_IMAP(fccbox)) {
-		imapfccbox = LIBBALSA_MAILBOX_IMAP(fccbox);
 		server = LIBBALSA_MAILBOX_REMOTE(fccbox)->server;
 		if(!CLIENT_CONTEXT_OPEN(fccbox)) /* Has not been opened */
 		{
@@ -329,11 +326,7 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 
 		/* Passwords are guaranteed to be set now */
 
-		snprintf(imappath, _POSIX_PATH_MAX, "{%s:%d}%s",
-		    server->host,
-		    server->port,
-		    imapfccbox->path);
-		mutt_write_fcc(imappath,
+		mutt_write_fcc(LIBBALSA_MAILBOX(fccbox)->url,
 			   mqi->message, NULL, 0, NULL);
 	    }
 	    libbalsa_unlock_mutt();

@@ -1,5 +1,8 @@
 2001-08-16  Carlos Morgado  <chbm@cprm.net>
 
+	* libbalsa/send.c: patch from Manuel McLure <manuel@mclure.org>
+	to use mailbox->url instead of reconstructing it
+
 	* src/store-address.c: fix from Ali Akcaagac to yesterday's
 	patch
 

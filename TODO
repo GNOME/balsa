@@ -1,5 +1,11 @@
 TODO LIST:
 
+/-------------\
+|key:         |
+| * = TODO    |
+| D = DONE    |
+| P = PARTIAL |
+\-------------/
 
 Things needed for Balsa v0.5 (for GNOME 1.0 release)
 Fix/update/make-sure-they-work:
@@ -13,16 +19,16 @@ New features/unfinished things:
  * update libmutt
 
 UI:
- * Mailbox in the main window (as a handle.. should be reparentable)
+ D Mailbox list in the main window (as a handle.. should be reparentable)
  * finish move and copy
  * put deleted items in the trash and remove them from the current clist
  * mailboxes with new mail should have bold text
- * DND (drag and drop)
+ P DND (drag and drop)
  * MIME supporting icons.  use the new gnome metadata stuff that gmc uses?
  * Use useful sounds
  * New mail notification
-     - via sound
-     - change icon window incase Balsa is minimized to a different icon
+     P via sound
+     * change icon window incase Balsa is minimized to a different icon
  * sending mail (code is awful, redo.  make useful for corba idl, support
      external editors)
  * auto-open mailboxes on startup

@@ -2,8 +2,6 @@
 
 	* src/balsa-index.c: Add sorting by sender and subject; use gtk+
 	methods to do the work. Simplify bndx_moveto (Manu).
-	* src/main-window.c: Grey the body button in the search dialog if
-	the mailbox is IMAP (IMAP does not support search in body). (Manu)
 
 2003-02-01  Pawel Salek  <pawsa@theochem.kth.se>
 

@@ -3,6 +3,7 @@ SGML_FILES = \
 
 EXTRA_DIST = \
 	topic.dat \
+	win-config-gen \
 	$(SGML_FILES)
 
 balsa_helpdir = $(gnomedatadir)/gnome/help/balsa/C

@@ -15,8 +15,8 @@ Source0:   balsa-%{PACKAGE_VERSION}.tar.bz2
 URL:       http://www.balsa.net/
 BuildRoot: /tmp/balsa-%{PACKAGE_VERSION}-root
 Packager: Pawel Salek <pawsa@theochem.kth.se>
-Requires: gtk+ >= 1.2.0
-Requires: gnome-libs >= 1.2.7
+Requires: gtk+ >= 1.2.7
+Requires: gnome-libs >= 1.2.0
 Provides: balsa
 Docdir: %{prefix}/doc
 
@@ -75,6 +75,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Oct 20 2000 Pawel Salek <pawsa@theochem.kth.se>
+
+- require gtk+>= 1.2.7, not gnome-libs. 
+
 * Fri Oct 20 2000 Pawel Salek <pawsa@theochem.kth.se>
 
 - require gnome-libs >= 1.2.7, earlier versions are buggy. drop building GSS.

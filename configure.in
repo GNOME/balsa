@@ -629,6 +629,25 @@ dnl ###########################################################################
 AC_SUBST(GLIB_GENMARSHAL)
 GLIB_GENMARSHAL=`pkg-config --variable=glib_genmarshal glib-2.0`
 
+
+dnl ###########################################################################
+dnl check if we should install our extra mime type icons in gnome's directory
+dnl (requires gtk+ > 2.4.0 and the proper folder) or for balsa only
+dnl ###########################################################################
+
+inst_gnome_icons="no"
+AC_MSG_CHECKING([whether to install extra icons globally])
+if $PKG_CONFIG --atleast-version=2.4.0 gtk+-2.0 ; then
+	GNOME_ICON_DIR=`$PKG_CONFIG --variable=prefix libgnomeui-2.0`/share/icons/gnome
+	if test -d $GNOME_ICON_DIR ; then
+		inst_gnome_icons="yes"
+		AC_SUBST(GNOME_ICON_DIR)
+	fi
+fi
+AC_MSG_RESULT($inst_gnome_icons)
+AM_CONDITIONAL([INSTALL_GNOME_ICONS], [test $inst_gnome_icons = "yes"])
+
+
 dnl ##########################################################################
 dnl Create files.
 dnl ##########################################################################
@@ -640,6 +659,7 @@ balsa.spec
 po/Makefile.in
 sounds/Makefile
 images/Makefile
+images/mimetypes/Makefile
 doc/Makefile
 doc/C/Makefile
 libbalsa/Makefile

@@ -1827,15 +1827,11 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
     /* get the pixbuf for the attachment's content type */
     is_fwd_message = forced_mime_type &&
 	!g_ascii_strncasecmp(forced_mime_type, "message/", 8) && is_a_temp_file;
-    if (is_fwd_message) {
-	pixbuf = gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-					BALSA_PIXMAP_FORWARD,
-					GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
+    if (is_fwd_message)
 	content_type = g_strdup(forced_mime_type);
-    } else
-	pixbuf = 
-	    libbalsa_icon_finder(forced_mime_type, filename, &content_type,
-				 GTK_ICON_SIZE_LARGE_TOOLBAR);
+    pixbuf = 
+	libbalsa_icon_finder(forced_mime_type, filename, &content_type,
+			     GTK_ICON_SIZE_LARGE_TOOLBAR);
 	
     /* create a new attachment info block */
     attach_data = balsa_attach_info_new(bsmsg);

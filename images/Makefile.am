@@ -1,3 +1,5 @@
+SUBDIRS = mimetypes
+
 # balsa_logo.png used by About menu (small one).
 # balsa-logo.png used by the init-druid
 balsa_IMGS = \

@@ -2797,17 +2797,10 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 #else
 	content_icon = NULL;
 #endif
-        if (!content_icon) {
-	    if (body->body_type == LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE)
-		content_icon = 
-		    gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-					   BALSA_PIXMAP_FORWARD,
-					   GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
-	    else
-		content_icon = 
-		    libbalsa_icon_finder(content_type, body->filename, NULL,
-					 GTK_ICON_SIZE_LARGE_TOOLBAR);
-	}
+        if (!content_icon)
+	    content_icon = 
+		libbalsa_icon_finder(content_type, body->filename, NULL,
+				     GTK_ICON_SIZE_LARGE_TOOLBAR);
         gtk_tree_store_set (GTK_TREE_STORE(model), iter, 
                             PART_INFO_COLUMN, info,
 			    PART_NUM_COLUMN, part_id,
@@ -2817,15 +2810,9 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
         g_object_unref(info);
         g_free(icon_title);
     } else {
-	if (body->body_type == LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE)
-	    content_icon = 
-		gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-				       BALSA_PIXMAP_FORWARD,
-				       GTK_ICON_SIZE_MENU, NULL);
-	else
-	    content_icon =
-		libbalsa_icon_finder(content_type, body->filename, NULL,
-				     GTK_ICON_SIZE_MENU);
+	content_icon =
+	    libbalsa_icon_finder(content_type, body->filename, NULL,
+				 GTK_ICON_SIZE_LARGE_TOOLBAR);
         gtk_tree_store_set (GTK_TREE_STORE(model), iter, 
                             PART_INFO_COLUMN, NULL,
 			    PART_NUM_COLUMN, part_id,
@@ -4392,9 +4379,7 @@ get_crypto_content_icon(LibBalsaMessageBody * body, const gchar * content_type,
     if ((libbalsa_message_body_protection(body) &
          (LIBBALSA_PROTECT_ENCRYPT | LIBBALSA_PROTECT_ERROR)) ==
         LIBBALSA_PROTECT_ENCRYPT)
-        return gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-                                      BALSA_PIXMAP_INFO_ENCR,
-                                      GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
+        return NULL;
 
     switch (gpgme_sigstat_to_protect_state(body)) {
     case LIBBALSA_MSG_PROTECT_SIGN_GOOD:

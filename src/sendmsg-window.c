@@ -59,8 +59,9 @@ create_toolbar (BalsaSendmsg * bsmw)
   tooltips = gtk_tooltips_new ();
 
   toolbar = gtk_toolbar_new (0, 0);
-  gtk_widget_realize (window);
+  gtk_toolbar_set_style (GTK_TOOLBAR (toolbar), balsa_app.toolbar_style);
 
+  gtk_widget_realize (window);
 
   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
 					   "Send", "Send", NULL,
@@ -131,11 +132,11 @@ create_menu (GtkWidget * window)
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 /*
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_OPEN, _ ("Attach File"));
-  gtk_widget_show (w);
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
-*/
+   w = gnome_stock_menu_item (GNOME_STOCK_MENU_OPEN, _ ("Attach File"));
+   gtk_widget_show (w);
+   gtk_menu_append (GTK_MENU (menu), w);
+   menu_items[i++] = w;
+ */
   w = gtk_menu_item_new ();
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
@@ -198,7 +199,7 @@ create_menu (GtkWidget * window)
   menu_items[i] = NULL;
 /*
    g_print ("%d menu items\n", i);
-*/
+ */
   gtk_window_add_accelerator_table (GTK_WINDOW (window), accel);
   return menubar;
 }

@@ -1,3 +1,21 @@
+2005-03-08 18:40 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* libbalsa/gmime-part-rfc2440.c: replace use of
+	g_mime_content_type_[gs]et_parameter() by
+	g_mime_object_[gs]et_content_type_parameter(), and
+	g_mime_part_get_content_type() by g_mime_object_get_content_type().
+
+2005-03-08 10:43  PeterB
+
+	* libbalsa/: mailbox.c, mailbox.h: remember that we loaded filters.
+	* src/filter-edit-callbacks.c: don't set empty filename; comment
+	out unused LIBESD condition.
+	* libbalsa/Makefile.am, libbalsa/filter-file.c, libbalsa/filter.h,
+	libbalsa/libbalsa-conf.c, libbalsa/libbalsa-conf.h,
+	libbalsa/mailbox-filter.c, src/save-restore.c: move all
+	GnomeConfigIterator code to (new) libbalsa-conf.c; implement
+	GnomeConfig version of libbalsa_conf_foreach_section.
+
 2005-03-04 19:56  Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* libbalsa/gmime-part-rfc2440.c, src/balsa-message.c,

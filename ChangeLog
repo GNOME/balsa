@@ -1,5 +1,7 @@
-2003-07-15 11:16  PeterB
+2003-07-15 11:40  PeterB
 
+	* src/sendmsg-window.c: Set locale only when menu item is
+	activated.
 	* src/spell-check.c: On error, signal the compose window so that it
 	can restore editability (fixes a bug that was reported--I can't
 	find the report right now).

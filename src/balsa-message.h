@@ -42,7 +42,6 @@ extern "C"
       GnomeCanvas canvas;
       GnomeCanvasGroup *headers;
       GnomeCanvasGroup *body;
-      GList *html;		/* list of xmhtml widgets */
 
       Message *message;
     };

@@ -48,7 +48,6 @@ balsa_LDADD = \
 	@LIBESD_LIB@	\
 	$(GNOME_LIBDIR) \
 	$(GNOMEUI_LIBS) \
-	$(GTKXMHTML_LIBS) \
 	$(top_builddir)/idl/libbalsasrv.a \
 	-lgnorba          \
 	$(ORB_LIBS)       \

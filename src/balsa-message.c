@@ -422,7 +422,7 @@ balsa_message_init(BalsaMessage * bm)
     GtkTreeStore *model;
     GtkCellRenderer *renderer;
     GtkTreeSelection *selection;
-    GtkStyle * text_style;
+    GtkStyle * border_style;
 
     /* Notebook to hold content + structure */
     bm->notebook = gtk_notebook_new();
@@ -447,13 +447,13 @@ balsa_message_init(BalsaMessage * bm)
     bm->header_container = bm_header_widget(bm);
 
     /* Make background of the view-port the same as the base color of the
-     * text (well, usually). */
+     * text. */
     text_view = g_object_get_data(G_OBJECT(bm->header_container),
 				  BALSA_MESSAGE_TEXT_VIEW);
-    text_style = gtk_style_copy(text_view->style);
-    text_style->bg[GTK_STATE_NORMAL] = text_style->base[GTK_STATE_NORMAL];
-    gtk_widget_set_style(bm->cont_viewport, text_style);
-    g_object_unref(text_style);
+    border_style = gtk_style_copy(gtk_rc_get_style(text_view));
+    border_style->bg[GTK_STATE_NORMAL] = border_style->base[GTK_STATE_NORMAL];
+    gtk_widget_set_style(bm->cont_viewport, border_style);
+    g_object_unref(border_style);
 
     /* Widget to hold message */
     message_widget = bm_message_widget(bm->header_container, FALSE);

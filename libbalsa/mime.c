@@ -25,6 +25,7 @@
 
 #include "libbalsa.h"
 #include "misc.h"
+#include "html.h"
 
 /* FIXME: The content of this file could go to message.c */
 
@@ -38,6 +39,7 @@ static GString *process_mime_multipart(LibBalsaMessage * message,
    returns string representation of given message part.
    NOTE: may return NULL(!).
 */
+
 GString *
 process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 		  gchar * reply_prefix_str, gint llen, gboolean ignore_html,
@@ -49,7 +51,11 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
     GString *reply = NULL;
     const GMimeContentType *type;
     GMimeStream *stream, *filter_stream;
+    GByteArray *array;
     const char *charset;
+    gboolean is_html;
+    gboolean is_enriched;
+    gboolean is_richtext;
 
     switch (libbalsa_message_body_type(body)) {
     case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
@@ -66,10 +72,18 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
 	type=g_mime_object_get_content_type(body->mime_part);
+
 	/* don't return text/html stuff... */
-	if (ignore_html && g_mime_content_type_is_type(type, "*", "html"))
+	is_html = g_mime_content_type_is_type(type, "text", "html");
+	is_enriched = g_mime_content_type_is_type(type, "text", "enriched");
+	is_richtext = g_mime_content_type_is_type(type, "text", "richtext");
+	if (ignore_html && (is_html || is_enriched || is_richtext))
 	    break;
+
 	stream = g_mime_stream_mem_new();
+	array = g_byte_array_new();
+	g_mime_stream_mem_set_byte_array(GMIME_STREAM_MEM(stream), array);
+
 	filter_stream = g_mime_stream_filter_new_with_stream(stream);
 	charset = libbalsa_message_body_charset(body);
 	if (!charset)
@@ -89,11 +103,29 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	    res = g_strdup("");
 	} else {
 	    g_mime_stream_write(stream, "", 1);
-	    res = GMIME_STREAM_MEM(stream)->buffer->data;
-	    GMIME_STREAM_MEM(stream)->owner = FALSE;
+	    res = g_byte_array_free(array, FALSE);
 	}
 	g_mime_stream_unref(filter_stream);
 	g_mime_stream_unref(stream);
+
+#ifdef HAVE_GTKHTML
+	if (is_html || is_enriched || is_richtext) {
+	    gchar *tmp;
+
+	    if (is_enriched || is_richtext) {
+		tmp = libbalsa_html_from_rich(res, allocated, is_richtext);
+		g_free(res);
+		res = tmp;
+		allocated = strlen(res);
+	    }
+
+	    tmp = libbalsa_html_to_string(res, allocated);
+	    if (tmp) {
+		g_free(res);
+		res = tmp;
+	    }
+	}
+#endif /* HAVE_GTKHTML */
 
 #ifdef HAVE_GPGME
 	/* if this is a RFC 2440 signed part, strip the signature status */
@@ -175,7 +207,10 @@ process_mime_multipart(LibBalsaMessage * message,
 	if (!s)
 	    continue;
 	if (res) {
-	    res = g_string_append(res, s->str);
+	    if (res->str[res->len - 1] != '\n')
+		g_string_append_c(res, '\n');
+	    g_string_append_c(res, '\n');
+	    g_string_append(res, s->str);
 	    g_string_free(s, TRUE);
 	} else
 	    res = s;

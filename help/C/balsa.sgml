@@ -202,6 +202,7 @@
 	      <guimenu>File</guimenu>
 	    </menuchoice>
 	  </term>
+
 	  <listitem>
 	    <para>This menu contains basic commands</para>
 
@@ -783,14 +784,15 @@
 	    list</interface></link> to bring it to the front.</para>
       
       <para>From the message index you can do a lot. Clicking on a
-	message will cause it to be displayed in the message
-	view. Right-clicking on it will give a pop-up menu letting you
-	reply to the message (or forward it, etc.) and move it to
-	another folder (using the Transfer menu item).  Double-clicking
-	on a message will open it in a separate window.</para>
+      message will cause it to be displayed in the message
+      view. Right-clicking on it will give a pop-up menu letting you
+      reply to the message (or forward it, etc.) and move it to
+      another folder (using the Transfer menu item).  Double-clicking
+      on a message will open it in a separate window.  Also, it is
+      possible to drag and drop messages from the index to other
+      mailboxes in the mailbox list and open mailbox tabs.</para>
 
-      <para>There are also pop up menu items for many of the same
-	functions.</para>
+      <para>The pop-up (context) menu contains the following items:</para>
 
       <variablelist>
         <varlistentry>
@@ -2599,11 +2601,31 @@
     <sect2 id="ct-move-msg">
       <title>Moving Messages</title>
 
-      <para>The easiest way to move messages around is to select them
-	in the <link linkend="subwin-msgindex">message index</link> and
-	use the Transfer context menu. It will let you choose a mailbox
-	in the <link linkend="subwin-mblist">mailbox list</link> and the
-	messages will be moved there. </para>
+      <para>There are several methods available for moving or copying
+      messages from one mailbox to another.  The first is via the
+      <guimenuitem>Transfer</guimenuitem> context menu, and the second
+      is using drag and drop.</para>
+
+      <para>To transfer messages using the
+      <guimenuitem>Transfer</guimenuitem> menu, simply select the
+      messages you desire to move from one mailbox, then bring up the
+      context menu and select the <guimenuitem>Transfer</guimenuitem>
+      submenu.  This will display a list of mailboxes similar to the
+      mailbox list in the main window.  The list can be scrolled and
+      trees expanded and collapsed, although these changes will not be
+      reflected in the main list.  Selecting a mailbox will start the
+      transfer.</para>
+
+      <para>The other method of transferring messages is to simply
+      drag and drop the message(s) from the message index to the
+      desired destination.  Select the message(s) you wish to
+      transfer, then drag them using the mouse until they are over the
+      intended mailbox.  The destination can either be in the mailbox
+      list in the main window, or if open mailbox tabs are enabled the
+      messages can be dragged to them.  Messages are copied by
+      default, but holding down the <keysym>Shift</keysym> key when
+      dropping the messages will move them instead.</para>
+
     </sect2>
 
     <sect2 id="ct-main-folder-imap">

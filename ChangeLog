@@ -1,3 +1,17 @@
+2001-01-20  Matthew Guenther  <guentherm@asme.org>
+
+	* TODO:  Update DND status.
+	* help/C/.cvsignore: Add some files to ignore that are created
+	when generating ps or rtf output.
+	* help/C/balsa.sgml: Add documentation about moving/copying
+	messages using drag and drop.
+	* src/balsa-index-page.c (balsa_index_page_window_init,
+	create_menu): Allow button2 to initiate DND, change "New" to
+	"Unread".
+	* src/balsa-mblist.c (balsa_mblist_init): Add signal handler for
+	"drag_motion", highlight mailboxes when attempting to receive a
+	drop.
+	
 2001-01-19  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/mailbox-conf.h: replace "libbalsa.h" with "mailbox-node.h"

@@ -105,6 +105,10 @@ static void mblist_drag_cb (GtkWidget* widget,
                             GdkDragContext* context, gint x, gint y,
                             GtkSelectionData* selection_data,
                             guint info, guint32 time, gpointer data);
+static gboolean mblist_drag_motion_cb (GtkWidget* mblist, 
+                                       GdkDragContext* context, 
+                                       gint x, gint y, guint time, 
+                                       gpointer user_data);
 
 
 guint
@@ -532,6 +536,10 @@ balsa_mblist_init(BalsaMBList * tree)
                        GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
     gtk_signal_connect (GTK_OBJECT (tree),"drag-data-received",
                         GTK_SIGNAL_FUNC (mblist_drag_cb), NULL);
+    gtk_signal_connect (GTK_OBJECT (tree), "drag-motion", 
+                        GTK_SIGNAL_FUNC (mblist_drag_motion_cb), 
+                        (gpointer) NULL);
+
     balsa_mblist_repopulate(tree);
 }
 
@@ -1382,4 +1390,27 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
     }
 
     g_list_free (messages);
+}
+
+
+static gboolean
+mblist_drag_motion_cb (GtkWidget* mblist, GdkDragContext* context, 
+                       gint x, gint y, guint time, gpointer user_data)
+{
+	gint row, col;
+	gint flag;
+
+	flag = gtk_clist_get_selection_info (GTK_CLIST (mblist), x, y, 
+                                             &row, &col);
+
+	if (flag) {
+		gtk_signal_handler_block_by_func (GTK_OBJECT (mblist),
+		GTK_SIGNAL_FUNC (select_mailbox), (gpointer) NULL);
+		
+		gtk_clist_select_row (GTK_CLIST (mblist), row - 1, col);
+		
+		gtk_signal_handler_unblock_by_func (GTK_OBJECT (mblist), GTK_SIGNAL_FUNC (select_mailbox), (gpointer) NULL);
+	}
+	
+	return FALSE;
 }

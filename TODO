@@ -25,11 +25,11 @@ status, etc.
 
 - [PARTIAL] finish move and copy
 
-- [PARTIAL] DND messages into mailboxes
- 	- [PARTIAL] Attachments in new mail
-     	- [PARTIAL] move/copy messages via DND
-       		- move
-       		- copy
+- [DONE] DND messages into mailboxes
+ 	- [DONE] Attachments in new mail
+     	- [DONE] move/copy messages via DND
+       		- [DONE] move
+       		- [DONE] copy
 
 - Fix mailbox creation/manipulation
 	- Add option to select type of desired local 

@@ -166,7 +166,8 @@ balsa_index_page_window_init(BalsaIndexPage * bip)
 		       (GtkSignalFunc) index_button_press_cb, bip);
 
     gtk_drag_source_set (index, 
-                         GDK_BUTTON1_MASK | GDK_SHIFT_MASK | GDK_CONTROL_MASK,
+                         GDK_BUTTON1_MASK | GDK_BUTTON2_MASK |
+                         GDK_SHIFT_MASK | GDK_CONTROL_MASK,
                          index_drag_types, ELEMENTS(index_drag_types),
                          GDK_ACTION_DEFAULT | GDK_ACTION_COPY | 
                          GDK_ACTION_MOVE);
@@ -562,7 +563,7 @@ create_menu(BalsaIndex * bindex)
     create_stock_menu_item( submenu, BALSA_PIXMAP_FLAGGED, _("Flagged"),
 			    balsa_message_toggle_flagged, bindex, TRUE);
      
-    create_stock_menu_item( submenu, BALSA_PIXMAP_ENVELOPE, _("New"),
+    create_stock_menu_item( submenu, BALSA_PIXMAP_ENVELOPE, _("Unread"),
 		    balsa_message_toggle_new, bindex, TRUE);
 
     gtk_widget_show(submenu);

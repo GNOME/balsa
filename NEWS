@@ -1,3 +1,9 @@
+* Balsa-1.3.4 release. Release date 2002-03-24
+
+- some MT fixes.
+- build fixes. Make some dependencies optional.
+- remove some double free()s.
+
 * Balsa-1.3.3 release. Release date 2002-03-04
 
 - filter incoming POP3 messages.

@@ -318,10 +318,13 @@ imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
   return rc;
 }
 
+#if USE_STRING_BUF	/* not used currently */
 struct string_buf {
   char *string;
   unsigned pos;
 };
+#endif
+#if USE_IMAP_APPEND_STR	/* not used currently */
 static size_t
 pass_str(char* buf, size_t sz, void*arg)
 {
@@ -334,12 +337,29 @@ pass_str(char* buf, size_t sz, void*arg)
   return cnt;
 }
 
+/* txt must be CRLF-encoded */
 ImapResponse
 imap_mbox_append_str(ImapMboxHandle *handle, const char *mbox,
                      ImapMsgFlags flags, size_t sz, char *txt)
 {
   char * s = txt;
   return imap_mbox_append(handle, mbox, flags, sz, pass_str, &s);
+}
+#endif
+
+static size_t
+pass_stream(char* buf, size_t sz, void*arg)
+{
+  return g_mime_stream_read((GMimeStream *) arg, buf, sz);
+}
+
+ImapResponse
+imap_mbox_append_stream(ImapMboxHandle *handle, const char *mbox,
+			ImapMsgFlags flags, GMimeStream *stream)
+{
+  return imap_mbox_append(handle, mbox, flags,
+			  g_mime_stream_length(stream), pass_stream,
+			  stream);
 }
 
 

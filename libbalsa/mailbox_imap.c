@@ -1563,8 +1563,9 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
 {
     ImapMsgFlags imap_flags = IMAP_FLAGS_EMPTY;
     ImapResponse rc;
-    gchar *mtext;
-    size_t len;
+    GMimeStream *stream;
+    GMimeStream *outstream;
+    GMimeFilter *crlffilter;
     ImapMboxHandle *handle;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), FALSE);
@@ -1583,16 +1584,25 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
 
     LOCK_MAILBOX_RETURN_VAL(mailbox, -1);
     
-    /* suck alert: use get_message_stream instead */
-    mtext = g_mime_message_to_string (message->mime_msg); 
-    len = strlen (mtext);
-
     handle = libbalsa_mailbox_imap_get_handle(LIBBALSA_MAILBOX_IMAP(mailbox));
-    rc = imap_mbox_append_str(handle, LIBBALSA_MAILBOX_IMAP(mailbox)->path,
-                              imap_flags, len, mtext);
+    stream = libbalsa_mailbox_get_message_stream(message->mailbox, message);
+
+    outstream = g_mime_stream_filter_new_with_stream(stream);
+    g_mime_stream_unref(stream);
+
+    crlffilter =
+	g_mime_filter_crlf_new(GMIME_FILTER_CRLF_ENCODE,
+			       GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+    g_mime_stream_filter_add(GMIME_STREAM_FILTER(outstream), crlffilter);
+    g_object_unref(crlffilter);
+
+    rc = imap_mbox_append_stream(handle,
+				 LIBBALSA_MAILBOX_IMAP(mailbox)->path,
+				 imap_flags, outstream);
+    g_mime_stream_unref(outstream);
+
     RELEASE_HANDLE(mailbox, handle);
 
-    g_free (mtext);
     g_object_unref ( G_OBJECT(message ) );    
     UNLOCK_MAILBOX(mailbox);
     

@@ -1,6 +1,8 @@
 #ifndef __IMAP_COMMANDS_H__
 #define __IMAP_COMMANDS_H__ 1
 
+#include <gmime/gmime.h>
+
 /* Any-State */
 int imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap);
 ImapResult imap_mbox_handle_noop(ImapMboxHandle *r);
@@ -24,8 +26,13 @@ typedef size_t (*ImapAppendFunc)(char*, size_t, void*);
 ImapResponse imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
                               ImapMsgFlags flags, size_t sz, 
                               ImapAppendFunc dump_cb,  void* arg);
+#if USE_IMAP_APPEND_STR /* not used currently */
 ImapResponse imap_mbox_append_str(ImapMboxHandle *handle, const char *mbox,
                               ImapMsgFlags flags, size_t sz, char *txt);
+#endif
+ImapResponse imap_mbox_append_stream(ImapMboxHandle * handle,
+				     const char *mbox, ImapMsgFlags flags,
+				     GMimeStream * stream);
 
 /* Selected State */
 ImapResult imap_mbox_search(ImapMboxHandle *h, const char* query);

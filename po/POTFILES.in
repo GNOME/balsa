@@ -26,7 +26,6 @@ libbalsa/mailbox_mh.c
 libbalsa/mailbox_pop3.c
 libbalsa/message.c
 libbalsa/mime.c
-libbalsa/pop3.c
 libbalsa/rfc3156.c
 libbalsa/send.c
 libbalsa/source-viewer.c

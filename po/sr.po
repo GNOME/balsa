@@ -8,8 +8,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-09-06 15:52+0200\n"
-"PO-Revision-Date: 2003-09-06 15:53+0200\n"
+"POT-Creation-Date: 2003-09-06 15:56+0200\n"
+"PO-Revision-Date: 2003-09-06 15:56+0200\n"
 "Last-Translator: Страхиња Радић <mr99164@alas.matf.bg.ac.yu>\n"
 "Language-Team: Serbian (sr) <serbiangnome-lista@nongnu.org>\n"
 "MIME-Version: 1.0\n"
@@ -463,10 +463,6 @@ msgstr "Изворно сандуче (%s) је само за читање. Не
 
 #: libbalsa/message.c:1023
 msgid "(No sibject)"
-msgstr "(без наслова)"
-
-#: libbalsa/message.c:1023
-msgid "(No subject)"
 msgstr "(без наслова)"
 
 #: libbalsa/mime.c:100 libbalsa/rfc3156.c:64

@@ -171,20 +171,18 @@ libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
 						(embedded_message->
 						 mime_part),
 						GMIME_DISPOSITION_INLINE);
+	g_mime_object_unref(GMIME_OBJECT(embedded_message));
     } else
     if (GMIME_IS_MULTIPART(mime_part))
     {
-	LibBalsaMessageBody *part=NULL;
+	LibBalsaMessageBody **part = &body->parts;
 	GList *child;
-	for (child=GMIME_MULTIPART(mime_part)->subparts; child; child=g_list_next(child))
+	for (child = GMIME_MULTIPART(mime_part)->subparts; child;
+	     child = child->next)
 	{
-	    if (!part) {
-		part=body->parts = libbalsa_message_body_new(body->message);
-	    } else {
-		part->next = libbalsa_message_body_new(body->message);
-		part=part->next;
-	    }
-	    libbalsa_message_body_set_mime_body(part, child->data);
+	    *part = libbalsa_message_body_new(body->message);
+	    libbalsa_message_body_set_mime_body(*part, child->data);
+	    part = &(*part)->next;
 	}
     }
 }

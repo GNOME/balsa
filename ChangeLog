@@ -1,5 +1,8 @@
-2004-09-28 05:47  PeterB
+2004-09-28 10:54  PeterB
 
+	* libbalsa/mailbox_mbox.c: use g_mime_object_get_header to verify
+	header offsets; use offset of MIME-Version header, if any, as
+	insertion point for status headers, if needed.
 	* libbalsa/mailbox_mbox.c: be more careful when locating Status and
 	X-Status headers.
 

@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-12-05 16:03+0000\n"
-"PO-Revision-Date: 2004-11-17 11:09+0100\n"
+"POT-Creation-Date: 2004-12-07 10:36+0100\n"
+"PO-Revision-Date: 2004-12-07 17:59+0100\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -75,31 +75,31 @@ msgstr "Nelze přidat duplikátní záznam"
 msgid "Unknown error"
 msgstr "Neznámá chyba"
 
-#: libbalsa/address.c:399
+#: libbalsa/address.c:444
 msgid "_Displayed Name:"
 msgstr "_Zobrazované jméno:"
 
-#: libbalsa/address.c:400
+#: libbalsa/address.c:445
 msgid "_First Name:"
 msgstr "_Křestní jméno:"
 
-#: libbalsa/address.c:402
+#: libbalsa/address.c:447
 msgid "_Middle Name:"
 msgstr "Pro_střední jméno:"
 
-#: libbalsa/address.c:404
+#: libbalsa/address.c:449
 msgid "_Last Name:"
 msgstr "_Příjmení:"
 
-#: libbalsa/address.c:405
+#: libbalsa/address.c:450
 msgid "_Nickname:"
 msgstr "Pře_zdívka:"
 
-#: libbalsa/address.c:406
+#: libbalsa/address.c:451
 msgid "O_rganization:"
 msgstr "_Organizace:"
 
-#: libbalsa/address.c:407
+#: libbalsa/address.c:452
 msgid "_Email Address:"
 msgstr "Adresa _elektronické pošty:"
 
@@ -2040,9 +2040,9 @@ msgid "(No sender)"
 msgstr "(žádný odesílatel)"
 
 #: src/balsa-message.c:1199
-#, fuzzy, c-format
+#, c-format
 msgid "Could not access message %ld in mailbox \"%s\"."
-msgstr "Nemohu pracovat se zprávou; poštovní schránka \"%s\" byla změněna."
+msgstr "Nemohu pracovat se zprávou %ld v poštovní schránce \"%s\"."
 
 #: src/balsa-message.c:1453 src/print.c:359 src/sendmsg-window.c:866
 #: src/sendmsg-window.c:2766
@@ -5875,9 +5875,6 @@ msgstr "Nahoru"
 #: src/toolbar-prefs.c:509
 msgid "Down"
 msgstr "Dolů"
-
-#~ msgid "E-mail"
-#~ msgstr "E-mail"
 
 #~ msgid "Error copying message to mailbox %s!"
 #~ msgstr "Chyba při kopírování zprávy do poštovní schránky %s!"

@@ -69,7 +69,6 @@ balsa_init (int argc, char **argv)
   balsa_mail_send balsa_servant;
   PortableServer_POA root_poa;
   PortableServer_POAManager pm;
-  CORBA_char *objref;
 
   CORBA_exception_init (&ev);
 
@@ -93,10 +92,8 @@ balsa_init (int argc, char **argv)
   PortableServer_POAManager_activate (pm, &ev);
   Exception (&ev);
 
-  objref = CORBA_ORB_object_to_string (orb, balsa_servant, &ev);
-
-  g_print ("%s\n", objref);
-  fflush (stdout);
+  goad_server_register(CORBA_OBJECT_NIL,
+		       balsa_servant, "balsa_mail_send", "server", &ev);
 }
 
 static void

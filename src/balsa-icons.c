@@ -98,6 +98,7 @@
 #include "pixmaps/menu_next_flagged.xpm"
 #include "pixmaps/menu_next_unread.xpm"
 #include "pixmaps/menu_mark_all.xpm"
+#include "pixmaps/menu_mark_all_read.xpm"
 
 #include "pixmaps/other_close.xpm"
 
@@ -180,6 +181,7 @@ register_balsa_pixmaps(void)
 	{ BALSA_PIXMAP_MENU_NEXT_FLAGGED,   menu_next_flagged_xpm},
 	{ BALSA_PIXMAP_MENU_NEXT_UNREAD,    menu_next_unread_xpm},
 	{ BALSA_PIXMAP_MENU_MARK_ALL,	    menu_mark_all_xpm},
+	{ BALSA_PIXMAP_MENU_MARK_ALL_READ,  menu_mark_all_read_xpm},
 
 	/* Other icons */
 	{ BALSA_PIXMAP_OTHER_CLOSE,		other_close_xpm},

@@ -1,3 +1,8 @@
+2004-01-25 Steve Wall
+
+	* src/balsa-icons.[hc]: add "mark all read" icon.
+	* src/main-window.c: add "mark all read" menu entry and action.
+
 2004-01-23 08:11  PeterB
 
 	* src/balsa-message.c: set message background correctly for all

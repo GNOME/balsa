@@ -189,6 +189,7 @@ static void select_all_cb(GtkWidget * widget, gpointer);
 static void message_copy_cb(GtkWidget * widget, gpointer data);
 static void message_select_all_cb(GtkWidget * widget, gpointer data);
 static void mark_all_cb(GtkWidget * widget, gpointer);
+static void mark_all_read_cb(GtkWidget * widget, gpointer);
 
 static void select_part_cb(BalsaMessage * bm, gpointer data);
 
@@ -609,18 +610,25 @@ static GnomeUIInfo mailbox_menu[] = {
         mark_all_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         BALSA_PIXMAP_MENU_MARK_ALL, 0, (GdkModifierType) 0, NULL
     },
+#define MENU_MAILBOX_MARK_ALL_READ_POS 6
+    {
+        GNOME_APP_UI_ITEM, N_("Mark all read"),
+        N_("Mark all messages in current mailbox as read"),
+        mark_all_read_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+        BALSA_PIXMAP_MENU_MARK_ALL_READ, 'R', GDK_MOD1_MASK|GDK_CONTROL_MASK, NULL
+    },
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_EDIT_POS 7
+#define MENU_MAILBOX_EDIT_POS 8
     GNOMEUIINFO_ITEM_STOCK(N_("_Edit..."), N_("Edit the selected mailbox"),
                            mailbox_conf_edit_cb,
                            GTK_STOCK_PREFERENCES),
-#define MENU_MAILBOX_DELETE_POS 8
+#define MENU_MAILBOX_DELETE_POS 9
     GNOMEUIINFO_ITEM_STOCK(N_("_Delete..."),
                            N_("Delete the selected mailbox"),
                            mailbox_conf_delete_cb,
                            GTK_STOCK_REMOVE),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_COMMIT_POS 10
+#define MENU_MAILBOX_COMMIT_POS 11
     GNOMEUIINFO_ITEM_STOCK(
         N_("Co_mmit Current"),
         N_("Commit the changes in the currently opened mailbox"),
@@ -631,21 +639,21 @@ static GnomeUIInfo mailbox_menu[] = {
         N_("Commit the changes in all mailboxes"),
         mailbox_commit_all,
         GTK_STOCK_REFRESH),
-#define MENU_MAILBOX_CLOSE_POS 12
+#define MENU_MAILBOX_CLOSE_POS 13
     GNOMEUIINFO_ITEM_STOCK(N_("_Close"), N_("Close mailbox"),
                            mailbox_close_cb, GTK_STOCK_CLOSE),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_EMPTY_TRASH_POS 14
+#define MENU_MAILBOX_EMPTY_TRASH_POS 15
     GNOMEUIINFO_ITEM_STOCK(N_("Empty _Trash"),
                            N_("Delete messages from the Trash mailbox"),
                            empty_trash, GTK_STOCK_REMOVE),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_APPLY_FILTERS 16
+#define MENU_MAILBOX_APPLY_FILTERS 17
     GNOMEUIINFO_ITEM_STOCK(N_("Edit/Apply _Filters"),
                            N_("Filter the content of the selected mailbox"),
                            filter_run_cb, GTK_STOCK_PROPERTIES),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_REMOVE_DUPLICATES 18
+#define MENU_MAILBOX_REMOVE_DUPLICATES 19
     GNOMEUIINFO_ITEM_STOCK(N_("_Remove Duplicates"),
                            N_("Remove duplicated messages "
                               "from the selected mailbox"),
@@ -1041,10 +1049,10 @@ enable_mailbox_menus(BalsaIndex * index)
     const static int mailbox_menu_entries[] = {
         MENU_MAILBOX_NEXT_POS,        MENU_MAILBOX_PREV_POS,
         MENU_MAILBOX_NEXT_UNREAD_POS, MENU_MAILBOX_NEXT_FLAGGED_POS,
-        MENU_MAILBOX_MARK_ALL_POS,    MENU_MAILBOX_DELETE_POS,
-        MENU_MAILBOX_EDIT_POS,        MENU_MAILBOX_COMMIT_POS,
-	MENU_MAILBOX_CLOSE_POS,       MENU_MAILBOX_APPLY_FILTERS,
-	MENU_MAILBOX_REMOVE_DUPLICATES
+        MENU_MAILBOX_MARK_ALL_POS,    MENU_MAILBOX_MARK_ALL_READ_POS,
+        MENU_MAILBOX_DELETE_POS,      MENU_MAILBOX_EDIT_POS,
+        MENU_MAILBOX_COMMIT_POS,      MENU_MAILBOX_CLOSE_POS,
+        MENU_MAILBOX_APPLY_FILTERS,   MENU_MAILBOX_REMOVE_DUPLICATES
     };
 
     const static int threading_menu_entries[] = {
@@ -3518,6 +3526,18 @@ mark_all_cb(GtkWidget * widget, gpointer data)
 
     gtk_widget_grab_focus(index);
     libbalsa_window_select_all(data);
+}
+
+static void
+mark_all_read_cb(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *index;
+
+    index = balsa_window_find_current_index(BALSA_WINDOW(data));
+    g_return_if_fail(index != NULL);
+
+    gtk_widget_grab_focus(index);
+    libbalsa_messages_read( BALSA_INDEX(index)->mailbox_node->mailbox->message_list, TRUE );
 }
 
 static void

@@ -70,6 +70,7 @@
 #define BALSA_PIXMAP_MENU_NEXT_FLAGGED		"balsa_menu_next_flagged"
 #define BALSA_PIXMAP_MENU_NEXT_UNREAD		"balsa_menu_next_unread"
 #define BALSA_PIXMAP_MENU_MARK_ALL		"balsa_menu_mark_all"
+#define BALSA_PIXMAP_MENU_MARK_ALL_READ		"balsa_menu_mark_all_read"
 
 #define BALSA_PIXMAP_OTHER_CLOSE		"balsa_other_close"
 

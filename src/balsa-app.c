@@ -1,4 +1,5 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
@@ -262,8 +263,9 @@ balsa_app_init(void)
     balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
     balsa_app.pwindow_option = WHILERETR;
     balsa_app.wordwrap = TRUE;
-    balsa_app.wraplength = 79;
+    balsa_app.wraplength = 72;
     balsa_app.browse_wrap = TRUE;
+    balsa_app.browse_wrap_length = 79;
     balsa_app.shown_headers = HEADERS_SELECTED;
     balsa_app.selected_headers = g_strdup(DEFAULT_SELECTED_HDRS);
     balsa_app.threading_type = BALSA_INDEX_THREADING_JWZ;
@@ -347,6 +349,10 @@ balsa_app_init(void)
     /* IMAP */
     balsa_app.check_imap = 1;
     balsa_app.check_imap_inbox = 0;
+
+    /* RFC2646 format=flowed */
+    balsa_app.recognize_rfc2646_format_flowed = TRUE;
+    balsa_app.send_rfc2646_format_flowed = TRUE;
 
     /* Message filing */
     balsa_app.folder_mru=NULL;

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -81,6 +81,7 @@ gint check_new_messages_auto_cb(gpointer data);
 void check_new_messages_cb(GtkWidget *, gpointer data);
 void check_new_messages_real(GtkWidget *, gpointer data, int type);
 void empty_trash(void);
+void update_view_menu(void);
 
 /* functions to manipulate the progress bars of the window */
 void balsa_window_increase_activity(BalsaWindow* window);

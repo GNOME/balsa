@@ -73,6 +73,7 @@ static void select_all_cb(GtkWidget * widget, gpointer);
 static void select_part_cb(BalsaMessage * bm, gpointer data);
 
 static void next_unread_cb(GtkWidget * widget, gpointer);
+static void next_flagged_cb(GtkWidget * widget, gpointer);
 static void print_cb(GtkWidget * widget, gpointer);
 static void trash_cb(GtkWidget * widget, gpointer);
 
@@ -264,6 +265,8 @@ message_window_new(LibBalsaMessage * message)
 				GTK_SIGNAL_FUNC(next_part_cb), mw);
     set_toolbar_button_callback(2, BALSA_PIXMAP_NEXT_UNREAD,
 				GTK_SIGNAL_FUNC(next_unread_cb), mw);
+    set_toolbar_button_callback(2, BALSA_PIXMAP_NEXT_FLAGGED,
+				GTK_SIGNAL_FUNC(next_flagged_cb), mw);
     set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_TRASH,
 				GTK_SIGNAL_FUNC(trash_cb), mw);
     set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_PRINT,
@@ -568,6 +571,31 @@ static void next_unread_cb(GtkWidget * widget, gpointer data)
     gtk_widget_destroy(GTK_WIDGET(mw->window));
     message_window_new(msg);
 }
+
+static void next_flagged_cb(GtkWidget * widget, gpointer data)
+{
+    MessageWindow *mw = (MessageWindow *) (data);
+    BalsaIndex *idx;
+    GtkCList *list;
+    LibBalsaMessage *msg;
+    
+    balsa_index_select_next_flagged(
+	idx=BALSA_INDEX(
+	    balsa_window_find_current_index(balsa_app.main_window)));
+    
+    list=GTK_CLIST(idx->ctree);
+    if(g_list_length(list->selection) != 1)
+	return;
+    
+    msg=LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(GTK_CTREE(list),
+						     list->selection->data));
+    if(!msg)
+	return;
+    
+    gtk_widget_destroy(GTK_WIDGET(mw->window));
+    message_window_new(msg);
+}
+
 
 static void print_cb(GtkWidget * widget, gpointer data)
 {

@@ -1,4 +1,5 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2001 Stuart Parmenter and others,
@@ -348,6 +349,296 @@ libbalsa_wrap_string(gchar * str, int width)
 	}
 	ptr++;
     }
+}
+
+/*
+ * implement RFC2646 `text=flowed' 
+ * first version by Emmanuel <e allaud wanadoo fr>
+ * this version by Peter <PeterBloomfield mindspring com>
+ *
+ * Note : the buffer pointed by par is not modified, the returned string
+ * is newly allocated (so we can directly wrap from message body)
+ * */
+
+#define MAX_WIDTH	997	/* enshrined somewhere */
+#define QUOTE_STRING	">"
+
+/*
+ * we'll use one routine to parse text into paragraphs
+ *
+ * if the text is coming off the wire, use the RFC specs
+ * if it's coming off the screen, don't destuff
+ * */
+static void
+unwrap_rfc2646(gchar * par, gboolean from_screen, GString ** result_p)
+{
+    gchar *str = NULL;
+    gchar **lines, **l;
+    gint ql = 0;
+
+    lines = l = g_strsplit(par, "\n", -1);
+
+    while (*lines) {
+        gint quote_level;
+        gboolean flowed;
+        gchar *pending = NULL;
+        gboolean tagged = FALSE;
+        gint tmp;
+
+        if (!str) {
+            str = *lines++;
+            ql = strspn(str, QUOTE_STRING);
+        }
+        quote_level = ql;
+        tmp = str[ql];
+        str[ql] = '\0';
+        *result_p = g_string_append(*result_p, str);
+        str[ql] = tmp;
+
+        do {
+            gchar *dq = &str[ql];
+            flowed = strcmp(dq, "-- ");
+            /* destuff if coming off the wire: */
+            if (!from_screen && *dq == ' ')
+                ++dq;
+            /* flush any pending line */
+            if (pending) {
+                if (!tagged) {
+                    /* 
+                     * insert a tagging character to show whether this
+                     * object is a paragraph or a fixed line
+                     *
+                     * we don't currently use this information, but we
+                     * might want to later
+                     *
+                     * it also serves to separate the quote string from
+                     * the text, which might begin with '>'
+                     * */
+                    *result_p = g_string_append_c(*result_p,
+                                                  flowed ? 'p' : 'f');
+                    tagged = TRUE;
+                }
+                *result_p = g_string_append(*result_p, pending);
+            }
+            /* hold this line as pending */
+            pending = dq;
+            flowed = flowed && *dq && dq[strlen(dq) - 1] == ' ';
+            if (!flowed || !*lines) {
+                str = NULL;
+                break;
+            }
+            str = *lines++;
+            ql = strspn(str, QUOTE_STRING);
+        } while (ql == quote_level);
+        /* 
+         * end of paragraph; either:
+         * - str has a new quote level; or
+         * - the last line was fixed, not flowed; or
+         * - we ran out of data.
+         *
+         * if it's a new quote level, we must trim trailing spaces from
+         * any pending line
+         * */
+        if (flowed && ql != quote_level) {
+            gchar *p = pending;
+            while (*p)
+                p++;
+            while (--p >= pending && *p == ' ');
+            *++p = '\0';
+        }
+        if (!tagged)
+            *result_p = g_string_append_c(*result_p, flowed ? 'p' : 'f');
+        *result_p = g_string_append(*result_p, pending);
+        *result_p = g_string_append_c(*result_p, '\n');
+    }
+
+    g_strfreev(l);
+}
+/*
+ * we'll use one routine to wrap the paragraphs
+ *
+ * if the text is going to the wire, use the RFC specs
+ * if it's going to the screen, don't space-stuff
+ * */
+static void
+dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
+               gboolean quote, GString ** result_p)
+{
+    gchar **lines, **l;
+
+    lines = l = g_strsplit(par, "\n", -1);
+
+    /* outer loop over paragraphs */
+    while (*lines) {
+        gchar *str, *quote_string;
+        size_t ql;
+
+        str = *lines++;
+        ql = strspn(str, QUOTE_STRING);
+        if (quote || ql) {
+            if (quote) {
+                gint tmp = str[ql];
+                str[ql] = '\0';
+                quote_string = g_strconcat(QUOTE_STRING, str, NULL);
+                str[ql] = tmp;
+            } else
+                quote_string = g_strndup(str, ql);
+        } else
+            quote_string = "";
+        /* skip over quote string and tag character: */
+        str += ql + 1;
+        /* one output line per middle loop */
+        do {                    /* ... while (*str); */
+            gboolean first_word = TRUE;
+            gchar *start = str;
+            gchar *line_break = start;
+            gint len = ql;
+
+            /* start of line: emit quote string */
+            *result_p = g_string_append(*result_p, quote_string);
+            if (quote)
+                ++len;
+            /* space-stuff if needed */
+            if (!to_screen
+                && (*str == ' ' || *str == QUOTE_STRING[0]
+                    || !strncmp(str, "From ", 5))) {
+                *result_p = g_string_append_c(*result_p, ' ');
+                ++len;
+            }
+            /* 
+             * wrapping strategy:
+             * break line into words, each with its trailing whitespace;
+             * emit words while they don't break the width;
+             *
+             * first word (with its trailing whitespace) is allowed to
+             * break the width
+             *
+             * one word per inner loop
+             * */
+            while (*str) {
+                while (*str && !isspace(*str) && len < MAX_WIDTH) {
+                    len++;
+                    str++;
+                }
+                while (len < MAX_WIDTH && isspace(*str)) {
+                    if (*str == '\t')
+                        len += 8 - len % 8;
+                    else
+                        len++;
+                    str++;
+                }
+                /*
+                 * to avoid some unnecessary space-stuffing,
+                 * we won't wrap at '>', ' ', or "From "
+                 * (we already passed any spaces, so just check for '>'
+                 * and "From ")
+                 * */
+                if (len < MAX_WIDTH && *str
+                    && (*str == QUOTE_STRING[0]
+                        || !strncmp(str, "From ", 5)))
+                    continue;
+
+                if (!*str || len > width) {
+                    gint tmp;
+                    /* allow an overlong first word, otherwise back up
+                     * str */
+                    if (len > width && !first_word)
+                        str = line_break;
+                    tmp = *str;
+                    *str = '\0';
+                    *result_p = g_string_append(*result_p, start);
+                    *str = tmp;
+                    break;
+                }
+                first_word = FALSE;
+                line_break = str;
+            }                   /* end of loop over words */
+            /* 
+             * make sure that a line ending in whitespace ends in an
+             * actual ' ' 
+             * */
+            if (str > start && isspace(str[-1]) && str[-1] != ' ')
+                *result_p = g_string_append_c(*result_p, ' ');
+            *result_p = g_string_append_c(*result_p, '\n');
+        } while (*str);         /* end of loop over output lines */
+
+        if (*quote_string)
+            g_free(quote_string);
+    }                           /* end of paragraph */
+
+    g_strfreev(l);
+}
+
+/* libbalsa_process_text_rfc2646:
+   re-wraps given flowed string to required width.
+   FIXME: parameters?
+*/
+GString *
+libbalsa_process_text_rfc2646(gchar * par, gint width,
+                              gboolean from_screen,
+                              gboolean to_screen, gboolean quote)
+{
+    gchar *str;
+    GString *result = g_string_new(NULL);
+
+    str = g_strndup(par, 20);
+    printf("libbalsa_process_text_rfc2646:\n");
+    printf(" par = <%s...>\n", str);
+    printf(" width = %d, quote = %s, from = %s, to = %s\n", width,
+           quote ? "TRUE" : "FALSE", from_screen ? "TRUE" : "FALSE",
+           to_screen ? "TRUE" : "FALSE");
+    g_free(str);
+
+    unwrap_rfc2646(par, from_screen, &result);
+    str = result->str;
+    g_string_free(result, FALSE);
+
+    result = g_string_new(NULL);
+    dowrap_rfc2646(str, width, to_screen, quote, &result);
+    g_free(str);
+
+    return result;
+}
+
+/* libbalsa_wrap_rfc2646:
+   wraps given string using soft breaks according to rfc2646
+*/
+gchar *
+libbalsa_wrap_rfc2646(gchar * par, gint width, gboolean from_screen,
+                      gboolean to_screen)
+{
+    GString *result;
+    gchar *str;
+
+    result = libbalsa_process_text_rfc2646(par, width, from_screen,
+                                           to_screen, FALSE);
+    str = result->str;
+    g_string_free(result, FALSE);
+
+    return str;
+}
+
+/* libbalsa_flowed_rfc2646:
+ * test whether a message body is format=flowed
+ * */
+gboolean
+libbalsa_flowed_rfc2646(LibBalsaMessageBody * body)
+{
+    gchar *content_type;
+    gchar *format;
+    gboolean flowed;
+
+    content_type = libbalsa_message_body_get_content_type(body);
+    if (g_strcasecmp(content_type, "text/plain"))
+        flowed = FALSE;
+    else {
+        format = libbalsa_message_body_get_parameter(body, "format");
+        flowed = format && (g_strcasecmp(format, "flowed") == 0);
+        g_free(format);
+    }
+    g_free(content_type);
+
+    return flowed;
 }
 
 /* libbalsa_set_charset:

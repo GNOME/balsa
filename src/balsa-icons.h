@@ -35,6 +35,8 @@
 
 #define BALSA_PIXMAP_NEXT_UNREAD	"next_unread"
 #define BALSA_PIXMAP_NEXT_UNREAD_MENU	"next_unread_menu"
+#define BALSA_PIXMAP_NEXT_FLAGGED       "next_flagged"
+#define BALSA_PIXMAP_NEXT_FLAGGED_MENU  "next_flagged_menu"
 
 #define BALSA_PIXMAP_MAIL_RPL_ALL	"reply_to_all"
 #define BALSA_PIXMAP_MAIL_RPL_ALL_MENU	"reply_to_all_menu"

@@ -1,4 +1,5 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2000 Stuart Parmenter and others,
@@ -29,9 +30,10 @@
 /* FIXME: The content of this file could go to message.c */
 
 static GString *process_mime_multipart(LibBalsaMessage * message,
-				       LibBalsaMessageBody * body,
+                                       LibBalsaMessageBody * body,
 				       gchar * reply_prefix_str,
-				       gint llen, gboolean ignore_html);
+				       gint llen, gboolean ignore_html,
+                                       gboolean flow);
 
 /* process_mime_part:
    returns string representation of given message part.
@@ -39,7 +41,8 @@ static GString *process_mime_multipart(LibBalsaMessage * message,
 */
 GString *
 process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
-		  gchar * reply_prefix_str, gint llen, gboolean ignore_html)
+		  gchar * reply_prefix_str, gint llen, gboolean ignore_html,
+                  gboolean flow)
 {
     FILE *part;
     size_t alloced;
@@ -56,8 +59,8 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
     case LIBBALSA_MESSAGE_BODY_TYPE_VIDEO:
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
-	reply = process_mime_multipart(message, body, reply_prefix_str, 
-				       llen, ignore_html);
+        reply = process_mime_multipart(message, body, reply_prefix_str,
+                                       llen, ignore_html, flow);
 	break;
     case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
 	/* don't return text/html stuff... */
@@ -74,12 +77,25 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	fclose(part);
 	if (!res)
 	    break;
+
 	if (llen > 0) {
+            if (flow && libbalsa_flowed_rfc2646(body)) {
+                /* we're making a `format=flowed' message, and the
+                 * message we're quoting was flowed
+                 *
+                 * we'll assume it's going to the screen */
+                reply =
+                    libbalsa_process_text_rfc2646(res, llen, FALSE, TRUE,
+                                                  reply_prefix_str !=
+                                                  NULL);
+                g_free(res);
+                break;
+            }
 	    if (reply_prefix_str)
 		llen -= strlen(reply_prefix_str);
 	    libbalsa_wrap_string(res, llen);
 	}
-	if (reply_prefix_str) {
+        if (reply_prefix_str || flow) {
 	    gchar *str, *ptr;
 	    /* prepend the prefix to all the lines */
 
@@ -89,7 +105,18 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 		ptr = strchr(str, '\n');
 		if (ptr)
 		    *ptr = '\0';
+                if (reply_prefix_str)
 		reply = g_string_append(reply, reply_prefix_str);
+                if (flow) {
+                    gchar *p;
+                    /* we're making a `format=flowed' message, but the
+                     * message we're quoting was `format=fixed', so we
+                     * must make sure all lines are `fixed'--that is,
+                     * trim any trailing ' ' characters */
+                    for (p = str; *p; ++p);
+                    while (*--p == ' ');
+                    *++p = '\0';
+                }
 		reply = g_string_append(reply, str);
 		reply = g_string_append_c(reply, '\n');
 		str = ptr;
@@ -104,16 +131,16 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 
 static GString *
 process_mime_multipart(LibBalsaMessage * message,
-		       LibBalsaMessageBody * body,
+                       LibBalsaMessageBody * body,
 		       gchar * reply_prefix_str, gint llen,
-		       gboolean ignore_html)
+		       gboolean ignore_html, gboolean flow)
 {
     LibBalsaMessageBody *part;
     GString *res = NULL, *s;
 
     for (part = body->parts; part; part = part->next) {
 	s = process_mime_part(message, part, reply_prefix_str, llen,
-			      ignore_html);
+                          ignore_html, flow);
 	if (!s)
 	    continue;
 	if (res) {
@@ -127,7 +154,7 @@ process_mime_multipart(LibBalsaMessage * message,
 
 GString *
 content2reply(LibBalsaMessage * message, gchar * reply_prefix_str,
-	      gint llen, gboolean ignore_html)
+	      gint llen, gboolean ignore_html, gboolean flow)
 {
     LibBalsaMessageBody *body;
     GString *reply = NULL, *res;
@@ -135,7 +162,7 @@ content2reply(LibBalsaMessage * message, gchar * reply_prefix_str,
     body = message->body_list;
     for (body = message->body_list; body; body = body->next) {
 	res = process_mime_part(message, body, reply_prefix_str, llen,
-				ignore_html);
+                                ignore_html, flow);
 	if (!res)
 	    continue;
 	if (reply) {

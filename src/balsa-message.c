@@ -1,4 +1,5 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
@@ -1619,9 +1620,18 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	
 	fnt = find_body_font(info->body);
 
-	if (bm->wrap_text)
-	    libbalsa_wrap_string(ptr, balsa_app.wraplength);
-	
+    if (bm->wrap_text) {
+        if (balsa_app.recognize_rfc2646_format_flowed
+            && libbalsa_flowed_rfc2646(info->body)) {
+            gchar *tmp =
+                libbalsa_wrap_rfc2646(ptr, balsa_app.browse_wrap_length, FALSE,
+                                      TRUE);
+            g_free(ptr);
+            ptr = tmp;
+        } else
+            libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
+    }
+
 	if (!fnt)
 	    fnt = gdk_fontset_load(balsa_app.message_font);
 	
@@ -2572,10 +2582,12 @@ handle_mdn_request(LibBalsaMessage *message)
 			      balsa_app.encoding_style,  
 			      balsa_app.smtp_server,
 			      balsa_app.smtp_authctx,
-			      balsa_app.smtp_tls_mode);
+			      balsa_app.smtp_tls_mode,
+			      balsa_app.send_rfc2646_format_flowed);
 #else
 	libbalsa_message_send(mdn, balsa_app.outbox, NULL,
-			      balsa_app.encoding_style);
+			      balsa_app.encoding_style,
+			      balsa_app.send_rfc2646_format_flowed);
 #endif
 	gtk_object_destroy(GTK_OBJECT(mdn));
     }
@@ -2732,10 +2744,12 @@ static void send_mdn_reply (GtkWidget *widget, gpointer user_data)
 			  balsa_app.encoding_style,  
 			  balsa_app.smtp_server,
 			  balsa_app.smtp_authctx,
-			  balsa_app.smtp_tls_mode);
+			  balsa_app.smtp_tls_mode,
+			  balsa_app.send_rfc2646_format_flowed);
 #else
     libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
-			  balsa_app.encoding_style);  
+			  balsa_app.encoding_style,
+			  balsa_app.send_rfc2646_format_flowed);
 #endif
     gtk_object_destroy(GTK_OBJECT(send_msg));
     gtk_widget_hide (dialog);

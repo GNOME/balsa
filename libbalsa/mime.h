@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,9 +30,9 @@
 GString *process_mime_part(LibBalsaMessage * message,
 			   LibBalsaMessageBody * body,
 			   gchar * reply_prefix_str, gint llen,
-			   gboolean ignore_html);
+			   gboolean ignore_html, gboolean flow);
 GString *content2reply(LibBalsaMessage * message,
 		       gchar * reply_prefix_str, gint llen,
-		       gboolean ignore_html);	/* arp */
+		       gboolean ignore_html, gboolean flow);	/* arp */
 
 #endif				/* __LIBBALSA_MIME_H__ */

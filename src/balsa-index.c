@@ -963,6 +963,55 @@ balsa_index_select_next_unread(BalsaIndex * bindex)
     }
 }
 
+/* balsa_index_select_next_flagged:
+ * 
+ * search for the next flagged in the current mailbox.
+ * wraps over if the selected message was the last one.
+ * */
+void
+balsa_index_select_next_flagged(BalsaIndex * bindex)
+{
+    GtkCList *clist;
+    LibBalsaMessage *message;
+    gint h, start_row;
+    
+    g_return_if_fail(bindex != NULL);
+    clist = GTK_CLIST(bindex->ctree);
+    
+    if ((h = balsa_index_get_largest_selected(clist) + 1) <= 0)
+	h = 0;
+    
+    if (h >= clist->rows)
+	h = 0;
+    
+    start_row = h;
+    
+    while (h < clist->rows) {
+	message = LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, h));
+	if (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED) {
+	    balsa_index_select_row(bindex, h);
+	    return;
+	}
+	++h;
+    }
+
+    /* We couldn't find it below our start position, try starting from
+     * the beginning.
+     * */
+    h = 0;
+    
+    while (h < start_row) {
+	message = LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, h));
+	
+	if (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED) {
+	    balsa_index_select_row(bindex, h);
+	    return;
+	}
+	++h;
+    }
+}
+
+
 /* balsa_index_select_previous:
  * 
  * selects previous message or first message when no messages are selected.

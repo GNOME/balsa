@@ -1,4 +1,5 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2001 Stuart Parmenter and others,
@@ -159,7 +160,8 @@ static guint balsa_send_message_real(SendMessageInfo* info);
 static void encode_descriptions(BODY * b);
 static gboolean libbalsa_create_msg(LibBalsaMessage * message,
 				    HEADER * msg, char *tempfile,
-				    gint encoding, int queu);
+				    gint encoding, gboolean flow,
+				    int queu);
 
 #ifdef BALSA_USE_THREADS
 void balsa_send_thread(MessageQueueItem * first_message);
@@ -231,7 +233,8 @@ encode_descriptions (BODY *b)
 }
 
 static BODY *
-add_mutt_body_plain(const gchar * charset, gint encoding_style)
+add_mutt_body_plain(const gchar * charset, gint encoding_style, 
+		    gboolean flow)
 {
     BODY *body;
     gchar buffer[PATH_MAX];
@@ -246,10 +249,10 @@ add_mutt_body_plain(const gchar * charset, gint encoding_style)
     body->use_disp = 0;
 
     body->encoding = encoding_style;
-    body->parameter = mutt_new_parameter();
-    body->parameter->attribute = g_strdup("charset");
-    body->parameter->value = g_strdup(charset);
-    body->parameter->next = NULL;
+
+    mutt_set_parameter("charset", charset, &body->parameter);
+    if (flow)
+	mutt_set_parameter("format", "flowed", &body->parameter);
 
     mutt_mktemp(buffer);
     body->filename = g_strdup(buffer);
@@ -279,7 +282,8 @@ static void dump_queue(const char*msg)
 */
 void
 libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
-		       LibBalsaMailbox * fccbox, gint encoding)
+		       LibBalsaMailbox * fccbox, gint encoding,
+		       gboolean flow)
 {
     MessageQueueItem *mqi;
     LibBalsaServer *server;
@@ -290,7 +294,7 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
     mqi = msg_queue_item_new(message);
     set_option(OPTWRITEBCC);
     if (libbalsa_create_msg(message, mqi->message,
-			    mqi->tempfile, encoding, 0)) {
+			    mqi->tempfile, encoding, flow, 0)) {
 	libbalsa_lock_mutt();
 	mutt_write_fcc(libbalsa_mailbox_local_get_path(outbox),
 		       mqi->message, NULL, 0, NULL);
@@ -346,21 +350,24 @@ gboolean
 libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
 		      LibBalsaMailbox* fccbox, gint encoding,
 		      gchar* smtp_server, auth_context_t smtp_authctx,
-		      gint tls_mode)
+		      gint tls_mode, gboolean flow)
 {
     if (message != NULL)
-	libbalsa_message_queue(message, outbox, fccbox, encoding);
-    return libbalsa_process_queue(outbox, encoding, smtp_server, smtp_authctx,
-                                  tls_mode);
+	libbalsa_message_queue(message, outbox, fccbox, encoding,
+			       flow);
+    return libbalsa_process_queue(outbox, encoding, smtp_server,
+				  smtp_authctx, tls_mode, flow);
 }
 #else
 gboolean
 libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
-		      LibBalsaMailbox* fccbox, gint encoding)
+		      LibBalsaMailbox* fccbox, gint encoding,
+		      gboolean flow)
 {
     if (message != NULL)
-	libbalsa_message_queue(message, outbox, fccbox, encoding);
-    return libbalsa_process_queue(outbox, encoding);
+	libbalsa_message_queue(message, outbox, fccbox, encoding,
+			       flow);
+    return libbalsa_process_queue(outbox, encoding, flow);
 }
 #endif
 
@@ -432,7 +439,7 @@ libbalsa_message_cb (void **buf, int *len, void *arg)
 gboolean 
 libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding, 
 		       gchar* smtp_server, auth_context_t smtp_authctx,
-		       gint tls_mode)
+		       gint tls_mode, gboolean flow)
 {
     MessageQueueItem *new_message;
     SendMessageInfo *send_message_info;
@@ -479,7 +486,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 
 	new_message = msg_queue_item_new(queu);
 	if (!libbalsa_create_msg(queu, new_message->message,
-				 new_message->tempfile, encoding, 1)) {
+				 new_message->tempfile, encoding, 
+				 flow, 1)) {
 	    msg_queue_item_destroy(new_message);
 	} else {
 	    total_messages_left++;
@@ -800,7 +808,8 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
    handler does that.
 */
 gboolean 
-libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding)
+libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding, 
+		       gboolean flow)
 {
     MessageQueueItem *mqi, *new_message;
     SendMessageInfo *send_message_info;
@@ -1141,7 +1150,8 @@ gboolean
 libbalsa_message_postpone(LibBalsaMessage * message,
 			  LibBalsaMailbox * draftbox,
 			  LibBalsaMessage * reply_message,
-			  gchar * fcc, gint encoding) {
+			  gchar * fcc, gint encoding,
+			  gboolean flow) {
     HEADER *msg;
     BODY *last, *newbdy;
     gchar *tmp;
@@ -1199,7 +1209,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 		g_strfreev(mime_type);
 	    }
 	} else if (body->buffer) {
-	    newbdy = add_mutt_body_plain(body->charset, encoding);
+	    newbdy = add_mutt_body_plain(body->charset, encoding, flow);
 	    if (body->mime_type) {
 		/* change the type and subtype within the mutt body */
 		gchar *type, *subtype;
@@ -1304,9 +1314,10 @@ libbalsa_message_postpone(LibBalsaMessage * message,
    copies message to msg.
    PS: seems to be broken when queu == 1 - further execution of
    mutt_free_header(mgs) leads to crash.
-*/ static gboolean
+*/ 
+static gboolean
 libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
-		    gint encoding, int queu) {
+		    gint encoding, gboolean flow, int queu) {
     BODY *last, *newbdy;
     FILE *tempfp;
     HEADER *msg_tmp;
@@ -1389,7 +1400,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 		g_strfreev(mime_type);
 	    }
 	} else if (body->buffer) {
-	    newbdy = add_mutt_body_plain(body->charset, encoding);
+	    newbdy = add_mutt_body_plain(body->charset, encoding, flow);
 	    if (body->mime_type) {
 		/* change the type and subtype within the mutt body */
 		gchar *type, *subtype;

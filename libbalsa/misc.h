@@ -1,4 +1,5 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2001 Stuart Parmenter and others,
@@ -43,14 +44,23 @@ gchar *libbalsa_deescape_specials(const gchar* str);
 
 gboolean libbalsa_find_word(const gchar * word, const gchar * str);
 void libbalsa_wrap_string(gchar * str, int width);
+GString *libbalsa_process_text_rfc2646(gchar * par, gint width,
+                                       gboolean from_screen,
+                                       gboolean to_screen,
+                                       gboolean quote);
+gchar *libbalsa_wrap_rfc2646(gchar * par, gint width,
+                             gboolean from_screen, gboolean to_screen);
+gboolean libbalsa_flowed_rfc2646(LibBalsaMessageBody * body);
 
 const char* libbalsa_set_charset(const gchar * charset);
 #if ENABLE_ESMTP
 gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 				gchar* smtp_server,
-				auth_context_t smtp_authctx, gint tls_mode);
+				auth_context_t smtp_authctx, gint tls_mode,
+				gboolean rfc2646);
 #else
-gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding);
+gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
+				gboolean rfc2646);
 #endif
 void libbalsa_marshal_POINTER__NONE(GtkObject *object, GtkSignalFunc func,
 				gpointer func_data, GtkArg *args);

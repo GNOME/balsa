@@ -183,24 +183,25 @@ gboolean balsa_postpone_message(LibBalsaMessage * message,
 				gchar * fcc);
 void libbalsa_message_queue(LibBalsaMessage* message, 
 			    LibBalsaMailbox* outbox, LibBalsaMailbox* fccbox,
-			    gint encoding);
+			    gint encoding, gboolean flow);
 #if ENABLE_ESMTP
 gboolean libbalsa_message_send(LibBalsaMessage* message,
 			       LibBalsaMailbox* outbox,  
 			       LibBalsaMailbox* fccbox,
 			       gint encoding, gchar* smtp_server,
 			       auth_context_t smtp_authctx,
-			       gint tls_mode);
+			       gint tls_mode, gboolean flow);
 #else
 gboolean libbalsa_message_send(LibBalsaMessage* message,
 			       LibBalsaMailbox* outbox,  
 			       LibBalsaMailbox* fccbox,
-			       gint encoding);
+			       gint encoding, gboolean flow);
 #endif
 gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 				   LibBalsaMailbox * draftbox,
 				   LibBalsaMessage * reply_message,
-				   gchar * fcc, gint encoding);
+				   gchar * fcc, gint encoding, 
+				   gboolean flow);
 
 /*
  * misc message releated functions

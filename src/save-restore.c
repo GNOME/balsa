@@ -1,4 +1,5 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
@@ -505,6 +506,8 @@ config_global_load(void)
     g_free(balsa_app.quote_regex);
     balsa_app.quote_regex =
 	gnome_config_get_string("QuoteRegex=" DEFAULT_QUOTE_REGEX);
+    balsa_app.recognize_rfc2646_format_flowed =
+	gnome_config_get_bool("RecognizeRFC2646FormatFlowed=true");
 
     {
 	int i;
@@ -535,6 +538,9 @@ config_global_load(void)
 
     /* ... wrap words */
     balsa_app.browse_wrap = gnome_config_get_bool("WordWrap=true");
+    balsa_app.browse_wrap_length = gnome_config_get_int("WordWrapLength=79");
+    if (balsa_app.browse_wrap_length < 40)
+	balsa_app.browse_wrap_length = 40;
 
     gnome_config_pop_prefix();
 
@@ -661,9 +667,11 @@ config_global_load(void)
     /* ... outgoing mail */
     balsa_app.encoding_style = gnome_config_get_int("EncodingStyle=2");
     balsa_app.wordwrap = gnome_config_get_bool("WordWrap=true");
-    balsa_app.wraplength = gnome_config_get_int("WrapLength=75");
+    balsa_app.wraplength = gnome_config_get_int("WrapLength=72");
     if (balsa_app.wraplength < 40)
 	balsa_app.wraplength = 40;
+    balsa_app.send_rfc2646_format_flowed =
+	gnome_config_get_bool("SendRFC2646FormatFlowed=true");
     balsa_app.reply_strip_html = 
 	gnome_config_get_bool("StripHtmlInReply=true");
     balsa_app.forward_attached = 
@@ -801,9 +809,12 @@ gint config_save(void)
     gnome_config_set_string("SelectedHeaders", balsa_app.selected_headers);
     gnome_config_set_int("ThreadingType", balsa_app.threading_type);
     gnome_config_set_string("QuoteRegex", balsa_app.quote_regex);
+    gnome_config_set_bool("RecognizeRFC2646FormatFlowed", 
+			  balsa_app.recognize_rfc2646_format_flowed);
     gnome_config_set_string("MessageFont", balsa_app.message_font);
     gnome_config_set_string("SubjectFont", balsa_app.subject_font);
     gnome_config_set_bool("WordWrap", balsa_app.browse_wrap);
+    gnome_config_set_int("WordWrapLength", balsa_app.browse_wrap_length);
 
     for(i=0;i<MAX_QUOTED_COLOR;i++) {
 	gchar *text = g_strdup_printf("QuotedColor%d", i);
@@ -897,6 +908,8 @@ gint config_save(void)
    gnome_config_set_int("EncodingStyle", balsa_app.encoding_style);
     gnome_config_set_bool("WordWrap", balsa_app.wordwrap);
     gnome_config_set_int("WrapLength", balsa_app.wraplength);
+    gnome_config_set_bool("SendRFC2646FormatFlowed",
+			   balsa_app.send_rfc2646_format_flowed);
     gnome_config_set_bool("StripHtmlInReply", balsa_app.reply_strip_html);
     gnome_config_set_bool("ForwardAttached", balsa_app.forward_attached);
 

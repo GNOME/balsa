@@ -37,6 +37,9 @@
 #include "pixmaps/next_unread.xpm"
 #include "pixmaps/next_unread_menu.xpm"
 
+#include "pixmaps/next_flagged.xpm"
+#include "pixmaps/next_flagged_menu.xpm"
+
 #include "pixmaps/reply_to_all.xpm"
 #include "pixmaps/reply_to_all_menu.xpm"
 #include "pixmaps/reply_to_group.xpm"
@@ -201,6 +204,10 @@ register_balsa_pixmaps(void)
 			  24, 24);
     register_balsa_pixmap(BALSA_PIXMAP_NEXT_UNREAD_MENU, next_unread_menu_xpm,
 			  16, 16);
+    register_balsa_pixmap(BALSA_PIXMAP_NEXT_FLAGGED, next_flagged_xpm, 
+			  24, 24);
+    register_balsa_pixmap(BALSA_PIXMAP_NEXT_FLAGGED_MENU, next_flagged_menu_xpm,
+			   16, 16);
     register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL, reply_to_all_xpm,
 			  24, 24);
     register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL_MENU, reply_to_all_menu_xpm,

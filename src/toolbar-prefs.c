@@ -90,6 +90,8 @@ button_data toolbar_buttons[]={
      N_("Open next"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_NEXT_UNREAD, N_("Next\nunread"), 
      N_("Open next unread message"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {BALSA_PIXMAP_NEXT_FLAGGED, N_("Next\nflagged"),
+     N_("Open next flagged message"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {GNOME_STOCK_PIXMAP_TRASH, N_("Trash /\nDelete"), 
      N_("Move the current message to trash"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {GNOME_STOCK_PIXMAP_PRINT, N_("Print"), 

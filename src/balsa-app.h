@@ -251,6 +251,7 @@ extern struct BalsaApplication {
     gboolean wordwrap;
     gint wraplength;
     gboolean browse_wrap;
+    gint browse_wrap_length;
     ShownHeaders shown_headers;
     gchar *selected_headers;
     BalsaIndexThreadingType threading_type;
@@ -332,6 +333,8 @@ extern struct BalsaApplication {
     BalsaMDNReply mdn_reply_clean;
     BalsaMDNReply mdn_reply_notclean;
 #endif
+    gboolean recognize_rfc2646_format_flowed;
+    gboolean send_rfc2646_format_flowed;
 
     GList *folder_mru;
     gint drag_default_is_move;

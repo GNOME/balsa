@@ -1,4 +1,5 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  * Copyright (C) 1998-2001 Stuart Parmenter and others, see AUTHORS file.
  *
@@ -197,27 +198,27 @@ static GnomeUIInfo edit_menu[] = {
      (gpointer) wrap_body_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
      GDK_z, GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_ADD_SIGNATURE 6
+#define EDIT_MENU_ADD_SIGNATURE 7
     {GNOME_APP_UI_ITEM, N_("Insert _Signature"), NULL,
      (gpointer) insert_signature_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
      GDK_z, GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_REFLOW_PARA 7
+#define EDIT_MENU_REFLOW_PARA 9
     {GNOME_APP_UI_ITEM, N_("_Reflow Paragraph"), NULL,
      (gpointer) reflow_par_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
      GDK_r, GDK_CONTROL_MASK, NULL},
-#define EDIT_MENU_REFLOW_MESSAGE 8
+#define EDIT_MENU_REFLOW_MESSAGE 10
     {GNOME_APP_UI_ITEM, N_("R_eflow Message"), NULL,
      (gpointer) reflow_body_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
      GDK_r, GDK_CONTROL_MASK | GDK_SHIFT_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_SPELL_CHECK 10
+#define EDIT_MENU_SPELL_CHECK 12
     GNOMEUIINFO_ITEM_STOCK(N_("_Check Spelling"), 
                            N_("Check the spelling of the message"),
                            spell_check_cb,
                            GNOME_STOCK_MENU_SPELLCHECK),
     GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_SELECT_IDENT 12
+#define EDIT_MENU_SELECT_IDENT 14
     GNOMEUIINFO_ITEM_STOCK(N_("Select _Identity..."), 
                            N_("Select the Identity to use for the message"),
                            change_identity_dialog_cb,
@@ -1225,6 +1226,27 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     return nb;
 }
 
+/*
+ * catch user `return' chars, and edit out any previous spaces
+ * to make them `hard returns',
+ * */
+static void
+insert_text_cb(GtkEditable * msg_text, gchar * new_text,
+               gint new_text_length, gint * position, gpointer user_data)
+{
+    if (new_text_length == 1 && *new_text == '\n') {
+        gint j = *position;
+        gchar *text = gtk_editable_get_chars(msg_text, 0, j);
+        gint i = j;
+        while (--i >= 0 && text[i] == ' ');
+        if (++i < j) {
+            gtk_editable_delete_text(msg_text, i, j);
+            *position = i;
+        }
+        g_free(text);
+    }
+}
+
 /* create_text_area 
    Creates the text entry part of the compose window.
 */
@@ -1234,6 +1256,9 @@ create_text_area(BalsaSendmsg * msg)
     GtkWidget *table;
 
     msg->text = gtk_text_new(NULL, NULL);
+    if (msg->flow)
+        gtk_signal_connect(GTK_OBJECT(msg->text), "insert-text",
+                           insert_text_cb, NULL);
     gtk_text_set_editable(GTK_TEXT(msg->text), TRUE);
     gtk_text_set_word_wrap(GTK_TEXT(msg->text), TRUE);
     balsa_spell_check_set_text(BALSA_SPELL_CHECK(msg->spell_checker),
@@ -1274,7 +1299,8 @@ continueBody(BalsaSendmsg * msg, LibBalsaMessage * message)
 	    gchar *body_type = libbalsa_message_body_get_content_type(body);
 
 	    if (!strcmp(body_type, "text/plain") &&
-		(rbdy = process_mime_part(message, body, NULL, -1, FALSE))) {
+		(rbdy = process_mime_part(message, body, NULL, -1, FALSE,
+                                          msg->flow))) {
 		gtk_text_insert(GTK_TEXT(msg->text), NULL, NULL, NULL, 
 				rbdy->str, strlen(rbdy->str));
 		g_string_free(rbdy, TRUE);
@@ -1403,7 +1429,7 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 			      type == SEND_FORWARD_QUOTE) ?
 			     balsa_app.quote_str : NULL,
 			     balsa_app.wordwrap ? balsa_app.wraplength : -1,
-			     balsa_app.reply_strip_html);
+			     balsa_app.reply_strip_html, msg->flow);
 	if (body)
 	    body = g_string_prepend(body, str);
 	else
@@ -1608,6 +1634,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->ident = balsa_app.current_ident;
     msg->update_config = FALSE;
     msg->modified = FALSE; 
+    msg->flow = balsa_app.wordwrap && balsa_app.send_rfc2646_format_flowed;
 
     switch (type) {
     case SEND_REPLY:
@@ -1658,6 +1685,14 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     fill_language_menu();
 
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, msg);
+    /*
+     * `Reflow paragraph' and `Reflow message' don't seem to make much
+     * sense when we're using `format=flowed'
+     * */
+    gtk_widget_set_sensitive(edit_menu[EDIT_MENU_REFLOW_PARA].widget,
+                             !msg->flow);
+    gtk_widget_set_sensitive(edit_menu[EDIT_MENU_REFLOW_MESSAGE].widget,
+                             !msg->flow);
 
     set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_MAIL_SND,
 				GTK_SIGNAL_FUNC(send_message_toolbar_cb), msg);
@@ -2211,8 +2246,14 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     body->buffer = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->text), 0,
 					  gtk_text_get_length(GTK_TEXT
 							      (bsmsg->text)));
-    if (balsa_app.wordwrap)
-	libbalsa_wrap_string(body->buffer, balsa_app.wraplength);
+    if (bsmsg->flow) {
+        gchar *tmp = libbalsa_wrap_rfc2646(body->buffer,
+                                           balsa_app.wraplength,
+                                           TRUE, FALSE);
+        g_free(body->buffer);
+        body->buffer = tmp;
+    } else if (balsa_app.wordwrap)
+        libbalsa_wrap_string(body->buffer, balsa_app.wraplength);
     body->charset = g_strdup(bsmsg->charset);
     libbalsa_message_append_part(message, body);
 
@@ -2271,14 +2312,16 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 
     if(queue_only)
 	libbalsa_message_queue(message, balsa_app.outbox, fcc,
-			       balsa_app.encoding_style);
+                               balsa_app.encoding_style,
+                               bsmsg->flow);
     else 
 #if ENABLE_ESMTP
 	successful = libbalsa_message_send(message, balsa_app.outbox, fcc,
 					   balsa_app.encoding_style,  
 			   		   balsa_app.smtp_server,
 			   		   balsa_app.smtp_authctx,
-			   		   balsa_app.smtp_tls_mode);
+                                           balsa_app.smtp_tls_mode,
+                                           bsmsg->flow);
 #else
         successful = libbalsa_message_send(message, balsa_app.outbox, fcc,
 					   balsa_app.encoding_style); 
@@ -2347,12 +2390,14 @@ message_postpone(BalsaSendmsg * bsmsg)
 	successp = libbalsa_message_postpone(message, balsa_app.draftbox,
 				  bsmsg->orig_message,
 				  message->fcc_mailbox,
-				  balsa_app.encoding_style);
+                                             balsa_app.encoding_style,
+                                             bsmsg->flow);
     else
 	successp = libbalsa_message_postpone(message, balsa_app.draftbox, 
                                   NULL,
 				  message->fcc_mailbox,
-				  balsa_app.encoding_style);
+                                             balsa_app.encoding_style,
+                                             bsmsg->flow);
     if(successp) {
 	if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message) {
 	    libbalsa_message_delete(bsmsg->orig_message);
@@ -2462,14 +2507,21 @@ wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     pos = gtk_editable_get_position(GTK_EDITABLE(bsmsg->text));
 
     the_text = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->text), 0, -1);
-    libbalsa_wrap_string(the_text, balsa_app.wraplength);
+    if (bsmsg->flow) {
+        gchar *tmp = libbalsa_wrap_rfc2646(the_text, balsa_app.wraplength,
+                                           TRUE, TRUE);
+        g_free(the_text);
+        the_text = tmp;
+    } else
+        libbalsa_wrap_string(the_text, balsa_app.wraplength);
 
     gtk_text_freeze(GTK_TEXT(bsmsg->text));
     gtk_editable_delete_text(GTK_EDITABLE(bsmsg->text), 0, -1);
     dummy = 0;
     gtk_editable_insert_text(GTK_EDITABLE(bsmsg->text), the_text,
 			     strlen(the_text), &dummy);
-    gtk_editable_set_position(GTK_EDITABLE(bsmsg->text), pos);
+    gtk_editable_set_position(GTK_EDITABLE(bsmsg->text),
+                              MIN(pos, dummy));
     gtk_text_thaw(GTK_TEXT(bsmsg->text));
     g_free(the_text);
 }

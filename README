@@ -53,3 +53,8 @@ Balsa CVS:
 	Balsa is hosted on the Gnome CVS servers. To get
 the latest source, get the module 'balsa' from the CVS
 root ':pserver:anonymous@anoncvs.gnome.org:/cvs/gnome'.
+
+Help System:
+	In order to compile the help files, you need to have the
+GNOME DocBook documentation system. Very good documentation
+can be found at: http://www.gnome.org/gdp/gdp-handbook/gettingstarted.html

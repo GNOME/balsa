@@ -1,3 +1,11 @@
+2004-03-07 12:33  PeterB
+
+	* libbalsa/filter.c, libbalsa/filter.h, libbalsa/libbalsa.h,
+	libbalsa/mailbox.c, libbalsa/mailbox.h, libbalsa/mailbox_imap.c,
+	libbalsa/mailbox_local.c, libbalsa/message.c, libbalsa/message.h,
+	libbalsa/imap/imap-commands.c, libbalsa/imap/imap-search.c,
+	src/filter-run-callbacks.c: re-enable filters.
+
 2004-03-06 16:59  PeterB
 
 	* libbalsa/body.c: check for NULL GMime filter.

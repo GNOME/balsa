@@ -796,7 +796,8 @@ create_new_page (void)
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
 
-  logo = gnome_unconditional_pixmap_file ("balsa/balsa_icon.png");
+  /*logo = gnome_unconditional_pixmap_file ("balsa/balsa_icon.png");*/
+  logo = balsa_pixmap_finder( "balsa/balsa_icon.png" );
   pixmap = gnome_pixmap_new_from_file (logo);
   g_free (logo);
   gtk_box_pack_start (GTK_BOX (vbox), pixmap, FALSE, FALSE, 0);

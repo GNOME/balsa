@@ -1587,7 +1587,9 @@ set_icon (GnomeApp * app)
 #endif
   ic_win = gdk_window_new (NULL, &att, GDK_WA_VISUAL | GDK_WA_COLORMAP);
   {
-    char *filename = gnome_unconditional_pixmap_file ("balsa/balsa_icon.png");
+	  /*char *filename = gnome_unconditional_pixmap_file ("balsa/balsa_icon.png");*/
+	  char *filename = balsa_pixmap_finder( "balsa/balsa_icon.png" );
+
 #ifdef USE_PIXBUF
     pb = gdk_pixbuf_new_from_file(filename);
 #else

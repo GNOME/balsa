@@ -2,7 +2,7 @@ balsa_BITMAPS = attachment.png balsa_logo.png balsa_icon.png balsa-top.png balsa
 
 EXTRA_DIST =	$(balsa_BITMAPS)
 
-balsabitmapsdir = $(datadir)/pixmaps/balsa
+balsabitmapsdir = @gnomedatadir@/pixmaps/balsa
 
 balsabitmaps_DATA = $(balsa_BITMAPS)
 

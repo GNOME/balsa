@@ -1,3 +1,20 @@
+2000-03-28  Peter Williams <peter@newton.cx>
+	* libbalsa/files.{c,h}: created balsa_file_finder,
+	  a *working* version of gnome_xxxx_file()
+	* configure.in: Added system install check, testing
+	  for installs into Gnome's prefix that may require
+	  root privileges. Added website options, to generate
+	  the website files and give them a root and prefix.
+	* src/mailbox-conf.c, src/main-windows.c, src/sendmsg-window.c,
+	  libinit-balsa/helper.c, libbalsa/mailbox.c: Use balsa_file_finder
+	* images/Makefile.am, sounds/Makefile.am: Use appropriate
+	  installation prefex depending on sysinstall option
+	* po/POTFILES.in: Remove src/spell-check.c, which does
+	  not compile and is not built
+	* libbalsa/Makefile.am: Added files.{c,h} to libbalsa
+	* website: Added directory for the Balsa website in CVS,
+	  buildable and installable with specifiable prefixes.
+	
 2000-03-27  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-app.c: auto-check explicitly checks Inbox.
@@ -149,6 +166,17 @@
 
 	* libbalsa/misc.c: make_string_from_list didn't handle NULL elements.
 	* libbalsa/misc.h:
+<<<<<<< ChangeLog
+	
+
+2000-03-06  Peter Williams  <peter@beta.newton.cx>
+
+	* libbalsa/mailbox.c (translate_message): On tip
+	  from Birger Langkjer, increase size of date
+	  buffer from an unreasonable-small 27 characters
+	  to 128.
+=======
+>>>>>>> 1.155
 
 2000-03-05  Pawel Salek  <pawsa@theochem.kth.se>
 

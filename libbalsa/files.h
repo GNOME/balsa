@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- * Copyright (C) 1999 Stuart Parmenter
+ * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,21 @@
  * 02111-1307, USA.
  */
 
-#ifndef __LIBBALSA_H__
-#define __LIBBALSA_H__
+#ifndef _BALSA_FILES_H
+#define _BALSA_FILES_H
 
-typedef struct _Mailbox Mailbox;
-typedef struct _Message Message;
-typedef struct _Address Address;
-typedef struct _Body Body;
-typedef struct _Server Server;
+#include "config.h"
+#include <gnome.h>
 
-#include "mailbox.h"
-#include "message.h"
-#include "address.h"
-#include "body.h"
-#include "files.h"
+/* filename is the filename (naw!)
+ * splice is what to put in between the prefix and the filename, if desired
+ * prefixes is a null-termed array of strings of prefixes to try. There are defaults that are always
+ *   tried.
+ * We ignore proper slashing of names. Ie, /prefix//splice//file won't be caught.
+ */
 
-void load_messages (Mailbox * mailbox, gint emit);
+gchar *balsa_file_finder( const gchar *filename, const gchar *splice, const gchar **prefixes );
 
-#endif /* __LIBBALSA_H__ */
+#define balsa_pixmap_finder( filename ) (balsa_file_finder( filename, "pixmaps", NULL))
+
+#endif

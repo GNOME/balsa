@@ -29,3 +29,12 @@
 
 /* Shall we multithread? */
 #undef BALSA_USE_THREADS
+
+#undef BALSA_STD_PREFIX
+#undef BALSA_DATA_PREFIX
+#undef GNOME_STD_PREFIX
+#undef GNOME_LIB_PREFIX
+#undef GNOME_DATA_PREFIX
+
+/* The prefixes to look for balsa data, at least most likely */
+#undef BALSA_COMMON_PREFIXES

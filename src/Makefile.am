@@ -42,6 +42,8 @@ balsa_SOURCES =	\
 	sendmsg-window.h	\
 	threads.h
 #	index-child.h		\
+#	spell-check.c		\
+#	spell-check.h		\
 
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \

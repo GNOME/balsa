@@ -88,10 +88,6 @@ ORB_CFLAGS="$ORBIT_CFLAGS"
 AC_SUBST(ORB_LIBS)
 AC_SUBST(ORB_CFLAGS)
 
-dnl PKGW: where to install pixmaps
-gnomedatadir=`$GNOME_CONFIG --datadir`
-AC_SUBST(gnomedatadir)
-
 dnl Automake @VARIABLE@ exports.
 AC_SUBST(BALSA_MAJOR)
 AC_SUBST(BALSA_REVISION)
@@ -100,8 +96,10 @@ AC_SUBST(BALSA_VERSION)
 AC_SUBST(LIBOBJS)
 AC_SUBST(LIBESD_LIB)
 
+dnl ######################################################################################
+dnl Enable all?
+dnl ######################################################################################
 
-dnl Enable all
 AC_ARG_ENABLE(all, [  --enable-all            Enable incomplete features [default=no]],[
 	AC_DEFINE(BALSA_SHOW_ALL)
 	use_all=yes
@@ -109,7 +107,10 @@ AC_ARG_ENABLE(all, [  --enable-all            Enable incomplete features [defaul
 	use_all=no
 ])
 
-dnl Enable information in the mailbox list
+dnl ######################################################################################
+dnl Enable information in the mailbox list?
+dnl ######################################################################################
+
 AC_ARG_ENABLE(info, [  --enable-info           Enable mailbox info [default=yes]],[
 	if test "$enableval" = "yes" ; then
 		AC_DEFINE(BALSA_SHOW_INFO)
@@ -122,7 +123,10 @@ AC_ARG_ENABLE(info, [  --enable-info           Enable mailbox info [default=yes]
 	use_info='yes'
 ])
 
-dnl Use threading
+dnl ######################################################################################
+dnl Use threading?
+dnl ######################################################################################
+
 AC_ARG_ENABLE(threads, [  --enable-threads        Use threading for mail retrieval (unstable) [default=no]],[
 	use_threads=$enableval
 ],[
@@ -145,7 +149,126 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+dnl ######################################################################################
+dnl Create website?
+dnl ######################################################################################
+
+AC_ARG_WITH(website, [  --with-website=ROOT     If specified, create the website data with specified root (developer only)],[
+	with_website=$withval
+],[
+	with_website=no
+])
+
+AC_MSG_CHECKING([whether to create the website])
+if test x"$with_website" != xno ; then
+	website_subdir=website
+	website_used=yes
+	website_root="http://www.balsa.net"
+	test -z "$with_website" || website_root=$withval
+	website_desc="yes; root $website_root"
+else
+	website_subdir=
+	website_used=no
+	website_root=
+	website_desc="no"
+fi
+
+AC_MSG_RESULT([$website_desc])
+AC_SUBST(website_subdir)
+AC_SUBST(website_root)
+
+dnl ######################################################################################
+dnl Website prefix?
+dnl ######################################################################################
+
+AC_ARG_WITH(website-prefix, [  --with-website-prefix=PREFIX Install the website files into PREFIX],[
+	with_website_prefix=$withval
+],[
+	with_website_prefix=no
+])
+
+AC_MSG_CHECKING([whether and where to install the website])
+if test x"$with_website_prefix" != xno ; then
+	if test x"$website_used" = xyes ; then
+		website_prefix=$withval
+		website_installed=yes
+		website_install_desc="yes; $withval"
+	else
+		AC_MSG_ERROR([You must specify --with-website to use --with-website-prefix])
+	fi
+else
+	website_prefix=
+	website_installed=no
+	website_install_desc=no
+fi
+
+AC_MSG_RESULT([$website_install_desc])
+AC_SUBST(website_prefix)
+AC_SUBST(website_installed)
+AC_SUBST(website_install_desc)
+AM_CONDITIONAL(WEBSITE_INSTALLED, [test x$website_installed = xyes])
+
+dnl ######################################################################################
+dnl Install into gnome locations? (may require priveleges that we don't have)
+dnl ######################################################################################
+
+AC_ARG_ENABLE([system-install], [  --disable-system-install Don't install some files into Gnome's prefix],[
+	use_system_install=$enableval
+],[
+	if test x"$BALSA_DISTCHECK_HACK" = xyes ; then
+		use_system_install=no
+	else
+		use_system_install=yes
+	fi
+])
+
+AC_MSG_CHECKING([whether to install into Gnome's prefix])
+if test x"$use_system_install" = xyes ; then
+	AC_MSG_RESULT([yes])
+	gnomedatadir=`${GNOME_CONFIG} --datadir`
+	gnomeconfdir=`${GNOME_CONFIG} --sysconfdir`
+else
+	AC_MSG_RESULT([no])
+	gnomedatadir=`eval "echo ${datadir}"`
+	gnomeconfdir=`eval "echo ${sysconfdir}"`
+fi
+
+AC_SUBST(gnomedatadir)
+AC_SUBST(gnomeconfdir)
+
+dnl ######################################################################################
+dnl Remember our prefixes
+dnl ######################################################################################
+
+dnl datadir='${prefix}/share', so we must eval it or something. This works
+BALSA_STD_PREFIX=`eval "echo ${prefix}"`
+BALSA_DATA_PREFIX=`eval "echo ${datadir}"`
+GNOME_STD_PREFIX=`${GNOME_CONFIG} --prefix`
+GNOME_LIB_PREFIX=`${GNOME_CONFIG} --libdir`
+GNOME_DATA_PREFIX=`${GNOME_CONFIG} --datadir`
+
+dnl Consolidate them!
+BALSA_COMMON_PREFIXES=`cat <<EOF |sort |uniq
+"${BALSA_STD_PREFIX}",
+"${BALSA_DATA_PREFIX}",
+"${GNOME_STD_PREFIX}",
+"${GNOME_DATA_PREFIX}",
+"${GNOME_LIB_PREFIX}",
+EOF
+`
+
+dnl Better way to do this?
+AC_DEFINE_UNQUOTED( BALSA_STD_PREFIX, "$BALSA_STD_PREFIX" )
+AC_DEFINE_UNQUOTED( BALSA_DATA_PREFIX, "$BALSA_DATA_PREFIX" )
+AC_DEFINE_UNQUOTED( GNOME_STD_PREFIX, "$GNOME_STD_PREFIX" )
+AC_DEFINE_UNQUOTED( GNOME_LIB_PREFIX, "$GNOME_LIB_PREFIX" )
+AC_DEFINE_UNQUOTED( GNOME_DATA_PREFIX, "$GNOME_DATA_PREFIX" )
+AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES` ) dnl bleah
+
+dnl ######################################################################################
 dnl Create files.
+dnl ######################################################################################
+
 AC_OUTPUT([
 Makefile
 balsa.1
@@ -161,10 +284,17 @@ libbalsa/Makefile
 libinit_balsa/Makefile
 idl/Makefile
 src/Makefile
+website/Makefile
+website/images/Makefile
+website/screens/Makefile
 ])
 
 echo "========= Final configuration ==================="
-echo "   Installing into prefix: $prefix"
-echo "     Using multithreading: $use_threads"
-echo "Using incomplete features: $use_all"
-echo "       Using mailbox info: $use_info"
+echo "    Installing into prefix: $prefix"
+echo "      Using multithreading: $use_threads"
+echo " Using incomplete features: $use_all"
+echo "        Using mailbox info: $use_info"
+echo "      Creating the website: $website_desc"
+echo "    Installing the website: $website_install_desc"
+echo "Installing some files into  "
+echo "            Gnome's prefix: $use_system_install (may require root privileges)"

@@ -359,7 +359,8 @@ static void
 add_attachment (GnomeIconList * iconlist, char *filename)
 {
    /* FIXME: the path to the file must not be hardcoded */ 
-   gchar *pix = gnome_pixmap_file ("balsa/attachment.png");
+	/* gchar *pix = gnome_pixmap_file ("balsa/attachment.png"); */
+	gchar *pix = balsa_pixmap_finder( "balsa/attachment.png" );
    
    if( !check_if_regular_file( filename ) ) {
       /*c_i_r_f() will pop up an error dialog for us, so we need do nothing.*/

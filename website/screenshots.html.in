@@ -1,0 +1,25 @@
+<html>
+<head>
+<title>Balsa Screenshots</title>
+<link rel="stylesheet" type="text/css" href="@website_root@/style.css">
+</head>
+<body background="@website_root@/images/bg.gif" bgcolor="#ffffff" text="#000000" link="#993300" vlink="#993300">
+
+<table width="100%">
+<!-- one big row to offset from the background -->
+<tr>
+<td width="80">&nbsp;</td>
+<td>
+
+<img src="@website_root@/images/balsa.gif" alt="balsa" align="middle" width="476" height="122">
+<big><big><b>Screenshots</b></big></big><br>
+<p>Here are a few pictures of what Balsa looks like:</p>
+<a href="@website_root@/screens/mainwindow.gif">Main Window</a> (10/14/99)<br>
+<a href="@website_root@/screens/compose.gif">Compose Window</a> (04/20/99)<br>
+<a href="@website_root@/screens/prefs.gif">Preferences</a> (10/14/99)
+
+</td>
+</tr>
+</table>
+</body>
+</html>

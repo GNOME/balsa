@@ -15,6 +15,8 @@ libbalsa_a_SOURCES = 		\
 	mime.h			\
 	misc.h			\
 	send.h			\
+	files.c			\
+	files.h			\
 	filter-error.c		\
 	filter-file.c		\
 	filter-funcs.c		\

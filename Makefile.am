@@ -1,4 +1,4 @@
-SUBDIRS = macros po intl sounds images help libmutt libbalsa libinit_balsa idl src
+SUBDIRS = macros po intl sounds images help libmutt libbalsa libinit_balsa idl src @website_subdir@
 
 man_MANS=balsa.1
 
@@ -10,7 +10,9 @@ desktop_DATA = balsa.desktop
 
 EXTRA_DIST = \
 	balsa.1.in \
-	balsa.spec.in
+	balsa.spec.in \
+	balsa.desktop \
+	gnome-balsa2.png
 
 dist-hook: balsa.spec
 	cp balsa.spec $(distdir)

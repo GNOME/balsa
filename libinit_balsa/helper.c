@@ -30,11 +30,14 @@
 
 #include "helper.h"
 #include "balsa-druid-page.h"
+#include "libbalsa.h"
 
-#ifdef BALSA_LOCAL_INSTALL
-#define gnome_pixmap_file( s ) g_strdup( g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps/", s, NULL ) )
-#define gnome_unconditional_pixmap_file( s ) g_strdup( g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps", s, NULL ) )
-#endif
+/*
+ * #ifdef BALSA_LOCAL_INSTALL
+ * #define gnome_pixmap_file( s ) g_strdup( g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps/", s, NULL ) )
+ * #define gnome_unconditional_pixmap_file( s ) g_strdup( g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps", s, NULL ) )
+ * #endif
+ */
 
 /* ************************************************************************** */
 
@@ -54,7 +57,8 @@ GdkImlibImage *balsa_init_get_png( const gchar *fname )
     g_return_val_if_fail( fname != NULL, NULL );
 
     fullname = g_strconcat( "balsa/", fname, NULL );
-    fullpath = gnome_pixmap_file( fullname );
+    /*fullpath = gnome_pixmap_file( fullname );*/
+    fullpath = balsa_pixmap_finder( fullname );
     g_free( fullname );
     
     if( !fullpath )

@@ -1291,7 +1291,7 @@ translate_message (HEADER * cur)
   Address *addr;
   ENVELOPE *cenv;
   LIST *tmp;
-  gchar rettime[27], *p;
+  gchar rettime[128], *p;
   struct tm *footime;
 
   if (!cur)

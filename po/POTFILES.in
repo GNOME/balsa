@@ -27,4 +27,3 @@ src/message-window.c
 src/pref-manager.c
 src/print.c
 src/sendmsg-window.c
-src/spell-check.c

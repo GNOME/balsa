@@ -40,7 +40,7 @@
 #endif
 
 #include "mailbox-filter.h"
-
+#include "filter-file.h"
 #include <libgnome/gnome-defs.h> 
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 

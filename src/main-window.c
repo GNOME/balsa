@@ -708,14 +708,13 @@ static GnomeUIInfo mailbox_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_HIDE_POS (MENU_MAILBOX_NEXT_FLAGGED_POS+2)
     GNOMEUIINFO_SUBTREE(N_("_Hide messages"), mailbox_hide_menu),
-    /* the next one is for testing only */
 #define MENU_MAILBOX_RESET_POS (MENU_MAILBOX_HIDE_POS + 1)
-    GNOMEUIINFO_ITEM_STOCK(N_("Reset _Filter"),  "",
+    GNOMEUIINFO_ITEM_STOCK(N_("_Reset Filter"), N_("Reset mailbox filter"),
                            reset_filter_cb, GTK_STOCK_FIND),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_MARK_ALL_POS (MENU_MAILBOX_RESET_POS + 2)
     {
-        GNOME_APP_UI_ITEM, N_("Select all"),
+        GNOME_APP_UI_ITEM, N_("_Select All"),
         N_("Select all messages in current mailbox"),
         mark_all_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         BALSA_PIXMAP_MENU_MARK_ALL, 0, (GdkModifierType) 0, NULL

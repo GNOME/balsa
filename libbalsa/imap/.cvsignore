@@ -1,2 +1,2 @@
 Makefile Makefile.in
-libimap-marhal.h libimap-marhal.c
+libimap-marshal.[hc]

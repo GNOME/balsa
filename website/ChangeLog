@@ -1,3 +1,8 @@
+2000-05-16  Peter Williams  <peter@beta.newton.cx>
+
+	* Makefile.am: Comment out .png's when installing from images/;
+	there are none.
+
 2000-04-18  Peter Williams  <peter@beta.newton.cx>
 
 	* main.html.in: Updated for 0.8.0-pre1

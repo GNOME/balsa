@@ -108,6 +108,8 @@ static gint toggle_queue_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void spell_check_cb(GtkWidget * widget, BalsaSendmsg *);
 
 static void address_book_cb(GtkWidget *widget, BalsaSendmsg *smd_msg_wind);
+static void address_book_response(GtkWidget * ab, gint response,
+                                  LibBalsaAddressEntry * address_entry);
 
 static gint set_locale(GtkWidget *, BalsaSendmsg *, gint);
 
@@ -541,28 +543,53 @@ append_comma_separated(GtkEditable *editable, const gchar * text)
 }
 
 /* the callback handlers */
+#define BALSA_SENDMSG_ADDRESS_BOOK_KEY "balsa-sendmsg-address-book"
 static void
-address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
+address_book_cb(GtkWidget * widget, BalsaSendmsg * snd_msg_wind)
 {
     GtkWidget *ab;
     LibBalsaAddressEntry *address_entry;
-    gint response;
+
+    /* Show only one dialog per window; one per address entry could be
+     * confusing. */
+    ab = g_object_get_data(G_OBJECT(snd_msg_wind->window),
+                           BALSA_SENDMSG_ADDRESS_BOOK_KEY);
+    if (ab) {
+        gdk_window_raise(ab->window);
+        return;
+    }
 
     address_entry =
-        LIBBALSA_ADDRESS_ENTRY(g_object_get_data
-                               (G_OBJECT(widget), "address-entry-widget"));
+        LIBBALSA_ADDRESS_ENTRY(g_object_get_data(G_OBJECT(widget),
+                                                 "address-entry-widget"));
+    gtk_widget_set_sensitive(GTK_WIDGET(address_entry), FALSE);
 
     ab = balsa_ab_window_new(TRUE, GTK_WINDOW(snd_msg_wind->window));
+    gtk_window_set_destroy_with_parent(GTK_WINDOW(ab), TRUE);
+    g_signal_connect(G_OBJECT(ab), "response",
+                     G_CALLBACK(address_book_response), address_entry);
+    g_object_set_data(G_OBJECT(snd_msg_wind->window),
+                      BALSA_SENDMSG_ADDRESS_BOOK_KEY, ab);
+    gtk_widget_show_all(ab);
+}
 
-    response = gtk_dialog_run(GTK_DIALOG(ab));
-    if ( response == GTK_RESPONSE_OK ) {
-	gchar *t =
-            balsa_ab_window_get_recipients(BALSA_AB_WINDOW(ab));
+/* Callback for the "response" signal for the address book dialog. */
+static void
+address_book_response(GtkWidget * ab, gint response,
+                      LibBalsaAddressEntry * address_entry)
+{
+    GtkWindow *parent = gtk_window_get_transient_for(GTK_WINDOW(ab));
 
+    if (response == GTK_RESPONSE_OK) {
+        gchar *t = balsa_ab_window_get_recipients(BALSA_AB_WINDOW(ab));
         append_comma_separated(GTK_EDITABLE(address_entry), t);
         g_free(t);
     }
+
     gtk_widget_destroy(ab);
+    g_object_set_data(G_OBJECT(parent), BALSA_SENDMSG_ADDRESS_BOOK_KEY,
+                      NULL);
+    gtk_widget_set_sensitive(GTK_WIDGET(address_entry), TRUE);
 }
 
 static gint

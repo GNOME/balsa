@@ -284,6 +284,7 @@ lb_imap_server_info_new(LibBalsaServer *server)
      * libbalsa_server_user_cb(). */
 
     handle = imap_mbox_handle_new();
+    imap_handle_set_timeout(handle, 30000); /* wait 30 seconds for packets */
     info = g_new0(struct handle_info, 1);
     info->handle = handle;
     imap_handle_set_monitorcb(handle, monitor_cb, info);
@@ -488,6 +489,28 @@ libbalsa_imap_server_save_config(LibBalsaImapServer *server)
     gnome_config_set_bool("HasFetchBug", server->has_fetch_bug);
 }
 
+/* handle_connection_error() releases handle_info data, clears password
+   and sets err apriopriately */
+static void
+handle_connection_error(int rc, struct handle_info *info,
+                        LibBalsaServer *server, GError **err)
+{
+    gchar *msg = imap_mbox_handle_get_last_msg(info->handle);
+    if(rc == IMAP_AUTH_FAILURE)
+        libbalsa_server_set_password(server, NULL);
+    if(rc != IMAP_CONNECT_FAILED) {
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_AUTH_ERROR,
+                    _("Cannot connect to the server: %s"), msg);
+    } else
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_NETWORK_ERROR,
+                    _("Cannot connect to the server"));
+    
+    g_free(msg);
+    lb_imap_server_info_free(info);
+}
+
 /**
  * libbalsa_imap_server_get_handle:
  * @server: A #LibBalsaImapServer
@@ -544,16 +567,7 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server, GError **err)
             rc=imap_mbox_handle_connect(info->handle, server->host,
                                         REQ_SSL(server));
             if(rc != IMAP_SUCCESS) {
-                gchar *msg = imap_mbox_handle_get_last_msg(info->handle);
-                if(rc == IMAP_AUTH_FAILURE)
-                    libbalsa_server_set_password(server, NULL);
-                g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                            rc != IMAP_CONNECT_FAILED
-                            ? LIBBALSA_MAILBOX_AUTH_ERROR :
-                            LIBBALSA_MAILBOX_NETWORK_ERROR,
-                            _("Cannot connect to the server: %s"), msg);
-                g_free(msg);
-                lb_imap_server_info_free(info);
+                handle_connection_error(rc, info, server, err);
                 g_mutex_unlock(imap_server->lock);
                 return NULL;
             }
@@ -649,14 +663,7 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
         rc=imap_mbox_handle_connect(info->handle, server->host,
                                     REQ_SSL(server));
         if(rc != IMAP_SUCCESS) {
-            gchar *msg = imap_mbox_handle_get_last_msg(info->handle);
-            if(rc == IMAP_AUTH_FAILURE)
-                libbalsa_server_set_password(server, NULL);
-            g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                        LIBBALSA_MAILBOX_OPEN_ERROR,
-                    _("Cannot connect to the server: %s"), msg);
-            g_free(msg);
-            lb_imap_server_info_free(info);
+            handle_connection_error(rc, info, server, err);
             g_mutex_unlock(imap_server->lock);
             return NULL;
         }

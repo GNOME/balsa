@@ -490,7 +490,9 @@ clean_cache(LibBalsaMailbox* mailbox)
    LIBBALSA_INFORMATION_MMESSAGE here but it would be overwritten by
    login information... */
 #define II(rc,h,line) \
-   {int trials=2;do{rc=line; \
+   {int trials=2;do{\
+    if(imap_mbox_is_disconnected(h)) imap_mbox_handle_reconnect(h, NULL);\
+    rc=line; \
     if(rc==IMR_SEVERED) \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
     _("IMAP connection has been severed. Reconnecting...")); \
@@ -498,7 +500,7 @@ clean_cache(LibBalsaMailbox* mailbox)
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
     _("IMAP server has shut the connection: %s Reconnecting..."), msg); \
     g_free(msg);}\
-    else break; imap_mbox_handle_reconnect(h, NULL);}while(trials-->0);}
+    else break;}while(trials-->0);}
 
 static ImapMboxHandle *
 libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mimap, GError **err)
@@ -1644,8 +1646,10 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     g_return_val_if_fail(mimap->opened, FALSE);
     imsg = mi_get_imsg(mimap, message->msgno);
 
-    g_return_val_if_fail(imsg, FALSE);
-    g_return_val_if_fail(imsg->envelope, FALSE);
+    if(!imsg || !imsg->envelope) /* Connection severed and and restore
+                                 *  failed - deal with it! */
+        return FALSE;
+
     lbimap_update_flags(message, imsg);
 
     lb_set_headers(message->headers, imsg->envelope, FALSE);

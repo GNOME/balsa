@@ -109,6 +109,7 @@ void imap_handle_set_monitorcb(ImapMboxHandle* h, ImapMonitorCb cb, void*);
 void imap_handle_set_infocb(ImapMboxHandle* h, ImapInfoCb cb, void*);
 void imap_handle_set_usercb(ImapMboxHandle* h, ImapUserCb cb, void*);
 void imap_handle_set_flagscb(ImapMboxHandle* h, ImapFlagsCb cb, void*);
+void imap_handle_set_timeout(ImapMboxHandle *, int milliseconds);
 
 ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst, 
                                     int over_ssl);

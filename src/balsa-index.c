@@ -620,6 +620,10 @@ bndx_selection_changed_func(GtkTreeModel * model, GtkTreePath * path,
 
     gtk_tree_model_get(model, iter, LB_MBOX_MESSAGE_COL, &sci->message,
                        -1);
+    if(!sci->message) /* Sad but true: backend knows the message
+                       * exists but could not fetch more data - we
+                       * need to handle it gracefully. */
+        return;
     if (!g_slist_find(*sci->selected, sci->message))
 	*sci->selected = g_slist_prepend(*sci->selected, sci->message);
     else {
@@ -951,6 +955,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     g_free(msg);
     try_cnt = 0;
     do {
+        g_clear_error(err);
         gdk_threads_leave();
         successp = libbalsa_mailbox_open(mailbox, err);
         gdk_threads_enter();
@@ -960,7 +965,6 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
            !(*err && (*err)->code == LIBBALSA_MAILBOX_TOOMANYOPEN_ERROR))
             break;
         balsa_mblist_close_lru_peer_mbx(balsa_app.mblist, mailbox);
-        g_clear_error(err);
     } while(try_cnt++<3);
     gnome_appbar_pop(balsa_app.appbar);
 

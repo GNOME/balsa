@@ -1,3 +1,11 @@
+2004-09-04  Pawel Salek
+
+	* libbalsa/imap-server.c: set timeout to 30s.
+	* libbalsa/mailbox_imap.c: handle missing envelopes gracefully.
+	* src/balsa-index.c: ditto. Do not overwrite error msg.
+	* libbalsa/send.c: fix mispelling.
+	* libbalsa/imap/imap-handle.[hc], imap_private.h: timeout setup.
+
 2004-09-03  Pawel Salek
 
 	* libbalsa/address-book-gpe.c: more consistent behaviour (perhaps

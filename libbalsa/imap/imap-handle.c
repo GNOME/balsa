@@ -125,6 +125,7 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
 {
   handle->host   = NULL;
   handle->mbox   = NULL;
+  handle->timeout = -1;
   handle->state  = IMHS_DISCONNECTED;
   handle->has_capabilities = FALSE;
   handle->exists = 0;
@@ -228,6 +229,14 @@ imap_handle_set_flagscb(ImapMboxHandle* h, ImapFlagsCb cb, void* arg)
 {
   h->flags_cb  = cb;
   h->flags_arg = arg;
+}
+
+void
+imap_handle_set_timeout(ImapMboxHandle *h, int milliseconds)
+{
+  h->timeout = milliseconds;
+  if(h->sio)
+    sio_set_timeout(h->sio, milliseconds);
 }
 
 int imap_mbox_is_disconnected (ImapMboxHandle *h)
@@ -404,6 +413,8 @@ imap_mbox_connect(ImapMboxHandle* handle)
     close(handle->sd);
     return IMAP_NOMEM;
   }
+  if(handle->timeout>0)
+    sio_set_timeout(handle->sio, handle->timeout);
 #ifdef USE_TLS
   if(handle->over_ssl) {
     SSL *ssl = imap_create_ssl();

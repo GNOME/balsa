@@ -1850,7 +1850,7 @@ do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root)
 					    message->headers->from->address_list->data);
 		if (message->headers->bcc_list)
 		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-					 _("This message will not be encrpyted for the BCC: recipient(s)."));
+					 _("This message will not be encrypted for the BCC: recipient(s)."));
 
 		if (message->gpg_mode & LIBBALSA_PROTECT_SIGN)
 		    success = 

@@ -38,6 +38,7 @@ struct _ImapMboxHandle {
   struct siobuf * sio;
   char *host;
   char* mbox; /* currently selected mailbox, if any */
+  int timeout; /* timeout in milliseconds */
 
   ImapConnectionState state;
   gboolean has_capabilities;

@@ -97,7 +97,7 @@ gint
 libbalsa_mailbox_maildir_create(const gchar * path, gboolean create)
 {
     gint exists;
-    gint magic_type;
+    GtkType magic_type;
 
     g_return_val_if_fail( path != NULL, -1);
 
@@ -105,12 +105,8 @@ libbalsa_mailbox_maildir_create(const gchar * path, gboolean create)
     if ( exists == 0 ) {
 	/* File exists. Check if it is a maildir... */
 	
-	libbalsa_lock_mutt();
-	magic_type = mx_get_magic(path);
-	libbalsa_unlock_mutt();
-	
-        /* [MBG] This needs to be != or Maildir mailboxes don't get parsed */
-	if ( magic_type != M_MAILDIR ) {
+	magic_type = libbalsa_mailbox_type_from_path(path);
+	if ( magic_type != LIBBALSA_TYPE_MAILBOX_MAILDIR ) {
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
 				 _("Mailbox %s does not appear to be a Maildir mailbox."), path);
 	    return(-1);

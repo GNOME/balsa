@@ -129,31 +129,24 @@ libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox)
 GtkObject *
 libbalsa_mailbox_local_new(const gchar * path, gboolean create)
 {
-    int magic_type;
+    GtkType magic_type = libbalsa_mailbox_type_from_path(path);
 
-    libbalsa_lock_mutt();
-    magic_type = mx_get_magic(path);
-    libbalsa_unlock_mutt();
-
-    switch (magic_type) {
-    case M_MBOX:
-    case M_MMDF:
+    if(magic_type == LIBBALSA_TYPE_MAILBOX_MBOX)
 	return libbalsa_mailbox_mbox_new(path, create);
-	break;
-    case M_MH:
+    else if(magic_type == LIBBALSA_TYPE_MAILBOX_MH)
 	return libbalsa_mailbox_mh_new(path, create);
-	break;
-    case M_MAILDIR:
+    else if(magic_type == LIBBALSA_TYPE_MAILBOX_MAILDIR)
 	return libbalsa_mailbox_maildir_new(path, create);
-	break;
-    case M_IMAP:
-	g_warning("Got IMAP as type for local mailbox\n");
-	return NULL;
-    default:			/* mailbox non-existent or unreadable */
-	if ( create ) 
+    else if(magic_type == LIBBALSA_TYPE_MAILBOX_IMAP) {
+        g_warning("IMAP path given as a path to local mailbox.\n");
+        return NULL;
+    } else {		/* mailbox non-existent or unreadable */
+	if(create) 
 	    return libbalsa_mailbox_mbox_new(path, TRUE);
-	g_warning("Unknown mailbox type\n");
-	return NULL;
+        else {
+            g_warning("Unknown mailbox type\n");
+            return NULL;
+        }
     }
 }
 

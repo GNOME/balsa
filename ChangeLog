@@ -1,3 +1,9 @@
+2002-05-16  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.c: reimplement libbalsa_mailbox_get_type()
+	without using mx_get_magic() that modified mailbox ctime.
+	* libbalsa/mailbox{local,maildir,mbox,mh}.c: use it. (#81751)
+
 2002-05-16  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/identity.c: improve a11y of identities dialog.

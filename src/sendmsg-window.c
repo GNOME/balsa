@@ -52,6 +52,9 @@ static gint check_if_regular_file (const gchar *);
 static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 void send_body_wrap (Body *body, GtkText *text);
 
+static void wrap_body_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
+static void reflow_par_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
+static void reflow_body_cb(GtkWidget* widget, BalsaSendmsg *bsmsg);
 
 static void check_readiness(GtkEditable *w, BalsaSendmsg *bsmsg);
 static void set_menus(BalsaSendmsg*);
@@ -144,12 +147,32 @@ static GnomeUIInfo file_menu[] =
 			  print_message_cb, GNOME_STOCK_PIXMAP_PRINT),
   GNOMEUIINFO_SEPARATOR,
 
-#define MENU_FILE_CLOSE_POS 6
+#define MENU_FILE_CLOSE_POS 7
   GNOMEUIINFO_MENU_CLOSE_ITEM(close_window, NULL),
 
   GNOMEUIINFO_END
 };
 
+/* Cut, Copy&Paste are in our case just a placeholders because they work 
+   anyway */
+static GnomeUIInfo edit_menu[] = 
+{
+   GNOMEUIINFO_MENU_CUT_ITEM(NULL, NULL),
+   GNOMEUIINFO_MENU_COPY_ITEM(NULL, NULL),
+   GNOMEUIINFO_MENU_PASTE_ITEM(NULL, NULL),
+   GNOMEUIINFO_SEPARATOR,
+   { GNOME_APP_UI_ITEM, N_ ("_Wrap body") ,N_ ("Wrap message lines"),
+     (gpointer)wrap_body_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
+     GDK_z, GDK_CONTROL_MASK, NULL },
+   GNOMEUIINFO_SEPARATOR,
+   { GNOME_APP_UI_ITEM, N_ ("_Reflow paragraph") , NULL,
+     (gpointer)reflow_par_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
+     GDK_r, GDK_CONTROL_MASK, NULL },
+   { GNOME_APP_UI_ITEM, N_ ("R_eflow message") , NULL,
+     (gpointer)reflow_body_cb, NULL, NULL,  GNOME_APP_PIXMAP_NONE, NULL, 
+     GDK_r, GDK_CONTROL_MASK | GDK_SHIFT_MASK, NULL },
+   GNOMEUIINFO_END
+};
 
 static GnomeUIInfo view_menu[] =
 {
@@ -184,7 +207,7 @@ static GnomeUIInfo iso_charset_menu[] = {
 #define ISO_CHARSET_3_POS 3
   GNOMEUIINFO_ITEM_NONE( N_ ("_South European (ISO-8859-3)"), NULL, iso_3_cb),
 #define ISO_CHARSET_5_POS 4
-  GNOMEUIINFO_ITEM_NONE( N_ ("_Cyrillic (ISO-8859-5)"), NULL, iso_5_cb),
+  GNOMEUIINFO_ITEM_NONE( N_ ("Cy_rillic (ISO-8859-5)"), NULL, iso_5_cb),
 #define ISO_CHARSET_8_POS 5
   GNOMEUIINFO_ITEM_NONE( N_ ("_Hebrew (ISO-8859-8)"), NULL, iso_8_cb),
 #define ISO_CHARSET_9_POS 6
@@ -208,7 +231,6 @@ static gchar* iso_charset_names[] = {
 typedef struct {
       gchar * name;
       guint length; 
-      
 } headerMenuDesc;
 
 headerMenuDesc headerDescs[] = { {"to", 3}, {"from", 3}, {"subject",2},
@@ -225,6 +247,7 @@ static GnomeUIInfo iso_menu[] = {
 static GnomeUIInfo main_menu[] =
 {
   GNOMEUIINFO_MENU_FILE_TREE(file_menu),
+  GNOMEUIINFO_MENU_EDIT_TREE(edit_menu),
   GNOMEUIINFO_SUBTREE(N_("_Show"), view_menu),
   GNOMEUIINFO_SUBTREE(N_("_ISO Charset"), iso_menu),
   GNOMEUIINFO_END
@@ -358,11 +381,11 @@ check_if_regular_file (const gchar *filename)
   gint result = TRUE;
 
   if (stat (filename, &s)) {
-    ptr = g_strdup_printf (_ ("Cannot get info on file \'%s\': %s\n"), filename,
-			   strerror (errno));
+     ptr = g_strdup_printf (_ ("Cannot get info on file '%s': %s\n"), 
+			    filename, strerror (errno));
     result = FALSE;
   } else if (!S_ISREG (s.st_mode)) {
-    ptr = g_strdup_printf (_ ("Attachment is not a regular file: \'%s\'\n"), 
+     ptr = g_strdup_printf (_ ("Attachment is not a regular file: '%s'\n"), 
 			   filename);
     result = FALSE;
   }
@@ -624,9 +647,9 @@ create_text_area (BalsaSendmsg * msg)
   gtk_text_set_editable (GTK_TEXT (msg->text), TRUE);
   gtk_text_set_word_wrap (GTK_TEXT (msg->text), TRUE);
 
-  gtk_widget_set_usize (msg->text, 
+  /*gtk_widget_set_usize (msg->text, 
 			(82 * 7) + (2 * msg->text->style->klass->xthickness), 
-			-1);
+			-1); */
   gtk_widget_show (msg->text);
   gtk_table_attach_defaults (GTK_TABLE (table), msg->text, 0, 1, 0, 1);
   hscrollbar = gtk_hscrollbar_new (GTK_TEXT (msg->text)->hadj);
@@ -721,6 +744,7 @@ fillBody(Message * message, BalsaSendmsg *msg, SendType type)
 	   balsa_app.sig_whenreply) ||
 	  ( (type == SEND_FORWARD) && balsa_app.sig_whenforward) ||
 	  ( (type == SEND_NORMAL) && balsa_app.sig_sending) ) {
+	gtk_text_insert   (GTK_TEXT(msg->text), NULL, NULL, NULL, "\n", 1);
 	gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, 
 			 signature, strlen (signature));
      }
@@ -931,8 +955,6 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
   gnome_app_set_contents (GNOME_APP (window), paned);
 
-  gtk_text_insert   (GTK_TEXT(msg->text), NULL, NULL, NULL, "\n", 1);
-
   if(type==SEND_CONTINUE) 
      continueBody(message,msg);
   else
@@ -955,6 +977,9 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
      forth which is sub-optimal.
   */
   set_menus(msg); 
+  gtk_window_set_default_size ( 
+     GTK_WINDOW(window), 
+     (82 * 7) + (2 * msg->text->style->klass->xthickness), 35*12);
   gtk_widget_show (window);
 
 
@@ -1338,92 +1363,167 @@ print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
    return TRUE;
 }
 
+// HELPER FUNCTIONS -----------------------------------------------
+/* wrap_string
+   wraps given string replacing spaces with '\n'.  do changes in place.
+   KISSed by pawsa.
+   lnbeg - line beginning position, sppos - space position, 
+   te - tab's extra space.
+*/
+static void
+wrap_string(gchar* str, int width)
+{
+   const int minl = width/2;
+   gchar *lnbeg, *sppos, *ptr;
+   gint te = 0;
+
+   g_assert(str != NULL);
+   lnbeg= sppos = ptr = str;
+
+   while(*ptr) {
+      if(*ptr=='\t') te += 7;
+      if(*ptr==' ') sppos = ptr;
+      if(ptr-lnbeg>width-te && sppos>=lnbeg+minl) {
+	 *sppos = '\n';
+	 lnbeg = ptr;te = 0;
+      }
+      if(*ptr=='\n') {
+	 lnbeg = ptr; te = 0;
+      }
+      ptr++;
+   }
+}
+
+/* reflows a paragraph in given string. The paragraph to reflow is
+determined by the cursor position. If mode is <0, whole string is
+reflowed. Replace tabs with single spaces, squeeze neighboring spaces. 
+Single '\n' replaced with spaces, double - retained. 
+HQ piece of code, modify only after thorough testing.
+*/
+/* find_beg_and_end - finds beginning and end of a paragraph;
+ *l will store the pointer to the first character of the paragraph,
+ *u - to the '\0' or first '\n' character delimiting the paragraph.
+ */
+static
+void find_beg_and_end(gchar *str, gint pos, gchar **l, gchar **u) 
+{
+   gint ln;
+
+   *l = str + pos;
+
+   while(*l>str && !(**l == '\n' && *(*l-1) == '\n') )
+      (*l)--;
+   if(*l+1<=str+pos && **l == '\n') (*l)++;
+
+   *u = str + pos;
+   ln = 0;
+   while(**u && !(ln && **u == '\n') )
+      ln = *(*u)++ == '\n';
+   if(ln) (*u)--;
+}
+
+/* lspace - last was space, iidx - insertion index.  */
+static void 
+reflow_string(gchar* str, gint mode, gint *cur_pos, int width) 
+{
+   gchar *l, *u, *sppos, *lnbeg, *iidx;
+   gint lnl = 0, lspace = 0; // 1 -> skip leading spaces
+
+   if(mode<0) {
+      l = str; u = str + strlen(str);
+   }
+   else find_beg_and_end(str, *cur_pos, &l, &u);
+
+   lnbeg = sppos = iidx = l;
+
+   while(l<u) {
+      if(lnl && *l == '\n') {
+	 *(iidx-1) = '\n';
+	 *iidx++ = '\n';
+	 lspace = 1;
+	 lnbeg = sppos = iidx;
+      } else if(isspace(*l)) {
+	 lnl = *l == '\n';
+	 if(!lspace) {
+	    sppos = iidx; 
+	    *iidx++= ' ';
+	 } else if(iidx-str<*cur_pos) (*cur_pos)--;
+	 lspace = 1;
+      } else {
+	 lspace = 0; lnl = 0;
+	 if(iidx-lnbeg>=width && lnbeg < sppos){
+	    *sppos='\n';
+	    lnbeg=sppos+1;
+	 }
+	 *iidx++ = *l;
+      }
+      l++;
+   }
+   /* job is done, shrink remainings */
+   while( (*iidx++ =*u++) )
+      ;
+}
+
+// END OF HELPER FUNCTIONS -----------------------------------------------
+
 void
 send_body_wrap (Body *body, GtkText *text)
 {
-  guint final_length, length;
-  int pos, tabspace, offset, minbreak, line_len, wraplength;
-  char *last_break, *current_line, *current_char;
-  char buffer[512];
-  GList *body_list=NULL, *next_line=NULL;
+   body->buffer = gtk_editable_get_chars (GTK_EDITABLE (text),0,-1);
+   
+   wrap_string(body->buffer, balsa_app.wraplength);
+}
 
-  minbreak = balsa_app.wraplength/2;
-  tabspace = 0;
-  
-  length = gtk_text_get_length(GTK_TEXT(text));
-  if( length == 0 )
-    {
-      body->buffer = g_strdup("");
-      return;
-    }
 
-  final_length = length;
-  current_line = gtk_editable_get_chars (GTK_EDITABLE (text),0,length);
-  last_break = current_line;
-  
-  /* while the remaining text is greater than screen width */
-  while(length > balsa_app.wraplength)
-    {
-      if( *current_line == '>')
-	wraplength = balsa_app.wraplength;
-      else
-	wraplength = balsa_app.wraplength - 6;
+static void
+wrap_body_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
+{
+   gint pos, dummy;
+   gchar * the_text;
 
-      /* find last 'breaking' character */
-      for(pos=0; (offset=pos+tabspace) < wraplength; pos++)
-	{
-	  current_char = (char *)(current_line+pos);
-	  if(*current_char=='\n')
-	    {
-	      last_break=(char *) current_char;
-	      break;
-	    }
-	  else if(*current_char==' ')
-	    last_break = current_char;
-	  else if(*current_char=='\t')
-	    tabspace+=4; /* assume tabs are about 5 chars wide */
-	}
-      line_len = (int) (last_break - current_line + 1);
+   pos = gtk_editable_get_position(GTK_EDITABLE(bsmsg->text));
 
-      /* if first break is on left side of screen, don't bother */
-      if( line_len < minbreak && *last_break != '\n' )
-	{
-	  last_break = (char *)(current_line+wraplength);
-	  line_len = wraplength+1;
-	}
-      strncpy(buffer, current_line, line_len);
-      if(buffer[line_len-1]=='\n')
-	buffer[line_len] = 0;
-      else
-	{
-	/* add newline if we're breaking text, and account for added length*/
-	  buffer[line_len] = '\n';
-	  buffer[line_len+1] = 0;
-	  final_length++;
-	}
-      body_list = g_list_append(body_list,g_strdup(buffer));
-      length -= line_len;
-      tabspace = 0;
-      last_break++;
-      current_line = last_break;
-   }
-  if(length)
-    body_list = g_list_append(body_list,g_strndup(current_line,length));
+   the_text = gtk_editable_get_chars (GTK_EDITABLE (bsmsg->text),0,-1);
+   wrap_string(the_text, balsa_app.wraplength);
 
-  body->buffer = g_malloc(final_length);
-  current_line = body->buffer;
+   gtk_text_freeze(GTK_TEXT(bsmsg->text));
+   gtk_editable_delete_text(GTK_EDITABLE(bsmsg->text),0,-1);
+   dummy = 0;
+   gtk_editable_insert_text(GTK_EDITABLE(bsmsg->text),the_text,
+			    strlen(the_text), &dummy);
+   gtk_editable_set_position(GTK_EDITABLE(bsmsg->text), pos);
+   gtk_text_thaw(GTK_TEXT(bsmsg->text));
+   g_free(the_text);
+}
 
-  /* use the list of wrapped lines to create message body */
-  next_line=body_list;
-  while(next_line)
-    {
-      strcpy(current_line, (char *)next_line->data);
-      current_line += strlen( next_line->data);
-      g_free(next_line->data);
-      next_line=next_line->next;
-    }
-  g_list_free(body_list);
+static void
+do_reflow (GtkText * txt, gint mode) {
+   gint pos, dummy;
+   gchar * the_text;
 
+   pos = gtk_editable_get_position( GTK_EDITABLE(txt) );
+   the_text = gtk_editable_get_chars ( GTK_EDITABLE(txt),0,-1);
+   reflow_string(the_text, mode, &pos, balsa_app.wraplength);
+
+   gtk_text_freeze(txt);
+   gtk_editable_delete_text( GTK_EDITABLE(txt), 0,-1);
+   dummy = 0;
+   gtk_editable_insert_text( GTK_EDITABLE(txt),the_text, 
+			     strlen(the_text), &dummy);
+   gtk_editable_set_position( GTK_EDITABLE(txt), pos);
+   gtk_text_thaw(txt);
+   g_free(the_text);
+}
+
+static void
+reflow_par_cb (GtkWidget * widget, BalsaSendmsg *bsmsg) {
+   do_reflow(GTK_TEXT(bsmsg->text), 
+	     gtk_editable_get_position(GTK_EDITABLE(bsmsg->text)) );
+}
+
+static void
+reflow_body_cb (GtkWidget * widget, BalsaSendmsg *bsmsg) {
+   do_reflow(GTK_TEXT(bsmsg->text), -1);
 }
 
 static void
@@ -1497,11 +1597,11 @@ static void set_menus(BalsaSendmsg *msg)
 
    for(i=0; i<sizeof(headerDescs)/sizeof(headerDescs[0]); i++)
       if(findWord(headerDescs[i].name, balsa_app.compose_headers) ) {
-	      /* show... (well, it's already been shown). */
+	 /* show... (well, it has already been shown). */
 	    gtk_check_menu_item_set_active(
 	    GTK_CHECK_MENU_ITEM(view_menu[i].widget), TRUE );
       } else {
-	      /* or hide... */
+	 /* or hide... */
 	 GTK_SIGNAL_FUNC(view_menu[i].moreinfo)(view_menu[i].widget,msg);
       }
 
@@ -1543,7 +1643,6 @@ two_const_fields_to_end(const gchar* ptr) {
 static gchar* 
 get_font_name(const gchar* base, int code) {
    static gchar type[] ="iso8859";
-   /* g_snprintf(font_name,sizeof(font_name),"%s-%d",base_mask,code); */
    gchar *res;
    const gchar* ptr = base;
    int dash_cnt = 0, len;
@@ -1591,7 +1690,6 @@ static gint
 iso_font_set(BalsaSendmsg *msg, gint code, gint idx) {
    guint point, txt_len;
    gchar* str, *font_name;
-   /* ten extra characters for the code only is more than sufficent */
    
    msg->charset_idx = idx;
 
@@ -1603,8 +1701,8 @@ iso_font_set(BalsaSendmsg *msg, gint code, gint idx) {
    if(msg->font) gdk_font_unref(msg->font);
 
    if( !( msg->font = gdk_font_load (font_name)) ) {
-      g_free(font_name);
       printf("Cannot find fond: %s\n", font_name);
+      g_free(font_name);
       return TRUE;
    }
    if(balsa_app.debug) 

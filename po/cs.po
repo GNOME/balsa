@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-06-14 11:58+0200\n"
-"PO-Revision-Date: 2003-06-14 22:23+0200\n"
+"POT-Creation-Date: 2003-06-18 03:46+0200\n"
+"PO-Revision-Date: 2003-06-18 21:10+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -325,7 +325,12 @@ msgstr "Nelze načíst poštovní schránku %s"
 msgid "No such mailbox type: %s"
 msgstr "Neznámý typ poštovní schránky: %s"
 
-#: libbalsa/mailbox.c:427
+#: libbalsa/mailbox.c:425
+#, c-format
+msgid "Bad local mailbox path \"%s\""
+msgstr "Špatná cesta k místní poštovní schránce \"%s\""
+
+#: libbalsa/mailbox.c:430
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr "Nelze vytvořit poštovní schránku typu %s"
@@ -2125,60 +2130,60 @@ msgstr "Velikost"
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Otevírá se poštovní schránka %s. Čekejte, prosím..."
 
-#: src/balsa-index.c:1869
+#: src/balsa-index.c:1872
 msgid "_View Source"
 msgstr "Zobrazit zdro_j"
 
-#: src/balsa-index.c:1871 src/main-window.c:444 src/message-window.c:118
+#: src/balsa-index.c:1874 src/main-window.c:444 src/message-window.c:118
 msgid "_Reply..."
 msgstr "_Odpovědět..."
 
-#: src/balsa-index.c:1873
+#: src/balsa-index.c:1876
 msgid "Reply To _All..."
 msgstr "Odpovědět vš_em..."
 
-#: src/balsa-index.c:1875
+#: src/balsa-index.c:1878
 msgid "Reply To _Group..."
 msgstr "Odpovědět _skupině..."
 
-#: src/balsa-index.c:1877
+#: src/balsa-index.c:1880
 msgid "_Forward Attached..."
 msgstr "Přeposlat _jako přílohu..."
 
-#: src/balsa-index.c:1879
+#: src/balsa-index.c:1882
 msgid "Forward _Inline..."
 msgstr "Přeposlat uvn_itř..."
 
-#: src/balsa-index.c:1881 src/main-window.c:546
+#: src/balsa-index.c:1884 src/main-window.c:546
 msgid "_Store Address..."
 msgstr "_Uložit adresu..."
 
-#: src/balsa-index.c:1894 src/filter-edit-dialog.c:216 src/mailbox-node.c:952
+#: src/balsa-index.c:1897 src/filter-edit-dialog.c:216 src/mailbox-node.c:952
 #: src/main-window.c:528 src/pref-manager.c:1572 src/pref-manager.c:2714
 msgid "_Delete"
 msgstr "O_dstranit"
 
-#: src/balsa-index.c:1899 src/main-window.c:535
+#: src/balsa-index.c:1902 src/main-window.c:535
 msgid "_Undelete"
 msgstr "O_bnovit smazané"
 
-#: src/balsa-index.c:1904
+#: src/balsa-index.c:1907
 msgid "Move To _Trash"
 msgstr "Přesunout do _koše"
 
-#: src/balsa-index.c:1908
+#: src/balsa-index.c:1911
 msgid "T_oggle"
 msgstr "_Označit"
 
-#: src/balsa-index.c:1911
+#: src/balsa-index.c:1914
 msgid "_Flagged"
 msgstr "O_značena"
 
-#: src/balsa-index.c:1914
+#: src/balsa-index.c:1917
 msgid "_Unread"
 msgstr "_Nepřečtené"
 
-#: src/balsa-index.c:1922
+#: src/balsa-index.c:1925
 msgid "_Move to"
 msgstr "_Přesunout do"
 
@@ -2998,15 +3003,15 @@ msgstr "Potvrdit"
 msgid "Information - Balsa"
 msgstr "Informace - Balsa"
 
-#: src/information-dialog.c:243
+#: src/information-dialog.c:244
 msgid "WARNING: "
 msgstr "VAROVÁNÍ: "
 
-#: src/information-dialog.c:246
+#: src/information-dialog.c:247
 msgid "ERROR: "
 msgstr "CHYBA: "
 
-#: src/information-dialog.c:249
+#: src/information-dialog.c:250
 msgid "FATAL: "
 msgstr "ZÁVAŽNÉ: "
 
@@ -5160,22 +5165,22 @@ msgstr ""
 msgid "sending message with gpg mode %d"
 msgstr "odesílám zprávu s režimem gpg %d"
 
-#: src/sendmsg-window.c:4365
+#: src/sendmsg-window.c:4361
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Odpověď pro %s: %s"
 
-#: src/sendmsg-window.c:4370
+#: src/sendmsg-window.c:4366
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Přeposlat zprávu pro %s: %s"
 
-#: src/sendmsg-window.c:4374
+#: src/sendmsg-window.c:4370
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Pokračovat v psaní zprávy pro %s: %s"
 
-#: src/sendmsg-window.c:4378
+#: src/sendmsg-window.c:4374
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nová zpráva pro %s: %s"

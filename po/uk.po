@@ -237,6 +237,8 @@ msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
 msgstr ""
+"Не вдалося в╕дкрити поштову скриню!\n"
+"Перев╕рте установки поштово╖ скрин╕."
 
 #: src/balsa-index-page.c:582 src/filter-edit-dialog.c:224
 msgid "New"
@@ -880,7 +882,6 @@ msgid "Get new mail on startup"
 msgstr "Отримати нову кореспонденц╕ю на початку"
 
 #: src/main.c:103
-#, fuzzy
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "П╕дготувати нове пов╕домлення до ЕПОШТА@АДРЕСА"
 
@@ -1501,9 +1502,3 @@ msgstr "Неможливо виконати команду друку."
 #: src/sendmsg-window.c:1386
 msgid "Error executing lpr"
 msgstr "Помилка виконання lpr"
-
-#~ msgid "Unable to Open Mailbox!"
-#~ msgstr "Не вдалося в╕дкрити поштову скриньку!"
-
-#~ msgid "All of the fields must be filled in"
-#~ msgstr "Вам необх╕дно заповнити вс╕ поля"

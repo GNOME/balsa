@@ -15,11 +15,31 @@
 #include "mailbox.h"
 
 
+/* filter match types */
+typedef enum
+{
+    FILTER_NONE = 0,
+    FILTER_SIMPLE,
+    FILTER_REGEX,
+    FILTER_EXEC
+} filter_match_type;
+
+typedef enum
+{
+    FILTER_MATCHES,
+    FILTER_NOMATCH,
+    FILTER_ALWAYS,
+} filter_when_type;
+	
+
 /* filter_run_dialog() modes */
 #define FILTER_RUN_SINGLE    0
 #define FILTER_RUN_MULTIPLE  1
 
-/* filter error codes */
+/*
+ * filter error codes
+ * (not an enum cause they *have* to match filter_errlist
+ */
 #define FILTER_NOERR         0
 #define FILTER_ENOFILE       1
 #define FILTER_ENOREAD       2
@@ -37,9 +57,11 @@ gint filter_errno;
 /* filters */
 typedef struct _filter
 {
-    guint16 type;
+    gint group;
     gchar *name;
-    guint16 flags;
+    filter_match_type type;
+    filter_when_type match_when;
+    guint flags;
 
     /*
      * This should perhaps be a union, especially to 
@@ -52,8 +74,9 @@ typedef struct _filter
      *     gchar exec_command[1024];
      * } _filter_strings;
      */
-    guint16 match_fields; /* for FILTER_SIMPLE filters */
+    guint match_fields; /* for FILTER_SIMPLE filters */
     gchar *match_string; /* for FILTER_SIMPLE filters */
+
     gchar *exec_command; /* for FILTER_EXEC filters */
 
     /* other options I haven't thought of yet */

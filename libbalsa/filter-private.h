@@ -11,11 +11,6 @@
 #define FILTER_REGCOMP       (REG_NEWLINE | REG_NOSUB | REG_EXTENDED)
 #define FILTER_REGEXEC       0
 
-/* filter types */
-#define FILTER_NONE          0
-#define FILTER_SIMPLE        1
-#define FILTER_REGEX         2
-#define FILTER_EXEC          3
 
 /* filter flags */
 #define FILTER_EMPTY         0    /* for clearing bitfields */

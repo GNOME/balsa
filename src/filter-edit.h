@@ -136,3 +136,27 @@ GtkWidget *fe_group_inbound;
 GtkWidget *fe_group_outbound;
 GtkWidget *fe_group_presend;
 GtkWidget *fe_group_demand;
+
+/* widgets for the type notebook simple page */
+GtkWidget *fe_type_simple_frame;
+GtkWidget *fe_type_simple_table;
+GtkWidget *fe_type_simple_all;
+GtkWidget *fe_type_simple_body;
+GtkWidget *fe_type_simple_header;
+GtkWidget *fe_type_simple_to;
+GtkWidget *fe_type_simple_from;
+GtkWidget *fe_type_simple_subject;
+GtkWidget *fe_type_simple_label;
+GtkWidget *fe_type_simple_entry;
+
+/* widgets for the type notebook regex page */
+GtkWidget *fe_type_regex_scroll;
+GtkWidget *fe_type_regex_list;
+GtkWidget *fe_type_regex_box;
+GtkWidget *fe_type_regex_add;
+GtkWidget *fe_type_regex_remove;
+GtkWidget *fe_type_regex_entry;
+
+/* Entry for the type notebook exec page */
+GtkWidget *fe_type_exec_label;
+GtkWidget *fe_type_exec_entry;

@@ -44,3 +44,19 @@ void fe_dialog_button_clicked(GtkWidget *widget,
     /* more destruction is needed.  But that is for later */
 }
 	
+
+/*
+ * fe_checkbutton_toggled()
+ *
+ * Handles toggling of the type checkbuttons.
+ * When they are toggled, the notebook page must change
+ */
+void fe_checkbutton_toggled(GtkWidget *widget,
+			    gpointer data)
+{
+    if (GTK_TOGGLE_BUTTON(widget)->active) 
+    {
+	gtk_notebook_set_page(GTK_NOTEBOOK(fe_type_notebook),
+			      (gint)data);
+    }
+}

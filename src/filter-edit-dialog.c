@@ -343,6 +343,10 @@ void filter_edit_dialog(GList *filter_list)
     gtk_widget_show(fe_type_box);
     fe_simple = gtk_radio_button_new_with_label(NULL,
 						"Simple");
+    gtk_signal_connect(GTK_OBJECT(fe_simple),
+		       "toggled",
+		       GTK_SIGNAL_FUNC(fe_checkbutton_toggled),
+		       (gpointer)0);
     gtk_box_pack_start(GTK_BOX(fe_type_box),
 		       fe_simple,
 		       TRUE,
@@ -352,6 +356,10 @@ void filter_edit_dialog(GList *filter_list)
     fe_regex = gtk_radio_button_new_with_label(
 	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_simple)),
 			       "Regular Expression");
+    gtk_signal_connect(GTK_OBJECT(fe_regex),
+		       "toggled",
+		       GTK_SIGNAL_FUNC(fe_checkbutton_toggled),
+		       (gpointer)1);
     gtk_box_pack_start(GTK_BOX(fe_type_box),
 		       fe_regex,
 		       TRUE,
@@ -361,6 +369,10 @@ void filter_edit_dialog(GList *filter_list)
     fe_exec = gtk_radio_button_new_with_label(
 	gtk_radio_button_group(GTK_RADIO_BUTTON(fe_regex)),
 			       "External Command");
+    gtk_signal_connect(GTK_OBJECT(fe_exec),
+		       "toggled",
+		       GTK_SIGNAL_FUNC(fe_checkbutton_toggled),
+		       (gpointer)2);
     gtk_box_pack_start(GTK_BOX(fe_type_box),
 		       fe_exec,
 		       TRUE,
@@ -383,6 +395,181 @@ void filter_edit_dialog(GList *filter_list)
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
 		     5, 5);
     gtk_widget_show(fe_type_notebook);
+    
+    /* The simple page of the type notebook */
+
+    fe_type_notebook_simple_page = gtk_table_new(5, 5, TRUE);
+    gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook),
+			     fe_type_notebook_simple_page,
+			     NULL);
+    gtk_widget_show(fe_type_notebook_simple_page);
+
+    fe_type_simple_frame = gtk_frame_new("Match in:");
+    gtk_frame_set_label_align(GTK_FRAME(fe_type_simple_frame),
+			      GTK_POS_LEFT,
+			      GTK_POS_TOP);
+    gtk_frame_set_shadow_type(GTK_FRAME(fe_type_simple_frame),
+			      GTK_SHADOW_ETCHED_IN);
+    gtk_table_attach(GTK_TABLE(fe_type_notebook_simple_page),
+		     fe_type_simple_frame,
+		     0, 5, 0, 4,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_FILL | GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_type_simple_frame);
+    fe_type_simple_table = gtk_table_new(3, 3, TRUE);
+    gtk_container_add(GTK_CONTAINER(fe_type_simple_frame),
+		      fe_type_simple_table);
+    gtk_widget_show(fe_type_simple_table);
+
+    fe_type_simple_all = gtk_check_button_new_with_label("All");
+    gtk_table_attach(GTK_TABLE(fe_type_simple_table),
+		     fe_type_simple_all,
+		     0, 1, 0, 1,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     2, 2);
+    gtk_widget_show(fe_type_simple_all);
+    fe_type_simple_header = gtk_check_button_new_with_label("Header");
+    gtk_table_attach(GTK_TABLE(fe_type_simple_table),
+		     fe_type_simple_header,
+		     1, 2, 0, 1,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     2, 2);
+    gtk_widget_show(fe_type_simple_header);
+    fe_type_simple_body = gtk_check_button_new_with_label("Body");
+    gtk_table_attach(GTK_TABLE(fe_type_simple_table),
+		     fe_type_simple_body,
+		     1, 2, 1, 2,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     2, 2);
+    gtk_widget_show(fe_type_simple_body);
+    fe_type_simple_to = gtk_check_button_new_with_label("To:");
+    gtk_table_attach(GTK_TABLE(fe_type_simple_table),
+		     fe_type_simple_to,
+		     2, 3, 0, 1,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     2, 2);
+    gtk_widget_show(fe_type_simple_to);
+    fe_type_simple_from = gtk_check_button_new_with_label("From:");
+    gtk_table_attach(GTK_TABLE(fe_type_simple_table),
+		     fe_type_simple_from,
+		     2, 3, 1, 2,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     2, 2);
+    gtk_widget_show(fe_type_simple_from);
+    fe_type_simple_subject = gtk_check_button_new_with_label("Subject");
+    gtk_table_attach(GTK_TABLE(fe_type_simple_table),
+		     fe_type_simple_subject,
+		     2, 3, 2, 3,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     2, 2);
+    gtk_widget_show(fe_type_simple_subject);
+
+    fe_type_simple_label = gtk_label_new("Match string:");
+    gtk_table_attach(GTK_TABLE(fe_type_notebook_simple_page),
+		     fe_type_simple_label,
+		     0, 1, 4, 5,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_type_simple_label);
+    fe_type_simple_entry = gtk_entry_new_with_max_length(1023);
+    gtk_table_attach(GTK_TABLE(fe_type_notebook_simple_page),
+		     fe_type_simple_entry,
+		     1, 5, 4, 5,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_type_simple_entry);
+
+    /* The regex page of the type notebook */
+
+    fe_type_notebook_regex_page = gtk_table_new(5, 5, TRUE);
+    gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook),
+			     fe_type_notebook_regex_page,
+			     NULL);
+    gtk_widget_show(fe_type_notebook_regex_page);
+
+    fe_type_regex_scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(fe_type_regex_scroll),
+				   GTK_POLICY_AUTOMATIC,
+				   GTK_POLICY_AUTOMATIC);
+    gtk_table_attach(GTK_TABLE(fe_type_notebook_regex_page),
+		     fe_type_regex_scroll,
+		     0, 5, 0, 3,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     2, 2);
+    gtk_widget_show(fe_type_regex_scroll);
+    fe_type_regex_list = gtk_list_new();
+    gtk_list_set_selection_mode(GTK_LIST(fe_type_regex_list),
+				GTK_SELECTION_SINGLE);
+    gtk_container_add(GTK_CONTAINER(fe_type_regex_scroll),
+		      fe_type_regex_list);
+    gtk_widget_show(fe_type_regex_list);
+
+    fe_type_regex_box = gtk_hbox_new(TRUE, 5);
+    gtk_table_attach(GTK_TABLE(fe_type_notebook_regex_page),
+		     fe_type_regex_box,
+		     0, 5, 3, 4,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     2, 2);
+    gtk_widget_show(fe_type_regex_box);
+    fe_type_regex_add = gtk_button_new_with_label("Add");
+    gtk_box_pack_start(GTK_BOX(fe_type_regex_box),
+		       fe_type_regex_add,
+		       TRUE,
+		       TRUE,
+		       0);
+    gtk_widget_show(fe_type_regex_add);
+    fe_type_regex_remove = gtk_button_new_with_label("Remove");
+    gtk_box_pack_start(GTK_BOX(fe_type_regex_box),
+		       fe_type_regex_remove,
+		       TRUE,
+		       TRUE,
+		       0);
+    gtk_widget_show(fe_type_regex_remove);
+
+    fe_type_regex_entry = gtk_entry_new_with_max_length(1023);
+    gtk_table_attach(GTK_TABLE(fe_type_notebook_regex_page),
+		     fe_type_regex_entry,
+		     0, 5, 4, 5,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     2, 2);
+    gtk_widget_show(fe_type_regex_entry);
+
+    /* The exec page of the type notebook */
+
+    fe_type_notebook_exec_page = gtk_table_new(5, 5, TRUE);
+    gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook),
+			     fe_type_notebook_exec_page,
+			     NULL);
+    gtk_widget_show(fe_type_notebook_exec_page);
+    
+    fe_type_exec_label = gtk_label_new("Command:");
+    gtk_table_attach(GTK_TABLE(fe_type_notebook_exec_page),
+		     fe_type_exec_label,
+		     0, 1, 0, 1,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_type_exec_label);
+    fe_type_exec_entry = gtk_entry_new_with_max_length(1023);
+    gtk_table_attach(GTK_TABLE(fe_type_notebook_exec_page),
+		     fe_type_exec_entry,
+		     1, 5, 0, 1,
+		     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
+		     GTK_SHRINK,
+		     5, 5);
+    gtk_widget_show(fe_type_exec_entry);
     
 
     /* The action notebook page */

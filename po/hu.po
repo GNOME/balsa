@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa VERSION\n"
-"POT-Creation-Date: 2001-01-09 14:33+0000\n"
-"PO-Revision-Date: 2001-01-09 15:51+0100\n"
+"POT-Creation-Date: 2001-01-10 14:56+0000\n"
+"PO-Revision-Date: 2001-01-10 15:51+0100\n"
 "Last-Translator: Andras TIMAR <timar@gnome.hu>\n"
 "Language-Team: Hungarian <hu@gnome.hu>\n"
 "MIME-Version: 1.0\n"
@@ -38,7 +38,7 @@ msgstr ""
 
 #: libbalsa/address-book-ldap.c:328 libbalsa/address-book-vcard.c:274
 msgid "No-Id"
-msgstr "Nincs Id"
+msgstr "Nincs azonosító"
 
 #: libbalsa/address-book-ldap.c:332 libbalsa/address-book-vcard.c:283
 msgid "No-Name"
@@ -52,7 +52,7 @@ msgstr ""
 #: libbalsa/address-book-vcard.c:252
 #, c-format
 msgid "Could not open vCard address book %s."
-msgstr "A vCarc címjegyzék %s megnyitása sikertelen."
+msgstr "A vCard címjegyzék %s megnyitása sikertelen."
 
 #: libbalsa/address-book-vcard.c:422
 #, c-format
@@ -89,7 +89,7 @@ msgstr "Postafiók betöltése sikertelen: %s"
 msgid "No such mailbox type: %s"
 msgstr "Nincs ilyen postafióktípus: %s"
 
-#: libbalsa/mailbox.c:345
+#: libbalsa/mailbox.c:326
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr "%s típusú postafiók létrehozása sikertelen."
@@ -116,22 +116,27 @@ msgstr "Elnézést, a Balsa (még) nem tud maildir postafiókot létrehozni."
 #: libbalsa/mailbox_maildir.c:161 libbalsa/mailbox_mh.c:160
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
-msgstr ""
+msgstr "%s megnyitása sikertelen. Hibakód = %d, "
 
 #: libbalsa/mailbox_maildir.c:179 libbalsa/mailbox_mh.c:177
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Could not remove contents of %s:\n"
 "%s"
-msgstr "A fájl nyitása nem volt sikeres.\n"
+msgstr ""
+"Nem sikerült törölni %s tartalmát:\n"
+"%s"
 
 #: libbalsa/mailbox_maildir.c:185 libbalsa/mailbox_mbox.c:169
 #: libbalsa/mailbox_mh.c:183
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Could not remove %s:\n"
 "%s"
-msgstr "A fájl nyitása nem volt sikeres.\n"
+msgstr ""
+"Nem sikerült törölni %s-t:\n"
+"%s"
+
 
 #: libbalsa/mailbox_mbox.c:120
 #, c-format
@@ -163,11 +168,11 @@ msgstr ""
 
 #: libbalsa/pop3.c:48
 msgid "connection error"
-msgstr ""
+msgstr "hiba a kapcsolatban"
 
 #: libbalsa/pop3.c:49
 msgid "POP command exection failed"
-msgstr ""
+msgstr "A POP parancs végrehajtása nem sikerült"
 
 #: libbalsa/pop3.c:50
 #, fuzzy
@@ -176,7 +181,7 @@ msgstr "Levél folytatása"
 
 #: libbalsa/pop3.c:51
 msgid "Could not run the delivery program (procmail)"
-msgstr ""
+msgstr "Nem tudom futtatni a kézbesítõprogramot (procmail)"
 
 #: libbalsa/pop3.c:52
 msgid "Could not open mailbox for spooling"
@@ -202,33 +207,35 @@ msgstr "Engedélyezés elutasítva"
 #: libbalsa/pop3.c:323
 #, c-format
 msgid "Retrieving Message %d of %d"
-msgstr ""
+msgstr "Üzenetek letöltése %d/%d"
 
 #: libbalsa/pop3.c:336
 #, c-format
 msgid "Received %d bytes of %d"
-msgstr ""
+msgstr "%d/%d bájt érkezett eddig"
 
 #: libbalsa/send.c:416
 msgid ""
 "SMTP protocol error. Cannot relay.\n"
 "Your message is left in Outbox."
 msgstr ""
+"SMTP protokollhiba. Nem küldi el.\n"
+"Az üzeneted a Kimenõ mappában maradt."
 
 #: libbalsa/send.c:809
 #, c-format
 msgid "Error: Could not find address for host %s."
-msgstr ""
+msgstr "Hiba: %s gép címe nem található."
 
 #: libbalsa/send.c:819
 #, c-format
 msgid "Connecting to %s"
-msgstr ""
+msgstr "Kapcsolódás %s géphez"
 
 #: libbalsa/send.c:825
-#, fuzzy, c-format
+#, c-format
 msgid "Error connecting to %s."
-msgstr "Hiba történt az lpr végrehajtásánál"
+msgstr "Hiba történt %s géphez való kapcsolódás közben."
 
 #.
 #. ISPRIME(9)
@@ -275,7 +282,7 @@ msgstr ""
 
 #: libinit_balsa/balsa-druid-page-directory.gob:194
 msgid "Mail Files"
-msgstr "Levelzõ fajlok"
+msgstr "Levelezõ fajlok"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:267
 msgid "Problem Creating Mailboxes"
@@ -286,8 +293,8 @@ msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
 msgstr ""
-"Sikeresen telepítetted a Balsat. Jó szórakozást!\n"
-"   -- The Balsa development team"
+"Sikeresen telepítetted a Balsát. Jó szórakozást!\n"
+"   -- A Balsa fejlesztõcsapata"
 
 #: libinit_balsa/balsa-druid-page-finish.gob:57
 msgid "All Done!"
@@ -303,7 +310,7 @@ msgstr "Név:"
 
 #: libinit_balsa/balsa-druid-page-user.gob:87
 msgid "Email address:"
-msgstr "Email cím:"
+msgstr "Emailcím:"
 
 #: libinit_balsa/balsa-druid-page-user.gob:91
 msgid "SMTP Server:"
@@ -323,7 +330,7 @@ msgstr "Hiba a helyi postafióknál"
 
 #: libinit_balsa/balsa-druid-page-welcome.gob:47
 msgid "Welcome to Balsa!"
-msgstr "Rendelkezésedre áll a Balsa!"
+msgstr "Üdvözöl a Balsa!"
 
 #: libinit_balsa/balsa-druid-page-welcome.gob:50
 msgid ""
@@ -335,13 +342,13 @@ msgid ""
 "main window for more information about contacting the authors or\n"
 "reporting bugs."
 msgstr ""
-"Úgy tûnik elõször használod a Balsat. A következõ\n"
+"Úgy tûnik elõször használod a Balsát. A következõ\n"
 "kérdések megválaszolásával beállíthatod a levelezõprogramot.\n"
 "Ezeket az értékeket a késõbbiekben a Balsa beállításainál változtathatod "
 "meg.\n"
 "Ha szükség van új fajlokra vagy könyvtárakra, akkor a Balsa ezeket "
 "automatikusan\n"
-"létrehozza. Ha fel akarod venni a kapcsolatot a szerzõkkel , vagy hibát "
+"létrehozza. Ha fel akarod venni a kapcsolatot a szerzõkkel, vagy hibát "
 "találtál,\n"
 "akkor nézd meg a Balsa névjegyét."
 
@@ -350,8 +357,8 @@ msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"
 msgstr ""
-"Így kilépsz a Balsa-ból.\n"
-"Valóban akarod?"
+"Így kilépsz a Balsából.\n"
+"Valóban ezt akarod?"
 
 #: libinit_balsa/balsa-initdruid.gob:119
 msgid "GnomeCard Address Book"
@@ -361,14 +368,14 @@ msgstr "GnomeCard Címjegyzék"
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr ""
-"\"%s\": az elérési útat a fájlrendszer gyökerétõl kiindulva kell megadni (/ "
+"\"%s\": az elérési útat a fájlrendszer gyökerétõl kiindulva kell megadni (/"
 "-el kezdõdik)."
 
 #: libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
 msgstr ""
-"Nem tudtam a könyvtárat létrehozni, mert az mkdir()-nél hibás volt az "
+"Nem sikerült a könyvtárat létrehozni, mert az mkdir()-nél hibás volt az "
 "elérési út: \"%s\"."
 
 #: libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
@@ -382,15 +389,15 @@ msgstr "A Balsa beállítása"
 
 #: libmutt/mbox.c:134 libmutt/mbox.c:292
 msgid "Reading %s... %d (%d%%)"
-msgstr "%s olvasása... /d (%d%%)"
+msgstr "%s olvasása... %d (%d%%)"
 
 #: libmutt/mbox.c:158 libmutt/mbox.c:217
 msgid "Mailbox is corrupt!"
-msgstr "Postafiók megsérült!"
+msgstr "Sérült postafiók!"
 
 #: libmutt/mbox.c:666
 msgid "Mailbox was corrupted!"
-msgstr "Postafiók megsérült!"
+msgstr "A postafiók megsérült!"
 
 #: libmutt/mbox.c:703 libmutt/mbox.c:978
 msgid "Fatal error!  Could not reopen mailbox!"
@@ -421,12 +428,11 @@ msgstr "Üzenetek mentése... %d (%d%%)"
 #: libmutt/mbox.c:962
 #, c-format
 msgid "Write failed!  Saved partial mailbox to %s"
-msgstr ""
+msgstr "A mentés nem sikerült!  A postafiók %s néven lett részlegesen elmentve"
 
 #: libmutt/mbox.c:1028
-#, fuzzy
 msgid "Could not reopen mailbox!"
-msgstr "A fájl nyitása nem volt sikeres.\n"
+msgstr "Nem lehet megnyitni a postafiókot!"
 
 #: libmutt/mbox.c:1066
 msgid "Reopening mailbox..."
@@ -468,17 +474,17 @@ msgstr "%s nem postafiók."
 #: libmutt/mx.c:542
 #, c-format
 msgid "Couldn't lock %s\n"
-msgstr ""
+msgstr "%s zárolása sikertelen\n"
 
 #: libmutt/mx.c:630
-#, fuzzy, c-format
+#, c-format
 msgid "Reading %s..."
-msgstr "Töltés..."
+msgstr "%s betöltése..."
 
 #: libmutt/mx.c:719
 #, c-format
 msgid "Writing %s..."
-msgstr ""
+msgstr "%s mentése..."
 
 #: libmutt/mx.c:746
 #, c-format
@@ -488,7 +494,7 @@ msgstr "%s postafiók szinkronizálása sikertelen."
 #: libmutt/mx.c:848
 #, c-format
 msgid "Moving read messages to %s..."
-msgstr ""
+msgstr "Az olvasott üzenetek átmozgatása %s helyre"
 
 #: libmutt/mx.c:899 libmutt/mx.c:1056
 msgid "Mailbox is unchanged."
@@ -497,12 +503,12 @@ msgstr "A postafiók változatlan."
 #: libmutt/mx.c:929
 #, c-format
 msgid "%d kept, %d moved, %d deleted."
-msgstr ""
+msgstr "%d megtartva, %d áthelyezve, %d törölve."
 
 #: libmutt/mx.c:932 libmutt/mx.c:1098
 #, c-format
 msgid "%d kept, %d deleted."
-msgstr ""
+msgstr "%d megtartva, %d törölve."
 
 #: libmutt/mx.c:1040
 #, c-format
@@ -535,59 +541,57 @@ msgstr "A szerkesztett levél nyomtatása"
 #: libmutt/mx.c:1095
 #, c-format
 msgid "%d kept."
-msgstr ""
+msgstr "%d megtartva."
 
 #: libmutt/mx.c:1375
-#, fuzzy
 msgid "Can't write message"
-msgstr "Levél folytatása"
+msgstr "Üzenet mentése sikertelen"
 
 #: libmutt/imap/auth.c:110
 msgid "Authenticating (CRAM-MD5)..."
-msgstr ""
+msgstr "Hitelesítés (CRAM-MD5)..."
 
 #: libmutt/imap/auth.c:202
 msgid "Authenticating (anonymous)..."
-msgstr ""
+msgstr "Hitelesítés (névtelen)"
 
 #: libmutt/imap/auth.c:288
 msgid "Anonymous authentication not supported."
-msgstr ""
+msgstr "Névtelen hitelesítés nincs támogatva."
 
 #: libmutt/imap/auth.c:301
 msgid "GSSAPI authentication failed."
-msgstr ""
+msgstr "GSSAPI hitelesítés sikertelen."
 
 #: libmutt/imap/auth.c:329
 msgid "CRAM-MD5 authentication failed."
-msgstr ""
+msgstr "CRAM-MD5 hitelesítés sikertelen."
 
 #: libmutt/imap/auth.c:344
 msgid "Skipping CRAM-MD5 authentication."
-msgstr ""
+msgstr "CRAM-MD5 hitelesítés elhagyása."
 
 #: libmutt/imap/auth.c:366
-#, fuzzy
 msgid "Logging in..."
-msgstr "Töltés..."
+msgstr "Bejelentkezés..."
 
 #. Login failed, try again
 #: libmutt/imap/auth.c:378
 msgid "Login failed."
-msgstr ""
+msgstr "Bejelentkezés sikertelen."
 
 #. now begin login
 #: libmutt/imap/auth_gss.c:88
 msgid "Authenticating (GSSAPI)..."
-msgstr ""
+msgstr "Hitelesítés (GSSAPI)..."
 
-#: libmutt/imap/browse.c:93
+#: libmutt/imap/browse.c:108
 msgid "Getting namespaces..."
 msgstr ""
 
-#: libmutt/imap/browse.c:120
+#: libmutt/imap/browse.c:135
 msgid "Getting folder list..."
-msgstr ""
+msgstr "Könyvtárlista letöltése..."
 
 #: libmutt/imap/imap_ssl.c:92
 msgid "Filling entropy pool"
@@ -608,27 +612,27 @@ msgstr ""
 #: libmutt/imap/imap_ssl.c:230
 #, c-format
 msgid "SSL connection using %s"
-msgstr ""
+msgstr "SSL kapcsolat %s használatával"
 
 #: libmutt/imap/imap_ssl.c:255
 msgid "Unknown"
-msgstr ""
+msgstr "Ismeretlen"
 
 #: libmutt/imap/imap_ssl.c:280
 msgid "[unable to calculate]"
-msgstr ""
+msgstr "[kiszámíthatatlan]"
 
 #: libmutt/imap/imap_ssl.c:298
 msgid "[invalid date]"
-msgstr ""
+msgstr "[érvénytelen dátum]"
 
 #: libmutt/imap/imap_ssl.c:373
 msgid "Server certificate is not yet valid"
-msgstr ""
+msgstr "A kiszolgáló hitelesítõ okmánya már nem érvényes"
 
 #: libmutt/imap/imap_ssl.c:380
 msgid "Server certificate has expired"
-msgstr ""
+msgstr "A kiszolgáló hitelesítõ okmánya lejárt"
 
 #: libmutt/imap/imap_ssl.c:454
 msgid "This certificate belongs to:"
@@ -680,11 +684,11 @@ msgstr "Feladó"
 
 #: libmutt/imap/imap_ssl.c:498
 msgid "Exit  "
-msgstr ""
+msgstr "Kilépés  "
 
 #: libmutt/imap/imap_ssl.c:500
 msgid "Help"
-msgstr ""
+msgstr "Súgó"
 
 #: libmutt/imap/imap_ssl.c:523
 msgid "Warning: Couldn't save certificate"
@@ -695,9 +699,8 @@ msgid "Certificate saved"
 msgstr ""
 
 #: libmutt/imap/util.c:43
-#, fuzzy
 msgid "Continue?"
-msgstr "Folytat"
+msgstr "Folytatod?"
 
 #: src/address-book.c:160 src/filter-edit-dialog.c:130
 msgid "Name"
@@ -713,9 +716,8 @@ msgstr "Címjegyzék"
 
 #. Entry widget for finding an address
 #: src/address-book.c:242
-#, fuzzy
 msgid "Search for Name:"
-msgstr "Keresés típusa:"
+msgstr "Név keresése:"
 
 #: src/address-book.c:310
 msgid "Send-To"
@@ -732,15 +734,15 @@ msgstr "Ismét importál"
 #. mode switching stuff
 #: src/address-book.c:346
 msgid "Treat multiple addresses as:"
-msgstr ""
+msgstr "Több cím kezelése:"
 
 #: src/address-book.c:350
 msgid "alternative addresses for the same person"
-msgstr ""
+msgstr "egy ember különféle címeiként"
 
 #: src/address-book.c:355
 msgid "a distribution list"
-msgstr ""
+msgstr "terjesztési listaként"
 
 #: src/address-book-config.c:100
 msgid "Address Book Configuration"
@@ -764,7 +766,7 @@ msgstr "LDAP Címjegyzék"
 
 #: src/address-book-config.c:293
 msgid "Balsa is not compiled with LDAP support"
-msgstr ""
+msgstr "Az LDAP támogatás nem lett belefordítva a Balsába"
 
 #. mailbox name
 #: src/address-book-config.c:313 src/address-book-config.c:371
@@ -772,27 +774,25 @@ msgid "Address Book Name:"
 msgstr "Címjegyzék neve:"
 
 #: src/address-book-config.c:322
-#, fuzzy
 msgid "File name"
-msgstr "Filter neve:"
+msgstr "Fájlnév"
 
 #: src/address-book-config.c:334 src/address-book-config.c:405
 msgid "Expand aliases as you type"
-msgstr ""
+msgstr "Az álnevek feloldása gépelés közben"
 
 #: src/address-book-config.c:382
-#, fuzzy
 msgid "Host name"
-msgstr "Vezetéknév:"
+msgstr "Gépnév"
 
 #: src/address-book-config.c:393
 msgid "Base Domain Name"
-msgstr ""
+msgstr "Tartománynév"
 
 #: src/address-book-config.c:460 src/filter-edit-dialog.c:379
 #: src/mailbox-conf.c:257 src/pref-manager.c:1215 src/pref-manager.c:1985
 msgid "Add"
-msgstr "Hozzáad"
+msgstr "Hozzáadás"
 
 #: src/address-book-config.c:507
 #, c-format
@@ -803,7 +803,7 @@ msgstr ""
 "A címjegyzéket tartalmazó fájl elérési útja '%s' helytelen.\n"
 "Szeretnéd kijavítani a fájlnevet?"
 
-#: src/balsa-app.c:71
+#: src/balsa-app.c:70
 #, c-format
 msgid ""
 "Opening remote mailbox %s.\n"
@@ -812,7 +812,7 @@ msgstr ""
 "A távoli %s postafiók megnyitása folyamatban.\n"
 "%s@%s jelszava:"
 
-#: src/balsa-app.c:75
+#: src/balsa-app.c:74
 #, c-format
 msgid "Mailbox password for %s@%s:"
 msgstr "%s@%s postafiók jelszava:"
@@ -846,7 +846,7 @@ msgid "Undelete"
 msgstr "Törlés visszavonása"
 
 #: src/balsa-index-page.c:547 src/filter-edit-dialog.c:224
-#: src/mailbox-node.c:351 src/main-window.c:490 src/pref-manager.c:1217
+#: src/mailbox-node.c:414 src/main-window.c:490 src/pref-manager.c:1217
 #: src/pref-manager.c:1987
 msgid "Delete"
 msgstr "Törlés"
@@ -1074,7 +1074,7 @@ msgstr "Fel"
 msgid "Down"
 msgstr "Le"
 
-#: src/filter-edit-dialog.c:218 src/mailbox-node.c:334
+#: src/filter-edit-dialog.c:218 src/mailbox-node.c:397
 msgid "New"
 msgstr "Új"
 
@@ -1198,11 +1198,6 @@ msgstr "HIBA: "
 msgid "FATAL: "
 msgstr "VÉGZETES: "
 
-#: src/local-mailbox.c:164
-#, c-format
-msgid "Local Mailbox Loaded as: %s\n"
-msgstr ""
-
 #: src/mailbox-conf.c:140
 msgid "No mailbox selected."
 msgstr "Nincs postafiók kiválasztva"
@@ -1321,53 +1316,58 @@ msgstr ""
 msgid "F_older Path:"
 msgstr "_Mappa elérési útja:"
 
-#: src/mailbox-node.c:170
+#: src/mailbox-node.c:176
 msgid "The folder edition to be written."
 msgstr ""
 
-#: src/mailbox-node.c:324
+#: src/mailbox-node.c:387
 msgid "Local Mbox Mailbox..."
 msgstr "Helyi Mbox postafiók..."
 
-#: src/mailbox-node.c:326
+#: src/mailbox-node.c:389
 msgid "Local Maildir Mailbox..."
 msgstr "Helyi Maildir postafiók..."
 
-#: src/mailbox-node.c:328
+#: src/mailbox-node.c:391
 msgid "Local MH Mailbox..."
 msgstr "Helyi MH postafiók..."
 
-#: src/mailbox-node.c:330
+#: src/mailbox-node.c:393
 msgid "Remote IMAP Mailbox..."
 msgstr "Távoli IMAP postafiók..."
 
-#: src/mailbox-node.c:346
+#: src/mailbox-node.c:409
 msgid "Open"
 msgstr "Megnyitás"
 
-#: src/mailbox-node.c:348
+#: src/mailbox-node.c:411
 msgid "Close"
 msgstr "Bezárás"
 
-#: src/mailbox-node.c:350
+#: src/mailbox-node.c:413
 msgid "Properties..."
 msgstr "Tulajdonságok..."
 
-#: src/mailbox-node.c:357
+#: src/mailbox-node.c:420
 msgid "Mark as Inbox"
 msgstr "Jelöld mint Érkezett"
 
-#: src/mailbox-node.c:358
+#: src/mailbox-node.c:421
 msgid "Mark as Sentbox"
 msgstr "Jelöld mint Elküldött"
 
-#: src/mailbox-node.c:359
+#: src/mailbox-node.c:422
 msgid "Mark as Trash"
 msgstr "Jelöld mint Kuka"
 
-#: src/mailbox-node.c:360
+#: src/mailbox-node.c:423
 msgid "Mark as Draftbox"
 msgstr "Jelöld mint Piszkozat"
+
+#: src/mailbox-node.c:524
+#, c-format
+msgid "Local Mailbox Loaded as: %s\n"
+msgstr ""
 
 #: src/main-window.c:203
 msgid "_Message..."

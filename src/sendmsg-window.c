@@ -861,7 +861,7 @@ quoteBody(BalsaSendmsg *msg, LibBalsaMessage * message, SendType type)
    libbalsa_message_body_ref (message);
    
    personStr = (message->from && message->from->personal) ?
-      message->from->personal : _("you");
+      message->from->personal : "you"; /* don't translate "you" here */
    
       /* Should use instead something like:
        * 	strftime( buf, sizeof(buf), _("On %A %B %d %Y etc"),
@@ -870,11 +870,17 @@ quoteBody(BalsaSendmsg *msg, LibBalsaMessage * message, SendType type)
        * so the date attribution can fully (and properly) translated.
        */
    if(message->date) {
-     date = libbalsa_message_date_to_gchar (message, balsa_app.date_string);
-     str = g_strdup_printf (_("On %s %s wrote:\n"), date, personStr);
-     g_free(date);
+      date = libbalsa_message_date_to_gchar (message, balsa_app.date_string);
+      if(message->from && message->from->personal)
+         str = g_strdup_printf (_("On %s %s wrote:\n"), date, personStr);
+      else
+         str = g_strdup_printf (_("On %s you wrote:\n"), date);
+      g_free(date);
    } else
-      str = g_strdup_printf (_("%s wrote:\n"), personStr);
+      if(message->from && message->from->personal)
+         str = g_strdup_printf (_("%s wrote:\n"), personStr); 
+      else
+         str = g_strdup_printf (_("You wrote:\n"));
 
 
    gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, 

@@ -230,7 +230,7 @@ static GnomeUIInfo message_menu[] =
   },
 #define MENU_MESSAGE_PREV_POS 1
   {
-    GNOME_APP_UI_ITEM, N_ ("Previous"), N_ ("Preivous Message"),
+    GNOME_APP_UI_ITEM, N_ ("Previous"), N_ ("Previous Message"),
     previous_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_BACK, 'P', 0, NULL
   },

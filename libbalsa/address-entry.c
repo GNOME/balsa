@@ -1532,25 +1532,15 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
     gint i;
     inputData *input;
 
-    /*
-     * FIXME: I don't know how to check if any data is/was selected.
-     *        The gtk-reference manual describes how to set it, not get it.
-     *        Is it even possible to select any data in the widget?
-     *        After all, we are in control...
-     *
-     *        The following hack works, but it /is/ a hack.  No way to
-     *        make it prettier without sub-classing GtkEntry.
-     */
     input = address_entry->input;
     addy = input->active->data;
     editable = GTK_EDITABLE(address_entry);
+
+    /*
+     * First: Cut the clipboard.
+     */
     if (editable->selection_start_pos != editable->selection_end_pos) {
 	libbalsa_cut_clipboard(address_entry);
-	/*
-	libbalsa_force_no_match(addy);
-	libbalsa_free_inputData(input);
-	address_entry->input = libbalsa_fill_input(address_entry);
-	*/
 	return;
     }
 
@@ -1563,6 +1553,7 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
        libbalsa_force_no_match(addy);
        return;
     }
+
     /*
      * Lets see if the user is at the beginning of an e-mail entry.
      */
@@ -1600,10 +1591,9 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
        g_free(left);
        addy->user = str;
        addy->cursor--;
-       /*
-       expand_alias_find_match(addy);
-       */
-       if (address_entry->find_match)
+       if (strlen(str) == 0)
+	   libbalsa_force_no_match(addy);
+       else if (address_entry->find_match)
 	   (*address_entry->find_match) (addy);
     }
 }
@@ -1637,25 +1627,11 @@ libbalsa_delete_forward_character(LibBalsaAddressEntry *address_entry)
     gint i;
     inputData *input;
     
-    /*
-     * FIXME: I don't know how to check if any data is/was selected.
-     *        The gtk-reference manual describes how to set it, not get it.
-     *        Is it even possible to select any data in the widget?
-     *        After all, we are in control...
-     *
-     *        The following hack works, but it /is/ a hack.  No way to
-     *        make it prettier without sub-classing GtkEntry.
-     */
     input = address_entry->input;
     addy = input->active->data;
     editable = GTK_EDITABLE(address_entry);
     if (editable->selection_start_pos != editable->selection_end_pos) {
 	libbalsa_cut_clipboard(address_entry);
-	/*
-	libbalsa_force_no_match(addy);
-	libbalsa_free_inputData(address_entry->input);
-	address_entry->input = libbalsa_fill_input(address_entry);
-	*/
 	return;
     }
 
@@ -2061,23 +2037,11 @@ libbalsa_keystroke_add_key(LibBalsaAddressEntry *address_entry, gchar *add)
      */
     if ((addy->cursor == 0) && (add[0] == (gchar) ' ')) return;
     
-    /*
-     * FIXME: I don't know how to check if any data is/was selected.
-     *        The gtk-reference manual describes how to set it, not get it.
-     *        Is it even possible to select any data in the widget?
-     *        After all, we are in control...
-     *
-     *        The following hack works, but it /is/ a hack.  No way to
-     *        make it prettier without sub-classing GtkEntry.
-     */
     editable = GTK_EDITABLE(address_entry);
     if (editable->selection_start_pos != editable->selection_end_pos) {
 	libbalsa_cut_clipboard(address_entry);
 	return;
     }
-	    /*
-            gtk_editable_delete_selection(editable);
-            */
 
     /*
      * Split the string at the correct cursor position.

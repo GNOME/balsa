@@ -115,6 +115,7 @@ int imap_cmd_step (IMAP_DATA* idata)
       dprint (1, (debugfile, "imap_cmd_step: Error while reading server response, closing connection.\n"));
       mutt_socket_close (idata->conn);
       idata->status = IMAP_FATAL;
+      cmd_handle_fatal (idata);
       return IMAP_CMD_FAIL;
     }
 
@@ -265,10 +266,11 @@ static void cmd_handle_fatal (IMAP_DATA* idata)
   if ((idata->state == IMAP_SELECTED) &&
       (idata->reopen & IMAP_REOPEN_ALLOW) &&
       !idata->ctx->closing) {
-      idata->status = IMAP_BYE;
-      idata->state  = IMAP_DISCONNECTED;
       mx_fastclose_mailbox (idata->ctx);
   }
+  mutt_socket_close(idata->conn);
+  idata->status = IMAP_BYE;
+  idata->state  = IMAP_DISCONNECTED;
 }
 
 /* cmd_handle_untagged: fallback parser for otherwise unhandled messages. */
@@ -303,6 +305,7 @@ static int cmd_handle_untagged (IMAP_DATA* idata)
 	 */
 	mutt_error _("Fatal error.  Message count is out of sync!");
 	idata->status = IMAP_FATAL;
+	cmd_handle_fatal (idata);
 	return -1;
       }
       /* at least the InterChange server sends EXISTS messages freely,
@@ -341,7 +344,7 @@ static int cmd_handle_untagged (IMAP_DATA* idata)
     /* server shut down our connection */
     s += 3;
     SKIPWS (s);
-    mutt_error ("%s", s);
+    mutt_error ("Server said good bye: %s", s);
     idata->status = IMAP_BYE;
     if (idata->state == IMAP_SELECTED)
       mx_fastclose_mailbox (idata->ctx);
@@ -355,7 +358,7 @@ static int cmd_handle_untagged (IMAP_DATA* idata)
     dprint (2, (debugfile, "Handling untagged NO\n"));
 
     /* Display the warning message from the server */
-    mutt_error ("%s", s+3);
+    mutt_error ("untagged NO: %s", s+3);
     sleep (2);
   }
 

@@ -1,3 +1,11 @@
+2001-02-22  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/address-entry.c: bug fix from 
+	Berend De Schouwer <bds@jhb.ucs.co.za>.
+	* libbalsa/message.c: don't crash when trying to operate on
+	closed mailboxes.
+	* libbalsa/libbalsa.c: skip empty mutt error messages.
+	
 2001-02-21  Matthew Guenther  <guentherm@asme.org>
 
 	* src/balsa-index-threading.c (threading_jwz, threading_simple):

@@ -222,7 +222,7 @@ libbalsa_guess_mail_spool(void)
 
 /*
  * This function is hooked into the mutt_error callback
- *
+ * mutt sometimes generates empty messages, ignore them.
  */
 static void
 libbalsa_mutt_error(const char *fmt, ...)
@@ -230,6 +230,7 @@ libbalsa_mutt_error(const char *fmt, ...)
     va_list va_args;
 
     va_start(va_args, fmt);
-    libbalsa_information_varg(LIBBALSA_INFORMATION_WARNING, fmt, va_args);
+    if(*fmt) 
+	libbalsa_information_varg(LIBBALSA_INFORMATION_WARNING, fmt, va_args);
     va_end(va_args);
 }

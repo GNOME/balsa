@@ -1,5 +1,11 @@
 2001-02-16  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* imap/command.c, imap/imap.c: armour the code against fata errors.
+	The patch sent to the mutt maintainer.
+	* imap/imap_private.h: redefine sleep.
+	
+2001-02-16  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* imap/command.c: handle properly fatal IMAP connection errors.
 
 2001-02-13  Carlos Morgado  <chbm@chbm.nu>

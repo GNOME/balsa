@@ -218,4 +218,7 @@ int imap_wordcasecmp(const char *a, const char *b);
 void imap_utf7_encode (char **s);
 void imap_utf7_decode (char **s);
 
+/* BALSA: speed up execution */
+#define sleep(n)
+
 #endif

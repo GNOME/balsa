@@ -326,6 +326,10 @@ libbalsa_message_user_hdrs(LibBalsaMessage * message)
     gchar **pair;
 
     g_return_val_if_fail(message->mailbox, NULL);
+    if(CLIENT_CONTEXT(message->mailbox)->hdrs == NULL) 
+	/* oops, mutt closed the mailbox on error, we should do the same */
+	return NULL;
+
     cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
     g_assert(cur != NULL);
     g_assert(cur->env != NULL);

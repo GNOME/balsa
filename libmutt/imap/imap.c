@@ -477,7 +477,7 @@ int imap_open_mailbox (CONTEXT* ctx)
   ctx->data = idata;
 
   if (idata->status == IMAP_FATAL)
-    goto fail;
+      goto fail;
 
   /* Clean up path and replace the one in the ctx */
   imap_fix_path (idata, mx.mbox, buf, sizeof (buf));
@@ -554,7 +554,7 @@ int imap_open_mailbox (CONTEXT* ctx)
     char *s;
     s = imap_next_word (idata->buf); /* skip seq */
     s = imap_next_word (s); /* Skip response */
-    mutt_error ("%s", s);
+    mutt_error ("Server answered NO: %s", s);
     sleep (2);
     goto fail;
   }
@@ -701,6 +701,7 @@ void imap_logout (IMAP_DATA* idata)
   imap_cmd_start (idata, "LOGOUT");
   while (imap_cmd_step (idata) == IMAP_CMD_CONTINUE)
     ;
+  idata->state = IMAP_DISCONNECTED;
 }
 
 int imap_close_connection (CONTEXT *ctx)

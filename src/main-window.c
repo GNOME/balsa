@@ -1934,6 +1934,9 @@ mail_progress_notify_cb()
                                         threadmessage->message_string);
             }
             break;
+        case LIBBALSA_NTFY_UPDATECONFIG:
+            config_mailbox_update(threadmessage->mailbox);
+            break;
         case LIBBALSA_NTFY_PROGRESS:
             percent = (gfloat) threadmessage->num_bytes /
                 (gfloat) threadmessage->tot_bytes;

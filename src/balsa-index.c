@@ -1063,11 +1063,8 @@ bndx_search_iter_and_select(BalsaIndex * index,
     if (wrap == BNDX_SEARCH_WRAP_YES && index->current_message)
 	stop_msgno = index->current_message->msgno;
     if (!bndx_search_iter(index, search_iter, &iter, direction, viewable,
-			  stop_msgno)) {
-	gtk_tree_selection_unselect_all(gtk_tree_view_get_selection
-					(GTK_TREE_VIEW(index)));
+			  stop_msgno))
 	return FALSE;
-    }
 
     bndx_expand_to_row_and_select(index, &iter);
     return TRUE;
@@ -1089,15 +1086,19 @@ static void
 bndx_select_next_threaded(BalsaIndex * index)
 {
     if (!bndx_search_iter_and_select(index, index->search_iter,
-				     BNDX_SEARCH_DIRECTION_NEXT,
-				     BNDX_SEARCH_VIEWABLE_ANY,
-				     BNDX_SEARCH_START_CURRENT,
-				     BNDX_SEARCH_WRAP_NO))
-	bndx_search_iter_and_select(index, index->search_iter,
-				    BNDX_SEARCH_DIRECTION_PREV,
-				    BNDX_SEARCH_VIEWABLE_ONLY,
-				    BNDX_SEARCH_START_CURRENT,
-				    BNDX_SEARCH_WRAP_NO);
+                                     BNDX_SEARCH_DIRECTION_NEXT,
+                                     BNDX_SEARCH_VIEWABLE_ANY,
+                                     BNDX_SEARCH_START_CURRENT,
+                                     BNDX_SEARCH_WRAP_NO)
+        && !bndx_search_iter_and_select(index, index->search_iter,
+                                        BNDX_SEARCH_DIRECTION_PREV,
+                                        BNDX_SEARCH_VIEWABLE_ONLY,
+                                        BNDX_SEARCH_START_CURRENT,
+                                        BNDX_SEARCH_WRAP_NO))
+	/* Nowhere to go--unselect current, so it can be filtered out of
+	 * the view. */
+        gtk_tree_selection_unselect_all(gtk_tree_view_get_selection
+                                        (GTK_TREE_VIEW(index)));
 }
 
 void

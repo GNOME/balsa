@@ -781,8 +781,12 @@ mailbox_conf_add(MailboxConfWindow *mcw)
     gboolean save_to_config = TRUE;
 
     mcw->mailbox = g_object_new(mcw->mailbox_type, NULL);
-
     mbnode = balsa_mailbox_node_new_from_mailbox(mcw->mailbox);
+    /* Now the mailbox has a view, so we can populate it, but it's not
+     * yet in balsa_app.mailbox_views, because the mailbox url isn't set.
+     */
+    mailbox_conf_view_check(mcw->view_info, mcw->mailbox);
+
     if ( LIBBALSA_IS_MAILBOX_LOCAL(mcw->mailbox) ) {
 	LibBalsaMailboxLocal *ml  = LIBBALSA_MAILBOX_LOCAL(mcw->mailbox);
 	gchar *path;
@@ -825,6 +829,10 @@ mailbox_conf_add(MailboxConfWindow *mcw)
     } else {
 	g_assert_not_reached();
     }
+
+    /* The mailbox url is now set. */
+    g_hash_table_insert(balsa_app.mailbox_views, mcw->mailbox->url,
+                        mcw->mailbox->view);
 
     if(save_to_config)
 	config_mailbox_add(mcw->mailbox, NULL);
@@ -1106,18 +1114,17 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
     GtkWidget *box;
     GtkWidget *button;
 
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
-
-    view = mailbox->view;
     view_info = g_new(BalsaMailboxConfView, 1);
     g_object_weak_ref(G_OBJECT(window),
                       (GWeakNotify) mailbox_conf_view_free, view_info);
     view_info->window = window;
 
+    view = mailbox ? mailbox->view : NULL;
+
     create_label(_("Identity:"), table, row);
     box = gtk_hbox_new(FALSE, 12);
     view_info->identity_name = NULL;
-    view_info->identity_label = gtk_label_new(view->identity_name
+    view_info->identity_label = gtk_label_new(view && view->identity_name
                                               ? view->identity_name
                                               : _("(No identity set)"));
     gtk_box_pack_start(GTK_BOX(box), view_info->identity_label, TRUE, TRUE,
@@ -1144,7 +1151,7 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
     gtk_table_attach(GTK_TABLE(table), box, 1, 2, row, row + 1,
                      GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 
-    button = (view->show == LB_MAILBOX_SHOW_FROM
+    button = (view && view->show == LB_MAILBOX_SHOW_FROM
               ? view_info->show_from : view_info->show_to);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
 
@@ -1192,7 +1199,7 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
         }
     }
 
-    if (!changed)
+    if (!changed || !view->open)
         return;
 
     balsa_mblist_close_mailbox(mailbox);

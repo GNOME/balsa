@@ -264,8 +264,12 @@ load_mailbox_view(BalsaMailboxNode * mbnode)
     LibBalsaMailbox *mailbox = mbnode->mailbox;
     LibBalsaMailboxView *view;
 
-    if (!mailbox->url)
+    if (!mailbox->url) {
+        /* The mailbox is being created: attach a view now, it will be
+         * inserted in balsa_app.mailbox_views later. */
+        mailbox->view = libbalsa_mailbox_view_new();
         return;
+    }
 
     view = g_hash_table_lookup(balsa_app.mailbox_views, mailbox->url);
     if (!view) {

@@ -129,8 +129,10 @@ fixes has been resolved as well.  See <tt>NEWS</tt> and/or
 
 <p>Balsa-2.0.3 is a quite mature GNOME2 port of balsa and has been
 used daily by many people. You may want to recompile balsa on your
-computer if you use different distribution. Try</p> <pre>rpm
---recompile balsa-2.0.2-1.src.rpm</pre>
+computer if you use different distribution. Try</p>
+
+ <pre>rpmbuild --recompile balsa-2.0.3-1.src.rpm</pre>
+
 <p><b>Please note</b> also that pspell distributed with RH makes balsa
 hang on <tt>fork()</tt> call, i.e. when any external program is to be forked
 from balsa. The solution is to remove <tt>-lc</tt> from dependency_libs 

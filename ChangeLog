@@ -4,6 +4,7 @@
 	* libbalsa/Makefile.am:
 	* images/Makefile.am: 
 	* sounds/Makefile.am:
+	* libbalsa/misc.c: improve wrapping of format=flowed (Peter Bl.).
 	* src/Makefile.am: automake fixes.
 	* src/balsa-index.[hc]: remove dead code. add prototypes.
 	* src/balsa-mblist.[hc]: disconnect properly non-relevant MbNodes.

@@ -358,6 +358,16 @@ libbalsa_wrap_string(gchar * str, int width)
  *
  * Note : the buffer pointed by par is not modified, the returned string
  * is newly allocated (so we can directly wrap from message body)
+ *
+ * Note about quoted material:
+ * >>>text with no space separating the `>>>' and the `text...' is ugly,
+ * so we'll space-stuff all quoted lines both for the screen and for the
+ * wire (except the usenet signature separator `-- ', which wouldn't be
+ * recognized if stuffed!). That means we must destuff *quoted* lines
+ * coming off the screen, but we'll assume that leading spaces on
+ * *unquoted* lines were put there intentionally by the user.
+ * The stuffing space isn't logically part of the text of the paragraph,
+ * so this doesn't change the content.
  * */
 
 #define MAX_WIDTH	997	/* enshrined somewhere */
@@ -367,7 +377,7 @@ libbalsa_wrap_string(gchar * str, int width)
  * we'll use one routine to parse text into paragraphs
  *
  * if the text is coming off the wire, use the RFC specs
- * if it's coming off the screen, don't destuff
+ * if it's coming off the screen, don't destuff unquoted lines
  * */
 static void
 unwrap_rfc2646(gchar * par, gboolean from_screen, GString ** result_p)
@@ -398,8 +408,8 @@ unwrap_rfc2646(gchar * par, gboolean from_screen, GString ** result_p)
         do {
             gchar *dq = &str[ql];
             flowed = strcmp(dq, "-- ");
-            /* destuff if coming off the wire: */
-            if (!from_screen && *dq == ' ')
+            /* destuff if coming off the wire or quoted: */
+            if (*dq == ' ' && (!from_screen || quote_level > 0))
                 ++dq;
             /* flush any pending line */
             if (pending) {
@@ -458,7 +468,7 @@ unwrap_rfc2646(gchar * par, gboolean from_screen, GString ** result_p)
  * we'll use one routine to wrap the paragraphs
  *
  * if the text is going to the wire, use the RFC specs
- * if it's going to the screen, don't space-stuff
+ * if it's going to the screen, don't space-stuff unquoted lines
  * */
 static void
 dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
@@ -498,10 +508,17 @@ dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
             *result_p = g_string_append(*result_p, quote_string);
             if (quote)
                 ++len;
-            /* space-stuff if needed */
-            if (!to_screen
-                && (*str == ' ' || *str == QUOTE_STRING[0]
-                    || !strncmp(str, "From ", 5))) {
+            /* space-stuffing:
+             * - for the wire, stuffing is required for lines beginning
+             *   with ` ', `>', or `From '
+             * - for the screen and for the wire, we'll use optional
+             *   stuffing of quoted lines to provide a visual separation
+             *   of quoting string and text
+             * - ...but we mustn't stuff `-- ' */
+            if (((!to_screen
+                  && (*str == ' ' || *str == QUOTE_STRING[0]
+                      || !strncmp(str, "From ", 5))) || len > 0)
+                && strcmp(str, "-- ")) {
                 *result_p = g_string_append_c(*result_p, ' ');
                 ++len;
             }

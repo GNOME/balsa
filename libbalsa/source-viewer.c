@@ -147,6 +147,11 @@ lsv_escape_cb(GtkWidget * widget, gpointer data)
     GMimeStream *mem_stream;
     char *raw_message;
 
+    if (!msg->mailbox) {
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("Mailbox closed"));
+	return;
+    }
     msg_stream = libbalsa_mailbox_get_message_stream(msg->mailbox, msg);
     if (msg_stream == NULL)
 	return;
@@ -164,20 +169,12 @@ lsv_escape_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-lsv_msg_weak_ref_notify(LibBalsaSourceViewerInfo * lsvi)
-{
-    lsvi->msg = NULL;
-    gtk_widget_destroy(lsvi->window);
-}
-
-static void
 lsv_window_destroy_notify(LibBalsaSourceViewerInfo * lsvi)
 {
-    if (lsvi->msg)
-        g_object_weak_unref(G_OBJECT(lsvi->msg),
-                            (GWeakNotify) lsv_msg_weak_ref_notify, lsvi);
+    g_object_unref(lsvi->msg);
     g_free(lsvi);
-  }
+}
+
 /* libbalsa_show_message_source:
    pops up a window containing the source of the message msg.
 */
@@ -217,8 +214,7 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
 
     lsvi = g_new(LibBalsaSourceViewerInfo, 1);
     lsvi->msg = msg;
-    g_object_weak_ref(G_OBJECT(msg),
-                      (GWeakNotify) lsv_msg_weak_ref_notify, lsvi);
+    g_object_ref(msg);
     lsvi->text = text;
     lsvi->window = window;
     lsvi->escape_specials = escape_specials;

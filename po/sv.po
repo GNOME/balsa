@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-12-26 23:54+0100\n"
-"PO-Revision-Date: 2002-12-26 23:54+0100\n"
+"POT-Creation-Date: 2002-12-27 10:33+0100\n"
+"PO-Revision-Date: 2002-12-27 10:33+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -144,86 +144,85 @@ msgid "Fwd:"
 msgstr "Vb:"
 
 #: libbalsa/identity.c:657
-msgid "Identity Name:"
-msgstr "Identitetsnamn:"
+msgid "_Identity Name:"
+msgstr "_Identitetsnamn:"
 
 #: libbalsa/identity.c:659
-msgid "Full Name:"
-msgstr "Fullständigt namn:"
+msgid "_Full Name:"
+msgstr "_Fullständigt namn:"
 
 #: libbalsa/identity.c:661
-msgid "Mailing Address:"
-msgstr "E-postadress:"
+msgid "_Mailing Address:"
+msgstr "_E-postadress:"
 
-#: libbalsa/identity.c:663
-msgid "Reply To:"
-msgstr "Svara till:"
+#. Reply To:
+#: libbalsa/identity.c:663 src/sendmsg-window.c:1881
+msgid "_Reply To:"
+msgstr "_Svara till:"
 
 #: libbalsa/identity.c:665
-msgid "Domain:"
-msgstr "Domän:"
+msgid "_Domain:"
+msgstr "_Domän:"
 
-#. bcc:
-#: libbalsa/identity.c:667 src/balsa-message.c:787 src/print.c:355
-#: src/sendmsg-window.c:1847 src/store-address.c:275
-msgid "Bcc:"
-msgstr "Osynlig kopia:"
+#: libbalsa/identity.c:667
+msgid "_Bcc:"
+msgstr "_Blindkopia:"
 
 #: libbalsa/identity.c:669
-msgid "Reply String:"
-msgstr "Svarssträng:"
+msgid "Reply _String:"
+msgstr "_Svarssträng:"
 
 #: libbalsa/identity.c:671
-msgid "Forward String:"
-msgstr "Vidarefordranssträng:"
+msgid "F_orward String:"
+msgstr "_Vidarebefordranssträng:"
 
 #: libbalsa/identity.c:673
-msgid "Signature Path:"
-msgstr "Signatursökväg:"
+msgid "Signature _Path:"
+msgstr "Signaturs_ökväg:"
 
 #: libbalsa/identity.c:677
-msgid "Execute Signature"
-msgstr "Exekvera signatur"
+msgid "_Execute Signature"
+msgstr "_Exekvera signatur"
 
 #: libbalsa/identity.c:680
-msgid "Include Signature"
-msgstr "Inkludera signatur"
+msgid "Incl_ude Signature"
+msgstr "Inkl_udera signatur"
 
 #: libbalsa/identity.c:683
-msgid "Include Signature When Forwarding"
-msgstr "Lägg till signatur vid vidarebefordran"
+msgid "Include Signature When For_warding"
+msgstr "Lägg till signatur vid _vidarebefordran"
 
 #: libbalsa/identity.c:686
-msgid "Include Signature When Replying"
-msgstr "Lägg till signatur vid svar"
+msgid "Include Signature When Rep_lying"
+msgstr "Lägg till signatur vid sva_r"
 
 #: libbalsa/identity.c:689
-msgid "Add Signature Separator"
-msgstr "Inkludera signaturavskiljare"
+msgid "_Add Signature Separator"
+msgstr "_Lägg till signaturavskiljare"
 
 #: libbalsa/identity.c:692
-msgid "Prepend Signature"
-msgstr "Lägg till signatur i början"
+msgid "Prepend Si_gnature"
+msgstr "Lägg till si_gnatur i början"
 
-#: libbalsa/identity.c:798
+#: libbalsa/identity.c:799
 msgid "Error: The identity does not have a name"
 msgstr "Fel: Identiteten har inget namn"
 
-#: libbalsa/identity.c:815
+#: libbalsa/identity.c:816
 msgid "Error: An identity with that name already exists"
 msgstr "Fel: En identitet med det namnet finns redan"
 
-#: libbalsa/identity.c:952
+#: libbalsa/identity.c:953
 msgid "Do you really want to delete the selected identity?"
 msgstr "Vill du verkligen ta bort den valda identiteten?"
 
-#: libbalsa/identity.c:974 src/address-book-config.c:535 src/folder-conf.c:167
+#: libbalsa/identity.c:975 src/address-book-config.c:535 src/folder-conf.c:167
 #: src/folder-conf.c:419
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "Fel vid visning: %s: %s\n"
 
-#: libbalsa/identity.c:1022
+#: libbalsa/identity.c:1023
 msgid "Manage Identities"
 msgstr "Hantera identiteter"
 
@@ -1485,14 +1484,13 @@ msgid "Balsa is not compiled with LDAP support"
 msgstr "Balsa är inte kompilerat med LDAP-stöd"
 
 #. mailbox name
-#: src/address-book-config.c:286 src/address-book-config.c:331
-#: src/address-book-config.c:393 src/address-book-config.c:453
-msgid "_Address Book Name"
-msgstr "_Adressboksnamn"
+#: src/address-book-config.c:286
+msgid "Address _Book Name"
+msgstr "Adress_boksnamn"
 
 #: src/address-book-config.c:291
-msgid "File name"
-msgstr "Filnamn"
+msgid "_File Name"
+msgstr "_Filnamn"
 
 #: src/address-book-config.c:298
 msgid "Select path for VCARD address book"
@@ -1502,6 +1500,12 @@ msgstr "Välj sökväg för VCARD-adressboken"
 #: src/address-book-config.c:412 src/address-book-config.c:469
 msgid "_Expand aliases as you type"
 msgstr "_Expandera alias när du skriver"
+
+#. mailbox name
+#: src/address-book-config.c:331 src/address-book-config.c:393
+#: src/address-book-config.c:453
+msgid "_Address Book Name"
+msgstr "_Adressboksnamn"
 
 #: src/address-book-config.c:336
 msgid "Load program location"
@@ -1535,13 +1539,10 @@ msgstr "_Värdnamn"
 msgid "_Base Domain Name"
 msgstr "_Basdomännamn"
 
-#. FIXME : I saw a lot of different ways to create button with
-#. pixmaps, hope this one is correct
-#. Right/Add button
-#: src/address-book-config.c:553 src/filter-edit-callbacks.c:842
-#: src/filter-run-dialog.c:312
-msgid "Add"
-msgstr "Lägg till"
+#: src/address-book-config.c:553 src/mailbox-conf.c:434
+#: src/pref-manager.c:1508 src/pref-manager.c:2595
+msgid "_Add"
+msgstr "_Lägg till"
 
 #: src/address-book-config.c:632
 #, c-format
@@ -1567,15 +1568,19 @@ msgstr "Sökvägen \"%s\" är inte korrekt. %s"
 msgid "Do you want to correct the path?"
 msgstr "Vill du rätta till sökvägen?"
 
-#: src/ab-window.c:165 src/filter-edit-dialog.c:193
+#: src/ab-main.c:134 src/ab-window.c:165 src/filter-edit-dialog.c:193
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:219
 #: src/filter-run-dialog.c:291
 msgid "Name"
 msgstr "Namn"
 
-#: src/ab-window.c:173
+#: src/ab-main.c:142 src/ab-window.c:173
 msgid "E-Mail Address"
 msgstr "E-postadress"
+
+#: src/ab-main.c:275
+msgid "_Search for Name:"
+msgstr "_Sök efter namn:"
 
 #: src/ab-window.c:206
 msgid "Address Book"
@@ -1614,7 +1619,7 @@ msgstr "en distributionslista"
 #: src/ab-window.c:669
 #, c-format
 msgid ""
-"Error opening addres book '%s'\n"
+"Error opening address book '%s'\n"
 "%s"
 msgstr ""
 "Fel vid öppnande av adressboken \"%s\"\n"
@@ -1794,6 +1799,12 @@ msgstr "Till:"
 #: src/sendmsg-window.c:1842 src/store-address.c:274
 msgid "Cc:"
 msgstr "Kopia:"
+
+#. bcc:
+#: src/balsa-message.c:787 src/print.c:355 src/sendmsg-window.c:1847
+#: src/store-address.c:275
+msgid "Bcc:"
+msgstr "Blindkopia:"
 
 #: src/balsa-message.c:790 src/print.c:356
 msgid "Fcc:"
@@ -2017,6 +2028,13 @@ msgstr "Flaggad"
 #: src/filter-edit-callbacks.c:801
 msgid "Contain/Does not contain"
 msgstr "Innehåller/Innehåller inte"
+
+#. FIXME : I saw a lot of different ways to create button with
+#. pixmaps, hope this one is correct
+#. Right/Add button
+#: src/filter-edit-callbacks.c:842 src/filter-run-dialog.c:312
+msgid "Add"
+msgstr "Lägg till"
 
 #. Left/Remove button
 #: src/filter-edit-callbacks.c:846 src/filter-edit-dialog.c:309
@@ -2508,10 +2526,6 @@ msgstr "Hoppsan! brevlådan inte funnen i balsa_app.mailbox-noder?\n"
 #: src/mailbox-conf.c:396
 msgid "Mailbox Configurator"
 msgstr "Brevlådekonfigurerare"
-
-#: src/mailbox-conf.c:434 src/pref-manager.c:1508 src/pref-manager.c:2595
-msgid "_Add"
-msgstr "_Lägg till"
 
 #: src/mailbox-conf.c:593
 #, c-format
@@ -4034,11 +4048,11 @@ msgstr "_Kopia"
 
 #: src/sendmsg-window.c:301
 msgid "_Bcc"
-msgstr "_Osynlig kopia"
+msgstr "_Blindkopia"
 
 #: src/sendmsg-window.c:303
 msgid "_Fcc"
-msgstr "_Vidarebefordrad osynlig kopia"
+msgstr "_Vidarebefordrad kopia"
 
 #: src/sendmsg-window.c:305
 msgid "_Reply To"
@@ -4295,11 +4309,6 @@ msgstr "_Ämne:"
 #: src/sendmsg-window.c:1852
 msgid "F_cc:"
 msgstr "_Vidarebefordra kopia:"
-
-#. Reply To:
-#: src/sendmsg-window.c:1881
-msgid "_Reply To:"
-msgstr "_Svara till:"
 
 #. Attachment list
 #: src/sendmsg-window.c:1888
@@ -4758,6 +4767,61 @@ msgstr "Tillgängliga knappar"
 msgid "Current toolbar"
 msgstr "Anpassa verktygsrad"
 
+#~ msgid "Identity Name:"
+#~ msgstr "Identitetsnamn:"
+
+#~ msgid "Full Name:"
+#~ msgstr "Fullständigt namn:"
+
+#~ msgid "Mailing Address:"
+#~ msgstr "E-postadress:"
+
+#~ msgid "Domain:"
+#~ msgstr "Domän:"
+
+#~ msgid "Reply String:"
+#~ msgstr "Svarssträng:"
+
+#~ msgid "Forward String:"
+#~ msgstr "Vidarebefordranssträng:"
+
+#~ msgid "Signature Path:"
+#~ msgstr "Signatursökväg:"
+
+#~ msgid "Execute Signature"
+#~ msgstr "Exekvera signatur"
+
+#~ msgid "Include Signature"
+#~ msgstr "Inkludera signatur"
+
+#~ msgid "Include Signature When Forwarding"
+#~ msgstr "Lägg till signatur vid vidarebefordran"
+
+#~ msgid "Include Signature When Replying"
+#~ msgstr "Lägg till signatur vid svar"
+
+#~ msgid "Add Signature Separator"
+#~ msgstr "Lägg till signaturavskiljare"
+
+#~ msgid "Prepend Signature"
+#~ msgstr "Lägg till signatur i början"
+
+#~ msgid "_Filename"
+#~ msgstr "_Filnamn"
+
+#~ msgid "Reply To:"
+#~ msgstr "Svara till:"
+
+#~ msgid "File name"
+#~ msgstr "Filnamn"
+
+#~ msgid ""
+#~ "Error opening addres book '%s'\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Fel vid öppnande av adressboken \"%s\"\n"
+#~ "%s"
+
 #~ msgid "Inbox:"
 #~ msgstr "Inkorg:"
 
@@ -4784,16 +4848,6 @@ msgstr "Anpassa verktygsrad"
 
 #~ msgid "SMTP Server:"
 #~ msgstr "SMTP-server:"
-
-#~ msgid ""
-#~ "Error opening address book '%s'\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Fel vid öppnande av adressboken \"%s\"\n"
-#~ "%s"
-
-#~ msgid "_Search for Name:"
-#~ msgstr "_Sök efter namn:"
 
 #~ msgid ""
 #~ "Could not open external query address book %s while trying to parse "
@@ -5427,7 +5481,7 @@ msgstr "Anpassa verktygsrad"
 #~ msgstr "Välj din signaturfil"
 
 #~ msgid "Default Bcc to:"
-#~ msgstr "Alltid osynlig kopia till:"
+#~ msgstr "Alltid blindkopia till:"
 
 #~ msgid "Sorry. Balsa doesn't (yet) know how to create a maildir mailbox"
 #~ msgstr "Tyvärr. Balsa kan (ännu) inte skapa en e-postkatalogsbrevlåda"
@@ -5495,10 +5549,10 @@ msgstr "Anpassa verktygsrad"
 #~ msgstr "Kopia:"
 
 #~ msgid "bcc:"
-#~ msgstr "Osynlig kopia:"
+#~ msgstr "blindkopia:"
 
 #~ msgid "fcc:"
-#~ msgstr "Vidarebefordrad osynlig kopia:"
+#~ msgstr "vidarebefordrad kopia:"
 
 #~ msgid "Local Mbox Mailbox..."
 #~ msgstr "Lokal mbox-brevlåda..."

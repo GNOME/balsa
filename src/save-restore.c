@@ -217,7 +217,7 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
                       strlen(balsa_app.local_mail_directory)) != 0) 
             config_mailbox_add(*special, NULL);
         else do_rescan_for = *special;
-	gtk_object_unref(GTK_OBJECT(*special));
+	g_object_unref(G_OBJECT(*special));
     }
     config_mailbox_delete(mailbox);
     config_mailbox_add(mailbox, specialNames[which]);

@@ -10,8 +10,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-02-05 17:16+0100\n"
-"PO-Revision-Date: 2002-02-05 17:16+0100\n"
+"POT-Creation-Date: 2002-02-09 13:41+0100\n"
+"PO-Revision-Date: 2002-02-09 13:42+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -223,7 +223,7 @@ msgstr "Domän:"
 
 #. bcc:
 #: libbalsa/identity.c:678 libbalsa/identity.c:1177 src/balsa-message.c:736
-#: src/print.c:393 src/sendmsg-window.c:1643 src/store-address.c:270
+#: src/print.c:395 src/sendmsg-window.c:1643 src/store-address.c:270
 msgid "Bcc:"
 msgstr "Osynlig kopia:"
 
@@ -285,7 +285,7 @@ msgstr "Vill du verkligen ta bort den valda identiteten?"
 msgid "New"
 msgstr "Ny"
 
-#: libbalsa/identity.c:1061 src/balsa-index.c:2116
+#: libbalsa/identity.c:1061 src/balsa-index.c:2123
 #: src/filter-edit-dialog.c:250 src/mailbox-node.c:615 src/pref-manager.c:1375
 #: src/pref-manager.c:2353
 msgid "Delete"
@@ -1557,65 +1557,65 @@ msgstr "Öppnar brevlådan %s. Var vänlig vänta..."
 msgid "To"
 msgstr "Till"
 
-#: src/balsa-index.c:2041
+#: src/balsa-index.c:2048
 msgid "Cannot access the message's body\n"
 msgstr "Kan inte komma åt meddelandehuvudet\n"
 
-#: src/balsa-index.c:2069
+#: src/balsa-index.c:2076
 msgid "View Source"
 msgstr "Visa källa"
 
-#: src/balsa-index.c:2071
+#: src/balsa-index.c:2078
 msgid "Reply..."
 msgstr "Svara..."
 
-#: src/balsa-index.c:2073
+#: src/balsa-index.c:2080
 msgid "Reply To All..."
 msgstr "Svara till alla..."
 
-#: src/balsa-index.c:2075
+#: src/balsa-index.c:2082
 msgid "Reply To Group..."
 msgstr "Svara till grupp..."
 
-#: src/balsa-index.c:2077
+#: src/balsa-index.c:2084
 msgid "Forward Attached..."
 msgstr "Vidarebefordra bifogad..."
 
-#: src/balsa-index.c:2079
+#: src/balsa-index.c:2086
 msgid "Forward Inline..."
 msgstr "Vidarebefordra inuti..."
 
-#: src/balsa-index.c:2081
+#: src/balsa-index.c:2088
 msgid "Store Address..."
 msgstr "Lagra adress..."
 
-#: src/balsa-index.c:2121
+#: src/balsa-index.c:2128
 msgid "Undelete"
 msgstr "Återskapa"
 
-#: src/balsa-index.c:2126
+#: src/balsa-index.c:2133
 msgid "Move To Trash"
 msgstr "Flytta till papperskorgen"
 
-#: src/balsa-index.c:2130
+#: src/balsa-index.c:2137
 msgid "Toggle"
 msgstr "Växla"
 
-#: src/balsa-index.c:2133 src/filter-edit-callbacks.c:637
+#: src/balsa-index.c:2140 src/filter-edit-callbacks.c:637
 #: src/main-window.c:440
 msgid "Flagged"
 msgstr "Flaggad"
 
-#: src/balsa-index.c:2136 src/balsa-mblist.c:471
+#: src/balsa-index.c:2143 src/balsa-mblist.c:471
 msgid "Unread"
 msgstr "Olästa"
 
-#: src/balsa-index.c:2150
+#: src/balsa-index.c:2157
 msgid "Move"
 msgstr "Flytta"
 
 #. Create standard entry
-#: src/balsa-index.c:2161 src/message-window.c:706
+#: src/balsa-index.c:2168 src/message-window.c:706
 msgid "Folder"
 msgstr "Mapp"
 
@@ -1646,41 +1646,41 @@ msgid "Save MIME Part"
 msgstr "Spara MIME-delen"
 
 #. Subject:
-#: src/balsa-message.c:721 src/print.c:364 src/sendmsg-window.c:1636
+#: src/balsa-message.c:721 src/print.c:366 src/sendmsg-window.c:1636
 msgid "Subject:"
 msgstr "Ämne:"
 
-#: src/balsa-message.c:725 src/print.c:370
+#: src/balsa-message.c:725 src/print.c:372
 msgid "Date:"
 msgstr "Datum:"
 
 #. From:
 #: src/balsa-message.c:730 src/filter-edit-callbacks.c:874
-#: src/main-window.c:2635 src/print.c:381 src/sendmsg-window.c:1626
+#: src/main-window.c:2635 src/print.c:383 src/sendmsg-window.c:1626
 #: src/store-address.c:267
 msgid "From:"
 msgstr "Från:"
 
 #. To:
 #: src/balsa-message.c:734 src/filter-edit-callbacks.c:865
-#: src/main-window.c:2634 src/print.c:391 src/sendmsg-window.c:1631
+#: src/main-window.c:2634 src/print.c:393 src/sendmsg-window.c:1631
 #: src/store-address.c:268
 msgid "To:"
 msgstr "Till:"
 
 #. cc:
 #: src/balsa-message.c:735 src/filter-edit-callbacks.c:892
-#: src/main-window.c:2637 src/print.c:392 src/sendmsg-window.c:1638
+#: src/main-window.c:2637 src/print.c:394 src/sendmsg-window.c:1638
 #: src/store-address.c:269
 msgid "Cc:"
 msgstr "Kopia:"
 
 #. fcc:
-#: src/balsa-message.c:739 src/print.c:394 src/sendmsg-window.c:1648
+#: src/balsa-message.c:739 src/print.c:396 src/sendmsg-window.c:1648
 msgid "Fcc:"
 msgstr "Vidarebefordrad kopia:"
 
-#: src/balsa-message.c:744 src/print.c:400
+#: src/balsa-message.c:744 src/print.c:402
 msgid "Disposition-Notification-To:"
 msgstr "Dispositionsbekräftelse-till:"
 
@@ -1774,12 +1774,12 @@ msgstr "Spara del"
 msgid "View part with %s"
 msgstr "Visa del med %s"
 
-#: src/balsa-message.c:1766
+#: src/balsa-message.c:1768
 #, c-format
 msgid "Calling URL %s..."
 msgstr "Anropar URL:en %s..."
 
-#: src/balsa-message.c:1832
+#: src/balsa-message.c:1834
 #, c-format
 msgid ""
 "Error writing to temporary file %s.\n"
@@ -1788,30 +1788,30 @@ msgstr ""
 "Fel vid skrivning till temporära filen %s.\n"
 "Kontrollera rättigheterna för katalogen."
 
-#: src/balsa-message.c:1840
+#: src/balsa-message.c:1842
 #, c-format
 msgid "Cannot open temporary file %s."
 msgstr "Kan inte öppna temporära filen %s."
 
-#: src/balsa-message.c:2129
+#: src/balsa-message.c:2131
 #, c-format
 msgid "Open with %s"
 msgstr "Öppna med %s"
 
-#: src/balsa-message.c:2266
+#: src/balsa-message.c:2268
 msgid "Save..."
 msgstr "Spara..."
 
-#: src/balsa-message.c:2403 src/balsa-message.c:2445
+#: src/balsa-message.c:2405 src/balsa-message.c:2447
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "Kunde inte skapa temporär fil %s"
 
-#: src/balsa-message.c:3093
+#: src/balsa-message.c:3095
 msgid "reply to MDN?"
 msgstr "svara till MDN?"
 
-#: src/balsa-message.c:3105
+#: src/balsa-message.c:3107
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2926,8 +2926,8 @@ msgstr ""
 "Var vänlig och kontrollera inställningarna för brevlådan."
 
 #: src/main-window.c:1581
-msgid "Copyright (C) 1997-2001"
-msgstr "Copyright © 1997-2001"
+msgid "Copyright (C) 1997-2002"
+msgstr "Copyright © 1997-2002"
 
 #: src/main-window.c:1584
 msgid ""
@@ -3646,32 +3646,41 @@ msgstr ""
 "Utskrift är inte möjlig."
 
 #. print the page number
-#: src/print.c:281
+#: src/print.c:283
 #, c-format
 msgid "Page: %i/%i"
 msgstr "Sida: %i/%i"
 
+#: src/print.c:612 src/print.c:961
+#, c-format
+msgid ""
+"Can not convert %s, falling back to us-ascii.\n"
+"Some characters may be printed incorrectly."
+msgstr ""
+"Kan inte konvertera %s, återgår till us-ascii.\n"
+"En del tecken kanske inte visas korrekt."
+
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:689
+#: src/print.c:710
 msgid "Type:"
 msgstr "Typ:"
 
-#: src/print.c:692
+#: src/print.c:713
 msgid "Filename:"
 msgstr "Filnamn:"
 
-#: src/print.c:899
+#: src/print.c:920
 #, c-format
 msgid "Balsa could not find paper type \"%s\".\n"
 msgstr "Balsa kunde inte hitta papperstypen \"%s\".\n"
 
-#: src/print.c:901
+#: src/print.c:922
 #, c-format
 msgid "Using paper type \"%s\" from /etc/paper.config instead\n"
 msgstr "Använder papperstypen \"%s\" från /etc/paper.config istället\n"
 
-#: src/print.c:1016
+#: src/print.c:1043
 #, c-format
 msgid ""
 "Balsa could not find font %s\n"
@@ -3680,27 +3689,27 @@ msgstr ""
 "Balsa kunde inte hitta typsnittet %s\n"
 "Utskrift är inte möjlig"
 
-#: src/print.c:1066
+#: src/print.c:1093
 #, c-format
 msgid "Balsa could not find paper type \"%s\", using system default.\n"
 msgstr ""
 "Balsa kunde inte hitta papperstypen \"%s\", använder systemets "
 "standardpapperstyp.\n"
 
-#: src/print.c:1069
+#: src/print.c:1096
 msgid "Check your paper type configuration or balsa preferences\n"
 msgstr ""
 "Kontrollera din papperstypskonfiguration eller dina balsa-inställningar\n"
 
-#: src/print.c:1072
+#: src/print.c:1099
 msgid "Paper"
 msgstr "Papper"
 
-#: src/print.c:1099
+#: src/print.c:1126
 msgid "Print message"
 msgstr "Skriv ut meddelande"
 
-#: src/print.c:1129
+#: src/print.c:1156
 msgid "Balsa: message print preview"
 msgstr "Balsa: förhandsgranska meddelandeutskrift"
 
@@ -4530,6 +4539,9 @@ msgstr "-"
 msgid "+"
 msgstr "+"
 
+#~ msgid "Copyright (C) 1997-2001"
+#~ msgstr "Copyright © 1997-2001"
+
 #~ msgid "Verify PGP signature?"
 #~ msgstr "Verifiera PGP-signatur?"
 
@@ -4666,9 +4678,6 @@ msgstr "+"
 
 #~ msgid "Missing or invalid `To' address"
 #~ msgstr "\"Till\"-adress saknas eller är ogiltig"
-
-#~ msgid "Copyright (C) 1997-2002"
-#~ msgstr "Copyright © 1997-2002"
 
 #~ msgid "Unable to export filter %s, an error occured."
 #~ msgstr "Kan inte exportera filtret %s, ett fel inträffade."

@@ -1,5 +1,7 @@
-2003-11-12 09:15  PeterB
+2003-11-12 09:32  PeterB
 
+	* libbalsa/mailbox_imap.c: Update total_messages on expunge;
+	disconnect signal handlers before releasing handle.
 	* libbalsa/imap/imap-handle.c: Use correct error code.
 
 2003-11-11 12:45  PeterB

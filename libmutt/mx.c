@@ -709,14 +709,19 @@ static int sync_mailbox (CONTEXT *ctx)
 #endif
   int rc = -1;
 
+  fprintf( stderr, "sync_mailbox\n" );
+
   if (!ctx->quiet)
     mutt_message ("Writing %s...", ctx->path);
+
+  fprintf( stderr, "Writing %s...\n", ctx->path );
 
   switch (ctx->magic)
   {
     case M_MBOX:
     case M_MMDF:
       rc = mbox_sync_mailbox (ctx);
+      fprintf( stderr, "Result: %d \n", rc );
 #ifdef BUFFY_SIZE
       tmp = mutt_find_mailbox (ctx->path);
 #endif
@@ -816,6 +821,7 @@ int mx_close_mailbox (CONTEXT *ctx)
     snprintf (buf, sizeof (buf), ctx->deleted == 1
 	     ? "Purge %d deleted message?" : "Purge %d deleted messages?",
 	      ctx->deleted);
+    ctx->changed = 1;
     if ((purge = query_quadoption (OPT_DELETE, buf)) < 0)
       return (-1);
   }
@@ -986,6 +992,8 @@ int mx_sync_mailbox (CONTEXT *ctx)
 {
   int rc, i;
 
+  fprintf( stderr, "mx_sync_mailbox \n" );
+
   if (ctx->dontwrite)
   {
     char buf[STRING], tmp[STRING];
@@ -1008,7 +1016,7 @@ int mx_sync_mailbox (CONTEXT *ctx)
 
   if (!ctx->changed && !ctx->deleted)
   {
-    mutt_message ("Mailbox is unchanged.");
+    fprintf (stderr, "Mailbox is unchanged.\n");
     return (0);
   }
 
@@ -1019,6 +1027,8 @@ int mx_sync_mailbox (CONTEXT *ctx)
     snprintf (buf, sizeof (buf), ctx->deleted == 1
 	     ? "Purge %d deleted message?" : "Purge %d deleted messages?",
 	      ctx->deleted);
+    ctx->changed = 1;
+    
     if ((rc = query_quadoption (OPT_DELETE, buf)) < 0)
       return (-1);
     else if (rc == M_NO)

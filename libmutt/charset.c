@@ -24,6 +24,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <ctype.h>
+
 #include <sys/types.h>
 #include <dirent.h>
 #include <unistd.h>
@@ -148,7 +150,8 @@ PreferredMIMENames[] =
   
   { "Extended_UNIX_Code_Packed_Format_for_Japanese",
       			"EUC-JP"	},
-  { "csEUCPkdFmtJapanese", "EUC-JP"	},
+  { "csEUCPkdFmtJapanese", 
+      			"EUC-JP"	},
   
   { "csGB2312",		"gb2312"	},
   { "csbig5",		"big5"		},
@@ -168,19 +171,37 @@ PreferredMIMENames[] =
   { "l8",		"iso-8859-14"	},
 
   { "iso_8859-15",	"iso-8859-15"	},
-
+  { "latin9",		"iso-8859-15"	}, /* this is not a bug */
+  
+  
   /*
    * If you happen to encounter system-specific brain-damage with
    * respect to character set naming, please add it here, and
    * submit a patch to <mutt-dev@mutt.org>. 
    */
 
+
+  
   /* 
    * David Champion <dgc@uchicago.edu> has observed this with
    * nl_langinfo under SunOS 5.8. 
    */
 
   { "646",		"us-ascii"	},
+  
+  /* 
+   * http://www.sun.com/software/white-papers/wp-unicode/
+   */
+  
+  { "eucJP",		"euc-jp"	},
+  { "PCK",		"Shift_JIS"	},
+  { "ko_KR-euc",	"euc-kr"	},
+  { "zh_TW-big5",	"big5"		},
+
+  /* seems to be common on some systems */
+
+  { "sjis",		"Shift_JIS"	},
+
   
   /* End of aliases.  Please keep this line last. */
   
@@ -220,15 +241,20 @@ void mutt_canonical_charset (char *dest, size_t dlen, const char *name)
   char scratch[LONG_STRING];
 
   /* catch some common iso-8859-something misspellings */
-  if (!mutt_strncasecmp (name, "iso8859", 7) && name[7] != '-')
+  if (!ascii_strncasecmp (name, "8859", 4) && name[4] != '-')
+    snprintf (scratch, sizeof (scratch), "iso-8859-%s", name +4);
+  else if (!ascii_strncasecmp (name, "8859-", 5))
+    snprintf (scratch, sizeof (scratch), "iso-8859-%s", name + 5);
+  else if (!ascii_strncasecmp (name, "iso8859", 7) && name[7] != '-')
     snprintf (scratch, sizeof (scratch), "iso_8859-%s", name + 7);
-  else if (!mutt_strncasecmp (name, "iso8859-", 8))
+  else if (!ascii_strncasecmp (name, "iso8859-", 8))
     snprintf (scratch, sizeof (scratch), "iso_8859-%s", name + 8);
   else
     strfcpy (scratch, NONULL(name), sizeof (scratch));
 
   for (i = 0; PreferredMIMENames[i].key; i++)
-    if (!mutt_strcasecmp (scratch, PreferredMIMENames[i].key))
+    if (!ascii_strcasecmp (scratch, PreferredMIMENames[i].key) ||
+	!mutt_strcasecmp (scratch, PreferredMIMENames[i].key))
     {
       strfcpy (dest, PreferredMIMENames[i].pref, dlen);
       return;
@@ -238,8 +264,7 @@ void mutt_canonical_charset (char *dest, size_t dlen, const char *name)
 
   /* for cosmetics' sake, transform to lowercase. */
   for (p = dest; *p; p++)
-    if ('A' <= *p && *p <= 'Z')
-      *p += 'a' - 'A';
+    *p = ascii_tolower (*p);
 }
 
 int mutt_chscmp (const char *s, const char *chs)
@@ -249,11 +274,11 @@ int mutt_chscmp (const char *s, const char *chs)
   if (!s) return 0;
 
   mutt_canonical_charset (buffer, sizeof (buffer), s);
-  return !mutt_strcasecmp (buffer, chs);
+  return !ascii_strcasecmp (buffer, chs);
 }
 
 
-#if 0
+#ifndef HAVE_ICONV
 
 iconv_t iconv_open (const char *tocode, const char *fromcode)
 {
@@ -278,23 +303,36 @@ int iconv_close (iconv_t cd)
  * Like iconv_open, but canonicalises the charsets
  */
 
-iconv_t mutt_iconv_open (const char *tocode, const char *fromcode)
+iconv_t mutt_iconv_open (const char *tocode, const char *fromcode, int flags)
 {
   char tocode1[SHORT_STRING];
   char fromcode1[SHORT_STRING];
+  char *tocode2, *fromcode2;
   char *tmp;
 
+  iconv_t cd;
+  
   mutt_canonical_charset (tocode1, sizeof (tocode1), tocode);
-  /* BALSA: hooks not supported 
-  if ((tmp = mutt_charset_hook (tocode1)))
-  mutt_canonical_charset (tocode1, sizeof (tocode1), tmp); */
-
+  /* BALSA: hooks not supported */
+#ifndef LIBMUTT
+  if ((flags & M_ICONV_HOOK_TO) && (tmp = mutt_charset_hook (tocode1)))
+    mutt_canonical_charset (tocode1, sizeof (tocode1), tmp);
+#endif
   mutt_canonical_charset (fromcode1, sizeof (fromcode1), fromcode);
-  /* BALSA: hooks not supported 
-     if ((tmp = mutt_charset_hook (fromcode1)))
-     mutt_canonical_charset (fromcode1, sizeof (fromcode1), tmp);*/
+ /* BALSA: hooks not supported */
+#ifndef LIBMUTT
+  if ((flags & M_ICONV_HOOK_FROM) && (tmp = mutt_charset_hook (fromcode1)))
+    mutt_canonical_charset (fromcode1, sizeof (fromcode1), tmp);
+#endif
 
-  return iconv_open (tocode1, fromcode1);
+  if ((cd = iconv_open (tocode1, fromcode1)) != (iconv_t) -1)
+    return cd;
+#ifndef LIBMUTT
+  if ((tocode2 = mutt_iconv_hook (tocode1)) && (fromcode2 = mutt_iconv_hook (fromcode1)))
+    return iconv_open (tocode2, fromcode2);
+#endif
+  
+  return (iconv_t) -1;
 }
 
 
@@ -369,7 +407,7 @@ size_t mutt_iconv (iconv_t cd, const char **inbuf, size_t *inbytesleft,
  * Used in rfc2047.c and rfc2231.c
  */
 
-int mutt_convert_string (char **ps, const char *from, const char *to)
+int mutt_convert_string (char **ps, const char *from, const char *to, int flags)
 {
   iconv_t cd;
   const char *repls[] = { "\357\277\275", "?", 0 };
@@ -378,7 +416,7 @@ int mutt_convert_string (char **ps, const char *from, const char *to)
   if (!s || !*s)
     return 0;
 
-  if (to && from && (cd = mutt_iconv_open (to, from)) != (iconv_t)-1) 
+  if (to && from && (cd = mutt_iconv_open (to, from, flags)) != (iconv_t)-1)
   {
     int len;
     const char *ib;
@@ -439,15 +477,14 @@ struct fgetconv_not
   iconv_t cd;
 };
 
-#if 0
-FGETCONV *fgetconv_open (FILE *file, const char *from, const char *to)
+FGETCONV *fgetconv_open (FILE *file, const char *from, const char *to, int flags)
 {
   struct fgetconv_s *fc;
   iconv_t cd = (iconv_t)-1;
   static const char *repls[] = { "\357\277\275", "?", 0 };
 
   if (from && to)
-    cd = mutt_iconv_open (to, from);
+    cd = mutt_iconv_open (to, from, flags);
 
   if (cd != (iconv_t)-1)
   {
@@ -523,6 +560,5 @@ void fgetconv_close (FGETCONV **_fc)
 
   if (fc->cd != (iconv_t)-1)
     iconv_close (fc->cd);
-  safe_free (_fc);
+  safe_free ((void **) _fc);
 }
-#endif

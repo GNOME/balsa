@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 2000-1 Brendan Cully <brendan@kublai.com>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,7 +22,7 @@
 
 #include "account.h"
 #include "browser.h"
-#include "../mailbox.h"
+#include "mailbox.h"
 
 /* -- data structures -- */
 typedef struct
@@ -31,6 +32,7 @@ typedef struct
 } IMAP_MBOX;
 
 /* imap.c */
+int imap_access (const char*, int);
 int imap_check_mailbox (CONTEXT *ctx, int *index_hint);
 int imap_close_connection (CONTEXT *ctx);
 int imap_delete_mailbox (CONTEXT* idata, char* mailbox);
@@ -48,15 +50,15 @@ void imap_disallow_reopen (CONTEXT *ctx);
 
 /* browse.c */
 int imap_browse (char* path, struct browser_state* state);
-/* BALSA: changed prototype for imap_mailbox_create: */
-int imap_mailbox_create (const char* folder, const char* subfolder,
-			 int subscribe);
+/* LIBMUTT - BALSA: changed prototype for imap_mailbox_create: */
+int imap_mailbox_create (const char* folder, const char* subfolder, int subscribe);
 /* BALSA: prototype for new function imap_mailbox_rename: */
 int imap_mailbox_rename (const char* prefix, const char* dir,
-			 const char* parent, const char* subfolder,
-			 int subscribe);
+                        const char* parent, const char* subfolder,
+                        int subscribe);
 /* BALSA: prototype for new function imap_mailbox_delete: */
 int imap_mailbox_delete (const char* path);
+
 
 /* message.c */
 int imap_append_message (CONTEXT* ctx, MESSAGE* msg);
@@ -67,7 +69,9 @@ int imap_fetch_message (MESSAGE* msg, CONTEXT* ctx, int msgno);
 void imap_logout_all (void);
 
 /* util.c */
+int imap_expand_path (char* path, size_t len);
 int imap_parse_path (const char* path, IMAP_MBOX* mx);
+void imap_pretty_mailbox (char* path);
 
 int imap_wait_keepalive (pid_t pid);
 void imap_keepalive (void);

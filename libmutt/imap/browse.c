@@ -57,6 +57,7 @@ int imap_browse (char* path, struct browser_state* state)
 {
   IMAP_DATA* idata;
   char buf[LONG_STRING];
+  char buf2[LONG_STRING];
   char nsbuf[LONG_STRING];
   char mbox[LONG_STRING];
   char list_cmd[5];
@@ -169,7 +170,7 @@ int imap_browse (char* path, struct browser_state* state)
 
       if (showparents)
       {
-	dprint (2, (debugfile, "imap_init_browse: adding parent %s\n", mbox));
+	dprint (3, (debugfile, "imap_init_browse: adding parent %s\n", mbox));
 	imap_add_folder (idata->delim, mbox, 1, 0, state, 1);
       }
 
@@ -213,14 +214,18 @@ int imap_browse (char* path, struct browser_state* state)
     /* Listing the home namespace, so INBOX should be included. Home 
      * namespace is not "", so we have to list it explicitly. We ask the 
      * server to see if it has descendants. */
-    dprint (4, (debugfile, "imap_init_browse: adding INBOX\n"));
+    dprint (2, (debugfile, "imap_init_browse: adding INBOX\n"));
     if (browse_add_list_result (idata, "LIST \"\" \"INBOX\"", state, 0))
       goto fail;
   }
 
   nsup = state->entrylen;
 
-  snprintf (buf, sizeof (buf), "%s \"\" \"%s%%\"", list_cmd, mbox);
+  dprint (3, (debugfile, "imap_browse: Quoting mailbox scan: %s -> ", mbox));
+  snprintf (buf, sizeof (buf), "%s%%", mbox);
+  imap_quote_string (buf2, sizeof (buf2), buf);
+  dprint (3, (debugfile, "%s\n", buf2));
+  snprintf (buf, sizeof (buf), "%s \"\" %s", list_cmd, buf2);
   if (browse_add_list_result (idata, buf, state, 0))
     goto fail;
 
@@ -234,7 +239,7 @@ int imap_browse (char* path, struct browser_state* state)
       if (nsi[i].listable && !nsi[i].home_namespace) {
 	imap_add_folder(nsi[i].delim, nsi[i].prefix, nsi[i].noselect,
 			nsi[i].noinferiors, state, 0);
-	dprint (4, (debugfile, "imap_init_browse: adding namespace: %s\n",
+	dprint (3, (debugfile, "imap_init_browse: adding namespace: %s\n",
 		    nsi[i].prefix));
       }
   }
@@ -296,16 +301,24 @@ int imap_mailbox_create (const char* folder, const char* subfolder,
 #ifndef LIBMUTT
   if (mutt_get_field (_("Create mailbox: "), buf, sizeof (buf), M_FILE) < 0)
     goto fail;
+
+  if (!mutt_strlen (buf))
+    {
+      mutt_error (_("Mailbox must have a name."));
+      mutt_sleep(1);
+    goto fail;
+    }
 #else
   strfcpy (buf + n, subfolder, sizeof (buf) - n);
 #endif
+
 
   if (imap_create_mailbox (idata, buf) < 0)
     goto fail;
 
 #ifndef LIBMUTT
   mutt_message _("Mailbox created.");
-  sleep (1);
+  mutt_sleep (0);
 #else
   if (subscribe) {
     snprintf(buf, sizeof (buf), "%s%c%s", folder, idata->delim, subfolder);
@@ -322,105 +335,6 @@ int imap_mailbox_create (const char* folder, const char* subfolder,
   return -1;
 }
 
-#ifdef LIBMUTT
-/*
-BALSA: rename capability
-Doesn't really belong here, but it goes with create.
-*/
-
-int imap_mailbox_rename (const char* prefix, const char* dir,
-			 const char* parent, const char* subfolder,
-			 int subscribe)
-{
-  IMAP_DATA* idata;
-  IMAP_MBOX mx;
-  char folder[LONG_STRING];
-  char buf[LONG_STRING];
-  short n;
-
-  snprintf(folder, sizeof (folder), "%s%s", prefix, dir);
-  if (imap_parse_path (folder, &mx) < 0)
-  {
-    dprint (1, (debugfile, "imap_mailbox_rename: Bad path %s\n", folder));
-    return -1;
-  }
-
-  if (!(idata = imap_conn_find (&mx.account, M_IMAP_CONN_NONEW)))
-  {
-    dprint (1, (debugfile, "imap_mailbox_rename: Couldn't find open connection to %s", mx.account.host));
-    goto fail;
-  }
-  
-  strfcpy (buf, parent, sizeof (buf));
-
-  /* append a delimiter if necessary */
-  n = mutt_strlen (buf);
-  if (n && (n < sizeof (buf) - 1) && (buf[n-1] != idata->delim))
-  {
-    buf[n++] = idata->delim;
-    buf[n] = '\0';
-  }
-  
-  strfcpy (buf + n, subfolder, sizeof (buf) - n);
-
-  if (imap_rename_mailbox (idata, mx.mbox, buf) < 0)
-    goto fail;
-
-  if (subscribe) {
-    snprintf(folder, sizeof (folder), "%s%s", prefix, buf);
-    if (imap_subscribe(folder, 1) < 0)
-      goto fail;
-  }
-
-  FREE (&mx.mbox);
-  return 0;
-
- fail:
-  FREE (&mx.mbox);
-  return -1;
-}
-
-/*
-BALSA: this function is needed because the lower-level imap_delete_mailbox
-segfaults when called from Balsa.  It doesn't especially belong here,
-but it roughly complements imap_mailbox_create above.
-*/
-int imap_mailbox_delete(const char* folder)
-{
-  IMAP_DATA* idata;
-  IMAP_MBOX mx;
-
-  if (imap_parse_path (folder, &mx) < 0)
-  {
-    dprint (1, (debugfile, "imap_mailbox_delete: Bad path %s\n",
-      folder));
-    return -1;
-  }
-
-  if (!(idata = imap_conn_find (&mx.account, M_IMAP_CONN_NONEW)))
-  {
-    dprint (1, (debugfile,
-               "imap_mailbox_delete: Couldn't find open connection to %s",
-               mx.account.host));
-    goto fail;
-  }
-
-  /* imap_delete_mailbox takes the CONTEXT as an argument,
-   * but expects the data field to point to IMAP_DATA:
-   */
-  if (!idata->ctx->data)
-    idata->ctx->data = idata;
-  if (!*mx.mbox || imap_delete_mailbox (idata->ctx, mx.mbox) < 0)
-    goto fail;
-
-  FREE (&mx.mbox);
-  return 0;
-
- fail:
-  FREE (&mx.mbox);
-  return -1;
-}
-#endif
 
 static int browse_add_list_result (IMAP_DATA* idata, const char* cmd,
   struct browser_state* state, short isparent)
@@ -500,7 +414,7 @@ static void imap_add_folder (char delim, char *folder, int noselect,
   /* apply filemask filter. This should really be done at menu setup rather
    * than at scan, since it's so expensive to scan. But that's big changes
    * to browser.c */
-  if (!((regexec (FileMask.rx, relpath, 0, NULL, 0) == 0) ^ FileMask.not))
+  if (!((regexec (Mask.rx, relpath, 0, NULL, 0) == 0) ^ Mask.not))
   {
     FREE (&mx.mbox);
     return;
@@ -675,3 +589,102 @@ static int browse_verify_namespace (IMAP_DATA* idata,
   return 0;
 }
 
+#ifdef LIBMUTT
+/*
+BALSA: rename capability
+Doesn't really belong here, but it goes with create.
+*/
+
+int imap_mailbox_rename (const char* prefix, const char* dir,
+			 const char* parent, const char* subfolder,
+			 int subscribe)
+{
+  IMAP_DATA* idata;
+  IMAP_MBOX mx;
+  char folder[LONG_STRING];
+  char buf[LONG_STRING];
+  short n;
+
+  snprintf(folder, sizeof (folder), "%s%s", prefix, dir);
+  if (imap_parse_path (folder, &mx) < 0)
+  {
+    dprint (1, (debugfile, "imap_mailbox_rename: Bad path %s\n", folder));
+    return -1;
+  }
+
+  if (!(idata = imap_conn_find (&mx.account, M_IMAP_CONN_NONEW)))
+  {
+    dprint (1, (debugfile, "imap_mailbox_rename: Couldn't find open connection to %s", mx.account.host));
+    goto fail;
+  }
+  
+  strfcpy (buf, parent, sizeof (buf));
+
+  /* append a delimiter if necessary */
+  n = mutt_strlen (buf);
+  if (n && (n < sizeof (buf) - 1) && (buf[n-1] != idata->delim))
+  {
+    buf[n++] = idata->delim;
+    buf[n] = '\0';
+  }
+  
+  strfcpy (buf + n, subfolder, sizeof (buf) - n);
+
+  if (imap_rename_mailbox (idata, mx.mbox, buf) < 0)
+    goto fail;
+
+  if (subscribe) {
+    snprintf(folder, sizeof (folder), "%s%s", prefix, buf);
+    if (imap_subscribe(folder, 1) < 0)
+      goto fail;
+  }
+
+  FREE (&mx.mbox);
+  return 0;
+
+ fail:
+  FREE (&mx.mbox);
+  return -1;
+}
+
+/*
+BALSA: this function is needed because the lower-level imap_delete_mailbox
+segfaults when called from Balsa.  It doesn't especially belong here,
+but it roughly complements imap_mailbox_create above.
+*/
+int imap_mailbox_delete(const char* folder)
+{
+  IMAP_DATA* idata;
+  IMAP_MBOX mx;
+
+  if (imap_parse_path (folder, &mx) < 0)
+  {
+    dprint (1, (debugfile, "imap_mailbox_delete: Bad path %s\n",
+      folder));
+    return -1;
+  }
+
+  if (!(idata = imap_conn_find (&mx.account, M_IMAP_CONN_NONEW)))
+  {
+    dprint (1, (debugfile,
+               "imap_mailbox_delete: Couldn't find open connection to %s",
+               mx.account.host));
+    goto fail;
+  }
+
+  /* imap_delete_mailbox takes the CONTEXT as an argument,
+   * but expects the data field to point to IMAP_DATA:
+   */
+  if (!idata->ctx->data)
+    idata->ctx->data = idata;
+  if (!*mx.mbox || imap_delete_mailbox (idata->ctx, mx.mbox) < 0)
+    goto fail;
+
+  FREE (&mx.mbox);
+  return 0;
+
+ fail:
+  FREE (&mx.mbox);
+  return -1;
+}
+#endif

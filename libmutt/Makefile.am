@@ -8,11 +8,13 @@ noinst_LIBRARIES = libmutt.a
 
 libmutt_a_SOURCES = \
 	account.c	\
+	ascii.c		\
 	attach.c 	\
 	base64.c	\
 	browser.h	\
 	buffy.c 	\
 	charset.c 	\
+	commands.c	\
 	copy.c 		\
 	date.c 		\
 	dotlock.c	\
@@ -29,7 +31,9 @@ libmutt_a_SOURCES = \
 	md5c.c		\
 	mh.c 		\
 	mx.c 		\
+	mutt_sasl.c	\
 	mutt_socket.c	\
+	mutt_tunnel.c	\
 	parse.c 	\
 	pattern.c 	\
 	rfc1524.c 	\
@@ -44,6 +48,7 @@ libmutt_a_SOURCES = \
 	url.c		\
 	acconfig.h	\
 	account.h	\
+	ascii.h		\
 	attach.h	\
 	buffy.h		\
 	charset.h 	\
@@ -66,6 +71,7 @@ libmutt_a_SOURCES = \
 	mutt_regex.h	\
 	mutt_sasl.h	\
 	mutt_socket.h	\
+	mutt_tunnel.h	\
 	mx.h		\
 	pager.h		\
 	parse.h		\

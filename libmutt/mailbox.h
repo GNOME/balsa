@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
 #ifndef _MAILBOX_H
@@ -33,7 +33,8 @@ enum
 {
   M_NEW_MAIL = 1,	/* new mail received in mailbox */
   M_LOCKED,		/* couldn't lock the mailbox */
-  M_REOPENED		/* mailbox was reopened */
+  M_REOPENED,		/* mailbox was reopened */
+  M_FLAGS               /* nondestructive flags change (IMAP) */
 };
 
 typedef struct
@@ -51,16 +52,20 @@ MESSAGE *mx_open_new_message (CONTEXT *, HEADER *, int);
 
 void mx_fastclose_mailbox (CONTEXT *);
 
-int mx_close_mailbox (CONTEXT *, int *index_hint);
-int mx_sync_mailbox (CONTEXT *ctx, int *index_hint);
+int mx_close_mailbox (CONTEXT *, int *);
+int mx_sync_mailbox (CONTEXT *ctx, int *);
 int mx_commit_message (MESSAGE *, CONTEXT *);
 int mx_close_message (MESSAGE **);
 int mx_get_magic (const char *);
 int mx_set_magic (const char *);
-int mx_check_mailbox (CONTEXT *ctx, int *index_hint, int lock);
+int mx_check_mailbox (CONTEXT *ctx, int *, int );
 #ifdef USE_IMAP
 int mx_is_imap (const char *);
 #endif
-
+#ifdef USE_POP
+int mx_is_pop (const char *);
+#endif
+ 
+int mx_access (const char*, int);
 
 #endif

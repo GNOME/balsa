@@ -1,3 +1,48 @@
+2001-07-18  Carlos Morgado  <chbm@chbm.nu>
+
+	* imap/util.c (Repository): 
+	* imap/utf7.c (Repository): 
+	* imap/message.c (Repository): 
+	* imap/imap_private.h (Repository): 
+	* imap/imap.h (Repository): 
+	* imap/imap.c (Repository): 
+	* imap/command.c (Repository): 
+	* imap/browse.c (Repository): 
+	* imap/auth_sasl.c (Repository): 
+	* imap/auth_login.c (Repository): 
+	* imap/auth_gss.c (Repository): 
+	* imap/auth_cram.c (Repository): 
+	* imap/auth_anon.c (Repository): 
+	* imap/auth.h (Repository): 
+	* imap/auth.c (Repository): 
+	* sendlib.c (Repository): 
+	* rfc2047.h (Repository): 
+	* rfc2047.c (Repository): 
+	* mx.h (Repository): 
+	* mutt_socket.h (Repository): 
+	* mutt_socket.c (Repository): 
+	* mutt_sasl.h (Repository): 
+	* mutt.h (Repository): 
+	* mime.h (Repository): 
+	* mailbox.h (Repository): 
+	* init.h (Repository): 
+	* handler.c (Repository): 
+	* globals.h (Repository): 
+	* commands.c (Repository): 
+	* charset.h (Repository): 
+	* charset.c (Repository): 
+	update from mutt-1.3.19, mostly to try to get IMAP TLS to work
+
+	* mutt_sasl.c: added
+	* ascii.c:
+	* ascii.h: added
+	* mutt_sasl.c: added
+	* mutt_tunnel.c:
+	* mutt_tunnel.h: added. will this work ?
+	* Makefile.am: added mutt_tunnel.[ch]
+	* sendlib.c: hardly touched ! don't disturb the libesmtp stuff
+	* configure.in: removed USE_POP, added use_sockets=1
+
 2001-07-18  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Perl Compatible Regular Expressions by 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
 /* Content-Type */
@@ -51,9 +51,12 @@ enum
 };
 
 /* MIME encoding/decoding global vars */
+
+#ifndef _SENDLIB_C
 extern int Index_hex[];
 extern int Index_64[];
 extern char B64Chars[];
+#endif
 
 #define hexval(c) Index_hex[(unsigned int)(c)]
 #define base64val(c) Index_64[(unsigned int)(c)]
@@ -68,3 +71,8 @@ extern const char *BodyEncodings[];
 
 #define TYPE(X) ((X->type == TYPEOTHER) && (X->xtype != NULL) ? X->xtype : BodyTypes[(X->type)])
 #define ENCODING(X) BodyEncodings[(X)]
+
+/* other MIME-related global variables */
+#ifndef _SENDLIB_C
+extern char MimeSpecials[];
+#endif

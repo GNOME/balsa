@@ -41,9 +41,9 @@ WHERE char *HdrFmt;
 WHERE char *Homedir;
 WHERE char *Hostname;
 #ifdef USE_IMAP
-WHERE char *ImapUser INITVAL (NULL);
-WHERE char *ImapCRAMKey INITVAL (NULL);
+WHERE char *ImapAuthenticators INITVAL (NULL);
 WHERE char *ImapPass INITVAL (NULL);
+WHERE char *ImapUser INITVAL (NULL);
 WHERE short ImapCheckTimeout;
 /* BALSA: set initial value to something sensible */
 WHERE char *ImapDelimChars INITVAL ("/.");
@@ -59,6 +59,7 @@ WHERE char *Maildir;
 WHERE char *MsgFmt;
 #ifdef USE_SOCKET
 WHERE char *Preconnect INITVAL (NULL);
+WHERE char *Tunnel INITVAL (NULL);
 #endif /* USE_SOCKET */
 
 WHERE char *Muttrc INITVAL (NULL);
@@ -78,6 +79,7 @@ WHERE char *Prefix;
 WHERE char *PrintCmd;
 WHERE char *QueryCmd;
 WHERE char *Realname;
+WHERE char *SendCharset;
 WHERE char *Sendmail;
 WHERE char *Shell;
 WHERE char *Signature;

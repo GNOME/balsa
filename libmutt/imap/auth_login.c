@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1999-2000 Brendan Cully <brendan@kublai.com>
+ * Copyright (C) 1999-2001 Brendan Cully <brendan@kublai.com>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "auth.h"
 
 /* imap_auth_login: Plain LOGIN support */
-imap_auth_res_t imap_auth_login (IMAP_DATA* idata)
+imap_auth_res_t imap_auth_login (IMAP_DATA* idata, const char* method)
 {
   char q_user[SHORT_STRING], q_pass[SHORT_STRING];
   char buf[STRING];
@@ -60,10 +60,7 @@ imap_auth_res_t imap_auth_login (IMAP_DATA* idata)
   if (!rc)
     return IMAP_AUTH_SUCCESS;
 
-  else if (rc == -1)
-    dprint (1, (debugfile, "imap_auth_login: Error logging in.\n"));
-
   mutt_error _("Login failed.");
-  sleep (2);
+  mutt_sleep (2);
   return IMAP_AUTH_FAILURE;
 }

@@ -16,6 +16,8 @@
  *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */ 
 
+#define _SENDLIB_C 1
+
 #include "mutt.h"
 #include "mutt_curses.h"
 #include "rfc2047.h"
@@ -1364,26 +1366,36 @@ int mutt_write_rfc822_header (FILE *fp, ENVELOPE *env, BODY *attach, int mode)
   return (ferror (fp) == 0 ? 0 : -1);
 }
 
+
+/* BALSA: new encode header to match new rfc2047 */
 static void encode_headers (LIST *h)
 {
-  char tmp[LONG_STRING];
+  char *tmp;
   char *p;
-  size_t len;
-
+  int i;
+  
   for (; h; h = h->next)
   {
-    if ((p = strchr (h->data, ':')))
-    {
-      *p++ = 0;
-      SKIPWS (p);
-      snprintf (tmp, sizeof (tmp), "%s: ", h->data);
-      len = mutt_strlen (tmp);
-      rfc2047_encode_string (tmp + len, sizeof (tmp) - len, (unsigned char *) p);
-      safe_free ((void **) &h->data);
-      h->data = safe_strdup (tmp);
-    }
+    if (!(p = strchr (h->data, ':')))
+      continue;
+
+    i = p - h->data;
+    ++p; SKIPWS (p);
+    tmp = safe_strdup (p);
+
+    if (!tmp)
+      continue;
+    
+    rfc2047_encode_string (&tmp);
+    safe_realloc ((void **) &h->data, 
+                  mutt_strlen (h->data) + 2 + mutt_strlen (tmp) + 1);
+
+    sprintf (h->data + i, ": %s", NONULL (tmp));  /* __SPRINTF_CHECKED__ */
+    
+    safe_free ((void **) &tmp);
   }
 }
+
 
 const char *mutt_fqdn(short may_hide_host)
 {
@@ -1862,23 +1874,21 @@ void mutt_prepare_envelope (ENVELOPE *env)
 #endif
 
   /* Take care of 8-bit => 7-bit conversion. */
-  rfc2047_encode_adrlist (env->to);
-  rfc2047_encode_adrlist (env->cc);
-  rfc2047_encode_adrlist (env->from);
-  rfc2047_encode_adrlist (env->mail_followup_to);
-  rfc2047_encode_adrlist (env->reply_to);
+  rfc2047_encode_adrlist (env->to, NULL);
+  rfc2047_encode_adrlist (env->cc, NULL);
+  rfc2047_encode_adrlist (env->from, NULL);
+  rfc2047_encode_adrlist (env->mail_followup_to, NULL);
+  rfc2047_encode_adrlist (env->reply_to, NULL);
   /* BALSA: Handle dispnotify_to field */
-  rfc2047_encode_adrlist (env->dispnotify_to);
+  rfc2047_encode_adrlist (env->dispnotify_to, NULL);
 
+  /* BALSA: updated to new rfc2047 */
   if (env->subject)
-  {
-    rfc2047_encode_string (buffer, sizeof (buffer) - 1,
-			   (unsigned char *) env->subject);
-    safe_free ((void **) &env->subject);
-    env->subject = safe_strdup (buffer);
-  }
+    {
+      rfc2047_encode_string (&env->subject);
+    }
   encode_headers (env->userhdrs);
-
+  
   if (!env->message_id)
     env->message_id = mutt_gen_msgid ();
 }

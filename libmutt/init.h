@@ -126,10 +126,87 @@ struct option_t MuttVars[] = {
   { "history",		DT_NUM,	 R_NONE, UL &HistSize, 10 },
   { "hostname",		DT_STR,	 R_NONE, UL &Fqdn, 0 },
 #ifdef USE_IMAP
-  { "imap_checkinterval", 	DT_NUM,	 R_NONE, UL &ImapCheckTime, 0 },
-  { "imap_user",	DT_STR,  R_NONE, UL &ImapUser, UL 0 },
-  { "imap_pass", 	DT_STR,  R_NONE, UL &ImapPass, UL 0 },
-  { "imap_passive",	DT_BOOL, R_NONE, OPTIMAPPASSIVE, 1 },
+  { "imap_authenticators", DT_STR, R_NONE, UL &ImapAuthenticators, UL 0 },
+  /*
+  ** .pp
+  ** This is a colon-delimited list of authentication methods mutt may
+  ** attempt to use to log in to an IMAP server, in the order mutt should
+  ** try them.  Authentication methods are either 'login' or the right
+  ** side of an IMAP 'AUTH=xxx' capability string, eg 'digest-md5',
+  ** 'gssapi' or 'cram-md5'. This parameter is case-insensitive. If this
+  ** parameter is unset (the default) mutt will try all available methods,
+  ** in order from most-secure to least-secure.
+  ** .pp
+  ** Example: set imap_authenticators="gssapi:cram-md5:login"
+  ** .pp
+  ** \fBNote:\fP Mutt will only fall back to other authentication methods if
+  ** the previous methods are unavailable. If a method is available but
+  ** authentication fails, mutt will not connect to the IMAP server.
+  */
+  { "imap_delim_chars",         DT_STR, R_NONE, UL &ImapDelimChars, UL "/." },
+  /*
+  ** .pp
+  ** This contains the list of characters which you would like to treat
+  ** as folder separators for displaying IMAP paths. In particular it
+  ** helps in using the '=' shortcut for your \fIfolder\fP variable.
+  */
+# ifdef USE_SSL
+  { "imap_force_ssl",           DT_BOOL, R_NONE, OPTIMAPFORCESSL, 0 },
+  /*
+  ** .pp
+  ** If this variable is set, Mutt will always use SSL when
+  ** connecting to IMAP servers.
+  */
+# endif
+{ "imap_list_subscribed",     DT_BOOL, R_NONE, OPTIMAPLSUB, 0 },
+  /*
+  ** .pp
+  ** This variable configures whether IMAP folder browsing will look for
+  ** only subscribed folders or all folders.  This can be toggled in the
+  ** IMAP browser with the \fItoggle-subscribed\fP command.
+  */
+  { "imap_pass",        DT_STR,  R_NONE, UL &ImapPass, UL 0 },
+  /*
+  ** .pp
+  ** Specifies the password for your IMAP account.  If unset, Mutt will
+  ** prompt you for your password when you invoke the fetch-mail function.
+  ** \fBWarning\fP: you should only use this option when you are on a
+  ** fairly secure machine, because the superuser can read your muttrc even
+  ** if you are the only one who can read the file.
+  */
+  { "imap_passive",             DT_BOOL, R_NONE, OPTIMAPPASSIVE, 1 },
+  /*
+  ** .pp
+  ** When set, mutt will not open new IMAP connections to check for new
+  ** mail.  Mutt will only check for new mail over existing IMAP
+  ** connections.  This is useful if you don't want to be prompted to
+  ** user/password pairs on mutt invocation, or if opening the connection
+  ** is slow.
+  */
+ { "imap_peek", DT_BOOL, R_NONE, OPTIMAPPEEK, 1 },
+  /*
+  ** .pp
+  ** If set, mutt will avoid implicitly marking your mail as read whenever
+  ** you fetch a message from the server. This is generally a good thing,
+  ** but can make closing an IMAP folder somewhat slower. This option
+  ** exists to appease spead freaks.
+  */
+  { "imap_servernoise",         DT_BOOL, R_NONE, OPTIMAPSERVERNOISE, 1 },
+  /*
+  ** .pp
+  ** When set, mutt will display warning messages from the IMAP
+  ** server as error messages. Since these messages are often
+  ** harmless, or generated due to configuration problems on the
+  ** server which are out of the users' hands, you may wish to suppress
+  ** them at some point.
+  */
+  { "imap_user",        DT_STR,  R_NONE, UL &ImapUser, UL 0 },
+  /*
+  ** .pp
+  ** Your login name on the IMAP server.
+  ** .pp
+  ** This variable defaults to your user name on the local machine.
+  */
 #endif
   { "implicit_autoview", DT_BOOL,R_NONE, OPTIMPLICITAUTOVIEW, 0},
   { "in_reply_to",	DT_STR,	 R_NONE, UL &InReplyTo, UL "%i; from %a on %{!%a, %b %d, %Y at %I:%M:%S%p %Z}" },
@@ -257,6 +334,17 @@ struct option_t MuttVars[] = {
   { "save_address",	DT_BOOL, R_NONE, OPTSAVEADDRESS, 0 },
   { "save_empty",	DT_BOOL, R_NONE, OPTSAVEEMPTY, 1 },
   { "save_name",	DT_BOOL, R_NONE, OPTSAVENAME, 0 },
+  { "send_charset",	DT_STR,  R_NONE, UL &SendCharset, UL "us-ascii:iso-8859-1:utf-8" },
+  /*
+  ** .pp
+  ** A list of character sets for outgoing messages. Mutt will use the
+  ** first character set into which the text can be converted exactly.
+  ** If your ``$$charset'' is not iso-8859-1 and recipients may not
+  ** understand UTF-8, it is advisable to include in the list an
+  ** appropriate widely used standard character set (such as
+  ** iso-8859-2, koi8-r or iso-2022-jp) either instead of or after
+  ** "iso-8859-1".
+  */
   { "sendmail",		DT_PATH, R_NONE, UL &Sendmail, UL SENDMAIL " -oem -oi" },
   { "sendmail_wait",	DT_NUM,  R_NONE, UL &SendmailWait, 0 },
   { "shell",		DT_PATH, R_NONE, UL &Shell, 0 },
@@ -276,11 +364,35 @@ struct option_t MuttVars[] = {
   { "status_on_top",	DT_BOOL, R_BOTH, OPTSTATUSONTOP, 0 },
   { "strict_threads",	DT_BOOL, R_RESORT|R_INDEX, OPTSTRICTTHREADS, 0 },
   { "suspend",		DT_BOOL, R_NONE, OPTSUSPEND, 1 },
+  { "text_flowed",      DT_BOOL, R_NONE, OPTTEXTFLOWED,  0 },
+  /*
+  ** .pp
+  ** When set, mutt will generate text/plain; format=flowed attachments.
+  ** This format is easier to handle for some mailing software, and generally
+  ** just looks like ordinary text.  To actually make use of this format's 
+  ** features, you'll need support in your editor.
+  ** .pp
+  ** Note that $$indent_string is ignored when this option is set.
+  */
   { "thorough_search",	DT_BOOL, R_NONE, OPTTHOROUGHSRC, 0 },
   { "tilde",		DT_BOOL, R_PAGER, OPTTILDE, 0 },
   { "timeout",		DT_NUM,	 R_NONE, UL &Timeout, 600 },
   { "tmpdir",		DT_PATH, R_NONE, UL &Tempdir, 0 },
   { "to_chars",		DT_STR,	 R_BOTH, UL &Tochars, UL " +TCF" },
+#ifdef USE_SOCKET
+  { "tunnel",		 DT_STR, R_NONE, UL &Tunnel, UL 0 },
+  /*
+  ** .pp
+  ** Setting this variable will cause mutt to open a pipe to a command
+  ** instead of a raw socket. You may be able to use this to set up 
+  ** preauthenticated connections to your IMAP/POP3 server. Example:
+  ** .pp
+  ** tunnel="ssh -q mailhost.net /usr/local/libexec/imapd"
+  ** .pp
+  ** NOTE: For this example to work you must be able to log in to the remote
+  ** machine without having to enter a password.
+  */  
+#endif
   { "use_8bitmime",	DT_BOOL, R_NONE, OPTUSE8BITMIME, 0 },
   { "use_domain",	DT_BOOL, R_NONE, OPTUSEDOMAIN, 1 },
   { "use_from",		DT_BOOL, R_NONE, OPTUSEFROM, 1 },

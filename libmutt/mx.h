@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
- * Copyright (C) 1999 Thomas Roessler <roessler@guug.de>
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 1999-2000 Thomas Roessler <roessler@guug.de>
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
 /*
@@ -38,6 +38,9 @@ enum
 #ifdef USE_IMAP
   , M_IMAP
 #endif
+#ifdef USE_POP
+  , M_POP
+#endif
 };
 
 WHERE short DefaultMagic INITVAL (M_MBOX);
@@ -46,16 +49,17 @@ WHERE short DefaultMagic INITVAL (M_MBOX);
 #define KENDRA_SEP "\001\001\001\001\001\001\001\001\001\001\001\001\001\001\001\001\001\001\001\001\n"
 #define MAXLOCKATTEMPT 5
 
-int mbox_sync_mailbox (CONTEXT *ctx, int *index_hint);
+int mbox_sync_mailbox (CONTEXT *, int *);
 int mbox_open_mailbox (CONTEXT *);
 int mbox_check_mailbox (CONTEXT *, int *);
 int mbox_close_mailbox (CONTEXT *);
 int mbox_lock_mailbox (CONTEXT *, int, int);
 int mbox_parse_mailbox (CONTEXT *);
 int mmdf_parse_mailbox (CONTEXT *);
+void mbox_unlock_mailbox (CONTEXT *);
 
 int mh_read_dir (CONTEXT *, const char *);
-int mh_sync_mailbox (CONTEXT *ctx, int *index_hint);
+int mh_sync_mailbox (CONTEXT *, int *);
 int mh_check_mailbox (CONTEXT *, int *);
 int mh_parse_sequences (CONTEXT *, const char *);
 
@@ -73,8 +77,6 @@ int mutt_reopen_mailbox (CONTEXT *, int *);
 void mx_alloc_memory (CONTEXT *);
 void mx_update_context (CONTEXT *);
 void mx_update_tables (CONTEXT *, int);
-
-FILE *mx_open_file_lock (const char *, const char *);
 
 
 int mx_lock_file (const char *, int, int, int, int);

@@ -66,7 +66,6 @@ int imap_access (const char* path, int flags)
     FREE (&mx.mbox);
     return -1;
   }
-  
 
   imap_fix_path (idata, mx.mbox, mailbox, sizeof (mailbox));
   FREE (&mx.mbox);
@@ -105,6 +104,7 @@ int imap_create_mailbox (IMAP_DATA* idata, char* mailbox)
   return 0;
 }
 
+/* BALSA - for some reason this went away in mutt 1.3.19 ...*/
 int imap_rename_mailbox(IMAP_DATA* idata, char* mailbox, char* new_name)
 {
   char buf[LONG_STRING], mbox[LONG_STRING], new_mbox[LONG_STRING];
@@ -175,6 +175,8 @@ int imap_read_literal (FILE* fp, IMAP_DATA* idata, long bytes)
     if (mutt_socket_readchar (idata->conn, &c) != 1)
     {
       dprint (1, (debugfile, "imap_read_literal: error during read, %ld bytes read\n", pos));
+      idata->status = IMAP_FATAL;
+      
       return -1;
     }
 
@@ -373,11 +375,7 @@ int imap_open_connection (IMAP_DATA* idata)
   int rc;
 
   if (mutt_socket_open (idata->conn) < 0)
-  {
-    mutt_error (_("Connection to %s failed."), idata->conn->account.host);
-    mutt_sleep (1);
     return -1;
-  }
 
   idata->state = IMAP_CONNECTED;
 
@@ -395,7 +393,7 @@ int imap_open_connection (IMAP_DATA* idata)
     {
       if ((rc = query_quadoption (OPT_SSLSTARTTLS,
         _("Secure connection with TLS?"))) == -1)
-	goto bail;
+	goto err_close_conn;
       if (rc == M_YES) {
 	if ((rc = imap_exec (idata, "STARTTLS", IMAP_CMD_FAIL_OK)) == -1)
 	  goto bail;
@@ -403,7 +401,7 @@ int imap_open_connection (IMAP_DATA* idata)
 	{
 	  if (mutt_ssl_starttls (idata->conn))
 	  {
-	    mutt_error ("Could not negotiate TLS connection");
+	    mutt_error (_("Could not negotiate TLS connection"));
 	    mutt_sleep (1);
 	    goto bail;
 	  }
@@ -440,9 +438,10 @@ int imap_open_connection (IMAP_DATA* idata)
   imap_get_delim (idata);
   return 0;
 
+ err_close_conn:
+  mutt_socket_close (idata->conn);
  bail:
   FREE (&idata->capstr);
-  mutt_socket_close (idata->conn);
   idata->state = IMAP_DISCONNECTED;
   return -1;
 }
@@ -668,7 +667,7 @@ int imap_open_mailbox (CONTEXT* ctx)
   ctx->msgcount = 0;
   count = imap_read_headers (idata, 0, count - 1) + 1;
 
-  dprint (1, (debugfile, "imap_open_mailbox(): msgcount is %d\n", ctx->msgcount));
+  dprint (2, (debugfile, "imap_open_mailbox: msgcount is %d\n", ctx->msgcount));
   FREE (&mx.mbox);
   return 0;
 
@@ -886,6 +885,7 @@ int imap_make_msg_set (IMAP_DATA* idata, char* buf, size_t buflen, int flag,
 int imap_sync_mailbox (CONTEXT* ctx, int expunge, int* index_hint)
 {
   IMAP_DATA* idata;
+  CONTEXT* appendctx = NULL;
   char buf[HUGE_STRING];
   char flags[LONG_STRING];
   char tmp[LONG_STRING];
@@ -943,8 +943,23 @@ int imap_sync_mailbox (CONTEXT* ctx, int expunge, int* index_hint)
   {
     if (ctx->hdrs[n]->changed)
     {
-      mutt_message (_("Saving message status flags... [%d/%d]"), n+1, ctx->msgcount);
-      
+      mutt_message (_("Saving message status flags... [%d/%d]"), n+1,
+        ctx->msgcount);
+
+      /* if attachments have been deleted we delete the message and reupload
+       * it. This works better if we're expunging, of course. */
+      if (ctx->hdrs[n]->attach_del)
+      {
+	dprint (3, (debugfile, "imap_sync_mailbox: Attachments to be deleted, falling back to _mutt_save_message\n"));
+	if (!appendctx)
+	  appendctx = mx_open_mailbox (ctx->path, M_APPEND | M_QUIET, NULL);
+	if (!appendctx)
+	{
+	  dprint (1, (debugfile, "imap_sync_mailbox: Error opening mailbox in append mode\n"));
+	}
+	else
+	  _mutt_save_message (ctx->hdrs[n], appendctx, 1, 0, 0);
+      }
       flags[0] = '\0';
       
       imap_set_flag (idata, IMAP_ACL_SEEN, ctx->hdrs[n]->read, "\\Seen ",
@@ -988,7 +1003,10 @@ int imap_sync_mailbox (CONTEXT* ctx, int expunge, int* index_hint)
         err_continue = imap_continue ("imap_sync_mailbox: STORE failed",
           idata->cmd.buf);
         if (err_continue != M_YES)
-          return -1;
+	{
+	  rc = -1;
+	  goto out;
+	}
       }
 
       ctx->hdrs[n]->changed = 0;
@@ -1001,14 +1019,24 @@ int imap_sync_mailbox (CONTEXT* ctx, int expunge, int* index_hint)
       mutt_bit_isset(idata->rights, IMAP_ACL_DELETE))
   {
     mutt_message _("Expunging messages from server...");
+    /* Set expunge bit so we don't get spurious reopened messages */
+    idata->reopen |= IMAP_EXPUNGE_EXPECTED;
     if (imap_exec (idata, "EXPUNGE", 0) != 0)
     {
       imap_error ("imap_sync_mailbox: EXPUNGE failed", idata->cmd.buf);
-      return -1;
+      rc = -1;
+      goto out;
     }
   }
 
-  return 0;
+  rc = 0;
+ out:
+  if (appendctx)
+  {
+    mx_fastclose_mailbox (appendctx);
+    FREE (&appendctx);
+  }
+  return rc;
 }
 
 /* imap_close_mailbox: issue close command if neccessary, reset IMAP_DATA */
@@ -1027,7 +1055,7 @@ void imap_close_mailbox (CONTEXT* ctx)
       (ctx == idata->ctx))
   {
     if (!(idata->noclose) && imap_exec (idata, "CLOSE", 0))
-      imap_error ("CLOSE failed", idata->cmd.buf);
+      mutt_error (_("CLOSE failed"));
 
     idata->reopen &= IMAP_REOPEN_ALLOW;
     idata->state = IMAP_AUTHENTICATED;
@@ -1063,6 +1091,7 @@ int imap_check_mailbox (CONTEXT *ctx, int *index_hint)
 
   IMAP_DATA* idata;
   time_t now;
+  int result = 0;
 
   idata = (IMAP_DATA*) ctx->data;
 
@@ -1072,21 +1101,23 @@ int imap_check_mailbox (CONTEXT *ctx, int *index_hint)
     ImapLastCheck = now;
 
     if (imap_exec (idata, "NOOP", 0) != 0)
-    {
-      imap_error ("imap_check_mailbox", idata->cmd.buf);
       return -1;
-    }
   }
-    
+
+  /* We call this even when we haven't run NOOP in case we have pending
+   * changes to process, since we can reopen here. */
+  imap_cmd_finish (idata);
+
   if (idata->check_status & IMAP_NEWMAIL_PENDING)
-  {
-    idata->check_status &= ~IMAP_NEWMAIL_PENDING;
-    return M_NEW_MAIL;
-  }
-  /* TODO: we should be able to detect external changes and return
-   *   M_REOPENED here. */
-  
-  return 0;
+    result = M_NEW_MAIL;
+  else if (idata->check_status & IMAP_EXPUNGE_PENDING)
+    result = M_REOPENED;
+  else if (idata->check_status & IMAP_FLAGS_PENDING)
+    result = M_FLAGS;
+
+  idata->check_status = 0;
+
+  return result;
 }
 
 /* returns count of recent messages if new = 1, else count of total messages.

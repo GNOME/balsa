@@ -36,7 +36,7 @@ extern GtkWidget *new_icon (gchar **, GtkWidget *);
 static void send_smtp_message (GtkWidget *, BalsaSendmsg *);
 static void close_window (GtkWidget *, gpointer);
 static void balsa_sendmsg_free (BalsaSendmsg *);
-static GtkWidget *create_menu (GtkWidget *);
+static GtkWidget *create_menu (BalsaSendmsg *);
 
 static GtkWidget *menu_items[6];
 GtkTooltips *tooltips;
@@ -111,8 +111,9 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
 }
 
 static GtkWidget *
-create_menu (GtkWidget * window)
+create_menu (BalsaSendmsg * bmsg)
 {
+  GtkWidget *window = bmsg->window;
   GtkWidget *menubar, *w, *menu;
   GtkAcceleratorTable *accel;
   int i = 0;
@@ -123,14 +124,15 @@ create_menu (GtkWidget * window)
 
   menu = gtk_menu_new ();
 
-  w = gtk_menu_item_new ();
-  gtk_widget_show (w);
-  gtk_menu_append (GTK_MENU (menu), w);
-
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_SND, _ ("Send"));
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
+  gtk_signal_connect (GTK_OBJECT (w),
+		      "activate",
+		      GTK_SIGNAL_FUNC (send_smtp_message),
+		      bmsg);
+
 /*
    w = gnome_stock_menu_item (GNOME_STOCK_MENU_OPEN, _ ("Attach File"));
    gtk_widget_show (w);
@@ -197,9 +199,9 @@ create_menu (GtkWidget * window)
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
   menu_items[i] = NULL;
-/*
-   g_print ("%d menu items\n", i);
- */
+
+  g_print ("%d menu items\n", i);
+
   gtk_window_add_accelerator_table (GTK_WINDOW (window), accel);
   return menubar;
 }
@@ -286,7 +288,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_widget_show (label);
   msg->to = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->to, 1, 2, 0, 1,
-		    GTK_FILL|GTK_EXPAND, GTK_FILL, 0, 0);
+		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
   if (type == 1)
     {
       gtk_entry_set_text (GTK_ENTRY (msg->to), get_header_replyto (bindex->stream, row));
@@ -301,7 +303,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_widget_show (label);
   msg->from = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->from, 1, 2, 1, 2,
-		    GTK_FILL|GTK_EXPAND, GTK_FILL, 0, 0);
+		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
   GTK_WIDGET_UNSET_FLAGS (msg->from, GTK_CAN_FOCUS);
   gtk_entry_set_editable (GTK_ENTRY (msg->from), FALSE);
 
@@ -331,7 +333,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
     }
 
   gtk_table_attach (GTK_TABLE (table), msg->subject, 1, 2, 2, 3,
-		    GTK_FILL|GTK_EXPAND, GTK_FILL, 0, 0);
+		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
   gtk_widget_show (msg->subject);
 
   label = gtk_label_new ("cc:");
@@ -341,7 +343,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_widget_show (label);
   msg->cc = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->cc, 1, 2, 3, 4,
-		    GTK_FILL|GTK_EXPAND, GTK_FILL, 0, 0);
+		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
   gtk_widget_show (msg->cc);
 
   label = gtk_label_new ("bcc:");
@@ -351,7 +353,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_widget_show (label);
   msg->bcc = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->bcc, 1, 2, 4, 5,
-		    GTK_FILL|GTK_EXPAND, GTK_FILL, 0, 0);
+		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
   gtk_widget_show (msg->bcc);
 
 
@@ -380,7 +382,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gnome_app_set_contents (GNOME_APP (msg->window), vbox);
 
   gnome_app_set_menus (GNOME_APP (msg->window),
-		       GTK_MENU_BAR (create_menu (msg->window)));
+		       GTK_MENU_BAR (create_menu (msg)));
 
   gnome_app_set_toolbar (GNOME_APP (msg->window),
 			 GTK_TOOLBAR (create_toolbar (msg)));

@@ -1,3 +1,9 @@
+2004-10-08 11:27  PeterB
+
+	* src/: balsa-mblist.c, main-window.c: check whether Balsa has
+	quit while checking mail.
+	* libbalsa/imap/imap-commands.c: plug leak.
+
 2004-10-06 15:20  PeterB
 
 	* src/: sendmsg-window.c, sendmsg-window.h: change "From:" address

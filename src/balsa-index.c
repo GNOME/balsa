@@ -26,6 +26,8 @@
 
 #define BUFFER_SIZE 1024
 
+static gfloat currentmsgno;
+extern GtkWidget *bottom_pbar;
 
 /* gtk widget */
 static void balsa_index_class_init (BalsaIndexClass * klass);
@@ -379,6 +381,9 @@ append_messages (BalsaIndex *bindex,
       sprintf (text[1], "%d", i);
       mail_fetchfrom (text[2], bindex->stream, i, (long) BUFFER_SIZE);
       mail_fetchsubject (text[3], bindex->stream, i, (long) BUFFER_SIZE);
+
+      gtk_progress_bar_update (GTK_PROGRESS_BAR (bottom_pbar), (gfloat)i/last);
+      gtk_widget_draw(bottom_pbar,NULL);
 
       mail_fetchstructure (bindex->stream, i, NIL);
       cache = mail_elt (bindex->stream, i);

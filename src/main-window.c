@@ -40,7 +40,7 @@
 #include "pixmaps/p11.xpm"
 #include "pixmaps/p14.xpm"
 
-
+GtkWidget *bottom_pbar;
 
 void show_about_box (GtkWidget * widget, gpointer data);
 GtkWidget * new_icon (gchar ** xpm, GtkWidget * window);
@@ -153,10 +153,12 @@ new_icon (gchar ** xpm, GtkWidget * window)
 static GtkWidget *
 create_statusbar (MainWindow *mw)
 {
-  GtkWidget *statusbar;
-  statusbar = gtk_statusbar_new();
+  GtkWidget *statusbar = gtk_statusbar_new();
+  bottom_pbar = gtk_progress_bar_new();
+  gtk_box_pack_start (GTK_BOX (statusbar), bottom_pbar, FALSE, FALSE, 0);
   gtk_statusbar_push(GTK_STATUSBAR(statusbar),1,"Something...");
   gtk_widget_show (statusbar);
+  gtk_widget_show(bottom_pbar);
   return statusbar;
 }
 

@@ -147,18 +147,12 @@ item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data)
   GtkWidget *save_dialog;
   GtkWidget *file_entry;
 
+  GdkCursor *cursor = NULL;
+
   info = data;
 
   switch (event->type)
     {
-    case GDK_ENTER_NOTIFY:
-      gnome_canvas_item_set (item, "fill_color", "red", NULL);
-      break;
-
-    case GDK_LEAVE_NOTIFY:
-      gnome_canvas_item_set (item, "fill_color", "black", NULL);
-      break;
-
     case GDK_BUTTON_PRESS:
       save_dialog = gnome_dialog_new (_ ("Save MIME Part"),
 				      _ ("Save"), _ ("Cancel"), NULL);
@@ -178,6 +172,23 @@ item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data)
       gnome_dialog_run (GNOME_DIALOG (save_dialog));
       gtk_widget_destroy (save_dialog);
       save_dialog = NULL;
+      break;
+
+    case GDK_ENTER_NOTIFY:
+      cursor = gdk_cursor_new (GDK_HAND2);
+      gdk_window_set_cursor (GTK_LAYOUT (item->canvas)->bin_window, cursor);
+      gdk_cursor_destroy (cursor);
+
+      if (!GNOME_IS_CANVAS_IMAGE (item))
+      gnome_canvas_item_set (item, "fill_color", "red", NULL);
+      break;
+
+    case GDK_LEAVE_NOTIFY:
+      cursor = gdk_cursor_new (GDK_HAND1);
+      gdk_window_set_cursor (GTK_LAYOUT (item->canvas)->bin_window, NULL);
+
+      if (!GNOME_IS_CANVAS_IMAGE (item))
+      gnome_canvas_item_set (item, "fill_color", "black", NULL);
       break;
     default:
       break;

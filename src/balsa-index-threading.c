@@ -793,10 +793,12 @@ threading_simple(BalsaIndex* bindex)
 			    (gpointer)msg_table);
     sibling=gtk_ctree_node_nth(ctree, 0);
     while(sibling!=NULL) {
-	root_children=g_list_append(root_children, sibling);
+	root_children=g_list_prepend(root_children, sibling);
 	sibling=GTK_CTREE_ROW(sibling)->sibling;
 	length++;
     }
+    /* FIXME : Order relevant here ? */
+    root_children = g_list_reverse(root_children);
     balsa_window_setup_progress(BALSA_WINDOW(bindex->window),
                                 length);
     for(p=root_children; p; p=g_list_next(p)) {

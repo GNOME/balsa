@@ -412,47 +412,48 @@ libbalsa_message_user_hdrs(LibBalsaMessage * message)
     
     if (env->return_path)
 	res =
-	    g_list_append(res,
+	    g_list_prepend(res,
 			  libbalsa_create_hdr_pair("Return-Path",
                                                    ADDRESS_to_gchar(env->return_path)));
 
     if (env->sender)
 	res =
-	    g_list_append(res,
+	    g_list_prepend(res,
 			  libbalsa_create_hdr_pair("Sender",
                                                    ADDRESS_to_gchar(env->sender)));
 
     if (env->mail_followup_to)
 	res =
-	    g_list_append(res,
+	    g_list_prepend(res,
 			  libbalsa_create_hdr_pair("Mail-Followup-To",
                                                    ADDRESS_to_gchar(env->
                                                                     mail_followup_to)));
 
     if (env->message_id)
 	res =
-	    g_list_append(res, libbalsa_create_hdr_pair("Message-ID",
+	    g_list_prepend(res, libbalsa_create_hdr_pair("Message-ID",
                                                         g_strdup(env->message_id)));
     
     for (tmp = env->references; tmp; tmp = tmp->next) {
 	res =
-	    g_list_append(res,
+	    g_list_prepend(res,
 			  libbalsa_create_hdr_pair("References",
                                                    g_strdup(tmp->data)));
     }
 
     for (tmp = env->in_reply_to; tmp; tmp = tmp->next) {
-        res = g_list_append(res, libbalsa_create_hdr_pair("In-Reply-To",
+        res = g_list_prepend(res, libbalsa_create_hdr_pair("In-Reply-To",
                                                           g_strdup(tmp->data)));
     }
 
     for (tmp = env->userhdrs; tmp; tmp = tmp->next) {
 	pair = g_strsplit(tmp->data, ":", 1);
 	g_strchug(pair[1]);
-	res = g_list_append(res, pair);
+	res = g_list_prepend(res, pair);
     }
 
-    return res;
+    /* FIXME : Is order relevant here ? */
+    return g_list_reverse(res);
 }
 
 
@@ -516,7 +517,7 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 	if(!mutt_append_message(handle->context,
 				CLIENT_CONTEXT(message->mailbox), cur, 
 				0,0))
-	    d = g_list_append(d, message);
+	    d = g_list_prepend(d, message);
 	else
 	    r = FALSE;
     }
@@ -524,6 +525,8 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 
     /* it would be faster to inline real_set_deleted_flag but this is
        cleaner */
+    /* FIXME : once more is order relevant here ? */
+    d = g_list_reverse(d);
     libbalsa_messages_delete(d);
     g_list_free(d);
 
@@ -1220,8 +1223,9 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
             LibBalsaAddress *addr =
                 libbalsa_address_new_from_libmutt(addy);
             if (addr)
-                message->to_list = g_list_append(message->to_list, addr);
+                message->to_list = g_list_prepend(message->to_list, addr);
         }
+	message->to_list = g_list_reverse(message->to_list);
     }
 
     if (!message->cc_list) {
@@ -1230,8 +1234,9 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
             LibBalsaAddress *addr =
                 libbalsa_address_new_from_libmutt(addy);
             if (addr)
-                message->cc_list = g_list_append(message->cc_list, addr);
+                message->cc_list = g_list_prepend(message->cc_list, addr);
         }
+	message->cc_list = g_list_reverse(message->cc_list);
     }
 
     if (!message->bcc_list) {
@@ -1240,8 +1245,9 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
             LibBalsaAddress *addr =
                 libbalsa_address_new_from_libmutt(addy);
             if (addr)
-                message->bcc_list = g_list_append(message->bcc_list, addr);
+                message->bcc_list = g_list_prepend(message->bcc_list, addr);
         }
+	message->bcc_list = g_list_reverse(message->bcc_list);
     }
 
     if (!message->in_reply_to && cenv->in_reply_to) {
@@ -1283,12 +1289,13 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
     if (!message->message_id)
         message->message_id = g_strdup(cenv->message_id);
 
-    if (!message->references)
+    if (!message->references) {
         for (tmp = cenv->references; tmp != NULL; tmp = tmp->next) {
-            message->references = g_list_append(message->references,
-                                                g_strdup(tmp->data));
+            message->references = g_list_prepend(message->references,
+						 g_strdup(tmp->data));
         }
-
+	message->references = g_list_reverse(message->references);	
+    }
     /* more! */
     
     if (!message->references_for_threading) {

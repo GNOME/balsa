@@ -1,3 +1,11 @@
+2002-09-02  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/address-book-{ldif,vcard}.c, address-entry.c, address.c:
+	* libbalsa/mailbox.c,mailbox_imap.c, message.c:
+	* src/balsa-index-threading.c,balsa-index.c, balsa-mblist.c:
+	* src/print.c, save-restore.c, sendmsg-window.c: 
+	g_list_append() may be expensive, _prepend() is safer.
+
 2002-09-01  Emmanuel <e.allaud@wanadoo.fr>
 
 	* src/filter-edit-callbacks.c: make the two buttons "All/Clear"

@@ -1699,9 +1699,10 @@ compose_from_list(GtkWidget * w, BalsaIndex * index, SendType send_type)
         LibBalsaMessage *message =
             gtk_ctree_node_get_row_data(index->ctree,
                                         GTK_CTREE_NODE(sel->data));
-        list = g_list_append(list, message);
+        list = g_list_prepend(list, message);
         sel = g_list_next(sel);
     }
+    list = g_list_reverse(list);
     sm = sendmsg_window_new_from_list(w, list, send_type);
     gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
                        GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
@@ -1747,8 +1748,9 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
 
     for(list = GTK_CLIST(index->ctree)->selection; list; list = list->next) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-	messages= g_list_append(messages, message);
+	messages= g_list_prepend(messages, message);
     }
+    messages = g_list_reverse(messages);
     if(messages) {
 	if (move_to_trash && (index != trash)) {
 	    libbalsa_messages_move(messages, balsa_app.trash);
@@ -2160,9 +2162,9 @@ balsa_index_transfer_messages(BalsaIndex * bindex,
     for (list = clist->selection; list;list = list->next) {
 	message = gtk_ctree_node_get_row_data(GTK_CTREE(bindex->ctree), 
 					      list->data);
-	messages=g_list_append(messages, message);
+	messages=g_list_prepend(messages, message);
     }
-
+    messages = g_list_reverse(messages);
     balsa_index_transfer(messages, bindex->mailbox_node->mailbox,
                          mailbox, bindex, FALSE);
     g_list_free(messages);

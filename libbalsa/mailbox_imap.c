@@ -337,19 +337,19 @@ message_from_header(datum header)
             break;
         case 'T':
             msg->to_list = 
-                g_list_append(msg->to_list, 
+                g_list_prepend(msg->to_list, 
                               libbalsa_address_new_from_string(header.dptr
                                                                +curpos));
             break;
         case 'C':
             msg->cc_list = 
-                g_list_append(msg->cc_list, 
+                g_list_prepend(msg->cc_list, 
                               libbalsa_address_new_from_string(header.dptr
                                                                +curpos));
             break;
         case 'B':
             msg->bcc_list = 
-                g_list_append(msg->bcc_list, 
+                g_list_prepend(msg->bcc_list, 
                               libbalsa_address_new_from_string(header.dptr
                                                                +curpos));
             break;
@@ -363,15 +363,19 @@ message_from_header(datum header)
             msg->message_id = g_strdup(header.dptr+curpos);
             break;
         case 'R':
-            msg->references = g_list_append(msg->references,
-                                            g_strdup(header.dptr+curpos));
+            msg->references_for_threading =
+		g_list_prepend(msg->references_for_threading,
+			       g_strdup(header.dptr+curpos));
             break;
             
         }
         curpos += strlen(header.dptr+curpos)+1;
     }
-    msg->references_for_threading = 
-        g_list_reverse(g_list_copy(msg->references));
+    msg->references =
+	g_list_reverse(g_list_copy(msg->references_for_threading));
+    msg->to_list = g_list_reverse(msg->to_list);
+    msg->cc_list = g_list_reverse(msg->cc_list);
+    msg->bcc_list = g_list_reverse(msg->bcc_list);
     return msg;
 }
 

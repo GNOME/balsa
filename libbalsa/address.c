@@ -144,14 +144,14 @@ libbalsa_address_new_list_from_string(const gchar * the_str)
     while (address) {
         if (address->mailbox && !address->group) { /* *** For now */
             addr = libbalsa_address_new_from_libmutt(address);
-            list = g_list_append(list, addr);
+            list = g_list_prepend(list, addr);
         }
         address = address->next;
     }
     rfc822_free_address(&address);
     libbalsa_unlock_mutt();
 
-    return list;
+    return g_list_reverse(list);
 }
 
 LibBalsaAddress *

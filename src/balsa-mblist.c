@@ -253,10 +253,10 @@ mblist_find_all_unread_mboxes(void)
     for (i = g_list_first(r); i; i = g_list_next(i)) {
 	mbnode =
 	    gtk_ctree_node_get_row_data(GTK_CTREE(balsa_app.mblist), i->data);
-	res = g_list_append(res, mbnode->mailbox);
+	res = g_list_prepend(res, mbnode->mailbox);
     }
     g_list_free(r);
-    return res;
+    return g_list_reverse(res);
 }
 
 /* mblist_open_mailbox
@@ -1458,9 +1458,10 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
 
     /* convert pointer array to GList */
     for (i=0; message_array[i]; i++)
-        messages = g_list_append (messages, message_array[i]);
+        messages = g_list_prepend (messages, message_array[i]);
 
     g_return_if_fail(messages);
+    messages = g_list_reverse(messages);
     orig_mailbox = ((LibBalsaMessage*) messages->data)->mailbox;
 
     /* Adjust for column header size */
@@ -1561,9 +1562,10 @@ balsa_mblist_scan_children(GtkCTree * ctree, GtkCTreeNode * node)
                            && mbnode->server->type ==
                            LIBBALSA_SERVER_IMAP))
             && !mbnode->scanned) {
-            list = g_list_append(list, mbnode);
+            list = g_list_prepend(list, mbnode);
         }
     }
+    list = g_list_reverse(list);
 
     if (list) {
         GList *l = list;

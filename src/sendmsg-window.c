@@ -2725,11 +2725,11 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 
     for (i = 0; i < MAIN_MENUS_COUNT; ++i) {
 	if (i != MAIN_FILE_MENU)
-	    list = g_list_append(list, (gpointer) main_menu[i].widget);
+	    list = g_list_prepend(list, (gpointer) main_menu[i].widget);
     }
     for (i = 0; i < MENU_FILE_CLOSE_POS; ++i) {
 	if (i != MENU_FILE_SEPARATOR1_POS && i != MENU_FILE_SEPARATOR2_POS)
-	    list = g_list_append(list, (gpointer) file_menu[i].widget);
+	    list = g_list_prepend(list, (gpointer) file_menu[i].widget);
     }
 
     for(i=0; i<ELEMENTS(main_toolbar_spell_disable); i++) {
@@ -2737,6 +2737,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
                                        main_toolbar_spell_disable[i]);
         if(w) list = g_list_prepend(list, w);
     }
+    /* FIXME : I gues that order is not relevant here */
     msg->spell_check_disable_list = list;
 
     /* Set up the default identity */
@@ -3178,9 +3179,10 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	    for (list = bsmsg->orig_message->references; list;
 		 list = list->next) {
 		message->references =
-		    g_list_append(message->references,
+		    g_list_prepend(message->references,
 				  g_strdup(list->data));
 	    }
+	    message->references = g_list_reverse(message->references);
 	}
 
         /* Date for In Reply To header: */

@@ -744,7 +744,7 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 
 	message = translate_message(cur);
         libbalsa_mailbox_link_message(mailbox, message);
-	messages=g_list_append(messages, message);
+	messages=g_list_prepend(messages, message);
         mailbox->new_messages--;
         mailbox->messages++;
     }
@@ -754,9 +754,13 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
     gdk_threads_enter();
 
     if(messages!=NULL){
-      gtk_signal_emit(GTK_OBJECT(mailbox),
+	/* FIXME : I keep order as before, but I don't think this is important
+	   because we do not rely on this order, do we ?
+	*/
+	messages = g_list_reverse(messages);
+	gtk_signal_emit(GTK_OBJECT(mailbox),
 			libbalsa_mailbox_signals[MESSAGES_NEW], messages);
-      g_list_free(messages);
+	g_list_free(messages);
     }
 
     libbalsa_mailbox_set_unread_messages_flag(mailbox,

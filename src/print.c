@@ -619,7 +619,7 @@ print_wrap_body(gchar * str, GnomeFont * font, gint width, gint tab_width)
 	    if (*ptr && last_space) {
 		gint lastQLevel = lineInfo->quoteLevel;
 		lineInfo->lineData = g_strndup(wrLine->str, last_space);
-		wrappedLines = g_list_append(wrappedLines, lineInfo);
+		wrappedLines = g_list_prepend(wrappedLines, lineInfo);
 		lineInfo = g_malloc(sizeof(lineInfo_T));
 		lineInfo->quoteLevel = lastQLevel;
 		wrLine = g_string_erase(wrLine, 0, last_space + 1);
@@ -629,7 +629,7 @@ print_wrap_body(gchar * str, GnomeFont * font, gint width, gint tab_width)
 	    }
 	}
 	lineInfo->lineData = wrLine->str;
-	wrappedLines = g_list_append(wrappedLines, lineInfo);
+	wrappedLines = g_list_prepend(wrappedLines, lineInfo);
 	g_string_free(wrLine, FALSE);
 	line = eol;
 	if (eol)
@@ -639,7 +639,7 @@ print_wrap_body(gchar * str, GnomeFont * font, gint width, gint tab_width)
     if (checkQuote)
 	regfree(&rex);
 
-    return wrappedLines;
+    return g_list_reverse(wrappedLines);
 }
 
 static void

@@ -1181,8 +1181,10 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
 	    GMimeReferences *references, *reference;
 	    reference = references = g_mime_references_decode(value);
 	    while (reference) {
-		message->references = g_list_prepend(message->references,
-						    g_strdup(reference->msgid));
+		message->references =
+		    g_list_prepend(message->references,
+				   g_strdup_printf("<%s>",
+						   reference->msgid));
 		reference = reference->next;
 	    }
 	    g_mime_references_clear(&references);

@@ -1,3 +1,9 @@
+2002-12-13 13:36  PeterB
+
+	* src/main-window.c: (balsa_window_real_close_mbnode) Clear the
+	window's BALSA_INDEX_GRAB_FOCUS data, so we can never try to grab
+	the focus to a nonexistent BalsaIndex.
+
 2002-12-13 09:40  PeterB
 
 	* src/balsa-mblist.c: (balsa_mblist_scan_mailbox_node) Remember

@@ -2519,6 +2519,8 @@ guess_identity(BalsaSendmsg* bsmsg)
         GList *ilist;
         
         addy = alist->data;
+        if(!addy->address_list) /* empty To: field */
+            continue;
         address_string = addy->address_list->data;
         for (ilist = balsa_app.identities; ilist;
              ilist = g_list_next(ilist)) {

@@ -22,6 +22,7 @@
 #include "balsa-message.h"
 #include "index-window.h"
 #include "main-window.h"
+#include "message-window.h"
 #include "misc.h"
 
 typedef struct _IndexWindow IndexWindow;
@@ -44,8 +45,8 @@ void create_new_index (Mailbox * mailbox);
 static void destroy_index_window (GtkWidget * widget);
 static void close_index_window (GtkWidget * widget);
 static void refresh_index_window (IndexWindow * iw);
-
 static void mailbox_listener (MailboxWatcherMessage * iw_message);
+static void index_select_cb (GtkWidget * widget, Message * message);
 
 void
 create_new_index (Mailbox * mailbox)
@@ -85,6 +86,12 @@ create_new_index (Mailbox * mailbox)
   gtk_widget_show (iw->index);
 
   balsa_index_set_mailbox (BALSA_INDEX (iw->index), iw->mailbox);
+
+  gtk_signal_connect (GTK_OBJECT (iw->index),
+		      "select_message",
+		      (GtkSignalFunc) index_select_cb,
+		      NULL);
+
   iw->watcher_id = mailbox_watcher_set (mailbox,
 				      (MailboxWatcherFunc) mailbox_listener,
 					MESSAGE_NEW_MASK,
@@ -164,4 +171,16 @@ mailbox_listener (MailboxWatcherMessage * iw_message)
     default:
       break;
     }
+}
+
+
+static void
+index_select_cb (GtkWidget * widget,
+		 Message * message)
+{
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail (BALSA_IS_INDEX (widget));
+  g_return_if_fail (message != NULL);
+
+  message_window_new (message);
 }

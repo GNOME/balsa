@@ -11,6 +11,7 @@ balsa_SOURCES =	\
 	main-window.c		\
 	main.c			\
 	mblist-window.c		\
+	message-window.c	\
 	misc.c			\
 	new-mailbox.c		\
 	pref-manager.c		\

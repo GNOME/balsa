@@ -3630,6 +3630,12 @@ rfc2298_address_equal(LibBalsaAddress *a, LibBalsaAddress *b)
 
     a_string = libbalsa_address_to_gchar (a, -1);
     b_string = libbalsa_address_to_gchar (b, -1);
+
+    if (!a_string || !b_string) {
+        g_free (a_string);
+        g_free (b_string);
+        return FALSE;
+    }
     
     /* first find the "@" in the two addresses */
     a_atptr = strchr (a_string, '@');

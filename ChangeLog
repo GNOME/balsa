@@ -1,3 +1,15 @@
+2001-05-10  Pawel Salek  <pawsa@theochem.kth.se>
+	
+	From Albrecht Dreß <albrecht.dress@arcormail.de>:
+	* src/print.c: compute the number of pages properly.
+	* src/balsa-app.h: added field for url color
+	* src/save-restore.c: save and restore this entry
+	* src/pref-manager.c: add "Hyperlink color" in the Colors notebook
+	* src/balsa-message.c: the stuff to detect and store url's, and to
+	call the browser.
+	From Jacob Ilsø Christensen <firelake@mail1.stofanet.dk>:
+	* src/balsa-mblist.c: upate the mailbox message count column properly.
+	
 2001-05-07  Carlos Morgado  <chbm@chbm.nu>
 
 	Applied libESMTP patch from Brian Stafford. 

@@ -1126,6 +1126,80 @@ reflow_string(gchar * str, gint mode, gint * cur_pos, int width)
     while ((*iidx++ = *u++));
 }
 
+typedef struct _message_url_t {
+    gint start, end;     /* positions within the text widget */
+    gchar *url;          /* the link */
+} message_url_t;
+
+static void
+gtk_text_insert_with_url(GtkText *text, GdkFont *font, GdkColor *dflt, 
+			 const char *chars, regex_t *url_reg,
+			 GList **url_list, gint *index)
+{
+    gint match;
+    regmatch_t url_match;
+    gchar *p = (gchar *)chars;
+
+    match = regexec(url_reg, p, 1, &url_match, 0);
+    while (!match) {
+	gchar *buf;
+	message_url_t *url_found;
+
+	if (url_match.rm_so) {
+	    buf = g_strndup(p, url_match.rm_so);
+	    gtk_text_insert(text, font, dflt, NULL, buf, -1);
+	    g_free(buf);
+	}
+      
+	buf = g_strndup(p + url_match.rm_so, 
+			url_match.rm_eo - url_match.rm_so);
+	if(balsa_app.debug) printf("Found URL: '%s'\n", buf);
+	gtk_text_insert(text, font, &balsa_app.url_color, NULL, buf, -1);
+
+	/* remember the URL and its position within the text */
+	url_found = g_malloc(sizeof(message_url_t));
+	url_found->start = *index + url_match.rm_so;
+	url_found->end = *index + url_match.rm_eo;
+	url_found->url = buf;  /* gets freed later... */
+	*url_list = g_list_append(*url_list, url_found);
+
+	p += url_match.rm_eo;
+	*index += url_match.rm_eo;
+	match = regexec(url_reg, p, 1, &url_match, 0);
+    }
+
+    if (*p) {
+	gtk_text_insert(text, font, dflt, NULL, p, -1);
+	*index += strlen (p);
+    }
+}
+
+static gboolean 
+check_call_url(GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+    g_return_val_if_fail(data, FALSE); /* this should not happen... */
+
+    if (event->type == GDK_BUTTON_RELEASE && event->button == 1) {
+	gint cursor = gtk_editable_get_position(GTK_EDITABLE(widget));
+	GList *url_list = (GList *)data;
+	
+	while (url_list) {
+	    message_url_t *url_data = (message_url_t *)url_list->data;
+
+	    if (cursor >= url_data->start && cursor <= url_data->end) {
+		gchar *notice =
+		    g_strdup_printf(_("Calling URL %s..."), url_data->url);
+		gnome_appbar_set_status(balsa_app.appbar, notice);
+		g_free(notice);
+		gnome_url_show(url_data->url);
+		break;
+	    }
+	    url_list = g_list_next(url_list);
+	}
+    }
+
+    return FALSE;
+}
 
 /* END OF HELPER FUNCTIONS ----------------------------------------------- */
 
@@ -1174,10 +1248,13 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	part_info_init_unknown(bm, info);
 #endif
     } else {
-	regex_t rex;
+	regex_t rex, url_reg;
+	const char *url_str = "((ht|f)tps?://[^[:blank:]\r\n]+)";
 	
 	GtkWidget *item = NULL;
 	GdkFont *fnt = NULL;
+
+	GList *url_list = NULL;
 	
 	fnt = find_body_font(info->body);
 	if (bm->wrap_text)
@@ -1207,12 +1284,16 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	   style = gtk_widget_get_style (GTK_WIDGET (bm));
 	   color = (GdkColor) style->text[GTK_STATE_PRELIGHT];
 	*/
-	
+	if (regcomp(&url_reg, url_str, REG_EXTENDED) != 0)
+	    g_warning
+		("part_info_init_mimetext: url regex compilation failed.");
 	if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0) {
 	    g_warning
 		("part_info_init_mimetext: quote regex compilation failed.");
 	    gtk_text_insert(GTK_TEXT(item), fnt, NULL, NULL, ptr, -1);
 	} else {
+	    gint index = 0;
+
 	    lines = l = g_strsplit(ptr, "\n", -1);
 	    for (line = *lines; line != NULL; line = *(++lines)) {
 		line = g_strconcat(line, "\n", NULL);
@@ -1224,18 +1305,26 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 		     * quote colors over again as the quote level
 		     * grows arbitrarily deep. */
 		    quote_level = (quote_level-1)%MAX_QUOTED_COLOR;
-		    gtk_text_insert(GTK_TEXT(item), fnt,
-				    &balsa_app.quoted_color[quote_level],
-				    NULL, line, -1);
+		    gtk_text_insert_with_url(GTK_TEXT(item), fnt,
+					     &balsa_app.quoted_color[quote_level],
+					     line, &url_reg, &url_list, &index);
 		} else
-		    gtk_text_insert(GTK_TEXT(item), fnt, NULL, NULL, 
-				    line, -1);
+		    gtk_text_insert_with_url(GTK_TEXT(item), fnt, NULL, 
+					     line, &url_reg, &url_list, &index);
 		g_free(line);
 	    }
 	    g_strfreev(l);
 	    regfree(&rex);
 	}
 	
+	if (url_list) {
+	    gtk_object_set_data(GTK_OBJECT(item), "url-list", 
+				(gpointer) url_list);
+	    gtk_signal_connect_after(GTK_OBJECT(item), "button_release_event",
+				     (GtkSignalFunc)check_call_url, 
+				     (gpointer) url_list);
+	}
+
 	gtk_text_set_editable(GTK_TEXT(item), FALSE);
 	
 	gtk_widget_show(item);
@@ -1489,8 +1578,26 @@ free_icon_data(gpointer data)
     if (info == NULL)
 	return;
 
-    if (info->widget)
+    if (info->widget) {
+	GList *url_list = 
+	    gtk_object_get_data(GTK_OBJECT(info->widget), "url-list");
+
+	if (url_list) {
+	    GList *p = url_list;
+	    
+	    while (p) {
+		message_url_t *url_data = (message_url_t *)p->data;
+
+		g_free(url_data->url);
+		g_free(url_data);
+		p = g_list_next(p);
+	    }
+	    
+	    g_list_free(url_list);
+	}
+
 	gtk_object_unref(GTK_OBJECT(info->widget));
+    }
 
     if (info->popup_menu)
 	gtk_object_unref(GTK_OBJECT(info->popup_menu));

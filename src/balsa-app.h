@@ -70,6 +70,8 @@
 #define DEFAULT_QUOTED_COLOR "rgb:0000/5000/5000"
 #define DEFAULT_QUOTE_REGEX  "^(([ \tA-Z])\1*[|>:}#])"
 
+#define DEFAULT_URL_COLOR    "rgb:A000/0000/0000"
+
 #define MAILBOX_MANAGER_WIDTH 350
 #define MAILBOX_MANAGER_HEIGHT 400
 
@@ -224,6 +226,9 @@ extern struct BalsaApplication {
     /* Colour of quoted text. */
     gchar *quote_regex;
     GdkColor quoted_color[MAX_QUOTED_COLOR];
+
+    /* text color of URL's */
+    GdkColor url_color;
 
     GtkToolbarStyle toolbar_style;
     GnomeMDIMode mdi_style;

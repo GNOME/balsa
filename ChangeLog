@@ -19,6 +19,7 @@
 	* libmutt/imap/imap_ssl.c: first approach. It requires more work
 	because the code includes user interface.
 	* src/main-window.c: check commit_changes return value.
+	* src/balsa-message.c: don't crash on corrupted images.
 
 2000-09-02  Pawel Salek  <pawsa@theochem.kth.se>
 

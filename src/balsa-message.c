@@ -621,10 +621,13 @@ part_info_init_image (BalsaMessage *bm, BalsaPartInfo *info)
   libbalsa_message_body_save_temporary ( info->body, NULL );
 
 #ifndef USE_PIXBUF
-  im = gdk_imlib_load_image (info->body->temp_filename);
+  if( !(im = gdk_imlib_load_image (info->body->temp_filename)) ) {
+    g_print( _("Could not load image. It is most likely corrupted.") );
+    return; 
+  }
   
   if ( !gdk_imlib_render(im,  im->rgb_width, im->rgb_height) ) {
-    g_print( _ ("Couldn't render image\n") );
+    g_print( _("Couldn't render image\n") );
   }
 
   pixmap = gdk_imlib_copy_image(im);

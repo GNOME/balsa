@@ -53,6 +53,7 @@ struct _LibBalsaAddressBook {
     /* The gnome_config prefix where we save this address book */
     gchar *config_prefix;
     gchar *name;
+    gchar *ext_op_code;    /* extra description for last operation */
     gboolean is_expensive; /* is lookup to the address book expensive? 
 			      e.g. LDAP address book */
     gboolean expand_aliases;
@@ -118,12 +119,15 @@ LibBalsaABErr libbalsa_address_book_modify_address(LibBalsaAddressBook *ab,
                                                    LibBalsaAddress *address,
                                                    LibBalsaAddress *newval);
 
+/* set_status takes over the string ownership */
+void libbalsa_address_book_set_status(LibBalsaAddressBook * ab, gchar *str);
 void libbalsa_address_book_save_config(LibBalsaAddressBook * ab,
 				       const gchar * prefix);
 void libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
 				       const gchar * prefix);
 
-const gchar* libbalsa_address_book_strerror(LibBalsaABErr err);
+const gchar* libbalsa_address_book_strerror(LibBalsaAddressBook * ab,
+					    LibBalsaABErr err);
 
 /*
 

@@ -669,10 +669,12 @@ balsa_ab_window_load(BalsaAbWindow *ab)
                                         (LibBalsaAddressBookLoadFunc)
                                         balsa_ab_window_load_cb,
                                         ab)) != LBABERR_OK) {
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("Error opening address book '%s'\n%s"),
-                          ab->current_address_book->name,
-                          libbalsa_address_book_strerror(err));
+	const gchar *desc =
+	    libbalsa_address_book_strerror(ab->current_address_book, err);
+        balsa_information_parented(GTK_WINDOW(ab),
+				   LIBBALSA_INFORMATION_ERROR,
+				   _("Error opening address book '%s':\n%s"),
+				   ab->current_address_book->name, desc);
     }
 }
 

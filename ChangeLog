@@ -1,3 +1,11 @@
+2003-08-13  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/address-book-ldap.c: provide more accurate information
+	on errors.
+	* libbalsa/address-book.[hc]: framework for detailed error reporting.
+	* src/ab-window.c: use it.
+	* src/sendmsg-window.c: set window focus correctly on delete event.
+	
 2003-08-13 09:29  PeterB
 
 	* libbalsa/mailbox-filter.c: Plug memory leak in

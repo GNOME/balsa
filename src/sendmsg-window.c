@@ -543,7 +543,8 @@ delete_handler(BalsaSendmsg* bsmsg)
         const gchar *tmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->to[1]));
 	GtkWidget* d = 
             gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
-                                   GTK_DIALOG_MODAL,
+                                   GTK_DIALOG_MODAL|
+                                   GTK_DIALOG_DESTROY_WITH_PARENT,
                                    GTK_MESSAGE_QUESTION,
                                    GTK_BUTTONS_YES_NO,
                                    _("The message to '%s' is modified.\n"

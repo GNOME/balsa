@@ -223,10 +223,9 @@ libbalsa_address_book_ldap_close_connection(LibBalsaAddressBookLdap * ab)
 
 /*
  * Opens the ldap connection, and binds to the server.
- * NOTE: We log messages at the debug level since they 
- * are not important for ordinary user.
+ * returns ldap status.
  */
-static gboolean
+static int
 libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
 {
     int result;
@@ -235,13 +234,8 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
     g_return_val_if_fail(ab->host != NULL, FALSE);
 
     ab->directory = ldap_init(ab->host, LDAP_PORT);
-    if (ab->directory == NULL) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Failed to initialise LDAP server.\n"
-			       "Check that the servername is valid."));
-	perror("ldap_init");
-	return FALSE;
-    }
+    if (ab->directory == NULL)
+	return LDAP_SERVER_DOWN;
 
     /* ignore error if the V3 LDAP cannot be set */
     if(ldap_set_option(ab->directory, LDAP_OPT_PROTOCOL_VERSION, &version)
@@ -252,18 +246,12 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
         /* turn TLS on */
         result = ldap_start_tls_s(ab->directory, NULL, NULL);
         if(result != LDAP_SUCCESS) {
-            libbalsa_information
-                (LIBBALSA_INFORMATION_DEBUG,
-                 _("Couldn't enable TLS on the LDAP connection: %s"),
-                 ldap_err2string(result));
             ldap_unbind(ab->directory);
             ab->directory = NULL;
-            return FALSE;
+            return result;
         }
 #else /* HAVE_LDAP_TLS */
-            libbalsa_information
-                (LIBBALSA_INFORMATION_ERROR,
-                 _("TLS requested but TLS support not compiled in."));
+	return LDAP_INAPPRIOPRIATE_AUTH;
 #endif /* HAVE_LDAP_TLS */
     }
 
@@ -273,15 +261,10 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
                                 ab->passwd);
 
     if (result != LDAP_SUCCESS) {
-	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-			     _("Failed to bind to server: %s\n"
-			       "Check that the server name is valid."),
-			     ldap_err2string(result));
 	ldap_unbind_s(ab->directory);
 	ab->directory = NULL;
-	return FALSE;
     }
-    return TRUE;
+    return result;
 }
 
 
@@ -311,8 +294,12 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
      * Connect to the server.
      */
     if (ldap_ab->directory == NULL) {
-	if (!libbalsa_address_book_ldap_open_connection(ldap_ab))
+	if ((rc=libbalsa_address_book_ldap_open_connection(ldap_ab))
+	    != LDAP_SUCCESS) {
+	    libbalsa_address_book_set_status(ab,
+					     g_strdup(ldap_err2string(rc)));
 	    return LBABERR_CANNOT_CONNECT;
+	}
     }
     
     /* 
@@ -348,6 +335,7 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
     }
     callback(ab, NULL, closure);
     ldap_msgfree(result);
+    libbalsa_address_book_set_status(ab, NULL);
     return LBABERR_OK;
 }
 
@@ -453,7 +441,7 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
     gchar *dn;
     LDAPMod *mods[7];
     LDAPMod modarr[6];
-    int cnt;
+    int cnt, rc;
     char *cn[]   = {NULL, NULL};
     char *gn[]   = {NULL, NULL};
 #if 1
@@ -467,8 +455,12 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
     g_return_val_if_fail(address->address_list, LBABERR_CANNOT_WRITE);
 
     if (ldap_ab->directory == NULL) {
-        if(!libbalsa_address_book_ldap_open_connection(ldap_ab))
+        if( (rc=libbalsa_address_book_ldap_open_connection(ldap_ab))
+	    != LDAP_SUCCESS) {
+	    libbalsa_address_book_set_status(ab,
+					     g_strdup(ldap_err2string(rc)));
 	    return LBABERR_CANNOT_CONNECT;
+	}
     }
 
     dn = g_strdup_printf("mail=%s,%s",
@@ -510,13 +502,20 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
         int rc = ldap_add_s(ldap_ab->directory, dn, mods);
         switch(rc) {
         case LDAP_SUCCESS: g_free(dn); return LBABERR_OK;
-        case LDAP_ALREADY_EXISTS: g_free(dn); return LBABERR_DUPLICATE;
+        case LDAP_ALREADY_EXISTS: 
+	    g_free(dn);
+	    libbalsa_address_book_set_status(ab,
+					     g_strdup(ldap_err2string(rc)));
+	    return LBABERR_DUPLICATE;
         case LDAP_SERVER_DOWN:
             libbalsa_address_book_ldap_close_connection(ldap_ab);
-            if(!libbalsa_address_book_ldap_open_connection(ldap_ab)) {
-                g_free(dn);
-                return LBABERR_CANNOT_CONNECT;
-            }
+        if( (rc=libbalsa_address_book_ldap_open_connection(ldap_ab))
+	    != LDAP_SUCCESS) {
+	    g_free(dn);
+	    libbalsa_address_book_set_status(ab,
+					     g_strdup(ldap_err2string(rc)));
+	    return LBABERR_CANNOT_CONNECT;
+	}
         /* fall through */
         default:
             fprintf(stderr, "ldap_add for dn=\"%s\" failed[0x%x]: %s\n",
@@ -524,6 +523,7 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
         }
     } while(cnt++<1);
     g_free(dn);
+    libbalsa_address_book_set_status(ab, NULL);
     return LBABERR_CANNOT_WRITE;
 }
 
@@ -533,14 +533,18 @@ libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
 {
     LibBalsaAddressBookLdap *ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
     gchar *dn;
-    int cnt;
+    int cnt, rc;
 
     g_return_val_if_fail(address, LBABERR_CANNOT_WRITE);
     g_return_val_if_fail(address->address_list, LBABERR_CANNOT_WRITE);
 
     if (ldap_ab->directory == NULL) {
-        if(!libbalsa_address_book_ldap_open_connection(ldap_ab))
+        if( (rc=libbalsa_address_book_ldap_open_connection(ldap_ab))
+	    != LDAP_SUCCESS) {
+	    libbalsa_address_book_set_status(ab,
+					     g_strdup(ldap_err2string(rc)));
 	    return LBABERR_CANNOT_CONNECT;
+	}
     }
 
     dn = g_strdup_printf("mail=%s,%s",
@@ -548,15 +552,18 @@ libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
                          ldap_ab->bind_dn);
     cnt = 0;
     do {
-        int rc = ldap_delete_s(ldap_ab->directory, dn);
+        rc = ldap_delete_s(ldap_ab->directory, dn);
         switch(rc) {
         case LDAP_SUCCESS: g_free(dn); return LBABERR_OK;
         case LDAP_SERVER_DOWN:
             libbalsa_address_book_ldap_close_connection(ldap_ab);
-            if(!libbalsa_address_book_ldap_open_connection(ldap_ab)) {
+	    if( (rc=libbalsa_address_book_ldap_open_connection(ldap_ab))
+		!= LDAP_SUCCESS) {
                 g_free(dn);
-                return LBABERR_CANNOT_CONNECT;
-            }
+		libbalsa_address_book_set_status(ab,
+						 g_strdup(ldap_err2string(rc)));
+		return LBABERR_CANNOT_CONNECT;
+	    }
             /* fall through */
         default:
             fprintf(stderr, "ldap_delete for dn=\"%s\" failed[0x%x]: %s\n",
@@ -564,6 +571,8 @@ libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
         }
     } while(cnt++<1);
     g_free(dn);
+    libbalsa_address_book_set_status(ab,
+				     g_strdup(ldap_err2string(rc)));
     return LBABERR_CANNOT_WRITE;
 }
 
@@ -604,8 +613,12 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
     /* the email address has not changed, continue with changing other 
      * attributes. */
     if (ldap_ab->directory == NULL) {
-        if(!libbalsa_address_book_ldap_open_connection(ldap_ab))
+        if( (rc=libbalsa_address_book_ldap_open_connection(ldap_ab))
+	    != LDAP_SUCCESS) {
+	    libbalsa_address_book_set_status(ab,
+					     g_strdup(ldap_err2string(rc)));
 	    return LBABERR_CANNOT_CONNECT;
+	}
     }
 
     dn = g_strdup_printf("mail=%s,%s",
@@ -661,10 +674,13 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
         case LDAP_SUCCESS: return LBABERR_OK;
         case LDAP_SERVER_DOWN:
             libbalsa_address_book_ldap_close_connection(ldap_ab);
-            if(!libbalsa_address_book_ldap_open_connection(ldap_ab)) {
-                g_free(dn);
-                return LBABERR_CANNOT_CONNECT;
-            }
+	    if( (rc=libbalsa_address_book_ldap_open_connection(ldap_ab))
+		!= LDAP_SUCCESS) {
+		g_free(dn);
+		libbalsa_address_book_set_status(ab,
+						 g_strdup(ldap_err2string(rc)));
+		return LBABERR_CANNOT_CONNECT;
+	    }
             /* fall through */
         default:
             fprintf(stderr, "ldap_modify for dn=\2%s\" failed[0x%x]: %s\n",
@@ -672,6 +688,8 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
         }
     } while(cnt++<1);
     g_free(dn);
+    libbalsa_address_book_set_status(ab,
+				     g_strdup(ldap_err2string(rc)));
     return LBABERR_CANNOT_WRITE;
 }
 
@@ -810,8 +828,12 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 
     if (!ab->expand_aliases || strlen(prefix)<LDAP_MIN_LEN) return NULL;
     if (ldap_ab->directory == NULL) {
-        if(!libbalsa_address_book_ldap_open_connection(ldap_ab))
+        if( (rc=libbalsa_address_book_ldap_open_connection(ldap_ab))
+	    != LDAP_SUCCESS) {
+	    libbalsa_address_book_set_status(ab,
+					     g_strdup(ldap_err2string(rc)));
 	    return NULL;
+	}
     }
 
     /*
@@ -827,8 +849,8 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
     g_free(ldap);
     result = NULL;
     rc = ldap_search_st(ldap_ab->directory, ldap_ab->base_dn,
-	   LDAP_SCOPE_SUBTREE, filter, attrs, 0, &timeout, &result);
-    
+			LDAP_SCOPE_SUBTREE, filter, attrs, 0, 
+			&timeout, &result);
     if(DEBUG_LDAP)
         g_print("Sent LDAP request: %s (basedn=%s) res=0x%x\n", 
                 filter, ldap_ab->base_dn, rc);
@@ -850,18 +872,14 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 	 */
 	break;
     case LDAP_SERVER_DOWN:
-        libbalsa_address_book_ldap_close_connection
-            (LIBBALSA_ADDRESS_BOOK_LDAP(ab));
+        libbalsa_address_book_ldap_close_connection(ldap_ab);
         g_print("Server down. Next attempt will try to reconnect.\n");
         break;
     default:
 	/*
 	 * Until we know for sure, complain about all other errors.
 	 */
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Failed to do a search: %s."
-			       "Check that the base name is valid."),
-			     ldap_err2string(rc));
+	ldap_perror(ldap_ab->directory, "alias_complete::ldap_search_st");
 	break;
     }
 

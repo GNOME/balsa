@@ -291,6 +291,15 @@ libbalsa_address_book_modify_address(LibBalsaAddressBook *ab,
     return res;
 }
 
+/* set_status takes over the string ownership */
+void
+libbalsa_address_book_set_status(LibBalsaAddressBook * ab, gchar *str)
+{
+    g_return_if_fail(ab);
+    g_free(ab->ext_op_code);
+    ab->ext_op_code = str;
+}
+
 void
 libbalsa_address_book_save_config(LibBalsaAddressBook * ab,
                                   const gchar * prefix)
@@ -378,9 +387,13 @@ libbalsa_address_book_real_load_config(LibBalsaAddressBook * ab,
 }
 
 const gchar*
-libbalsa_address_book_strerror(LibBalsaABErr err)
+libbalsa_address_book_strerror(LibBalsaAddressBook * ab, LibBalsaABErr err)
 {
     const gchar *s;
+    g_return_val_if_fail(ab, NULL);
+    if(ab->ext_op_code)
+	return ab->ext_op_code;
+
     switch(err) {
     case LBABERR_OK:             s= _("No error"); break;
     case LBABERR_CANNOT_READ:    s= _("Cannot read from address book"); break;

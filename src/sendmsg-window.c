@@ -32,8 +32,6 @@
 #include "send.h"
 #include "sendmsg-window.h"
 
-extern GtkWidget *new_icon (gchar **, GtkWidget *);
-
 static void send_message_cb (GtkWidget *, BalsaSendmsg *);
 static void close_window (GtkWidget *, gpointer);
 static GtkWidget *create_menu (BalsaSendmsg *);
@@ -227,6 +225,8 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   GtkWidget *hscrollbar;
   GtkWidget *vscrollbar;
   GtkCList *clist;
+  GdkFont *font;
+  GtkStyle *style;
 
   BalsaSendmsg *msg = NULL;
   gchar *from;
@@ -236,6 +236,11 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 
   Message *message = NULL;
   Body *body = NULL;
+
+  style = gtk_style_new ();
+  font = gdk_font_load ("-adobe-courier-medium-r-*-*-*-120-*-*-*-*-iso8859-1");
+  style->font = font;
+
 
   msg = g_malloc (sizeof (BalsaSendmsg));
   switch (type)
@@ -419,14 +424,18 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   msg->text = gtk_text_new (NULL, NULL);
   gtk_text_set_editable (GTK_TEXT (msg->text), TRUE);
   gtk_text_set_word_wrap (GTK_TEXT (msg->text), TRUE);
+  gtk_widget_set_style (msg->text, style);
+  gtk_widget_set_usize (msg->text, (72 * 7) + (2 * msg->text->style->klass->xthickness) + 8, -1);
   gtk_widget_show (msg->text);
   gtk_table_attach_defaults (GTK_TABLE (table), msg->text, 0, 1, 0, 1);
   hscrollbar = gtk_hscrollbar_new (GTK_TEXT (msg->text)->hadj);
+  GTK_WIDGET_UNSET_FLAGS (hscrollbar, GTK_CAN_FOCUS);
   gtk_table_attach (GTK_TABLE (table), hscrollbar, 0, 1, 1, 2,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
   gtk_widget_show (hscrollbar);
 
   vscrollbar = gtk_vscrollbar_new (GTK_TEXT (msg->text)->vadj);
+  GTK_WIDGET_UNSET_FLAGS (vscrollbar, GTK_CAN_FOCUS);
   gtk_table_attach (GTK_TABLE (table), vscrollbar, 1, 2, 0, 1,
 		    GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
   gtk_widget_show (vscrollbar);
@@ -444,6 +453,8 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gtk_text_freeze (GTK_TEXT (msg->text));
   if (type != 0)
     {
+      message_body_ref (message);
+
       if (message->body_list)
 	{
 	  body = (Body *) message->body_list->data;
@@ -480,6 +491,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 	    }
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
 	}
+      message_body_unref (message);
     }
 
   if (balsa_app.signature)

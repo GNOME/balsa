@@ -2000,6 +2000,7 @@ typedef struct _BalsaMBListMRUOption BalsaMBListMRUOption;
 
 /* Forward references */
 static void bmbl_mru_option_menu_setup(BalsaMBListMRUOption * mro);
+static void bmbl_mru_option_menu_init(BalsaMBListMRUOption * mro);
 static void bmbl_mru_option_menu_cb(const gchar * url, gpointer data);
 static void bmbl_mru_option_menu_destroy_cb(BalsaMBListMRUOption * mro);
 
@@ -2034,7 +2035,7 @@ balsa_mblist_mru_option_menu(GtkWindow * window, GList ** url_list)
     mro->option_menu = GTK_OPTION_MENU(option_menu);
     mro->url = NULL;
     bmbl_mru_option_menu_setup(mro);
-    gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), 0);
+    bmbl_mru_option_menu_init(mro);
     g_object_set_data_full(G_OBJECT(option_menu), "mro", mro, 
                            (GDestroyNotify) bmbl_mru_option_menu_destroy_cb);
 
@@ -2128,6 +2129,21 @@ bmbl_mru_option_menu_destroy_cb(BalsaMBListMRUOption * mro)
 {
     g_free(mro->url);
     g_free(mro);
+}
+
+/* Initialize mro->url by activating the top menu item on
+ * mro->option_menu.
+ */
+static void
+bmbl_mru_option_menu_init(BalsaMBListMRUOption * mro)
+{
+    GtkWidget *menu =
+	    gtk_option_menu_get_menu(GTK_OPTION_MENU(mro->option_menu));
+    GList *children = GTK_MENU_SHELL(menu)->children;
+    if (g_list_length(children) > 1) {
+        GtkMenuItem *item = children->data;
+        gtk_menu_item_activate(item);
+    }
 }
 
 void

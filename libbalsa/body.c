@@ -117,24 +117,29 @@ libbalsa_message_body_extract_embedded_headers(GMimeMessage* msg)
     return ehdr;
 }
 
+/* Create a LibBalsaMessageBody with structure matching the GMimeObject;
+ * the body may already have the necessary parts, so we check before
+ * allocating new ones; it may have too many, so we free any that are no
+ * longer needed.
+ */
 
-void
-libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
-				    GMimeObject * mime_part)
+/* First some helpers. */
+static void
+libbalsa_message_body_set_filename(LibBalsaMessageBody * body)
+{
+    if (GMIME_IS_PART(body->mime_part)) {
+	g_free(body->filename);
+	body->filename =
+	    g_strdup(g_mime_part_get_filename(GMIME_PART(body->mime_part)));
+    }
+}
+
+static void
+libbalsa_message_body_set_types(LibBalsaMessageBody * body)
 {
     const GMimeContentType *type;
-    g_return_if_fail(mime_part);
-    g_return_if_fail(body->mime_part == NULL);
 
-    type = g_mime_object_get_content_type(mime_part);
-    g_object_ref(G_OBJECT(mime_part));	
-    if (body->mime_part)
-	g_object_unref(G_OBJECT(body->mime_part));	
-    body->mime_part = mime_part;
-    if (GMIME_IS_PART(mime_part))
-	body->filename =
-	    g_strdup(g_mime_part_get_filename(GMIME_PART(mime_part)));
-
+    type = g_mime_object_get_content_type(body->mime_part);
     if      (g_mime_content_type_is_type(type, "audio", "*"))
 	body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_AUDIO;
     else if (g_mime_content_type_is_type(type, "application", "*"))
@@ -152,39 +157,93 @@ libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
     else if (g_mime_content_type_is_type(type, "video", "*"))
 	body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_VIDEO;
     else body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_OTHER;
-    body->mime_type = g_mime_content_type_to_string(type);
 
-    if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE &&
-	GMIME_IS_MESSAGE_PART(body->mime_part)) {
-	GMimeMessagePart* message_part = GMIME_MESSAGE_PART(body->mime_part);
-	GMimeMessage* embedded_message =
-	    g_mime_message_part_get_message(message_part);
-	body->embhdrs =
-	    libbalsa_message_body_extract_embedded_headers(embedded_message);
-	body->parts = libbalsa_message_body_new(body->message);
-	libbalsa_message_body_set_mime_body(body->parts,
-					    embedded_message->mime_part);
-	if (GMIME_IS_PART(embedded_message->mime_part))
-	    /* This part may not have a Content-Disposition header, but
-	     * we must treat it as inline. */
-	    g_mime_part_set_content_disposition(GMIME_PART
-						(embedded_message->
-						 mime_part),
-						GMIME_DISPOSITION_INLINE);
-	g_mime_object_unref(GMIME_OBJECT(embedded_message));
-    } else
-    if (GMIME_IS_MULTIPART(mime_part))
-    {
-	LibBalsaMessageBody **part = &body->parts;
-	GList *child;
-	for (child = GMIME_MULTIPART(mime_part)->subparts; child;
-	     child = child->next)
-	{
-	    *part = libbalsa_message_body_new(body->message);
-	    libbalsa_message_body_set_mime_body(*part, child->data);
-	    part = &(*part)->next;
-	}
+    g_free(body->mime_type);
+    body->mime_type = g_mime_content_type_to_string(type);
+}
+
+static LibBalsaMessageBody **
+libbalsa_message_body_set_message_part(LibBalsaMessageBody * body,
+				       LibBalsaMessageBody ** next_part)
+{
+    GMimeMessagePart *message_part;
+    GMimeMessage *embedded_message;
+
+    message_part = GMIME_MESSAGE_PART(body->mime_part);
+    embedded_message = g_mime_message_part_get_message(message_part);
+
+    libbalsa_message_headers_destroy(body->embhdrs);
+    body->embhdrs =
+	libbalsa_message_body_extract_embedded_headers(embedded_message);
+    if (!*next_part)
+	*next_part = libbalsa_message_body_new(body->message);
+    libbalsa_message_body_set_mime_body(*next_part,
+					embedded_message->mime_part);
+    next_part = &(*next_part)->next;
+
+    if (GMIME_IS_PART(embedded_message->mime_part))
+	/* This part may not have a Content-Disposition header, but
+	 * we must treat it as inline. */
+	g_mime_part_set_content_disposition(GMIME_PART
+					    (embedded_message->mime_part),
+					    GMIME_DISPOSITION_INLINE);
+
+    g_mime_object_unref(GMIME_OBJECT(embedded_message));
+
+    return next_part;
+}
+
+static LibBalsaMessageBody **
+libbalsa_message_body_set_multipart(LibBalsaMessageBody * body,
+				    LibBalsaMessageBody ** next_part)
+{
+    GList *child;
+
+    for (child = GMIME_MULTIPART(body->mime_part)->subparts; child;
+	 child = child->next) {
+	if (!*next_part)
+	    *next_part = libbalsa_message_body_new(body->message);
+	libbalsa_message_body_set_mime_body(*next_part, child->data);
+	next_part = &(*next_part)->next;
     }
+
+    return next_part;
+}
+
+static void
+libbalsa_message_body_set_parts(LibBalsaMessageBody * body)
+{
+    LibBalsaMessageBody **next_part = &body->parts;
+
+    if (GMIME_IS_MESSAGE_PART(body->mime_part))
+	next_part = libbalsa_message_body_set_message_part(body, next_part);
+    else if (GMIME_IS_MULTIPART(body->mime_part))
+	next_part = libbalsa_message_body_set_multipart(body, next_part);
+
+    /* Free any parts that weren't used; the test isn't strictly
+     * necessary, but it should fail unless something really strange has
+     * happened, so it's worth including. */
+    if (*next_part) {
+	libbalsa_message_body_free(*next_part);
+	*next_part = NULL;
+    }
+}
+
+void
+libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
+				    GMimeObject * mime_part)
+{
+    g_return_if_fail(body != NULL);
+    g_return_if_fail(GMIME_IS_OBJECT(mime_part));
+
+    g_object_ref(G_OBJECT(mime_part));
+    if (body->mime_part)
+	g_object_unref(G_OBJECT(body->mime_part));
+    body->mime_part = mime_part;
+
+    libbalsa_message_body_set_filename(body);
+    libbalsa_message_body_set_types(body);
+    libbalsa_message_body_set_parts(body);
 }
 
 LibBalsaMessageBodyType

@@ -52,10 +52,6 @@ AM_PATH_GLIB([1.2.0],[],[
 dnl this should come after `AC_PROG_CC'
 GNOME_X_CHECKS
 
-AC_CHECK_LIB(ltdl,lt_dlopen,, [
-	AC_MSG_ERROR([*** libtool not found.  Please check http://www.balsa.net for information on the required files.])
-])
-
 AC_CHECK_LIB(pspell, new_pspell_manager,,[
 	AC_MSG_ERROR([*** libpspell not found.  Please check http://www.balsa.net for information on the required files.])
 ])

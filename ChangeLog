@@ -1,3 +1,7 @@
+2001-09-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: don't detect LIBTOOL twice.
+	
 2001-09-22  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/main-window.c: make sure new mail button CAN_DEFAULT

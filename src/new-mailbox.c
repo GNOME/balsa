@@ -101,6 +101,7 @@ open_new_mailbox (Mailbox * mailbox)
   NewMailboxWindow *nmw;
   GList *list;
   GtkWidget *bbox;
+  GtkWidget *label;
 
 
   /* DISABLE EDITING FOR NOW */
@@ -160,14 +161,16 @@ open_new_mailbox (Mailbox * mailbox)
   gtk_widget_show (nmw->notebook);
 
 
+  label = gtk_label_new("np");
   /* notebook pages */
   gtk_notebook_append_page (GTK_NOTEBOOK (nmw->notebook),
 			    create_new_page (nmw),
-			    NULL);
+			    label);
 
+  label = gtk_label_new("lp");
   gtk_notebook_append_page (GTK_NOTEBOOK (nmw->notebook),
 			    create_local_mailbox_page (nmw),
-			    NULL);
+			    label);
 
 
 

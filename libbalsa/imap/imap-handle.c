@@ -2416,7 +2416,7 @@ ir_thread_sub(ImapMboxHandle *h, GNode *parent, int last)
       }
       return rc;
   }
-  if(seqno == 0) return IMAP_PROTOCOL_ERROR;
+  if(seqno == 0) return IMR_PROTOCOL;
   item = g_node_append_data(parent, GUINT_TO_POINTER(seqno));
   if (c == ' ') {
       rc = ir_thread_sub(h, item, c);

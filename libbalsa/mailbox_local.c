@@ -557,7 +557,7 @@ libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
     }
     if(flags & LB_FETCH_RFC822_HEADERS) {
         message->headers->user_hdrs = 
-            libbalsa_message_user_hdrs_from_gmime(message->mime_msg);
+            libbalsa_message_user_hdrs_from_gmime(mime_message);
         message->has_all_headers = 1;
     }
 }
@@ -573,12 +573,19 @@ libbalsa_mailbox_local_release_message(LibBalsaMailbox * mailbox,
 }
 
 static void
-libbalsa_mailbox_local_fetch_headers(LibBalsaMailbox *mailbox,
-                                     LibBalsaMessage *message)
+libbalsa_mailbox_local_fetch_headers(LibBalsaMailbox * mailbox,
+				     LibBalsaMessage * message)
 {
     g_return_if_fail(message->headers->user_hdrs == NULL);
-    message->headers->user_hdrs = 
-        libbalsa_message_user_hdrs_from_gmime(message->mime_msg);
+
+    if (message->mime_msg)
+	message->headers->user_hdrs =
+	    libbalsa_message_user_hdrs_from_gmime(message->mime_msg);
+    else {
+	libbalsa_mailbox_fetch_message_structure(mailbox, message,
+						 LB_FETCH_RFC822_HEADERS);
+	libbalsa_mailbox_local_release_message(mailbox, message);
+    }
 }
 
 static const gchar*

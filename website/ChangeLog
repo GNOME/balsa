@@ -1,3 +1,43 @@
+2000-06-26  Pawel Salek <pawsa@theochem.kth.se>
+
+	* download.html.in: added link to CVS instructions and repository.
+	
+2000-06-23  Peter Williams <peter@newton.cx>
+
+	* main.html.in: Add a "Balsa Reviewed" section.
+	
+2000-06-20  Pawel Salek <pawsa@theochem.kth.se>
+
+	* main.html.in, download.html.in: 0.8.1 announcement.
+	
+2000-06-16  Peter Williams  <peter@beta.newton.cx>
+
+	* screenshots.html.in: New screenshot of new composer.
+
+2000-06-15  Peter Williams  <peter@beta.newton.cx>
+
+	* faq.html.in: Add a FAQ about nesting mailboxes
+	as per http://www.linuxworld.com/linuxworld/lw-2000-06/lw-06-vcontrol_2.html.
+
+2000-06-06  Peter Williams  <peter@newton.cx>
+	* main.hmtl.in: Announce packages on downloads page,
+	reorg to have table setup like other pages.
+
+	* download.html.in: Add Slack and Deb package links,
+	add a bit more description to the newton.cx and
+	theochem.se RPM links.
+	
+2000-05-21  Peter Williams  <peter@beta.newton.cx>
+
+	* main.html.in: Announce Balsa 0.8.0
+
+	* download.html.in: Nicer download page.
+
+2000-05-16  Peter Williams  <peter@beta.newton.cx>
+
+	* Makefile.am: Comment out .png's when installing from images/;
+	there are none.
+
 2000-04-18  Peter Williams  <peter@beta.newton.cx>
 
 	* main.html.in: Updated for 0.8.0-pre1

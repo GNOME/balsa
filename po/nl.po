@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa\n"
-"POT-Creation-Date: 2000-06-01 20:26-0400\n"
+"POT-Creation-Date: 2000-06-29 14:28-0400\n"
 "PO-Revision-Date: 1999-01-31 12:00+0100\n"
 "Last-Translator: Dirk-Jan C. Binnema <djcb@dds.nl>\n"
 "Language-Team: Linux Gebruikersgroep Den Haag <djcb@dds.nl>\n"
@@ -13,87 +13,84 @@ msgstr ""
 "Content-Type: text/plain; charset=?\n"
 "Content-Transfer-Encoding: 8Bit\n"
 
-#: libbalsa/mailbox.c:196
+#: libbalsa/mailbox.c:197
 msgid "Error: "
 msgstr ""
 
-#: libbalsa/mailbox.c:631
+#: libbalsa/mailbox.c:649
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr "Postvak:  %s refcount: %d\n"
 
-#: libbalsa/mailbox.c:651
+#: libbalsa/mailbox.c:669
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Postvak: Sluiten van %s Refcount: %d\n"
 
-#.
-#. ISPRIME(9)
-#.
-#: libinit_balsa/balsa-druid-page-directory.gob:57
+#: libinit_balsa/balsa-druid-page-directory.gob:54
 #, fuzzy
 msgid "Inbox:"
 msgstr "Pad voor Postvak-In:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:57
+#: libinit_balsa/balsa-druid-page-directory.gob:54
 #, fuzzy
 msgid "Outbox:"
 msgstr "Pad voor Postvak-Uit:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:57
+#: libinit_balsa/balsa-druid-page-directory.gob:54
 #, fuzzy
 msgid "Sentbox:"
 msgstr "Pad voor Postvak-In:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:57
+#: libinit_balsa/balsa-druid-page-directory.gob:54
 msgid "Draftbox:"
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.gob:57
+#: libinit_balsa/balsa-druid-page-directory.gob:54
 #, fuzzy
 msgid "Trash:"
 msgstr "Pad voor prullenbak:"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:77
+#: libinit_balsa/balsa-druid-page-directory.gob:74
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.gob:95
+#: libinit_balsa/balsa-druid-page-directory.gob:92
 #, c-format
 msgid "An error occurred when attempting to creat(2) the file \"%s\"."
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.gob:103
+#: libinit_balsa/balsa-druid-page-directory.gob:100
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.gob:158
+#: libinit_balsa/balsa-druid-page-directory.gob:155
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.gob:209
+#: libinit_balsa/balsa-druid-page-directory.gob:198
 #, fuzzy
 msgid "Mail Files"
 msgstr "Beheer van filters"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:282
+#: libinit_balsa/balsa-druid-page-directory.gob:271
 #, fuzzy
 msgid "Problem Creating Mailboxes"
 msgstr "Bewerk postvak"
 
-#: libinit_balsa/balsa-druid-page-finish.gob:45
+#: libinit_balsa/balsa-druid-page-finish.gob:47
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-finish.gob:57
+#: libinit_balsa/balsa-druid-page-finish.gob:59
 msgid "All Done!"
 msgstr ""
 
@@ -102,7 +99,7 @@ msgid "Please enter information about yourself."
 msgstr ""
 
 #: libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:205
-#: src/address-book.c:450
+#: src/address-book.c:451
 #, fuzzy
 msgid "Name:"
 msgstr "Datum"
@@ -149,7 +146,7 @@ msgid ""
 "reporting bugs."
 msgstr ""
 
-#: libinit_balsa/balsa-initdruid.gob:91
+#: libinit_balsa/balsa-initdruid.gob:95
 msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"
@@ -183,16 +180,14 @@ msgstr ""
 msgid "E-Mail Address:"
 msgstr "E-Mail adres:"
 
-#: src/address-book.c:291 src/balsa-index-page.c:1046
+#: src/address-book.c:291 src/balsa-index-page.c:874
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
 " - %s\n"
 msgstr ""
 
-#: src/address-book.c:294 src/balsa-index-page.c:1028
-#: src/balsa-index-page.c:1049 src/balsa-index-page.c:1085
-#: src/sendmsg-window.c:393
+#: src/address-book.c:294 src/sendmsg-window.c:404
 msgid "OK"
 msgstr ""
 
@@ -205,277 +200,272 @@ msgstr ""
 msgid "No-Name"
 msgstr "Datum"
 
-#: src/address-book.c:415 src/filter-edit-dialog.c:135
+#: src/address-book.c:416 src/filter-edit-dialog.c:135
 msgid "Name"
 msgstr ""
 
-#: src/address-book.c:415
+#: src/address-book.c:416
 #, fuzzy
 msgid "E-Mail Address"
 msgstr "E-Mail adres:"
 
-#: src/address-book.c:422 src/address-book.c:460 src/main-window.c:173
+#: src/address-book.c:423 src/address-book.c:461 src/main-window.c:177
 msgid "Address Book"
 msgstr ""
 
-#: src/address-book.c:492
+#: src/address-book.c:493
 #, fuzzy
 msgid "Send-To"
 msgstr "Versturen"
 
-#: src/address-book.c:506
+#: src/address-book.c:507
 msgid "Run GnomeCard"
 msgstr ""
 
-#: src/address-book.c:512
+#: src/address-book.c:513
 msgid "Re-Import"
 msgstr ""
 
-#: src/balsa-app.c:217
-#, c-format
-msgid "Balsa cannot open your \"%s\" mailbox."
-msgstr ""
-
-#: src/balsa-app.c:230
-#, fuzzy
-msgid "Inbox"
-msgstr "Pad voor Postvak-In:"
-
-#: src/balsa-app.c:235
-#, fuzzy
-msgid "Outbox"
-msgstr "Pad voor Postvak-Uit:"
-
-#: src/balsa-app.c:240
-#, fuzzy
-msgid "Sentbox"
-msgstr "Pad voor Postvak-In:"
-
-#: src/balsa-app.c:245
-msgid "Draftbox"
-msgstr ""
-
-#: src/balsa-app.c:250
-#, fuzzy
-msgid "Trash"
-msgstr "Pad voor prullenbak:"
-
-#: src/balsa-index-page.c:290
+#: src/balsa-index-page.c:295
 msgid "Mailbox password:"
 msgstr "Wachtwoord voor postvak:"
 
 #. password field
-#: src/balsa-index-page.c:298 src/mailbox-conf.c:992 src/mailbox-conf.c:1091
+#: src/balsa-index-page.c:303 src/mailbox-conf.c:981 src/mailbox-conf.c:1080
 #, fuzzy
 msgid "Password:"
 msgstr "Wachtwoord voor postvak:"
 
-#: src/balsa-index-page.c:324
+#: src/balsa-index-page.c:329
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
 msgstr ""
 
-#: src/balsa-index-page.c:590 src/filter-edit-dialog.c:222
+#: src/balsa-index-page.c:607 src/filter-edit-dialog.c:222
 #, fuzzy
 msgid "New"
 msgstr "_Nieuw"
 
-#: src/balsa-index-page.c:598 src/main-window.c:373
+#: src/balsa-index-page.c:610 src/main-window.c:412
 msgid "Reply"
 msgstr "Beantwoorden"
 
-#: src/balsa-index-page.c:606 src/main-window.c:376
+#: src/balsa-index-page.c:613 src/main-window.c:415
 msgid "Reply to all"
 msgstr "Allen beantwoorden"
 
-#: src/balsa-index-page.c:614 src/main-window.c:379
+#: src/balsa-index-page.c:616 src/main-window.c:418
 msgid "Forward"
 msgstr "Doorsturen"
 
-#: src/balsa-index-page.c:622 src/filter-edit-dialog.c:228
-#: src/main-window.c:366 src/pref-manager.c:886
+#: src/balsa-index-page.c:619 src/filter-edit-dialog.c:228
+#: src/main-window.c:405 src/pref-manager.c:886
 msgid "Delete"
 msgstr "Verwijderen"
 
-#: src/balsa-index-page.c:630
+#: src/balsa-index-page.c:622
 msgid "Undelete"
 msgstr "Terughalen"
 
-#: src/balsa-index-page.c:638
+#: src/balsa-index-page.c:626 src/balsa-index-page.c:1237
 #, fuzzy
 msgid "Store Address"
 msgstr "'Reply-to' adres:"
 
-#: src/balsa-index-page.c:646
+#: src/balsa-index-page.c:629 src/main-window.c:313
+msgid "Toggle flagged"
+msgstr ""
+
+#: src/balsa-index-page.c:637
 msgid "Transfer"
 msgstr "Overzetten"
 
-#: src/balsa-index-page.c:1026
-msgid "You may only store one address at a time.\n"
+#: src/balsa-index-page.c:842
+msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr ""
 
-#: src/balsa-index-page.c:1082
+#: src/balsa-index-page.c:879
+msgid "The Card Name field must be non-empty.\n"
+msgstr ""
+
+#: src/balsa-index-page.c:885
 #, c-format
 msgid ""
 "There is already an address book entry for %s.\n"
 "Run GnomeCard if you would like to edit your address book entries.\n"
 msgstr ""
 
-#: src/balsa-index-page.c:1100
-msgid ""
-"\n"
-"BEGIN:VCARD\n"
+#: src/balsa-index-page.c:1149
+#, fuzzy
+msgid "Card Name:"
+msgstr "Datum"
+
+#: src/balsa-index-page.c:1149
+#, fuzzy
+msgid "First Name:"
+msgstr "Uw naam:"
+
+#: src/balsa-index-page.c:1150
+#, fuzzy
+msgid "Last Name:"
+msgstr "Datum"
+
+#: src/balsa-index-page.c:1150
+msgid "Organization:"
 msgstr ""
 
-#: src/balsa-index-page.c:1101
-#, c-format
-msgid "FN:%s\n"
+#: src/balsa-index-page.c:1151
+#, fuzzy
+msgid "Email Address:"
+msgstr "E-Mail adres:"
+
+#: src/balsa-index-page.c:1166
+msgid "In order to store an address, you must select a message.\n"
 msgstr ""
 
-#: src/balsa-index-page.c:1102
-#, c-format
-msgid "EMAIL;INTERNET:%s\n"
+#: src/balsa-index-page.c:1176
+msgid "You may only store one address at a time.\n"
 msgstr ""
 
-#: src/balsa-index-page.c:1103
-msgid "END:VCARD\n"
+#: src/balsa-index-page.c:1189
+msgid "This message doesn't contain an e-mail address.\n"
 msgstr ""
 
-#: src/balsa-index.c:252
+#: src/balsa-index-page.c:1240
+msgid "Contact Information"
+msgstr ""
+
+#: src/balsa-index.c:264
 msgid "From"
 msgstr "Van"
 
-#: src/balsa-index.c:253 src/filter-edit-dialog.c:349
+#: src/balsa-index.c:265 src/filter-edit-dialog.c:349
 msgid "Subject"
 msgstr "Onderwerp"
 
-#: src/balsa-index.c:254
+#: src/balsa-index.c:266
 msgid "Date"
 msgstr "Datum"
 
-#: src/balsa-mblist.c:221 src/mailbox-conf.c:1186
+#: src/balsa-index.c:372
+msgid "To"
+msgstr ""
+
+#: src/balsa-mblist.gob:87 src/mailbox-conf.c:1173
 #, fuzzy
 msgid "Mailbox"
 msgstr "Postvakken"
 
-#: src/balsa-mblist.c:221
+#: src/balsa-mblist.gob:87
 #, fuzzy
 msgid "Unread"
 msgstr "Ongelezen"
 
-#: src/balsa-mblist.c:221
+#: src/balsa-mblist.gob:87
 #, fuzzy
 msgid "Total"
 msgstr "Lokale mail"
 
-#: src/balsa-mblist.c:824
+#: src/balsa-mblist.gob:418
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr ""
 
-#: src/balsa-message.c:165 src/balsa-message.c:170
+#: src/balsa-message.c:214 src/balsa-message.c:218
 msgid "Save MIME Part"
 msgstr "Bewaar MIME deel"
 
-#: src/balsa-message.c:166 src/balsa-message.c:226
+#: src/balsa-message.c:215 src/balsa-message.c:1104
 msgid "Save"
 msgstr "Bewaren"
 
-#: src/balsa-message.c:166 src/balsa-message.c:226 src/mailbox-conf.c:667
-#: src/sendmsg-window.c:128 src/sendmsg-window.c:419 src/sendmsg-window.c:1088
-#: src/sendmsg-window.c:1394 src/sendmsg-window.c:1417
+#: src/balsa-message.c:215 src/mailbox-conf.c:687 src/sendmsg-window.c:130
+#: src/sendmsg-window.c:430 src/sendmsg-window.c:1104
+#: src/sendmsg-window.c:1393 src/sendmsg-window.c:1416
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/balsa-message.c:168 src/balsa-message.c:228
+#: src/balsa-message.c:216
 msgid "Please choose a filename to save this part of the message as:"
 msgstr ""
 
-#: src/balsa-message.c:225 src/balsa-message.c:230
-#, fuzzy
-msgid "Save Text"
-msgstr "Bewaren"
-
-#: src/balsa-message.c:301 src/balsa-message.c:315
+#: src/balsa-message.c:266 src/balsa-message.c:290
 #, c-format
 msgid " Open of %s failed:%s "
 msgstr "Openen van %s mislukt:%s "
 
-#: src/balsa-message.c:302 src/balsa-message.c:317
+#: src/balsa-message.c:271
+msgid "Error"
+msgstr ""
+
+#: src/balsa-message.c:271 src/balsa-message.c:294
 msgid "Ok"
 msgstr "Ok"
 
-#: src/balsa-message.c:644
+#: src/balsa-message.c:545
 #, fuzzy
 msgid "Date:"
 msgstr "Datum"
 
 #. From:
-#: src/balsa-message.c:648 src/filter-edit-dialog.c:337
-#: src/sendmsg-window.c:591
+#: src/balsa-message.c:549 src/filter-edit-dialog.c:337
+#: src/sendmsg-window.c:602
 #, fuzzy
 msgid "From:"
 msgstr "Van"
 
 #. To:
-#: src/balsa-message.c:652 src/filter-edit-dialog.c:325
-#: src/sendmsg-window.c:593
+#: src/balsa-message.c:553 src/filter-edit-dialog.c:325
+#: src/sendmsg-window.c:604
 msgid "To:"
 msgstr ""
 
-#: src/balsa-message.c:653
+#: src/balsa-message.c:554
 msgid "Cc:"
 msgstr ""
 
-#: src/balsa-message.c:654
+#: src/balsa-message.c:555
 msgid "Bcc:"
 msgstr ""
 
-#: src/balsa-message.c:657
+#: src/balsa-message.c:558
 msgid "Fcc:"
 msgstr ""
 
 #. Subject:
-#: src/balsa-message.c:658 src/sendmsg-window.c:599
+#: src/balsa-message.c:559 src/sendmsg-window.c:610
 #, fuzzy
 msgid "Subject:"
 msgstr "Onderwerp"
 
-#: src/balsa-message.c:734
+#: src/balsa-message.c:620
+msgid "Couldn't render image\n"
+msgstr ""
+
+#: src/balsa-message.c:669
+msgid "Balsa does not know how to display this message part"
+msgstr ""
+
+#: src/balsa-message.c:674
 #, c-format
-msgid "other part: error writing to temporary file %s: %s"
+msgid "Content Type: %s/%s"
 msgstr ""
 
-#: src/balsa-message.c:788
-msgid ""
-"<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
-"application/"
-msgstr ""
-
-#: src/balsa-message.c:792
-#, fuzzy
-msgid "<P>The parameters of this message are:<BR>"
-msgstr "Voeg bijlages ('attachments') toe aan dit bericht"
-
-#: src/balsa-message.c:793
-msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
-msgstr ""
-
-#: src/balsa-message.c:827
+#: src/balsa-message.c:676
 #, c-format
-msgid "image: error writing to temporary file: %s"
+msgid "Content Type: %s"
 msgstr ""
 
-#: src/balsa-message.c:1068
-#, c-format
-msgid "text part: error writing to temporary file %s: %s"
-msgstr ""
-
-#: src/balsa-message.c:1214
+#: src/balsa-message.c:683
 #, fuzzy, c-format
-msgid "Open of %s failed. Errno = %d, "
-msgstr "Openen van %s mislukt:%s "
+msgid "Filename: %s"
+msgstr "Uw naam:"
+
+#: src/balsa-message.c:690
+#, fuzzy
+msgid "Save part"
+msgstr "Bewaar MIME deel"
 
 #: src/filter-edit-dialog.c:30
 #, fuzzy
@@ -488,7 +478,7 @@ msgid "Outbound"
 msgstr "Pad voor Postvak-Uit:"
 
 #: src/filter-edit-dialog.c:32
-msgid "Pre-send"
+msgid "Before Sending"
 msgstr ""
 
 #: src/filter-edit-dialog.c:33
@@ -574,12 +564,12 @@ msgstr "Wijzigen"
 msgid "Match string:"
 msgstr ""
 
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:282 src/mailbox-conf.c:1151
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:286 src/mailbox-conf.c:1139
 #: src/pref-manager.c:873
 msgid "Add"
 msgstr "Toevoegen"
 
-#: src/filter-edit-dialog.c:425 src/sendmsg-window.c:340
+#: src/filter-edit-dialog.c:425 src/sendmsg-window.c:351
 msgid "Remove"
 msgstr "Verwijderen"
 
@@ -666,7 +656,7 @@ msgstr "Verwijderen"
 msgid "Balsa Filters"
 msgstr "Beheer van filters"
 
-#: src/mailbox-conf.c:159
+#: src/mailbox-conf.c:163
 #, fuzzy, c-format
 msgid ""
 "This will remove the mailbox %s and it's files permanently from your "
@@ -676,7 +666,7 @@ msgstr ""
 "Dit zal het postvak permanent van uw systeem verwijderen.\n"
 " Weet u zeker dat u dat wilt doen?"
 
-#: src/mailbox-conf.c:164
+#: src/mailbox-conf.c:168
 #, fuzzy, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
@@ -687,379 +677,421 @@ msgstr ""
 "U kunt later 'Toevoegen postvak' gebruiken om het postvak weer te "
 "benaderenWeet u zeker dat u het postvak wilt verwijderen?"
 
-#: src/mailbox-conf.c:193
+#: src/mailbox-conf.c:197
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr ""
 
-#: src/mailbox-conf.c:237
+#: src/mailbox-conf.c:241
 msgid "Mailbox Configurator"
 msgstr "Postvakinstellingen"
 
-#: src/mailbox-conf.c:292 src/mailbox-conf.c:1145
+#: src/mailbox-conf.c:296 src/mailbox-conf.c:1133
 msgid "Update"
 msgstr "Verversen"
 
-#: src/mailbox-conf.c:436 src/mailbox-conf.c:452 src/mailbox-conf.c:465
+#: src/mailbox-conf.c:435 src/mailbox-conf.c:440 src/mailbox-conf.c:464
 msgid "You need to fill in the Mailbox Name field."
 msgstr ""
 
-#: src/mailbox-conf.c:439
+#: src/mailbox-conf.c:443
 msgid "You need to fill in the folderpath field."
 msgstr ""
 
-#: src/mailbox-conf.c:441
+#: src/mailbox-conf.c:445
 msgid "You need to fill in the IMAP Server field"
 msgstr ""
 
-#: src/mailbox-conf.c:443
+#: src/mailbox-conf.c:447
 msgid "You need to fill in the username field"
 msgstr ""
 
-#: src/mailbox-conf.c:445
+#: src/mailbox-conf.c:449
 msgid "You need to fill in the password field"
 msgstr ""
 
-#: src/mailbox-conf.c:447
+#: src/mailbox-conf.c:451
 msgid "You need to fill in the port field"
 msgstr ""
 
-#: src/mailbox-conf.c:469
+#: src/mailbox-conf.c:468
 msgid "You need to fill in the user field."
 msgstr ""
 
-#: src/mailbox-conf.c:473
+#: src/mailbox-conf.c:472
 msgid "You need to fill in the password field."
 msgstr ""
 
-#: src/mailbox-conf.c:477
+#: src/mailbox-conf.c:476
 msgid "You need to fill in the server field."
 msgstr ""
 
-#: src/mailbox-conf.c:481
+#: src/mailbox-conf.c:480
 msgid "You need to fill in the port field."
 msgstr ""
 
-#: src/mailbox-conf.c:485
+#: src/mailbox-conf.c:484
 msgid "Some of the fields are blank."
 msgstr ""
 
-#: src/mailbox-conf.c:666
+#: src/mailbox-conf.c:646
+#, fuzzy, c-format
+msgid "%s on %s"
+msgstr " op "
+
+#: src/mailbox-conf.c:686
 #, fuzzy, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr "Postvak '%s' kan niet gecreeerd worden\n"
 
-#. used to build a string: MAILBOXNAME " on " SERVERNAME
-#: src/mailbox-conf.c:735
-msgid " on "
-msgstr " op "
-
-#: src/mailbox-conf.c:848
+#: src/mailbox-conf.c:834
 msgid "New mailbox type:"
 msgstr "Type van nieuw postvak: "
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:854
+#: src/mailbox-conf.c:840
 msgid "Local mailbox"
 msgstr "Lokaal postvak"
 
-#: src/mailbox-conf.c:862
-msgid "IMAP server"
-msgstr "IMAP Server"
+#: src/mailbox-conf.c:850
+msgid "Single IMAP folder"
+msgstr ""
 
 #. mailbox name
-#: src/mailbox-conf.c:885 src/mailbox-conf.c:920 src/mailbox-conf.c:1037
+#: src/mailbox-conf.c:874 src/mailbox-conf.c:909 src/mailbox-conf.c:1026
 #, fuzzy
 msgid "Mailbox Name:"
 msgstr "Naam van postvak"
 
 #. path to file
-#: src/mailbox-conf.c:895
+#: src/mailbox-conf.c:884
 #, fuzzy
 msgid "Mailbox path:"
 msgstr "Wachtwoord voor postvak:"
 
 #. pop server
-#: src/mailbox-conf.c:937 src/mailbox-conf.c:1047
+#: src/mailbox-conf.c:926 src/mailbox-conf.c:1036
 #, fuzzy
 msgid "Server:"
 msgstr "SMTP Server:"
 
 #. pop port
-#: src/mailbox-conf.c:956 src/mailbox-conf.c:1061
+#: src/mailbox-conf.c:945 src/mailbox-conf.c:1050
 #, fuzzy
 msgid "Port:"
 msgstr "Afdrukken"
 
 #. username
-#: src/mailbox-conf.c:975 src/mailbox-conf.c:1076
+#: src/mailbox-conf.c:964 src/mailbox-conf.c:1065
 #, fuzzy
 msgid "Username:"
 msgstr "Uw naam:"
 
 #. toggle for check
-#: src/mailbox-conf.c:1007 src/main-window.c:362
+#: src/mailbox-conf.c:996 src/main-window.c:401
 msgid "Check"
 msgstr "Check"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:1015
+#: src/mailbox-conf.c:1004
 msgid "Delete from server"
 msgstr ""
 
-#: src/mailbox-conf.c:1104
+#: src/mailbox-conf.c:1093
 msgid "Folder path:"
 msgstr ""
 
-#: src/main-window.c:167
+#: src/main-window.c:171
 msgid "_Get new mail"
 msgstr "Lees nieuwe mail"
 
-#: src/main-window.c:167
+#: src/main-window.c:171
 msgid "Fetch new incoming mail"
 msgstr "Lees nieuwe mail"
 
-#: src/main-window.c:173
+#: src/main-window.c:177
 msgid "Opens the address book"
 msgstr ""
 
-#: src/main-window.c:180
+#: src/main-window.c:184
 #, fuzzy
 msgid "Pr_int"
 msgstr "Afdrukken"
 
-#: src/main-window.c:180
+#: src/main-window.c:184
 #, fuzzy
 msgid "Print current mail"
 msgstr "Druk het huidige bericht af"
 
-#: src/main-window.c:205
+#: src/main-window.c:209 src/message-window.c:55
 msgid "N_o headers"
 msgstr ""
 
-#: src/main-window.c:207
+#: src/main-window.c:211 src/message-window.c:57
 msgid "_Selected headers"
 msgstr ""
 
-#: src/main-window.c:209
+#: src/main-window.c:213 src/message-window.c:59
 msgid "All _headers"
 msgstr ""
 
-#: src/main-window.c:218 src/main-window.c:392
+#: src/main-window.c:222 src/main-window.c:431
 msgid "Next"
 msgstr "Volgende"
 
-#: src/main-window.c:218
+#: src/main-window.c:222
 #, fuzzy
 msgid "Next Message"
 msgstr "Nieuw bericht"
 
-#: src/main-window.c:224 src/main-window.c:387
+#: src/main-window.c:228 src/main-window.c:426
 msgid "Previous"
 msgstr "Vorige"
 
-#: src/main-window.c:224
+#: src/main-window.c:228
 #, fuzzy
 msgid "Preivous Message"
 msgstr "Open vorig bericht"
 
-#: src/main-window.c:230 src/main-window.c:397
+#: src/main-window.c:234 src/main-window.c:436
 #, fuzzy
 msgid "Next Unread"
 msgstr "Ongelezen"
 
-#: src/main-window.c:230
+#: src/main-window.c:234
 #, fuzzy
 msgid "Next Unread Message"
 msgstr "Bericht verwijderen"
 
-#: src/main-window.c:238
+#: src/main-window.c:241 src/message-window.c:94
+#, fuzzy
+msgid "Next Part"
+msgstr "Volgende"
+
+#: src/main-window.c:241 src/message-window.c:94
+#, fuzzy
+msgid "Next Part in Message"
+msgstr "Nieuw bericht"
+
+#: src/main-window.c:247 src/message-window.c:99
+#, fuzzy
+msgid "Previous Part"
+msgstr "Vorige"
+
+#: src/main-window.c:247 src/message-window.c:99
+#, fuzzy
+msgid "Previous Part in Message"
+msgstr "Open vorig bericht"
+
+#: src/main-window.c:253 src/message-window.c:104
+#, fuzzy
+msgid "Save Current Part"
+msgstr "Bewaar MIME deel"
+
+#: src/main-window.c:254 src/message-window.c:105
+msgid "Save Current Part in Message"
+msgstr ""
+
+#: src/main-window.c:262
 msgid "_New"
 msgstr "_Nieuw"
 
-#: src/main-window.c:238
+#: src/main-window.c:262
 msgid "Compose a new message"
 msgstr "Maak een nieuw bericht"
 
-#: src/main-window.c:245 src/message-window.c:54
+#: src/main-window.c:269 src/message-window.c:75
 msgid "_Reply"
 msgstr "Beantwoorden"
 
-#: src/main-window.c:245
+#: src/main-window.c:269
 msgid "Reply to the current message"
 msgstr "Beantwoord huidig bericht"
 
-#: src/main-window.c:252 src/message-window.c:60
+#: src/main-window.c:276 src/message-window.c:81
 msgid "Reply to _all"
 msgstr "Beantwoord allen"
 
-#: src/main-window.c:253
+#: src/main-window.c:277
 msgid "Reply to all recipients of the current message"
 msgstr "Beantwoord alle ontvangers van het huidige bericht"
 
-#: src/main-window.c:260 src/message-window.c:67
+#: src/main-window.c:284 src/message-window.c:88
 msgid "_Forward"
 msgstr "Doorsturen"
 
-#: src/main-window.c:260
+#: src/main-window.c:284
 msgid "Forward the current message"
 msgstr "Stuur het huidige bericht door"
 
-#: src/main-window.c:267
+#: src/main-window.c:291
 msgid "_Continue"
 msgstr ""
 
-#: src/main-window.c:267
+#: src/main-window.c:291
 #, fuzzy
 msgid "Continue editing current message"
 msgstr "Druk het huidige bericht af"
 
-#: src/main-window.c:275 src/main-window.c:313
+#: src/main-window.c:299 src/main-window.c:352
 msgid "_Delete"
 msgstr "Verwijderen"
 
-#: src/main-window.c:275
+#: src/main-window.c:299
 msgid "Delete the current message"
 msgstr "Verwijder het huidige bericht"
 
-#: src/main-window.c:282
+#: src/main-window.c:306
 msgid "_Undelete"
 msgstr "Terughalen"
 
-#: src/main-window.c:282
+#: src/main-window.c:306
 msgid "Undelete the message"
 msgstr "Haal het bericht terug"
 
-#: src/main-window.c:288
+#: src/main-window.c:313
+msgid "_Toggle flagged"
+msgstr ""
+
+#: src/main-window.c:321
+#, fuzzy
+msgid "_Store Address"
+msgstr "'Reply-to' adres:"
+
+#: src/main-window.c:321
+msgid "Store address of sender in addressbook"
+msgstr ""
+
+#: src/main-window.c:327 src/message-window.c:111
 msgid "_Wrap"
 msgstr ""
 
-#: src/main-window.c:305
+#: src/main-window.c:344
 msgid "List"
 msgstr "Opnemen in lijst"
 
-#: src/main-window.c:309
+#: src/main-window.c:348
 msgid "_Add"
 msgstr "Toevoegen"
 
-#: src/main-window.c:309
+#: src/main-window.c:348
 msgid "Add a new mailbox"
 msgstr "Postvak toevoegen"
 
-#: src/main-window.c:311
+#: src/main-window.c:350
 msgid "_Edit"
 msgstr "Bewerken"
 
-#: src/main-window.c:311
+#: src/main-window.c:350
 msgid "Edit the selected mailbox"
 msgstr "Bewerk het geselecteerde postvak"
 
-#: src/main-window.c:313
+#: src/main-window.c:352
 msgid "Delete the selected mailbox"
 msgstr "Verwijder het geselecteerde postvak"
 
-#: src/main-window.c:316
+#: src/main-window.c:355
 msgid "Co_mmit current"
 msgstr "Doorvoeren wijzigingen"
 
-#: src/main-window.c:316
+#: src/main-window.c:355
 msgid "Commit the changes in the currently opened mailbox"
 msgstr "Voer de wijziging door in het geopende postvak"
 
-#: src/main-window.c:318
+#: src/main-window.c:357
 msgid "_Close"
 msgstr "Sluiten"
 
-#: src/main-window.c:318
+#: src/main-window.c:357
 #, fuzzy
 msgid "Close mailbox"
 msgstr "Lokaal postvak"
 
-#: src/main-window.c:321
+#: src/main-window.c:360
 msgid "Empty _Trash"
 msgstr ""
 
-#: src/main-window.c:321
+#: src/main-window.c:360
 #, fuzzy
 msgid "Delete Messages from the trash mailbox"
 msgstr "Verwijder het geselecteerde postvak"
 
-#: src/main-window.c:327
+#: src/main-window.c:366
 msgid "_Filters..."
 msgstr ""
 
-#: src/main-window.c:327
+#: src/main-window.c:366
 msgid "Manage filters"
 msgstr "Beheer van filters"
 
-#: src/main-window.c:336
+#: src/main-window.c:375
 #, fuzzy
 msgid "_Show mailbox tree"
 msgstr "Type van nieuw postvak: "
 
-#: src/main-window.c:339
+#: src/main-window.c:378
 #, fuzzy
 msgid "Show mailbox _tabs"
 msgstr "Type van nieuw postvak: "
 
-#: src/main-window.c:353
+#: src/main-window.c:392
 msgid "_Message"
 msgstr "Bericht"
 
-#: src/main-window.c:354
+#: src/main-window.c:393
 #, fuzzy
 msgid "Mail_box"
 msgstr "Postvakken"
 
-#: src/main-window.c:362
+#: src/main-window.c:401
 msgid "Check Email"
 msgstr "Check E-mail "
 
-#: src/main-window.c:366
+#: src/main-window.c:405
 msgid "Delete Message"
 msgstr "Bericht verwijderen"
 
-#: src/main-window.c:370
+#: src/main-window.c:409
 msgid "Compose"
 msgstr "Nieuw bericht"
 
-#: src/main-window.c:370
+#: src/main-window.c:409
 msgid "Compose Message"
 msgstr "Nieuw bericht opstellen"
 
-#: src/main-window.c:382
+#: src/main-window.c:421
 msgid "Continue"
 msgstr ""
 
-#: src/main-window.c:387
+#: src/main-window.c:426
 #, fuzzy
 msgid "Open Previous message"
 msgstr "Open vorig bericht"
 
-#: src/main-window.c:392
+#: src/main-window.c:431
 #, fuzzy
 msgid "Open Next message"
 msgstr "Open volgend bericht"
 
-#: src/main-window.c:397
+#: src/main-window.c:436
 #, fuzzy
 msgid "Open Next Unread Message"
 msgstr "Open volgend bericht"
 
-#: src/main-window.c:402 src/print.c:82 src/sendmsg-window.c:125
-#: src/sendmsg-window.c:153
+#: src/main-window.c:441 src/print.c:82 src/sendmsg-window.c:127
+#: src/sendmsg-window.c:155
 msgid "Print"
 msgstr "Afdrukken"
 
-#: src/main-window.c:402
+#: src/main-window.c:441
 msgid "Print current message"
 msgstr "Druk het huidige bericht af"
 
-#: src/main-window.c:888
+#: src/main-window.c:905
 msgid "Copyright (C) 1997-2000"
 msgstr ""
 
-#: src/main-window.c:890
+#: src/main-window.c:907
 #, fuzzy
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
@@ -1072,149 +1104,177 @@ msgstr ""
 "\n"
 "Voor bugreports: http://www.gnome.org/cgi-bin/bugs"
 
-#: src/main.c:78
+#: src/main-window.c:1458
+msgid ""
+"In order to store an address, you must open a mailbox and select a message.\n"
+msgstr ""
+
+#: src/main.c:74
 #, fuzzy
 msgid "Get new mail on startup"
 msgstr "Lees nieuwe mail"
 
-#: src/main.c:80
+#: src/main.c:75
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr ""
 
-#: src/main.c:82
-msgid "Opens MAILBOXNAME"
+#: src/main.c:76
+msgid "Opens MAILBOX1, MAILBOX2, ... upon startup"
 msgstr ""
 
-#: src/main.c:82
-msgid "MAILBOXNAME"
-msgstr ""
-
-#: src/main.c:83
+#: src/main.c:77
 #, fuzzy
 msgid "Opens first unread mailbox"
 msgstr "Open het geselecteerde postvak"
 
-#: src/mblist-window.c:376
+#: src/main.c:352
+msgid ""
+"Do you want Balsa to automatically save your\n"
+"session when you exit? If you have your session\n"
+"manager automatically start Balsa, say yes\n"
+"and Balsa will reappear the way you left it; say\n"
+"no and it will reappear in the same state every\n"
+"time. If you don't understand this, answer no."
+msgstr ""
+
+#: src/mblist-window.c:425
 #, fuzzy
 msgid "Open Mailbox"
 msgstr "Postvakken"
 
-#: src/mblist-window.c:382
+#: src/mblist-window.c:426
 #, fuzzy
 msgid "Close Mailbox"
 msgstr "Postvakken"
 
-#: src/mblist-window.c:389
+#: src/mblist-window.c:429
 #, fuzzy
 msgid "Add New Mailbox"
 msgstr "Postvak toevoegen"
 
-#: src/mblist-window.c:397
+#: src/mblist-window.c:433
 #, fuzzy
 msgid "Edit Mailbox Properties"
 msgstr "Remote mailservers"
 
-#: src/mblist-window.c:403
+#: src/mblist-window.c:434
 #, fuzzy
 msgid "Delete Mailbox"
 msgstr "Type van nieuw postvak: "
 
-#: src/mblist-window.c:430 src/mblist-window.c:446 src/mblist-window.c:464
-#: src/mblist-window.c:479
+#: src/mblist-window.c:435
+msgid "Mark as Inbox"
+msgstr ""
+
+#: src/mblist-window.c:436
+#, fuzzy
+msgid "Mark as Sentbox"
+msgstr "Pad voor Postvak-In:"
+
+#: src/mblist-window.c:437
+msgid "Mark as Trash"
+msgstr ""
+
+#: src/mblist-window.c:438
+msgid "Mark as Draftbox"
+msgstr ""
+
+#: src/mblist-window.c:461 src/mblist-window.c:477 src/mblist-window.c:495
+#: src/mblist-window.c:510
 msgid "No mailbox selected."
 msgstr "Geen postvak geselecteerd"
 
-#: src/message-window.c:54
+#: src/message-window.c:75
 msgid "Reply to this message"
 msgstr "Beantwoord dit bericht"
 
-#: src/message-window.c:61
+#: src/message-window.c:82
 msgid "Reply to all recipients of this message"
 msgstr "Beantwoord alle geadresseerden van dit bericht"
 
-#: src/message-window.c:67
+#: src/message-window.c:88
 msgid "Forward this message"
 msgstr "Stuur dit bericht door"
 
-#: src/pref-manager.c:124
+#: src/pref-manager.c:125
 #, fuzzy
 msgid "Text"
 msgstr "Volgende"
 
-#: src/pref-manager.c:125
+#: src/pref-manager.c:126
 msgid "Icons"
 msgstr ""
 
-#: src/pref-manager.c:126
+#: src/pref-manager.c:127
 msgid "Both"
 msgstr ""
 
-#: src/pref-manager.c:138
+#: src/pref-manager.c:139
 msgid "7bits"
 msgstr ""
 
-#: src/pref-manager.c:139
+#: src/pref-manager.c:140
 msgid "8bits"
 msgstr ""
 
-#: src/pref-manager.c:140
+#: src/pref-manager.c:141
 msgid "quoted"
 msgstr ""
 
-#: src/pref-manager.c:152
+#: src/pref-manager.c:153
 #, fuzzy
 msgid "While Retrieving Messages"
 msgstr "Bericht verwijderen"
 
-#: src/pref-manager.c:153
+#: src/pref-manager.c:154
 msgid "Until Closed"
 msgstr ""
 
-#: src/pref-manager.c:154
+#: src/pref-manager.c:155
 #, fuzzy
 msgid "Never"
 msgstr "Verwijderen"
 
-#: src/pref-manager.c:179
+#: src/pref-manager.c:180
 msgid "Balsa Preferences"
 msgstr "Balsa Instellingen"
 
-#: src/pref-manager.c:187 src/pref-manager.c:653
+#: src/pref-manager.c:188 src/pref-manager.c:653
 msgid "Identity"
 msgstr "Identiteit"
 
-#: src/pref-manager.c:190 src/pref-manager.c:723 src/pref-manager.c:801
+#: src/pref-manager.c:191 src/pref-manager.c:723 src/pref-manager.c:801
 #, fuzzy
 msgid "Signature"
 msgstr "Signatuur:"
 
-#: src/pref-manager.c:193
+#: src/pref-manager.c:194
 msgid "Mail Servers"
 msgstr "Mail Servers"
 
-#: src/pref-manager.c:196
+#: src/pref-manager.c:197
 #, fuzzy
 msgid "Mail Options"
 msgstr "Beheer van filters"
 
-#: src/pref-manager.c:199 src/pref-manager.c:1223
+#: src/pref-manager.c:200 src/pref-manager.c:1223
 msgid "Display"
 msgstr "Weergave"
 
-#: src/pref-manager.c:202 src/pref-manager.c:1248 src/pref-manager.c:1293
+#: src/pref-manager.c:203 src/pref-manager.c:1248 src/pref-manager.c:1293
 #, fuzzy
 msgid "Printing"
 msgstr "Afdrukken"
 
-#: src/pref-manager.c:205 src/pref-manager.c:1334 src/pref-manager.c:1352
+#: src/pref-manager.c:206 src/pref-manager.c:1334 src/pref-manager.c:1352
 msgid "Encoding"
 msgstr ""
 
-#: src/pref-manager.c:208 src/pref-manager.c:1379
+#: src/pref-manager.c:209 src/pref-manager.c:1379
 msgid "Misc"
 msgstr "Diversen"
 
-#: src/pref-manager.c:211
+#: src/pref-manager.c:212
 msgid "Startup"
 msgstr ""
 
@@ -1477,277 +1537,312 @@ msgstr ""
 msgid "Print Command:"
 msgstr ""
 
-#: src/sendmsg-window.c:109
+#: src/sendmsg-window.c:111
 msgid "Send"
 msgstr "Versturen"
 
-#: src/sendmsg-window.c:109
+#: src/sendmsg-window.c:111
 msgid "Send this mail"
 msgstr "Verstuur dit bericht"
 
-#: src/sendmsg-window.c:113
+#: src/sendmsg-window.c:115
 msgid "Attach"
 msgstr "Bijlage toevoegen"
 
-#: src/sendmsg-window.c:113
+#: src/sendmsg-window.c:115
 msgid "Add attachments to this message"
 msgstr "Voeg bijlages ('attachments') toe aan dit bericht"
 
-#: src/sendmsg-window.c:117
+#: src/sendmsg-window.c:119
 msgid "Postpone"
 msgstr ""
 
-#: src/sendmsg-window.c:117
+#: src/sendmsg-window.c:119
 msgid "Continue this message later"
 msgstr ""
 
-#: src/sendmsg-window.c:121
+#: src/sendmsg-window.c:123
 msgid "Spelling"
 msgstr "Spelling"
 
-#: src/sendmsg-window.c:121
+#: src/sendmsg-window.c:123
 msgid "Check Spelling"
 msgstr "Controleer spelling"
 
-#: src/sendmsg-window.c:136
+#: src/sendmsg-window.c:138
 msgid "_Include File..."
 msgstr ""
 
-#: src/sendmsg-window.c:140
+#: src/sendmsg-window.c:142
 msgid "_Attach file..."
 msgstr "Bestand in bijlage..."
 
-#: src/sendmsg-window.c:145
+#: src/sendmsg-window.c:147
 msgid "_Send"
 msgstr "Versturen"
 
-#: src/sendmsg-window.c:145
+#: src/sendmsg-window.c:147
 #, fuzzy
 msgid "Send the currently edited message"
 msgstr "Verwijder het huidige bericht"
 
-#: src/sendmsg-window.c:149
+#: src/sendmsg-window.c:151
 msgid "_Postpone"
 msgstr ""
 
-#: src/sendmsg-window.c:153
+#: src/sendmsg-window.c:155
 #, fuzzy
 msgid "Print the edited message"
 msgstr "Druk het huidige bericht af"
 
-#: src/sendmsg-window.c:171
+#: src/sendmsg-window.c:173
 msgid "_Wrap body"
 msgstr ""
 
-#: src/sendmsg-window.c:171
+#: src/sendmsg-window.c:173
 #, fuzzy
 msgid "Wrap message lines"
 msgstr "Doorsturen bericht"
 
-#: src/sendmsg-window.c:175
+#: src/sendmsg-window.c:177
 msgid "_Reflow paragraph"
 msgstr ""
 
-#: src/sendmsg-window.c:178
+#: src/sendmsg-window.c:180
 #, fuzzy
 msgid "R_eflow message"
 msgstr "Nieuw bericht"
 
-#: src/sendmsg-window.c:187
+#: src/sendmsg-window.c:189
 #, fuzzy
 msgid "Fr_om"
 msgstr "Van"
 
-#: src/sendmsg-window.c:189
+#: src/sendmsg-window.c:191
 msgid "_To"
 msgstr ""
 
-#: src/sendmsg-window.c:191
+#: src/sendmsg-window.c:193
 #, fuzzy
 msgid "_Subject"
 msgstr "Onderwerp"
 
-#: src/sendmsg-window.c:193
+#: src/sendmsg-window.c:195
 msgid "_Cc"
 msgstr ""
 
-#: src/sendmsg-window.c:195
+#: src/sendmsg-window.c:197
 msgid "_Bcc"
 msgstr ""
 
-#: src/sendmsg-window.c:197
+#: src/sendmsg-window.c:199
 msgid "_Fcc"
 msgstr ""
 
-#: src/sendmsg-window.c:199
+#: src/sendmsg-window.c:201
 #, fuzzy
 msgid "_Reply To"
 msgstr "Beantwoorden"
 
-#: src/sendmsg-window.c:201
+#: src/sendmsg-window.c:203
 #, fuzzy
 msgid "_Attachments"
 msgstr "Bijlage toevoegen"
 
-#: src/sendmsg-window.c:203
+#: src/sendmsg-window.c:205
 msgid "_Comments"
 msgstr ""
 
-#: src/sendmsg-window.c:205
+#: src/sendmsg-window.c:207
 msgid "_Keywords"
 msgstr ""
 
-#: src/sendmsg-window.c:216
+#: src/sendmsg-window.c:218
 msgid "_Western (ISO-8859-1)"
 msgstr ""
 
-#: src/sendmsg-window.c:218
+#: src/sendmsg-window.c:220
 msgid "W_estern (ISO-8859-15)"
 msgstr ""
 
-#: src/sendmsg-window.c:220
+#: src/sendmsg-window.c:222
 msgid "_Central European (ISO-8859-2)"
 msgstr ""
 
-#: src/sendmsg-window.c:222
+#: src/sendmsg-window.c:224
 msgid "_South European (ISO-8859-3)"
 msgstr ""
 
-#: src/sendmsg-window.c:224
+#: src/sendmsg-window.c:226
 msgid "_Baltic (ISO-8859-13)"
 msgstr ""
 
-#: src/sendmsg-window.c:226
+#: src/sendmsg-window.c:228
 msgid "Cy_rillic (ISO-8859-5)"
 msgstr ""
 
-#: src/sendmsg-window.c:228
+#: src/sendmsg-window.c:230
 msgid "_Hebrew (ISO-8859-8)"
 msgstr ""
 
-#: src/sendmsg-window.c:230
+#: src/sendmsg-window.c:232
 msgid "_Turkish (ISO-8859-9)"
 msgstr ""
 
-#: src/sendmsg-window.c:232
-msgid "_Celtic (ISO-8859-14)"
+#: src/sendmsg-window.c:234
+msgid "Ce_ltic (ISO-8859-14)"
 msgstr ""
 
-#: src/sendmsg-window.c:271
+#: src/sendmsg-window.c:236
+msgid "Ru_ssian (KOI8-R)"
+msgstr ""
+
+#: src/sendmsg-window.c:238
+msgid "_Ukrainian (KOI8-U)"
+msgstr ""
+
+#: src/sendmsg-window.c:279
 msgid "_Show"
 msgstr ""
 
-#: src/sendmsg-window.c:272
+#: src/sendmsg-window.c:280
 msgid "_ISO Charset"
 msgstr ""
 
-#: src/sendmsg-window.c:391
+#: src/sendmsg-window.c:402
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
 msgstr ""
 
-#: src/sendmsg-window.c:409
+#: src/sendmsg-window.c:420
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Info over bestand '%s' kan niet verkregen worden: %s\n"
 
-#: src/sendmsg-window.c:413
+#: src/sendmsg-window.c:424
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Bijlage '%s' is geen regulier bestand\n"
 
-#: src/sendmsg-window.c:473
+#: src/sendmsg-window.c:484
 msgid "Attach file"
 msgstr "Bestand als bijlage"
 
 #. cc:
-#: src/sendmsg-window.c:602
+#: src/sendmsg-window.c:613
 msgid "cc:"
 msgstr ""
 
 #. bcc:
-#: src/sendmsg-window.c:605
+#: src/sendmsg-window.c:616
 msgid "bcc:"
 msgstr ""
 
 #. fcc:
-#: src/sendmsg-window.c:608
+#: src/sendmsg-window.c:619
 msgid "fcc:"
 msgstr ""
 
 #. Reply To:
-#: src/sendmsg-window.c:637
+#: src/sendmsg-window.c:648
 #, fuzzy
 msgid "Reply To:"
 msgstr "Beantwoord "
 
 #. Attachment list
-#: src/sendmsg-window.c:641
+#: src/sendmsg-window.c:652
 #, fuzzy
 msgid "Attachments:"
 msgstr "Bijlage toevoegen"
 
 #. Comments:
-#: src/sendmsg-window.c:684
+#: src/sendmsg-window.c:695
 msgid "Comments:"
 msgstr ""
 
 #. Keywords:
-#: src/sendmsg-window.c:687
+#: src/sendmsg-window.c:698
 msgid "Keywords:"
 msgstr ""
 
-#: src/sendmsg-window.c:764
+#: src/sendmsg-window.c:775
 msgid "you"
 msgstr ""
 
-#: src/sendmsg-window.c:773
+#: src/sendmsg-window.c:784
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr ""
 
-#: src/sendmsg-window.c:775
+#: src/sendmsg-window.c:786
 #, c-format
 msgid "%s wrote:\n"
 msgstr ""
 
-#: src/sendmsg-window.c:845
+#: src/sendmsg-window.c:856
 msgid "Reply to "
 msgstr "Beantwoord "
 
-#: src/sendmsg-window.c:850
+#: src/sendmsg-window.c:861
 msgid "Forward message"
 msgstr "Doorsturen bericht"
 
-#: src/sendmsg-window.c:855
+#: src/sendmsg-window.c:866
 #, fuzzy
 msgid "Continue message"
 msgstr "Nieuw bericht"
 
-#: src/sendmsg-window.c:860
+#: src/sendmsg-window.c:871
 msgid "New message"
 msgstr "Nieuw bericht"
 
-#: src/sendmsg-window.c:1087
+#: src/sendmsg-window.c:1103
 msgid "Could not open the file.\n"
 msgstr ""
 
-#: src/sendmsg-window.c:1093
+#: src/sendmsg-window.c:1109
 msgid "Loading..."
 msgstr ""
 
-#: src/sendmsg-window.c:1118
+#: src/sendmsg-window.c:1134
 msgid "Include file"
 msgstr ""
 
-#: src/sendmsg-window.c:1392
+#: src/sendmsg-window.c:1391
 msgid "Cannot execute print command."
 msgstr ""
 
-#: src/sendmsg-window.c:1416
+#: src/sendmsg-window.c:1415
 msgid "Error executing lpr"
 msgstr ""
+
+#, fuzzy
+#~ msgid "Inbox"
+#~ msgstr "Pad voor Postvak-In:"
+
+#, fuzzy
+#~ msgid "Outbox"
+#~ msgstr "Pad voor Postvak-Uit:"
+
+#, fuzzy
+#~ msgid "Trash"
+#~ msgstr "Pad voor prullenbak:"
+
+#, fuzzy
+#~ msgid "Save Text"
+#~ msgstr "Bewaren"
+
+#, fuzzy
+#~ msgid "<P>The parameters of this message are:<BR>"
+#~ msgstr "Voeg bijlages ('attachments') toe aan dit bericht"
+
+#, fuzzy
+#~ msgid "Open of %s failed. Errno = %d, "
+#~ msgstr "Openen van %s mislukt:%s "
+
+#~ msgid "IMAP server"
+#~ msgstr "IMAP Server"
 
 #~ msgid "Local Mailbox Loaded as: %s\n"
 #~ msgstr "Lokaal postvak geladen als: %s\n"

@@ -1,14 +1,16 @@
 [__section_info__]
 description=Balsa E-mail reader
 description[ca]=Lector de correu Balsa
-description[da]=E-post-læseren Balsa
+description[da]=E-postprogrammet Balsa
 description[el]=Ğñüãñáììá ÇëåêôñïíéêŞò Áëëçëïãñáößáò Balsa
 description[es]=Lector de correo Balsa
 description[et]=Elektronpostiprogramm Balsa
 description[fr]=Lecteur de courrier Balsa
 description[lt]=Balsa el. pağto programa
+description[no]=Balsa e-post leser
 description[sv]=Balsa epostprogram
-description[tr]=Basla ePosta uygulaması
+description[tr]=Balsa ePosta uygulaması
+description[uk]=úŞÉÔÕ×ÁŞ ÅÌÅËÔÒÏÎÎÏ§ ĞÏÛÔÉ Balsa
 description[wa]=Manaedjeu d' emilaedjes Balsa
 
 [startup]
@@ -21,6 +23,8 @@ description[es]=Inicio del programa
 description[et]=Programmi käivitamine
 description[fr]=Démarrage du programme
 description[lt]=Programos paleidimas
+description[no]=Programmoppstart
 description[sv]=Programstart
 description[tr]=Uygulama başlangıçı
+description[uk]=úÁĞÕÓË ĞÒÏÇÒÁÍÉ
 description[wa]=Enondaedje do programe

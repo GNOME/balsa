@@ -11,37 +11,94 @@
 <td width="80">&nbsp;</td>
 <td>
 
-<p><img src="@website_root@/images/balsa.jpg" alt="balsa" align="middle" width="476" height="122"><big><big>Download</big></big></p>
+<img src="@website_root@/images/balsa.jpg" alt="balsa" align="middle" width="476" height="122">
+<big><big><b>Download</b></big></big><br>
 
 <table width="80%">
+<tr>
+	<td colspan="2"><p>&nbsp;</p></td>
+</tr>
+<tr>
+	<td colspan="2"><hr></td>
+</tr>
 <tr>
 	<th colspan="2" align="left"><big>Source</big></th>
 </tr>
 <tr>
-	<td colspan="2"><a href="ftp://ftp.balsa.net/pub/balsa/balsa-0.6.0.tar.gz">Balsa 0.6.0</a></td>
+	<td colspan="2"><a href="ftp://ftp.newton.cx/pub/balsa/balsa-0.8.1.tar.gz">ftp://ftp.newton.cx/pub/balsa/balsa-0.8.1.tar.gz</a></td>
+</tr>
+<tr>
+	<td colspan="2"><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1.tar.gz</a></td>
+</tr>
+<tr>
+	<td colspan="2"><p>&nbsp;</p></td>
 </tr>
 <tr>
 	<td colspan="2"><hr></td>
 </tr>
-<!--
 <tr>
 	<th colspan="2" align="left"><big>Packages</big></th>
 </tr>
 <tr>
-	<td>Red Hat</td>
-	<td><a href="ftp://ftp.balsa.net/pub/balsa/debian/balsa_0.6.0-1_i386.deb">Debian i386 (potato)</a></td>
+	<td colspan="2">US East Coast source RPM: <a href="ftp://ftp.newton.cx/pub/balsa/balsa-0.8.1-1.src.rpm">ftp://ftp.newton.cx/pub/balsa/balsa-0.8.1-1.src.rpm</a></td>
+</tr>
+<tr>
+	<td colspan="2">Europe source RPM: <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1-1.src.rpm</a></td>
+</tr>
+<tr>
+	<td colspan="2"><p>&nbsp;</p></td>
+</tr>
+<tr>
+	<td colspan="2">US East Coast i386 binary RPM: <a href="ftp://ftp.newton.cx/pub/balsa/balsa-0.8.1-1.i386.rpm">ftp://ftp.newton.cx/pub/balsa/balsa-0.8.1-1.i386.rpm</a></td>
+</tr>
+<tr>
+	<td colspan="2">Europe i386 binary RPM: <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.1-1.i386.rpm</a></td>
+</tr>
+<tr>
+	<td colspan="2"><p>&nbsp;</p></td>
+</tr>
+<tr>
+	<td colspan="2"><a href="http://www.linuxmafia.org/pcentral/sview.php3?name=balsa">Most recent version for Slackware</a>.</td>
+</tr>
+<tr>
+	<td colspan="2"><p>&nbsp;</p></td>
+</tr>
+<tr>
+	<td colspan="2">Daniele Cruciani's <a href="http://www.cli.di.unipi.it/~cruciani/Package/">Debian package</a> (experimental).</td>
+</tr>
+<tr>
+	<td colspan="2"><p>&nbsp;</p></td>
 </tr>
 <tr>
 	<td colspan="2"><hr></td>
 </tr>
--->
+<tr>
+	<th colspan="2" align="left"><big>CVS source</big></th>
+</tr>
+<tr>
+	<td colspan="2">Balsa source is also available from GNOME 
+<a href="http://developer.gnome.org/tools/cvs.html">CVS 
+repository</a>. Check out <b>balsa</b> module. The CVS version
+is <em>sometimes</em> not sufficiently stable for everyday use it but has all
+ the new features and is best starting point if you want to hack balsa.</td>
+</tr>
+
+<tr>
+	<td colspan="2"><hr></td>
+</tr>
 <tr>
 	<th colspan="2" align="left"><big>Requirements</big></th>
 </tr>
 <tr>
-	<td colspan="2">
-		<p><a href="http://www.gnome.org/start/">GNOME</a>, <a href="http://windowmaker.org/ftp/pub/beta/srcs/libPropList.tar.gz">libPropList</a></p>
-	</td>
+	<td colspan="2">A basic <a href="http://www.gnome.org/start/">GNOME installation</a>.</td>
+</tr>
+<tr>
+	<td colspan="2"><p>&nbsp;</p></td>
+</tr>
+<tr>
+	<td colspan="2">Balsa needs <a href="http://windowmaker.org/ftp/pub/beta/srcs/libPropList-0.10.1.tar.gz">libPropList</a>.
+	It must be installed with a prefix of /usr if you wish to also use a Balsa RPM. Note that many Linux distributions have
+        this package included on CD, check it out first.</td>
 </tr>
 </table>
 

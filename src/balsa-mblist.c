@@ -152,7 +152,8 @@ static gboolean bmbl_find_data_func(GtkTreeModel * model,
                                     GtkTreePath * path,
                                     GtkTreeIter * iter, gpointer data);
 static void bmbl_mbnode_tab_style(BalsaMailboxNode * mbnode, gint unread);
-static void bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter);
+static void bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter,
+			    gint total_messages);
 static gint bmbl_core_mailbox(LibBalsaMailbox * mailbox);
 static void bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
                           GdkEventButton * event);
@@ -897,7 +898,11 @@ bmbl_row_activated_cb(GtkTreeView * tree_view, GtkTreePath * path,
 struct update_mbox_data {
     LibBalsaMailbox *mailbox;
     GtkTreeStore *store;
+    guint total_messages;
 };
+static void bmbl_update_mailbox(GtkTreeStore * store,
+				LibBalsaMailbox * mailbox,
+				gint total_messages);
 static gboolean
 update_mailbox_idle(struct update_mbox_data*umd)
 {
@@ -905,7 +910,7 @@ update_mailbox_idle(struct update_mbox_data*umd)
     if (umd->store) {
         g_object_remove_weak_pointer(G_OBJECT(umd->store),
                                      (gpointer) &umd->store);
-        balsa_mblist_update_mailbox(umd->store, umd->mailbox);
+        bmbl_update_mailbox(umd->store, umd->mailbox, umd->total_messages);
     }
     gdk_threads_leave();
     g_free(umd);
@@ -922,6 +927,7 @@ bmbl_update_mailbox_idle_add(LibBalsaMailbox * mailbox,
 
     umd = g_new(struct update_mbox_data,1);
     umd->mailbox = mailbox; umd->store = store;
+    umd->total_messages = libbalsa_mailbox_total_messages(mailbox);
     g_object_add_weak_pointer(G_OBJECT(store), (gpointer) &umd->store);
     g_idle_add((GSourceFunc)update_mailbox_idle, umd);
 }
@@ -1231,7 +1237,7 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
                        -1);
     g_free(name);
     if (mbnode->mailbox)
-	bmbl_node_style(GTK_TREE_MODEL(store), iter);    
+	bmbl_node_style(GTK_TREE_MODEL(store), iter, -1);    
     return TRUE;
 }
 
@@ -1392,9 +1398,9 @@ bmbl_find_data_func(GtkTreeModel * model, GtkTreePath * path,
     return FALSE;
 }
 
-void
-balsa_mblist_update_mailbox(GtkTreeStore * store,
-			    LibBalsaMailbox * mailbox)
+static void
+bmbl_update_mailbox(GtkTreeStore * store, LibBalsaMailbox * mailbox,
+		    gint total_messages)
 {
     GtkTreeModel *model = GTK_TREE_MODEL(store);
     GtkTreeIter iter;
@@ -1405,7 +1411,7 @@ balsa_mblist_update_mailbox(GtkTreeStore * store,
                                    bmbl_find_data_func, mailbox))
         return;
 
-    bmbl_node_style(model, &iter);
+    bmbl_node_style(model, &iter, total_messages);
 
     /* Do the folder styles as well */
     balsa_mblist_have_new(GTK_TREE_STORE(model));
@@ -1415,6 +1421,13 @@ balsa_mblist_update_mailbox(GtkTreeStore * store,
         return;
 
     balsa_mblist_set_status_bar(mailbox);
+}
+
+void
+balsa_mblist_update_mailbox(GtkTreeStore * store,
+			    LibBalsaMailbox * mailbox)
+{
+    bmbl_update_mailbox(store, mailbox, -1);
 }
 
 /* bmbl_mbnode_tab_style: find the label widget by recursively searching
@@ -1469,7 +1482,7 @@ bmbl_mbnode_tab_style(BalsaMailboxNode * mbnode, gint unread)
  * NOTES: ignore special mailboxes.
  * */
 static void
-bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
+bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter, gint total_messages)
 {
     BalsaMailboxNode * mbnode;
     LibBalsaMailbox *mailbox;
@@ -1542,11 +1555,12 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
     }
     /* We only want to do this if the mailbox is open, otherwise leave
      * the message numbers untouched in the display */
-    if (MAILBOX_OPEN(mailbox)) {
-        if (libbalsa_mailbox_total_messages(mailbox) > 0) {
+    if (total_messages >= 0 || MAILBOX_OPEN(mailbox)) {
+	if (total_messages < 0)
+	    total_messages = libbalsa_mailbox_total_messages(mailbox);
+        if (total_messages > 0) {
             text =
-		g_strdup_printf("%d",
-				libbalsa_mailbox_total_messages(mailbox));
+		g_strdup_printf("%d", total_messages);
             gtk_tree_store_set(GTK_TREE_STORE(model), iter,
                                TOTAL_COLUMN, text, -1);
             g_free(text);

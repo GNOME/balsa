@@ -19,13 +19,20 @@ libbalsa_a_SOURCES = 		\
 	filter-file.c		\
 	filter-funcs.c		\
 	libbalsa.c		\
+	libbalsa.h		\
+	libbalsa_private.h	\
 	misc.c			\
 	mime.c			\
 	mailbox.c		\
 	mailbox_local.c		\
+	mailbox_local.h		\
 	mailbox_pop3.c		\
+	mailbox_pop3.h		\
 	mailbox_imap.c		\
-	send.c
+	mailbox_imap.h		\
+	send.c			\
+	threads.h		
+
 
 libbalsa_a_LIBADD = @LIBOBJS@
 

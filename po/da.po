@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
-"POT-Creation-Date: 1999-12-06 21:45+0100\n"
+"POT-Creation-Date: 1999-12-07 20:27-0500\n"
 "PO-Revision-Date: 1999-12-06 21:53+01:00\n"
 "Last-Translator: Kenneth Christiansen - <kenneth@ripen.dk>\n"
 "Language-Team: Danish <sslug-locale@sslug.dk>\n"
@@ -318,7 +318,7 @@ msgstr "Ned"
 msgid "New"
 msgstr "Ny"
 
-#: src/filter-edit-dialog.c:194 src/main-window.c:293 src/pref-manager.c:719
+#: src/filter-edit-dialog.c:194 src/main-window.c:293 src/pref-manager.c:722
 msgid "Delete"
 msgstr "Slet"
 
@@ -343,7 +343,7 @@ msgid "Match string:"
 msgstr "Find tekst:"
 
 #: src/filter-edit-dialog.c:380 src/mailbox-conf.c:281 src/mailbox-conf.c:1065
-#: src/pref-manager.c:709
+#: src/pref-manager.c:712
 msgid "Add"
 msgstr "Tilføj"
 
@@ -810,7 +810,7 @@ msgstr ""
 "\n"
 "Rapportér venligst om fejl på: http://bugs.gnome.org/"
 
-#: src/main.c:100
+#: src/main.c:104
 msgid "Get new mail on startup"
 msgstr "Hent ny post ved opstart"
 
@@ -867,7 +867,7 @@ msgid "Balsa Preferences"
 msgstr "Balsa indstillinger"
 
 #. identity page
-#: src/pref-manager.c:192 src/pref-manager.c:582
+#: src/pref-manager.c:192 src/pref-manager.c:585
 msgid "Identity"
 msgstr "Identitet"
 
@@ -882,145 +882,145 @@ msgid "Display"
 msgstr "Udseende"
 
 #. Misc page
-#: src/pref-manager.c:213 src/pref-manager.c:866
+#: src/pref-manager.c:213 src/pref-manager.c:869
 msgid "Misc"
 msgstr "Diverse"
 
 #. Encoding page
-#: src/pref-manager.c:220 src/pref-manager.c:944
+#: src/pref-manager.c:220 src/pref-manager.c:947
 msgid "Encoding"
 msgstr "Indkodning"
 
 #. Printing page
-#: src/pref-manager.c:226 src/pref-manager.c:999
+#: src/pref-manager.c:226 src/pref-manager.c:1002
 msgid "Printing"
 msgstr "Udskrivning"
 
 #. your name
-#: src/pref-manager.c:590
+#: src/pref-manager.c:593
 msgid "Your name:"
 msgstr "Dit navn:"
 
 #. email address
-#: src/pref-manager.c:600
+#: src/pref-manager.c:603
 msgid "E-Mail address:"
 msgstr "E-postadresse:"
 
 #. reply-to address
-#: src/pref-manager.c:610
+#: src/pref-manager.c:613
 msgid "Reply-to address:"
 msgstr "Svar-til adresse:"
 
 #. Signature stuff
-#: src/pref-manager.c:621
+#: src/pref-manager.c:624
 msgid "Signature"
 msgstr "Signatur"
 
-#: src/pref-manager.c:629
+#: src/pref-manager.c:632
 msgid "Signature file:"
 msgstr "Signaturfil:"
 
-#: src/pref-manager.c:640
+#: src/pref-manager.c:643
 msgid "Include signature when sending mail"
 msgstr "Inkludér signatur når du sender post"
 
-#: src/pref-manager.c:644
+#: src/pref-manager.c:647
 msgid "Include signature when forwarding mail"
 msgstr "Inkludér signatur når du videresender post"
 
-#: src/pref-manager.c:648
+#: src/pref-manager.c:651
 msgid "Include signature when replying to mail"
 msgstr "Inkludér signatur når du svarer på post"
 
-#: src/pref-manager.c:679
+#: src/pref-manager.c:682
 msgid "Remote Mailbox Servers"
 msgstr "Eksterne postkasseservere"
 
-#: src/pref-manager.c:688
+#: src/pref-manager.c:691
 msgid "Type"
 msgstr "Type"
 
-#: src/pref-manager.c:689
+#: src/pref-manager.c:692
 msgid "Mailbox name"
 msgstr "Navn på postkasse"
 
-#: src/pref-manager.c:714
+#: src/pref-manager.c:717
 msgid "Modify"
 msgstr "Modificér"
 
-#: src/pref-manager.c:724
+#: src/pref-manager.c:727
 msgid "Local Mail"
 msgstr "Lokal post"
 
-#: src/pref-manager.c:730
+#: src/pref-manager.c:733
 msgid "Local mail directory:"
 msgstr "Lokal postmappe:"
 
 #. smtp server
-#: src/pref-manager.c:737
+#: src/pref-manager.c:740
 msgid "Outgoing Mail"
 msgstr "Udgående post"
 
-#: src/pref-manager.c:746
+#: src/pref-manager.c:749
 msgid "Remote SMTP Server"
 msgstr "Ekstern SMTP server"
 
-#: src/pref-manager.c:756
+#: src/pref-manager.c:759
 msgid "Local mail user agent"
 msgstr "Brugeragent for lokal post"
 
 #. Toolbars
-#: src/pref-manager.c:801
+#: src/pref-manager.c:804
 msgid "Toolbars"
 msgstr "Værktøjslinier"
 
 #. Main window
-#: src/pref-manager.c:818
+#: src/pref-manager.c:821
 msgid "Main window"
 msgstr "Hovedvindue"
 
-#: src/pref-manager.c:821
+#: src/pref-manager.c:824
 msgid "Use preview pane"
 msgstr "Vis brev i lille vindue"
 
 #. Progress Dialog
-#: src/pref-manager.c:825
+#: src/pref-manager.c:828
 msgid "Display Progress Dialog"
 msgstr "Vis fremgangsbjælke"
 
-#: src/pref-manager.c:845
+#: src/pref-manager.c:848
 msgid "View mailbox content informations "
 msgstr "Vis information om postkasseindhold "
 
-#: src/pref-manager.c:874
+#: src/pref-manager.c:877
 msgid "Debug"
 msgstr "Aflusing"
 
-#: src/pref-manager.c:880
+#: src/pref-manager.c:883
 msgid "Reply prefix:"
 msgstr "Svarprefiks:"
 
-#: src/pref-manager.c:894
+#: src/pref-manager.c:897
 msgid "Font:"
 msgstr "Skrifttype:"
 
-#: src/pref-manager.c:909
+#: src/pref-manager.c:912
 msgid "Browse..."
 msgstr "Gennemse..."
 
-#: src/pref-manager.c:955
+#: src/pref-manager.c:958
 msgid "Charset:"
 msgstr "Tegnsæt:"
 
-#: src/pref-manager.c:1009
+#: src/pref-manager.c:1012
 msgid "Print command:"
 msgstr "Udskrivningskommando:"
 
-#: src/pref-manager.c:1020
+#: src/pref-manager.c:1023
 msgid "Linesize:"
 msgstr "Linielængde:"
 
-#: src/pref-manager.c:1032
+#: src/pref-manager.c:1035
 msgid "Break line"
 msgstr "Ombryd linier"
 

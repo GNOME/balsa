@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-0.4.9.5\n"
-"POT-Creation-Date: 1999-09-04 21:58+0200\n"
+"POT-Creation-Date: 1999-12-07 20:27-0500\n"
 "PO-Revision-Date: 1999-07-27\n"
 "Last-Translator: Pawe³ Dziekoñski <pdziekonski@mml.ch.pwr.wroc.pl>\n"
 "Language-Team: POLISH <pl@li.org>\n"
@@ -15,402 +15,395 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-2\n"
 "Content-Transfer-Encoding: 8-bit\n"
 
-#: src/balsa-index.c:1
+#: src/balsa-index.c:231
 msgid "From"
 msgstr "Od"
 
-#: src/balsa-index.c:1 src/filter-edit-dialog.c:1
+#: src/balsa-index.c:232 src/filter-edit-dialog.c:315
 msgid "Subject"
 msgstr "Temat"
 
-#: src/balsa-index.c:1
+#: src/balsa-index.c:233
 msgid "Date"
 msgstr "Data"
 
-#: src/balsa-init.c:1
-msgid "Welcome To Balsa!"
-msgstr "Witaj w Balsie!"
+#: src/balsa-init.c:69
+msgid "Trash"
+msgstr "¦mietnik"
 
-#: src/balsa-init.c:1
-msgid "welcome"
-msgstr "witaj"
+#: src/balsa-init.c:70
+msgid "Draftbox"
+msgstr "Poczta robocza"
 
-#: src/balsa-init.c:1
-msgid "general"
-msgstr "ogólne"
+#: src/balsa-init.c:71
+msgid "Sentbox"
+msgstr "Poczta wys³ana"
 
-#: src/balsa-init.c:1
-msgid "mailboxs"
-msgstr "skrzynki"
+#: src/balsa-init.c:72
+msgid "Outbox"
+msgstr "Poczna wychodz±ca"
 
-#: src/balsa-init.c:1
-msgid ""
-"Welcome to Balsa!\n"
-"\n"
+#: src/balsa-init.c:73
+msgid "Inbox"
+msgstr "Poczta przychodz±ca"
+
+#: src/balsa-init.c:129
+msgid "Configure Balsa"
+msgstr ""
+
+#. Start page ****************************************
+#. This text we must linebreak manually.
+#: src/balsa-init.c:138
+#, fuzzy
+msgid "Welcome to Balsa!"
 msgstr ""
 "Witaj w Balsie!\n"
 "\n"
 
-#: src/balsa-init.c:1
-msgid "You seem to be running Balsa for the first time.\n"
-msgstr "Wygl±da na to, ¿e uruchomiono Balsê po raz pierwszy.\n"
-
-#: src/balsa-init.c:1
+#: src/balsa-init.c:139
 msgid ""
-"The following steps will setup Balsa by asking a few simple questions.  "
+"You seem to be running Balsa for the first time. The following\n"
+"steps will set up Balsa by asking a few simple questions. Once\n"
+"you have completed these steps, you can always change them later\n"
+"in Balsa's preferences. Please check the about box in Balsa's\n"
+"main window for more information about contacting the authors or\n"
+"reporting bugs."
 msgstr ""
-"W kilku krokach Balsa zostanie skonfigurowna przez zadanie kilku pytañ.  "
 
-#: src/balsa-init.c:1
+#. User info ****************************************
+#: src/balsa-init.c:153
+msgid "User Settings"
+msgstr ""
+
+#: src/balsa-init.c:159
 msgid ""
-"Once you have completed these steps, you can always change them at a later "
-"time through Balsa's preferences.  "
+"Please enter information about yourself. If you don't\n"
+"use an SMTP server, enter \"localhost\" into the box."
 msgstr ""
-"Wszystkie ustawienia mo¿na zmieniæ pó¼niej u¿ywaj±c menu Preferencji Balsy."
 
-#: src/balsa-init.c:1
+#. Folders ****************************************
+#: src/balsa-init.c:172
+msgid "Mail Directory Settings"
+msgstr ""
+
+#. Finish ****************************************
+#: src/balsa-init.c:209
+msgid "All done!"
+msgstr ""
+
+#: src/balsa-init.c:210
 msgid ""
-"Please check the about box in Balsa's main window for more information on "
-"contacting the authors or reporting bugs."
+"You've successfully set up Balsa. Have fun!\n"
+"   -- The Balsa development team"
 msgstr ""
-"Aby uzyskaæ wiêcej informacji o autorach lub o zg³aszaniu b³êdów, nale¿y "
-"wybraæ 'Informacje o...' z menu oknie g³ównym."
 
-#. your name
-#: src/balsa-init.c:1 src/pref-manager.c:1
-msgid "Your name:"
-msgstr "Twoje imiê i nazwisko:"
+#: src/balsa-init.c:303
+#, fuzzy
+msgid "Create Mail Directory?"
+msgstr "Katalog lokalnej poczty:"
 
-#. email address
-#: src/balsa-init.c:1 src/pref-manager.c:1
-msgid "E-Mail address:"
-msgstr "Adres e-Mail:"
-
-#. smtp server
-#: src/balsa-init.c:1
-msgid "SMTP server:"
-msgstr "Serwer SMTP:"
-
-#: src/balsa-init.c:1
-msgid "Inbox Path:"
-msgstr "¦cie¿ka poczty przychodz±cej:"
-
-#: src/balsa-init.c:1
-msgid "Outbox Path:"
-msgstr "¦cie¿ka poczty wychodz±cej:"
-
-#: src/balsa-init.c:1
-msgid "Sentbox Path:"
-msgstr "¦cie¿ka poczty wys³anej:"
-
-#: src/balsa-init.c:1
-msgid "Draftbox Path:"
-msgstr "¦cie¿ka poczty roboczej:"
-
-#: src/balsa-init.c:1
-msgid "Trash Path:"
-msgstr "¦cie¿ka ¶mietnika:"
-
-#: src/balsa-init.c:1
+#: src/balsa-init.c:306
 msgid ""
-"If you wish to use IMAP for these\n"
-"please change them inside Balsa\n"
+"The mailbox directory you specified either does not exist or is not properly "
+"accessible. If you click the \"Next\" button, I will attempt to create it. "
+"If you click \"Back\", you can change the directory. If you think the "
+"directory should work, check the error message below, fix the problem, click "
+"\"Back\", then try \"Next\" again."
 msgstr ""
-"Je¶li zamierzasz u¿ywaæ IMAP, zmieñ\n"
-"odpowiednie ustawienia wewn±trz Balsy\n"
 
-#: src/balsa-init.c:1 src/balsa-init.c:1 src/balsa-init.c:1
-#: src/balsa-init.c:1 src/balsa-init.c:1
+#: src/balsa-init.c:316
+msgid "There is a serious internal error.\n"
+msgstr ""
+
+#: src/balsa-init.c:351
+msgid "Error Creating Directory"
+msgstr ""
+
+#: src/balsa-init.c:354
+msgid ""
+"There was an error creating the folder, detailed below. You cannot continue "
+"unless your mail folder exists. Either go back and choose a new folder or "
+"cancel this setup and fix the problem."
+msgstr ""
+
+#: src/balsa-init.c:385
+#, fuzzy, c-format
+msgid "Configure %s"
+msgstr "Kontynuuje"
+
+#: src/balsa-init.c:390
 #, c-format
 msgid ""
-"Mailbox \"%s\" is not valid.\n"
-"\n"
-"Would you like to create it?"
+"Please specify a filename for mail folder \"%s\". (It will be created if it "
+"does not exist.)"
 msgstr ""
-"Skrzynka \"%s\" nie istnieje.\n"
+
+#: src/balsa-init.c:442
+#, fuzzy
+msgid "Create Mailbox?"
+msgstr "Skrzynka"
+
+#: src/balsa-init.c:449
+msgid "OOPS BUG"
+msgstr ""
+
+#: src/balsa-init.c:525
+#, c-format
+msgid ""
+"The directory or file \"%s\" does not appear to exist, or it is not a "
+"mailbox. Should I try to create it as a mailbox? Click the \"Next\" button "
+"to try and create it. Click \"Back\" to choose another filename."
+msgstr ""
+
+#: src/balsa-init.c:554
+#, fuzzy
+msgid "Mailbox Creation Failed"
+msgstr "Nazwa skrzynki"
+
+#: src/balsa-init.c:558
+#, c-format
+msgid ""
+"A mailbox could not be created at the filename \"%s\". A more exact error is "
+"below. Please determine the error and fix the problem, either by going "
+"backwards and choosing a filename that will work, or exiting this setup and "
+"fixing the problem elsewhere.\n"
 "\n"
-"Czy chcesz j± utworzyæ?"
+"Errno: %d (%s)"
+msgstr ""
 
-#: src/balsa-init.c:1
-msgid "Unable to procede without a valid mailbox.  Please try again."
-msgstr "Nie mo¿na kontynuowaæ bez poprawnej skrzynki. Spróbuj ponownie."
+#: src/balsa-init.c:655
+msgid ""
+"This will exit Balsa. Do you\n"
+"really want to do this?"
+msgstr ""
 
-#: src/balsa-init.c:1
-msgid "Finish"
-msgstr "Zakoñcz"
+#: src/balsa-init.c:736
+msgid ""
+"I would now like you to tell me where your mail directories are. The "
+"directory below will be contain your Balsa mailboxes, and be searched for "
+"new mailboxes. storing your Balsa mail. It does not necessarily have to "
+"exist (yet).\n"
+"\n"
+"There are five folders that you will be asked to set up; if they do not "
+"exist, they will be created. However, you must have all five of them by the "
+"time setup is finished.\n"
+msgstr ""
 
-#: src/balsa-init.c:1
-msgid "Inbox"
-msgstr "Poczta przychodz±ca"
+#: src/balsa-init.c:755
+#, fuzzy
+msgid "Your mailbox directory:"
+msgstr "Katalog lokalnej poczty:"
 
-#: src/balsa-init.c:1
-msgid "Outbox"
-msgstr "Poczna wychodz±ca"
-
-#: src/balsa-init.c:1
-msgid "Sentbox"
-msgstr "Poczta wys³ana"
-
-#: src/balsa-init.c:1
-msgid "Draftbox"
-msgstr "Poczta robocza"
-
-#: src/balsa-init.c:1
-msgid "Trash"
-msgstr "¦mietnik"
-
-#: src/balsa-message.c:1 src/balsa-message.c:1
+#: src/balsa-message.c:159 src/balsa-message.c:162
 msgid "Save MIME Part"
 msgstr "Zapisz za³±cznik MIME"
 
-#: src/balsa-message.c:1
+#: src/balsa-message.c:160
 msgid "Save"
 msgstr "Zapisz"
 
-#: src/balsa-message.c:1 src/mailbox-conf.c:1 src/sendmsg-window.c:1
-#: src/sendmsg-window.c:1
+#: src/balsa-message.c:160 src/mailbox-conf.c:624 src/sendmsg-window.c:85
+#: src/sendmsg-window.c:218
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: src/balsa-message.c:1 src/balsa-message.c:1
+#: src/balsa-message.c:231 src/balsa-message.c:246
 #, c-format
 msgid " Open of %s failed:%s "
 msgstr " Otwarcie %s nie powiod³o siê:%s "
 
-#: src/balsa-message.c:1 src/balsa-message.c:1
+#: src/balsa-message.c:232 src/balsa-message.c:247
 msgid "Ok"
 msgstr "Ok"
 
 #. this is the first row, so we'll use 0.0 here
-#: src/balsa-message.c:1
+#: src/balsa-message.c:512
 msgid "Date:"
 msgstr "Data:"
 
 #. To:
-#: src/balsa-message.c:1 src/filter-edit-dialog.c:1
-#: src/sendmsg-window.c:1
+#: src/balsa-message.c:519 src/filter-edit-dialog.c:291
+#: src/sendmsg-window.c:338
 msgid "To:"
 msgstr "Do:"
 
-#: src/balsa-message.c:1
+#: src/balsa-message.c:527
 msgid "Cc:"
 msgstr "Cc:"
 
-#: src/balsa-message.c:1
+#: src/balsa-message.c:535
 msgid "Bcc:"
 msgstr "Bcc:"
 
 #. From:
-#: src/balsa-message.c:1 src/filter-edit-dialog.c:1
-#: src/sendmsg-window.c:1
+#: src/balsa-message.c:545 src/filter-edit-dialog.c:303
+#: src/sendmsg-window.c:363
 msgid "From:"
 msgstr "Od:"
 
 #. Subject:
-#: src/balsa-message.c:1 src/sendmsg-window.c:1
+#: src/balsa-message.c:559 src/sendmsg-window.c:383
 msgid "Subject:"
 msgstr "Temat:"
 
-#: src/balsa-message.c:1
+#: src/balsa-message.c:651
 msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
 msgstr "<tr><td bgcolor=\"#f0f0f0\"> Otrzymano zakodowany plik typu aplikacja/"
 
-#: src/balsa-message.c:1
+#: src/balsa-message.c:655
 msgid "<P>The parameters of this message are:<BR>"
 msgstr "<P>Parametry wiadomo¶ci:<BR>"
 
-#: src/balsa-message.c:1
+#: src/balsa-message.c:656
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
 msgstr "<table border=0><tr><th>Atrybut</th><th>Warto¶æ</th></tr>\n"
 
-#: src/balsa-message.c:1
+#: src/balsa-message.c:866
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Otwarcie %s nie powiod³o siê. Kod b³êdu = %d, "
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:100
 msgid "On"
 msgstr "Akt."
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:101
 msgid "Name"
 msgstr "Nazwa"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:165
 msgid "Up"
 msgstr "Góra"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:171
 msgid "Down"
 msgstr "Dó³"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:188
 msgid "New"
 msgstr "Nowy"
 
-#: src/filter-edit-dialog.c:1 src/index-child.c:1 src/main-window.c:1
-#: src/pref-manager.c:1
+#: src/filter-edit-dialog.c:194 src/main-window.c:293 src/pref-manager.c:722
 msgid "Delete"
 msgstr "Usuñ"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:237
 msgid "Match in:"
 msgstr "Przeszukiwane czê¶ci:"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:255
 msgid "All"
 msgstr "Wszystkie"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:267
 msgid "Header"
 msgstr "Nag³ówek"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:279
 msgid "Body"
 msgstr "Tre¶æ"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:328
 msgid "Match string:"
 msgstr "Wyszukiwany napis:"
 
-#: src/filter-edit-dialog.c:1 src/mailbox-conf.c:1 src/mailbox-conf.c:1
-#: src/pref-manager.c:1
+#: src/filter-edit-dialog.c:380 src/mailbox-conf.c:281 src/mailbox-conf.c:1065
+#: src/pref-manager.c:712
 msgid "Add"
 msgstr "Dodaj"
 
-#: src/filter-edit-dialog.c:1 src/sendmsg-window.c:1
+#: src/filter-edit-dialog.c:391 src/sendmsg-window.c:154
 msgid "Remove"
 msgstr "Usuñ"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:420
 msgid "Command:"
 msgstr "Polecenie:"
 
 #. The name entry
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:456
 msgid "Filter name:"
 msgstr "Nazwa filtra:"
 
 #. The "Process when:" option menu
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:475
 msgid "Process when:"
 msgstr "Uwzglêdniany kiedy:"
 
 #. The "Run on:" option menu
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:506
 msgid "Run on:"
 msgstr "Wykonywanie przy:"
 
 #. the type notebook's option menu
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:536
 msgid "Search type:"
 msgstr "Typ wyszukiwania:"
 
 #. The notification area
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:592
 msgid "Notification:"
 msgstr "Powiadomienie:"
 
 #. Notification buttons
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:601
 msgid "Play sound:"
 msgstr "Odtwarzanie d¼wiêku:"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:609
 msgid "Use Sound..."
 msgstr "Wykorzystanie d¼wiêku..."
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:618
 msgid "Popup text:"
 msgstr "Wyskakuj±cy napis:"
 
 #. The action area
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:637
 msgid "Action to perform:"
 msgstr "Podejmowana akcja:"
 
 #. The disposition area
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:658
 msgid "Disposition:"
 msgstr "Umieszczanie:"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:666
 msgid "Place/leave in default folder"
 msgstr "Umieszczanie/pozostawianie w domy¶lnym folderze"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:671
 msgid "Do not place/leave in default folder"
 msgstr "Bez umieszczania/pozostawiania w domy¶lnym folderze"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:676
 msgid "Stop filtering here"
 msgstr "Zatrzymanie filtrowania"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:704
 msgid "Match"
 msgstr "Przeszukiwanie"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:707
 msgid "Action"
 msgstr "Akcja"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:721
 msgid "Revert"
 msgstr "Odwróæ"
 
-#: src/filter-edit-dialog.c:1
+#: src/filter-edit-dialog.c:749
 msgid "Balsa Filters"
 msgstr "Zarz±dzanie filtrami"
 
-#: src/index-child.c:1
-msgid "Mailbox password:"
-msgstr "Has³o dla skrzynki:"
-
-#. password field
-#: src/index-child.c:1 src/mailbox-conf.c:1 src/mailbox-conf.c:1
-msgid "Password:"
-msgstr "Has³o:"
-
-#: src/index-child.c:1
-msgid "Unable to Open Mailbox!"
-msgstr "Nie mo¿na otworzyæ skrzynki!"
-
-#: src/index-child.c:1
-msgid "Transfer"
-msgstr "Przenie¶"
-
-#: src/index-child.c:1
-msgid "Change Status"
-msgstr "Zmieñ status"
-
-#: src/index-child.c:1
-msgid "Unread"
-msgstr "Nie przeczytany"
-
-#: src/index-child.c:1
-msgid "Read"
-msgstr "Przeczytany"
-
-#: src/index-child.c:1
-msgid "Replied"
-msgstr "Opowiedziany"
-
-#: src/index-child.c:1
-msgid "Forwarded"
-msgstr "Przes³any dalej"
-
-#: src/index-child.c:1
-msgid "Undelete"
-msgstr "Odtwórz"
-
-#: src/local-mailbox.c:1
+#: src/local-mailbox.c:163
 #, c-format
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr "Lokalna skrzynka za³adowana jako: %s\n"
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:161
 msgid ""
 "This will remove the mailbox and it's files permanently from your system.\n"
 "Are you sure you want to remove this mailbox?"
@@ -418,7 +411,7 @@ msgstr ""
 "Skrzynka i ca³a jej zawarto¶æ zostanie skasowana.\n"
 "Czy na pewno skasowaæ?"
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:166
 msgid ""
 "This will remove the mailbox from the list of mailboxes\n"
 "You may use \"Add Mailbox\" later to access this mailbox again\n"
@@ -428,342 +421,353 @@ msgstr ""
 "Mo¿esz u¿yæ \"Dodaj skrzynkê\" by mieæ dostêp do tej skrzynki ponownie.\n"
 "Czy na pewno usun±æ?"
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:194
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Uups! Nie odnaleziono skrzynki w balsa_app.mailbox?\n"
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:238
 msgid "Mailbox Configurator"
 msgstr "Konfiguracja skrzynki"
 
-#: src/mailbox-conf.c:1 src/mailbox-conf.c:1
+#: src/mailbox-conf.c:291 src/mailbox-conf.c:1059
 msgid "Update"
 msgstr "Od¶wie¿"
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:421
 msgid "You need to fill in the folderpath field."
 msgstr "Nale¿y wype³niæ pole ze ¶cie¿k± foldera."
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:425
 msgid "You need to fill in the IMAP Server field"
 msgstr "Nale¿y wype³niæ pole z nazw± serwera IMAP"
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:429
 msgid "You need to fill in the username field"
 msgstr "Nale¿y wype³niæ pole z nazw± u¿ytkownika"
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:433
 msgid "You need to fill in the password field"
 msgstr "Nale¿y wype³niæ pole z has³em"
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:437
 msgid "You need to fill in the port field"
 msgstr "Nale¿y wype³niæ pole z numerem portu"
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:440
 msgid "All of the fields must be filled in"
 msgstr "Nale¿y wype³niæ wszystkie pola"
 
-#: src/mailbox-conf.c:1 src/mailbox-conf.c:1
+#: src/mailbox-conf.c:447 src/mailbox-conf.c:459
 msgid "You need to fill in the Mailbox Name field."
 msgstr "Nale¿y wype³niæ pole z nazw± skrzynki."
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:463
 msgid "You need to fill in the user field."
 msgstr "Nale¿y wype³niæ pole z nazw± u¿ytkownika."
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:467
 msgid "You need to fill in the password field."
 msgstr "Nale¿y wype³niæ pole z has³em."
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:471
 msgid "You need to fill in the server field."
 msgstr "Nale¿y wype³niæ pole z nazw± serwera."
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:475
 msgid "Some of the fields are blank."
 msgstr "Nie wype³niono niektórych pól."
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:623
 #, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr "Nie mo¿na utworzyæ skrzynki '%s': %s\n"
 
 #. used to build a string: MAILBOXNAME " on " SERVERNAME
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:687
 msgid " on "
 msgstr " na "
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:795
 msgid "New mailbox type:"
 msgstr "Typ nowej skrzynki:"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:801
 msgid "Local mailbox"
 msgstr "Skrzynka lokalna"
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:809
 msgid "IMAP server"
 msgstr "Skrzynka na serwerze IMAP"
 
 #. mailbox name
-#: src/mailbox-conf.c:1 src/mailbox-conf.c:1
+#: src/mailbox-conf.c:832 src/mailbox-conf.c:867
 msgid "Mailbox Name:"
 msgstr "Nazwa skrzynki:"
 
 #. path to file
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:842
 msgid "Mailbox path:"
 msgstr "¦cie¿ka skrzynki:"
 
 #. pop server
-#: src/mailbox-conf.c:1 src/mailbox-conf.c:1
+#: src/mailbox-conf.c:884 src/mailbox-conf.c:965
 msgid "Server:"
 msgstr "Serwer:"
 
 #. username
-#: src/mailbox-conf.c:1 src/mailbox-conf.c:1
+#: src/mailbox-conf.c:903 src/mailbox-conf.c:994
 msgid "Username:"
 msgstr "Nazwa u¿ytkownika:"
 
+#. password field
+#: src/mailbox-conf.c:920 src/mailbox-conf.c:1009
+msgid "Password:"
+msgstr "Has³o:"
+
 #. toggle for check
-#: src/mailbox-conf.c:1 src/main-window.c:1
+#: src/mailbox-conf.c:935 src/main-window.c:289
 msgid "Check"
 msgstr "Sprawd¼"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:943
 msgid "Delete from server"
 msgstr "Usuniêcie z serwera"
 
 #. imap server port number
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:979
 msgid "Port:"
 msgstr "Port:"
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:1022
 msgid "Folder path:"
 msgstr "¦cie¿ka folera:"
 
-#: src/mailbox-conf.c:1
+#: src/mailbox-conf.c:1100
 msgid "Mailbox"
 msgstr "Skrzynka"
 
-#: src/main-window.c:1
+#: src/main-window.c:139
 msgid "_Get new mail"
 msgstr "Pobierz _now± pocztê"
 
-#: src/main-window.c:1
+#: src/main-window.c:139
 msgid "Fetch new incoming mail"
 msgstr "Pobiera now± pocztê"
 
-#: src/main-window.c:1
+#: src/main-window.c:147
+#, fuzzy
+msgid "Pr_int"
+msgstr "Drukuj"
+
+#: src/main-window.c:147
+#, fuzzy
+msgid "Print current mail"
+msgstr "Drukuje bie¿±cy list"
+
+#: src/main-window.c:173
 msgid "_New"
 msgstr "_Nowy"
 
-#: src/main-window.c:1
+#: src/main-window.c:173
 msgid "Compose a new message"
 msgstr "Tworzy nowy list"
 
-#: src/main-window.c:1 src/message-window.c:1
+#: src/main-window.c:179 src/message-window.c:54
 msgid "_Reply"
 msgstr "_Odpowiedz"
 
-#: src/main-window.c:1
+#: src/main-window.c:179
 msgid "Reply to the current message"
 msgstr "Odpowiada na bie¿±cy list"
 
-#: src/main-window.c:1 src/message-window.c:1
+#: src/main-window.c:185 src/message-window.c:60
 msgid "Reply to _all"
 msgstr "Odpowiedz _wszystkim"
 
-#: src/main-window.c:1
+#: src/main-window.c:186
 msgid "Reply to all recipients of the current message"
 msgstr "Odpowiada wszystkim adresatom bie¿±cego listu"
 
-#: src/main-window.c:1 src/message-window.c:1
+#: src/main-window.c:192 src/message-window.c:67
 msgid "_Forward"
 msgstr "Prze¶lij _dalej"
 
-#: src/main-window.c:1
+#: src/main-window.c:192
 msgid "Forward the current message"
 msgstr "Przesy³a dalej bie¿±cy list"
 
-#: src/main-window.c:1
+#: src/main-window.c:198
 msgid "_Continue"
 msgstr "_Kontynuuj"
 
-#: src/main-window.c:1
+#: src/main-window.c:198
 msgid "Continue editing current message"
 msgstr "Kontynuuje edycjê zaznaczonego listu"
 
-#: src/main-window.c:1 src/main-window.c:1
+#: src/main-window.c:205 src/main-window.c:248
 msgid "_Delete"
 msgstr "_Usuñ"
 
-#: src/main-window.c:1
+#: src/main-window.c:205
 msgid "Delete the current message"
 msgstr "Usuwa bie¿±cy list"
 
-#: src/main-window.c:1
+#: src/main-window.c:211
 msgid "_Undelete"
 msgstr "O_dtwórz"
 
-#: src/main-window.c:1
+#: src/main-window.c:211
 msgid "Undelete the message"
 msgstr "Odtwarza list"
 
-#: src/main-window.c:1
+#: src/main-window.c:218
 msgid "Address Book"
 msgstr "Ksi±¿ka adresowa"
 
-#: src/main-window.c:1
+#: src/main-window.c:218
 msgid "Opens the address book"
 msgstr "Otwiera ksi±¿kê adresow±"
 
-#: src/main-window.c:1
+#: src/main-window.c:235
 msgid "List"
 msgstr "Lista"
 
-#: src/main-window.c:1
+#: src/main-window.c:239
 msgid "_Open"
 msgstr "_Otwórz"
 
-#: src/main-window.c:1
+#: src/main-window.c:239
 msgid "Open the selected mailbox"
 msgstr "Otwiera wybran± skrzynkê"
 
-#: src/main-window.c:1
+#: src/main-window.c:241
 msgid "_Close"
 msgstr "_Zamknij"
 
-#: src/main-window.c:1
+#: src/main-window.c:241
 msgid "Close the selected mailbox"
 msgstr "Zamyka wybran± skrzynkê"
 
-#: src/main-window.c:1
+#: src/main-window.c:244
 msgid "_Add"
 msgstr "_Dodaj"
 
-#: src/main-window.c:1
+#: src/main-window.c:244
 msgid "Add a new mailbox"
 msgstr "Dodaje now± skrzynkê"
 
-#: src/main-window.c:1
+#: src/main-window.c:246
 msgid "_Edit"
 msgstr "_Edycja"
 
-#: src/main-window.c:1
+#: src/main-window.c:246
 msgid "Edit the selected mailbox"
 msgstr "Modyfikuje wybran± skrzynkê"
 
-#: src/main-window.c:1
+#: src/main-window.c:248
 msgid "Delete the selected mailbox"
 msgstr "Usuwa wybran± skrzynkê"
 
-#: src/main-window.c:1
+#: src/main-window.c:251
 msgid "C_lose current"
 msgstr "Z_amknij bie¿±c±"
 
-#: src/main-window.c:1
+#: src/main-window.c:251
 msgid "Close the currently opened mailbox"
 msgstr "Zamyka aktualnie otwart± skrzynkê"
 
-#: src/main-window.c:1
+#: src/main-window.c:253
 msgid "Co_mmit current"
 msgstr "_Zatwierd¼ bie¿±c±"
 
-#: src/main-window.c:1
+#: src/main-window.c:253
 msgid "Commit the changes in the currently opened mailbox"
 msgstr "Zatwierdza zmiany w aktualnie otwartej skrzynce"
 
-#: src/main-window.c:1
+#: src/main-window.c:256
 msgid "O_pened"
 msgstr "_Otwarte"
 
-#: src/main-window.c:1
+#: src/main-window.c:262
 msgid "_Filters..."
 msgstr "_Filtry..."
 
-#: src/main-window.c:1
+#: src/main-window.c:262
 msgid "Manage filters"
 msgstr "Zarz±dzanie filtrami"
 
-#: src/main-window.c:1
+#: src/main-window.c:280
 msgid "_Message"
 msgstr "_List"
 
-#: src/main-window.c:1
+#: src/main-window.c:281
 msgid "Mail_boxes"
 msgstr "Skrzynki"
 
-#: src/main-window.c:1
+#: src/main-window.c:289
 msgid "Check Email"
 msgstr "Sprawdza pocztê"
 
-#: src/main-window.c:1
+#: src/main-window.c:293
 msgid "Delete Message"
 msgstr "Usuwa list"
 
-#: src/main-window.c:1
+#: src/main-window.c:297
 msgid "Compose"
 msgstr "Nowy list"
 
-#: src/main-window.c:1
+#: src/main-window.c:297
 msgid "Compose Message"
 msgstr "Nowy list"
 
-#: src/main-window.c:1
+#: src/main-window.c:300
 msgid "Reply"
 msgstr "Odpowiada"
 
-#: src/main-window.c:1
+#: src/main-window.c:303
 msgid "Reply to all"
 msgstr "Odpowiada wszystkim"
 
-#: src/main-window.c:1
+#: src/main-window.c:306
 msgid "Forward"
 msgstr "Przesy³a dalej"
 
-#: src/main-window.c:1
+#: src/main-window.c:309
 msgid "Continue"
 msgstr "Kontynuuje"
 
-#: src/main-window.c:1
+#: src/main-window.c:314
 msgid "Previous"
 msgstr "Poprzedni"
 
-#: src/main-window.c:1
+#: src/main-window.c:314
 msgid "Open Previous message"
 msgstr "Otwiera poprzedni list"
 
-#: src/main-window.c:1
+#: src/main-window.c:319
 msgid "Next"
 msgstr "Nastêpny"
 
-#: src/main-window.c:1
+#: src/main-window.c:319
 msgid "Open Next message"
 msgstr "Otwiera nastêpny list"
 
-#: src/main-window.c:1 src/sendmsg-window.c:1
+#: src/main-window.c:324 src/sendmsg-window.c:82
 msgid "Print"
 msgstr "Drukuj"
 
-#: src/main-window.c:1
+#: src/main-window.c:324
 msgid "Print current message"
 msgstr "Drukuje bie¿±cy list"
 
-#: src/main-window.c:1
-msgid "Mailboxes/Opened/"
-msgstr "Skrzynki/Otwarte/"
-
-#: src/main-window.c:1
+#: src/main-window.c:701
 msgid "Copyright (C) 1997-1999"
 msgstr "Copyright (C) 1997-1999"
 
-#: src/main-window.c:1
+#: src/main-window.c:703
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -775,255 +779,328 @@ msgstr ""
 "\n"
 "Zg³aszanie b³êdów jest mo¿liwe pod adresem http://bugs.gnome.org/"
 
-#: src/main-window.c:1
-msgid "Checked."
-msgstr "Sprawdzona."
-
-#: src/main.c:1
+#: src/main.c:104
 msgid "Get new mail on startup"
 msgstr "Pobieranie nowej poczny przy uruchamianiu"
 
-#: src/message-window.c:1
+#: src/message-window.c:54
 msgid "Reply to this message"
 msgstr "Odpowiedz na ten list"
 
-#: src/message-window.c:1
+#: src/message-window.c:61
 msgid "Reply to all recipients of this message"
 msgstr "Odpowiada wszystkim adresatom tego listu"
 
-#: src/message-window.c:1
+#: src/message-window.c:67
 msgid "Forward this message"
 msgstr "Przesy³a dalej ten list"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:89
 msgid "Text"
 msgstr "Napisy"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:90
 msgid "Icons"
 msgstr "Ikony"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:91
 msgid "Both"
 msgstr "Napisy i ikony"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:103
 msgid "7bits"
 msgstr "7 bitów"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:104
 msgid "8bits"
 msgstr "8 bitów"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:105
 msgid "quoted"
 msgstr "opisowe"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:117
+#, fuzzy
+msgid "While Retrieving Messages"
+msgstr "Usuwa list"
+
+#: src/pref-manager.c:118
+msgid "Until Closed"
+msgstr ""
+
+#: src/pref-manager.c:119
+#, fuzzy
+msgid "Never"
+msgstr "Odwróæ"
+
+#: src/pref-manager.c:172
 msgid "Balsa Preferences"
 msgstr "Konfiguracja Balsy"
 
 #. identity page
-#: src/pref-manager.c:1 src/pref-manager.c:1
+#: src/pref-manager.c:192 src/pref-manager.c:585
 msgid "Identity"
 msgstr "Dane personalne"
 
 #. mailboxes page
-#: src/pref-manager.c:1
+#: src/pref-manager.c:199
 msgid "Mail Servers"
 msgstr "Serwery poczty"
 
 #. display page
-#: src/pref-manager.c:1
+#: src/pref-manager.c:206
 msgid "Display"
 msgstr "Wy¶wietlanie"
 
 #. Misc page
-#: src/pref-manager.c:1 src/pref-manager.c:1
+#: src/pref-manager.c:213 src/pref-manager.c:869
 msgid "Misc"
 msgstr "Inne"
 
-#. Misc page
-#: src/pref-manager.c:1 src/pref-manager.c:1
+#. Encoding page
+#: src/pref-manager.c:220 src/pref-manager.c:947
 msgid "Encoding"
 msgstr "Kodowanie"
 
+#. Printing page
+#: src/pref-manager.c:226 src/pref-manager.c:1002
+#, fuzzy
+msgid "Printing"
+msgstr "Drukuj"
+
+#. your name
+#: src/pref-manager.c:593
+msgid "Your name:"
+msgstr "Twoje imiê i nazwisko:"
+
+#. email address
+#: src/pref-manager.c:603
+msgid "E-Mail address:"
+msgstr "Adres e-Mail:"
+
 #. reply-to address
-#: src/pref-manager.c:1
+#: src/pref-manager.c:613
 msgid "Reply-to address:"
 msgstr "Adres dla poczty zwrotnej:"
 
-#. signature
-#: src/pref-manager.c:1
-msgid "Signature:"
+#. Signature stuff
+#: src/pref-manager.c:624
+#, fuzzy
+msgid "Signature"
 msgstr "Plik z sygnatur±:"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:632
+#, fuzzy
+msgid "Signature file:"
+msgstr "Plik z sygnatur±:"
+
+#: src/pref-manager.c:643
+msgid "Include signature when sending mail"
+msgstr ""
+
+#: src/pref-manager.c:647
+msgid "Include signature when forwarding mail"
+msgstr ""
+
+#: src/pref-manager.c:651
+msgid "Include signature when replying to mail"
+msgstr ""
+
+#: src/pref-manager.c:682
 msgid "Remote Mailbox Servers"
 msgstr "Zdalne serwery skrzynek"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:691
 msgid "Type"
 msgstr "Typ"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:692
 msgid "Mailbox name"
 msgstr "Nazwa skrzynki"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:717
 msgid "Modify"
 msgstr "Modyfikuj"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:727
 msgid "Local Mail"
 msgstr "Poczta lokalna"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:733
 msgid "Local mail directory:"
 msgstr "Katalog lokalnej poczty:"
 
 #. smtp server
-#: src/pref-manager.c:1
+#: src/pref-manager.c:740
 msgid "Outgoing Mail"
 msgstr "Poczta wychodz±ca"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:749
 msgid "Remote SMTP Server"
 msgstr "Zdalny serwer SMTP"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:759
 msgid "Local mail user agent"
 msgstr "Lokalny program pocztowy"
 
 #. Toolbars
-#: src/pref-manager.c:1
+#: src/pref-manager.c:804
 msgid "Toolbars"
 msgstr "Paski narzêdziowe"
 
 #. Main window
-#: src/pref-manager.c:1
+#: src/pref-manager.c:821
 msgid "Main window"
 msgstr "G³ówne okno"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:824
 msgid "Use preview pane"
 msgstr "Podgl±d tre¶ci listu"
 
-#: src/pref-manager.c:1
+#. Progress Dialog
+#: src/pref-manager.c:828
+msgid "Display Progress Dialog"
+msgstr ""
+
+#: src/pref-manager.c:848
 msgid "View mailbox content informations "
 msgstr "Wy¶wietla informacje o zawarto¶ci skrzynki "
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:877
 msgid "Debug"
 msgstr "Informacje o b³êdach"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:883
 msgid "Reply prefix:"
 msgstr "Znaki cytowania:"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:897
 msgid "Font:"
 msgstr "Czcionka:"
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:912
 msgid "Browse..."
 msgstr "Przegl±daj..."
 
-#: src/pref-manager.c:1
+#: src/pref-manager.c:958
 msgid "Charset:"
 msgstr "Zestaw znaków:"
 
-#: src/sendmsg-window.c:1
+#: src/pref-manager.c:1012
+#, fuzzy
+msgid "Print command:"
+msgstr "Polecenie:"
+
+#: src/pref-manager.c:1023
+msgid "Linesize:"
+msgstr ""
+
+#: src/pref-manager.c:1035
+msgid "Break line"
+msgstr ""
+
+#: src/sendmsg-window.c:73
 msgid "Send"
 msgstr "Wy¶lij"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:73
 msgid "Send this mail"
 msgstr "Wy¶lij pocztê"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:75
 msgid "Attach"
 msgstr "Za³±cz"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:75
 msgid "Add attachments to this message"
 msgstr "Za³acza plik do listu"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:77
 msgid "Postpone"
 msgstr "Od³ó¿"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:77
 msgid "Continue this message later"
 msgstr "Odk³ada list na pó¼niej"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:80
 msgid "Spelling"
 msgstr "Pisownia"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:80
 msgid "Check Spelling"
 msgstr "Sprawdza poprawno¶æ pisowni"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:92
 msgid "_Send"
 msgstr "_Wy¶lij"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:96
 msgid "_Attach file..."
 msgstr "_Za³±cz plik..."
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:100
 msgid "_Postpone"
 msgstr "_Od³ó¿"
 
-#: src/sendmsg-window.c:1
+#. PKGW
+#: src/sendmsg-window.c:194
+msgid ""
+"The attachment pixmap (balsa/attachment.png) cannot be found.\n"
+"Sadly, this means you cannot attach any files.\n"
+msgstr ""
+
+#: src/sendmsg-window.c:196
+msgid "OK"
+msgstr ""
+
+#: src/sendmsg-window.c:211
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Nie mo¿na pobraæ informacji o pliku '%s' : %s\n"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:214
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Za³±cznik nie jest zwyk³ym plikiem: '%s'\n"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:264
 msgid "Attach file"
 msgstr "Za³±cz plik"
 
 #. cc:
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:393
 msgid "cc:"
 msgstr "cc:"
 
 #. bcc:
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:418
 msgid "bcc:"
 msgstr "bcc:"
 
 #. fcc:
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:443
 msgid "fcc:"
 msgstr "fcc:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:471
 msgid "Attachments:"
 msgstr "Za³±czniki:"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:566
 msgid "Reply to "
 msgstr "Odpowiedz "
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:571
 msgid "Forward message"
 msgstr "Przesy³a dalej list"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:576
 msgid "Continue message"
 msgstr "Kontynuuj list"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:581
 msgid "New message"
 msgstr "Nowy list"
 
@@ -1033,25 +1110,131 @@ msgstr "Nowy list"
 #. * 	tmp = g_strdup_printf (buf);
 #. * so the date attribution can fully (and properly) translated.
 #.
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:755
 #, c-format
 msgid "On %s "
 msgstr "Dnia %s '"
 
-#: src/sendmsg-window.c:1 src/sendmsg-window.c:1
+#: src/sendmsg-window.c:765 src/sendmsg-window.c:768
 msgid "you"
 msgstr "ty"
 
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:770
 msgid " wrote:\n"
 msgstr " napisa³e¶/napisa³a¶:\n"
 
-#: libbalsa/mailbox.c:1
+#: libbalsa/mailbox.c:586
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr "Skrzynka: Otwieranie %s Referencji: %d\n"
 
-#: libbalsa/mailbox.c:1
+#: libbalsa/mailbox.c:606
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Skrzynka: Zamykanie %s Referencji: %d\n"
+
+#~ msgid "Welcome To Balsa!"
+#~ msgstr "Witaj w Balsie!"
+
+#~ msgid "welcome"
+#~ msgstr "witaj"
+
+#~ msgid "general"
+#~ msgstr "ogólne"
+
+#~ msgid "mailboxs"
+#~ msgstr "skrzynki"
+
+#~ msgid "You seem to be running Balsa for the first time.\n"
+#~ msgstr "Wygl±da na to, ¿e uruchomiono Balsê po raz pierwszy.\n"
+
+#~ msgid ""
+#~ "The following steps will setup Balsa by asking a few simple questions.  "
+#~ msgstr ""
+#~ "W kilku krokach Balsa zostanie skonfigurowna przez zadanie kilku pytañ.  "
+
+#~ msgid ""
+#~ "Once you have completed these steps, you can always change them at a later "
+#~ "time through Balsa's preferences.  "
+#~ msgstr ""
+#~ "Wszystkie ustawienia mo¿na zmieniæ pó¼niej u¿ywaj±c menu Preferencji Balsy."
+
+#~ msgid ""
+#~ "Please check the about box in Balsa's main window for more information on "
+#~ "contacting the authors or reporting bugs."
+#~ msgstr ""
+#~ "Aby uzyskaæ wiêcej informacji o autorach lub o zg³aszaniu b³êdów, nale¿y "
+#~ "wybraæ 'Informacje o...' z menu oknie g³ównym."
+
+#~ msgid "SMTP server:"
+#~ msgstr "Serwer SMTP:"
+
+#~ msgid "Inbox Path:"
+#~ msgstr "¦cie¿ka poczty przychodz±cej:"
+
+#~ msgid "Outbox Path:"
+#~ msgstr "¦cie¿ka poczty wychodz±cej:"
+
+#~ msgid "Sentbox Path:"
+#~ msgstr "¦cie¿ka poczty wys³anej:"
+
+#~ msgid "Draftbox Path:"
+#~ msgstr "¦cie¿ka poczty roboczej:"
+
+#~ msgid "Trash Path:"
+#~ msgstr "¦cie¿ka ¶mietnika:"
+
+#~ msgid ""
+#~ "If you wish to use IMAP for these\n"
+#~ "please change them inside Balsa\n"
+#~ msgstr ""
+#~ "Je¶li zamierzasz u¿ywaæ IMAP, zmieñ\n"
+#~ "odpowiednie ustawienia wewn±trz Balsy\n"
+
+#~ msgid ""
+#~ "Mailbox \"%s\" is not valid.\n"
+#~ "\n"
+#~ "Would you like to create it?"
+#~ msgstr ""
+#~ "Skrzynka \"%s\" nie istnieje.\n"
+#~ "\n"
+#~ "Czy chcesz j± utworzyæ?"
+
+#~ msgid "Unable to procede without a valid mailbox.  Please try again."
+#~ msgstr "Nie mo¿na kontynuowaæ bez poprawnej skrzynki. Spróbuj ponownie."
+
+#~ msgid "Finish"
+#~ msgstr "Zakoñcz"
+
+#~ msgid "Mailbox password:"
+#~ msgstr "Has³o dla skrzynki:"
+
+#~ msgid "Unable to Open Mailbox!"
+#~ msgstr "Nie mo¿na otworzyæ skrzynki!"
+
+#~ msgid "Transfer"
+#~ msgstr "Przenie¶"
+
+#~ msgid "Change Status"
+#~ msgstr "Zmieñ status"
+
+#~ msgid "Unread"
+#~ msgstr "Nie przeczytany"
+
+#~ msgid "Read"
+#~ msgstr "Przeczytany"
+
+#~ msgid "Replied"
+#~ msgstr "Opowiedziany"
+
+#~ msgid "Forwarded"
+#~ msgstr "Przes³any dalej"
+
+#~ msgid "Undelete"
+#~ msgstr "Odtwórz"
+
+#~ msgid "Mailboxes/Opened/"
+#~ msgstr "Skrzynki/Otwarte/"
+
+#~ msgid "Checked."
+#~ msgstr "Sprawdzona."

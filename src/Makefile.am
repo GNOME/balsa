@@ -4,45 +4,48 @@ bin_PROGRAMS = balsa
 
 balsa_SOURCES =	\
 	address-book.c		\
-	balsa-app.c		\
-	balsa-icons.c		\
-	balsa-index.c		\
-	balsa-init.c		\
-	balsa-mblist.c		\
-	balsa-message.c		\
-	filter-edit-callbacks.c	\
-	filter-edit-dialog.c	\
-	balsa-index-page.c	\
-	local-mailbox.c		\
-	mailbox-conf.c		\
-	main-window.c		\
-	main.c			\
-	message-window.c	\
-	pref-manager.c		\
-	print.c			\
-	save-restore.c		\
-	sendmsg-window.c	\
 	address-book.h		\
+	balsa-app.c		\
 	balsa-app.h		\
+	balsa-icons.c		\
 	balsa-icons.h		\
+	balsa-index.c		\
 	balsa-index.h		\
-	balsa-mblist.h		\
+	balsa-index-page.c	\
+	balsa-index-page.h	\
+	balsa-init.c		\
 	balsa-init.h		\
+	balsa-mblist.c		\
+	balsa-mblist.h		\
+	balsa-message.c		\
 	balsa-message.h		\
 	filter-edit.h		\
-	index-child.h		\
+	filter-edit-callbacks.c	\
+	filter-edit-dialog.c	\
+	local-mailbox.c		\
 	local-mailbox.h		\
+	mailbox-conf.c		\
 	mailbox-conf.h		\
+	main-window.c		\
 	main-window.h		\
+	main.c			\
 	main.h			\
-	message-window.h	\
-	pref-manager.h		\
-	print.h			\
-	save-restore.h		\
-	sendmsg-window.h	\
 	mblist-window.c		\
-	mblist-window.h
+	mblist-window.h		\
+	message-window.c	\
+	message-window.h	\
+	pref-manager.c		\
+	pref-manager.h		\
+	print.c			\
+	print.h			\
+	save-restore.c		\
+	save-restore.h		\
+	sendmsg-window.c	\
+	sendmsg-window.h	\
+	threads.h
 
+
+#	index-child.h		\
 
 INCLUDES=						\
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\"	\
@@ -76,15 +79,3 @@ balsa_DEPENDENCIES = \
 dist-hook:
 	mkdir $(distdir)/pixmaps
 	cp $(srcdir)/pixmaps/*.xpm $(distdir)/pixmaps
-
-
-
-
-
-
-
-
-
-
-
-

@@ -6,7 +6,9 @@ noinst_LIBRARIES = libinit_balsa.a
 libinit_balsa_a_SOURCES = 		\
 	$(BUILT_SOURCES)		\
 	helper.c			\
-	init_balsa.c
+	helper.h			\
+	init_balsa.c			\
+	init_balsa.h
 
 BUILT_SOURCES =				\
 	balsa-initdruid.c		\

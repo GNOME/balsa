@@ -1,3 +1,8 @@
+2004-07-04  Carlos Morgado  <chbm gnome.org>
+
+	* libbalsa/imap/imap-handle.c (imap_mbox_connect): 
+	plug slight memory leak in handle->sio
+
 2004-06-03  Pawel Salek
 
 	* configure.in, NEWS: release 2.1.90

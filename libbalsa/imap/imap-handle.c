@@ -382,11 +382,18 @@ imap_mbox_connect(ImapMboxHandle* handle)
   ImapResponse resp;
   const char *service = "imap";
 
+  /* reset some handle status */
   handle->has_capabilities = FALSE;
+  if(handle->sio) {
+    sio_detach(handle->sio);
+    handle->sio = NULL;
+  }
+
 #ifdef USE_TLS
   handle->using_tls = 0;
   if(handle->over_ssl) service = "imaps";
 #endif
+
   handle->sd = imap_socket_open(handle->host, service);
   if(handle->sd<0) return IMAP_CONNECT_FAILED;
   

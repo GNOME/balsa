@@ -52,7 +52,12 @@ extern "C"
            GdkFont   *font;
            LibBalsaMessage *orig_message;
            SendType type;
-           const gchar * charset;
+           /* language selection related data */
+           const gchar* charset;
+           const gchar* locale;
+           GtkWidget* current_language_menu;
+
+           /* widgets to be disabled when the address is incorrect */
            GtkWidget * ready_widgets[2];
            GtkWidget * view_checkitems[VIEW_MENU_LENGTH];
            GList* spell_check_disable_list;

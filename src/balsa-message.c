@@ -40,7 +40,9 @@
 #endif
 
 #include "quote-color.h"
-#define BGLINKCOLOR "LightSteelBlue1"
+
+#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
+
 
 struct _BalsaPartInfo
   {
@@ -390,7 +392,7 @@ balsa_message_set (BalsaMessage * bm,
   gnome_icon_list_select_icon(GNOME_ICON_LIST(bm->part_list), 0);
   
   select_part(bm, 0);
-  if ( had_focus && bm->current_part && bm->current_part->focus_widget )
+  /* if ( had_focus && bm->current_part && bm->current_part->focus_widget ) */
     gtk_widget_grab_focus(bm->current_part->focus_widget);
 
   /* We show the part list if:
@@ -744,24 +746,46 @@ two_const_fields_to_end(const gchar* ptr) {
    return cnt<3;
 }
 
-/* get_font_name returns iso8859 font name based on given font 
+/* get_font_name returns font name based on given font 
    wildcard 'base' and given character set encoding.
    Algorithm: copy max first 12 fields, cutting additionally 
    at most two last, if they are constant.
 */
+static struct {
+  gchar *charset, *font_postfix;
+} charset2font[] = {
+  {"iso-8859-1", "iso8859-1"},
+  {"iso-8859-2", "iso8859-2"},
+  {"iso-8859-4", "iso8859-4"},
+  {"iso-8859-7", "iso8859-7"},
+  {"iso-8859-13", "iso8859-13"},
+  {"euc-jp",     "jisx0208.1983-0"},
+  {"euc-kr",     "jisx0208.1983-0"},
+  {"koi-8-r",    "koi8-r"},
+  {"koi-8-u",    "koi8-u"},
+  {"us-ascii",   "iso8859-1"}
+};
+
 gchar* 
-get_font_name(const gchar* base, int code) {
-   static gchar type[] ="iso8859";
+get_font_name(const gchar* base, const gchar *charset) {
    gchar *res;
-   const gchar* ptr = base;
-   int dash_cnt = 0, len;
+   const gchar* ptr = base, *postfix = NULL;
+   int dash_cnt = 0, len, i;
 
    g_return_val_if_fail(base != NULL, NULL);
-   g_return_val_if_fail(code >= 0,    NULL);
+   g_return_val_if_fail(charset >= 0, NULL);
 
-   while(*ptr && dash_cnt<13) {
+   for(i=ELEMENTS(charset2font)-1; i>=0; i--)
+     if(g_strcasecmp(charset, charset2font[i].charset)==0) {
+       postfix = charset2font[i].font_postfix;
+       break;
+     }
+   if(!postfix) return g_strdup(base); /* print warning here? */
+
+   /* assemble the XLFD */
+   while(*ptr) {
       if(*ptr == '-') dash_cnt++;
-      
+      if(dash_cnt>=13) break;
       if(two_const_fields_to_end(ptr)) break;
       ptr++;
    }
@@ -772,16 +796,17 @@ get_font_name(const gchar* base, int code) {
    len = ptr-base;
    /* if(dash_cnt>12) len--; */
    if(len<1) len = 1;
-   res = (gchar*)g_malloc(len+sizeof(type)+3+(code>9?2:1));
+   res = (gchar*)g_malloc(len+strlen(postfix)+2);
    if(balsa_app.debug)
-      fprintf(stderr,"base font name: %s and code: %d\n"
-	      "mallocating %d bytes\n", base, code,
-	      len+sizeof(type)+2+(code>9?2:1) );
+      fprintf(stderr,"* base font name: %s\n*    and postfix: %s\n"
+	      "*    mallocating: %d bytes\n", base, postfix,
+	      len+strlen(postfix)+2);
 
    if(len>1) strncpy(res, base, len);
    else { strncpy(res, "*", 1); len = 1; } 
 
-   sprintf(res+len,"-%s-%d", type, code);
+   res[len] = '-';
+   strcpy(res+len+1, postfix);
    return res;
 }   
 
@@ -831,13 +856,7 @@ find_body_font(LibBalsaMessageBody * body)
   charset = libbalsa_message_body_get_parameter(body, "charset");
   
   if ( charset )
-  {
-    if ( g_strncasecmp(charset,"iso-8859-",9) != 0 )
-      font_name = NULL;
-    else
-      font_name = get_font_name(balsa_app.message_font, atoi(charset+9));
-  } 
-
+      font_name = get_font_name(balsa_app.message_font, charset);
   g_free(charset);
 
   return font_name;
@@ -1053,11 +1072,8 @@ static void part_info_init_html(BalsaMessage *bm, BalsaPartInfo *info, gchar *pt
   html = gtk_html_new();
 
   stream = gtk_html_begin ( GTK_HTML(html) );
-  
   gtk_html_write ( GTK_HTML(html), stream, ptr, len );
-
   gtk_html_end ( GTK_HTML(html), stream, GTK_HTML_STREAM_OK );
-
   gtk_html_set_editable ( GTK_HTML(html), FALSE );
   
   gtk_signal_connect(GTK_OBJECT(html), "size_request",
@@ -1125,9 +1141,8 @@ part_info_init (BalsaMessage *bm, BalsaPartInfo *info)
     part_info_init_audio (bm, info);
     break;
   case LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION:
-    if (balsa_app.debug){
+    if (balsa_app.debug)
       fprintf (stderr, "part: application\n");
-    }
     part_info_init_application(bm, info);
     break;
   case LIBBALSA_MESSAGE_BODY_TYPE_IMAGE:

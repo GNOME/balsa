@@ -641,12 +641,13 @@ set_prefs (void)
 
 	if ( balsa_app.address->address_list ) {
 	  gtk_entry_set_text (GTK_ENTRY (pui->email), balsa_app.address->address_list->data);
-	} else {
+	} else
 	  gtk_entry_set_text (GTK_ENTRY (pui->email), "");
-	}
 
-	gtk_entry_set_text (GTK_ENTRY (pui->replyto), balsa_app.replyto);
-	gtk_entry_set_text (GTK_ENTRY (pui->domain), balsa_app.domain);
+	if(balsa_app.replyto) gtk_entry_set_text (GTK_ENTRY (pui->replyto), 
+						  balsa_app.replyto);
+	if(balsa_app.domain)  gtk_entry_set_text (GTK_ENTRY (pui->domain), 
+						  balsa_app.domain);
 
 	gtk_entry_set_text (GTK_ENTRY (pui->signature), balsa_app.signature_path);
 

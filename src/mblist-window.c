@@ -67,7 +67,10 @@ static GtkTargetEntry dnd_mb_target[] =
 void mblist_open_mailbox (LibBalsaMailbox * mailbox);
 void mblist_close_mailbox (LibBalsaMailbox * mailbox);
 static void mailbox_select_cb (BalsaMBList *, LibBalsaMailbox *, GtkCTreeNode *, GdkEventButton *);
-static gboolean mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+static gboolean mblist_button_press_cb (GtkWidget *widget, 
+					GdkEventButton *event, gpointer data);
+static gboolean mblist_key_press_cb (GtkWidget *widget, 
+				     GdkEventKey *event, gpointer data);
 /*PKGW*/
 static void size_allocate_cb( GtkWidget *widget, GtkAllocation *alloc );
 
@@ -113,7 +116,9 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "select_mailbox",
     GTK_SIGNAL_FUNC (mailbox_select_cb), NULL);
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "button_press_event",
-  GTK_SIGNAL_FUNC (mblist_button_press_cb), NULL);
+		      GTK_SIGNAL_FUNC (mblist_button_press_cb), NULL);
+  gtk_signal_connect (GTK_OBJECT (mblw->ctree), "key_press_event",
+		      GTK_SIGNAL_FUNC (mblist_key_press_cb), NULL);
   /* PKGW: We want to catch size changes for balsa_app.mblist_width */
   gtk_signal_connect( GTK_OBJECT( mblw->ctree ), "size_allocate",
 		      GTK_SIGNAL_FUNC( size_allocate_cb ), NULL );
@@ -273,6 +278,31 @@ mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_
 
   return FALSE; /* never reached but this avoid compiler warning */
 }
+
+
+static gboolean 
+mblist_key_press_cb (GtkWidget *widget, GdkEventKey *event, gpointer data)
+{
+  GtkCTreeNode *node;
+  MailboxNode *mbnode;
+  LibBalsaMailbox *mailbox;
+
+  if(event->keyval == GDK_Return) {
+    node = gtk_ctree_node_nth(GTK_CTREE(widget), GTK_CLIST(widget)->focus_row);
+    printf("row: %i\n", GTK_CLIST(widget)->focus_row);
+    g_return_val_if_fail(node, FALSE);
+    mbnode = gtk_ctree_node_get_row_data(GTK_CTREE(widget), node);
+    if (mbnode->IsDir)
+      return FALSE;
+    
+    mailbox = mbnode->mailbox;
+    g_return_val_if_fail (LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    mblist_open_mailbox (mailbox);  
+    gtk_ctree_select(GTK_CTREE(widget), node);
+    return TRUE;
+  }
+  return FALSE;
+}  
 
 /*PKGW*/
 static void size_allocate_cb( GtkWidget *widget, GtkAllocation *alloc )

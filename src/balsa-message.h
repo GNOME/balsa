@@ -86,13 +86,10 @@ extern "C"
 					   ShownHeaders sh);
   void balsa_message_set_wrap(BalsaMessage *bmessage, gboolean wrap);
 
-  /* a helper functions; FIXME: find more proper location for them.  */
-  gchar* get_font_name(const gchar* base, int code);
-
   void reflow_string(gchar* str, gint mode, gint *cur_pos, int width);
 
    /* a helper functions; FIXME: find more proper location for them.  */
-   gchar* get_font_name(const gchar* base, int code);
+   gchar* get_font_name(const gchar* base, const gchar *charset);
    gchar* get_koi_font_name(const gchar* base, const gchar* code);
 
 #ifdef __cplusplus

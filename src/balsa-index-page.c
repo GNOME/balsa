@@ -125,12 +125,11 @@ GtkObject *balsa_index_page_new(BalsaWindow *window)
   BalsaIndexPage *bip;
 
   bip = gtk_type_new(BALSA_TYPE_INDEX_PAGE);
-
   balsa_index_page_window_init( bip );
-
   bip->window = GTK_WIDGET( window );
 
   g_get_current_time(&bip->last_use);
+  GTK_OBJECT_UNSET_FLAGS(bip->index, GTK_CAN_FOCUS);
 
   return GTK_OBJECT(bip);
 }

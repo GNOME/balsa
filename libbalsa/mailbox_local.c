@@ -107,12 +107,13 @@ libbalsa_mailbox_local_new(const gchar *path, gboolean create)
 {
 	LibBalsaMailbox *mailbox;
 	LibBalsaMailboxType type;
-	struct stat st;
-	int fd;
+	int fd, magic_type;
 
 	libbalsa_lock_mutt();
+	magic_type = mx_get_magic(path);
+	libbalsa_unlock_mutt();
 
-	switch ( mx_get_magic(path) ) {
+	switch (magic_type) {
 	case M_MBOX:
 	case M_MMDF:
 		type = LIBBALSA_MAILBOX_LOCAL_MBOX;
@@ -126,26 +127,14 @@ libbalsa_mailbox_local_new(const gchar *path, gboolean create)
 	case M_IMAP:
 		g_warning ("Got IMAP as type for local mailbox\n");
 		return NULL;
-	default:
-		type =  LIBBALSA_MAILBOX_LOCAL_MBOX;
-	}
-
-	libbalsa_unlock_mutt();
-
-	if ( type == LIBBALSA_MAILBOX_LOCAL_MBOX && 
-	     (fd=stat(path, &st)) == -1 /* && errno == -ENOENT */ ) {
-		if (!create)
-			return NULL;
-		
-		fd = creat( path, S_IRUSR | S_IWUSR );
-		if( fd == -1 ) {
-			g_warning ("An error:\n%s\n occured while trying to create the mailbox"
-				   "\"%s\"\n",
+	default: /* mailbox non-existent or unreadable */
+		if(!create) return NULL;
+		if( (fd = creat( path, S_IRUSR | S_IWUSR )) == -1) {
+			g_warning ("An error:\n%s\n occured while trying to "
+				   "create the mailbox \"%s\"\n",
 				   strerror(errno), path);
 			return NULL;
-		} else {
-			close(fd);
-		}
+		} else	close(fd);
 	}
 
 	mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_LOCAL);
@@ -154,13 +143,11 @@ libbalsa_mailbox_local_new(const gchar *path, gboolean create)
 		mailbox->is_directory = TRUE;
 
 	LIBBALSA_MAILBOX_LOCAL(mailbox)->type = type;
-
 	LIBBALSA_MAILBOX_LOCAL(mailbox)->path = g_strdup(path);
 
 	libbalsa_notify_register_mailbox(mailbox);
 
 	return GTK_OBJECT(mailbox);
-
 }
 
 static void

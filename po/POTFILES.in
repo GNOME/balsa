@@ -39,7 +39,7 @@ src/main-window.c
 src/main.c
 src/mblist-window.c
 src/message-window.c
-src/orbit-glue.c
+# src/orbit-glue.c : disabled because it is excluded from the dist file
 src/pref-manager.c
 src/print.c
 src/sendmsg-window.c

@@ -164,8 +164,10 @@ libbalsa_address_new_from_libmutt (ADDRESS * caddr)
 	address = libbalsa_address_new ();
 
 	address->full_name = g_strdup (caddr->personal);
-	address->address_list = g_list_append(address->address_list, g_strdup(caddr->mailbox));
-
+	if(caddr->mailbox)
+		address->address_list = g_list_append(address->address_list, 
+						      g_strdup(caddr->mailbox));
+	
 	return address;
 }
 

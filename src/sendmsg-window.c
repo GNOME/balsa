@@ -22,7 +22,6 @@
 
 #include "libbalsa.h"
 
-#include <langinfo.h>
 #include <stdio.h>
 #include <string.h>
 #include <gnome.h>
@@ -62,7 +61,7 @@ static gint check_if_regular_file (const gchar *);
 static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 
 static void check_readiness(GtkEditable *w, BalsaSendmsg *bsmsg);
-static void set_menus(BalsaSendmsg*);
+static void init_menus(BalsaSendmsg*);
 static gint toggle_from_cb (GtkWidget *, BalsaSendmsg *);
 static gint toggle_to_cb (GtkWidget *, BalsaSendmsg *);
 static gint toggle_subject_cb (GtkWidget *, BalsaSendmsg *);
@@ -78,19 +77,7 @@ static void spell_check_cb (GtkWidget* widget, BalsaSendmsg*);
 static void spell_check_done_cb (BalsaSpellCheck* spell_check, BalsaSendmsg*);
 static void spell_check_set_sensitive (BalsaSendmsg* msg, gboolean state);
 
-static gint set_iso_charset(BalsaSendmsg*, gint , gint );
-static gint iso_1_cb(GtkWidget* , BalsaSendmsg *);
-static gint iso_2_cb(GtkWidget* , BalsaSendmsg *);
-static gint iso_3_cb(GtkWidget* , BalsaSendmsg *);
-static gint iso_5_cb(GtkWidget* , BalsaSendmsg *);
-static gint iso_8_cb(GtkWidget* , BalsaSendmsg *);
-static gint iso_9_cb(GtkWidget* , BalsaSendmsg *);
-static gint iso_13_cb(GtkWidget* , BalsaSendmsg *);
-static gint iso_14_cb(GtkWidget* , BalsaSendmsg *);
-static gint iso_15_cb(GtkWidget* , BalsaSendmsg *);
-static gint koi8_r_cb(GtkWidget* , BalsaSendmsg *);
-static gint koi8_u_cb(GtkWidget* , BalsaSendmsg *);
-
+static gint set_locale(GtkWidget*, BalsaSendmsg*, gint );
 
 /* Standard DnD types */
 enum
@@ -168,7 +155,7 @@ static GnomeUIInfo file_menu[] =
 			 postpone_message_cb, GNOME_STOCK_MENU_SAVE),
 
 #define MENU_FILE_PRINT_POS 5
-  GNOMEUIINFO_ITEM_STOCK(N_ ("Print"), N_ ("Print the edited message"), 
+  GNOMEUIINFO_ITEM_STOCK(N_ ("Print..."), N_ ("Print the edited message"), 
 			  print_message_cb, GNOME_STOCK_PIXMAP_PRINT),
   GNOMEUIINFO_SEPARATOR,
 
@@ -240,69 +227,89 @@ static GnomeUIInfo view_menu[] =
 #error Inconsistency in defined lengths.
 #endif
 
-/* ISO-8859-1 MUST BE at the first position - see set_menus */
-static GnomeUIInfo iso_charset_menu[] = {
-#define ISO_CHARSET_1_POS 0
-  GNOMEUIINFO_ITEM_NONE( N_ ("_Western (ISO-8859-1)"), NULL, iso_1_cb),
-#define ISO_CHARSET_15_POS 1
-  GNOMEUIINFO_ITEM_NONE( N_ ("W_estern (ISO-8859-15)"), NULL, iso_15_cb),
-#define ISO_CHARSET_2_POS 2
-  GNOMEUIINFO_ITEM_NONE( N_ ("_Central European (ISO-8859-2)"), NULL,iso_2_cb),
-#define ISO_CHARSET_3_POS 3
-  GNOMEUIINFO_ITEM_NONE( N_ ("_South European (ISO-8859-3)"), NULL, iso_3_cb),
-#define ISO_CHARSET_13_POS 4
-  GNOMEUIINFO_ITEM_NONE( N_ ("_Baltic (ISO-8859-13)"), NULL, iso_13_cb),
-#define ISO_CHARSET_5_POS 5
-  GNOMEUIINFO_ITEM_NONE( N_ ("Cy_rillic (ISO-8859-5)"), NULL, iso_5_cb),
-#define ISO_CHARSET_8_POS 6
-  GNOMEUIINFO_ITEM_NONE( N_ ("_Hebrew (ISO-8859-8)"), NULL, iso_8_cb),
-#define ISO_CHARSET_9_POS 7
-  GNOMEUIINFO_ITEM_NONE( N_ ("_Turkish (ISO-8859-9)"), NULL, iso_9_cb),
-#define ISO_CHARSET_14_POS 8
-  GNOMEUIINFO_ITEM_NONE( N_ ("Ce_ltic (ISO-8859-14)"), NULL, iso_14_cb),
-#define KOI8_R_POS 9
-  GNOMEUIINFO_ITEM_NONE( N_ ("Ru_ssian (KOI8-R)"), NULL, koi8_r_cb),
-#define KOI8_U_POS 10
-  GNOMEUIINFO_ITEM_NONE( N_ ("_Ukrainian (KOI8-U)"), NULL, koi8_u_cb),
+static void lang_brazilian_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_catalan_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_danish_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_german_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_dutch_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_english_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_estonian_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_finnish_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_french_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_greek_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_hungarian_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_italian_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_japanese_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_korean_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_baltic_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_norwegian_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_polish_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_portugese_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_russian_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_slovak_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_spanish_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_swedish_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_turkish_cb(GtkWidget*, BalsaSendmsg*);
+static void lang_ukrainian_cb(GtkWidget*, BalsaSendmsg*);
+
+static GnomeUIInfo locale_ah_menu[] = {
+  GNOMEUIINFO_ITEM_NONE( N_("Baltic"),     NULL, lang_baltic_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Brazilian"),  NULL, lang_brazilian_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Catalan"),    NULL, lang_catalan_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Danish"),     NULL, lang_danish_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Dutch"),      NULL, lang_dutch_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("English"),    NULL, lang_english_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Estonian"),   NULL, lang_estonian_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Finnish"),    NULL, lang_finnish_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("French"),     NULL, lang_french_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("German"),     NULL, lang_german_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Greek"),      NULL, lang_greek_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Hungarian"),  NULL, lang_hungarian_cb),
   GNOMEUIINFO_END
 };
 
-/* the same sequence as in iso_charset_menu; the array stores charset name
-   included in the MIME type information.
- */
-static gchar* iso_charset_names[] = {
-   "ISO-8859-1",
-   "ISO-8859-15",
-   "ISO-8859-2",
-   "ISO-8859-3",
-   "ISO-8859-13",
-   "ISO-8859-5",
-   "ISO-8859-8",
-   "ISO-8859-9",
-   "ISO-8859-14",
-   "KOI8-R"
+static GnomeUIInfo locale_iz_menu[] = {
+  GNOMEUIINFO_ITEM_NONE( N_("Italian"),    NULL, lang_italian_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Japanese"),   NULL, lang_japanese_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Korean"),     NULL, lang_korean_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Norwegian"),  NULL, lang_norwegian_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Polish"),     NULL, lang_polish_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Portugese"),  NULL, lang_portugese_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Russian"),    NULL, lang_russian_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Slovak"),     NULL, lang_slovak_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Spanish"),    NULL, lang_spanish_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Swedish"),    NULL, lang_swedish_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Turkish"),    NULL, lang_turkish_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Ukrainian"),  NULL, lang_ukrainian_cb),
+  GNOMEUIINFO_END
 };
+
+/* two sections plus one place-holder for the current language.
+*/
+static GnomeUIInfo lang_menu[] = {
+  GNOMEUIINFO_SUBTREE(N_("_A-H"), locale_ah_menu),
+  GNOMEUIINFO_SUBTREE(N_("_I-Z"), locale_iz_menu),
+  GNOMEUIINFO_SEPARATOR,
+#define LANG_CURRENT_POS 3
+  GNOMEUIINFO_ITEM_NONE(NULL, NULL, NULL),
+  GNOMEUIINFO_END
+};
+  
+
+#define CASE_INSENSITIVE_NAME
+#define PRESERVE_CASE TRUE
+#define OVERWRITE_CASE FALSE
 
 typedef struct {
       gchar * name;
       guint length; 
 } headerMenuDesc;
 
-
-#define CASE_INSENSITIVE_NAME
-#define PRESERVE_CASE TRUE
-#define OVERWRITE_CASE FALSE
-
-
 headerMenuDesc headerDescs[] = { {"from", 3}, {"to", 3}, {"subject",2},
 				 {"cc", 3}, {"bcc",  3}, {"fcc",    2},
 				 {"replyto", 3}, {"attachments", 4},
 				 {"comments", 2}, {"keywords",2}};
 
-static GnomeUIInfo iso_menu[] = {
-   GNOMEUIINFO_RADIOLIST(iso_charset_menu),
-   GNOMEUIINFO_END
-};
 
 #define MAIN_MENUS_COUNT 4
 static GnomeUIInfo main_menu[] =
@@ -314,14 +321,69 @@ static GnomeUIInfo main_menu[] =
 #define MAIN_VIEW_MENU 2
   GNOMEUIINFO_SUBTREE(N_("_Show"), view_menu),
 #define MAIN_CHARSET_MENU 3
-  GNOMEUIINFO_SUBTREE(N_("_ISO Charset"), iso_menu),
+  GNOMEUIINFO_SUBTREE(N_("_Language"), lang_menu),
   GNOMEUIINFO_END
 };
 
+/* the array of locale names and charset names included in the MIME
+   type information.  
+*/
+struct {
+  gchar *locale, *charset, *lang_name;
+  GtkSignalFunc callback;
+} locales[] = {
+#define LOC_BRAZILIAN_POS 0
+  {"pt_BR", "ISO-8859-1",  N_("Brazilian")},
+#define LOC_CATALAN_POS   1
+  {"ca_ES", "ISO-8859-1",  N_("Catalan")},
+#define LOC_DANISH_POS    2
+  {"da_DK", "ISO-8859-1",  N_("Danish")},
+#define LOC_GERMAN_POS    3
+  {"de_DE", "ISO-8859-1",  N_("German")},
+#define LOC_DUTCH_POS     4
+  {"nl_NL", "ISO-8859-1",  N_("Dutch")},
+#define LOC_ENGLISH_POS   5
+  {"en_GB", "ISO-8859-1",  N_("English")},
+#define LOC_ESTONIAN_POS  6
+  {"et_EE", "ISO-8859-1",  N_("Estonian")},
+#define LOC_FINNISH_POS   7
+  {"fi_FI", "ISO-8859-1",  N_("Finnish")},
+#define LOC_FRENCH_POS    8
+  {"fr_FR", "ISO-8859-1",  N_("French")},
+#define LOC_GREEK_POS     9
+  {"el_GR", "ISO-8859-7",  N_("Greek")},
+#define LOC_HUNGARIAN_POS 10
+  {"hu_HU", "ISO-8859-2",  N_("Hungarian")},
+#define LOC_ITALIAN_POS   11
+  {"it_IT", "ISO-8859-1",  N_("Italian")},
+#define LOC_JAPANESE_POS  12
+  {"ja_JP", "euc-jp",      N_("Japanese")},
+#define LOC_KOREAN_POS    13
+  {"ko_OK", "euc-kr",      N_("Korean")},
+#define LOC_BALTIC_POS    14
+  {"lt_LT", "ISO-8859-13", N_("Baltic")},
+#define LOC_NORWEGIAN_POS 15
+  {"no_NO", "ISO-8859-1", N_("Norwegian")},
+#define LOC_POLISH_POS    16
+  {"pl_PL", "ISO-8859-2", N_("Polish")},
+#define LOC_PORTUGESE_POS 17
+  {"pt_PT", "ISO-8859-1", N_("Portugese")},
+#define LOC_RUSSIAN_POS   18
+  {"ru_RU", "ISO-8859-5", N_("Russian")},
+#define LOC_SLOVAK_POS    19
+  {"sl_SI", "ISO-8859-2", N_("Slovak")},
+#define LOC_SPANISH_POS   20
+  {"es_ES", "ISO-8859-1", N_("Spanish")},
+#define LOC_SWEDISH_POS   21
+  {"sv_SE", "ISO-8859-1", N_("Swedish")},
+#define LOC_TURKISH_POS   22
+  {"tr_TR", "ISO-8859-9", N_("Turkish")},
+#define LOC_UKRAINIAN_POS 23
+  {"uk_UK", "KOI-8-U",    N_("Ukrainian")}
+};
 
 static gint mail_headers_page;
 static gint spell_check_page;
-
 
 
 /* the callback handlers */
@@ -366,16 +428,16 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
    
    balsa_app.compose_headers = g_strdup(newStr);
 
-   gtk_widget_destroy (bsm->window);
-   if(balsa_app.debug) printf("balsa_sendmsg_destroy: Freeing bsm\n");
-   g_free (bsm);
-
    if(bsm->orig_message) {
        if(bsm->orig_message->mailbox) 
 	 libbalsa_mailbox_close(bsm->orig_message->mailbox);
        gtk_object_unref( GTK_OBJECT(bsm->orig_message) );
    }
 
+   if(balsa_app.debug) printf("balsa_sendmsg_destroy: Freeing bsm\n");
+   gtk_widget_destroy (bsm->window);
+   g_list_free(bsm->spell_check_disable_list);
+   g_free(bsm);
    
 #ifdef BALSA_USE_THREADS
    if(balsa_app.compose_email && !sending_mail)
@@ -384,6 +446,28 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
    if(balsa_app.compose_email)
      balsa_exit(); 
 #endif
+}
+
+/* language menu helper functions */
+static gint find_locale_index_by_locale(const gchar* locale)
+{
+  int len, i;
+
+  len = strlen(locale);
+  i = ELEMENTS(locales)-1;
+  while( i>=0 && g_strncasecmp (locales[i].locale, locale, len) !=0)
+    i--;
+  return i>=0 ? i : LOC_ENGLISH_POS;
+}
+
+/* fill_language_menu:
+   fills in the system language.
+*/
+static void fill_language_menu()
+{
+  int idxsys;
+  idxsys = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
+  lang_menu[LANG_CURRENT_POS].label    = locales[idxsys].lang_name;
 }
 
 /* remove_attachment - right mouse button callback */
@@ -1008,6 +1092,7 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
   msg = g_malloc (sizeof (BalsaSendmsg));
   msg->font = NULL;
   msg->charset = NULL;
+  msg->locale  = NULL;
 
 
   alias_load_addressbook();
@@ -1050,11 +1135,13 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
   gtk_signal_connect (GTK_OBJECT (msg->window), "destroy_event",
   		      GTK_SIGNAL_FUNC (delete_event_cb), msg);
 
+  fill_language_menu();
   gnome_app_create_menus_with_data (GNOME_APP (window), main_menu, msg);
   gnome_app_create_toolbar_with_data (GNOME_APP (window), main_toolbar, msg);
 
   msg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS].widget;
   msg->ready_widgets[1] = main_toolbar[TOOL_SEND_POS].widget;
+  msg->current_language_menu = lang_menu[LANG_CURRENT_POS].widget;
 
   /* create spell checking disable widget list */
   list = NULL;
@@ -1237,7 +1324,7 @@ sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type
   /* FIXME: this will also reset the font, copying the text back and 
      forth which is sub-optimal.
   */
-  set_menus (msg); 
+  init_menus (msg); 
   gtk_notebook_set_page (GTK_NOTEBOOK (msg->notebook), mail_headers_page);
   gtk_window_set_default_size ( 
      GTK_WINDOW(window), 
@@ -1732,17 +1819,16 @@ static gint toggle_comments_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
 static gint toggle_keywords_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
 {return toggle_entry(bsmsg, bsmsg->keywords, MENU_TOGGLE_KEYWORDS_POS,2); }
 
-/* set_menus:
+/* init_menus:
    performs the initial menu setup: shown headers as well as correct
    message charset. Copies also the the menu pointers for further usage
    at the message close  - they would be overwritten if another compose
    window was opened simultaneously.
 */
 static void
-set_menus(BalsaSendmsg *msg)
+init_menus(BalsaSendmsg *msg)
 {
-   unsigned i;
-   const gchar * charset = NULL;
+   int i;
 
    g_assert(ELEMENTS(headerDescs) == ELEMENTS(msg->view_checkitems));
 
@@ -1757,121 +1843,85 @@ set_menus(BalsaSendmsg *msg)
 	 GTK_SIGNAL_FUNC(view_menu[i].moreinfo)(view_menu[i].widget, msg);
       }
    }
-   /* set the charset:
-      read from the preferences set up. If not found, 
-      set to the 0th set.
-   */
-   charset = msg->charset ? msg->charset : balsa_app.charset;
-   i = sizeof(iso_charset_names)/sizeof(iso_charset_names[0])-1;
-   while( i>0 && g_strcasecmp (iso_charset_names[i], charset) !=0)
-      i--;
 
-   if(balsa_app.debug)
-      printf("set_menus: Charset: %s idx %d\n", charset, i);
-    
-   if(i==0) 
-      set_iso_charset(msg, 1, 0);
-   else
-      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
-	 iso_charset_menu[i].widget), TRUE);
+   /* set the charset... */
+   if(msg->charset) { /* find by charset */
+     i = ELEMENTS(locales)-1;
+     while( i>=0 && g_strcasecmp (locales[i].charset, msg->charset) !=0)
+       i--;
+     if(i<0) i = LOC_ENGLISH_POS;
+   } else 
+     i = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
+
+   printf("locale pos: %i\n", i);
+   set_locale(NULL, msg, i);
 
    /* gray 'send' and 'postpone' */
    check_readiness(GTK_EDITABLE(msg->to[1]), msg);
 }
 
-/* hardcoded charset set :
-   msg is the compose window, code is the iso-8859 character and
-   idx - corresponding entry index in iso_charset_names and similar.
+/* set_locale:
+   w - menu widget that has been changed. if the even is generated during 
+   menu initialization, w is NULL.
+   msg is the compose window,
+   idx - corresponding entry index in locale_names.
 */
 
-
 static gint 
-set_iso_charset(BalsaSendmsg *msg, gint code, gint idx) {
-   guint point, txt_len;
-   gchar* str, *font_name;
-   
-   if( ! GTK_CHECK_MENU_ITEM(iso_charset_menu[idx].widget)->active)
-      return TRUE;
+set_locale(GtkWidget* w, BalsaSendmsg *msg, gint idx) {
+   gchar *font_name, *old_locale;
 
-   msg->charset = iso_charset_names[idx];
+   msg->charset = locales[idx].charset;
+   msg->locale  = locales[idx].locale;
 
-   font_name = get_font_name(balsa_app.message_font, code);
-   if(msg->font) gdk_font_unref(msg->font);
+   font_name = get_font_name(balsa_app.message_font, msg->charset);
 
-   if( !( msg->font = gdk_font_load (font_name)) ) {
-      printf("Cannot find font: %s\n", font_name);
-      g_free(font_name);
-      return TRUE;
-   }
-   if(balsa_app.debug) 
-      fprintf(stderr,"loaded font with mask: %s\n", font_name);
-   g_free(font_name);
-   
+   printf("Set locale %s\nwith font: %s.\n", msg->locale, font_name);
+   old_locale = setlocale(LC_CTYPE, msg->locale);
+   if(!old_locale) {
+     printf("Setlocale %s failed.\n", msg->locale); 
+     gtk_widget_set_sensitive(w, FALSE);
+   }  else {
+     if(msg->font) gdk_font_unref(msg->font); 
+     msg->font = gdk_fontset_load (font_name);
+     setlocale(LC_CTYPE, old_locale);
+     if(!msg->font) {
+       printf("Cannot find font: %s for locale %s\n", font_name, msg->locale);
+     } else {
+       
+       /* Set the new message style */
+#if 1
+       { GtkStyle *style;
+       style = gtk_style_copy (gtk_widget_get_style (GTK_WIDGET (msg->text)));
+       //gdk_font_unref(style->font);
+       style->font = msg->font;
+       gtk_widget_set_style(GTK_WIDGET (msg->text), style);
+       gtk_style_unref(style);
+       }
+#else
+       { gchar *str; gint tst_len, point;
+       gtk_text_freeze( GTK_TEXT(msg->text) );
+       point   = gtk_editable_get_position( GTK_EDITABLE(msg->text) ); 
+       txt_len = gtk_text_get_length( GTK_TEXT(msg->text) );
+       str     = gtk_editable_get_chars( GTK_EDITABLE(msg->text), 0, txt_len);
+       
+       if(str) {
+	 gtk_text_set_point( GTK_TEXT(msg->text), 0);
+	 gtk_text_forward_delete ( GTK_TEXT(msg->text), txt_len); 
+	 gtk_text_insert(GTK_TEXT(msg->text), msg->font, NULL, NULL, 
+			 str, txt_len);
+	 g_free(str);
+       }
+       gtk_text_thaw( GTK_TEXT(msg->text) );
+       }
+#endif
+       gtk_label_set(GTK_LABEL(GTK_BIN(msg->current_language_menu)->child), 
+		     _(locales[idx].lang_name));
+     } /* endif: font found */
+     g_free(font_name);
+   }   /* endif: locale set */
 
-   gtk_text_freeze( GTK_TEXT(msg->text) );
-   point   = gtk_editable_get_position( GTK_EDITABLE(msg->text) ); 
-   txt_len = gtk_text_get_length( GTK_TEXT(msg->text) );
-   str     = gtk_editable_get_chars( GTK_EDITABLE(msg->text), 0, txt_len);
-   
-   gtk_text_set_point( GTK_TEXT(msg->text), 0);
-   gtk_text_forward_delete ( GTK_TEXT(msg->text), txt_len); 
-   
-   gtk_text_insert(GTK_TEXT(msg->text), msg->font, NULL, NULL, str, txt_len);
-   g_free(str);
-   gtk_text_thaw( GTK_TEXT(msg->text) );
-
-   gtk_editable_set_position( GTK_EDITABLE(msg->text), point);
-   return FALSE;
-}
-
-static gint 
-set_koi8_charset(BalsaSendmsg *msg, const gchar *code, gint idx) {
-   guint point, txt_len;
-   gchar* str, *koi_font_name, *iso_font_name, *font_name;
-   
-   if( ! GTK_CHECK_MENU_ITEM(iso_charset_menu[idx].widget)->active)
-      return TRUE;
-
-   msg->charset = iso_charset_names[idx];
-
-   koi_font_name = get_koi_font_name(balsa_app.message_font, code);
-   iso_font_name = get_font_name(balsa_app.message_font,1);
-   
-   font_name = (gchar*)g_malloc(strlen(koi_font_name)+strlen(iso_font_name)+2);
-   sprintf(font_name,"%s,%s",koi_font_name,iso_font_name);
-   g_free(koi_font_name);
-   g_free(iso_font_name);
-      
-   if(msg->font)
-     gdk_font_unref(msg->font);
-
-   if( !( msg->font = gdk_fontset_load (font_name)) ) {
-      printf("Cannot find font: %s\n", font_name);
-      g_free(font_name);
-      return TRUE;
-   }
-
-   if(balsa_app.debug) 
-      fprintf(stderr,"Loaded font with mask: %s\n", font_name);
-
-   g_free(font_name);
-   
-
-   gtk_text_freeze( GTK_TEXT(msg->text) );
-   point   = gtk_editable_get_position( GTK_EDITABLE(msg->text) ); 
-   txt_len = gtk_text_get_length( GTK_TEXT(msg->text) );
-   str     = gtk_editable_get_chars( GTK_EDITABLE(msg->text), 0, txt_len);
-   
-   gtk_text_set_point( GTK_TEXT(msg->text), 0);
-   gtk_text_forward_delete ( GTK_TEXT(msg->text), txt_len); 
-   
-   gtk_text_insert(GTK_TEXT(msg->text), msg->font , NULL, NULL, str, txt_len);
-   g_free(str);
-   gtk_text_thaw( GTK_TEXT(msg->text) );
-
-   gtk_editable_set_position( GTK_EDITABLE(msg->text), point);
-   return FALSE;
-
+  return FALSE;
 }
 
 /* spell_check_cb
@@ -1883,45 +1933,14 @@ static void
 spell_check_cb (GtkWidget* widget, BalsaSendmsg* msg)
 {
   BalsaSpellCheck* sc;
-  const gchar* language = NULL;
-  gchar* charset = NULL;
-  gint i = ELEMENTS (iso_charset_names);
-
 
   sc = BALSA_SPELL_CHECK (msg->spell_checker);
 
   /* configure the spell checker */
-  language = gnome_i18n_get_language ();
-  if (!language || g_strcasecmp (language, "C") == 0) {
-    /* We've got the default locale, but pspell doesn't understand
-     * that, so put "en" instead.  This should be better, but should
-     * probably be done within pspell.  
-     * */
-    balsa_spell_check_set_language (sc, "en");
-  } else {
-    balsa_spell_check_set_language (sc, language);
-  }
-  
-  while (i) {
-    if (msg->charset == iso_charset_names[i])
-      break;
-    --i;
-  }
-  
-  if (i <= ISO_CHARSET_14_POS ) 
-    charset = g_strdup ("iso8859-*");
-  else if (i == KOI8_R_POS)
-    charset = g_strdup ("koi8-r");
-  else {
-    /* pspell doesn't know how to handle other charsts */
-    balsa_information (BALSA_INFORMATION_SHOW_DIALOG, 
-                       "Can't handle this character set");
-    return;
-  } 
+  balsa_spell_check_set_language (sc, msg->locale);
 
   gtk_widget_show_all(GTK_WIDGET(sc));
-  balsa_spell_check_set_character_set (sc, charset);
-  g_free (charset);
+  balsa_spell_check_set_character_set (sc, msg->charset);
   balsa_spell_check_set_module(sc, spell_check_modules_name[balsa_app.module]);
   balsa_spell_check_set_suggest_mode (sc, spell_check_suggest_mode_name[balsa_app.suggestion_mode]);
   balsa_spell_check_set_ignore_length (sc, balsa_app.ignore_size);
@@ -1970,26 +1989,51 @@ spell_check_set_sensitive (BalsaSendmsg* msg, gboolean state)
 }
 
 
-
-static gint iso_1_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return set_iso_charset(bsmsg,  1, ISO_CHARSET_1_POS); }
-static gint iso_2_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return set_iso_charset(bsmsg,  2, ISO_CHARSET_2_POS); }
-static gint iso_3_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return set_iso_charset(bsmsg,  3, ISO_CHARSET_3_POS); }
-static gint iso_5_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return set_iso_charset(bsmsg,  5, ISO_CHARSET_5_POS); }
-static gint iso_8_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return set_iso_charset(bsmsg,  8, ISO_CHARSET_8_POS); }
-static gint iso_9_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return set_iso_charset(bsmsg,  9, ISO_CHARSET_9_POS); }
-static gint iso_13_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return set_iso_charset(bsmsg, 13, ISO_CHARSET_13_POS); }
-static gint iso_14_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return set_iso_charset(bsmsg, 14, ISO_CHARSET_14_POS); }
-static gint iso_15_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return set_iso_charset(bsmsg, 15, ISO_CHARSET_15_POS); }
-static gint koi8_r_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return set_koi8_charset(bsmsg, "r", KOI8_R_POS); }
-static gint koi8_u_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return set_koi8_charset(bsmsg, "u", KOI8_U_POS); }
+static void lang_brazilian_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg,  LOC_BRAZILIAN_POS); }
+static void lang_catalan_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_CATALAN_POS); }
+static void lang_danish_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_DANISH_POS); }
+static void lang_german_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_GERMAN_POS); }
+static void lang_dutch_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_DUTCH_POS); }
+static void lang_english_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_ENGLISH_POS); }
+static void lang_estonian_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_ESTONIAN_POS); }
+static void lang_finnish_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_FINNISH_POS); }
+static void lang_french_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_FRENCH_POS); }
+static void lang_greek_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_GREEK_POS); }
+static void lang_hungarian_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_HUNGARIAN_POS); }
+static void lang_italian_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_ITALIAN_POS); }
+static void lang_japanese_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_JAPANESE_POS); }
+static void lang_korean_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_KOREAN_POS); }
+static void lang_baltic_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_BALTIC_POS); }
+static void lang_norwegian_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_NORWEGIAN_POS); }
+static void lang_polish_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_POLISH_POS); }
+static void lang_portugese_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_PORTUGESE_POS); }
+static void lang_russian_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_RUSSIAN_POS); }
+static void lang_slovak_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_SLOVAK_POS); }
+static void lang_spanish_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_SPANISH_POS); }
+static void lang_swedish_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_SWEDISH_POS); }
+static void lang_turkish_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_TURKISH_POS); }
+static void lang_ukrainian_cb(GtkWidget*w, BalsaSendmsg*bsmsg)
+{ set_locale(w, bsmsg, LOC_UKRAINIAN_POS); }

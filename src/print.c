@@ -307,7 +307,7 @@ print_wrap_string(gchar* str, GnomeFont *font, gint width)
     last_space = NULL;
     while(*ptr && (line_width <= width || !last_space) ) {
       if(isspace(*ptr)) { *ptr = ' '; last_space = ptr; }
-      line_width += gnome_font_get_width(font, *ptr++);
+      line_width += gnome_font_get_width_string_n(font, ptr++, 1);
     }
     if(*ptr) {
       *last_space = '\n'; ptr = last_space + 1;

@@ -318,6 +318,7 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_clist_set_row_height (clist, 16);
 
   /* Set default sorting behaviour */
+  gtk_clist_set_auto_sort (clist, TRUE);
   gtk_clist_set_sort_column (clist, 5);
   gtk_clist_set_compare_func (clist, date_compare);
   gtk_clist_set_sort_type (clist, GTK_SORT_DESCENDING);
@@ -464,7 +465,8 @@ balsa_index_add (BalsaIndex * bindex,
   if (bindex->mailbox == NULL)
     return;
 
-  text[0] = "";
+  sprintf (buff1, "%ld", message->msgno+1);
+  text[0] = buff1;              /* set message number */
   text[1] = NULL;		/* flags */
   text[2] = NULL;		/* attachments */
 
@@ -499,10 +501,6 @@ balsa_index_add (BalsaIndex * bindex,
   row = gtk_clist_append (GTK_CLIST (bindex), text);
 
   g_free(text[5]);
-
-  /* set message number */
-  sprintf (buff1, "%d", row + 1);
-  gtk_clist_set_text(GTK_CLIST (bindex), row, 0, buff1);
 
   gtk_clist_set_row_data (GTK_CLIST (bindex), row, (gpointer) message);
 
@@ -571,7 +569,9 @@ balsa_index_select_row (BalsaIndex* bindex, gint row)
     gtk_clist_moveto (clist, row, -1, 1.0, 0.0);
 }
 
-
+/* balsa_index_select_next:
+   selects next message or last message when no messages are selected.
+*/
 void
 balsa_index_select_next (BalsaIndex * bindex)
 {
@@ -583,7 +583,7 @@ balsa_index_select_next (BalsaIndex * bindex)
 
   if( (h=bi_get_largest_selected(clist)) < 0
      || h + 1 >= clist->rows)
-     return;
+    h = clist->rows-1;
   
   balsa_index_select_row (bindex, h + 1);
 }
@@ -636,7 +636,9 @@ balsa_index_select_next_unread (BalsaIndex * bindex)
   }
 }
 
-
+/* balsa_index_select_next:
+   selects previous message or first message when no messages are selected.
+*/
 void
 balsa_index_select_previous (BalsaIndex * bindex)
 {
@@ -650,23 +652,22 @@ balsa_index_select_previous (BalsaIndex * bindex)
   clist = GTK_CLIST (bindex);
 
   if (!clist->selection)
-    return;
-
-  h = clist->rows;		/* set this to the max number of rows */
-
-  list = clist->selection;
-  while (list)			/* look for the selected row with the lowest number */
-    {
+    h = 1;
+  else {
+    h = clist->rows;	/* set this to the max number of rows */
+    
+    list = clist->selection;
+    while (list) {	/* look for the selected row with the lowest number */
       i = GPOINTER_TO_INT (list->data);
       if (i < h)
 	h = i;
       list = list->next;
     }
-
-  /* avoid unselecting everything, and then not selecting a valid row */
-  if (h < 1)
-    h = 1;
-
+    
+    /* avoid unselecting everything, and then not selecting a valid row */
+    if (h < 1)
+      h = 1;
+  } 
   /* FIXME, if it is already on row 1, we shouldn't unselect all/reselect */
   balsa_index_select_row (bindex, h - 1);
 }

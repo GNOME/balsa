@@ -289,7 +289,7 @@ load_local_mailboxes ()
   DIR *dp;
   struct dirent *d;
 
-  g_assert(balsa_app.local_mail_directory != NULL);
+  g_return_if_fail(balsa_app.local_mail_directory != NULL);
   dp = opendir (balsa_app.local_mail_directory);
   if (!dp)
     return;

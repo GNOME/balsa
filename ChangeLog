@@ -2,7 +2,29 @@
 
 	* libbalsa/information.c: idle functions must unregister
 	themselves. this somehow worked on linux but failed on FreeBSD.
-	
+	* libbalsa/address.c(libbalsa_address_new_from_string): never add
+	NULL to the address list.
+	* libbalsa/mailbox_local.c: don't assume that if the file exists,
+	it is readable.
+	* src/balsa-index-page.c: make the message index not focusable in
+	order to simplify the keyboard navigation (next and prev ara
+	available through shortcuts anyway).
+	* src/balsa-index.c: enable auto_sort so incoming messages are put
+	in right place. 'prev' moves to the first message when no messages
+	selected, and 'next' - to the last.
+	* src/balsa-message.c: grab focus to the message so the keyboard
+	scrolling is possible. New language&charset selection.
+	* src/balsa-message.h: new api of get_font_name()
+	* src/local-mailbox.c: don't crash on damaged configuration, when 
+	balsa_app.local_mail_directory=NULL
+	* src/mblist-window.c: implement keyboard handler, 'Enter' opens
+	selected mailbox.
+	* src/pref-manager.c: handle missing balsa_app.{replyto,domain}
+	configuration entries correctly (led to lock-up).
+	* src/print.c: achieve gnome-print-0.22 compatibility, fix #25570.
+	* src/sendmsg-window.[hc]: implement new language selection, don't
+	refer fields of deleted structure in the _destroy method.
+
 2000-09-21  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/balsa-message.c: Patch from Timothy Alan Chandler

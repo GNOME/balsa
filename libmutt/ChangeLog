@@ -1,3 +1,8 @@
+2000-11-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Atsuhiko Yamanaka's <ymnk@jcraft.com> patch for multithreaded msg view.
+	* libmutt/parse.c: forcing relevant user headers...
+	
 2000-11-12  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* imap/imap_auth.c: fix CRAM authorization bug: the code assumed 

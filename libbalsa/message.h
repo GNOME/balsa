@@ -83,6 +83,7 @@ struct _LibBalsaMessage {
 
     /* replied message ID's */
     GList *references;
+    GList *references_for_threading; /* oldest first */
 
     /* replied message ID; from address on date */
     gchar *in_reply_to;

@@ -476,7 +476,7 @@ index_button_press_cb(GtkWidget * widget, GdkEventButton * event,
     guint row, column;
     LibBalsaMessage *current_message;
     GtkCList *clist;
-    LibBalsaMailbox *mailbox;
+    /* LibBalsaMailbox *mailbox; */
 
     clist = GTK_CLIST(widget);
     on_message =
@@ -484,7 +484,7 @@ index_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 				     &column);
 
     if (on_message) {
-	mailbox = gtk_clist_get_row_data(clist, row);
+	/* mailbox = gtk_clist_get_row_data(clist, row); */
 	current_message =
 	    LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, row));
 
@@ -638,7 +638,7 @@ transfer_messages_cb(BalsaMBList * bmbl, LibBalsaMailbox * mailbox,
 	list = clist->selection;
 	while (list) {
 	    message =
-		gtk_clist_get_row_data(clist, GPOINTER_TO_INT(list->data));
+		gtk_ctree_node_get_row_data(GTK_CTREE(bindex), list->data);
 	    messages=g_list_append(messages, message);
 	    list = list->next;
 	}
@@ -718,7 +718,7 @@ index_child_drag_data_get(GtkWidget * widget, GdkDragContext * context,
 			  guint32 time)
 {
     /*--*/
-    guint *selected_rows;
+    GtkCTreeNode **selected_rows;
     guint nb_selected_rows;
 
     GtkCList *clist;
@@ -741,8 +741,8 @@ index_child_drag_data_get(GtkWidget * widget, GdkDragContext * context,
     for (message_count = 0; message_count < nb_selected_rows;
 	 message_count++) {
 	current_message =
-	    LIBBALSA_MESSAGE(gtk_clist_get_row_data
-			     (clist, selected_rows[message_count]));
+	    LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data
+			     (GTK_CTREE(widget), selected_rows[message_count]));
 	message_list[message_count] = current_message;
     }
 
@@ -771,8 +771,8 @@ balsa_message_reply(GtkWidget * widget, gpointer index)
     list = GTK_CLIST(index)->selection;
     while (list) {
 	message =
-	    gtk_clist_get_row_data(GTK_CLIST(index),
-				   GPOINTER_TO_INT(list->data));
+	    gtk_ctree_node_get_row_data(GTK_CTREE(index),
+					list->data);
 	sm = sendmsg_window_new(widget, message, SEND_REPLY);
 	gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
 			   GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
@@ -794,8 +794,8 @@ balsa_message_replytoall(GtkWidget * widget, gpointer index)
     list = GTK_CLIST(index)->selection;
     while (list) {
 	message =
-	    gtk_clist_get_row_data(GTK_CLIST(index),
-				   GPOINTER_TO_INT(list->data));
+	    gtk_ctree_node_get_row_data(GTK_CTREE(index),
+					list->data);
 	sm = sendmsg_window_new(widget, message, SEND_REPLY_ALL);
 	gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
 			   GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
@@ -817,8 +817,8 @@ balsa_message_forward(GtkWidget * widget, gpointer index)
     list = GTK_CLIST(index)->selection;
     while (list) {
 	message =
-	    gtk_clist_get_row_data(GTK_CLIST(index),
-				   GPOINTER_TO_INT(list->data));
+	    gtk_ctree_node_get_row_data(GTK_CTREE(index),
+					list->data);
 	sm = sendmsg_window_new(widget, message, SEND_FORWARD);
 	gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
 			   GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
@@ -841,8 +841,8 @@ balsa_message_continue(GtkWidget * widget, gpointer index)
     list = GTK_CLIST(index)->selection;
     while (list) {
 	message =
-	    gtk_clist_get_row_data(GTK_CLIST(index),
-				   GPOINTER_TO_INT(list->data));
+	    gtk_ctree_node_get_row_data(GTK_CTREE(index),
+					list->data);
 	sm = sendmsg_window_new(widget, message, SEND_CONTINUE);
 	gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
 			   GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
@@ -890,8 +890,8 @@ balsa_message_toggle_flagged(GtkWidget * widget, gpointer index)
 
     /* First see if we should unselect or select */
     while (list) {
-	message = gtk_clist_get_row_data(GTK_CLIST(index),
-					 GPOINTER_TO_INT(list->data));
+	message = gtk_ctree_node_get_row_data(GTK_CTREE(index),
+					      list->data);
 
 	if (!(message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)) {
 	    is_all_flagged = FALSE;
@@ -904,8 +904,8 @@ balsa_message_toggle_flagged(GtkWidget * widget, gpointer index)
     list = GTK_CLIST(index)->selection;
 
     while (list) {
-	message = gtk_clist_get_row_data(GTK_CLIST(index),
-					 GPOINTER_TO_INT(list->data));
+	message = gtk_ctree_node_get_row_data(GTK_CTREE(index),
+					      list->data);
 
 	if (is_all_flagged) {
 	    libbalsa_message_unflag(message);
@@ -938,8 +938,8 @@ balsa_message_delete(GtkWidget * widget, gpointer index)
 	to_trash = TRUE;
 
     while (list) {
-	message = gtk_clist_get_row_data(GTK_CLIST(index),
-					 GPOINTER_TO_INT(list->data));
+	message = gtk_ctree_node_get_row_data(GTK_CTREE(index),
+					      list->data);
 	messages=g_list_append(messages, message);
 	list = list->next;
     }
@@ -976,8 +976,8 @@ balsa_message_undelete(GtkWidget * widget, gpointer index)
     list = GTK_CLIST(index)->selection;
     while (list) {
 	message =
-	    gtk_clist_get_row_data(GTK_CLIST(index),
-				   GPOINTER_TO_INT(list->data));
+	    gtk_ctree_node_get_row_data(GTK_CTREE(index),
+					list->data);
 	libbalsa_message_undelete(message);
 	list = list->next;
     }

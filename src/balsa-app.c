@@ -31,7 +31,6 @@
 #include "local-mailbox.h"
 #include "misc.h"
 #include "libbalsa.h"
-#include "src/mblist-window.h"
 #include "spell-check.h"
 #include "main-window.h"
 #include "information.h"

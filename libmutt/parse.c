@@ -892,7 +892,14 @@ ENVELOPE *mutt_read_rfc822_header (FILE *f, HEADER *hdr, short user_hdrs,
   long loc;
   int matched;
   size_t linelen = LONG_STRING;
-
+  int force_user_hdrs; /* BALSA */
+                       /* This variable was added to push In-Reply-To: header
+                        * to e->userhdrs, which will be parsed in 
+                        * libbalsa/mailbox.c
+                        * It will be preferable to use user_hdrs in calling 
+                        * mutt_read_rfc822_header function in stead of 
+                        * using this variable.
+                        */
   in_reply_to[0] = 0;
 
   if (hdr)
@@ -913,6 +920,7 @@ ENVELOPE *mutt_read_rfc822_header (FILE *f, HEADER *hdr, short user_hdrs,
   while (*(line = read_rfc822_line (f, line, &linelen)) != 0)
   {
     matched = 0;
+    force_user_hdrs = 0; /* BALSA */
 
     if ((p = strpbrk (line, ": \t")) == NULL || *p != ':')
     {
@@ -1047,6 +1055,7 @@ ENVELOPE *mutt_read_rfc822_header (FILE *f, HEADER *hdr, short user_hdrs,
 	    strfcpy (in_reply_to, p, sizeof (in_reply_to));
 	    rfc2047_decode (in_reply_to, in_reply_to,
 			    sizeof (in_reply_to));
+	    force_user_hdrs = 1;  /* BALSA */
 	  }
 	}
 	break;
@@ -1201,7 +1210,7 @@ ENVELOPE *mutt_read_rfc822_header (FILE *f, HEADER *hdr, short user_hdrs,
     }
 
      /* Keep track of the user-defined headers */
-    if (!matched && user_hdrs)
+    if (!matched && (user_hdrs || force_user_hdrs))  /* BALSA */
     {
       if (last)
       {

@@ -116,6 +116,7 @@ libbalsa_message_init(LibBalsaMessage * message)
     message->message_id = NULL;
     message->body_ref = 0;
     message->body_list = NULL;
+    message->references_for_threading = NULL;
 }
 
 
@@ -255,6 +256,16 @@ libbalsa_message_destroy(GtkObject * object)
 
     libbalsa_message_body_free(message->body_list);
     message->body_list = NULL;
+
+    if(message->references_for_threading!=NULL){
+	GList *list=message->references_for_threading;
+	for(; list; list=g_list_next(list)){
+	    if(list->data)
+		g_free(list->data);
+	}
+	g_list_free (message->references_for_threading);
+	message->references_for_threading=NULL;
+    }
 }
 
 const gchar *

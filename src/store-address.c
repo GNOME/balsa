@@ -93,8 +93,7 @@ balsa_store_address(GtkWidget * widget, gpointer index)
 	return;
     }
 
-    message = gtk_clist_get_row_data(GTK_CLIST(index),
-				     GPOINTER_TO_INT(list->data));
+    message = gtk_ctree_node_get_row_data(GTK_CTREE(index), list->data);
 
     if (message->from->address_list == NULL) {
 	GtkWidget *box = NULL;

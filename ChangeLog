@@ -1,3 +1,21 @@
+2000-11-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Atsuhiko Yamanaka's <ymnk@jcraft.com> patch for multithreaded msg view.
+	* libbalsa/mailbox.c: store message's in-reply-to header.
+	* libbalsa/message.[hc]: add references_for_threading field to 
+	destroy method.
+	* libmutt/parse.c: forcing user headers..
+	* src/Makefile.am: add balsa-index-threading.{c,h} to the file list.
+	* src/balsa-index-page.c: use CTree instead of CList for message index.
+	* src/balsa-index.[ch]: the same.
+	* src/store-address.c: the same.
+	* src/balsa-index-threading.[hc]: the threading support (jwz sorting)
+	
+	* src/balsa-app.c: remove forgotten include mblist-window.h 
+	* src/main-window.c: the same + Atsuhiko's CList->CTree
+	* src/main.c: remove not needed mblist-window.h and balsa-mblist.h
+	
+	
 2000-11-22  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/main-window.c: (fill_mailbox_passwords) fix fix, permit 

@@ -41,8 +41,6 @@
 
 #include "balsa-app.h"
 #include "balsa-icons.h"
-#include "mblist-window.h"
-#include "balsa-mblist.h"
 #include "main-window.h"
 #include "libbalsa.h"
 #include "misc.h"

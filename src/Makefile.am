@@ -11,6 +11,8 @@ balsa_BASE_SOURCES =	\
 	balsa-icons.h		\
 	balsa-index.c		\
 	balsa-index.h		\
+	balsa-index-threading.c	\
+	balsa-index-threading.h	\
 	balsa-index-page.c	\
 	balsa-index-page.h	\
 	balsa-mblist.c		\

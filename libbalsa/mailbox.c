@@ -777,6 +777,15 @@ translate_message(HEADER * cur)
 	    SKIPWS(p);
 
 	    message->in_reply_to = g_strdup(p);
+	} else if (g_strncasecmp ("In-Reply-To:", tmp->data, 12) == 0){
+	    p = tmp->data + 12;
+	    while(*p!='\0'&& *p!='<')p++;
+	    if(*p!='\0'){
+		message->in_reply_to = g_strdup (p);
+		p=message->in_reply_to;
+		while(*p!='\0' && *p!='>')p++;
+		if(*p=='>')*(p+1)='\0';
+	    }
 	}
 	tmp = tmp->next;
     }
@@ -790,6 +799,33 @@ translate_message(HEADER * cur)
     }
 
     /* more! */
+
+    if(cenv->references!=NULL){
+	LIST* p=cenv->references;
+	while(p!=NULL){
+	    message->references_for_threading = 
+		g_list_prepend(message->references_for_threading, 
+			       g_strdup(p->data));
+            p=p->next;
+	}
+    }
+
+#if 0
+    /* According to  RFC 1036 (section 2.2.5), MessageIDs in References header
+     * must be in the oldest first order; the direct parent should be last. 
+     * It seems, however, some MUAs ignore this rule.
+     * For example, one of them adds the direct parent to the head of
+     * the References header.
+     */
+    if(message->in_reply_to != NULL &&
+       message->references_for_threading != NULL &&
+       1<g_list_length(message->references_for_threading) &&
+       strcmp(message->in_reply_to, 
+	      (g_list_first(message->references_for_threading))->data)==0){
+	GList *foo=message->references_for_threading;
+        message->references_for_threading=g_list_remove(foo, foo->data);
+    }
+#endif
 
     return message;
 }

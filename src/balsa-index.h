@@ -38,14 +38,15 @@ extern "C" {
     typedef struct _BalsaIndexClass BalsaIndexClass;
 
     struct _BalsaIndex {
-	GtkCList clist;
+	GtkCTree ctree;
 
 	LibBalsaMailbox *mailbox;
-	guint first_new_message;
+	LibBalsaMessage *first_new_message;
+	int threading_type;
     };
 
     struct _BalsaIndexClass {
-	GtkCListClass parent_class;
+	GtkCTreeClass parent_class;
 
 	void (*select_message) (BalsaIndex * bindex,
 				LibBalsaMessage * message);
@@ -81,7 +82,7 @@ extern "C" {
 
 /* retrieve the selection */
     extern void balsa_index_get_selected_rows(BalsaIndex * bindex,
-					      guint ** rows,
+					      GtkCTreeNode *** rows,
 					      guint * nb_rows);
 
 #ifdef __cplusplus

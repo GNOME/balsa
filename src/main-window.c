@@ -46,7 +46,6 @@
 #include "pref-manager.h"
 #include "sendmsg-window.h"
 #include "mailbox-conf.h"
-#include "mblist-window.h"
 #include "main-window.h"
 #include "print.h"
 #include "address-book.h"
@@ -2018,11 +2017,10 @@ notebook_switch_page_cb(GtkWidget * notebook,
     balsa_index_update_message(BALSA_INDEX_PAGE(index_page));
 
     if (GTK_CLIST(index)->selection) {
-	message = message = gtk_clist_get_row_data(GTK_CLIST(index),
-						   GPOINTER_TO_INT
-						   (GTK_CLIST
-						    (index)->selection->
-						    data));
+	message = gtk_ctree_node_get_row_data(GTK_CTREE(index),
+					      (GTK_CLIST
+					       (index)->selection->
+					       data));
 	enable_message_menus(message);
     } else {
 	enable_message_menus(NULL);

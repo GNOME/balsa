@@ -1,3 +1,8 @@
+2003-07-05  Albrecht Dreß  <albrecht.dress@arcor.de>		
+
+	* src/balsa-message.c: show from and subject for attached 
+	messages
+
 2003-07-04  Pawel Salek <pawsa theochem.kth.se>
 
 	* src/sendmsg-window.c: sort also translated language names.

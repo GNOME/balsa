@@ -2455,7 +2455,14 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 	info = balsa_part_info_new(body);
 	bm->info_count++;
 
-	if (is_multipart)
+	if (g_ascii_strcasecmp(content_type, "message/rfc822") == 0 &&
+	    body->embhdrs) {
+	    gchar *from = libbalsa_address_to_gchar(body->embhdrs->from, 0);
+	    icon_title = 
+		g_strdup_printf(_("rfc822 message (from %s, subject \"%s\")"),
+				from, body->embhdrs->subject);
+	    g_free(from);
+	} else if (is_multipart)
 	    icon_title = mpart_content_name(content_type);
 	else if (body->filename)
 	    icon_title =

@@ -190,8 +190,8 @@ index_select_cb (GtkWidget * widget,
   g_return_if_fail (message != NULL);
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     message_window_new (message);
-  else if (bevent && bevent->button == 1)
-	  create_menu(BALSA_INDEX(widget), message);
+  else if (bevent && bevent->button == 3)
+    gtk_widget_show (create_menu(BALSA_INDEX(widget), message));
 }
 /*
  * CLIST Callbacks

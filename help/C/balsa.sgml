@@ -19,7 +19,6 @@
 
     <author>
       <firstname>Peter</firstname> <surname>Williams</surname>
-      
       <affiliation>
 	<address>
           <email>peter@newton.cx</email>
@@ -32,6 +31,15 @@
       <affiliation>
 	<address>
 	  <email>mguenther@netcom.ca</email>
+	</address>
+      </affiliation>
+    </author>
+
+    <author>
+      <firstname>Berend</firstname> <surname>De Schouwer</surname>
+      <affiliation>
+	<address>
+	  <email>bds@jhb.ucs.co.za</email>
 	</address>
       </affiliation>
     </author>
@@ -91,7 +99,7 @@
   <sect1 id="introduction">
     <title>Introduction</title>
     
-    <graphic fileref="images/balsa_logo" format="png" srccredit="tigert"></graphic>
+    <graphic fileref="images/balsa_logo.png" format="png" srccredit="tigert"></graphic>
 
     <para><application>Balsa</application> is a graphical mail client
       similar to Eudora on Windows. It supports the standard features of
@@ -184,7 +192,7 @@
 	<title>Main Window Toolbar</title>
 	<screenshot>
 	  <screeninfo>Main Window Toolbar</screeninfo>
-	  <graphic fileref="images/main-window-toolbar" format="png" srccredit="Matthew Guenther"></graphic>
+	  <graphic fileref="images/main-window-toolbar.png" format="png" srccredit="Matthew Guenther"></graphic>
 	</screenshot>
       </figure>
 
@@ -657,7 +665,7 @@
       <title>Message Composition Window</title>
       <screenshot>
 	<screeninfo>Message Composition Window</screeninfo>
-	<graphic fileref="images/newmsg-window" format="png" srccredit="Matthew Guenther" align="center"></graphic>
+	<graphic fileref="images/newmsg-window.png" format="png" srccredit="Matthew Guenther" align="center"></graphic>
       </screenshot>
     </figure>
     
@@ -957,7 +965,7 @@
 	<title>Toolbar</title>
 	<screenshot>
 	  <screeninfo>Balsa Message Composer Toolbar</screeninfo>
-	  <graphic fileref="images/newmsg-window-toolbar" format="png" srccredit="Matthew Guenther" align="center"></graphic>
+	  <graphic fileref="images/newmsg-window-toolbar.png" format="png" srccredit="Matthew Guenther" align="center"></graphic>
 	</screenshot>
       </figure>
 
@@ -1139,6 +1147,15 @@
 	    of addresses from the <application>GnomeCard</application>
 	    application.</para>
 	</tip>
+
+	<tip>
+	  <para> In addition, Balsa supports alias expansion.  As you
+	    type a name, Balsa will guess the e-mail address from all
+	    the entries in the <application>GnomeCard</application>
+	    application.  To enable this feature, read the section
+	    on <link linkend="ct-alias-expansion">Alias Expansion</link>
+          </para>
+	</tip>
       </sect3>
     </sect2>
 
@@ -1149,7 +1166,7 @@
 	<title>List of Attachments</title>
 	<screenshot>
 	  <screeninfo>List of Attachments</screeninfo>
-	  <graphic fileref="images/newmsg-window-attachments" format="png" srccredit="Matthew Guenther" align="center"></graphic>
+	  <graphic fileref="images/newmsg-window-attachments.png" format="png" srccredit="Matthew Guenther" align="center"></graphic>
 	</screenshot>
       </figure>
 
@@ -1216,6 +1233,13 @@
 	    address</guilabel></term><listitem><para>The address that you wish
 	    people to reply to your email with (if you have a home and a
 	    work address, for instance).</para></listitem></varlistentry>
+
+      <varlistentry><term><guilabel>Default
+	    domain</guilabel></term><listitem><para>The domain that you
+	    wish to append to all e-mail entries where you did not
+	    specify the domain.  Normally you would use your local
+	    domain.  You need to enable <link linkend="win-config-7">Alias Expansion</link> for this to work.
+	    </para></listitem></varlistentry>
     </variablelist>
   </sect1>
 
@@ -1610,6 +1634,16 @@
 	    messages.</para>
 	</listitem>
       </varlistentry>
+
+      <varlistentry>
+	<term><guilabel>Expand aliases as you type</guilabel></term>
+	<listitem>
+	  <para>This will expand aliases as you type them.  Read
+	    more about this feature in the <link linkend="ct-alias-expansion">
+	    Alias Expansion</link>
+	    section.</para>
+	</listitem>
+      </varlistentry>
     </variablelist>
   </sect1>
 
@@ -1654,6 +1688,9 @@
 
       <listitem><para><link linkend="ct-main-folder-imap">Making one
 	    of the main folders IMAP-based</link> </para></listitem>
+
+      <listitem><para><link linkend="ct-alias-expansion">Expanding
+	    e-mail addresses automatically</link> </para></listitem>
 
     </itemizedlist>
 
@@ -1720,6 +1757,47 @@
 	<application>Balsa</application>. Your Inbox will now be an IMAP
 	mailbox. Hopefully you can figure out how to make your other
 	mailboxes IMAP-based from these instructions.</para>
+    </sect2>
+
+    <sect2 id="ct-alias-expansion">
+      <title>I want Balsa to guess my friends</title>
+
+      <para>Balsa can expand the names of your contacts it finds in
+        the <application>GnomeCard</application> addressbook.  It
+	will do this by both the Card Name (unique alias) and the
+	Full Name.
+      </para>
+
+      <para>As you type a username in any of the To:, Cc:, or Bcc:
+        entry boxes in the <link linkend="win-composer">Compose window</link>,
+	it will do a case insensitive search in the addressbook for
+	a matching username, and fill in the best match.  This is best
+	demonstrated with the following picture:
+	<graphic fileref="images/example-alias.png" format="png" srccredit="Berend De Schouwer" align="center"></graphic>
+	The example shows what it looks like if
+	<quote>Balsa Mailing List</quote> is in your addressbook, and you
+	have typed &quot;ba&quot;
+      </para>
+
+      <para>If the match shown is what you want, simply press Enter to
+        move to the next entry, or press Comma or End to type another
+	e-mail address.</para>
+
+      <para>If the match shown is not the one you want, pressing Tab
+        will cycle through all possible matches.  If there is only one
+	match, it will move to the end of the match.  At any point, you
+	can simply continue typing and ignore the matched entry.
+	To move to the next entry without accepting the shown entry,
+	press the Down arrow.</para>
+
+      <para>As a bonus, if the e-mail address does not contain a domain,
+        it will add the default domain to the name entered, so you never
+	have to type the local domain in again.</para>
+
+      <para>
+        To enable this feature, tag it in the <link linkend="win-config-7">
+	Preferences</link> dialog.
+      </para>
     </sect2>
   </sect1>
 

@@ -681,7 +681,7 @@ balsa_mblist_set_style (BalsaMBList* mblist)
 
   /* Get and attempt to allocate the colour */
   color = balsa_app.mblist_unread_color;
-  colormap = gdk_window_get_colormap (GTK_WIDGET(mblist)->window);
+  colormap =gdk_window_get_colormap(GTK_WIDGET(balsa_app.main_window)->window);
   if (!gdk_colormap_alloc_color (colormap, &color, FALSE, TRUE)) {
     fprintf (stderr, "Couldn't allocate colour for unread mailboxes!\n");
     gdk_color_black (colormap, &color);

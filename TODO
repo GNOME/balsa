@@ -7,7 +7,7 @@ TODO LIST:
 | P = PARTIAL |
 \-------------/
 
-Things needed for Balsa v0.5 (for GNOME 1.0 release)
+Things needed for Balsa v0.5
 Fix/update/make-sure-they-work:
  * POP3
  * IMAP

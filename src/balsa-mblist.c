@@ -371,10 +371,11 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 		  GtkStyle *style;
 
 		  style = gtk_style_copy (gtk_widget_get_style (GTK_WIDGET (ctree)));
-
+                  gdk_font_unref(style->font);
 		  font = gdk_font_load
 					("-adobe-courier-medium-r-*-*-*-120-*-*-*-*-iso8859-1");
 		  style->font = font;
+                  gdk_font_ref(style->font);
 
 		  gtk_ctree_node_set_row_style (ctree, cnode, style);
 		  gtk_ctree_set_node_info (ctree, cnode,

@@ -373,10 +373,6 @@ balsa_index_init(BalsaIndex * index)
     
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_MULTIPLE);
 
-    /* Set default sorting behaviour */
-    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(tree_store),
-                                         5, GTK_SORT_ASCENDING);
-
     /* handle select row signals to display message in the window
      * preview pane */
     index->selection_changed_id =
@@ -621,10 +617,10 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
 			     (gpointer) index);
 
     /* do threading */
-    bndx_set_sort_order(index, mailbox->sort_field, mailbox->sort_type);
     for (list = mailbox->message_list; list; list = list->next)
 	balsa_index_add(index, list->data);
     balsa_index_set_threading_type(index, mailbox->threading_type);
+    bndx_set_sort_order(index, mailbox->sort_field, mailbox->sort_type);
 
     bndx_moveto(index);
 

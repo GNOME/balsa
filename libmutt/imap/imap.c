@@ -1491,7 +1491,7 @@ static int uid_search_parse_response(IMAP_DATA* idata,
   if(strncmp(buf,"SEARCH", 6))
     return -2;
   /* skip to message number */
-  buf = imap_next_word (imap_next_word(buf));
+  buf = imap_next_word(buf);
   while(*buf) {
     uid = atoi (buf);
     cb(uid, cbdata);

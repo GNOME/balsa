@@ -1,6 +1,7 @@
 2002-05-15  Pawel Salek  <pawsa@theochem.kth.se>
 
-	* imap/imap.c: add imap_uid_search()
+	* imap/imap.c: add imap_uid_search(). skip right number of words 
+	when processing SEARCH response.
 	
 2002-03-10  Pawel Salek  <pawsa@theochem.kth.se>
 

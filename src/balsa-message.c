@@ -1216,7 +1216,7 @@ get_font_name(const gchar * base, const gchar * charset,
     int dash_cnt = 0, len, i;
 
     g_return_val_if_fail(base != NULL, NULL);
-    g_return_val_if_fail(charset >= 0, NULL);
+    g_return_val_if_fail(charset != NULL, NULL);
 
     for (i = ELEMENTS(charset2font) - 1; i >= 0; i--)
 	if (g_strcasecmp(charset, charset2font[i].charset) == 0) {

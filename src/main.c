@@ -252,7 +252,15 @@ main (int argc, char *argv[])
   window = balsa_window_new();
   gtk_widget_show(window);
 
-  gtk_main ();
+  gdk_rgb_init();
+#ifdef USE_PIXBUF
+  gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
+  gtk_widget_set_default_visual(gdk_rgb_get_visual());
+#else
+  gtk_widget_set_default_colormap(gdk_imlib_get_colormap());
+  gtk_widget_set_default_visual(gdk_imlib_get_visual());
+#endif
+  gtk_main();
 
 #ifdef BALSA_USE_THREADS
   threads_init( FALSE );

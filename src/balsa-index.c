@@ -250,15 +250,9 @@ balsa_index_init (BalsaIndex * bindex)
 
   bindex->mailbox = NULL;
 
-  gtk_widget_push_visual (gdk_imlib_get_visual ());
-  gtk_widget_push_colormap (gdk_imlib_get_colormap ());
-
   /* create the clist */
   gtk_clist_construct (GTK_CLIST(bindex), 6, titles);
   clist = GTK_CLIST(bindex);
-
-  gtk_widget_pop_colormap ();
-  gtk_widget_pop_visual ();
 
   gtk_signal_connect (GTK_OBJECT (clist), "click_column",
 		      GTK_SIGNAL_FUNC (clist_click_column),

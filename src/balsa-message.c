@@ -259,11 +259,7 @@ balsa_message_create (void)
 {
   BalsaMessage *bmessage;
   
-  gtk_widget_push_visual (gdk_imlib_get_visual ());
-  gtk_widget_push_colormap (gdk_imlib_get_colormap ());
   bmessage = gtk_type_new (balsa_message_get_type ());
-  gtk_widget_pop_visual ();
-  gtk_widget_pop_colormap ();
 
   gtk_signal_connect_after(GTK_OBJECT (bmessage), "key_press_event", GTK_SIGNAL_FUNC (key_pressed), NULL);
   gtk_signal_connect(GTK_OBJECT (bmessage), "button_press_event", GTK_SIGNAL_FUNC (button_pressed), NULL);

@@ -474,8 +474,6 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 6, 7,
 		    GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
-  gtk_widget_push_visual (gdk_imlib_get_visual ());
-  gtk_widget_push_colormap (gdk_imlib_get_colormap ());
   /* create icon list */
   sw = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
@@ -488,9 +486,6 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_drag_dest_set (GTK_WIDGET (msg->attachments), GTK_DEST_DEFAULT_ALL,
 		     drop_types, ELEMENTS (drop_types),
 		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
-
-  gtk_widget_pop_visual ();
-  gtk_widget_pop_colormap ();
 
   gtk_widget_set_usize (msg->attachments, -1, 50);
 

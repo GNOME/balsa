@@ -87,17 +87,11 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
   mblw = g_malloc0(sizeof(MBListWindow));
   mblw->window = GTK_WIDGET(window);
 
-  gtk_widget_push_visual(gdk_imlib_get_visual());
-  gtk_widget_push_colormap(gdk_imlib_get_colormap());
-
   widget = gtk_scrolled_window_new (NULL, NULL);
   mblw->ctree = GTK_CTREE (balsa_mblist_new ());
   balsa_app.mblist = BALSA_MBLIST (mblw->ctree);
   gtk_container_add(GTK_CONTAINER(widget), GTK_WIDGET(mblw->ctree));
 
-  gtk_widget_pop_colormap ();
-  gtk_widget_pop_visual ();
-  
   /* PKGW TEST: what happens if we do this?
    *  gtk_widget_set_usize (GTK_WIDGET (mblw->ctree), balsa_app.mblist_width, balsa_app.mblist_height);
    */

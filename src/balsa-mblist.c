@@ -196,8 +196,6 @@ balsa_mblist_init (BalsaMBList * tree)
 {
   char *titles[3] =
   {"mailbox", "unread", "total"};
-  gtk_widget_push_visual (gdk_imlib_get_visual ());
-  gtk_widget_push_colormap (gdk_imlib_get_colormap ());
 #ifdef BALSA_SHOW_INFO
   gtk_ctree_construct (GTK_CTREE (tree), 3, 0, titles);
 #else
@@ -210,9 +208,6 @@ balsa_mblist_init (BalsaMBList * tree)
 #endif
 	  /* we want this on by default */
     gtk_clist_column_titles_hide (GTK_CLIST (tree));
-
-  gtk_widget_pop_colormap ();
-  gtk_widget_pop_visual ();
 
   gtk_signal_connect (GTK_OBJECT (tree), "tree_expand",
 		      GTK_SIGNAL_FUNC (mailbox_tree_expand), NULL);

@@ -1,3 +1,7 @@
+2001-09-21  Abel Cheung  <maddog@linux.org.hk>
+
+	* balsa.desktop: Rename zh_TW.Big5 -> zh_TW.
+
 2001-09-20  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/folder-conf.c: do not disconnect already disconnected data

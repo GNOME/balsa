@@ -383,6 +383,12 @@ void libbalsa_mailbox_msgno_changed(LibBalsaMailbox  *mailbox, guint seqno);
 void libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno);
 void libbalsa_mailbox_msgno_removed(LibBalsaMailbox  *mailbox, guint seqno);
 
+/* Search */
+gboolean libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox,
+				     guint seqno,
+				     GtkTreePath ** path,
+				     GtkTreeIter * iter);
+
 /* set icons */
 void libbalsa_mailbox_set_unread_icon(GdkPixbuf * pixbuf);
 void libbalsa_mailbox_set_trash_icon(GdkPixbuf * pixbuf);

@@ -852,6 +852,32 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     gtk_tree_path_free(path);
 }
 
+/* Find a message in the tree-model, by its message number. */
+gboolean
+libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox, guint seqno,
+			    GtkTreePath ** path, GtkTreeIter * iter)
+{
+    GtkTreeIter tmp_iter;
+
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+
+    tmp_iter.user_data =
+	g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
+		    GINT_TO_POINTER(seqno));
+
+    if (!tmp_iter.user_data)
+	return FALSE;
+
+    tmp_iter.stamp = mailbox->stamp;
+
+    if (path)
+	*path =
+	    gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &tmp_iter);
+    if (iter)
+	*iter = tmp_iter;
+
+    return TRUE;
+}
 
 /* Callback for the "messages-status-changed" signal.
  * mb:          the mailbox--must not be NULL;

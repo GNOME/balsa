@@ -1,3 +1,13 @@
+2004-02-15 13:16  PeterB
+
+	* src/main-window.c: get balsa_app.mblist_width and
+	balsa_app.notebook_height from gtk_paned_get_position() instead of
+	from allocation dimensions (avoids dimension creep when they're
+	used in gtk_paned_set_position()).
+	* libbalsa/: mailbox.c, mailbox_imap.c: revert yesterday's
+	change--lock the mailbox in imap_flags_cb() instead of in
+	libbalsa_mailbox_messages_status_changed().
+
 2004-02-14  Pawel Salek
 
 	* libbalsa/imap-server.c: store certificated accepted for the session.

@@ -22,17 +22,14 @@ void fe_dialog_button_clicked(GtkWidget *widget,
 {
     switch ((int)data)
     {
-    case 1: /* Cancel button */
-	g_print("cancel\n");
+    case 2: /* Cancel button */
 	break;
 
-    case 2: /* Help button */
-	g_print("help\n");
+    case 1: /* Help button */
 	/* something here */
 	break;
 
     case 3: /* OK button */
-	g_print("ok\n");
 	/* more of something here */
 
     default:
@@ -235,3 +232,99 @@ void fe_sound_browse_clicked(GtkWidget *widget,
 	GTK_OBJECT (filesel));
     gtk_widget_show(filesel);
 } /* end fe_sound_browse_clicked */
+
+
+/*
+ * fe_new_pressed()
+ *
+ * Callback for the "new" button
+ */
+void fe_new_pressed(GtkWidget *widget,
+		    gpointer throwaway)
+{
+    gint new_row;
+    GdkPixmap *pixmap;
+    GdkBitmap *mask;
+    GtkStyle *style;
+    gchar *new_item[] = 
+    {
+	"", "New filter"
+    };
+
+    new_row = gtk_clist_append(GTK_CLIST(fe_clist),
+			       new_item);
+
+    /* now for the pixmap from gdk */
+    style = gtk_widget_get_style(fe_clist);
+    pixmap = gdk_pixmap_create_from_xpm_d( fe_clist->window,  &mask,
+					   &style->bg[GTK_STATE_NORMAL],
+					   (gchar **)enabled_xpm );
+    gtk_clist_set_pixmap(GTK_CLIST(fe_clist),
+			 new_row,
+			 0,
+			 pixmap,
+			 mask);
+    gdk_pixmap_unref(pixmap);
+			 
+    gtk_clist_select_row(GTK_CLIST(fe_clist),
+			 new_row,
+			 1);
+} /* end fe_new_pressed() */
+
+
+/*
+ * fe_clist_button_event_press()
+ *
+ * Callback for when button is pressed.
+ */
+void fe_clist_button_event_press(GtkWidget *widget,
+				 GdkEventButton *bevent,
+				 gpointer data)
+{
+    gint row, column, res;
+    GdkPixmap *pixmap;
+    GdkBitmap *mask;
+    GtkStyle *style;
+    GtkCellType type;
+
+
+    res = gtk_clist_get_selection_info(GTK_CLIST(fe_clist),
+				       bevent->x,
+				       bevent->y,
+				       &row,
+				       &column);
+
+    if ((bevent->button != 1) || (column != 0))
+	return;
+
+    type = gtk_clist_get_cell_type(GTK_CLIST(fe_clist),
+				   row,
+				   column);
+
+    if (type == GTK_CELL_PIXMAP)
+    {
+	gtk_clist_set_text(GTK_CLIST(fe_clist),
+			   row,
+			   column,
+			   "");
+    }
+    else
+    {
+	/* now for the pixmap from gdk */
+	style = gtk_widget_get_style(fe_clist);
+	pixmap = gdk_pixmap_create_from_xpm_d( fe_clist->window,  &mask,
+					       &style->bg[GTK_STATE_NORMAL],
+					       (gchar **)enabled_xpm );
+	gtk_clist_set_pixmap(GTK_CLIST(fe_clist),
+			     row,
+			     column,
+			     pixmap,
+			     mask);
+	gdk_pixmap_unref(pixmap);
+    }
+
+    gtk_signal_emit_stop_by_name(GTK_OBJECT(fe_clist),
+				 "button_press_event");
+				 
+
+} /* end fe_clist_button_event_press() */

@@ -59,7 +59,7 @@ void filter_delete_regex(filter_regex *filter_reg,
     if (filter_reg->string)
 	g_free(filter_reg->string);
 
-    regfree(&(filter_reg->compiled));
+    regfree(filter_reg->compiled);
 
     return;
 } /* end filter_delete_regex() */
@@ -80,11 +80,8 @@ void filter_free(filter *fil,
     if (! fil)
 	return;
 
-    if (fil->match_string)
-	g_free(fil->match_string);
-
-    if (fil->exec_command)
-	g_free(fil->exec_command);
+    if (fil->name)
+	g_free(fil->name);
 
     if (fil->regex)
     {
@@ -147,8 +144,9 @@ filter *filter_new()
     newfil->type = FILTER_NONE;
     newfil->flags = FILTER_EMPTY;
     newfil->match_fields = FILTER_EMPTY;
-    newfil->match_string = NULL;
-    newfil->exec_command = NULL;
+    newfil->match.string[0] = '\0';
+    newfil->sound[0] = '\0';
+    newfil->popup_text[0] = '\0';
     newfil->regex = NULL;
 
     return(newfil);
@@ -182,6 +180,7 @@ gint filter_append_regex(filter *fil,
     }
 
     temp->string = g_strdup(reg);
+    temp->compiled = NULL;
 
     fil->regex = g_list_append(fil->regex,
 			       temp);
@@ -205,7 +204,7 @@ void filter_regcomp(filter_regex *fre,
 {
     gint rc;
 
-    rc = regcomp(&(fre->compiled),
+    rc = regcomp(fre->compiled,
 		 fre->string,
 		 FILTER_REGCOMP);
 
@@ -214,7 +213,7 @@ void filter_regcomp(filter_regex *fre,
 	gchar errorstring[256];
 
 	regerror(rc,
-		 &(fre->compiled),
+		 fre->compiled,
 		 errorstring,
 		 256);
 

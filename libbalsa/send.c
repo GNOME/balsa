@@ -242,7 +242,7 @@ balsa_send_message_real(HEADER *msg, char *tempfile, Mailbox *fcc )
 
     mutt_free_header (&msg);
 
- /* Since we didn´t send the mail we don´t save it at send_mailbox */
+ /* Since we didn't send the mail we don't save it at send_mailbox */
     return TRUE;
   }
 
@@ -391,9 +391,9 @@ balsa_postpone_message (Message * message)
   return TRUE;
 }
 
-/* In smtp_answer the check the answer and give back 1 if is a positive answer or a 0 if it is negative, 
- * in that case we need to copy the message to be send later. The error will be shown to the user from 
- * this funtion */	 
+/* In smtp_answer the check the answer and give back 1 if is a positive answer
+ * or a 0 if it is negative, in that case we need to copy the message to be 
+ * send later. The error will be shown to the user from this funtion */	 
    
 static int smtp_answer (int fd)
   {
@@ -411,7 +411,8 @@ static int smtp_answer (int fd)
   strncpy (code, buffer, 3);
 
   
-/* I have to check all posible positive code in RFC. Maybe it can be use an if sentence */
+/* I have to check all posible positive code in RFC. Maybe it can be use an 
+ * if sentence */
 
   switch (atoi(code)) 
     {
@@ -439,7 +440,7 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
   char *tmp, *tmpbuffer;
   ADDRESS *address;
  
-  snprintf (buffer, 512,"MAIL FROM:%s\r\n", msg->env->from->mailbox);
+  snprintf (buffer, 512,"MAIL FROM:<%s>\r\n", msg->env->from->mailbox);
   write (s, buffer, strlen (buffer));
   if (smtp_answer (s) == 0)
   {
@@ -450,7 +451,7 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
   address = msg->env->to;
   while (address != NULL)
   {	  
-      snprintf (buffer, 512,"RCPT TO:%s\r\n", address->mailbox);
+      snprintf (buffer, 512,"RCPT TO:<%s>\r\n", address->mailbox);
       write (s, buffer, strlen (buffer));
       address=address->next;
     /* We check for a positive answer */
@@ -468,7 +469,7 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
   address = msg->env->cc;
   while (address != NULL)
   {
-      snprintf (buffer, sizeof(buffer),"RCPT TO:%s\r\n", address->mailbox);
+      snprintf (buffer, sizeof(buffer),"RCPT TO:<%s>\r\n", address->mailbox);
       write (s, buffer, strlen (buffer));
       address=address->next;
 
@@ -482,7 +483,7 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
   address = msg->env->bcc;
   while (address != NULL)
   {       
-      snprintf (buffer, sizeof(buffer),"RCPT TO:%s\r\n", address->mailbox);
+      snprintf (buffer, sizeof(buffer),"RCPT TO:<%s>\r\n", address->mailbox);
       write (s, buffer, strlen (buffer));
       address=address->next;
 
@@ -548,6 +549,12 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
   return 1;
 }
 
+/* The code of returning answer is the following:
+ * -1    Error when conecting to the smtp server (this includes until
+ *        salutation is over and we are ready to start with smtp protocol)
+ * -2    Error during protocol 
+ * 1     Everything when perfect */
+
 int balsa_smtp_send (HEADER *msg, char *tempfile, char *server)
 {
 
@@ -555,6 +562,10 @@ int balsa_smtp_send (HEADER *msg, char *tempfile, char *server)
   struct hostent *he;
   char buffer[525]; /* Maximum allow by RFC */
   int n, s, error = 0, SmtpPort=25;
+#ifdef BALSA_USE_THREADS
+  SendThreadMessage *error_message;
+  char error_msg[256];
+#endif
   
 /* Here we make the conecction */  
   s = socket (AF_INET, SOCK_STREAM, IPPROTO_IP);
@@ -568,8 +579,13 @@ int balsa_smtp_send (HEADER *msg, char *tempfile, char *server)
     /* Must be a DNS name */
     if ((he = gethostbyname (NONULL(balsa_app.smtp_server))) == NULL)
     {
-      fprintf(stderr,"Error: Could not find address for host %s.\n", server);
-      //mutt_error ("Could not find address for host %s.", balsa_app.smtp_server);
+#ifdef BALSA_USE_THREADS
+     printf(error_msg,"Error: Could not find address for host %s.",server);
+     MSGSENDTHREAD(error_message, MSGSENDTHREADERROR,error_msg,NULL,NULL); 
+     MSGSENDTHREAD(error_message, MSGSENDTHREADERROR,"segundo mensaje error_msg",NULL,NULL);
+#else
+     fprintf(stderr,"Error: Could not find address for host %s.\n", server);
+#endif
       return -1;
     }
     memcpy ((void *)&sin.sin_addr, *(he->h_addr_list), he->h_length);
@@ -597,7 +613,7 @@ int balsa_smtp_send (HEADER *msg, char *tempfile, char *server)
   write (s, buffer, strlen (buffer));
 	  
   if (smtp_answer (s) == 0)
-    return -1;
+    return -2;
 
   if ((balsa_smtp_protocol ( s, tempfile, msg)) == 0 )
   {
@@ -605,7 +621,7 @@ int balsa_smtp_send (HEADER *msg, char *tempfile, char *server)
      snprintf (buffer, 512, "RSET %s\r\n", server);
      write (s, buffer, strlen (buffer));
      if (smtp_answer (s) == 0)
-        return -1;
+        return -2;
   }
   
   unlink (tempfile);
@@ -618,7 +634,7 @@ int balsa_smtp_send (HEADER *msg, char *tempfile, char *server)
   close (s);
   
   if (error == 1)
-     return -1;
+     return -2;
      
   return 1;
 }  

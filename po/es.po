@@ -42,11 +42,11 @@ msgstr ""
 #: src/balsa-init.c:71
 #, fuzzy
 msgid "Sentbox"
-msgstr "Correo recibido"
+msgstr "Correo enviado"
 
 #: src/balsa-init.c:72
 msgid "Outbox"
-msgstr "Correo enviado"
+msgstr "Correo saliente"
 
 #: src/balsa-init.c:73
 msgid "Inbox"
@@ -74,6 +74,12 @@ msgid ""
 "main window for more information about contacting the authors or\n"
 "reporting bugs."
 msgstr ""
+"Parece que esta utilizando Balsa por primera vez. Los siguientes pasos\n"
+"configuragán Balsa mediante unas simples preguntas. Una vez que termine\n"
+"este proceso, usted podrá modifiacar sus datos en \"Preferencias\"\n"
+"Por favor acuda a la opción \"Acerca de\" en Balsa para obtener mas\n"
+"informacion sobre como contactar con los autores o como comunicar fallos\n"
+"en Balsa."
 
 #. User info ****************************************
 #: src/balsa-init.c:153
@@ -86,6 +92,8 @@ msgid ""
 "Please enter information about yourself. If you don't\n"
 "use an SMTP server, enter \"localhost\" into the box."
 msgstr ""
+"Por favor introduzca la siguiente información sobre usted. Si usted no\n"
+"usa un servidor SMTP, introduzca \"localhost\" en el recuadro."
 
 #. Folders ****************************************
 #: src/balsa-init.c:172
@@ -95,7 +103,7 @@ msgstr ""
 #. Finish ****************************************
 #: src/balsa-init.c:209
 msgid "All done!"
-msgstr ""
+msgstr "¡Todo esta terminado!"
 
 #: src/balsa-init.c:210
 msgid ""

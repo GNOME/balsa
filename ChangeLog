@@ -11,6 +11,8 @@
 	- Select first item in POP3 server list.
 	  FIXME: needs to select "proper" item based on previous action, 
 	  add, delete, and modify.
+	- Internationalize a few strings.
+	  Rename "POP3 Servers" frame to "Remote Mailbox Servers"
 
 	* src/sendmsg-window.c:
 	Change menu item "Exit" to "Close".  We do not exit the app.

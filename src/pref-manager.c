@@ -393,7 +393,7 @@ create_mailservers_page ()
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
 
-  frame = gtk_frame_new ("POP3 Servers");
+  frame = gtk_frame_new (_("Remote Mailbox Servers"));
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
 
   hbox = gtk_hbox_new (FALSE, 0);
@@ -418,22 +418,22 @@ create_mailservers_page ()
   gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
   gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox), 25, 15);
 
-  button = gtk_button_new_with_label ("Add");
+  button = gtk_button_new_with_label (_("Add"));
   gtk_container_add (GTK_CONTAINER (bbox), button);
   gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
 			     GTK_SIGNAL_FUNC (pop3_add_cb), NULL);
 
-  button = gtk_button_new_with_label ("Modify");
+  button = gtk_button_new_with_label (_("Modify"));
   gtk_container_add (GTK_CONTAINER (bbox), button);
   gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
 			     GTK_SIGNAL_FUNC (pop3_edit_cb), NULL);
 
-  button = gtk_button_new_with_label ("Delete");
+  button = gtk_button_new_with_label (_("Delete"));
   gtk_container_add (GTK_CONTAINER (bbox), button);
   gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
 			     GTK_SIGNAL_FUNC (pop3_del_cb), NULL);
 
-  frame = gtk_frame_new ("Local Mail");
+  frame = gtk_frame_new (_("Local Mail"));
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
   hbox = gtk_hbox_new (TRUE, 0);
   gtk_container_add (GTK_CONTAINER (frame), hbox);
@@ -445,7 +445,7 @@ create_mailservers_page ()
   gtk_box_pack_start (GTK_BOX (hbox), mail_dir, TRUE, TRUE, 2);
 
   /* smtp server */
-  frame = gtk_frame_new ("Sending Mail");
+  frame = gtk_frame_new (_("Sending Mail"));
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
   hbox = gtk_hbox_new (TRUE, 0);
   gtk_container_add (GTK_CONTAINER (frame), hbox);

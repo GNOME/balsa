@@ -58,7 +58,7 @@ extern "C"
 
    /* a helper functions; FIXME: find more proper location for them.  */
    gchar* get_font_name(const gchar* base, int code);
-   gchar* get_koi_font_name(const gchar* base);
+   gchar* get_koi_font_name(const gchar* base, const gchar* code);
 
    void reflow_string(gchar* str, gint mode, gint *cur_pos, int width);
 #ifdef __cplusplus

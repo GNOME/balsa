@@ -234,7 +234,6 @@ static GnomeUIInfo iso_charset_menu[] = {
   GNOMEUIINFO_ITEM_NONE( N_ ("Ce_ltic (ISO-8859-14)"), NULL, iso_14_cb),
 #define KOI8_R_POS 9
   GNOMEUIINFO_ITEM_NONE( N_ ("Ru_ssian (KOI8-R)"), NULL, koi8_r_cb),
-  GNOMEUIINFO_END
 #define KOI8_U_POS 10
   GNOMEUIINFO_ITEM_NONE( N_ ("_Ukrainian (KOI8-U)"), NULL, koi8_u_cb),
   GNOMEUIINFO_END

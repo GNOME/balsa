@@ -1,5 +1,7 @@
-2004-07-14 11:23  PeterB
+2004-07-14 11:41  PeterB
 
+	* src/balsa-index.c: block selection "changed" signal handler while
+	we change the list of selected messages.
 	* src/save-restore.c: save all mailbox-views in the hash table, not
 	just those in the mailbox tree.
 	* src/balsa-app.c: mark a mailbox-view as not open if we fail to

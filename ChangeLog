@@ -1,3 +1,8 @@
+2003-08-22 14:17  PeterB
+
+	* src/balsa-message.c: Allow message structure tree to be collapsed
+	(Albrecht Dress <albrecht.dress@arcor.de>).
+
 2003-08-22  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/address-book-ldap.c: handle better broken connections.

@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD.es\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-08-10 19:18+0200\n"
-"PO-Revision-Date: 2003-08-11 02:53+0200\n"
+"POT-Creation-Date: 2003-08-12 19:12+0200\n"
+"PO-Revision-Date: 2003-08-13 01:12+0200\n"
 "Last-Translator: Francisco Javier F. Serrador <serrador@arrakis.es>\n"
 "Language-Team: Spanish <traductores@es.gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -22,23 +22,23 @@ msgstr ""
 # libbalsa/address-book-ldap.c:310 libbalsa/address-book-vcard.c:174
 # libbalsa/address-book-ldap.c:322 libbalsa/address-book-vcard.c:192
 #. The externq database doesn't support Id's, sorry!
-#: libbalsa/address-book-extern.c:253 libbalsa/address-book-ldap.c:391
-#: libbalsa/address-book-ldif.c:417 libbalsa/address-book-vcard.c:281
+#: libbalsa/address-book-extern.c:255 libbalsa/address-book-ldap.c:403
+#: libbalsa/address-book-ldif.c:419 libbalsa/address-book-vcard.c:283
 msgid "No-Id"
 msgstr "Sin Id"
 
 # libbalsa/address-book-ldap.c:317 libbalsa/address-book-vcard.c:183
 # libbalsa/address-book-ldap.c:329 libbalsa/address-book-vcard.c:201
-#: libbalsa/address-book-extern.c:257 libbalsa/address-book-ldap.c:397
-#: libbalsa/address-book-ldif.c:420 libbalsa/address-book-ldif.c:652
-#: libbalsa/address-book-ldif.c:689 libbalsa/address-book-ldif.c:693
-#: libbalsa/address-book-vcard.c:299
+#: libbalsa/address-book-extern.c:259 libbalsa/address-book-ldap.c:409
+#: libbalsa/address-book-ldif.c:422 libbalsa/address-book-ldif.c:654
+#: libbalsa/address-book-ldif.c:691 libbalsa/address-book-ldif.c:695
+#: libbalsa/address-book-vcard.c:301
 msgid "No-Name"
 msgstr "Sin nombre"
 
 # libbalsa/address-book-ldap.c:172
 # libbalsa/address-book-ldap.c:188
-#: libbalsa/address-book-ldap.c:239
+#: libbalsa/address-book-ldap.c:240
 msgid ""
 "Failed to initialise LDAP server.\n"
 "Check that the servername is valid."
@@ -46,18 +46,18 @@ msgstr ""
 "Falló la inicialización del servidor LDAP.\n"
 "Compruebe que el nombre del servidor es válido."
 
-#: libbalsa/address-book-ldap.c:256
+#: libbalsa/address-book-ldap.c:257
 #, c-format
 msgid "Couldn't enable TLS on the LDAP connection: %s"
 msgstr "No se pudo activar TLS en la conexión LDAP: %s"
 
-#: libbalsa/address-book-ldap.c:265
+#: libbalsa/address-book-ldap.c:266
 msgid "TLS requested but TLS support not compiled in."
 msgstr "Se pidió TLS pero no hay soporte TLS compilado"
 
 # libbalsa/address-book-ldap.c:182
 # libbalsa/address-book-ldap.c:198
-#: libbalsa/address-book-ldap.c:276
+#: libbalsa/address-book-ldap.c:277
 #, c-format
 msgid ""
 "Failed to bind to server: %s\n"
@@ -68,46 +68,46 @@ msgstr ""
 
 # libbalsa/address-book-ldap.c:230
 # libbalsa/address-book-ldap.c:246
-#: libbalsa/address-book-ldap.c:853
+#: libbalsa/address-book-ldap.c:862
 #, c-format
 msgid "Failed to do a search: %s.Check that the base name is valid."
 msgstr "Falló al efectuar la búsqueda: %s. Compruebe que el nombre base es válido."
 
-#: libbalsa/address-book.c:384 libbalsa/filter-error.c:45
+#: libbalsa/address-book.c:385 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Sin errores"
 
 # libbalsa/address-book.c:163
 # libbalsa/address-book.c:170
-#: libbalsa/address-book.c:385
+#: libbalsa/address-book.c:386
 msgid "Cannot read from address book"
 msgstr "No se puede leer del libro de direcciones"
 
 # libbalsa/address-book.c:163
 # libbalsa/address-book.c:170
-#: libbalsa/address-book.c:386
+#: libbalsa/address-book.c:387
 msgid "Cannot write to address book"
 msgstr "No se puede escribir al libro de direcciones"
 
 # libmutt/imap/imap_ssl.c:229
 # libmutt/imap/imap_ssl.c:229
-#: libbalsa/address-book.c:387
+#: libbalsa/address-book.c:388
 msgid "Cannot connect to server"
 msgstr "No se puede conectar al servidor"
 
 # libbalsa/address-book.c:163
 # libbalsa/address-book.c:170
-#: libbalsa/address-book.c:388
+#: libbalsa/address-book.c:389
 msgid "Cannot search in the address book"
 msgstr "No se puede buscar en el libro de direcciones"
 
-#: libbalsa/address-book.c:390
+#: libbalsa/address-book.c:391
 msgid "Cannot add duplicate entry"
 msgstr "No se puede agregar una entrada duplicada"
 
 # libmutt/imap/imap_ssl.c:254
 # libmutt/imap/imap_ssl.c:254
-#: libbalsa/address-book.c:391
+#: libbalsa/address-book.c:392
 msgid "Unknown error"
 msgstr "Se ha producido un error desconocido"
 
@@ -1185,7 +1185,7 @@ msgstr "Conectado a MTA"
 # src/balsa-message.c:633 src/filter-edit-dialog.c:316 src/print.c:348
 # src/sendmsg-window.c:867
 #: libbalsa/send.c:888 src/balsa-message.c:1232 src/print.c:349
-#: src/sendmsg-window.c:667 src/sendmsg-window.c:2138 src/store-address.c:342
+#: src/sendmsg-window.c:667 src/sendmsg-window.c:2138 src/store-address.c:297
 msgid "From:"
 msgstr "De:"
 
@@ -1200,7 +1200,7 @@ msgstr "De"
 # src/balsa-message.c:637 src/filter-edit-dialog.c:306 src/print.c:353
 # src/sendmsg-window.c:870
 #: libbalsa/send.c:899 src/balsa-message.c:1241 src/print.c:353
-#: src/sendmsg-window.c:666 src/sendmsg-window.c:2145 src/store-address.c:343
+#: src/sendmsg-window.c:666 src/sendmsg-window.c:2145 src/store-address.c:298
 msgid "To:"
 msgstr "A:"
 
@@ -2583,17 +2583,17 @@ msgstr "¿Quiere corregir la ruta?"
 
 # src/address-book.c:362 src/filter-edit-dialog.c:135
 # src/address-book.c:387 src/filter-edit-dialog.c:130
-#: src/ab-main.c:169 src/ab-window.c:167 src/filter-edit-dialog.c:193
+#: src/ab-main.c:304 src/ab-window.c:167 src/filter-edit-dialog.c:193
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
 #: src/filter-run-dialog.c:292
 msgid "Name"
 msgstr "Nombre"
 
-# src/filter-edit-dialog.c:570
-# src/filter-edit-dialog.c:491
-#: src/ab-main.c:299
-msgid "_Search for Name:"
-msgstr "_Buscar por nombre:"
+# src/main-window.c:259
+# src/main-window.c:262
+#: src/ab-main.c:389
+msgid "F_ilter:"
+msgstr "F_iltro:"
 
 # src/address-book.c:362
 # src/address-book.c:387
@@ -2603,51 +2603,51 @@ msgstr "Correo electrónico"
 
 # src/address-book.c:369
 # src/address-book.c:394
-#: src/ab-window.c:208
+#: src/ab-window.c:207
 msgid "Address Book"
 msgstr "Libreta de direcciones"
 
 # src/filter-edit-dialog.c:570
 # src/filter-edit-dialog.c:491
 #. Entry widget for finding an address
-#: src/ab-window.c:265
+#: src/ab-window.c:264
 msgid "Search for Name:"
 msgstr "Buscar por el nombre:"
 
 # src/address-book.c:477
 # src/address-book.c:523
-#: src/ab-window.c:324
+#: src/ab-window.c:323
 msgid "Send-To"
 msgstr "Enviar a"
 
 # src/address-book.c:493
 # src/address-book.c:549
-#: src/ab-window.c:344
+#: src/ab-window.c:343
 msgid "Run GnomeCard"
 msgstr "Ejecutar GnomeCard"
 
 # src/address-book.c:499
 # src/address-book.c:558
-#: src/ab-window.c:352
-msgid "Re-Import"
-msgstr "Reimportar"
+#: src/ab-window.c:351
+msgid "_Re-Import"
+msgstr "_Reimportar"
 
 #. mode switching stuff
-#: src/ab-window.c:362
+#: src/ab-window.c:361
 msgid "Treat multiple addresses as:"
 msgstr "Tratar múltiples direcciones como:"
 
-#: src/ab-window.c:366
+#: src/ab-window.c:365
 msgid "alternative addresses for the same person"
 msgstr "direcciones alternativas para la misma persona"
 
-#: src/ab-window.c:371
+#: src/ab-window.c:370
 msgid "a distribution list"
 msgstr "una lista de distribución"
 
 # libbalsa/send.c:788
 # libbalsa/send.c:794
-#: src/ab-window.c:671
+#: src/ab-window.c:673
 #, c-format
 msgid ""
 "Error opening address book '%s'\n"
@@ -2956,7 +2956,7 @@ msgstr "Responder a:"
 # src/balsa-message.c:638
 #. cc:
 #: src/balsa-message.c:1242 src/print.c:354 src/sendmsg-window.c:670
-#: src/sendmsg-window.c:1852 src/sendmsg-window.c:2152 src/store-address.c:344
+#: src/sendmsg-window.c:1852 src/sendmsg-window.c:2152 src/store-address.c:299
 msgid "Cc:"
 msgstr "Cc:"
 
@@ -2964,7 +2964,7 @@ msgstr "Cc:"
 # src/balsa-message.c:639
 #. bcc:
 #: src/balsa-message.c:1243 src/print.c:355 src/sendmsg-window.c:669
-#: src/sendmsg-window.c:1857 src/store-address.c:345
+#: src/sendmsg-window.c:1857 src/store-address.c:300
 msgid "Bcc:"
 msgstr "Bcc:"
 
@@ -6437,41 +6437,37 @@ msgstr "¿Guardar esta dirección y cerrar el diálogo?"
 # src/mblist-window.c:528
 # src/mblist-window.c:501 src/mblist-window.c:517 src/mblist-window.c:536
 # src/mblist-window.c:551
-#: src/store-address.c:212
+#: src/store-address.c:211
 msgid "No address book selected...."
 msgstr "No hay una libreta de direcciones seleccionada..."
 
-#: src/store-address.c:225
-msgid "Sorry, no semicolons are allowed in the name!\n"
-msgstr "No se permiten puntos y comas en el nombre\n"
-
 # libbalsa/address-book.c:163
 # libbalsa/address-book.c:170
-#: src/store-address.c:266
+#: src/store-address.c:221
 msgid "Address could not be written to this address book."
 msgstr "No se pudo escribir la dirección al libro de direcciones."
 
-#: src/store-address.c:268
+#: src/store-address.c:223
 msgid "Address book could not be accessed."
 msgstr "No se pudo acceder al libro de direcciones."
 
-#: src/store-address.c:270
+#: src/store-address.c:225
 msgid "This mail address is already in this address book."
 msgstr "Esta dirección de correo ya está en el libro de direcciones."
 
-#: src/store-address.c:272
+#: src/store-address.c:227
 msgid "Unexpected address book error. Report it."
 msgstr "Error inesperado en el libro de direcciones. Informe de él."
 
 # src/address-book.c:369
 # src/address-book.c:394
-#: src/store-address.c:286
+#: src/store-address.c:241
 msgid "Choose Address Book"
 msgstr "Elegir libreta de direcciones"
 
 # src/store-address.c:137
 # src/store-address.c:149
-#: src/store-address.c:329
+#: src/store-address.c:284
 msgid "Choose Address"
 msgstr "Elegir dirección"
 
@@ -6834,6 +6830,14 @@ msgstr "Subir"
 #: src/toolbar-prefs.c:506
 msgid "Down"
 msgstr "Bajar"
+
+# src/filter-edit-dialog.c:570
+# src/filter-edit-dialog.c:491
+#~ msgid "_Search for Name:"
+#~ msgstr "_Buscar por nombre:"
+
+#~ msgid "Sorry, no semicolons are allowed in the name!\n"
+#~ msgstr "No se permiten puntos y comas en el nombre\n"
 
 #~ msgid "External editor command:"
 #~ msgstr "Comando del editor externo:"

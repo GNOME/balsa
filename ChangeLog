@@ -1,3 +1,8 @@
+2002-06-28  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/folder-scanners.c:
+	* src/balsa-mblist.c: more conservative imap scanning locking scheme.
+
 2002-06-26  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-mblist.c: use "pixbuf" property of

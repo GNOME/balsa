@@ -177,20 +177,15 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
             return;
     }
 
-    if (list_inbox) {
+    gdk_threads_enter(); libbalsa_lock_mutt();
+
+    if (list_inbox)
         /* force INBOX into the mailbox list
          * delim doesn't matter, so we'll give it '/'
          * and we'll mark it as not scanned, in case it
          * has any subfolders */
-        gdk_threads_enter();
-        libbalsa_lock_mutt();
         mailbox_handler(rnode, "INBOX", '/', FALSE);
-        libbalsa_unlock_mutt();
-        gdk_threads_leave();
-    }
 
-	
-    libbalsa_lock_mutt();
     safe_free((void **)&ImapUser);   ImapUser = safe_strdup(server->user);
     safe_free((void **)&ImapPass);   ImapPass = safe_strdup(server->passwd);
     /* subscribed triggers a bug in libmutt, disable it now */
@@ -233,7 +228,7 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     g_list_foreach((GList*)state.subfolders, (GFunc)g_free, NULL);
     g_list_free((GList*)state.subfolders);
     state_free (&state);
-    libbalsa_unlock_mutt();
+    libbalsa_unlock_mutt(); gdk_threads_leave();
 }
 
 /* this function ovverrides mutt's one.
@@ -253,7 +248,6 @@ void imap_add_folder (char delim, char *folder, int noselect,
 	   noinferiors, isparent);  */
     if(isparent) return;
     libbalsa_unlock_mutt();
-    gdk_threads_enter();
     if(!noselect) {
 	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                              "ADDING MAILBOX %s\n", folder);
@@ -274,6 +268,5 @@ void imap_add_folder (char delim, char *folder, int noselect,
 	state->mailbox_handler(state->rnode, folder, delim, state->scanned);
     else if (isFolder)
 	state->folder_handler(state->rnode, folder, delim, state->scanned);
-    gdk_threads_leave();
     libbalsa_lock_mutt();
 }

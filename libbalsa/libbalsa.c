@@ -532,7 +532,7 @@ ask_cert_real(X509 *cert)
     label = gtk_label_new(str->str);
     g_string_free(str, TRUE);
     gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(dialog)->vbox),
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),
                        label, TRUE, TRUE, 1);
     gtk_widget_show(label);
 
@@ -580,7 +580,9 @@ libmutt_ask_for_cert_acceptance(X509 *cert)
     pthread_cond_init(&acd.cond, NULL);
     acd.cert = cert;
     gtk_idle_add(ask_cert_idle, &acd);
+    libbalsa_unlock_mutt(); gdk_threads_leave();
     pthread_cond_wait(&acd.cond, &ask_cert_lock);
+    gdk_threads_enter(); libbalsa_lock_mutt();
     
     pthread_cond_destroy(&acd.cond);
     pthread_mutex_unlock(&ask_cert_lock);

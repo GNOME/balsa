@@ -184,7 +184,12 @@ index_child_new (GnomeMDI * mdi, Mailbox * mailbox)
 
   mdichild = gnome_mdi_find_child (mdi, mailbox->name);
   if (mdichild)
-    return NULL;
+    {
+      GtkWidget *view;
+      view = (mdichild->views)->data;
+      gnome_mdi_set_active_view(mdi, view);
+      return NULL;
+    }
 
   child = gtk_type_new (index_child_get_type ());
   if (child)
@@ -628,5 +633,6 @@ index_child_drag_data_get (GtkWidget *widget, GdkDragContext *context,
   gtk_selection_data_set (selection_data,
 			  selection_data->target,
 			  8 * sizeof(Message *), (gchar *)message_list, nb_selected_rows * sizeof(Message *));
+  g_free( message_list );
 }
 

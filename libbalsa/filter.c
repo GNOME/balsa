@@ -245,7 +245,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 		}
 	    }
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT)) {
-		str=(gchar *)LIBBALSA_MESSAGE_GET_SUBJECT(message);
+		const gchar *str = LIBBALSA_MESSAGE_GET_SUBJECT(message);
 		if (str) match=REGEXEC(*(regex->compiled),str)==0;
 		if (match) break;
 	    }

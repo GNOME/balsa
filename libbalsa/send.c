@@ -426,6 +426,17 @@ libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
 }
 #endif
 
+static void
+lbs_change_flags(LibBalsaMessage * msg, LibBalsaMessageFlag set,
+                 LibBalsaMessageFlag clear)
+{
+    GArray *array = g_array_new(FALSE, FALSE, sizeof(guint));
+
+    g_array_append_val(array, msg->msgno);
+    libbalsa_mailbox_messages_change_flags(msg->mailbox, array, set,
+                                           clear);
+    g_array_free(array, TRUE);
+}
 
 #if ENABLE_ESMTP
 /* [BCS] - libESMTP uses a callback function to read the message from the
@@ -562,12 +573,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	if (created != LIBBALSA_MESSAGE_CREATE_OK) {
 	    msg_queue_item_destroy(new_message);
 	} else {
-	    GList * messages = g_list_prepend(NULL, msg);
-
-            libbalsa_messages_change_flag(messages,
-                                          LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                                          TRUE);
-	    g_list_free(messages);
+	    lbs_change_flags(msg, LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
 	    /*
 	       The message needs to be filtered and the newlines converted to
 	       \r\n because internally the lines foolishly terminate with the
@@ -774,7 +780,6 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
 {
     MessageQueueItem *mqi;
     const smtp_status_t *status;
-    GList * messages;
 
     send_lock();
     /* Get the app data and decrement the reference count.  Only delete
@@ -783,12 +788,9 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
     if (mqi != NULL)
       mqi->refcount--;
 
-    if(mqi != NULL && mqi->orig != NULL && mqi->orig->mailbox) {
-        messages = g_list_prepend(NULL, mqi->orig);
-        libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                                      FALSE);
-        g_list_free(messages);
-    } else printf("mqi: %p mqi->orig: %p mqi->orig->mailbox: %p\n",
+    if(mqi != NULL && mqi->orig != NULL && mqi->orig->mailbox)
+	lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_FLAGGED);
+    else printf("mqi: %p mqi->orig: %p mqi->orig->mailbox: %p\n",
                   mqi, mqi ? mqi->orig : NULL, 
                   mqi&&mqi->orig ? mqi->orig->mailbox : NULL);
     status = smtp_message_transfer_status (message);
@@ -800,13 +802,10 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
                 libbalsa_message_find_user_hdr(mqi->orig, "X-Balsa-Fcc");
             const gchar **fccurl = fcclist ? fcclist->data : NULL;
 
-	    messages = g_list_prepend(NULL, mqi->orig);
 	    if (mqi->orig->mailbox && fccurl) {
                 LibBalsaMailbox *fccbox = mqi->finder(fccurl[1]);
-                libbalsa_messages_change_flag
-                    (messages, LIBBALSA_MESSAGE_FLAG_NEW, FALSE);
-                libbalsa_messages_change_flag
-                    (messages, LIBBALSA_MESSAGE_FLAG_FLAGGED, FALSE);
+		lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW);
+		lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_FLAGGED);
 		libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
                 remove = libbalsa_mailbox_copy_message(mqi->orig, fccbox)>=0;
                 if(!remove) 
@@ -817,11 +816,9 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
             /* If copy failed, mark the message again as flagged -
                otherwise it will get resent again. And again, and
                again... */
-            libbalsa_messages_change_flag
-                (messages, 
-                 remove ? LIBBALSA_MESSAGE_FLAG_DELETED : 
-                 LIBBALSA_MESSAGE_FLAG_FLAGGED, TRUE);
-            g_list_free(messages);
+            lbs_change_flags(mqi->orig, remove ?
+                             LIBBALSA_MESSAGE_FLAG_DELETED :
+                             LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
 	}
     } else {
 	/* XXX - Show the poor user the status codes and message. */
@@ -1029,12 +1026,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
 	if (created != LIBBALSA_MESSAGE_CREATE_OK) {
 	    msg_queue_item_destroy(new_message);
 	} else {
-	    GList * messages = g_list_prepend(NULL, msg);
-
-            libbalsa_messages_change_flag(messages,
-                                          LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                                          TRUE);
-	    g_list_free(messages);
+	    lbs_change_flags(msg, LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
 	    if (mqi)
 		mqi->next_message = new_message;
 	    else
@@ -1068,26 +1060,24 @@ handle_successful_send(MessageQueueItem *mqi, LibBalsaFccboxFinder finder)
 {
     if (mqi->orig->mailbox) {
         gboolean remove = TRUE;
-	GList * messages = g_list_prepend(NULL, mqi->orig);
         GList* fcclist =
             libbalsa_message_find_user_hdr(mqi->orig, "X-Balsa-Fcc");
         const gchar **fccurl = fcclist ? fcclist->data : NULL;
 
-        libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                                  FALSE);
-	libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_NEW,
-		                      FALSE);
+	lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_FLAGGED);
+	lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW);
 	libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
 
         if (mqi->orig->mailbox && fccurl) {
             LibBalsaMailbox *fccbox = mqi->finder(fccurl[1]);
             remove = libbalsa_mailbox_copy_message(mqi->orig, fccbox)>=0;
         }
-        if(remove)
-            libbalsa_messages_change_flag(messages, 
-                                          LIBBALSA_MESSAGE_FLAG_DELETED,
-                                          TRUE);
-	g_list_free(messages);
+        /* If copy failed, mark the message again as flagged -
+           otherwise it will get resent again. And again, and
+           again... */
+        lbs_change_flags(mqi->orig, remove ?
+                         LIBBALSA_MESSAGE_FLAG_DELETED :
+                         LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
     }
     mqi->status = MQI_SENT;
 }
@@ -1196,10 +1186,6 @@ balsa_send_message_real(SendMessageInfo* info)
        on the messages with a 2xx status recorded against them.  However
        its possible for individual recipients to fail too.  Need a way to
        report it all.  */
-    /* Do we really need to grab the gdk lock? If so, we'd have to drop
-     * it again before calling libbalsa_messages_change_flag().
-     * gdk_threads_enter();
-     */
     smtp_enumerate_messages (info->session, handle_successful_send, 
                              &session_started);
 

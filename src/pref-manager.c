@@ -2495,6 +2495,16 @@ server_edit_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
+address_book_change(LibBalsaAddressBook * address_book, gboolean append)
+{
+    if (append)
+        balsa_app.address_book_list =
+            g_list_append(balsa_app.address_book_list, address_book);
+    config_address_book_save(address_book);
+    update_address_books();
+}
+
+static void
 address_book_edit_cb(GtkWidget * widget, gpointer data)
 {
     LibBalsaAddressBook *address_book;
@@ -2510,13 +2520,8 @@ address_book_edit_cb(GtkWidget * widget, gpointer data)
 
     g_assert(address_book != NULL);
 
-    address_book = 
-        balsa_address_book_config_new(address_book,
-                                      GTK_WINDOW(property_box));
-    if (address_book) {
-	config_address_book_save(address_book);
-	update_address_books();
-    }
+    balsa_address_book_config_new(address_book, address_book_change,
+                                  GTK_WINDOW(property_box));
 }
 
 static void
@@ -2541,17 +2546,8 @@ set_default_address_book_cb(GtkWidget * button, gpointer data)
 static void
 address_book_add_cb(GtkWidget * widget, gpointer data)
 {
-    LibBalsaAddressBook *address_book;
-    address_book = 
-        balsa_address_book_config_new(NULL,
-                                      GTK_WINDOW(property_box));
-
-    if (address_book != NULL) {
-	balsa_app.address_book_list =
-	    g_list_append(balsa_app.address_book_list, address_book);
-	config_address_book_save(address_book);
-	update_address_books();
-    }
+    balsa_address_book_config_new(NULL, address_book_change,
+                                  GTK_WINDOW(property_box));
 }
 
 static void

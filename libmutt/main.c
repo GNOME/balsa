@@ -16,8 +16,6 @@
  *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */ 
 
-#define MAIN_C 1
-
 #include "mutt.h"
 #include "mutt_curses.h"
 #include "keymap.h"

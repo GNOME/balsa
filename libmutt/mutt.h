@@ -28,7 +28,7 @@
 #include "hash.h"
 
 /* nifty trick I stole from ELM 2.5alpha. */
-#ifdef MAIN_C
+#ifdef GLOBALS_C
 #define WHERE 
 #define INITVAL(x) = x
 #else

@@ -895,6 +895,8 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
     gboolean ret;
     HEADER *msg_header;
 
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
+
     msg_header = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
 
     /* FIXME: Can be simplified into 1 if */

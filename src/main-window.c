@@ -154,6 +154,7 @@ static void save_current_part_cb(GtkWidget * widget, gpointer data);
 static void delete_message_cb(GtkWidget * widget, gpointer data);
 static void undelete_message_cb(GtkWidget * widget, gpointer data);
 static void toggle_flagged_message_cb(GtkWidget * widget, gpointer data);
+static void toggle_new_message_cb(GtkWidget * widget, gpointer data);
 static void store_address_cb(GtkWidget * widget, gpointer data);
 static void wrap_message_cb(GtkWidget * widget, gpointer data);
 static void show_no_headers_cb(GtkWidget * widget, gpointer data);
@@ -320,6 +321,25 @@ static GnomeUIInfo view_menu[] = {
     GNOMEUIINFO_END
 };
 
+static GnomeUIInfo message_toggle_menu[] = {
+#define MENU_MESSAGE_TOGGLE_FLAGGED_POS 0
+    /* ! */    
+    {
+	GNOME_APP_UI_ITEM, N_("Flagged"), N_("Toggle flagged"),
+	toggle_flagged_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+	BALSA_PIXMAP_FLAGGED, 'X', 0, NULL
+    },
+#define MENU_MESSAGE_TOGGLE_NEW_POS 1
+    /* ! */    
+    {
+	GNOME_APP_UI_ITEM, N_("New"), N_("Toggle New"),
+	toggle_new_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+	BALSA_PIXMAP_ENVELOPE, 0, 0, NULL
+    },
+    GNOMEUIINFO_END
+};
+
+
 static GnomeUIInfo message_menu[] = {
 #define MENU_MESSAGE_REPLY_POS 0
     /* R */
@@ -389,13 +409,10 @@ static GnomeUIInfo message_menu[] = {
 	undelete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
     },
-#define MENU_MESSAGE_TOGGLE_FLAGGED_POS 11
+
+#define MENU_MESSAGE_TOGGLE_POS 11
     /* ! */
-    {
-	GNOME_APP_UI_ITEM, N_("_Toggle Flagged"), N_("Toggle flagged"),
-	toggle_flagged_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-	BALSA_PIXMAP_FLAGGED, 'X', 0, NULL
-    },
+    GNOMEUIINFO_SUBTREE(N_("_Toggle"), message_toggle_menu),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MESSAGE_STORE_ADDRESS_POS 13
     /* S */
@@ -804,14 +821,20 @@ enable_message_menus(LibBalsaMessage * message)
     if (message && message->mailbox->readonly) {
 	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_DELETE_POS].widget, FALSE);
 	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_UNDEL_POS].widget, FALSE);
-	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TOGGLE_FLAGGED_POS].widget,
+	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TOGGLE_POS].widget,
+				 FALSE);
+	gtk_widget_set_sensitive(message_toggle_menu[MENU_MESSAGE_TOGGLE_FLAGGED_POS].widget,
+				 FALSE);
+	gtk_widget_set_sensitive(message_toggle_menu[MENU_MESSAGE_TOGGLE_NEW_POS].widget,
 				 FALSE);
 
 	gtk_widget_set_sensitive(main_toolbar[TOOLBAR_DELETE_POS].widget, FALSE);
     } else {
 	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_DELETE_POS].widget, enable);
 	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_UNDEL_POS].widget, enable);
-	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TOGGLE_FLAGGED_POS].widget, enable);
+	gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TOGGLE_POS].widget, enable);
+	gtk_widget_set_sensitive(message_toggle_menu[MENU_MESSAGE_TOGGLE_FLAGGED_POS].widget, enable);
+	gtk_widget_set_sensitive(message_toggle_menu[MENU_MESSAGE_TOGGLE_NEW_POS].widget, enable);
 
 	gtk_widget_set_sensitive(main_toolbar[TOOLBAR_DELETE_POS].widget, enable);
     }
@@ -1755,6 +1778,14 @@ static void
 toggle_flagged_message_cb(GtkWidget * widget, gpointer data)
 {
     balsa_message_toggle_flagged(widget,
+				 balsa_window_find_current_index
+				 (BALSA_WINDOW(data)));
+}
+
+static void
+toggle_new_message_cb(GtkWidget * widget, gpointer data)
+{
+    balsa_message_toggle_new(widget,
 				 balsa_window_find_current_index
 				 (BALSA_WINDOW(data)));
 }

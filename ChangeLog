@@ -1,3 +1,7 @@
+2004-03-31  Carlos Morgado  <chbm gnome.org>
+
+	* src/balsa-message.c: quote argument when we invoke a vfs command
+
 2004-03-31 09:24  PeterB
 
 	* libbalsa/imap/imap-handle.c: declaration out of order.

@@ -835,7 +835,7 @@ key_pressed_cb(GtkWidget * widget, GdkEventKey * event, gpointer user_data)
     /*
      * We cannot use GDK_MODIFIER_MASK because that would trap SHIFT.
      */
-    if (event->state & GDK_CONTROL_MASK)
+    if (event->state & (GDK_CONTROL_MASK|GDK_MOD1_MASK|GDK_MOD2_MASK))
 	return FALSE;
 
     /*

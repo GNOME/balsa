@@ -6,6 +6,7 @@
 	* src/balsa-message.c: release selection, fix  #29362 and #30395.
 	* src/main-window.c: remove deprecated code message deletion on sending
 	* src/sendmsg-window.c: fix Slovak locale.
+	* src/expand-alias.c: fix #30977 (Alt ignored when expansion on).
 	
 2000-11-06  Pawel Salek  <pawsa@theochem.kth.se>
 

@@ -1,5 +1,7 @@
-2004-06-06 18:39  PeterB
+2004-06-06 20:11  PeterB
 
+	* libbalsa/source-viewer.c, src/sendmsg-window.c:
+	GTK_WRAP_WORD_CHAR is since gtk-2.4.0.
 	* libbalsa/mailbox_mbox.c: change preface or postface only when
 	non-NULL.
 	* libbalsa/mailbox_mbox.c: space-stuff From_ lines in multipart

@@ -92,9 +92,21 @@ static void balsa_index_set_style(BalsaIndex * bindex, GtkCTreeNode *node);
 static void balsa_index_set_style_recursive(BalsaIndex * bindex, GtkCTreeNode *node);
 static void balsa_index_set_parent_style(BalsaIndex *bindex, GtkCTreeNode *node);
 static void populate_mru(GtkWidget *menu, BalsaIndex *bindex);
+static void balsa_index_check_visibility(GtkCList * clist,
+                                         GtkCTreeNode * node,
+                                         gfloat row_align);
+static GtkCTreeNode *balsa_index_find_node(BalsaIndex * bindex,
+                                           gboolean previous,
+                                           LibBalsaMessageFlag flag);
+static void balsa_index_transfer_messages(BalsaIndex * bindex,
+                                          LibBalsaMailbox * mailbox);
 static void balsa_index_idle_remove(gpointer data);
 static void balsa_index_idle_add(gpointer data, gpointer message);
 static gboolean balsa_index_idle_clear(gpointer data);
+static void balsa_index_idle_remove(gpointer data);
+static void balsa_index_idle_add(gpointer data, gpointer message);
+static gboolean balsa_index_idle_clear(gpointer data);
+static gint balsa_index_most_recent_message(GtkCList * clist);
 
 
 /* mailbox callbacks */
@@ -113,8 +125,6 @@ static void mailbox_messages_delete_cb(BalsaIndex * bindex,
 /* clist callbacks */
 static void button_event_press_cb(GtkWidget * clist, GdkEventButton * event,
 				  gpointer data);
-static void button_event_release_cb(GtkWidget * clist,
-				    GdkEventButton * event, gpointer data);
 static void select_message(GtkWidget * widget, GtkCTreeNode *row, gint column,
 			   gpointer data);
 static void unselect_message(GtkWidget * widget, GtkCTreeNode *row, 
@@ -124,6 +134,10 @@ static void unselect_all_messages (GtkCList* clist, gpointer user_data);
 
 static void resize_column_event_cb(GtkCList * clist, gint column,
 				   gint width, gpointer data);
+static void tree_expand_cb(GtkCTree * ctree, GList * node,
+                           gpointer user_data);
+static void tree_collapse_cb(GtkCTree * ctree, GList * node,
+                           gpointer user_data);
 
 /* Callbacks */
 static gint mru_search_cb(GNode *node, struct FolderMRUEntry *entry);
@@ -167,10 +181,6 @@ static void transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row,
 
 static void sendmsg_window_destroy_cb(GtkWidget * widget, gpointer data);
 
-
-
-
-
 /* signals */
 enum {
     SELECT_MESSAGE,
@@ -178,7 +188,6 @@ enum {
     UNSELECT_ALL_MESSAGES,
     LAST_SIGNAL
 };
-
 
 /* marshallers */
 typedef void (*BalsaIndexSignal1) (GtkObject * object,
@@ -190,7 +199,6 @@ static gint balsa_index_signals[LAST_SIGNAL] = {
 };
 
 static GtkScrolledWindowClass *parent_class = NULL;
-
 
 guint
 balsa_index_get_type()
@@ -261,8 +269,6 @@ balsa_index_class_init(BalsaIndexClass * klass)
     klass->select_message = NULL;
     klass->unselect_message = NULL;
 }
-
-
 
 static void
 balsa_index_init(BalsaIndex * bindex)
@@ -360,10 +366,16 @@ balsa_index_init(BalsaIndex * bindex)
 		       (GtkSignalFunc) button_event_press_cb,
 		       (gpointer) bindex);
 
-    gtk_signal_connect(GTK_OBJECT(bindex->ctree),
-		       "button_release_event",
-		       (GtkSignalFunc) button_event_release_cb,
-		       (gpointer) bindex);
+    /* catch thread expand/collapse events, to set the head node style
+     * for unread messages */
+    gtk_signal_connect_after(GTK_OBJECT(bindex->ctree),
+                             "tree-expand",
+                             (GtkSignalFunc) tree_expand_cb,
+                             (gpointer) bindex);
+    gtk_signal_connect_after(GTK_OBJECT(bindex->ctree),
+                             "tree-collapse",
+                             (GtkSignalFunc) tree_collapse_cb,
+                             (gpointer) bindex);
 
     /* We want to catch column resize attempts to store the new value */
     gtk_signal_connect(GTK_OBJECT(clist),
@@ -398,26 +410,14 @@ static gint
 date_compare(GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2)
 {
     LibBalsaMessage *m1, *m2;
-    time_t t1, t2;
-
     GtkCListRow *row1 = (GtkCListRow *) ptr1;
     GtkCListRow *row2 = (GtkCListRow *) ptr2;
 
     m1 = row1->data;
     m2 = row2->data;
+    g_return_val_if_fail(m1 && m2, 0);
 
-    if (!m1 || !m2)
-	return 0;
-
-    t1 = m1->date;
-    t2 = m2->date;
-
-    if (t1 < t2)
-	return 1;
-    if (t1 > t2)
-	return -1;
-
-    return 0;
+    return m2->date - m1->date;
 }
 
 
@@ -433,8 +433,7 @@ numeric_compare(GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2)
     m1 = row1->data;
     m2 = row2->data;
 
-    if (!m1 || !m2)
-	return 0;
+    g_return_val_if_fail(m1 && m2, 0);
 
     t1 = LIBBALSA_MESSAGE_GET_NO(m1);
     t2 = LIBBALSA_MESSAGE_GET_NO(m2);
@@ -468,36 +467,27 @@ size_compare(GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2)
     return t2-t1;
 }
 
-/* balsa_index_get_largest_selected:
-   helper function, finds the message with largest number among selected and
+/* balsa_index_most_recent_message:
+   helper function, finds the message most recently selected and
    fails with -1, if the selection is empty.
 */
-gint
-balsa_index_get_largest_selected(GtkCList * clist)
+static gint
+balsa_index_most_recent_message(GtkCList * clist)
 {
-    GList *list;
-    gint i = 0;
-    gint h = 0;
-
-    if (!clist->selection)
-	return -1;
-
-    list = clist->selection;
-    while (list) {
-	i = gtk_clist_find_row_from_data(clist,
-					 LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(GTK_CTREE(clist), list->data)));
-	if (i > h)
-	    h = i;
-	list = g_list_next(list);
+    if (clist->selection == NULL)
+        return -1;
+    else {
+        GtkCTreeNode *node = g_list_last(clist->selection)->data;
+        gpointer data =
+            gtk_ctree_node_get_row_data(GTK_CTREE(clist), node);
+        return gtk_clist_find_row_from_data(clist, data);
     }
-    return h;
 }
 
 
 static void
 clist_click_column(GtkCList * clist, gint column, gpointer data)
 {
-    gint h;
     GtkSortType sort_type = clist->sort_type;
 
     if (column == clist->sort_column)
@@ -508,9 +498,7 @@ clist_click_column(GtkCList * clist, gint column, gpointer data)
     gtk_clist_sort(clist);
     DO_CLIST_WORKAROUND(clist);
 
-    if ((h = balsa_index_get_largest_selected(clist)) >= 0 &&
-	gtk_clist_row_is_visible(clist, h) != GTK_VISIBILITY_FULL)
-	gtk_clist_moveto(clist, h, 0, 1.0, 0.0);
+    balsa_index_check_visibility(clist, NULL, 0.5);
 }
 
 
@@ -522,26 +510,25 @@ clist_click_column(GtkCList * clist, gint column, gpointer data)
 void 
 balsa_index_set_first_new_message(BalsaIndex * bindex)
 {
-
-    LibBalsaMessage* message;
-    gint i = 0;
-    
-    g_return_if_fail(bindex != NULL);
-    bindex->first_new_message = NULL;
-    
-    while (i < GTK_CLIST(bindex->ctree)->rows) {
-        message = LIBBALSA_MESSAGE(
-            gtk_clist_get_row_data(GTK_CLIST(bindex->ctree), i));
-        
-        if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
-            bindex->first_new_message = message;
-            return;
-        }
-        ++i;
-    }
+    GtkCTreeNode *node =
+        balsa_index_find_node(bindex, FALSE, LIBBALSA_MESSAGE_FLAG_NEW);
+    if (node)
+        bindex->first_new_message =
+            LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data
+                             (bindex->ctree, node));
 }
 
-
+struct balsa_index_scan_info {
+    gpointer node;                      /* current ctree node */
+    GList *selection;                   /* copy of clist->selection */
+    LibBalsaMessageFlag flag;           /* look only for matching nodes */
+    GtkCTreeNode *first;                /* returns first matching */
+    GtkCTreeNode *previous;             /* returns last matching
+                                           before selection */
+    GtkCTreeNode *next;                 /* returns first matching
+                                           after selection */
+    GtkCTreeNode *last;                 /* returns last matching */
+};
 
 /* 
  * This is an idle handler. Be sure to use gdk_threads_{enter/leave}
@@ -555,8 +542,8 @@ moveto_handler(BalsaIndex * bindex)
     gint row = -1;
     gpointer row_data = NULL;
     GList* list = NULL;
+    GtkCTreeNode *node;
     
-
     if (!GTK_WIDGET_VISIBLE(GTK_WIDGET(bindex)))
 	return TRUE;
 
@@ -572,6 +559,15 @@ moveto_handler(BalsaIndex * bindex)
                                           GTK_CLIST(bindex->ctree)->rows - 1);
     }
         
+    node = gtk_ctree_find_by_row_data(bindex->ctree, NULL, row_data);
+    while (node && !gtk_ctree_is_viewable(bindex->ctree, node)) {
+        node = GTK_CTREE_ROW(node)->parent;
+        if (balsa_app.view_message_on_open)
+            gtk_ctree_expand(bindex->ctree, node);
+    }
+    if (!balsa_app.view_message_on_open)
+        row_data = gtk_ctree_node_get_row_data(bindex->ctree, node);
+
     if (row_data) {
         row = gtk_clist_find_row_from_data (GTK_CLIST (bindex->ctree),
                                             row_data);
@@ -753,7 +749,7 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
   for discussion of the GtkCtree bug. The bug is triggered when one
   attempts to delete a collapsed message thread.
 */
-void
+static void
 balsa_index_del(BalsaIndex * bindex, LibBalsaMessage * message)
 {
     gint row;
@@ -819,6 +815,7 @@ balsa_index_del(BalsaIndex * bindex, LibBalsaMessage * message)
     gtk_clist_unselect_row (GTK_CLIST (bindex->ctree), row, -1);
     gtk_ctree_remove_node(GTK_CTREE(bindex->ctree), node);
 
+
     /* if last message is removed, clear the preview */
     if (GTK_CLIST (bindex->ctree)->rows <= 0) {
         balsa_index_idle_add(bindex, NULL);
@@ -862,165 +859,247 @@ balsa_index_select_row(BalsaIndex * bindex, gint row)
 	gtk_clist_moveto(clist, row, -1, 0.5, 0.0);
 }
 
+static void
+balsa_index_check_visibility(GtkCList *clist, GtkCTreeNode * node,
+                             gfloat row_align)
+{
+    gint row;
+    if (node) {
+        gpointer tmp = gtk_ctree_node_get_row_data(GTK_CTREE(clist), node);
+        row = gtk_clist_find_row_from_data(clist, tmp);
+    } else
+        row = balsa_index_most_recent_message(clist);
+    if (gtk_clist_row_is_visible(clist, row) != GTK_VISIBILITY_FULL) 
+	gtk_clist_moveto(clist, row, -1, row_align, 0.0);
+}
 
-/* balsa_index_select_next:
- * 
- * selects next message or last message when no messages are selected.
- * */
+/*
+ * select message interfaces
+ *
+ * - balsa_index_select_next:
+ *   - if any selected,
+ *       selects first viewable message after first selected message
+ *       no-op if there isn't one
+ *   - if no selection,
+ *       selects first message
+ *   callback for `next message' menu item and `open next' toolbar
+ *   button
+ *
+ * - balsa_index_select_previous:
+ *   - if any selected,
+ *       selects last viewable message before first selected message
+ *       no-op if there isn't one
+ *   - if no selection,
+ *       selects first message
+ *   callback for `previous message' menu item and `open previous'
+ *   toolbar button
+ *
+ * - balsa_index_select_next_threaded: 
+ *   - selects first unselected message after first selected message,
+ *     expanding thread if necessary
+ *   - if none, falls back to last viewable message before first
+ *     selected message
+ *   called after moving (or deleting) messages, so there's always a
+ *   selection
+ *
+ * - balsa_index_select_next_unread:
+ *   - selects first unread unselected message after first selected
+ *     message, expanding thread if necessary
+ *   - if none, wraps around to the first unread message anywhere 
+ *   - no-op if there are no unread messages
+ *   callback for `next unread message' menu item and `open next unread
+ *   message' toolbar button
+ *
+ * - balsa_index_select_next_flagged:
+ *   like balsa_index_select_next_unread
+ */
+
+/* balsa_index_scan_node:
+ * callback for pre-recursive search for previous and next
+ * after search:
+ * - b->previous is last viewable message before current, NULL if none,
+ *     NULL if no current message
+ * - b->next is first viewable message after current, NULL if none,
+ *     first message if no current message
+ */
+static void
+balsa_index_scan_node(GtkCTree * ctree, GtkCTreeNode * node,
+                      struct balsa_index_scan_info *b)
+{
+    if (node == b->node) {
+        b->previous = b->last;
+        b->next = NULL;
+    } else {
+        LibBalsaMessage *message =
+            LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(ctree, node));
+        /* if we're not looking for flagged messages, we want only
+         * viewable messages
+         * if we are looking for flagged messages, we want those
+         * that match, viewable or not */
+        if ((b->flag == 0 && gtk_ctree_is_viewable(ctree, node))
+            || (b->flag & message->flags)) {
+            if (b->first == NULL)
+                /* first matching message */
+                b->first = node;
+            if (b->next == NULL)
+                /* first message, or first after current */
+                b->next = node;
+            b->last = node;
+        }
+    }
+}
+
+/* balsa_index_select_node:
+ * make sure it's viewable, then pass it to balsa_index_select_row
+ * no-op if it's NULL
+ */
+static void
+balsa_index_select_node(BalsaIndex * bindex, GtkCTreeNode * node)
+{
+    if (node) {
+        gpointer tmp = gtk_ctree_node_get_row_data(bindex->ctree, node);
+        GtkCList *clist = GTK_CLIST(bindex->ctree);
+        gint row;
+
+        while (node && !gtk_ctree_is_viewable(bindex->ctree, node)) {
+            node = GTK_CTREE_ROW(node)->parent;
+            gtk_ctree_expand(bindex->ctree, node);
+            balsa_index_set_style(bindex, node);
+        }
+        /* now that the row we want is viewable, we can look up its
+         * number */
+        row = gtk_clist_find_row_from_data(clist, tmp);
+        balsa_index_select_row(bindex, row);
+    }
+}
+
+/* balsa_index_find_node:
+ * common search code--look for next or previous, with or without flag
+ */
+static GtkCTreeNode *
+balsa_index_find_node(BalsaIndex * bindex, gboolean previous,
+                      LibBalsaMessageFlag flag)
+{
+    GtkCTreeNode *node;
+    struct balsa_index_scan_info *bi;
+    
+    g_return_val_if_fail(bindex != NULL, NULL);
+
+    bi = g_new0(struct balsa_index_scan_info, 1);
+    bi->node =
+        GTK_CLIST(bindex->ctree)->selection
+        ? g_list_last(GTK_CLIST(bindex->ctree)->selection)->data : NULL;
+    bi->flag = flag;
+    gtk_ctree_pre_recursive(bindex->ctree, NULL, (GtkCTreeFunc)
+                            balsa_index_scan_node, bi);
+    node = previous ? bi->previous : bi->next;
+    if (node == NULL && flag != 0)
+        /* if looking for new or flagged messages, fall back to first
+         * matching */
+        node = bi->first;
+    g_free(bi);
+    return node;
+}
+
 void
 balsa_index_select_next(BalsaIndex * bindex)
 {
-    GtkCList *clist;
-    gint h;
-
-    g_return_if_fail(bindex != NULL);
-    clist = GTK_CLIST(bindex->ctree);
-
-    /* [MBG] check this part, it might need to be h - 2 instead */
-    if ((h = balsa_index_get_largest_selected(clist)) < 0 || h + 1 >= clist->rows)
-	h = clist->rows - 1;
-
-    balsa_index_select_row(bindex, h + 1);
+    balsa_index_select_node(bindex, balsa_index_find_node(bindex, 
+                            FALSE, 0));
 }
 
-/* balsa_index_select_next_unread:
- * balsa_index_select_next_flagged:
- * 
- * search for the next unread/flagged in the current mailbox.
- * wraps over if the selected message was the last one.
- * */
-struct balsa_index_scan_info {
-    LibBalsaMessageFlag flag;
-    GtkCTreeNode *first_match;
-    LibBalsaMessage *first_match_message;
-    GtkCTreeNode *next_match;
-    LibBalsaMessage *next_match_message;
-    GtkCTreeNode *node;
-    LibBalsaMessage *message;
-};
-
-static void
-balsa_index_scan_for_flag(GtkCTree *ctree, GtkCTreeNode *node,
-                          struct balsa_index_scan_info *b)
+void
+balsa_index_select_previous(BalsaIndex * bindex)
 {
-    LibBalsaMessage *message
-        = LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(ctree, node));
-    if (message->flags & b->flag) {
-        if (!b->first_match) {
-            b->first_match = node;
-            b->first_match_message = message;
-        }
-        if (b->node && !b->next_match) {
-            b->next_match = node;
-            b->next_match_message = message;
-        }
-    }
-    if (message == b->message)
-        b->node = node;
-}
-
-static void
-balsa_index_select_next_by_flag(BalsaIndex * bindex,
-                                LibBalsaMessageFlag flag)
-{
-    GtkCList *clist;
-    LibBalsaMessage *message;
-    gint h;
-    struct balsa_index_scan_info bi;
-    GtkCTreeNode *node;
-
-    g_return_if_fail(bindex != NULL);
-    clist = GTK_CLIST(bindex->ctree);
-
-    if ((h = balsa_index_get_largest_selected(clist) + 1) <= 0)
-	h = 0;
-
-    if (h >= clist->rows)
-	h = 0;
-
-    /* search the ctree for a matching message */
-    bi.flag = flag;
-    bi.first_match = NULL;
-    bi.next_match = NULL;
-    bi.node = NULL;
-    if (h > 0)
-        bi.message =
-            LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, h - 1));
-    else
-        bi.message = NULL;
-    gtk_ctree_pre_recursive(bindex->ctree, NULL, (GtkCTreeFunc)
-                            balsa_index_scan_for_flag, &bi);
-    if (bi.next_match) {
-        node = bi.next_match;
-        message = bi.next_match_message;
-    } else if (bi.first_match) {
-        node = bi.first_match;
-        message = bi.first_match_message;
-    } else 
-        return;
-
-    while (!gtk_ctree_is_viewable(bindex->ctree, node)) {
-        node = GTK_CTREE_ROW(node)->parent;
-        gtk_ctree_expand(bindex->ctree, node);
-        balsa_index_set_style(bindex, node);
-    }
-
-    balsa_index_select_row(bindex,
-                           gtk_clist_find_row_from_data(clist,
-                                                        message));
+    balsa_index_select_node(bindex, balsa_index_find_node(bindex, 
+                            TRUE, 0));
 }
 
 void
 balsa_index_select_next_unread(BalsaIndex * bindex)
 {
-    balsa_index_select_next_by_flag(bindex,
-                                    LIBBALSA_MESSAGE_FLAG_NEW);
+    balsa_index_select_node(bindex, balsa_index_find_node(bindex, 
+                            FALSE, LIBBALSA_MESSAGE_FLAG_NEW));
 }
 
 void
 balsa_index_select_next_flagged(BalsaIndex * bindex)
 {
-    balsa_index_select_next_by_flag(bindex,
-                                    LIBBALSA_MESSAGE_FLAG_FLAGGED);
+    balsa_index_select_node(bindex, balsa_index_find_node(bindex, 
+                            FALSE, LIBBALSA_MESSAGE_FLAG_FLAGGED));
 }
 
-
-/* balsa_index_select_previous:
- * 
- * selects previous message or first message when no messages are selected.
- * */
-void
-balsa_index_select_previous(BalsaIndex * bindex)
+/* balsa_index_scan_selection:
+ * callback for pre-recursive search for next message after moving one
+ * or more message out of the mailbox
+ * after search:
+ * - b->next is next unselected message after first selected message,
+ *     which may be currently non-viewable
+ * - b->first is first unselected viewable message
+ * - b->last is last unselected viewable message
+ * any or all may be NULL--we'll use them in the order next, first, last
+ */
+static void
+balsa_index_scan_selection(GtkCTree * ctree, GtkCTreeNode * node,
+                       struct balsa_index_scan_info *b)
 {
-    GtkCList *clist;
     GList *list;
-    gint i = 0;
-    gint h = 0;
 
-    g_return_if_fail(bindex != NULL);
-    clist = GTK_CLIST(bindex->ctree);
-
-    if (!clist->selection)
-	h = 1;
-    else {
-	h = clist->rows;	/* set this to the max number of rows */
-
-	list = clist->selection;
-	while (list) {		
-            /* look for the selected row with the lowest number */
-	    i = gtk_clist_find_row_from_data(clist,
-					     LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(bindex->ctree, list->data)));
-	    if (i < h)
-		h = i;
-	    list = list->next;
-	}
-
-	/* avoid unselecting everything, and then not selecting a valid row */
-	if (h < 1)
-	    h = 1;
+    for (list = b->selection; list; list = g_list_next(list)) {
+        if (list->data == node) {
+            if (b->previous == NULL) {
+                /* this is the first time we found a selected node */
+                b->previous = b->last;
+                /* clear any `next' node we found before */
+                b->next = NULL;
+            }
+            b->selection = g_list_remove(b->selection, list);
+            return;
+        }
     }
-    /* FIXME, if it is already on row 1, we shouldn't unselect all/reselect */
-    balsa_index_select_row(bindex, h - 1);
+
+    /* this node isn't selected */
+
+    if (b->next == NULL)
+        /* save it whether or not it's viewable */
+        b->next = node;
+
+    if (gtk_ctree_is_viewable(ctree, node))
+        b->last = node;
+}
+
+/* balsa_index_select_next_threaded:
+ * finds and selects a message after moving one or more message out of
+ * the index
+ */
+void
+balsa_index_select_next_threaded(BalsaIndex * bindex)
+{
+    GtkCTreeNode *node;
+    GtkCList *clist;
+    struct balsa_index_scan_info *bi;
+    
+    g_return_if_fail(bindex != NULL);
+    
+    clist = GTK_CLIST(bindex->ctree);
+    bi = g_new0(struct balsa_index_scan_info, 1);
+
+    bi->selection = g_list_copy(clist->selection);
+    gtk_ctree_pre_recursive(bindex->ctree, NULL, (GtkCTreeFunc)
+                            balsa_index_scan_selection, bi);
+
+    node = bi->next;
+    if (node == NULL)
+        node = bi->first;
+    if (node == NULL)
+        node = bi->last;
+    g_free(bi);
+    if (node)
+        balsa_index_select_node(bindex, node);
+    else
+        /* we're emptying the index, so we must set up the idle handler
+         * appropriately */
+        balsa_index_idle_add(bindex, NULL);
 }
 
 /* balsa_index_redraw_current redraws currently selected message,
@@ -1044,9 +1123,6 @@ balsa_index_redraw_current(BalsaIndex * bindex)
     h = gtk_clist_find_row_from_data(clist,
 				     LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(bindex->ctree, g_list_first(clist->selection)->data)));
     gtk_clist_select_row(clist, h, -1);
-
-    if (gtk_clist_row_is_visible(clist, h) != GTK_VISIBILITY_FULL)
-	gtk_clist_moveto(clist, h, 0, 0.0, 0.0);
 }
 
 void
@@ -1062,38 +1138,30 @@ balsa_index_update_flag(BalsaIndex * bindex, LibBalsaMessage * message)
     }
 }
 
-
-
 static void
 balsa_index_set_col_images(BalsaIndex * bindex, GtkCTreeNode *node,
 			   LibBalsaMessage * message)
 {
     guint tmp;
     GtkCTree* ctree;
-    GdkPixmap* pixmap;
-    GdkPixmap* bitmap;
+    /* only ony status icon is shown; they are ordered from most important. */
+    const static struct {
+        int mask;
+        BalsaIconName icon_name;
+    } flags[] = {
+        { LIBBALSA_MESSAGE_FLAG_DELETED, BALSA_ICON_MBOX_TRASH   },
+        { LIBBALSA_MESSAGE_FLAG_FLAGGED, BALSA_ICON_INFO_FLAGGED },
+        { LIBBALSA_MESSAGE_FLAG_REPLIED, BALSA_ICON_INFO_REPLIED },
+        { LIBBALSA_MESSAGE_FLAG_NEW,     BALSA_ICON_INFO_NEW } };
 
     ctree = bindex->ctree;
 
-    if (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+    for(tmp=0; tmp<ELEMENTS(flags) && !(message->flags & flags[tmp].mask);
+        tmp++);
+    if(tmp<ELEMENTS(flags))
 	gtk_ctree_node_set_pixmap(ctree, node, 1,
-				  balsa_icon_get_pixmap(BALSA_ICON_MBOX_TRASH),
-				  balsa_icon_get_bitmap(BALSA_ICON_MBOX_TRASH));
-    else if (LIBBALSA_MESSAGE_IS_FLAGGED(message)) {
-	gtk_ctree_node_set_pixmap(ctree, node, 1,
-				  balsa_icon_get_pixmap(BALSA_ICON_INFO_FLAGGED),
-				  balsa_icon_get_bitmap(BALSA_ICON_INFO_FLAGGED));
-    }
-
-    else if (message->flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
-	gtk_ctree_node_set_pixmap(ctree, node, 1,
-				  balsa_icon_get_pixmap(BALSA_ICON_INFO_REPLIED),
-				  balsa_icon_get_bitmap(BALSA_ICON_INFO_REPLIED));
-
-    else if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
-	gtk_ctree_node_set_pixmap(ctree, node, 1,
-				  balsa_icon_get_pixmap(BALSA_ICON_INFO_NEW),
-				  balsa_icon_get_bitmap(BALSA_ICON_INFO_NEW));
+				  balsa_icon_get_pixmap(flags[tmp].icon_name),
+				  balsa_icon_get_bitmap(flags[tmp].icon_name));
     else
         gtk_ctree_node_set_text(ctree, node, 1, NULL);
     /* Alternatively, we could show an READ icon:
@@ -1102,16 +1170,15 @@ balsa_index_set_col_images(BalsaIndex * bindex, GtkCTreeNode *node,
      * balsa_icon_get_bitmap(BALSA_ICON_INFO_READ)); 
      */
 
-    tmp = libbalsa_message_has_attachment(message);
-
-    if (tmp) {
+    if (libbalsa_message_has_attachment(message)) {
 	gtk_ctree_node_set_pixmap(ctree, node, 2,
 				  balsa_icon_get_pixmap(BALSA_ICON_INFO_ATTACHMENT),
 				  balsa_icon_get_bitmap(BALSA_ICON_INFO_ATTACHMENT));
     }
 }
 
-static gboolean thread_has_unread(GtkCTree *ctree, GtkCTreeNode *node)
+static gboolean
+thread_has_unread(GtkCTree *ctree, GtkCTreeNode *node)
 {
     GtkCTreeNode *child;
 
@@ -1128,8 +1195,8 @@ static gboolean thread_has_unread(GtkCTree *ctree, GtkCTreeNode *node)
 } 
 
 
-static void balsa_index_set_style(BalsaIndex * bindex, 
-					  GtkCTreeNode *node)
+static void
+balsa_index_set_style(BalsaIndex * bindex, GtkCTreeNode *node)
 {
     GtkCTree *ctree;
     GtkStyle *style;
@@ -1151,8 +1218,8 @@ static void balsa_index_set_style(BalsaIndex * bindex,
     gtk_ctree_node_set_row_style(ctree, node, style);
 }
 
-static void balsa_index_set_style_recursive(BalsaIndex * bindex, 
-						   GtkCTreeNode *node)
+static void
+balsa_index_set_style_recursive(BalsaIndex * bindex, GtkCTreeNode *node)
 {
     GtkCTreeNode *child;
 
@@ -1165,8 +1232,8 @@ static void balsa_index_set_style_recursive(BalsaIndex * bindex,
 }
 
 
-static void balsa_index_set_parent_style(BalsaIndex * bindex, 
-						 GtkCTreeNode *node)
+static void
+balsa_index_set_parent_style(BalsaIndex * bindex, GtkCTreeNode *node)
 {
     GtkCTreeNode *parent;
 
@@ -1179,8 +1246,7 @@ static void balsa_index_set_parent_style(BalsaIndex * bindex,
 /* CLIST callbacks */
 
 static void
-button_event_press_cb(GtkWidget * ctree, GdkEventButton * event, 
-                      gpointer data)
+button_event_press_cb(GtkWidget * ctree, GdkEventButton * event, gpointer data)
 {
     gint row, column;
     gint on_message;
@@ -1230,25 +1296,27 @@ button_event_press_cb(GtkWidget * ctree, GdkEventButton * event,
         }
     }
 }
+
+/* tree_expand_cb:
+ * callback on expand events
+ * set/reset unread style, as appropriate, and check visibility of child */
 static void
-button_event_release_cb(GtkWidget * clist, GdkEventButton * event,
-			gpointer data)
+tree_expand_cb(GtkCTree * ctree, GList * node, gpointer user_data)
 {
-    gint row, column;
-    BalsaIndex *bindex;
-    
-    gtk_grab_remove(clist);
-    gdk_pointer_ungrab(event->time);
-
-    bindex = BALSA_INDEX(data);
-
-    if(gtk_clist_get_selection_info(GTK_CLIST(bindex->ctree), 
-				    event->x, event->y, &row, &column)) {
-	balsa_index_set_style_recursive(bindex, gtk_ctree_node_nth (bindex->ctree, row));
-    }
-
+    GtkCTreeNode *child = GTK_CTREE_ROW(node)->children;
+    if (child)
+        balsa_index_check_visibility(GTK_CLIST(ctree), child, 1.0);
+    balsa_index_set_style(BALSA_INDEX(user_data), GTK_CTREE_NODE(node));
 }
 
+/* tree_collapse_cb:
+ * callback on collapse events
+ * set/reset unread style, as appropriate */
+static void
+tree_collapse_cb(GtkCTree * ctree, GList * node, gpointer user_data)
+{
+    balsa_index_set_style(BALSA_INDEX(user_data), GTK_CTREE_NODE(node));
+}
 
 static void
 select_message(GtkWidget * widget, GtkCTreeNode *row, gint column,
@@ -1291,7 +1359,7 @@ unselect_message(GtkWidget * widget, GtkCTreeNode *row, gint column,
 
 
 static void
-unselect_all_messages (GtkCList* clist, gpointer user_data)
+unselect_all_messages(GtkCList* clist, gpointer user_data)
 {
     BalsaIndex *bindex;
     LibBalsaMessage *message;
@@ -1395,6 +1463,7 @@ static void
 mailbox_message_delete_cb(BalsaIndex * bindex, LibBalsaMessage * message)
 {
     balsa_index_del(bindex, message);
+    balsa_index_check_visibility(GTK_CLIST(bindex->ctree), NULL, 0.5);
 }
 
 static void
@@ -1409,6 +1478,7 @@ mailbox_messages_delete_cb(BalsaIndex * bindex, GList * messages)
 	messages=g_list_next(messages);
     }
 
+    balsa_index_check_visibility(GTK_CLIST(bindex->ctree), NULL, 0.5);
     gtk_clist_thaw(GTK_CLIST(bindex->ctree));
 }
 
@@ -1450,69 +1520,6 @@ balsa_index_get_selected_rows(BalsaIndex * bindex, GtkCTreeNode ***rows,
     *rows = selected_rows;
 
     return;
-}
-
-
-/* balsa_index_refresh [MBG]
- * 
- * bindex:  The BalsaIndex that is to be updated
- * 
- * Description: This function updates the mailbox index, used in
- * situations such as when we are loading a number of new messages
- * into a mailbox that is already open.
- * 
- * */
-void
-balsa_index_refresh(BalsaIndex * bindex)
-{
-    GtkCList* clist;
-    GList *list;
-    gint i;
-    gint newrow;
-    LibBalsaMessage *old_message;
-
-    g_return_if_fail(bindex != NULL);
-    g_return_if_fail(bindex->mailbox_node->mailbox != NULL);
-
-    clist = GTK_CLIST (bindex->ctree);
-    gtk_clist_freeze(clist);
-
-    old_message = 
-        gtk_clist_get_row_data(clist, balsa_index_get_largest_selected(clist));
-    gtk_clist_unselect_all(clist);
-    gtk_clist_clear(clist);
-
-    list = bindex->mailbox_node->mailbox->message_list;
-    i = 0;
-    while (list) {
-	balsa_index_add(bindex, LIBBALSA_MESSAGE(list->data));
-	list = list->next;
-	i++;
-    }
-
-    balsa_index_threading(bindex);
-    gtk_clist_sort(clist);
-    DO_CLIST_WORKAROUND(clist);
-
-    if (old_message)
-	newrow =
-	    gtk_clist_find_row_from_data(clist, old_message);
-    else
-	newrow = -1;
-
-    if (newrow >= 0) {
-	gtk_clist_select_row(clist,
-			     gtk_clist_find_row_from_data(clist, old_message),
-			     -1);
-	i = newrow;
-    } else {
-	gtk_clist_select_row(clist, i, -1);
-    }
-
-    if (gtk_clist_row_is_visible(clist, i) != GTK_VISIBILITY_FULL) 
-        gtk_clist_moveto(clist, i, -1, 0.5, 0.0);
-
-    gtk_clist_thaw(clist);
 }
 
 /* balsa_index_close_and_destroy:
@@ -1563,152 +1570,64 @@ balsa_message_view_source(GtkWidget * widget, gpointer user_data)
     }	
 }
 
-void
-balsa_message_reply(GtkWidget * widget, gpointer user_data)
+static void
+compose_foreach(GtkWidget* w, BalsaIndex* index, SendType send_type)
 {
     GList *list;
     LibBalsaMessage *message;
     BalsaSendmsg *sm;
-    BalsaIndex* index;
 
-    g_return_if_fail(widget != NULL);
-    g_return_if_fail(user_data != NULL);
-
-    index = BALSA_INDEX (user_data);
-    list = GTK_CLIST(index->ctree)->selection;
-
-    while (list) {
+    for(list = GTK_CLIST(index->ctree)->selection; list; list = list->next) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-	sm = sendmsg_window_new(widget, message, SEND_REPLY);
+	sm = sendmsg_window_new(w, message, send_type);
 	gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
 			   GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
 			   NULL);
-	list = list->next;
     }
 }
 
+void
+balsa_message_reply(GtkWidget * widget, gpointer user_data)
+{
+    compose_foreach(widget, BALSA_INDEX (user_data), SEND_REPLY);
+}
 
 void
 balsa_message_replytoall(GtkWidget * widget, gpointer user_data)
 {
-    GList *list;
-    LibBalsaMessage *message;
-    BalsaSendmsg *sm;
-    BalsaIndex* index;
-
-
-    g_return_if_fail(widget != NULL);
-    g_return_if_fail(user_data != NULL);
-
-    index = BALSA_INDEX (user_data);
-    list = GTK_CLIST(index->ctree)->selection;
-    while (list) {
-	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-	sm = sendmsg_window_new(widget, message, SEND_REPLY_ALL);
-	gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
-			   GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
-			   NULL);
-	list = list->next;
-    }
+    compose_foreach(widget, BALSA_INDEX (user_data), SEND_REPLY_ALL);
 }
-
 
 void
 balsa_message_replytogroup(GtkWidget * widget, gpointer user_data)
 {
-    GList *list;
-    LibBalsaMessage *message;
-    BalsaSendmsg *sm;
-    BalsaIndex* index;
-
-
-    g_return_if_fail(widget != NULL);
-    g_return_if_fail(user_data != NULL);
-
-    index = BALSA_INDEX (user_data);
-    list = GTK_CLIST(index->ctree)->selection;
-    while (list) {
-	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-	sm = sendmsg_window_new(widget, message, SEND_REPLY_GROUP);
-	gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
-			   GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
-			   NULL);
-	list = list->next;
-    }
+    compose_foreach(widget, BALSA_INDEX (user_data), SEND_REPLY_GROUP);
 }
-
-
-static void
-balsa_message_forward(GtkWidget * widget, gpointer user_data, SendType fwd_type)
-{
-    GList *list;
-    LibBalsaMessage *message;
-    BalsaSendmsg *sm;
-    BalsaIndex* index;
-    
-
-    g_return_if_fail(widget != NULL);
-    g_return_if_fail(user_data != NULL);
-
-    index = BALSA_INDEX (user_data);
-    list = GTK_CLIST(index->ctree)->selection;
-    while (list) {
-	message =
-	    gtk_ctree_node_get_row_data(index->ctree, list->data);
-	sm = sendmsg_window_new(widget, message, fwd_type);
-	gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
-			   GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
-			   NULL);
-	list = list->next;
-    }
-}
-
 
 void
 balsa_message_forward_attached(GtkWidget * widget, gpointer user_data)
 {
-    balsa_message_forward(widget, user_data, SEND_FORWARD_ATTACH);
+    compose_foreach(widget, BALSA_INDEX (user_data), SEND_FORWARD_ATTACH);
 }
-
 
 void
 balsa_message_forward_inline(GtkWidget * widget, gpointer user_data)
 {
-    balsa_message_forward(widget, user_data, SEND_FORWARD_INLINE);
+    compose_foreach(widget, BALSA_INDEX (user_data), SEND_FORWARD_INLINE);
 }
-
 
 void
 balsa_message_forward_default(GtkWidget * widget, gpointer user_data)
 {
-    balsa_message_forward(widget, user_data, balsa_app.forward_attached 
-			  ? SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE);
+    compose_foreach(widget, BALSA_INDEX (user_data), 
+                    balsa_app.forward_attached 
+                    ? SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE);
 }
-
 
 void
 balsa_message_continue(GtkWidget * widget, gpointer user_data)
 {
-    GList *list;
-    LibBalsaMessage *message;
-    BalsaSendmsg *sm;
-    BalsaIndex* index;
-
-
-    g_return_if_fail(widget != NULL);
-    g_return_if_fail(user_data != NULL);
-
-    index = BALSA_INDEX (user_data);
-    list = GTK_CLIST(index->ctree)->selection;
-
-    while (list) {
-	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-	sm = sendmsg_window_new(widget, message, SEND_CONTINUE);
-	gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
-			   GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
-			   NULL);
-	list = list->next;
-    }
+    compose_foreach(widget, BALSA_INDEX (user_data), SEND_CONTINUE);
 }
 
 
@@ -1718,22 +1637,11 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
     GList *list;
     BalsaIndex *trash = balsa_find_index_by_mailbox(balsa_app.trash);
     LibBalsaMessage *message;
-    gboolean select_next = TRUE;
-    GList *messages=NULL;
-    LibBalsaMailbox *orig;
-    gint message_count = 0;
+    GList *messages = NULL;
 
-    /* select the previous message if we're at the bottom of the index */
-    if (GTK_CLIST(index->ctree)->rows - 1 == 
-        balsa_index_get_largest_selected(GTK_CLIST(index->ctree)))
-        select_next = FALSE;
-
-    
     for(list = GTK_CLIST(index->ctree)->selection; list; list = list->next) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
 	messages= g_list_append(messages, message);
-	orig = message->mailbox; /* sloppy way */
-	++message_count;
     }
     if(messages) {
 	if (move_to_trash && (index != trash)) {
@@ -1745,23 +1653,20 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
 		enable_empty_trash(TRASH_CHECK);
 	}
 	g_list_free(messages);
-    }
-    
-    /* select another message depending on where we are in the list */
-    if (GTK_CLIST(index->ctree)->rows > message_count) {
-        if (select_next)
-            balsa_index_select_next(index);
-	else
-            balsa_index_select_previous(index);
-    } 
-    /* sync with backend AFTER adjacent message is selected.
-       Update the style and message counts in the mailbox list */
-    libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
-    balsa_mblist_update_mailbox(balsa_app.mblist, 
+
+        /* select another message depending on where we are in the list
+         */
+        balsa_index_select_next_threaded(index);
+
+        /* sync with backend AFTER adjacent message is selected.
+         * Update the style and message counts in the mailbox list */
+        libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
+        balsa_mblist_update_mailbox(balsa_app.mblist,
                                     index->mailbox_node->mailbox);
-    
-    // balsa_index_redraw_current(index);
+        // balsa_index_redraw_current(index);
+    }
 }
+
 
 void
 balsa_message_move_to_trash(GtkWidget * widget, gpointer user_data)
@@ -1826,40 +1731,47 @@ balsa_find_notebook_page_num(LibBalsaMailbox * mailbox)
     return -1;
 }
 
+/* This function toggles the given attribute of a list of messages,
+   using given callback.
+ */
+static void
+balsa_message_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag,
+                          void(*cb)(LibBalsaMessage*, gboolean))
+{
+    GList *list;
+    LibBalsaMessage *message;
+    int is_all_flagged = TRUE;
+
+    /* First see if we should set given flag or unset */
+    for(list=GTK_CLIST(index->ctree)->selection; list; list=list->next) {
+	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
+	if (!(message->flags & flag)) {
+	    is_all_flagged = FALSE;
+	    break;
+	}
+    }
+
+    /* If they all have the flag set, then unset them. Otherwise, set
+     * them all.
+     */
+
+    for (list=GTK_CLIST(index->ctree)->selection; list; list=list->next) {
+	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
+        (*cb)(message, !is_all_flagged);
+    }
+    libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
+}
+
 /* This function toggles the FLAGGED attribute of a list of messages
  */
 void
 balsa_message_toggle_flagged(GtkWidget * widget, gpointer user_data)
 {
-    GList *list;
-    LibBalsaMessage *message;
-    int is_all_flagged = TRUE;
-    BalsaIndex* index;
-
-    g_return_if_fail(widget != NULL);
     g_return_if_fail(user_data != NULL);
 
-    index = BALSA_INDEX (user_data);
-    list = GTK_CLIST(index->ctree)->selection;
-
-    /* First see if we should unselect or select */
-    while (list) {
-	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-
-	if (!LIBBALSA_MESSAGE_IS_FLAGGED(message)) {
-	    is_all_flagged = FALSE;
-	    break;
-	}
-	list = list->next;
-    }
-
-    /* If they are all flagged, then unflag them. Otherwise, flag them all */
-
-    for (list=GTK_CLIST(index->ctree)->selection; list; list=list->next) {
-	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-        libbalsa_message_flag(message, !is_all_flagged);
-    }
-    libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
+    balsa_message_toggle_flag(BALSA_INDEX(user_data), 
+                              LIBBALSA_MESSAGE_FLAG_FLAGGED,
+                              libbalsa_message_flag);
 }
 
 
@@ -1868,66 +1780,13 @@ balsa_message_toggle_flagged(GtkWidget * widget, gpointer user_data)
 void
 balsa_message_toggle_new(GtkWidget * widget, gpointer user_data)
 {
-    GList *list;
-    LibBalsaMessage *message;
-    int is_all_read = TRUE;
-    BalsaIndex* index;
-
-    g_return_if_fail(widget != NULL);
     g_return_if_fail(user_data != NULL);
 
-    index = BALSA_INDEX (user_data);
-    list = GTK_CLIST(index->ctree)->selection;
-
-    /* First see if we should mark as read or unread */
-    while (list) {
-	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-
-	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
-	    is_all_read = FALSE;
-	    break;
-	}
-	list = list->next;
-    }
-
-    /* if all read mark as new, otherwise mark as read */
-    for(list=GTK_CLIST(index->ctree)->selection; list; list=list->next) {
-	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
-        libbalsa_message_read(message, !is_all_read);
-    }
-    libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
+    balsa_message_toggle_flag(BALSA_INDEX(user_data), 
+                              LIBBALSA_MESSAGE_FLAG_NEW,
+                              libbalsa_message_read);
 }
 
-/* balsa_index_reset:
-   reset the mailbox content the hard way.
-   DEPRECATED.
-
-   This function should NEVER be used because it it time-consuming and
-   flips the notebook pages. There are simpler ways to obtain
-   equivalent effect.  
-*/
-void
-balsa_index_reset(BalsaIndex * index)
-{
-    GtkWidget *current_index, *window;
-    BalsaMailboxNode *mbnode;
-    gint i, page_num;
-
-    g_return_if_fail (index != NULL);
-
-    mbnode = index->mailbox_node;
-    window = index->window;
-
-    i = gtk_notebook_current_page(GTK_NOTEBOOK(balsa_app.notebook));
-    current_index =
-	gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i);
-
-    balsa_window_close_mbnode(BALSA_WINDOW(window), mbnode);
-    balsa_window_open_mbnode(BALSA_WINDOW(window), mbnode);
-
-    page_num = balsa_find_notebook_page_num(mbnode->mailbox);
-    gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook), page_num);
-}
 
 /* balsa_index_update_message:
    update preview window to currently selected message of index.
@@ -1942,7 +1801,7 @@ balsa_index_update_message(BalsaIndex * index)
     if(!balsa_app.previewpane) return;
 
     list = GTK_CLIST(index->ctree);
-    row = balsa_index_get_largest_selected (list);
+    row = balsa_index_most_recent_message(list);
 
     message = 
 	(row < 0) ? NULL : GTK_OBJECT(gtk_clist_get_row_data(list, row));
@@ -2047,38 +1906,38 @@ idle_handler_cb(GtkWidget * widget)
 static GtkWidget *
 create_menu(BalsaIndex * bindex)
 {
+    const static struct {             /* this is a invariable part of */
+        const char* icon, *label;     /* the context message menu.    */
+        GtkSignalFunc func;
+    } entries[] = {
+        { GNOME_STOCK_MENU_BOOK_OPEN,    N_("View Source"), 
+          balsa_message_view_source },
+        { BALSA_PIXMAP_MENU_REPLY,       N_("Reply..."), 
+          balsa_message_reply },
+        { BALSA_PIXMAP_MENU_REPLY_ALL,   N_("Reply To All..."), 
+          balsa_message_replytoall },
+        { BALSA_PIXMAP_MENU_REPLY_GROUP, N_("Reply To Group..."), 
+          balsa_message_replytogroup },
+        { BALSA_PIXMAP_MENU_FORWARD,     N_("Forward Attached..."), 
+          balsa_message_forward_attached },
+        { BALSA_PIXMAP_MENU_FORWARD,     N_("Forward Inline..."), 
+          balsa_message_forward_inline },
+        { GNOME_STOCK_MENU_BOOK_RED,     N_("Store Address..."), 
+          balsa_store_address } };
     GtkWidget *menu, *menuitem, *submenu, *smenuitem, *mrumenu, *mruitem;
     GtkWidget *bmbl, *scroll;
     GtkRequisition req;
     LibBalsaMailbox* mailbox;
-    GList *tmp;
-
+    unsigned i;
+ 
     BALSA_DEBUG();
     mailbox = bindex->mailbox_node->mailbox;
 
     menu = gtk_menu_new();
 
-    create_stock_menu_item(menu, GNOME_STOCK_MENU_BOOK_OPEN , _("View Source"),
- 			   balsa_message_view_source, bindex, TRUE);
-
-    create_stock_menu_item(menu, BALSA_PIXMAP_MENU_REPLY, _("Reply..."),
-			   balsa_message_reply, bindex, TRUE);
-
-    create_stock_menu_item(menu, BALSA_PIXMAP_MENU_REPLY_ALL,
-			   _("Reply To All..."), balsa_message_replytoall,
-			   bindex, TRUE);
-
-    create_stock_menu_item(menu, BALSA_PIXMAP_MENU_REPLY_GROUP,
-			   _("Reply To Group..."), balsa_message_replytogroup,
-			   bindex, TRUE);
-
-    create_stock_menu_item(menu, BALSA_PIXMAP_MENU_FORWARD,
-			   _("Forward Attached..."), 
-			   balsa_message_forward_attached, bindex, TRUE);
-
-    create_stock_menu_item(menu, BALSA_PIXMAP_MENU_FORWARD,
-			   _("Forward Inline..."), 
-			   balsa_message_forward_inline, bindex, TRUE);
+    for(i=0; i<ELEMENTS(entries); i++)
+        create_stock_menu_item(menu, entries[i].icon, _(entries[i].label),
+                               entries[i].func, bindex, TRUE);
 
     create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH,
 			   _("Delete"), balsa_message_delete, bindex,
@@ -2093,10 +1952,6 @@ create_menu(BalsaIndex * bindex)
 			       bindex, !mailbox->readonly);
     }
 
-    create_stock_menu_item(menu, GNOME_STOCK_MENU_BOOK_RED,
-			   _("Store Address..."),
-			   balsa_store_address, bindex, TRUE);
-
     menuitem = gtk_menu_item_new_with_label(_("Toggle"));
     submenu = gtk_menu_new();
 
@@ -2107,7 +1962,6 @@ create_menu(BalsaIndex * bindex)
 			    balsa_message_toggle_new, bindex, TRUE);
 
     gtk_widget_show(submenu);
-
     gtk_widget_show(menuitem);
 
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
@@ -2144,7 +1998,8 @@ create_menu(BalsaIndex * bindex)
 
     scroll = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(scroll), 
-                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+                                    GTK_POLICY_AUTOMATIC, 
+                                    GTK_POLICY_AUTOMATIC);
 
     bmbl = balsa_mblist_new();
     gtk_signal_connect(GTK_OBJECT(bmbl), "tree_select_row",
@@ -2168,7 +2023,6 @@ create_menu(BalsaIndex * bindex)
     gtk_widget_show(bmbl);
     gtk_widget_show(scroll);
     gtk_widget_show(smenuitem);
-
 
     return menu;
 }
@@ -2203,68 +2057,63 @@ close_if_transferred_cb(BalsaMBList * bmbl, GdkEvent * event,
 }
 
 static void
-transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column, 
-		     gpointer data)
+balsa_index_transfer_messages(BalsaIndex * bindex,
+                              LibBalsaMailbox * mailbox)
 {
     GtkCList* clist;
-    BalsaIndex* bindex = NULL;
     GList *list, *messages;
     LibBalsaMessage* message;
     BalsaMailboxNode *mbnode;
-    gboolean select_next = TRUE;
-    gint message_count = 0;
 
-    g_return_if_fail(data != NULL);
-
-    bindex = BALSA_INDEX (data);
+    g_return_if_fail(bindex != NULL);
+    if (mailbox == NULL)
+        return;
     clist = GTK_CLIST(bindex->ctree);
 
-    mbnode = gtk_ctree_node_get_row_data(ctree, row);
-
-    if(mbnode->mailbox == NULL) return;
-
-   /*Transferring to same mailbox? */
-    if (bindex->mailbox_node->mailbox == mbnode->mailbox)
+    /*Transferring to same mailbox? */
+    if (bindex->mailbox_node->mailbox == mailbox)
 	return;
-
-    /* select the previous message if we're at the bottom of the index */
-    if (clist->rows - 1 == balsa_index_get_largest_selected(clist))
-        select_next = FALSE;
-
 
     messages=NULL;
     for (list = clist->selection; list;list = list->next) {
 	message = gtk_ctree_node_get_row_data(GTK_CTREE(bindex->ctree), 
 					      list->data);
 	messages=g_list_append(messages, message);
-	++message_count;
     }
 
     if(messages!=NULL) {
-	libbalsa_messages_move(messages, mbnode->mailbox);
+	libbalsa_messages_move(messages, mailbox);
 	g_list_free(messages);
     }
    
     /* select another message depending on where we are in the list */
-    if (clist->rows > message_count) {
-        if (select_next)
-            balsa_index_select_next(bindex);
-        else
-            balsa_index_select_previous(bindex);
-    }
-
+    balsa_index_select_next_threaded(bindex);
 
     libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
 
-    if (mbnode->mailbox == balsa_app.trash) {
+    if (mailbox == balsa_app.trash) {
 	enable_empty_trash(TRASH_FULL);
     } else if (bindex->mailbox_node->mailbox == balsa_app.trash) {
 	enable_empty_trash(TRASH_CHECK);
     }
 
-    balsa_remove_from_folder_mru(mbnode->mailbox->url);
-    balsa_add_to_folder_mru(mbnode->mailbox->url);
+    balsa_remove_from_folder_mru(mailbox->url);
+    balsa_add_to_folder_mru(mailbox->url);
     gtk_object_set_data(GTK_OBJECT(bindex), "transferredp", (gpointer) 1);
+}
+
+static void
+transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column, 
+		     gpointer data)
+{
+    BalsaIndex* bindex;
+    BalsaMailboxNode *mbnode;
+
+    g_return_if_fail(data != NULL);
+
+    bindex = BALSA_INDEX (data);
+    mbnode = gtk_ctree_node_get_row_data(ctree, row);
+    balsa_index_transfer_messages(bindex, mbnode->mailbox);
 }
 
 static void
@@ -2308,6 +2157,9 @@ balsa_index_update_tree(BalsaIndex *bindex, gboolean expand)
     GtkCTreeNode *node, *msg_node=NULL;
 
     gtk_clist_freeze(clist);
+    gtk_signal_handler_block_by_func(GTK_OBJECT(bindex->ctree),
+                                     expand ? tree_expand_cb :
+                                     tree_collapse_cb, bindex);
     for(node=gtk_ctree_node_nth(tree, 0); node; 
 	node=GTK_CTREE_NODE_NEXT(node)) {
 	if(expand)
@@ -2321,24 +2173,19 @@ balsa_index_update_tree(BalsaIndex *bindex, gboolean expand)
     }
     
     if (msg_node) {
-	guint i;
-	
 	if(!expand) {		/* Re-expand msg_node's thread; cf. Remarks */
 	    for(node=GTK_CTREE_ROW(msg_node)->parent; node;
 		node=GTK_CTREE_ROW(node)->parent) {
 		gtk_ctree_expand(tree, node);
 	    }
 	}
-	gtk_clist_thaw(clist);
-	
-	if( (i=gtk_clist_find_row_from_data(clist, msg->message))>=0 &&
-	    gtk_clist_row_is_visible(clist, i) != GTK_VISIBILITY_FULL) {
-	    gtk_clist_moveto(clist, i, -1, 0.5, 0.0);
-	    gtk_clist_select_row(clist, i, 0);
-	}
+        gtk_clist_thaw(clist);
+        balsa_index_check_visibility(clist, msg_node, 0.5);
     } else
-	gtk_clist_thaw(clist);
-
+        gtk_clist_thaw(clist);
+    gtk_signal_handler_unblock_by_func(GTK_OBJECT(bindex->ctree),
+                                       expand ? tree_expand_cb :
+                                       tree_collapse_cb, bindex);
 }
 
 /* balsa_index_set_threading_type:
@@ -2350,7 +2197,6 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
 {
     GList *list;
     LibBalsaMailbox* mailbox = NULL;
-    gint i=0;
     GtkCList *clist;
 
     g_return_if_fail (bindex);
@@ -2568,60 +2414,8 @@ populate_mru(GtkWidget * menu, BalsaIndex * bindex)
 static void
 mru_select_cb(GtkWidget *widget, struct FolderMRUEntry *entry)
 {
-    GtkCList* clist;
-    BalsaIndex* bindex = NULL;
-    GList *list, *messages;
-    LibBalsaMessage* message;
-    gboolean select_next = TRUE;
-    gint message_count = 0;
-
     g_return_if_fail(entry != NULL);
-
-    bindex = entry->bindex;
-    clist = GTK_CLIST(bindex->ctree);
-
-   /*Transferring to same mailbox? */
-    if (bindex->mailbox_node->mailbox == entry->mailbox)
-	return;
-
-    /* select the previous message if we're at the bottom of the index */
-    if (clist->rows - 1 == balsa_index_get_largest_selected(clist))
-        select_next = FALSE;
-
-
-    messages=NULL;
-    for (list = clist->selection; list;list = list->next) {
-	message = gtk_ctree_node_get_row_data(GTK_CTREE(bindex->ctree), 
-					      list->data);
-	messages=g_list_append(messages, message);
-	++message_count;
-    }
-
-    if(messages!=NULL) {
-	libbalsa_messages_move(messages, entry->mailbox);
-	g_list_free(messages);
-    }
-   
-    /* select another message depending on where we are in the list */
-    if (clist->rows > message_count) {
-        if (select_next)
-            balsa_index_select_next(bindex);
-        else
-            balsa_index_select_previous(bindex);
-    }
-
-
-    libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
-
-    if (entry->mailbox == balsa_app.trash) {
-	enable_empty_trash(TRASH_FULL);
-    } else if (bindex->mailbox_node->mailbox == balsa_app.trash) {
-	enable_empty_trash(TRASH_CHECK);
-    }
-
-    balsa_remove_from_folder_mru(entry->mailbox->url);
-    balsa_add_to_folder_mru(entry->mailbox->url);
-    gtk_object_set_data(GTK_OBJECT(bindex), "transferredp", (gpointer) 1);
+    balsa_index_transfer_messages(entry->bindex, entry->mailbox);
 }
 
 /* idle handler wrappers

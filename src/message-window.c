@@ -625,50 +625,10 @@ static void print_cb(GtkWidget * widget, gpointer data)
 static void trash_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) (data);
-    LibBalsaMessage *msg;
-    LibBalsaMailbox *mailbox;
-    BalsaIndex *index;
-    GtkCList *list;
-    int row, newrow;
-    
-    msg=mw->message;
-    mailbox=msg->mailbox;
-    index=balsa_find_index_by_mailbox(mailbox);
+    LibBalsaMailbox *mailbox = mw->message->mailbox;
 
-    if(index) {
-	list=GTK_CLIST(index->ctree);
-	row=newrow=gtk_clist_find_row_from_data(list, msg);
-	
-	/* If the current message is the only one selected in the index */
-	/* (common case) we want to move the current message down if */
-	/* possible, up otherwise so a message remains selected */
-	if(g_list_length(list->selection) == 1)	{
-	    if(gtk_ctree_node_get_row_data(
-		GTK_CTREE(list), list->selection->data) == msg) {
-				/* Clear the selection on the current row */
-		gtk_clist_unselect_row(list, row, 0);
-
-		if(list->rows > 1) {
-		    if(newrow >= list->rows-1) /* Must back up */
-			--newrow;
-		    else
-			++newrow;
-
-		    if(newrow < 0)
-			newrow=0;
-
-		    /* Set new selected row */
-		    gtk_clist_select_row(list, newrow, 0);
-		}
-	    }
-	}
-	gtk_clist_remove(list, row);
-    }
-
-    if(msg->mailbox != balsa_app.trash)
-	libbalsa_message_move(msg, balsa_app.trash);
-    else
-	libbalsa_message_delete(msg, TRUE);
+    balsa_message_move_to_trash(widget,
+                                balsa_find_index_by_mailbox(mailbox));
 
     gtk_widget_destroy(GTK_WIDGET(mw->window));
 }
@@ -794,7 +754,6 @@ transfer_message_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column,
     GtkCList* clist=NULL;
     BalsaIndex* bindex = NULL;
     BalsaMailboxNode *mbnode;
-    gboolean select_next = TRUE;
 
     g_return_if_fail(mw != NULL);
 
@@ -808,25 +767,12 @@ transfer_message_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column,
     if (mw->message->mailbox == mbnode->mailbox)
 	return;
     
-    if(bindex != NULL && bindex->ctree != NULL) {
-	clist = GTK_CLIST(bindex->ctree);
-	
-	/* select the previous message if we're at the bottom of the index */
-	if (clist->rows - 1 == balsa_index_get_largest_selected(clist))
-	    select_next = FALSE;
-    }
-    
     mw->transferred = TRUE;
     libbalsa_message_move(mw->message, mbnode->mailbox);
     
     if(bindex != NULL && bindex->ctree != NULL) {
 	/* select another message depending on where we are in the list */
-	if (clist->rows > 1) {
-	    if (select_next)
-		balsa_index_select_next(bindex);
-	    else
-		balsa_index_select_previous(bindex);
-	}
+	balsa_index_select_next_threaded(bindex);
 	libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
     }
     
@@ -903,7 +849,6 @@ mru_select_cb(GtkWidget *widget, struct BalsaMRUEntry *entry)
     
     GtkCList* clist=NULL;
     BalsaIndex* bindex = NULL;
-    gboolean select_next = TRUE;
 
     bindex = balsa_find_index_by_mailbox(mw->message->mailbox);
 
@@ -911,25 +856,12 @@ mru_select_cb(GtkWidget *widget, struct BalsaMRUEntry *entry)
     if (mw->message->mailbox == mailbox)
 	return;
 
-    if(bindex != NULL && bindex->ctree != NULL) {
-	clist = GTK_CLIST(bindex->ctree);
-	
-	/* select the previous message if we're at the bottom of the index */
-	if (clist->rows - 1 == balsa_index_get_largest_selected(clist))
-	    select_next = FALSE;
-    }
-    
     mw->transferred = TRUE;
     libbalsa_message_move(mw->message, mailbox);
     
     if(bindex != NULL && bindex->ctree != NULL) {
 	/* select another message depending on where we are in the list */
-	if (clist->rows > 1) {
-	    if (select_next)
-		balsa_index_select_next(bindex);
-	    else
-		balsa_index_select_previous(bindex);
-	}
+	balsa_index_select_next_threaded(bindex);
 	libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
     }
     

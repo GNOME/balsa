@@ -1531,6 +1531,8 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
             switch (context->action) {
             case GDK_ACTION_MOVE:
                 libbalsa_messages_move (messages, mailbox);
+                balsa_index_select_next_threaded
+                    (balsa_find_index_by_mailbox(orig_mailbox));
                 break;
 
             case GDK_ACTION_DEFAULT:

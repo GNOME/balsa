@@ -2827,10 +2827,11 @@ notebook_switch_page_cb(GtkWidget * notebook,
     balsa_index_update_message(BALSA_INDEX(index));
 
     if (GTK_CLIST(clist)->selection) {
-        message = gtk_ctree_node_get_row_data(GTK_CTREE(clist),
-                                              (GTK_CLIST
-                                               (clist)->selection->
-                                               data));
+        message =
+            gtk_ctree_node_get_row_data(GTK_CTREE(clist),
+                                        (g_list_last
+                                         (GTK_CLIST(clist)->selection)->
+                                         data));
         enable_message_menus(message);
     } else {
         enable_message_menus(NULL);
@@ -2978,6 +2979,8 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
         switch (context->action) {
         case GDK_ACTION_MOVE:
             libbalsa_messages_move (messages, mailbox);
+            balsa_index_select_next_threaded
+                (balsa_find_index_by_mailbox(orig_mailbox));
             break;
             
         case GDK_ACTION_DEFAULT:

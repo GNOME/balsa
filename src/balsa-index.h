@@ -94,6 +94,7 @@ extern "C" {
     void balsa_index_redraw_current(BalsaIndex *);
 
 /* select up/down the index */
+    void balsa_index_select_next_threaded(BalsaIndex * bindex);
     void balsa_index_select_next(BalsaIndex *);
     void balsa_index_select_next_unread(BalsaIndex * bindex);
     void balsa_index_select_next_flagged(BalsaIndex * bindex);
@@ -136,7 +137,6 @@ extern "C" {
 				   gint, gpointer);
     void balsa_index_refresh_size (GtkNotebook *, GtkNotebookPage *,
 				   gint, gpointer);
-    gint balsa_index_get_largest_selected(GtkCList *clist);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

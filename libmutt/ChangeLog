@@ -1,3 +1,8 @@
+2001-10-16  Carlos Morgado  <chbm@chbm.nu>
+
+	* mutt_ssl.c: patch from Jeremy Katz <katzj@redhat.com> 
+	to cycle through all the ssl protos
+
 2001-10-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* sendlib.c: robust mime boundary by Peter Bloomfield (#62156).

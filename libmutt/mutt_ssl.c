@@ -256,6 +256,10 @@ int ssl_socket_write (CONNECTION* conn, const char* buf, size_t len)
 
 int ssl_socket_open (CONNECTION * conn)
 {
+/* BALSA: we want to retry with different SSL options in libmutt 
+ * [chbm] look this over for new GUI stuff
+ */
+#ifndef LIBMUTT
   sslsockdata *data;
   int maxbits;
 
@@ -267,8 +271,6 @@ int ssl_socket_open (CONNECTION * conn)
 
   data->ctx = SSL_CTX_new (SSLv23_client_method ());
 
-#ifndef LIBMUTT
-  /* how will we configure this in balsa ? */
   /* disable SSL protocols as needed */
   if (!option(OPTTLSV1)) 
   {
@@ -282,7 +284,6 @@ int ssl_socket_open (CONNECTION * conn)
   {
     SSL_CTX_set_options(data->ctx, SSL_OP_NO_SSLv3);
   }
-#endif
 
   data->ssl = SSL_new (data->ctx);
   SSL_set_fd (data->ssl, conn->fd);
@@ -297,6 +298,49 @@ int ssl_socket_open (CONNECTION * conn)
     &maxbits);
 
   return 0;
+#else
+  sslsockdata *data;
+  int maxbits;
+  int ret;
+  int tries = 0;
+  /* XXX we should save the options successful here */
+  long options[4] = { 0, SSL_OP_NO_TLSv1, SSL_OP_NO_SSLv3, SSL_OP_NO_SSLv2 };
+
+  while (tries < 4) {
+    if (raw_socket_open (conn) < 0)
+      return -1;
+  
+    data = (sslsockdata *) safe_calloc (1, sizeof (sslsockdata));
+    conn->sockdata = data;
+  
+    data->ctx = SSL_CTX_new (SSLv23_client_method ());
+    
+    SSL_CTX_set_options(data->ctx, SSL_OP_ALL);
+    SSL_CTX_set_options(data->ctx, options[tries]);
+    
+    data->ssl = SSL_new (data->ctx);
+    SSL_set_fd (data->ssl, conn->fd);
+    
+    /* if we hit a protocol violation, try another variation */
+    ret = ssl_negotiate(data);
+    if (ret == -2)
+    {
+      ssl_socket_close (conn);
+      tries++;
+      continue;
+    } else if (ret) {
+      ssl_socket_close (conn);
+      return -1;
+    }
+  
+    conn->ssf = SSL_CIPHER_get_bits (SSL_get_current_cipher (data->ssl),
+                                    &maxbits);
+
+    return 0;
+  }
+  mutt_error("SSL failed: Unable to negotiate protocol");
+  return -1;
+#endif
 }
 
 /* ssl_negotiate: After SSL state has been initialised, attempt to negotiate
@@ -318,6 +362,12 @@ int ssl_negotiate (sslsockdata* ssldata)
     switch (SSL_get_error (ssldata->ssl, err))
     {
     case SSL_ERROR_SYSCALL:
+#ifdef LIBMUTT
+      /* BALSA: if err 0, protocol violation, not IO error; retry with opts */
+      if (err == 0) {
+       return -2;
+      }
+#endif
       errmsg = "I/O error";
       break;
     case SSL_ERROR_SSL:

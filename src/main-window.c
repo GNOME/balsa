@@ -1114,9 +1114,9 @@ enable_message_menus(LibBalsaMessage * message)
     GtkWidget *toolbar =
         balsa_toolbar_get_from_gnome_app(GNOME_APP(balsa_app.main_window));
 
-    enable       = (message != NULL);
-    enable_mod   = (message && !message->mailbox->readonly);
-    enable_multi = (message && libbalsa_message_is_multipart(message));
+    enable       = (message != NULL && message->mailbox != NULL);
+    enable_mod   = (enable && !message->mailbox->readonly);
+    enable_multi = (enable && libbalsa_message_is_multipart(message));
 
     /* Handle menu items which require write access to mailbox */
     for(i=0; i<ELEMENTS(mods); i++)

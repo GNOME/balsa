@@ -106,6 +106,7 @@ struct _MessageClass
   void (* set_answered)   (Message *message, gboolean set);
   void (* set_read)       (Message *message, gboolean set);
   void (* set_deleted)    (Message *message, gboolean set);
+  void (* set_flagged)		(Message *message, gboolean set);
 };
 
 
@@ -125,6 +126,9 @@ void message_read (Message * message);
 void message_unread (Message * message);
 void message_delete (Message * message);
 void message_undelete (Message * message);
+
+void message_flag (Message * message);
+void message_unflag (Message * message);
 
 void message_answer (Message * message);
 void message_reply (Message * message);

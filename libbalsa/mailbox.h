@@ -78,6 +78,7 @@ typedef enum
   MESSAGE_MARK_ANSWER,		/* message has been answered */
   MESSAGE_MARK_READ,		/* message has changed from new to read */
   MESSAGE_MARK_UNREAD,		/* message has changed from read to new */
+	MESSAGE_MARK_FLAGGED,		/* message has been flagged/unflagged */
   MESSAGE_MARK_DELETE,		/* message has been marked deleted */
   MESSAGE_MARK_UNDELETE,	/* message has been marked undeleted */
   MESSAGE_DELETE,		/* message has been deleted */
@@ -96,11 +97,12 @@ typedef enum
   MESSAGE_MARK_UNREAD_MASK = 1 << 3,
   MESSAGE_MARK_DELETE_MASK = 1 << 4,
   MESSAGE_MARK_UNDELETE_MASK = 1 << 5,
-  MESSAGE_DELETE_MASK = 1 << 6,
-  MESSAGE_NEW_MASK = 1 << 7,
-  MESSAGE_FLAGGED_MASK = 1 << 8,
-  MESSAGE_REPLIED_MASK = 1 << 9,
-  MESSAGE_APPEND_MASK = 1 << 10
+  MESSAGE_MARK_FLAGGED_MASK = 1 << 6,
+  MESSAGE_DELETE_MASK = 1 << 7,
+  MESSAGE_NEW_MASK = 1 << 8,
+  MESSAGE_FLAGGED_MASK = 1 << 9,
+  MESSAGE_REPLIED_MASK = 1 << 10,
+  MESSAGE_APPEND_MASK = 1 << 11
 } MailboxWatcherMessageMask;
 
 
@@ -273,7 +275,7 @@ extern void  send_watcher_mark_undelete_message (Mailbox * mailbox, Message * me
 extern void  send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining);
 extern void  send_watcher_delete_message (Mailbox * mailbox, Message * message);
 extern void  send_watcher_append_message (Mailbox * mailbox, Message * message);
-
+extern void  send_watcher_mark_flagged_message(Mailbox * mailbox, Message *message);
 
 
 /*

@@ -1,3 +1,15 @@
+2000-06-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Terence Haddock's <haddock@tripi.com> flagging patch.
+	* libbalsa/mailbox.{h,c}: send_watcher_mark_flag_message() implemented,
+	MESSAGE_MARK_FLAGGED/MESSAGE_MARK_FLAGGED_MASK enums aded.
+	* libbalsa/message.{h,c}: set_flagged signal implemented.
+	* src/balsa-icons.{h,c}: pixmaps/flagged.xpm added.
+	* src/balsa-index-page.{h,c}: Toggle flagged popup menu entry,
+	balsa_message_toggle_flagged() callback.
+	* src/balsa-index.c: flag displaying code.
+	* src/main-window.c: main menu toggle flag entry
+
 2000-06-17  Pawel Salek  <pawsa@theochem.kth.se>
 
 	IMAP directory stuff, usable version. Terminology needs polishing.

@@ -90,6 +90,7 @@ void send_watcher_mark_clear_message (Mailbox * mailbox, Message * message);
 void send_watcher_mark_answer_message (Mailbox * mailbox, Message * message);
 void send_watcher_mark_read_message (Mailbox * mailbox, Message * message);
 void send_watcher_mark_unread_message (Mailbox * mailbox, Message * message);
+void send_watcher_mark_flag_message (Mailbox * mailbox, Message * message);
 void send_watcher_mark_delete_message (Mailbox * mailbox, Message * message);
 void send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message);
 void send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining);
@@ -1007,6 +1008,31 @@ send_watcher_mark_read_message (Mailbox * mailbox, Message * message)
 	  (*watcher->func) (&mw_message);
 	}
     }
+}
+ 
+void
+send_watcher_mark_flag_message (Mailbox * mailbox, Message * message)
+{
+	GList *list;
+	MailboxWatcherMessage mw_message;
+	MailboxWatcher *watcher;
+
+	mw_message.type = MESSAGE_MARK_FLAGGED;
+	mw_message.mailbox = mailbox;
+	mw_message.message = message;
+
+	list = WATCHER_LIST (mailbox);
+	while (list)
+	{
+		watcher = list->data;
+		list = list->next;
+
+		if (watcher->mask & MESSAGE_MARK_FLAGGED_MASK)
+		{
+			mw_message.data = watcher->data;
+			(*watcher->func) (&mw_message);
+		}
+	}
 }
 
 void

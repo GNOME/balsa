@@ -49,6 +49,7 @@ static void libbalsa_message_real_clear_flags(Message *message);
 static void libbalsa_message_real_set_answered_flag(Message *message, gboolean set);
 static void libbalsa_message_real_set_read_flag(Message *message, gboolean set);
 static void libbalsa_message_real_set_deleted_flag(Message *message, gboolean set);
+static void libbalsa_message_real_set_flagged(Message *message, gboolean set);
 char * mime_content_type2str (int contenttype);
 
 enum {
@@ -56,6 +57,7 @@ enum {
   SET_ANSWERED,
   SET_READ,
   SET_DELETED,
+	SET_FLAGGED,
   LAST_SIGNAL
 };
 
@@ -154,6 +156,15 @@ libbalsa_message_class_init (MessageClass *klass)
                     GTK_TYPE_NONE, 1,
 		    GTK_TYPE_BOOL);
 
+	message_signals[SET_FLAGGED] = 
+		gtk_signal_new ("set_flagged",
+				GTK_RUN_LAST,
+				object_class->type,
+				GTK_SIGNAL_OFFSET(MessageClass, set_flagged),
+				gtk_marshal_NONE__INT,
+				GTK_TYPE_NONE, 1,
+				GTK_TYPE_BOOL);
+
   gtk_object_class_add_signals(object_class, message_signals, LAST_SIGNAL);
 
   object_class->destroy = libbalsa_message_real_destroy;
@@ -162,6 +173,7 @@ libbalsa_message_class_init (MessageClass *klass)
   klass->set_answered = libbalsa_message_real_set_answered_flag;
   klass->set_read = libbalsa_message_real_set_read_flag;
   klass->set_deleted = libbalsa_message_real_set_deleted_flag;
+  klass->set_flagged = libbalsa_message_real_set_flagged;
 }
 
 /*
@@ -416,6 +428,28 @@ libbalsa_message_real_set_read_flag(Message *message, gboolean set)
 }
 
 static void
+libbalsa_message_real_set_flagged(Message *message, gboolean set)
+{
+	HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
+
+	LOCK_MAILBOX (message->mailbox);
+	RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
+
+	if (!set && (message->flags & MESSAGE_FLAG_FLAGGED)) {
+		mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_FLAG, FALSE);
+
+		message->flags &= ~MESSAGE_FLAG_FLAGGED;
+	} else if (set){
+		mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_FLAG, TRUE);
+
+		message->flags |= MESSAGE_FLAG_FLAGGED;
+	}
+	send_watcher_mark_unread_message (message->mailbox, message);
+
+	UNLOCK_MAILBOX (message->mailbox);
+}
+
+static void
 libbalsa_message_real_set_deleted_flag(Message *message, gboolean set)
 {
     HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
@@ -449,6 +483,24 @@ libbalsa_message_real_set_deleted_flag(Message *message, gboolean set)
     }
     
     UNLOCK_MAILBOX (message->mailbox);
+}
+
+void
+message_flag(Message *message)
+{
+	g_return_if_fail(message != NULL);
+	g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
+
+	gtk_signal_emit(GTK_OBJECT(message), message_signals[SET_FLAGGED], TRUE);
+}
+
+void
+message_unflag(Message *message)
+{
+	g_return_if_fail(message != NULL);
+	g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
+
+	gtk_signal_emit(GTK_OBJECT(message), message_signals[SET_FLAGGED], FALSE);
 }
 
 void

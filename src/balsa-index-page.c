@@ -627,6 +627,14 @@ create_menu (BalsaIndex * bindex)
 			 _("Store Address"),
 			 balsa_message_store_address, bindex);
 
+	menuitem = gtk_menu_item_new_with_label(_("Toggle flagged"));
+	gtk_signal_connect(GTK_OBJECT(menuitem),
+			"activate",
+			(GtkSignalFunc) balsa_message_toggle_flagged,
+			bindex);
+	gtk_menu_append (GTK_MENU (menu), menuitem);
+	gtk_widget_show (menuitem);
+
   menuitem = gtk_menu_item_new_with_label (_("Transfer"));
   submenu = gtk_menu_new ();
   smenuitem = gtk_menu_item_new ();
@@ -1007,7 +1015,6 @@ balsa_message_next_unread (GtkWidget* widget, gpointer index)
   balsa_index_select_next_unread (index);
 }
 
-
 void
 balsa_message_previous (GtkWidget * widget, gpointer index)
 {
@@ -1015,6 +1022,54 @@ balsa_message_previous (GtkWidget * widget, gpointer index)
   balsa_index_select_previous (index);
 }
 
+ 
+/* This function toggles the FLAGGED attribute of a message
+ */
+void
+balsa_message_toggle_flagged (GtkWidget * widget, gpointer index)
+{
+	GList   *list;
+	Message *message;
+	int      is_all_flagged = TRUE;
+ 
+	g_return_if_fail (widget != NULL);
+	g_return_if_fail(index != NULL);
+
+	list = GTK_CLIST(index)->selection;
+
+	/* First see if we should unselect or select */
+	while (list)
+	{
+		message = gtk_clist_get_row_data(GTK_CLIST(index), 
+			GPOINTER_TO_INT(list->data));
+
+		if (!(message->flags & MESSAGE_FLAG_FLAGGED))
+		{
+			is_all_flagged = FALSE;
+			break;
+		}
+		list = list->next;
+	}
+
+	/* If they are all flagged, then unflag them. Otherwise, flag them all */
+	list = GTK_CLIST(index)->selection;
+ 
+	while (list)
+	{
+		message = gtk_clist_get_row_data(GTK_CLIST(index), 
+			GPOINTER_TO_INT(list->data));
+
+		if (is_all_flagged)
+		{
+			message_unflag(message);
+		} else {
+			message_flag(message);
+		}
+ 
+		list = list->next;
+	}
+	mailbox_commit_flagged_changes(BALSA_INDEX(index)->mailbox);
+}
 
 void
 balsa_message_delete (GtkWidget * widget, gpointer index)

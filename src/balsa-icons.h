@@ -38,7 +38,9 @@ typedef enum
     BALSA_ICON_ENVELOPE,
 
     BALSA_ICON_ARROW,
-    BALSA_ICON_MULTIPART
+    BALSA_ICON_MULTIPART,
+
+    BALSA_ICON_FLAGGED
   }
 BalsaIconName;
 

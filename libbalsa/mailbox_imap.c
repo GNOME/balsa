@@ -331,6 +331,8 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
    Only open mailboxes are checked, although closed can be checked too
    with OPTIMAPPASIVE option set.
    NOTE: mx_check_mailbox can close mailbox(). Be cautious.
+   We have to set Timeout to 0 because mutt would not allow checking several
+   mailboxes in row.
 */
 static void
 libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
@@ -340,7 +342,7 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE); 
     } else {
 	gint i = 0;
-	long newmsg;
+	long newmsg, timeout;
 	gint index_hint;
 	g_return_if_fail(CLIENT_CONTEXT(mailbox));
 	
@@ -350,7 +352,9 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 
 	libbalsa_lock_mutt();
 	imap_allow_reopen(CLIENT_CONTEXT(mailbox));
+	timeout = Timeout; Timeout = 0;
 	i = mx_check_mailbox(CLIENT_CONTEXT(mailbox), &index_hint, 0);
+	Timeout = timeout;
 	libbalsa_unlock_mutt();
 
 	if (i < 0) {

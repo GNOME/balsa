@@ -601,8 +601,10 @@ add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
 	/* type is not a valid local mailbox type. */
 	g_assert_not_reached();
     }
-    if(!mailbox) /* local mailbox could not be created; privileges? */
+    if(!mailbox) {/* local mailbox could not be created; privileges? */
+	printf("Not accessible mailbox %s\n", path);
 	return NULL;
+    }
     mailbox->name = g_strdup(name);
     
     node = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));
@@ -711,7 +713,9 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
     libbalsa_mailbox_remote_set_server(
 	LIBBALSA_MAILBOX_REMOTE(m), BALSA_MAILBOX_NODE(root->data)->server);
     m->path = g_strdup(fn);
-    printf("Adding mailbox of name %s\n", basename);
+    if(balsa_app.debug) 
+	printf("add_imap_mailbox: Adding mailbox of name %s (full path %s)\n", 
+	       basename, fn);
     LIBBALSA_MAILBOX(m)->name = g_strdup(basename);
     return add_imap_entry(root, fn, m, delim);
 }
@@ -719,6 +723,8 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
 static GNode*
 add_imap_folder(GNode*root, const char* fn, char delim)
 { 
+    if(balsa_app.debug) 
+	printf("add_imap_folder: Adding folder of path %s\n", fn);
     return add_imap_entry(root, fn, NULL, delim);
 }
 

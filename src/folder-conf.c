@@ -119,9 +119,6 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 	create_check(fcw.dialog, _("_Subscribed folders only"), table, 5);
     gtk_signal_connect(GTK_OBJECT(fcw.subscribed), "toggled", 
 		       subscribed_func, &fcw);
-    if(mn && mn->subscribed)
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw.subscribed), TRUE);
-
     create_label(_("_Prefix"), table, 6, &keyval);
     fcw.prefix = create_entry(fcw.dialog, table, NULL, NULL, 6, 
 			      mn ? mn->dir : NULL, keyval);
@@ -129,6 +126,10 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     gtk_widget_show_all(GTK_WIDGET(fcw.dialog));
     gnome_dialog_close_hides(fcw.dialog, TRUE);
     gtk_widget_grab_focus(fcw.folder_name);
+
+    /* all the widgets are ready, set their values */
+    if(mn && mn->subscribed)
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw.subscribed), TRUE);
 
     /* FIXME: I don't like this loop. */
     while( (button = gnome_dialog_run(fcw.dialog)) == 2) 

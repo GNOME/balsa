@@ -515,8 +515,8 @@ update_imap_mailbox(MailboxConfWindow *mcw)
 		       mailbox);
 
     libbalsa_mailbox_imap_set_path(mailbox,
-				   (path == NULL
-				    || path[0] == '\0') ? "INBOX" : path);
+				   (path == NULL || path[0] == '\0') 
+				   ? "INBOX" : path);
     g_free(path);
 }
 
@@ -613,7 +613,8 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	gchar *path;
 
 	path = gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.local.path));
-	libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL(mcw->mailbox), path);
+	libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL(mcw->mailbox), 
+					path);
 
 	node =g_node_new(mbnode);
 	g_node_append(balsa_app.mailbox_nodes, node);
@@ -630,36 +631,6 @@ mailbox_conf_add(MailboxConfWindow *mcw)
     } else {
 	g_assert_not_reached();
     }
-	/* IMAP Mailboxes */
-#if 0
-    case MC_PAGE_IMAP_DIR:
-	{
-	    ImapDir *dir = imapdir_new();
-	    fill_in_imap_data(&dir->name, &dir->path);
-
-	    dir->user =
-		g_strdup(gtk_entry_get_text
-			 (GTK_ENTRY(mcw->imap_username)));
-	    dir->passwd =
-		g_strdup(gtk_entry_get_text
-			 (GTK_ENTRY(mcw->imap_password)));
-	    dir->host =
-		g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)));
-	    dir->port =
-		atoi(gtk_entry_get_text(GTK_ENTRY(mcw->imap_port)));
-
-	    imapdir_scan(dir);
-	    if (!G_NODE_IS_LEAF(dir->file_tree)) {
-		config_imapdir_add(dir);
-		g_node_append(balsa_app.mailbox_nodes, dir->file_tree);
-		dir->file_tree = NULL;
-		imapdir_destroy(dir);
-		return MC_RET_OK;
-	    } else
-		imapdir_destroy(dir);
-	    /* and assume it was ordinary IMAP mailbox */
-	}
-#endif
 
     config_mailbox_add(mcw->mailbox, NULL);
 

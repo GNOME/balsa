@@ -1,3 +1,17 @@
+2001-03-02  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_imap.c: take care of Timeout to allow checking 
+	multiple mailboxes in a row.
+	* src/folder-conf.c: 'subscribed' configuration accessed not-yet 
+	created widgets.
+	* src/mailbox-conf.c: remove old crap.
+	* src/mailbox-node.c: add some debugging output for folder 
+	configuration.
+	* src/main.c: fix detection of inititial run.
+	* src/save-restore.c: same.
+	* src/sendmsg-window.c: armour file attachinng code. Russian 
+	language fixes from Dmitry G. Mastrukov <dmitry@taurussoft.org>
+	
 2001-02-28  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/mailbox_local.c: (libbalsa_mailbox_local_set_path)

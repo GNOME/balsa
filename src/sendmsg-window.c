@@ -80,7 +80,7 @@ static gint postpone_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint print_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint attach_clicked(GtkWidget *, gpointer);
 static gint close_window(GtkWidget *, gpointer);
-static gint check_if_regular_file(const gchar *);
+static gchar* check_if_regular_file(const gchar *);
 static void balsa_sendmsg_destroy(BalsaSendmsg * bsm);
 
 static void check_readiness(GtkEditable * w, BalsaSendmsg * bsmsg);
@@ -148,7 +148,7 @@ static GnomeUIInfo main_toolbar[] = {
 			   postpone_message_cb, GNOME_STOCK_PIXMAP_SAVE),
     GNOMEUIINFO_SEPARATOR,
 #define TOOL_SPELLING_POS 6
-    GNOMEUIINFO_ITEM_STOCK(N_("Check Spelling"),
+    GNOMEUIINFO_ITEM_STOCK(N_("Spelling"),
 			   N_
 			   ("Run a spell check on the current message"),
 			   spell_check_cb, GNOME_STOCK_PIXMAP_SPELLCHECK),
@@ -420,9 +420,9 @@ struct {
 #define LOC_ROMANIAN_POS 19
     {"ro_RO", "ISO-8859-2", N_("Romanian")},
 #define LOC_RUSSIAN_ISO_POS   20
-    {"ru_RU", "ISO-8859-5", N_("Russian (ISO)")},
+    {"ru_SU", "ISO-8859-5", N_("Russian (ISO)")},
 #define LOC_RUSSIAN_KOI_POS   21
-    {"ru_RU", "KOI-8-R", N_("Russian (KOI)")},
+    {"ru_RU", "KOI8-R", N_("Russian (KOI)")},
 #define LOC_SLOVAK_POS    22
     {"sk_SK", "ISO-8859-2", N_("Slovak")},
 #define LOC_SPANISH_POS   23
@@ -432,7 +432,7 @@ struct {
 #define LOC_TURKISH_POS   25
     {"tr_TR", "ISO-8859-9", N_("Turkish")},
 #define LOC_UKRAINIAN_POS 26
-    {"uk_UK", "KOI-8-U", N_("Ukrainian")}
+    {"uk_UK", "KOI8-U", N_("Ukrainian")}
 };
 
 static gint mail_headers_page;
@@ -489,7 +489,7 @@ balsa_sendmsg_destroy(BalsaSendmsg * bsm)
     g_assert(bsm != NULL);
     g_assert(ELEMENTS(headerDescs) == ELEMENTS(bsm->view_checkitems));
 
-    g_message("balsa_sendmsg_destroy(): Start.");
+    if(balsa_app.debug) g_message("balsa_sendmsg_destroy(): Start.");
     if (bsm->orig_message) {
 	if (bsm->orig_message->mailbox)
 	    libbalsa_mailbox_close(bsm->orig_message->mailbox);
@@ -511,7 +511,7 @@ balsa_sendmsg_destroy(BalsaSendmsg * bsm)
 	while(sending_mail) {
 	    while(gtk_events_pending())
 		gtk_main_iteration_do(FALSE);
-	    usleep(500);
+	    usleep(2000);
 	}
 	balsa_exit();
     }
@@ -519,7 +519,7 @@ balsa_sendmsg_destroy(BalsaSendmsg * bsm)
     if (balsa_app.compose_email)
 	balsa_exit();
 #endif
-    g_message("balsa_sendmsg_destroy(): Stop.");
+    if(balsa_app.debug) g_message("balsa_sendmsg_destroy(): Stop.");
 }
 
 /* language menu helper functions */
@@ -615,8 +615,9 @@ select_attachment(GnomeIconList * ilist, gint num, GdkEventButton * event,
 static void
 add_attachment(GnomeIconList * iconlist, char *filename)
 {
+    GtkWidget *msgbox;
     const gchar *content_type;
-    gchar *pix;
+    gchar *pix, *err_msg;
 
     /* FIXME: What is the default type? */
     content_type = gnome_mime_type_or_default ( filename, "application/octet-stream" );
@@ -624,12 +625,16 @@ add_attachment(GnomeIconList * iconlist, char *filename)
 
     if (balsa_app.debug)
 	fprintf(stderr, "Trying to attach '%s'\n", filename);
-    if (!check_if_regular_file(filename)) {
-	/*c_i_r_f() will pop up an error dialog for us, so we need do nothing. */
+    if ( (err_msg=check_if_regular_file(filename)) != NULL) {
+	msgbox = gnome_message_box_new(err_msg, GNOME_MESSAGE_BOX_ERROR,
+				       _("Cancel"), NULL);
+	gtk_window_set_modal(GTK_WINDOW(msgbox), TRUE);
+	gnome_dialog_run(GNOME_DIALOG(msgbox));
+	g_free(err_msg);
 	return;
     }
 
-    if (pix && check_if_regular_file(pix)) {
+    if (pix && (err_msg=check_if_regular_file(pix)) == NULL) {
 	gint pos;
 	gchar *label;
 
@@ -640,41 +645,40 @@ add_attachment(GnomeIconList * iconlist, char *filename)
 
 	g_free(label);
 
-    } else
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  _("The attachment pixmap (balsa/attachment.png) cannot be found.\n"
-			    "This means you cannot attach any files.\n"));
-
+    } else { 
+	if(pix) {
+	    balsa_information
+		(LIBBALSA_INFORMATION_ERROR,
+		 _("The attachment pixmap (%s) cannot be used.\n %s"),
+		 pix, err_msg);
+	    g_free(err_msg);
+	} else
+	    balsa_information
+		(LIBBALSA_INFORMATION_ERROR,
+		 _("Default attachment pixmap (balsa/attachment.png) cannot be found:\n"
+		   "Your balsa installation is corrupted."));
+    }
     g_free ( pix ) ;
 }
 
-static gint
+static gchar* 
 check_if_regular_file(const gchar * filename)
 {
     struct stat s;
-    GtkWidget *msgbox;
     gchar *ptr = NULL;
-    gint result = TRUE;
 
-    if (stat(filename, &s)) {
-	ptr = g_strdup_printf(_("Cannot get info on file '%s': %s\n"),
+    if (stat(filename, &s))
+	ptr = g_strdup_printf(_("Cannot get info on file '%s': %s"),
 			      filename, strerror(errno));
-	result = FALSE;
-    } else if (!S_ISREG(s.st_mode) || access(filename, R_OK) != 0) {
+    else if (!S_ISREG(s.st_mode))
 	ptr =
 	    g_strdup_printf(
-	      _("Attachment is not a regular file or cannot be read: '%s'\n"),
-	      filename);
-	result = FALSE;
+		_("Attachment %s is not a regular file."), filename);
+    else if(access(filename, R_OK) != 0) {
+	ptr =
+	    g_strdup_printf(_("File %s cannot be read\n"), filename);
     }
-    if (ptr) {
-	msgbox = gnome_message_box_new(ptr, GNOME_MESSAGE_BOX_ERROR,
-				       _("Cancel"), NULL);
-	g_free(ptr);
-	gtk_window_set_modal(GTK_WINDOW(msgbox), TRUE);
-	gnome_dialog_run(GNOME_DIALOG(msgbox));
-    }
-    return result;
+    return ptr;
 }
 
 /* attach_dialog_ok:

@@ -140,7 +140,9 @@ balsa_send_message (Message * message)
   GList *lista;
   Message *queu;
   int message_number = 0;
+#ifdef BALSA_USE_THREADS
   GtkWidget *send_dialog_source = NULL;
+#endif  
 //  GtkWidget *send_dialog_message = NULL;
 
 fprintf(stderr,"Comienzo la funcion\n");
@@ -169,13 +171,11 @@ fprintf(stderr,"Comienzo la funcion\n");
 #ifdef BALSA_USE_THREADS
 
   pthread_mutex_lock( &send_messages_lock );
-#endif
   
   if (sending_mail == FALSE )
   {
 
 /* We create here the progress bar */
-
   	send_dialog = gnome_dialog_new("Sending Mail...", "Hide", NULL);
 
   	gnome_dialog_set_close(GNOME_DIALOG(send_dialog), TRUE);
@@ -199,6 +199,7 @@ fprintf(stderr,"Comienzo la funcion\n");
   	gtk_widget_show_all( send_dialog );
 
 /* Progress bar done */
+#endif
 
 	 last_message = first_message;
          balsa_mailbox_open (balsa_app.outbox);
@@ -237,10 +238,9 @@ fprintf(stderr,"Comienzo la funcion\n");
 	 }
 	 
 	 balsa_mailbox_close (balsa_app.outbox);
-	
+	 
+#ifdef BALSA_USE_THREADS	
    }
-
-#ifdef BALSA_USE_THREADS
 
       pthread_mutex_unlock( &send_messages_lock );
 #endif
@@ -401,9 +401,10 @@ balsa_send_message_real(MessageQueueItem *first_message)
 				current_message->message, NULL, 0, NULL);
 	       
 */
+#ifdef BALSA_USE_THREADS
 		 MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE, "Hola",
 		                         current_message->orig, NULL, 0);
-
+#endif
 	 }
 	 else
          {
@@ -418,10 +419,10 @@ balsa_send_message_real(MessageQueueItem *first_message)
   //      free( current_message );
         current_message = next_message;
     }
-
+#ifdef BALSA_USE_THREADS
     MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE, "LAST",
                              NULL, NULL, 0);
-
+#endif
     //if (open == 0)
 	//    balsa_mailbox_close (balsa_app.outbox);
 
@@ -598,14 +599,16 @@ static int smtp_answer (int fd)
 int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
 {
   char message[500], buffer[525]; /* Maximum allow by RFC */
-  int fp,left,len, total, send=0;
-  float percent=0;
-  struct stat st;
+  int fp,left,len;
   char *tmp, *tmpbuffer;
   ADDRESS *address;
+#ifdef BALSA_USE_THREADS  
+  int total, send = 0;
+  struct stat st;
+  float percent=0;
   SendThreadMessage *progress_message;
   char send_message[100];
-  
+#endif
  
   snprintf (buffer, 512,"MAIL FROM:<%s>\r\n", msg->env->from->mailbox);
   write (s, buffer, strlen (buffer));
@@ -663,12 +666,14 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
 
 
   /* Now we are ready to send the message */
-  //total_messages_left = 4 ;
-  sprintf (send_message, "Messages to be send: %d ", total_messages_left);
+
+#ifdef BALSA_USE_THREADS
   
+  sprintf (send_message, "Messages to be send: %d ", total_messages_left);
   MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS, send_message,
 	                      NULL, NULL, 0);
- 
+#endif
+  
   snprintf (buffer, 512,"DATA\r\n");
   write (s, buffer, strlen (buffer));
   if (smtp_answer (s) == 0)
@@ -679,11 +684,12 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
 
   if ((fp=open(tempfile,O_RDONLY))==-1)
     return -1;
- 
+  
+#ifdef BALSA_USE_THREADS 
   lstat (tempfile, &st);
    
   total = (int)st.st_size;
-  
+#endif  
 
   while ((left = (int)read (fp, message, sizeof(message)))!=0)
   {
@@ -696,21 +702,25 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
             {
 		write (s,tmpbuffer,len);
 		write (s, "\r\n",2);
+#ifdef BALSA_USE_THREADS
 		send = send + len + 2 ;
 	    
 		percent = (float)send/total ;
 /*	        MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS, "",	                         NULL, NULL, percent);
 */			
+#endif
 	    }
 	    else
 	    {
 		write (s,tmpbuffer,len);
 		write (s, "\n",1);
+#ifdef BALSA_USE_THREADS
 		send = send + len + 1;
 
 		percent = (float)send/total ;
 /*		MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS, "",	                         NULL, NULL, percent);
 */			
+#endif		
 	    }
 	    tmpbuffer=tmp+1;
 	    left=left-(len+1);
@@ -718,13 +728,15 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
 		 break;
     }
     
-    write (s, tmpbuffer,left);  
+    write (s, tmpbuffer,left); 
+    
+#ifdef BALSA_USE_THREADS
     send = send + left;
     percent = (float)send/total ;
     
     MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS, "",
 	                 NULL, NULL, percent);
-
+#endif
   }
   
   snprintf (buffer, sizeof(buffer),"\r\n.\r\n");
@@ -852,15 +864,14 @@ int balsa_smtp_send (MessageQueueItem *first_message, char *server)
 
   close (s);
   
+#ifdef BALSA_USE_THREADS
+  
   MSGSENDTHREAD (finish_message, MSGSENDTHREADFINISHED,"",NULL,NULL,0); 
+#endif
+
   
   if (error == 1)
      return -2;
-
-#ifdef BALSA_USE_THREADS
-     
-     // MSGSENDTHREAD(threadmsg, MSGMAILTHREAD_PROGRESS, "Hola"); 
-#endif
 
   
   return 1;

@@ -46,6 +46,11 @@ static void show_selected_cb(GtkWidget * widget, gpointer data);
 static void show_all_headers_cb(GtkWidget * widget, gpointer data);
 static void wrap_message_cb(GtkWidget *widget, gpointer data);
 
+static void copy_cb(GtkWidget *widget, gpointer data);
+static void select_all_cb(GtkWidget *widget, gpointer);
+
+static void select_part_cb(BalsaMessage *bm, gpointer data);
+
 /*
  * The list of messages which are being displayed.
  */
@@ -75,8 +80,10 @@ static GnomeUIInfo edit_menu[] =
   /*  GNOMEUIINFO_MENU_UNDO_ITEM(NULL, NULL); */
   /*  GNOMEUIINFO_MENU_REDO_ITEM(NULL, NULL); */
   /*  GNOMEUIINFO_SEPARATOR, */
-  GNOMEUIINFO_MENU_COPY_ITEM(NULL, NULL),
-  GNOMEUIINFO_MENU_SELECT_ALL_ITEM(NULL, NULL),
+#define MENU_EDIT_COPY_POS 0
+  GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
+#define MENU_EDIT_SELECT_ALL_POS 1
+  GNOMEUIINFO_MENU_SELECT_ALL_ITEM(select_all_cb, NULL),
   /*  GNOMEUINFO_SEPARATOR, */
   /*  GNOMEUIINFO_MENU_FIND_ITEM(NULL, NULL); */
   /*  GNOMEUIINFO_MENU_FIND_AGAIN_ITEM(NULL, NULL); */
@@ -195,7 +202,6 @@ message_window_new (LibBalsaMessage * message)
   mw->message = message;
 
   mw->window = gnome_app_new ("balsa", "Message");
-  gtk_object_set_data (GTK_OBJECT (mw->window), "msgwin", mw);
 
   gtk_signal_connect (GTK_OBJECT (mw->window),
 		      "destroy",
@@ -203,12 +209,15 @@ message_window_new (LibBalsaMessage * message)
 		      mw);
 
   gnome_app_create_menus_with_data (GNOME_APP (mw->window),
-		  main_menu, mw->window);
+		  main_menu, mw);
 
   scroll = gtk_scrolled_window_new(NULL, NULL);
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
   mw->bmessage = balsa_message_new ();
+
+  gtk_signal_connect(GTK_OBJECT(mw->bmessage), "select-part",
+		     GTK_SIGNAL_FUNC(select_part_cb), mw);
 
   gtk_container_add(GTK_CONTAINER(scroll), mw->bmessage);
   gtk_widget_show(scroll);
@@ -255,8 +264,7 @@ destroy_message_window (GtkWidget * widget, gpointer data)
 static void
 replyto_message_cb(GtkWidget * widget, gpointer data)
 {
-  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
-							     "msgwin");
+  MessageWindow *mw = (MessageWindow *)data;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail (mw != NULL);
@@ -267,8 +275,7 @@ replyto_message_cb(GtkWidget * widget, gpointer data)
 static void
 replytoall_message_cb(GtkWidget * widget, gpointer data)
 {
-  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
-							     "msgwin");
+  MessageWindow *mw = (MessageWindow *)data;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail (mw != NULL);
@@ -279,8 +286,7 @@ replytoall_message_cb(GtkWidget * widget, gpointer data)
 static void
 forward_message_cb(GtkWidget * widget, gpointer data)
 {
-  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
-							     "msgwin");
+  MessageWindow *mw = (MessageWindow *)data;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail (mw != NULL);
@@ -291,17 +297,15 @@ forward_message_cb(GtkWidget * widget, gpointer data)
 static void 
 next_part_cb(GtkWidget * widget, gpointer data)
 {
-  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
-							     "msgwin");
-  balsa_message_next_part(BALSA_MESSAGE(mw->bmessage));
-  
+  MessageWindow *mw = (MessageWindow *)data;
+
+  balsa_message_next_part(BALSA_MESSAGE(mw->bmessage));  
 }
 
 static void 
 previous_part_cb(GtkWidget * widget, gpointer data)
 {
-  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
-							     "msgwin");
+  MessageWindow *mw = (MessageWindow *)data;
 
   balsa_message_previous_part(BALSA_MESSAGE(mw->bmessage));
 }
@@ -309,8 +313,7 @@ previous_part_cb(GtkWidget * widget, gpointer data)
 static void 
 save_current_part_cb(GtkWidget *widget, gpointer data)
 {
-  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
-							     "msgwin");
+  MessageWindow *mw = (MessageWindow *)data;
 
   balsa_message_save_current_part(BALSA_MESSAGE(mw->bmessage));
 }
@@ -318,49 +321,78 @@ save_current_part_cb(GtkWidget *widget, gpointer data)
 static void
 close_message_window(GtkWidget * widget, gpointer data)
 {
-  gtk_widget_destroy(GTK_WIDGET(data));
+  MessageWindow *mw = (MessageWindow *)data;
+
+  gtk_widget_destroy(GTK_WIDGET(mw->window));
 }
 
 
 static void 
 show_no_headers_cb(GtkWidget * widget, gpointer data)
 {
-  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
-							     "msgwin");
+  MessageWindow *mw = (MessageWindow *)data;
   
   balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage), 
 				      HEADERS_NONE);
-
 }
 
 static void 
 show_selected_cb(GtkWidget * widget, gpointer data)
 {
-  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
-							     "msgwin");
+  MessageWindow *mw = (MessageWindow *)data;
   
   balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage), 
 				      HEADERS_SELECTED);
-
 }
 
 static void 
 show_all_headers_cb(GtkWidget * widget, gpointer data)
 {
-  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
-							     "msgwin");
+  MessageWindow *mw = (MessageWindow *)data;
   
   balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage), 
 				      HEADERS_ALL);
-
 }
 
 static void 
 wrap_message_cb(GtkWidget *widget, gpointer data)
 {
-  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
-							     "msgwin");
+  MessageWindow *mw = (MessageWindow *)data;
 
   balsa_message_set_wrap(BALSA_MESSAGE(mw->bmessage), 
 			 GTK_CHECK_MENU_ITEM(widget)->active);
 }
+
+static void 
+select_part_cb(BalsaMessage *bm, gpointer data)
+{
+  gboolean enable;
+
+  if ( balsa_message_can_select(bm) )
+    enable = TRUE;
+  else
+    enable = FALSE;
+
+  gtk_widget_set_sensitive ( edit_menu[MENU_EDIT_COPY_POS].widget, enable);
+  gtk_widget_set_sensitive ( edit_menu[MENU_EDIT_SELECT_ALL_POS].widget, enable);
+}
+
+
+static void
+copy_cb(GtkWidget *widget, gpointer data)
+{
+  MessageWindow *mw = (MessageWindow*)(data);
+
+ if ( mw->bmessage )
+    balsa_message_copy_clipboard(BALSA_MESSAGE(mw->bmessage));
+}
+
+static void
+select_all_cb(GtkWidget *widget, gpointer data)
+{
+  MessageWindow *mw = (MessageWindow*)(data);
+ 
+ if ( mw->bmessage )
+    balsa_message_select_all(BALSA_MESSAGE(mw->bmessage));
+}
+

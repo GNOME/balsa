@@ -1983,13 +1983,5 @@ balsa_window_unselect_message_cb (GtkWidget * widget, LibBalsaMessage * message,
 static void 
 select_part_cb(BalsaMessage *bm, gpointer data)
 {
-  BalsaWindow *bw;
-
-  bw = BALSA_WINDOW(data);
-
-  if ( bw->preview )
-    enable_edit_menus(BALSA_MESSAGE(bw->preview));
-  else
-    enable_edit_menus(NULL);
-
+  enable_edit_menus(bm);
 }

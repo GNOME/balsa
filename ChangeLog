@@ -1,5 +1,8 @@
 2000-09-26  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* src/main-window.c: simplify select_part_cb.
+	* src/message-window.c: Connect up Copy and Select All menu items.
+	
 	* src/balsa-message.[ch]: New signal 'select_part', emitted when you
 	select a part (odd that). Implemented
 	balsa_message_{can_select,_select_all,_copy} to support menu

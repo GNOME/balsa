@@ -1,3 +1,22 @@
+2003-10-10 23:27  PeterB
+
+	* src/main-window.c: Use register_balsa_pixbufs when the main
+	window has been created.
+	* src/balsa-index.c: Remove icon code.
+	* src/: balsa-icons.c, balsa-icons.h: Impl. register_balsa_pixbufs
+	to initialize the new mail icon, etc.
+	* libbalsa/: message.c, message.h: Impl.
+	libbalsa_message_set_status_icons; install local versions of
+	libbalsa_message_is_multipart, etc., that work with the mailbox
+	locked.
+	* libbalsa/: mailbox_imap.c, mailbox_maildir.c, mailbox_mbox.c,
+	mailbox_mh.c: Set message icons.
+	* libbalsa/: mailbox.c, mailbox.h: Add api for setting new mail
+	icon, etc.; use icons in LB_MBOX_MARKED_COL and LB_MBOX_ATTACH_COL;
+	signal the tree-view when icons change.
+	* libbalsa/mailbox_local.c: Fix message numbering for threading;
+	check more carefully for potential loops in threads.
+
 2003-10-09 12:09  PeterB
 
 	* src/main-window.c: Add accelerators for zoom in/out.

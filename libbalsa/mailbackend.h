@@ -7,4 +7,5 @@
 #include "libmutt/mailbox.h"
 #include "libmutt/copy.h"
 #include "libmutt/mime.h"
+#include "libmutt/buffy.h"
 #endif

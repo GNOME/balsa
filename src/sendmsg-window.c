@@ -118,8 +118,6 @@ static gint toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static gint toggle_queue_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 
 static void spell_check_cb(GtkWidget * widget, BalsaSendmsg *);
-static void spell_check_done_cb(BalsaSpellCheck * spell_check,
-				BalsaSendmsg *);
 
 static void address_book_cb(GtkWidget *widget, BalsaSendmsg *smd_msg_wind);
 
@@ -1925,8 +1923,6 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     create_string_entry(table, _("Keywords:"), 9, msg->keywords);
 
     sc = balsa_spell_check_new();
-    gtk_signal_connect(GTK_OBJECT(sc), "done-spell-check",
-		       GTK_SIGNAL_FUNC(spell_check_done_cb), msg);
     msg->spell_checker = sc;
 
     gtk_widget_show_all(table);
@@ -1939,20 +1935,22 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
  * to make them `hard returns',
  * */
 static void
-insert_text_cb(GtkEditable * msg_text, gchar * new_text,
-               gint new_text_length, gint * position, gpointer user_data)
+insert_text_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
+               gchar *text, gint len, gpointer user_data)
 {
-    if (new_text_length == 1 && *new_text == '\n') {
-        gint j = *position;
-        gchar *text = gtk_editable_get_chars(msg_text, 0, j);
-        gint i = j;
-        while (--i >= 0 && text[i] == ' ');
-        if (++i < j) {
-            gtk_editable_delete_text(msg_text, i, j);
-            *position = i;
-        }
-        g_free(text);
-    }
+    GtkTextIter tmp_iter;
+    gunichar c = ' ';
+
+    if (*text != '\n' || len != 1)
+        return;
+
+    tmp_iter = *iter;
+    while (gtk_text_iter_backward_char(&tmp_iter)
+           && (c = gtk_text_iter_get_char(&tmp_iter)) == ' ')
+        /* nothing */;
+    if (c != ' ')
+        gtk_text_iter_forward_char(&tmp_iter);
+    gtk_text_buffer_delete(buffer, &tmp_iter, iter);
 }
 
 /* drag_data_quote - text area D&D callback */
@@ -1995,9 +1993,12 @@ create_text_area(BalsaSendmsg * msg)
     gtk_widget_modify_font(msg->text,
                            pango_font_description_from_string
                            (balsa_app.message_font));
-    if (msg->flow)
-        gtk_signal_connect(GTK_OBJECT(msg->text), "insert-at-cursor",
-                           GTK_SIGNAL_FUNC(insert_text_cb), NULL);
+    if (msg->flow) {
+        GtkTextBuffer *buffer =
+            gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
+        g_signal_connect(G_OBJECT(buffer), "insert-text",
+                         G_CALLBACK(insert_text_cb), NULL);
+    }
     gtk_text_view_set_editable(GTK_TEXT_VIEW(msg->text), TRUE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(msg->text), GTK_WRAP_WORD);
     balsa_spell_check_set_text(BALSA_SPELL_CHECK(msg->spell_checker),
@@ -3628,8 +3629,7 @@ set_locale(GtkWidget * w, BalsaSendmsg * msg, gint idx)
 
 /* spell_check_cb
  * 
- * Start the spell check, disable appropriate menu items so users
- * can't screw up spell-check midway through 
+ * Start the spell check
  * */
 static void
 spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
@@ -3641,7 +3641,6 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
     /* configure the spell checker */
     balsa_spell_check_set_language(sc, msg->locale);
 
-    gtk_widget_show_all(GTK_WIDGET(sc));
     balsa_spell_check_set_character_set(sc, msg->charset);
     balsa_spell_check_set_module(sc,
 				 spell_check_modules_name
@@ -3651,17 +3650,9 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * msg)
 				       [balsa_app.suggestion_mode]);
     balsa_spell_check_set_ignore_length(sc, balsa_app.ignore_size);
 
+    /* this will block until the dialog is closed */
     balsa_spell_check_start(sc);
-    gtk_window_set_modal(GTK_WINDOW(sc), TRUE);
-    gtk_dialog_run(GTK_DIALOG(sc));
-}
 
-
-static void
-spell_check_done_cb(BalsaSpellCheck * spell_check, BalsaSendmsg * msg)
-{
-    gtk_window_set_modal(GTK_WINDOW(spell_check), FALSE);
-    gtk_widget_hide(GTK_WIDGET(spell_check));
     check_readiness(msg);
 }
 

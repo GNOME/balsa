@@ -1,3 +1,9 @@
+2002-04-17 Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/spell-check.c: utilize GtkDialog more efficiently.
+	* src/sendmsg-window.c: when format=flowed and user hits `Enter', 
+properly delete preceding spaces.
+
 2002-04-16  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/libbalsa.c: ask libmutt for data in UTF-8.
@@ -6,7 +12,6 @@
 	* src/balsa-message.c: conversion not longer needed.
 	* src/sendmsg-window.c: do not always pop up spell-check window
 	* src/spell-check.c:    (Peter Bloomfield).
-
 
 2002-04-15  Pawel Salek <pawsa@theochem.kth.se>
 

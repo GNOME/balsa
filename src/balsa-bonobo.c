@@ -120,7 +120,7 @@ impl_balsa_composer_sendMessage (PortableServer_Servant _servant,
     
     for( i = 0; i < attachments->_length ; i++ ) {
 	add_attachment(GNOME_ICON_LIST(snd->attachments[1]), 
-		       attachments->_buffer[i], FALSE, NULL);	
+		       g_strdup(attachments->_buffer[i]), FALSE, NULL);	
     }
     snd->quit_on_close = FALSE;
 }

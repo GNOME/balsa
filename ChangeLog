@@ -1,3 +1,8 @@
+2003-12-23  Carlos Morgado  <chbm gnome.org>
+
+	* src/balsa-bonobo.c (impl_balsa_composer_sendMessage): 
+	bonobo reclaims its buffers (duh) - unbreak balsa -m
+
 2003-12-20 08:04  PeterB
 
 	* libbalsa/mailbox_mbox.c: Reuse LibBalsaMessageBody when reparsing

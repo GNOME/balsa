@@ -1,5 +1,8 @@
-2004-08-18 13:51  PeterB
+2004-08-18 14:33  PeterB
 
+	* src/folder-conf.c: redraw row when descriptive name is changed.
+	* src/mailbox-conf.c: handle name-change for special mailboxes when
+	path is not changed.
 	* src/main-window.c: verify balsa_app.mblist_tree_store in
 	mail-check thread.
 	* libbalsa/mailbox_imap.c: disconnect signal handler when

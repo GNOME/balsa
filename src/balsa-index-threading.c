@@ -847,13 +847,19 @@ chop_re(gchar* str)
 	while(*p && isspace((int)*p)) p++;
 	if(!*p) break;
 	
-	if(g_strncasecmp(p, "re:", 3)==0 || g_strncasecmp(p, "aw:", 3)==0)
+	if(g_strncasecmp(p, "re:", 3)==0 || g_strncasecmp(p, "aw:", 3)==0) {
 	    p+=3;
-	else if(g_strncasecmp(p, _("Re:"), strlen(_("Re:")))==0)
+	    continue;
+	} else if(g_strncasecmp(p, _("Re:"), strlen(_("Re:")))==0) {
+	    /* should "re" be localized ? */
 	    p+=strlen(_("Re:"));
-	else if(g_strncasecmp(p, balsa_app.reply_string,
-			      strlen(balsa_app.reply_string))==0)
+	    continue;
+	} else if(g_strncasecmp(p, balsa_app.reply_string,
+				strlen(balsa_app.reply_string))==0) {
 	    p+=strlen(balsa_app.reply_string);
+	    continue;
+	};
+	break;
     }
     return p;
 }

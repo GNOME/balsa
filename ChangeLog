@@ -1,3 +1,7 @@
+2001-04-05  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/balsa-index-threading.c: (chop_re) fix stoping condition
+
 2001-04-03  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/main-window.c: lock GDK in balsa_window_progress_timeout().

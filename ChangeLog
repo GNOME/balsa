@@ -4,8 +4,9 @@
 	libbalsa/gmime-application-pkcs7.h,
 	libbalsa/gmime-gpgme-signature.c, libbalsa/gmime-gpgme-signature.h,
 	libbalsa/gmime-part-rfc2440.h, libbalsa/rfc3156.c,
-	src/balsa-message.c, src/print.c: a first implementation of the
-	S/MIME (RFC 2633) crypto protocol for Balsa 2.2 is ready.
+	src/balsa-message.c, src/print.c, configure.in: a first
+	implementation of the S/MIME (RFC 2633) crypto protocol for
+	Balsa 2.2 is ready.
 
 2004-10-20  Pawel Salek
 

@@ -235,18 +235,13 @@ static GtkWidget *
 store_address_note_frame(struct store_address_info *info)
 {
     GtkWidget *frame = gtk_frame_new(_("Choose Address"));
-    GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
     LibBalsaMessage *message;
     GList *list = GTK_CLIST(info->index->ctree)->selection;
 
     info->notebook = gtk_notebook_new();
+    gtk_notebook_set_scrollable(GTK_NOTEBOOK(info->notebook), TRUE);
     gtk_container_set_border_width(GTK_CONTAINER(info->notebook), 5);
-    gtk_container_add(GTK_CONTAINER(frame), scroll);
-    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll),
-                                          info->notebook);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), 
-                                   GTK_POLICY_AUTOMATIC,
-                                   GTK_POLICY_NEVER);
+    gtk_container_add(GTK_CONTAINER(frame), info->notebook);
 
     list = g_list_last(list);
     while (list) {

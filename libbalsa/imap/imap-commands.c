@@ -84,6 +84,8 @@ need_fetch(unsigned seqno, struct fetch_data* fd)
       && fd->h->msg_cache[seqno-1]->envelope == NULL) return seqno;
   if( (fd->ift & IMFETCH_BODYSTRUCT) 
       && fd->h->msg_cache[seqno-1]->body == NULL) return seqno;
+  if( (fd->ift & IMFETCH_RFC822SIZE) 
+      && fd->h->msg_cache[seqno-1]->rfc822size <0) return seqno;
   return 0;
 }
 
@@ -458,11 +460,12 @@ imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
   if(hi>exists) hi = exists;
   seq = coalesce_seq_range(lo, hi, cf, &fd);
   if(seq) {
-    const char* hdr[4];
+    const char* hdr[5];
     int idx = 0;
     hdr[idx++] = "UID";
     if(ift & IMFETCH_ENV)        hdr[idx++] = "ENVELOPE";
     if(ift & IMFETCH_BODYSTRUCT) hdr[idx++] = "BODY";
+    if(ift & IMFETCH_RFC822SIZE) hdr[idx++] = "RFC822.SIZE";
     hdr[idx] = NULL;
     rc = imap_mbox_handle_fetch(handle, seq, hdr);
     g_free(seq);

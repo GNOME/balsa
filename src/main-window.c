@@ -1760,8 +1760,7 @@ mailbox_check_func(GNode * node)
     if (mbnode->mailbox) {      /* mailbox, not a folder */
         if (!LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox) ||
             imap_check_test(mbnode->dir ? mbnode->dir :
-                            LIBBALSA_MAILBOX_IMAP(mbnode->mailbox)->
-                            path)) {
+                            libbalsa_mailbox_imap_get_path(LIBBALSA_MAILBOX_IMAP(mbnode->mailbox)))) {
             libbalsa_mailbox_check(mbnode->mailbox);
         }
     }

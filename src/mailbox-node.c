@@ -299,8 +299,7 @@ imap_scan_attach_mailbox(GNode* node, imap_scan_item * isi)
     libbalsa_mailbox_remote_set_server(
         LIBBALSA_MAILBOX_REMOTE(m),
         BALSA_MAILBOX_NODE(node->data)->server);
-    m->path = g_strdup(isi->fn);
-    libbalsa_mailbox_imap_update_url(m);
+    libbalsa_mailbox_imap_set_path(m, isi->fn);
     if(balsa_app.debug)
         printf("imap_scan_attach_mailbox: add mbox of name %s "
 	       "(full path %s)\n", isi->fn, LIBBALSA_MAILBOX(m)->url);

@@ -543,7 +543,7 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 	LibBalsaMailboxImap *imap;
 	LibBalsaServer *server;
-
+        const gchar *path;
 	imap = LIBBALSA_MAILBOX_IMAP(mailbox);
 	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
@@ -559,9 +559,10 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	if (server->passwd)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.password),
 			       server->passwd);
-	if (imap->path)
+        path = libbalsa_mailbox_imap_get_path(imap);
+	if (path)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.folderpath),
-			       imap->path);
+			       path);
 #ifdef USE_SSL
 	gtk_toggle_button_set_active
 	    (GTK_TOGGLE_BUTTON(mcw->mb_data.imap.use_ssl),

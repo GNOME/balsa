@@ -818,7 +818,9 @@ imap_body_set_id(ImapBody *body, char *id)
 ImapMessage*
 imap_message_new(void)
 {
-  return g_malloc0(sizeof(ImapMessage));
+  ImapMessage * msg=g_malloc0(sizeof(ImapMessage));
+  msg->rfc822size=-1;
+  return msg;
 }
 
 void
@@ -826,6 +828,7 @@ imap_message_free(ImapMessage *msg)
 {
   g_return_if_fail(msg);
   if(msg->envelope) imap_envelope_free(msg->envelope);
+  if(msg->body)     imap_body_free    (msg->body);
   g_free(msg);
 }
 
@@ -1493,7 +1496,7 @@ ir_envelope(struct siobuf *sio, ImapEnvelope *env)
   if( (c=sio_getc(sio)) != '(') return IMR_PROTOCOL;
   date = imap_get_nstring(sio);
   if(date) {
-    env->date = g_mime_utils_header_decode_date(date, NULL);
+    if(env) env->date = g_mime_utils_header_decode_date(date, NULL);
     g_free(date);
   }
   if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;

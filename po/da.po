@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
-"POT-Creation-Date: 2000-02-07 03:04+0100\n"
+"POT-Creation-Date: 2000-02-09 07:03+0100\n"
 "PO-Revision-Date: 2000-02-07 03:25+01:00\n"
 "Last-Translator: Birger Langkjer <birger.langkjer@image.dk>\n"
 "Language-Team: Danish <sslug-locale@sslug.dk>\n"
@@ -1235,26 +1235,6 @@ msgstr "Affald:"
 msgid "Mail Files"
 msgstr "Postfiler"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:243
-msgid "Inbox"
-msgstr "Indbakke"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:245
-msgid "Outbox"
-msgstr "Udbakke"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:247
-msgid "Sentbox"
-msgstr "Sendt_post"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:249
-msgid "Draftbox"
-msgstr "Kladder"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:251
-msgid "Trash"
-msgstr "Affald"
-
 #: libinit_balsa/balsa-druid-page-directory.gob:259
 msgid "Problem Creating Mailboxes"
 msgstr "Problem ved oprettelse af postkasser"
@@ -1324,6 +1304,21 @@ msgid ""
 msgstr ""
 "Dette vil afslutte Balsa.\n"
 "Vil du virkelig gerne det?"
+
+#~ msgid "Inbox"
+#~ msgstr "Indbakke"
+
+#~ msgid "Outbox"
+#~ msgstr "Udbakke"
+
+#~ msgid "Sentbox"
+#~ msgstr "Sendt_post"
+
+#~ msgid "Draftbox"
+#~ msgstr "Kladder"
+
+#~ msgid "Trash"
+#~ msgstr "Affald"
 
 #~ msgid "_Open"
 #~ msgstr "Å_bn"

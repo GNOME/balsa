@@ -30,6 +30,7 @@
 #include "libbalsa.h"
 #include "libbalsa-marshal.h"
 #include "message.h"
+#include "misc.h"
 
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 
@@ -241,6 +242,9 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
     mailbox->filters=NULL;
     mailbox->view=NULL;
     mailbox->msg_tree = g_node_new(NULL);
+    do
+	mailbox->stamp = g_random_int ();
+    while (mailbox->stamp == 0);
 }
 
 /*
@@ -900,6 +904,10 @@ libbalsa_mailbox_set_view(LibBalsaMailbox *mailbox,
     g_warning("Implement me!");
 }
 
+/* FIXME: we should inform the treeview that we have rehashed the rows.
+ * what the callee does instead is to unset and set the model again
+ * for the TreeView. This is somewhat ugly.
+ */
 void
 libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
 			       LibBalsaMailboxThreadingType thread_type)
@@ -908,6 +916,9 @@ libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox, thread_type);
+    
+    /* invalidate iterators */
+    mailbox->stamp++;
 }
 
 LibBalsaMailboxView *
@@ -1105,6 +1116,37 @@ mbox_model_get_path(GtkTreeModel	* tree_model,
   FIXME: still includes some debugging code in case fetching the
   message failed.
 */
+static gchar*
+get_from_field(LibBalsaMessage *message)
+{
+    gboolean append_dots = FALSE;
+    const gchar *name_str = NULL;
+    gchar *from;
+    LibBalsaAddress *addy = NULL;
+
+    g_return_val_if_fail(message->mailbox, NULL);
+    if (message->mailbox->view->show == LB_MAILBOX_SHOW_TO) {
+	if (message->headers && message->headers->to_list) {
+	    GList *list = g_list_first(message->headers->to_list);
+	    addy = list->data;
+	    append_dots = list->next != NULL;
+	}
+    } else {
+ 	if (message->headers && message->headers->from)
+	    addy = message->headers->from;
+    }
+    if (addy)
+	name_str = libbalsa_address_get_name(addy);
+    if(!name_str)           /* !addy, or addy contained no name/address */
+	name_str = "";
+    
+    from = append_dots ? g_strconcat(name_str, ",...", NULL)
+                       : g_strdup(name_str);
+    /* FIXME: use balsa_app.convert_8bit_codeset */
+    libbalsa_utf8_sanitize(&from, TRUE, WEST_EUROPE, NULL);
+    return from;
+}
+
 static void
 mbox_model_get_value(GtkTreeModel *tree_model,
 		     GtkTreeIter  *iter,
@@ -1153,7 +1195,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 	g_value_set_string(value, "A");  break;
     case LB_MBOX_FROM_COL:
 	if(msg) {
-	    tmp = libbalsa_address_to_gchar(msg->headers->from, -1);
+	    tmp = get_from_field(msg);
 	    g_value_set_string_take_ownership(value, tmp);
 	} else g_value_set_string(value, "from unknown");
         break;

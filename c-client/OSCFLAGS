@@ -1,0 +1,1 @@
+-DSTDPROTO=unixproto -DMAILSPOOL="/var/spool/mail" -DANONYMOUSHOME="/var/spool/mail/anonymous" -DACTIVEFILE="/usr/lib/news/active" -DNEWSSPOOL="/var/spool/news" -DRSHPATH="/usr/bin/rsh"

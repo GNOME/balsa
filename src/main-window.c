@@ -2685,6 +2685,8 @@ check_new_messages_real(GtkWidget *widget, gpointer data, int type)
     if (checking_mail) {
         pthread_mutex_unlock(&mailbox_lock);
         fprintf(stderr, "Already Checking Mail!\n");
+	if (progress_dialog)
+	    gdk_window_raise(progress_dialog->window);
         return;
     }
     checking_mail = 1;
@@ -2824,6 +2826,25 @@ message_print_cb(GtkWidget * widget, gpointer data)
 /* this one is called only in the threaded code */
 #ifdef BALSA_USE_THREADS
 static void
+balsa_window_mailbox_check(LibBalsaMailbox * mailbox)
+{
+    MailThreadMessage *threadmessage;
+    gchar *string = NULL;
+
+    if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
+	BalsaMailboxNode *mbnode = balsa_find_mailbox(mailbox);
+	while (mbnode->parent)
+	    mbnode = mbnode->parent;
+	string = g_strdup_printf(_("IMAP Server %s: %s"), mbnode->name,
+                                 mailbox->name);
+    } else if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox))
+	string = g_strdup_printf(_("Local mailbox: %s"), mailbox->name);
+    MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, string, 0, 0);
+    g_free(string);
+    libbalsa_mailbox_check(mailbox);
+}
+
+static void
 check_messages_thread(GSList * list)
 {
     /*  
@@ -2837,10 +2858,8 @@ check_messages_thread(GSList * list)
 
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, "POP3", 0, 0);
     check_mailbox_list(balsa_app.inbox_input);
-    MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL,
-                  "Local Mail", 0, 0);
 
-    g_slist_foreach(list, (GFunc) libbalsa_mailbox_check, NULL);
+    g_slist_foreach(list, (GFunc) balsa_window_mailbox_check, NULL);
     g_slist_foreach(list, (GFunc) g_object_unref, NULL);
     g_slist_free(list);
 

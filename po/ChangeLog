@@ -1,3 +1,7 @@
+2000-05-02  Pawel Salek <pawsa@theochem.kth.se>
+	* POTFILES.in: removing src/spell-check.c - the file is not used
+	and it broke make distcheck
+	
 2000-05-02  Andreas Hyden  <a.hyden@cyberpoint.se>
 
 	* sv.po: Updated Swedish translation.

@@ -1111,6 +1111,11 @@ lbm_mbox_armor_part(GMimeObject ** part)
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
     g_object_unref(filter);
 
+    filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
+				    GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+    g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
+    g_object_unref(filter);
+
     parser = g_mime_parser_new_with_stream(fstream);
     g_mime_stream_unref(fstream);
 
@@ -1121,22 +1126,11 @@ lbm_mbox_armor_part(GMimeObject ** part)
 static GMimeStream *
 lbm_mbox_armor_stream(GMimeStream * stream, LibBalsaMessageFlag flags)
 {
-    GMimeStream *fstream;
-    GMimeFilter *filter;
     GMimeParser *parser;
     GMimeMessage *message;
     GMimeStream *mem;
 
-    /* CRLF filter before parsing the message. */
-    fstream = g_mime_stream_filter_new_with_stream(stream);
-    filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
-				    GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
-    g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
-    g_object_unref(filter);
-
-    parser = g_mime_parser_new_with_stream(fstream);
-    g_mime_stream_unref(fstream);
-
+    parser = g_mime_parser_new_with_stream(stream);
     message = g_mime_parser_construct_message(parser);
     g_object_unref(parser);
 

@@ -1604,16 +1604,16 @@ libbalsa_mailbox_prepare_threading(LibBalsaMailbox *mailbox,
         ->prepare_threading(mailbox, lo, hi);
 }
 
-void
+gboolean
 libbalsa_mailbox_fetch_message_structure(LibBalsaMailbox *mailbox,
                                          LibBalsaMessage *message,
                                          LibBalsaFetchFlag flags)
 {
-    g_return_if_fail(mailbox != NULL);
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-    g_return_if_fail(message != NULL);
+    g_return_val_if_fail(mailbox != NULL, FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_return_val_if_fail(message != NULL, FALSE);
 
-    LIBBALSA_MAILBOX_GET_CLASS(mailbox)
+    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)
         ->fetch_message_structure(mailbox, message, flags);
 }
 
@@ -1851,7 +1851,7 @@ static LibBalsaMailboxView libbalsa_mailbox_view_default = {
     LB_MAILBOX_THREADING_FLAT,	/* threading_type       */
     0,				/* filter               */
     LB_MAILBOX_SORT_TYPE_ASC,	/* sort_type            */
-    LB_MAILBOX_SORT_DATE,	/* sort_field           */
+    LB_MAILBOX_SORT_NO,         /* sort_field           */
     LB_MAILBOX_SHOW_UNSET,	/* show                 */
     0,				/* exposed              */
     0,				/* open                 */

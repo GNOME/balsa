@@ -1,3 +1,35 @@
+2001-09-22  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* Makefile.am: fix --disable-nls build of tarball.
+	* libbalsa/misc.[hc]: fix #60834: an ever-lasting MIME problem due
+	to immortal gnome-mime bug.
+	* libbalsa/files.c: continuation.
+	* libbalsa/send.c: same.
+	* src/print.c: same.
+	
+	Albrecht Dreﬂ's attachment forwarding and msg postpone patch (#60874).
+	* libbalsa/body.c: MessageBody::mime_type always useful.
+	* libbalsa/message.[hc]: implement libbalsa_message_save().
+	* libbalsa/mime.[hc]: make process_mime_part() global.
+	* libbalsa/send.c: postponing messages with attachments fixed.
+	* src/balsa-app.h: add forward_attached field.
+	* src/balsa-index.c: new forwarding UI code.
+	* src/main-window.[hc]: same.
+	* src/message-window.c: same.
+	* src/main.c: add_attachment() API modified.
+	* src/pref-manager.c: choose default forward method.
+	* src/save-restore.c: s&r it.
+	* src/sendmsg-window.[hc]: the meat of attachment forwarding code.
+	
+	Stephen P. Wall <Steve_Wall@redcom.com>:
+	* src/balsa-icons.[hc]: reply_to_group toolbar icon.
+	* src/balsa-index.[hc]: reply to grup UI modified.
+	* src/balsa-mblist.c: enable/disable empty trash toolbar button.
+	* src/main-window.c: empty trash toolbar button disable/enable.
+	* src/toolbar-factory.[hc]: empty trash, reply group and close mbox
+	buttons.
+	* src/toolbar-prefs.c: continued.
+	
 2001-09-21  Abel Cheung  <maddog@linux.org.hk>
 
 	* balsa.desktop: Rename zh_TW.Big5 -> zh_TW.

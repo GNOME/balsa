@@ -100,6 +100,7 @@ typedef struct _PropertyUI {
     /* colours */
     GtkWidget *unread_color;
     GtkWidget *quoted_color[MAX_QUOTED_COLOR];
+    GtkWidget *url_color;
 
     /* quote regex */
     GtkWidget *quote_pattern;
@@ -447,6 +448,10 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 			   GTK_SIGNAL_FUNC(properties_modified_cb),
 			   property_box);
 
+    gtk_signal_connect(GTK_OBJECT(pui->url_color), "released",
+		       GTK_SIGNAL_FUNC(properties_modified_cb),
+		       property_box);
+
     /* Gnome Property Box Signals */
     gtk_signal_connect(GTK_OBJECT(property_box), "destroy",
 		       GTK_SIGNAL_FUNC(destroy_pref_window_cb), pui);
@@ -681,6 +686,15 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 				   0);
     }
 
+    /* url color */
+    gdk_colormap_free_colors(gdk_window_get_colormap(GTK_WIDGET(pbox)->window),
+			     &balsa_app.url_color, 1);
+    gnome_color_picker_get_i16(GNOME_COLOR_PICKER(pui->url_color),
+			       &(balsa_app.url_color.red),
+			       &(balsa_app.url_color.green),
+			       &(balsa_app.url_color.blue),
+			       0);			       
+
     /* Information dialogs */
     menu_item =
 	gtk_menu_get_active(GTK_MENU(pui->information_message_menu));
@@ -901,6 +915,11 @@ set_prefs(void)
 				   balsa_app.quoted_color[i].red,
 				   balsa_app.quoted_color[i].green,
 				   balsa_app.quoted_color[i].blue, 0);
+
+    gnome_color_picker_set_i16(GNOME_COLOR_PICKER(pui->url_color),
+			       balsa_app.url_color.red,
+			       balsa_app.url_color.green,
+			       balsa_app.url_color.blue, 0);
 
     /* Information Message */
     gtk_menu_set_active(GTK_MENU(pui->information_message_menu),
@@ -1675,6 +1694,13 @@ create_display_page(gpointer data)
 	pui->quoted_color[i] = color_box( GTK_BOX(vbox12), text);
 	g_free(text);
     }
+
+    color_frame = gtk_frame_new(_("Link Color"));
+    gtk_container_set_border_width(GTK_CONTAINER(color_frame), 5);
+    gtk_box_pack_start(GTK_BOX(vbox8), color_frame, FALSE, FALSE, 0);
+    vbox9 = vbox_in_container(color_frame);
+
+    pui->url_color = color_box(GTK_BOX(vbox9), _("Hyperlink color"));
 
     /* Fonts Preferences Page */
     vbox9 = gtk_vbox_new(FALSE, 0);

@@ -495,16 +495,16 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
     if (pi->ypos - pdata->lines * BALSA_PRINT_BODY_SIZE < pi->margin_bottom) {
 	int lines_left = pdata->lines;
 
-	lines_left -= (pi->ypos - pi->margin_bottom) / BALSA_PRINT_HEAD_SIZE;
+	lines_left -= (pi->ypos - pi->margin_bottom) / BALSA_PRINT_BODY_SIZE;
 	pi->pages++;
-	while (lines_left * BALSA_PRINT_HEAD_SIZE > pi->printable_height) {
-	    lines_left -= pi->printable_height / BALSA_PRINT_HEAD_SIZE;
+	while (lines_left * BALSA_PRINT_BODY_SIZE > pi->printable_height) {
+	    lines_left -= pi->printable_height / BALSA_PRINT_BODY_SIZE;
 	    pi->pages++;
 	}
 	pi->ypos = pi->margin_bottom + pi->printable_height -
-	    lines_left * BALSA_PRINT_HEAD_SIZE;
+	    lines_left * BALSA_PRINT_BODY_SIZE;
     } else
-	pi->ypos -= pdata->lines * BALSA_PRINT_HEAD_SIZE;
+	pi->ypos -= pdata->lines * BALSA_PRINT_BODY_SIZE;
 
     pi->print_parts = g_list_append (pi->print_parts, pdata);
 }

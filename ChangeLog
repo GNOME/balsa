@@ -1,3 +1,12 @@
+2004-12-07 18:57  PeterB
+
+	* src/sendmsg-window.c: use libbalsa_wrap_rfc2646() to ensure
+	space-stuffing.
+	* libbalsa/misc.c: append spaces for DelSp=Yes.
+	* libbalsa/gmime-gpgme-context.h: replace GMIME_CHECK_* macros with
+	G_TYPE_*.
+	* libbalsa/mailbox_mbox.c: simplify From_ line armoring.
+
 2004-12-06 16:23  PeterB
 
 	* libbalsa/: address.c, address.h: parse string with group address;

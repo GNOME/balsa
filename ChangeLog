@@ -1,3 +1,11 @@
+2004-10-11 15:18  PeterB
+
+	* libbalsa/: filter.c, filter.h: implement
+	libbalsa_condition_is_flag_only.
+	* libbalsa/mailbox.c: catch runaway
+	libbalsa_mailbox_search_iter_step; use
+	libbalsa_condition_is_flag_only.
+
 2004-10-11 14:55  Craig Routledge <webstuff@craigroutledge.com>
 
 	* src/: balsa-icons.c, balsa-icons.h, message-window.c,

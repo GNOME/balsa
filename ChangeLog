@@ -1,3 +1,9 @@
+2003-10-31  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/server.c: make sure LibBalsaServer::host field is set.
+	* src/sendmsg-window.c: do not crash on replying to a message with 
+	empty To: header.
+
 2003-10-27 17:01  PeterB
 
 	* libbalsa/filter.c: Avoid casting a (const gchar *) to (gchar *).

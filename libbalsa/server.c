@@ -303,7 +303,7 @@ libbalsa_server_load_config(LibBalsaServer * server)
 {
     gboolean d;
     server->host = gnome_config_get_string("Server");
-    if(strrchr(server->host, ':') == NULL) {
+    if(server->host && strrchr(server->host, ':') == NULL) {
         gint port;
         port = gnome_config_get_int_with_default("Port", &d);
         if (!d) {

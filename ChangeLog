@@ -1,6 +1,18 @@
+2004-05-24 17:34  PeterB
+
+	* libbalsa/folder-scanners.c, libbalsa/folder-scanners.h,
+	libbalsa/mailbox_local.c, src/balsa-app.c, src/balsa-app.h,
+	src/balsa-index.c, src/balsa-mblist.c, src/balsa-mblist.h,
+	src/filter-edit-callbacks.c, src/folder-conf.c, src/mailbox-conf.c,
+	src/mailbox-node.c, src/mailbox-node.h, src/main-window.c,
+	src/main-window.h, src/main.c, src/pref-manager.c,
+	src/save-restore.c, src/save-restore.h: remove
+	BalsaApplication::mailbox_nodes;
+	BalsaApplication::mblist_tree_store owns its BalsaMailboxNodes.
+
 2004-05-24 09:05  PeterB
 
-	* libbalsa/mailbox.c, libbalsa/message.c, src/balsa-message.c:
+	* libbalsa/mailbox.[ch], libbalsa/message.c, src/balsa-message.c:
 	update the cached icon as well as the message icon; shift the
 	responsibility for signalling "row-changed" to the mailbox code.
 

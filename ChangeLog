@@ -1,5 +1,8 @@
-2003-10-22 13:51  PeterB
+2003-10-22 18:30  PeterB
 
+	* libbalsa/: mailbox_imap.c, imap/Makefile.am,
+	imap/imap-commands.c, imap/imap-commands.h: Use GMimeStream to
+	append a message.
 	* libbalsa/mailbox_mbox.c: Use
 	libbalsa_address_to_gchar(message->headers->from, 0) instead of
 	g_mime_message_get_sender(message->mime_msg).

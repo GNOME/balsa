@@ -422,7 +422,7 @@ libbalsa_address_entry_get_list(GtkEntry * address_entry)
 	ia = g_hash_table_lookup(info->table, name);
         if (!ia) {
 	    tmp_list = internet_address_parse_string(name);
-	    ia = internet_address_list_get_address(tmp_list);
+	    ia = tmp_list->address;
 	}
         if (ia)
             address_list = internet_address_list_append(address_list, ia);

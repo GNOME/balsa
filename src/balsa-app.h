@@ -36,27 +36,35 @@
 /* global balsa application structure */
 extern struct BalsaApplication
 {
+
+  /* personal information */
   gchar *real_name;
   gchar *username;
   gchar *hostname;
   gchar *email;
   gchar *organization;
   gchar *local_mail_directory;
-  
+
+
   gchar *smtp_server;
-  
+
+
   Mailbox *auth_mailbox;
   Mailbox *current_mailbox;
   
+  GtkWidget *current_index;
+
+
   GList *mailbox_list;
-  
-  MainWindow *main_window;
-  
   GList *addressbook_list;
-  
+
+
+  /* timer for periodic mail checking */
   gint timer;
+
 }
 balsa_app;
+
 
 void init_balsa_app (int argc, char *argv[]);
 

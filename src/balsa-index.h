@@ -38,40 +38,42 @@ typedef struct _BalsaIndex BalsaIndex;
 typedef struct _BalsaIndexClass BalsaIndexClass;
 
 struct _BalsaIndex
-  {
-    GtkBin bin;
+{
+  GtkBin bin;
+  
+  MAILSTREAM *stream;
+  glong last_message;
+  
+  /* pixmap and icon for new messages */
+  GdkPixmap *new_xpm;
+  GdkBitmap *new_xpm_mask;
+  
+  /* progress bar to be updated while loading messages */
+  GtkProgressBar *progress_bar;
+};
 
-    MAILSTREAM *stream;
-    glong last_message;
-
-    /* pixmap and icon for new messages */
-    GdkPixmap *new_xpm;
-    GdkBitmap *new_xpm_mask;
-
-    /* progress bar to be updated while loading messages */
-    GtkProgressBar *progress_bar;
-  };
 
 struct _BalsaIndexClass
-  {
-    GtkBinClass parent_class;
+{
+  GtkBinClass parent_class;
+  
+  void (*select_message) (BalsaIndex *bindex,
+			  MAILSTREAM *stream,
+			  glong mesgno);
+};
 
-    void (*select_message) (BalsaIndex *bindex,
-			    MAILSTREAM *stream,
-			    glong mesgno);
-  };
 
 
 
 guint balsa_index_get_type (void);
-
-GtkWidget *balsa_index_new ();
+GtkWidget * balsa_index_new ();
 
 
 /* sets the mail stream; if it's a new stream, then it's 
  * contents is loaded into the index */
 void balsa_index_set_stream (BalsaIndex * bindex,
 			     MAILSTREAM * stream);
+
 
 /* appends any new messages in the stream to the index, 
  * XXX: maybe this should be re-named balsa_index_ping?? */
@@ -82,7 +84,11 @@ void balsa_index_append_new_messages (BalsaIndex * bindex);
 void balsa_index_select_next (BalsaIndex *);
 void balsa_index_select_previous (BalsaIndex *);
 
-void balsa_delete_message(BalsaIndex * bindex);
+
+/* set delete/undelete flag on message */
+void balsa_index_delete_message (BalsaIndex * bindex);
+void balsa_index_undelete_message (BalsaIndex * bindex);
+
 
 /* set the pointer to the progress bar that's used to show
  * progress loading images */

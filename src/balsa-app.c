@@ -47,6 +47,7 @@ init_balsa_app (int argc, char *argv[])
   /* include linkage for the c-client library */
 #include "linkage.c"
 
+
   /* initalize application structure before ALL ELSE */
   balsa_app.real_name = NULL;
   balsa_app.username = NIL;
@@ -57,9 +58,10 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.auth_mailbox = NULL;
   balsa_app.current_mailbox = NULL;
   balsa_app.mailbox_list = NULL;
-  balsa_app.main_window = NULL;
+  balsa_app.current_index = NULL;
   balsa_app.addressbook_list = NULL;
   balsa_app.timer = 0;
+
 
   restore_global_settings ();
   mailboxes_init ();
@@ -68,8 +70,7 @@ init_balsa_app (int argc, char *argv[])
 
 
   /* create main window */
-  balsa_app.main_window = create_main_window ();
-  balsa_app.timer = gtk_timeout_add (5*60*1000, current_mailbox_check, NULL);
+  balsa_app.timer = gtk_timeout_add (5 * 60 * 1000, current_mailbox_check, NULL);
 }
 
 
@@ -81,15 +82,17 @@ mailboxes_init (void)
   gint num;
   gint i;
 
-  gnome_config_get_vector("/balsa/Global/Accounts",&num,&mailboxes);
-  for(i=0;num>i;i++)
-  {
-	  printf("Loaded mailbox: %s\n",mailboxes[i]);
-	  load_mailboxes(mailboxes[i]);
-  }
+  gnome_config_get_vector("/balsa/Global/Accounts", &num, &mailboxes);
+
+  for (i = 0; num > i; i++)
+    {
+      printf ("Loaded mailbox: %s\n", mailboxes[i]);
+      load_mailboxes (mailboxes[i]);
+    }
 
   return 1;
 }
+
 
 static void
 setup_local_mailboxes ()

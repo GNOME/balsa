@@ -366,7 +366,6 @@ balsa_index_get_progress_bar (BalsaIndex * bindex)
 }
 
 
-
 static void
 balsa_index_size_request (GtkWidget * widget,
 			  GtkRequisition * requisition)
@@ -389,6 +388,7 @@ balsa_index_size_request (GtkWidget * widget,
       requisition->height = child->requisition.height;
     }
 }
+
 
 static void
 balsa_index_size_allocate (GtkWidget * widget,
@@ -423,8 +423,9 @@ balsa_index_size_allocate (GtkWidget * widget,
     }
 }
 
+
 void
-balsa_delete_message (BalsaIndex * bindex)
+balsa_index_delete_message (BalsaIndex * bindex)
 {
   GtkCList *clist;
   glong row;
@@ -446,7 +447,7 @@ balsa_delete_message (BalsaIndex * bindex)
 }
 
 void
-balsa_undelete_message (BalsaIndex * bindex)
+balsa_index_undelete_message (BalsaIndex * bindex)
 {
   GtkCList *clist;
   glong row;
@@ -503,8 +504,11 @@ append_messages (BalsaIndex * bindex,
       mail_date (text[4], cache);
 
       gtk_clist_append (GTK_CLIST (GTK_BIN (bindex)->child), text);
-/*      update_new_message_pixmap (bindex, i);*/
       update_new_message_flag (bindex, i);
+
+      /* give time to gtk so the GUI isn't blocked */
+      while (gtk_events_pending())
+	gtk_main_iteration();
     }
 
   gtk_clist_thaw (GTK_CLIST (GTK_BIN (bindex)->child));
@@ -519,7 +523,8 @@ append_messages (BalsaIndex * bindex,
   g_free (text[4]);
 }
 
-/*
+
+#if 0
 static void
 update_new_message_pixmap (BalsaIndex * bindex,
 			   glong mesgno)
@@ -542,7 +547,8 @@ update_new_message_pixmap (BalsaIndex * bindex,
 			mesgno - 1, 0,
 			NULL);
 }
-*/
+#endif
+
 
 static void
 update_new_message_flag (BalsaIndex * bindex,
@@ -563,10 +569,13 @@ update_new_message_flag (BalsaIndex * bindex,
 			mesgno - 1, 0,
 			NULL);
 }
+
+
+
+
 /*
  * CLIST Callbacks
  */
-
 static void
 realize_clist (GtkWidget * widget,
 	       gpointer * data)

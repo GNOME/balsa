@@ -20,27 +20,8 @@
 #ifndef __main_window_h__
 #define __main_window_h__
 
-#include <gnome.h>
-
-typedef struct _MainWindow MainWindow;
-struct _MainWindow
-  {
-    GtkWidget *window;
-
-    GtkWidget *menubar;
-
-    GtkWidget *toolbar;
-    GtkWidget *mailbox_option_menu;
-    GtkWidget *mailbox_menu;
-    GtkWidget *move_menu;
-
-    GtkWidget *index;
-
-    GtkWidget *message_area;
-
-    GtkWidget *status_bar;
-  };
-
-MainWindow *create_main_window ();
+void open_main_window ();
+void close_main_window ();
+void refresh_main_window ();
 
 #endif /* __main_window_h__ */

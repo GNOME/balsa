@@ -16,13 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-
 #include <stdio.h>
 #include <gtk/gtk.h>
 #include "mailbox.h"
 #include "balsa-app.h"
-#include "balsa-index.h"
-#include "index.h"
 
 
 gchar *
@@ -463,9 +460,6 @@ mailbox_open (Mailbox * mailbox)
   if (old_mailbox != NIL)
     mailbox_close (old_mailbox);
 
-  /* update the index */
-  balsa_index_set_stream (BALSA_INDEX (balsa_app.main_window->index),
-			  mailbox->stream);
 
   return TRUE;
 }
@@ -476,6 +470,7 @@ mailbox_close (Mailbox * mailbox)
 {
   /* now close the mail stream and expunge deleted
    * messages -- the expunge may not have to be done */
+
   mailbox->stream = mail_close_full (mailbox->stream, CL_EXPUNGE);
 }
 

@@ -39,3 +39,17 @@ get_string_set_default (const char *path,
   g_string_free (buffer, 1);
   return result;
 }
+
+
+GtkWidget *
+new_icon (gchar ** xpm, GtkWidget * window)
+{
+  GdkPixmap *pixmap;
+  GtkWidget *pixmapwid;
+  GdkBitmap *mask;
+
+  pixmap = gdk_pixmap_create_from_xpm_d (window->window, &mask, 0, xpm);
+
+  pixmapwid = gtk_pixmap_new (pixmap, mask);
+  return pixmapwid;
+}

@@ -21,7 +21,6 @@
 #include "c-client.h"
 #include "balsa-app.h"
 #include "balsa-index.h"
-#include "index.h"
 #include "mailbox.h"
 
 
@@ -89,6 +88,8 @@ get_header_replyto (MAILSTREAM * stream, unsigned long mesgno)
   return t;
 }
 
+
+
 /* 
  * Callbacks from the C-CLIENT Library
  */
@@ -105,15 +106,8 @@ void
 mm_exists (MAILSTREAM * stream,
 	   unsigned long number)
 {
-  if (!balsa_app.main_window)
-    return;
-  if (number > 0)
-    {
-      balsa_index_append_new_messages (BALSA_INDEX (balsa_app.main_window->index));
-/*
- * system("cat /home/pavlov/balsa/src/sounds/yougotmail.wav>/dev/dsp &");
- */
-    }
+  if (number > 0 && balsa_app.current_index)
+    balsa_index_append_new_messages (BALSA_INDEX (balsa_app.current_index));
 }
 
 

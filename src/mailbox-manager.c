@@ -19,7 +19,6 @@
 #include <gnome.h>
 #include "mailbox-manager.h"
 #include "balsa-app.h"
-#include "index.h"
 #include "mailbox.h"
 
 typedef struct _MailboxManagerWindow MailboxManagerWindow;

@@ -20,7 +20,6 @@
 #include "config.h"
 #include <gnome.h>
 #include "balsa-app.h"
-#include "index.h"
 #include "c-client.h"
 #include "mailbox.h"
 
@@ -30,16 +29,7 @@ main (int argc, char *argv[])
   gnome_init ("balsa", NULL, argc, argv, 0, NULL);
 
   init_balsa_app (argc, argv);
-  mailbox_menu_update ();
-
-  /* give things a kick start here */
-  if (balsa_app.mailbox_list)
-    {
-      Mailbox *mailbox;
-
-      mailbox = (Mailbox *) balsa_app.mailbox_list->data;
-      mailbox_open (mailbox);
-    }
+  open_main_window ();
 
   gtk_main ();
   return 0;

@@ -23,10 +23,10 @@
 #include "config.h"
 #include <gnome.h>
 #include "c-client.h"
+#include "balsa-app.h"
 #include "balsa-message.h"
 #include "balsa-index.h"
 #include "sendmsg-window.h"
-#include "index.h"
 #include "mailbox.h"
 
 gint delete_event (GtkWidget *, gpointer);
@@ -213,13 +213,13 @@ new_message (GtkWidget * widget, gpointer data)
 void
 replyto_message (GtkWidget * widget, gpointer data)
 {
-  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.main_window->index), 1);
+  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 1);
 }
 
 void
 forward_message (GtkWidget * widget, gpointer data)
 {
-  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.main_window->index), 2);
+  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 2);
 }
 
 void

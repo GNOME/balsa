@@ -622,18 +622,10 @@ add_header_gchar(BalsaMessage * bm, const gchar *header, const gchar *label,
 	return;
 
     /* always display the label in the predefined font */
-#ifdef OLD_HEADER_FONT_CODE
-    /* always display the label in the predefined font */
     if (strcmp(header, "subject") != 0)
         fontname = balsa_app.message_font;
     else
 	fontname = balsa_app.subject_font;
-#else
-    if (strcmp(header, "subject") != 0)
-        fontname = "Sans 10";
-    else
-	fontname = "Sans 12";
-#endif
     tag = gtk_text_buffer_create_tag(buffer, NULL,
                                      "font", fontname,
                                      NULL);
@@ -662,7 +654,9 @@ add_header_gchar(BalsaMessage * bm, const gchar *header, const gchar *label,
     if (value && *value != '\0') {
         gint pad_chars = 15 - strlen(label);
 
-        gtk_text_buffer_insert(buffer, &insert, pad, MAX(1, pad_chars));
+        gtk_text_buffer_insert_with_tags(buffer, &insert,
+                                         pad, MAX(1, pad_chars),
+                                         tag, NULL);
 
 	wrapped_value = g_strdup(value);
 	libbalsa_wrap_string(wrapped_value, balsa_app.wraplength - 15);
@@ -678,7 +672,9 @@ add_header_gchar(BalsaMessage * bm, const gchar *header, const gchar *label,
 		line_end++;
 
 	    if (line_start != wrapped_value)
-                gtk_text_buffer_insert(buffer, &insert, pad, 15);
+                gtk_text_buffer_insert_with_tags(buffer, &insert,
+                                                 pad, 15,
+                                                 tag, NULL);
             gtk_text_buffer_insert_with_tags(buffer, &insert, 
                                              line_start,
                                              line_end - line_start, 
@@ -1793,6 +1789,11 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 
         item = gtk_text_view_new();
         buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(item));
+
+        /* set the message font */
+        gtk_widget_modify_font(item,
+                               pango_font_description_from_string
+                               (balsa_app.message_font));
 
         gtk_signal_connect(GTK_OBJECT(item), "key_press_event",
                            (GtkSignalFunc) balsa_message_key_press_event,

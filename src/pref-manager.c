@@ -648,8 +648,7 @@ create_mailservers_page ()
                     (GtkAttachOptions) GTK_EXPAND | GTK_FILL,
 		    (GtkAttachOptions) GTK_EXPAND | GTK_FILL, 0, 0);
   /* This line is to be deleted whenever smtp works */
-//  gtk_widget_set_sensitive (pui->rb_smtp_server, FALSE); 
-// Hola 
+  gtk_widget_set_sensitive (pui->rb_smtp_server, FALSE); 
   
   pui->rb_local_mua = gtk_radio_button_new_with_label (rbgroup,
   	_("Local mail user agent"));

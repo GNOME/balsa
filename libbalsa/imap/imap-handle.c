@@ -711,12 +711,12 @@ static void
 imap_envelope_free_data(ImapEnvelope* env)
 {
   if(env->subject)     g_free(env->subject);
-  if(env->from)        g_free(env->from);
-  if(env->sender)      g_free(env->sender);
-  if(env->replyto)     g_free(env->replyto);
-  if(env->to)          g_free(env->to);
-  if(env->cc)          g_free(env->cc);
-  if(env->bcc)         g_free(env->bcc);
+  if(env->from)        imap_address_free(env->from);
+  if(env->sender)      imap_address_free(env->sender);
+  if(env->replyto)     imap_address_free(env->replyto);
+  if(env->to)          imap_address_free(env->to);
+  if(env->cc)          imap_address_free(env->cc);
+  if(env->bcc)         imap_address_free(env->bcc);
   if(env->in_reply_to) g_free(env->in_reply_to);
   if(env->message_id)  g_free(env->message_id);
 }

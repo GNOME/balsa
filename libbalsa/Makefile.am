@@ -86,6 +86,6 @@ libbalsa_a_SOURCES = 		\
 
 
 INCLUDES=-I${top_srcdir} -I${top_builddir}/libmutt \
-	$(PCRE_CFLAGS)
+	$(BALSA_CFLAGS)
 
 

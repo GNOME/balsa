@@ -1,3 +1,7 @@
+#undef PACKAGE
+#undef GETTEXT_PACKAGE
+#undef VERSION
+
 #undef ENABLE_NLS
 #undef HAVE_CATGETS
 #undef HAVE_GETTEXT
@@ -45,6 +49,7 @@
 #undef GNOME_STD_PREFIX
 #undef GNOME_LIB_PREFIX
 #undef GNOME_DATA_PREFIX
+#undef PTHREAD_LIB
 
 /* The prefixes to look for balsa data, at least most likely */
 #undef BALSA_COMMON_PREFIXES

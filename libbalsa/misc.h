@@ -2,7 +2,7 @@
 /* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -67,9 +67,12 @@ void libbalsa_marshal_POINTER__NONE(GtkObject *object, GtkSignalFunc func,
 void libbalsa_marshal_POINTER__OBJECT(GtkObject * object,
 				      GtkSignalFunc func,
 				      gpointer func_data, GtkArg * args);
-void libbalsa_marshall_POINTER__POINTER_POINTER(GtkObject *object, 
-						GtkSignalFunc func,
-						gpointer func_data, GtkArg *args);
+void libbalsa_marshall_POINTER__POINTER_POINTER(GClosure *closure,
+                                         GValue *return_value,
+                                         guint n_param_values,
+                                         const GValue *param_values,
+                                         gpointer invocation_hint,
+                                         gpointer marshal_data);
 
 gboolean libbalsa_delete_directory_contents(const gchar *path);
 gchar *libbalsa_truncate_string(const gchar * str, gint length, gint dots);

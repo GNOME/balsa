@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -88,35 +88,39 @@ libbalsa_address_book_class_init(LibBalsaAddressBookClass * klass)
     libbalsa_address_book_signals[LOAD] =
 	gtk_signal_new("load",
 		       GTK_RUN_FIRST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaAddressBookClass, load),
 		       gtk_marshal_NONE__POINTER_POINTER, GTK_TYPE_NONE, 2,
 		       GTK_TYPE_POINTER, GTK_TYPE_POINTER);
     libbalsa_address_book_signals[STORE_ADDRESS] =
 	gtk_signal_new("store-address",
 		       GTK_RUN_FIRST,
-		       object_class->type,
+		       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaAddressBookClass,
 					 store_address),
 		       gtk_marshal_NONE__OBJECT, GTK_TYPE_NONE, 1,
 		       GTK_TYPE_OBJECT);
     libbalsa_address_book_signals[SAVE_CONFIG] =
-	gtk_signal_new("save-config", GTK_RUN_FIRST, object_class->type,
+	gtk_signal_new("save-config", GTK_RUN_FIRST,
+                       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaAddressBookClass,
 					 save_config),
 		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
 		       GTK_TYPE_POINTER);
     libbalsa_address_book_signals[LOAD_CONFIG] =
-	gtk_signal_new("load-config", GTK_RUN_FIRST, object_class->type,
+	gtk_signal_new("load-config", GTK_RUN_FIRST, 
+                       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaAddressBookClass,
 					 load_config),
 		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
 		       GTK_TYPE_POINTER);
     libbalsa_address_book_signals[ALIAS_COMPLETE] =
-	gtk_signal_new("alias-complete", GTK_RUN_LAST, object_class->type,
+	gtk_signal_new("alias-complete", GTK_RUN_LAST, 
+                       GTK_CLASS_TYPE(object_class),
 		       GTK_SIGNAL_OFFSET(LibBalsaAddressBookClass,
 					 alias_complete),
-		       libbalsa_marshall_POINTER__POINTER_POINTER, GTK_TYPE_POINTER, 2,
+		       libbalsa_marshall_POINTER__POINTER_POINTER, 
+                       GTK_TYPE_POINTER, 2,
 		       GTK_TYPE_POINTER, GTK_TYPE_POINTER);
 
     gtk_object_class_add_signals(object_class,

@@ -1,21 +1,68 @@
-dnl ###########################################################################
-dnl Startup
-dnl ###########################################################################
-
-AC_INIT(src/main.c)
-AM_CONFIG_HEADER(config.h)
-
+dnl -*- mode: m4 -*-
+AC_PREREQ(2.52)
 dnl ###########################################################################
 dnl Versioning
 dnl   BALSA_VERSION is what we use.
 dnl ###########################################################################
 
-BALSA_MAJOR=1
-BALSA_REVISION=3
-BALSA_PATCHLEVEL=1
 
-BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
-VERSION="$BALSA_VERSION"
+BALSA_MAJOR=2
+BALSA_REVISION=0
+BALSA_PATCHLEVEL=0
+
+VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
+
+dnl ###########################################################################
+dnl Startup
+dnl ###########################################################################
+AC_INIT(balsa,"$VERSION",http://bugzilla.gnome.org/enter_bug.cgi?product=balsa)
+AC_CONFIG_SRCDIR(src/main.c)
+AM_CONFIG_HEADER(config.h)
+
+AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
+
+AM_MAINTAINER_MODE
+
+AC_ISC_POSIX
+AC_PROG_CC
+AC_STDC_HEADERS
+AM_PROG_LIBTOOL
+AC_PROG_INTLTOOL
+AM_HDR_SIGACTION
+AM_HDR_SIGSET
+
+
+
+dnl ##########################################################################
+dnl Check for GtkHTML if available
+dnl ##########################################################################
+
+AC_ARG_ENABLE([gtkhtml], [  --enable-gtkhtml Use GtkHTML if available (experimental) [default=yes]],[
+	use_gtkhtml=$enableval
+],[
+	use_gtkhtml=no
+])
+
+if test x"$use_gtkhtml" = xyes ; then 
+        gnome_extras="$gnome_extras gtkhtml-2.0"
+fi
+
+dnl ###########################################################################
+dnl Use the new GNOME2 pkgconfig to check required modules
+dnl ###########################################################################
+PKG_CHECK_MODULES(BALSA, [
+glib-2.0
+libgnome-2.0
+libgnomeui-2.0
+gtk+-2.0
+gnome-vfs-2.0
+libgnomeprint-2.0 >= 1.106.0
+libgnomeprintui-2.0 >= 1.106.0
+$gnome_extras
+])
+AC_SUBST(BALSA_CFLAGS)
+AC_SUBST(BALSA_LIBS)
+AC_SUBST(PTHREAD_LIB)
 
 dnl ###########################################################################
 dnl Configure libmutt, later
@@ -23,32 +70,6 @@ dnl ###########################################################################
 
 AC_CONFIG_SUBDIRS(libmutt)
 
-dnl ###########################################################################
-dnl Now that we have versioning, checks and stuff
-dnl ###########################################################################
-
-
-AM_INIT_AUTOMAKE(balsa, [$VERSION])
-
-
-AM_MAINTAINER_MODE
-AM_ACLOCAL_INCLUDE(macros)
-
-GNOME_INIT
-
-AC_PROG_CC
-AC_ISC_POSIX
-AC_STDC_HEADERS
-AC_PROG_YACC
-AM_PROG_LIBTOOL
-
-
-AM_PATH_GLIB([1.2.0],[],[
-	AC_MSG_ERROR([You need GLib installed -- GNOME requires this as well.])
-],gthread)
-
-dnl this should come after `AC_PROG_CC'
-GNOME_X_CHECKS
 
 AC_CHECK_LIB(pspell, new_pspell_manager,,[
 	AC_MSG_ERROR([*** libpspell(-devel) not found.  Please check http://www.balsa.net for information on the required files.])
@@ -60,59 +81,22 @@ dnl Reset
 
 
 dnl ###########################################################################
-dnl Check for a recent enough version of gnome-libs.
-dnl ###########################################################################
-
-AC_MSG_CHECKING([for gnome-libs version >= 1.2.13])
-vers=`gnome-config --version gnome-libs | sed 's/^gnome-libs //'`
-case $vers in
-	1.0.*|1.2.[0-9])
-		AC_MSG_RESULT([no])
-		AC_MSG_ERROR([Balsa requires a version of gnome-libs newer than 1.2.1] )
-		;;
-	*) 
-		AC_MSG_RESULT([yes])
-		;;
-esac
-gnome_libs="glib gtk gnome gnomeui"
-
-dnl ###########################################################################
-dnl Check for gnome-window-icon stuff.
-dnl ###########################################################################
-AC_CHECK_HEADERS(libgnomeui/gnome-window-icon.h)
-AC_SUBST(HAVE_LIBGNOMEUI_GNOME_WINDOW_ICON_H)
-
-dnl ###########################################################################
-dnl Check for gnome-print
-dnl ###########################################################################
-
-AM_PATH_GNOME_PRINT([0.25.0], [
-	AC_DEFINE(HAVE_GNOME_PRINT)
-	printing_support=yes
-	gnome_libs="$gnome_libs print"
-], [ 
-   printing_support="no (gnome-print >= 0.25 required)"
-])
-
-
-dnl ###########################################################################
 dnl All the linguas, all the time.
 dnl ###########################################################################
 
 ALL_LINGUAS="az bg ca cs da de en_GB el es et fi fr ga hu it ja ko lt nl no nn pl pt pt_BR ro ru sk sl sv tr uk wa zh_CN zh_TW"
-LINGUAS="$ALL_LINGUAS"
-AM_GNOME_GETTEXT
+GETTEXT_PACKAGE=balsa
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE")
+AM_GLIB_GNU_GETTEXT
+# AM_GNOME_GETTEXT above substs $DATADIRNAME
+# this is the directory where the *.{mo,gmo} files are installed
+gnomelocaledir='${prefix}/${DATADIRNAME}/locale'
+AC_SUBST(gnomelocaledir)
 
 dnl ###########################################################################
 dnl Substitutions, defines, part I
 dnl ###########################################################################
-
-AC_SUBST(CFLAGS)
-AC_SUBST(CPPFLAGS)
-AC_SUBST(LDFLAGS)
-
-dnl No choice about this
-gnome_cv_use_gnome=yes
 
 AC_DEFINE_UNQUOTED(BALSA_MAJOR, $BALSA_MAJOR)
 AC_DEFINE_UNQUOTED(BALSA_REVISION, $BALSA_REVISION)
@@ -123,15 +107,10 @@ dnl ###########################################################################
 dnl More checks
 dnl ###########################################################################
 
-AC_CHECK_LIB(crypt, crypt)
-
 dnl these may be used later.
 dnl AC_CHECK_LIB(des, des_encrypt)
 dnl AC_CHECK_LIB(krb, krb_sendauth)
 dnl AC_CHECK_LIB(acap, acap_OpenConnection)
-
-AM_HDR_SIGACTION
-AM_HDR_SIGSET
 
 dnl ###########################################################################
 dnl ORBit support
@@ -154,28 +133,11 @@ AC_SUBST(BALSA_PATCHLEVEL)
 AC_SUBST(BALSA_RELEASE)
 AC_SUBST(BALSA_VERSION)
 
-AC_SUBST(LIBOBJS)
-AC_SUBST(LIBESD_LIB)
-
 dnl ###########################################################################
 dnl Enable all? (=broken stuff)
 dnl ###########################################################################
 
-AC_ARG_ENABLE(all, [  --enable-all            Enable incomplete features [default=no]],[
-	use_all=$enableval
-],[
-	use_all=no
-])
-
-AC_MSG_CHECKING([whether to build unfinished features])
-if test x"$use_all" = xyes ; then
-	AC_MSG_RESULT([yes])
-	AC_DEFINE(BALSA_SHOW_ALL)
-else
-	AC_MSG_RESULT([no])
-fi
-
-AM_CONDITIONAL(BALSA_SHOW_ALL, test x"$use_all" = xyes)
+AM_CONDITIONAL(BALSA_SHOW_ALL, true)
 
 dnl ###########################################################################
 dnl Use threading?
@@ -187,108 +149,9 @@ AC_ARG_ENABLE(threads, [  --enable-threads        Use threading for mail retriev
 	use_threads=yes
 ])
 
-AC_MSG_CHECKING([whether to use threads])
-if test x"$use_threads" = xyes ; then
-	AC_MSG_RESULT([yes])
-	if test ! -z `$GLIB_CONFIG --help 2>&1 |grep 'gthread'` ; then
-		THREAD_CFLAGS=`$GLIB_CONFIG --cflags gthread`
-		THREAD_LIBS=`$GLIB_CONFIG --libs gthread`
-		CFLAGS="$CFLAGS $THREAD_CFLAGS"
-		LIBS="$LIBS $THREAD_LIBS"
-		AC_DEFINE(BALSA_USE_THREADS,1)
-	else
-		AC_MSG_ERROR([Balsa requires GThread from GLib to use threading.])
-	fi
-else
-	AC_MSG_RESULT([no])
-fi
+dnl FIXME: Better way to check for threads...
+AC_DEFINE(BALSA_USE_THREADS, test x"$use_threads" = xyes)
 
-dnl ###########################################################################
-dnl Check for gnome-vfs
-dnl ###########################################################################
-AC_MSG_CHECKING(whether to Gnome-VFS is available)
-if gnome-config --libs vfs > /dev/null 2>&1; then
-    AC_MSG_RESULT(yes)
-    gnome_libs="$gnome_libs vfs oaf"
-else
-    AC_MSG_ERROR([Gnome-VFS(-devel) library is needed to build balsa])
-fi
-
-dnl ##########################################################################
-dnl Check for GdkPixbuf if available
-dnl I guess we could safely assome everybody has got this one, couldn't we?
-dnl ##########################################################################
-AC_MSG_CHECKING(whether to GdkPixbuf is available)
-if gnome-config --libs gdk_pixbuf > /dev/null 2>&1; then
-	gnome_libs="$gnome_libs gdk_pixbuf"
-       	AC_MSG_RESULT(yes)
-else
-    AC_MSG_ERROR([gdk-pixbuf(-devel) library is needed to build balsa])
-fi
-
-dnl ##########################################################################
-dnl Check for GtkHTML if available
-dnl ##########################################################################
-
-AC_ARG_ENABLE([gtkhtml], [  --enable-gtkhtml Use GtkHTML if available (experimental) [default=yes]],[
-	check_gtkhtml=$enableval
-],[
-	check_gtkhtml=yes
-])
-
-AC_MSG_CHECKING(whether to use GtkHTML)
-if test x"$check_gtkhtml" = xyes ; then
-	if gnome-config --libs gtkhtml > /dev/null 2>&1; then
-        	vers=`gnome-config --modversion gtkhtml | sed 's/^gtkhtml-//'`
-	        case $vers  in
-                       0.[0123])
-                               have_gtkhtml=no ;;
-                       *) 
-                               have_gtkhtml=yes ;;
-        	esac
-	else
-        	have_gtkhtml=no
-	fi
-	if test x"$have_gtkhtml" = xyes ; then
-	       	AC_MSG_RESULT(yes)
-		gnome_libs="$gnome_libs gtkhtml"
-		AC_DEFINE(HAVE_GTKHTML)
-	else
-	        AC_MSG_RESULT(not found)
-	fi
-else
-	have_gtkhtml=no
-	AC_MSG_RESULT(no)
-fi
-
-
-dnl ##########################################################################
-dnl Install into gnome locations? (may require priveliges that we don't have)
-dnl ##########################################################################
-
-AC_ARG_ENABLE([system-install], [  --disable-system-install Don't install some files into Gnome's prefix],[
-	use_system_install=$enableval
-],[
-	if test x"$BALSA_DISTCHECK_HACK" = xyes ; then
-		use_system_install=no
-	else
-		use_system_install=yes
-	fi
-])
-
-AC_MSG_CHECKING([whether to install into Gnome's prefix])
-if test x"$use_system_install" = xyes ; then
-	AC_MSG_RESULT([yes])
-	gnomedatadir=`${GNOME_CONFIG} --datadir`
-	gnomeconfdir=`${GNOME_CONFIG} --sysconfdir`
-else
-	AC_MSG_RESULT([no])
-	gnomedatadir=\${datadir}
-	gnomeconfdir=\${sysconfdir}
-fi
-
-AC_SUBST(gnomedatadir)
-AC_SUBST(gnomeconfdir)
 
 dnl ###########################################################################
 dnl Remember our prefixes
@@ -298,27 +161,18 @@ dnl ###########################################################################
 dnl datadir='${prefix}/share', so we must eval it or something. This works
 BALSA_STD_PREFIX=`eval "echo ${prefix}"`
 BALSA_DATA_PREFIX=`eval "echo ${datadir}"`
-GNOME_STD_PREFIX=`${GNOME_CONFIG} --prefix`
-GNOME_LIB_PREFIX=`${GNOME_CONFIG} --libdir`
-GNOME_DATA_PREFIX=`${GNOME_CONFIG} --datadir`
 
 dnl Consolidate them!
 AC_PROG_AWK
 BALSA_COMMON_PREFIXES=`sort<<EOF|uniq|${AWK} '{if(l!~/^$/)print l ",";l=$0}END{print l}'
 "${BALSA_STD_PREFIX}"
 "${BALSA_DATA_PREFIX}"
-"${GNOME_STD_PREFIX}"
-"${GNOME_DATA_PREFIX}"
-"${GNOME_LIB_PREFIX}"
 EOF
 `
 
 dnl Better way to do this?
 AC_DEFINE_UNQUOTED( BALSA_STD_PREFIX, "$BALSA_STD_PREFIX" )
 AC_DEFINE_UNQUOTED( BALSA_DATA_PREFIX, "$BALSA_DATA_PREFIX" )
-AC_DEFINE_UNQUOTED( GNOME_STD_PREFIX, "$GNOME_STD_PREFIX" )
-AC_DEFINE_UNQUOTED( GNOME_LIB_PREFIX, "$GNOME_LIB_PREFIX" )
-AC_DEFINE_UNQUOTED( GNOME_DATA_PREFIX, "$GNOME_DATA_PREFIX" )
 AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES` ) 
 dnl bleah
 
@@ -354,14 +208,21 @@ AC_ARG_WITH(esmtp, [  --with-esmtp	        Enable libESMTP [default=yes]],[
 AC_MSG_CHECKING([whether to build ESMTP support])
 if test "x$with_esmtp" != xno  ; then
 AC_MSG_RESULT([yes])
-	AC_CHECK_LIB(esmtp, smtp_start_session, AC_DEFINE(ENABLE_ESMTP) LIBS="$LIBS -lesmtp", AC_MSG_ERROR([*** You enabled ESMTP but esmtp library is not found.]), -lesmtp)
-	AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients, AC_DEFINE(ENABLE_ESMTP), AC_MSG_ERROR([*** You enabled ESMTP but esmtp library doesn't support
+    AC_CHECK_LIB(esmtp, smtp_start_session, 
+        [ AC_DEFINE(ENABLE_ESMTP) ], [
+        AC_MSG_ERROR([*** You enabled ESMTP but esmtp library is not found.])],
+        -lpthread)
+    AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients,
+        [ AC_DEFINE(ENABLE_ESMTP) ], 
+        AC_MSG_ERROR([*** You enabled ESMTP but esmtp library doesn't support
 	'require_all_recipients'. Please get a Balsa aware
 	libESMTP from http://www.balsa.net/main.html or compile
-	libESMTP with './configure --enable-require-all-recipients'.]), -lesmtp)
-	test "$with_esmtp" != yes && LIBS="$LIBS -L$with_esmtp/lib"
+	libESMTP with './configure --enable-require-all-recipients'.]), 
+        -lpthread)
+        
+     test "$with_esmtp" != yes && BALSA_LIBS="$BALSA_LIBS -L$with_esmtp/lib"
 else
-	AC_MSG_RESULT([no])
+     AC_MSG_RESULT([no])
 fi	  
 
 AC_CHECK_LIB(esmtp, smtp_starttls_set_password_cb,
@@ -395,21 +256,20 @@ dnl AM_CONDITIONAL(USE_SASL, test x$need_sasl = xyes)
 
 
 dnl #############################################################
-dnl Link with iconv for charset translation, if not found
-dnl without library.  Needed for libmutt and balsa itself.
+dnl Some systems have extra libiconv replacing iconv functions from
+dnl libc. Use this library if requested.
 dnl #############################################################
-AC_ARG_WITH(iconv,
-            [  --with-iconv=DIR           Where libiconv is installed ],
+AC_ARG_WITH(iconv,      
+           [  --with-iconv=DIR           Where libiconv is installed ],
            [if test "$with_iconv" != yes -a "$with_iconv" != no ; then
                    CPPFLAGS="-I${with_iconv}/include $CPPFLAGS"
                    LDFLAGS="-L${with_iconv}/lib $LDFLAGS"
             fi])
-
-AC_CHECK_LIB(iconv, iconv_open, , [
-	AC_CHECK_FUNC(iconv_open, , [
-			AC_MSG_ERROR([*** You need iconv for balsa.])
-			])
-	])
+ AC_CHECK_LIB(iconv, iconv_open, , [
+ AC_CHECK_FUNC(iconv_open, , [
+ 	AC_MSG_ERROR([*** You need iconv for balsa.])
+  ])
+])
 
 dnl ##########################################################################
 dnl Check for PCRE if available
@@ -438,8 +298,8 @@ if test x"$check_pcre" = xyes ; then
 
 	if test x"$have_pcre" = xyes ; then
 	       	AC_MSG_RESULT(yes)
-		CFLAGS="$CFLAGS `pcre-config --cflags-posix`"
-		LIBS="$LIBS `pcre-config --libs-posix`"
+		BALSA_CFLAGS="$BALSA_CFLAGS `pcre-config --cflags-posix`"
+		BALSA_LIBS="$BALSA_LIBS `pcre-config --libs-posix`"
 		AC_DEFINE(HAVE_PCRE)
 	else
 	        AC_MSG_RESULT(not found)
@@ -447,19 +307,6 @@ if test x"$check_pcre" = xyes ; then
 else
 	have_pcre=no
 	AC_MSG_RESULT(no)
-fi
-
-AC_SUBST(PCRE_CFLAGS)
-AC_SUBST(PCRE_LIBS)
-
-dnl ##########################################################################
-dnl Detected all the gnome libs, add them to the list.
-dnl ##########################################################################
-
-CFLAGS="$CFLAGS `gnome-config --cflags $gnome_libs`"
-if test "$gnome_libs" != "" ; then 
-	LIBS="$LIBS `gnome-config --libs $gnome_libs`"
-	echo "GNOME libs to link against: $gnome_libs"
 fi
 
 dnl ##########################################################################
@@ -540,7 +387,7 @@ if test "x$with_gss" != xno  ; then
       ],[
 	  LIBS="$LIBS -L$gssdir/lib -lgssapi_krb5"
       ], -lkrb5 -ldes -lasn1 -lroken -lcrypt -lcom_err -L$gssdir/lib)
-      CFLAGS="$CFLAGS -I$gssdir/include"
+      BALSA_CFLAGS="$BALSA_CFLAGS -I$gssdir/include"
    fi
 else
    AC_MSG_RESULT(no)
@@ -594,7 +441,7 @@ dnl ###########################################################################
 
 if test -d "${srcdir}/CVS" ; then
 	BALSA_FROM_CVS=yes
-	CFLAGS="$CFLAGS -Werror"
+	BALSA_CFLAGS="$BALSA_CFLAGS -Werror"
 else
 	BALSA_FROM_CVS=no
 fi
@@ -622,8 +469,6 @@ Makefile
 balsa.1
 balsa.spec
 po/Makefile.in
-macros/Makefile
-intl/Makefile
 sounds/Makefile
 images/Makefile
 help/Makefile
@@ -641,17 +486,13 @@ echo ""
 echo "================ Final configuration ==================="
 echo "    Installing into prefix: $prefix"
 echo "      Using multithreading: $use_threads"
-echo " Using incomplete features: $use_all"
-echo "Installing some files into  "
-echo "            Gnome's prefix: $use_system_install (may require root privileges)"
 echo "   Enable compile warnings: $set_more_warnings"
 echo "                Use ESMTP : $with_esmtp"
-echo "               Use GtkHTML: $have_gtkhtml"
+echo "               Use GtkHTML: $use_gtkhtml"
 echo "                  Use LDAP: $use_ldap"
 echo "                   Use GSS: $with_gss"
 echo "                   Use SSL: $with_ssl"
 dnl echo "                  Use SASL: $need_sasl"
-echo "          Printing support: $printing_support"
 echo ""
 
 if test x"$BALSA_FROM_CVS" = xyes ; then

@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-09-07 00:40+0200\n"
-"PO-Revision-Date: 2003-09-07 00:41+0200\n"
+"POT-Creation-Date: 2003-09-08 00:21+0200\n"
+"PO-Revision-Date: 2003-09-08 00:22+0200\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -60,35 +60,35 @@ msgstr "Kan inte lägga till dublettpost"
 msgid "Unknown error"
 msgstr "Okänt fel"
 
-#: libbalsa/address.c:747
+#: libbalsa/address.c:751
 msgid "_Displayed Name:"
 msgstr "_Visat namn:"
 
-#: libbalsa/address.c:748
+#: libbalsa/address.c:752
 msgid "_First Name:"
 msgstr "_Förnamn:"
 
-#: libbalsa/address.c:749
+#: libbalsa/address.c:753
 msgid "_Middle Name:"
 msgstr "_Andranamn:"
 
-#: libbalsa/address.c:750
+#: libbalsa/address.c:754
 msgid "_Last Name:"
 msgstr "_Efternamn:"
 
-#: libbalsa/address.c:751
+#: libbalsa/address.c:755
 msgid "_Nickname:"
 msgstr "_Smeknamn:"
 
-#: libbalsa/address.c:752
+#: libbalsa/address.c:756
 msgid "O_rganization:"
 msgstr "O_rganisation:"
 
-#: libbalsa/address.c:753 libinit_balsa/balsa-druid-page-user.c:79
+#: libbalsa/address.c:757 libinit_balsa/balsa-druid-page-user.c:79
 msgid "_Email Address:"
 msgstr "_E-postadress:"
 
-#: libbalsa/body.c:112 libbalsa/message.c:1023
+#: libbalsa/body.c:112 libbalsa/message.c:1016
 msgid "(No subject)"
 msgstr "(Inget ämne)"
 
@@ -139,33 +139,33 @@ msgstr "Fel vid borttagning av meddelanden"
 msgid "Error when moving messages"
 msgstr "Fel vid flyttande av meddelanden"
 
-#: libbalsa/gmime-gpgme-context.c:155
+#: libbalsa/gmime-gpgme-context.c:157
 #, c-format
 msgid "Cannot sign message: could not create gpgme context: %s"
 msgstr "Kan inte signera meddelande: kunde inte skapa gpgme-sammanhang: %s"
 
-#: libbalsa/gmime-gpgme-context.c:306
+#: libbalsa/gmime-gpgme-context.c:308
 #, c-format
 msgid "Cannot sign message: could not get gpgme data from istream: %s"
 msgstr ""
 "Kan inte signera meddelande: kunde inte hämta gpgme-data från iflöde: %s"
 
-#: libbalsa/gmime-gpgme-context.c:314
+#: libbalsa/gmime-gpgme-context.c:316
 #, c-format
 msgid "Cannot sign message: gpgme could not create new data: %s"
 msgstr "Kan inte signera meddelande: gpgme kunde inte skapa nya data: %s"
 
-#: libbalsa/gmime-gpgme-context.c:324
+#: libbalsa/gmime-gpgme-context.c:326
 #, c-format
 msgid "Cannot sign message: gpgme signing failed: %s"
 msgstr "Kan inte signera meddelande: gpgme-signering misslyckades: %s"
 
-#: libbalsa/gmime-gpgme-context.c:343
+#: libbalsa/gmime-gpgme-context.c:345
 #, c-format
 msgid "Cannot sign message: could not get gpgme data: %s"
 msgstr "Kan inte signera meddelande: kunde inte hämta gpgme-data: %s"
 
-#: libbalsa/gmime-gpgme-context.c:373
+#: libbalsa/gmime-gpgme-context.c:375
 #, c-format
 msgid ""
 "Cannot verify message signature: could not get gpgme data from istream: %s"
@@ -173,7 +173,7 @@ msgstr ""
 "Kan inte verifiera meddelandesignatur: kunde inte hämta gpgme-data från "
 "iflöde: %s"
 
-#: libbalsa/gmime-gpgme-context.c:382
+#: libbalsa/gmime-gpgme-context.c:384
 #, c-format
 msgid ""
 "Cannot verify message signature: could not get gpgme data from sigstream: %s"
@@ -181,64 +181,64 @@ msgstr ""
 "Kan inte verifiera meddelandesignatur: kunde inte hämta gpgme-data från "
 "sigflöde: %s"
 
-#: libbalsa/gmime-gpgme-context.c:391 libbalsa/rfc3156.c:763
+#: libbalsa/gmime-gpgme-context.c:393 libbalsa/rfc3156.c:759
 #, c-format
 msgid "gpgme signature verification failed: %s"
 msgstr "verifiering av gpgme-signatur mislyckades: %s"
 
-#: libbalsa/gmime-gpgme-context.c:440
+#: libbalsa/gmime-gpgme-context.c:442
 #, c-format
 msgid "Cannot encrypt message: could not create gpgme recipients set: %s"
 msgstr "Kan inte kryptera meddelande: kunde inte skapa gpg-mottagarsamling: %s"
 
-#: libbalsa/gmime-gpgme-context.c:466
+#: libbalsa/gmime-gpgme-context.c:468
 #, c-format
 msgid "Cannot encrypt message: could not get gpgme data from istream: %s"
 msgstr ""
 "Kan inte kryptera meddelande: kunde inte hämta gpgme-data från iflöde: %s"
 
-#: libbalsa/gmime-gpgme-context.c:475
+#: libbalsa/gmime-gpgme-context.c:477
 #, c-format
 msgid "Cannot encrypt message: gpgme could not create new data: %s"
 msgstr "Kan inte kryptera meddelande: gpgme kunde inte skapa nya data: %s"
 
-#: libbalsa/gmime-gpgme-context.c:486
+#: libbalsa/gmime-gpgme-context.c:488
 #, c-format
 msgid "Cannot encrypt message: gpgme encryption failed: %s"
 msgstr "Kan inte kryptera meddelande: gpgme-kryptering misslyckades: %s"
 
-#: libbalsa/gmime-gpgme-context.c:501
+#: libbalsa/gmime-gpgme-context.c:503
 #, c-format
 msgid "Cannot encrypt message: could not get gpgme data: %s"
 msgstr "Kan inte kryptera meddelande: kunde inte hämta gpgme-data: %s"
 
-#: libbalsa/gmime-gpgme-context.c:532
+#: libbalsa/gmime-gpgme-context.c:534
 #, c-format
 msgid "Cannot decrypt message: could not get gpgme data from istream: %s"
 msgstr ""
 "Kan inte dekryptera meddelande: kunde inte hämta gpgme-data från iflöde: %s"
 
-#: libbalsa/gmime-gpgme-context.c:540
+#: libbalsa/gmime-gpgme-context.c:542
 #, c-format
 msgid "Cannot decrypt message: gpgme could not create new data: %s"
 msgstr "Kan inte dekryptera meddelande: gpgme kunde inte skapa nya data: %s"
 
-#: libbalsa/gmime-gpgme-context.c:550
+#: libbalsa/gmime-gpgme-context.c:552
 #, c-format
 msgid "Cannot decrypt message: gpgme decrypting failed: %s"
 msgstr "Kan inte dekryptera meddelande: gpgme-dekryptering misslyckades: %s"
 
-#: libbalsa/gmime-gpgme-context.c:561
+#: libbalsa/gmime-gpgme-context.c:563
 #, c-format
 msgid "Cannot decrypt message: could not get gpgme data: %s"
 msgstr "Kan inte dekryptera meddelande: kunde inte hämta gpgme-data: %s"
 
-#: libbalsa/gmime-gpgme-context.c:589 libbalsa/gmime-gpgme-context.c:644
+#: libbalsa/gmime-gpgme-context.c:591 libbalsa/gmime-gpgme-context.c:646
 #, c-format
 msgid "Failed to execute gpgme: %s"
 msgstr "Misslyckades med att köra gpgme: %s"
 
-#: libbalsa/gmime-gpgme-context.c:590 libbalsa/gmime-gpgme-context.c:645
+#: libbalsa/gmime-gpgme-context.c:592 libbalsa/gmime-gpgme-context.c:647
 #: libmutt/mutt_ssl.c:440 src/pref-manager.c:1267 src/pref-manager.c:1366
 msgid "Unknown"
 msgstr "Okänd"
@@ -431,7 +431,7 @@ msgstr "Felaktig lokal brevlådesökväg \"%s\""
 msgid "Could not create a mailbox of type %s"
 msgstr "Kunde inte skapa en brevlåda av typen %s"
 
-#: libbalsa/mailbox_imap.c:664 libbalsa/mailbox_imap.c:1150
+#: libbalsa/mailbox_imap.c:655 libbalsa/mailbox_imap.c:1147
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -443,12 +443,12 @@ msgstr ""
 "uttryck\n"
 "återfaller till standardsökmetoden"
 
-#: libbalsa/mailbox_imap.c:819
+#: libbalsa/mailbox_imap.c:813
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: Öppnar %s Refräknare: %d\n"
 
-#: libbalsa/mailbox_imap.c:1017
+#: libbalsa/mailbox_imap.c:1014
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -457,28 +457,28 @@ msgstr ""
 "Kommandot IMAP SEARCH misslyckades för brevlådan %s\n"
 "Återfaller till standardsökmetoden"
 
-#: libbalsa/mailbox_maildir.c:166
+#: libbalsa/mailbox_maildir.c:164
 #, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
 msgstr "Brevlådan %s verkar inte vara av typen Maildir."
 
-#: libbalsa/mailbox_maildir.c:175
+#: libbalsa/mailbox_maildir.c:173
 #, c-format
 msgid "Could not create a MailDir directory at %s (%s)"
 msgstr "Kunde inte skapa en e-postkatalog på %s (%s)"
 
-#: libbalsa/mailbox_maildir.c:182 libbalsa/mailbox_maildir.c:190
-#: libbalsa/mailbox_maildir.c:200
+#: libbalsa/mailbox_maildir.c:180 libbalsa/mailbox_maildir.c:188
+#: libbalsa/mailbox_maildir.c:198
 #, c-format
 msgid "Could not create a MailDir at %s (%s)"
 msgstr "Kunde inte skapa en e-postkatalog på %s (%s)"
 
-#: libbalsa/mailbox_maildir.c:272 libbalsa/mailbox_mh.c:248
+#: libbalsa/mailbox_maildir.c:280 libbalsa/mailbox_mh.c:248
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Öppnande av %s misslyckades. Felnummer = %d, "
 
-#: libbalsa/mailbox_maildir.c:291 libbalsa/mailbox_mh.c:267
+#: libbalsa/mailbox_maildir.c:299 libbalsa/mailbox_mh.c:267
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
@@ -487,7 +487,7 @@ msgstr ""
 "Kunde inte ta bort innehållet i %s:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:297 libbalsa/mailbox_mbox.c:235
+#: libbalsa/mailbox_maildir.c:305 libbalsa/mailbox_mbox.c:235
 #: libbalsa/mailbox_mh.c:273
 #, c-format
 msgid ""
@@ -497,15 +497,20 @@ msgstr ""
 "Kunde inte ta bort %s:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:459 libbalsa/mailbox_mbox.c:381
+#: libbalsa/mailbox_maildir.c:465
 #, c-format
-msgid "LibBalsaMailboxMbox: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxMbox: Öppnar %s Refräknare: %d\n"
+msgid "LibBalsaMailboxMaildir: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxMaildir: Öppnar %s Refräknare: %d\n"
 
 #: libbalsa/mailbox_mbox.c:158
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "Brevlådan %s verkar inte vara en Mbox-brevlåda."
+
+#: libbalsa/mailbox_mbox.c:381
+#, c-format
+msgid "LibBalsaMailboxMbox: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxMbox: Öppnar %s Refräknare: %d\n"
 
 #: libbalsa/mailbox_mh.c:156
 #, c-format
@@ -569,7 +574,7 @@ msgstr ""
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr "Källbrevlådan (%s) är skrivskyddad. Kan inte flytta meddelanden"
 
-#: libbalsa/mime.c:100 libbalsa/rfc3156.c:64
+#: libbalsa/mime.c:99 libbalsa/rfc3156.c:63
 msgid ""
 "\n"
 "--\n"
@@ -615,17 +620,17 @@ msgstr "Uppkopplingen nekades"
 msgid "Authentication failed"
 msgstr "Autentisering misslyckades"
 
-#: libbalsa/pop3.c:421
+#: libbalsa/pop3.c:422
 #, c-format
 msgid "Retrieving Message %d of %d"
 msgstr "Hämtar meddelande %d av %d"
 
-#: libbalsa/pop3.c:433
+#: libbalsa/pop3.c:434
 #, c-format
 msgid "Received %d bytes of %d"
 msgstr "Mottog %d byte av %d"
 
-#: libbalsa/rfc3156.c:180
+#: libbalsa/rfc3156.c:176
 #, c-format
 msgid ""
 "\n"
@@ -634,12 +639,12 @@ msgstr ""
 "\n"
 "Signerad av: %s"
 
-#: libbalsa/rfc3156.c:184
+#: libbalsa/rfc3156.c:180
 #, c-format
 msgid "Mail address: %s"
 msgstr "E-postadress: %s"
 
-#: libbalsa/rfc3156.c:186
+#: libbalsa/rfc3156.c:182
 #, c-format
 msgid ""
 "\n"
@@ -648,7 +653,7 @@ msgstr ""
 "\n"
 "Giltighet: %s"
 
-#: libbalsa/rfc3156.c:188
+#: libbalsa/rfc3156.c:184
 #, c-format
 msgid ""
 "\n"
@@ -657,7 +662,7 @@ msgstr ""
 "\n"
 "Ägartillit: %s"
 
-#: libbalsa/rfc3156.c:191
+#: libbalsa/rfc3156.c:187
 #, c-format
 msgid ""
 "\n"
@@ -666,7 +671,7 @@ msgstr ""
 "\n"
 "Nyckelfingeravtryck: %s"
 
-#: libbalsa/rfc3156.c:196
+#: libbalsa/rfc3156.c:192
 #, c-format
 msgid ""
 "\n"
@@ -675,7 +680,7 @@ msgstr ""
 "\n"
 "Nyckeln skapad den: %s"
 
-#: libbalsa/rfc3156.c:201
+#: libbalsa/rfc3156.c:197
 #, c-format
 msgid ""
 "\n"
@@ -684,140 +689,140 @@ msgstr ""
 "\n"
 "Signerad den: %s"
 
-#: libbalsa/rfc3156.c:335
+#: libbalsa/rfc3156.c:331
 #, c-format
 msgid "GMimeGPG signature verification failed: %s"
 msgstr "Verifiering av GMimeGPG-signatur mislyckades: %s"
 
-#: libbalsa/rfc3156.c:442
+#: libbalsa/rfc3156.c:438
 msgid "Enter passphrase to decrypt message"
 msgstr "Ange lösenfras för att dekryptera meddelandet"
 
-#: libbalsa/rfc3156.c:503 libbalsa/rfc3156.c:1508
+#: libbalsa/rfc3156.c:499 libbalsa/rfc3156.c:1501
 #, c-format
 msgid "could not get a key for %s"
 msgstr "kunde inte hämta en nyckel för %s"
 
-#: libbalsa/rfc3156.c:536
+#: libbalsa/rfc3156.c:532
 msgid "The signature is valid."
 msgstr "Signaturen är giltig."
 
-#: libbalsa/rfc3156.c:538
+#: libbalsa/rfc3156.c:534
 msgid "The signature is valid but expired."
 msgstr "Signaturen är giltig men har gått ut."
 
-#: libbalsa/rfc3156.c:540
+#: libbalsa/rfc3156.c:536
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr ""
 "Signaturen är giltig men nyckeln som används för att verifiera signaturen "
 "har gått ut."
 
-#: libbalsa/rfc3156.c:542
+#: libbalsa/rfc3156.c:538
 msgid "The signature is invalid."
 msgstr "Signaturen är ogiltig."
 
-#: libbalsa/rfc3156.c:544
+#: libbalsa/rfc3156.c:540
 msgid "The signature could not be verified due to a missing key."
 msgstr "Signaturen kunde inte verifieras på grund av en saknad nyckel."
 
-#: libbalsa/rfc3156.c:546
+#: libbalsa/rfc3156.c:542
 msgid "This part is not a real PGP signature."
 msgstr "Denna del är inte en riktig PGP-signatur."
 
-#: libbalsa/rfc3156.c:548
+#: libbalsa/rfc3156.c:544
 msgid "An error prevented the signature verification."
 msgstr "Ett fel förhindrade signaturverifieringen."
 
-#: libbalsa/rfc3156.c:550
+#: libbalsa/rfc3156.c:546
 msgid "This part contains at least two signatures with different status."
 msgstr "Denna del innehåller åtminstone två signaturer med olika status."
 
-#: libbalsa/rfc3156.c:553
+#: libbalsa/rfc3156.c:549
 msgid "bad status"
 msgstr "felaktig status"
 
-#: libbalsa/rfc3156.c:563
+#: libbalsa/rfc3156.c:559
 msgid "The user ID is of unknown validity."
 msgstr "Giltigheten för användar-id är okänd."
 
-#: libbalsa/rfc3156.c:565
+#: libbalsa/rfc3156.c:561
 msgid "The validity of the user ID is undefined."
 msgstr "Giltigheten för användar-id är odefinierad."
 
-#: libbalsa/rfc3156.c:567
+#: libbalsa/rfc3156.c:563
 msgid "The user ID is never valid."
 msgstr "Användar-id är aldrig giltigt."
 
-#: libbalsa/rfc3156.c:569
+#: libbalsa/rfc3156.c:565
 msgid "The user ID is marginally valid."
 msgstr "Användar-id är marginellt giltigt."
 
-#: libbalsa/rfc3156.c:571
+#: libbalsa/rfc3156.c:567
 msgid "The user ID is fully valid."
 msgstr "Användar-id är helt giltigt."
 
-#: libbalsa/rfc3156.c:573
+#: libbalsa/rfc3156.c:569
 msgid "The user ID is ultimately valid."
 msgstr "Användar-id är ultimat giltigt."
 
-#: libbalsa/rfc3156.c:575 libbalsa/rfc3156.c:1220
+#: libbalsa/rfc3156.c:571 libbalsa/rfc3156.c:1216
 msgid "bad validity"
 msgstr "felaktig giltighet"
 
-#: libbalsa/rfc3156.c:624 libbalsa/rfc3156.c:726 libbalsa/rfc3156.c:846
-#: libbalsa/rfc3156.c:961 libbalsa/rfc3156.c:2178
+#: libbalsa/rfc3156.c:620 libbalsa/rfc3156.c:722 libbalsa/rfc3156.c:842
+#: libbalsa/rfc3156.c:957
 #, c-format
 msgid "could not create gpgme context: %s"
 msgstr "kunde inte skapa gpgme-sammanhang: %s"
 
-#: libbalsa/rfc3156.c:639 libbalsa/rfc3156.c:866
+#: libbalsa/rfc3156.c:635 libbalsa/rfc3156.c:862
 msgid "Enter passsphrase to OpenPGP sign the first message part"
 msgstr "Ange lösenfras för att OpenPGP-signera den första meddelandedelen"
 
-#: libbalsa/rfc3156.c:647 libbalsa/rfc3156.c:743 libbalsa/rfc3156.c:878
-#: libbalsa/rfc3156.c:970
+#: libbalsa/rfc3156.c:643 libbalsa/rfc3156.c:739 libbalsa/rfc3156.c:874
+#: libbalsa/rfc3156.c:966
 #, c-format
 msgid "gpgme could not get data from buffer: %s"
 msgstr "gpgme kunde inte hämta data från buffert: %s"
 
-#: libbalsa/rfc3156.c:654 libbalsa/rfc3156.c:753 libbalsa/rfc3156.c:886
-#: libbalsa/rfc3156.c:979
+#: libbalsa/rfc3156.c:650 libbalsa/rfc3156.c:749 libbalsa/rfc3156.c:882
+#: libbalsa/rfc3156.c:975
 #, c-format
 msgid "gpgme could not create new data object: %s"
 msgstr "gpgme kunde inte skapa nytt dataobjekt: %s"
 
-#: libbalsa/rfc3156.c:663
+#: libbalsa/rfc3156.c:659
 #, c-format
 msgid "gpgme signing failed: %s"
 msgstr "gpgme-signering misslyckades: %s"
 
-#: libbalsa/rfc3156.c:675 libbalsa/rfc3156.c:793 libbalsa/rfc3156.c:918
-#: libbalsa/rfc3156.c:1020 libbalsa/rfc3156.c:2225
+#: libbalsa/rfc3156.c:671 libbalsa/rfc3156.c:789 libbalsa/rfc3156.c:914
+#: libbalsa/rfc3156.c:1016
 #, c-format
 msgid "could not get gpgme data: %s"
 msgstr "kunde inte hämta gpgme-data: %s"
 
-#: libbalsa/rfc3156.c:900
+#: libbalsa/rfc3156.c:896
 #, c-format
 msgid "gpgme signing and encryption failed: %s"
 msgstr "gpgme-signering och kryptering misslyckades: %s"
 
-#: libbalsa/rfc3156.c:904 libbalsa/rfc3156.c:2211
+#: libbalsa/rfc3156.c:900
 #, c-format
 msgid "gpgme encryption failed: %s"
 msgstr "gpgme-kryptering misslyckades: %s"
 
-#: libbalsa/rfc3156.c:986
+#: libbalsa/rfc3156.c:982
 msgid "Enter passsphrase to decrypt message part"
 msgstr "Ange lösenfras för att dekryptera meddelandedel"
 
-#: libbalsa/rfc3156.c:992
+#: libbalsa/rfc3156.c:988
 #, c-format
 msgid "gpgme decryption and signature verification failed: %s"
 msgstr "gpgme-dekryptering och signatur-verifiering mislyckades: %s"
 
-#: libbalsa/rfc3156.c:1037
+#: libbalsa/rfc3156.c:1033
 #, c-format
 msgid ""
 "The OpenPGP encrypted message part contains 8-bit characters, but no header "
@@ -826,7 +831,7 @@ msgstr ""
 "Den OpenPGP-krypterade meddelandedelen innehåller 8-bitarstecken, men inget "
 "huvud som beskriver den teckenkodning som använts (konverterade till %s)"
 
-#: libbalsa/rfc3156.c:1103
+#: libbalsa/rfc3156.c:1099
 #, c-format
 msgid ""
 "%s\n"
@@ -836,12 +841,12 @@ msgstr ""
 "Vill du köra gpg för att importera den publika nyckeln med fingeravtrycket %"
 "s?"
 
-#: libbalsa/rfc3156.c:1128
+#: libbalsa/rfc3156.c:1124
 #, c-format
 msgid "Could not launch %s to get the public key %s."
 msgstr "Kunde inte starta %s för att hitta publika nyckeln %s."
 
-#: libbalsa/rfc3156.c:1176
+#: libbalsa/rfc3156.c:1172
 #, c-format
 msgid ""
 "Running gpg failed with return value %d:\n"
@@ -850,7 +855,7 @@ msgstr ""
 "Körande av gpg misslyckades med returvärde %d:\n"
 "%s"
 
-#: libbalsa/rfc3156.c:1183
+#: libbalsa/rfc3156.c:1179
 #, c-format
 msgid ""
 "Running gpg successful:\n"
@@ -859,91 +864,91 @@ msgstr ""
 "Körande av gpg lyckades:\n"
 "%s"
 
-#: libbalsa/rfc3156.c:1208
+#: libbalsa/rfc3156.c:1204
 msgid "unknown"
 msgstr "okänd"
 
-#: libbalsa/rfc3156.c:1210
+#: libbalsa/rfc3156.c:1206
 msgid "undefined"
 msgstr "odefinierad"
 
-#: libbalsa/rfc3156.c:1212
+#: libbalsa/rfc3156.c:1208
 msgid "never"
 msgstr "aldrig"
 
-#: libbalsa/rfc3156.c:1214
+#: libbalsa/rfc3156.c:1210
 msgid "marginal"
 msgstr "marginell"
 
-#: libbalsa/rfc3156.c:1216
+#: libbalsa/rfc3156.c:1212
 msgid "full"
 msgstr "fullständig"
 
-#: libbalsa/rfc3156.c:1218
+#: libbalsa/rfc3156.c:1214
 msgid "ultimate"
 msgstr "ultimat"
 
-#: libbalsa/rfc3156.c:1286
+#: libbalsa/rfc3156.c:1279
 msgid "Fingerprint"
 msgstr "Fingeravtryck"
 
-#: libbalsa/rfc3156.c:1286
+#: libbalsa/rfc3156.c:1279
 msgid "Key ID"
 msgstr "Nyckel-ID"
 
-#: libbalsa/rfc3156.c:1286
+#: libbalsa/rfc3156.c:1279
 msgid "Validity"
 msgstr "Giltighet"
 
-#: libbalsa/rfc3156.c:1286
+#: libbalsa/rfc3156.c:1279
 msgid "Owner trust"
 msgstr "Ägartillit"
 
-#: libbalsa/rfc3156.c:1287
+#: libbalsa/rfc3156.c:1280
 msgid "Length"
 msgstr "Längd"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: libbalsa/rfc3156.c:1324
+#: libbalsa/rfc3156.c:1317
 msgid "Select key"
 msgstr "Välj dialog"
 
-#: libbalsa/rfc3156.c:1332
+#: libbalsa/rfc3156.c:1325
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Välj den privata nyckeln för signeraren %s"
 
-#: libbalsa/rfc3156.c:1335
+#: libbalsa/rfc3156.c:1328
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Välj den publika nyckeln för mottagaren %s"
 
-#: libbalsa/rfc3156.c:1425
+#: libbalsa/rfc3156.c:1418
 #, c-format
 msgid "could not list keys for %s: %s"
 msgstr "kunde inte lista nycklar för %s: %s"
 
-#: libbalsa/rfc3156.c:1433
+#: libbalsa/rfc3156.c:1426
 #, c-format
 msgid "could not retrieve key for %s: %s"
 msgstr "kunde inte hämta nyckel för %s: %s"
 
-#: libbalsa/rfc3156.c:1470
+#: libbalsa/rfc3156.c:1463
 #, c-format
 msgid "could not get a private key for %s"
 msgstr "kunde inte hämta en privat nyckel för %s"
 
-#: libbalsa/rfc3156.c:1496
+#: libbalsa/rfc3156.c:1489
 #, c-format
 msgid "could not create gpgme recipients set: %s"
 msgstr "kunde inte skapa gpg-mottagarsamling: %s"
 
-#: libbalsa/rfc3156.c:1520
+#: libbalsa/rfc3156.c:1513
 #, c-format
 msgid "could not add recipient %s: %s"
 msgstr "kunde inte lägga till mottagaren %s: %s"
 
-#: libbalsa/rfc3156.c:1899
+#: libbalsa/rfc3156.c:1855
 #, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -954,7 +959,7 @@ msgstr ""
 "\n"
 "Nyckel: %s"
 
-#: libbalsa/rfc3156.c:1903
+#: libbalsa/rfc3156.c:1859
 #, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -965,42 +970,32 @@ msgstr ""
 "\n"
 "Nyckel: %s"
 
-#: libbalsa/rfc3156.c:1918
+#: libbalsa/rfc3156.c:1874
 msgid "remember passphrase for"
 msgstr "kom ihåg lösenord för"
 
-#: libbalsa/rfc3156.c:1923 src/pref-manager.c:1691 src/pref-manager.c:2519
+#: libbalsa/rfc3156.c:1879 src/pref-manager.c:1691 src/pref-manager.c:2519
 #: src/pref-manager.c:2540
 msgid "minutes"
 msgstr "minut"
 
-#: libbalsa/rfc3156.c:2129
+#: libbalsa/rfc3156.c:2063
 msgid "Enter passsphrase to sign message"
 msgstr "Ange lösenfrasen för att signera meddelandet"
 
-#: libbalsa/rfc3156.c:2194
-#, c-format
-msgid "gpgme could not get data from file: %s"
-msgstr "gpgme kunde inte hämta data från fil: %s"
-
-#: libbalsa/rfc3156.c:2202
-#, c-format
-msgid "gpgme could not create new data: %s"
-msgstr "gpgme kunde inte skapa nya data: %s"
-
-#: libbalsa/send.c:219 libbalsa/send.c:226
+#: libbalsa/send.c:221 libbalsa/send.c:228
 msgid "Sending Mail..."
 msgstr "Skickar brev..."
 
-#: libbalsa/send.c:222 src/main-window.c:1805
+#: libbalsa/send.c:224 src/main-window.c:1805
 msgid "_Hide"
 msgstr "_Dölj"
 
-#: libbalsa/send.c:356
+#: libbalsa/send.c:359
 msgid "Unable to open sentbox - could not get IMAP server information"
 msgstr "Kan inte öppna utkorg - kunde inte få tag i IMAP-serverinformation."
 
-#: libbalsa/send.c:776
+#: libbalsa/send.c:779
 #, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -1011,7 +1006,7 @@ msgstr ""
 "%d: %s\n"
 "Meddelandet är kvar i din utkorg.\n"
 
-#: libbalsa/send.c:818
+#: libbalsa/send.c:821
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -1022,7 +1017,7 @@ msgstr ""
 "%d: %s\n"
 "Meddelandet är kvar i din utkorg.\n"
 
-#: libbalsa/send.c:828
+#: libbalsa/send.c:831
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -1031,33 +1026,33 @@ msgstr ""
 "Systemet kommer att försöka skicka om meddelandet igen tills\n"
 "du tar bort det."
 
-#: libbalsa/send.c:858
+#: libbalsa/send.c:861
 msgid "Connected to MTA"
 msgstr "Ansluten till MTA"
 
-#: libbalsa/send.c:865 src/balsa-message.c:1236 src/print.c:349
+#: libbalsa/send.c:868 src/balsa-message.c:1236 src/print.c:349
 #: src/sendmsg-window.c:669 src/sendmsg-window.c:2136 src/store-address.c:303
 msgid "From:"
 msgstr "Från:"
 
-#: libbalsa/send.c:868 src/balsa-index.c:360
+#: libbalsa/send.c:871 src/balsa-index.c:360
 msgid "From"
 msgstr "Från"
 
-#: libbalsa/send.c:876 src/balsa-message.c:1245 src/print.c:353
+#: libbalsa/send.c:879 src/balsa-message.c:1245 src/print.c:353
 #: src/sendmsg-window.c:668 src/sendmsg-window.c:2143 src/store-address.c:304
 msgid "To:"
 msgstr "Till:"
 
-#: libbalsa/send.c:879 src/balsa-index.c:845
+#: libbalsa/send.c:882 src/balsa-index.c:845
 msgid "To"
 msgstr "Till"
 
-#: libbalsa/send.c:915
+#: libbalsa/send.c:918
 msgid "Disconnected"
 msgstr "Frånkopplad"
 
-#: libbalsa/send.c:1102
+#: libbalsa/send.c:1105
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -1071,7 +1066,7 @@ msgstr ""
 "via: \"host:smtp\".\n"
 "Meddelandet är kvar i utkorgen."
 
-#: libbalsa/send.c:1112
+#: libbalsa/send.c:1115
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1080,7 +1075,7 @@ msgstr ""
 "SMTP-serverproblem (%d): %s\n"
 "Meddelandet är kvar i utkorgen."
 
-#: libbalsa/send.c:1436 libbalsa/send.c:1614
+#: libbalsa/send.c:1438 libbalsa/send.c:1615
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "Detta meddelande kommer inte att krypteras för blindkopiemottagarna."
 
@@ -5673,6 +5668,12 @@ msgstr "Upp"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Ned"
+
+#~ msgid "gpgme could not get data from file: %s"
+#~ msgstr "gpgme kunde inte hämta data från fil: %s"
+
+#~ msgid "gpgme could not create new data: %s"
+#~ msgstr "gpgme kunde inte skapa nya data: %s"
 
 #~ msgid "%s: Opening %s Refcount: %d\n"
 #~ msgstr "%s: Öppnar %s Refräknare: %d\n"

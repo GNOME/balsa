@@ -35,14 +35,18 @@
 
 #define BUFFER_SIZE 1024
 
-gint delete_event (GtkWidget *, gpointer);
 
 extern GtkWidget *new_icon (gchar **, GtkWidget *);
+
+
+void balsa_sendmsg_destroy (GtkWidget * widget);
 
 static void send_smtp_message (GtkWidget *, BalsaSendmsg *);
 static void close_window (GtkWidget *, gpointer);
 static void balsa_sendmsg_free (BalsaSendmsg *);
 static GtkWidget *create_menu (GtkWidget *);
+
+
 
 static GtkWidget *menu_items[9];
 GtkTooltips *tooltips;
@@ -54,6 +58,8 @@ close_window (GtkWidget * widget, gpointer data)
 {
   gtk_widget_destroy (GTK_WIDGET (data));
 }
+
+
 
 static GtkWidget *
 create_toolbar (BalsaSendmsg * bsmw)
@@ -68,60 +74,76 @@ create_toolbar (BalsaSendmsg * bsmw)
   gtk_widget_realize (window);
 
 
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-					   "Send", "Send", NULL,
-	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_SND),
-					GTK_SIGNAL_FUNC (send_smtp_message),
-					   bsmw);
+  toolbarbutton =
+    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+			     "Send",
+			     "Send", 
+			     NULL,
+			     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_SND),
+			     GTK_SIGNAL_FUNC (send_smtp_message),
+			     bsmw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
+
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-					 "Spell Check", "Spell Check", NULL,
-					   new_icon (p13_xpm, window), NULL,
-					   "Spell Check");
+
+  toolbarbutton = 
+    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+			     "Spell Check",
+			     "Spell Check",
+			     NULL,
+			     new_icon (p13_xpm, window),
+			     NULL,
+			     "Spell Check");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
+
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-				       "Address Book", "Address Book", NULL,
-					   new_icon (p14_xpm, window), NULL,
-					   "Address Book");
+
+  toolbarbutton =
+    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+			     "Address Book",
+			     "Address Book",
+			     NULL,
+			     new_icon (p14_xpm, window), 
+			     NULL,
+			     "Address Book");
+
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-					   "Print", "Print", NULL,
-	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_PRINT),
-					   NULL, "Print");
+
+  toolbarbutton = 
+    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+			     "Print",
+			     "Print",
+			     NULL,
+			     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_PRINT),
+			     NULL,
+			     "Print");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
+
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-		   "Context Sensitive Help", "Context Sensitive Help", NULL,
-					   new_icon (p16_xpm, window), NULL,
-					   "Context Sensitive Help");
+
+  toolbarbutton =
+    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+			     "Context Sensitive Help",
+			     "Context Sensitive Help", 
+			     NULL,
+			     new_icon (p16_xpm, window),
+			     NULL,
+			     "Context Sensitive Help");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
+
 
   gtk_widget_show (toolbar);
   return toolbar;
 }
 
-void
-balsa_sendmsg_destroy (BalsaSendmsg * bsm)
-{
-  gtk_widget_destroy (bsm->to);
-  gtk_widget_destroy (bsm->from);
-  gtk_widget_destroy (bsm->subject);
-  gtk_widget_destroy (bsm->cc);
-  gtk_widget_destroy (bsm->bcc);
-  gtk_widget_destroy (bsm->window);
-  g_free (bsm);
-  bsm = NULL;
-}
 
 static GtkWidget *
 create_menu (GtkWidget * window)
@@ -196,6 +218,7 @@ create_menu (GtkWidget * window)
   gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
+
   menu = gtk_menu_new ();
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_ABOUT, _ ("Contents"));
@@ -203,17 +226,18 @@ create_menu (GtkWidget * window)
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 
+
   w = gtk_menu_item_new_with_label (_ ("Help"));
   gtk_widget_show (w);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
   gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
+ 
   menu_items[i] = NULL;
-/*
-   g_print ("%d menu items\n", i);
- */
   gtk_window_add_accelerator_table (GTK_WINDOW (window), accel);
+
+
   return menubar;
 }
 
@@ -251,7 +275,10 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   gchar *from;
   gint row;
 
+
   msg = g_malloc (sizeof (BalsaSendmsg));
+
+
   switch (type)
     {
     case 0:
@@ -277,11 +304,23 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
       msg->window = gnome_app_new ("balsa", "Forward message");
       break;
     }
-  gtk_signal_connect (GTK_OBJECT (msg->window), "destroy",
-		      GTK_SIGNAL_FUNC (delete_event), NULL);
-  gtk_signal_connect (GTK_OBJECT (msg->window), "delete_event",
-		      GTK_SIGNAL_FUNC (delete_event), NULL);
+
+  gtk_object_set_user_data (GTK_OBJECT (msg->window), (gpointer) msg);
+  
+  gtk_signal_connect (GTK_OBJECT (msg->window),
+		      "destroy",
+		      (GtkSignalFunc) balsa_sendmsg_destroy,
+		      NULL);
+
+  gtk_signal_connect (GTK_OBJECT (msg->window),
+		      "delete_event",
+		      (GtkSignalFunc) gtk_false,
+		      NULL);
+
   gtk_widget_set_usize (msg->window, 600, 340);
+
+
+
 
   vbox = gtk_vbox_new (FALSE, 1);
   gtk_container_border_width (GTK_CONTAINER (vbox), 2);
@@ -400,12 +439,21 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 }
 
 
+void
+balsa_sendmsg_destroy (GtkWidget * widget)
+{
+  BalsaSendmsg * bsm;
+
+  bsm = (BalsaSendmsg *) gtk_object_get_user_data (GTK_OBJECT (widget));
+
+  g_free (bsm);
+  bsm = NULL;
+}
 
 
 /*
  * C-client stuff below! LOOK OUT! :)
  */
-
 static GString *
 gtk_text_to_email (char *buff)
 {
@@ -497,5 +545,7 @@ send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
   mail_free_envelope (&msg);
   mail_free_body (&body);
   g_string_free (text, 1);
-  balsa_sendmsg_destroy (bsmsg);
+
+
+  gtk_widget_destroy (bsmsg->window);
 }

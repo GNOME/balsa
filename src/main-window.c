@@ -1275,7 +1275,7 @@ send_progress_notify_cb( )
                 while (node != NULL)
                 {
 			message = node->data;
-                	message_delete ( message ); 
+                	if(message->mailbox) message_delete ( message ); 
 			message_destroy( message );
 			node = node->next;
                 }

@@ -1,3 +1,8 @@
+2000-06-05  Pawel Salek <pawsa@theochem.kth.se>
+	* libbalsa/send.c,src/main-window.c: don't delete loose messages
+	* src/sendmsg-window.c: replying a message from a closed mailbox
+	crashed balsa.
+	
 2000-06-02  Peter Williams  <peter@beta.newton.cx>
 
 	* src/Makefile.am: s/GNOMEGNORBA_LIBS/GNOMEUI_LIBS/

@@ -393,7 +393,8 @@ balsa_send_message_real(MessageQueueItem *first_message)
 		 MSGSENDTHREAD(delete_message, MSGSENDTHREADDELETE," ",
 		                         current_message->orig, NULL, 0);
 #else
-		 message_delete (current_message->orig);
+		 if(current_message->orig->mailbox)
+		     message_delete (current_message->orig);
 #endif
 	 }
 	 else

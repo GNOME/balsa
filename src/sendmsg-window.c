@@ -317,8 +317,11 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
    if(balsa_app.debug) printf("balsa_sendmsg_destroy: Freeing bsm\n");
    g_free (bsm);
 
-  if(balsa_app.compose_email)
-    balsa_exit();
+   if(bsm->orig_message && bsm->orig_message->mailbox)
+       mailbox_open_unref(bsm->orig_message->mailbox);
+
+   if(balsa_app.compose_email)
+       balsa_exit();
 }
 
 /* remove_attachment - right mouse button callback */
@@ -860,8 +863,11 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
       window = gnome_app_new ("balsa", _ ("New message"));
       msg->orig_message = NULL;
       break;
-
     }
+  if(message && message->mailbox)
+                /* reference the original mailbox so we don't loose the
+		   mail even if the mailbox is closed */
+      mailbox_open_ref(message->mailbox);
 
   msg->window  = window;
   msg->type    = type;
@@ -1194,6 +1200,7 @@ bsmsg2message(BalsaSendmsg *bsmsg)
   gchar recvtime[50];
   struct tm *footime;
 
+  g_assert(bsmsg != NULL);
   message = message_new ();
 
   message->from = make_address_from_string(gtk_entry_get_text 

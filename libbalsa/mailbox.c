@@ -339,14 +339,9 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
 
     mailbox->readonly = FALSE;
     mailbox->disconnected = FALSE;
-    mailbox->mailing_list_address = NULL;
 
     mailbox->filters=NULL;
-    mailbox->identity_name=NULL;
-    mailbox->threading_type = LB_MAILBOX_THREADING_JWZ;
-    mailbox->sort_type =  LB_MAILBOX_SORT_TYPE_ASC;
-    mailbox->sort_field = LB_MAILBOX_SORT_DATE;
-    mailbox->show = LB_MAILBOX_SHOW_UNSET;
+    mailbox->view=NULL;
 }
 
 /*
@@ -377,9 +372,6 @@ libbalsa_mailbox_finalize(GObject * object)
 
     mailbox = LIBBALSA_MAILBOX(object);
 
-    if ( mailbox->mailing_list_address )
-	g_object_unref(mailbox->mailing_list_address);
-    mailbox->mailing_list_address = NULL;
 
     g_free(mailbox->config_prefix);
     mailbox->config_prefix = NULL;
@@ -387,8 +379,9 @@ libbalsa_mailbox_finalize(GObject * object)
     mailbox->name = NULL;
     g_free(mailbox->url);
     mailbox->url = NULL;
-    g_free(mailbox->identity_name);
-    mailbox->identity_name = NULL;
+
+    /* The LibBalsaMailboxView is owned by balsa_app.mailbox_views. */
+    mailbox->view = NULL;
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -682,59 +675,6 @@ libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
 		  libbalsa_mailbox_signals[LOAD_CONFIG], 0, prefix);
 
     gnome_config_pop_prefix();
-}
-
-/* libbalsa_mailbox_load_view:
-   load view related data from current config context. Works also for
-   nameless, scanned mailboxes.
-*/
-void
-libbalsa_mailbox_load_view(LibBalsaMailbox * mbx)
-{
-    int def;
-    gchar *address;
-
-    if (mbx->mailing_list_address) 
-	g_object_unref(mbx->mailing_list_address);
-    address = gnome_config_get_string_with_default("MailingListAddress", &def);
-    mbx->mailing_list_address = 
-	def ? NULL : libbalsa_address_new_from_string(address);
-    g_free(address);
-
-    g_free(mbx->identity_name);
-    mbx->identity_name = gnome_config_get_string("Identity");
-
-    mbx->threading_type = gnome_config_get_int_with_default("Threading", &def);
-    if(def) mbx->threading_type = LB_MAILBOX_THREADING_SIMPLE;
-    mbx->sort_type = gnome_config_get_int_with_default("SortType", &def);
-    if(def) mbx->sort_type = LB_MAILBOX_SORT_TYPE_ASC;
-    mbx->sort_field = gnome_config_get_int_with_default("SortField", &def);
-    if(def) mbx->sort_field = LB_MAILBOX_SORT_DATE;
-    mbx->show = gnome_config_get_int_with_default("Show", &def);
-    if(def) mbx->show = LB_MAILBOX_SHOW_UNSET;
-}
-
-/* libbalsa_mailbox_save_view:
-   save view related data from current config context. Works also for
-   nameless, scanned mailboxes.
-*/
-void
-libbalsa_mailbox_save_view(LibBalsaMailbox * mbx)
-{
-    if (mbx->mailing_list_address) {
-	gchar* tmp = libbalsa_address_to_gchar(mbx->mailing_list_address, 0);
-	gnome_config_set_string("MailingListAddress", tmp);
-	g_free(tmp);
-    } else {
-	gnome_config_clean_key("MailingListAddress");
-    }
-    if(mbx->identity_name)
-	gnome_config_set_string("Identity", mbx->identity_name);
-    else gnome_config_clean_key("Identity");
-    gnome_config_set_int("Threading",   mbx->threading_type);
-    gnome_config_set_int("SortType",    mbx->sort_type);
-    gnome_config_set_int("SortField",   mbx->sort_field);
-    gnome_config_set_int("Show", mbx->show);
 }
 
 FILE *
@@ -1253,4 +1193,33 @@ void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
     g_signal_emit(G_OBJECT(mbox),
 		  libbalsa_mailbox_signals[MESSAGES_STATUS_CHANGED], 0,
 		  messages, flag);
+}
+
+/*
+ * Mailbox views
+ */
+LibBalsaMailboxView *
+libbalsa_mailbox_view_new(void)
+{
+    LibBalsaMailboxView *view = g_new(LibBalsaMailboxView, 1);
+
+    view->mailing_list_address = NULL;
+    view->identity_name=NULL;
+    view->threading_type = LB_MAILBOX_THREADING_JWZ;
+    view->sort_type =  LB_MAILBOX_SORT_TYPE_ASC;
+    view->sort_field = LB_MAILBOX_SORT_DATE;
+    view->show = LB_MAILBOX_SHOW_UNSET;
+    view->exposed = FALSE;
+    view->open = FALSE;
+
+    return view;
+}
+
+void
+libbalsa_mailbox_view_free(LibBalsaMailboxView * view)
+{
+    if (view->mailing_list_address)
+        g_object_unref(view->mailing_list_address);
+    g_free(view->identity_name);
+    g_free(view);
 }

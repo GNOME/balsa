@@ -110,6 +110,18 @@ struct _LibBalsaMailboxAppendHandle {
 
 typedef struct _LibBalsaMailboxClass LibBalsaMailboxClass;
 
+typedef struct _LibBalsaMailboxView LibBalsaMailboxView;
+struct _LibBalsaMailboxView {
+    LibBalsaAddress *mailing_list_address;
+    gchar *identity_name;
+    LibBalsaMailboxThreadingType threading_type;
+    LibBalsaMailboxSortType      sort_type;
+    LibBalsaMailboxSortFields    sort_field;
+    LibBalsaMailboxShow          show;
+    gboolean exposed;
+    gboolean open;
+};
+
 struct _LibBalsaMailbox {
     GObject object;
 
@@ -139,18 +151,10 @@ struct _LibBalsaMailbox {
     glong unread_messages;	/* number of unread messages in the mailbox */
     glong total_messages;	/* total number of messages in the mailbox  */
 
-    /* Mailing list contained in this mailbox. Or NULL */
-    LibBalsaAddress *mailing_list_address;
-
     /* Associated filters (struct mailbox_filter) */
     GSList * filters;
 
-    /* Default identity associated with the mailbox */
-    gchar *identity_name;
-    LibBalsaMailboxThreadingType threading_type;
-    LibBalsaMailboxSortType      sort_type;
-    LibBalsaMailboxSortFields    sort_field;
-    LibBalsaMailboxShow          show;
+    LibBalsaMailboxView *view;
 };
 
 struct _LibBalsaMailboxClass {
@@ -190,7 +194,6 @@ struct _LibBalsaMailboxClass {
     void (*save_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     void (*load_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
 };
-
 
 GType libbalsa_mailbox_get_type(void);
 
@@ -259,8 +262,6 @@ void libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
 void libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);
 
-void libbalsa_mailbox_load_view(LibBalsaMailbox * mailbox);
-void libbalsa_mailbox_save_view(LibBalsaMailbox * mailbox);
 /*
  * misc mailbox releated functions
  */
@@ -270,4 +271,11 @@ gboolean libbalsa_mailbox_commit(LibBalsaMailbox* mailbox);
 void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
 					      GList * messages,
 					      gint flag);
+
+/*
+ * Mailbox views
+ */
+LibBalsaMailboxView *libbalsa_mailbox_view_new(void);
+void libbalsa_mailbox_view_free(LibBalsaMailboxView * view);
+
 #endif				/* __LIBBALSA_MAILBOX_H__ */

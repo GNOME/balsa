@@ -69,8 +69,6 @@ extern "C" {
     void balsa_spell_check_set_text(BalsaSpellCheck * spell_check,
 				    GtkTextView * view);
     void balsa_spell_check_start(BalsaSpellCheck * spell_check);
-    void balsa_spell_check_finish(BalsaSpellCheck * spell_check,
-				  gboolean keep_changes);
 
 
 #ifdef __cplusplus

@@ -292,6 +292,31 @@ message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
     close_message_window(NULL, (gpointer) mw);
 }
 
+static void
+mw_set_part_buttons_sensitive(MessageWindow * mw)
+{
+    BalsaMessage *msg = BALSA_MESSAGE(mw->bmessage);
+    GtkWidget *toolbar;
+    gboolean enable;
+
+    if (!msg || !msg->treeview)
+	return;
+
+    toolbar = balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
+
+    enable = balsa_message_has_next_part(msg);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_PART,
+                                       enable);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_NEXT_PART_POS].
+                             widget, enable);
+
+    enable = balsa_message_has_previous_part(msg);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_PREVIOUS_PART,
+                                       enable);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_PREVIOUS_PART_POS].
+                             widget, enable);
+}
+
 static gboolean
 message_window_idle_handler(MessageWindow* mw)
 {
@@ -328,24 +353,7 @@ message_window_idle_handler(MessageWindow* mw)
     }
 
     balsa_message_set_close(msg, TRUE);
-
-    if (msg && msg->treeview) {
-        GtkWidget *toolbar =
-            balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
-        gboolean enable = msg->info_count > 1;
-
-        balsa_toolbar_set_button_sensitive(toolbar,
-                                           BALSA_PIXMAP_PREVIOUS_PART,
-                                           enable);
-        balsa_toolbar_set_button_sensitive(toolbar,
-                                           BALSA_PIXMAP_NEXT_PART, enable);
-        gtk_widget_set_sensitive(message_menu
-                                 [MENU_MESSAGE_NEXT_PART_POS].widget,
-                                 enable);
-        gtk_widget_set_sensitive(message_menu
-                                 [MENU_MESSAGE_PREVIOUS_PART_POS].widget,
-                                 enable);
-    }
+    mw_set_part_buttons_sensitive(mw);
 
     /* Update the style and message counts in the mailbox list */
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
@@ -461,6 +469,14 @@ bindex_closed_cb(gpointer data, GObject *bindex)
     gtk_widget_destroy(mw->window);
 }
 
+static void
+mw_disable_trash(GtkWidget * toolbar)
+{
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_TRASH, FALSE);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_TRASH_POS].widget,
+                             FALSE);
+}
+
 void
 message_window_new(LibBalsaMessage * message)
 {
@@ -539,8 +555,12 @@ message_window_new(LibBalsaMessage * message)
                                     G_CALLBACK(mru_menu_cb), mw);
     move_menu = main_menu[MAIN_MENU_MOVE_POS].widget;
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(move_menu), submenu);
-    if(message->mailbox->readonly)
+    if(message->mailbox->readonly) {
 	gtk_widget_set_sensitive(move_menu, FALSE);
+	mw_disable_trash(toolbar);
+    }
+    if (message->mailbox == balsa_app.trash)
+	mw_disable_trash(toolbar);
     mw->bmessage = balsa_message_new();
     
     gnome_app_set_contents(GNOME_APP(mw->window), mw->bmessage);
@@ -678,6 +698,7 @@ next_part_cb(GtkWidget * widget, gpointer data)
     MessageWindow *mw = (MessageWindow *) data;
 
     balsa_message_next_part(BALSA_MESSAGE(mw->bmessage));
+    mw_set_part_buttons_sensitive(mw);
 }
 
 static void
@@ -686,6 +707,7 @@ previous_part_cb(GtkWidget * widget, gpointer data)
     MessageWindow *mw = (MessageWindow *) data;
 
     balsa_message_previous_part(BALSA_MESSAGE(mw->bmessage));
+    mw_set_part_buttons_sensitive(mw);
 }
 
 static void

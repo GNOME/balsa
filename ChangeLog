@@ -1,3 +1,12 @@
+2004-07-25  Pawel Salek
+
+	* libbalsa/mailbox.[hc], mailbox_imap.c: remove SORT_NATURAL and
+	SORT_FROM: duplicated SORT_NO and SORT_SENDER, respectively.
+	* src/balsa-index.c: disable column buttons - they confuse tab chain.
+	* src/balsa-message.c: limit tab focus to one part only.
+	* src/main-window.c: sortin menu entries in touchscreen mode.
+	* src/sendmsg-window.c: default toolbar in touchscreen mode.
+
 2004-07-23  Pawel Salek
 
 	* configure.in: add --enable-touch-ui

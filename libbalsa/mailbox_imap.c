@@ -2118,8 +2118,7 @@ libbalsa_mailbox_imap_sort(LibBalsaMailbox *mbox, GArray *array)
     GArray *tmp;
     len = array->len;
 
-    if(mbox->view->sort_field == LB_MAILBOX_SORT_NO
-	|| mbox->view->sort_field == LB_MAILBOX_SORT_NATURAL) {
+    if(mbox->view->sort_field == LB_MAILBOX_SORT_NO) {
         g_array_sort_with_data(array, (GCompareDataFunc)lbmi_compare_func,
                                GINT_TO_POINTER(mbox->view->sort_type ==
                                                LB_MAILBOX_SORT_TYPE_ASC));

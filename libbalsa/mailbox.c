@@ -2895,7 +2895,6 @@ mbox_get_sort_column_id(GtkTreeSortable * sortable,
     if (sort_column_id) {
         switch (mbox->view->sort_field) {
         default:
-        case LB_MAILBOX_SORT_NATURAL:
         case LB_MAILBOX_SORT_NO:
             *sort_column_id = LB_MBOX_MSGNO_COL;
             break;
@@ -2938,6 +2937,7 @@ mbox_set_sort_column_id(GtkTreeSortable * sortable,
     view = mbox->view;
 
     switch (sort_column_id) {
+    default:
     case LB_MBOX_MSGNO_COL:
         new_field = LB_MAILBOX_SORT_NO;
         break;
@@ -2952,9 +2952,6 @@ mbox_set_sort_column_id(GtkTreeSortable * sortable,
         break;
     case LB_MBOX_SIZE_COL:
         new_field = LB_MAILBOX_SORT_SIZE;
-        break;
-    default:
-        new_field = LB_MAILBOX_SORT_NATURAL;
         break;
     }
 

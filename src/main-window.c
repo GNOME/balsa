@@ -172,7 +172,13 @@ static void toggle_deleted_message_cb(GtkWidget * widget, gpointer data);
 static void toggle_new_message_cb(GtkWidget * widget, gpointer data);
 static void toggle_answered_message_cb(GtkWidget * widget, gpointer data);
 static void store_address_cb(GtkWidget * widget, gpointer data);
+#if defined(ENABLE_TOUCH_UI)
+static void sort_change_cb(GtkWidget * widget, gpointer data);
+static void balsa_window_set_sort_menu(BalsaWindow *window,
+                                       LibBalsaMailboxSortFields col);
+#else
 static void wrap_message_cb(GtkWidget * widget, gpointer data);
+#endif /* ENABLE_TOUCH_UI */
 static void show_no_headers_cb(GtkWidget * widget, gpointer data);
 static void show_selected_cb(GtkWidget * widget, gpointer data);
 static void show_all_headers_cb(GtkWidget * widget, gpointer data);
@@ -212,7 +218,6 @@ static void find_again_cb(GtkWidget * widget, gpointer data);
 static void filter_dlg_cb(GtkWidget * widget, gpointer data);
 static void filter_export_cb(GtkWidget * widget, gpointer data);
 static void filter_run_cb(GtkWidget * widget, gpointer data);
-static void remove_duplicates_cb(GtkWidget * widget, gpointer data);
 
 static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
@@ -415,8 +420,8 @@ static GnomeUIInfo threading_menu[] = {
     GNOMEUIINFO_END
 };
 
-static GnomeUIInfo view_menu[] = {
 #if defined(ENABLE_TOUCH_UI)
+static GnomeUIInfo view_mailbox_menu[] = {
     { GNOME_APP_UI_ITEM, N_("_In"),  N_("Show Incoming Folder"),
      open_mailbox_cb, GINT_TO_POINTER('I'), NULL, GNOME_APP_PIXMAP_NONE,
      NULL, 'I', GDK_CONTROL_MASK|GDK_SHIFT_MASK, NULL},
@@ -432,33 +437,78 @@ static GnomeUIInfo view_menu[] = {
     { GNOME_APP_UI_ITEM, N_("_Trash"),  N_("Show Trashed Messages"),
      open_mailbox_cb, GINT_TO_POINTER('T'), NULL, GNOME_APP_PIXMAP_NONE,
      NULL, 'T', GDK_CONTROL_MASK|GDK_SHIFT_MASK, NULL},
+    GNOMEUIINFO_END
+};
+static GnomeUIInfo view_sort_l_menu[] = {
+#define VIEW_SORT_MSGNO_POS 0
+    GNOMEUIINFO_RADIOITEM_DATA(N_("By _Arrival"),
+                               N_("Arrival order"),
+                               sort_change_cb,
+                               GINT_TO_POINTER(LB_MBOX_MSGNO_COL),
+                               NULL),
+#define VIEW_SORT_SENDER_POS 1
+    GNOMEUIINFO_RADIOITEM_DATA(N_("By _Sender"),
+                               N_("Sender order"),
+                               sort_change_cb,
+                               GINT_TO_POINTER(LB_MBOX_FROM_COL),
+                               NULL),
+#define VIEW_SORT_SUBJECT_POS 2
+    GNOMEUIINFO_RADIOITEM_DATA(N_("By S_ubject"),
+                               N_("Subject order"),
+                               sort_change_cb,
+                               GINT_TO_POINTER(LB_MBOX_SUBJECT_COL),
+                               NULL),
+#define VIEW_SORT_DATE_POS 3
+    GNOMEUIINFO_RADIOITEM_DATA(N_("By _Date"),
+                               N_("By sending date"),
+                               sort_change_cb,
+                               GINT_TO_POINTER(LB_MBOX_DATE_COL),
+                               NULL),
+#define VIEW_SORT_SIZE_POS 4
+    GNOMEUIINFO_RADIOITEM_DATA(N_("By Si_ze"),
+                               N_("By message size"),
+                               sort_change_cb,
+                               GINT_TO_POINTER(LB_MBOX_SIZE_COL),
+                               NULL),
+    GNOMEUIINFO_END
+};
+static GnomeUIInfo view_sort_menu[] = {
+    GNOMEUIINFO_RADIOLIST(view_sort_l_menu),
+    GNOMEUIINFO_END
+};
+#endif /* ENABLE_TOUCH_UI */
+
+static GnomeUIInfo view_menu[] = {
+#if defined(ENABLE_TOUCH_UI)
+    GNOMEUIINFO_SUBTREE(N_("_Mailbox"), view_mailbox_menu),
+    GNOMEUIINFO_SUBTREE(N_("S_ort"), view_sort_menu),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_VIEW_MAILBOX_LIST_POS 6
-#else
-#define MENU_VIEW_MAILBOX_LIST_POS  0
-#endif
+#define MENU_VIEW_MAILBOX_LIST_POS 3
     GNOMEUIINFO_TOGGLEITEM(N_("_Show Mailbox Tree (F9)"),
                            N_("Toggle display of mailbox and folder tree"),
                            show_mbtree_cb, NULL),
-#if !defined(ENABLE_TOUCH_UI)
+#define MENU_VIEW_SEP1_POS (MENU_VIEW_MAILBOX_LIST_POS+1)
+#else /* ENABLE_TOUCH_UI */
+#define MENU_VIEW_MAILBOX_LIST_POS 0
+    GNOMEUIINFO_TOGGLEITEM(N_("_Show Mailbox Tree (F9)"),
+                           N_("Toggle display of mailbox and folder tree"),
+                           show_mbtree_cb, NULL),
 #define MENU_VIEW_MAILBOX_TABS_POS 1
     GNOMEUIINFO_TOGGLEITEM(N_("Show Mailbox _Tabs"),
                            N_("Toggle display of mailbox notebook tabs"),
                            show_mbtabs_cb, NULL),
-#define SHOW_MENU_CNT 2
-#else
-#define SHOW_MENU_CNT 1
-#endif /* ENABLE_TOUCH_UI */
     GNOMEUIINFO_SEPARATOR,
-#define MENU_VIEW_WRAP_POS (MENU_VIEW_MAILBOX_LIST_POS+SHOW_MENU_CNT+1)
+#define MENU_VIEW_WRAP_POS (MENU_VIEW_MAILBOX_LIST_POS+3)
     GNOMEUIINFO_TOGGLEITEM(N_("_Wrap"), N_("Wrap message lines"),
                            wrap_message_cb, NULL),
+#define MENU_VIEW_SEP1_POS (MENU_VIEW_WRAP_POS+1)
+#endif /* ENABLE_TOUCH_UI */
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_RADIOLIST(shown_hdrs_menu),
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_RADIOLIST(threading_menu),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_VIEW_EXPAND_ALL_POS (MENU_VIEW_WRAP_POS+6)
+#define MENU_VIEW_EXPAND_ALL_POS (MENU_VIEW_SEP1_POS+5)
     { GNOME_APP_UI_ITEM, N_("E_xpand All"),
      N_("Expand all threads"),
      expand_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
@@ -749,12 +799,6 @@ static GnomeUIInfo mailbox_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("Edit/Apply _Filters"),
                            N_("Filter the content of the selected mailbox"),
                            filter_run_cb, GTK_STOCK_PROPERTIES),
-    GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_REMOVE_DUPLICATES (MENU_MAILBOX_APPLY_FILTERS+2)
-    GNOMEUIINFO_ITEM_STOCK(N_("_Remove Duplicates"),
-                           N_("Remove duplicated messages "
-                              "from the selected mailbox"),
-                           remove_duplicates_cb, GTK_STOCK_REMOVE),
     GNOMEUIINFO_END
 };
 
@@ -923,6 +967,16 @@ static const struct callback_item {
 
 /* Standard buttons; "" means a separator. */
 static const gchar* main_toolbar[] = {
+#if defined(ENABLE_TOUCH_UI)
+    BALSA_PIXMAP_RECEIVE,
+    "",
+    BALSA_PIXMAP_NEW,
+    BALSA_PIXMAP_REPLY,
+    BALSA_PIXMAP_REPLY_ALL,
+    BALSA_PIXMAP_FORWARD,
+    "",
+    BALSA_PIXMAP_TRASH
+#else /* defined(ENABLE_TOUCH_UI) */
     BALSA_PIXMAP_RECEIVE,
     "",
     BALSA_PIXMAP_TRASH,
@@ -936,6 +990,7 @@ static const gchar* main_toolbar[] = {
     BALSA_PIXMAP_NEXT_UNREAD,
     "",
     BALSA_PIXMAP_PRINT
+#endif /* defined(ENABLE_TOUCH_UI) */
 };
 
 /* Create the toolbar model for the main window's toolbar.
@@ -1134,11 +1189,6 @@ balsa_window_new()
     /* set the toolbar style */
     balsa_window_refresh(window);
 
-    if (balsa_app.browse_wrap)
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-                                       (view_menu[MENU_VIEW_WRAP_POS].widget),
-                                       TRUE);
-
     if (balsa_app.shown_headers >= HEADERS_NONE
         && balsa_app.shown_headers <= HEADERS_ALL)
         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
@@ -1146,6 +1196,10 @@ balsa_window_new()
                                        TRUE);
 
 #if !defined(ENABLE_TOUCH_UI)
+    if (balsa_app.browse_wrap)
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
+                                       (view_menu[MENU_VIEW_WRAP_POS].widget),
+                                       TRUE);
     if (balsa_app.show_notebook_tabs)
         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                        (view_menu[MENU_VIEW_MAILBOX_TABS_POS].widget),
@@ -1188,7 +1242,6 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
         MENU_MAILBOX_MARK_ALL_POS,    MENU_MAILBOX_DELETE_POS,
         MENU_MAILBOX_EDIT_POS,     /* MENU_MAILBOX_COMMIT_POS, */
 	MENU_MAILBOX_CLOSE_POS,       MENU_MAILBOX_APPLY_FILTERS,
-	MENU_MAILBOX_REMOVE_DUPLICATES
     };
 
     const static int threading_menu_entries[] = {
@@ -1248,6 +1301,10 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
         gtk_widget_set_sensitive(view_menu[view_menu_entries[i]].widget, enable);
 
     if (mailbox) {
+#if defined(ENABLE_TOUCH_UI)
+        balsa_window_set_sort_menu(window,
+                                   libbalsa_mailbox_get_sort_field(mailbox));
+#endif
 	balsa_window_set_threading_menu(window,
 					libbalsa_mailbox_get_threading_type
 					(mailbox));
@@ -2814,6 +2871,50 @@ store_address_cb(GtkWidget * widget, gpointer data)
     g_list_free(messages);
 }
 
+#if defined(ENABLE_TOUCH_UI)
+static void
+balsa_window_set_sort_menu(BalsaWindow *window, LibBalsaMailboxColumn col)
+{
+    int pos;
+    switch(col) {
+    case LB_MAILBOX_SORT_NO:      pos = VIEW_SORT_MSGNO_POS;   break;
+    case LB_MAILBOX_SORT_SENDER:  pos = VIEW_SORT_SENDER_POS;  break;
+    case LB_MAILBOX_SORT_SUBJECT: pos = VIEW_SORT_SUBJECT_POS; break;
+    case LB_MAILBOX_SORT_DATE:    pos = VIEW_SORT_DATE_POS;    break;
+    case LB_MAILBOX_SORT_SIZE:    pos = VIEW_SORT_SIZE_POS;    break;
+    default: return;
+    }
+    g_signal_handlers_block_by_func(G_OBJECT(view_sort_l_menu[pos].widget),
+                                    view_sort_l_menu[pos].moreinfo, 
+                                    window);
+    gtk_check_menu_item_set_active
+        (GTK_CHECK_MENU_ITEM(view_sort_l_menu[pos].widget), TRUE);
+    g_signal_handlers_unblock_by_func(G_OBJECT(view_sort_l_menu[pos].widget),
+                                      view_sort_l_menu[pos].moreinfo,
+                                      window);
+}
+
+static void
+sort_change_cb(GtkWidget * widget, gpointer data)
+{
+    gint             column;
+    GtkWidget       *bindex;
+    LibBalsaMailbox *mailbox;
+
+    if(!GTK_CHECK_MENU_ITEM(widget)->active)
+        return;
+
+    bindex = balsa_window_find_current_index(BALSA_WINDOW(data));
+    if(!bindex)
+        return;
+
+    column = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
+                                             GNOMEUIINFO_KEY_UIDATA));
+    mailbox = BALSA_INDEX(bindex)->mailbox_node->mailbox;
+    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(mailbox),
+                                         column, GTK_SORT_ASCENDING);
+ }
+#else
 static void
 wrap_message_cb(GtkWidget * widget, gpointer data)
 {
@@ -2827,6 +2928,7 @@ wrap_message_cb(GtkWidget * widget, gpointer data)
                                balsa_app.browse_wrap);
     refresh_preferences_manager();
 }
+#endif /* ENABLE_TOUCH_UI */
 
 /* show_no_headers_cb:
    this is a callback for the menu item but it is also called
@@ -2944,7 +3046,9 @@ static void
 open_mailbox_cb(GtkWidget *widget, gpointer data)
 {
     LibBalsaMailbox *mailbox;
-    switch(GPOINTER_TO_INT(data)) {
+    gint mbx = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
+                                                 GNOMEUIINFO_KEY_UIDATA));
+    switch(mbx) {
     default:
     case 'I': mailbox = balsa_app.inbox;    break;
     case 'D': mailbox = balsa_app.draftbox; break;
@@ -3254,15 +3358,6 @@ filter_run_cb(GtkWidget * widget, gpointer data)
 	   of the filter action (eg a copy)). So let's see that later :) */
 	balsa_information(LIBBALSA_INFORMATION_WARNING, 
                           _("You can apply filters only on mailbox\n"));
-}
-
-static void
-remove_duplicates_cb(GtkWidget * widget, gpointer data)
-{                          
-    GtkWidget *index = balsa_window_find_current_index(BALSA_WINDOW(data));
-
-    if (index)
-        balsa_index_remove_duplicates(BALSA_INDEX(index));
 }
 
 static void
@@ -4170,6 +4265,7 @@ show_preview_pane_cb(GtkWidget * widget, gpointer data)
 void
 update_view_menu(BalsaWindow * window)
 {
+#if !defined(ENABLE_TOUCH_UI)
     GtkWidget *w = view_menu[MENU_VIEW_WRAP_POS].widget;
     g_signal_handlers_block_by_func(G_OBJECT(w), 
                                     G_CALLBACK(wrap_message_cb), window);
@@ -4181,6 +4277,7 @@ update_view_menu(BalsaWindow * window)
     if (window->preview)
         balsa_message_set_wrap(BALSA_MESSAGE(window->preview),
                                balsa_app.browse_wrap);
+#endif /* ENABLE_TOUCH_UI */
 }
 
 /* Update the notebook tab label when the mailbox name is changed. */

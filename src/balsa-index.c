@@ -255,6 +255,22 @@ bndx_popup_menu(GtkWidget * widget)
     return TRUE;
 }
 
+static void
+bi_apply_other_column_settings(GtkTreeViewColumn *column,
+                               gboolean sortable, gint typeid)
+{
+#if !defined(ENABLE_TOUCH_UI)
+    if(sortable)
+        gtk_tree_view_column_set_sort_column_id(column, typeid);
+#endif /* ENABLE_TOUCH_UI */
+
+    gtk_tree_view_column_set_alignment(column, 0.5);
+
+#if GTK_CHECK_VERSION(2,4,0) && defined(TREE_VIEW_FIXED_HEIGHT)
+    gtk_tree_view_column_set_sizing(col, GTK_TREE_VIEW_COLUMN_FIXED);
+#endif
+}
+
 /* BalsaIndex instance init method; no tree store is set on the tree
  * view--that's handled later, when the view is populated. */
 #define INDEX_ICON_SZ 16
@@ -281,17 +297,14 @@ bndx_instance_init(BalsaIndex * index)
 #define set_sizing(col)
 #endif
     /* Index column */
-    column = gtk_tree_view_column_new();
-    gtk_tree_view_column_set_title(column, "#");
-    gtk_tree_view_column_set_alignment(column, 0.5);
     renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes("#", renderer,
+                                                 "text", LB_MBOX_MSGNO_COL,
+                                                 NULL);
     g_object_set(renderer, "xalign", 1.0, NULL);
-    gtk_tree_view_column_pack_start(column, renderer, FALSE);
-    gtk_tree_view_column_set_attributes(column, renderer,
-                                        "text", LB_MBOX_MSGNO_COL,
-                                        NULL);
-    gtk_tree_view_column_set_sort_column_id(column, LB_MBOX_MSGNO_COL);
     set_sizing(column); gtk_tree_view_append_column(tree_view, column);
+    bi_apply_other_column_settings(column, TRUE, LB_MBOX_MSGNO_COL);
 
     /* Status icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
@@ -300,8 +313,8 @@ bndx_instance_init(BalsaIndex * index)
         gtk_tree_view_column_new_with_attributes("S", renderer,
                                                  "pixbuf", LB_MBOX_MARKED_COL,
                                                  NULL);
-    gtk_tree_view_column_set_alignment(column, 0.5);
     set_sizing(column); gtk_tree_view_append_column(tree_view, column);
+    bi_apply_other_column_settings(column, FALSE, 0);
 
     /* Attachment icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
@@ -310,8 +323,9 @@ bndx_instance_init(BalsaIndex * index)
         gtk_tree_view_column_new_with_attributes("A", renderer,
                                                  "pixbuf", LB_MBOX_ATTACH_COL,
                                                  NULL);
-    gtk_tree_view_column_set_alignment(column, 0.5);
-     set_sizing(column); gtk_tree_view_append_column(tree_view, column);
+    set_sizing(column); gtk_tree_view_append_column(tree_view, column);
+    bi_apply_other_column_settings(column, FALSE, 0);
+
     /* From/To column */
     renderer = gtk_cell_renderer_text_new();
     column = 
@@ -320,12 +334,10 @@ bndx_instance_init(BalsaIndex * index)
 						 "weight", LB_MBOX_WEIGHT_COL,
 						 "style", LB_MBOX_STYLE_COL,
                                                  NULL);
-    gtk_tree_view_column_set_alignment(column, 0.5);
     gtk_tree_view_column_set_resizable(column, TRUE);
     gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
-    gtk_tree_view_column_set_sort_column_id(column,
-					    LB_MBOX_FROM_COL);
     gtk_tree_view_append_column(tree_view, column);
+    bi_apply_other_column_settings(column, TRUE, LB_MBOX_FROM_COL);
 
     /* Subject column--contains tree expanders */
     renderer = gtk_cell_renderer_text_new();
@@ -335,12 +347,10 @@ bndx_instance_init(BalsaIndex * index)
 						 "weight", LB_MBOX_WEIGHT_COL,
 						 "style", LB_MBOX_STYLE_COL,
                                                  NULL);
-    gtk_tree_view_column_set_alignment(column, 0.5);
     gtk_tree_view_column_set_resizable(column, TRUE);
     gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
-    gtk_tree_view_column_set_sort_column_id(column,
-                                            LB_MBOX_SUBJECT_COL);
     gtk_tree_view_append_column(tree_view, column);
+    bi_apply_other_column_settings(column, TRUE, LB_MBOX_SUBJECT_COL);
     gtk_tree_view_set_expander_column(tree_view, column);
 
     /* Date column */
@@ -351,17 +361,14 @@ bndx_instance_init(BalsaIndex * index)
 						 "weight", LB_MBOX_WEIGHT_COL,
 						 "style", LB_MBOX_STYLE_COL,
                                                  NULL);
-    gtk_tree_view_column_set_alignment(column, 0.5);
     gtk_tree_view_column_set_resizable(column, TRUE);
     gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
-    gtk_tree_view_column_set_sort_column_id(column,
-					    LB_MBOX_DATE_COL);
     gtk_tree_view_append_column(tree_view, column);
+    bi_apply_other_column_settings(column, TRUE, LB_MBOX_DATE_COL);
 
     /* Size column */
     column = gtk_tree_view_column_new();
     gtk_tree_view_column_set_title(column, _("Size"));
-    gtk_tree_view_column_set_alignment(column, 0.5);
     renderer = gtk_cell_renderer_text_new();
     g_object_set(renderer, "xalign", 1.0, NULL);
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
@@ -370,9 +377,8 @@ bndx_instance_init(BalsaIndex * index)
 					"weight", LB_MBOX_WEIGHT_COL,
 					"style", LB_MBOX_STYLE_COL,
                                         NULL);
-    gtk_tree_view_column_set_sort_column_id(column,
-                                            LB_MBOX_SIZE_COL);
     set_sizing(column); gtk_tree_view_append_column(tree_view, column);
+    bi_apply_other_column_settings(column, TRUE, LB_MBOX_SIZE_COL);
 
     /* Initialize some other members */
     index->mailbox_node = NULL;

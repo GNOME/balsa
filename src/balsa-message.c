@@ -116,6 +116,12 @@ static gint balsa_message_focus_in_part(GtkWidget * widget,
 static gint balsa_message_focus_out_part(GtkWidget * widget,
                                          GdkEventFocus * event,
                                          BalsaMessage * bm);
+static gint balsa_message_limit_focus(GtkWidget * widget,
+                                      GdkEventFocus * event,
+                                      BalsaMessage * bm);
+static gint balsa_message_unlimit_focus(GtkWidget * widget,
+                                        GdkEventFocus * event,
+                                        BalsaMessage * bm);
 
 static gint balsa_message_key_press_event(GtkWidget * widget,
                                           GdkEventKey * event,
@@ -403,6 +409,12 @@ bm_header_widget_new(BalsaMessage * bm, gboolean add_attachments_btn)
     gtk_container_add(GTK_CONTAINER(widget), hbox);
 
     text_view = gtk_text_view_new();
+    g_signal_connect(G_OBJECT(text_view), "focus_in_event",
+                     G_CALLBACK(balsa_message_limit_focus),
+                     (gpointer) bm);
+    g_signal_connect(G_OBJECT(text_view), "focus_out_event",
+                     G_CALLBACK(balsa_message_unlimit_focus),
+                     (gpointer) bm);
     bm_modify_font_from_string(text_view, balsa_app.message_font);
     gtk_text_view_set_editable(GTK_TEXT_VIEW(text_view), FALSE);
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(text_view), 2);
@@ -427,6 +439,12 @@ bm_header_widget_new(BalsaMessage * bm, gboolean add_attachments_btn)
 	gtk_container_add(GTK_CONTAINER(ebox), vbox);
 
 	button = gtk_button_new();
+        g_signal_connect(G_OBJECT(button), "focus_in_event",
+                         G_CALLBACK(balsa_message_limit_focus),
+                           (gpointer) bm);
+        g_signal_connect(G_OBJECT(button), "focus_out_event",
+                         G_CALLBACK(balsa_message_unlimit_focus),
+                           (gpointer) bm);
 	gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
 	gtk_container_add(GTK_CONTAINER(button), 
 			  gtk_image_new_from_stock("gnome-stock-attach", 
@@ -568,6 +586,12 @@ balsa_message_init(BalsaMessage * bm)
 
     /* Widget to hold message */
     message_widget = bm_message_widget_new(bm->header_container, FALSE);
+    g_signal_connect(G_OBJECT(message_widget), "focus_in_event",
+                     G_CALLBACK(balsa_message_limit_focus),
+                     (gpointer) bm);
+    g_signal_connect(G_OBJECT(message_widget), "focus_out_event",
+                     G_CALLBACK(balsa_message_unlimit_focus),
+                           (gpointer) bm);
     gtk_container_add(GTK_CONTAINER(bm->cont_viewport), message_widget);
     bm->content = bm_message_widget_get_content_box(message_widget);
 
@@ -673,6 +697,25 @@ balsa_message_destroy(GtkObject * object)
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
         (*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
+}
+
+static gint
+balsa_message_limit_focus(GtkWidget * widget, GdkEventFocus * event,
+                          BalsaMessage * bm)
+{
+    /* Disable can_focus on other message parts so that TAB does not
+     * attempt to move the focus on them. */
+    GList *list = g_list_append(NULL, widget);
+    gtk_container_set_focus_chain(GTK_CONTAINER(bm->content), list);
+    g_list_free(list);
+    return FALSE;
+}
+static gint
+balsa_message_unlimit_focus(GtkWidget * widget, GdkEventFocus * event,
+                            BalsaMessage * bm)
+{
+    gtk_container_unset_focus_chain(GTK_CONTAINER(bm->content));
+    return FALSE;
 }
 
 static gint
@@ -2292,6 +2335,12 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
             libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
 
         item = gtk_text_view_new();
+        g_signal_connect(G_OBJECT(item), "focus_in_event",
+                         G_CALLBACK(balsa_message_limit_focus),
+                           (gpointer) bm);
+        g_signal_connect(G_OBJECT(item), "focus_out_event",
+                         G_CALLBACK(balsa_message_unlimit_focus),
+                           (gpointer) bm);
         gtk_text_view_set_editable(GTK_TEXT_VIEW(item), FALSE);
         gtk_text_view_set_left_margin(GTK_TEXT_VIEW(item), 2);
         gtk_text_view_set_right_margin(GTK_TEXT_VIEW(item), 15);

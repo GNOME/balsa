@@ -2755,24 +2755,39 @@ static const struct callback_item {
     const char *icon_id;
     BalsaToolbarFunc callback;
 } callback_table[] = {
-    {BALSA_PIXMAP_ATTACHMENT, BALSA_TOOLBAR_FUNC(attach_clicked)},
-    {BALSA_PIXMAP_IDENTITY, BALSA_TOOLBAR_FUNC(change_identity_dialog_cb)},
-    {BALSA_PIXMAP_POSTPONE, BALSA_TOOLBAR_FUNC(postpone_message_cb)},
-    {BALSA_PIXMAP_PRINT, BALSA_TOOLBAR_FUNC(print_message_cb)},
-    {BALSA_PIXMAP_SAVE, BALSA_TOOLBAR_FUNC(save_message_cb)},
-    {BALSA_PIXMAP_SEND, BALSA_TOOLBAR_FUNC(send_message_toolbar_cb)},
-    {GTK_STOCK_CLOSE, BALSA_TOOLBAR_FUNC(close_window_cb)},
-    {GTK_STOCK_SPELL_CHECK, BALSA_TOOLBAR_FUNC(spell_check_cb)},
+    {BALSA_PIXMAP_ATTACHMENT,  BALSA_TOOLBAR_FUNC(attach_clicked)},
+    {BALSA_PIXMAP_IDENTITY,    BALSA_TOOLBAR_FUNC(change_identity_dialog_cb)},
+    {BALSA_PIXMAP_POSTPONE,    BALSA_TOOLBAR_FUNC(postpone_message_cb)},
+    {BALSA_PIXMAP_PRINT,       BALSA_TOOLBAR_FUNC(print_message_cb)},
+    {BALSA_PIXMAP_SAVE,        BALSA_TOOLBAR_FUNC(save_message_cb)},
+    {BALSA_PIXMAP_SEND,        BALSA_TOOLBAR_FUNC(send_message_toolbar_cb)},
+    {GTK_STOCK_CLOSE,          BALSA_TOOLBAR_FUNC(close_window_cb)},
+    {GTK_STOCK_SPELL_CHECK,    BALSA_TOOLBAR_FUNC(spell_check_cb)},
 #ifdef HAVE_GPGME
-    {BALSA_PIXMAP_GPG_SIGN, BALSA_TOOLBAR_FUNC(toggle_sign_tb_cb)},
+    {BALSA_PIXMAP_GPG_SIGN,    BALSA_TOOLBAR_FUNC(toggle_sign_tb_cb)},
     {BALSA_PIXMAP_GPG_ENCRYPT, BALSA_TOOLBAR_FUNC(toggle_encrypt_tb_cb)},
 #endif
-    {GTK_STOCK_UNDO, BALSA_TOOLBAR_FUNC(sw_undo_cb)},
-    {GTK_STOCK_REDO, BALSA_TOOLBAR_FUNC(sw_redo_cb)},
+    {GTK_STOCK_UNDO,           BALSA_TOOLBAR_FUNC(sw_undo_cb)},
+    {GTK_STOCK_REDO,           BALSA_TOOLBAR_FUNC(sw_redo_cb)},
 };
 
 /* Standard buttons; "" means a separator. */
 static const gchar* compose_toolbar[] = {
+#if defined(ENABLE_TOUCH_UI)
+    GTK_STOCK_UNDO,
+    GTK_STOCK_REDO,
+    GTK_STOCK_SPELL_CHECK,
+    "",
+    BALSA_PIXMAP_ATTACHMENT,
+    "",
+    BALSA_PIXMAP_SAVE,
+    "",
+    BALSA_PIXMAP_SEND,
+    "",
+    GTK_STOCK_CLOSE,
+    "",
+    BALSA_PIXMAP_IDENTITY,
+#else /* ENABLE_TOUCH_UI */
     BALSA_PIXMAP_SEND,
     "",
     BALSA_PIXMAP_ATTACHMENT,
@@ -2789,6 +2804,7 @@ static const gchar* compose_toolbar[] = {
     BALSA_PIXMAP_PRINT,
     "",
     GTK_STOCK_CLOSE,
+#endif /* ENABLE_TOUCH_UI */
 };
 
 /* Create the toolbar model for the compose window's toolbar.

@@ -1,4 +1,4 @@
-.TH Balsa 1 "21 Dec 1999" Version 0.6.0
+.TH Balsa 1 "21 Dec 1999" Version @VERSION@
 .SH NAME
 Balsa - the GNOME email client.
 

@@ -17,12 +17,12 @@ libbalsa/mime.c
 libbalsa/misc.c
 libbalsa/send.c
 
-libinit_balsa/balsa-druid-page.c
-libinit_balsa/balsa-druid-page-error.c
-libinit_balsa/balsa-druid-page-directory.c
-libinit_balsa/balsa-druid-page-finish.c
-libinit_balsa/balsa-druid-page-user.c
-libinit_balsa/balsa-druid-page-welcome.c
-libinit_balsa/balsa-initdruid.c
+libinit_balsa/balsa-druid-page.gob
+libinit_balsa/balsa-druid-page-error.gob
+libinit_balsa/balsa-druid-page-directory.gob
+libinit_balsa/balsa-druid-page-finish.gob
+libinit_balsa/balsa-druid-page-user.gob
+libinit_balsa/balsa-druid-page-welcome.gob
+libinit_balsa/balsa-initdruid.gob
 libinit_balsa/helper.c
 libinit_balsa/init_balsa.c

@@ -30,9 +30,9 @@
 %}
 
 class Balsa:Druid:Page from Gnome:Druid:Page:Standard {
-	private GnomeDruidPage *prev;
-	private GnomeDruidPage *next;
-	private GnomeDruid *druid;
+	public GnomeDruidPage *prev;
+	public GnomeDruidPage *next;
+	public GnomeDruid *druid;
 
 	/*We are abstract*/
 	/*public Gtk:Object *new( void ) { GtkObject *me; me = GTK_OBJECT( GET_NEW ); return me; }*/

@@ -61,13 +61,13 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 		gchar *preset;
 		char hostbuf[512];
 
-		self->emaster.setbits = 0;
-		self->emaster.numentries = 0;
-		self->emaster.donemask = 0;
-		self->ed0.master = &( self->emaster );
-		self->ed1.master = &( self->emaster );
-		self->ed2.master = &( self->emaster );
-		self->ed3.master = &( self->emaster );
+		self->_priv->emaster.setbits = 0;
+		self->_priv->emaster.numentries = 0;
+		self->_priv->emaster.donemask = 0;
+		self->_priv->ed0.master = &( self->_priv->emaster );
+		self->_priv->ed1.master = &( self->_priv->emaster );
+		self->_priv->ed2.master = &( self->_priv->emaster );
+		self->_priv->ed3.master = &( self->_priv->emaster );
 
 		table = GTK_TABLE( gtk_table_new( 5, 2, FALSE ) );
 
@@ -79,18 +79,18 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 			8, 4 );
 
 		preset = g_get_real_name();
-		balsa_init_add_table_entry( table, 0, _("Name:"), preset, &( self->ed0 ), GTK_WIDGET( self ), &( self->name ) );
+		balsa_init_add_table_entry( table, 0, _("Name:"), preset, &( self->_priv->ed0 ), GTK_WIDGET( self ), &( self->_priv->name ) );
 		
 		gethostname( hostbuf, 511 );
 		preset = g_strconcat( g_get_user_name(), "@", hostbuf, NULL );
-		balsa_init_add_table_entry( table, 1, _("Email address:"), preset, &( self->ed1 ), GTK_WIDGET( self ), &( self->email ) );
+		balsa_init_add_table_entry( table, 1, _("Email address:"), preset, &( self->_priv->ed1 ), GTK_WIDGET( self ), &( self->_priv->email ) );
 		g_free( preset );
 
 		preset = "localhost";
-		balsa_init_add_table_entry( table, 2, _("SMTP Server:"), preset, &( self->ed2 ), GTK_WIDGET( self ), &( self->smtp ) );
+		balsa_init_add_table_entry( table, 2, _("SMTP Server:"), preset, &( self->_priv->ed2 ), GTK_WIDGET( self ), &( self->_priv->smtp ) );
 
 		preset = g_strconcat( g_get_home_dir(), "/mail", NULL );
-		balsa_init_add_table_entry( table, 3, _("Local Mail Directory:"), preset, &( self->ed3 ), GTK_WIDGET( self ), &( self->localmaildir ) );
+		balsa_init_add_table_entry( table, 3, _("Local Mail Directory:"), preset, &( self->_priv->ed3 ), GTK_WIDGET( self ), &( self->_priv->localmaildir ) );
 		g_free( preset );
 
 		gtk_box_pack_start( GTK_BOX( (GNOME_DRUID_PAGE_STANDARD( self ))->vbox ),
@@ -115,7 +115,7 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 		/* Don't let them continue unless all entries have something. */
 		/* FIXME: unify this with code above */
 
-		if( ENTRY_MASTER_DONE( self->emaster ) ) {
+		if( ENTRY_MASTER_DONE( self->_priv->emaster ) ) {
 			gnome_druid_set_buttons_sensitive( GNOME_DRUID( druid ), TRUE, TRUE, TRUE );
 		} else {
 			gnome_druid_set_buttons_sensitive( GNOME_DRUID( druid ), TRUE, FALSE, TRUE );
@@ -131,19 +131,19 @@ class Balsa:Druid:Page:User from Balsa:Druid:Page {
 
 		if( balsa_app.address->personal )
 			g_free( balsa_app.address->personal );
-		balsa_app.address->personal = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->name ) ) );
+		balsa_app.address->personal = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->name ) ) );
 
 		if( balsa_app.address->mailbox )
 			g_free( balsa_app.address->mailbox );
-		balsa_app.address->mailbox = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->email ) ) );
+		balsa_app.address->mailbox = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->email ) ) );
 
 		if( balsa_app.smtp_server );
 			g_free( balsa_app.smtp_server );
-		balsa_app.smtp_server = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->smtp ) ) );
+		balsa_app.smtp_server = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->smtp ) ) );
 
 		if( balsa_app.local_mail_directory );
 			g_free( balsa_app.local_mail_directory );
-		balsa_app.local_mail_directory = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->localmaildir ) ) );
+		balsa_app.local_mail_directory = g_strdup( gtk_entry_get_text( GTK_ENTRY( self->_priv->localmaildir ) ) );
 
 		if( balsa_init_create_to_directory( balsa_app.local_mail_directory, &uhoh ) ) {
 			GtkObject *page;

@@ -455,10 +455,10 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
     GNode *walk;
     GList *glist = NULL;
     
-    glist = g_list_append (glist, "Sentbox");
-    glist = g_list_append (glist, "Draftbox");
-    glist = g_list_append (glist, "Outbox");
-    glist = g_list_append (glist, "Trash");
+    glist = g_list_append (glist, balsa_app.sentbox->name);
+    glist = g_list_append (glist, balsa_app.draftbox->name);
+    glist = g_list_append (glist, balsa_app.outbox->name);
+    glist = g_list_append (glist, balsa_app.trash->name);
     walk = g_node_last_child (balsa_app.mailbox_nodes);
     while (walk) {
       glist = g_list_append (glist, ((MailboxNode *)((walk)->data))->name);
@@ -622,6 +622,13 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   {
     if (balsa_app.bcc)
       gtk_entry_set_text (GTK_ENTRY (msg->bcc), balsa_app.bcc);
+  }
+
+  /* Fcc: */
+  {
+    if (type == SEND_CONTINUE && message->fcc_mailbox != NULL)
+      gtk_entry_set_text (GTK_ENTRY(GTK_COMBO(msg->fcc)->entry),
+                          message->fcc_mailbox->name);
   }
 
   /* Subject: */
@@ -882,13 +889,13 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   tmp = gtk_entry_get_text (GTK_ENTRY(GTK_COMBO(bsmsg->fcc)->entry));
   message->fcc_mailbox = NULL;
   if (balsa_app.mailbox_nodes && tmp != NULL) {
-    if (!strcmp (tmp, "Sentbox"))
+    if (!strcmp (tmp, balsa_app.sentbox->name))
        message->fcc_mailbox = balsa_app.sentbox;
-    else if (!strcmp (tmp, "Draftbox"))
+    else if (!strcmp (tmp, balsa_app.draftbox->name))
        message->fcc_mailbox = balsa_app.draftbox;
-    else if (!strcmp (tmp, "Outbox"))
+    else if (!strcmp (tmp, balsa_app.outbox->name))
        message->fcc_mailbox = balsa_app.outbox;
-    else if (!strcmp (tmp, "Trash"))
+    else if (!strcmp (tmp, balsa_app.trash->name))
        message->fcc_mailbox = balsa_app.trash;
     else {
       GNode *walk;
@@ -942,10 +949,19 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
       if (bsmsg->orig_message)
 	    message_reply (bsmsg->orig_message);
       }
-    else if (bsmsg->type == SEND_CONTINUE) {
-      if (bsmsg->orig_message)
-        message_delete (bsmsg->orig_message);
-    }
+    else if (bsmsg->type == SEND_CONTINUE)
+      {
+        if (bsmsg->orig_message)
+          {
+            message_delete (bsmsg->orig_message);
+            mailbox_commit_flagged_changes (bsmsg->orig_message->mailbox);
+          }
+        if (message->in_reply_to)
+          {
+            /* TODO: Find message to be marked as being answered with message
+             * ID, mailbox type and mailbox name. */
+          }
+      }
   }
 
   g_list_free (message->body_list);
@@ -1021,9 +1037,19 @@ postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   }
 
 
-  balsa_postpone_message (message);
-  if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message)
-      message_delete (bsmsg->orig_message);
+ if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL)
+     && bsmsg->orig_message)
+   balsa_postpone_message (message, bsmsg->orig_message, 
+                           gtk_entry_get_text (
+                               GTK_ENTRY(GTK_COMBO(bsmsg->fcc)->entry)));
+ else
+   balsa_postpone_message (message, NULL, gtk_entry_get_text (
+       GTK_ENTRY(GTK_COMBO(bsmsg->fcc)->entry)));
+ if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message)
+   {
+     message_delete (bsmsg->orig_message);
+     mailbox_commit_flagged_changes (bsmsg->orig_message->mailbox);
+   }
 
   g_list_free (message->body_list);
   message_destroy (message);

@@ -1,6 +1,6 @@
 # Note that this is NOT a relocatable package
 %define ver      @VERSION@
-%define rel      2
+%define rel      1
 %define prefix   /usr
 
 Summary:   Balsa Mail Client
@@ -29,16 +29,17 @@ IMAP.
 # Needed for snapshot releases.
 if [ ! -f configure ]; then
 %ifarch alpha
-  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --host=alpha-redhat-linux --prefix=%prefi
-x 
+  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --host=alpha-redhat-linux \
+    --prefix=%{prefix} --sysconfdir=/etc
 %else
-  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%prefix 
+  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%{prefix} --sysconfdir=/etc 
 %endif
 else
 %ifarch alpha
-  CFLAGS="$RPM_OPT_FLAGS" ./configure --host=alpha-redhat-linux --prefix=%prefix
+  CFLAGS="$RPM_OPT_FLAGS" ./configure --host=alpha-redhat-linux \
+    --prefix=%{prefix} --sysconfdir=/etc
 %else
-  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%prefix 
+  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix} --sysconfdir=/etc
 %endif
 fi
 
@@ -51,13 +52,8 @@ fi
 
 %install
 rm -rf $RPM_BUILD_ROOT
-#install -d $RPM_BUILD_ROOT/etc/{rc.d/init.d,pam.d,profile.d,X11/wmconfig}
 
-make prefix=$RPM_BUILD_ROOT%{prefix} install
-
-# cp -f balsa.1 $RPM_BUILD_ROOT%{prefix}/man/man1
-mkdir -p $RPM_BUILD_ROOT%{prefix}/man/man1
-install -c -m 644 balsa.1 $RPM_BUILD_ROOT%{prefix}/man/man1
+make prefix=$RPM_BUILD_ROOT%{prefix} sysconfdir=$RPM_BUILD_ROOT/etc install
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -68,9 +64,16 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bin/balsa
 %{prefix}/share/*
 %{prefix}/man/*
+%config /etc/*
 
 
 %changelog
+* Thu Dec 30 1999 Bruno Pires Marinho <bapm@camoes.rnl.ist.utl.pt>
+
+- Improved the spec file by adding a sysconfdir=/etc, removing the man
+  instalation because balsa does it now and adding the files on the /etc
+  to the distribution
+
 * Tue Oct  5 1999 Jan Nieuwenhuizen <janneke@gnu.org>
 
 - Fixed man install

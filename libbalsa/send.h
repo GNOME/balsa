@@ -26,7 +26,8 @@ extern "C"
 #endif				/* __cplusplus */
 
   gboolean balsa_send_message (Message * message);
-  gboolean balsa_postpone_message (Message * message);
+  gboolean balsa_postpone_message (Message * message, Message *reply_message,
+                                   gchar * fcc);
 
 
 #ifdef __cplusplus

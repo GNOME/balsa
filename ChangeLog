@@ -1,11 +1,70 @@
+1999-12-30  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
+
+	* libbalsa/mailbox.c (translate_message):
+	* src/sendmsg-window.c:
+	* libbalsa/send.h:
+	* libbalsa/send.c: Added the code necessary to save the message ID
+	of the replyed message. The mailbox name where the message is
+	located is also saved. Added also the code to read the saved
+	stuff. Left a TODO to find the message and set it answered.
+
+	* libbalsa/mailbox.c (translate_message): Include set message_id
+	on the Message.
+
+	* src/main-window.c (continue_message_cb): Only continue on the
+	draft mailbox.
+
+	* src/sendmsg-window.c: The mailbox where the message was erased
+	because it was sent or continued should be immediately
+	committed. Remove the direct names of the mailboxes (like Sentbox)
+	and put the current name instead (like balsa_app.sentbox->name).
+
+	* balsa.spec.in: Improved the spec file by adding a
+	sysconfdir=/etc, removing the man instalation because balsa does
+	it now and adding the files on the /etc to the distribution.
+
+	* Makefile.am:
+	* .cvsignore:
+	* balsa.1.in:
+	* balsa.1: Removed balsa.1 and add balsa.1.in with 0.6.0 replaced
+	by @VERSION@. The configure file now generated the balsa.1. Also
+	made the Makefile.am install the man file.
+
+	* help/C/Makefile.am:
+	* images/Makefile.am: Removed the use_sys_install stuff and make it
+	right.
+
+	* configure.in:
+	* acconfig.h: Normal users don't need gob to build the system so
+	we don't check for is presence. Also removed the use_sys_install
+	stuff because it makes no sence.
+
+	* libinit_balsa/*.gob: Made the gob files compatible with the
+	latest version 0.91.2.
+
+	* libinit_balsa/Makefile.am: The built files go with the
+	distribution and the GOB variable is gone. Also added the option
+	--no-private-header to gob command. This way we avoing adding a
+	lot of header files.
+
+	* libinit_balsa/.cvsignore: Ignore generated files.
+
+	* src/balsa-message.c: The fcc shows up if exists for postponed
+	messages.
+
+	* libbalsa/mailbox.c (translate_message):
+	* src/sendmsg-window.c:
+	* libbalsa/send.h:
+	* libbalsa/send.c (balsa_postpone_message): The fcc is saved in
+	postponed messages.
+
 1999-12-30  Ragnar Henriksne <ragnar@juniks.org>
 	* src/pref-manager.c - total rewrite of the layout, and new features.
 	* src/balsa-app.h new stuff to balsa_app. (new features)
 	* src/arrow.xpm - new file ( a dummy arrow ) until we manage to
-          create some real stuff...
-        * src/main.c - added the functionallity "empty trash".
+	create some real stuff...
+	* src/main.c - added the functionallity "empty trash".
 	* src/save-restore.c - save and restore of new features.
-
 
 1999-12-29  Martin Norbäck  <d95mback@dtek.chalmers.se>
 

@@ -35,7 +35,7 @@ class Balsa:Druid:Page:Welcome from Gnome:Druid:Page:Start {
 	public Gtk:Object *new( Balsa:InitDruid *druid (check null type) ) { 
 		GtkObject *self = GTK_OBJECT( GET_NEW );
 
-		(BALSA_DRUID_PAGE_WELCOME( self ))->druid = druid;
+		(BALSA_DRUID_PAGE_WELCOME( self ))->_priv->druid = druid;
 		gnome_druid_page_start_set_logo( GNOME_DRUID_PAGE_START( self ), druid->default_logo );
 		gnome_druid_page_start_set_watermark( GNOME_DRUID_PAGE_START( self ), balsa_init_get_png( "balsa-watermark.png" ) );
 

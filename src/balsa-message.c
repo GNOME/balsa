@@ -561,6 +561,14 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 				      row[1], 0.0, next_height);
     }
 
+  if (message->fcc_mailbox)
+    {
+      next_height = next_row_height (row);
+      item = balsa_message_text_item (_("Fcc:"), row[0], 0.0, next_height);
+      data = balsa_message_text_item (message->fcc_mailbox->name, row[1], 0.0,
+                                      next_height);
+    }
+
   if (message->subject)
     {
       next_height = next_row_height (row);

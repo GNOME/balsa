@@ -1,3 +1,17 @@
 .deps
 Makefile.in
 Makefile
+balsa-druid-page-directory.h
+balsa-druid-page-directory.c
+balsa-druid-page-error.h
+balsa-druid-page-error.c
+balsa-druid-page-finish.h
+balsa-druid-page-finish.c
+balsa-druid-page-user.h
+balsa-druid-page-user.c
+balsa-druid-page-welcome.h
+balsa-druid-page-welcome.c
+balsa-druid-page.h
+balsa-druid-page.c
+balsa-initdruid.h
+balsa-initdruid.c

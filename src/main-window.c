@@ -1113,7 +1113,11 @@ forward_message_cb (GtkWidget * widget, gpointer data)
 static void
 continue_message_cb (GtkWidget * widget, gpointer data)
 {
-  balsa_message_continue (widget, balsa_window_find_current_index (BALSA_WINDOW (data)));
+  BalsaIndex *index;
+
+  index = BALSA_INDEX (balsa_window_find_current_index (BALSA_WINDOW (data)));
+  if (index->mailbox == balsa_app.draftbox)
+      balsa_message_continue (widget, index);
 }
 
 

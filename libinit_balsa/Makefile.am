@@ -35,13 +35,10 @@ GOBFILES =				\
 	balsa-druid-page-finish.gob
 
 %.c: %.gob
-if USE_GOB
-	$(GOB) $<
-else
-	@echo "Info: Not using gob on $<"
-endif
+	gob --no-private-header $<
 
-EXTRA_DIST = $(GOBFILES)
+EXTRA_DIST = $(GOBFILES) \
+	$(BUILT_SOURCES)
 
 INCLUDES=-I. -I$(top_srcdir) \
 	-I$(top_builddir)/libmutt \

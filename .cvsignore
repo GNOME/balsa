@@ -25,3 +25,4 @@ config.h.in
 COPYING
 intl
 gmon.out
+balsa.1

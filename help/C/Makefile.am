@@ -5,11 +5,7 @@ EXTRA_DIST = \
 	topic.dat \
 	$(SGML_FILES)
 
-if sys_install
-balsa_helpdir = $(gnomedatadir)/gnome/help/balsa/C
-else
 balsa_helpdir = $(datadir)/gnome/help/balsa/C
-endif
 
 balsa_help_DATA = \
 	topic.dat \

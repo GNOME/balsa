@@ -40,12 +40,12 @@ class Balsa:Druid:Page:Finish from Balsa:Druid:Page {
 	 }
 
 	init( self ) {
-		self->text = gtk_label_new( _(
+		self->_priv->text = gtk_label_new( _(
 			"You've successfully set up Balsa. Have fun!\n"
 			"   -- The Balsa development team"
 			) );
-		gtk_label_set_justify( GTK_LABEL( self->text ), GTK_JUSTIFY_CENTER );
-		gtk_box_pack_start( GTK_BOX( (GNOME_DRUID_PAGE_STANDARD( self ))->vbox ), GTK_WIDGET( self->text ),
+		gtk_label_set_justify( GTK_LABEL( self->_priv->text ), GTK_JUSTIFY_CENTER );
+		gtk_box_pack_start( GTK_BOX( (GNOME_DRUID_PAGE_STANDARD( self ))->vbox ), GTK_WIDGET( self->_priv->text ),
 			TRUE, TRUE, 8 );
 	}
 

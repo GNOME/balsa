@@ -37,8 +37,8 @@ class Balsa:Druid:Page:Error from Balsa:Druid:Page {
 	public GtkObject *new_after( Balsa:Druid:Page *prev (check null type), gchar *title (check null), gchar *text (check null) ) {
 		BalsaDruidPageError *self = BALSA_DRUID_PAGE_ERROR( GET_NEW );
 
-		self->real_next = prev->next;
-		self->text = g_strdup( text );
+		self->_priv->real_next = prev->next;
+		self->_priv->text = g_strdup( text );
 		prev->next = GNOME_DRUID_PAGE( self );
 		(BALSA_DRUID_PAGE( self ))->prev = GNOME_DRUID_PAGE( prev );
 		(BALSA_DRUID_PAGE( self ))->next = NULL;
@@ -74,7 +74,7 @@ class Balsa:Druid:Page:Error from Balsa:Druid:Page {
 
 		PARENT_HANDLER( self );
 
-		label = gtk_label_new( (BALSA_DRUID_PAGE_ERROR( self ))->text );
+		label = gtk_label_new( (BALSA_DRUID_PAGE_ERROR( self ))->_priv->text );
 		gtk_box_pack_start( GTK_BOX( (GNOME_DRUID_PAGE_STANDARD( self ))->vbox ), label, TRUE, TRUE, 8 );
 
 		errtext = g_strdup_printf( "Technical Information:\n"
@@ -102,7 +102,7 @@ class Balsa:Druid:Page:Error from Balsa:Druid:Page {
 
 		g_return_val_if_fail( self->prev != NULL, TRUE );
 
-		(BALSA_DRUID_PAGE( self->prev ))->next = (BALSA_DRUID_PAGE_ERROR( self ))->real_next;
+		(BALSA_DRUID_PAGE( self->prev ))->next = (BALSA_DRUID_PAGE_ERROR( self ))->_priv->real_next;
 		gnome_druid_set_page( GNOME_DRUID( (BALSA_DRUID_PAGE( self ))->druid ), GNOME_DRUID_PAGE( self->prev ) );
 		gtk_object_destroy( GTK_OBJECT( self ) );
 		return TRUE;

@@ -20,6 +20,7 @@
 #include "config.h"
 #include <glib.h>
 #include <stdarg.h>
+#include <ctype.h>
 /* this should be removed.  it is only used for _() for internationalzation */
 #include <gnome.h>
 
@@ -33,6 +34,7 @@
 #include <pthread.h>
 #endif
 
+#include "../src/balsa-app.h"
 #include "mailbackend.h"
 
 #include "libbalsa.h"
@@ -1271,7 +1273,8 @@ translate_message (HEADER * cur)
   ADDRESS *addy;
   Address *addr;
   ENVELOPE *cenv;
-  gchar rettime[27];
+  LIST *tmp;
+  gchar rettime[27], *p;
   struct tm *footime;
 
   if (!cur)
@@ -1306,8 +1309,52 @@ translate_message (HEADER * cur)
       addr = translate_address (addy);
       message->bcc_list = g_list_append (message->bcc_list, addr);
     }
+  
+  /* Get fcc from message */
+  for (tmp = cenv->userhdrs; tmp; )
+    {
+      if (mutt_strncasecmp ("X-Mutt-Fcc:", tmp->data, 11) == 0)
+        {
+          p = tmp->data + 11;
+          SKIPWS (p);
+
+          message->fcc_mailbox = NULL;
+          if (balsa_app.mailbox_nodes && p != NULL) {
+            if (!strcmp (p, balsa_app.sentbox->name))
+              message->fcc_mailbox = balsa_app.sentbox;
+            else if (!strcmp (p, balsa_app.draftbox->name))
+              message->fcc_mailbox = balsa_app.draftbox;
+            else if (!strcmp (p, balsa_app.outbox->name))
+              message->fcc_mailbox = balsa_app.outbox;
+            else if (!strcmp (p, balsa_app.trash->name))
+              message->fcc_mailbox = balsa_app.trash;
+            else {
+                GNode *walk;
+    
+                walk = g_node_last_child (balsa_app.mailbox_nodes);
+                while (walk) {
+                  if (!strcmp (p, ((MailboxNode *)((walk)->data))->name)) {
+                    message->fcc_mailbox =
+                        ((MailboxNode *)((walk)->data))->mailbox;
+                    break;
+                  } else
+                    walk = walk->prev;
+                }
+            }
+          }
+        }
+      else if (mutt_strncasecmp ("X-Mutt-Fcc:", tmp->data, 18) == 0)
+        {
+          p = tmp->data + 18;
+          SKIPWS (p);
+
+          message->in_reply_to = g_strdup (p);
+        }
+      tmp = tmp->next;
+    }
 
   message->subject = g_strdup (cenv->subject);
+  message->message_id = g_strdup (cenv->message_id);
 
   /* more! */
 

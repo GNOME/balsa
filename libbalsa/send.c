@@ -337,7 +337,8 @@ void balsa_send_thread(MessageQueueItem *first_message)
 #endif
 
 gboolean
-balsa_postpone_message (Message * message)
+balsa_postpone_message (Message * message, Message * reply_message, 
+                        gchar * fcc)
 {
   HEADER *msg;
   BODY *last, *newbdy;
@@ -429,7 +430,19 @@ balsa_postpone_message (Message * message)
 
   encode_descriptions (msg->content);
 
-  mutt_write_fcc (MAILBOX_LOCAL (balsa_app.draftbox)->path, msg, NULL, 1, NULL);
+  if (reply_message != NULL)
+    /* Just saves the message ID, mailbox type and mailbox name. We could
+     * search all mailboxes for the ID but that would not be too fast. We
+     * could also add more stuff ID like path, server, ... without this
+     * if you change the name of the mailbox the flag will not be set. */
+    tmp = g_strdup_printf ("%s\r%d\r%s",
+                           reply_message->message_id,
+                           reply_message->mailbox->type,
+                           reply_message->mailbox->name);
+  else
+    tmp = NULL;
+  mutt_write_fcc (MAILBOX_LOCAL (balsa_app.draftbox)->path, msg, tmp, 1, fcc);
+
   if (balsa_app.draftbox->open_ref > 0)
     mailbox_check_new_messages (balsa_app.draftbox);
   mutt_free_header (&msg);
@@ -709,8 +722,6 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
   FILE *tempfp;
   HEADER *msg_tmp;
   MESSAGE *mensaje;
-  char datos[10];
-  
 				
   if (!msg->env)
     msg->env = mutt_new_envelope ();

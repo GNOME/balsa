@@ -1,3 +1,7 @@
+2005-02-16 09:13  PeterB
+
+	* src/mailbox-conf.c: manage sensitivity of the OK/Update button.
+
 2005-02-15 21:48  Craig Routledge <webstuff@craigroutledge.com>
 
 	* src/balsa-message.c: better handling of

@@ -541,9 +541,14 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
       break;
     }
 
-  gtk_entry_append_text (GTK_ENTRY (msg->subject), newsubject);
-  g_free (newsubject);
-  newsubject = NULL;
+  if (type == SEND_REPLY ||
+      type == SEND_REPLY_ALL ||
+      type == SEND_FORWARD)
+    {
+      gtk_entry_set_text (GTK_ENTRY (msg->subject), newsubject);
+      g_free (newsubject);
+      newsubject = NULL;
+    }
 
   if (type == SEND_REPLY_ALL)
     {

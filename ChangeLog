@@ -1,3 +1,8 @@
+2003-08-14 19:33  PeterB
+
+	* src/mailbox-conf.c: Check whether a mailbox view is already in
+	balsa_app.mailbox_views.
+
 2003-08-13 19:26  PeterB
 
 	* libbalsa/body.c: Don't include G_DIR_SEPARATORs in temp_filenames

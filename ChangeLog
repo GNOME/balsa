@@ -1,5 +1,28 @@
 1999-01-08  Nat Friedman  <nat@nat.org>
 
+	* src/sendmsg-window.c (file_menu): Standardized.
+
+	(close_window): Fixed signature.
+	(send_message_cb): Likewise.
+	(attach_clicked): Likewise.
+	(close_window): Likewise.
+	(attach_dialog_cancel): Likewise.
+
+1999-01-08  Nat Friedman  <nat@nat.org>
+
+	* src/message-window.c: Include sendmsg-window.h and message-window.h
+	Added a prototype for destroy_message_window.
+
+	(message_menu): A new menu.
+	(replyto_message_cb): Calback for the new menu.
+	(replytoall_message_cb): Likewise.
+	(forward_message_cb): Likewise.
+
+	(message_window_new): gtk_object_set_data stores the
+ 	MessageWindow, not the window.
+
+1999-01-08  Nat Friedman  <nat@nat.org>
+
 	* src/main-window.c (APPBAR_KEY): Changed the PROGRESSBAR_KEY to
  	APPBAR_KEY.
 	(main_window_set_cursor): Use the GnomeAppBar's progress meter.

@@ -195,19 +195,13 @@ struct _LibBalsaMailboxClass {
     GObjectClass parent_class;
 
     /* Signals */
-    gboolean (*open_mailbox) (LibBalsaMailbox * mailbox);
-    void (*close_mailbox) (LibBalsaMailbox * mailbox);
     void (*changed) (LibBalsaMailbox * mailbox);
-
-    void (*messages_status_changed) (LibBalsaMailbox * mailbox,
-				     GList * messages,
-				     gint flag);
     void (*progress_notify) (LibBalsaMailbox * mailbox, int type,
                              int prog, int tot, const gchar* msg);
-    void (*set_unread_messages_flag) (LibBalsaMailbox * mailbox,
-				      gboolean flag);
 
     /* Virtual Functions */
+    gboolean (*open_mailbox) (LibBalsaMailbox * mailbox);
+    void (*close_mailbox) (LibBalsaMailbox * mailbox);
     LibBalsaMessage *(*get_message) (LibBalsaMailbox * mailbox, guint msgno);
     void (*prepare_threading)(LibBalsaMailbox *mailbox, guint lo, guint hi);
     void (*fetch_message_structure)(LibBalsaMailbox *mailbox,

@@ -169,6 +169,24 @@ bab_set_address_book(LibBalsaAddressBook *ab, GtkWidget* list,
     return TRUE;
 }
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+static void
+select_address_book_cb(GtkRadioAction * action, GtkRadioAction * current,
+                       gpointer callback_data)
+{
+    GList *l;
+
+    if (action != current)
+        return;
+    l = g_list_nth(contacts_app.address_book_list,
+                   GPOINTER_TO_INT(callback_data));
+    if (!l)
+        return;
+    ab_set_edit_widget(NULL, FALSE);
+    bab_set_address_book(LIBBALSA_ADDRESS_BOOK(l->data),
+                         contacts_app.entry_list, NULL);
+}
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
 static void
 select_address_book_cb(gpointer callback_data, guint callback_action,
                        GtkWidget *w)
@@ -183,6 +201,7 @@ select_address_book_cb(gpointer callback_data, guint callback_action,
     bab_set_address_book(LIBBALSA_ADDRESS_BOOK(l->data),
                          contacts_app.entry_list, NULL);
 }
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 static void
 address_changed_cb(GtkWidget *w, gpointer data)
@@ -194,7 +213,11 @@ address_changed_cb(GtkWidget *w, gpointer data)
 
 
 static void
+#if GTK_CHECK_VERSION(2, 4, 0)
+edit_new_person_cb(GtkAction * action, gpointer user_data)
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
 edit_new_person_cb(gpointer callback_data, guint callback_action, GtkWidget *w)
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 {
     GtkWidget *ew;
     contacts_app.displayed_address = NULL;
@@ -205,6 +228,124 @@ edit_new_person_cb(gpointer callback_data, guint callback_action, GtkWidget *w)
     gtk_widget_set_sensitive(contacts_app.remove_button, FALSE);
 }
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+/* Normal items */
+static GtkActionEntry entries[] = {
+    {"FileMenu", NULL, "_File"},
+    {"EntryMenu", NULL, "_Entry"},
+    {"HelpMenu", NULL, "_Help"},
+    {"New", GTK_STOCK_NEW, "_New", NULL, "New file", NULL},
+    {"Open", GTK_STOCK_OPEN, "_Open", NULL, "Open a file", NULL},
+    {"Save", GTK_STOCK_SAVE, "_Save", NULL, "Save file", NULL},
+    {"SaveAs", GTK_STOCK_SAVE_AS, "Save _As", "<shift><control>S",
+     "Save file as", NULL},
+    {"Quit", GTK_STOCK_QUIT, "_Quit", NULL, "Exit the program",
+     gtk_main_quit},
+    {"NewPerson", GTK_STOCK_NEW, "_New Person", "<shift><control>N",
+     "Add new person", G_CALLBACK(edit_new_person_cb)},
+    {"NewGroup", GTK_STOCK_NEW, "New _Group", "<control>G",
+     "Add new group", NULL},
+    {"About",
+#if GTK_CHECK_VERSION(2, 6, 0)
+     GTK_STOCK_ABOUT,
+#else
+     GNOME_STOCK_ABOUT,
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
+     "_About", NULL, NULL, NULL}
+};
+
+static const char *ui_description =
+"<ui>"
+"  <menubar name='MainMenu'>"
+"    <menu action='FileMenu'>"
+"      <menuitem action='New'/>"
+"      <menuitem action='Open'/>"
+"      <menuitem action='Save'/>"
+"      <menuitem action='SaveAs'/>"
+"      <separator/>"
+"      <menuitem action='Quit'/>"
+"      <separator/>"
+"    </menu>"
+"    <menu action='EntryMenu'>"
+"      <menuitem action='NewPerson'/>"
+"      <menuitem action='NewGroup'/>"
+"    </menu>"
+"    <menu action='HelpMenu'>"
+"      <menuitem action='About'/>"
+"    </menu>"
+"  </menubar>"
+"</ui>";
+
+static void
+get_main_menu(GtkWidget * window, GtkWidget ** menubar,
+              GList * address_books)
+{
+    GtkActionGroup *action_group;
+    GtkUIManager *ui_manager;
+    GtkAccelGroup *accel_group;
+    GError *error;
+    GList *ab;
+    int cnt;
+    GSList *group = NULL;
+
+    action_group = gtk_action_group_new("MenuActions");
+    gtk_action_group_add_actions(action_group, entries,
+                                 G_N_ELEMENTS(entries), window);
+
+    ui_manager = gtk_ui_manager_new();
+    gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
+
+    accel_group = gtk_ui_manager_get_accel_group(ui_manager);
+    gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
+
+    error = NULL;
+    if (!gtk_ui_manager_add_ui_from_string(ui_manager, ui_description,
+                                           -1, &error)) {
+        g_message("building menus failed: %s", error->message);
+        g_error_free(error);
+        return;
+    }
+
+    for (cnt = 1, ab = address_books; ab; ab = ab->next, cnt++) {
+        LibBalsaAddressBook *address_book;
+        guint merge_id;
+        gchar *accelerator;
+        GtkRadioAction *radio_action;
+
+        address_book = LIBBALSA_ADDRESS_BOOK(ab->data);
+
+        radio_action = gtk_radio_action_new(address_book->name,
+                                            address_book->name, NULL,
+                                            NULL, cnt - 1);
+        if (group)
+            gtk_radio_action_set_group(radio_action, group);
+        else {
+            group = gtk_radio_action_get_group(radio_action);
+	    gtk_action_activate(GTK_ACTION(radio_action));
+	}
+        g_signal_connect(G_OBJECT(radio_action), "changed",
+                         G_CALLBACK(select_address_book_cb),
+                         GINT_TO_POINTER(cnt - 1));
+
+        accelerator =
+            cnt <= 9 ? g_strdup_printf("<control>%d", cnt) : NULL;
+        gtk_action_group_add_action_with_accel(action_group,
+                                               GTK_ACTION(radio_action),
+                                               accelerator);
+        g_free(accelerator);
+
+        merge_id = gtk_ui_manager_new_merge_id(ui_manager);
+        gtk_ui_manager_add_ui(ui_manager, merge_id,
+                              "/ui/MainMenu/FileMenu/",
+                              address_book->name, address_book->name,
+                              GTK_UI_MANAGER_AUTO, FALSE);
+    }
+
+    if (menubar)
+        /* Finally, return the actual menu bar created by the UIManager. */
+        *menubar = gtk_ui_manager_get_widget(ui_manager, "/MainMenu");
+}
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
 static GtkItemFactoryEntry menu_items[] = {
   { "/_File",         NULL,         NULL, 0, "<Branch>" },
   { "/File/_New",     "<control>N", NULL, 0, NULL },
@@ -266,6 +407,7 @@ get_main_menu(GtkWidget  *window, GtkWidget **menubar, GList* address_books)
         /* Finally, return the actual menu bar created by the item factory. */
         *menubar = gtk_item_factory_get_widget (item_factory, "<main>");
 }
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 
 static void

@@ -497,9 +497,9 @@ libbalsa_ask_for_cert_acceptance(X509 *cert, const char *explanation)
 }
 #else /* BALSA_USE_THREADS */
 int
-libbalsa_ask_for_cert_acceptance(X509 *cert)
+libbalsa_ask_for_cert_acceptance(X509 *cert, const char *explanation)
 {
-    return ask_cert_real(cert);
+    return ask_cert_real(cert, explanation);
 }
 #endif /* BALSA_USE_THREADS */
 

@@ -483,9 +483,15 @@ AC_ARG_WITH(gss, [  --with-gss              Enable GSS [default=no]],
     [with_gss=$withval],[with_gss=no])
 
 dnl ##########################################################################
-dnl GMime version?
+dnl Check versions
 dnl ##########################################################################
 
+if $PKG_CONFIG --atleast-version=2.2.0 glib-2.0 ; then
+  AC_DEFINE(HAVE_GLIB22,1,[Defined when glib version is at least 2.2.0])
+fi
+dnl if $PKG_CONFIG --atleast-version=2.2.0 gtk+-2.0 ; then
+dnl   AC_DEFINE(HAVE_GTK22,1,[Defined when Gtk+ version is at least 2.2.0])
+dnl fi
 if $PKG_CONFIG --atleast-version=2.1.0 gmime-2.0 ; then
   AC_DEFINE(HAVE_GMIME21,1,[Defined when GMime version is at least 2.1.0])
 fi

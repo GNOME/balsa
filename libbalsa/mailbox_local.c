@@ -361,9 +361,10 @@ libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
 	if (i < 0) {
 	    g_print("mx_check_mailbox() failed on %s\n", mailbox->name);
 	} 
-	if( i == M_REOPENED) {
+	if( i == M_REOPENED && LIBBALSA_IS_MAILBOX_MBOX(mailbox)) {
 	    /* redo everything from the start instead of looking
-	       only at new messages */
+	       only at new messages, but only for mboxes, maildir
+	       seems to break with this */
 	    libbalsa_mailbox_free_messages(mailbox);	    
 	}
 	if (i == M_NEW_MAIL || i == M_REOPENED) {

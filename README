@@ -85,20 +85,27 @@ Libraries:
 	Balsa uses libESMTP library available at 
 http://www.stafford.uklinux.net/libesmtp/
 The current version is available at
-http://www.stafford.uklinux.net/libesmtp/libesmtp-0.8.4.tar.bz2
+http://www.stafford.uklinux.net/libesmtp/libesmtp-0.8.9.tar.bz2
 or
-http://www.stafford.uklinux.net/libesmtp/libesmtp-0.8.4.tar.gz
+http://www.stafford.uklinux.net/libesmtp/libesmtp-0.8.9.tar.gz
 
 Note, that it the current version requires --enable-require-all-recipents
 option to the configure script. You can grab {i386,src}.rpm that has
 this option enabled from ftp://ftp.chbm.nu/pub/ (built on RH 6.2)
 or from
-http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.8.4-1.i386.rpm
-http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.8.4-1.src.rpm
+http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.8.9-1.i386.rpm
+http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.8.9-1.src.rpm
+
+        If you compile libesmtp yourself, make sure that you can link
+a program with it, or alternatively, inform configure script about the
+location of libesmtp, e.g.: 
+
+LIBS=-L/usr/local/lib ./configure <configure options>
+
 	
-	The binaries are compiled against gnome-libs-1.2.8, if you use
-older/newer libraries, you will need to recompile balsa from the
-source.  Balsa also needs the pspell spell checking libraries.
+	The balsa binaries are compiled against gnome-libs-1.2.8, if
+you use older/newer libraries, you will need to recompile balsa from
+the source.  Balsa also needs the pspell spell checking libraries.
 
 	Make sure you have libtool installed (if you get some error 
 messages during compilation or when running precompiled binaries saying that

@@ -1,3 +1,12 @@
+2001-07-19  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* AUTHORS: update Ian Campbell's address.
+	* INSTALL: add info about gnome-print, libESMTP and pcre.
+	* src/balsa-mblist.c: fix hotspot calculation with shown headers
+	M. Thielker <balsa@t-data.com>
+	* src/spell-check.c: fix regexp's.
+	* src/toolbar-factory.c: fix hit translations.
+
 2001-07-18  Carlos Morgado  <chbm@chbm.nu>
 
 	* configure.in:

@@ -1206,9 +1206,9 @@ next_word(BalsaSpellCheck * spell_check)
     static gboolean in_line = FALSE;
 
 #ifdef HAVE_PCRE
-    const gchar *new_word_regex = "\\<[[:alpha:]']*\\>";
-#else
     const gchar *new_word_regex = "\\b[[:alpha:]']+\\b";
+#else
+    const gchar *new_word_regex = "\\<[[:alpha:]']*\\>";
 #endif
 
     /* compile the regular expressions */

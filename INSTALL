@@ -11,8 +11,9 @@ Please make sure you have the following things:
 	GTK         >= 1.2.1
 	Imlib       >= 1.9.2
 	gnome-libs  >= 1.2.1  (see notes below)
+	gnome-print >= 0.25
 	libpspell   >= 0.11.2 (and at least one spell check module)
-	libesmtp    >= 0.8.1   http://www.stafford.uklinux.net/libesmtp/
+	libesmtp    >= 0.8.3   http://www.stafford.uklinux.net/libesmtp/
 	
 	If you do not have these, please check:
 
@@ -25,6 +26,16 @@ Please make sure you have the following things:
 	Installation of pspell is known to be troublesome, make sure 
 	you have read - and understood - all the details. Feedback
 	should to to pspell team, not balsa team.
+
+	It is highly recommended to install and use the Perl Compatible
+	Regular Expression library (PCRE), version 3.0 or higher.
+	Further information about this library is available from
+
+	http://www.pcre.org/
+
+	Some pre-built PCRE rpm's can be found at
+
+	http://www.rpmfind.net/linux/rpm2html/search.php?query=pcre
 
 	You need also gnome-doc-tools for building the help system.
 	They are available from

@@ -396,7 +396,7 @@ get_toolbar(GtkWidget *window, int toolbar)
 	}
 
 	if(i != MAXTOOLBARITEMS && tmpdata[i].widget == NULL) {
-	    text=tmp=g_strdup(toolbar_buttons[button].button_text);
+	    text=tmp=g_strdup(_(toolbar_buttons[button].button_text));
 	    if(!balsa_app.toolbar_wrap_button_text)
 		while(*tmp) {
 		    if(*tmp == '\n')
@@ -418,8 +418,8 @@ get_toolbar(GtkWidget *window, int toolbar)
 	    tmpdata[i].widget=
 		gtk_toolbar_append_element(
 		    bar, type, NULL, text, 
-		    toolbar_buttons[button].help_text,
-		    toolbar_buttons[button].help_text,
+		    _(toolbar_buttons[button].help_text),
+		    _(toolbar_buttons[button].help_text),
 		    gnome_stock_pixmap_widget(
 			window, toolbar_buttons[button].pixmap_id),
 		    tmpdata[i].callback,

@@ -1513,6 +1513,7 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
     BalsaMailboxNode* mbnode;
     gint row, column;
     gint i;
+    int adjust=0;
     LibBalsaMessage** message_array;
 
 
@@ -1527,7 +1528,12 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
     g_return_if_fail(messages);
     orig_mailbox = ((LibBalsaMessage*) messages->data)->mailbox;
 
+    /* Adjust for column header size */
+    adjust +=GTK_CLIST(ctree)->column_title_area.height;
+
     /* find the node and mailbox */
+    y-=adjust;
+    
     if (gtk_clist_get_selection_info (GTK_CLIST (ctree), x, y, 
                                       &row, &column)) {
         node = gtk_ctree_node_nth (ctree, row);
@@ -1573,11 +1579,18 @@ mblist_drag_motion_cb (GtkWidget* mblist, GdkDragContext* context,
 #if 0
     gint row, col;
     gint flag;
+    int adjust=0;
     
     flag = gtk_clist_get_selection_info (GTK_CLIST (mblist), x, y, 
 					 &row, &col);
     
     if (flag) {
+        adjust +=GTK_CLIST(mblist)->column_title_area.height;
+
+    y-=adjust;
+    gtk_clist_get_selection_info (GTK_CLIST (mblist), x, y, 
+                                  &row, &col);
+
 	gtk_signal_handler_block_by_func(GTK_OBJECT (mblist),
 					 GTK_SIGNAL_FUNC (select_mailbox), 
 					 NULL);

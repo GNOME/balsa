@@ -61,7 +61,7 @@ extern "C" {
         LibBalsaMessage* current_message;
         gboolean prev_message;
         gboolean next_message;
-	GSList *selected;
+	GArray *selected;
         gchar *sos_filter; /* SenderOrSubject filter string, if any */
 
         /* signal handler ids */
@@ -110,7 +110,7 @@ extern "C" {
                                     LibBalsaCondition *flag_filter);
 
 /* move or copy a list of messages */
-    void balsa_index_transfer(BalsaIndex * index, GList * messages,
+    void balsa_index_transfer(BalsaIndex * index, GArray * msgnos,
                               LibBalsaMailbox * to_mailbox, gboolean copy);
 
 /* select up/down the index */

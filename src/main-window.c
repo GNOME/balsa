@@ -87,13 +87,14 @@ static GnomeUIInfo file_menu[] =
 {
     /* Ctrl-M */
   {
- GNOME_APP_UI_ITEM, N_ ("_Get new mail"), NULL, check_new_messages_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_MAIL_RCV, 'M', GDK_CONTROL_MASK, NULL
+ GNOME_APP_UI_ITEM, N_ ("_Get new mail"), N_("Fetch new incoming mail"),
+ check_new_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+ GNOME_STOCK_MENU_MAIL_RCV, 'M', GDK_CONTROL_MASK, NULL
   },
 
   GNOMEUIINFO_SEPARATOR,
 
-  GNOMEUIINFO_ITEM_STOCK ("_Preferences...", NULL, open_preferences_manager, GNOME_STOCK_MENU_PROP),
+  GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL),
 
   GNOMEUIINFO_SEPARATOR,
 
@@ -106,34 +107,41 @@ static GnomeUIInfo message_menu[] =
 {
     /* M */
   {
-    GNOME_APP_UI_ITEM, N_ ("_New"), NULL, new_message_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_MAIL, 'M', 0, NULL
+    GNOME_APP_UI_ITEM, N_ ("_New"), N_("Compose a new message"),
+    new_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_MAIL, 'M', 0, NULL
   },
     /* R */
   {
-    GNOME_APP_UI_ITEM, N_ ("_Reply"), NULL, replyto_message_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_MAIL_RPL, 'R', 0, NULL
+    GNOME_APP_UI_ITEM, N_ ("_Reply"), N_("Reply to the current message"),
+    replyto_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_MAIL_RPL, 'R', 0, NULL
   },
     /* A */
   {
- GNOME_APP_UI_ITEM, N_ ("Reply to _all"), NULL, replytoall_message_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_MAIL_RPL, 'A', 0, NULL
+    GNOME_APP_UI_ITEM, N_ ("Reply to _all"),
+    N_("Reply to all recipients of the current message"),
+    replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_MAIL_RPL, 'A', 0, NULL
   },
     /* F */
   {
-    GNOME_APP_UI_ITEM, N_ ("_Forward"), NULL, forward_message_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL
+    GNOME_APP_UI_ITEM, N_ ("_Forward"), N_("Forward the current message"),
+    forward_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
     /* D */
   {
-    GNOME_APP_UI_ITEM, N_ ("_Delete"), NULL, delete_message_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
+    GNOME_APP_UI_ITEM, N_ ("_Delete"), N_("Delete the current message"),
+    delete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
   },
     /* U */
   {
-    GNOME_APP_UI_ITEM, N_ ("_Undelete"), NULL, undelete_message_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
+    GNOME_APP_UI_ITEM, N_ ("_Undelete"), N_("Undelete the message"),
+    undelete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
   },
   GNOMEUIINFO_END
 };
@@ -146,9 +154,12 @@ static GnomeUIInfo mailbox_menu[] =
     NULL, GNOME_APP_PIXMAP_NONE, GNOME_STOCK_MENU_PROP, 'C', 0, NULL
   },
 #endif
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Add"), NULL, mblist_menu_add_cb, GNOME_STOCK_MENU_PROP),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Edit"), NULL, mblist_menu_edit_cb, GNOME_STOCK_MENU_PROP),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Delete"), NULL, mblist_menu_delete_cb, GNOME_STOCK_MENU_TRASH),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Add"), N_("Add a new mailbox"),
+			  mblist_menu_add_cb, GNOME_STOCK_MENU_PROP),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Edit"), N_("Edit the selected mailbox"),
+			  mblist_menu_edit_cb, GNOME_STOCK_MENU_PROP),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Delete"), N_("Delete the selected mailbox"),
+			  mblist_menu_delete_cb, GNOME_STOCK_MENU_TRASH),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_END
 };

@@ -1716,8 +1716,15 @@ void mutt_decode_attachment (BODY *b, STATE *s)
   if (istext && s->flags & M_CHARCONV)
   {
     char *charset = mutt_get_parameter ("charset", b->parameter);
+#ifdef LIBMUTT
+    /* balsa: don't convert us-ascii to utf8 - if there are 8-bit chars
+       in this part (i.e. it's broken), balsa will take care of them. */
+    if (charset && strcasecmp(charset, "us-ascii") && Charset)
+      cd = mutt_iconv_open (Charset, charset, M_ICONV_HOOK_FROM);
+#else
     if (charset && Charset)
       cd = mutt_iconv_open (Charset, charset, M_ICONV_HOOK_FROM);
+#endif
   }
 
   fseek (s->fpin, b->offset, 0);

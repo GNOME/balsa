@@ -1,3 +1,8 @@
+2004-07-04  Carlos Morgado  <chbm gnome.org>
+
+	* handler.c: patch from Albrecht to expose 
+	always expose illegal 8bit chars to libbalsa
+
 2003-08-19 14:17  PeterB
 
 	* imap/imap.c: Use value returned by

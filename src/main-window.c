@@ -66,8 +66,7 @@ create_main_window ()
   /* main window */
   mw->window = gnome_app_new ("balsa", "Balsa");
   gtk_window_set_wmclass (GTK_WINDOW (mw->window), "balsa_app", "Balsa");
-  gtk_widget_set_usize (mw->window, 640, 400);
-
+  gtk_widget_set_usize (mw->window, 620, 400);
   gtk_signal_connect (GTK_OBJECT (mw->window),
 		      "destroy",
 		      (GtkSignalFunc) balsa_exit,

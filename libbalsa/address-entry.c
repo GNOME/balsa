@@ -2300,11 +2300,16 @@ lbae_append_addresses(GtkEntryCompletion * completion, GList * match,
     gtk_entry_completion_complete(completion);
 
     for (; match; match = match->next) {
-        name = libbalsa_address_to_gchar(match->data, 0);
-	gtk_list_store_append(store, &iter);
-	gtk_list_store_set(store, &iter, NAME_COL, name,
-                           ADDRESS_COL, match->data, -1);
-        g_free(name);
+        LibBalsaAddress *address = match->data;
+        gint i, n = g_list_length(address->address_list);
+
+        for (i = 0; i < n; i++) {
+            name = libbalsa_address_to_gchar(address, i);
+            gtk_list_store_append(store, &iter);
+            gtk_list_store_set(store, &iter, NAME_COL, name,
+                               ADDRESS_COL, address, -1);
+            g_free(name);
+        }
     }
 
     info = g_object_get_data(G_OBJECT(completion),
@@ -2313,9 +2318,9 @@ lbae_append_addresses(GtkEntryCompletion * completion, GList * match,
         /* No domain in the user's entry, and the current identity has a
          * default domain, so we'll add user@domain as a possible
          * autocompletion. */
-	name = g_strconcat(prefix, "@", info->domain, NULL);
-	gtk_list_store_append(store, &iter);
-	gtk_list_store_set(store, &iter, NAME_COL, name, -1);
+        name = g_strconcat(prefix, "@", info->domain, NULL);
+        gtk_list_store_append(store, &iter);
+        gtk_list_store_set(store, &iter, NAME_COL, name, -1);
         g_free(name);
     }
 }

@@ -213,7 +213,11 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
 
     state->subfolders = NULL;
 
-    imap_path = g_strdup_printf("%s%c", path, state->delim);
+    imap_path =
+	path[strlen(path) - 1] != state->delim
+	? g_strdup_printf("%s%c", path, state->delim)
+	: g_strdup(path);
+
     if (state->subscribed) 
 	imap_mbox_lsub(handle, imap_path);
     else

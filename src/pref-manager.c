@@ -158,7 +158,7 @@ gchar *pwindow_type_label[NUM_PWINDOW_MODES] =
 void
 open_preferences_manager(GtkWidget *widget, gpointer data)
 {
-	static GnomeHelpMenuEntry help_entry = { "balsa", "win-config.html" };
+	static GnomeHelpMenuEntry help_entry = { NULL, "win-config" };
 	gint i;
 	GnomeApp *active_win = GNOME_APP(data);
 	GtkWidget *page;
@@ -326,7 +326,7 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 
         help_entry.name = gnome_app_id;        
         gtk_signal_connect (GTK_OBJECT (property_box), "help", 
-                            GTK_SIGNAL_FUNC (gnome_help_display), &help_entry);
+	GTK_SIGNAL_FUNC (gnome_help_pbox_display), &help_entry); 
 
 	gtk_widget_show_all ( GTK_WIDGET(property_box));
 

@@ -142,6 +142,7 @@ mailbox_init (gchar * inbox_path)
   struct utsname utsname;
   char *p;
   gchar *tmp;
+  gchar buffer[256];
 
   Spoolfile = inbox_path;
 
@@ -155,9 +156,30 @@ mailbox_init (gchar * inbox_path)
 
   /* some systems report the FQDN instead of just the hostname */
   if ((p = strchr (utsname.nodename, '.')))
+    {
     Hostname = mutt_substrdup (utsname.nodename, p);
+    p++;
+    strfcpy (buffer, p, sizeof (buffer)); /* save the domain for below */
+    }
   else
     Hostname = g_strdup (utsname.nodename);
+
+#ifndef DOMAIN
+#define DOMAIN buffer
+  if (!p && getdnsdomainname (buffer, sizeof (buffer)) == -1)
+    Fqdn = safe_strdup ("@");
+  else
+#endif /* DOMAIN */
+  {
+# ifdef HIDDEN_HOST
+    Fqdn = safe_strdup (DOMAIN);
+# else
+    Fqdn = safe_malloc (strlen (DOMAIN) + strlen (Hostname) + 2);
+    sprintf (Fqdn, "%s.%s", Hostname, DOMAIN);
+# endif /* HIDDEN_HOST */
+  }
+
+  Sendmail = SENDMAIL;
 
   Shell = g_strdup ((p = getenv ("SHELL")) ? p : "/bin/sh");
   Tempdir = g_get_tmp_dir ();

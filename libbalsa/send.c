@@ -23,6 +23,7 @@
 #include <string.h>
 #include <gnome.h>
 
+#include "balsa-app.h"
 #include "mailbox.h"
 #include "misc.h"
 
@@ -32,7 +33,6 @@ gboolean
 send_message (Message * message, gchar * smtp_server, glong debug)
 {
   FILE *tempfp = NULL;
-  BODY *pbody;
   HEADER *msg;
   gchar *text;
   gchar buffer[PATH_MAX];
@@ -43,9 +43,7 @@ send_message (Message * message, gchar * smtp_server, glong debug)
   if (!msg->env)
     msg->env = mutt_new_envelope ();
 
-  pbody = mutt_new_body ();
-  pbody->next = msg->content;	/* don't kill command-line attachments */
-  msg->content = pbody;
+  msg->content = mutt_new_body ();
 
   msg->content->type = TYPETEXT;
   msg->content->subtype = safe_strdup ("plain");
@@ -53,54 +51,33 @@ send_message (Message * message, gchar * smtp_server, glong debug)
   msg->content->use_disp = 0;
 
   mutt_mktemp (buffer);
+  msg->content->filename = g_strdup (buffer);
   tempfp = safe_fopen (buffer, "w+");
-  msg->content->filename = safe_strdup (buffer);
-/*
-  process_user_header (msg->env);
-*/
-  tmp = address_to_gchar(message->from);
-  msg->env->from = rfc822_parse_adrlist(msg->env->from, tmp);
-  g_free(tmp);
-  msg->env->subject = g_strdup(message->subject);
 
-  msg->env->to = rfc822_parse_adrlist (msg->env->to, make_string_from_list(message->to_list));
-  msg->env->cc = rfc822_parse_adrlist (msg->env->cc, make_string_from_list(message->cc_list));
-  msg->env->bcc = rfc822_parse_adrlist (msg->env->bcc, make_string_from_list(message->bcc_list));
-	  
+/*
+   process_user_header (msg->env);
+ */
+  tmp = address_to_gchar (message->from);
+  msg->env->from = rfc822_parse_adrlist (msg->env->from, tmp);
+  g_free (tmp);
+  msg->env->subject = g_strdup (message->subject);
+
+  msg->env->to = rfc822_parse_adrlist (msg->env->to, make_string_from_list (message->to_list));
+  msg->env->cc = rfc822_parse_adrlist (msg->env->cc, make_string_from_list (message->cc_list));
+  msg->env->bcc = rfc822_parse_adrlist (msg->env->bcc, make_string_from_list (message->bcc_list));
+
+
+  text = ((Body *) (g_list_first (message->body_list)->data))->buffer;
+  fputs (text, tempfp);
   fclose (tempfp);
   tempfp = NULL;
 
-#if 0
+  mutt_update_encoding (msg->content);
 
-  body->type = TYPETEXT;
+  mutt_send_message (msg, balsa_app.outbox_path);
 
-  /* FIXME: mabey problem */
-  text = ((Body *) (g_list_first (message->body_list)->data))->buffer;
+  unlink (msg->content->filename);
 
-  body->contents.text.data = g_strdup (text);
-  body->contents.text.size = strlen (body->contents.text.data);
-
-  if (msg->env->to)
-    {
-      fprintf (stderr, "Sending...\n");
-      if (stream = smtp_open (hostlist, debug))
-	{
-	  if (smtp_mail (stream, "MAIL", envelope, body))
-	    fprintf (stderr, "[Ok]\n");
-	  else
-	    fprintf (stderr, "[Failed - %s]\n", stream->reply);
-	}
-    }
-  if (stream)
-    smtp_close (stream);
-  else
-    fprintf (stderr, "[Can't open connection to any server]\n");
-  mail_free_envelope (&envelope);
-  mail_free_body (&body);
-#endif
-
-  if (tempfp)
-    fclose (tempfp);
   mutt_free_header (&msg);
 
   return TRUE;

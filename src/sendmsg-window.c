@@ -67,7 +67,7 @@ create_toolbar (BalsaSendmsg * bsmw)
   gtk_widget_realize (window);
 
   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-					   _("Send"), _("Send"), NULL,
+					   _ ("Send"), _ ("Send"), NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_SND),
 					   GTK_SIGNAL_FUNC (send_message_cb),
 					   bsmw);
@@ -210,7 +210,7 @@ create_menu (BalsaSendmsg * bmsg)
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
   if (balsa_app.debug)
-     g_print("Menu items in sendmsg-window.c: %i\n",i);
+    g_print ("Menu items in sendmsg-window.c: %i\n", i);
 
   menu_items[i] = NULL;
   gtk_window_add_accel_group (GTK_WINDOW (window), accel);
@@ -241,7 +241,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   switch (type)
     {
     case 0:
-      msg->window = gnome_app_new ("balsa", _("New message"));
+      msg->window = gnome_app_new ("balsa", _ ("New message"));
       break;
     case 1:
       clist = GTK_CLIST (GTK_BIN (bindex)->child);
@@ -253,7 +253,8 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 
       message = (Message *) gtk_clist_get_row_data (clist, row);
 
-      msg->window = gnome_app_new ("balsa", _("Reply to "));
+      msg->window = gnome_app_new ("balsa", _ ("Reply to "));
+      msg->type = 1;
       break;
     case 2:
       clist = GTK_CLIST (GTK_BIN (bindex)->child);
@@ -265,7 +266,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 
       message = (Message *) gtk_clist_get_row_data (clist, row);
 
-      msg->window = gnome_app_new ("balsa", _("Forward message"));
+      msg->window = gnome_app_new ("balsa", _ ("Forward message"));
       break;
     }
 
@@ -490,8 +491,8 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   message->from = address_new ();
   message->from->personal = g_strdup (balsa_app.real_name);
-  message->from->mailbox = g_malloc(strlen(balsa_app.username)+strlen(balsa_app.hostname)+2);
-  sprintf(message->from->mailbox,"%s@%s", balsa_app.username, balsa_app.hostname);
+  message->from->mailbox = g_malloc (strlen (balsa_app.username) + strlen (balsa_app.hostname) + 2);
+  sprintf (message->from->mailbox, "%s@%s", balsa_app.username, balsa_app.hostname);
   message->subject = g_strdup (gtk_entry_get_text (GTK_ENTRY (bsmsg->subject)));
 
   message->to_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->to)));
@@ -505,7 +506,10 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   message->body_list = g_list_append (message->body_list, body);
 
   if (send_message (message, balsa_app.smtp_server, balsa_app.debug))
-      message_reply(message);
+    if (bsmsg->type == 1)
+      {
+	message_reply (message);
+      }
 
   body_free (body);
   message->body_list->data = NULL;

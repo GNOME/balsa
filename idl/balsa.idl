@@ -5,10 +5,14 @@
 
 /* FIXME: work under progress. do not make parte of install */
 
+#include <Bonobo.idl>
+
 
 module GNOME {
   module Balsa {
     
+    typedef Bonobo::Stream MultiPart;
+
     exception UnknownFolder {
       string reason;
     };
@@ -17,14 +21,21 @@ module GNOME {
       string reason;
     };
 
+    typedef struct Attachment_struct  {
+      string name;
+      MultiPart file;
+    } Attachment;
+    
+    typedef  sequence <Attachment> AttachmentList;
+
     interface Message {
       attribute string to;
       attribute string cc;
       attribute string subject;
-      attribute string body;
-      attribute string attachments;
+      attribute MultiPart body; 
+      attribute AttachmentList attachments; 
 
-      void add_attachment ( in string filename );
+      void add_attachment ( in Attachment attach );
 
       boolean send_message( );
       
@@ -32,13 +43,13 @@ module GNOME {
 
     interface MessageList {
       void select_message ( in long index ) raises (UnknownMessage);
-      void open_message   (in long message_number);
+      void open_message   ( in long message_number);
       Message get_message ( in long index );     
     };
 
 
     interface FolderBrowser {
-      attribute boolean has_unread_messages;
+      attribute long unread_messages;
 
       void open_folder( in string path ) raises (UnknownFolder);
 
@@ -48,6 +59,18 @@ module GNOME {
 
       MessageList get_unread_message_list();
       MessageList get_message_list();
+
+      void synch();
+    };
+
+
+    interface App {
+      long fetch_pop();
+      void open_compose_window();
+      Message new_message();
+
+      string get_folder_list();
+      FolderBrowser open_unread_mailbox();
     };
 
   };

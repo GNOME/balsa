@@ -1,3 +1,8 @@
+2003-08-27 15:49  PeterB
+
+	* src/sendmsg-window.c: Restore the ability to completely turn off
+	word wrap when sending.
+
 2003-08-26  Pawel Salek  <pawsa theochem.kth.se>
 
 	* configure.in, NEWS: release 2.0.14.

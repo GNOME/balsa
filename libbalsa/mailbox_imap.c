@@ -661,6 +661,27 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap)
     return mimap->handle;
 }
 
+/* Get the list of unseen messages from the server and set
+ * the unread-messages count. */
+static void
+lbm_imap_get_unseen(LibBalsaMailboxImap * mimap)
+{
+    guint count;
+    guint *msgs;
+
+    if (imap_mbox_find_unseen(mimap->handle, &count, &msgs) != IMR_OK) {
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("IMAP SEARCH UNSEEN request failed"
+			       " for mailbox %s"),
+			     LIBBALSA_MAILBOX(mimap)->url);
+	return;
+    }
+    g_free(msgs);
+
+    LIBBALSA_MAILBOX(mimap)->unread_messages = count;
+    LIBBALSA_MAILBOX(mimap)->has_unread_messages = count > 0;
+}
+
 /* libbalsa_mailbox_imap_open:
    opens IMAP mailbox. On failure leaves the object in sane state.
 */
@@ -686,7 +707,6 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 
     mimap->opened         = TRUE;
     mailbox->disconnected = FALSE;
-    mailbox->unread_messages = 0;
     total_messages = imap_mbox_handle_get_exists(mimap->handle);
     mimap->messages_info = g_array_sized_new(FALSE, TRUE, 
 					     sizeof(struct message_info),
@@ -696,6 +716,8 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 	g_array_append_val(mimap->messages_info, a);
     }
 
+    if (imap_mbox_handle_first_unseen(mimap->handle))
+	lbm_imap_get_unseen(mimap);
     run_filters_on_reception(mimap);
 
 #ifdef DEBUG
@@ -819,9 +841,10 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	return;
     }
 
-    if (LIBBALSA_MAILBOX_IMAP(mailbox)->handle)
+    if (LIBBALSA_MAILBOX_IMAP(mailbox)->handle) {
 	libbalsa_mailbox_imap_noop(LIBBALSA_MAILBOX_IMAP(mailbox));
-    else
+	lbm_imap_get_unseen(LIBBALSA_MAILBOX_IMAP(mailbox));
+    } else
 	g_warning("mailbox has open_ref>0 but no handle!\n");
 
     run_filters_on_reception(LIBBALSA_MAILBOX_IMAP(mailbox));

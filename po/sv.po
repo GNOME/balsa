@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.6.0\n"
-"POT-Creation-Date: 2000-04-19 15:41+0200\n"
+"POT-Creation-Date: 2000-04-20 20:26+0200\n"
 "PO-Revision-Date: 1999-12-28 14:03+0100\n"
 "Last-Translator: Andreas Hyden <a.hyden@cyberpoint.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -859,11 +859,11 @@ msgstr "Skriv ut"
 msgid "Print current message"
 msgstr "Skriv ut nuvarande meddelande"
 
-#: src/main-window.c:886
+#: src/main-window.c:888
 msgid "Copyright (C) 1997-2000"
 msgstr "Copyright (C) 1997-2000"
 
-#: src/main-window.c:888
+#: src/main-window.c:890
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -1049,13 +1049,12 @@ msgid "Reply prefix:"
 msgstr "Svarsprefix:"
 
 #: src/pref-manager.c:778
-#, fuzzy
 msgid "Use signature file when:"
 msgstr "Använd signaturfil när:"
 
 #: src/pref-manager.c:785
 msgid "enable signature separator"
-msgstr ""
+msgstr "aktivera signaturseparator"
 
 #: src/pref-manager.c:822
 msgid "Remote Malibox Servers"
@@ -1115,11 +1114,11 @@ msgstr "Kolla posten automatiskt varje:"
 
 #: src/pref-manager.c:1032
 msgid "Word Wrap"
-msgstr ""
+msgstr "Ordbrytning"
 
 #: src/pref-manager.c:1043
 msgid "Wrap Outgoing Text at:"
-msgstr ""
+msgstr "Bryt utgående text vid:"
 
 #: src/pref-manager.c:1058
 msgid "Characters"
@@ -1155,7 +1154,7 @@ msgstr "Visa alla rubriker"
 
 #: src/pref-manager.c:1139
 msgid "Show mailbox statistics in left pane"
-msgstr ""
+msgstr "Visa brevlådestatistik i vänsta rutan"
 
 #: src/pref-manager.c:1146
 msgid "Toolbars"
@@ -1179,7 +1178,7 @@ msgstr "Markerade rubriker:"
 
 #: src/pref-manager.c:1266
 msgid "characters"
-msgstr ""
+msgstr "tecken"
 
 #: src/pref-manager.c:1270
 msgid "Print command:"
@@ -1190,9 +1189,8 @@ msgid "Break line at:"
 msgstr "Radbryt vid:"
 
 #: src/pref-manager.c:1310
-#, fuzzy
 msgid "Charset"
-msgstr "Teckenkodning:"
+msgstr "Teckenuppsättning"
 
 #: src/pref-manager.c:1379
 msgid "Debug"
@@ -1241,6 +1239,8 @@ msgid ""
 "Enter print command below\n"
 "Remember to include '%s'"
 msgstr ""
+"Ange utskriftskommandot nedan\n"
+"Kom ihåg att inkludera '%s'"
 
 #: src/print.c:103
 msgid "Print Command:"
@@ -1280,7 +1280,7 @@ msgstr "Kontrollera stavning"
 
 #: src/sendmsg-window.c:133
 msgid "_Include File..."
-msgstr ""
+msgstr "_Inkludera fil..."
 
 #: src/sendmsg-window.c:137
 msgid "_Attach file..."
@@ -1307,9 +1307,8 @@ msgid "_Wrap body"
 msgstr ""
 
 #: src/sendmsg-window.c:168
-#, fuzzy
 msgid "Wrap message lines"
-msgstr "Eftersänd meddelande"
+msgstr ""
 
 #: src/sendmsg-window.c:172
 msgid "_Reflow paragraph"
@@ -1346,14 +1345,12 @@ msgid "_Fcc"
 msgstr ""
 
 #: src/sendmsg-window.c:196
-#, fuzzy
 msgid "_Reply To"
-msgstr "_Svara"
+msgstr "_Svara till"
 
 #: src/sendmsg-window.c:198
-#, fuzzy
 msgid "_Attachments"
-msgstr "Bifogade filer:"
+msgstr "_Bifogningar"
 
 #: src/sendmsg-window.c:200
 msgid "_Comments"
@@ -1369,7 +1366,7 @@ msgstr "_Västern (ISO-8859-1)"
 
 #: src/sendmsg-window.c:215
 msgid "W_estern (ISO-8859-15)"
-msgstr ""
+msgstr "V_ästern (ISO-8859-15)"
 
 #: src/sendmsg-window.c:217
 msgid "_Central European (ISO-8859-2)"

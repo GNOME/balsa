@@ -1,3 +1,10 @@
+2003-03-06 13:54  PeterB
+
+	* src/: sendmsg-window.c, spell-check.c, spell-check.h: Non-modal
+	spell checker.
+	* src/mailbox-conf.c: Use identity set by user in mailbox conf
+	dialog.
+
 2003-03-06  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/filter.c: utf8-aware filtering.

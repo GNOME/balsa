@@ -7,7 +7,8 @@
 void 
 initialize_balsa (int argc, char *argv[])
 {
-      fprintf (stderr,"New install of Balsa\n");
-
+      fprintf (stderr,"New install of Balsa\nPlease goto Settings and Preferences and Mailbox Manager.");
+/*
       open_preferences_manager();
+*/
 }

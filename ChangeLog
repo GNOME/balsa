@@ -1,5 +1,8 @@
 1998-12-15  Jeff Garzik  <jgarzik@pobox.com>
 
+	* src/pref-manager.c:
+	Added protocol column to server list.
+
 	* src/spell-check.[ch]:
 	Spell checking module for mail compose window.
 

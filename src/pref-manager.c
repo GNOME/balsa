@@ -284,7 +284,7 @@ update_pop3_servers (void)
 {
   GtkCList *clist;
   GList *list = balsa_app.inbox_input;
-  gchar *text[1];
+  gchar *text[2];
   gint row;
 
   Mailbox *mailbox;
@@ -302,7 +302,12 @@ update_pop3_servers (void)
       mailbox = list->data;
       if (mailbox)
 	{
-	  text[0] = mailbox->name;
+	  switch (mailbox->type) {
+	    case MAILBOX_POP3:	text[0] = "POP3"; break;
+	    case MAILBOX_IMAP:	text[0] = "IMAP"; break;
+	    default:		text[0] = "????"; break;
+	  }
+	  text[1] = mailbox->name;
 	  row = gtk_clist_append (clist, text);
 	  gtk_clist_set_row_data (clist, row, mailbox);
 	}
@@ -401,7 +406,12 @@ create_mailservers_page ()
   gtk_container_add (GTK_CONTAINER (frame), hbox);
 
   sw = gtk_scrolled_window_new (NULL, NULL);
-  pui->pop3servers = gtk_clist_new (1);
+  pui->pop3servers = gtk_clist_new (2);
+  gtk_clist_set_column_title(GTK_CLIST(pui->pop3servers), 0, _("Type"));
+  gtk_clist_set_column_title(GTK_CLIST(pui->pop3servers), 1, _("Mailbox name"));
+  gtk_clist_column_titles_show(GTK_CLIST(pui->pop3servers));
+  gtk_clist_set_column_width(GTK_CLIST(pui->pop3servers), 0, 45);
+  gtk_clist_column_titles_passive(GTK_CLIST(pui->pop3servers));
   gtk_container_add (GTK_CONTAINER (sw), pui->pop3servers);
 
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),

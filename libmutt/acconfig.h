@@ -112,6 +112,6 @@
 
 /* Define as 1 if iconv() only converts exactly and we should treat
  * all return values other than (size_t)(-1) as equivalent. */
- #define ICONV_NONTRANS 0
+#define ICONV_NONTRANS 0
  
  

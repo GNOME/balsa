@@ -1,4 +1,9 @@
-2000-09-11  Carlos Morgado <chbm@chbm.nu>
+2000-09-11  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/save-restore.c: config_get_unused_section didn't guess new
+	mailbox keys correctly. now we don't mess up the config on save. 
+
+2000-09-11  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/Makefile.am: balsa_SOURCE -> balsa_BASE_SOURCE, make way for 
 	balsa_IDL_SOURCE (inactive ATM)

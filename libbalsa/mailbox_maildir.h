@@ -49,6 +49,7 @@ struct _LibBalsaMailboxMaildir {
     time_t mtime_new;
     gchar *curdir;
     gchar *newdir;
+    gchar *tmpdir;
 };
 
 struct _LibBalsaMailboxMaildirClass {

@@ -234,6 +234,7 @@ lbm_maildir_set_subdirs(LibBalsaMailboxMaildir * mdir, const gchar * path)
 {
     mdir->curdir = g_strdup_printf("%s/cur", path);
     mdir->newdir = g_strdup_printf("%s/new", path);
+    mdir->tmpdir = g_strdup_printf("%s/tmp", path);
 }
 
 GObject *
@@ -270,6 +271,8 @@ libbalsa_mailbox_maildir_finalize(GObject * object)
     mdir->curdir = NULL;
     g_free(mdir->newdir);
     mdir->newdir = NULL;
+    g_free(mdir->tmpdir);
+    mdir->tmpdir = NULL;
 
     if (G_OBJECT_CLASS(parent_class)->finalize)
 	G_OBJECT_CLASS(parent_class)->finalize(object);
@@ -460,7 +463,10 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
     }
 
     if (!mailbox->readonly)
-	mailbox->readonly = access (path, W_OK) ? TRUE : FALSE;
+	mailbox->readonly = (access(path, W_OK)
+			     || access(mdir->curdir, W_OK)
+			     || access(mdir->newdir, W_OK)
+			     || access(mdir->tmpdir, W_OK)) ? TRUE : FALSE;
     mailbox->unread_messages = 0;
     parse_mailbox_subdirs(mailbox);
 #ifdef DEBUG

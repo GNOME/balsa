@@ -120,7 +120,7 @@ balsa_init_window_new (void)
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (iw->window)->vbox), vbox, FALSE, FALSE, 0);
   gtk_widget_show (vbox);
 
-  logo = gnome_unconditional_pixmap_file ("balsa_logo.png");
+  logo = gnome_unconditional_pixmap_file ("balsa/balsa_logo.png");
   pixmap = gnome_pixmap_new_from_file (logo);
   g_free (logo);
   gtk_box_pack_start (GTK_BOX (vbox), pixmap, FALSE, FALSE, 0);

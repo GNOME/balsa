@@ -662,7 +662,7 @@ set_icon (GdkWindow * w)
   att.visual = gdk_imlib_get_visual ();
   att.colormap = gdk_imlib_get_colormap ();
   ic_win = gdk_window_new (NULL, &att, GDK_WA_VISUAL | GDK_WA_COLORMAP);
-  im = gdk_imlib_load_image (gnome_unconditional_pixmap_file ("balsa_icon.png"));
+  im = gdk_imlib_load_image (gnome_unconditional_pixmap_file ("balsa/balsa_icon.png"));
   gdk_window_set_icon (w, ic_win, NULL, NULL);
   gdk_imlib_render (im, att.width, att.height);
   pmap = gdk_imlib_move_image (im);

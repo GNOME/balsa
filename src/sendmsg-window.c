@@ -231,16 +231,18 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
   gint pos;
 
   fs = GTK_FILE_SELECTION (data);
-  iconlist = GNOME_ICON_LIST(gtk_object_get_user_data (GTK_OBJECT (fs)));
+  iconlist = GNOME_ICON_LIST (gtk_object_get_user_data (GTK_OBJECT (fs)));
 
-  filename = gtk_file_selection_get_filename(fs);
+  filename = gtk_file_selection_get_filename (fs);
 
-  pos = gnome_icon_list_append(iconlist, gnome_pixmap_file("attachment.png"), filename);
-  gnome_icon_list_set_icon_data(iconlist, pos, filename);
-  
+  pos = gnome_icon_list_append (iconlist,
+		   gnome_unconditional_pixmap_file ("balsa/attachment.png"),
+				filename);
+  gnome_icon_list_set_icon_data (iconlist, pos, filename);
+
   /* FIXME */
   /* g_free(filename); */
-  
+
   gtk_widget_destroy (GTK_WIDGET (fs));
 }
 
@@ -257,10 +259,10 @@ attach_clicked (GtkWidget * widget, gpointer data)
   GnomeIconList *iconlist;
   GtkFileSelection *fs;
 
-  iconlist = GNOME_ICON_LIST(data);
+  iconlist = GNOME_ICON_LIST (data);
 
   fsw = gtk_file_selection_new (_ ("Attach file"));
-  gtk_object_set_user_data(GTK_OBJECT(fsw), iconlist);
+  gtk_object_set_user_data (GTK_OBJECT (fsw), iconlist);
 
   fs = GTK_FILE_SELECTION (fsw);
 

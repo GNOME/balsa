@@ -1,3 +1,8 @@
+2003-10-01 16:55  PeterB
+
+	* libbalsa/mailbox_local.c: Implement threading, based on previous
+	balsa-index-threading.c code.
+
 2003-10-01  Pawel Salek <pawsa theochem.kth.se>
 
 	* libbalsa/mailbox_{mbox,mh,pop3}.c:

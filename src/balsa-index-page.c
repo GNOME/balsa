@@ -531,6 +531,10 @@ create_menu(BalsaIndex * bindex)
 			   _("Reply To All..."), balsa_message_replytoall,
 			   bindex, TRUE);
 
+    create_stock_menu_item(menu, BALSA_PIXMAP_MAIL_RPL_ALL_MENU,
+			   _("Reply To Group..."), balsa_message_replytogroup,
+			   bindex, TRUE);
+
     create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_FWD,
 			   _("Forward..."), balsa_message_forward, bindex,
 			   TRUE);
@@ -698,6 +702,29 @@ balsa_message_replytoall(GtkWidget * widget, gpointer index)
 	    gtk_ctree_node_get_row_data(GTK_CTREE(index),
 					list->data);
 	sm = sendmsg_window_new(widget, message, SEND_REPLY_ALL);
+	gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
+			   GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
+			   NULL);
+	list = list->next;
+    }
+}
+
+void
+balsa_message_replytogroup(GtkWidget * widget, gpointer index)
+{
+    GList *list;
+    LibBalsaMessage *message;
+    BalsaSendmsg *sm;
+
+    g_return_if_fail(widget != NULL);
+    g_return_if_fail(index != NULL);
+
+    list = GTK_CLIST(index)->selection;
+    while (list) {
+	message =
+	    gtk_ctree_node_get_row_data(GTK_CTREE(index),
+					list->data);
+	sm = sendmsg_window_new(widget, message, SEND_REPLY_GROUP);
 	gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
 			   GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
 			   NULL);

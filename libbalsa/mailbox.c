@@ -255,6 +255,7 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
     mailbox->message_list = NULL;
 
     mailbox->readonly = FALSE;
+    mailbox->mailing_list_address = NULL;
 }
 
 /* libbalsa_mailbox_destroy:
@@ -270,6 +271,10 @@ libbalsa_mailbox_destroy(GtkObject * object)
 
     while (mailbox->open_ref > 0)
 	libbalsa_mailbox_close(mailbox);
+
+    if ( mailbox->mailing_list_address )
+	gtk_object_unref(GTK_OBJECT(mailbox->mailing_list_address));
+    mailbox->mailing_list_address = NULL;
 
     g_free(mailbox->name);
     mailbox->name = NULL;
@@ -505,11 +510,20 @@ static void
 libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix)
 {
+    gchar *tmp;
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     gnome_config_set_string("Type",
 			    gtk_type_name(GTK_OBJECT_TYPE(mailbox)));
     gnome_config_set_string("Name", mailbox->name);
+
+    if ( mailbox->mailing_list_address ) {
+	tmp = libbalsa_address_to_gchar(mailbox->mailing_list_address, 0);
+	gnome_config_set_string("MailingListAddress", tmp);
+	g_free(tmp);
+    } else {
+	gnome_config_clean_key("MailingListAddress");
+    }
 
     g_free(mailbox->config_prefix);
     mailbox->config_prefix = g_strdup(prefix);
@@ -520,6 +534,8 @@ static void
 libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix)
 {
+    gboolean def;
+    gchar *address;
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     g_free(mailbox->config_prefix);
@@ -527,6 +543,16 @@ libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
 
     g_free(mailbox->name);
     mailbox->name = gnome_config_get_string("Name=Mailbox");
+
+    if ( mailbox->mailing_list_address ) 
+	gtk_object_unref(GTK_OBJECT(mailbox->mailing_list_address));
+    address = gnome_config_get_string_with_default("MailingListAddress", &def);
+    if ( def == TRUE ) {
+	mailbox->mailing_list_address = NULL;
+    } else {
+	mailbox->mailing_list_address = libbalsa_address_new_from_string(address);
+    }
+    g_free(address);
 }
 
 /*

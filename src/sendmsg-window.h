@@ -30,6 +30,7 @@ extern "C" {
 	SEND_NORMAL,		/* initialized by Compose */
 	SEND_REPLY,		/* by Reply               */
 	SEND_REPLY_ALL,		/* by Reply All           */
+	SEND_REPLY_GROUP,       /* by Reply to Group      */
 	SEND_FORWARD,		/* by Forward             */
 	SEND_CONTINUE		/* by Continue postponed  */
     } SendType;

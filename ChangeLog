@@ -1,3 +1,16 @@
+2000-12-19  Ian Campbell  <ijc25@cam.ac.uk>
+
+	Initial implementation of Reply to Group function. Still needs
+	configuration options.
+	
+	* libbalsa/mailbox.[ch]: Add mailing_list_address as a field. Add
+	configuration loading and saving of this field.
+	* src/balsa-index-page.[ch]: add balsa_message_replytogroup which
+	uses mailbox->mailing_list_address if set, or else tries to guess
+	from a header
+	* src/main-window.c: Add Reply to Group menu item.
+	* src/sendmsg-window.[ch]: Handle SEND_REPLY_GROUP as a compose type.
+	
 2000-12-18  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: bump version to 1.0.1

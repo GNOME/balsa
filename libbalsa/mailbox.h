@@ -79,6 +79,9 @@ struct _LibBalsaMailbox {
     gboolean has_unread_messages;
     glong unread_messages;	/* number of unread messages in the mailbox */
     glong total_messages;	/* total number of messages in the mailbox  */
+
+    /* Mailing list contained in this mailbox. Or NULL */
+    LibBalsaAddress *mailing_list_address;
 };
 
 struct _LibBalsaMailboxClass {

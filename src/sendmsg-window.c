@@ -1189,7 +1189,7 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	body = g_string_new("");
 
     if ((signature = read_signature()) != NULL) {
-	if (((type == SEND_REPLY || type == SEND_REPLY_ALL) &&
+	if (((type == SEND_REPLY || type == SEND_REPLY_ALL || type == SEND_REPLY_GROUP) &&
 	     balsa_app.sig_whenreply) ||
 	    ((type == SEND_FORWARD) && balsa_app.sig_whenforward) ||
 	    ((type == SEND_NORMAL) && balsa_app.sig_sending)) {
@@ -1311,6 +1311,25 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	tmp = libbalsa_address_to_gchar(addr, 0);
 	gtk_entry_set_text(GTK_ENTRY(msg->to[1]), tmp);
 	g_free(tmp);
+    } else if ( type == SEND_REPLY_GROUP ) {
+	if ( message->mailbox->mailing_list_address ) {
+	    tmp = libbalsa_address_to_gchar
+		(message->mailbox->mailing_list_address, 0);
+	    gtk_entry_set_text(GTK_ENTRY(msg->to[1]), tmp);
+	    g_free(tmp);
+	} else {
+	    GList *lst, *p;
+	    gchar **pair;
+	    
+	    lst = libbalsa_message_user_hdrs(message);
+	    for (p = g_list_first(lst); p; p = g_list_next(p)) {
+		pair = p->data;
+		if ( libbalsa_find_word(pair[0], "x-beenthere x-mailing-list") )
+		    gtk_entry_set_text(GTK_ENTRY(msg->to[1]), pair[1]);
+		g_strfreev(pair);
+	    }
+	    g_list_free(lst);
+	}
     }
 
     /* From: */
@@ -1340,6 +1359,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     switch (type) {
     case SEND_REPLY:
     case SEND_REPLY_ALL:
+    case SEND_REPLY_GROUP:
 	if (!message->subject) {
 	    newsubject = g_strdup("Re: ");
 	    break;

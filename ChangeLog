@@ -1,3 +1,14 @@
+2004-02-29 00:20  PeterB
+
+	* src/main-window.c: implement persistent search-iters.
+	* src/: balsa-index.c, balsa-index.h: implement persistent
+	search-iters; rearrange search code.
+	* libbalsa/mailbox_local.c: new name for match_condition.
+	* libbalsa/mailbox_imap.c: implement persistent search-iters.
+	* libbalsa/: mailbox.c, mailbox.h: support persistent search-iters.
+	* libbalsa/: filter.c, filter.h: rename match_condition as
+	libbalsa_condition_matches; implement libbalsa_condition_can_match.
+
 2004-02-28  Pawel Salek
 
 	* libbalsa/filter-funcs.c: implement libbalsa_condition_new_date()

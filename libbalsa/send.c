@@ -518,7 +518,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
     }
     libbalsa_mailbox_check(outbox);
     if (!libbalsa_mailbox_total_messages(outbox)) {
-	libbalsa_mailbox_close(outbox);
+	libbalsa_mailbox_close(outbox, TRUE);
 	send_unlock();
 	return TRUE;
     }
@@ -1155,7 +1155,7 @@ balsa_send_message_real(SendMessageInfo* info)
     smtp_enumerate_messages (info->session, handle_successful_send, 
                              &session_started);
 
-    libbalsa_mailbox_close(info->outbox);
+    libbalsa_mailbox_close(info->outbox, TRUE);
     /*
      * gdk_flush();
      * gdk_threads_leave();
@@ -1271,7 +1271,7 @@ balsa_send_message_real(SendMessageInfo* info)
     }
     
     gdk_threads_enter();
-    libbalsa_mailbox_close(info->outbox);
+    libbalsa_mailbox_close(info->outbox, TRUE);
     gdk_flush();
     gdk_threads_leave();
 

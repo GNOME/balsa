@@ -20,7 +20,6 @@
 #include "balsa-app.h"
 #include "balsa-index.h"
 #include "balsa-message.h"
-#include "index-window.h"
 #include "main-window.h"
 #include "message-window.h"
 #include "misc.h"
@@ -78,6 +77,30 @@ static void message_status_set_answered_cb (GtkWidget *, Message *);
 static void delete_message_cb (GtkWidget *, Message *);
 static void undelete_message_cb (GtkWidget *, Message *);
 
+void 
+index_child_changed (GnomeMDI * mdi, GnomeMDIChild * gmdic)
+{
+  IndexChild *child;
+  GList *list;
+
+  if (!mdi || !child_list || !gmdic)
+    return;
+
+  list = g_list_first (child_list);
+
+  for (; list != NULL; list = list->next)
+    {
+      child = (IndexChild *) list->data;
+      if (child)
+	if (!strcmp (child->mailbox->name, gmdic->name))
+	  {
+	    balsa_app.current_index = child->index;
+	    return;
+	  }
+    }
+  balsa_app.current_index = NULL;
+}
+
 IndexChild *
 index_child_get_active (GnomeMDI * mdi)
 {
@@ -90,7 +113,7 @@ index_child_get_active (GnomeMDI * mdi)
 
   gmdic = gnome_mdi_active_child (mdi);
 
-  list = g_list_first(child_list);
+  list = g_list_first (child_list);
 
   for (; list != NULL; list = list->next)
     {
@@ -244,23 +267,23 @@ create_menu (BalsaIndex * bindex, Message * message)
 
   submenu = gtk_menu_new ();
   smenuitem = gtk_menu_item_new_with_label ("Unread");
-  gtk_signal_connect (GTK_OBJECT (menuitem), "activate", 
-		  (GtkSignalFunc) message_status_set_new_cb, message);
+  gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+		      (GtkSignalFunc) message_status_set_new_cb, message);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
 
   smenuitem = gtk_menu_item_new_with_label ("Read");
-  gtk_signal_connect (GTK_OBJECT (menuitem), "activate", 
-		  (GtkSignalFunc) message_status_set_read_cb, message);
+  gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+		      (GtkSignalFunc) message_status_set_read_cb, message);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
 
   smenuitem = gtk_menu_item_new_with_label ("Replied");
-  gtk_signal_connect (GTK_OBJECT (menuitem), "activate", 
-		  (GtkSignalFunc) message_status_set_answered_cb, message);
+  gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+		   (GtkSignalFunc) message_status_set_answered_cb, message);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
-  
+
   smenuitem = gtk_menu_item_new_with_label ("Forwarded");
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
@@ -369,7 +392,7 @@ index_child_class_init (IndexChildClass * class)
   parent_class = gtk_type_class (gnome_mdi_child_get_type ());
 }
 
-static void 
+static void
 index_child_init (IndexChild * child)
 {
 

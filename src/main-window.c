@@ -112,7 +112,7 @@ open_main_window ()
   /* meubar and toolbar */
   gtk_signal_connect (GTK_OBJECT (mw->mdi), "create_menus", GTK_SIGNAL_FUNC (create_menu), NULL);
   gtk_signal_connect (GTK_OBJECT (mw->mdi), "create_toolbar", GTK_SIGNAL_FUNC (create_toolbar), NULL);
-
+  gtk_signal_connect (GTK_OBJECT(mw->mdi), "child_changed", GTK_SIGNAL_FUNC(index_child_changed), NULL);
   gnome_mdi_set_child_list_path(mw->mdi, _("Mailboxes/<Separator>"));
 
   gnome_mdi_set_mode (mw->mdi, balsa_app.mdi_style);
@@ -563,65 +563,48 @@ new_message_cb (GtkWidget * widget)
 static void
 replyto_message_cb (GtkWidget * widget)
 {
-  MainWindow *mainwindow;
-  IndexChild *ic;
   g_return_if_fail (widget != NULL);
-/*
+
   if (!balsa_app.current_index)
     return;
-*/
-  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-  ic = index_child_get_active(mainwindow->mdi);
-  if (!ic) return;
-/* sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 1); */
-  sendmsg_window_new (widget, BALSA_INDEX (ic->index), 1);
+
+  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 1);
 }
 
 
 static void
 forward_message_cb (GtkWidget * widget)
 {
-  MainWindow *mainwindow;
-  IndexChild *ic;
   g_return_if_fail (widget != NULL);
-/*
+
   if (!balsa_app.current_index)
     return;
-*/
-  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-  ic = index_child_get_active(mainwindow->mdi);
-  if (!ic) return;
-/*  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 2); */
-  sendmsg_window_new (widget, BALSA_INDEX (ic->index), 2);
+
+  sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index), 2);
 }
 
 
 static void
 next_message_cb (GtkWidget * widget)
 {
-  MainWindow *mainwindow;
-  IndexChild *ic;
-
   g_return_if_fail (widget != NULL);
 
-  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-  ic = index_child_get_active(mainwindow->mdi);
-  if (!ic) return;
-  balsa_index_select_next (BALSA_INDEX (ic->index));
+  if (!balsa_app.current_index)
+    return;
+
+  balsa_index_select_next (BALSA_INDEX (balsa_app.current_index));
 }
 
 
 static void
 previous_message_cb (GtkWidget * widget)
 {
-  MainWindow *mainwindow;
-  IndexChild *ic;
-
   g_return_if_fail (widget != NULL);
-  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-  ic = index_child_get_active(mainwindow->mdi);
-  if (!ic) return;
-  balsa_index_select_previous (BALSA_INDEX (ic->index));
+
+  if (!balsa_app.current_index)
+    return;
+
+  balsa_index_select_previous (BALSA_INDEX (balsa_app.current_index));
 }
 
 

@@ -377,7 +377,7 @@ moveto_handler (BalsaIndex * bindex)
 {
   if (!GTK_WIDGET_VISIBLE (GTK_WIDGET (bindex)))
     return TRUE;
-  gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), bindex->first_new_message - 1, -1, 1.0, 0.0);
+  gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), bindex->first_new_message - 1, -1, 0.0, 0.0);
   return FALSE;
 }
 

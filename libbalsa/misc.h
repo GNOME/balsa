@@ -22,7 +22,7 @@
 
 #include "libbalsa.h"
 
-gchar *address_to_gchar (Address * addr);
+gchar *address_to_gchar (const Address * addr);
 gchar *make_string_from_list (GList *);
 
 size_t readfile (FILE * fp, char **buf);
@@ -39,4 +39,6 @@ struct _MailboxNode
 
 MailboxNode *mailbox_node_new (const gchar * name, Mailbox * mb, gint i);
 gchar *g_get_host_name (void);
+
+gboolean find_word(const gchar * word, const gchar* str);
 #endif /* __MISC_H__ */

@@ -70,6 +70,8 @@ typedef struct _PropertyUI {
 
 	GtkWidget *date_format;
 
+	GtkWidget *selected_headers;
+
 	/* printing */
 	GtkWidget *PrintCommand;
 	GtkWidget *PrintBreakline;
@@ -438,6 +440,8 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 	/* Date format */
 	gtk_signal_connect (GTK_OBJECT (pui->date_format), "changed",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+	gtk_signal_connect (GTK_OBJECT (pui->selected_headers), "changed",
+			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
 
 	gtk_widget_show_all ( GTK_WIDGET(pui->pbox));
 
@@ -581,6 +585,11 @@ apply_prefs (GtkWidget * pbox, PropertyUI * pui)
 	g_free (balsa_app.date_string);
 	balsa_app.date_string = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->date_format)));
 
+	/* selected headers */
+	g_free (balsa_app.selected_headers);
+	balsa_app.selected_headers = g_strdup (gtk_entry_get_text (
+	   GTK_ENTRY (pui->selected_headers)) );
+
 	// XXX
 	//  refresh_main_window ();
 	
@@ -695,9 +704,12 @@ set_prefs (void)
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->empty_trash), balsa_app.empty_trash_on_exit);
 
 	/* date format */
-	gtk_entry_set_text (GTK_ENTRY (pui->date_format),
-			    balsa_app.date_string ? balsa_app.date_string : "");
-
+	if(balsa_app.date_string) 
+	   gtk_entry_set_text (GTK_ENTRY (pui->date_format),
+			       balsa_app.date_string);
+	if(balsa_app.date_string) 
+	   gtk_entry_set_text (GTK_ENTRY (pui->selected_headers),
+			       balsa_app.selected_headers);
 }
 
 void
@@ -1215,15 +1227,12 @@ create_display_page ( )
 	GtkWidget *format_frame, *format_table, *format_widget;
 	
 	vbox2 = gtk_vbox_new (FALSE, 0);
-	gtk_widget_show (vbox2);
 	
 	frame7 = gtk_frame_new (_("Main window"));
-	gtk_widget_show (frame7);
 	gtk_box_pack_start (GTK_BOX (vbox2), frame7, FALSE, FALSE, 0);
 	gtk_container_set_border_width (GTK_CONTAINER (frame7), 5);
 
 	vbox7 = gtk_vbox_new (TRUE, 0);
-	gtk_widget_show (vbox7);
 	gtk_container_add (GTK_CONTAINER (frame7), vbox7);
 	gtk_container_set_border_width (GTK_CONTAINER (vbox7), 5);	
 
@@ -1237,6 +1246,8 @@ create_display_page ( )
  *
  * -Ragnar-
  *
+ * pawels: is replaced by the code connected to "selected headers" field 
+ * below. To be removed.
  */
 	pui->view_allheaders = gtk_check_button_new_with_label (_("View all headers"));
 	gtk_widget_show (pui->view_allheaders);
@@ -1245,21 +1256,17 @@ create_display_page ( )
 	
 #ifdef BALSA_SHOW_INFO
 	pui->mblist_show_mb_content_info = gtk_check_button_new_with_label (_("Show mailbox statistics in left pane"));
-	gtk_widget_show (pui->mblist_show_mb_content_info);
 	gtk_box_pack_start (GTK_BOX (vbox7), pui->mblist_show_mb_content_info, FALSE, TRUE, 0);
 #endif BALSA_SHOW_INFO
 
 	hbox4 = gtk_hbox_new (TRUE, 0);
-	gtk_widget_show (hbox4);
 	gtk_box_pack_start (GTK_BOX (vbox2), hbox4, FALSE, FALSE, 0);
 	
 	frame8 = gtk_frame_new (_("Toolbars"));
-	gtk_widget_show (frame8);
 	gtk_box_pack_start (GTK_BOX (hbox4), frame8, TRUE, TRUE, 0);
 	gtk_container_set_border_width (GTK_CONTAINER (frame8), 5);
 
 	vbox3 = gtk_vbox_new (FALSE, 0);
-	gtk_widget_show (vbox3);
 	gtk_container_add (GTK_CONTAINER (frame8), vbox3);
 	gtk_container_set_border_width (GTK_CONTAINER (vbox3), 5);
 
@@ -1273,51 +1280,58 @@ create_display_page ( )
 
 	
 	frame9 = gtk_frame_new (_("Display progress dialog"));
-	gtk_widget_show (frame9);
 	gtk_box_pack_start (GTK_BOX (hbox4), frame9, TRUE, TRUE, 0);
 	gtk_container_set_border_width (GTK_CONTAINER (frame9), 5);
 	
 	vbox4 = gtk_vbox_new (FALSE, 0);
-	gtk_widget_show (vbox4);
 	gtk_container_add (GTK_CONTAINER (frame9), vbox4);
 	gtk_container_set_border_width (GTK_CONTAINER (vbox4), 5);
 
 	format_frame = gtk_frame_new( _("Display Formats") );
-	gtk_widget_show( format_frame );
 	gtk_box_pack_start( GTK_BOX(vbox2), format_frame, FALSE, FALSE, 0 );
 	gtk_container_set_border_width( GTK_CONTAINER( format_frame ), 5 );
 
-	format_table = gtk_table_new( 1, 2, FALSE );
-	gtk_widget_show( format_table );
+	format_table = gtk_table_new( 2, 2, FALSE );
 	gtk_container_add( GTK_CONTAINER( format_frame ), format_table );
 	gtk_container_set_border_width( GTK_CONTAINER( format_table ), 5 );	
-
 	format_widget = gtk_label_new( _("Date encoding (for strftime):") );
-	gtk_widget_show( format_widget );
 	gtk_table_attach( GTK_TABLE( format_table ), format_widget, 0, 1, 0, 1,
 			  (GtkAttachOptions) GTK_FILL, (GtkAttachOptions) 0,
 			  0, 0 );
 	gtk_label_set_justify( GTK_LABEL( format_widget ), GTK_JUSTIFY_RIGHT );
 
 	format_widget = gtk_entry_new();
-	gtk_widget_show( format_widget );
 	gtk_table_attach( GTK_TABLE( format_table ), format_widget, 1, 2, 0, 1,
 			  (GtkAttachOptions) GTK_FILL, (GtkAttachOptions) 0,
 			  0, 0 );
 	pui->date_format = format_widget;
 
-	
+	format_widget = gtk_label_new( _("Selected headers:") );
+	gtk_table_attach( GTK_TABLE( format_table ), format_widget, 0, 1, 1, 2,
+			  (GtkAttachOptions) GTK_FILL, (GtkAttachOptions) 0,
+			  0, 0 );
+	gtk_label_set_justify( GTK_LABEL( format_widget ), GTK_JUSTIFY_RIGHT );
+
+	format_widget = gtk_entry_new();
+	gtk_table_attach( GTK_TABLE( format_table ), format_widget, 1, 2, 1, 2,
+			  (GtkAttachOptions) GTK_FILL, (GtkAttachOptions) 0,
+			  0, 0 );
+	pui->selected_headers = format_widget;
+
 	group = NULL;
 	for (i = 0; i < NUM_PWINDOW_MODES; i++)  {
-		pui->pwindow_type[i] = GTK_RADIO_BUTTON (gtk_radio_button_new_with_label (group, _(pwindow_type_label[i])));
-		gtk_box_pack_start (GTK_BOX (vbox4), GTK_WIDGET (pui->pwindow_type[i]), FALSE, TRUE, 0);
+		pui->pwindow_type[i] = GTK_RADIO_BUTTON (
+		   gtk_radio_button_new_with_label (group, 
+						    _(pwindow_type_label[i])));
+		gtk_box_pack_start (GTK_BOX (vbox4), 
+				    GTK_WIDGET (pui->pwindow_type[i]), 
+				    FALSE, TRUE, 0);
 		group = gtk_radio_button_group (pui->pwindow_type[i]);
 	}
 
-	
 	label18 = gtk_label_new (_("Display"));
-	gtk_widget_show (label18);
 
+	gtk_widget_show_all (vbox2);
 	return vbox2;
 }
 

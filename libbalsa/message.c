@@ -208,13 +208,13 @@ message_destroy(Message * message)
   gtk_object_destroy((GtkObject*)message);
 }
 
-gchar *
+const gchar *
 message_pathname (Message * message)
 {
   return CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno]->path;
 }
 
-gchar *
+const gchar *
 message_charset (Message *message)
 {
    gchar * charset = NULL;
@@ -229,6 +229,21 @@ message_charset (Message *message)
    }
 
    return charset;
+}
+
+/* returns GList of _const_ strings containing user headers */
+GList *
+message_user_hdrs(Message *message) 
+{
+   HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
+   LIST * tmp;
+   GList * res = NULL;
+
+   g_assert(cur != NULL);
+   for(tmp = cur->env->userhdrs; tmp; tmp = tmp->next)
+      res = g_list_append(res, tmp->data);
+      
+   return res;
 }
 
 /* TODO and/or FIXME look at the flags for mutt_append_message */

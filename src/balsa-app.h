@@ -62,6 +62,7 @@
 
 #define DEFAULT_MESSAGE_FONT "-*-fixed-medium-r-normal-*-*-*-*-*-c-*-iso8859-1"
 #define DEFAULT_DATE_FORMAT "%a, %d %b %Y %H:%M:%S"
+#define DEFAULT_SELECTED_HDRS "From To Date Cc"
 #define DEFAULT_CHARSET "ISO-8859-1"
 #define DEFAULT_ENCODING ENC8BIT
 #define DEFAULT_LINESIZE 78
@@ -81,6 +82,11 @@ struct stPrinting{
 };
 
 
+enum ShownHeaders {
+   HEADERS_NONE = 0,
+   HEADERS_SELECTED,
+   HEADERS_ALL 
+};
 
 /* global balsa application structure */
 extern struct BalsaApplication
@@ -150,7 +156,9 @@ extern struct BalsaApplication
   gboolean wordwrap;
   gint wraplength;
   gboolean browse_wrap;
-  
+  enum ShownHeaders shown_headers;
+  gchar * selected_headers;
+
   gboolean empty_trash_on_exit;
   gboolean previewpane;
   gboolean debug;

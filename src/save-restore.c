@@ -726,6 +726,16 @@ config_global_load (void)
   else
     balsa_app.browse_wrap = atoi (field);
 
+  if ((field = pl_dict_get_str (globals, "ShownHeaders")) == NULL)
+    balsa_app.shown_headers = HEADERS_SELECTED;
+  else
+    balsa_app.shown_headers = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "SelectedHeaders")) == NULL)
+    balsa_app.selected_headers = g_strdup (DEFAULT_SELECTED_HDRS);
+  else
+    balsa_app.selected_headers = g_strdup (field);
+
   /* toolbar style */
   if ((field = pl_dict_get_str (globals, "ToolbarStyle")) == NULL)
     balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
@@ -1040,6 +1050,14 @@ config_global_save (void)
 
   snprintf (tmp, sizeof (tmp), "%d", balsa_app.browse_wrap );
   pl_dict_add_str_str (globals, "BrowseWrap", tmp);
+
+  snprintf (tmp, sizeof (tmp), "%d", balsa_app.shown_headers );
+  pl_dict_add_str_str (globals, "ShownHeaders", tmp);
+
+  if(balsa_app.selected_headers)
+     pl_dict_add_str_str (globals, "SelectedHeaders", 
+			  balsa_app.selected_headers);
+  else pl_dict_add_str_str (globals, "SelectedHeaders", DEFAULT_SELECTED_HDRS);
 
   /* arp --- "LeadinStr" into cfg. */
   if (balsa_app.quote_str != NULL)

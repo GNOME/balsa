@@ -441,6 +441,8 @@ balsa_message_clear (BalsaMessage * bmessage)
     {
       gtk_object_destroy (GTK_OBJECT (bmessage->headers));
       bmessage->headers = NULL;
+    }
+  if(bmessage->body) {
       gtk_object_destroy (GTK_OBJECT (bmessage->body));
       bmessage->body = NULL;
     }
@@ -545,42 +547,61 @@ next_row_height (GnomeCanvasGroup * row[])
   gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (row[1]), &x1, &y1, &x2, &y2);
   t = y2 - y1;
 
-  if (o > t)
-    return o;
-  else
-    return t;
+  return (o > t) ? o : t;
 }
 
 static void
-optional_list_header(GList * list, double *next_height, 
-		     GnomeCanvasGroup *row[], const gchar* label) 
+add_header_glist(const char * header, const gchar* label, 
+		 GList * list, GnomeCanvasGroup *row[]) 
 {
   GnomeCanvasItem *item;
   GnomeCanvasItem *data;
-  gchar * val;
-  if (list) {
-     *next_height = next_row_height (row);
-     item = balsa_message_text_item (label, row[0], 0.0, *next_height, 
-				     NULL);
-     val = make_string_from_list (list);
-     data = balsa_message_text_item (val, row[1], 0.0, *next_height, NULL);
-     g_free(val);
+  gchar * value;
+  double next_height;
+
+  if (list && (balsa_app.shown_headers == HEADERS_ALL || 
+		find_word(header, balsa_app.selected_headers) ) ) {
+     next_height = next_row_height (row);
+     item  = balsa_message_text_item (label, row[0], 0.0, next_height, NULL);
+     value = make_string_from_list (list);
+     if(balsa_app.browse_wrap)
+	wrap_string(value, balsa_app.wraplength-15);
+     data  = balsa_message_text_item (value, row[1], 0.0, next_height, NULL);
+     g_free(value);
+  }
+}
+
+static void
+add_header_gchar(const char * header, const gchar * label, 
+		 const gchar * value, GnomeCanvasGroup *row[]) 
+{
+  GnomeCanvasItem *item;
+  GnomeCanvasItem *data;
+  double next_height;
+
+  g_assert(label != NULL && header != NULL);
+
+  if (value && (balsa_app.shown_headers == HEADERS_ALL || 
+		find_word(header, balsa_app.selected_headers) ) ) {
+     next_height = next_row_height (row);
+     item = balsa_message_text_item (label, row[0], 0.0, next_height, NULL);
+     data = balsa_message_text_item (value, row[1], 0.0, next_height, NULL);
   }
 }
 
 static void
 headers2canvas (BalsaMessage * bmessage, Message * message)
 {
-  double next_height = 0;
   double x1, x2, y1, y2;
 
   GnomeCanvasGroup *bm_root;
   GnomeCanvasGroup *row[2];
-  GnomeCanvasItem *item;
-  GnomeCanvasItem *data;
+
+  if(balsa_app.shown_headers == HEADERS_NONE)
+     return;
 
   bm_root = GNOME_CANVAS_GROUP (GNOME_CANVAS (bmessage)->root);
-
+  
   bmessage->headers =
     GNOME_CANVAS_GROUP (gnome_canvas_item_new (bm_root,
 					       GNOME_TYPE_CANVAS_GROUP,
@@ -599,55 +620,43 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 						      "y", (double) 0.0,
 						      NULL));
 
-  if (message->date)
-    {
-      /* this is the first row, so we'll use 0.0 here */
-      item = balsa_message_text_item (_("Date:"), row[0], 0.0, 0.0, NULL);
-      data = balsa_message_text_item (message->date, row[1], 0.0, 0.0, NULL);
-    }
+  add_header_gchar("date", _("Date:"), message->date, row); 
 
-  if (message->from)
-    {
-      gchar *from;
-      next_height = next_row_height (row);
+  if (message->from) {
+     gchar *from = address_to_gchar(message->from);
+     add_header_gchar("from", _("From:"), from, row);
+     g_free (from);
+  }
 
-      item = balsa_message_text_item (_("From:"), row[0], 0.0, next_height, 
-				      NULL);
+  add_header_glist("to",  _("To:"),  message->to_list,  row);
+  add_header_glist("cc",  _("Cc:"),  message->cc_list,  row);
+  add_header_glist("bcc", _("Bcc:"), message->bcc_list, row); 
 
-      if (message->from->personal)
-	from = g_strdup_printf ("%s <%s>", message->from->personal, message->from->mailbox);
-      else
-	from = g_strdup (message->from->mailbox);
+  if(message->fcc_mailbox)
+     add_header_gchar("fcc" , _("Fcc:"),     message->fcc_mailbox->name, row);
+  add_header_gchar("subject", _("Subject:"), message->subject,           row);
 
-      data = balsa_message_text_item (from, row[1], 0.0, next_height, NULL);
-      g_free (from);
-    }
-
-
-  optional_list_header(message->to_list,  &next_height, row, _("To:"));
-  optional_list_header(message->cc_list,  &next_height, row, _("Cc:"));
-  optional_list_header(message->bcc_list, &next_height, row, _("Bcc:"));
-
-  if (message->fcc_mailbox)
-    {
-      next_height = next_row_height (row);
-      item = balsa_message_text_item (_("Fcc:"), row[0], 0.0, next_height, 
-				      NULL);
-      data = balsa_message_text_item (message->fcc_mailbox->name, row[1], 0.0,
-                                      next_height, NULL);
-    }
-
-  if (message->subject)
-    {
-      next_height = next_row_height (row);
-      item = balsa_message_text_item (_("Subject:"), row[0], 0.0, next_height,
-				      NULL);
-      data = balsa_message_text_item (message->subject, row[1], 0.0, 
-				      next_height, NULL);
-    }
+  /* user headers have no alignment, should they have it? */
+  if(balsa_app.shown_headers == HEADERS_ALL) {
+     GList *p, * lst = message_user_hdrs(message);
+     gchar * hdr, *ptr, *val;
+     for(p = g_list_first(lst); p; p = g_list_next(p) ) {
+	ptr = strchr((char*)p->data, ':');
+	if(ptr) {
+	   hdr = g_strndup((gchar*)p->data, ptr -((char*)p->data) +1);
+	   val = g_strdup(ptr+1);
+	   if(balsa_app.browse_wrap)
+	      wrap_string(val, balsa_app.wraplength-(ptr -((char*)p->data)+1));
+	   add_header_gchar("user", hdr, val,  row);
+	   g_free(val);
+	   g_free(hdr);
+	}
+     }
+     g_list_free(lst);
+  }
 
   gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (row[0]), &x1, &y1, &x2, &y2);
-  gnome_canvas_item_move (GNOME_CANVAS_ITEM (row[1]), x2 - x1 + 50, 0.0);
+  gnome_canvas_item_move (GNOME_CANVAS_ITEM (row[1]), x2 - x1 + 25, 0.0);
 }
 
 
@@ -659,7 +668,12 @@ body2canvas (BalsaMessage * bmessage, Message * message)
 
   bm_root = GNOME_CANVAS_GROUP (GNOME_CANVAS (bmessage)->root);
 
-  gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (bmessage->headers), &x1, &y1, &x2, &y2);
+  if(bmessage->headers)
+     gnome_canvas_item_get_bounds (
+	GNOME_CANVAS_ITEM (bmessage->headers), &x1, &y1, &x2, &y2);
+  else {
+     x1 = x2= y1 = y2 = 0;
+  }
 
   bmessage->body =
     GNOME_CANVAS_GROUP (gnome_canvas_item_new (bm_root,
@@ -1020,7 +1034,6 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gr
 	s.fpin = fp;
 	s.prefix = '\0';
 
-	fprintf (stderr, "Someone please verify the following assignment.\n");
 	s.flags = 0;
 
 	mutt_mktemp( tmp_file_name );

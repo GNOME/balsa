@@ -130,7 +130,9 @@ static void previous_message_cb (GtkWidget * widget, gpointer data);
 static void delete_message_cb (GtkWidget * widget, gpointer data);
 static void undelete_message_cb (GtkWidget * widget, gpointer data);
 static void wrap_message_cb (GtkWidget * widget, gpointer data);
-
+static void show_no_headers_cb(GtkWidget * widget, gpointer data);
+static void show_selected_cb(GtkWidget * widget, gpointer data);
+static void show_all_headers_cb(GtkWidget * widget, gpointer data);
 
 static void filter_dlg_cb (GtkWidget * widget, gpointer data);
 
@@ -190,6 +192,16 @@ static GnomeUIInfo file_menu[] =
   GNOMEUIINFO_END
 };
 
+static GnomeUIInfo shown_hdrs_menu[] =
+{
+   GNOMEUIINFO_RADIOITEM( N_ ("_Show no headers"), NULL, 
+			  show_no_headers_cb, NULL),
+   GNOMEUIINFO_RADIOITEM( N_ ("Show _selected headers"),NULL,
+			  show_selected_cb, NULL),
+   GNOMEUIINFO_RADIOITEM( N_ ("Show all _headers"), NULL, 
+			  show_all_headers_cb, NULL),
+   GNOMEUIINFO_END
+};
 static GnomeUIInfo message_menu[] =
 {
     /* M */
@@ -239,7 +251,8 @@ static GnomeUIInfo message_menu[] =
   GNOMEUIINFO_SEPARATOR,
 #define MENU_MESSAGE_WRAP_POS 9
   GNOMEUIINFO_TOGGLEITEM( N_ ("_Wrap"), NULL, wrap_message_cb, NULL),
-  
+  GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_RADIOLIST(shown_hdrs_menu),
   GNOMEUIINFO_END
 };
 
@@ -503,6 +516,12 @@ balsa_window_new ()
   if(balsa_app.browse_wrap)
      gtk_check_menu_item_set_active(
 	GTK_CHECK_MENU_ITEM(message_menu[MENU_MESSAGE_WRAP_POS].widget), TRUE);
+
+  if(balsa_app.shown_headers>= HEADERS_NONE && 
+     balsa_app.shown_headers<= HEADERS_ALL)
+     gtk_check_menu_item_set_active(
+	GTK_CHECK_MENU_ITEM(shown_hdrs_menu[balsa_app.shown_headers].widget),
+	TRUE);
   
   return GTK_WIDGET (window);
 }
@@ -1275,6 +1294,37 @@ wrap_message_cb (GtkWidget * widget, gpointer data)
    if(index) 
       balsa_index_redraw_current (index);
 }
+
+static void 
+show_no_headers_cb(GtkWidget * widget, gpointer data) {
+   BalsaIndex *index;
+   
+   balsa_app.shown_headers = HEADERS_NONE;
+   index =(BalsaIndex*)balsa_window_find_current_index(BALSA_WINDOW (data));
+   if(index) 
+      balsa_index_redraw_current (index);
+}
+
+static void 
+show_selected_cb(GtkWidget * widget, gpointer data) {
+   BalsaIndex *index;
+   
+   balsa_app.shown_headers = HEADERS_SELECTED;
+   index =(BalsaIndex*)balsa_window_find_current_index(BALSA_WINDOW (data));
+   if(index) 
+      balsa_index_redraw_current (index);
+}
+
+static void
+show_all_headers_cb(GtkWidget * widget, gpointer data) {
+   BalsaIndex *index;
+   
+   balsa_app.shown_headers = HEADERS_ALL;
+   index =(BalsaIndex*)balsa_window_find_current_index(BALSA_WINDOW (data));
+   if(index) 
+      balsa_index_redraw_current (index);
+}
+
 
 static void
 filter_dlg_cb (GtkWidget * widget, gpointer data)

@@ -124,6 +124,8 @@ balsa_app_init (void)
   balsa_app.wordwrap = TRUE;
   balsa_app.wraplength = 79;
   balsa_app.browse_wrap = TRUE;
+  balsa_app.shown_headers = HEADERS_SELECTED;
+  balsa_app.selected_headers = g_strdup(DEFAULT_SELECTED_HDRS);
 
   balsa_app.index_num_width = NUM_DEFAULT_WIDTH;
   balsa_app.index_status_width = STATUS_DEFAULT_WIDTH;

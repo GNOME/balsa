@@ -55,28 +55,20 @@ g_get_host_name (void)
   return g_strdup (utsname.nodename);
 }
 
+
 gchar *
-address_to_gchar (Address * addr)
+address_to_gchar (const Address * addr)
 {
-  gchar *retc;
+  gchar *retc = NULL;
 
-  GString *gs = g_string_new (NULL);
-
-  if (addr->personal)
-    {
-      gs = g_string_append (gs, addr->personal);
-      gs = g_string_append_c (gs, ' ');
-    }
-  if (addr->mailbox)
-    {
-      if (addr->personal)
-	gs = g_string_append_c (gs, '<');
-      gs = g_string_append (gs, addr->mailbox);
-      if (addr->personal)
-	gs = g_string_append_c (gs, '>');
-    }
-  retc = g_strdup (gs->str);
-  g_string_free (gs, TRUE);
+  if (addr->personal) {
+     if(addr->mailbox)
+	retc= g_strdup_printf("%s <%s>", addr->personal, addr->mailbox);
+     else retc = g_strdup(addr->personal);
+  } else
+     if(addr->mailbox)
+	retc = g_strdup(addr->mailbox);
+  
   return retc;
 }
 
@@ -155,3 +147,19 @@ readfile (FILE * fp, char **buf)
 
   return size;
 }
+
+/* find_word
+   searches given word delimited by blanks or string boundaries in given
+   string. Returns TRUE if the word is found.
+*/
+gboolean
+find_word(const gchar * word, const gchar* str) {
+   char* ptr;
+   int len = strlen(word);
+
+   if( (ptr=strstr(str, word)) != NULL) {
+      return ( ptr==str || isspace((unsigned char)*(ptr-1)) ) && 
+	 ( isspace((unsigned char)*(ptr+len)) || *(ptr+len)=='\0' );
+   } return FALSE;
+}
+

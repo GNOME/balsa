@@ -240,9 +240,8 @@ headerMenuDesc headerDescs[] = { {"to", 3}, {"from", 3}, {"subject",2},
 				  {"replyto", 3}, {"attachments", 4} };
 
 static GnomeUIInfo iso_menu[] = {
-  { GNOME_APP_UI_RADIOITEMS, NULL, NULL, iso_charset_menu, NULL, NULL,
-    GNOME_APP_PIXMAP_NONE, NULL, 0, 0, NULL },
-  GNOMEUIINFO_END
+   GNOMEUIINFO_RADIOLIST(iso_charset_menu),
+   GNOMEUIINFO_END
 };
 
 
@@ -1475,24 +1474,13 @@ static gint toggle_attachments_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
    return toggle_entry(bsmsg->attachments, MENU_TOGGLE_ATTACHMENTS_POS,4);
 }
 
-static gint
-findWord(const gchar * word, const gchar* str) {
-   char* ptr;
-   int len = strlen(word);
-
-   if( (ptr=strstr(str, word)) != NULL) {
-      return (ptr==str || *(ptr-1)==' ') && 
-	 ( *(ptr+len)==' ' || *(ptr+len)=='\0');
-   } return FALSE;
-}
-
 static void set_menus(BalsaSendmsg *msg)
 {
    unsigned i;
    const gchar * charset = NULL;
 
    for(i=0; i<sizeof(headerDescs)/sizeof(headerDescs[0]); i++)
-      if(findWord(headerDescs[i].name, balsa_app.compose_headers) ) {
+      if(find_word(headerDescs[i].name, balsa_app.compose_headers) ) {
 	 /* show... (well, it has already been shown). */
 	    gtk_check_menu_item_set_active(
 	    GTK_CHECK_MENU_ITEM(view_menu[i].widget), TRUE );

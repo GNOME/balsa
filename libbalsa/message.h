@@ -133,7 +133,8 @@ void message_body_unref (Message * message);
 /*
  * misc message releated functions
  */
-gchar *message_pathname (Message * message);
-gchar *message_charset  (Message *message);
+const gchar *message_pathname (Message * message);
+const gchar *message_charset  (Message *message);
 
+GList *message_user_hdrs(Message *message);
 #endif /* __MESSAGE_H__ */

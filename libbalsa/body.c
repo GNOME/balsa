@@ -247,3 +247,24 @@ libbalsa_message_body_is_inline(LibBalsaMessageBody * body)
     libbalsa_unlock_mutt();
     return res;
 }
+
+LibBalsaMessageBody*
+libbalsa_message_body_get_by_id(LibBalsaMessageBody* body, const gchar* id)
+{
+    LibBalsaMessageBody* res;
+    const gchar* bodyid;
+
+    g_return_val_if_fail(id, NULL);
+    libbalsa_lock_mutt();
+    bodyid = mutt_get_parameter("id", body->mutt_body->parameter);
+    libbalsa_unlock_mutt();
+
+    if( bodyid && strcmp(id, bodyid) ==0)
+	return body;
+    if(body->parts && 
+       (res=libbalsa_message_body_get_by_id(body->parts, id))!=NULL)
+	return res;
+    if(body->next)
+	return libbalsa_message_body_get_by_id(body->next, id);
+    else return NULL;
+}

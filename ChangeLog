@@ -1,3 +1,9 @@
+2003-01-02  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/body.[hc]: implement libbalsa_message_body_get_by_id()
+	* libbalsa/message.[hc]: implement libbalsa_message_get_part_by_id().
+	* src/balsa-message.c: add "request_url" signal handler (#52168).
+
 2002-12-31  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/mailbox.c: update mailbox signal scheme (merge HEAD).

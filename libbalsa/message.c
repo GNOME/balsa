@@ -396,6 +396,20 @@ libbalsa_message_user_hdrs(LibBalsaMessage * message)
     return res;
 }
 
+/* libbalsa_message_get_part_by_id:
+   return a message part identified by Content-ID=id
+   message must be referenced. (FIXME?)
+*/
+FILE*
+libbalsa_message_get_part_by_id(LibBalsaMessage* msg, const gchar* id)
+{
+    LibBalsaMessageBody* body = 
+	libbalsa_message_body_get_by_id(msg->body_list,	id);
+    if(!body) return NULL;
+    if(!libbalsa_message_body_save_temporary(body, NULL)) return NULL;
+    return fopen(body->temp_filename, "r");
+}
+
 
 gboolean
 libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
@@ -805,7 +819,7 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 	UNLOCK_MAILBOX(message->mailbox);
 
 	fseek(msg->fp, cur->content->offset, 0);        
-    } else {
+    } else { /* disconnected mode */
 	UNLOCK_MAILBOX(message->mailbox);
 	msg = (MESSAGE *)g_malloc (sizeof (MESSAGE));
 	msg->fp = libbalsa_mailbox_get_message_stream(message->mailbox,
@@ -1293,20 +1307,3 @@ libbalsa_message_title(LibBalsaMessage * message, const gchar * format)
     return tmp;
 }
 
-LibBalsaMessage *
-libbalsa_message_find_by_message_id(LibBalsaMailbox * mailbox, gchar * msgid)
-{
-    LibBalsaMessage* message;
-    GList *list = NULL;
-    
-
-    for (list = mailbox->message_list; list; list = g_list_next(list)) {
-        message = list->data;
-        
-        if (g_ascii_strcasecmp(message->message_id, msgid) == 0) {
-            return message;
-        }
-    }
-
-    return NULL;
-}

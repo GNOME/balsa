@@ -133,6 +133,9 @@ static void scroll_change(GtkAdjustment * adj, gint diff);
 static void balsa_gtk_html_size_request(GtkWidget * widget,
 					GtkRequisition * requisition,
 					gpointer data);
+static gboolean balsa_gtk_html_url_requested(GtkWidget *html, const gchar *url,
+					     HtmlStream* stream,
+					     LibBalsaMessage* msg);
 static void balsa_gtk_html_link_clicked(GObject * obj, 
 					const gchar *url);
 #endif
@@ -1726,6 +1729,8 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
     html_view_set_document(HTML_VIEW(html), document);
 
     html_document_open_stream(document, "text/html");
+    g_signal_connect(G_OBJECT(document), "request_url",
+		     G_CALLBACK(balsa_gtk_html_url_requested), bm->message);
     html_document_write_stream(document, ptr, len);
     html_document_close_stream (document);
 
@@ -2567,6 +2572,29 @@ balsa_gtk_html_size_request(GtkWidget * widget,
         widget->style->xthickness * 2;
     requisition->height = GTK_LAYOUT(widget)->vadjustment->upper +
         widget->style->ythickness * 2;
+}
+
+static gboolean
+balsa_gtk_html_url_requested(GtkWidget *html, const gchar *url,
+			     HtmlStream* stream, LibBalsaMessage* msg)
+{
+    FILE* f;
+    int i;
+    char buf[4096];
+
+    if(strncmp(url,"cid:",4)) {
+	printf("non-local URL request ignored: %s\n", url);
+	return FALSE;
+    }
+    if( (f=libbalsa_message_get_part_by_id(msg,url+4)) == NULL)
+	return FALSE;
+
+    while ((i = fread (buf, 1, sizeof(buf), f)) != 0)
+	html_stream_write (stream, buf, i);
+    html_stream_close(stream);
+    fclose (f);
+    
+    return TRUE;
 }
 
 static void

@@ -1648,9 +1648,11 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
         gchar *hdr;
         ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle,
                                                    message->msgno);
-        LibBalsaMessageBody *body = libbalsa_message_body_new(message);
-	lbm_imap_construct_body(body, im->body);
-        libbalsa_message_append_part(message, body);
+        if(flags & LB_FETCH_STRUCTURE) {
+            LibBalsaMessageBody *body = libbalsa_message_body_new(message);
+            lbm_imap_construct_body(body, im->body);
+            libbalsa_message_append_part(message, body);
+        }
         if( (flags & LB_FETCH_RFC822_HEADERS) &&
             (hdr = im->fetched_header_fields) && *hdr && *hdr != '\r') {
             libbalsa_message_set_headers_from_string(message, hdr);

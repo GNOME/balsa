@@ -2982,7 +2982,10 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     /* create text area for the message */
     gtk_paned_add2(GTK_PANED(paned), create_text_area(bsmsg));
 
-    /* fill in that info: */
+    /* fill in that info:
+     * ref the message so that we have all needed headers */
+    if (message)
+	libbalsa_message_body_ref(message, TRUE, TRUE);
 
     /* To: */
     if (type == SEND_REPLY || type == SEND_REPLY_ALL) {
@@ -3041,8 +3044,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
                            2 * paned->style->ythickness);
     gnome_app_set_contents(GNOME_APP(window), paned);
 
-    if (message)
-	libbalsa_message_body_ref(message, TRUE, TRUE);
     /* set the menus - and language index */
     if (message && !bsmsg->charset)
 	bsmsg->charset = libbalsa_message_charset(message);

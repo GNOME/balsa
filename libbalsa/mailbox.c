@@ -1407,8 +1407,6 @@ libbalsa_mailbox_fetch_message_structure(LibBalsaMailbox *mailbox,
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
     g_return_if_fail(message != NULL);
 
-    if(message->body_list) /* already fetched no need to refetch it */
-        return;
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)
         ->fetch_message_structure(mailbox, message, flags);
 }

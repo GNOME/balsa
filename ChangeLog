@@ -8,6 +8,7 @@
 	* libbalsa/message.[ch]: fetch msg structure and headers in one shot.
 	* src/balsa-message.c: update argument list of message_body_ref().
 	* src/{sendmsg-window,print}.c: ditto.
+	* libbalsa/mailbox.c: make sure not to break group-reply.
 
 2004-04-19 09:17  PeterB
 

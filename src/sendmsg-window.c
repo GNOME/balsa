@@ -620,8 +620,10 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   gtk_text_set_point (GTK_TEXT (msg->text), 0);
   gtk_text_thaw (GTK_TEXT (msg->text));
   /* set the toolbar so we are consistant with the rest of balsa */
+/* FIXME */
+  /*
   gtk_toolbar_set_style (GTK_TOOLBAR (GNOME_APP (window)->toolbar), balsa_app.toolbar_style);
-
+*/
   /* display the window */
   gtk_widget_show_all (window);
 }

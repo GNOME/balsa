@@ -339,7 +339,10 @@ refresh_main_window (void)
   /*
    * set the toolbar style
    */
+/* FIXME */
+	/*
   gtk_toolbar_set_style (GTK_TOOLBAR (GNOME_APP (mdi->active_window)->toolbar), balsa_app.toolbar_style);
+  */
 }
 
 /*
@@ -705,7 +708,7 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_container_add (GTK_CONTAINER (mblw->sw), GTK_WIDGET (mblw->ctree));
   gtk_container_add (GTK_CONTAINER (dock_item), GTK_WIDGET (mblw->sw));
 
-  gnome_dock_add_item (GNOME_DOCK (app->dock), dock_item, GNOME_DOCK_POS_LEFT, 0, 0, 0, TRUE);
+  gnome_dock_add_item (GNOME_DOCK (app->dock), dock_item, GNOME_DOCK_LEFT, 0, 0, 0, TRUE);
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
 

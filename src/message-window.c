@@ -272,6 +272,7 @@ message_window_idle_handler(MessageWindow* mw)
     gtk_window_set_title(GTK_WINDOW(mw->window), title);
     g_free(title);
     balsa_message_set(msg, message);
+    balsa_message_set_close(msg, TRUE);
 
     if(msg && msg->treeview) {
 	if (msg->info_count > 1) {
@@ -461,7 +462,6 @@ message_window_new(LibBalsaMessage * message)
     if(message->mailbox->readonly)
 	gtk_widget_set_sensitive(move_menu, FALSE);
     mw->bmessage = balsa_message_new();
-    balsa_message_set_close(BALSA_MESSAGE(mw->bmessage), TRUE);
     
     gnome_app_set_contents(GNOME_APP(mw->window), mw->bmessage);
 
@@ -721,6 +721,11 @@ mw_set_selected(MessageWindow * mw)
 {
     GList *list;
 
+    /* Temporarily tell the BalsaMessage not to close when its message
+     * is finalized, so we can safely unref it in mw_clear_message.
+     * We'll restore the usual close-with-message behavior after setting
+     * the new message. */
+    balsa_message_set_close(BALSA_MESSAGE(mw->bmessage), FALSE);
     mw_clear_message(mw);
 
     list = balsa_index_selected_list(mw->bindex);

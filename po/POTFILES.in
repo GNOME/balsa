@@ -49,7 +49,6 @@ libmutt/lib.c
 libmutt/mbox.c
 libmutt/mutt_socket.c
 libmutt/mutt_ssl.c
-libmutt/mutt_tunnel.c
 libmutt/mh.c
 libmutt/mx.c
 libmutt/parse.c

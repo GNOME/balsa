@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-01-19 03:21+0100\n"
-"PO-Revision-Date: 2003-01-19 03:21+0100\n"
+"POT-Creation-Date: 2003-01-21 09:24+0100\n"
+"PO-Revision-Date: 2003-01-21 09:24+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -144,12 +144,12 @@ msgstr "Fel vid flyttande av meddelanden"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:87 src/balsa-index-threading.c:804
-#: src/balsa-index-threading.c:806 src/sendmsg-window.c:2310
-#: src/sendmsg-window.c:2311
+#: src/balsa-index-threading.c:806 src/sendmsg-window.c:2312
+#: src/sendmsg-window.c:2313
 msgid "Re:"
 msgstr "Sv:"
 
-#: libbalsa/identity.c:88 src/sendmsg-window.c:2339 src/sendmsg-window.c:2340
+#: libbalsa/identity.c:88 src/sendmsg-window.c:2341 src/sendmsg-window.c:2342
 msgid "Fwd:"
 msgstr "Vb:"
 
@@ -1299,16 +1299,6 @@ msgstr "Avsluta  "
 msgid "Help"
 msgstr "Hjälp"
 
-#: libmutt/mutt_tunnel.c:73
-#, c-format
-msgid "Connecting with \"%s\"..."
-msgstr "Ansluter med \"%s\"..."
-
-#: libmutt/mutt_tunnel.c:150 libmutt/mutt_tunnel.c:166
-#, c-format
-msgid "Tunnel error talking to %s: %s"
-msgstr "Tunnlingsfel vid diskussion med %s: %s"
-
 #: libmutt/mh.c:608
 #, c-format
 msgid "Reading %s... %d"
@@ -1820,13 +1810,13 @@ msgid "To:"
 msgstr "Till:"
 
 #. cc:
-#: src/balsa-message.c:786 src/print.c:355 src/sendmsg-window.c:1830
+#: src/balsa-message.c:786 src/print.c:355 src/sendmsg-window.c:1831
 #: src/store-address.c:277
 msgid "Cc:"
 msgstr "Kopia:"
 
 #. bcc:
-#: src/balsa-message.c:787 src/print.c:356 src/sendmsg-window.c:1835
+#: src/balsa-message.c:787 src/print.c:356 src/sendmsg-window.c:1836
 #: src/store-address.c:278
 msgid "Bcc:"
 msgstr "Blindkopia:"
@@ -1886,7 +1876,7 @@ msgstr "Åtkomsttyp: e-postserver\n"
 msgid "Mail server: %s\n"
 msgstr "E-postserver: %s\n"
 
-#: src/balsa-message.c:1003 src/sendmsg-window.c:2121
+#: src/balsa-message.c:1003 src/sendmsg-window.c:2122
 #, c-format
 msgid "Subject: %s\n"
 msgstr "Ärende: %s\n"
@@ -2107,7 +2097,7 @@ msgstr "_Meddelandetext"
 
 #. To:
 #: src/filter-edit-callbacks.c:999 src/main-window.c:2709
-#: src/sendmsg-window.c:1819
+#: src/sendmsg-window.c:1820
 msgid "_To:"
 msgstr "_Till:"
 
@@ -4109,168 +4099,172 @@ msgstr "_Kommentarer"
 msgid "_Keywords"
 msgstr "_Nyckelord"
 
-#: src/sendmsg-window.c:318 src/sendmsg-window.c:387
+#: src/sendmsg-window.c:318 src/sendmsg-window.c:389
 msgid "Brazilian"
 msgstr "Brasiliansk"
 
-#: src/sendmsg-window.c:320 src/sendmsg-window.c:389
+#: src/sendmsg-window.c:320 src/sendmsg-window.c:391
 msgid "Catalan"
 msgstr "Katalansk"
 
-#: src/sendmsg-window.c:322 src/sendmsg-window.c:391
+#: src/sendmsg-window.c:322 src/sendmsg-window.c:393
 msgid "Chinese Simplified"
 msgstr "Förenklad kinesisk"
 
-#: src/sendmsg-window.c:324 src/sendmsg-window.c:393
+#: src/sendmsg-window.c:324 src/sendmsg-window.c:395
 msgid "Chinese Traditional"
 msgstr "Traditionell kinesisk"
 
-#: src/sendmsg-window.c:326 src/sendmsg-window.c:395
+#: src/sendmsg-window.c:326 src/sendmsg-window.c:397
 msgid "Czech"
 msgstr "Tjeckisk"
 
-#: src/sendmsg-window.c:328 src/sendmsg-window.c:397
+#: src/sendmsg-window.c:328 src/sendmsg-window.c:399
 msgid "Danish"
 msgstr "Dansk"
 
-#: src/sendmsg-window.c:330 src/sendmsg-window.c:409
+#: src/sendmsg-window.c:330 src/sendmsg-window.c:411
 msgid "German"
 msgstr "Tysk"
 
-#: src/sendmsg-window.c:332 src/sendmsg-window.c:399
+#: src/sendmsg-window.c:332 src/sendmsg-window.c:401
 msgid "Dutch"
 msgstr "Nederländsk"
 
 #. English -> American English, argh...
-#: src/sendmsg-window.c:335 src/sendmsg-window.c:401
+#: src/sendmsg-window.c:335 src/sendmsg-window.c:403
 msgid "English"
 msgstr "Engelsk"
 
-#: src/sendmsg-window.c:337 src/sendmsg-window.c:403
+#: src/sendmsg-window.c:337 src/sendmsg-window.c:405
+msgid "Esperanto"
+msgstr "Esperanto"
+
+#: src/sendmsg-window.c:339
 msgid "Estonian"
 msgstr "Estländsk"
 
-#: src/sendmsg-window.c:339 src/sendmsg-window.c:405
+#: src/sendmsg-window.c:341 src/sendmsg-window.c:407
 msgid "Finnish"
 msgstr "Finsk"
 
-#: src/sendmsg-window.c:341 src/sendmsg-window.c:407
+#: src/sendmsg-window.c:343 src/sendmsg-window.c:409
 msgid "French"
 msgstr "Fransk"
 
-#: src/sendmsg-window.c:343 src/sendmsg-window.c:411
+#: src/sendmsg-window.c:345 src/sendmsg-window.c:413
 msgid "Greek"
 msgstr "Grekisk"
 
-#: src/sendmsg-window.c:345 src/sendmsg-window.c:413
+#: src/sendmsg-window.c:347 src/sendmsg-window.c:415
 msgid "Hebrew"
 msgstr "Hebreisk"
 
-#: src/sendmsg-window.c:347 src/sendmsg-window.c:415
+#: src/sendmsg-window.c:349 src/sendmsg-window.c:417
 msgid "Hungarian"
 msgstr "Ungersk"
 
-#: src/sendmsg-window.c:349 src/sendmsg-window.c:417
+#: src/sendmsg-window.c:351 src/sendmsg-window.c:419
 msgid "Italian"
 msgstr "Italiensk"
 
-#: src/sendmsg-window.c:351 src/sendmsg-window.c:419
+#: src/sendmsg-window.c:353 src/sendmsg-window.c:421
 msgid "Japanese"
 msgstr "Japansk"
 
-#: src/sendmsg-window.c:353 src/sendmsg-window.c:425
+#: src/sendmsg-window.c:355 src/sendmsg-window.c:427
 msgid "Korean"
 msgstr "Koreansk"
 
-#: src/sendmsg-window.c:355 src/sendmsg-window.c:427
+#: src/sendmsg-window.c:357 src/sendmsg-window.c:429
 msgid "Latvian"
 msgstr "Lettisk"
 
-#: src/sendmsg-window.c:357 src/sendmsg-window.c:429
+#: src/sendmsg-window.c:359 src/sendmsg-window.c:431
 msgid "Lithuanian"
 msgstr "Litauisk"
 
-#: src/sendmsg-window.c:359 src/sendmsg-window.c:431
+#: src/sendmsg-window.c:361 src/sendmsg-window.c:433
 msgid "Norwegian"
 msgstr "Norsk"
 
-#: src/sendmsg-window.c:361 src/sendmsg-window.c:433
+#: src/sendmsg-window.c:363 src/sendmsg-window.c:435
 msgid "Polish"
 msgstr "Polsk"
 
-#: src/sendmsg-window.c:363 src/sendmsg-window.c:435
+#: src/sendmsg-window.c:365 src/sendmsg-window.c:437
 msgid "Portugese"
 msgstr "Portugisisk"
 
-#: src/sendmsg-window.c:365 src/sendmsg-window.c:437
+#: src/sendmsg-window.c:367 src/sendmsg-window.c:439
 msgid "Romanian"
 msgstr "Rumänsk"
 
-#: src/sendmsg-window.c:367 src/sendmsg-window.c:439
+#: src/sendmsg-window.c:369 src/sendmsg-window.c:441
 msgid "Russian (ISO)"
 msgstr "Rysk (ISO)"
 
-#: src/sendmsg-window.c:369 src/sendmsg-window.c:441
+#: src/sendmsg-window.c:371 src/sendmsg-window.c:443
 msgid "Russian (KOI)"
 msgstr "Rysk (KOI)"
 
-#: src/sendmsg-window.c:371 src/sendmsg-window.c:443
+#: src/sendmsg-window.c:373 src/sendmsg-window.c:445
 msgid "Slovak"
 msgstr "Slovakisk"
 
-#: src/sendmsg-window.c:373 src/sendmsg-window.c:445
+#: src/sendmsg-window.c:375 src/sendmsg-window.c:447
 msgid "Spanish"
 msgstr "Spansk"
 
-#: src/sendmsg-window.c:375 src/sendmsg-window.c:447
+#: src/sendmsg-window.c:377 src/sendmsg-window.c:449
 msgid "Swedish"
 msgstr "Svensk"
 
-#: src/sendmsg-window.c:377 src/sendmsg-window.c:449
+#: src/sendmsg-window.c:379 src/sendmsg-window.c:451
 msgid "Turkish"
 msgstr "Turkisk"
 
-#: src/sendmsg-window.c:379 src/sendmsg-window.c:451
+#: src/sendmsg-window.c:381 src/sendmsg-window.c:453
 msgid "Ukrainian"
 msgstr "Ukrainsk"
 
-#: src/sendmsg-window.c:381
+#: src/sendmsg-window.c:383
 msgid "Generic UTF-8"
 msgstr "Allmän UTF-8"
 
-#: src/sendmsg-window.c:453
+#: src/sendmsg-window.c:455
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: src/sendmsg-window.c:461
+#: src/sendmsg-window.c:463
 msgid "_A-J"
 msgstr "_A-J"
 
-#: src/sendmsg-window.c:462
+#: src/sendmsg-window.c:464
 msgid "_K-Z"
 msgstr "_K-Z"
 
-#: src/sendmsg-window.c:473
+#: src/sendmsg-window.c:475
 msgid "_Request Disposition Notification"
 msgstr "_Begär leveransbekräftelse"
 
-#: src/sendmsg-window.c:475
+#: src/sendmsg-window.c:477
 msgid "_Always Queue Sent Mail"
 msgstr "_Kölägg alltid skickade brev"
 
-#: src/sendmsg-window.c:518
+#: src/sendmsg-window.c:520
 msgid "_Show"
 msgstr "_Visa"
 
-#: src/sendmsg-window.c:520
+#: src/sendmsg-window.c:522
 msgid "_Language"
 msgstr "_Språk"
 
-#: src/sendmsg-window.c:522
+#: src/sendmsg-window.c:524
 msgid "_Options"
 msgstr "A_lternativ"
 
-#: src/sendmsg-window.c:580
+#: src/sendmsg-window.c:582
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -4279,11 +4273,11 @@ msgstr ""
 "Meddelandet till \"%s\" har ändrats.\n"
 "Spara meddelandet i utkastkorgen?"
 
-#: src/sendmsg-window.c:847
+#: src/sendmsg-window.c:849
 msgid "Select Identity"
 msgstr "Välj identitet"
 
-#: src/sendmsg-window.c:1147
+#: src/sendmsg-window.c:1148
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -4298,43 +4292,43 @@ msgstr ""
 "\n"
 "Vill du verkligen bifoga denna fil som referens?"
 
-#: src/sendmsg-window.c:1158
+#: src/sendmsg-window.c:1159
 msgid "Attach as Reference?"
 msgstr "Bifoga som referens?"
 
-#: src/sendmsg-window.c:1249
+#: src/sendmsg-window.c:1250
 msgid "Remove"
 msgstr "Ta bort"
 
-#: src/sendmsg-window.c:1260
+#: src/sendmsg-window.c:1261
 msgid "attach as reference"
 msgstr "bifoga som referens"
 
-#: src/sendmsg-window.c:1266
+#: src/sendmsg-window.c:1267
 msgid "attach as file"
 msgstr "bifoga som fil"
 
-#: src/sendmsg-window.c:1421
+#: src/sendmsg-window.c:1422
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Kan inte få information om filen \"%s\": %s"
 
-#: src/sendmsg-window.c:1426
+#: src/sendmsg-window.c:1427
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Bilagan %s är ingen vanlig fil."
 
-#: src/sendmsg-window.c:1429
+#: src/sendmsg-window.c:1430
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "Filen %s kan inte läsas\n"
 
-#: src/sendmsg-window.c:1483
+#: src/sendmsg-window.c:1484
 msgid "Attach file"
 msgstr "Bifoga fil"
 
-#: src/sendmsg-window.c:1577 src/sendmsg-window.c:1614
-#: src/sendmsg-window.c:2719
+#: src/sendmsg-window.c:1578 src/sendmsg-window.c:1615
+#: src/sendmsg-window.c:2721
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -4343,94 +4337,94 @@ msgstr ""
 "Möjlig orsak: inte tillräckligt med temporärt utrymme"
 
 #. From:
-#: src/sendmsg-window.c:1814
+#: src/sendmsg-window.c:1815
 msgid "F_rom:"
 msgstr "F_rån:"
 
 #. Subject:
-#: src/sendmsg-window.c:1826
+#: src/sendmsg-window.c:1827
 msgid "S_ubject:"
 msgstr "_Ämne:"
 
 #. fcc:
-#: src/sendmsg-window.c:1840
+#: src/sendmsg-window.c:1841
 msgid "F_cc:"
 msgstr "_Vidarebefordra kopia:"
 
 #. Reply To:
-#: src/sendmsg-window.c:1869
+#: src/sendmsg-window.c:1870
 msgid "_Reply To:"
 msgstr "_Svara till:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1876
+#: src/sendmsg-window.c:1877
 msgid "_Attachments:"
 msgstr "_Bifogade filer:"
 
 #. Comments:
-#: src/sendmsg-window.c:1923
+#: src/sendmsg-window.c:1924
 msgid "Comments:"
 msgstr "Kommentarer:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1926
+#: src/sendmsg-window.c:1927
 msgid "Keywords:"
 msgstr "Nyckelord:"
 
-#: src/sendmsg-window.c:2101
+#: src/sendmsg-window.c:2102
 msgid "you"
 msgstr "du"
 
-#: src/sendmsg-window.c:2108
+#: src/sendmsg-window.c:2109
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------vidarebefordrat meddelande från %s------\n"
 
-#: src/sendmsg-window.c:2114
+#: src/sendmsg-window.c:2115
 #, c-format
 msgid "Date: %s\n"
 msgstr "Datum: %s\n"
 
-#: src/sendmsg-window.c:2128
+#: src/sendmsg-window.c:2129
 #, c-format
 msgid "From: %s\n"
 msgstr "Från: %s\n"
 
-#: src/sendmsg-window.c:2136
+#: src/sendmsg-window.c:2137
 #, c-format
 msgid "To: %s\n"
 msgstr "Till: %s\n"
 
-#: src/sendmsg-window.c:2144
+#: src/sendmsg-window.c:2145
 #, c-format
 msgid "CC: %s\n"
 msgstr "Kopia: %s\n"
 
-#: src/sendmsg-window.c:2150
+#: src/sendmsg-window.c:2151
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Meddelande-ID: %s\n"
 
-#: src/sendmsg-window.c:2157
+#: src/sendmsg-window.c:2158
 #, c-format
 msgid "References: %s"
 msgstr "Referenser: %s"
 
-#: src/sendmsg-window.c:2174
+#: src/sendmsg-window.c:2175
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "Den %s skrev %s:\n"
 
-#: src/sendmsg-window.c:2176
+#: src/sendmsg-window.c:2177
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s skrev:\n"
 
-#: src/sendmsg-window.c:2884
+#: src/sendmsg-window.c:2886
 msgid "Choose charset"
 msgstr "Välj teckentabell"
 
-#: src/sendmsg-window.c:2891
+#: src/sendmsg-window.c:2893
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
@@ -4438,16 +4432,16 @@ msgstr ""
 "Denna fil är inte kodad i US-ASCII eller UTF-8.\n"
 "Välj teckentabellen som ska användas för kodning av filen."
 
-#: src/sendmsg-window.c:2957
+#: src/sendmsg-window.c:2959
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Kunde inte öppna filen %s.\n"
 
-#: src/sendmsg-window.c:2978
+#: src/sendmsg-window.c:2980
 msgid "Include file"
 msgstr "Inkludera fil"
 
-#: src/sendmsg-window.c:3231
+#: src/sendmsg-window.c:3233
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -4456,22 +4450,22 @@ msgstr ""
 "Meddelandet kan inte kodas i teckentabellen %s.\n"
 "Välj ett språk för detta meddelande."
 
-#: src/sendmsg-window.c:3922
+#: src/sendmsg-window.c:3924
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Svara till %s: %s"
 
-#: src/sendmsg-window.c:3927
+#: src/sendmsg-window.c:3929
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Vidarebefordra meddelande till %s: %s"
 
-#: src/sendmsg-window.c:3931
+#: src/sendmsg-window.c:3933
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Fortsätt meddelande till %s: %s"
 
-#: src/sendmsg-window.c:3935
+#: src/sendmsg-window.c:3937
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nytt meddelande till %s: %s"
@@ -4843,6 +4837,12 @@ msgstr "Upp"
 #: src/toolbar-prefs.c:506
 msgid "Down"
 msgstr "Ned"
+
+#~ msgid "Connecting with \"%s\"..."
+#~ msgstr "Ansluter med \"%s\"..."
+
+#~ msgid "Tunnel error talking to %s: %s"
+#~ msgstr "Tunnlingsfel vid diskussion med %s: %s"
 
 #~ msgid "Preview Font"
 #~ msgstr "Typsnitt för förhandsgranskning"

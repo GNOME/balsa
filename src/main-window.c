@@ -1312,8 +1312,8 @@ void
 balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
 {
     const static int mailbox_menu_entries[] = {
-        MENU_MAILBOX_NEXT_POS,        MENU_MAILBOX_PREV_POS,
-        MENU_MAILBOX_NEXT_UNREAD_POS, MENU_MAILBOX_NEXT_FLAGGED_POS,
+     /* MENU_MAILBOX_NEXT_POS,        MENU_MAILBOX_PREV_POS,
+        MENU_MAILBOX_NEXT_UNREAD_POS, */ MENU_MAILBOX_NEXT_FLAGGED_POS,
         MENU_MAILBOX_MARK_ALL_POS,    MENU_MAILBOX_DELETE_POS,
         MENU_MAILBOX_EDIT_POS,     /* MENU_MAILBOX_COMMIT_POS, */
 	MENU_MAILBOX_CLOSE_POS,       MENU_MAILBOX_APPLY_FILTERS,
@@ -1374,6 +1374,14 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
         gtk_widget_set_sensitive(threading_menu[threading_menu_entries[i]].widget, enable);
     for(i=0; i < ELEMENTS(view_menu_entries); i++)
         gtk_widget_set_sensitive(view_menu[view_menu_entries[i]].widget, enable);
+
+    gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_NEXT_POS].widget,
+                             index && index->next_message);
+    gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_PREV_POS].widget,
+                             index && index->prev_message);
+    gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_NEXT_UNREAD_POS].
+                             widget, mailbox
+                             && mailbox->unread_messages > 0);
 
     if (mailbox) {
 #if defined(ENABLE_TOUCH_UI)

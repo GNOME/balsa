@@ -1,5 +1,7 @@
-2003-07-29 09:51  PeterB
+2003-07-29 12:31  PeterB
 
+	* src/balsa-index.c: Try harder to keep threads expanded when
+	balsa_app.expand_tree is set.
 	* libbalsa/address-book-extern.c: Fix #118574, #118576, #113371.
 
 2003-07-28 14:52  PeterB

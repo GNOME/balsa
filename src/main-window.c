@@ -106,6 +106,7 @@ open_main_window (void)
 {
   /* main window */
   mdi = GNOME_MDI (gnome_mdi_new ("balsa", "Balsa"));
+  set_icon ();
 
   gtk_signal_connect (GTK_OBJECT (mdi),
 		      "destroy",
@@ -122,8 +123,6 @@ open_main_window (void)
 
   gtk_window_set_policy (GTK_WINDOW (mdi->active_window), TRUE, TRUE, FALSE);
   gtk_widget_set_usize (GTK_WIDGET (mdi->active_window), balsa_app.mw_width, balsa_app.mw_height);
-
-  set_icon ();
 
   refresh_main_window ();
 }
@@ -596,7 +595,7 @@ set_icon (void)
   GdkImlibImage *im;
   GdkPixmap *pixmap;
   GdkBitmap *mask;
-
+  
   XIconSize *xis = NULL;
   gint count;
   gint i, maxw = 0, maxh = 0;
@@ -605,6 +604,11 @@ set_icon (void)
 		 GDK_ROOT_WINDOW (),
 		 &xis, &count);
 
+  if (!xis)
+    return;
+
+  g_print("XIconSize's found: %i\n",count);
+  
   for (i = 0; i < count; i++)
     {
       g_print ("min: %ih x %iw\nmax: %ih x %iw\n",
@@ -631,4 +635,8 @@ set_icon (void)
   gdk_imlib_destroy_image (im);
 
   gdk_window_set_icon (GDK_ROOT_PARENT (), NULL, pixmap, mask);
+  gdk_window_set_icon_name (GDK_ROOT_PARENT(), "Balsa");
+
+  gdk_pixmap_unref(pixmap);
+  gdk_bitmap_unref(mask);
 }

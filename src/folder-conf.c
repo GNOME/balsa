@@ -573,7 +573,9 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     create_label(_("_Identity:"), table, 2, &keyval);
     fcw.identity = create_entry(fcw.dialog, table,
 				NULL,
-				&fcw, 2, mn->mailbox->identity_name, keyval);
+				&fcw, 2, 
+				(mn != NULL ? mn->mailbox->identity_name : NULL), 
+				keyval);
 
     gtk_widget_show_all(GTK_WIDGET(fcw.dialog));
 

@@ -494,9 +494,9 @@ mbnode_expunge_func(GtkTreeModel *model, GtkTreePath *path,
 {
     BalsaMailboxNode *mbnode;
 
+    gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     g_return_val_if_fail(mbnode, FALSE);
 
-    gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     if (mbnode->mailbox && libbalsa_mailbox_is_open(mbnode->mailbox)) {
         time_t tm = time(NULL);
         if(tm-mbnode->last_use > balsa_app.expunge_timeout)

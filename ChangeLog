@@ -1,3 +1,10 @@
+2004-11-23 09:20  PeterB
+
+	* libbalsa/mailbox_maildir.c: more careful caching of subdir
+	mod-times.
+	* libbalsa/mailbox.c: allow changing pseudo-flags in read-only
+	mailbox.
+
 2004-11-22 19:31  PeterB
 
 	* src/balsa-app.c: make use of recursive gdk_threads_*; check

@@ -1,3 +1,10 @@
+2004-08-06  Pawel Salek
+
+	* libbalsa/imap-server.c: 
+	* libbalsa/mailbox_imap.[hc]: simplify slightly cache maintainance.
+	* libbalsa/send.c: cancel authentication if no user.
+	* src/main.c: do _very_rarely_ expunge after all :-/.
+
 2004-08-05  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: re-try patches affected filter-on-reception.

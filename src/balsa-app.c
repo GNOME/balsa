@@ -263,7 +263,8 @@ authinteract (auth_client_request_t request, char **result, int fields,
 	if (request[i].flags & AUTH_PASS)
 	    result[i] = balsa_app.smtp_passphrase;
 	else if (request[i].flags & AUTH_USER)
-	    result[i] = balsa_app.smtp_user;
+	    result[i] = (balsa_app.smtp_user && *balsa_app.smtp_user)
+                ? balsa_app.smtp_user : NULL;
 
     	/* Fail the AUTH exchange if something was requested
     	   but not supplied. */

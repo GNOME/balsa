@@ -774,7 +774,7 @@ libbalsa_imap_server_close_all_connections(void)
     if(imap_servers) 
         g_hash_table_foreach(imap_servers, close_all_connections_cb, NULL);
     G_UNLOCK(imap_servers);
-    libbalsa_imap_remove_temp_dir();
+    libbalsa_imap_purge_temp_dir(0);
 }
 
 /**

@@ -64,6 +64,10 @@
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
 
+/* we force expunge now and then so that mailboxes do not grow too
+ * large. This is overriden by "do not expunge on close" setting. */
+#define EXPUNGE_PERIOD_HOURS 26
+
 /* Globals for Thread creation, messaging, pipe I/O */
 pthread_t get_mail_thread;
 pthread_t send_mail;
@@ -434,6 +438,49 @@ scan_mailboxes_idle_cb()
 
     return FALSE; 
 }
+
+/* periodic_expunge_func makes sure that even the open mailboxes get
+ * expunged now and than, even if they are opened longer than
+ * EXPUNGE_PERIOD_HOURS. If we did not do it, the mailboxes would in
+ * principle grow indefinetely. */
+static gboolean
+mbnode_expunge_func(GtkTreeModel *model, GtkTreePath *path,
+                    GtkTreeIter *iter)
+{
+    BalsaMailboxNode *mbnode;
+
+    g_return_val_if_fail(mbnode, FALSE);
+
+    gtk_tree_model_get(model, iter, 0, &mbnode, -1);
+    if (mbnode->mailbox && libbalsa_mailbox_is_open(mbnode->mailbox))
+        libbalsa_mailbox_sync_storage(mbnode->mailbox, TRUE);
+
+    g_object_unref(mbnode);
+
+    return FALSE;
+}
+
+static gboolean
+periodic_expunge_cb(void)
+{
+#if !defined(ENABLE_TOUCH_UI)
+    /* should we enforce expunging now and then? Perhaps not... */
+    if(!balsa_app.expunge_on_close) return TRUE;
+#endif
+
+    libbalsa_message(LIBBALSA_INFORMATION_MESSAGE,
+                     _("Compressing mail folders..."));
+    /* make sure it is shown before we continue */
+    gdk_threads_enter();
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+			   (GtkTreeModelForeachFunc)mbnode_expunge_func,
+			   NULL);
+    gdk_threads_leave();
+    /* purge imap cache? leave 15MB */
+    libbalsa_imap_purge_temp_dir(15*1024*1024);
+    return TRUE; /* do it later as well */
+}
+
 /* -------------------------- main --------------------------------- */
 int
 main(int argc, char *argv[])
@@ -557,6 +604,8 @@ main(int argc, char *argv[])
 
 
     g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);
+    g_timeout_add(EXPUNGE_PERIOD_HOURS*3600*1000,
+                  (GSourceFunc) periodic_expunge_cb, NULL);
 
     gdk_threads_enter();
     gtk_main();

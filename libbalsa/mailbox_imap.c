@@ -76,6 +76,8 @@ struct message_info {
 
 static LibBalsaMailboxClass *parent_class = NULL;
 
+static off_t ImapCacheSize = 15*1024*1024; /* 15MB */
+
 static void libbalsa_mailbox_imap_finalize(GObject * object);
 static void libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass *
 					     klass);
@@ -402,9 +404,8 @@ cmp_by_time (gconstpointer  a, gconstpointer  b)
 }
 
 static void
-clean_dir(const char *dir_name)
+clean_dir(const char *dir_name, off_t cache_size)
 {
-    static const off_t MAX_MBOX_CACHE_SIZE = 10*1024*1024; /* 10MB */
     DIR* dir;
     struct dirent* key;
     GList *list, *lst;
@@ -435,7 +436,7 @@ clean_dir(const char *dir_name)
     for(lst = list; lst; lst = lst->next) {
         struct file_info *fi = (struct file_info*)(lst->data);
         sz += fi->size;
-        if(sz>MAX_MBOX_CACHE_SIZE) {
+        if(sz>cache_size) {
             printf("removing %s\n", fi->name);
             unlink(fi->name);
         }
@@ -455,13 +456,13 @@ clean_cache(LibBalsaMailbox* mailbox)
 
     dir = get_cache_dir(LIBBALSA_MAILBOX_IMAP(mailbox), "body",
                         is_persistent);
-    clean_dir(dir);
+    clean_dir(dir, ImapCacheSize);
     g_free(dir);
     /* the body and part dirs are different only with persistent caching. */
     if(is_persistent) {
         dir = get_cache_dir(LIBBALSA_MAILBOX_IMAP(mailbox), "part",
                             is_persistent);
-        clean_dir(dir);
+        clean_dir(dir, ImapCacheSize);
         g_free(dir);
     }
  
@@ -2309,35 +2310,18 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
     return parent_class->messages_copy(mailbox, msgnos, dest);
 }
 
-/* libbalsa_imap_remove_temp_dir() removes the temporary directory used
+void
+libbalsa_imap_set_cache_size(off_t cache_size)
+{
+    ImapCacheSize = cache_size;
+}
+
+/* libbalsa_imap_purge_temp_dir() purges the temporary directory used
    for non-persistent message caching. */
 void
-libbalsa_imap_remove_temp_dir(void)
+libbalsa_imap_purge_temp_dir(off_t cache_size)
 {
     gchar *dir_name = get_cache_dir(NULL, NULL, FALSE);
-    DIR* dir;
-    struct dirent* key;
-    GList *list, *lst;
-    dir = opendir(dir_name);
-    if(!dir) {
-        g_free(dir_name);
-        return;
-    }
-
-    list = NULL;
-    while ( (key=readdir(dir)) != NULL)
-        list = g_list_prepend(list, g_strdup(key->d_name));
-    closedir(dir);
-
-    for(lst = list; lst; lst = lst->next) {
-        struct stat st;
-        gchar *fname = g_strconcat(dir_name, "/", lst->data, NULL);
-        if(stat(fname, &st) == 0 && S_ISREG(st.st_mode))
-            unlink(fname);
-        g_free(fname);
-        g_free(lst->data);
-    }
-    
-    g_list_free(list);
+    clean_dir(dir_name, cache_size);
     g_free(dir_name);
 }

@@ -1,3 +1,10 @@
+2000-11-02  Matthew Guenther  <guentherm@asme.org>
+
+	* help/C/Makefile.am: Distribute README with tar.gz.
+	
+	* src/balsa-message.c (balsa_get_font_by_charset): Memory leak
+	fix.
+
 2000-11-02  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/main-window.c(balsa_window_enable_continue): try to

@@ -925,7 +925,7 @@ get_font_name(const gchar * base, const gchar * charset,
     /* if(dash_cnt>12) len--; */
     if (len < 1)
 	len = 1;
-    res = (gchar *) g_malloc(len + strlen(postfix) + 2);
+    res = (gchar *) g_malloc (len + strlen(postfix) + 2);
     if (balsa_app.debug)
 	fprintf(stderr, "* base font name: %s\n*    and postfix: %s\n"
 		"*    mallocating: %d bytes\n", base, postfix,
@@ -958,6 +958,7 @@ balsa_get_font_by_charset(const gchar * base, const gchar * charset)
     fontname = get_font_name(base, charset, &fs);
     result   = gdk_font_load (fontname);
     xfs = result ? GDK_FONT_XFONT (result) : NULL;
+
     if (xfs && (xfs->min_byte1 != 0 || xfs->max_byte1 != 0))
     {
 	gchar *tmp_name;
@@ -967,9 +968,11 @@ balsa_get_font_by_charset(const gchar * base, const gchar * charset)
 	result = gdk_fontset_load (tmp_name);
 	g_free (tmp_name);
     }
+
     if(!result)
 	g_print("Cannot find font: %s for charset %s\n", fontname, charset);
 
+    g_free (fontname);
     return result;
 }
 
@@ -1566,8 +1569,8 @@ select_part(BalsaMessage * bm, gint part)
 			     2, GTK_EXPAND | GTK_FILL,
 			     GTK_EXPAND | GTK_FILL, 0, 1);
 	} else {
-	    /* HACK! This is a spacer, so that the attachment icons will stay at
-	       the bottom of the window.
+	    /* HACK! This is a spacer, so that the attachment icons
+	     * will stay at the bottom of the window.
 	     */
 	    GtkWidget *box;
 

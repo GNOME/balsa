@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: balsa 0.6.0\n"
-"POT-Creation-Date: 2000-04-18 21:23-0400\n"
-"PO-Revision-Date: 2000-04-16 22:02+0100\n"
+"Project-Id-Version: balsa 0.8.0pre1\n"
+"POT-Creation-Date: 2000-04-20 13:32+0200\n"
+"PO-Revision-Date: 2000-04-20 13:33+0100\n"
 "Last-Translator: Fatih Demir <kabalak@gmx.net>\n"
 "Language-Team: Turkish <tr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -242,6 +242,8 @@ msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
 msgstr ""
+"ePosta kutusunu açamadým !\n"
+"Lütfen ePosta kutusu ayarlarýný bir daha gözden geçir ."
 
 #: src/balsa-index-page.c:582 src/filter-edit-dialog.c:224
 msgid "New"
@@ -866,11 +868,11 @@ msgstr "Yazdýr"
 msgid "Print current message"
 msgstr "Geçerli iletiyi yazdýr"
 
-#: src/main-window.c:886
+#: src/main-window.c:888
 msgid "Copyright (C) 1997-2000"
 msgstr "Tel'if hakký (C) 1997-2000"
 
-#: src/main-window.c:888
+#: src/main-window.c:890
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -888,9 +890,8 @@ msgid "Get new mail on startup"
 msgstr "Baþlarken yeni ePostayý al"
 
 #: src/main.c:103
-#, fuzzy
 msgid "Compose a new email to EMAIL@ADDRESS"
-msgstr "EMAIL'e yeni bir ePosta iletisi yaz"
+msgstr "kabalak@gmx.net'e yeni bir ePosta yaz"
 
 #: src/main.c:104
 msgid "Opens MAILBOXNAME"

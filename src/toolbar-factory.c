@@ -75,8 +75,7 @@ struct BalsaToolbarIcon_ {
 };
 
 /* callbacks */
-static void bt_button_toggled(GtkToggleButton * button,
-                              BalsaToolbarIcon * bti);
+static void bt_button_toggled(GtkWidget * button, BalsaToolbarIcon * bti);
 static void bt_destroy(GtkWidget * toolbar, BalsaToolbarData * btd);
 
 /* forward references */
@@ -355,14 +354,13 @@ balsa_toolbar_refresh(GtkWidget * toolbar)
         case TOOLBAR_BUTTON_TYPE_TOGGLE:
 #if GTK_CHECK_VERSION(2, 4, 0)
 	    tool_item = gtk_toggle_tool_button_new_from_stock(icon);
-	    if (bti->callback) {
-		g_signal_connect(G_OBJECT(tool_item), "toggled",
-                                 G_CALLBACK(bti->callback), bti->user_data);
-		g_signal_connect(G_OBJECT(tool_item), "toggled",
-                                 G_CALLBACK(bt_button_toggled), bti);
-	    }
             gtk_toggle_tool_button_set_active(GTK_TOGGLE_TOOL_BUTTON
                                               (tool_item), bti->active);
+	    g_signal_connect(G_OBJECT(tool_item), "toggled",
+                             G_CALLBACK(bt_button_toggled), bti);
+	    if (bti->callback)
+		g_signal_connect(G_OBJECT(tool_item), "toggled",
+                                 G_CALLBACK(bti->callback), bti->user_data);
 #else /* GTK_CHECK_VERSION(2, 4, 0) */
             type = GTK_TOOLBAR_CHILD_TOGGLEBUTTON;
 #endif /* GTK_CHECK_VERSION(2, 4, 0) */
@@ -490,17 +488,27 @@ balsa_toolbar_set_button_active(GtkWidget * toolbar, const gchar * icon,
 
     bti->active = active;
     if (bti->widget)
+#if GTK_CHECK_VERSION(2, 4, 0)
+        gtk_toggle_tool_button_set_active(GTK_TOGGLE_TOOL_BUTTON
+                                          (bti->widget), active);
+#else                           /* GTK_CHECK_VERSION(2, 4, 0) */
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(bti->widget),
                                      active);
+#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 /* Signal handlers. */
 
 /* Handler for the "toggled" signal. */
 static void
-bt_button_toggled(GtkToggleButton * button, BalsaToolbarIcon * bti)
+bt_button_toggled(GtkWidget * button, BalsaToolbarIcon * bti)
 {
-    bti->active = gtk_toggle_button_get_active(button);
+#if GTK_CHECK_VERSION(2, 4, 0)
+    bti->active =
+        gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(button));
+#else                           /* GTK_CHECK_VERSION(2, 4, 0) */
+    bti->active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
+#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 /* Handler for the "destroy" signal. */

@@ -1,5 +1,9 @@
 2004-07-06  Pawel Salek
 
+	* NEWS, configure.in: release 2.1.91.
+
+2004-07-06  Pawel Salek
+
 	* libbalsa/address-book-{vcard,ldif}.c: add addresses to empty
 	address books.
 	* libbalsa/mailbox_mbox.c: set recent flags on added messages.
@@ -10,8 +14,6 @@
 	* src/*.c: 
 	* libinit_balsa/balsa-druid-page-directory.c: ditto.
 	* src/main-window.c: disable calls to noop notify functions.
-
-2004-07-06  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: safety net.
 	* libbalsa/imap/imap-commands.[hc]: compilation fixes.

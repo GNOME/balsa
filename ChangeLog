@@ -1,3 +1,6 @@
+2000-04-18  Pawel Salek <pawsa@theochem.kth.se>
+	* IMAP authentication error bug fix.
+	
 2000-04-17  Fatih Demir	<kabalak@gmx.net>
 
 	* configure.in : Added tr to ALL_LINGUAS .

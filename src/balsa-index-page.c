@@ -315,15 +315,16 @@ gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
 
   if (!mailbox_open_ref(mailbox))
   {
-    messagebox = gnome_message_box_new(_("Unable to Open Mailbox!"),
-					GNOME_MESSAGE_BOX_ERROR,
-					GNOME_STOCK_BUTTON_OK,
-					NULL);
-    gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
-    gtk_window_set_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
-    gtk_widget_show (messagebox);
-    page->mailbox = NULL;
-    return TRUE;
+      messagebox = gnome_message_box_new(
+	  _("Unable to Open Mailbox!\nPlease check the mailbox settings."),
+	  GNOME_MESSAGE_BOX_ERROR,
+	  GNOME_STOCK_BUTTON_OK,
+	  NULL);
+      gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
+      gtk_window_set_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
+      gtk_widget_show (messagebox);
+      page->mailbox = NULL;
+      return TRUE;
   }
 
   balsa_index_set_mailbox(BALSA_INDEX(page->index), mailbox);

@@ -1263,10 +1263,13 @@ static int imap_authenticate (IMAP_DATA *idata, CONNECTION *conn)
     else if (r == -2)
     {
       /* Login failed, try again */
-      mutt_error ("Login failed.");
-      sleep (1);
+	/* mutt_error ("Login failed."); */
+#ifndef LIBMUTT
       FREE (&ImapUser);
       FREE (&ImapPass);
+#else
+      return -1;
+#endif
     }
     else
     {

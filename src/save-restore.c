@@ -63,7 +63,6 @@ static void config_identities_load(void);
 static void check_for_old_sigs(GList * id_list_tmp);
 
 static void config_filters_load(void);
-void config_filters_save(void);
 
 #define folder_section_path(mn) \
     BALSA_MAILBOX_NODE(mn)->config_prefix ? \
@@ -1621,7 +1620,7 @@ config_filters_load(void)
     void *iterator;
     gchar * key,* tmp;
     gint pref_len = strlen(FILTER_SECTION_PREFIX);
-    gint non_critical_error=FILTER_NOERR;
+    guint save = 0;
 
     filter_errno=FILTER_NOERR;
     iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
@@ -1633,16 +1632,33 @@ config_filters_load(void)
 	    gnome_config_push_prefix(tmp);
 	    g_free(tmp);	    
 	    fil = libbalsa_filter_new_from_config();
-	    FILTER_SETFLAG(fil,FILTER_VALID);
-	    FILTER_SETFLAG(fil,FILTER_COMPILED);
-            balsa_app.filters = 
-                g_slist_prepend(balsa_app.filters, fil);
+	    if (!fil->condition) {
+		/* Try pre-2.1 style: */
+		FilterOpType op = gnome_config_get_int("Operation");
+		ConditionMatchType cmt =
+		    op == FILTER_OP_OR ? CONDITION_OR : CONDITION_AND;
+		gnome_config_pop_prefix();
+		fil->condition =
+		    libbalsa_condition_new_2_0(BALSA_CONFIG_PREFIX, key, cmt);
+		gnome_config_push_prefix(tmp);
+		if (fil->condition)
+		    ++save;
+	    }
+	    if (!fil->condition) {
+		g_idle_add((GSourceFunc) config_warning_idle,
+			   _("Filter with no condition was ignored"));
+		libbalsa_filter_free(fil, GINT_TO_POINTER(FALSE));
+	    } else {
+		FILTER_SETFLAG(fil,FILTER_VALID);
+		FILTER_SETFLAG(fil,FILTER_COMPILED);
+		balsa_app.filters = g_slist_prepend(balsa_app.filters, fil);
+	    }
 	    gnome_config_pop_prefix();
 	}
 	g_free(key);	
     }
-    if (filter_errno==FILTER_NOERR)
-	filter_errno=non_critical_error;
+    if (save)
+	config_filters_save();
 }
 
 #define FILTER_SECTION_MAX "9999"

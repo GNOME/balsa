@@ -206,3 +206,181 @@ libbalsa_mailbox_filters_save_config(LibBalsaMailbox * mbox)
 	g_free(filters_names[i]);
     g_free(filters_names);
 }
+
+/* Temporary code for transition from 2.0.x */
+static LibBalsaCondition *
+libbalsa_condition_new_from_config()
+{
+    LibBalsaCondition *newc;
+#if 0
+    gchar **regexs;
+    gint nbregexs, i;
+    LibBalsaConditionRegex *newreg;
+#endif
+    struct tm date;
+    gchar *str, *p;
+    unsigned fields;
+
+    newc = libbalsa_condition_new();
+
+    newc->type = gnome_config_get_int("Type");
+    newc->negate = gnome_config_get_bool("Condition-not");
+    fields = gnome_config_get_int("Match-fields");
+
+    switch (newc->type) {
+    case CONDITION_STRING:
+	newc->match.string.fields = fields;
+	newc->match.string.string =
+	    gnome_config_get_string("Match-string");
+	newc->match.string.user_header =
+	    CONDITION_CHKMATCH(newc, CONDITION_MATCH_US_HEAD) ?
+	    gnome_config_get_string("User-header") : NULL;
+	break;
+    case CONDITION_REGEX:
+	newc->match.regex.fields = fields;
+#if 0
+	gnome_config_get_vector("Reg-exps", &nbregexs, &regexs);
+	for (i = 0; i < nbregexs && (filter_errno == FILTER_NOERR); i++) {
+	    newreg = g_new(LibBalsaConditionRegex, 1);
+	    newreg->string = regexs[i];
+	    newreg->compiled = NULL;
+	    newc->match.regexs =
+		g_slist_prepend(newc->match.regexs, newreg);
+	}
+	newc->match.regexs = g_slist_reverse(newc->match.regexs);
+	/* Free the array of (gchar*)'s, but not the strings pointed by them */
+	g_free(regexs);
+#endif
+	break;
+    case CONDITION_DATE:
+	str = gnome_config_get_string("Low-date");
+	if (str[0] == '\0')
+	    newc->match.date.date_low = 0;
+	else {
+	    (void) strptime("00:00:00", "%T", &date);
+	    p = (gchar *) strptime(str, "%Y-%m-%d", &date);
+	    if (!p || *p != '\0')
+		filter_errno = FILTER_EFILESYN;
+	    else
+		newc->match.date.date_low = mktime(&date);
+	}
+	g_free(str);
+	str = gnome_config_get_string("High-date");
+	if (str[0] == '\0')
+	    newc->match.date.date_high = 0;
+	else {
+	    (void) strptime("23:59:59", "%T", &date);
+	    p = (gchar *) strptime(str, "%Y-%m-%d", &date);
+	    if (!p || *p != '\0')
+		filter_errno = FILTER_EFILESYN;
+	    else
+		newc->match.date.date_high = mktime(&date);
+	}
+	g_free(str);
+	break;
+    case CONDITION_FLAG:
+	newc->match.flags = gnome_config_get_int("Flags");
+	break;
+    default:
+	filter_errno = FILTER_EFILESYN;
+    }
+
+    return newc;
+}
+
+/* Load a list of conditions using prefix and filter_section_name to locate
+ * the section in config file
+ * Will correctly set filter flags
+ * Position filter_errno
+ */
+
+/* Temporary struct used to ensure that we keep the same order for conditions
+   as specified by the user */
+
+typedef struct {
+    LibBalsaCondition *cnd;
+    gint order;
+} LibBalsaTempCondition;
+
+static gint
+compare_conditions_order(gconstpointer a, gconstpointer b)
+{
+    const LibBalsaTempCondition *t1 = a;
+    const LibBalsaTempCondition *t2 = b;
+    return t2->order - t1->order;
+}
+
+#define CONDITION_SECTION_PREFIX "condition-"
+
+LibBalsaCondition *
+libbalsa_condition_new_2_0(gchar * prefix, gchar * filter_section_name,
+			   ConditionMatchType cmt)
+{
+    LibBalsaCondition *cond;
+    LibBalsaCondition *cond_2_0 = NULL;
+    void *iterator;
+    gchar *tmp, *condprefix, *key;
+    gint pref_len =
+	strlen(CONDITION_SECTION_PREFIX) + strlen(filter_section_name) + 1;
+    gint err = FILTER_NOERR;
+    GList *tmp_list = NULL;
+    GList *l;
+
+    tmp =
+	g_strconcat(CONDITION_SECTION_PREFIX, filter_section_name, ":",
+		    NULL);
+    iterator = gnome_config_init_iterator_sections(prefix);
+    filter_errno = FILTER_NOERR;
+
+    while ((filter_errno == FILTER_NOERR) &&
+	   (iterator = gnome_config_iterator_next(iterator, &key, NULL))) {
+
+	if (strncmp(key, tmp, pref_len) == 0) {
+	    condprefix = g_strconcat(prefix, key, "/", NULL);
+	    gnome_config_push_prefix(condprefix);
+	    g_free(condprefix);
+	    cond = libbalsa_condition_new_from_config();
+	    if (cond) {
+		if (filter_errno == FILTER_EFILESYN) {
+		    /* We don't stop the process for syntax error, we
+		     * just discard the malformed condition we also
+		     * remember (with err) that a syntax error occurs
+		     */
+		    err = FILTER_EFILESYN;
+		    filter_errno = FILTER_NOERR;
+		    libbalsa_condition_free(cond);
+		} else {
+		    LibBalsaTempCondition *tmp =
+			g_new(LibBalsaTempCondition, 1);
+
+		    tmp->cnd = cond;
+		    tmp->order = atoi(strrchr(key, ':') + 1);
+		    tmp_list = g_list_prepend(tmp_list, tmp);
+		}
+	    }
+	    gnome_config_pop_prefix();
+	}
+	g_free(key);
+    }
+    g_free(tmp);
+    /* We position filter_errno to the last non-critical error */
+    if (filter_errno == FILTER_NOERR) {
+	LibBalsaTempCondition *tmp;
+
+	filter_errno = err;
+	/* We sort the list of temp conditions, then
+	   we create the combined condition. */
+	tmp_list = g_list_sort(tmp_list, compare_conditions_order);
+	l = tmp_list;
+	for (; tmp_list; tmp_list = g_list_next(tmp_list)) {
+	    tmp = (LibBalsaTempCondition *) (tmp_list->data);
+	    cond_2_0 = cond_2_0 ?
+		libbalsa_condition_new_bool_ptr(FALSE, cmt, tmp->cnd,
+						cond_2_0) : tmp->cnd;
+	    g_free(tmp);
+	}
+	g_list_free(l);
+    } /* else we leak the list and structures?? */
+
+    return cond_2_0;
+}

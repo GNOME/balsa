@@ -579,6 +579,9 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
 	guint msgno;
 	GArray *msgnos;
 
+	if (!filter->condition)
+	    continue;
+
 	cond_and.match.andor.right  = filter->condition;
 	search_iter = libbalsa_mailbox_search_iter_new(&cond_and);
 

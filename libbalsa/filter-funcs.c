@@ -271,7 +271,7 @@ libbalsa_condition_new_from_string(gchar **string)
         return NULL;
     if(strncmp(*string, "NOT ", 4) == 0) {
         negated = TRUE;
-        string += 4;
+        *string += 4;
     } else negated = FALSE;
 
     for(i=0; i<ELEMENTS(cond_types); i++)

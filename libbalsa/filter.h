@@ -279,4 +279,9 @@ void filter_perror(const gchar * s);
 gboolean libbalsa_condition_can_match(LibBalsaCondition * cond,
 				      LibBalsaMessage * message);
 
+/* Compatibility */
+LibBalsaCondition *libbalsa_condition_new_2_0(gchar * prefix,
+					      gchar * filter_section_name,
+					      ConditionMatchType cmt);
+
 #endif				/* __FILTER_H__ */

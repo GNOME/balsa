@@ -1731,8 +1731,8 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
 
     /* Set the op-codes associated with the selected item */
     condition_op =
-        GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu),"value"))
-        ? CONDITION_OR : CONDITION_AND;
+	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu), "value")) ==
+	FILTER_OP_OR ? CONDITION_OR : CONDITION_AND;
 
     /* Retrieve all conditions for that filter */
 

@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-06-24 10:33+0200\n"
-"PO-Revision-Date: 2002-06-24 10:33+0200\n"
+"POT-Creation-Date: 2002-06-25 19:20+0200\n"
+"PO-Revision-Date: 2002-06-25 19:24+0200\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -279,45 +279,45 @@ msgid "LDAP Directory for %s"
 msgstr "LDAP-katalog för %s"
 
 #: libbalsa/libbalsa.c:500
-msgid "This certificate belongs to:\n"
-msgstr "Detta certifikat tillhör:\n"
+msgid "<b>This certificate belongs to:</b>\n"
+msgstr "<b>Detta certifikat tillhör:</b>\n"
 
 #: libbalsa/libbalsa.c:508
 msgid ""
 "\n"
-"This certificate was issued by:\n"
+"<b>This certificate was issued by:</b>\n"
 msgstr ""
 "\n"
-"Detta certifikat utfärdades av:\n"
+"<b>Detta certifikat utfärdades av:</b>\n"
 
 #: libbalsa/libbalsa.c:517
 #, c-format
 msgid ""
-"This certificate is valid\n"
+"<b>This certificate is valid</b>\n"
 "from %s\n"
 "to %s\n"
-"Fingerprint: %s"
+"<b>Fingerprint:</b> %s"
 msgstr ""
-"Detta certifikat är giltigt\n"
+"<b>Detta certifikat är giltigt</b>\n"
 "från %s\n"
 "till %s\n"
-"Fingeravtryck: %s"
+"<b>Fingeravtryck:</b> %s"
 
 #: libbalsa/libbalsa.c:526
 msgid "IMAP TLS certificate"
 msgstr "IMAP TLS-certifikat"
 
-#: libbalsa/libbalsa.c:527
-msgid "Accept Once"
-msgstr "Acceptera en gång"
-
-#: libbalsa/libbalsa.c:527
-msgid "Accept&Save"
-msgstr "Acceptera och spara"
-
 #: libbalsa/libbalsa.c:528
-msgid "Reject"
-msgstr "Förkasta"
+msgid "_Accept Once"
+msgstr "_Acceptera en gång"
+
+#: libbalsa/libbalsa.c:529
+msgid "Accept&_Save"
+msgstr "Acceptera och _spara"
+
+#: libbalsa/libbalsa.c:530
+msgid "_Reject"
+msgstr "_Förkasta"
 
 #. Non-threaded locking mechanism
 #: libbalsa/libbalsa_private.h:104 libbalsa/libbalsa_private.h:116
@@ -4669,6 +4669,27 @@ msgstr "Tillgängliga knappar"
 #: src/toolbar-prefs.c:772
 msgid "Current toolbar"
 msgstr "Anpassa verktygsrad"
+
+#~ msgid "This certificate belongs to:\n"
+#~ msgstr "Detta certifikat tillhör:\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "This certificate was issued by:\n"
+#~ msgstr ""
+#~ "\n"
+#~ "Detta certifikat utfärdades av:\n"
+
+#~ msgid ""
+#~ "This certificate is valid\n"
+#~ "from %s\n"
+#~ "to %s\n"
+#~ "Fingerprint: %s"
+#~ msgstr ""
+#~ "Detta certifikat är giltigt\n"
+#~ "från %s\n"
+#~ "till %s\n"
+#~ "Fingeravtryck: %s"
 
 #~ msgid "Accept and Save"
 #~ msgstr "Acceptera och spara"

@@ -4,6 +4,10 @@ if USE_SSL
 SSLSOURCES = mutt_ssl.c mutt_ssl.h
 endif
 
+if USE_SASL
+SASLSOURCES = 	mutt_sasl.c
+endif
+
 noinst_LIBRARIES = libmutt.a
 
 libmutt_a_SOURCES = \
@@ -31,7 +35,6 @@ libmutt_a_SOURCES = \
 	md5c.c		\
 	mh.c 		\
 	mx.c 		\
-	mutt_sasl.c	\
 	mutt_socket.c	\
 	mutt_tunnel.c	\
 	parse.c 	\
@@ -82,6 +85,7 @@ libmutt_a_SOURCES = \
 	sort.h		\
 	url.h		\
 	$(SSLSOURCES)
+	$(SASLSOURCES)
 
 SUBDIRS = imap
 

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -885,6 +885,7 @@ update_mailbox_idle(struct update_mbox_data*umd)
     }
     gdk_threads_leave();
     g_free(umd);
+    return FALSE;
 }
 
 static void

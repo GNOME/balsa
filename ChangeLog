@@ -1,3 +1,7 @@
+2004-04-05  Pawel Salek
+
+	* NEWS, configure.in: release balsa-2.1.2
+
 2004-04-04  Pawel Salek
 
 	* libbalsa/mailbox_local.c: make sure to kill the delayed sync handler

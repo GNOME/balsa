@@ -1,6 +1,14 @@
+* Balsa-2.1.2 release. Release date 2004-04-05
+
+- POP3 with TLS and PIPELINING.
+- mbox driver performance improvements.
+- numerous other performance improvements.
+- filters reenabled.
+- memory leaks plugged.
+
 * Balsa-2.1.1 release. Release date 2004-02-29
 
-oNumerous fixes, most prominent are:
+Numerous fixes, most prominent are:
 - reduce memory usage of mbox driver.
 - major cleanup of local and remote drivers.
 - searching re-enabled again.

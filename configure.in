@@ -117,10 +117,15 @@ dnl Check for GPGME if available
 dnl (we don't use the std macros AM_PATH_GPGME and AM_PATH_XML2 here to avoid
 dnl dependencies...)
 dnl ##########################################################################
-AC_MSG_CHECKING(whether to build with gpgme/RFC3156 support)
-AC_ARG_WITH([gpgme],
-	[  --with-gpgme=DIR        build with GPGME/RFC3156 support (experimental) [default=no]],
-	[ have_gpgme=$withval ], [ have_gpgme=no ])
+dnl gpgme does not work in head.
+dnl AC_MSG_CHECKING(whether to build with gpgme/RFC3156 support)
+dnl 
+dnl AC_ARG_WITH([gpgme],
+dnl	[  --with-gpgme=DIR        build with GPGME/RFC3156 support (experimental) [default=no]],
+dnl	[ have_gpgme=$withval ], [ have_gpgme=no ])
+
+have_gpgme=no
+
 if test x"$have_gpgme" != xno ; then
 	AC_MSG_RESULT(yes)
 	xcflags=$CFLAGS

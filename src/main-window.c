@@ -617,13 +617,13 @@ static GnomeUIInfo message_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MESSAGE_NEXT_PART_POS 6
     {
-        GNOME_APP_UI_ITEM, N_("Next Part"), N_("Next part in message"),
+        GNOME_APP_UI_ITEM, N_("_Next Part"), N_("Next part in message"),
         next_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         BALSA_PIXMAP_MENU_NEXT, '.', GDK_CONTROL_MASK, NULL
     },
 #define MENU_MESSAGE_PREVIOUS_PART_POS 7
     {
-        GNOME_APP_UI_ITEM, N_("Previous Part"),
+        GNOME_APP_UI_ITEM, N_("_Previous Part"),
         N_("Previous part in message"),
         previous_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         BALSA_PIXMAP_MENU_PREVIOUS, ',', GDK_CONTROL_MASK, NULL

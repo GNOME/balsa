@@ -793,7 +793,7 @@ static int libbalsa_smtp_send (MessageQueueItem *first_message, char *server)
 		memcpy ((void *)&sin.sin_addr, (void *)&n, sizeof(n));
 	}
 
-	libbalsa_information ( LIBBALSA_INFORMATION_MESAGE, "Connecting to %s", inet_ntoa (sin.sin_addr));
+	libbalsa_information ( LIBBALSA_INFORMATION_MESSAGE, "Connecting to %s", inet_ntoa (sin.sin_addr));
 
 	if (connect (s, (struct sockaddr *) &sin, sizeof (struct sockaddr_in)) == -1) {
 #ifdef BALSA_USE_THREADS

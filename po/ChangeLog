@@ -1,3 +1,9 @@
+2004-01-25  Jordi Mallach  <jordi@sindominio.net>
+
+	* ca.po: Updated Catalan translation by
+	Aleix Badia i Bosch <abadia@ica.es>.
+	Recoded as UTF-8.
+
 2004-01-14  Francisco Javier F. Serrador  <serrador@cvs.gnome.org>
 
 	* es.po: Updated spansih translation.

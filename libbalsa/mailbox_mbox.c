@@ -473,6 +473,7 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
 }
 
+static void lbm_mbox_armor_part(GMimeObject ** part);
 static gboolean
 lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
 		   gboolean expunge,
@@ -497,6 +498,7 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
     GMimeParser *gmime_parser;
     LibBalsaMailboxMbox *mbox;
 
+    libbalsa_mailbox_mbox_check(mailbox);
     mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
     
     /* find the first deleted/changed message. We save a lot of time by only
@@ -597,6 +599,7 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
 		return FALSE;
 	    }
 	} else {
+	    lbm_mbox_armor_part(&msg_info->message->mime_msg->mime_part);
 	    /* write From_ & message */
 	    if (!msg_info->from
 		|| g_mime_stream_write_string(temp_stream,

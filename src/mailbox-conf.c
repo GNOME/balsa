@@ -121,8 +121,11 @@ find_mailbox_func (GNode * g1, gpointer data)
   return TRUE;
 }
 
-
-static GNode *
+/* find_gnode_in_mbox_list:
+   looks for given mailbox in th GNode tree, usually but not limited to
+   balsa_app.mailox_nodes
+*/
+GNode *
 find_gnode_in_mbox_list (GNode * gnode_list, Mailbox * mailbox)
 {
   gpointer d[2];

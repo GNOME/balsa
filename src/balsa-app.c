@@ -186,17 +186,18 @@ do_load_mailboxes (void)
 
   load_local_mailboxes ();
 
-  switch (balsa_app.inbox->type)
+    switch (balsa_app.inbox->type)
     {
     case MAILBOX_MAILDIR:
     case MAILBOX_MBOX:
-    case MAILBOX_MH:
+    case MAILBOX_MH: 
       mailbox_init (MAILBOX_LOCAL (balsa_app.inbox)->path,
-		      balsa_error,
-		      update_gui);
+		    balsa_error,
+		    update_gui);
       break;
 
     case MAILBOX_IMAP:
+      mailbox_init (getenv("MAIL"), balsa_error, update_gui);
       break;
 
     case MAILBOX_POP3:

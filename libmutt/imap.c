@@ -879,7 +879,6 @@ static int imap_reopen_mailbox (CONTEXT *ctx, int *index_hint)
     s = imap_next_word (s); /* Skip response */
     CTX_DATA->state = IMAP_AUTHENTICATED;
     mutt_error (s);
-    sleep (1);
     return (-1);
   }
 
@@ -1034,7 +1033,6 @@ static int imap_exec (char *buf, size_t buflen, IMAP_DATA *idata,
     SKIPWS (pc);
     pc = imap_next_word (pc);
     mutt_error (pc);
-    sleep (1);
     return (-1);
   }
 
@@ -1192,7 +1190,6 @@ static int imap_check_capabilities (IMAP_DATA *idata)
       ||mutt_bit_isset(idata->capabilities,IMAP4REV1)))
   {
     mutt_error ("This IMAP server is ancient. Mutt does not work with it.");
-    sleep (5);	/* pause a moment to let the user see the error */
     return (-1);
   }
   return (0);
@@ -1772,7 +1769,6 @@ int imap_append_message (CONTEXT *ctx, MESSAGE *msg)
     SKIPWS (pc);
     pc = imap_next_word (pc);
     mutt_error (pc);
-    sleep (1);
     fclose (fp);
     return (-1);
   }
@@ -1816,7 +1812,6 @@ int imap_append_message (CONTEXT *ctx, MESSAGE *msg)
     SKIPWS (pc);
     pc = imap_next_word (pc);
     mutt_error (pc);
-    sleep (1);
     return (-1);
   }
 

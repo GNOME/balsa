@@ -36,6 +36,7 @@
 #include "main.h"
 #include "main-window.h"
 #include "mailbox-conf.h"
+#include "save-restore.h"
 #include "../libbalsa/mailbox.h"
 
 typedef struct _MBListWindow MBListWindow;
@@ -203,26 +204,6 @@ mblist_open_mailbox (Mailbox * mailbox)
 #endif
 
   balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
-
-  /* I don't know what is the purpose of that code, so I put
-     it in comment until somebody tells me waht it  is useful 
-     for.      -Bertrand 
-  
-  if (!strcmp (mailbox->name, _("Inbox")) ||
-      !strcmp (mailbox->name, _("Outbox")) ||
-      !strcmp (mailbox->name, _("Trash")))
-    return ;
-  
-
-  gtk_ctree_set_node_info (GTK_CTREE (mblw->ctree),
-    row,
-    mailbox->name, 5,
-    NULL, NULL,
-    balsa_icon_get_pixmap (BALSA_ICON_TRAY_EMPTY),
-    balsa_icon_get_bitmap (BALSA_ICON_TRAY_EMPTY),
-    FALSE, TRUE); 
-    
-    gtk_ctree_node_set_row_style (GTK_CTREE (mblw->ctree), row, NULL); */
 }
 
 
@@ -351,6 +332,48 @@ mb_del_cb (GtkWidget * widget, Mailbox * mailbox)
   mailbox_conf_delete (mailbox);
 }
 
+/* mb_inbox_cb:
+   sets the given mailbox as inbox.
+*/
+static void
+mb_inbox_cb (GtkWidget * widget, Mailbox * mailbox)
+{
+  if (mailbox->type == MAILBOX_UNKNOWN)
+    return;
+  /* FIXME: make it clean  and move the code to a separate function */
+  config_mailbox_set_as_special(mailbox, SPECIAL_INBOX);
+  /* I wonder if this should not go into _idle_ function because it may be(?)
+   expensive. */
+  balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
+}
+
+static void
+mb_sentbox_cb (GtkWidget * widget, Mailbox * mailbox)
+{
+  if (mailbox->type == MAILBOX_UNKNOWN)
+    return;
+  config_mailbox_set_as_special(mailbox, SPECIAL_SENT);
+  balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
+}
+
+static void
+mb_trash_cb (GtkWidget * widget, Mailbox * mailbox)
+{
+  if (mailbox->type == MAILBOX_UNKNOWN)
+    return;
+  config_mailbox_set_as_special(mailbox, SPECIAL_TRASH);
+  balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
+}
+
+static void
+mb_draftbox_cb (GtkWidget * widget, Mailbox * mailbox)
+{
+  if (mailbox->type == MAILBOX_UNKNOWN)
+    return;
+  config_mailbox_set_as_special(mailbox, SPECIAL_DRAFT);
+  balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
+}
+
 /* FIXME make these use gnome_popup_menu stuff
 static GnomeUIInfo mailbox_menu[] =
   GNOMEUIINFO_ITEM_STOCK (_ ("_Open Mailbox"), N_("Open the selected mailbox"),
@@ -364,47 +387,42 @@ static GnomeUIInfo mailbox_menu[] =
 };
 */
 
+static void
+add_menu_entry(GtkWidget * menu, const gchar * label, GtkSignalFunc cb,
+	       Mailbox * mailbox)
+{
+    GtkWidget *menuitem;
+    
+    menuitem = gtk_menu_item_new_with_label (label);
+    gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+			GTK_SIGNAL_FUNC (cb), mailbox);
+    gtk_menu_append (GTK_MENU (menu), menuitem);
+    gtk_widget_show (menuitem);
+}
+
 static GtkWidget *
 mblist_create_context_menu (GtkCTree * ctree, Mailbox * mailbox)
 {
-  GtkWidget *menu, *menuitem;
+  GtkWidget *menu;
 
   menu = gtk_menu_new ();
 
   if (mailbox)
     {
-      menuitem = gtk_menu_item_new_with_label (_ ("Open Mailbox"));
-      gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-			  GTK_SIGNAL_FUNC (mb_open_cb), mailbox);
-      gtk_menu_append (GTK_MENU (menu), menuitem);
-      gtk_widget_show (menuitem);
-     
-      menuitem = gtk_menu_item_new_with_label (_ ("Close Mailbox"));
-      gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-			  GTK_SIGNAL_FUNC (mb_close_cb), mailbox);
-      gtk_menu_append (GTK_MENU (menu), menuitem);
-      gtk_widget_show (menuitem);
+      add_menu_entry(menu, _("Open Mailbox"), mb_open_cb, mailbox);
+      add_menu_entry(menu, _("Close Mailbox"), mb_close_cb, mailbox);
     }
   
-  menuitem = gtk_menu_item_new_with_label (_ ("Add New Mailbox"));
-  gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-		      GTK_SIGNAL_FUNC (mb_add_cb), mailbox);
-  gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_widget_show (menuitem);
+  add_menu_entry(menu, _("Add New Mailbox"), mb_add_cb, mailbox);
   
   if (mailbox)
     {
-      menuitem = gtk_menu_item_new_with_label (_ ("Edit Mailbox Properties"));
-      gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-			  GTK_SIGNAL_FUNC (mb_conf_cb), mailbox);
-      gtk_menu_append (GTK_MENU (menu), menuitem);
-      gtk_widget_show (menuitem);
-      
-      menuitem = gtk_menu_item_new_with_label (_ ("Delete Mailbox"));
-      gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-			  GTK_SIGNAL_FUNC (mb_del_cb), mailbox);
-      gtk_menu_append (GTK_MENU (menu), menuitem);
-      gtk_widget_show (menuitem);
+      add_menu_entry(menu, _("Edit Mailbox Properties"), mb_conf_cb, mailbox);
+      add_menu_entry(menu, _("Delete Mailbox"),   mb_del_cb,     mailbox);
+      add_menu_entry(menu, _("Mark as Inbox"),    mb_inbox_cb,   mailbox);
+      add_menu_entry(menu, _("Mark as Sentbox"),  mb_sentbox_cb, mailbox);
+      add_menu_entry(menu, _("Mark as Trash"),    mb_trash_cb,   mailbox);
+      add_menu_entry(menu, _("Mark as Draftbox"), mb_sentbox_cb, mailbox);
     }
 
   return menu;

@@ -34,6 +34,7 @@
 #include "balsa-app.h"
 #include "misc.h"
 #include "save-restore.h"
+#include "mailbox-conf.h"
 #include "../libmutt/mutt.h"
 
 static proplist_t pl_dict_add_str_str (proplist_t dict_arg, gchar * string1,
@@ -58,10 +59,6 @@ rot (gchar * pass)
   len = strlen (pass);
   buff = g_strdup (pass);
 
-  /* Used to assert( buff ); this is wrong. If g_strdup
-     fails we're screwed anyway so let the upcoming coredump
-     occur. */
-
   for (i = 0; i < len; i++)
     {
       if ((buff[i] <= 'M' && buff[i] >= 'A')
@@ -72,6 +69,43 @@ rot (gchar * pass)
 	buff[i] -= 13;
     }
   return buff;
+}
+/* config_mailbox_set_as_special:
+   allows to set given mailboxe as one of the special mailboxes
+   PS: I am not sure if I should add outbox to the list.
+   specialNames must be in sync with the specialType definition.
+*/
+
+static gchar * specialNames[] = { "Inbox", "Sentbox", "Trash", "Draftbox" };
+void
+config_mailbox_set_as_special(Mailbox * mailbox, specialType which)
+{
+    Mailbox ** special;
+    GNode * node;
+
+    g_return_if_fail(mailbox != NULL);
+
+    switch(which) {
+    case SPECIAL_INBOX: special = &balsa_app.inbox;    break;
+    case SPECIAL_SENT : special = &balsa_app.sentbox;  break;
+    case SPECIAL_TRASH: special = &balsa_app.trash;    break;
+    case SPECIAL_DRAFT: special = &balsa_app.draftbox; break;
+    default : return;
+    }
+    if(*special) {
+	config_mailbox_add(*special, NULL);
+	node = g_node_new (mailbox_node_new (
+	    (*special)->name, *special, 
+	    (*special)->type == MAILBOX_MH));
+	g_node_append (balsa_app.mailbox_nodes, node);
+    }
+    config_mailbox_delete (mailbox);
+    config_mailbox_add (mailbox, specialNames[which]);
+    
+    node = find_gnode_in_mbox_list (balsa_app.mailbox_nodes, mailbox);
+    g_node_unlink(node);
+
+    *special = mailbox;
 }
 
 /* Load the configuration from the specified file. The filename is

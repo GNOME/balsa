@@ -360,6 +360,8 @@ void balsa_mblist_redraw (BalsaMBList * bmbl)
 
   ctree = GTK_CTREE (bmbl);
 
+  mutt_buffy_notify();
+
   gtk_clist_freeze (GTK_CLIST (ctree));
   gtk_clist_clear (GTK_CLIST (ctree));
   
@@ -423,8 +425,6 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 
   if (!gnode || (!(mbnode = gnode->data)))
     return FALSE;
-
-  mutt_buffy_notify();
 
   if (mbnode->mailbox)
   {

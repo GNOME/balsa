@@ -189,6 +189,29 @@ buffy_add_mailbox(const char *path, const char *user, const char *passwd)
     return *tmp;
 }
 
+static BUFFY*
+buffy_mailbox_remove(BUFFY * bf)
+{
+    BUFFY ** tmp = &Incoming;
+
+    if(!*tmp) return NULL; /* strange error */
+    if(*tmp == bf)
+	*tmp = (*tmp)->next;
+    else {
+	while(*tmp && (*tmp)->next != bf) 
+	    tmp = &(*tmp)->next;
+	if( !*tmp ) return NULL; /* not found again, critical error! */
+	(*tmp)->next = bf->next;
+    }
+
+    fprintf(stderr,"Removing %s from buffy list\n", bf->path);
+    safe_free((void **) &bf->user);
+    safe_free((void **) &bf->passwd);
+    safe_free((void **) &bf->path);
+    safe_free((void **) &bf);
+    return (*tmp)->next;
+}
+
 int mutt_parse_mailboxes (BUFFER *path, BUFFER *s, unsigned long data, BUFFER *err)
 {
   BUFFY *tmp;
@@ -365,15 +388,19 @@ int mutt_buffy_check (int force)
         if (do_imap_check)
         {
 	  char * old_user = ImapUser, *old_passwd = ImapPass;
+	  int res;
           tmp->new = 0;
 	  
 	  ImapUser = tmp->user;
 	  ImapPass = tmp->passwd;
-          if (imap_buffy_check (tmp->path) > 0)
+          if ( (res=imap_buffy_check (tmp->path))>0 )
           {
             BuffyCount++;
             tmp->new = 1;
-          }
+          } else if(res<0)
+	      /* failed (authorization?), remove it from list not
+		 to try the same wrong password over and over again */
+	      tmp = buffy_mailbox_remove(tmp);
 	  ImapUser = old_user, ImapPass = old_passwd;
         }
         else

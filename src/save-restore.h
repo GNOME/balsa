@@ -34,6 +34,15 @@
 #define MAX_PROPLIST_KEY_LEN    32
 #endif
 
+typedef enum {
+    SPECIAL_INBOX = 0,
+    SPECIAL_SENT,
+    SPECIAL_TRASH,
+    SPECIAL_DRAFT
+}  specialType;
+
+void config_mailbox_set_as_special(Mailbox * mailbox, specialType which);
+
 gint config_load (gchar * user_filename);
 gint config_save (gchar * user_filename);
 

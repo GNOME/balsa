@@ -304,6 +304,10 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
   return;
 }
 
+/* mailbox_add_for_checking:
+   adds given mailbox to the list of mailboxes to be checked for modification
+   via mutt's buffy mechanism.
+*/
 void
 mailbox_add_for_checking (Mailbox * mailbox)
 {
@@ -326,8 +330,6 @@ mailbox_add_for_checking (Mailbox * mailbox)
       passwd = MAILBOX_IMAP(mailbox)->server->passwd;
   } else 
       return;
-
-  fprintf(stderr, "mailbox_add_for_checking, path=%s\n", path);
 
   tmp = buffy_add_mailbox(path, user, passwd);
   

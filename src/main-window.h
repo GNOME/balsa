@@ -84,8 +84,6 @@ void check_new_messages_cb(GtkWidget *, gpointer data);
 void check_new_messages_real(GtkWidget *, gpointer data, int type);
 void empty_trash(void);
 void update_view_menu(void);
-int  balsa_window_filter_to_int(void);
-void balsa_window_filter_from_int(int mask);
 BalsaToolbarModel *balsa_window_get_toolbar_model(void);
 
 /* functions to manipulate the progress bars of the window */

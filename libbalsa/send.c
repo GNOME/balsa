@@ -368,9 +368,12 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 		if (LIBBALSA_IS_MAILBOX_LOCAL(fccbox) ||
 		    LIBBALSA_IS_MAILBOX_IMAP(fccbox)) {
 		    libbalsa_mailbox_copy_message( message, fccbox );
+                    /* fcc perhaps does not know about this message yet! 
+                     * later check will discover it and thread. 
 		    libbalsa_mailbox_set_threading(fccbox,
 						   fccbox->view->
 						   threading_type);
+                    */
 		}
 		libbalsa_mailbox_check(fccbox);
 	}
@@ -507,6 +510,12 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	send_unlock();
 	return TRUE;
     }
+    /* FIXME: we should not need to create the msg_list in such a
+     * silly way.  Instead, we should properly iterate over messages
+     * in the mailbox via either get_first/get_next() (susceptible to
+     * problems when an external session changes content of the
+     * mailbox) or _forall(mailbox, cb, cbdata) */
+    libbalsa_mailbox_set_threading(outbox, LB_MAILBOX_THREADING_FLAT);
     /* We create here the progress bar */
     ensure_send_progress_dialog();
 

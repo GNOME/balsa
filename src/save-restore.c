@@ -652,7 +652,6 @@ config_global_load(void)
         balsa_app.selected_headers = g_ascii_strdown(tmp, -1);
         g_free(tmp);
     }
-    balsa_app.view_filter = gnome_config_get_int("ViewFilter");
 
     /* ... Message window title format */
     g_free(balsa_app.message_title_format);
@@ -1072,7 +1071,6 @@ config_save(void)
     gnome_config_set_string("DateFormat", balsa_app.date_string);
     gnome_config_set_int("ShownHeaders", balsa_app.shown_headers);
     gnome_config_set_string("SelectedHeaders", balsa_app.selected_headers);
-    gnome_config_set_int("ViewFilter", balsa_window_filter_to_int());
     gnome_config_set_string("MessageTitleFormat",
                             balsa_app.message_title_format);
     gnome_config_set_bool("ExpandTree", balsa_app.expand_tree);
@@ -1514,6 +1512,7 @@ config_views_load(void)
                     gnome_config_get_int_with_default("Threading", &def);
                 if (def)
                     view->threading_type = LB_MAILBOX_THREADING_SIMPLE;
+                view->filter = gnome_config_get_int("GUIFilter");
 
                 view->sort_type =
                     gnome_config_get_int_with_default("SortType", &def);
@@ -1579,6 +1578,7 @@ save_view(GNode * node, int *cnt)
        gnome_config_set_string("Identity", view->identity_name);
     else gnome_config_clean_key("Identity");
     gnome_config_set_int("Threading",   view->threading_type);
+    gnome_config_set_int("GUIFilter",   view->filter);
     gnome_config_set_int("SortType",    view->sort_type);
     gnome_config_set_int("SortField",   view->sort_field);
     gnome_config_set_int("Show", view->show);

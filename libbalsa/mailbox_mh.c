@@ -472,12 +472,6 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox)
     mailbox->unread_messages = 0;
     lbm_mh_parse_both(mh);
 
-    libbalsa_mailbox_local_load_messages(mailbox, 0);
-
-    /* We run the filters here also because new could have been put
-       in the mailbox with another mechanism than Balsa */
-    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
-
 #ifdef DEBUG
     g_print(_("%s: Opening %s Refcount: %d\n"),
 	    "LibBalsaMailboxMh", mailbox->name, mailbox->open_ref);

@@ -278,7 +278,6 @@ extern struct BalsaApplication {
     gboolean expand_tree;
     gboolean show_mblist;
     gboolean show_notebook_tabs;
-    int      view_filter;
     gboolean alternative_layout;
     gboolean view_message_on_open;
     gboolean line_length;

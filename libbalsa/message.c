@@ -566,7 +566,11 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
     if (d) {
         libbalsa_messages_change_flag (d, LIBBALSA_MESSAGE_FLAG_DELETED,
                                        TRUE);
-	libbalsa_mailbox_set_threading(dest, dest->view->threading_type);
+        /* threading here is pointless: dest might not have discovered
+         * yet added headers. Check later will do that, and threading
+         * as well.
+         libbalsa_mailbox_set_threading(dest, dest->view->threading_type);
+        */
     }
 
     libbalsa_mailbox_check(dest);

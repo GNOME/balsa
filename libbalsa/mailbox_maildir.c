@@ -463,12 +463,6 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
 	mailbox->readonly = access (path, W_OK) ? TRUE : FALSE;
     mailbox->unread_messages = 0;
     parse_mailbox_subdirs(mailbox);
-    libbalsa_mailbox_local_load_messages(mailbox, 0);
-
-    /* We run the filters here also because new could have been put
-       in the mailbox with another mechanism than Balsa */
-    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
-
 #ifdef DEBUG
     g_print(_("%s: Opening %s Refcount: %d\n"),
 	    "LibBalsaMailboxMaildir", mailbox->name, mailbox->open_ref);

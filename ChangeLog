@@ -1,3 +1,14 @@
+2004-02-07  Pawel Salek
+
+	* libbalsa/mailbox.[hc]: do not sort/thread unless requested.
+	Add persistent view filters.
+	* libbalsa/mailbox_imap.c: modify accordingly.
+	* libbalsa/mailbox_{local,maildir,mbox,mh}.c: ditto.
+	* libbalsa/{message,send}.c: do not do pointless threading.
+	* src/balsa-app.h: remove global view filter - do it per mailbox.
+	* src/main-window.[hc]: support for per-mailbox view filters.
+	* src/save-restore.c: config support for that.
+
 2004-02-06 05:20  PeterB
 
 	* libbalsa/mailbox_mbox.c: change parser to check for start < end

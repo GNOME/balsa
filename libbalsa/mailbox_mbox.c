@@ -364,12 +364,6 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
     if (st.st_size != 0)
 	parse_mailbox(mbox);
     mbox_unlock(mailbox, NULL);
-    libbalsa_mailbox_local_load_messages(mailbox, 0);
-
-    /* We run the filters here also because new could have been put
-       in the mailbox with another mechanism than Balsa */
-    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
-
 #ifdef DEBUG
     g_print(_("%s: Opening %s Refcount: %d\n"),
 	    "LibBalsaMailboxMbox", mailbox->name, mailbox->open_ref);
@@ -848,12 +842,13 @@ lbm_mbox_message_new(GMimeMessage * mime_message,
     const char *header;
     LibBalsaMessageFlag flags = 0;
 
+#if defined(THIS_HAS_BEEN_TESTED)
     if (mime_message->subject &&
 	!strcmp(mime_message->subject,
 		"DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA")) {
-	g_mime_object_unref(GMIME_OBJECT(mime_message));
 	return NULL;
     }
+#endif
 
     message = libbalsa_message_new();
 

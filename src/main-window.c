@@ -176,6 +176,7 @@ static void show_preview_pane_cb(GtkWidget * widget, gpointer data);
 
 static void threading_change_cb(GtkWidget * widget, gpointer data);
 static void balsa_window_set_threading_menu(int option);
+static void balsa_window_set_filter_menu(int gui_filter);
 static void expand_all_cb(GtkWidget * widget, gpointer data);
 static void collapse_all_cb(GtkWidget * widget, gpointer data);
 #ifdef HAVE_GTKHTML
@@ -1076,7 +1077,6 @@ balsa_window_new()
                                        (view_menu[MENU_VIEW_MAILBOX_TABS_POS].widget),
                                        TRUE);
 
-    balsa_window_filter_from_int(balsa_app.view_filter);
     /* Disable menu items at start up */
     enable_mailbox_menus(NULL);
     enable_message_menus(NULL);
@@ -1172,8 +1172,10 @@ enable_mailbox_menus(BalsaIndex * index)
     for(i=0; i < ELEMENTS(view_menu_entries); i++)
         gtk_widget_set_sensitive(view_menu[view_menu_entries[i]].widget, enable);
 
-    if (mailbox)
+    if (mailbox) {
         balsa_window_set_threading_menu(mailbox->view->threading_type);
+        balsa_window_set_filter_menu(mailbox->view->filter);
+    }
 }
 
 /*
@@ -1371,6 +1373,29 @@ balsa_window_set_threading_menu(int option)
                                       balsa_app.main_window);
 }
 
+static void
+balsa_window_set_filter_menu(int mask)
+{
+    unsigned i;
+
+    for(i=0; i<ELEMENTS(mailbox_hide_menu); i++) {
+        GtkWidget *item;
+        int states_index =
+            GPOINTER_TO_INT(mailbox_hide_menu[i].user_data);
+        if(mailbox_hide_menu[i].type != GNOME_APP_UI_TOGGLEITEM)
+            continue;
+        item = mailbox_hide_menu[i].widget;
+        g_signal_handlers_block_by_func(G_OBJECT(item),
+                                        mailbox_hide_menu[i].moreinfo, 
+                                        balsa_app.main_window);
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), 
+                                       mask & (1<<states_index));
+        g_signal_handlers_unblock_by_func(G_OBJECT(item),
+                                          mailbox_hide_menu[i].moreinfo, 
+                                          balsa_app.main_window);
+    }
+}
+
 /* balsa_window_open_mbnode: 
    opens mailbox, creates message index. mblist_open_mailbox() is what
    you want most of the time because it can switch between pages if a
@@ -1487,8 +1512,7 @@ real_open_mbnode(BalsaMailboxNode * mbnode)
 
     balsa_window_increase_activity(window);
     failurep = balsa_index_load_mailbox_node(BALSA_INDEX (index),
-                                             mbnode,
-                                             bw_get_view_filter(window));
+                                             mbnode, NULL);
     balsa_window_decrease_activity(window);
 
     if(failurep) {
@@ -1537,6 +1561,10 @@ real_open_mbnode(BalsaMailboxNode * mbnode)
 
     /* Enable relavent menu items... */
     enable_mailbox_menus(index);
+    libbalsa_mailbox_set_view_filter(mbnode->mailbox,
+                                     bw_get_view_filter(window), FALSE);
+    balsa_index_set_threading_type(BALSA_INDEX(index),
+                                   mbnode->mailbox->view->threading_type);
     gdk_flush();
     gdk_threads_leave();
 #ifdef BALSA_USE_THREADS
@@ -3037,11 +3065,11 @@ bw_get_view_filter(BalsaWindow *window)
     return filter;
 }
 
-/* balsa_window_filter_to_int() returns an integer representing the
+/**balsa_window_filter_to_int() returns an integer representing the
    view filter.  This routine must gracefully handle case when main
    window is not yet created - it may be called from the setup druid.
 */
-int
+static int
 balsa_window_filter_to_int(void)
 {
     unsigned i;
@@ -3057,22 +3085,6 @@ balsa_window_filter_to_int(void)
         res |= 1<<states_index;
     }
     return res;
-}
-
-void
-balsa_window_filter_from_int(int mask)
-{
-    unsigned i;
-
-    for(i=0; i<ELEMENTS(mailbox_hide_menu); i++) {
-        int states_index =
-            GPOINTER_TO_INT(mailbox_hide_menu[i].user_data);
-        if(mailbox_hide_menu[i].type != GNOME_APP_UI_TOGGLEITEM)
-            continue;
-        if(mask & (1<<states_index))
-            gtk_check_menu_item_set_active
-                (GTK_CHECK_MENU_ITEM(mailbox_hide_menu[i].widget), TRUE);
-    }
 }
 
 static void
@@ -3123,6 +3135,8 @@ hide_changed_cb(GtkWidget * widget, gpointer data)
      * just steal old view filter for the time being to avoid copying
      * it - but we could just as well clone it. */
     libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
+    /* make it persistent */
+    mailbox->view->filter = balsa_window_filter_to_int();
 }
 
 static void

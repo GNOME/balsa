@@ -399,6 +399,10 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
 				     LibBalsaMailboxThreadingType
 				     thread_type)
 {
+    if(!mailbox->msg_tree) { /* first reference */
+        mailbox->msg_tree = g_node_new(NULL);
+        libbalsa_mailbox_local_load_messages(mailbox, 0);
+    }
     if (thread_type == LB_MAILBOX_THREADING_JWZ)
 	lbml_threading_jwz(mailbox, mailbox->msg_tree);
     else

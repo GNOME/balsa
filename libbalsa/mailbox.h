@@ -132,11 +132,18 @@ struct _LibBalsaMailboxView {
     LibBalsaAddress *mailing_list_address;
     gchar *identity_name;
     LibBalsaMailboxThreadingType threading_type;
+    /** filter is a frontend-specific code determining used view
+     * filter.  GUI usually allows to generate only a subset of all
+     * possible LibBalsaCondition's and mapping from arbitary
+     * LibBalsaCondition to a GUI configuration is not always
+     * possible.  Therefore, we provide this variable for GUI's
+     * convinence.  */
+    int      filter; 
     LibBalsaMailboxSortType      sort_type;
     LibBalsaMailboxSortFields    sort_field;
     LibBalsaMailboxShow          show;
-    gboolean exposed;
-    gboolean open;
+    unsigned exposed:1;
+    unsigned open:1;
 };
 
 struct _LibBalsaMailbox {

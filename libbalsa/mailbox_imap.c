@@ -1942,6 +1942,8 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 	new_tree = NULL;
     }
 
+    if(!mailbox->msg_tree) /* first reference */
+        mailbox->msg_tree = g_node_new(NULL);
     if (new_tree)
 	libbalsa_mailbox_set_msg_tree(mailbox, new_tree);
 }
@@ -1953,8 +1955,6 @@ lbm_imap_update_view_filter(LibBalsaMailbox   *mailbox,
     if(mailbox->view_filter)
         libbalsa_condition_free(mailbox->view_filter);
     mailbox->view_filter = view_filter;
-    libbalsa_mailbox_imap_set_threading(mailbox,
-                                        mailbox->view->threading_type);
 }
 
 static gint

@@ -387,19 +387,11 @@ libbalsa_mailbox_open(LibBalsaMailbox * mailbox)
 	mailbox->open_ref++;
 	retval = TRUE;
     } else {
-	mailbox->open_ref++;
-	mailbox->msg_tree = g_node_new(NULL);
 	mailbox->stamp++;
 	retval =
 	    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->open_mailbox(mailbox);
-	if (retval) {
-	    if (mailbox->view)
-		lbm_set_threading(mailbox, mailbox->view->threading_type);
-	} else {
-	    mailbox->open_ref = 0;
-	    g_node_destroy(mailbox->msg_tree);
-	    mailbox->msg_tree = NULL;
-	}
+        if(retval)
+            	mailbox->open_ref++;
     }
 
     UNLOCK_MAILBOX(mailbox);
@@ -1350,9 +1342,7 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
 {
     gboolean unlock;
 
-    if (!mailbox->msg_tree)
-	return;
-
+    g_return_if_fail(MAILBOX_OPEN(mailbox)); /* or perhaps it's legal? */
     unlock = lbm_threads_enter();
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox,
@@ -1387,6 +1377,7 @@ libbalsa_mailbox_view_new(void)
     view->mailing_list_address = NULL;
     view->identity_name=NULL;
     view->threading_type = LB_MAILBOX_THREADING_FLAT;
+    view->filter = 0; /* we should not be even setting this */
     view->sort_type =  LB_MAILBOX_SORT_TYPE_ASC;
     view->sort_field = LB_MAILBOX_SORT_DATE;
     view->show = LB_MAILBOX_SHOW_UNSET;

@@ -717,9 +717,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     g_signal_connect_swapped(G_OBJECT(mailbox), "changed",
 			     G_CALLBACK(bndx_mailbox_changed_cb),
 			     (gpointer) index);
-
-    /* Set the tree store, load messages, and do threading. */
-    libbalsa_mailbox_set_view_filter(mailbox, view_filter, FALSE);
+    /* Set the tree store*/
 #ifndef GTK2_FETCHES_ONLY_VISIBLE_CELLS
     g_object_set_data(G_OBJECT(mailbox), "tree-view", tree_view);
 #endif

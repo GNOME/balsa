@@ -22,7 +22,7 @@ use fcntl (although it can be enabled) since this locking method is
 very fragile and often not portable (see 
 <a
    href="http://www.washington.edu/pine/tech-notes/low-level.html#locking">
-here</a> for example).</p>
+here</a> for more details).</p>
 
 <p>Make sure that your spool directory has <samp>drwxrwxrwt</samp> (01777) access
 privileges. Presently, dotfile locking requires this unconditionally
@@ -90,7 +90,7 @@ so you can share it between balsa and fetchmail and get consistent
 behavior no matter you use balsa or fetchmail for downloading.
 </blockquote>
 <blockquote>
-Simple example ~/.procmailrc file:
+Simple example <samp>~/.procmailrc</samp> file:
 <pre>
 :0H:
 * ^Subject:.*balsa
@@ -108,6 +108,30 @@ Yes.&nbsp; Balsa does support attachments.&nbsp; You can drag files
 from GNOME compliant file managers into the compose window as well as select
 them from a file selection box.
 </blockquote></li>
+
+<li><p>When I click on a jpg in Balsa it immediately displays the
+ image for me in the preview pane. When I click a gif I see this
+ message in the preview pane:</P>
+<pre>
+No open or view action defined in GNOME MIME for this content type
+Content Type:application/octet-stream
+Filename: ./signups_day_week.gif
+</pre>
+
+<blockquote>
+<p>Basically, images should be sent with content type set to:
+<samp>image/jpeg</samp> or <samp>image/gif</samp> and so on. Content
+type <samp>application/octet-stream</samp> is just a binary data.</p>
+
+<p>To make it a little easier (it saves a few steps, such as saving
+the file to disk then finding a viewer), in the Control Panel for
+Balsa, under Mime Types, find application/octet-stream - highlight it,
+select "Edit" and in the entry for View, put in "xv %f" (without the
+quotes). Any other quick graphic viewer will do. Now when you get a
+message as you've described, when you click on the image, you'll have
+a new button for the message saying "View part with xv %f" (or
+whatever viewer you've decided to use).</p>
+</blockquote>
 
 <li><p>How do I nest mailboxes?</p>
 <blockquote>

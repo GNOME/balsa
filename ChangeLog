@@ -4,6 +4,7 @@
 	reporting.
 	* libbalsa/address-book-{vcard,ldif}.c: use filter parameter.
 	* libbalsa/address.c: provide sensible edit widget for NULL address.
+	* libbalsa/filter-funcs.c: plug leaks (Manu).
 	* src/ab-main.c: next series of fixes.
 	* src/sendmsg-window.c: D&D files to compose window.
 

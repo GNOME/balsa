@@ -517,6 +517,26 @@ build_right_side(GtkWindow * window)
     return rightside;
 }				/* end build_right_side() */
 
+/* Helper */
+static void
+fe_collect_user_headers(LibBalsaCondition * condition)
+{
+    switch (condition->type) {
+    case CONDITION_STRING:
+        if (CONDITION_CHKMATCH(condition, CONDITION_MATCH_US_HEAD)) {
+	    gchar *user_header = condition->match.string.user_header;
+	    if (user_header && *user_header)
+		fe_add_new_user_header(user_header);
+	}
+        break;
+    case CONDITION_AND:
+    case CONDITION_OR:
+        fe_collect_user_headers(condition->match.andor.left);
+        fe_collect_user_headers(condition->match.andor.right);
+    default:
+        break;
+    }
+}
 
 /*
  * filters_edit_dialog()
@@ -618,15 +638,8 @@ filters_edit_dialog(void)
                               _("Filter \"%s\" has no condition."),
                               fil->name);
 
-#if !GTK_CHECK_VERSION(2, 4, 0)
-#if FIXME
-        /* If this condition is a match on a user header,
-           add the user header name to the combo list */
-        if (CONDITION_CHKMATCH(c,CONDITION_MATCH_US_HEAD) &&
-            c->user_header && c->user_header[0])
-            fe_add_new_user_header(c->user_header);
-#endif
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
+	fe_collect_user_headers(fil->condition);
+
 	cpfil->action=fil->action;
 	if (fil->action_string) 
             cpfil->action_string=g_strdup(fil->action_string);	

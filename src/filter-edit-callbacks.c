@@ -433,39 +433,55 @@ void
 fe_add_new_user_header(const gchar * str)
 {
     GList *lst;
-#if GTK_CHECK_VERSION(2, 4, 0)
-    gint i, active;
-#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
 
     for (lst = fe_user_headers_list; lst; lst = g_list_next(lst))
         if (g_ascii_strcasecmp(str, (gchar *) lst->data) == 0)
             return;
 
     /* It's a new string, add it */
-#if GTK_CHECK_VERSION(2, 4, 0)
-    /* First clear the combo box... */
-    for (i = g_list_length(fe_user_headers_list); --i >= 0;)
-        gtk_combo_box_remove_text(GTK_COMBO_BOX(fe_user_header), i);
-
-#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
     fe_user_headers_list =
         g_list_insert_sorted(fe_user_headers_list, g_strdup(str),
                              (GCompareFunc) g_ascii_strcasecmp);
-#if GTK_CHECK_VERSION(2, 4, 0)
-
-    /* ...then remake it with the new string... */
-    active = -1;
-    for (lst = fe_user_headers_list, i = 0; lst; lst = lst->next, i++) {
-        gtk_combo_box_append_text(GTK_COMBO_BOX(fe_user_header),
-                                  lst->data);
-        if (!g_ascii_strcasecmp(str, lst->data))
-            active = i;
-    }
-
-    /* ...and make the new entry active. */
-    gtk_combo_box_set_active(GTK_COMBO_BOX(fe_user_header), active);
-#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
 }
+
+#if GTK_CHECK_VERSION(2, 4, 0)
+static void
+fe_user_header_set_active(const gchar * user_header)
+{
+    if (user_header && *user_header) {
+	GList *lst;
+        gint i;
+
+        for (lst = fe_user_headers_list, i = 0; lst; lst = lst->next, i++) {
+            if (g_ascii_strcasecmp(user_header, lst->data) == 0) {
+                gtk_combo_box_set_active(GTK_COMBO_BOX(fe_user_header), i);
+                break;
+            }
+        }
+    }
+}
+
+static void
+fe_user_header_add(const gchar * user_header)
+{
+    if (user_header && *user_header) {
+        GList *lst;
+
+        /* First clear the combo box... */
+        for (lst = fe_user_headers_list; lst; lst = lst->next)
+            gtk_combo_box_remove_text(GTK_COMBO_BOX(fe_user_header), 0);
+
+        fe_add_new_user_header(user_header);
+
+        /* ...then remake it with the new string... */
+        for (lst = fe_user_headers_list; lst; lst = lst->next)
+            gtk_combo_box_append_text(GTK_COMBO_BOX(fe_user_header),
+                                      lst->data);
+
+        fe_user_header_set_active(user_header);
+    }
+}
+#endif                          /* GTK_CHECK_VERSION(2, 4, 0) */
 
 /* conditon_validate is responsible of validating
  * the changes to the current condition, according to the widgets
@@ -521,7 +537,9 @@ condition_validate(LibBalsaCondition* new_cnd)
 		return FALSE;
 	    }
 #if GTK_CHECK_VERSION(2, 4, 0)
-            fe_add_new_user_header(str);
+            if (gtk_combo_box_get_active(GTK_COMBO_BOX(fe_user_header)) < 0)
+		/* User has changed the entry. */
+		fe_user_header_add(str);
 #else
 	    fe_add_new_user_header(str);
 	    /* This piece of code replaces the combo list
@@ -734,10 +752,8 @@ fill_condition_widgets(LibBalsaCondition* cnd)
                                  CONDITION_CHKMATCH(cnd,CONDITION_MATCH_US_HEAD) && andmask);
     if (CONDITION_CHKMATCH(cnd,CONDITION_MATCH_US_HEAD) && andmask) {
 #if GTK_CHECK_VERSION(2, 4, 0)
-	gchar *tmp = cnd->match.string.user_header;
-	if (tmp && *tmp)
-	    fe_add_new_user_header(tmp);
-	gtk_widget_set_sensitive(fe_user_header,TRUE);
+	gtk_widget_set_sensitive(fe_user_header, TRUE);
+	fe_user_header_set_active(cnd->match.string.user_header);
 #else
 	gtk_widget_set_sensitive(GTK_WIDGET(fe_user_header),TRUE);
 	gtk_entry_set_text(GTK_ENTRY(fe_user_header->entry),

@@ -1,3 +1,8 @@
+2004-07-20 09:34  PeterB
+
+	* src/mailbox-conf.c: don't duplicate a local mailbox in the
+	mailbox list when changing properties.
+
 2004-07-19 23:41  PeterB
 
 	* libbalsa/imap/imap-search.c: plug leak.

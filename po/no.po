@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8.0\n"
-"POT-Creation-Date: 2000-06-12 20:21+0200\n"
-"PO-Revision-Date: 2000-06-12 20:28+02:00\n"
+"POT-Creation-Date: 2000-06-16 12:55+0200\n"
+"PO-Revision-Date: 2000-06-16 13:00+02:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@online.no>\n"
 "Language-Team: Norwegian <no@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -181,7 +181,7 @@ msgstr "Legg til ny adresse"
 msgid "E-Mail Address:"
 msgstr "E-post adresse:"
 
-#: src/address-book.c:291 src/balsa-index-page.c:1043
+#: src/address-book.c:291 src/balsa-index-page.c:865
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -190,9 +190,7 @@ msgstr ""
 "Kunne ikke åpne ~/.gnome/GnomeCard.gcrd for lesing.\n"
 " - %s\n"
 
-#: src/address-book.c:294 src/balsa-index-page.c:1029
-#: src/balsa-index-page.c:1046 src/balsa-index-page.c:1083
-#: src/sendmsg-window.c:403
+#: src/address-book.c:294 src/sendmsg-window.c:403
 msgid "OK"
 msgstr "OK"
 
@@ -212,7 +210,7 @@ msgstr "Navn"
 msgid "E-Mail Address"
 msgstr "E-post adresse"
 
-#: src/address-book.c:420 src/address-book.c:458 src/main-window.c:173
+#: src/address-book.c:420 src/address-book.c:458 src/main-window.c:177
 msgid "Address Book"
 msgstr "Adressebok"
 
@@ -253,16 +251,16 @@ msgstr "Skisser"
 msgid "Trash"
 msgstr "Søppel"
 
-#: src/balsa-index-page.c:290
+#: src/balsa-index-page.c:293
 msgid "Mailbox password:"
 msgstr "Passord for postboks:"
 
 #. password field
-#: src/balsa-index-page.c:298 src/mailbox-conf.c:991 src/mailbox-conf.c:1090
+#: src/balsa-index-page.c:301 src/mailbox-conf.c:991 src/mailbox-conf.c:1090
 msgid "Password:"
 msgstr "Passord:"
 
-#: src/balsa-index-page.c:324
+#: src/balsa-index-page.c:327
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -270,44 +268,48 @@ msgstr ""
 "Kunne ikke åpne postboks\n"
 "Vennligst sjekk innstillingene."
 
-#: src/balsa-index-page.c:590 src/filter-edit-dialog.c:222
+#: src/balsa-index-page.c:608 src/filter-edit-dialog.c:222
 msgid "New"
 msgstr "Ny"
 
-#: src/balsa-index-page.c:598 src/main-window.c:373
+#: src/balsa-index-page.c:611 src/main-window.c:405
 msgid "Reply"
 msgstr "Svar"
 
-#: src/balsa-index-page.c:606 src/main-window.c:376
+#: src/balsa-index-page.c:614 src/main-window.c:408
 msgid "Reply to all"
 msgstr "Svar til alle"
 
-#: src/balsa-index-page.c:614 src/main-window.c:379
+#: src/balsa-index-page.c:617 src/main-window.c:411
 msgid "Forward"
 msgstr "Send videre"
 
-#: src/balsa-index-page.c:622 src/filter-edit-dialog.c:228
-#: src/main-window.c:366 src/pref-manager.c:886
+#: src/balsa-index-page.c:620 src/filter-edit-dialog.c:228
+#: src/main-window.c:398 src/pref-manager.c:886
 msgid "Delete"
 msgstr "Slett"
 
-#: src/balsa-index-page.c:630
+#: src/balsa-index-page.c:623
 msgid "Undelete"
 msgstr "Angre slett"
 
-#: src/balsa-index-page.c:639
+#: src/balsa-index-page.c:627 src/balsa-index-page.c:1181
 msgid "Store Address"
 msgstr "Lagre adresse"
 
-#: src/balsa-index-page.c:647
+#: src/balsa-index-page.c:630
 msgid "Transfer"
 msgstr "Overfør"
 
-#: src/balsa-index-page.c:1028
-msgid "You may only store one address at a time.\n"
-msgstr "Du kan kun lagre en adresse om gangen.\n"
+#: src/balsa-index-page.c:833
+msgid "No ;'s!\n"
+msgstr "Ingen ; tegn!\n"
 
-#: src/balsa-index-page.c:1080
+#: src/balsa-index-page.c:870
+msgid "The Card Name field must be non-empty.\n"
+msgstr "Feltet med navn på kortet kan ikke være tomt.\n"
+
+#: src/balsa-index-page.c:876
 #, c-format
 msgid ""
 "There is already an address book entry for %s.\n"
@@ -315,6 +317,42 @@ msgid ""
 msgstr ""
 "Det finnes allerede en oppføring i adresseboken for %s.\n"
 "Kjør GnomeCard hvis du ønsker å redigere oppføringer i adresseboken.\n"
+
+#: src/balsa-index-page.c:1093
+msgid "Card Name:"
+msgstr "Navn på kort:"
+
+#: src/balsa-index-page.c:1093
+msgid "First Name:"
+msgstr "Fornavn:"
+
+#: src/balsa-index-page.c:1094
+msgid "Last Name:"
+msgstr "Etternavn:"
+
+#: src/balsa-index-page.c:1094
+msgid "Organization:"
+msgstr "Organisasjon:"
+
+#: src/balsa-index-page.c:1095
+msgid "Email Address:"
+msgstr "E-post adresse:"
+
+#: src/balsa-index-page.c:1110
+msgid "In order to store an address, you must select a message.\n"
+msgstr "For å lagre en adresse må du først velge den.\n"
+
+#: src/balsa-index-page.c:1120
+msgid "You may only store one address at a time.\n"
+msgstr "Du kan kun lagre en adresse om gangen.\n"
+
+#: src/balsa-index-page.c:1133
+msgid "This message doesn't contain an e-mail address.\n"
+msgstr "Denne meldingen inneholder ikke en e-post adresse.\n"
+
+#: src/balsa-index-page.c:1184
+msgid "Contact Information"
+msgstr "Kontaktinformasjon"
 
 #: src/balsa-index.c:252
 msgid "From"
@@ -349,105 +387,97 @@ msgstr "Total"
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Vist postboks: %s med %ld meldinger, %ld nye"
 
-#: src/balsa-message.c:165 src/balsa-message.c:170
+#: src/balsa-message.c:213 src/balsa-message.c:217
 msgid "Save MIME Part"
 msgstr "Lagre MIME-del"
 
-#: src/balsa-message.c:166 src/balsa-message.c:226
+#: src/balsa-message.c:214 src/balsa-message.c:1087
 msgid "Save"
 msgstr "Lagre"
 
-#: src/balsa-message.c:166 src/balsa-message.c:226 src/mailbox-conf.c:670
-#: src/sendmsg-window.c:130 src/sendmsg-window.c:429 src/sendmsg-window.c:1101
+#: src/balsa-message.c:214 src/mailbox-conf.c:670 src/sendmsg-window.c:130
+#: src/sendmsg-window.c:429 src/sendmsg-window.c:1101
 #: src/sendmsg-window.c:1408 src/sendmsg-window.c:1431
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: src/balsa-message.c:168 src/balsa-message.c:228
+#: src/balsa-message.c:215
 msgid "Please choose a filename to save this part of the message as:"
 msgstr ""
 "Vennligst velg et filnavn som du vil lagre denne delen av meldingen som:"
 
-#: src/balsa-message.c:225 src/balsa-message.c:230
-msgid "Save Text"
-msgstr "Lagre tekst"
-
-#: src/balsa-message.c:301 src/balsa-message.c:315
+#: src/balsa-message.c:263 src/balsa-message.c:283
 #, c-format
 msgid " Open of %s failed:%s "
 msgstr " Åpning av %s feilet:%s "
 
-#: src/balsa-message.c:302 src/balsa-message.c:317
+#: src/balsa-message.c:266
+msgid "Error"
+msgstr "Feil"
+
+#: src/balsa-message.c:266 src/balsa-message.c:285
 msgid "Ok"
 msgstr "Ok"
 
-#: src/balsa-message.c:644
+#: src/balsa-message.c:531
 msgid "Date:"
 msgstr "Dato:"
 
 #. From:
-#: src/balsa-message.c:648 src/filter-edit-dialog.c:337
+#: src/balsa-message.c:535 src/filter-edit-dialog.c:337
 #: src/sendmsg-window.c:601
 msgid "From:"
 msgstr "Fra:"
 
 #. To:
-#: src/balsa-message.c:652 src/filter-edit-dialog.c:325
+#: src/balsa-message.c:539 src/filter-edit-dialog.c:325
 #: src/sendmsg-window.c:603
 msgid "To:"
 msgstr "Til:"
 
-#: src/balsa-message.c:653
+#: src/balsa-message.c:540
 msgid "Cc:"
 msgstr "Cc:"
 
-#: src/balsa-message.c:654
+#: src/balsa-message.c:541
 msgid "Bcc:"
 msgstr "Bcc:"
 
-#: src/balsa-message.c:657
+#: src/balsa-message.c:544
 msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:658 src/sendmsg-window.c:609
+#: src/balsa-message.c:545 src/sendmsg-window.c:609
 msgid "Subject:"
 msgstr "Emne:"
 
-#: src/balsa-message.c:734
+#: src/balsa-message.c:603
+msgid "Couldn't render image\n"
+msgstr "Kunne ikke rendre bildet\n"
+
+#: src/balsa-message.c:651
+msgid "Balsa does not know how to display this message part"
+msgstr "Balsa kan ikke vise denne delen av meldingen"
+
+#: src/balsa-message.c:656
 #, c-format
-msgid "other part: error writing to temporary file %s: %s"
-msgstr "andre del: feil under skriving til midlertidig fil %s: %s"
+msgid "Content Type: %s/%s"
+msgstr "Innholdstype: %s/%s"
 
-#: src/balsa-message.c:788
-msgid ""
-"<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
-"application/"
-msgstr ""
-"<tr><td bgcolor=\"#f0f0f0\"> Du mottok en kodet fil av type applikasjon/"
-
-#: src/balsa-message.c:792
-msgid "<P>The parameters of this message are:<BR>"
-msgstr "<P>Parameterene til denne meldingen er: <BR>"
-
-#: src/balsa-message.c:793
-msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
-msgstr "<table border=0><tr><th>Attributt</th><th>Verdi</th></tr>\n"
-
-#: src/balsa-message.c:827
+#: src/balsa-message.c:658
 #, c-format
-msgid "image: error writing to temporary file: %s"
-msgstr "bilde: feil under skriving til midlertidig fil: %s"
+msgid "Content Type: %s"
+msgstr "Innholdstype: %s"
 
-#: src/balsa-message.c:1106
+#: src/balsa-message.c:665
 #, c-format
-msgid "text part: error writing to temporary file %s: %s"
-msgstr "tekstdel: feil under skriving til midlertidig fil %s: %s"
+msgid "Filename: %s"
+msgstr "Filnavn: %s"
 
-#: src/balsa-message.c:1251
-#, c-format
-msgid "Open of %s failed. Errno = %d, "
-msgstr "Åpning av %s feilet. Errno = %d, "
+#: src/balsa-message.c:672
+msgid "Save part"
+msgstr "Lagre del"
 
 #: src/filter-edit-dialog.c:30
 msgid "Inbound"
@@ -757,7 +787,7 @@ msgid "Username:"
 msgstr "Brukernavn:"
 
 #. toggle for check
-#: src/mailbox-conf.c:1006 src/main-window.c:362
+#: src/mailbox-conf.c:1006 src/main-window.c:394
 msgid "Check"
 msgstr "Sjekk"
 
@@ -770,240 +800,272 @@ msgstr "Slett fra tjener"
 msgid "Folder path:"
 msgstr "Sti til mappe:"
 
-#: src/main-window.c:167
+#: src/main-window.c:171
 msgid "_Get new mail"
 msgstr "_Hent ny post"
 
-#: src/main-window.c:167
+#: src/main-window.c:171
 msgid "Fetch new incoming mail"
 msgstr "Hent ny innkommende post"
 
-#: src/main-window.c:173
+#: src/main-window.c:177
 msgid "Opens the address book"
 msgstr "Åpner adresseboken"
 
-#: src/main-window.c:180
+#: src/main-window.c:184
 msgid "Pr_int"
 msgstr "Skr_iv ut"
 
-#: src/main-window.c:180
+#: src/main-window.c:184
 msgid "Print current mail"
 msgstr "Skriv ut denne meldingen"
 
-#: src/main-window.c:205
+#: src/main-window.c:209 src/message-window.c:54
 msgid "N_o headers"
 msgstr "In_gen headere"
 
-#: src/main-window.c:207
+#: src/main-window.c:211 src/message-window.c:56
 msgid "_Selected headers"
 msgstr "_Valgte headere"
 
-#: src/main-window.c:209
+#: src/main-window.c:213 src/message-window.c:58
 msgid "All _headers"
 msgstr "_Alle headere"
 
-#: src/main-window.c:218 src/main-window.c:392
+#: src/main-window.c:222 src/main-window.c:424
 msgid "Next"
 msgstr "Neste"
 
-#: src/main-window.c:218
+#: src/main-window.c:222
 msgid "Next Message"
 msgstr "Neste melding"
 
-#: src/main-window.c:224 src/main-window.c:387
+#: src/main-window.c:228 src/main-window.c:419
 msgid "Previous"
 msgstr "Forrige"
 
-#: src/main-window.c:224
+#: src/main-window.c:228
 msgid "Preivous Message"
 msgstr "Forrige melding"
 
-#: src/main-window.c:230 src/main-window.c:397
+#: src/main-window.c:234 src/main-window.c:429
 msgid "Next Unread"
 msgstr "Neste uleste"
 
-#: src/main-window.c:230
+#: src/main-window.c:234
 msgid "Next Unread Message"
 msgstr "Neste uleste melding"
 
-#: src/main-window.c:238
+#: src/main-window.c:241 src/message-window.c:93
+msgid "Next Part"
+msgstr "Neste del"
+
+#: src/main-window.c:241 src/message-window.c:93
+msgid "Next Part in Message"
+msgstr "Neste del av meldingen"
+
+#: src/main-window.c:247 src/message-window.c:98
+msgid "Previous Part"
+msgstr "Forrige del"
+
+#: src/main-window.c:247 src/message-window.c:98
+msgid "Previous Part in Message"
+msgstr "Forrige del i meldingen"
+
+#: src/main-window.c:253 src/message-window.c:103
+msgid "Save Current Part"
+msgstr "Lagre denne delen"
+
+#: src/main-window.c:254 src/message-window.c:104
+msgid "Save Current Part in Message"
+msgstr "Lagre denne delen av meldingen"
+
+#: src/main-window.c:262
 msgid "_New"
 msgstr "_Ny"
 
-#: src/main-window.c:238
+#: src/main-window.c:262
 msgid "Compose a new message"
 msgstr "Komponer en ny melding"
 
-#: src/main-window.c:245 src/message-window.c:54
+#: src/main-window.c:269 src/message-window.c:74
 msgid "_Reply"
 msgstr "_Svar"
 
-#: src/main-window.c:245
+#: src/main-window.c:269
 msgid "Reply to the current message"
 msgstr "Svar på denne meldingen"
 
-#: src/main-window.c:252 src/message-window.c:60
+#: src/main-window.c:276 src/message-window.c:80
 msgid "Reply to _all"
 msgstr "Svar til _alle"
 
-#: src/main-window.c:253
+#: src/main-window.c:277
 msgid "Reply to all recipients of the current message"
 msgstr "Svar til alle mottakere av denne meldingen"
 
-#: src/main-window.c:260 src/message-window.c:67
+#: src/main-window.c:284 src/message-window.c:87
 msgid "_Forward"
 msgstr "S_end videre"
 
-#: src/main-window.c:260
+#: src/main-window.c:284
 msgid "Forward the current message"
 msgstr "Videresend nåværende melding"
 
-#: src/main-window.c:267
+#: src/main-window.c:291
 msgid "_Continue"
 msgstr "_Fortsett"
 
-#: src/main-window.c:267
+#: src/main-window.c:291
 msgid "Continue editing current message"
 msgstr "Fortsett å redigere denne meldingen"
 
-#: src/main-window.c:275 src/main-window.c:313
+#: src/main-window.c:299 src/main-window.c:345
 msgid "_Delete"
 msgstr "S_lett"
 
-#: src/main-window.c:275
+#: src/main-window.c:299
 msgid "Delete the current message"
 msgstr "Slett denne meldingen"
 
-#: src/main-window.c:282
+#: src/main-window.c:306
 msgid "_Undelete"
 msgstr "A_ngre slett"
 
-#: src/main-window.c:282
+#: src/main-window.c:306
 msgid "Undelete the message"
 msgstr "Angre sletting av melding"
 
-#: src/main-window.c:288
+#: src/main-window.c:314
+msgid "_Store Address"
+msgstr "Lagre adre_sse"
+
+#: src/main-window.c:314
+msgid "Store address of sender in addressbook"
+msgstr "Lagre adressen til avsender i adresseboken"
+
+#: src/main-window.c:320 src/message-window.c:110
 msgid "_Wrap"
 msgstr "_Bryt"
 
-#: src/main-window.c:305
+#: src/main-window.c:337
 msgid "List"
 msgstr "Liste"
 
-#: src/main-window.c:309
+#: src/main-window.c:341
 msgid "_Add"
 msgstr "Le_gg til"
 
-#: src/main-window.c:309
+#: src/main-window.c:341
 msgid "Add a new mailbox"
 msgstr "Legg til en ny postboks"
 
-#: src/main-window.c:311
+#: src/main-window.c:343
 msgid "_Edit"
 msgstr "Re_diger"
 
-#: src/main-window.c:311
+#: src/main-window.c:343
 msgid "Edit the selected mailbox"
 msgstr "Rediger valgte postboks"
 
-#: src/main-window.c:313
+#: src/main-window.c:345
 msgid "Delete the selected mailbox"
 msgstr "Slett valgte postboks"
 
-#: src/main-window.c:316
+#: src/main-window.c:348
 msgid "Co_mmit current"
 msgstr "Akt_iver nåværende"
 
-#: src/main-window.c:316
+#: src/main-window.c:348
 msgid "Commit the changes in the currently opened mailbox"
 msgstr "Aktiver endringene i nåværende åpnet postboks"
 
-#: src/main-window.c:318
+#: src/main-window.c:350
 msgid "_Close"
 msgstr "_Lukk"
 
-#: src/main-window.c:318
+#: src/main-window.c:350
 msgid "Close mailbox"
 msgstr "Lukk postboks"
 
-#: src/main-window.c:321
+#: src/main-window.c:353
 msgid "Empty _Trash"
 msgstr "_Tøm søppel"
 
-#: src/main-window.c:321
+#: src/main-window.c:353
 msgid "Delete Messages from the trash mailbox"
 msgstr "Slett meldinger fra søppelkurven"
 
-#: src/main-window.c:327
+#: src/main-window.c:359
 msgid "_Filters..."
 msgstr "_Filtre..."
 
-#: src/main-window.c:327
+#: src/main-window.c:359
 msgid "Manage filters"
 msgstr "Håndter filtre"
 
-#: src/main-window.c:336
+#: src/main-window.c:368
 msgid "_Show mailbox tree"
 msgstr "_Vis postboks-tre"
 
-#: src/main-window.c:339
+#: src/main-window.c:371
 msgid "Show mailbox _tabs"
 msgstr "Vis postboks-faner"
 
-#: src/main-window.c:353
+#: src/main-window.c:385
 msgid "_Message"
 msgstr "_Melding"
 
-#: src/main-window.c:354
+#: src/main-window.c:386
 msgid "Mail_box"
 msgstr "Post_boks"
 
-#: src/main-window.c:362
+#: src/main-window.c:394
 msgid "Check Email"
 msgstr "Sjekk epost"
 
-#: src/main-window.c:366
+#: src/main-window.c:398
 msgid "Delete Message"
 msgstr "Slett melding"
 
-#: src/main-window.c:370
+#: src/main-window.c:402
 msgid "Compose"
 msgstr "Lag ny"
 
-#: src/main-window.c:370
+#: src/main-window.c:402
 msgid "Compose Message"
 msgstr "Lag ny melding"
 
-#: src/main-window.c:382
+#: src/main-window.c:414
 msgid "Continue"
 msgstr "Fortsett"
 
-#: src/main-window.c:387
+#: src/main-window.c:419
 msgid "Open Previous message"
 msgstr "Åpne forrige melding"
 
-#: src/main-window.c:392
+#: src/main-window.c:424
 msgid "Open Next message"
 msgstr "Åpne neste melding"
 
-#: src/main-window.c:397
+#: src/main-window.c:429
 msgid "Open Next Unread Message"
 msgstr "Åpne neste uleste melding"
 
-#: src/main-window.c:402 src/print.c:82 src/sendmsg-window.c:127
+#: src/main-window.c:434 src/print.c:82 src/sendmsg-window.c:127
 #: src/sendmsg-window.c:155
 msgid "Print"
 msgstr "Skriv ut"
 
-#: src/main-window.c:402
+#: src/main-window.c:434
 msgid "Print current message"
 msgstr "Skriv ut denne meldingen"
 
-#: src/main-window.c:888
+#: src/main-window.c:892
 msgid "Copyright (C) 1997-2000"
 msgstr "Copyright (C) 1997-2000"
 
-#: src/main-window.c:890
+#: src/main-window.c:894
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -1014,6 +1076,11 @@ msgstr ""
 "Balsa kan finnes på http://www.balsa.net/\n"
 "\n"
 "Vennligst rapporter feil på: http://bugs.gnome.org/"
+
+#: src/main-window.c:1443
+msgid ""
+"In order to store an address, you must open a mailbox and select a message.\n"
+msgstr "For å lagre en adresse må du først åpne en postboks og velge en melding.\n"
 
 #: src/main.c:78
 msgid "Get new mail on startup"
@@ -1076,15 +1143,15 @@ msgstr "Merk som skisse-mappe"
 msgid "No mailbox selected."
 msgstr "Ingen postboks valgt."
 
-#: src/message-window.c:54
+#: src/message-window.c:74
 msgid "Reply to this message"
 msgstr "Svar på denne meldingen"
 
-#: src/message-window.c:61
+#: src/message-window.c:81
 msgid "Reply to all recipients of this message"
 msgstr "Svar til alle mottakere av denne meldingen"
 
-#: src/message-window.c:67
+#: src/message-window.c:87
 msgid "Forward this message"
 msgstr "Videresend denne meldingen"
 

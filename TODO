@@ -12,17 +12,7 @@ Stuart
  * #mh/ requires a .mh_profile in ~ which looks something
    like:  "Path: Mail", telling it to get mh folders from
    ~/Mail
- * Quote messages in replyto
- * Do not add Re: if one already exists
 
-
-Jay
----------------------------------------------------------
-
-
-
-Someone
----------------------------------------------------------
  * Look into recursing directories upon local mail reading.
    This this should create submenus under the mailbox menu.
    Not sure how to do this right now without chaning lots

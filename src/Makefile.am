@@ -21,9 +21,9 @@ balsa_SOURCES =	\
 	addrbook-manager.c	\
 	balsa-init.c
 
-INCLUDES=-I. -I$(srcdir)/../imap/c-client $(GNOME_INCLUDEDIR)
+INCLUDES=-I. -I$(srcdir)/../c-client $(GNOME_INCLUDEDIR)
 
-balsa_LDADD = ../imap/c-client/c-client.a \
+balsa_LDADD = -L$(srcdir)/../c-client/c-client.a \
 	$(GNOME_LIBDIR) \
 	$(GNOMEUI_LIBS) \
 	$(GTKXMHTML_LIBS) \

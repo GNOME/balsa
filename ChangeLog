@@ -1,5 +1,11 @@
 2004-08-28  Pawel Salek
 
+	* libbalsa/send.c: fix calls to smtp_header_set_option()
+	(wrong since 2001-05-22).
+	* libbalsa/address-book-gpe.c: handle MODIFIED tag.
+
+2004-08-28  Pawel Salek
+
 	* NEWS, configure.in: release 2.2.4
 	* libbalsa/address-book-gpe.c: handle entries without addresses.
 	* libbalsa/imap/imap-handle.c: cleanup.

@@ -626,7 +626,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	    /* Add this after the Bcc: copy. */
 	    message = smtp_add_message (session);
 	    if (bcc_message)
-		smtp_set_header_option (message, "Bcc", Hdr_PROHIBIT);
+		smtp_set_header_option (message, "Bcc", Hdr_PROHIBIT, 1);
 
 	    smtp_message_set_application_data (message, new_message);
 	    smtp_set_messagecb (message, libbalsa_message_cb, new_message);
@@ -699,8 +699,8 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
             add_recipients(bcc_message, NULL, bcc_recip, "Cc");
 
 	    /* Prohibit status headers. */
-	    smtp_set_header_option(message, "Status", Hdr_PROHIBIT);
-	    smtp_set_header_option(message, "X-Status", Hdr_PROHIBIT);
+	    smtp_set_header_option(message, "Status", Hdr_PROHIBIT, 1);
+	    smtp_set_header_option(message, "X-Status", Hdr_PROHIBIT, 1);
 
 
 	    /* Estimate the size of the message.  This need not be exact

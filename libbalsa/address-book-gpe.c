@@ -36,6 +36,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <time.h>
 
 #include "address-book.h"
 #include "address-book-gpe.h"
@@ -330,7 +331,7 @@ libbalsa_address_book_gpe_load(LibBalsaAddressBook * ab,
              "select distinct urn from contacts where "
              "(upper(tag)='FAMILY_NAME' or upper(tag)='GIVEN_NAME' or "
              "upper(tag)='NAME' or "
-             "upper(tag)=WORK.EMAIL' or upper(tag)='HOME.EMAIL') "
+             "upper(tag)='WORK.EMAIL' or upper(tag)='HOME.EMAIL') "
              "and value LIKE '%q%%'",
              gpe_read_address, &gc, &err, filter);
     } else {
@@ -383,51 +384,37 @@ libbalsa_address_book_gpe_add_address(LibBalsaAddressBook *ab,
     /* FIXME: duplicate detection! */
 
     id = sqlite_last_insert_rowid(gpe_ab->db);
-    INSERT_ATTR(gpe_ab->db,id, "NAME",  address->full_name);
+    INSERT_ATTR(gpe_ab->db,id, "NAME",        address->full_name);
     INSERT_ATTR(gpe_ab->db,id, "GIVEN_NAME",  address->first_name);
     INSERT_ATTR(gpe_ab->db,id, "FAMILY_NAME", address->last_name);
     INSERT_ATTR(gpe_ab->db,id, "NICKNAME",    address->nick_name);
     INSERT_ATTR(gpe_ab->db,id, "WORK.ORGANIZATION", address->organization);
     INSERT_ATTR(gpe_ab->db,id, "WORK.EMAIL",
                 (char*)address->address_list->data);
-
+    sqlite_exec_printf(gpe_ab->db, "insert into contacts values "
+                       "('%d', 'MODIFIED', %d)", NULL, NULL, NULL,
+                       id, time(NULL));
     return LBABERR_OK;
 }
-static gboolean
+static gchar*
 db_delete_by_uid(sqlite *db, guint uid)
 {
-  int r;
-  gchar *err;
-  gboolean rollback = FALSE;
-
-  r = sqlite_exec (db, "begin transaction", NULL, NULL, &err);
-  if (r)
-    goto error;
-
-  rollback = TRUE;
-
-  r = sqlite_exec_printf (db, "delete from contacts where urn='%d'",
-                          NULL, NULL, &err, uid);
-  if (r)
-    goto error;
-
-  r = sqlite_exec_printf (db, "delete from contacts_urn where urn='%d'",
-                          NULL, NULL, &err, uid);
-  if (r)
-    goto error;
-
-  r = sqlite_exec (db, "commit transaction", NULL, NULL, &err);
-  if (r)
-    goto error;
-
-  return TRUE;
-
-error:
-  if (rollback)
-    sqlite_exec (db, "rollback transaction", NULL, NULL, NULL);
-  /* do something with err */
-  free (err);
-  return FALSE;
+    int r;
+    gchar *err;
+    
+    if( (r=sqlite_exec(db, "begin transaction",
+                       NULL, NULL, &err)) == SQLITE_OK)
+        return err;
+    
+    if( (r=sqlite_exec_printf(db, "delete from contacts where urn='%d'",
+                              NULL, NULL, &err, uid)) == SQLITE_OK &&
+        (r=sqlite_exec_printf(db, "delete from contacts_urn where urn='%d'",
+                              NULL, NULL, &err, uid)) == SQLITE_OK &&
+        (r=sqlite_exec(db, "commit transaction", NULL,
+                       NULL, &err)) == SQLITE_OK) return NULL;
+    
+    sqlite_exec(db, "rollback transaction", NULL, NULL, NULL);
+    return err;
 }
 
 static LibBalsaABErr
@@ -436,6 +423,7 @@ libbalsa_address_book_gpe_remove_address(LibBalsaAddressBook *ab,
 {
     LibBalsaAddressBookGpe *gpe_ab = LIBBALSA_ADDRESS_BOOK_GPE(ab);
     guint uid;
+    char *err;
     g_return_val_if_fail(address, LBABERR_CANNOT_WRITE);
     g_return_val_if_fail(address->address_list, LBABERR_CANNOT_WRITE);
 
@@ -447,23 +435,80 @@ libbalsa_address_book_gpe_remove_address(LibBalsaAddressBook *ab,
     if(!uid)/* safety check, perhaps unnecessary */
         return LBABERR_CANNOT_WRITE;
         
-    return db_delete_by_uid(gpe_ab->db, uid) 
-        ? LBABERR_OK : LBABERR_CANNOT_WRITE;
+    err = db_delete_by_uid(gpe_ab->db, uid);
+    if(err) {
+        libbalsa_address_book_set_status(ab, err);
+        free(err);
+        return LBABERR_CANNOT_WRITE;
+    } else return LBABERR_OK;
 }
 
 
 /** libbalsa_address_book_gpe_modify_address:
     modify given address.
 */
+#define INSERT_ATTR_R(db,id,attr,val) \
+ if( (val) && *(val)) {\
+ if( (r=sqlite_exec_printf \
+         ((db), "insert into contacts values ('%d', '%q', '%q')",\
+                    NULL, NULL, &err, (id), (attr), (val))) != SQLITE_OK)\
+    goto rollback;}
+
 static LibBalsaABErr
 libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
-                                          LibBalsaAddress *address,
-                                          LibBalsaAddress *newval)
+                                         LibBalsaAddress *address,
+                                         LibBalsaAddress *newval)
 {
+    LibBalsaAddressBookGpe *gpe_ab = LIBBALSA_ADDRESS_BOOK_GPE(ab);
+    guint uid;
+    int r;
+    char *err;
+
     g_return_val_if_fail(address, LBABERR_CANNOT_WRITE);
     g_return_val_if_fail(address->address_list, LBABERR_CANNOT_WRITE);
     g_return_val_if_fail(newval->address_list, LBABERR_CANNOT_WRITE);
-    /* alternatively follow up commit_person */
+
+    if (gpe_ab->db == NULL) {
+        if( !libbalsa_address_book_gpe_open_db(gpe_ab))
+	    return LBABERR_CANNOT_CONNECT;
+    }
+    uid = GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(address), "urn"));
+    /* safety check, perhaps unnecessary */
+    g_return_val_if_fail(uid, LBABERR_CANNOT_WRITE);
+
+    /* do the real work here */
+    if( (r=sqlite_exec(gpe_ab->db, "begin transaction",
+                       NULL, NULL, &err)) != SQLITE_OK) {
+        libbalsa_address_book_set_status(ab, err);
+        free(err); /* failed, so soon!? */
+        return LBABERR_CANNOT_WRITE;
+    }
+
+    if( (r=sqlite_exec_printf(gpe_ab->db,
+                              "delete from contacts where urn='%d'",
+                              NULL, NULL, &err, uid)) != SQLITE_OK)
+        goto rollback;
+    printf("newval: given_name: %s\n", newval->first_name);
+    INSERT_ATTR_R(gpe_ab->db,uid, "NAME",        newval->full_name);
+    INSERT_ATTR_R(gpe_ab->db,uid, "GIVEN_NAME",  newval->first_name);
+    INSERT_ATTR_R(gpe_ab->db,uid, "FAMILY_NAME", newval->last_name);
+    INSERT_ATTR_R(gpe_ab->db,uid, "NICKNAME",    newval->nick_name);
+    INSERT_ATTR_R(gpe_ab->db,uid, "WORK.ORGANIZATION", newval->organization);
+    INSERT_ATTR_R(gpe_ab->db,uid, "WORK.EMAIL",
+                (char*)newval->address_list->data);
+    if( (r=sqlite_exec_printf(gpe_ab->db, "insert into contacts values "
+                              "('%d', 'MODIFIED', %d)", NULL, NULL, &err,
+                              uid, time(NULL))) != SQLITE_OK)
+        goto rollback;
+    
+    if( (r=sqlite_exec(gpe_ab->db, "commit transaction", NULL,
+                       NULL, &err)) == SQLITE_OK) return LBABERR_OK;
+
+ rollback:
+    libbalsa_address_book_set_status(ab, err);
+    free(err);
+    sqlite_exec(gpe_ab->db, "rollback transaction", NULL, NULL, NULL);
+
     return LBABERR_CANNOT_WRITE;
 }
 

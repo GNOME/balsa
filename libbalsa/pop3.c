@@ -546,18 +546,18 @@ fetch_direct(int s, gint first_msg, gint msgs, gint tot_bytes,
     
     g_return_val_if_fail(spoolfile, POP_OK);
 
-    gdk_threads_enter(); libbalsa_lock_mutt();
+    libbalsa_lock_mutt();
     nctx = mx_open_mailbox (spoolfile, M_APPEND, &ctx);
-    libbalsa_unlock_mutt(); gdk_threads_leave(); 
+    libbalsa_unlock_mutt();
     if(nctx == NULL) return POP_OPEN_ERR;
 
     num_bytes=0;  
     for (i = first_msg; i <= msgs; i++) {
 	if( (err=send_fetch_req(s, i, buffer, sizeof(buffer))) != POP_OK)
 	    break;
-	gdk_threads_enter(); libbalsa_lock_mutt();
+	libbalsa_lock_mutt();
 	msg = mx_open_new_message (&ctx, NULL, M_ADD_FROM);
-	libbalsa_unlock_mutt(); gdk_threads_leave(); 
+	libbalsa_unlock_mutt();
 	if (msg == NULL)  {
 	    DM("POP3: Error while creating new message %d", i );
 	    err = POP_MSG_APPEND;
@@ -567,18 +567,18 @@ fetch_direct(int s, gint first_msg, gint msgs, gint tot_bytes,
 	err = fetch_single_msg(s, msg->fp, i, first_msg, msgs, &num_bytes,
 			       tot_bytes, prog_cb);
 	if(err != POP_OK) break;
-	gdk_threads_enter(); libbalsa_lock_mutt();
+	libbalsa_lock_mutt();
 	if (mx_commit_message (msg, &ctx) != 0) err = POP_WRITE_ERR;
 	mx_close_message (&msg);
-	libbalsa_unlock_mutt(); gdk_threads_leave(); 
+	libbalsa_unlock_mutt();
 	
 	if (err) break;
 	if (delete_on_server) delete_msg(s, i); /* ignore errors */
     }
     if (err != POP_OK) reset_server(s, buffer, sizeof(buffer));
-    gdk_threads_enter(); libbalsa_lock_mutt();
+    libbalsa_lock_mutt();
     mx_close_mailbox (&ctx, NULL);
-    libbalsa_unlock_mutt(); gdk_threads_leave();
+    libbalsa_unlock_mutt(); 
     return err;
 }
 

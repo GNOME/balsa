@@ -1,3 +1,13 @@
+2002-09-10  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/pop3.c: gdk_thread_ locks were redundant there.
+
+2002-09-10  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-index.c: modify bndx_find_row to find next in thread,
+	excluding messages to be removed; fix bndx_messages_remove to use
+	bndx_find_row, and simplify it.
+
 2002-09-09  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-index.c: 2nd message is not previous from

@@ -522,28 +522,6 @@ balsa_app_destroy(void)
     if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");
 }
 
-static gboolean
-ping_imap_func(GNode *node)
-{
-    BalsaMailboxNode *mbnode = BALSA_MAILBOX_NODE(node->data);
-    g_return_val_if_fail(mbnode, FALSE);
-
-    if (!mbnode->mailbox || !LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
-	return FALSE;
-    libbalsa_mailbox_imap_noop(LIBBALSA_MAILBOX_IMAP(mbnode->mailbox));
-
-    return FALSE;
-}
-static gint
-ping_imap_cb(gpointer data)
-{
-    balsa_mailbox_nodes_lock(FALSE);
-    g_node_traverse(balsa_app.mailbox_nodes, G_PRE_ORDER, G_TRAVERSE_ALL,
-                    -1, (GNodeTraverseFunc) ping_imap_func, NULL);
-    balsa_mailbox_nodes_unlock(FALSE);
-    
-    return TRUE;
-}
 gboolean
 do_load_mailboxes(void)
 {
@@ -556,7 +534,6 @@ do_load_mailboxes(void)
 	fprintf(stderr, "do_load_mailboxes: Unknown inbox mailbox type\n");
 	return FALSE;
     }
-    g_timeout_add(20*60*1000, (GSourceFunc) ping_imap_cb, NULL);
     return TRUE;
 }
 

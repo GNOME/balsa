@@ -724,8 +724,8 @@ bmbl_column_resize(GtkWidget * widget,
 /* bmbl_drag_cb
  * 
  * Description: This is the drag_data_recieved signal handler for the
- * BalsaMBList.  It retrieves a list of messages terminated by a NULL
- * pointer, converts it to a GList, then transfers it to the selected
+ * BalsaMBList.  It retrieves the source BalsaIndex and transfers the
+ * index's selected messages to the target
  * mailbox.  Depending on what key is held down when the message(s)
  * are dropped they are either copied or moved.  The default action is
  * to copy.
@@ -742,22 +742,16 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
     GtkTreeIter iter;
     LibBalsaMailbox *mailbox;
     LibBalsaMailbox *orig_mailbox;
-    GList *messages = NULL;
-    LibBalsaMessage **message;
+    BalsaIndex *orig_index;
 
-
-
-    /* convert pointer array to GList */
-    for (message = (LibBalsaMessage **) selection_data->data; *message;
-         message++) {
-        messages = g_list_prepend(messages, *message);
-    }
-    if(!messages) /* it is actually possible to drag from GtkTreeView
-                   * * when no rows are selected: Disable preview for
-                   * that. */
+    orig_index = *(BalsaIndex **) selection_data->data;
+    g_free(data);
+    if (orig_index->selected->len == 0)
+	/* it is actually possible to drag from GtkTreeView when no rows
+	 * are selected: Disable preview for that. */
        return; 
 
-    orig_mailbox = ((LibBalsaMessage *) messages->data)->mailbox;
+    orig_mailbox = orig_index->mailbox_node->mailbox;
 
     /* find the node and mailbox */
 
@@ -776,16 +770,13 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
 
         /* cannot transfer to the originating mailbox */
         if (mailbox != NULL && mailbox != orig_mailbox)
-            balsa_index_transfer(balsa_find_index_by_mailbox(orig_mailbox),
-                                 messages, mailbox,
+            balsa_index_transfer(orig_index, orig_index->selected, mailbox,
                                  context->action != GDK_ACTION_MOVE);
         gtk_tree_path_free(path);
     }
 
     if (balsa_find_iter_by_data(&iter, orig_mailbox))
         gtk_tree_selection_select_iter(selection, &iter);
-
-    g_list_free(messages);
 }
 
 /* bmbl_select_mailbox

@@ -1,3 +1,8 @@
+2001-09-10  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/mailbox_pop3.c (libbalsa_mailbox_pop3_check): WorksForMe(tm)
+	seems to work for other people too. looks nicer
+
 2001-09-06  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/send.c: make gcc happier, make return of libbalsa_message_postpone

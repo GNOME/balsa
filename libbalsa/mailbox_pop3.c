@@ -293,21 +293,17 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	return;
     }	
     libbalsa_mailbox_open(tmp_mailbox);
-    /* chbm: fixme - make this more linear */
-    if((m->inbox) && (tmp_mailbox->messages)) {
-	if(libbalsa_messages_move(tmp_mailbox->message_list, m->inbox)) {    
-	    unlink((const char*)tmp_path);
-	} else {
-	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-				 _("Error placing messages from %s on %s\n"
-				   "Messages are left in %s\n"),
-				 mailbox->name, 
-				 LIBBALSA_MAILBOX(m->inbox)->name,
-				 tmp_path);
-        libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));
-	}
+    if((m->inbox) && (tmp_mailbox->messages) &&
+	!libbalsa_messages_move(tmp_mailbox->message_list, m->inbox)) {    
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("Error placing messages from %s on %s\n"
+			       "Messages are left in %s\n"),
+			     mailbox->name, 
+			     LIBBALSA_MAILBOX(m->inbox)->name,
+			     tmp_path);
+	libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));	
     } else {
-    libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));
+	libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));
 	unlink((const char*)tmp_path);
     }
     gtk_object_destroy(GTK_OBJECT(tmp_mailbox));	

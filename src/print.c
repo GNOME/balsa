@@ -128,7 +128,7 @@ gnome_print_show_with_charset(PrintInfo * pi, char const * text)
 	obuflen = ibuflen << 1; /* should be sufficient? */
 	conv_obuf = conv_obufp = g_malloc(obuflen);
 	/* the prototype of iconv() changed with glibc 2.2 */
-#if defined __GLIBC__ && __GLIBC__ && __GLIBC_MINOR__ <= 1
+#if defined __GLIBC__ && __GLIBC__ && __GLIBC_MINOR__ <= 1 || (defined sun)
 	iconv(pi->conv_data, (const char **)&conv_ibuf, &ibuflen, &conv_obuf, &obuflen);
 #else
 	iconv(pi->conv_data, &conv_ibuf, &ibuflen, &conv_obuf, &obuflen);

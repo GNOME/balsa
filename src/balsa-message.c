@@ -372,6 +372,11 @@ save_part(BalsaPartInfo * info)
 
     save_dialog = 
 	GTK_FILE_SELECTION(gtk_file_selection_new(_("Save MIME Part")));
+    /* start workaround for prematurely realized widget returned
+     * by some GTK+ versions */
+    if(GTK_WIDGET_REALIZED(save_dialog))
+        gtk_widget_unrealize(GTK_WIDGET(save_dialog));
+    /* end workaround for prematurely realized widget */
     gtk_window_set_wmclass(GTK_WINDOW(save_dialog), "save_part", "Balsa");
 
     if (balsa_app.save_dir)

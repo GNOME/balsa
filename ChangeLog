@@ -1,3 +1,10 @@
+2001-09-25  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/print.c:
+	* src/sendmsg-window.c: Sun port (Steve Wall)
+	* src/balsa-message.c: unrealize GtkFileSelection widget 
+	returned buggy gtk+ (Peter Bloomfield).
+
 2001-09-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: don't detect LIBTOOL twice.
@@ -304,7 +311,7 @@
 	* src/filter-edit-callbacks.c: 
 	* src/balsa-app.h: last signed-unsigned comparisons removed.
 	* libbalsa/address-book-ldif.c: remove redundant assignment
-	(spotted by Stephen P. Wall <Steve_Wall@redcom.com>).
+	(spotted by Steve Wall <hitched97@myrealbox.com>).
 	* libbalsa/send.c: enable TLS in SMTP whenever possible.
 	* src/main-window.c: don't imap_check_test() NULLs.
 	* Makefile.am: clean up versioning.
@@ -448,7 +455,7 @@
 	
 2001-08-13  Pawel Salek  <pawsa@theochem.kth.se>
 
-	Take care of #53566. Stephen P. Wall <Steve_Wall@redcom.com>.
+	Take care of #53566. Steve Wall <hitched97@myrealbox.com>.
 	(treated as bug fix, not a new feature).
 	* libbalsa/address-book-ldif.{h,c}: LDIF support.
 	* libbalsa/Makefile.am: add address-book-ldif.{h,c}
@@ -1315,7 +1322,7 @@
 	* src/main-window.c (show_about_box): bugs. -> bugzilla.
 
 2001-03-30  Pawel Salek  <pawsa@theochem.kth.se>
-	Patch from Stephen P. Wall <Steve_Wall@redcom.com>
+	Patch from Steve Wall <hitched97@myrealbox.com>
 
 	* src/balsa-app.h: change the max color depth; add reply_string 
 	and forward_string fields.

@@ -1556,7 +1556,7 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message, SendType type)
 		tmp += i;
 	    }
 	}
-	while( *tmp && isspace(*tmp) ) tmp++;
+	while( *tmp && isspace((int)*tmp) ) tmp++;
 	newsubject = g_strdup_printf("%s %s", 
 				     balsa_app.current_ident->reply_string, 
 				     tmp);
@@ -1585,7 +1585,7 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message, SendType type)
 		    tmp += i;
 		}
 	    }
-	    while( *tmp && isspace(*tmp) ) tmp++;
+	    while( *tmp && isspace((int)*tmp) ) tmp++;
 	    if (message->from && message->from->address_list)
 		newsubject = 
 		    g_strdup_printf("%s %s [%s]",
@@ -2016,7 +2016,8 @@ read_signature(BalsaSendmsg *msg)
     /* Signature is a path to a program */
     if (*p == '|') {
 	p++;
-	while (isspace(*p) && *p != '\0') p++; /* Forward past any spaces */
+	while (isspace((int)*p) && *p != '\0')
+	    p++; /* Forward past any spaces */
 
 	siglen = strlen(p);
 	sigpath = g_malloc(siglen+1);
@@ -2088,6 +2089,11 @@ include_file_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     GtkWidget *file_selector;
 
     file_selector = gtk_file_selection_new(_("Include file"));
+    /* start workaround for prematurely realized widget returned
+     * by some GTK+ versions */
+    if(GTK_WIDGET_REALIZED(file_selector))
+        gtk_widget_unrealize(file_selector);
+    /* end workaround for prematurely realized widget */
     gtk_window_set_wmclass(GTK_WINDOW(file_selector), "file", "Balsa");
     gtk_object_set_user_data(GTK_OBJECT(file_selector), bsmsg);
 

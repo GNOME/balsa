@@ -174,7 +174,8 @@ static int qp_decode_triple (char *s, char *d)
   return -1;
 }
 
-static void qp_decode_line (char *dest, char *src, size_t *l)
+static void qp_decode_line (char *dest, char *src, size_t *l,
+			    int last)
 {
   char *d, *s;
   char c;
@@ -204,7 +205,7 @@ static void qp_decode_line (char *dest, char *src, size_t *l)
     }
   }
 
-  if (!soft)
+  if (!soft && last == '\n')
     *d++ = '\n';
   
   *d = '\0';
@@ -243,12 +244,16 @@ void mutt_decode_quoted (STATE *s, long len, int istext, iconv_t cd)
   size_t l2;
   size_t l3;
 
+  int last;
+
   if (istext)
     state_set_prefix(s);
 
   while (len > 0)
   {
-    if (fgets (line, sizeof (line), s->fpin) == NULL)
+    last = 0;
+    
+    if (fgets (line, MIN (sizeof (line), len + 1), s->fpin) == NULL)
       break;
 
     len -= (l2 = strlen (line));
@@ -259,15 +264,15 @@ void mutt_decode_quoted (STATE *s, long len, int istext, iconv_t cd)
      * i.e. garbage.
      */
 
-    if (l2 && line[l2 - 1] != '\n')
-      while (len > 0 && fgetc (s->fpin) != '\n')
-	len--;
-
+    if (l2 && (last = line[l2 - 1]) != '\n')
+      while (len > 0 && (last = fgetc (s->fpin)) != '\n')
+ 	len--;
+    
     /* 
      * decode and do character set conversion
      */
     
-    qp_decode_line (decline + l, line, &l3);
+    qp_decode_line (decline + l, line, &l3, last);
     l += l3;
     convert_to_state (cd, decline, &l, s);
   }
@@ -892,9 +897,13 @@ void text_enriched_handler (BODY *a, STATE *s)
   FREE (&(stte.param));
 }                                                                              
 
+#ifndef LIBMUTT 
 /*
  * An implementation of RFC 2646.
  * 
+ *
+ * NOTE: This still has to be made UTF-8 aware.
+ *
  */
 
 #define FLOWED_MAX 77
@@ -932,8 +941,8 @@ static void flowed_stuff (STATE *s, char *cont, int level)
      * some text on the line which looks like it's quoted, turn off 
      * ANSI colors, so quote coloring doesn't affect this line. 
      */
-    if (*cont && !level && flowed_maybe_quoted (cont))
-      state_puts ("\033[0;m",s);
+    if (*cont && !level && !mutt_strcmp (Pager, "builtin") && flowed_maybe_quoted (cont))
+      state_puts ("\033[0m",s);  
   }
   else if ((*cont == ' ') || (*cont == '>') || (!level && !mutt_strncmp (cont, "From ", 5)))
     state_putc (' ', s);
@@ -948,6 +957,22 @@ static char *flowed_skip_indent (char *prefix, char *cont)
 }
 
 
+static int flowed_visual_strlen (char *l, int i)
+{
+  int j;
+  for (j = 0; *l; l++)
+  {
+    if (*l == '\t')
+      j += 8 - ((i + j) % 8);
+    else
+      j++;
+  }
+  
+  return j;
+}
+
+
+
 static void text_plain_flowed_handler (BODY *a, STATE *s)
 {
   char line[LONG_STRING];
@@ -957,12 +982,12 @@ static void text_plain_flowed_handler (BODY *a, STATE *s)
   int  last_quoted;
   int  full = 1;
   int  last_full;
-  int  col = 0;
+  int  col = 0, tmpcol;
 
+  int  i_add = 0;
   int  add = 0;
   int  soft = 0;
-  int  max;
-  int  l;
+  int  l, rl;
   
   int  flowed_max;
   int  bytes = a->length;
@@ -980,6 +1005,10 @@ static void text_plain_flowed_handler (BODY *a, STATE *s)
   
   if ((flowed_max = FLOWED_MAX) > COLS - 3)
     flowed_max = COLS - 3;
+  if (flowed_max > COLS - WrapMargin)
+    flowed_max = COLS - WrapMargin;
+  if (flowed_max <= 0)
+    flowed_max = COLS;
 
   while (bytes > 0 && fgets (line, sizeof (line), s->fpin))
   {
@@ -1047,6 +1076,7 @@ static void text_plain_flowed_handler (BODY *a, STATE *s)
 
       /* If there is an indentation, record it. */
       cont = flowed_skip_indent (indent, cont);
+      i_add = flowed_visual_strlen (indent, quoted + add);
     }
     else
     {
@@ -1078,23 +1108,21 @@ static void text_plain_flowed_handler (BODY *a, STATE *s)
       /* try to find a point for word wrapping */
 
     retry_wrap:
-      l = mutt_strlen (cont);
-      if (quoted + add + col + l > flowed_max)
+      l  = flowed_visual_strlen (cont, quoted + i_add + add + col);
+      rl = mutt_strlen (cont);
+      if (quoted + i_add + add + col + l > flowed_max)
       {
 	actually_wrap = 1;
-	if ((max = flowed_max - quoted - add - col)
-	    > l)
-	  max = l;
-
-	for (t = cont + max; t > cont; t--)
+	for (tmpcol = quoted + i_add + add + col, t = cont;
+	     *t && tmpcol < flowed_max; t++)
 	{
 	  if (*t == ' ' || *t == '\t')
-	  {
 	    tail = t;
-	    break;
-	  }
 	}
-
+	if (*t == '\t')
+	  tmpcol = (tmpcol & ~7) + 8;
+	else
+	  tmpcol++;
 	if (tail)
 	{
 	  *tail++ = '\0';
@@ -1103,7 +1131,7 @@ static void text_plain_flowed_handler (BODY *a, STATE *s)
       }
 
       /* We seem to be desperate.  Get me a new line, and retry. */
-      if (!tail && (quoted + add + col + mutt_strlen (cont) > flowed_max) && col)
+      if (!tail && (quoted + add + col + i_add + l > flowed_max) && col)
       {
 	state_putc ('\n', s);
 	col = 0;
@@ -1140,8 +1168,8 @@ static void text_plain_flowed_handler (BODY *a, STATE *s)
 
       /* output the text */
       state_puts (cont, s);
-      col += strlen (cont);
-      
+      col += flowed_visual_strlen (cont, quoted + i_add + add + col);
+       
       /* possibly indicate a soft line break */
       if (soft == 2)
       {
@@ -1166,10 +1194,6 @@ static void text_plain_flowed_handler (BODY *a, STATE *s)
     state_putc ('\n', s);
   
 }
-
-
-
-
 
 #define TXTHTML     1
 #define TXTPLAIN    2
@@ -1305,6 +1329,7 @@ static void alternative_handler (BODY *a, STATE *s)
   else if (s->flags & M_DISPLAY)
   {
     /* didn't find anything that we could display! */
+    state_mark_attach (s);
     state_puts(_("[-- Error:  Could not display any parts of Multipart/Alternative! --]\n"), s);
   }
 }
@@ -1330,9 +1355,8 @@ void message_handler (BODY *a, STATE *s)
 
   if (b->parts)
   {
-    mutt_copy_hdr (s->fpin, s->fpout, off_start, b->parts->offset,
-	(((s->flags & M_WEED) || ((s->flags & M_DISPLAY) && option (OPTWEED))) ? (CH_WEED | CH_REORDER) : 0) |
-	(s->prefix ? CH_PREFIX : 0) | CH_DECODE | CH_FROM, s->prefix);
+    (((s->flags & M_WEED) || ((s->flags & (M_DISPLAY|M_PRINTING)) && option (OPTWEED))) ? (CH_WEED | CH_REORDER) : 0) |
+      (s->prefix ? CH_PREFIX : 0) | CH_DECODE | CH_FROM, s->prefix);
 
     if (s->prefix)
       state_puts (s->prefix, s);
@@ -1397,8 +1421,10 @@ int mutt_can_decode (BODY *a)
 
   return (0);
 }
+#endif /* LIBMUTT */
 
 
+#ifndef LIBMUTT
 void multipart_handler (BODY *a, STATE *s)
 {
   BODY *b, *p;
@@ -1423,6 +1449,7 @@ void multipart_handler (BODY *a, STATE *s)
   {
     if (s->flags & M_DISPLAY)
     {
+      state_mark_attach (s);
       state_printf (s, _("[-- Attachment #%d"), count);
       if (p->description || p->filename || p->form_name)
       {
@@ -1538,8 +1565,10 @@ void autoview_handler (BODY *a, STATE *s)
       /* check for data on stderr */
       if (fgets (buffer, sizeof(buffer), fperr)) 
       {
-	if (s->flags & M_DISPLAY) 
+	if (s->flags & M_DISPLAY) {
+	   state_mark_attach (s);
 	  state_printf (s, _("[-- Autoview stderr of %s --]\n"), command);
+	}
 
 	state_puts (s->prefix, s);
 	state_puts (buffer, s);
@@ -1556,9 +1585,11 @@ void autoview_handler (BODY *a, STATE *s)
       /* Check for stderr messages */
       if (fgets (buffer, sizeof(buffer), fperr))
       {
-	if (s->flags & M_DISPLAY)
+	if (s->flags & M_DISPLAY) {
+	  state_mark_attach(s);
 	  state_printf (s, _("[-- Autoview stderr of %s --]\n"), 
 			command);
+	}
 	
 	state_puts (buffer, s);
 	mutt_copy_stream (fperr, s->fpout);
@@ -1576,12 +1607,16 @@ void autoview_handler (BODY *a, STATE *s)
       mutt_unlink (tempfile);
 
     if (s->flags & M_DISPLAY) 
+    {
+      state_mark_attach (s);
       mutt_clear_error ();
+    }
   }
   rfc1524_free_entry (&entry);
 }
+#endif
 
-
+#ifndef LIBMUTT
 static void external_body_handler (BODY *b, STATE *s)
 {
   const char *access_type;
@@ -1592,7 +1627,10 @@ static void external_body_handler (BODY *b, STATE *s)
   if (!access_type)
   {
     if (s->flags & M_DISPLAY)
+    {
+      state_mark_attach (s);
       state_puts (_("[-- Error: message/external-body has no access-type parameter --]\n"), s);
+    }
     return;
   }
 
@@ -1604,11 +1642,12 @@ static void external_body_handler (BODY *b, STATE *s)
 
   if (!ascii_strcasecmp (access_type, "x-mutt-deleted"))
   {
-    if (s->flags & M_DISPLAY)
+    if (s->flags & (M_DISPLAY|M_PRINTING))
     {
       char *length;
       char pretty_size[10];
 
+      state_mark_attach (s);
       state_printf (s, _("[-- This %s/%s attachment "),
 	       TYPE(b->parts), b->parts->subtype);
       length = mutt_get_parameter ("length", b->parameter);
@@ -1621,9 +1660,15 @@ static void external_body_handler (BODY *b, STATE *s)
       state_puts (_("has been deleted --]\n"), s);
 
       if (expire != -1)
-	state_printf (s, _("[-- on %s --]\n"), expiration);
+      {
+	state_mark_attach (s);
+ 	state_printf (s, _("[-- on %s --]\n"), expiration);
+      }
       if (b->parts->filename)
-	state_printf (s, _("[-- name: %s --]\n"), b->parts->filename);
+      {
+	state_mark_attach (s);
+	state_printf (s, _("[-- on %s --]\n"), expiration);
+      }
 
       mutt_copy_hdr (s->fpin, s->fpout, ftell (s->fpin), b->parts->offset,
 		     (option (OPTWEED) ? (CH_WEED | CH_REORDER) : 0) |
@@ -1648,15 +1693,19 @@ static void external_body_handler (BODY *b, STATE *s)
     if (s->flags & M_DISPLAY)
     {
       state_printf (s,
-	       _("[-- This %s/%s attachment is not included, --]\n"
-		 "[-- and the indicated access-type %s is unsupported --]\n"),
-	       TYPE(b->parts), b->parts->subtype, access_type);
+		    _("[-- This %s/%s attachment is not included, --]\n"),
+		    TYPE (b->parts), b->parts->subtype);
+      state_mark_attach (s);
+      state_printf (s, 
+		    _("[-- and the indicated access-type %s is unsupported --]\n"),
+		    access_type);
       mutt_copy_hdr (s->fpin, s->fpout, ftell (s->fpin), b->parts->offset,
 		     (option (OPTWEED) ? (CH_WEED | CH_REORDER) : 0) |
 		     CH_DECODE , NULL);
     }
   }
 }
+#endif
 
 
 void mutt_decode_attachment (BODY *b, STATE *s)
@@ -1693,7 +1742,7 @@ void mutt_decode_attachment (BODY *b, STATE *s)
 }
 
 
-
+#ifndef LIBMUTT
 void mutt_body_handler (BODY *b, STATE *s)
 {
   int decode = 0;
@@ -1705,6 +1754,8 @@ void mutt_body_handler (BODY *b, STATE *s)
   size_t tmplength = 0;
   char type[STRING];
 
+  int oflags = s->flags;
+
   /* first determine which handler to use to process this part */
 
   snprintf (type, sizeof (type), "%s/%s", TYPE (b), b->subtype);
@@ -1713,7 +1764,10 @@ void mutt_body_handler (BODY *b, STATE *s)
     rfc1524_entry *entry = rfc1524_new_entry ();
 
     if (rfc1524_mailcap_lookup (b, type, entry, M_AUTOVIEW))
-      handler = autoview_handler;
+    {
+      handler   = autoview_handler;
+      s->flags &= ~M_CHARCONV;
+    }
     rfc1524_free_entry (&entry);
   }
   else if (b->type == TYPETEXT)
@@ -1825,7 +1879,7 @@ void mutt_body_handler (BODY *b, STATE *s)
 	if ((s->fpout = safe_fopen (tempfile, "w")) == NULL)
 	{
 	  mutt_error _("Unable to open temporary file!");
-	  return;
+	  goto bail;
 	}
 	/* decoding the attachment changes the size and offset, so save a copy
 	 * of the "real" values now, and restore them after processing
@@ -1884,6 +1938,7 @@ void mutt_body_handler (BODY *b, STATE *s)
 #ifndef LIBMUTT
   else if (s->flags & M_DISPLAY)
   {
+    state_mark_attach (s);
     state_printf (s, _("[-- %s/%s is unsupported "), TYPE (b), b->subtype);
     if (!option (OPTVIEWATTACH))
     {
@@ -1896,6 +1951,11 @@ void mutt_body_handler (BODY *b, STATE *s)
     fputs (" --]\n", s->fpout);
   }
 #endif
+ bail:
+  s->flags = oflags;
 }
+#endif /* LIBMUTT */
+
+
 
 

@@ -42,6 +42,9 @@
 #include <sys/utsname.h>
 #include <errno.h>
 #include <sys/wait.h>
+#ifdef LIBMUTT
+#include <assert.h>
+#endif /* balsa thing for code removed from libmutt */
 
 #define toggle_quadoption(opt) QuadOptions ^= (1 << (2 * opt))
 
@@ -89,35 +92,6 @@ int mutt_option_index (char *s)
   return (-1);
 }
 #endif
-static void add_char (BUFFER *buf, char ch)
-{
-  size_t offset;
-
-  if (buf->dptr >= buf->data + buf->dsize)
-  {
-    offset = buf->dptr - buf->data;
-    buf->dsize += 4;
-    safe_realloc ((void **) &buf->data, buf->dsize);
-    buf->dptr = buf->data + offset;
-  }
-  *buf->dptr++ = ch;
-}
-
-static void add_str (BUFFER *buf, const char *s)
-{
-  size_t slen = mutt_strlen (s);
-  size_t offset;
-
-  if (buf->dptr + slen > buf->data + buf->dsize)
-  {
-    offset = buf->dptr - buf->data;
-    buf->dsize += slen;
-    safe_realloc ((void **) &buf->data, buf->dsize);
-    buf->dptr = buf->data + offset;
-  }
-  memcpy (buf->dptr, s, slen);
-  buf->dptr += slen;
-}
 
 int mutt_extract_token (BUFFER *dest, BUFFER *tok, int flags)
 {
@@ -149,27 +123,31 @@ int mutt_extract_token (BUFFER *dest, BUFFER *tok, int flags)
       qc = ch;
     else if (ch == '\\' && qc != '\'')
     {
+      if (!*tok->dptr)
+	return -1; /* premature end of token */
       switch (ch = *tok->dptr++)
       {
 	case 'c':
 	case 'C':
-	  add_char (dest, (toupper (*tok->dptr) - '@') & 0x7f);
+	  if (!*tok->dptr)
+	    return -1; /* premature end of token */
+	  mutt_buffer_addch (dest, (toupper (*tok->dptr) - '@') & 0x7f);
 	  tok->dptr++;
 	  break;
 	case 'r':
-	  add_char (dest, '\r');
+	  mutt_buffer_addch (dest, '\r');
 	  break;
 	case 'n':
-	  add_char (dest, '\n');
+	  mutt_buffer_addch (dest, '\n');
 	  break;
 	case 't':
-	  add_char (dest, '\t');
+	  mutt_buffer_addch (dest, '\t');
 	  break;
 	case 'f':
-	  add_char (dest, '\f');
+	  mutt_buffer_addch (dest, '\f');
 	  break;
 	case 'e':
-	  add_char (dest, '\033');
+	  mutt_buffer_addch (dest, '\033');
 	  break;
 	default:
 	  if (isdigit ((unsigned char) ch) &&
@@ -177,30 +155,33 @@ int mutt_extract_token (BUFFER *dest, BUFFER *tok, int flags)
 	      isdigit ((unsigned char) *(tok->dptr + 1)))
 	  {
 
-	    add_char (dest, (ch << 6) + (*tok->dptr << 3) + *(tok->dptr + 1) - 3504);
+	    mutt_buffer_addch (dest, (ch << 6) + (*tok->dptr << 3) + *(tok->dptr + 1) - 3504);
 	    tok->dptr += 2;
 	  }
 	  else
-	    add_char (dest, ch);
+	    mutt_buffer_addch (dest, ch);
       }
     }
     else if (ch == '^' && (flags & M_TOKEN_CONDENSE))
     {
+      if (!*tok->dptr)
+	return -1; /* premature end of token */
       ch = *tok->dptr++;
       if (ch == '^')
-	add_char (dest, ch);
+	mutt_buffer_addch (dest, ch);
       else if (ch == '[')
-	add_char (dest, '\033');
+	mutt_buffer_addch (dest, '\033');
       else if (isalpha ((unsigned char) ch))
-	add_char (dest, toupper (ch) - '@');
+	mutt_buffer_addch (dest, toupper (ch) - '@');
       else
       {
-	add_char (dest, '^');
-	add_char (dest, ch);
+	mutt_buffer_addch (dest, '^');
+	mutt_buffer_addch (dest, ch);
       }
     }
     else if (ch == '`' && (!qc || qc == '"'))
     {
+#ifndef LIBMUTT
       FILE	*fp;
       pid_t	pid;
       char	*cmd, *ptr;
@@ -240,7 +221,14 @@ int mutt_extract_token (BUFFER *dest, BUFFER *tok, int flags)
 
       /* if we got output, make a new string consiting of the shell ouptput
 	 plus whatever else was left on the original line */
-      if (expn.data)
+      /* BUT: If this is inside a quoted string, directly add output to 
+       * the token */
+      if (expn.data && qc)
+      {
+	mutt_buffer_addstr (dest, expn.data);
+	FREE (&expn.data);
+      }
+      else if (expn.data)
       {
 	expnlen = mutt_strlen (expn.data);
 	tok->dsize = expnlen + mutt_strlen (tok->dptr) + 1;
@@ -255,10 +243,14 @@ int mutt_extract_token (BUFFER *dest, BUFFER *tok, int flags)
 	ptr = NULL;
 	FREE (&expn.data);
       }
+#else
+      int backtick_not_supported__file_bug = 0;
+      assert(backtick_not_supported__file_bug);
+#endif
     }
     else if (ch == '$' && (!qc || qc == '"') && (*tok->dptr == '{' || isalpha ((unsigned char) *tok->dptr)))
     {
-      char *env, *var;
+      char *env = NULL, *var = NULL;
 
       if (*tok->dptr == '{')
       {
@@ -276,14 +268,14 @@ int mutt_extract_token (BUFFER *dest, BUFFER *tok, int flags)
 	var = mutt_substrdup (tok->dptr, pc);
 	tok->dptr = pc;
       }
-      if ((env = getenv (var)))
-	add_str (dest, env);
+      if (var && (env = getenv (var)))
+	mutt_buffer_addstr (dest, env);
       FREE (&var);
     }
     else
-      add_char (dest, ch);
+      mutt_buffer_addch (dest, ch);
   }
-  add_char (dest, 0); /* terminate the string */
+  mutt_buffer_addch (dest, 0); /* terminate the string */
   SKIPWS (tok->dptr);
   return 0;
 }
@@ -418,18 +410,38 @@ static int parse_unalias (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *er
     tmp = Aliases;
     for (tmp = Aliases; tmp; tmp = tmp->next)
     {
-      if (mutt_strcasecmp (buf->data, tmp->name) == 0)
+      if (CurrentMenu == MENU_ALIAS)
       {
-	if (last)
-	  last->next = tmp->next;
-	else
-	  Aliases = tmp->next;
-	tmp->next = NULL;
-	mutt_free_alias (&tmp);
-	break;
+	for (tmp = Aliases; tmp ; tmp = tmp->next)
+	  tmp->del = 1;
+	set_option (OPTFORCEREDRAWINDEX);
       }
-      last = tmp;
+      else
+	mutt_free_alias (&Aliases);
+      break;
     }
+    else
+      for (tmp = Aliases; tmp; tmp = tmp->next)
+      {
+	if (mutt_strcasecmp (buf->data, tmp->name) == 0)
+	{
+	  if (CurrentMenu == MENU_ALIAS)
+	  {
+	    tmp->del = 1;
+	    set_option (OPTFORCEREDRAWINDEX);
+	    break;
+	  }
+
+	  if (last)
+	    last->next = tmp->next;
+	  else
+	    Aliases = tmp->next;
+	  tmp->next = NULL;
+	  mutt_free_alias (&tmp);
+	  break;
+	}
+	last = tmp;
+      }   
   }
   while (MoreArgs (s));
   return 0;
@@ -462,14 +474,20 @@ static int parse_alias (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
   {
     /* create a new alias */
     tmp = (ALIAS *) safe_calloc (1, sizeof (ALIAS));
+    tmp->self = tmp;
     tmp->name = safe_malloc (len + 1);
     memcpy (tmp->name, s->dptr, len);
     tmp->name[len] = 0;
+    /* give the main addressbook code a chance */
+    if (CurrentMenu == MENU_ALIAS)
+      set_option (OPTMENUCALLER)
   }
   else
   {
     /* override the previous value */
     rfc822_free_address (&tmp->addr);
+    if (CurrentMenu == MENU_ALIAS)
+      set_option (OPTFORCEREDRAWINDEX);
   }
   s->dptr = p;
 
@@ -493,6 +511,7 @@ parse_unmy_hdr (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
   do
   {
     mutt_extract_token (buf, s, 0);
+
     if (mutt_strcmp ("*", buf->data) == 0)
       mutt_free_list (&UserHeader);
     else
@@ -607,6 +626,42 @@ parse_sort (short *val, const char *s, const struct mapping_t *map, BUFFER *err)
   return 0;
 }
 #ifndef LIBMUTT
+
+static void mutt_set_default (struct option_t *p)
+{
+  switch (p->type & DT_MASK)
+  {
+    case DT_STR:
+      if (!p->init && *((char **) p->data))
+        p->init = (unsigned long) safe_strdup (* ((char **) p->data));
+      break;
+    case DT_PATH:
+      if (!p->init && *((char **) p->data))
+      {
+        char *cp = safe_strdup (*((char **) p->data));
+        /* mutt_pretty_mailbox (cp); */
+        p->init = (unsigned long) cp;
+      }
+      break;
+    case DT_ADDR:
+      if (!p->init && *((ADDRESS **) p->data))
+      {
+   	char tmp[HUGE_STRING];
+        *tmp = '\0';
+        rfc822_write_address (tmp, sizeof (tmp), *((ADDRESS **) p->data));
+        p->init = (unsigned long) safe_strdup (tmp);
+      }
+      break;
+    case DT_RX:
+    {
+      REGEXP *pp = (REGEXP *) p->data;
+      if (!p->init && pp->pattern)
+        p->init = (unsigned long) safe_strdup (pp->pattern);
+      break;
+    } 
+  }
+}
+
 static void mutt_restore_default (struct option_t *p)
 {
   switch (p->type & DT_MASK)
@@ -688,7 +743,10 @@ static void mutt_restore_default (struct option_t *p)
   if (p->flags & R_RESORT_SUB)
     set_option (OPTSORTSUBTHREADS);
   if (p->flags & R_RESORT)
-    set_option (OPTNEEDRESORT);
+    set_option (OPTNEEDRESORT); 
+  if (p->flags & R_RESORT_INIT)
+    set_option (OPTRESORTINIT);
+
 }
 
 static int parse_set (BUFFER *tmp, BUFFER *s, unsigned long data, BUFFER *err)
@@ -1549,6 +1607,12 @@ void mutt_init (int skip_sys_rc, LIST *commands)
   err.data = error;
   err.dsize = sizeof (error);
 
+/* 
+ * XXX - use something even more difficult to predict?
+ */
+  snprintf (AttachmentMarker, sizeof (AttachmentMarker),
+	    "\033]9;%ld\a", (long) time (NULL));
+  
   /* on one of the systems I use, getcwd() does not return the same prefix
      as is listed in the passwd file */
   if ((p = getenv ("HOME")))
@@ -1725,6 +1789,13 @@ void mutt_init (int skip_sys_rc, LIST *commands)
     parse_my_hdr (&token, &buf, 0, &err);
     FREE (&token.data);
   }
+
+
+  if ((p = getenv ("EMAIL")) != NULL)
+    From = rfc822_parse_adrlist (NULL, p);
+
+  mutt_set_langinfo_charset ();
+  mutt_set_charset (Charset);
 
   /* Set standard defaults */
   for (i = 0; MuttVars[i].option; i++)

@@ -1294,7 +1294,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	if (msg->content->next)
 	    msg->content = mutt_make_multipart(msg->content);
     }
-    mutt_prepare_envelope(msg->env);
+    mutt_prepare_envelope(msg->env, FALSE);
     libbalsa_unlock_mutt();
 
     encode_descriptions(msg->content);
@@ -1455,7 +1455,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	} else {
 	    /* safe_free bug patch: steal it! */
             libbalsa_lock_mutt();
-	    msg->content = mutt_copy_body(body->mutt_body, NULL);
+            msg->content = libmutt_copy_body(body->mutt_body, NULL);
             libbalsa_unlock_mutt();
 	}
 
@@ -1474,7 +1474,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
     libbalsa_lock_mutt();
     if (msg->content && msg->content->next)
         msg->content = mutt_make_multipart(msg->content);
-    mutt_prepare_envelope(msg->env);
+    mutt_prepare_envelope(msg->env, TRUE);
     libbalsa_unlock_mutt();
 
     encode_descriptions(msg->content);
@@ -1489,7 +1489,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
             return FALSE;
         }
 
-	mutt_write_rfc822_header(tempfp, msg->env, msg->content, -1);
+	mutt_write_rfc822_header(tempfp, msg->env, msg->content, -1, 0);
 	fputc('\n', tempfp);	/* tie off the header. */
 
 	if ((mutt_write_mime_body(msg->content, tempfp) == -1)) {

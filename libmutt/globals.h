@@ -56,6 +56,9 @@ WHERE char *Ispell;
 WHERE char *Locale;
 WHERE char *MailcapPath;
 WHERE char *Maildir;
+WHERE char *MhFlagged;
+WHERE char *MhReplied;
+WHERE char *MhUnseen;
 WHERE char *MsgFmt;
 #ifdef USE_SOCKET
 WHERE char *Preconnect INITVAL (NULL);
@@ -85,6 +88,10 @@ WHERE char *Shell;
 WHERE char *Signature;
 WHERE char *SimpleSearch;
 WHERE char *Spoolfile;
+#if defined(USE_SSL) || defined(USE_NSS)
+WHERE char *SslCertFile INITVAL (NULL);
+WHERE char *SslEntropyFile INITVAL (NULL);
+#endif
 WHERE char *StChars;
 /*WHERE char *Status; */
 WHERE char *Tempdir;
@@ -126,6 +133,11 @@ WHERE short ReadInc;
 WHERE short SendmailWait;
 WHERE short Timeout;
 WHERE short WriteInc;
+
+#ifdef USE_IMAP
+WHERE short ImapKeepalive;
+#endif
+
 
 /* flags for received signals */
 WHERE volatile sig_atomic_t SigAlrm INITVAL (0);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -13,17 +13,21 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
-#ifndef __MUTT_H__
-#define __MUTT_H__
+#ifndef MUTT_H
+#define MUTT_H
 
 #include "muttconfig.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #ifdef HAVE_UNISTD_H
-#include <unistd.h> /* needed for SEEK_SET */
+# include <unistd.h> /* needed for SEEK_SET */
+#endif
+#ifdef HAVE_UNIX_H
+# include <unix.h>   /* needed for snprintf on QNX. */
 #endif
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -31,30 +35,38 @@
 #include <limits.h>
 #include <stdarg.h>
 #include <signal.h>
+#ifdef HAVE_WCHAR_H
+# include <wchar.h>
+#endif
+#if defined(HAVE_WCTYPE_H) && defined(HAVE_WC_FUNCS)
+# include <wctype.h>
+#endif
 
 #ifndef _POSIX_PATH_MAX
 #include <posix1_lim.h>
 #endif
 
+#include <pwd.h>
+#include <grp.h>
+
 #include "rfc822.h"
 #include "hash.h"
+#include "charset.h"
+
+#ifdef SUBVERSION
+# define MUTT_VERSION (VERSION SUBVERSION)
+#else  
+# define MUTT_VERSION (VERSION)
+#endif
 
 /* nifty trick I stole from ELM 2.5alpha. */
-#ifdef GLOBALS_C
+#ifdef MAIN_C
 #define WHERE 
 #define INITVAL(x) = x
 #else
 #define WHERE extern
 #define INITVAL(x) 
 #endif
-
-#define MUTT_TRUE 1
-#define MUTT_FALSE 0
-
-#define HUGE_STRING	5120
-#define LONG_STRING     1024
-#define STRING          256
-#define SHORT_STRING    128
 
 /* flags for mutt_copy_header() */
 #define CH_UPDATE	1      /* update the status and x-status fields? */
@@ -71,6 +83,7 @@
 #define CH_TXTPLAIN	(1<<11) /* generate text/plain MIME headers */
 #define CH_NOLEN	(1<<12) /* don't write Content-Length: and Lines: */
 #define CH_WEED_DELIVERED (1<<13) /* weed eventual Delivered-To headers */
+#define CH_FORCE_FROM	(1<<14)	/* give CH_FROM precedence over CH_WEED? */
 
 /* flags for mutt_enter_string() */
 #define  M_ALIAS   1      /* do alias "completion" by calling up the alias-menu */
@@ -126,9 +139,13 @@ typedef enum
 #define M_SENDHOOK	(1<<2)
 #define M_FCCHOOK	(1<<3)
 #define M_SAVEHOOK	(1<<4)
-#ifdef _PGPPATH
-#define M_PGPHOOK	(1<<5)
+#define M_CHARSETHOOK	(1<<5)
+#define M_ICONVHOOK 	(1<<6)
+#define M_MESSAGEHOOK	(1<<7)
+#ifdef HAVE_PGP
+#define M_PGPHOOK	(1<<8)
 #endif
+#define M_ACCOUNTHOOK	(1<<9)
 
 /* tree characters for linearize_tree and print_enriched_string */
 #define M_TREE_LLCORNER		1
@@ -140,21 +157,17 @@ typedef enum
 #define M_TREE_RARROW		7
 #define M_TREE_STAR		8
 #define M_TREE_HIDDEN		9
-#define M_TREE_MAX		10
+#define M_TREE_EQUALS		10
+#define M_TREE_TTEE		11
+#define M_TREE_BTEE		12
+#define M_TREE_MISSING		13
+#define M_TREE_MAX		14
 
 #define M_THREAD_COLLAPSE	(1<<0)
 #define M_THREAD_UNCOLLAPSE	(1<<1)
 #define M_THREAD_GET_HIDDEN	(1<<2)
 #define M_THREAD_UNREAD		(1<<3)
 #define M_THREAD_NEXT_UNREAD	(1<<4)
-
-
-#ifdef M_READ
-/* FIXME: On Solaris (and probably others), M_READ is defined by the
-   streams headers (<sys/streams.h>).  We need to use a better
-   prefix.  */
-#undef M_READ
-#endif
 
 enum
 {
@@ -191,6 +204,7 @@ enum
   M_FROM,
   M_DATE,
   M_DATE_RECEIVED,
+  M_DUPLICATED,
   M_ID,
   M_BODY,
   M_HEADER,
@@ -205,11 +219,12 @@ enum
   M_PERSONAL_RECIP,
   M_PERSONAL_FROM,
   M_ADDRESS,
-#ifdef _PGPPATH
+#ifdef HAVE_PGP
   M_PGP_SIGN,
   M_PGP_ENCRYPT,
   M_PGP_KEY,
 #endif
+  M_XLABEL,
   
   /* Options for Mailcap lookup */
   M_EDIT,
@@ -241,8 +256,9 @@ enum
 enum
 {
 
-#ifdef _PGPPATH
-  OPT_VERIFYSIG, /* verify PGP signatures */
+#ifdef HAVE_PGP
+  OPT_VERIFYSIG,      /* verify PGP signatures */
+  OPT_PGPTRADITIONAL, /* create old-style PGP messages */
 #endif
 
 #ifdef USE_SSL
@@ -252,15 +268,22 @@ enum
   OPT_PRINT,
   OPT_INCLUDE,
   OPT_DELETE,
+  OPT_MFUPTO,
   OPT_MIMEFWD,
   OPT_MOVE,
   OPT_COPY,
+#ifdef USE_POP
+  OPT_POPDELETE,
+  OPT_POPRECONNECT,
+#endif
   OPT_POSTPONE,
   OPT_QUIT,
   OPT_REPLYTO,
   OPT_ABORT,
   OPT_RECALL,
-  OPT_SUBJECT
+  OPT_SUBJECT,
+  OPT_MIMEFWDREST,
+  OPT_MAX
 };
 
 /* flags to ci_send_message() */
@@ -272,12 +295,19 @@ enum
 #define SENDBATCH	(1<<5)
 #define SENDMAILX	(1<<6)
 #define SENDKEY		(1<<7)
-#define SENDEDITMSG	(1<<8)
+#define SENDRESEND	(1<<8)
+
+/* flags to _mutt_select_file() */
+#define M_SEL_BUFFY	(1<<0)
+#define M_SEL_MULTI	(1<<1)
+#define M_SEL_FOLDER	(1<<2)
+
 
 /* boolean vars */
 enum
 {
   OPTALLOW8BIT,
+  OPTALLOWANSI,
   OPTARROWCURSOR,
   OPTASCIICHARS,
   OPTASKBCC,
@@ -293,6 +323,8 @@ enum
   OPTCONFIRMAPPEND,
   OPTCONFIRMCREATE,
   OPTDELETEUNTAG,
+  OPTDIGESTCOLLAPSE,
+  OPTDUPTHREADS,
   OPTEDITHDRS,
   OPTENCODEFROM,
   OPTENVFROM,
@@ -307,6 +339,7 @@ enum
   OPTHEADER,
   OPTHELP,
   OPTHIDDENHOST,
+  OPTHIDEMISSING,
   OPTIGNORELISTREPLYTO,
 #ifdef USE_IMAP
   OPTIMAPLSUB,
@@ -317,14 +350,16 @@ enum
   OPTIMAPFORCESSL,
 # endif
 #endif
-#ifdef USE_SSL
+#if defined(USE_SSL) || defined(USE_NSS)
   OPTSSLV2,
   OPTSSLV3,
   OPTTLSV1,
   OPTSSLSYSTEMCERTS,
 #endif
   OPTIMPLICITAUTOVIEW,
+  OPTKEEPFLAGGED,
   OPTMAILCAPSANITIZE,
+  OPTMAILDIRTRASH,
   OPTMARKERS,
   OPTMARKOLD,
   OPTMENUSCROLL,	/* scroll menu instead of implicit next-page */
@@ -335,10 +370,12 @@ enum
   OPTPAGERSTOP,
   OPTPIPEDECODE,
   OPTPIPESPLIT,
-  OPTPOPAPOP,
-  OPTPOPDELETE,
+#ifdef USE_POP
+  OPTPOPAUTHTRYALL,
   OPTPOPLAST,
+#endif
   OPTPRINTDECODE,
+  OPTPRINTSPLIT,
   OPTPROMPTAFTER,
   OPTREADONLY,
   OPTREPLYSELF,
@@ -352,12 +389,14 @@ enum
   OPTSAVENAME,
   OPTSCORE,
   OPTSIGDASHES,
+  OPTSIGONTOP,
   OPTSORTRE,
   OPTSTATUSONTOP,
   OPTSTRICTTHREADS,
   OPTSUSPEND,
   OPTTEXTFLOWED,
   OPTTHOROUGHSRC,
+  OPTTHREADRECEIVED,
   OPTTILDE,
   OPTUNCOLLAPSEJUMP,
   OPTUSE8BITMIME,
@@ -378,6 +417,7 @@ enum
 #ifdef HAVE_PGP
   OPTPGPAUTOSIGN,
   OPTPGPAUTOENCRYPT,
+  OPTPGPIGNORESUB,
   OPTPGPLONGIDS,
   OPTPGPREPLYENCRYPT,
   OPTPGPREPLYSIGN,
@@ -404,18 +444,19 @@ enum
   OPTSIGNALSBLOCKED,	/* (pseudo) using by mutt_block_signals () */
   OPTSYSSIGNALSBLOCKED,	/* (pseudo) using by mutt_block_signals_system () */
   OPTNEEDRESORT,	/* (pseudo) used to force a re-sort */
+  OPTRESORTINIT,	/* (pseudo) used to force the next resort to be from scratch */
   OPTVIEWATTACH,	/* (pseudo) signals that we are viewing attachments */
   OPTFORCEREDRAWINDEX,	/* (pseudo) used to force a redraw in the main index */
   OPTFORCEREDRAWPAGER,	/* (pseudo) used to force a redraw in the pager */
   OPTSORTSUBTHREADS,	/* (pseudo) used when $sort_aux changes */
   OPTNEEDRESCORE,	/* (pseudo) set when the `score' command is used */
-  OPTUSEHEADERDATE,	/* (pseudo) used by edit-message */
   OPTATTACHMSG,		/* (pseudo) used by attach-message */
-  OPTKEEPQUIET,         /* (pseudo) shut up the message and refresh
-                         *          functions while we are executing an
-                         *          external program.
-                         */  
-#ifdef _PGPPATH
+  OPTKEEPQUIET,		/* (pseudo) shut up the message and refresh
+			 * 	    functions while we are executing an
+			 * 	    external program.
+			 */
+  OPTMENUCALLER,	/* (pseudo) tell menu to give caller a take */
+#ifdef HAVE_PGP
   OPTPGPCHECKTRUST,	/* (pseudo) used by pgp_select_key () */
   OPTDONTHANDLEPGPKEYS,	/* (pseudo) used to extract PGP keys */
 #endif
@@ -458,10 +499,12 @@ void mutt_init (int, LIST *);
 
 typedef struct alias
 {
+  struct alias *self;		/* XXX - ugly hack */
   char *name;
   ADDRESS *addr;
   struct alias *next;
   short tagged;
+  short del;
   short num;
 } ALIAS;
 
@@ -474,8 +517,10 @@ typedef struct envelope
   ADDRESS *bcc;
   ADDRESS *sender;
   ADDRESS *reply_to;
- /* BALSA: added dispnotify_to field */
+#ifdef LIBMUTT 
+  /* BALSA: added dispnotify_to field */
   ADDRESS *dispnotify_to;
+#endif
   ADDRESS *mail_followup_to;
   char *subject;
   char *real_subj;		/* offset of the real subject */
@@ -484,6 +529,7 @@ typedef struct envelope
   char *date;
   char *x_label;
   LIST *references;		/* message references (in reverse order) */
+  LIST *in_reply_to;		/* in-reply-to header content */
   LIST *userhdrs;		/* user defined headers */
 } ENVELOPE;
 
@@ -499,13 +545,14 @@ typedef struct content
 {
   long hibin;              /* 8-bit characters */
   long lobin;              /* unprintable 7-bit chars (eg., control chars) */
+  long crlf;		   /* '\r' and '\n' characters */
   long ascii;              /* number of ascii chars */
   long linemax;            /* length of the longest line in the file */
   unsigned int space : 1;  /* whitespace at the end of lines? */
   unsigned int binary : 1; /* long lines, or CR not in CRLF pair */
   unsigned int from : 1;   /* has a line beginning with "From "? */
   unsigned int dot : 1;    /* has a line consisting of a single dot? */
-  unsigned int nonasc : 1; /* has unicode characters out of ASCII range */
+  unsigned int cr : 1;     /* has CR, even when in a CRLF pair */
 } CONTENT;
 
 typedef struct body
@@ -546,7 +593,7 @@ typedef struct body
   unsigned int type : 4;        /* content-type primary type */
   unsigned int encoding : 3;    /* content-transfer-encoding */
   unsigned int disposition : 2; /* content-disposition */
-  unsigned int use_disp : 1;    /* Content-Disposition field printed? */
+  unsigned int use_disp : 1;    /* Content-Disposition uses filename= ? */
   unsigned int unlink : 1;      /* flag to indicate the the file named by
 				 * "filename" should be unlink()ed before
 				 * free()ing this structure
@@ -554,40 +601,46 @@ typedef struct body
   unsigned int tagged : 1;
   unsigned int deleted : 1;	/* attachment marked for deletion */
 
-  unsigned int noconv : 1;      /* don't do character set conversion */
+  unsigned int noconv : 1;	/* don't do character set conversion */
   unsigned int force_charset : 1; 
-                                /* send mode: don't adjust the character
-                                 * set when in send-mode.
-                                 */
+  				/* send mode: don't adjust the character
+				 * set when in send-mode.
+				 */
 
-  unsigned int collapsed : 1;   /* used by recvattach */
+#ifdef HAVE_PGP
+  unsigned int goodsig : 1;	/* good PGP signature */
+#endif
 
+  unsigned int collapsed : 1;	/* used by recvattach */
 
 } BODY;
 
 typedef struct header
 {
-#ifdef _PGPPATH
-  unsigned int pgp : 3;
+#ifdef HAVE_PGP
+  unsigned int pgp : 4;
 #endif
 
-  unsigned int mime : 1;    /* has a Mime-Version header? */
-  unsigned int flagged : 1; /* marked important? */
+  unsigned int mime : 1;    		/* has a Mime-Version header? */
+  unsigned int flagged : 1; 		/* marked important? */
   unsigned int tagged : 1;
   unsigned int deleted : 1;
   unsigned int changed : 1;
-  unsigned int attach_del : 1; /* has an attachment marked for deletion */
+  unsigned int attach_del : 1; 		/* has an attachment marked for deletion */
   unsigned int old : 1;
   unsigned int read : 1;
-  unsigned int expired : 1; /* already expired? */
-  unsigned int superseded : 1; /* got superseded? */
+  unsigned int expired : 1; 		/* already expired? */
+  unsigned int superseded : 1; 		/* got superseded? */
   unsigned int replied : 1;
-  unsigned int subject_changed : 1; /* used for threading */
-  unsigned int display_subject : 1; /* used for threading */
-  unsigned int fake_thread : 1;     /* no ref matched, but subject did */
-  unsigned int threaded : 1;        /* message has been threaded */
-  unsigned int recip_valid : 1;  /* is_recipient is valid */
-  unsigned int active : 1;	    /* message is not to be removed */
+  unsigned int subject_changed : 1; 	/* used for threading */
+  unsigned int threaded : 1;	    	/* used for threading */
+  unsigned int display_subject : 1; 	/* used for threading */
+  unsigned int recip_valid : 1;  	/* is_recipient is valid */
+  unsigned int active : 1;	    	/* message is not to be removed */
+  unsigned int trash : 1;		/* message is marked as trashed on disk.
+					 * This flag is used by the maildir_trash
+					 * option.
+					 */
   
   /* timezone of the sender of this message */
   unsigned int zhours : 5;
@@ -599,38 +652,55 @@ typedef struct header
   unsigned int matched : 1;
 
   /* the following are used to support collapsing threads  */
-  unsigned int collapsed : 1; /* is this message part of a collapsed thread? */
-  unsigned int limited : 1;   /* is this message in a limited view?  */
-  size_t num_hidden;          /* number of hidden messages in this view */
+  unsigned int collapsed : 1; 	/* is this message part of a collapsed thread? */
+  unsigned int limited : 1;   	/* is this message in a limited view?  */
+  size_t num_hidden;          	/* number of hidden messages in this view */
 
-  short recipient;	/* user_is_recipient()'s return value, cached */
+  short recipient;		/* user_is_recipient()'s return value, cached */
   
-  int pair; /* color-pair to use when displaying in the index */
+  int pair; 			/* color-pair to use when displaying in the index */
 
-  time_t date_sent;     /* time when the message was sent (UTC) */
-  time_t received;      /* time when the message was placed in the mailbox */
-  long offset;          /* where in the stream does this message begin? */
-  int lines;		/* how many lines in the body of this message? */
-  int index;		/* the absolute (unsorted) message number */
-  int msgno;		/* number displayed to the user */
-  int virtual;		/* virtual message number */
+  time_t date_sent;     	/* time when the message was sent (UTC) */
+  time_t received;      	/* time when the message was placed in the mailbox */
+  long offset;          	/* where in the stream does this message begin? */
+  int lines;			/* how many lines in the body of this message? */
+  int index;			/* the absolute (unsorted) message number */
+  int msgno;			/* number displayed to the user */
+  int virtual;			/* virtual message number */
   int score;
-  ENVELOPE *env;	/* envelope information */
-  BODY *content;	/* list of MIME parts */
+  ENVELOPE *env;		/* envelope information */
+  BODY *content;		/* list of MIME parts */
   char *path;
   
-  /* the following are used for threading support */
-  struct header *parent;
-  struct header *child;  /* decendants of this message */
-  struct header *next;   /* next message in this thread */
-  struct header *prev;   /* previous message in thread */
-  struct header *last_sort; /* last message in subthread, for secondary SORT_LAST */
-  char *tree;            /* character string to print thread tree */
+  char *tree;           	/* character string to print thread tree */
+  struct thread *thread;
 
-#ifdef USE_IMAP
-  void *data;            /* driver-specific data (only used by IMAP */
+#ifdef MIXMASTER
+  LIST *chain;
+#endif
+
+#ifdef USE_POP
+  int refno;			/* message number on server */
+#endif
+
+#if defined USE_POP || defined USE_IMAP
+  void *data;            	/* driver-specific data */
 #endif
 } HEADER;
+
+typedef struct thread
+{
+  unsigned int fake_thread : 1;
+  unsigned int duplicate_thread : 1;
+  unsigned int sort_children : 1;
+  unsigned int check_subject : 1;
+  struct thread *parent;
+  struct thread *child;
+  struct thread *next;
+  struct thread *prev;
+  HEADER *message;
+  HEADER *sort_key;
+} THREAD;
 
 #include "mutt_regex.h"
 
@@ -653,6 +723,8 @@ typedef struct pattern_t
   regex_t *rx;
 } pattern_t;
 
+
+#ifdef LIBMUTT
 /* BALSA: make the structure non-anonymous so we can have pointers to it
    without parsing this file for the struct definition. */
 struct _CONTEXT
@@ -666,9 +738,10 @@ struct _CONTEXT
   char *pattern;                /* limit pattern string */
   pattern_t *limit_pattern;     /* compiled limit pattern */
   HEADER **hdrs;
-  HEADER *tree;			/* top of thread tree */
+  THREAD *tree;			/* top of thread tree */
   HASH *id_hash;		/* hash table by msg id */
   HASH *subj_hash;		/* hash table by subject */
+  HASH *thread_hash;		/* hash table for threading */
   int *v2r;			/* mapping from virtual to real msgno */
   int hdrmax;			/* number of pointers in hdrs */
   int msgcount;			/* number of messages in the mailbox */
@@ -679,7 +752,7 @@ struct _CONTEXT
   int deleted;			/* how many deleted messages */
   int flagged;			/* how many flagged messages */
   int msgnotreadyet;		/* which msg "new" in pager, -1 if none */
-#ifdef USE_IMAP
+#if defined USE_POP || defined USE_IMAP
   void *data;			/* driver specific data */
 #endif /* USE_IMAP */
 
@@ -691,11 +764,53 @@ struct _CONTEXT
   unsigned int dontwrite : 1;   /* dont write the mailbox on close */
   unsigned int append : 1;	/* mailbox is opened in append mode */
   unsigned int quiet : 1;	/* inhibit status messages? */
-  unsigned int revsort : 1;	/* mailbox sorted in reverse? */
   unsigned int collapsed : 1;   /* are all threads collapsed? */
   unsigned int closing : 1;	/* mailbox is being closed */
 };
 typedef struct _CONTEXT CONTEXT;
+#else
+typedef struct 
+{
+  char *path;
+  FILE *fp;
+  time_t mtime;
+  time_t mtime_cur;		/* used with maildir folders */
+  off_t size;
+  off_t vsize;
+  char *pattern;                /* limit pattern string */
+  pattern_t *limit_pattern;     /* compiled limit pattern */
+  HEADER **hdrs;
+  THREAD *tree;			/* top of thread tree */
+  HASH *id_hash;		/* hash table by msg id */
+  HASH *subj_hash;		/* hash table by subject */
+  HASH *thread_hash;		/* hash table for threading */
+  int *v2r;			/* mapping from virtual to real msgno */
+  int hdrmax;			/* number of pointers in hdrs */
+  int msgcount;			/* number of messages in the mailbox */
+  int vcount;			/* the number of virtual messages */
+  int tagged;			/* how many messages are tagged? */
+  int new;			/* how many new messages? */
+  int unread;			/* how many unread messages? */
+  int deleted;			/* how many deleted messages */
+
+  int flagged;			/* how many flagged messages */
+  int msgnotreadyet;		/* which msg "new" in pager, -1 if none */
+#if defined USE_POP || defined USE_IMAP
+  void *data;			/* driver specific data */
+#endif /* USE_IMAP */
+
+  short magic;			/* mailbox type */
+
+  unsigned int locked : 1;	/* is the mailbox locked? */
+  unsigned int changed : 1;	/* mailbox has been modified */
+  unsigned int readonly : 1;    /* don't allow changes to the mailbox */
+  unsigned int dontwrite : 1;   /* dont write the mailbox on close */
+  unsigned int append : 1;	/* mailbox is opened in append mode */
+  unsigned int quiet : 1;	/* inhibit status messages? */
+  unsigned int collapsed : 1;   /* are all threads collapsed? */
+  unsigned int closing : 1;	/* mailbox is being closed */
+} CONTEXT;
+#endif /* LIBMUTT */
 
 typedef struct attachptr
 {
@@ -714,30 +829,47 @@ typedef struct
   int flags;
 } STATE;
 
+/* used by enter.c */
 
-
-void mutt_set_charset (char *);
+typedef struct
+{
+  wchar_t *wbuf;
+  size_t wbuflen;
+  size_t lastchar;
+  size_t curpos;
+  size_t begin;
+  int	 tabs;
+} ENTER_STATE;
 
 /* flags for the STATE struct */
 #define M_DISPLAY	(1<<0) /* output is displayed to the user */
 
-#ifdef _PGPPATH
+
+
+#ifdef HAVE_PGP
 #define M_VERIFY	(1<<1) /* perform signature verification */
 #endif
+
+
 
 #define M_PENDINGPREFIX (1<<2) /* prefix to write, but character must follow */
 #define M_WEED          (1<<3) /* weed headers even when not in display mode */
 #define M_CHARCONV	(1<<4) /* Do character set conversions */
+#define M_PRINTING	(1<<5) /* are we printing? - M_DISPLAY "light" */
 
 #define state_set_prefix(s) ((s)->flags |= M_PENDINGPREFIX)
 #define state_reset_prefix(s) ((s)->flags &= ~M_PENDINGPREFIX)
 #define state_puts(x,y) fputs(x,(y)->fpout)
 #define state_putc(x,y) fputc(x,(y)->fpout)
 
-void state_prefix_putc(char, STATE *);
+void state_mark_attach (STATE *);
+void state_attach_puts (const char *, STATE *);
+void state_prefix_putc (char, STATE *);
 int  state_printf(STATE *, const char *, ...);
 
+#include "ascii.h"
 #include "protos.h"
 #include "lib.h"
 #include "globals.h"
-#endif
+
+#endif /* MUTT_H */

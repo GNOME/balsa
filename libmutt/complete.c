@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -13,10 +13,14 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
 #include "mutt.h"
+#ifdef USE_IMAP
+#include "mailbox.h"
+#include "imap.h"
+#endif
 
 #include <dirent.h>
 #include <string.h>
@@ -29,26 +33,62 @@
  *
  * return 0 if ok, -1 if no matches
  */
-int mutt_complete (char *s)
+int mutt_complete (char *s, size_t slen)
 {
   char *p;
-  DIR *dirp;
+  DIR *dirp = NULL;
   struct dirent *de;
   int i ,init=0;
   size_t len;
   char dirpart[_POSIX_PATH_MAX], exp_dirpart[_POSIX_PATH_MAX];
   char filepart[_POSIX_PATH_MAX];
+#ifdef USE_IMAP
+  char imap_path[LONG_STRING];
+
+  dprint (2, (debugfile, "mutt_complete: completing %s\n", s));
+
+  /* we can use '/' as a delimiter, imap_complete rewrites it */
+  if (*s == '=' || *s == '+' || *s == '!')
+  {
+    if (*s == '!')
+      p = NONULL (Spoolfile);
+    else
+      p = NONULL (Maildir);
+    if (s[1])
+    {
+      /* don't append '/' if Maildir/Spoolfile is imap://host/ only */
+      if (mx_is_imap (NONULL (p)) && p[strlen (p)-1] == '/')
+        snprintf (imap_path, sizeof (imap_path), "%s%s", p, s+1);
+      else
+        snprintf (imap_path, sizeof (imap_path), "%s/%s", NONULL (p),
+          s+1);
+    }
+    else
+      strfcpy (imap_path, NONULL(p), sizeof(imap_path));
+  }
+  else
+    strfcpy (imap_path, s, sizeof(imap_path));
+
+  if (mx_is_imap (imap_path))
+    return imap_complete (s, slen, imap_path);
+#endif
   
-  if (*s == '=' || *s == '+')
+  if (*s == '=' || *s == '+' || *s == '!')
   {
     dirpart[0] = *s;
     dirpart[1] = 0;
-    strfcpy (exp_dirpart, NONULL (Maildir), sizeof (exp_dirpart));
+    if (*s == '!')
+      strfcpy (exp_dirpart, NONULL (Spoolfile), sizeof (exp_dirpart));
+    else
+      strfcpy (exp_dirpart, NONULL (Maildir), sizeof (exp_dirpart));
     if ((p = strrchr (s, '/')))
     {
+      char buf[_POSIX_PATH_MAX];
       *p++ = 0;
-      sprintf (exp_dirpart + strlen (exp_dirpart), "/%s", s+1);
-      sprintf (dirpart + strlen (dirpart), "%s/", s+1);
+      snprintf (buf, sizeof (buf), "%s/%s", exp_dirpart, s+1);
+      strfcpy (exp_dirpart, buf, sizeof (exp_dirpart));
+      snprintf (buf, sizeof (buf), "%s%s/", dirpart, s+1);
+      strfcpy (dirpart, buf, sizeof (dirpart));
       strfcpy (filepart, p, sizeof (filepart));
     }
     else
@@ -99,11 +139,11 @@ int mutt_complete (char *s)
    * special case to handle when there is no filepart yet.  find the first
    * file/directory which is not ``.'' or ``..''
    */
-  if ((len = strlen (filepart)) == 0)
+  if ((len = mutt_strlen (filepart)) == 0)
   {
     while ((de = readdir (dirp)) != NULL)
     {
-      if (strcmp (".", de->d_name) != 0 && strcmp ("..", de->d_name) != 0)
+      if (mutt_strcmp (".", de->d_name) != 0 && mutt_strcmp ("..", de->d_name) != 0)
       {
 	strfcpy (filepart, de->d_name, sizeof (filepart));
 	init++;
@@ -114,7 +154,7 @@ int mutt_complete (char *s)
 
   while ((de = readdir (dirp)) != NULL)
   {
-    if (strncmp (de->d_name, filepart, len) == 0)
+    if (mutt_strncmp (de->d_name, filepart, len) == 0)
     {
       if (init)
       {
@@ -139,13 +179,14 @@ int mutt_complete (char *s)
 	if (dirpart[0])
 	{
 	  strfcpy (buf, exp_dirpart, sizeof (buf));
-	  strcat (buf, "/");
+	  strfcpy (buf + strlen (buf), "/", sizeof (buf) - strlen (buf));
 	}
 	else
 	  buf[0] = 0;
-	strcat (buf, filepart);
+	strfcpy (buf + strlen (buf), filepart, sizeof (buf) - strlen (buf));
 	if (stat (buf, &st) != -1 && (st.st_mode & S_IFDIR))
-	  strcat (filepart, "/");
+	  strfcpy (filepart + strlen (filepart), "/",
+		   sizeof (filepart) - strlen (filepart));
 	init = 1;
       }
     }
@@ -154,13 +195,13 @@ int mutt_complete (char *s)
 
   if (dirpart[0])
   {
-    strcpy (s, dirpart);
-    if (strcmp ("/", dirpart) != 0 && dirpart[0] != '=' && dirpart[0] != '+')
-      strcat (s, "/");
-    strcat (s, filepart);
+    strfcpy (s, dirpart, slen);
+    if (mutt_strcmp ("/", dirpart) != 0 && dirpart[0] != '=' && dirpart[0] != '+')
+      strfcpy (s + strlen (s), "/", slen - strlen (s));
+    strfcpy (s + strlen (s), filepart, slen - strlen (s));
   }
   else
-    strcpy (s, filepart);
+    strfcpy (s, filepart, slen);
 
   return (init ? 0 : -1);
 }

@@ -392,6 +392,10 @@ int mx_get_magic (const char *path)
     if (access (tmp, F_OK) == 0)
       return (M_MH);
 
+    snprintf (tmp, sizeof (tmp), "%s/.mew-cache", path);
+    if (access (tmp, F_OK) == 0)
+      return (M_MH);
+
     /* 
      * ok, this isn't an mh folder, but mh mode can be used to read
      * Usenet news from the spool. ;-) 
@@ -663,10 +667,6 @@ CONTEXT *mx_open_mailbox (const char *path, int flags, CONTEXT *pctx)
    */
   set_option (OPTFORCEREFRESH);
 
-  /* create hash tables */
-  ctx->id_hash = hash_create (1031);
-  ctx->subj_hash = hash_create (1031);
-
   if (!ctx->quiet)
     mutt_message (_("Reading %s..."), ctx->path);
 
@@ -736,6 +736,9 @@ void mx_fastclose_mailbox (CONTEXT *ctx)
     hash_destroy (&ctx->subj_hash, NULL);
   if (ctx->id_hash)
     hash_destroy (&ctx->id_hash, NULL);
+#ifndef LIBMUTT
+  mutt_clear_threads (ctx); 
+#endif
   for (i = 0; i < ctx->msgcount; i++)
     mutt_free_header (&ctx->hdrs[i]);
   safe_free ((void **) &ctx->hdrs);
@@ -860,7 +863,11 @@ int mx_close_mailbox (CONTEXT *ctx, int *index_hint)
   }
 
 #ifndef LIBMUTT
-  if (ctx->deleted)
+  /* 
+   * There is no point in asking whether or not to purge if we are
+   * just marking messages as "trash".
+   */
+  if (ctx->deleted && !(ctx->magic == M_MAILDIR && option (OPTMAILDIRTRASH)))
   {
     snprintf (buf, sizeof (buf), ctx->deleted == 1
 	     ? "Purge %d deleted message?" : "Purge %d deleted messages?",
@@ -895,7 +902,8 @@ int mx_close_mailbox (CONTEXT *ctx, int *index_hint)
     if (ctx->magic == M_IMAP && mx_is_imap (mbox))
     {
       /* tag messages for moving, and clear old tags, if any */
-      for (i = 0; i < ctx->msgcount; i++)
+      if (ctx->hdrs[i]->read && !ctx->hdrs[i]->deleted
+	  && !(ctx->hdrs[i]->flagged && option (OPTKEEPFLAGGED)))  
 	if (ctx->hdrs[i]->read && !ctx->hdrs[i]->deleted)
 	  ctx->hdrs[i]->tagged = 1;
 	else
@@ -1015,8 +1023,9 @@ void mx_update_tables(CONTEXT *ctx, int committing)
 #define this_body ctx->hdrs[j]->content
   for (i = 0, j = 0; i < ctx->msgcount; i++)
   {
-    if ((committing && !ctx->hdrs[i]->deleted) || 
-	(!committing && ctx->hdrs[i]->active))
+    if ((committing && (!ctx->hdrs[i]->deleted || 
+			(ctx->magic == M_MAILDIR && option (OPTMAILDIRTRASH)))) ||
+ 	(!committing && ctx->hdrs[i]->active))
     {
       if (i != j)
       {
@@ -1032,14 +1041,15 @@ void mx_update_tables(CONTEXT *ctx, int committing)
 	  this_body->hdr_offset;
       }
 
-      if(committing)
+      if (committing)
 	ctx->hdrs[j]->changed = 0;
-      else
+      else if (ctx->hdrs[j]->changed)
+	ctx->changed++;
+      
+      if (!committing || (ctx->magic == M_MAILDIR && option (OPTMAILDIRTRASH)))
       {
 	if (ctx->hdrs[j]->deleted)
 	  ctx->deleted++;
-	if (ctx->hdrs[j]->changed)
-	  ctx->changed++;
       }
 
       if (ctx->hdrs[j]->tagged)
@@ -1062,9 +1072,9 @@ void mx_update_tables(CONTEXT *ctx, int committing)
 		      ctx->hdrs[i]->content->offset -
 		      ctx->hdrs[i]->content->hdr_offset);
       /* remove message from the hash tables */
-      if (ctx->hdrs[i]->env->real_subj)
+      if (ctx->subj_hash && ctx->hdrs[i]->env->real_subj)
 	hash_delete (ctx->subj_hash, ctx->hdrs[i]->env->real_subj, ctx->hdrs[i], NULL);
-      if (ctx->hdrs[i]->env->message_id)
+      if (ctx->id_hash && ctx->hdrs[i]->env->message_id)
 	hash_delete (ctx->id_hash, ctx->hdrs[i]->env->message_id, ctx->hdrs[i], NULL);
       mutt_free_header (&ctx->hdrs[i]);
     }
@@ -1159,15 +1169,21 @@ int mx_sync_mailbox (CONTEXT *ctx, int *index_hint)
 
     if (ctx->msgcount == ctx->deleted &&
 	(ctx->magic == M_MBOX || ctx->magic == M_MMDF) &&
-	!mutt_is_spool(ctx->path) && !option (OPTSAVEEMPTY))
+	!mutt_is_spool (ctx->path) && !option (OPTSAVEEMPTY))
     {
       unlink (ctx->path);
       mx_fastclose_mailbox (ctx);
       return 0;
     }
-
-    /* if we haven't deleted any messages, we don't need to resort */
-    if (purge)
+    
+    /* if we haven't deleted any messages, we don't need to resort */ 
+    /* ... except for certain folder formats which need "unsorted" 
+     * sort order in order to synchronize folders.
+     * 
+     * MH and maildir are safe.  mbox-style seems to need re-sorting,
+     * at least with the new threading code.
+     */
+    if (purge || (ctx->magic != M_MAILDIR && ctx->magic != M_MH)) 
     {
       mx_update_tables(ctx, 1);
       mutt_sort_headers (ctx, 1); /* rethread from scratch */
@@ -1237,6 +1253,13 @@ MESSAGE *mx_open_new_message (CONTEXT *dest, HEADER *hdr, int flags)
   msg = safe_calloc (1, sizeof (MESSAGE));
   msg->magic = dest->magic;
   msg->write = 1;
+
+ if (hdr)
+ {
+   msg->flags.flagged = hdr->flagged;
+   msg->flags.replied = hdr->replied;
+   msg->flags.read    = hdr->read;
+ }
 
   if (func (msg, dest, hdr) == 0)
   {
@@ -1341,7 +1364,12 @@ MESSAGE *mx_open_message (CONTEXT *ctx, int msgno)
       char path[_POSIX_PATH_MAX];
       
       snprintf (path, sizeof (path), "%s/%s", ctx->path, cur->path);
-      if ((msg->fp = fopen (path, "r")) == NULL)
+
+      if ((msg->fp = fopen (path, "r")) == NULL && errno == ENOENT &&
+	  ctx->magic == M_MAILDIR)
+	msg->fp = maildir_open_find_message (ctx->path, cur->path);
+      
+      if (msg->fp == NULL)
       {
 	mutt_perror (path);
 	dprint (1, (debugfile, "mx_open_message: fopen: %s: %s (errno %d).\n",
@@ -1427,7 +1455,7 @@ int mx_commit_message (MESSAGE *msg, CONTEXT *ctx)
   }
   
   if (r == 0 && (ctx->magic == M_MBOX || ctx->magic == M_MMDF || ctx->magic == M_KENDRA)
-      && fflush (msg->fp) == EOF)
+      && (fflush (msg->fp) == EOF || fsync (fileno (msg->fp)) == -1))
   {
     mutt_perror _("Can't write message");
     r = -1;
@@ -1488,60 +1516,73 @@ void mx_alloc_memory (CONTEXT *ctx)
 /* this routine is called to update the counts in the context structure for
  * the last message header parsed.
  */
-void mx_update_context (CONTEXT *ctx)
+void mx_update_context (CONTEXT *ctx, int new_messages)
 {
-  HEADER *h = ctx->hdrs[ctx->msgcount];
-
+  HEADER *h;
+  int msgno;
+  
+  for (msgno = ctx->msgcount - new_messages; msgno < ctx->msgcount; msgno++)
+  {
+    h = ctx->hdrs[msgno];
 
 
 
 #ifdef HAVE_PGP
-  /* NOTE: this _must_ be done before the check for mailcap! */
-  h->pgp = pgp_query (h->content);
+    /* NOTE: this _must_ be done before the check for mailcap! */
+    h->pgp = pgp_query (h->content);
 #endif /* HAVE_PGP */
 
-  if (!ctx->pattern)
-  {
-    ctx->v2r[ctx->vcount] = ctx->msgcount;
-    h->virtual = ctx->vcount++;
-  }
-  else
-    h->virtual = -1;
-  h->msgno = ctx->msgcount;
-  ctx->msgcount++;
-
-  if (h->env->supersedes)
-  {
-    HEADER *h2 = hash_find (ctx->id_hash, h->env->supersedes);
-
-    /* safe_free (&h->env->supersedes); should I ? */
-    if (h2)
+    if (!ctx->pattern)
     {
-      h2->superseded = 1;
-      if (option (OPTSCORE)) 
-	mutt_score_message (ctx, h2, 1);
+      ctx->v2r[ctx->vcount] = msgno;
+      h->virtual = ctx->vcount++;
     }
-  }
+    else
+      h->virtual = -1;
+    h->msgno = msgno;
+    
+#ifndef LIBMUTT /* couldn't find a path where supersedes would be 
+		   true. my guess is if mutt_make_id_hash is 
+		   really needed here it will break hell */
+    if (h->env->supersedes)
+    {
+      HEADER *h2; 
 
-  /* add this message to the hash tables */
-  if (h->env->message_id)
-    hash_insert (ctx->id_hash, h->env->message_id, h, 0);
-  if (h->env->real_subj)
-    hash_insert (ctx->subj_hash, h->env->real_subj, h, 1);
+      if (!ctx->id_hash)	
+	ctx->id_hash = mutt_make_id_hash (ctx);
+ 
+      h2 = hash_find (ctx->id_hash, h->env->supersedes);
+      
+      /* safe_free (&h->env->supersedes); should I ? */
+      if (h2)
+	{
+	h2->superseded = 1;
+	if (option (OPTSCORE)) 
+	  mutt_score_message (ctx, h2, 1);
+      }
+    }
+#endif
 
-  if (option (OPTSCORE)) 
-    mutt_score_message (ctx, h, 0);
-  
-  if (h->changed)
-    ctx->changed = 1;
-  if (h->flagged)
-    ctx->flagged++;
-  if (h->deleted)
-    ctx->deleted++;
-  if (!h->read)
-  {
-    ctx->unread++;
-    if (!h->old)
-      ctx->new++;
+    /* add this message to the hash tables */
+    if (ctx->id_hash && h->env->message_id)
+      hash_insert (ctx->id_hash, h->env->message_id, h, 0);
+    if (ctx->subj_hash && h->env->real_subj)
+      hash_insert (ctx->subj_hash, h->env->real_subj, h, 1);
+#ifndef LIBMUTT
+    if (option (OPTSCORE)) 
+      mutt_score_message (ctx, h, 0);
+#endif
+    if (h->changed)
+      ctx->changed = 1;
+    if (h->flagged)
+      ctx->flagged++;
+    if (h->deleted)
+      ctx->deleted++;
+    if (!h->read)
+      {
+	ctx->unread++;
+	if (!h->old)
+	  ctx->new++;
+      }
   }
 }

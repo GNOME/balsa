@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
 /* flags to _mutt_copy_message */
@@ -23,11 +23,13 @@
 #define M_CM_DISPLAY	(1<<3)	/* output is displayed to the user */
 #define M_CM_UPDATE	(1<<4)  /* update structs on sync */
 #define M_CM_WEED	(1<<5)  /* weed message/rfc822 attachment headers */
-#define M_CM_CHARCONV	(1<<6)	/* perform character set conversions */
+#define M_CM_CHARCONV	(1<<6)  /* perform character set conversions */
+#define M_CM_PRINTING	(1<<7)	/* printing the message - display light */
 
-#ifdef _PGPPATH
-#define M_CM_DECODE_PGP	(1<<7)	/* used for decoding PGP messages */
-#define M_CM_VERIFY	(1<<8)	/* do signature verification */
+
+#ifdef HAVE_PGP
+#define M_CM_DECODE_PGP	(1<<8)	/* used for decoding PGP messages */
+#define M_CM_VERIFY	(1<<9)	/* do signature verification */
 #endif
 
 

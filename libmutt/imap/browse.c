@@ -82,7 +82,7 @@ int imap_browse (char* path, struct browser_state* state)
 
   if (imap_parse_path (path, &mx))
   {
-    mutt_error ("%s is an invalid IMAP path", path);
+    mutt_error (_("%s is an invalid IMAP path"), path);
     return -1;
   }
 
@@ -146,7 +146,7 @@ int imap_browse (char* path, struct browser_state* state)
           }
         }
       }
-      while (mutt_strncmp (idata->cmd.buf, idata->cmd.seq, SEQLEN));
+      while (ascii_strncmp (idata->cmd.buf, idata->cmd.seq, SEQLEN));
     }
 
     /* if we're descending a folder, mark it as current in browser_state */
@@ -223,6 +223,12 @@ int imap_browse (char* path, struct browser_state* state)
     dprint (2, (debugfile, "imap_init_browse: adding INBOX\n"));
     if (browse_add_list_result (idata, "LIST \"\" \"INBOX\"", state, 0))
       goto fail;
+
+    if (!state->entrylen)
+    {
+      mutt_error _("No such folder");
+      goto fail;
+    }
   }
 
   nsup = state->entrylen;
@@ -379,7 +385,7 @@ static int browse_add_list_result (IMAP_DATA* idata, const char* cmd,
           isparent);
     }
   }
-  while ((mutt_strncmp (idata->cmd.buf, idata->cmd.seq, SEQLEN) != 0));
+  while ((ascii_strncmp (idata->cmd.buf, idata->cmd.seq, SEQLEN) != 0));
 
   FREE (&mx.mbox);
   return 0;
@@ -485,7 +491,15 @@ static int browse_get_namespace (IMAP_DATA* idata, char* nsbuf, int nsblen,
       for (type = IMAP_NS_PERSONAL; *s; type++)
       {
 	s = imap_next_word (s);
-	if (*s && strncmp (s, "NIL", 3))
+#ifdef LIBMUTT
+	/* we reverte this change in libmutt. aparently we triger
+	   a folder scanning bug with "" namespaces that isn't seen on mutt. 
+	   this has been reported on mutt-devel
+	*/
+	if (*s && ascii_strncmp (s, "NIL", 3))
+#else
+	if (ascii_strncmp (s, "NIL", 3))
+#endif
 	{
 	  s++;
 	  while (*s && *s != ')')
@@ -593,7 +607,7 @@ static int browse_verify_namespace (IMAP_DATA* idata,
 	return -1;
       nsi->listable |= (name != NULL);
     }
-    while ((mutt_strncmp (idata->cmd.buf, idata->cmd.seq, SEQLEN) != 0));
+    while ((ascii_strncmp (idata->cmd.buf, idata->cmd.seq, SEQLEN) != 0));
   }
 
   return 0;
@@ -692,7 +706,7 @@ int imap_mailbox_delete(const char* folder)
    */
   if (!idata->ctx->data)
     idata->ctx->data = idata;
-  if (!*mx.mbox || imap_delete_mailbox (idata->ctx, mx.mbox) < 0)
+  if (!*mx.mbox || imap_delete_mailbox (idata->ctx, mx) < 0)
     goto fail;
 
   FREE (&mx.mbox);

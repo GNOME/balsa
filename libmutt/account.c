@@ -51,6 +51,13 @@ int mutt_account_match (const ACCOUNT* a1, const ACCOUNT* a2)
   if (a2->flags & M_ACCT_USER)
     return (!strcmp (a2->user, user));
 
+#ifdef LIBMUTT /* paranoia */
+#if defined(USE_SSL) || defined(USE_NSS)
+  if (!(a1->flags & a2->flags & M_ACCT_SSL))
+    return 0;
+#endif
+#endif
+
   return 1;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
 /*
@@ -78,13 +78,17 @@ struct binding_t OpMain[] = {
   { "delete-thread",		OP_DELETE_THREAD,		"\004" },
   { "delete-subthread",		OP_DELETE_SUBTHREAD,		"\033d" },
   { "edit",			OP_EDIT_MESSAGE,		"e" },
+  { "edit-type",		OP_EDIT_TYPE,			"\005" },
   { "forward-message",		OP_FORWARD_MESSAGE,		"f" },
   { "flag-message",		OP_FLAG_MESSAGE,		"F" },
   { "group-reply",		OP_GROUP_REPLY,			"g" },
 #ifdef USE_POP
   { "fetch-mail",		OP_MAIN_FETCH_MAIL,		"G" },
 #endif
-  { "display-headers",		OP_DISPLAY_HEADERS,		"h" },
+#ifdef USE_IMAP
+  { "imap-fetch-mail",		OP_MAIN_IMAP_FETCH,		NULL },
+#endif
+  { "display-toggle-weed",		OP_DISPLAY_HEADERS,		"h" },
   { "next-undeleted",		OP_MAIN_NEXT_UNDELETED,		"j" },
   { "previous-undeleted",	OP_MAIN_PREV_UNDELETED,		"k" },
   { "limit",			OP_MAIN_LIMIT,			"l" },
@@ -106,6 +110,7 @@ struct binding_t OpMain[] = {
   { "recall-message",		OP_RECALL_MESSAGE,		"R" },
   { "read-thread",		OP_MAIN_READ_THREAD,		"\022" },
   { "read-subthread",		OP_MAIN_READ_SUBTHREAD,		"\033r" },
+  { "resend-message",		OP_RESEND,			"\033e" },
   { "save-message",		OP_SAVE,			"s" },
   { "tag-pattern",		OP_MAIN_TAG_PATTERN,		"T" },
   { "tag-subthread",		OP_TAG_SUBTHREAD,		NULL },
@@ -127,10 +132,11 @@ struct binding_t OpMain[] = {
   { "previous-new",		OP_MAIN_PREV_NEW,		"\033\t" },
   { "next-unread",		OP_MAIN_NEXT_UNREAD,		NULL },
   { "previous-unread",		OP_MAIN_PREV_UNREAD,		NULL },
+  { "parent-message",		OP_MAIN_PARENT_MESSAGE,		"P" },
 
 
-
-#ifdef _PGPPATH
+#ifdef HAVE_PGP
+  { "check-traditional-pgp",	OP_CHECK_TRADITIONAL,		"\033P" },
   { "extract-keys",		OP_EXTRACT_KEYS,		"\013" },
   { "forget-passphrase",	OP_FORGET_PASSPHRASE,		"\006" },
   { "mail-key",			OP_MAIL_KEY,			"\033k" },
@@ -154,11 +160,14 @@ struct binding_t OpPager[] = {
   { "delete-thread",	OP_DELETE_THREAD,		"\004" },
   { "delete-subthread",	OP_DELETE_SUBTHREAD,		"\033d" },
   { "edit",		OP_EDIT_MESSAGE,		"e" },
+  { "edit-type",	OP_EDIT_TYPE,			"\005" },
   { "forward-message",	OP_FORWARD_MESSAGE,		"f" },
   { "flag-message",	OP_FLAG_MESSAGE,		"F" },
   { "group-reply",	OP_GROUP_REPLY,			"g" },
-  { "display-headers",	OP_DISPLAY_HEADERS,		"h" },
-  { "exit",		OP_PAGER_EXIT,			"i" },
+#ifdef USE_IMAP
+  { "imap-fetch-mail",  OP_MAIN_IMAP_FETCH,		NULL },
+#endif
+  { "display-toggle-weed",	OP_DISPLAY_HEADERS,		"h" },
   { "next-undeleted",	OP_MAIN_NEXT_UNDELETED,		"j" },
   { "next-entry",	OP_NEXT_ENTRY,			"J" },
   { "previous-undeleted",OP_MAIN_PREV_UNDELETED,	"k" },
@@ -174,10 +183,12 @@ struct binding_t OpPager[] = {
   { "previous-thread",	OP_MAIN_PREV_THREAD,		"\020" },
   { "previous-subthread",OP_MAIN_PREV_SUBTHREAD,	"\033p" },
   { "quit",		OP_QUIT,			"Q" },
+  { "exit",		OP_EXIT,			"q" },
   { "reply",		OP_REPLY,			"r" },
   { "recall-message",	OP_RECALL_MESSAGE,		"R" },
   { "read-thread",	OP_MAIN_READ_THREAD,		"\022" },
   { "read-subthread",	OP_MAIN_READ_SUBTHREAD,		"\033r" },
+  { "resend-message",	OP_RESEND,			"\033e" },
   { "save-message",	OP_SAVE,			"s" },
   { "skip-quoted",	OP_PAGER_SKIP_QUOTED,		"S" },
   { "decode-save",	OP_DECODE_SAVE,			"\033s" },
@@ -196,7 +207,7 @@ struct binding_t OpPager[] = {
   { "next-page",	OP_NEXT_PAGE,			" " },
   { "previous-page",	OP_PREV_PAGE,			"-" },
   { "top",		OP_PAGER_TOP,			"^" },
-  { "bottom",		OP_PAGER_BOTTOM,		"$" },
+  { "sync-mailbox",	OP_MAIN_SYNC_FOLDER,            "$" },
   { "shell-escape",	OP_SHELL_ESCAPE,		"!" },
   { "enter-command",	OP_ENTER_COMMAND,		":" },
   { "search",		OP_SEARCH,			"/" },
@@ -210,12 +221,14 @@ struct binding_t OpPager[] = {
   { "half-up",		OP_HALF_UP,			NULL },
   { "half-down",	OP_HALF_DOWN,			NULL },
   { "previous-line",	OP_PREV_LINE,			NULL },
+  { "bottom",		OP_PAGER_BOTTOM,		NULL },
+  { "parent-message",	OP_MAIN_PARENT_MESSAGE,		"P" },
 
 
 
 
-
-#ifdef _PGPPATH
+#ifdef HAVE_PGP
+  { "check-traditional-pgp",	OP_CHECK_TRADITIONAL,		"\033P"   },
   { "extract-keys",	OP_EXTRACT_KEYS,		"\013" },
   { "forget-passphrase",OP_FORGET_PASSPHRASE,		"\006" },
   { "mail-key",		OP_MAIL_KEY,			"\033k" },
@@ -231,12 +244,14 @@ struct binding_t OpPager[] = {
 
 struct binding_t OpAttach[] = {
   { "bounce-message",	OP_BOUNCE_MESSAGE,		"b" },
-  { "display-headers",	OP_DISPLAY_HEADERS,		"h" },
+  { "display-toggle-weed",	OP_DISPLAY_HEADERS,	"h" },
+  { "edit-type",	OP_EDIT_TYPE,			"\005" },
   { "print-entry",	OP_PRINT,			"p" },
   { "save-entry",	OP_SAVE,			"s" },
   { "pipe-entry",	OP_PIPE,			"|" },
   { "view-mailcap",	OP_ATTACH_VIEW_MAILCAP,		"m" },
   { "reply",		OP_REPLY,			"r" },
+  { "resend-message",	OP_RESEND,			"\033e" },
   { "group-reply",	OP_GROUP_REPLY,			"g" },
   { "list-reply",	OP_LIST_REPLY,			"L" },
   { "forward-message",	OP_FORWARD_MESSAGE,		"f" },
@@ -244,11 +259,13 @@ struct binding_t OpAttach[] = {
   { "view-attach",	OP_VIEW_ATTACH,			M_ENTER_S },
   { "delete-entry",	OP_DELETE,			"d" },
   { "undelete-entry",	OP_UNDELETE,			"u" },
+  { "collapse-parts",	OP_ATTACH_COLLAPSE,		"v" },
+  
 
-
-
-#ifdef _PGPPATH
-  { "extract-keys",	OP_EXTRACT_KEYS,		"\013" },
+#ifdef HAVE_PGP
+  { "check-traditional-pgp",	OP_CHECK_TRADITIONAL,		"\033P"   },
+  { "extract-keys",		OP_EXTRACT_KEYS,		"\013" },
+  { "forget-passphrase",	OP_FORGET_PASSPHRASE,		"\006" },
 #endif
 
 
@@ -263,7 +280,7 @@ struct binding_t OpCompose[] = {
   { "edit-cc",		OP_COMPOSE_EDIT_CC,		"c" },
   { "copy-file",	OP_SAVE,			"C" },
   { "detach-file",	OP_DELETE,			"D" },
-  { "display-headers",	OP_DISPLAY_HEADERS,		"h" },
+  { "toggle-disposition",OP_COMPOSE_TOGGLE_DISPOSITION,	"\004" },
   { "edit-description",	OP_COMPOSE_EDIT_DESCRIPTION,	"d" },
   { "edit-message",	OP_COMPOSE_EDIT_MESSAGE,	"e" },
   { "edit-headers",	OP_COMPOSE_EDIT_HEADERS,	"E" },
@@ -273,6 +290,7 @@ struct binding_t OpCompose[] = {
   { "edit-fcc",		OP_COMPOSE_EDIT_FCC,		"f" },
   { "filter-entry",	OP_FILTER,			"F" },
   { "get-attachment",	OP_COMPOSE_GET_ATTACHMENT,	"G" },
+  { "display-toggle-weed",	OP_DISPLAY_HEADERS,		"h" },
   { "ispell",		OP_COMPOSE_ISPELL,		"i" },
   { "print-entry",	OP_PRINT,			"l" },
   { "edit-mime",	OP_COMPOSE_EDIT_MIME,		"m" },
@@ -282,20 +300,25 @@ struct binding_t OpCompose[] = {
   { "rename-file",	OP_COMPOSE_RENAME_FILE,		"R" },
   { "edit-subject",	OP_COMPOSE_EDIT_SUBJECT,	"s" },
   { "edit-to",		OP_COMPOSE_EDIT_TO,		"t" },
-  { "edit-type",	OP_COMPOSE_EDIT_TYPE,		"\024" },
+  { "edit-type",	OP_EDIT_TYPE,			"\024" },
   { "write-fcc",	OP_COMPOSE_WRITE_MESSAGE,	"w" },
   { "toggle-unlink",	OP_COMPOSE_TOGGLE_UNLINK,	"u" },
+  { "toggle-recode",    OP_COMPOSE_TOGGLE_RECODE,	NULL },
   { "update-encoding",	OP_COMPOSE_UPDATE_ENCODING,	"U" },
   { "view-attach",	OP_VIEW_ATTACH,			M_ENTER_S },
   { "send-message",	OP_COMPOSE_SEND_MESSAGE,	"y" },
   { "pipe-entry",	OP_PIPE,			"|" },
 
-#ifdef _PGPPATH
+#ifdef HAVE_PGP
   { "attach-key",	OP_COMPOSE_ATTACH_KEY,		"\033k" },
   { "forget-passphrase",OP_FORGET_PASSPHRASE,		"\006"  },
   { "pgp-menu",		OP_COMPOSE_PGP_MENU,		"p" 	},
 #endif
 
+#ifdef MIXMASTER
+  { "mix",		OP_COMPOSE_MIX,			"M" },
+#endif
+  
   { NULL,		0,				NULL }
 };
 
@@ -304,6 +327,13 @@ struct binding_t OpPost[] = {
   { "undelete-entry",	OP_UNDELETE,	"u" },
   { NULL,		0,		NULL }
 };
+
+struct binding_t OpAlias[] = {
+  { "delete-entry",	OP_DELETE,	"d" },
+  { "undelete-entry",	OP_UNDELETE,	"u" },
+  { NULL,		0,		NULL }
+};
+  
 
 /* The file browser */
 struct binding_t OpBrowser[] = {
@@ -316,6 +346,13 @@ struct binding_t OpBrowser[] = {
   { "check-new",	OP_CHECK_NEW,		NULL },
   { "toggle-mailboxes", OP_TOGGLE_MAILBOXES, 	"\t" },
   { "view-file",	OP_BROWSER_VIEW_FILE,	" " },
+#ifdef USE_IMAP
+  { "create-mailbox",   OP_CREATE_MAILBOX,      "C" },
+  { "delete-mailbox",   OP_DELETE_MAILBOX,      "d" },
+  { "subscribe",	OP_BROWSER_SUBSCRIBE,	"s" },
+  { "unsubscribe",	OP_BROWSER_UNSUBSCRIBE,	"u" },
+  { "toggle-subscribed", OP_BROWSER_TOGGLE_LSUB, "T" },
+#endif
   { NULL,		0,			NULL }
 };
 
@@ -331,28 +368,48 @@ struct binding_t OpQuery[] = {
 struct binding_t OpEditor[] = {
   { "bol",		OP_EDITOR_BOL,			"\001" },
   { "backward-char",	OP_EDITOR_BACKWARD_CHAR,	"\002" },
+  { "backward-word",	OP_EDITOR_BACKWARD_WORD,	"\033b"},
+  { "capitalize-word",	OP_EDITOR_CAPITALIZE_WORD,	"\033c"},
+  { "downcase-word",	OP_EDITOR_DOWNCASE_WORD,	"\033l"},
+  { "upcase-word",	OP_EDITOR_UPCASE_WORD,		"\033u"},
   { "delete-char",	OP_EDITOR_DELETE_CHAR,		"\004" },
   { "eol",		OP_EDITOR_EOL,			"\005" },
   { "forward-char",	OP_EDITOR_FORWARD_CHAR,		"\006" },
+  { "forward-word",	OP_EDITOR_FORWARD_WORD,		"\033f"},
   { "backspace",	OP_EDITOR_BACKSPACE,		"\010" },
   { "kill-eol",		OP_EDITOR_KILL_EOL,		"\013" },
+  { "kill-eow",		OP_EDITOR_KILL_EOW,		"\033d"},
   { "kill-line",	OP_EDITOR_KILL_LINE,		"\025" },
   { "quote-char",	OP_EDITOR_QUOTE_CHAR,		"\026" },
   { "kill-word",	OP_EDITOR_KILL_WORD,		"\027" },
-  { "complete",		OP_EDITOR_COMPLETE,		"\t" },
+  { "complete",		OP_EDITOR_COMPLETE,		"\t"   },
   { "complete-query",	OP_EDITOR_COMPLETE_QUERY,	"\024" },
-  { "buffy-cycle",	OP_EDITOR_BUFFY_CYCLE,		" " },
-  { "history-up",	OP_EDITOR_HISTORY_UP,		NULL },
-  { "history-down",	OP_EDITOR_HISTORY_DOWN,		NULL },
-  { NULL,		0,				NULL }
+  { "buffy-cycle",	OP_EDITOR_BUFFY_CYCLE,		" "    },
+  { "history-up",	OP_EDITOR_HISTORY_UP,		NULL   },
+  { "history-down",	OP_EDITOR_HISTORY_DOWN,		NULL   },
+  { "transpose-chars",	OP_EDITOR_TRANSPOSE_CHARS,	NULL   },
+  { NULL,		0,				NULL   }
 };
 
 
 
-#ifdef _PGPPATH
+#ifdef HAVE_PGP
 struct binding_t OpPgp[] = {
   { "verify-key",	OP_VERIFY_KEY,		"c" },
   { "view-name",	OP_VIEW_ID,		"%" },
   { NULL,		0,				NULL }
 };
-#endif /* _PGPPATH */
+#endif /* HAVE_PGP */
+
+
+#ifdef MIXMASTER
+struct binding_t OpMix[] = {
+  { "accept",		OP_MIX_USE,	M_ENTER_S },
+  { "append",		OP_MIX_APPEND,	"a"       },
+  { "insert",		OP_MIX_INSERT,	"i"       },
+  { "delete",		OP_MIX_DELETE,  "d"	  },
+  { "chain-prev",	OP_MIX_CHAIN_PREV, "<left>" },
+  { "chain-next",	OP_MIX_CHAIN_NEXT, "<right>" },
+  { NULL, 		0, 		NULL }
+};
+#endif /* MIXMASTER */

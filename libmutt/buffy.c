@@ -362,12 +362,7 @@ int mutt_buffy_check (int force)
 	break;
 
       case M_MAILDIR:
-      case M_MH:
-
-	if(tmp->magic == M_MAILDIR)
-	  snprintf (path, sizeof (path), "%s/new", tmp->path);
-	else
-	  strfcpy (path, tmp->path, sizeof(path));
+	snprintf (path, sizeof (path), "%s/new", tmp->path);
 	if ((dirp = opendir (path)) == NULL)
 	{
 	  tmp->magic = 0;
@@ -375,7 +370,9 @@ int mutt_buffy_check (int force)
 	}
 	while ((de = readdir (dirp)) != NULL)
 	{
-	  if (*de->d_name != '.')
+	  char *p;
+	  if (*de->d_name != '.' && 
+	      (!(p = strstr (de->d_name, ":2,")) || !strchr (p + 3, 'T')))
 	  {
 	    /* one new message is enough */
 	    BuffyCount++;
@@ -384,6 +381,11 @@ int mutt_buffy_check (int force)
 	  }
 	}
 	closedir (dirp);
+	break;
+	
+      case M_MH:
+	if ((tmp->new = mh_buffy (tmp->path)) > 0)
+	  BuffyCount++;
 	break;
 
 #ifdef USE_IMAP

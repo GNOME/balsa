@@ -57,9 +57,6 @@ static int entropy_byte_count = 0;
 #define HAVE_ENTROPY()	(!access(DEVRANDOM, R_OK) || entropy_byte_count >= 16)
 #endif
 
-char *SslCertFile = NULL;
-char *SslEntropyFile = NULL;
-
 typedef struct _sslsockdata
 {
   SSL_CTX *ctx;
@@ -76,6 +73,7 @@ static int ssl_socket_read (CONNECTION * conn, char* buf, size_t len);
 static int ssl_socket_write (CONNECTION* conn, const char* buf, size_t len);
 static int ssl_socket_open (CONNECTION * conn);
 static int ssl_socket_close (CONNECTION * conn);
+static int tls_close (CONNECTION* conn);
 int ssl_negotiate (sslsockdata*);
 
 /* mutt_ssl_starttls: Negotiate TLS over an already opened connection.
@@ -115,7 +113,7 @@ int mutt_ssl_starttls (CONNECTION* conn)
   conn->sockdata = ssldata;
   conn->read = ssl_socket_read;
   conn->write = ssl_socket_write;
-  conn->close = ssl_socket_close;
+  conn->close = tls_close;
 
   conn->ssf = SSL_CIPHER_get_bits (SSL_get_current_cipher (ssldata->ssl),
     &maxbits);
@@ -248,7 +246,7 @@ int ssl_socket_read (CONNECTION * conn, char* buf, size_t len)
   return SSL_read (data->ssl, buf, len);
 }
 
-int ssl_socket_write (CONNECTION* conn, const char* buf, size_t len)
+static int ssl_socket_write (CONNECTION* conn, const char* buf, size_t len)
 {
   sslsockdata *data = conn->sockdata;
   return SSL_write (data->ssl, buf, len);
@@ -368,16 +366,16 @@ int ssl_negotiate (sslsockdata* ssldata)
        return -2;
       }
 #endif
-      errmsg = "I/O error";
+      errmsg = _("I/O error");
       break;
     case SSL_ERROR_SSL:
-      errmsg = "unspecified protocol error";
+      errmsg = _("unspecified protocol error");
       break;
     default:
       errmsg = "unknown error";
     }
     
-    mutt_error ("SSL failed: %s", errmsg);
+    mutt_error (_("SSL failed: %s"), errmsg);
     mutt_sleep (1);
 
     return -1;
@@ -402,7 +400,7 @@ int ssl_negotiate (sslsockdata* ssldata)
   return 0;
 }
 
-int ssl_socket_close (CONNECTION * conn)
+static int ssl_socket_close (CONNECTION * conn)
 {
   sslsockdata *data = conn->sockdata;
   if (data)
@@ -418,6 +416,17 @@ int ssl_socket_close (CONNECTION * conn)
   return raw_socket_close (conn);
 }
 
+static int tls_close (CONNECTION* conn)
+{
+  int rc;
+
+  rc = ssl_socket_close (conn);
+  conn->read = raw_socket_read;
+  conn->write = raw_socket_write;
+  conn->close = raw_socket_close;
+
+  return rc;
+}
 
 
 static char *x509_get_part (char *line, const char *ndx)
@@ -425,7 +434,7 @@ static char *x509_get_part (char *line, const char *ndx)
   static char ret[SHORT_STRING];
   char *c, *c2;
 
-  strncpy (ret, _("Unknown"), sizeof (ret));
+  strfcpy (ret, _("Unknown"), sizeof (ret));
 
   c = strstr (line, ndx);
   if (c)
@@ -434,7 +443,7 @@ static char *x509_get_part (char *line, const char *ndx)
     c2 = strchr (c, '/');
     if (c2)
       *c2 = '\0';
-    strncpy (ret, c, sizeof (ret));
+    strfcpy (ret, c, sizeof (ret));
     if (c2)
       *c2 = '/';
   }
@@ -632,7 +641,8 @@ static int ssl_check_certificate (sslsockdata * data)
     menu->dialog[i] = (char *) safe_calloc (1, SHORT_STRING * sizeof (char));
 
   row = 0;
-  strncpy (menu->dialog[row++], _("This certificate belongs to:"), SHORT_STRING);
+  strfcpy (menu->dialog[row], _("This certificate belongs to:"), SHORT_STRING);
+  row++;
   name = X509_NAME_oneline (X509_get_subject_name (data->cert),
 			    buf, sizeof (buf));
   for (i = 0; i < 5; i++)
@@ -642,7 +652,8 @@ static int ssl_check_certificate (sslsockdata * data)
   }
 
   row++;
-  strncpy (menu->dialog[row++], _("This certificate was issued by:"), SHORT_STRING);
+  strfcpy (menu->dialog[row], _("This certificate was issued by:"), SHORT_STRING);
+  row++;
   name = X509_NAME_oneline (X509_get_issuer_name (data->cert),
 			    buf, sizeof (buf));
   for (i = 0; i < 5; i++)

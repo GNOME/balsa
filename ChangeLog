@@ -1,3 +1,8 @@
+2002-02-25  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/Makefile.am: added LIBMUTT for some libmutt/*.h ...
+	* libbalsa/send.c: slight changes needed for libmutt update 
+
 2002-02-22  Matthew Guenther  <guentherm@asme.org>
 
 	* src/sendmsg-window.c (fillBody): use prep_signature function

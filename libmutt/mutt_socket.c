@@ -63,13 +63,8 @@ int mutt_socket_close (CONNECTION* conn)
     rc = conn->close (conn);
 
   conn->fd = -1;
-#ifdef LIBMUTT
-  /* reset methods so the connection structure can be reused */
-  conn->read = raw_socket_read;
-  conn->write = raw_socket_write;
-  conn->open = raw_socket_open;
-  conn->close = raw_socket_close;
-#endif
+  conn->ssf = 0;
+
   return rc;
 }
 
@@ -229,7 +224,16 @@ void mutt_socket_free (CONNECTION* conn)
 CONNECTION* mutt_conn_find (const CONNECTION* start, const ACCOUNT* account)
 {
   CONNECTION* conn;
+  ciss_url_t url;
+  char hook[LONG_STRING];
 
+  /* account isn't actually modified, since url isn't either */
+  mutt_account_tourl ((ACCOUNT*) account, &url);
+  url.path = NULL;
+  url_ciss_tostring (&url, hook, sizeof (hook), 0);
+#ifndef LIBMUTT /* no mutt hooks */
+  mutt_account_hook (hook);
+#endif 
   conn = start ? start->next : Connections;
   while (conn)
   {
@@ -245,7 +249,11 @@ CONNECTION* mutt_conn_find (const CONNECTION* start, const ACCOUNT* account)
   Connections = conn;
 
   if (Tunnel && *Tunnel)
+#ifndef LIBMUTT
     mutt_tunnel_socket_setup (conn);
+#else
+  {} 
+#endif
   else if (account->flags & M_ACCT_SSL) 
   {
 #ifdef USE_SSL
@@ -255,7 +263,7 @@ CONNECTION* mutt_conn_find (const CONNECTION* start, const ACCOUNT* account)
 #else
     mutt_error _("SSL is unavailable.");
     mutt_sleep (2);
-    FREE (&conn);
+    mutt_socket_free (conn);
 
     return NULL;
 #endif
@@ -273,6 +281,7 @@ CONNECTION* mutt_conn_find (const CONNECTION* start, const ACCOUNT* account)
 
 static int socket_preconnect (void)
 {
+#ifndef LIBMUTT
   int rc;
   int save_errno;
 
@@ -290,7 +299,7 @@ static int socket_preconnect (void)
       return save_errno;
     }
   }
-
+#endif /* balsa - no spawning in libmutt */  
   return 0;
 }
 
@@ -418,11 +427,11 @@ int raw_socket_open (CONNECTION* conn)
   for (cur = res; cur != NULL; cur = cur->ai_next)
   {
     fd = socket (cur->ai_family, cur->ai_socktype, cur->ai_protocol);
-    fcntl(fd,F_SETFD,FD_CLOEXEC);
     if (fd >= 0)
     {
       if ((rc = socket_connect (fd, cur->ai_addr)) == 0)
       {
+	fcntl(fd,F_SETFD,FD_CLOEXEC);
 	conn->fd = fd;
 	break;
       }

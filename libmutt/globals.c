@@ -16,11 +16,15 @@
  *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */ 
 
+/* LIBMUTT - balsa - mutt-1.3 deprecated this, it's actually a 
+   nice way to get the globals without main.c - chbm */
+#define MAIN_C	1
 #define GLOBALS_C	1
 #include "mutt.h"
 #include "mutt_curses.h"
 #include "keymap.h"
 #include "mailbox.h"
+#include "mutt_regex.h"
 #ifdef _PGPPATH
 #include "pgp.h"
 #endif

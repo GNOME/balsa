@@ -118,30 +118,31 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 	fcw.port = create_entry(fcw.dialog, table, NULL, NULL, 2, tmp, keyval);
 	g_free(tmp);
     } else fcw.port = 
-	       create_entry(fcw.dialog, table, NULL, NULL, 3, "143", keyval);
+	       create_entry(fcw.dialog, table, NULL, NULL, 2, "143", keyval);
 
 
-    create_label(_("_User name:"), table, 4, &keyval);
-    fcw.username = create_entry(fcw.dialog, table, validate_folder, &fcw, 4, 
+    create_label(_("_User name:"), table, 3, &keyval);
+    fcw.username = create_entry(fcw.dialog, table, validate_folder, &fcw, 3, 
 			    s ? s->user : g_get_user_name(), 
 			    keyval);
 
-    create_label(_("_Password:"), table, 5, &keyval);
-    fcw.password = create_entry(fcw.dialog, table, NULL, NULL, 5,
+    create_label(_("_Password:"), table, 4, &keyval);
+    fcw.password = create_entry(fcw.dialog, table, NULL, NULL, 4,
 				s ? s->passwd : NULL, 
 				keyval);
     gtk_entry_set_visibility(GTK_ENTRY(fcw.password), FALSE);
 
     fcw.subscribed = create_check(fcw.dialog, _("_Subscribed folders only"), 
-				  table, 6, FALSE);
-    create_label(_("_Prefix"), table, 7, &keyval);
-    fcw.prefix = create_entry(fcw.dialog, table, NULL, NULL, 7, 
+				  table, 5, FALSE);
+
+    create_label(_("_Prefix"), table, 6, &keyval);
+    fcw.prefix = create_entry(fcw.dialog, table, NULL, NULL, 6, 
 			      mn ? mn->dir : NULL, keyval);
     
 #ifdef USE_SSL
     fcw.use_ssl = create_check(fcw.dialog,
 			       _("Use SSL (IMAPS)"),
-			       table, 8, s ? s->use_ssl : FALSE);
+			       table, 7, s ? s->use_ssl : FALSE);
     gtk_signal_connect(GTK_OBJECT(fcw.use_ssl), "toggled", imap_use_ssl_cb, &fcw);
 #endif
 

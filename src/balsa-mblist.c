@@ -38,6 +38,13 @@
 #include "mailbox-node.h"
 #include "main-window.h"
 
+/* Column numbers (used for sort_column_id): */
+typedef enum {
+    BMBL_TREE_COLUMN_NAME = 1,
+    BMBL_TREE_COLUMN_UNREAD,
+    BMBL_TREE_COLUMN_TOTAL
+} BmblTreeColumnId;
+
 /* object arguments */
 enum {
     PROP_0,
@@ -111,7 +118,6 @@ static void bmbl_row_activated_cb(GtkTreeView * tree_view,
                                   GtkTreePath * path,
                                   GtkTreeViewColumn * column,
                                   gpointer data);
-static void bmbl_column_click(GtkTreeViewColumn * column, gpointer data);
 static void bmbl_unread_messages_changed_cb(LibBalsaMailbox *
                                             mailbox, gboolean flag,
                                             GtkTreeStore * store);
@@ -341,6 +347,9 @@ bmbl_init(BalsaMBList * mblist)
     gtk_tree_view_column_set_fixed_width(column,
                                          balsa_app.mblist_name_width);
     gtk_tree_view_append_column(tree_view, column);
+    gtk_tree_view_column_set_sort_column_id(column,
+                                            BMBL_TREE_COLUMN_NAME);
+ 
 
     /* Message counts are right-justified, each in a column centered
      * under its heading. */
@@ -363,6 +372,9 @@ bmbl_init(BalsaMBList * mblist)
                                          balsa_app.mblist_newmsg_width);
     gtk_tree_view_column_set_visible(column, mblist->display_info);
     gtk_tree_view_append_column(tree_view, column);
+    gtk_tree_view_column_set_sort_column_id(column,
+                                            BMBL_TREE_COLUMN_UNREAD);
+
 
     /* Total message count column */
     column = gtk_tree_view_column_new();
@@ -383,6 +395,8 @@ bmbl_init(BalsaMBList * mblist)
                                          balsa_app.mblist_totalmsg_width);
     gtk_tree_view_column_set_visible(column, mblist->display_info);
     gtk_tree_view_append_column(tree_view, column);
+    gtk_tree_view_column_set_sort_column_id(column,
+                                            BMBL_TREE_COLUMN_TOTAL);
 
     /* arrange for non-mailbox nodes to be non-selectable */
     gtk_tree_selection_set_select_function(gtk_tree_view_get_selection
@@ -404,11 +418,25 @@ bmbl_init(BalsaMBList * mblist)
                  balsa_app.mblist_show_mb_content_info,
                  NULL);
 
-    gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(store), 0,
+    gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(store),
+                                    BMBL_TREE_COLUMN_NAME,
                                     bmbl_row_compare,
-                                    GINT_TO_POINTER(0), NULL);
-    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(store), 0,
-                                         GTK_SORT_ASCENDING);
+                                    GINT_TO_POINTER(BMBL_TREE_COLUMN_NAME),
+                                    NULL);
+    gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(store),
+                                    BMBL_TREE_COLUMN_UNREAD,
+                                    bmbl_row_compare,
+                                    GINT_TO_POINTER(BMBL_TREE_COLUMN_UNREAD),
+                                    NULL);
+    gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(store),
+                                    BMBL_TREE_COLUMN_TOTAL,
+                                    bmbl_row_compare,
+                                    GINT_TO_POINTER(BMBL_TREE_COLUMN_TOTAL),
+                                    NULL);
+    /* Default is ascending sort by name */
+    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(store),
+					 BMBL_TREE_COLUMN_NAME,
+					 GTK_SORT_ASCENDING);
 }
 
 /*
@@ -528,7 +556,7 @@ bmbl_child_toggled_cb(GtkTreeModel * model, GtkTreePath * path,
 
 /* bmbl_row_compare
  * 
- * This function determines the sorting order of the clist, depending
+ * This function determines the sorting order of the list, depending
  * on what column is selected.  The first column sorts by name, with
  * exception given to the five "core" mailboxes (Inbox, Draftbox,
  * Sentbox, Outbox, Trash).  The second sorts by number of unread
@@ -536,79 +564,49 @@ bmbl_child_toggled_cb(GtkTreeModel * model, GtkTreePath * path,
  * */
 static gint
 bmbl_row_compare(GtkTreeModel * model, GtkTreeIter * iter1,
-                         GtkTreeIter * iter2, gpointer data)
+                 GtkTreeIter * iter2, gpointer data)
 {
-    gint sort_column = GPOINTER_TO_INT(data);
-    LibBalsaMailbox* m1 = NULL;
-    LibBalsaMailbox* m2 = NULL;
-    BalsaMailboxNode* mbnode1 = NULL;
-    BalsaMailboxNode* mbnode2 = NULL;
-    gint core1 = 0;
-    gint core2 = 0;
+    BmblTreeColumnId sort_column = GPOINTER_TO_INT(data);
+    LibBalsaMailbox *m1 = NULL;
+    LibBalsaMailbox *m2 = NULL;
+    BalsaMailboxNode *mbnode1;
+    BalsaMailboxNode *mbnode2;
+    gchar *name1, *name2;
+    gint core1;
+    gint core2;
+    gint ret_val = 0;
 
-    gtk_tree_model_get(model, iter1, MBNODE_COLUMN, &mbnode1, -1);
-    gtk_tree_model_get(model, iter2, MBNODE_COLUMN, &mbnode2, -1);
-
-    if (!mbnode1 || !mbnode2)
-        return 0;
+    gtk_tree_model_get(model, iter1,
+                       MBNODE_COLUMN, &mbnode1, NAME_COLUMN, &name1, -1);
+    gtk_tree_model_get(model, iter2,
+                       MBNODE_COLUMN, &mbnode2, NAME_COLUMN, &name2, -1);
 
     m1 = mbnode1->mailbox;
     m2 = mbnode2->mailbox;
 
     switch (sort_column) {
-    case 0:
-        if (!m1 || !m2) {
-            /* compare using names, potentially mailboxnodes */
-            if (!m1 && !m2) {
-                return g_ascii_strcasecmp(mbnode1->name, mbnode2->name);
-            } else if (m1) {
-                if (bmbl_core_mailbox(m1))
-                    return -1;
-                else {
-                    gchar *name = g_path_get_basename(mbnode2->name);
-                    gint tmp =
-                        m1->name ? g_ascii_strcasecmp(name, m1->name) : -1;
+    case BMBL_TREE_COLUMN_NAME:
+        /* compare using names, potentially mailboxnodes */
+        core1 = bmbl_core_mailbox(m1);
+        core2 = bmbl_core_mailbox(m2);
+        ret_val = ((core1 || core2) ? core2 - core1
+                   : g_ascii_strcasecmp(name1, name2));
+        break;
 
-                    g_free(name);
-                    return tmp;
-                }
-            } else if (m2) {
-                if (bmbl_core_mailbox(m2)) 
-                    return 1;
-                else {
-                    gchar *name = g_path_get_basename(mbnode1->name);
-                    gint tmp =
-                        m2->name ? g_ascii_strcasecmp(name, m2->name) : 1;
+    case BMBL_TREE_COLUMN_UNREAD:
+        ret_val = ((m1 ? m1->unread_messages : 0)
+                   - (m2 ? m2->unread_messages : 0));
+        break;
 
-                    g_free(name);
-                    return tmp;
-                }
-            } else {
-                return 0;
-            }
-        } else if (bmbl_core_mailbox(m1) || 
-                   bmbl_core_mailbox(m2)) {
-            core1 = bmbl_core_mailbox(m1);
-            core2 = bmbl_core_mailbox(m2);
-            return core2 - core1;
-        } else {
-            return g_ascii_strcasecmp(m1->name, m2->name);
-        } 
-    case 1:
-        if (m1 && m2) 
-            return m2->unread_messages - m1->unread_messages;
-        else
-            return 0;
-
-    case 2:
-        if (m1 && m2)
-            return m2->total_messages - m1->total_messages;
-        else
-            return 0;
-    
-    default:
-        return 0;
+    case BMBL_TREE_COLUMN_TOTAL:
+        ret_val = ((m1 ? m1->total_messages : 0)
+                   - (m2 ? m2->total_messages : 0));
+        break;
     }
+
+    g_free(name1);
+    g_free(name2);
+    return ret_val;
 }
 
 /* bmbl_button_press_cb:
@@ -852,39 +850,6 @@ bmbl_row_activated_cb(GtkTreeView * tree_view, GtkTreePath * path,
         balsa_mblist_open_mailbox(mbnode->mailbox);
 }
 
-/* bmbl_column_click [MBG]
- *  
- *  Description: This causes the columns to be sorted depending on
- *  which columns are clicked.  If a column is already selected as the
- *  sorting column when clicked, the order of sorting is changed.
- * */
-static void
-bmbl_column_click(GtkTreeViewColumn * column, gpointer data)
-{
-    GtkSortType order = GTK_SORT_ASCENDING;
-    GtkTreeView *tree_view = GTK_TREE_VIEW(data);
-    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-    GtkTreeSortable *sortable = GTK_TREE_SORTABLE(model);
-    GList *columns = gtk_tree_view_get_columns(tree_view);
-    gint col_id = g_list_index(columns, column);
-    gint current_col_id;
-
-    g_list_free(columns);
-    if (gtk_tree_sortable_get_sort_column_id(sortable,
-                                             &current_col_id, &order)) {
-        GtkTreeViewColumn *current_column =
-            gtk_tree_view_get_column(tree_view, current_col_id);
-
-        gtk_tree_view_column_set_sort_indicator(current_column, FALSE);
-        if (current_col_id == col_id)
-            order = (order == GTK_SORT_DESCENDING ?
-                     GTK_SORT_ASCENDING : GTK_SORT_DESCENDING);
-    }
-    gtk_tree_sortable_set_sort_column_id(sortable, col_id, order);
-    gtk_tree_view_column_set_sort_indicator(column, TRUE);
-    gtk_tree_view_column_set_sort_order(column, order);
-}
-
 static void
 bmbl_messages_status_changed_cb(LibBalsaMailbox * mailbox,
 				GList * messages,
@@ -902,39 +867,15 @@ bmbl_messages_status_changed_cb(LibBalsaMailbox * mailbox,
 	balsa_mblist_update_mailbox(store, mailbox);
 }
 
-struct store_mailbox_pair {
-    GtkTreeStore * store;
-    LibBalsaMailbox* mailbox;
-};
-
-/* bmbl_unread_messages_changed_cb:
-   update flags. Since it is a libbalsa signal handler, it can be called
-   from a thread. Therefore, show a due dilligence and do the actual UI
-   action from an idle handler.
-*/
-static gboolean
-balsa_mblist_update_mailbox_idle(struct store_mailbox_pair* arg)
-{
-  
-    gdk_threads_enter();
-    balsa_mblist_update_mailbox(arg->store, arg->mailbox);    
-    gdk_threads_leave();
-    g_object_unref(arg->store); g_object_unref(arg->mailbox);
-    g_free(arg);
-    return FALSE;
-}
 static void
 bmbl_unread_messages_changed_cb(LibBalsaMailbox * mailbox,
 				gboolean flag,
 				GtkTreeStore * store)
 {
-    struct store_mailbox_pair *arg;
     g_return_if_fail(mailbox);
     g_return_if_fail(store);
-    arg = g_new(struct store_mailbox_pair, 1);
-    arg->store = store; arg->mailbox = mailbox;
-    g_object_ref(arg->store); g_object_ref(arg->mailbox);
-    g_idle_add((GSourceFunc)balsa_mblist_update_mailbox_idle, arg);
+
+    balsa_mblist_update_mailbox(store, mailbox);
 }
 
 /* public methods */
@@ -1066,9 +1007,7 @@ balsa_mblist_close_mailbox(LibBalsaMailbox * mailbox)
 void
 balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
 {
-    GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(mblist));
     GtkTreeSelection *selection;
-    gint i;
 
     g_signal_connect(G_OBJECT(mblist), "button_press_event",
                      G_CALLBACK(bmbl_button_press_cb), NULL);
@@ -1088,21 +1027,6 @@ balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
                      G_CALLBACK(bmbl_select_mailbox), NULL);
     g_signal_connect(G_OBJECT(mblist), "row-activated",
                      G_CALLBACK(bmbl_row_activated_cb), NULL);
-
-    for (i = 0; i < 3; ++i) {
-        GtkTreeViewColumn *column =
-            gtk_tree_view_get_column(GTK_TREE_VIEW(mblist), i);
-
-        gtk_tree_view_column_set_resizable(column, TRUE);
-        gtk_tree_view_column_set_clickable(column, TRUE);
-
-        g_signal_connect(G_OBJECT(column), "clicked",
-                         G_CALLBACK(bmbl_column_click),
-                         mblist);
-        gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(model),
-                                        i, bmbl_row_compare, 
-                                        GINT_TO_POINTER(i), NULL);
-    }
 }
 
 /* bmbl_disconnect_mailbox_signals

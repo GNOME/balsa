@@ -362,11 +362,11 @@ lbm_mh_handle_seq_line(LibBalsaMailboxMh * mh, gchar * line)
     LibBalsaMessageFlag flag;
     gchar **sequences, **seq;
 
-    if (g_str_has_prefix(line, LibBalsaMailboxMhUnseen))
+    if (libbalsa_str_has_prefix(line, LibBalsaMailboxMhUnseen))
 	flag = LIBBALSA_MESSAGE_FLAG_NEW;
-    else if (g_str_has_prefix(line, LibBalsaMailboxMhFlagged))
+    else if (libbalsa_str_has_prefix(line, LibBalsaMailboxMhFlagged))
 	flag = LIBBALSA_MESSAGE_FLAG_FLAGGED;
-    else if (g_str_has_prefix(line, LibBalsaMailboxMhReplied))
+    else if (libbalsa_str_has_prefix(line, LibBalsaMailboxMhReplied))
 	flag = LIBBALSA_MESSAGE_FLAG_REPLIED;
     else			/* unknown sequence */
 	return;
@@ -759,9 +759,9 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	line->len = 0;
 	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
 	if (line->data &&
-	    !g_str_has_prefix(line->data, LibBalsaMailboxMhUnseen) &&
-	    !g_str_has_prefix(line->data, LibBalsaMailboxMhFlagged) &&
-	    !g_str_has_prefix(line->data, LibBalsaMailboxMhReplied))
+	    !libbalsa_str_has_prefix(line->data, LibBalsaMailboxMhUnseen) &&
+	    !libbalsa_str_has_prefix(line->data, LibBalsaMailboxMhFlagged) &&
+	    !libbalsa_str_has_prefix(line->data, LibBalsaMailboxMhReplied))
 	{
 	    /* unknown sequence */
 	    g_mime_stream_write(temp_stream, line->data, line->len);

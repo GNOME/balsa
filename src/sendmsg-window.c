@@ -109,9 +109,9 @@ static void toggle_format_cb(GtkCheckMenuItem * check_menu_item,
                              BalsaSendmsg * bsmsg);
 #ifdef HAVE_GPGME
 static void toggle_sign_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void toggle_sign_tb_cb(GtkToggleButton * widget, BalsaSendmsg * bsmsg);
+static void toggle_sign_tb_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void toggle_encrypt_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void toggle_encrypt_tb_cb(GtkToggleButton * widget, BalsaSendmsg * bsmsg);
+static void toggle_encrypt_tb_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void toggle_gpg_mode_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg, GtkWidget *toolbar);
 static void bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg *bsmsg,
@@ -4490,10 +4490,18 @@ toggle_sign_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
 
 static void 
-toggle_sign_tb_cb(GtkToggleButton * widget, BalsaSendmsg * bsmsg)
+toggle_sign_tb_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
+#if GTK_CHECK_VERSION(2, 4, 0)
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
+                                   (bsmsg->gpg_sign_menu_item),
+                                   gtk_toggle_tool_button_get_active
+                                   (GTK_TOGGLE_TOOL_BUTTON(widget)));
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
-				   gtk_toggle_button_get_active(widget));
+				   gtk_toggle_button_get_active
+				   (GTK_TOGGLE_BUTTON(widget)));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 
@@ -4529,10 +4537,18 @@ toggle_encrypt_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
 
 static void 
-toggle_encrypt_tb_cb(GtkToggleButton * widget, BalsaSendmsg * bsmsg)
+toggle_encrypt_tb_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
+#if GTK_CHECK_VERSION(2, 4, 0)
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
+                                   (bsmsg->gpg_encrypt_menu_item),
+                                   gtk_toggle_tool_button_get_active
+                                   (GTK_TOGGLE_TOOL_BUTTON(widget)));
+#else /* GTK_CHECK_VERSION(2, 4, 0) */
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
-				   gtk_toggle_button_get_active(widget));
+				   gtk_toggle_button_get_active
+				   (GTK_TOGGLE_BUTTON(widget)));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 }
 
 

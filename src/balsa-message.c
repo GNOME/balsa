@@ -170,7 +170,7 @@ balsa_message_set (BalsaMessage * bmessage,
   cur = cur->next = mail_newstringlist ();
   cur->text.size = strlen (cur->text.data = (unsigned char *) cpystr ("Newsgroups"));
 
-#ifdef 0
+#if 0
   buff = g_realloc (buff, strlen (buff) + strlen ("<table>\n") + 1);
   strcat (buff, "<table>\n");
 

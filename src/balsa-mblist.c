@@ -895,22 +895,8 @@ bmbl_row_activated_cb(GtkTreeView * tree_view, GtkTreePath * path,
         balsa_mblist_open_mailbox(mbnode->mailbox);
 }
 
-static void
-bmbl_messages_status_changed_cb(LibBalsaMailbox * mailbox,
-				GList * messages,
-				gint flag,
-				GtkTreeStore * store)
-{
-    g_return_if_fail(store);
-    g_return_if_fail(mailbox);
-    /* We update the mailbox infos only if the flag changed was the DELETED flag
-       or the NEW flag, because they are the only ones that change the numbers
-       displayed
-     */
-    if ((flag == LIBBALSA_MESSAGE_FLAG_DELETED) ||
-	(flag == LIBBALSA_MESSAGE_FLAG_NEW))
-	balsa_mblist_update_mailbox(store, mailbox);
-}
+/* Mailbox status changed callbacks: update the UI in an idle handler.
+ */
 
 struct update_mbox_data {
     LibBalsaMailbox *mailbox;
@@ -931,9 +917,8 @@ update_mailbox_idle(struct update_mbox_data*umd)
 }
 
 static void
-bmbl_unread_messages_changed_cb(LibBalsaMailbox * mailbox,
-				gboolean flag,
-				GtkTreeStore * store)
+bmbl_update_mailbox_idle_add(LibBalsaMailbox * mailbox,
+			     GtkTreeStore * store)
 {
     struct update_mbox_data *umd;
     g_return_if_fail(mailbox);
@@ -943,6 +928,27 @@ bmbl_unread_messages_changed_cb(LibBalsaMailbox * mailbox,
     umd->mailbox = mailbox; umd->store = store;
     g_object_add_weak_pointer(G_OBJECT(store), (gpointer) &umd->store);
     g_idle_add((GSourceFunc)update_mailbox_idle, umd);
+}
+
+static void
+bmbl_messages_status_changed_cb(LibBalsaMailbox * mailbox,
+				GList * messages,
+				gint flag, GtkTreeStore * store)
+{
+    /* We update the mailbox infos only if the flag changed was the DELETED flag
+       or the NEW flag, because they are the only ones that change the numbers
+       displayed
+     */
+    if ((flag == LIBBALSA_MESSAGE_FLAG_DELETED) ||
+	(flag == LIBBALSA_MESSAGE_FLAG_NEW))
+	bmbl_update_mailbox_idle_add(mailbox, store);
+}
+
+static void
+bmbl_unread_messages_changed_cb(LibBalsaMailbox * mailbox,
+				gboolean flag, GtkTreeStore * store)
+{
+    bmbl_update_mailbox_idle_add(mailbox, store);
 }
 
 /* public methods */

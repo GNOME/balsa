@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-11-05 13:55+0100\n"
-"PO-Revision-Date: 2001-11-05 17:49+0100\n"
+"POT-Creation-Date: 2001-11-12 11:27+0100\n"
+"PO-Revision-Date: 2001-11-12 11:28+0100\n"
 "Last-Translator: GNOME PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -3895,8 +3895,8 @@ msgid "Store Address"
 msgstr "Zapis adresu"
 
 #: src/store-address.c:1
-msgid "Save in address book"
-msgstr "Zapisz w ksi±¿ce adresowej"
+msgid "Save this address and close the dialog?"
+msgstr "Czy zapisaæ ten adres i zamkn±æ okno?"
 
 #: src/store-address.c:1
 msgid "No address book selected...."

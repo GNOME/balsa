@@ -1,3 +1,10 @@
+2004-02-13 23:18  PeterB
+
+	* libbalsa/send.c: prohibit smtp from sending Status and X-Status
+	headers.
+	* libbalsa/mailbox_pop3.c: set RECENT flag on incoming messages (as
+	well as NEW).
+
 2004-02-12  Pawel Salek
 
 	* libbalsa/libbalsa.c: extra debugging for cert validation.

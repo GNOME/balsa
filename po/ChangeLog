@@ -1,3 +1,7 @@
+2002-12-02  Pawel Salek <pawsa@theochem.kth.se>
+
+	* POTFILES.in: replace src/address-book.c with src/ab-window.c
+
 2002-11-23  Christophe Merlet  <redfox@redfoxcenter.org>
 
 	* fr.po: Updated French translation from work of

@@ -62,7 +62,11 @@ extern struct BalsaApplication
   
   gchar *local_mail_directory;
   gchar *smtp_server;
-  
+
+	/* signature stuff */
+  gboolean sig_sending;
+  gboolean sig_whenforward;
+  gboolean sig_whenreply;
   gchar *signature_path;
   gchar *signature;
   

@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-09-08 01:22+0200\n"
-"PO-Revision-Date: 2003-09-08 01:21+0200\n"
+"POT-Creation-Date: 2003-09-08 14:38+0200\n"
+"PO-Revision-Date: 2003-09-08 14:38+0200\n"
 "Last-Translator: Strahinja Radić <mr99164@alas.matf.bg.ac.yu>\n"
 "Language-Team: Serbian (sr) <serbiangnome-lista@nongnu.org>\n"
 "MIME-Version: 1.0\n"
@@ -86,7 +86,7 @@ msgstr "Organi_zacija:"
 msgid "_Email Address:"
 msgstr "Adresa _epošte:"
 
-#: libbalsa/body.c:112 libbalsa/message.c:1016
+#: libbalsa/body.c:113 libbalsa/message.c:1018
 msgid "(No subject)"
 msgstr "(bez naslova)"
 
@@ -106,34 +106,34 @@ msgstr "Greška u sintaksi regularnog izraza"
 msgid "Attempt to apply an invalid filter"
 msgstr "Pokušana je primena neispravnog filtera"
 
-#: libbalsa/filter-file.c:440
+#: libbalsa/filter-file.c:441
 #, c-format
 msgid "Invalid filters %s for mailbox %s"
 msgstr "Neispravni filteri %s za sanduče %s"
 
-#: libbalsa/filter.c:203 libbalsa/filter.c:280
+#: libbalsa/filter.c:204 libbalsa/filter.c:281
 msgid "Unable to load message body to match filter"
 msgstr "Nisam mogao da učitam telo poruke koje odgovara filteru"
 
-#: libbalsa/filter.c:480
+#: libbalsa/filter.c:481
 #, c-format
 msgid "Invalid filter: %s"
 msgstr "Neispravan filter: %s"
 
-#: libbalsa/filter.c:594 libbalsa/filter.c:613
+#: libbalsa/filter.c:595 libbalsa/filter.c:614
 #, c-format
 msgid "Bad mailbox name for filter: %s"
 msgstr "Loš naziv sandučeta za filter: %s"
 
-#: libbalsa/filter.c:598
+#: libbalsa/filter.c:599
 msgid "Error when copying messages"
 msgstr "Greška pri kopiranju poruka."
 
-#: libbalsa/filter.c:606
+#: libbalsa/filter.c:607
 msgid "Error when trashing messages"
 msgstr "Greška pri odbacivanju poruka"
 
-#: libbalsa/filter.c:617
+#: libbalsa/filter.c:618
 msgid "Error when moving messages"
 msgstr "Greška pri premeštanju poruka"
 
@@ -255,12 +255,12 @@ msgstr "Nepoznato"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:88 src/balsa-index-threading.c:547
-#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2318
-#: src/sendmsg-window.c:2319
+#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2323
+#: src/sendmsg-window.c:2324
 msgid "Re:"
 msgstr "Odg:"
 
-#: libbalsa/identity.c:89 src/sendmsg-window.c:2348 src/sendmsg-window.c:2349
+#: libbalsa/identity.c:89 src/sendmsg-window.c:2353 src/sendmsg-window.c:2354
 msgid "Fwd:"
 msgstr "Psl:"
 
@@ -365,20 +365,16 @@ msgstr "Greška pri prikazivanju pomoći za ličnosti: %s\n"
 msgid "Manage Identities"
 msgstr "Upravljanje ličnostima"
 
-#: libbalsa/libbalsa.c:87 libmutt/mutt_socket.c:489
-msgid "unknown error"
-msgstr "nepoznata greška"
-
-#: libbalsa/libbalsa.c:397
+#: libbalsa/libbalsa.c:366
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "LDAP katalog za %s"
 
-#: libbalsa/libbalsa.c:505
+#: libbalsa/libbalsa.c:454
 msgid "<b>This certificate belongs to:</b>\n"
 msgstr "<b>Ova potvrda pripada:</b>\n"
 
-#: libbalsa/libbalsa.c:513
+#: libbalsa/libbalsa.c:462
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
@@ -386,7 +382,7 @@ msgstr ""
 "\n"
 "<b>Ovu potvrdu je izdao:</b>\n"
 
-#: libbalsa/libbalsa.c:523
+#: libbalsa/libbalsa.c:472
 #, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -399,24 +395,24 @@ msgstr ""
 "do %s\n"
 "<b>Otisak:</b> %s"
 
-#: libbalsa/libbalsa.c:533
+#: libbalsa/libbalsa.c:482
 msgid "IMAP TLS certificate"
 msgstr "IMAP TLS potvrda"
 
-#: libbalsa/libbalsa.c:535
+#: libbalsa/libbalsa.c:484
 msgid "_Accept Once"
 msgstr "_Prihvati jednom"
 
-#: libbalsa/libbalsa.c:536
+#: libbalsa/libbalsa.c:485
 msgid "Accept&_Save"
 msgstr "Prihvati i _sačuvaj"
 
-#: libbalsa/libbalsa.c:537
+#: libbalsa/libbalsa.c:486
 msgid "_Reject"
 msgstr "_Odbij"
 
 #. Non-threaded locking mechanism
-#: libbalsa/libbalsa_private.h:105 libbalsa/libbalsa_private.h:117
+#: libbalsa/libbalsa_private.h:103 libbalsa/libbalsa_private.h:115
 #, c-format
 msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
 msgstr "*** GREŠKA: Sanduče ima katanac: %s ***\n"
@@ -441,7 +437,7 @@ msgstr "Loša putanja lokalnog sandučeta „%s“"
 msgid "Could not create a mailbox of type %s"
 msgstr "Nisam mogao da stvorim sanduče vrste %s"
 
-#: libbalsa/mailbox_imap.c:655 libbalsa/mailbox_imap.c:1147
+#: libbalsa/mailbox_imap.c:656 libbalsa/mailbox_imap.c:1148
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -452,12 +448,14 @@ msgstr ""
 "ili upit nije saglasan sa IMAP-om (možda koristite regularne izraze)\n"
 "vraćam se na podrazumevani način pretrage"
 
-#: libbalsa/mailbox_imap.c:813
+#: libbalsa/mailbox_imap.c:814 libbalsa/mailbox_maildir.c:465
+#: libbalsa/mailbox_mbox.c:381 libbalsa/mailbox_mh.c:465
+#: libbalsa/mailbox_pop3.c:204
 #, c-format
-msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxImap: Otvaram %s Refbroj: %d\n"
+msgid "%s: Opening %s Refcount: %d\n"
+msgstr "%s: Otvaram %s Refbroj: %d\n"
 
-#: libbalsa/mailbox_imap.c:1014
+#: libbalsa/mailbox_imap.c:1015
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -506,20 +504,10 @@ msgstr ""
 "Nisam mogao da uklonim %s:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:465
-#, c-format
-msgid "LibBalsaMailboxMaildir: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxMaildir: Otvaram %s Refbroj: %d\n"
-
 #: libbalsa/mailbox_mbox.c:158
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "Sanduče %s ne izgleda kao sanduče vrste „Mbox“."
-
-#: libbalsa/mailbox_mbox.c:381
-#, c-format
-msgid "LibBalsaMailboxMbox: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxMbox: Otvaram %s Refbroj: %d\n"
 
 #: libbalsa/mailbox_mh.c:156
 #, c-format
@@ -535,16 +523,6 @@ msgstr "Nisam mogao da stvorim direktorijum vrste „MH“ u %s (%s)"
 #, c-format
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Nisam mogao da stvorim strukturu vrste „MH“ u %s (%s)"
-
-#: libbalsa/mailbox_mh.c:465
-#, c-format
-msgid "LibBalsaMailboxMh: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxMh: Otvaram %s Refbroj: %d\n"
-
-#: libbalsa/mailbox_pop3.c:204
-#, c-format
-msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxPop3: Otvaram %s Refbroj: %d\n"
 
 #: libbalsa/mailbox_pop3.c:256
 #, c-format
@@ -578,7 +556,7 @@ msgstr ""
 "Greška pri premeštanju poruka iz samdučeta „%s“ u „%s“\n"
 "Poruke se nalaze u sandučetu „%s“\n"
 
-#: libbalsa/message.c:480
+#: libbalsa/message.c:482
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr "Izvorno sanduče (%s) je samo za čitanje. Ne mogu da premestim poruke"
@@ -1037,7 +1015,7 @@ msgid "Connected to MTA"
 msgstr "Povezao sam se sa APP"
 
 #: libbalsa/send.c:868 src/balsa-message.c:1236 src/print.c:349
-#: src/sendmsg-window.c:669 src/sendmsg-window.c:2136 src/store-address.c:303
+#: src/sendmsg-window.c:669 src/sendmsg-window.c:2141 src/store-address.c:303
 msgid "From:"
 msgstr "Od:"
 
@@ -1046,7 +1024,7 @@ msgid "From"
 msgstr "Od"
 
 #: libbalsa/send.c:879 src/balsa-message.c:1245 src/print.c:353
-#: src/sendmsg-window.c:668 src/sendmsg-window.c:2143 src/store-address.c:304
+#: src/sendmsg-window.c:668 src/sendmsg-window.c:2148 src/store-address.c:304
 msgid "To:"
 msgstr "Kome:"
 
@@ -1708,6 +1686,10 @@ msgstr "Povezujem se sa %s..."
 msgid "Could not connect to %s (%s)."
 msgstr "Nisam mogao da se povežem sa %s (%s)."
 
+#: libmutt/mutt_socket.c:489
+msgid "unknown error"
+msgstr "nepoznata greška"
+
 #: libmutt/mutt_ssl.c:170
 msgid "Failed to find enough entropy on your system"
 msgstr "Nisam mogao da pronađem dovoljno entropije na vašem sistemu"
@@ -1837,20 +1819,20 @@ msgstr "Broj katanaca je prekoračen, da uklonim katanac za %s?"
 msgid "Can't dotlock %s.\n"
 msgstr "Ne mogu da postavim dotlock za %s.\n"
 
-#: libmutt/mx.c:189
+#: libmutt/mx.c:189 libbalsa/misc.c:1585
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "Vreme je isteklo pri pokušaju da postavim katanac vrste „fcntl“!"
 
-#: libmutt/mx.c:195
+#: libmutt/mx.c:195 libbalsa/misc.c:1591
 #, c-format
 msgid "Waiting for fcntl lock... %d"
 msgstr "Čekam na katanac vrste „fcntl“... %d"
 
-#: libmutt/mx.c:223
+#: libmutt/mx.c:223 libbalsa/misc.c:1619
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "Vreme je isteklo pri pokušaju da postavim katanac vrste  „flock“!"
 
-#: libmutt/mx.c:230
+#: libmutt/mx.c:230 libbalsa/misc.c:1626
 #, c-format
 msgid "Waiting for flock attempt... %d"
 msgstr "Čekanje na pokušaj zaključavanja vrste „flock“... %d"
@@ -2368,11 +2350,11 @@ msgstr ""
 "struktura neispravna."
 
 #: src/balsa-message.c:1228 src/print.c:338 src/sendmsg-window.c:674
-#: src/sendmsg-window.c:2131
+#: src/sendmsg-window.c:2136
 msgid "Subject:"
 msgstr "Tema:"
 
-#: src/balsa-message.c:1231 src/print.c:344 src/sendmsg-window.c:2125
+#: src/balsa-message.c:1231 src/print.c:344 src/sendmsg-window.c:2130
 msgid "Date:"
 msgstr "Datum:"
 
@@ -2382,13 +2364,13 @@ msgstr "Odgovoriti na:"
 
 #. cc:
 #: src/balsa-message.c:1246 src/print.c:354 src/sendmsg-window.c:672
-#: src/sendmsg-window.c:1850 src/sendmsg-window.c:2150 src/store-address.c:305
+#: src/sendmsg-window.c:1852 src/sendmsg-window.c:2155 src/store-address.c:305
 msgid "Cc:"
 msgstr "Kopija:"
 
 #. bcc:
 #: src/balsa-message.c:1247 src/print.c:355 src/sendmsg-window.c:671
-#: src/sendmsg-window.c:1855 src/store-address.c:306
+#: src/sendmsg-window.c:1857 src/store-address.c:306
 msgid "Bcc:"
 msgstr "Nevidljiva kopija:"
 
@@ -2708,7 +2690,7 @@ msgstr "Te_lo"
 
 #. To:
 #: src/filter-edit-callbacks.c:1006 src/main-window.c:2737
-#: src/sendmsg-window.c:1839
+#: src/sendmsg-window.c:1841
 msgid "_To:"
 msgstr "_Kome:"
 
@@ -4264,7 +4246,7 @@ msgstr "Tiha provera u pozadini (bez poruka u liniji stanja)"
 msgid "Quoted and Flowed Text"
 msgstr "Citirani i uključeni tekst"
 
-#: src/pref-manager.c:1735 src/sendmsg-window.c:3787
+#: src/pref-manager.c:1735 src/sendmsg-window.c:3792
 msgid "Quoted Text Regular Expression"
 msgstr "Regularni izraz za citirani tekst"
 
@@ -5092,7 +5074,7 @@ msgstr ""
 "Da sačuvam poruku u „Skice“?"
 
 #. Comments:
-#: src/sendmsg-window.c:673 src/sendmsg-window.c:1944
+#: src/sendmsg-window.c:673 src/sendmsg-window.c:1946
 msgid "Comments:"
 msgstr "Primedbe:"
 
@@ -5155,8 +5137,8 @@ msgstr "Datoteka %s se ne može čitati\n"
 msgid "Attach file"
 msgstr "Priloži datoteku"
 
-#: src/sendmsg-window.c:1576 src/sendmsg-window.c:1638
-#: src/sendmsg-window.c:2888
+#: src/sendmsg-window.c:1578 src/sendmsg-window.c:1640
+#: src/sendmsg-window.c:2893
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5165,68 +5147,68 @@ msgstr ""
 "Mogući razlog: nedovoljno prostora za privremeni smeštaj"
 
 #. From:
-#: src/sendmsg-window.c:1834
+#: src/sendmsg-window.c:1836
 msgid "F_rom:"
 msgstr "O_d:"
 
 #. Subject:
-#: src/sendmsg-window.c:1846
+#: src/sendmsg-window.c:1848
 msgid "S_ubject:"
 msgstr "_Tema:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: src/sendmsg-window.c:1860
+#: src/sendmsg-window.c:1862
 msgid "F_cc:"
 msgstr "U _datoteku:"
 
 #. Reply To:
-#: src/sendmsg-window.c:1890
+#: src/sendmsg-window.c:1892
 msgid "_Reply To:"
 msgstr "_Odgovor na:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1897
+#: src/sendmsg-window.c:1899
 msgid "_Attachments:"
 msgstr "_Prilozi:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1947
+#: src/sendmsg-window.c:1949
 msgid "Keywords:"
 msgstr "Ključne reči:"
 
-#: src/sendmsg-window.c:2110
+#: src/sendmsg-window.c:2115
 msgid "you"
 msgstr "vi"
 
-#: src/sendmsg-window.c:2119
+#: src/sendmsg-window.c:2124
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------prosleđena poruka od %s------\n"
 
-#: src/sendmsg-window.c:2154
+#: src/sendmsg-window.c:2159
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "IB poruke: %s\n"
 
-#: src/sendmsg-window.c:2160
+#: src/sendmsg-window.c:2165
 msgid "References:"
 msgstr "Pozivanja:"
 
-#: src/sendmsg-window.c:2170
+#: src/sendmsg-window.c:2175
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Dana %s, %s je napisao:\n"
 
-#: src/sendmsg-window.c:2172
+#: src/sendmsg-window.c:2177
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s je napisao:\n"
 
-#: src/sendmsg-window.c:3050
+#: src/sendmsg-window.c:3055
 msgid "Choose charset"
 msgstr "Izaberite skup znakova:"
 
-#: src/sendmsg-window.c:3057
+#: src/sendmsg-window.c:3062
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
@@ -5234,16 +5216,16 @@ msgstr ""
 "Ova datoteka nije kodirana u US-ASCII ili UTF-8.\n"
 "Molim izaberite skup znakova kojim je kodirana ova datoteka."
 
-#: src/sendmsg-window.c:3123
+#: src/sendmsg-window.c:3128
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Ne mogu da otvorim datoteku %s.\n"
 
-#: src/sendmsg-window.c:3145
+#: src/sendmsg-window.c:3150
 msgid "Include file"
 msgstr "Uključi datoteku"
 
-#: src/sendmsg-window.c:3442
+#: src/sendmsg-window.c:3447
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5254,7 +5236,7 @@ msgstr ""
 "Molim izaberite jezik za ovu poruku.\n"
 "Za višejezičke poruke, koristite UTF-8."
 
-#: src/sendmsg-window.c:3462
+#: src/sendmsg-window.c:3467
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5264,32 +5246,32 @@ msgstr ""
 "deo poruke se potpisuje i/ili šifruje. Ukoliko je potrebno zaštititi celu "
 "poruku, treba da izaberete režim „MIME“. Da li zaista želite da nastavim?"
 
-#: src/sendmsg-window.c:3475
+#: src/sendmsg-window.c:3480
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "šaljem poruku u režimu GPG-a %d"
 
-#: src/sendmsg-window.c:3786
+#: src/sendmsg-window.c:3791
 #, c-format
 msgid "Could not compile %s"
 msgstr "Ne mogu da prevedem %s"
 
-#: src/sendmsg-window.c:4304
+#: src/sendmsg-window.c:4309
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Odgovor za %s: %s"
 
-#: src/sendmsg-window.c:4309
+#: src/sendmsg-window.c:4314
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Prosledi poruku za %s: %s"
 
-#: src/sendmsg-window.c:4313
+#: src/sendmsg-window.c:4318
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Nastavi poruku za %s: %s"
 
-#: src/sendmsg-window.c:4317
+#: src/sendmsg-window.c:4322
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nova poruka za %s: %s"
@@ -5672,6 +5654,18 @@ msgstr "Gore"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Dole"
+
+#~ msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
+#~ msgstr "LibBalsaMailboxImap: Otvaram %s Refbroj: %d\n"
+
+#~ msgid "LibBalsaMailboxMaildir: Opening %s Refcount: %d\n"
+#~ msgstr "LibBalsaMailboxMaildir: Otvaram %s Refbroj: %d\n"
+
+#~ msgid "LibBalsaMailboxMbox: Opening %s Refcount: %d\n"
+#~ msgstr "LibBalsaMailboxMbox: Otvaram %s Refbroj: %d\n"
+
+#~ msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
+#~ msgstr "LibBalsaMailboxPop3: Otvaram %s Refbroj: %d\n"
 
 #~ msgid "gpgme could not get data from file: %s"
 #~ msgstr "gpgme nije mogao da dobavi podatke iz datoteke: %s"

@@ -1,3 +1,9 @@
+* Balsa-2.0.2 release. Release date 2002-09-15
+
+- lot of deprected coe removed.
+- internationalization problems nailed down.
+- many bug fixes and improvements ported from the main trunk.
+
 * Balsa-2.0.1 release. Release date 2002-06-10
 
 This is a second release of GNOME2 port. It shares many improvements

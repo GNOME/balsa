@@ -714,6 +714,11 @@ display_headers(BalsaMessage * bm)
 	g_free(from);
     }
 
+    if (message->reply_to) {
+	gchar *reply_to = libbalsa_address_to_gchar(message->reply_to, 0);
+	add_header_gchar(bm, "reply-to", _("Reply-To:"), reply_to);
+	g_free(reply_to);
+    }
     add_header_glist(bm, "to", _("To:"), message->to_list);
     add_header_glist(bm, "cc", _("Cc:"), message->cc_list);
     add_header_glist(bm, "bcc", _("Bcc:"), message->bcc_list);

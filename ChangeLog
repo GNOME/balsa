@@ -1,3 +1,9 @@
+2005-03-03 20:07  PeterB
+
+	* libbalsa/: mailbox_mbox.c, mailbox_mbox.h: implement
+	lbm_mbox_mime_stream_{lock,unlock}; use them to avoid interruption
+	of a sequence of GMimeStream operations.
+
 2005-03-01 09:49  PeterB
 
 	* src/sendmsg-window.c: make file choosers transient for compose

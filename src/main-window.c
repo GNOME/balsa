@@ -156,9 +156,8 @@ create_statusbar (MainWindow *mw)
   GtkWidget *statusbar = gtk_statusbar_new();
   bottom_pbar = gtk_progress_bar_new();
   gtk_box_pack_start (GTK_BOX (statusbar), bottom_pbar, FALSE, FALSE, 0);
-  gtk_statusbar_push(GTK_STATUSBAR(statusbar),1,"Something...");
   gtk_widget_show (statusbar);
-  gtk_widget_show(bottom_pbar);
+  gtk_widget_show (bottom_pbar);
   return statusbar;
 }
 

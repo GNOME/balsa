@@ -378,6 +378,10 @@ append_messages (BalsaIndex *bindex,
 
   gtk_clist_freeze (GTK_CLIST (GTK_BIN (bindex)->child));
 
+/*  gtk_widget_show(bottom_pbar);
+  gtk_signal_emit_by_name(GTK_OBJECT(bottom_pbar),"expose_event");
+ gtk_statusbar_push(GTK_STATUSBAR(statusbar),1,"Something...");*/
+
   for (i = first; i <= last; i++)
     {
       sprintf (text[1], "%d", i);
@@ -396,7 +400,7 @@ append_messages (BalsaIndex *bindex,
     }
 
   gtk_clist_thaw (GTK_CLIST (GTK_BIN (bindex)->child));
-
+/*  gtk_widget_hide(bottom_pbar);*/
   g_free (text[1]);
   g_free (text[2]);
   g_free (text[3]);

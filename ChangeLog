@@ -1,3 +1,10 @@
+2004-09-06 12:11  PeterB
+
+	* src/balsa-message.c: check mailbox only if we are displaying a
+	new part.
+	* libbalsa/mailbox_imap.c: fix from Pawel for content-type/charset
+	breakage from yesterday's commit.
+
 2004-09-05 17:13  PeterB
 
 	* libbalsa/: body.c, body.h: new methods

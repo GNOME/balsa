@@ -50,6 +50,7 @@ struct _BalsaMessage {
 	/* Widget to hold headers */
 	GtkWidget *header_text;
 	ShownHeaders shown_headers;
+	gboolean show_all_headers;
 
 	/* Widget to hold content */
 	GtkWidget *content;

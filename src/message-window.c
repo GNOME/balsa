@@ -192,8 +192,8 @@ struct _MessageWindow {
     GtkWidget *bmessage;
 
     LibBalsaMessage *message;
-    int show_all_headers_save;
     int headers_shown;
+    int show_all_headers;
 };
 
 void reset_show_all_headers(MessageWindow *mw);
@@ -373,8 +373,8 @@ message_window_new(LibBalsaMessage * message)
     mw->window = gnome_app_new("balsa", title);
     g_free(title);
 
-    mw->show_all_headers_save=-1;
     mw->headers_shown=balsa_app.shown_headers;
+    mw->show_all_headers = FALSE;
 
     model = message_window_get_toolbar_model();
     toolbar = balsa_toolbar_new(model);
@@ -733,27 +733,13 @@ show_all_headers_tool_cb(GtkWidget * widget, gpointer data)
 
     if (balsa_toolbar_get_button_active(toolbar,
                                         BALSA_PIXMAP_SHOW_HEADERS)) {
-        mw->show_all_headers_save=mw->headers_shown;
-		mw->headers_shown=HEADERS_ALL;
+        mw->show_all_headers = TRUE;
 	balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage),
 					    HEADERS_ALL);
     } else {
-        if(mw->show_all_headers_save == -1)
-            return;
-
-        switch(mw->show_all_headers_save) {
-        case HEADERS_NONE:
-            show_no_headers_cb(widget, data);
-            break;
-        case HEADERS_ALL:
-            show_all_headers_cb(widget, data);
-            break;
-        case HEADERS_SELECTED:
-        default:
-            show_selected_cb(widget, data);
-            break;
-        }
-        mw->show_all_headers_save=-1;
+        mw->show_all_headers = FALSE;
+	balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage),
+					    mw->headers_shown);
     }
 }
 
@@ -762,7 +748,7 @@ void reset_show_all_headers(MessageWindow *mw)
     GtkWidget *toolbar =
         balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
 
-    mw->show_all_headers_save = -1;
+    mw->show_all_headers = FALSE;
     balsa_toolbar_set_button_active(toolbar, BALSA_PIXMAP_SHOW_HEADERS, FALSE);
 }
 

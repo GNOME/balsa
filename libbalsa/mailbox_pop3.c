@@ -324,12 +324,14 @@ progress_cb(void* mailbox, char *msg, int prog, int tot)
 {
     int msg_type;
 
-    switch(tot) {
-    case -1: msg_type = LIBBALSA_NTFY_FINISHED; break;
-    case 0:
-    default: msg_type = LIBBALSA_NTFY_MSGINFO;  break;
+    if (tot==-1) msg_type = LIBBALSA_NTFY_FINISHED;
+    else {
+	msg_type = LIBBALSA_NTFY_MSGINFO;
+	if (tot>0)
+	    libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mailbox), 
+					     LIBBALSA_NTFY_PROGRESS, prog,
+					     tot, msg);
     }
-
     libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mailbox), 
                                      msg_type, prog, tot, msg);
 }

@@ -98,8 +98,6 @@ static void display_new_mail_notification(int);
 
 #endif
 
-static int show_all_headers_save=-1;
-
 static void balsa_window_class_init(BalsaWindowClass * klass);
 static void balsa_window_init(BalsaWindow * window);
 static void balsa_window_real_open_mbnode(BalsaWindow *window,
@@ -1546,9 +1544,6 @@ balsa_window_destroy(GtkObject * object)
     BalsaWindow *window;
 
     window = BALSA_WINDOW(object);
-
-    if(show_all_headers_save != -1)
-        balsa_app.shown_headers=show_all_headers_save;
 
     balsa_window_idle_remove(window);
 
@@ -3549,31 +3544,18 @@ show_all_headers_tool_cb(GtkWidget * widget, gpointer data)
     GtkWidget *toolbar = balsa_toolbar_get_from_gnome_app(GNOME_APP(data));
     BalsaWindow *bw;
 
+    bw = BALSA_WINDOW(data);
     if (balsa_toolbar_get_button_active(toolbar,
                                         BALSA_PIXMAP_SHOW_HEADERS)) {
-        show_all_headers_save=balsa_app.shown_headers;
-        balsa_app.shown_headers=HEADERS_ALL;
-        bw = BALSA_WINDOW(data);
+        balsa_app.show_all_headers = TRUE;
         if (bw->preview)
             balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
                                                 HEADERS_ALL);
     } else {
-        if(show_all_headers_save == -1)
-            return;
-
-        switch(show_all_headers_save) {
-        case HEADERS_NONE:
-            show_no_headers_cb(NULL, data);
-            break;
-        case HEADERS_ALL:
-            show_all_headers_cb(NULL, data);
-            break;
-        case HEADERS_SELECTED:
-        default:
-            show_selected_cb(NULL, data);
-            break;
-        }
-        show_all_headers_save=-1;
+        balsa_app.show_all_headers = FALSE;
+        if (bw->preview)
+            balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
+                                                balsa_app.shown_headers);
     }
 }
 
@@ -3583,7 +3565,7 @@ reset_show_all_headers(void)
     GtkWidget *toolbar =
         balsa_toolbar_get_from_gnome_app(GNOME_APP(balsa_app.main_window));
 
-    show_all_headers_save=-1;
+    balsa_app.show_all_headers = FALSE;
     balsa_toolbar_set_button_active(toolbar, BALSA_PIXMAP_SHOW_HEADERS,
                                     FALSE);
 }

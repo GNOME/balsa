@@ -268,6 +268,7 @@ extern struct BalsaApplication {
     gboolean browse_wrap;
     gint browse_wrap_length;
     ShownHeaders shown_headers;
+    gboolean show_all_headers;
     gchar *selected_headers;
     gchar *message_title_format;
     LibBalsaMailboxThreadingType threading_type;

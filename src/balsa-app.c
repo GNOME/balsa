@@ -331,6 +331,7 @@ balsa_app_init(void)
     balsa_app.browse_wrap = TRUE;
     balsa_app.browse_wrap_length = 79;
     balsa_app.shown_headers = HEADERS_SELECTED;
+    balsa_app.show_all_headers = FALSE;
     balsa_app.selected_headers = g_strdup(DEFAULT_SELECTED_HDRS);
     balsa_app.threading_type = LB_MAILBOX_THREADING_JWZ;
     balsa_app.expand_tree = FALSE;

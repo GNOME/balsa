@@ -257,7 +257,11 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
     mailbox->open_ref++;
     UNLOCK_MAILBOX(mailbox);
     libbalsa_mailbox_load_messages(mailbox);
-    
+
+    /* We run the filters here also because new could have been put
+       in the mailbox with another mechanism than Balsa */
+    run_filters_on_reception(mailbox);
+
     /* increment the reference count */
 #ifdef DEBUG
     g_print(_("LibBalsaMailboxLocal: Opening %s Refcount: %d\n"),

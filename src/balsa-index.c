@@ -357,6 +357,8 @@ bndx_instance_init(BalsaIndex * index)
     column = 
         gtk_tree_view_column_new_with_attributes(_("From"), renderer,
                                                  "text", BNDX_FROM_COLUMN,
+						 "weight",
+						 BNDX_WEIGHT_COLUMN,
                                                  NULL);
     gtk_tree_view_column_set_alignment(column, 0.5);
     gtk_tree_view_column_set_resizable(column, TRUE);
@@ -393,6 +395,7 @@ bndx_instance_init(BalsaIndex * index)
     column = 
         gtk_tree_view_column_new_with_attributes(_("Date"), renderer,
                                                  "text", BNDX_DATE_COLUMN,
+						 "weight",BNDX_WEIGHT_COLUMN,
                                                  NULL);
     gtk_tree_view_column_set_alignment(column, 0.5);
     gtk_tree_view_column_set_resizable(column, TRUE);
@@ -411,6 +414,7 @@ bndx_instance_init(BalsaIndex * index)
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes(column, renderer,
                                         "text", BNDX_SIZE_COLUMN,
+					"weight",BNDX_WEIGHT_COLUMN,
                                         NULL);
     gtk_tree_view_column_set_sort_column_id(column,
                                             BNDX_TREE_COLUMN_SIZE);
@@ -1238,8 +1242,7 @@ bndx_set_col_images(BalsaIndex * index, GtkTreeIter * iter,
     } flags[] = {
         { LIBBALSA_MESSAGE_FLAG_DELETED, BALSA_PIXMAP_TRASH   },
         { LIBBALSA_MESSAGE_FLAG_FLAGGED, BALSA_PIXMAP_INFO_FLAGGED },
-        { LIBBALSA_MESSAGE_FLAG_REPLIED, BALSA_PIXMAP_INFO_REPLIED },
-        { LIBBALSA_MESSAGE_FLAG_NEW,     BALSA_PIXMAP_INFO_NEW } };
+        { LIBBALSA_MESSAGE_FLAG_REPLIED, BALSA_PIXMAP_INFO_REPLIED }};
 
     for (tmp = 0; tmp < ELEMENTS(flags)
          && !LIBBALSA_MESSAGE_HAS_FLAG(message, flags[tmp].mask);
@@ -1265,7 +1268,12 @@ bndx_set_col_images(BalsaIndex * index, GtkTreeIter * iter,
     gtk_tree_store_set(GTK_TREE_STORE(model), iter,
                        BNDX_STATUS_COLUMN, status_pixbuf,
                        BNDX_ATTACH_COLUMN, attach_pixbuf,
+		       BNDX_WEIGHT_COLUMN,
+		       LIBBALSA_MESSAGE_HAS_FLAG(message,
+						 LIBBALSA_MESSAGE_FLAG_NEW) ?
+		       PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL,
                        -1);
+	
 }
 
 static gboolean
@@ -1307,12 +1315,10 @@ bndx_set_style_func(GtkTreeModel * model, GtkTreePath * path,
         && thread_has_unread(index, iter)) {
         gtk_tree_store_set(store, iter,
                            BNDX_COLOR_COLUMN, &balsa_app.mblist_unread_color,
-                           BNDX_WEIGHT_COLUMN, PANGO_WEIGHT_BOLD,
                            -1);
     } else
         gtk_tree_store_set(store, iter,
                            BNDX_COLOR_COLUMN, NULL,
-                           BNDX_WEIGHT_COLUMN, PANGO_WEIGHT_NORMAL,
                            -1);
 
     return FALSE;

@@ -1,3 +1,14 @@
+2003-02-28  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/libbalsa.c: recignize 8-bit charsets before euc-xx etc.
+	* libbalsa/mailbox_pop3.c: partially fix progress dialog (Emmanuel).
+	* libbalsa/mailbox_local.c: run filters on reception (Emmanuel).
+	* src/balsa-{app,message}.[hc]:
+	* src/{main,message}-window.c:
+	* src/print.c: fix Show all toolbar button (Steve Wall)
+	* src/balsa-index.c: use bold font to mark unseen messages.
+	* src/mailbox-conf.c: fix bug 107299.
+
 2003-02-28 15:21  PeterB
 
 	* src/balsa-message.c: Fix header indents.

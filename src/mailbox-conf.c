@@ -907,10 +907,6 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
     gnome_file_entry_set_default_path(GNOME_FILE_ENTRY(file),
                                       balsa_app.local_mail_directory);
 
-    g_signal_connect_swapped(G_OBJECT(mcw->mb_data.local.path),
-                             "activate",
-                             G_CALLBACK(gtk_window_activate_default),
-                             mcw->window);
     g_signal_connect(G_OBJECT(mcw->mb_data.local.path), "changed",
 		     G_CALLBACK(check_for_blank_fields), mcw);
 

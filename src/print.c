@@ -278,10 +278,10 @@ print_header_string(GList **header_list, const gchar *field_id,
 {
     gchar **hdr_pair;
 
-    if (!value ||
-	balsa_app.shown_headers == HEADERS_NONE ||
-	!(balsa_app.shown_headers == HEADERS_ALL || 
-	  libbalsa_find_word(field_id, balsa_app.selected_headers)))
+    if (!value || balsa_app.shown_headers == HEADERS_NONE ||
+	 !(balsa_app.show_all_headers ||
+	   balsa_app.shown_headers == HEADERS_ALL ||
+	   libbalsa_find_word(field_id, balsa_app.selected_headers)))
 	return;
 
     hdr_pair = g_new0(gchar *, 3);
@@ -296,10 +296,10 @@ print_header_list(GList **header_list, const gchar *field_id,
 {
     gchar **hdr_pair;
 
-    if (!values ||
-	balsa_app.shown_headers == HEADERS_NONE ||
-	!(balsa_app.shown_headers == HEADERS_ALL || 
-	  libbalsa_find_word(field_id, balsa_app.selected_headers)))
+    if (!values || balsa_app.shown_headers == HEADERS_NONE ||
+	 !(balsa_app.show_all_headers ||
+	   balsa_app.shown_headers == HEADERS_ALL ||
+	   libbalsa_find_word(field_id, balsa_app.selected_headers)))
 	return;
 
     hdr_pair = g_new0(gchar *, 3);

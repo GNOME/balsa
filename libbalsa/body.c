@@ -373,7 +373,11 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
     gchar *mime_type = NULL;
     const gchar *charset;
 
-    if (libbalsa_mailbox_get_message_part(body->message, body)) {
+    g_return_val_if_fail(body != NULL, NULL);
+    g_return_val_if_fail(body->message != NULL, NULL);
+
+    if (body->message->mailbox
+	&& libbalsa_mailbox_get_message_part(body->message, body)) {
         GMimeDataWrapper *wrapper;
 
         wrapper =
@@ -434,6 +438,10 @@ libbalsa_message_body_get_content(LibBalsaMessageBody * body, gchar ** buf)
     GMimeStream *stream, *stream_mem;
     GByteArray *array;
     gssize len;
+
+    g_return_val_if_fail(body != NULL, -1);
+    g_return_val_if_fail(body->message != NULL, -1);
+    g_return_val_if_fail(buf != NULL, -1);
 
     *buf = NULL;
     stream = libbalsa_message_body_get_stream(body);

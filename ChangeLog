@@ -1,3 +1,9 @@
+2005-02-16 20:20  Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* libbalsa/misc.c, libbalsa/misc.h, src/balsa-message.c,
+	src/sendmsg-window.c: implement libbalsa_ia_rfc2821_equal and use
+	it to exclude self from cc list.
+
 2005-02-16 09:13  PeterB
 
 	* src/mailbox-conf.c: manage sensitivity of the OK/Update button.

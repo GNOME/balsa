@@ -827,6 +827,7 @@ typedef enum _rfc_extbody_t {
     RFC2046_EXTBODY_TFTP,
     RFC2046_EXTBODY_LOCALFILE,
     RFC2046_EXTBODY_MAILSERVER,
+    RFC2017_EXTBODY_URL,
     RFC2046_EXTBODY_UNKNOWN
 } rfc_extbody_t;
 
@@ -841,6 +842,7 @@ static rfc_extbody_id rfc_extbodys[] = {
     { "tftp",        RFC2046_EXTBODY_TFTP},
     { "local-file",  RFC2046_EXTBODY_LOCALFILE},
     { "mail-server", RFC2046_EXTBODY_MAILSERVER},
+    { "URL",         RFC2017_EXTBODY_URL}, 
     { NULL,          RFC2046_EXTBODY_UNKNOWN}};
 
 static void
@@ -868,7 +870,19 @@ part_info_init_message_extbody_url(BalsaMessage * bm, BalsaPartInfo * info,
 	g_string_sprintfa(msg, _("Access type: local-file\n"));
 	g_string_sprintfa(msg, _("File name: %s"), local_name);
 	g_free(local_name);
-    } else {
+    } else if (url_type == RFC2017_EXTBODY_URL) {
+	gchar *local_name;
+
+	local_name = 
+	    libbalsa_message_body_get_parameter(info->body, "name");
+
+	url = g_strdup(local_name+5);
+	url[strlen(url)-1] = '\0';
+	msg = g_string_new(_("Content Type: external-body\n"));
+	g_string_sprintfa(msg, _("Access type: URL\n"));
+	g_string_sprintfa(msg, _("URL: %s"), url);
+	g_free(local_name);
+    } else { /* *FTP* */
 	gchar *ftp_dir, *ftp_name, *ftp_site;
 	    
 	ftp_dir = 
@@ -993,6 +1007,7 @@ part_info_init_message(BalsaMessage * bm, BalsaPartInfo * info)
 	case RFC2046_EXTBODY_ANONFTP:
 	case RFC2046_EXTBODY_TFTP:
 	case RFC2046_EXTBODY_LOCALFILE:
+	case RFC2017_EXTBODY_URL:
 	    part_info_init_message_extbody_url(bm, info, extbody_type->action);
 	    break;
 	case RFC2046_EXTBODY_MAILSERVER:

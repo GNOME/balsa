@@ -278,7 +278,10 @@ add_mutt_body_as_extbody(const gchar *filename, const gchar *mime_type)
 
     body->encoding = ENC7BIT;
 
-    mutt_set_parameter("access-type", "local-file", &body->parameter);
+    if(!strncmp( filename, "URL", 3 ))
+	mutt_set_parameter("access-type","URL", &body->parameter);
+    else
+	mutt_set_parameter("access-type", "local-file", &body->parameter);
     mutt_set_parameter("name", filename, &body->parameter);
     mutt_mktemp(buffer);
     body->filename = g_strdup(buffer);

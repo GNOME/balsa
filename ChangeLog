@@ -1,3 +1,11 @@
+2001-10-15  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/balsa-message.c: 
+	* src/sendmsg-window.c: 
+	* libbalsa/send.c: 
+	support for sending and receving ext-body/URL + dnd of mozilla
+	urls
+
 2001-10-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/save-restore.c: handle corrupted toolbar configuration.

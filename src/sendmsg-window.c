@@ -129,11 +129,14 @@ enum {
     TARGET_MESSAGES,
     TARGET_URI_LIST,
     TARGET_EMAIL,
+    TARGET_STRING
 };
 
 static GtkTargetEntry drop_types[] = {
     {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES},
-    {"text/uri-list", 0, TARGET_URI_LIST}
+    {"text/uri-list", 0, TARGET_URI_LIST},
+    { "STRING",     0, TARGET_STRING },
+    { "text/plain", 0, TARGET_STRING },
 };
 
 static GtkTargetEntry email_field_drop_types[] = {
@@ -697,6 +700,7 @@ remove_attachment(GtkWidget * widget, GnomeIconList * ilist)
     gtk_object_remove_data(GTK_OBJECT(ilist), "selectednumbertoremove");
 }
 
+
 /* ask if an attachment shall be message/external-body */
 static void
 extbody_dialog_delete(GtkWidget *dialog, GdkEvent *event, 
@@ -723,6 +727,33 @@ no_change_to_extbody(GtkWidget *widget, gpointer user_data)
 }
 
 
+static void
+add_extbody_attachment(GnomeIconList *ilist, 
+		       const gchar *name, const gchar *mime_type,
+		       gboolean delete_on_destroy) {
+    gchar *pix;
+    gchar *label;
+    attachment_t *attach;
+    gint pos;
+
+    g_return_if_fail(name != NULL); 
+    
+    attach = g_malloc(sizeof(attachment_t));
+    attach->filename = g_strdup_printf("URL=\"%s\"",name);
+    attach->force_mime_type = mime_type != NULL ? g_strdup(mime_type) : NULL;
+    attach->delete_on_destroy = delete_on_destroy;
+    attach->as_extbody = TRUE;
+
+    pix = libbalsa_icon_finder("message/external-body", attach->filename);
+    label = g_strdup_printf ("%s (%s)", attach->filename, 
+			     "message/external-body");
+    pos = gnome_icon_list_append(ilist, pix, label);
+    gnome_icon_list_set_icon_data_full(ilist, pos, attach, destroy_attachment);
+    g_free(pix);
+    g_free(label);
+}
+
+
 /* send attachment as external body - right mouse button callback */
 static void
 extbody_attachment(GtkWidget * widget, gpointer user_data)
@@ -730,8 +761,7 @@ extbody_attachment(GtkWidget * widget, gpointer user_data)
     GtkWidget *dialog = GTK_WIDGET(user_data);
     GnomeIconList *ilist;
     gint num;
-    attachment_t *attach, *oldattach;
-    gchar *pix, *label;
+    attachment_t *oldattach;
 
     ilist = 
 	GNOME_ICON_LIST(gtk_object_get_user_data (GTK_OBJECT (dialog)));
@@ -746,25 +776,14 @@ extbody_attachment(GtkWidget * widget, gpointer user_data)
 
     /* remove the selected element and replace it */
     gnome_icon_list_freeze(ilist);
-    attach = g_malloc(sizeof(attachment_t));
-    attach->filename = oldattach->filename ? 
-	g_strdup(oldattach->filename) : NULL;
-    attach->force_mime_type = oldattach->force_mime_type ? 
-	g_strdup(attach->force_mime_type) : NULL;
-    attach->delete_on_destroy = oldattach->delete_on_destroy;
-    attach->as_extbody = TRUE;
+    add_extbody_attachment(ilist, oldattach->filename, 
+			   oldattach->force_mime_type, 
+			   oldattach->delete_on_destroy );
     gnome_icon_list_remove(ilist, num);
-    
-    /* as this worked before, don't do too much (== any) error checking... */
-    pix = libbalsa_icon_finder("message/external-body", attach->filename);
-    label = g_strdup_printf ("%s (%s)", g_basename(attach->filename), 
-			     "message/external-body");
-    gnome_icon_list_insert(ilist, num, pix, label);
-    gnome_icon_list_set_icon_data_full(ilist, num, attach, destroy_attachment);
-    g_free(label);
-    g_free(pix);
     gnome_icon_list_thaw(ilist);
+    
 }
+
 
 static void
 show_extbody_dialog(GtkWidget *widget, GnomeIconList *ilist)
@@ -1243,23 +1262,26 @@ attachments_add(GtkWidget * widget,
                                      _("Attaching message failed.\n"
                                        "Possible reason: not enough temporary space"));
         }
-    } else { /* ??? if (info == TARGET_URI_LIST) */
-    GList *names, *l;
-
-    names = gnome_uri_list_extract_filenames(selection_data->data);
-
-    for (l = names; l; l = l->next)
-	add_attachment(GNOME_ICON_LIST(bsmsg->attachments[1]),
-		       g_strdup((char *) l->data), FALSE, NULL);
-
-    gnome_uri_list_free_strings(names);
-
-    /* show attachment list */
-    bsmsg->update_config = FALSE;
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
-	bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
-    bsmsg->update_config = TRUE;
-    }
+    } else if (info == TARGET_URI_LIST) {
+	GList *names, *l;
+	
+	names = gnome_uri_list_extract_filenames(selection_data->data);
+	
+	for (l = names; l; l = l->next)
+	    add_attachment(GNOME_ICON_LIST(bsmsg->attachments[1]),
+			   g_strdup((char *) l->data), FALSE, NULL);
+	
+	gnome_uri_list_free_strings(names);
+	
+	/* show attachment list */
+	bsmsg->update_config = FALSE;
+	gtk_check_menu_item_set_active(
+				       GTK_CHECK_MENU_ITEM(bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
+	bsmsg->update_config = TRUE;
+    } else if( info == TARGET_STRING) {
+	add_extbody_attachment( GNOME_ICON_LIST(bsmsg->attachments[1]),
+				selection_data->data, "text/html", FALSE );
+    }	
 }
 
 /* to_add - e-mail (To, From, Cc, Bcc) field D&D callback */

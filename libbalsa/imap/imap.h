@@ -82,7 +82,7 @@ ImapAddress *imap_address_new(gchar *name, gchar *addr_spec);
 void imap_address_free(ImapAddress* addr);
 
 typedef struct ImapEnvelope_ {
-  ImapDate date;
+  ImapDate date;  /* as in the message header */
   gchar *subject; /* mime encoded, 7-bit subject as fetched from server */
   ImapAddress *from;
   ImapAddress *sender;
@@ -125,7 +125,7 @@ typedef struct ImapMessage_ {
   ImapMsgFlags flags;
   ImapEnvelope *envelope;
   ImapBody     *body;
-  ImapDate     internal_date;
+  ImapDate     internal_date; /* delivery date */
   int rfc822size;
   /* rfc822, rfc822.header, rfc822.text, body, body structure, body
      section have yet to be implemented. Currently, they will be ignored.

@@ -1,3 +1,11 @@
+2003-09-30  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/mailbox.c: part I of workaround for Gtk2 fetching
+	invisible cells.
+	* src/balsa-index.c: part II (set "tree-view" data).
+	* libbalsa/mailbox_imap.c: remove debugging output.
+	* libbalsa/imap/imap-handle.[ch]: parse date.
+	
 2003-09-29  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/mailbox.[ch]: add set_threading virtual function.

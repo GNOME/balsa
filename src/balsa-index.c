@@ -2795,7 +2795,11 @@ bndx_set_tree_store(BalsaIndex * index)
     g_return_if_fail(index->mailbox_node->mailbox);
     gtk_tree_view_set_model(tree_view,
                             GTK_TREE_MODEL(index->mailbox_node->mailbox));
-
+#ifndef GTK2_FETCHES_ONLY_VISIBLE_CELLS
+    g_object_set_data(G_OBJECT(index->mailbox_node->mailbox), "tree-view",
+		      tree_view);
+#endif
+		      
 #if 0
     we do not implement sortable yet.
     gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(tree_store),

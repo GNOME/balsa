@@ -1393,7 +1393,6 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     msg_info = message_info_from_msgno(mimap, msgno);
 
-    printf("msgno=%u msg_info=%p\n", msgno, msg_info);
     if (!msg_info) {
 	printf("%s returns NULL\n", __func__);
 	return NULL;
@@ -1520,6 +1519,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     envelope = msg_info->msg->envelope;
     message->subj = g_mime_utils_8bit_header_decode(envelope->subject);
     message->headers->date = envelope->date;
+    message->length        = msg_info->msg->rfc822size;
     message->headers->from =
 	libbalsa_address_new_from_imap_address(envelope->from);
     message->sender =

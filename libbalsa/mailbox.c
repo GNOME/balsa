@@ -1111,7 +1111,28 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 		     column < (int) ELEMENTS(mbox_model_col_type));
  
     msgno = GPOINTER_TO_UINT( ((GNode*)iter->user_data)->data );
+#ifdef GTK2_FETCHES_ONLY_VISIBLE_CELLS
     msg = libbalsa_mailbox_get_message(lmm, msgno);
+#else 
+    { GdkRectangle a, b, c, d; 
+    /* assumed that only one view is showing the mailbox */
+    GtkTreeView *tree = g_object_get_data(G_OBJECT(tree_model), "tree-view");
+    GtkTreePath *path = gtk_tree_model_get_path(tree_model, iter);
+    GtkTreeViewColumn *col = gtk_tree_view_get_column(tree, column);
+    gtk_tree_view_get_visible_rect(tree, &a);
+    gtk_tree_view_get_cell_area(tree, path, col, &b);
+    gtk_tree_view_widget_to_tree_coords(tree, b.x, b.y, &c.x, &c.y);
+    gtk_tree_view_widget_to_tree_coords(tree, b.x+b.width, b.y+b.height, 
+					&c.width, &c.height);
+    c.width -= c.x; c.height -= c.y;
+    if(gdk_rectangle_intersect(&a, &c, &d)) 
+	msg = libbalsa_mailbox_get_message(lmm, msgno);
+    else { 
+	msg = NULL; 
+    }
+    gtk_tree_path_free(path);
+    }
+#endif
     g_value_init (value, mbox_model_col_type[column]);
     switch(column) {
     case LB_MBOX_MSGNO_COL:
@@ -1139,7 +1160,10 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 	} else g_value_set_string(value, "unknown");
 	break;
     case LB_MBOX_SIZE_COL:
-	g_value_set_string(value, "unknown");
+	if(msg) {
+	    tmp = libbalsa_message_size_to_gchar(msg, FALSE);
+	    g_value_set_string_take_ownership(value, tmp);
+	} else g_value_set_string(value, "unknown");
 	break;
     case LB_MBOX_MESSAGE_COL:
 	g_value_set_pointer(value, msg); break;

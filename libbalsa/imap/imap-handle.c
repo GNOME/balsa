@@ -19,6 +19,8 @@
 #include <strings.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <gmime/gmime-utils.h>
+
 #include "libimap-marshal.h"
 #include "imap-auth.h"
 #include "imap-handle.h"
@@ -1428,8 +1430,10 @@ ir_envelope(struct siobuf *sio, ImapEnvelope *env)
 
   if( (c=sio_getc(sio)) != '(') return IMR_PROTOCOL;
   date = imap_get_nstring(sio);
-  if(date) g_free(date);
-  if(env) env->date = 0;
+  if(date) {
+    env->date = g_mime_utils_header_decode_date(date, NULL);
+    g_free(date);
+  }
   if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
   str = imap_get_nstring(sio);
   if(env) env->subject = str; else g_free(str);

@@ -142,7 +142,7 @@ msgid ""
 "reporting bugs."
 msgstr ""
 "Izgleda da poganjate Baslo prviè. Sledeèi koraki bodo nastavili\n"
-"Balso z spra¹evanjem enostavnih vpra¹anj. Ko boste konèali te\n"
+"Balso s spra¹evanjem enostavnih vpra¹anj. Ko boste konèali te\n"
 "korake, jih lahko vedno spremenite kasneje v nastavitvah Balse\n"
 "Èe je potrebno ustvariti kakr¹nekoli imenike ali datoteke,\n"
 "bo to storjeno samodejno. Prosim poglejte v \"O Balsi\" v glavnem\n"
@@ -327,7 +327,7 @@ msgstr ""
 
 #: src/balsa-index-page.c:1148
 msgid "Card Name:"
-msgstr "Ime Kartice"
+msgstr "Ime Kartice:"
 
 #: src/balsa-index-page.c:1148
 msgid "First Name:"
@@ -702,11 +702,11 @@ msgstr "Posodobi"
 
 #: src/mailbox-conf.c:436 src/mailbox-conf.c:442 src/mailbox-conf.c:466
 msgid "You need to fill in the Mailbox Name field."
-msgstr "Vpisati morate Ime Predala"
+msgstr "Vpisati morate Ime predala."
 
 #: src/mailbox-conf.c:445
 msgid "You need to fill in the folderpath field."
-msgstr "Vpisati morate imenik mape."
+msgstr "Vpisati morate Imenik mape."
 
 #: src/mailbox-conf.c:447
 msgid "You need to fill in the IMAP Server field"
@@ -726,19 +726,19 @@ msgstr "Vpisati morate vrata"
 
 #: src/mailbox-conf.c:470
 msgid "You need to fill in the user field."
-msgstr "Vpisati morate polje uporabnik"
+msgstr "Vpisati morate polje uporabnik."
 
 #: src/mailbox-conf.c:474
 msgid "You need to fill in the password field."
-msgstr "Vpisati morate geslo"
+msgstr "Vpisati morate geslo."
 
 #: src/mailbox-conf.c:478
 msgid "You need to fill in the server field."
-msgstr "Vpisati morate stre¾nik"
+msgstr "Vpisati morate stre¾nik."
 
 #: src/mailbox-conf.c:482
 msgid "You need to fill in the port field."
-msgstr "Vpisati morate vrata"
+msgstr "Vpisati morate vrata."
 
 #: src/mailbox-conf.c:486
 msgid "Some of the fields are blank."
@@ -1096,7 +1096,7 @@ msgstr ""
 msgid ""
 "In order to store an address, you must open a mailbox and select a message.\n"
 msgstr ""
-"Èe ¾elite shraniti naslov, morate odpreti predal in izbrati sporoèilo\n"
+"Èe ¾elite shraniti naslov, morate odpreti predal in izbrati sporoèilo.\n"
 
 #: src/main.c:78
 msgid "Get new mail on startup"

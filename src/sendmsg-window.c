@@ -24,6 +24,12 @@
 #include <gnome.h>
 #include <ctype.h>
 
+#include <sys/stat.h>	/* for check_if_regular_file() */
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#include <errno.h>
+
 #include "balsa-app.h"
 #include "balsa-message.h"
 #include "balsa-index.h"
@@ -160,6 +166,29 @@ add_attachment (GnomeIconList * iconlist, char *filename)
   gnome_icon_list_set_icon_data (iconlist, pos, filename);
 }
 
+static gint
+check_if_regular_file (gchar *filename)
+{
+  struct stat s;
+  GtkWidget *msgbox;
+  gchar *ptr = 0;
+  gint result = TRUE;
+  if (stat (filename, &s)) {
+    ptr = g_strdup_printf (_ ("Cannot get info on file '%s': %s\n"), filename, strerror (errno));
+    result = FALSE;
+  } else if (!S_ISREG (s.st_mode)) {
+    ptr = g_strdup_printf (_ ("Attachment is not a regular file: '%s'\n"), filename);
+    result = FALSE;
+  }
+  if (ptr) {
+    msgbox = gnome_message_box_new (ptr, GNOME_MESSAGE_BOX_ERROR, _ ("Cancel"), NULL);
+    gtk_window_set_modal (GTK_WINDOW (msgbox), TRUE);
+    gnome_dialog_run (GNOME_DIALOG (msgbox));
+    free (ptr);
+  }
+  return result;
+}
+
 static void
 attach_dialog_ok (GtkWidget * widget, gpointer data)
 {
@@ -171,8 +200,8 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
   iconlist = GNOME_ICON_LIST (gtk_object_get_user_data (GTK_OBJECT (fs)));
 
   filename = g_strdup (gtk_file_selection_get_filename (fs));
-
-  add_attachment (iconlist, filename);
+  if (check_if_regular_file (filename))
+    add_attachment (iconlist, filename);
 
   /* FIXME */
   /* g_free(filename); */

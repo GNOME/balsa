@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 2000-11-14 13:46+0300\n"
-"PO-Revision-Date: 2000-11-14 13:53+03:00\n"
+"POT-Creation-Date: 2000-11-17 17:20+0300\n"
+"PO-Revision-Date: 2000-11-17 17:23+03:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -73,17 +73,17 @@ msgstr "Нет адресной книги такого типа: %s"
 msgid "Could not create a address book of type %s"
 msgstr "Невозможно создать адресную книгу типа %s"
 
-#: libbalsa/mailbox.c:275
+#: libbalsa/mailbox.c:297
 #, c-format
 msgid "Cannot load mailbox %s"
 msgstr "Невозможно загрузить почтовый ящик %s"
 
-#: libbalsa/mailbox.c:282
+#: libbalsa/mailbox.c:304
 #, c-format
 msgid "No such mailbox type: %s"
 msgstr "Нет такого типа нового почтового ящика: %s"
 
-#: libbalsa/mailbox.c:290
+#: libbalsa/mailbox.c:312
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr "Невозможно создать почтовый ящик типа %s"
@@ -103,7 +103,7 @@ msgstr "LibBalsaMailboxLocal: Открыто %s Число ссылок: %d\n"
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: Открыто %s Число ссылок: %d\n"
 
-#: libbalsa/mailbox_pop3.c:249
+#: libbalsa/mailbox_pop3.c:248
 #, c-format
 msgid ""
 "POP3 mailbox %s accessing error:\n"
@@ -148,12 +148,30 @@ msgstr "Соединение отброшено"
 msgid "Authentication failed"
 msgstr "Сбой идентификации"
 
-#: libbalsa/send.c:773
+#: libbalsa/pop3.c:323
+#, c-format
+msgid "Retrieving Message %d of %d"
+msgstr "Получение сообщения %d из %d"
+
+#: libbalsa/pop3.c:336
+#, c-format
+msgid "Received %d bytes of %d"
+msgstr "Получено %d байт из %d"
+
+#: libbalsa/send.c:381 libbalsa/send.c:385
+msgid ""
+"SMTP protocol error. Cannot relay.\n"
+"Your message is left in Outbox."
+msgstr ""
+"Ошибка протокола SMTP. Доставка невозможна.\n"
+"Ваше сообщение осталось в \"Исходящих\". "
+
+#: libbalsa/send.c:776
 #, c-format
 msgid "Could not find address for host %s."
 msgstr "Не удалось найти адрес для хоста %s."
 
-#: libbalsa/send.c:779
+#: libbalsa/send.c:782
 #, c-format
 msgid "Error: Could not find address for host %s."
 msgstr "Ошибка: Не удалось найти адрес для хоста %s."
@@ -743,58 +761,58 @@ msgstr ""
 "Невозможно открыть почтовый ящик!\n"
 "Проверьте его настройки."
 
-#: src/balsa-index-page.c:524
+#: src/balsa-index-page.c:525
 msgid "Reply..."
 msgstr "Ответить..."
 
-#: src/balsa-index-page.c:528
+#: src/balsa-index-page.c:529
 msgid "Reply To All..."
 msgstr "Ответить всем..."
 
-#: src/balsa-index-page.c:532
+#: src/balsa-index-page.c:533
 msgid "Forward..."
 msgstr "Переслать..."
 
-#: src/balsa-index-page.c:537
+#: src/balsa-index-page.c:538
 msgid "Undelete"
 msgstr "Восстановить"
 
-#: src/balsa-index-page.c:540 src/filter-edit-dialog.c:224
+#: src/balsa-index-page.c:541 src/filter-edit-dialog.c:224
 #: src/main-window.c:441 src/mblist-window.c:475 src/pref-manager.c:1160
 #: src/pref-manager.c:1881
 msgid "Delete"
 msgstr "Удалить"
 
-#: src/balsa-index-page.c:544
+#: src/balsa-index-page.c:545
 msgid "Move To Trash"
 msgstr "Отправить в корзину"
 
-#: src/balsa-index-page.c:549
+#: src/balsa-index-page.c:550
 msgid "Store Address..."
 msgstr "Сохранить адрес..."
 
-#: src/balsa-index-page.c:552
+#: src/balsa-index-page.c:553
 msgid "Toggle Flagged"
 msgstr "Переключить сигнализируемое"
 
-#: src/balsa-index-page.c:555
+#: src/balsa-index-page.c:556
 msgid "Transfer"
 msgstr "Передать"
 
 #. FIXME:
-#: src/balsa-index.c:296
+#: src/balsa-index.c:302
 msgid "From"
 msgstr "Отправитель"
 
-#: src/balsa-index.c:297 src/filter-edit-dialog.c:326
+#: src/balsa-index.c:303 src/filter-edit-dialog.c:326
 msgid "Subject"
 msgstr "Тема"
 
-#: src/balsa-index.c:298
+#: src/balsa-index.c:304
 msgid "Date"
 msgstr "Дата"
 
-#: src/balsa-index.c:417
+#: src/balsa-index.c:423
 msgid "To"
 msgstr "Кому"
 
@@ -824,8 +842,8 @@ msgstr "Сохранить MIME-закодированную часть"
 msgid "Save"
 msgstr "Сохранить"
 
-#: src/balsa-message.c:288 src/sendmsg-window.c:156 src/sendmsg-window.c:642
-#: src/sendmsg-window.c:1756 src/sendmsg-window.c:1779
+#: src/balsa-message.c:288 src/sendmsg-window.c:156 src/sendmsg-window.c:628
+#: src/sendmsg-window.c:1757 src/sendmsg-window.c:1780
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -839,7 +857,7 @@ msgid " Could not save %s:%s "
 msgstr "Невозможно сохранить %s:%s "
 
 #. Subject:
-#: src/balsa-message.c:625 src/print.c:358 src/sendmsg-window.c:884
+#: src/balsa-message.c:625 src/print.c:358 src/sendmsg-window.c:883
 msgid "Subject:"
 msgstr "Тема:"
 
@@ -849,13 +867,13 @@ msgstr "Дата:"
 
 #. From:
 #: src/balsa-message.c:633 src/filter-edit-dialog.c:316 src/print.c:348
-#: src/sendmsg-window.c:875
+#: src/sendmsg-window.c:874
 msgid "From:"
 msgstr "От:"
 
 #. To:
 #: src/balsa-message.c:637 src/filter-edit-dialog.c:306 src/print.c:353
-#: src/sendmsg-window.c:878
+#: src/sendmsg-window.c:877
 msgid "To:"
 msgstr "Кому:"
 
@@ -1009,7 +1027,7 @@ msgstr "В тексте письма"
 msgid "Match string:"
 msgstr "Строка для сравнения:"
 
-#: src/filter-edit-dialog.c:384 src/sendmsg-window.c:551
+#: src/filter-edit-dialog.c:384 src/sendmsg-window.c:537
 msgid "Remove"
 msgstr "Удалить"
 
@@ -1615,48 +1633,48 @@ msgstr "Balsa: %s (только для чтения)"
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main.c:108
+#: src/main.c:109
 msgid "Get new mail on startup"
 msgstr "Проверить почту при запуске"
 
-#: src/main.c:110
+#: src/main.c:111
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Cоставить новое письмо для EMAIL@ADRESS"
 
-#: src/main.c:112
+#: src/main.c:113
 msgid "Opens MAILBOXNAME"
 msgstr "Открывается MAILBOXNAME"
 
-#: src/main.c:112
+#: src/main.c:113
 msgid "MAILBOXNAME"
 msgstr "MAILBOXNAME"
 
-#: src/main.c:115
+#: src/main.c:116
 msgid "Opens first unread mailbox"
 msgstr "Открыть первый почтовый ящик с непрочитанными письмами"
 
-#: src/main.c:133 src/main.c:138 src/main.c:144 src/main.c:150 src/main.c:156
+#: src/main.c:134 src/main.c:139 src/main.c:145 src/main.c:151 src/main.c:157
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa не может открыть ваш почтовый ящик \"%s\""
 
-#: src/main.c:133
+#: src/main.c:134
 msgid "Inbox"
 msgstr "Входящие"
 
-#: src/main.c:139
+#: src/main.c:140
 msgid "Outbox"
 msgstr "Исходящие"
 
-#: src/main.c:145
+#: src/main.c:146
 msgid "Sentbox"
 msgstr "Отправленные"
 
-#: src/main.c:151
+#: src/main.c:152
 msgid "Draftbox"
 msgstr "Черновики"
 
-#: src/main.c:156
+#: src/main.c:157
 msgid "Trash"
 msgstr "Мусорная корзина"
 
@@ -2422,7 +2440,7 @@ msgstr "Показать"
 msgid "_Language"
 msgstr "Язык"
 
-#: src/sendmsg-window.c:615
+#: src/sendmsg-window.c:601
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -2430,61 +2448,61 @@ msgstr ""
 "Изображение вложения (balsa/attachment.png) не было найдено.\n"
 "Это значит что вы не можете вложить какие-либо файлы.\n"
 
-#: src/sendmsg-window.c:630
+#: src/sendmsg-window.c:616
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Нет информации про файл '%s': %s\n"
 
-#: src/sendmsg-window.c:636
+#: src/sendmsg-window.c:622
 #, c-format
 msgid "Attachment is not a regular file or cannot be read: '%s'\n"
 msgstr ""
 "Приложение не является обычным файлом или не может быть прочитано: '%s'\n"
 
-#: src/sendmsg-window.c:701
+#: src/sendmsg-window.c:698
 msgid "Attach file"
 msgstr "Приложить файл"
 
 #. cc:
-#: src/sendmsg-window.c:889
+#: src/sendmsg-window.c:888
 msgid "cc:"
 msgstr "О. копия(сс):"
 
 #. bcc:
-#: src/sendmsg-window.c:895
+#: src/sendmsg-window.c:894
 msgid "bcc:"
 msgstr "Н.о. копия(bcc):"
 
 #. fcc:
-#: src/sendmsg-window.c:901
+#: src/sendmsg-window.c:900
 msgid "fcc:"
 msgstr "копия(fcc)"
 
 #. Reply To:
-#: src/sendmsg-window.c:936
+#: src/sendmsg-window.c:935
 msgid "Reply To:"
 msgstr "Обратный адрес:"
 
 #. Attachment list
-#: src/sendmsg-window.c:942
+#: src/sendmsg-window.c:941
 msgid "Attachments:"
 msgstr "Вложения:"
 
 #. Comments:
-#: src/sendmsg-window.c:987
+#: src/sendmsg-window.c:986
 msgid "Comments:"
 msgstr "Комментарии:"
 
 #. Keywords:
-#: src/sendmsg-window.c:990
+#: src/sendmsg-window.c:989
 msgid "Keywords:"
 msgstr "Ключевые слова:"
 
-#: src/sendmsg-window.c:1087
+#: src/sendmsg-window.c:1086
 msgid "you"
 msgstr "вы"
 
-#: src/sendmsg-window.c:1092
+#: src/sendmsg-window.c:1091
 #, c-format
 msgid ""
 "\n"
@@ -2493,7 +2511,7 @@ msgstr ""
 "\n"
 "На %s %s написал:\n"
 
-#: src/sendmsg-window.c:1095
+#: src/sendmsg-window.c:1094
 #, c-format
 msgid ""
 "\n"
@@ -2518,24 +2536,24 @@ msgstr "Продолжить письмо"
 msgid "New message"
 msgstr "Новое письмо"
 
-#: src/sendmsg-window.c:1463
+#: src/sendmsg-window.c:1464
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Не удалось открыть файл %s.\n"
 
-#: src/sendmsg-window.c:1465
+#: src/sendmsg-window.c:1466
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: src/sendmsg-window.c:1492
+#: src/sendmsg-window.c:1493
 msgid "Include file"
 msgstr "Включить файл"
 
-#: src/sendmsg-window.c:1754
+#: src/sendmsg-window.c:1755
 msgid "Cannot execute print command."
 msgstr "Не удалось выполнить команду печати."
 
-#: src/sendmsg-window.c:1777
+#: src/sendmsg-window.c:1778
 msgid "Error executing lpr"
 msgstr "Ошибка выполнения lpr"
 

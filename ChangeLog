@@ -1,3 +1,7 @@
+2003-04-26 05:24  PeterB
+
+	* src/balsa-message.c: Always remember id returned by g_idle_add.
+
 2003-04-26  Kang Jeong-Hee  <Keizi@mail.co.kr>
 
 	* src/balsa-index.c, src/balsa-message.c: replace (FALSE, 0)

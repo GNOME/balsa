@@ -24,6 +24,7 @@
 #include "sendmsg-window.h"
 #include "index.h"
 #include "mailbox.h"
+#include "pref-manager.h"
 #include "mailbox-manager.h"
 #include "addrbook-manager.h"
 #include "../config.h"
@@ -424,24 +425,30 @@ create_menu (GtkWidget * window)
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
 
-  /* TOOLS Menu */
+  /* Settings Menu */
   menu = gtk_menu_new ();
+
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Preferences..."));
+  gtk_widget_show (w);
+  gtk_signal_connect (GTK_OBJECT (w),
+		      "activate",
+		      (GtkSignalFunc) open_preferences_manager,
+		      NULL);
+  gtk_menu_append (GTK_MENU (menu), w);
+  menu_items[i++] = w;
+
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Mailbox Manager..."));
   gtk_widget_show (w);
-  gtk_signal_connect_object (GTK_OBJECT (w),
-			     "activate",
-			     (GtkSignalFunc) open_mailbox_manager,
-			     NULL);
+  gtk_signal_connect (GTK_OBJECT (w),
+		      "activate",
+		      (GtkSignalFunc) open_mailbox_manager,
+		      NULL);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Settings"));
-  gtk_widget_show (w);
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
 
-  w = gtk_menu_item_new_with_label (_ ("Tools"));
+  w = gtk_menu_item_new_with_label (_ ("Settings"));
   gtk_widget_show (w);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
   gtk_menu_item_right_justify (GTK_MENU_ITEM (w));

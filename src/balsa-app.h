@@ -29,8 +29,9 @@
 /* global balsa application structure */
 struct
   {
-    gchar *user;
     gchar *user_name;
+    gchar *email;
+    gchar *organization;
     gchar *local_mail_directory;
 
     gchar *smtp_server;

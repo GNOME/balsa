@@ -42,239 +42,156 @@ static PreferencesManagerWindow *pmw = NULL;
 
 static gint preferences_manager_destroy ();
 
+static GtkWidget * create_identity_page ();
+static void refresh_identity_data ();
+
+
 
 void
 open_preferences_manager ()
 {
   GtkWidget *label;
   GtkWidget *vbox;
-  GtkWidget *vboxm;
-  GtkWidget *table;
   GtkWidget *hbox;
   GtkWidget *button;
-
-  static gchar *titles[] =
-  {
-    "Account",
-    "Type"
-  };
+  GtkWidget *notebook;
 
 
-  /* only one mailbox manager window */
-  if (mmw)
+  /* only one preferences manager window */
+  if (pmw)
     return;
 
-  mmw = g_malloc (sizeof (MailboxManagerWindow));
+  pmw = g_malloc (sizeof (PreferencesManagerWindow));
 
-  mmw->window = gtk_window_new (GTK_WINDOW_DIALOG);
-  gtk_container_border_width (GTK_CONTAINER (mmw->window), 3);
-  gtk_window_set_title (GTK_WINDOW (mmw->window), "Mailbox Manager");
-  gtk_window_set_wmclass (GTK_WINDOW (mmw->window), "mailbox_manager", "Balsa");
-  gtk_widget_set_usize (mmw->window, 400, 300);
-  gtk_window_position (GTK_WINDOW (mmw->window), GTK_WIN_POS_CENTER);
+  pmw->window = gtk_window_new (GTK_WINDOW_DIALOG);
+  gtk_container_border_width (GTK_CONTAINER (pmw->window), 3);
+  gtk_window_set_title (GTK_WINDOW (pmw->window), "Preferences");
+  gtk_window_set_wmclass (GTK_WINDOW (pmw->window), "preferences_manager", 
+			  "Balsa");
+  gtk_widget_set_usize (pmw->window, 400, 300);
+  gtk_window_position (GTK_WINDOW (pmw->window), GTK_WIN_POS_CENTER);
 
-  gtk_signal_connect (GTK_OBJECT (mmw->window), 
+  gtk_signal_connect (GTK_OBJECT (pmw->window), 
 		      "delete_event",
-		      GTK_SIGNAL_FUNC (mailbox_manager_destroy),
+		      GTK_SIGNAL_FUNC (preferences_manager_destroy),
 		      NULL);
 
 
-  vboxm = gtk_vbox_new (FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (mmw->window), vboxm);
-  gtk_widget_show (vboxm);
-
-
-  hbox = gtk_hbox_new (FALSE, 0);
-  gtk_container_border_width (GTK_CONTAINER (hbox), 10);
-  gtk_box_pack_start (GTK_BOX (vboxm), hbox, TRUE, TRUE, 10);
-  gtk_widget_show (hbox);
-
-
-  /* accounts clist */
-  mmw->list = gtk_clist_new_with_titles (2, titles);
-  gtk_clist_column_titles_passive (GTK_CLIST (mmw->list));
-  gtk_clist_set_selection_mode (GTK_CLIST (mmw->list), GTK_SELECTION_BROWSE);
-
-  gtk_clist_set_column_width (GTK_CLIST (mmw->list), 0, 100);
-  gtk_clist_set_column_width (GTK_CLIST (mmw->list), 1, 50);
-
-  gtk_clist_set_policy (GTK_CLIST (mmw->list),
-			GTK_POLICY_AUTOMATIC,
-			GTK_POLICY_AUTOMATIC);
-
-  gtk_box_pack_start (GTK_BOX (hbox), mmw->list, TRUE, TRUE, 10);
-
-  gtk_signal_connect (GTK_OBJECT (mmw->list),
-		      "select_row",
-		      (GtkSignalFunc) select_row_cb,
-		      NULL);
-
-  update_mailbox_list ();
-  gtk_widget_show (mmw->list);
-
-
-  /* one vbox to hold them all... */
   vbox = gtk_vbox_new (FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (hbox), vbox, FALSE, FALSE, 10);
+  gtk_container_add (GTK_CONTAINER (pmw->window), vbox);
   gtk_widget_show (vbox);
 
 
-  /* edit account button */
-  button = gtk_button_new_with_label ("Edit...");
-  gtk_widget_set_usize (button, 70, 30);
-  gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, FALSE, 10);
-
-  gtk_signal_connect (GTK_OBJECT (button),
-		      "clicked",
-		      (GtkSignalFunc) edit_cb,
-		      NULL);
-
-  gtk_widget_show (button);
+  /* notbook */
+  notebook = gtk_notebook_new ();
+  gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
+  gtk_box_pack_start (GTK_BOX (vbox), notebook, TRUE, TRUE, 5);
+  gtk_widget_show (notebook);
 
 
-  /* new account button */
-  button = gtk_button_new_with_label ("New...");
-  gtk_widget_set_usize (button, 70, 30);
-  gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, FALSE, 10);
-
-  gtk_signal_connect (GTK_OBJECT (button),
-		      "clicked",
-		      (GtkSignalFunc) new_cb,
-		      NULL);
-  
-  gtk_widget_show (button);
+  /* identity page */
+  label = gtk_label_new ("Identity");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), 
+			    create_identity_page (), 
+			    label);
 
 
-  /* duplicate account button */
-  button = gtk_button_new_with_label ("Duplicate");
-  gtk_widget_set_usize (button, 70, 30);
-  gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, FALSE, 10);
- 
-  gtk_signal_connect (GTK_OBJECT (button),
-		      "clicked",
-		      (GtkSignalFunc) duplicate_cb,
-		      NULL);
-
-  gtk_widget_show (button);
-
-
-  /* delete account button */
-  button = gtk_button_new_with_label ("Delete");
-  gtk_widget_set_usize (button, 70, 30);
-  gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, FALSE, 10);
-
-  gtk_signal_connect (GTK_OBJECT (button),
-		      "clicked",
-		      (GtkSignalFunc) delete_cb,
-		      NULL);
-  
-  gtk_widget_show (button);
-
-
-  hbox = gtk_hbox_new (FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vboxm), hbox, FALSE, TRUE, 0);
-  gtk_widget_show (hbox);
-
-
-  /* close button */
-  button = gtk_button_new_with_label ("Close");
-  GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
-  gtk_widget_grab_default (button);
-  gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
-
-  gtk_signal_connect (GTK_OBJECT (button),
-		      "clicked",
-		      GTK_SIGNAL_FUNC (mailbox_manager_destroy),
-		      NULL);
-
-  gtk_signal_connect_object (GTK_OBJECT (button), 
-			     "clicked",
-			     GTK_SIGNAL_FUNC (gtk_widget_destroy),
-			     GTK_OBJECT (mmw->window));
-
-  gtk_widget_show (button);
-
-
-  /* show the whole thing */
-  gtk_widget_show (mmw->window);
+  /* set data and show the whole thing */
+  refresh_identity_data ();
+  gtk_widget_show (pmw->window);
 }
 
 static gint
-mailbox_manager_destroy ()
+preferences_manager_destroy ()
 {
-  g_free (mmw);
-  mmw = NULL;
+  g_free (pmw);
+  pmw = NULL;
 
   return FALSE;
 }
 
-/* sets the list of mailboxes in the mailbox manager window */
-static void
-update_mailbox_list ()
+
+static GtkWidget *
+create_identity_page ()
 {
-  GList *list;
-  Mailbox *mailbox;
-  gchar *list_items[3];
+  GtkWidget *vbox;
+  GtkWidget *table;  
+  GtkWidget *label;
 
-  gtk_clist_freeze (GTK_CLIST (mmw->list));
-  gtk_clist_clear (GTK_CLIST (mmw->list));
 
-  list = balsa_app.mailbox_list;
-  while (list)
-    {
-      mailbox = list->data;
-      list = list->next;
-      
-      list_items[0] = mailbox->name;
-      list_items[1] = mailbox_type_description (mailbox->type);
-      
-      gtk_clist_set_row_data (GTK_CLIST (mmw->list),
-			      gtk_clist_append (GTK_CLIST (mmw->list), list_items),
-			      mailbox);
-    }
+  vbox = gtk_vbox_new (FALSE, 0);
+  gtk_container_border_width (GTK_CONTAINER (vbox), 10);
+  gtk_widget_show (vbox);
 
-  gtk_clist_thaw (GTK_CLIST (mmw->list));
+
+  table = gtk_table_new (3, 2, FALSE);
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 10);
+  gtk_widget_show (table);
+
+
+  /* your name */
+  label = gtk_label_new ("Your Name:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1, 
+		    GTK_EXPAND | GTK_FILL, 
+		    GTK_EXPAND | GTK_FILL, 
+		    10, 0);
+  gtk_widget_show (label);
+
+
+  pmw->user_name = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pmw->user_name, 1, 2, 0, 1, 
+		    GTK_EXPAND | GTK_FILL, 
+		    GTK_EXPAND | GTK_FILL, 
+		    0, 0);
+  gtk_widget_show (pmw->user_name);
+
+
+  /* email address */
+  label = gtk_label_new ("E-Mail Address:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
+		    GTK_EXPAND | GTK_FILL, 
+		    GTK_EXPAND | GTK_FILL, 
+		    10, 0);
+  gtk_widget_show (label);
+
+
+  pmw->email = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table),pmw->email , 1, 2, 1, 2,
+		    GTK_EXPAND | GTK_FILL, 
+		    GTK_EXPAND | GTK_FILL, 
+		    0, 0);
+  gtk_widget_show (pmw->email);
+
+
+  /* organization */
+  label = gtk_label_new ("Organization:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
+		    GTK_EXPAND | GTK_FILL, 
+		    GTK_EXPAND | GTK_FILL, 
+		    10, 0);
+  gtk_widget_show (label);
+
+
+  pmw->organization = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pmw->organization, 1, 2, 2, 3,
+		    GTK_EXPAND | GTK_FILL, 
+		    GTK_EXPAND | GTK_FILL, 
+		    0, 0);
+  gtk_widget_show (pmw->organization);
+
+
+  return vbox;
 }
 
-static void
-select_row_cb (GtkWidget * widget,
-	       gint row,
-	       gint column,
-	       GdkEventButton * bevent)
-{
-}
 
 static void
-edit_cb ()
+refresh_identity_data ()
 {
-  Mailbox *mailbox;
-
-  mailbox = GTK_CLIST (mmw->list)->selection->data;
+  gtk_entry_set_text (GTK_ENTRY (pmw->user_name), balsa_app.user_name);
+  gtk_entry_set_text (GTK_ENTRY (pmw->email), balsa_app.email);
+  gtk_entry_set_text (GTK_ENTRY (pmw->organization), balsa_app.organization);
 }
 
-static void
-new_cb ()
-{
-  Mailbox *mailbox;
-
-  mailbox = GTK_CLIST (mmw->list)->selection->data;
-  edit_mailbox_pop3 (NULL);
-}
-
-static void
-duplicate_cb ()
-{
-  Mailbox *mailbox;
-
-  mailbox = GTK_CLIST (mmw->list)->selection->data;
-
-}
-
-static void
-delete_cb (GtkWidget * widget, gpointer something)
-{
-  Mailbox *mailbox;
-
-  mailbox = GTK_CLIST (mmw->list)->selection->data;
-
-}

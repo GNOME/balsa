@@ -40,8 +40,9 @@ init_balsa_app (int argc, char *argv[])
   #include "linkage.c"
 
   /* initalize application structure before ALL ELSE */
-  balsa_app.user = NULL;
   balsa_app.user_name = NULL;
+  balsa_app.email = NULL;
+  balsa_app.organization = NULL;
   balsa_app.local_mail_directory = NULL;
   balsa_app.smtp_server = NULL;
   balsa_app.auth_mailbox = NULL;
@@ -174,12 +175,15 @@ load_global_settings ()
 
   /* set to Global configure section */
   gnome_config_push_prefix ("/balsa/Global/");
-  
-  /* user id */
-  balsa_app.user = get_string_set_default ("user", pw->pw_name);
 
   /* user's text name */
   balsa_app.user_name = get_string_set_default ("user name", pw->pw_gecos);
+
+  /* email */
+  balsa_app.email = get_string_set_default ("email", pw->pw_name);
+
+  /* organization */
+  balsa_app.organization = get_string_set_default ("organization", "None");
 
   /* directory */
   path = g_string_new (NULL);

@@ -325,7 +325,7 @@ edit_mailbox_pop3 (Mailbox * mailbox)
 
   /* name of the mailbox */
   label = gtk_label_new ("Mailbox Name:");
-  gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1, 
 		    GTK_EXPAND | GTK_FILL, 
 		    GTK_EXPAND | GTK_FILL, 
@@ -343,7 +343,7 @@ edit_mailbox_pop3 (Mailbox * mailbox)
 
   /* POP server name */
   label = gtk_label_new ("POP3 server:");
-  gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
 		    GTK_EXPAND | GTK_FILL, 
 		    GTK_EXPAND | GTK_FILL, 
@@ -361,7 +361,7 @@ edit_mailbox_pop3 (Mailbox * mailbox)
 
   /* username on POP3 server */
   label = gtk_label_new ("Username:");
-  gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
 		    GTK_EXPAND | GTK_FILL, 
 		    GTK_EXPAND | GTK_FILL, 
@@ -379,7 +379,7 @@ edit_mailbox_pop3 (Mailbox * mailbox)
 
   /* password on POP3 server */
   label = gtk_label_new ("Password:");
-  gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
 		    GTK_EXPAND | GTK_FILL, 
 		    GTK_EXPAND | GTK_FILL, 

@@ -153,7 +153,7 @@ gchar *pwindow_type_label[NUM_PWINDOW_MODES] =
 void
 open_preferences_manager(GtkWidget *widget, gpointer data)
 {
-	static GnomeHelpMenuEntry help_entry = { NULL, "properties" };
+	static GnomeHelpMenuEntry help_entry = { "balsa", "win-config.html" };
 	gint i;
 	GnomeApp *active_win = GNOME_APP(data);
 	GtkWidget *hbuttonbox1;

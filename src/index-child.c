@@ -215,10 +215,10 @@ index_child_create_view (GnomeMDIChild * child)
   IndexChild *ic;
 
   ic = INDEX_CHILD (child);
-#if 0
+
   if (balsa_app.previewpane)
     {
-#endif
+
       vpane = gtk_vpaned_new ();
 
       ic->index = balsa_index_new ();
@@ -244,20 +244,24 @@ index_child_create_view (GnomeMDIChild * child)
       gtk_widget_set_usize (vpane, 1, 250);
 
       gtk_widget_show_all (vpane);
-#if 0
+
     }
   else
     {
       ic->index = balsa_index_new ();
       gtk_widget_show (ic->index);
     }
-#endif
+
 
   balsa_index_set_mailbox (BALSA_INDEX (ic->index), ic->mailbox);
 
   gtk_signal_connect (GTK_OBJECT (ic->index), "select_message",
 		      (GtkSignalFunc) index_select_cb, ic);
-  return (vpane);
+
+  if (balsa_app.previewpane)
+    return (vpane);
+  else
+    return ic->index;
 }
 
 static gint handler = 0;
@@ -277,8 +281,11 @@ idle_handler_cb (GtkWidget * widget)
 		    NULL, NULL, NULL, NULL,
 		    bevent->button, bevent->time);
 
-  else if (BALSA_MESSAGE (((IndexChild *) data)->message))
-    balsa_message_set (BALSA_MESSAGE (((IndexChild *) data)->message), message);
+  else if (INDEX_CHILD (data)->message)
+    {
+      if (BALSA_MESSAGE (INDEX_CHILD (data)->message))
+	balsa_message_set (BALSA_MESSAGE (INDEX_CHILD (data)->message), message);
+    }
 
   handler = 0;
 

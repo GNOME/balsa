@@ -1918,11 +1918,11 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
     switch(thread_type) {
     case LB_MAILBOX_THREADING_FLAT:
         if(filter) {
-            imap_sort_filter(mimap->handle,
-                             lbmi_get_imap_sort_key(mailbox),
-                             mailbox->view->sort_type ==
-			     LB_MAILBOX_SORT_TYPE_ASC,
-                             filter);
+            imap_mbox_sort_filter(mimap->handle,
+                                  lbmi_get_imap_sort_key(mailbox),
+                                  mailbox->view->sort_type ==
+                                  LB_MAILBOX_SORT_TYPE_ASC,
+                                  filter);
             new_tree =
                 g_node_copy(imap_mbox_handle_get_thread_root(mimap->handle));
         } else {
@@ -1999,10 +1999,10 @@ libbalsa_mailbox_imap_sort(LibBalsaMailbox *mbox, GArray *array)
         msgno_map[msgno_arr[i]-1] = i;
 
     qsort(msgno_arr, len, sizeof(msgno_arr[0]), cmp_msgno);
-    imap_sort_msgno(LIBBALSA_MAILBOX_IMAP(mbox)->handle,
-                    lbmi_get_imap_sort_key(mbox),
-                    mbox->view->sort_type == LB_MAILBOX_SORT_TYPE_ASC,
-                    msgno_arr, len); /* ignore errors */
+    imap_mbox_sort_msgno(LIBBALSA_MAILBOX_IMAP(mbox)->handle,
+                         lbmi_get_imap_sort_key(mbox),
+                         mbox->view->sort_type == LB_MAILBOX_SORT_TYPE_ASC,
+                         msgno_arr, len); /* ignore errors */
     
     tmp = g_array_new(FALSE,FALSE, sizeof(SortTuple));
     g_array_append_vals(tmp, array->data, array->len);

@@ -9,6 +9,12 @@
 	* src/main-window.[hc]: support for per-mailbox view filters.
 	* src/save-restore.c: config support for that.
 
+	(part 2)
+	* src/main-window.c: (msg) thread in (p)thread without gdk lock
+	* libbalsa/mailbox.c(lbm_threads_enter): support for nested gdk locks.
+	* libbalsa/mailbox_imap.c, libbalsa/imap/imap_commands.[hc]:
+	obey the namespace rules.
+	
 2004-02-06 05:20  PeterB
 
 	* libbalsa/mailbox_mbox.c: change parser to check for start < end

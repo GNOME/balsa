@@ -1563,10 +1563,10 @@ real_open_mbnode(BalsaMailboxNode * mbnode)
     enable_mailbox_menus(index);
     libbalsa_mailbox_set_view_filter(mbnode->mailbox,
                                      bw_get_view_filter(window), FALSE);
-    balsa_index_set_threading_type(BALSA_INDEX(index),
-                                   mbnode->mailbox->view->threading_type);
     gdk_flush();
     gdk_threads_leave();
+    balsa_index_set_threading_type(BALSA_INDEX(index),
+                                   mbnode->mailbox->view->threading_type);
 #ifdef BALSA_USE_THREADS
     pthread_mutex_unlock(&open_lock);
 #endif

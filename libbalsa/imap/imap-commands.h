@@ -79,9 +79,9 @@ ImapResponse imap_mbox_uid_search(ImapMboxHandle *handle, const char *query,
                                   void (*cb)(unsigned uid, void *),
                                   void *cb_data);
 
-ImapResponse imap_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
-                             int ascending, int *msgno, unsigned cnt);
-ImapResponse imap_sort_filter(ImapMboxHandle *handle, ImapSortKey key,
-                              int ascending, char *filter);
+ImapResponse imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
+                                  int ascending, int *msgno, unsigned cnt);
+ImapResponse imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key,
+                                   int ascending, char *filter);
 
 #endif /* __IMAP_COMMANDS_H__ */

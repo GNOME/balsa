@@ -391,7 +391,7 @@ libbalsa_mailbox_open(LibBalsaMailbox * mailbox)
 	retval =
 	    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->open_mailbox(mailbox);
         if(retval)
-            	mailbox->open_ref++;
+            mailbox->open_ref++;
     }
 
     UNLOCK_MAILBOX(mailbox);
@@ -758,29 +758,34 @@ libbalsa_mailbox_type_from_path(const gchar * path)
  */
 
 #ifdef BALSA_USE_THREADS
+static pthread_t holding_thread = 0;
 static gboolean
 lbm_threads_enter(void)
 {
     gboolean unlock = g_mutex_trylock(gdk_threads_mutex);
+    pthread_t current_thread = pthread_self();
     gboolean is_main_thread =
-	(pthread_self() == libbalsa_get_main_thread());
+	(current_thread == libbalsa_get_main_thread());
 
     if (is_main_thread) {
 	if (unlock)
 	    g_warning("Main thread was unlocked");
     } else {
 	if (!unlock) {
+            if(current_thread != holding_thread) {
 #ifdef DEBUG
-	    g_print("Sub thread must wait for lock...");
-	    gdk_threads_enter();
-	    g_print("got it!\n");
+                g_print("Sub thread must wait for lock...");
+                gdk_threads_enter();
+                holding_thread = current_thread;
+                g_print("got it!\n");
 #else
-	    gdk_threads_enter();
+                gdk_threads_enter();
 #endif
-	    unlock = TRUE;
+                unlock = TRUE;
+            } 
+            holding_thread = current_thread;
 	}
     }
-
     return unlock;
 }
 
@@ -790,6 +795,7 @@ lbm_threads_leave(gboolean unlock)
     if (unlock) {
 	gdk_flush();
 	gdk_threads_leave();
+        holding_thread = 0;
     }
 }
 #else
@@ -1381,6 +1387,7 @@ libbalsa_mailbox_view_new(void)
     view->sort_type =  LB_MAILBOX_SORT_TYPE_ASC;
     view->sort_field = LB_MAILBOX_SORT_DATE;
     view->show = LB_MAILBOX_SHOW_UNSET;
+    view->filter  = 0;
     view->exposed = FALSE;
     view->open = FALSE;
 
@@ -2120,10 +2127,7 @@ mbox_compare_func(const SortTuple * a,
     }
 
     if (mbox->view->sort_type == LB_MAILBOX_SORT_TYPE_DESC) {
-	if (retval > 0)
-	    retval = -1;
-	else if (retval < 0)
-	    retval = 1;
+        retval = -retval;
     }
 
     return retval;

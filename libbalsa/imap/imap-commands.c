@@ -814,8 +814,8 @@ sort_code_to_string(ImapSortKey key)
 }
 
 ImapResponse
-imap_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
-                int ascending, int *msgno, unsigned cnt)
+imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
+                     int ascending, int *msgno, unsigned cnt)
 {
   ImapResponse rc;
   const char *keystr;
@@ -852,8 +852,8 @@ append_no(ImapMboxHandle *handle, unsigned seqno, void *arg)
 }
 
 ImapResponse
-imap_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
-                 char *filter)
+imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
+                      char *filter)
 {
   ImapResponse rc;
   const char *keystr;

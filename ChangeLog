@@ -1,3 +1,9 @@
+2003-03-08 00:26  PeterB
+
+	* src/: main-window.c, message-window.c, print.c, print.h,
+	sendmsg-window.c, sendmsg-window.h: Allow only one print dialog,
+	even for the compose window.
+
 2003-03-07 11:44  PeterB
 
 	* src/balsa-index.c: Don't count deleted messages when looking for

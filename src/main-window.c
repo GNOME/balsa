@@ -129,13 +129,14 @@ static void previous_message_cb (GtkWidget * widget, gpointer data);
 
 static void delete_message_cb (GtkWidget * widget, gpointer data);
 static void undelete_message_cb (GtkWidget * widget, gpointer data);
+static void wrap_message_cb (GtkWidget * widget, gpointer data);
 
 
 static void filter_dlg_cb (GtkWidget * widget, gpointer data);
 
 gboolean balsa_close_mailbox_on_timer(GtkWidget *widget, gpointer *data);
 
-static void mailbox_close_child (GtkWidget * widget, gpointer data);
+/* static void mailbox_close_child (GtkWidget * widget, gpointer data); */
 static void mailbox_commit_changes (GtkWidget * widget, gpointer data);
 static void mailbox_empty_trash(GtkWidget * widget, gpointer data);
 
@@ -158,12 +159,17 @@ static GnomeUIInfo file_menu[] =
  GNOME_STOCK_MENU_MAIL_RCV, 'M', GDK_CONTROL_MASK, NULL
   },
   GNOMEUIINFO_SEPARATOR,
+  {
+    GNOME_APP_UI_ITEM, N_ ("Address Book"), N_("Opens the address book"),
+    address_book_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_BOOK_RED, 'B', 0, NULL
+  },
 
   /* Ctrl-I */
   {
     GNOME_APP_UI_ITEM, N_ ("Pr_int"), N_("Print current mail"),
     file_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_MENU_MAIL_RCV, 'I', GDK_CONTROL_MASK, NULL
+    GNOME_STOCK_MENU_PRINT, 'I', GDK_CONTROL_MASK, NULL
   },
   GNOMEUIINFO_SEPARATOR,
 
@@ -230,14 +236,10 @@ static GnomeUIInfo message_menu[] =
     undelete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
   },
-
   GNOMEUIINFO_SEPARATOR,
-  {
-    GNOME_APP_UI_ITEM, N_ ("Address Book"), N_("Opens the address book"),
-    address_book_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_MENU_BOOK_RED, 'B', 0, NULL
-  },
-
+#define MENU_MESSAGE_WRAP_POS 9
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_Wrap"), NULL, wrap_message_cb, NULL),
+  
   GNOMEUIINFO_END
 };
 
@@ -444,8 +446,6 @@ balsa_window_new ()
   gnome_app_create_toolbar_with_data(GNOME_APP(window), main_toolbar, window);
 
 
-
-
   /* set the toolbar style */
   balsa_window_refresh(window);
 
@@ -500,6 +500,10 @@ balsa_window_new ()
   gtk_widget_show(window->mblist);
   gtk_widget_show(preview);
 
+  if(balsa_app.browse_wrap)
+     gtk_check_menu_item_set_active(
+	GTK_CHECK_MENU_ITEM(message_menu[MENU_MESSAGE_WRAP_POS].widget), TRUE);
+  
   return GTK_WIDGET (window);
 }
 
@@ -1260,6 +1264,19 @@ undelete_message_cb (GtkWidget * widget, gpointer data)
 }
 
 static void
+wrap_message_cb (GtkWidget * widget, gpointer data) 
+{
+   BalsaIndex *index;
+
+   balsa_app.browse_wrap = GTK_CHECK_MENU_ITEM(widget)->active;
+
+   /* redisplay current message? */
+   index =(BalsaIndex*)balsa_window_find_current_index(BALSA_WINDOW (data));
+   if(index) 
+      balsa_index_redraw_current (index);
+}
+
+static void
 filter_dlg_cb (GtkWidget * widget, gpointer data)
 {
   filter_edit_dialog (NULL);
@@ -1273,6 +1290,7 @@ mblist_window_cb (GtkWidget * widget, gpointer data)
 }
 */
 
+/* FIXME not used at least since 2000.03.06
 static void
 mailbox_close_child (GtkWidget * widget, gpointer data)
 {
@@ -1284,6 +1302,7 @@ mailbox_close_child (GtkWidget * widget, gpointer data)
 
   balsa_window_close_mailbox(BALSA_WINDOW(data), BALSA_INDEX(index)->mailbox);
 }
+*/
 
 static void
 mailbox_commit_changes (GtkWidget * widget, gpointer data)

@@ -123,6 +123,7 @@ balsa_app_init (void)
   balsa_app.pwindow_option = WHILERETR;
   balsa_app.wordwrap = TRUE;
   balsa_app.wraplength = 79;
+  balsa_app.browse_wrap = TRUE;
 
   balsa_app.index_num_width = NUM_DEFAULT_WIDTH;
   balsa_app.index_status_width = STATUS_DEFAULT_WIDTH;

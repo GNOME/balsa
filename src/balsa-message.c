@@ -877,7 +877,7 @@ get_font_name(const gchar* base, int code) {
     * in the chunk below
     * extra space for dwo dashes and '\0' */
    len = ptr-base;
-   if(dash_cnt>12) len--;
+   /* if(dash_cnt>12) len--; */
    if(len<1) len = 1;
    res = (gchar*)g_malloc(len+sizeof(type)+3+(code>9?2:1));
    if(balsa_app.debug)
@@ -1071,7 +1071,7 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gr
 		   gchar *font_name;
 		   
 		   font_name = find_body_font(bdy);
-		   if(balsa_app.wordwrap) 
+		   if(balsa_app.browse_wrap) 
 		      wrap_string(ptr, balsa_app.wraplength);
 		   text = balsa_message_text_item( 
 		      ptr, group, 0.0, next_part_height (group), font_name );

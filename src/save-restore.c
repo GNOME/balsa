@@ -721,6 +721,11 @@ config_global_load (void)
   if (balsa_app.wraplength < 40 )
     balsa_app.wraplength = 40;
 
+  if ((field = pl_dict_get_str (globals, "BrowseWrap")) == NULL)
+    balsa_app.browse_wrap = TRUE;
+  else
+    balsa_app.browse_wrap = atoi (field);
+
   /* toolbar style */
   if ((field = pl_dict_get_str (globals, "ToolbarStyle")) == NULL)
     balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
@@ -1032,6 +1037,9 @@ config_global_save (void)
 
   snprintf (tmp, sizeof (tmp), "%d", balsa_app.wraplength);
   pl_dict_add_str_str (globals, "WrapLength", tmp);
+
+  snprintf (tmp, sizeof (tmp), "%d", balsa_app.browse_wrap );
+  pl_dict_add_str_str (globals, "BrowseWrap", tmp);
 
   /* arp --- "LeadinStr" into cfg. */
   if (balsa_app.quote_str != NULL)

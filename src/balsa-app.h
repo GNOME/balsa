@@ -149,6 +149,7 @@ extern struct BalsaApplication
   gint pwindow_option;
   gboolean wordwrap;
   gint wraplength;
+  gboolean browse_wrap;
   
   gboolean empty_trash_on_exit;
   gboolean previewpane;

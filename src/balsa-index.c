@@ -544,6 +544,46 @@ balsa_index_select_previous (BalsaIndex * bindex)
     gtk_clist_moveto (clist, h - 1, 0, 0.0, 0.0);
 }
 
+/* balsa_index_redraw_current redraws currently selected message,
+   called when for example the message wrapping was switched on/off,
+   the message canvas width has changed etc.
+   FIXME: find a simpler way to do it.
+*/
+void
+balsa_index_redraw_current (BalsaIndex * bindex)
+{
+  GtkCList *clist;
+  GList *list;
+  gint i = 0;
+  gint h = 0;
+
+  g_return_if_fail (bindex != NULL);
+
+  clist = GTK_CLIST (bindex);
+
+  if (!clist->selection)
+    return;
+
+  h = clist->rows;	 /* set this to the max number of rows */
+
+  list = clist->selection;
+  while (list)		 /* look for the selected row with the lowest number */
+    {
+      i = GPOINTER_TO_INT (list->data);
+      if (i < h)
+	h = i;
+      list = list->next;
+    }
+
+  /* avoid unselecting everything, and then not selecting a valid row */
+  if (h < 1)
+    h = 1;
+
+  gtk_clist_select_row (clist, h, -1);
+
+  if (gtk_clist_row_is_visible (clist, h) != GTK_VISIBILITY_FULL)
+    gtk_clist_moveto (clist, h, 0, 0.0, 0.0);
+}
 
 void
 balsa_index_update_flag (BalsaIndex * bindex, Message * message)

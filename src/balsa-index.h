@@ -74,6 +74,7 @@ extern "C"
 /* select up/down the index */
   void balsa_index_select_next (BalsaIndex *);
   void balsa_index_select_previous (BalsaIndex *);
+  void balsa_index_redraw_current (BalsaIndex *);
 
 /* retrieve the selection */
   extern void balsa_index_get_selected_rows( BalsaIndex *bindex, guint **rows, guint *nb_rows );

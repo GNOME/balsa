@@ -150,8 +150,9 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     GList* list = NULL, *el;
     struct browser_state state;
     int i;
-
-    printf("imap_dir: reading for %s\n", path);
+    
+    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                         "imap_dir: reading for %s\n", path);
     init_state (&state);
     state.imap_browse = 1;
     state.rnode = rnode;
@@ -194,7 +195,6 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 	state.scanned = (i < depth - 1);
 	list = state.subfolders;
 	state.subfolders = NULL;
-	printf("Deph: %i -------------------------------------------\n", i);
 	for(el= g_list_first(list); el; el = g_list_next(el)) {
 	    if(*(char*)el->data)
 		imap_path = g_strdup_printf("imap%s://%s/%s/", 
@@ -239,14 +239,16 @@ void imap_add_folder (char delim, char *folder, int noselect,
 	   noinferiors, isparent);  */
     if(isparent) return;
     if(!noselect) {
-	printf("ADDING MAILBOX %s\n", folder);
+	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                             "ADDING MAILBOX %s\n", folder);
 	++isMailbox;
     }
     /* this extra check is needed for subscribed folder handling. 
 	   Read RFC when iin doubt. */
     if(!g_list_find_custom(state->subfolders, folder,
 			   (GCompareFunc)strcmp)) {
-	printf("ADDING FOLDER  %s\n", folder);
+	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                             "ADDING FOLDER  %s\n", folder);
 	    
 	state->subfolders = g_list_append(state->subfolders,
 					  g_strdup(folder));

@@ -47,7 +47,7 @@ int imap_mailbox_check(char *path, int new,
 #else
 int imap_mailbox_check (char *path, int new);
 #endif
-int imap_subscribe (char *path, int subscribe);
+int imap_subscribe (const char *path, int subscribe);
 int imap_complete (char* dest, size_t dlen, char* path);
 
 void imap_allow_reopen (CONTEXT *ctx);
@@ -58,9 +58,8 @@ int imap_browse (char* path, struct browser_state* state);
 /* LIBMUTT - BALSA: changed prototype for imap_mailbox_create: */
 int imap_mailbox_create (const char* folder, const char* subfolder, int subscribe);
 /* BALSA: prototype for new function imap_mailbox_rename: */
-int imap_mailbox_rename (const char* prefix, const char* dir,
-                        const char* parent, const char* subfolder,
-                        int subscribe);
+int imap_mailbox_rename (const char* url, const char* parent, 
+                         const char* subfolder, int subscribe);
 /* BALSA: prototype for new function imap_mailbox_delete: */
 int imap_mailbox_delete (const char* path);
 

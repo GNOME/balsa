@@ -1,3 +1,8 @@
+2002-06-09  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* imap/browse.c: imap_mailbox_rename() return status.
+	* imap/imap.[ch]: imap_subscribe accepts const char* argument.
+
 2002-05-31  Carlos Morgado  <chbm@chbm.nu>
 
 	* Makefile.am:

@@ -617,20 +617,19 @@ NOTE: the correct renaming sequence according to Mark Crispin is
 3. subscribe again (if neeeded).
 */
 
-int imap_mailbox_rename (const char* prefix, const char* dir,
-			 const char* parent, const char* subfolder,
-			 int subscribe)
+int imap_mailbox_rename (const char* url, const char* parent, 
+                         const char* subfolder, int subscribe)
 {
   IMAP_DATA* idata;
   IMAP_MBOX mx;
-  char folder[LONG_STRING];
   char buf[LONG_STRING];
   short n;
+  BUFFER new_url;
 
-  snprintf(folder, sizeof (folder), "%s%s", prefix, dir);
-  if (imap_parse_path (folder, &mx) < 0)
+  memset (&new_url, 0, sizeof (new_url));
+  if (imap_parse_path (url, &mx) < 0)
   {
-    dprint (1, (debugfile, "imap_mailbox_rename: Bad path %s\n", folder));
+    dprint (1, (debugfile, "imap_mailbox_rename: Bad path %s\n", url));
     return -1;
   }
 
@@ -652,20 +651,28 @@ int imap_mailbox_rename (const char* prefix, const char* dir,
   
   strfcpy (buf + n, subfolder, sizeof (buf) - n);
 
-  imap_subscribe(folder, 0);
+  imap_subscribe(url, 0);
   if (imap_rename_mailbox (idata, mx.mbox, buf) < 0)
     goto fail;
 
   if (subscribe) {
-    snprintf(folder, sizeof (folder), "%s%s", prefix, buf);
-    if (imap_subscribe(folder, 1) < 0)
-      goto fail;
+    char* slash = strchr(url+8, '/');
+    if(slash) {
+      mutt_buffer_add(&new_url, url, slash-url+1);
+      mutt_buffer_addstr(&new_url, parent);
+      mutt_buffer_addch (&new_url, idata->delim);
+      mutt_buffer_addstr(&new_url, subfolder);
+      if (imap_subscribe(new_url.data, 1) < 0)
+        goto fail;
+    }
   }
 
+  FREE (&new_url.data);
   FREE (&mx.mbox);
   return 0;
 
  fail:
+  FREE (&new_url.data);
   FREE (&mx.mbox);
   return -1;
 }

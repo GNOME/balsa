@@ -318,7 +318,6 @@ browse_button_select_row_cb(GtkTreeSelection * selection, gpointer data)
                 gtk_tree_selection_get_tree_view(selection);
             gchar *path = mbnode->dir;
 
-            fcw->mbnode = mbnode;
             if (path)
                 gtk_entry_set_text(GTK_ENTRY(fcw->parent_folder), path);
 
@@ -461,24 +460,30 @@ subfolder_conf_clicked_cb(gpointer data)
 		     */
 		    balsa_window_close_mbnode(balsa_app.main_window, 
                                               fcw->mbnode);
-		    libbalsa_imap_rename_subfolder(fcw->mbnode->dir, 
-                                                   parent, folder,
-						   fcw->mbnode->subscribed,
-						   fcw->mbnode->server);
+		    libbalsa_imap_rename_subfolder
+                        (LIBBALSA_MAILBOX_IMAP(fcw->mbnode->mailbox),
+                         parent, folder, fcw->mbnode->subscribed);
+                    g_free(fcw->mbnode->dir);
+                    fcw->mbnode->dir = g_strdup(parent);
 
-		    /*	Rescan as little of the tree as possible.
-		     *	We'll assume that `parent' is consistent
-		     *	with `fcw->mbnode' (that is, the parent path
-		     *	was found by browsing, not typing in the entry.
-		     */
-		    if (!strncmp(parent, fcw->old_parent, strlen(parent)))
+		    /*	Rescan as little of the tree as possible. */
+		    if (!strncmp(parent, fcw->old_parent, strlen(parent))){
 			/* moved it up the tree */
-			balsa_mailbox_node_rescan(fcw->mbnode);
-		    else if (!strncmp(parent, fcw->old_parent, 
-                                      strlen(fcw->old_parent)))
+                        GNode* n = balsa_find_dir(balsa_app.mailbox_nodes,
+                                                  parent);
+                        if(n)
+                            balsa_mailbox_node_rescan
+                                (BALSA_MAILBOX_NODE(n->data));
+                        else printf("Parent not found!?\n");
+                    } else if (!strncmp(parent, fcw->old_parent, 
+                                        strlen(fcw->old_parent))) {
 			/* moved it down the tree */
-			balsa_mailbox_node_rescan(fcw->mbnode->parent);
-		    else {
+                        GNode* n = balsa_find_dir(balsa_app.mailbox_nodes,
+                                                  fcw->old_parent);
+                        if(n)
+                            balsa_mailbox_node_rescan
+                                (BALSA_MAILBOX_NODE(n->data));
+                    } else {
 			/* moved it sideways: a chain of folders might
 			 * go away, so we'd better rescan from higher up
 			 */
@@ -530,7 +535,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
             gtk_dialog_run(GTK_DIALOG(dlg)); gtk_widget_destroy(dlg);
 	    return;
 	}
-	fcw.mbnode = mn->parent;
+	fcw.mbnode = mn;
 	fcw.old_folder = mn->mailbox->name;
     } else {
 	/* create */
@@ -543,14 +548,14 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 	    fcw.mbnode = NULL;
 	fcw.old_folder = NULL;
     }
-    fcw.old_parent = fcw.mbnode ? fcw.mbnode->dir : NULL;
+    fcw.old_parent = fcw.mbnode ? fcw.mbnode->parent->dir : NULL;
 
     fcw.dialog = 
         GTK_DIALOG(gtk_dialog_new_with_buttons
                    (_("Remote IMAP subfolder"), 
                     GTK_WINDOW(balsa_app.main_window),
                     GTK_DIALOG_DESTROY_WITH_PARENT,
-                    mn ? _("Update") : _("Create"), GTK_RESPONSE_OK,
+                    mn ? _("_Update") : _("_Create"), GTK_RESPONSE_OK,
                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, 
                     GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
                     NULL));

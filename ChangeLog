@@ -1,3 +1,16 @@
+2002-06-09  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/folder-scanners.c: debug printf->libbalsa_information.
+	* libbalsa/mailbox.h: comment on field usage.
+	* libbalsa/mailbox_imap.[ch]:lock mutt+rename/subscribe error checking.
+	* src/balsa-app.h: senbox is special, too.
+	* src/folder-conf.c: fix (hopefully for everybody) renaming.
+	* src/mailbox-conf.c: cleanup renaming (many problems with local
+	mailbox renaming fixed).
+	* src/mailbox-node.[ch]: add balsa_mailbox_local_rescan_parent().
+	a mailbox can have only one special function.
+	* src/save-restore.c: changing special mailboxes adapted.
+
 2002-06-07 Steve Wall <hitched97@myrealbox.com>
 
 	* src/pref-manager.c: convert the three radio buttons to a single

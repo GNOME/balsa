@@ -12,6 +12,7 @@ Please make sure you have the following things:
 	Imlib       >= 1.9.2
 	gnome-libs  >= 1.2.1  (see notes below)
 	libpspell   >= 0.11.2 (and at least one spell check module)
+	libesmtp    >= 0.8.1   http://www.stafford.uklinux.net/libesmtp/
 	
 	If you do not have these, please check:
 

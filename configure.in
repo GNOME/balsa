@@ -60,5 +60,6 @@ po/Makefile.in
 macros/Makefile
 intl/Makefile
 libbalsa/Makefile
+libmutt/Makefile
 src/Makefile
 ],[sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])

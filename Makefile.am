@@ -1,4 +1,4 @@
-SUBDIRS = po intl libbalsa src macros
+SUBDIRS = po intl libbalsa libmutt src macros
 
 ## to automatically rebuild aclocal.m4 if any of the macros in
 ## `macros/' change

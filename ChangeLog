@@ -1,3 +1,9 @@
+2003-07-08  Pawel Salek  <pawsa theochem.kth.se>
+
+	* src/balsa-app.h: add fields for print settings: margins, layout etc.
+	* src/save-restore.c: save&restore more print settings.
+	* src/print.c: get'em and set'em.
+
 2003-07-06  Pawel Salek  <pawsa theochem.kth.se>
 
 	* NEWS, configure.in: release balsa-2.0.12.

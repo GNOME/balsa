@@ -327,6 +327,14 @@ extern struct BalsaApplication {
 
     /* printing */
     gchar* paper_size; /* A4 or Letter */
+    gchar* margin_left;
+    gchar* margin_top;
+    gchar* margin_right;
+    gchar* margin_bottom;
+    gchar* print_unit;
+    gchar* print_layout;
+    gchar* paper_orientation;
+    gchar* page_orientation;
     gchar* print_header_font;  /* font for printing headers */
     gchar* print_body_font;    /* font for printing text parts */
     gchar* print_footer_font;  /* font for printing footers */

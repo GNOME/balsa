@@ -246,11 +246,11 @@ start_new_page(PrintInfo * pi)
     if (balsa_app.debug)
 	g_print("Processing page %s\n", buf);
 
+    gnome_print_beginpage(pi->pc, buf);
     /* print the page number */
     if (balsa_app.print_highlight_cited)
 	gnome_print_setrgbcolor (pi->pc, 0.0, 0.0, 0.0);
     page_no = g_strdup_printf(_("Page: %i/%i"), pi->current_page, pi->pages);
-    gnome_print_beginpage(pi->pc, buf);
     ypos = pi->page_height - pi->pgnum_from_top;
     gnome_print_setfont(pi->pc, pi->header_font);
     width = gnome_font_get_width_utf8(pi->header_font, page_no);
@@ -1528,6 +1528,23 @@ print_response_cb(GtkDialog * dialog, gint response, CommonInfo * ci)
     g_free(balsa_app.paper_size);
     balsa_app.paper_size =
         gnome_print_config_get(config, GNOME_PRINT_KEY_PAPER_SIZE); 
+    balsa_app.print_unit =
+        gnome_print_config_get(config, GNOME_PRINT_KEY_PREFERED_UNIT); 
+    balsa_app.margin_left =
+        gnome_print_config_get(config, GNOME_PRINT_KEY_PAGE_MARGIN_LEFT); 
+    balsa_app.margin_top =
+        gnome_print_config_get(config, GNOME_PRINT_KEY_PAGE_MARGIN_TOP); 
+    balsa_app.margin_right =
+        gnome_print_config_get(config, GNOME_PRINT_KEY_PAGE_MARGIN_RIGHT);
+    balsa_app.margin_bottom =
+        gnome_print_config_get(config, GNOME_PRINT_KEY_PAGE_MARGIN_BOTTOM); 
+    balsa_app.print_layout =
+        gnome_print_config_get(config, GNOME_PRINT_KEY_LAYOUT); 
+    balsa_app.paper_orientation =
+        gnome_print_config_get(config, GNOME_PRINT_KEY_PAPER_ORIENTATION); 
+    balsa_app.page_orientation =
+        gnome_print_config_get(config, GNOME_PRINT_KEY_PAGE_ORIENTATION); 
+
     gnome_print_config_unref(config);
 
     pi = print_info_new(ci);
@@ -1606,6 +1623,30 @@ message_print(LibBalsaMessage * msg, GtkWindow * parent)
     config = BALSA_GNOME_PRINT_UI_GET_CONFIG(ci->master);
     gnome_print_config_set(config, GNOME_PRINT_KEY_PAPER_SIZE, 
                            balsa_app.paper_size);
+    if(balsa_app.print_unit)
+	gnome_print_config_set(config, GNOME_PRINT_KEY_PREFERED_UNIT,
+			       balsa_app.print_unit); 
+    if(balsa_app.margin_left)
+	gnome_print_config_set(config, GNOME_PRINT_KEY_PAGE_MARGIN_LEFT,
+			       balsa_app.margin_left); 
+    if(balsa_app.margin_top)
+	gnome_print_config_set(config, GNOME_PRINT_KEY_PAGE_MARGIN_TOP,
+			       balsa_app.margin_top); 
+    if(balsa_app.margin_right)
+	gnome_print_config_set(config, GNOME_PRINT_KEY_PAGE_MARGIN_RIGHT,
+			       balsa_app.margin_right);
+    if(balsa_app.margin_bottom)
+	gnome_print_config_set(config, GNOME_PRINT_KEY_PAGE_MARGIN_BOTTOM,
+			       balsa_app.margin_bottom); 
+    if(balsa_app.print_layout)
+	gnome_print_config_set(config, GNOME_PRINT_KEY_LAYOUT,
+			       balsa_app.print_layout); 
+    if(balsa_app.paper_orientation)
+	gnome_print_config_set(config, GNOME_PRINT_KEY_PAPER_ORIENTATION,
+			       balsa_app.paper_orientation); 
+    if(balsa_app.page_orientation)
+	gnome_print_config_set(config, GNOME_PRINT_KEY_PAPER_ORIENTATION,
+			       balsa_app.page_orientation); 
     gnome_print_config_unref(config);
     
     ci->dialog = print_dialog(ci);

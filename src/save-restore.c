@@ -758,6 +758,22 @@ config_global_load(void)
     g_free(balsa_app.paper_size);
     balsa_app.paper_size =
 	gnome_config_get_string("PaperSize=" DEFAULT_PAPER_SIZE);
+    g_free(balsa_app.margin_left);
+    balsa_app.margin_left   = gnome_config_get_string("LeftMargin");
+    g_free(balsa_app.margin_top);
+    balsa_app.margin_top    = gnome_config_get_string("TopMargin");
+    g_free(balsa_app.margin_right);
+    balsa_app.margin_right  = gnome_config_get_string("RightMargin");
+    g_free(balsa_app.margin_bottom);
+    balsa_app.margin_bottom = gnome_config_get_string("BottomMargin");
+    g_free(balsa_app.print_unit);
+    balsa_app.print_unit    = gnome_config_get_string("PrintUnit");
+    g_free(balsa_app.print_layout);
+    balsa_app.print_layout  = gnome_config_get_string("PrintLayout");
+    g_free(balsa_app.paper_orientation);
+    balsa_app.paper_orientation  = gnome_config_get_string("PaperOrientation");
+    g_free(balsa_app.page_orientation);
+    balsa_app.page_orientation   = gnome_config_get_string("PageOrientation");
 
     g_free(balsa_app.print_header_font);
     balsa_app.print_header_font =
@@ -1107,6 +1123,24 @@ config_save(void)
     /* Printing options ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Printing/");
     gnome_config_set_string("PaperSize",balsa_app.paper_size);
+    if(balsa_app.margin_left)
+	gnome_config_set_string("LeftMargin",   balsa_app.margin_left);
+    if(balsa_app.margin_top)
+	gnome_config_set_string("TopMargin",    balsa_app.margin_top);
+    if(balsa_app.margin_bottom)
+	gnome_config_set_string("RightMargin",  balsa_app.margin_right);
+    if(balsa_app.margin_bottom)
+	gnome_config_set_string("BottomMargin", balsa_app.margin_bottom);
+    if(balsa_app.print_unit)
+	gnome_config_set_string("PrintUnit",    balsa_app.print_unit);
+    if(balsa_app.print_layout)
+	gnome_config_set_string("PrintLayout", balsa_app.print_layout);
+    if(balsa_app.margin_bottom)
+	gnome_config_set_string("PaperOrientation", 
+				balsa_app.paper_orientation);
+    if(balsa_app.margin_bottom)
+	gnome_config_set_string("PageOrientation", balsa_app.page_orientation);
+
     gnome_config_set_string("PrintHeaderFont",
                             balsa_app.print_header_font);
     gnome_config_set_string("PrintBodyFont", balsa_app.print_body_font);

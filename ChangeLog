@@ -1,3 +1,10 @@
+2001-01-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-app.c: move local dir back to the top.
+	* src/save-restore.c: second part of it.
+	* src/local-mailbox.c: fix names of local dirs. 
+	Remove load_local_mailboxes() - new code made it trivial.
+
 2001-01-06  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/address-entry.c:

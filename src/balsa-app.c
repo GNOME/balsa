@@ -111,7 +111,7 @@ balsa_app_init(void)
     balsa_app.draftbox = NULL;
     balsa_app.trash = NULL;
 
-    balsa_app.mailbox_nodes = g_node_new(NULL);
+    balsa_app.mailbox_nodes = NULL;
 
     balsa_app.new_messages_timer = 0;
     balsa_app.new_messages = 0;
@@ -207,9 +207,9 @@ balsa_app_init(void)
 static gint
 append_subtree_f(GNode* gn, gpointer data)
 {
-    if(gn->data) /* fails for root node only */
-	balsa_mailbox_node_append_subtree(BALSA_MAILBOX_NODE(gn->data),
-					       gn);
+    g_return_val_if_fail(gn->data, FALSE);
+    balsa_mailbox_node_append_subtree(BALSA_MAILBOX_NODE(gn->data),
+				      gn);
     return FALSE;
 }
 
@@ -226,12 +226,13 @@ do_load_mailboxes(void)
 	return FALSE;
     }
 
-    load_local_mailboxes();
-    
     /* expand subtrees; move later to an idle callback or a separate 
        thread to construct folders that are expensive to build (IMAP over
        dialup).
+       Expanding is a two step process: first, one expands the local
+       directory, later: all other folders.  
     */
+    append_subtree_f(balsa_app.mailbox_nodes, NULL); 
     g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_LEAFS, -1,
                     append_subtree_f, NULL);
     

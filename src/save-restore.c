@@ -63,8 +63,9 @@ static void config_identities_save(void);
 
 gint config_load(void)
 {
-    config_mailboxes_init();
-    config_global_load();
+    config_global_load();      /* initializes balsa_app.mailbox_nodes *
+				* needed in the next step             */
+    config_mailboxes_init(); 
     return TRUE;
 }
 
@@ -473,6 +474,9 @@ config_global_load(void)
     /* directory */
     g_free(balsa_app.local_mail_directory);
     balsa_app.local_mail_directory = gnome_config_get_string("MailDir");
+
+    balsa_app.mailbox_nodes = g_node_new(balsa_mailbox_node_new_from_dir(
+        balsa_app.local_mail_directory));
 
     /* debugging enabled */
     balsa_app.debug = gnome_config_get_bool("Debug=false");

@@ -230,7 +230,7 @@ read_dir(GNode *rnode, const gchar * prefix)
 		add_mailbox(rnode, de->d_name, filename, mailbox_type);
 	    } else {
 		name = g_basename(prefix);
-		current_node = add_mailbox(rnode, name, prefix, 0);
+		current_node = add_mailbox(rnode, name, filename, 0);
 		read_dir(current_node, filename);
 	    }
 	} else {
@@ -240,14 +240,4 @@ read_dir(GNode *rnode, const gchar * prefix)
 	}
     }
     closedir(dpc);
-}
-
-
-void
-load_local_mailboxes()
-{
-    /* read_dir(balsa_app.mailbox_nodes, balsa_app.local_mail_directory);
-     */
-    g_node_append(balsa_app.mailbox_nodes,
-		  g_node_new(balsa_mailbox_node_new_from_dir(balsa_app.local_mail_directory)));
 }

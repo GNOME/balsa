@@ -373,7 +373,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   else
     {
       g_print ("balsa-index.c: moving to row %i\n", i);
-      gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), i - 2, 0, 1.0, 0.0);
+      gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), i - 1, 0, 1.0, 0.0);
     }
   first_new_message = 0;
 }

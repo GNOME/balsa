@@ -830,9 +830,6 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	g_assert_not_reached();
     }
 
-    /* The mailbox url is now set. */
-    g_hash_table_insert(balsa_app.mailbox_views,
-                        g_strdup(mcw->mailbox->url), mcw->mailbox->view);
 
     if(save_to_config)
 	config_mailbox_add(mcw->mailbox, NULL);
@@ -842,8 +839,11 @@ mailbox_conf_add(MailboxConfWindow *mcw)
     if (LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox))
 	/* redraw the pop3 server list */
 	update_mail_servers();
-    else /* redraw the main mailbox list */
+    else {/* redraw the main mailbox list */
+        g_hash_table_insert(balsa_app.mailbox_views,
+                            g_strdup(mcw->mailbox->url), mcw->mailbox->view);
 	balsa_mblist_repopulate(balsa_app.mblist_tree_store);
+    }
 }
 
 /* Create a page for the type of mailbox... */
@@ -1171,8 +1171,9 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
     gboolean changed;
     LibBalsaMailboxView *view;
 
-    g_return_if_fail(view_info != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    if(view_info == NULL) /* POP3 mailboxes do not have view_info */
+        return;
 
     changed = FALSE;
     view = mailbox->view;

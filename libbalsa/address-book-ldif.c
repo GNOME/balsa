@@ -437,8 +437,11 @@ find_addr(GList *ab_list, const gchar *id)
     return NULL;
 }
 
-
-static void expand_addr_list(LibBalsaAddress *address, GList *ab_list)
+/* expand_addr_list:
+   expands address list cautiously to avoid circular references.
+*/
+static void
+expand_addr_list(LibBalsaAddress *address, GList *ab_list)
 {
     GList *member, *notfound = NULL;
     GList *member_list=NULL;
@@ -447,7 +450,7 @@ static void expand_addr_list(LibBalsaAddress *address, GList *ab_list)
 	gchar *member_data=member->data;
 	LibBalsaAddress *ref=find_addr(ab_list, member_data);
 
-	if(ref) {
+	if(ref && ref != address) {
 	    member_list=g_list_prepend(member_list, ref);
 	    g_object_ref(ref);
 	    g_free(member_data);

@@ -1,3 +1,9 @@
+2003-06-04  Pawel Salek <pawsa theochem.kth.se>
+
+	* libbalsa/address-book-ldif.c: detect circular references.
+	* libbalsa/source-viewer.c: compile on RH9.
+	* src/mailbox-conf.c: do not crash on POP3 mailbox configuration.
+	
 2003-06-04 06:01  PeterB
 
 	* libbalsa/source-viewer.c: Include "misc.h" (Miquel van

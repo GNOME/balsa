@@ -4,6 +4,7 @@ bin_PROGRAMS = balsa
 
 balsa_SOURCES =	\
 	balsa-app.c		\
+	balsa-icons.c		\
 	balsa-index.c		\
 	balsa-init.c		\
 	balsa-mblist.c		\
@@ -20,6 +21,7 @@ balsa_SOURCES =	\
 	save-restore.c		\
 	sendmsg-window.c	\
 	balsa-app.h		\
+	balsa-icons.h		\
 	balsa-index.h		\
 	balsa-init.h		\
 	balsa-message.h		\

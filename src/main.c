@@ -24,6 +24,7 @@
 #include <orb/orbit.h>
 
 #include "balsa-app.h"
+#include "balsa-icons.h"
 #include "balsa-init.h"
 #include "main-window.h"
 #include "mailbox.h"
@@ -157,6 +158,10 @@ main (int argc, char *argv[])
   config_mailboxes_init ();
   mailboxes_init ();
 
+  /* create all the pretty icons that balsa uses that
+   * arn't part of gnome-libs */
+  balsa_icons_init();
+  
   gnome_triggers_do ("", "program", "balsa", "startup", NULL);
 
   main_window_init ();

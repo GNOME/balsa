@@ -23,27 +23,13 @@
 #include <string.h>
 #include <gnome.h>
 #include "balsa-app.h"
+#include "balsa-icons.h"
 #include "balsa-index.h"
 #include "main-window.h"
-
-#include "pixmaps/envelope.xpm"
-#include "pixmaps/replied.xpm"
-#include "pixmaps/forwarded.xpm"
-#include "pixmaps/trash.xpm"
 
 /* constants */
 #define BUFFER_SIZE 1024
 
-
-static GdkPixmap *new_pix;
-static GdkPixmap *replied_pix;
-static GdkPixmap *forwarded_pix;
-static GdkPixmap *deleted_pix;
-
-static GdkBitmap *new_mask;
-static GdkBitmap *replied_mask;
-static GdkBitmap *forwarded_mask;
-static GdkBitmap *deleted_mask;
 
 /* gtk widget */
 static void balsa_index_class_init (BalsaIndexClass * klass);
@@ -245,7 +231,6 @@ clist_click_column (GtkCList * clist, gint column, gpointer data)
 static void
 balsa_index_init (BalsaIndex * bindex)
 {
-  GdkImlibImage *im;
 /*
  * status
  * priority
@@ -266,30 +251,6 @@ balsa_index_init (BalsaIndex * bindex)
   titles[3] = _ ("From");
   titles[4] = _ ("Subject");
   titles[5] = _ ("Date");
-
-  im = gdk_imlib_create_image_from_xpm_data (envelope_xpm);
-  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-  new_pix = gdk_imlib_copy_image (im);
-  new_mask = gdk_imlib_copy_mask (im);
-  gdk_imlib_destroy_image (im);
-
-  im = gdk_imlib_create_image_from_xpm_data (replied_xpm);
-  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-  replied_pix = gdk_imlib_copy_image (im);
-  replied_mask = gdk_imlib_copy_mask (im);
-  gdk_imlib_destroy_image (im);
-
-  im = gdk_imlib_create_image_from_xpm_data (forwarded_xpm);
-  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-  forwarded_pix = gdk_imlib_copy_image (im);
-  forwarded_mask = gdk_imlib_copy_mask (im);
-  gdk_imlib_destroy_image (im);
-
-  im = gdk_imlib_create_image_from_xpm_data (trash_xpm);
-  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-  deleted_pix = gdk_imlib_copy_image (im);
-  deleted_mask = gdk_imlib_copy_mask (im);
-  gdk_imlib_destroy_image (im);
 
   GTK_WIDGET_SET_FLAGS (bindex, GTK_NO_WINDOW);
   bindex->mailbox = NULL;
@@ -638,15 +599,22 @@ static void
 clist_set_col_img_from_flag (BalsaIndex * bindex, gint row, Message * message)
 {
   if (message->flags & MESSAGE_FLAG_DELETED)
-    gtk_clist_set_pixmap (GTK_CLIST (bindex->clist), row, 1, deleted_pix, deleted_mask);
+    gtk_clist_set_pixmap (GTK_CLIST (bindex->clist), row, 1,
+			  balsa_icon_get_pixmap (BALSA_ICON_TRASH),
+			  balsa_icon_get_bitmap (BALSA_ICON_TRASH));
 /*
    if (message->flags & MESSAGE_FLAG_FLAGGED)
    gtk_clist_set_pixmap (GTK_CLIST (bindex->clist), row, 1, , mailbox_mask);
  */
   else if (message->flags & MESSAGE_FLAG_REPLIED)
-    gtk_clist_set_pixmap (GTK_CLIST (bindex->clist), row, 1, replied_pix, replied_mask);
+    gtk_clist_set_pixmap (GTK_CLIST (bindex->clist), row, 1,
+			  balsa_icon_get_pixmap (BALSA_ICON_REPLIED),
+			  balsa_icon_get_bitmap (BALSA_ICON_REPLIED));
+
   else if (message->flags & MESSAGE_FLAG_NEW)
-    gtk_clist_set_pixmap (GTK_CLIST (bindex->clist), row, 1, new_pix, new_mask);
+    gtk_clist_set_pixmap (GTK_CLIST (bindex->clist), row, 1,
+			  balsa_icon_get_pixmap (BALSA_ICON_ENVELOPE),
+			  balsa_icon_get_bitmap (BALSA_ICON_ENVELOPE));
   else
     gtk_clist_set_text (GTK_CLIST (bindex->clist), row, 1, NULL);
 }

@@ -23,33 +23,9 @@
 #include <gtk/gtkfeatures.h>
 
 #include "balsa-app.h"
+#include "balsa-icons.h"
 #include "balsa-mblist.h"
 #include "misc.h"
-
-#include "pixmaps/mini_dir_closed.xpm"
-#include "pixmaps/mini_dir_open.xpm"
-#include "pixmaps/plain-folder.xpm"
-#include "pixmaps/full-folder.xpm"
-#include "pixmaps/inbox.xpm"
-#include "pixmaps/outbox.xpm"
-#include "pixmaps/trash.xpm"
-
-
-static GdkPixmap *open_folder;
-static GdkPixmap *closed_folder;
-static GdkPixmap *tray_empty;
-static GdkPixmap *tray_full;
-static GdkPixmap *inboxpix;
-static GdkPixmap *outboxpix;
-static GdkPixmap *trashpix;
-
-static GdkBitmap *open_mask;
-static GdkBitmap *closed_mask;
-static GdkBitmap *tray_empty_mask;
-static GdkBitmap *tray_full_mask;
-static GdkBitmap *inbox_mask;
-static GdkBitmap *outbox_mask;
-static GdkBitmap *trash_mask;
 
 enum
   {
@@ -151,28 +127,8 @@ balsa_mblist_class_init (BalsaMBListClass * klass)
 }
 
 static void
-imlib_magic_stuff (gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
-{
-  GdkImlibImage *im;
-  im = gdk_imlib_create_image_from_xpm_data (data);
-  gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-  *pmap = gdk_imlib_move_image (im);
-  *bmap = gdk_imlib_move_mask (im);
-  gdk_imlib_destroy_image (im);
-  im = NULL;
-}
-
-static void
 balsa_mblist_init (BalsaMBList * tree)
 {
-  imlib_magic_stuff (mini_dir_open_xpm, &open_folder, &open_mask);
-  imlib_magic_stuff (mini_dir_closed_xpm, &closed_folder, &closed_mask);
-  imlib_magic_stuff (plain_folder_xpm, &tray_empty, &tray_empty_mask);
-  imlib_magic_stuff (full_folder_xpm, &tray_full, &tray_full_mask);
-  imlib_magic_stuff (inbox_xpm, &inboxpix, &inbox_mask);
-  imlib_magic_stuff (outbox_xpm, &outboxpix, &outbox_mask);
-  imlib_magic_stuff (trash_xpm, &trashpix, &trash_mask);
-
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
 
@@ -216,20 +172,32 @@ balsa_mblist_redraw (BalsaMBList * bmbl)
 
   /* inbox */
   text[0] = "Inbox";
-  ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5, inboxpix,
-			    inbox_mask, inboxpix, inbox_mask, FALSE, FALSE);
+  ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5,
+				  balsa_icon_get_pixmap (BALSA_ICON_INBOX),
+				  balsa_icon_get_bitmap (BALSA_ICON_INBOX),
+				  balsa_icon_get_pixmap (BALSA_ICON_INBOX),
+				  balsa_icon_get_bitmap (BALSA_ICON_INBOX),
+				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.inbox);
 
   /* outbox */
   text[0] = "Outbox";
-  ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5, outboxpix,
-			 outbox_mask, outboxpix, outbox_mask, FALSE, FALSE);
+  ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5,
+				  balsa_icon_get_pixmap (BALSA_ICON_OUTBOX),
+				  balsa_icon_get_bitmap (BALSA_ICON_OUTBOX),
+				  balsa_icon_get_pixmap (BALSA_ICON_OUTBOX),
+				  balsa_icon_get_bitmap (BALSA_ICON_OUTBOX),
+				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.outbox);
 
   /* trash */
   text[0] = "Trash";
-  ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5, trashpix,
-			    trash_mask, trashpix, trash_mask, FALSE, FALSE);
+  ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5,
+				  balsa_icon_get_pixmap (BALSA_ICON_TRASH),
+				  balsa_icon_get_bitmap (BALSA_ICON_TRASH),
+				  balsa_icon_get_pixmap (BALSA_ICON_TRASH),
+				  balsa_icon_get_bitmap (BALSA_ICON_TRASH),
+				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.trash);
 
   if (balsa_app.mailbox_nodes)
@@ -300,14 +268,16 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 
 		  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 					   NULL, NULL,
-					   tray_full, tray_full_mask,
+			       balsa_icon_get_pixmap (BALSA_ICON_TRAY_FULL),
+			       balsa_icon_get_bitmap (BALSA_ICON_TRAY_FULL),
 					   FALSE, TRUE);
 		}
 	      else
 		{
 		  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 					   NULL, NULL,
-					   tray_empty, tray_empty_mask,
+			      balsa_icon_get_pixmap (BALSA_ICON_TRAY_EMPTY),
+			      balsa_icon_get_bitmap (BALSA_ICON_TRAY_EMPTY),
 					   FALSE, TRUE);
 		}
 
@@ -319,8 +289,10 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
     {
       /* new directory, but not a mailbox */
       gtk_ctree_set_node_info (ctree, cnode, g_basename (mbnode->name), 5,
-			       closed_folder, closed_mask,
-			       open_folder, open_mask,
+			       balsa_icon_get_pixmap (BALSA_ICON_DIR_CLOSED),
+			       balsa_icon_get_bitmap (BALSA_ICON_DIR_CLOSED),
+			       balsa_icon_get_pixmap (BALSA_ICON_DIR_OPEN),
+			       balsa_icon_get_bitmap (BALSA_ICON_DIR_OPEN),
 			       G_NODE_IS_LEAF (gnode), TRUE);
     }
   return TRUE;

@@ -1,5 +1,5 @@
 /* XPM */
-static char * full_folder_xpm[] = {
+static char * tray_full_xpm[] = {
 "16 16 42 1",
 " 	c None",
 ".	c #000000",

@@ -21,10 +21,89 @@
 #include "balsa-app.h"
 
 
-Mailbox *mailbox_new (gchar * name,
-		      gchar * mbox);
+enum
+  {
+    MAILBOX_MBOX,
+    MAILBOX_POP3,
+    MAILBOX_IMAP,
+    MAILBOX_NNTP
+  } 
+MailboxType;
+
+
+typedef union _Mailbox Mailbox;
+typedef struct _MailboxCommon MailboxCommon;
+typedef struct _MailboxMBox MailboxMBox;
+typedef struct _MailboxPOP3 MailboxPOP3;
+typedef struct _MailboxIMAP MailboxIMAP;
+
+
+struct _MailboxCommon
+  {
+    MailboxType type;
+    gchar *name;
+    MAILSTREAM *stream;
+  };
+
+struct _MailboxMBox
+  {
+    MailboxType type;
+    gchar *name;
+    MAILSTREAM *stream;
+
+    gchar *path;
+  };
+
+struct _MailboxPOP3
+  {
+    MailboxType type;
+    gchar *name;
+    MAILSTREAM *stream;
+
+    gchar *user;
+    gchar *passwd;
+    gchar *server;
+  };
+
+struct _MailboxIMAP
+  {
+    MailboxType type;
+    gchar *name;
+    MAILSTREAM *stream;
+
+    gchar *user;
+    gchar *passwd;
+    gchar *server;
+  };
+
+struct _MailboxNNTP
+  {
+    MailboxType type;
+    gchar *name;
+    MAILSTREAM *stream;
+
+    gchar *user;
+    gchar *passwd;
+    gchar *server;
+  };
+
+union _Mailbox
+  {
+    MailboxType type;
+    MailboxCommon common;
+    MailboxMBox mbox;
+    MailboxPOP3 pop3;
+    MailboxIMAP imap;
+    MailboxNNTP nntp;
+  };
+
+
+Mailbox * mailbox_new (MailboxType * type);
+
 int mailbox_open (Mailbox * mailbox);
+
 void mailbox_close (Mailbox * mailbox);
+
 void current_mailbox_check ();
 
 #endif /* __mailbox_h__ */

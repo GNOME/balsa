@@ -21,26 +21,68 @@
 #include "balsa-index.h"
 #include "index.h"
 
-
 Mailbox *
-mailbox_new ( gchar * name,
-	     gchar * mbox)
+mailbox_new (MailboxType * type)
 {
-  Mailbox *mailbox;
+  Mailbox mailbox;
+  MailboxMBox *mbox;
+  MailboxPOP3 *pop3;
+  MailboxIMAP *imap;
+  MailboxNNTP *nntp;
 
   mailbox = g_malloc (sizeof (Mailbox));
-  mailbox->name = g_strdup (name);
-  mailbox->path = g_strdup (mbox);
-  mailbox->stream = NIL;
 
+  switch (type)
+    {
+    case MAILBOX_MBOX:
+      mbox = (MailboxMBox *) mailbox;
+      mbox->type = MAILBOX_MBOX;
+      mbox->name = NULL;
+      mbox->stream = NIL;
+      mbox->path = NULL;
+      break;
+      
+    case MAILBOX_POP3:
+      pop3 = (MailboxPOP3 *) mailbox;
+      pop3->type = MAILBOX_POP3;
+      pop3->name = NULL;
+      pop3->stream = NIL;
+      pop3->user = NULL;
+      pop3->passwd = NULL;
+      pop3->server = NULL;
+      break;
+      
+    case MAILBOX_IMAP:
+      imap = (MailboxIMAP *) mailbox;
+      imap->type = MAILBOX_IMAP;
+      imap->name = NULL;
+      imap->stream = NIL;
+      imap->user = NULL;
+      imap->passwd = NULL;
+      imap->server = NULL;
+      break;
+      
+    case MAILBOX_NNTP:
+      nntp = (MailboxNNTP *) mailbox;
+      nntp->type = MAILBOX_NNTP;
+      nntp->name = NULL;
+      nntp->stream = NIL;
+      nntp->user = NULL;
+      nntp->passwd = NULL;
+      nntp->server = NULL;
+      break;
+    }
+  
   return mailbox;
-};
-
+}
 
 int
 mailbox_open (Mailbox * mailbox)
 {
   Mailbox *old_mailbox;
+  MailboxCommon *mcommon;
+
+  mcommon = (MailboxCommon *) mailbox;
 
   /* don't open a mailbox if it's already open 
    * -- runtime sanity */
@@ -71,16 +113,27 @@ mailbox_open (Mailbox * mailbox)
   return TRUE;
 }
 
+
 void
 mailbox_close (Mailbox * mailbox)
 {
+  MailboxCommon *mcommon;
+
+  mcommon = (MailboxCommon *) mailbox;
+
   /* now close the mail stream and expunge deleted
    * messages -- the expunge may not have to be done */
-  mailbox->stream = mail_close_full (mailbox->stream, CL_EXPUNGE);
+  mcommon->stream = mail_close_full (mailbox->stream, CL_EXPUNGE);
 }
 
+
+/* this is lame -- we need to replace this with a good
+ * mailbox checking mechanism */
 void
 current_mailbox_check ()
 {
-  mail_ping (balsa_app.current_mailbox->stream);
+  MailboxCommon *mcommon;
+
+  mcommon = (MailboxCommon *) balsa_app.current_mailbox;
+  mail_ping (mcommon->stream);
 }

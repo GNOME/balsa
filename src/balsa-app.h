@@ -20,25 +20,20 @@
 
 #include <gnome.h>
 #include "c-client.h"
+#include "mailbox.h"
 #include "main-window.h"
 
 
 #define DEFAULT_MAIL_SUBDIR "mail"
 
 
-typedef struct _Mailbox Mailbox;
-struct _Mailbox
-  {
-    gchar *name;
-    gchar *path;
-
-    MAILSTREAM *stream;
-  };
-
+/* global balsa application structure */
 struct
   {
     gchar *user_name;
     gchar *local_mail_directory;
+
+    gchar *smtp_server;
 
     Mailbox *current_mailbox;
     GList *mailbox_list;

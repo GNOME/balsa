@@ -347,8 +347,9 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 
   button = gtk_button_new ();
   gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
+  GTK_WIDGET_UNSET_FLAGS (button, GTK_CAN_FOCUS);
   gtk_container_add (GTK_CONTAINER (button),
-	      gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_BLUE));
+	       gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_RED));
   gtk_table_attach (GTK_TABLE (table), button, 2, 3, 0, 1,
 		    0, 0, 0, 0);
 
@@ -364,6 +365,14 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
   GTK_WIDGET_UNSET_FLAGS (msg->from, GTK_CAN_FOCUS);
   gtk_entry_set_editable (GTK_ENTRY (msg->from), FALSE);
+
+  button = gtk_button_new ();
+  gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
+  GTK_WIDGET_UNSET_FLAGS (button, GTK_CAN_FOCUS);
+  gtk_container_add (GTK_CONTAINER (button),
+	      gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_BLUE));
+  gtk_table_attach (GTK_TABLE (table), button, 2, 3, 1, 2,
+		    0, 0, 0, 0);
 
   /* Subject: */
   label = gtk_label_new ("Subject:");
@@ -387,8 +396,9 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 
   button = gtk_button_new ();
   gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
+  GTK_WIDGET_UNSET_FLAGS (button, GTK_CAN_FOCUS);
   gtk_container_add (GTK_CONTAINER (button),
-	      gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_BLUE));
+	    gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_YELLOW));
   gtk_table_attach (GTK_TABLE (table), button, 2, 3, 3, 4,
 		    0, 0, 0, 0);
 
@@ -404,8 +414,9 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 
   button = gtk_button_new ();
   gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
+  GTK_WIDGET_UNSET_FLAGS (button, GTK_CAN_FOCUS);
   gtk_container_add (GTK_CONTAINER (button),
-	      gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_BLUE));
+	     gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_GREEN));
   gtk_table_attach (GTK_TABLE (table), button, 2, 3, 4, 5,
 		    0, 0, 0, 0);
 

@@ -280,7 +280,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	return;
     }	
     libbalsa_mailbox_open(tmp_mailbox);
-    if ((m->inbox) && (tmp_mailbox->total_messages)) {
+    if ((m->inbox) && (libbalsa_mailbox_total_messages(tmp_mailbox))) {
         LibBalsaMailboxLocal *mbox = LIBBALSA_MAILBOX_LOCAL(tmp_mailbox);
 	GList *list;
 

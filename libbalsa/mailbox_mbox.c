@@ -75,6 +75,8 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_mbox_change_message_flags(LibBalsaMailbox * mailbox, guint msgno,
 					   LibBalsaMessageFlag set,
 					   LibBalsaMessageFlag clear);
+static guint libbalsa_mailbox_mbox_total_messages(LibBalsaMailbox *
+						  mailbox);
 
 
 GType libbalsa_mailbox_mbox_get_type(void)
@@ -129,6 +131,8 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_mbox_add_message;
     libbalsa_mailbox_class->change_message_flags =
 	libbalsa_mailbox_mbox_change_message_flags;
+    libbalsa_mailbox_class->total_messages =
+	libbalsa_mailbox_mbox_total_messages;
 
     libbalsa_mailbox_local_class->remove_files = 
 	libbalsa_mailbox_mbox_remove_files;
@@ -288,8 +292,6 @@ parse_mailbox(LibBalsaMailbox * mailbox)
 	    g_array_append_val(messages_info, msg_info);
     }
     g_object_unref(G_OBJECT(gmime_parser));
-
-    mailbox->total_messages = messages_info->len;
 }
 
 static void
@@ -354,7 +356,6 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
 
     if (!mailbox->readonly)
 	mailbox->readonly = access (path, W_OK) ? 1 : 0;
-    mailbox->total_messages = 0;
     mailbox->unread_messages = 0;
     if (st.st_size != 0)
 	parse_mailbox(mailbox);
@@ -427,7 +428,7 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 				       GMIME_STREAM_SEEK_SET) == -1)
 		    g_message("libbalsa_mailbox_mbox_check: "
 			      "g_mime_stream_seek() failed\n");
-		last_msgno = mailbox->total_messages;
+		last_msgno = mbox->messages_info->len;
 		parse_mailbox(mailbox);
 		mbox->size = g_mime_stream_tell(mbox->gmime_stream);
 		mbox_unlock(mailbox, NULL);
@@ -726,7 +727,6 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
 			    msg_info->message);
 		free_message_info(msg_info);
 		g_array_remove_index(mbox->messages_info, j);
-		mailbox->total_messages = mbox->messages_info->len;
 	    }
 	}
 	g_object_unref(G_OBJECT(gmime_parser));
@@ -1045,4 +1045,12 @@ libbalsa_mailbox_mbox_change_message_flags(LibBalsaMailbox * mailbox,
 				  msg_info->flags);
 
     libbalsa_mailbox_local_queue_sync(LIBBALSA_MAILBOX_LOCAL(mailbox));
+}
+
+static guint
+libbalsa_mailbox_mbox_total_messages(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxMbox *mbox = (LibBalsaMailboxMbox *) mailbox;
+
+    return mbox->messages_info ? mbox->messages_info->len : 0;
 }

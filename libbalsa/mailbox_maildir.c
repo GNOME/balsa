@@ -86,6 +86,8 @@ static void libbalsa_mailbox_maildir_change_message_flags(LibBalsaMailbox * mail
 						     guint msgno,
 						     LibBalsaMessageFlag set,
 						     LibBalsaMessageFlag clear);
+static guint libbalsa_mailbox_maildir_total_messages(LibBalsaMailbox *
+						     mailbox);
 
 /* util functions */
 static LibBalsaMessageFlag parse_filename(const gchar *subdir,
@@ -156,12 +158,13 @@ libbalsa_mailbox_maildir_class_init(LibBalsaMailboxMaildirClass * klass)
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_maildir_add_message;
     libbalsa_mailbox_class->change_message_flags =
 	libbalsa_mailbox_maildir_change_message_flags;
+    libbalsa_mailbox_class->total_messages =
+	libbalsa_mailbox_maildir_total_messages;
 
     libbalsa_mailbox_local_class->remove_files = 
 	libbalsa_mailbox_maildir_remove_files;
     libbalsa_mailbox_local_class->load_message =
         libbalsa_mailbox_maildir_load_message;
-
 }
 
 static void
@@ -428,11 +431,8 @@ static void parse_mailbox(LibBalsaMailbox * mailbox, const gchar *subdir)
 static void
 parse_mailbox_subdirs(LibBalsaMailbox * mailbox)
 {
-    LibBalsaMailboxMaildir *mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
-
     parse_mailbox(mailbox, "cur");
     parse_mailbox(mailbox, "new");
-    mailbox->total_messages = mdir->msgno_2_msg_info->len;
 }
 
 static gboolean
@@ -526,7 +526,7 @@ libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
     mdir->mtime_cur = st_cur.st_mtime;
     mdir->mtime_new = st_new.st_mtime;
 
-    last_msgno = mailbox->total_messages;
+    last_msgno = mdir->msgno_2_msg_info->len;
     parse_mailbox_subdirs(mailbox);
 
     libbalsa_mailbox_local_load_messages(mailbox, last_msgno);
@@ -711,8 +711,6 @@ lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir,
     }
     g_slist_free(si.removed_list);
 
-    LIBBALSA_MAILBOX(mdir)->total_messages = mdir->msgno_2_msg_info->len;
-
     /* FIXME: record mtime of dirs */
 
     return TRUE;
@@ -879,4 +877,12 @@ libbalsa_mailbox_maildir_change_message_flags(LibBalsaMailbox * mailbox, guint m
     msg_info->flags &= ~clear;
 
     libbalsa_mailbox_local_queue_sync(LIBBALSA_MAILBOX_LOCAL(mailbox));
+}
+
+static guint
+libbalsa_mailbox_maildir_total_messages(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxMaildir *mdir = (LibBalsaMailboxMaildir *) mailbox;
+
+    return mdir->msgno_2_msg_info ? mdir->msgno_2_msg_info->len : 0;
 }

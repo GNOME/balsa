@@ -143,6 +143,8 @@ static void lbm_imap_update_view_filter(LibBalsaMailbox   *mailbox,
                                         LibBalsaCondition *view_filter);
 static void libbalsa_mailbox_imap_sort(LibBalsaMailbox *mailbox,
                                        GArray *array);
+static guint libbalsa_mailbox_imap_total_messages(LibBalsaMailbox *
+						  mailbox);
 
 static void server_settings_changed(LibBalsaServer * server,
 				    LibBalsaMailbox * mailbox);
@@ -247,6 +249,8 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
     libbalsa_mailbox_class->update_view_filter =
         lbm_imap_update_view_filter;
     libbalsa_mailbox_class->sort = libbalsa_mailbox_imap_sort;
+    libbalsa_mailbox_class->total_messages =
+	libbalsa_mailbox_imap_total_messages;
 }
 
 static void
@@ -551,7 +555,6 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
             libbalsa_mailbox_msgno_inserted(mailbox, i);
         }
     }
-    mailbox->total_messages = cnt;
 }
 
 static void
@@ -631,9 +634,6 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap)
 	mimap->uid_validity = uidval;
 	/* FIXME: update/remove msg uids */
     }
-    /* test exist */
-    LIBBALSA_MAILBOX(mimap)->total_messages
-	= imap_mbox_handle_get_exists(mimap->handle);
 
     /* FIXME: these handlers should be disconnected when mailbox is closed. */
     imap_handle_set_flagscb(mimap->handle, (ImapFlagsCb)imap_flags_cb, mimap);
@@ -656,6 +656,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     LibBalsaMailboxImap *mimap;
     LibBalsaServer *server;
     unsigned i;
+    guint total_messages;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), FALSE);
 
@@ -672,11 +673,11 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     mimap->opened         = TRUE;
     mailbox->disconnected = FALSE;
     mailbox->unread_messages = 0;
-    mailbox->total_messages = imap_mbox_handle_get_exists(mimap->handle);
+    total_messages = imap_mbox_handle_get_exists(mimap->handle);
     mimap->messages_info = g_array_sized_new(FALSE, TRUE, 
 					     sizeof(struct message_info),
-					     mailbox->total_messages);
-    for(i=0; i<(unsigned)mailbox->total_messages; i++) {
+					     total_messages);
+    for(i=0; i < total_messages; i++) {
 	struct message_info a = {0};
 	g_array_append_val(mimap->messages_info, a);
     }
@@ -1831,7 +1832,7 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 {
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     GNode * new_tree;
-    int msgno;
+    guint msgno;
     gchar *filter = libbalsa_condition_build_imap_query(mailbox->view_filter);
 
     mailbox->view->threading_type = thread_type;
@@ -1847,7 +1848,7 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
                 g_node_copy(imap_mbox_handle_get_thread_root(mimap->handle));
         } else {
             new_tree = g_node_new(NULL);
-            for(msgno = 1; msgno <= mailbox->total_messages; msgno++)
+            for(msgno = 1; msgno <= mimap->messages_info->len; msgno++)
                 g_node_append_data(new_tree, GUINT_TO_POINTER(msgno));
         }
         break;
@@ -1935,4 +1936,12 @@ libbalsa_mailbox_imap_sort(LibBalsaMailbox *mbox, GArray *array)
     g_array_free(tmp, TRUE);
     g_free(msgno_arr);
     g_free(msgno_map);
+}
+
+static guint
+libbalsa_mailbox_imap_total_messages(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxImap *mimap = (LibBalsaMailboxImap *) mailbox;
+
+    return mimap->messages_info ? mimap->messages_info->len : 0;
 }

@@ -168,7 +168,6 @@ struct _LibBalsaMailbox {
     /* info fields */
     gboolean has_unread_messages;
     glong unread_messages;	/* number of unread messages in the mailbox */
-    glong total_messages;	/* total number of messages in the mailbox  */
 
     /* Associated filters (struct mailbox_filter) */
     GSList * filters;
@@ -233,6 +232,7 @@ struct _LibBalsaMailboxClass {
                                 LibBalsaCondition *view_filter);
     void (*sort) (LibBalsaMailbox * mailbox, GArray *sort_array);
     gboolean (*close_backend)(LibBalsaMailbox * mailbox);
+    guint (*total_messages)(LibBalsaMailbox * mailbox);
 };
 
 GType libbalsa_mailbox_get_type(void);
@@ -376,6 +376,7 @@ GType libbalsa_mailbox_type_from_path(const gchar * filename);
 void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
 					      GList * messages,
 					      gint flag);
+guint libbalsa_mailbox_total_messages(LibBalsaMailbox * mailbox);
 
 /*
  * Mailbox views-related functions.

@@ -237,7 +237,8 @@ libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox, guint msgno)
     g_return_val_if_fail(mailbox != NULL, NULL);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox), NULL);
     g_return_val_if_fail(msgno > 0, NULL);
-    g_return_val_if_fail(msgno <= (guint) mailbox->total_messages, NULL);
+    g_return_val_if_fail(msgno <= libbalsa_mailbox_total_messages(mailbox),
+			 NULL);
 
     message = libbalsa_message_new();
     LIBBALSA_MAILBOX_LOCAL_GET_CLASS(mailbox)->load_message(mailbox,
@@ -348,7 +349,7 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox, guint msgno)
     if (MAILBOX_CLOSED(mailbox))
 	return;
 
-    while (++msgno <= (guint) mailbox->total_messages)
+    while (++msgno <= libbalsa_mailbox_total_messages(mailbox))
 	if (libbalsa_mailbox_local_load_message(mailbox, msgno))
 	    ++new_messages;
 
@@ -396,21 +397,33 @@ static void
 lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
                              LibBalsaCondition *view_filter)
 {
-    glong msgno;
-    for (msgno=1; msgno<=mailbox->total_messages; msgno++) {
+    guint msgno;
+
+    for (msgno = 1;
+	 msgno <= libbalsa_mailbox_total_messages(mailbox);
+	 msgno++) {
         LibBalsaMessage *msg = 
             libbalsa_mailbox_get_message(mailbox, msgno);
+	/* FIXME: If the message flags have changed, a message in the
+	 * current view may no longer match the view-filter's
+	 * conditions; to be sure, we should do something like
+	 * gboolean in_view =
+	 *     g_node_find(mailbox->msg_tree, G_PRE_ORDER,
+	 *                 G_TRAVERSE_ALL, GUINT_TO_POINTER(msgno))
+	 *     != NULL;
+	 * (or update the view when the flags change ;-)
+	 */
         gboolean old_match = 
             (!mailbox->view_filter || 
              match_condition(mailbox->view_filter, msg, TRUE));
         gboolean new_match = 
             (!view_filter || match_condition(view_filter, msg, TRUE));
         if(old_match && !new_match) {
-            printf("removing %ld (%ld) from view\n", msgno, msg->msgno);
+            printf("removing %d (%ld) from view\n", msgno, msg->msgno);
 	    libbalsa_mailbox_msgno_filt_out(mailbox, msgno);
         }
         if(!old_match && new_match) {
-            printf("adding %ld (%ld) to the view\n", msgno, msg->msgno);
+            printf("adding %d (%ld) to the view\n", msgno, msg->msgno);
 	    libbalsa_mailbox_msgno_filt_in(mailbox, msgno);
         }
     }
@@ -502,7 +515,7 @@ lbml_info_setup(LibBalsaMailbox * mailbox, GNode * msg_tree,
     ti->mailbox = mailbox;
     ti->msg_tree = msg_tree;
 
-    ti->msg_array_len = ti->mailbox->total_messages;
+    ti->msg_array_len = libbalsa_mailbox_total_messages(mailbox);
     ti->msg_array = g_new(LibBalsaMessage *, ti->msg_array_len);
 
     for (msgno = 1; msgno <= ti->msg_array_len; msgno++)

@@ -644,8 +644,8 @@ bmbl_row_compare(GtkTreeModel * model, GtkTreeIter * iter1,
         break;
 
     case BMBL_TREE_COLUMN_TOTAL:
-        ret_val = ((m1 ? m1->total_messages : 0)
-                   - (m2 ? m2->total_messages : 0));
+        ret_val = ((m1 ? libbalsa_mailbox_total_messages(m1) : 0)
+                   - (m2 ? libbalsa_mailbox_total_messages(m2) : 0));
         break;
     }
 
@@ -1217,7 +1217,7 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
 	    else if(mailbox == balsa_app.trash)
 		in = BALSA_PIXMAP_MBOX_TRASH;
 	    else
-		in = (mailbox->total_messages > 0)
+		in = (libbalsa_mailbox_total_messages(mailbox) > 0)
 		? BALSA_PIXMAP_MBOX_TRAY_FULL
                 : BALSA_PIXMAP_MBOX_TRAY_EMPTY;
 
@@ -1573,9 +1573,11 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
     }
     /* We only want to do this if the mailbox is open, otherwise leave
      * the message numbers untouched in the display */
-    if (MAILBOX_OPEN(mailbox) && (mailbox->total_messages >= 0)) {
-        if (mailbox->total_messages > 0) {
-            text = g_strdup_printf("%ld", mailbox->total_messages);
+    if (MAILBOX_OPEN(mailbox)) {
+        if (libbalsa_mailbox_total_messages(mailbox) > 0) {
+            text =
+		g_strdup_printf("%d",
+				libbalsa_mailbox_total_messages(mailbox));
             gtk_tree_store_set(GTK_TREE_STORE(model), iter,
                                TOTAL_COLUMN, text, -1);
             g_free(text);
@@ -2182,9 +2184,9 @@ void
 balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox)
 {
     gchar *desc =
-        g_strdup_printf(_
-                        ("Shown mailbox: %s with %ld messages, %ld new"),
-                        mailbox->name, mailbox->total_messages,
+        g_strdup_printf(_("Shown mailbox: %s with %d messages, %ld new"),
+			mailbox->name,
+			libbalsa_mailbox_total_messages(mailbox),
                         mailbox->unread_messages);
 
     gnome_appbar_set_default(balsa_app.appbar, desc);

@@ -1136,7 +1136,8 @@ enable_mailbox_menus(BalsaIndex * index)
                                        && mailbox->unread_messages > 0);
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_FLAGGED, 
                                        mailbox
-                                       && mailbox->total_messages > 0);
+                                       && libbalsa_mailbox_total_messages
+				       (mailbox) > 0);
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_CLOSE_MBOX,
                                        enable);
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_MARKED_ALL,
@@ -1269,7 +1270,7 @@ enable_empty_trash(TrashState status)
         balsa_toolbar_get_from_gnome_app(GNOME_APP(balsa_app.main_window));
     gboolean set = TRUE;
     if (MAILBOX_OPEN(balsa_app.trash)) {
-        set = balsa_app.trash->total_messages > 0;
+        set = libbalsa_mailbox_total_messages(balsa_app.trash) > 0;
     } else {
         switch(status) {
         case TRASH_CHECK:
@@ -1278,7 +1279,7 @@ enable_empty_trash(TrashState status)
 #if CAN_DO_MAILBOX_OPENING_VERY_VERY_FAST
             if (balsa_app.trash) {
                 libbalsa_mailbox_open(balsa_app.trash);
-                set = balsa_app.trash->total_messages > 0;
+		set = libbalsa_mailbox_total_messages(balsa_app.trash) > 0;
                 libbalsa_mailbox_close(balsa_app.trash);
             } else set = TRUE;
 #else
@@ -1316,10 +1317,10 @@ balsa_window_enable_continue(void)
          * almost as well. 
          * */
 /*      libbalsa_mailbox_open(balsa_app.draftbox, FALSE); */
-/*      if (balsa_app.draftbox->total_messages > 0) { */
+/*      if (libbalsa_mailbox_total_messages(balsa_app.draftbox) > 0) { */
 
         gboolean n = !MAILBOX_OPEN(balsa_app.draftbox)
-            || balsa_app.draftbox->total_messages;
+            || libbalsa_mailbox_total_messages(balsa_app.draftbox) > 0;
 
         balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_CONTINUE, n);
         gtk_widget_set_sensitive(file_menu[MENU_FILE_CONTINUE_POS].widget, n);

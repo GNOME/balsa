@@ -651,7 +651,8 @@ mw_set_buttons_sensitive(MessageWindow * mw)
 				       && mailbox->unread_messages > 0);
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_FLAGGED,
 				       mailbox
-				       && mailbox->total_messages > 0);
+				       && libbalsa_mailbox_total_messages
+				       (mailbox) > 0);
 }
 
 static void

@@ -82,6 +82,7 @@ static void libbalsa_mailbox_mh_change_message_flags(LibBalsaMailbox * mailbox,
 						     guint msgno,
 						     LibBalsaMessageFlag set,
 						     LibBalsaMessageFlag clear);
+static guint libbalsa_mailbox_mh_total_messages(LibBalsaMailbox * mailbox);
 
 
 GType
@@ -141,6 +142,8 @@ libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass * klass)
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_mh_add_message;
     libbalsa_mailbox_class->change_message_flags =
 	libbalsa_mailbox_mh_change_message_flags;
+    libbalsa_mailbox_class->total_messages =
+	libbalsa_mailbox_mh_total_messages;
 
     libbalsa_mailbox_local_class->load_message =
         libbalsa_mailbox_mh_load_message;
@@ -429,10 +432,8 @@ static void
 lbm_mh_parse_both(LibBalsaMailboxMh * mh)
 {
     lbm_mh_parse_mailbox(mh);
-    if (mh->msgno_2_msg_info) {
+    if (mh->msgno_2_msg_info)
 	lbm_mh_parse_sequences(mh);
-	LIBBALSA_MAILBOX(mh)->total_messages = mh->msgno_2_msg_info->len;
-    }
 }
 
 static void
@@ -472,7 +473,6 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox)
     
     if (!mailbox->readonly)
 	mailbox->readonly = access (path, W_OK) ? 1 : 0;
-    mailbox->total_messages = 0;
     mailbox->unread_messages = 0;
     lbm_mh_parse_both(mh);
 
@@ -545,7 +545,7 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
     mh->mtime = st.st_mtime;
     mh->mtime_sequences = st_sequences.st_mtime;
 
-    last_msgno = mailbox->total_messages;
+    last_msgno = mh->msgno_2_msg_info->len;
     lbm_mh_parse_both(mh);
 
     libbalsa_mailbox_local_load_messages(mailbox, last_msgno);
@@ -729,9 +729,8 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     lbm_mh_print_line(&flagged);
     lbm_mh_print_line(&replied);
 
-    mailbox->total_messages = mh->msgno_2_msg_info->len;
     /* Renumber */
-    for (msgno = 1; msgno <= (guint) mailbox->total_messages; msgno++) {
+    for (msgno = 1; msgno <= mh->msgno_2_msg_info->len; msgno++) {
 	msg_info = lbm_mh_message_info_from_msgno(mh, msgno);
 	msg_info->message->msgno = msgno;
     }
@@ -986,4 +985,12 @@ libbalsa_mailbox_mh_change_message_flags(LibBalsaMailbox * mailbox, guint msgno,
     msg_info->flags &= ~clear;
 
     libbalsa_mailbox_local_queue_sync(LIBBALSA_MAILBOX_LOCAL(mailbox));
+}
+
+static guint
+libbalsa_mailbox_mh_total_messages(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxMh *mh = (LibBalsaMailboxMh *) mailbox;
+
+    return mh->msgno_2_msg_info ? mh->msgno_2_msg_info->len : 0;
 }

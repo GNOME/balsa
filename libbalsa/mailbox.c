@@ -248,6 +248,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->save_config  = libbalsa_mailbox_real_save_config;
     klass->load_config  = libbalsa_mailbox_real_load_config;
     klass->close_backend  = libbalsa_mailbox_real_close_backend;
+    klass->total_messages = NULL;
 }
 
 static void
@@ -263,7 +264,6 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
     mailbox->open_ref = 0;
     mailbox->has_unread_messages = FALSE;
     mailbox->unread_messages = 0;
-    mailbox->total_messages = 0;
 
     mailbox->readonly = FALSE;
     mailbox->disconnected = FALSE;
@@ -1168,6 +1168,15 @@ libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox)
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_backend(mailbox);
 }
 
+guint
+libbalsa_mailbox_total_messages(LibBalsaMailbox * mailbox)
+{
+    g_return_val_if_fail(mailbox != NULL, 0);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), 0);
+
+    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->total_messages(mailbox);
+}
+
 gboolean
 libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox, gboolean expunge)
 {
@@ -1206,9 +1215,8 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     g_return_val_if_fail(mailbox != NULL, NULL);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
-    g_return_val_if_fail(msgno > 0
-			 && msgno <= (guint) mailbox->total_messages,
-			 NULL);
+    g_return_val_if_fail(msgno > 0 && msgno <=
+			 libbalsa_mailbox_total_messages(mailbox), NULL);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message(mailbox,
 							    msgno);
@@ -2387,7 +2395,7 @@ lbm_update_msg_tree_populate(GNode * node,
     guint msgno;
 
     msgno = GPOINTER_TO_UINT(node->data);
-    g_assert(msgno <= (guint) mti->mailbox->total_messages);
+    g_assert(msgno <= libbalsa_mailbox_total_messages(mti->mailbox));
 
     mti->nodes[msgno] = node;
 
@@ -2404,7 +2412,7 @@ lbm_update_msg_tree_prune(GNode * node,
     guint msgno;
 
     msgno = GPOINTER_TO_UINT(node->data);
-    g_assert(msgno <= (guint) mti->mailbox->total_messages);
+    g_assert(msgno <= libbalsa_mailbox_total_messages(mti->mailbox));
     if (!mti->nodes[msgno]) {
 	/* It's a bottom-up traverse, so the node's remaining children
 	 * are all in the new tree; we'll promote them to be children of
@@ -2437,13 +2445,13 @@ lbm_update_msg_tree_move(GNode * new_node,
 	return FALSE;
 
     msgno = GPOINTER_TO_UINT(new_node->data);
-    g_assert(msgno <= (guint) mti->mailbox->total_messages);
+    g_assert(msgno <= libbalsa_mailbox_total_messages(mti->mailbox));
     node = mti->nodes[msgno];
     if (!node)
 	mti->nodes[msgno] = node = g_node_new(new_node->data);
 
     msgno = GPOINTER_TO_UINT(new_node->parent->data);
-    g_assert(msgno <= (guint) mti->mailbox->total_messages);
+    g_assert(msgno <= libbalsa_mailbox_total_messages(mti->mailbox));
     parent = mti->nodes[msgno];
     g_assert(parent != NULL);
 
@@ -2460,7 +2468,8 @@ lbm_update_msg_tree(LibBalsaMailbox * mailbox, GNode * new_tree)
 
     mti.mailbox = mailbox;
     mti.new_tree = new_tree;
-    mti.nodes = g_new0(GNode *, 1 + mailbox->total_messages);
+    mti.nodes =
+	g_new0(GNode *, 1 + libbalsa_mailbox_total_messages(mailbox));
 
     /* Populate the nodes array with nodes in the new tree. */
     g_node_traverse(new_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
@@ -2471,7 +2480,8 @@ lbm_update_msg_tree(LibBalsaMailbox * mailbox, GNode * new_tree)
 
     /* Clear the nodes array and repopulate it with nodes in the current
      * tree. */
-    memset(mti.nodes, 0, sizeof(GNode *) * (1 + mailbox->total_messages));
+    memset(mti.nodes, 0,
+	   sizeof(GNode *) * (1 + libbalsa_mailbox_total_messages(mailbox)));
     g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
 		    (GNodeTraverseFunc) lbm_update_msg_tree_populate, &mti);
     /* Check parent-child relationships. */

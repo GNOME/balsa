@@ -536,7 +536,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
     send_lock();
 
     libbalsa_mailbox_open(outbox);
-    if (!outbox->total_messages) {
+    if (!libbalsa_mailbox_total_messages(outbox)) {
 	libbalsa_mailbox_close(outbox);
 	send_unlock();
 	return TRUE;

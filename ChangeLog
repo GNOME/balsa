@@ -1,3 +1,8 @@
+2003-09-07  Carlos Morgado <chbm gnome.org>
+
+	* src/Makefile.am: alter link order
+	* libbalsa/address.c: utf8 sanitize addresses
+
 2003-09-07  Bart Visscher <magick@Linux-Fan.com>
 
 	* libbalsa/message.c: remove open/sync/close around add_message
@@ -2985,4 +2990,3 @@
 	* configure.in, Makefile.am, acconfig.h,
 	libbalsa/Makefile.am: modify just to make it compile
 	* libbalsa/address-book.c, libbalsa/misc.h: make first file compile.
-

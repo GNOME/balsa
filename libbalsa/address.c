@@ -27,6 +27,7 @@
 #include <gmime/gmime.h>
 
 #include "address.h"
+#include "misc.h"
 
 static GObjectClass *parent_class;
 
@@ -507,9 +508,12 @@ libbalsa_address_new_from_string(const gchar * str)
 {
     LibBalsaAddress* addr;
     InternetAddressList *list;
-
-    list = internet_address_parse_string(str);
-    if (!list)
+gchar *tmp = g_strdup(str);
+    
+	libbalsa_utf8_sanitize(&tmp, FALSE, WEST_EUROPE, NULL);
+	list = internet_address_parse_string(tmp);
+    g_free(tmp);
+	if (!list)
 	return NULL;
 
     addr = libbalsa_address_new();

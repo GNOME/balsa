@@ -1,3 +1,8 @@
+2002-04-05 Steve Wall <hitched97@myrealbox.com>
+
+	* src/sendmsg-window.c: mark included messages as included, not
+	replied. Fix signature delimiter detection.
+
 2002-04-04  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox_{local,pop3}.c: filtering fixes by Emmanuel.

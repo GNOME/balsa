@@ -933,7 +933,9 @@ prep_signature(LibBalsaIdentity* ident, gchar* sig)
     /* empty signature is a legal signature */
     if(sig == NULL) return NULL;
     
-    if (ident->sig_separator && g_strncasecmp(sig, "-- \n", 5)) {
+    if (ident->sig_separator
+        && g_strncasecmp(sig, "--\n", 3)
+        && g_strncasecmp(sig, "-- \n", 4)) {
         sig_tmp = g_strconcat("\n-- \n", sig, NULL);
         g_free(sig);
         sig = sig_tmp;
@@ -2180,79 +2182,78 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
     if (message->date)
 	date = libbalsa_message_date_to_gchar(message, balsa_app.date_string);
 
-    if (type == SEND_FORWARD_ATTACH) {
+    if (type == SEND_FORWARD_INLINE) {
 	const gchar *subject;
+	GList *ref_list = message->references;
 
-	str = g_strdup_printf(_("------forwarded message------\n"), 
-			      personStr);
-	body = g_string_new(str);
+	body = content2reply(message, NULL,
+			     balsa_app.wordwrap ? balsa_app.wraplength : -1,
+			     balsa_app.reply_strip_html, msg->flow);
+
+	str = g_strdup(_("----- End Included Message -----\n"));
+	g_string_append(body, str);
 	g_free(str);
 
-	if (date) {
-	    str = g_strdup_printf(_("Date: %s\n"), date);
-	    g_string_append(body, str);
+	g_string_prepend(body, "\n");
+
+	for( ; ref_list; ref_list = ref_list->next ) {
+	    str = g_strdup_printf(_("References: %s"), ref_list->data);
+	    g_string_prepend(body, str);
 	    g_free(str);
 	}
 
-	subject = LIBBALSA_MESSAGE_GET_SUBJECT(message);
-	if (subject) {
-	    str = g_strdup_printf(_("Subject: %s\n"), subject);
-	    g_string_append(body, str);
-	    g_free(str);
-	}
+	str = g_strdup_printf(_("Message-ID: %s\n"), message->message_id);
+	g_string_prepend(body, str);
+	g_free(str);
 
-	if (message->from) {
-	    gchar *from = libbalsa_address_to_gchar(message->from, 0);
-	    str = g_strdup_printf(_("From: %s\n"), from);
-	    g_string_append(body, str);
-	    g_free(from);
+	if (message->cc_list) {
+	    gchar *cc_list = libbalsa_make_string_from_list(message->cc_list);
+	    str = g_strdup_printf(_("CC: %s\n"), cc_list);
+	    g_string_prepend(body, str);
+	    g_free(cc_list);
 	    g_free(str);
 	}
 
 	if (message->to_list) {
 	    gchar *to_list = libbalsa_make_string_from_list(message->to_list);
 	    str = g_strdup_printf(_("To: %s\n"), to_list);
-	    g_string_append(body, str);
+	    g_string_prepend(body, str);
 	    g_free(to_list);
 	    g_free(str);
 	}
 
-	if (message->cc_list) {
-	    gchar *cc_list = libbalsa_make_string_from_list(message->cc_list);
-	    str = g_strdup_printf(_("CC: %s\n"), cc_list);
-	    g_string_append(body, str);
-	    g_free(cc_list);
+	if (message->from) {
+	    gchar *from = libbalsa_address_to_gchar(message->from, 0);
+	    str = g_strdup_printf(_("From: %s\n"), from);
+	    g_string_prepend(body, str);
+	    g_free(from);
 	    g_free(str);
 	}
 
-	str = g_strdup_printf(_("Message-ID: %s\n"), message->message_id);
-	g_string_append(body, str);
+	subject = LIBBALSA_MESSAGE_GET_SUBJECT(message);
+	if (subject) {
+	    str = g_strdup_printf(_("Subject: %s\n"), subject);
+	    g_string_prepend(body, str);
+	    g_free(str);
+	}
+
+	if (date) {
+	    str = g_strdup_printf(_("Date: %s\n"), date);
+	    g_string_prepend(body, str);
+	    g_free(str);
+	}
+
+	str = g_strdup(_("----- Begin Included Message -----\n"));
+	g_string_prepend(body, str);
 	g_free(str);
 
-	if (message->references) {
-	    GList *ref_list = message->references;
-
-	    str = g_strdup_printf(_("References: %s"), ref_list->data);
-	    g_string_append(body, str);
-	    g_free(str);
-	    ref_list = ref_list->next;
-
-	    while (ref_list) {
-		str = g_strdup_printf(" %s", ref_list->data);
-		g_string_append(body, str);
-		g_free(str);
-		ref_list = ref_list->next;
-	    }
-		
-	    g_string_append(body, "\n");
-	}
     } else {
 	if (date)
 	    str = g_strdup_printf(_("On %s %s wrote:\n"), date, personStr);
 	else
 	    str = g_strdup_printf(_("%s wrote:\n"), personStr);
 	body = content2reply(message,
-			     (type == SEND_REPLY || type == SEND_REPLY_ALL || 
+			     (type == SEND_REPLY || type == SEND_REPLY_ALL ||
 			      type == SEND_REPLY_GROUP) ?
 			     balsa_app.quote_str : NULL,
 			     balsa_app.wordwrap ? balsa_app.wraplength : -1,

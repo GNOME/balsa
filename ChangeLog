@@ -1,3 +1,10 @@
+2003-09-10  Carlos Morgado  <chbm chbm.net>
+
+	* configure.in (BALSA_PATCHLEVEL): bump version 2.1.0
+
+	* libbalsa/mailbox_imap.c (imap_matched):
+	make imap search not crash, it's still broken though
+
 2003-09-10 06:07  PeterB
 
 	* src/main-window.c: Set mailbox tab color on opening; flush the

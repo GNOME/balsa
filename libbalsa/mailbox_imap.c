@@ -951,7 +951,7 @@ typedef struct {
 } ImapSearchData;
 
 static void
-imap_matched(guint32 uid, ImapSearchData* data)
+imap_matched(gpointer foo, guint32 uid, ImapSearchData* data)
 {
     LibBalsaMessage* m = 
         g_hash_table_lookup(data->uids,GUINT_TO_POINTER(uid)); 
@@ -973,20 +973,21 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
     gchar* query;
     ImapResult rc = IMR_NO;
     ImapMboxHandle* handle;
-    ImapSearchData cbdata;
+    ImapSearchData * cbdata;
     GList* msgs;
 
     *err = FALSE;
     
-    cbdata.uids = g_hash_table_new(NULL, NULL); 
-    cbdata.res  = g_hash_table_new(NULL, NULL);
+    cbdata = g_new( ImapSearchData, 1 );
+    cbdata->uids = g_hash_table_new(NULL, NULL); 
+    cbdata->res  = g_hash_table_new(NULL, NULL);
     query = libbalsa_filter_build_imap_query(op, conditions, only_recent);
     if (query) {
 	for(msgs= LIBBALSA_MAILBOX(mbox)->message_list; msgs;
 	    msgs = msgs->next){
 	    LibBalsaMessage *m = LIBBALSA_MESSAGE(msgs->data);
 	    ImapUID uid = IMAP_MESSAGE_UID(m);
-	    g_hash_table_insert(cbdata.uids, GUINT_TO_POINTER(uid), m);
+	    g_hash_table_insert(cbdata->uids, GUINT_TO_POINTER(uid), m);
 	}
 	
 	handle = libbalsa_mailbox_imap_get_handle(mbox, NULL);
@@ -994,7 +995,7 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 	    gulong handler_id;
 	    handler_id = g_signal_connect(G_OBJECT(handle), "search-response",
 					  G_CALLBACK(imap_matched),
-					  (gpointer) &cbdata);
+					  (gpointer) cbdata);
 
 	    rc = imap_mbox_uid_search(handle, query);
 
@@ -1003,18 +1004,18 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 	    g_free(query);
 	}
     }
-    g_hash_table_destroy(cbdata.uids);
+    g_hash_table_destroy(cbdata->uids);
     /* Clean up on error */
     if (rc != IMR_OK) {
-	g_hash_table_destroy(cbdata.res);
-	cbdata.res = NULL;
+	g_hash_table_destroy(cbdata->res);
+	cbdata->res = NULL;
 	*err = TRUE;
 	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
 			     _("IMAP SEARCH command failed for mailbox %s\n"
 			       "falling back to default searching method"),
 			     LIBBALSA_MAILBOX(mbox)->url);
     };
-    return cbdata.res;
+    return cbdata->res;
 }
 
 /* This function download the UID via the SEARCH command if necessary

@@ -2118,7 +2118,11 @@ create_text_area(BalsaSendmsg * bsmsg)
     gtk_text_buffer_create_tag(buffer, "soft", NULL);
     gtk_text_buffer_create_tag(buffer, "url", NULL);
     gtk_text_view_set_editable(text_view, TRUE);
+#if GTK_CHECK_VERSION(2, 4, 0)
     gtk_text_view_set_wrap_mode(text_view, GTK_WRAP_WORD_CHAR);
+#else
+    gtk_text_view_set_wrap_mode(text_view, GTK_WRAP_WORD);
+#endif
 
     table = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(table),

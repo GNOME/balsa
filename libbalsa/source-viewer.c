@@ -198,7 +198,11 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
     pango_font_description_free(desc);
 
     gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
+#if GTK_CHECK_VERSION(2, 4, 0)
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD_CHAR);
+#else
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD);
+#endif
 
     interior = gtk_scrolled_window_new(GTK_TEXT_VIEW(text)->hadjustment,
                                        GTK_TEXT_VIEW(text)->vadjustment);

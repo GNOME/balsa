@@ -513,8 +513,7 @@ main(int argc, char *argv[])
             else sendmsg_window_set_field(snd,"to", opt_compose_email);
         }
         for(lst = opt_attach_list; lst; lst = g_slist_next(lst))
-            add_attachment(GNOME_ICON_LIST(snd->attachments[1]),
-                           lst->data, FALSE, NULL);
+            add_attachment(snd, lst->data, FALSE, NULL);
 	snd->quit_on_close = FALSE;
     };
     gtk_widget_show(window);

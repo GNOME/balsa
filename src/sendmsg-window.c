@@ -1343,9 +1343,10 @@ destroy_attachment (gpointer data)
    takes over the ownership of filename.
 */
 gboolean
-add_attachment(GnomeIconList * iconlist, char *filename, 
+add_attachment(BalsaSendmsg * bsmsg, char *filename, 
                gboolean is_a_temp_file, const gchar *forced_mime_type)
 {
+    GnomeIconList *iconlist = GNOME_ICON_LIST(bsmsg->attachments[1]);
     gchar *content_type = NULL;
     gchar *pix, *err_bsmsg;
 
@@ -1396,6 +1397,11 @@ add_attachment(GnomeIconList * iconlist, char *filename,
 	g_free(label);
     }
 
+    bsmsg->update_config = FALSE;
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
+	    bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
+    bsmsg->update_config = TRUE;
+
     g_free(pix) ;
     g_free(content_type);
     return TRUE;
@@ -1429,7 +1435,6 @@ static void
 attach_dialog_ok(GtkWidget * widget, gpointer data)
 {
     GtkFileSelection *fs;
-    GnomeIconList *iconlist;
     BalsaSendmsg *bsmsg;
     gchar **files;
     gchar **tmp;
@@ -1438,18 +1443,12 @@ attach_dialog_ok(GtkWidget * widget, gpointer data)
     fs = GTK_FILE_SELECTION(data);
     bsmsg = g_object_get_data(G_OBJECT(fs), "balsa-data");
 
-    iconlist = GNOME_ICON_LIST(bsmsg->attachments[1]);
     files = gtk_file_selection_get_selections(fs);
     for (tmp = files; *tmp; ++tmp)
-        if(!add_attachment(iconlist, g_strdup(*tmp), FALSE, NULL)) res++;
+        if(!add_attachment(bsmsg, g_strdup(*tmp), FALSE, NULL)) res++;
 
     g_strfreev(files);
     
-    bsmsg->update_config = FALSE;
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
-	bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
-    bsmsg->update_config = TRUE;
-
     g_free(balsa_app.attach_dir);
     balsa_app.attach_dir =
         g_path_get_dirname(gtk_file_selection_get_filename(fs));
@@ -1462,13 +1461,10 @@ static void
 attach_clicked(GtkWidget * widget, gpointer data)
 {
     GtkWidget *fsw;
-    GnomeIconList *iconlist;
     GtkFileSelection *fs;
     BalsaSendmsg *bsmsg;
 
     bsmsg = data;
-
-    iconlist = GNOME_ICON_LIST(bsmsg->attachments[1]);
 
     fsw = gtk_file_selection_new(_("Attach file"));
 #if 0
@@ -1515,10 +1511,8 @@ attach_message(BalsaSendmsg *bsmsg, LibBalsaMessage *message)
         g_free(name);
         return FALSE;
     }
-    add_attachment(GNOME_ICON_LIST(bsmsg->attachments[1]), name,
+    add_attachment(bsmsg, name,
 		   TRUE, "message/rfc822");
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
-	    bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
     return TRUE;
 }
 
@@ -1636,15 +1630,10 @@ attachments_add(GtkWidget * widget,
     } else if (info == TARGET_URI_LIST) {
         GSList *uri_list = uri2gslist(selection_data->data);
         for (; uri_list; uri_list = g_slist_next(uri_list)) {
-	    add_attachment(GNOME_ICON_LIST(bsmsg->attachments[1]),
+	    add_attachment(bsmsg,
 			   uri_list->data, FALSE, NULL); /* steal strings */
         }
         g_slist_free(uri_list);
-	/* show attachment list */
-	bsmsg->update_config = FALSE;
-	gtk_check_menu_item_set_active(
-				       GTK_CHECK_MENU_ITEM(bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
-	bsmsg->update_config = TRUE;
     } else if( info == TARGET_STRING) {
 	add_extbody_attachment( GNOME_ICON_LIST(bsmsg->attachments[1]),
 				selection_data->data, "text/html", FALSE, TRUE);
@@ -2070,7 +2059,7 @@ continueBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 		libbalsa_message_body_save_fd(body, fd);
 	    }
 	    body_type = libbalsa_message_body_get_content_type(body);
-	    add_attachment(GNOME_ICON_LIST(bsmsg->attachments[1]), name,
+	    add_attachment(bsmsg, name,
 			   body->filename != NULL, body_type);
 	    g_free(body_type);
 	    body = body->next;

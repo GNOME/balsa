@@ -23,7 +23,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
-static sigset_t Sigset;
+extern sigset_t Sigset;
 static int IsEndwin = 0;
 
 static pid_t *PidList = NULL;
@@ -182,32 +182,6 @@ void mutt_signal_init (void)
    */
   SLang_getkey_intr_hook = mutt_intr_hook;
 #endif
-}
-
-/* signals which are important to block while doing critical ops */
-void mutt_block_signals (void)
-{
-  if (!option (OPTSIGNALSBLOCKED))
-  {
-    sigemptyset (&Sigset);
-    sigaddset (&Sigset, SIGINT);
-    sigaddset (&Sigset, SIGWINCH);
-    sigaddset (&Sigset, SIGHUP);
-    sigaddset (&Sigset, SIGTERM);
-    sigaddset (&Sigset, SIGTSTP);
-    sigprocmask (SIG_BLOCK, &Sigset, 0);
-    set_option (OPTSIGNALSBLOCKED);
-  }
-}
-
-/* restore the previous signal mask */
-void mutt_unblock_signals (void)
-{
-  if (option (OPTSIGNALSBLOCKED))
-  {
-    sigprocmask (SIG_UNBLOCK, &Sigset, 0);
-    unset_option (OPTSIGNALSBLOCKED);
-  }
 }
 
 void mutt_block_signals_system (void)

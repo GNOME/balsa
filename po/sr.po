@@ -8,8 +8,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-09-07 14:44+0200\n"
-"PO-Revision-Date: 2003-09-07 14:43+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-09-08 01:22+0200\n"
+"PO-Revision-Date: 2003-09-08 01:21+0200\n"
 "Last-Translator: Страхиња Радић <mr99164@alas.matf.bg.ac.yu>\n"
 "Language-Team: Serbian (sr) <serbiangnome-lista@nongnu.org>\n"
 "MIME-Version: 1.0\n"
@@ -57,35 +58,35 @@ msgstr "Не могу да додам исти унос два пута"
 msgid "Unknown error"
 msgstr "Непозната грешка"
 
-#: libbalsa/address.c:747
+#: libbalsa/address.c:751
 msgid "_Displayed Name:"
 msgstr "П_риказано име:"
 
-#: libbalsa/address.c:748
+#: libbalsa/address.c:752
 msgid "_First Name:"
 msgstr "_Име:"
 
-#: libbalsa/address.c:749
+#: libbalsa/address.c:753
 msgid "_Middle Name:"
 msgstr "_Средње име:"
 
-#: libbalsa/address.c:750
+#: libbalsa/address.c:754
 msgid "_Last Name:"
 msgstr "_Презиме:"
 
-#: libbalsa/address.c:751
+#: libbalsa/address.c:755
 msgid "_Nickname:"
 msgstr "_Надимак:"
 
-#: libbalsa/address.c:752
+#: libbalsa/address.c:756
 msgid "O_rganization:"
 msgstr "Органи_зација:"
 
-#: libbalsa/address.c:753 libinit_balsa/balsa-druid-page-user.c:79
+#: libbalsa/address.c:757 libinit_balsa/balsa-druid-page-user.c:79
 msgid "_Email Address:"
 msgstr "Адреса _епоште:"
 
-#: libbalsa/body.c:112 libbalsa/message.c:1023
+#: libbalsa/body.c:112 libbalsa/message.c:1016
 msgid "(No subject)"
 msgstr "(без наслова)"
 
@@ -136,36 +137,36 @@ msgstr "Грешка при одбацивању порука"
 msgid "Error when moving messages"
 msgstr "Грешка при премештању порука"
 
-#: libbalsa/gmime-gpgme-context.c:155
+#: libbalsa/gmime-gpgme-context.c:157
 #, c-format
 msgid "Cannot sign message: could not create gpgme context: %s"
 msgstr ""
 "Не могу да потпишем поруку: нисам могао да створим gpgme-ов контекст: %s"
 
-#: libbalsa/gmime-gpgme-context.c:306
+#: libbalsa/gmime-gpgme-context.c:308
 #, c-format
 msgid "Cannot sign message: could not get gpgme data from istream: %s"
 msgstr ""
 "Не могу да потпишем поруку: нисам успео да добавим податке из istream-а: %s"
 
-#: libbalsa/gmime-gpgme-context.c:314
+#: libbalsa/gmime-gpgme-context.c:316
 #, c-format
 msgid "Cannot sign message: gpgme could not create new data: %s"
 msgstr ""
 "Не могу да потпишем поруку: gpgme није могао да створи нове податке: %s"
 
-#: libbalsa/gmime-gpgme-context.c:324
+#: libbalsa/gmime-gpgme-context.c:326
 #, c-format
 msgid "Cannot sign message: gpgme signing failed: %s"
 msgstr "Не могу да потпишем поруку: потписивање gpgme-ом није успело: %s"
 
-#: libbalsa/gmime-gpgme-context.c:343
+#: libbalsa/gmime-gpgme-context.c:345
 #, c-format
 msgid "Cannot sign message: could not get gpgme data: %s"
 msgstr ""
 "Не могу да потпишем поруку: нисам могао да добавим gpgme-ове податке: %s"
 
-#: libbalsa/gmime-gpgme-context.c:373
+#: libbalsa/gmime-gpgme-context.c:375
 #, c-format
 msgid ""
 "Cannot verify message signature: could not get gpgme data from istream: %s"
@@ -173,7 +174,7 @@ msgstr ""
 "Не могу да проверим потпис поруке: нисам успео да добавим податке из istream-"
 "а: %s"
 
-#: libbalsa/gmime-gpgme-context.c:382
+#: libbalsa/gmime-gpgme-context.c:384
 #, c-format
 msgid ""
 "Cannot verify message signature: could not get gpgme data from sigstream: %s"
@@ -181,73 +182,73 @@ msgstr ""
 "Не могу да проверим потпис поруке: нисам успео да добавим податке из "
 "sigstream-а: %s"
 
-#: libbalsa/gmime-gpgme-context.c:391 libbalsa/rfc3156.c:763
+#: libbalsa/gmime-gpgme-context.c:393 libbalsa/rfc3156.c:759
 #, c-format
 msgid "gpgme signature verification failed: %s"
 msgstr "провера потписа помоћу gpgme-а није успела: %s"
 
-#: libbalsa/gmime-gpgme-context.c:440
+#: libbalsa/gmime-gpgme-context.c:442
 #, c-format
 msgid "Cannot encrypt message: could not create gpgme recipients set: %s"
 msgstr ""
 "Не могу да шифрујем поруку: нисам могао да створим gpgme-ов скуп прималаца: %"
 "s"
 
-#: libbalsa/gmime-gpgme-context.c:466
+#: libbalsa/gmime-gpgme-context.c:468
 #, c-format
 msgid "Cannot encrypt message: could not get gpgme data from istream: %s"
 msgstr ""
 "Не могу да шифрујем поруку: нисам могао да добавим gpgme податке из istream-"
 "а: %s"
 
-#: libbalsa/gmime-gpgme-context.c:475
+#: libbalsa/gmime-gpgme-context.c:477
 #, c-format
 msgid "Cannot encrypt message: gpgme could not create new data: %s"
 msgstr ""
 "Не могу да шифрујем поруку: gpgme није могао да створи нове податке: %s"
 
-#: libbalsa/gmime-gpgme-context.c:486
+#: libbalsa/gmime-gpgme-context.c:488
 #, c-format
 msgid "Cannot encrypt message: gpgme encryption failed: %s"
 msgstr "Не могу да шифрујем поруку: шифровање помоћу gpgme-а није успело: %s"
 
-#: libbalsa/gmime-gpgme-context.c:501
+#: libbalsa/gmime-gpgme-context.c:503
 #, c-format
 msgid "Cannot encrypt message: could not get gpgme data: %s"
 msgstr ""
 "Не могу да шифрујем поруку: нисам могао да добавим gpgme-ове податке: %s"
 
-#: libbalsa/gmime-gpgme-context.c:532
+#: libbalsa/gmime-gpgme-context.c:534
 #, c-format
 msgid "Cannot decrypt message: could not get gpgme data from istream: %s"
 msgstr ""
 "Не могу да дешифрујем поруку: нисам могао да добавим gpgme податке из "
 "istream-а: %s"
 
-#: libbalsa/gmime-gpgme-context.c:540
+#: libbalsa/gmime-gpgme-context.c:542
 #, c-format
 msgid "Cannot decrypt message: gpgme could not create new data: %s"
 msgstr ""
 "Не могу да дешифрујем поруку: gpgme није могао да створи нове податке: %s"
 
-#: libbalsa/gmime-gpgme-context.c:550
+#: libbalsa/gmime-gpgme-context.c:552
 #, c-format
 msgid "Cannot decrypt message: gpgme decrypting failed: %s"
 msgstr ""
 "Не могу да дешифрујем поруку: није успело дешифровање помоћу gpgme-а: %s"
 
-#: libbalsa/gmime-gpgme-context.c:561
+#: libbalsa/gmime-gpgme-context.c:563
 #, c-format
 msgid "Cannot decrypt message: could not get gpgme data: %s"
 msgstr ""
 "Не могу да дешифрујем поруку: нисам могао да добавим gpgme-ове податке: %s"
 
-#: libbalsa/gmime-gpgme-context.c:589 libbalsa/gmime-gpgme-context.c:644
+#: libbalsa/gmime-gpgme-context.c:591 libbalsa/gmime-gpgme-context.c:646
 #, c-format
 msgid "Failed to execute gpgme: %s"
 msgstr "Нисам успео да извршим gpgme: %s"
 
-#: libbalsa/gmime-gpgme-context.c:590 libbalsa/gmime-gpgme-context.c:645
+#: libbalsa/gmime-gpgme-context.c:592 libbalsa/gmime-gpgme-context.c:647
 #: libmutt/mutt_ssl.c:440 src/pref-manager.c:1267 src/pref-manager.c:1366
 msgid "Unknown"
 msgstr "Непознато"
@@ -440,7 +441,7 @@ msgstr "Лоша путања локалног сандучета „%s“"
 msgid "Could not create a mailbox of type %s"
 msgstr "Нисам могао да створим сандуче врсте %s"
 
-#: libbalsa/mailbox_imap.c:664 libbalsa/mailbox_imap.c:1150
+#: libbalsa/mailbox_imap.c:655 libbalsa/mailbox_imap.c:1147
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -451,12 +452,12 @@ msgstr ""
 "или упит није сагласан са IMAP-ом (можда користите регуларне изразе)\n"
 "враћам се на подразумевани начин претраге"
 
-#: libbalsa/mailbox_imap.c:819
+#: libbalsa/mailbox_imap.c:813
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: Отварам %s Рефброј: %d\n"
 
-#: libbalsa/mailbox_imap.c:1017
+#: libbalsa/mailbox_imap.c:1014
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -465,28 +466,28 @@ msgstr ""
 "Наредба IMAP SEARCH није успела за сандуче „%s“\n"
 "враћам се на подразумевани начин претраге"
 
-#: libbalsa/mailbox_maildir.c:166
+#: libbalsa/mailbox_maildir.c:164
 #, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
 msgstr "Сандуче %s не изгледа као сандуче врсте „Maildir“."
 
-#: libbalsa/mailbox_maildir.c:175
+#: libbalsa/mailbox_maildir.c:173
 #, c-format
 msgid "Could not create a MailDir directory at %s (%s)"
 msgstr "Нисам могао да створим „MailDir“ директоријум у %s (%s)"
 
-#: libbalsa/mailbox_maildir.c:182 libbalsa/mailbox_maildir.c:190
-#: libbalsa/mailbox_maildir.c:200
+#: libbalsa/mailbox_maildir.c:180 libbalsa/mailbox_maildir.c:188
+#: libbalsa/mailbox_maildir.c:198
 #, c-format
 msgid "Could not create a MailDir at %s (%s)"
 msgstr "Нисам могао да створим „MailDir“ у %s (%s)"
 
-#: libbalsa/mailbox_maildir.c:272 libbalsa/mailbox_mh.c:248
+#: libbalsa/mailbox_maildir.c:280 libbalsa/mailbox_mh.c:248
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Нисам успео да отворим „%s“. Грешка број %d, "
 
-#: libbalsa/mailbox_maildir.c:291 libbalsa/mailbox_mh.c:267
+#: libbalsa/mailbox_maildir.c:299 libbalsa/mailbox_mh.c:267
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
@@ -495,7 +496,7 @@ msgstr ""
 "Нисам могао да уклоним садржај %s:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:297 libbalsa/mailbox_mbox.c:235
+#: libbalsa/mailbox_maildir.c:305 libbalsa/mailbox_mbox.c:235
 #: libbalsa/mailbox_mh.c:273
 #, c-format
 msgid ""
@@ -505,15 +506,20 @@ msgstr ""
 "Нисам могао да уклоним %s:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:459 libbalsa/mailbox_mbox.c:381
+#: libbalsa/mailbox_maildir.c:465
 #, c-format
-msgid "LibBalsaMailboxMbox: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxMbox: Отварам %s Рефброј: %d\n"
+msgid "LibBalsaMailboxMaildir: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxMaildir: Отварам %s Рефброј: %d\n"
 
 #: libbalsa/mailbox_mbox.c:158
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "Сандуче %s не изгледа као сандуче врсте „Mbox“."
+
+#: libbalsa/mailbox_mbox.c:381
+#, c-format
+msgid "LibBalsaMailboxMbox: Opening %s Refcount: %d\n"
+msgstr "LibBalsaMailboxMbox: Отварам %s Рефброј: %d\n"
 
 #: libbalsa/mailbox_mh.c:156
 #, c-format
@@ -577,7 +583,7 @@ msgstr ""
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr "Изворно сандуче (%s) је само за читање. Не могу да преместим поруке"
 
-#: libbalsa/mime.c:100 libbalsa/rfc3156.c:64
+#: libbalsa/mime.c:99 libbalsa/rfc3156.c:63
 msgid ""
 "\n"
 "--\n"
@@ -623,17 +629,17 @@ msgstr "Повезивање је одбијено"
 msgid "Authentication failed"
 msgstr "Потврда исправности није успела"
 
-#: libbalsa/pop3.c:421
+#: libbalsa/pop3.c:422
 #, c-format
 msgid "Retrieving Message %d of %d"
 msgstr "Преузимам поруку %d од %d"
 
-#: libbalsa/pop3.c:433
+#: libbalsa/pop3.c:434
 #, c-format
 msgid "Received %d bytes of %d"
 msgstr "Примљено %d бајтова од %d"
 
-#: libbalsa/rfc3156.c:180
+#: libbalsa/rfc3156.c:176
 #, c-format
 msgid ""
 "\n"
@@ -642,12 +648,12 @@ msgstr ""
 "\n"
 "Потписао: %s"
 
-#: libbalsa/rfc3156.c:184
+#: libbalsa/rfc3156.c:180
 #, c-format
 msgid "Mail address: %s"
 msgstr "Поштанска адреса: %s"
 
-#: libbalsa/rfc3156.c:186
+#: libbalsa/rfc3156.c:182
 #, c-format
 msgid ""
 "\n"
@@ -656,7 +662,7 @@ msgstr ""
 "\n"
 "Исправност: %s"
 
-#: libbalsa/rfc3156.c:188
+#: libbalsa/rfc3156.c:184
 #, c-format
 msgid ""
 "\n"
@@ -665,7 +671,7 @@ msgstr ""
 "\n"
 "Поверење у власника: %s"
 
-#: libbalsa/rfc3156.c:191
+#: libbalsa/rfc3156.c:187
 #, c-format
 msgid ""
 "\n"
@@ -674,7 +680,7 @@ msgstr ""
 "\n"
 "Отисак кључа: %s"
 
-#: libbalsa/rfc3156.c:196
+#: libbalsa/rfc3156.c:192
 #, c-format
 msgid ""
 "\n"
@@ -683,7 +689,7 @@ msgstr ""
 "\n"
 "Датум стварања кључа: %s"
 
-#: libbalsa/rfc3156.c:201
+#: libbalsa/rfc3156.c:197
 #, c-format
 msgid ""
 "\n"
@@ -692,138 +698,138 @@ msgstr ""
 "\n"
 "Датум потписивања: %s"
 
-#: libbalsa/rfc3156.c:335
+#: libbalsa/rfc3156.c:331
 #, c-format
 msgid "GMimeGPG signature verification failed: %s"
 msgstr "Провера GMimeGPG потписа није успела: %s"
 
-#: libbalsa/rfc3156.c:442
+#: libbalsa/rfc3156.c:438
 msgid "Enter passphrase to decrypt message"
 msgstr "Унесите лозинку за дешифровање поруке"
 
-#: libbalsa/rfc3156.c:503 libbalsa/rfc3156.c:1508
+#: libbalsa/rfc3156.c:499 libbalsa/rfc3156.c:1501
 #, c-format
 msgid "could not get a key for %s"
 msgstr "нисам могао да добавим кључ за %s"
 
-#: libbalsa/rfc3156.c:536
+#: libbalsa/rfc3156.c:532
 msgid "The signature is valid."
 msgstr "Потпис је исправан."
 
-#: libbalsa/rfc3156.c:538
+#: libbalsa/rfc3156.c:534
 msgid "The signature is valid but expired."
 msgstr "Потпис је исправан али је истекао."
 
-#: libbalsa/rfc3156.c:540
+#: libbalsa/rfc3156.c:536
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr "Потпис је исправан али је кључ за потврду потписа истекао."
 
-#: libbalsa/rfc3156.c:542
+#: libbalsa/rfc3156.c:538
 msgid "The signature is invalid."
 msgstr "Потпис није исправан."
 
-#: libbalsa/rfc3156.c:544
+#: libbalsa/rfc3156.c:540
 msgid "The signature could not be verified due to a missing key."
 msgstr "Потпис није могао да буде проверен због непостојања кључа."
 
-#: libbalsa/rfc3156.c:546
+#: libbalsa/rfc3156.c:542
 msgid "This part is not a real PGP signature."
 msgstr "Овај део није прави PGP потпис."
 
-#: libbalsa/rfc3156.c:548
+#: libbalsa/rfc3156.c:544
 msgid "An error prevented the signature verification."
 msgstr "Грешка је спречила проверу потписа."
 
-#: libbalsa/rfc3156.c:550
+#: libbalsa/rfc3156.c:546
 msgid "This part contains at least two signatures with different status."
 msgstr "Овај део садржи најмање два потписа са различитим стањем."
 
-#: libbalsa/rfc3156.c:553
+#: libbalsa/rfc3156.c:549
 msgid "bad status"
 msgstr "лоше стање"
 
-#: libbalsa/rfc3156.c:563
+#: libbalsa/rfc3156.c:559
 msgid "The user ID is of unknown validity."
 msgstr "Не може се проценити исправност корисничког ИБ."
 
-#: libbalsa/rfc3156.c:565
+#: libbalsa/rfc3156.c:561
 msgid "The validity of the user ID is undefined."
 msgstr "Исправност корисничког ИБ није задата."
 
-#: libbalsa/rfc3156.c:567
+#: libbalsa/rfc3156.c:563
 msgid "The user ID is never valid."
 msgstr "Кориснички ИБ никад није исправан."
 
-#: libbalsa/rfc3156.c:569
+#: libbalsa/rfc3156.c:565
 msgid "The user ID is marginally valid."
 msgstr "Кориснички ИБ је делом исправан."
 
-#: libbalsa/rfc3156.c:571
+#: libbalsa/rfc3156.c:567
 msgid "The user ID is fully valid."
 msgstr "Кориснички ИБ је у потпуности исправан."
 
-#: libbalsa/rfc3156.c:573
+#: libbalsa/rfc3156.c:569
 msgid "The user ID is ultimately valid."
 msgstr "Корисничи ИБ је увек исправан."
 
-#: libbalsa/rfc3156.c:575 libbalsa/rfc3156.c:1220
+#: libbalsa/rfc3156.c:571 libbalsa/rfc3156.c:1216
 msgid "bad validity"
 msgstr "лоша исправност"
 
-#: libbalsa/rfc3156.c:624 libbalsa/rfc3156.c:726 libbalsa/rfc3156.c:846
-#: libbalsa/rfc3156.c:961 libbalsa/rfc3156.c:2178
+#: libbalsa/rfc3156.c:620 libbalsa/rfc3156.c:722 libbalsa/rfc3156.c:842
+#: libbalsa/rfc3156.c:957
 #, c-format
 msgid "could not create gpgme context: %s"
 msgstr "нисам могао да створим gpgme-ов контекст: %s"
 
-#: libbalsa/rfc3156.c:639 libbalsa/rfc3156.c:866
+#: libbalsa/rfc3156.c:635 libbalsa/rfc3156.c:862
 msgid "Enter passsphrase to OpenPGP sign the first message part"
 msgstr "Унесите лозинку за потписивање првог дела поруке помоћу OpenPGP-а"
 
-#: libbalsa/rfc3156.c:647 libbalsa/rfc3156.c:743 libbalsa/rfc3156.c:878
-#: libbalsa/rfc3156.c:970
+#: libbalsa/rfc3156.c:643 libbalsa/rfc3156.c:739 libbalsa/rfc3156.c:874
+#: libbalsa/rfc3156.c:966
 #, c-format
 msgid "gpgme could not get data from buffer: %s"
 msgstr "gpgme не може да добави податке из бафера: %s"
 
-#: libbalsa/rfc3156.c:654 libbalsa/rfc3156.c:753 libbalsa/rfc3156.c:886
-#: libbalsa/rfc3156.c:979
+#: libbalsa/rfc3156.c:650 libbalsa/rfc3156.c:749 libbalsa/rfc3156.c:882
+#: libbalsa/rfc3156.c:975
 #, c-format
 msgid "gpgme could not create new data object: %s"
 msgstr "gpgme није могао да створи нови објекат података: %s"
 
-#: libbalsa/rfc3156.c:663
+#: libbalsa/rfc3156.c:659
 #, c-format
 msgid "gpgme signing failed: %s"
 msgstr "потписивање gpgme-ом није успело: %s"
 
-#: libbalsa/rfc3156.c:675 libbalsa/rfc3156.c:793 libbalsa/rfc3156.c:918
-#: libbalsa/rfc3156.c:1020 libbalsa/rfc3156.c:2225
+#: libbalsa/rfc3156.c:671 libbalsa/rfc3156.c:789 libbalsa/rfc3156.c:914
+#: libbalsa/rfc3156.c:1016
 #, c-format
 msgid "could not get gpgme data: %s"
 msgstr "нисам могао да добавим gpgme-ове податке: %s"
 
-#: libbalsa/rfc3156.c:900
+#: libbalsa/rfc3156.c:896
 #, c-format
 msgid "gpgme signing and encryption failed: %s"
 msgstr "потписивање и шифровање помоћу gpgme-а није успело: %s"
 
-#: libbalsa/rfc3156.c:904 libbalsa/rfc3156.c:2211
+#: libbalsa/rfc3156.c:900
 #, c-format
 msgid "gpgme encryption failed: %s"
 msgstr "шифровање помоћу gpgme-а није успело: %s"
 
-#: libbalsa/rfc3156.c:986
+#: libbalsa/rfc3156.c:982
 msgid "Enter passsphrase to decrypt message part"
 msgstr "Унесите лозинку ради дешифровања дела поруке"
 
-#: libbalsa/rfc3156.c:992
+#: libbalsa/rfc3156.c:988
 #, c-format
 msgid "gpgme decryption and signature verification failed: %s"
 msgstr "неуспешно дешифровање и провера потписа помоћу gpgme-а: %s"
 
-#: libbalsa/rfc3156.c:1037
+#: libbalsa/rfc3156.c:1033
 #, c-format
 msgid ""
 "The OpenPGP encrypted message part contains 8-bit characters, but no header "
@@ -832,7 +838,7 @@ msgstr ""
 "Порука шифрована помоћу OpenPGP-а садржи 8-битне знаке, али не и заглавље \n"
 "које описује коришћени скуп знакова (посматрано као %s)"
 
-#: libbalsa/rfc3156.c:1103
+#: libbalsa/rfc3156.c:1099
 #, c-format
 msgid ""
 "%s\n"
@@ -841,12 +847,12 @@ msgstr ""
 "%s\n"
 "Желите ли да покренете gpg ради увоза јавног кључа са отиском %s?"
 
-#: libbalsa/rfc3156.c:1128
+#: libbalsa/rfc3156.c:1124
 #, c-format
 msgid "Could not launch %s to get the public key %s."
 msgstr "Не могу да покренем %s ради добављања јавног кључа %s."
 
-#: libbalsa/rfc3156.c:1176
+#: libbalsa/rfc3156.c:1172
 #, c-format
 msgid ""
 "Running gpg failed with return value %d:\n"
@@ -855,7 +861,7 @@ msgstr ""
 "Неуспешно покретање gpg-а, са резултатом %d:\n"
 "%s"
 
-#: libbalsa/rfc3156.c:1183
+#: libbalsa/rfc3156.c:1179
 #, c-format
 msgid ""
 "Running gpg successful:\n"
@@ -864,91 +870,91 @@ msgstr ""
 "Успешно покретање gpg-а:\n"
 "%s"
 
-#: libbalsa/rfc3156.c:1208
+#: libbalsa/rfc3156.c:1204
 msgid "unknown"
 msgstr "непознато"
 
-#: libbalsa/rfc3156.c:1210
+#: libbalsa/rfc3156.c:1206
 msgid "undefined"
 msgstr "није задано"
 
-#: libbalsa/rfc3156.c:1212
+#: libbalsa/rfc3156.c:1208
 msgid "never"
 msgstr "никад"
 
-#: libbalsa/rfc3156.c:1214
+#: libbalsa/rfc3156.c:1210
 msgid "marginal"
 msgstr "скоро"
 
-#: libbalsa/rfc3156.c:1216
+#: libbalsa/rfc3156.c:1212
 msgid "full"
 msgstr "у потпуности"
 
-#: libbalsa/rfc3156.c:1218
+#: libbalsa/rfc3156.c:1214
 msgid "ultimate"
 msgstr "увек"
 
-#: libbalsa/rfc3156.c:1286
+#: libbalsa/rfc3156.c:1279
 msgid "Fingerprint"
 msgstr "Отисак"
 
-#: libbalsa/rfc3156.c:1286
+#: libbalsa/rfc3156.c:1279
 msgid "Key ID"
 msgstr "ИБ кључа"
 
-#: libbalsa/rfc3156.c:1286
+#: libbalsa/rfc3156.c:1279
 msgid "Validity"
 msgstr "Исправност"
 
-#: libbalsa/rfc3156.c:1286
+#: libbalsa/rfc3156.c:1279
 msgid "Owner trust"
 msgstr "Поверење у власника"
 
-#: libbalsa/rfc3156.c:1287
+#: libbalsa/rfc3156.c:1280
 msgid "Length"
 msgstr "Дужина"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: libbalsa/rfc3156.c:1324
+#: libbalsa/rfc3156.c:1317
 msgid "Select key"
 msgstr "Изаберите кључ"
 
-#: libbalsa/rfc3156.c:1332
+#: libbalsa/rfc3156.c:1325
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Изаберите приватни кључ за потписника %s"
 
-#: libbalsa/rfc3156.c:1335
+#: libbalsa/rfc3156.c:1328
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Изаберите јавни кључ за примаоца %s"
 
-#: libbalsa/rfc3156.c:1425
+#: libbalsa/rfc3156.c:1418
 #, c-format
 msgid "could not list keys for %s: %s"
 msgstr "нисам могао да побројим кључеве за %s: %s"
 
-#: libbalsa/rfc3156.c:1433
+#: libbalsa/rfc3156.c:1426
 #, c-format
 msgid "could not retrieve key for %s: %s"
 msgstr "нисам могао да добавим кључ за %s: %s"
 
-#: libbalsa/rfc3156.c:1470
+#: libbalsa/rfc3156.c:1463
 #, c-format
 msgid "could not get a private key for %s"
 msgstr "нисам могао да добавим приватни кључ за %s"
 
-#: libbalsa/rfc3156.c:1496
+#: libbalsa/rfc3156.c:1489
 #, c-format
 msgid "could not create gpgme recipients set: %s"
 msgstr "нисам могао да створим gpgme-ов скуп прималаца: %s"
 
-#: libbalsa/rfc3156.c:1520
+#: libbalsa/rfc3156.c:1513
 #, c-format
 msgid "could not add recipient %s: %s"
 msgstr "нисам могао да додам примаоца %s: %s"
 
-#: libbalsa/rfc3156.c:1899
+#: libbalsa/rfc3156.c:1855
 #, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -959,7 +965,7 @@ msgstr ""
 "\n"
 "Kључ: %s"
 
-#: libbalsa/rfc3156.c:1903
+#: libbalsa/rfc3156.c:1859
 #, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -970,43 +976,33 @@ msgstr ""
 "\n"
 "Кључ: %s"
 
-#: libbalsa/rfc3156.c:1918
+#: libbalsa/rfc3156.c:1874
 msgid "remember passphrase for"
 msgstr "запамти лозинку за"
 
-#: libbalsa/rfc3156.c:1923 src/pref-manager.c:1691 src/pref-manager.c:2519
+#: libbalsa/rfc3156.c:1879 src/pref-manager.c:1691 src/pref-manager.c:2519
 #: src/pref-manager.c:2540
 msgid "minutes"
 msgstr "минута"
 
-#: libbalsa/rfc3156.c:2129
+#: libbalsa/rfc3156.c:2063
 msgid "Enter passsphrase to sign message"
 msgstr "Унесите лозинку да бисте потписали поруку"
 
-#: libbalsa/rfc3156.c:2194
-#, c-format
-msgid "gpgme could not get data from file: %s"
-msgstr "gpgme није могао да добави податке из датотеке: %s"
-
-#: libbalsa/rfc3156.c:2202
-#, c-format
-msgid "gpgme could not create new data: %s"
-msgstr "gpgme није могао да створи нове податке: %s"
-
-#: libbalsa/send.c:219 libbalsa/send.c:226
+#: libbalsa/send.c:221 libbalsa/send.c:228
 msgid "Sending Mail..."
 msgstr "Шаљем пошту..."
 
-#: libbalsa/send.c:222 src/main-window.c:1805
+#: libbalsa/send.c:224 src/main-window.c:1805
 msgid "_Hide"
 msgstr "_Сакриј"
 
-#: libbalsa/send.c:356
+#: libbalsa/send.c:359
 msgid "Unable to open sentbox - could not get IMAP server information"
 msgstr ""
 "Не могу да отворим „Послане“ - не могу да добавим податке са сервера IMAP"
 
-#: libbalsa/send.c:776
+#: libbalsa/send.c:779
 #, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -1017,7 +1013,7 @@ msgstr ""
 "%d: %s\n"
 "Порука је задржана у сандучету „Одлазеће“.\n"
 
-#: libbalsa/send.c:818
+#: libbalsa/send.c:821
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -1028,7 +1024,7 @@ msgstr ""
 "%d: %s\n"
 "Порука је задржана међу одлазном поштом.\n"
 
-#: libbalsa/send.c:828
+#: libbalsa/send.c:831
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -1036,33 +1032,33 @@ msgstr ""
 "Проблем са слањем поруке, смештам је у ваше „Одлазеће“.\n"
 "Систем ће покушавати са поновним слањем поруке док је не обришете."
 
-#: libbalsa/send.c:858
+#: libbalsa/send.c:861
 msgid "Connected to MTA"
 msgstr "Повезао сам се са АПП"
 
-#: libbalsa/send.c:865 src/balsa-message.c:1236 src/print.c:349
+#: libbalsa/send.c:868 src/balsa-message.c:1236 src/print.c:349
 #: src/sendmsg-window.c:669 src/sendmsg-window.c:2136 src/store-address.c:303
 msgid "From:"
 msgstr "Од:"
 
-#: libbalsa/send.c:868 src/balsa-index.c:360
+#: libbalsa/send.c:871 src/balsa-index.c:360
 msgid "From"
 msgstr "Од"
 
-#: libbalsa/send.c:876 src/balsa-message.c:1245 src/print.c:353
+#: libbalsa/send.c:879 src/balsa-message.c:1245 src/print.c:353
 #: src/sendmsg-window.c:668 src/sendmsg-window.c:2143 src/store-address.c:304
 msgid "To:"
 msgstr "Коме:"
 
-#: libbalsa/send.c:879 src/balsa-index.c:845
+#: libbalsa/send.c:882 src/balsa-index.c:845
 msgid "To"
 msgstr "Коме"
 
-#: libbalsa/send.c:915
+#: libbalsa/send.c:918
 msgid "Disconnected"
 msgstr "Раздвојен"
 
-#: libbalsa/send.c:1102
+#: libbalsa/send.c:1105
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -1076,7 +1072,7 @@ msgstr ""
 "назначите преко: „домаћин:smtp“.\n"
 "Порука се налази у одлазећим."
 
-#: libbalsa/send.c:1112
+#: libbalsa/send.c:1115
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1085,7 +1081,7 @@ msgstr ""
 "Проблем SMTP сервера (%d): %s\n"
 "Порука се налази у одлазећим."
 
-#: libbalsa/send.c:1436 libbalsa/send.c:1614
+#: libbalsa/send.c:1438 libbalsa/send.c:1615
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "Ова порука неће бити шифрована BCC: примаоцу(има)."
 
@@ -5676,6 +5672,12 @@ msgstr "Горе"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Доле"
+
+#~ msgid "gpgme could not get data from file: %s"
+#~ msgstr "gpgme није могао да добави податке из датотеке: %s"
+
+#~ msgid "gpgme could not create new data: %s"
+#~ msgstr "gpgme није могао да створи нове податке: %s"
 
 #~ msgid "(No sibject)"
 #~ msgstr "(без наслова)"

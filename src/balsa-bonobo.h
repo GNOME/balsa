@@ -24,36 +24,36 @@
 #ifndef __BALSA_BONOBO_H
 #define __BALSA_BONBO_H
  
-#include <GNOME_Balsa.h>
 #include <bonobo/bonobo-control.h>
 #include <bonobo/bonobo-object.h>
+#include <Balsa.h>
  
 G_BEGIN_DECLS
  
-#define BALSA_APPLICATION_SERVER_TYPE         (balsa_application_server_get_type ())
-#define BALSA_APPLICATION_SERVER(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o),
-BALSA_APPLICATION_SERVER_TYPE, BalsaApplicationServer))
-#define BALSA_APPLICATION_SERVER_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), BALSA_APPLICATION_SERVER_TYPE, BalsaApplicationServerClass))
-#define BALSA_APPLICATION_SERVER_IS_OBJECT(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o),
-BALSA_APPLICATION_SERVER_TYPE))
-#define BALSA_APPLICATION_SERVER_IS_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), BALSA_APPLICATION_SERVER_TYPE))
-#define BALSA_APPLICATION_SERVER_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), BALSA_APPLICATION_SERVER_TYPE, BalsaApplicationServerClass))
+#define BALSA_COMPOSER_TYPE         (balsa_composer_get_type ())
+#define BALSA_COMPOSER(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o),
+BALSA_COMPOSER_TYPE, BalsaComposerServer))
+#define BALSA_COMPOSER_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), BALSA_COMPOSER_TYPE, BalsaComposerServerClass))
+#define BALSA_COMPOSER_IS_OBJECT(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o),
+BALSA_COMPOSER_TYPE))
+#define BALSA_COMPOSER_IS_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), BALSA_COMPOSER_TYPE))
+#define BALSA_COMPOSER_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), BALSA_COMPOSER_TYPE, BalsaComposerServerClass))
  
 typedef struct
 {
         BonoboObject parent;
-} GeditApplicationServer;
+} BalsaComposer;
  
 typedef struct
 {
         BonoboObjectClass parent_class;
  
-        POA_GNOME_Balsa_Application__epv epv;
-} GeditApplicationServerClass;
+        POA_GNOME_Balsa_Composer__epv epv;
+} BalsaComposerClass;
  
-GType          balsa_application_server_get_type (void);
+GType          balsa_composer_get_type (void);
  
-BonoboObject  *balsa_application_server_new      (GdkScreen *screen);
+BonoboObject  *balsa_composer_new      ();
  
 G_END_DECLS
  

@@ -1,3 +1,9 @@
+2004-05-26 10:30  PeterB
+
+	* src/balsa-index.c: Manu: one more recursion killed, in
+	bndx_expand_to_row; deselect hidden messages when a new message
+	is selected.
+
 2004-05-25 18:51  PeterB
 
 	* src/: balsa-app.c, balsa-index.c, mailbox-node.c, main-window.c:

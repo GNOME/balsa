@@ -19,8 +19,8 @@
 #ifndef _IMAP_H
 #define _IMAP_H 1
 
-/* BALSA: we don't use terminal browser #include "browser.h" */
-#include "mailbox.h"
+#include "browser.h"
+#include "../mailbox.h"
 
 typedef struct
 {
@@ -55,7 +55,7 @@ void imap_allow_reopen (CONTEXT *ctx);
 void imap_disallow_reopen (CONTEXT *ctx);
 
 /* browse.c */
-/* BALSA: int imap_init_browse (char *path, struct browser_state *state); */
+int imap_init_browse (char *path, struct browser_state *state);
 
 /* message.c */
 int imap_append_message (CONTEXT* ctx, MESSAGE* msg);

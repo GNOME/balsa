@@ -1116,16 +1116,16 @@ balsa_mblist_folder_style(GtkCTree * ctree, GtkCTreeNode * node,
 
     /* If we're on a leaf, just see if it's displayed as unread */
     if (GTK_CTREE_ROW(node)->is_leaf) {
-	g_return_if_fail(mbnode->mailbox);
+	/* mailbox or an empty folder */
 	if (mbnode->style & MBNODE_STYLE_NEW_MAIL)
 	    has_unread |= 1 << (GTK_CTREE_ROW(node)->level);
 	return;
 
     } else {
-	g_return_if_fail(mbnode->mailbox==NULL);
-
-	/* We're on a folder here, see if any of the leaves were displayed
-	 * as having unread messages, change the style accordingly */
+	g_return_if_fail(mbnode->mailbox == NULL);
+	/* We're on a _non-empty_ folder here, see if any of the leaves 
+	   were displayed as having unread messages, change the style
+	   accordingly */
 	if (has_unread & (1 << (GTK_CTREE_ROW(node)->level + 1))) {
 
 	    gtk_ctree_node_set_row_style(ctree, node,

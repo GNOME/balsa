@@ -1,3 +1,10 @@
+2001-01-08  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* browser.h: added from mutt-1.2.5i
+	* imap/Makefile.am: adding imap-browse.c to the file list
+	* imap/browse.c: added file.
+	* imap/imap.h: include browser.h and imap_init_browse() prototype.
+	
 2000-12-20  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* mh.c (maildir_parse_message): Parse headers with user_hdrs=1, so

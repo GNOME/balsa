@@ -19,12 +19,20 @@
  * 02111-1307, USA.
  */
 
-#ifndef __LOCAL_MAILBOX_H__
-#define __LOCAL_MAILBOX_H__
+#ifndef __FOLDER_SCANNERS_H__
+#define __FOLDER_SCANNERS_H__
 
-void load_local_mailboxes(void);
+typedef GNode* (LocalHandler)(GNode*root, const char*d_name, const char* fn);
+typedef GNode* (ImapHandler)(GNode*root, const char* fn, char delim);
 
 /* read_dir used by mailbox-node append-subtree callback */
-void read_dir(GNode *rnode, const gchar * prefix); 
+void scanner_local_dir(GNode *rnode, const gchar * prefix, 
+		       LocalHandler folder_handler, 
+		       LocalHandler mailbox_handler);
 
-#endif				/* __LOCAL_MAILBOX_H__ */
+void scanner_imap_dir(GNode *rnode, LibBalsaServer* server, 
+		      const gchar* path, int depth,
+		      ImapHandler folder_handler, 
+		      ImapHandler mailbox_handler);
+
+#endif				/* __FOLDER_SCANNERS_H__ */

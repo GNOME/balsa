@@ -297,7 +297,7 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
     gnome_config_push_prefix(prefix);
     type_str = gnome_config_get_string_with_default("Type", &got_default);
 
-    if (got_default == TRUE) {
+    if (got_default) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("Cannot load mailbox %s"), prefix);
 	return NULL;
@@ -308,6 +308,7 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("No such mailbox type: %s"), type_str);
 	g_free(type_str);
+	gnome_config_pop_prefix();
 	return NULL;
     }
 
@@ -316,39 +317,16 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
      * FIXME: This should be removed in som efuture release.
      */
     if ( type == LIBBALSA_TYPE_MAILBOX_LOCAL ) {
-	int magic_type;
 	gchar *path = gnome_config_get_string("Path");
-
-	libbalsa_lock_mutt();
-	magic_type = mx_get_magic(path);
-	libbalsa_unlock_mutt();
-
-	g_free(path);
-
-	switch (magic_type) {
-	case M_MBOX:
-	    type = LIBBALSA_TYPE_MAILBOX_MBOX;
-	    break;
-	case M_MAILDIR:
-	    type = LIBBALSA_TYPE_MAILBOX_MAILDIR;
-	    break;
-	case M_MH:
-	    type = LIBBALSA_TYPE_MAILBOX_MH;
-	    break;
-	default:
-	    break;
-	}
+	type = libbalsa_mailbox_type_from_path(path);
     }
     mailbox = gtk_type_new(type);
-    if (mailbox == NULL) {
+    if (mailbox == NULL)
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("Could not create a mailbox of type %s"),
 			     type_str);
-	g_free(type_str);
-	return NULL;
-    }
-
-    libbalsa_mailbox_load_config(mailbox, prefix);
+    else 
+	libbalsa_mailbox_load_config(mailbox, prefix);
 
     gnome_config_pop_prefix();
     g_free(type_str);
@@ -679,7 +657,7 @@ libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox)
     mailbox->unread_messages = 0;
 }
 
-GtkType libbalsa_mailbox_type_from_path(gchar * filename)
+GtkType libbalsa_mailbox_type_from_path(const gchar * filename)
 {
     struct stat st;
     GtkType ret = 0;

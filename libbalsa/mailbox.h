@@ -152,6 +152,6 @@ void libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
 /*
  * misc mailbox releated functions
  */
-GtkType libbalsa_mailbox_type_from_path(gchar * filename);
+GtkType libbalsa_mailbox_type_from_path(const gchar * filename);
 
 #endif				/* __LIBBALSA_MAILBOX_H__ */

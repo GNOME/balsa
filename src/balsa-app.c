@@ -28,7 +28,6 @@
 #include <stdio.h>
 
 #include "balsa-app.h"
-#include "local-mailbox.h"
 #include "misc.h"
 #include "libbalsa.h"
 #include "spell-check.h"

@@ -1,4 +1,23 @@
-2001-01-06  Pawel Salek  <pawsa@theochem.kth.se>
+2001-01-08  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/Makefile.am: add libbalsa/folder-scanners.[hc]
+	* libbalsa/mailbox.[hc]:libbalsa fix a condition because
+	(cond == TRUE) is different from (cond) (think about it!)
+	* libbalsa/mailbox_imap.[hc]: change type of
+	libbalsa_mailbox_imap_set_path(gchar*) arg to const gchar*.
+	* libbalsa/mailbox_remote.[hc]: add 
+	libbalsa_mailbox_remote_set_server().
+	* libbalsa/misc.c: remove remainings of old ImapDir code.
+	* libbalsa/folder-scanners.[hc]: added.
+
+	* src/Makefile.am: remove local-mailbox.[hc]
+	* src/balsa-app.c: remove deprecated local-mailbox.h
+	* src/balsa-mblist.c: settle styles for empty folders (which
+	are plain leaves from GtkCTree point of view).
+	* src/mailbox-node.[ch]: implement most of the folder scanner code.
+	* src/save-restore.c: add loading folders from config.
+	
+2001-01-07  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/mailbox-conf.c: append POP mailbox nodes to 
 	balsa_app.input_inbox instead of just mailboxes. MailboxNodes

@@ -25,10 +25,25 @@
 #include "mutt.h"
 #include "imap_private.h"
 
+#ifdef LIBMUTT
+#include "browser.h"
+#define _(a) (a)
+
+void init_state (struct browser_state *state)
+{
+  state->entrylen = 0;
+  state->entrymax = 256;
+  state->entry = (struct folder_file *) safe_malloc (sizeof (struct folder_file) * state->entrymax);
+}
+#endif
+
 /* -- forward declarations -- */
 static int add_list_result (CONNECTION *conn, const char *seq, const char *cmd,
   struct browser_state *state, short isparent);
-static void imap_add_folder (char delim, char *folder, int noselect,
+
+/* BALSA: we have our own imap_add_folder() function: static  */
+
+void imap_add_folder (char delim, char *folder, int noselect,
   int noinferiors, struct browser_state *state, short isparent);
 static int compare_names(struct folder_file *a, struct folder_file *b);
 static int get_namespace (IMAP_DATA *idata, char *nsbuf, int nsblen, 
@@ -309,6 +324,7 @@ static int add_list_result (CONNECTION *conn, const char *seq, const char *cmd,
   return (0);
 }
 
+#ifndef LIBMUTT
 /* imap_add_folder: add a folder name to the browser list, formatting it as
  *   necessary. */
 static void imap_add_folder (char delim, char *folder, int noselect,
@@ -367,6 +383,7 @@ static void imap_add_folder (char delim, char *folder, int noselect,
   (state->entry)[state->entrylen].inferiors = !noinferiors;
   (state->entrylen)++;
 }
+#endif
 
 static int compare_names(struct folder_file *a, struct folder_file *b) 
 {

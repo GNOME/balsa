@@ -57,4 +57,7 @@ struct _LibBalsaMailboxRemoteClass {
 
 GtkType libbalsa_mailbox_remote_get_type(void);
 
+void libbalsa_mailbox_remote_set_server(LibBalsaMailboxRemote* m, 
+					LibBalsaServer* s);
+
 #endif				/* __LIBBALSA_MAILBOX_REMOTE_H__ */

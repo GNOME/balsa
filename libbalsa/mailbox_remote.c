@@ -61,3 +61,11 @@ libbalsa_mailbox_remote_init(LibBalsaMailboxRemote * mailbox)
 {
     mailbox->server = NULL;
 }
+
+void 
+libbalsa_mailbox_remote_set_server(LibBalsaMailboxRemote*m, LibBalsaServer* s)
+{
+    if(m->server) gtk_object_unref(GTK_OBJECT(m->server));
+    m->server = s;
+    if(s) gtk_object_ref(GTK_OBJECT(s));
+}

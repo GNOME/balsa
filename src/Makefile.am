@@ -26,8 +26,6 @@ balsa_BASE_SOURCES =	\
 	filter-edit-dialog.c	\
 	information-dialog.h	\
 	information-dialog.c	\
-	local-mailbox.c		\
-	local-mailbox.h		\
 	mailbox-conf.c		\
 	mailbox-conf.h		\
 	mailbox-node.c		\

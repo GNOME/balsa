@@ -1,63 +1,64 @@
 noinst_LIBRARIES = libbalsa.a
 
 libbalsa_a_SOURCES = 		\
-	filter-funcs.h		\
-	filter-private.h	\
-	filter.h		\
-	mailbackend.h		\
-	mailbox.h		\
-	message.c		\
-	message.h		\
-	body.h			\
-	body.c			\
-	address.h		\
-	address.c		\
-	address-book.h		\
-	address-book.c		\
-	address-book-ldap.h	\
 	address-book-ldap.c 	\
-	address-book-vcard.h	\
+	address-book-ldap.h	\
 	address-book-vcard.c	\
+	address-book-vcard.h	\
+	address-book.c		\
+	address-book.h		\
 	address-entry.c		\
 	address-entry.h		\
-	mime.h			\
-	misc.h			\
-	notify.c		\
-	notify.h		\
+	address.c		\
+	address.h		\
+	body.c			\
+	body.h			\
 	files.c			\
 	files.h			\
 	filter-error.c		\
 	filter-file.c		\
 	filter-funcs.c		\
-	imapdir.h		\
+	filter-funcs.h		\
+	filter-private.h	\
+	filter.h		\
+	folder-scanners.c	\
+	folder-scanners.h	\
+	information.c		\
+	information.h		\
 	libbalsa.c		\
 	libbalsa.h		\
 	libbalsa_private.h	\
-	misc.c			\
-	mime.c			\
+	mailbackend.h		\
 	mailbox.c		\
-	mailbox_local.c		\
-	mailbox_local.h		\
-	mailbox_remote.c	\
-	mailbox_remote.h	\
-	mailbox_pop3.c		\
-	mailbox_pop3.h		\
+	mailbox.h		\
 	mailbox_imap.c		\
 	mailbox_imap.h		\
+	mailbox_local.c		\
+	mailbox_local.h		\
+	mailbox_maildir.c	\
+	mailbox_maildir.h	\
 	mailbox_mbox.c		\
 	mailbox_mbox.h		\
 	mailbox_mh.c		\
 	mailbox_mh.h		\
-	mailbox_maildir.c	\
-	mailbox_maildir.h	\
+	mailbox_pop3.c		\
+	mailbox_pop3.h		\
+	mailbox_remote.c	\
+	mailbox_remote.h	\
+	message.c		\
+	message.h		\
+	mime.c			\
+	mime.h			\
+	misc.c			\
+	misc.h			\
+	notify.c		\
+	notify.h		\
 	pop3.c			\
 	pop3.h			\
 	send.c			\
 	server.c		\
 	server.h		\
-	threads.h		\
-	information.h		\
-	information.c
+	threads.h
 
 
 libbalsa_a_LIBADD = @LIBOBJS@

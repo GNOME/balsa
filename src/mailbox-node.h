@@ -57,8 +57,12 @@ struct _BalsaMailboxNode {
     BalsaMailboxNode *parent; /* NULL for root-level folders & mailboxes */
     LibBalsaMailbox * mailbox; /* != NULL for leaves only */
     gchar *name;       /* used for folders, i.e. when mailbox == NULL */
-    gboolean expanded; /* used for folders */
     BalsaMailboxNodeStyle style;
+    int expanded:1; /* used for folders */
+    int remote:1;   /* is dirname or server field used in data union.
+		     * If there is a need for more types, make a subclass. */
+    gchar* dir;
+    LibBalsaServer * server; /* Used only by remote; is referenced */
 };
 
 struct _BalsaMailboxNodeClass {
@@ -71,9 +75,12 @@ struct _BalsaMailboxNodeClass {
 
 GtkType balsa_mailbox_node_get_type(void);
 
-GtkObject *balsa_mailbox_node_new(void);
+BalsaMailboxNode *balsa_mailbox_node_new(void);
 BalsaMailboxNode *balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox *m);
 BalsaMailboxNode *balsa_mailbox_node_new_from_dir(const gchar* dir);
+BalsaMailboxNode *balsa_mailbox_node_new_imap(LibBalsaServer* s, const char*p);
+BalsaMailboxNode *balsa_mailbox_node_new_from_config(const gchar* prefix);
+
 GtkWidget *balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode);
 void balsa_mailbox_node_show_prop_dialog(BalsaMailboxNode * mbnode);
 void balsa_mailbox_node_append_subtree(BalsaMailboxNode * mbnode, GNode *r);

@@ -20,5 +20,5 @@ noinst_LIBRARIES = libimap.a
 noinst_HEADERS = imap_private.h imap_socket.h message.h $(SSLHEADERS) \
 	md5.h imap.h
 
-libimap_a_SOURCES = auth.c command.c imap.c imap.h message.c \
+libimap_a_SOURCES = auth.c browse.c command.c imap.c imap.h message.c \
 	socket.c util.c $(GSSSOURCES) $(SSLSOURCES)

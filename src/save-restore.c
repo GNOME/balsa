@@ -33,11 +33,14 @@
 #include "quote-color.h"
 
 #define BALSA_CONFIG_PREFIX "balsa/"
+#define FOLDER_SECTION_PREFIX "folder-"
 #define MAILBOX_SECTION_PREFIX "mailbox-"
 #define ADDRESS_BOOK_SECTION_PREFIX "address-book-"
 
-static gint config_mailboxes_init(void);
+static gint config_section_init(const char* section_prefix, 
+				gint (*cb)(const char*));
 static gint config_global_load(void);
+static gint config_folder_init(const gchar * prefix);
 static gint config_mailbox_init(const gchar * prefix);
 static gchar *config_get_unused_section(const gchar * prefix);
 
@@ -65,7 +68,9 @@ gint config_load(void)
 {
     config_global_load();      /* initializes balsa_app.mailbox_nodes *
 				* needed in the next step             */
-    config_mailboxes_init(); 
+    config_section_init(MAILBOX_SECTION_PREFIX, config_mailbox_init);
+    config_section_init(FOLDER_SECTION_PREFIX,  config_folder_init);
+
     return TRUE;
 }
 
@@ -200,25 +205,26 @@ gint config_mailbox_update(LibBalsaMailbox * mailbox)
 
 /* This function initializes all the mailboxes internally, going through
    the list of all the mailboxes in the configuration file one by one. */
+
 static gint
-config_mailboxes_init(void)
+config_section_init(const char* section_prefix, gint (*cb)(const char*))
 {
     void *iterator;
     gchar *key, *val, *tmp;
-    int pref_len = strlen(MAILBOX_SECTION_PREFIX);
+    int pref_len = strlen(section_prefix);
 
     iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
     while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
-	if (strncmp(key, MAILBOX_SECTION_PREFIX, pref_len) == 0) {
+	if (strncmp(key, section_prefix, pref_len) == 0) {
 	    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
-	    config_mailbox_init(tmp);
+	    cb(tmp);
 	    g_free(tmp);
 	}
 	g_free(key);
 	g_free(val);
     }
-    return TRUE;		/* hm... check_basic_mailboxes? */
-}				/* config_mailboxes_init */
+    return TRUE;
+}				/* config_section_init */
 
 /* Initialize the specified mailbox, creating the internal data
    structures which represent the mailbox. */
@@ -264,6 +270,21 @@ config_mailbox_init(const gchar * prefix)
     return TRUE;
 }				/* config_mailbox_init */
 
+
+/* Initialize the specified folder, creating the internal data
+   structures which represent the folder. */
+static gint
+config_folder_init(const gchar * prefix)
+{
+    BalsaMailboxNode *folder;
+
+    g_return_val_if_fail(prefix != NULL, FALSE);
+
+    if( (folder = balsa_mailbox_node_new_from_config(prefix)) )
+	g_node_append(balsa_app.mailbox_nodes, g_node_new(folder));
+
+    return folder != NULL;
+}				/* config_folder_init */
 
 /* Load Balsa's global settings */
 static gint

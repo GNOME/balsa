@@ -1747,7 +1747,6 @@ bmbl_mru_selected_cb(GtkTreeSelection * selection, gpointer data)
     GdkEvent *event;
     GtkTreeView *tree_view;
     GtkTreePath *path;
-    GtkTreeViewColumn *column;
 
     if (!data)
         return;
@@ -1760,7 +1759,7 @@ bmbl_mru_selected_cb(GtkTreeSelection * selection, gpointer data)
     if (event->type != GDK_BUTTON_PRESS ||
         !gtk_tree_view_get_path_at_pos(tree_view, event->button.x,
                                        event->button.y, &path,
-                                       &column, NULL, NULL)) {
+                                       NULL, NULL, NULL)) {
         gtk_tree_selection_unselect_all(selection);
         gdk_event_free(event);
         return;
@@ -1872,11 +1871,21 @@ bmbl_mru_combo_box_setup(GtkComboBox * combo_box)
     BalsaMBListMRUOption *mro =
         g_object_get_data(G_OBJECT(combo_box), "mro");
     GList *list;
+#if GTK_CHECK_VERSION(2, 6, 0)
+    GtkListStore *store;
+    GtkTreeIter iter;
+#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
     gint i;
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
 
     gtk_combo_box_set_active(combo_box, -1);
+#if GTK_CHECK_VERSION(2, 6, 0)
+    store = GTK_LIST_STORE(gtk_combo_box_get_model(combo_box));
+    gtk_list_store_clear(store);
+#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
     for (i = g_slist_length(mro->real_urls) + 1; --i >= 0;)
         gtk_combo_box_remove_text(combo_box, i);
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
     g_slist_foreach(mro->real_urls, (GFunc) g_free, NULL);
     g_slist_free(mro->real_urls);
     mro->real_urls = NULL;
@@ -1886,13 +1895,30 @@ bmbl_mru_combo_box_setup(GtkComboBox * combo_box)
         LibBalsaMailbox *mailbox;
 
         if ((mailbox = balsa_find_mailbox_by_url(url)) || !*url) {
+#if GTK_CHECK_VERSION(2, 6, 0)
+	    gtk_list_store_append(store, &iter);
+	    gtk_list_store_set(store, &iter,
+                               0, mailbox ? mailbox->name : "",
+                               1, FALSE, -1);
+#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
             gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box),
                                       mailbox ? mailbox->name : "");
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
             mro->real_urls = g_slist_append(mro->real_urls, g_strdup(url));
         }
     }
 
+#if GTK_CHECK_VERSION(2, 6, 0)
+    /* Separator: */
+    gtk_list_store_append(store, &iter);
+    gtk_list_store_set(store, &iter, 1, TRUE, -1);
+    gtk_list_store_append(store, &iter);
+    gtk_list_store_set(store, &iter,
+                       0, _("Other..."),
+		       1, FALSE, -1);
+#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
     gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), _("Other..."));
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
     gtk_combo_box_set_active(combo_box, 0);
 }
 
@@ -1947,16 +1973,43 @@ bmbl_mru_combo_box_destroy_cb(BalsaMBListMRUOption * mro)
  * Adds a last entry that pops up the whole mailbox tree. When an item
  * is clicked, the url_list is updated.
  */
+#if GTK_CHECK_VERSION(2, 6, 0)
+static gboolean
+bmbl_mru_separator_func(GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
+{
+    gboolean is_sep;
+
+    gtk_tree_model_get(model, iter, 1, &is_sep, -1);
+
+    return is_sep;
+}
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
 
 GtkWidget *
 balsa_mblist_mru_option_menu(GtkWindow * window, GList ** url_list)
 {
     GtkWidget *combo_box;
     BalsaMBListMRUOption *mro;
+#if GTK_CHECK_VERSION(2, 6, 0)
+    GtkListStore *store;
+    GtkCellRenderer *renderer;
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
 
     g_return_val_if_fail(url_list != NULL, NULL);
 
+#if GTK_CHECK_VERSION(2, 6, 0)
+    store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_BOOLEAN);
+    combo_box = gtk_combo_box_new_with_model(GTK_TREE_MODEL(store));
+    renderer = gtk_cell_renderer_text_new();
+    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(combo_box), renderer, TRUE);
+    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(combo_box), renderer,
+                                   "text", 0, NULL);
+    gtk_combo_box_set_row_separator_func(GTK_COMBO_BOX(combo_box),
+                                         bmbl_mru_separator_func, NULL,
+                                         NULL);
+#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
     combo_box = gtk_combo_box_new_text();
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
     mro = g_new(BalsaMBListMRUOption, 1);
 
     mro->window = window;

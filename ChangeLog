@@ -1,3 +1,8 @@
+2003-02-27 14:54  PeterB
+
+	* src/: balsa-index.c, balsa-index.h, main-window.c: Implement
+	Mailbox=>_Remove Duplicates.
+
 2003-02-27  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/misc.c: 

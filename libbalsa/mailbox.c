@@ -223,8 +223,6 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
       else
         strcpy( uid, MAILBOX_POP3 (mailbox)->last_popped_uid );
 
-      PopUID = uid;
-
       /* Delete it if necessary */
       if (MAILBOX_POP3 (mailbox)->delete_from_server)
       {

@@ -327,14 +327,14 @@ libbalsa_message_real_set_read_flag(Message *message, gboolean set)
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
 
   if (set) {
-    mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, MFLAG_READ, TRUE);
+    mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_READ, TRUE);
     mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_OLD, FALSE);
 
     message->flags &= ~MESSAGE_FLAG_NEW;
     message->mailbox->unread_messages-- ;
     send_watcher_mark_read_message (message->mailbox, message);
   } else {
-    mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, MFLAG_READ, TRUE);
+    mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_READ, TRUE);
 
     message->flags |= MESSAGE_FLAG_NEW;
     message->mailbox->unread_messages++;

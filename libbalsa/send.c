@@ -238,7 +238,7 @@ balsa_send_message_real(HEADER *msg, char *tempfile, Mailbox *fcc )
   
   if (i==-1)
   {
-    mutt_write_fcc (MAILBOX_LOCAL (balsa_app.outbox)->path, msg, NULL, 1);
+    mutt_write_fcc (MAILBOX_LOCAL (balsa_app.outbox)->path, msg, NULL, 1, NULL);
 
     if (balsa_app.outbox->open_ref > 0)
       {
@@ -260,7 +260,7 @@ balsa_send_message_real(HEADER *msg, char *tempfile, Mailbox *fcc )
        balsa_app.sentbox->type == MAILBOX_MBOX) &&
        fcc != NULL) 
     {
-      mutt_write_fcc (MAILBOX_LOCAL (fcc)->path, msg, NULL, 0);
+      mutt_write_fcc (MAILBOX_LOCAL (fcc)->path, msg, NULL, 0, NULL);
 
       if (fcc->open_ref > 0)
 	{
@@ -399,7 +399,7 @@ balsa_postpone_message (Message * message)
 
   encode_descriptions (msg->content);
 
-  mutt_write_fcc (MAILBOX_LOCAL (balsa_app.draftbox)->path, msg, NULL, 1);
+  mutt_write_fcc (MAILBOX_LOCAL (balsa_app.draftbox)->path, msg, NULL, 1, NULL);
   if (balsa_app.draftbox->open_ref > 0)
     mailbox_check_new_messages (balsa_app.draftbox);
   mutt_free_header (&msg);

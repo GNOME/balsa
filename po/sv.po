@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-07-14 15:11+0200\n"
-"PO-Revision-Date: 2003-07-14 15:20+0200\n"
+"POT-Creation-Date: 2003-07-15 20:26+0200\n"
+"PO-Revision-Date: 2003-07-15 20:26+0200\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -921,7 +921,7 @@ msgstr "gpgme kunde inte skapa nya data: %s"
 msgid "Sending Mail..."
 msgstr "Skickar brev..."
 
-#: libbalsa/send.c:221 src/main-window.c:1820
+#: libbalsa/send.c:221 src/main-window.c:1795
 msgid "_Hide"
 msgstr "_Dölj"
 
@@ -2093,25 +2093,29 @@ msgstr ""
 "Fel vid öppnande av adressboken \"%s\"\n"
 "%s"
 
-#: src/balsa-app.c:66
+#: src/balsa-app.c:73
 #, c-format
 msgid ""
 "Opening remote mailbox %s.\n"
-"The password for %s@%s:"
+"The _password for %s@%s:"
 msgstr ""
 "Öppnar fjärrbrevlådan %s.\n"
-"Lösenordet för %s@%s:"
+"_Lösenordet för %s@%s:"
 
-#: src/balsa-app.c:71
+#: src/balsa-app.c:78
 #, c-format
-msgid "Mailbox password for %s@%s:"
-msgstr "Brevlådelösenord för %s@%s:"
+msgid "Mailbox _password for %s@%s:"
+msgstr "Brevlåde_lösenord för %s@%s:"
 
-#: src/balsa-app.c:74
+#: src/balsa-app.c:81
 msgid "Password needed"
 msgstr "Lösenord krävs"
 
-#: src/balsa-app.c:633
+#: src/balsa-app.c:95 src/folder-conf.c:308
+msgid "_Remember password"
+msgstr "_Kom ihåg lösenord"
+
+#: src/balsa-app.c:648
 #, c-format
 msgid "Couldn't open mailbox \"%s\""
 msgstr "Kunde inte öppna brevlådan \"%s\""
@@ -2629,17 +2633,17 @@ msgstr "_Alla"
 msgid "C_lear"
 msgstr "T_öm"
 
-#: src/filter-edit-callbacks.c:990 src/main-window.c:2750
+#: src/filter-edit-callbacks.c:990 src/main-window.c:2723
 msgid "_Body"
 msgstr "_Meddelandetext"
 
 #. To:
-#: src/filter-edit-callbacks.c:997 src/main-window.c:2751
+#: src/filter-edit-callbacks.c:997 src/main-window.c:2724
 #: src/sendmsg-window.c:1805
 msgid "_To:"
 msgstr "_Till:"
 
-#: src/filter-edit-callbacks.c:1004 src/main-window.c:2752
+#: src/filter-edit-callbacks.c:1004 src/main-window.c:2725
 msgid "_From:"
 msgstr "_Från:"
 
@@ -2647,7 +2651,7 @@ msgstr "_Från:"
 msgid "_Subject"
 msgstr "_Ärende"
 
-#: src/filter-edit-callbacks.c:1019 src/main-window.c:2754
+#: src/filter-edit-callbacks.c:1019 src/main-window.c:2727
 msgid "_Cc:"
 msgstr "_Kopia:"
 
@@ -2904,10 +2908,6 @@ msgstr "_Server:"
 #: src/folder-conf.c:302 src/mailbox-conf.c:933
 msgid "Use_r name:"
 msgstr "Använda_rnamn:"
-
-#: src/folder-conf.c:308
-msgid "_Remember password"
-msgstr "_Kom ihåg lösenord"
 
 #: src/folder-conf.c:313
 msgid "_Password:"
@@ -3782,72 +3782,72 @@ msgstr ""
 "\n"
 "Om du vill rapportera fel kan du göra det på: http://bugzilla.gnome.org/"
 
-#: src/main-window.c:1817
+#: src/main-window.c:1792
 msgid "Checking Mail..."
 msgstr "Kontrollerar e-post..."
 
-#: src/main-window.c:2117
+#: src/main-window.c:2090
 msgid "Finished Checking."
 msgstr "Slutförde kontroll."
 
-#: src/main-window.c:2181
+#: src/main-window.c:2154
 #, c-format
 msgid "Sending error: %s"
 msgstr "Fel vid sänding: %s"
 
-#: src/main-window.c:2277
+#: src/main-window.c:2250
 msgid "Balsa: New mail"
 msgstr "Balsa: Ny post"
 
-#: src/main-window.c:2289
+#: src/main-window.c:2262
 #, c-format
 msgid "You have received %d new messages."
 msgstr "Du har fått %d nya meddelanden."
 
-#: src/main-window.c:2290
+#: src/main-window.c:2263
 msgid "You have received 1 new message."
 msgstr "Du har fått 1 nytt meddelande."
 
-#: src/main-window.c:2710
+#: src/main-window.c:2683
 msgid "Search mailbox"
 msgstr "Sök i brevlåda"
 
-#: src/main-window.c:2723
+#: src/main-window.c:2696
 msgid "_Reverse search"
 msgstr "_Omvänd sökning"
 
-#: src/main-window.c:2726
+#: src/main-window.c:2699
 msgid "_Search for:"
 msgstr "_Sök efter:"
 
-#: src/main-window.c:2739
+#: src/main-window.c:2712
 msgid "In:"
 msgstr "I:"
 
-#: src/main-window.c:2753
+#: src/main-window.c:2726
 msgid "S_ubject"
 msgstr "_Ämne"
 
-#: src/main-window.c:2868
+#: src/main-window.c:2841
 msgid "You can apply filters only on mailbox\n"
 msgstr "Du kan endast tillämpa filter på brevlåda\n"
 
-#: src/main-window.c:2912 src/main-window.c:2931
+#: src/main-window.c:2885 src/main-window.c:2904
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Sparande av brevlådan %s misslyckades."
 
-#: src/main-window.c:3124
+#: src/main-window.c:3097
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (skrivskyddad)"
 
-#: src/main-window.c:3126
+#: src/main-window.c:3099
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3224
+#: src/main-window.c:3197
 msgid "Cannot access the message's body\n"
 msgstr "Kan inte komma åt meddelandehuvudet\n"
 
@@ -5182,22 +5182,22 @@ msgstr "skickar meddelande med gpg-läge %d"
 msgid "Could not compile %s"
 msgstr "Kunde inte kompilera %s"
 
-#: src/sendmsg-window.c:4251
+#: src/sendmsg-window.c:4253
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Svara till %s: %s"
 
-#: src/sendmsg-window.c:4256
+#: src/sendmsg-window.c:4258
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Vidarebefordra meddelande till %s: %s"
 
-#: src/sendmsg-window.c:4260
+#: src/sendmsg-window.c:4262
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Fortsätt meddelande till %s: %s"
 
-#: src/sendmsg-window.c:4264
+#: src/sendmsg-window.c:4266
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nytt meddelande till %s: %s"
@@ -5593,6 +5593,16 @@ msgstr "Upp"
 #: src/toolbar-prefs.c:506
 msgid "Down"
 msgstr "Ned"
+
+#~ msgid ""
+#~ "Opening remote mailbox %s.\n"
+#~ "The password for %s@%s:"
+#~ msgstr ""
+#~ "Öppnar fjärrbrevlådan %s.\n"
+#~ "Lösenordet för %s@%s:"
+
+#~ msgid "Mailbox password for %s@%s:"
+#~ msgstr "Brevlådelösenord för %s@%s:"
 
 #~ msgid "Owner trust: %s"
 #~ msgstr "Ägartillit: %s"

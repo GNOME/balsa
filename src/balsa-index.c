@@ -69,10 +69,9 @@ static void balsa_index_add(BalsaIndex * index, LibBalsaMessage * message);
 /* retrieve the selection */
 static void bndx_set_col_images(BalsaIndex * index, GtkTreeIter * iter,
                                 LibBalsaMessage * message);
-static gboolean bndx_set_style(BalsaIndex * index, GtkTreePath * path);
-static gboolean bndx_set_style_recursive(BalsaIndex * index,
-                                         GtkTreePath * path);
-static void bndx_set_parent_style(BalsaIndex * index, GtkTreePath * path);
+static void bndx_set_style(BalsaIndex * index, GtkTreePath * path,
+                           GtkTreeIter * iter);
+static void bndx_set_parent_style(BalsaIndex * index, GtkTreeIter * iter);
 static void bndx_check_visibility(BalsaIndex * index);
 static void bndx_scroll_to_row(BalsaIndex * index, GtkTreePath * path);
 static gboolean bndx_find_row(BalsaIndex * index,
@@ -640,8 +639,6 @@ balsa_index_add(BalsaIndex * index, LibBalsaMessage * message)
     LibBalsaAddress *addy = NULL;
     LibBalsaMailbox* mailbox;
     gboolean append_dots;
-    GtkTreePath *path;
-    
 
     g_return_if_fail(index != NULL);
     g_return_if_fail(message != NULL);
@@ -706,8 +703,6 @@ balsa_index_add(BalsaIndex * index, LibBalsaMessage * message)
     g_free(text[6]);
 
     bndx_set_col_images(index, &iter, message);
-    path = gtk_tree_model_get_path(model, &iter);
-    gtk_tree_path_free(path);
 }
 
 struct BndxFindInfo {
@@ -1316,68 +1311,53 @@ thread_has_unread(BalsaIndex * index, GtkTreeIter * iter)
     return FALSE;
 }
 
-
+/* Helper for bndx_set_style; also a gtk_tree_model_foreach callback. */
 static gboolean
-bndx_set_style(BalsaIndex * index, GtkTreePath * path)
+bndx_set_style_func(GtkTreeModel * model, GtkTreePath * path,
+                    GtkTreeIter * iter, BalsaIndex * index)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(index);
-    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
     GtkTreeStore *store = GTK_TREE_STORE(model);
-    GtkTreeIter iter;
+    GtkTreeView *tree_view = GTK_TREE_VIEW(index);
 
     /* FIXME: Improve style handling;
               - Consider storing styles locally, with or config setting
 	        separate from the "mailbox" one.  */
     
-    if (!gtk_tree_model_get_iter(model, &iter, path))
-        return FALSE;
-
     if (!gtk_tree_view_row_expanded(tree_view, path)
-        && thread_has_unread(index, &iter)) {
-        gtk_tree_store_set(store, &iter,
+        && thread_has_unread(index, iter)) {
+        gtk_tree_store_set(store, iter,
                            BNDX_COLOR_COLUMN, &balsa_app.mblist_unread_color,
                            BNDX_WEIGHT_COLUMN, PANGO_WEIGHT_BOLD,
                            -1);
     } else
-        gtk_tree_store_set(store, &iter,
+        gtk_tree_store_set(store, iter,
                            BNDX_COLOR_COLUMN, NULL,
                            BNDX_WEIGHT_COLUMN, PANGO_WEIGHT_NORMAL,
                            -1);
 
-    return TRUE;
+    return FALSE;
 }
-
-static gboolean
-bndx_set_style_recursive(BalsaIndex * index, GtkTreePath * path)
-{
-    GtkTreePath *child_path;
-
-    if (gtk_tree_path_get_depth(path) > 0 && !bndx_set_style(index, path))
-        return FALSE;
-
-    child_path = gtk_tree_path_copy(path);
-    gtk_tree_path_down(child_path);
-
-    while (bndx_set_style_recursive(index, child_path))
-        gtk_tree_path_next(child_path);
-
-    gtk_tree_path_free(child_path);
-    return TRUE;
-}
-
 
 static void
-bndx_set_parent_style(BalsaIndex * index, GtkTreePath * path)
+bndx_set_style(BalsaIndex * index, GtkTreePath * path, GtkTreeIter * iter)
 {
-    GtkTreePath *parent_path;
+    bndx_set_style_func(gtk_tree_view_get_model(GTK_TREE_VIEW(index)),
+                        path, iter, index);
+}
 
-    parent_path = gtk_tree_path_copy(path);
+static void
+bndx_set_parent_style(BalsaIndex * index, GtkTreeIter * iter)
+{
+    GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
+    GtkTreeIter parent_iter;
+    GtkTreePath *path = gtk_tree_model_get_path(model, iter);
 
-    while (gtk_tree_path_up(parent_path)
-           && gtk_tree_path_get_depth(parent_path) > 0)
-	bndx_set_style(index, parent_path);
-
-    gtk_tree_path_free(parent_path);
+    while (gtk_tree_model_iter_parent(model, &parent_iter, iter)) {
+        gtk_tree_path_up(path);
+	bndx_set_style(index, path, &parent_iter);
+        *iter = parent_iter;
+    }
+    gtk_tree_path_free(path);
 }
 
 /* GtkTree* callbacks */
@@ -1518,6 +1498,8 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
     BalsaIndex *index = BALSA_INDEX(tree_view);
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreePath *current_path = NULL;
+    GtkTreeIter child_iter;
+    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
 
     /* if current message has become viewable, reselect it */
     if (bndx_find_message(index, &current_path, NULL,
@@ -1531,7 +1513,18 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
         gtk_tree_path_free(current_path);
     }
 
-    bndx_set_style(index, path);
+    /* Reset the style of this row... */
+    bndx_set_style(index, path, iter);
+    /* ...and check the styles of its newly viewable children. */
+    if (gtk_tree_model_iter_children(model, &child_iter, iter)) {
+        GtkTreePath *child_path = gtk_tree_path_copy(path);
+        gtk_tree_path_down(child_path);
+        do {
+            bndx_set_style(index, child_path, &child_iter);
+            gtk_tree_path_next(child_path);
+        } while (gtk_tree_model_iter_next(model, &child_iter));
+        gtk_tree_path_free(child_path);
+    }
     bndx_changed_find_row(index);
 }
 
@@ -1544,7 +1537,7 @@ bndx_tree_collapse_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
 {
     BalsaIndex *index = BALSA_INDEX(tree_view);
 
-    bndx_set_style(index, path);
+    bndx_set_style(index, path, iter);
     bndx_changed_find_row(index);
 }
 
@@ -1663,13 +1656,11 @@ mailbox_messages_added(BalsaIndex * bindex, GList *messages)
     balsa_index_threading(bindex, 
 			  bindex->mailbox_node->mailbox->threading_type);
     for (list = messages; list; list = g_list_next(list)) {
-        GtkTreePath *path;
+        GtkTreeIter iter;
 
-        if (bndx_find_message(bindex, &path, NULL,
-                              (LibBalsaMessage *) list->data)) {
-            bndx_set_parent_style(bindex, path);
-            gtk_tree_path_free(path);
-        }
+        if (bndx_find_message(bindex, NULL, &iter,
+                              (LibBalsaMessage *) list->data))
+            bndx_set_parent_style(bindex, &iter);
     }
     bndx_select_message(bindex, bindex->current_message);
 
@@ -2252,7 +2243,6 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
 	    approach would be to change preview, e.g. to top of thread. */
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
-    GtkTreePath *path;
     gulong handler =
         expand ? index->row_expanded_id : index->row_collapsed_id;
 
@@ -2263,9 +2253,9 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
     else
         gtk_tree_view_collapse_all(tree_view);
 
-    path = gtk_tree_path_new();
-    bndx_set_style_recursive(index, path);     /* chbm */
-    gtk_tree_path_free(path);
+    gtk_tree_model_foreach(gtk_tree_view_get_model(tree_view),
+                           (GtkTreeModelForeachFunc) bndx_set_style_func,
+                           index);
 
     /* Re-expand msg_node's thread; cf. Remarks */
     /* expand_to_row is redundant in the expand_all case, but the

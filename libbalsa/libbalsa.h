@@ -23,12 +23,14 @@
 typedef struct _Mailbox Mailbox;
 typedef struct _Message Message;
 typedef struct _Address Address;
+typedef struct _Contact Contact;
 typedef struct _Body Body;
 typedef struct _Server Server;
 
 #include "mailbox.h"
 #include "message.h"
 #include "address.h"
+#include "contact.h"
 #include "body.h"
 #include "files.h"
 

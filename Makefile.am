@@ -11,18 +11,34 @@ desktop_DATA = balsa.desktop
 EXTRA_DIST = \
 	balsa.1.in \
 	balsa.spec.in \
+	rpm-po.patch \
 	balsa.desktop \
 	gnome-balsa2.png
 
 dist-hook: balsa.spec
 	cp balsa.spec $(distdir)
 
-RPM: balsa.spec
-	$(MAKE) distdir="$(PACKAGE)-@BALSA_SHORT_VERSION@" dist
-	rpm -ta "./$(PACKAGE)-@BALSA_SHORT_VERSION@.tar.gz"
+@MAINT@RPM: balsa.spec
+@MAINT@	rm -f *.rpm
+@MAINT@	$(MAKE) distdir="$(PACKAGE)-@BALSA_SHORT_VERSION@" dist
+@MAINT@	cp $(top_srcdir)/rpm-po.patch $(top_builddir)/rpm-po.patch
+@MAINT@	rpm -ta "./$(PACKAGE)-@BALSA_SHORT_VERSION@.tar.gz"
+@MAINT@	rm $(top_builddir)/rpm-po.patch
+@MAINT@	-test -f "/usr/src/redhat/SRPMS/$(PACKAGE)-@VERSION@-@BALSA_RELEASE@.src.rpm" \
+@MAINT@		&& cp -f "/usr/src/redhat/SRPMS/$(PACKAGE)-@VERSION@-@BALSA_RELEASE@.src.rpm" .
+@MAINT@	-for ping in /usr/src/redhat/RPMS/* ; do \
+@MAINT@		if test -d $$ping ; then \
+@MAINT@			arch=`echo $$ping |sed -e 's,/.*/\([^/][^/]*\),\1,'` ; \
+@MAINT@			f="$$ping/$(PACKAGE)-@VERSION@-@BALSA_RELEASE@.$$arch.rpm" ; \
+@MAINT@			test -f $$f && cp -f $$f . ; \
+@MAINT@		fi ; \
+@MAINT@	done
+  
+@MAINT@snapshot:
+@MAINT@	$(MAKE) distdir=$(PACKAGE)-`date +"%y%m%d"` dist
 
-snapshot:
-	$(MAKE) distdir=$(PACKAGE)-`date +"%y%m%d"` dist
+@MAINT@balsa-dcheck:
+@MAINT@	$(MAKE) BALSA_DISTCHECK_HACK=yes distcheck
 
 ## to automatically rebuild aclocal.m4 if any of the macros in
 ## `macros/' change

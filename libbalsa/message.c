@@ -260,16 +260,23 @@ message_user_hdrs(Message *message)
 	
     g_assert(cur != NULL);
     g_assert(cur->env != NULL);
-    res = g_list_append(res, create_hdr_pair(
-	"Return-Path", ADDRESS_to_gchar(cur->env->return_path) ) );
-    
-    res = g_list_append(res, create_hdr_pair(
-	"Sender", ADDRESS_to_gchar(cur->env->sender) ) );
-    res = g_list_append(res, create_hdr_pair(
-	"Mail-Followup-To", ADDRESS_to_gchar(cur->env->mail_followup_to) ) );
-    res = g_list_append(res, create_hdr_pair(
-	"Message-ID", g_strdup(cur->env->message_id) ) );
 
+    if(cur->env->return_path)
+	res = g_list_append(res, create_hdr_pair(
+	    "Return-Path", ADDRESS_to_gchar(cur->env->return_path) ) );
+    
+    if(cur->env->sender)
+	res = g_list_append(res, create_hdr_pair(
+	    "Sender", ADDRESS_to_gchar(cur->env->sender) ) );
+
+    if(cur->env->mail_followup_to)
+	res = g_list_append(res, create_hdr_pair(
+	    "Mail-Followup-To", ADDRESS_to_gchar(cur->env->mail_followup_to)));
+
+    if(cur->env->message_id)
+	res = g_list_append(res, create_hdr_pair(
+	    "Message-ID", g_strdup(cur->env->message_id) ) );
+    
     for(tmp = cur->env->references; tmp; tmp = tmp->next) {
 	res = g_list_append(res,create_hdr_pair(
 	"References", g_strdup(tmp->data)) );
@@ -487,6 +494,7 @@ message_delete(Message *message)
 {
   g_return_if_fail(message != NULL);
   g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
+  g_return_if_fail(message->mailbox != NULL);
 
   gtk_signal_emit(GTK_OBJECT(message), message_signals[SET_DELETED], TRUE);
 }

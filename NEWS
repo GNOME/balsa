@@ -1,0 +1,3 @@
+If you experience coredumps or other strange behavior when upgrading
+Balsa, try removing ~/.balsarc. The format of the preferences file
+has changed and Balsa can get confused if an old one is present.

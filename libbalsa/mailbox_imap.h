@@ -48,4 +48,6 @@ struct _MailboxIMAPClass
 
 gint mailbox_imap_has_new_messages(MailboxIMAP *mailbox);
 
+/* deprecated: gint mailbox_imap_has_new_messages(MailboxIMAP *mailbox); */
+
 #endif /* __balsa_mailbox_imap_h__ */

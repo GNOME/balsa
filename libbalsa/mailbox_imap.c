@@ -18,6 +18,9 @@
  */
 
 #include "libbalsa.h"
+#include "libmutt/mutt.h"
+#include "libmutt/mailbox.h"
+#include "libmutt/imap.h"
 
 static MailboxClass *parent_class = NULL;
 //static guint mailbox_signals[LAST_SIGNAL] = { 0 };
@@ -111,3 +114,33 @@ mailbox_imap_has_new_messages(MailboxIMAP *mailbox)
     /* if(res) MAILBOX(mailbox)->has_unread_messages = res; */
     return res;
 }
+
+#if 0
+/* mailbox_imap_has_new_messages:
+   returns non-zero when the IMAP mbox in question has new messages.
+   should it load new messages, too?
+
+   REMARK: imap is now checked as ordinary file mailboxes, via Buffy system.
+*/
+gint
+mailbox_imap_has_new_messages(MailboxIMAP *mailbox)
+{
+    gint res;
+    gchar * tmp;
+
+    g_assert(mailbox!=NULL);
+
+    if(MAILBOX(mailbox)->has_unread_messages)
+	return MAILBOX(mailbox)->has_unread_messages;
+
+    tmp = g_strdup_printf("{%s:%i}%s", 
+			  mailbox->server->host,
+			  mailbox->server->port,
+			  mailbox->path);
+    set_imap_username ( MAILBOX(mailbox) );
+    res = imap_buffy_check (tmp);
+    g_free(tmp);
+    /* if(res) MAILBOX(mailbox)->has_unread_messages = res; */
+    return res;
+}
+#endif

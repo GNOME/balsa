@@ -92,10 +92,13 @@ struct stPrinting{
     gchar *PrintCommand;
 };
 
+#ifndef __TYPEDEF_BALSA_MBLIST__
 #define __TYPEDEF_BALSA_MBLIST__
 typedef struct _BalsaMBList BalsaMBList;
+#endif
 
-enum ShownHeaders {
+typedef enum _ShownHeaders ShownHeaders;
+enum _ShownHeaders {
    HEADERS_NONE = 0,
    HEADERS_SELECTED,
    HEADERS_ALL 
@@ -153,7 +156,7 @@ extern struct BalsaApplication
   gboolean wordwrap;
   gint wraplength;
   gboolean browse_wrap;
-  enum ShownHeaders shown_headers;
+  ShownHeaders shown_headers;
   gchar * selected_headers;
   gboolean show_mblist;
   gboolean show_notebook_tabs;
@@ -209,6 +212,7 @@ typedef struct BalsaFudgeColor_t
 void balsa_app_init (void);
 gint do_load_mailboxes (void);
 void update_timer( gboolean update, guint minutes );
+void balsa_error_toggle_fatality( gboolean are_fatal );
 
 #include "sm-balsa.h"
 

@@ -1,3 +1,5 @@
+requires 1.0.0
+
 %h{
 /*
  * Balsa E-Mail Client
@@ -26,16 +28,30 @@
 #include "balsa-druid-page.h"
 %}
 
+%privateheader{
+enum __ed_types {
+	INBOX,
+	OUTBOX,
+	SENTBOX,
+	DRAFTBOX,
+	TRASH,
+	NUM_EDs
+};
+%}
+
 %{
 #include "balsa-app.h"
 #include "cfg-balsa.h"
 #include "balsa-druid-page-error.h"
+#include "misc.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
+
+static gchar *init_mbnames[NUM_EDs] = { N_("Inbox:"), N_("Outbox:"), N_("Sentbox:"), N_("Draftbox:"), N_("Trash:") };
 
 static Mailbox *unconditional_mailbox( const gchar *path, const gchar *prettyname, gchar **error );
 
@@ -92,7 +108,7 @@ static Mailbox *unconditional_mailbox( const gchar *path, const gchar *prettynam
 	box->name = g_strdup( gettext( prettyname ) );
 	(MAILBOX_LOCAL( box ))->path = dup;
 	cfg_mailbox_write_simple( box );
-	add_mailboxes_for_checking( box );
+	mailbox_add_for_checking( box );
 	return box;
 }
 
@@ -108,11 +124,7 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 
 	/*No arrays in gob :-(*/
 	private EntryMaster emaster;
-	private EntryData ed0;
-	private EntryData ed1;
-	private EntryData ed2;
-	private EntryData ed3;
-	private EntryData ed4;
+	private EntryData ed[NUM_EDs];
 
 	public GtkObject *new( Balsa:InitDruid *druid (check type null ) ) 
 	{ 
@@ -127,7 +139,9 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 	{
 		GtkTable *table;
 		GtkLabel *label;
-		gchar *preset;
+		int i;
+		GtkWidget **init_widgets[NUM_EDs];
+		gchar *init_presets[NUM_EDs] = { NULL, NULL, NULL, NULL, NULL };
 
 		self->_priv->paths_locked = FALSE;
 
@@ -135,46 +149,43 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 		self->_priv->emaster.numentries = 0;
 		self->_priv->emaster.donemask = 0;
 
-		self->_priv->ed0.master = &( self->_priv->emaster );
-		self->_priv->ed1.master = &( self->_priv->emaster );
-		self->_priv->ed2.master = &( self->_priv->emaster );
-		self->_priv->ed3.master = &( self->_priv->emaster );
-		self->_priv->ed4.master = &( self->_priv->emaster );
-
-		table = GTK_TABLE( gtk_table_new( 6, 2, FALSE ) );
+		table = GTK_TABLE( gtk_table_new( NUM_EDs + 1, 2, FALSE ) );
 	
 		label = GTK_LABEL( gtk_label_new( _(
-			"Please confirm the locations of your default mail files.\n"
+			"Please verify the locations of your default mail files.\n"
 			"These will be created if necessary." ) ) );
 		gtk_label_set_justify( label, GTK_JUSTIFY_RIGHT );
 		gtk_label_set_line_wrap( label, TRUE );
+
 		gtk_table_attach( table, GTK_WIDGET( label ), 0, 2, 0, 1,
 			GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL,
 			8, 4 );
 
-		preset = getenv( "MAIL" );
-		if( preset )
-			preset = g_strdup( preset );
-		balsa_init_add_table_entry( table, 0, _("Inbox:"), preset, 
-			&( self->_priv->ed0 ), GTK_WIDGET( self ), &( self->_priv->inbox ) );
-		if( preset )
+		init_presets[INBOX] = balsa_guess_mail_spool();
+
+		init_widgets[INBOX] = &( self->_priv->inbox );
+		init_widgets[OUTBOX] = &( self->_priv->outbox );
+		init_widgets[SENTBOX] = &( self->_priv->sentbox );
+		init_widgets[DRAFTBOX] = &( self->_priv->draftbox );
+		init_widgets[TRASH] = &( self->_priv->trash );
+
+		for( i = 0; i < NUM_EDs; i++ ) {
+			gchar *preset;
+
+			self->_priv->ed[i].master = &( self->_priv->emaster );
+
+			init_mbnames[i] = _(init_mbnames[i]);
+
+			if( init_presets[i] )
+				preset = init_presets[i];
+			else
+				preset = g_strdup( "[Dummy value]" );
+
+			balsa_init_add_table_entry( table, i, init_mbnames[i], preset,
+				&( self->_priv->ed[i] ), GTK_WIDGET( self ), init_widgets[i] );
+
 			g_free( preset );
-
-		/* This used to set all the mail directories to their proper values
-		 * as in the prepare code. But at this point balsa_app.local_mail_directory
-		 * is NULL, so we use a dummy value. 
-		 */
-		balsa_init_add_table_entry( table, 1, _("Outbox:"), "[dummy value]", 
-			&( self->_priv->ed1 ), GTK_WIDGET( self ), &( self->_priv->outbox ) );
-
-		balsa_init_add_table_entry( table, 2, _("Sentbox:"), "[dummy value]", 
-			&( self->_priv->ed2 ), GTK_WIDGET( self ), &( self->_priv->sentbox ) );
-
-		balsa_init_add_table_entry( table, 3, _("Draftbox:"), "[dummy value]", 
-			&( self->_priv->ed3 ), GTK_WIDGET( self ), &( self->_priv->draftbox ) );
-
-		balsa_init_add_table_entry( table, 4, _("Trash:"), "[dummy value]", 
-			&( self->_priv->ed4 ), GTK_WIDGET( self ), &( self->_priv->trash ) );
+		}
 
 		gtk_box_pack_start( GTK_BOX( (GNOME_DRUID_PAGE_STANDARD( self ))->vbox ),
 			GTK_WIDGET( table ), TRUE, TRUE, 8 );

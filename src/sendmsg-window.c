@@ -71,13 +71,17 @@ static gint toggle_keywords_cb (GtkWidget *, BalsaSendmsg *);
 
 static gint set_iso_charset(BalsaSendmsg*, gint , gint );
 static gint iso_1_cb(GtkWidget* , BalsaSendmsg *);
-static gint iso_15_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_2_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_3_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_5_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_8_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_9_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_13_cb(GtkWidget* , BalsaSendmsg *);
+static gint iso_14_cb(GtkWidget* , BalsaSendmsg *);
+static gint iso_15_cb(GtkWidget* , BalsaSendmsg *);
+static gint koi8_r_cb(GtkWidget* , BalsaSendmsg *);
+static gint koi8_u_cb(GtkWidget* , BalsaSendmsg *);
+
 
 /* Standard DnD types */
 enum
@@ -212,21 +216,27 @@ static GnomeUIInfo view_menu[] =
 /* ISO-8859-1 MUST BE at the first position - see set_menus */
 static GnomeUIInfo iso_charset_menu[] = {
 #define ISO_CHARSET_1_POS 0
-  GNOMEUIINFO_ITEM_NONE( N_ ("_Western (ISO-8859-1)"), NULL, iso_1_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("_Western (ISO-8859-1)"), NULL, iso_1_cb),
 #define ISO_CHARSET_15_POS 1
-  GNOMEUIINFO_ITEM_NONE( N_ ("W_estern (ISO-8859-15)"), NULL, iso_15_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("W_estern (ISO-8859-15)"), NULL, iso_15_cb),
 #define ISO_CHARSET_2_POS 2
-  GNOMEUIINFO_ITEM_NONE( N_ ("_Central European (ISO-8859-2)"), NULL,iso_2_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("_Central European (ISO-8859-2)"), NULL,iso_2_cb),
 #define ISO_CHARSET_3_POS 3
-  GNOMEUIINFO_ITEM_NONE( N_ ("_South European (ISO-8859-3)"), NULL, iso_3_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("_South European (ISO-8859-3)"), NULL, iso_3_cb),
 #define ISO_CHARSET_13_POS 4
-  GNOMEUIINFO_ITEM_NONE( N_ ("_Baltic (ISO-8859-13)"), NULL, iso_13_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("_Baltic (ISO-8859-13)"), NULL, iso_13_cb),
 #define ISO_CHARSET_5_POS 5
-  GNOMEUIINFO_ITEM_NONE( N_ ("Cy_rillic (ISO-8859-5)"), NULL, iso_5_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("Cy_rillic (ISO-8859-5)"), NULL, iso_5_cb),
 #define ISO_CHARSET_8_POS 6
-  GNOMEUIINFO_ITEM_NONE( N_ ("_Hebrew (ISO-8859-8)"), NULL, iso_8_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("_Hebrew (ISO-8859-8)"), NULL, iso_8_cb),
 #define ISO_CHARSET_9_POS 7
-  GNOMEUIINFO_ITEM_NONE( N_ ("_Turkish (ISO-8859-9)"), NULL, iso_9_cb),
+  GNOMEUIINFO_ITEM_NONE( N_("_Turkish (ISO-8859-9)"), NULL, iso_9_cb),
+#define ISO_CHARSET_14_POS 8
+  GNOMEUIINFO_ITEM_NONE( N_("Ce_ltic (ISO-8859-14)"), NULL, iso_14_cb),
+#define KOI8_R_POS 9
+  GNOMEUIINFO_ITEM_NONE( N_("Ru_ssian (KOI8-R)"), NULL, koi8_r_cb),
+#define KOI8_U_POS 10
+  GNOMEUIINFO_ITEM_NONE( N_("_Ukrainian (KOI8-U)"), NULL, koi8_u_cb),
   GNOMEUIINFO_END
 };
 
@@ -242,6 +252,9 @@ static gchar* iso_charset_names[] = {
    "ISO-8859-5",
    "ISO-8859-8",
    "ISO-8859-9",
+   "ISO-8859-14",
+   "KOI8-R",
+   "KOI8-U"
 };
 
 typedef struct {
@@ -309,6 +322,9 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
    
    balsa_app.compose_headers = g_strdup(newStr);
 
+   if(bsm->orig_message && bsm->orig_message->mailbox)
+       mailbox_open_unref(bsm->orig_message->mailbox);
+
    gtk_widget_destroy (bsm->window);
    if(balsa_app.debug) printf("balsa_sendmsg_destroy: Freeing bsm\n");
    g_free (bsm);
@@ -366,10 +382,10 @@ select_attachment (GnomeIconList * ilist, gint num, GdkEventButton * event,
 static void
 add_attachment (GnomeIconList * iconlist, char *filename)
 {
-   /* FIXME: the path to the file must not be hardcoded */ 
+	/* FIXME: the path to the file must not be hardcoded */ 
 	/* gchar *pix = gnome_pixmap_file ("balsa/attachment.png"); */
 	gchar *pix = balsa_pixmap_finder( "balsa/attachment.png" );
-   
+	
    if( !check_if_regular_file( filename ) ) {
       /*c_i_r_f() will pop up an error dialog for us, so we need do nothing.*/
       return;
@@ -445,10 +461,11 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
       filename = g_strconcat(dir, p, NULL);
       if(strcmp(filename, sel_file) != 0)
 	  add_attachment (iconlist, filename);
-      g_free(filename);
+      /* do not g_free(filename) - the add_attachment arg is not const */
+      /* g_free(filename); */
   }
 
-  /* do not g_free(filename) - the add_attachment arg is not const */
+
 
   gtk_widget_destroy (GTK_WIDGET (fs));
   g_free(dir);
@@ -860,6 +877,10 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
     }
 
+  if( message && message->mailbox )
+	  /* Ref the box so that we don't lose the mail */
+	  mailbox_open_ref( message->mailbox );
+
   msg->window  = window;
   msg->type    = type;
 
@@ -1164,8 +1185,22 @@ is_ready_to_send(BalsaSendmsg * bsmsg) {
    return TRUE;
 }
 
-/* bsmsg2message
+static void 
+strip_chars(gchar *str, const gchar * char2strip) 
+{
+    gchar *ins = str;
+    while(*str) {
+	if(strchr(char2strip, *str) == NULL) 
+	    *ins++ = *str;
+	str++;
+    }
+    *ins = '\0';
+}
+
+/* bsmsg2message:
    creates Message struct based on given BalsaMessage
+   stripping EOL chars is necessary - the GtkEntry fields can in principle 
+   contain them. Such characters might screw up message formatting
 */
 static Message *
 bsmsg2message(BalsaSendmsg *bsmsg)
@@ -1176,6 +1211,8 @@ bsmsg2message(BalsaSendmsg *bsmsg)
   gchar recvtime[50];
   struct tm *footime;
 
+  g_assert( bsmsg != NULL );
+
   message = message_new ();
 
   message->from = make_address_from_string(gtk_entry_get_text 
@@ -1183,6 +1220,7 @@ bsmsg2message(BalsaSendmsg *bsmsg)
 
   message->subject = g_strdup (gtk_entry_get_text 
 			       (GTK_ENTRY (bsmsg->subject[1])));
+  strip_chars( message->subject, "\r\n" );
 
   message->to_list = make_list_from_string (
      gtk_entry_get_text (GTK_ENTRY (bsmsg->to[1])));
@@ -1607,19 +1645,74 @@ set_iso_charset(BalsaSendmsg *msg, gint code, gint idx) {
    return FALSE;
 }
 
+static gint 
+set_koi8_charset(BalsaSendmsg *msg, const gchar *code, gint idx) {
+   guint point, txt_len;
+   gchar* str, *koi_font_name, *iso_font_name, *font_name;
+   
+   if( ! GTK_CHECK_MENU_ITEM(iso_charset_menu[idx].widget)->active)
+      return TRUE;
+
+   msg->charset = iso_charset_names[idx];
+
+   koi_font_name = get_koi_font_name(balsa_app.message_font, code);
+   iso_font_name = get_font_name(balsa_app.message_font,1);
+   
+   font_name = (gchar*)g_malloc(strlen(koi_font_name)+strlen(iso_font_name)+2);
+   sprintf(font_name,"%s,%s",koi_font_name,iso_font_name);
+   g_free(koi_font_name);
+   g_free(iso_font_name);
+      
+   if(msg->font)
+     gdk_font_unref(msg->font);
+
+   if( !( msg->font = gdk_fontset_load (font_name)) ) {
+      printf("Cannot find font: %s\n", font_name);
+      g_free(font_name);
+      return TRUE;
+   }
+
+   if(balsa_app.debug) 
+      fprintf(stderr,"Loaded font with mask: %s\n", font_name);
+
+   g_free(font_name);
+   
+
+   gtk_text_freeze( GTK_TEXT(msg->text) );
+   point   = gtk_editable_get_position( GTK_EDITABLE(msg->text) ); 
+   txt_len = gtk_text_get_length( GTK_TEXT(msg->text) );
+   str     = gtk_editable_get_chars( GTK_EDITABLE(msg->text), 0, txt_len);
+   
+   gtk_text_set_point( GTK_TEXT(msg->text), 0);
+   gtk_text_forward_delete ( GTK_TEXT(msg->text), txt_len); 
+   
+   gtk_text_insert(GTK_TEXT(msg->text), msg->font , NULL, NULL, str, txt_len);
+   g_free(str);
+   gtk_text_thaw( GTK_TEXT(msg->text) );
+
+   gtk_editable_set_position( GTK_EDITABLE(msg->text), point);
+   return FALSE;
+}
+
 static gint iso_1_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  1, ISO_CHARSET_1_POS); }
-static gint iso_15_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return set_iso_charset(bsmsg, 15, ISO_CHARSET_15_POS); }
 static gint iso_2_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  2, ISO_CHARSET_2_POS); }
 static gint iso_3_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  3, ISO_CHARSET_3_POS); }
-static gint iso_13_cb(GtkWidget* widget, BalsaSendmsg *bmsg)
-{return set_iso_charset(bmsg, 13, ISO_CHARSET_13_POS); }
 static gint iso_5_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  5, ISO_CHARSET_5_POS); }
 static gint iso_8_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  8, ISO_CHARSET_8_POS); }
 static gint iso_9_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  9, ISO_CHARSET_9_POS); }
+static gint iso_13_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return set_iso_charset(bsmsg, 13, ISO_CHARSET_13_POS); }
+static gint iso_14_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return set_iso_charset(bsmsg, 14, ISO_CHARSET_14_POS); }
+static gint iso_15_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return set_iso_charset(bsmsg, 15, ISO_CHARSET_15_POS); }
+static gint koi8_r_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return set_koi8_charset(bsmsg, "r", KOI8_R_POS); }
+static gint koi8_u_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return set_koi8_charset(bsmsg, "u", KOI8_U_POS); }

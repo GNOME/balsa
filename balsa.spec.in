@@ -12,11 +12,13 @@ Release:   %rel
 Copyright: GPL
 Group:     Applications/Internet
 Source0:   balsa-%{PACKAGE_VERSION}.tar.gz
+Patch1:	   @srcdir@/rpm-po.patch
 URL:       http://www.balsa.net/
 BuildRoot: /tmp/balsa-%{PACKAGE_VERSION}-root
 Packager: Michael Fulbright <msf@redhat.com>
 Requires: gtk+ >= 1.2.0
 Requires: gnome-libs >= 1.0.0
+Provides: balsa
 Docdir: %{prefix}/doc
 
 %description
@@ -26,19 +28,7 @@ IMAP.
  
 %prep
 %setup
-
-patch -b -p1 <<EOF
---- balsa-0.6.0.orig/po/Makefile.in.in
-+++ balsa-0.6.0/po/Makefile.in.in
-@@ -17,6 +17,6 @@
- VPATH = @at_srcdir@
-
--prefix = @at_prefix@
-+prefix = \$(DESTDIR)/usr
- exec_prefix = @at_exec_prefix@
- datadir = \$(prefix)/@at_DATADIRNAME@
- localedir = \$(datadir)/locale
-EOF
+%patch1
 
 %build
 # Needed for snapshot releases.
@@ -81,11 +71,14 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/pixmaps/*
 /usr/share/sounds/balsa/*
 %{prefix}/man/*
-%config /etc/CORBA/servers/balsa.gnorba
 %config /etc/sound/events/*
 
 
 %changelog
+* Thu Jun  1 2000 Peter Williams <oeter@newton.cx>
+
+- Don't try to install IDL stuff as we have deleted it :-)
+
 * Thu Dec 30 1999 Bruno Pires Marinho <bapm@camoes.rnl.ist.utl.pt>
 
 - Improved the spec file by adding a sysconfdir=/etc, removing the man

@@ -122,8 +122,11 @@ find_mailbox_func (GNode * g1, gpointer data)
   return TRUE;
 }
 
-
-static GNode *
+/* find_gnode_in_mbox_list:
+   looks for given mailbox in th GNode tree, usually but not limited to
+   balsa_app.mailox_nodes
+*/
+GNode *
 find_gnode_in_mbox_list (GNode * gnode_list, Mailbox * mailbox)
 {
   gpointer d[2];
@@ -149,7 +152,7 @@ void
 mailbox_conf_delete (Mailbox * mailbox)
 {
   GNode *gnode;
-  gchar *msg;
+  gchar *msg, *msg1;
   gint clicked_button;
   GtkWidget *ask;
 
@@ -157,20 +160,21 @@ mailbox_conf_delete (Mailbox * mailbox)
       || mailbox->type == MAILBOX_MAILDIR
       || mailbox->type == MAILBOX_MBOX)
     {
-      msg = _("This will remove the mailbox and it's files permanently from your system.\n"
+      msg = _("This will remove the mailbox %s and it's files permanently from your system.\n"
 	       "Are you sure you want to remove this mailbox?");
     }
   else
     {
-      msg = _("This will remove the mailbox from the list of mailboxes\n"
+      msg = _("This will remove the mailbox %s from the list of mailboxes\n"
 	  "You may use \"Add Mailbox\" later to access this mailbox again\n"
 	       "Are you sure you want to remove this mailbox?");
     }
 
-
-  ask = gnome_message_box_new (msg,
+  msg1 = g_strdup_printf(msg, mailbox->name);
+  ask = gnome_message_box_new (msg1,
 			       GNOME_MESSAGE_BOX_QUESTION,
 		       GNOME_STOCK_BUTTON_YES, GNOME_STOCK_BUTTON_NO, NULL);
+  g_free(msg1);
 
   gnome_dialog_set_default (GNOME_DIALOG (ask), 1);
   gtk_window_set_modal (GTK_WINDOW (ask), TRUE);
@@ -507,8 +511,9 @@ check_for_blank_fields(Mailbox *mailbox)
     return -1;               /* Was a blank, want to cancel */
 }
 
+#if 0
 static int
-conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
+conf_update_mailbox (Mailbox * mailbox )
 {
   int field_check;
 
@@ -631,7 +636,7 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
     }
   return 1;
 }
-
+#endif
 
 static Mailbox *
 conf_add_mailbox ()
@@ -687,8 +692,6 @@ conf_add_mailbox ()
 	node = g_node_new (mailbox_node_new (mailbox->name, mailbox,
 					     mailbox->type != MAILBOX_MBOX));
 	g_node_append (balsa_app.mailbox_nodes, node);
-	cfg_mailbox_write_simple( mailbox );
-	add_mailboxes_for_checking (mailbox);
       }
       break;
 
@@ -699,8 +702,10 @@ conf_add_mailbox ()
       field_check = check_for_blank_fields(mailbox);
       if(field_check == -2)
 	break;
-      else if(field_check == -1)
-	return NULL;
+      else if(field_check == -1) {
+	  gtk_object_destroy(GTK_OBJECT(mailbox));
+	  return NULL;
+      }
 
       mailbox->name = g_strdup (gtk_entry_get_text (
 	  GTK_ENTRY (mcw->pop_mailbox_name)));
@@ -712,8 +717,6 @@ conf_add_mailbox ()
       MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
 
       balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
-      cfg_mailbox_write_simple( mailbox );
-      add_mailboxes_for_checking (mailbox);
       break;
 
 
@@ -750,8 +753,6 @@ conf_add_mailbox ()
       node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
       g_node_append (balsa_app.mailbox_nodes, node);
 
-      cfg_mailbox_write_simple( mailbox );
-      add_mailboxes_for_checking (mailbox);
       break;
 
     case MC_PAGE_NEW:
@@ -759,6 +760,8 @@ conf_add_mailbox ()
 	    break;
     }
 
+  cfg_mailbox_write_simple( mailbox );
+  mailbox_add_for_checking (mailbox);
   return mailbox;
 }
 
@@ -767,29 +770,20 @@ static void
 mailbox_conf_close (GtkWidget * widget, gboolean save)
 {
   Mailbox *mailbox;
-  int return_value;
 
   mailbox = mcw->mailbox;
 
   if (mailbox && save)		/* we are updating the mailbox */
     {
-      gchar *old_mbox_name = g_strdup (mailbox->name);
-      return_value = conf_update_mailbox (mcw->mailbox, old_mbox_name);
-      g_free (old_mbox_name);
-
-      if (mailbox->type == MAILBOX_POP3 &&
-	  return_value != -1)                /* redraw the pop3 server list */
+      if (mailbox->type == MAILBOX_POP3 )    /* redraw the pop3 server list */
 	update_pop3_servers ();
       else                                   /* redraw the main mailbox list */
 	balsa_mblist_rebuild (BALSA_MBLIST (balsa_app.mblist));	
 
-      if(return_value != -1) {
 	gtk_widget_destroy (mcw->window);
 	g_free (mcw);
 	mcw = NULL;
-      }
-
-      return;			/* don't continue */
+	return;			/* don't continue */
     }
 
 

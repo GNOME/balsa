@@ -37,7 +37,7 @@
 
 /* Global application structure */
 struct BalsaApplication balsa_app;
-
+static gboolean errors_are_fatal = TRUE;
 
 /* prototypes */
 static gboolean check_special_mailboxes (void);
@@ -55,6 +55,7 @@ update_gui(void)
     while (gtk_events_pending ())
          gtk_main_iteration ();
 }
+
 static void
 balsa_error (const char *fmt,...)
 {
@@ -68,6 +69,10 @@ balsa_error (const char *fmt,...)
 
   g_warning (outstr);
 
+  /* Sometimes a different thread makes GTK+
+   * calls in here. How do we handle this???
+   */
+  
   messagebox = gnome_message_box_new (outstr,
 				      GNOME_MESSAGE_BOX_ERROR,
 				      GNOME_STOCK_BUTTON_OK,
@@ -76,8 +81,9 @@ balsa_error (const char *fmt,...)
   gtk_window_set_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
   gtk_widget_show (messagebox);
 
-  gtk_signal_connect (GTK_OBJECT (messagebox), "clicked",
-		      GTK_SIGNAL_FUNC (error_exit_cb), NULL);
+  if( errors_are_fatal ) 
+	  gtk_signal_connect (GTK_OBJECT (messagebox), "clicked",
+			      GTK_SIGNAL_FUNC (error_exit_cb), NULL);
 }
 
 
@@ -91,16 +97,9 @@ balsa_app_init( void )
 gint
 do_load_mailboxes (void)
 {
+	gchar *spool;
+
 	if( check_special_mailboxes () )
-		return FALSE;
-
-	/* load_local_mailboxes does not work well without trash */
-	if (!balsa_app.trash) 
-		return FALSE;
-
-	load_local_mailboxes ();
-
-	if (!balsa_app.inbox)
 		return FALSE;
 
 	switch (balsa_app.inbox->type)
@@ -108,20 +107,22 @@ do_load_mailboxes (void)
 	case MAILBOX_MAILDIR:
 	case MAILBOX_MBOX:
 	case MAILBOX_MH:
-		mailbox_init (MAILBOX_LOCAL (balsa_app.inbox)->path,
-			      balsa_error,
-			      update_gui);
+		spool = g_strdup( MAILBOX_LOCAL(balsa_app.inbox)->path );
 		break;
 
 	case MAILBOX_IMAP:
-		break;
-
 	case MAILBOX_POP3:
+		spool = balsa_guess_mail_spool();
 		break;
 	default:
-		fprintf (stderr, "do_load_mailboxes: Unknown mailbox type\n");
-		break;
+		fprintf (stderr, "do_load_mailboxes: Unknown inbox mailbox type\n");
+		return FALSE;
 	}
+
+	mailbox_init( spool, balsa_error, update_gui );
+	g_free( spool );
+
+	load_local_mailboxes ();
 	
 	return TRUE;
 }
@@ -191,4 +192,9 @@ update_timer( gboolean update, guint minutes )
       balsa_app.check_mail_timer_id = 0;
     }
 
+}
+
+void balsa_error_toggle_fatality( gboolean are_fatal )
+{
+	errors_are_fatal = are_fatal;
 }

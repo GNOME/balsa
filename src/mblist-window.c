@@ -38,6 +38,7 @@
 #include "mailbox-conf.h"
 #include "../libbalsa/mailbox.h"
 #include "cfg-memory-widgets.h"
+#include "cfg-balsa.h"
 
 typedef struct _MBListWindow MBListWindow;
 struct _MBListWindow
@@ -195,27 +196,6 @@ mblist_open_mailbox (Mailbox * mailbox)
 	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c); 
 	page = gtk_object_get_data(GTK_OBJECT(page),"indexpage"); 
 	cfg_memory_clist_restore( GTK_WIDGET(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)) );
-
-	/* I don't know what is the purpose of that code, so I put
-	 * it in comment until somebody tells me waht it  is useful 
-	 * for.      -Bertrand 
-	 * 
-	 *  if (!strcmp (mailbox->name, _("Inbox")) ||
-	 * !strcmp (mailbox->name, _("Outbox")) ||
-	 * !strcmp (mailbox->name, _("Trash")))
-	 * return ;
-	 *
-	 *
-	 * gtk_ctree_set_node_info (GTK_CTREE (mblw->ctree),
-	 * row,
-	 * mailbox->name, 5,
-	 * NULL, NULL,
-	 * balsa_icon_get_pixmap (BALSA_ICON_TRAY_EMPTY),
-	 * balsa_icon_get_bitmap (BALSA_ICON_TRAY_EMPTY),
-	 * FALSE, TRUE); 
-	 *
-	 * gtk_ctree_node_set_row_style (GTK_CTREE (mblw->ctree), row, NULL); 
-	 */
 }
 
 
@@ -336,6 +316,75 @@ mb_del_cb (GtkWidget * widget, Mailbox * mailbox)
   mailbox_conf_delete (mailbox);
 }
 
+static void make_mb_special( Mailbox *mailbox, Mailbox **appitem );
+static void make_mb_special( Mailbox *mailbox, Mailbox **appitem )
+{
+	GNode *node;
+
+	g_return_if_fail( mailbox );
+	g_return_if_fail( appitem );
+
+	if( (*appitem) ) {
+		node = g_node_new( mailbox_node_new( (*appitem)->name, (*appitem),
+						     ((*appitem)->type == MAILBOX_MH) ) );
+		g_node_append( balsa_app.mailbox_nodes, node );
+		cfg_mailbox_write_simple( (*appitem) );
+	}
+
+	node = find_gnode_in_mbox_list( balsa_app.mailbox_nodes, mailbox );
+	g_node_unlink( node );
+
+	(*appitem) = mailbox;
+
+	cfg_mailbox_write_simple( mailbox );
+}
+	
+/* mb_inbox_cb:
+   sets the given mailbox as inbox.
+*/
+static void
+mb_inbox_cb (GtkWidget * widget, Mailbox * mailbox)
+{
+  if (mailbox->type == MAILBOX_UNKNOWN)
+    return;
+
+  make_mb_special( mailbox, &balsa_app.inbox );
+
+  /* I wonder if this should not go into _idle_ function because it may be
+   expensive. */
+  balsa_mblist_rebuild (BALSA_MBLIST (balsa_app.mblist));
+}
+
+static void
+mb_sentbox_cb (GtkWidget * widget, Mailbox * mailbox)
+{
+  if (mailbox->type == MAILBOX_UNKNOWN)
+    return;
+
+  make_mb_special( mailbox, &balsa_app.sentbox );
+  balsa_mblist_rebuild (BALSA_MBLIST (balsa_app.mblist));
+}
+
+static void
+mb_trash_cb (GtkWidget * widget, Mailbox * mailbox)
+{
+  if (mailbox->type == MAILBOX_UNKNOWN)
+    return;
+
+  make_mb_special( mailbox, &balsa_app.trash );
+  balsa_mblist_rebuild (BALSA_MBLIST (balsa_app.mblist));
+}
+
+static void
+mb_draftbox_cb (GtkWidget * widget, Mailbox * mailbox)
+{
+  if (mailbox->type == MAILBOX_UNKNOWN)
+    return;
+
+  make_mb_special( mailbox, &balsa_app.draftbox );
+  balsa_mblist_rebuild (BALSA_MBLIST (balsa_app.mblist));
+}
+
 /* FIXME make these use gnome_popup_menu stuff
 static GnomeUIInfo mailbox_menu[] =
   GNOMEUIINFO_ITEM_STOCK (_ ("_Open Mailbox"), N_("Open the selected mailbox"),
@@ -349,47 +398,42 @@ static GnomeUIInfo mailbox_menu[] =
 };
 */
 
+static void
+add_menu_entry(GtkWidget * menu, const gchar * label, GtkSignalFunc cb,
+	       Mailbox * mailbox)
+{
+    GtkWidget *menuitem;
+    
+    menuitem = gtk_menu_item_new_with_label (label);
+    gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+			GTK_SIGNAL_FUNC (cb), mailbox);
+    gtk_menu_append (GTK_MENU (menu), menuitem);
+    gtk_widget_show (menuitem);
+}
+
 static GtkWidget *
 mblist_create_context_menu (GtkCTree * ctree, Mailbox * mailbox)
 {
-  GtkWidget *menu, *menuitem;
+  GtkWidget *menu;
 
   menu = gtk_menu_new ();
 
   if (mailbox)
     {
-      menuitem = gtk_menu_item_new_with_label (_ ("Open Mailbox"));
-      gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-			  GTK_SIGNAL_FUNC (mb_open_cb), mailbox);
-      gtk_menu_append (GTK_MENU (menu), menuitem);
-      gtk_widget_show (menuitem);
-     
-      menuitem = gtk_menu_item_new_with_label (_ ("Close Mailbox"));
-      gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-			  GTK_SIGNAL_FUNC (mb_close_cb), mailbox);
-      gtk_menu_append (GTK_MENU (menu), menuitem);
-      gtk_widget_show (menuitem);
+      add_menu_entry(menu, _("Open Mailbox"), mb_open_cb, mailbox);
+      add_menu_entry(menu, _("Close Mailbox"), mb_close_cb, mailbox);
     }
   
-  menuitem = gtk_menu_item_new_with_label (_ ("Add New Mailbox"));
-  gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-		      GTK_SIGNAL_FUNC (mb_add_cb), mailbox);
-  gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_widget_show (menuitem);
+  add_menu_entry(menu, _("Add New Mailbox"), mb_add_cb, mailbox);
   
   if (mailbox)
     {
-      menuitem = gtk_menu_item_new_with_label (_ ("Edit Mailbox Properties"));
-      gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-			  GTK_SIGNAL_FUNC (mb_conf_cb), mailbox);
-      gtk_menu_append (GTK_MENU (menu), menuitem);
-      gtk_widget_show (menuitem);
-      
-      menuitem = gtk_menu_item_new_with_label (_ ("Delete Mailbox"));
-      gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-			  GTK_SIGNAL_FUNC (mb_del_cb), mailbox);
-      gtk_menu_append (GTK_MENU (menu), menuitem);
-      gtk_widget_show (menuitem);
+      add_menu_entry(menu, _("Edit Mailbox Properties"), mb_conf_cb, mailbox);
+      add_menu_entry(menu, _("Delete Mailbox"),   mb_del_cb,     mailbox);
+      add_menu_entry(menu, _("Mark as Inbox"),    mb_inbox_cb,   mailbox);
+      add_menu_entry(menu, _("Mark as Sentbox"),  mb_sentbox_cb, mailbox);
+      add_menu_entry(menu, _("Mark as Trash"),    mb_trash_cb,   mailbox);
+      add_menu_entry(menu, _("Mark as Draftbox"), mb_draftbox_cb, mailbox);
     }
 
   return menu;

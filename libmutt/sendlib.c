@@ -1735,6 +1735,7 @@ mutt_invoke_sendmail (ADDRESS *to, ADDRESS *cc, ADDRESS *bcc, /* recips */
 		args = add_option (args, &argslen, &argsmax, DsnReturn);
 	}
 
+	args = add_option (args, &argslen, &argsmax, "-i");
 	args = add_option (args, &argslen, &argsmax, "--");
 	args = add_args (args, &argslen, &argsmax, to);
 	args = add_args (args, &argslen, &argsmax, cc);

@@ -37,6 +37,9 @@
 #include <string.h>
 #include <unistd.h>
 
+/* XXXXX */
+#define BALSA_TEST_POP3 1
+
 static int getLine (int fd, char *s, int len)
 {
   char ch;
@@ -49,12 +52,18 @@ static int getLine (int fd, char *s, int len)
     if (ch == '\n')
     {
       *s = 0;
+      #ifdef BALSA_TEST_POP3
+      fprintf( stderr, "POP3 L: \"%s\"\n", (char *) (s - bytes) );
+      #endif
       return (bytes);
     }
     /* make sure not to overwrite the buffer */
     if (bytes == len - 1)
     {
       *s = 0;
+      #ifdef BALSA_TEST_POP3
+      fprintf( stderr, "POP3 L: \"%s\"\n", (char *) (s - bytes) );
+      #endif
       return bytes;
     }
   }
@@ -77,6 +86,19 @@ static int getPass (void)
   return 1;
 }
 #endif
+
+#ifdef BALSA_TEST_POP3
+#define G_STMT_START ({
+#define G_STMT_END })
+#define mutt_error( str, args... ) G_STMT_START { fprintf( stderr, "POP3 E: " ); fprintf( stderr, str, ##args ); fprintf( stderr, "\n" ); mutt_error( str, ##args ); } G_STMT_END
+#define mutt_message( str, args... ) G_STMT_START { fprintf( stderr, "POP3 M: " ); fprintf( stderr, str, ##args ); fprintf( stderr, "\n" ); mutt_message( str, ##args ); } G_STMT_END
+#define mutt_perror( str ) G_STMT_START { fprintf( stderr, "POP3 P: %s\n", (str) ); mutt_perror( str ); } G_STMT_END
+#define write( sock, buffer, size ) G_STMT_START { fprintf( stderr, "POP3 O: \"%s\"\n", buffer ); write( sock, buffer, (size) ); } G_STMT_END
+#define DM( fmt, args... ) G_STMT_START { fprintf( stderr, "POP3 D: " ); fprintf( stderr, fmt, ##args ); fprintf( stderr, "\n" ); } G_STMT_END
+#else
+#define DM( fmt, args... ) 
+#endif
+
 void mutt_fetchPopMail (void)
 {
   struct sockaddr_in sin;
@@ -100,6 +122,8 @@ void mutt_fetchPopMail (void)
   CONTEXT ctx;
   MESSAGE *msg = NULL;
 
+  DM( "CheckPopMail head" );
+
   if (!PopHost)
   {
     mutt_error ("POP host is not defined.");
@@ -111,9 +135,21 @@ void mutt_fetchPopMail (void)
     mutt_error ("No POP username is defined.");
     return;
   }
+
+  DM( "Open buffer mailbox" );
+
+  if (mx_open_mailbox (NONULL(Spoolfile), M_APPEND, &ctx) == NULL) {
+	  mutt_error( "Cannot open the temporary mailbox to spool POP3 messages: \"%s\"", Spoolfile );
+	  return;
+  }
+
+
 #ifndef LIBMUTT   
   if (!getPass ()) return;
 #endif
+
+  DM( "Begin connection" );
+
   s = socket (AF_INET, SOCK_STREAM, IPPROTO_IP);
 
   memset ((char *) &sin, 0, sizeof(sin));
@@ -126,6 +162,7 @@ void mutt_fetchPopMail (void)
     if ((he = gethostbyname (NONULL(PopHost))) == NULL)
     {
       mutt_error ("Could not find address for host %s.", PopHost);
+      mx_fastclose_mailbox (&ctx);
       return;
     }
     memcpy ((void *)&sin.sin_addr, *(he->h_addr_list), he->h_length);
@@ -140,9 +177,13 @@ void mutt_fetchPopMail (void)
     mutt_perror ("connect");
     return;
   }
-  
-  if (getLine (s, buffer, sizeof (buffer)) == -1)
-    goto fail;
+
+  DM( "Connected; hello" );
+
+  if (getLine (s, buffer, sizeof (buffer)) == -1) {
+	  mx_fastclose_mailbox (&ctx);
+	  goto fail;
+  }
 
   if (mutt_strncmp (buffer, "+OK", 3) != 0)
   {
@@ -150,12 +191,16 @@ void mutt_fetchPopMail (void)
     mutt_error (buffer);
     goto finish;
   }
+
+  DM( "hellod; user" );
 
   snprintf (buffer, sizeof(buffer), "user %s\r\n", PopUser);
   write (s, buffer, mutt_strlen (buffer));
 
-  if (getLine (s, buffer, sizeof (buffer)) == -1)
-    goto fail;
+  if (getLine (s, buffer, sizeof (buffer)) == -1) {
+      mx_fastclose_mailbox (&ctx);
+      goto fail;
+  }
 
   if (mutt_strncmp (buffer, "+OK", 3) != 0)
   {
@@ -163,12 +208,16 @@ void mutt_fetchPopMail (void)
     mutt_error (buffer);
     goto finish;
   }
-  
+
+  DM( "usered; password" );
+
   snprintf (buffer, sizeof(buffer), "pass %s\r\n", NONULL(PopPass));
   write (s, buffer, mutt_strlen (buffer));
   
-  if (getLine (s, buffer, sizeof (buffer)) == -1)
-    goto fail;
+  if (getLine (s, buffer, sizeof (buffer)) == -1) {
+	  mx_fastclose_mailbox (&ctx);
+	  goto fail;
+  }
 
   if (mutt_strncmp (buffer, "+OK", 3) != 0)
   {
@@ -180,12 +229,16 @@ void mutt_fetchPopMail (void)
     mutt_error (buffer[0] ? buffer : "Server closed connection!");
     goto finish;
   }
-  
+
+  DM( "passworded; stat" );
+
   /* find out how many messages are in the mailbox. */
   write (s, "stat\r\n", 6);
   
-  if (getLine (s, buffer, sizeof (buffer)) == -1)
-    goto fail;
+  if (getLine (s, buffer, sizeof (buffer)) == -1) {
+	  mx_fastclose_mailbox (&ctx);
+	  goto fail;
+  }
 
   if (mutt_strncmp (buffer, "+OK", 3) != 0)
   {
@@ -196,14 +249,13 @@ void mutt_fetchPopMail (void)
   
   sscanf (buffer, "+OK %d %d", &msgs, &bytes);
 
+  DM( "Stat retrieved" );
+
   if (msgs == 0)
   {
     mutt_message ("No new mail in POP mailbox.");
     goto finish;
   }
-
-  if (mx_open_mailbox (NONULL(Spoolfile), M_APPEND, &ctx) == NULL)
-    goto finish;
 
  first_msg = 1;
 
@@ -216,6 +268,7 @@ void mutt_fetchPopMail (void)
  
  if ( !option (OPTPOPDELETE) )
  {
+	 DM( "Checking for seen UIDLs" );
 
   for( i = msgs; i > 0 ; i--) 
   {
@@ -258,6 +311,7 @@ void mutt_fetchPopMail (void)
 
   total = msgs - first_msg + 1; /* will be used for display later */
  
+  DM( "Status: total %d, messages %d, first_msg %d", total, msgs, first_msg );
 
   /*  Check for the total amount of bytes mail to be received */
   tot_bytes=0;
@@ -267,22 +321,28 @@ void mutt_fetchPopMail (void)
     write (s, buffer, strlen(buffer));
     if ( getLine (s, buffer, sizeof(buffer)) == -1) 
     {
+	    DM( "Abort while listing message %d", i );
       mx_fastclose_mailbox (&ctx);
       goto fail;
     }
     
     if (sscanf (buffer,"+OK %d %d",&i,&num_bytes) != 2) 
     {
+	    DM( "Error on list message %d encountered", i );
       tot_bytes=-1;
       break;
     }
     tot_bytes += num_bytes;
+
+    DM( "Message info: total %d, this %d", tot_bytes, num_bytes );
   }
 
 
   num_bytes=0;  
   for (i = first_msg ; i <= msgs ; i++)
   {
+	  DM( "Retrieving message %d", i );
+
     snprintf (buffer, sizeof(buffer), "retr %d\r\n", i);
     write (s, buffer, strlen (buffer));
 
@@ -294,12 +354,14 @@ void mutt_fetchPopMail (void)
 
     if (getLine (s, buffer, sizeof (buffer)) == -1)
     {
+	    DM( "Abort while retrieving message %d", i );
       mx_fastclose_mailbox (&ctx);
       goto fail;
     }
 
     if (mutt_strncmp (buffer, "+OK", 3) != 0)
     {
+	    DM( "Error on retrieve message %d", i );
       mutt_remove_trailing_ws (buffer);
       mutt_error (buffer);
       break;
@@ -307,6 +369,7 @@ void mutt_fetchPopMail (void)
 
     if ((msg = mx_open_new_message (&ctx, NULL, M_ADD_FROM)) == NULL)
     {
+	    DM( "Error while creating new message %d", i );
       err = 1;
       break;
     }
@@ -316,6 +379,8 @@ void mutt_fetchPopMail (void)
     {
       char *p;
       int chunk;
+
+      DM( "Message reading loop: %d" );
 
       if ((chunk = getLine (s, buffer, sizeof (buffer))) == -1)
       {
@@ -328,11 +393,15 @@ void mutt_fetchPopMail (void)
       sprintf( threadbuf,"Received %d bytes of %d",num_bytes,tot_bytes);
       MSGMAILTHREAD(threadmsg, MSGMAILTHREAD_PROGRESS, threadbuf, num_bytes,tot_bytes); 
 #endif
+
       /* check to see if we got a full line */
       if (buffer[chunk-2] == '\r' && buffer[chunk-1] == '\n')
       {
+	      DM( "Line completed" );
+
 	if (mutt_strcmp(".\r\n", buffer) == 0)
 	{
+		DM( "Line finished" );
 	  /* end of message */
 	  break;
 	}
@@ -355,7 +424,8 @@ void mutt_fetchPopMail (void)
       }
       else
 	p = buffer;
-      
+
+      DM( "Writing message to fp" );
       fwrite (p, 1, chunk, msg->fp);
     }
 
@@ -365,6 +435,8 @@ void mutt_fetchPopMail (void)
       err = 1;
     }
 
+    DM( "Message retrieved" );
+
     mx_close_message (&msg);
 
     if (err)
@@ -372,6 +444,8 @@ void mutt_fetchPopMail (void)
 
     if (option (OPTPOPDELETE))
     {
+	    DM( "Nuking message" );
+
       /* delete the message on the server */
       snprintf (buffer, sizeof(buffer), "dele %d\r\n", i);
       write (s, buffer, mutt_strlen (buffer));
@@ -381,6 +455,7 @@ void mutt_fetchPopMail (void)
       if (mutt_strncmp (buffer, "+OK", 3) != 0)
       {
 	err = 1;
+	DM( "Error on message delete %d", i );
         mutt_remove_trailing_ws (buffer);
 	mutt_error (buffer);
 	break;
@@ -392,13 +467,17 @@ void mutt_fetchPopMail (void)
 
   if (msg)
   {
+	  DM( "commit close message" );
     mx_commit_message (msg, &ctx);
     mx_close_message (&msg);
   }
+
+  DM( "mailbox close" );
   mx_close_mailbox (&ctx);
 
   if (err)
   {
+	  DM( "Reset server" );
     /* make sure no messages get deleted */
     write (s, "rset\r\n", 6);
     getLine (s, buffer, sizeof (buffer)); /* snarf the response */
@@ -406,6 +485,7 @@ void mutt_fetchPopMail (void)
 
 finish:
 
+  DM( "Logout from server" );
   /* exit gracefully */
   write (s, "quit\r\n", 6);
   getLine (s, buffer, sizeof (buffer)); /* snarf the response */
@@ -416,7 +496,7 @@ finish:
   /* not reached */
 
 fail:
-
+  DM( "Abort failure death explosion" );
   mutt_error ("Server closed connection!");
   close (s);
 }

@@ -23,4 +23,5 @@
 
 void mailbox_conf_new (Mailbox * mailbox, gint add_new_mailbox, MailboxType type);
 void mailbox_conf_delete (Mailbox * mailbox);
+GNode *find_gnode_in_mbox_list (GNode * gnode_list, Mailbox * mailbox);
 #endif /* __NEW_MAILBOX_H__ */

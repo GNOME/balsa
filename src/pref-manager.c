@@ -327,7 +327,8 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 
         help_entry.name = gnome_app_id;        
         gtk_signal_connect (GTK_OBJECT (property_box), "help", 
-	GTK_SIGNAL_FUNC (gnome_help_pbox_display), &help_entry); 
+                            GTK_SIGNAL_FUNC (gnome_help_pbox_display), 
+                            &help_entry); 
 
 	gtk_widget_show_all ( GTK_WIDGET(property_box));
 
@@ -1361,7 +1362,7 @@ create_misc_page ( )
 	GtkWidget *label27;
 	GtkWidget *label;
         GtkWidget *color_frame;
-        GtkWidget *unread_color_table;
+        GtkWidget *unread_color_box;
         GtkWidget *unread_color_label;
 
 	vbox9 = gtk_vbox_new (FALSE, 0);
@@ -1435,27 +1436,26 @@ create_misc_page ( )
         gtk_container_set_border_width (GTK_CONTAINER (color_frame), 5);
 	gtk_box_pack_start (GTK_BOX (vbox9), color_frame, FALSE, FALSE, 0);
 
-        unread_color_table = gtk_table_new (2, 1, FALSE);
-        gtk_widget_show (unread_color_table);
-        gtk_container_add (GTK_CONTAINER (color_frame), unread_color_table);
-        gtk_container_set_border_width (GTK_CONTAINER (unread_color_table), 0);
-
-        unread_color_label = gtk_label_new (_("Mailbox with unread messages colour"));
-        gtk_widget_show (unread_color_label);
-        gtk_table_attach (GTK_TABLE (unread_color_table),
-                          unread_color_label, 0, 1, 0, 1,
-                          GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 0, 0);
-        gtk_label_set_justify (GTK_LABEL (unread_color_label), GTK_JUSTIFY_RIGHT);
+        unread_color_box = gtk_hbox_new (FALSE, 0);
+        gtk_widget_show (unread_color_box);
+        gtk_container_add (GTK_CONTAINER (color_frame), unread_color_box);
+        gtk_container_set_border_width (GTK_CONTAINER (unread_color_box), 0);
 
         pui->unread_color = gnome_color_picker_new ();
         gnome_color_picker_set_title (GNOME_COLOR_PICKER (pui->unread_color), _("Mailbox with unread messages colour"));
         gnome_color_picker_set_dither (GNOME_COLOR_PICKER (pui->unread_color) , TRUE);
         gtk_widget_show (pui->unread_color);
+        gtk_box_pack_start (GTK_BOX (unread_color_box), pui->unread_color, 
+                          FALSE, FALSE, 5);
         gtk_container_set_border_width (GTK_CONTAINER (pui->unread_color), 5);
-        gtk_table_attach (GTK_TABLE (unread_color_table), 
-                          pui->unread_color, 1, 2, 0, 1,
-                          GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
-        
+
+        unread_color_label = gtk_label_new (_("Mailbox with unread messages colour"));
+        gtk_widget_show (unread_color_label);
+        gtk_box_pack_start (GTK_BOX (unread_color_box), unread_color_label, 
+                            FALSE, FALSE, 5);
+        gtk_label_set_justify (GTK_LABEL (unread_color_label), 
+                               GTK_JUSTIFY_LEFT);
+
 	return vbox9;
 }
 

@@ -224,3 +224,44 @@ wrap_string(gchar* str, int width)
       ptr++;
    }
 }
+
+/* balsa_guess_mail_spool
+
+   Returns an allocated gchar * with our best guess of the user's
+   mail spool file.
+*/
+
+gchar *balsa_guess_mail_spool( void )
+{
+	int i;
+	gchar *env;
+	gchar *spool;
+	static const gchar *guesses[] = { 
+		"/var/spool/mail/", 
+		"/var/mail/", 
+		"/usr/spool/mail/", 
+		"/usr/mail/", 
+		NULL 
+	};
+
+	if( (env = getenv( "MAIL" )) != NULL )
+		return g_strdup( env );
+
+	if( (env = getenv( "USER" )) != NULL ) {
+		for( i = 0; guesses[i] != NULL; i++ ) {
+			spool = g_strconcat( guesses[i], env, NULL );
+
+			if( g_file_exists( spool ) )
+				return spool;
+
+			g_free( spool );
+		}
+	}
+
+	/* libmutt's configure.in indicates that this 
+	 * ($HOME/mailbox) exists on
+	 * some systems, and it's a good enough default if we
+	 * can't guess it any other way. */
+	return gnome_util_prepend_user_home( "mailbox" );
+}
+

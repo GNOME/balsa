@@ -40,6 +40,7 @@ class Balsa:Druid:Page from Gnome:Druid:Page:Standard {
 	virtual private void
 	construct( self ) {
 		GnomeDruidPageStandard *std = GNOME_DRUID_PAGE_STANDARD( self );
+		GtkStyle *style;
 
 		std->background_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( std->canvas ) ),
 			GNOME_TYPE_CANVAS_RECT, NULL );
@@ -52,15 +53,28 @@ class Balsa:Druid:Page from Gnome:Druid:Page:Standard {
 		if( std->logo_image )
 			gnome_canvas_item_set( std->logo_item, "image", std->logo_image, NULL );
 
-		std->title_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( std->canvas ) ),
-			GNOME_TYPE_CANVAS_TEXT, 
-			"text", std->title,
-			"font", "-adobe-helvetica-bold-r-normal-*-*-180-*-*-p-*-iso8859-1",
-			"x", (gfloat) 15.0,
-			"y", (gfloat) 8 + 50.0 / 2.0,
-			"anchor", GTK_ANCHOR_WEST,
-			NULL );
-		
+		style = gtk_rc_get_style( GTK_WIDGET(std) );
+
+		if( style != NULL && style->font->type == GDK_FONT_FONTSET ) {
+			std->title_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( std->canvas ) ),
+				GNOME_TYPE_CANVAS_TEXT, 
+				"text", std->title,
+				"fontset", style->rc_style->fontset_name,
+				"x", (gfloat) 15.0,
+				"y", (gfloat) 8 + 50.0 / 2.0,
+				"anchor", GTK_ANCHOR_WEST,
+				NULL );
+		} else {
+			std->title_item = gnome_canvas_item_new( gnome_canvas_root( GNOME_CANVAS( std->canvas ) ),
+				GNOME_TYPE_CANVAS_TEXT, 
+				"text", std->title,
+				"font", "-adobe-helvetica-bold-r-normal-*-*-180-*-*-p-*-iso8859-1",
+				"x", (gfloat) 15.0,
+				"y", (gfloat) 8 + 50.0 / 2.0,
+				"anchor", GTK_ANCHOR_WEST,
+				NULL );
+		}
+
 		/*FIXME: don't make these copied straight out of the druid code. */
 		/*gnome_canvas_item_set( std->title_item, "x", 15.0, "y", (gfloat) 8 + 50.0 / 2.0, "anchor", GTK_ANCHOR_NORTH_WEST, NULL );*/
 	}

@@ -35,6 +35,7 @@
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-mblist.h"
+#include "balsa-mblist-private.h"
 #include "mblist-window.h" /* mblist_open_mailbox */
 #include "misc.h"
 #include "mailbox.h"
@@ -469,7 +470,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 			closed_pmap = balsa_icon_get_pixmap( BALSA_ICON_TRAY_EMPTY );
 			closed_bmap = balsa_icon_get_bitmap( BALSA_ICON_TRAY_EMPTY );
 			expanded = mbnode->expanded;
-		} else if( mailbox_have_new_messages( (MAILBOX_LOCAL(mbnode->mailbox))->path ) ) {
+		} else if( mailbox_have_new_messages( MAILBOX( mbnode->mailbox) ) ) {
 			mbnode->mailbox->has_unread_messages = TRUE;
 
 			closed_pmap = balsa_icon_get_pixmap( BALSA_ICON_TRAY_FULL );
@@ -537,12 +538,7 @@ check_new (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
 	 * already open we can get conflicting results since we're checking
 	 * the file on disk as opposed to the mailbox in memory */
 
-	if( BALSA_IS_MAILBOX_LOCAL (mailbox) && mailbox->open_ref == 0 )
-		/* Call the actual function to determine the presence of new unread
-		 * messages */
-		mailbox->has_unread_messages = mailbox_have_new_messages( MAILBOX_LOCAL(mailbox)->path );
-	else if( MAILBOX_IS_IMAP(mailbox) && mailbox->open_ref > 0 )
-		mailbox->has_unread_messages = mailbox_imap_has_new_messages( MAILBOX_IMAP(mailbox) );
+	mailbox->has_unread_messages = mailbox_have_new_messages( mailbox );
 
 	mailbox_style( ctree, node, cnode_data, BALSA_MBLIST(ctree)->display_content_info );
 }

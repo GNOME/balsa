@@ -180,6 +180,26 @@ check_all_imap_hosts (Mailbox * to, GList *mailboxes)
 #endif
 }
 
+#ifdef BALSA_USE_THREADS
+static void error_in_thread( const char *format, ... );
+
+static void error_in_thread( const char *format, ... )
+{
+	va_list val;
+	gchar *submessage, *message;
+	MailThreadMessage *tmsg;
+
+	va_start( val, format );
+	submessage = g_strdup_vprintf( format, val );
+	va_end( val );
+
+	message = g_strconcat( _("Error: "), submessage, NULL );
+	g_free( submessage );
+
+	MSGMAILTHREAD( tmsg, MSGMAILTHREAD_ERROR, message );
+	g_free( message );
+}
+#endif
 
 void
 check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
@@ -191,6 +211,11 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
 #ifdef BALSA_USE_THREADS
   char msgbuf[160];
   MailThreadMessage *threadmsg;
+  void (*mutt_error_backup)( const char *, ... );
+
+  /* Otherwise we get multithreaded GTK+ calls... baaad */
+  mutt_error_backup = mutt_error;
+  mutt_error = error_in_thread;
 
 /*  Only check if lock has been set */
   pthread_mutex_lock( &mailbox_lock);
@@ -202,21 +227,23 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
   pthread_mutex_unlock( &mailbox_lock );
 #endif BALSA_USE_THREADS
 
+  balsa_error_toggle_fatality( FALSE );
+
   list = g_list_first (mailboxes);
-
- /* if (to->type != MAILBOX_MBOX)
-    return;
-  */
   
-  Spoolfile = MAILBOX_LOCAL (to)->path;
-
+  /* 1. Spoolfile is set in mailbox_init; 
+     2. the 'to' folder doesn't have to be local, can be IMAP
+     3. remove this comment when its meaning become obvious.
+     Spoolfile = MAILBOX_LOCAL (to)->path;
+  */
+     
   while (list)
   {
     mailbox = list->data;
     if (MAILBOX_POP3 (mailbox)->check)
     {
       PopHost = g_strdup (MAILBOX_POP3(mailbox)->server->host);
-      PopPort = 110;
+      PopPort = (MAILBOX_POP3(mailbox)->server->port);
       PopPass = g_strdup (MAILBOX_POP3(mailbox)->server->passwd);
       PopUser = g_strdup (MAILBOX_POP3(mailbox)->server->user);
 
@@ -247,10 +274,11 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
       g_free (PopPass);
       g_free (PopUser);
 
-      if(MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
+      if( MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
          strcmp(MAILBOX_POP3(mailbox)->last_popped_uid, uid) != 0)
       {
-        g_free ( MAILBOX_POP3 (mailbox)->last_popped_uid );
+	      if( MAILBOX_POP3( mailbox )->last_popped_uid )
+		      g_free ( MAILBOX_POP3 (mailbox)->last_popped_uid );
         MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
 
 #ifdef BALSA_USE_THREADS
@@ -266,55 +294,76 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
     }
     list = list->next;
   }
+
+  #ifdef BALSA_USE_THREADS
+  mutt_error = mutt_error_backup;
+  #endif
+
+  balsa_error_toggle_fatality( TRUE );
   return;
 }
 
+/* mailbox_add_for_checking:
+   adds given mailbox to the list of mailboxes to be checked for modification
+   via mutt's buffy mechanism.
+*/
 void
-add_mailboxes_for_checking (Mailbox * mailbox)
+mailbox_add_for_checking (Mailbox * mailbox)
 {
-  BUFFY **tmp;
-  gchar *path;
+  BUFFY *tmp;
+  gchar *path, *user, *passwd;
 
-  if (!MAILBOX_IS_LOCAL(mailbox))
-    return;
+  g_return_if_fail(mailbox != NULL);
 
-  path = MAILBOX_LOCAL (mailbox)->path;
+  if (MAILBOX_IS_LOCAL(mailbox)) {
+      path = MAILBOX_LOCAL (mailbox)->path;
+      user = passwd = NULL;
+  }
+  else if (MAILBOX_IS_IMAP(mailbox) && MAILBOX_IMAP(mailbox)->server->user 
+           && MAILBOX_IMAP(mailbox)->server->passwd) {
+      path = g_strdup_printf("{%s:%i}%s", 
+			     MAILBOX_IMAP(mailbox)->server->host,
+			     MAILBOX_IMAP(mailbox)->server->port,
+			     MAILBOX_IMAP(mailbox)->path);
+      user   = MAILBOX_IMAP(mailbox)->server->user;
+      passwd = MAILBOX_IMAP(mailbox)->server->passwd;
+  } else 
+      return;
 
-  for (tmp = &Incoming; *tmp; tmp = &((*tmp)->next))
-    {
-      if (strcmp (path, (*tmp)->path) == 0)
-	return;
-    }
-
-  if (!*tmp)
-    {
-      *tmp = (BUFFY *) g_new0 (BUFFY, 1);
-      (*tmp)->path = g_strdup (path);
-      (*tmp)->next = NULL;
-    }
-
-  (*tmp)->new = 0;
-  (*tmp)->notified = 1;
-  (*tmp)->newly_created = 0;
-
-  return;
+  tmp = buffy_add_mailbox(path, user, passwd);
+  
+  if(MAILBOX_IS_IMAP(mailbox)) 
+      g_free(path);
 }
+
+/* mailbox_have_new_messages:
+   assumes that mutt_buffy_notify() has been called - this function
+   is expensive and should be called only once 
+*/
+
 
 gint
-mailbox_have_new_messages (gchar * path)
+mailbox_have_new_messages (Mailbox * mailbox)
 {
   BUFFY *tmp = NULL;
+  gchar * path;
 
-  mutt_buffy_notify ();
+  if(MAILBOX_IS_LOCAL(mailbox))
+      path = g_strdup(MAILBOX_LOCAL(mailbox)->path);
+  else if(MAILBOX_IS_IMAP(mailbox))
+      path = g_strdup_printf("{%s:%i}%s", 
+			     MAILBOX_IMAP(mailbox)->server->host,
+			     MAILBOX_IMAP(mailbox)->server->port,
+			     MAILBOX_IMAP(mailbox)->path);
+  else return FALSE;
 
   for (tmp = Incoming; tmp; tmp = tmp->next)
-    {
-      if (strcmp (tmp->path, path) == 0)
-	{
-	  if (tmp->new)
-	    return TRUE;
-	}
-    }
+  {
+      if (strcmp (tmp->path, path) == 0) {
+	  g_free(path);
+	  return tmp->new;
+      }
+  }
   return FALSE;
 }
 
@@ -596,7 +645,7 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
       mailbox->open_ref++;
 
 #ifdef DEBUG
-      g_print (_ ("Mailbox: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+      g_print (_("Mailbox: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 #endif
 
       /* FIXME */
@@ -616,7 +665,7 @@ void
 mailbox_open_unref (Mailbox * mailbox)
 {
 #ifdef DEBUG
-      g_print (_ ("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+      g_print (_("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 #endif
   LOCK_MAILBOX (mailbox);
 
@@ -1466,6 +1515,112 @@ make_address_from_string(gchar* str) {
   return addr;
 }
 
+/*
+ * contacts
+ */
+Contact *
+contact_new (void)
+{
+  Contact *contact;
+
+  contact = g_malloc (sizeof (Contact));
+
+  contact->card_name = NULL;
+  contact->first_name = NULL;
+  contact->last_name = NULL;
+  contact->organization = NULL;
+  contact->email_address = NULL;
+  
+  return contact;
+}
+
+
+void
+contact_free (Contact * contact)
+{
+
+  if (!contact)
+    return;
+
+  g_free(contact->card_name);
+  g_free(contact->first_name);
+  g_free(contact->last_name);  
+  g_free(contact->organization);
+  g_free(contact->email_address);
+  
+  g_free(contact);
+}
+
+void contact_list_free(GList * contact_list)
+{
+  GList *list;
+  for (list = g_list_first (contact_list); list; list = g_list_next (list))
+    if(list->data) contact_free (list->data);
+  g_list_free (contact_list);
+}
+
+gint
+contact_store(Contact *contact)
+{
+    FILE *gc; 
+    gchar string[256];
+    gint in_vcard = FALSE;
+
+    if(strlen(contact->card_name) == 0)
+        return CONTACT_CARD_NAME_FIELD_EMPTY;
+
+    gc = fopen(gnome_util_prepend_user_home(".gnome/GnomeCard.gcrd"), "r+");
+    
+    if (!gc) 
+        return CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE; 
+            
+    while (fgets(string, sizeof(string), gc)) 
+    { 
+        if ( g_strncasecmp(string, "BEGIN:VCARD", 11) == 0 ) {
+            in_vcard = TRUE;
+            continue;
+        }
+                
+        if ( g_strncasecmp(string, "END:VCARD", 9) == 0 ) {
+            in_vcard = FALSE;
+            continue;
+        }
+        
+        if (!in_vcard) continue;
+        
+        g_strchomp(string);
+                
+        if ( g_strncasecmp(string, "FN:", 3) == 0 )
+        {
+            gchar *id = g_strdup(string+3);
+            if(g_strcasecmp(id, contact->card_name) == 0)
+            {
+                g_free(id);
+                fclose(gc);
+                return CONTACT_CARD_NAME_EXISTS;
+            }
+            g_free(id);
+            continue;
+        }
+    }
+
+    fprintf(gc, "\nBEGIN:VCARD\n");
+    fprintf(gc, g_strdup_printf( "FN:%s\n", contact->card_name));
+
+    if(strlen(contact->first_name) || strlen(contact->last_name))
+        fprintf(gc, g_strdup_printf( "N:%s;%s\n", contact->last_name, contact->first_name));
+
+    if(strlen(contact->organization))
+        fprintf(gc, g_strdup_printf( "ORG:%s\n", contact->organization));
+            
+    if(strlen(contact->email_address))
+        fprintf(gc, g_strdup_printf( "EMAIL;INTERNET:%s\n", contact->email_address));
+            
+    fprintf(gc, "END:VCARD\n");
+    
+    fclose(gc);
+    return CONTACT_CARD_STORED_SUCCESSFULLY;
+}
 
 /*
  * body

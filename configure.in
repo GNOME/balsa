@@ -13,13 +13,17 @@ dnl                        keeps the release as a separate field
 dnl ######################################################################################
 
 BALSA_MAJOR=0
-BALSA_REVISION=8
+BALSA_REVISION=9
 BALSA_PATCHLEVEL=0
-BALSA_RELEASE="pre1"
+BALSA_RELEASE=1
+use_release=no
 
-dnl It's okay to set BALSA_RELEASE= ; this handles it
+dnl BALSA_RELEASE must be specified (1 if nothing else), but
+dnl change use_release depending on whether we want it to be
+dnl appended to our official version. (no usually, yes for
+dnl something like 'pre1' or 'beta4')
 
-if test x"$BALSA_RELEASE" = x ; then
+if test x"$use_release" = xno ; then
 	brsffx=
 else
 	brsffx="-${BALSA_RELEASE}"
@@ -65,7 +69,7 @@ dnl ############################################################################
 dnl All the linguas, all the time.
 dnl ######################################################################################
 
-ALL_LINGUAS="ca da de el es et fi fr ga it ja ko lt nl no pl pt_BR ru sv tr uk zh_CN"
+ALL_LINGUAS="ca da de el es es_ES et fi fr ga hu it ja ko lt nl no pl pt pt_BR ru sv tr uk zh_CN"
 LINGUAS="$ALL_LINGUAS"
 AM_GNU_GETTEXT
 
@@ -268,7 +272,7 @@ dnl ############################################################################
 
 BALSA_OFFSET_TOOL([src/Makefile.offset],[src/cfg-balsa.c],
 [	
-	CFLAGS="${CFLAGS} ${GNORBA_CFLAGS}"
+	CFLAGS="${CFLAGS} ${GNOMEUI_CFLAGS}"
 	CFLAGS="\${CFLAGS} -I\${top_builddir} -I\${top_builddir}/src -I\${top_builddir}/libmutt"
 	CFLAGS="\${CFLAGS} -I\${top_srcdir} -I\${top_srcdir}/libmutt -I\${top_srcdir}/libbalsa"
 	CFLAGS="\${CFLAGS} -I\${top_srcdir}/src"

@@ -62,6 +62,7 @@ class Balsa:Druid:Page:Welcome from Gnome:Druid:Page:Start {
 	virtual void
 	construct( self ) {
 		GnomeDruidPageStart *druid_page_start = GNOME_DRUID_PAGE_START( self );
+		GtkStyle *style;
 
 		/*FIXME: copied out of gnome-druid-page-start.c.... */
 		druid_page_start->background_item =
@@ -90,20 +91,39 @@ class Balsa:Druid:Page:Welcome from Gnome:Druid:Page:Start {
 				 gnome_canvas_image_get_type (),
 				 "image", druid_page_start->watermark_image, NULL);
 
-		druid_page_start->title_item =
-			gnome_canvas_item_new (gnome_canvas_root (GNOME_CANVAS (druid_page_start->canvas)),
-				gnome_canvas_text_get_type (),
-				"text", druid_page_start->title,
-				"font", "-adobe-helvetica-bold-r-normal-*-*-180-*-*-p-*-iso8859-1",
-				NULL);
+		style = gtk_rc_get_style( GTK_WIDGET( self ) );
 
-		druid_page_start->text_item =
-			gnome_canvas_item_new (gnome_canvas_root (GNOME_CANVAS (druid_page_start->canvas)),
-				gnome_canvas_text_get_type (),
-				"text", druid_page_start->text,
-				"justification", GTK_JUSTIFY_LEFT,
-				"font", "-adobe-helvetica-medium-r-normal-*-*-120-*-*-p-*-iso8859-1",
-				NULL );
+		if( style != NULL && style->font->type == GDK_FONT_FONTSET ) {
+			druid_page_start->title_item =
+				gnome_canvas_item_new (gnome_canvas_root (GNOME_CANVAS (druid_page_start->canvas)),
+					gnome_canvas_text_get_type (),
+					"text", druid_page_start->title,
+					"fontset", style->rc_style->fontset_name,
+					NULL);
+
+			druid_page_start->text_item =
+				gnome_canvas_item_new (gnome_canvas_root (GNOME_CANVAS (druid_page_start->canvas)),
+					gnome_canvas_text_get_type (),
+					"text", druid_page_start->text,
+					"justification", GTK_JUSTIFY_LEFT,
+					"fontset", style->rc_style->fontset_name,
+					NULL );
+		} else {
+			druid_page_start->title_item =
+				gnome_canvas_item_new (gnome_canvas_root (GNOME_CANVAS (druid_page_start->canvas)),
+					gnome_canvas_text_get_type (),
+					"text", druid_page_start->title,
+					"font", "-adobe-helvetica-bold-r-normal-*-*-180-*-*-p-*-iso8859-1",
+					NULL);
+
+			druid_page_start->text_item =
+				gnome_canvas_item_new (gnome_canvas_root (GNOME_CANVAS (druid_page_start->canvas)),
+					gnome_canvas_text_get_type (),
+					"text", druid_page_start->text,
+					"justification", GTK_JUSTIFY_LEFT,
+					"font", "-adobe-helvetica-medium-r-normal-*-*-120-*-*-p-*-iso8859-1",
+					NULL );
+		}
 	}
 
 	/*The weird selves are to remove pointer compatibilty warnings. Sigh*/

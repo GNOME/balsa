@@ -57,12 +57,11 @@ GIOChannel 		*mail_thread_msg_receive;
 GIOChannel              *send_thread_msg_send;
 GIOChannel              *send_thread_msg_receive;
 
-
 static void threads_init( gboolean init );
 #endif /* BALSA_USE_THREADS */
 
 static void args_init( int argc, char **argv );
-static void close_mailbox( Mailbox *mb );
+static void force_close_mailbox( Mailbox *mb );
 static void mailboxes_init( void );
 static void empty_trash( void );
 
@@ -119,19 +118,6 @@ static void mailboxes_init( void )
   if (do_load_mailboxes () == FALSE)
     {
       fprintf (stderr, "*** error loading mailboxes\n");
-      balsa_init_begin ();
-      return;
-    }
-
-  /* At this point, if inbox/outbox/trash are still null, then we
-     were not able to locate the settings for them anywhere in our
-     configuartion and should run balsa-init. */
-  if (balsa_app.inbox == NULL || balsa_app.outbox == NULL ||
-      balsa_app.sentbox == NULL || balsa_app.trash == NULL ||
-      balsa_app.draftbox == NULL)
-    {
-      fprintf (stderr, 
-               "*** One of inbox/outbox/sentbox/draftbox/trash is NULL\n");
       balsa_init_begin ();
       return;
     }
@@ -278,7 +264,8 @@ main (int argc, char *argv[])
   return 0;
 }
 
-static void close_mailbox( Mailbox *mb )
+static void
+force_close_mailbox( Mailbox *mb )
 {
 	g_return_if_fail( mb );
 
@@ -316,7 +303,7 @@ close_all_mailboxes (GNode * node, gpointer data)
 		if (!(mbnode->mailbox))
 			return FALSE;
 		    
-		close_mailbox( mbnode->mailbox );
+		force_close_mailbox( mbnode->mailbox );
 	}
 
 	return FALSE;
@@ -334,11 +321,11 @@ void balsa_close_mailboxes( sm_exit_trigger_results_t *res, gpointer user_data )
   if (balsa_app.empty_trash_on_exit)
 	  empty_trash( );
 
-  close_mailbox( balsa_app.inbox );
-  close_mailbox( balsa_app.outbox );
-  close_mailbox( balsa_app.sentbox );
-  close_mailbox( balsa_app.draftbox );
-  close_mailbox( balsa_app.trash );
+  force_close_mailbox( balsa_app.inbox );
+  force_close_mailbox( balsa_app.outbox );
+  force_close_mailbox( balsa_app.sentbox );
+  force_close_mailbox( balsa_app.draftbox );
+  force_close_mailbox( balsa_app.trash );
 
   res->internal_error = FALSE;
   res->external_error = FALSE;

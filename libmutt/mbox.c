@@ -707,9 +707,12 @@ int mbox_sync_mailbox (CONTEXT *ctx)
   /* Check to make sure that the file hasn't changed on disk */
   if ((i = mbox_check_mailbox (ctx, NULL)) == M_NEW_MAIL ||  i == M_REOPENED)
   {
-    /* new mail arrived, or mailbox reopened */
-    need_sort = i;
-    goto bail;
+      /* new mail arrived, or mailbox reopened */
+      /* The previous way of handling it: need_sort = i; goto bail;
+	 It was not right: if we are aseked to sync the mailbox,
+	 we must do it. */
+      fprintf(stderr,"mbox_sync would bail but will reparse...\n");
+      if(i = mbox_parse_mailbox (ctx)) goto bail;
   }
   else if (i < 0)
   {

@@ -4,7 +4,8 @@ bin_PROGRAMS = balsa
 
 GOB_OUTPUTS = \
 	balsa-mblist.c \
-	balsa-mblist.h
+	balsa-mblist.h \
+	balsa-mblist-private.h
 
 GOBFILES = \
 	balsa-mblist.gob
@@ -91,12 +92,8 @@ dist-hook:
 	cp $(srcdir)/pixmaps/*.xpm $(distdir)/pixmaps
 
 %.c %.h: %.gob
-	gob --no-private-header $<
+	(cd $(srcdir) && gob --always-private-header $<)
 
 EXTRA_DIST = \
 	$(GOBFILES)		\
 	$(BUILT_SOURCES)
-
-# test_cfg_SOURCES = cfg-backend.c test-cfg.c
-# test_cfg_LDADD = $(GNOME_LIBDIR) $(GNOMEGNORBA_LIBS) $(INTLLIBS)
-# noinst_PROGRAMS = test_cfg

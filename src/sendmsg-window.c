@@ -262,7 +262,7 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
   msg->from = gtk_entry_new ();
   gtk_table_attach_defaults (GTK_TABLE (table), msg->from, 1, 2, 1, 2);
   GTK_WIDGET_UNSET_FLAGS(msg->from, GTK_CAN_FOCUS);
-  gtk_entry_set_editable(msg->from,FALSE);
+  gtk_entry_set_editable(GTK_ENTRY(msg->from),FALSE);
 
   from = g_malloc (strlen (balsa_app.real_name) + 2 + strlen (balsa_app.username) + 1 + strlen (balsa_app.hostname) + 2);
   sprintf (from, "%s <%s@%s>\0",

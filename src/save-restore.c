@@ -57,6 +57,36 @@ add_mailbox_config (gint num, gchar * name, gchar * path, gint type)
   g_string_free (gstring, 1);
 }
 
+void
+delete_mailbox_config (gchar * name)
+{
+  GString *gstring;
+  gchar **mblist;
+  gint i;
+  GList *list;
+  Mailbox *mailbox;
+
+  gstring = g_string_new (NULL);
+  g_string_sprintf (gstring, "/balsa/%s", name);
+  gnome_config_clean_section (gstring->str);
+
+  mblist = g_new (gchar *, g_list_length (balsa_app.mailbox_list));
+
+  list = g_list_first (balsa_app.mailbox_list);
+  for (; list; list = list->next, mailbox = list->data)
+    {
+      if (!strcmp (name, mailbox->name))
+	{
+	  balsa_app.mailbox_list = g_list_remove (balsa_app.mailbox_list, list->data);
+	}
+    }
+
+  list = g_list_first (balsa_app.mailbox_list);
+  for (i = 0; list; list = list->next, i++, mailbox = list->data)
+    {
+      mblist[i] = g_strdup (mailbox->name);
+    }
+}
 
 gint
 load_mailboxes (gchar * name)
@@ -97,47 +127,47 @@ load_mailboxes (gchar * name)
 	{
 	case 0:		/*  MBX  */
 	  mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
-	  mbx->name = g_strdup(name);
+	  mbx->name = g_strdup (name);
 	  mbx->path = gnome_config_get_string ("Path");
 	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
 	  break;
 	case 1:		/*  MTX  */
 	  mtx = (MailboxMTX *) mailbox_new (MAILBOX_MTX);
-	  mtx->name = g_strdup(name);
+	  mtx->name = g_strdup (name);
 	  mtx->path = gnome_config_get_string ("Path");
 	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mtx);
 	  break;
 	case 2:		/*  TENEX  */
 	  tenex = (MailboxTENEX *) mailbox_new (MAILBOX_TENEX);
-	  tenex->name = g_strdup(name);
+	  tenex->name = g_strdup (name);
 	  tenex->path = gnome_config_get_string ("Path");
 	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, tenex);
 	  break;
 	case 3:		/*  MBox  */
 	  mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
-	  mbox->name = g_strdup(name);
+	  mbox->name = g_strdup (name);
 	  mbox->path = gnome_config_get_string ("Path");
 	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
 	  break;
 	case 4:		/*  MMDF  */
 	  mmdf = (MailboxMMDF *) mailbox_new (MAILBOX_MMDF);
-	  mmdf->name = g_strdup(name);
+	  mmdf->name = g_strdup (name);
 	  mmdf->path = gnome_config_get_string ("Path");
 	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mmdf);
 	  break;
 	case 5:		/*  UNIX  */
 	  unixmb = (MailboxUNIX *) mailbox_new (MAILBOX_UNIX);
-	  unixmb->name = g_strdup(name);
+	  unixmb->name = g_strdup (name);
 	  unixmb->path = gnome_config_get_string ("Path");
 	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, unixmb);
 	  break;
 	case 6:		/*  MH  */
 	  mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
-	  mh->name = g_strdup(name);
+	  mh->name = g_strdup (name);
 	  mh->path = gnome_config_get_string ("Path");
 	case 7:		/*  POP3  */
 	  pop3 = (MailboxPOP3 *) mailbox_new (MAILBOX_POP3);
-	  pop3->name = g_strdup(name);
+	  pop3->name = g_strdup (name);
 	  pop3->user = gnome_config_get_string ("username");
 	  pop3->passwd = gnome_config_get_string ("password");
 	  pop3->server = gnome_config_get_string ("server");
@@ -145,7 +175,7 @@ load_mailboxes (gchar * name)
 	  break;
 	case 8:		/*  IMAP  */
 	  imap = (MailboxIMAP *) mailbox_new (MAILBOX_IMAP);
-	  imap->name = g_strdup(name);
+	  imap->name = g_strdup (name);
 	  imap->user = gnome_config_get_string ("username");
 	  imap->passwd = gnome_config_get_string ("password");
 	  imap->server = gnome_config_get_string ("server");
@@ -154,7 +184,7 @@ load_mailboxes (gchar * name)
 	  break;
 	case 9:		/*  NNTP  */
 	  nntp = (MailboxNNTP *) mailbox_new (MAILBOX_NNTP);
-	  nntp->name = g_strdup(name);
+	  nntp->name = g_strdup (name);
 	  nntp->user = gnome_config_get_string ("username");
 	  nntp->passwd = gnome_config_get_string ("password");
 	  nntp->server = gnome_config_get_string ("server");

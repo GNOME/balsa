@@ -1,3 +1,7 @@
+2002-09-11  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-index.[hc]: handle idle handlers in a safer way.
+
 2002-09-10  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/pop3.c: gdk_thread_ locks were redundant there.

@@ -65,6 +65,13 @@ extern "C" {
 
 	gchar *date_string;
 	gboolean line_length;
+
+        /* idle handler data */
+        guint changed_idle_id;
+        guint sync_backend_idle_id;
+        guint preview_idle_id;
+        LibBalsaMessage *preview_message;
+        GSList *update_flag_list;
     };
 
     struct _BalsaIndexClass {

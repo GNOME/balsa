@@ -255,7 +255,6 @@ extern struct BalsaApplication {
     GdkColor bad_address_color;
 
     GtkToolbarStyle toolbar_style;
-    GnomeMDIMode mdi_style;
     guint pwindow_option;
     gboolean wordwrap;
     gint wraplength;

@@ -1,3 +1,32 @@
+2002-07-24  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/store-address.c:
+	* src/sendmsg-window.c: 
+	* src/print.c: 
+	* src/message-window.c: 
+	* src/main.c: 
+	* src/main-window.c: 
+	* src/balsa-mblist.c: 
+	* src/balsa-index.h: 
+	* src/balsa-index.c: 
+	* src/balsa-index-threading.c: 
+	* src/balsa-icons.h: 
+	* src/balsa-icons.c: 
+	* src/balsa-app.h: 
+	* src/balsa-app.c: 
+	* libbalsa/mailbox.c: 
+	* libbalsa/mailbox-filter.c: 
+	* libbalsa/libbalsa.c: 
+	* libbalsa/identity.c: 
+	* libbalsa/folder-scanners.c: 
+	* libbalsa/filter.c: 
+	from Peter, unglify toolbar icons - they were being stretched,
+	remove some more deprecated code - move from gtk_obj to gobj
+
+	* libbalsa/libbalsa.c: set Charset to UTF-8. this should make
+	libmutt convert to utf-8 and let pango sort it out
+		
+	
 2002-07-21  Pablo Saratxaga  <pablo@mandrakesoft.com>
 
 	* configure.in: Added Vietnamese (vi) to ALL_LINGUAS

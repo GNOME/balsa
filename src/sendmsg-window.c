@@ -1525,18 +1525,16 @@ insert_selected_messages(BalsaSendmsg *msg, SendType type)
 	balsa_window_find_current_index(balsa_app.main_window);
     
     if (index) {
-	GList *node;
-	GtkCTree *ctree = GTK_CTREE(BALSA_INDEX(index)->ctree);
+	GList *node, *l = balsa_index_selected_list(BALSA_INDEX(index));
     
-	for (node = GTK_CLIST(ctree)->selection; node;
-	     node = g_list_next(node)) {
-	    LibBalsaMessage *message =
-		gtk_ctree_node_get_row_data(ctree, GTK_CTREE_NODE(node->data));
+	for (node = l; node; node = g_list_next(node)) {
+	    LibBalsaMessage *message = node->data;
 	    GString *body = quoteBody(msg, message, type);
 	    
             gtk_text_buffer_insert_at_cursor(buffer, body->str, body->len);
 	    g_string_free(body, TRUE);
 	}
+        g_list_free(l);
     }
     
     return TRUE;
@@ -1555,13 +1553,10 @@ attach_message_cb(GtkWidget * widget, BalsaSendmsg *msg)
 	balsa_window_find_current_index(balsa_app.main_window);
     
     if (index) {
-	GList *node;
-	GtkCTree *ctree = GTK_CTREE(BALSA_INDEX(index)->ctree);
+	GList *node, *l = balsa_index_selected_list(BALSA_INDEX(index));
     
-	for (node = GTK_CLIST(ctree)->selection; node;
-	     node = g_list_next(node)) {
-	    LibBalsaMessage *message =
-		gtk_ctree_node_get_row_data(ctree, GTK_CTREE_NODE(node->data));
+	for (node = l; node; node = g_list_next(node)) {
+	    LibBalsaMessage *message = node->data;
 
 	    if(!attach_message(msg, message)) {
                 libbalsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -1570,6 +1565,7 @@ attach_message_cb(GtkWidget * widget, BalsaSendmsg *msg)
                 break;
             }
 	}
+        g_list_free(l);
     }
     
     return TRUE;

@@ -91,7 +91,6 @@ libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix,
 {
     DIR *dpc;
     struct dirent *de;
-    const gchar * name;
     char filename[PATH_MAX];
     struct stat st;
     GtkType mailbox_type;
@@ -120,10 +119,12 @@ libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix,
 	    } else if (mailbox_type == LIBBALSA_TYPE_MAILBOX_MAILDIR) {
 		mailbox_handler(rnode, de->d_name, filename);
 	    } else {
-		name = g_basename(prefix);
+                gchar *name = g_path_get_basename(prefix);
+
 		current_node = folder_handler(rnode, name, filename);
 		libbalsa_scanner_local_dir(current_node, filename, 
 					   folder_handler, mailbox_handler);
+                g_free(name);
 	    }
 	} else {
 	    mailbox_type = libbalsa_mailbox_type_from_path(filename);

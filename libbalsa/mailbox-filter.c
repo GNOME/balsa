@@ -28,6 +28,7 @@
  */
 
 #include "config.h"
+#include <string.h>
 #include <gnome.h>
 #include "filter-file.h"
 #include "mailbox-filter.h"

@@ -311,7 +311,7 @@ filters_run_on_messages(GSList * filter_list, GList * messages)
 	}
 	if (match) {
 	    /* We hold a reference on the matching messages, to be sure they are still there when we do actions of filter */
-	    gtk_object_ref(GTK_OBJECT(messages->data));
+	    g_object_ref(messages->data);
 	    filt->matching_messages=g_list_prepend(filt->matching_messages,LIBBALSA_MESSAGE(messages->data));
 	}
     }
@@ -363,7 +363,7 @@ filters_run_on_messages(GSList * filter_list, GList * messages)
 	    }
 	    /* We unref all messages */
 	    for (lst_messages=filt->matching_messages;lst_messages;lst_messages=g_list_next(lst_messages))
-		gtk_object_unref(GTK_OBJECT(lst_messages->data));
+		g_object_unref(lst_messages->data);
 	    g_list_free(filt->matching_messages);
 	    filt->matching_messages=NULL;
 	}

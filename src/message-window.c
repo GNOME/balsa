@@ -593,19 +593,21 @@ static void next_unread_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) (data);
     BalsaIndex *idx;
-    GtkCList *list;
+    GList *list;
     LibBalsaMessage *msg;
 
     balsa_index_select_next_unread(
 	idx=BALSA_INDEX(
 	    balsa_window_find_current_index(balsa_app.main_window)));
 
-    list=GTK_CLIST(idx->ctree);
-    if(g_list_length(list->selection) != 1)
-	return;
+    list = balsa_index_selected_list(idx);
+    if (g_list_length(list) != 1) {
+        g_list_free(list);
+        return;
+    }
 
-    msg=LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(GTK_CTREE(list),
-						     list->selection->data));
+    msg = LIBBALSA_MESSAGE(list->data);
+    g_list_free(list);
     if(!msg)
 	return;
 
@@ -617,19 +619,21 @@ static void next_flagged_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) (data);
     BalsaIndex *idx;
-    GtkCList *list;
+    GList *list;
     LibBalsaMessage *msg;
 
     balsa_index_select_next_flagged(
 	idx=BALSA_INDEX(
 	    balsa_window_find_current_index(balsa_app.main_window)));
 
-    list=GTK_CLIST(idx->ctree);
-    if(g_list_length(list->selection) != 1)
-	return;
+    list = balsa_index_selected_list(idx);
+    if (g_list_length(list) != 1) {
+        g_list_free(list);
+        return;
+    }
 
-    msg=LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(GTK_CTREE(list),
-						     list->selection->data));
+    msg = LIBBALSA_MESSAGE(list->data);
+    g_list_free(list);
     if(!msg)
 	return;
 

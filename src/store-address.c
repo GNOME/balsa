@@ -259,24 +259,22 @@ store_address_note_frame(struct store_address_info *info)
 {
     GtkWidget *frame = gtk_frame_new(_("Choose Address"));
     LibBalsaMessage *message;
-    GList *list = GTK_CLIST(info->index->ctree)->selection;
+    GList *list, *l = balsa_index_selected_list(info->index);
 
     info->notebook = gtk_notebook_new();
     gtk_notebook_set_scrollable(GTK_NOTEBOOK(info->notebook), TRUE);
     gtk_container_set_border_width(GTK_CONTAINER(info->notebook), 5);
     gtk_container_add(GTK_CONTAINER(frame), info->notebook);
 
-    list = g_list_last(list);
-    while (list) {
-        message = gtk_ctree_node_get_row_data(info->index->ctree,
-                                              list->data);
+    for (list = g_list_last(l); list; list = g_list_previous(list)) {
+        message = list->data;
         if (message->from)
             store_address_add_address(info, _("From:"), message->from);
         store_address_add_glist(info, _("To:"), message->to_list);
         store_address_add_glist(info, _("Cc:"), message->cc_list);
         store_address_add_glist(info, _("Bcc:"), message->bcc_list);
-        list = g_list_previous(list);
     }
+    g_list_free(l);
     return frame;
 }
 

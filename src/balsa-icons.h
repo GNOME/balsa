@@ -48,53 +48,44 @@
 #define BALSA_PIXMAP_IDENTITY			"balsa_identity"
 #define BALSA_PIXMAP_CLOSE_MBOX			"balsa_close_mbox"
 
-#define BALSA_PIXMAP_MENU_NEW			"menu_new"
-#define BALSA_PIXMAP_MENU_FLAGGED		"menu_flagged"
-#define BALSA_PIXMAP_MENU_IDENTITY		"menu_identity"
-#define BALSA_PIXMAP_MENU_FORWARD		"menu_forward"
-#define BALSA_PIXMAP_MENU_REPLY	                "menu_reply"
-#define BALSA_PIXMAP_MENU_REPLY_ALL		"menu_reply_all"
-#define BALSA_PIXMAP_MENU_REPLY_GROUP		"menu_reply_group"
-#define BALSA_PIXMAP_MENU_POSTPONE		"menu_postpone"
-#define BALSA_PIXMAP_MENU_PRINT	                "menu_print"
-#define BALSA_PIXMAP_MENU_NEXT			"menu_next"
-#define BALSA_PIXMAP_MENU_PREVIOUS		"menu_previous"
-#define BALSA_PIXMAP_MENU_SAVE			"menu_save"
-#define BALSA_PIXMAP_MENU_SEND			"menu_send"
-#define BALSA_PIXMAP_MENU_SEND_RECEIVE		"menu_send_receive"
-#define BALSA_PIXMAP_MENU_COMPOSE		"menu_compose"
-#define BALSA_PIXMAP_MENU_ATTACHMENT		"menu_attachment"
-#define BALSA_PIXMAP_MENU_RECEIVE		"menu_receive"
-#define BALSA_PIXMAP_MENU_NEXT_FLAGGED		"menu_next_flagged"
-#define BALSA_PIXMAP_MENU_NEXT_UNREAD		"menu_next_unread"
-#define BALSA_PIXMAP_MENU_MARK_ALL		"menu_mark_all"
+#define BALSA_PIXMAP_MENU_NEW			"balsa_menu_new"
+#define BALSA_PIXMAP_MENU_FLAGGED		"balsa_menu_flagged"
+#define BALSA_PIXMAP_MENU_IDENTITY		"balsa_menu_identity"
+#define BALSA_PIXMAP_MENU_FORWARD		"balsa_menu_forward"
+#define BALSA_PIXMAP_MENU_REPLY	                "balsa_menu_reply"
+#define BALSA_PIXMAP_MENU_REPLY_ALL		"balsa_menu_reply_all"
+#define BALSA_PIXMAP_MENU_REPLY_GROUP		"balsa_menu_reply_group"
+#define BALSA_PIXMAP_MENU_POSTPONE		"balsa_menu_postpone"
+#define BALSA_PIXMAP_MENU_PRINT	                "balsa_menu_print"
+#define BALSA_PIXMAP_MENU_NEXT			"balsa_menu_next"
+#define BALSA_PIXMAP_MENU_PREVIOUS		"balsa_menu_previous"
+#define BALSA_PIXMAP_MENU_SAVE			"balsa_menu_save"
+#define BALSA_PIXMAP_MENU_SEND			"balsa_menu_send"
+#define BALSA_PIXMAP_MENU_SEND_RECEIVE		"balsa_menu_send_receive"
+#define BALSA_PIXMAP_MENU_COMPOSE		"balsa_menu_compose"
+#define BALSA_PIXMAP_MENU_ATTACHMENT		"balsa_menu_attachment"
+#define BALSA_PIXMAP_MENU_RECEIVE		"balsa_menu_receive"
+#define BALSA_PIXMAP_MENU_NEXT_FLAGGED		"balsa_menu_next_flagged"
+#define BALSA_PIXMAP_MENU_NEXT_UNREAD		"balsa_menu_next_unread"
+#define BALSA_PIXMAP_MENU_MARK_ALL		"balsa_menu_mark_all"
 
-#define BALSA_PIXMAP_OTHER_CLOSE		"other_close"
+#define BALSA_PIXMAP_OTHER_CLOSE		"balsa_other_close"
 
-#define BALSA_PIXMAP_MBOX_DRAFT                 "mbox_draft"
-#define BALSA_PIXMAP_MBOX_IN                    "mbox_in"
-#define BALSA_PIXMAP_MBOX_OUT                   "mbox_out"
-#define BALSA_PIXMAP_MBOX_SENT                  "mbox_sent"
-#define BALSA_PIXMAP_MBOX_TRASH                 "mbox_trash"
-#define BALSA_PIXMAP_MBOX_TRAY_EMPTY            "mbox_tray_empty"
-#define BALSA_PIXMAP_MBOX_TRAY_FULL             "mbox_tray_full"
-#define BALSA_PIXMAP_MBOX_DIR_OPEN              "mbox_dir_open"
-#define BALSA_PIXMAP_MBOX_DIR_CLOSED            "mbox_dir_closed"
+#define BALSA_PIXMAP_MBOX_DRAFT                 "balsa_mbox_draft"
+#define BALSA_PIXMAP_MBOX_IN                    "balsa_mbox_in"
+#define BALSA_PIXMAP_MBOX_OUT                   "balsa_mbox_out"
+#define BALSA_PIXMAP_MBOX_SENT                  "balsa_mbox_sent"
+#define BALSA_PIXMAP_MBOX_TRASH                 "balsa_mbox_trash"
+#define BALSA_PIXMAP_MBOX_TRAY_EMPTY            "balsa_mbox_tray_empty"
+#define BALSA_PIXMAP_MBOX_TRAY_FULL             "balsa_mbox_tray_full"
+#define BALSA_PIXMAP_MBOX_DIR_OPEN              "balsa_mbox_dir_open"
+#define BALSA_PIXMAP_MBOX_DIR_CLOSED            "balsa_mbox_dir_closed"
 
-typedef enum {
-    BALSA_ICON_MBOX_TRASH,
+#define BALSA_PIXMAP_INFO_FLAGGED               "balsa_info_flagged"
+#define BALSA_PIXMAP_INFO_REPLIED               "balsa_info_replied"
+#define BALSA_PIXMAP_INFO_NEW                   "balsa_info_new"
+#define BALSA_PIXMAP_INFO_ATTACHMENT            "balsa_info_attachment"
 
-    BALSA_ICON_INFO_REPLIED,
-    BALSA_ICON_INFO_READ,
-    BALSA_ICON_INFO_FORWARD,
-    BALSA_ICON_INFO_FLAGGED,
-    BALSA_ICON_INFO_NEW,
-    BALSA_ICON_INFO_ATTACHMENT,
-} BalsaIconName;
-
-void balsa_icons_init(void);
-GdkPixmap *balsa_icon_get_pixmap(BalsaIconName icon);
-GdkBitmap *balsa_icon_get_bitmap(BalsaIconName icon);
 void register_balsa_pixmaps(void);
 void balsa_icon_create(const gchar ** data, GdkPixmap ** pmap,
                        GdkBitmap ** bmap);

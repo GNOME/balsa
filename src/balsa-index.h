@@ -33,9 +33,9 @@ extern "C" {
     GtkType balsa_index_get_type(void);
 
 #define BALSA_TYPE_INDEX          (balsa_index_get_type ())
-#define BALSA_INDEX(obj)          (GTK_CHECK_CAST (obj, balsa_index_get_type (), BalsaIndex))
-#define BALSA_INDEX_CLASS(klass)  (GTK_CHECK_CLASS_CAST (klass, balsa_index_get_type (), BalsaIndexClass))
-#define BALSA_IS_INDEX(obj)       (GTK_CHECK_TYPE (obj, balsa_index_get_type ()))
+#define BALSA_INDEX(obj)          (GTK_CHECK_CAST (obj, BALSA_TYPE_INDEX, BalsaIndex))
+#define BALSA_INDEX_CLASS(klass)  (GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_INDEX, BalsaIndexClass))
+#define BALSA_IS_INDEX(obj)       (GTK_CHECK_TYPE (obj, BALSA_TYPE_INDEX))
 #define BALSA_IS_INDEX_CLASS(klass) (GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_INDEX))
 
 
@@ -43,13 +43,20 @@ extern "C" {
     typedef struct _BalsaIndexClass BalsaIndexClass;
 
     struct _BalsaIndex {
-        GtkScrolledWindow sw;    
+        GtkTreeView tree_view;
         
-        GtkCTree* ctree;
         GtkWidget* window;       
+
+        /* the popup menu and some items we need to refer to */
+        GtkWidget *popup_menu;
+        GtkWidget *delete_item;
+        GtkWidget *undelete_item;
+        GtkWidget *move_to_trash_item;
+        GtkWidget *move_to_item;
 
         BalsaMailboxNode* mailbox_node;
         LibBalsaMessage* first_new_message;
+        LibBalsaMessage* current_message;
 
         int threading_type;
         GTimeVal last_use;
@@ -59,7 +66,7 @@ extern "C" {
     };
 
     struct _BalsaIndexClass {
-	GtkScrolledWindowClass parent_class;
+	GtkTreeViewClass parent_class;
 
 	void (*select_message) (BalsaIndex * bindex,
 				LibBalsaMessage * message);
@@ -68,6 +75,20 @@ extern "C" {
         void (*unselect_all_messages) (BalsaIndex* bindex);
     };
 
+/* tree model columns */
+    enum {
+        BNDX_MESSAGE_COLUMN,
+        BNDX_INDEX_COLUMN,
+        BNDX_STATUS_COLUMN,
+        BNDX_ATTACH_COLUMN,
+        BNDX_FROM_COLUMN,
+        BNDX_SUBJECT_COLUMN,
+        BNDX_DATE_COLUMN,
+        BNDX_SIZE_COLUMN,
+        BNDX_COLOR_COLUMN,
+        BNDX_WEIGHT_COLUMN,
+        BNDX_N_COLUMNS
+    };
 
 /* function prototypes */
     
@@ -119,12 +140,15 @@ extern "C" {
     void balsa_index_reset(BalsaIndex * index);
     gint balsa_find_notebook_page_num(LibBalsaMailbox * mailbox);
     void balsa_index_update_message(BalsaIndex * index);
+    void balsa_index_set_column_widths(BalsaIndex * index);
+    GList * balsa_index_selected_list(BalsaIndex * index);
+    void balsa_index_move_subtree(GtkTreeModel * model, GtkTreePath * root,
+                                  GtkTreePath * new_parent,
+                                  GHashTable * ref_table);
 
     /* Updating index columns when preferences change */
-    void balsa_index_refresh_date (GtkNotebook *, GtkNotebookPage *,
-				   gint, gpointer);
-    void balsa_index_refresh_size (GtkNotebook *, GtkNotebookPage *,
-				   gint, gpointer);
+    void balsa_index_refresh_date (BalsaIndex * index);
+    void balsa_index_refresh_size (BalsaIndex * index);
 
     /* Change the display of all indexes when balsa_app.hide_deleted is
      * changed */

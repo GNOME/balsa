@@ -893,15 +893,16 @@ create_entry(GtkDialog *mcw, GtkWidget * table,
 BalsaIndex*
 balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
 {
+    GtkWidget *page;
     GtkWidget *index;
     guint i;
     g_return_val_if_fail(balsa_app.notebook, NULL);
 
     for (i = 0;
-	 (index =
+	 (page =
 	  gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
 	 i++) {
-        
+        index = gtk_bin_get_child(GTK_BIN(page));
 	if (BALSA_INDEX(index)->mailbox_node != NULL
             && BALSA_INDEX(index)->mailbox_node->mailbox == mailbox)
 	    return BALSA_INDEX(index);

@@ -1030,21 +1030,17 @@ void
 message_print_cb(GtkWidget * widget, gpointer cbdata)
 {
     BalsaIndex *index;
-    GList *list;
     LibBalsaMessage *msg;
 
     g_return_if_fail(cbdata);
 
     index = BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(cbdata)));
-    if (!index || (list = GTK_CLIST(index->ctree)->selection) == NULL)
-	return;
+    if (!index)
+        return;
 
-    msg =
-	LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(
-	    GTK_CTREE(index->ctree), list->data));
-    /* print only first selected message */
-
-    message_print(msg);
+    msg = index->current_message;
+    if (msg)
+        message_print(msg);
 }
 
 

@@ -63,8 +63,6 @@
 #include "pixmaps/mbox_dir_open.xpm"
 
 #include "pixmaps/info_replied.xpm"
-#include "pixmaps/info_read.xpm"
-#include "pixmaps/info_forward.xpm"
 #include "pixmaps/info_flagged.xpm"
 #include "pixmaps/info_new.xpm"
 #include "pixmaps/info_attachment.xpm"
@@ -94,94 +92,12 @@
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
-typedef struct _BalsaIcon BalsaIcon;
-struct _BalsaIcon {
-    GdkPixmap *p;
-    GdkBitmap *b;
-};
-
-static BalsaIcon mbox_draft;
-static BalsaIcon mbox_in;
-static BalsaIcon mbox_out;
-static BalsaIcon mbox_sent;
-static BalsaIcon mbox_trash;
-
-static BalsaIcon mbox_tray_empty;
-static BalsaIcon mbox_tray_full;
-
-static BalsaIcon mbox_dir_open;
-static BalsaIcon mbox_dir_closed;
-
-static BalsaIcon info_replied;
-static BalsaIcon info_read;
-static BalsaIcon info_forward;
-static BalsaIcon info_flagged;
-static BalsaIcon info_new;
-static BalsaIcon info_attachment;
-
 void
 balsa_icon_create(const gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
 {
     /* Is there any reason to use gdkpixbuf here? */
     *pmap = gdk_pixmap_create_from_xpm_d(GDK_ROOT_PARENT(), bmap, 0,
                                          (gchar **) data);
-}
-
-void
-balsa_icons_init(void)
-{
-    balsa_icon_create(mbox_draft_xpm,		&mbox_draft.p,		&mbox_draft.b);
-    balsa_icon_create(mbox_in_xpm,		&mbox_in.p,		&mbox_in.b);
-    balsa_icon_create(mbox_out_xpm,		&mbox_out.p,		&mbox_out.b);
-    balsa_icon_create(mbox_sent_xpm,		&mbox_sent.p,		&mbox_sent.b);
-    balsa_icon_create(mbox_trash_xpm,		&mbox_trash.p,		&mbox_trash.b);
-
-    balsa_icon_create(mbox_tray_empty_xpm,	&mbox_tray_empty.p,	&mbox_tray_empty.b);
-    balsa_icon_create(mbox_tray_full_xpm,	&mbox_tray_full.p,	&mbox_tray_full.b);
-
-    balsa_icon_create(mbox_dir_closed_xpm,	&mbox_dir_closed.p,	&mbox_dir_closed.b);
-    balsa_icon_create(mbox_dir_open_xpm,	&mbox_dir_open.p,	&mbox_dir_open.b);
-
-    balsa_icon_create(info_replied_xpm,	&info_replied.p,	&info_replied.b);
-    balsa_icon_create(info_read_xpm,		&info_read.p,		&info_read.b);
-    balsa_icon_create(info_forward_xpm,	&info_forward.p,	&info_forward.b);
-    balsa_icon_create(info_flagged_xpm,	&info_flagged.p,	&info_flagged.b);
-    balsa_icon_create(info_new_xpm,		&info_new.p,		&info_new.b);
-    balsa_icon_create(info_attachment_xpm,	&info_attachment.p,	&info_attachment.b);
-}
-
-GdkPixmap *
-balsa_icon_get_pixmap(BalsaIconName name)
-{
-    switch (name) {
-	case BALSA_ICON_MBOX_TRASH:		return mbox_trash.p;
-
-	case BALSA_ICON_INFO_REPLIED:		return info_replied.p;
-	case BALSA_ICON_INFO_READ:		return info_read.p;
-	case BALSA_ICON_INFO_FORWARD:		return info_forward.p;
-	case BALSA_ICON_INFO_FLAGGED:		return info_flagged.p;
-	case BALSA_ICON_INFO_NEW:		return info_new.p;
-	case BALSA_ICON_INFO_ATTACHMENT:	return info_attachment.p;
-    }
-
-    return NULL;
-}
-
-GdkBitmap *
-balsa_icon_get_bitmap(BalsaIconName name)
-{
-    switch (name) {
-	case BALSA_ICON_MBOX_TRASH:		return mbox_trash.b;
-
-	case BALSA_ICON_INFO_REPLIED:		return info_replied.b;
-	case BALSA_ICON_INFO_READ:		return info_read.b;
-	case BALSA_ICON_INFO_FORWARD:		return info_forward.b;
-	case BALSA_ICON_INFO_FLAGGED:		return info_flagged.b;
-	case BALSA_ICON_INFO_NEW:		return info_new.b;
-	case BALSA_ICON_INFO_ATTACHMENT:	return info_attachment.b;
-    }
-
-    return NULL;
 }
 
 static void
@@ -263,6 +179,12 @@ register_balsa_pixmaps(void)
         { BALSA_PIXMAP_MBOX_TRAY_FULL,  mbox_tray_full_xpm },
         { BALSA_PIXMAP_MBOX_DIR_OPEN,   mbox_dir_open_xpm },
         { BALSA_PIXMAP_MBOX_DIR_CLOSED, mbox_dir_closed_xpm },
+
+        /* BalsaIndex icons */
+        { BALSA_PIXMAP_INFO_FLAGGED,    info_flagged_xpm },
+        { BALSA_PIXMAP_INFO_REPLIED,    info_replied_xpm },
+        { BALSA_PIXMAP_INFO_NEW,        info_new_xpm },
+        { BALSA_PIXMAP_INFO_ATTACHMENT, info_attachment_xpm },
     };
 
     unsigned i;

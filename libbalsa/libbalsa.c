@@ -160,6 +160,7 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     ReplyRegexp.rx = (regex_t *) safe_malloc (sizeof (regex_t));
     REGCOMP(ReplyRegexp.rx,"^(re([\\[0-9\\]+])*|aw):[ \t]*",0);
 
+    Charset = "utf-8";
     /* more likely to least likely or something */
     SendCharset = "us-ascii:iso-8859-1:iso-8859-15:iso-8859-2:iso-8859-9:iso-8859-13:euc-kr:euc-jp:KOI8-R";    
 
@@ -304,7 +305,7 @@ libbalsa_guess_mail_spool(void)
 	for (i = 0; guesses[i] != NULL; i++) {
 	    spool = g_strconcat(guesses[i], env, NULL);
 
-	    if (g_file_exists(spool))
+	    if (g_file_test(spool, G_FILE_TEST_EXISTS))
 		return spool;
 
 	    g_free(spool);
@@ -416,7 +417,7 @@ gchar *libbalsa_guess_ldif_file()
     for (i = 0; guesses[i] != NULL; i++) {
 	ldif = gnome_util_prepend_user_home(guesses[i]);
 	
-	if (g_file_exists(ldif))
+	if (g_file_test(ldif, G_FILE_TEST_EXISTS))
 	     return ldif;
 	  
 	g_free(ldif);

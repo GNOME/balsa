@@ -83,6 +83,7 @@ enum {
     MESSAGES_NEW,
     MESSAGE_DELETE,
     MESSAGES_DELETE,
+    MESSAGES_DELETE_ALL,
     GET_MESSAGE_STREAM,
     CHECK,
     GET_MATCHING,
@@ -195,6 +196,14 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 					 messages_delete),
 		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
 		       GTK_TYPE_POINTER);
+
+    libbalsa_mailbox_signals[MESSAGES_DELETE_ALL] =
+	gtk_signal_new("messages-delete-all",
+		       GTK_RUN_FIRST,
+		       GTK_CLASS_TYPE(object_class),
+		       GTK_SIGNAL_OFFSET(LibBalsaMailboxClass,
+					 messages_delete),
+		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
 
     libbalsa_mailbox_signals[SET_UNREAD_MESSAGES_FLAG] =
 	gtk_signal_new("set-unread-messages-flag",
@@ -771,7 +780,7 @@ libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox)
 
     if(list){
       gtk_signal_emit(GTK_OBJECT(mailbox),
-		      libbalsa_mailbox_signals[MESSAGES_DELETE], list);
+		      libbalsa_mailbox_signals[MESSAGES_DELETE_ALL]);
     }
 
     while (list) {

@@ -1,6 +1,5 @@
 bin_PROGRAMS = balsa
 
-if BALSA_SHOW_ALL
 filter_src = \
 	filter-edit.h		\
 	filter-edit-callbacks.c	\
@@ -12,7 +11,13 @@ filter_src = \
 	filter-run-callbacks.c	\
 	filter-run-dialog.c
 
+if BALSA_SHOW_ALL
+extra_src  = $(filter_src)
+else
+extra_src  = 
 endif
+
+EXTRA_DIST = $(filter_src)
 
 balsa_BASE_SRCLIST =	\
 	address-book.c		\
@@ -65,7 +70,7 @@ balsa_BASE_SRCLIST =	\
 	toolbar-prefs.h		\
 	toolbar-factory.c	\
 	toolbar-factory.h	\
-	$(filter_src)
+	$(extra_src)
 
 balsa_IDL_SRCLIST = # balsa-common.c balsa-skels.c balsa-stubs.c		
 
@@ -90,7 +95,7 @@ balsa_LDADD = \
 
 dist-hook:
 	mkdir $(distdir)/pixmaps
-	cp $(srcdir)/pixmaps/*.xpm $(distdir)/pixmaps
+	cp $(srcdir)/pixmaps/*.{xpm,png} $(distdir)/pixmaps
 
 idldir = $(datadir)/idl
 

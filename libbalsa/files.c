@@ -33,6 +33,8 @@ static const gchar *permanent_prefixes[] = {
 	GNOME_STD_PREFIX,
 	GNOME_LIB_PREFIX,*/
     BALSA_COMMON_PREFIXES,
+    "src",
+    ".",
     NULL
 };
 

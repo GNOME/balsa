@@ -1250,7 +1250,7 @@ get_font_name(const gchar * base, const gchar * charset,
 
     /* defense against a patologically short base font wildcard implemented
      * in the chunk below
-     * extra space for dwo dashes and '\0' */
+     * extra space for two dashes and '\0' */
     len = ptr - base;
     /* if(dash_cnt>12) len--; */
     if (len < 1)
@@ -1263,10 +1263,8 @@ get_font_name(const gchar * base, const gchar * charset,
 
     if (len > 1)
 	strncpy(res, base, len);
-    else {
-	strncpy(res, "*", 1);
-	len = 1;
-    }
+    else
+	*res='*';
 
     res[len] = '-';
     strcpy(res + len + 1, postfix);

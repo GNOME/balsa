@@ -1120,12 +1120,12 @@ destroy_attachment (gpointer data)
 	char *last_slash = strrchr(attach->filename, '/');
 
 	if (balsa_app.debug)
-	    fprintf (stderr, __FILE__ ":" __FUNCTION__ ": unlink `%s'\n",
+	    fprintf (stderr, "%s:%s: unlink `%s'\n", __FILE__, __FUNCTION__,
 		     attach->filename);
 	unlink(attach->filename);
 	*last_slash = 0;
 	if (balsa_app.debug)
-	    fprintf (stderr, __FILE__ ":" __FUNCTION__ ": rmdir `%s'\n",
+	    fprintf (stderr, "%s:%s: rmdir `%s'\n", __FILE__, __FUNCTION__,
 		     attach->filename);
 	rmdir(attach->filename);
     }

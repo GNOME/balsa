@@ -1,12 +1,24 @@
 noinst_LIBRARIES = libbalsa.a
 
-if BALSA_SHOW_ALL
 filter_src = \
+	filter-error.c		\
 	filter-file.c		\
 	filter-file.h		\
+	filter-funcs.c		\
+	filter-funcs.h		\
+	filter-private.h	\
 	filter.c		\
-	filter.h
+	filter.h		\
+	mailbox-filter.c	\
+	mailbox-filter.h
+
+if BALSA_SHOW_ALL
+extra_src  = $(filter_src)
+else
+extra_src  = 
 endif
+
+EXTRA_DIST = $(filter_src)
 
 libbalsa_a_SOURCES = 		\
 	abook-completion.c	\
@@ -29,10 +41,6 @@ libbalsa_a_SOURCES = 		\
 	body.h			\
 	files.c			\
 	files.h			\
-	filter-error.c		\
-	filter-funcs.c		\
-	filter-funcs.h		\
-	filter-private.h	\
 	folder-scanners.c	\
 	folder-scanners.h	\
 	identity.c		\
@@ -43,8 +51,6 @@ libbalsa_a_SOURCES = 		\
 	libbalsa.h		\
 	libbalsa_private.h	\
 	mailbackend.h		\
-	mailbox-filter.c	\
-	mailbox-filter.h	\
 	mailbox.c		\
 	mailbox.h		\
 	mailbox_imap.c		\
@@ -76,7 +82,8 @@ libbalsa_a_SOURCES = 		\
 	server.h		\
 	source-viewer.c		\
 	threads.h		\
-	$(filter_src)
+	$(extra_src)
+
 
 INCLUDES=-I${top_srcdir} -I${top_builddir}/libmutt \
 	$(PCRE_CFLAGS)

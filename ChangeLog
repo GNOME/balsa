@@ -1,3 +1,12 @@
+2002-01-29  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/files.c: Add "src" and "." last-resort prefixes.
+	* libbalsa/pop3.c: secure against too long UIDs (Emmanuel).
+	* libbalsa/Makefile.am: always add filter files to the tarball.
+	* src/Makefile.am: add alternative and mixed icons.
+	* src/balsa-message.c: replace strncpy() by an assignment (Emmanuel).
+	* src/sendmsg-window.c: resolve __FUNCTION__ problems (Ali Akcaagac).
+
 2002-01-23  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/toolbar-factory.[hc]: rename mygtk_toolbar_remove_all() to

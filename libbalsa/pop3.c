@@ -352,8 +352,11 @@ pop_get_stats(int s, gint *first_msg, gint *msgs, gint *tot_bytes,
 		/* none of uidl or last recognised, fail.. */
 		return POP_COMMAND_ERR;
 	    }
-	    sscanf( buffer + 3, " %d %s", &tmp, uid);
-	    
+	    /* We protect ourselves from a badly formed answer that could
+	       lead us to an overflow */
+	    sscanf( buffer + 3, " %d %79s", &tmp, uid);
+	    uid[79]='\0';/* be sure to have a null-ended string*/
+
 	    if(i == *msgs) {
 		strcpy(last_uid, uid); /* save uid of the last message */
 		if(*prev_last_uid == '\0')
@@ -625,7 +628,7 @@ fetch_pop_mail (const gchar *pop_host, const gchar *pop_user,
 	write (s, "quit\r\n", 6);
 	getLine (s, buffer, sizeof (buffer)); /* snarf the response */
 	if(status == POP_OK)
-	    strcpy(last_uid, uid);/* FIXME: overflow error on hideous reply? */
+	    strcpy(last_uid, uid);
     }
     close (s);
 

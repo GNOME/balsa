@@ -50,6 +50,7 @@
 #include "sendmsg-window.h"
 #include "information.h"
 #include "pop3.h"
+#include "imap-server.h"
 
 #include "libinit_balsa/init_balsa.h"
 
@@ -215,6 +216,8 @@ balsa_init(int argc, char **argv)
 	 N_("Opens default Inbox on startup"), NULL},
 	{"debug-pop", 'd', POPT_ARG_NONE, &PopDebug, 0, 
 	 N_("Debug POP3 connection"), NULL},
+	{"debug-imap", 'D', POPT_ARG_NONE, &ImapDebug, 0, 
+	 N_("Debug IMAP connection"), NULL},
 	{NULL, '\0', 0, NULL, 0}	/* end the list */
     };
 

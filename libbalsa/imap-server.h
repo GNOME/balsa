@@ -34,4 +34,6 @@ gboolean libbalsa_imap_server_has_free_handles(LibBalsaImapServer *server);
 gboolean libbalsa_imap_server_is_offline(LibBalsaImapServer *server);
 void libbalsa_imap_server_set_offline_mode(LibBalsaImapServer *server,
 					   gboolean offline);
+
+extern gint ImapDebug;
 #endif /* __IMAP_SERVER_H__ */

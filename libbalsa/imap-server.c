@@ -216,15 +216,42 @@ libbalsa_imap_server_expunge_notify_cb(ImapMboxHandle *handle, int seqno,
 	libbalsa_mailbox_imap_expunge_notify(user, seqno);
 }
 
+gint ImapDebug = 0;
+#define BALSA_TEST_IMAP 1
+
 static void
 monitor_cb(const char *buffer, int length, int direction, void *arg)
 {
-#if 1
-  int i;
-  printf("%c: ", direction ? 'C' : 'S');
-  for(i=0; i<length; i++) putchar(buffer[i]);
-  fflush(NULL);
-#endif
+#if BALSA_TEST_IMAP
+  if (ImapDebug) {
+    const gchar *passwd = NULL;
+    int i;
+
+    if (direction) {
+      const gchar *login = g_strstr_len(buffer, length, "LOGIN ");
+      if (login) {
+	const gchar *user = login + 6;
+	passwd = g_strstr_len(user, length - (user - buffer), " ");
+	if (passwd) {
+	  int new_len = ++passwd - buffer;
+	  if (new_len < length)
+	    length = new_len;
+	  else
+	    passwd = NULL;
+	}
+      }
+    }
+
+    printf("IMAP %c: ", direction ? 'C' : 'S');
+    for (i = 0; i < length; i++)
+      putchar(buffer[i]);
+
+    if (passwd)
+      puts("(password hidden)");
+
+    fflush(NULL);
+  }
+#endif				/* BALSA_TEST_IMAP */
   if (direction)
     ((struct handle_info *) arg)->last_used = time(NULL);
 }

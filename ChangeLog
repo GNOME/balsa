@@ -1,3 +1,7 @@
+2000-05-12  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/balsa-message.c: #9422 bug fix.
+	
 2000-05-09  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/address-book.c: preleminary handling of gcard address lists.

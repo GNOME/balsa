@@ -731,6 +731,7 @@ imap_body_free(ImapBody* body)
   g_free(body->media_subtype);
   g_free(body->desc);
   g_free(body->content_dsp_other);
+  g_free(body->content_uri);
   g_hash_table_destroy(body->params);
   if(body->envelope) imap_envelope_free(body->envelope);
   if(body->child) imap_body_free(body->child);
@@ -1356,16 +1357,15 @@ ir_search(ImapMboxHandle *h)
 /* ir_sort: sort response handler. clears current view and creates a
    new one.
 */
+/* draft-ietf-imapext-sort-13.txt:
+ * sort-data = "SORT" *(SP nz-number) */
 static ImapResponse
 ir_sort(ImapMboxHandle *h)
 {
   int c;
   char seq[12];
-  do {
-    c=imap_get_atom(h->sio, seq, sizeof(seq));
-    if(!seq[0]) break;
+  while ((c=imap_get_atom(h->sio, seq, sizeof(seq))), seq[0])
     mbox_view_append_no(&h->mbox_view, atoi(seq));
-  } while(1);
   return ir_check_crlf(h, c);
 }
 
@@ -1380,32 +1380,27 @@ ir_flags(ImapMboxHandle *h)
 static ImapResponse
 ir_exists(ImapMboxHandle *h, unsigned seqno)
 {
-  int c;
   unsigned old_exists = h->exists;
 
-  while( (c=sio_getc(h->sio))!=EOF && c != 0x0a);
   imap_mbox_resize_cache(h, seqno);
   mbox_view_resize(&h->mbox_view, old_exists, seqno);
 
   g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[EXISTS_NOTIFY], 0);
                 
-  return IMR_OK;
+  return ir_check_crlf(h, sio_getc(h->sio));
 }
 
 static ImapResponse
 ir_recent(ImapMboxHandle *h, unsigned seqno)
 {
-  int c; while( (c=sio_getc(h->sio))!=EOF && c != 0x0a);
   h->recent = seqno;
   /* FIXME: send a signal here! */
-  return IMR_OK;
+  return ir_check_crlf(h, sio_getc(h->sio));
 }
 
 static ImapResponse
 ir_expunge(ImapMboxHandle *h, unsigned seqno)
 {
-  int c; while( (c=sio_getc(h->sio))!=EOF && c != 0x0a);
-
   g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[EXPUNGE_NOTIFY],
 		0, seqno);
   
@@ -1417,7 +1412,7 @@ ir_expunge(ImapMboxHandle *h, unsigned seqno)
   }
   h->exists--;
   mbox_view_expunge(&h->mbox_view, seqno);
-  return IMR_OK;
+  return ir_check_crlf(h, sio_getc(h->sio));
 }
 
 static ImapResponse
@@ -2072,7 +2067,6 @@ ir_body_type_mpart (struct siobuf *sio, ImapBody * body,
 		    ImapBodyExtensibility type)
 {
   ImapResponse rc;
-  ImapBody *b;
   gchar *str;
   int c;
 
@@ -2083,15 +2077,10 @@ ir_body_type_mpart (struct siobuf *sio, ImapBody * body,
   c = sio_getc (sio);
   do
     {
-      b = body ? imap_body_new () : NULL;
+      ImapBody *b = body ? imap_body_new () : NULL;
       rc = ir_body (sio, c, b, type);
       if (body)
-	{
-	  if (rc == IMR_OK)
-	    imap_body_append_child (body, b);
-	  else
-	    imap_body_free (b);
-	}
+	imap_body_append_child (body, b);
       if (rc != IMR_OK)
 	return rc;
     }
@@ -2364,7 +2353,7 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
     c=sio_getc(h->sio);
   } while( c!= EOF && c == ' ');
   if(c!=')') return IMR_PROTOCOL;
-  return ir_check_crlf(h, (c=sio_getc(h->sio)));
+  return ir_check_crlf(h, sio_getc(h->sio));
 }
 
 static ImapResponse
@@ -2447,13 +2436,13 @@ ir_thread(ImapMboxHandle *h)
   h->thread_root = NULL;
   root = g_node_new(NULL);
   while (c == '(') {
-      rc=ir_thread_sub(h, root, c);
-      if (rc!=IMR_OK) {
-	  return rc;
-      }
-      c=sio_getc(h->sio);
+    rc=ir_thread_sub(h, root, c);
+    if (rc!=IMR_OK)
+      break;
+    c=sio_getc(h->sio);
   }
-  rc = ir_check_crlf(h, c);
+  if (rc == IMR_OK)
+    rc = ir_check_crlf(h, c);
 
   if (rc != IMR_OK)
       g_node_destroy(root);
@@ -2468,24 +2457,23 @@ ir_thread(ImapMboxHandle *h)
 static const struct {
   const gchar *response;
   int keyword_len;
-  int always_has_data;
   ImapResponse (*handler)(ImapMboxHandle *h);
 } ResponseHandlers[] = {
-  { "OK",         2, 1, ir_ok },
-  { "NO",         2, 1, ir_no },
-  { "BAD",        3, 1, ir_bad },
-  { "PREAUTH",    7, 1, ir_preauth },
-  { "BYE",        3, 1, ir_bye },
-  { "CAPABILITY",10, 1, ir_capability },
-  { "LIST",       4, 1, ir_list },
-  { "LSUB",       4, 1, ir_lsub },
-  { "STATUS",     6, 1, ir_status },
-  { "SEARCH",     6, 0, ir_search },
-  { "SORT",       4, 0, ir_sort   },
-  { "THREAD",     6, 0, ir_thread },
-  { "FLAGS",      5, 1, ir_flags  },
+  { "OK",         2, ir_ok },
+  { "NO",         2, ir_no },
+  { "BAD",        3, ir_bad },
+  { "PREAUTH",    7, ir_preauth },
+  { "BYE",        3, ir_bye },
+  { "CAPABILITY",10, ir_capability },
+  { "LIST",       4, ir_list },
+  { "LSUB",       4, ir_lsub },
+  { "STATUS",     6, ir_status },
+  { "SEARCH",     6, ir_search },
+  { "SORT",       4, ir_sort   },
+  { "THREAD",     6, ir_thread },
+  { "FLAGS",      5, ir_flags  },
   /* FIXME Is there an unnumbered FETCH response? */
-  { "FETCH",      5, 1, ir_fetch  }
+  { "FETCH",      5, ir_fetch  }
 };
 static const struct {
   const gchar *response;
@@ -2508,8 +2496,12 @@ ir_handle_response(ImapMboxHandle *h)
 
   c = imap_get_atom(h->sio, atom, sizeof(atom));
   if( isdigit(atom[0]) ) {
+    if (c != ' ')
+      return IMR_PROTOCOL;
     seqno = atoi(atom);
-    imap_get_atom(h->sio, atom, sizeof(atom));
+    c = imap_get_atom(h->sio, atom, sizeof(atom));
+    if (c == 0x0d)
+      sio_ungetc(h->sio);
     for(i=0; i<ELEMENTS(NumHandlers); i++) {
       if(g_ascii_strncasecmp(atom, NumHandlers[i].response, 
                              NumHandlers[i].keyword_len) == 0) {
@@ -2518,14 +2510,13 @@ ir_handle_response(ImapMboxHandle *h)
       }
     }
   } else {
+    if (c == 0x0d)
+      sio_ungetc(h->sio);
     for(i=0; i<ELEMENTS(ResponseHandlers); i++) {
       if(g_ascii_strncasecmp(atom, ResponseHandlers[i].response, 
                              ResponseHandlers[i].keyword_len) == 0) {
-	if (ResponseHandlers[i].always_has_data || c == ' ') {
-	  return
-	    ResponseHandlers[i].handler(h);
-	}
-	return ir_check_crlf(h, c);
+	return
+	  ResponseHandlers[i].handler(h);
       }
     }
   }

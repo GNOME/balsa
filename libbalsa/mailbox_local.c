@@ -328,10 +328,31 @@ static void libbalsa_mailbox_local_load_config (LibBalsaMailbox *mailbox, const 
 	
 	local->path = gnome_config_get_string ("Path");
 
+	/* FIXME: Maybe we should save the type... */
+
+	libbalsa_lock_mutt();
+
+	switch ( mx_get_magic(local->path) ) {
+	case M_MBOX:
+	case M_MMDF:
+		local->type = LIBBALSA_MAILBOX_LOCAL_MBOX;
+		break;
+	case M_MH:
+		local->type = LIBBALSA_MAILBOX_LOCAL_MH;
+		break;
+	case M_MAILDIR:
+		local->type = LIBBALSA_MAILBOX_LOCAL_MAILDIR;
+		break;
+	default:
+		local->type =  LIBBALSA_MAILBOX_LOCAL_MBOX;
+	}
+
+	libbalsa_unlock_mutt();
+
+
 	if ( LIBBALSA_MAILBOX_CLASS(parent_class)->load_config )
 		LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);
 
 	libbalsa_notify_register_mailbox(mailbox);
-
 }
 

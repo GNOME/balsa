@@ -1,3 +1,8 @@
+2000-09-11  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox_local.c: When loading from config, setup
+	local->type correctly.
+
 2000-09-10  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/mailbox.[ch], src/mailbox_*.c, src/server.[ch]: Implement

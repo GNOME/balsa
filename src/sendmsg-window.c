@@ -2166,7 +2166,8 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
 
 	    for (ref_list = message->references; ref_list;
                  ref_list = g_list_next(ref_list))
-		g_string_append_printf(body, " %s", (gchar *) ref_list->data);
+		g_string_append_printf(body, " <%s>",
+				       (gchar *) ref_list->data);
 		
 	    g_string_append_c(body, '\n');
 	}
@@ -3344,17 +3345,21 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	strftime(recvtime, sizeof(recvtime),
 		 "%a, %b %d, %Y at %H:%M:%S %z", footime);
 
-        if (bsmsg->orig_message->message_id) {
-            message->references =
-                g_list_prepend(message->references,
-                               g_strdup(bsmsg->orig_message->message_id));
-            message->in_reply_to =
-                bsmsg->orig_message->headers->from
-                ? g_strconcat(bsmsg->orig_message->message_id, "; from ",
-                              bsmsg->orig_message->headers->from->address_list->data,
-                              " on ", recvtime, NULL)
-                : g_strdup(bsmsg->orig_message->message_id);
-        }
+	if (bsmsg->orig_message->message_id) {
+	    message->references =
+		g_list_prepend(message->references,
+			       g_strdup(bsmsg->orig_message->message_id));
+	    message->in_reply_to =
+		g_list_prepend(NULL,
+		    bsmsg->orig_message->headers->from
+		    ? g_strconcat("<", bsmsg->orig_message->message_id,
+				  "> (from ",
+				  bsmsg->orig_message->headers->from->
+				  address_list->data, " on ", recvtime, ")",
+				  NULL)
+		    : g_strconcat("<", bsmsg->orig_message->message_id, ">",
+				  NULL));
+	}
     }
 
     body = libbalsa_message_body_new(message);

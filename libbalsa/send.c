@@ -1249,29 +1249,26 @@ balsa_send_message_real(SendMessageInfo* info)
 
 
 static void
-message_add_references(LibBalsaMessage* message, GMimeMessage* msg) 
+message_add_references(LibBalsaMessage * message, GMimeMessage * msg)
 {
-    gchar* references;
-    gchar* references_dup;
-    GList* list;
-
     /* If the message has references set, add them to the envelope */
     if (message->references != NULL) {
-	list = message->references;
-	references = g_strdup(list->data);
-	list = list->next;
+	GList *list = message->references;
+	GString *str = g_string_new(NULL);
 
-	while (list != NULL) {
-	    references_dup = g_strconcat(list->data, " ", references, NULL);
-	    g_free(references);
-	    references = references_dup;
-           list = list->next;
-       }
-	g_mime_message_set_header(msg, "References", references);
-
-	/* There's no specific header function for In-Reply-To */
-	g_mime_message_set_header(msg, "In-Reply-To", message->in_reply_to);
+	do {
+	    if (str->len > 0)
+		g_string_append_c(str, ' ');
+	    g_string_append_printf(str, "<%s>", (gchar *) list->data);
+	} while ((list = list->next) != NULL);
+	g_mime_message_set_header(msg, "References", str->str);
+	g_string_free(str, TRUE);
     }
+
+    if (message->in_reply_to)
+	/* There's no specific header function for In-Reply-To */
+	g_mime_message_set_header(msg, "In-Reply-To",
+				  message->in_reply_to->data);
 }
 
 #ifdef HAVE_GPGME

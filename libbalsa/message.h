@@ -152,7 +152,7 @@ struct _LibBalsaMessage {
     GList *references_for_threading; /* oldest first */
 
     /* replied message ID; from address on date */
-    gchar *in_reply_to;
+    GList *in_reply_to;
 
     /* message ID */
     gchar *message_id;
@@ -323,4 +323,6 @@ gboolean libbalsa_message_set_header_from_string(LibBalsaMessage *message,
 						 gchar *line);
 void libbalsa_message_set_references_from_string(LibBalsaMessage * message,
 						 const gchar *str);
+void libbalsa_message_set_in_reply_to_from_string(LibBalsaMessage * message,
+						  const gchar *str);
 #endif				/* __LIBBALSA_MESSAGE_H__ */

@@ -157,11 +157,12 @@ libbalsa_message_finalize(GObject * object)
 #endif
     g_list_foreach(message->references, (GFunc) g_free, NULL);
     g_list_free(message->references);
-
     message->references = NULL;
 
-    g_free(message->in_reply_to);
+    g_list_foreach(message->in_reply_to, (GFunc) g_free, NULL);
+    g_list_free(message->in_reply_to);
     message->in_reply_to = NULL;
+
     g_free(message->message_id);
     message->message_id = NULL;
 
@@ -833,8 +834,10 @@ libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read)
 	g_list_free(message->references);
 	message->references = NULL;
 
-	g_free(message->in_reply_to);
+	g_list_foreach(message->in_reply_to, (GFunc) g_free, NULL);
+	g_list_free(message->in_reply_to);
 	message->in_reply_to = NULL;
+
 	g_free(message->message_id);
 	message->message_id = NULL;
 	libbalsa_message_headers_update(message);
@@ -1224,51 +1227,54 @@ void
 libbalsa_message_headers_update(LibBalsaMessage * message)
 {
     int offset;
-  
+
     g_return_if_fail(message != NULL);
     g_return_if_fail(message->headers != NULL);
 
-    if (message->mime_msg == NULL)
-	return;
+    if (message->mime_msg) {
+	libbalsa_message_headers_from_gmime(message->headers,
+					    message->mime_msg);
 
-    libbalsa_message_headers_from_gmime(message->headers, message->mime_msg);
+	g_mime_message_get_date(message->mime_msg, &message->headers->date,
+				&offset);
+	if (!message->sender)
+	    message->sender =
+		libbalsa_address_new_from_gmime(g_mime_message_get_sender
+						(message->mime_msg));
 
-    g_mime_message_get_date(message->mime_msg, &message->headers->date, &offset);
-    if (!message->sender)
-        message->sender =
-	    libbalsa_address_new_from_gmime(g_mime_message_get_sender(message->mime_msg));
-
-    if (!message->in_reply_to) {
-	const gchar *header;
-	gchar *tmp;
-        header = g_mime_message_get_header(message->mime_msg, "In-Reply-To");
-        message->in_reply_to = g_mime_utils_8bit_header_decode(header);
-	if (message->in_reply_to && (tmp = strchr(message->in_reply_to, ';')))
-	    tmp[0] = 0;
-    }
-
-#ifdef MESSAGE_COPY_CONTENT
-    if (!message->subj) {
-	const char *subj;
-        subj = g_mime_message_get_subject(message->mime_msg);
-        message->subj = g_mime_utils_8bit_header_decode(subj);
-    }
-#endif
-    if (!message->message_id) {
-	const char *value = g_mime_message_get_message_id(message->mime_msg);
-	if (value)
-	    message->message_id = g_strdup_printf("<%s>", value);
-    }
-
-    if (!message->references) {
-	const char *value = g_mime_message_get_header(
-				message->mime_msg, "References");
-	if (value) {
-	    libbalsa_message_set_references_from_string(message, value);
+	if (!message->in_reply_to) {
+	    const gchar *header =
+		g_mime_message_get_header(message->mime_msg,
+					  "In-Reply-To");
+	    libbalsa_message_set_in_reply_to_from_string(message, header);
 	}
-    }
+#ifdef MESSAGE_COPY_CONTENT
+	if (!message->subj) {
+	    const char *subj;
+	    subj = g_mime_message_get_subject(message->mime_msg);
+	    message->subj = g_mime_utils_8bit_header_decode(subj);
+	}
+#endif
+	if (!message->message_id) {
+	    const char *value =
+		g_mime_message_get_message_id(message->mime_msg);
+	    if (value)
+		message->message_id = g_strdup(value);
+	}
+
+	if (!message->references) {
+	    const char *value =
+		g_mime_message_get_header(message->mime_msg, "References");
+	    if (value) {
+		libbalsa_message_set_references_from_string(message,
+							    value);
+	    }
+	}
+    }	/* if (message->mime_msg) */
+
     /* more! */
-    if (!message->references_for_threading) {
+    if (!message->references_for_threading
+	&& (!message->in_reply_to || !message->in_reply_to->next)) {
         GList *tmp = g_list_copy(message->references);
 
         if (message->in_reply_to) {
@@ -1278,14 +1284,14 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
              * of this list (which will be the last after reversing it,
              * below) */
             GList *foo =
-                g_list_find_custom(tmp, message->in_reply_to,
+                g_list_find_custom(tmp, message->in_reply_to->data,
                                    (GCompareFunc) strcmp);
                 
             if (foo) {
                 tmp = g_list_remove_link(tmp, foo);
                 g_list_free_1(foo);
             }
-            tmp = g_list_prepend(tmp, message->in_reply_to);
+            tmp = g_list_prepend(tmp, message->in_reply_to->data);
         }
 
         message->references_for_threading = g_list_reverse(tmp);
@@ -1301,24 +1307,45 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
     }
 }
 
+static GList *
+references_decode(const gchar * str)
+{
+    GMimeReferences *references, *reference;
+    GList *list = NULL;
+
+    reference = references = g_mime_references_decode(str);
+    while (reference) {
+	list = g_list_prepend(list, g_strdup(reference->msgid));
+	reference = reference->next;
+    }
+    g_mime_references_clear(&references);
+
+    return g_list_reverse(list);
+}
+
 void
 libbalsa_message_set_references_from_string(LibBalsaMessage * message,
 					    const gchar *str)
 {
-    GMimeReferences *references, *reference;
-
     g_return_if_fail(message->references == NULL);
     g_return_if_fail(str != NULL);
 
-    reference = references = g_mime_references_decode(str);
-    while (reference) {
-	message->references =
-	    g_list_prepend(message->references,
-			   g_strdup_printf("<%s>", reference->msgid));
-	reference = reference->next;
+    message->references = references_decode(str);
+}
+
+void
+libbalsa_message_set_in_reply_to_from_string(LibBalsaMessage * message,
+					     const gchar * str)
+{
+    g_return_if_fail(message->in_reply_to == NULL);
+
+    if (str) {
+	/* FIXME for Balsa's old non-compliant header */
+	gchar *p = strrchr(str, ';');
+	p = p ? g_strndup(str, p - str) : g_strdup(str);
+	message->in_reply_to = references_decode(p);
+	g_free(p);
     }
-    g_mime_references_clear(&references);
-    message->references = g_list_reverse(message->references);	
 }
 
 /* libbalsa_message_title:
@@ -1448,15 +1475,10 @@ libbalsa_message_set_header_from_string(LibBalsaMessage *message, gchar *line)
 	    libbalsa_address_new_list_from_string(value);
     } else
     if (g_ascii_strcasecmp(name, "In-Reply-To") == 0) {
-	gchar *tmp;
-        message->in_reply_to = g_mime_utils_8bit_header_decode(value);
-	if (message->in_reply_to && (tmp = strchr(message->in_reply_to, ';')))
-	    tmp[0] = 0;
+	libbalsa_message_set_in_reply_to_from_string(message, value);
     } else
     if (g_ascii_strcasecmp(name, "Message-ID") == 0) {
-	gchar *message_id = g_mime_utils_decode_message_id(value);
-	message->message_id = g_strdup_printf("<%s>", message_id);
-	g_free(message_id);
+	message->message_id = g_mime_utils_decode_message_id(value);
     } else
     if (g_ascii_strcasecmp(name, "References") == 0) {
 	libbalsa_message_set_references_from_string(message, value);

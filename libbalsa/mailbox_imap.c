@@ -1509,13 +1509,11 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 	libbalsa_address_new_list_from_imap_address_list(envelope->cc);
     message->headers->bcc_list =
 	libbalsa_address_new_list_from_imap_address_list(envelope->bcc);
-    message->in_reply_to =
-	g_mime_utils_8bit_header_decode(envelope->in_reply_to);
+    libbalsa_message_set_in_reply_to_from_string(message,
+						 envelope->in_reply_to);
     if (envelope->message_id) {
-	gchar *message_id;
-	message_id = g_mime_utils_decode_message_id(envelope->message_id);
-	message->message_id = g_strdup_printf("<%s>", message_id);
-	g_free(message_id);
+	message->message_id =
+	    g_mime_utils_decode_message_id(envelope->message_id);
     }
 }
 

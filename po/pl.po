@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-10-25 12:14+0200\n"
-"PO-Revision-Date: 2001-10-25 12:16+0200\n"
+"POT-Creation-Date: 2001-11-05 13:55+0100\n"
+"PO-Revision-Date: 2001-11-05 17:49+0100\n"
 "Last-Translator: GNOME PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -168,7 +168,7 @@ msgstr "Dziedzina:"
 
 #. bcc:
 #: libbalsa/identity.c:1 libbalsa/identity.c:1 src/balsa-message.c:1
-#: src/print.c:1 src/sendmsg-window.c:1
+#: src/print.c:1 src/sendmsg-window.c:1 src/store-address.c:1
 msgid "Bcc:"
 msgstr "Bcc:"
 
@@ -183,6 +183,10 @@ msgstr "Przedrostek oznaczaj±cy przes³anie:"
 #: libbalsa/identity.c:1 libbalsa/identity.c:1
 msgid "Signature Path:"
 msgstr "¦cie¿ka pliku z podpisem"
+
+#: libbalsa/identity.c:1 libbalsa/identity.c:1
+msgid "Execute Signature"
+msgstr "Z³o¿enie podpisu"
 
 #: libbalsa/identity.c:1 libbalsa/identity.c:1
 msgid "Append Signature"
@@ -494,11 +498,11 @@ msgstr "Roz³±czony"
 msgid "SMTP server problem: %s"
 msgstr "Problem z serwerem SMTP: %s"
 
-#: libbalsa/source-viewer.c:1
+#: libbalsa/source-viewer.c:1 src/main-window.c:1
 msgid "_Select Text"
 msgstr "Zaznacz _tekst"
 
-#: libbalsa/source-viewer.c:1
+#: libbalsa/source-viewer.c:1 src/main-window.c:1
 msgid "Select entire mail"
 msgstr "Zaznacza ca³y list"
 
@@ -586,6 +590,10 @@ msgstr ""
 msgid "All Done!"
 msgstr "Gotowe!"
 
+#: libinit_balsa/balsa-druid-page-finish.gob:1
+msgid "GnomeCard Address Book"
+msgstr "Ksi±¿ka adresowa GnomeCard"
+
 #: libinit_balsa/balsa-druid-page-user.gob:1
 msgid "Please enter information about yourself."
 msgstr "Wprowad¼ informacje o sobie."
@@ -644,10 +652,6 @@ msgid ""
 msgstr ""
 "Spowoduje do zakoñczenie Balsy.\n"
 "Czy na pewno chcesz to zrobiæ?"
-
-#: libinit_balsa/balsa-initdruid.gob:1
-msgid "GnomeCard Address Book"
-msgstr "Ksi±¿ka adresowa GnomeCard"
 
 #: libinit_balsa/helper.c:1
 #, c-format
@@ -1354,6 +1358,10 @@ msgid "File name"
 msgstr "Nazwa pliku"
 
 #: src/address-book-config.c:1 src/address-book-config.c:1
+msgid "Select path for address book"
+msgstr "Wybór ¶cie¿ki ksi±¿ki adresowej"
+
+#: src/address-book-config.c:1 src/address-book-config.c:1
 #: src/address-book-config.c:1
 msgid "_Expand aliases as you type"
 msgstr "_Rozwijanie aliasów w trakcie pisania"
@@ -1491,16 +1499,16 @@ msgid "Forward Inline..."
 msgstr "Prze¶lij w tre¶ci listu..."
 
 #: src/balsa-index.c:1
+msgid "Store Address..."
+msgstr "Zapisz adres..."
+
+#: src/balsa-index.c:1
 msgid "Undelete"
 msgstr "Odtwórz"
 
 #: src/balsa-index.c:1
 msgid "Move To Trash"
 msgstr "Wyrzuæ do ¶mietnika"
-
-#: src/balsa-index.c:1
-msgid "Store Address..."
-msgstr "Zapisz adres..."
 
 #: src/balsa-index.c:1
 msgid "Toggle"
@@ -1560,18 +1568,19 @@ msgstr "Data:"
 
 #. From:
 #: src/balsa-message.c:1 src/filter-edit-dialog.c:1 src/print.c:1
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:1 src/store-address.c:1
 msgid "From:"
 msgstr "Od:"
 
 #. To:
 #: src/balsa-message.c:1 src/filter-edit-dialog.c:1 src/print.c:1
-#: src/sendmsg-window.c:1
+#: src/sendmsg-window.c:1 src/store-address.c:1
 msgid "To:"
 msgstr "Dla:"
 
 #. cc:
 #: src/balsa-message.c:1 src/print.c:1 src/sendmsg-window.c:1
+#: src/store-address.c:1
 msgid "Cc:"
 msgstr "Cc:"
 
@@ -1953,6 +1962,30 @@ msgid "Select parent folder"
 msgstr "Wybór folderu nadrzêdnego"
 
 #: src/folder-conf.c:1
+#, c-format
+msgid ""
+"Renaming INBOX is special!\n"
+"You will create a subfolder %s in %s\n"
+"containing the messages from INBOX.\n"
+"INBOX and its subfolders will remain.\n"
+"What would you like to do?"
+msgstr ""
+"Zmiana nazwy INBOX jest traktowana w specjalny sposób!\n"
+"Zostanie stworzony %s wewn±trz %s,\n"
+"zawieraj±cy listy z INBOX.\n"
+"INBOX wraz z podfolderami pozostanie.\n"
+"Co chcesz zrobiæ?"
+
+#: src/folder-conf.c:1
+msgid "Rename INBOX"
+msgstr "Zmieñ nazwê"
+
+#: src/folder-conf.c:1 src/folder-conf.c:1 src/mailbox-conf.c:1
+#: src/mailbox-conf.c:1 src/mailbox-conf.c:1 src/sendmsg-window.c:1
+msgid "Cancel"
+msgstr "Anuluj"
+
+#: src/folder-conf.c:1
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
@@ -1984,31 +2017,6 @@ msgstr "Folder _nadrzêdny:"
 #: src/folder-conf.c:1
 msgid "Browse..."
 msgstr "Przegl±daj..."
-
-#: src/folder-conf.c:1
-#, c-format
-msgid ""
-"Renaming INBOX is special!\n"
-"You will create a subfolder %s in %s\n"
-"containing the messages from INBOX.\n"
-"INBOX and its subfolders will remain.\n"
-"What would you like to do?"
-msgstr ""
-"Zmiana nazwy INBOX jest traktowana w specjalny sposób!\n"
-"Zostanie stworzony %s wewn±trz %s,\n"
-"zawieraj±cy listy z INBOX.\n"
-"INBOX wraz z podfolderami pozostanie.\n"
-"Co chcesz zrobiæ?"
-
-#: src/folder-conf.c:1
-msgid "Rename INBOX"
-msgstr "Zmieñ nazwê"
-
-#: src/folder-conf.c:1 src/folder-conf.c:1 src/mailbox-conf.c:1
-#: src/mailbox-conf.c:1 src/mailbox-conf.c:1 src/sendmsg-window.c:1
-#: src/toolbar-prefs.c:1
-msgid "Cancel"
-msgstr "Anuluj"
 
 #: src/folder-conf.c:1
 msgid ""
@@ -2230,7 +2238,7 @@ msgstr "Zdalny folder podrzêdny IMAP..."
 msgid "Open"
 msgstr "Otwórz"
 
-#: src/mailbox-node.c:1 src/toolbar-prefs.c:1
+#: src/mailbox-node.c:1
 msgid "Close"
 msgstr "Zamknij"
 
@@ -2337,8 +2345,20 @@ msgid "Send messages from the outbox"
 msgstr "Wysy³a listy z folderu \"Poczta wychodz±ca\""
 
 #: src/main-window.c:1
+msgid "Send and _Receive Mail"
+msgstr "Wy¶lij i p_obierz listy"
+
+#: src/main-window.c:1
+msgid "Send and Receive messages"
+msgstr "Wysy³a i pobiera listy"
+
+#: src/main-window.c:1
 msgid "_Print..."
 msgstr "Wy_drukuj..."
+
+#: src/main-window.c:1
+msgid "Print currently selected messages"
+msgstr "Drukuje zaznaczone listy"
 
 #: src/main-window.c:1
 msgid "_Address Book..."
@@ -2456,7 +2476,7 @@ msgstr "Prze³±cza oznaczenie listu jako nowy"
 msgid "_Reply..."
 msgstr "_Odpisz..."
 
-#: src/main-window.c:1 src/toolbar-prefs.c:1
+#: src/main-window.c:1
 msgid "Reply to the current message"
 msgstr "Odpowiada na bie¿±cy list"
 
@@ -2472,7 +2492,7 @@ msgstr "Odpowiada wszystkim adresatom i autorowi listu"
 msgid "Reply to _Group..."
 msgstr "Do g_rupy..."
 
-#: src/main-window.c:1 src/message-window.c:1 src/toolbar-prefs.c:1
+#: src/main-window.c:1 src/message-window.c:1
 msgid "Reply to mailing list"
 msgstr "Odpowiada na listê dyskusyjn±"
 
@@ -2750,6 +2770,10 @@ msgid "Opens first unread mailbox"
 msgstr "Otwiera pierwsz± nie sprawdzon± skrzynkê"
 
 #: src/main.c:1
+msgid "Opens default Inbox on startup"
+msgstr "Otwiera przy uruchamianiu domy¶ln± skrzynkê z poczt± nadchodz±c±"
+
+#: src/main.c:1
 msgid "Debug POP3 connection"
 msgstr "¦ledzenie po³±czenia POP3"
 
@@ -2874,7 +2898,7 @@ msgstr "W³a¶ciwo¶ci listów"
 msgid "Display"
 msgstr "Wy¶wietlanie"
 
-#: src/pref-manager.c:1 src/toolbar-prefs.c:1
+#: src/pref-manager.c:1
 msgid "Spelling"
 msgstr "Pisownia"
 
@@ -3252,6 +3276,10 @@ msgid "Options"
 msgstr "Opcje"
 
 #: src/pref-manager.c:1
+msgid "Open Inbox upon startup"
+msgstr "Otwieranie przy uruchamianiu skrzynki z poczt± nadchodz±c±"
+
+#: src/pref-manager.c:1
 msgid "Check mail upon startup"
 msgstr "Sprawdzanie poczty przy uruchamianiu"
 
@@ -3387,7 +3415,7 @@ msgstr "Z_a³±cz listy"
 msgid "_Send"
 msgstr "_Wy¶lij"
 
-#: src/sendmsg-window.c:1 src/toolbar-prefs.c:1
+#: src/sendmsg-window.c:1
 msgid "Send this message"
 msgstr "Wysy³a list"
 
@@ -3654,7 +3682,7 @@ msgstr ""
 msgid "Closing the Compose Window"
 msgstr "Zamykanie okna tworzenia listu"
 
-#: src/sendmsg-window.c:1 src/toolbar-prefs.c:1
+#: src/sendmsg-window.c:1
 msgid "Select Identity"
 msgstr "To¿samo¶æ"
 
@@ -3801,7 +3829,7 @@ msgstr "Odpowied¼"
 msgid "Forward message"
 msgstr "Przes³anie listu dalej"
 
-#: src/sendmsg-window.c:1 src/toolbar-prefs.c:1
+#: src/sendmsg-window.c:1
 msgid "Continue message"
 msgstr "Kontynuacja listu"
 
@@ -3859,6 +3887,34 @@ msgid "Revert all changes and finish spell checking"
 msgstr "Wycofuje wszystkie zmiany i koñczy sprawdzanie pisowni"
 
 #: src/store-address.c:1
+msgid "Store address: no addresses"
+msgstr "Zapis adresu: brak adresów"
+
+#: src/store-address.c:1
+msgid "Store Address"
+msgstr "Zapis adresu"
+
+#: src/store-address.c:1
+msgid "Save in address book"
+msgstr "Zapisz w ksi±¿ce adresowej"
+
+#: src/store-address.c:1
+msgid "No address book selected...."
+msgstr "Nie wybrano ksi±¿ki adresowej"
+
+#: src/store-address.c:1
+msgid "Sorry, no semicolons are allowed in the name!\n"
+msgstr "Niestety, umieszczanie ¶redników w nazwie nie jest dopuszczalne!\n"
+
+#: src/store-address.c:1
+msgid "Choose Address Book"
+msgstr "Wybór ksi±¿ki adresowej"
+
+#: src/store-address.c:1
+msgid "Choose Address"
+msgstr "Wybór adresu"
+
+#: src/store-address.c:1
 msgid "Card Name:"
 msgstr "Nazwa karty:"
 
@@ -3882,227 +3938,9 @@ msgstr "Organizacja:"
 msgid "Email Address:"
 msgstr "Adres e-mail:"
 
-#: src/store-address.c:1
-msgid "In order to store an address, you must select a message.\n"
-msgstr "Aby zapisaæ adres, musisz zaznaczyæ list.\n"
-
-#: src/store-address.c:1
-msgid "You may only store one address at a time.\n"
-msgstr "Mo¿na zapisaæ jednocze¶nie tylko jeden adres.\n"
-
-#: src/store-address.c:1
-msgid "This message doesn't contain an e-mail address.\n"
-msgstr "List nie zawiera adresu e-mail.\n"
-
-#: src/store-address.c:1
-msgid "Store Address"
-msgstr "Zapis adresu"
-
-#: src/store-address.c:1
-msgid "Contact Information"
-msgstr "Informacje kontaktowe"
-
-#: src/store-address.c:1
-msgid "No address book selected...."
-msgstr "Nie wybrano ksi±¿ki adresowej"
-
-#: src/store-address.c:1
-msgid "Sorry, no semicolons are allowed in the name!\n"
-msgstr "Niestety, umieszczanie ¶redników w nazwie nie jest dopuszczalne!\n"
-
-#: src/toolbar-prefs.c:1 src/toolbar-prefs.c:1
+#: src/toolbar-prefs.c:1
 msgid "Separator"
 msgstr "Separator"
-
-#: src/toolbar-prefs.c:1
-msgid "Check"
-msgstr "Sprawd¼"
-
-#: src/toolbar-prefs.c:1
-msgid "Check for new email"
-msgstr "Sprawdza now± pocztê"
-
-#: src/toolbar-prefs.c:1
-msgid "Compose"
-msgstr "Nowy"
-
-#: src/toolbar-prefs.c:1
-msgid "Compose message"
-msgstr "Tworzy nowy list"
-
-#: src/toolbar-prefs.c:1
-msgid "Continue"
-msgstr "Kontynuuj"
-
-#: src/toolbar-prefs.c:1
-msgid "Reply"
-msgstr "Odpisz"
-
-#: src/toolbar-prefs.c:1
-msgid ""
-"Reply\n"
-"to all"
-msgstr "Wszystkim"
-
-#: src/toolbar-prefs.c:1
-msgid "Reply to all recipients"
-msgstr "Odpowiada autorowi i wszystkim adresatom listu"
-
-#: src/toolbar-prefs.c:1
-msgid ""
-"Reply\n"
-"to group"
-msgstr "Do grupy"
-
-#: src/toolbar-prefs.c:1
-msgid "Forward"
-msgstr "Dalej"
-
-#: src/toolbar-prefs.c:1
-msgid "Forward the current message"
-msgstr "Przesy³a bie¿±cy list dalej"
-
-#: src/toolbar-prefs.c:1
-msgid "Previous"
-msgstr "Poprzedni"
-
-#: src/toolbar-prefs.c:1
-msgid "Open previous"
-msgstr "Otwiera poprzedni list"
-
-#: src/toolbar-prefs.c:1
-msgid "Next"
-msgstr "Nastêpny"
-
-#: src/toolbar-prefs.c:1
-msgid "Open next"
-msgstr "Otwiera nastêpny list"
-
-#: src/toolbar-prefs.c:1
-msgid ""
-"Next\n"
-"unread"
-msgstr "Nast. NP"
-
-#: src/toolbar-prefs.c:1
-msgid "Open next unread message"
-msgstr "Otwiera nastêpny nieprzeczytany list"
-
-#: src/toolbar-prefs.c:1
-msgid ""
-"Next\n"
-"flagged"
-msgstr ""
-"Nastêpny\n"
-"oznakowany"
-
-#: src/toolbar-prefs.c:1
-msgid "Open next flagged message"
-msgstr "Otwiera nastêpny oznakowany list"
-
-#: src/toolbar-prefs.c:1
-msgid ""
-"Trash /\n"
-"Delete"
-msgstr "Usuñ"
-
-#: src/toolbar-prefs.c:1
-msgid "Move the current message to trash"
-msgstr "Przenosi bie¿±cy list do ¶mietnika"
-
-#: src/toolbar-prefs.c:1
-msgid "Print"
-msgstr "Wydrukuj"
-
-#: src/toolbar-prefs.c:1
-msgid "Print current message"
-msgstr "Drukuje bie¿±cy list"
-
-#: src/toolbar-prefs.c:1
-msgid "Send"
-msgstr "Wy¶lij"
-
-#: src/toolbar-prefs.c:1
-msgid "Attach"
-msgstr "Za³±cz"
-
-#: src/toolbar-prefs.c:1
-msgid "Add attachments to this message"
-msgstr "Dodaje do listu za³±czniki"
-
-#: src/toolbar-prefs.c:1
-msgid "Save"
-msgstr "Zapisz"
-
-#: src/toolbar-prefs.c:1
-msgid "Save the current item"
-msgstr "Zapisuje bie¿±cy element"
-
-#: src/toolbar-prefs.c:1
-msgid "Set identity to use for this message"
-msgstr "Wybiera to¿samo¶æ wykorzystan± przy wys³aniu listu"
-
-#: src/toolbar-prefs.c:1
-msgid "Run a spell check"
-msgstr "Rozpoczyna sprawdzanie pisowni listu"
-
-#: src/toolbar-prefs.c:1
-msgid "Cancel this message"
-msgstr "Porzuca tworzenie listu"
-
-#: src/toolbar-prefs.c:1
-msgid ""
-"Toggle\n"
-"new"
-msgstr ""
-"Prze³±cz\n"
-"nowy"
-
-#: src/toolbar-prefs.c:1
-msgid "Toggle new message flag"
-msgstr "Prze³±cza oznaczenie listu jako nowy"
-
-#: src/toolbar-prefs.c:1
-msgid "Mark all"
-msgstr "Zaznacz wszystkie"
-
-#: src/toolbar-prefs.c:1
-msgid "Mark all messages in current mailbox"
-msgstr "Zaznacza wszystkie listy w bie¿±cej skrzynce"
-
-#: src/toolbar-prefs.c:1
-msgid ""
-"All\n"
-"headers"
-msgstr ""
-"Wszystkie\n"
-"nag³ówki"
-
-#: src/toolbar-prefs.c:1
-msgid "Show all headers"
-msgstr "Wy¶wietla wszystkie nag³ówki"
-
-#: src/toolbar-prefs.c:1
-msgid "Empty Trash"
-msgstr "Opró¿nij ¶mietnik"
-
-#: src/toolbar-prefs.c:1
-msgid "Delete messages from the trash mailbox"
-msgstr "Usuwa listy ze skrzynki ¶mietnika"
-
-#: src/toolbar-prefs.c:1
-msgid "Close current mailbox"
-msgstr "Zamyka bie¿±c± skrzynkê"
-
-#: src/toolbar-prefs.c:1
-msgid ""
-"Preview\n"
-"pane"
-msgstr "Podgl±d listu"
-
-#: src/toolbar-prefs.c:1
-msgid "Show preview pane"
-msgstr "Podgl±d listu wewn±trz okna"
 
 #: src/toolbar-prefs.c:1
 msgid "Customize"

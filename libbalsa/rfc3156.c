@@ -1833,9 +1833,9 @@ get_passphrase_cb(void *opaque, const char *uid_hint,
     }
 #else
 #ifdef ENABLE_PCACHE
-    passwd = get_passphrase_real(cb_data, uid_hint, prev_was_bad, pcache);
+    passwd = get_passphrase_real(context, uid_hint, prev_was_bad, pcache);
 #else
-    passwd = get_passphrase_real(cb_data, uid_hint, prev_was_bad);
+    passwd = get_passphrase_real(context, uid_hint, prev_was_bad);
 #endif				/* ENABLE_PCACHE */
 #endif				/* BALSA_USE_THREADS */
 

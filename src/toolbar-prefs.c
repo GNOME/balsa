@@ -98,7 +98,7 @@ static void source_selected_cb(GtkCList *clist, gint row, gint column,
                                GdkEventButton *event, gpointer user_data);
 static void source_unselected_cb(GtkCList *clist, gint row, gint column,
                                  GdkEventButton *event, gpointer user_data);
-static void dest_selecteded_cb(GtkCList *clist, gint row, gint column,
+static void dest_selected_cb(GtkCList *clist, gint row, gint column,
                                GdkEventButton *event, gpointer user_data);
 static void dest_unselected_cb(GtkCList *clist, gint row, gint column,
                                GdkEventButton *event, gpointer user_data);
@@ -292,8 +292,13 @@ recreate_preview(BalsaToolbarType toolbar, gboolean preview_only)
 		bar, text,
 		_(toolbar_buttons[index].help_text),
 		_(toolbar_buttons[index].help_text),
+#if BALSA_MAJOR < 2
 		gnome_stock_pixmap_widget(GTK_WIDGET(balsa_app.main_window),
 					  toolbar_buttons[index].pixmap_id),
+#else
+                gtk_image_new_from_stock(toolbar_buttons[index].pixmap_id,
+                                         GTK_ICON_SIZE_BUTTON),
+#endif                          /* BALSA_MAJOR < 2 */
 		NULL,
 		NULL);
 	    if(word_wrap) 
@@ -301,15 +306,28 @@ recreate_preview(BalsaToolbarType toolbar, gboolean preview_only)
 
 	    toolbar_items[toolbar][i].widget=btn;
 	    if(!preview_only) {
+#if BALSA_MAJOR < 2
+#else
+                /* FIXME: nasty hack! */
+                GtkWidget *tmp =
+                    gtk_image_new_from_stock(toolbar_buttons[index].pixmap_id,
+                                             GTK_ICON_SIZE_BUTTON);
+#endif                          /* BALSA_MAJOR < 2 */
+
 		row=gtk_clist_append(
 		    GTK_CLIST(toolbar_pages[toolbar].destination),
 		    list_data);
 		gtk_clist_set_text(
 		    GTK_CLIST(toolbar_pages[toolbar].destination),
 		    row, 1, text);
+#if BALSA_MAJOR < 2
 		gnome_stock_pixmap_gdk(toolbar_buttons[index].pixmap_id,
 				       GNOME_STOCK_PIXMAP_REGULAR,
 				       &pixmap, &mask);
+#else
+                gtk_image_get_pixmap(GTK_IMAGE(tmp), &pixmap, &mask);
+                gtk_widget_destroy(tmp);
+#endif                          /* BALSA_MAJOR < 2 */
 		gtk_clist_set_pixmap(
 		    GTK_CLIST(toolbar_pages[toolbar].destination),
 		    row, 0, pixmap, mask);
@@ -591,9 +609,19 @@ populate_list(GtkWidget *list, int toolbar)
 	tmp[1]=NULL;
 	row=gtk_clist_append(GTK_CLIST(list), tmp);
 	if(*(toolbar_buttons[i].pixmap_id)) {
+#if BALSA_MAJOR < 2
 	    gnome_stock_pixmap_gdk(toolbar_buttons[i].pixmap_id,
 				   GNOME_STOCK_PIXMAP_REGULAR,
 				   &pixmap, &mask);
+#else
+            /* FIXME: nasty hack! */
+            GtkWidget *tmp =
+                gtk_image_new_from_stock(toolbar_buttons[i].pixmap_id,
+                                         GTK_ICON_SIZE_BUTTON);
+            gtk_image_get_pixmap(GTK_IMAGE(tmp), &pixmap, &mask);
+            gtk_widget_destroy(tmp);
+#endif                          /* BALSA_MAJOR < 2 */
+
 	    gtk_clist_set_pixmap(GTK_CLIST(list), row, 0, pixmap, mask);
 	}
 	text = wrap = g_strdup(_(toolbar_buttons[i].button_text));
@@ -707,6 +735,7 @@ create_toolbar_page(BalsaToolbarType toolbar)
     gtk_container_set_border_width(GTK_CONTAINER(preview_ctlbox), 5);
 
     /* The preview is an actual, fully functional toolbar */
+#if BALSA_MAJOR < 2
     preview_box=GTK_WIDGET(gtk_toolbar_new(GTK_ORIENTATION_HORIZONTAL,
 					   GTK_TOOLBAR_BOTH));
     gtk_toolbar_set_space_style(GTK_TOOLBAR(preview_box),
@@ -715,6 +744,12 @@ create_toolbar_page(BalsaToolbarType toolbar)
 				  GTK_RELIEF_NONE);
     gtk_toolbar_set_space_size(GTK_TOOLBAR(preview_box),
 			       18);
+#else
+    preview_box = GTK_WIDGET(gtk_toolbar_new());
+    gtk_toolbar_set_orientation(GTK_TOOLBAR(preview_box), 
+                                GTK_ORIENTATION_HORIZONTAL);
+    gtk_toolbar_set_style(GTK_TOOLBAR(preview_box), GTK_TOOLBAR_BOTH);
+#endif                          /* BALSA_MAJOR < 2 */
     toolbar_pages[toolbar].preview=preview_box;
 
     /* embedded in a scrolled_window */
@@ -785,9 +820,8 @@ create_toolbar_page(BalsaToolbarType toolbar)
     gtk_box_pack_start(GTK_BOX(center_button_box), button_box,
 		       FALSE, FALSE, 0);
 
-    back_button=gnome_pixmap_button(
-	gnome_stock_pixmap_widget(outer_box, GNOME_STOCK_PIXMAP_UP),
-	_("Up"));
+    back_button = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_UP,
+                                                _("Up"));
     toolbar_pages[toolbar].back_button=back_button;
 
     gtk_box_pack_start(GTK_BOX(button_box), back_button, FALSE, FALSE, 0);
@@ -795,25 +829,22 @@ create_toolbar_page(BalsaToolbarType toolbar)
     move_button_box=gtk_hbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(button_box), move_button_box, FALSE, FALSE, 0);
 
-    remove_button=gnome_pixmap_button(
-	gnome_stock_pixmap_widget(outer_box, GNOME_STOCK_PIXMAP_BACK),
-	_("-"));
+    remove_button = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_BACK,
+                                                  "-");
     toolbar_pages[toolbar].remove_button=remove_button;
 
     gtk_box_pack_start(GTK_BOX(move_button_box),
 		       remove_button, FALSE, FALSE, 0);
 
-    add_button=gnome_pixmap_button(
-	gnome_stock_pixmap_widget(outer_box, GNOME_STOCK_PIXMAP_FORWARD),
-	_("+"));
+    add_button = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_FORWARD,
+                                               "+");
     toolbar_pages[toolbar].add_button=add_button;
 
     gtk_box_pack_start(GTK_BOX(move_button_box),
 		       add_button, FALSE, FALSE, 0);
 
-    forward_button=gnome_pixmap_button(
-	gnome_stock_pixmap_widget(outer_box, GNOME_STOCK_PIXMAP_DOWN),
-	_("Down"));
+    forward_button = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_DOWN,
+                                                   _("Down"));
     toolbar_pages[toolbar].forward_button=forward_button;
 
     gtk_box_pack_start(GTK_BOX(button_box), forward_button, FALSE, FALSE, 0);
@@ -828,39 +859,50 @@ create_toolbar_page(BalsaToolbarType toolbar)
 
     /* Frame signals */
     gtk_signal_connect(GTK_OBJECT(outer_box), "destroy",
-		       page_destroy_cb, (gpointer)toolbar);
+		       GTK_SIGNAL_FUNC(page_destroy_cb),
+                       (gpointer)toolbar);
 
     gtk_signal_connect(GTK_OBJECT(customize_widget), "apply",
 		       GTK_SIGNAL_FUNC(apply_toolbar_prefs), (gpointer)toolbar);
 
     /* UI signals */
     gtk_signal_connect(GTK_OBJECT(list), "select-row",
-		       source_selected_cb, (gpointer)toolbar);
+		       GTK_SIGNAL_FUNC(source_selected_cb),
+                       (gpointer)toolbar);
     gtk_signal_connect(GTK_OBJECT(list), "unselect-row",
-		       source_unselected_cb, (gpointer)toolbar);
+		       GTK_SIGNAL_FUNC(source_unselected_cb),
+                       (gpointer)toolbar);
 
     gtk_signal_connect(GTK_OBJECT(destination), "select-row",
-		       dest_selected_cb, (gpointer)toolbar);
+		       GTK_SIGNAL_FUNC(dest_selected_cb),
+                       (gpointer)toolbar);
     gtk_signal_connect(GTK_OBJECT(destination), "unselect-row",
-		       dest_unselected_cb, (gpointer)toolbar);
+		       GTK_SIGNAL_FUNC(dest_unselected_cb),
+                       (gpointer)toolbar);
 
     gtk_signal_connect(GTK_OBJECT(add_button), "clicked",
-		       add_button_cb, (gpointer)toolbar);
+		       GTK_SIGNAL_FUNC(add_button_cb),
+                       (gpointer)toolbar);
 
     gtk_signal_connect(GTK_OBJECT(remove_button), "clicked",
-		       remove_button_cb, (gpointer)toolbar);
+		       GTK_SIGNAL_FUNC(remove_button_cb),
+                       (gpointer)toolbar);
 
     gtk_signal_connect(GTK_OBJECT(forward_button), "clicked",
-		       forward_button_cb, (gpointer)toolbar);
+		       GTK_SIGNAL_FUNC(forward_button_cb),
+                       (gpointer)toolbar);
 
     gtk_signal_connect(GTK_OBJECT(back_button), "clicked",
-		       back_button_cb, (gpointer)toolbar);
+		       GTK_SIGNAL_FUNC(back_button_cb),
+                       (gpointer)toolbar);
 
     gtk_signal_connect(GTK_OBJECT(wrap_button), "toggled",
-		       wrap_toggled_cb, (gpointer)toolbar);
+		       GTK_SIGNAL_FUNC(wrap_toggled_cb),
+                       (gpointer)toolbar);
 
     gtk_signal_connect(GTK_OBJECT(outer_box), "expose-event",
-		       page_active_cb, (gpointer)wrap_button);
+		       GTK_SIGNAL_FUNC(page_active_cb),
+                       (gpointer)wrap_button);
 
     gtk_widget_set_sensitive(add_button, FALSE);
     gtk_widget_set_sensitive(remove_button, FALSE);

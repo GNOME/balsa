@@ -20,7 +20,6 @@
  */
 
 /* MAKE SURE YOU USE THE HELPER FUNCTIONS, like create_table(), etc. */
-#if 0
 #include "config.h"
 
 #include <gnome.h>
@@ -208,6 +207,11 @@ static void spelling_optionmenu_cb(GtkItem * menuitem, gpointer data);
 static void threading_optionmenu_cb(GtkItem* menuitem, gpointer data);
 static void set_default_address_book_cb(GtkWidget * button, gpointer data);
 static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox);
+#if BALSA_MAJOR < 2
+#else
+static void balsa_help_pbox_display(GnomePropertyBox * property_box,
+                                    gint page_num);
+#endif                          /* BALSA_MAJOR < 2 */
 
 guint toolbar_type[NUM_TOOLBAR_MODES] = {
     GTK_TOOLBAR_TEXT,
@@ -262,9 +266,12 @@ const gchar* threading_style_label[NUM_THREADING_STYLES] = {
 void
 open_preferences_manager(GtkWidget * widget, gpointer data)
 {
-    static GnomeHelpMenuEntry help_entry = { NULL, "preferences" };
     GnomeApp *active_win = GNOME_APP(data);
     gint i;
+#if BALSA_MAJOR < 2
+    static GnomeHelpMenuEntry help_entry = { NULL, "preferences" };
+    help_entry.name = gnome_app_id;
+#endif
 
     /* only one preferences manager window */
     if (already_open) {
@@ -319,12 +326,14 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     for (i = 0; i < NUM_TOOLBAR_MODES; i++) {
 	gtk_signal_connect(GTK_OBJECT(pui->toolbar_type[i]), "clicked",
-			   properties_modified_cb, property_box);
+			   GTK_SIGNAL_FUNC(properties_modified_cb),
+                           property_box);
     }
 
     for (i = 0; i < NUM_PWINDOW_MODES; i++) {
 	gtk_signal_connect(GTK_OBJECT(pui->pwindow_type[i]), "clicked",
-			   properties_modified_cb, property_box);
+			   GTK_SIGNAL_FUNC(properties_modified_cb),
+                           property_box);
     }
 
     gtk_signal_connect(GTK_OBJECT(pui->previewpane), "toggled",
@@ -380,7 +389,8 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     for (i = 0; i < NUM_ENCODING_MODES; i++) {
 	gtk_signal_connect(GTK_OBJECT(pui->encoding_type[i]), "clicked",
-			   properties_modified_cb, property_box);
+			   GTK_SIGNAL_FUNC(properties_modified_cb),
+                           property_box);
     }
     gtk_signal_connect(GTK_OBJECT(pui->mail_directory), "changed",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
@@ -550,10 +560,15 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(property_box), "apply",
 		       GTK_SIGNAL_FUNC(apply_prefs), pui);
 
-    help_entry.name = gnome_app_id;
+#if BALSA_MAJOR < 2
     gtk_signal_connect(GTK_OBJECT(property_box), "help",
 		       GTK_SIGNAL_FUNC(gnome_help_pbox_display),
 		       &help_entry);
+#else
+    gtk_signal_connect(GTK_OBJECT(property_box), "help",
+		       GTK_SIGNAL_FUNC(balsa_help_pbox_display),
+                       NULL);
+#endif                          /* BALSA_MAJOR < 2 */
 
     gtk_widget_show_all(GTK_WIDGET(property_box));
 
@@ -579,7 +594,7 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     GtkWidget *balsa_window;
     GtkWidget *entry_widget;
     GtkWidget *menu_item;
-    gchar* tmp;
+    const gchar* tmp;
 
     if (page_num != -1)
 	return;
@@ -1404,12 +1419,12 @@ create_mailserver_page(gpointer data)
     gtk_clist_set_column_widget(GTK_CLIST(pui->mail_servers), 1, label15);
     gtk_label_set_justify(GTK_LABEL(label15), GTK_JUSTIFY_LEFT);
     gtk_signal_connect(GTK_OBJECT(pui->mail_servers), "select-row",
-                       mail_servers_cb, NULL);
+                       GTK_SIGNAL_FUNC(mail_servers_cb), NULL);
 
     vbox1 = vbox_in_container(hbox1);
-    add_button_to_box(_("Add"),    server_add_cb,  vbox1);
-    add_button_to_box(_("Modify"), server_edit_cb, vbox1);
-    add_button_to_box(_("Delete"), server_del_cb,  vbox1);
+    add_button_to_box(_("Add"),    GTK_SIGNAL_FUNC(server_add_cb),  vbox1);
+    add_button_to_box(_("Modify"), GTK_SIGNAL_FUNC(server_edit_cb), vbox1);
+    add_button_to_box(_("Delete"), GTK_SIGNAL_FUNC(server_del_cb),  vbox1);
 
     frame4 = gtk_frame_new(_("Local mail"));
     gtk_table_attach(GTK_TABLE(table3), frame4, 0, 1, 1, 2,
@@ -2412,10 +2427,14 @@ create_address_book_page(gpointer data)
     gtk_clist_set_column_widget(GTK_CLIST(pui->address_books), 2, label);
 
     vbox = vbox_in_container(hbox);
-    add_button_to_box(_("Add"),            address_book_add_cb,         vbox);
-    add_button_to_box(_("Modify"),         address_book_edit_cb,        vbox);
-    add_button_to_box(_("Delete"),         address_book_delete_cb,      vbox);
-    add_button_to_box(_("Set as default"), set_default_address_book_cb, vbox);
+    add_button_to_box(_("Add"),
+                      GTK_SIGNAL_FUNC(address_book_add_cb),         vbox);
+    add_button_to_box(_("Modify"),
+                      GTK_SIGNAL_FUNC(address_book_edit_cb),        vbox);
+    add_button_to_box(_("Delete"),         
+                      GTK_SIGNAL_FUNC(address_book_delete_cb),      vbox);
+    add_button_to_box(_("Set as default"), 
+                      GTK_SIGNAL_FUNC(set_default_address_book_cb), vbox);
 
     update_address_books();
 
@@ -2436,7 +2455,7 @@ properties_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 static void
 font_changed(GtkWidget * widget, GtkWidget * pbox)
 {
-    gchar *font;
+    const gchar *font;
     GtkWidget *peer;
     if (GNOME_IS_FONT_PICKER(widget)) {
 	font = gnome_font_picker_get_font_name(GNOME_FONT_PICKER(widget));
@@ -2564,17 +2583,21 @@ server_add_cb(GtkWidget * widget, gpointer data)
 
     menu = gtk_menu_new();
     menuitem = gtk_menu_item_new_with_label(_("Remote POP3 mailbox..."));
-    gtk_signal_connect(GTK_OBJECT(menuitem), "activate", pop3_add, NULL);
+    gtk_signal_connect(GTK_OBJECT(menuitem), "activate",
+                       GTK_SIGNAL_FUNC(pop3_add),
+                       NULL);
     gtk_menu_append(GTK_MENU(menu), menuitem);
     gtk_widget_show(menuitem);
     menuitem = gtk_menu_item_new_with_label(_("Remote IMAP mailbox..."));
     gtk_signal_connect(GTK_OBJECT(menuitem), "activate",
-		       mailbox_conf_add_imap_cb, NULL);
+		       GTK_SIGNAL_FUNC(mailbox_conf_add_imap_cb),
+                       NULL);
     gtk_menu_append(GTK_MENU(menu), menuitem);
     gtk_widget_show(menuitem);
     menuitem = gtk_menu_item_new_with_label(_("Remote IMAP folder..."));
     gtk_signal_connect(GTK_OBJECT(menuitem), "activate",
-		       folder_conf_add_imap_cb, NULL);
+		       GTK_SIGNAL_FUNC(folder_conf_add_imap_cb),
+                       NULL);
     gtk_menu_append(GTK_MENU(menu), menuitem);
     gtk_widget_show(menuitem);
     gtk_widget_show(menu);
@@ -2680,7 +2703,8 @@ create_pref_option_menu(const gchar * names[], gint size, gint * index, GtkSigna
 	menuitem = gtk_menu_item_new_with_label(names[i]);
 	gtk_object_set_data(GTK_OBJECT(menuitem), "menu_index",
 			    GINT_TO_POINTER(i));
-	gtk_signal_connect(GTK_OBJECT(menuitem), "select", callback,
+	gtk_signal_connect(GTK_OBJECT(menuitem), "select",
+                           GTK_SIGNAL_FUNC(callback),
 			   (gpointer) index);
 	gtk_signal_connect(GTK_OBJECT(menuitem), "select",
 			   GTK_SIGNAL_FUNC(properties_modified_cb),
@@ -2775,4 +2799,21 @@ refresh_preferences_manager(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->browse_wrap),
                                  balsa_app.browse_wrap);
 }
-#endif
+
+#if BALSA_MAJOR < 2
+#else
+static void
+balsa_help_pbox_display(GnomePropertyBox * property_box, gint page_num)
+{
+    gchar *help_path = g_strdup_printf("preferences-%d", page_num);
+    GError *err = NULL;
+
+    gnome_help_display_uri(help_path, &err);
+    if (err) {
+        g_print(_("Error displaying %s: %s\n"), help_path, err->message);
+        g_error_free(err);
+    }
+
+    g_free(help_path);
+}
+#endif                          /* BALSA_MAJOR < 2 */

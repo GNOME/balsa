@@ -1,5 +1,14 @@
 2002-03-09  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
+	* configure.in: gtkhtml was renamed to libgkthtml. Take into account.
+	* src/address-book-config.c, address-book.c:
+	* src/balsa-app.c,balsa-icons.c, filter-edit-dialog.c:
+	* src/filter-run-dialog.c, pref-manager.c,store-address.c: reduce
+	number of preprocessor conditionals.
+	* src/toolbar-factory.c,toolbar-prefs.c: port to gnome2.
+	
+2002-03-09  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
 	* libinit_balsa/*: get rid of gob. Port to gnome2.
 	* configure.in: remove test for gob.
 

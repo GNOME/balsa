@@ -151,7 +151,7 @@ balsa_address_book_init(BalsaAddressBook *ab)
 	*box2,
 	*scrolled_window,
 	*ab_option, *ab_menu, *menu_item,
-	*stock_widget, *frame, *label;
+	*frame, *label;
     GList *ab_list;
     LibBalsaAddressBook *address_book;
     guint default_offset = 0;
@@ -280,34 +280,14 @@ balsa_address_book_init(BalsaAddressBook *ab)
     gtk_box_pack_start(GTK_BOX(hbox), ab->arrow_box, FALSE, FALSE, 1);
     gtk_widget_show(ab->arrow_box);
     
-    /* FIXME: Can make a stock button in one call... */
-    w = gtk_button_new();
-#if BALSA_MAJOR < 2
-    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab),
-					     GNOME_STOCK_PIXMAP_FORWARD);
-#else
-    stock_widget = gtk_image_new_from_stock(GNOME_STOCK_PIXMAP_FORWARD,
-                                            GTK_ICON_SIZE_BUTTON);
-#endif                          /* BALSA_MAJOR < 2 */
-    gtk_container_add(GTK_CONTAINER(w), stock_widget);
+    w = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_FORWARD, "");
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
-    gtk_widget_show(stock_widget);
     gtk_widget_show(w);
     gtk_signal_connect(GTK_OBJECT(w), "clicked",
 		       GTK_SIGNAL_FUNC(balsa_address_book_move_to_recipient_list),
 		       ab);
     
-    w = gtk_button_new();
-    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
-#if BALSA_MAJOR < 2
-    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab),
-					     GNOME_STOCK_PIXMAP_BACK);
-#else
-    stock_widget = gtk_image_new_from_stock(GNOME_STOCK_PIXMAP_BACK,
-                                            GTK_ICON_SIZE_BUTTON);
-#endif                          /* BALSA_MAJOR < 2 */
-    gtk_container_add(GTK_CONTAINER(w), stock_widget);
-    gtk_widget_show(stock_widget);
+    w = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_BACK, "");
     gtk_widget_show(w);
     gtk_signal_connect(GTK_OBJECT(w), "clicked",
 		       GTK_SIGNAL_FUNC(balsa_address_book_remove_from_recipient_list),
@@ -335,31 +315,19 @@ balsa_address_book_init(BalsaAddressBook *ab)
     gtk_hbutton_box_set_layout_default(GTK_BUTTONBOX_START);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
     gtk_widget_show(GTK_WIDGET(hbox));
-#if BALSA_MAJOR < 2
-    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab),
-					     GNOME_STOCK_PIXMAP_OPEN);
-#else
-    stock_widget = gtk_image_new_from_stock(GNOME_STOCK_PIXMAP_OPEN,
-                                            GTK_ICON_SIZE_BUTTON);
-#endif                          /* BALSA_MAJOR < 2 */
-    w = gtk_button_new_with_label(_("Run GnomeCard"));
-    gtk_container_add(GTK_CONTAINER(w), stock_widget);
+
+    w = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_OPEN,
+                                      _("Run GnomeCard"));
     gtk_signal_connect(GTK_OBJECT(w), "clicked",
-		       GTK_SIGNAL_FUNC(balsa_address_book_run_gnomecard), NULL);
+		       GTK_SIGNAL_FUNC(balsa_address_book_run_gnomecard),
+                       NULL);
     gtk_container_add(GTK_CONTAINER(hbox), w);
     gtk_widget_show(GTK_WIDGET(w));
 
-    /* FIXME: Should strive to not need this?? */
-#if BALSA_MAJOR < 2
-    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab),
-					     GNOME_STOCK_PIXMAP_ADD);
-#else
-    stock_widget = gtk_image_new_from_stock(GNOME_STOCK_PIXMAP_ADD,
-                                            GTK_ICON_SIZE_BUTTON);
-#endif                          /* BALSA_MAJOR < 2 */
-    w = gtk_button_new_with_label(_("Re-Import"));
-    gtk_container_add(GTK_CONTAINER(w), stock_widget);
-    gtk_signal_connect(GTK_OBJECT(w), "clicked", GTK_SIGNAL_FUNC(balsa_address_book_reload),
+    w = balsa_stock_button_with_label(GNOME_STOCK_PIXMAP_ADD, 
+                                      _("Re-Import"));
+    gtk_signal_connect(GTK_OBJECT(w), "clicked",
+                       GTK_SIGNAL_FUNC(balsa_address_book_reload),
 		       ab);
     gtk_container_add(GTK_CONTAINER(hbox), w);
     gtk_widget_show(w);

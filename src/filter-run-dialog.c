@@ -216,7 +216,6 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     GtkWidget *sw;
     static gchar *titles_available[] = { N_("Name") };
     static gchar *titles_selected[] = { N_("Name"),N_("On reception"),N_("On exit") };
-    GtkWidget *pixmap;
     guint i;
 
 
@@ -297,28 +296,12 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
 
     /* FIXME : I saw a lot of different ways to create button with pixmaps, hope this one is correct*/
     /* Right/Add button */
-#if BALSA_MAJOR < 2
-    pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_FORWARD);
-    button = gnome_pixmap_button(pixmap,"");
-#else
-    pixmap = gtk_image_new_from_stock(GNOME_STOCK_MENU_FORWARD,
-                                      GTK_ICON_SIZE_BUTTON);
-    button = gtk_button_new_with_label("");
-    gtk_container_add(GTK_CONTAINER(button), pixmap);
-#endif                          /* BALSA_MAJOR < 2 */
+    button = balsa_stock_button_with_label(GNOME_STOCK_MENU_FORWARD, "");
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
 		       GTK_SIGNAL_FUNC(fr_add_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* Left/Remove button */
-#if BALSA_MAJOR < 2
-    pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_BACK);
-    button = gnome_pixmap_button(pixmap,"");
-#else
-    pixmap = gtk_image_new_from_stock(GNOME_STOCK_MENU_BACK,
-                                      GTK_ICON_SIZE_BUTTON);
-    button = gtk_button_new_with_label("");
-    gtk_container_add(GTK_CONTAINER(button), pixmap);
-#endif                          /* BALSA_MAJOR < 2 */
+    button = balsa_stock_button_with_label(GNOME_STOCK_MENU_BACK, "");
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
 		       GTK_SIGNAL_FUNC(fr_remove_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
@@ -360,28 +343,12 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
 
     /* up button */
-#if BALSA_MAJOR < 2
-    pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_UP);
-    button = gnome_pixmap_button(pixmap, _("Up"));
-#else
-    pixmap = gtk_image_new_from_stock(GNOME_STOCK_MENU_UP,
-                                      GTK_ICON_SIZE_BUTTON);
-    button = gtk_button_new_with_label("");
-    gtk_container_add(GTK_CONTAINER(button), pixmap);
-#endif                          /* BALSA_MAJOR < 2 */
+    button = balsa_stock_button_with_label(GNOME_STOCK_MENU_UP, _("Up"));
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
 		       GTK_SIGNAL_FUNC(fr_up_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* down button */
-#if BALSA_MAJOR < 2
-    pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_DOWN);
-    button = gnome_pixmap_button(pixmap, _("Down"));
-#else
-    pixmap = gtk_image_new_from_stock(GNOME_STOCK_MENU_DOWN,
-                                      GTK_ICON_SIZE_BUTTON);
-    button = gtk_button_new_with_label("");
-    gtk_container_add(GTK_CONTAINER(button), pixmap);
-#endif                          /* BALSA_MAJOR < 2 */
+    button = balsa_stock_button_with_label(GNOME_STOCK_MENU_DOWN, _("Down"));
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
 		       GTK_SIGNAL_FUNC(fr_down_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);

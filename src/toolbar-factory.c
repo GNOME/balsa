@@ -497,8 +497,14 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
 	if(i >= 100) /* FIXME: what is this magic number? */
 	    return NULL;
 	++toolbar_map_entries;
+#if BALSA_MAJOR < 2
 	bar=GTK_TOOLBAR(gtk_toolbar_new(GTK_ORIENTATION_HORIZONTAL,
 					GTK_TOOLBAR_BOTH));
+#else
+        bar = GTK_TOOLBAR(gtk_toolbar_new());
+        gtk_toolbar_set_orientation(bar, GTK_ORIENTATION_HORIZONTAL);
+        gtk_toolbar_set_style(bar, GTK_TOOLBAR_BOTH);
+#endif                          /* BALSA_MAJOR < 2 */
     } else {
 	bar=GTK_TOOLBAR(toolbar_map[i].toolbar);
 	/* remove all items from the existing bar. */
@@ -509,7 +515,9 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
     toolbar_map[i].window=window;
     toolbar_map[i].type=toolbar;
     
+#if BALSA_MAJOR < 2
     gtk_toolbar_set_space_style(bar, GTK_TOOLBAR_SPACE_LINE);
+#endif                          /* BALSA_MAJOR < 2 */
     
     if(create_stock_toolbar(toolbar) == -1)
 	return NULL;
@@ -565,9 +573,14 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
 		    bar, type, NULL, text, 
 		    _(toolbar_buttons[button].help_text),
 		    _(toolbar_buttons[button].help_text),
+#if BALSA_MAJOR < 2
 		    gnome_stock_pixmap_widget(
 			window, toolbar_buttons[button].pixmap_id),
-		    tmpdata[i].callback,
+#else
+                    gtk_image_new_from_stock(toolbar_buttons[button].pixmap_id,
+                                             GTK_ICON_SIZE_BUTTON),
+#endif                          /* BALSA_MAJOR < 2 */
+		    GTK_SIGNAL_FUNC(tmpdata[i].callback),
 		    tmpdata[i].data != NULL ? tmpdata[i].data : window);
 	    g_free(text);
 	    tmpdata[i].position=position++;

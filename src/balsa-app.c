@@ -496,15 +496,18 @@ open_mailboxes_idle_cb(gchar * names[])
 GtkWidget *
 balsa_stock_button_with_label(const char *icon, const char *label)
 {
+    GtkWidget *button;
+    GtkWidget *pixmap;
 #if BALSA_MAJOR < 2
-    return gnome_pixmap_button(gnome_stock_new_with_icon(icon), label);
+    pixmap = gnome_stock_new_with_icon(icon);
+    button = gnome_pixmap_button(pixmap, label);
 #else
-    GtkWidget *button = gtk_button_new_with_label(label);
-    GtkWidget *pixmap = gtk_image_new_from_stock(icon,
-                                                 GTK_ICON_SIZE_BUTTON);
+    button = label
+        && *label ? gtk_button_new_with_label(label) : gtk_button_new();
+    pixmap = gtk_image_new_from_stock(icon, GTK_ICON_SIZE_BUTTON);
     gtk_container_add(GTK_CONTAINER(button), pixmap);
+#endif                          /* BALSA_MAJOR < 2 */
     return button;
-#endif              /* BALSA_MAJOR < 2 */
 }
 
 static gint

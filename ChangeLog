@@ -1,5 +1,7 @@
-2004-06-04 16:00  PeterB
+2004-06-04 17:26  PeterB
 
+	* src/filter-edit-callbacks.c: allow editing of compound
+	conditions.
 	* libbalsa/filter-funcs.c: eat space between left and right
 	conditions.
 	* src/main-window.c: document, and fix typo.

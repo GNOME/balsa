@@ -119,7 +119,7 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
   balsa_app.mdi_style = GNOME_MDI_DEFAULT_MODE;
 
-  gnome_sound_init("localhost");
+  gnome_sound_init ("localhost");
 
   gnome_sound_play (gnome_sound_file ("balsa/startup.wav"));
 
@@ -207,6 +207,8 @@ read_signature (void)
 {
   FILE *fp;
   size_t len;
+
+  g_free (balsa_app.signature);
 
   if (!(fp = fopen (balsa_app.signature_path, "r")))
     return FALSE;

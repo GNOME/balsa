@@ -1,3 +1,8 @@
+2003-02-16 10:05  PeterB
+
+	* src/mailbox-node.c: Find special mailboxes by mailbox instead of
+	by url.
+
 2003-02-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-mblist.c (bmbl_node_style): enforce view update (gtk2-2.2).

@@ -1,3 +1,9 @@
+2003-09-10 06:07  PeterB
+
+	* src/main-window.c: Set mailbox tab color on opening; flush the
+	display before gdk_threads_leave().
+	* src/balsa-mblist.c: Restore color to mailbox tabs.
+
 2003-09-09  Carlos Morgado  <chbm chbm.net>
 
 	* libmutt:

@@ -282,7 +282,8 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	do {
 	    LibBalsaMessage *message =
 		libbalsa_mailbox_get_message(tmp_mailbox, msgno);
-	    message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
+	    message->flags |= (LIBBALSA_MESSAGE_FLAG_NEW |
+			       LIBBALSA_MESSAGE_FLAG_RECENT);
 	    msg_list = g_list_prepend(msg_list, message);
 	} while (--msgno > 0);
 

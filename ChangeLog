@@ -1,3 +1,9 @@
+2000-08-06  Ian Campbell  <ijc25@cam.ac.uk>
+	* libbalsa/server.c: Emit signals properly. This fixes the problem
+	with adding/updating POP3 mailboxes.
+	* src/balsa-mblist.c: Cast paramter to gtk_idle_add to allow
+	compile with full warnings.
+
 2000-08-06  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/balsa-mblist.c: use main_window as colormap source, needed for 

@@ -147,7 +147,7 @@ void libbalsa_server_set_username(LibBalsaServer *server, const gchar *username)
   g_return_if_fail(server != NULL);
   g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-  gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_USERNAME]);
+  gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_USERNAME], username);
 }
 
 void libbalsa_server_set_password(LibBalsaServer *server, const gchar *passwd)
@@ -155,7 +155,7 @@ void libbalsa_server_set_password(LibBalsaServer *server, const gchar *passwd)
   g_return_if_fail(server != NULL);
   g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-  gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_PASSWORD]);
+  gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_PASSWORD], passwd);
 }
 
 void libbalsa_server_set_host(LibBalsaServer *server, const gchar *host, gint port)
@@ -163,7 +163,7 @@ void libbalsa_server_set_host(LibBalsaServer *server, const gchar *host, gint po
   g_return_if_fail(server != NULL);
   g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-  gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_HOST]);
+  gtk_signal_emit(GTK_OBJECT(server), libbalsa_server_signals[SET_HOST], host, port);
 }
 
 static void 

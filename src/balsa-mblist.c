@@ -733,7 +733,7 @@ void
 balsa_mblist_have_new (BalsaMBList * bmbl)
 {
   bmbl->needs_update  = TRUE;
-  gtk_idle_add(do_have_new, bmbl);
+  gtk_idle_add((GtkFunction)do_have_new, bmbl);
 }
 
 /* balsa_mblist_check_new [MBG]

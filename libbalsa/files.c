@@ -74,29 +74,28 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
 	g_free(cat);
     }
 
-    if (prefixes == NULL) {
-	if (warn)
-            g_warning("Cannot find expected file \"%s\" "
-                      "(spliced with \"%s\") with no extra prefixes",
-	              filename, splice);
-	return NULL;
+    if(prefixes) {
+        for (i = 0; prefixes[i]; i++) {
+            cat =
+                g_strconcat(prefixes[i], PATH_SEP_STR, splice, PATH_SEP_STR,
+                            filename, NULL);
+            
+            if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
+                return cat;
+            
+            g_free(cat);
+        }
     }
-
-    for (i = 0; prefixes[i]; i++) {
-	cat =
-	    g_strconcat(prefixes[i], PATH_SEP_STR, splice, PATH_SEP_STR,
-			filename, NULL);
-
-	if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
-	    return cat;
-
-	g_free(cat);
-    }
+    cat =  g_strconcat("images", PATH_SEP_STR, filename, NULL);
+    if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
+        return cat;
+    g_free(cat);
 
     if (warn)
         g_warning("Cannot find expected file \"%s\" "
-                  "(spliced with \"%s\") even with extra prefixes",
-	          filename, splice);
+                  "(spliced with \"%s\") %s extra prefixes",
+	          filename, splice,
+                  prefixes ? "even with" : "with no");
     return NULL;
 }
 
@@ -139,6 +138,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
 	    *p_gnome_icon = '-';
 
         tmp = g_strconcat("document-icons/", gnome_icon, NULL);
+	g_free(icon);
         icon = gnome_vfs_icon_path_from_filename(tmp);
         g_free(tmp);
 

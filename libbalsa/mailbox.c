@@ -994,8 +994,10 @@ lbm_entry_check(LibBalsaMailbox * mailbox, guint msgno)
     unread = (entry->status_icon == LIBBALSA_MESSAGE_STATUS_UNREAD);
     while ((node = node->parent) && (msgno = GPOINTER_TO_UINT(node->data))) {
 	entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
-	entry->has_unseen_child =
-	    unread ? 1 : lbm_node_has_unseen_child(mailbox, node);
+        if(entry) /* We may have info about the children but not about
+                   * the parent: eg. imap. */
+            entry->has_unseen_child =
+                unread ? 1 : lbm_node_has_unseen_child(mailbox, node);
     }
 }
 

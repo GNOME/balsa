@@ -1,5 +1,9 @@
 2000-05-20  Peter Williams  <peter@beta.newton.cx>
 
+	* libinit_balsa/Makefile.am: @MAINT@ the gob rule,
+	add a nasty dist-hook thing to pick up the generated
+	sources.
+
 	* AUTHORS README TODO INSTALL NEWS balsa.1.in
 	help/C/balsa.sgml: Documentation updates to
 	make this the official 0.8.0

@@ -34,11 +34,7 @@ GOBFILES =				\
 	balsa-druid-page-directory.gob	\
 	balsa-druid-page-finish.gob
 
-%.c %.h: %.gob
-	gob --no-private-header $<
-
-EXTRA_DIST = $(GOBFILES) \
-	$(BUILT_SOURCES)
+EXTRA_DIST = $(GOBFILES)
 
 INCLUDES=-I. -I$(top_srcdir) \
 	-I$(top_builddir)/libmutt \
@@ -47,3 +43,9 @@ INCLUDES=-I. -I$(top_srcdir) \
 	-I$(top_srcdir)/src \
 	$(GNOME_INCLUDEDIR)
 
+dist-hook:
+	test -n "$(BUILT_SOURCES)" \
+		&& cp -f $(BUILT_SOURCES) $(distdir)
+
+@MAINT@%.c %.h: %.gob
+@MAINT@	gob --no-private-header $<

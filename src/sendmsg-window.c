@@ -1593,15 +1593,15 @@ attachment_menu_vfs_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
     g_return_if_fail(info != NULL);
 
     if ((id = g_object_get_data (G_OBJECT (menu_item), "mime_action"))) {
-#if HAVE_GNOME_VFS28
+#if HAVE_GNOME_VFS29
         GnomeVFSMimeApplication *app=
             gnome_vfs_mime_application_new_from_desktop_id(id);
-#else /* HAVE_GNOME_VFS28 */
+#else /* HAVE_GNOME_VFS29 */
         GnomeVFSMimeApplication *app=
             gnome_vfs_mime_application_new_from_id(id);
-#endif /* HAVE_GNOME_VFS28 */
+#endif /* HAVE_GNOME_VFS29 */
         if (app) {
-#if HAVE_GNOME_VFS28
+#if HAVE_GNOME_VFS29
             gboolean tmp = gnome_vfs_mime_application_supports_uris(app);
             gchar *uri = tmp ? g_strconcat("file://", info->filename, NULL)
                              : g_strdup(info->filename);
@@ -1609,7 +1609,7 @@ attachment_menu_vfs_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
             gnome_vfs_mime_application_launch(app, uris);
             g_free(uri);
             g_list_free(uris);
-#else /* HAVE_GNOME_VFS28 */
+#else /* HAVE_GNOME_VFS29 */
 	    gboolean tmp =
 		(app->expects_uris ==
 		 GNOME_VFS_MIME_APPLICATION_ARGUMENT_TYPE_URIS);
@@ -1620,7 +1620,7 @@ attachment_menu_vfs_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
 	    gnome_execute_shell(NULL, exe_str);
 	    fprintf(stderr, "Executed: %s\n", exe_str);
 	    g_free (exe_str);
-#endif /* HAVE_GNOME_VFS28 */
+#endif /* HAVE_GNOME_VFS29 */
 	    gnome_vfs_mime_application_free(app);    
         } else {
             fprintf(stderr, "lookup for application %s returned NULL\n", id);

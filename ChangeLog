@@ -9,7 +9,16 @@
 	declarations from spell-check.h to spell-check.c.
 	* src/message-window.c, print.c, quote-color.c, save-restore.c:
 	* src/store-address.c, toolbar-factory.c: replace deprecated items.
-
+	* src/balsa-index.c: keep keyboard focus in message body.
+	* src/balsa-message.[ch]: remove balsa_message_clear (unnecessary).
+	* src/main-window.[ch]: grab the focus to the message index only when 
+	switching notebook pages; store idle-handler ids as GObject data.
+	* src/main.c: move initialization of balsa_app.visual and 
+	balsa_app.colormap to balsa-app.c; set GNOME_PARAM_APP_PREFIX and 
+	GNOME_PARAM_APP_DATADIR on startup.
+	* src/balsa-app.c: initialize balsa_app.visual and balsa_app.colormap 
+	here instead of in main.c.
+	
 2002-10-30  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/main.c: do not hang when called with -m (#97168).

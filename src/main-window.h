@@ -48,7 +48,6 @@ struct _BalsaWindow {
     GtkWidget *vpaned;
     GtkWidget *current_index;
     LibBalsaMessage *current_message;
-    guint set_message_id;
 };
 
 struct _BalsaWindowClass {

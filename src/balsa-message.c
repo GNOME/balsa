@@ -476,18 +476,11 @@ bm_message_weak_ref_cb(BalsaMessage * bm, LibBalsaMessage * message)
     }
 }
 
-void
-balsa_message_clear(BalsaMessage * bm)
-{
-    g_return_if_fail(bm != NULL);
-
-    balsa_message_set(bm, NULL);
-
-}
-
 /* balsa_message_set:
    returns TRUE on success, FALSE on failure (message content could not be
    accessed).
+
+   if message == NULL, clears the display and returns TRUE
 */
 gboolean
 balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)

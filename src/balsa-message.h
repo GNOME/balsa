@@ -79,7 +79,6 @@ struct _BalsaMessageClass {
 GtkType balsa_message_get_type(void);
 GtkWidget *balsa_message_new(void);
 
-void balsa_message_clear(BalsaMessage * bmessage);
 gboolean balsa_message_set(BalsaMessage * bmessage,
 			   LibBalsaMessage * message);
 

@@ -147,10 +147,8 @@ balsa_init(int argc, char **argv)
     
     gnome_program_init(PACKAGE, VERSION, LIBGNOMEUI_MODULE, argc, argv,
                        GNOME_PARAM_POPT_TABLE, options,
-                       /* FIXME: should Makefile.am define PREFIX,
-                        * SYSCONFDIR, DATADIR and LIBDIR?
-                        * if it did, we'd use:
-                        * GNOME_PROGRAM_STANDARD_PROPERTIES, */
+                       GNOME_PARAM_APP_PREFIX, BALSA_STD_PREFIX,
+                       GNOME_PARAM_APP_DATADIR, BALSA_STD_PREFIX "/share",
                        NULL);
 }
 
@@ -357,12 +355,6 @@ main(int argc, char *argv[])
 
     /* Initialize libbalsa */
     libbalsa_init((LibBalsaInformationFunc) balsa_information);
-
-    gtk_widget_set_default_colormap(gdk_rgb_get_colormap());
-
-    /* Allocate the best colormap we can get */
-    balsa_app.visual = gdk_visual_get_best();
-    balsa_app.colormap = gdk_colormap_new(balsa_app.visual, TRUE);
 
     /* checking for valid config files */
     config_init();

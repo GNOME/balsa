@@ -2983,6 +2983,7 @@ mw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
 /* When page is switched we change the preview window and the selected 
    mailbox in the mailbox tree.
  */
+#define BALSA_INDEX_GRAB_FOCUS "balsa-index-grab-focus"
 static void
 notebook_switch_page_cb(GtkWidget * notebook,
                         GtkNotebookPage * notebookpage, guint page_num)
@@ -3013,6 +3014,7 @@ notebook_switch_page_cb(GtkWidget * notebook,
         gtk_window_set_title(GTK_WINDOW(window), "Balsa");
     }
 
+    g_object_set_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS, index);
     balsa_window_idle_replace(window, index->current_message);
     enable_message_menus(index->current_message);
     enable_mailbox_menus(index);
@@ -3045,15 +3047,20 @@ balsa_window_index_changed_cb(GtkWidget * widget, gpointer data)
     balsa_window_idle_replace(window, index->current_message);
 }
 
+#define BALSA_SET_MESSAGE_ID "balsa-set-message-id"
 static void
 balsa_window_idle_replace(BalsaWindow * window, LibBalsaMessage * message)
 {
     if (window->current_message != message) {
         window->current_message = message;
         if (balsa_app.previewpane) {
+            guint set_message_id;
+
             balsa_window_idle_remove(window);
-            window->set_message_id =
+            set_message_id =
                 gtk_idle_add((GtkFunction) balsa_window_idle_cb, window);
+            g_object_set_data(G_OBJECT(window), BALSA_SET_MESSAGE_ID,
+                              GUINT_TO_POINTER(set_message_id));
         }
     }
 }
@@ -3061,29 +3068,45 @@ balsa_window_idle_replace(BalsaWindow * window, LibBalsaMessage * message)
 static void
 balsa_window_idle_remove(BalsaWindow * window)
 {
-    if (window->set_message_id) {
-        gtk_idle_remove(window->set_message_id);
-        window->set_message_id = 0;
+    guint set_message_id =
+        GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(window),
+                                           BALSA_SET_MESSAGE_ID));
+
+    if (set_message_id) {
+        gtk_idle_remove(set_message_id);
+        g_object_set_data(G_OBJECT(window), BALSA_SET_MESSAGE_ID, 
+                          GUINT_TO_POINTER(0));
     }
 }
 
 static gboolean
 balsa_window_idle_cb(BalsaWindow * window)
 {
+    guint set_message_id =
+        GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(window),
+                                           BALSA_SET_MESSAGE_ID));
+    BalsaIndex *index;
+
+    if (set_message_id == 0)
+        return FALSE;
+    g_object_set_data(G_OBJECT(window), BALSA_SET_MESSAGE_ID,
+                      GUINT_TO_POINTER(0));
+
     gdk_threads_enter();
-    if (window->set_message_id) {
-        window->set_message_id = 0;
-        if (window->current_message) {
-            if (balsa_message_set(BALSA_MESSAGE(window->preview),
-                                  window->current_message))
-                gtk_widget_grab_focus(window->current_index);
-            else
-                balsa_information(LIBBALSA_INFORMATION_ERROR,
-                                  _("Cannot access the message's body\n"));
-        } else
-            balsa_message_clear(BALSA_MESSAGE(window->preview));
+
+    if (!balsa_message_set(BALSA_MESSAGE(window->preview),
+                           window->current_message))
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("Cannot access the message's body\n"));
+
+    index = g_object_get_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS);
+    if (index) {
+        gtk_widget_grab_focus(GTK_WIDGET(index));
+        g_object_set_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS, NULL);
     }
+
     gdk_threads_leave();
+
     return FALSE;
 }
 

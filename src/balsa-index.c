@@ -1103,38 +1103,55 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * prev,
     }
 }
 
+static void
+bndx_activate_cursor_key(BalsaIndex * index, guint keyval)
+{
+    gboolean index_has_focus = GTK_WIDGET_HAS_FOCUS(GTK_WIDGET(index));
+    
+    gtk_widget_grab_focus(GTK_WIDGET(index));
+    gtk_bindings_activate(GTK_OBJECT(index), keyval, 0);
+    if (!index_has_focus) {
+        GtkWidget *preview = BALSA_WINDOW(index->window)->preview;
+        gtk_widget_grab_focus(BALSA_MESSAGE(preview)->header_text);
+    }
+}
+
 void
 balsa_index_select_next(BalsaIndex * index)
 {
-    gtk_widget_grab_focus(GTK_WIDGET(index));
-    gtk_bindings_activate(GTK_OBJECT(index), GDK_Down, 0);
+    bndx_activate_cursor_key(index, GDK_Down);
 }
 
 void
 balsa_index_select_previous(BalsaIndex * index)
 {
-    gtk_widget_grab_focus(GTK_WIDGET(index));
-    gtk_bindings_activate(GTK_OBJECT(index), GDK_Up, 0);
+    bndx_activate_cursor_key(index, GDK_Up);
+}
+
+static void
+bndx_select_next_with_flag(BalsaIndex * index, LibBalsaMessageFlag flag)
+{
+    GtkTreeIter iter;
+    gboolean index_has_focus = GTK_WIDGET_HAS_FOCUS(GTK_WIDGET(index));
+    
+    bndx_find_row(index, NULL, &iter, flag, FILTER_NOOP, NULL, NULL);
+    bndx_expand_to_row_and_select(index, &iter);
+    if (!index_has_focus) {
+        GtkWidget *preview = BALSA_WINDOW(index->window)->preview;
+        gtk_widget_grab_focus(BALSA_MESSAGE(preview)->header_text);
+    }
 }
 
 void
 balsa_index_select_next_unread(BalsaIndex * index)
 {
-    GtkTreeIter iter;
-
-    bndx_find_row(index, NULL, &iter, LIBBALSA_MESSAGE_FLAG_NEW,
-                  FILTER_NOOP, NULL, NULL);
-    bndx_expand_to_row_and_select(index, &iter);
+    bndx_select_next_with_flag(index, LIBBALSA_MESSAGE_FLAG_NEW);
 }
 
 void
 balsa_index_select_next_flagged(BalsaIndex * index)
 {
-    GtkTreeIter iter;
-
-    bndx_find_row(index, NULL, &iter, LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                  FILTER_NOOP, NULL, NULL);
-    bndx_expand_to_row_and_select(index, &iter);
+    bndx_select_next_with_flag(index, LIBBALSA_MESSAGE_FLAG_FLAGGED);
 }
 
 void

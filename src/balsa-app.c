@@ -360,8 +360,10 @@ balsa_app_init(void)
     balsa_app.mblist_newmsg_width = NEWMSGCOUNT_DEFAULT_WIDTH;
     balsa_app.mblist_totalmsg_width = TOTALMSGCOUNT_DEFAULT_WIDTH;
 
-    balsa_app.visual = NULL;
-    balsa_app.colormap = NULL;
+    /* Allocate the best colormap we can get */
+    gtk_widget_set_default_colormap(gdk_rgb_get_colormap());
+    balsa_app.visual = gdk_visual_get_best();
+    balsa_app.colormap = gdk_colormap_new(balsa_app.visual, TRUE);
 
     gdk_color_parse(MBLIST_UNREAD_COLOR, &balsa_app.mblist_unread_color);
 

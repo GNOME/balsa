@@ -151,9 +151,9 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
                 return FALSE;  
 	    }
 	    body=content2reply(message,NULL,0,FALSE,FALSE);
-	    if (is_new) libbalsa_message_read(message, FALSE);
 	    if (mbox_locked)
 		UNLOCK_MAILBOX(message->mailbox);
+	    if (is_new) libbalsa_message_read(message, FALSE);
 	    libbalsa_message_body_unref(message);
 	    if (mbox_locked)
 		LOCK_MAILBOX(message->mailbox);

@@ -1,5 +1,5 @@
 [balsa]
 type=exe
-repo_id=balsa
-description=BALSA Client
-localtion-info=balsa
+repo_id=IDL:balsa/simple_send:1.0
+description=BALSA E-mail reader
+location-info=balsa

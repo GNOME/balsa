@@ -1,5 +1,9 @@
-2004-04-21 05:38  PeterB
+2004-04-21 12:42  PeterB
 
+	* libbalsa/mailbox_imap.c: map IMBENC_OTHER to
+	GMIME_PART_ENCODING_DEFAULT.
+	* src/: balsa-mblist.c, main-window.c: use ngettext--fix for bug
+	#116604.
 	* libbalsa/message.c: libbalsa_message_set_headers_from_string sets
 	all headers again.
 

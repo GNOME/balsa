@@ -482,8 +482,6 @@ load_cache(LibBalsaMailbox* mailbox)
         nextkey = gdbm_nextkey(dbf, key);
         free(key.dptr); key = nextkey;
     }
-    free(key.dptr);
-
     gdbm_close(dbf);
     return TRUE;
 }

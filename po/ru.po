@@ -5,15 +5,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 2000-08-31 10:35+0400\n"
-"PO-Revision-Date: 2000-08-31 10:43+04:00\n"
+"POT-Creation-Date: 2000-09-04 20:27+0400\n"
+"PO-Revision-Date: 2000-09-04 20:37+04:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=koi8-r\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: libbalsa/mailbox_imap.c:233
+#: libbalsa/mailbox_imap.c:248
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: Открыто %s Число ссылок: %d\n"
@@ -28,12 +28,12 @@ msgstr "LibBalsaMailboxLocal: Открыто %s Число ссылок: %d\n"
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: Открыто %s Число ссылок: %d\n"
 
-#: libbalsa/send.c:787
+#: libbalsa/send.c:784
 #, c-format
 msgid "Could not find address for host %s."
 msgstr "Не удалось найти адрес для хоста %s."
 
-#: libbalsa/send.c:790
+#: libbalsa/send.c:787
 #, c-format
 msgid "Error: Could not find address for host %s."
 msgstr "Ошибка: Не удалось найти адрес для хоста %s."
@@ -345,8 +345,41 @@ msgstr "Невозможно записать письмо"
 msgid "Unable to get APOP seed from server"
 msgstr "Не удаллось получить зерно APOP с сервера"
 
+#: libmutt/imap/auth.c:110
+msgid "Authenticating (CRAM-MD5)..."
+msgstr "Идентификация (CRAM-MD5)..."
+
+#: libmutt/imap/auth.c:197
+msgid "Authenticating (anonymous)..."
+msgstr "Идентификация (аноним)..."
+
+#: libmutt/imap/auth.c:283
+msgid "Anonymous authentication not supported."
+msgstr "Анонимная идентификация не поддерживается."
+
+#: libmutt/imap/auth.c:296
+msgid "GSSAPI authentication failed."
+msgstr "Сбой идентификации GSSAPI."
+
+#: libmutt/imap/auth.c:324
+msgid "CRAM-MD5 authentication failed."
+msgstr "Сбой идентификации CRAM-MD5."
+
+#: libmutt/imap/auth.c:339
+msgid "Skipping CRAM-MD5 authentication."
+msgstr "Пропуск идентификации CRAM-MD5."
+
+#: libmutt/imap/auth.c:361
+msgid "Logging in..."
+msgstr "Регистрация..."
+
+#. Login failed, try again
+#: libmutt/imap/auth.c:373
+msgid "Login failed."
+msgstr "Сбой регистрации."
+
 #. now begin login
-#: libmutt/imap/auth_gss.c:83
+#: libmutt/imap/auth_gss.c:88
 msgid "Authenticating (GSSAPI)..."
 msgstr "Идентификация (GSSAPI)..."
 
@@ -528,41 +561,51 @@ msgstr "Импортировать только первый адрес"
 msgid "Import all adresses"
 msgstr "Импортировать все адреса"
 
-#: src/balsa-app.c:119
+#: src/balsa-app.c:92
+#, c-format
+msgid ""
+"Opening remote mailbox %s.\n"
+"The password for %s@%s:"
+msgstr ""
+"Отрытие удаленного почтового ящика %s.\n"
+"Пароль для %s@%s:"
+
+#: src/balsa-app.c:95
+#, c-format
+msgid "Mailbox password for %s@%s:"
+msgstr "Пароль для почтового ящика %s@%s:"
+
+#: src/balsa-app.c:145
 msgid "Balsa Warning"
 msgstr "Предупреждение Balsa"
 
-#: src/balsa-app.c:290 src/balsa-app.c:295 src/balsa-app.c:300
-#: src/balsa-app.c:305 src/balsa-app.c:310
+#: src/balsa-app.c:316 src/balsa-app.c:321 src/balsa-app.c:326
+#: src/balsa-app.c:331 src/balsa-app.c:336
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa не может открыть ваш почтовый ящик \"%s\""
 
-#: src/balsa-app.c:290
+#: src/balsa-app.c:316
 msgid "Inbox"
 msgstr "Входящие"
 
-#: src/balsa-app.c:295
+#: src/balsa-app.c:321
 msgid "Outbox"
 msgstr "Исходящие"
 
-#: src/balsa-app.c:300
+#: src/balsa-app.c:326
 msgid "Sentbox"
 msgstr "Отправленные"
 
-#: src/balsa-app.c:305
+#: src/balsa-app.c:331
 msgid "Draftbox"
 msgstr "Черновики"
 
-#: src/balsa-app.c:310
+#: src/balsa-app.c:336
 msgid "Trash"
 msgstr "Мусорная корзина"
 
-#: src/balsa-index-page.c:268
-msgid "Mailbox password:"
-msgstr "Пароль для почтового ящика:"
-
-#: src/balsa-index-page.c:291
+#: src/balsa-index-page.c:256
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -570,48 +613,48 @@ msgstr ""
 "Невозможно открыть почтовый ящик!\n"
 "Проверьте его настройки."
 
-#: src/balsa-index-page.c:531 src/filter-edit-dialog.c:222
+#: src/balsa-index-page.c:496 src/filter-edit-dialog.c:222
 msgid "New"
 msgstr "Новый"
 
-#: src/balsa-index-page.c:534 src/main-window.c:395
+#: src/balsa-index-page.c:499 src/main-window.c:395
 msgid "Reply"
 msgstr "Ответить"
 
-#: src/balsa-index-page.c:537 src/main-window.c:398
+#: src/balsa-index-page.c:502 src/main-window.c:398
 msgid "Reply to all"
 msgstr "Ответить всем"
 
-#: src/balsa-index-page.c:540 src/main-window.c:401
+#: src/balsa-index-page.c:505 src/main-window.c:401
 msgid "Forward"
 msgstr "Переслать"
 
-#: src/balsa-index-page.c:543 src/filter-edit-dialog.c:228
+#: src/balsa-index-page.c:508 src/filter-edit-dialog.c:228
 #: src/main-window.c:388 src/pref-manager.c:947
 msgid "Delete"
 msgstr "Удалить"
 
-#: src/balsa-index-page.c:545
+#: src/balsa-index-page.c:510
 msgid "Undelete"
 msgstr "Восстановить"
 
-#: src/balsa-index-page.c:549 src/balsa-index-page.c:1129
+#: src/balsa-index-page.c:514 src/balsa-index-page.c:1094
 msgid "Store Address"
 msgstr "Сохранить адрес"
 
-#: src/balsa-index-page.c:552 src/main-window.c:311
+#: src/balsa-index-page.c:517 src/main-window.c:311
 msgid "Toggle flagged"
 msgstr "Переключить сигнализируемое"
 
-#: src/balsa-index-page.c:560
+#: src/balsa-index-page.c:525
 msgid "Transfer"
 msgstr "Передать"
 
-#: src/balsa-index-page.c:734
+#: src/balsa-index-page.c:699
 msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr "Извините, в имени не допустимо наличие точки с запятой!\n"
 
-#: src/balsa-index-page.c:766
+#: src/balsa-index-page.c:731
 #, c-format
 msgid ""
 "Unable to open %s for read.\n"
@@ -620,11 +663,11 @@ msgstr ""
 "Не удалось открыть %s для чтения.\n"
 "- %s\n"
 
-#: src/balsa-index-page.c:771
+#: src/balsa-index-page.c:736
 msgid "The Card Name field must be non-empty.\n"
 msgstr "Поле \"Название карточки\" не должно быть пустым.\n"
 
-#: src/balsa-index-page.c:777
+#: src/balsa-index-page.c:742
 #, c-format
 msgid ""
 "There is already an address book entry for %s.\n"
@@ -633,39 +676,39 @@ msgstr ""
 "Для %s уже есть запись в адресной книге.\n"
 "Запустить GnomeCard если хотите отредактировать записи в адресной книге.\n"
 
-#: src/balsa-index-page.c:1041
+#: src/balsa-index-page.c:1006
 msgid "Card Name:"
 msgstr "Название карточки:"
 
-#: src/balsa-index-page.c:1041
+#: src/balsa-index-page.c:1006
 msgid "First Name:"
 msgstr "Имя:"
 
-#: src/balsa-index-page.c:1042
+#: src/balsa-index-page.c:1007
 msgid "Last Name:"
 msgstr "Фамилия:"
 
-#: src/balsa-index-page.c:1042
+#: src/balsa-index-page.c:1007
 msgid "Organization:"
 msgstr "Организация:"
 
-#: src/balsa-index-page.c:1043
+#: src/balsa-index-page.c:1008
 msgid "Email Address:"
 msgstr "Эл.адрес:"
 
-#: src/balsa-index-page.c:1058
+#: src/balsa-index-page.c:1023
 msgid "In order to store an address, you must select a message.\n"
 msgstr "Для того чтобы сохранить адрес, вы должны выбрать сообщение.\n"
 
-#: src/balsa-index-page.c:1068
+#: src/balsa-index-page.c:1033
 msgid "You may only store one address at a time.\n"
 msgstr "Вы можете сохранить только один адрес за раз.\n"
 
-#: src/balsa-index-page.c:1081
+#: src/balsa-index-page.c:1046
 msgid "This message doesn't contain an e-mail address.\n"
 msgstr "Это сообщение не содержит эл.адресов.\n"
 
-#: src/balsa-index-page.c:1132
+#: src/balsa-index-page.c:1097
 msgid "Contact Information"
 msgstr "Контактная информация"
 
@@ -685,7 +728,7 @@ msgstr "Дата"
 msgid "To"
 msgstr "Кому"
 
-#: src/balsa-mblist.c:218 src/mailbox-conf.c:1209
+#: src/balsa-mblist.c:218 src/mailbox-conf.c:1211
 msgid "Mailbox"
 msgstr "Почтовый ящик"
 
@@ -884,7 +927,7 @@ msgstr "В тексте письма"
 msgid "Match string:"
 msgstr "Строка для сравнения:"
 
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1174
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1176
 #: src/pref-manager.c:934
 msgid "Add"
 msgstr "Добавить"
@@ -1004,7 +1047,7 @@ msgstr "Почтовый ящик не найден в узлах balsa_app.mailbox?\n"
 msgid "Mailbox Configurator"
 msgstr "Конфигурация почт. ящика"
 
-#: src/mailbox-conf.c:330 src/mailbox-conf.c:1168
+#: src/mailbox-conf.c:330 src/mailbox-conf.c:1170
 msgid "Update"
 msgstr "Обновить"
 
@@ -1049,70 +1092,70 @@ msgstr "Некоторые из полей пусты."
 msgid "%s on %s"
 msgstr "%s на %s"
 
-#: src/mailbox-conf.c:851
+#: src/mailbox-conf.c:853
 msgid "New mailbox type:"
 msgstr "Тип нового почтового ящика"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:857
+#: src/mailbox-conf.c:859
 msgid "Local mailbox"
 msgstr "Местный почтовый ящик"
 
-#: src/mailbox-conf.c:867
+#: src/mailbox-conf.c:869
 msgid "Single IMAP folder"
 msgstr "Одна папка IMAP"
 
-#: src/mailbox-conf.c:876
+#: src/mailbox-conf.c:878
 msgid "IMAP folder set"
 msgstr "Установлена папка IMAP"
 
 #. mailbox name
-#: src/mailbox-conf.c:901 src/mailbox-conf.c:936 src/mailbox-conf.c:1061
+#: src/mailbox-conf.c:903 src/mailbox-conf.c:938 src/mailbox-conf.c:1063
 msgid "Mailbox Name:"
 msgstr "Название почтового ящика:"
 
 #. path to file
-#: src/mailbox-conf.c:911
+#: src/mailbox-conf.c:913
 msgid "Mailbox path:"
 msgstr "Путь к почтовому ящику:"
 
 #. pop server
-#: src/mailbox-conf.c:953 src/mailbox-conf.c:1071
+#: src/mailbox-conf.c:955 src/mailbox-conf.c:1073
 msgid "Server:"
 msgstr "Сервер:"
 
 #. pop port
-#: src/mailbox-conf.c:972 src/mailbox-conf.c:1085
+#: src/mailbox-conf.c:974 src/mailbox-conf.c:1087
 msgid "Port:"
 msgstr "Порт:"
 
 #. username
-#: src/mailbox-conf.c:991 src/mailbox-conf.c:1100
+#: src/mailbox-conf.c:993 src/mailbox-conf.c:1102
 msgid "Username:"
 msgstr "Имя пользоватеся:"
 
 #. password field
-#: src/mailbox-conf.c:1008 src/mailbox-conf.c:1115
+#: src/mailbox-conf.c:1010 src/mailbox-conf.c:1117
 msgid "Password:"
 msgstr "Пароль:"
 
 #. toggle for apop
-#: src/mailbox-conf.c:1023
+#: src/mailbox-conf.c:1025
 msgid "Use APOP"
 msgstr "Использовать APOP"
 
 #. toggle for check
-#: src/mailbox-conf.c:1031 src/main-window.c:384
+#: src/mailbox-conf.c:1033 src/main-window.c:384
 msgid "Check"
 msgstr "Проверить"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:1039
+#: src/mailbox-conf.c:1041
 msgid "Delete from server"
 msgstr "Удалить с сервера"
 
-#: src/mailbox-conf.c:1128
+#: src/mailbox-conf.c:1130
 msgid "Folder path:"
 msgstr "Путь к папке:"
 

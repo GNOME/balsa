@@ -1,3 +1,7 @@
+2004-01-04  Francisco Javier F. Serrador  <serrador@cvs.gnome.org>
+
+	* src/main.c: Fixed typo staartup-->startup
+
 2004-01-04  Carlos Morgado  <chbm gnome.org>
 
 	* src/Balsa.idl: 

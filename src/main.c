@@ -188,7 +188,7 @@ balsa_init(int argc, char **argv)
 
 	{"checkmail", 'c', POPT_ARG_NONE,
 	 &(cmd_check_mail_on_startup), 0,
-	 N_("Get new mail on staartup"), NULL},
+	 N_("Get new mail on startup"), NULL},
 	{"compose", 'm', POPT_ARG_STRING, &(opt_compose_email),
 	 0, N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
 	{"attach", 'a', POPT_ARG_STRING, &(attachment),

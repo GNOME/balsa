@@ -141,6 +141,9 @@ read_dir (gchar * prefix, struct dirent *d)
   if (!d)
     return;
 
+  if (d->d_name[0] == '.')
+    return;
+
   sprintf (filename, "%s/%s", prefix, d->d_name);
 
   if (stat (filename, &st) == -1)
@@ -157,15 +160,9 @@ read_dir (gchar * prefix, struct dirent *d)
       if (!dpc)
 	return;
       while ((dc = readdir (dpc)) != NULL)
-	{
-	  if (d->d_name[0] == '.')
-	    continue;
-
-	  read_dir (filename, dc);
-	}
+	read_dir (filename, dc);
       closedir (dpc);
     }
-
   else
     {
       if (!strisnum (d->d_name))

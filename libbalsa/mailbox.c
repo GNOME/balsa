@@ -207,14 +207,17 @@ check_all_pop3_hosts (Mailbox * to)
   while (list)
     {
       mailbox = list->data;
-      PopHost = g_strdup (MAILBOX_POP3 (mailbox)->server);
-      PopPort = 110;
-      PopPass = g_strdup (MAILBOX_POP3 (mailbox)->passwd);
-      PopUser = g_strdup (MAILBOX_POP3 (mailbox)->user);
-      mutt_fetchPopMail ();
-      g_free (PopHost);
-      g_free (PopPass);
-      g_free (PopUser);
+      if (MAILBOX_POP3 (mailbox)->check)
+	{
+	  PopHost = g_strdup (MAILBOX_POP3 (mailbox)->server);
+	  PopPort = 110;
+	  PopPass = g_strdup (MAILBOX_POP3 (mailbox)->passwd);
+	  PopUser = g_strdup (MAILBOX_POP3 (mailbox)->user);
+	  mutt_fetchPopMail ();
+	  g_free (PopHost);
+	  g_free (PopPass);
+	  g_free (PopUser);
+	}
       list = list->next;
     }
 }
@@ -292,6 +295,7 @@ mailbox_new (MailboxType type)
       MAILBOX_POP3 (mailbox)->user = NULL;
       MAILBOX_POP3 (mailbox)->passwd = NULL;
       MAILBOX_POP3 (mailbox)->server = NULL;
+      MAILBOX_POP3 (mailbox)->check = FALSE;
       break;
 
     case MAILBOX_IMAP:
@@ -1327,9 +1331,9 @@ message_body_ref (Message * message)
   if (cur->content->type == TYPEMULTIPART)
     {
       cur->content->parts = mutt_parse_multipart (msg->fp,
-						  mutt_get_parameter ("boundary", cur->content->parameter),
-						  cur->content->offset + cur->content->length,
-						  strcasecmp ("digest", cur->content->subtype) == 0);
+		   mutt_get_parameter ("boundary", cur->content->parameter),
+				cur->content->offset + cur->content->length,
+			 strcasecmp ("digest", cur->content->subtype) == 0);
     }
   if (msg != NULL)
     {
@@ -1365,7 +1369,7 @@ message_body_ref (Message * message)
 	      body->mutt_body = bdy;
 	      message->body_list = g_list_append (message->body_list, body);
 	      bdy = bdy->next;
-	      
+
 	    }
 	}
 #endif

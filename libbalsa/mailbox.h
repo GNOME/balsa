@@ -147,6 +147,7 @@ struct _MailboxPOP3
     gchar *user;
     gchar *passwd;
     gchar *server;
+    gboolean check;
   };
 
 

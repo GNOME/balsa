@@ -426,7 +426,8 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 5, 6,
 		    GTK_FILL, GTK_FILL, 0, 0);
 
-  msg->attachments = gnome_icon_list_new (80,NULL,TRUE);
+  msg->attachments = gnome_icon_list_new (16,NULL,FALSE);
+
   gtk_widget_show(msg->attachments);
   gtk_table_attach (GTK_TABLE (table), msg->attachments, 1, 3, 5, 6,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 0, 0);

@@ -62,7 +62,8 @@ static void libbalsa_mailbox_mbox_remove_files(LibBalsaMailboxLocal *mailbox);
 static gboolean libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_mbox_close_backend(LibBalsaMailbox * mailbox);
-static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox);
+static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox,
+                                           gboolean expunge);
 static LibBalsaMessage *libbalsa_mailbox_mbox_get_message(
 						  LibBalsaMailbox * mailbox,
 						  guint msgno);
@@ -491,7 +492,8 @@ static gboolean libbalsa_mailbox_mbox_close_backend(LibBalsaMailbox * mailbox)
     return TRUE;
 }
 
-static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
+static gboolean
+libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 {
     int fd;
     const gchar *path;

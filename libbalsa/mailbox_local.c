@@ -330,7 +330,6 @@ libbalsa_mailbox_free_messages(LibBalsaMailboxLocal *mailbox)
     mbox->total_messages = 0;
     mbox->unread_messages = 0;
 }
-#endif
 
 /* libbalsa_mailbox_sync_backend_real
  * synchronize the frontend and libbalsa: build a list of messages
@@ -385,7 +384,7 @@ libbalsa_mailbox_local_sync_backend_real(LibBalsaMailboxLocal *mailbox,
         g_list_free(q);
     }
 }
-
+#endif
 /* libbalsa_mailbox_link_message:
    MAKE sure the mailbox is LOCKed before entering this routine.
 */ 
@@ -447,38 +446,6 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox)
 					      mailbox->unread_messages > 0);
 
     
-}
-
-/* libbalsa_mailbox_commit:
-   commits the data to storage.
-
-
-   Returns TRUE on success, FALSE on failure.  */
-gboolean
-libbalsa_mailbox_commit(LibBalsaMailbox *mailbox)
-{
-    gboolean rc = TRUE;
-
-    if (MAILBOX_CLOSED(mailbox))
-	return FALSE;
-
-    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
-    /* remove messages flagged for deleting, before committing: */
-    libbalsa_mailbox_local_sync_backend_real
-        (LIBBALSA_MAILBOX_LOCAL(mailbox), TRUE);
-    rc = libbalsa_mailbox_sync_storage(mailbox);
-
-    if (rc == TRUE) {
-	    UNLOCK_MAILBOX(mailbox);
-	    if (mailbox->new_messages) {
-		    libbalsa_mailbox_local_load_messages(mailbox);
-		    rc = 0;
-	    }
-    } else {
-        UNLOCK_MAILBOX(mailbox);
-    }
-
-    return rc;
 }
 
 static void

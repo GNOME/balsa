@@ -58,7 +58,8 @@ static void libbalsa_mailbox_maildir_remove_files(LibBalsaMailboxLocal *mailbox)
 static gboolean libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_maildir_close_backend(LibBalsaMailbox * mailbox);
-static gboolean libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox);
+static gboolean libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox,
+                                              gboolean expunge);
 static struct message_info *message_info_from_msgno(
 						  LibBalsaMailbox * mailbox,
 						  guint msgno);
@@ -626,7 +627,9 @@ maildir_sync(gchar *key, struct message_info *msg_info, const gchar *path)
     }
 }
 
-static gboolean libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox)
+static gboolean
+libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox,
+                              gboolean expunge)
 {
     /*
      * foreach message_info

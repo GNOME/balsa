@@ -1564,7 +1564,8 @@ balsa_close_commit_mailbox_on_timer(GtkWidget * widget, gpointer * data)
                 fprintf(stderr, "Commiting %s, time: %d\n",
                         BALSA_INDEX(index)->mailbox_node->mailbox->url ,
                         time);
-            libbalsa_mailbox_commit(BALSA_INDEX(index)->mailbox_node->mailbox);
+            libbalsa_mailbox_sync_storage
+                (BALSA_INDEX(index)->mailbox_node->mailbox, FALSE);
         }
 	if (i == c)
             continue;
@@ -2903,7 +2904,7 @@ mailbox_commit_changes(GtkWidget * widget, gpointer data)
 
     current_mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
     
-    if (!libbalsa_mailbox_commit(current_mailbox))
+    if (!libbalsa_mailbox_sync_storage(current_mailbox, TRUE))
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Commiting mailbox %s failed."),
                           current_mailbox->name);
@@ -2922,7 +2923,7 @@ mailbox_commit_each(GNode *node, gpointer data)
     if(box->open_ref == 0)
 	return FALSE;
 
-    if (!libbalsa_mailbox_commit(box))
+    if (!libbalsa_mailbox_sync_storage(box, TRUE))
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Commiting mailbox %s failed."),
                           box->name);

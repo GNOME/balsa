@@ -1,3 +1,14 @@
+2003-10-14  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/mailbox.[hc]: remove old crap. fix sync_storage().
+
+	* libbalsa/mailbox_{imap,maildir,mbox,mh}.c: adjustments to sync().
+	* libbalsa/mailbox_local.c: remove old crap.
+	* src/main-window.c: use new sync_storage() method
+
+	* src/information-dialog.[ch]: 
+	* src/main.c: fix bug 124568.
+
 2003-10-14 08:36  PeterB
 
 	* src/message-window.c: Trash the message in the window, not the

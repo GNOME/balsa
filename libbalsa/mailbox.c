@@ -709,40 +709,6 @@ libbalsa_mailbox_type_from_path(const gchar * path)
     return G_TYPE_OBJECT;
 }
 
-#if 0
-void
-libbalsa_mailbox_remove_messages(LibBalsaMailbox * mbox, GList * messages)
-{
-    LOCK_MAILBOX(mbox);
-    for (; messages; messages = g_list_next(messages)) {
-	LibBalsaMessage * message = LIBBALSA_MESSAGE(messages->data);
-
-	message->mailbox = NULL;
-	g_object_unref(G_OBJECT(message));
-	mbox->message_list =
-		g_list_remove(mbox->message_list, message);
-    }
-    UNLOCK_MAILBOX(mbox);
-}
-
-/* libbalsa_mailbox_sync_backend:
- * use libbalsa_mailbox_sync_backend_real to synchronize the frontend and
- * libbalsa
- */
-gint
-libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete)
-{
-    gint res = 0;
-
-    /* only open mailboxes can be commited; lock it instead of opening */
-    g_return_val_if_fail(MAILBOX_OPEN(mailbox), 0);
-    LOCK_MAILBOX_RETURN_VAL(mailbox, 0);
-    libbalsa_mailbox_sync_backend_real(mailbox, delete);
-    UNLOCK_MAILBOX(mailbox);
-    return res;
-}
-#endif
-
 void
 libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 {
@@ -902,20 +868,17 @@ libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox)
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
-    if (libbalsa_mailbox_sync_storage(mailbox) == FALSE)
-	return FALSE;
-
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_backend(mailbox);
 }
 
 gboolean
-libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox)
+libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox, gboolean expunge)
 {
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(!mailbox->readonly, TRUE);
 
-    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->sync(mailbox);
+    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->sync(mailbox, expunge);
 }
 
 LibBalsaMessage*

@@ -230,7 +230,7 @@ struct _LibBalsaMailboxClass {
 			   GSList * conditions);
     void (*save_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     void (*load_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
-    gboolean (*sync) (LibBalsaMailbox * mailbox);
+    gboolean (*sync) (LibBalsaMailbox * mailbox, gboolean expunge);
     int (*add_message) (LibBalsaMailbox * mailbox, LibBalsaMessage * message );
     void (*change_message_flags) (LibBalsaMailbox * mailbox, guint msgno,
                                   LibBalsaMessageFlag set,
@@ -302,7 +302,16 @@ const gchar *libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
 GMimeStream *libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
 						 LibBalsaMessage * message);
 
-gint libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete);
+
+/** libbalsa_mailbox_sync_storage() asks the mailbox to synchronise
+    the memory information about messages with disk. Many drivers
+    update storage immediately and for them this operation may be
+    no-op. When expunge is set, driver is supposed to clean up the mailbox,
+    including physical removal of old deleted messages.
+*/
+
+gboolean libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox,
+                                       gboolean expunge);
 
 /* This function returns TRUE if the mailbox can be matched
    against the given filters (eg : IMAP mailbox can't
@@ -335,7 +344,6 @@ void libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
 int libbalsa_mailbox_copy_message(LibBalsaMessage *message,
 				  LibBalsaMailbox *dest);
 gboolean libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox);
-gboolean libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox);
 
 void libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox,
 					   guint msgno,
@@ -347,7 +355,6 @@ void libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox,
  * misc mailbox releated functions
  */
 GType libbalsa_mailbox_type_from_path(const gchar * filename);
-gboolean libbalsa_mailbox_commit(LibBalsaMailbox* mailbox);
 
 void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
 					      GList * messages,

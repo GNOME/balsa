@@ -111,7 +111,8 @@ static void libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
 
 static gboolean libbalsa_mailbox_imap_close_backend(LibBalsaMailbox * mailbox);
-static gboolean libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox);
+static gboolean libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox,
+                                           gboolean expunge);
 static LibBalsaMessage* libbalsa_mailbox_imap_get_message(LibBalsaMailbox*
 							  mailbox,
 							  guint msgno);
@@ -1187,13 +1188,20 @@ gboolean libbalsa_mailbox_imap_close_backend(LibBalsaMailbox * mailbox)
     return TRUE;
 }
 
-gboolean libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox)
+gboolean
+libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 {
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    gboolean res = TRUE;
 
     g_return_val_if_fail(mimap->opened, FALSE);
-
-    return imap_mbox_expunge(mimap->handle) == IMR_OK;
+    /* we are always in sync, we need only to do expunge now and then */
+    if(expunge) {
+        LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
+        res =  imap_mbox_expunge(mimap->handle) == IMR_OK;
+        UNLOCK_MAILBOX(mailbox);
+    }
+    return res;
 }
 
 static LibBalsaAddress *

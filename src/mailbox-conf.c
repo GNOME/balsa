@@ -747,6 +747,13 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 
     mailbox = mcw->mailbox;
 
+    if(mcw->identity_name) {
+	g_free(mailbox->identity_name);
+	mailbox->identity_name = mcw->identity_name;
+        mcw->identity_name = NULL;
+        config_views_save();
+    }
+
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
 	gchar *filename;
 	const gchar *name;
@@ -778,12 +785,6 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 	update_pop_mailbox(mcw);
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 	update_imap_mailbox(mcw);
-    }
-
-    if(mcw->identity_name) {
-	g_free(mailbox->identity_name);
-	mailbox->identity_name = mcw->identity_name;
-        mcw->identity_name = NULL;
     }
 
     if (mailbox->config_prefix)
@@ -886,6 +887,8 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
 {
     GtkWidget *table, *box;
     GtkWidget *file, *label, *button;
+    gchar *tmp;
+
     table = gtk_table_new(3, 2, FALSE);
 
     /* mailbox name */
@@ -919,7 +922,9 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
 
     label = create_label(_("Identity:"), table, 2);
     box = gtk_hbox_new(FALSE, 5);
-    mcw->identity_label = gtk_label_new("");
+    tmp = g_strdup_printf("(%s)", _("No value set"));
+    mcw->identity_label = gtk_label_new(tmp);
+    g_free(tmp);
     gtk_box_pack_start(GTK_BOX(box), mcw->identity_label, TRUE, TRUE, 5);
 
     button = gtk_button_new_with_mnemonic(_("C_hange..."));

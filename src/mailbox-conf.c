@@ -339,52 +339,54 @@ mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
 static void
 mailbox_conf_set_values (Mailbox * mailbox)
 {
-  if (!mailbox)
-    return;
+	char port[10]; /* Max size of the number is 65536... we're okay */
 
-  switch (mailbox->type)
-    {
-    case MAILBOX_MH:
-    case MAILBOX_MAILDIR:
-    case MAILBOX_MBOX:
-      gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_LOCAL);
-      if (mailbox)
+	if (!mailbox)
+		return;
+
+	switch (mailbox->type)
 	{
-	  gtk_entry_set_text (GTK_ENTRY (mcw->local_mailbox_name), mailbox->name);
-	  gtk_entry_set_text (GTK_ENTRY (mcw->local_mailbox_path), MAILBOX_LOCAL (mailbox)->path);
+	case MAILBOX_MH:
+	case MAILBOX_MAILDIR:
+	case MAILBOX_MBOX:
+		gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_LOCAL);
+		if (mailbox)
+		{
+			gtk_entry_set_text (GTK_ENTRY (mcw->local_mailbox_name), mailbox->name);
+			gtk_entry_set_text (GTK_ENTRY (mcw->local_mailbox_path), MAILBOX_LOCAL (mailbox)->path);
+		}
+		break;
+	case MAILBOX_POP3:
+		if (mailbox)
+		{
+			sprintf( port, "%d", MAILBOX_POP3( mailbox )->server->port );
+
+			gtk_entry_set_text (GTK_ENTRY (mcw->pop_mailbox_name), mailbox->name);
+			gtk_entry_set_text (GTK_ENTRY (mcw->pop_server), MAILBOX_POP3 (mailbox)->server->host);
+			gtk_entry_set_text (GTK_ENTRY (mcw->pop_port), port);
+			gtk_entry_set_text (GTK_ENTRY (mcw->pop_username), MAILBOX_POP3 (mailbox)->server->user);
+			gtk_entry_set_text (GTK_ENTRY (mcw->pop_password), MAILBOX_POP3 (mailbox)->server->passwd);
+			gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_check), MAILBOX_POP3 (mailbox)->check);
+			gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server), MAILBOX_POP3 (mailbox)->delete_from_server);
+		}
+		gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_POP3);
+		break;
+	case MAILBOX_IMAP:
+		if (mailbox)
+		{
+			sprintf( port, "%d", MAILBOX_IMAP( mailbox )->server->port );
+
+			gtk_entry_set_text (GTK_ENTRY (mcw->imap_server), MAILBOX_IMAP(mailbox)->server->host);
+			gtk_entry_set_text (GTK_ENTRY (mcw->imap_username), MAILBOX_IMAP(mailbox)->server->user);
+			gtk_entry_set_text (GTK_ENTRY (mcw->imap_password), MAILBOX_IMAP(mailbox)->server->passwd);
+			gtk_entry_set_text (GTK_ENTRY (mcw->imap_port), port );
+		}
+		gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_IMAP);
+		break;
+	case MAILBOX_UNKNOWN:
+		/* do nothing for now */
+		break;
 	}
-      break;
-    case MAILBOX_POP3:
-      if (mailbox)
-	{
-	  gtk_entry_set_text (GTK_ENTRY (mcw->pop_mailbox_name), mailbox->name);
-	  gtk_entry_set_text (GTK_ENTRY (mcw->pop_server), MAILBOX_POP3 (mailbox)->server->host);
-	  gtk_entry_set_text (GTK_ENTRY (mcw->pop_username), MAILBOX_POP3 (mailbox)->server->user);
-	  gtk_entry_set_text (GTK_ENTRY (mcw->pop_password), MAILBOX_POP3 (mailbox)->server->passwd);
-	  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_check), MAILBOX_POP3 (mailbox)->check);
-	  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server), MAILBOX_POP3 (mailbox)->delete_from_server);
-	}
-      gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_POP3);
-      break;
-    case MAILBOX_IMAP:
-      if (mailbox)
-	{
-	  gtk_entry_set_text (GTK_ENTRY (mcw->imap_server), MAILBOX_IMAP(mailbox)->server->host);
-	  gtk_entry_set_text (GTK_ENTRY (mcw->imap_username), MAILBOX_IMAP(mailbox)->server->user);
-	  gtk_entry_set_text (GTK_ENTRY (mcw->imap_password), MAILBOX_IMAP(mailbox)->server->passwd);
-	  {
-	    gchar tmp[10];
-	    sprintf (tmp, "%i", MAILBOX_IMAP(mailbox)->server->port);
-	    /*PKGW: typo here */
-	    gtk_entry_set_text (GTK_ENTRY (mcw->imap_port), tmp);
-	  }
-	}
-      gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_IMAP);
-      break;
-    case MAILBOX_UNKNOWN:
-      /* do nothing for now */
-      break;
-    }
 }
 
 
@@ -451,6 +453,7 @@ check_for_blank_fields(Mailbox *mailbox)
     if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_mailbox_name)), "") ||
        !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)), "") ||
        !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)), "") ||
+       !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_port)), "") ||
        !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)), ""))  {
       
       
@@ -469,6 +472,10 @@ check_for_blank_fields(Mailbox *mailbox)
       else if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)), ""))
 	{
 	  msg = _("You need to fill in the server field.");
+	}
+      else if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_port)), ""))
+	{
+	  msg = _("You need to fill in the port field.");
 	}
       else
 	{
@@ -546,6 +553,7 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
       MAILBOX_POP3 (mailbox)->server->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)));
       MAILBOX_POP3 (mailbox)->server->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)));
       MAILBOX_POP3 (mailbox)->server->host = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)));
+      MAILBOX_POP3 (mailbox)->server->port= atoi( gtk_entry_get_text (GTK_ENTRY (mcw->pop_port)));
       MAILBOX_POP3 (mailbox)->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
       MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
 
@@ -662,6 +670,7 @@ conf_add_mailbox ()
       MAILBOX_POP3 (mailbox)->server->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)));
       MAILBOX_POP3 (mailbox)->server->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)));
       MAILBOX_POP3 (mailbox)->server->host = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)));
+      MAILBOX_POP3 (mailbox)->server->port = atoi (gtk_entry_get_text (GTK_ENTRY (mcw->pop_port)));
       MAILBOX_POP3 (mailbox)->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
       MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
 
@@ -863,7 +872,7 @@ create_pop_mailbox_page (void)
   GtkWidget *table;
   GtkWidget *label;
 
-  return_widget = table = gtk_table_new (6, 2, FALSE);
+  return_widget = table = gtk_table_new (7, 2, FALSE);
   gtk_widget_show (table);
 
   /* mailbox name */
@@ -902,16 +911,35 @@ create_pop_mailbox_page (void)
 
   gtk_widget_show (mcw->pop_server);
 
-  /* username  */
+  /* pop port */
 
-  label = gtk_label_new (_("Username:"));
+  label = gtk_label_new (_("Port:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
 		    GTK_FILL, GTK_FILL,
 		    10, 10);
+
+  gtk_widget_show (label);
+
+  mcw->pop_port = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), mcw->pop_port, 1, 2, 2, 3,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
+
+  gtk_entry_append_text (GTK_ENTRY (mcw->pop_port), "110");
+
+  gtk_widget_show (mcw->pop_port);
+
+  /* username  */
+
+  label = gtk_label_new (_("Username:"));
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
   gtk_widget_show (label);
   mcw->pop_username = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->pop_username, 1, 2, 2, 3,
+  gtk_table_attach (GTK_TABLE (table), mcw->pop_username, 1, 2, 3, 4,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
 
@@ -923,12 +951,12 @@ create_pop_mailbox_page (void)
 
   label = gtk_label_new (_("Password:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 4, 5,
 		    GTK_FILL, GTK_FILL,
 		    10, 10);
   gtk_widget_show (label);
   mcw->pop_password = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->pop_password, 1, 2, 3, 4,
+  gtk_table_attach (GTK_TABLE (table), mcw->pop_password, 1, 2, 4, 5,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
   gtk_entry_set_visibility (GTK_ENTRY (mcw->pop_password), FALSE);
@@ -937,7 +965,7 @@ create_pop_mailbox_page (void)
   /* toggle for check */
 
   mcw->pop_check = gtk_check_button_new_with_label (_("Check"));
-  gtk_table_attach (GTK_TABLE (table), mcw->pop_check, 0, 2, 4, 5,
+  gtk_table_attach (GTK_TABLE (table), mcw->pop_check, 0, 2, 5, 6,
 		    GTK_FILL, GTK_FILL,
 		    10, 10);
   gtk_widget_show (mcw->pop_check);
@@ -945,7 +973,7 @@ create_pop_mailbox_page (void)
   /* toggle for deletion from server */
 
   mcw->pop_delete_from_server = gtk_check_button_new_with_label (_("Delete from server"));
-  gtk_table_attach (GTK_TABLE (table), mcw->pop_delete_from_server, 0, 2, 5, 6,
+  gtk_table_attach (GTK_TABLE (table), mcw->pop_delete_from_server, 0, 2, 6, 7,
 		    GTK_FILL, GTK_FILL,
 		    10, 10);
   gtk_widget_show (mcw->pop_delete_from_server);

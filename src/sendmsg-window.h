@@ -88,6 +88,7 @@ extern "C" {
         GtkStyle *bad_address_style;  
 #ifdef HAVE_GPGME
 	guint gpg_mode;
+	GtkWidget *gpg_radio[2];
 #endif
     };
 

@@ -3154,6 +3154,9 @@ balsa_window_idle_remove(BalsaWindow * window)
     }
 }
 
+
+static volatile gboolean balsa_window_idle_cb_active = FALSE;
+
 static gboolean
 balsa_window_idle_cb(BalsaWindow * window)
 {
@@ -3164,6 +3167,10 @@ balsa_window_idle_cb(BalsaWindow * window)
 
     if (set_message_id == 0)
         return FALSE;
+    if (balsa_window_idle_cb_active)
+	return TRUE;
+    balsa_window_idle_cb_active = TRUE;
+
     g_object_set_data(G_OBJECT(window), BALSA_SET_MESSAGE_ID,
                       GUINT_TO_POINTER(0));
 
@@ -3181,6 +3188,7 @@ balsa_window_idle_cb(BalsaWindow * window)
     }
 
     gdk_threads_leave();
+    balsa_window_idle_cb_active = FALSE;
 
     return FALSE;
 }

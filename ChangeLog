@@ -1,3 +1,19 @@
+2003-04-09  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+
+	* libbalsa/rfc3156.[ch]: OpenPGP (RFC2440) mode support.
+	* libbalsa/send.c: sending OpenPGP signed messages.
+	* src/balsa-message.c: provide more feedback for messages with
+	broken structure.
+	* src/sendmsg-window.[hc]: Allow to select OpenPGP mode.
+	* src/main-window.c: fixes a GPG-related crash when during startup.
+	* libbalsa/rfc3156.c: make the passphrase dialog mt safe.
+	* libbalsa/rfc3156.[hc], src/balsa-message.c: remember signature
+	info for '2440 messages.
+	* libbalsa/mime.c: strip signature info off a '2440 message on
+	reply/forward/... 
+	* configure.in: replace --enable-gpgme with --with-gpgme.
+
+
 2003-04-07 08:43  PeterB
 
 	* libbalsa/misc.c, libbalsa/misc.h, src/pref-manager.c: Remove

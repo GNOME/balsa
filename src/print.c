@@ -422,7 +422,7 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
 #ifdef HAVE_GPGME
     /* add the signature status info if available */
     if (balsa_app.shown_headers != HEADERS_NONE &&
-	libbalsa_is_pgp_signed(body) && body->parts->next->sig_info) {
+	libbalsa_is_pgp_signed(body) > 0 && body->parts->next->sig_info) {
 	pdata->sig_status =
 	    g_strdup(libbalsa_gpgme_sig_stat_to_gchar(body->parts->next->sig_info->status));
 	lines += print_wrap_string(&pdata->sig_status, pi->header_font,

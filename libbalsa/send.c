@@ -1468,6 +1468,79 @@ get_mailbox_names(GList *list, ADDRESS *a)
 }
 #endif
 
+
+#ifdef HAVE_GPGME
+static gint
+libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, HEADER * msg,
+			       gint mode)
+{
+    gchar *cbuf, *rbuf = NULL;
+
+    /* convert the buffer to the requested charset (if it's not utf-8) */
+    if (g_ascii_strcasecmp(body->charset, "utf-8"))
+	cbuf = g_convert(body->buffer, strlen(body->buffer),
+			 body->charset, "utf-8",
+			 NULL, NULL, NULL);
+    else
+	cbuf = g_strdup(body->buffer);
+    g_return_val_if_fail(cbuf != NULL, LIBBALSA_MESSAGE_SIGN_ERROR);
+    
+    switch (mode & ~LIBBALSA_GPG_RFC2440)
+	{
+	case LIBBALSA_GPG_SIGN:   /* sign only */
+	    rbuf = libbalsa_rfc2440_sign_buffer(cbuf, msg->env->from->mailbox,
+						NULL);
+	    g_free(cbuf);
+	    if (!rbuf)
+		return LIBBALSA_MESSAGE_SIGN_ERROR;
+	    break;
+	case LIBBALSA_GPG_ENCRYPT:
+	case LIBBALSA_GPG_ENCRYPT | LIBBALSA_GPG_SIGN:
+	    {
+		GList *encrypt_for = NULL;
+			    
+		/* build a list containing the addresses of all to:, cc:
+		   and the from: address. Note: don't add bcc: addresses
+		   as they would be visible in the encrypted block. */
+		encrypt_for = 
+		    get_mailbox_names(encrypt_for, msg->env->to);
+		encrypt_for =
+		    get_mailbox_names(encrypt_for, msg->env->cc);
+		encrypt_for = g_list_append(encrypt_for,
+					    msg->env->from->mailbox);
+		if (msg->env->bcc)
+		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+					 _("This message will not be encrpyted for the BCC: recipient(s)."));
+
+		if (mode & LIBBALSA_GPG_SIGN)
+		    rbuf = libbalsa_rfc2440_encrypt_buffer(cbuf, 
+							   msg->env->from->mailbox,
+							   encrypt_for,
+							   NULL);
+		else
+		    rbuf = libbalsa_rfc2440_encrypt_buffer(cbuf, 
+							   NULL,
+							   encrypt_for,
+							   NULL);
+		g_list_free(encrypt_for);
+	    }
+	    g_free(cbuf);
+	    if (!rbuf)
+		return LIBBALSA_MESSAGE_ENCRYPT_ERROR;
+	    break;
+	default:
+	    g_free(cbuf);
+	    g_error("illegal gpg_mode %d (" __FILE__ " line %d)",
+		    mode, __LINE__);
+	}
+			
+    g_free(body->buffer);
+    body->buffer = rbuf;
+    return LIBBALSA_MESSAGE_CREATE_OK;
+}
+#endif
+
+
 /* libbalsa_create_msg:
    copies message to msg.
    PS: seems to be broken when queu == 1 - further execution of
@@ -1547,10 +1620,10 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 	    }
 	} else if (body->buffer) {
 #ifdef HAVE_GPGME
-	    /* force quoted printable encoding if signing is requested */
+	    /* force quoted printable encoding if only signing is requested */
 	    newbdy =
 		add_mutt_body_plain(body->charset,
-				    (message->gpg_mode & LIBBALSA_GPG_SIGN) ?
+				    ((message->gpg_mode & (LIBBALSA_GPG_SIGN | LIBBALSA_GPG_ENCRYPT)) == LIBBALSA_GPG_SIGN) ?
 				    ENCQUOTEDPRINTABLE : encoding, flow);
 #else
 	    newbdy =
@@ -1571,6 +1644,19 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 		}
 		g_free (type);
 	    }
+#ifdef HAVE_GPGME
+	    /* in '2440 mode, touch *only* the first body! */
+	    if (body == message->body_list && message->gpg_mode > 0 &&
+		(message->gpg_mode & LIBBALSA_GPG_RFC2440) != 0) {
+		gint result = 
+		    libbalsa_create_rfc2440_buffer(body, msg,
+						   message->gpg_mode);
+
+		if (result != LIBBALSA_MESSAGE_CREATE_OK)
+		    return result;
+		newbdy->noconv = 1;  /* it's already converted by gpgme... */
+	    }
+#endif
 	    tempfp = safe_fopen(newbdy->filename, "w+");
 	    fputs(body->buffer, tempfp);
 	    fclose(tempfp);
@@ -1595,7 +1681,8 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
     }
     
 #ifdef HAVE_GPGME
-    if (can_create_rfc3156 && message->gpg_mode > 0) {
+    if (can_create_rfc3156 && message->gpg_mode > 0 &&
+	(message->gpg_mode & LIBBALSA_GPG_RFC2440) == 0) {
 	switch (message->gpg_mode)
 	    {
 	    case LIBBALSA_GPG_SIGN:   /* sign message */

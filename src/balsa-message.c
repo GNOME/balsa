@@ -519,7 +519,9 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
     gint result = LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN;
 
     for (; body; body = body->next) {
-	if (libbalsa_is_pgp_signed(body)) {
+	gint signres = libbalsa_is_pgp_signed(body);
+
+	if (signres > 0) {
 	    LibBalsaSignatureInfo *checkResult;
 	    gchar *sender = libbalsa_address_to_gchar(message->from, -1);
 
@@ -547,7 +549,14 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
 				     sender, LIBBALSA_MESSAGE_GET_SUBJECT(message));
 	    }
 	    g_free(sender);
-	}
+	} else if (signres < 0) {
+	    gchar *sender = libbalsa_address_to_gchar(message->from, -1);
+	    
+	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				 _("The message sent by %s with subject \"%s\" contains a \"multipart/signed\" part, but it's structure is invalid. The signature, if there is any, can not be checked."),
+				 sender, LIBBALSA_MESSAGE_GET_SUBJECT(message));
+	    g_free(sender);
+	}	    
 
 	/* scan embedded messages */
 	if (body->parts) {
@@ -611,11 +620,22 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     /* FIXME: not checking for body_ref == 1 leads to a crash if we have both
      * the encrypted and the unencrypted version open as the body chain of the
      * first one will be unref'd. */
-    if (message->body_ref == 1 && 
-	libbalsa_is_pgp_encrypted(message->body_list))
-	/* try to decrypt the message... */
-	message->body_list->parts =
-	    libbalsa_body_decrypt(message->body_list->parts, NULL);
+    if (message->body_ref == 1) {
+	gint encrres = 	libbalsa_is_pgp_encrypted(message->body_list);
+
+	if (encrres > 0)
+	    /* try to decrypt the message... */
+	    message->body_list->parts =
+		libbalsa_body_decrypt(message->body_list->parts, NULL);
+	else if (encrres < 0) {
+	    gchar *sender = libbalsa_address_to_gchar(message->from, -1);
+
+	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				 _("The message sent by %s with subject \"%s\" contains a \"multipart/encrypted\" part, but it's structure is invalid."),
+				 sender, LIBBALSA_MESSAGE_GET_SUBJECT(message));
+	    g_free(sender);
+	}
+    }
     
     /* scan the message for signatures */
     message->sig_state = 
@@ -908,7 +928,7 @@ display_headers(BalsaMessage * bm)
     g_list_free(lst);
 
 #ifdef HAVE_GPGME
-    if (libbalsa_is_pgp_signed(message->body_list)) {
+    if (libbalsa_is_pgp_signed(message->body_list) > 0) {
 	if (message->body_list->parts->next->sig_info)
 	    add_header_sigstate(bm, message->body_list->parts->next->sig_info);
     }
@@ -1661,6 +1681,9 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         regex_t rex;
         GList *url_list = NULL;
 	const gchar *target_cs;
+#ifdef HAVE_GPGME
+	LibBalsaMessageBodyRFC2440Mode rfc2440mode;
+#endif
 
         if (!libbalsa_utf8_sanitize(&ptr, balsa_app.convert_unknown_8bit,
 				    balsa_app.convert_unknown_8bit_codeset, &target_cs)) {
@@ -1672,6 +1695,47 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 				 target_cs ? target_cs : "\"?\"");
 	    g_free(from);
 	}
+
+#ifdef HAVE_GPGME
+	/* check if this is a RFC2440 part */
+	rfc2440mode = libbalsa_rfc2440_check_buffer(ptr);
+	if (rfc2440mode != LIBBALSA_BODY_RFC2440_NONE) {
+	    gchar *charset = 
+		libbalsa_message_body_get_parameter(info->body, "charset");
+	    GpgmeSigStat sig_res;
+	    
+	    /* do the rfc2440 stuff */
+	    if (rfc2440mode == LIBBALSA_BODY_RFC2440_SIGNED)
+		sig_res = 
+		    libbalsa_rfc2440_check_signature(&ptr, charset, 
+						     TRUE, &info->body->sig_info,
+						     balsa_app.date_string);
+	    else
+		sig_res = 
+		    libbalsa_rfc2440_decrypt_buffer(&ptr, charset, 
+						    TRUE, &info->body->sig_info,
+						    balsa_app.date_string, NULL);
+	    if (sig_res == GPGME_SIG_STAT_GOOD)
+		libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+				     _("detected a good signature"));
+	    else if (sig_res != GPGME_SIG_STAT_NONE) {
+		gchar *sender = 
+		    libbalsa_address_to_gchar(bm->message->from, -1);
+		
+		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				     _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
+				     sender, LIBBALSA_MESSAGE_GET_SUBJECT(bm->message),
+				     libbalsa_gpgme_sig_stat_to_gchar(sig_res));
+		g_free(sender);
+	    }
+	    
+	    /* overwrite the tmp buffer */
+	    fp = freopen(info->body->temp_filename, "w+", fp);
+	    fwrite(ptr, strlen(ptr), 1, fp);
+	    fflush(fp);
+	    g_free(charset);
+	}
+#endif
 
         if (libbalsa_message_body_is_flowed(info->body)) {
             /* Parse, but don't wrap. */

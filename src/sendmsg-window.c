@@ -108,6 +108,7 @@ static void toggle_format_cb(GtkCheckMenuItem * check_menu_item,
 #ifdef HAVE_GPGME
 static void toggle_sign_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void toggle_encrypt_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
+static void toggle_gpg_mode_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 #endif
 
 static void spell_check_cb(GtkWidget * widget, BalsaSendmsg *);
@@ -475,6 +476,24 @@ static GnomeUIInfo lang_menu[] = {
     GNOMEUIINFO_END
 };
 
+#ifdef HAVE_GPGME
+static GnomeUIInfo gpg_mode_list[] = {
+#define OPTS_MENU_GPG_3156_POS 0
+    GNOMEUIINFO_RADIOITEM_DATA(N_("_GnuPG uses MIME mode"),
+			       NULL,
+                               toggle_gpg_mode_cb,
+                               GINT_TO_POINTER(0),
+                               NULL),
+#define OPTS_MENU_GPG_2440_POS 1
+    GNOMEUIINFO_RADIOITEM_DATA(N_("_GnuPG uses old OpenPGP mode"),
+			       NULL,
+                               toggle_gpg_mode_cb,
+                               GINT_TO_POINTER(LIBBALSA_GPG_RFC2440),
+                               NULL),
+    GNOMEUIINFO_END
+};
+#endif
+
 static GnomeUIInfo opts_menu[] = {
 #define OPTS_MENU_DISPNOTIFY_POS 0
     GNOMEUIINFO_TOGGLEITEM(N_("_Request Disposition Notification"), NULL, 
@@ -483,12 +502,16 @@ static GnomeUIInfo opts_menu[] = {
     GNOMEUIINFO_TOGGLEITEM(N_("_Format = Flowed"), NULL, 
 			   toggle_format_cb, NULL),
 #ifdef HAVE_GPGME
-#define OPTS_MENU_SIGN_POS 2
-    GNOMEUIINFO_TOGGLEITEM(N_("_Sign Message"), NULL,
+    GNOMEUIINFO_SEPARATOR,
+#define OPTS_MENU_SIGN_POS 3
+    GNOMEUIINFO_TOGGLEITEM(N_("_Sign Message"), 
+			   N_("signs the message using GnuPG"),
 			   toggle_sign_cb, NULL),
-#define OPTS_MENU_ENCRYPT_POS 3
-    GNOMEUIINFO_TOGGLEITEM(N_("_Encrypt Message"), NULL,
+#define OPTS_MENU_ENCRYPT_POS 4
+    GNOMEUIINFO_TOGGLEITEM(N_("_Encrypt Message"), 
+			   N_("signs the message using GnuPG for all To: and CC: recipients"),
 			   toggle_encrypt_cb, NULL),
+    GNOMEUIINFO_RADIOLIST(gpg_mode_list),
 #endif
     GNOMEUIINFO_END
 };
@@ -2663,6 +2686,15 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
                                    (opts_menu[OPTS_MENU_FORMAT_POS].
                                     widget), balsa_app.wordwrap);
 
+#ifdef HAVE_GPGME
+    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget,
+			     FALSE);
+    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget,
+			     FALSE);
+    msg->gpg_radio[0] = gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget;
+    msg->gpg_radio[1] = gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget;    
+#endif
+
     /* Set up the default identity */
     if(!set_identity_from_mailbox(msg))
         /* Get the identity from the To: field of the original message */
@@ -3274,6 +3306,26 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
         g_error_free(err);
         return FALSE;
     }
+#ifdef HAVE_GPGME
+    if ((bsmsg->gpg_mode & LIBBALSA_GPG_RFC2440) != 0 &&
+	(bsmsg->gpg_mode & ~LIBBALSA_GPG_RFC2440) != 0 &&
+	gnome_icon_list_get_num_icons(GNOME_ICON_LIST
+				      (bsmsg->attachments[1])) > 0) {
+	/* we are going to RFC2440 sign/encrypt a multipart... */
+	GtkWidget *dialog;
+	gint choice;
+
+	dialog = gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
+					GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
+					GTK_MESSAGE_QUESTION,
+					GTK_BUTTONS_OK_CANCEL,
+					_("You selected OpenPGP mode for a message with attachments. In this mode, only the first part will be signed and/or encrypted. You should select MIME mode if the complete message shall be protected. Do you really want to proceed?"));
+	choice = gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
+	if (choice != GTK_RESPONSE_OK)
+	    return FALSE;
+    }
+#endif
 
     message = bsmsg2message(bsmsg);
     fcc = balsa_find_mailbox_by_url(bsmsg->fcc_url);
@@ -3701,19 +3753,41 @@ toggle_format_cb(GtkCheckMenuItem * check_menu_item, BalsaSendmsg * bsmsg)
 static void 
 toggle_sign_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
+    gboolean radio_on;
+
     if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)))
 	bsmsg->gpg_mode |= LIBBALSA_GPG_SIGN;
     else
 	bsmsg->gpg_mode &= ~LIBBALSA_GPG_SIGN;
+
+    radio_on = (bsmsg->gpg_mode & ~LIBBALSA_GPG_RFC2440) > 0;
+    gtk_widget_set_sensitive(bsmsg->gpg_radio[0], radio_on);
+    gtk_widget_set_sensitive(bsmsg->gpg_radio[1], radio_on);
 }
 
 static void 
 toggle_encrypt_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
+    gboolean radio_on;
+
     if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)))
 	bsmsg->gpg_mode |= LIBBALSA_GPG_ENCRYPT;
     else
 	bsmsg->gpg_mode &= ~LIBBALSA_GPG_ENCRYPT;
+
+    radio_on = (bsmsg->gpg_mode & ~LIBBALSA_GPG_RFC2440) > 0;
+    gtk_widget_set_sensitive(bsmsg->gpg_radio[0], radio_on);
+    gtk_widget_set_sensitive(bsmsg->gpg_radio[1], radio_on);
+}
+
+static void
+toggle_gpg_mode_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+    gint rfc_flag = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
+						      GNOMEUIINFO_KEY_UIDATA));
+
+    if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)))
+	bsmsg->gpg_mode = (bsmsg->gpg_mode & ~LIBBALSA_GPG_RFC2440) | rfc_flag;
 }
 #endif
 

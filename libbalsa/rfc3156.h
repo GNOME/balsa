@@ -32,8 +32,10 @@
 
 #define LIBBALSA_GPG_SIGN      (1 << 0)
 #define LIBBALSA_GPG_ENCRYPT   (1 << 1)
+#define LIBBALSA_GPG_RFC2440   (1 << 2)
 
 typedef struct _LibBalsaSignatureInfo LibBalsaSignatureInfo;
+typedef enum _LibBalsaMessageBodyRFC2440Mode LibBalsaMessageBodyRFC2440Mode;
 
 struct _LibBalsaSignatureInfo {
     GpgmeSigStat status;
@@ -45,8 +47,15 @@ struct _LibBalsaSignatureInfo {
     time_t sign_time;
 };
 
-gboolean libbalsa_is_pgp_signed(LibBalsaMessageBody *body);
-gboolean libbalsa_is_pgp_encrypted(LibBalsaMessageBody *body);
+enum _LibBalsaMessageBodyRFC2440Mode {
+    LIBBALSA_BODY_RFC2440_NONE = 0,
+    LIBBALSA_BODY_RFC2440_SIGNED,
+    LIBBALSA_BODY_RFC2440_ENCRYPTED
+};
+
+
+gint libbalsa_is_pgp_signed(LibBalsaMessageBody *body);
+gint libbalsa_is_pgp_encrypted(LibBalsaMessageBody *body);
 
 gboolean libbalsa_sign_mutt_body(MuttBody **sign_body, const gchar *rfc822_for,
 				 gchar **micalg, GtkWindow *parent);
@@ -60,6 +69,26 @@ gboolean libbalsa_sign_encrypt_mutt_body(MuttBody **se_body,
 gboolean libbalsa_body_check_signature(LibBalsaMessageBody *body);
 LibBalsaMessageBody *libbalsa_body_decrypt(LibBalsaMessageBody *body,
 					   GtkWindow *parent);
+
+LibBalsaMessageBodyRFC2440Mode libbalsa_rfc2440_check_buffer(const gchar *buffer);
+gchar *libbalsa_rfc2440_sign_buffer(const gchar *buffer,
+				    const gchar *sign_for,
+				    GtkWindow *parent);
+GpgmeSigStat libbalsa_rfc2440_check_signature(gchar **buffer,
+					      const gchar *charset,
+					      gboolean append_info,
+					      LibBalsaSignatureInfo **sig_info,
+					      const gchar * date_string);
+gchar *libbalsa_rfc2440_encrypt_buffer(const gchar *buffer,
+				       const gchar *sign_for,
+				       GList *encrypt_for,
+				       GtkWindow *parent);
+GpgmeSigStat libbalsa_rfc2440_decrypt_buffer(gchar **buffer,
+					     const gchar *charset,
+					     gboolean append_info,
+					     LibBalsaSignatureInfo **sig_info,
+					     const gchar *date_string,
+					     GtkWindow *parent);
 
 LibBalsaSignatureInfo *libbalsa_signature_info_destroy(LibBalsaSignatureInfo* info);
 const gchar *libbalsa_gpgme_sig_stat_to_gchar(GpgmeSigStat stat);

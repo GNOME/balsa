@@ -92,37 +92,36 @@ dnl (we don't use the std macros AM_PATH_GPGME and AM_PATH_XML2 here to avoid
 dnl dependencies...)
 dnl ##########################################################################
 AC_MSG_CHECKING(whether to build with gpgme/RFC3156 support)
-AC_ARG_ENABLE([gpgme],
-	[  --enable-gpgme          build with GPGME/RFC3156 support (experimental) [default=no]],
-	[ have_gpgme=$enableval ], [ have_gpgme=no ])
-if test x"$have_gpgme" = xyes ; then
+AC_ARG_WITH([gpgme],
+	[  --with-gpgme=DIR        build with GPGME/RFC3156 support (experimental) [default=no]],
+	[ have_gpgme=$withval ], [ have_gpgme=no ])
+if test x"$have_gpgme" != xno ; then
 	AC_MSG_RESULT(yes)
-	AC_CHECK_PROG(have_gpgme_config, gpgme-config, yes, no)
-	if test x"$have_gpgme_config" = xyes ; then
-		AC_MSG_CHECKING([gpgme library version])
-		gpgme_version=`gpgme-config --version`
-		AC_MSG_RESULT([$gpgme_version])
-		gpgme_major=`echo $gpgme_version | sed 's/\..*$//'`
-		gpgme_minor=`echo $gpgme_version | sed 's/[[0-9]]*\.//' | sed 's/\..*$//'`
-		gpgme_micro=`echo $gpgme_version | sed 's/^.*\.//'`
-		if test "$gpgme_major" -eq "0" -a \
-			"$gpgme_minor" -eq "3" -a \
-			"$gpgme_micro" -ge "14" ; then
-			AC_DEFINE(HAVE_GPGME,1,[Defined when gpgme is available.])
-			BALSA_CFLAGS="$BALSA_CFLAGS `gpgme-config --cflags`"
-			BALSA_LIBS="$BALSA_LIBS `gpgme-config --libs`"
-			AC_CHECK_PROG(have_xml2_config, xml2-config, yes, no)
-			if test x"$have_xml2_config" = xyes ; then
-				AC_DEFINE(HAVE_XML2,1,[Defined when libxml2 is available.])
-				BALSA_CFLAGS="$BALSA_CFLAGS `xml2-config --cflags`"
-				BALSA_LIBS="$BALSA_LIBS `xml2-config --libs`"
-			fi
+	xcflags=$CFLAGS
+	if test x"$have_gpgme" != xyes ; then
+		CFLAGS="$CFLAGS -I$have_gpgme/include"
+	fi
+	AC_MSG_CHECKING([gpgme library version])
+	AC_TRY_RUN([#include <gpgme.h>
+		    #include <stdio.h>
+		    int main() {
+			char gv[] = GPGME_VERSION;
+			printf("%s\n", GPGME_VERSION);
+			return !(gv[0]=='0' && gv[1]=='.' && gv[2]=='3' && gv[3]=='.' &&
+			    gv[4]=='1' && gv[5]>='4');
+                    }], [gpgme_ver=yes], [gpgme_ver=no])
+	CFLAGS=$xcflags
+	if test x"$gpgme_ver" = xyes; then
+		AC_DEFINE(HAVE_GPGME,1,[Defined when gpgme is available.])
+		if test x"$have_gpgme" != xyes ; then
+			BALSA_CFLAGS="$BALSA_CFLAGS -I$have_gpgme/include"
+			BALSA_LIBS="$BALSA_LIBS -L$have_gpgme/lib -lgpgme"
 		else
-			AC_MSG_WARN([sorry, you need gpgme version 0.3.x w/ x >= 14, but you have $gpgme_version])
-			have_gpgme=no
+			BALSA_LIBS="$BALSA_LIBS -lgpgme"
 		fi
+		have_gpgme=yes
 	else
-		AC_MSG_WARN([hmmm, did you install gpgme-config?])
+		AC_MSG_WARN([sorry, you need gpgme version 0.3.x w/ x >= 14])
 		have_gpgme=no
 	fi
 else

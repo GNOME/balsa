@@ -2149,13 +2149,19 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
 {
     GString *body;
     gchar *str, *date = NULL;
-    const gchar *personStr;
+    gchar *personStr;
+    const gchar *orig_address;
 
     libbalsa_message_body_ref(message, TRUE);
 
-    personStr = libbalsa_address_get_name(message->from);
-    if (!personStr)
-	personStr = _("you");
+    if (!(orig_address = libbalsa_address_get_name(message->from)))
+	personStr = g_strdup(_("you"));
+    else {
+	personStr = g_strdup(orig_address);
+	libbalsa_utf8_sanitize(&personStr, balsa_app.convert_unknown_8bit,
+			       balsa_app.convert_unknown_8bit_codeset, NULL);
+    }
+	
     if (message->date)
 	date = libbalsa_message_date_to_gchar(message, balsa_app.date_string);
 
@@ -2232,6 +2238,7 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
     }
     
     g_free(date);
+    g_free(personStr);
 
     if (!bsmsg->charset)
 	bsmsg->charset = libbalsa_message_charset(message);
@@ -2749,6 +2756,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	addr = (message->reply_to) ? message->reply_to : message->from;
 
 	tmp = libbalsa_address_to_gchar(addr, 0);
+ 	libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
+ 			       balsa_app.convert_unknown_8bit_codeset, NULL);
 	gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), tmp);
 	g_free(tmp);
     } else if ( type == SEND_REPLY_GROUP ) {
@@ -2767,11 +2776,15 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     if (type == SEND_REPLY_ALL) {
 	tmp = libbalsa_make_string_from_list(message->to_list);
 
+ 	libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
+ 			       balsa_app.convert_unknown_8bit_codeset, NULL);
 	gtk_entry_set_text(GTK_ENTRY(bsmsg->cc[1]), tmp);
 	g_free(tmp);
 
 	if (message->cc_list) {
 	    tmp = libbalsa_make_string_from_list(message->cc_list);
+ 	    libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
+ 				   balsa_app.convert_unknown_8bit_codeset, NULL);
 	    append_comma_separated(GTK_EDITABLE(bsmsg->cc[1]), tmp);
 	    g_free(tmp);
 	}
@@ -4038,6 +4051,8 @@ set_list_post_address(BalsaSendmsg * bsmsg)
         gchar *tmp =
             libbalsa_address_to_gchar(message->mailbox->
                                       mailing_list_address, 0);
+ 	libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
+ 			       balsa_app.convert_unknown_8bit_codeset, NULL);
         gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), tmp);
         g_free(tmp);
     } else {

@@ -397,7 +397,7 @@ replyto_message_cb (GtkWidget * widget, gpointer data)
   if (!balsa_app.current_index_child)
     return;
 
-  clist = GTK_CLIST (BALSA_INDEX (balsa_app.current_index_child->index)->clist);
+  clist = GTK_CLIST (balsa_app.current_index_child->index);
   list = clist->selection;
   while (list)
     {
@@ -419,7 +419,7 @@ replytoall_message_cb (GtkWidget * widget, gpointer data)
   if (!balsa_app.current_index_child)
     return;
 
-  clist = GTK_CLIST (BALSA_INDEX (balsa_app.current_index_child->index)->clist);
+  clist = GTK_CLIST (balsa_app.current_index_child->index);
   list = clist->selection;
   while (list)
     {
@@ -442,7 +442,7 @@ forward_message_cb (GtkWidget * widget, gpointer data)
   if (!balsa_app.current_index_child)
     return;
 
-  clist = GTK_CLIST (BALSA_INDEX (balsa_app.current_index_child->index)->clist);
+  clist = GTK_CLIST (balsa_app.current_index_child->index);
   list = clist->selection;
   while (list)
     {
@@ -487,7 +487,7 @@ delete_message_cb (GtkWidget * widget, gpointer data)
   if (!balsa_app.current_index_child)
     return;
 
-  clist = GTK_CLIST (BALSA_INDEX (balsa_app.current_index_child->index)->clist);
+  clist = GTK_CLIST (balsa_app.current_index_child->index);
   list = clist->selection;
   while (list)
     {
@@ -510,7 +510,7 @@ undelete_message_cb (GtkWidget * widget, gpointer data)
   if (!balsa_app.current_index_child)
     return;
 
-  clist = GTK_CLIST (BALSA_INDEX (balsa_app.current_index_child->index)->clist);
+  clist = GTK_CLIST (balsa_app.current_index_child->index);
   list = clist->selection;
   while (list)
     {

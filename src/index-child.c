@@ -218,12 +218,10 @@ check_for_new_mail (GtkWidget * widget)
 }
 
 static GtkWidget *
-index_child_create_view (GnomeMDIChild * child)
+index_child_create_view (GnomeMDIChild * child, gpointer data)
 {
+  GtkWidget *sw;
   GtkWidget *vpane = NULL;
-  GtkWidget *table;
-  GtkWidget *hscrollbar;
-  GtkWidget *vscrollbar;
   IndexChild *ic;
 
   ic = INDEX_CHILD (child);
@@ -233,37 +231,43 @@ index_child_create_view (GnomeMDIChild * child)
 
       vpane = gtk_vpaned_new ();
 
+      /* balsa_index */
+      sw = gtk_scrolled_window_new (NULL, NULL);
+      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
+				      GTK_POLICY_AUTOMATIC,
+				      GTK_POLICY_AUTOMATIC);
       ic->index = balsa_index_new ();
+      gtk_widget_set_usize (ic->index, -1, 200);
+      gtk_container_add (GTK_CONTAINER (sw), ic->index);
+      gtk_paned_add1 (GTK_PANED (vpane), sw);
 
-      gtk_widget_set_usize (ic->index, 1, 200);
-
-      gtk_paned_add1 (GTK_PANED (vpane), ic->index);
-
-      table = gtk_table_new (2, 2, FALSE);
-
+      /* balsa_message */
+      sw = gtk_scrolled_window_new (NULL, NULL);
+      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
+				      GTK_POLICY_AUTOMATIC,
+				      GTK_POLICY_AUTOMATIC);
       ic->message = balsa_message_new ();
+      gtk_widget_set_usize (ic->message, -1, 250);
+      gtk_container_add (GTK_CONTAINER (sw), ic->message);
+      gtk_paned_add2 (GTK_PANED (vpane), sw);
 
-      gtk_table_attach_defaults (GTK_TABLE (table), ic->message, 0, 1, 0, 1);
 
-      hscrollbar = gtk_hscrollbar_new (GTK_LAYOUT (ic->message)->hadjustment);
-      GTK_WIDGET_UNSET_FLAGS (hscrollbar, GTK_CAN_FOCUS);
-      gtk_table_attach (GTK_TABLE (table), hscrollbar, 0, 1, 1, 2,
-			GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 
-      vscrollbar = gtk_vscrollbar_new (GTK_LAYOUT (ic->message)->vadjustment);
-      GTK_WIDGET_UNSET_FLAGS (vscrollbar, GTK_CAN_FOCUS);
-      gtk_table_attach (GTK_TABLE (table), vscrollbar, 1, 2, 0, 1,
-			GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
-
-      gtk_paned_add2 (GTK_PANED (vpane), table);
-      gtk_widget_set_usize (vpane, 1, 250);
       gtk_widget_show_all (vpane);
 
     }
   else
     {
+      sw = gtk_scrolled_window_new (NULL, NULL);
+      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
+				      GTK_POLICY_AUTOMATIC,
+				      GTK_POLICY_AUTOMATIC);
       ic->index = balsa_index_new ();
+      gtk_widget_set_usize (ic->index, 1, 200);
+      gtk_container_add (GTK_CONTAINER (sw), ic->index);
+
       gtk_widget_show (ic->index);
+      gtk_widget_show (sw);
     }
 
 
@@ -274,7 +278,7 @@ index_child_create_view (GnomeMDIChild * child)
 
   /* Make messages draggable */
   /* we want to grab the clist and not the scrolled window */
-  gtk_drag_source_set (GTK_WIDGET (BALSA_INDEX (ic->index)->clist),
+  gtk_drag_source_set (GTK_WIDGET (ic->index),
 		       GDK_BUTTON1_MASK, drag_types, ELEMENTS (drag_types),
       GDK_ACTION_LINK | GDK_ACTION_MOVE | GDK_ACTION_COPY | GDK_ACTION_ASK);
 
@@ -290,7 +294,7 @@ index_child_create_view (GnomeMDIChild * child)
   if (balsa_app.previewpane)
     return (vpane);
   else
-    return ic->index;
+    return sw;
 }
 
 static gint handler = 0;
@@ -467,7 +471,7 @@ transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row,
   g_return_if_fail (bmbl != NULL);
   g_return_if_fail (bindex != NULL);
 
-  clist = GTK_CLIST (bindex->clist);
+  clist = GTK_CLIST (bindex);
   list = clist->selection;
   while (list)
     {
@@ -489,7 +493,7 @@ delete_message_cb (GtkWidget * widget, BalsaIndex * bindex)
   g_return_if_fail (widget != NULL);
   g_return_if_fail (bindex != NULL);
 
-  clist = GTK_CLIST (bindex->clist);
+  clist = GTK_CLIST (bindex);
   list = clist->selection;
   while (list)
     {
@@ -514,7 +518,7 @@ undelete_message_cb (GtkWidget * widget, BalsaIndex * bindex)
   g_return_if_fail (widget != NULL);
   g_return_if_fail (bindex != NULL);
 
-  clist = GTK_CLIST (bindex->clist);
+  clist = GTK_CLIST (bindex);
   list = clist->selection;
   while (list)
     {

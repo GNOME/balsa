@@ -39,8 +39,7 @@ extern "C"
 
   struct _BalsaIndex
     {
-      GtkBin bin;
-      GtkWidget *clist;
+      GtkCList clist;
 
       Mailbox *mailbox;
       guint watcher_id;
@@ -49,7 +48,7 @@ extern "C"
 
   struct _BalsaIndexClass
     {
-      GtkBinClass parent_class;
+      GtkCListClass parent_class;
 
       void (*select_message) (BalsaIndex * bindex, Message * message);
     };

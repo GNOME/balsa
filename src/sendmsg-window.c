@@ -3775,6 +3775,9 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     if (is_ready_to_send(bsmsg)) {
         if(message_postpone(bsmsg))
             gtk_widget_destroy(bsmsg->window);
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_MESSAGE,
+                                   _("Message postponed."));
     }
 }
 
@@ -3808,6 +3811,9 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 	libbalsa_mailbox_get_message(balsa_app.draftbox,
 				     libbalsa_mailbox_total_messages
 				     (balsa_app.draftbox));
+    balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                               LIBBALSA_INFORMATION_MESSAGE,
+                               _("Message saved."));
 }
 
 static void

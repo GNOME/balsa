@@ -3683,11 +3683,12 @@ static void
 reset_filter_cb(GtkWidget * widget, gpointer data)
 {
     BalsaWindow *bw = BALSA_WINDOW(data);
-    GtkWidget *index = balsa_window_find_current_index(bw);
-    LibBalsaMailbox *mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
-    LibBalsaCondition *filter;
-    filter = balsa_window_get_view_filter(bw);
-    libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
+    GtkWidget *bindex = balsa_window_find_current_index(bw);
+
+    /* do it by resetting the sos filder */
+    gtk_entry_set_text(GTK_ENTRY(bw->sos_entry), "");
+    balsa_index_set_sos_filter(BALSA_INDEX(bindex),
+                               "", balsa_window_get_view_filter(bw));
 }
 
 static void

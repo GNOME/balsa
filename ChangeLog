@@ -1,3 +1,9 @@
+2004-07-31  Pawel Salek
+
+	* configure.in: minor cleanup.
+	* src/main-window.c: reset SoS filter on "Mailbox/Reset Filter".
+	* src/sendmsg-window.c: inform the user the message has been saved.
+
 2004-07-31 15:19  PeterB
 
 	* src/: balsa-app.h, balsa-index.c, filter-run-dialog.c,

@@ -1,3 +1,9 @@
+2005-01-17  Pawel Salek
+
+	* libbalsa/address-entry.c: add missing #include.
+	* libbalsa/identity.h: 
+	* libinit_balsa/balsa-druid-page-user.c: port it to InternetAddress.
+
 2005-01-17 14:32  PeterB
 
 	* libbalsa/address-entry.c: use list->address instead of

@@ -287,16 +287,12 @@ balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
     } else {
         ident = balsa_app.current_ident;
     }
-    g_free(ident->address->full_name);
-    ident->address->full_name =
-        gtk_editable_get_chars(GTK_EDITABLE(user->name), 0, -1);
-
-    g_list_foreach(ident->address->address_list, (GFunc) g_free, NULL);
-    g_list_free(ident->address->address_list);
-    ident->address->address_list =
-        g_list_prepend(NULL,
-                       gtk_editable_get_chars(GTK_EDITABLE(user->email), 0,
-                                              -1));
+    g_free(ident->ia->name);
+    ident->ia->name = gtk_editable_get_chars(GTK_EDITABLE(user->name), 0, -1);
+    g_assert(ident->ia->type == INTERNET_ADDRESS_NAME);
+    g_free(ident->ia->value.addr);
+    ident->ia->value.addr =
+        gtk_editable_get_chars(GTK_EDITABLE(user->email), 0, -1);
     /* outgoing mail */
 #if ENABLE_ESMTP
     g_free(balsa_app.smtp_server);

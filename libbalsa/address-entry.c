@@ -38,7 +38,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <gtk/gtk.h>
-
+#include <gmime/internet-address.h>
 #include "address-book.h"
 
 /*************************************************************

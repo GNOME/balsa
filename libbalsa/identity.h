@@ -26,6 +26,7 @@
 #include "config.h"
 
 #include <gtk/gtk.h>
+#include <gmime/internet-address.h>
 
 #ifdef __cpluscplus
 extern "C" 

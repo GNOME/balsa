@@ -536,6 +536,7 @@ create_string_entry(GtkWidget* table, const gchar * label, int y_pos,
 {
    arr[0] = gtk_label_new (label);
    gtk_misc_set_alignment (GTK_MISC (arr[0]), 0.0, 0.5);
+   gtk_misc_set_padding (GTK_MISC (arr[0]), GNOME_PAD_SMALL, GNOME_PAD_SMALL);
    gtk_table_attach (GTK_TABLE (table), arr[0], 0, 1, y_pos, y_pos+1,
 		     GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
    
@@ -602,6 +603,7 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   /* fcc: */
   msg->fcc[0] = gtk_label_new (_("fcc:"));
   gtk_misc_set_alignment (GTK_MISC (msg->fcc[0]), 0.0, 0.5);
+  gtk_misc_set_padding (GTK_MISC (msg->fcc[0]), GNOME_PAD_SMALL, GNOME_PAD_SMALL);
   gtk_table_attach (GTK_TABLE (table), msg->fcc[0], 0, 1, 5, 6,
 		    GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
@@ -634,6 +636,7 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   /* Attachment list */
   msg->attachments[0] = gtk_label_new (_("Attachments:"));
   gtk_misc_set_alignment (GTK_MISC (msg->attachments[0]), 0.0, 0.5);
+  gtk_misc_set_padding (GTK_MISC (msg->attachments[0]), GNOME_PAD_SMALL, GNOME_PAD_SMALL);
   gtk_table_attach (GTK_TABLE (table), msg->attachments[0], 0, 1, 7, 8,
 		    GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 

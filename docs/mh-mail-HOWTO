@@ -1,0 +1,53 @@
+	     HOWTO get balsa managing existing MH folders
+
+Author: Stephan C . Buchert <scb@stelab.nagoya-u.ac.jp>
+
+Many users of balsa have an archive of their previously received,
+drafted, sent, deleted ... mails. Of course they want to manage these
+with balsa. Depending on the mail system that has been used the
+already existing messages are stored in different ways:
+
+1) in the local computer as so-called mbox files
+2) in the local computer as so-called MH folders
+3) in a server as so-called IMAP folders
+
+This list is perhaps not complete.
+
+Here I describe how I got balsa managing my emails that are stored in
+MH folders, nr 2 above.
+
+The MH (Message Handling) system stores each e-mail message in a
+separate file. A directory with one or several files containing MH
+emails is an MH folder. Thus a part of the UNIX file system itself
+represents the structure of an MH mail archive. The root of this
+structure is typically at "/home/user/Mail", where "user" stands for
+the login name. In contrast to this, mbox files (nr 1 above) contain
+typically more than one message. An mbox file with only one message is
+not an MH message, and vice versa.
+
+MH mail data can be managed using the "low level" nmh tools, which are
+included in most Linux distributions, by exmh, which provides a GUI to
+the nmh tools, by two different packages for Emacs, namely mh-mail and
+Mew, and by others.
+
+Also Balsa can be used to manage your MH folders, as well as mbox
+files and IMAP folders. The latter two are mailboxes in balsa, but an
+error results if a balsa mailbox path is configured to an MH mail
+folder. Rather, my "Local Mail" in the window for "Mail Servers" from
+"Preferences" says "/home/scb/Mail" and balsa shows nicely all my MH
+folders which are under "/home/scb/Mail".
+
+There was another minor hurdle, before balsa really displayed my MH
+mails:
+
+Obviously balsa identifies MH mail folders by the existence of a file
+".mh_sequences" in these folders. If, for example, the Emacs mh-mail
+package has been used before balsa, then there is no problem. However,
+I use a system called MEW (http://www.mew.org) which lets me see mail
+with Japanese characters using Emacs/Mule. Mew doesn't create files
+".mh_sequences" (but rather files ".mew-cache"). Therefore I had to
+create (touch) files ".mh_sequences" in each MH folder. Concerning
+balsa these files ".mh_sequences" can be empty, they only must exist.
+
+Once balsa recognizes the MH folders as described above, it can handle
+both MH folders and mailboxes, transfer messages between these two etc.

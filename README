@@ -1,4 +1,4 @@
-Balsa E-Mail Client 0.9.2
+Balsa E-Mail Client 0.9.3
 
   This is a non-stable, development release. See ChangeLog for the list
   of the recent changes.
@@ -83,4 +83,5 @@ very fragile and often not portable (see for example
 http://www.washington.edu/pine/tech-notes/low-level.html#locking).
 
 Reporting Bugs:
-	See http://www.balsa.net/bugs.html for instructions.
+	See http://www.balsa.net/bugs.html for instructions.  Do not
+report bugs with GtkHTML - it is quite unstable. Patches are welcome.

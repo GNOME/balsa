@@ -1,3 +1,8 @@
+2000-08-27  Pawel Salek <pawsa@theochem.kth.se>
+
+	* README, NEWS, configure.in: updated for balsa-0.9.3
+	* docs/mh-mail-HOWTO: added.
+
 2000-08-27  Carlos Morgado  <chbm@chbm.nu>
 
 	* save-restore.c, mailbox-conf.c: apop support (lacking GUI)

@@ -1,17 +1,20 @@
-Balsa-0.9.2 development release. Release date 2000-08-14.
+Balsa-0.9.3 development release. Release date 2000-08-28.
+
 This is a developement release with unfinished features.
 
-There are known problems with POP downloading.
+POP downloading seem to be finally solved.
 
-- Is anyone else seeing a crash when deleting the last message from a
-mailbox.
+Crash when deleting the last message from a mailbox has been identified
+and terminated.
 
-If you could also drop in a note about not reporting bugs with GtkHTML
-that would be cool (it's only an experimental feature)
-
-You might want to mention especially not to report problems with GtkHTML
-not initialising GConf (solution - build GtkHTML without GConf support)
+Do not report bugs with GtkHTML - it is quite unstable. Patches are
+welcome.
 
 If you experience coredumps or other strange behavior when upgrading
 Balsa, try removing ~/.balsarc. The format of the preferences file
 has changed and Balsa can get confused if an old one is present.
+
+We are trying to improve threading, and merge improved IMAP code
+(CRAM-MD5, GSS authentications). If you need these features, drop a
+line to balsa-maintaiers@theochem.kth.se, it will give us more
+motivation.

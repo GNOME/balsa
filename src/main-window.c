@@ -375,7 +375,6 @@ balsa_window_new ()
 {
   BalsaWindow *window;
   GnomeAppBar *appbar;
-  GtkWidget *mailbox_list;
   GtkWidget *preview;
   GtkWidget *hpaned;
   GtkWidget *vpaned;
@@ -407,14 +406,15 @@ balsa_window_new ()
   vpaned = gtk_vpaned_new();
   hpaned = gtk_hpaned_new();
   window->notebook = gtk_notebook_new();
+  gtk_notebook_set_show_border(GTK_NOTEBOOK(window->notebook), FALSE);
   /* this call will set window->preview */
   preview = balsa_window_create_preview_pane(window);
 
   gnome_app_set_contents(GNOME_APP(window), hpaned);
 
   // XXX
-  mailbox_list = balsa_mailbox_list_window_new(window);
-  gtk_paned_pack1(GTK_PANED(hpaned), mailbox_list, TRUE, TRUE);
+  window->mblist = balsa_mailbox_list_window_new(window);
+  gtk_paned_pack1(GTK_PANED(hpaned), window->mblist, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(hpaned), vpaned, TRUE, TRUE);
 
   gtk_paned_pack1(GTK_PANED(vpaned), window->notebook, TRUE, TRUE);
@@ -423,7 +423,7 @@ balsa_window_new ()
   gtk_widget_show(vpaned);
   gtk_widget_show(hpaned);
   gtk_widget_show(window->notebook);
-  gtk_widget_show(mailbox_list);
+  gtk_widget_show(window->mblist);
   gtk_widget_show(preview);
 
   return GTK_WIDGET (window);
@@ -531,10 +531,11 @@ static GtkWidget *balsa_window_create_preview_pane(BalsaWindow *window)
 
 static void balsa_window_destroy (GtkObject     *object)
 {
-  /* XXX this is too late to get the right width and height
+  BalsaWindow *window;
   gint x, y;
   gchar *geometry;
-  
+
+  /* XXX this is too late to get the right width and height
   geometry = gnome_geometry_string(GTK_WIDGET(object)->window);
   gnome_parse_geometry(geometry,
 		       &x, &y,
@@ -542,6 +543,15 @@ static void balsa_window_destroy (GtkObject     *object)
 		       &balsa_app.mw_height);
   g_free (geometry);
   */
+
+  window = BALSA_WINDOW(object);
+
+  geometry = gnome_geometry_string(GTK_WIDGET(window->mblist)->window);
+  gnome_parse_geometry(geometry,
+		       &x, &y,
+		       &balsa_app.mblist_width, 
+		       &balsa_app.mblist_height);
+  
   balsa_app.mw_width = 640;
   balsa_app.mw_height = 400;
 

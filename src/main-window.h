@@ -38,6 +38,7 @@ struct _BalsaWindow
   GnomeApp window;
 
   GtkWidget *progress_bar;
+  GtkWidget *mblist;
   GtkWidget *notebook;
   GtkWidget *preview; // message is child
 };

@@ -579,7 +579,7 @@ CONTEXT *mx_open_mailbox (const char *path, int flags, CONTEXT *pctx)
     ctx = safe_malloc (sizeof (CONTEXT));
   memset (ctx, 0, sizeof (CONTEXT));
   ctx->path = safe_strdup (path);
-
+  set_option(OPTCHECKNEW);
   ctx->msgnotreadyet = -1;
   ctx->collapsed = 0;
   

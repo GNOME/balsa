@@ -228,13 +228,6 @@ void mutt_endwin (const char *msg)
     puts (msg);
 }
 
-void mutt_perror (const char *s)
-{
-  char *p = strerror (errno);
-
-  mutt_error ("%s: %s (errno = %d)", s, p ? p : "unknown error", errno);
-}
-
 int mutt_any_key_to_continue (const char *s)
 {
   struct termios t;

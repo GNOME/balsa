@@ -456,6 +456,13 @@ void mutt_mktemp (char *s)
   unlink (s);
 }
 
+void mutt_perror (const char *s)
+{
+  const char *p = strerror (errno);
+
+  mutt_error ("%s: %s (errno = %d)", s, p ? p : "unknown error", errno);
+}
+
 /* convert all characters in the string to lowercase */
 char *mutt_strlower (char *s)
 {

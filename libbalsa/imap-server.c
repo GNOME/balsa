@@ -7,11 +7,14 @@ How to handle responses related to a mailbox, have to be investigated.
 */
 #include <string.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #include "libbalsa.h"
 #include "imap-handle.h"
 #include "imap-server.h"
+#include "imap-commands.h"
 
+#include <gnome.h>
 #include <libgnome/gnome-config.h>
 
 static LibBalsaServerClass *parent_class = NULL;
@@ -44,6 +47,8 @@ static gboolean connection_cleanup(gpointer ptr);
 #define CONNECTION_CLEANUP_POLL_PERIOD	(5*60)
 /* Cleanup connections more then 10 minutes idle */
 #define CONNECTION_CLEANUP_IDLE_TIME	(10*60)
+/* Send NOOP after 20 minutes to keep a connection alive */
+#define CONNECTION_CLEANUP_NOOP_TIME	(20*60)
 
 G_LOCK_DEFINE_STATIC(imap_servers);
 GHashTable *imap_servers;
@@ -183,62 +188,6 @@ libbalsa_imap_server_finalize(GObject * object)
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
-static gboolean connection_cleanup(gpointer ptr)
-{
-    LibBalsaImapServer *imap_server;
-    time_t idle_marker;
-    GList *list;
-
-    g_return_val_if_fail(LIBBALSA_IS_IMAP_SERVER(ptr), FALSE);
-    imap_server = LIBBALSA_IMAP_SERVER(ptr);
-    idle_marker = time(NULL) - CONNECTION_CLEANUP_IDLE_TIME;
-
-    g_mutex_lock(imap_server->lock);
-    for(list = g_list_first(imap_server->free_handles);
-	list; list = g_list_next(list)) {
-	struct handle_info *info = list->data;
-	if (info->last_used < idle_marker) {
-	    GList *next = g_list_next(list);
-	    imap_server->free_handles =
-		g_list_delete_link(imap_server->free_handles, list);
-	    list = next;
-	    g_object_unref(info->handle);
-	    g_free(info);
-	}
-    }
-    g_mutex_unlock(imap_server->lock);
-    return TRUE;
-}
-
-static LibBalsaImapServer* get_or_create(const gchar *username,
-					 const gchar *host)
-{
-    LibBalsaImapServer *imap_server;
-    gchar *key;
-
-    if (!imap_servers) {
-	G_LOCK(imap_servers);
-	if (!imap_servers)
-	    imap_servers = g_hash_table_new(g_str_hash, g_str_equal);
-	G_UNLOCK(imap_servers);
-    }
-
-    /* lookup username@host */
-    key = g_strdup_printf("%s@%s", username, host);
-    G_LOCK(imap_servers);
-    imap_server = g_hash_table_lookup(imap_servers, key);
-    if (!imap_server) {
-	imap_server = g_object_new(LIBBALSA_TYPE_IMAP_SERVER, NULL);
-	imap_server->key = key;
-	g_hash_table_insert(imap_servers, key, imap_server);
-    } else {
-	g_free(key);
-	g_object_ref(imap_server);
-    }
-    G_UNLOCK(imap_servers);
-    return imap_server;
-}
-
 static void 
 libbalsa_imap_server_expunge_notify_cb(ImapMboxHandle *handle, int seqno,
 				       LibBalsaImapServer *imap_server)
@@ -273,6 +222,8 @@ monitor_cb(const char *buffer, int length, int direction, void *arg)
   for(i=0; i<length; i++) putchar(buffer[i]);
   fflush(NULL);
 #endif
+  if (direction)
+    ((struct handle_info *) arg)->last_used = time(NULL);
 }
 
 static void
@@ -307,9 +258,12 @@ flags_cb(unsigned seqno, void* h)
 #endif
 }
 
-static ImapMboxHandle *create_handle(LibBalsaServer *server)
+/* Create a struct handle_info with a new handle. */
+static struct handle_info *
+lb_imap_server_info_new(LibBalsaServer *server)
 {
     ImapMboxHandle *handle;
+    struct handle_info *info;
 
     /* try getting password, quit on cancel */
     if (!server->passwd) {
@@ -319,7 +273,9 @@ static ImapMboxHandle *create_handle(LibBalsaServer *server)
     }
 
     handle = imap_mbox_handle_new();
-    imap_handle_set_monitorcb(handle, monitor_cb, NULL);
+    info = g_new0(struct handle_info, 1);
+    info->handle = handle;
+    imap_handle_set_monitorcb(handle, monitor_cb, info);
     imap_handle_set_infocb(handle,    set_info, NULL);
     imap_handle_set_alertcb(handle,   set_alert, NULL);
     imap_handle_set_flagscb(handle,   flags_cb, handle);
@@ -327,7 +283,104 @@ static ImapMboxHandle *create_handle(LibBalsaServer *server)
     g_signal_connect(G_OBJECT(handle), "expunge-notify",
 		     G_CALLBACK(libbalsa_imap_server_expunge_notify_cb),
 		     (gpointer)server);
-    return handle;
+    return info;
+}
+
+/* Clean up and free a struct handle_info. */
+static void
+lb_imap_server_info_free(struct handle_info *info)
+{
+    g_object_unref(info->handle);
+    g_free(info);
+}
+
+/* Check handles periodically; shut down inactive ones, and send NOOP to
+ * host to keep active connections alive. */
+static void
+lb_imap_server_cleanup(LibBalsaImapServer * imap_server)
+{
+    time_t idle_marker;
+    GList *list;
+
+    g_mutex_lock(imap_server->lock);
+
+    idle_marker = time(NULL) - CONNECTION_CLEANUP_IDLE_TIME;
+    for(list = g_list_first(imap_server->free_handles);
+	list; list = g_list_next(list)) {
+	struct handle_info *info = list->data;
+	if (info->last_used < idle_marker) {
+	    GList *next = g_list_next(list);
+	    imap_server->free_handles =
+		g_list_delete_link(imap_server->free_handles, list);
+	    lb_imap_server_info_free(info);
+	    list = next;
+	}
+    }
+
+    idle_marker -=
+	CONNECTION_CLEANUP_NOOP_TIME - CONNECTION_CLEANUP_IDLE_TIME;
+    for (list = imap_server->used_handles; list; list = list->next) {
+	struct handle_info *info = list->data;
+	if (info->last_used < idle_marker) {
+	    if (imap_mbox_handle_noop(info->handle) != IMR_OK)
+		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				     _("Could not send \"%s\" to \"%s\""),
+				     "NOOP",
+				     LIBBALSA_SERVER(imap_server)->host);
+	}
+    }
+
+    g_mutex_unlock(imap_server->lock);
+}
+
+static gboolean connection_cleanup(gpointer ptr)
+{
+#ifdef BALSA_USE_THREADS
+    pthread_t cleanup_thread;
+#endif                          /*BALSA_USE_THREADS */
+    LibBalsaImapServer *imap_server;
+
+    g_return_val_if_fail(LIBBALSA_IS_IMAP_SERVER(ptr), FALSE);
+
+    imap_server = LIBBALSA_IMAP_SERVER(ptr);
+#ifdef BALSA_USE_THREADS
+    pthread_create(&cleanup_thread, NULL,
+		   (void *) lb_imap_server_cleanup, imap_server);
+    pthread_detach(cleanup_thread);
+#else                           /*BALSA_USE_THREADS */
+    lb_imap_server_cleanup(imap_server);
+#endif                          /*BALSA_USE_THREADS */
+
+    return TRUE;
+}
+
+static LibBalsaImapServer* get_or_create(const gchar *username,
+					 const gchar *host)
+{
+    LibBalsaImapServer *imap_server;
+    gchar *key;
+
+    if (!imap_servers) {
+	G_LOCK(imap_servers);
+	if (!imap_servers)
+	    imap_servers = g_hash_table_new(g_str_hash, g_str_equal);
+	G_UNLOCK(imap_servers);
+    }
+
+    /* lookup username@host */
+    key = g_strdup_printf("%s@%s", username, host);
+    G_LOCK(imap_servers);
+    imap_server = g_hash_table_lookup(imap_servers, key);
+    if (!imap_server) {
+	imap_server = g_object_new(LIBBALSA_TYPE_IMAP_SERVER, NULL);
+	imap_server->key = key;
+	g_hash_table_insert(imap_servers, key, imap_server);
+    } else {
+	g_free(key);
+	g_object_ref(imap_server);
+    }
+    G_UNLOCK(imap_servers);
+    return imap_server;
 }
 
 /**
@@ -411,7 +464,6 @@ LibBalsaImapServer* libbalsa_imap_server_new_from_config(void)
 ImapMboxHandle* libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(imap_server);
-    ImapMboxHandle *handle = NULL;
     struct handle_info *info = NULL;
     ImapResult rc;
 
@@ -427,39 +479,43 @@ ImapMboxHandle* libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server)
 	if (!conn)
 	    conn = g_list_first(imap_server->free_handles);
 	info = (struct handle_info*)conn->data;
-	handle = info->handle;
 	imap_server->free_handles =
 	    g_list_delete_link(imap_server->free_handles, conn);
     }
     /* create if used < max connections */
-    if (!handle
+    if (!info
 	&& imap_server->used_connections < imap_server->max_connections) {
 	g_mutex_unlock(imap_server->lock);
-	handle = create_handle(server);
+	info = lb_imap_server_info_new(server);
 	g_mutex_lock(imap_server->lock);
+	/* FIXME: after dropping and reacquiring the lock,
+	 * (imap_server->used_connections < imap_server->max_connections)
+	 * might no longer be true--do we care?
+	if (imap_server->used_connections >= imap_server->max_connections) {
+	    lb_imap_server_info_free(info);
+	    g_mutex_unlock(imap_server->lock);
+	    return NULL;
+	}
+	 */
     }
-    if (handle && imap_mbox_is_disconnected(handle)) {
-	rc=imap_mbox_handle_connect(handle, server->host,
+    if (info && imap_mbox_is_disconnected(info->handle)) {
+	rc=imap_mbox_handle_connect(info->handle, server->host,
 				    server->user, server->passwd);
 	if(rc != IMAP_SUCCESS) {
-	    g_object_unref(handle);
+	    lb_imap_server_info_free(info);
 	    g_mutex_unlock(imap_server->lock);
 	    return NULL;
 	}
     }
     /* add handle to used list */
-    if (handle) {
-	if (!info) {
-	    info = g_new0(struct handle_info, 1);
-	    info->handle = handle;
-	}
+    if (info) {
 	imap_server->used_handles = g_list_prepend(imap_server->used_handles,
 						   info);
 	imap_server->used_connections++;
     }
     g_mutex_unlock(imap_server->lock);
 
-    return handle;
+    return info ? info->handle : NULL;
 }
 
 /**
@@ -479,7 +535,6 @@ ImapMboxHandle* libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *im
 {
     LibBalsaServer *server = LIBBALSA_SERVER(imap_server);
     struct handle_info *info = NULL;
-    ImapMboxHandle *handle = NULL;
     ImapResult rc;
 
     if (imap_server->offline_mode)
@@ -497,44 +552,47 @@ ImapMboxHandle* libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *im
 				      by_last_user);
 	if (conn) {
 	    info = (struct handle_info*)conn->data;
-	    handle = info->handle;
 	    imap_server->free_handles =
 		g_list_delete_link(imap_server->free_handles, conn);
 	}
     }
     /* create if used < max connections */
-    if (!handle
+    if (!info
 	&& imap_server->used_connections < imap_server->max_connections) {
 	g_mutex_unlock(imap_server->lock);
-	handle = create_handle(server);
-	if (!handle)
+	info = lb_imap_server_info_new(server);
+	if (!info)
 	    return NULL;
 	g_mutex_lock(imap_server->lock);
+	/* FIXME: after dropping and reacquiring the lock,
+	 * (imap_server->used_connections < imap_server->max_connections)
+	 * might no longer be true--do we care?
+	if (imap_server->used_connections >= imap_server->max_connections) {
+	    lb_imap_server_info_free(info);
+	    g_mutex_unlock(imap_server->lock);
+	    return NULL;
+	}
+	 */
     }
     /* reuse a free connection */
-    if (!handle && imap_server->free_handles) {
+    if (!info && imap_server->free_handles) {
 	GList *conn;
 	conn = g_list_first(imap_server->free_handles);
 	info = (struct handle_info*)conn->data;
-	handle = info->handle;
 	imap_server->free_handles =
 	    g_list_delete_link(imap_server->free_handles, conn);
     }
-    if (handle && imap_mbox_is_disconnected(handle)) {
-	rc=imap_mbox_handle_connect(handle, server->host,
+    if (info && imap_mbox_is_disconnected(info->handle)) {
+	rc=imap_mbox_handle_connect(info->handle, server->host,
 				    server->user, server->passwd);
 	if(rc != IMAP_SUCCESS) {
-	    g_object_unref(handle);
+	    lb_imap_server_info_free(info);
 	    g_mutex_unlock(imap_server->lock);
 	    return NULL;
 	}
     }
     /* add handle to used list */
-    if (handle) {
-	if (!info) {
-	    info = g_new0(struct handle_info, 1);
-	    info->handle = handle;
-	}
+    if (info) {
 	info->last_user = user;
 	imap_server->used_handles = g_list_prepend(imap_server->used_handles,
 						   info);
@@ -542,7 +600,7 @@ ImapMboxHandle* libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *im
     }
     g_mutex_unlock(imap_server->lock);
 
-    return handle;
+    return info ? info->handle : NULL;
 }
 
 /**
@@ -571,17 +629,12 @@ void libbalsa_imap_server_release_handle(LibBalsaImapServer *imap_server,
 	imap_server->used_connections--;
     }
     /* check max_connections */
-    if (imap_server->used_connections >= imap_server->max_connections) {
-	g_object_unref(handle);
-	g_free(info);
-    }
+    if (imap_server->used_connections >= imap_server->max_connections)
+	lb_imap_server_info_free(info);
     else
     /* add to free list */
-    {
-	info->last_used = time(NULL);
 	imap_server->free_handles = g_list_append(imap_server->free_handles,
 						  info);
-    }
     g_mutex_unlock(imap_server->lock);
 }
 
@@ -605,17 +658,16 @@ void libbalsa_imap_server_set_max_connections(LibBalsaImapServer *server,
  *
  * Forces a logout on all connections, used when cleaning up.
  **/
-static void force_disconnect_cb(struct handle_info *info)
-{
-    g_object_unref(info->handle);
-    g_free(info);
-}
 void libbalsa_imap_server_force_disconnect(LibBalsaImapServer *imap_server)
 {
     g_mutex_lock(imap_server->lock);
-    g_list_foreach(imap_server->used_handles, (GFunc)force_disconnect_cb, NULL);
+    g_list_foreach(imap_server->used_handles,
+		   (GFunc) lb_imap_server_info_free, NULL);
+    g_list_free(imap_server->used_handles);
     imap_server->used_handles = NULL;
-    g_list_foreach(imap_server->free_handles, (GFunc)force_disconnect_cb, NULL);
+    g_list_foreach(imap_server->free_handles,
+		   (GFunc) lb_imap_server_info_free, NULL);
+    g_list_free(imap_server->free_handles);
     imap_server->free_handles = NULL;
     g_mutex_unlock(imap_server->lock);
 }

@@ -46,8 +46,10 @@ install-data-local: index.html
 	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/$$basefile; \
 	done
 	-for file in $(srcdir)/images/*.png ; do \
-	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/images;\
+	basefile=`basename $$file`; \
+	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/images/$$basefile;\
 	done
 	-for file in balsa/stylesheet-images/*.gif ; do \
-	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/stylesheet-images;\
+	basefile=`basename $$file`; \
+	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/stylesheet-images/$$basefile;\
 	done

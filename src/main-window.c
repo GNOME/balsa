@@ -502,8 +502,18 @@ static GnomeUIInfo message_menu[] = {
         view_msg_source_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         GNOME_STOCK_MENU_BOOK_OPEN, 'v', GDK_CONTROL_MASK, NULL
     },
+	GNOMEUIINFO_SEPARATOR,   
+#define MENU_MESSAGE_COPY_POS 11
+	GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
+#define MENU_MESSAGE_SELECT_ALL_POS 12
+	{
+		GNOME_APP_UI_ITEM, N_("_Select Text"),
+		N_("Select entire mail"),
+		select_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
+		NULL, 'A', GDK_CONTROL_MASK, NULL
+    },  
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_TRASH_POS 11
+#define MENU_MESSAGE_TRASH_POS 15
     /* D */
     {
         GNOME_APP_UI_ITEM, N_("_Move to Trash"), 
@@ -511,23 +521,23 @@ static GnomeUIInfo message_menu[] = {
         trash_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
     },
-#define MENU_MESSAGE_DELETE_POS 12
+#define MENU_MESSAGE_DELETE_POS 16
     { GNOME_APP_UI_ITEM, N_("_Delete"), 
       N_("Delete the current message"),
       delete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       GNOME_STOCK_MENU_TRASH, 'D', GDK_CONTROL_MASK, NULL },
-#define MENU_MESSAGE_UNDEL_POS 13
+#define MENU_MESSAGE_UNDEL_POS 17
     /* U */
     {
         GNOME_APP_UI_ITEM, N_("_Undelete"), N_("Undelete the message"),
         undelete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
         GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
     },
-#define MENU_MESSAGE_TOGGLE_POS 14
+#define MENU_MESSAGE_TOGGLE_POS 18
     /* ! */
     GNOMEUIINFO_SUBTREE(N_("_Toggle"), message_toggle_menu),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_STORE_ADDRESS_POS 16
+#define MENU_MESSAGE_STORE_ADDRESS_POS 19
     /* S */
     {
         GNOME_APP_UI_ITEM, N_("_Store Address..."),
@@ -1069,13 +1079,15 @@ static void
 enable_edit_menus(BalsaMessage * bm)
 {
     gboolean enable;
-    if (bm && balsa_message_can_select(bm))
-        enable = TRUE;
-    else
-        enable = FALSE;
+    enable = (bm && balsa_message_can_select(bm));
 
     gtk_widget_set_sensitive(edit_menu[MENU_EDIT_COPY_POS].widget, enable);
     gtk_widget_set_sensitive(edit_menu[MENU_EDIT_SELECT_ALL_POS].widget,
+                             enable);
+
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_COPY_POS].widget, 
+                             enable);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_SELECT_ALL_POS].widget,
                              enable);
 }
 
@@ -3365,4 +3377,7 @@ update_view_menu(void)
                                    balsa_app.browse_wrap);
     gtk_signal_handler_unblock_by_func(GTK_OBJECT(w), wrap_message_cb,
                                        balsa_app.main_window);
+    if (balsa_app.main_window->preview)
+        balsa_message_set_wrap(BALSA_MESSAGE(balsa_app.main_window->preview),
+                               balsa_app.browse_wrap);
 }

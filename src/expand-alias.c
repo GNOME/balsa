@@ -153,8 +153,10 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
 	    addr = LIBBALSA_ADDRESS(search->data);
 	}
 	output=libbalsa_address_to_gchar(addr, 0);
-	
-	g_message("expand_alias_find_match(): Found [%s]", addr->full_name);
+
+	if(balsa_app.debug)
+            g_message("expand_alias_find_match(): Found [%s]", 
+                      addr->full_name);
 	g_list_foreach(match, (GFunc)gtk_object_unref, NULL);
 	
 	/*
@@ -164,7 +166,5 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
     if (prefix) g_free(prefix);
 
     addy->match = output;
-    if (addy->match)
-	g_message("expand_alias_find_match(): Setting to [%s]", addy->match);
 }
 

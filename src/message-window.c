@@ -39,7 +39,7 @@ typedef struct _MessageWindow MessageWindow;
 
 /* callbacks */
 static void destroy_message_window(GtkWidget * widget, MessageWindow * mw);
-static void mw_message_destroy_notify(MessageWindow * mw);
+static void mw_message_weak_notify(MessageWindow * mw, GObject * obj);
 static void close_message_window(GtkWidget * widget, gpointer data);
 
 static void replyto_message_cb(GtkWidget * widget, gpointer data);
@@ -187,6 +187,7 @@ struct _MessageWindow {
     GtkWidget *bmessage;
 
     LibBalsaMessage *message;
+    BalsaIndex *bindex;
     int headers_shown;
     int show_all_headers;
     guint idle_handler_id;
@@ -205,7 +206,6 @@ static void
 message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
 {
     GList *list;
-    BalsaIndex* bindex;
 
     g_return_if_fail(mailbox != NULL);
 
@@ -214,8 +214,7 @@ message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
 	return;
 
     list = g_list_append(NULL, mw->message);
-    bindex = balsa_find_index_by_mailbox(mw->message->mailbox);
-    balsa_index_transfer(bindex, list, mailbox, FALSE);
+    balsa_index_transfer(mw->bindex, list, mailbox, FALSE);
     g_list_free_1(list);
     
     close_message_window(NULL, (gpointer) mw);
@@ -225,13 +224,11 @@ static gboolean
 message_window_idle_handler(MessageWindow* mw)
 {
     BalsaMessage *msg = BALSA_MESSAGE(mw->bmessage);
-    LibBalsaMessage *message;
+    LibBalsaMessage *message = mw->message;
 
     gdk_threads_enter();
 
     mw->idle_handler_id = 0;
-
-    message = g_object_get_data(G_OBJECT(msg), "message");
 
     balsa_message_set(msg, message);
 
@@ -325,6 +322,20 @@ message_window_get_toolbar_model(void)
 
 #define BALSA_MESSAGE_WINDOW_KEY "balsa-message-window"
 
+static void
+mw_set_message(MessageWindow *mw, LibBalsaMessage * message)
+{
+    mw->message = message;
+    mw_set_next_unread(mw);
+    g_object_set_data(G_OBJECT(message), BALSA_MESSAGE_WINDOW_KEY, mw);
+    g_object_weak_ref(G_OBJECT(message),
+		      (GWeakNotify) mw_message_weak_notify, mw);
+
+    g_object_ref(message); /* protect from destroying */
+    mw->idle_handler_id =
+        g_idle_add((GSourceFunc) message_window_idle_handler, mw);
+}
+
 void
 message_window_new(LibBalsaMessage * message)
 {
@@ -334,7 +345,6 @@ message_window_new(LibBalsaMessage * message)
     GtkWidget *toolbar;
     guint i;
     GtkWidget *move_menu, *submenu;
-    BalsaIndex *bindex;
 
     if (!message)
 	return;
@@ -353,10 +363,6 @@ message_window_new(LibBalsaMessage * message)
     }
 
     mw = g_malloc0(sizeof(MessageWindow));
-    g_object_set_data_full(G_OBJECT(message), BALSA_MESSAGE_WINDOW_KEY, mw,
-                           (GDestroyNotify) mw_message_destroy_notify);
-
-    mw->message = message;
 
     title = libbalsa_message_title(message,
                                    balsa_app.message_title_format);
@@ -384,10 +390,10 @@ message_window_new(LibBalsaMessage * message)
     g_signal_connect(G_OBJECT(mw->window), "size_allocate",
                      G_CALLBACK(size_alloc_cb), NULL);
     
-    bindex = balsa_find_index_by_mailbox(mw->message->mailbox);
-    g_signal_connect_swapped(G_OBJECT(bindex), "index-changed",
+    mw->bindex = balsa_find_index_by_mailbox(message->mailbox);
+    g_object_add_weak_pointer(G_OBJECT(mw->bindex), (gpointer) &mw->bindex);
+    g_signal_connect_swapped(G_OBJECT(mw->bindex), "index-changed",
 			     G_CALLBACK(mw_set_next_unread), mw);
-    mw_set_next_unread(mw);
 
     gnome_app_create_menus_with_data(GNOME_APP(mw->window), main_menu, mw);
 
@@ -396,7 +402,7 @@ message_window_new(LibBalsaMessage * message)
                                     G_CALLBACK(mru_menu_cb), mw);
     move_menu = main_menu[MAIN_MENU_MOVE_POS].widget;
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(move_menu), submenu);
-    if(mw->message->mailbox->readonly)
+    if(message->mailbox->readonly)
 	gtk_widget_set_sensitive(move_menu, FALSE);
     mw->bmessage = balsa_message_new();
     
@@ -417,49 +423,60 @@ message_window_new(LibBalsaMessage * message)
                                 balsa_app.message_window_width, 
                                 balsa_app.message_window_height);
 
-    gtk_widget_show(mw->bmessage);
-    gtk_widget_show(mw->window);
+    gtk_widget_show_all(mw->window);
+    mw_set_message(mw, message);
+}
 
-    g_object_set_data(G_OBJECT(mw->bmessage), "message", message);
-    g_object_ref(G_OBJECT(message)); /* protect from destroying */
-    mw->idle_handler_id =
-        g_idle_add((GSourceFunc) message_window_idle_handler, mw);
+static void
+mw_clear_message(MessageWindow * mw)
+{
+    if (mw->idle_handler_id) {
+	g_source_remove(mw->idle_handler_id);
+	if (mw->message)
+	    g_object_unref(mw->message);
+	mw->idle_handler_id = 0;
+    } else if (mw->message) {
+	g_object_set_data(G_OBJECT(mw->message), BALSA_MESSAGE_WINDOW_KEY,
+			  NULL);
+	g_object_weak_unref(G_OBJECT(mw->message),
+			    (GWeakNotify) mw_message_weak_notify, mw);
+    }
+    mw->message = NULL;
 }
 
 /* Handler for the "destroy" signal for mw->window. */
 static void
 destroy_message_window(GtkWidget * widget, MessageWindow * mw)
 {
-    if (mw->message && mw->message->mailbox) {
-	BalsaIndex *bindex =
-	    balsa_find_index_by_mailbox(mw->message->mailbox);
-	if (bindex)
-	    g_signal_handlers_disconnect_matched(G_OBJECT(bindex),
-						 G_SIGNAL_MATCH_DATA, 0, 0,
-						 NULL, NULL, mw);
-    }
+    if (mw->bindex)
+	g_signal_handlers_disconnect_matched(G_OBJECT(mw->bindex),
+					     G_SIGNAL_MATCH_DATA, 0, 0,
+					     NULL, NULL, mw);
 
-    if (mw->idle_handler_id) {
-        g_source_remove(mw->idle_handler_id);
-        if (mw->message)
-            g_object_unref(mw->message);
-    }
-
-    mw->window = NULL;
-    if (mw->message)
-        g_object_set_data(G_OBJECT(mw->message), BALSA_MESSAGE_WINDOW_KEY,
-                          NULL);
+    mw_clear_message(mw);
 
     g_free(mw);
 }
 
-/* GDestroyNotify for mw->message. */
+/* GWeakNotify for mw->message. */
+static gboolean
+mw_destroy_window(MessageWindow * mw)
+{
+    gdk_threads_enter();
+    g_object_unref(mw->window);
+    gtk_widget_destroy(mw->window);
+    gdk_threads_leave();
+}
+
 static void
-mw_message_destroy_notify(MessageWindow * mw)
+mw_message_weak_notify(MessageWindow * mw, GObject *obj)
 {
     mw->message = NULL;
-    if (mw->window)
-        gtk_widget_destroy(mw->window);
+    g_object_ref(mw->window);
+    /* Destroy the window in an idle handler, because the BalsaMessage
+     * must get its own weak notification about the message before we
+     * destroy the window. */
+    g_idle_add((GSourceFunc) mw_destroy_window, mw);
 }
 
 static void
@@ -652,68 +669,42 @@ select_all_cb(GtkWidget * widget, gpointer data)
     libbalsa_window_select_all(GTK_WINDOW(mw->window));
 }
 
-static void next_unread_cb(GtkWidget * widget, gpointer data)
+static void
+mw_set_selected(MessageWindow * mw)
+{
+    GList *list;
+
+    mw_clear_message(mw);
+
+    list = balsa_index_selected_list(mw->bindex);
+    if (g_list_length(list) == 1)
+	mw_set_message(mw, LIBBALSA_MESSAGE(list->data));
+    g_list_free(list);
+}
+
+static void
+next_unread_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) (data);
-    BalsaIndex *idx;
-    GList *list;
-    LibBalsaMessage *msg;
 
-    gtk_widget_destroy(mw->window);
-
-    balsa_index_select_next_unread(
-	idx=BALSA_INDEX(
-	    balsa_window_find_current_index(balsa_app.main_window)));
-
-    list = balsa_index_selected_list(idx);
-    if (g_list_length(list) != 1) {
-        g_list_free(list);
-        return;
-    }
-
-    msg = LIBBALSA_MESSAGE(list->data);
-    g_list_free(list);
-    if(!msg)
-	return;
-
-    message_window_new(msg);
+    balsa_index_select_next_unread(mw->bindex);
+    mw_set_selected(mw);
 }
 
 static void next_flagged_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) (data);
-    BalsaIndex *idx;
-    GList *list;
-    LibBalsaMessage *msg;
 
-    gtk_widget_destroy(mw->window);
-
-    balsa_index_select_next_flagged(
-	idx=BALSA_INDEX(
-	    balsa_window_find_current_index(balsa_app.main_window)));
-
-    list = balsa_index_selected_list(idx);
-    if (g_list_length(list) != 1) {
-        g_list_free(list);
-        return;
-    }
-
-    msg = LIBBALSA_MESSAGE(list->data);
-    g_list_free(list);
-    if(!msg)
-	return;
-
-    message_window_new(msg);
+    balsa_index_select_next_flagged(mw->bindex);
+    mw_set_selected(mw);
 }
 
 
 static void print_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) (data);
-    LibBalsaMessage *msg;
     
-    msg=mw->message;
-    message_print(msg, GTK_WINDOW(mw->window));
+    message_print(mw->message, GTK_WINDOW(mw->window));
 }
 
 static void trash_cb(GtkWidget * widget, gpointer data)

@@ -22,9 +22,13 @@
 #define M_CM_DECODE	(1<<2)	/* decode the message body into text/plain */
 #define M_CM_DISPLAY	(1<<3)	/* output is displayed to the user */
 #define M_CM_UPDATE	(1<<4)  /* update structs on sync */
+#define M_CM_WEED	(1<<5)  /* weed message/rfc822 attachment headers */
+#define M_CM_CHARCONV	(1<<6)	/* perform character set conversions */
 
-
-
+#ifdef _PGPPATH
+#define M_CM_DECODE_PGP	(1<<7)	/* used for decoding PGP messages */
+#define M_CM_VERIFY	(1<<8)	/* do signature verification */
+#endif
 
 
 

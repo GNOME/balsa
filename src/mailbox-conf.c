@@ -494,17 +494,25 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 
     /* Remove mailbox on IMAP server */
     if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) && !mailbox->config_prefix) {
+        GError *err = NULL;
 	BalsaMailboxNode *parent = mbnode->parent;
-	libbalsa_imap_delete_folder(LIBBALSA_MAILBOX_IMAP(mailbox));
-	/* a chain of folders might go away, so we'd better rescan from
-	 * higher up
-	 */
-	while (!parent->mailbox && parent->parent) {
-	    mbnode = parent;
-	    parent = parent->parent;
-	}
-	balsa_mblist_mailbox_node_remove(mbnode);
-	balsa_mailbox_node_rescan(parent); /* see it as server sees it */
+        if(libbalsa_imap_delete_folder(LIBBALSA_MAILBOX_IMAP(mailbox),
+                                       &err)) {
+            /* a chain of folders might go away, so we'd better rescan from
+             * higher up
+             */
+            while (!parent->mailbox && parent->parent) {
+                mbnode = parent;
+                parent = parent->parent;
+            }
+            balsa_mblist_mailbox_node_remove(mbnode);
+            balsa_mailbox_node_rescan(parent); /* see it as server sees it */
+        } else {
+            balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              _("Folder deletion failed. Reason: %s"),
+                              err ? err->message : "unknown");
+            g_clear_error(&err);
+        }
 	return;
     }
 

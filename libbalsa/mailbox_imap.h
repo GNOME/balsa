@@ -62,14 +62,17 @@ void libbalsa_mailbox_imap_noop(LibBalsaMailboxImap* mbox);
 
 void libbalsa_imap_close_all_connections(void);
 
-void libbalsa_imap_new_subfolder(const gchar * parent, const gchar * folder,
-				 gboolean subscribe, LibBalsaServer * server);
+gboolean libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
+                                     gboolean subscribe,
+                                     LibBalsaServer *server, GError **err);
 
 gboolean libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* mbox,
                                         const gchar *new_parent,
-                                        const gchar *folder, gboolean subscr);
+                                        const gchar *folder, gboolean subscr,
+                                        GError **err);
 
-gboolean libbalsa_imap_delete_folder(LibBalsaMailboxImap * mailbox);
+gboolean libbalsa_imap_delete_folder(LibBalsaMailboxImap * mailbox,
+                                     GError **err);
 
 gchar *libbalsa_imap_url(LibBalsaServer * server, const gchar * path);
 

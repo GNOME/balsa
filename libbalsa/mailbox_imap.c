@@ -1541,15 +1541,20 @@ libbalsa_imap_close_all_connections(void)
 gboolean
 libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* imap,
                                const gchar *new_parent, const gchar *folder, 
-                               gboolean subscribe)
+                               gboolean subscribe,
+                               GError **err)
 {
     ImapResult rc;
     ImapMboxHandle* handle;
     gchar *new_path;
 
     handle = libbalsa_mailbox_imap_get_handle(imap, NULL);
-    if (!handle)
+    if (!handle) {
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_RENAME_ERROR,
+                    _("Cannot get IMAP handle"));
 	return FALSE;
+    }
 
     II(rc,handle,
        imap_mbox_subscribe(handle, imap->path, FALSE));
@@ -1559,39 +1564,66 @@ libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* imap,
     if (subscribe && rc == IMR_OK)
 	rc = imap_mbox_subscribe(handle, new_path, TRUE);
     g_free(new_path);
-
+    if(rc != IMR_OK) {
+        gchar *msg = imap_mbox_handle_get_last_msg(handle);
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_RENAME_ERROR,
+                    "%s", msg);
+        g_free(msg);
+    }
     libbalsa_mailbox_imap_release_handle(imap);
+
     return rc == IMR_OK;
 }
 
-void
+gboolean
 libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
-			    gboolean subscribe, LibBalsaServer *server)
+			    gboolean subscribe, LibBalsaServer *server,
+                            GError **err)
 {
     ImapResult rc;
     ImapMboxHandle* handle;
     gchar *new_path;
-    char delim[2];
+
     if (!LIBBALSA_IS_IMAP_SERVER(server))
-	return;
+	return FALSE;
     handle = libbalsa_imap_server_get_handle(LIBBALSA_IMAP_SERVER(server),
 					     NULL);
-    if (!handle)
-	return;
-    delim[0] = imap_mbox_handle_get_delim(handle, parent);
-    delim[1] = '\0';
-    new_path = g_strjoin(delim, parent, folder, NULL);
+    if (!handle) {
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_RENAME_ERROR,
+                    _("Cannot get IMAP handle"));
+	return FALSE;
+    }
+    if(parent && *parent) {
+        char delim[2];
+        delim[0] = imap_mbox_handle_get_delim(handle, parent);
+        delim[1] = '\0';
+        if(parent[strlen(parent)-1] == delim[0])
+            new_path = g_strconcat(parent, folder, NULL);
+        else
+            new_path = g_strjoin(delim, parent, folder, NULL);
+    } else
+        new_path = g_strdup(folder);
     II(rc,handle,
        imap_mbox_create(handle, new_path));
     if (subscribe && rc == IMR_OK)
 	rc = imap_mbox_subscribe(handle, new_path, TRUE);
     g_free(new_path);
+    if(rc != IMR_OK) {
+        gchar *msg = imap_mbox_handle_get_last_msg(handle);
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_RENAME_ERROR,
+                    "%s", msg);
+        g_free(msg);
+    }
 
     libbalsa_imap_server_release_handle(LIBBALSA_IMAP_SERVER(server), handle);
+    return rc == IMR_OK;
 }
 
 gboolean
-libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
+libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox, GError **err)
 {
     ImapResponse rc;
     ImapMboxHandle* handle;
@@ -1607,6 +1639,13 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
     imap_mbox_subscribe(handle, mailbox->path, FALSE);
     II(rc,handle,
        imap_mbox_delete(handle, mailbox->path));
+    if(rc != IMR_OK) {
+        gchar *msg = imap_mbox_handle_get_last_msg(handle);
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_DELETE_ERROR,
+                    "%s", msg);
+        g_free(msg);
+    }
 
     libbalsa_mailbox_imap_release_handle(mailbox);
     return rc == IMR_OK;

@@ -1,3 +1,10 @@
+2005-01-07  Pawel Salek
+
+	* libbalsa/libbalsa.h: add mailbox manipulation error codes.
+	* libbalsa/mailbox_imap.[hc]: return more info on error.
+	* src/folder-conf.c: handle errors better.
+	* src/mailbox-conf.c: ditto.
+
 2005-01-06  Pawel Salek
 
 	* libbalsa/imap/imap-handle.c: silence debugging output.

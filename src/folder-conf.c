@@ -264,7 +264,7 @@ fix_ctree(GtkCTree * ctree, GtkCTreeNode * cnode, gpointer data)
 	SubfolderDialogData *fcw = (SubfolderDialogData *) data;
 	if (!mbnode->server || mbnode->server->type != LIBBALSA_SERVER_IMAP
 	    || (fcw->mbnode && fcw->mbnode->server != mbnode->server))
-	    gtk_ctree_remove_node(ctree, cnode);
+	    mblist_remove_mblist_node(BALSA_MBLIST(ctree), mbnode, cnode);
 	else
 	    gtk_ctree_node_set_selectable(ctree, cnode, TRUE);
     }

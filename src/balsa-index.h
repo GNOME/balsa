@@ -95,8 +95,8 @@ extern "C" {
 
 /* select up/down the index */
     void balsa_index_select_next(BalsaIndex *);
-    void balsa_index_select_first_unread(BalsaIndex*);
     void balsa_index_select_next_unread(BalsaIndex * bindex);
+    void balsa_index_select_next_flagged(BalsaIndex * bindex);
     void balsa_index_select_previous(BalsaIndex *);
     void balsa_index_select_row(BalsaIndex * bindex, gint row);
 
@@ -111,10 +111,11 @@ extern "C" {
     void balsa_message_replytoall(GtkWidget * widget, gpointer user_data);
     void balsa_message_replytogroup(GtkWidget * widget, gpointer user_data);
 
-    void balsa_message_forward_attached(GtkWidget * widget, gpointer user_data);
-    void balsa_message_forward_quoted(GtkWidget * widget, gpointer user_data);
-    void balsa_message_forward_default(GtkWidget * widget, gpointer user_data);
-    void balsa_message_continue(GtkWidget * widget, gpointer user_data);
+    void balsa_message_forward_attached(GtkWidget * widget, gpointer data);
+    void balsa_message_forward_inline(GtkWidget * widget, gpointer data);
+    void balsa_message_forward_quoted(GtkWidget * widget, gpointer data);
+    void balsa_message_forward_default(GtkWidget * widget, gpointer data);
+    void balsa_message_continue(GtkWidget * widget, gpointer data);
 
     void balsa_message_move_to_trash(GtkWidget * widget, gpointer user_data);
     void balsa_message_delete(GtkWidget * widget, gpointer user_data);

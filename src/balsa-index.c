@@ -884,33 +884,6 @@ balsa_index_select_next(BalsaIndex * bindex)
     balsa_index_select_row(bindex, h + 1);
 }
 
-
-/* 
- * select the first unread message in the index, otherwise select the
- * last message.
- */
-void
-balsa_index_select_first_unread(BalsaIndex* bindex)
-{
-    gint row;
-    
-
-    g_return_if_fail(bindex != NULL);
-    
-    balsa_index_set_first_new_message(bindex);
-
-    if (bindex->first_new_message != NULL) {
-        row = gtk_clist_find_row_from_data (GTK_CLIST(bindex->ctree), 
-                                            bindex->first_new_message);
-    } else {
-        row = GTK_CLIST(bindex->ctree)->rows - 1;
-    }
-    
-    balsa_index_select_row(bindex, row);
-}
-
-
-
 /* balsa_index_select_next_unread:
  * 
  * search for the next unread in the current mailbox.

@@ -1369,6 +1369,17 @@ balsa_mblist_focus_mailbox(BalsaMBList * bmbl, LibBalsaMailbox * mailbox)
    Return TRUE (or equivalent) on success, FALSE on failure.
 */
 gboolean
+mblist_remove_mblist_node(BalsaMBList *mblist, BalsaMailboxNode *mbnode,
+		GtkCTreeNode *node)
+{
+    if (mbnode->mailbox)
+	gtk_signal_disconnect_by_func(GTK_OBJECT(mbnode->mailbox),
+				      balsa_mblist_unread_messages_changed_cb,
+				      (gpointer) GTK_CTREE(mblist));
+    gtk_ctree_remove_node(GTK_CTREE(mblist), node);
+}
+
+gboolean
 mblist_remove_mailbox_node(BalsaMBList *mblist, BalsaMailboxNode* mbnode)
 {
     GtkCTreeNode* node;
@@ -1377,7 +1388,7 @@ mblist_remove_mailbox_node(BalsaMBList *mblist, BalsaMailboxNode* mbnode)
 
     node = gtk_ctree_find_by_row_data(GTK_CTREE(mblist), NULL, mbnode);
     if(node)
-	gtk_ctree_remove_node(GTK_CTREE(mblist), node);
+	mblist_remove_mblist_node(mblist, mbnode, node);
 
     return node != NULL;
 }

@@ -2338,7 +2338,8 @@ balsa_message_previous_part(BalsaMessage * bmessage)
     select_part(bmessage, index);
 }
 
-LibBalsaMessageBody *preferred_part(LibBalsaMessageBody *parts)
+static LibBalsaMessageBody*
+preferred_part(LibBalsaMessageBody *parts)
 {
     /* TODO: Consult preferences and/or previous selections */
 

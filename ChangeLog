@@ -1,3 +1,15 @@
+2001-10-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: warn on missing prototypes.
+	* libbalsa/Makefile.am:
+	* images/Makefile.am: 
+	* sounds/Makefile.am:
+	* src/Makefile.am: automake fixes.
+	* src/balsa-index.[hc]: remove dead code. add prototypes.
+	* src/balsa-mblist.[hc]: disconnect properly non-relevant MbNodes.
+	* src/balsa-message.c: make preferred_part() static.
+	* src/folder-conf.c: disconnect signals on MbNode removal (#61691).
+	
 2001-10-02  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/address.c: fix esmtp=no build.

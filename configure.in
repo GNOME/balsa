@@ -532,8 +532,8 @@ if test x"$check_pcre" = xyes ; then
 
 	if test x"$have_pcre" = xyes ; then
 	       	AC_MSG_RESULT(yes)
-		PCRE_CFLAGS="`pcre-config --cflags-posix`"
-		PCRE_LIBS="`pcre-config --libs-posix`"
+		CFLAGS="$CFLAGS `pcre-config --cflags-posix`"
+		LIBS="$LIBS `pcre-config --libs-posix`"
 		AC_DEFINE(HAVE_PCRE)
 	else
 	        AC_MSG_RESULT(not found)
@@ -561,7 +561,7 @@ if test "$gnome_libs" != "" ; then
 fi
 
 if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
-	for option in -Wsign-promo -Wsign-compare -Wpointer-arith -Wnested-externs -Wchar-subscripts -Wuninitialized; do
+	for option in -Wsign-promo -Wsign-compare -Wpointer-arith -Wnested-externs -Wchar-subscripts -Wuninitialized -Wmissing-prototypes; do
                 SAVE_CFLAGS="$CFLAGS"
                 CFLAGS="$CFLAGS $option"
                 AC_MSG_CHECKING([whether gcc understands $option])

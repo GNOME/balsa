@@ -65,10 +65,7 @@ libbalsa_a_SOURCES = 		\
 	source-viewer.c		\
 	threads.h
 
-
-libbalsa_a_LIBADD = @LIBOBJS@
-
-INCLUDES=-I. -I${top_srcdir} -I${top_builddir}/libmutt \
+INCLUDES=-I${top_srcdir} -I${top_builddir}/libmutt \
 	$(PCRE_CFLAGS)
 
 

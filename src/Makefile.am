@@ -64,8 +64,6 @@ INCLUDES = \
 	-I$(top_srcdir) \
 	-I$(top_srcdir)/libbalsa
 
-CFLAGS += $(PCRE_CFLAGS) 
-
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\
 	$(top_builddir)/libmutt/imap/libimap.a	\
@@ -76,13 +74,6 @@ balsa_LDADD = \
 	$(INTLLIBS) \
 	$(PCRE_LIBS) \
 	$(PTHREAD_LIB)
-
-balsa_DEPENDENCIES = \
-	$(top_builddir)/libbalsa/libbalsa.a	\
-	$(top_builddir)/libmutt/libmutt.a	\
-        $(top_builddir)/libmutt/imap/libimap.a	\
-	$(top_builddir)/libmutt/libmutt.a	\
-	$(top_builddir)/libinit_balsa/libinit_balsa.a
 
 dist-hook:
 	mkdir $(distdir)/pixmaps

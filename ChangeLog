@@ -1,5 +1,17 @@
 2001-04-17  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* libbalsa/address-entry.c: workaround for incorrectly handled
+	address cutting. Cutting the text by mouse leads to ", , "
+	appearing in the address entry, and the code cannot handle empty
+	addresses. FIXME!
+	
+	* configure.in: require gnome-print-0.25 to allow printing non-english
+	texts.
+	* src/print.c: utf8-enabled printing support by 
+	Albrecht Dreﬂ <albrecht.dress@arcormail.de>
+	
+2001-04-17  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* libbalsa/libbalsa_private.h: CLIENT_CONTEXT() macro: type cast
 	is not a l-value in strict C. fix #53050.
 	* libbalsa/mailbox.h: change type of context fld to struct _CONTEXT*.

@@ -22,6 +22,7 @@
 #include <gnome.h>
 #include <config.h>
 #include <balsa-app.h>
+#include <iconv.h>
 
 #include "print.h"
 
@@ -85,8 +86,14 @@ typedef struct _PrintInfo {
     gchar *buff, *pointer, *line_buf;
     gchar **headers;		/* can be released with g_strfreev() */
 
+    /* character conversion info */
+    iconv_t conv_data;
+
 } PrintInfo;
 
+
+static void
+gnome_print_show_with_charset(PrintInfo * pi, char const * text);
 
 static guint
 linecount(const gchar * str)
@@ -178,7 +185,7 @@ prepare_page_header(PrintInfo * pi)
 				   pi->printable_width -
 				   pi->header_label_width);
 
-    pi->header_height = lines * BALSA_PRINT_HEAD_SIZE;
+    pi->header_height = (lines + 1) * BALSA_PRINT_HEAD_SIZE;
     gtk_object_unref(GTK_OBJECT(font));
 }
 
@@ -223,6 +230,18 @@ print_info_new(const gchar * paper, LibBalsaMessage * msg,
 		pi->font_char_height);
     pi->pages = ((pi->total_lines - 1) / pi->lines_per_page) + 1;
 
+    /*
+     * Calling libbalsa_message_charset(msg) when composing a message leads to a
+     * crash, but msg->body_list->charset is NULL for a received one. So we have
+     * to try both methods...
+     */
+    if (msg->body_list->charset)
+	pi->conv_data = iconv_open("utf8", msg->body_list->charset);
+    else if (libbalsa_message_charset(msg))
+	pi->conv_data = iconv_open("utf8", libbalsa_message_charset(msg));
+    else
+	pi->conv_data = iconv_open("utf8", "iso-8859-1");
+
     return pi;
 }
 
@@ -231,6 +250,7 @@ static void
 print_info_destroy(PrintInfo * pi)
 {
     /* ... */
+    iconv_close(pi->conv_data);
     g_strfreev(pi->headers);
     pi->headers = NULL;
     g_free(pi->line_buf);
@@ -412,11 +432,11 @@ print_line(PrintInfo * pi, int line_on_page)
     gnome_print_moveto(pi->pc, pi->margin_left,
 		       pi->page_height - pi->margin_top - pi->header_height
 		       - (pi->font_char_height * line_on_page));
-    gnome_print_show(pi->pc, pi->line_buf);
+    gnome_print_show_with_charset(pi, pi->line_buf);
 }
 
 static void
-print_header_val(GnomePrintContext * pc, gint x, gint * y,
+print_header_val(PrintInfo * pi, gint x, gint * y,
 		 gint line_height, gchar * val)
 {
     gchar *ptr, *eol;
@@ -426,8 +446,8 @@ print_header_val(GnomePrintContext * pc, gint x, gint * y,
 	eol = strchr(ptr, '\n');
 	if (eol)
 	    *eol = '\0';
-	gnome_print_moveto(pc, x, *y);
-	gnome_print_show(pc, ptr);
+	gnome_print_moveto(pi->pc, x, *y);
+	gnome_print_show_with_charset(pi, ptr);
 	ptr = eol;
 	if (eol) {
 	    *eol = '\n';
@@ -450,19 +470,44 @@ print_header(PrintInfo * pi, guint page)
     width = gnome_font_get_width_string(font, page_no);
     gnome_print_moveto(pi->pc, pi->page_width - pi->margin_left - width,
 		       ypos);
-    gnome_print_show(pi->pc, page_no);
+    gnome_print_show_with_charset(pi, page_no);
     g_free(page_no);
 
     for (i = 0; pi->headers[i]; i += 2) {
 	gnome_print_moveto(pi->pc, pi->margin_left, ypos);
-	gnome_print_show(pi->pc, pi->headers[i]);
-	print_header_val(pi->pc, pi->margin_left + pi->header_label_width,
+	gnome_print_show_with_charset(pi, pi->headers[i]);
+	print_header_val(pi, pi->margin_left + pi->header_label_width,
 			 &ypos, BALSA_PRINT_HEAD_SIZE, pi->headers[i + 1]);
     }
 
+    /* print a horizontal line below the header */
+    ypos += BALSA_PRINT_HEAD_SIZE >> 1;
+    gnome_print_setlinewidth(pi->pc, 1.0);
+    gnome_print_newpath(pi->pc);
+    gnome_print_moveto(pi->pc, pi->margin_left, ypos);
+    gnome_print_lineto(pi->pc, pi->printable_width + pi->margin_left, ypos);
+    gnome_print_stroke (pi->pc);
+    
     gtk_object_unref(GTK_OBJECT(font));
 }
 
+static void
+gnome_print_show_with_charset(PrintInfo * pi, char const * text)
+{
+    gchar *conv_ibuf, *conv_ibufp, *conv_obuf, *conv_obufp;
+    size_t ibuflen, obuflen;
+    g_return_if_fail(pi->conv_data != (iconv_t)(-1));
+
+    /* as iconv() changes all supplied pointers, we have to remember them... */
+    conv_ibuf = conv_ibufp = g_strdup (text);
+    ibuflen = strlen(conv_ibuf) + 1;
+    obuflen = ibuflen << 1; /* should be sufficient? */
+    conv_obuf = conv_obufp = g_malloc(obuflen);
+    iconv(pi->conv_data, (const char **)&conv_ibuf, &ibuflen, &conv_obuf, &obuflen);
+    gnome_print_show(pi->pc, conv_obufp);
+    g_free (conv_ibufp);
+    g_free (conv_obufp);
+}
 #endif
 
 

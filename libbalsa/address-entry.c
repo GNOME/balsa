@@ -2161,7 +2161,7 @@ static GList *
 libbalsa_find_list_entry(LibBalsaAddressEntry *address_entry, gint *cursor)
 {
     GList *list, *previous;
-    gint i;
+    gint address_start;
     gboolean found;
     emailData *addy;
     gint pos;
@@ -2169,7 +2169,7 @@ libbalsa_find_list_entry(LibBalsaAddressEntry *address_entry, gint *cursor)
     g_return_val_if_fail(address_entry != NULL, NULL);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry), NULL);
 
-    i = 0;
+    address_start = 0;
     found = FALSE;
     pos = *cursor;
     *cursor = 0;
@@ -2177,15 +2177,21 @@ libbalsa_find_list_entry(LibBalsaAddressEntry *address_entry, gint *cursor)
 	 (list != NULL) && (found == FALSE);
 	 list = g_list_next(list)) {
 	addy = (emailData *)list->data;
-	i = i + libbalsa_length_of_address(addy);
-	if (pos <= i) {
+	address_start += libbalsa_length_of_address(addy);
+	if (pos <= address_start) {
 	    found = TRUE;
-	    *cursor = libbalsa_length_of_address(addy) - (i - pos);
+	    *cursor = libbalsa_length_of_address(addy) - (address_start - pos);
 	}
-	i = i + 2;
+	address_start += 2; /* strlen(", ") */
 	previous = list;
     }
     g_assert(found == TRUE);
+    if(*cursor<0) { /* error, correct it and print a warning.
+		       This needs to be fixed in long term. */
+	*cursor = 0;
+	g_warning("libbalsa_find_list_entry failed to compute the cursor.\n"
+		  "find a way to reproduce it and report it.");
+    }
     return previous;
 }
 

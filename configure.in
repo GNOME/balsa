@@ -100,8 +100,11 @@ dnl ############################################################################
 dnl Check for gnome-print
 dnl ######################################################################################
 
-AM_PATH_GNOME_PRINT([0.20.0], [
+AM_PATH_GNOME_PRINT([0.25.0], [
 	AC_DEFINE(HAVE_GNOME_PRINT)
+	printing_support=yes
+], [ 
+   printing_support="no (gnome-print >= 0.25 required)"
 ])
 
 
@@ -434,7 +437,14 @@ if test "x$with_ssl" != xno  ; then
 else
 	AC_MSG_RESULT([no])
 fi
-
+dnl #############################################################
+dnl Link with iconv for charset translation, if not found
+dnl without library.  Needed for libmutt.
+dnl #############################################################
+AC_CHECK_FUNC(iconv, , 
+	AC_SEARCH_LIBS(iconv_open, iconv, LIBS="$LIBS -liconv",
+			AC_MSG_ERROR([*** You need iconv for libmutt.]))
+)
 dnl #############################################################
 dnl turn warnings into errors to enforce clean code
 dnl #############################################################
@@ -488,6 +498,7 @@ echo "               Use GtkHTML: $have_gtkhtml"
 echo "                  Use LDAP: $use_ldap"
 echo "                   Use GSS: $with_gss"
 echo "                   Use SSL: $with_ssl"
+echo "          Printing support: $printing_support"
 echo ""
 
 if test x"$BALSA_FROM_CVS" = xyes ; then

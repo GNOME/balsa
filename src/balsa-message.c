@@ -185,7 +185,7 @@ static void part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info);
 static void part_context_menu_vfs_cb(GtkWidget * menu_item, BalsaPartInfo * info);
 static void part_create_menu (BalsaPartInfo* info);
 
-static GtkVBoxClass *parent_class = NULL;
+static GtkNotebookClass *parent_class = NULL;
 
 /* stuff needed for sending Message Disposition Notifications */
 static gboolean rfc2298_address_equal(LibBalsaAddress *a, LibBalsaAddress *b);
@@ -256,7 +256,7 @@ balsa_message_get_type()
         };
 
         balsa_message_type =
-            g_type_register_static(GTK_TYPE_VBOX, "BalsaMessage",
+            g_type_register_static(GTK_TYPE_NOTEBOOK, "BalsaMessage",
                                    &balsa_message_info, 0);
     }
 
@@ -431,11 +431,8 @@ balsa_message_init(BalsaMessage * bm)
     GtkCellRenderer *renderer;
     GtkTreeSelection *selection;
 
-    /* Notebook to hold content + structure */
-    bm->notebook = gtk_notebook_new();
-    gtk_notebook_set_show_border(GTK_NOTEBOOK(bm->notebook), FALSE);
-    gtk_widget_show(bm->notebook);
-    gtk_container_add(GTK_CONTAINER(bm), bm->notebook);
+    gtk_notebook_set_show_border(GTK_NOTEBOOK(bm), FALSE);
+    gtk_widget_show(GTK_WIDGET(bm));
 
     /* scrolled window for the contents */
     scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -444,12 +441,12 @@ balsa_message_init(BalsaMessage * bm)
                                    GTK_POLICY_AUTOMATIC);
     label = gtk_label_new(_("Content"));
     gtk_widget_show(label);
-    gtk_notebook_append_page(GTK_NOTEBOOK(bm->notebook), scroll, label);
+    gtk_notebook_append_page(GTK_NOTEBOOK(bm), scroll, label);
     gtk_widget_show(scroll);
     bm->cont_viewport = gtk_viewport_new(NULL, NULL);
     gtk_widget_show(bm->cont_viewport);
     gtk_container_add(GTK_CONTAINER(scroll), bm->cont_viewport);
-    g_signal_connect_after(bm->notebook, "style-set",
+    g_signal_connect_after(bm, "style-set",
 			   G_CALLBACK(bm_on_set_style), bm);
 
     /* Widget to hold headers */
@@ -504,7 +501,7 @@ balsa_message_init(BalsaMessage * bm)
                                    GTK_POLICY_AUTOMATIC);
     label = gtk_label_new(_("Message parts"));
     gtk_widget_show(label);
-    gtk_notebook_append_page(GTK_NOTEBOOK(bm->notebook), scroll, label);
+    gtk_notebook_append_page(GTK_NOTEBOOK(bm), scroll, label);
     gtk_widget_show(scroll);
     gtk_widget_show(bm->treeview);
     gtk_container_add(GTK_CONTAINER(scroll), bm->treeview);
@@ -712,7 +709,7 @@ tree_activate_row_cb(GtkTreeView *treeview, GtkTreePath *arg1,
         }
     }
 
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm->notebook), 0);
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
     select_part(bm, info);
 }
 
@@ -1041,8 +1038,8 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 
     if (message == NULL) {
         gtk_widget_hide(bm->cont_viewport);
-        gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm->notebook), FALSE);
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(bm->notebook), 0);
+        gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), FALSE);
+        gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
         return TRUE;
     }
     gtk_widget_show(bm->cont_viewport);
@@ -1100,8 +1097,8 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     display_headers(bm);
     display_content(bm);
 
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm->notebook), bm->info_count > 1);
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm->notebook), 0);
+    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), bm->info_count > 1);
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
 
     /*
      * At this point we check if (a) a message was new (its not new

@@ -654,42 +654,42 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     gtk_table_set_row_spacings(GTK_TABLE(table), padding);
     gtk_table_set_col_spacings(GTK_TABLE(table), padding);
 
-    ident_dialog_add_entry(table, row++, dialog, _("Identity Name:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("_Identity Name:"), 
 		           "identity-name");
-    ident_dialog_add_entry(table, row++, dialog, _("Full Name:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("_Full Name:"), 
                            "identity-fullname");
-    ident_dialog_add_entry(table, row++, dialog, _("Mailing Address:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("_Mailing Address:"), 
                            "identity-address");
-    ident_dialog_add_entry(table, row++, dialog, _("Reply To:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("_Reply To:"), 
                            "identity-replyto");
-    ident_dialog_add_entry(table, row++, dialog, _("Domain:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("_Domain:"), 
                            "identity-domain");
-    ident_dialog_add_entry(table, row++, dialog, _("Bcc:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("_Bcc:"), 
                            "identity-bcc");
-    ident_dialog_add_entry(table, row++, dialog, _("Reply String:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("Reply _String:"), 
                            "identity-replystring");
-    ident_dialog_add_entry(table, row++, dialog, _("Forward String:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("F_orward String:"), 
                            "identity-forwardstring");
-    ident_dialog_add_entry(table, row++, dialog, _("Signature Path:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("Signature _Path:"), 
                            "identity-sigpath");
     
     ident_dialog_add_checkbutton(table, row++, dialog,
-                                _("Execute Signature"),
+                                _("_Execute Signature"),
 				"identity-sigexecutable");
     ident_dialog_add_checkbutton(table, row++, dialog,
-                                 _("Include Signature"), 
+                                 _("Incl_ude Signature"), 
                                  "identity-sigappend");
     ident_dialog_add_checkbutton(table, row++, dialog, 
-                                 _("Include Signature When Forwarding"),
+                                 _("Include Signature When For_warding"),
                                  "identity-whenforward");
     ident_dialog_add_checkbutton(table, row++, dialog,
-                                 _("Include Signature When Replying"),
+                                 _("Include Signature When Rep_lying"),
                                  "identity-whenreply");
     ident_dialog_add_checkbutton(table, row++, dialog, 
-                                 _("Add Signature Separator"),
+                                 _("_Add Signature Separator"),
                                  "identity-sigseparator");
     ident_dialog_add_checkbutton(table, row++, dialog,
-                                 _("Prepend Signature"),
+                                 _("Prepend Si_gnature"),
                                  "identity-sigprepend");
 
     return GTK_WIDGET(frame);
@@ -707,7 +707,7 @@ ident_dialog_add_checkbutton(GtkWidget * table, gint row,
 {
     GtkWidget *check;
 
-    check = gtk_check_button_new_with_label(check_label);
+    check = gtk_check_button_new_with_mnemonic(check_label);
     gtk_table_attach_defaults(GTK_TABLE(table), check, 0, 2, row, row + 1);
     g_object_set_data(G_OBJECT(dialog), check_key, check);
 }
@@ -726,7 +726,7 @@ ident_dialog_add_entry(GtkWidget * table, gint row, GtkDialog * dialog,
     GtkWidget *label;
     GtkWidget *entry;
 
-    label = gtk_label_new(label_name);
+    label = gtk_label_new_with_mnemonic(label_name);
     gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
 
@@ -736,6 +736,7 @@ ident_dialog_add_entry(GtkWidget * table, gint row, GtkDialog * dialog,
     g_object_set_data(G_OBJECT(dialog), entry_key, entry);
     if (row == 0)
         gtk_widget_grab_focus(entry);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
 }
 
 /* set_identity_name_in_tree:

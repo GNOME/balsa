@@ -283,12 +283,12 @@ create_vcard_page(AddressBookConfig * abc)
 
     /* mailbox name */
 
-    label = create_label(_("_Address Book Name"), table, 0);
+    label = create_label(_("Address _Book Name"), table, 0);
     abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
 				   ab ? abc->address_book->name : NULL, 
 				   label);
 
-    label = gtk_label_new(_("File name"));
+    label = gtk_label_new(_("_File Name"));
     gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
 		     GTK_FILL, GTK_FILL, 10, 10);
@@ -550,7 +550,7 @@ next_button_cb(AddressBookConfig * abc)
     gtk_widget_destroy(abc->continue_button);
     abc->continue_button =
         gtk_dialog_add_button(GTK_DIALOG(abc->window),
-                              _("Add"), ABC_RESPONSE_ADD);
+                              _("_Add"), ABC_RESPONSE_ADD);
     gtk_box_reorder_child(GTK_BOX(bbox), abc->continue_button, 0);
 
     page = create_page_from_type(abc);

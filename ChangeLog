@@ -4,6 +4,8 @@
 	* libbalsa/filter.c: port incremental imap queries from HEAD (Emmanuel)
 	* libinit_balsa/balsa-druid-page-{directory,user}.c:
 	* libinit_balsa/helper.c: add missing shortcuts.
+	* libbalsa/identity.c, src/address-book-config.c: add shortcuts.
+	* src/ab-window.c: fix typo (#102013).
 	
 2002-12-25  Pawel Salek  <pawsa@theochem.kth.se>
 

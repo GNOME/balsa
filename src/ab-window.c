@@ -666,7 +666,7 @@ balsa_ab_window_load(BalsaAbWindow *ab)
                                         balsa_ab_window_load_cb,
                                         ab)) != LBABERR_OK) {
         balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("Error opening addres book '%s'\n%s"),
+                          _("Error opening address book '%s'\n%s"),
                           ab->current_address_book->name,
                           libbalsa_address_book_strerror(err));
     }

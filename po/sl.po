@@ -5,7 +5,7 @@
 
 msgid ""
 msgstr ""
-"Project-Id-Version: Balsa\n"
+"Project-Id-Version: balsa\n"
 "POT-Creation-Date: 2000-06-24 12:30+0200\n"
 "PO-Revision-Date: 2000-06-24 12:30+0200\n"
 "Last-Translator: Andraz Tori <andraz.tori1@guest.arnes.si>\n"
@@ -636,7 +636,7 @@ msgstr "Dejanje, ki naj se izvr¹i:"
 #. The disposition area
 #: src/filter-edit-dialog.c:692
 msgid "Disposition:"
-msgstr "Odlagali¹èe:"
+msgstr "Odlo¾i¹èe:"
 
 #: src/filter-edit-dialog.c:700
 msgid "Place/leave in default folder"
@@ -941,11 +941,11 @@ msgstr "Izbri¹i trenutno sporoèilo"
 
 #: src/main-window.c:307
 msgid "_Undelete"
-msgstr "_Odizbri¹i"
+msgstr "_Odbri¹i"
 
 #: src/main-window.c:307
 msgid "Undelete the message"
-msgstr "Odizbri¹i sporoèilo"
+msgstr "Odbri¹i sporoèilo"
 
 #: src/main-window.c:314
 msgid "_Toggle flagged"

@@ -447,7 +447,7 @@ int imap_append_message (CONTEXT *ctx, MESSAGE *msg)
   /* some platforms, it sometimes returns non-NULL at EOF */
   len=0;
   nl=1;
-  while(fgets(buf, sizeof(buf), fp) && !feof(fp))
+  while(!feof(fp) && fgets(buf, sizeof(buf), fp))
   {
     if(nl && !strncmp(buf, "Status: ", 8))
     {

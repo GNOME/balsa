@@ -15,37 +15,183 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
+
 #include <stdio.h>
 #include <string.h>
 #include <gtk/gtk.h>
 #include <gnome.h>
-#include "balsa-message.h"
+#include "c-client.h"
 #include "sendmsg-window.h"
+#include "balsa-message.h"
+#include "balsa-index.h"
+#include "index.h"
+#include "mailbox.h"
+#include "pixmaps/p8.xpm"
+#include "pixmaps/p13.xpm"
+#include "pixmaps/p14.xpm"
+#include "pixmaps/p15.xpm"
+#include "pixmaps/p16.xpm"
 
 gint delete_event (GtkWidget *, gpointer);
 void send_smtp_message (GtkWidget *, BalsaSendmsg *);
+extern void balsa_exit ();
+extern GtkWidget *new_icon (gchar **, GtkWidget *);
 
+static GtkWidget *menu_items[9];
+GtkTooltips *tooltips;
 
-static GtkMenuEntry main_menu_items[] =
+void close_window (GtkWidget *widget, gpointer data)
 {
-  {"<Balsa>/Message/Send", NULL, NULL, NULL},
-  {"<Balsa>/Message/Save as...", NULL, NULL, NULL},
-  {"<Balsa>/Message/Print", NULL, NULL, NULL},
-  {"<Balsa>/Message/<separator>", NULL, NULL, NULL},
-  {"<Balsa>/Message/Attach file...", NULL, NULL, NULL},
-  {"<Balsa>/Message/<separator>", NULL, NULL, NULL},
-  {"<Balsa>/Message/Close", NULL, delete_event, NULL},
-  {"<Balsa>/Edit/Copy", "<control>C", NULL, "Copy"},
-  {"<Balsa>/Edit/Cut", "<control>X", NULL, "Cut"},
-  {"<Balsa>/Edit/Paste", "<control>V", NULL, "Paste"},
-  {"<Balsa>/PGP/FFU", NULL, NULL, NULL},
-  {"<Balsa>/Help/Contents", NULL, NULL, NULL},
-};
-static int main_nmenu_items = sizeof (main_menu_items) / sizeof (main_menu_items[0]);
+  gtk_widget_destroy (GTK_WIDGET (data)); 
+}
+
+static GtkWidget *
+create_toolbar (BalsaSendmsg *mw)
+{
+  GtkWidget *window=mw->window;
+  GtkWidget *toolbar;
+  GtkWidget *toolbarbutton;
+
+  tooltips = gtk_tooltips_new ();
+
+  toolbar = gtk_toolbar_new (0, 0);
+  gtk_widget_realize (window);
 
 
-void
-sendmsg_window_new (GtkWidget * widget, gpointer data)
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					 "Send", "Send", NULL,
+					   new_icon (p8_xpm, window), GTK_SIGNAL_FUNC (send_smtp_message),
+					   "Send");
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					 "Spell Check", "Spell Check", NULL,
+					   new_icon (p13_xpm, window), NULL,
+					   "Spell Check");
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+				       "Address Book", "Address Book", NULL,
+					   new_icon (p14_xpm, window), NULL,
+					   "Address Book");
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+					   "Print", "Print", NULL,
+					   new_icon (p15_xpm, window), NULL,
+					   "Print");
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+		   "Context Sensitive Help", "Context Sensitive Help", NULL,
+					   new_icon (p16_xpm, window), NULL,
+					   "Context Sensitive Help");
+
+  gtk_widget_show (toolbar);
+  return toolbar;
+}
+
+
+static GtkWidget *
+create_menu (GtkWidget * window)
+{
+  GtkWidget *menubar, *w, *menu;
+  GtkAcceleratorTable *accel;
+  int i = 0;
+
+  accel = gtk_accelerator_table_new ();
+  menubar = gtk_menu_bar_new ();
+  gtk_widget_show (menubar);
+
+  menu = gtk_menu_new ();
+
+  w = gtk_menu_item_new ();
+  gtk_widget_show (w);
+  gtk_menu_append (GTK_MENU (menu), w);
+
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Send"));
+  gtk_widget_show (w);
+  gtk_menu_append (GTK_MENU (menu), w);
+  menu_items[i++] = w;
+
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Attach File"));
+  gtk_widget_show (w);
+  gtk_menu_append (GTK_MENU (menu), w);
+  menu_items[i++] = w;
+
+  w = gtk_menu_item_new ();
+  gtk_widget_show (w);   
+  gtk_menu_append (GTK_MENU (menu), w);  
+
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Close"));
+  gtk_widget_show (w);
+  gtk_menu_append (GTK_MENU (menu), w);
+  gtk_signal_connect_object (GTK_OBJECT (w), "activate",
+                             GTK_SIGNAL_FUNC (close_window),
+                             GTK_OBJECT(window));
+  menu_items[i++] = w;
+
+  w = gtk_menu_item_new_with_label (_ ("Message"));
+  gtk_widget_show (w);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
+  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
+
+  menu = gtk_menu_new ();
+
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_CUT, _ ("Cut"));
+  gtk_widget_show (w);
+  gtk_widget_install_accelerator (w, accel, "activate",
+				  'X', GDK_CONTROL_MASK);
+  gtk_menu_append (GTK_MENU (menu), w);
+  menu_items[i++] = w;
+
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_COPY, _ ("Copy"));
+  gtk_widget_show (w);
+  gtk_widget_install_accelerator (w, accel, "activate",
+				  'C', GDK_CONTROL_MASK);
+  gtk_menu_append (GTK_MENU (menu), w);
+  menu_items[i++] = w;
+
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PASTE, _ ("Paste"));
+  gtk_widget_show (w);
+  gtk_widget_install_accelerator (w, accel, "activate",
+				  'V', GDK_CONTROL_MASK);
+  gtk_menu_append (GTK_MENU (menu), w);
+  menu_items[i++] = w;
+
+  w = gtk_menu_item_new_with_label (_ ("Edit"));
+  gtk_widget_show (w);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
+  gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
+  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
+
+  menu = gtk_menu_new ();
+
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_ABOUT, _ ("Contents"));
+  gtk_widget_show (w);
+  gtk_menu_append (GTK_MENU (menu), w);
+  menu_items[i++] = w;
+  
+  w = gtk_menu_item_new_with_label (_ ("Help"));
+  gtk_widget_show (w);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
+  gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
+  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
+
+  menu_items[i] = NULL;
+
+/*  g_print("%d menu items\n", i); */
+
+  gtk_window_add_accelerator_table (GTK_WINDOW (window), accel);
+  return menubar;
+}
+
+
+void sendmsg_window_new(GtkWidget *widget, gpointer data)
 {
   BalsaSendmsg *msg = g_malloc0 (sizeof (BalsaSendmsg));
   GtkWidget *vbox;
@@ -56,32 +202,18 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
   GtkMenuFactory *factory;
   GtkMenuFactory *subfactories[1];
 
-  msg->window = gtk_window_new (GTK_WINDOW_DIALOG);
-  gtk_window_set_title (GTK_WINDOW (msg->window), "New message");
-  gtk_container_border_width (GTK_CONTAINER (msg->window), 1);
+  msg->window = gnome_app_new ("balsa_sendmsg_window", "New message");
+  gtk_window_set_wmclass (GTK_WINDOW (msg->window), "balsa_app",
+			  "Balsa");
 
-  gtk_window_set_title (GTK_WINDOW (msg->window), "New Message");
-  gtk_widget_set_usize (GTK_WIDGET (msg->window), 540, 380);
+  gtk_signal_connect (GTK_OBJECT (msg->window), "destroy",
+		      GTK_SIGNAL_FUNC(delete_event), NULL);
+
   gtk_signal_connect (GTK_OBJECT (msg->window), "delete_event",
 		      GTK_SIGNAL_FUNC (delete_event), NULL);
 
   vbox = gtk_vbox_new (FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (msg->window), vbox);
   gtk_widget_show (vbox);
-
-  factory = gtk_menu_factory_new (GTK_MENU_FACTORY_MENU_BAR);
-  subfactories[0] = gtk_menu_factory_new (GTK_MENU_FACTORY_MENU_BAR);
-  gtk_menu_factory_add_subfactory (factory, subfactories[0], "<Balsa>");
-  gtk_menu_factory_add_entries (factory, main_menu_items, main_nmenu_items);
-  menubar = subfactories[0]->widget;
-  gtk_box_pack_start (GTK_BOX (vbox), menubar, FALSE, TRUE, 0);
-  gtk_widget_show (menubar);
-
-  sendbut = gtk_button_new_with_label ("send");
-  gtk_box_pack_start (GTK_BOX (vbox), sendbut, FALSE, TRUE, 0);
-  gtk_widget_show (sendbut);
-  gtk_signal_connect (GTK_OBJECT (sendbut), "clicked",
-		      GTK_SIGNAL_FUNC (send_smtp_message), msg);
 
   table = gtk_table_new (5, 2, FALSE);
   gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
@@ -163,8 +295,17 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
 
   gtk_widget_show (msg->text);
   gtk_widget_show (table1);
+
+  gnome_app_set_contents (GNOME_APP (msg->window), vbox);
+
+  gnome_app_set_menus (GNOME_APP (msg->window),
+		       GTK_MENU_BAR (create_menu (msg->window)));
+
+  msg->toolbar=create_toolbar (msg);
+  gnome_app_set_toolbar (GNOME_APP (msg->window),
+			 GTK_TOOLBAR (msg->toolbar));
+
   gtk_widget_show (msg->window);
-  return;
 }
 
 static char *hostlist[] =

@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- * Copyright (C) 1997-98 Jay Painter
+ * Copyright (C) 1997-98 Jay Painter and Stuart Parmenter
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "balsa-app.h"
 #include "index.h"
 #include "mailbox.h"
+#include "../config.h"
 
 int
 main (int argc, char *argv[])

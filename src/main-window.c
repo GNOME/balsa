@@ -61,7 +61,7 @@ new_icon (gchar ** xpm, GtkWidget * window)
   return pixmapwid;
 }
 
-GtkWidget *
+static GtkWidget *
 create_toolbar (MainWindow *mw)
 {
   GtkWidget *window=mw->window;

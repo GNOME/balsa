@@ -18,8 +18,6 @@
 #ifndef __BALSA_SENDMSG_H__
 #define __BALSA_SENDMSG_H__
 
-#include <gtk/gtk.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -30,6 +28,7 @@ typedef struct _BalsaSendmsg       BalsaSendmsg;
 struct _BalsaSendmsg
 {
   GtkWidget *window;
+  GtkWidget *toolbar;
   GtkWidget *to, *from, *subject, *cc, *bcc;
   GtkWidget *text;
   GtkWidget *hscrollbar, *vscrollbar;

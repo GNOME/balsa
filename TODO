@@ -22,7 +22,6 @@ Stuart
 
 
 sendmsg-window TODO:
- * free EVERYTHING in the sendmsg-window when it is closed.
  * look at smtp code crashing if gtk_text is empty
 
 Jay

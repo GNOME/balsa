@@ -1514,9 +1514,10 @@ msgstr ""
 msgid "Password needed"
 msgstr ""
 
+#. GRUT modified this item
 #: src/balsa-app.c:95 src/folder-conf.c:288
 msgid "_Remember password"
-msgstr ""
+msgstr "_Kujto fjalëkalimin"
 
 #: src/balsa-app.c:578
 #, c-format
@@ -2741,9 +2742,10 @@ msgstr "_Pronësitë...."
 msgid "_Subscribe"
 msgstr "_Abonohu"
 
+#. GRUT modified this item
 #: src/mailbox-node.c:976
 msgid "_Unsubscribe"
-msgstr ""
+msgstr "_Ç'regjistrohu"
 
 #: src/mailbox-node.c:984
 msgid "Mark as _Inbox"

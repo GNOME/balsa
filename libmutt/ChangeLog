@@ -1,3 +1,8 @@
+2002-01-08  Carlos Morgado  <chbm@chbm.nu>
+
+	* rfc822.c: applied 'rfc822_terminate' mutt security 
+	patch 
+
 2002-01-07  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* Makefile.am: remove commands.c - not used.

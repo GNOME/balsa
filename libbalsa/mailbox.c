@@ -273,11 +273,12 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
 static void
 libbalsa_mailbox_destroy(GtkObject * object)
 {
-    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(object);
+    LibBalsaMailbox *mailbox;
+    g_return_if_fail(object);
 
-    if (!mailbox)
-	return;
+    mailbox = LIBBALSA_MAILBOX(object);
 
+    /* g_print("Destroying mailbox: %s\n", mailbox->name); */
     while (mailbox->open_ref > 0)
 	libbalsa_mailbox_close(mailbox);
 

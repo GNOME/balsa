@@ -1514,19 +1514,9 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
 
 
 	mailbox = mbnode->mailbox;
-        /* cannot transfer to a directory */
-        if (!mailbox) {
-            g_list_free (messages);
-            return;
-        }
 
         /* cannot transfer to the originating mailbox */
-        if (mailbox != orig_mailbox) {
-            if (balsa_app.drag_default_is_move)
-                gdk_drag_status(context,
-                                (context->actions ==
-                                 GDK_ACTION_COPY) ? GDK_ACTION_COPY :
-                                GDK_ACTION_MOVE, time);
+        if (mailbox != NULL && mailbox != orig_mailbox) {
             switch (context->action) {
             case GDK_ACTION_MOVE:
                 libbalsa_messages_move (messages, mailbox);
@@ -1559,30 +1549,29 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
 
 
 static gboolean
-mblist_drag_motion_cb (GtkWidget* mblist, GdkDragContext* context, 
-                       gint x, gint y, guint time, gpointer user_data)
+mblist_drag_motion_cb(GtkWidget * mblist, GdkDragContext * context,
+                      gint x, gint y, guint time, gpointer user_data)
 {
     gint row, col;
-    gint flag;
-    int adjust=0;
-    
-    flag = gtk_clist_get_selection_info (GTK_CLIST (mblist), x, y, 
-					 &row, &col);
-    
-    if (flag) {
-        adjust +=GTK_CLIST(mblist)->column_title_area.height;
-	
-	y-=adjust;
-	gtk_clist_get_selection_info (GTK_CLIST (mblist), x, y, 
-				      &row, &col);
-	
-	gtk_signal_handler_block_by_func(GTK_OBJECT (mblist),
-					 GTK_SIGNAL_FUNC (select_mailbox), 
-					 NULL);
-	gtk_clist_select_row (GTK_CLIST (mblist), row, col);
-	gtk_signal_handler_unblock_by_func(GTK_OBJECT (mblist), 
-					   GTK_SIGNAL_FUNC (select_mailbox),
-					   NULL);
+    int adjust;
+
+    adjust = GTK_CLIST(mblist)->column_title_area.height;
+
+    y -= adjust;
+    if (gtk_clist_get_selection_info(GTK_CLIST(mblist), x, y, &row, &col)
+        && row != GPOINTER_TO_INT(GTK_CLIST(mblist)->selection->data)) {
+        gtk_signal_handler_block_by_func(GTK_OBJECT(mblist),
+                                         GTK_SIGNAL_FUNC
+                                         (select_mailbox), NULL);
+        gtk_clist_select_row(GTK_CLIST(mblist), row, col);
+        gtk_signal_handler_unblock_by_func(GTK_OBJECT(mblist),
+                                           GTK_SIGNAL_FUNC
+                                           (select_mailbox), NULL);
     }
+    if (balsa_app.drag_default_is_move)
+        gdk_drag_status(context,
+                        (context->actions ==
+                         GDK_ACTION_COPY) ? GDK_ACTION_COPY :
+                        GDK_ACTION_MOVE, time);
     return FALSE;
 }

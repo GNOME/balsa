@@ -148,6 +148,11 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox)
 		       (gpointer) mailbox);
 }
 
+/* libbalsa_mailbox_imap_destroy:
+   NOTE: we have to close mailbox ourselves without waiting for
+   LibBalsaMailbox::destroy because we want to destroy server as well,
+   and close requires server for proper operation.  
+*/
 static void
 libbalsa_mailbox_imap_destroy(GtkObject * object)
 {
@@ -158,13 +163,18 @@ libbalsa_mailbox_imap_destroy(GtkObject * object)
 
     mailbox = LIBBALSA_MAILBOX_IMAP(object);
 
-    remote = LIBBALSA_MAILBOX_REMOTE(object);
-
-    g_free(mailbox->path);
+    while (LIBBALSA_MAILBOX(mailbox)->open_ref > 0)
+	libbalsa_mailbox_close(LIBBALSA_MAILBOX(object));
 
     libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
 
-    gtk_object_unref(GTK_OBJECT(remote->server));
+    remote = LIBBALSA_MAILBOX_REMOTE(object);
+    g_free(mailbox->path); mailbox->path = NULL;
+
+    if(remote->server) {
+	gtk_object_unref(GTK_OBJECT(remote->server));
+	remote->server = NULL;
+    }
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));

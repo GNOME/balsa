@@ -400,16 +400,14 @@ speed gain is negligible or negative: the number of called system
 functions in present case is constant and equal to 1; the previous
 version called system function either once or twice per directory. */
 static gboolean
-close_all_mailboxes(GNode * node, gpointer data)
+destroy_mbnode(GNode * node, gpointer data)
 {
     BalsaMailboxNode *mbnode = (BalsaMailboxNode *) node->data;
 
     if(mbnode == NULL) /* true for root node only */
 	return FALSE;
     
-    if (mbnode->mailbox) 
-	force_close_mailbox(mbnode->mailbox);
-    else {
+    if (!mbnode->mailbox) {
 	gchar *tmpfile = g_strdup_printf("%s/.expanded", mbnode->name);
 	if (mbnode->expanded)
 	    close(creat(tmpfile, S_IRUSR | S_IWUSR));
@@ -417,33 +415,34 @@ close_all_mailboxes(GNode * node, gpointer data)
 	    unlink(tmpfile);
 	g_free(tmpfile);
     }
-
+    gtk_object_destroy(GTK_OBJECT(mbnode));
     return FALSE;
 }
 
 static void
 balsa_cleanup(void)
 {
-    g_node_traverse(balsa_app.mailbox_nodes,
-		    G_LEVEL_ORDER,
-		    G_TRAVERSE_ALL, 10, close_all_mailboxes, NULL);
-
     if (balsa_app.empty_trash_on_exit)
 	empty_trash();
 
-    force_close_mailbox(balsa_app.inbox);
-    gtk_object_unref(GTK_OBJECT(balsa_app.inbox));
-    force_close_mailbox(balsa_app.outbox);
-    gtk_object_unref(GTK_OBJECT(balsa_app.outbox));
-    force_close_mailbox(balsa_app.sentbox);
-    gtk_object_unref(GTK_OBJECT(balsa_app.sentbox));
-    force_close_mailbox(balsa_app.draftbox);
-    gtk_object_unref(GTK_OBJECT(balsa_app.draftbox));
-    force_close_mailbox(balsa_app.trash);
-    gtk_object_unref(GTK_OBJECT(balsa_app.trash));
-
     config_save();
 
+    /* FIXME: stop switching notebook pages in a more elegant way.
+       Probably, the cleanest solution is to call enable_menus_xxx
+       functions from an idle function connected to balsa_message_set. */
+    gtk_signal_disconnect_by_data(GTK_OBJECT(balsa_app.notebook), NULL);
+
+    /* close all mailboxes */
+    g_node_traverse(balsa_app.mailbox_nodes,
+		    G_LEVEL_ORDER,
+		    G_TRAVERSE_ALL, 10, destroy_mbnode, NULL);
+    gtk_object_unref(GTK_OBJECT(balsa_app.inbox));
+    gtk_object_unref(GTK_OBJECT(balsa_app.outbox));
+    gtk_object_unref(GTK_OBJECT(balsa_app.sentbox));
+    gtk_object_unref(GTK_OBJECT(balsa_app.draftbox));
+    gtk_object_unref(GTK_OBJECT(balsa_app.trash));
+    g_node_destroy(balsa_app.mailbox_nodes);
+    balsa_app.mailbox_nodes = NULL;
     gnome_sound_shutdown();
     libbalsa_imap_close_all_connections();
     if(balsa_app.debug) g_print("Finished cleaning up.\n");

@@ -221,6 +221,10 @@ static void notebook_drag_received_cb (GtkWidget* widget,
                                             GtkSelectionData* selection_data, 
                                             guint info, guint32 time, 
                                             gpointer data);
+static gboolean notebook_drag_motion_cb (GtkWidget* widget,
+                                       GdkDragContext* context,
+                                       gint x, gint y, guint time,
+                                       gpointer user_data);
 
 
 static GtkWidget *balsa_notebook_label_new (BalsaMailboxNode* mbnode);
@@ -734,6 +738,8 @@ balsa_window_new()
                        GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
     gtk_signal_connect (GTK_OBJECT (window->notebook), "drag-data-received",
                         GTK_SIGNAL_FUNC (notebook_drag_received_cb), NULL);
+    gtk_signal_connect (GTK_OBJECT (window->notebook), "drag-motion",
+                        GTK_SIGNAL_FUNC (notebook_drag_motion_cb), NULL);
    balsa_app.notebook = window->notebook;
 
     scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -2725,17 +2731,15 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
     orig_mailbox = ((LibBalsaMessage*) messages->data)->mailbox;
     
     if (mailbox != NULL && mailbox != orig_mailbox) {
-        switch (context->suggested_action) {
+        switch (context->action) {
         case GDK_ACTION_MOVE:
             libbalsa_messages_move (messages, mailbox);
-            context->action = context->suggested_action;
             break;
             
         case GDK_ACTION_DEFAULT:
         case GDK_ACTION_COPY:
         default:
             libbalsa_messages_copy (messages, mailbox);
-            context->action = context->suggested_action;
             break;
         }
         
@@ -2746,6 +2750,17 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
     g_list_free (messages);
 }
 
+static gboolean
+notebook_drag_motion_cb(GtkWidget * widget, GdkDragContext * context,
+                        gint x, gint y, guint time, gpointer user_data)
+{
+    if (balsa_app.drag_default_is_move)
+        gdk_drag_status(context,
+			(context->actions ==
+			 GDK_ACTION_COPY) ? GDK_ACTION_COPY :
+			GDK_ACTION_MOVE, time);
+    return FALSE;
+}
 
 /* balsa_window_progress_timeout
  * 

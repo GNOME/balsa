@@ -1,8 +1,19 @@
+2001-09-17  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.c: passing NULL mailbox to mailbox_destroy is 
+	an error.
+	* libbalsa/mailbox_imap.c: properly destroy the mailbox.
+	* libbalsa/mailbox_maildir.c:
+	* libbalsa/mailbox_mbox.c: chain up destroy.
+	* src/main-window.c: 
+	* src/balsa-mblist.c: second part of d&d fixes.
+	* src/main.c: exit balsa. Carefully. (avoid referencing partially
+	destroyed UI).
+
 2001-09-17  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-mblist.c: Peter Bloomfield - when dnding
 	selection goes back to source mailbox
-
 
 2001-09-15  Peter Bloomfield <PeterBloomfield@MindSpring.com>
 

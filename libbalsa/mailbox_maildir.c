@@ -185,7 +185,8 @@ libbalsa_mailbox_maildir_new(const gchar * path, gboolean create)
 static void
 libbalsa_mailbox_maildir_destroy(GtkObject * object)
 {
-
+    if (GTK_OBJECT_CLASS(parent_class)->destroy)
+	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
 }
 
 static FILE *

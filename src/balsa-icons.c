@@ -73,6 +73,7 @@
 #  include "pixmaps/balsa_gpg_encrypt.xpm"
 #  include "pixmaps/info_lock.xpm"
 #  include "pixmaps/info_lock_good.xpm"
+#  include "pixmaps/info_lock_sigtrust.xpm"
 #  include "pixmaps/info_lock_bad.xpm"
 #  include "pixmaps/info_lock_encr.xpm"
 #endif
@@ -202,6 +203,7 @@ register_balsa_pixmaps(void)
 #ifdef HAVE_GPGME
         { BALSA_PIXMAP_INFO_SIGN,       info_sign_xpm },
         { BALSA_PIXMAP_INFO_SIGN_GOOD,  info_sign_good_xpm },
+	{ BALSA_PIXMAP_INFO_SIGN_NOTRUST, info_lock_sigtrust_xpm },
         { BALSA_PIXMAP_INFO_SIGN_BAD,   info_sign_bad_xpm },
         { BALSA_PIXMAP_INFO_ENCR,       info_encr_xpm },
 #endif

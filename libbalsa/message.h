@@ -72,7 +72,8 @@ enum _LibBalsaMsgCreateResult {
 #ifdef HAVE_GPGME
 #define  LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN     0
 #define  LIBBALSA_MESSAGE_SIGNATURE_GOOD        1
-#define  LIBBALSA_MESSAGE_SIGNATURE_BAD        -1
+#define  LIBBALSA_MESSAGE_SIGNATURE_NOTRUST     2
+#define  LIBBALSA_MESSAGE_SIGNATURE_BAD         3
 #endif
 
 struct _LibBalsaMessage {

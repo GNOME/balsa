@@ -812,10 +812,19 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
 
 	    if (checkResult) {
 		if (checkResult->status == GPGME_SIG_STAT_GOOD) {
-		    if (result != LIBBALSA_MESSAGE_SIGNATURE_BAD)
-			result = LIBBALSA_MESSAGE_SIGNATURE_GOOD;
-		    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-					 _("detected a good signature"));
+		    /* check if we trust this signature at least marginally */
+		    if (checkResult->validity >= GPGME_VALIDITY_MARGINAL &&
+			checkResult->trust >= GPGME_VALIDITY_MARGINAL) {
+			if (result <= LIBBALSA_MESSAGE_SIGNATURE_GOOD)
+			    result = LIBBALSA_MESSAGE_SIGNATURE_GOOD;
+			libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+					     _("detected a good signature"));
+		    } else {
+			if (result <= LIBBALSA_MESSAGE_SIGNATURE_NOTRUST)
+			    result = LIBBALSA_MESSAGE_SIGNATURE_NOTRUST;
+			libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+					     _("detected a good signature with insufficient validity/trust"));
+		    }
 		} else {
 		    result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
 
@@ -851,9 +860,7 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
 	if (body->parts) {
 	    gint sub_result =
 		balsa_message_scan_signatures(body->parts, message);
-	    if (sub_result == LIBBALSA_MESSAGE_SIGNATURE_BAD ||
-		(sub_result == LIBBALSA_MESSAGE_SIGNATURE_GOOD &&
-		 result != LIBBALSA_MESSAGE_SIGNATURE_BAD))
+	    if (sub_result >= result)
 		result = sub_result;
 	}
     }
@@ -2029,12 +2036,22 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 						    balsa_app.date_string, NULL);
 
 	    if (sig_res == GPGME_SIG_STAT_GOOD) {
-		libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-				     _("detected a good signature"));
-		content_icon =
-		    gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-					   BALSA_PIXMAP_INFO_SIGN_GOOD,
-					   GTK_ICON_SIZE_MENU, NULL);
+		if (info->body->sig_info->validity >= GPGME_VALIDITY_MARGINAL &&
+		    info->body->sig_info->trust >= GPGME_VALIDITY_MARGINAL) {
+		    content_icon =
+			gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+					       BALSA_PIXMAP_INFO_SIGN_GOOD,
+					       GTK_ICON_SIZE_MENU, NULL);
+			libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+					     _("detected a good signature"));
+		} else {
+		    content_icon =
+			gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+					       BALSA_PIXMAP_INFO_SIGN_NOTRUST,
+					       GTK_ICON_SIZE_MENU, NULL);
+			libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+					     _("detected a good signature with insufficient validity/trust"));
+		}
 	    } else if (sig_res != GPGME_SIG_STAT_NONE) {
 		gchar *sender = bm->message->from 
                     ? libbalsa_address_to_gchar(bm->message->from, -1)
@@ -2398,14 +2415,25 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 		gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
 				       BALSA_PIXMAP_INFO_ENCR,
 				       GTK_ICON_SIZE_MENU, NULL);
-	else if (body->sig_info)
-	    content_icon =
-		gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-				       body->sig_info->status == GPGME_SIG_STAT_GOOD ?
-				       BALSA_PIXMAP_INFO_SIGN_GOOD :
-				       BALSA_PIXMAP_INFO_SIGN_BAD,
-				       GTK_ICON_SIZE_MENU, NULL);
-	else
+	else if (body->sig_info) {
+	    if (body->sig_info->status == GPGME_SIG_STAT_GOOD) {
+		if (body->sig_info->validity >= GPGME_VALIDITY_MARGINAL &&
+		    body->sig_info->trust >= GPGME_VALIDITY_MARGINAL)
+		    content_icon =
+			gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+					       BALSA_PIXMAP_INFO_SIGN_GOOD,
+					       GTK_ICON_SIZE_MENU, NULL);
+		else
+		    content_icon =
+			gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+					       BALSA_PIXMAP_INFO_SIGN_NOTRUST,
+					       GTK_ICON_SIZE_MENU, NULL);
+	    } else
+		content_icon =
+		    gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+					   BALSA_PIXMAP_INFO_SIGN_BAD,
+					   GTK_ICON_SIZE_MENU, NULL);
+	} else
 #endif
 	    content_icon =
 		gdk_pixbuf_new_from_file_scaled(pix, 16, 16, GDK_INTERP_BILINEAR, NULL);

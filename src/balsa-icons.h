@@ -92,6 +92,7 @@
 #  define BALSA_PIXMAP_GPG_ENCRYPT              "balsa_gpg_encrypt"
 #  define BALSA_PIXMAP_INFO_SIGN                "balsa_info_sign"
 #  define BALSA_PIXMAP_INFO_SIGN_GOOD           "balsa_info_sign_good"
+#  define BALSA_PIXMAP_INFO_SIGN_NOTRUST        "balsa_info_sign_trust"
 #  define BALSA_PIXMAP_INFO_SIGN_BAD            "balsa_info_sign_bad"
 #  define BALSA_PIXMAP_INFO_ENCR                "balsa_info_encr"
 #endif

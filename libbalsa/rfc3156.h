@@ -41,6 +41,7 @@ typedef enum _LibBalsaMessageBodyRFC2440Mode LibBalsaMessageBodyRFC2440Mode;
 struct _LibBalsaSignatureInfo {
     GpgmeSigStat status;
     GpgmeValidity validity;
+    GpgmeValidity trust;
     gchar *sign_name;
     gchar *sign_email;
     gchar *fingerprint;

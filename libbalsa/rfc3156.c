@@ -115,6 +115,7 @@ static void (*segvhandler)(int);
 
 
 /* local prototypes */
+static const gchar *libbalsa_gpgme_validity_to_gchar_short(GpgmeValidity validity);
 static const gchar *get_passphrase_cb(void *opaque, const char *desc,
 				      void **r_hd);
 static gchar *gpgme_signature(MailDataMBox *mailData, const gchar *sign_for,
@@ -171,6 +172,8 @@ libbalsa_signature_info_to_gchar(LibBalsaSignatureInfo * info,
 				   info->sign_email);
 	g_string_append_printf(msg, _("\nValidity: %s"),
 			       libbalsa_gpgme_validity_to_gchar(info->validity));
+	g_string_append_printf(msg, _("\nOwner trust: %s"),
+			       libbalsa_gpgme_validity_to_gchar_short(info->trust));
 	if (info->fingerprint)
 	    g_string_append_printf(msg, _("\nKey fingerprint: %s"),
 				   info->fingerprint);
@@ -1423,6 +1426,8 @@ get_sig_info_from_ctx(LibBalsaSignatureInfo* info, GpgmeCtx ctx)
     gpgme_get_sig_key(ctx, 0, &key);
     info->validity =
 	gpgme_key_get_ulong_attr(key, GPGME_ATTR_VALIDITY, NULL, 0);
+    info->trust =
+	gpgme_key_get_ulong_attr(key, GPGME_ATTR_OTRUST, NULL, 0);
     info->sign_name =
 	g_strdup(gpgme_key_get_string_attr(key, GPGME_ATTR_NAME, NULL, 0));
     info->sign_email =
@@ -1438,12 +1443,14 @@ enum {
     GPG_KEY_FP_COLUMN = 0,
     GPG_KEY_ID_COLUMN,
     GPG_KEY_VALIDITY_COLUMN,
+    GPG_KEY_TRUST_COLUMN,
     GPG_KEY_LENGTH_COLUMN,
     GPG_KEY_NUM_COLUMNS
 };
 
 static gchar *col_titles[] =
-    { N_("Fingerprint"), N_("Key ID"), N_("Trust"), N_("Length") };
+    { N_("Fingerprint"), N_("Key ID"), N_("Validity"), N_("Owner trust"),
+      N_("Length") };
 
 
 /* callback function if a new row is selected in the list */
@@ -1506,7 +1513,8 @@ select_key_fp_from_list(int secret_only, const gchar *for_address, GList *keys,
 		       scrolled_window, TRUE, TRUE, 0);
 
     model = gtk_tree_store_new (GPG_KEY_NUM_COLUMNS, G_TYPE_STRING,
-				G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT);
+				G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
+				G_TYPE_INT);
 
     tree_view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (model));
     selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (tree_view));
@@ -1527,6 +1535,8 @@ select_key_fp_from_list(int secret_only, const gchar *for_address, GList *keys,
 			    gpgme_key_get_string_attr(key, GPGME_ATTR_KEYID, NULL, 0),
 			    GPG_KEY_VALIDITY_COLUMN, 
 			    libbalsa_gpgme_validity_to_gchar_short(gpgme_key_get_ulong_attr(key, GPGME_ATTR_VALIDITY, NULL, 0)),
+			    GPG_KEY_TRUST_COLUMN, 
+			    libbalsa_gpgme_validity_to_gchar_short(gpgme_key_get_ulong_attr(key, GPGME_ATTR_OTRUST, NULL, 0)),
 			    GPG_KEY_LENGTH_COLUMN,
 			    gpgme_key_get_ulong_attr(key, GPGME_ATTR_LEN, NULL, 0),
 			    -1);

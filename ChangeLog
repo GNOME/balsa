@@ -1,3 +1,18 @@
+2001-03-30  Pawel Salek  <pawsa@theochem.kth.se>
+	Patch from Stephen P. Wall <Steve_Wall@redcom.com>
+
+	* src/balsa-app.h: change the max color depth; add reply_string 
+	and forward_string fields.
+	* src/balsa-index-threading.c: guess reply messages more intelligently.
+	* src/balsa-message.c: new quote color code.
+	* src/main-window.c: update author list.
+	* src/pref-manager.c: configure reply_string, forward_string and 
+	colors.
+	* src/save-restore.c: s&r reply_string, forward_string and 
+	colors.
+	* src/sendmsg-window.c: better reply/fwd subject generation using
+	defined strings.
+	
 2001-03-29  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* help/C/balsa.sgml: update IMAP folders section.

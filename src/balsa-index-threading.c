@@ -37,6 +37,8 @@
 #include <string.h>
 #include <gnome.h>
 #include <glib.h>
+#include <ctype.h>
+#include "balsa-app.h"
 #include "balsa-index.h"
 #include "balsa-index-threading.h"
 #include "main-window.h"
@@ -842,12 +844,16 @@ chop_re(gchar* str)
 {
     gchar *p=str;
     while(*p) {
-	while(*p && *p==' ') p++;
-	if(*p && g_strncasecmp(p, "RE:", 3)==0) {
+	while(*p && isspace((int)*p)) p++;
+	if(!*p) break;
+	
+	if(g_strncasecmp(p, "re:", 3)==0 || g_strncasecmp(p, "aw:", 3)==0)
 	    p+=3;
-	    continue;
-	}
-	break;
+	else if(g_strncasecmp(p, _("Re:"), strlen(_("Re:")))==0)
+	    p+=strlen(_("Re:"));
+	else if(g_strncasecmp(p, balsa_app.reply_string,
+			      strlen(balsa_app.reply_string))==0)
+	    p+=strlen(balsa_app.reply_string);
     }
     return p;
 }

@@ -31,6 +31,7 @@
 #include "save-restore.h"
 #include "spell-check.h"
 #include "address-book-config.h"
+#include "quote-color.h"
 
 /* FIXME: Mutt dependency for ENC7BIT ENC8BIT ENCQUOTEDPRINTABLE consts*/
 #include "../libmutt/mime.h"
@@ -70,6 +71,8 @@ typedef struct _PropertyUI {
     GtkWidget *wordwrap;
     GtkWidget *wraplength;
     GtkWidget *bcc;
+    GtkWidget *reply_string;
+    GtkWidget *forward_string;
     GtkWidget *check_mail_upon_startup;
     GtkWidget *remember_open_mboxes;
     GtkWidget *mblist_show_mb_content_info;
@@ -96,8 +99,7 @@ typedef struct _PropertyUI {
 
     /* colours */
     GtkWidget *unread_color;
-    GtkWidget *quoted_color_start;
-    GtkWidget *quoted_color_end;
+    GtkWidget *quoted_color[MAX_QUOTED_COLOR];
 
     /* quote regex */
     GtkWidget *quote_pattern;
@@ -374,6 +376,12 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(pui->bcc), "changed",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->reply_string), "changed",
+		       GTK_SIGNAL_FUNC(properties_modified_cb),
+		       property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->forward_string), "changed",
+		       GTK_SIGNAL_FUNC(properties_modified_cb),
+		       property_box);
 
     /* arp */
     gtk_signal_connect(GTK_OBJECT(pui->quote_str), "changed",
@@ -433,12 +441,11 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(pui->unread_color), "released",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
-    gtk_signal_connect(GTK_OBJECT(pui->quoted_color_start), "released",
-		       GTK_SIGNAL_FUNC(properties_modified_cb),
-		       property_box);
-    gtk_signal_connect(GTK_OBJECT(pui->quoted_color_end), "released",
-		       GTK_SIGNAL_FUNC(properties_modified_cb),
-		       property_box);
+
+    for(i=0;i<MAX_QUOTED_COLOR;i++)
+	gtk_signal_connect(GTK_OBJECT(pui->quoted_color[i]), "released",
+			   GTK_SIGNAL_FUNC(properties_modified_cb),
+			   property_box);
 
     /* Gnome Property Box Signals */
     gtk_signal_connect(GTK_OBJECT(property_box), "destroy",
@@ -597,6 +604,10 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 
     g_free(balsa_app.bcc);
     balsa_app.bcc = g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->bcc)));
+    g_free(balsa_app.reply_string);
+    balsa_app.reply_string = g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->reply_string)));
+    g_free(balsa_app.forward_string);
+    balsa_app.forward_string = g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->forward_string)));
 
     balsa_app.close_mailbox_auto =
 	GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->active;
@@ -659,22 +670,16 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 			       &(balsa_app.mblist_unread_color.blue), 0);
 
     /* quoted text color */
-    gdk_colormap_free_colors(gdk_window_get_colormap
-			     (GTK_WIDGET(pbox)->window),
-			     &balsa_app.quoted_color[0], 1);
-    gnome_color_picker_get_i16(GNOME_COLOR_PICKER(pui->quoted_color_start),
-			       &(balsa_app.quoted_color[0].red),
-			       &(balsa_app.quoted_color[0].green),
-			       &(balsa_app.quoted_color[0].blue), 0);
-    gdk_colormap_free_colors(gdk_window_get_colormap
-			     (GTK_WIDGET(pbox)->window),
-			     &balsa_app.quoted_color[MAX_QUOTED_COLOR - 1],
-			     1);
-    gnome_color_picker_get_i16(GNOME_COLOR_PICKER(pui->quoted_color_end),
-			       &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red),
-			       &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green),
-			       &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue),
-			       0);
+    for(i=0;i<MAX_QUOTED_COLOR;i++) {
+	gdk_colormap_free_colors(gdk_window_get_colormap
+				 (GTK_WIDGET(pbox)->window),
+				 &balsa_app.quoted_color[i], 1);
+	gnome_color_picker_get_i16(GNOME_COLOR_PICKER(pui->quoted_color[i]),
+				   &(balsa_app.quoted_color[i].red),
+				   &(balsa_app.quoted_color[i].green),
+				   &(balsa_app.quoted_color[i].blue),
+				   0);
+    }
 
     /* Information dialogs */
     menu_item =
@@ -832,6 +837,10 @@ set_prefs(void)
 
     gtk_entry_set_text(GTK_ENTRY(pui->bcc),
 		       balsa_app.bcc ? balsa_app.bcc : "");
+    gtk_entry_set_text(GTK_ENTRY(pui->reply_string),
+		       balsa_app.reply_string ? balsa_app.reply_string : "");
+    gtk_entry_set_text(GTK_ENTRY(pui->forward_string),
+		       balsa_app.forward_string ? balsa_app.forward_string : "");
 
     /* arp */
     gtk_entry_set_text(GTK_ENTRY(pui->quote_str), balsa_app.quote_str);
@@ -886,14 +895,12 @@ set_prefs(void)
 			       balsa_app.mblist_unread_color.red,
 			       balsa_app.mblist_unread_color.green,
 			       balsa_app.mblist_unread_color.blue, 0);
-    gnome_color_picker_set_i16(GNOME_COLOR_PICKER(pui->quoted_color_start),
-			       balsa_app.quoted_color[0].red,
-			       balsa_app.quoted_color[0].green,
-			       balsa_app.quoted_color[0].blue, 0);
-    gnome_color_picker_set_i16(GNOME_COLOR_PICKER(pui->quoted_color_end),
-			       balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red,
-			       balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green,
-			       balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue, 0);
+
+    for(i=0;i<MAX_QUOTED_COLOR;i++)
+	gnome_color_picker_set_i16(GNOME_COLOR_PICKER(pui->quoted_color[i]),
+				   balsa_app.quoted_color[i].red,
+				   balsa_app.quoted_color[i].green,
+				   balsa_app.quoted_color[i].blue, 0);
 
     /* Information Message */
     gtk_menu_set_active(GTK_MENU(pui->information_message_menu),
@@ -1475,10 +1482,12 @@ outgoing_page(gpointer data)
     gtk_box_pack_start(GTK_BOX(vbox1), frame2, FALSE, FALSE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(frame2), 5);
 
-    table2 = GTK_TABLE(gtk_table_new(1, 2, FALSE));
+    table2 = GTK_TABLE(gtk_table_new(3, 2, FALSE));
     gtk_container_add(GTK_CONTAINER(frame2), GTK_WIDGET(table2));
     gtk_container_set_border_width(GTK_CONTAINER(table2), 5);
     pui->bcc = attach_entry(_("Default Bcc to:"), 0, table2);
+    pui->reply_string = attach_entry(_("Default Reply string:"), 1, table2);
+    pui->forward_string = attach_entry(_("Default Forward string:"), 2, table2);
 
     frame2 = gtk_frame_new(_("Encoding"));
     gtk_box_pack_start(GTK_BOX(vbox1), frame2, FALSE, FALSE, 0);
@@ -1661,10 +1670,11 @@ create_display_page(gpointer data)
     gtk_box_pack_start(GTK_BOX(vbox8), color_frame, FALSE, FALSE, 0);
     vbox12 = vbox_in_container(color_frame);
 
-    pui->quoted_color_start = color_box(
-	GTK_BOX(vbox12), _("Quoted text primary color"));
-    pui->quoted_color_end = color_box(
-	GTK_BOX(vbox12), _("Quoted text secondary color"));
+    for(i=0;i<MAX_QUOTED_COLOR;i++) {
+	gchar *text = g_strdup_printf(_("Quote level %d color"), i+1);
+	pui->quoted_color[i] = color_box( GTK_BOX(vbox12), text);
+	g_free(text);
+    }
 
     /* Fonts Preferences Page */
     vbox9 = gtk_vbox_new(FALSE, 0);

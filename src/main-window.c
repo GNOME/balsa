@@ -1333,9 +1333,7 @@ show_about_box(void)
     const gchar *authors[] = {
 	"Ian Campbell <ijc25@cam.ac.uk>",
 	"Matthew Guenther <guentherm@asme.org>",
-	"Stuart Parmenter <pavlov@pavlov.net>",
 	"Pawel Salek <pawsa@theochem.kth.se>",
-	"Peter Williams <peter@newton.cx>",
 	"and many others (see AUTHORS file)",
 	NULL
     };

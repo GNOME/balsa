@@ -1368,36 +1368,57 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     case SEND_REPLY_ALL:
     case SEND_REPLY_GROUP:
 	if (!message->subject) {
-	    newsubject = g_strdup("Re: ");
+	    newsubject = g_strdup(balsa_app.reply_string);
 	    break;
 	}
 
 	tmp = message->subject;
-	if (strlen(tmp) > 2 &&
-	    toupper(tmp[0]) == 'R' &&
-	    toupper(tmp[1]) == 'E' && tmp[2] == ':') {
-	    newsubject = g_strdup(message->subject);
-	    break;
+	if (g_strncasecmp(tmp, "re:", 3) == 0 || g_strncasecmp(tmp, "aw:", 3) == 0) {
+	    tmp += 3;
+	} else if (g_strncasecmp(tmp, _("Re:"), strlen(_("Re:"))) == 0) {
+	    tmp += strlen(_("Re:"));
+	} else {
+	    i = strlen(balsa_app.reply_string);
+	    if (g_strncasecmp(tmp, balsa_app.reply_string, i) == 0) {
+		tmp += i;
+	    }
 	}
-	newsubject = g_strdup_printf("Re: %s", message->subject);
+	while( *tmp && isspace(*tmp) ) tmp++;
+	newsubject = g_strdup_printf("%s %s", balsa_app.reply_string, tmp);
+	g_strchomp(newsubject);
 	break;
 
     case SEND_FORWARD:
 	if (!message->subject) {
 	    if (message->from && message->from->address_list)
-		newsubject = g_strdup_printf("Forwarded message from %s",
+		newsubject = g_strdup_printf("%s from %s",
+					     balsa_app.forward_string,
 					     (gchar *) message->
 					     from->address_list->data);
 	    else
-		newsubject = g_strdup("Forwarded message");
+		newsubject = g_strdup(balsa_app.forward_string);
 	} else {
+	    tmp = message->subject;
+	    if (g_strncasecmp(tmp, "fwd:", 4) == 0) {
+		tmp += 4;
+	    } else if (g_strncasecmp(tmp, _("Fwd:"), strlen(_("Fwd:"))) == 0) {
+		tmp += strlen(_("Fwd:"));
+	    } else {
+		i = strlen(balsa_app.forward_string);
+		if (g_strncasecmp(tmp, balsa_app.forward_string, i) == 0) {
+		    tmp += i;
+		}
+	    }
+	    while( *tmp && isspace(*tmp) ) tmp++;
 	    if (message->from && message->from->address_list)
-		newsubject = g_strdup_printf("[%s: %s]",
+		newsubject = g_strdup_printf("%s %s [%s]",
+					     balsa_app.forward_string, tmp,
 					     (gchar *) message->
-					     from->address_list->data,
-					     message->subject);
-	    else
-		newsubject = g_strdup_printf("Fwd: %s", message->subject);
+					     from->address_list->data);
+	    else {
+		newsubject = g_strdup_printf("%s %s", balsa_app.forward_string, tmp);
+		g_strchomp(newsubject);
+	    }
 	}
 	break;
     default:

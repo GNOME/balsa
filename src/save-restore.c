@@ -421,11 +421,22 @@ config_global_load(void)
     g_free(balsa_app.quote_regex);
     balsa_app.quote_regex =
 	gnome_config_get_string("QuoteRegex=" DEFAULT_QUOTE_REGEX);
-    load_color("QuotedColorStart=" DEFAULT_QUOTED_COLOR,
-	       &balsa_app.quoted_color[0]);
-    load_color("QuotedColorEnd=" DEFAULT_QUOTED_COLOR,
-	       &balsa_app.quoted_color[MAX_QUOTED_COLOR - 1]);
-    make_gradient(balsa_app.quoted_color, 0, MAX_QUOTED_COLOR - 1);
+
+    {
+	int i;
+#if MAX_QUOTED_COLOR != 6
+#warning 'default_quoted_color' array needs to be updated
+#endif
+	gchar *default_quoted_color[6] = {
+	    "rgb:0000/8000/8000", "rgb:8000/0000/0000", "rgb:0000/8000/0000",
+	    "rgb:0000/0000/8000", "rgb:8000/8000/0000", "rgb:8000/0000/8000"};
+	for(i=0;i<MAX_QUOTED_COLOR;i++) {
+	    gchar *text = g_strdup_printf("QuotedColor%d=%s", i, i<6 ?
+			  default_quoted_color[i] : DEFAULT_QUOTED_COLOR);
+	    load_color(text, &balsa_app.quoted_color[i]);
+	    g_free(text);
+	}
+    }
 
     /* ... font used to display messages */
     g_free(balsa_app.message_font);
@@ -595,6 +606,7 @@ config_global_load(void)
 gint config_save(void)
 {
     gchar **open_mailboxes_vector;
+    gint i;
 
     config_address_books_save();
     config_identities_save();
@@ -645,9 +657,12 @@ gint config_save(void)
     gnome_config_set_string("MessageFont", balsa_app.message_font);
     gnome_config_set_string("SubjectFont", balsa_app.subject_font);
     gnome_config_set_bool("WordWrap", balsa_app.browse_wrap);
-    save_color("QuotedColorStart", &balsa_app.quoted_color[0]);
-    save_color("QuotedColorEnd",
-	       &balsa_app.quoted_color[MAX_QUOTED_COLOR - 1]);
+
+    for(i=0;i<MAX_QUOTED_COLOR;i++) {
+	gchar *text = g_strdup_printf("QuotedColor%d", i);
+	save_color(text, &balsa_app.quoted_color[i]);
+	g_free(text);
+    }
 
     gnome_config_pop_prefix();
 
@@ -852,6 +867,9 @@ config_address_books_save(void)
 static void
 config_identities_load(void)
 {
+    gchar *tmp;
+
+
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "identity-default/");
 
     if (balsa_app.address)
@@ -874,6 +892,16 @@ config_identities_load(void)
 
     /* bcc field for outgoing mails; optional */
     balsa_app.bcc = gnome_config_get_string("Bcc");
+
+    /* reply_string field for outgoing mails */
+    tmp = g_strdup_printf("ReplyString=%s", _("Re:"));
+    balsa_app.reply_string = gnome_config_get_string(tmp);
+    g_free(tmp);
+
+    /* forward_string field for outgoing mails */
+    tmp = g_strdup_printf("ForwardString=%s", _("Fwd:"));
+    balsa_app.forward_string = gnome_config_get_string(tmp);
+    g_free(tmp);
 
     /* signature file path */
     balsa_app.signature_path = gnome_config_get_string("SignaturePath");
@@ -902,6 +930,8 @@ config_identities_save(void)
     gnome_config_set_string("ReplyTo", balsa_app.replyto);
     gnome_config_set_string("Domain", balsa_app.domain);
     gnome_config_set_string("Bcc", balsa_app.bcc);
+    gnome_config_set_string("ReplyString", balsa_app.reply_string);
+    gnome_config_set_string("ForwardString", balsa_app.forward_string);
     gnome_config_set_string("SignaturePath", balsa_app.signature_path);
 
     gnome_config_set_bool("SigSending", balsa_app.sig_sending);

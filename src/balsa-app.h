@@ -63,9 +63,9 @@
  * Default colour for quoted text
  * oh no, I used the US spelling.
  */
-#define MAX_QUOTED_COLOR 4
+#define MAX_QUOTED_COLOR 6
 #define DEFAULT_QUOTED_COLOR "rgb:0000/5000/5000"
-#define DEFAULT_QUOTE_REGEX "^(([ \tA-Z])\1*[|>:}#])+"
+#define DEFAULT_QUOTE_REGEX  "^(([ \tA-Z])\1*[|>:}#])"
 
 #define MAILBOX_MANAGER_WIDTH 350
 #define MAILBOX_MANAGER_HEIGHT 400
@@ -144,6 +144,8 @@ extern struct BalsaApplication {
     gchar *replyto;
     gchar *domain;
     gchar *bcc;
+    gchar *reply_string;
+    gchar *forward_string;
 
     gchar *local_mail_directory;
     gchar *smtp_server;

@@ -1217,14 +1217,17 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	    for (line = *lines; line != NULL; line = *(++lines)) {
 		line = g_strconcat(line, "\n", NULL);
 		quote_level = is_a_quote(line, &rex);
-		if (quote_level > MAX_QUOTED_COLOR)
-		    quote_level = MAX_QUOTED_COLOR;
-		if (quote_level != 0)
+		if (quote_level != 0) {
+		    /* Modulus the quote level by the max,
+		     * ie, always have "1 <= quote level <= MAX"
+		     * this allows cycling through the possible
+		     * quote colors over again as the quote level
+		     * grows arbitrarily deep. */
+		    quote_level = (quote_level-1)%MAX_QUOTED_COLOR;
 		    gtk_text_insert(GTK_TEXT(item), fnt,
-				    &balsa_app.quoted_color[quote_level -
-							   1], NULL, 
-				    line, -1);
-		else
+				    &balsa_app.quoted_color[quote_level],
+				    NULL, line, -1);
+		} else
 		    gtk_text_insert(GTK_TEXT(item), fnt, NULL, NULL, 
 				    line, -1);
 		g_free(line);

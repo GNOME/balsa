@@ -1,3 +1,8 @@
+2005-01-22  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: do not loose content type paramters -
+	fix message wrapping on replying.
+
 2005-01-20  Pawel Salek
 
 	* libbalsa/address-entry.c: fix crashes on: domain-expanded

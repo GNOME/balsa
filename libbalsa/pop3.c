@@ -626,7 +626,7 @@ fetch_pop_mail (const gchar *pop_host, const gchar *pop_user,
 	/* exit gracefully */
 	write (s, "quit\r\n", 6);
 	getLine (s, buffer, sizeof (buffer)); /* snarf the response */
-	if(status == POP_OK)
+	if(status == POP_OK && !delete_on_server)
 	    strcpy(last_uid, uid);
     }
     close (s);

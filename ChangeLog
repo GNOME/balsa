@@ -1,5 +1,7 @@
-2004-06-07 00:00  PeterB
+2004-06-07 09:59  PeterB
 
+	* libbalsa/mailbox-filter.c: match URL exactly when looking up
+	filter section.
 	* libbalsa/mailbox_local.c: retrieve user headers more reliably.
 
 2004-06-06 20:11  PeterB

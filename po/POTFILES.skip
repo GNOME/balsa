@@ -1,4 +1,6 @@
 #keep it sorted alphabetically.
+# nothing interesting here, just helper function
+libmutt/attach.c
 # flags.c: one string used by the mutt's threading code.
 libmutt/flags.c
 # keymaps_def.h: mutt key help.

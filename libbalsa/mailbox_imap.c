@@ -790,12 +790,18 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 
 /* libbalsa_mailbox_imap_check:
    checks imap mailbox for new messages.
-   Called with the mailbox open and locked.
+   Called with the mailbox locked.
 */
 static void
 libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 {
     g_assert(LIBBALSA_IS_MAILBOX_IMAP(mailbox));
+
+    if (!MAILBOX_OPEN(mailbox)) {
+	if (libbalsa_notify_check_mailbox(mailbox))
+	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
+	return;
+    }
 
     if (LIBBALSA_MAILBOX_IMAP(mailbox)->handle)
 	libbalsa_mailbox_imap_noop(LIBBALSA_MAILBOX_IMAP(mailbox));

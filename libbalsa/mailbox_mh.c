@@ -492,7 +492,7 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox)
 
 static int libbalsa_mailbox_mh_open_temp (const gchar *dest_path,
 					  char **name_used);
-/* Called with mailbox open and locked. */
+/* Called with mailbox locked. */
 static void
 libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
 {
@@ -502,6 +502,12 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
     int modified = 0;
 
     g_assert(LIBBALSA_IS_MAILBOX_MH(mailbox));
+
+    if (!MAILBOX_OPEN(mailbox)) {
+	if (libbalsa_notify_check_mailbox(mailbox))
+	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
+	return;
+    }
 
     mh = LIBBALSA_MAILBOX_MH(mailbox);
 

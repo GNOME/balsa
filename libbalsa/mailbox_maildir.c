@@ -462,7 +462,7 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
     return TRUE;
 }
 
-/* Called with mailbox open and locked. */
+/* Called with mailbox locked. */
 static void
 libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
 {
@@ -472,6 +472,12 @@ libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
     LibBalsaMailboxMaildir *mdir;
 
     g_assert(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
+
+    if (!MAILBOX_OPEN(mailbox)) {
+	if (libbalsa_notify_check_mailbox(mailbox))
+	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
+	return;
+    }
 
     mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
 

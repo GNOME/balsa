@@ -374,7 +374,7 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
     return TRUE;
 }
 
-/* Called with mailbox open and locked. */
+/* Called with mailbox locked. */
 static void
 libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 {
@@ -384,6 +384,12 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
     LibBalsaMailboxMbox *mbox;
 
     g_assert(LIBBALSA_IS_MAILBOX_MBOX(mailbox));
+
+    if (!MAILBOX_OPEN(mailbox)) {
+	if (libbalsa_notify_check_mailbox(mailbox))
+	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
+	return;
+    }
 
     mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
     path = libbalsa_mailbox_local_get_path(mailbox);

@@ -481,12 +481,7 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     LOCK_MAILBOX(mailbox);
-
-    if (MAILBOX_OPEN(mailbox))
-	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->check(mailbox);
-    else if (libbalsa_notify_check_mailbox(mailbox))
-	libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
-
+    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->check(mailbox);
     UNLOCK_MAILBOX(mailbox);
 
 #ifdef BALSA_USE_THREADS

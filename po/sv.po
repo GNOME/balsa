@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-05-10 20:30+0200\n"
-"PO-Revision-Date: 2002-05-10 20:31+0200\n"
+"POT-Creation-Date: 2002-05-18 17:16+0200\n"
+"PO-Revision-Date: 2002-05-18 17:16+0200\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -147,170 +147,127 @@ msgstr "Ogiltiga filter %s för brevlådan %s"
 msgid "Unable to load message body to match filter"
 msgstr "Kan inte läsa in meddelandetexten för att matcha filter"
 
-#: libbalsa/filter.c:226
+#: libbalsa/filter.c:273
 #, c-format
 msgid "Invalid filter : %s"
 msgstr "Ogiltigt filter: %s"
 
-#: libbalsa/filter.c:288 libbalsa/filter.c:300
+#: libbalsa/filter.c:335 libbalsa/filter.c:347
 #, c-format
 msgid "Bad mailbox name for filter : %s"
 msgstr "Felaktigt brevlådenamn för filtret: %s"
 
-#: libbalsa/filter.c:290
+#: libbalsa/filter.c:337
 msgid "Error when copying messages"
 msgstr "Fel vid kopiering av meddelanden"
 
-#: libbalsa/filter.c:294
+#: libbalsa/filter.c:341
 msgid "Error when trashing messages"
 msgstr "Fel vid borttagning av meddelanden"
 
-#: libbalsa/filter.c:302
+#: libbalsa/filter.c:349
 msgid "Error when moving messages"
 msgstr "Fel vid flyttande av meddelanden"
 
 #: libbalsa/identity.c:31
-msgid "Default"
-msgstr "Standard"
+msgid "New Identity"
+msgstr "Ny identitet"
 
 #. should "re" be localized ?
-#: libbalsa/identity.c:133 src/balsa-index-threading.c:854
-#: src/balsa-index-threading.c:856 src/sendmsg-window.c:2294
-#: src/sendmsg-window.c:2295
+#: libbalsa/identity.c:132 src/balsa-index-threading.c:770
+#: src/balsa-index-threading.c:772 src/sendmsg-window.c:2284
+#: src/sendmsg-window.c:2285
 msgid "Re:"
 msgstr "Sv:"
 
-#: libbalsa/identity.c:134 src/sendmsg-window.c:2323 src/sendmsg-window.c:2324
+#: libbalsa/identity.c:133 src/sendmsg-window.c:2313 src/sendmsg-window.c:2314
 msgid "Fwd:"
 msgstr "Vb:"
 
-#: libbalsa/identity.c:477 src/filter-edit-dialog.c:372
-msgid "Edit"
-msgstr "Redigera"
-
-#: libbalsa/identity.c:482
-msgid "Set Default"
-msgstr "Ställ in standardalternativ"
-
-#: libbalsa/identity.c:676
-msgid "Create Identity"
-msgstr "Skapa identitet"
-
-#: libbalsa/identity.c:677
-msgid "Edit Identity"
-msgstr "Redigera identitet"
-
-#: libbalsa/identity.c:705 libbalsa/identity.c:1141
+#: libbalsa/identity.c:654
 msgid "Identity Name:"
 msgstr "Identitetsnamn:"
 
-#: libbalsa/identity.c:710 libbalsa/identity.c:1143
+#: libbalsa/identity.c:656
 msgid "Full Name:"
 msgstr "Fullständigt namn:"
 
-#: libbalsa/identity.c:715 libbalsa/identity.c:719 libbalsa/identity.c:1145
+#: libbalsa/identity.c:658
 msgid "Mailing Address:"
 msgstr "E-postadress:"
 
 #. Reply To:
-#: libbalsa/identity.c:724 libbalsa/identity.c:1147 src/sendmsg-window.c:1855
+#: libbalsa/identity.c:660 src/sendmsg-window.c:1845
 msgid "Reply To:"
 msgstr "Svara till:"
 
-#: libbalsa/identity.c:727 libbalsa/identity.c:1149
+#: libbalsa/identity.c:662
 msgid "Domain:"
 msgstr "Domän:"
 
 #. bcc:
-#: libbalsa/identity.c:730 libbalsa/identity.c:1151 src/balsa-message.c:716
-#: src/print.c:373 src/sendmsg-window.c:1823 src/store-address.c:277
+#: libbalsa/identity.c:664 src/balsa-message.c:716 src/print.c:373
+#: src/sendmsg-window.c:1813 src/store-address.c:277
 msgid "Bcc:"
 msgstr "Osynlig kopia:"
 
-#: libbalsa/identity.c:733 libbalsa/identity.c:1153
+#: libbalsa/identity.c:666
 msgid "Reply String:"
 msgstr "Svarssträng:"
 
-#: libbalsa/identity.c:736 libbalsa/identity.c:1155
+#: libbalsa/identity.c:668
 msgid "Forward String:"
 msgstr "Vidarefordranssträng:"
 
-#: libbalsa/identity.c:739 libbalsa/identity.c:1157
+#: libbalsa/identity.c:670
 msgid "Signature Path:"
 msgstr "Signatursökväg:"
 
-#: libbalsa/identity.c:743 libbalsa/identity.c:1160
+#: libbalsa/identity.c:674
 msgid "Execute Signature"
 msgstr "Exekvera signatur"
 
-#: libbalsa/identity.c:747 libbalsa/identity.c:1163
+#: libbalsa/identity.c:677
 msgid "Include Signature"
 msgstr "Inkludera signatur"
 
-#: libbalsa/identity.c:751 libbalsa/identity.c:1165
+#: libbalsa/identity.c:680
 msgid "Include Signature When Forwarding"
 msgstr "Lägg till signatur vid vidarebefordran"
 
-#: libbalsa/identity.c:754 libbalsa/identity.c:1168
+#: libbalsa/identity.c:683
 msgid "Include Signature When Replying"
 msgstr "Lägg till signatur vid svar"
 
-#: libbalsa/identity.c:757 libbalsa/identity.c:1171
+#: libbalsa/identity.c:686
 msgid "Add Signature Separator"
 msgstr "Inkludera signaturavskiljare"
 
-#: libbalsa/identity.c:760 libbalsa/identity.c:1174
+#: libbalsa/identity.c:689
 msgid "Prepend Signature"
 msgstr "Lägg till signatur i början"
 
-#: libbalsa/identity.c:855
+#: libbalsa/identity.c:795
 msgid "Error: The identity does not have a name"
 msgstr "Fel: Identiteten har inget namn"
 
-#: libbalsa/identity.c:871
+#: libbalsa/identity.c:812
 msgid "Error: An identity with that name already exists"
 msgstr "Fel: En identitet med det namnet finns redan"
 
-#: libbalsa/identity.c:1013
-msgid "Cannot delete default profile, please make another default first."
-msgstr "Kan inte ta bort standardprofil, skapa en annan standardprofil först."
-
-#: libbalsa/identity.c:1019 src/folder-conf.c:419 src/folder-conf.c:610
-#: src/mailbox-conf.c:224 src/mailbox-conf.c:239 src/mailbox-conf.c:250
-msgid "Question"
-msgstr "Fråga"
-
-#: libbalsa/identity.c:1029
+#: libbalsa/identity.c:951
 msgid "Do you really want to delete the selected identity?"
 msgstr "Vill du verkligen ta bort den valda identiteten?"
 
-#: libbalsa/identity.c:1051 src/main-window.c:297
-msgid "_New"
-msgstr "_Nytt"
+#: libbalsa/identity.c:973 src/address-book-config.c:627 src/folder-conf.c:166
+#: src/folder-conf.c:487 src/pref-manager.c:2821
+#, c-format
+msgid "Error displaying %s: %s\n"
+msgstr "Fel vid visning: %s: %s\n"
 
-#: libbalsa/identity.c:1052
-msgid "_Edit"
-msgstr "_Redigera"
-
-#: libbalsa/identity.c:1053
-msgid "_Set Default"
-msgstr "_Ställ in standardalternativ"
-
-#: libbalsa/identity.c:1054 src/main-window.c:534
-msgid "_Delete"
-msgstr "_Ta bort"
-
-#: libbalsa/identity.c:1066
+#: libbalsa/identity.c:1032
 msgid "Manage Identities"
 msgstr "Hantera identiteter"
-
-#: libbalsa/identity.c:1261
-msgid "Do"
-msgstr "Gör"
-
-#: libbalsa/identity.c:1261
-msgid "Do Not"
-msgstr "Gör inte"
 
 #: libbalsa/libbalsa.c:373
 #, c-format
@@ -328,53 +285,53 @@ msgstr "*** FEL: Brevlådelås finns: %s ***\n"
 msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
 msgstr "*** FEL: Brevlådeström stängd: %s ***\n"
 
-#: libbalsa/mailbox.c:329
+#: libbalsa/mailbox.c:341
 #, c-format
 msgid "Cannot load mailbox %s"
 msgstr "Kan inte läsa in brevlådan %s"
 
-#: libbalsa/mailbox.c:336
+#: libbalsa/mailbox.c:348
 #, c-format
 msgid "No such mailbox type: %s"
 msgstr "Det finns ingen sådan brevlådetyp: %s"
 
-#: libbalsa/mailbox.c:353
+#: libbalsa/mailbox.c:365
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr "Kunde inte skapa en brevlåda av typen %s"
 
-#: libbalsa/mailbox_imap.c:658
+#: libbalsa/mailbox_imap.c:663
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: Öppnar %s Refräknare: %d\n"
 
-#: libbalsa/mailbox_local.c:280
+#: libbalsa/mailbox_local.c:273
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxLocal: Öppnar %s Refräknare: %d\n"
 
-#: libbalsa/mailbox_maildir.c:115
+#: libbalsa/mailbox_maildir.c:111
 #, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
 msgstr "Brevlådan %s verkar inte vara av typen Maildir."
 
-#: libbalsa/mailbox_maildir.c:124
+#: libbalsa/mailbox_maildir.c:120
 #, c-format
 msgid "Could not create a MailDir directory at %s (%s)"
 msgstr "Kunde inte skapa en e-postkatalog på %s (%s)"
 
-#: libbalsa/mailbox_maildir.c:131 libbalsa/mailbox_maildir.c:139
-#: libbalsa/mailbox_maildir.c:149
+#: libbalsa/mailbox_maildir.c:127 libbalsa/mailbox_maildir.c:135
+#: libbalsa/mailbox_maildir.c:145
 #, c-format
 msgid "Could not create a MailDir at %s (%s)"
 msgstr "Kunde inte skapa en e-postkatalog på %s (%s)"
 
-#: libbalsa/mailbox_maildir.c:210 libbalsa/mailbox_mh.c:188
+#: libbalsa/mailbox_maildir.c:206 libbalsa/mailbox_mh.c:185
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Öppnande av %s misslyckades. Felnummer = %d, "
 
-#: libbalsa/mailbox_maildir.c:229 libbalsa/mailbox_mh.c:207
+#: libbalsa/mailbox_maildir.c:225 libbalsa/mailbox_mh.c:204
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
@@ -383,8 +340,8 @@ msgstr ""
 "Kunde inte ta bort innehållet i %s:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:235 libbalsa/mailbox_mbox.c:178
-#: libbalsa/mailbox_mh.c:213
+#: libbalsa/mailbox_maildir.c:231 libbalsa/mailbox_mbox.c:175
+#: libbalsa/mailbox_mh.c:210
 #, c-format
 msgid ""
 "Could not remove %s:\n"
@@ -393,22 +350,22 @@ msgstr ""
 "Kunde inte ta bort %s:\n"
 "%s"
 
-#: libbalsa/mailbox_mbox.c:113
+#: libbalsa/mailbox_mbox.c:110
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "Brevlådan %s verkar inte vara en Mbox-brevlåda."
 
-#: libbalsa/mailbox_mh.c:113
+#: libbalsa/mailbox_mh.c:110
 #, c-format
 msgid "Mailbox %s does not appear to be a Mh mailbox."
 msgstr "Brevlådan %s verkar inte vara en MH-brevlåda."
 
-#: libbalsa/mailbox_mh.c:123
+#: libbalsa/mailbox_mh.c:120
 #, c-format
 msgid "Could not create MH directory at %s (%s)"
 msgstr "Kunde inte skapa en MH-katalog på %s (%s)"
 
-#: libbalsa/mailbox_mh.c:130
+#: libbalsa/mailbox_mh.c:127
 #, c-format
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Kunde inte skapa MH-struktur på %s (%s)"
@@ -520,7 +477,7 @@ msgstr "Mottog %d byte av %d"
 msgid "Sending Mail..."
 msgstr "Skickar brev..."
 
-#: libbalsa/send.c:226 src/main-window.c:1733
+#: libbalsa/send.c:226 src/main-window.c:1728
 msgid "Hide"
 msgstr "Dölj"
 
@@ -578,14 +535,19 @@ msgid ""
 "via: \"host:smtp\".\n"
 "Message is left in outbox."
 msgstr ""
+"SMTP-servern vägrade anslutning.\n"
+"Balsa använder som standard skickandetjänsten (587).\n"
+"Om du vill skicka e-post genom att använda relätjänsten (25) bör du explicit "
+"ange det med: \"värd:smtp\".\n"
+"Meddelandet är kvar i utkorgen."
 
 #: libbalsa/send.c:1050
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
 msgstr ""
-"SMTP-protokollfel. Kan inte vidarebefordra.\n"
+"SMTP-serverproblem (%d): %s\n"
 "Ditt meddelande ligger kvar i utkorgen."
 
 #: libbalsa/source-viewer.c:46 src/main-window.c:519
@@ -1494,12 +1456,6 @@ msgstr "_Värdnamn"
 msgid "_Base Domain Name"
 msgstr "_Basdomännamn"
 
-#: src/address-book-config.c:627 src/folder-conf.c:166 src/folder-conf.c:487
-#: src/pref-manager.c:2821
-#, c-format
-msgid "Error displaying %s: %s\n"
-msgstr "Fel vid visning: %s: %s\n"
-
 #: src/address-book-config.c:645 src/filter-edit-callbacks.c:714
 #: src/mailbox-conf.c:397 src/pref-manager.c:1427 src/pref-manager.c:2432
 msgid "Add"
@@ -1577,103 +1533,100 @@ msgid "Password needed"
 msgstr "Lösenord krävs"
 
 #. FIXME:
-#: src/balsa-index.c:303
+#: src/balsa-index.c:306
 msgid "From"
 msgstr "Från"
 
-#: src/balsa-index.c:304 src/filter-edit-callbacks.c:887
+#: src/balsa-index.c:307 src/filter-edit-callbacks.c:887
 msgid "Subject"
 msgstr "Ärende"
 
-#: src/balsa-index.c:305
+#: src/balsa-index.c:308
 msgid "Date"
 msgstr "Datum"
 
-#: src/balsa-index.c:306
+#: src/balsa-index.c:309
 msgid "Size"
 msgstr "Storlek"
 
-#: src/balsa-index.c:628
+#: src/balsa-index.c:629
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Öppnar brevlådan %s. Var vänlig vänta..."
 
-#: src/balsa-index.c:660
+#: src/balsa-index.c:661
 msgid "To"
 msgstr "Till"
 
-#: src/balsa-index.c:2018
+#: src/balsa-index.c:1985
 msgid "Cannot access the message's body\n"
 msgstr "Kan inte komma åt meddelandehuvudet\n"
 
-#: src/balsa-index.c:2046
+#: src/balsa-index.c:2013
 msgid "View Source"
 msgstr "Visa källa"
 
-#: src/balsa-index.c:2048
+#: src/balsa-index.c:2015
 msgid "Reply..."
 msgstr "Svara..."
 
-#: src/balsa-index.c:2050
+#: src/balsa-index.c:2017
 msgid "Reply To All..."
 msgstr "Svara till alla..."
 
-#: src/balsa-index.c:2052
+#: src/balsa-index.c:2019
 msgid "Reply To Group..."
 msgstr "Svara till grupp..."
 
-#: src/balsa-index.c:2054
+#: src/balsa-index.c:2021
 msgid "Forward Attached..."
 msgstr "Vidarebefordra bifogad..."
 
-#: src/balsa-index.c:2056
+#: src/balsa-index.c:2023
 msgid "Forward Inline..."
 msgstr "Vidarebefordra inuti..."
 
-#: src/balsa-index.c:2058
+#: src/balsa-index.c:2025
 msgid "Store Address..."
 msgstr "Lagra adress..."
 
-#: src/balsa-index.c:2091 src/filter-edit-dialog.c:268 src/mailbox-node.c:624
+#: src/balsa-index.c:2058 src/filter-edit-dialog.c:268 src/mailbox-node.c:625
 #: src/pref-manager.c:1429 src/pref-manager.c:2436
 msgid "Delete"
 msgstr "Ta bort"
 
-#: src/balsa-index.c:2097
+#: src/balsa-index.c:2064
 msgid "Undelete"
 msgstr "Återskapa"
 
-#: src/balsa-index.c:2103
+#: src/balsa-index.c:2070
 msgid "Move To Trash"
 msgstr "Flytta till papperskorgen"
 
-#: src/balsa-index.c:2108
+#: src/balsa-index.c:2075
 msgid "Toggle"
 msgstr "Växla"
 
-#: src/balsa-index.c:2111 src/filter-edit-callbacks.c:641
+#: src/balsa-index.c:2078 src/filter-edit-callbacks.c:641
 #: src/main-window.c:432
 msgid "Flagged"
 msgstr "Flaggad"
 
-#: src/balsa-index.c:2115 src/balsa-mblist.c:155
+#: src/balsa-index.c:2082 src/balsa-mblist.c:155
 msgid "Unread"
 msgstr "Olästa"
 
-#: src/balsa-index.c:2127
-#, fuzzy
+#: src/balsa-index.c:2094
 msgid "Move to"
-msgstr "Flytta"
+msgstr "Flytta till"
 
-#: src/balsa-index.c:2137
-#, fuzzy
+#: src/balsa-index.c:2104
 msgid "Other..."
-msgstr "_Filter..."
+msgstr "Annan..."
 
-#: src/balsa-index.c:2151
-#, fuzzy
+#: src/balsa-index.c:2118
 msgid "Choose destination folder"
-msgstr "Flytta till mapp:"
+msgstr "Välj destinationsmapp"
 
 #: src/balsa-mblist.c:154
 msgid "Mailbox"
@@ -1702,7 +1655,7 @@ msgid "Save MIME Part"
 msgstr "Spara MIME-delen"
 
 #. Subject:
-#: src/balsa-message.c:701 src/print.c:344 src/sendmsg-window.c:1816
+#: src/balsa-message.c:701 src/print.c:344 src/sendmsg-window.c:1806
 msgid "Subject:"
 msgstr "Ämne:"
 
@@ -1712,24 +1665,24 @@ msgstr "Datum:"
 
 #. From:
 #: src/balsa-message.c:710 src/filter-edit-callbacks.c:878 src/print.c:361
-#: src/sendmsg-window.c:1806 src/store-address.c:274
+#: src/sendmsg-window.c:1796 src/store-address.c:274
 msgid "From:"
 msgstr "Från:"
 
 #. To:
 #: src/balsa-message.c:714 src/filter-edit-callbacks.c:869 src/print.c:371
-#: src/sendmsg-window.c:1811 src/store-address.c:275
+#: src/sendmsg-window.c:1801 src/store-address.c:275
 msgid "To:"
 msgstr "Till:"
 
 #. cc:
 #: src/balsa-message.c:715 src/filter-edit-callbacks.c:896 src/print.c:372
-#: src/sendmsg-window.c:1818 src/store-address.c:276
+#: src/sendmsg-window.c:1808 src/store-address.c:276
 msgid "Cc:"
 msgstr "Kopia:"
 
 #. fcc:
-#: src/balsa-message.c:719 src/print.c:374 src/sendmsg-window.c:1828
+#: src/balsa-message.c:719 src/print.c:374 src/sendmsg-window.c:1818
 msgid "Fcc:"
 msgstr "Vidarebefordrad kopia:"
 
@@ -1784,7 +1737,7 @@ msgstr "Åtkomsttyp: mail-server\n"
 msgid "Mail server: %s\n"
 msgstr "E-postserver: %s\n"
 
-#: src/balsa-message.c:958 src/sendmsg-window.c:2105
+#: src/balsa-message.c:958 src/sendmsg-window.c:2095
 #, c-format
 msgid "Subject: %s\n"
 msgstr "Ärende: %s\n"
@@ -1938,7 +1891,7 @@ msgid "Low date is greater than high date"
 msgstr "Undre datumet är större än övre datumet"
 
 #: src/filter-edit-callbacks.c:641 src/filter-edit-dialog.c:262
-#: src/filter-edit-dialog.c:378 src/mailbox-node.c:596 src/main-window.c:439
+#: src/filter-edit-dialog.c:378 src/mailbox-node.c:597 src/main-window.c:439
 msgid "New"
 msgstr "Ny"
 
@@ -1955,7 +1908,7 @@ msgid "Contain/Does not contain"
 msgstr "Innehåller/Innehåller inte"
 
 #: src/filter-edit-callbacks.c:718 src/filter-edit-dialog.c:383
-#: src/sendmsg-window.c:1238
+#: src/sendmsg-window.c:1231
 msgid "Remove"
 msgstr "Ta bort"
 
@@ -2075,6 +2028,10 @@ msgstr "Filternamn:"
 #: src/filter-edit-dialog.c:325
 msgid "Operation between conditions"
 msgstr "Åtgärd mellan villkor"
+
+#: src/filter-edit-dialog.c:372
+msgid "Edit"
+msgstr "Redigera"
 
 #. The notification area
 #: src/filter-edit-dialog.c:412
@@ -2254,6 +2211,11 @@ msgstr ""
 "som innehåller meddelandena från INBOX.\n"
 "INBOX och dess undermappar kommer att\n"
 "finnas kvar. Vad vill du göra?"
+
+#: src/folder-conf.c:419 src/folder-conf.c:610 src/mailbox-conf.c:224
+#: src/mailbox-conf.c:239 src/mailbox-conf.c:250
+msgid "Question"
+msgstr "Fråga"
 
 #: src/folder-conf.c:422
 msgid "Rename INBOX"
@@ -2500,82 +2462,82 @@ msgstr "Använd SSL (imaps)"
 msgid "The folder edition to be written."
 msgstr "Mappversionen att skriva."
 
-#: src/mailbox-node.c:581 src/main-window.c:262
+#: src/mailbox-node.c:582 src/main-window.c:262
 msgid "Local mbox mailbox..."
 msgstr "Lokal mbox-brevlåda..."
 
-#: src/mailbox-node.c:583 src/main-window.c:267
+#: src/mailbox-node.c:584 src/main-window.c:267
 msgid "Local Maildir mailbox..."
 msgstr "Lokal Maildir-brevlåda..."
 
-#: src/mailbox-node.c:585 src/main-window.c:272
+#: src/mailbox-node.c:586 src/main-window.c:272
 msgid "Local MH mailbox..."
 msgstr "Lokal MH-brevlåda..."
 
-#: src/mailbox-node.c:587 src/main-window.c:277 src/pref-manager.c:2599
+#: src/mailbox-node.c:588 src/main-window.c:277 src/pref-manager.c:2599
 msgid "Remote IMAP mailbox..."
 msgstr "IMAP-fjärrbrevlåda..."
 
-#: src/mailbox-node.c:590 src/main-window.c:283 src/pref-manager.c:2605
+#: src/mailbox-node.c:591 src/main-window.c:283 src/pref-manager.c:2605
 msgid "Remote IMAP folder..."
 msgstr "IMAP-fjärrmapp..."
 
-#: src/mailbox-node.c:592 src/main-window.c:288
+#: src/mailbox-node.c:593 src/main-window.c:288
 msgid "Remote IMAP subfolder..."
 msgstr "IMAP-fjärrundermapp..."
 
 #. clicked on the empty space
-#: src/mailbox-node.c:603 src/mailbox-node.c:635 src/mailbox-node.c:656
+#: src/mailbox-node.c:604 src/mailbox-node.c:636 src/mailbox-node.c:657
 msgid "Rescan"
 msgstr "Läs om"
 
-#: src/mailbox-node.c:612
+#: src/mailbox-node.c:613
 msgid "Open"
 msgstr "Öppna"
 
-#: src/mailbox-node.c:615 src/toolbar-factory.c:187
+#: src/mailbox-node.c:616 src/toolbar-factory.c:187
 msgid "Close"
 msgstr "Stäng"
 
-#: src/mailbox-node.c:621
+#: src/mailbox-node.c:622
 msgid "Properties..."
 msgstr "Egenskaper..."
 
-#: src/mailbox-node.c:631
+#: src/mailbox-node.c:632
 msgid "Subscribe"
 msgstr "Prenumerera"
 
-#: src/mailbox-node.c:633
+#: src/mailbox-node.c:634
 msgid "Unsubscribe"
 msgstr "Säg upp prenumeration"
 
-#: src/mailbox-node.c:641
+#: src/mailbox-node.c:642
 msgid "Mark as Inbox"
 msgstr "Markera som inkorg"
 
-#: src/mailbox-node.c:644
+#: src/mailbox-node.c:645
 msgid "Mark as Sentbox"
 msgstr "Markera som skickatkorg"
 
-#: src/mailbox-node.c:647
+#: src/mailbox-node.c:648
 msgid "Mark as Trash"
 msgstr "Markera som papperskorg"
 
-#: src/mailbox-node.c:650
+#: src/mailbox-node.c:651
 msgid "Mark as Draftbox"
 msgstr "Markera som utkastkorg"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:653
+#: src/mailbox-node.c:654
 msgid "Edit/Apply filters"
 msgstr "Redigera/Tillämpa filter"
 
-#: src/mailbox-node.c:810
+#: src/mailbox-node.c:811
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Lokala brevlådan %s inläst som: %s\n"
 
-#: src/mailbox-node.c:842
+#: src/mailbox-node.c:843
 #, c-format
 msgid "Local folder %s\n"
 msgstr "Lokal mapp %s\n"
@@ -2611,6 +2573,10 @@ msgstr "Lägg till en ny IMAP-mapp"
 #: src/main-window.c:289
 msgid "Add new IMAP subfolder"
 msgstr "Lägg till ny IMAP-undermapp"
+
+#: src/main-window.c:297
+msgid "_New"
+msgstr "_Nytt"
 
 #: src/main-window.c:301
 msgid "_Continue"
@@ -2852,6 +2818,10 @@ msgstr "_Flytta till papperskorgen"
 msgid "Move the current message to Trash mailbox"
 msgstr "Flytta det aktuella meddelandet till papperskorgen"
 
+#: src/main-window.c:534
+msgid "_Delete"
+msgstr "_Ta bort"
+
 #: src/main-window.c:535
 msgid "Delete the current message"
 msgstr "Ta bort aktuellt meddelande"
@@ -2981,7 +2951,7 @@ msgstr ""
 "Balsa skickar ett brev nu.\n"
 "Avbryt skickande?"
 
-#: src/main-window.c:1302
+#: src/main-window.c:1297
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -2989,11 +2959,11 @@ msgstr ""
 "Kunde inte öppna brevlådan!\n"
 "Var vänlig och kontrollera inställningarna för brevlådan."
 
-#: src/main-window.c:1594
+#: src/main-window.c:1589
 msgid "Copyright (C) 1997-2002"
 msgstr "Copyright © 1997-2002"
 
-#: src/main-window.c:1598
+#: src/main-window.c:1593
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3005,74 +2975,74 @@ msgstr ""
 "\n"
 "Om du vill rapportera fel kan du göra det på: http://bugzilla.gnome.org/"
 
-#: src/main-window.c:1730
+#: src/main-window.c:1725
 msgid "Checking Mail..."
 msgstr "Kontrollerar e-post..."
 
-#: src/main-window.c:2022
+#: src/main-window.c:2017
 msgid "Finished Checking."
 msgstr "Slutförde kontroll."
 
-#: src/main-window.c:2093
+#: src/main-window.c:2088
 #, c-format
 msgid "Sending error: %s"
 msgstr "Fel vid sänding: %s"
 
-#: src/main-window.c:2193
+#: src/main-window.c:2188
 msgid "You have new mail waiting"
 msgstr "Du har ny e-post som väntar"
 
-#: src/main-window.c:2196
+#: src/main-window.c:2191
 msgid "OK"
 msgstr "OK"
 
-#: src/main-window.c:2642
+#: src/main-window.c:2637
 msgid "Search mailbox"
 msgstr "Sök i brevlåda"
 
-#: src/main-window.c:2660
+#: src/main-window.c:2655
 msgid "_Reverse search"
 msgstr "_Omvänd sökning"
 
-#: src/main-window.c:2663
+#: src/main-window.c:2658
 msgid "_Search for:"
 msgstr "_Sök efter:"
 
-#: src/main-window.c:2675
+#: src/main-window.c:2670
 msgid "In:"
 msgstr "I:"
 
-#: src/main-window.c:2686
+#: src/main-window.c:2681
 msgid "_Body"
 msgstr "_Meddelandetext"
 
-#: src/main-window.c:2687
+#: src/main-window.c:2682
 msgid "_To:"
 msgstr "_Till:"
 
-#: src/main-window.c:2688
+#: src/main-window.c:2683
 msgid "_From:"
 msgstr "_Från:"
 
-#: src/main-window.c:2689 src/sendmsg-window.c:286
+#: src/main-window.c:2684 src/sendmsg-window.c:286
 msgid "_Subject"
 msgstr "_Ärende"
 
-#: src/main-window.c:2690
+#: src/main-window.c:2685
 msgid "_Cc:"
 msgstr "_Kopia:"
 
-#: src/main-window.c:2836 src/main-window.c:2855
+#: src/main-window.c:2826 src/main-window.c:2845
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Sparande av brevlådan %s misslyckades."
 
-#: src/main-window.c:3060
+#: src/main-window.c:3050
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (skrivskyddad)"
 
-#: src/main-window.c:3062
+#: src/main-window.c:3052
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
@@ -4077,7 +4047,7 @@ msgstr "_Språk"
 msgid "_Options"
 msgstr "A_lternativ"
 
-#: src/sendmsg-window.c:540
+#: src/sendmsg-window.c:544
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -4086,19 +4056,15 @@ msgstr ""
 "Meddelandet till \"%s\" har ändrats.\n"
 "Spara meddelandet i utkastkorgen?"
 
-#: src/sendmsg-window.c:545
-msgid "Closing the Compose Window"
-msgstr "Stänger författandefönstret"
-
-#: src/sendmsg-window.c:817
+#: src/sendmsg-window.c:812
 msgid "Select Identity"
 msgstr "Välj identitet"
 
-#: src/sendmsg-window.c:1133
+#: src/sendmsg-window.c:1128
 msgid "Attach as Reference?"
 msgstr "Bifoga som referens?"
 
-#: src/sendmsg-window.c:1150
+#: src/sendmsg-window.c:1145
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -4113,15 +4079,15 @@ msgstr ""
 "\n"
 "Vill du verkligen bifoga denna fil som referens?"
 
-#: src/sendmsg-window.c:1249
+#: src/sendmsg-window.c:1242
 msgid "attach as reference"
 msgstr "bifoga som referens"
 
-#: src/sendmsg-window.c:1255
+#: src/sendmsg-window.c:1248
 msgid "attach as file"
 msgstr "bifoga som fil"
 
-#: src/sendmsg-window.c:1380
+#: src/sendmsg-window.c:1369
 #, c-format
 msgid ""
 "The attachment pixmap (%s) cannot be used.\n"
@@ -4130,36 +4096,35 @@ msgstr ""
 "Bifogningsbilden (%s) kan inte användas.\n"
 " %s"
 
-#: src/sendmsg-window.c:1386
-#, fuzzy
+#: src/sendmsg-window.c:1375
 msgid ""
 "Default attachment pixmap (attachment.png) cannot be found:\n"
 "Your balsa installation is corrupted."
 msgstr ""
-"Standardbifogningsbilden (balsa/attachment.png) kan inte hittas:\n"
+"Standardbifogningsbilden (attachment.png) kan inte hittas:\n"
 "Din balsainstallation är trasig."
 
-#: src/sendmsg-window.c:1400
+#: src/sendmsg-window.c:1390
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Kan inte få information om filen \"%s\": %s"
 
-#: src/sendmsg-window.c:1405
+#: src/sendmsg-window.c:1395
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Bilagan %s är ingen vanlig fil."
 
-#: src/sendmsg-window.c:1408
+#: src/sendmsg-window.c:1398
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "Filen %s kan inte läsas\n"
 
-#: src/sendmsg-window.c:1462
+#: src/sendmsg-window.c:1452
 msgid "Attach file"
 msgstr "Bifoga fil"
 
-#: src/sendmsg-window.c:1562 src/sendmsg-window.c:1598
-#: src/sendmsg-window.c:2701
+#: src/sendmsg-window.c:1552 src/sendmsg-window.c:1588
+#: src/sendmsg-window.c:2691
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -4168,95 +4133,95 @@ msgstr ""
 "Möjlig orsak: inte tillräckligt med temporärt utrymme"
 
 #. Attachment list
-#: src/sendmsg-window.c:1862
+#: src/sendmsg-window.c:1852
 msgid "Attachments:"
 msgstr "Bifogade filer:"
 
 #. Comments:
-#: src/sendmsg-window.c:1907
+#: src/sendmsg-window.c:1897
 msgid "Comments:"
 msgstr "Kommentarer:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1910
+#: src/sendmsg-window.c:1900
 msgid "Keywords:"
 msgstr "Nyckelord:"
 
-#: src/sendmsg-window.c:2085
+#: src/sendmsg-window.c:2075
 msgid "you"
 msgstr "du"
 
-#: src/sendmsg-window.c:2092
+#: src/sendmsg-window.c:2082
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------vidarebefordrat meddelande från %s------\n"
 
-#: src/sendmsg-window.c:2098
+#: src/sendmsg-window.c:2088
 #, c-format
 msgid "Date: %s\n"
 msgstr "Datum: %s\n"
 
-#: src/sendmsg-window.c:2112
+#: src/sendmsg-window.c:2102
 #, c-format
 msgid "From: %s\n"
 msgstr "Från: %s\n"
 
-#: src/sendmsg-window.c:2120
+#: src/sendmsg-window.c:2110
 #, c-format
 msgid "To: %s\n"
 msgstr "Till: %s\n"
 
-#: src/sendmsg-window.c:2128
+#: src/sendmsg-window.c:2118
 #, c-format
 msgid "CC: %s\n"
 msgstr "Kopia: %s\n"
 
-#: src/sendmsg-window.c:2134
+#: src/sendmsg-window.c:2124
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Meddelande-ID: %s\n"
 
-#: src/sendmsg-window.c:2141
+#: src/sendmsg-window.c:2131
 #, c-format
 msgid "References: %s"
 msgstr "Referenser: %s"
 
-#: src/sendmsg-window.c:2158
+#: src/sendmsg-window.c:2148
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "Den %s skrev %s:\n"
 
-#: src/sendmsg-window.c:2160
+#: src/sendmsg-window.c:2150
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s skrev:\n"
 
-#: src/sendmsg-window.c:2519
+#: src/sendmsg-window.c:2509
 msgid "Reply to "
 msgstr "Svara till "
 
-#: src/sendmsg-window.c:2525
+#: src/sendmsg-window.c:2515
 msgid "Forward message"
 msgstr "Eftersänd meddelande"
 
-#: src/sendmsg-window.c:2530 src/toolbar-factory.c:142
+#: src/sendmsg-window.c:2520 src/toolbar-factory.c:142
 msgid "Continue message"
 msgstr "Fortsätt meddelande"
 
-#: src/sendmsg-window.c:2535
+#: src/sendmsg-window.c:2525
 msgid "New message"
 msgstr "Nytt meddelande"
 
-#: src/sendmsg-window.c:2846
+#: src/sendmsg-window.c:2836
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Kunde inte öppna filen %s.\n"
 
-#: src/sendmsg-window.c:2851
+#: src/sendmsg-window.c:2841
 msgid "Loading..."
 msgstr "Läser in..."
 
-#: src/sendmsg-window.c:2873
+#: src/sendmsg-window.c:2863
 msgid "Include file"
 msgstr "Inkludera fil"
 
@@ -4479,7 +4444,7 @@ msgstr "Skicka"
 
 #: src/toolbar-factory.c:167
 msgid "Exchange"
-msgstr ""
+msgstr "Utbyt"
 
 #: src/toolbar-factory.c:169
 msgid "Attach"
@@ -4494,9 +4459,8 @@ msgid "Save the current item"
 msgstr "Spara det aktuella objektet"
 
 #: src/toolbar-factory.c:173
-#, fuzzy
 msgid "Identity"
-msgstr "Redigera identitet"
+msgstr "Identitet"
 
 #: src/toolbar-factory.c:174
 msgid "Set identity to use for this message"
@@ -4555,9 +4519,8 @@ msgid "Close current mailbox"
 msgstr "Stäng aktuell brevlåda"
 
 #: src/toolbar-factory.c:189
-#, fuzzy
 msgid "Msg Preview"
-msgstr "Förhandsgranska"
+msgstr "Meddelandeförhandsvisning"
 
 #: src/toolbar-factory.c:190
 msgid "Show preview pane"
@@ -4592,6 +4555,37 @@ msgstr "Tillgängliga knappar"
 #: src/toolbar-prefs.c:772
 msgid "Current toolbar"
 msgstr "Anpassa verktygsrad"
+
+#~ msgid "Default"
+#~ msgstr "Standard"
+
+#~ msgid "Set Default"
+#~ msgstr "Ställ in standardalternativ"
+
+#~ msgid "Create Identity"
+#~ msgstr "Skapa identitet"
+
+#~ msgid "Edit Identity"
+#~ msgstr "Redigera identitet"
+
+#~ msgid "Cannot delete default profile, please make another default first."
+#~ msgstr ""
+#~ "Kan inte ta bort standardprofil, skapa en annan standardprofil först."
+
+#~ msgid "_Edit"
+#~ msgstr "_Redigera"
+
+#~ msgid "_Set Default"
+#~ msgstr "_Ställ in standardalternativ"
+
+#~ msgid "Do"
+#~ msgstr "Gör"
+
+#~ msgid "Do Not"
+#~ msgstr "Gör inte"
+
+#~ msgid "Closing the Compose Window"
+#~ msgstr "Stänger författandefönstret"
 
 #~ msgid "SMTP server problem: %s"
 #~ msgstr "SMTP-serverproblem: %s"

@@ -363,7 +363,6 @@ close_cb (GtkWidget * widget, gpointer data)
 {
   GtkCTreeNode *ctnode;
   Mailbox *mailbox;
-  GnomeMDIChild *child;
 
   if (!GTK_CLIST (mblw->ctree)->selection)
     return;
@@ -375,19 +374,23 @@ close_cb (GtkWidget * widget, gpointer data)
   mailbox = gtk_ctree_node_get_row_data (mblw->ctree, ctnode);
 #endif
 
+  mblist_close_mailbox(mailbox);
+
+}
+
+void
+mblist_close_mailbox(Mailbox* mailbox)
+{
+  GnomeMDIChild *child;
+  
   if (mailbox)
     {
       child = gnome_mdi_find_child (mblw->mdi, mailbox->name);
       if (child)
 	gnome_mdi_remove_child (mblw->mdi, child, TRUE);
     }
-}
+}    
 
-void
-mblist_remove_mailbox (Mailbox * mailbox)
-{
-
-}
 
 static void
 close_mblist_window (GtkWidget * widget)
@@ -465,6 +468,14 @@ mb_add_cb (GtkWidget * widget, Mailbox * mailbox)
   mailbox_conf_new (mailbox, TRUE);
 }
 
+static void
+mb_del_cb(GtkWidget* wifget, Mailbox* mailbox)
+{
+  if (mailbox->type == MAILBOX_UNKNOWN)
+    return;
+  mailbox_conf_delete(mailbox);
+}
+    
 
 static GtkWidget *
 create_menu (GtkCTree * ctree, Mailbox * mailbox)
@@ -476,10 +487,17 @@ create_menu (GtkCTree * ctree, Mailbox * mailbox)
 		      GTK_SIGNAL_FUNC (mb_add_cb), mailbox);
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
+
   menuitem = gtk_menu_item_new_with_label (_ ("Edit Mailbox"));
   gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
 		      GTK_SIGNAL_FUNC (mb_conf_cb), mailbox);
   gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show(menuitem);
+  
+  menuitem = gtk_menu_item_new_with_label(_("Delete Mailbox"));
+  gtk_signal_connect(GTK_OBJECT(menuitem),"activate",
+		     GTK_SIGNAL_FUNC(mb_del_cb), mailbox);
+  gtk_menu_append(GTK_MENU(menu), menuitem);
   gtk_widget_show (menuitem);
 
   return menu;

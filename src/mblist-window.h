@@ -25,6 +25,7 @@
 void mblist_open_window (GnomeMDI *);
 void mblist_add_mailbox (Mailbox *);
 void mblist_remove_mailbox (Mailbox * mailbox);
-void mblist_redraw();
+void mblist_close_mailbox(Mailbox* mailbox);
+void mblist_redraw(void);
 
 #endif /* __MBLIST_WINDOW_H__ */

@@ -264,11 +264,11 @@ find_mailbox_func(GNode* g1, gpointer data)
   gpointer*    d  = data;
   gchar*       name = *(gchar**)data;
   
+  if (!n1)
+    return FALSE;
   if (strcmp(n1->name, name) != 0) {
-    fprintf(stderr,"find_mailbpx_func(%s, %s) returns FALSE\n", n1->name, name);
     return FALSE;
   }
-  fprintf(stderr,"find_mailbpx_func(%s, %s) returns TRUE\n", n1->name, name);
   *(++d) = g1;
   return TRUE;
 }
@@ -285,7 +285,6 @@ find_gnode_in_mbox_list(GNode* gnode_list, gchar* mbox_name)
   
   g_node_traverse(gnode_list, G_IN_ORDER, G_TRAVERSE_LEAFS, -1, find_mailbox_func, d);
   retval = d[1];
-  fprintf(stderr, "find_gnode_in_mbox_list: retval = %p\n", retval);
   return retval;
 }
 
@@ -317,8 +316,9 @@ config_mailbox_delete (gchar * name)
     return FALSE;
 
   accounts = PLRemoveDictionaryEntry (accounts, mbox);
+  
   /* Don't forget to remove the node from balsa's mailbox list */
-  gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, name);
+	gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, name);
   if (!gnode)
     {
       fprintf(stderr,"Oooop! mailbox not found in balsa_app.mailbox nodes?\n");
@@ -327,7 +327,7 @@ config_mailbox_delete (gchar * name)
     {
       g_node_unlink(gnode);
     }
-  
+  config_save(BALSA_CONFIG_FILE);
   return TRUE;
 } /* config_mailbox_delete */
 

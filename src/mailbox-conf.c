@@ -19,6 +19,7 @@
 
 #include "config.h"
 #include <errno.h>
+#include <fcntl.h>
 
 #include <gnome.h>
 #include "balsa-app.h"
@@ -26,6 +27,7 @@
 #include "main-window.h"
 #include "misc.h"
 #include "save-restore.h"
+#include "mblist-window.h"
 
 /* we'll create the notebook pages in the
  * order of these enumerated types so they 
@@ -82,27 +84,56 @@ struct _MailboxConfWindow
 static MailboxConfWindow *mcw;
 
 
-static MailboxType new_mailbox_type = -1;
-
 /* callbacks */
 static void mailbox_conf_close (GtkWidget * widget, gboolean save);
 static void next_cb (GtkWidget * widget);
 
 /* misc functions */
-static void mailbox_conf_set_values (Mailbox * mailbox);
+static void          mailbox_conf_set_values (Mailbox * mailbox);
 
 /* notebook pages */
-static GtkWidget *create_new_page ();
-static GtkWidget *create_local_mailbox_page ();
-static GtkWidget *create_pop_mailbox_page ();
-static GtkWidget *create_imap_mailbox_page ();
+static GtkWidget *create_new_page (void);
+static GtkWidget *create_local_mailbox_page (void);
+static GtkWidget *create_pop_mailbox_page (void);
+static GtkWidget *create_imap_mailbox_page (void);
+
+
+
+void
+mailbox_conf_delete(Mailbox* mailbox)
+{
+  
+  gint       clicked_button;
+  GtkWidget* ask = gnome_message_box_new(_("This will remove the mailbox permanently.\n"
+					   "Are you sure you want to delete this mailbox?"),
+					 GNOME_MESSAGE_BOX_QUESTION,
+					 GNOME_STOCK_BUTTON_YES, GNOME_STOCK_BUTTON_NO, NULL);
+  
+  gnome_dialog_set_default(GNOME_DIALOG(ask), 1);
+  gnome_dialog_set_modal(GNOME_DIALOG(ask));
+  clicked_button = gnome_dialog_run(GNOME_DIALOG(ask));
+  if (clicked_button == 1)
+    {
+      return;
+    }
+
+  /* Close the mailbox, in case it was open */
+  mblist_close_mailbox(mailbox);
+  
+  /* Delete it from the config file and internal nodes */
+  config_mailbox_delete(mailbox->name);
+
+  /* Delete local files */
+  /* mailbox_remove(mailbox, TRUE); */
+
+  mblist_redraw();
+}
 
 
 void
 mailbox_conf_new (Mailbox * mailbox, gint add_mbox)
 {
   GtkWidget *label;
-  GtkWidget *bbox;
 
   if (mcw)
     return;
@@ -233,6 +264,9 @@ mailbox_conf_set_values (Mailbox * mailbox)
 	}
       gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_IMAP);
       break;
+    case MAILBOX_UNKNOWN:
+      /* do nothing for now */
+      break;
     }
 }
 
@@ -289,6 +323,9 @@ conf_update_mailbox (Mailbox * mailbox, gchar* old_mbox_name)
       MAILBOX_IMAP (mailbox)->port = strtol (gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)), (char **) NULL, 10);
 
       config_mailbox_update (mailbox, old_mbox_name);
+      break;
+    case MAILBOX_UNKNOWN:
+      /* Do nothing for now */
       break;
     }
 }
@@ -367,6 +404,9 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	node = g_node_new (mailbox_node_new (g_strdup (mailbox->name), mailbox, FALSE));
 	config_mailbox_add (mailbox, "generic");
 	break;
+      case MC_PAGE_NEW:
+	g_warning("mailbox_conf_close: Invalid mcw->next_page value\n");
+	break;
       }
   mblist_redraw();
 
@@ -387,7 +427,7 @@ set_next_page (GtkWidget * widget, MailboxConfPageType type)
  * create notebook pages
  */
 static GtkWidget *
-create_new_page ()
+create_new_page (void)
 {
   GtkWidget *vbox;
   GtkWidget *bbox;
@@ -434,15 +474,10 @@ create_new_page ()
 
 
 static GtkWidget *
-create_local_mailbox_page ()
+create_local_mailbox_page (void)
 {
   GtkWidget *return_widget;
-  GtkWidget *table;
   GtkWidget *label;
-  GtkWidget *menu;
-  GtkWidget *menuitem;
-  GtkWidget *frame;
-  GtkWidget *radio_button;
   GtkWidget *hbox;
   
   return_widget = gtk_vbox_new(FALSE, 0);
@@ -480,7 +515,7 @@ create_local_mailbox_page ()
 }
 
 static GtkWidget *
-create_pop_mailbox_page ()
+create_pop_mailbox_page (void)
 {
   GtkWidget *return_widget;
   GtkWidget *table;
@@ -569,13 +604,11 @@ create_pop_mailbox_page ()
 
 
 static GtkWidget *
-create_imap_mailbox_page ()
+create_imap_mailbox_page (void)
 {
   GtkWidget *return_widget;
   GtkWidget *table;
   GtkWidget *label;
-  GtkWidget *menu;
-  GtkWidget *menuitem;
   GtkWidget *frame;
   GtkWidget *radio_button;
 
@@ -770,6 +803,9 @@ next_cb (GtkWidget * widget)
 
     case MC_PAGE_IMAP:
       gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_IMAP);
+      break;
+    case MC_PAGE_NEW:
+      g_warning("In mailbox_conf.c: next_cb: Invalid value of mcw->next_page\n");
       break;
     }
 }

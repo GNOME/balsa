@@ -138,15 +138,6 @@ static void send_watcher_delete_message (Mailbox * mailbox, Message * message);
 static Message *translate_message (HEADER * cur);
 static Address *translate_address (ADDRESS * caddr);
 
-static void
-do_mutt_error (char *str,...)
-{
-  va_list ap;
-  va_start (ap, str);
-  g_warning (str, ap);
-  va_end (ap);
-}
-
 /* We're gonna set Mutt global vars here */
 void
 mailbox_init (gchar * inbox_path, void (*error_func)(const char* fmt, ...))

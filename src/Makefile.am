@@ -1,4 +1,4 @@
-CFLAGS += -Wall -Wmissing-prototypes -Wpointer-arith
+CFLAGS += -Wall# -Wmissing-prototypes -Wpointer-arith
 
 bin_PROGRAMS = balsa
 

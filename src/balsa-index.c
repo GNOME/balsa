@@ -111,9 +111,6 @@ static void balsa_index_transfer_messages(BalsaIndex * bindex,
 static void balsa_index_idle_remove(gpointer data);
 static void balsa_index_idle_add(gpointer data, gpointer message);
 static gboolean balsa_index_idle_clear(gpointer data);
-static void balsa_index_idle_remove(gpointer data);
-static void balsa_index_idle_add(gpointer data, gpointer message);
-static gboolean balsa_index_idle_clear(gpointer data);
 static gint balsa_index_most_recent_message(GtkCList * clist);
 
 
@@ -1442,9 +1439,7 @@ select_message(GtkWidget * widget, GtkCTreeNode *row, gint column,
 			message, NULL);
     }
 
-    if(balsa_app.previewpane) {
-        balsa_index_idle_add(bindex, message);
-    }
+    balsa_index_idle_add(bindex, message);
 }
 
 
@@ -1945,8 +1940,6 @@ balsa_index_update_message(BalsaIndex * index)
     gint row;
     GtkObject *message;
     GtkCList *list;
-
-    if(!balsa_app.previewpane) return;
 
     list = GTK_CLIST(index->ctree);
     row = balsa_index_most_recent_message(list);
@@ -2594,6 +2587,8 @@ balsa_index_idle_remove(gpointer data)
 static void
 balsa_index_idle_add(gpointer data, gpointer message)
 {
+    if (!balsa_app.previewpane)
+        return;
     balsa_index_idle_remove(data);
     replace_attached_data(GTK_OBJECT(data), "message", message);
     handler.id = gtk_idle_add((GtkFunction) idle_handler_cb, data);

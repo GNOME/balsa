@@ -1,8 +1,12 @@
+2001-12-19  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* rfc822.c: last ditch check.
+
 2001-12-05  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
-	* libmutt/browser.h: add 'scanned' field.
-	
-	2001-12-03  Pawel Salek  <pawsa@theochem.kth.se>
+	* browser.h: add 'scanned' field.
+		
+2001-12-03  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Toralf Lund #66032:
 	* mutt_ssl.c: print SSL version as a message, not an error 

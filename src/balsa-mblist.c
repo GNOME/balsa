@@ -1648,5 +1648,8 @@ balsa_mblist_scan_children(GtkCTree * ctree, GtkCTreeNode * node)
         g_list_free(l);
         if (BALSA_MBLIST(ctree) != balsa_app.mblist)
             balsa_mblist_repopulate(BALSA_MBLIST(ctree));
+        /* to restore the folder styles for unread messages, we need to
+         * do a full check; perhaps after a few seconds' delay? */
+        check_new_messages_real(NULL, NULL, TYPE_BACKGROUND);
     }
 }

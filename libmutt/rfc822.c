@@ -338,6 +338,11 @@ ADDRESS *rfc822_parse_adrlist (ADDRESS *top, const char *s)
   while (last && last->next)
     last = last->next;
 
+#ifdef LIBMUTT
+  /* last-ditch sanity check: */
+  if (s == NULL)
+      return top;
+#endif
   SKIPWS (s);
   begin = s;
   while (*s)

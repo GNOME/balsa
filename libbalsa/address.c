@@ -305,6 +305,12 @@ static LibBalsaAddress *find_address(const gchar *addr_str,
 gchar *
 libbalsa_address_to_gchar(LibBalsaAddress * address, gint n)
 {
+    return libbalsa_address_to_gchar_p(address, n);
+}
+/* private version */
+gchar *
+libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n)
+{
     gchar *retc = NULL;
     gboolean dist_list = TRUE;
 

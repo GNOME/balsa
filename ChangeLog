@@ -1,3 +1,13 @@
+2001-12-19  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-mblist.c: check messages on repopulating mailbox list.
+	* libbalsa/address.c: add private conversion function.
+	* libbalsa/{libbalsa_private.h,misc,c}: add private
+	libbalsa_make_string_from_list_p()
+	* libbalsa/send.c: reorganize code to remove few lock_libmutt()'s.
+	* src/sendmsg-window.c: some sanity checks.
+	* src/balsa-index.c: clean up preview panel handling.
+
 2001-12-19  Carlos Morgado  <chbm@chbm.nu>
 
 	* configure.in: fix openssl check

@@ -2715,6 +2715,17 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
 
     message = bsmsg2message(bsmsg);
+    if (!LIBBALSA_IS_ADDRESS(message->from)) {
+        gnome_ok_dialog_parented(_("Missing or invalid `From' address"),
+                                 GTK_WINDOW(balsa_app.main_window));
+        return FALSE;
+    }
+    if (message->to_list == NULL
+        || !LIBBALSA_IS_ADDRESS(message->to_list->data)) {
+        gnome_ok_dialog_parented(_("Missing or invalid `To' address"),
+                                 GTK_WINDOW(balsa_app.main_window));
+        return FALSE;
+    }
     fcc = message->fcc_mailbox && *(message->fcc_mailbox)
 	? mblist_find_mbox_by_name(balsa_app.mblist, message->fcc_mailbox)
 	: NULL;

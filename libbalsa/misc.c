@@ -32,6 +32,7 @@
 #include <gnome.h>
 
 #include "libbalsa.h"
+#include "libbalsa_private.h"
 #include "mailbackend.h"
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
@@ -159,6 +160,12 @@ libbalsa_deescape_specials(const gchar* str)
 gchar *
 libbalsa_make_string_from_list(const GList * the_list)
 {
+    return libbalsa_make_string_from_list_p(the_list);
+}
+/* private to libbalsa: */
+gchar *
+libbalsa_make_string_from_list_p(const GList * the_list)
+{
     gchar *retc, *str;
     GList *list;
     GString *gs = g_string_new(NULL);
@@ -168,7 +175,7 @@ libbalsa_make_string_from_list(const GList * the_list)
 
     while (list) {
 	addy = list->data;
-	str = libbalsa_address_to_gchar(addy, 0);
+	str = libbalsa_address_to_gchar_p(addy, 0);
 	if (str)
 	    g_string_append(gs, str);
 

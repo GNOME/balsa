@@ -1,5 +1,4 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
-/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2001 Stuart Parmenter and others,
@@ -1157,57 +1156,40 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
 	} safe_free((void **) &delptr->next);
     }
 
-    libbalsa_unlock_mutt();
+    tmp = libbalsa_address_to_gchar_p(message->from, 0);
 
-    tmp = libbalsa_address_to_gchar(message->from, 0);
-
-    libbalsa_lock_mutt();
     hdr->env->from = rfc822_parse_adrlist(hdr->env->from, tmp);
-    libbalsa_unlock_mutt();
     g_free(tmp);
 
     if (message->reply_to) {
-	tmp = libbalsa_address_to_gchar(message->reply_to, 0);
+	tmp = libbalsa_address_to_gchar_p(message->reply_to, 0);
 
-	libbalsa_lock_mutt();
 	hdr->env->reply_to =
 	    rfc822_parse_adrlist(hdr->env->reply_to, tmp);
-	libbalsa_unlock_mutt();
 
 	g_free(tmp);
     }
 
     if (message->dispnotify_to) {
-	tmp = libbalsa_address_to_gchar(message->dispnotify_to, 0);
+	tmp = libbalsa_address_to_gchar_p(message->dispnotify_to, 0);
 
-	libbalsa_lock_mutt();
 	hdr->env->dispnotify_to =
 	    rfc822_parse_adrlist(hdr->env->dispnotify_to, tmp);
-	libbalsa_unlock_mutt();
 
 	g_free(tmp);
     }
 
     hdr->env->subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
 
-    /* This continuous lock/unlock business is because 
-     * we can't call libbalsa API funcs with the 
-     * mutt lock held. grr 
-     */
-    tmp = libbalsa_make_string_from_list(message->to_list);
-    libbalsa_lock_mutt();
+    tmp = libbalsa_make_string_from_list_p(message->to_list);
     hdr->env->to = rfc822_parse_adrlist(hdr->env->to, tmp);
-    libbalsa_unlock_mutt();
     g_free(tmp);
 
-    tmp = libbalsa_make_string_from_list(message->cc_list);
-    libbalsa_lock_mutt();
+    tmp = libbalsa_make_string_from_list_p(message->cc_list);
     hdr->env->cc = rfc822_parse_adrlist(hdr->env->cc, tmp);
-    libbalsa_unlock_mutt();
     g_free(tmp);
 
-    tmp = libbalsa_make_string_from_list(message->bcc_list);
-    libbalsa_lock_mutt();
+    tmp = libbalsa_make_string_from_list_p(message->bcc_list);
     hdr->env->bcc = rfc822_parse_adrlist(hdr->env->bcc, tmp);
     libbalsa_unlock_mutt();
     g_free(tmp);

@@ -28,6 +28,11 @@
 #define __LIBBALSA_PRIVATE_H__
 
 LibBalsaAddress *libbalsa_address_new_from_libmutt(ADDRESS * caddr);
+/* private interfaces to avoid the libbalsa API */
+/* address.c: */
+gchar *libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n);
+/* misc.c: */
+gchar *libbalsa_make_string_from_list_p(const GList * the_list);
 
 
 #ifdef BALSA_USE_THREADS

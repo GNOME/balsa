@@ -68,6 +68,9 @@ struct _LibBalsaMailboxImap {
 
     GArray* messages_info;
     gboolean opened;
+
+    GArray *sort_ranks;
+    LibBalsaMailboxSortFields sort_field;
 };
 
 struct _LibBalsaMailboxImapClass {
@@ -116,9 +119,12 @@ static LibBalsaMessage* libbalsa_mailbox_imap_get_message(LibBalsaMailbox*
 							  guint msgno);
 static void libbalsa_mailbox_imap_prepare_threading(LibBalsaMailbox *mailbox, 
                                                     guint lo, guint hi);
-static void libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
-                                                  LibBalsaMessage *message,
-                                                  LibBalsaFetchFlag flags);
+static gboolean libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *
+                                                      mailbox,
+                                                      LibBalsaMessage *
+                                                      message,
+                                                      LibBalsaFetchFlag
+                                                      flags);
 static void libbalsa_mailbox_imap_fetch_headers(LibBalsaMailbox *mailbox,
                                                 LibBalsaMessage *message);
 static gboolean libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
@@ -266,6 +272,8 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox)
     mailbox->path = NULL;
     mailbox->handle = NULL;
     mailbox->handle_refs = 0;
+    mailbox->sort_ranks = g_array_new(FALSE, FALSE, sizeof(guint));
+    mailbox->sort_field = -1;	/* Initially invalid. */
 }
 
 /* libbalsa_mailbox_imap_finalize:
@@ -296,6 +304,8 @@ libbalsa_mailbox_imap_finalize(GObject * object)
 	g_object_unref(G_OBJECT(remote->server));
 	remote->server = NULL;
     }
+
+    g_array_free(mailbox->sort_ranks, TRUE); mailbox->sort_ranks = NULL;
 
     if (G_OBJECT_CLASS(parent_class)->finalize)
 	G_OBJECT_CLASS(parent_class)->finalize(object);
@@ -681,6 +691,7 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
     unsigned cnt = imap_mbox_handle_get_exists(mimap->handle);
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
 
+    mimap->sort_field = -1;	/* Invalidate. */
     if(cnt<mimap->messages_info->len) { /* remove messages */
         printf("%s: expunge ignored?\n", __func__);
     } else if (cnt > mimap->messages_info->len) { /* new messages arrived */
@@ -723,6 +734,7 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
 
     libbalsa_mailbox_msgno_removed(mailbox, seqno);
     ++mimap->search_stamp;
+    mimap->sort_field = -1;	/* Invalidate. */
     if(msg_info->message) {
 	gchar **pair =
             get_cache_name_pair(mimap, "body", 
@@ -931,6 +943,7 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
 	imap_mbox_unselect(mbox->handle);
     free_messages_info(mbox);
     libbalsa_mailbox_imap_release_handle(mbox);
+    mbox->sort_field = -1;	/* Invalidate. */
 }
 
 static FILE*
@@ -1794,7 +1807,7 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
     return TRUE;
 }
 
-static void
+static gboolean
 libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
                                       LibBalsaMessage *message,
                                       LibBalsaFetchFlag flags)
@@ -1803,7 +1816,7 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     LibBalsaServer *server;
     ImapFetchType ift = 0;
-    g_return_if_fail(mimap->opened);
+    g_return_val_if_fail(mimap->opened, FALSE);
 
     /* work around some server bugs... */
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
@@ -1818,7 +1831,7 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
     }
 
     if(get_struct_from_cache(mailbox, message, flags))
-        return;
+        return TRUE;
 
     if(flags & LB_FETCH_RFC822_HEADERS) ift |= IMFETCH_RFC822HEADERS_SELECTED;
     if(flags & LB_FETCH_STRUCTURE)      ift |= IMFETCH_BODYSTRUCT;
@@ -1830,7 +1843,8 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
         gchar *hdr;
         ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle,
                                                    message->msgno);
-        g_return_if_fail(im); /* in case of msg number discrepancies */
+	/* in case of msg number discrepancies: */
+        g_return_val_if_fail(im != NULL, FALSE);
         if(flags & LB_FETCH_STRUCTURE) {
             LibBalsaMessageBody *body = libbalsa_message_body_new(message);
             lbm_imap_construct_body(body, im->body);
@@ -1842,6 +1856,8 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
             message->has_all_headers = 1;
         }
     }
+
+    return TRUE;
 }
 
 static void
@@ -2287,65 +2303,65 @@ lbm_imap_update_view_filter(LibBalsaMailbox   *mailbox,
     mailbox->view_filter = view_filter;
 }
 
+/* Sorting
+ *
+ * To avoid multiple server queries when the view is threaded, we sort
+ * the whole mailbox, find the rank of each message, and cache the
+ * result in LibBalsaMailboxImap::rank.  When libbalsa_mailbox_imap_sort()
+ * is called on a subset of messages, it can use their ranks to sort
+ * them.  The sort-field is also cached, so we can refresh the ranks
+ * when the sort-field is changed.  The cached sort-field is invalidated
+ * (set to -1) whenever the cached ranks might be out of date.
+ */
 static gint
 lbmi_compare_func(const SortTuple * a,
 		  const SortTuple * b,
-		  gboolean ascending)
+		  LibBalsaMailboxImap * mimap)
 {
-    if(ascending)
-        return GPOINTER_TO_INT(a->node->data) - GPOINTER_TO_INT(b->node->data);
-    else
-        return GPOINTER_TO_INT(b->node->data) - GPOINTER_TO_INT(a->node->data);
+    unsigned seqnoa, seqnob;
+    int retval;
+    LibBalsaMailbox *mbox = (LibBalsaMailbox *) mimap;
+
+    seqnoa = GPOINTER_TO_UINT(a->node->data);
+    g_assert(seqnoa <= mimap->sort_ranks->len);
+    seqnob = GPOINTER_TO_UINT(b->node->data);
+    g_assert(seqnob <= mimap->sort_ranks->len);
+    retval = g_array_index(mimap->sort_ranks, guint, seqnoa - 1) -
+	g_array_index(mimap->sort_ranks, guint, seqnob - 1);
+
+    return mbox->view->sort_type == LB_MAILBOX_SORT_TYPE_ASC ?
+        retval : -retval;
 }
 
 static void
 libbalsa_mailbox_imap_sort(LibBalsaMailbox *mbox, GArray *array)
 {
-    unsigned *msgno_arr, *msgno_map, len, i, no_max;
-    GArray *tmp;
+    unsigned *msgno_arr, i;
     ImapResponse rc;
-    len = array->len;
+    LibBalsaMailboxImap *mimap;
 
-    if(mbox->view->sort_field == LB_MAILBOX_SORT_NO) {
-        g_array_sort_with_data(array, (GCompareDataFunc)lbmi_compare_func,
-                               GINT_TO_POINTER(mbox->view->sort_type ==
-                                               LB_MAILBOX_SORT_TYPE_ASC));
-        return;
+    mimap = LIBBALSA_MAILBOX_IMAP(mbox);
+    if (mimap->sort_field != mbox->view->sort_field) {
+	/* Cached ranks are invalid. */
+        guint len = mimap->messages_info->len;
+        msgno_arr = g_malloc(len * sizeof(unsigned));
+        for (i = 0; i < len; i++)
+            msgno_arr[i] = i + 1;
+        if (mbox->view->sort_field != LB_MAILBOX_SORT_NO)
+	    /* Server-side sort of the whole mailbox. */
+            II(rc, LIBBALSA_MAILBOX_IMAP(mbox)->handle,
+               imap_mbox_sort_msgno(LIBBALSA_MAILBOX_IMAP(mbox)->handle,
+                                    lbmi_get_imap_sort_key(mbox), TRUE,
+                                    msgno_arr, len)); /* ignore errors */
+        g_array_set_size(mimap->sort_ranks, len);
+        for (i = 0; i < len; i++)
+	    g_array_index(mimap->sort_ranks, guint, msgno_arr[i] - 1) = i;
+	g_free(msgno_arr);
+	/* Validate the cache. */
+        mimap->sort_field = mbox->view->sort_field;
     }
-    if(mbox->view->threading_type != LB_MAILBOX_THREADING_FLAT)
-        return; /* IMAP threading has an own way of sorting messages.
-                 * We could possibly disable sort buttons if threading
-                 * is used. */
-    msgno_arr = g_malloc(len*sizeof(unsigned));
-    no_max = 0;
-    for(i=0; i<len; i++) {
-        msgno_arr[i] = 
-            GPOINTER_TO_UINT(g_array_index(array, SortTuple, i).node->data);
-        if(msgno_arr[i]> no_max)
-            no_max = msgno_arr[i];
-    }
-    msgno_map  = g_malloc(no_max*sizeof(unsigned));
-    for(i=0; i<len; i++)
-        msgno_map[msgno_arr[i]-1] = i;
-
-    qsort(msgno_arr, len, sizeof(msgno_arr[0]), cmp_msgno);
-    II(rc,LIBBALSA_MAILBOX_IMAP(mbox)->handle,
-       imap_mbox_sort_msgno(LIBBALSA_MAILBOX_IMAP(mbox)->handle,
-                            lbmi_get_imap_sort_key(mbox),
-                            mbox->view->sort_type == LB_MAILBOX_SORT_TYPE_ASC,
-                            msgno_arr, len)); /* ignore errors */
-       
-    tmp = g_array_new(FALSE,FALSE, sizeof(SortTuple));
-    g_array_append_vals(tmp, array->data, array->len);
-    g_array_set_size(array, 0);    /* truncate */
-
-    for(i=0; i<len; i++)
-        g_array_append_val(array, 
-                           g_array_index(tmp,SortTuple, 
-                                         msgno_map[msgno_arr[i]-1]));
-    g_array_free(tmp, TRUE);
-    g_free(msgno_arr);
-    g_free(msgno_map);
+    g_array_sort_with_data(array, (GCompareDataFunc) lbmi_compare_func,
+                           mimap);
 }
 
 static guint

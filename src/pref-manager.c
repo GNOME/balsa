@@ -29,7 +29,10 @@ struct _PreferencesManagerWindow
   
   /* identity */
   GtkWidget *real_name;
-  GtkWidget *email;
+
+  GtkWidget *username;
+  GtkWidget *hostname;
+
   GtkWidget *organization;
   
   /* local */
@@ -149,8 +152,6 @@ open_preferences_manager ()
   gtk_widget_show (button);
 
 
-
-
   /* set data and show the whole thing */
   refresh_preferences_manager ();
   gtk_widget_show (pmw->window);
@@ -178,18 +179,18 @@ cancel_preferences_manager ()
 void
 refresh_preferences_manager ()
 {
-  gchar *email;
-
-  email = g_malloc (strlen (balsa_app.username) + 1 + strlen (balsa_app.hostname) + 2);
-  sprintf (email, "%s@%s\0", balsa_app.username, balsa_app.hostname);
-
-
   gtk_entry_set_text (GTK_ENTRY (pmw->real_name), balsa_app.real_name);
-  gtk_entry_set_text (GTK_ENTRY (pmw->email), email);
+
+  /* we're gonna display this as  USERNAME @ HOSTNAME 
+   * for the From: header */
+  gtk_entry_set_text (GTK_ENTRY (pmw->username), balsa_app.username);
+  gtk_entry_set_text (GTK_ENTRY (pmw->hostname), balsa_app.hostname);
+
   gtk_entry_set_text (GTK_ENTRY (pmw->organization), balsa_app.organization);
 
+  gtk_entry_set_text (GTK_ENTRY (pmw->smtp_server), balsa_app.smtp_server);
 
-  g_free (email);
+  gtk_entry_set_text (GTK_ENTRY (pmw->mail_directory), balsa_app.local_mail_directory);
 }
 
 
@@ -201,6 +202,7 @@ static GtkWidget *
 create_identity_page ()
 {
   GtkWidget *vbox;
+  GtkWidget *hbox;
   GtkWidget *table;
   GtkWidget *label;
   GtkWidget *button;
@@ -211,7 +213,7 @@ create_identity_page ()
   gtk_widget_show (vbox);
 
 
-  table = gtk_table_new (3, 2, FALSE);
+  table = gtk_table_new (5, 2, FALSE);
   gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   gtk_widget_show (table);
 
@@ -242,11 +244,21 @@ create_identity_page ()
   gtk_widget_show (label);
 
 
-  pmw->email = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), pmw->email, 1, 2, 1, 2,
+  pmw->username = gtk_entry_new ();
+  pmw->hostname = gtk_entry_new ();
+  hbox=gtk_hbox_new(FALSE, 0);
+  gtk_widget_show(hbox);
+  gtk_box_pack_start (GTK_BOX (hbox), pmw->username, TRUE, TRUE, 0);
+  gtk_widget_show(pmw->username);
+  label = gtk_label_new ("@");
+  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+  gtk_widget_show(label);
+  gtk_box_pack_start (GTK_BOX (hbox), pmw->hostname, TRUE, TRUE, 0);
+  gtk_widget_show(pmw->hostname);
+  
+  gtk_table_attach (GTK_TABLE (table), hbox, 1, 2, 1, 2,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
-  gtk_widget_show (pmw->email);
 
 
   /* organization */
@@ -263,6 +275,38 @@ create_identity_page ()
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
   gtk_widget_show (pmw->organization);
+
+
+  /* smtp server */
+  label = gtk_label_new ("SMTP server:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (label);
+
+
+  pmw->smtp_server = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pmw->smtp_server, 1, 2, 3, 4,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
+  gtk_widget_show (pmw->smtp_server);
+
+  
+  /* local mail dir */
+  label = gtk_label_new ("Local mail directory:");
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 4, 5,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (label);
+
+
+  pmw->mail_directory = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pmw->mail_directory, 1, 2, 4, 5,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
+  gtk_widget_show (pmw->mail_directory);
 
 
   return vbox;

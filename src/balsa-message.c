@@ -21,10 +21,13 @@
 #include <stdio.h>
 #include <string.h>
 #include "balsa-message.h"
-
+/*
 #define HTML_HEAD "<html><body bgcolor=#ffffff><pre>"
 #define HTML_FOOT "</pre></body></html>"
+*/
 
+#define HTML_HEAD "<html><body bgcolor=#ffffff><p><tt>"
+#define HTML_FOOT "</tt></p></body></html>"
 
 static GString *text2html (char *buff);
 
@@ -167,6 +170,8 @@ balsa_message_set (BalsaMessage * bmessage,
   cur = cur->next = mail_newstringlist ();
   cur->text.size = strlen (cur->text.data = (unsigned char *) cpystr ("Newsgroups"));
 
+
+  /* message headers */
   c = mail_fetchheader_full (stream, mesgno, lines, NIL, NIL);
   gs = text2html (c);
   buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
@@ -175,17 +180,22 @@ balsa_message_set (BalsaMessage * bmessage,
 
   mail_free_stringlist (&lines);
 
+  /* separate the headers from the body */
+  buff = g_realloc (buff, strlen (buff) + strlen ("</tt></p><p><tt>") + 1);
+  strcat (buff, "</tt></p><p><tt>");
+
+  
   /* message body */
   c = mail_fetchtext (stream, mesgno);
 
-   gs = text2html (c);
-   buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
-/*
-  buff = g_realloc (buff, strlen (buff) + strlen (c) + 1);
-  strcat (buff, c);
-*/
-   strcat (buff, gs->str);
-   g_string_free (gs, 1);
+  gs = text2html (c);
+  buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
+
+/* buff = g_realloc (buff, strlen (buff) + strlen (c) + 1);
+   strcat (buff, c); */
+
+  strcat (buff, gs->str);
+  g_string_free (gs, 1);
 
   /* HTML footer */
   buff = g_realloc (buff, strlen (buff) + strlen (HTML_FOOT) + 1);
@@ -317,6 +327,18 @@ text2html (char *buff)
 
   for (i = 0; i < len; i++)
     {
+      if (buff[i] == '\r' && buff[i + 1] == '\n')
+	{
+	  gs = g_string_append (gs, "<br>\n");
+	}
+      else if (buff[i] == '\r')
+	{
+	  gs = g_string_append (gs, "<br>\n");
+	}
+      else if (buff[i] == '\n')
+	{
+	  gs = g_string_append (gs, "<br>\n");
+	}
       switch (buff[i])
 	{
 	case '<':

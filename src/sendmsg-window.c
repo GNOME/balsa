@@ -333,7 +333,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   msg->subject = gtk_entry_new ();
   if (type != 0)
     {
-      gtk_entry_set_text (GTK_ENTRY (msg->subject), get_header_subject (bindex->stream, row));
+      gtk_entry_set_text (GTK_ENTRY (msg->subject), get_header ("subject", bindex->stream, row));
       if (type == 1)
 	gtk_entry_prepend_text (GTK_ENTRY (msg->subject), "Re: ");
       else if (type == 2)
@@ -369,6 +369,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 
   msg->text = gtk_text_new (NULL, NULL);
   gtk_text_set_editable (GTK_TEXT (msg->text), TRUE);
+  gtk_text_set_word_wrap(GTK_TEXT (msg->text), TRUE);
   gtk_widget_show (msg->text);
   gtk_table_attach_defaults (GTK_TABLE (table), msg->text, 0, 1, 0, 1);
   hscrollbar = gtk_hscrollbar_new (GTK_TEXT (msg->text)->hadj);

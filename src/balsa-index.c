@@ -194,7 +194,7 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_BROWSE);
   gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_RIGHT);
   gtk_clist_set_column_width (clist, 0, 25);
-  gtk_clist_set_column_width (clist, 1, 25);
+  gtk_clist_set_column_width (clist, 1, 30);
   gtk_clist_set_column_width (clist, 2, 150);
   gtk_clist_set_column_width (clist, 3, 250);
   gtk_clist_set_column_width (clist, 4, 100);

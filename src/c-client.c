@@ -34,6 +34,24 @@
  */
 
 char *
+get_header (char *header, MAILSTREAM * stream, unsigned long mesgno)
+{
+  char *t;
+  int olen = strlen (header);
+  int len;
+  STRINGLIST headerline = {{(unsigned char *) header, olen}, NIL};
+  t = mail_fetch_header (stream, mesgno, NIL, &headerline, NIL, FT_INTERNAL | FT_PEEK);
+  len = strlen (t);
+  if (len < 3)
+    return "";
+  memmove (t, t + olen + 2, len - olen + 1);
+  t[strlen (t) - 2] = '\0';
+  return t;
+}
+
+
+
+char *
 get_header_from (MAILSTREAM * stream, unsigned long mesgno)
 {
   char *t;
@@ -67,24 +85,6 @@ get_header_replyto (MAILSTREAM * stream, unsigned long mesgno)
   if (len < 3)
     return get_header_from (stream, mesgno);
   memmove (t, t + 10, len - 9);
-  t[strlen (t) - 2] = '\0';
-  return t;
-}
-
-
-char *
-get_header_subject (MAILSTREAM * stream, unsigned long mesgno)
-{
-  char *t;
-  int len;
-  static STRINGLIST mailreplytoline =
-  {
-    {(unsigned char *) "subject", 7}, NIL};
-  t = mail_fetch_header (stream, mesgno, NIL, &mailreplytoline, NIL, FT_INTERNAL | FT_PEEK);
-  len = strlen (t);
-  if (len < 3)
-    return "";
-  memmove (t, t + 9, len - 8);
   t[strlen (t) - 2] = '\0';
   return t;
 }

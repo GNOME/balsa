@@ -46,7 +46,6 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.real_name = NULL;
   balsa_app.username = NIL;
   balsa_app.hostname = NIL;
-/*  balsa_app.email = NULL; */
   balsa_app.organization = NULL;
   balsa_app.local_mail_directory = NULL;
   balsa_app.smtp_server = NULL;
@@ -254,13 +253,17 @@ setup_local_mailboxes ()
   struct stat st;
   char filename[PATH_MAX + 1];
   DRIVER *drv = NIL;
+  MailboxMBX *mbx;
   MailboxMBox *mbox;
   MailboxUNIX *unixmb;
   gint i = 0;
 
 
-  /* check the MAIL environment variable for a spool directory */
-/* We'll make this the default if no other mailboxes are loaded... */
+/*
+ * check the MAIL environment variable for a spool directory 
+ * We'll make this the default if no other mailboxes are loaded...
+ */
+
 /*
    if (getenv ("MAIL"))
    {
@@ -285,6 +288,17 @@ setup_local_mailboxes ()
 	    {
 	      if (drv = mail_valid (NIL, g_strdup (filename), "error, cannot load. darn"))
 		{
+#ifdef DEBUG
+		     printf("%s - %s\n", d->d_name, drv->name);
+#endif
+		  if (!strcmp (drv->name, "mbx"))
+		    {
+		      mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
+		      mbx->name = g_strdup (d->d_name);
+		      mbx->path = g_strdup (filename);
+
+		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
+		    }
 
 		  if (!strcmp (drv->name, "mbox"))
 		    {
@@ -293,9 +307,6 @@ setup_local_mailboxes ()
 		      mbox->path = g_strdup (filename);
 
 		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
-/*
- *                  mailbox_add_gnome_config (i, mbox->name, mbox->path, 3);
- */
 		    }
 		  if (!strcmp (drv->name, "unix"))
 		    {
@@ -304,9 +315,6 @@ setup_local_mailboxes ()
 		      unixmb->path = g_strdup (filename);
 
 		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, unixmb);
-/*
- *                  mailbox_add_gnome_config (i, unixmb->name, unixmb->path, 5);
- */
 		    }
 		  i++;
 		}

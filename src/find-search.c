@@ -44,7 +44,8 @@ add_check_button(GtkWidget* table, const gchar* label, gint x, gint y)
     return GTK_TOGGLE_BUTTON(res);
 }
 
-gint find_real(BalsaIndex * bindex,gboolean again)
+gint
+find_real(BalsaIndex * bindex,gboolean again)
 {
     /* FIXME : later we could do a search based on a complete filter */
     static LibBalsaFilter * f=NULL;
@@ -74,7 +75,7 @@ gint find_real(BalsaIndex * bindex,gboolean again)
         GtkToggleButton *matching_to, *matching_cc, *matching_subject;
 	GtkRadioButton * regex_type,* simple_type;
 	GSList * rb_group;
-	gint res=-1;
+	gint res=0;
 	
 	gnome_dialog_close_hides(dia,TRUE);
 
@@ -161,19 +162,17 @@ gint find_real(BalsaIndex * bindex,gboolean again)
 	gtk_toggle_button_set_active(matching_cc,
 				     CONDITION_CHKMATCH(cnd,CONDITION_MATCH_CC));
 
-	if (cnd) {
-	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(regex_type),
-					 cnd->type==CONDITION_REGEX);	    
-	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(simple_type),
-					 (cnd->type==CONDITION_SIMPLE)
-					 || cnd->type==CONDITION_NONE);
-	}
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(regex_type),
+				     cnd->type==CONDITION_REGEX);	    
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(simple_type),
+				     (cnd->type==CONDITION_SIMPLE)
+				     || cnd->type==CONDITION_NONE);
 
         gtk_widget_grab_focus(search_entry);
         gnome_dialog_editable_enters(dia, GTK_EDITABLE(search_entry));
         gnome_dialog_set_default(dia, 0);
 
-	if (gnome_dialog_run(dia)==0) {
+	while (gnome_dialog_run(dia)==0) {
 	    /* OK --> Process the search dialog fields */
 	    cnd->match_fields=CONDITION_EMPTY;
 	    if (gtk_toggle_button_get_active(matching_body))
@@ -186,53 +185,55 @@ gint find_real(BalsaIndex * bindex,gboolean again)
 		CONDITION_SETMATCH(cnd,CONDITION_MATCH_FROM);
 	    if (gtk_toggle_button_get_active(matching_cc))
 		CONDITION_SETMATCH(cnd,CONDITION_MATCH_CC);
-	    if (cnd->match_fields!=CONDITION_EMPTY && gtk_entry_get_text(GTK_ENTRY(search_entry))[0]) {
-		reverse=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(reverse_button));
-		
-		/* Free all condition */
-		switch (cnd->type) {
-		case CONDITION_SIMPLE:
-		    g_free(cnd->match.string);
-		    break;
-		case CONDITION_REGEX:
-		    regexs_free(cnd->match.regexs);
-		default:;
-		}
-		
-		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(simple_type))) {
-		    cnd->match.string =
-			g_strdup(gtk_entry_get_text(GTK_ENTRY(search_entry)));
-		    cnd->type=CONDITION_SIMPLE;
-		    res=1;
-		}
-		else {
-		    LibBalsaConditionRegex * new_reg = libbalsa_condition_regex_new();
-		    
-		    new_reg->string = g_strdup(gtk_entry_get_text(GTK_ENTRY(search_entry)));
-		    cnd->match.regexs = g_slist_prepend(NULL,new_reg);
-		    cnd->type=CONDITION_REGEX;
-		    libbalsa_condition_compile_regexs(cnd);
-		    if (filter_errno != FILTER_NOERR) {
-			gchar * errorstring =
-			    g_strdup_printf(_("Unable to compile search Reg. Exp."));
-			filter_perror(errorstring);
-			g_free(errorstring);
-		    }
-		    else res=1;
-		}
+	    if (cnd->match_fields==CONDITION_EMPTY) {
+		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                                     _("You must specify at least one field to search"));
+		res=-1;
+		continue;
+	    }
+	    else if (!gtk_entry_get_text(GTK_ENTRY(search_entry))[0]) {
+		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                                     _("You must provide a non-empty string"));
+		res=-1;
+		continue;
+	    }
+	    reverse=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(reverse_button));
 	    
-		/* FIXME : We should print error messages, but for
-		 * that we should first make find dialog non-modal
-		 * balsa_information(LIBBALSA_INFORMATION_ERROR,_("You
-		 * must specify at least one field to look in"));
-		 * *balsa_information(LIBBALSA_INFORMATION_ERROR,_("You
-		 * must provide a non-empty string")); */
+	    /* Free all condition */
+	    switch (cnd->type) {
+	    case CONDITION_SIMPLE:
+		g_free(cnd->match.string);
+		break;
+	    case CONDITION_REGEX:
+		regexs_free(cnd->match.regexs);
+	    default:;
+	    }
+	    
+	    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(simple_type))) {
+		cnd->match.string =
+		    g_strdup(gtk_entry_get_text(GTK_ENTRY(search_entry)));
+		cnd->type=CONDITION_SIMPLE;
+		res=1;
+		break;
+	    }
+	    else {
+		LibBalsaConditionRegex * new_reg = libbalsa_condition_regex_new();
+		
+		new_reg->string = g_strdup(gtk_entry_get_text(GTK_ENTRY(search_entry)));
+		cnd->match.regexs = g_slist_prepend(NULL,new_reg);
+		cnd->type=CONDITION_REGEX;
+		libbalsa_condition_compile_regexs(cnd);
+		if (filter_errno != FILTER_NOERR) {
+		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                                         _("Unable to compile search Reg. Exp."));
+		    res=-1;
+		    continue;
+		}
+		res=1;
+		break;
 	    }
 	}
-	else res=0;
 	gtk_widget_destroy(GTK_WIDGET(dia));
-	/* Here ok==TRUE means OK button was pressed, search is valid so let's go
-	 * else cancel was pressed return */
 	if (res!=1) return res;
     }
 

@@ -529,7 +529,7 @@ filters_edit_dialog(void)
     GSList * cnds,* filter_list;
 
     if (fr_dialogs_opened) {
-	balsa_information(LIBBALSA_INFORMATION_ERROR,
+	balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
                           _("A filter run dialog is open."
                             "Close it before you can modify filters."));
 	return;

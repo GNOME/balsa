@@ -3,12 +3,16 @@ TODO LIST:
 Milestone 1.4 targets:
 ----------------------
 - [DONE] Merge upcoming stable mutt into libmutt
-- Filters
+- [Mostly DONE] Filters
 - have pop3 mailbox indexes on servers that support it
-- split server/mailbox configuration logically, redo secure connection 
+- [DONE] split server/mailbox configuration logically, redo secure connection 
   settings
+- Show a message when no matching messages are found on search.
 - decent mailing list support at address book and alias expansion levels.
   (LDIF/LDAP seems to be the most apriopriate file format).
+- update webpage: Screen shots and FAQ.
+- sig separator working correctly?
+- do not quit when mail checking thread is active (strange crashes on quit).
 
 New features/unfinished things:
 -------------------------------
@@ -22,7 +26,7 @@ UI:
 - Incorporate use of GNOME Docklet to indicate status of unread mail,
 status, etc.
 
-- inline images (patch in bugzilla)
+- [DONE] inline images (patch in bugzilla)
 	
 - Split Preferences window into several more managable chunks.
 

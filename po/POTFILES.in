@@ -66,6 +66,7 @@ src/filter-export-callbacks.c
 src/filter-export-dialog.c
 src/filter-run-callbacks.c
 src/filter-run-dialog.c
+src/find-search.c
 src/folder-conf.c
 src/information-dialog.c
 src/mailbox-conf.c

@@ -134,17 +134,19 @@ typedef struct _LibBalsaFilter {
     FilterActionType action;
     /* action_string depends on action : 
      * - if action is FILTER_MOVE, or FILTER_COPY, action_string is
-     *   the name of the mailbox to move/copy the matching message
+     *   the URL (this is mandatory because it determines UNIQUELY
+     *   the mailbox, unlike the name) of the mailbox to move/copy 
+     *   the matching message
      * - if action is FILTER_RUN, action_string is the command to run
-         for now this is the way to specify parameters (replaced by
-         pieces of the matching message) for the running command,
-         proposition : %f,%t,%c,%s are replaced by the corresponding
-         header (from,to,cc,subject) field of the matching message on
-         the command line with enclosing quotes if necessary, e.g. :
-         command_to_run %t %s -----> command_to_run manu@wanadoo.fr
-         "about filters" If you want the body, we must find a way to
-         pipe it to the std input of the command (FIXME what do we do
-         for different parts, attachments and so on?)
+     *   for now this is the way to specify parameters (replaced by
+     *   pieces of the matching message) for the running command,
+     *   proposition : %f,%t,%c,%s are replaced by the corresponding
+     *   header (from,to,cc,subject) field of the matching message on
+     *   the command line with enclosing quotes if necessary, e.g. :
+     *   command_to_run %t %s -----> command_to_run manu@wanadoo.fr
+     *   "about filters" If you want the body, we must find a way to
+     *   pipe it to the std input of the command (FIXME what do we do
+     *   for different parts, attachments and so on?)
      * - if action is FILTER_TRASH it's NULL
      * - FIXME if action is FILTER_PRINT it could be the print command ?
      */

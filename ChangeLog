@@ -1,3 +1,23 @@
+2002-06-23  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in: make clear gnome-print-devel package neede for
+	compilation. Check for libesmtp headers.
+	* libbalsa/mailbox_pop3.c, pop3.c: do not update GUI more
+	frequently than necessary.
+	* src/folder-conf.c: fix sub-folder creation damaged when fixing
+	renaming.
+
+	* src/information-dialog.[hc]: add parent arg to balsa_information().
+	* libbalsa/information.[hc]: use it.
+	* src/balsa-{index,message}.c , filter-edit-{callbacks,dialog}.c,
+	src/filter-export-{callbacks,dialog}.c, run-{callbacks,dialog}.c,
+	filter-run.h, mailbox-conf.c, main.c,print.c, sendmsg-window.[ch],
+	spell-check.c, store-address.c: ditto.
+	
+	* libbalsa/filter.[hc]: use find_by_url() api (Emmanuel).
+	* libbalsa/address.c: handle empty full_name nicely (Peter B)
+	* src/balsa-mblist.[hc], src/sendmsg-window.c: MRU fixes (#84220).
+	
 2002-06-14  Emmanuel <e.allaud@wanadoo.fr>
 
 	* src/Makefile.am:

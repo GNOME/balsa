@@ -39,14 +39,14 @@
 void
 message_print_cb(GtkWidget * widget, gpointer cbdata)
 {
-    balsa_information(LIBBALSA_INFORMATION_ERROR, _(
+    balsa_information(LIBBALSA_INFORMATION_ERROR, NULL, _(
 	"This version of balsa is compiled without gnome-print support.\n"
 	"Printing is not possible."));
 }
 void
 message_print(LibBalsaMessage *msg)
 {
-    balsa_information(LIBBALSA_INFORMATION_ERROR, _(
+    balsa_information(LIBBALSA_INFORMATION_ERROR, NULL, _(
 	"This version of balsa is compiled without gnome-print support.\n"
 	"Printing is not possible."));
 }
@@ -674,7 +674,7 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
     if (charset) {
 	pdata->conv = iconv_open("UTF-8", charset);
 	if (pdata->conv == (iconv_t)(-1)) {
-	    balsa_information(LIBBALSA_INFORMATION_ERROR,
+	    balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
 			      _("Can not convert %s, falling back to US-ASCII.\nSome characters may be printed incorrectly."),
 			      charset);
 	    pdata->conv = iconv_open("UTF-8", "US-ASCII");
@@ -1007,9 +1007,9 @@ print_info_new(const gchar * paper, LibBalsaMessage * msg,
     pi->paper = gnome_paper_with_name(paper);
     if (pi->paper == NULL) {
      	papers = gnome_paper_name_list();
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
+	balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
 			  _("Balsa could not find paper type \"%s\".\n"), paper);
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
+	balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
 			  _("Using paper type \"%s\" from /etc/paper.config instead\n"),
 			  (char *)papers->data);
 	pi->paper = gnome_paper_with_name((char *)papers->data);
@@ -1042,7 +1042,7 @@ print_info_new(const gchar * paper, LibBalsaMessage * msg,
     if (the_charset) {
 	pi->conv_data = iconv_open("UTF-8", the_charset);
 	if (pi->conv_data == (iconv_t)(-1)) {
-	    balsa_information(LIBBALSA_INFORMATION_ERROR,
+	    balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
 			      _("Can not convert %s, falling back to US-ASCII.\nSome characters may be printed incorrectly."),
 			      the_charset);
 	    pi->conv_data = iconv_open("UTF-8", "US-ASCII");
@@ -1124,7 +1124,7 @@ is_font_ok(const gchar * font_name)
     GnomeFont *test_font = gnome_font_new(font_name, 10);
 
     if (!test_font) {
-	balsa_information(LIBBALSA_INFORMATION_ERROR,
+	balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
 			  _("Balsa could not find font %s\n"
 			    "Printing is not possible"), font_name);
 	return FALSE;
@@ -1233,10 +1233,10 @@ adjust_print_dialog(GtkWidget * dialog)
 
     /* paper selection */
     if ((gpaper = gnome_paper_with_name(balsa_app.paper_size)) == NULL) {
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
+	balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
 			  _("Balsa could not find paper type \"%s\", using"
 			    " system default.\n"), balsa_app.paper_size);
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
+	balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
 			  _("Check your paper type configuration or balsa preferences\n"));
 	balsa_app.paper_size = g_strdup(gnome_paper_name_default());
     }

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; indent-tab-mode: nil; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1505,6 +1505,8 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     LibBalsaFilter *fil,*old;
     gchar *temp,*mailbox_name=NULL;
     GtkWidget * menu;
+    GtkWindow* parent = GTK_WINDOW(gtk_widget_get_ancestor(widget, 
+                                                           GTK_TYPE_WINDOW));
     gint row,i;
     FilterActionType action;
 
@@ -1515,12 +1517,12 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     /* quick check before we malloc */
     temp = gtk_entry_get_text(GTK_ENTRY(fe_name_entry));
     if (!temp || temp[0] == '\0') {
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
+        balsa_information(LIBBALSA_INFORMATION_ERROR, parent,
                           _("No filter name specified."));
         return;
     } 
     if(!unique_filter_name(temp,row)) {
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
+        balsa_information(LIBBALSA_INFORMATION_ERROR, parent,
                           _("Filter %s already exists."), temp);
         return;
     }
@@ -1539,8 +1541,8 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     }
 
     if (!fe_conditions_list->rows) {
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("Your filter must have conditions\n"));
+        balsa_information(LIBBALSA_INFORMATION_ERROR, parent,
+                          _("Filter must have conditions."));
         return;
     }
     /* Construct the new filter according with the data fields */
@@ -1614,7 +1616,7 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
         tmpstr = gtk_entry_get_text(GTK_ENTRY(fe_sound_entry));
         if ((!tmpstr) || (tmpstr[0] == '\0')) {
             libbalsa_filter_free(fil, GINT_TO_POINTER(TRUE));
-	    balsa_information(LIBBALSA_INFORMATION_ERROR,
+	    balsa_information(LIBBALSA_INFORMATION_ERROR, parent,
 			      _("You must provide a sound to play"));
             return;
         }

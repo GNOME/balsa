@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,10 +30,12 @@
 #include "save-restore.h"
 #include "pixmaps/other_enabled.xpm"
 
-/* fe_already_open is TRUE when the filters dialog is opened, we use this to prevent incoherency if we
- * have both filters dialog and mailbox filters dialog boxes opened at the same time
- * FIXME : we can perhaps imagine a way to "refresh" the other dialog boxes when filters have been modified
- * but it'll be complex, and I'm not sure it is worth it
+/* fe_already_open is TRUE when the filters dialog is opened, we use
+ * this to prevent incoherency if we have both filters dialog and
+ * mailbox filters dialog boxes opened at the same time.
+ * FIXME : we can perhaps imagine a way to "refresh" the other dialog
+ * boxes when filters have been modified but it'll be complex, and I'm
+ * not sure it is worth it.
  *
  * Defined in filter-edit-dialog.c
  */
@@ -206,7 +208,8 @@ balsa_filter_run_dialog_new(LibBalsaMailbox * mbox)
     /* Populate list of selected filters */
     if (!populate_selected_filters_list(p->selected_filters,mbox->filters)) {
 	fr_clean_associated_mailbox_filters(p->selected_filters);
-	balsa_information(LIBBALSA_INFORMATION_ERROR,_("Memory allocation error"));
+	balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
+                          _("Memory allocation error"));
 	gnome_dialog_close(GNOME_DIALOG(p));
     }
 
@@ -307,18 +310,21 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
 				  BALSA_BUTTON_WIDTH / 2,
 				  BALSA_BUTTON_HEIGHT / 2);
 
-    /* FIXME : I saw a lot of different ways to create button with pixmaps, hope this one is correct*/
+    /* FIXME : I saw a lot of different ways to create button with
+       pixmaps, hope this one is correct*/
     /* Right/Add button */
     pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_FORWARD);
     button = gnome_pixmap_button(pixmap,"");
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-		       GTK_SIGNAL_FUNC(fr_add_pressed), p);
+    gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+                              GTK_SIGNAL_FUNC(fr_add_pressed), 
+                              GTK_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* Left/Remove button */
     pixmap = gnome_stock_new_with_icon(GNOME_STOCK_MENU_BACK);
     button = gnome_pixmap_button(pixmap,"");
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-		       GTK_SIGNAL_FUNC(fr_remove_pressed), p);
+    gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+                              GTK_SIGNAL_FUNC(fr_remove_pressed), 
+                              GTK_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
     gtk_box_pack_start(GTK_BOX(hbox),bbox, TRUE, TRUE, 0);
@@ -396,7 +402,9 @@ filters_run_dialog(LibBalsaMailbox *mbox)
     GtkWidget * p;
 
     if (fe_already_open) {
-	balsa_information(LIBBALSA_INFORMATION_ERROR,_("The filters dialog is opened, close it before you can run filters on any mailbox"));
+	balsa_information(LIBBALSA_INFORMATION_ERROR, NULL, _
+                          ("The filters dialog is opened.\n"
+                           "Close it before you run filters on any mailbox"));
 	return;
     }
     /* We look for an existing dialog box for this mailbox */

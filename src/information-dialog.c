@@ -38,9 +38,9 @@ static void balsa_information_list_button_cb(GnomeDialog * dialog,
 					     gint button, gpointer data);
 
 static void balsa_information_list(LibBalsaInformationType type,
-				   char *msg);
+                                   GtkWindow* parent, char *msg);
 static void balsa_information_dialog(LibBalsaInformationType type,
-				     char *msg);
+                                     GtkWindow* parent, char *msg);
 static void balsa_information_stderr(LibBalsaInformationType type,
 				     char *msg);
 
@@ -64,7 +64,8 @@ balsa_information_list_button_cb(GnomeDialog * dialog, gint button,
 }
 
 void
-balsa_information(LibBalsaInformationType type, const char *fmt, ...)
+balsa_information(LibBalsaInformationType type, GtkWindow* parent, 
+                  const char *fmt, ...)
 {
     BalsaInformationShow show;
     gchar *msg;
@@ -97,10 +98,10 @@ balsa_information(LibBalsaInformationType type, const char *fmt, ...)
     case BALSA_INFORMATION_SHOW_NONE:
 	break;
     case BALSA_INFORMATION_SHOW_DIALOG:
-	balsa_information_dialog(type, msg);
+	balsa_information_dialog(type, parent, msg);
 	break;
     case BALSA_INFORMATION_SHOW_LIST:
-	balsa_information_list(type, msg);
+	balsa_information_list(type, parent, msg);
 	break;
     case BALSA_INFORMATION_SHOW_STDERR:
 	balsa_information_stderr(type, msg);
@@ -119,13 +120,15 @@ balsa_information(LibBalsaInformationType type, const char *fmt, ...)
  * Pops up an error dialog
  */
 static void
-balsa_information_dialog(LibBalsaInformationType type, char *msg)
+balsa_information_dialog(LibBalsaInformationType type, GtkWindow* parent,
+                         char *msg)
 {
     GtkWidget *messagebox;
 
+    if(!parent) parent = GTK_WINDOW(balsa_app.main_window);
+
     messagebox =
-	gnome_error_dialog_parented(msg,
-				    GTK_WINDOW(balsa_app.main_window));
+	gnome_error_dialog_parented(msg, parent);
 
     gtk_window_set_position(GTK_WINDOW(messagebox), GTK_WIN_POS_CENTER);
 
@@ -138,7 +141,8 @@ balsa_information_dialog(LibBalsaInformationType type, char *msg)
  * hundreds of windows is ugly.
  */
 static void
-balsa_information_list(LibBalsaInformationType type, char *msg)
+balsa_information_list(LibBalsaInformationType type, GtkWindow* parent, 
+                       char *msg)
 {
     gchar *outstr[1];
     gint new_row;
@@ -158,7 +162,8 @@ balsa_information_list(LibBalsaInformationType type, char *msg)
 	/* Default is to close */
 	gnome_dialog_set_default(GNOME_DIALOG(information_dialog), 1);
 	gnome_dialog_set_parent(GNOME_DIALOG(information_dialog),
-				GTK_WINDOW(balsa_app.main_window));
+				parent ? 
+                                parent : GTK_WINDOW(balsa_app.main_window));
 
 	/* Reset the policy gnome_dialog_new makes itself non-resizable */
 	gtk_window_set_policy(GTK_WINDOW(information_dialog), TRUE, TRUE,

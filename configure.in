@@ -97,7 +97,7 @@ AM_PATH_GNOME_PRINT([0.25.0], [
 	printing_support=yes
 	gnome_libs="$gnome_libs print"
 ], [ 
-   printing_support="no (gnome-print >= 0.25 required)"
+   printing_support="no (gnome-print(-devel) >= 0.25 required)"
 ])
 
 
@@ -370,6 +370,10 @@ if test "x$with_esmtp" != xno  ; then
 	    libESMTP with './configure --enable-require-all-recipients'.]))
     AC_CHECK_LIB(esmtp, smtp_starttls_set_password_cb,
 	AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE))
+    AC_CHECK_HEADER(libesmtp.h, ,
+        	AC_MSG_ERROR([*** You enabled ESMTP but libestmp.h header
+            is not found. Either it is installed in a not standard location
+            or you are missing a libesmtp-devel package (or corresponding).]))
 else
     AC_MSG_RESULT([no])
 fi

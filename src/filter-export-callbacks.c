@@ -58,6 +58,7 @@ void fex_dialog_buttons_cb(GtkWidget * dialog, gint button, gpointer data)
 	    str=g_strdup_printf("%s.siv",fil->name);
 	    if (!libbalsa_filter_export_sieve(fil,str))
 		balsa_information(LIBBALSA_INFORMATION_ERROR,
+                                  GTK_WINDOW(dialog),
                                   _("Unable to export filter %s,"
                                     "an error occured."),
                                   fil->name);

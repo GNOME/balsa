@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1848,7 +1848,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
     /* proper code */
     if (!libbalsa_message_body_save_temporary(info->body, NULL)) {
 	balsa_information
-	    (LIBBALSA_INFORMATION_ERROR,
+	    (LIBBALSA_INFORMATION_ERROR, NULL,
 	     _("Error writing to temporary file %s.\n"
 	       "Check the directory permissions."),
 	     info->body->temp_filename);
@@ -1856,7 +1856,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
     }
 
     if ((fp = fopen(info->body->temp_filename, "r")) == NULL) {
-	balsa_information(LIBBALSA_INFORMATION_ERROR,
+	balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
 			  _("Cannot open temporary file %s."),
 			  info->body->temp_filename);
 	return;
@@ -2432,7 +2432,7 @@ part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info)
 
     if (key != NULL && (cmd = gnome_mime_get_value(content_type, key)) != NULL) {
 	if (!libbalsa_message_body_save_temporary(info->body, NULL)) {
-	    balsa_information(LIBBALSA_INFORMATION_WARNING,
+	    balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
 			      _("could not create temporary file %s"),
 			      info->body->temp_filename);
 	    g_free(content_type);
@@ -2475,7 +2475,7 @@ part_context_menu_vfs_cb(GtkWidget * menu_item, BalsaPartInfo * info)
 		fprintf(stderr, "Executed: %s\n", exe_str);
 		g_free (exe_str);
 	    } else {
-		balsa_information(LIBBALSA_INFORMATION_WARNING,
+		balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
 				  _("could not create temporary file %s"),
 				  info->body->temp_filename);
 	    }

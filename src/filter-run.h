@@ -34,9 +34,10 @@
 #include "mailbox.h"
 
 /*
- * We define a new gtk type BalsaFilterRunDialog, inheriting from GnomeDialog
- * each object contains the whole set of data needed for managing the dialog box
- * that way there is no global variables (but the list of 
+ * We define a new gtk type BalsaFilterRunDialog, inheriting from
+ * GnomeDialog each object contains the whole set of data needed for
+ * managing the dialog box.
+ * In that way there is no global variables (but the list of 
  * fr = filter run
  */
 
@@ -84,8 +85,8 @@ void fr_dialog_button_clicked(GtkWidget * widget, gint button,
 /* 
  *Callbacks for left/right buttons
  */
-void fr_add_pressed(GtkWidget * widget, gpointer data);
-void fr_remove_pressed(GtkWidget * widget, gpointer data);
+void fr_add_pressed(BalsaFilterRunDialog* dialog);
+void fr_remove_pressed(BalsaFilterRunDialog* dialog);
 
 /* 
  *Callbacks for up/down buttons

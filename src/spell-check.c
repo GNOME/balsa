@@ -755,7 +755,7 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check)
 
     if (pspell_error_number(spell_error) != 0) {
 	/* quit without breaking things */
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
+	balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
 			  pspell_error_message(spell_error));
 
 	gtk_signal_emit(GTK_OBJECT(spell_check),
@@ -777,8 +777,8 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check)
     spell_check->length = strlen(spell_check->original_text);
 
     if (balsa_app.debug)
-	balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			  "BalsaSpellCheck: Start\n");
+	libbalsa_information(LIBBALSA_INFORMATION_DEBUG, 
+                             "BalsaSpellCheck: Start\n");
 
     balsa_spell_check_next(spell_check);
 }
@@ -848,8 +848,8 @@ balsa_spell_check_learn(BalsaSpellCheck * spell_check,
 				  spell_check->end_pos);
 
     if (balsa_app.debug)
-	balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			  "BalsaSpellCheck: Learn %s\n", word);
+	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                             "BalsaSpellCheck: Learn %s\n", word);
 
     if (learn_type == SESSION_DICT) {
 	result =
@@ -864,12 +864,12 @@ balsa_spell_check_learn(BalsaSpellCheck * spell_check,
     /* If result is 0, the learn operation failed */
     if (!result) {
 	if (pspell_manager_error_number(spell_check->spell_manager) != 0) {
-	    balsa_information(BALSA_INFORMATION_SHOW_DIALOG,
+	    balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
 			      "BalsaSpellCheck: Learn operation failed;\n%s\n",
 			      pspell_manager_error_message
 			      (spell_check->spell_manager));
 	} else {
-	    balsa_information(BALSA_INFORMATION_SHOW_DIALOG,
+	    balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
 			      "BalsaSpellCheck: Learn operation failed.\n");
 	}
     }
@@ -922,9 +922,9 @@ balsa_spell_check_fix(BalsaSpellCheck * spell_check, gboolean fix_all)
     }
 
     if (balsa_app.debug)
-	balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			  "BalsaSpellCheck: Replace %s with %s\n",
-			  old_word, new_word);
+	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                             "BalsaSpellCheck: Replace %s with %s\n",
+                             old_word, new_word);
 
     gtk_text_freeze(spell_check->text);
     switch_word(spell_check, old_word, new_word);
@@ -1035,8 +1035,8 @@ balsa_spell_check_finish(BalsaSpellCheck * spell_check,
     spell_check->length = 0;
 
     if (balsa_app.debug)
-	balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			  "BalsaSpellCheck: Finished\n");
+	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                             "BalsaSpellCheck: Finished\n");
 
     gtk_signal_emit(GTK_OBJECT(spell_check),
 		    balsa_spell_check_signals[DONE_SPELLCHECK]);
@@ -1065,8 +1065,8 @@ setup_suggestions(BalsaSpellCheck * spell_check)
 	    pspell_string_emulation_next(spell_check->suggestions)) !=
 	   NULL) {
 	if (balsa_app.debug)
-	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			      "BalsaSpellCheck: Suggest %s\n", new_word);
+	    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                                 "BalsaSpellCheck: Suggest %s\n", new_word);
 
 	row_text[0] = g_strdup(new_word);
 	gtk_clist_append(spell_check->list, row_text);
@@ -1095,10 +1095,9 @@ check_word(BalsaSpellCheck * spell_check)
 				  spell_check->end_pos);
 
     if (word) {
-
 	if (balsa_app.debug)
-	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			      "BalsaSpellCheck: Check %s", word);
+	    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                                 "BalsaSpellCheck: Check %s", word);
 
 	correct = pspell_manager_check(spell_check->spell_manager, word);
     } else {
@@ -1107,8 +1106,8 @@ check_word(BalsaSpellCheck * spell_check)
 
     if (!correct) {
 	if (balsa_app.debug)
-	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			      " ...incorrect.\n");
+	    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                                 " ...incorrect.\n");
 
 	spell_check->word_list =
 	    pspell_manager_suggest(spell_check->spell_manager, word);
@@ -1121,8 +1120,8 @@ check_word(BalsaSpellCheck * spell_check)
 	}
     } else {
 	if (balsa_app.debug)
-	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			      " ...correct.\n");
+	    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                                 " ...correct.\n");
     }
 
     g_free(word);
@@ -1176,7 +1175,7 @@ static gboolean
 check_pspell_errors(PspellManager * manager)
 {
     if (pspell_manager_error_number(manager) != 0) {
-	balsa_information(BALSA_INFORMATION_SHOW_LIST,
+	balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
 			  "BalsaSpellCheck: Pspell Error: %s\n",
 			  pspell_manager_error_message(manager));
 	return TRUE;
@@ -1220,7 +1219,7 @@ next_word(BalsaSpellCheck * spell_check)
      * may change, so compile it new every time!)
      */
     if (regcomp(&quoted_rex, balsa_app.quote_regex, REG_EXTENDED)) {
-	balsa_information(LIBBALSA_INFORMATION_ERROR,
+	balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
 			  "BalsaSpellCheck: Quoted text regular expression compilation failed\n");
 	return FALSE;
     }
@@ -1233,7 +1232,7 @@ next_word(BalsaSpellCheck * spell_check)
 	locale_tables = pcre_maketables();
 	if (!(new_word_rex = 
 	      pcre_compile(new_word_regex, PCRE_CASELESS, &errptr, &erroffs, locale_tables))) {
-	    balsa_information(LIBBALSA_INFORMATION_ERROR,
+	    balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
 			      "BalsaSpellCheck: New word regular expression compilation failed (%s)\n", errptr);
 	    regfree(&quoted_rex);
 	    return FALSE;
@@ -1241,7 +1240,7 @@ next_word(BalsaSpellCheck * spell_check)
 #else
 	new_word_rex = g_malloc(sizeof(regex_t));
 	if (regcomp(new_word_rex, new_word_regex, REG_EXTENDED | REG_NEWLINE)) {
-	    balsa_information(LIBBALSA_INFORMATION_ERROR,
+	    balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
 			      "BalsaSpellCheck: New word regular expression compilation failed\n");
 	    regfree(&quoted_rex);
 	    return FALSE;
@@ -1262,9 +1261,9 @@ next_word(BalsaSpellCheck * spell_check)
     while (!in_line && line && !balsa_app.check_quoted &&
 	   is_a_quote(line, &quoted_rex)) {
 	if (balsa_app.debug) {
-	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			      "BalsaSpellCheck: Ignore Quoted: %s\n",
-			      line);
+	    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                                 "BalsaSpellCheck: Ignore Quoted: %s\n",
+                                 line);
 	}
 
 	offset += strlen(line);

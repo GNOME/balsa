@@ -1410,11 +1410,12 @@ destroy_attachment (gpointer data)
    takes over the ownership of filename.
 */
 gboolean
-add_attachment(GnomeIconList * iconlist, char *filename, 
+add_attachment(BalsaSendmsg* bsmsg, char *filename, 
                gboolean is_a_temp_file, const gchar *forced_mime_type)
 {
     GtkWidget *msgbox;
     gchar *pix, *err_msg, *content_type;
+    GnomeIconList * iconlist = GNOME_ICON_LIST(bsmsg->attachments[1]);
 
     if (balsa_app.debug)
 	fprintf(stderr, "Trying to attach '%s'\n", filename);
@@ -1452,15 +1453,16 @@ add_attachment(GnomeIconList * iconlist, char *filename,
                                            destroy_attachment);
 	g_free(label);
     } else { 
+        GtkWindow* parent = GTK_WINDOW(bsmsg->window);
 	if(pix) {
 	    balsa_information
-		(LIBBALSA_INFORMATION_ERROR,
+		(LIBBALSA_INFORMATION_ERROR, parent,
 		 _("The attachment pixmap (%s) cannot be used.\n %s"),
 		 pix, err_msg);
 	    g_free(err_msg);
 	} else
 	    balsa_information
-		(LIBBALSA_INFORMATION_ERROR,
+		(LIBBALSA_INFORMATION_ERROR, parent,
 		 _("Default attachment pixmap (balsa/attachment.png) cannot be found:\n"
 		   "Your balsa installation is corrupted."));
     }
@@ -1497,7 +1499,6 @@ static void
 attach_dialog_ok(GtkWidget * widget, gpointer data)
 {
     GtkFileSelection *fs;
-    GnomeIconList *iconlist;
     BalsaSendmsg *bsmsg;
     gchar *filename, *dir, *p, *sel_file;
     GList *node;
@@ -1506,21 +1507,20 @@ attach_dialog_ok(GtkWidget * widget, gpointer data)
     fs = GTK_FILE_SELECTION(data);
     bsmsg = gtk_object_get_user_data(GTK_OBJECT(fs));
 
-    iconlist = GNOME_ICON_LIST(bsmsg->attachments[1]);
     sel_file = gtk_file_selection_get_filename(fs);
     dir = g_strdup(sel_file);
     p = strrchr(dir, '/');
     if (p)
 	*(p + 1) = '\0';
 
-    do_close = add_attachment(iconlist, g_strdup(sel_file), FALSE, NULL);
+    do_close = add_attachment(bsmsg, g_strdup(sel_file), FALSE, NULL);
     for (node = GTK_CLIST(fs->file_list)->selection; node;
 	 node = g_list_next(node)) {
 	gtk_clist_get_text(GTK_CLIST(fs->file_list),
 			   GPOINTER_TO_INT(node->data), 0, &p);
 	filename = g_strconcat(dir, p, NULL);
 	if (strcmp(filename, sel_file) != 0)
-	    add_attachment(iconlist, filename, FALSE, NULL);
+	    add_attachment(bsmsg, filename, FALSE, NULL);
 	else g_free(filename);
     }
     
@@ -1597,8 +1597,7 @@ attach_message(BalsaSendmsg *msg, LibBalsaMessage *message)
         g_free(name);
         return FALSE;
     }
-    add_attachment(GNOME_ICON_LIST(msg->attachments[1]), name,
-		   TRUE, "message/rfc822");
+    add_attachment(msg, name, TRUE, "message/rfc822");
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
 	    msg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
     return TRUE;
@@ -1701,8 +1700,7 @@ attachments_add(GtkWidget * widget,
 	names = gnome_uri_list_extract_filenames(selection_data->data);
 	
 	for (l = names; l; l = l->next)
-	    add_attachment(GNOME_ICON_LIST(bsmsg->attachments[1]),
-			   g_strdup((char *) l->data), FALSE, NULL);
+	    add_attachment(bsmsg, g_strdup((char *) l->data), FALSE, NULL);
 	
 	gnome_uri_list_free_strings(names);
 	
@@ -1940,8 +1938,7 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
                              msg->orig_message->fcc_url);
     msg->fcc[1] =
         balsa_mblist_mru_option_menu(GTK_WINDOW(msg->window),
-                                     &balsa_app.fcc_mru,
-                                     &msg->fcc_url);
+                                     &balsa_app.fcc_mru);
     align = gtk_alignment_new(0, 0.5, 0, 1);
     gtk_container_add(GTK_CONTAINER(align), msg->fcc[1]);
     gtk_table_attach(GTK_TABLE(table), align, 1, 3, 5, 6,
@@ -2165,8 +2162,7 @@ continueBody(BalsaSendmsg * msg, LibBalsaMessage * message)
 		name = g_strdup(tmp_file_name);
 	    libbalsa_message_body_save(body, NULL, name);
 	    body_type = libbalsa_message_body_get_content_type(body);
-	    add_attachment(GNOME_ICON_LIST(msg->attachments[1]), name,
-			   body->filename != NULL, body_type);
+	    add_attachment(msg, name, body->filename != NULL, body_type);
 	    g_free(body_type);
 	    body = body->next;
 	}
@@ -2994,7 +2990,8 @@ do_insert_file(GtkWidget * selector, GtkFileSelection * fs)
     cnt = gtk_editable_get_position(GTK_EDITABLE(bsmsg->text));
 
     if (!(fl = fopen(fname, "rt"))) {
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
+	balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          GTK_WINDOW(bsmsg->window),
 			  _("Could not open the file %s.\n"), fname);
     } else {
 	gnome_appbar_push(balsa_app.appbar, _("Loading..."));
@@ -3161,6 +3158,10 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
     ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->bcc[1]));
     message->bcc_list = libbalsa_address_new_list_from_string(ctmp);
+
+    /* get the fcc-box from the option menu widget */
+    bsmsg->fcc_url =
+        g_strdup(balsa_mblist_mru_option_menu_get(bsmsg->fcc[1]));
 
     ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->reply_to[1]));
     if (*ctmp)

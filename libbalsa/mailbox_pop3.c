@@ -343,10 +343,15 @@ progress_cb(char *msg, int prog, int tot)
     MailThreadMessage *message;
 
     message = g_new(MailThreadMessage, 1);
-    if (prog == 0 && tot == 0)
-	message->message_type = MSGMAILTHREAD_MSGINFO;
-    else
-	message->message_type = MSGMAILTHREAD_PROGRESS;
+    switch(tot) {
+    case -1: message->message_type = MSGMAILTHREAD_FINISHED; break;
+    case 0:
+        if (prog == 0) {
+            message->message_type = MSGMAILTHREAD_MSGINFO;
+            break;
+        }
+    default: message->message_type = MSGMAILTHREAD_MSGINFO; break;
+    }
     memcpy(message->message_string, msg, strlen(msg) + 1);
     message->num_bytes = prog;
     message->tot_bytes = tot;

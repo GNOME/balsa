@@ -1990,7 +1990,7 @@ idle_handler_cb(GtkWidget * widget)
 	if (message) {
 	    if(!balsa_message_set(BALSA_MESSAGE (bmsg), message))
 		balsa_information
-		    (LIBBALSA_INFORMATION_ERROR,
+		    (LIBBALSA_INFORMATION_ERROR, NULL,
 		     _("Cannot access the message's body\n"));
 	}
 	else

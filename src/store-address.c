@@ -139,7 +139,9 @@ store_address_from_entries(struct store_address_info * info,
 
     if (info->current_address_book == NULL) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
-    		      _("No address book selected...."));
+                          GTK_WINDOW(gtk_widget_get_ancestor(info->notebook,
+                                                             GTK_TYPE_WINDOW)),
+                          _("No address book selected...."));
         return;
     }
 

@@ -78,6 +78,8 @@ GtkWidget *balsa_mblist_mru_menu(GtkWindow * window, GList ** url_list,
 void balsa_mblist_mru_add(GList ** url_list, const gchar * url);
 void balsa_mblist_mru_drop(GList ** url_list, const gchar * url);
 GtkWidget *balsa_mblist_mru_option_menu(GtkWindow * window, 
-                                        GList ** url_list,
-                                        gchar ** url);
+                                        GList ** url_list);
+void balsa_mblist_mru_option_menu_set(GtkWidget * option_menu,
+                                      const gchar * url);
+const gchar *balsa_mblist_mru_option_menu_get(GtkWidget * option_menu);
 #endif

@@ -1275,7 +1275,7 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
 
     if(failurep) {
         libbalsa_information(
-            LIBBALSA_INFORMATION_ERROR,
+            LIBBALSA_INFORMATION_ERROR, NULL,
             _("Unable to Open Mailbox!\nPlease check the mailbox settings."));
         gtk_object_destroy(GTK_OBJECT(index));
         gdk_threads_leave();
@@ -1999,7 +1999,7 @@ send_progress_notify_cb()
 
         switch (threadmessage->message_type) {
         case MSGSENDTHREADERROR:
-            balsa_information(LIBBALSA_INFORMATION_WARNING,
+            balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
                               _("Sending error: %s"),
                               threadmessage->message_string);
             break;
@@ -2572,7 +2572,7 @@ mailbox_commit_changes(GtkWidget * widget, gpointer data)
     current_mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
     
     if (!libbalsa_mailbox_commit(current_mailbox))
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
+        balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
                           _("Commiting mailbox %s failed."),
                           current_mailbox->name);
 }
@@ -2591,7 +2591,7 @@ mailbox_commit_each(GNode *node, gpointer data)
 	return FALSE;
 
     if (!libbalsa_mailbox_commit(box))
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
+        balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
                           _("Commiting mailbox %s failed."),
                           box->name);
     return FALSE;

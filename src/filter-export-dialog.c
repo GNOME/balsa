@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -58,7 +58,7 @@ filters_export_dialog(void)
     GSList * filter_list;
 
     if (fr_dialogs_opened) {
-	balsa_information(LIBBALSA_INFORMATION_ERROR,
+	balsa_information(LIBBALSA_INFORMATION_ERROR, NULL,
                           _("There are opened filter run dialogs, "
                             "close them before you can modify filters."));
 	return;

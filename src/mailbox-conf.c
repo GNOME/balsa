@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -224,7 +224,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 
     if(BALSA_IS_MAILBOX_SPECIAL(mailbox)) {
 	balsa_information(
-	    LIBBALSA_INFORMATION_ERROR,
+            LIBBALSA_INFORMATION_ERROR, NULL,
 	    _("Mailbox '%s' is used by balsa and I cannot remove it.\n"
 	      "If you really want to remove it, assign its function\n"
 	      "to some other mailbox."), mailbox->name);
@@ -672,7 +672,8 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 	    (i =
 	     libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL
 					     (mailbox), filename)) != 0) {
-	    balsa_information(LIBBALSA_INFORMATION_WARNING,
+	    balsa_information(LIBBALSA_INFORMATION_WARNING, 
+                              GTK_WINDOW(mcw->window),
 			      _("Rename of %s to %s failed:\n%s"),
 			      libbalsa_mailbox_local_get_path(mailbox),
 			      filename, strerror(i));

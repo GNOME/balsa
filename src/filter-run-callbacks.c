@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -105,8 +105,6 @@ run_filters_on_mailbox(GtkCList * clist,LibBalsaMailbox *mbox)
 	if (libbalsa_filter_apply(filters))
 	    enable_empty_trash(TRASH_FULL);
     }
-    /* else balsa_information(LIBBALSA_INFORMATION_WARNING,
-           _("No message has matched the filters\n")); */
     gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
     g_slist_free(filters);
     return TRUE;
@@ -142,7 +140,10 @@ void fr_dialog_button_clicked(GtkWidget * widget, gint button,
     switch (button) {
     case 0:			/* Apply button */
 	if (!run_filters_on_mailbox(p->selected_filters,p->mbox))
-	    balsa_information(LIBBALSA_INFORMATION_ERROR,_("Error when applying filters"));
+	    balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              GTK_WINDOW(gtk_widget_get_ancestor
+                                         (widget, GTK_TYPE_WINDOW)),
+                              _("Error when applying filters"));
 	return;
     case 1:                     /* OK button */
 	save_filters(p);
@@ -169,16 +170,13 @@ void fr_dialog_button_clicked(GtkWidget * widget, gint button,
  */
 
 void
-fr_add_pressed(GtkWidget * widget, gpointer data)
+fr_add_pressed(BalsaFilterRunDialog* p)
 {
     LibBalsaFilter* fil;
     GList * lst;
     GSList *tmp;
     gint row,rows;
     gchar *col[FILTER_WHEN_NB+1];
-    BalsaFilterRunDialog * p;
-
-    p=BALSA_FILTER_RUN_DIALOG(data);
 
     /* We check possibility of recursion here: we do not allow a filter 
        to be applied on a mailbox if its action rule modify this mailbox
@@ -203,6 +201,7 @@ fr_add_pressed(GtkWidget * widget, gpointer data)
 	}
 	else
 	    balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              GTK_WINDOW(p),
 			      _("The destination mailbox of the filter %s is %s\n"
 			      "you can't associate it with the same mailbox (that causes recursion)"),
 			      fil->name,p->mbox->name);
@@ -220,13 +219,10 @@ fr_add_pressed(GtkWidget * widget, gpointer data)
 }
 
 void
-fr_remove_pressed(GtkWidget * widget, gpointer data)
+fr_remove_pressed(BalsaFilterRunDialog * p)
 {
     LibBalsaMailboxFilter* fil;
     gint new_row;
-    BalsaFilterRunDialog * p;
-
-    p=BALSA_FILTER_RUN_DIALOG(data);
 
     if (p->selected_filters->selection) {
 	p->filters_modified=TRUE;
@@ -249,14 +245,8 @@ fr_remove_pressed(GtkWidget * widget, gpointer data)
 void available_list_select_row_cb(GtkWidget *widget, gint row, gint column,
 				  GdkEventButton *event, gpointer data)
 {
-    BalsaFilterRunDialog * p;
-
-    if ( event == NULL )
-	return;
-
-    p=BALSA_FILTER_RUN_DIALOG(data);
-    if (event->type == GDK_2BUTTON_PRESS)
-	fr_add_pressed(NULL,data);
+    if (event && event->type == GDK_2BUTTON_PRESS)
+	fr_add_pressed(BALSA_FILTER_RUN_DIALOG(data));
 }
 
 void selected_list_select_row_event_cb(GtkWidget *widget,
@@ -303,11 +293,8 @@ void selected_list_select_row_event_cb(GtkWidget *widget,
 void selected_list_select_row_cb(GtkWidget *widget,gint row,gint column,
 				 GdkEventButton *event, gpointer data)
 {
-    if ( event == NULL )
-	return;
-
-    if (event->type == GDK_2BUTTON_PRESS)
-	fr_remove_pressed(NULL,data);
+    if (event && event->type == GDK_2BUTTON_PRESS)
+	fr_remove_pressed(BALSA_FILTER_RUN_DIALOG(data));
 }
 /* 
  *Callbacks for up/down buttons

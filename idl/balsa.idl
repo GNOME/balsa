@@ -1,0 +1,52 @@
+/*
+  IDL for Balsa
+  $Id$
+*/
+
+module GNOME {
+  module Balsa {
+    
+    exception UnknownFolder {
+      string reason;
+    };
+    
+    exception UnknownMessage {
+      string reason;
+    };
+
+    interface Message {
+      attribute string to;
+      attribute string cc;
+      attribute string subject;
+      attribute string body;
+      attribute string attachments;
+
+      void add_attachment ( in string filename );
+
+      boolean send_message( );
+      
+    };
+
+    interface MessageList {
+      void select_message ( in long index ) raises (UnknownMessage);
+      void open_message   (in long message_number);
+      Message get_message ( in long index );     
+    };
+
+
+    interface FolderBrowser {
+      attribute boolean has_unread_messages;
+
+      void open_folder( in string path ) raises (UnknownFolder);
+
+      boolean put_message( in Message message) raises (UnknownFolder);
+
+      oneway void close_folder();
+
+      MessageList get_unread_message_list();
+      MessageList get_message_list();
+    };
+
+  };
+};
+

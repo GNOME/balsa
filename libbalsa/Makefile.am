@@ -79,8 +79,11 @@ libbalsa_a_SOURCES = 		\
 	rfc3156.c		\
 	rfc3156.h
 
+# we include padlock-keyhole because make dist may not figure it out
+# automatically.
 EXTRA_DIST = \
-	libbalsa-marshal.list
+	libbalsa-marshal.list \
+	padlock-keyhole.xpm
 
 INCLUDES= -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	-I${top_srcdir}/libmutt -I${top_builddir}/libmutt \

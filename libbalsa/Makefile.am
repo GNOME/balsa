@@ -12,6 +12,7 @@ libbalsa_a_SOURCES = 		\
 	message.h		\
 	body.h			\
 	address.h		\
+	contact.h		\
 	mime.h			\
 	misc.h			\
 	send.h			\

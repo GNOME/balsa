@@ -1,4 +1,5 @@
 2000-06-15  Pawel Salek <pawsa@theochem.kth.se>
+	* libbalsa/Makefile.am: added contact.h to the list of files.
 
 	New era approaching: large patch from Ian Campbell <ijc25@cam.ac.uk>
 	* src/balsa-app.h: some defs.

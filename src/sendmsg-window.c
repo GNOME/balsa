@@ -334,7 +334,7 @@ struct {
 #define LOC_CHINESE_TRADITIONAL_POS   3
     {"zh_TW.Big5", "big5", N_("Chinese Traditional")},
 #define LOC_CZECH_POS       4
-    {"cs_CS", "ISO-9959-2", N_("Czech")},
+    {"cs_CZ", "ISO-8859-2", N_("Czech")},
 #define LOC_DANISH_POS      5
     {"da_DK", "ISO-8859-1", N_("Danish")},
 #define LOC_GERMAN_POS      6

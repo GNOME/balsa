@@ -1,3 +1,7 @@
+2005-02-09 18:40  PeterB
+
+	* src/main-window.c: fix the About dialog.
+
 2005-02-08 17:33  PeterB
 
 	* src/save-restore.c: save the sanitized toolbar.

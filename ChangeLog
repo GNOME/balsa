@@ -1,3 +1,8 @@
+2000-09-25  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* src/spell-check.c: Fixed marking of strings. Use _( not _ (
+	to mark strings for translation.
+	
 2000-09-25  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-message.c(message_set): show headers only when asked to.

@@ -71,12 +71,11 @@ balsa_store_address(GtkWidget * widget, gpointer index)
 
     if (list == NULL) {
 	GtkWidget *box = NULL;
-	char *msg =
-	    _
-	    ("In order to store an address, you must select a message.\n");
-	box =
-	    gnome_message_box_new(msg, GNOME_MESSAGE_BOX_ERROR,
-				  GNOME_STOCK_BUTTON_OK, NULL);
+	char *msg = 
+	    _("In order to store an address, you must select a message.\n");
+
+	box = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_ERROR,
+				    GNOME_STOCK_BUTTON_OK, NULL);
 	gtk_window_set_modal(GTK_WINDOW(box), TRUE);
 	gnome_dialog_run_and_close(GNOME_DIALOG(box));
 	return;
@@ -85,8 +84,10 @@ balsa_store_address(GtkWidget * widget, gpointer index)
     if (list->next) {
 	GtkWidget *box = NULL;
 	char *msg = _("You may only store one address at a time.\n");
+
 	box = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_ERROR,
 				    GNOME_STOCK_BUTTON_OK, NULL);
+
 	gtk_window_set_modal(GTK_WINDOW(box), TRUE);
 	gnome_dialog_run_and_close(GNOME_DIALOG(box));
 	return;
@@ -98,8 +99,10 @@ balsa_store_address(GtkWidget * widget, gpointer index)
     if (message->from->address_list == NULL) {
 	GtkWidget *box = NULL;
 	char *msg = _("This message doesn't contain an e-mail address.\n");
+
 	box = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_ERROR,
 				    GNOME_STOCK_BUTTON_OK, NULL);
+
 	gtk_window_set_modal(GTK_WINDOW(box), TRUE);
 	gnome_dialog_run_and_close(GNOME_DIALOG(box));
 	return;
@@ -170,9 +173,10 @@ balsa_store_address(GtkWidget * widget, gpointer index)
 
 	    gtk_signal_connect(GTK_OBJECT(menu_item), "activate",
 			       address_book_menu_cb, address_book);
-	    if (address_book == balsa_app.default_address_book) {
+
+	    if (address_book == balsa_app.default_address_book)
 		gtk_menu_set_active(GTK_MENU(ab_menu), default_ab_offset);
-	    }
+
 	    default_ab_offset++;
 
 	    ab_list = g_list_next(ab_list);
@@ -209,11 +213,9 @@ balsa_store_address(GtkWidget * widget, gpointer index)
     gnome_dialog_set_default(GNOME_DIALOG(dialog), 0);
 
     gtk_signal_connect(GTK_OBJECT(dialog), "clicked",
-		       GTK_SIGNAL_FUNC
-		       (store_address_dialog_button_clicked_cb), entries);
+		       GTK_SIGNAL_FUNC(store_address_dialog_button_clicked_cb), entries);
     gtk_signal_connect(GTK_OBJECT(dialog), "close",
-		       GTK_SIGNAL_FUNC(store_address_dialog_close),
-		       entries);
+		       GTK_SIGNAL_FUNC(store_address_dialog_close), entries);
 
     gtk_widget_show_all(dialog);
 
@@ -245,22 +247,23 @@ store_address_dialog_button_clicked_cb(GtkWidget * widget, gint which,
 	/* FIXME: This problem should be solved in the VCard implementation in libbalsa */
 	/* semicolons mess up how GnomeCard processes the fields, so disallow them */
 	for (cnt = 0; cnt < NUM_FIELDS; cnt++) {
-	    entry_str =
-		gtk_editable_get_chars(GTK_EDITABLE(entries[cnt]), 0, -1);
+	    entry_str =	gtk_editable_get_chars(GTK_EDITABLE(entries[cnt]), 0, -1);
 	    entry_str_len = strlen(entry_str);
 
 	    for (cnt2 = 0; cnt2 < entry_str_len; cnt2++) {
 		if (entry_str[cnt2] == ';') {
-		    msg =
-			_
-			("Sorry, no semicolons are allowed in the name!\n");
+		    msg = _("Sorry, no semicolons are allowed in the name!\n");
+
 		    gtk_editable_select_region(GTK_EDITABLE(entries[cnt]),
 					       0, -1);
+
 		    gtk_widget_grab_focus(GTK_WIDGET(entries[cnt]));
+
 		    box = gnome_message_box_new(msg,
 						GNOME_MESSAGE_BOX_ERROR,
 						GNOME_STOCK_BUTTON_OK,
 						NULL);
+
 		    gtk_window_set_modal(GTK_WINDOW(box), TRUE);
 		    gnome_dialog_run_and_close(GNOME_DIALOG(box));
 		    g_free(entry_str);
@@ -271,7 +274,7 @@ store_address_dialog_button_clicked_cb(GtkWidget * widget, gint which,
 	}
 
 	address = libbalsa_address_new();
-	address->full_name =
+	address->full_name = 
 	    g_strstrip(gtk_editable_get_chars
 		       (GTK_EDITABLE(entries[FULL_NAME]), 0, -1));
 	address->first_name =

@@ -1,7 +1,9 @@
 2000-10-06  Ian Campbell  <ijc25@cam.ac.uk>
 
-	* Various files: Allow the subject to be displayed in another font
-	(ie bold)
+	* src/*: Fixed some places where indent didn't handle long lines
+	nicely.
+	* src/*: (forgot which files - sorry): Allow the subject to be
+	displayed in another font (ie bold)
 
 2000-10-06  Pawel Salek  <pawsa@theochem.kth.se>
 

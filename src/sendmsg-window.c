@@ -472,8 +472,7 @@ balsa_sendmsg_destroy(BalsaSendmsg * bsm)
 	    strcat(newStr, headerDescs[i].name);
 	    strcat(newStr, " ");
 	}
-    if (balsa_app.compose_headers)	/* should never fail... */
-	g_free(balsa_app.compose_headers);
+    g_free(balsa_app.compose_headers);
 
     balsa_app.compose_headers = g_strdup(newStr);
 
@@ -612,9 +611,8 @@ add_attachment(GnomeIconList * iconlist, char *filename)
 	gnome_icon_list_set_icon_data(iconlist, pos, filename);
     } else
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  _
-			  ("The attachment pixmap (balsa/attachment.png) cannot be found.\n"
-			   "This means you cannot attach any files.\n"));
+			  _("The attachment pixmap (balsa/attachment.png) cannot be found.\n"
+			    "This means you cannot attach any files.\n"));
 }
 
 static gint
@@ -739,9 +737,8 @@ attachments_add(GtkWidget * widget,
     gnome_uri_list_free_strings(names);
 
     /* show attachment list */
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-				   (bsmsg->view_checkitems
-				    [MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), 
+				   TRUE);
 }
 
 /* to_add - e-mail (To, From, Cc, Bcc) field D&D callback */
@@ -756,7 +753,6 @@ to_add(GtkWidget * widget,
 
     if (strlen(gtk_entry_get_text(GTK_ENTRY(widget))) == 0) {
 	gtk_entry_set_text(GTK_ENTRY(widget), selection_data->data);
-	return;
     } else {
 	gtk_entry_append_text(GTK_ENTRY(widget), ",");
 	gtk_entry_append_text(GTK_ENTRY(widget), selection_data->data);
@@ -919,6 +915,7 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
 	glist = g_list_append(glist, balsa_app.draftbox->name);
 	glist = g_list_append(glist, balsa_app.outbox->name);
 	glist = g_list_append(glist, balsa_app.trash->name);
+
 	walk = g_node_last_child(balsa_app.mailbox_nodes);
 	while (walk) {
 	    glist =

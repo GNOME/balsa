@@ -675,12 +675,9 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 			     &balsa_app.quoted_color[MAX_QUOTED_COLOR - 1],
 			     1);
     gnome_color_picker_get_i16(GNOME_COLOR_PICKER(pui->quoted_color_end),
-			       &(balsa_app.
-				 quoted_color[MAX_QUOTED_COLOR - 1].red),
-			       &(balsa_app.
-				 quoted_color[MAX_QUOTED_COLOR - 1].green),
-			       &(balsa_app.
-				 quoted_color[MAX_QUOTED_COLOR - 1].blue),
+			       &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red),
+			       &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green),
+			       &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue),
 			       0);
 
     /* Information dialogs */
@@ -1324,8 +1321,8 @@ create_mailserver_page()
 
 
 /*
-	 * finnish mail servers, starting mail options
-	 */
+ * finnish mail servers, starting mail options
+ */
 static GtkWidget *
 create_mailoptions_page()
 {

@@ -159,9 +159,8 @@ gint config_mailbox_add(LibBalsaMailbox * mailbox, const char *key_arg)
     if (key_arg == NULL)
 	tmp = mailbox_section_path(mailbox);
     else
-	tmp =
-	    g_strdup_printf(BALSA_CONFIG_PREFIX MAILBOX_SECTION_PREFIX
-			    "%s/", key_arg);
+	tmp = g_strdup_printf(BALSA_CONFIG_PREFIX MAILBOX_SECTION_PREFIX
+			      "%s/", key_arg);
 
     libbalsa_mailbox_save_config(mailbox, tmp);
     g_free(tmp);

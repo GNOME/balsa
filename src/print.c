@@ -70,9 +70,8 @@ message_print_cb(GtkWidget * widget, gpointer cbdata)
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 10);
     gtk_widget_show(hbox);
 
-    tmp =
-	gtk_label_new(_
-		      ("Enter print command below\nRemember to include '%s'"));
+    tmp = gtk_label_new(_("Enter print command below\nRemember to include '%s'"));
+
     gtk_box_pack_start(GTK_BOX(hbox), tmp, FALSE, TRUE, 5);
     gtk_widget_show(tmp);
 
@@ -128,10 +127,8 @@ print_destroy(GtkWidget * widget, gpointer data)
 {
 
     if (print_dialog) {
-
 	gtk_widget_destroy(print_dialog);
 	print_dialog = NULL;
-
     }
 
 }				/* print_destroy */
@@ -503,9 +500,8 @@ message_print(LibBalsaMessage * msg)
     if (!is_font_ok(BALSA_PRINT_HEAD_FONT)
 	|| !is_font_ok(BALSA_PRINT_BODY_FONT))
 	return;
-    dialog =
-	gnome_print_dialog_new(_("Print mesage"),
-			       GNOME_PRINT_DIALOG_COPIES);
+    dialog = gnome_print_dialog_new(_("Print mesage"),
+				    GNOME_PRINT_DIALOG_COPIES);
     gnome_dialog_set_parent(GNOME_DIALOG(dialog),
 			    GTK_WINDOW(balsa_app.main_window));
     gtk_window_set_wmclass(GTK_WINDOW(dialog), "print", "Balsa");
@@ -530,8 +526,7 @@ message_print(LibBalsaMessage * msg)
     if (preview) {
 	GnomePrintMasterPreview *preview_widget =
 	    gnome_print_master_preview_new(pi->master,
-					   _
-					   ("Balsa: message print preview"));
+					   _("Balsa: message print preview"));
 	gtk_widget_show(GTK_WIDGET(preview_widget));
     } else
 	gnome_print_master_print(pi->master);
@@ -668,3 +663,7 @@ print_header(PrintInfo * pi, guint page)
 }
 
 #endif
+
+
+
+

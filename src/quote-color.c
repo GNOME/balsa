@@ -38,15 +38,10 @@ make_gradient(GdkColor colors[], gint first, gint last)
     gint /*add, */ i;
     double dr, dg, db;
 
-    dr =
-	(double) (colors[last].red - colors[first].red) / (last - first +
-							   1);
-    dg =
-	(double) (colors[last].green - colors[first].green) / (last -
-							       first + 1);
-    db =
-	(double) (colors[last].blue - colors[first].blue) / (last - first +
-							     1);
+    dr = (double) (colors[last].red - colors[first].red) / (last - first + 1);
+    dg = (double) (colors[last].green - colors[first].green) / (last - first + 1);
+    db = (double) (colors[last].blue - colors[first].blue) / (last - first + 1);
+
     for (i = (first + 1); i < last; i++) {
 	colors[i].red = colors[i - 1].red + dr;
 	colors[i].blue = colors[i - 1].blue + db;
@@ -106,3 +101,6 @@ allocate_quote_colors(GtkWidget * widget, GdkColor color[],
 	     TRUE)) gdk_color_black(balsa_app.colormap, &color[i]);
     }
 }
+
+
+

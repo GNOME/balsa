@@ -416,6 +416,7 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     spell_check->highlight_colour->red = 65535;
     spell_check->highlight_colour->green = 0;
     spell_check->highlight_colour->blue = 0;
+
     gdk_colormap_alloc_color(balsa_app.colormap,
 			     spell_check->highlight_colour, TRUE, TRUE);
 
@@ -483,30 +484,25 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     change_all = gnome_stock_button_with_label(GNOME_STOCK_PIXMAP_REFRESH,
 					       "Change All");
     gtk_tooltips_set_tip(balsa_app.tooltips, change_all,
-			 _
-			 ("Replace all occurances of the current word with the selected suggestion"),
+			 _("Replace all occurances of the current word with the selected suggestion"),
 			 NULL);
     gtk_box_pack_start(GTK_BOX(vbox2), change_all, FALSE, FALSE, 0);
 
-    ignore = gnome_stock_button_with_label(GNOME_STOCK_PIXMAP_FORWARD,
-					   "Ignore");
+    ignore = gnome_stock_button_with_label(GNOME_STOCK_PIXMAP_FORWARD, "Ignore");
 
     gtk_tooltips_set_tip(balsa_app.tooltips, ignore,
 			 _("Skip the current word"), NULL);
     gtk_box_pack_start(GTK_BOX(vbox1), ignore, FALSE, FALSE, 0);
 
-    ignore_all = gnome_stock_button_with_label(GNOME_STOCK_PIXMAP_LAST,
-					       "Ignore All");
+    ignore_all = gnome_stock_button_with_label(GNOME_STOCK_PIXMAP_LAST, "Ignore All");
     gtk_tooltips_set_tip(balsa_app.tooltips, ignore_all,
 			 _("Skip all occurances of the current word"),
 			 NULL);
     gtk_box_pack_start(GTK_BOX(vbox2), ignore_all, FALSE, FALSE, 0);
 
-    learn = gnome_stock_button_with_label(GNOME_STOCK_PIXMAP_BOOK_OPEN,
-					  "Learn");
+    learn = gnome_stock_button_with_label(GNOME_STOCK_PIXMAP_BOOK_OPEN, "Learn");
     gtk_tooltips_set_tip(balsa_app.tooltips, learn,
-			 _
-			 ("Add the current word to your personal dictionar"),
+			 _("Add the current word to your personal dictionar"),
 			 NULL);
     gtk_box_pack_start(GTK_BOX(vbox1), learn, FALSE, FALSE, 0);
 

@@ -118,8 +118,7 @@ ab_okay_cb(GtkWidget * widget, gpointer data)
 		g_list_foreach(addy->address_list,
 			       (GFunc) address_list_to_string, &str);
 	    } else {
-		str =
-		    g_strdup_printf("%s <%s>", addy->full_name,
+		str = g_strdup_printf("%s <%s>", addy->full_name,
 				    (gchar *) addy->address_list->data);
 	    }
 
@@ -167,8 +166,7 @@ swap_clist_entry(gint row, GtkWidget * src, GtkWidget * dst)
     LibBalsaAddress *addy_data;
 
     if (src != NULL || dst != NULL) {
-	addy_data =
-	    LIBBALSA_ADDRESS(gtk_clist_get_row_data(GTK_CLIST(src), row));
+	addy_data = LIBBALSA_ADDRESS(gtk_clist_get_row_data(GTK_CLIST(src), row));
 
 	listdata[0] = addy_data->id;
 	if (addy_data->address_list)
@@ -205,8 +203,7 @@ ab_switch_cb(GtkWidget * widget, gpointer data)
     while (GTK_CLIST(from)->selection) {
 	swap_clist_entry(GPOINTER_TO_INT(GTK_CLIST(from)->selection->data),
 			 from,
-			 (data ==
-			  book_clist) ? (add_clist) : (book_clist));
+			 (data == book_clist) ? (add_clist) : (book_clist));
     }
 }
 
@@ -299,9 +296,7 @@ ab_load(GtkWidget * widget, gpointer data)
      * Show the GList.
      */
     gtk_clist_set_column_width(GTK_CLIST(book_clist), 0,
-			       gtk_clist_optimal_column_width(GTK_CLIST
-							      (book_clist),
-							      0));
+			       gtk_clist_optimal_column_width(GTK_CLIST(book_clist),0));
     gtk_clist_thaw(GTK_CLIST(book_clist));
 
 }
@@ -325,8 +320,7 @@ ab_find(GtkWidget * group_entry)
     gtk_clist_freeze(GTK_CLIST(book_clist));
 
     num = 0;
-    while ((row = gtk_clist_get_row_data(GTK_CLIST(book_clist), num)) !=
-	   NULL) {
+    while ((row = gtk_clist_get_row_data(GTK_CLIST(book_clist), num)) != NULL) {
 	gtk_clist_get_text(GTK_CLIST(book_clist), num, 0, &new);
 	if (strncasecmp(new, entry_text, strlen(entry_text)) == 0) {
 	    gtk_clist_moveto(GTK_CLIST(book_clist), num, 0, 0, 0);
@@ -373,9 +367,8 @@ address_book_cb(GtkWidget * widget, gpointer data)
     titles[1] = _(titles[1]);
 #endif
 
-    dialog =
-	gnome_dialog_new(_("Address Book"), GNOME_STOCK_BUTTON_OK,
-			 GNOME_STOCK_BUTTON_CANCEL, NULL);
+    dialog = gnome_dialog_new(_("Address Book"), GNOME_STOCK_BUTTON_OK,
+			      GNOME_STOCK_BUTTON_CANCEL, NULL);
 
     /* If we have something in the data, then the addressbook was opened
      * from a message window */
@@ -429,9 +422,10 @@ address_book_cb(GtkWidget * widget, gpointer data)
 
 	    gtk_signal_connect(GTK_OBJECT(menu_item), "activate",
 			       address_book_menu_cb, address_book);
-	    if (address_book == balsa_app.default_address_book) {
+
+	    if (address_book == balsa_app.default_address_book)
 		gtk_menu_set_active(GTK_MENU(ab_menu), default_offset);
-	    }
+
 	    default_offset++;
 
 	    ab_list = g_list_next(ab_list);
@@ -509,8 +503,7 @@ address_book_cb(GtkWidget * widget, gpointer data)
 				       (scrolled_window),
 				       GTK_POLICY_AUTOMATIC,
 				       GTK_POLICY_AUTOMATIC);
-	gtk_box_pack_start(GTK_BOX(box2), scrolled_window, FALSE, FALSE,
-			   0);
+	gtk_box_pack_start(GTK_BOX(box2), scrolled_window, FALSE, FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(scrolled_window), add_clist);
 	gtk_clist_set_selection_mode(GTK_CLIST(add_clist),
 				     GTK_SELECTION_MULTIPLE);
@@ -525,8 +518,7 @@ address_book_cb(GtkWidget * widget, gpointer data)
     hbox = gtk_hbutton_box_new();
     gtk_hbutton_box_set_layout_default(GTK_BUTTONBOX_START);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
-    w =
-	gnome_pixmap_button(gnome_stock_pixmap_widget
+    w = gnome_pixmap_button(gnome_stock_pixmap_widget
 			    (dialog, GNOME_STOCK_PIXMAP_OPEN),
 			    _("Run GnomeCard"));
 
@@ -535,8 +527,7 @@ address_book_cb(GtkWidget * widget, gpointer data)
     gtk_container_add(GTK_CONTAINER(hbox), w);
     gtk_widget_ref(w);
 
-    w =
-	gnome_pixmap_button(gnome_stock_pixmap_widget
+    w =	gnome_pixmap_button(gnome_stock_pixmap_widget
 			    (dialog, GNOME_STOCK_PIXMAP_ADD),
 			    _("Re-Import"));
     gtk_signal_connect(GTK_OBJECT(w), "clicked", GTK_SIGNAL_FUNC(ab_load),
@@ -546,17 +537,13 @@ address_book_cb(GtkWidget * widget, gpointer data)
     ab_load(NULL, NULL);
 
     /* mode switching stuff */
-    radio1 =
-	gtk_radio_button_new_with_label(NULL,
-					_("Import first address only"));
-    radio2 =
-	gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON
-						    (radio1),
-						    _
-						    ("Import all adresses"));
+    radio1 = gtk_radio_button_new_with_label(NULL, _("Import first address only"));
+    radio2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON
+							 (radio1),
+							 _("Import all adresses"));
+
     gtk_signal_connect(GTK_OBJECT(radio1), "toggled",
 		       GTK_SIGNAL_FUNC(mode_toggled), radio1);
-
 
     /* Pack them into a box, then show all the widgets */
     gtk_box_pack_start(GTK_BOX(vbox), radio1, TRUE, TRUE, 1);

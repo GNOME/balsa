@@ -24,19 +24,6 @@
 
 #include "libbalsa.h"
 
-/* FIXME XXX This should be a "configure" option.  Stuart? */
-#define BALSA_CONFIG_FILE ".balsarc"
-
-
-/* arp --- All proplist keys are assumed to be no large than this.
- * This is to try and minimize the number of magic numbers used when
- * key buffers are statically allocated on the stack
- */
-#ifndef MAX_PROPLIST_KEY_LEN
-/* NB!!! This includes space for the terminating \0! */
-#define MAX_PROPLIST_KEY_LEN    32
-#endif
-
 typedef enum {
     SPECIAL_INBOX = 0,
     SPECIAL_SENT,

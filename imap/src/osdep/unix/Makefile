@@ -9,7 +9,7 @@
 #		Internet: MRC@CAC.Washington.EDU
 #
 # Date:		11 May 1989
-# Last Edited:	30 April 1998
+# Last Edited:	29 June 1998
 #
 # Copyright 1998 by the University of Washington
 #
@@ -78,7 +78,6 @@ ARRC=ar rc
 CC=cc
 LN=ln -s
 RANLIB=ranlib
-RM=rm -rf
 
 
 # Standard distribution build parameters
@@ -97,6 +96,8 @@ BINARIES=mail.o misc.o newsrc.o smanager.o osdep.o utf8.o siglocal.o \
 CFLAGS=$(BASECFLAGS) $(EXTRACFLAGS)
 MAKE=make
 MV=mv
+RM=rm -rf
+SH=sh
 
 
 # Primary build command
@@ -218,7 +219,7 @@ dpx:	# Bull DPX/2
 	 RSHPATH=/usr/bin/remsh \
 	 BASECFLAGS="-Dconst= -DSYSTEM5 -DSHORT_IDENT" \
 	 BASELDFLAGS="-linet" \
-	 RANLIB=true LN="ln"
+	 RANLIB=true LN=ln
 
 drs:	# ICL DRS/NX
 	$(BUILD) OS=$@ SIGTYPE=sv4 CHECKPW=sv4 LOGINPW=sv4 \
@@ -243,7 +244,7 @@ epx:	# EP/IX
 	 RANLIB=true
 
 gas:	# GCC Altos SVR4
-	$(BUILD) OS=asv SIGTYPE=sv4 \
+	$(BUILD) OS=asv SIGTYPE=sv4 LOGINPW=old \
 	 ACTIVEFILE=/usr/spool/news/active \
 	 RSHPATH=/usr/bin/rcmd \
 	 BASECFLAGS="-g -O -DALTOS_SYSTEM_V -DSIGSTOP=SIGKILL" \
@@ -266,11 +267,11 @@ ghp:	# GCC HP-UX
 	 RANLIB=true CC=gcc
 
 gso:	# GCC Solaris
-	$(BUILD) OS=sol SIGTYPE=psx CHECKPW=sv4 \
+	$(BUILD) OS=sol SIGTYPE=psx CHECKPW=psx \
 	 MAILSPOOL=/var/mail NEWSSPOOL=/var/spool/news \
 	 ACTIVEFILE=/usr/share/news/active \
 	 RSHPATH=/usr/bin/rsh \
-	 BASECFLAGS="-g -O2 -DNFSKLUDGE -DCHECKACCOUNTEXPIRATION" \
+	 BASECFLAGS="-g -O2 -DNFSKLUDGE" \
 	 BASELDFLAGS="-lsocket -lnsl -lgen" \
 	 RANLIB=true CC=gcc
 
@@ -337,7 +338,6 @@ mnt:	# Mint
 	 BASECFLAGS="-g -O -Dunix=1 -D__atarist__ -D_POSIX_SOURCE -pipe" \
 	 RSHPATH=/usr/bin/rsh \
 	 RANLIB=true CC=gcc ARRC="gcc-ar rc"
-	fixstk 131072 $(ARCHIVE)
 
 neb:	# NetBSD
 	$(BUILD) OS=bsi \
@@ -364,7 +364,7 @@ os4:	# OSF/1 (Digital UNIX) 4
 	 BASELDFLAGS="-lsecurity -ldb -laud -lm"
 
 ptx:	# PTX
-	$(BUILD) OS=$@ SIGTYPE=psx CHECKPW=sv4 LOGINPW=sv4 \
+	$(BUILD) OS=$@ SIGTYPE=psx CHECKPW=svo LOGINPW=sv4 \
 	 MAILSPOOL=/usr/mail \
 	 RSHPATH=/usr/bin/resh \
 	 BASECFLAGS="-Wc,-O3 -Wc,-seq -Dprivate=PRIVATE -DNFSKLUDGE" \
@@ -376,9 +376,9 @@ pyr:	# Pyramid
 	 BASECFLAGS="-g -Dconst= -DNFSKLUDGE"
 
 qnx:	# QNX
-	$(BUILD) OS=$@ CHECKPW=sv4 LOGINPW=old \
+	$(BUILD) OS=$@ CHECKPW=psx LOGINPW=old \
 	 RSHPATH=/usr/ucb/rsh \
-	 BASECFLAGS="-Otax -g -Dunix=1 -D_POSIX_SOURCE -DCHECKACCOUNTEXPIRATION" \
+	 BASECFLAGS="-Otax -g -Dunix=1 -D_POSIX_SOURCE" \
 	 BASELDFLAGS="-g -N128k -llogin -lsocket -lunix"
 
 s40:	# SUN-OS 4.0
@@ -400,8 +400,8 @@ sco:	# Santa Cruz Operation
 	 STDPROTO=mmdfproto \
 	 RSHPATH=/usr/bin/rcmd \
 	 BASECFLAGS="-O3" \
-	 BASELDFLAGS="-lsocket -lprot -lcrypt -lx" \
-	 RANLIB=true LN="ln"
+	 BASELDFLAGS="-lsocket -lprot -lcrypt_i -lx -los" \
+	 RANLIB=true LN=ln
 
 # Note: setting _POSIX_SOURCE doesn't seem to build it as of SGI IRIX 5.3
 
@@ -428,19 +428,19 @@ shp:	# HP-UX with Trusted Computer Base
 slx:	# Secure Linux
 	@echo You are building for glibc versions of Secure Linux
 	@echo If you want libc5 versions you must use sl5 instead!
-	$(BUILD) OS=$@ SIGTYPE=psx CHECKPW=sv4 \
+	$(BUILD) OS=$@ SIGTYPE=psx CHECKPW=psx \
 	 SPOOLDIR=/var/spool \
 	 RSHPATH=/usr/bin/rsh \
-	 BASECFLAGS="-g -O6 -DNFSKLUDGE -DCHECKACCOUNTEXPIRATION" \
+	 BASECFLAGS="-g -fno-omit-frame-pointer -O6 -DNFSKLUDGE" \
 	 BASELDFLAGS="-s -lcrypt"
 
 # Note: KC Smith at Microsoft says that -lshadow is for libc5
 
 sl5:	# Secure Linux using libc5
-	$(BUILD) OS=slx SIGTYPE=psx CHECKPW=sv4 \
+	$(BUILD) OS=slx SIGTYPE=psx CHECKPW=psx \
 	 SPOOLDIR=/var/spool \
 	 RSHPATH=/usr/bin/rsh \
-	 BASECFLAGS="-g -O6 -DNFSKLUDGE -DCHECKACCOUNTEXPIRATION" \
+	 BASECFLAGS="-g -fno-omit-frame-pointer -O6 -DNFSKLUDGE" \
 	 BASELDFLAGS="-s -lshadow"
 
 snx:	# Siemens Nixdorf SINIX and Reliant UNIX
@@ -488,11 +488,11 @@ snx:	# Siemens Nixdorf SINIX and Reliant UNIX
 #    you got this compiler and not the UCB compiler using BSD libraries.
 
 sol:	# Solaris
-	$(BUILD) OS=$@ SIGTYPE=psx CHECKPW=sv4 \
+	$(BUILD) OS=$@ SIGTYPE=psx CHECKPW=psx \
 	 MAILSPOOL=/var/mail NEWSSPOOL=/var/spool/news \
 	 ACTIVEFILE=/usr/share/news/active \
 	 RSHPATH=/usr/bin/rsh \
-	 BASECFLAGS="-g -O2 -DNFSKLUDGE -DCHECKACCOUNTEXPIRATION" \
+	 BASECFLAGS="-g -O2 -DNFSKLUDGE" \
 	 BASELDFLAGS="-lsocket -lnsl -lgen" \
 	 RANLIB=true CC=ucbcc
 
@@ -518,7 +518,7 @@ sv2:	# SVR2
 	 RSHPATH=/usr/bin/remsh \
 	 BASECFLAGS="-Dconst= -DSYSTEM5 -DSHORT_IDENT -I/usr/ethernet/include" \
 	 BASELDFLAGS="-lnet" \
-	 RANLIB=true LN="ln"
+	 RANLIB=true LN=ln
 
 sv4:	# SVR4
 	$(BUILD) OS=$@ SIGTYPE=sv4 CHECKPW=sv4 LOGINPW=sv4 \
@@ -537,7 +537,7 @@ ult:	# Ultrix
 uw2:	# UnixWare SVR4.2
 	$(BUILD) OS=sv4 SIGTYPE=sv4 CHECKPW=sv4 \
 	 MAILSPOOL=/var/mail NEWSSPOOL=/var/spool/news \
-	 ACTIVEFILE=/usr/share/news/active \
+	 ACTIVEFILE=/var/news/lib/active \
 	 RSHPATH=/usr/bin/rsh \
 	 BASECFLAGS="-g" \
 	 BASELDFLAGS="-lsocket -lnsl -lgen" \
@@ -555,19 +555,19 @@ vu2:	# VAX Ultrix 2.3, etc.
 
 # Build it!
 
-build:	clean once ckp$(PASSWDTYPE) $(EXTRAAUTHENTICATORS) $(ARCHIVE)
+build:	clean once $(ARCHIVE)
 
 all:	$(ARCHIVE)
 
 $(ARCHIVE): $(BINARIES)
 	$(RM) $(ARCHIVE) || true
-	$(ARRC) $(ARCHIVE) $(BINARIES)
-	$(RANLIB) $(ARCHIVE)
+	@cat ARCHIVE
+	@$(SH) ARCHIVE
 
 # Cleanup
 
 clean:
-	$(RM) *.o linkage.[ch] auths.c $(ARCHIVE) osdep.* *TYPE *FLAGS || true
+	$(RM) auths.c flockbsd.c linkage.[ch] siglocal.c osdep*.[ch] *.o ARCHIVE *FLAGS *TYPE $(ARCHIVE) || true
 
 
 # Dependencies
@@ -604,7 +604,7 @@ utf8.o: mail.h misc.h osdep.h utf8.h
 osdep.o:mail.h misc.h env.h fs.h ftl.h nl.h tcp.h \
 	osdep.h env_unix.h tcp_unix.h \
 	osdep.c env_unix.c fs_unix.c ftl_unix.c nl_unix.c tcp_unix.c \
-	auths.c flock.c fsync.c gethstid.c \
+	auths.c flock.c flockbsd.c flcksafe.c fsync.c gethstid.c \
 	gr_wait.c gr_wait4.c gr_waitp.c \
 	auth_gss.c auth_krb.c auth_log.c \
 	scandir.c setpgrp.c strerror.c truncate.c write.c \
@@ -619,12 +619,16 @@ osdep.c: osdepbas.c osdepckp.c osdeplog.c
 	$(RM) osdep.c || true
 	cat osdepbas.c osdepckp.c osdeplog.c > osdep.c
 
+flockbsd.c:	# cretin Linux
+
 siglocal.c:	# cretin Linux
 
 
 # Once-only environment setup
 
-once:
+once:	onceenv ckp$(PASSWDTYPE) flockbsd.c osdep.c $(EXTRAAUTHENTICATORS) 
+
+onceenv:
 	@echo Once-only environment setup...
 	./drivers $(EXTRADRIVERS) $(DEFAULTDRIVERS) dummy
 	./mkauths $(EXTRAAUTHENTICATORS) $(DEFAULTAUTHENTICATORS)
@@ -635,11 +639,12 @@ once:
 	 -DACTIVEFILE=\"$(ACTIVEFILE)\" -DNEWSSPOOL=\"$(NEWSSPOOL)\" \
 	 -DRSHPATH=\"$(RSHPATH)\" > OSCFLAGS
 	echo $(BASELDFLAGS) $(EXTRALDFLAGS) > LDFLAGS
+	echo "$(ARRC) $(ARCHIVE) $(BINARIES);$(RANLIB) $(ARCHIVE)" >> ARCHIVE
 	$(LN) os_$(OS).h osdep.h
 	$(LN) os_$(OS).c osdepbas.c
-	$(LN) sig_$(SIGTYPE).c siglocal.c
 	$(LN) log_$(LOGINPW).c osdeplog.c
-
+	$(LN) sig_$(SIGTYPE).c siglocal.c
+	sh -c '(test -f /usr/include/sys/statvfs.h && $(LN) flocksun.c flockbsd.c) || $(LN) flocksv4.c flockbsd.c'
 
 # Password checkers
 

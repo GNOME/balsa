@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	22 May 1990
- * Last Edited:	26 February 1998
+ * Last Edited:	22 June 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -297,7 +297,8 @@ long tenex_status (MAILSTREAM *stream,char *mbx,long flags)
       if (!mail_elt (stream,i)->seen) status.unseen++;
   status.uidnext = stream->uid_last + 1;
   status.uidvalidity = stream->uid_validity;
-  if (!status.recent &&		/* calculate post-snarf results */
+				/* calculate post-snarf results */
+  if (!status.recent && LOCAL->inbox &&
       (systream = mail_open (NIL,sysinbox (),OP_READONLY|OP_SILENT))) {
     status.messages += systream->nmsgs;
     status.recent += systream->recent;
@@ -621,6 +622,11 @@ long tenex_ping (MAILSTREAM *stream)
 	unlockfd (ld,lock);	/* release shared parse/append permission */
       }
     }
+    else if ((sbuf.st_ctime > sbuf.st_atime)||(sbuf.st_ctime > sbuf.st_mtime)){
+      time_t tp[2];		/* whack the times if necessary */
+      LOCAL->filetime = tp[0] = tp[1] = time (0);
+      utime (stream->mailbox,tp);
+    }
   }
   return r;			/* return result of the parse */
 }
@@ -774,7 +780,12 @@ void tenex_expunge (MAILSTREAM *stream)
 	read (LOCAL->fd,LOCAL->buf,m);
 	pos = j - delta;	/* write to destination position */
 	lseek (LOCAL->fd,pos,L_SET);
-	write (LOCAL->fd,LOCAL->buf,m);
+	while (T) {
+	  lseek (LOCAL->fd,pos,L_SET);
+	  if (write (LOCAL->fd,LOCAL->buf,m) > 0) break;
+	  mm_notify (stream,strerror (errno),WARN);
+	  mm_diskerror (stream,errno,T);
+	}
 	pos += m;		/* new position */
 	j += m;			/* next chunk, perhaps */
       } while (k -= m);		/* until done */
@@ -1090,8 +1101,8 @@ long tenex_parse (MAILSTREAM *stream)
 
 				/* swell the cache */
     mail_exists (stream,++nmsgs);
-				/* intantiate an elt for this message */
-    elt = mail_elt (stream,nmsgs);
+				/* instantiate an elt for this message */
+    (elt = mail_elt (stream,nmsgs))->valid = T;
     elt->private.uid = ++stream->uid_last;
 				/* note file offset of header */
     elt->private.special.offset = curpos;
@@ -1225,7 +1236,7 @@ void tenex_update_status (MAILSTREAM *stream,unsigned long msgno,long syncflag)
   struct stat sbuf;
   unsigned long j,k = 0;
 				/* readonly */
-  if (stream->rdonly) tenex_read_flags (stream,elt);
+  if (stream->rdonly || !elt->valid) tenex_read_flags (stream,elt);
   else {			/* readwrite */
     j = elt->user_flags;	/* get user flags */
 				/* reverse bits (dontcha wish we had CIRC?) */

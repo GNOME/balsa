@@ -41,12 +41,16 @@
  *
  */
 
+#define rfc822_write_address(dest,adr) \
+  rfc822_write_address_full (dest,adr,NIL)
+
+
 /* Function prototypes */
 
 void rfc822_header (char *header,ENVELOPE *env,BODY *body);
 void rfc822_address_line (char **header,char *type,ENVELOPE *env,ADDRESS *adr);
 void rfc822_header_line (char **header,char *type,ENVELOPE *env,char *text);
-void rfc822_write_address (char *dest,ADDRESS *adr);
+char *rfc822_write_address_full (char *dest,ADDRESS *adr,char *base);
 void rfc822_address (char *dest,ADDRESS *adr);
 void rfc822_cat (char *dest,char *src,const char *specials);
 void rfc822_write_body_header (char **header,BODY *body);

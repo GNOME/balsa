@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	1 August 1988
- * Last Edited:	14 January 1998
+ * Last Edited:	4 June 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -53,22 +53,16 @@ struct passwd *checkpw (struct passwd *pw,char *pass,int argc,char *argv[])
 				/* shadow authentication */
     if ((sp = getspnam (pw->pw_name)) &&
 	((sp->sp_lstchg <= 0) || (sp->sp_max <= 0) ||
-	 ((sp->sp_lstchg + sp->sp_max) > now)) &&
-#ifdef CHECKACCOUNTEXPIRATION
-	((sp->sp_expire <= 0) || (sp->sp_expire >= now)) &&
-#endif
+	 ((sp->sp_lstchg + sp->sp_max) >= now)) &&
 	!strcmp (sp->sp_pwdp,(char *) crypt (pass,sp->sp_pwdp))) {
       if ((sp->sp_lstchg > 0) && (sp->sp_max > 0) &&
 	  ((left = (sp->sp_lstchg + sp->sp_max) - now) <= sp->sp_warn)) {
-	sprintf (tmp,"[ALERT] Password expires in %ld days",(long) left);
-	mm_notify (NIL,tmp,NIL);
+	if (left) {
+	  sprintf (tmp,"[ALERT] Password expires in %ld day(s)",(long) left);
+	  mm_notify (NIL,tmp,NIL);
+	}
+	else mm_notify (NIL,"[ALERT] Password expires today!",WARN);
       }
-#ifdef CHECKACCOUNTEXPIRATION
-      if ((sp->sp_expire > 0) && ((left = sp->sp_expire - now) < 28)) {
-	sprintf (tmp,"[ALERT] Account expires in %ld days",(long) left);
-	mm_notify (NIL,tmp,NIL);
-      }
-#endif
       endspent ();		/* don't need shadow password data any more */
     }
     else pw = NIL;		/* password failed */

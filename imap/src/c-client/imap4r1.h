@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	14 October 1988
- * Last Edited:	20 January 1998
+ * Last Edited:	26 June 1998
  *
  * Sponsorship:	The original version of this work was developed in the
  *		Symbolic Systems Resources Group of the Knowledge Systems
@@ -97,6 +97,16 @@ typedef struct imap_local {
 
 #define LOCAL ((IMAPLOCAL *) stream->local)
 
+/* Has THREAD extension (else done in client) */
+
+#define LEVELTHREAD(stream) (((IMAPLOCAL *) stream->local)->threader ? T : NIL)
+
+
+/* Has SORT extension (else done in client) */
+
+#define LEVELSORT(stream) ((IMAPLOCAL *) stream->local)->use_sort
+
+
 /* IMAP4rev1 level or better */
 
 #define LEVELIMAP4rev1(stream) ((IMAPLOCAL *) stream->local)->imap4rev1
@@ -127,8 +137,7 @@ typedef struct imap_local {
 /* IMAP2 RFC-1176 level or better */
 
 #define LEVEL1176(stream) ((IMAPLOCAL *) stream->local)->rfc1176
-
-
+
 /* Arguments to imap_send() */
 
 typedef struct imap_argument {

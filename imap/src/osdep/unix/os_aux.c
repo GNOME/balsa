@@ -63,5 +63,6 @@ extern int sys_nerr;
 #include "gr_wait.c"
 #include "strerror.c"
 #include "strtoul.c"
+#include "strpbrk.c"		/* the A/UX version is bogus! */
 #include "memmove.c"
 #include "tz_sv4.c"

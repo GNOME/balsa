@@ -10,9 +10,9 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	10 April 1992
- * Last Edited:	30 December 1997
+ * Last Edited:	3 June 1998
  *
- * Copyright 1997 by the University of Washington
+ * Copyright 1998 by the University of Washington
  *
  *  Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -35,7 +35,9 @@
 
 #include <unistd.h>
 #include <string.h>
+#define char void
 #include <memory.h>
+#undef char
 #include <sys/types.h>
 #include <sys/dir.h>
 #include <fcntl.h>
@@ -61,7 +63,13 @@
 #define SIGSTOP SIGQUIT
 
 #define S_IFLNK 0120000
-#define LOG_MAIL 0
+
+
+/* syslog() emulation */
+
+#define LOG_MAIL        (2<<3)  /* mail system */
+#define LOG_AUTH        (4<<3)  /* security/authorization messages */
+
 
 /* For flock() emulation */
 
@@ -72,8 +80,6 @@
 #define LOCK_NB 4
 #define LOCK_UN 8
 
-#define utime portable_utime
-int portable_utime (char *file,time_t timep[2]);
 
 /* For setitimer() emulation */
 

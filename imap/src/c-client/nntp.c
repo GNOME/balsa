@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	10 February 1992
- * Last Edited:	23 March 1998
+ * Last Edited:	19 May 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -230,12 +230,21 @@ void nntp_list (MAILSTREAM *stream,char *ref,char *pat)
 void nntp_lsub (MAILSTREAM *stream,char *ref,char *pat)
 {
   void *sdb = NIL;
-  char *s,pattern[MAILTMPLEN];
+  char *s,mbx[MAILTMPLEN];
 				/* return data from newsrc */
-  if (nntp_canonicalize (ref,pat,pattern)) newsrc_lsub (stream,pattern);
-				/* only if null stream and * requested */
-  if (!stream && !ref && !strcmp (pat,"*") && (s = sm_read (&sdb)))
-    do if (nntp_valid (s)) mm_lsub (stream,NIL,s,NIL);
+  if (nntp_canonicalize (ref,pat,mbx)) newsrc_lsub (stream,mbx);
+  if (*pat == '{') {		/* if remote pattern, must be NNTP */
+    if (!nntp_valid (pat)) return;
+    ref = NIL;			/* good NNTP pattern, punt reference */
+  }
+				/* if remote reference, must be valid NNTP */
+  if (ref && (*ref == '{') && !nntp_valid (ref)) return;
+				/* kludgy application of reference */
+  if (ref && *ref) sprintf (mbx,"%s%s",ref,pat);
+  else strcpy (mbx,pat);
+
+  if (s = sm_read (&sdb)) do if (nntp_valid (s) && pmatch (s,mbx))
+    mm_lsub (stream,NIL,s,NIL);
   while (s = sm_read (&sdb));	/* until no more subscriptions */
 }
 
@@ -446,6 +455,10 @@ MAILSTREAM *nntp_mopen (MAILSTREAM *stream)
     nntp_mclose (stream,NIL);	/* do close action */
     stream->dtb = &nntpdriver;	/* reattach this driver */
     mail_free_cache (stream);	/* clean up cache */
+  }
+  if (mb.secflag) {		/* in case /secure switch given */
+    mm_log ("Secure NNTP login not available",ERROR);
+    return NIL;
   }
 				/* in case /debug switch given */
   if (mb.dbgflag) stream->debug = T;

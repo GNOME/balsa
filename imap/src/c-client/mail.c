@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	22 November 1989
- * Last Edited:	12 April 1998
+ * Last Edited:	23 June 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -564,6 +564,7 @@ long mail_unsubscribe (MAILSTREAM *stream,char *mailbox)
 
 long mail_create (MAILSTREAM *stream,char *mailbox)
 {
+  MAILSTREAM *ts;
   char *s,tmp[MAILTMPLEN];
   DRIVER *d;
 				/* create of INBOX invalid */
@@ -618,7 +619,7 @@ long mail_create (MAILSTREAM *stream,char *mailbox)
 	   (((*mailbox == '{') || (*mailbox == '#')) &&
 	    (stream = mail_open (NIL,mailbox,OP_PROTOTYPE | OP_SILENT))))
     d = stream->dtb;
-  else if (*mailbox != '{') d = default_proto (NIL)->dtb;
+  else if ((*mailbox != '{') && (ts = default_proto (NIL))) d = ts->dtb;
   else {			/* failed utterly */
     sprintf (tmp,"Can't create mailbox %s: indeterminate format",mailbox);
     mm_log (tmp,ERROR);
@@ -994,7 +995,7 @@ ENVELOPE *mail_fetch_structure (MAILSTREAM *stream,unsigned long msgno,
     if (body || !elt->rfc822_size) {
       s = (*stream->dtb->header) (stream,msgno,&hdrsize,flags & ~FT_INTERNAL);
 				/* make copy in case body fetch smashes it */
-      hdr = memcpy (fs_get ((size_t) hdrsize+1),s,(size_t) hdrsize);
+      hdr = (char *) memcpy (fs_get ((size_t) hdrsize+1),s,(size_t) hdrsize);
       hdr[hdrsize] = '\0';	/* tie off header */
       (*stream->dtb->text) (stream,msgno,&bs,(flags & ~FT_INTERNAL) | FT_PEEK);
       if (!elt->rfc822_size) elt->rfc822_size = hdrsize + SIZE (&bs);
@@ -1095,7 +1096,7 @@ char *mail_fetch_message (MAILSTREAM *stream,unsigned long msgno,
 				/* ugh, have to do this the crufty way */
   u = mail_fetch_header (stream,msgno,NIL,NIL,&i,flags);
 				/* copy in case text method stomps on it */
-  s = memcpy ((char *) fs_get ((size_t) i),u,(size_t) i);
+  s = (char *) memcpy (fs_get ((size_t) i),u,(size_t) i);
   if ((*stream->dtb->text) (stream,msgno,&bs,flags)) {
     t = &stream->text;		/* build combined copy */
     if (t->data) fs_give ((void **) &t->data);
@@ -1160,6 +1161,7 @@ char *mail_fetch_header (MAILSTREAM *stream,unsigned long msgno,char *section,
 	t = &m->header.text;	/* fetch data */
 				/* don't need to postprocess lines */
 	if (m->lines) lines = NIL;
+	else if (lines) textcpy (t = &stream->text,&m->header.text);
       }
     }
     else if (b) {		/* nested body wanted? */
@@ -1678,6 +1680,19 @@ void mail_flag (MAILSTREAM *stream,char *sequence,char *flag,long flags)
        mail_sequence (stream,sequence)))
     for (i = 1,nf = (flags & ST_SET) ? T : NIL; i <= stream->nmsgs; i++)
       if ((elt = mail_elt (stream,i))->sequence) {
+	struct {		/* old flags */
+	  unsigned int valid : 1;
+	  unsigned int seen : 1;
+	  unsigned int deleted : 1;
+	  unsigned int flagged : 1;
+	  unsigned int answered : 1;
+	  unsigned int draft : 1;
+	  unsigned long user_flags;
+	} old;
+	old.valid = elt->valid; old.seen = elt->seen;
+	old.deleted = elt->deleted; old.flagged = elt->flagged;
+	old.answered = elt->answered; old.draft = elt->draft;
+	old.user_flags = elt->user_flags;
 	elt->valid = NIL;	/* prepare for flag alteration */
 	if (stream->dtb->flagmsg) (*stream->dtb->flagmsg) (stream,elt);
 	if (f&fSEEN) elt->seen = nf;
@@ -1689,6 +1704,10 @@ void mail_flag (MAILSTREAM *stream,char *sequence,char *flag,long flags)
 	if (flags & ST_SET) elt->user_flags |= uf;
 	else elt->user_flags &= ~uf;
 	elt->valid = T;		/* flags now altered */
+	if ((old.valid != elt->valid) || (old.seen != elt->seen) ||
+	    (old.deleted != elt->deleted) || (old.flagged != elt->flagged) ||
+	    (old.answered != elt->answered) || (old.draft != elt->draft) ||
+	    (old.user_flags != elt->user_flags)) mm_flags(stream,elt->msgno);
 	if (stream->dtb->flagmsg) (*stream->dtb->flagmsg) (stream,elt);
       }
 				/* call driver once */
@@ -2765,7 +2784,8 @@ long mail_search_body (MAILSTREAM *stream,unsigned long msgno,BODY *body,
 	if (!strcmp (param->attribute,"CHARSET")) t = param->value;
       switch (body->encoding) {	/* what encoding? */
       case ENCBASE64:
-	st.data = rfc822_base64 ((unsigned char *) s,i,&st.size);
+	st.data = (unsigned char *)
+	  rfc822_base64 ((unsigned char *) s,i,&st.size);
 	ret = mail_search_string (&st,t,&stream->private.search.string);
 	fs_give ((void **) &st.data);
 	break;
@@ -2801,7 +2821,7 @@ long mail_search_string (SIZEDTEXT *s,char *charset,STRINGLIST **st)
   if (utf8_text (s,charset,&u,NIL)) {
     while (*sc) {		/* run down criteria list */
       if (search (u.data,u.size,(*sc)->text.data,(*sc)->text.size)) {
-	t = (*sc);		/* found one, need to flush this */
+	t = (void *) (*sc);	/* found one, need to flush this */
 	*sc = (*sc)->next;	/* remove it from the list */
 	fs_give (&t);		/* flush the buffer */
       }
@@ -3526,14 +3546,14 @@ THREADNODE *mail_thread_orderedsubject (MAILSTREAM *stream,char *charset,
   if (lst = (*sorter) (stream,charset,spg,&pgm,flags & ~(SE_FREE | SE_UID))){
     if (*(ls = lst)) {		/* create thread */
 				/* note first subject */
-      cur = top = thr = mail_newthreadnode ((*mailcache) (stream,*ls++,
-							  CH_SORTCACHE));
+      cur = top = thr = mail_newthreadnode
+	((SORTCACHE *) (*mailcache) (stream,*ls++,CH_SORTCACHE));
 				/* note its number */
       cur->num = (flags & SE_UID) ? mail_uid (stream,*lst) : *lst;
       i = 1;			/* number of threads */
       while (*ls) {		/* build tree */
 				/* subjects match? */
-	s = (*mailcache) (stream,*ls++,CH_SORTCACHE);
+	s = (SORTCACHE *) (*mailcache) (stream,*ls++,CH_SORTCACHE);
 	if (mail_compare_cstring (top->sc->subject,s->subject)) {
 	  i++;			/* have a new thread */
 	  top = top->branch = cur = mail_newthreadnode (s);

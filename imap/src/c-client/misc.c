@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	5 July 1988
- * Last Edited:	11 March 1998
+ * Last Edited:	11 May 1998
  *
  * Sponsorship:	The original version of this work was developed in the
  *		Symbolic Systems Resources Group of the Knowledge Systems
@@ -244,9 +244,10 @@ long search (unsigned char *base,long basec,unsigned char *pat,long patc)
   if (base && (basec > 0) && pat && (patc > 0) && (basec >= patc)) {
     memset (mask,0,256);	/* initialize search validity mask */
     for (i = 0; i < patc; i++) if (!mask[c = pat[i]]) {
-				/* mark both cases if alphabetic */
-      if (alphatab[c]) mask[c & 0xdf] = mask[c | 0x20] = T;
-      else mask[c] = T;		/* mark single character */
+				/* mark single character if non-alphabetic */
+      if (alphatab[c] & 0x20) mask[c] = T;
+				/* else mark both cases */
+      else mask[c & 0xdf] = mask[c | 0x20] = T;
     }
 				/* Boyer-Moore type search */
     for (i = --patc; i < basec; i += (mask[c] ? 1 : (j + 1)))

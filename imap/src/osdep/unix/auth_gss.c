@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	12 January 1998
- * Last Edited:	28 April 1998
+ * Last Edited:	8 June 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -115,8 +115,8 @@ long auth_gssapi_client (authchallenge_t challenger,authrespond_t responder,
     sprintf (tmp,"%s@%s",mb->service,mb->host);
     buf.length = strlen (buf.value = tmp) + 1;
 				/* get service name */
-    if (gss_import_name (&min,&buf,gss_nt_service_name,&crname) !=
-	GSS_S_COMPLETE) (*responder) (stream,NIL,0);
+    if (gss_import_name(&min,&buf,gss_nt_service_name,&crname)!=GSS_S_COMPLETE)
+      (*responder) (stream,NIL,0);
     else switch (maj =		/* get context */
 		 gss_init_sec_context (&min,GSS_C_NO_CREDENTIAL,&ctx,
 				       crname,GSS_C_NO_OID,

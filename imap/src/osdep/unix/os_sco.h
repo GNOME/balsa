@@ -10,9 +10,9 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	1 August 1988
- * Last Edited:	30 December 1997
+ * Last Edited:	11 May 1998
  *
- * Copyright 1997 by the University of Washington
+ * Copyright 1998 by the University of Washington
  *
  *  Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -76,10 +76,6 @@
 
 #define utime portable_utime
 int portable_utime (char *file,time_t timep[2]);
-
-/* For geteuid emulation */
-
-#define geteuid Geteuid
 
 #include "env_unix.h"
 #include "fs.h"
@@ -95,4 +91,3 @@ int scandir (char *dirname,struct direct ***namelist,select_t select,
 	     compar_t compar);
 int bsd_flock (int fd,int operation);
 int fsync (int fd);
-int Geteuid (void);

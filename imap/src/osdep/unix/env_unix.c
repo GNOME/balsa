@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	1 August 1988
- * Last Edited:	28 April 1998
+ * Last Edited:	28 June 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -318,6 +318,22 @@ void server_traps (void *clkint,void *kodint,void *hupint,void *trmint)
   arm_signal (SIGHUP,hupint);	/* prepare for hangup */
   arm_signal (SIGTERM,trmint);	/* prepare for termination */
 }
+
+
+/* Wait for stdin input
+ * Accepts: timeout in seconds
+ * Returns: T if have input on stdin, else NIL
+ */
+
+long server_input_wait (long seconds)
+{
+  fd_set rfd;
+  struct timeval tmo;
+  FD_ZERO (&rfd);
+  FD_SET (0,&rfd);
+  tmo.tv_sec = seconds; tmo.tv_usec = 0;
+  return select (1,&rfd,0,0,&tmo) ? LONGT : NIL;
+}
 
 /* Server log in
  * Accepts: user name string
@@ -525,7 +541,7 @@ char *sysinbox ()
 {
   char tmp[MAILTMPLEN];
   if (!sysInbox) {		/* initialize if first time */
-    sprintf (tmp,"%s/%s",MAILSPOOL,myUserName);
+    sprintf (tmp,"%s/%s",MAILSPOOL,myusername ());
     sysInbox = cpystr (tmp);	/* system inbox is from mail spool */
   }
   return sysInbox;

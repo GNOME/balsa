@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	15 June 1988
- * Last Edited:	20 April 1998
+ * Last Edited:	22 June 1998
  *
  * Sponsorship:	The original version of this work was developed in the
  *		Symbolic Systems Resources Group of the Knowledge Systems
@@ -230,11 +230,21 @@ void imap_list (MAILSTREAM *stream,char *ref,char *pat)
 void imap_lsub (MAILSTREAM *stream,char *ref,char *pat)
 {
   void *sdb = NIL;
-  char *s;
+  char *s,mbx[MAILTMPLEN];
+				/* do it on the server */
   imap_list_work (stream,"LSUB",ref,pat,NIL);
-				/* only if null stream and * requested */
-  if (!stream && !ref && !strcmp (pat,"*") && (s = sm_read (&sdb)))
-    do if (imap_valid (s)) mm_lsub (stream,NIL,s,NIL);
+  if (*pat == '{') {		/* if remote pattern, must be IMAP */
+    if (!imap_valid (pat)) return;
+    ref = NIL;			/* good IMAP pattern, punt reference */
+  }
+				/* if remote reference, must be valid IMAP */
+  if (ref && (*ref == '{') && !imap_valid (ref)) return;
+				/* kludgy application of reference */
+  if (ref && *ref) sprintf (mbx,"%s%s",ref,pat);
+  else strcpy (mbx,pat);
+
+  if (s = sm_read (&sdb)) do if (imap_valid (s) && pmatch (s,mbx))
+    mm_lsub (stream,NIL,s,NIL);
   while (s = sm_read (&sdb));	/* until no more subscriptions */
 }
 
@@ -298,8 +308,8 @@ void imap_list_work (MAILSTREAM *stream,char *cmd,char *ref,char *pat,
     for (s = mbx; *s; s++) if (*s == '%') *s = '*';
     args[0] = &apat; args[1] = NIL;
     apat.type = LISTMAILBOX; apat.text = (void *) mbx;
-    if (!(strstr (cmd,"LIST") &&/* if list, try IMAP2bis, then RFC-1176 form */
-	  strcmp (imap_send (stream,"FIND ALL.MAILBOXES",args)->key,"BAD")) ||
+    if (!(strstr (cmd,"LIST") &&/* if list, try IMAP2bis, then RFC-1176 */
+	  strcmp (imap_send (stream,"FIND ALL.MAILBOXES",args)->key,"BAD")) &&
 	!strcmp (imap_send (stream,"FIND MAILBOXES",args)->key,"BAD"))
       LOCAL->rfc1176 = NIL;	/* must be RFC-1064 */
   }
@@ -317,8 +327,14 @@ void imap_list_work (MAILSTREAM *stream,char *cmd,char *ref,char *pat,
 
 long imap_subscribe (MAILSTREAM *stream,char *mailbox)
 {
-  return imap_manage (stream,mailbox,LEVELIMAP4 (stream) ?
-		      "Subscribe" : "Subscribe Mailbox",NIL);
+  MAILSTREAM *st = stream;
+  long ret = ((stream && LOCAL && LOCAL->netstream) ||
+	      (stream = mail_open (NIL,mailbox,OP_HALFOPEN|OP_SILENT))) ?
+		imap_manage (stream,mailbox,LEVELIMAP4 (stream) ?
+			     "Subscribe" : "Subscribe Mailbox",NIL) : NIL;
+				/* toss out temporary stream */
+  if (st != stream) mail_close (stream);
+  return ret;
 }
 
 
@@ -330,8 +346,14 @@ long imap_subscribe (MAILSTREAM *stream,char *mailbox)
 
 long imap_unsubscribe (MAILSTREAM *stream,char *mailbox)
 {
-  return imap_manage (stream,mailbox,LEVELIMAP4 (stream) ?
-		      "Unsubscribe" : "Unsubscribe Mailbox",NIL);
+  MAILSTREAM *st = stream;
+  long ret = ((stream && LOCAL && LOCAL->netstream) ||
+	      (stream = mail_open (NIL,mailbox,OP_HALFOPEN|OP_SILENT))) ?
+		imap_manage (stream,mailbox,LEVELIMAP4 (stream) ?
+			     "Unsubscribe" : "Unsubscribe Mailbox",NIL) : NIL;
+				/* toss out temporary stream */
+  if (st != stream) mail_close (stream);
+  return ret;
 }
 
 /* IMAP create mailbox
@@ -1358,9 +1380,10 @@ unsigned long *imap_sort (MAILSTREAM *stream,char *charset,SEARCHPGM *spg,
     IMAPPARSEDREPLY *reply;
     SEARCHSET *ss = NIL;
     apgm.type = SORTPROGRAM; apgm.text = (void *) pgm;
-    achs.type = ASTRING; achs.text = charset ? charset : "US-ASCII";
+    achs.type = ASTRING; achs.text = (void *) (charset ? charset : "US-ASCII");
     aspg.type = SEARCHPROGRAM;
-    if (!(aspg.text = spg)) {	/* did he provide a searchpgm? */
+				/* did he provide a searchpgm? */
+    if (!(aspg.text = (void *) spg)) {
       for (i = 1,start = last = 0; i <= stream->nmsgs; ++i)
 	if (mail_elt (stream,i)->searched) {
 	  if (ss) {		/* continuing a sequence */
@@ -1377,7 +1400,7 @@ unsigned long *imap_sort (MAILSTREAM *stream,char *charset,SEARCHPGM *spg,
 	  }
 	}
 				/* nothing to sort if no messages */
-      if (!(aspg.text = spg)) return NIL;
+      if (!(aspg.text = (void *) spg)) return NIL;
 				/* else install last sequence */
       if (last != start) ss->last = last;
     }
@@ -1445,7 +1468,7 @@ unsigned long *imap_sort (MAILSTREAM *stream,char *charset,SEARCHPGM *spg,
     if (s) {			/* prefetch needed data */
       IMAPARG *args[3],aseq,aatt;
       aseq.type = SEQUENCE; aseq.text = (void *) s;
-      aatt.type = ATOM; aatt.text = needenvs ? "ALL" : "FAST";
+      aatt.type = ATOM; aatt.text = (void *) (needenvs ? "ALL" : "FAST");
       args[0] = &aseq; args[1] = &aatt; args[2] = NIL;
       imap_send (stream,"FETCH",args);
       fs_give ((void **) &s);
@@ -1480,9 +1503,10 @@ THREADNODE *imap_thread (MAILSTREAM *stream,char *type,char *charset,
     IMAPPARSEDREPLY *reply;
     SEARCHSET *ss = NIL;
     apgm.type = ATOM; apgm.text = (void *) type;
-    achs.type = ASTRING; achs.text = charset ? charset : "US-ASCII";
+    achs.type = ASTRING; achs.text = (void *) (charset ? charset : "US-ASCII");
     aspg.type = SEARCHPROGRAM;
-    if (!(aspg.text = spg)) {	/* did he provide a searchpgm? */
+				/* did he provide a searchpgm? */
+    if (!(aspg.text = (void *) spg)) {
       for (i = 1,start = last = 0; i <= stream->nmsgs; ++i)
 	if (mail_elt (stream,i)->searched) {
 	  if (ss) {		/* continuing a sequence */
@@ -1499,7 +1523,7 @@ THREADNODE *imap_thread (MAILSTREAM *stream,char *type,char *charset,
 	  }
 	}
 				/* nothing to sort if no messages */
-      if (!(aspg.text = spg)) return NIL;
+      if (!(aspg.text = (void *) spg)) return NIL;
 				/* else install last sequence */
       if (last != start) ss->last = last;
     }
@@ -2240,216 +2264,18 @@ void imap_parse_unsolicited (MAILSTREAM *stream,IMAPPARSEDREPLY *reply)
   unsigned long i = 0;
   unsigned long msgno;
   char *s,*t;
-				/* see if key is a number */
-  msgno = strtoul (reply->key,&s,10);
-  if (*s) {			/* if non-numeric */
-    if (!strcmp (reply->key,"FLAGS")) {
-				/* flush old user flags if any */
-      while ((i < NUSERFLAGS) && stream->user_flags[i])
-	fs_give ((void **) &stream->user_flags[i++]);
-      i = 0;			/* add flags */
-      if (s = (char *) strtok (reply->text+1," )"))
-	do if (*s != '\\') stream->user_flags[i++] = cpystr (s);
-      while (s = (char *) strtok (NIL," )"));
-    }
-    else if (!strcmp (reply->key,"SEARCH")) {
-				/* only do something if have text */
-      if (reply->text && (t = (char *) strtok (reply->text," "))) do {
-	i = atol (t);
-				/* UIDs always passed to main program */
-	if (LOCAL->uidsearch) mm_searched (stream,i);
-				/* should be a msgno then */
-	else if (i <= stream->nmsgs) {
-	  mail_elt (stream,i)->searched = T;
-	  if (!stream->silent) mm_searched (stream,i);
-	}
-      }
-      while (t = (char *) strtok (NIL," "));
-    }
-    else if (!strcmp (reply->key,"NAMESPACE")) {
-      if (LOCAL->namespace) {
-	mail_free_namespace (&LOCAL->namespace[0]);
-	mail_free_namespace (&LOCAL->namespace[1]);
-	mail_free_namespace (&LOCAL->namespace[2]);
-      }
-      else LOCAL->namespace = (NAMESPACE **) fs_get (3 * sizeof (NAMESPACE *));
-      s = reply->text;		/* parse namespace results */
-      LOCAL->namespace[0] = imap_parse_namespace (stream,&s,reply);
-      LOCAL->namespace[1] = imap_parse_namespace (stream,&s,reply);
-      LOCAL->namespace[2] = imap_parse_namespace (stream,&s,reply);
-      if (s && *s) {
-	sprintf (LOCAL->tmp,"Junk after namespace list: %.80s",s);
-	mm_log (LOCAL->tmp,WARN);
-      }
-    }
-
-    else if (!strcmp (reply->key,"SORT")) {
-      LOCAL->sortsize = 0;	/* initialize sort data */
-      if (LOCAL->sortdata) fs_give ((void **) &LOCAL->sortdata);
-      LOCAL->sortdata = (unsigned long *)
-	fs_get ((stream->nmsgs + 1) * sizeof (unsigned long));
-				/* only do something if have text */
-      if (reply->text && (t = (char *) strtok (reply->text," "))) do
-	LOCAL->sortdata[LOCAL->sortsize++] = atol (t);
-      while ((t = (char *) strtok (NIL," ")) &&
-	      (LOCAL->sortsize < stream->nmsgs));
-      LOCAL->sortdata[LOCAL->sortsize] = 0;
-    }
-    else if (!strcmp (reply->key,"THREAD")) {
-      if (LOCAL->threaddata) mail_free_threadnode (&LOCAL->threaddata);
-      s = reply->text;
-      LOCAL->threaddata = imap_parse_thread (&s);
-      if (s && *s) {
-	sprintf (LOCAL->tmp,"Junk at end of thread: %.80s",s);
-	mm_log (LOCAL->tmp,WARN);
-      }
-    }
-
-    else if (!strcmp (reply->key,"STATUS")) {
-      MAILSTATUS status;
-      char *txt;
-      switch (*reply->text) {	/* mailbox is an astring */
-      case '"':			/* quoted string? */
-      case '{':			/* literal? */
-	txt = reply->text;	/* status data is in reply */
-	t = imap_parse_string (stream,&txt,reply,NIL,NIL);
-				/* must be followed by space */
-	if (!(txt && (*txt++ == ' '))) txt = NIL;
-	break;
-      default:			/* must be atom */
-	t = cpystr (reply->text);
-	if (txt = strchr (t,' ')) *txt++ = '\0';
-	break;
-      }
-      if (t && txt && (*txt++ == '(') && (s = strchr (txt,')')) && (s - txt) &&
-	  !s[1]) {
-	*s = '\0';		/* tie off status data */
-				/* initialize data block */
-	status.flags = status.messages = status.recent = status.unseen =
-	status.uidnext = status.uidvalidity = 0;
-	ucase (txt);		/* do case-independent match */
-	while (*txt && (s = strchr (txt,' '))) {
-	  *s++ = '\0';		/* tie off status attribute name */
-	  i = strtoul (s,&s,10);/* get attribute value */
-	  if (!strcmp (txt,"MESSAGES")) {
-	    status.flags |= SA_MESSAGES;
-	    status.messages = i;
-	  }
-	  else if (!strcmp (txt,"RECENT")) {
-	    status.flags |= SA_RECENT;
-	    status.recent = i;
-	  }
-	  else if (!strcmp (txt,"UNSEEN")) {
-	    status.flags |= SA_UNSEEN;
-	    status.unseen = i;
-	  }
-	  else if (!strcmp (txt,"UIDNEXT") || !strcmp (txt,"UID-NEXT")) {
-	    status.flags |= SA_UIDNEXT;
-	    status.uidnext = i;
-	  }
-	  else if (!strcmp (txt,"UIDVALIDITY")|| !strcmp (txt,"UID-VALIDITY")){
-	    status.flags |= SA_UIDVALIDITY;
-	    status.uidvalidity = i;
-	  }
-				/* next attribute */
-	  txt = (*s == ' ') ? s + 1 : s;
-	}
-	strcpy (strchr (strcpy (LOCAL->tmp,stream->mailbox),'}') + 1,t);
-				/* pass status to main program */
-	mm_status (stream,LOCAL->tmp,&status);
-      }
-      fs_give ((void **) &t);
-    }
-
-    else if ((!strcmp (reply->key,"LIST") || !strcmp (reply->key,"LSUB")) &&
-	     (*reply->text == '(') && (s = strchr (reply->text,')')) &&
-	     (s[1] == ' ')) {
-      char delimiter = '\0';
-      *s++ = '\0';		/* tie off attribute list */
-				/* parse attribute list */
-      if (t = (char *) strtok (reply->text+1," ")) do {
-	if (!strcmp (ucase (t),"\\NOINFERIORS")) i |= LATT_NOINFERIORS;
-	else if (!strcmp (t,"\\NOSELECT")) i |= LATT_NOSELECT;
-	else if (!strcmp (t,"\\MARKED")) i |= LATT_MARKED;
-	else if (!strcmp (t,"\\UNMARKED")) i |= LATT_UNMARKED;
-				/* ignore extension flags */
-      }
-      while (t = (char *) strtok (NIL," "));
-      switch (*++s) {		/* process delimiter */
-      case 'N':			/* NIL */
-      case 'n':
-	s += 4;			/* skip over NIL<space> */
-	break;
-      case '"':			/* have a delimiter */
-	delimiter = (*++s == '\\') ? *++s : *s;
-	s += 3;			/* skip over <delimiter><quote><space> */
-      }
-				/* need to prepend a prefix? */
-      if (LOCAL->prefix) strcpy (LOCAL->tmp,LOCAL->prefix);
-      else LOCAL->tmp[0] = '\0';/* no prefix needed */
-				/* need to do string parse? */
-      if ((*s == '"') || (*s == '{')) {
-	strcat (LOCAL->tmp,t = imap_parse_string (stream,&s,reply,NIL,NIL));
-	fs_give ((void **) &t);
-      }
-      else strcat(LOCAL->tmp,s);/* atom is easy */
-      if (reply->key[1] == 'S') mm_lsub (stream,delimiter,LOCAL->tmp,i);
-      else mm_list (stream,delimiter,LOCAL->tmp,i);
-    }
-    else if (!strcmp (reply->key,"MAILBOX")) {
-      if (LOCAL->prefix)
-	sprintf (t = LOCAL->tmp,"%s%s",LOCAL->prefix,reply->text);
-      else t = reply->text;
-      mm_list (stream,NIL,t,NIL);
-    }
-    else if (!strcmp (reply->key,"OK") || !strcmp (reply->key,"PREAUTH"))
-      imap_parse_response (stream,reply->text,NIL,T);
-    else if (!strcmp (reply->key,"NO"))
-      imap_parse_response (stream,reply->text,WARN,T);
-    else if (!strcmp (reply->key,"BAD"))
-      imap_parse_response (stream,reply->text,ERROR,T);
-    else if (!strcmp (reply->key,"BYE")) {
-      LOCAL->byeseen = T;	/* note that a BYE seen */
-      imap_parse_response (stream,reply->text,BYE,T);
-    }
-
-    else if (!strcmp (reply->key,"CAPABILITY")) {
-				/* only do something if have text */
-      if (reply->text && (t = (char *) strtok (ucase (reply->text)," "))) do {
-	if (!strcmp (t,"IMAP4")) LOCAL->imap4 = T;
-	else if (!strcmp (t,"IMAP4REV1")) LOCAL->imap4rev1 = T;
-	else if (!strcmp (t,"NAMESPACE")) LOCAL->use_namespace = T;
-	else if (!strcmp (t,"SCAN")) LOCAL->use_scan = T;
-	else if (!strncmp (t,"SORT",4)) LOCAL->use_sort = T;
-	else if (!strncmp (t,"THREAD",6) && ((t[6] == '=') || !t[6])) {
-	  if (t[6]) {
-	    THREADER *thread = (THREADER *) fs_get (sizeof (THREADER));
-	    thread->name = cpystr (t+7);
-	    thread->dispatch = NIL;
-	    thread->next = LOCAL->threader;
-	    LOCAL->threader = thread;
-	  }
-	}
-	else if (!strncmp (t,"AUTH",4) && ((t[4] == '=') || (t[4] == '-'))) {
-	  if (!stream->secure || strcmp (t+5,"LOGIN")) {
-	    if ((i = mail_lookup_auth_name (t+5)) && (--i < MAXAUTHENTICATORS))
-	      LOCAL->use_auth |= (1 << i);
-	    else if (!strcmp (t+5,"ANONYMOUS")) LOCAL->use_authanon = T;
-	  }
-	}
-				/* unsupported IMAP4 extension */
-	else if (!strcmp (t,"STATUS")) LOCAL->use_status = T;
-				/* ignore other capabilities */
-      }
-      while (t = (char *) strtok (NIL," "));
-    }
-    else {
+  if (isdigit (*reply->key)) {	/* see if key is a number */
+    msgno = strtoul (reply->key,&s,10);
+    if (*s) {			/* better be nothing after number */
       sprintf (LOCAL->tmp,"Unexpected untagged message: %.80s",reply->key);
       mm_log (LOCAL->tmp,WARN);
+      return;
     }
-  }
-  else {			/* if numeric, a keyword follows */
-				/* deposit null at end of keyword */
+    if (!reply->text) {		/* better be some data */
+      mm_log ("Missing message data",WARN);
+      return;
+    }
+				/* get keyword */
     s = ucase ((char *) strtok (reply->text," "));
 				/* and locate the text after it */
     t = (char *) strtok (NIL,"\n");
@@ -2457,7 +2283,7 @@ void imap_parse_unsolicited (MAILSTREAM *stream,IMAPPARSEDREPLY *reply)
 				/* change in size of mailbox */
     if (!strcmp (s,"EXISTS")) mail_exists (stream,msgno);
     else if (!strcmp (s,"RECENT")) mail_recent (stream,msgno);
-    else if (!strcmp (s,"EXPUNGE")) {
+    else if (!strcmp (s,"EXPUNGE") && msgno && (msgno <= stream->nmsgs)) {
       mailcache_t mc = (mailcache_t) mail_parameters (NIL,GET_CACHE,NIL);
       MESSAGECACHE *elt = (MESSAGECACHE *) (*mc) (stream,msgno,CH_ELT);
       if (elt) imap_gc_body (elt->private.msg.body);
@@ -2465,7 +2291,8 @@ void imap_parse_unsolicited (MAILSTREAM *stream,IMAPPARSEDREPLY *reply)
       mail_expunged (stream,msgno);
     }
 
-    else if (!strcmp (s,"FETCH") || !strcmp (s,"STORE")) {
+    else if ((!strcmp (s,"FETCH") || !strcmp (s,"STORE")) &&
+	     msgno && (msgno <= stream->nmsgs)) {
       char *prop;
       GETS_DATA md;
       ENVELOPE **e;
@@ -2621,6 +2448,220 @@ void imap_parse_unsolicited (MAILSTREAM *stream,IMAPPARSEDREPLY *reply)
       mm_log (LOCAL->tmp,WARN);
     }
   }
+
+  else if (!strcmp (reply->key,"FLAGS")) {
+				/* flush old user flags if any */
+    while ((i < NUSERFLAGS) && stream->user_flags[i])
+      fs_give ((void **) &stream->user_flags[i++]);
+    i = 0;			/* add flags */
+    if (reply->text && (s = (char *) strtok (reply->text+1," )"))) do
+      if (*s != '\\') stream->user_flags[i++] = cpystr (s);
+    while (s = (char *) strtok (NIL," )"));
+  }
+  else if (!strcmp (reply->key,"SEARCH")) {
+				/* only do something if have text */
+    if (reply->text && (t = (char *) strtok (reply->text," "))) do {
+				/* UIDs always passed to main program */
+      if (LOCAL->uidsearch) mm_searched (stream,atol (t));
+				/* should be a msgno then */
+      else if ((i = atol (t)) <= stream->nmsgs) {
+	mail_elt (stream,i)->searched = T;
+	if (!stream->silent) mm_searched (stream,i);
+      }
+    } while (t = (char *) strtok (NIL," "));
+  }
+  else if (!strcmp (reply->key,"NAMESPACE")) {
+    if (LOCAL->namespace) {
+      mail_free_namespace (&LOCAL->namespace[0]);
+      mail_free_namespace (&LOCAL->namespace[1]);
+      mail_free_namespace (&LOCAL->namespace[2]);
+    }
+    else LOCAL->namespace = (NAMESPACE **) fs_get (3 * sizeof (NAMESPACE *));
+    if (s = reply->text) {	/* parse namespace results */
+      LOCAL->namespace[0] = imap_parse_namespace (stream,&s,reply);
+      LOCAL->namespace[1] = imap_parse_namespace (stream,&s,reply);
+      LOCAL->namespace[2] = imap_parse_namespace (stream,&s,reply);
+      if (s && *s) {
+	sprintf (LOCAL->tmp,"Junk after namespace list: %.80s",s);
+	mm_log (LOCAL->tmp,WARN);
+      }
+    }
+    else mm_log ("Missing namespace list",WARN);
+  }
+  else if (!strcmp (reply->key,"SORT")) {
+    LOCAL->sortsize = 0;	/* initialize sort data */
+    if (LOCAL->sortdata) fs_give ((void **) &LOCAL->sortdata);
+    LOCAL->sortdata = (unsigned long *)
+      fs_get ((stream->nmsgs + 1) * sizeof (unsigned long));
+				/* only do something if have text */
+    if (reply->text && (t = (char *) strtok (reply->text," "))) do
+      LOCAL->sortdata[LOCAL->sortsize++] = atol (t);
+    while ((t = (char *) strtok (NIL," ")) && (LOCAL->sortsize<stream->nmsgs));
+    LOCAL->sortdata[LOCAL->sortsize] = 0;
+  }
+  else if (!strcmp (reply->key,"THREAD")) {
+    if (LOCAL->threaddata) mail_free_threadnode (&LOCAL->threaddata);
+    if (s = reply->text) {
+      LOCAL->threaddata = imap_parse_thread (&s);
+      if (s && *s) {
+	sprintf (LOCAL->tmp,"Junk at end of thread: %.80s",s);
+	mm_log (LOCAL->tmp,WARN);
+      }
+    }
+  }
+
+  else if (!strcmp (reply->key,"STATUS")) {
+    MAILSTATUS status;
+    char *txt;
+    if (!reply->text) {
+      mm_log ("Missing STATUS data",WARN);
+      return;
+    }
+    switch (*reply->text) {	/* mailbox is an astring */
+    case '"':			/* quoted string? */
+    case '{':			/* literal? */
+      txt = reply->text;	/* status data is in reply */
+      t = imap_parse_string (stream,&txt,reply,NIL,NIL);
+				/* must be followed by space */
+      if (!(txt && (*txt++ == ' '))) txt = NIL;
+      break;
+    default:			/* must be atom */
+      t = cpystr (reply->text);
+      if (txt = strchr (t,' ')) *txt++ = '\0';
+      break;
+    }
+    if (t && txt && (*txt++ == '(') && (s = strchr (txt,')')) && (s - txt) &&
+	!s[1]) {
+      *s = '\0';		/* tie off status data */
+				/* initialize data block */
+      status.flags = status.messages = status.recent = status.unseen =
+	status.uidnext = status.uidvalidity = 0;
+      ucase (txt);		/* do case-independent match */
+      while (*txt && (s = strchr (txt,' '))) {
+	*s++ = '\0';		/* tie off status attribute name */
+	i = strtoul (s,&s,10);/* get attribute value */
+	if (!strcmp (txt,"MESSAGES")) {
+	  status.flags |= SA_MESSAGES;
+	  status.messages = i;
+	}
+	else if (!strcmp (txt,"RECENT")) {
+	  status.flags |= SA_RECENT;
+	  status.recent = i;
+	}
+	else if (!strcmp (txt,"UNSEEN")) {
+	  status.flags |= SA_UNSEEN;
+	  status.unseen = i;
+	}
+	else if (!strcmp (txt,"UIDNEXT") || !strcmp (txt,"UID-NEXT")) {
+	  status.flags |= SA_UIDNEXT;
+	  status.uidnext = i;
+	}
+	else if (!strcmp (txt,"UIDVALIDITY")|| !strcmp (txt,"UID-VALIDITY")){
+	  status.flags |= SA_UIDVALIDITY;
+	  status.uidvalidity = i;
+	}
+				/* next attribute */
+	txt = (*s == ' ') ? s + 1 : s;
+      }
+      strcpy (strchr (strcpy (LOCAL->tmp,stream->mailbox),'}') + 1,t);
+				/* pass status to main program */
+      mm_status (stream,LOCAL->tmp,&status);
+    }
+    fs_give ((void **) &t);
+  }
+
+  else if ((!strcmp (reply->key,"LIST") || !strcmp (reply->key,"LSUB")) &&
+	   (*reply->text == '(') && (s = strchr (reply->text,')')) &&
+	   (s[1] == ' ')) {
+    char delimiter = '\0';
+    if (!reply->text) {
+      mm_log ("Missing LIST/LSUB data",WARN);
+      return;
+    }
+    *s++ = '\0';		/* tie off attribute list */
+				/* parse attribute list */
+    if (t = (char *) strtok (reply->text+1," ")) do {
+      if (!strcmp (ucase (t),"\\NOINFERIORS")) i |= LATT_NOINFERIORS;
+      else if (!strcmp (t,"\\NOSELECT")) i |= LATT_NOSELECT;
+      else if (!strcmp (t,"\\MARKED")) i |= LATT_MARKED;
+      else if (!strcmp (t,"\\UNMARKED")) i |= LATT_UNMARKED;
+				/* ignore extension flags */
+    }
+    while (t = (char *) strtok (NIL," "));
+    switch (*++s) {		/* process delimiter */
+    case 'N':			/* NIL */
+    case 'n':
+      s += 4;			/* skip over NIL<space> */
+      break;
+    case '"':			/* have a delimiter */
+      delimiter = (*++s == '\\') ? *++s : *s;
+      s += 3;			/* skip over <delimiter><quote><space> */
+    }
+				/* need to prepend a prefix? */
+    if (LOCAL->prefix) strcpy (LOCAL->tmp,LOCAL->prefix);
+    else LOCAL->tmp[0] = '\0';	/* no prefix needed */
+				/* need to do string parse? */
+    if ((*s == '"') || (*s == '{')) {
+      strcat (LOCAL->tmp,t = imap_parse_string (stream,&s,reply,NIL,NIL));
+      fs_give ((void **) &t);
+    }
+    else strcat(LOCAL->tmp,s);/* atom is easy */
+    if (reply->key[1] == 'S') mm_lsub (stream,delimiter,LOCAL->tmp,i);
+    else mm_list (stream,delimiter,LOCAL->tmp,i);
+  }
+  else if (!strcmp (reply->key,"MAILBOX")) {
+    if (!reply->text) {
+      mm_log ("Missing MAILBOX data",WARN);
+      return;
+    }
+    if (LOCAL->prefix)
+      sprintf (t = LOCAL->tmp,"%s%s",LOCAL->prefix,reply->text);
+    else t = reply->text;
+    mm_list (stream,NIL,t,NIL);
+  }
+  else if (!strcmp (reply->key,"OK") || !strcmp (reply->key,"PREAUTH"))
+    imap_parse_response (stream,reply->text,NIL,T);
+  else if (!strcmp (reply->key,"NO"))
+    imap_parse_response (stream,reply->text,WARN,T);
+  else if (!strcmp (reply->key,"BAD"))
+    imap_parse_response (stream,reply->text,ERROR,T);
+  else if (!strcmp (reply->key,"BYE")) {
+    LOCAL->byeseen = T;	/* note that a BYE seen */
+    imap_parse_response (stream,reply->text,BYE,T);
+  }
+
+  else if (!strcmp (reply->key,"CAPABILITY")) {
+				/* only do something if have text */
+    if (reply->text && (t = (char *) strtok (ucase (reply->text)," "))) do {
+      if (!strcmp (t,"IMAP4")) LOCAL->imap4 = T;
+      else if (!strcmp (t,"IMAP4REV1")) LOCAL->imap4rev1 = T;
+      else if (!strcmp (t,"NAMESPACE")) LOCAL->use_namespace = T;
+      else if (!strcmp (t,"SCAN")) LOCAL->use_scan = T;
+      else if (!strncmp (t,"SORT",4)) LOCAL->use_sort = T;
+      else if (!strncmp (t,"THREAD=",7)) {
+	THREADER *thread = (THREADER *) fs_get (sizeof (THREADER));
+	thread->name = cpystr (t+7);
+	thread->dispatch = NIL;
+	thread->next = LOCAL->threader;
+	LOCAL->threader = thread;
+      }
+      else if (!strncmp (t,"AUTH",4) && ((t[4] == '=') || (t[4] == '-'))) {
+	if (!stream->secure || strcmp (t+5,"LOGIN")) {
+	  if ((i = mail_lookup_auth_name (t+5)) && (--i < MAXAUTHENTICATORS))
+	    LOCAL->use_auth |= (1 << i);
+	  else if (!strcmp (t+5,"ANONYMOUS")) LOCAL->use_authanon = T;
+	}
+      }
+				/* unsupported IMAP4 extension */
+      else if (!strcmp (t,"STATUS")) LOCAL->use_status = T;
+				/* ignore other capabilities */
+    }
+    while (t = (char *) strtok (NIL," "));
+  }
+  else {
+    sprintf (LOCAL->tmp,"Unexpected untagged message: %.80s",reply->key);
+    mm_log (LOCAL->tmp,WARN);
+  }
 }
 
 /* Parse human-readable response text
@@ -2634,7 +2675,7 @@ void imap_parse_response (MAILSTREAM *stream,char *text,long errflg,long ntfy)
 {
   char *s,*t;
   size_t i;
-  if ((*text == '[') && (t = strchr (s = text + 1,']')) &&
+  if (text && (*text == '[') && (t = strchr (s = text + 1,']')) &&
       ((i = t - s) < IMAPTMPLEN)) {
     LOCAL->tmp[i] = '\0';	/* make mungable copy of text code */
     if (s = strchr (strncpy (LOCAL->tmp,s,i),' ')) *s++ = '\0';
@@ -2676,7 +2717,7 @@ void imap_parse_response (MAILSTREAM *stream,char *text,long errflg,long ntfy)
     }
   }
 				/* give event to main program */
-  if (ntfy && !stream->silent) mm_notify (stream,text,errflg);
+  if (ntfy && !stream->silent) mm_notify (stream,text ? text : "",errflg);
 }
 
 /* Parse a namespace
@@ -2822,6 +2863,7 @@ void imap_parse_header (MAILSTREAM *stream,ENVELOPE **env,SIZEDTEXT *hdr)
   if (*env) {			/* need to merge this header into envelope? */
     if (!(*env)->newsgroups) {	/* need Newsgroups? */
       (*env)->newsgroups = nenv->newsgroups;
+      (*env)->ngbogus = nenv->ngbogus;
       nenv->newsgroups = NIL;
     }
     if (!(*env)->followup_to) {	/* need Followup-To? */
@@ -2869,6 +2911,7 @@ void imap_parse_envelope (MAILSTREAM *stream,ENVELOPE **env,char **txtptr,
     if (oenv) {			/* need to merge old envelope? */
       (*env)->newsgroups = oenv->newsgroups;
       oenv->newsgroups = NIL;
+      (*env)->ngbogus = oenv->ngbogus;
       (*env)->followup_to = oenv->followup_to;
       oenv->followup_to = NIL;
       (*env)->references = oenv->references;
@@ -3031,11 +3074,10 @@ void imap_parse_flags (MAILSTREAM *stream,MESSAGECACHE *elt,char **txtptr)
     else elt->user_flags |= imap_parse_user_flag (stream,flag);
   }
   ++*txtptr;			/* bump past delimiter */
-  if ((old.valid != elt->valid) || (old.seen != elt->seen) ||
+  if (!old.valid || (old.seen != elt->seen) ||
       (old.deleted != elt->deleted) || (old.flagged != elt->flagged) ||
       (old.answered != elt->answered) || (old.draft != elt->draft) ||
-      (old.user_flags != elt->user_flags))
-  mm_flags (stream,elt->msgno);	/* make sure top level knows */
+      (old.user_flags != elt->user_flags)) mm_flags (stream,elt->msgno);
 }
 
 
@@ -3310,7 +3352,8 @@ void imap_parse_body_structure (MAILSTREAM *stream,BODY *body,char **txtptr,
       body->type = TYPEOTHER;	/* assume unknown type */
       body->encoding = ENCOTHER;/* and unknown encoding */
 				/* parse type */
-      if (s = ucase (imap_parse_string (stream,txtptr,reply,NIL,NIL))) {
+      if (s = imap_parse_string (stream,txtptr,reply,NIL,NIL)) {
+	ucase (s);
 	for (i=0;(i<=TYPEMAX) && body_types[i] && strcmp(s,body_types[i]);i++);
 	if (i <= TYPEMAX) {	/* only if found a slot */
 	  body->type = i;	/* set body type */
@@ -3328,8 +3371,8 @@ void imap_parse_body_structure (MAILSTREAM *stream,BODY *body,char **txtptr,
       body->parameter = imap_parse_body_parameter (stream,txtptr,reply);
       body->id = imap_parse_string (stream,txtptr,reply,NIL,NIL);
       body->description = imap_parse_string (stream,txtptr,reply,NIL,NIL);
-      if (s = ucase (imap_parse_string (stream,txtptr,reply,NIL,NIL))) {
-				/* search for body encoding */
+      if (s = imap_parse_string (stream,txtptr,reply,NIL,NIL)) {
+	ucase (s);		/* search for body encoding */
 	for (i = 0; (i <= ENCMAX) && body_encodings[i] &&
 	     strcmp (s,body_encodings[i]); i++);
 	if (i > ENCMAX) body->type = ENCOTHER;

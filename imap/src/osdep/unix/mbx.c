@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	3 October 1995
- * Last Edited:	27 April 1998
+ * Last Edited:	1 July 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -336,7 +336,8 @@ long mbx_status (MAILSTREAM *stream,char *mbx,long flags)
       if (!mail_elt (stream,i)->seen) status.unseen++;
   status.uidnext = stream->uid_last + 1;
   status.uidvalidity = stream->uid_validity;
-  if (!status.recent &&		/* calculate post-snarf results */
+				/* calculate post-snarf results */
+  if (!status.recent && LOCAL->inbox &&
       (systream = mail_open (NIL,sysinbox (),OP_READONLY|OP_SILENT))) {
     status.messages += systream->nmsgs;
     status.recent += systream->recent;
@@ -388,8 +389,7 @@ MAILSTREAM *mbx_open (MAILSTREAM *stream)
     }
   }
 
-  stream->local = (MBXLOCAL *) memset (fs_get (sizeof (MBXLOCAL)),NIL,
-				       sizeof (MBXLOCAL));
+  stream->local = memset (fs_get (sizeof (MBXLOCAL)),NIL,sizeof (MBXLOCAL));
   LOCAL->buf = (char *) fs_get (MAXMESSAGESIZE + 1);
   LOCAL->buflen = MAXMESSAGESIZE;
 				/* note if an INBOX or not */
@@ -406,7 +406,7 @@ MAILSTREAM *mbx_open (MAILSTREAM *stream)
   LOCAL->filesize = HDRSIZE;	/* initialize parsed file size */
 				/* time not set up yet */
   LOCAL->lastsnarf = LOCAL->filetime = 0;
-  LOCAL->fullcheck = LOCAL->flagcheck = LOCAL->newkeyword = NIL;
+  LOCAL->fullcheck = LOCAL->flagcheck = NIL;
   stream->sequence++;		/* bump sequence number */
 				/* parse mailbox */
   stream->nmsgs = stream->recent = 0;
@@ -546,8 +546,8 @@ void mbx_flag (MAILSTREAM *stream,char *sequence,char *flag,long flags)
     fstat (LOCAL->fd,&sbuf);	/* get current write time */
     LOCAL->filetime = sbuf.st_mtime;
   }
-  if (LOCAL->ffuserflag < NUSERFLAGS && stream->user_flags[LOCAL->ffuserflag])
-    LOCAL->newkeyword = T;	/* note if any new keywords appeared */
+  if ((LOCAL->ffuserflag < NUSERFLAGS)&&stream->user_flags[LOCAL->ffuserflag])
+    mbx_update_header (stream);	/* update header */
 }
 
 
@@ -605,6 +605,11 @@ long mbx_ping (MAILSTREAM *stream)
 	r = mbx_parse (stream);	/* parse snarfed messages */
       }
       unlockfd (ld,lock);	/* release shared parse/append permission */
+    }
+    else if ((sbuf.st_ctime > sbuf.st_atime)||(sbuf.st_ctime > sbuf.st_mtime)){
+      time_t tp[2];		/* whack the times if necessary */
+      LOCAL->filetime = tp[0] = tp[1] = time (0);
+      utime (stream->mailbox,tp);
     }
   }
   return r;			/* return result of the parse */
@@ -699,7 +704,7 @@ void mbx_expunge (MAILSTREAM *stream)
   off_t pos,ppos;
   int ld;
   unsigned long i,j,k,m,n,delta,reclaimed;
-  unsigned long recent = stream->recent;
+  unsigned long recent = 0;
   char lock[MAILTMPLEN];
   MESSAGECACHE *elt;
 				/* do nothing if stream dead */
@@ -731,13 +736,18 @@ void mbx_expunge (MAILSTREAM *stream)
     flock (LOCAL->fd,LOCK_SH);	/* recover previous lock */
     unlockfd (ld,lock);		/* release exclusive parse/append permission */
     for (i = 1,n = reclaimed = 0; i <= stream->nmsgs; ) {
-      if ((elt = mbx_elt (stream,i,NIL))->deleted) {
-	mbx_update_status (stream,elt->msgno,mus_EXPUNGE);
-	if (elt->recent) --recent;
-	mail_expunged(stream,i);/* notify upper levels */
-	n++;			/* count up one more expunged message */
+      if (elt = mbx_elt (stream,i,T)) {
+	if (elt->deleted) {
+	  mbx_update_status (stream,elt->msgno,mus_EXPUNGE);
+	  mail_expunged(stream,i);/* notify upper levels */
+	  n++;			/* count up one more expunged message */
+	}
+	else {
+	  i++;			/* preserved message */
+	  if (elt->recent) ++recent;
+	}
       }
-      else i++;			/* preserved message */
+      else n++;			/* count up one more expunged message */
     }
     fsync (LOCAL->fd);		/* force disk update */
   }
@@ -756,13 +766,12 @@ void mbx_expunge (MAILSTREAM *stream)
 				/* number of bytes to smash or preserve */
       ppos += (k = elt->private.special.text.size + elt->rfc822_size);
       if (elt->deleted) {	/* if deleted */
-				/* if recent, note one less recent message */
-	if (elt->recent) --recent;
 	delta += k;		/* number of bytes to delete */
 	mail_expunged(stream,i);/* notify upper levels */
 	n++;			/* count up one more expunged message */
       }
       else if (i++ && delta) {	/* preserved message */
+	if (elt->recent) ++recent;
 				/* first byte to preserve */
 	j = elt->private.special.offset;
 	do {			/* read from source position */
@@ -1061,10 +1070,11 @@ long mbx_parse (MAILSTREAM *stream)
 				/* parse last UID */
   stream->uid_last = strtoul (LOCAL->buf + 15,NIL,16);
 				/* parse user flags */
-  for (i = 0, s = LOCAL->buf + 25; i < NUSERFLAGS && (t = strchr (s,'\015'));
+  for (i = 0, s = LOCAL->buf + 25;
+       (i < NUSERFLAGS) && (t = strchr (s,'\015')) && (t - s);
        i++, s = t + 2) {
     *t = '\0';			/* tie off flag */
-    if (*s && !stream->user_flags[i]) stream->user_flags[i] = cpystr (s);
+    if (!stream->user_flags[i]) stream->user_flags[i] = cpystr (s);
   }
   LOCAL->ffuserflag = (int) i;	/* first free user flag */
 
@@ -1152,8 +1162,8 @@ long mbx_parse (MAILSTREAM *stream)
       lastuid = m ? m : ++stream->uid_last;
     else {			/* not expunged, swell the cache */
       mail_exists (stream,++nmsgs);
-				/* intantiate an elt for this message */
-      elt = mail_elt (stream,nmsgs);
+				/* instantiate an elt for this message */
+      (elt = mail_elt (stream,nmsgs))->valid = T;
 				/* parse the date */
       if (!mail_parse_date (elt,LOCAL->buf)) {
 	sprintf (tmp,"Unable to parse message date at %lu: %.80s",
@@ -1180,7 +1190,7 @@ long mbx_parse (MAILSTREAM *stream)
 				/* UID already assigned? */
       if (!(elt->private.uid = m)) {
 	elt->recent = T;	/* no, mark as recent */
-	recent++;		/* count up a new recent message */
+	++recent;		/* count up a new recent message */
 				/* assign new UID */
 	elt->private.uid = ++stream->uid_last;
 	mbx_update_status (stream,elt->msgno,NIL);
@@ -1227,8 +1237,6 @@ MESSAGECACHE *mbx_elt (MAILSTREAM *stream,unsigned long msgno,long expok)
   old.user_flags = elt->user_flags;
 				/* get new flags */
   if (mbx_read_flags (stream,elt) && expok) {
-				/* message expunged, notify top level */
-    if (elt->recent) --stream->recent;	
     mail_expunged (stream,elt->msgno);
     return NIL;			/* return this message was expunged */
   }
@@ -1285,15 +1293,22 @@ void mbx_update_header (MAILSTREAM *stream)
   memset (s,'\0',HDRSIZE);	/* initialize header */
   sprintf (s,"*mbx*\015\012%08lx%08lx\015\012",
 	   stream->uid_validity,stream->uid_last);
-  for (i = 0; i < NUSERFLAGS; ++i)
-    sprintf (s += strlen (s),"%s\015\012",
-	     stream->user_flags[i] ? stream->user_flags[i] : "");
-  lseek (LOCAL->fd,0,L_SET);	/* rewind file */
+  for (i = 0; (i < NUSERFLAGS) && stream->user_flags[i]; ++i)
+    sprintf (s += strlen (s),"%s\015\012",stream->user_flags[i]);
+  LOCAL->ffuserflag = i;	/* first free user flag */
+				/* can we create more user flags? */
+  stream->kwd_create = (i < NUSERFLAGS) ? T : NIL;
+				/* write reserved lines */
+  while (i++ < NUSERFLAGS) strcat (s,"\015\012");
+  while (T) {
+    lseek (LOCAL->fd,0,L_SET);	/* rewind file */
 				/* write new header */
-  write (LOCAL->fd,LOCAL->buf,HDRSIZE);
+    if (write (LOCAL->fd,LOCAL->buf,HDRSIZE) > 0) break;
+    mm_notify (stream,strerror (errno),WARN);
+    mm_diskerror (stream,errno,T);
+  }
 }
-
-
+
 /* MBX update status string
  * Accepts: MAIL stream
  *	    message number
@@ -1304,17 +1319,28 @@ void mbx_update_status (MAILSTREAM *stream,unsigned long msgno,long flags)
 {
   MESSAGECACHE *elt = mail_elt (stream,msgno);
   struct stat sbuf;
-  int delflags = fDELETED + (flags & mus_EXPUNGE ? fEXPUNGED : NIL);
+  int expflag;
 				/* readonly */
-  if (stream->rdonly) mbx_read_flags (stream,elt);
+  if (stream->rdonly || !elt->valid) mbx_read_flags (stream,elt);
   else {			/* readwrite */
-    if (LOCAL->newkeyword) {	/* defined a new keyword? */
-      mbx_update_header (stream);
-      LOCAL->newkeyword = NIL;	/* don't do this again */
+				/* want to expunge message? */
+    if (elt->deleted && (flags & mus_EXPUNGE)) expflag = fEXPUNGED;
+    else {			/* seek to system flags */
+      lseek (LOCAL->fd,(off_t) elt->private.special.offset +
+	     elt->private.special.text.size - 15,L_SET);
+				/* read the current system flags */
+      if (read (LOCAL->fd,LOCAL->buf,4) < 0) {
+	sprintf (LOCAL->buf,"Unable to read system flags: %s",
+		 strerror (errno));
+	fatal (LOCAL->buf);
+      }
+      LOCAL->buf[4] = '\0';	/* tie off buffer */
+				/* note current set of expunged flag */
+      expflag = (strtoul (LOCAL->buf,NIL,16)) & fEXPUNGED;
     }
 				/* print new flag string */
     sprintf (LOCAL->buf,"%08lx%04x-%08lx",elt->user_flags,
-	     (fSEEN * elt->seen) + (delflags * elt->deleted) +
+	     expflag + (fSEEN * elt->seen) + (fDELETED * elt->deleted) +
 	     (fFLAGGED * elt->flagged) + (fANSWERED * elt->answered) +
 	     (fDRAFT * elt->draft),elt->private.uid);
     while (T) {			/* get to that place in the file */

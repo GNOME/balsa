@@ -101,7 +101,6 @@ typedef	struct fd_set {
 #include "fsync.c"
 #undef setpgrp
 #include "setpgrp.c"
-#include "utime.c"
 
 /* Emulator for BSD syslog() routine
  * Accepts: priority

@@ -10,9 +10,9 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	23 February 1992
- * Last Edited:	29 December 1997
+ * Last Edited:	3 June 1998
  *
- * Copyright 1997 by the University of Washington
+ * Copyright 1998 by the University of Washington
  *
  *  Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -244,7 +244,7 @@ void mh_list (MAILSTREAM *stream,char *ref,char *pat)
       mh_list_work (stream,s,test,0);
     }
 				/* always an INBOX */
-    if (pmatch ("#MHINBOX",test))
+    if (pmatch ("#MHINBOX",ucase (test)))
       mm_list (stream,NIL,"#MHINBOX",LATT_NOINFERIORS);
   }
 }

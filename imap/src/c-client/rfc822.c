@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	27 July 1988
- * Last Edited:	16 April 1998
+ * Last Edited:	24 June 1998
  *
  * Sponsorship:	The original version of this work was developed in the
  *		Symbolic Systems Resources Group of the Knowledge Systems
@@ -151,56 +151,19 @@ void rfc822_header (char *header,ENVELOPE *env,BODY *body)
 
 void rfc822_address_line (char **header,char *type,ENVELOPE *env,ADDRESS *adr)
 {
-  char *t,tmp[MAILTMPLEN];
-  long i,len,n = 0;
   char *s = (*header += strlen (*header));
   if (adr) {			/* do nothing if no addresses */
     if (env && env->remail) strcat (s,"ReSent-");
     strcat (s,type);		/* write header name */
     strcat (s,": ");
-    s += (len = strlen (s));	/* initial string length */
-    do {			/* run down address list */
-      *(t = tmp) = '\0';	/* initially empty string */
-				/* start of group? */
-      if (adr->mailbox && !adr->host) {
-				/* yes, write group name */
-	rfc822_cat (t,adr->mailbox,rspecials);
-	strcat (t,": ");	/* write group identifier */
-	n++;			/* in a group, suppress expansion */
-      }
-      else {			/* not start of group */
-	if (!adr->host && n) {	/* end of group? */
-	  strcat (t,";");	/* write close delimiter */
-	  n--;			/* no longer in a group */
-	}
-	else if (!n) {		/* only print if not inside a group */
-				/* simple case? */
-	  if (!(adr->personal || adr->adl)) rfc822_address (t,adr);
-	  else {		/* no, must use phrase <route-addr> form */
-	    if (adr->personal) rfc822_cat (t,adr->personal,rspecials);
-	    strcat (t," <");	/* write address delimiter */
-				/* write address */
-	    rfc822_address (t,adr);
-	    strcat (t,">");	/* closing delimiter */
-	  }
-	}
-				/* write delimiter for next recipient */
-	if (!n && adr->next && adr->next->mailbox) strcat (t,", ");
-      }
-				/* if string would overflow */
-      if ((len += (i = strlen (t))) > 78) {
-	len = 4 + i;		/* continue it on a new line */
-	*s++ = '\015'; *s++ = '\012';
-	*s++ = ' '; *s++ = ' '; *s++ = ' '; *s++ = ' ';
-      }
-      while (*t) *s++ = *t++;	/* write this address */
-    } while (adr = adr->next);
+    s = rfc822_write_address_full (s + strlen (s),adr,*header);
 				/* tie off header line */
     *s++ = '\015'; *s++ = '\012'; *s = '\0';
     *header = s;		/* set return value */
   }
 }
-
+
+
 /* Write RFC822 text from header line
  * Accepts: pointer to destination string pointer
  *	    pointer to header type
@@ -213,40 +176,55 @@ void rfc822_header_line (char **header,char *type,ENVELOPE *env,char *text)
   if (text) sprintf ((*header += strlen (*header)),"%s%s: %s\015\012",
 		     env->remail ? "ReSent-" : "",type,text);
 }
-
-
-/* Write RFC822 address
+
+/* Write RFC822 address list
  * Accepts: pointer to destination string
  *	    address to interpret
+ *	    header base if pretty-printing
+ * Returns: end of destination string
  */
 
-void rfc822_write_address (char *dest,ADDRESS *adr)
+				/* RFC822 continuation, must start with CRLF */
+#define RFC822CONT "\015\012    "
+
+char *rfc822_write_address_full (char *dest,ADDRESS *adr,char *base)
 {
-  while (adr) {
-				/* start of group? */
-    if (adr->mailbox && !adr->host) {
+  long i,n;
+  for (n = 0; adr; adr = adr->next) {
+    if (adr->host) {		/* ordinary address? */
+      if (!(base && n)) {	/* only write if exact form or not in group */
+				/* simple case? */
+	if (!(adr->personal || adr->adl)) rfc822_address (dest,adr);
+	else {			/* no, must use phrase <route-addr> form */
+	  if (adr->personal) rfc822_cat (dest,adr->personal,rspecials);
+	  strcat (dest," <");	/* write address delimiter */
+	  rfc822_address (dest,adr);
+	  strcat (dest,">");	/* closing delimiter */
+	}
+	if (adr->next && adr->next->mailbox) strcat (dest,", ");
+      }
+    }
+    else if (adr->mailbox) {	/* start of group? */
 				/* yes, write group name */
       rfc822_cat (dest,adr->mailbox,rspecials);
       strcat (dest,": ");	/* write group identifier */
-      adr = adr->next;		/* move to next address block */
+      n++;			/* in a group */
     }
-    else {			/* end of group? */
-      if (!adr->host) strcat (dest,";");
-				/* simple case? */
-      else if (!(adr->personal || adr->adl)) rfc822_address (dest,adr);
-      else {			/* no, must use phrase <route-addr> form */
-	if (adr->personal) {	/* in case have adl but no personal name */
-	  rfc822_cat (dest,adr->personal,rspecials);
-	  strcat (dest," ");
-	}
-	strcat (dest,"<");	/* write address delimiter */
-	rfc822_address (dest,adr);/* write address */
-	strcat (dest,">");	/* closing delimiter */
-      }
-				/* delimit if there is one */
-      if ((adr = adr->next) && adr->mailbox) strcat (dest,", ");
+    else if (n) {		/* must be end of group (but be paranoid) */
+      strcat (dest,";");
+      n--;			/* no longer in that group */
     }
+    i = strlen (dest);		/* length of what we just wrote */
+				/* write continuation if doesn't fit */
+    if (base && (dest > (base + 4)) && ((dest + i) > (base + 78))) {
+      memmove (dest + sizeof (RFC822CONT) - 1,dest,i + 1);
+      memcpy (dest,RFC822CONT,sizeof (RFC822CONT) - 1);
+      base = dest + 2;		/* new base */
+      dest += i + sizeof (RFC822CONT) - 1;
+    }
+    else dest += i;		/* new end of string */
   }
+  return dest;			/* return end of string */
 }
 
 /* Write RFC822 route-address to string
@@ -496,6 +474,7 @@ void rfc822_parse_msg (ENVELOPE **en,BODY **bdy,char *s,unsigned long i,
       }
     }
   }
+
   /* We require a Path: header and/or a Message-ID belonging to a known
    * winning mail program, in order to believe Newsgroups:.  This is because
    * of the unfortunate existance of certain cretins who believe that it
@@ -504,18 +483,20 @@ void rfc822_parse_msg (ENVELOPE **en,BODY **bdy,char *s,unsigned long i,
    * The authors of other high-quality email/news software are encouraged to
    * use similar methods to indentify messages as coming from their software,
    * and having done so, to tell us so they too can be blessed in this list.
+   *
+   * May 1998 update: as was predicted back in March 1995 when this kludge was
+   * first added, mail/news unifying programs are now the norm.  However, the
+   * encouragement in the previous paragraph didn't take, and there's no good
+   * way to determine bogons accurately.  Consequently, we no longer remove the
+   * newsgroup information from the envelope on the bogon test; we just light
+   * a bogon bit and let the main program worry about what to do.
    */
   if (env->newsgroups && !PathP && env->message_id &&
       strncmp (env->message_id,"<Pine.",6) &&
       strncmp (env->message_id,"<MS-C.",6) &&
       strncmp (env->message_id,"<MailManager.",13) &&
       strncmp (env->message_id,"<EasyMail.",11) &&
-      strncmp (env->message_id,"<ML-",4)) {
-    sprintf (tmp,"Probable bogus newsgroup list \"%s\" in \"%s\" ignored",
-	     env->newsgroups,env->message_id);
-    mm_log (tmp,PARSE);
-    fs_give ((void **) &env->newsgroups);
-  }
+      strncmp (env->message_id,"<ML-",4)) env->ngbogus = T;
   fs_give ((void **) &tmp);	/* done with scratch buffer */
 				/* default Sender: and Reply-To: to From: */
   if (!env->sender) env->sender = rfc822_cpy_adr (env->from);
@@ -1184,7 +1165,7 @@ ADDRESS *rfc822_parse_addrspec (char *string,char **ret,char *defaulthost)
     if (*end == '[') {		/* domain literal? */
       string = end;		/* start of domain literal */
       if (end = rfc822_parse_word (string + 1,"]\\")) {
-	size_t len = end - string;
+	size_t len = ++end - string;
 	strncpy (adr->host = (char *) fs_get (len + 1),string,len);
 	adr->host[len] = '\0';	/* tie off literal */
       }

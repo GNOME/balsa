@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	9 May 1991
- * Last Edited:	11 March 1998
+ * Last Edited:	4 June 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -196,21 +196,25 @@ void dummy_list (MAILSTREAM *stream,char *ref,char *pat)
 void dummy_lsub (MAILSTREAM *stream,char *ref,char *pat)
 {
   void *sdb = NIL;
-  char *s,test[MAILTMPLEN],utest[MAILTMPLEN];
+  char *s,*t,test[MAILTMPLEN],tmp[MAILTMPLEN];
+  int showuppers = pat[strlen (pat) - 1] == '%';
 				/* get canonical form of name */
-  if (dummy_canonicalize (test,ref,pat) && (s = sm_read (&sdb))) {
-    ucase (strcpy (utest,test));/* uppercase version of pattern */
-    do {
+  if (dummy_canonicalize (test,ref,pat) && (s = sm_read (&sdb))) do
+    if (*s != '{') {
       if (((s[0] == 'I') || (s[0] == 'i')) &&
 	  ((s[1] == 'N') || (s[1] == 'n')) &&
 	  ((s[2] == 'B') || (s[2] == 'b')) &&
 	  ((s[3] == 'O') || (s[3] == 'o')) &&
 	  ((s[4] == 'X') || (s[4] == 'x')) && !s[5] &&
-	  pmatch ("INBOX",utest)) mm_lsub (stream,NIL,s,LATT_NOINFERIORS);
+	  pmatch ("INBOX",ucase (strcpy (tmp,test))))
+	mm_lsub (stream,NIL,s,LATT_NOINFERIORS);
       else if (pmatch_full (s,test,'/')) mm_lsub (stream,'/',s,NIL);
+      else while (showuppers && (t = strrchr (s,'/'))) {
+	*t = '\0';		/* tie off the name */
+	if (pmatch_full (s,test,'/')) mm_lsub (stream,'/',s,LATT_NOSELECT);
+      }
     }
-    while (s = sm_read (&sdb));	/* until no more subscriptions */
-  }
+  while (s = sm_read (&sdb));	/* until no more subscriptions */
 }
 
 /* Dummy list mailboxes worker routine
@@ -273,9 +277,9 @@ void dummy_list_work (MAILSTREAM *stream,char *dir,char *pat,char *contents,
 		  ((tmp[3] == 'O') || (tmp[3] == 'o')) &&
 		  ((tmp[4] == 'X') || (tmp[4] == 'x')) && !tmp[5]))
 	      dummy_listed (stream,'/',tmp,LATT_NOINFERIORS +
-			    ((sbuf.st_atime < sbuf.st_ctime) ? LATT_MARKED :
-			     ((sbuf.st_atime > sbuf.st_ctime) ? LATT_UNMARKED :
-			      0)),contents);
+			    ((sbuf.st_size && (sbuf.st_atime<=sbuf.st_ctime)) ?
+			     ((sbuf.st_atime<sbuf.st_ctime) ? LATT_MARKED : 0)
+			     : LATT_UNMARKED),contents);
 	    break;
 	  }
 	}
@@ -563,26 +567,24 @@ long dummy_append (MAILSTREAM *stream,char *mailbox,char *flags,char *date,
   int fd = -1;
   int e;
   char tmp[MAILTMPLEN];
+  MAILSTREAM *ts = default_proto (T);
   if ((strcmp (ucase (strcpy (tmp,mailbox)),"INBOX")) &&
 	   ((fd = open (dummy_file (tmp,mailbox),O_RDONLY,NIL)) < 0)) {
-    if ((e = errno) == ENOENT) {/* failed, was it no such file? */
+    if ((e = errno) == ENOENT)	/* failed, was it no such file? */
       mm_notify (stream,"[TRYCREATE] Must create mailbox before append",NIL);
-      return NIL;
-    }
     sprintf (tmp,"%s: %s",strerror (e),mailbox);
     mm_log (tmp,ERROR);		/* pass up error */
     return NIL;			/* always fails */
   }
-  else if (fd >= 0) {		/* found file? */
+  if (fd >= 0) {		/* found file? */
     fstat (fd,&sbuf);		/* get its size */
     close (fd);			/* toss out the fd */
-    if (sbuf.st_size) {		/* non-empty file? */
-      sprintf (tmp,"Indeterminate mailbox format: %s",mailbox);
-      mm_log (tmp,ERROR);
-      return NIL;
-    }
+    if (sbuf.st_size) ts = NIL;	/* non-empty file? */
   }
-  return (*default_proto (T)->dtb->append) (stream,mailbox,flags,date,message);
+  if (ts) return (*ts->dtb->append) (stream,mailbox,flags,date,message);
+  sprintf (tmp,"Indeterminate mailbox format: %s",mailbox);
+  mm_log (tmp,ERROR);
+  return NIL;
 }
 
 /* Dummy mail generate file string

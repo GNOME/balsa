@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	1 August 1988
- * Last Edited:	12 February 1998
+ * Last Edited:	1 July 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -35,7 +35,7 @@
 
 #undef write			/* don't use redefined write() */
  
-static tcptimeout_t ttmo = NIL;	/* TCP timeout handler routine */
+static tcptimeout_t tmoh = NIL;	/* TCP timeout handler routine */
 static long ttmo_open = 0;	/* TCP timeouts, in seconds */
 static long ttmo_read = 0;
 static long ttmo_write = 0;
@@ -61,10 +61,10 @@ void *tcp_parameters (long function,void *value)
 {
   switch ((int) function) {
   case SET_TIMEOUT:
-    ttmo = (tcptimeout_t) value;
+    tmoh = (tcptimeout_t) value;
     break;
   case GET_TIMEOUT:
-    value = (void *) ttmo;
+    value = (void *) tmoh;
     break;
   case SET_OPENTIMEOUT:
     ttmo_open = (long) value;
@@ -446,10 +446,10 @@ long tcp_getdata (TCPSTREAM *stream)
   int i;
   fd_set fds,efds;
   struct timeval tmo;
-  time_t t;
+  time_t t = time (0);
   if (stream->tcpsi < 0) return NIL;
   while (stream->ictr < 1) {	/* if nothing in the buffer */
-    t = time (0);		/* start of request */
+    time_t tl = time (0);	/* start of request */
     tmo.tv_sec = ttmo_read;	/* read timeout */
     tmo.tv_usec = 0;
     FD_ZERO (&fds);		/* initialize selection vector */
@@ -460,10 +460,11 @@ long tcp_getdata (TCPSTREAM *stream)
     while (((i = select (stream->tcpsi+1,&fds,0,&efds,ttmo_read ? &tmo : 0))<0)
 	   && (errno == EINTR));
     if (!i) {			/* timeout? */
-      if (ttmo && ((*ttmo) (time (0) - t))) continue;
+      time_t tc = time (0);
+      if (tmoh && ((*tmoh) (tc - t,tc - tl))) continue;
       else return tcp_abort (stream);
     }
-    if (i < 0) return tcp_abort (stream);
+    else if (i < 0) return tcp_abort (stream);
     while (((i = read (stream->tcpsi,stream->ibuf,BUFLEN)) < 0) &&
 	   (errno == EINTR));
     if (i < 1) return tcp_abort (stream);
@@ -497,10 +498,10 @@ long tcp_sout (TCPSTREAM *stream,char *string,unsigned long size)
   int i;
   fd_set fds;
   struct timeval tmo;
-  time_t t;
+  time_t t = time (0);
   if (stream->tcpso < 0) return NIL;
   while (size > 0) {		/* until request satisfied */
-    t = time (0);		/* start of request */
+    time_t tl = time (0);	/* start of request */
     tmo.tv_sec = ttmo_write;	/* write timeout */
     tmo.tv_usec = 0;
     FD_ZERO (&fds);		/* initialize selection vector */
@@ -509,10 +510,11 @@ long tcp_sout (TCPSTREAM *stream,char *string,unsigned long size)
     while (((i = select (stream->tcpso+1,0,&fds,0,ttmo_write ? &tmo : 0)) < 0)
 	   && (errno == EINTR));
     if (!i) {			/* timeout? */
-      if (ttmo && ((*ttmo) (time (0) - t))) continue;
+      time_t tc = time (0);
+      if (tmoh && ((*tmoh) (tc - t,tc - tl))) continue;
       else return tcp_abort (stream);
     }
-    if (i < 0) return tcp_abort (stream);
+    else if (i < 0) return tcp_abort (stream);
     while (((i = write (stream->tcpso,string,size)) < 0) && (errno == EINTR));
     if (i < 0) return tcp_abort (stream);
     size -= i;			/* how much we sent */
@@ -559,7 +561,7 @@ long tcp_abort (TCPSTREAM *stream)
 
 char *tcp_host (TCPSTREAM *stream)
 {
-  return stream->host;
+  return stream->host;		/* use tcp_remotehost() if want guarantees */
 }
 
 
@@ -571,19 +573,34 @@ char *tcp_host (TCPSTREAM *stream)
 char *tcp_remotehost (TCPSTREAM *stream)
 {
   if (!stream->remotehost) {
+    char *s,tmp[MAILTMPLEN];
     struct hostent *he;
     struct sockaddr_in sin;
     int sinlen = sizeof (struct sockaddr_in);
-    stream->remotehost =
-      cpystr ((!getpeername (stream->tcpsi,(struct sockaddr *) &sin,&sinlen) &&
-	       (he = gethostbyaddr ((char *) &sin.sin_addr,
-				     sizeof (struct in_addr),sin.sin_family)))?
-	      he->h_name : stream->host);
+    if (getpeername (stream->tcpsi,(struct sockaddr *) &sin,&sinlen))
+      s = stream->host;
+#ifndef DISABLE_REVERSE_DNS_LOOKUP
+    /* Guarantees that the client will have the same string as the server does
+     * from calling tcp_serverhost ().
+     */
+    else if (he = gethostbyaddr ((char *) &sin.sin_addr,
+				 sizeof (struct in_addr),sin.sin_family))
+      s = he->h_name;
+#else
+  /* Not recommended.  In any mechanism (e.g. Kerberos) in which both client
+   * and server must agree on the name of the server system, this may cause
+   * the client to have a different idea of the server's name from the server.
+   * This is particularly important in those cases where a server has multiple
+   * CNAMEs; the gethostbyaddr() will canonicalize the name to the proper IP
+   * address.
+   */
+#endif
+    else sprintf (s = tmp,"[%s]",inet_ntoa (sin.sin_addr));
+    stream->remotehost = cpystr (s);
   }
   return stream->remotehost;
 }
-
-
+
 /* TCP/IP return port for this stream
  * Accepts: TCP/IP stream
  * Returns: port number for this stream
@@ -593,7 +610,8 @@ unsigned long tcp_port (TCPSTREAM *stream)
 {
   return stream->port;		/* return port number */
 }
-
+
+
 /* TCP/IP get local host name
  * Accepts: TCP/IP stream
  * Returns: local host name
@@ -608,15 +626,22 @@ char *tcp_localhost (TCPSTREAM *stream)
     int sinlen = sizeof (struct sockaddr_in);
 				/* get socket address */
     if ((stream->port & 0xffff000) ||
-	getsockname (stream->tcpsi,(struct sockaddr *) &sin,&sinlen)) {
-				/* not a socket or failed, use my name */
-      gethostname (tmp,MAILTMPLEN-1);
-      s = (he = gethostbyname (tmp)) ? he->h_name : tmp;
-    }
+	getsockname (stream->tcpsi,(struct sockaddr *) &sin,&sinlen))
+      s = mylocalhost ();	/* not a socket or failed, use my name */
+#ifndef DISABLE_REVERSE_DNS_LOOKUP
+    /* Guarantees that the client will have the same string as the server will
+     * get in doing a reverse DNS lookup on the client's IP address.
+     */
 				/* translate socket address to name */
     else if (he = gethostbyaddr ((char *) &sin.sin_addr,
 				 sizeof (struct in_addr),sin.sin_family)) 
       s = he->h_name;
+#else
+    /* Not recommended.  In any mechanism (e.g. SMTP or NNTP) in which both
+     * client and server must agree on the name of the client system, this may
+     * cause the client to use the wrong name.
+     */
+#endif
     else sprintf (s = tmp,"[%s]",inet_ntoa (sin.sin_addr));
     stream->localhost = cpystr (s);
   }
@@ -636,11 +661,15 @@ char *tcp_clienthost ()
     struct hostent *he;
     struct sockaddr_in sin;
     int sinlen = sizeof (struct sockaddr_in);
-
     if (getpeername (0,(struct sockaddr *) &sin,&sinlen)) s = "UNKNOWN";
+#ifndef DISABLE_REVERSE_DNS_LOOKUP
+    /* Includes both client name and IP address in syslog() output. */
     else if (he = gethostbyaddr ((char *) &sin.sin_addr,
 				 sizeof (struct in_addr),sin.sin_family)) 
-      s = he->h_name;
+      sprintf (s = tmp,"%s [%s]",he->h_name,inet_ntoa (sin.sin_addr));
+#else
+    /* Not recommended.  Syslog output will only have the client IP address. */
+#endif
     else sprintf (s = tmp,"[%s]",inet_ntoa (sin.sin_addr));
     myClientHost = cpystr (s);
   }
@@ -662,14 +691,24 @@ char *tcp_serverhost ()
     struct sockaddr_in sin;
     int sinlen = sizeof (struct sockaddr_in);
 				/* get socket address */
-    if (!getsockname (0,(struct sockaddr *) &sin,&sinlen) &&
-	(he = gethostbyaddr ((char *) &sin.sin_addr,
-			     sizeof (struct in_addr),sin.sin_family)))
+    if (getsockname (0,(struct sockaddr *) &sin,&sinlen)) s = mylocalhost ();
+#ifndef DISABLE_REVERSE_DNS_LOOKUP
+    /* Guarantees that the server will have the same string as the client does
+     * from calling tcp_remotehost ().
+     */
+    else if (he = gethostbyaddr ((char *) &sin.sin_addr,
+				 sizeof (struct in_addr),sin.sin_family))
       s = he->h_name;
-    else {			/* failed, use my name */
-      gethostname (tmp,MAILTMPLEN-1);
-      s = (he = gethostbyname (tmp)) ? he->h_name : tmp;
-    }
+#else
+    /* Not recommended.  In any mechanism (e.g. Kerberos) in which both client
+     * and server must agree on the name of the server system, this may cause
+     * a spurious mismatch.  This is particularly important when multiple
+     * server systems are co-located on the same CPU with different IP
+     * addresses; the gethostbyaddr() call will return the name of the proper
+     * server system name and avoid canonicalizing it to a default name.
+     */
+#endif
+    else sprintf (s = tmp,"[%s]",inet_ntoa (sin.sin_addr));
     myServerHost = cpystr (s);
   }
   return myServerHost;

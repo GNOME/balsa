@@ -10,9 +10,9 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	6 June 1994
- * Last Edited:	29 December 1997
+ * Last Edited:	19 May 1998
  *
- * Copyright 1997 by the University of Washington
+ * Copyright 1998 by the University of Washington
  *
  *  Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -178,8 +178,7 @@ void pop3_list (MAILSTREAM *stream,char *ref,char *pat)
     mm_list (stream,NIL,tmp,LATT_NOINFERIORS);
   }
 }
-
-
+
 /* POP3 mail find list of subscribed mailboxes
  * Accepts: mail stream
  *	    reference
@@ -189,13 +188,23 @@ void pop3_list (MAILSTREAM *stream,char *ref,char *pat)
 void pop3_lsub (MAILSTREAM *stream,char *ref,char *pat)
 {
   void *sdb = NIL;
-  char *s;
-				/* only if null stream and * requested */
-  if (!stream && !ref && !strcmp (pat,"*") && (s = sm_read (&sdb)))
-    do if (pop3_valid (s)) mm_lsub (stream,NIL,s,NIL);
+  char *s,mbx[MAILTMPLEN];
+  if (*pat == '{') {		/* if remote pattern, must be POP3 */
+    if (!pop3_valid (pat)) return;
+    ref = NIL;			/* good POP3 pattern, punt reference */
+  }
+				/* if remote reference, must be valid POP3 */
+  if (ref && (*ref == '{') && !pop3_valid (ref)) return;
+				/* kludgy application of reference */
+  if (ref && *ref) sprintf (mbx,"%s%s",ref,pat);
+  else strcpy (mbx,pat);
+
+  if (s = sm_read (&sdb)) do if (pop3_valid (s) && pmatch (s,mbx))
+    mm_lsub (stream,NIL,s,NIL);
   while (s = sm_read (&sdb));	/* until no more subscriptions */
 }
-
+
+
 /* POP3 mail subscribe to mailbox
  * Accepts: mail stream
  *	    mailbox to add to subscription list
@@ -312,6 +321,10 @@ MAILSTREAM *pop3_open (MAILSTREAM *stream)
     pop3_close (stream,NIL);	/* do close action */
     stream->dtb = &pop3driver;	/* reattach this driver */
     mail_free_cache (stream);	/* clean up cache */
+  }
+  if (mb.secflag) {		/* in case /secure switch given */
+    mm_log ("Secure POP3 login not available",ERROR);
+    return NIL;
   }
 				/* in case /debug switch given */
   if (mb.dbgflag) stream->debug = T;

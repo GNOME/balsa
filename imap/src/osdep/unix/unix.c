@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	20 December 1989
- * Last Edited:	12 March 1998
+ * Last Edited:	11 June 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -364,8 +364,7 @@ MAILSTREAM *unix_open (MAILSTREAM *stream)
     for (i = 0; i < NUSERFLAGS; i++)
       if (stream->user_flags[i]) fs_give ((void **) &stream->user_flags[i]);
   }
-  stream->local = (UNIXLOCAL *)
-    memset (fs_get (sizeof (UNIXLOCAL)),0,sizeof (UNIXLOCAL));
+  stream->local = memset (fs_get (sizeof (UNIXLOCAL)),0,sizeof (UNIXLOCAL));
 				/* canonicalize the stream mailbox name */
   dummy_file (tmp,stream->mailbox);
 				/* flush old name */
@@ -636,45 +635,36 @@ void unix_flagmsg (MAILSTREAM *stream,MESSAGECACHE *elt)
 /* UNIX mail ping mailbox
  * Accepts: MAIL stream
  * Returns: T if stream alive, else NIL
- * No-op for readonly files, since read/writer can expunge it from under us!
  */
 
 long unix_ping (MAILSTREAM *stream)
 {
   char lock[MAILTMPLEN];
   struct stat sbuf;
-				/* does he want to give up readwrite? */
-  if (stream->rdonly && (LOCAL->ld >= 0)) {
-				/* checkpoint only if we changed something */
-    if (LOCAL->dirty && unix_parse (stream,lock,LOCK_EX)) {
-      unix_rewrite (stream,NIL);/* try to save our changes */
-				/* flush locks */
-      unix_unlock (LOCAL->fd,stream,lock);
-      mail_unlock (stream);
-      mm_nocritical (stream);	/* done with critical */
-    }
-				/* unless checkpoint aborted */
-    if (LOCAL && (LOCAL->ld >= 0)) {
-      flock (LOCAL->ld,LOCK_UN);/* release the lock */
-      close (LOCAL->ld);	/* close the lock file */
-      LOCAL->ld = -1;		/* no more lock fd */
-      unlink (LOCAL->lname);	/* delete it */
-    }
-  }
-				/* make sure it is alright to do this at all */
+				/* big no-op if not readwrite */
   if (LOCAL && (LOCAL->ld >= 0) && !stream->lock) {
-				/* get current mailbox size */
-    if (LOCAL->fd >= 0) fstat (LOCAL->fd,&sbuf);
-    else stat (LOCAL->name,&sbuf);
+    if (stream->rdonly) {	/* does he want to give up readwrite? */
+				/* checkpoint if we changed something */
+      if (LOCAL->dirty) unix_check (stream);
+      flock (LOCAL->ld,LOCK_UN);/* release readwrite lock */
+      close (LOCAL->ld);	/* close the readwrite lock file */
+      LOCAL->ld = -1;		/* no more readwrite lock fd */
+      unlink (LOCAL->lname);	/* delete the readwrite lock file */
+    }
+    else {			/* get current mailbox size */
+      if (LOCAL->fd >= 0) fstat (LOCAL->fd,&sbuf);
+      else stat (LOCAL->name,&sbuf);
 				/* parse if mailbox changed */
-    if ((sbuf.st_size != LOCAL->filesize) && unix_parse (stream,lock,LOCK_SH)){
+      if ((sbuf.st_size != LOCAL->filesize) &&
+	  unix_parse (stream,lock,LOCK_SH)) {
 				/* unlock mailbox */
-      unix_unlock (LOCAL->fd,stream,lock);
-      mail_unlock (stream);	/* and stream */
-      mm_nocritical (stream);	/* done with critical */
+	unix_unlock (LOCAL->fd,stream,lock);
+	mail_unlock (stream);	/* and stream */
+	mm_nocritical (stream);	/* done with critical */
+      }
     }
   }
-  return LOCAL ? T : NIL;	/* return if still alive */
+  return LOCAL ? LONGT : NIL;	/* return if still alive */
 }
 
 /* UNIX mail check mailbox
@@ -685,12 +675,16 @@ void unix_check (MAILSTREAM *stream)
 {
   char lock[MAILTMPLEN];
 				/* parse and lock mailbox */
-  if ((LOCAL->ld >= 0) && unix_parse (stream,lock,LOCK_EX)) {
-    if (LOCAL->dirty && unix_rewrite (stream,NIL) && LOCAL &&
-	(LOCAL->ld >= 0) && !stream->silent) mm_log ("Check completed",NIL);
-				/* flush locks */
-    unix_unlock (LOCAL->fd,stream,lock);
-    mail_unlock (stream);
+  if (LOCAL && (LOCAL->ld >= 0) && !stream->lock &&
+      unix_parse (stream,lock,LOCK_EX)) {
+				/* any unsaved changes? */
+    if (LOCAL->dirty && unix_rewrite (stream,NIL)) {
+      unlink (lock);		/* flush the lock file */
+      if (!stream->silent) mm_log ("Checkpoint completed",NIL);
+    }
+				/* no checkpoint needed, just unlock */
+    else unix_unlock (LOCAL->fd,stream,lock);
+    mail_unlock (stream);	/* unlock the stream */
     mm_nocritical (stream);	/* done with critical */
   }
 }
@@ -704,30 +698,29 @@ void unix_expunge (MAILSTREAM *stream)
 {
   unsigned long i;
   char lock[MAILTMPLEN];
-  if (LOCAL->ld < 0) {		/* won't do on readonly files */
-    if (!stream->silent) mm_log ("Expunge ignored on readonly mailbox",WARN);
-  }
+  char *msg = NIL;
 				/* parse and lock mailbox */
-  else if (unix_parse (stream,lock,LOCK_EX)) {
+  if (LOCAL && (LOCAL->ld >= 0) && !stream->lock &&
+      unix_parse (stream,lock,LOCK_EX)) {
 				/* count expunged messages if not dirty */
     if (!LOCAL->dirty) for (i = 1; i <= stream->nmsgs; i++)
       if (mail_elt (stream,i)->deleted) LOCAL->dirty = T;
-    if (LOCAL->dirty) {		/* only if dirty or expunged messages */
-      if (unix_rewrite (stream,&i) && !stream->silent) {
-	if (i) {
-	  sprintf (LOCAL->buf,"Expunged %lu messages",i);
-	  mm_log (LOCAL->buf,NIL);
-	}
-	else mm_log ("Mailbox checkpointed, but no messages deleted",NIL);
-      }
+    if (!LOCAL->dirty) {	/* not dirty and no expunged messages */
+      unix_unlock (LOCAL->fd,stream,lock);
+      msg = "No messages deleted, so no update needed";
     }
-    else if (!stream->silent)
-      mm_log ("No messages deleted, so no update needed",NIL);
-				/* flush locks */
-    unix_unlock (LOCAL->fd,stream,lock);
-    mail_unlock (stream);
+    else if (unix_rewrite (stream,&i)) {
+      unlink (lock);		/* flush the lock file */
+      if (i) sprintf (msg = LOCAL->buf,"Expunged %lu messages",i);
+      else msg = "Mailbox checkpointed, but no messages expunged";
+    }
+				/* rewrite failed */
+    else unix_unlock (LOCAL->fd,stream,lock);
+    mail_unlock (stream);	/* unlock the stream */
     mm_nocritical (stream);	/* done with critical */
+    if (msg && !stream->silent) mm_log (msg,NIL);
   }
+  else if (!stream->silent) mm_log("Expunge ignored on readonly mailbox",WARN);
 }
 
 /* UNIX mail copy message(s)
@@ -1592,22 +1585,23 @@ unsigned long unix_xstatus (MAILSTREAM *stream,char *status,MESSAGECACHE *elt,
 }
 
 /* Rewrite mailbox file
- * Accepts: MAIL stream
+ * Accepts: MAIL stream, must be critical and locked
  *	    return pointer to number of expunged messages if want expunge
- * Returns: T if success, NIL if failure
+ * Returns: T if success and mailbox unlocked, NIL if failure
  */
 
 long unix_rewrite (MAILSTREAM *stream,unsigned long *nexp)
 {
   unsigned long i,j;
   int e,retry;
+  time_t tp[2];
   FILE *f;
   MESSAGECACHE *elt;
   unsigned long recent = stream->recent;
   unsigned long size = 0;	/* initially nothing done */
   if (nexp) *nexp = 0;		/* initially nothing expunged */
 				/* open scratch file */
-  if (!(f = tmpfile ())) return NIL;
+  if (!(f = tmpfile ())) return unix_punt_scratch (NIL);
 				/* write pseudo-header */
   if (!unix_fwrite (f,LOCAL->buf,unix_pseudo (stream,LOCAL->buf),&size))
     return unix_punt_scratch (f);
@@ -1647,7 +1641,6 @@ long unix_rewrite (MAILSTREAM *stream,unsigned long *nexp)
     }
   }
 
-  mm_critical (stream);		/* all OK, go critical now */
 				/* update the cache */
   for (i = 1; i <= stream->nmsgs;) {
     elt = mail_elt (stream,i);	/* get cache */
@@ -1687,10 +1680,19 @@ long unix_rewrite (MAILSTREAM *stream,unsigned long *nexp)
   ftruncate (LOCAL->fd,LOCAL->filesize = size);
   fsync (LOCAL->fd);		/* make sure the updates take */
   LOCAL->dirty = NIL;		/* no longer dirty */
-  mm_nocritical (stream);	/* release critical */
   				/* notify upper level of new mailbox sizes */
   mail_exists (stream,stream->nmsgs);
   mail_recent (stream,recent);
+				/* set atime to now, mtime a second earlier */
+  tp[1] = (tp[0] = time (0)) - 1;
+				/* set the times, note change */
+  if (!utime (LOCAL->name,tp)) LOCAL->filetime = tp[1];
+  close (LOCAL->fd);		/* close and reopen file */
+  if ((LOCAL->fd = open (LOCAL->name,O_RDWR,NIL)) < 0) {
+    sprintf (LOCAL->buf,"Mailbox open failed, aborted: %s",strerror (errno));
+    mm_log (LOCAL->buf,ERROR);
+    unix_abort (stream);
+  }
   return T;			/* looks good */
 }
 
@@ -1759,8 +1761,8 @@ long unix_fwrite (FILE *f,char *s,unsigned long i,unsigned long *size)
 long unix_punt_scratch (FILE *f)
 {
   char tmp[MAILTMPLEN];
-  sprintf (tmp,"Checkpoint file error: %s",strerror (errno));
+  sprintf (tmp,"Checkpoint file failure: %s",strerror (errno));
   mm_log (tmp,ERROR);
-  fclose (f);			/* flush the output file */
+  if (f) fclose (f);		/* flush the output file */
   return NIL;
 }

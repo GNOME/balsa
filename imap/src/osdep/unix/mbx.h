@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	3 October 1995
- * Last Edited:	18 March 1998
+ * Last Edited:	1 July 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -44,7 +44,6 @@ typedef struct mbx_local {
   unsigned int inbox : 1;	/* if this is an INBOX or not */
   unsigned int flagcheck: 1;	/* if ping should sweep for flags */
   unsigned int fullcheck: 1;	/* if ping must sweep flags and expunged */
-  unsigned int newkeyword : 1;	/* if a new keyword was created */
   unsigned int expunged : 1;	/* if one or more expunged messages */
   int fd;			/* file descriptor for I/O */
   int ffuserflag;		/* first free user flag */

@@ -1,5 +1,5 @@
 /*
- * Program:	Safe File Lock for OSF/1
+ * Program:	Safe File Lock
  *
  * Author:	Mark Crispin
  *		Networks and Distributed Computing
@@ -10,9 +10,9 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	10 October 1996
- * Last Edited:	17 April 1997
+ * Last Edited:	28 May 1998
  *
- * Copyright 1997 by the University of Washington
+ * Copyright 1998 by the University of Washington
  *
  *  Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -33,7 +33,7 @@
  *
  */
  
-/* Safe BSD flock() call
+/* Safe flock() call
  * Accepts: file descriptor
  *	    operation bitmask
  * Returns: 0 if successful, -1 if failure under BSD conditions
@@ -47,8 +47,11 @@ int safe_flock (int fd,int op)
   do {				/* do the lock */
     while ((i = flock (fd,op)) && (errno == EINTR));
     if (!i) return 0;		/* success */
+    /* Can't use switch here because these error codes may resolve to the
+     * same value on some systems.
+     */
     if ((errno != EWOULDBLOCK) && (errno != EAGAIN) && (errno != EACCES)) {
-      sprintf (tmp,"Unexpected locking failure %s",strerror (errno));
+      sprintf (tmp,"Unexpected file locking failure: %s",strerror (errno));
       mm_log (tmp,WARN);	/* give the user a warning of what happened */
       if (!logged++) syslog (LOG_ERR,tmp);
       sleep (5);		/* slow things down in case this loops */

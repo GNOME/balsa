@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	5 July 1988
- * Last Edited:	29 December 1997
+ * Last Edited:	19 June 1998
  *
  * Sponsorship:	The original version of this work was developed in the
  *		Symbolic Systems Resources Group of the Knowledge Systems
@@ -19,7 +19,7 @@
  *		Institutes of Health under grant number RR-00785.
  *
  * Original version Copyright 1988 by The Leland Stanford Junior University
- * Copyright 1997 by the University of Washington
+ * Copyright 1998 by the University of Washington
  *
  *  Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -55,6 +55,12 @@
 
 #undef min
 #undef max
+
+
+/* And some C libraries have these as int functions */
+
+#define min Min
+#define max Max
 
 
 /* Compatibility definitions */

@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	22 November 1989
- * Last Edited:	2 April 1998
+ * Last Edited:	13 May 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -383,6 +383,7 @@ ADDRESS {
 /* Message envelope */
 
 typedef struct mail_envelope {
+  unsigned int ngbogus : 1;	/* newsgroups may be bogus */
   char *remail;			/* remail header if any */
   ADDRESS *return_path;		/* error return address */
   char *date;			/* message composition date string */
@@ -882,7 +883,7 @@ typedef char *(*readprogress_t) (GETS_DATA *md,unsigned long octets);
 typedef void *(*mailcache_t) (MAILSTREAM *stream,unsigned long msgno,long op);
 typedef long (*mailproxycopy_t) (MAILSTREAM *stream,char *sequence,
 				 char *mailbox,long options);
-typedef long (*tcptimeout_t) (long time);
+typedef long (*tcptimeout_t) (long overall,long last);
 typedef void *(*authchallenge_t) (void *stream,unsigned long *len);
 typedef long (*authrespond_t) (void *stream,char *s,unsigned long size);
 typedef long (*authcheck_t) (void);

@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	10 March 1992
- * Last Edited:	5 March 1998
+ * Last Edited:	28 March 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -265,24 +265,37 @@ long mbox_ping (MAILSTREAM *stream)
 	  read (sfd,s = (char *) fs_get (size + 1),size);
 	  s[size] = '\0';	/* tie it off */
 	  fstat (fd,&sbuf);	/* get current file size before write */
-
 				/* copy to mbox and empty sysinbx */
-	  if ((write (fd,s,size) >= 0) && !fsync (fd)) {
-	    ftruncate (sfd,0);
-	    if (!snarfed++) {	/* have we snarfed before? */
-	      char tmp[MAILTMPLEN];
-	      sprintf (tmp,"Moved %lu bytes of new mail to %s from %s",
-		       size,stream->mailbox,sysinbox ());
-	      if (strcmp ((char *) mail_parameters (NIL,GET_SERVICENAME,NIL),
-			  "unknown"))
-		syslog (LOG_INFO,"%s host= ",tmp,tcp_clienthost ());
-	      else mm_log (tmp,stream->nmsgs ? NIL : WARN);
-	    }
-	  }
-	  else {		/* failed */
+	  if ((write (fd,s,size) < 0) || fsync (fd)) {
 	    sprintf (LOCAL->buf,"New mail move failed: %s",strerror (errno));
 	    mm_log (LOCAL->buf,ERROR);
 	    ftruncate (fd,sbuf.st_size);
+	  }
+	  else if (fstat (sfd,&sbuf) || (size != sbuf.st_size)) {
+	    sprintf (LOCAL->buf,"Lock corruption on %s, old size=%lu now=%lu",
+		     sysinbox (),size,sbuf.st_size);
+	    mm_log (LOCAL->buf,ERROR);
+	    ftruncate (fd,sbuf.st_size);
+	    /* Believe it or not, a Singaporean government system actually had
+	     * symlinks from /var/mail/user to ~user/mbox.  To compound this
+	     * error, they used an SVR4 system; BSD and OSF locks would have
+	     * prevented it but not SVR4 locks.
+	     */
+	    if (!fstat (sfd,&sbuf) && (size == sbuf.st_size))
+	      syslog (LOG_ALERT,"File %s and %s are the same file!",
+		      sysinbox,stream->mailbox);
+	  }
+
+	  else {		/* everything looks OK */
+	    ftruncate (sfd,0);	/* truncate the spool file to zero bytes */
+	    if (!snarfed++) {	/* have we snarfed before? */
+	      sprintf (LOCAL->buf,"Moved %lu bytes of new mail to %s from %s",
+		       size,stream->mailbox,sysinbox ());
+	      if (strcmp ((char *) mail_parameters (NIL,GET_SERVICENAME,NIL),
+			  "unknown"))
+		syslog (LOG_INFO,"%s host= %s",LOCAL->buf,tcp_clienthost ());
+	      else mm_log (LOCAL->buf,stream->nmsgs ? NIL : WARN);
+	    }
 	  }
 	  unix_unlock (fd,NIL,lock);
 	  fs_give ((void **) &s);/* flush the poop */

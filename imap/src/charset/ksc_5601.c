@@ -10,9 +10,9 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	3 July 1997
- * Last Edited:	3 November 1997
+ * Last Edited:	29 May 1998
  *
- * Copyright 1997 by the University of Washington
+ * Copyright 1998 by the University of Washington
  *
  *  Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -44,7 +44,7 @@
 #define MAX_KSC5601_TEN 190
 
 
-#define KSCTOUNICODE(c,c1,ku,ten)					\
+#define KSCTOUNICODE(c,c1,ku,ten)				\
   ((((ku = c - BASE_KSC5601_KU) < MAX_KSC5601_KU) &&		\
     ((ten = c1 - BASE_KSC5601_TEN) < MAX_KSC5601_TEN)) ?	\
    ksc5601tab[ku][ten] : 0xfffd)

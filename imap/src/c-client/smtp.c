@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	27 July 1988
- * Last Edited:	10 December 1996
+ * Last Edited:	23 June 1998
  *
  * Sponsorship:	The original version of this work was developed in the
  *		Symbolic Systems Resources Group of the Knowledge Systems
@@ -19,7 +19,7 @@
  *		Institutes of Health under grant number RR-00785.
  *
  * Original version Copyright 1988 by The Leland Stanford Junior University
- * Copyright 1996 by the University of Washington
+ * Copyright 1998 by the University of Washington
  *
  *  Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -53,6 +53,23 @@
 /* Mailer parameters */
 
 long smtp_port = 0;		/* default port override */
+
+
+/* SMTP limits, current as of most recent draft */
+
+#define SMTPMAXLOCALPART 64
+#define SMTPMAXDOMAIN 255
+#define SMTPMAXPATH 256
+
+
+/* I have seen local parts of more than 64 octets, in spite of the SMTP
+ * limits.  So, we'll have a more generous limit that's still guaranteed
+ * not to pop the buffer, and let the server worry about it.  As of this
+ * writing, it comes out to 240.  Anyone with a mailbox name larger than
+ * that is in serious need of a life or at least a new ISP!  23 June 1998
+ */
+
+#define MAXLOCALPART ((MAILTMPLEN - (SMTPMAXDOMAIN + SMTPMAXPATH + 32)) / 2)
 
 /* Mail Transfer Protocol open connection
  * Accepts: network driver
@@ -71,9 +88,11 @@ SENDSTREAM *smtp_open_full (NETDRIVER *dv,char **hostlist,char *service,
   char *s,tmp[MAILTMPLEN];
   NETSTREAM *netstream;
   if (!(hostlist && *hostlist)) mm_log ("Missing SMTP service host",ERROR);
-  else do {			/* try to open connection */
+				/* maximum domain name is 64 characters */
+  else do if (strlen (*hostlist) < SMTPMAXDOMAIN) {
     if (smtp_port) sprintf (s = tmp,"%s:%ld",*hostlist,smtp_port);
     else s = *hostlist;		/* get server name */
+				/* try to open connection */
     if (netstream = net_open (dv,s,service,port)) {
       stream = (SENDSTREAM *) memset (fs_get (sizeof (SENDSTREAM)),0,
 				      sizeof (SENDSTREAM));
@@ -138,6 +157,11 @@ SENDSTREAM *smtp_close (SENDSTREAM *stream)
 
 long smtp_mail (SENDSTREAM *stream,char *type,ENVELOPE *env,BODY *body)
 {
+  /* Note: This assumes that the envelope will never generate a header of
+   * more than 8K.  If your client generates godzilla headers, you will
+   * need to install your own rfc822out_t routine via SET_RFC822OUTPUT
+   * to use in place of this.
+   */
   char tmp[8*MAILTMPLEN];
   long error = NIL;
   if (!(env->to || env->cc || env->bcc)) {
@@ -148,7 +172,12 @@ long smtp_mail (SENDSTREAM *stream,char *type,ENVELOPE *env,BODY *body)
   				/* make sure stream is in good shape */
   smtp_send (stream,"RSET",NIL);
   strcpy (tmp,"FROM:<");	/* compose "MAIL FROM:<return-path>" */
-  rfc822_address (tmp,env->return_path);
+  if (env->return_path && env->return_path->host &&
+      !((env->return_path->adl &&
+	 (strlen (env->return_path->adl) > SMTPMAXPATH)) ||
+	(strlen (env->return_path->mailbox) > SMTPMAXLOCALPART) ||
+	(strlen (env->return_path->host) > SMTPMAXDOMAIN)))
+    rfc822_address (tmp,env->return_path);
   strcat (tmp,">");
   if (ESMTP.ok) {
     if (ESMTP.eightbit.ok && ESMTP.eightbit.want) strcat(tmp," BODY=8BITMIME");
@@ -189,28 +218,44 @@ long smtp_mail (SENDSTREAM *stream,char *type,ENVELOPE *env,BODY *body)
 void smtp_rcpt (SENDSTREAM *stream,ADDRESS *adr,long *error)
 {
   char *s,tmp[MAILTMPLEN];
-  while (adr) {
+  while (adr) {			/* for each address on the list */
 				/* clear any former error */
     if (adr->error) fs_give ((void **) &adr->error);
     if (adr->host) {		/* ignore group syntax */
-      strcpy (tmp,"TO:<");	/* compose "RCPT TO:<return-path>" */
-      rfc822_address (tmp,adr);
-      strcat (tmp,">");
-				/* want notifications */
-      if (ESMTP.ok && ESMTP.dsn.ok && ESMTP.dsn.want) {
-	strcat (tmp," NOTIFY=");/* yes, start with prefix */
-	s = tmp + strlen (tmp);	/* find end of string */
-	if (ESMTP.dsn.notify.failure) strcat (s,"FAILURE,");
-	if (ESMTP.dsn.notify.delay) strcat (s,"DELAY,");
-	if (ESMTP.dsn.notify.success) strcat (s,"SUCCESS,");
-				/* tie off last comma */
-	if (*s) s[strlen (s) - 1] = '\0';
-	else strcat (tmp,"NEVER");
+				/* enforce SMTP limits to protect the buffer */
+      if (adr->adl && (strlen (adr->adl) > SMTPMAXPATH)) {
+	adr->error = cpystr ("501 Path too long");
+	*error = T;
       }
+      else if (strlen (adr->mailbox) > MAXLOCALPART) {
+	adr->error = cpystr ("501 Recipient name too long");
+	*error = T;
+      }
+      if ((strlen (adr->host) > SMTPMAXDOMAIN)) {
+	adr->error = cpystr ("501 Recipient domain too long");
+	*error = T;
+      }
+      else {
+	strcpy (tmp,"TO:<");	/* compose "RCPT TO:<return-path>" */
+	rfc822_address (tmp,adr);
+	strcat (tmp,">");
+				/* want notifications */
+	if (ESMTP.ok && ESMTP.dsn.ok && ESMTP.dsn.want) {
+				/* yes, start with prefix */
+	  strcat (tmp," NOTIFY=");
+	  s = tmp + strlen (tmp);
+	  if (ESMTP.dsn.notify.failure) strcat (s,"FAILURE,");
+	  if (ESMTP.dsn.notify.delay) strcat (s,"DELAY,");
+	  if (ESMTP.dsn.notify.success) strcat (s,"SUCCESS,");
+				/* tie off last comma */
+	  if (*s) s[strlen (s) - 1] = '\0';
+	  else strcat (tmp,"NEVER");
+	}
 				/* send "RCPT TO" command */
-      if (!(smtp_send (stream,"RCPT",tmp) == SMTPOK)) {
-	*error = T;		/* note that an error occurred */
-	adr->error = cpystr (stream->reply);
+	if (!(smtp_send (stream,"RCPT",tmp) == SMTPOK)) {
+	  *error = T;		/* note that an error occurred */
+	  adr->error = cpystr (stream->reply);
+	}
       }
     }
     adr = adr->next;		/* do any subsequent recipients */
@@ -225,7 +270,7 @@ void smtp_rcpt (SENDSTREAM *stream,ADDRESS *adr,long *error)
 
 long smtp_send (SENDSTREAM *stream,char *command,char *args)
 {
-  char tmp[MAILTMPLEN];
+  char tmp[MAILTMPLEN+64];
   long reply;
 				/* build the complete command */
   if (args) sprintf (tmp,"%s %s",command,args);
@@ -279,7 +324,8 @@ long smtp_ehlo (SENDSTREAM *stream,char *host)
     return smtp_fake (stream,SMTPSOFTFATAL,"SMTP connection broken (EHLO)");
 				/* got an OK reply? */
   do if ((i = smtp_reply (stream)) == SMTPOK) {
-    ucase (strcpy (tmp,stream->reply+4));
+    ucase (strncpy (tmp,stream->reply+4,MAILTMPLEN-1));
+    tmp[MAILTMPLEN-1] = '\0';
 				/* defined by SMTP 8bit-MIMEtransport */
     if ((tmp[0] == '8') && (tmp[1] == 'B') && (tmp[2] == 'I') &&
 	(tmp[3] == 'T') && (tmp[4] == 'M') && (tmp[5] == 'I') &&

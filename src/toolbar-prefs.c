@@ -406,7 +406,8 @@ create_toolbar_page(BalsaToolbarModel * model)
 
     /* The "window itself" */
     outer_box=gtk_vbox_new(FALSE, 0);
-    g_object_set_data(G_OBJECT(outer_box), BALSA_KEY_TOOLBAR_PAGE, page);
+    g_object_set_data_full(G_OBJECT(outer_box), BALSA_KEY_TOOLBAR_PAGE,
+                           page, g_free);
 
     /* Preview display */
     toolbar_frame=gtk_frame_new(_("Preview"));

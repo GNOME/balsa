@@ -521,6 +521,8 @@ save_part(BalsaPartInfo * info)
     else filename = NULL;
 
     if (filename) {
+	libbalsa_utf8_sanitize(&filename, balsa_app.convert_unknown_8bit, 
+			       balsa_app.convert_unknown_8bit_codeset, NULL);
 	gtk_file_selection_set_filename(GTK_FILE_SELECTION(save_dialog),
                                         filename);
 	g_free(filename);
@@ -2465,10 +2467,14 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 	    g_free(from);
 	} else if (is_multipart)
 	    icon_title = mpart_content_name(content_type);
-	else if (body->filename)
+	else if (body->filename) {
+	    gchar * filename = g_strdup(body->filename);
+	    libbalsa_utf8_sanitize(&filename, balsa_app.convert_unknown_8bit, 
+				   balsa_app.convert_unknown_8bit_codeset, NULL);
 	    icon_title =
-		g_strdup_printf("%s (%s)", body->filename, content_type);
-	else
+		g_strdup_printf("%s (%s)", filename, content_type);
+	    g_free(filename);
+	} else
 	    icon_title = g_strdup_printf("(%s)", content_type);
 	
 	part_create_menu (info);

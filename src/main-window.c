@@ -454,7 +454,7 @@ static GnomeUIInfo message_toggle_menu[] = {
     {
         GNOME_APP_UI_ITEM, N_("New"), N_("Toggle New"),
         toggle_new_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-        BALSA_PIXMAP_MENU_NEW, 0, 0, NULL
+        BALSA_PIXMAP_MENU_NEW, 'R', GDK_CONTROL_MASK, NULL
     },
     GNOMEUIINFO_END
 };

@@ -35,6 +35,7 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "misc.h"
+#include "html.h"
 
 static const gchar *libbalsa_get_codeset_name(const gchar *txt, 
 					      LibBalsaCodeset Codeset);
@@ -1290,6 +1291,10 @@ libbalsa_window_select_all(GtkWindow * window)
         if (gtk_tree_selection_get_mode(selection) ==
             GTK_SELECTION_MULTIPLE)
             gtk_tree_selection_select_all(selection);
+#ifdef    HAVE_GTKHTML
+    } else if (libbalsa_html_can_select(focus_widget)) {
+	libbalsa_html_select_all(focus_widget);
+#endif /* HAVE_GTKHTML */
     }
 }
 

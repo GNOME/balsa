@@ -39,10 +39,16 @@ struct message_info {
     char *key;
     const char *subdir;
     char *filename;
-    LibBalsaMessageFlag flags;
-    LibBalsaMessageFlag orig_flags;
+    LibBalsaMessageFlag flags;  	/* May have pseudo-flags */
+    LibBalsaMessageFlag orig_flags;     /* Has only real flags */
     LibBalsaMessage *message;
 };
+#define REAL_FLAGS(flags) (flags & LIBBALSA_MESSAGE_FLAGS_REAL)
+#define FLAGS_REALLY_DIFFER(orig_flags, flags) \
+    (((orig_flags ^ flags) & LIBBALSA_MESSAGE_FLAGS_REAL) != 0)
+#define FLAGS_CHANGED(msg_info) \
+    FLAGS_REALLY_DIFFER(msg_info->orig_flags, msg_info->flags)
+  
 
 static LibBalsaMailboxLocalClass *parent_class = NULL;
 
@@ -407,16 +413,19 @@ static void parse_mailbox(LibBalsaMailbox * mailbox, const gchar *subdir)
 
 	key = g_strdup(filename);
 	/* strip flags of filename */
-	if ((p = strrchr (key, ':')) != NULL &&
-	    strncmp (p + 1, "2,", 2) == 0)
-	{
+	if ((p = strrchr(key, ':')) && !strncmp(p, ":2,", 3))
 	    *p = '\0';
-	}
-
-	msg_info = g_hash_table_lookup(messages_info, key);
 
 	flags = parse_filename(subdir, filename);
-	if (msg_info == NULL) {
+	msg_info = g_hash_table_lookup(messages_info, key);
+	if (msg_info) {
+	    g_free(key);
+	    if (FLAGS_REALLY_DIFFER(msg_info->orig_flags, flags)) {
+		g_warning("Message flags for \"%s\" changed\n",
+                          msg_info->key);
+		msg_info->orig_flags = flags;
+	    }
+	} else {
 	    msg_info = g_new0(struct message_info, 1);
 	    g_hash_table_insert(messages_info, key, msg_info);
 	    g_ptr_array_add(msgno_2_msg_info, msg_info);
@@ -425,13 +434,8 @@ static void parse_mailbox(LibBalsaMailbox * mailbox, const gchar *subdir)
 	    msg_info->key=key;
 	    msg_info->filename=g_strdup(filename);
 	    msg_info->flags = msg_info->orig_flags = flags;
-	} else
-	    g_free(key);
-	msg_info->subdir = subdir;
-	if (msg_info->orig_flags != flags) {
-	    g_print("Message flags for (%s) changed\n", msg_info->key);
-	    msg_info->orig_flags = flags;
 	}
+	msg_info->subdir = subdir;
     }
     g_dir_close(dir);
 }
@@ -709,7 +713,7 @@ maildir_sync_add(struct message_info *msg_info, const gchar * path)
 			  new_flags);
     g_free(msg_info->filename);
     msg_info->filename = new;
-    msg_info->orig_flags = msg_info->flags;
+    msg_info->orig_flags = REAL_FLAGS(msg_info->flags);
 
     return retval;
 }
@@ -753,7 +757,7 @@ libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox, gboolean expunge)
              && strcmp(msg_info->subdir, "new") != 0)
             || ((!msg_info->flags & LIBBALSA_MESSAGE_FLAG_RECENT)
                 && strcmp(msg_info->subdir, "cur") != 0)
-            || msg_info->flags != msg_info->orig_flags) {
+            || FLAGS_CHANGED(msg_info)) {
 	    if (!maildir_sync_add(msg_info, path))
 		ok = FALSE;
 	}
@@ -837,7 +841,7 @@ libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox,
 	g_object_add_weak_pointer(G_OBJECT(message),
 				  (gpointer) & msg_info->message);
 
-	message->flags = msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
+	message->flags = REAL_FLAGS(msg_info->flags);
 	message->mailbox = mailbox;
 	message->msgno = msgno;
 	libbalsa_message_load_envelope(message);
@@ -938,7 +942,7 @@ libbalsa_mailbox_maildir_messages_change_flags(LibBalsaMailbox * mailbox,
 
         msg_info->flags |= set;
         msg_info->flags &= ~clear;
-        if (!((old_flags ^ msg_info->flags) & LIBBALSA_MESSAGE_FLAGS_REAL))
+	if (!FLAGS_REALLY_DIFFER(msg_info->flags, old_flags))
 	    /* No real flags changed. */
             continue;
         ++changed;

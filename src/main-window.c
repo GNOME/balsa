@@ -19,6 +19,14 @@
  * 02111-1307, USA.
  */
 
+/*
+ * BalsaWindow: subclass of GnomeApp
+ *
+ * The only known instance of BalsaWindow is balsa_app.main_window,
+ * but the code in this module does not depend on that fact, to make it
+ * more self-contained.  pb
+ */
+
 #include "config.h"
 
 #include <string.h>
@@ -2061,7 +2069,7 @@ void
 check_new_messages_real(GtkWidget *widget, gpointer data, int type)
 {
 #ifdef BALSA_USE_THREADS
-    BalsaWindow * window = window;
+    BalsaWindow * window = data;
 
     /*  Only Run once -- If already checking mail, return.  */
     pthread_mutex_lock(&mailbox_lock);

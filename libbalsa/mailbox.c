@@ -498,21 +498,22 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 }
 
 /* libbalsa_mailbox_message_match:
-   Tests if the given message matches the conditions : this is used
+ * Tests if message with msgno matches the conditions cached in the
+ * search_iter: this is used
    by the search code. It is a "virtual method", indeed IMAP has a
    special way to implement it for speed/bandwidth reasons
  */
 gboolean
 libbalsa_mailbox_message_match(LibBalsaMailbox * mailbox,
-			       LibBalsaMessage * message,
-			       LibBalsaCondition *condition)
+			       guint msgno,
+			       LibBalsaMailboxSearchIter *search_iter)
 {
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->message_match(mailbox,
-							      message,
-							      condition);
+							      msgno,
+							      search_iter);
 }
 
 /* libbalsa_mailbox_match:
@@ -1039,15 +1040,93 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     lbm_threads_leave(unlock);
 }
 
-gboolean
-libbalsa_mailbox_find(LibBalsaMailbox *mailbox, GtkTreeIter *pos,
-                      gboolean search_forward,
-                      LibBalsaCondition *condition,
-                      GList *exclude)
+/* Search iters */
+LibBalsaMailboxSearchIter *
+libbalsa_mailbox_search_iter_new(LibBalsaMailbox * mailbox,
+				 GtkTreeIter * pos,
+				 LibBalsaCondition * condition)
 {
-    /* finds first message matching the condition. */
+    LibBalsaMailboxSearchIter *iter;
+
+    iter = g_new(LibBalsaMailboxSearchIter, 1);
+    iter->iter = pos;
+    iter->condition = libbalsa_condition_clone(condition);
+    iter->user_data = NULL;
+
+    return iter;
+}
+
+void
+libbalsa_mailbox_search_iter_free(LibBalsaMailbox * mailbox,
+				  LibBalsaMailboxSearchIter * iter)
+{
+    if (LIBBALSA_MAILBOX_GET_CLASS(mailbox)->search_iter_free)
+	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->search_iter_free(iter);
+    libbalsa_condition_free(iter->condition);
+    g_free(iter);
+}
+
+/* GNode iterators. */
+static GNode *
+lbm_next(GNode * node)
+{
+    /* next is:     our first child, if we have one;
+     *              else our sibling, if we have one;
+     *              else the sibling of our first ancestor who has
+     *              one.  */
+    if (node->children)
+	return node->children;
+    else
+	do
+	    if (node->next)
+		return node->next;
+	while ((node = node->parent));
+
+    return NULL;
+}
+
+static GNode *
+lbm_prev(GNode * node)
+{
+    /* previous is: if we have a sibling,
+     *                      if it has children, its last descendant;
+     *                      else the sibling;
+     *              else our parent. */
+    if (node->prev) {
+	node = node->prev;
+	if (node->children) {
+	    GNode *tmp;
+	    node = node->children;
+	    while ((tmp = node->next) || (tmp = node->children))
+		node = tmp;
+	}
+	return node;
+    }
+
+    node = node->parent;
+    return G_NODE_IS_ROOT(node) ? NULL : node;
+}
+
+gboolean
+libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
+				  LibBalsaMailboxSearchIter * search_iter,
+				  gboolean forward)
+{
+    GNode *node = search_iter->iter->user_data;
+    GNode *(*step_func)(GNode *) = forward ?  lbm_next : lbm_prev;
+    gboolean (*match_func)(LibBalsaMailbox *, guint, 
+			   LibBalsaMailboxSearchIter *) =
+	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->message_match;
+
+    while ((node = step_func(node)))
+	if (match_func(mailbox, GPOINTER_TO_UINT(node->data), search_iter)) {
+	    search_iter->iter->user_data = node;
+	    return TRUE;
+	}
+
     return FALSE;
 }
+
 /* Find a message in the tree-model, by its message number. */
 gboolean
 libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox, guint seqno,

@@ -184,6 +184,14 @@ struct _LibBalsaMailbox {
     LibBalsaMailboxView *view;
 };
 
+/* Search iter */
+typedef struct {
+    GtkTreeIter *iter;		/* input: starting point for search;
+				 * output: found message. */
+    LibBalsaCondition *condition;	
+    gpointer user_data;		/* private backend info */
+} LibBalsaMailboxSearchIter;
+
 struct _LibBalsaMailboxClass {
     GObjectClass parent_class;
 
@@ -216,9 +224,11 @@ struct _LibBalsaMailboxClass {
 					LibBalsaMessage * message);
 
     void (*check) (LibBalsaMailbox * mailbox);
+
+    void (*search_iter_free) (LibBalsaMailboxSearchIter * iter);
     gboolean (*message_match) (LibBalsaMailbox * mailbox,
-			       LibBalsaMessage * message,
-			       LibBalsaCondition *condition);
+			       guint msgno,
+			       LibBalsaMailboxSearchIter *search_iter);
     void (*mailbox_match) (LibBalsaMailbox * mailbox,
 			   GSList * filters_list);
     gboolean (*can_match) (LibBalsaMailbox * mailbox,
@@ -333,18 +343,22 @@ gboolean libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox,
 gboolean libbalsa_mailbox_can_match(LibBalsaMailbox  *mailbox,
 				    LibBalsaCondition *condition);
 gboolean libbalsa_mailbox_message_match(LibBalsaMailbox  *mailbox,
-					LibBalsaMessage  *message,
-					LibBalsaCondition *condition);
+					guint msgno,
+					LibBalsaMailboxSearchIter *search_iter);
 
-/* libbalsa_mailbox_find() looks in mailbox mailbox, starting at
-   position pos, searching forward if search_forward is true, for a
-   first message that matches (op, cond_list) filter, excluding
-   messages in exclude list.
-*/
-gboolean libbalsa_mailbox_find(LibBalsaMailbox *mailbox, GtkTreeIter *pos,
-                               gboolean search_forward,
-                               LibBalsaCondition *condition,
-                               GList *exclude);
+/* Search iter */
+LibBalsaMailboxSearchIter *libbalsa_mailbox_search_iter_new(LibBalsaMailbox
+							    * mailbox,
+							    GtkTreeIter *
+							    pos,
+							    LibBalsaCondition
+							    * condition);
+gboolean libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
+					   LibBalsaMailboxSearchIter * iter,
+					   gboolean forward);
+void libbalsa_mailbox_search_iter_free(LibBalsaMailbox * mailbox,
+				       LibBalsaMailboxSearchIter * iter);
+
 /* Virtual function (this function is different for IMAP
  */
 void libbalsa_mailbox_match(LibBalsaMailbox * mbox, GSList * filter_list );

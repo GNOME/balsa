@@ -1,3 +1,9 @@
+2004-09-09 05:04  PeterB
+
+	* libbalsa/mailbox_imap.c: do not fetch expunged message.
+	* src/balsa-index.c, src/main-window.c, libbalsa/send.c: use
+	gdk_display_flush if available, instead of gdk_flush.
+
 2004-09-08  Pawel Salek
 
 	* src/message-window.c: change defaults for touch-ui build.

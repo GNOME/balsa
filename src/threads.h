@@ -56,10 +56,11 @@ typedef struct
  */
 
 #define  MSGMAILTHREAD( message, type, mbox, string, num, tot) \
-  message = malloc( sizeof( MailThreadMessage )); \
+  message = g_new(MailThreadMessage, 1); \
   message->message_type = type; \
   message->mailbox = mbox; \
-  strncpy( message->message_string, string, strlen(string) + 1 ); \
+  strncpy( message->message_string, string, sizeof(message->message_string)); \
+  message->message_string[sizeof(message->message_string)-1]='\0';\
   message->num_bytes=num;\
   message->tot_bytes=tot;\
   write( mail_thread_pipes[1], (void *) &message, sizeof(void *) );

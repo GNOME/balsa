@@ -1239,6 +1239,7 @@ check_messages_thread( gpointer data )
 gboolean
 mail_progress_notify_cb( )
 {
+  const int MSG_BUFFER_SIZE=512*sizeof(MailThreadMessage*);
     MailThreadMessage *threadmessage;
     MailThreadMessage **currentpos;
     void *msgbuffer;
@@ -1246,14 +1247,15 @@ mail_progress_notify_cb( )
     gfloat percent;
     GtkWidget *errorbox;
 
-    msgbuffer = malloc( 2049 );
+    msgbuffer = g_malloc(MSG_BUFFER_SIZE);
 
     g_io_channel_read( mail_thread_msg_receive, msgbuffer, 
-          2048, &count );
+          MSG_BUFFER_SIZE, &count );
 
-    if( count < sizeof( void *) )
+    /* FIXME: imagine reading just half of the pointer. The sync is gone.. */
+    if( count < sizeof(MailThreadMessage*) ) 
       {
-	free( msgbuffer );
+	g_free( msgbuffer );
 	return TRUE;
       }
 
@@ -1307,10 +1309,10 @@ mail_progress_notify_cb( )
 	      (gfloat) threadmessage->tot_bytes;
 	    if( percent > 1.0 || percent < 0.0 )
 	      {
-		percent = 1.0;
 		if( balsa_app.debug )
 		  fprintf(stderr, "progress bar percentage out of range %f\n",
 			  percent);
+		percent = 1.0;
 	      }
 	    if (progress_dialog && GTK_IS_WIDGET ( progress_dialog ) ) 
 	      gtk_progress_bar_update(GTK_PROGRESS_BAR(progress_dialog_bar),
@@ -1353,11 +1355,11 @@ mail_progress_notify_cb( )
 		      threadmessage->message_type, threadmessage->message_string );
 	    
 	  }
-	free( threadmessage );
+	g_free( threadmessage );
 	currentpos++;
 	count -= sizeof(void *);
       }
-    free( msgbuffer );
+    g_free( msgbuffer );
 	
     gdk_threads_leave();
 

@@ -1,3 +1,11 @@
+2000-09-29  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/send.c: glib is MT-safe now, use g_new/g_free pair 
+	(+Ian's safe_free fix).
+	* src/main-window.c: use g_malloc/g_free.
+	* src/threads.h: use g_new/g_free pair, use strncpy properly.
+	* src/sendmsg-window.c: print warnings with balsa_information.
+
 2000-09-29  Christophe Merlet  <christophe@merlet.net>
 
 	* src/balsa-message.c,src/local-mailbox.c,src/main-window.c,

@@ -414,7 +414,8 @@ static gint
 delete_event_cb (GtkWidget * widget, GdkEvent *e, gpointer data)
 {
   balsa_sendmsg_destroy ((BalsaSendmsg*)data);
-  g_message ("delete_event_cb(): Calling alias_free_addressbook().\n");
+  if(balsa_app.debug)
+    g_message ("delete_event_cb(): Calling alias_free_addressbook().\n");
   alias_free_addressbook ();
   return TRUE;
 }
@@ -490,8 +491,9 @@ static void fill_language_menu()
 {
   int idxsys;
   idxsys = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
-  printf("idxsys: %d %s for %s\n", idxsys, locales[idxsys].lang_name, 
-	 setlocale(LC_CTYPE, NULL));
+  if(balsa_app.debug)
+    printf("idxsys: %d %s for %s\n", idxsys, locales[idxsys].lang_name, 
+	   setlocale(LC_CTYPE, NULL));
   lang_menu[LANG_CURRENT_POS].label = (char*)locales[idxsys].lang_name;
 }
 
@@ -565,16 +567,11 @@ add_attachment (GnomeIconList * iconlist, char *filename)
 	 iconlist, pix,
 	 g_basename (filename));
       gnome_icon_list_set_icon_data (iconlist, pos, filename);
-   } else {
-      /*PKGW*/
-      GtkWidget *box = gnome_message_box_new( 
-	 _("The attachment pixmap (balsa/attachment.png) cannot be found.\n"
-	  "This means you cannot attach any files.\n"), 
-	GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
-     gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
-     gnome_dialog_run( GNOME_DIALOG( box ) );
-     gtk_widget_destroy( GTK_WIDGET( box ) );
-   }
+   } else 
+     balsa_information(
+       LIBBALSA_INFORMATION_WARNING,
+       _("The attachment pixmap (balsa/attachment.png) cannot be found.\n"
+	 "This means you cannot attach any files.\n"));
 }
 
 static gint
@@ -1399,12 +1396,8 @@ static void do_insert_file(GtkWidget *selector, GtkFileSelection* fs) {
    cnt = gtk_editable_get_position( GTK_EDITABLE(bsmsg->text) );
 
    if(! (fl = fopen(fname,"rt")) ) {
-      GtkWidget *box = gnome_message_box_new( 
-	 _("Could not open the file.\n"), 
-	 GNOME_MESSAGE_BOX_ERROR, _("Cancel"), NULL );
-      gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
-      gnome_dialog_run( GNOME_DIALOG( box ) );
-      gtk_widget_destroy( GTK_WIDGET( box ) );
+     balsa_information(LIBBALSA_INFORMATION_WARNING,
+		       _("Could not open the file %s.\n"), fname);
    } else {
       gnome_appbar_push(balsa_app.appbar, _("Loading..."));
 

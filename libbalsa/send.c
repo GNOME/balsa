@@ -70,7 +70,7 @@ msg_queue_item_new(LibBalsaMessage *message)
 {
 	MessageQueueItem *mqi;
 
-	mqi = (MessageQueueItem*)malloc(sizeof(MessageQueueItem));
+	mqi = g_new(MessageQueueItem, 1);
 	mqi->orig = message;
 	mqi->message = mutt_new_header ();
 	mqi->next_message = NULL;
@@ -90,7 +90,7 @@ msg_queue_item_destroy(MessageQueueItem* mqi)
 		mutt_free_header (&mqi->message);
 	if(mqi->fcc)
 		g_free(mqi->fcc);
-	free(mqi);
+	g_free(mqi);
 }
 
 static guint balsa_send_message_real(MessageQueueItem *first_message);
@@ -447,8 +447,7 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr)
 			dptr->next = mutt_new_list ();
 			dptr = dptr->next;
 		}
-		g_free (delptr->next);
-		delptr->next = 0;
+		safe_free ((void**)&delptr->next);
 	}
 
 	libbalsa_unlock_mutt();

@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-10-23 19:38+0200\n"
-"PO-Revision-Date: 2001-10-24 19:18+0200\n"
+"POT-Creation-Date: 2001-10-25 12:14+0200\n"
+"PO-Revision-Date: 2001-10-25 12:16+0200\n"
 "Last-Translator: GNOME PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1937,6 +1937,10 @@ msgid "_Subscribed folders only"
 msgstr "Tylko _zasubskrybowane foldery"
 
 #: src/folder-conf.c:1
+msgid "_Always show INBOX"
+msgstr "_Zawsze wy¶wietlana Poczta nadchodz±ca (INBOX)"
+
+#: src/folder-conf.c:1
 msgid "_Prefix"
 msgstr "P_rzedrostek"
 
@@ -2599,11 +2603,19 @@ msgstr "Usuwa skrzynkê"
 
 #: src/main-window.c:1
 msgid "Co_mmit Current"
-msgstr "_Zapisz bie¿±c±"
+msgstr "Zapisz _bie¿±c±"
 
 #: src/main-window.c:1
 msgid "Commit the changes in the currently opened mailbox"
 msgstr "Zapisuje zmiany w otwartej skrzynce"
+
+#: src/main-window.c:1
+msgid "Commit _All"
+msgstr "Zapisz _wszystkie"
+
+#: src/main-window.c:1
+msgid "Commit the changes in all mailboxes"
+msgstr "Zapisuje zmiany we wszystkich skrzynkach"
 
 #: src/main-window.c:1
 msgid "_Close"
@@ -2698,7 +2710,7 @@ msgstr "Oczekuje nowa poczta"
 msgid "OK"
 msgstr "OK"
 
-#: src/main-window.c:1
+#: src/main-window.c:1 src/main-window.c:1
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Zapisanie zmian w skrzynce %s nie powiod³o siê."

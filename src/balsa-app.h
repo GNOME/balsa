@@ -383,7 +383,6 @@ extern struct BalsaApplication {
 
     GList *folder_mru;
     GList *fcc_mru;
-    gint drag_default_is_move;
     gboolean delete_immediately;
     gboolean hide_deleted;
 

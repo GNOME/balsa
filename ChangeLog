@@ -1,3 +1,11 @@
+2003-09-11 Darko Obradovic <dobradovic gmx.de>
+
+	* src/balsa-app.[hc]: remove balsa_app.drag_default_is_move
+	* src/balsa-mblist.c: assume above is true always.
+	* src/main-window.c: ditto.
+	* src/pref-manager.c: remove configuration part.
+	* src/save-restore.c: and save-restore part.
+	
 2003-09-09 10:55  PeterB
 
 	* src/main-window.c: Set mailbox tab color on opening; flush the

@@ -3259,11 +3259,11 @@ static gboolean
 notebook_drag_motion_cb(GtkWidget * widget, GdkDragContext * context,
                         gint x, gint y, guint time, gpointer user_data)
 {
-    if (balsa_app.drag_default_is_move)
-        gdk_drag_status(context,
-                        (context->actions ==
-                         GDK_ACTION_COPY) ? GDK_ACTION_COPY :
-                        GDK_ACTION_MOVE, time);
+    gdk_drag_status(context,
+                    (context->actions ==
+                     GDK_ACTION_COPY) ? GDK_ACTION_COPY :
+                    GDK_ACTION_MOVE, time);
+
     return FALSE;
 }
 

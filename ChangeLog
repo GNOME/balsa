@@ -1,3 +1,8 @@
+2003-03-10 20:08  PeterB
+
+	* src/: balsa-index.c, main-window.c, store-address.c,
+	store-address.h: Non-modal store address dialog.
+
 2003-03-09 22:54  PeterB
 
 	* libbalsa/identity.c, src/balsa-message.c, src/folder-conf.c,

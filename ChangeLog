@@ -1,3 +1,9 @@
+2005-03-24 06:59  PeterB
+
+	* src/ab-main.c: set all locales.
+	* src/main.c: set all locales.
+	* src/main-window.c: make label localizable.
+
 2005-03-24 Pawel Salek
 
 	* libbalsa/address-book-ldap.c: add missing libbalsa-conf.h

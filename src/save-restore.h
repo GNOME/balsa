@@ -19,11 +19,18 @@
 #ifndef __SAVE_RESTORE_H__
 #define __SAVE_RESTORE_H__
 
-void add_mailbox_config (Mailbox * current);
-void delete_mailbox_config (gchar *);
-void update_mailbox_config (Mailbox *, gchar* old_mbox_name);
-gint load_mailboxes (gchar *);
-gint restore_global_settings (void);
-void save_global_settings (void);
+/* FIXME XXX This should be a "configure" option.  Stuart? */
+#define BALSA_CONFIG_FILE ".balsarc"
+
+gint config_load(gchar * user_filename);
+gint config_save(gchar * user_filename);
+
+gint config_mailbox_add (Mailbox * mailbox, char * name);
+gint config_mailbox_delete(gchar * name);
+gint config_mailbox_update (Mailbox * mailbox, gchar * old_mbox_name);
+gint config_mailboxes_init(void);
+
+gint config_global_load(void);
+gint config_global_save(void);
 
 #endif /* __SAVE_RESTORE_H__ */

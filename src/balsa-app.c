@@ -33,6 +33,7 @@
 #include "mailbox.h"
 #include "save-restore.h"
 #include "index-child.h"
+#include "main-window.h"
 
 
 /* Global application structure */
@@ -50,7 +51,6 @@ static gint check_for_new_messages ();
 void
 init_balsa_app (int argc, char *argv[])
 {
-  gchar *tmp;
 
   /* 
    * initalize application structure before ALL ELSE 
@@ -81,10 +81,10 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
   balsa_app.mdi_style = GNOME_MDI_DEFAULT_MODE;
 
-  balsa_app.proplist = PLGetProplistWithPath ("~/.balsarc");
-
-  if (!balsa_app.proplist)
+  if (config_load (BALSA_CONFIG_FILE) == FALSE)
     {
+      fprintf(stderr, "*** Could not load config file %s!\n",
+	      BALSA_CONFIG_FILE);
       initialize_balsa (argc, argv);
       return;
     }
@@ -92,8 +92,9 @@ init_balsa_app (int argc, char *argv[])
   /* Load all the global settings.  If there's an error, then some crucial
      piece of the global settings was not available, and we need to run
      balsa-init. */
-  if (restore_global_settings() == FALSE)
+  if (config_global_load() == FALSE)
     {
+      fprintf(stderr, "*** config_global_load failed\n");
       initialize_balsa (argc, argv);
       return;
     }
@@ -107,6 +108,7 @@ init_balsa_app (int argc, char *argv[])
   if (balsa_app.inbox == NULL || balsa_app.outbox == NULL ||
       balsa_app.trash == NULL)
     {
+      fprintf(stderr, "*** One of inbox/outbox/trash is NULL\n");
       initialize_balsa (argc, argv);
       return;
     }
@@ -139,11 +141,15 @@ do_load_mailboxes ()
 
     case MAILBOX_POP3:
       break;
+    default:
+      fprintf(stderr, "do_load_mailboxes: Unknown mailbox type\n");
+      break;
     }
 
   load_local_mailboxes ();
   read_signature ();
   special_mailboxes ();
+  fprintf(stderr, "foo\n");
 }
 
 static gint
@@ -186,38 +192,11 @@ check_for_new_messages ()
 #endif
 
 
-
 static gint
 mailboxes_init (void)
 {
-  gint num = 0;
-  gint i = 0;
-  proplist_t accts, elem, temp_str;
-
-  temp_str = PLMakeString("accounts");
-  accts = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
-  PLRelease(temp_str);
-  if (accts == NULL)
-    num = 0;
-  else
-    num = PLGetNumberOfElements (accts);
-
-  for (i = 0; i < num; i++)
-    {
-      elem = PLGetArrayElement (accts, i);
-      if (load_mailboxes (PLGetString (elem)) == FALSE)
-	{
-	  fprintf(stderr, "*** An error occurred while loading the "
-		  "mailbox: %s\n", PLGetString(elem));
-	  return 0;
-	}
-      if (balsa_app.debug)
-	fprintf (stderr, "Loaded mailbox: %s\n", PLGetString (elem));
-    }
-
-  return 1;
+  return config_mailboxes_init();
 }
-
 
 static void
 special_mailboxes ()

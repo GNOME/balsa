@@ -461,24 +461,24 @@ complete_cb (GtkWidget * widget)
   mailbox = mailbox_new (type);
   mailbox->name = g_strdup ("Inbox");
   MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
-  add_mailbox_config (mailbox);
+  config_mailbox_add (mailbox, "Inbox");
   mailbox_free (mailbox);
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
   mailbox = mailbox_new (type);
   mailbox->name = g_strdup ("Outbox");
   MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->outbox)));
-  add_mailbox_config (mailbox);
+  config_mailbox_add (mailbox, "Outbox");
   mailbox_free (mailbox);
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->trash)));
   mailbox = mailbox_new (type);
   mailbox->name = g_strdup ("Trash");
   MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->trash)));
-  add_mailbox_config (mailbox);
+  config_mailbox_add (mailbox, "Trash");
   mailbox_free (mailbox);
 
-  save_global_settings ();
+  config_global_save ();
 
   gtk_widget_destroy (prefs->real_name);
   gtk_widget_destroy (prefs->email);
@@ -496,6 +496,9 @@ complete_cb (GtkWidget * widget)
   gtk_widget_destroy (iw->window);
   g_free (iw);
 
+#if 0
   do_load_mailboxes ();
   open_main_window ();
+#endif
+  init_balsa_app(0, NULL);
 }

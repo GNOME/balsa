@@ -1,3 +1,17 @@
+1998-08-23  Nat Friedman  <ndf@retrans.mit.edu>
+
+	* src/save-restore.c: This file has been completely rewritten.
+	libPropList based configuration loading and storing is now
+	functional.
+
+	The configuration function names have all been made sane, also,
+	and several files, including balsa-app.c, balsa-init.c, main.c,
+	and pref-manager.c had to be modified to call the new routines.
+
+	* src/mailbox-conf.c: Added some casts to the gtk_signal_connect()
+	calls so that passing non-pointer closures doesn't generate a warning.
+
+
 1998-08-07  Michael Lausch  <mla@gams.co.at>
 
 	* src/main.c (balsa_exit): fix crash when exiting without

@@ -104,6 +104,6 @@ balsa_exit ()
   gtk_timeout_remove (balsa_app.new_messages_timer);
 #endif
 
-  save_global_settings ();
+  config_global_save ();
   gtk_exit (0);
 }

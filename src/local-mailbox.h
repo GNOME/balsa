@@ -19,6 +19,6 @@
 #ifndef __LOCAL_MAILBOX_H__
 #define __LOCAL_MAILBOX_H__
 
-void load_local_mailboxes ();
+void load_local_mailboxes (void);
 
 #endif /* __LOCAL_MAILBOX_H__ */

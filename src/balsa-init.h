@@ -1,1 +1,1 @@
-void initialize_balsa();
+void initialize_balsa (int argc, char *argv[]);

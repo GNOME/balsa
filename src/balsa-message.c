@@ -47,8 +47,6 @@ static void balsa_message_size_allocate (GtkWidget * widget, GtkAllocation * all
 
 /* static */
 
-static void  text2html (gchar* txt, struct obstack* html_buffer);
-
 static GtkBinClass *parent_class = NULL;
 
 guint

@@ -81,6 +81,6 @@ balsa_app;
 
 
 void init_balsa_app (int argc, char *argv[]);
-void do_load_mailboxes();
+void do_load_mailboxes(void);
 
 #endif /* __BALSA_APP_H__ */

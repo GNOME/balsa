@@ -252,7 +252,7 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
   /*
    * close window and free memory
    */
-  save_global_settings ();
+  config_global_save ();
 }
 
 

@@ -576,7 +576,7 @@ config_get_unused_section (const gchar *prefix)
 	max = curr;
     }
   }
-  name =  g_strdup_printf(BALSA_CONFIG_PREFIX "%s-%d/", prefix, max+1);
+  name =  g_strdup_printf(BALSA_CONFIG_PREFIX "%s%d/", prefix, max+1);
   if(balsa_app.debug)
     g_print("config_mailbox_get_highest_number: name='%s'\n", name);
   return name;

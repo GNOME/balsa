@@ -110,7 +110,8 @@ lbh_new(const gchar * text, size_t len, GString * export_string,
 			 link_clicked_cb, NULL);
 
     stream = gtk_html_begin(GTK_HTML(html));
-    gtk_html_write(GTK_HTML(html), stream, text, len);
+    if (len > 0)
+	gtk_html_write(GTK_HTML(html), stream, text, len);
     if (export_string)
 	gtk_html_export(GTK_HTML(html), "text/plain",
 			(GtkHTMLSaveReceiverFn) libbalsa_html_receiver_fn,

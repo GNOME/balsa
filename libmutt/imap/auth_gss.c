@@ -152,7 +152,7 @@ imap_auth_res_t imap_auth_gss (IMAP_DATA* idata)
 	goto bail;
       }
 
-      request_buf.length = mutt_from_base64 (buf2, idata->buf + 2);
+      request_buf.length = mutt_from_base64 (buf2, idata->cmd.buf + 2);
       request_buf.value = buf2;
       sec_token = &request_buf;
     }
@@ -171,7 +171,7 @@ imap_auth_res_t imap_auth_gss (IMAP_DATA* idata)
     dprint (1, (debugfile, "Error receiving server response.\n"));
     goto bail;
   }
-  request_buf.length = mutt_from_base64 (buf2, idata->buf + 2);
+  request_buf.length = mutt_from_base64 (buf2, idata->cmd.buf + 2);
   request_buf.value = buf2;
 
   maj_stat = gss_unwrap (&min_stat, context, &request_buf, &send_token,
@@ -233,13 +233,13 @@ imap_auth_res_t imap_auth_gss (IMAP_DATA* idata)
   do
     rc = imap_cmd_step (idata);
   while (rc == IMAP_CMD_CONTINUE);
-  if (rc != IMAP_CMD_DONE)
+  if (rc != IMAP_CMD_OK)
   {
     dprint (1, (debugfile, "Error receiving server response.\n"));
     mutt_socket_write(idata->conn, "*\r\n");
     goto bail;
   }
-  if (imap_code (idata->buf))
+  if (imap_code (idata->cmd.buf))
   {
     /* flush the security context */
     dprint (2, (debugfile, "Releasing GSS credentials\n"));
@@ -260,6 +260,6 @@ imap_auth_res_t imap_auth_gss (IMAP_DATA* idata)
 
  bail:
   mutt_error _("GSSAPI authentication failed.");
-  sleep (2);
+  mutt_sleep (2);
   return IMAP_AUTH_FAILURE;
 }

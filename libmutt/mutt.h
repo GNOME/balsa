@@ -245,6 +245,10 @@ enum
   OPT_VERIFYSIG, /* verify PGP signatures */
 #endif
 
+#ifdef USE_SSL
+  OPT_SSLSTARTTLS,
+#endif
+
   OPT_PRINT,
   OPT_INCLUDE,
   OPT_DELETE,

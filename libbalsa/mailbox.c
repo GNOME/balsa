@@ -423,8 +423,11 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
 
     LOCK_MAILBOX(mailbox);
 
-    if (--mailbox->open_ref == 0)
+    if (--mailbox->open_ref == 0) {
 	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox);
+	mailbox->sort_column_id = MBOX_SORT_COLUMN_UNSORTED;
+	mailbox->stamp++;
+    }
 
     UNLOCK_MAILBOX(mailbox);
 }

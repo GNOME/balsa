@@ -1,3 +1,7 @@
+2003-07-10  Pawel Salek  <pawsa theochem.kth.se>
+
+	* src/filter-run-callbacks.c: fix bug 116603.
+
 2003-07-08  Danilo Šegan  <dsegan@gmx.net>
 
 	* src/main-window.c (show_about_box): Use the "translator_credits"

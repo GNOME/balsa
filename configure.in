@@ -255,6 +255,9 @@ dnl Remember our prefixes
 dnl   The way prefix et al are defined makes us jump through some hoops.
 dnl ###########################################################################
 
+if test "x$prefix" = "xNONE"; then
+	prefix=$ac_default_prefix
+fi
 dnl datadir='${prefix}/share', so we must eval it or something. This works
 BALSA_STD_PREFIX=`eval "echo ${prefix}"`
 BALSA_DATA_PREFIX=`eval "echo ${datadir}/balsa"`

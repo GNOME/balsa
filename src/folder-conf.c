@@ -223,6 +223,7 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     } else {
         balsa_mailbox_node_rescan(fcw->mbnode);
         config_folder_update(fcw->mbnode);
+	balsa_mblist_mailbox_node_redraw(fcw->mbnode);
     }
 }
 

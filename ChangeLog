@@ -1,5 +1,7 @@
-2004-05-25 13:28  PeterB
+2004-05-25 18:51  PeterB
 
+	* src/: balsa-app.c, balsa-index.c, mailbox-node.c, main-window.c:
+	bullet-proof against closing during startup.
 	* libbalsa/mailbox.c: Manu: make get-path-helper nonrecursive.
 	* libbalsa/mailbox.c: run filters on recent undeleted messages, not
 	all recent.

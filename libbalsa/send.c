@@ -366,7 +366,7 @@ balsa_send_message_real(MessageQueueItem *first_message)
      
      unlink (first_message->tempfile);
      mutt_free_header (&first_message->message);
-     free( &first_message );
+     free( first_message );
 
 #ifdef BALSA_USE_THREADS
 

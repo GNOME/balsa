@@ -519,7 +519,7 @@ static void balsa_mailbox_real_close_mailbox(Mailbox *mailbox)
 static gint
 _mailbox_open_ref (Mailbox * mailbox, gint flag)
 {
-  GString *tmp;
+  gchar *tmp;
   struct stat st;
   LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
 
@@ -566,15 +566,13 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
       break;
 
     case MAILBOX_IMAP:
-      tmp = g_string_new (NULL);
-      g_string_append_c (tmp, '{');
-      g_string_append (tmp, MAILBOX_IMAP(mailbox)->server->host);
-      g_string_sprintfa (tmp, ":%i", MAILBOX_IMAP(mailbox)->server->port);
-      g_string_append_c (tmp, '}');
-      g_string_append (tmp, MAILBOX_IMAP (mailbox)->path);
+      tmp = g_strdup_printf("{%s:%i}%s", 
+			    MAILBOX_IMAP(mailbox)->server->host,
+			    MAILBOX_IMAP(mailbox)->server->port,
+			    MAILBOX_IMAP(mailbox)->path);
       set_imap_username (mailbox);
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp->str, flag, NULL);
-      g_string_free (tmp, TRUE);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp, flag, NULL);
+      g_free (tmp);
       break;
 
     case MAILBOX_UNKNOWN:

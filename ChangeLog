@@ -1,3 +1,9 @@
+2003-10-04 08:08  PeterB
+
+	* libbalsa/mailbox_local.c: Use g_node_traverse to visit nodes--it
+	really does visit all nodes.
+	* libbalsa/mailbox_imap.c: Set msgno correctly when unthreaded.
+
 2003-10-03 08:30  PeterB
 
 	* libbalsa/: mailbox.c, mailbox_imap.c, mailbox_local.c,

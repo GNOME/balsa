@@ -186,9 +186,8 @@ struct _LibBalsaMailboxClass {
     /* Signals */
     gboolean (*open_mailbox) (LibBalsaMailbox * mailbox);
     void (*close_mailbox) (LibBalsaMailbox * mailbox);
+    void (*changed) (LibBalsaMailbox * mailbox);
 
-    void (*messages_added) (LibBalsaMailbox * mailbox,
-			    GList * messages);
     void (*message_append) (LibBalsaMailbox * mailbox,
 			    LibBalsaMessage * message);
     void (*messages_status_changed) (LibBalsaMailbox * mailbox,

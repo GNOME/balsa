@@ -581,6 +581,12 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
   Message *message;
   Body *body;
+  gchar *tmp;
+
+  tmp = gtk_entry_get_text (GTK_ENTRY (bsmsg->to));
+  if (strlen (tmp) < 4)
+    return;
+
   message = message_new ();
 
   message->from = address_new ();

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-03 22:43-0400\n"
+"POT-Creation-Date: 1998-08-04 09:21-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,15 +14,15 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: ENCODING\n"
 
-#: src/balsa-index.c:170
+#: src/balsa-index.c:175
 msgid "From"
 msgstr ""
 
-#: src/balsa-index.c:171
+#: src/balsa-index.c:176
 msgid "Subject"
 msgstr ""
 
-#: src/balsa-index.c:172
+#: src/balsa-index.c:177
 msgid "Date"
 msgstr ""
 
@@ -111,34 +111,34 @@ msgstr ""
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr ""
 
-#: src/mailbox-manager.c:64
+#: src/mailbox-manager.c:69
 msgid "Account"
 msgstr ""
 
-#: src/mailbox-manager.c:65
+#: src/mailbox-manager.c:70
 msgid "Type"
 msgstr ""
 
-#: src/mailbox-manager.c:66
+#: src/mailbox-manager.c:71
 msgid "Server"
 msgstr ""
 
-#: src/mailbox-manager.c:83
+#: src/mailbox-manager.c:86
 msgid "Mailbox Manager"
 msgstr ""
 
 #. edit account button
-#: src/mailbox-manager.c:137
+#: src/mailbox-manager.c:140
 msgid "Edit..."
 msgstr ""
 
 #. edit account button
-#: src/mailbox-manager.c:150
+#: src/mailbox-manager.c:153
 msgid "New..."
 msgstr ""
 
 #. delete account button
-#: src/mailbox-manager.c:163
+#: src/mailbox-manager.c:166
 msgid "Delete..."
 msgstr ""
 
@@ -373,7 +373,7 @@ msgstr ""
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:1102
+#: libbalsa/mailbox.c:1103
 #, c-format
 msgid "Loading message: %s/%s\n"
 msgstr ""

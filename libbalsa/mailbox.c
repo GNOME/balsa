@@ -212,7 +212,7 @@ check_all_pop3_hosts (Mailbox * to)
     }
 }
 
-gint 
+gint
 mailbox_have_new_messages (gchar * path)
 {
   return 1;
@@ -365,7 +365,7 @@ mailbox_open_ref (Mailbox * mailbox)
       /* incriment the reference count */
       mailbox->open_ref++;
 
-      g_print (_("Mailbox: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+      g_print (_ ("Mailbox: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 
       UNLOCK_MAILBOX ();
       return TRUE;
@@ -390,7 +390,7 @@ mailbox_open_unref (Mailbox * mailbox)
 
   if (mailbox->open_ref == 0)
     {
-      g_print (_("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+      g_print (_ ("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 
       free_messages (mailbox);
       mailbox->messages = 0;
@@ -1078,8 +1078,9 @@ message_body_ref (Message * message)
   STATE s;
   gchar *buf;
   gchar tmpfile[PATH_MAX];
+  gchar tmpfile1[PATH_MAX];
   size_t size;
-  
+
   if (!message)
     return;
 
@@ -1099,12 +1100,22 @@ message_body_ref (Message * message)
       b = cur->content;
 
       if (balsa_app.debug)
-	g_print (_("Loading message: %s/%s\n"), TYPE (b->type), b->subtype);
+	g_print (_ ("Loading message: %s/%s\n"), TYPE (b->type), b->subtype);
 
       memset (&s, 0, sizeof (s));
       mutt_mktemp (tmpfile);
 
-      fp = fopen (MAILBOX_LOCAL (message->mailbox)->path, "r");
+      switch (message->mailbox->type)
+	{
+	case MAILBOX_MH:
+	case MAILBOX_MAILDIR:
+	  snprintf (tmpfile1, PATH_MAX, "%s/%s", MAILBOX_LOCAL (message->mailbox)->path, cur->path);
+	  fp = fopen (tmpfile1, "r");
+	  break;
+	default:
+	  fp = fopen (MAILBOX_LOCAL (message->mailbox)->path, "r");
+	  break;
+	}
       s.fpout = fopen (tmpfile, "w+");
       fseek ((s.fpin = fp), b->offset, 0);
       mutt_decode_attachment (b, &s);
@@ -1114,8 +1125,8 @@ message_body_ref (Message * message)
       fflush (s.fpout);
       size = readfile (s.fpout, &buf);
 
-      buf[size-1] = '\0';
-      
+      buf[size - 1] = '\0';
+
       fclose (s.fpout);
 
       body = body_new ();
@@ -1242,4 +1253,3 @@ body_free (Body * body)
   g_free (body->buffer);
   g_free (body);
 }
-

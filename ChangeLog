@@ -1,3 +1,7 @@
+2004-08-13 19:21  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	* libbalsa/gmime-gpgme-context.c: plug leaks.
+
 2004-08-12  Pawel Salek
 
 	* libbalsa/imap-server.c: do not set key for unitialized object.

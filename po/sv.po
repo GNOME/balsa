@@ -1,11 +1,12 @@
 # Swedish translation of balsa.
 # Copyright (C) 1999 Free Software Foundation, Inc.
 # Martin Norbäck <d95mback@dtek.chalmers.se>, 1999
+# Andreas Hyden <a.hyden@cyberpoint.se>
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.6.0\n"
-"POT-Creation-Date: 2000-04-20 20:26+0200\n"
+"POT-Creation-Date: 2000-04-21 22:34+0200\n"
 "PO-Revision-Date: 1999-12-28 14:03+0100\n"
 "Last-Translator: Andreas Hyden <a.hyden@cyberpoint.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -96,8 +97,8 @@ msgstr "Allt klart!"
 msgid "Please enter information about yourself."
 msgstr "Skriv in information om dig själv."
 
-#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:185
-#: src/address-book.c:410
+#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:187
+#: src/address-book.c:422
 msgid "Name:"
 msgstr "Namn:"
 
@@ -172,96 +173,100 @@ msgstr "Konfigurera Balsa"
 
 #: src/address-book.c:175
 msgid "Add New Address"
-msgstr ""
+msgstr "Lägg till ny adress"
 
-#: src/address-book.c:192
+#: src/address-book.c:194
 msgid "E-Mail Address:"
 msgstr "Epostadress:"
 
-#: src/address-book.c:271
+#: src/address-book.c:273
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
 " - %s\n"
 msgstr ""
+"Kunde inte öppna ~/.gnome/GnomeCard.gcrd för läsning.\n"
+" - %s\n"
 
-#: src/address-book.c:274 src/sendmsg-window.c:381
+#: src/address-book.c:276 src/sendmsg-window.c:381
 msgid "OK"
 msgstr "Ok"
 
-#: src/address-book.c:293
+#: src/address-book.c:295
 msgid "No-Id"
-msgstr ""
+msgstr "Inget-Id"
 
-#: src/address-book.c:301
+#: src/address-book.c:303
 msgid "No-Name"
 msgstr "Namnlös"
 
-#: src/address-book.c:390 src/filter-edit-dialog.c:137
+#: src/address-book.c:392 src/filter-edit-dialog.c:137
 msgid "Name"
 msgstr "Namn"
 
-#: src/address-book.c:390
+#: src/address-book.c:392
 msgid "E-Mail Address"
 msgstr "Epostadress:"
 
-#: src/address-book.c:392 src/address-book.c:420 src/main-window.c:173
+#: src/address-book.c:394 src/address-book.c:432 src/main-window.c:173
 msgid "Address Book"
 msgstr "Adressbok"
 
-#: src/address-book.c:452
+#: src/address-book.c:464
 msgid "Send-To"
 msgstr "Skicka till"
 
-#: src/address-book.c:466
+#: src/address-book.c:478
 msgid "Run GnomeCard"
 msgstr "Kör GnomeCard"
 
-#: src/address-book.c:472
+#: src/address-book.c:484
 msgid "Re-Import"
-msgstr ""
+msgstr "Läs om"
 
 #: src/balsa-index-page.c:287
 msgid "Mailbox password:"
 msgstr "Brevlådans lösenord:"
 
 #. password field
-#: src/balsa-index-page.c:293 src/mailbox-conf.c:988 src/mailbox-conf.c:1087
+#: src/balsa-index-page.c:294 src/mailbox-conf.c:989 src/mailbox-conf.c:1088
 msgid "Password:"
 msgstr "Lösenord:"
 
-#: src/balsa-index-page.c:319
+#: src/balsa-index-page.c:320
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
 msgstr ""
+"Kunde inte öppna brevlådan!\n"
+"Var vänlig kolla brevlådeinställningarna."
 
-#: src/balsa-index-page.c:582 src/filter-edit-dialog.c:224
+#: src/balsa-index-page.c:583 src/filter-edit-dialog.c:224
 msgid "New"
 msgstr "Nytt"
 
-#: src/balsa-index-page.c:590 src/main-window.c:373
+#: src/balsa-index-page.c:591 src/main-window.c:373
 msgid "Reply"
 msgstr "Svara"
 
-#: src/balsa-index-page.c:598 src/main-window.c:376
+#: src/balsa-index-page.c:599 src/main-window.c:376
 msgid "Reply to all"
 msgstr "Svara till alla"
 
-#: src/balsa-index-page.c:606 src/main-window.c:379
+#: src/balsa-index-page.c:607 src/main-window.c:379
 msgid "Forward"
 msgstr "Eftersänd"
 
-#: src/balsa-index-page.c:614 src/filter-edit-dialog.c:230
+#: src/balsa-index-page.c:615 src/filter-edit-dialog.c:230
 #: src/main-window.c:366 src/pref-manager.c:876
 msgid "Delete"
 msgstr "Radera"
 
-#: src/balsa-index-page.c:622
+#: src/balsa-index-page.c:623
 msgid "Undelete"
 msgstr "_Återskapa"
 
-#: src/balsa-index-page.c:630
+#: src/balsa-index-page.c:631
 msgid "Transfer"
 msgstr "Överför"
 
@@ -282,87 +287,86 @@ msgstr "Datum"
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Visad brevlåda: %s med %ld meddelanden, %ld nya"
 
-#: src/balsa-message.c:165 src/balsa-message.c:169
+#: src/balsa-message.c:165 src/balsa-message.c:170
 msgid "Save MIME Part"
 msgstr "Spara MIME-delen"
 
-#: src/balsa-message.c:166 src/balsa-message.c:224
+#: src/balsa-message.c:166 src/balsa-message.c:225
 msgid "Save"
 msgstr "Spara"
 
-#: src/balsa-message.c:166 src/balsa-message.c:224 src/mailbox-conf.c:665
+#: src/balsa-message.c:166 src/balsa-message.c:225 src/mailbox-conf.c:666
 #: src/sendmsg-window.c:125 src/sendmsg-window.c:407 src/sendmsg-window.c:1074
 #: src/sendmsg-window.c:1364 src/sendmsg-window.c:1387
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: src/balsa-message.c:167 src/balsa-message.c:225
+#: src/balsa-message.c:168 src/balsa-message.c:227
 msgid "Please choose a filename to save this part of the message as:"
-msgstr ""
+msgstr "Var vänlig välj ett filnamn att spara denna delen av meddelandet som:"
 
-#: src/balsa-message.c:223 src/balsa-message.c:227
+#: src/balsa-message.c:224 src/balsa-message.c:229
 msgid "Save Text"
 msgstr "Spara text"
 
-#: src/balsa-message.c:298 src/balsa-message.c:313
+#: src/balsa-message.c:300 src/balsa-message.c:315
 #, c-format
 msgid " Open of %s failed:%s "
 msgstr " Misslyckades med att öppna %s:%s "
 
-#: src/balsa-message.c:299 src/balsa-message.c:314
+#: src/balsa-message.c:301 src/balsa-message.c:316
 msgid "Ok"
 msgstr "Ok"
 
-#: src/balsa-message.c:640
+#: src/balsa-message.c:642
 msgid "Date:"
 msgstr "Datum:"
 
 #. From:
-#: src/balsa-message.c:644 src/filter-edit-dialog.c:339
+#: src/balsa-message.c:646 src/filter-edit-dialog.c:339
 #: src/sendmsg-window.c:579
 msgid "From:"
 msgstr "Från:"
 
 #. To:
-#: src/balsa-message.c:648 src/filter-edit-dialog.c:327
+#: src/balsa-message.c:650 src/filter-edit-dialog.c:327
 #: src/sendmsg-window.c:581
 msgid "To:"
 msgstr "Till:"
 
-#: src/balsa-message.c:649
+#: src/balsa-message.c:651
 msgid "Cc:"
 msgstr "Kopia:"
 
-#: src/balsa-message.c:650
+#: src/balsa-message.c:652
 msgid "Bcc:"
 msgstr "Osynlig kopia:"
 
-#: src/balsa-message.c:653
-#, fuzzy
+#: src/balsa-message.c:655
 msgid "Fcc:"
-msgstr "Kopia:"
+msgstr "Vidarebefodrad kopia:"
 
 #. Subject:
-#: src/balsa-message.c:654 src/sendmsg-window.c:587
+#: src/balsa-message.c:656 src/sendmsg-window.c:587
 msgid "Subject:"
 msgstr "Rubrik:"
 
-#: src/balsa-message.c:763
+#: src/balsa-message.c:765
 msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
 msgstr ""
 "<tr><td bgcolor=\"#f0f0f0\"> Du fick en kodad fil av typen application/"
 
-#: src/balsa-message.c:767
+#: src/balsa-message.c:769
 msgid "<P>The parameters of this message are:<BR>"
 msgstr "<P>Parametrarna i detta meddelande är:<BR>"
 
-#: src/balsa-message.c:768
+#: src/balsa-message.c:770
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
 msgstr "<table border=0><tr><th>Attribut</th><th>Värde</th></tr>\n"
 
-#: src/balsa-message.c:1163
+#: src/balsa-message.c:1165
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Kunde inte öppna %s. Felnummer = %d, "
@@ -399,7 +403,7 @@ msgstr "Meddelande"
 msgid "Match string:"
 msgstr "Matcha sträng:"
 
-#: src/filter-edit-dialog.c:416 src/mailbox-conf.c:280 src/mailbox-conf.c:1147
+#: src/filter-edit-dialog.c:416 src/mailbox-conf.c:281 src/mailbox-conf.c:1148
 #: src/pref-manager.c:863
 msgid "Add"
 msgstr "Lägg till"
@@ -514,118 +518,118 @@ msgstr "Åoåop! brevlåda ej funnen i balsa_app.mailbox-noder?\n"
 msgid "Mailbox Configurator"
 msgstr "Brevlådekonfigurerare"
 
-#: src/mailbox-conf.c:290 src/mailbox-conf.c:1141
+#: src/mailbox-conf.c:291 src/mailbox-conf.c:1142
 msgid "Update"
 msgstr "Uppdatera"
 
-#: src/mailbox-conf.c:434 src/mailbox-conf.c:450 src/mailbox-conf.c:463
+#: src/mailbox-conf.c:435 src/mailbox-conf.c:451 src/mailbox-conf.c:464
 msgid "You need to fill in the Mailbox Name field."
 msgstr "Du måste skriva in ett brevlådenamn."
 
-#: src/mailbox-conf.c:437
+#: src/mailbox-conf.c:438
 msgid "You need to fill in the folderpath field."
 msgstr "Du måste skriva in sökvägen till mappen"
 
-#: src/mailbox-conf.c:439
+#: src/mailbox-conf.c:440
 msgid "You need to fill in the IMAP Server field"
 msgstr "Du måste skriva in en IMAP-server"
 
-#: src/mailbox-conf.c:441
+#: src/mailbox-conf.c:442
 msgid "You need to fill in the username field"
 msgstr "Du måste skriva in ett användarnamn"
 
-#: src/mailbox-conf.c:443
+#: src/mailbox-conf.c:444
 msgid "You need to fill in the password field"
 msgstr "Du måste skriva in ett lösenord"
 
-#: src/mailbox-conf.c:445
+#: src/mailbox-conf.c:446
 msgid "You need to fill in the port field"
 msgstr "Du måste skriva in en port"
 
-#: src/mailbox-conf.c:467
+#: src/mailbox-conf.c:468
 msgid "You need to fill in the user field."
 msgstr "Du måste skriva in ett användarnamn."
 
-#: src/mailbox-conf.c:471
+#: src/mailbox-conf.c:472
 msgid "You need to fill in the password field."
 msgstr "Du måste skriva in ett lösenord."
 
-#: src/mailbox-conf.c:475
+#: src/mailbox-conf.c:476
 msgid "You need to fill in the server field."
 msgstr "Du måste skriva in en server."
 
-#: src/mailbox-conf.c:479
+#: src/mailbox-conf.c:480
 msgid "You need to fill in the port field."
 msgstr "Du måste skriva in portposten."
 
-#: src/mailbox-conf.c:483
+#: src/mailbox-conf.c:484
 msgid "Some of the fields are blank."
 msgstr "Några av fälten är ej ifyllda."
 
-#: src/mailbox-conf.c:664
+#: src/mailbox-conf.c:665
 #, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr "Kan inte skapa brevlåda '%s': %s\n"
 
 #. used to build a string: MAILBOXNAME " on " SERVERNAME
-#: src/mailbox-conf.c:731
+#: src/mailbox-conf.c:732
 msgid " on "
 msgstr " på "
 
-#: src/mailbox-conf.c:844
+#: src/mailbox-conf.c:845
 msgid "New mailbox type:"
 msgstr "Ny brevlådetyp:"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:850
+#: src/mailbox-conf.c:851
 msgid "Local mailbox"
 msgstr "Lokal brevlåda"
 
-#: src/mailbox-conf.c:858
+#: src/mailbox-conf.c:859
 msgid "IMAP server"
 msgstr "IMAP-server"
 
 #. mailbox name
-#: src/mailbox-conf.c:881 src/mailbox-conf.c:916 src/mailbox-conf.c:1033
+#: src/mailbox-conf.c:882 src/mailbox-conf.c:917 src/mailbox-conf.c:1034
 msgid "Mailbox Name:"
 msgstr "Brevlådenamn:"
 
 #. path to file
-#: src/mailbox-conf.c:891
+#: src/mailbox-conf.c:892
 msgid "Mailbox path:"
 msgstr "Sökväg till brevlådan:"
 
 #. pop server
-#: src/mailbox-conf.c:933 src/mailbox-conf.c:1043
+#: src/mailbox-conf.c:934 src/mailbox-conf.c:1044
 msgid "Server:"
 msgstr "Server:"
 
 #. pop port
-#: src/mailbox-conf.c:952 src/mailbox-conf.c:1057
+#: src/mailbox-conf.c:953 src/mailbox-conf.c:1058
 msgid "Port:"
 msgstr "Port:"
 
 #. username
-#: src/mailbox-conf.c:971 src/mailbox-conf.c:1072
+#: src/mailbox-conf.c:972 src/mailbox-conf.c:1073
 msgid "Username:"
 msgstr "Användarnamn:"
 
 #. toggle for check
-#: src/mailbox-conf.c:1003 src/main-window.c:362
+#: src/mailbox-conf.c:1004 src/main-window.c:362
 msgid "Check"
 msgstr "Kolla"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:1011
+#: src/mailbox-conf.c:1012
 msgid "Delete from server"
 msgstr "Ta bort från servern"
 
-#: src/mailbox-conf.c:1100
+#: src/mailbox-conf.c:1101
 msgid "Folder path:"
 msgstr "Sökväg till mapp:"
 
-#: src/mailbox-conf.c:1182
+#: src/mailbox-conf.c:1183
 msgid "Mailbox"
 msgstr "Brevlåda"
 
@@ -651,7 +655,7 @@ msgstr "Skriv ut nuvarande brev"
 
 #: src/main-window.c:205
 msgid "N_o headers"
-msgstr ""
+msgstr "_Inga rubriker"
 
 #: src/main-window.c:207
 msgid "_Selected headers"
@@ -659,7 +663,7 @@ msgstr "_Valda rubriker"
 
 #: src/main-window.c:209
 msgid "All _headers"
-msgstr ""
+msgstr "Alla _rubriker"
 
 #: src/main-window.c:218 src/main-window.c:392
 msgid "Next"
@@ -743,7 +747,7 @@ msgstr "Återskapa meddelandet"
 
 #: src/main-window.c:288
 msgid "_Wrap"
-msgstr ""
+msgstr "_Bryt"
 
 #: src/main-window.c:305
 msgid "List"
@@ -806,9 +810,8 @@ msgid "_Show mailbox tree"
 msgstr "Visa brevlådeträd"
 
 #: src/main-window.c:339
-#, fuzzy
 msgid "Show mailbox _tabs"
-msgstr "Ny brevlådetyp:"
+msgstr "Visa brevklådsflikar"
 
 #: src/main-window.c:353
 msgid "_Message"
@@ -881,11 +884,11 @@ msgstr "Hämta ny post när du startar Balsa"
 
 #: src/main.c:103
 msgid "Compose a new email to EMAIL@ADDRESS"
-msgstr ""
+msgstr "Skriv nytt brev till EPOST@ADRESS"
 
 #: src/main.c:104
 msgid "Opens MAILBOXNAME"
-msgstr ""
+msgstr "Öppnar BREVLÅDSNAMN"
 
 #: src/main.c:104
 msgid "MAILBOXNAME"
@@ -1038,7 +1041,7 @@ msgstr "eftersänder post"
 
 #: src/pref-manager.c:762
 msgid ">"
-msgstr ""
+msgstr ">"
 
 #: src/pref-manager.c:764
 msgid "Signature file:"
@@ -1308,16 +1311,15 @@ msgstr ""
 
 #: src/sendmsg-window.c:168
 msgid "Wrap message lines"
-msgstr ""
+msgstr "Bryt meddelandelinjer"
 
 #: src/sendmsg-window.c:172
 msgid "_Reflow paragraph"
 msgstr ""
 
 #: src/sendmsg-window.c:175
-#, fuzzy
 msgid "R_eflow message"
-msgstr "Nytt meddelande"
+msgstr ""
 
 #: src/sendmsg-window.c:184
 msgid "Fr_om"
@@ -1333,12 +1335,11 @@ msgstr "R_ubrik"
 
 #: src/sendmsg-window.c:190
 msgid "_Cc"
-msgstr ""
+msgstr "_Kopia"
 
 #: src/sendmsg-window.c:192
-#, fuzzy
 msgid "_Bcc"
-msgstr "Osynlig kopia:"
+msgstr "Osynlig kopia"
 
 #: src/sendmsg-window.c:194
 msgid "_Fcc"
@@ -1393,18 +1394,16 @@ msgid "_Show"
 msgstr "_Visa"
 
 #: src/sendmsg-window.c:263
-#, fuzzy
 msgid "_ISO Charset"
-msgstr "Teckenkodning:"
+msgstr "_ISO teckenkodning"
 
 #: src/sendmsg-window.c:379
-#, fuzzy
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
 msgstr ""
 "Bifoga-bilden (balsa/attachment.png) kan inte hittas.\n"
-"Tyvärr betyder det att du inte kan bifoga några filer.\n"
+"Det betyder att du inte kan bifoga några filer.\n"
 
 #: src/sendmsg-window.c:397
 #, c-format
@@ -1460,14 +1459,12 @@ msgid "you"
 msgstr "du"
 
 #: src/sendmsg-window.c:759
-#, fuzzy, c-format
 msgid "On %s %s wrote:\n"
-msgstr ":\n"
+msgstr "På %s skrev %s:\n"
 
 #: src/sendmsg-window.c:761
-#, fuzzy, c-format
 msgid "%s wrote:\n"
-msgstr ":\n"
+msgstr "%s skrev:\n"
 
 #: src/sendmsg-window.c:831
 msgid "Reply to "

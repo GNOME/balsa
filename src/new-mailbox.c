@@ -476,50 +476,10 @@ create_local_mailbox_page (NewMailboxWindow * nmw)
 
   menuitem = 
     append_menuitem_connect (GTK_MENU (menu), 
-			     mailbox_type_description (MAILBOX_MBX),
-			     NULL,
-			     NULL,
-			     (gpointer) MAILBOX_MBX);
-  set_new_mailbox_data (GTK_OBJECT (menuitem), nmw);
-
-    menuitem = 
-    append_menuitem_connect (GTK_MENU (menu), 
-			     mailbox_type_description (MAILBOX_MTX),
-			     NULL,
-			     NULL,
-			     (gpointer) MAILBOX_MTX);
-    set_new_mailbox_data (GTK_OBJECT (menuitem), nmw);
-
-  menuitem = 
-    append_menuitem_connect (GTK_MENU (menu), 
-			     mailbox_type_description (MAILBOX_TENEX),
-			     NULL,
-			     NULL,
-			     (gpointer) MAILBOX_TENEX);
-  set_new_mailbox_data (GTK_OBJECT (menuitem), nmw);
-
-  menuitem = 
-    append_menuitem_connect (GTK_MENU (menu), 
 			     mailbox_type_description (MAILBOX_MBOX),
 			     NULL,
 			     NULL,
 			     (gpointer) MAILBOX_MBOX);
-  set_new_mailbox_data (GTK_OBJECT (menuitem), nmw);
-
-  menuitem = 
-    append_menuitem_connect (GTK_MENU (menu), 
-			     mailbox_type_description (MAILBOX_MMDF),
-			     NULL,
-			     NULL,
-			     (gpointer) MAILBOX_MMDF);
-  set_new_mailbox_data (GTK_OBJECT (menuitem), nmw);
-
-  menuitem = 
-    append_menuitem_connect (GTK_MENU (menu), 
-			     mailbox_type_description (MAILBOX_UNIX),
-			     NULL,
-			     NULL,
-			     (gpointer) MAILBOX_UNIX);
   set_new_mailbox_data (GTK_OBJECT (menuitem), nmw);
 
   menuitem = 
@@ -530,6 +490,12 @@ create_local_mailbox_page (NewMailboxWindow * nmw)
 			     (gpointer) MAILBOX_MH);
   set_new_mailbox_data (GTK_OBJECT (menuitem), nmw);
 
+  menuitem = 
+    append_menuitem_connect (GTK_MENU (menu), 
+			     mailbox_type_description (MAILBOX_MH),
+			     NULL,
+			     NULL,
+			     (gpointer) MAILBOX_MH);
 
   nmw->local_type_menu = gtk_option_menu_new ();
   gtk_widget_set_usize (nmw->local_type_menu, 0, BALSA_BUTTON_HEIGHT);

@@ -17,7 +17,6 @@
  * 02111-1307, USA.
  */
 #include <gnome.h>
-#include <pwd.h>
 
 #include "balsa-app.h"
 #include "mailbox.h"
@@ -215,18 +214,15 @@ void
 restore_global_settings ()
 {
   GString *path;
-  struct passwd *pw;
-
-  pw = getpwuid (getuid ());
 
   /* set to Global configure section */
   gnome_config_push_prefix ("/balsa/Global/");
 
   /* user's real name */
-  balsa_app.real_name = get_string_set_default ("real name", pw->pw_gecos);
+  balsa_app.real_name = get_string_set_default ("real name", g_get_real_name());
 
   /* user name */
-  balsa_app.username = get_string_set_default ("user name", pw->pw_name);
+  balsa_app.username = get_string_set_default ("user name", g_get_user_name());
 
   /* hostname */
   balsa_app.hostname = get_string_set_default ("host name", mylocalhost ());
@@ -236,7 +232,7 @@ restore_global_settings ()
 
   /* directory */
   path = g_string_new (NULL);
-  g_string_sprintf (path, "%s/Mail", pw->pw_dir);
+  g_string_sprintf (path, "%s/Mail", g_get_home_dir());
   balsa_app.local_mail_directory = get_string_set_default ("local mail directory", path->str);
   g_string_free (path, 1);
 

@@ -27,7 +27,6 @@
 #define MAILBOX_LOCAL(mailbox)  ((MailboxLocal *)(mailbox))
 #define MAILBOX_POP3(mailbox)   ((MailboxPOP3 *)(mailbox))
 #define MAILBOX_IMAP(mailbox)   ((MailboxIMAP *)(mailbox))
-#define MAILBOX_NNTP(mailbox)   ((MailboxNNTP *)(mailbox))
 
 
 /*
@@ -111,9 +110,9 @@ struct _Mailbox
     glong new_messages;
     GList *message_list;
 
-    FILE *fd;
-    time_t mtime;
-    off_t size;
+    GList *children;
+
+    GTree *thread;
   };
 
 
@@ -140,16 +139,6 @@ struct _MailboxIMAP
     gchar *passwd;
     gchar *server;
     gchar *path;
-  };
-
-
-struct _MailboxNNTP
-  {
-    Mailbox mailbox;
-    gchar *user;
-    gchar *passwd;
-    gchar *server;
-    gchar *newsgroup;
   };
 
 

@@ -362,6 +362,8 @@ current_selection_changed_cb(GtkTreeSelection * selection, ToolbarPage * page)
 static void
 tp_dialog_response_cb(GtkDialog * dialog, gint response, gpointer data)
 {
+    GError *err = NULL;
+
     switch (response) {
     case GTK_RESPONSE_DELETE_EVENT:
     case GTK_RESPONSE_CLOSE:
@@ -369,7 +371,12 @@ tp_dialog_response_cb(GtkDialog * dialog, gint response, gpointer data)
         gtk_widget_destroy(GTK_WIDGET(dialog));
         break;
     case GTK_RESPONSE_HELP:
-        /* FIXME */
+        gnome_help_display("balsa", "toolbar-prefs", &err);
+        if (err) {
+            g_print(_("Error displaying toolbar help: %s\n"), err->message);
+            g_error_free(err);
+        }
+        break;
     default:
         break;
     }

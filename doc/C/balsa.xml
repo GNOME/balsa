@@ -2650,6 +2650,52 @@ This is version 2.718 of the Balsa manual.
 </variablelist>
 </sect1>
 
+<!-- ################################################################# -->
+<!--                 SECTION: CUSTOMIZING TOOLBARS                     -->
+<!-- ################################################################# -->
+<sect1 id="toolbar-prefs">
+<title>Customizing Toolbars</title>
+
+<para>
+  Balsa allows you to change the layout of the toolbars on the three
+  main types of window: the main window, message windows, and compose
+  windows. You open the dialog with the
+  <menuchoice>
+  <guimenu>Settings</guimenu>
+  <guimenuitem>Toolbars...</guimenuitem>
+  </menuchoice>
+  menu item.
+</para>
+<para>
+  The dialog contains a notebook with a page for each type of window. On
+  each page, you'll see a Preview of the toolbar, which changes as you
+  change the layout. The list of <quote>Available buttons</quote> shows
+  buttons that may be used on the toolbar, but aren't currently used,
+  and the <quote>Current toolbar</quote> list shows the current layout,
+  including both buttons and separators. You can add buttons to the
+  current toolbar, remove them, or move them up or down in the list,
+  using the controls in the central button box.
+</para>
+<para>
+  Below the notebook is a checkbox for wrapping the button labels
+  (the text that may accompany the buttons). This option applies to
+  the toolbars on all three types of window. If you choose wrapping,
+  long labels will be shown on two lines.  You control whether and where
+  the labels are shown using the popup (right click) menu for any actual
+  toolbar, not this dialog.
+</para>
+<para>
+  This is an <quote>instant apply</quote> dialog: the changes you make
+  take effect immediately, as shown in the Preview toolbar; actual
+  toolbars are updated when you close the dialog. Immediately below the
+  Preview toolbar you'll find a button that restores the standard layout
+  for that toolbar. <emphasis>Note</emphasis> that the standard layout
+  is the one that you see before the toolbar has been customized. If you
+  use this option, all current <emphasis>and past</emphasis> changes
+  will be undone.
+</para>
+</sect1>
+
 
 <!-- ################################################################# -->
 <!--                 SECTION: FOLDER CONFIGURATION                     -->

@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8\n"
-"POT-Creation-Date: 2003-02-13 00:58+0200\n"
-"PO-Revision-Date: 2003-02-12 14:17--500\n"
+"POT-Creation-Date: 2003-02-14 00:25+0200\n"
+"PO-Revision-Date: 2003-02-13 13:32--500\n"
 "Last-Translator: Yuriy Syrota <yuri@renome.rovno.ua>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -614,7 +614,7 @@ msgstr "Ві_діслані:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:38
 msgid "_Draftbox:"
-msgstr "_Чорновики:"
+msgstr "_Чернетки:"
 
 #: libinit_balsa/balsa-druid-page-directory.c:39
 msgid "_Trash:"
@@ -3984,7 +3984,7 @@ msgstr "Перевірити цитату"
 
 #: src/pref-manager.c:2433
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Різне"
 
 #: src/pref-manager.c:2435
 msgid "Debug"
@@ -4497,7 +4497,8 @@ msgstr "Параметри"
 #, c-format
 msgid "The message to '%s' is modified.\n"
 "Save message to Draftbox?"
-msgstr ""
+msgstr "Повідомлення до адресата \"%s\" модифіковано.\n"
+"Зберегти повідомлення в теці \"Чернетки\"?"
 
 #: src/sendmsg-window.c:849
 #, fuzzy
@@ -4732,7 +4733,7 @@ msgstr "Зберегти адресу"
 
 #: src/store-address.c:125
 msgid "Save this address and close the dialog?"
-msgstr ""
+msgstr "Зберегти цю адресу і закрити діалог?"
 
 #: src/store-address.c:148
 msgid "No address book selected...."

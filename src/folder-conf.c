@@ -359,7 +359,7 @@ subfolder_conf_clicked_cb(GtkObject* dialog, int buttonno, gpointer data)
 	folder = 
             gtk_editable_get_chars(GTK_EDITABLE(fcw->folder_name), 0, -1);
         
-	if (fcw->mbnode) {
+	if (fcw->old_folder) {
 	    /* rename */
 	    if (strcmp(parent, fcw->old_parent) || 
                 strcmp(folder, fcw->old_folder)) {

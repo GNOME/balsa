@@ -648,6 +648,7 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 	if (cur->replied)
 	    message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
 
+        message->msgno     = cur->msgno;
         /* set the length */
 #ifdef MESSAGE_COPY_CONTENT
         message->length = cur->content->length;

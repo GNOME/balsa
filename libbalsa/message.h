@@ -107,6 +107,8 @@ struct _LibBalsaMessage {
     LibBalsaMessageBody *body_list;
     /*  GList *body_list; */
 
+    gint msgno;     /* message no; always copy for faster sorting. */
+#define LIBBALSA_MESSAGE_GET_NO(m)      ((m)->msgno)
 #if MESSAGE_COPY_CONTENT
     glong length;   /* byte len */
     gint lines_len; /* line len */
@@ -115,9 +117,9 @@ struct _LibBalsaMessage {
 #else
 #define LIBBALSA_MESSAGE_GET_LENGTH(m) libbalsa_message_get_length(m)
 #define LIBBALSA_MESSAGE_GET_LINES(m)  libbalsa_message_get_lines(m)
+#define LIBBALSA_MESSAGE_GET_NO(m)  libbalsa_message_get_no(m)
 #endif
 };
-#define LIBBALSA_MESSAGE_GET_NO(m)  libbalsa_message_get_no(m)
 #define LIBBALSA_MESSAGE_IS_FLAGGED(m)\
  ((m)->flags&LIBBALSA_MESSAGE_FLAG_FLAGGED)
 

@@ -1,3 +1,9 @@
+2001-11-09  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/message.h: have a copy of msgno for faster sorting.
+	* libbalsa/mailbox.c: copy msgno for faster sorting.
+	* src/folder-conf.c: recognize properly if you add a folder or update.
+
 2001-11-08  Carlos Morgado  <chbm@chbm.nu>
 
 	* configure.in: gss stuff tweak

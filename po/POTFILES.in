@@ -13,6 +13,7 @@ libbalsa/filter-error.c
 libbalsa/filter-file.c
 libbalsa/filter.c
 libbalsa/folder-scanners.c
+libbalsa/gmime-gpgme-context.c
 libbalsa/identity.c
 libbalsa/libbalsa.c
 libbalsa/libbalsa_private.h
@@ -51,15 +52,15 @@ libmutt/imap/message.c
 libmutt/imap/util.c
 libmutt/lib.c
 libmutt/mbox.c
+libmutt/mh.c
 libmutt/mutt_socket.c
 libmutt/mutt_ssl.c
-libmutt/mh.c
 libmutt/mx.c
 libmutt/parse.c
 libmutt/sendlib.c
-src/address-book-config.c
 src/ab-main.c
 src/ab-window.c
+src/address-book-config.c
 src/balsa-app.c
 src/balsa-index-threading.c
 src/balsa-index.c

@@ -17,7 +17,16 @@
  * 02111-1307, USA.
  */
 
-/* PKGW 11/17/1999: Major overhaul to use GnomeDruid. Huzzah! */
+/* PKGW 11/17/1999: Major overhaul to use GnomeDruid. Huzzah! 
+
+   However, what follows may not be suitable for younger, more
+   impressionable programmers. It is sooo, sooo, sooo ugly. To
+   make it clean would require deriving GnomeDruidPages for my
+   various special pages, no small task. However, if you delete
+   your .balsarc and run the setter-upper -- wow!
+
+   TODO: some GtkLabels aren't repainted??
+*/
 
 #include "config.h"
 

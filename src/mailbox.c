@@ -783,6 +783,7 @@ message_new ()
 
   message = g_malloc (sizeof (Message));
 
+  message->flags = 0;
   message->msgno = 0;
   message->mailbox = NULL;
   message->remail = NULL;
@@ -896,6 +897,7 @@ void
 message_body_ref (Message * message)
 {
   Body *body;
+
  
   if (!message)
     return;
@@ -906,10 +908,8 @@ message_body_ref (Message * message)
       return;
     }
 
-  g_print("Message: loading %s\n", message->subject);
-
   body = body_new ();
-  body->buffer = g_strdup("Hello, this is a test message.\nThank you for trying Balsa!");
+  body->buffer = g_strdup(mail_fetchtext (CLIENT_STREAM (message->mailbox), message->msgno));
   
   message->body_list = g_list_append (message->body_list, body);
   message->body_ref++;
@@ -930,8 +930,6 @@ message_body_unref (Message * message)
 
   if (--message->body_ref == 0)
     {
-      g_print("Message: unloading %s\n", message->subject);
-
       list = message->body_list;
       while (list)
 	{

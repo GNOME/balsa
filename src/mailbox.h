@@ -69,6 +69,13 @@ typedef enum
 } MailboxWatcherMessageMask;
 
 
+typedef enum
+{
+  MESSAGE_FLAG_NEW            = 1 << 1,
+  MESSAGE_FLAG_DELETE         = 1 << 2,
+  MESSAGE_FLAG_ANSWERED       = 1 << 3
+} MessageFlags;
+
 
 /*
  * strucutres
@@ -161,6 +168,9 @@ struct _Message
 {
   /* the mailbox this message belongs to */
   Mailbox *mailbox;
+
+  /* flags */
+  MessageFlags flags;
 
   /* the ordered numberic index of this message in 
    * the mailbox beginning from 1, not 0 */

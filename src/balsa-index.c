@@ -167,6 +167,7 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_BROWSE);
   gtk_clist_set_column_justification (clist, 0, GTK_JUSTIFY_CENTER);
+  gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_RIGHT);
   gtk_clist_set_column_width (clist, 0, 9);
   gtk_clist_set_column_width (clist, 1, 30);
   gtk_clist_set_column_width (clist, 2, 150);
@@ -305,6 +306,7 @@ void
 balsa_index_add (BalsaIndex * bindex,
 		 Message * message)
 {
+  gchar buff1[1024], buff2[1024];
   gchar *text[5];
   gchar *tmp;
   gint row;
@@ -316,18 +318,25 @@ balsa_index_add (BalsaIndex * bindex,
     return;
 
   text[0] = NULL;
-  text[1] = NULL;
+
+  text[1] = buff1;
+
+  text[2] = buff2;
   if (message->from->personal)
-    text[2] = message->from->personal;
+    sprintf (text[2], "%s", message->from->personal);
   else
-  {
-    text[2] = g_malloc(strlen(message->from->user)+1+strlen(message->from->host)+1);
     sprintf (text[2], "%s@%s", message->from->user, message->from->host);
-    }
+
   text[3] = message->subject;
+
   text[4] = message->date;
 
   row = gtk_clist_append (GTK_CLIST (GTK_BIN (bindex)->child), text);
+
+  /* set message number */
+  sprintf (text[1], "%d", row + 1);
+  gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, text[1]);
+
   gtk_clist_set_row_data (GTK_CLIST (GTK_BIN (bindex)->child), row, (gpointer) message);
 }
 
@@ -395,7 +404,6 @@ balsa_index_set_flag (BalsaIndex * bindex, Message * message, gchar * flag)
     }
 #endif
 }
-
 
 
 /*

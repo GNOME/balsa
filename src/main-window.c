@@ -336,13 +336,17 @@ close_main_window (void)
 void
 refresh_main_window (void)
 {
+  GnomeDockItem *item;
+  GtkWidget *toolbar;
+
   /*
    * set the toolbar style
    */
-/* FIXME */
-	/*
-  gtk_toolbar_set_style (GTK_TOOLBAR (GNOME_APP (mdi->active_window)->toolbar), balsa_app.toolbar_style);
-  */
+  item = gnome_app_get_dock_item_by_name (GNOME_APP (mdi->active_window),
+                                          GNOME_APP_TOOLBAR_NAME);
+  toolbar = gnome_dock_item_get_child (item);
+
+  gtk_toolbar_set_style (GTK_TOOLBAR (toolbar), balsa_app.toolbar_style);
 }
 
 /*
@@ -697,10 +701,10 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
 
-  dock_item = gnome_dock_item_new (_("Mailboxes"),
-  				   GNOME_DOCK_ITEM_BEH_NEVER_HORIZONTAL);
-  gnome_dock_item_set_shadow_type (GNOME_DOCK_ITEM (dock_item),
-  				   GTK_SHADOW_NONE);
+  dock_item = gnome_dock_item_new ("MailboxList",
+                                   GNOME_DOCK_ITEM_BEH_NEVER_HORIZONTAL
+                                   | GNOME_DOCK_ITEM_BEH_EXCLUSIVE);
+  gnome_dock_item_set_shadow_type (GNOME_DOCK_ITEM (dock_item), GTK_SHADOW_NONE);
 
   mblw->sw = gtk_scrolled_window_new (NULL, NULL);
   mblw->ctree = GTK_CTREE (balsa_mblist_new ());
@@ -708,7 +712,11 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_container_add (GTK_CONTAINER (mblw->sw), GTK_WIDGET (mblw->ctree));
   gtk_container_add (GTK_CONTAINER (dock_item), GTK_WIDGET (mblw->sw));
 
-  gnome_dock_add_item (GNOME_DOCK (app->dock), dock_item, GNOME_DOCK_LEFT, 0, 0, 0, TRUE);
+  gnome_app_add_dock_item (app,
+                           GNOME_DOCK_ITEM (dock_item),
+                           GNOME_DOCK_LEFT,
+                           0, 0, 0);
+
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
 

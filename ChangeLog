@@ -1,3 +1,13 @@
+1998-12-15  Ettore Perazzoli  <ettore@comm2000.it>
+
+	* src/main-window.c (refresh_main_window): Retrieve the toolbar
+ 	with `gnome_app_get_dock_widget_by_name()'.
+	(mblist_open_window): Make the behavior of the dock item
+ 	`EXCLUSIVE'.  Use `gnome_app_add_dock_item' instead of
+ 	`gnome_dock_add_item()'.
+
+	* src/sendmsg-window.c (sendmsg_window_new): Likewise.
+
 1998-12-14  Stuart Parmenter  <pavlov@pavlov.net>
 
         ./	  : INSTALL README balsa.1 balsa.spec configure.in,

@@ -38,15 +38,6 @@
  * enums
  */
 typedef enum {
-    MAILBOX_MBOX,
-    MAILBOX_MH,
-    MAILBOX_MAILDIR,
-    MAILBOX_POP3,
-    MAILBOX_IMAP,
-    MAILBOX_UNKNOWN
-} LibBalsaMailboxType;
-
-typedef enum {
     MAILBOX_SORT_DATE = 1,
     MAILBOX_SORT_SIZE = 2,
     MAILBOX_SORT_SUBJECT = 3,
@@ -158,6 +149,6 @@ void libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
 /*
  * misc mailbox releated functions
  */
-LibBalsaMailboxType libbalsa_mailbox_valid(gchar * filename);
+GtkType libbalsa_mailbox_type_from_path(gchar * filename);
 
 #endif				/* __LIBBALSA_MAILBOX_H__ */

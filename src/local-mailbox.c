@@ -109,7 +109,7 @@ mb_node_find_path(GNode * root, GTraverseType order, GTraverseFlags flags,
 */
 static void
 add_mailbox(const gchar * name, const gchar * path,
-	    LibBalsaMailboxType type, gint isdir)
+	    GtkType type, gint isdir)
 {
     LibBalsaMailbox *mailbox;
     GNode *rnode;
@@ -141,7 +141,7 @@ add_mailbox(const gchar * name, const gchar * path,
 			  G_TRAVERSE_ALL, path))
 	return;
 
-    if (isdir && type == MAILBOX_UNKNOWN) {
+    if (isdir && type == 0) {
 	gchar *tmppath;
 	gchar *dirname;
 	MailboxNode *mbnode;
@@ -163,23 +163,19 @@ add_mailbox(const gchar * name, const gchar * path,
 	g_free(dirname);
 
     } else {
-	switch (type) {
-	case MAILBOX_MH:
-	case MAILBOX_MBOX:
-	case MAILBOX_MAILDIR:
-	    mailbox =
-		LIBBALSA_MAILBOX(libbalsa_mailbox_local_new(path, FALSE));
-	    break;
-	case MAILBOX_IMAP:
-	case MAILBOX_POP3:
-	    g_warning("Error: can't have a local IMAP or POP mailbox\n");
-	default:
-	    g_warning("Unknown mailbox type\n");
-	    mailbox = NULL;
+	if ( type == LIBBALSA_TYPE_MAILBOX_MH ) {
+	    mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_mh_new(path, FALSE));
+	} else if ( type == LIBBALSA_TYPE_MAILBOX_MBOX ) {
+	    mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_mbox_new(path, FALSE));
+	} else if ( type == LIBBALSA_TYPE_MAILBOX_MAILDIR ) {
+	    mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_maildir_new(path, FALSE));
+	} else {
+	    /* type is not a valid local mailbox type. */
+	    g_assert_not_reached();
 	}
 	mailbox->name = g_strdup(name);
 
-	if (isdir && type == MAILBOX_MH) {
+	if (isdir && type == LIBBALSA_TYPE_MAILBOX_MH ) {
 	    /*      g_strdup (g_basename (g_dirname (myfile))) */
 	    node = g_node_new(mailbox_node_new(path, mailbox, TRUE));
 	    rnode = find_my_node(balsa_app.mailbox_nodes, G_LEVEL_ORDER,
@@ -228,7 +224,7 @@ read_dir(gchar * prefix, struct dirent *d)
 
     char filename[PATH_MAX];
     struct stat st;
-    LibBalsaMailboxType mailbox_type;
+    GtkType mailbox_type;
 
 
     if (!d)
@@ -245,18 +241,18 @@ read_dir(gchar * prefix, struct dirent *d)
 	return;
 
     if (S_ISDIR(st.st_mode)) {
-	mailbox_type = libbalsa_mailbox_valid(filename);
+	mailbox_type = libbalsa_mailbox_type_from_path(filename);
 
 	if (balsa_app.debug)
 	    fprintf(stderr, "Mailbox name = %s,  mailbox type = %d\n",
 		    filename, mailbox_type);
 
-	if (mailbox_type == MAILBOX_MH || mailbox_type == MAILBOX_MAILDIR) {
+	if (mailbox_type == LIBBALSA_TYPE_MAILBOX_MH || mailbox_type == LIBBALSA_TYPE_MAILBOX_MAILDIR) {
 	    add_mailbox(d->d_name, filename, mailbox_type, 1);
 	} else {
-	    add_mailbox(d->d_name, filename, MAILBOX_UNKNOWN, 1);
+	    add_mailbox(d->d_name, filename, 0, 1);
 	}
-	if (mailbox_type != MAILBOX_MAILDIR) {
+	if (mailbox_type != LIBBALSA_TYPE_MAILBOX_MAILDIR) {
 	    dpc = opendir(filename);
 	    if (!dpc)
 		return;
@@ -267,8 +263,8 @@ read_dir(gchar * prefix, struct dirent *d)
     } else {
 	if (!is_mh_message(d->d_name)) {
 
-	    mailbox_type = libbalsa_mailbox_valid(filename);
-	    if (mailbox_type != MAILBOX_UNKNOWN)
+	    mailbox_type = libbalsa_mailbox_type_from_path(filename);
+	    if (mailbox_type != 0)
 		add_mailbox(d->d_name, filename, mailbox_type, 0);
 	}
     }

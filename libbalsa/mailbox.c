@@ -654,33 +654,36 @@ libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox)
     mailbox->unread_messages = 0;
 }
 
-LibBalsaMailboxType libbalsa_mailbox_valid(gchar * filename)
+GtkType libbalsa_mailbox_type_from_path(gchar * filename)
 {
     struct stat st;
-    LibBalsaMailboxType ret;
+    GtkType ret = 0;
 
+    /*
+     * FIXME: Needed? if the file doesn't exist won't
+     * we get some unknown value from mx_get_magic 
+     */
     if (stat(filename, &st) == -1)
-	return MAILBOX_UNKNOWN;
+	return 0;
 
     libbalsa_lock_mutt();
     switch (mx_get_magic(filename)) {
     case M_MBOX:
-	ret = MAILBOX_MBOX;
+	ret = LIBBALSA_TYPE_MAILBOX_MBOX;
 	break;
     case M_MMDF:
-	ret = MAILBOX_MBOX;
+	ret = LIBBALSA_TYPE_MAILBOX_MBOX;
 	break;
     case M_MH:
-	ret = MAILBOX_MH;
+	ret = LIBBALSA_TYPE_MAILBOX_MH;
 	break;
     case M_MAILDIR:
-	ret = MAILBOX_MAILDIR;
+	ret = LIBBALSA_TYPE_MAILBOX_MAILDIR;
 	break;
     case M_IMAP:
-	ret = MAILBOX_IMAP;
+	ret = LIBBALSA_TYPE_MAILBOX_IMAP;
 	break;
-    default:
-	ret = MAILBOX_UNKNOWN;
+    case M_KENDRA: /* We don't support KENDRA */
 	break;
     }
     libbalsa_unlock_mutt();

@@ -1,5 +1,13 @@
 2000-12-12  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* libbalsa/mailbox.[ch]: Remove LibBalsaMailboxType, since each
+	type therein is now a separate class (and so hasa type id). Rename
+	libbalsa_mailbox_valid to libbalsa_mailbox_type_from_path for
+	clarity.
+	* src/local-mailbox.c: Don't use LibBalsaMailboxType.
+	
+2000-12-12  Ian Campbell  <ijc25@cam.ac.uk>
+
 	* libbalsa/libbalsa.c (libbalsa_init): Need to register new
 	mailboxes at init time so that config loading will work
 

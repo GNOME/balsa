@@ -322,6 +322,7 @@ gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
     gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
     gtk_window_set_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
     gtk_widget_show (messagebox);
+    page->mailbox = NULL;
     return TRUE;
   }
 

@@ -1377,7 +1377,6 @@ int imap_open_mailbox (CONTEXT *ctx)
 	idata->selected_mailbox);
   else
     snprintf (buf, sizeof (buf), "{%s}%s", host, idata->selected_mailbox);
-
   FREE (&(ctx->path));
   ctx->path = safe_strdup (buf);
 
@@ -1423,9 +1422,8 @@ int imap_open_mailbox (CONTEXT *ctx)
     char *s;
     s = imap_next_word (buf); /* skip seq */
     s = imap_next_word (s); /* Skip response */
-    mutt_error (s);
+    /* mutt_error (s); */
     idata->state = IMAP_AUTHENTICATED;
-    sleep (1);
     return (-1);
   }
 

@@ -2186,8 +2186,40 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
     fclose(fp);
 }
 #ifdef HAVE_GTKHTML
+static gboolean
+balsa_gtk_html_popup(HtmlView * view)
+{
+    GtkWidget *menu, *menuitem;
+
+    menu = gtk_menu_new();
+    menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
+    g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
+			     G_CALLBACK(html_view_zoom_in), view);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
+    g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
+			     G_CALLBACK(html_view_zoom_out), view);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
+    g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
+			     G_CALLBACK(html_view_zoom_reset), view);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    gtk_widget_show_all(menu);
+    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
+	           0, gtk_get_current_event_time());
+    return TRUE;
+}
+
+static gboolean
+balsa_gtk_html_button_press_cb(HtmlView * view, GdkEventButton * event,
+			       BalsaMessage * bm)
+{
+    return ((event->type == GDK_BUTTON_PRESS && event->button == 3)
+	    ? balsa_gtk_html_popup(view) : FALSE);
+}
+
 static void
-part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
+ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
 		    size_t len)
 {
     GtkWidget *html;
@@ -2211,6 +2243,10 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
 		     G_CALLBACK(balsa_gtk_html_link_clicked), NULL);
     g_signal_connect(G_OBJECT(html), "on_url",
 		     G_CALLBACK(balsa_gtk_html_on_url), bm);
+    g_signal_connect(G_OBJECT(html), "popup-menu",
+		     G_CALLBACK(balsa_gtk_html_popup), bm);
+    g_signal_connect(G_OBJECT(html), "button_press_event",
+		     G_CALLBACK(balsa_gtk_html_button_press_cb), bm);
 
     gtk_widget_show(html);
 

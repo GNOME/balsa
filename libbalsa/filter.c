@@ -355,7 +355,8 @@ extend_query(GString * query, const gchar * imap_str, gchar * string)
    P OR Q to a NOT(NOT P NOT Q) in the SEARCH syntax.
  */
 gchar*
-libbalsa_filter_build_imap_query(FilterOpType op, GSList* condlist)
+libbalsa_filter_build_imap_query(FilterOpType op, GSList* condlist,
+				 gboolean only_recent)
 {
     GString* query = g_string_new("");
     gchar* str;
@@ -454,6 +455,8 @@ libbalsa_filter_build_imap_query(FilterOpType op, GSList* condlist)
     }
     if (!match_on_deleted)
 	g_string_prepend(query, "UNDELETED ");
+    if (only_recent)
+	g_string_prepend(query, "RECENT ");
     str = query->str;
     g_string_free(query, FALSE);
     return str;
@@ -508,18 +511,51 @@ libbalsa_filter_match(GSList * filter_list, GList * messages,
 				 LIBBALSA_MESSAGE(messages->data), mbox_locked);
 	}
 	if (match) {
-	    /* We hold a reference on the matching messages, to be sure they are still there when we do actions of filter */
+	    /* We hold a reference on the matching messages, to be sure they 
+	       are still there when we do actions of filter */
 	    g_object_ref(messages->data);
-	    filt->matching_messages=g_list_prepend(filt->matching_messages,LIBBALSA_MESSAGE(messages->data));
+	    filt->matching_messages = 
+		g_list_prepend(filt->matching_messages,
+			       LIBBALSA_MESSAGE(messages->data));
 	}
     }
 }
 
-void libbalsa_filter_match_mailbox(GSList * filter_list, LibBalsaMailbox * mbox)
+void libbalsa_filter_sanitize(GSList * filter_list)
 {
-    LOCK_MAILBOX(mbox);
-    libbalsa_filter_match(filter_list, mbox->message_list, TRUE);
-    UNLOCK_MAILBOX(mbox);
+    GSList * lst,* lst2;
+    GList * matching;
+    LibBalsaFilter * flt,* flt2;
+
+    /* Now we traverse all matching messages so that we only keep the first
+       match : ie if a message matches several filters, it is kept only by
+       the first one as a matching message.
+    */
+    for (lst = g_slist_next(filter_list); lst; lst = g_slist_next(lst)) {
+	flt = lst->data;
+	for (matching = flt->matching_messages; matching;) {
+	    for (lst2 = filter_list; lst2 != lst; lst2 = g_slist_next(lst2)) {
+		flt2 = lst2->data;
+		/* We found that this message matches a previous filter, get
+		   rid of it and stop the search */
+		if (g_list_find(flt2->matching_messages, matching->data)) {
+		    /* Don't forget to pass to the next message before deleting
+		       the current one */
+		    GList * tmp = g_list_next(matching);
+
+		    flt->matching_messages = 
+			g_list_delete_link(flt->matching_messages, matching);
+		    matching = tmp;
+		    break;
+		}
+	    }
+	    /* Pass to the next message only if the current one has not been
+	       found, else matching has already been made pointing to the next
+	       message */
+	    if (lst2==lst)
+		matching = g_list_next(matching);
+	}
+    }
 }
 
 /* Apply all filters on their matching messages (call
@@ -539,7 +575,6 @@ libbalsa_filter_apply(GSList * filter_list)
 
     g_return_val_if_fail(url_to_mailbox_mapper, FALSE);
     if (!filter_list) return FALSE;
-
     for (lst=filter_list;lst;lst=g_slist_next(lst)) {
 	filt=(LibBalsaFilter*)lst->data;
 	if (!filt->matching_messages) continue;

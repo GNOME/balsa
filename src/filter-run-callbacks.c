@@ -91,7 +91,7 @@ run_filters_on_mailbox(GtkTreeView * filter_list, LibBalsaMailbox * mbox)
     if (!filters) return TRUE;
     if (!filters_prepare_to_run(filters))
 	return FALSE;
-    libbalsa_filter_match_mailbox(filters,mbox);
+    libbalsa_mailbox_match(mbox, filters);
     for (lst=filters;lst;lst = g_slist_next(lst))
 	if (((LibBalsaFilter*) lst->data)->matching_messages)
 	    break;
@@ -191,10 +191,20 @@ fr_add_pressed_func(GtkTreeModel * model, GtkTreePath * path,
     } else
         balsa_information(LIBBALSA_INFORMATION_ERROR,
                           _("The destination mailbox of "
-                            "the filter \"%s\" is \"%s\"\n"
+                            "the filter \"%s\" is \"%s\"\n."
                             "You can't associate it with the same "
                             "mailbox (that causes recursion)."),
                           fil->name, p->mbox->name);
+
+    if (!libbalsa_mailbox_can_match(p->mbox, fil->conditions))
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
+			  _("The filter \"%s\" is not compatible with "
+			    "the mailbox type of \"%s\".\n"
+			    "This happens for example when you use"
+			    " regular expressions match with IMAP mailboxes,"
+			    " it is done by a very slow method; if possible, use substring match"
+			    " instead."),
+			  fil->name, p->mbox->name);
 }
 
 void

@@ -180,7 +180,8 @@ gint match_condition(LibBalsaCondition* cond,LibBalsaMessage* message,
 gint match_conditions(FilterOpType op,GSList* cond,LibBalsaMessage* message,
 		      gboolean mbox_locked);
 
-gchar* libbalsa_filter_build_imap_query(FilterOpType, GSList* conditions);
+gchar* libbalsa_filter_build_imap_query(FilterOpType, GSList* conditions,
+					gboolean only_recent);
 
 /* Filtering functions */
 /* FIXME : perhaps I should try to use multithreading -> but we must
@@ -204,10 +205,11 @@ gint filters_prepare_to_run(GSList * filters);
 void libbalsa_filter_match(GSList * filter_list, GList * messages,
 			   gboolean mbox_locked);
 
-/* Same but on mailbox, convenience function that locks the mailbox
-   before calling libbalsa_filter_match */
-
-void libbalsa_filter_match_mailbox(GSList * filter_list, LibBalsaMailbox * mbox);
+/* Sanitize the matching messages of a filters list, ie if a
+   message matches several filters, only keep the first match
+   Essentially used by IMAP code
+ */
+void libbalsa_filter_sanitize(GSList * filter_list);
 
 /* libbalsa_filter_apply will let all filters to apply on their
  * matching messages (you must call libbalsa_filters_match before)

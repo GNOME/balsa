@@ -48,10 +48,11 @@ static void libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox
 							   * mailbox,
 							   gboolean flag);
 static gboolean libbalsa_mailbox_real_message_match(LibBalsaMailbox* mailbox,
-						     LibBalsaMessage * message,
-						     int op,
-						     GSList* conditions);
-
+						    LibBalsaMessage * message,
+						    int op,
+						    GSList* conditions);
+static gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox* mailbox,
+						GSList * conditions);
 static void libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
 static void libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
@@ -89,6 +90,8 @@ enum {
     PROGRESS_NOTIFY,
     CHECK,
     MESSAGE_MATCH,
+    MAILBOX_MATCH,
+    CAN_MATCH,
     SET_UNREAD_MESSAGES_FLAG,
     SAVE_CONFIG,
     LOAD_CONFIG,
@@ -253,6 +256,26 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      G_TYPE_BOOLEAN, 3, G_TYPE_POINTER, G_TYPE_INT,
 		     G_TYPE_POINTER);
 
+    libbalsa_mailbox_signals[MAILBOX_MATCH] =
+	g_signal_new("mailbox-match",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_LAST,
+                     G_STRUCT_OFFSET(LibBalsaMailboxClass,
+                                     mailbox_match),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__POINTER, G_TYPE_NONE, 1,
+                     G_TYPE_POINTER);
+
+    libbalsa_mailbox_signals[CAN_MATCH] =
+	g_signal_new("can-match",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_LAST,
+                     G_STRUCT_OFFSET(LibBalsaMailboxClass,
+                                     can_match),
+                     NULL, NULL,
+                     libbalsa_BOOLEAN__POINTER, G_TYPE_BOOLEAN, 1,
+                     G_TYPE_POINTER);
+
     libbalsa_mailbox_signals[SAVE_CONFIG] =
 	g_signal_new("save-config",
                      G_TYPE_FROM_CLASS(object_class),
@@ -289,6 +312,8 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->get_message_stream = NULL;
     klass->check = NULL;
     klass->message_match = libbalsa_mailbox_real_message_match;
+    klass->mailbox_match = libbalsa_mailbox_real_mbox_match;
+    klass->can_match = libbalsa_mailbox_real_can_match;
     klass->save_config  = libbalsa_mailbox_real_save_config;
     klass->load_config  = libbalsa_mailbox_real_load_config;
 }
@@ -537,6 +562,89 @@ libbalsa_mailbox_message_match(LibBalsaMailbox* mailbox,
 		  libbalsa_mailbox_signals[MESSAGE_MATCH], 0,
                   message, op, conditions, &retval);
     return retval;
+}
+
+/* libbalsa_mailbox_match:
+   Compute the messages matching the filters.
+   Virtual method : it is redefined by IMAP
+ */
+void
+libbalsa_mailbox_match(LibBalsaMailbox* mailbox,
+		       GSList* filters_list)
+{
+    g_return_if_fail(mailbox != NULL);
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    g_signal_emit(G_OBJECT(mailbox),
+		  libbalsa_mailbox_signals[MAILBOX_MATCH], 0,
+                  filters_list);
+}
+
+void libbalsa_mailbox_real_mbox_match(LibBalsaMailbox * mbox,
+				      GSList * filter_list)
+{
+    LOCK_MAILBOX(mbox);
+    libbalsa_filter_match(filter_list, mbox->message_list, TRUE);
+    UNLOCK_MAILBOX(mbox);
+}
+
+gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox* mailbox,
+					 GSList * conditions)
+{
+    /* By default : all filters is OK */
+    return TRUE;
+}
+
+gboolean libbalsa_mailbox_can_match(LibBalsaMailbox * mailbox,
+				    GSList * conditions)
+{
+    gboolean retval;
+
+    g_return_val_if_fail(mailbox!=NULL, FALSE);
+
+    g_signal_emit(G_OBJECT(mailbox),
+		  libbalsa_mailbox_signals[CAN_MATCH], 0,
+                  conditions, &retval);
+    
+    return retval;
+}
+
+/* Helper function to run the "on reception" filters on a mailbox */
+
+void
+libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox, GSList * filters)
+{
+    GList * new_messages;
+    gboolean free_filters = FALSE;
+
+    g_return_if_fail(mailbox!=NULL);
+
+    if (!filters) {
+	if (!mailbox->filters)
+	    config_mailbox_filters_load(mailbox);
+	
+	filters = libbalsa_mailbox_filters_when(mailbox->filters,
+						FILTER_WHEN_INCOMING);
+	free_filters = TRUE;
+    }
+
+    /* We apply filter if needed */
+    if (filters) {
+	LOCK_MAILBOX(mailbox);
+	new_messages = libbalsa_extract_new_messages(mailbox->message_list);
+	if (new_messages) {
+	    if (filters_prepare_to_run(filters)) {
+		libbalsa_filter_match(filters, new_messages, TRUE);
+		UNLOCK_MAILBOX(mailbox);
+		libbalsa_filter_apply(filters);
+	    }
+	    else UNLOCK_MAILBOX(mailbox);
+	    g_list_free(new_messages);
+	}
+	else UNLOCK_MAILBOX(mailbox);
+	if (free_filters)
+	    g_slist_free(filters);
+    }
 }
 
 void

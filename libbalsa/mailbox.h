@@ -149,11 +149,11 @@ struct _LibBalsaMailbox {
 
 struct _LibBalsaMailboxClass {
     GObjectClass parent_class;
-
+    
     /* Signals */
     gboolean (*open_mailbox) (LibBalsaMailbox * mailbox);
     LibBalsaMailboxAppendHandle* (*open_mailbox_append)
-	(LibBalsaMailbox * mailbox);
+	 (LibBalsaMailbox * mailbox);
     void (*close_mailbox) (LibBalsaMailbox * mailbox);
 
     void (*messages_added) (LibBalsaMailbox * mailbox,
@@ -174,9 +174,13 @@ struct _LibBalsaMailboxClass {
     FILE *(*get_message_stream) (LibBalsaMailbox * mailbox,
 				 LibBalsaMessage * message);
     void (*check) (LibBalsaMailbox * mailbox);
-    gboolean (*message_match)(LibBalsaMailbox * mailbox,
-			      LibBalsaMessage * message,
-			      int op, GSList* conditions);
+    gboolean (*message_match) (LibBalsaMailbox * mailbox,
+			       LibBalsaMessage * message,
+			       int op, GSList* conditions);
+    void (*mailbox_match) (LibBalsaMailbox * mailbox,
+			   GSList * filters_list);
+    gboolean (*can_match) (LibBalsaMailbox * mailbox,
+			   GSList * conditions);
     void (*save_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     void (*load_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
 };
@@ -214,9 +218,35 @@ gint libbalsa_mailbox_sync_backend(LibBalsaMailbox * mailbox, gboolean delete);
 
 void libbalsa_mailbox_check(LibBalsaMailbox * mailbox);
 
+/* This function returns TRUE if the mailbox can be matched
+   against the given filters (eg : IMAP mailbox can't
+   use the SEARCH IMAP command for regex match, so the
+   match is done via default filtering funcs->can be slow)
+ */
+gboolean libbalsa_mailbox_can_match(LibBalsaMailbox * mailbox,
+				    GSList * conditions);
 gboolean libbalsa_mailbox_message_match(LibBalsaMailbox * mailbox,
 					LibBalsaMessage * message,
 					int op, GSList* conditions);
+
+/* Virtual function (this function is different for IMAP
+ */
+void libbalsa_mailbox_match(LibBalsaMailbox * mbox, GSList * filter_list );
+
+/* Default filtering function : this is exported because it is used
+   as a fallback for IMAP mailboxes when SEARCH command can not be
+   used.
+   It is ONLY FOR INTERNAL USE (use libbalsa_mailbox_match instead)
+*/
+void libbalsa_mailbox_real_mbox_match(LibBalsaMailbox * mbox, GSList * filter_list);
+
+/* Default filtering function (on reception) : this is exported
+   because it is used as a fallback for IMAP mailboxes when SEARCH
+   command can not be used.
+   It is ONLY FOR INTERNAL USE
+*/
+void libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox,
+					       GSList * filters);
 
 void libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);

@@ -56,8 +56,6 @@ static void libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
 static void libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
-static void run_filters_on_reception(LibBalsaMailbox * mailbox);
-
 GType
 libbalsa_mailbox_local_get_type(void)
 {
@@ -260,7 +258,7 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox)
 
     /* We run the filters here also because new could have been put
        in the mailbox with another mechanism than Balsa */
-    run_filters_on_reception(mailbox);
+    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
 
     /* increment the reference count */
 #ifdef DEBUG
@@ -292,37 +290,6 @@ libbalsa_mailbox_local_append(LibBalsaMailbox * mailbox)
     }
     libbalsa_unlock_mutt();
     return res;
-}
-
-/* Helper function to run the "on reception" filters on a mailbox */
-
-static void
-run_filters_on_reception(LibBalsaMailbox * mailbox)
-{
-    GSList * filters;
-    GList * new_messages;
-
-    if (!mailbox->filters)                                
-        config_mailbox_filters_load(mailbox);
-
-    filters = libbalsa_mailbox_filters_when(mailbox->filters,
-                                            FILTER_WHEN_INCOMING);
-    /* We apply filter if needed */
-    if (filters) {
-	LOCK_MAILBOX(mailbox);
-	new_messages = libbalsa_extract_new_messages(mailbox->message_list);
-	if (new_messages) {
-	    if (filters_prepare_to_run(filters)) {
-		libbalsa_filter_match(filters, new_messages, TRUE);
-		UNLOCK_MAILBOX(mailbox);
-		libbalsa_filter_apply(filters);
-	    }
-	    else UNLOCK_MAILBOX(mailbox);
-	    g_list_free(new_messages);
-	}
-	else UNLOCK_MAILBOX(mailbox);
-	g_slist_free(filters);
-    }
 }
 
 /* libbalsa_mailbox_local_check:
@@ -360,7 +327,7 @@ libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
 		CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
 	    UNLOCK_MAILBOX(mailbox);
 	    libbalsa_mailbox_load_messages(mailbox);
-	    run_filters_on_reception(mailbox);
+	    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
 	} else {
 	    UNLOCK_MAILBOX(mailbox);
 	}

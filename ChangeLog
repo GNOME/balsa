@@ -1,3 +1,12 @@
+2003-04-02  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/mailbox.[hc],mailbox_{local,imap}.[hc]: define new
+	functions (mainly functions moved from filter code) to implement
+	the new API, add filtering on reception (in open and check funcs).
+	* libbalsa/filter.[hc]: move code to mailbox files.
+	* libbalsa/libbalsa-marshal.list: add BOOLEAN:POINTER
+	* src/filter-run-callbacks.c use new functions.
+
 2003-03-26  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/address-book-ldap.c: LDAP uses UTF-8 and so do we.

@@ -77,6 +77,11 @@ void libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap * mailbox,
 gboolean libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox, 
                                          gboolean subscribe);
 
+GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
+						 int op, GSList * conditions,
+						 gboolean only_recent,
+						 gboolean * err);
+
 void libbalsa_mailbox_imap_noop(LibBalsaMailboxImap* mbox);
 
 void libbalsa_imap_close_all_connections(void);

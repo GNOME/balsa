@@ -62,7 +62,7 @@ AC_CHECK_FUNCS(setegid srand48 strerror)
 
 AC_REPLACE_FUNCS(strcasecmp)
 
-if( -f ../libbalsa/libbalsa.c ) then
+if test -f ../libbalsa/libbalsa.c ; then
 # if we're part of balsa, we're part of
 # gnome and thus have snprintf and vsnprintf
   AC_DEFINE(HAVE_SNPRINTF)

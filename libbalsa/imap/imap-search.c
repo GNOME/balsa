@@ -115,7 +115,6 @@ imap_search_key_new_date(ImapSearchDateRange range, int internal, time_t tm)
   s->d.date.dt = tm;
   s->d.date.internal_date = internal;
   s->d.date.range = range;
-  printf("%s(): time=%u\n", __FUNCTION__, (unsigned)tm);
   return s;
 }
 
@@ -246,7 +245,6 @@ imap_write_key_date(ImapMboxHandle *handle, ImapSearchDateRange range,
   default: /* which is -2, the only remaining option */
   case IMSE_D_SINCE  : sio_write(handle->sio, "SINCE " , 6); break;
   }
-  printf("%s(): time=%u\n", __FUNCTION__, (unsigned)tm);
   localtime_r(&tm, &date);
   sio_printf(handle->sio, "%02d-%s-%04d",
              date.tm_mday, month[date.tm_mon], date.tm_year + 1900);
@@ -295,7 +293,6 @@ imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s, unsigned cmdno,
       if(rc != IMR_OK) return rc;
       break;
     case IMSE_DATE:
-      printf("%s(): time=%u\n", __FUNCTION__, (unsigned)s->d.date.dt);
       imap_write_key_date(handle, s->d.date.range, s->d.date.internal_date,
                           s->d.date.dt);
       break;

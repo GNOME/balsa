@@ -18,24 +18,31 @@ Source0:   %{name}-%{version}.tar.bz2
 URL:       http://balsa.gnome.org/
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Packager: Pawel Salek <pawsa@theochem.kth.se>
-Requires: gtk2 >= 2.0.0
-Requires: libgnome >= 2.0.0
-Requires: libgnomeui >= 2.0.0
-Requires: gnome-vfs2 >= 2.0.0
 Requires: libesmtp >= 0.8.6
 Requires: pspell
 Provides: balsa
 
 BuildRequires:  libesmtp >= 0.8.6
+%if %redhat
+Requires: gtk2 >= 2.0.0
+Requires: libgnome >= 2.0.0
+Requires: libgnomeui >= 2.0.0
+Requires: gnome-vfs2 >= 2.0.0
 BuildRequires:  gtk2-devel >= 2.0.0
 BuildRequires:  libgnome-devel >= 2.0.0
 BuildRequires:  libgnomeui-devel >= 2.0.0
 BuildRequires:  gnome-vfs2-devel >= 2.0.0
-%if %redhat
 BuildRequires:  pspell-devel
 %endif
 %if %mdk
-BuildRequires:  libgnome-vfs0-devel
+Requires: gtk+2.0
+Requires: libgnome2_0 
+Requires: libgnomeui2_0
+Requires: libgnome-vfs2_0
+BuildRequires:  libgtk+2.0_0-devel
+BuildRequires:  libgnome2_0-devel 
+BuildRequires:  libgnomeui2_0-devel
+BuildRequires:  libgnome-vfs2_0-devel
 BuildRequires:  libpspell4-devel
 BuildRequires:  libltdl3-devel
 BuildRequires:  libpcre0-devel
@@ -108,6 +115,10 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
 
 
 %changelog
+* Sat Jul 26 2003 Misu Moldovan <dumol@go.ro>
+- further split the Red Hat and Mandrake sections
+- fix Mandrake 9.x dependencies
+
 * Mon Sep 16 2002 Pawel Salek <pawsa@theochem.kth.se>
 - adapt to GNOME2 requirements.
 

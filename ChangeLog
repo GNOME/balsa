@@ -1,3 +1,7 @@
+2003-07-27  Pawel Salek  <pawsa theochem.kth.se>
+
+	* NEWS, configure.in: release balsa-2.0.13
+
 2003-07-25  Darko Obradovic <dobradovic gmx.de>
 
 	* src/main.c: set up the icon in a GNOME-2 compatible fashion.

@@ -61,7 +61,6 @@ static void libbalsa_mailbox_local_set_threading(LibBalsaMailbox *mailbox,
 						 thread_type);
 static void lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
                                          LibBalsaCondition *view_filter);
-static void libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox);
 
 static void libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *mailbox, 
                                                      guint lo, guint hi);
@@ -138,8 +137,6 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 	libbalsa_mailbox_local_set_threading;
     libbalsa_mailbox_class->update_view_filter =
         lbm_local_update_view_filter;
-    libbalsa_mailbox_class->close_mailbox =
-	libbalsa_mailbox_local_close_mailbox;
     libbalsa_mailbox_class->prepare_threading =
         libbalsa_mailbox_local_prepare_threading;
     libbalsa_mailbox_class->fetch_message_structure = 
@@ -155,7 +152,6 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 static void
 libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox)
 {
-    mailbox->msg_list = NULL;
     mailbox->sync_id = 0;
 }
 
@@ -312,13 +308,23 @@ libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 }
 
 static void
-libbalsa_mailbox_local_real_mbox_match(LibBalsaMailbox *mbox,
-                                       GSList * filter_list)
+libbalsa_mailbox_local_real_mbox_match(LibBalsaMailbox * mbox,
+				       GSList * filter_list)
 {
+    guint msgno;
+    GList *msg_list = NULL;
+
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mbox));
     LOCK_MAILBOX(mbox);
-    libbalsa_filter_match(filter_list, 
-                          LIBBALSA_MAILBOX_LOCAL(mbox)->msg_list, TRUE);
+
+    for (msgno = libbalsa_mailbox_total_messages(mbox); msgno > 0; msgno--)
+	msg_list =
+	    g_list_prepend(msg_list,
+			   libbalsa_mailbox_get_message(mbox, msgno));
+
+    libbalsa_filter_match(filter_list, msg_list, TRUE);
+    g_list_free(msg_list);
+
     UNLOCK_MAILBOX(mbox);
 }
 
@@ -333,7 +339,6 @@ libbalsa_mailbox_link_message(LibBalsaMailboxLocal *mailbox,
     gchar *id;
 
     msg->mailbox = mbx;
-    mailbox->msg_list = g_list_prepend(mailbox->msg_list, msg);
 
     if (LIBBALSA_MESSAGE_IS_UNREAD(msg)
 	&& !LIBBALSA_MESSAGE_IS_DELETED(msg))
@@ -371,18 +376,6 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox, guint msgno)
 
     libbalsa_mailbox_set_unread_messages_flag(mailbox,
 					      mailbox->unread_messages > 0);
-}
-
-static void
-libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox)
-{
-    LibBalsaMailboxLocal *mbox = LIBBALSA_MAILBOX_LOCAL(mailbox);
-
-    g_list_free(mbox->msg_list);
-    mbox->msg_list = NULL;
-
-    if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
-	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
 }
 
 /*

@@ -47,7 +47,6 @@ typedef struct _LibBalsaMailboxLocalClass LibBalsaMailboxLocalClass;
 struct _LibBalsaMailboxLocal {
     LibBalsaMailbox mailbox;
 
-    GList *msg_list;
     guint sync_id;
 };
 

@@ -681,9 +681,6 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    g_hash_table_remove(mh->messages_info, 
 		    		GINT_TO_POINTER(msg_info->fileno));
 	    libbalsa_mailbox_msgno_removed(mailbox, msgno);
-	    LIBBALSA_MAILBOX_LOCAL(mh)->msg_list = /* Ugh!! */
-		g_list_remove(LIBBALSA_MAILBOX_LOCAL(mh)->msg_list,
-			msg_info->message);
 	} else {
 	    lbm_mh_flag_line(msg_info, LIBBALSA_MESSAGE_FLAG_NEW, &unseen);
 	    lbm_mh_flag_line(msg_info, LIBBALSA_MESSAGE_FLAG_FLAGGED, &flagged);

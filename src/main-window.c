@@ -3183,15 +3183,25 @@ mailbox_commit_all(GtkWidget * widget, gpointer data)
 void
 empty_trash(void)
 {
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.trash));
-    if(!libbalsa_mailbox_open(balsa_app.trash)) return;
+    guint msgno;
+    GList *msg_list = NULL;
 
-    libbalsa_messages_change_flag
-        (LIBBALSA_MAILBOX_LOCAL(balsa_app.trash)->msg_list,
-         LIBBALSA_MESSAGE_FLAG_DELETED, TRUE);
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.trash));
+    if (!libbalsa_mailbox_open(balsa_app.trash))
+	return;
+
+    for (msgno = libbalsa_mailbox_total_messages(balsa_app.trash);
+	 msgno > 0; msgno--)
+	msg_list =
+	    g_list_prepend(msg_list,
+			   libbalsa_mailbox_get_message(balsa_app.trash,
+							msgno));
+    libbalsa_messages_change_flag(msg_list, LIBBALSA_MESSAGE_FLAG_DELETED,
+				  TRUE);
+    g_list_free(msg_list);
     libbalsa_mailbox_close(balsa_app.trash);
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
-                                balsa_app.trash);
+				balsa_app.trash);
     enable_empty_trash(TRASH_EMPTY);
 }
 

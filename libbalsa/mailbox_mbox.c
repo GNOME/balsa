@@ -927,10 +927,6 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
 	    }
 	} else {
 	    libbalsa_mailbox_msgno_removed(mailbox, j + 1);
-	    /* FIXME when we get rid of msg_list... */
-	    LIBBALSA_MAILBOX_LOCAL(mbox)->msg_list =
-		g_list_remove(LIBBALSA_MAILBOX_LOCAL(mbox)->msg_list,
-			      msg_info->message);
 	    free_message_info(msg_info);
 	    g_array_remove_index(mbox->messages_info, j);
 	}

@@ -691,9 +691,6 @@ lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir,
 	g_ptr_array_remove(mdir->msgno_2_msg_info, removed);
 	libbalsa_mailbox_msgno_removed(LIBBALSA_MAILBOX(mdir),
 				       removed->message->msgno);
-	LIBBALSA_MAILBOX_LOCAL(mdir)->msg_list = /* Ugh!! */
-	    g_list_remove(LIBBALSA_MAILBOX_LOCAL(mdir)->msg_list,
-		    removed->message);
 	/* This will free removed: */
 	g_hash_table_remove(mdir->messages_info, removed->key);
     }

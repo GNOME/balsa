@@ -1012,7 +1012,7 @@ imap_get_string_with_lookahead(struct siobuf* sio, int c)
         c = sio_getc(sio);
       g_string_append_c(str, c);
     }
-    res = str->str; g_string_free(str, FALSE);
+    res = g_string_free(str, FALSE);
   } else { /* this MUST be literal */
     char buf[15];
     int len;
@@ -1072,7 +1072,7 @@ imap_get_astring(struct siobuf *sio, int* lookahead)
       g_string_append_c(str, c);
       c = sio_getc(sio);
     } while(IS_ASTRING_CHAR(c));
-    res = str->str; g_string_free(str, FALSE);
+    res = g_string_free(str, FALSE);
     *lookahead = c;
   } else {
     res = imap_get_string_with_lookahead(sio, c);
@@ -1476,11 +1476,14 @@ imap_get_address(struct siobuf* sio)
   ImapAddress *res = NULL;
   int i, c;
 
-  if(sio_getc(sio) != '(') return NULL;
+  if((c=sio_getc(sio)) != '(') {
+    sio_ungetc(sio);
+    return NULL;
+  }
   
   for(i=0; i<4; i++) {
     addr[i] = imap_get_nstring(sio);
-    if( (c=sio_getc(sio)) != ' '); /* error but do nothing */
+    if( (c=sio_getc(sio)) != ' '); /* error if i < 3 but do nothing */
   }
   if(c == ')') {
     if(addr[2] == NULL) /* end group */
@@ -1498,22 +1501,34 @@ imap_get_address(struct siobuf* sio)
     if(addr[i]) g_free(addr[i]);
   return res;
 }
-static ImapAddress*
-imap_get_addr_list(struct siobuf *sio)
+
+static ImapResponse
+imap_get_addr_list (struct siobuf *sio, ImapAddress ** list)
 {
-  ImapAddress *res = NULL;
-  int c=sio_getc(sio);
-  if( c == '(') {
-    ImapAddress ** addr = &res;
-    while( (*addr=imap_get_address(sio)) != NULL) {
-      addr = &(*addr)->next;
-    }
-    /* assert(c==')'); */
-  } else { /* nil; FIXME: error checking */
-    sio_getc(sio); /* i */
-    sio_getc(sio); /* l */
+  int c;
+  ImapAddress *res;
+  ImapAddress **addr;
+
+  if ((c=sio_getc (sio)) != '(') {
+    if (imap_is_nil(sio, c)) return IMR_OK;
+    else return IMR_PROTOCOL;
   }
-  return res;
+
+  res = NULL;
+  addr = &res;
+  while ((*addr = imap_get_address (sio)) != NULL)
+    addr = &(*addr)->next;
+  if (sio_getc (sio) != ')') {
+    imap_address_free (res);
+    return IMR_PROTOCOL;
+  }
+
+  if (list)
+    *list = res;
+  else
+    imap_address_free (res);
+
+  return IMR_OK;
 }
 
 static ImapResponse
@@ -1521,7 +1536,6 @@ ir_envelope(struct siobuf *sio, ImapEnvelope *env)
 {
   int c;
   char *date, *str;
-  ImapAddress *addr;
 
   if( (c=sio_getc(sio)) != '(') return IMR_PROTOCOL;
   date = imap_get_nstring(sio);
@@ -1533,29 +1547,29 @@ ir_envelope(struct siobuf *sio, ImapEnvelope *env)
   str = imap_get_nstring(sio);
   if(env) env->subject = str; else g_free(str);
   if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
-  addr = imap_get_addr_list(sio);
-  if(env) env->from = addr; else imap_address_free(addr);
+  if(imap_get_addr_list(sio, env ? &env->from : NULL) != IMR_OK)
+    return IMR_PROTOCOL;
   if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
-  addr = imap_get_addr_list(sio);
-  if(env) env->sender = addr; else imap_address_free(addr);
+  if(imap_get_addr_list(sio, env ? &env->sender : NULL) != IMR_OK)
+    return IMR_PROTOCOL;
   if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
-  addr = imap_get_addr_list(sio);
-  if(env) env->replyto = addr; else imap_address_free(addr);
+  if(imap_get_addr_list(sio, env ? &env->replyto : NULL) != IMR_OK)
+    return IMR_PROTOCOL;
   if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
-  addr = imap_get_addr_list(sio);
-  if(env) env->to = addr; else imap_address_free(addr); 
+  if(imap_get_addr_list(sio, env ? &env->to : NULL) != IMR_OK)
+    return IMR_PROTOCOL;
   if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
-  addr = imap_get_addr_list(sio);
-  if(env) env->cc = addr; else imap_address_free(addr);
+  if(imap_get_addr_list(sio, env ? &env->cc : NULL) != IMR_OK)
+    return IMR_PROTOCOL;
   if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
-  addr = imap_get_addr_list(sio);
-  if(env) env->bcc = addr; else imap_address_free(addr);
+  if(imap_get_addr_list(sio, env ? &env->bcc : NULL) != IMR_OK)
+    return IMR_PROTOCOL;
   if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
   str = imap_get_nstring(sio);
   if(env) env->in_reply_to = str; else g_free(str);
   if( (c=sio_getc(sio)) != ' ') { printf("c=%c\n",c); return IMR_PROTOCOL;}
   str = imap_get_nstring(sio);
-  if(env) env->message_id = str; else imap_address_free(addr);
+  if(env) env->message_id = str; else g_free(str);
   if( (c=sio_getc(sio)) != ')') { printf("c=%d\n",c);return IMR_PROTOCOL;}
   return IMR_OK;
 }

@@ -87,6 +87,12 @@ LDFLAGS="$balsa_save_LDFLAGS"
 LIBS="$balsa_save_LIBS"
 
 dnl ######################################################################################
+dnl Check for gnome-window-icon stuff.
+dnl ######################################################################################
+AC_CHECK_HEADERS(libgnomeui/gnome-window-icon.h)
+AC_SUBST(HAVE_LIBGNOMEUI_GNOME_WINDOW_ICON_H)
+
+dnl ######################################################################################
 dnl All the linguas, all the time.
 dnl ######################################################################################
 

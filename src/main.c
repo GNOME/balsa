@@ -21,7 +21,9 @@
 #include "config.h"
 
 #include <gnome.h>
+#ifdef HAVE_LIBGNOMEUI_GNOME_WINDOW_ICON_H
 #include <libgnomeui/gnome-window-icon.h>
+#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -198,7 +200,9 @@ main (int argc, char *argv[])
   balsa_icons_init ();
 
   default_icon = balsa_pixmap_finder( "balsa/balsa_icon.png" );
+#ifdef HAVE_LIBGNOMEUI_GNOME_WINDOW_ICON_H
   gnome_window_icon_set_default_from_file ( default_icon );
+#endif
   g_free( default_icon );
 
   gnome_triggers_do ("", "program", "balsa", "startup", NULL);

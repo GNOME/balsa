@@ -1,3 +1,8 @@
+2000-08-08  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* configure.in: Add check for libgnomeui/gnome-window-icon.h
+	* src/main.c: Only use the gnome-window-icon stuff if we have it.
+
 2000-08-08  Pawel Salek <pawsa@theochem.kth.se>
 	* libbalsa/mailbox_local.c(libbalsa_mailbox_local_new):	fix
 	mailbox creation code and be more verbose on error.

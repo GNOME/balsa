@@ -42,14 +42,18 @@ dnl ##########################################################################
 dnl Check for GtkHTML if available
 dnl ##########################################################################
 
+AC_MSG_CHECKING(whether to use GtkHTML)
 AC_ARG_ENABLE([gtkhtml], [  --enable-gtkhtml Use GtkHTML if available (experimental) [default=yes]],[
 	use_gtkhtml=$enableval
 ],[
 	use_gtkhtml=no
 ])
+AC_MSG_RESULT($use_gtkhtml)
 
 if test x"$use_gtkhtml" = xyes ; then 
         gnome_extras="$gnome_extras libgtkhtml-2.0"
+         # define it, pkg-config will fail in the worst case.
+        AC_DEFINE(HAVE_GTKHTML)
 fi
 
 dnl ###########################################################################

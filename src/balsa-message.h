@@ -95,10 +95,6 @@ void balsa_message_select_all(BalsaMessage * bmessage);
 
 void reflow_string(gchar * str, gint mode, gint * cur_pos, int width);
 
-/* a helper functions; FIXME: find more proper location for them.  */
-GdkFont* balsa_get_font_by_charset(const gchar* base, const gchar*charset,
-                                   gchar ** fontname);
-
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

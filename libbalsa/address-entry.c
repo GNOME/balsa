@@ -45,6 +45,7 @@
  * structure is declared here to keep it opaque */
 struct _LibBalsaAddressEntry {
     GtkEntry parent;
+    gpointer dummy;             /* GtkEntry needs more space? */
 
     GList *active;              /* A GList of email addresses.
                                  * Caution! active may not
@@ -1892,8 +1893,8 @@ libbalsa_address_entry_focus_out(GtkWidget *widget, GdkEventFocus *event)
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(widget), FALSE);
     g_return_val_if_fail(event != NULL, FALSE);
 
-    GTK_WIDGET_UNSET_FLAGS(widget, GTK_HAS_FOCUS);
 #if BALSA_MAJOR == 1
+    GTK_WIDGET_UNSET_FLAGS(widget, GTK_HAS_FOCUS);
     /* not in gtk+-2.0: */
     gtk_widget_draw_focus(widget);
 #endif                          /* BALSA_MAJOR == 1 */
@@ -1907,7 +1908,8 @@ libbalsa_address_entry_focus_out(GtkWidget *widget, GdkEventFocus *event)
 #ifdef USE_XIM
     gdk_im_end ();
 #endif
-    return FALSE;
+    return
+        GTK_WIDGET_CLASS(parent_class)->focus_out_event(widget, event);
 }
 
 

@@ -25,8 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-/*  gdkx needed for GDK_FONT_XFONT */
-#include <gdk/gdkx.h>
+#include <iconv.h>
 #include <libgnomevfs/gnome-vfs-mime-info.h>
 
 #include "balsa-app.h"
@@ -137,7 +136,9 @@ static void balsa_gtk_html_size_request(GtkWidget * widget,
 static void balsa_gtk_html_link_clicked(GtkWidget *html, 
 					const gchar *url);
 #endif
+#if defined(TEXT_URL_HANDLING_CODE) || defined(HAVE_GTKHTML)
 static void balsa_gtk_html_on_url(GtkWidget *html, const gchar *url);
+#endif
 static void balsa_icon_list_size_request(GtkWidget * widget,
 					 GtkRequisition * requisition,
 					 gpointer data);
@@ -605,13 +606,14 @@ add_header_gchar(BalsaMessage * bm, const gchar *header, const gchar *label,
     GtkTextIter insert;
     GtkTextTag *tag;
     gchar *fontname;
-    GdkFont *fnt;
     gchar pad[] = "                ";
     gchar cr[] = "\n";
     gchar *line_start, *line_end;
     gchar *wrapped_value;
+#ifdef OLD_HEADER_FONT_CODE
     const gchar *msgcharset;
-
+    GdkFont *fnt;
+#endif
     if (!(bm->shown_headers == HEADERS_ALL || 
           libbalsa_find_word(header, balsa_app.selected_headers))) 
 	return;
@@ -1178,167 +1180,7 @@ part_info_init_video(BalsaMessage * bm, BalsaPartInfo * info)
     part_info_init_unknown(bm, info);
 }
 
-/* the name should really be one_or_two_const_fields_to_end */
-static gint
-two_const_fields_to_end(const gchar * ptr)
-{
-    int cnt = 0;
-
-    while (*ptr && cnt < 3) {
-	if (*ptr == '*')
-	    return 0;
-	if (*ptr++ == '-')
-	    cnt++;
-    }
-    return cnt < 3;
-}
-
-/* get_font_name returns font name based on given font 
-   wildcard 'base' and given character set encoding.
-   Algorithm: copy max first 12 fields, cutting additionally 
-   at most two last, if they are constant.
-   FIXME: this data duplicates information in sendmsg-window.c
-*/
-static struct {
-    gchar *charset, *font_postfix;
-    gboolean use_fontset;
-} charset2font[] = {
-    {"iso-8859-1", "iso8859-1", FALSE}, 
-    {"iso-8859-2", "iso8859-2", FALSE}, 
-    {"iso-8859-3", "iso8859-3", FALSE}, 
-    {"iso-8859-4", "iso8859-4", FALSE}, 
-    {"iso-8859-5", "iso8859-5", FALSE}, 
-    {"iso-8859-7", "iso8859-7", FALSE}, 
-    {"iso-8859-9", "iso8859-9", FALSE},
-    {"iso-8859-13", "iso8859-13", FALSE}, 
-    {"iso-8859-14", "iso8859-14", FALSE}, 
-    {"iso-8859-15", "iso8859-15", FALSE}, 
-    {"euc-jp", "jisx0208.1983-0", TRUE}, 
-    {"euc-kr", "ksc5601.1987-0", TRUE}, 
-    {"koi-8-r", "koi8-r", FALSE}, 
-    {"koi-8-u", "koi8-u", FALSE}, 
-    {"koi8-r",  "koi8-r", FALSE}, 
-    {"koi8-u",  "koi8-u", FALSE}, 
-    {"us-ascii", "iso8859-1", FALSE}
-};
-
-/* get_font_name:
-   returns a font name corresponding to given font and charset.
-   If use_fontset is provided, it will pass the information if fontset is
-   recommended.
-*/
-static gchar *
-get_font_name(const gchar * base, const gchar * charset, 
-	      gboolean * use_fontset)
-{
-    gchar *res;
-    const gchar *ptr = base, *postfix = NULL;
-    int dash_cnt = 0, len, i;
-
-    g_return_val_if_fail(base != NULL, NULL);
-    g_return_val_if_fail(charset != NULL, NULL);
-
-    return g_strdup("Courier 11");
-    for (i = ELEMENTS(charset2font) - 1; i >= 0; i--)
-	if (g_strcasecmp(charset, charset2font[i].charset) == 0) {
-	    postfix = charset2font[i].font_postfix;
-	    if(use_fontset) *use_fontset = charset2font[i].use_fontset;
-	    break;
-	}
-    if (!postfix)
-	return g_strdup(base);	/* print warning here? */
-
-    /* assemble the XLFD */
-    while (*ptr) {
-	if (*ptr == '-')
-	    dash_cnt++;
-	if (dash_cnt >= 13)
-	    break;
-	if (two_const_fields_to_end(ptr))
-	    break;
-	ptr++;
-    }
-
-    /* defense against a patologically short base font wildcard implemented
-     * in the chunk below
-     * extra space for two dashes and '\0' */
-    len = ptr - base;
-    /* if(dash_cnt>12) len--; */
-    if (len < 1)
-	len = 1;
-    res = (gchar *) g_malloc (len + strlen(postfix) + 2);
-    if (balsa_app.debug)
-	fprintf(stderr, "* base font name: %s\n*    and postfix: %s\n"
-		"*    mallocating: %d bytes\n", base, postfix,
-		len + strlen(postfix) + 2);
-
-    if (len > 1)
-	strncpy(res, base, len);
-    else
-	*res='*';
-
-    res[len] = '-';
-    strcpy(res + len + 1, postfix);
-    return res;
-}
-
-/* balsa_get_font_by_charset:
-   returns font or fontset as specified by general base and charset.
-   Follows code from gfontsel except from the fact that it tries 
-   to never return NULL.
-*/
-GdkFont*
-balsa_get_font_by_charset(const gchar * base, const gchar * charset,
-                          gchar ** result_fontname)
-{
-    gchar * fontname;
-    GdkFont *result;
-    gboolean fs;
-    XFontStruct *xfs;
-
-    fontname = get_font_name(base, charset, &fs);
-    result   = gdk_font_load (fontname);
-    xfs = result ? GDK_FONT_XFONT (result) : NULL;
-
-    if (!xfs || (xfs->min_byte1 != 0 || xfs->max_byte1 != 0))
-    {
-	gchar *tmp_name;
-	g_print("balsa_get_font_by_charset: using fontset\n");
-	if(result) gdk_font_unref (result);
-	tmp_name = g_strconcat (fontname, ",*", NULL);
-	result = gdk_fontset_load (tmp_name);
-        g_free(fontname);
-	fontname = tmp_name;
-    }
-
-    if(!result)
-	g_print("Cannot find font: %s for charset %s\n", fontname, charset);
-
-    if (result_fontname)
-        *result_fontname = fontname;
-    else
-        g_free (fontname);
-    return result;
-}
-
-
 /* HELPER FUNCTIONS ----------------------------------------------- */
-static GdkFont*
-find_body_font(LibBalsaMessageBody * body)
-{
-    gchar *charset;
-    GdkFont * font = NULL;
-
-    charset = libbalsa_message_body_get_parameter(body, "charset");
-
-    if (charset) {
-	font = balsa_get_font_by_charset(balsa_app.message_font, charset, NULL);
-	g_free(charset);
-    }
-    return font;
-}
-
-
 /* reflows a paragraph in given string. The paragraph to reflow is
 determined by the cursor position. If mode is <0, whole string is
 reflowed. Replace tabs with single spaces, squeeze neighboring spaces. 
@@ -1429,8 +1271,10 @@ static const char *url_str = "(((https?|ftps?|nntp)://)|(mailto:|news:))(%[0-9A-
 #endif
 
 /* the cursors which are displayed over URL's and normal message text */
+#if defined(TEXT_URL_HANDLING_CODE) || defined(USE_GTKHTML)
 static GdkCursor *url_cursor_normal = NULL;
 static GdkCursor *url_cursor_over_url = NULL;
+#endif
 
 static void
 free_url_list(GList *l)
@@ -1463,6 +1307,7 @@ free_hotarea_list(GList *l)
     }
 }
 
+#ifdef TEXT_URL_HANDLING_CODE
 /* prescanner: 
  * used to find candidates for lines containing URL's.
  * Empirially, this approach is faster (by factor of 8) than scanning
@@ -1802,31 +1647,6 @@ check_over_url(GtkWidget *widget, GdkEvent *event, gpointer data)
     return FALSE;
 }
 
-static void
-handle_url(const message_url_t* url)
-{
-    if (url->is_mailto) {
-	BalsaSendmsg *snd = 
-	    sendmsg_window_new(GTK_WIDGET(balsa_app.main_window),
-			       NULL, SEND_NORMAL);
-	sendmsg_window_process_url(url->url + 7,
-				   sendmsg_window_set_field, snd);	
-    } else {
-	gchar *notice = g_strdup_printf(_("Calling URL %s..."),
-					url->url);
-        GError *err = NULL;
-
-        gnome_appbar_set_status(balsa_app.appbar, notice);
-        g_free(notice);
-        gnome_url_show(url->url, &err);
-        if (err) {
-            g_print(_("Error showing %s: %s\n"), url->url,
-                    err->message);
-            g_error_free(err);
-        }
-    }
-}
-
 /* if the mouse button was released over an url, try to call it */
 static gboolean 
 check_call_url(GtkWidget *widget, GdkEventButton *event, gpointer data)
@@ -1861,6 +1681,31 @@ check_call_url(GtkWidget *widget, GdkEventButton *event, gpointer data)
 
     return FALSE;
 }
+static void
+handle_url(const message_url_t* url)
+{
+    if (url->is_mailto) {
+	BalsaSendmsg *snd = 
+	    sendmsg_window_new(GTK_WIDGET(balsa_app.main_window),
+			       NULL, SEND_NORMAL);
+	sendmsg_window_process_url(url->url + 7,
+				   sendmsg_window_set_field, snd);	
+    } else {
+	gchar *notice = g_strdup_printf(_("Calling URL %s..."),
+					url->url);
+        GError *err = NULL;
+
+        gnome_appbar_set_status(balsa_app.appbar, notice);
+        g_free(notice);
+        gnome_url_show(url->url, &err);
+        if (err) {
+            g_print(_("Error showing %s: %s\n"), url->url,
+                    err->message);
+            g_error_free(err);
+        }
+    }
+}
+#endif /* defined(TEXT_URL_HANDLING_CODE) */
 
 /* END OF HELPER FUNCTIONS ----------------------------------------------- */
 
@@ -1873,8 +1718,6 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
     gchar *content_type;
     gchar *ptr = NULL;
     size_t alloced;
-    gchar **l = NULL, **lines = NULL, *line = NULL;
-    gint quote_level = 0;
 
     /* one-time compilation of a constant url_str expression */
     if (!url_reg) {
@@ -1920,14 +1763,20 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         part_info_init_unknown(bm, info);
 #endif
     } else {
-        regex_t rex;
         GtkWidget *item = NULL;
         GtkTextBuffer *buffer;
+#ifdef TEXT_URL_HANDLING_CODE
         GdkFont *fnt = NULL;
+        regex_t rex;
         GList *url_list = NULL;
-
-        fnt = find_body_font(info->body);
-
+        gint quote_level = 0;
+        gchar **l = NULL, **lines = NULL, *line = NULL;
+#else
+        int obuflen, ibuflen;
+        char* obuf, *obufp, *ibuf;
+        const char*charset;
+        iconv_t conv;
+#endif
         if (bm->wrap_text) {
             if (balsa_app.recognize_rfc2646_format_flowed
                 && libbalsa_flowed_rfc2646(info->body)) {
@@ -1938,9 +1787,6 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
             } else
                 libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
         }
-
-        if (!fnt)
-            fnt = gdk_fontset_load(balsa_app.message_font);
 
         item = gtk_text_view_new();
         buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(item));
@@ -1954,10 +1800,13 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         gtk_signal_connect(GTK_OBJECT(item), "focus_out_event",
                            (GtkSignalFunc) balsa_message_focus_out_part,
                            (gpointer) bm);
-#ifdef OLD_STYLE_CODE
+#ifdef TEXT_URL_HANDLING_CODE
 
         /* get the widget's default font for those people who did not set up a 
            custom one */
+        fnt = find_body_font(info->body);
+        if (!fnt)
+            fnt = gdk_fontset_load(balsa_app.message_font);
         if (!fnt)
             fnt = gtk_style_get_font(item->style);
 
@@ -2017,8 +1866,27 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
                                      (GtkSignalFunc) mail_text_draw, fnt);
         }
 #else
-        gtk_text_buffer_insert_at_cursor(buffer, ptr, -1);
-#endif /* OLD_STYLE_CODE */
+        /* this should not be an 'else, iconv should be done always. */
+        obuflen = alloced * 4 +1;
+	obuf = obufp = g_malloc(obuflen);
+        ibuf = ptr;
+        ibuflen = alloced;
+        charset = libbalsa_message_charset(info->message);
+        conv = iconv_open("utf8", charset ? charset : "iso-8859-1");
+        if(conv == (iconv_t)(-1)) { /* hm, isn't us-ascii to utf8 a noop? */
+            printf("iconv_open(%s) failed, defaulting to us-ascii\n", charset);
+	    conv = iconv_open("utf8", "us-ascii");
+        }
+#if defined __GLIBC__ && __GLIBC__ && __GLIBC_MINOR__ <= 1 || (defined sun)
+	iconv(conv, (const char **)&ibuf, &ibuflen, &obuf, &obuflen);
+#else
+	iconv(conv, &ibuf, &ibuflen, &obuf, &obuflen);
+#endif
+	iconv_close(conv);
+	*obuf = '\0';
+        gtk_text_buffer_insert_at_cursor(buffer, obufp, -1); 
+        g_free(obufp);
+#endif /* TEXT_URL_HANDLING_CODE */
         gtk_text_view_set_editable(GTK_TEXT_VIEW(item), FALSE);
 
         gtk_widget_show(item);
@@ -2854,8 +2722,8 @@ balsa_gtk_html_size_request(GtkWidget * widget,
     g_return_if_fail(GTK_IS_HTML(widget));
     g_return_if_fail(requisition != NULL);
 
-    requisition->width  = -(widget->style->klass->xthickness + 1) * 2;
-    requisition->height = -(widget->style->klass->ythickness + 1) * 2;
+    requisition->width  = -(widget->style->xthickness + 1) * 2;
+    requisition->height = -(widget->style->ythickness + 1) * 2;
 
     requisition->width  += GTK_LAYOUT(widget)->hadjustment->upper -1 /*EMP*/;
     requisition->height += GTK_LAYOUT(widget)->vadjustment->upper -1 /*EMP*/;
@@ -2865,9 +2733,16 @@ balsa_gtk_html_size_request(GtkWidget * widget,
 static void
 balsa_gtk_html_link_clicked(GtkWidget *html, const gchar *url)
 {
-    gnome_url_show(url);
+    GError *err = NULL;
+    gnome_url_show(url, &err);
+    if (err) {
+        g_print(_("Error showing %s: %s\n"), url, err->message);
+        g_error_free(err);
+    }
 }
 #endif
+
+#if defined(TEXT_URL_HANDLING_CODE) || defined(HAVE_GTKHTML)
 static void
 balsa_gtk_html_on_url(GtkWidget *html, const gchar *url)
 {
@@ -2889,6 +2764,7 @@ balsa_gtk_html_on_url(GtkWidget *html, const gchar *url)
 	}
     }
 }
+#endif
 
 static void
 balsa_icon_list_size_request(GtkWidget * widget,

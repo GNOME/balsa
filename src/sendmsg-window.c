@@ -2965,7 +2965,7 @@ set_ready(LibBalsaAddressEntry * address_entry, BalsaSendmsgAddress *sma)
         if (list) {
             len = g_list_length(list);
 
-            g_list_foreach(list, (GFunc) gtk_object_unref, NULL);
+            g_list_foreach(list, (GFunc) gtk_object_destroy, NULL);
             g_list_free(list);
         } else {
             /* error */
@@ -3623,8 +3623,7 @@ set_locale(GtkWidget * w, BalsaSendmsg * msg, gint idx)
 		       (GTK_BIN(msg->current_language_menu)->child), tmp);
     g_free(tmp);
     
-    msg->font = balsa_get_font_by_charset(balsa_app.message_font,
-                                          msg->charset, NULL);
+    msg->font = gdk_font_load("fixed"); /* FIXME */
 
     if (msg->font) {
 	gdk_font_ref(msg->font);

@@ -1,3 +1,8 @@
+2005-01-20  Pawel Salek
+
+	* libbalsa/address-entry.c: fix crashes on: domain-expanded
+	address selection; unparsable address.
+
 2005-01-17 23:02  PeterB
 
 	* src/: balsa-message.c, sendmsg-window.c: port from

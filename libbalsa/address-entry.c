@@ -202,6 +202,7 @@ lbae_append_addresses(GtkEntryCompletion * completion, GList * match,
     GtkListStore *store;
     GtkTreeIter iter;
     gchar *name;
+    InternetAddress *ia;
 
     info = g_object_get_data(G_OBJECT(completion),
                              LIBBALSA_ADDRESS_ENTRY_INFO);
@@ -213,7 +214,7 @@ lbae_append_addresses(GtkEntryCompletion * completion, GList * match,
     internet_address_list_destroy(info->address_list);
     info->address_list = NULL;
     for (; match; match = match->next) {
-	InternetAddress *ia = match->data;
+	ia = match->data;
 
 	name = internet_address_to_string(ia, FALSE);
         gtk_list_store_append(store, &iter);
@@ -228,8 +229,11 @@ lbae_append_addresses(GtkEntryCompletion * completion, GList * match,
          * default domain, so we'll add user@domain as a possible
          * autocompletion. */
         name = g_strconcat(prefix, "@", info->domain, NULL);
+        ia = internet_address_new_name("", name);
         gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter, NAME_COL, name, -1);
+        gtk_list_store_set(store, &iter, NAME_COL, name, ADDRESS_COL, ia, -1);
+	info->address_list =
+	    internet_address_list_append(info->address_list, ia);
         g_free(name);
     }
 }
@@ -422,7 +426,7 @@ libbalsa_address_entry_get_list(GtkEntry * address_entry)
 	ia = g_hash_table_lookup(info->table, name);
         if (!ia) {
 	    tmp_list = internet_address_parse_string(name);
-	    ia = tmp_list->address;
+	    if(tmp_list) ia = tmp_list->address;
 	}
         if (ia)
             address_list = internet_address_list_append(address_list, ia);

@@ -1,11 +1,13 @@
+#include "config.h"
+#include <gnome.h>
 #include "balsa-init.h"
 
 void 
-initialize_balsa ()
+initialize_balsa (int argc, char *argv[])
 {
-  if (!gnome_config_has_section ("/balsa/Global"))
-    {
-      printf ("New install of Balsa\n");
+      fprintf (stderr,"New install of Balsa\n");
+
+      init_balsa_app (argc, argv);
+
       open_preferences_manager();
-    }
 }

@@ -28,8 +28,18 @@ main (int argc, char *argv[])
 {
   gnome_init ("balsa", NULL, argc, argv, 0, NULL);
 
-  init_balsa_app (argc, argv);
-  open_main_window ();
+
+  if (!gnome_config_has_section ("/balsa/Global"))
+    {
+      initialize_balsa (argc,argv);
+      gtk_main ();
+    }
+  else
+    {
+      init_balsa_app (argc, argv);
+      open_main_window ();
+      gtk_main ();
+    }
 
   gtk_main ();
   return 0;
@@ -51,7 +61,7 @@ balsa_exit ()
 	mailbox_close (mailbox);
     }
 
-  gtk_timeout_remove(balsa_app.timer);
+  gtk_timeout_remove (balsa_app.timer);
   gnome_config_sync ();
   gtk_exit (0);
 }

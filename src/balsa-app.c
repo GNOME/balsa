@@ -67,13 +67,10 @@ init_balsa_app (int argc, char *argv[])
   /* GUI settings */
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
 
-  initialize_balsa();
-
   restore_global_settings ();
   mailboxes_init ();
   setup_local_mailboxes ();
   my_special_mailbox ();
-
 
   /* create main window */
 /*  balsa_app.timer = gtk_timeout_add (5 * 60 * 1000, current_mailbox_check, NULL); */

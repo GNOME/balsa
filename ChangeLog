@@ -4,6 +4,8 @@
 
 2005-03-15 13:03  PeterB
 
+	* libbalsa/body.c: convert charset also for html parts (fixes
+	bug 170456).
 	* libbalsa/mailbox_imap.c: use delim to build path when renaming;
 	use g_build_path() for IMAP paths.
 

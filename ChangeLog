@@ -1,5 +1,8 @@
-2003-10-22 07:11  PeterB
+2003-10-22 13:51  PeterB
 
+	* libbalsa/mailbox_mbox.c: Use
+	libbalsa_address_to_gchar(message->headers->from, 0) instead of
+	g_mime_message_get_sender(message->mime_msg).
 	* libbalsa/mailbox_imap.c: Use g_mime_utils_header_decode_text
 	instead of deprecated g_mime_utils_8bit_header_decode.
 	* libbalsa/mailbox_imap.c: Decode addresses.

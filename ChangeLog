@@ -1,3 +1,7 @@
+2003-07-29  Pawel Salek  <pawsa theochem.kth.se>
+
+	* src/balsa-index.c: try addressing #118620: reorder menu entries.
+
 2003-07-29 12:31  PeterB
 
 	* src/balsa-index.c: Try harder to keep threads expanded when

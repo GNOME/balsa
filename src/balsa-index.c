@@ -1887,8 +1887,6 @@ bndx_popup_menu_create(BalsaIndex * index)
         GtkSignalFunc func;
     } entries[] = {
         {
-        GNOME_STOCK_BOOK_OPEN, N_("_View Source"),
-                GTK_SIGNAL_FUNC(bndx_view_source)}, {
         BALSA_PIXMAP_MENU_REPLY, N_("_Reply..."),
                 GTK_SIGNAL_FUNC(balsa_message_reply)}, {
         BALSA_PIXMAP_MENU_REPLY_ALL, N_("Reply To _All..."),
@@ -1910,6 +1908,8 @@ bndx_popup_menu_create(BalsaIndex * index)
         create_stock_menu_item(menu, entries[i].icon, _(entries[i].label),
                                entries[i].func, index);
 
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), 
+                          gtk_separator_menu_item_new());
     index->delete_item =
         create_stock_menu_item(menu, GNOME_STOCK_TRASH,
                                _("_Delete"),
@@ -1943,6 +1943,14 @@ bndx_popup_menu_create(BalsaIndex * index)
     menuitem = gtk_menu_item_new_with_mnemonic(_("_Move to"));
     index->move_to_item = menuitem;
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+
+    
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), 
+                          gtk_separator_menu_item_new());
+    create_stock_menu_item(menu, GNOME_STOCK_BOOK_OPEN,
+                           _("_View Source"),
+                           GTK_SIGNAL_FUNC(bndx_view_source),
+                           index);
 
     return menu;
 }
@@ -2019,14 +2027,10 @@ create_stock_menu_item(GtkWidget * menu, const gchar * type,
 		       const gchar * label, GtkSignalFunc cb,
 		       gpointer data)
 {
-#if BALSA_MAJOR < 2
-    GtkWidget *menuitem = gnome_stock_menu_item(type, label);
-#else
     GtkWidget *menuitem = gtk_image_menu_item_new_with_mnemonic(label);
     GtkWidget *image = gtk_image_new_from_stock(type, GTK_ICON_SIZE_MENU);
 
     gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
-#endif                          /* BALSA_MAJOR < 2 */
 
     g_signal_connect(G_OBJECT(menuitem), "activate", G_CALLBACK(cb), data);
 

@@ -1,3 +1,7 @@
+2000-11-14  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* po/POTFILES.in: libmutt/pop.c out, libbalsa/pop3.c in.
+	
 2000-11-08  Szabolcs BAN <shooby@gnome.hu>
 
 	* hu.po: Emese modified some terminology stuff.

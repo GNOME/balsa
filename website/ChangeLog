@@ -1,3 +1,8 @@
+2000-10-03  Pawel Salek <pawsa@theochem.kth.se>
+
+	* Makefile.am,configure.in: renamed faq.html.in to faq.html
+	* faq.html: removed tables, updated questions.
+	
 2000-09-29  Pawel Salek <pawsa@theochem.kth.se>
 
 	* main.html, download.html: updated for balsa-1.0.pre1

@@ -30,7 +30,6 @@ dnl ############################################################################
 
 AC_OUTPUT([
 Makefile
-faq.html
 features.html
 screenshots.html
 bugs.html

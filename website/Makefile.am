@@ -1,5 +1,4 @@
 IN_FILES = \
-	faq.html.in \
 	features.html.in \
 	screenshots.html.in \
 	bugs.html.in \

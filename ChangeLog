@@ -1,4 +1,8 @@
-2001-10-19  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+2001-10-21  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in, NEWS, AUTHORS: prepare 1.2.1 release.
+
+2001-10-21  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-index.c: automatic thread expansion on next unread #62737.
 
@@ -63,7 +67,7 @@
 
 	* libbalsa/address-book-ldif.c: never ever modify the list while
 	iterating over it: fix #62468.
-	* src/save-restore.c: remove unused identity/Indentities string.
+	* src/save-restore.c: remove unused identity/Identities string.
 	keep identity order (Steve Wall).
 	
 2001-10-16  Pawel Salek  <pawsa@theochem.kth.se>
@@ -257,7 +261,7 @@
 	* src/print.c:
 	* src/sendmsg-window.c: Sun port (Steve Wall)
 	* src/balsa-message.c: unrealize GtkFileSelection widget 
-	returned buggy gtk+ (Peter Bloomfield).
+	returned by buggy ximian gtk+ builds (Peter Bloomfield).
 
 2001-09-24  Pawel Salek  <pawsa@theochem.kth.se>
 

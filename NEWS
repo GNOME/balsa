@@ -1,3 +1,16 @@
+* Balsa-1.2.1 release. Release date 2001-10-21
+
+- new icons (Ali Akcaagac).
+- handling MIME external-body types: receiving and sending.
+- forwarding messages as attachement (Albrecht Dreﬂ).
+- handling format=flowed messages (Peter Bloomfield, rfc2646).
+- improved handling of collapsed threads (Toralf Lund, Carlos).
+- handling of distribution lists for LDIF address books (Toralf Lund).
+- extended D&D compose mail handling (Peter Bloomfield, Toralf Lund).
+- many new functions added to the toolbar.
+- multiple UI improvements.
+- several bugs fixed.
+
 * Balsa-1.2.0 release. Release date 2001-09-18
 
 - exit clean up cleaned up.

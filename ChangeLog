@@ -1,3 +1,8 @@
+2004-06-16 07:41  PeterB
+
+	* libbalsa/mailbox.c: flush the display instead of syncing it, to
+	improve performance especially on a remote display.
+
 2004-06-15 10:59  PeterB
 
 	* src/balsa-app.c, src/balsa-app.h, src/balsa-index.c,

@@ -467,7 +467,9 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     /* Search results may be cached in iter_view. */
     iter_view =
 	libbalsa_mailbox_search_iter_view(index->mailbox_node->mailbox);
-    /* Check currently selected messages. */
+    /* Check currently selected messages; first block this handler, to
+     * avoid recursive calls while we are changing index->selected. */
+    g_signal_handler_block(selection, index->selection_changed_id);
     for (list = index->selected; list; list = next) {
 	GtkTreePath *path;
 	LibBalsaMessage *message = list->data;
@@ -504,6 +506,7 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     gtk_tree_selection_selected_foreach(selection,
                                         bndx_selection_changed_func,
                                         &sci);
+    g_signal_handler_unblock(selection, index->selection_changed_id);
     if (g_slist_find(index->selected, index->current_message))
         return;
 

@@ -5,6 +5,7 @@
 	contexts (#96548).
 	* libbalsa/address-book-ldap.c: do not crash on severed LDAP
 	connections (PS).
+	* src/folder-conf.c: do not crash on subfolder creation (#96720, EA).
 
 2002-10-20  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 

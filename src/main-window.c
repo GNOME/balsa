@@ -426,11 +426,11 @@ static GnomeUIInfo view_menu[] = {
 #define MENU_VIEW_ZOOM_IN MENU_VIEW_COLLAPSE_ALL_POS + 2
     { GNOME_APP_UI_ITEM, N_("Zoom _In"), N_("Increase magnification"),
       zoom_cb, GINT_TO_POINTER(1), NULL, GNOME_APP_PIXMAP_STOCK,
-      GTK_STOCK_ZOOM_IN, 0, 0, NULL},
+      GTK_STOCK_ZOOM_IN, '+', GDK_CONTROL_MASK, NULL},
 #define MENU_VIEW_ZOOM_OUT MENU_VIEW_ZOOM_IN + 1
     { GNOME_APP_UI_ITEM, N_("Zoom _Out"), N_("Decrease magnification"),
       zoom_cb, GINT_TO_POINTER(-1), NULL, GNOME_APP_PIXMAP_STOCK,
-      GTK_STOCK_ZOOM_OUT, 0, 0, NULL},
+      GTK_STOCK_ZOOM_OUT, '-', GDK_CONTROL_MASK, NULL},
 #define MENU_VIEW_ZOOM_100 MENU_VIEW_ZOOM_OUT + 1
       /* To warn msgfmt that the % sign isn't a format specifier: */
       /* xgettext:no-c-format */
@@ -880,6 +880,13 @@ balsa_window_new()
     gnome_app_construct(GNOME_APP(window), "balsa", "Balsa");
 
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
+
+    /* Use Ctrl+= as an alternative accelerator for zoom-in, because
+     * Ctrl++ is a 3-key combination. */
+    gtk_widget_add_accelerator(view_menu[MENU_VIEW_ZOOM_IN].widget,
+			       "activate", GNOME_APP(window)->accel_group,
+			       '=', GDK_CONTROL_MASK, (GtkAccelFlags) 0);
+
 
     model = balsa_window_get_toolbar_model();
     toolbar = balsa_toolbar_new(model);

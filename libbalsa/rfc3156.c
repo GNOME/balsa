@@ -1225,7 +1225,7 @@ check_gpg_child(gpointer data)
 
     gpg_message =
 	g_locale_to_utf8(spawned_gpg->stderr_buf->str, -1, NULL,
-			 &bytes_read, NULL);
+			 NULL, NULL);
     gdk_threads_enter();
     if (WEXITSTATUS(status) > 0)
 	dialog =

@@ -1103,16 +1103,15 @@ set_prefs(void)
     /* wrap incoming text/plain */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->browse_wrap),
                                  balsa_app.browse_wrap);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->browse_wrap_length),
-		    (float) balsa_app.browse_wrap_length);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-				 (pui->recognize_rfc2646_format_flowed),
-				  balsa_app.recognize_rfc2646_format_flowed);
-
     gtk_widget_set_sensitive(pui->browse_wrap_length,
-			     balsa_app.browse_wrap);
-    gtk_widget_set_sensitive(pui->recognize_rfc2646_format_flowed,
-			     balsa_app.browse_wrap);
+                             balsa_app.browse_wrap);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->browse_wrap_length),
+                              (float) balsa_app.browse_wrap_length);
+
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                 (pui->recognize_rfc2646_format_flowed),
+                                 balsa_app.
+                                 recognize_rfc2646_format_flowed);
 
     /* how to treat multipart/alternative */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
@@ -2874,8 +2873,6 @@ browse_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->browse_wrap));
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->browse_wrap_length), newstate);
-    gtk_widget_set_sensitive(GTK_WIDGET(pui->recognize_rfc2646_format_flowed),
-			     newstate);
     properties_modified_cb(widget, pbox);
 }
 

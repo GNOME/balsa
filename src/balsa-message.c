@@ -1629,16 +1629,14 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 
         libbalsa_utf8_sanitize(ptr);
 
-        if (bm->wrap_text) {
-            if (balsa_app.recognize_rfc2646_format_flowed
-                && libbalsa_flowed_rfc2646(info->body)) {
-                ptr =
-                    libbalsa_wrap_rfc2646(ptr,
-                                          balsa_app.browse_wrap_length,
-                                          FALSE, TRUE);
-            } else
-                libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
-        }
+        if (balsa_app.recognize_rfc2646_format_flowed
+            && libbalsa_flowed_rfc2646(info->body)) {
+            ptr = libbalsa_wrap_rfc2646(ptr,
+                                        (bm->wrap_text
+                                         ? balsa_app.browse_wrap_length
+                                         : G_MAXINT), FALSE, TRUE);
+        } else if (bm->wrap_text)
+            libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
 
         item = gtk_text_view_new();
         gtk_text_view_set_editable(GTK_TEXT_VIEW(item), FALSE);

@@ -44,7 +44,7 @@
 #endif
 
 #include "dotlock.h"
-#include "config.h"
+
 
 #ifdef DL_STANDALONE
 #include "reldate.h"

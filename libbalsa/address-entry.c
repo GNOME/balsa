@@ -64,7 +64,7 @@ struct _LibBalsaAddressEntry {
 /*
  * Global variable.  We need this for access to parent methods.
  */
-static GtkWidgetClass *parent_class = NULL;
+static GtkEntryClass *parent_class = NULL;
 
 
 /*
@@ -115,8 +115,8 @@ static void libbalsa_delete_backward_word	(LibBalsaAddressEntry *);
 static void libbalsa_delete_line		(LibBalsaAddressEntry *);
 static void libbalsa_delete_to_line_end		(LibBalsaAddressEntry *);
 static void libbalsa_force_expand               (LibBalsaAddressEntry *);
-static void libbalsa_paste_clipboard		(LibBalsaAddressEntry *);
-static void libbalsa_cut_clipboard		(LibBalsaAddressEntry *);
+static void libbalsa_paste_clipboard		(GtkEntry *);
+static void libbalsa_cut_clipboard		(GtkEntry *);
 
 /*
  * Map the Control keys to relevant functions.
@@ -127,7 +127,7 @@ static const LibBalsaTextFun control_keys[26] =
 {
     (LibBalsaTextFun)libbalsa_keystroke_home,		/* a */
     (LibBalsaTextFun)libbalsa_move_backward_character,	/* b */
-    (LibBalsaTextFun)gtk_editable_copy_clipboard,	/* c */
+    NULL,						/* c */
     (LibBalsaTextFun)libbalsa_delete_forward_character,	/* d */
     (LibBalsaTextFun)libbalsa_keystroke_end,		/* e */
     (LibBalsaTextFun)libbalsa_move_forward_character,	/* f */
@@ -146,9 +146,9 @@ static const LibBalsaTextFun control_keys[26] =
     NULL,						/* s */
     NULL,						/* t */
     (LibBalsaTextFun)libbalsa_delete_line,		/* u */
-    (LibBalsaTextFun)libbalsa_paste_clipboard,		/* v */
+    NULL,		                                /* v */
     (LibBalsaTextFun)libbalsa_delete_backward_word,	/* w */
-    (LibBalsaTextFun)libbalsa_cut_clipboard,		/* x */
+    NULL,						/* x */
     NULL,						/* y */
     NULL,						/* z */
 };
@@ -227,9 +227,11 @@ libbalsa_address_entry_class_init(LibBalsaAddressEntryClass *klass)
 {
     GtkWidgetClass *gtk_widget_class;
     GtkObjectClass *object_class;
+    GtkEntryClass  *entry_class;
 
     object_class = GTK_OBJECT_CLASS(klass);
     gtk_widget_class = GTK_WIDGET_CLASS(klass);
+    entry_class = GTK_ENTRY_CLASS(klass);
     parent_class = gtk_type_class(GTK_TYPE_ENTRY);
 
     object_class->destroy = libbalsa_address_entry_destroy;
@@ -238,6 +240,9 @@ libbalsa_address_entry_class_init(LibBalsaAddressEntryClass *klass)
     gtk_widget_class->key_press_event = libbalsa_address_entry_key_press;
     gtk_widget_class->focus_out_event = libbalsa_address_entry_focus_out;
     gtk_widget_class->selection_received = libbalsa_address_entry_received;
+
+    entry_class->cut_clipboard = libbalsa_cut_clipboard;
+    entry_class->paste_clipboard = libbalsa_paste_clipboard;
 }
 
 static void
@@ -941,7 +946,7 @@ libbalsa_delete_backward_character(LibBalsaAddressEntry *address_entry)
      * First: Cut the clipboard.
      */
     if (libbalsa_get_selection_bounds(editable, NULL, NULL) && !addy->match) {
-	libbalsa_cut_clipboard(address_entry);
+	libbalsa_cut_clipboard(GTK_ENTRY(address_entry));
 	return;
     }
 
@@ -1023,7 +1028,7 @@ libbalsa_delete_forward_character(LibBalsaAddressEntry *address_entry)
     addy = address_entry->active->data;
     editable = GTK_EDITABLE(address_entry);
     if (libbalsa_get_selection_bounds(editable, NULL, NULL) && !addy->match) {
-	libbalsa_cut_clipboard(address_entry);
+	libbalsa_cut_clipboard(GTK_ENTRY(address_entry));
 	return;
     }
 
@@ -1389,7 +1394,7 @@ libbalsa_keystroke_add_key(LibBalsaAddressEntry *address_entry, gchar *add)
     editable = GTK_EDITABLE(address_entry);
     addy = address_entry->active->data;
     if (libbalsa_get_selection_bounds(editable, NULL, NULL) && !addy->match) {
-	libbalsa_cut_clipboard(address_entry);
+	libbalsa_cut_clipboard(GTK_ENTRY(address_entry));
     }
 
     /*
@@ -1512,13 +1517,10 @@ libbalsa_force_expand(LibBalsaAddressEntry *address_entry)
  *     modifies address_entry
  *************************************************************/
 static void
-libbalsa_paste_clipboard(LibBalsaAddressEntry *address_entry)
+libbalsa_paste_clipboard(GtkEntry *entry)
 {
-    GtkEditable *editable;
-
-    editable = GTK_EDITABLE(address_entry);
-    gtk_editable_paste_clipboard(editable);
-    libbalsa_fill_input(address_entry);
+    parent_class->paste_clipboard(entry);
+    libbalsa_fill_input(LIBBALSA_ADDRESS_ENTRY(entry));
 }
 
 
@@ -1535,13 +1537,10 @@ libbalsa_paste_clipboard(LibBalsaAddressEntry *address_entry)
  *     modifies address_entry
  *************************************************************/
 static void
-libbalsa_cut_clipboard(LibBalsaAddressEntry *address_entry)
+libbalsa_cut_clipboard(GtkEntry *entry)
 {
-    GtkEditable *editable;
-
-    editable = GTK_EDITABLE(address_entry);
-    gtk_editable_cut_clipboard(editable);
-    libbalsa_fill_input(address_entry);
+    parent_class->cut_clipboard(entry);
+    libbalsa_fill_input(LIBBALSA_ADDRESS_ENTRY(entry));
 }
 
 
@@ -1619,7 +1618,7 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
     case GDK_Insert:	/* done */
 	return_val = TRUE;
 	if (event->state & GDK_SHIFT_MASK) {
-	    libbalsa_paste_clipboard(address_entry);
+	    libbalsa_paste_clipboard(entry);
 	} else if (event->state & GDK_CONTROL_MASK)
 	    gtk_editable_copy_clipboard(editable);
 	break;
@@ -1628,7 +1627,7 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
 	if (event->state & GDK_CONTROL_MASK) /* done */
 	    libbalsa_delete_forward_word(address_entry);
 	else if (event->state & GDK_SHIFT_MASK) {
-	    libbalsa_cut_clipboard(address_entry);
+	    libbalsa_cut_clipboard(entry);
 	} else
 	    libbalsa_delete_forward_character(address_entry);
 	break;

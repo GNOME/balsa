@@ -157,6 +157,15 @@ extern "C" {
     /* Expunge deleted messages. */
     void balsa_index_expunge(BalsaIndex * index);
 
+    /* Message window */
+    guint balsa_index_next_msgno(BalsaIndex * index, guint current_msgno);
+    guint balsa_index_previous_msgno(BalsaIndex * index,
+                                     guint current_msgno);
+    guint balsa_index_next_unread_msgno(BalsaIndex * index,
+                                        guint current_msgno);
+    guint balsa_index_next_flagged_msgno(BalsaIndex * index,
+                                         guint current_msgno);
+
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

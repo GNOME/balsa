@@ -693,7 +693,7 @@ balsa_window_new()
 				show_all_headers_tool_cb, window);
     
     gnome_app_set_toolbar(GNOME_APP(window),
-			  get_toolbar(GTK_WIDGET(window), 0));
+			  get_toolbar(GTK_WIDGET(window), TOOLBAR_MAIN));
     
     appbar =
 	GNOME_APPBAR(gnome_appbar_new(TRUE, TRUE, GNOME_PREFERENCES_USER));
@@ -2108,18 +2108,26 @@ wrap_message_cb(GtkWidget * widget, gpointer data)
 			       balsa_app.browse_wrap);
 }
 
+/* show_no_headers_cb:
+   this is a callback for the menu item but it is also called
+   by the show_all_headers_tool_cb function to reset the menu and 
+   internal balsa_app data to HEADERS_SELECTED state.
+   These two cases are distinguished by widget parameter.
+   when widget != NULL, this callback is triggered by the menu event.
+   when widget == NULL, we just reset the state.
+*/
 static void
 show_no_headers_cb(GtkWidget * widget, gpointer data)
 {
     BalsaWindow *bw;
 
-    if (!GTK_CHECK_MENU_ITEM(widget)->active)
+    reset_show_all_headers();
+    if(widget && !GTK_CHECK_MENU_ITEM(widget)->active)
 	return;
 
     balsa_app.shown_headers = HEADERS_NONE;
 
     bw = BALSA_WINDOW(data);
-
     if (bw->preview)
 	balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
 					    HEADERS_NONE);
@@ -2130,7 +2138,8 @@ show_selected_cb(GtkWidget * widget, gpointer data)
 {
     BalsaWindow *bw;
 
-    if (!GTK_CHECK_MENU_ITEM(widget)->active)
+    reset_show_all_headers();
+    if(widget && !GTK_CHECK_MENU_ITEM(widget)->active)
 	return;
 
     balsa_app.shown_headers = HEADERS_SELECTED;
@@ -2148,17 +2157,10 @@ show_all_headers_cb(GtkWidget * widget, gpointer data)
     
     reset_show_all_headers();
     
-    if(GTK_IS_MENU_ITEM(widget))
-	reset_show_all_headers();
-    
-    if(GTK_IS_MENU_ITEM(widget))
-	reset_show_all_headers();
-    
-    if(GTK_IS_MENU_ITEM(widget) && !GTK_CHECK_MENU_ITEM(widget)->active)
+    if(widget && !GTK_CHECK_MENU_ITEM(widget)->active)
 	return;
     
     balsa_app.shown_headers = HEADERS_ALL;
-    
     bw = BALSA_WINDOW(data);
     if (bw->preview)
 	balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
@@ -2643,14 +2645,14 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
     if (mailbox != NULL && mailbox != orig_mailbox) {
         switch (context->suggested_action) {
         case GDK_ACTION_MOVE:
-            balsa_messages_move (messages, mailbox);
+            libbalsa_messages_move (messages, mailbox);
             context->action = context->suggested_action;
             break;
             
         case GDK_ACTION_DEFAULT:
         case GDK_ACTION_COPY:
         default:
-            balsa_messages_copy (messages, mailbox);
+            libbalsa_messages_copy (messages, mailbox);
             context->action = context->suggested_action;
             break;
         }
@@ -3050,14 +3052,14 @@ show_all_headers_tool_cb(GtkWidget * widget, gpointer data)
 	
 	switch(show_all_headers_save) {
 	case HEADERS_NONE:
-	    show_no_headers_cb(widget, data);
+	    show_no_headers_cb(NULL, data);
 	    break;
 	case HEADERS_ALL:
-	    show_all_headers_cb(widget, data);
+	    show_all_headers_cb(NULL, data);
 	    break;
 	case HEADERS_SELECTED:
 	default:
-	    show_selected_cb(widget, data);
+	    show_selected_cb(NULL, data);
 	    break;
 	}
 	show_all_headers_save=-1;

@@ -47,10 +47,6 @@ struct _BalsaMBList {
 
 struct _BalsaMBListClass {
     GtkCTreeClass parent_class;
-
-    void (*select_mailbox) (BalsaMBList * bmblist,
-			    LibBalsaMailbox * mailbox, gint row,
-			    GdkEventButton *);
 };
 
 GtkType balsa_mblist_get_type(void);

@@ -1490,7 +1490,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 				GTK_SIGNAL_FUNC(close_window), msg);
 
     gnome_app_set_toolbar(GNOME_APP(window),
-			  get_toolbar(GTK_WIDGET(window), 1));
+			  get_toolbar(GTK_WIDGET(window), TOOLBAR_COMPOSE));
 
     msg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS].widget;
     msg->ready_widgets[1] = file_menu[MENU_FILE_QUEUE_POS].widget;

@@ -346,13 +346,4 @@ GtkWidget *create_entry(GnomeDialog *mcw, GtkWidget * table,
 GtkWidget *create_check(GnomeDialog *mcw, const gchar * label, 
 			GtkWidget * table, gint row);
 
-gboolean balsa_message_copy(LibBalsaMessage * message,
-			    LibBalsaMailbox * dest);
-gboolean balsa_message_move(LibBalsaMessage * message,
-			    LibBalsaMailbox * dest);
-gboolean balsa_messages_copy(GList * messages,
-			    LibBalsaMailbox * dest);
-gboolean balsa_messages_move(GList * messages,
-			     LibBalsaMailbox * dest);
-
 #endif				/* __BALSA_APP_H__ */

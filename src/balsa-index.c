@@ -1533,7 +1533,7 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
     }
     if(messages) {
 	if (move_to_trash && (index != trash)) {
-	    balsa_messages_move(messages, balsa_app.trash);
+	    libbalsa_messages_move(messages, balsa_app.trash);
 	} else
 	    libbalsa_messages_delete(messages);
 	g_list_free(messages);
@@ -2031,7 +2031,7 @@ transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column,
     }
 
     if(messages!=NULL) {
-	balsa_messages_move(messages, mbnode->mailbox);
+	libbalsa_messages_move(messages, mbnode->mailbox);
 	g_list_free(messages);
     }
    

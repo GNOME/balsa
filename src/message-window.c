@@ -156,6 +156,7 @@ struct _MessageWindow {
 
     LibBalsaMessage *message;
     int show_all_headers_save;
+	int headers_shown;
 };
 
 void reset_show_all_headers(MessageWindow *mw);
@@ -202,6 +203,7 @@ message_window_new(LibBalsaMessage * message)
     mw->window = gnome_app_new("balsa", "Message");
 
     mw->show_all_headers_save=-1;
+    mw->headers_shown=balsa_app.shown_headers;
     
     set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_MAIL_RPL,
 				GTK_SIGNAL_FUNC(replyto_message_cb), mw);
@@ -227,7 +229,8 @@ message_window_new(LibBalsaMessage * message)
 				GTK_SIGNAL_FUNC(show_all_headers_tool_cb), mw);
     
     gnome_app_set_toolbar(GNOME_APP(mw->window),
-			  get_toolbar(GTK_WIDGET(mw->window), 2));
+			  get_toolbar(GTK_WIDGET(mw->window), 
+				      TOOLBAR_MESSAGE));
     
     set_toolbar_button_sensitive(mw->window, 2,
 				 GNOME_STOCK_PIXMAP_BACK, FALSE);
@@ -378,6 +381,8 @@ show_no_headers_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) data;
 
+	mw->headers_shown=HEADERS_NONE;
+
     reset_show_all_headers(mw);
     balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage),
 					HEADERS_NONE);
@@ -388,6 +393,8 @@ show_selected_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) data;
 
+	mw->headers_shown=HEADERS_SELECTED;
+
     reset_show_all_headers(mw);
     balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage),
 					HEADERS_SELECTED);
@@ -397,6 +404,8 @@ static void
 show_all_headers_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) data;
+
+	mw->headers_shown=HEADERS_ALL;
 
     reset_show_all_headers(mw);
     balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage),
@@ -540,7 +549,8 @@ static void show_all_headers_tool_cb(GtkWidget * widget, gpointer data)
         return;
    
     if(GTK_TOGGLE_BUTTON(btn)->active)  {
-        mw->show_all_headers_save=balsa_app.shown_headers;
+        mw->show_all_headers_save=mw->headers_shown;
+		mw->headers_shown=HEADERS_ALL;
 	balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage),
 					    HEADERS_ALL);
     } else {

@@ -1,3 +1,15 @@
+2001-07-20  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/Makefile.am: add missing PCRE_CFLAGS.
+	* src/balsa-app.[hc]: remove balsa_message_{move,copy} wrappers.
+	* src/balsa-index.c: use libbalsa functions instead of wrappers.
+	* src/balsa-mblist.[hc]: remove crap. allow mailbox selection without
+	opening.
+	* src/main-window.c: fix "all headers" toolbar button handlers.
+	* src/toolbar-factory.[hc]: use TOOLBAR_ enums instead of magic ints.
+	* src/message-window.c: same.
+	* src/sendmsg-window.c: same.
+
 2001-07-19  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* AUTHORS: update Ian Campbell's address.

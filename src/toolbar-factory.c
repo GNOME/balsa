@@ -68,16 +68,13 @@ struct toolbar_bdata {
     char *id;
     int disabled;
     int position;
-} toolbar_data[MAXTOOLBARS][MAXTOOLBARITEMS];
-
-/* Rather than getting into the init stuff, this makes it self_contained */
-static int init=1;
+} toolbar_data[MAXTOOLBARS][MAXTOOLBARITEMS] = { { {0} } };
 
 static struct toolbar_bmap
 {
     GtkWidget *window;
     GtkWidget *toolbar;
-    int type;
+    BalsaToolbarType type;
 } toolbar_map[100];
 static int toolbar_map_entries=0;
 
@@ -131,12 +128,13 @@ static char *toolbar2_legal[]={
 static char **toolbar_legal[]={toolbar0_legal, toolbar1_legal, toolbar2_legal};
 
 static void populate_stock_toolbar(int bar, int id);
-static int get_toolbar_button_slot(int toolbar, char *id);
-static GtkToolbar *get_bar_instance(GtkWidget *window, int toolbar);
-static int get_position_value(int toolbar, char *id);
+static int get_toolbar_button_slot(BalsaToolbarType toolbar, char *id);
+static GtkToolbar *get_bar_instance(GtkWidget *window, 
+				    BalsaToolbarType toolbar);
+static int get_position_value(BalsaToolbarType toolbar, char *id);
 
 static int
-get_position_value(int toolbar, char *id)
+get_position_value(BalsaToolbarType toolbar, char *id)
 {
     int i;
 
@@ -154,7 +152,7 @@ get_position_value(int toolbar, char *id)
    FIXME: comment needed.
 */
 GtkWidget *
-get_tool_widget(GtkWidget *window, int toolbar, char *id)
+get_tool_widget(GtkWidget *window, BalsaToolbarType toolbar, char *id)
 {
     GtkToolbar *bar;
     GList *lp;
@@ -187,7 +185,7 @@ get_tool_widget(GtkWidget *window, int toolbar, char *id)
    FIXME: comment needed.
 */
 static GtkToolbar*
-get_bar_instance(GtkWidget *window, int toolbar)
+get_bar_instance(GtkWidget *window, BalsaToolbarType toolbar)
 {
     int i;
 
@@ -279,8 +277,7 @@ create_stock_toolbar(int id)
     if(balsa_app.toolbar_count >= MAXTOOLBARS)
 	return -1;
     
-    newbar=balsa_app.toolbar_count;
-    ++balsa_app.toolbar_count;
+    newbar = balsa_app.toolbar_count++;
     
     balsa_app.toolbars[newbar]=
 	(char **)g_malloc(sizeof(char *)*MAXTOOLBARITEMS);
@@ -296,7 +293,7 @@ create_stock_toolbar(int id)
    FIXME: comment needed.
 */
 GtkToolbar *
-get_toolbar(GtkWidget *window, int toolbar)
+get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
 {
     GtkToolbar *bar;
     GtkToolbarChild *child;
@@ -307,11 +304,6 @@ get_toolbar(GtkWidget *window, int toolbar)
     int type;
     char *tmp, *text;
     struct toolbar_bdata tmpdata[MAXTOOLBARITEMS];
-
-    if(init) {
-	memset((char *)&toolbar_data, 0, sizeof(toolbar_data));
-	init=0;
-    }
 
     memset((char *)&tmpdata, 0, sizeof(tmpdata));
 
@@ -439,7 +431,7 @@ get_toolbar(GtkWidget *window, int toolbar)
 }
 
 static int
-get_toolbar_button_slot(int toolbar, char *id)
+get_toolbar_button_slot(BalsaToolbarType toolbar, char *id)
 {
     int i;
     
@@ -461,17 +453,12 @@ get_toolbar_button_slot(int toolbar, char *id)
    FIXME: comment needed.
 */
 void
-set_toolbar_button_callback(int toolbar, char *id, 
+set_toolbar_button_callback(BalsaToolbarType toolbar, char *id, 
 			    void (*callback)(GtkWidget *, gpointer), 
 			    gpointer data)
 {
     int slot;
     
-    if(init) {
-	memset((char *)&toolbar_data, 0, sizeof(toolbar_data));
-	init=0;
-    }
-
     slot=get_toolbar_button_slot(toolbar, id);
     if(slot == -1)
 	return;
@@ -484,16 +471,11 @@ set_toolbar_button_callback(int toolbar, char *id,
    FIXME: comment needed.
 */
 void
-set_toolbar_button_sensitive(GtkWidget *window, int toolbar, char *id, 
-			     int sensitive)
+set_toolbar_button_sensitive(GtkWidget *window, BalsaToolbarType toolbar, 
+			     char *id, int sensitive)
 {
     int slot;
     GtkWidget *widget;
-
-    if(init) {
-	memset((char *)&toolbar_data, 0, sizeof(toolbar_data));
-	init=0;
-    }
 
     slot=get_toolbar_button_slot(toolbar, id);
     if(slot == -1)

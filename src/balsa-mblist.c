@@ -39,11 +39,6 @@
 #include "threads.h"
 #endif
 
-enum {
-    SELECT_MAILBOX,
-    LAST_SIGNAL
-};
-
 /* object arguments */
 enum {
     ARG_0,
@@ -111,6 +106,7 @@ static gboolean mblist_drag_motion_cb (GtkWidget* mblist,
                                        GdkDragContext* context, 
                                        gint x, gint y, guint time, 
                                        gpointer user_data);
+static void select_mailbox(GtkCTree * ctree, GtkCTreeNode * row, gint column);
 
 /* helpers */
 static void __mbnode_set_tab_style(BalsaMailboxNode *mbnode, GtkStyle *style, gint unread);
@@ -164,20 +160,6 @@ balsa_mblist_class_init(BalsaMBListClass * klass)
     object_class = (GtkObjectClass *) klass;
     tree_class = GTK_CTREE_CLASS(klass);
 
-#if 0
-    balsa_mblist_signals[SELECT_MAILBOX] =
-	gtk_signal_new("select_mailbox",
-		       GTK_RUN_LAST,
-		       object_class->type,
-		       GTK_SIGNAL_OFFSET(BalsaMBListClass, select_mailbox),
-		       gtk_marshal_NONE__POINTER_POINTER_POINTER,
-		       GTK_TYPE_NONE, 3, GTK_TYPE_POINTER,
-		       GTK_TYPE_POINTER, GTK_TYPE_GDK_EVENT);
-
-    gtk_object_class_add_signals(object_class, balsa_mblist_signals,
-				 LAST_SIGNAL);
-#endif
-
     object_class->destroy = balsa_mblist_destroy;
     parent_class = gtk_type_class(gtk_ctree_get_type());
     object_class->set_arg = balsa_mblist_set_arg;
@@ -187,7 +169,6 @@ balsa_mblist_class_init(BalsaMBListClass * klass)
 			    GTK_TYPE_BOOL, GTK_ARG_READWRITE,
 			    ARG_SHOW_CONTENT_INFO);
 
-    klass->select_mailbox = NULL;
 }
 
 static void
@@ -422,20 +403,12 @@ mblist_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 	g_return_val_if_fail(mbnode != NULL, FALSE);
 
 	switch(event->button) {
-#if 0
-	/* handled by select_mailbox(): */
-        case 1:
-	    balsa_app.mblist->currently_selected_ctree_node = node; 
-	    if(mbnode->mailbox)
-		mblist_open_mailbox(mbnode->mailbox);
-
-	    gtk_signal_emit(GTK_OBJECT(bmbl),
-			    balsa_mblist_signals[SELECT_MAILBOX],
-			    mbnode->mailbox, row, event);
-	    break;
-#endif
 	case 3:
+	    gtk_signal_handler_block_by_func(GTK_OBJECT(bmbl),
+				     select_mailbox, NULL);
 	    gtk_ctree_select(ctree, node);
+	    gtk_signal_handler_unblock_by_func(GTK_OBJECT(bmbl),
+					       select_mailbox, NULL);
 	    gtk_menu_popup(GTK_MENU(
 		balsa_mailbox_node_get_context_menu(mbnode)), NULL,
 			   NULL, NULL, NULL, event->button, event->time);
@@ -533,14 +506,6 @@ balsa_mblist_init(BalsaMBList * tree)
 	gtk_clist_set_column_visibility(GTK_CLIST(tree), 2, FALSE);
 	gtk_clist_column_titles_hide(GTK_CLIST(tree));
     } else gtk_clist_column_titles_show(GTK_CLIST(tree));
-
-
-#if 0
-    gtk_signal_connect(GTK_OBJECT(tree),
-		       "button_press_event",
-		       (GtkSignalFunc) button_event_press_cb,
-		       (gpointer) NULL);
-#endif
 
     balsa_mblist_repopulate(tree);
 }
@@ -1551,14 +1516,14 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
         if (mailbox != orig_mailbox) {
             switch (context->suggested_action) {
             case GDK_ACTION_MOVE:
-                balsa_messages_move (messages, mailbox);
+                libbalsa_messages_move (messages, mailbox);
                 context->action = context->suggested_action;
                 break;
 
             case GDK_ACTION_DEFAULT:
             case GDK_ACTION_COPY:
             default:
-                balsa_messages_copy (messages, mailbox);
+                libbalsa_messages_copy (messages, mailbox);
 		context->action = context->suggested_action;
                 break;
             }

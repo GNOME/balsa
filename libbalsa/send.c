@@ -44,6 +44,7 @@ add_mutt_body_plain (void)
 
   mutt_mktemp (buffer);
   body->filename = g_strdup (buffer);
+  mutt_update_encoding (body);
 
   return body;
 }
@@ -124,12 +125,14 @@ balsa_send_message (Message * message, gchar * smtp_server, glong debug)
 	    last->next = newbdy;
 	  else
 	    msg->content = newbdy;
+
+	  last = newbdy;
 	}
 
       list = list->next;
     }
 
-  mutt_update_encoding (msg->content);
+  msg->content = mutt_make_multipart (msg->content);
 
   switch (balsa_app.outbox->type)
     {

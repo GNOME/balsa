@@ -566,6 +566,8 @@ static GnomeUIInfo view_menu[] = {
 #endif				/* HAVE_GTKHTML */
     GNOMEUIINFO_END
 };
+#define MENU_EXPAND_ALL_WIDGET    view_menu[MENU_VIEW_EXPAND_ALL_POS].widget
+#define MENU_COLLAPSE_ALL_WIDGET  view_menu[MENU_VIEW_COLLAPSE_ALL_POS].widget
 #define MENU_VIEW_ZOOM_IN_WIDGET  view_menu[MENU_VIEW_ZOOM_IN].widget
 #define MENU_VIEW_ZOOM_OUT_WIDGET view_menu[MENU_VIEW_ZOOM_OUT].widget
 #define MENU_VIEW_ZOOM_100_WIDGET view_menu[MENU_VIEW_ZOOM_100].widget
@@ -950,6 +952,8 @@ static GnomeUIInfo tu_view_more_menu[] = {
                            enable_view_filter_cb, NULL),
     GNOMEUIINFO_END
 };
+#define MENU_EXPAND_ALL_WIDGET    tu_view_more_menu[MENU_VIEW_EXPAND_ALL_POS].widget
+#define MENU_COLLAPSE_ALL_WIDGET  tu_view_more_menu[MENU_VIEW_COLLAPSE_ALL_POS].widget
 
 static GnomeUIInfo tu_view_menu[] = {
 #define MENU_VIEW_NEXT_UNREAD_POS 0
@@ -1625,6 +1629,18 @@ balsa_window_new()
  * Enable or disable menu items/toolbar buttons which depend 
  * on if there is a mailbox open. 
  */
+static void
+enable_expand_collapse(LibBalsaMailbox * mailbox)
+{
+    gboolean enable;
+
+    enable = mailbox &&
+        libbalsa_mailbox_get_threading_type(mailbox) !=
+        LB_MAILBOX_THREADING_FLAT;
+    gtk_widget_set_sensitive(MENU_EXPAND_ALL_WIDGET,   enable);
+    gtk_widget_set_sensitive(MENU_COLLAPSE_ALL_WIDGET, enable);
+}
+
 void
 balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
 {
@@ -1643,9 +1659,7 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
         &mailbox_menu[MENU_MAILBOX_APPLY_FILTERS],
         &threading_menu[MENU_THREADING_FLAT_POS],
         &threading_menu[MENU_THREADING_SIMPLE_POS],
-        &threading_menu[MENU_THREADING_JWZ_POS],
-        &view_menu[MENU_VIEW_EXPAND_ALL_POS],
-        &view_menu[MENU_VIEW_COLLAPSE_ALL_POS]
+        &threading_menu[MENU_THREADING_JWZ_POS]
 #else /* ENABLE_TOUCH_UI */
         &tu_edit_menu[MENU_EDIT_SELECT_ALL_POS],
         &tu_edit_menu[MENU_EDIT_FIND_POS],
@@ -1655,9 +1669,7 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
         &tu_mailbox_menu[MENU_MAILBOX_EXPUNGE_POS],
         &tu_mailbox_menu[MENU_MAILBOX_CLOSE_POS],
         &tu_tools_filters_menu[TOOLS_SELECT_FILTER_POS],
-        &tu_view_more_menu[MENU_VIEW_NEXT_FLAGGED_POS],
-        &tu_view_more_menu[MENU_VIEW_EXPAND_ALL_POS],
-        &tu_view_more_menu[MENU_VIEW_COLLAPSE_ALL_POS]
+        &tu_view_more_menu[MENU_VIEW_NEXT_FLAGGED_POS]
 #endif /* ENABLE_TOUCH_UI */
     };
 #if defined(ENABLE_TOUCH_UI)
@@ -1739,6 +1751,7 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
 	balsa_window_set_filter_menu(window,
 				     libbalsa_mailbox_get_filter(mailbox));
     }
+    enable_expand_collapse(mailbox);
 }
 
 /*
@@ -1949,6 +1962,10 @@ static void
 balsa_window_set_threading_menu(BalsaWindow * window, int option)
 {
     int pos;
+    GtkWidget *index;
+    BalsaMailboxNode *mbnode;
+    LibBalsaMailbox *mailbox;
+
     switch(option) {
     case LB_MAILBOX_THREADING_FLAT:
     pos = MENU_THREADING_FLAT_POS; break;
@@ -1966,6 +1983,11 @@ balsa_window_set_threading_menu(BalsaWindow * window, int option)
     g_signal_handlers_unblock_by_func(G_OBJECT(threading_menu[pos].widget),
                                       threading_menu[pos].moreinfo,
                                       window);
+
+    if ((index = balsa_window_find_current_index(window))
+	&& (mbnode = BALSA_INDEX(index)->mailbox_node)
+	&& (mailbox = mbnode->mailbox))
+	enable_expand_collapse(mailbox);
 }
 #endif /* ENABLE_TOUCH_UI */
 

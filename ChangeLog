@@ -1,3 +1,7 @@
+2004-10-01  PeterB
+
+	* src/main-window.c: sensitize expand/collapse all.
+
 2004-09-30 13:48  PeterB
 
 	* src/mailbox-node.c: do not connect twice to the

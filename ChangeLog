@@ -1,3 +1,10 @@
+2002-03-31  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/mailbox_imap.c: 
+	* libbalsa/mailbox.c: 
+	* libbalsa/mailbox.h: 
+	* libbalsa/message.c: crude disconnected mode
+
 2002-03-31  Hasbullah Bin Pit <sebol@ikhlas.com>
 
 	* configure.in: Added ms to ALL_LINGUAS.

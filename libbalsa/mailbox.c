@@ -279,6 +279,7 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
     mailbox->message_list = NULL;
 
     mailbox->readonly = FALSE;
+    mailbox->disconnected = FALSE;
     mailbox->mailing_list_address = NULL;
 
 #ifdef BALSA_SHOW_ALL

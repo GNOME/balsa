@@ -613,13 +613,12 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 
     /* FIXME: temporarily disabled, until better way of loading headers
        is invented. */
-#ifdef HAVE_GDBM_H
-    /*
+#if defined(HAVE_GDBM_H) && defined(CACHE_IMAP_HEADERS_TOO)
       if(load_cache(mailbox)) {
 	mailbox->open_ref++;
 	UNLOCK_MAILBOX(mailbox);
 	return TRUE;
-        } */
+      } 
 #endif
     imap = LIBBALSA_MAILBOX_IMAP(mailbox);
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
@@ -627,6 +626,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     /* try getting password, quit on cancel */
     if (!(server->passwd && *server->passwd) &&
 	!(server->passwd = libbalsa_server_get_password(server, mailbox))) {
+	mailbox->disconnected = TRUE;
 	UNLOCK_MAILBOX(mailbox);
 	return FALSE;
     }
@@ -660,6 +660,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 	UNLOCK_MAILBOX(mailbox);
 	gdk_threads_enter();
     }
+    mailbox->disconnected = FALSE;
     return CLIENT_CONTEXT_OPEN(mailbox);
 }
 
@@ -734,6 +735,8 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
     key.dptr  = (char*)uid;
     key.dsize = sizeof(ImapUID)*2;
     if(dbf && gdbm_exists(dbf, key)) {
+	balsa_information(LIBBALSA_INFORMATION_DEBUG,
+			  "imap cache: found %d/%d", uid[0], uid[1]);
         data = gdbm_fetch(dbf, key);
         stream = tmpfile();
         fwrite(data.dptr, data.dsize, sizeof(char), stream);
@@ -746,21 +749,27 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
         MESSAGE *msg = safe_calloc(1, sizeof(MESSAGE));
         msg->magic = CLIENT_CONTEXT(mailbox)->magic;
         if (!imap_fetch_message(msg, CLIENT_CONTEXT(mailbox), 
-                                message->header->msgno))
+                                message->header->msgno)) 
             stream = msg->fp;
-        FREE(&msg);
+	FREE(&msg);
 #ifdef HAVE_GDBM_H
-        data.dsize = libbalsa_readfile(stream, &data.dptr);
-        rewind(stream);
-        if(dbf) gdbm_close(dbf);
-        assure_balsa_dir();
-        dbf = gdbm_open(fname, 0, GDBM_WRITER, S_IRUSR|S_IWUSR, NULL);
-        if(dbf) {
-            gdbm_store(dbf, key, data, GDBM_REPLACE);
-            gdbm_close(dbf);
-        } else
-            g_warning("Writing to cache file '%s' failed.", fname);
-        g_free(data.dptr); /* allocated by libbalsa_readfile */
+	if(stream) { /* don't cache negatives */
+	    data.dsize = libbalsa_readfile(stream, &data.dptr);
+	    rewind(stream);
+	    if(dbf) gdbm_close(dbf);
+	    assure_balsa_dir();
+	    dbf = gdbm_open(fname, 0, GDBM_WRITER, S_IRUSR|S_IWUSR, NULL);
+	    if(dbf) {
+		balsa_information(LIBBALSA_INFORMATION_DEBUG,
+				  "imap cache: pushing %d/%d",
+				  uid[0], uid[1] );
+		gdbm_store(dbf, key, data, GDBM_REPLACE);
+		gdbm_close(dbf);
+	    
+	    } else
+		g_warning("Writing to cache file '%s' failed.", fname);
+	    g_free(data.dptr); /* allocated by libbalsa_readfile */
+	}
 #endif
     }
 #ifdef HAVE_GDBM_H

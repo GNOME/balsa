@@ -1,5 +1,7 @@
-2004-11-03 16:12  PeterB
+2004-11-03 21:36  PeterB
 
+	* libbalsa/address-entry.c: update completion list on cursor
+	movement.
 	* libbalsa/address-entry.c: test for NULL name; clean up completion
 	list.
 	* src/expand-alias.c, src/expand-alias.h, src/main.c,

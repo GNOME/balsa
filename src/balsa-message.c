@@ -28,6 +28,8 @@
 #include "mime.h"
 #include "misc.h"
 
+#define BGLINKCOLOR "LightSteelBlue1"
+
 static gchar tmp_file_name[PATH_MAX + 1];
 
 static gint part_idx;
@@ -147,6 +149,14 @@ item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data)
 
   switch (event->type)
     {
+    case GDK_ENTER_NOTIFY:
+      gnome_canvas_item_set (item, "fill_color", "red", NULL);
+      break;
+
+    case GDK_LEAVE_NOTIFY:
+      gnome_canvas_item_set (item, "fill_color", "black", NULL);
+      break;
+
     case GDK_BUTTON_PRESS:
       save_dialog = gnome_dialog_new (_ ("Save MIME Part"),
 				      _ ("Save"), _ ("Cancel"), NULL);
@@ -521,7 +531,7 @@ audio2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
   BalsaSaveFileInfo *info;
 
   item = balsa_message_text_item ("--AUDIO--", group, 0.0, next_part_height (group));
-  balsa_message_text_item_set_bg (item, group, "LightSteelBlue1");
+  balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
   info = balsa_save_file_info_new (NULL, message, bdy);
   gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), info);
 
@@ -534,10 +544,17 @@ application2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *
   GnomeCanvasItem *item;
   BalsaSaveFileInfo *info;
 
-  item = balsa_message_text_item ("--APPLICATION--", group, 0.0, next_part_height (group));
-  balsa_message_text_item_set_bg (item, group, "LightSteelBlue1");
+  /* create text */
+  item = balsa_message_text_item ("--APPLICATION--", group, 0.0,
+				  next_part_height (group));
+  /* create item's background under text as created above */
+  balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
+
   info = balsa_save_file_info_new (NULL, message, bdy);
-  gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), info);
+  /* attach a signal to the background we created, so that we can change it
+   * when the mouse is moved over it */
+  gtk_signal_connect (GTK_OBJECT (item), "event",
+		      GTK_SIGNAL_FUNC (item_event), info);
 #if 0
   gchar link_bfr[128];
   PARAMETER *bdy_parameter = bdy->parameter;
@@ -598,7 +615,7 @@ message2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gro
   BalsaSaveFileInfo *info;
 
   item = balsa_message_text_item ("--MESSAGE--", group, 0.0, next_part_height (group));
-  balsa_message_text_item_set_bg (item, group, "LightSteelBlue1");
+  balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
   info = balsa_save_file_info_new (NULL, message, bdy);
   gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), info);
 }
@@ -622,7 +639,7 @@ video2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
   BalsaSaveFileInfo *info;
 
   item = balsa_message_text_item ("--VIDEO--", group, 0.0, next_part_height (group));
-  balsa_message_text_item_set_bg (item, group, "LightSteelBlue1");
+  balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
   info = balsa_save_file_info_new (NULL, message, bdy);
   gtk_signal_connect (GTK_OBJECT (item), "event", GTK_SIGNAL_FUNC (item_event), info);
 }
@@ -651,7 +668,7 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * gr
 	{
 	  GnomeCanvasItem *item;
 	  item = balsa_message_text_item ("--HTML--", group, 0.0, next_part_height (group));
-	  balsa_message_text_item_set_bg (item, group, "LightSteelBlue1");
+	  balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
 	  goto END;
 	}
       /* add the text item to the canvas */

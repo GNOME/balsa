@@ -389,11 +389,7 @@ int mutt_buffy_check (int force)
 #ifdef USE_IMAP
       case M_IMAP:
         /* poll on do_imap_check, else return cached value */
-#ifdef LIBMUTT
-        if (do_imap_check && imap_check_test(tmp->path))
-#else
         if (do_imap_check)
-#endif
         {
 	  char * old_user = ImapUser, *old_passwd = ImapPass;
 	  int res;
@@ -401,7 +397,11 @@ int mutt_buffy_check (int force)
 	  
 	  ImapUser = tmp->user;
 	  ImapPass = tmp->passwd;
+#ifdef LIBMUTT
+          if ( (res=imap_mailbox_check (tmp->path, 1, imap_check_test))>0 )
+#else
           if ( (res=imap_mailbox_check (tmp->path, 1))>0 )
+#endif
           {
             BuffyCount++;
             tmp->new = 1;

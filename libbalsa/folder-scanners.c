@@ -209,6 +209,7 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     }
     g_list_foreach((GList*)state.subfolders, (GFunc)g_free, NULL);
     g_list_free((GList*)state.subfolders);
+    state_free (&state);
     libbalsa_unlock_mutt();
     
 }

@@ -262,6 +262,7 @@ IMAP_DATA* imap_new_idata (void) {
   idata->cmd.buf = NULL;
   idata->cmd.blen = 0;
   idata->cmd.state = IMAP_CMD_OK;
+  idata->capstr = NULL;
 
   return idata;
 }
@@ -271,6 +272,8 @@ void imap_free_idata (IMAP_DATA** idata) {
   if (!idata)
     return;
 
+  FREE (&(*idata)->capstr);
+  mutt_free_list (&(*idata)->flags);
   FREE (&((*idata)->cmd.buf));
   FREE (idata);
 }

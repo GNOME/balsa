@@ -1,3 +1,15 @@
+2001-08-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* browser.h: add state_free() prototype.
+	* imap/browse.c: implement it.
+	* imap/command.c (cmd_parse_capabilities): free old capstr.
+	* buffy.c: cleanup by Peter Bloomfield.
+	* imap/imap.c (imap_logout_all): free idata on closing imap socket.
+	Check if mailbox should be checked for new mail or not.
+	* imap/imap.h: propotype for imap_mailbox_check() with a callback.
+	* imap/util.c: initialize capstr field to NULL. Free all fields of
+	idata.
+	
 2001-08-19  Carlos Morgado  <chbm@chbm.nu>
 
 	* imap/imap.c:  

@@ -151,6 +151,7 @@ void imap_logout_all (void)
       imap_logout ((IMAP_DATA*) conn->data);
       mutt_clear_error ();
       mutt_socket_close (conn);
+      imap_free_idata(&conn->data);
       mutt_socket_free (conn);
     }
 
@@ -1152,7 +1153,11 @@ int imap_check_mailbox (CONTEXT *ctx, int *index_hint)
  *   0+   number of messages in mailbox
  *  -1    error while polling mailboxes
  */
+#ifdef LIBMUTT
+int imap_mailbox_check (char* path, int new, int imap_check_test(const char *))
+#else
 int imap_mailbox_check (char* path, int new)
+#endif
 {
   CONNECTION *conn;
   IMAP_DATA *idata;
@@ -1167,6 +1172,13 @@ int imap_mailbox_check (char* path, int new)
   
   if (imap_parse_path (path, &mx))
     return -1;
+
+#ifdef LIBMUTT
+  if (!imap_check_test(mx.mbox)) {
+    FREE (&mx.mbox);
+    return 0;
+  }
+#endif
 
   /* If imap_passive is set, don't open a connection to check for new mail */
   if (option (OPTIMAPPASSIVE))

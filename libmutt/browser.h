@@ -61,7 +61,8 @@ struct browser_state
 #endif
 };
 
-/* BALSA: add declaration of this fuction */
+/* BALSA: add declaration of these fuctions */
 void init_state (struct browser_state *state);
+void state_free (struct browser_state *state);
 
 #endif /* _BROWSER_H */

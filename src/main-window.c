@@ -1461,27 +1461,12 @@ check_mailbox_list(GList * mailbox_list)
 static void
 mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
 {
-    char *tmp;
-    
     BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, node);
     g_return_if_fail(mbnode);
     
     if(mbnode->mailbox) { /* mailbox, not a folder */
-	if(balsa_app.check_imap || 
-	   !LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox)) {
-	    if(LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox)) {
-		tmp=LIBBALSA_MAILBOX_IMAP(mbnode->mailbox)->path;
-
-		/* Specs say there may be a {host:port} prefix */
-		/* Set the pointer to point past that to the real path */
-		if(strchr(tmp, '}'))
-		    tmp=strchr(tmp, '}')+1;
-
-		/* Melanie's Cyrus IMAP server uses UPPERCASE for INBOX */
-		/* FIXME: Check if that's true for all IMAP servers     */
-		if(balsa_app.check_imap_inbox && strcmp(tmp, "INBOX"))
-		    return;
-	    }
+	if (!LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox) ||
+	    imap_check_test(mbnode->dir)) {
 	    gdk_threads_enter();
 	    libbalsa_mailbox_check(mbnode->mailbox);
 	    gdk_threads_leave();
@@ -1496,12 +1481,10 @@ mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
 static gboolean
 imap_check_test(const gchar * path)
 {
-    if (balsa_app.check_imap && balsa_app.check_imap_inbox) {
-	/* `path' is a url */
-	gchar *tmp = strrchr(path, '/');
-	g_return_val_if_fail(tmp, FALSE);
-	return strcmp(++tmp, "INBOX") == 0;
-    } else
+    /* path has been parsed, so it's just the folder path */
+    if (balsa_app.check_imap && balsa_app.check_imap_inbox)
+	return strcmp(path, "INBOX") == 0;
+    else
 	return balsa_app.check_imap;
 }
 

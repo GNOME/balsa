@@ -70,6 +70,7 @@ balsa_store_address(GtkWidget * widget, gpointer user_data)
     gchar *first_name = NULL;
     gchar *middle_name = NULL;
     gchar *last_name = NULL;
+    gchar *carrier = NULL;
     GtkWidget *ab_option, *menu_item, *ab_menu;
     GList *ab_list;
     LibBalsaAddressBook *address_book;
@@ -158,10 +159,15 @@ balsa_store_address(GtkWidget * widget, gpointer user_data)
 	    cnt2 = 1;
 	    if (cnt > 2)
 		while (cnt2 != cnt - 1) {
+		    carrier = middle_name;
 		    middle_name = g_strconcat(middle_name, names[cnt2++], NULL);
+		    g_free(carrier);
 
-		    if (cnt2 != cnt - 1)
+		    if (cnt2 != cnt - 1) {
+			carrier = middle_name;
 			middle_name = g_strconcat(middle_name, " ", NULL);
+			g_free(carrier);
+		    }
 		}
 
 	    g_strfreev(names);

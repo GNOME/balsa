@@ -36,6 +36,12 @@ void init_state (struct browser_state *state)
   state->entry = (struct folder_file *) 
     safe_malloc (sizeof (struct folder_file) * state->entrymax);
 }
+
+void state_free (struct browser_state *state)
+{
+  safe_free((void**)&state->entry);
+  safe_free((void**)&state->folder);
+}
 /* #endif */
 
 /* -- forward declarations -- */
@@ -95,7 +101,7 @@ int imap_browse (char* path, struct browser_state* state)
     {
       mutt_message _("Getting namespaces...");
       if (browse_get_namespace (idata, nsbuf, sizeof (nsbuf), 
-			 nsi, sizeof (nsi),  &nns) != 0)
+				nsi, sizeof (nsi),  &nns) != 0)
 	goto fail;
       if (browse_verify_namespace (idata, nsi, nns) != 0)
 	goto fail;

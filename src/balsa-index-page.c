@@ -609,27 +609,38 @@ create_menu (BalsaIndex * bindex)
 static void
 transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event, BalsaIndex * bindex)
 {
-  GtkCList *clist;
-  BalsaIndexPage *page=NULL;
-  GList *list;
-  Message *message;
+	GtkCList *clist;
+	BalsaIndexPage *page=NULL;
+	GList *list;
+	Message *message;
 
-  g_return_if_fail (bmbl != NULL);
-  g_return_if_fail (bindex != NULL);
+	g_return_if_fail (bmbl != NULL);
+	g_return_if_fail (bindex != NULL);
 
-  clist = GTK_CLIST (bindex);
-  list = clist->selection;
-  while (list)
-    {
-      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT (list->data));
-      message_move (message, mailbox);
-      list = list->next;
-    }
-  mailbox_commit_flagged_changes(bindex->mailbox);
+	clist = GTK_CLIST (bindex);
+	
+	/*This is a bit messy :-)*/
+	page = BALSA_INDEX_PAGE( 
+		gtk_object_get_data( GTK_OBJECT( 
+			gtk_notebook_get_nth_page( GTK_NOTEBOOK( balsa_app.notebook ),
+						   gtk_notebook_get_current_page( GTK_NOTEBOOK( balsa_app.notebook ) )  
+						   )
+				), "indexpage" ) );
+	if( page->mailbox == mailbox ) /*Transferring to same mailbox?*/
+		return;
 
-  if((page=balsa_find_notebook_page(mailbox)))
+	list = clist->selection;
+	while (list)
+	{
+		message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT (list->data));
+		message_move (message, mailbox);
+		list = list->next;
+	}
+	mailbox_commit_flagged_changes(bindex->mailbox);
+	
+	if((page=balsa_find_notebook_page(mailbox)))
     balsa_index_page_reset(page);
-
+	
 }
 /* DND features                                              */
 
@@ -886,11 +897,3 @@ balsa_message_undelete (GtkWidget * widget, gpointer index)
   }
   balsa_index_select_next (index);
 }
-
-
-
-
-
-
-
-

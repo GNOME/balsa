@@ -1,3 +1,9 @@
+1999-12-17  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/balsa-index-page.c (transfer_messages_cb): Prevent
+	  transferring a message to its own folder, which was a
+	  coredump.
+
 1999-12-16  Peter Williams <peter@newton.cx>
 	* macros/Makefile.am: uncommented "if INSIDE_GNOME_COMMON"
 	  as mentioned by Jules Bean.

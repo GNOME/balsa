@@ -3,12 +3,11 @@ IN_FILES =
 HTML_FILES = \
 	bugs.html	\
 	download.html	\
-	download.html	\
 	faq.html	\
 	features.html	\
 	index.html	\
 	list.html	\
-	main.html	\
+	oldnews.html	\
 	screenshots.html
 
 EXTRA_DIST = $(IN_FILES)

@@ -17,12 +17,14 @@ BUILT_SOURCES =				\
 	balsa-druid-page-directory.c	\
 	balsa-druid-page-finish.c	\
 	balsa-initdruid.h		\
+	balsa-initdruid-private.h	\
 	balsa-druid-page.h		\
 	balsa-druid-page-error.h	\
 	balsa-druid-page-welcome.h	\
 	balsa-druid-page-user.h		\
 	balsa-druid-page-directory.h	\
-	balsa-druid-page-finish.h	
+	balsa-druid-page-finish.h	\
+	balsa-druid-page-finish-private.h
 
 GOB_SRCLIST =				\
 	balsa-initdruid.gob		\

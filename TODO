@@ -34,14 +34,13 @@ UI:
  * MIME supporting icons.  use the new gnome metadata stuff that gmc uses?
  * New mail notification
      P via sound
-     * change icon window incase Balsa is minimized to a different icon
+     * change icon window in case Balsa is minimized to a different icon
  P sending mail (code is awful, redo.  make useful for corba idl, support
      external editors)
  * auto-open mailboxes on startup
  * Make things optional:
      - inline images (on by default)
-     - check for new mail ever xx minutes
-     - open mailboxes on startup
+     D check for new mail every xx minutes
      - load mail from local mail directory
  * spell checking in the send window
  * menu and toolbar for message-window

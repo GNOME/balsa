@@ -54,7 +54,6 @@ mailbox_watcher_remove (mailbox, guint id);
 mailbox_watcher_remove_by_data (mailbox, gpointer data);
 
 will remove the watcher.  The message reciever is a MailboxWatcherFunc.
-It's form is:
+Its form is:
 
 typedef void (*MailboxWatcherFunc) (MailboxWatcherMessage *);
-

@@ -51,6 +51,7 @@
 #include "main-window.h"
 #include "print.h"
 #include "address-book.h"
+#include "save-restore.h" /*mailbox_get_pkey*/
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
@@ -86,7 +87,6 @@ enum {
   GSList *list = NULL;
   
 extern void load_messages (Mailbox * mailbox, gint emit);
-extern void config_mailbox_update(Mailbox * mailbox, char * name);
 
 void progress_dialog_destroy_cb ( GtkWidget *, gpointer data);
 static void check_messages_thread( Mailbox *mbox );
@@ -1041,6 +1041,7 @@ mail_progress_notify_cb( )
     uint count;
     gfloat percent;
     GtkWidget *errorbox;
+    gchar *pkey;
 
     msgbuffer = malloc( 2049 );
 
@@ -1093,11 +1094,11 @@ mail_progress_notify_cb( )
 	      }
 	    break;
 	  case MSGMAILTHREAD_UPDATECONFIG:
-	      config_mailbox_update( 
-		  threadmessage->mailbox, 
-		  mailbox_get_pkey(
-		      MAILBOX_POP3(threadmessage->mailbox)->mailbox) ); 
-	    break;
+		  pkey = mailbox_get_pkey( threadmessage->mailbox );
+		  config_mailbox_update( threadmessage->mailbox, pkey ); 
+		  g_free( pkey );
+		  break;
+
 	  case MSGMAILTHREAD_LOAD:
 	    LOCK_MAILBOX(threadmessage->mailbox);
 	    load_messages(threadmessage->mailbox, 1);

@@ -25,8 +25,6 @@
 
 #include "libbalsa.h"
 
-#include <assert.h>
-
 #include <gnome.h>
 #include <proplist.h>
 #include <sys/types.h>
@@ -41,8 +39,7 @@
 static proplist_t pl_dict_add_str_str (proplist_t dict_arg, gchar * string1,
 				       gchar * string2);
 static gchar *pl_dict_get_str (proplist_t dict, gchar * str);
-static const gchar* config_get_pkey(proplist_t mbox);
-static proplist_t config_mailbox_get_by_name (const gchar * name);
+static gchar* config_get_pkey(proplist_t mbox);
 static proplist_t config_mailbox_get_by_pkey (const gchar * pkey);
 static proplist_t config_mailbox_get_key (proplist_t mailbox);
 static gint config_mailbox_init (proplist_t mbox, gchar * key);
@@ -56,19 +53,14 @@ rot (gchar * pass)
   gint len = 0, i = 0;
 
   /*PKGW: let's do the assert() BEFORE we coredump... */
-  assert( pass != NULL );
+  g_assert( pass != NULL );
 
   len = strlen (pass);
   buff = g_strdup (pass);
 
   /* Used to assert( buff ); this is wrong. If g_strdup
-     fails we're screwed anyway to let the upcoming coredump
+     fails we're screwed anyway so let the upcoming coredump
      occur. */
-
-  assert (pass != NULL);
-  assert (buff != NULL);	/* TODO: using assert for this case is wrong!
-				 * The error should be handled gracefully.
-				 */
 
   for (i = 0; i < len; i++)
     {
@@ -346,7 +338,7 @@ gint
 config_mailbox_delete (const Mailbox * mailbox)
 {
   proplist_t accounts, mbox, mbox_key, temp_str;
-  const gchar * pkey;
+  gchar * pkey;
 
   if (balsa_app.proplist == NULL)
     {
@@ -364,6 +356,8 @@ config_mailbox_delete (const Mailbox * mailbox)
   /* Grab the specified mailbox */
   pkey = mailbox_get_pkey(mailbox);
   mbox = config_mailbox_get_by_pkey (pkey);
+  g_free( pkey );
+
   if (mbox == NULL)
     return FALSE;
 
@@ -1271,7 +1265,7 @@ pl_dict_get_str (proplist_t dict, gchar * str)
    note that the mailbox name does not fulfill pkey conditions.
    FIXME: the present implementation leaves room for improvement.
 */
-const gchar*
+gchar*
 mailbox_get_pkey(const Mailbox * mailbox)
 {
     gchar *pkey;
@@ -1280,33 +1274,41 @@ mailbox_get_pkey(const Mailbox * mailbox)
 
     switch(mailbox->type) {
     case MAILBOX_POP3:
-	pkey = MAILBOX_POP3 (mailbox)->server->name; break;
+	    pkey = g_strdup_printf( "%s %d", MAILBOX_POP3 (mailbox)->server->host, MAILBOX_POP3(mailbox)->server->port ); 
+	    break;
     case MAILBOX_MBOX:
     case MAILBOX_MAILDIR:
     case MAILBOX_MH:
-	pkey = MAILBOX_LOCAL (mailbox)->path; break;
+	    pkey = g_strdup( MAILBOX_LOCAL (mailbox)->path );
+	    break;
     case MAILBOX_IMAP:
-	pkey = MAILBOX_IMAP (mailbox)->path; break;
+	    pkey = g_strdup_printf( "%s %d %s", MAILBOX_IMAP (mailbox)->server->host, MAILBOX_IMAP (mailbox)->server->port, MAILBOX_IMAP (mailbox)->path );
+	    break;
     default: /* MAILBOX_UNKNOWN */
-	pkey = mailbox->name;
+	    pkey = g_strdup( mailbox->name );
     }
+
     return pkey;
 }
 
-static const gchar*
+static gchar*
 config_get_pkey(proplist_t mbox)
 {
-    gchar *type;
+	gchar *type;
+	gchar *result;
 
-    type = pl_dict_get_str (mbox, "Type");
-    
-    if (strcasecmp (type, "local") == 0)	/* Local mailbox */
-	return pl_dict_get_str(mbox, "Path");
-    else if(strcasecmp(type,"POP3") == 0)
-	return pl_dict_get_str(mbox, "Server");
-    else if(g_strcasecmp(type,"IMAP") == 0)
-	return pl_dict_get_str(mbox, "Path");
-    else return NULL;
+	type = pl_dict_get_str (mbox, "Type");
+	
+	if (strcasecmp (type, "local") == 0)
+		result = g_strdup( pl_dict_get_str(mbox, "Path") );
+	else if(strcasecmp(type,"POP3") == 0)
+		result = g_strdup_printf( "%s %s", pl_dict_get_str(mbox, "Server"), pl_dict_get_str( mbox, "Port" ) );
+	else if(g_strcasecmp(type,"IMAP") == 0)
+		result = g_strdup_printf( "%s %s %s", pl_dict_get_str(mbox, "Server"), pl_dict_get_str( mbox, "Port" ), pl_dict_get_str(mbox, "Path") );
+	else 
+		result = NULL;
+
+	return result;
 }
 
 static proplist_t
@@ -1314,7 +1316,7 @@ config_mailbox_get_by_pkey (const gchar * pkey)
 {
   proplist_t temp_str, accounts, mbox, mbox_key;
   int num_elements, i;
-  const gchar * key;
+  gchar * key;
 
   g_assert (balsa_app.proplist != NULL);
 
@@ -1341,8 +1343,13 @@ config_mailbox_get_by_pkey (const gchar * pkey)
 
       key = config_get_pkey(mbox);
 
-      if (key && strcmp (key, pkey) == 0)
+      if (key && strcmp (key, pkey) == 0) {
+	      g_free( key );
 	  return mbox;
+      }
+
+      g_free( key );
+
     }
 
   return NULL;
@@ -1426,7 +1433,7 @@ config_mailbox_get_key (proplist_t mailbox)
 
       mbox = PLGetDictionaryEntry (accounts, mbox_key);
 
-      if (mbox == mailbox)
+      if ( PLIsEqual( mbox, mailbox ) )
 	return mbox_key;
 
     }

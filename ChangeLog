@@ -1,5 +1,18 @@
 2000-05-06  Peter Williams  <peter@beta.newton.cx>
 
+	* src/main-window.c (mail_progress_notify_cb): g_free
+	the mailbox pkey now. Include save-restore.h
+
+	* src/mailbox-conf.c (mailbox_conf_close): Don't 
+	g_strdup the mailbox pkey; that is done for us now.
+
+	* libbalsa/mailbox.h (struct _Server): Remove Server.name
+	field, which is unused.
+
+	* src/save-restore.[ch] (mailbox_get_pkey): Return a g_strdup
+	string; don't user server->name, which is unused. Remove
+	the const return type. Misc changes to accomodate this.
+
 	* src/balsa-mblist.c (balsa_mblist_redraw): Check for
 	NULL return value from gtk_ctree_insert_node (caused 
 	warnings with POP3 mailboxes)

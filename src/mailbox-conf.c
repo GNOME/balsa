@@ -773,7 +773,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 
   if (mailbox && save)		/* we are updating the mailbox */
     {
-      gchar *old_mbox_pkey = g_strdup ( mailbox_get_pkey(mailbox) );
+      gchar *old_mbox_pkey = mailbox_get_pkey(mailbox);
       return_value = conf_update_mailbox (mcw->mailbox, old_mbox_pkey);
       g_free (old_mbox_pkey);
 

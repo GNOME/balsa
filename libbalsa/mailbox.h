@@ -166,7 +166,6 @@ struct _Server
   GtkObject object;
 
   ServerType type;
-  gchar *name;
 
   gchar *host;
   gint port;

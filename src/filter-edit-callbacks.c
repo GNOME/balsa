@@ -668,6 +668,7 @@ condition_dialog_button_clicked(GtkWidget * dialog, gint button,
 {
     LibBalsaCondition* new_cnd;
     gint row;
+    static GnomeHelpMenuEntry help_entry = { NULL, "x1656.html#WIN-CONDITION" };
 
     switch (button) {
     case 0:  /* OK button */
@@ -711,7 +712,8 @@ condition_dialog_button_clicked(GtkWidget * dialog, gint button,
         gnome_dialog_close(GNOME_DIALOG(dialog));
         break;
     case 2:  /* Help button */
-        /* FIXME */
+	help_entry.name = gnome_app_id;
+	gnome_help_display(NULL, &help_entry);
 	break;
     }
 }
@@ -1246,6 +1248,7 @@ fe_dialog_button_clicked(GtkWidget * dialog, gint button, gpointer data)
 {
     gint row;
     GList * names_lst;
+    static GnomeHelpMenuEntry help_entry = { NULL, "x1656.html" };
     
     switch (button) {
     case 0:                     /* OK button */
@@ -1254,10 +1257,9 @@ fe_dialog_button_clicked(GtkWidget * dialog, gint button, gpointer data)
         balsa_app.filters = NULL;
         
         /* We put the modified filters */
-        for (row = 0;row<fe_filters_list->rows;row++) {
+        for (row = 0;row<fe_filters_list->rows;row++)
             balsa_app.filters = g_slist_prepend(balsa_app.filters,
 						gtk_clist_get_row_data(fe_filters_list, row));
-        }
 
         /* Little hack to tell the clean-up functions not to free
            filters on OK button press */
@@ -1276,8 +1278,9 @@ fe_dialog_button_clicked(GtkWidget * dialog, gint button, gpointer data)
         break;
 
     case 2:                     /* Help button */
-        /* more of something here */
-
+	help_entry.name = gnome_app_id;
+	gnome_help_display(NULL, &help_entry);
+	break;
     default:
         /* we should NEVER get here */
         break;
@@ -1663,6 +1666,7 @@ fe_clist_select_row(GtkWidget * widget, gint row, gint column,
     LibBalsaCondition* cnd;
     GSList *list;
     gint new_row;
+    gchar * str ="";
 
     fil = (LibBalsaFilter*)gtk_clist_get_row_data(fe_filters_list, row);
     
@@ -1704,8 +1708,11 @@ fe_clist_select_row(GtkWidget * widget, gint row, gint column,
     for (list = fil->conditions;
          list && filter_errno==FILTER_NOERR;list=g_slist_next(list)) {
         cnd = (LibBalsaCondition*) list->data;
+	/* Trick to have correct i18n */
         new_row = gtk_clist_append(fe_conditions_list,
-				   &(fe_search_type[cnd->type-1].text));
+				   &str);
+	gtk_clist_set_text(fe_conditions_list, new_row, 0,
+			   _(fe_search_type[cnd->type-1].text));
         gtk_clist_set_row_data(fe_conditions_list, new_row,
                                libbalsa_condition_clone(cnd));
     }

@@ -125,6 +125,7 @@ void fr_dialog_button_clicked(GtkWidget * widget, gint button,
 {
     gint row;
     BalsaFilterRunDialog * p;
+    static GnomeHelpMenuEntry help_entry = { NULL, "x1722.html" };
 
     p=BALSA_FILTER_RUN_DIALOG(widget);
     switch (button) {
@@ -145,7 +146,8 @@ void fr_dialog_button_clicked(GtkWidget * widget, gint button,
 	
 	break;
     case 3:			/* Help button */
-	/* more of something here */
+	help_entry.name = gnome_app_id;
+	gnome_help_display(NULL, &help_entry);
 	return;
 
     default:

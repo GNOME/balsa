@@ -81,7 +81,7 @@ GtkWidget * fe_condition_delete_button,* fe_condition_edit_button;
 /* ******************************** */
 
 option_list fe_search_type[] = {
-    {N_("Simple"), CONDITION_SIMPLE, NULL},
+    {N_("Substring lookup"), CONDITION_SIMPLE, NULL},
     {N_("Regular Expression"), CONDITION_REGEX, NULL},
     {N_("Date interval"),CONDITION_DATE,NULL},
     {N_("Flag condition"),CONDITION_FLAG,NULL}

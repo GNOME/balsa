@@ -1,3 +1,15 @@
+2002-10-05  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/filter-file.c: use same fixed date format to 
+	store/load filters dates : %Y-%m-%d
+	* src/main-window.c: add the Edit/Apply Filters menu to the 
+	mailbox menu.
+	* src/filter-{edit,run}-callbacks.c : add link to help.
+	* src/filter-edit-callbacks.c: fix an i18n problem with 
+	conditions names;
+	* src/filter-edit-dialog.c: rename a condition type to be more 
+	understandable.
+
 2002-10-07  Emmanuel <e.allaud@wanadoo.fr>
 
 	* src/filter-run-callbacks.c: add missing sync_backend in filter code.

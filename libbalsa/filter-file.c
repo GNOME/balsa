@@ -297,12 +297,12 @@ libbalsa_condition_save_config(LibBalsaCondition * cond)
 	break;
     case CONDITION_DATE:
 	if (cond->match.interval.date_low)
-	    strftime(str, sizeof(str), "%G-%m-%d",
+	    strftime(str, sizeof(str), "%Y-%m-%d",
                      localtime(&cond->match.interval.date_low));
 	else str[0] = '\0';
 	gnome_config_set_string("Low-date", str);
 	if (cond->match.interval.date_high)
-	    strftime(str, sizeof(str), "%G-%m-%d",
+	    strftime(str, sizeof(str), "%Y-%m-%d",
                      localtime(&cond->match.interval.date_high));
 	else str[0]='\0';
 	gnome_config_set_string("High-date",str);

@@ -202,6 +202,7 @@ static void find_cb(GtkWidget * widget, gpointer data);
 static void find_again_cb(GtkWidget * widget, gpointer data);
 static void filter_dlg_cb(GtkWidget * widget, gpointer data);
 static void filter_export_cb(GtkWidget * widget, gpointer data);
+static void filter_run_cb(GtkWidget * widget, gpointer data);
 
 static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
@@ -629,6 +630,12 @@ static GnomeUIInfo mailbox_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("Empty _Trash"),
                            N_("Delete messages from the Trash mailbox"),
                            empty_trash, GNOME_STOCK_PIXMAP_REMOVE),
+    GNOMEUIINFO_SEPARATOR,
+#define MENU_MAILBOX_APPLY_FILTERS 16
+    GNOMEUIINFO_ITEM_STOCK(N_("Edit/Apply Filters"),
+                           N_("Filter the content of the selected mailbox"),
+                           filter_run_cb, GNOME_STOCK_MENU_PROP),
+
     GNOMEUIINFO_END
 };
 
@@ -2515,6 +2522,21 @@ static void
 filter_export_cb(GtkWidget * widget, gpointer data)
 {
     filters_export_dialog();
+}
+
+static void
+filter_run_cb(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *index = balsa_window_find_current_index(BALSA_WINDOW(data));
+
+    if (index)
+        filters_run_dialog(BALSA_INDEX(index)->mailbox_node->mailbox);
+    else
+	/* FIXME : Perhaps should we be able to apply filters on folders (ie recurse on all mailboxes in it),
+	   but there are problems of infinite recursion (when one mailbox being filtered is also the destination
+	   of the filter action (eg a copy)). So let's see that later :) */
+	balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
+                          _("You can apply filters only on mailbox\n"));
 }
 
 /* closes the mailbox on the notebook's active page */

@@ -11,15 +11,15 @@ Contributors:  (major)
 
 Special thanks to:
 
-  Tuomas Kuosmanen:
+  Tuomas Kuosmanen <tigert@gimp.org>
     for all the beutiful icons in Balsa!  These add so much to
     Balsa!  I know I keep asking you for things and I really appriciate
     everything you have done!  Also thanks for the awsome Balsa logo!
   
-  Nat Friedman:
+  Nat Friedman <nat@nat.org>
     for doing the libPropList work in Balsa.
 
-  Manish Singh:
+  Manish Singh <yosh@gimp.org>
     for always looking at stuff when I need help.  Especially with
     autoconf stuff.
 

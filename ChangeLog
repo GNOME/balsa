@@ -1,3 +1,8 @@
+2003-02-12 07:49  PeterB
+
+	* src/balsa-mblist.c: Fix #105871: make mblist columns resizable
+	again.
+
 2003-02-11 19:13  PeterB
 
 	* src/balsa-index.c: Use a weak pointer to find out when the

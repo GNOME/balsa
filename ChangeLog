@@ -4,6 +4,7 @@
 	* libbalsa/imap/imap-commands.c: re-select message correctly.
 	* src/Makefile.am: mark built sources correctly.
 	* src/main.c: fix periodic expunge code.
+	* src/sendmsg-window.c: remove '\n' added by ctime_r().
 
 2004-08-08  Carlos Morgado  <chbm gnome.org>
 

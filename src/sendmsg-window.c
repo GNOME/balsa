@@ -3666,7 +3666,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	    message->references = g_list_reverse(message->references);
 	}
 	ctime_r(&bsmsg->orig_message->headers->date, recvtime);
-
+        if(recvtime[0]) /* safety check; remove trailing '\n' */
+            recvtime[strlen(recvtime)-1] = '\0';
 	if (bsmsg->orig_message->message_id) {
 	    message->references =
 		g_list_append(message->references,

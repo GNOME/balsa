@@ -307,10 +307,10 @@ static gboolean
 scan_mailboxes_idle_cb()
 {
     gdk_threads_enter();
-    balsa_mailbox_nodes_lock(FALSE);
+    balsa_mailbox_nodes_lock(TRUE);
     g_node_traverse(balsa_app.mailbox_nodes, G_POST_ORDER, G_TRAVERSE_ALL, -1,
                     append_subtree_f, NULL);
-    balsa_mailbox_nodes_unlock(FALSE);
+    balsa_mailbox_nodes_unlock(TRUE);
     gdk_threads_leave();
 
     if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox)

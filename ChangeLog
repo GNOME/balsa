@@ -1,3 +1,8 @@
+2003-11-13 08:57  PeterB
+
+	* libbalsa/mailbox.c: Implement GtkTreeDragSource
+	interface--trivial, but necessary to support dnd.
+
 2003-11-12 16:26  PeterB
 
 	* src/balsa-message.c: Ref widget when passing to idle handler.

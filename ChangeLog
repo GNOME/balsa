@@ -1,3 +1,10 @@
+2004-04-26 20:00  PeterB
+
+	* libbalsa/filter-file.c, libbalsa/filter-funcs.c,
+	libbalsa/filter.h, libbalsa/mailbox.c, src/filter-edit-callbacks.c,
+	src/save-restore.c: ease migration of filters from 2.0-style config
+	to 2.1-style.
+
 2004-04-25 11:35  PeterB
 
 	* libbalsa/send.c: check for error return from

@@ -1,3 +1,8 @@
+2004-01-11 12:32  PeterB
+
+	* src/balsa-message.c: Plug a memory leak; allow 2-pixel motion
+	tolerance when activating a URL.
+
 2004-01-11  Pawel Salek
 
 	* libbalsa/filter-funcs.[hc]: fix remaining problems with
